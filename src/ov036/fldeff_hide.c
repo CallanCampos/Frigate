@@ -1,6 +1,8 @@
 // The objects an actor hides in or behind. The name is the ROM's own, from GFL_HeapAllocate's file argument. Function
 // names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
@@ -41,35 +43,35 @@ typedef struct {
     u16 anmId;
 } HideResIds;
 
-static void func_ov036_021c6720(FieldEffectHide *effect);
-static void func_ov036_021c679c(FieldEffectHide *effect);
-static void func_ov036_021c6834(FieldEffectTask *task, void *work);
+static void Hide_LoadObjects(FieldEffectHide *effect);
+static void Hide_FreeObjects(FieldEffectHide *effect);
+static void HideTask_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021c6860(FieldEffectTask *task, void *work);
-static void func_ov036_021c687c(FieldEffectTask *task, void *work);
-static void func_ov036_021c68c4(FieldEffectTask *task, void *work);
+static void HideTask_UpdatePosition(FieldEffectTask *task, void *work);
+static void HideTask_Draw(FieldEffectTask *task, void *work);
 
-static const u32 HIDE_SE_IDS[HIDE_KIND_COUNT] = { 0x570, 0x7a5, 0x87e };
+static const u32 HIDE_SE_IDS[HIDE_KIND_COUNT] = { SEQ_SE_TB_START, SEQ_SE_FLD_149, SEQ_SE_OCHIBA_01 };
 
 static const HideResIds HIDE_RES_IDS[HIDE_KIND_COUNT] = { { 0x5e, 0x6d }, { 0x5d, 0x6c }, { 0x62, 0x86 } };
 
 static const FieldEffectTaskVTable HIDE_TASK_VTABLE = {
-    sizeof(HideTask), func_ov036_021c6834, func_ov036_021c6860, func_ov036_021c687c, func_ov036_021c68c4,
+    sizeof(HideTask), HideTask_Init, func_ov036_021c6860, HideTask_UpdatePosition, HideTask_Draw,
 };
 
 void *func_ov036_021c66e8(FieldEffects *effects, HeapID heapId) {
     FieldEffectHide *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectHide), TRUE, "fldeff_hide.c", 107);
 
     effect->effects = effects;
-    func_ov036_021c6720(effect);
+    Hide_LoadObjects(effect);
     return effect;
 }
 
 void func_ov036_021c670c(FieldEffects *effects, void *data) {
-    func_ov036_021c679c(data);
+    Hide_FreeObjects(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021c6720(FieldEffectHide *effect) {
+static void Hide_LoadObjects(FieldEffectHide *effect) {
     FieldG3DObjResRequest request;
     int i = 0;
     const HideResIds *ids = HIDE_RES_IDS;
@@ -87,7 +89,7 @@ static void func_ov036_021c6720(FieldEffectHide *effect) {
     }
 }
 
-static void func_ov036_021c679c(FieldEffectHide *effect) {
+static void Hide_FreeObjects(FieldEffectHide *effect) {
     int i = 0;
     FieldG3DObjSystem *objSys = func_ov036_021a3724(effect->effects);
 
@@ -128,7 +130,7 @@ u16 func_ov036_021c6820(FieldEffectTask *task) {
     return TRUE;
 }
 
-static void func_ov036_021c6834(FieldEffectTask *task, void *work) {
+static void HideTask_Init(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
     HideTaskParams *params = func_ov036_021a3ac8(task);
 
@@ -145,7 +147,7 @@ static void func_ov036_021c6860(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021c687c(FieldEffectTask *task, void *work) {
+static void HideTask_UpdatePosition(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
     VecFx32 pos;
     fx32 height;
@@ -161,7 +163,7 @@ static void func_ov036_021c687c(FieldEffectTask *task, void *work) {
     func_ov036_021a3ae8(task, &pos);
 }
 
-static void func_ov036_021c68c4(FieldEffectTask *task, void *work) {
+static void HideTask_Draw(FieldEffectTask *task, void *work) {
     HideTask *hideTask = work;
     VecFx32 pos;
 

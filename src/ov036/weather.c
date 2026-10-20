@@ -15,6 +15,7 @@
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/tcb.h"
+#include "system/zone_weather.h"
 
 typedef struct {
     Field3DBg *layers[2];
@@ -44,7 +45,7 @@ static void func_ov036_02199248(TCB *tcb, void *data);
 static BOOL func_ov036_02199260(FieldWeather *weather, u32 weatherId);
 static void func_ov036_02199294(FieldWeather *weather, HeapID heapId);
 static void func_ov036_02199330(FieldWeather *weather, HeapID heapId);
-static u32 func_ov036_021993a4(u32 current, u32 next);
+static u32 func_ov036_021993a4(u16 current, u16 next);
 
 static const Field3DBgInit WEATHER_BG_SETUPS[2] = {
     { 0x100, 0xc0, FX32_CONST(80), 0 },
@@ -54,11 +55,14 @@ static const Field3DBgInit WEATHER_BG_SETUPS[2] = {
 static const ClActSurfaceSetup WEATHER_SURFACE_SETUP = { 0, 0, 0x100, 0xc0, 0, 1 };
 
 static const WeatherOverlay WEATHER_OVERLAYS[15] = {
-    { &SUNNY_WEATHER, 0x4a },        { &FLAKE_WEATHER, 0x4b },      { &RAIN_WEATHER, 0x4c },
-    { &SANDSTORM_WEATHER, 0x4d },    { &BLIZZARD_WEATHER, 0x4b },   { &FLUTTER_WEATHER, 0x4b },
-    { &THUNDERSTORM_WEATHER, 0x4c }, { &GUSTY_RAIN_WEATHER, 0x4c }, { &SPECK_WEATHER, 0x4b },
-    { &TINT_WEATHER_9, 0x4e },       { &TINT_WEATHER_10, 0x4e },    { &TINT_WEATHER_11, 0x4e },
-    { &SANDSTORM_WEATHER_2, 0x4d },  { &TINT_WEATHER_13, 0x4e },    { &TINT_WEATHER_14, 0x4e },
+    { &SUNNY_WEATHER, OVERLAY_ID(74) },        { &FLAKE_WEATHER, OVERLAY_ID(75) },
+    { &RAIN_WEATHER, OVERLAY_ID(76) },         { &SANDSTORM_WEATHER, OVERLAY_ID(77) },
+    { &BLIZZARD_WEATHER, OVERLAY_ID(75) },     { &FLUTTER_WEATHER, OVERLAY_ID(75) },
+    { &THUNDERSTORM_WEATHER, OVERLAY_ID(76) }, { &GUSTY_RAIN_WEATHER, OVERLAY_ID(76) },
+    { &SPECK_WEATHER, OVERLAY_ID(75) },        { &TINT_WEATHER_9, OVERLAY_ID(78) },
+    { &TINT_WEATHER_10, OVERLAY_ID(78) },      { &TINT_WEATHER_11, OVERLAY_ID(78) },
+    { &SANDSTORM_WEATHER_2, OVERLAY_ID(77) },  { &TINT_WEATHER_13, OVERLAY_ID(78) },
+    { &TINT_WEATHER_14, OVERLAY_ID(78) },
 };
 
 static WeatherTransitionFunc WEATHER_TRANSITION_FUNCS[2] = {
@@ -66,7 +70,7 @@ static WeatherTransitionFunc WEATHER_TRANSITION_FUNCS[2] = {
     func_ov036_02199330,
 };
 
-void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u32 season,
+void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u16 season,
                           HeapID heapId) {
     FieldWeather *weather;
     ClActRenderer *renderer;
@@ -78,9 +82,9 @@ void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void 
     }
     weather->transition = 0;
     weather->state = 0;
-    weather->current = 0xffff;
-    weather->next = 0xffff;
-    weather->pending = 0xffff;
+    weather->current = WEATHER_NONE;
+    weather->next = WEATHER_NONE;
+    weather->pending = WEATHER_NONE;
     weather->overlayId = -1;
     weather->actUnit = ClActUnit_Create(0x40, 8, heapId);
     renderer = ClActRenderer_Create(&WEATHER_SURFACE_SETUP, 1, heapId);
@@ -118,9 +122,9 @@ void FieldWeather_Update(void *weatherPtr, HeapID heapId) {
     s32 i;
 
     WEATHER_TRANSITION_FUNCS[weather->transition](weather, heapId);
-    if (weather->state == 0 && weather->pending != 0xffff) {
+    if (weather->state == 0 && weather->pending != WEATHER_NONE) {
         func_ov036_02199208(weather, weather->pending);
-        weather->pending = 0xffff;
+        weather->pending = WEATHER_NONE;
     }
     for (i = 0; i < 2; i++) {
         func_ov036_02199434(weather->tasks[i], heapId);
@@ -167,7 +171,7 @@ void SetWeatherInit(void *weatherPtr, u16 weatherId, HeapID heapId) {
     func_ov036_02199224(weather, WEATHER_OVERLAYS[weatherId].overlayId);
     func_ov036_02199618(weather->tasks[0], WEATHER_OVERLAYS[weatherId].data, 0, 0, 1, 1, heapId);
     weather->current = weatherId;
-    weather->next = 0xffff;
+    weather->next = WEATHER_NONE;
 }
 
 void func_ov036_02199208(void *weather, u32 weatherId) {
@@ -243,7 +247,7 @@ static void func_ov036_02199294(FieldWeather *weather, HeapID heapId) {
         func_ov036_02199618(weather->tasks[0], WEATHER_OVERLAYS[weather->next].data, 1, 1, 1, weather->fadeIn, heapId);
         weather->current = weather->next;
         weather->fadeIn = TRUE;
-        weather->next = 0xffff;
+        weather->next = WEATHER_NONE;
         weather->state = 0;
         break;
     }
@@ -266,7 +270,7 @@ static void func_ov036_02199330(FieldWeather *weather, HeapID heapId) {
             weather->tasks[0] = weather->tasks[1];
             weather->current = weather->next;
             weather->tasks[1] = task;
-            weather->next = 0xffff;
+            weather->next = WEATHER_NONE;
             weather->fadeIn = TRUE;
             weather->state = 0;
         }
@@ -274,12 +278,12 @@ static void func_ov036_02199330(FieldWeather *weather, HeapID heapId) {
     }
 }
 
-static u32 func_ov036_021993a4(u32 current, u32 next) {
+static u32 func_ov036_021993a4(u16 current, u16 next) {
     u32 result = FALSE;
 
     switch (current) {
     case 1:
-        if ((u16)(next + 0xfffc) <= 1) {
+        if (next == 4 || next == 5) {
             result = TRUE;
         }
         break;

@@ -2,6 +2,7 @@
 // as the mission runs. The ROM names the file in its heap allocation. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). The code was first written by mariano54 on their
 // parallel-decomp branch.
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
@@ -117,30 +118,30 @@ typedef struct {
     FieldFMissionInfo *info;
 } FieldFMissionBlink;
 
-static void func_ov036_021b5cbc(FieldFMissionInfo *info, ArcTool *arc);
-static void func_ov036_021b5d4c(FieldFMissionInfo *info);
-static ClActor *func_ov036_021b5d78(FieldFMissionInfo *info, s16 x, s16 y, u16 sequence, u8 priority);
-static void func_ov036_021b5dc8(FieldFMissionInfo *info);
-static void func_ov036_021b5f24(FieldFMissionInfo *info);
-static void func_ov036_021b5f48(FieldFMissionInfo *info, BOOL visible);
-static void func_ov036_021b5f64(FieldFMissionInfo *info);
-static BOOL func_ov036_021b5f84(FieldFMissionInfo *info);
-static u32 func_ov036_021b5f98(u32 value, u8 digit);
-static void func_ov036_021b5fd4(FieldFMissionInfo *info, u32 value, int digits, int firstActor, BOOL showZeros);
-static void func_ov036_021b6040(FieldFMissionInfo *info, BOOL force);
-static void func_ov036_021b60a0(FieldFMissionInfo *info);
-static void func_ov036_021b60d0(FieldFMissionInfo *info, u8 actor, u16 x);
-static void func_ov036_021b60ec(int mode, int score, u16 *iconX, u16 *scoreX);
-static void func_ov036_021b60f8(FieldFMissionInfo *info);
-static void func_ov036_021b616c(FieldFMissionInfo *info);
-static void func_ov036_021b61e8(FieldFMissionInfo *info, u8 first, u8 count, int yOffset);
-static void func_ov036_021b62d4(TCBEx *task, void *data);
-static void func_ov036_021b6368(FieldFMissionInfo *info);
-static void func_ov036_021b63dc(TCBEx *task, void *data);
-static void func_ov036_021b6410(FieldFMissionInfo *info);
-static void func_ov036_021b6474(TCBEx *task, void *data);
+static void FieldFMissionInfo_LoadResources(FieldFMissionInfo *info, ArcTool *arc);
+static void FieldFMissionInfo_FreeResources(FieldFMissionInfo *info);
+static ClActor *FieldFMissionInfo_CreateActor(FieldFMissionInfo *info, s16 x, s16 y, u16 sequence, u8 priority);
+static void FieldFMissionInfo_CreateActors(FieldFMissionInfo *info);
+static void FieldFMissionInfo_DeleteActors(FieldFMissionInfo *info);
+static void FieldFMissionInfo_SetActorsVisible(FieldFMissionInfo *info, BOOL visible);
+static void FieldFMissionInfo_Hide(FieldFMissionInfo *info);
+static BOOL FieldFMissionInfo_IsGroupVisible(FieldFMissionInfo *info);
+static u32 FieldFMissionInfo_GetDigit(u32 value, u8 digit);
+static void FieldFMissionInfo_SetNumber(FieldFMissionInfo *info, u32 value, int digits, int firstActor, BOOL showZeros);
+static void FieldFMissionInfo_UpdateTime(FieldFMissionInfo *info, BOOL force);
+static void FieldFMissionInfo_UpdateGroupCount(FieldFMissionInfo *info);
+static void FieldFMissionInfo_SetActorX(FieldFMissionInfo *info, u8 actor, u16 x);
+static void FieldFMissionInfo_GetScoreLayout(int mode, int score, u16 *iconX, u16 *scoreX);
+static void FieldFMissionInfo_UpdateScore(FieldFMissionInfo *info);
+static void FieldFMissionInfo_Show(FieldFMissionInfo *info);
+static void FieldFMissionInfo_StartSlide(FieldFMissionInfo *info, u8 first, u8 count, int yOffset);
+static void FieldFMissionInfo_SlideTask(TCBEx *task, void *data);
+static void FieldFMissionInfo_UpdateScoreHighlight(FieldFMissionInfo *info);
+static void FieldFMissionInfo_ScoreHighlightTask(TCBEx *task, void *data);
+static void FieldFMissionInfo_UpdateTimeHighlight(FieldFMissionInfo *info);
+static void FieldFMissionInfo_TimeHighlightTask(TCBEx *task, void *data);
 
-void *func_ov036_021b5b7c(GameSystem *gsys, HeapID heapId) {
+void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId) {
     FieldFMissionInfo *info = GFL_HeapAllocate(heapId, sizeof(FieldFMissionInfo), TRUE, "field_fmission_info.c", 192);
 
     info->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_FMISSION_INFO, heapId);
@@ -149,26 +150,26 @@ void *func_ov036_021b5b7c(GameSystem *gsys, HeapID heapId) {
     info->festival = GSYS_GetLinkFestival(gsys);
     info->config = GetFestMissionCfg(info->festival);
     info->seconds = 0xffff;
-    func_ov036_021b5cbc(info, info->arc);
-    func_ov036_021b5dc8(info);
+    FieldFMissionInfo_LoadResources(info, info->arc);
+    FieldFMissionInfo_CreateActors(info);
     info->tasks = GFL_TCBExMgrCreate(info->heapId, info->heapId, 16, 128);
     GFL_ArcToolFree(info->arc);
     info->arc = NULL;
-    func_ov036_021b5f64(info);
+    FieldFMissionInfo_Hide(info);
     return info;
 }
 
-void func_ov036_021b5bfc(void *work) {
+void FieldFMissionInfo_Free(void *work) {
     FieldFMissionInfo *info = work;
 
     GFL_TCBExMgrFreeTasks(info->tasks);
     GFL_TCBExMgrFree(info->tasks);
-    func_ov036_021b5f24(info);
-    func_ov036_021b5d4c(info);
+    FieldFMissionInfo_DeleteActors(info);
+    FieldFMissionInfo_FreeResources(info);
     GFL_HeapFree(info);
 }
 
-void func_ov036_021b5c28(void *work) {
+void FieldFMissionInfo_Update(void *work) {
     FieldFMissionInfo *info = work;
 
     if (isFesMissionAvailable(info->config)) {
@@ -177,30 +178,30 @@ void func_ov036_021b5c28(void *work) {
         // The ROM reads shown again for the second test
         if (info->shown) {
             if (running) {
-                func_ov036_021b5f64(info);
+                FieldFMissionInfo_Hide(info);
             } else {
-                func_ov036_021b6368(info);
-                func_ov036_021b6410(info);
+                FieldFMissionInfo_UpdateScoreHighlight(info);
+                FieldFMissionInfo_UpdateTimeHighlight(info);
             }
         } else if (!info->shown && !running) {
-            func_ov036_021b616c(info);
+            FieldFMissionInfo_Show(info);
         }
         GFL_TCBExMgrUpdate(info->tasks);
     }
 }
 
-void func_ov036_021b5c78(void *work) {
+void FieldFMissionInfo_UpdateDisplay(void *work) {
     FieldFMissionInfo *info = work;
 
     if (isFesMissionAvailable(info->config) && info->shown) {
-        func_ov036_021b6040(info, FALSE);
-        info->groupVisible = func_ov036_021b5f84(info);
-        func_ov036_021b60a0(info);
-        func_ov036_021b60f8(info);
+        FieldFMissionInfo_UpdateTime(info, FALSE);
+        info->groupVisible = FieldFMissionInfo_IsGroupVisible(info);
+        FieldFMissionInfo_UpdateGroupCount(info);
+        FieldFMissionInfo_UpdateScore(info);
     }
 }
 
-static void func_ov036_021b5cbc(FieldFMissionInfo *info, ArcTool *arc) {
+static void FieldFMissionInfo_LoadResources(FieldFMissionInfo *info, ArcTool *arc) {
     info->unit = ClActUnit_Create(FMISSION_ACTOR_COUNT, 0, info->heapId);
     {
         ClActSurfaceSetup surface = { 0, 0, 256, 192, 0, 2 };
@@ -216,7 +217,7 @@ static void func_ov036_021b5cbc(FieldFMissionInfo *info, ArcTool *arc) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 }
 
-static void func_ov036_021b5d4c(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_FreeResources(FieldFMissionInfo *info) {
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, FALSE);
     ClActSys_FreeCellAnims(info->cellAnims);
     ClActSys_FreeChars(info->chars);
@@ -225,7 +226,7 @@ static void func_ov036_021b5d4c(FieldFMissionInfo *info) {
     ClActUnit_Delete(info->unit);
 }
 
-static ClActor *func_ov036_021b5d78(FieldFMissionInfo *info, s16 x, s16 y, u16 sequence, u8 priority) {
+static ClActor *FieldFMissionInfo_CreateActor(FieldFMissionInfo *info, s16 x, s16 y, u16 sequence, u8 priority) {
     ClActorSetup setup;
     ClActor *actor;
 
@@ -242,39 +243,40 @@ static ClActor *func_ov036_021b5d78(FieldFMissionInfo *info, s16 x, s16 y, u16 s
     return actor;
 }
 
-static void func_ov036_021b5dc8(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_CreateActors(FieldFMissionInfo *info) {
     int i;
 
-    info->actors[FMISSION_ACTOR_GROUP_LABEL] = func_ov036_021b5d78(info, 0, 144, FMISSION_SEQ_GROUP_LABEL, 2);
-    info->actors[FMISSION_ACTOR_SCORE_LABEL] = func_ov036_021b5d78(info, 0, 168, FMISSION_SEQ_SCORE_LABEL, 2);
-    info->actors[FMISSION_ACTOR_TIME_PANEL] = func_ov036_021b5d78(info, 176, 0, FMISSION_SEQ_TIME_PANEL, 2);
+    info->actors[FMISSION_ACTOR_GROUP_LABEL] = FieldFMissionInfo_CreateActor(info, 0, 144, FMISSION_SEQ_GROUP_LABEL, 2);
+    info->actors[FMISSION_ACTOR_SCORE_LABEL] = FieldFMissionInfo_CreateActor(info, 0, 168, FMISSION_SEQ_SCORE_LABEL, 2);
+    info->actors[FMISSION_ACTOR_TIME_PANEL] = FieldFMissionInfo_CreateActor(info, 176, 0, FMISSION_SEQ_TIME_PANEL, 2);
     for (i = 0; i < FMISSION_COUNT_DIGITS; i++) {
         info->actors[i + FMISSION_ACTOR_GROUP_DIGITS] =
-            func_ov036_021b5d78(info, i * 8 + 46, 144, FMISSION_SEQ_GROUP_DIGIT, 1);
+            FieldFMissionInfo_CreateActor(info, i * 8 + 46, 144, FMISSION_SEQ_GROUP_DIGIT, 1);
         info->actors[i + FMISSION_ACTOR_SCORE_DIGITS] =
-            func_ov036_021b5d78(info, i * 8 + 44, 172, FMISSION_SEQ_DIGIT, 1);
+            FieldFMissionInfo_CreateActor(info, i * 8 + 44, 172, FMISSION_SEQ_DIGIT, 1);
     }
-    info->actors[FMISSION_ACTOR_ICON] = func_ov036_021b5d78(info, 80, 180, FMISSION_SEQ_ICONS, 1);
+    info->actors[FMISSION_ACTOR_ICON] = FieldFMissionInfo_CreateActor(info, 80, 180, FMISSION_SEQ_ICONS, 1);
     for (i = 0; i < FMISSION_TIME_DIGITS; i++) {
-        info->actors[i + FMISSION_ACTOR_MINUTES] = func_ov036_021b5d78(info, i * 8 + 204, 4, FMISSION_SEQ_DIGIT, 1);
+        info->actors[i + FMISSION_ACTOR_MINUTES] =
+            FieldFMissionInfo_CreateActor(info, i * 8 + 204, 4, FMISSION_SEQ_DIGIT, 1);
         // The seconds follow the minutes' columns, moved past the colon
         info->actors[i + FMISSION_ACTOR_SECONDS] =
-            func_ov036_021b5d78(info, (i + FMISSION_TIME_DIGITS) * 8 + 209, 4, FMISSION_SEQ_DIGIT, 1);
+            FieldFMissionInfo_CreateActor(info, (i + FMISSION_TIME_DIGITS) * 8 + 209, 4, FMISSION_SEQ_DIGIT, 1);
     }
-    info->actors[FMISSION_ACTOR_COLON] = func_ov036_021b5d78(info, 219, 4, FMISSION_SEQ_COLON, 1);
+    info->actors[FMISSION_ACTOR_COLON] = FieldFMissionInfo_CreateActor(info, 219, 4, FMISSION_SEQ_COLON, 1);
     func_0204c520(info->actors[FMISSION_ACTOR_COLON], TRUE);
-    info->actors[FMISSION_ACTOR_SCORE_FLASH] = func_ov036_021b5d78(info, 40, 172, FMISSION_SEQ_FLASH, 0);
-    info->actors[FMISSION_ACTOR_TIME_FLASH] = func_ov036_021b5d78(info, 208, 4, FMISSION_SEQ_FLASH, 0);
+    info->actors[FMISSION_ACTOR_SCORE_FLASH] = FieldFMissionInfo_CreateActor(info, 40, 172, FMISSION_SEQ_FLASH, 0);
+    info->actors[FMISSION_ACTOR_TIME_FLASH] = FieldFMissionInfo_CreateActor(info, 208, 4, FMISSION_SEQ_FLASH, 0);
     func_0204c520(info->actors[FMISSION_ACTOR_SCORE_FLASH], TRUE);
     func_0204c520(info->actors[FMISSION_ACTOR_TIME_FLASH], TRUE);
-    info->actors[FMISSION_ACTOR_SCORE_GAIN] = func_ov036_021b5d78(info, 104, 180, FMISSION_SEQ_SCORE_GAIN, 2);
-    info->actors[FMISSION_ACTOR_TIME_GAIN] = func_ov036_021b5d78(info, 104, 4, FMISSION_SEQ_TIME_GAIN, 2);
+    info->actors[FMISSION_ACTOR_SCORE_GAIN] = FieldFMissionInfo_CreateActor(info, 104, 180, FMISSION_SEQ_SCORE_GAIN, 2);
+    info->actors[FMISSION_ACTOR_TIME_GAIN] = FieldFMissionInfo_CreateActor(info, 104, 4, FMISSION_SEQ_TIME_GAIN, 2);
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {
         ClActor_GetSurfacePos(info->actors[i], &info->positions[i], CLACT_SURFACE_MAIN);
     }
 }
 
-static void func_ov036_021b5f24(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_DeleteActors(FieldFMissionInfo *info) {
     int i;
 
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {
@@ -283,7 +285,7 @@ static void func_ov036_021b5f24(FieldFMissionInfo *info) {
     }
 }
 
-static void func_ov036_021b5f48(FieldFMissionInfo *info, BOOL visible) {
+static void FieldFMissionInfo_SetActorsVisible(FieldFMissionInfo *info, BOOL visible) {
     int i;
 
     for (i = 0; i < FMISSION_ACTOR_COUNT; i++) {
@@ -291,29 +293,30 @@ static void func_ov036_021b5f48(FieldFMissionInfo *info, BOOL visible) {
     }
 }
 
-static void func_ov036_021b5f64(FieldFMissionInfo *info) {
-    func_ov036_021b5f48(info, FALSE);
+static void FieldFMissionInfo_Hide(FieldFMissionInfo *info) {
+    FieldFMissionInfo_SetActorsVisible(info, FALSE);
     info->shown = FALSE;
     ClActUnit_SetActive(info->unit, FALSE);
     info->scoreTimer = 0;
 }
 
-static BOOL func_ov036_021b5f84(FieldFMissionInfo *info) {
+static BOOL FieldFMissionInfo_IsGroupVisible(FieldFMissionInfo *info) {
     return LinkFestival_GetMemberCount(info->festival) > 1;
 }
 
-static u32 func_ov036_021b5f98(u32 value, u8 digit) {
+static u32 FieldFMissionInfo_GetDigit(u32 value, u8 digit) {
     u32 powers[8] = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 };
 
     return value % powers[digit + 1] / powers[digit];
 }
 
-static void func_ov036_021b5fd4(FieldFMissionInfo *info, u32 value, int digits, int firstActor, BOOL showZeros) {
+static void FieldFMissionInfo_SetNumber(FieldFMissionInfo *info, u32 value, int digits, int firstActor,
+                                        BOOL showZeros) {
     int i;
     BOOL started = FALSE;
 
     for (i = digits - 1; i >= 0; i--) {
-        int digit = func_ov036_021b5f98(value, i);
+        int digit = FieldFMissionInfo_GetDigit(value, i);
 
         if (i > 0 && !showZeros) {
             BOOL visible = FALSE;
@@ -331,13 +334,13 @@ static void func_ov036_021b5fd4(FieldFMissionInfo *info, u32 value, int digits, 
     }
 }
 
-static void func_ov036_021b6040(FieldFMissionInfo *info, BOOL force) {
+static void FieldFMissionInfo_UpdateTime(FieldFMissionInfo *info, BOOL force) {
     int time = LinkFestival_GetSecondsLeft(info->festival);
     int minutes = time / 60;
 
     if (time != info->seconds || force) {
-        func_ov036_021b5fd4(info, minutes % 60, FMISSION_TIME_DIGITS, FMISSION_ACTOR_MINUTES, TRUE);
-        func_ov036_021b5fd4(info, time % 60, FMISSION_TIME_DIGITS, FMISSION_ACTOR_SECONDS, TRUE);
+        FieldFMissionInfo_SetNumber(info, minutes % 60, FMISSION_TIME_DIGITS, FMISSION_ACTOR_MINUTES, TRUE);
+        FieldFMissionInfo_SetNumber(info, time % 60, FMISSION_TIME_DIGITS, FMISSION_ACTOR_SECONDS, TRUE);
         info->seconds = time;
         if (!force && time > 0 && time <= 10) {
             GFL_SndSEPlay(SEQ_SE_DECIDE5);
@@ -345,66 +348,67 @@ static void func_ov036_021b6040(FieldFMissionInfo *info, BOOL force) {
     }
 }
 
-static void func_ov036_021b60a0(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_UpdateGroupCount(FieldFMissionInfo *info) {
     if (info->groupVisible) {
         ClActor_SetVisible(info->actors[FMISSION_ACTOR_GROUP_LABEL], TRUE);
-        func_ov036_021b5fd4(info, func_0201482c(info->festival), FMISSION_COUNT_DIGITS, FMISSION_ACTOR_GROUP_DIGITS,
-                            FALSE);
+        FieldFMissionInfo_SetNumber(info, func_0201482c(info->festival), FMISSION_COUNT_DIGITS,
+                                    FMISSION_ACTOR_GROUP_DIGITS, FALSE);
     }
 }
 
-static void func_ov036_021b60d0(FieldFMissionInfo *info, u8 actor, u16 x) {
+static void FieldFMissionInfo_SetActorX(FieldFMissionInfo *info, u8 actor, u16 x) {
     info->positions[actor].x = x;
     ClActor_SetSurfacePos(info->actors[actor], &info->positions[actor], CLACT_SURFACE_MAIN);
 }
 
 // Where the mission's icon and the player's score go, the same whatever the mission and the score
-static void func_ov036_021b60ec(int mode, int score, u16 *iconX, u16 *scoreX) {
+static void FieldFMissionInfo_GetScoreLayout(int mode, int score, u16 *iconX, u16 *scoreX) {
     *iconX = 80;
     *scoreX = 44;
 }
 
-static void func_ov036_021b60f8(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_UpdateScore(FieldFMissionInfo *info) {
     int i;
     int mode = info->config->info.unk10_6;
     int score = func_02014828(info->festival);
     u16 iconX;
     u16 scoreX;
 
-    func_ov036_021b5fd4(info, score, FMISSION_COUNT_DIGITS, FMISSION_ACTOR_SCORE_DIGITS, FALSE);
+    FieldFMissionInfo_SetNumber(info, score, FMISSION_COUNT_DIGITS, FMISSION_ACTOR_SCORE_DIGITS, FALSE);
     ClActor_SetSequence(info->actors[FMISSION_ACTOR_ICON], mode + FMISSION_SEQ_ICONS);
     ClActor_RestartAnim(info->actors[FMISSION_ACTOR_ICON]);
-    func_ov036_021b60ec(mode, score, &iconX, &scoreX);
-    func_ov036_021b60d0(info, FMISSION_ACTOR_ICON, iconX);
+    FieldFMissionInfo_GetScoreLayout(mode, score, &iconX, &scoreX);
+    FieldFMissionInfo_SetActorX(info, FMISSION_ACTOR_ICON, iconX);
     for (i = 0; i < FMISSION_COUNT_DIGITS; i++) {
-        func_ov036_021b60d0(info, i + FMISSION_ACTOR_SCORE_DIGITS, scoreX + i * 8);
+        FieldFMissionInfo_SetActorX(info, i + FMISSION_ACTOR_SCORE_DIGITS, scoreX + i * 8);
     }
 }
 
-static void func_ov036_021b616c(FieldFMissionInfo *info) {
-    info->groupVisible = func_ov036_021b5f84(info);
+static void FieldFMissionInfo_Show(FieldFMissionInfo *info) {
+    info->groupVisible = FieldFMissionInfo_IsGroupVisible(info);
     // The bottom's actors, from the group's label or the score's, slide up, and the top's slide down
     if (info->groupVisible) {
-        func_ov036_021b61e8(info, FMISSION_ACTOR_GROUP_LABEL, FMISSION_ACTOR_TIME_PANEL - FMISSION_ACTOR_GROUP_LABEL,
-                            48);
+        FieldFMissionInfo_StartSlide(info, FMISSION_ACTOR_GROUP_LABEL,
+                                     FMISSION_ACTOR_TIME_PANEL - FMISSION_ACTOR_GROUP_LABEL, 48);
     } else {
-        func_ov036_021b61e8(info, FMISSION_ACTOR_SCORE_LABEL, FMISSION_ACTOR_TIME_PANEL - FMISSION_ACTOR_SCORE_LABEL,
-                            48);
+        FieldFMissionInfo_StartSlide(info, FMISSION_ACTOR_SCORE_LABEL,
+                                     FMISSION_ACTOR_TIME_PANEL - FMISSION_ACTOR_SCORE_LABEL, 48);
     }
-    func_ov036_021b61e8(info, FMISSION_ACTOR_TIME_PANEL, FMISSION_ACTOR_COUNT - FMISSION_ACTOR_TIME_PANEL, -24);
-    func_ov036_021b6368(info);
-    func_ov036_021b6410(info);
-    func_ov036_021b6040(info, TRUE);
-    func_ov036_021b60a0(info);
-    func_ov036_021b60f8(info);
+    FieldFMissionInfo_StartSlide(info, FMISSION_ACTOR_TIME_PANEL, FMISSION_ACTOR_COUNT - FMISSION_ACTOR_TIME_PANEL,
+                                 -24);
+    FieldFMissionInfo_UpdateScoreHighlight(info);
+    FieldFMissionInfo_UpdateTimeHighlight(info);
+    FieldFMissionInfo_UpdateTime(info, TRUE);
+    FieldFMissionInfo_UpdateGroupCount(info);
+    FieldFMissionInfo_UpdateScore(info);
     info->shown = TRUE;
     ClActUnit_SetActive(info->unit, TRUE);
 }
 
-static void func_ov036_021b61e8(FieldFMissionInfo *info, u8 first, u8 count, int yOffset) {
+static void FieldFMissionInfo_StartSlide(FieldFMissionInfo *info, u8 first, u8 count, int yOffset) {
     FieldFMissionSlide *slide;
     int i;
-    TCBEx *task = GFL_TCBExMgrAddTask(info->tasks, func_ov036_021b62d4, sizeof(FieldFMissionSlide), 0);
+    TCBEx *task = GFL_TCBExMgrAddTask(info->tasks, FieldFMissionInfo_SlideTask, sizeof(FieldFMissionSlide), 0);
 
     slide = GFL_TCBExGetData(task);
     MI_CpuFill8(slide, 0, sizeof(FieldFMissionSlide));
@@ -427,7 +431,7 @@ static void func_ov036_021b61e8(FieldFMissionInfo *info, u8 first, u8 count, int
     slide->step = FX_Div(FX32_CONST(yOffset), FX32_CONST(slide->timer));
 }
 
-static void func_ov036_021b62d4(TCBEx *task, void *data) {
+static void FieldFMissionInfo_SlideTask(TCBEx *task, void *data) {
     FieldFMissionSlide *slide = data;
     FieldFMissionInfo *info = slide->info;
     int i;
@@ -451,7 +455,7 @@ static void func_ov036_021b62d4(TCBEx *task, void *data) {
     }
 }
 
-static void func_ov036_021b6368(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_UpdateScoreHighlight(FieldFMissionInfo *info) {
     u32 score = LinkFestival_GetTotalScore(info->festival);
 
     if (func_02014828(info->festival) < score) {
@@ -463,7 +467,8 @@ static void func_ov036_021b6368(FieldFMissionInfo *info) {
             FieldFMissionBlink *blink;
 
             info->scoreAnim = TRUE;
-            task = GFL_TCBExMgrAddTask(info->tasks, func_ov036_021b63dc, sizeof(FieldFMissionBlink), 0);
+            task =
+                GFL_TCBExMgrAddTask(info->tasks, FieldFMissionInfo_ScoreHighlightTask, sizeof(FieldFMissionBlink), 0);
             blink = GFL_TCBExGetData(task);
             MI_CpuFill8(blink, 0, sizeof(FieldFMissionBlink));
             blink->info = info;
@@ -473,7 +478,7 @@ static void func_ov036_021b6368(FieldFMissionInfo *info) {
     }
 }
 
-static void func_ov036_021b63dc(TCBEx *task, void *data) {
+static void FieldFMissionInfo_ScoreHighlightTask(TCBEx *task, void *data) {
     FieldFMissionBlink *blink = data;
     FieldFMissionInfo *info = blink->info;
 
@@ -487,7 +492,7 @@ static void func_ov036_021b63dc(TCBEx *task, void *data) {
     GFL_TCBExRequestEnd(task);
 }
 
-static void func_ov036_021b6410(FieldFMissionInfo *info) {
+static void FieldFMissionInfo_UpdateTimeHighlight(FieldFMissionInfo *info) {
     if (func_02014838(info->festival)) {
         info->timeTimer = FMISSION_HIGHLIGHT_FRAMES;
         func_0201483c(info->festival);
@@ -496,7 +501,7 @@ static void func_ov036_021b6410(FieldFMissionInfo *info) {
             FieldFMissionBlink *blink;
 
             info->timeAnim = TRUE;
-            task = GFL_TCBExMgrAddTask(info->tasks, func_ov036_021b6474, sizeof(FieldFMissionBlink), 0);
+            task = GFL_TCBExMgrAddTask(info->tasks, FieldFMissionInfo_TimeHighlightTask, sizeof(FieldFMissionBlink), 0);
             blink = GFL_TCBExGetData(task);
             MI_CpuFill8(blink, 0, sizeof(FieldFMissionBlink));
             blink->info = info;
@@ -506,7 +511,7 @@ static void func_ov036_021b6410(FieldFMissionInfo *info) {
     }
 }
 
-static void func_ov036_021b6474(TCBEx *task, void *data) {
+static void FieldFMissionInfo_TimeHighlightTask(TCBEx *task, void *data) {
     FieldFMissionBlink *blink = data;
     FieldFMissionInfo *info = blink->info;
 

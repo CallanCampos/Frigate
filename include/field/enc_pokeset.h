@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "field/encounter.h"
+#include "save/encounter.h"
 #include "struct_decls.h"
 
 // The kinds of encounter, which pick the zone's slots
@@ -81,10 +82,10 @@ typedef struct {
 void CreateEncountManager(EncountManager *manager, GameData *gameData, int encType, u32 mode, u16 weather);
 u32 FieldEncount_CalcEncountRate(EncountManager *manager, GameData *gameData, u32 rate);
 int FieldEncount_GenWilds(EncData *encData, EncountManager *manager, u16 zoneId, WildPkmParam *params);
-void *FieldEncount_RndCheckRoaming(EncountManager *manager, u32 zoneId);
+RoamingPkm *FieldEncount_RndCheckRoaming(EncountManager *manager, u32 zoneId);
 u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId);
-void FieldEncount_CreateWildPkm(PartyPkm *pkm, EncountManager *manager, WildPkmParam *param);
-void FieldEncount_GenRoamingPkm(PartyPkm *pkm, EncountManager *manager, void *roamingPkm);
+void FieldEncount_CreateWildPkm(PartyPkm *pkm, const EncountManager *manager, WildPkmParam *param);
+void FieldEncount_GenRoamingPkm(PartyPkm *pkm, const EncountManager *manager, const RoamingPkm *roamingPkm);
 void makeNPokeFromData(PartyPkm *pkm, u8 index);
 const SwarmData *getSwarmDataPtr(GameData *gameData);
 

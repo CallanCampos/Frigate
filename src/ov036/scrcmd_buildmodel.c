@@ -16,6 +16,8 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
+u16 g_ScrBMAnmWaitHandleID;
+
 // The world position of a tile
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
 

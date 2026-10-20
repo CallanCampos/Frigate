@@ -73,7 +73,7 @@ GameEvent *EventFieldSubprocessTransition_Create(GameSystem *gsys, Field *field,
                                                  const GameProcFunctions *functions, void *param);
 GameEvent *EventPlayerSpinDown_Create(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventQuicksandArrive_Create(GameEvent *event, GameSystem *gsys, Field *field);
-GameEvent *EventQuicksandDrawIn_Create(GameEvent *event, GameSystem *gsys, Field *field, VecFx32 *pos);
+GameEvent *EventQuicksandDrawIn_Create(GameEvent *event, GameSystem *gsys, Field *field, const VecFx32 *pos);
 GameEvent *EventTeleportEffect_Create(GameEvent *event, GameSystem *gsys, Field *field, BOOL a3);
 void func_ov036_021b50c8(PlaceName *placeName, s32 zoneId);
 void func_ov036_021b5168(PlaceName *placeName);

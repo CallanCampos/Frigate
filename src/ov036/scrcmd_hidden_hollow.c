@@ -1,7 +1,12 @@
-// The script commands of the Hidden Grottoes: rolling what a grotto holds, asking for it, and the events that take the
-// player in and out of one. The ROM has no name for the file; scrcmd_hidden_hollow.c is descriptive. Names from swan
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The script commands of the Hidden Grottoes: asking what a grotto holds, and the events that take the player in
+// and out of one. The ROM has no name for the file; scrcmd_hidden_hollow.c is descriptive. Rolling what a grotto
+// holds is hidden_hollow_generate.c, before it. Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/flags.h"
+#include "constants/obj_codes.h"
+#include "constants/species.h"
+#include "constants/zones.h"
 #include "field/event_mapchange.h"
 #include "field/fest_mission_hollow.h"
 #include "field/festival.h"
@@ -15,7 +20,6 @@
 #include "gfl/arc.h"
 #include "gfl/random.h"
 #include "save/event_work.h"
-#include "save/high_link.h"
 #include "save/misc_savedata.h"
 #include "save/save_control.h"
 #include "system/game_data.h"
@@ -24,10 +28,6 @@
 #include "system/tpoke_data.h"
 
 #define SLOT_ARC 0x111
-#define HOLLOW_COUNT 20
-#define SLOT_CHANCE_COUNT 10
-#define HOLLOW_ZONE 0x206
-#define FLAG_HOLLOW_EVENT 0x97f
 
 // Which of a grotto file's two sets of Pokémon the version reads
 #ifdef BLACK2
@@ -71,20 +71,9 @@ typedef struct {
     u8 hollow;
 } WarpOutWork;
 
-// By grotto, how likely each of the ten slots is, out of 100
-static const u8 HOLLOW_SLOT_CHANCES[HOLLOW_COUNT][SLOT_CHANCE_COUNT] = {
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-    { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 }, { 1, 4, 15, 1, 4, 10, 25, 1, 4, 10 },
-};
-
 // The level of a Pokémon that a grotto's mission gives, by grotto
-static const u8 HOLLOW_MISSION_LEVELS[HOLLOW_COUNT] = { 15, 25, 25, 30, 30, 35, 40, 40, 40, 50,
-                                                        45, 55, 40, 40, 60, 60, 60, 60, 60, 60 };
+static const u8 HOLLOW_MISSION_LEVELS[HIDDEN_HOLLOW_COUNT] = { 15, 25, 25, 30, 30, 35, 40, 40, 40, 50,
+                                                               45, 55, 40, 40, 60, 60, 60, 60, 60, 60 };
 
 static void CreateHiddenHollowWarpPosVec(VecFx32 *pos, u32 x, u32 y, u32 z);
 static void SetupHiddenHollowEvents(HollowEventWork *work);
@@ -95,43 +84,9 @@ static void CreateHiddenHollowItemActor(MMSys *actors);
 static GameEventReturnCode EventHiddenHollowWarpIn_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventHiddenHollowWarpOut_Callback(GameEvent *event, u32 *state, void *data);
 static HollowSlot *getSlotFilePtr(HollowFile *file, u32 slot);
-static void func_ov036_021c9394(HollowEventWork *work);
-static void func_ov036_021c93c0(HollowEventWork *work);
-static u32 func_ov036_021c9440(u32 hollow);
-
-void generateHollow(RivalDataSave *data, u8 hollow) {
-    u8 slot = 10;
-    u8 group = GFL_RandomLC(4);
-    u32 volume = PassPower_ApplyGrottoVolume(1);
-    u32 i = 0;
-    int j;
-    const u8 *chances;
-    u8 roll;
-    u8 sum;
-
-    if (volume != 0) {
-        do {
-            roll = GFL_RandomLC(100) + 1;
-            sum = 0;
-            chances = HOLLOW_SLOT_CHANCES[hollow];
-
-            for (j = 0; j < SLOT_CHANCE_COUNT; j++) {
-                sum += chances[j];
-                if (roll <= sum) {
-                    slot = j;
-                    break;
-                }
-            }
-            if (slot <= 2) {
-                break;
-            }
-        } while (++i < volume);
-    }
-    setSlot(data, hollow, slot);
-    setGroup(data, hollow, group);
-    setHollowGender(data, hollow, (u8)GFL_RandomLC(100));
-    setHollowStatus(data, hollow, TRUE);
-}
+static void CreateMissionHiddenHollowPokemonActor(HollowEventWork *work);
+static void ActivateHiddenHollowMission(HollowEventWork *work);
+static u32 GetHiddenHollowMissionLevel(u32 hollow);
 
 BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     void *gimmick;
@@ -142,9 +97,9 @@ BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     RivalEntry *entry;
     GameData *gameData;
     u16 *result;
-    BOOL mission;
+    u32 hollow;
     u8 group;
-    u8 hollow;
+    BOOL mission;
     HollowFile file;
 
     gameData = FieldScriptEnv_GetGameData(env);
@@ -157,7 +112,7 @@ BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
     slot = getSlotNumber(rival, hollow);
     group = getGroupNumber(rival, hollow);
     gimmick = Field_GetFesGimmick(field);
-    if (hollowFesMissions(gimmick, hollow) && RivalSelect_IsSelectedAndActive(gimmick, hollow) == 1) {
+    if (hollowFesMissions(gimmick, hollow) && RivalSelect_IsSelectedAndActive(gimmick, hollow) == TRUE) {
         entry = RivalSelect_GetEntry(gimmick, hollow);
         mission = TRUE;
     }
@@ -180,7 +135,7 @@ BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
             min = slotData->minLevel[group];
             *result = min + GFL_RandomLC((u8)(slotData->maxLevel[group] - min));
         } else {
-            *result = func_ov036_021c9440(hollow);
+            *result = GetHiddenHollowMissionLevel(hollow);
         }
         break;
     case 2:
@@ -232,14 +187,20 @@ BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env) {
-    GameData *gameData = FieldScriptEnv_GetGameData(env);
-    Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
-    BOOL mission = FALSE;
-    RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
-    u8 hollow = getHollowNum(rival);
-    void *gimmick = Field_GetFesGimmick(field);
+    GameData *gameData;
+    Field *field;
+    RivalDataSave *rival;
+    u32 hollow;
+    BOOL mission;
+    void *gimmick;
 
-    if (hollowFesMissions(gimmick, hollow) && RivalSelect_IsSelectedAndActive(gimmick, hollow) == 1) {
+    gameData = FieldScriptEnv_GetGameData(env);
+    field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
+    mission = FALSE;
+    rival = getHollow_RivalData(GameData_GetSaveControl(gameData));
+    hollow = getHollowNum(rival);
+    gimmick = Field_GetFesGimmick(field);
+    if (hollowFesMissions(gimmick, hollow) && RivalSelect_IsSelectedAndActive(gimmick, hollow) == TRUE) {
         mission = TRUE;
     }
     if (mission) {
@@ -279,7 +240,7 @@ static GameEventReturnCode EventHiddenHollowWarpIn_Callback(GameEvent *event, u3
     switch (*state) {
     case 0:
         setHollowNum(work->rival, work->hollow);
-        func_ov036_021c93c0(work);
+        ActivateHiddenHollowMission(work);
         DisableAllActorsMovement(Field_GetActorSystem(work->field));
         next = CallFieldMapEntranceOutTransitionDefault(work->gsys, work->field, 4, 0);
         GameEvent_ChainNext(event, next);
@@ -287,12 +248,12 @@ static GameEventReturnCode EventHiddenHollowWarpIn_Callback(GameEvent *event, u3
         break;
     case 1:
         CreateHiddenHollowWarpPosVec(&pos, 15, 0, 27);
-        next = EventMapChange_CreateGridDefault(work->gsys, work->field, HOLLOW_ZONE, &pos, 0);
+        next = EventMapChange_CreateGridDefault(work->gsys, work->field, ZONE_HIDDEN_GROTTO, &pos, 0);
         GameEvent_ChainNext(event, next);
         (*state)++;
         break;
     case 2:
-        if (FldActSys_IsAsyncLoadPending(Field_GetActorSystem(work->field)) == 1) {
+        if (FldActSys_IsAsyncLoadPending(Field_GetActorSystem(work->field)) == TRUE) {
             break;
         }
         next = CallFieldMapEntranceInTransition(work->gsys, work->field, 0, 1, 1, 0, 0);
@@ -320,21 +281,21 @@ static void SetupHiddenHollowEvents(HollowEventWork *work) {
         switch (type) {
         case 1:
             CreateGenericHiddenHollowPokemonActor(work);
-            EventWork_FlagReset(work->eventWork, FLAG_HOLLOW_EVENT);
+            EventWork_FlagReset(work->eventWork, EVENT_FLAG_0x097f);
             break;
         case 2:
             CreateHiddenHollowItemActor(work->actors);
-            EventWork_FlagReset(work->eventWork, FLAG_HOLLOW_EVENT);
+            EventWork_FlagReset(work->eventWork, EVENT_FLAG_0x097f);
             break;
         case 3:
-            EventWork_FlagSet(work->eventWork, FLAG_HOLLOW_EVENT);
+            EventWork_FlagSet(work->eventWork, EVENT_FLAG_0x097f);
             break;
         }
     } else {
         if (RivalSelect_IsSelectedAndActive(gimmick, work->hollow)) {
-            func_ov036_021c9394(work);
+            CreateMissionHiddenHollowPokemonActor(work);
         }
-        EventWork_FlagReset(work->eventWork, FLAG_HOLLOW_EVENT);
+        EventWork_FlagReset(work->eventWork, EVENT_FLAG_0x097f);
     }
 }
 
@@ -361,9 +322,9 @@ static void CreateHiddenHollowPokemonActor(MMSys *actors, u16 species, u16 sex, 
         TPokeData *data = LoadTPokeData(0x15);
         u16 objCode = GetPokemonFieldOBJCODE(data, species, sex, form);
         FreeTPokeData(data);
-        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, objCode, 0, HOLLOW_ZONE);
+        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, objCode, 0, ZONE_HIDDEN_GROTTO);
     } else {
-        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, 0x6e, 0, HOLLOW_ZONE);
+        actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, OBJ_CODE_110, 0, ZONE_HIDDEN_GROTTO);
     }
     SetActorSCRID(actor, 1);
     if (moves == 1) {
@@ -372,14 +333,14 @@ static void CreateHiddenHollowPokemonActor(MMSys *actors, u16 species, u16 sex, 
 }
 
 static BOOL isFoongusAmoongus(u16 species) {
-    if (species != 0x24f && species != 0x24e) {
+    if (species != SPECIES_AMOONGUSS && species != SPECIES_FOONGUS) {
         return FALSE;
     }
     return TRUE;
 }
 
 static void CreateHiddenHollowItemActor(MMSys *actors) {
-    FieldActor *actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, 0x6e, 0, HOLLOW_ZONE);
+    FieldActor *actor = CreateNewActorByParam(actors, 0xf, 0xc, 1, 0xe0, OBJ_CODE_110, 0, ZONE_HIDDEN_GROTTO);
 
     SetActorSCRID(actor, 2);
 }
@@ -427,7 +388,7 @@ static GameEventReturnCode EventHiddenHollowWarpOut_Callback(GameEvent *event, u
         break;
     }
     case 2:
-        if (FldActSys_IsAsyncLoadPending(Field_GetActorSystem(work->field)) == 1) {
+        if (FldActSys_IsAsyncLoadPending(Field_GetActorSystem(work->field)) == TRUE) {
             break;
         }
         next = CallFieldMapEntranceInTransition(work->gsys, work->field, 1, 1, 1, 0, 0);
@@ -464,14 +425,14 @@ BOOL s02E5_HiddenHollowSet(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static void func_ov036_021c9394(HollowEventWork *work) {
+static void CreateMissionHiddenHollowPokemonActor(HollowEventWork *work) {
     void *gimmick = Field_GetFesGimmick(work->field);
     RivalEntry *entry = RivalSelect_GetEntry(gimmick, work->hollow);
 
     CreateHiddenHollowPokemonActor(work->actors, entry->unk4, entry->unk1, entry->unk6, 1, 0x15);
 }
 
-static void func_ov036_021c93c0(HollowEventWork *work) {
+static void ActivateHiddenHollowMission(HollowEventWork *work) {
     void *gimmick;
 
     getTypeOfFilledSlot(work->rival, work->hollow);
@@ -501,6 +462,6 @@ BOOL s02E6_HiddenHollowCreateEvents(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static u32 func_ov036_021c9440(u32 hollow) {
+static u32 GetHiddenHollowMissionLevel(u32 hollow) {
     return HOLLOW_MISSION_LEVELS[hollow];
 }

@@ -1,5 +1,7 @@
 // The footprints and tracks that actors leave in sand, snow and deep sand, which fade after a while. The name is the
 // ROM's own, from GFL_HeapAllocate's file argument.
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
@@ -35,12 +37,12 @@ typedef struct {
     int timer;
 } FootmarkTask;
 
-static void func_ov036_021b4700(FieldEffectFootmark *footmark);
-static void func_ov036_021b4758(FieldEffectFootmark *footmark);
-static u32 func_ov036_021b4778(FieldEffectFootmark *footmark, u32 kind, u32 dir, u32 prevDir);
-static void func_ov036_021b4878(FieldEffectTask *task, void *work);
-static void func_ov036_021b48e8(FieldEffectTask *task, void *work);
-static void func_ov036_021b4904(FieldEffectTask *task, void *work);
+static void Footmark_LoadTextures(FieldEffectFootmark *footmark);
+static void Footmark_FreeTextures(FieldEffectFootmark *footmark);
+static u32 Footmark_GetTexture(FieldEffectFootmark *footmark, u32 kind, u32 dir, u32 prevDir);
+static void FootmarkTask_Init(FieldEffectTask *task, void *work);
+static void FootmarkTask_Delete(FieldEffectTask *task, void *work);
+static void FootmarkTask_Update(FieldEffectTask *task, void *work);
 static void func_ov036_021b4968(FieldEffectTask *task, void *work);
 
 // The tracks' texture, from 4, by the direction the actor came from and the one it goes to
@@ -54,9 +56,9 @@ static const u8 FOOTMARK_TRACK_TEXTURES[4][4] = {
 // clang-format off
 static const FieldEffectTaskVTable FOOTMARK_TASK_VTABLE = {
     sizeof(FootmarkTask),
-    func_ov036_021b4878,
-    func_ov036_021b48e8,
-    func_ov036_021b4904,
+    FootmarkTask_Init,
+    FootmarkTask_Delete,
+    FootmarkTask_Update,
     func_ov036_021b4968,
 };
 
@@ -73,17 +75,17 @@ void *func_ov036_021b46b0(FieldEffects *effects, HeapID heapId) {
 
     footmark->effects = effects;
     footmark->blact = Field_GetEffectBlAct(FieldEffects_GetField(effects));
-    func_ov036_021b4700(footmark);
+    Footmark_LoadTextures(footmark);
     footmark->sinkDepth = FX32_CONST(2);
     return footmark;
 }
 
 void func_ov036_021b46ec(FieldEffects *effects, void *data) {
-    func_ov036_021b4758(data);
+    Footmark_FreeTextures(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021b4700(FieldEffectFootmark *footmark) {
+static void Footmark_LoadTextures(FieldEffectFootmark *footmark) {
     const u16 *file = FOOTMARK_TEXTURE_FILES;
     ArcTool *arc = FieldEffects_GetArc(footmark->effects);
     BlActMatRequest request;
@@ -102,7 +104,7 @@ static void func_ov036_021b4700(FieldEffectFootmark *footmark) {
     }
 }
 
-static void func_ov036_021b4758(FieldEffectFootmark *footmark) {
+static void Footmark_FreeTextures(FieldEffectFootmark *footmark) {
     int i;
 
     for (i = 0; i < FOOTMARK_TEXTURE_COUNT; i++) {
@@ -111,7 +113,7 @@ static void func_ov036_021b4758(FieldEffectFootmark *footmark) {
 }
 
 // The texture of a mark of a kind, which the caller picks by the ground and the footprint type of the actor's model
-static u32 func_ov036_021b4778(FieldEffectFootmark *footmark, u32 kind, u32 dir, u32 prevDir) {
+static u32 Footmark_GetTexture(FieldEffectFootmark *footmark, u32 kind, u32 dir, u32 prevDir) {
     u32 texture = 0;
     u32 track;
 
@@ -144,11 +146,11 @@ void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FieldEffectFootmark *footmark = FieldEffects_GetHandleData(effects, 5);
 
     params.footmark = footmark;
-    texture = func_ov036_021b4778(footmark, kind, GetActorFaceDir(actor), GetActorLastFaceDir(actor));
+    texture = Footmark_GetTexture(footmark, kind, GetActorFaceDir(actor), GetActorLastFaceDir(actor));
     CopyActorWPos(actor, &pos);
     ConvGXZToVector(FldAct_GetInitGPosX(actor), FldAct_GetInitGPosZ(actor), &pos);
     // Footprints to the left or right, whose texture is the direction, sit a little further back.
-    // BUG: Deep sand's textures start at 20, so the second test never passes and its tracks never move back
+    // The retail deep-sand branch tests directional IDs outside its 20-25 track texture range.
     if (kind == 0 && (texture == 2 || texture == 3)) {
         pos.z -= FX32_CONST(2);
     } else if (kind == 4 && (texture == 2 || texture == 3)) {
@@ -161,7 +163,7 @@ void func_ov036_021b47c8(FieldActor *actor, FieldEffects *effects, u32 kind) {
     FieldEffects_TCBCreate(effects, &FOOTMARK_TASK_VTABLE, &pos, 0, &params, 0);
 }
 
-static void func_ov036_021b4878(FieldEffectTask *task, void *work) {
+static void FootmarkTask_Init(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
     FootmarkTaskParams *params = func_ov036_021a3ac8(task);
     BlActActorRequest request;
@@ -183,7 +185,7 @@ static void func_ov036_021b4878(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021b48e8(FieldEffectTask *task, void *work) {
+static void FootmarkTask_Delete(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
     BlActSys *blact = fmTask->params.footmark->blact;
 
@@ -193,7 +195,7 @@ static void func_ov036_021b48e8(FieldEffectTask *task, void *work) {
 }
 
 // Stay for 16 frames, then fade out
-static void func_ov036_021b4904(FieldEffectTask *task, void *work) {
+static void FootmarkTask_Update(FieldEffectTask *task, void *work) {
     FootmarkTask *fmTask = work;
     u8 alpha;
     BlActSys *blact;

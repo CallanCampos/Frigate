@@ -49,15 +49,15 @@ typedef struct {
 } TalkMsgWinSetup;
 
 // Loads the frame's characters and palette to the BG and allocates the tails' texture and palette in VRAM
-TalkMsgWinSys *func_ov036_0218b1f8(const TalkMsgWinSetup *setup);
+TalkMsgWinSys *TalkMsgWinSys_Create(const TalkMsgWinSetup *setup);
 // Loads the tails' texture and palette
 void loadTexture_wrapper(TalkMsgWinSys *sys);
 // Once a frame: runs the windows' print streams and opens, moves and closes them
-void func_ov036_0218b294(TalkMsgWinSys *sys);
+void TalkMsgWinSys_Update(TalkMsgWinSys *sys);
 void func_ov036_0218b2e8(TalkMsgWinSys *sys);
 // Draws the tails and the windows opening and closing
-void func_ov036_0218b2ec(TalkMsgWinSys *sys);
-void func_ov036_0218b320(TalkMsgWinSys *sys);
+void TalkMsgWinSys_Draw(TalkMsgWinSys *sys);
+void TalkMsgWinSys_Free(TalkMsgWinSys *sys);
 // Creates window index at a place of the screen, without a tail, and prints strbuf at textX and textY when opened. A
 // frameType is a TALKMSG_WIN_FRAME_ style
 void func_ov036_0218b370(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u8 x, u8 y, u8 width, u8 height, u32 unused,

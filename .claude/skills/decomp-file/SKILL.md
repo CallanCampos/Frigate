@@ -107,8 +107,11 @@ perfect function.
 ```
 
 Library code built with another compiler, such as SPL with `1.2/base` (`lib/spl/library.toml`), gets its
-compiler by default; leave out `--compilers`. The probe ignores relocated bytes, so a wrong call target or addend
-only shows in `ninja`'s module check.
+compiler by default; leave out `--compilers`. The probe ignores relocated bytes. For complete files, `ninja`'s module
+check catches wrong call targets and addends. An incomplete file still links its original assembly, so a passing
+build cannot check its C's relocations: compare the compiled object's callees and pool targets with the original
+`relocs.txt` and pool words in both versions, including signed versus unsigned runtime helpers. Do this even for a
+function the probe calls `MATCH`; identical instructions can call a different function.
 
 For each function left over, use the `match-function` skill: triage, a few rounds of levers, then stop under its rules.
 For several stubborn functions in different files, start one `function-matcher` agent per file, never two on the same

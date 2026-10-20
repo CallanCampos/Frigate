@@ -188,18 +188,6 @@ void func_ov036_02197288(FieldActor *actor);
 // The functions that run an action command: what to do on the first frame, each frame and at the end
 typedef BOOL (*ActorAcmdFunc)(FieldActor *actor);
 
-typedef struct {
-    ActorAcmdFunc start;
-    ActorAcmdFunc update;
-    ActorAcmdFunc end;
-} ActorAcmdFuncs;
-
-// An action command that is done in its first frame: what to do then, and at the end
-typedef struct {
-    ActorAcmdFunc start;
-    ActorAcmdFunc end;
-} ActorAcmdTurnFuncs;
-
 // The work of a jump along the rail, which fldmmdl_g3dobj.c's func_ov036_02195354 starts and fld_act_rail.c updates
 typedef struct {
     s32 speed;
@@ -280,7 +268,7 @@ void func_ov036_02195a58(FieldActor *actor, VecFx16 *dest);
 void GetActorRailPos(FieldActor *actor, RailPosition *position);
 BOOL func_ov036_02195928(FieldActor *actor, RailPosition *position);
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position);
-// Overlay 36's fld_act_rail.c: the actor's position as its rail unit holds it, the unit's step, the collision flags of
+// Overlay 36's fldmmdl_rail.c: the actor's position as its rail unit holds it, the unit's step, the collision flags of
 // a step in a direction (1 off the rails, 2 a blocked tile, 4 another actor), the first actor on a rail position other
 // than exclude, and the change of the actor's grid position to the one a step ahead
 void func_ov036_02195604(FieldActor *actor, RailPosition *position);
@@ -315,17 +303,10 @@ void func_ov036_02195c0c(FieldActor *actor);
 void func_ov036_02195c14(FieldActor *actor);
 void func_ov036_02195c1c(FieldActor *actor);
 void func_ov036_02195c24(FieldActor *actor);
-// Clears the rail data to no points, with the curves' and cameras' function tables
+// Overlay 36's rail_data_handle.c: clears the rail data to no points, with the curves' and cameras' function tables
 void RailDataHandle_Reset(RailDataHandle *handle);
 u32 GetIndexOfObjID(u16 objCode);
 
-// Overlay 36's table that func_ov036_02194650 indexes, by a record's unk9: the animations of the billboard actors
-typedef struct {
-    const BlActAnimStep *const *unk0;
-    u32 unk4;
-} Ov036Unk021cf1c8;
-
-extern const Ov036Unk021cf1c8 data_ov036_021cf1c8[];
 void FldAct_SetShadowGroup(FieldActor *actor, u32 group);
 u16 GetActorFaceDir(FieldActor *actor);
 void CheckSetActorFaceDir(FieldActor *actor, u16 dir);

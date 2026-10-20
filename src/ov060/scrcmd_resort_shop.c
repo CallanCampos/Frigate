@@ -8,6 +8,7 @@
 #include "field/field_camera.h"
 #include "field/field_msgbg.h"
 #include "field/field_script.h"
+#include "field/fldmmdl_drawdata.h"
 #include "field/game_beacon_set.h"
 #include "field/resort.h"
 #include "field/scrcmd_resort_shop.h"
@@ -1917,7 +1918,7 @@ static void ResortShop_ApplyPersonOrder(ResortShopWork *wk, u8 mode, u8 subMode)
 }
 
 static u8 ResortShop_GetTextureIndex(u32 index) {
-    return data_ov036_021cf1c8[index].unk0[1]->face;
+    return FIELD_BILLBOARD_ANIM_SETS[index].animations[1]->face;
 }
 
 static void ResortShop_GetModelTexture(ArcTool *handle, u16 objCode, u8 *texture, u16 *fileId) {

@@ -1,4 +1,6 @@
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/zones.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
@@ -24,17 +26,17 @@ static u16 DecideAbyssalRuinsDiveZoneByUndellaBayPos(u32 zoneId, u32 x, u32 z);
 
 // Dive spots of Undella Bay: zone, x, z, the Abyssal Ruins zone they lead to
 static const u16 UNDELLA_BAY_DIVE_WARPS[4][4] = {
-    { 0xf0, 0x320, 0x113, 0xf1 },
-    { 0xf0, 0x311, 0x121, 0xf2 },
-    { 0xf0, 0x32f, 0x121, 0xf3 },
-    { 0xf0, 0x320, 0x133, 0xf4 },
+    { ZONE_UNDELLA_BAY, 0x320, 0x113, ZONE_ABYSSAL_RUINS },
+    { ZONE_UNDELLA_BAY, 0x311, 0x121, ZONE_ABYSSAL_RUINS_2 },
+    { ZONE_UNDELLA_BAY, 0x32f, 0x121, ZONE_ABYSSAL_RUINS_3 },
+    { ZONE_UNDELLA_BAY, 0x320, 0x133, ZONE_ABYSSAL_RUINS_4 },
 };
 
 void *FldActMatColorPreset_Create(HeapID heapId) {
     FldActMatColorPreset *preset =
         GFL_HeapAllocate(heapId, sizeof(FldActMatColorPreset), TRUE, "field_bbd_color.c", 91);
 
-    preset->arcTool = GFL_ArcSysCreateFileHandle(0xad, heapId);
+    preset->arcTool = GFL_ArcSysCreateFileHandle(ARCID_FIELD_BBD_COLOR, heapId);
     return preset;
 }
 
@@ -61,13 +63,13 @@ void FldActMatColorPreset_Apply(void *work, BlActScene *scene) {
     normal.z = preset->normal[2];
     VEC_Fx16Normalize(&normal, &normal);
     BlActScene_SetCustomNormal(scene, &normal);
-    diffuse = preset->diffuse[0] | (preset->diffuse[1] << 5) | (preset->diffuse[2] << 10);
+    diffuse = GX_RGB(preset->diffuse[0], preset->diffuse[1], preset->diffuse[2]);
     BlActScene_SetColDiffuse(scene, &diffuse);
-    ambient = preset->ambient[0] | (preset->ambient[1] << 5) | (preset->ambient[2] << 10);
+    ambient = GX_RGB(preset->ambient[0], preset->ambient[1], preset->ambient[2]);
     BlActScene_SetColAmbient(scene, &ambient);
-    specular = preset->specular[0] | (preset->specular[1] << 5) | (preset->specular[2] << 10);
+    specular = GX_RGB(preset->specular[0], preset->specular[1], preset->specular[2]);
     BlActScene_SetColSpecular(scene, &specular);
-    emissive = preset->emissive[0] | (preset->emissive[1] << 5) | (preset->emissive[2] << 10);
+    emissive = GX_RGB(preset->emissive[0], preset->emissive[1], preset->emissive[2]);
     BlActScene_SetColEmissive(scene, &emissive);
 }
 

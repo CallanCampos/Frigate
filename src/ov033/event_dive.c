@@ -79,7 +79,7 @@ GameEventReturnCode EventDiveOut_Callback(GameEvent *event, u32 *state, void *ev
             accelTask = FieldActorSpinTask_CreatePlayerAccel(data->field, 0x14, 3);
             spinTask = FieldActorSpinTask_CreatePlayer(data->field, 0xc, 3);
             FieldTaskManager_AddTask(taskManager, accelTask, 0);
-            FieldTaskManager_AddTask(taskManager, spinTask, (u32)accelTask);
+            FieldTaskManager_AddTask(taskManager, spinTask, accelTask);
             FieldFog_Animate(fog, 0x7f0f, FieldFog_GetDepthShift(fog), 0x1a);
         }
         (*state)++;
@@ -125,7 +125,7 @@ GameEvent *CreateDiveOutEvent(GameSystem *gsys, Field *field, u32 param) {
     return event;
 }
 
-GameEvent *func_ov033_0217a0f4(GameSystem *gsys, Field *field, u32 direction) {
+GameEvent *func_ov033_0217a0f4(GameSystem *gsys, Field *field, u16 direction) {
     GameEvent *event;
     void **data;
     FieldPlayer *player;

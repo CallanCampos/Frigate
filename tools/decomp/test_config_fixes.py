@@ -369,6 +369,42 @@ class BoundaryRecordTests(unittest.TestCase):
         self.cli("section-end", MODULE, "src/example.c", ".text", "0x5010", "0x5020")
         self.assertEqual(fixes.load_fixes(), [(MODULE, 0x5020, "section_end", "src/example.c:.text")])
 
+    def add_bss(self, other_start=0x6010):
+        for version, addr in [("b2_us", 0x5010), ("w2_us", other_start)]:
+            path = fixes.config_dir(version, MODULE) / "delinks.txt"
+            text = path.read_text().replace(
+                "src/example.c:\n    .text start:0x00000000 end:0xffffffff\n",
+                "src/example.c:\n    .text start:0x00000000 end:0xffffffff\n"
+                f"    .bss start:{addr:#010x} end:{addr + 12:#010x}\n")
+            path.write_text(text)
+
+    def test_remove_section_maps_both_versions_and_replays_idempotently(self):
+        self.add_bss()
+        self.cli("remove-section", MODULE, "src/example.c", ".bss", "0x5010")
+        for version in ("b2_us", "w2_us"):
+            self.assertNotIn("    .bss", self.delinks(version))
+            self.assertIn("src/example.c:\n    .text", self.delinks(version))
+            self.assertIn("src/next.c:\n    .text", self.delinks(version))
+        self.assertEqual(fixes.load_fixes(), [(MODULE, 0x5010, "remove_section", "src/example.c:.bss")])
+        after = self.snapshot()
+        self.cli("apply")
+        self.cli("remove-section", MODULE, "src/example.c", ".bss", "0x5010")
+        self.assertEqual(self.snapshot(), after)
+
+    def test_remove_section_later_wrong_start_leaves_both_versions_unchanged(self):
+        self.add_bss(other_start=0x6014)
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "does not start"):
+            self.cli("remove-section", MODULE, "src/example.c", ".bss", "0x5010")
+        self.assertEqual(self.snapshot(), before)
+
+    def test_remove_section_missing_owner_is_rejected_without_changes(self):
+        self.add_bss()
+        before = self.snapshot()
+        with self.assertRaisesRegex(SystemExit, "not registered"):
+            self.cli("remove-section", MODULE, "src/missing.c", ".bss", "0x5010")
+        self.assertEqual(self.snapshot(), before)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -186,7 +186,7 @@ void FieldCameraAnimationController_SetAnimation(FieldCameraAnimationController 
                                                  const FieldCameraAnimation *animation);
 void FieldCameraAnimationController_PrepareCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_StartAnimation(FieldCameraAnimationController *controller);
-// Overlay 36's field_camera_anime.c, not written yet: releases the camera the animation is bound to, and puts the
+// Overlay 36's field_camera_anime.c: releases the camera the animation is bound to, and puts the
 // camera at the animation's start
 void FieldCameraAnimationController_FinishCamera(FieldCameraAnimationController *controller);
 void FieldCameraAnimationController_CommitSrcCoords(FieldCameraAnimationController *controller);
@@ -227,9 +227,9 @@ void FieldCamera_FinishDelay(FieldCamera *camera);
 BOOL FieldCamera_IsDelayActive(FieldCamera *camera);
 // What the camera follows
 void *FieldCamera_GetBind(FieldCamera *camera);
-void FieldCamera_SetBind(FieldCamera *camera, void *bind);
+void FieldCamera_SetBind(FieldCamera *camera, const VecFx32 *bind);
 // What the camera follows on a rail map
-void FieldCamera_SetRefBind(FieldCamera *camera, void *bind);
+void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind);
 void *FieldCamera_GetRefBind(FieldCamera *camera);
 // The event camera's animations: start, animate to a target or back over frames, and end
 void FieldCamera_EVCameraInit(FieldCamera *camera);

@@ -172,11 +172,16 @@ BOOL s01C2_ElevatorChangeMap(VM *vm, FieldScriptEnv *env) {
         ElevatorFloor *floor = ElevatorTable_GetEntry(table, index);
         ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
         GameSystem *gsys = ScriptWork_GetGameSystem(work);
+        Field *field = GSYS_GetField(gsys);
+        u16 zoneId = floor->zoneId;
+        u16 x = floor->x;
+        u16 y = floor->y;
+        u16 z = floor->z;
 
-        pos.x = GRID_TO_FX32(floor->x);
-        pos.y = GRID_TO_FX32(floor->y);
-        pos.z = GRID_TO_FX32(floor->z);
-        ScriptWork_CallEvent(work, EventMapChange_CreateGridDefault(gsys, GSYS_GetField(gsys), floor->zoneId, &pos, 1));
+        pos.x = GRID_TO_FX32(x);
+        pos.y = GRID_TO_FX32(y);
+        pos.z = GRID_TO_FX32(z);
+        ScriptWork_CallEvent(work, EventMapChange_CreateGridDefault(gsys, field, zoneId, &pos, 1));
     }
     return TRUE;
 }
@@ -312,7 +317,7 @@ BOOL func_ov036_021b01e0(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u32 month = GameData_GetMonth(gameData);
-    u32 day = GameData_GetDay(gameData);
+    s32 day = GameData_GetDay(gameData);
     u16 value;
 
     if (func_ov036_021b01b8(month, day) == TRUE) {

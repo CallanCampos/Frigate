@@ -27,7 +27,7 @@ void func_ov036_0219aab0(FieldPlayer *player, u16 dir, VecFx32 *vec);
 // Whether the player is on a catwalk, and takes them off it
 BOOL func_ov036_0219ac8c(FieldPlayer *player);
 void func_ov036_0219acac(FieldPlayer *player);
-void func_ov036_0219ad30(FieldPlayer *player, u32 dir, RailPosition *pos);
+void func_ov036_0219ad30(FieldPlayer *player, u16 dir, RailPosition *pos);
 // The player's object code for a sex, in a form or an extra state
 u16 FieldPlayer_GetObjCodeByForme(u32 sex, u32 forme);
 u16 FieldPlayer_GetObjCodeByExState(u32 sex, u32 exState);
@@ -50,7 +50,7 @@ void *Field_GetMoneyWin(Field *field);
 void Field_SetMoneyWin(Field *field, void *moneyWin);
 // Recolors a texture resource with the field's color post-FX
 void FieldColorPostFX_Apply(void *postFx, void *texture);
-fx32 func_ov036_02181324(Field *field);
+fx32 Field_GetActorYOffset(Field *field);
 void FieldPlayer_GetGPos(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 // A number below 6 that overlay 137 reads from the game data
 u32 TrainerCard_CountStars(GameData *gameData);
@@ -74,7 +74,7 @@ void *func_ov036_021c6574(void *effects, u32 a1, const VecFx32 *pos);
 void func_ov036_021c65a8(void *obj, u16 a1);
 void func_ov036_021c65e8(void *obj, u16 a1);
 void FieldPlayer_SetWPos(FieldPlayer *player, const VecFx32 *pos);
-void FieldPlayer_SetDirection(FieldPlayer *player, u32 dir);
+void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir);
 void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 a4);
 
 // The work of the zone's gimmick, such as a gym's puzzle, which the gimmick's overlay allocates at the zone's start
@@ -94,7 +94,7 @@ u32 func_ov036_021ba6a4(u8 index, void *list);
 u32 func_ov036_021ba6b0(u8 index, void *list);
 // Sets whether the entry at index is in use, which func_ov036_021ba624 checks before it fills one in
 void func_ov036_021ba6bc(u8 index, BOOL inUse, void *list);
-// Overlay 36's field_fade.c, not written yet: whether a grid position is in the rectangle of an entry of the list
+// Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
 BOOL func_ov036_021ba594(s32 x, s32 z, const void *entry);
 // The mapper's WFBC work
 void *func_ov036_0218adac(HeapID heapId);
@@ -174,9 +174,9 @@ void Field_TerminateGimmick(Field *field);
 void Field_UpdateGimmick(Field *field);
 BOOL Field_CheckGimmickID(Field *field, u32 id);
 void func_ov036_021b5180(PlaceName *placeName);
-BOOL FieldmapProc_Init(GameProc *proc, int *seq, void *param, void *work);
-BOOL FieldmapProc_Update(GameProc *proc, int *seq, void *param, void *work);
-BOOL FieldmapProc_End(GameProc *proc, int *seq, void *param, void *work);
+BOOL FieldmapProc_Init(GameProc *proc, u32 *seq, void *param, void *work);
+BOOL FieldmapProc_Update(GameProc *proc, u32 *seq, void *param, void *work);
+BOOL FieldmapProc_End(GameProc *proc, u32 *seq, void *param, void *work);
 Field *Field_Create(GameSystem *gsys, HeapID heapId);
 void Field_Free(Field *field);
 void Field_RenderStart(Field *field);
@@ -217,7 +217,7 @@ BOOL func_ov036_02180fc0(GameCommSys *comm);
 
 void FieldRenderPhase1_Fieldmap(Field *field);
 void FieldRenderPhase2_Fieldmap(Field *field);
-fx32 func_ov036_0218132c(Field *field);
+fx32 Field_CalcActorYOffset(Field *field);
 void FieldColorPostFX_Set(void *postFx, void *luminanceTable, BOOL flashback);
 
 #endif // POKEBW2_FIELD_FIELD_H

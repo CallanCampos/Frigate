@@ -257,7 +257,7 @@ void UnionSubdisp_UpdateAltFrame(UnionSubdisp *work, BOOL active) {
         UnionSelf *self = &sys->situ;
 
         if (self->changed == 1) {
-            func_ov036_021b445c(sys, NULL, self->look, self->state);
+            UnionChat_AppendLine(sys, NULL, self->look, self->state);
             self->changed = 0;
         }
         UnionSubdisp_UpdateChat(work, &sys->visitorList);
@@ -510,7 +510,7 @@ static void UnionSubdisp_UpdateChat(UnionSubdisp *work, UnionVisitorList *list) 
 
         for (index = list->drawnEnd; index <= list->viewEnd; index++) {
             if (index > -1) {
-                UnionVisitor *chat = func_ov036_021b4620(list, index);
+                UnionVisitor *chat = UnionChat_GetLine(list, index);
 
                 GFL_ASSERT(chat != NULL);
                 UnionSubdisp_DrawLine(work, chat, index);
@@ -622,7 +622,7 @@ static void UnionSubdisp_DrawAllLines(UnionSubdisp *work, UnionVisitorList *list
     }
     write_pos = list->viewEnd - oldest - 1;
     for (view_no = list->viewEnd; view_no > oldest; view_no--) {
-        chat = func_ov036_021b4620(list, view_no);
+        chat = UnionChat_GetLine(list, view_no);
         GFL_ASSERT(chat != NULL);
         GFL_ASSERT(write_pos > -1);
         UnionSubdisp_DrawLine(work, chat, write_pos);
@@ -648,7 +648,7 @@ static void UnionSubdisp_MoveLine(UnionSubdisp *work, u8 from, u8 to, UnionVisit
         BmpWin_FlushChar(work->windows[to]);
         return;
     }
-    UnionSubdisp_DrawLine(work, func_ov036_021b4620(list, index - 2 + from), to);
+    UnionSubdisp_DrawLine(work, UnionChat_GetLine(list, index - 2 + from), to);
 }
 
 // Scrolls the lines by delta lines, drawing the ones that come in
@@ -666,7 +666,7 @@ static void UnionSubdisp_ScrollLines(UnionSubdisp *work, UnionVisitorList *list,
             write_pos++;
         }
         for (write_pos = LINE_COUNT - offset; write_pos < LINE_COUNT; write_pos++) {
-            chat = func_ov036_021b4620(list, list->viewEnd - 2 + write_pos);
+            chat = UnionChat_GetLine(list, list->viewEnd - 2 + write_pos);
             GFL_ASSERT(chat != NULL);
             UnionSubdisp_DrawLine(work, chat, write_pos);
         }
@@ -677,7 +677,7 @@ static void UnionSubdisp_ScrollLines(UnionSubdisp *work, UnionVisitorList *list,
             write_pos--;
         }
         for (write_pos = -1 - offset; write_pos > -1; write_pos--) {
-            chat = func_ov036_021b4620(list, list->viewEnd - 2 + write_pos);
+            chat = UnionChat_GetLine(list, list->viewEnd - 2 + write_pos);
             GFL_ASSERT_MSG(chat != NULL, "view_no=%d, write_pos=%d, offset=%d\n", list->viewEnd, write_pos, offset);
             UnionSubdisp_DrawLine(work, chat, write_pos);
         }
@@ -837,7 +837,7 @@ static BOOL UnionSubdisp_UpdateLineTouch(UnionSystem *sys, UnionSubdisp *work, U
             index = list->viewEnd - 2 + line;
         }
         UnionSubdisp_StartFlash(work, list, index);
-        visitor = func_ov036_021b4620(list, index);
+        visitor = UnionChat_GetLine(list, index);
         if (visitor != NULL) {
             MI_CpuCopy8(visitor->mac, sys->situ.mac78, 6);
         }

@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "field/field_actor.h"
+#include "field/fldmmdl_drawdata.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -115,7 +116,7 @@ static void WbtSetup_SetMatches(WbtSystem *sys, WbtSetup *setup) {
 }
 
 static u8 func_ov055_021e6a14(u32 index) {
-    return data_ov036_021cf1c8[index].unk0[1]->face;
+    return FIELD_BILLBOARD_ANIM_SETS[index].animations[1]->face;
 }
 
 static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4) {

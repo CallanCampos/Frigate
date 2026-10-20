@@ -165,7 +165,7 @@ Same instructions, registers swapped.
   `CopyBatonPassParams` and `BattleMon_TickCondition` match only with their condition accesses through a static inline
   `GetConditionPtr(mon, BattleConditionID id)`; the same accessor with a `u32 id`, casts and an enum counter don't.
 - How a store is written can move the parameters' registers too: `*result = *partyResult != 0 ? 3 : 0;` swapped two
-  pointer parameters' registers in `scrcmd_fld_battle.c`'s `func_ov036_021aec28`, where the same store as an
+  pointer parameters' registers in `scrcmd_fld_battle.c`'s `TeamSelect_CheckTeams`, where the same store as an
   `if`/`else` matched.
 - The registers follow the declarations, but the order the constants are set follows the statements: when the
   declaration order that gives the right registers sets them in the wrong order, or derives one constant from the
@@ -738,7 +738,7 @@ Same code, other `sp` offsets or frame size.
   was the converted copy in `r5`, after `slot`. A `u16` or `u32` parameter matched too, but the function's other
   callers pass their `int` counters as `(u8)i`, which a `u8` parameter explains.
   A narrowing to the callee's type is hoisted out of the loop, and an explicit cast at the call is not the same:
-  `field_msgbg.c`'s `func_ov036_02187f58` passes its `u32 spacing` to `GFL_FontGetBlockWidth` in a loop and
+  `field_msgbg.c`'s `FieldMsgBG_GetWidestOption` passes its `u32 spacing` to `GFL_FontGetBlockWidth` in a loop and
   matches only with that function taking `u16 spacing`, which narrows the spacing once before the loop into the
   slot after the widest option's index. With a `u32` parameter and `(u16)spacing` at the call the two slots
   were swapped (5 bytes), and every order of the declarations kept them so.
@@ -1511,6 +1511,10 @@ Same instructions, scheduled in another order.
   inline's entry and spills it, was a local of the caller: `mystery.c`'s `MysteryEffect_Init` sets
   `tailHeapId = HEAPID_TAIL(heapId);` before calling the inlined gift-Pokémon routine, which reaches the original's size,
   where `HEAPID_TAIL(heapId)` written as the argument is 4 bytes short.
+- In `fld3d_ci.c`'s `EventFieldEffectCutinSub_DrawStrToTexture`, `HEAPID_TAIL(heapId)` passed directly to each
+  allocation matches both ROMs. Saving the macro's result in a `u32` adds narrowings (0x194 against 0x190); a
+  `HeapID` local instead shares the narrowed value and is four bytes short. The macro at each call preserves the
+  allocation's heap semantics without a temporary.
 - Reads of a `const` table are not moved across stores to I/O registers, so a table read the original does before the
   stores of a NitroSDK register inline was written before it: `mystery_album.c`'s `MysteryCardView_SeqThrowAway`
   reads a card position's x and y into `int` locals before `G2_SetWnd0InsidePlane`.
@@ -1968,9 +1972,6 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loop over the forms.
 - A switch of three cases can compile to a compare chain that tests them in value order. When the original tests 1,
   then 2, then 0, the source is an `if`/`else if` chain in that order: `scrcmd_msg.c`'s `SystemMsgWin_Open`.
-- A result flag declared after a call, `CalcAttachmentPos(env, FALSE); BOOL done = FALSE;`, takes the register of a
-  parameter that died in the call, and MWCC still sets it just before the `bl`: `scrcmd_msg.c`'s
-  `ScriptNative_ActorMsgWinWait`.
 - A struct member set from a C99 compound literal, `request.pos = (VecFx32){ 0, 0, 0 };`, builds the literal in a
   stack temporary through a base register just before the copy (`str r6, [r3]; str r6, [r3, #4]; str r6, [r3, #8];
   ldm r3!, {r0, r1}`), in source order among the other member stores. An initialized local makes the same stores at
@@ -2260,7 +2261,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   prototype that takes one needs it: `STD_TVSNPrintf`'s `str.start[len - 1]` is `adds r0, p, len; subs r0, #1; strb
   [r0]` with a `size_t len` and `subs; strb [p, r0]` with a `u32`.
   The `int` types stay the default all the same: with `s32` and `u32` as `long` and `fx32` as `long` throughout, three
-  rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `func_ov036_021ad8e8`) and 92
+  rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `ShopUI_PrintItemBuyMessage`) and 92
   matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
   the type of the code.
 - `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
@@ -2454,11 +2455,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
   `pixels = (srcPixel[0] << 8) | srcPixel[-1];` in its odd arm, which keeps `ldrb r1, [r2]` at the top of both arms.
   A `color = srcPixel[0];` set before the `if` pinned the load above the branch as well.
-- MWCC evaluates the operands of `|` in the order they are grouped, so a color built from three computed parts shows
-  its grouping: `field_menu.c`'s cursor fade (`func_ov036_021a040c`) computes red, then blue, then green, and only
-  matches as `r | ((b << 10) | (g << 5))`, not as `GX_RGB(r, g, b)`.
 - A block that many cases of a switch branch to, such as the step advance of `event_entrance_effect.c`'s
-  `func_ov036_0219f380` (`*state = next(work); advance(work);`), is each case's own copy merged by cross-jumping. A flag
+  `EntranceEffect_ArrivalCallback` (`*state = next(work); advance(work);`), is each case's own copy merged by cross-jumping. A flag
   set in the cases and tested after the switch keeps a register for it and doesn't match.
 - An early `return` at the top of a long function jumps to the nearest `b` to the epilogue. When the original skips the
   body with `bne` over a `b` to the very end, the body was wrapped in `if (cond) { ... }`, as in the PC box's
@@ -3097,7 +3095,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC doesn't fold float arithmetic on a local variable that holds a constant, so `size / 2.0f` stays a call when
   `size` is a variable, while an expression of literals is folded.
 - `compiler_probe.py` skips relocated words, so a wrong addend, such as a table index that the compiler folds into a
-  literal pool address, or a call to the wrong runtime helper, only shows when the module check fails. Division and
+  literal pool address, or a call to the wrong runtime helper needs a separate relocation check. A module check
+  catches it only when the file's C is linked; incomplete files still link their original assembly. Division and
   modulo call `_s32_div_f` for a signed operand and `_u32_div_f` (swan's `__aeabi_uidivmod`) for an unsigned one; a
   `u8` or `u16` promotes to a signed `int`, so `(u8)id % 5u` is the unsigned one, and so is a `u16` divided by a
   `u32`. `wipe_sub.c`'s `WipeLineRange_Apply` divides `(range->end - range->start) * step` signed, its fields being
@@ -3112,7 +3111,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `build/<version>/build` with the original to find it.
 - A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned, and `_ll_sdiv`
   (0x0208d414) when both are signed: `pass_power.c`'s `PassPower_ApplyCapture` divides an `s64 value` by 100. The
-  probe masks the call's relocation, so only linking the file shows the wrong helper. A call to `_ll_udiv` with
+  probe masks the call's relocation, so check the helper in the object or the linked file. A call to `_ll_udiv` with
   operands sign-extended by `asr #0x1f` is an `int` cast to `u64`: the trade's box cubes turn by
   `((u64)((x + 48) % width) << 16) / width` in `func_ov194_021c2844`. A file that calls it needs `_ll_udiv` added as a
   label on `__aeabi_uldivmod` with `config_fixes.py add-label` before it can go complete.
@@ -3446,6 +3445,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a file's shared `.rodata` are such locals: `win_record.c` has its two columns' x (`{ 0, 144 }`) in
   `WinRecord_PrintItemAt` and its BG scroll's speed and wrap (`{ 0x40, 0x2000 }`) in `WinRecord_ScrollBG`, read as
   `add r2, #0x40`, and a 12-byte table that nothing reads, 4-aligned, so it is declared as `u32`s.
+  `field_menu.c`'s four BG setups likewise belong to its background-loading function: placing all four there keeps
+  the unused 32-byte setup among the three live templates and reproduces the full data layout in both ROMs.
 - Such a static can sit anywhere in the shared section, sorted by its size, and its function shows what it is.
   Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`. They are read
   as `static const GXRgb sEdgeColors[8]` in `PokeList_Init3D`, which turns edge marking on but never loads a table.

@@ -82,6 +82,10 @@ again replaces its earlier record, since fixes replay in address order:
 .venv/bin/python tools/decomp/config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028
 ```
 
+`remove-section MODULE FILE SECTION EXPECTED_START` removes a section wrongly attributed to a source file, such as
+a label inside another file's heap. It verifies the owner and start in both versions before writing; repeating an
+already-applied removal is harmless. The fix is recorded for config regeneration.
+
 A relocation that dsd could not pin to one overlay only links while its symbol is global. When a function becomes
 `static` in a decompiled file, check `relocs.txt` of both versions for relocations to its address with several
 candidate modules, and fix the ones that belong to another overlay. Field gimmicks, such as gym puzzles, share one load

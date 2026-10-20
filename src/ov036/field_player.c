@@ -1,5 +1,6 @@
 #include "types.h"
 #include "constants/flags.h"
+#include "constants/obj_codes.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_g3d_mapper.h"
@@ -46,28 +47,28 @@ typedef struct {
 // clang-format off
 static const PlayerSprite PLAYER_SPRITE_MAP[2][PLAYER_FORM_COUNT] = {
     {
-        {0xe7, FLD_PLAYER_EXSTATE_NONE},
-        {0xe8, FLD_PLAYER_EXSTATE_CYCLING},
-        {0xe9, FLD_PLAYER_EXSTATE_SURF},
-        {0xe9, FLD_PLAYER_EXSTATE_DIVE},
-        {0xea, 4},
-        {0xeb, 4},
-        {0xec, 4},
-        {0xee, 4},
-        {0xef, 4},
-        {0xed, 4},
+        {OBJ_CODE_HERO, FLD_PLAYER_EXSTATE_NONE},
+        {OBJ_CODE_232, FLD_PLAYER_EXSTATE_CYCLING},
+        {OBJ_CODE_233, FLD_PLAYER_EXSTATE_SURF},
+        {OBJ_CODE_233, FLD_PLAYER_EXSTATE_DIVE},
+        {OBJ_CODE_234, 4},
+        {OBJ_CODE_235, 4},
+        {OBJ_CODE_236, 4},
+        {OBJ_CODE_238, 4},
+        {OBJ_CODE_239, 4},
+        {OBJ_CODE_237, 4},
     },
     {
-        {0xf0, FLD_PLAYER_EXSTATE_NONE},
-        {0xf1, FLD_PLAYER_EXSTATE_CYCLING},
-        {0xf2, FLD_PLAYER_EXSTATE_SURF},
-        {0xf2, FLD_PLAYER_EXSTATE_DIVE},
-        {0xf3, 4},
-        {0xf4, 4},
-        {0xf5, 4},
-        {0xf7, 4},
-        {0xf8, 4},
-        {0xf6, 4},
+        {OBJ_CODE_HEROINE, FLD_PLAYER_EXSTATE_NONE},
+        {OBJ_CODE_241, FLD_PLAYER_EXSTATE_CYCLING},
+        {OBJ_CODE_242, FLD_PLAYER_EXSTATE_SURF},
+        {OBJ_CODE_242, FLD_PLAYER_EXSTATE_DIVE},
+        {OBJ_CODE_243, 4},
+        {OBJ_CODE_244, 4},
+        {OBJ_CODE_245, 4},
+        {OBJ_CODE_247, 4},
+        {OBJ_CODE_248, 4},
+        {OBJ_CODE_246, 4},
     },
 };
 
@@ -139,11 +140,11 @@ void FieldPlayer_ForceBrake(FieldPlayer *player) {
     }
 }
 
-void func_ov036_0219a5b8(FieldPlayer *player, TCB *tcb) {
-    func_ov036_0219b138(player->core, tcb);
+void func_ov036_0219a5b8(FieldPlayer *player, FieldEffectTask *task) {
+    func_ov036_0219b138(player->core, task);
 }
 
-TCB *func_ov036_0219a5c4(FieldPlayer *player) {
+FieldEffectTask *func_ov036_0219a5c4(FieldPlayer *player) {
     return FieldPlayerCore_GetTerrainEffectTCB(player->core);
 }
 
@@ -192,7 +193,7 @@ u16 FieldPlayer_GetFaceDir(FieldPlayer *player) {
     return FieldPlayerCore_GetFaceDir(player->core);
 }
 
-void FieldPlayer_SetDirection(FieldPlayer *player, u32 dir) {
+void FieldPlayer_SetDirection(FieldPlayer *player, u16 dir) {
     FieldPlayerCore_SetDirection(player->core, dir);
 }
 
@@ -288,7 +289,7 @@ u16 FieldPlayer_GetObjCodeByExState(u32 sex, u32 exState) {
             return sprite->objCode;
         }
     }
-    return 0xe7;
+    return OBJ_CODE_HERO;
 }
 
 // The form with the object code, PLAYER_FORM_COUNT if it isn't one of the player's
@@ -316,7 +317,7 @@ BOOL func_ov036_0219a834(FieldPlayer *player) {
     return TRUE;
 }
 
-void FieldPlayer_ForceObjCode(FieldPlayer *player, u32 objCode) {
+void FieldPlayer_ForceObjCode(FieldPlayer *player, u16 objCode) {
     FieldPlayerCore_ForceObjCode(player->core, objCode);
 }
 
@@ -552,7 +553,7 @@ void func_ov036_0219ad24(FieldPlayer *player, RailPosition *pos) {
     FieldPlayerCore_GetRailPos(player->nogrid, pos);
 }
 
-void func_ov036_0219ad30(FieldPlayer *player, u32 dir, RailPosition *pos) {
+void func_ov036_0219ad30(FieldPlayer *player, u16 dir, RailPosition *pos) {
     func_ov036_0219d044(player->nogrid, dir, pos);
 }
 

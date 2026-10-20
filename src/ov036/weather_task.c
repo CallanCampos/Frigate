@@ -58,6 +58,8 @@ struct WeatherObj {
     WeatherObj *next;
 };
 
+#define WEATHER_OBJ_COUNT 32
+
 struct WeatherTask {
     ClActUnit *unit;
     FieldFog *fog;
@@ -78,7 +80,7 @@ struct WeatherTask {
     WeatherSound sound;
     WeatherTimer timer;
     VecFx32 lookAt;
-    WeatherObj objs[32];
+    WeatherObj objs[WEATHER_OBJ_COUNT];
     WeatherObj *objHead;
     int objCount;
     u8 fogPending;
@@ -86,8 +88,6 @@ struct WeatherTask {
     u8 fogDuration;
     u32 fogColor;
 };
-
-#define WEATHER_OBJ_COUNT 32
 
 static const ClActorSetup WEATHER_OBJ_SETUP = { 0, 0, 0, 0x40, 3 };
 static const u8 WEATHER_STATE_KINDS[13] = { 0, 1, 1, 1, 1, 2, 2, 1, 3, 4, 4, 5, 5 };
@@ -129,7 +129,8 @@ static void func_ov036_0219a020(WeatherRes *res);
 static void func_ov036_02199fc0(WeatherRes *res);
 static void func_ov036_0219a044(WeatherRes *res, int index, Field3DBg *bg, const void *config, HeapID heapId);
 static void func_ov036_0219a094(WeatherRes *res, int index, Field3DBg *bg);
-static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, WeatherRes *res, ClActUnit *unit, HeapID heapId);
+static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, const WeatherRes *res, ClActUnit *unit,
+                                HeapID heapId);
 static void func_ov036_0219a23c(WeatherObj *obj);
 static void func_ov036_0219a1e4(WeatherObj *obj);
 static void *func_ov036_0219a250(WeatherObj *obj);
@@ -609,12 +610,12 @@ void func_ov036_02199c6c(WeatherObj *obj, ClActorPos *pos) {
 void func_ov036_02199c80(WeatherObj *obj, const ClActorPos *pos) {
     ClActorPos wrapped = *pos;
     if (wrapped.x > 0x140) {
-        wrapped.x = wrapped.x % 0x140;
+        wrapped.x %= 0x140;
     } else if (wrapped.x < -0x40) {
         wrapped.x += 0x140;
     }
     if (wrapped.y > 0x100) {
-        wrapped.y = wrapped.y % 0x100;
+        wrapped.y %= 0x100;
     } else if (wrapped.y < -0x40) {
         wrapped.y += 0x100;
     }
@@ -689,11 +690,11 @@ static void func_ov036_02199da8(WeatherTask *task, WeatherObj *obj) {
 static void func_ov036_02199de4(WeatherTask *task, WeatherObj *obj) {
     task->objCount--;
     if (task->objHead == obj) {
-        WeatherObj *next = obj->next;
-        if (next == obj) {
-            next = NULL;
+        if (obj->next == obj) {
+            task->objHead = NULL;
+        } else {
+            task->objHead = obj->next;
         }
-        task->objHead = next;
     }
     obj->next->prev = obj->prev;
     obj->prev->next = obj->next;
@@ -914,7 +915,8 @@ static BOOL func_ov036_0219a1f0(WeatherObj *obj) {
     return FALSE;
 }
 
-static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, WeatherRes *res, ClActUnit *unit, HeapID heapId) {
+static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, const WeatherRes *res, ClActUnit *unit,
+                                HeapID heapId) {
     obj->task = task;
     obj->actor = ClActor_Create(unit, res->chars, res->palette, res->cells, &WEATHER_OBJ_SETUP, 0, heapId);
     ClActor_SetVisible(obj->actor, FALSE);

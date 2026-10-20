@@ -27,15 +27,15 @@ typedef struct {
 } Fld3DCiSoundKey;
 
 // fld_particle.c: the field's particle system
-FieldParticle *func_ov036_021bb590(HeapID heapId);
-ParticleSystem *func_ov036_021bb5d0(FieldParticle *particle);
-void func_ov036_021bb60c(FieldParticle *particle);
+FieldParticle *FieldParticle_Create(HeapID heapId);
+ParticleSystem *FieldParticle_CreateSystem(FieldParticle *particle);
+void FieldParticle_DeleteSystem(FieldParticle *particle);
 void *FieldParticle_LoadResource(FieldParticle *particle, u32 arcId, u32 fileId);
-void func_ov036_021bb630(FieldParticle *particle, void *resource, BOOL immediate, TCBManager *tcbMgr);
+void FieldParticle_SetResource(FieldParticle *particle, void *resource, BOOL immediate, TCBManager *tcbMgr);
 // Whether the particle system has no emitter left
-BOOL func_ov036_021bb63c(FieldParticle *particle);
-void func_ov036_021bb658(FieldParticle *particle);
-void func_ov036_021bb674(void);
+BOOL FieldParticle_IsFinished(FieldParticle *particle);
+void FieldParticle_Free(FieldParticle *particle);
+void FieldParticle_DrawAndUpdateAll(void);
 
 // The screen fades and sound effects of the field effects, which fld3d_ci.c's tables point to
 extern const Fld3DCiSoundKey data_ov036_021d1784[1];

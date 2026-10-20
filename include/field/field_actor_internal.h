@@ -26,15 +26,34 @@ typedef struct {
 } FieldActorSceneNodeVTable;
 
 // Overlay 36's tables of the move codes' functions, by move code (fldmmdl_movedata.c's), and of the scene nodes'
-// functions, by sceneNodeType
+// functions, by sceneNodeType (fldmmdl_drawdata.c's)
 extern const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[];
 // Overlay 36's fldmmdl_movedata.c: the tables of the action commands' functions, by command, for the actors on the
-// grid and on the rails (the rail one, which points to fld_act_rail.c's tables, is not written yet), and the rows of
-// commands that differ only by direction, by direction
+// grid and on the rails, and the rows of commands that differ only by direction, by direction
 extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES[];
 extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES_RAIL[];
 extern const u32 *const ACMD_DIR_LUT[];
 extern const FieldActorSceneNodeVTable *const FIELD_ACTOR_MAIN_VTABLES[];
+// Overlay 36's field_rail_loader.c: the functions of the kinds of scene node that FIELD_ACTOR_MAIN_VTABLES lists
+extern const FieldActorSceneNodeVTable data_ov036_021cf7d8;
+extern const FieldActorSceneNodeVTable data_ov036_021cf7f0;
+extern const FieldActorSceneNodeVTable data_ov036_021cf808;
+extern const FieldActorSceneNodeVTable data_ov036_021cf820;
+extern const FieldActorSceneNodeVTable data_ov036_021cf838;
+extern const FieldActorSceneNodeVTable data_ov036_021cf850;
+extern const FieldActorSceneNodeVTable data_ov036_021cf868;
+extern const FieldActorSceneNodeVTable data_ov036_021cf880;
+extern const FieldActorSceneNodeVTable data_ov036_021cf898;
+extern const FieldActorSceneNodeVTable data_ov036_021cf8b0;
+extern const FieldActorSceneNodeVTable data_ov036_021cf8c8;
+extern const FieldActorSceneNodeVTable data_ov036_021cf8e0;
+extern const FieldActorSceneNodeVTable data_ov036_021cf8f8;
+extern const FieldActorSceneNodeVTable data_ov036_021cf910;
+extern const FieldActorSceneNodeVTable data_ov036_021cf928;
+extern const FieldActorSceneNodeVTable data_ov036_021cf940;
+extern const FieldActorSceneNodeVTable data_ov036_021cf958;
+// Overlay 36's fldmmdl_g3dobj_draw.c: the functions of the actors drawn as a 3D model
+extern const FieldActorSceneNodeVTable data_ov036_021cf9a0;
 
 // A position on the grid
 typedef struct {

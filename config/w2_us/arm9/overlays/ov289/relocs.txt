@@ -152,7 +152,6 @@ from:0x021f5146 kind:thumb_call to:0x02074a98 module:main
 from:0x021f51b4 kind:load to:0x021f5236 module:overlay(289)
 from:0x021f51b8 kind:load to:0x021f5238 module:overlay(289)
 from:0x021f51bc kind:load to:0x021f540c module:overlay(289)
-from:0x021f53ec kind:load to:0x021e0001 module:overlay(36)
 from:0x021f5400 kind:load to:0x021f5256 module:overlay(289)
 from:0x021f5404 kind:load to:0x021f52b4 module:overlay(289)
 from:0x021f5408 kind:load to:0x021f5322 module:overlay(289)

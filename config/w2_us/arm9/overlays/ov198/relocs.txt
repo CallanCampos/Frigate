@@ -357,4 +357,3 @@ from:0x021b447c kind:thumb_call to:0x0203a1fc module:main
 from:0x021b44e4 kind:load to:0x021b40f1 module:overlay(198)
 from:0x021b44e8 kind:load to:0x021b4295 module:overlay(198)
 from:0x021b44ec kind:load to:0x021b437d module:overlay(198)
-from:0x021b4550 kind:load to:0x021e0001 module:overlay(36)

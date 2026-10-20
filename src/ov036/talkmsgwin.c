@@ -5,6 +5,8 @@
 // names; the other functions are unnamed, and the types' and constants' names are ours. The code was first written by
 // mariano54 on their parallel-decomp branch.
 
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
 #include "field/talkmsgwin.h"
@@ -104,58 +106,58 @@ struct TalkMsgWinSys {
     NNSGfdPlttKey plttKey;
 };
 
-static void func_ov036_0218b5e0(TalkMsgWin *win);
-static BOOL func_ov036_0218b5fc(TalkMsgWin *win);
-static BOOL func_ov036_0218b60c(TalkMsgWin *win);
-static BmpWin *func_ov036_0218b61c(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height);
+static void TalkMsgWin_Reset(TalkMsgWin *win);
+static BOOL TalkMsgWin_IsFree(TalkMsgWin *win);
+static BOOL TalkMsgWin_IsShown(TalkMsgWin *win);
+static BmpWin *TalkMsgWinSys_CreateBmpWin(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height);
 static void ActorMsgWin_CreateCore(TalkMsgWinSys *sys, TalkMsgWin *win, const VecFx32 *target, StrBuf *strbuf,
                                    const TalkMsgWinParam *param);
-static void func_ov036_0218b6c4(TalkMsgWinSys *sys, TalkMsgWin *win);
-static void func_ov036_0218b6f8(TalkMsgWin *win);
-static void func_ov036_0218b700(TalkMsgWin *win);
+static void TalkMsgWin_Free(TalkMsgWinSys *sys, TalkMsgWin *win);
+static void TalkMsgWin_RequestOpen(TalkMsgWin *win);
+static void TalkMsgWin_RequestClose(TalkMsgWin *win);
 // A window's state, for windows that grow from their tail: the polygons follow the target, the frame is redrawn
 // when the tail moves to another side, and printing starts once the window is full size
-static void func_ov036_0218b70c(TalkMsgWinSys *sys, TalkMsgWin *win);
+static void TalkMsgWin_UpdateAnimated(TalkMsgWinSys *sys, TalkMsgWin *win);
 // A window's state, for windows created by func_ov036_0218b370, which open and close at once
-static void func_ov036_0218b7e8(TalkMsgWinSys *sys, TalkMsgWin *win);
-static void func_ov036_0218b870(TalkMsgWinSys *sys, TalkMsgWin *win);
+static void TalkMsgWin_UpdateImmediate(TalkMsgWinSys *sys, TalkMsgWin *win);
+static void TalkMsgWin_Draw(TalkMsgWinSys *sys, TalkMsgWin *win);
 // Draws the tail, and the window's quad scaled by the frame of its opening while it isn't shown
-static void func_ov036_0218b8a4(TalkMsgWinSys *sys, TalkMsgWin *win, BOOL shown);
+static void TalkMsgWin_DrawPolygons(TalkMsgWinSys *sys, TalkMsgWin *win, BOOL shown);
 // The screen position of a point of the scene, and the point on the near plane there
-static void func_ov036_0218b9fc(const VecFx32 *world, int *x, int *y, VecFx32 *out);
+static void TalkMsgWin_ProjectTarget(const VecFx32 *world, int *x, int *y, VecFx32 *out);
 // The point of another window that a tail between them ends at, on the near plane
-static void func_ov036_0218ba18(TalkMsgWin *win, TalkMsgWin *other, int *outX, int *outY, VecFx32 *out);
+static void TalkMsgWin_GetWindowAnchor(TalkMsgWin *win, TalkMsgWin *other, int *outX, int *outY, VecFx32 *out);
 // Where a tail leaves the frame of a window across the screen, on its left or its right part
-static void func_ov036_0218bae4(int x, int width, BOOL right, u16 *outLeft, u16 *outRight);
+static void TalkMsgWin_GetBarTailBounds(int x, int width, BOOL right, u16 *outLeft, u16 *outRight);
 // Where the tail leaves the frame, on the near plane, for a target at targetX and targetY on the screen, and which
 // side of the frame that is
-static u32 func_ov036_0218bb0c(TalkMsgWin *win, int targetX, int targetY, VecFx32 *start, VecFx32 *end);
+static u32 TalkMsgWin_CalcTailBase(TalkMsgWin *win, int targetX, int targetY, VecFx32 *start, VecFx32 *end);
 // The window's corners on the near plane
-static void func_ov036_0218bcb0(TalkMsgWin *win, VecFx32 *topLeft, VecFx32 *topRight, VecFx32 *bottomLeft,
-                                VecFx32 *bottomRight);
+static void TalkMsgWin_GetNearPlaneCorners(TalkMsgWin *win, VecFx32 *topLeft, VecFx32 *topRight, VecFx32 *bottomLeft,
+                                           VecFx32 *bottomRight);
 // Sets the polygons from the tail's tip, where it leaves the frame, and the window's corners
-static void func_ov036_0218bd14(TalkMsgWinSys *sys, TalkMsgWin *win, const VecFx32 *target, const VecFx32 *start,
-                                const VecFx32 *end, const VecFx32 *topLeft, const VecFx32 *topRight,
-                                const VecFx32 *bottomLeft, const VecFx32 *bottomRight);
+static void TalkMsgWin_SetPolygons(TalkMsgWinSys *sys, TalkMsgWin *win, const VecFx32 *target, const VecFx32 *start,
+                                   const VecFx32 *end, const VecFx32 *topLeft, const VecFx32 *topRight,
+                                   const VecFx32 *bottomLeft, const VecFx32 *bottomRight);
 // Moves the polygons to the target, and returns whether the tail went to another side of the frame
-static BOOL func_ov036_0218bec0(TalkMsgWinSys *sys, TalkMsgWin *win);
+static BOOL TalkMsgWin_UpdatePolygons(TalkMsgWinSys *sys, TalkMsgWin *win);
 // Looks at the target from the camera's place relative to it, with the near plane in front of the camera's, through
 // the camera or, to draw, straight to the geometry engine
 static void func_ov036_0218bf5c(TalkMsgWinSys *sys, BOOL draw);
-static void func_ov036_0218bfe4(TalkMsgWinSys *sys);
-static void func_ov036_0218c018(TalkMsgWinSys *sys);
-static u32 func_ov036_0218c054(TalkMsgWinSys *sys, TalkMsgWinSetup *setup);
+static void TalkMsgWinSys_BackupCamera(TalkMsgWinSys *sys);
+static void TalkMsgWinSys_RestoreCamera(TalkMsgWinSys *sys);
+static u32 TalkMsgWinSys_LoadFrameResources(TalkMsgWinSys *sys, TalkMsgWinSetup *setup);
 static void loadTexture(TalkMsgWinSys *sys);
 // The frames, drawn in the BG's screen around a window except at the screen's edges, with the tail's tile on one side.
 // A tile number's 0x400 and 0x800 flip it horizontally and vertically
-static void func_ov036_0218c174(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail);
-static void func_ov036_0218c4c0(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail);
-static void func_ov036_0218c9dc(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail);
-static void func_ov036_0218cf00(TalkMsgWinSys *sys, BmpWin *bmpWin, u8 frameType, u32 tail);
-static void func_ov036_0218cf28(TalkMsgWinSys *sys, TalkMsgWin *win);
-static void func_ov036_0218cf38(TalkMsgWinSys *sys, TalkMsgWin *win);
+static void TalkMsgWin_DrawNormalFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail);
+static void TalkMsgWin_DrawSpikyFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail);
+static void TalkMsgWin_DrawBumpyFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail);
+static void TalkMsgWin_DrawFrameByType(TalkMsgWinSys *sys, BmpWin *bmpWin, u8 frameType, u32 tail);
+static void TalkMsgWin_DrawFrameWithoutTail(TalkMsgWinSys *sys, TalkMsgWin *win);
+static void TalkMsgWin_DrawFrameWithTail(TalkMsgWinSys *sys, TalkMsgWin *win);
 // Clears the frame around a window
-static void func_ov036_0218cf48(TalkMsgWinSys *sys, BmpWin *bmpWin);
+static void TalkMsgWin_ClearFrame(TalkMsgWinSys *sys, BmpWin *bmpWin);
 
 // The tails' texture, 8x8 texels of 16 colors, and its palette
 static u8 TALKMSG_WIN_TEX[] = {
@@ -168,18 +170,18 @@ static u8 TALKMSG_WIN_PLT[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x63,
 };
 
-TalkMsgWinSys *func_ov036_0218b1f8(const TalkMsgWinSetup *setup) {
+TalkMsgWinSys *TalkMsgWinSys_Create(const TalkMsgWinSetup *setup) {
     TalkMsgWinSys *sys = GFL_HeapAllocate(setup->heapId, sizeof(TalkMsgWinSys), TRUE, "talkmsgwin.c", 236);
     int i;
 
     sys->setup = *setup;
     sys->tcbMgr = GFL_TCBExMgrCreate(setup->heapId, setup->heapId, TALKMSG_WIN_COUNT, 32);
     for (i = 0; i < TALKMSG_WIN_COUNT; i++) {
-        func_ov036_0218b5e0(&sys->windows[i]);
+        TalkMsgWin_Reset(&sys->windows[i]);
     }
     sys->texKey = NNS_GfdAllocTexVram(sizeof(TALKMSG_WIN_TEX), FALSE, 0);
     sys->plttKey = NNS_GfdAllocPlttVram(sizeof(TALKMSG_WIN_PLT), FALSE, 0);
-    sys->frameChars = func_ov036_0218c054(sys, &sys->setup) / BGSYS_TILE_SIZE_16;
+    sys->frameChars = TalkMsgWinSys_LoadFrameResources(sys, &sys->setup) / BGSYS_TILE_SIZE_16;
     return sys;
 }
 
@@ -187,42 +189,42 @@ void loadTexture_wrapper(TalkMsgWinSys *sys) {
     loadTexture(sys);
 }
 
-void func_ov036_0218b294(TalkMsgWinSys *sys) {
+void TalkMsgWinSys_Update(TalkMsgWinSys *sys) {
     int i;
 
     GFL_TCBExMgrUpdate(sys->tcbMgr);
-    func_ov036_0218bfe4(sys);
+    TalkMsgWinSys_BackupCamera(sys);
     func_ov036_0218bf5c(sys, FALSE);
     for (i = 0; i < TALKMSG_WIN_COUNT; i++) {
         if (sys->windows[i].skipAnim == 0) {
-            func_ov036_0218b70c(sys, &sys->windows[i]);
+            TalkMsgWin_UpdateAnimated(sys, &sys->windows[i]);
         } else {
-            func_ov036_0218b7e8(sys, &sys->windows[i]);
+            TalkMsgWin_UpdateImmediate(sys, &sys->windows[i]);
         }
     }
-    func_ov036_0218c018(sys);
+    TalkMsgWinSys_RestoreCamera(sys);
 }
 
 void func_ov036_0218b2e8(TalkMsgWinSys *sys) {
 }
 
-void func_ov036_0218b2ec(TalkMsgWinSys *sys) {
+void TalkMsgWinSys_Draw(TalkMsgWinSys *sys) {
     int i;
 
     NNS_G3dGeFlushBuffer();
     func_ov036_0218bf5c(sys, TRUE);
     for (i = 0; i < TALKMSG_WIN_COUNT; i++) {
         if (sys->windows[i].skipAnim == 0) {
-            func_ov036_0218b870(sys, &sys->windows[i]);
+            TalkMsgWin_Draw(sys, &sys->windows[i]);
         }
     }
 }
 
-void func_ov036_0218b320(TalkMsgWinSys *sys) {
+void TalkMsgWinSys_Free(TalkMsgWinSys *sys) {
     int i;
 
     for (i = 0; i < TALKMSG_WIN_COUNT; i++) {
-        func_ov036_0218b6c4(sys, &sys->windows[i]);
+        TalkMsgWin_Free(sys, &sys->windows[i]);
     }
     NNS_GfdFreePlttVram(sys->plttKey);
     NNS_GfdFreeTexVram(sys->texKey);
@@ -297,15 +299,15 @@ void ActorMsgWin_CreateAtAutoPos(TalkMsgWinSys *sys, u32 index, const VecFx32 *t
 }
 
 void func_ov036_0218b4b4(TalkMsgWinSys *sys, u32 index) {
-    func_ov036_0218b6c4(sys, &sys->windows[index]);
+    TalkMsgWin_Free(sys, &sys->windows[index]);
 }
 
 void func_ov036_0218b4c8(TalkMsgWinSys *sys, u32 index) {
-    func_ov036_0218b6f8(&sys->windows[index]);
+    TalkMsgWin_RequestOpen(&sys->windows[index]);
 }
 
 void func_ov036_0218b4d8(TalkMsgWinSys *sys, u32 index) {
-    func_ov036_0218b700(&sys->windows[index]);
+    TalkMsgWin_RequestClose(&sys->windows[index]);
 }
 
 BOOL func_ov036_0218b4e8(TalkMsgWinSys *sys, u32 index) {
@@ -316,7 +318,7 @@ BOOL func_ov036_0218b4e8(TalkMsgWinSys *sys, u32 index) {
 }
 
 BOOL func_ov036_0218b4fc(TalkMsgWinSys *sys, u32 index) {
-    return func_ov036_0218b60c(&sys->windows[index]);
+    return TalkMsgWin_IsShown(&sys->windows[index]);
 }
 
 PrintStream *func_ov036_0218b50c(TalkMsgWinSys *sys, u32 index) {
@@ -344,27 +346,27 @@ void func_ov036_0218b524(TalkMsgWinSys *sys, u32 index, StrBuf *strbuf, u32 wait
 }
 
 BmpWin *func_ov036_0218b588(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height, u32 frameType) {
-    BmpWin *bmpWin = func_ov036_0218b61c(sys, x, y, width, height);
+    BmpWin *bmpWin = TalkMsgWinSys_CreateBmpWin(sys, x, y, width, height);
 
-    func_ov036_0218cf00(sys, bmpWin, frameType, TALKMSG_WIN_TAIL_NONE);
+    TalkMsgWin_DrawFrameByType(sys, bmpWin, frameType, TALKMSG_WIN_TAIL_NONE);
     return bmpWin;
 }
 
 void func_ov036_0218b5ac(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 frameType) {
-    func_ov036_0218cf00(sys, bmpWin, frameType, TALKMSG_WIN_TAIL_NONE);
+    TalkMsgWin_DrawFrameByType(sys, bmpWin, frameType, TALKMSG_WIN_TAIL_NONE);
 }
 
 void func_ov036_0218b5bc(TalkMsgWinSys *sys, BmpWin *bmpWin) {
-    func_ov036_0218cf48(sys, bmpWin);
+    TalkMsgWin_ClearFrame(sys, bmpWin);
     GFL_BGSysLoadScr(sys->setup.bg);
 }
 
 void func_ov036_0218b5d0(TalkMsgWinSys *sys, BmpWin *bmpWin) {
-    func_ov036_0218cf48(sys, bmpWin);
+    TalkMsgWin_ClearFrame(sys, bmpWin);
     BmpWin_Free(bmpWin);
 }
 
-static void func_ov036_0218b5e0(TalkMsgWin *win) {
+static void TalkMsgWin_Reset(TalkMsgWin *win) {
     win->state = TALKMSG_WIN_STATE_FREE;
     win->stream = NULL;
     VEC_Fx16Set(&win->poly.vtx[0], 0, 0, 0);
@@ -372,21 +374,21 @@ static void func_ov036_0218b5e0(TalkMsgWin *win) {
     VEC_Fx16Set(&win->poly.vtx[2], 0, 0, 0);
 }
 
-static BOOL func_ov036_0218b5fc(TalkMsgWin *win) {
+static BOOL TalkMsgWin_IsFree(TalkMsgWin *win) {
     if (win->state == TALKMSG_WIN_STATE_FREE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov036_0218b60c(TalkMsgWin *win) {
+static BOOL TalkMsgWin_IsShown(TalkMsgWin *win) {
     if (win->state == TALKMSG_WIN_STATE_SHOWN) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BmpWin *func_ov036_0218b61c(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height) {
+static BmpWin *TalkMsgWinSys_CreateBmpWin(TalkMsgWinSys *sys, u8 x, u8 y, u8 width, u8 height) {
     BmpWin *bmpWin = BmpWin_CreateDynamic(sys->setup.bg, x, y, width, height, sys->setup.winPalette, TRUE);
 
     GFL_BitmapFill(BmpWin_GetBitmap(bmpWin), 15);
@@ -401,7 +403,7 @@ static void ActorMsgWin_CreateCore(TalkMsgWinSys *sys, TalkMsgWin *win, const Ve
     u8 width;
     u8 height;
 
-    func_ov036_0218b6c4(sys, win);
+    TalkMsgWin_Free(sys, win);
     win->target = target;
     win->strbuf = strbuf;
     win->color = param->color;
@@ -416,44 +418,44 @@ static void ActorMsgWin_CreateCore(TalkMsgWinSys *sys, TalkMsgWin *win, const Ve
     if (y + height > TALKMSG_WIN_SCREEN_HEIGHT) {
         y = TALKMSG_WIN_SCREEN_HEIGHT - height;
     }
-    win->bmpWin = func_ov036_0218b61c(sys, x, y, width, height);
+    win->bmpWin = TalkMsgWinSys_CreateBmpWin(sys, x, y, width, height);
     win->poly.tail = param->tail;
     win->textX = 8;
     win->textY = 0;
     win->state = TALKMSG_WIN_STATE_CREATED;
 }
 
-static void func_ov036_0218b6c4(TalkMsgWinSys *sys, TalkMsgWin *win) {
-    if (func_ov036_0218b5fc(win) == FALSE) {
+static void TalkMsgWin_Free(TalkMsgWinSys *sys, TalkMsgWin *win) {
+    if (TalkMsgWin_IsFree(win) == FALSE) {
         if (win->stream != NULL) {
             PrintStream_Delete(win->stream);
             win->stream = NULL;
         }
-        func_ov036_0218cf48(sys, win->bmpWin);
+        TalkMsgWin_ClearFrame(sys, win->bmpWin);
         BmpWin_Free(win->bmpWin);
         win->skipAnim = 0;
         win->state = TALKMSG_WIN_STATE_FREE;
     }
 }
 
-static void func_ov036_0218b6f8(TalkMsgWin *win) {
+static void TalkMsgWin_RequestOpen(TalkMsgWin *win) {
     win->state = TALKMSG_WIN_STATE_OPEN;
 }
 
-static void func_ov036_0218b700(TalkMsgWin *win) {
+static void TalkMsgWin_RequestClose(TalkMsgWin *win) {
     win->state = TALKMSG_WIN_STATE_CLOSING;
     win->frame = TALKMSG_WIN_CLOSE_FRAMES;
 }
 
-static void func_ov036_0218b70c(TalkMsgWinSys *sys, TalkMsgWin *win) {
+static void TalkMsgWin_UpdateAnimated(TalkMsgWinSys *sys, TalkMsgWin *win) {
     switch (win->state) {
     case TALKMSG_WIN_STATE_OPEN:
-        func_ov036_0218bec0(sys, win);
+        TalkMsgWin_UpdatePolygons(sys, win);
         win->frame = 0;
         win->state = TALKMSG_WIN_STATE_OPENING;
         break;
     case TALKMSG_WIN_STATE_OPENING:
-        func_ov036_0218bec0(sys, win);
+        TalkMsgWin_UpdatePolygons(sys, win);
         if (win->frame < TALKMSG_WIN_OPEN_FRAMES) {
             win->frame++;
         } else {
@@ -461,14 +463,14 @@ static void func_ov036_0218b70c(TalkMsgWinSys *sys, TalkMsgWin *win) {
 
             win->state = TALKMSG_WIN_STATE_SHOWN;
             wait = win->wait;
-            func_ov036_0218cf38(sys, win);
+            TalkMsgWin_DrawFrameWithTail(sys, win);
             win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
                                              sys->tcbMgr, 0, sys->setup.heapId, 15);
         }
         break;
     case TALKMSG_WIN_STATE_SHOWN:
-        if (func_ov036_0218bec0(sys, win) == TRUE) {
-            func_ov036_0218cf38(sys, win);
+        if (TalkMsgWin_UpdatePolygons(sys, win) == TRUE) {
+            TalkMsgWin_DrawFrameWithTail(sys, win);
         }
         break;
     case TALKMSG_WIN_STATE_CLOSING:
@@ -479,12 +481,12 @@ static void func_ov036_0218b70c(TalkMsgWinSys *sys, TalkMsgWin *win) {
         }
         break;
     case TALKMSG_WIN_STATE_CLOSED:
-        func_ov036_0218b6c4(sys, win);
+        TalkMsgWin_Free(sys, win);
         break;
     }
 }
 
-static void func_ov036_0218b7e8(TalkMsgWinSys *sys, TalkMsgWin *win) {
+static void TalkMsgWin_UpdateImmediate(TalkMsgWinSys *sys, TalkMsgWin *win) {
     switch (win->state) {
     case TALKMSG_WIN_STATE_OPEN:
         win->frame = 0;
@@ -494,7 +496,7 @@ static void func_ov036_0218b7e8(TalkMsgWinSys *sys, TalkMsgWin *win) {
 
         win->state = TALKMSG_WIN_STATE_SHOWN;
         wait = win->wait;
-        func_ov036_0218cf28(sys, win);
+        TalkMsgWin_DrawFrameWithoutTail(sys, win);
         win->stream = PrintStream_Create(win->bmpWin, win->textX, win->textY, win->strbuf, sys->setup.font, wait,
                                          sys->tcbMgr, 0, sys->setup.heapId, 15);
         break;
@@ -503,22 +505,22 @@ static void func_ov036_0218b7e8(TalkMsgWinSys *sys, TalkMsgWin *win) {
         win->state = TALKMSG_WIN_STATE_CLOSED;
         break;
     case TALKMSG_WIN_STATE_CLOSED:
-        func_ov036_0218b6c4(sys, win);
+        TalkMsgWin_Free(sys, win);
         break;
     }
 }
 
-static void func_ov036_0218b870(TalkMsgWinSys *sys, TalkMsgWin *win) {
+static void TalkMsgWin_Draw(TalkMsgWinSys *sys, TalkMsgWin *win) {
     switch (win->state) {
     case TALKMSG_WIN_STATE_FREE:
     case TALKMSG_WIN_STATE_CREATED:
     case TALKMSG_WIN_STATE_OPEN:
         break;
     case TALKMSG_WIN_STATE_OPENING:
-        func_ov036_0218b8a4(sys, win, FALSE);
+        TalkMsgWin_DrawPolygons(sys, win, FALSE);
         break;
     case TALKMSG_WIN_STATE_SHOWN:
-        func_ov036_0218b8a4(sys, win, TRUE);
+        TalkMsgWin_DrawPolygons(sys, win, TRUE);
         break;
     case TALKMSG_WIN_STATE_CLOSING:
     case TALKMSG_WIN_STATE_CLOSED:
@@ -526,7 +528,7 @@ static void func_ov036_0218b870(TalkMsgWinSys *sys, TalkMsgWin *win) {
     }
 }
 
-static void func_ov036_0218b8a4(TalkMsgWinSys *sys, TalkMsgWin *win, BOOL shown) {
+static void TalkMsgWin_DrawPolygons(TalkMsgWinSys *sys, TalkMsgWin *win, BOOL shown) {
     const TalkMsgWinPolygon *poly = &win->poly;
     fx32 scale;
 
@@ -567,12 +569,12 @@ static void func_ov036_0218b8a4(TalkMsgWinSys *sys, TalkMsgWin *win, BOOL shown)
     G3_PopMtx(1);
 }
 
-static void func_ov036_0218b9fc(const VecFx32 *world, int *x, int *y, VecFx32 *out) {
+static void TalkMsgWin_ProjectTarget(const VecFx32 *world, int *x, int *y, VecFx32 *out) {
     NNS_G3dWorldPosToScrPos(world, x, y);
     NNS_G3dScrPosToWorldLine(*x, *y, out, NULL);
 }
 
-static void func_ov036_0218ba18(TalkMsgWin *win, TalkMsgWin *other, int *outX, int *outY, VecFx32 *out) {
+static void TalkMsgWin_GetWindowAnchor(TalkMsgWin *win, TalkMsgWin *other, int *outX, int *outY, VecFx32 *out) {
     int winX = (BmpWin_GetPosX(win->bmpWin) - 1) * 8;
     int winY = (BmpWin_GetPosY(win->bmpWin) - 1) * 8;
     int winW = (BmpWin_GetWidth1(win->bmpWin) + 2) * 8;
@@ -599,7 +601,7 @@ static void func_ov036_0218ba18(TalkMsgWin *win, TalkMsgWin *other, int *outX, i
     NNS_G3dScrPosToWorldLine(*outX, *outY, out, NULL);
 }
 
-static void func_ov036_0218bae4(int x, int width, BOOL right, u16 *outLeft, u16 *outRight) {
+static void TalkMsgWin_GetBarTailBounds(int x, int width, BOOL right, u16 *outLeft, u16 *outRight) {
     if (right == FALSE) {
         *outLeft = x + 64;
         *outRight = *outLeft + 16;
@@ -609,7 +611,7 @@ static void func_ov036_0218bae4(int x, int width, BOOL right, u16 *outLeft, u16 
     }
 }
 
-static u32 func_ov036_0218bb0c(TalkMsgWin *win, int targetX, int targetY, VecFx32 *start, VecFx32 *end) {
+static u32 TalkMsgWin_CalcTailBase(TalkMsgWin *win, int targetX, int targetY, VecFx32 *start, VecFx32 *end) {
     int x = (BmpWin_GetPosX(win->bmpWin) - 1) * 8;
     int y = (BmpWin_GetPosY(win->bmpWin) - 1) * 8;
     int width = (BmpWin_GetWidth1(win->bmpWin) + 2) * 8;
@@ -678,7 +680,7 @@ static u32 func_ov036_0218bb0c(TalkMsgWin *win, int targetX, int targetY, VecFx3
             right = TRUE;
             result = TALKMSG_WIN_TAIL_BOTTOM_RIGHT;
         }
-        func_ov036_0218bae4(x, width, right, &startX, &endX);
+        TalkMsgWin_GetBarTailBounds(x, width, right, &startX, &endX);
         break;
     case TALKMSG_WIN_SHAPE_BOTTOM:
         endY = startY = y + 4;
@@ -697,7 +699,7 @@ static u32 func_ov036_0218bb0c(TalkMsgWin *win, int targetX, int targetY, VecFx3
             right = TRUE;
             result = TALKMSG_WIN_TAIL_TOP_RIGHT;
         }
-        func_ov036_0218bae4(x, width, right, &startX, &endX);
+        TalkMsgWin_GetBarTailBounds(x, width, right, &startX, &endX);
         break;
     }
     NNS_G3dScrPosToWorldLine(startX, startY, start, NULL);
@@ -705,8 +707,8 @@ static u32 func_ov036_0218bb0c(TalkMsgWin *win, int targetX, int targetY, VecFx3
     return result;
 }
 
-static void func_ov036_0218bcb0(TalkMsgWin *win, VecFx32 *topLeft, VecFx32 *topRight, VecFx32 *bottomLeft,
-                                VecFx32 *bottomRight) {
+static void TalkMsgWin_GetNearPlaneCorners(TalkMsgWin *win, VecFx32 *topLeft, VecFx32 *topRight, VecFx32 *bottomLeft,
+                                           VecFx32 *bottomRight) {
     int x = BmpWin_GetPosX(win->bmpWin) * 8;
     int y = (BmpWin_GetPosY(win->bmpWin) - 1) * 8;
     int width = BmpWin_GetWidth1(win->bmpWin) * 8;
@@ -718,9 +720,9 @@ static void func_ov036_0218bcb0(TalkMsgWin *win, VecFx32 *topLeft, VecFx32 *topR
     NNS_G3dScrPosToWorldLine(x + width, y + height, bottomRight, NULL);
 }
 
-static void func_ov036_0218bd14(TalkMsgWinSys *sys, TalkMsgWin *win, const VecFx32 *target, const VecFx32 *start,
-                                const VecFx32 *end, const VecFx32 *topLeft, const VecFx32 *topRight,
-                                const VecFx32 *bottomLeft, const VecFx32 *bottomRight) {
+static void TalkMsgWin_SetPolygons(TalkMsgWinSys *sys, TalkMsgWin *win, const VecFx32 *target, const VecFx32 *start,
+                                   const VecFx32 *end, const VecFx32 *topLeft, const VecFx32 *topRight,
+                                   const VecFx32 *bottomLeft, const VecFx32 *bottomRight) {
     VecFx32 toStart;
     VecFx32 toEnd;
     VecFx32 toTopLeft;
@@ -776,7 +778,7 @@ static void func_ov036_0218bd14(TalkMsgWinSys *sys, TalkMsgWin *win, const VecFx
                 FX_Div(toBottomRight.z, size));
 }
 
-static BOOL func_ov036_0218bec0(TalkMsgWinSys *sys, TalkMsgWin *win) {
+static BOOL TalkMsgWin_UpdatePolygons(TalkMsgWinSys *sys, TalkMsgWin *win) {
     VecFx32 tip;
     VecFx32 start;
     VecFx32 end;
@@ -791,13 +793,13 @@ static BOOL func_ov036_0218bec0(TalkMsgWinSys *sys, TalkMsgWin *win) {
 
     if (win->target != NULL) {
         VEC_Subtract(win->target, &sys->camTarget, &target);
-        func_ov036_0218b9fc(&target, &x, &y, &tip);
+        TalkMsgWin_ProjectTarget(&target, &x, &y, &tip);
     } else {
-        func_ov036_0218ba18(win, &sys->windows[win->anchorWin], &x, &y, &tip);
+        TalkMsgWin_GetWindowAnchor(win, &sys->windows[win->anchorWin], &x, &y, &tip);
     }
-    tail = func_ov036_0218bb0c(win, x, y, &start, &end);
-    func_ov036_0218bcb0(win, &topLeft, &topRight, &bottomLeft, &bottomRight);
-    func_ov036_0218bd14(sys, win, &tip, &start, &end, &topLeft, &topRight, &bottomLeft, &bottomRight);
+    tail = TalkMsgWin_CalcTailBase(win, x, y, &start, &end);
+    TalkMsgWin_GetNearPlaneCorners(win, &topLeft, &topRight, &bottomLeft, &bottomRight);
+    TalkMsgWin_SetPolygons(sys, win, &tip, &start, &end, &topLeft, &topRight, &bottomLeft, &bottomRight);
     if (win->poly.tail != tail) {
         win->poly.tail = tail;
         return TRUE;
@@ -831,14 +833,14 @@ static void func_ov036_0218bf5c(TalkMsgWinSys *sys, BOOL draw) {
     }
 }
 
-static void func_ov036_0218bfe4(TalkMsgWinSys *sys) {
+static void TalkMsgWinSys_BackupCamera(TalkMsgWinSys *sys) {
     GFL_G3DCameraGetLookatPos(sys->setup.camera, &sys->camPos);
     GFL_G3DCameraGetLookatUpVector(sys->setup.camera, &sys->camUp);
     GFL_G3DCameraGetLookatTarget(sys->setup.camera, &sys->camTarget);
     GFL_G3DCameraGetProjectionZNear(sys->setup.camera, &sys->camZNear);
 }
 
-static void func_ov036_0218c018(TalkMsgWinSys *sys) {
+static void TalkMsgWinSys_RestoreCamera(TalkMsgWinSys *sys) {
     GFL_G3DCameraSetLookatPos(sys->setup.camera, &sys->camPos);
     GFL_G3DCameraSetLookatUpVector(sys->setup.camera, &sys->camUp);
     GFL_G3DCameraSetLookatTarget(sys->setup.camera, &sys->camTarget);
@@ -846,7 +848,7 @@ static void func_ov036_0218c018(TalkMsgWinSys *sys) {
     GFL_G3DCameraFlush(sys->setup.camera);
 }
 
-static u32 func_ov036_0218c054(TalkMsgWinSys *sys, TalkMsgWinSetup *setup) {
+static u32 TalkMsgWinSys_LoadFrameResources(TalkMsgWinSys *sys, TalkMsgWinSetup *setup) {
     u32 palType;
 
     GFL_BGSysClearScr(setup->bg);
@@ -891,7 +893,7 @@ void func_ov036_0218c110(TalkMsgWinSys *sys) {
     GFL_BGSysLoadNCGRStatic(ARCID_WINFRAME, 5, sys->setup.bg, sys->setup.frameChar, 0, FALSE, sys->setup.heapId);
 }
 
-static void func_ov036_0218c174(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
+static void TalkMsgWin_DrawNormalFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
     int x = BmpWin_GetPosX(bmpWin);
     int y = BmpWin_GetPosY(bmpWin);
     u16 width = BmpWin_GetWidth1(bmpWin);
@@ -1015,7 +1017,7 @@ static void func_ov036_0218c174(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
     GFL_BGSysLoadScr(bg);
 }
 
-static void func_ov036_0218c4c0(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
+static void TalkMsgWin_DrawSpikyFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
     // The order of these declarations, with the values assigned after them, sets the locals' registers and stack
     // slots
     int atTop;
@@ -1185,7 +1187,7 @@ static void func_ov036_0218c4c0(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
     GFL_BGSysLoadScr(bg);
 }
 
-static void func_ov036_0218c9dc(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
+static void TalkMsgWin_DrawBumpyFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
     // The order of these declarations, with the values assigned after them, sets the locals' registers and stack
     // slots
     int atTop;
@@ -1356,29 +1358,29 @@ static void func_ov036_0218c9dc(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 tail) {
     GFL_BGSysLoadScr(bg);
 }
 
-static void func_ov036_0218cf00(TalkMsgWinSys *sys, BmpWin *bmpWin, u8 frameType, u32 tail) {
+static void TalkMsgWin_DrawFrameByType(TalkMsgWinSys *sys, BmpWin *bmpWin, u8 frameType, u32 tail) {
     switch (frameType) {
     case TALKMSG_WIN_FRAME_NORMAL:
-        func_ov036_0218c174(sys, bmpWin, tail);
+        TalkMsgWin_DrawNormalFrame(sys, bmpWin, tail);
         break;
     case TALKMSG_WIN_FRAME_SPIKY:
-        func_ov036_0218c4c0(sys, bmpWin, tail);
+        TalkMsgWin_DrawSpikyFrame(sys, bmpWin, tail);
         break;
     case TALKMSG_WIN_FRAME_BUMPY:
-        func_ov036_0218c9dc(sys, bmpWin, tail);
+        TalkMsgWin_DrawBumpyFrame(sys, bmpWin, tail);
         break;
     }
 }
 
-static void func_ov036_0218cf28(TalkMsgWinSys *sys, TalkMsgWin *win) {
-    func_ov036_0218cf00(sys, win->bmpWin, win->frameType, TALKMSG_WIN_TAIL_NONE);
+static void TalkMsgWin_DrawFrameWithoutTail(TalkMsgWinSys *sys, TalkMsgWin *win) {
+    TalkMsgWin_DrawFrameByType(sys, win->bmpWin, win->frameType, TALKMSG_WIN_TAIL_NONE);
 }
 
-static void func_ov036_0218cf38(TalkMsgWinSys *sys, TalkMsgWin *win) {
-    func_ov036_0218cf00(sys, win->bmpWin, win->frameType, win->poly.tail);
+static void TalkMsgWin_DrawFrameWithTail(TalkMsgWinSys *sys, TalkMsgWin *win) {
+    TalkMsgWin_DrawFrameByType(sys, win->bmpWin, win->frameType, win->poly.tail);
 }
 
-static void func_ov036_0218cf48(TalkMsgWinSys *sys, BmpWin *bmpWin) {
+static void TalkMsgWin_ClearFrame(TalkMsgWinSys *sys, BmpWin *bmpWin) {
     // The order of these declarations sets the locals' registers
     int y;
     int x;

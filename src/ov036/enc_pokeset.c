@@ -3,8 +3,12 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "constants/abilities.h"
+#include "constants/flags.h"
 #include "constants/items.h"
+#include "constants/natures.h"
 #include "constants/pokemon.h"
+#include "constants/types.h"
+#include "constants/zones.h"
 #include "field/enc_pokeset.h"
 #include "field/encounter.h"
 #include "field/field.h"
@@ -21,10 +25,10 @@
 #include "system/aeabi.h"
 #include "system/game_data.h"
 
-// The flag that marks the swarms, which overlay 36's swarm table lists
-#define FLAG_SWARMS 0x960
-// The flag that lets N's Pokémon appear
-#define FLAG_N_POKEMON 0x98a
+// The event flag that starts the swarms, which other systems wait for too
+#define FLAG_SWARMS EVENT_FLAG_0x0960
+// The event flag that lets N's Pokémon appear
+#define FLAG_N_POKEMON EVENT_FLAG_0x098a
 
 static void SetupEncountFlagsByPartyPokeAbil(EncountManager *manager, u16 weather);
 static BOOL FieldEncount_CheckLevelRepelled(EncountManager *manager, u8 level);
@@ -36,7 +40,7 @@ static void FieldEncount_CheckApplyHighLevelWilds(const EncountManager *manager,
                                                   WildPkmParam *param);
 static void FieldEncount_GenWildPokeParam(EncountManager *manager, const WildEncSlot *slots, WildPkmParam *param);
 static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL compoundEyes, BOOL doubleBattle);
-static u32 FieldEncount_GenPID(EncountManager *manager, void *personal, WildPkmParam *param);
+static u32 FieldEncount_GenPID(const EncountManager *manager, void *personal, WildPkmParam *param);
 static int GetEncountSlotByProbability(const u8 *odds, int count);
 static int EncountMakeRnd12(int count);
 static int EncountMakeRnd5T1(int count);
@@ -46,7 +50,7 @@ static int EncountMakeRndFull(int count);
 // The chance of each held item of the species' three, in percent: without and with Compound Eyes, in normal and in dark
 // grass
 // clang-format off
-static const u8 data_ov036_021d0118[4][3] = {
+static const u8 HELD_ITEM_RATES[4][3] = {
     {50, 5, 0},
     {60, 20, 0},
     {50, 5, 1},
@@ -62,23 +66,24 @@ static int (*const ENCOUNT_SLOT_RANDOMIZE_FUNCS[4])(int count) = {
     EncountMakeRndFull,
 };
 
-// The chance of each slot, in percent, for each row the Lucky Encounter pass powers pick
-// clang-format off
-static const u8 ENCOUNTRATE_RND5T1[4][5] = {
-    {60, 30, 5, 4, 1},
-    {50, 30, 10, 5, 5},
-    {40, 30, 10, 10, 10},
-    {30, 20, 10, 20, 20},
-};
-
-// clang-format on
-
+// The chance of each slot, in percent, for each row the Lucky Encounter pass powers pick. The two five-slot tables are
+// declared the other way round, since MWCC's sort of the data by size swaps them
 // clang-format off
 static const u8 ENCOUNTRATE_RND5T2[4][5] = {
     {40, 40, 15, 4, 1},
     {40, 35, 15, 5, 5},
     {30, 30, 20, 10, 10},
     {20, 20, 20, 20, 20},
+};
+
+// clang-format on
+
+// clang-format off
+static const u8 ENCOUNTRATE_RND5T1[4][5] = {
+    {60, 30, 5, 4, 1},
+    {50, 30, 10, 5, 5},
+    {40, 30, 10, 10, 10},
+    {30, 20, 10, 20, 20},
 };
 
 // clang-format on
@@ -94,36 +99,56 @@ static const u8 ENCOUNTRATE_RND12[4][12] = {
 // clang-format on
 
 // N's Pokémon: the zones they appear in, the species and level, the nature, and the sex and ability
-// clang-format off
-const NPokeSpec N_POKEMON_INFO[14] = {
-    {0x13f, 1, 509, 7, 10, 0, 1},
-    {0x9a, 1, 519, 13, 22, 0, 1},
-    {0x9a, 1, 535, 13, 15, 0, 1},
-    {0x9a, 1, 532, 13, 19, 0, 0},
-    {0x9e, 1, 551, 22, 6, 0, 1},
-    {0x9e, 1, 554, 22, 14, 0, 0},
-    {0x9e, 1, 561, 22, 21, 0, 1},
-    {0x9e, 1, 559, 22, 9, 0, 0},
-    {0xc3, 3, 525, 28, 14, 0, 0},
-    {0xc3, 3, 597, 28, 18, 0, 0},
-    {0xc3, 3, 595, 28, 6, 0, 1},
-    {0xc3, 3, 599, 28, 19, 0, 0},
-    {0x144, 1, 527, 55, 10, 0, 0},
-    {0x9e, 1, 555, 35, 20, 0, 2},
+const NPokeSpec N_POKEMON_INFO[ENCOUNT_SAVE_N_POKE_COUNT] = {
+    { ZONE_ROUTE_2, 1, SPECIES_PURRLOIN, 7, NATURE_TIMID, GENDER_MALE, 1 },
+    { ZONE_PINWHEEL_FOREST, 1, SPECIES_PIDOVE, 13, NATURE_SASSY, GENDER_MALE, 1 },
+    { ZONE_PINWHEEL_FOREST, 1, SPECIES_TYMPOLE, 13, NATURE_MODEST, GENDER_MALE, 1 },
+    { ZONE_PINWHEEL_FOREST, 1, SPECIES_TIMBURR, 13, NATURE_RASH, GENDER_MALE, 0 },
+    { ZONE_DESERT_RESORT_2, 1, SPECIES_SANDILE, 22, NATURE_DOCILE, GENDER_MALE, 1 },
+    { ZONE_DESERT_RESORT_2, 1, SPECIES_DARUMAKA, 22, NATURE_NAIVE, GENDER_MALE, 0 },
+    { ZONE_DESERT_RESORT_2, 1, SPECIES_SIGILYPH, 22, NATURE_GENTLE, GENDER_MALE, 1 },
+    { ZONE_DESERT_RESORT_2, 1, SPECIES_SCRAGGY, 22, NATURE_LAX, GENDER_MALE, 0 },
+    { ZONE_CHARGESTONE_CAVE_2, 3, SPECIES_BOLDORE, 28, NATURE_NAIVE, GENDER_MALE, 0 },
+    { ZONE_CHARGESTONE_CAVE_2, 3, SPECIES_FERROSEED, 28, NATURE_BASHFUL, GENDER_MALE, 0 },
+    { ZONE_CHARGESTONE_CAVE_2, 3, SPECIES_JOLTIK, 28, NATURE_DOCILE, GENDER_MALE, 1 },
+    { ZONE_CHARGESTONE_CAVE_2, 3, SPECIES_KLINK, 28, NATURE_RASH, GENDER_MALE, 0 },
+    { ZONE_WELLSPRING_CAVE, 1, SPECIES_WOOBAT, 55, NATURE_TIMID, GENDER_MALE, 0 },
+    { ZONE_DESERT_RESORT_2, 1, SPECIES_DARMANITAN, 35, NATURE_CALM, GENDER_MALE, 2 },
 };
 
-// clang-format on
-
-// clang-format off
-static const SwarmData data_ov036_021d01fc[19] = {
-    {0x13d, 83, 0, 40, 55},  {0x98, 97, 0, 40, 55},   {0x14b, 311, 0, 40, 55}, {0x141, 313, 0, 40, 55},
-    {0x15c, 317, 0, 40, 55}, {0x9e, 450, 0, 40, 55},  {0x149, 177, 0, 40, 55}, {0x151, 162, 0, 40, 55},
-    {0x170, 84, 0, 40, 55},  {0x159, 195, 0, 40, 55}, {0x16d, 284, 0, 40, 55}, {0x172, 277, 0, 40, 55},
-    {0x178, 79, 0, 40, 55},  {0x17a, 22, 0, 40, 55},  {0x17f, 204, 0, 40, 55}, {0x183, 187, 0, 40, 55},
-    {0x1cd, 332, 0, 40, 55}, {0x1be, 185, 0, 40, 55}, {0x1da, 168, 0, 40, 55},
+// The swarms: the zone, the species and form, and the level range. White 2 has Minun, Illumise, Mr. Mime and Ledian
+// for Plusle, Volbeat, Sudowoodo and Ariados, with Illumise's Route 3 swarm moved down the list
+static const SwarmData SWARM_DATA[ENCOUNT_SAVE_SWARM_LOCATION_COUNT] = {
+    { ZONE_ROUTE_1, SPECIES_FARFETCHD, 0, 40, 55 },
+    { ZONE_DREAMYARD, SPECIES_HYPNO, 0, 40, 55 },
+#ifdef BLACK2
+    { ZONE_ROUTE_6, SPECIES_PLUSLE, 0, 40, 55 },
+    { ZONE_ROUTE_3, SPECIES_VOLBEAT, 0, 40, 55 },
+#else
+    { ZONE_ROUTE_6, SPECIES_MINUN, 0, 40, 55 },
+#endif
+    { ZONE_ROUTE_9, SPECIES_SWALOT, 0, 40, 55 },
+    { ZONE_DESERT_RESORT_2, SPECIES_HIPPOWDON, 0, 40, 55 },
+    { ZONE_ROUTE_5, SPECIES_NATU, 0, 40, 55 },
+    { ZONE_ROUTE_7, SPECIES_FURRET, 0, 40, 55 },
+    { ZONE_ROUTE_12, SPECIES_DODUO, 0, 40, 55 },
+    { ZONE_ROUTE_8, SPECIES_QUAGSIRE, 0, 40, 55 },
+    { ZONE_ROUTE_11, SPECIES_MASQUERAIN, 0, 40, 55 },
+    { ZONE_ROUTE_13, SPECIES_SWELLOW, 0, 40, 55 },
+    { ZONE_ABUNDANT_SHRINE, SPECIES_SLOWPOKE, 0, 40, 55 },
+    { ZONE_ROUTE_15, SPECIES_FEAROW, 0, 40, 55 },
+    { ZONE_ROUTE_16, SPECIES_PINECO, 0, 40, 55 },
+    { ZONE_ROUTE_18, SPECIES_HOPPIP, 0, 40, 55 },
+    { ZONE_REVERSAL_MOUNTAIN, SPECIES_CACTURNE, 0, 40, 55 },
+#ifdef BLACK2
+    { ZONE_ROUTE_20, SPECIES_SUDOWOODO, 0, 40, 55 },
+    { ZONE_ROUTE_22, SPECIES_ARIADOS, 0, 40, 55 },
+#else
+    { ZONE_ROUTE_3, SPECIES_ILLUMISE, 0, 40, 55 },
+    { ZONE_ROUTE_20, SPECIES_MR_MIME, 0, 40, 55 },
+    { ZONE_ROUTE_22, SPECIES_LEDIAN, 0, 40, 55 },
+#endif
 };
-
-// clang-format on
 
 void CreateEncountManager(EncountManager *manager, GameData *gameData, int encType, u32 mode, u16 weather) {
     SaveControl *save = GameData_GetSaveControl(gameData);
@@ -225,17 +250,18 @@ int FieldEncount_GenWilds(EncData *encData, EncountManager *manager, u16 zoneId,
     return FieldEncount_GenWildsCore(manager, slots, params);
 }
 
-void *FieldEncount_RndCheckRoaming(EncountManager *manager, u32 zoneId) {
-    void *roaming[2];
+RoamingPkm *FieldEncount_RndCheckRoaming(EncountManager *manager, u32 zoneId) {
+    RoamingPkm *roaming[ENCOUNT_SAVE_ROAMING_COUNT];
     u8 count = 0;
     u8 i;
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < ENCOUNT_SAVE_ROAMING_COUNT; i++) {
         if (EncountSave_GetRoamingPkmStatus(manager->encountSave, i)) {
-            void *roamingPkm = EncountSave_GetRoamingPkm(manager->encountSave, i);
+            RoamingPkm *roamingPkm = EncountSave_GetRoamingPkm(manager->encountSave, i);
 
-            if (zoneId == EncountSave_GetRoamingPkmParam(roamingPkm, 1) &&
-                !FieldEncount_CheckLevelRepelled(manager, EncountSave_GetRoamingPkmParam(roamingPkm, 6))) {
+            if (zoneId == EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_ZONE) &&
+                !FieldEncount_CheckLevelRepelled(manager,
+                                                 EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_LEVEL))) {
                 roaming[count++] = roamingPkm;
             }
         }
@@ -247,7 +273,7 @@ void *FieldEncount_RndCheckRoaming(EncountManager *manager, u32 zoneId) {
 }
 
 u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
-    u8 candidates[14];
+    u8 candidates[ENCOUNT_SAVE_N_POKE_COUNT];
     u8 count;
     u32 chance;
     int caught;
@@ -269,7 +295,7 @@ u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
         return 0xff;
     }
     count = 0;
-    for (i = 0; i < 14; i++) {
+    for (i = 0; i < ENCOUNT_SAVE_N_POKE_COUNT; i++) {
         const NPokeSpec *spec = &N_POKEMON_INFO[i];
 
         if (!IsNPokeAlreadyCaught(manager->encountSave, i)) {
@@ -291,7 +317,7 @@ u8 FieldEncount_RndCheckNPoke(EncountManager *manager, u32 zoneId) {
     return candidates[GFL_RandomLCAlt(count)];
 }
 
-void FieldEncount_CreateWildPkm(PartyPkm *pkm, EncountManager *manager, WildPkmParam *param) {
+void FieldEncount_CreateWildPkm(PartyPkm *pkm, const EncountManager *manager, WildPkmParam *param) {
     void *personal = PML_PersonalLoad(param->species, param->form, 4);
     u32 rolls = 1;
     u32 pid;
@@ -330,15 +356,16 @@ void FieldEncount_CreateWildPkm(PartyPkm *pkm, EncountManager *manager, WildPkmP
     PML_PersonalFree(personal);
 }
 
-void FieldEncount_GenRoamingPkm(PartyPkm *pkm, EncountManager *manager, void *roamingPkm) {
-    u16 species = EncountSave_GetRoamingPkmParam(roamingPkm, 4);
-    u8 level = EncountSave_GetRoamingPkmParam(roamingPkm, 6);
-    u32 ivs = EncountSave_GetRoamingPkmParam(roamingPkm, 2);
+void FieldEncount_GenRoamingPkm(PartyPkm *pkm, const EncountManager *manager, const RoamingPkm *roamingPkm) {
+    u16 species = EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_SPECIES);
+    u8 level = EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_LEVEL);
+    u32 ivs = EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_IVS);
 
-    PokeParty_CreatePkm(pkm, species, level, manager->trainerId, ivs, EncountSave_GetRoamingPkmParam(roamingPkm, 3));
-    PokeParty_SetParam(pkm, PKM_PARAM_NATURE, EncountSave_GetRoamingPkmParam(roamingPkm, 10));
-    PokeParty_SetParam(pkm, PKM_PARAM_STATUS, EncountSave_GetRoamingPkmParam(roamingPkm, 7));
-    PokeParty_SetParam(pkm, PKM_PARAM_HP, EncountSave_GetRoamingPkmParam(roamingPkm, 5));
+    PokeParty_CreatePkm(pkm, species, level, manager->trainerId, ivs,
+                        EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_PERSONALITY));
+    PokeParty_SetParam(pkm, PKM_PARAM_NATURE, EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_NATURE));
+    PokeParty_SetParam(pkm, PKM_PARAM_STATUS, EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_STATUS));
+    PokeParty_SetParam(pkm, PKM_PARAM_HP, EncountSave_GetRoamingPkmParam(roamingPkm, ROAMING_PKM_PARAM_HP));
     PokeParty_RecalcStats(pkm);
 }
 
@@ -450,10 +477,10 @@ const SwarmData *getSwarmDataPtr(GameData *gameData) {
         return NULL;
     }
     location = EncountSave_GetSwarmLocation(SaveControl_GetEncountSave(save));
-    if (location >= 19) {
+    if (location >= ENCOUNT_SAVE_SWARM_LOCATION_COUNT) {
         location = 0;
     }
-    return &data_ov036_021d01fc[location];
+    return &SWARM_DATA[location];
 }
 
 static BOOL createSwarm(EncData *encData, EncountManager *manager, u16 zoneId, WildEncSlot *slots) {
@@ -538,7 +565,7 @@ static void FieldEncount_SetupFromData(const WildEncSlot *slot, WildPkmParam *pa
     }
     param->level = slot->minLevel + GFL_RandomLC(100) % (range + 1);
     param->species = slot->species;
-    formCount = PML_PersonalGetParamSingle(slot->species, 0, 0x20);
+    formCount = PML_PersonalGetParamSingle(slot->species, 0, PERSONAL_FORM_COUNT);
     if (slot->form == 0x1f) {
         param->form = GFL_RandomLCAlt(formCount);
     } else if (slot->form >= formCount) {
@@ -555,8 +582,8 @@ static u8 GetEncountIndexForPreferredType(EncountManager *manager, const WildEnc
 
     for (i = 0; i < manager->slotCount; i++) {
         if (slots[i].form != 0x1f) {
-            u8 type1 = PML_PersonalGetParamSingle(slots[i].species, slots[i].form, 6);
-            u8 type2 = PML_PersonalGetParamSingle(slots[i].species, slots[i].form, 7);
+            u8 type1 = PML_PersonalGetParamSingle(slots[i].species, slots[i].form, PERSONAL_TYPE_1);
+            u8 type2 = PML_PersonalGetParamSingle(slots[i].species, slots[i].form, PERSONAL_TYPE_2);
 
             if (type1 == type || type2 == type) {
                 candidates[count++] = i;
@@ -598,9 +625,9 @@ static void FieldEncount_GenWildPokeParam(EncountManager *manager, const WildEnc
     u8 index = 0xff;
 
     if (manager->magnetPull) {
-        index = GetEncountIndexForPreferredType(manager, slots, 8);
+        index = GetEncountIndexForPreferredType(manager, slots, TYPE_STEEL);
     } else if (manager->staticAbility) {
-        index = GetEncountIndexForPreferredType(manager, slots, 12);
+        index = GetEncountIndexForPreferredType(manager, slots, TYPE_ELECTRIC);
     }
     if (index == 0xff) {
         index = ENCOUNT_SLOT_RANDOMIZE_FUNCS[manager->slotFuncIndex](manager->slotCount);
@@ -623,7 +650,7 @@ static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL c
         PokeParty_SetParam(pkm, PKM_PARAM_ITEM, items[0]);
         return;
     }
-    odds = data_ov036_021d0118[doubleBattle * 2 + compoundEyes];
+    odds = HELD_ITEM_RATES[doubleBattle * 2 + compoundEyes];
     roll = GFL_RandomLC(100);
     sum = 0;
     for (i = 0; i < 3; i++) {
@@ -635,7 +662,7 @@ static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL c
     }
 }
 
-static u32 FieldEncount_GenPID(EncountManager *manager, void *personal, WildPkmParam *param) {
+static u32 FieldEncount_GenPID(const EncountManager *manager, void *personal, WildPkmParam *param) {
     u32 sex = 2;
     u32 shiny;
     u32 pid;

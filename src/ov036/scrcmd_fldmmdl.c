@@ -2,7 +2,9 @@
 // positions, directions and rail positions, and pausing the actors that a script doesn't move. The name is the ROM's
 // own, from GFL_HeapAllocate's file argument. Function names from swan (https://github.com/ds-pokemon-hacking/swan,
 // GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/event_action_call.h"
 #include "field/event_actor_move.h"
 #include "field/event_dive.h"
@@ -24,6 +26,8 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 #include "system/vm.h"
+
+u8 g_ScrEventActorFlags;
 
 // The world position of a tile's corner, and of its center
 #define GRID_TO_FX32(n) ((n) * FX32_CONST(16))
@@ -71,7 +75,7 @@ static const u32 ACMD_QUEUE_TURN_S_8F[2] = { ACMD(0x21, 1), ACMD_END };
 static const u32 ACMD_QUEUE_TURN_W_8F[2] = { ACMD(0x22, 1), ACMD_END };
 static const u32 ACMD_QUEUE_TURN_E_8F[2] = { ACMD(0x23, 1), ACMD_END };
 
-static FieldActor *func_ov036_021a98c4(FieldScriptEnv *env, u16 id) {
+static FieldActor *FindScriptActor(FieldScriptEnv *env, u16 id) {
     FieldActor *actor;
     MMSys *mmSys = GetScrEnvMMdlSys(env);
 
@@ -90,10 +94,10 @@ static FieldActor *func_ov036_021a98c4(FieldScriptEnv *env, u16 id) {
 }
 
 BOOL s0064_ActorCmdExec(VM *vm, FieldScriptEnv *env) {
-    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    FieldScriptEnv_GetScriptWork(env);
     u16 id = ScriptReadAny(vm, env);
     u32 offset = VM_Read32(vm);
-    FieldActor *actor = func_ov036_021a98c4(env, id);
+    FieldActor *actor = FindScriptActor(env, id);
 
     if (actor == NULL) {
         return FALSE;
@@ -209,7 +213,7 @@ static BOOL WalkRouteDestPosBlockCheck(WalkRoute *route, VecFx32 pos) {
 }
 
 // Steps around the blocked tile in dir: one tile and more to the side, then one tile in dir
-static BOOL func_ov036_021a9ae4(u32 dir, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *index, WalkRoute *route) {
+static BOOL WalkRoute_Detour(u32 dir, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *index, WalkRoute *route) {
     VecFx32 start;
     VecFx32 sideZ;
     VecFx32 sideX;
@@ -277,7 +281,7 @@ static BOOL func_ov036_021a9ae4(u32 dir, VecFx32 *pos, WalkRouteAcmd *acmd, u16 
 }
 
 // Walks one tile toward the destination, or around the tile if it is blocked
-static void func_ov036_021a9c68(u32 step, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *index, WalkRoute *route) {
+static void WalkRoute_WriteStep(u32 step, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *index, WalkRoute *route) {
     VecFx32 next;
     u32 dir;
 
@@ -298,7 +302,7 @@ static void func_ov036_021a9c68(u32 step, VecFx32 *pos, WalkRouteAcmd *acmd, u16
     }
     AdjustVecByDir(dir, &next, 1);
     if (WalkRouteDestPosBlockCheck(route, next)) {
-        func_ov036_021a9ae4(dir, pos, acmd, index, route);
+        WalkRoute_Detour(dir, pos, acmd, index, route);
         return;
     }
     WriteWalkRouteAcmdCore(acmd, dir, index, 1, route);
@@ -306,8 +310,8 @@ static void func_ov036_021a9c68(u32 step, VecFx32 *pos, WalkRouteAcmd *acmd, u16
 }
 
 // Walks back to the line the route started on, after a step around a blocked tile
-static BOOL func_ov036_021a9cf0(u32 step, fx32 line, fx32 now, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *index,
-                                WalkRoute *route) {
+static BOOL WalkRoute_ReturnToLine(u32 step, fx32 line, fx32 now, VecFx32 *pos, WalkRouteAcmd *acmd, u16 *index,
+                                   WalkRoute *route) {
     VecFx32 next;
     s16 diff = FX32_TO_GRID(now) - FX32_TO_GRID(line);
     u32 dir;
@@ -342,7 +346,7 @@ static BOOL func_ov036_021a9cf0(u32 step, fx32 line, fx32 now, VecFx32 *pos, Wal
 }
 
 // Walks along one axis until pos reaches dest on it
-static void func_ov036_021a9d90(WalkRouteAcmd *acmd, u16 *index, VecFx32 *pos, VecFx32 *dest, WalkRoute *route) {
+static void WalkRoute_WriteAxis(WalkRouteAcmd *acmd, u16 *index, VecFx32 *pos, VecFx32 *dest, WalkRoute *route) {
     fx32 *posOther;
     u32 step;
     fx32 *posAxis;
@@ -371,9 +375,9 @@ static void func_ov036_021a9d90(WalkRouteAcmd *acmd, u16 *index, VecFx32 *pos, V
         destAxis = &dest->z;
     }
     while (FX32_TO_GRID(*posAxis) != FX32_TO_GRID(*destAxis)) {
-        func_ov036_021a9c68(step, pos, acmd, index, route);
+        WalkRoute_WriteStep(step, pos, acmd, index, route);
         if (*posOther != line && FX32_TO_GRID(*posAxis) != FX32_TO_GRID(*destAxis)) {
-            if (func_ov036_021a9cf0(step, line, *posOther, pos, acmd, index, route) == TRUE) {
+            if (WalkRoute_ReturnToLine(step, line, *posOther, pos, acmd, index, route) == TRUE) {
                 line = *posOther;
             }
         }
@@ -388,10 +392,16 @@ static u16 CreateRouteActionQueue(WalkRouteAcmd *acmd, FieldActor *actor, WalkRo
     CopyActorWPos(actor, &pos);
     dest.x = GRID_TO_FX32(route->x);
     dest.z = GRID_TO_FX32(route->z);
+    // BUG: The original passes an unset destination Y to the tile and bounds checks
+#ifdef BUGFIX
+    dest.y = pos.y;
     WalkRouteDestPosBlockCheck(route, dest);
-    func_ov036_021a9d90(acmd, &index, &pos, &dest, route);
+#else
+    WalkRouteDestPosBlockCheck(route, dest);
+#endif
+    WalkRoute_WriteAxis(acmd, &index, &pos, &dest, route);
     route->axis = route->axis == 0 ? 1 : 0;
-    func_ov036_021a9d90(acmd, &index, &pos, &dest, route);
+    WalkRoute_WriteAxis(acmd, &index, &pos, &dest, route);
     // The route ends with 0xfd, not ACMD_END
     acmd[index].code = 0xfd;
     acmd[index].count = 0;
@@ -403,7 +413,7 @@ BOOL s024F_ActorWalkRoute(VM *vm, FieldScriptEnv *env) {
     u16 id = ScriptReadAny(vm, env);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
-    FieldActor *actor = func_ov036_021a98c4(env, id);
+    FieldActor *actor = FindScriptActor(env, id);
     WalkRouteAcmd *acmd;
 
     if (actor == NULL) {
@@ -649,7 +659,7 @@ static BOOL DisableAllButEventActorsMovement(VM *vm, FieldScriptEnv *env) {
 
 static BOOL WaitAndDisableFollowerMovement(VM *vm, void *data) {
     FieldScriptEnv *env = data;
-    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    FieldScriptEnv_GetScriptWork(env);
     FieldActor *follower = FindActorByMoveCode(GetScrEnvMMdlSys(env), MOVE_CODE_FOLLOWER);
 
     if (IsActorFlag16(follower) == FALSE) {
@@ -727,7 +737,7 @@ BOOL s006F_PlayerGetActorInFront(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov036_021aa624(VM *vm, void *data) {
+static BOOL ScriptNative_WaitPlayerSpecialSequence(VM *vm, void *data) {
     FieldScriptEnv *env = data;
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 
@@ -746,7 +756,7 @@ BOOL s0075_PlayerSetSpecialSequence(VM *vm, FieldScriptEnv *env) {
     if (func_ov036_0219a580(player) == TRUE) {
         return FALSE;
     }
-    VM_SetNativeCallback(vm, func_ov036_021aa624);
+    VM_SetNativeCallback(vm, ScriptNative_WaitPlayerSpecialSequence);
     return TRUE;
 }
 
@@ -830,7 +840,15 @@ BOOL s0077_PlayerTurnByTrigger(VM *vm, FieldScriptEnv *env) {
             break;
         }
     }
+    // BUG: With no trigger, the original compares an uninitialized direction.
+#ifdef BUGFIX
+    if (i == NELEMS(dirs)) {
+        return FALSE;
+    }
     faceDir = FieldPlayer_GetFaceDir(player);
+#else
+    faceDir = FieldPlayer_GetFaceDir(player);
+#endif
     if (faceDir != dir) {
         if (dir == 0) {
             action = ACMD_QUEUE_TURN_N_8F;
@@ -913,7 +931,7 @@ BOOL s02BE_ActorMoveLinear(VM *vm, FieldScriptEnv *env) {
     u16 y = ScriptReadAny(vm, env);
     u16 z = ScriptReadAny(vm, env);
     u16 frames = ScriptReadAny(vm, env);
-    FieldActor *actor = func_ov036_021a98c4(env, id);
+    FieldActor *actor = FindScriptActor(env, id);
     GameEvent *event;
 
     if (actor == NULL) {
@@ -1002,7 +1020,7 @@ BOOL s007E_ActorPlayTeleportSeq(VM *vm, FieldScriptEnv *env) {
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
     FieldTask *moveTask;
 
-    GFL_SndSEPlay(0x676);
+    GFL_SndSEPlay(SEQ_SE_FLD_05);
     offset.x = 0;
     offset.y = FX32_CONST(150);
     offset.z = 0;

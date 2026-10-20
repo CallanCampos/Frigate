@@ -1,6 +1,7 @@
 // The script commands of Trainers: the sighting event, the Trainer IDs and battle types, the battles and the music.
 // The ROM has no name for the file; scrcmd_trainer.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "battle/trainer_data.h"
 #include "field/event_battle.h"
@@ -18,7 +19,7 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-static void func_ov036_021a6b4c(FieldScriptEnv *env);
+static void RecordNimbasaStadiumBattle(FieldScriptEnv *env);
 
 BOOL s0080_TrainerEyeEventInit(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -84,7 +85,7 @@ BOOL s0082_TrainerGetActorID(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0084_ActorGetTrainerID(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptWork_GetFieldWork(work);
     u16 scrId = ScriptWork_GetSCRID(work);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -94,7 +95,7 @@ BOOL s0084_ActorGetTrainerID(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0085_CallTrainerBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    u16 scrId = ScriptWork_GetSCRID(work);
+    ScriptWork_GetSCRID(work);
     u16 trainer1 = ScriptReadAny(vm, env);
     u16 trainer2 = ScriptReadAny(vm, env);
     u16 flags = ScriptReadAny(vm, env);
@@ -109,13 +110,13 @@ BOOL s0085_CallTrainerBattle(VM *vm, FieldScriptEnv *env) {
     fieldWork = ScriptWork_GetFieldWork(work);
     ScriptWork_CallEvent(
         work, EventTrainerBattleCall_Create(gsys, fieldWork->field, battleType, 0, trainer1, trainer2, flags));
-    func_ov036_021a6b4c(env);
+    RecordNimbasaStadiumBattle(env);
     return TRUE;
 }
 
 BOOL s0085_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    u16 scrId = ScriptWork_GetSCRID(work);
+    ScriptWork_GetSCRID(work);
     u16 partner = ScriptReadAny(vm, env);
     u16 trainer1 = ScriptReadAny(vm, env);
     u16 trainer2 = ScriptReadAny(vm, env);
@@ -125,7 +126,7 @@ BOOL s0085_CallTrainerMultiBattle(VM *vm, FieldScriptEnv *env) {
 
     ScriptWork_CallEvent(work,
                          EventTrainerBattleCall_Create(gsys, fieldWork->field, 1, partner, trainer1, trainer2, flags));
-    func_ov036_021a6b4c(env);
+    RecordNimbasaStadiumBattle(env);
     return TRUE;
 }
 
@@ -169,7 +170,7 @@ BOOL s008A_TrainerGetBattleType(VM *vm, FieldScriptEnv *env) {
 
 BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameData *gameData = FieldScriptEnv_GetGameData(env);
+    FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 trainerId = ScriptReadAny(vm, env);
 
@@ -180,7 +181,7 @@ BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
 
 BOOL s008F_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameData *gameData = FieldScriptEnv_GetGameData(env);
+    FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 trainerClass = ScriptReadAny(vm, env);
 
@@ -190,7 +191,7 @@ BOOL s008F_TrainerClassBGMPlayPush(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0090_TrainerBGMPlay(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameData *gameData = FieldScriptEnv_GetGameData(env);
+    FieldScriptEnv_GetGameData(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 trainerId = ScriptReadAny(vm, env);
 
@@ -233,7 +234,7 @@ BOOL s0093_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0094_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    u16 scrId = ScriptWork_GetSCRID(work);
+    ScriptWork_GetSCRID(work);
     u16 trainer1 = ScriptReadAny(vm, env);
     u16 trainer2 = ScriptReadAny(vm, env);
     u16 flags = ScriptReadAny(vm, env);
@@ -253,7 +254,7 @@ BOOL s0094_CallTradedPokemonBattle(VM *vm, FieldScriptEnv *env) {
 }
 
 // Count a battle in the Nimbasa City stadiums
-static void func_ov036_021a6b4c(FieldScriptEnv *env) {
+static void RecordNimbasaStadiumBattle(FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     GameRecords *records = GameData_GetRecords(FieldScriptEnv_GetGameData(env));
 

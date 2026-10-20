@@ -93,12 +93,12 @@ static BOOL EventTrainerEyeSub_SetIdleMoveCode(EventTrainerEyeWork *work);
 static BOOL EventTrainerEyeSub_Finish(EventTrainerEyeWork *work);
 static BOOL EventTrainerEye_Update(EventTrainerEyeWork *work);
 static GameEventReturnCode EventTrainerEye_Callback(GameEvent *event, u32 *state, void *data);
-static u16 func_ov036_021a643c(FieldActor *actor);
+static u16 EventTrainerEye_GetSightType(FieldActor *actor);
 static BOOL EventTrainerEye_CheckPathObstacle(FieldActor *actor, u16 dir, int range, EncountSystem *encounter);
-static u16 func_ov036_021a6544(FieldActor *actor);
+static u16 EventTrainerEye_UsesSpecialScript(FieldActor *actor);
 static BOOL CheckTrainerAlreadyDefeated(Field *field, FieldActor *actor);
 static void InitFieldScriptTrainerSetup(TrainerClashData *data, FieldActor *actor, int range, u16 dir);
-static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId);
+static FieldActor *EventTrainerEye_FindPairedTrainer(FieldActor *trainer, u16 trainerId);
 static GameEvent *CreateTrainerClashEvent(Field *field, FieldActor *actor);
 
 static const TrainerLineOfSightFunc TRAINER_LOS_DIST_FUNCTIONS[4] = {
@@ -142,7 +142,7 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
 
     if (EventTrainerEye_FindClashActor(field, NULL, &data) == TRUE) {
         battleCount = func_ov036_02182f90(Field_GetGameSystem(field));
-        if (func_ov036_021a6544(data.actor) == TRUE) {
+        if (EventTrainerEye_UsesSpecialScript(data.actor) == TRUE) {
             battleType = 0;
         } else {
             battleType = getBattleType(data.trainerId);
@@ -168,8 +168,8 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
             }
         } else if (battleType == 1) {
             if (battleCount >= 2) {
-                InitFieldScriptTrainerSetup(&partner, func_ov036_021a65d4(data.actor, data.trainerId), data.range,
-                                            data.dir);
+                InitFieldScriptTrainerSetup(&partner, EventTrainerEye_FindPairedTrainer(data.actor, data.trainerId),
+                                            data.range, data.dir);
                 event = CreateTrainerClashEvent(field, data.actor);
                 data.kind = 1;
                 SetupTrainerClashSlot(event, 0, &data);
@@ -239,7 +239,7 @@ static int EventTrainerEye_CheckActorClash(EncountSystem *encounter, FieldActor 
     int dist;
     s16 range;
     u16 dir;
-    u16 eyeType = func_ov036_021a643c(actor);
+    u16 eyeType = EventTrainerEye_GetSightType(actor);
 
     if (eyeType == 1 || eyeType == 2) {
         dir = 0;
@@ -518,7 +518,7 @@ static GameEventReturnCode EventTrainerEye_Callback(GameEvent *event, u32 *state
 }
 
 // How the actor looks for the player: 1 the way it faces, 2 every way
-static u16 func_ov036_021a643c(FieldActor *actor) {
+static u16 EventTrainerEye_GetSightType(FieldActor *actor) {
     return EvType_GetSightType(GetActorEvType(actor));
 }
 
@@ -557,14 +557,14 @@ static BOOL EventTrainerEye_CheckPathObstacle(FieldActor *actor, u16 dir, int ra
 }
 
 u16 GetNPCTrainerID(FieldActor *actor) {
-    if (func_ov036_021a6544(actor) != TRUE) {
+    if (EventTrainerEye_UsesSpecialScript(actor) != TRUE) {
         return GetNPCTrainerIDFromSCRID(FldAct_GetSCRID(actor));
     }
     return GetActorUID(actor);
 }
 
 // Whether the actor uses the special Trainer script, whose Trainer ID is its UID
-static u16 func_ov036_021a6544(FieldActor *actor) {
+static u16 EventTrainerEye_UsesSpecialScript(FieldActor *actor) {
     return FldAct_GetSCRID(actor) == SCRID_SPECIAL_TRAINER;
 }
 
@@ -574,7 +574,7 @@ static BOOL CheckTrainerAlreadyDefeated(Field *field, FieldActor *actor) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     EventWork *eventWork = GameData_GetEventWork(gameData);
 
-    if (func_ov036_021a6544(actor) != TRUE) {
+    if (EventTrainerEye_UsesSpecialScript(actor) != TRUE) {
         return TrainerFlagGet(eventWork, GetNPCTrainerID(actor));
     }
     index = GetNPCTrainerID(actor) - 0xb0;
@@ -591,7 +591,7 @@ static void InitFieldScriptTrainerSetup(TrainerClashData *data, FieldActor *acto
 }
 
 // The other Trainer of a double battle pair
-static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId) {
+static FieldActor *EventTrainerEye_FindPairedTrainer(FieldActor *trainer, u16 trainerId) {
     FieldActor *actor;
     u32 index = 0;
     MMSys *actorSys = GetActorMModelSystem(trainer);
@@ -599,7 +599,7 @@ static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId) {
 
     while (NextActor(actorSys, &actor, &index) == TRUE) {
         if (actor != trainer) {
-            eyeType = func_ov036_021a643c(actor);
+            eyeType = EventTrainerEye_GetSightType(actor);
             if ((eyeType == 1 || eyeType == 2) && trainerId == GetNPCTrainerID(actor)) {
                 return actor;
             }
@@ -611,7 +611,7 @@ static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId) {
 static GameEvent *CreateTrainerClashEvent(Field *field, FieldActor *actor) {
     GameSystem *gsys = Field_GetGameSystem(field);
 
-    if (func_ov036_021a6544(actor) != TRUE) {
+    if (EventTrainerEye_UsesSpecialScript(actor) != TRUE) {
         return EventScriptCall_Create(gsys, SCRID_TRAINER_CLASH, actor, 1);
     }
     return EventScriptCall_Create(gsys, SCRID_SPECIAL_TRAINER_CLASH, actor, 1);

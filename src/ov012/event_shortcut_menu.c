@@ -498,7 +498,7 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
 
 void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
     GameData *gameData;
-    u16 *param;
+    ShortcutMenuPos *listPos;
     void *msgBGSys;
 
     if (work->app == NULL && work->done == 0) {
@@ -508,8 +508,8 @@ void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
             func_ov036_02187834(msgBGSys);
         }
         gameData = GSYS_GetGameData(work->gameSystem);
-        param = GameData_GetShortcutMenuPos(gameData);
-        work->app = func_ov036_021bedd8(gameData, arg0, param, 0x50, 0x15);
+        listPos = GameData_GetShortcutMenuPos(gameData);
+        work->app = func_ov036_021bedd8(gameData, arg0, listPos, HEAPID_FIELD_PARTICLE, HEAPID_FIELDMAP);
     }
 }
 

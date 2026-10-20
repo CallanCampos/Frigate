@@ -255,6 +255,8 @@ void BlActSys_Free(BlActSys *sys);
 BlActScene *BlActSys_GetScene(BlActSys *sys);
 // Load materials or actors and return the first's index, or BLACT_NONE for actors that do not fit
 u16 BlActSys_ExecMatLoadRequests(BlActSys *sys, const BlActMatRequest *requests, u32 count);
+// Bind a scene material to a new texture material and return its index. The material is stored as a u16, but
+// fldmmdl_blact.c passes BlActScene_AddMaterialExistTex's u32 result without narrowing it
 u16 BlActSys_AddTexMat(BlActSys *sys, u32 material, void *texResource);
 void BlActSys_FreeMaterials(BlActSys *sys, u16 first, u32 count);
 void BlActSys_FreeTexMat(BlActSys *sys, u32 texMat);
@@ -264,7 +266,8 @@ void BlActSys_DeleteActors(BlActSys *sys, u32 first, u32 count);
 void BlActSys_UpdateActors(BlActSys *sys);
 void BlActSys_Draw(BlActSys *sys, G3DCamera *camera, G3DLight *lights);
 void BlActSys_SetActorVisible(BlActSys *sys, u32 actor, BOOL visible);
-BOOL BlActSys_IsActorVisible(BlActSys *sys, u32 actor);
+// A u16 index, which fldeff_reflect.c's u32 index is narrowed to at each call, as for BlActSys_GetSceneActor
+BOOL BlActSys_IsActorVisible(BlActSys *sys, u16 actor);
 void BlActSys_SetActorLight(BlActSys *sys, u32 actor, BOOL enable, u32 light);
 void BlActSys_SetActorAnimating(BlActSys *sys, u32 actor, BOOL animate);
 void BlActSys_SetActorAnims(BlActSys *sys, u32 actor, const BlActAnimStep *const *anims, u16 animCount);
@@ -274,9 +277,9 @@ void BlActSys_SetActorStep(BlActSys *sys, u32 actor, u16 step);
 u16 BlActSys_GetActorStep(BlActSys *sys, u32 actor);
 // Make the actor's material use another's palette
 void BlActSys_ShareActorPltt(BlActSys *sys, u32 actor, u32 texMat);
-u32 BlActSys_GetSceneActor(BlActSys *sys, u32 actor);
+u32 BlActSys_GetSceneActor(BlActSys *sys, u16 actor);
 u16 BlActSys_GetMatByActor(BlActSys *sys, u32 actor);
 // The last command the actor's animation ran, and whether it was one
-BOOL BlActSys_GetActorLastCmd(BlActSys *sys, u32 actor, u16 *cmd);
+BOOL BlActSys_GetActorLastCmd(BlActSys *sys, u16 actor, u16 *cmd);
 
 #endif // POKEBW2_GFL_BLACT_H

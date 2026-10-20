@@ -51,6 +51,6 @@ from:0x021f8308 kind:load to:0x021f70e0 module:overlays(271,286,288)
 from:0x021f830c kind:load to:0x021f8181 module:overlay(272)
 from:0x021f8310 kind:load to:0x021f81c9 module:overlay(272)
 from:0x021f8314 kind:overlay_id to:167
-from:0x021f8318 kind:load to:0x021d6d20 module:overlays(36,167)
+from:0x021f8318 kind:load to:0x021d6d20 module:overlay(167)
 from:0x021f831c kind:load to:0x021f81e9 module:overlay(272)
 from:0x021f8320 kind:load to:0x021f823d module:overlay(272)

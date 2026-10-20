@@ -1,6 +1,9 @@
 // The darkness of a dark cave around the player: a sphere drawn around the camera that Flash widens. The name is the
 // ROM's string
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field_flash.h"
 #include "field/fld_wipe_3dobj.h"
 #include "gfl/heap.h"
@@ -90,11 +93,11 @@ void FieldFlash_Draw(FieldFlash *flash) {
     }
 }
 
-void func_ov036_021c1c68(FieldFlash *flash, u32 nextState) {
+void FieldFlash_RequestState(FieldFlash *flash, u32 nextState) {
     flash->nextState = nextState;
 }
 
-u16 func_ov036_021c1c6c(FieldFlash *flash) {
+u16 FieldFlash_GetState(FieldFlash *flash) {
     return flash->state;
 }
 
@@ -154,7 +157,7 @@ void func_ov036_021c1d14(FieldFlash *flash) {
 void func_ov036_021c1d30(FieldFlash *flash) {
     flash->state = 2;
     FieldFlashAnimation_Set(&flash->animation, 0x3000, 0xaa00, 0x1f, 0x1f, 0xf);
-    GFL_SndSEPlay(0x766);
+    GFL_SndSEPlay(SEQ_SE_FLD_127);
 }
 
 void func_ov036_021c1d5c(FieldFlash *flash) {

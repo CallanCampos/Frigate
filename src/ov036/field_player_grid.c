@@ -1,3 +1,5 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/event_data.h"
@@ -212,7 +214,7 @@ static void FieldPlayerGrid_ClearConstMoveFlag(FieldPlayerGrid *grid);
 static BOOL FieldPlayerGrid_CheckConstMoveFlag(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_SetConstMoveEndSpotFlag(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_ClearConstMoveEndSpotFlag(FieldPlayerGrid *grid);
-static void func_ov036_0219c994(FieldPlayerGrid *grid);
+static void FieldPlayerGrid_ClearFlag4(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_SetCatwalkBalancingFlag(FieldPlayerGrid *grid, BOOL set);
 static BOOL FieldPlayerGrid_CheckCatwalkBalancingFlag(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_SetCatwalkExitingFlag(FieldPlayerGrid *grid, BOOL set);
@@ -316,7 +318,7 @@ void FieldPlayerGrid_UpdateMovement(FieldPlayerGrid *grid, u32 pressedKeys, u32 
 static void FieldPlayerGrid_SetCommonStatus(FieldPlayerGrid *grid, u32 command, const GridMoveInput *input) {
     grid->command = command;
     FieldPlayerCore_CalcSeparateKeyDirs(grid->core, input->heldKeys);
-    func_ov036_0219c994(grid);
+    FieldPlayerGrid_ClearFlag4(grid);
     FieldPlayerGrid_ClearFlag(grid, GRID_FLAG_RUNNING);
     if (command == GRID_COMMAND_MOVE) {
         FieldPlayerGrid_ClearConstMoveEndSpotFlag(grid);
@@ -473,7 +475,7 @@ u32 FieldPlayerGrid_GetMoveDirContType(FieldPlayerGrid *grid, u16 dir) {
     return MOVE_DIR_CONT_MOVE;
 }
 
-BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid) {
+BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid, u16 dir) {
     return FieldPlayerCore_IsAcmdFinished(grid->core);
 }
 
@@ -870,7 +872,6 @@ static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldA
     u32 tileType;
     u32 tileFlags;
     u32 hit;
-    u16 tileClass;
 
     if (IsAllActorAcmdFinished(actor) == FALSE) {
         return GRID_COMMAND_NONE;
@@ -883,7 +884,7 @@ static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldA
         hit = 0;
     }
     if (tileType != 0xffffffff) {
-        tileClass = GetTileClass(tileType);
+        GetTileClass(tileType);
         tileFlags = GetTileFlags(tileType);
         if (hit == 0) {
             if (tileFlags & 2) {
@@ -1309,7 +1310,7 @@ static void FieldPlayerGrid_ClearConstMoveEndSpotFlag(FieldPlayerGrid *grid) {
     FieldPlayerGrid_ClearFlag(grid, GRID_FLAG_CONST_MOVE_END_SPOT);
 }
 
-static void func_ov036_0219c994(FieldPlayerGrid *grid) {
+static void FieldPlayerGrid_ClearFlag4(FieldPlayerGrid *grid) {
     FieldPlayerGrid_ClearFlag(grid, GRID_FLAG_4);
 }
 

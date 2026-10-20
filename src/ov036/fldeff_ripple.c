@@ -1,5 +1,7 @@
 // The ripple that spreads where an actor steps in shallow water. The name is the ROM's own, from GFL_HeapAllocate's
 // file argument.
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -26,15 +28,15 @@ typedef struct {
     u16 actorIndex;
 } RippleTask;
 
-static void func_ov036_021be7d8(FieldEffectRipple *ripple);
-static void func_ov036_021be818(FieldEffectRipple *ripple);
-static void func_ov036_021be8b0(FieldEffectTask *task, void *work);
-static void func_ov036_021be948(FieldEffectTask *task, void *work);
-static void func_ov036_021be964(FieldEffectTask *task, void *work);
-static void func_ov036_021be984(FieldEffectTask *task, void *work);
+static void FieldEffectRipple_LoadMaterial(FieldEffectRipple *ripple);
+static void FieldEffectRipple_FreeMaterial(FieldEffectRipple *ripple);
+static void RippleTask_Init(FieldEffectTask *task, void *work);
+static void RippleTask_Free(FieldEffectTask *task, void *work);
+static void RippleTask_Update(FieldEffectTask *task, void *work);
+static void RippleTask_Draw(FieldEffectTask *task, void *work);
 
 static const FieldEffectTaskVTable RIPPLE_TASK_VTABLE = {
-    sizeof(RippleTask), func_ov036_021be8b0, func_ov036_021be948, func_ov036_021be964, func_ov036_021be984,
+    sizeof(RippleTask), RippleTask_Init, RippleTask_Free, RippleTask_Update, RippleTask_Draw,
 };
 
 static const BlActAnimStep RIPPLE_ANIM_SPREAD[] = {
@@ -48,16 +50,16 @@ void *func_ov036_021be790(FieldEffects *effects, HeapID heapId) {
 
     ripple->effects = effects;
     ripple->blact = Field_GetWildEffectBlAct(FieldEffects_GetField(effects));
-    func_ov036_021be7d8(ripple);
+    FieldEffectRipple_LoadMaterial(ripple);
     return ripple;
 }
 
 void func_ov036_021be7c4(FieldEffects *effects, void *data) {
-    func_ov036_021be818(data);
+    FieldEffectRipple_FreeMaterial(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021be7d8(FieldEffectRipple *ripple) {
+static void FieldEffectRipple_LoadMaterial(FieldEffectRipple *ripple) {
     BlActMatRequest request;
     ArcTool *arc = FieldEffects_GetArc(ripple->effects);
 
@@ -71,7 +73,7 @@ static void func_ov036_021be7d8(FieldEffectRipple *ripple) {
     ripple->matIndex = BlActSys_ExecMatLoadRequests(ripple->blact, &request, 1);
 }
 
-static void func_ov036_021be818(FieldEffectRipple *ripple) {
+static void FieldEffectRipple_FreeMaterial(FieldEffectRipple *ripple) {
     BlActSys_FreeMaterials(ripple->blact, ripple->matIndex, 1);
 }
 
@@ -84,6 +86,10 @@ void func_ov036_021be828(void *effects, FieldActor *actor, u32 big, u32 atInit) 
     if (atInit) {
         GetActorInitGPos(actor, &gpos);
         ConvGXZToVector(gpos.x, gpos.z, &pos);
+        // BUG: The initial-position path leaves the ripple height uninitialized.
+#ifdef BUGFIX
+        pos.y = GetActorPosY(actor);
+#endif
     } else {
         CopyActorWPos(actor, &pos);
     }
@@ -99,7 +105,7 @@ void func_ov036_021be828(void *effects, FieldActor *actor, u32 big, u32 atInit) 
     FieldEffects_TCBCreate(effects, &RIPPLE_TASK_VTABLE, NULL, 0, &params, 0);
 }
 
-static void func_ov036_021be8b0(FieldEffectTask *task, void *work) {
+static void RippleTask_Init(FieldEffectTask *task, void *work) {
     RippleTask *rippleTask = work;
     RippleTaskParams *params = func_ov036_021a3ac8(task);
     BlActActorRequest request;
@@ -129,7 +135,7 @@ static void func_ov036_021be8b0(FieldEffectTask *task, void *work) {
     BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
 }
 
-static void func_ov036_021be948(FieldEffectTask *task, void *work) {
+static void RippleTask_Free(FieldEffectTask *task, void *work) {
     RippleTask *rippleTask = work;
     BlActSys *blact = rippleTask->ripple->blact;
     u16 actorIndex = rippleTask->actorIndex;
@@ -139,7 +145,7 @@ static void func_ov036_021be948(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021be964(FieldEffectTask *task, void *work) {
+static void RippleTask_Update(FieldEffectTask *task, void *work) {
     RippleTask *rippleTask = work;
     u16 cmd;
 
@@ -148,5 +154,5 @@ static void func_ov036_021be964(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021be984(FieldEffectTask *task, void *work) {
+static void RippleTask_Draw(FieldEffectTask *task, void *work) {
 }

@@ -1,4 +1,6 @@
 // field_slope_slip.c: the event that slides the player down a slope tile
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/field.h"
@@ -37,10 +39,10 @@ static const SlopeSlipTileConfig SLOPE_SLIP_TILES[4] = {
 
 const SlopeSlipTileConfig *GetSlopeSlipTileConfig(u32 tileClass);
 BOOL IsTileSlopeSlip_(u32 tileClass);
-GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, SlopeSlipWork *work);
-u16 func_ov036_021c2394(SlopeSlipWork *work);
-u16 func_ov036_021c23a4(SlopeSlipWork *work);
-u16 func_ov036_021c23b4(SlopeSlipWork *work);
+GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, void *data);
+u16 SlopeSlip_GetAcmd(SlopeSlipWork *work);
+u16 SlopeSlip_GetDirection(SlopeSlipWork *work);
+u16 SlopeSlip_GetTurnInterval(SlopeSlipWork *work);
 
 const SlopeSlipTileConfig *GetSlopeSlipTileConfig(u32 tileClass) {
     u32 i;
@@ -60,17 +62,18 @@ BOOL IsTileSlopeSlip_(u32 tileClass) {
     return FALSE;
 }
 
-u16 func_ov036_021c23c4(SlopeSlipWork *work);
+u16 SlopeSlip_GetTileClass(SlopeSlipWork *work);
 void func_ov036_021c23e8(SlopeSlipWork *work);
 void func_ov036_021c242c(SlopeSlipWork *work);
 void func_ov036_021c2460(SlopeSlipWork *work);
 BOOL func_ov036_021c2474(SlopeSlipWork *work);
 void func_ov036_021c2490(SlopeSlipWork *work);
 
-GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, SlopeSlipWork *work) {
+GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, void *data) {
+    SlopeSlipWork *work = data;
     switch (*state) {
     case 0:
-        if (!IsTileSlopeSlip_(func_ov036_021c23c4(work))) {
+        if (!IsTileSlopeSlip_(SlopeSlip_GetTileClass(work))) {
             *state = 2;
         } else {
             *state = 1;
@@ -96,7 +99,7 @@ GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, SlopeSlipW
 }
 
 GameEvent *EventSlopeSlip_Create(GameEvent *parent, GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, parent, (GameEventCallback)func_ov036_021c22d4, sizeof(SlopeSlipWork));
+    GameEvent *event = GameEvent_Create(gsys, parent, func_ov036_021c22d4, sizeof(SlopeSlipWork));
     SlopeSlipWork *work = GameEvent_GetData(event);
 
     work->gsys = gsys;
@@ -113,28 +116,28 @@ BOOL IsTileSlopeSlip(u32 tileClass) {
     return IsTileSlopeSlip_(tileClass);
 }
 
-u16 func_ov036_021c2394(SlopeSlipWork *work) {
+u16 SlopeSlip_GetAcmd(SlopeSlipWork *work) {
     if (work->config != NULL) {
         return work->config->acmd;
     }
     return 0;
 }
 
-u16 func_ov036_021c23a4(SlopeSlipWork *work) {
+u16 SlopeSlip_GetDirection(SlopeSlipWork *work) {
     if (work->config != NULL) {
         return work->config->dir;
     }
     return 0;
 }
 
-u16 func_ov036_021c23b4(SlopeSlipWork *work) {
+u16 SlopeSlip_GetTurnInterval(SlopeSlipWork *work) {
     if (work->config != NULL) {
         return work->config->turnInterval;
     }
     return 0;
 }
 
-u16 func_ov036_021c23c4(SlopeSlipWork *work) {
+u16 SlopeSlip_GetTileClass(SlopeSlipWork *work) {
     VecFx32 pos;
 
     FieldPlayer_GetWPos(work->player, &pos);
@@ -142,7 +145,7 @@ u16 func_ov036_021c23c4(SlopeSlipWork *work) {
 }
 
 void func_ov036_021c23e8(SlopeSlipWork *work) {
-    u32 interval = func_ov036_021c23b4(work);
+    u32 interval = SlopeSlip_GetTurnInterval(work);
 
     work->frames++;
     if (work->frames % interval == 0) {
@@ -154,7 +157,7 @@ void func_ov036_021c23e8(SlopeSlipWork *work) {
 }
 
 void func_ov036_021c242c(SlopeSlipWork *work) {
-    FldAct_SetAcmd(work->actor, func_ov036_021c2394(work));
+    FldAct_SetAcmd(work->actor, SlopeSlip_GetAcmd(work));
     SetActorFlag(work->actor, 8);
     if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35))) {
         GFL_SndSEPlay(SEQ_SE_FLD_35);
@@ -162,7 +165,7 @@ void func_ov036_021c242c(SlopeSlipWork *work) {
 }
 
 void func_ov036_021c2460(SlopeSlipWork *work) {
-    const SlopeSlipTileConfig *config = GetSlopeSlipTileConfig(func_ov036_021c23c4(work));
+    const SlopeSlipTileConfig *config = GetSlopeSlipTileConfig(SlopeSlip_GetTileClass(work));
 
     if (config != NULL) {
         work->config = config;
@@ -170,7 +173,7 @@ void func_ov036_021c2460(SlopeSlipWork *work) {
 }
 
 BOOL func_ov036_021c2474(SlopeSlipWork *work) {
-    if (ActorRouteCollCheckOneTileInDir(work->actor, func_ov036_021c23a4(work))) {
+    if (ActorRouteCollCheckOneTileInDir(work->actor, SlopeSlip_GetDirection(work))) {
         return TRUE;
     }
     return FALSE;
@@ -179,6 +182,6 @@ BOOL func_ov036_021c2474(SlopeSlipWork *work) {
 void func_ov036_021c2490(SlopeSlipWork *work) {
     ClearActorFlag(work->actor, 8);
     if (work->config != NULL) {
-        CheckSetActorFaceDir(work->actor, func_ov036_021c23a4(work));
+        CheckSetActorFaceDir(work->actor, SlopeSlip_GetDirection(work));
     }
 }

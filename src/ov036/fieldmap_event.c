@@ -45,10 +45,10 @@
 #include "field/gym_humilau.h"
 #include "field/gym_mistralton.h"
 #include "field/height_ex.h"
+#include "field/hidden_hollow_generate.h"
 #include "field/pair_sys.h"
 #include "field/player_state.h"
 #include "field/pleasure_boat.h"
-#include "field/scrcmd_hidden_hollow.h"
 #include "field/shortcut_menu.h"
 #include "field/subscreen.h"
 #include "field/union_actor.h"
@@ -1404,7 +1404,7 @@ static GameEventReturnCode EventSurfExit_Callback(GameEvent *event, u32 *state, 
     case 1: {
         u16 acmd;
 
-        func_ov036_021a4504((FieldEffectTask *)func_ov036_0219a5c4(player), 0);
+        func_ov036_021a4504(func_ov036_0219a5c4(player), 0);
         FieldPlayer_SetSpecialSeq(player, 1);
         func_ov036_0219a58c(player);
         acmd = GetAcmdForDir(work->dir, ACMD_JUMP_1);
@@ -1581,14 +1581,12 @@ u32 func_ov036_02182f90(GameSystem *gsys) {
 // Whether no actor stands on the tiles the player would jump over to leave the water
 static BOOL IsSurfExitPathClear(FieldInteractWk *wk, Field *field, int steps) {
     FieldActor *actor = FieldPlayer_GetActor(wk->player);
-    s16 z;
-    s16 x;
-    u16 dir;
+    u16 dir = wk->moveDir;
+
+    s16 x = GetGPosX(actor);
+    s16 z = GetGPosZ(actor);
     int i;
 
-    dir = wk->moveDir;
-    x = GetGPosX(actor);
-    z = GetGPosZ(actor);
     if (steps == 0) {
         steps++;
     }

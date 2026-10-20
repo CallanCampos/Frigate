@@ -48,7 +48,7 @@ static void GameBeacon_FillReceivedPassPower(GameBeacon *info, u32 passPower);
 static void GameBeacon_FillThanks(GameBeacon *info, GameData *gameData, u16 value);
 static void GameBeacon_FillPhrase(GameBeacon *info, const StrBuf *name, u8 value);
 static void GameBeacon_FillPokestar(GameBeacon *info, u8 value, u16 type);
-static void GameBeacon_FillTournament(GameBeacon *info, u8 value, u8 extra, u32 type);
+static void GameBeacon_FillTournament(GameBeacon *info, u16 value, u8 extra, u32 type);
 static void GameBeacon_FillJoinAvenueShopping(GameBeacon *info);
 static void GameBeacon_FillArea(GameBeacon *info, u8 extra, u16 value, u16 type);
 
@@ -608,14 +608,14 @@ static void GameBeacon_FillPokestar(GameBeacon *info, u8 value, u16 type) {
     GameBeacon_ClearRecent(info);
 }
 
-void GameBeacon_BroadcastTournamentChallenge(u8 value) {
+void GameBeacon_BroadcastTournamentChallenge(u16 value) {
     if (GameBeaconSys_CanSendType(0x35)) {
         GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
         GameBeacon_FillTournament(&GameBeaconSys->mine.beacon, value, 0, 0x35);
     }
 }
 
-void GameBeacon_BroadcastTournamentWin(u8 value, u8 kind) {
+void GameBeacon_BroadcastTournamentWin(u16 value, u8 kind) {
     u32 type = 0x38;
 
     if (kind != 3) {
@@ -627,14 +627,14 @@ void GameBeacon_BroadcastTournamentWin(u8 value, u8 kind) {
     }
 }
 
-void GameBeacon_BroadcastTournamentLoss(u8 value, u8 extra) {
+void GameBeacon_BroadcastTournamentLoss(u16 value, u8 extra) {
     if (GameBeaconSys_CanSendType(0x37)) {
         GameBeaconSendSlot_ResetB2W2Only(&GameBeaconSys->mine);
         GameBeacon_FillTournament(&GameBeaconSys->mine.beacon, value, extra, 0x37);
     }
 }
 
-static void GameBeacon_FillTournament(GameBeacon *info, u8 value, u8 extra, u32 type) {
+static void GameBeacon_FillTournament(GameBeacon *info, u16 value, u8 extra, u32 type) {
     info->type = type;
     info->payload.pair.a = value;
     info->payload.pair.b = extra;

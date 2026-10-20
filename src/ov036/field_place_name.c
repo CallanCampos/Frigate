@@ -1,5 +1,9 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/arc.h"
+#include "constants/text_banks.h"
+#include "constants/version.h"
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_msgbg.h"
@@ -66,25 +70,25 @@ void func_ov036_021b5194(PlaceName *wk);
 void func_ov036_021b51bc(PlaceName *wk);
 void func_ov036_021b51d0(PlaceName *wk);
 void func_ov036_021b51e0(PlaceName *wk, u32 fileId);
-void func_ov036_021b5204(PlaceName *wk);
+void PlaceName_FreePaletteFile(PlaceName *wk);
 void func_ov036_021b521c(PlaceName *wk);
 void func_ov036_021b5230(PlaceName *wk, u32 fileId);
-void func_ov036_021b5258(PlaceName *wk);
+void PlaceName_FreeCharFile(PlaceName *wk);
 void func_ov036_021b5270(PlaceName *wk);
 void func_ov036_021b5284(PlaceName *wk, u32 fileId);
-void func_ov036_021b52ac(PlaceName *wk);
+void PlaceName_FreeScreenFile(PlaceName *wk);
 void func_ov036_021b52c4(PlaceName *wk);
 void func_ov036_021b52e0(PlaceName *wk);
 void func_ov036_021b52fc(PlaceName *wk);
 void func_ov036_021b5318(PlaceName *wk);
-void func_ov036_021b5330(PlaceName *wk);
+void PlaceName_FreeRenderer(PlaceName *wk);
 void func_ov036_021b5344(PlaceName *wk);
 void func_ov036_021b53a8(PlaceName *wk);
 void func_ov036_021b53cc(PlaceName *wk);
 void func_ov036_021b53e8(PlaceName *wk);
 void func_ov036_021b53f4(PlaceName *wk, u32 index);
 void func_ov036_021b540c(PlaceName *wk);
-void func_ov036_021b5420(PlaceName *wk);
+void PlaceName_FreeArchive(PlaceName *wk);
 void func_ov036_021b5434(PlaceName *wk);
 void func_ov036_021b54e0(PlaceName *wk);
 void func_ov036_021b5500(PlaceName *wk);
@@ -130,21 +134,21 @@ void func_ov036_021b5a6c(PlaceName *wk);
 void func_ov036_021b5a80(PlaceName *wk);
 HeapID FieldPlaceName_GetHeapID(PlaceName *wk);
 ArcTool *FieldPlaceName_GetArc(PlaceName *wk);
-Font *func_ov036_021b5a9c(PlaceName *wk);
-void func_ov036_021b5aa0(PlaceName *wk, HeapID heapId);
-void func_ov036_021b5aa4(PlaceName *wk, Font *font);
-void func_ov036_021b5aa8(PlaceName *wk, u32 mode);
-u32 func_ov036_021b5aac(PlaceName *wk);
-void func_ov036_021b5ab0(PlaceName *wk);
-void func_ov036_021b5ab8(PlaceName *wk);
-u8 func_ov036_021b5ac8(PlaceName *wk);
-void func_ov036_021b5ad0(PlaceName *wk);
-void func_ov036_021b5ad8(PlaceName *wk);
+Font *PlaceName_GetFont(PlaceName *wk);
+void PlaceName_SetHeapID(PlaceName *wk, HeapID heapId);
+void PlaceName_SetFont(PlaceName *wk, Font *font);
+void PlaceName_SetMode(PlaceName *wk, u32 mode);
+u32 PlaceName_GetMode(PlaceName *wk);
+void PlaceName_ResetTimer(PlaceName *wk);
+void PlaceName_IncrementTimer(PlaceName *wk);
+u8 PlaceName_GetState(PlaceName *wk);
+void PlaceName_ResetState(PlaceName *wk);
+void PlaceName_NextState(PlaceName *wk);
 void func_ov036_021b5ae8(PlaceName *wk);
 void func_ov036_021b5b04(PlaceName *wk);
 u16 PlaceName_GetReqZoneID(PlaceName *wk);
 void SetPlaceNameDispZone(PlaceName *wk, u16 zoneId);
-StrBuf *func_ov036_021b5b3c(PlaceName *wk);
+StrBuf *PlaceName_GetName(PlaceName *wk);
 BOOL CheckPopupPlaceNameDispAuto(u16 zoneId, BOOL a1);
 
 static const ClActSurfaceSetup sPlaceNameSurfaceSetup = { 0, 0, 256, 192, 0, 1 };
@@ -152,7 +156,7 @@ static const ClActSurfaceSetup sPlaceNameSurfaceSetup = { 0, 0, 256, 192, 0, 1 }
 static const BGSetup sPlaceNameBGSetup = { 0, 0, 0x800, 0, 1, 0, 2, 1, 0x8000, 0, 1, 0, 0 };
 
 BOOL isGameVerWhite2(void) {
-    if (getGameVersion() == 22) {
+    if (getGameVersion() == VERSION_WHITE2) {
         return TRUE;
     }
     return FALSE;
@@ -166,8 +170,8 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys
     func_ov036_021b5a14(wk);
     func_ov036_021b5a2c(wk);
     func_ov036_021b5a44(wk);
-    func_ov036_021b5aa0(wk, heapId);
-    func_ov036_021b5aa4(wk, func_ov036_0218799c(msgBGSys));
+    PlaceName_SetHeapID(wk, heapId);
+    PlaceName_SetFont(wk, func_ov036_0218799c(msgBGSys));
     func_ov036_021b5318(wk);
     func_ov036_021b5344(wk);
     func_ov036_021b53cc(wk);
@@ -191,26 +195,26 @@ PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys
 
 void FieldPlaceName_Free(PlaceName *wk) {
     func_ov036_021b5b04(wk);
-    func_ov036_021b52ac(wk);
-    func_ov036_021b5258(wk);
-    func_ov036_021b5204(wk);
+    PlaceName_FreeScreenFile(wk);
+    PlaceName_FreeCharFile(wk);
+    PlaceName_FreePaletteFile(wk);
     func_ov036_021b54e0(wk);
     func_ov036_021b5a80(wk);
     func_ov036_021b5600(wk);
     func_ov036_021b53e8(wk);
     func_ov036_021b53a8(wk);
-    func_ov036_021b5330(wk);
+    PlaceName_FreeRenderer(wk);
     func_ov036_021b5a58(wk);
     func_ov036_021b5a6c(wk);
     func_ov036_021b52fc(wk);
-    func_ov036_021b5420(wk);
+    PlaceName_FreeArchive(wk);
     GFL_BGSysReleaseBG(3);
     func_ov036_021b5a0c(wk);
 }
 
 void func_ov036_021b4ff8(PlaceName *wk) {
-    func_ov036_021b5ab8(wk);
-    switch (func_ov036_021b5aac(wk)) {
+    PlaceName_IncrementTimer(wk);
+    switch (PlaceName_GetMode(wk)) {
     case 0:
         func_ov036_021b5778(wk);
         break;
@@ -237,7 +241,7 @@ void func_ov036_021b4ff8(PlaceName *wk) {
 }
 
 void func_ov036_021b5064(PlaceName *wk) {
-    switch (func_ov036_021b5aac(wk)) {
+    switch (PlaceName_GetMode(wk)) {
     case 0:
         func_ov036_021b5994(wk);
         break;
@@ -330,7 +334,7 @@ void func_ov036_021b51e0(PlaceName *wk, u32 fileId) {
     wk->paletteFile = GFL_G2DIOReadNCLRArc(FieldPlaceName_GetArc(wk), fileId, &wk->paletteData, heapId);
 }
 
-void func_ov036_021b5204(PlaceName *wk) {
+void PlaceName_FreePaletteFile(PlaceName *wk) {
     if (wk->paletteFile != NULL) {
         GFL_HeapFree(wk->paletteFile);
         wk->paletteFile = NULL;
@@ -347,7 +351,7 @@ void func_ov036_021b5230(PlaceName *wk, u32 fileId) {
     wk->charFile = GFL_G2DIOReadBGNCGRArc(FieldPlaceName_GetArc(wk), fileId, FALSE, &wk->charData, heapId);
 }
 
-void func_ov036_021b5258(PlaceName *wk) {
+void PlaceName_FreeCharFile(PlaceName *wk) {
     if (wk->charFile != NULL) {
         GFL_HeapFree(wk->charFile);
         wk->charFile = NULL;
@@ -364,7 +368,7 @@ void func_ov036_021b5284(PlaceName *wk, u32 fileId) {
     wk->screenFile = GFL_G2DIOReadNSCRArc(FieldPlaceName_GetArc(wk), fileId, FALSE, &wk->screenData, heapId);
 }
 
-void func_ov036_021b52ac(PlaceName *wk) {
+void PlaceName_FreeScreenFile(PlaceName *wk) {
     if (wk->screenFile != NULL) {
         GFL_HeapFree(wk->screenFile);
         wk->screenFile = NULL;
@@ -394,7 +398,7 @@ void func_ov036_021b5318(PlaceName *wk) {
     wk->renderer = ClActRenderer_Create(&sPlaceNameSurfaceSetup, 1, wk->heapId);
 }
 
-void func_ov036_021b5330(PlaceName *wk) {
+void PlaceName_FreeRenderer(PlaceName *wk) {
     if (wk->renderer != NULL) {
         ClActRenderer_Delete(wk->renderer);
         wk->renderer = NULL;
@@ -438,7 +442,7 @@ void func_ov036_021b540c(PlaceName *wk) {
     wk->arc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_PLACE_NAME, FieldPlaceName_GetHeapID(wk));
 }
 
-void func_ov036_021b5420(PlaceName *wk) {
+void PlaceName_FreeArchive(PlaceName *wk) {
     if (wk->arc != NULL) {
         GFL_ArcToolFree(wk->arc);
         wk->arc = NULL;
@@ -484,9 +488,9 @@ void func_ov036_021b5500(PlaceName *wk) {
     u32 season;
 
     MI_CpuFill8(&text, 0, sizeof(text));
-    text.font = func_ov036_021b5a9c(wk);
+    text.font = PlaceName_GetFont(wk);
     text.zoneId = wk->shownZoneId;
-    text.name = func_ov036_021b5b3c(wk);
+    text.name = PlaceName_GetName(wk);
     func_ov036_021b68d8(wk->objects[0], &text);
     MI_CpuFill8(&season, 0, sizeof(season));
     season = wk->season;
@@ -601,9 +605,9 @@ void func_ov036_021b5660(PlaceName *wk) {
 }
 
 void func_ov036_021b56d4(PlaceName *wk, u32 mode) {
-    func_ov036_021b5aa8(wk, mode);
-    func_ov036_021b5ab0(wk);
-    func_ov036_021b5ad0(wk);
+    PlaceName_SetMode(wk, mode);
+    PlaceName_ResetTimer(wk);
+    PlaceName_ResetState(wk);
     if (mode == 0) {
         func_ov036_021b5550(wk);
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -653,29 +657,29 @@ void func_ov036_021b5778(PlaceName *wk) {
 }
 
 void func_ov036_021b57bc(PlaceName *wk) {
-    switch (func_ov036_021b5ac8(wk)) {
+    switch (PlaceName_GetState(wk)) {
     case 0:
         func_ov036_021b5660(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 1:
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 2:
         GFL_BGSysClearScr(3);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 3:
         func_ov036_021b521c(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 4:
         func_ov036_021b5270(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 5:
         func_ov036_021b52c4(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 6:
         GFL_BGSysSetBGPriority(3, 1);
@@ -687,11 +691,11 @@ void func_ov036_021b57bc(PlaceName *wk) {
                                 TRUE);
         G2_SetWndOutsidePlane(GX_WND_PLANEMASK_BG0 | GX_WND_PLANEMASK_BG1 | GX_WND_PLANEMASK_BG2 | GX_WND_PLANEMASK_OBJ,
                               TRUE);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 7:
         func_ov036_021b5500(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 8:
         if (func_ov036_021b5588(wk)) {
@@ -702,12 +706,12 @@ void func_ov036_021b57bc(PlaceName *wk) {
 }
 
 void func_ov036_021b58b4(PlaceName *wk) {
-    switch (func_ov036_021b5ac8(wk)) {
+    switch (PlaceName_GetState(wk)) {
     case 0:
         __endColorBlending(wk);
         GFL_BGSysSetBGEnabled(3, 1);
         func_ov036_021b55ac(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 1:
         if (wk->timer > 10 && func_ov036_021b5588(wk)) {
@@ -724,9 +728,9 @@ void func_ov036_021b5900(PlaceName *wk) {
 }
 
 void func_ov036_021b5914(PlaceName *wk) {
-    switch (func_ov036_021b5ac8(wk)) {
+    switch (PlaceName_GetState(wk)) {
     case 0:
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 1:
         func_ov036_021b56d4(wk, 5);
@@ -735,10 +739,10 @@ void func_ov036_021b5914(PlaceName *wk) {
 }
 
 void func_ov036_021b5938(PlaceName *wk) {
-    switch (func_ov036_021b5ac8(wk)) {
+    switch (PlaceName_GetState(wk)) {
     case 0:
         func_ov036_021b55cc(wk);
-        func_ov036_021b5ad8(wk);
+        PlaceName_NextState(wk);
         break;
     case 1:
         if (wk->timer > 12 && func_ov036_021b5588(wk)) {
@@ -803,7 +807,7 @@ void func_ov036_021b5a14(PlaceName *wk) {
 }
 
 void func_ov036_021b5a2c(PlaceName *wk) {
-    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, 0x6d, FieldPlaceName_GetHeapID(wk));
+    wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, FieldPlaceName_GetHeapID(wk));
 }
 
 void func_ov036_021b5a44(PlaceName *wk) {
@@ -839,43 +843,43 @@ ArcTool *FieldPlaceName_GetArc(PlaceName *wk) {
     return wk->arc;
 }
 
-Font *func_ov036_021b5a9c(PlaceName *wk) {
+Font *PlaceName_GetFont(PlaceName *wk) {
     return wk->font;
 }
 
-void func_ov036_021b5aa0(PlaceName *wk, HeapID heapId) {
+void PlaceName_SetHeapID(PlaceName *wk, HeapID heapId) {
     wk->heapId = heapId;
 }
 
-void func_ov036_021b5aa4(PlaceName *wk, Font *font) {
+void PlaceName_SetFont(PlaceName *wk, Font *font) {
     wk->font = font;
 }
 
-void func_ov036_021b5aa8(PlaceName *wk, u32 mode) {
+void PlaceName_SetMode(PlaceName *wk, u32 mode) {
     wk->mode = mode;
 }
 
-u32 func_ov036_021b5aac(PlaceName *wk) {
+u32 PlaceName_GetMode(PlaceName *wk) {
     return wk->mode;
 }
 
-void func_ov036_021b5ab0(PlaceName *wk) {
+void PlaceName_ResetTimer(PlaceName *wk) {
     wk->timer = 0;
 }
 
-void func_ov036_021b5ab8(PlaceName *wk) {
+void PlaceName_IncrementTimer(PlaceName *wk) {
     wk->timer++;
 }
 
-u8 func_ov036_021b5ac8(PlaceName *wk) {
+u8 PlaceName_GetState(PlaceName *wk) {
     return wk->state;
 }
 
-void func_ov036_021b5ad0(PlaceName *wk) {
+void PlaceName_ResetState(PlaceName *wk) {
     wk->state = 0;
 }
 
-void func_ov036_021b5ad8(PlaceName *wk) {
+void PlaceName_NextState(PlaceName *wk) {
     wk->state++;
 }
 
@@ -898,7 +902,7 @@ void SetPlaceNameDispZone(PlaceName *wk, u16 zoneId) {
     wk->reqZoneId = zoneId;
 }
 
-StrBuf *func_ov036_021b5b3c(PlaceName *wk) {
+StrBuf *PlaceName_GetName(PlaceName *wk) {
     return wk->name;
 }
 

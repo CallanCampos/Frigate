@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "constants/directions.h"
+#include "constants/obj_codes.h"
 #include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_acmd.h"
@@ -371,457 +372,15 @@ static BOOL func_ov036_021911cc(FieldActor *actor);
 static BOOL func_ov036_021911e8(FieldActor *actor);
 static BOOL func_ov036_0219120c(FieldActor *actor);
 
-const ActorAcmdFunc data_ov036_021cacac[] = { func_ov036_0218fc3c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacb4[] = { func_ov036_02191174, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacbc[] = { func_ov036_02190e60, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacc4[] = { func_ov036_0219100c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caccc[] = { func_ov036_0218f0f4, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacd4[] = { func_ov036_0218fc64, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacdc[] = { func_ov036_0218fc50, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cace4[] = { func_ov036_02191090, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacec[] = { func_ov036_0218fc28, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_DIR_TABLE[] = { func_ov036_0218f0d0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cacfc[] = { func_ov036_0218fc78, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad04[] = { func_ov036_0218fc14, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad0c[] = { func_ov036_0218f0dc, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad14[] = { func_ov036_0218f0e8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad1c[] = { func_ov036_02190db0, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad28[] = { func_ov036_0218fcf8, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad40[] = { func_ov036_02190218, func_ov036_02190234, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad4c[] = { func_ov036_02191188, func_ov036_021911e8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad70[] = { func_ov036_0218f42c, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad7c[] = { func_ov036_0218f414, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad88[] = { func_ov036_0218f3fc, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cad94[] = { func_ov036_0218fa7c, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cadac[] = { func_ov036_02190e04, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cadb8[] = { func_ov036_0218fce8, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cadc4[] = { func_ov036_02190680, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cadd0[] = { func_ov036_02190d88, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caddc[] = { func_ov036_0218f440, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cade8[] = { func_ov036_0219119c, func_ov036_0219120c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cadf4[] = { func_ov036_02190e28, func_ov036_02190e44, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae00[] = { func_ov036_021909b4, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae0c[] = { func_ov036_021911b0, func_ov036_0219120c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae18[] = { func_ov036_02190c4c, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae24[] = { func_ov036_02190c70, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae30[] = { func_ov036_02190010, func_ov036_02190028, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae3c[] = { func_ov036_02190980, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae48[] = { func_ov036_0219094c, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae54[] = { func_ov036_02190918, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae6c[] = { func_ov036_021908b0, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae78[] = { func_ov036_0219087c, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae84[] = { func_ov036_02190848, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae90[] = { func_ov036_02190814, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cae9c[] = { func_ov036_021907e0, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caea8[] = { func_ov036_021907ac, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caeb4[] = { func_ov036_02190778, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caec0[] = { func_ov036_0218fe74, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caecc[] = { func_ov036_0218fa58, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caed8[] = { func_ov036_0218fa34, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caee4[] = { func_ov036_0218fa10, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caef0[] = { func_ov036_02190748, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caefc[] = { func_ov036_02190718, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf08[] = { func_ov036_02190ddc, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf14[] = { func_ov036_021910b0, func_ov036_021910f4, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf20[] = { func_ov036_02190e74, func_ov036_02190eac, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf2c[] = { func_ov036_02190650, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf38[] = { func_ov036_02190620, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf44[] = { func_ov036_021905f0, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf50[] = { func_ov036_02190c98, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf5c[] = { func_ov036_02190cc0, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf68[] = { func_ov036_02190eec, func_ov036_02190f14, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf74[] = { func_ov036_021911cc, func_ov036_0219120c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf80[] = { func_ov036_0219045c, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf8c[] = { func_ov036_0219048c, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caf98[] = { func_ov036_02190ce8, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafa4[] = { func_ov036_021904c0, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafb0[] = { func_ov036_0219042c, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafbc[] = { func_ov036_021903f8, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafc8[] = { func_ov036_021903c8, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafd4[] = { func_ov036_02190394, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafe0[] = { func_ov036_02190200, func_ov036_021901b0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cafec[] = { func_ov036_021901e8, func_ov036_021901b0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021caff8[] = { func_ov036_021901d0, func_ov036_021901b0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb004[] = { func_ov036_021900c8, func_ov036_02190110, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb010[] = { func_ov036_0218f590, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb01c[] = { func_ov036_0218fff8, func_ov036_02190028, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb028[] = { func_ov036_0218ffdc, func_ov036_02190080, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb034[] = { func_ov036_0218ffdc, func_ov036_02190028, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb040[] = { func_ov036_0218ffc0, func_ov036_02190080, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb04c[] = { func_ov036_0218ffc0, func_ov036_02190028, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb058[] = { func_ov036_0218ffa4, func_ov036_02190080, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb064[] = { func_ov036_0218ffa4, func_ov036_02190028, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb070[] = { func_ov036_0218ff7c, func_ov036_0218ff8c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb07c[] = { func_ov036_0218ff6c, func_ov036_0218ff8c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb088[] = { func_ov036_0218ff5c, func_ov036_0218ff8c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb094[] = { func_ov036_0218ff4c, func_ov036_0218ff8c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0a0[] = { func_ov036_0218ff24, func_ov036_0218ff34, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0ac[] = { func_ov036_0218ff14, func_ov036_0218ff34, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0b8[] = { func_ov036_0218ff04, func_ov036_0218ff34, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0c4[] = { func_ov036_0218fef4, func_ov036_0218ff34, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0d0[] = { func_ov036_0218f3e4, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0dc[] = { func_ov036_0218f3d0, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb0e8[] = { func_ov036_0218f3b8, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { func_ov036_0218f3a0, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb100[] = { func_ov036_0218fecc, func_ov036_0218fedc, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb10c[] = { func_ov036_0218febc, func_ov036_0218fedc, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb118[] = { func_ov036_0218feac, func_ov036_0218fedc, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb124[] = { func_ov036_0218fe9c, func_ov036_0218fedc, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb13c[] = { func_ov036_0218fe64, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb148[] = { func_ov036_0218fe54, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb154[] = { func_ov036_0218fe44, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb160[] = { func_ov036_0218fe34, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb16c[] = { func_ov036_0218fe24, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb178[] = { func_ov036_0218fe14, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb184[] = { func_ov036_0218fe04, func_ov036_0218fe84, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb190[] = { func_ov036_0218fd58, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb19c[] = { func_ov036_0218fd48, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1a8[] = { func_ov036_0218fd38, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1c0[] = { func_ov036_0218fd08, func_ov036_0218fcc0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1cc[] = { func_ov036_021906e4, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1d8[] = { func_ov036_021906b0, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1e4[] = { func_ov036_0218f9a8, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb1fc[] = { func_ov036_02190d0c, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb208[] = { func_ov036_02190528, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb214[] = { func_ov036_0219055c, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb220[] = { func_ov036_02190d38, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb22c[] = { func_ov036_0218fb98, func_ov036_0218fbcc, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb238[] = { func_ov036_0218fb2c, func_ov036_0218fb50, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb244[] = { func_ov036_0218fb20, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb250[] = { func_ov036_0218faf0, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb25c[] = { func_ov036_0218fafc, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb268[] = { func_ov036_02190590, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb274[] = { func_ov036_0218fb08, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb280[] = { func_ov036_0218fae4, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb28c[] = { func_ov036_0218fad8, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb298[] = { func_ov036_0218f9ec, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2a4[] = { func_ov036_0218f9c8, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2b0[] = { func_ov036_0218fb14, func_ov036_0218fab8, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { func_ov036_0218f988, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2c8[] = { func_ov036_0218f964, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2d4[] = { func_ov036_0218f944, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2e0[] = { func_ov036_0218f920, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2ec[] = { func_ov036_0218f900, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb2f8[] = { func_ov036_0218f8e0, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb304[] = { func_ov036_0218f8bc, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb310[] = { func_ov036_0218f898, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb31c[] = { func_ov036_0218f878, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb328[] = { func_ov036_0218f858, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb334[] = { func_ov036_0218f838, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb340[] = { func_ov036_0218f818, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_JUMP8F[] = { func_ov036_0218f7f8, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb358[] = { func_ov036_0218f7d4, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb364[] = { func_ov036_0218f7b4, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb370[] = { func_ov036_0218f790, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_JUMP16F[] = { func_ov036_0218f76c, func_ov036_0218f690, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb388[] = { func_ov036_0218f5f0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb394[] = { func_ov036_0218f5e0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb3a0[] = { func_ov036_0218f5d0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_TURN2_TABLE[] = { func_ov036_0218f5c0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb3b8[] = { func_ov036_0218f5b0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb3c4[] = { func_ov036_0218f5a0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb3d0[] = { func_ov036_021905c0, func_ov036_02190350, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_TURN4_TABLE[] = { func_ov036_0218f580, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb3e8[] = { func_ov036_0218f570, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb3f4[] = { func_ov036_0218f560, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb400[] = { func_ov036_0218f550, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_TURN8_TABLE[] = { func_ov036_0218f540, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb418[] = { func_ov036_0218f530, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb424[] = { func_ov036_0218f520, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb430[] = { func_ov036_0218f510, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_TURN16_TABLE[] = { func_ov036_0218f500, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb448[] = { func_ov036_0218f4f0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb454[] = { func_ov036_0218f4e0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb460[] = { func_ov036_0218f4d0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_TURN32_TABLE[] = { func_ov036_0218f4c0, func_ov036_0218f48c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb478[] = { func_ov036_0218f388, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb484[] = { func_ov036_0218f374, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb490[] = { func_ov036_0218f35c, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb49c[] = { func_ov036_0218f348, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb4a8[] = { func_ov036_0218f330, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb4b4[] = { func_ov036_0218f31c, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb4c0[] = { func_ov036_0218f304, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_WALK2_TABLE[] = { func_ov036_0218f2ec, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb4d8[] = { func_ov036_0218f2d8, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb4e4[] = { func_ov036_0218f2c4, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb4f0[] = { func_ov036_0218f2b0, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_WALK4_TABLE[] = { func_ov036_0218f29c, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb508[] = { func_ov036_0218f288, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb514[] = { func_ov036_0218f274, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb520[] = { func_ov036_0218f25c, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_WALK8_TABLE[] = { func_ov036_0218f244, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb538[] = { func_ov036_0218f230, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb544[] = { func_ov036_0218f21c, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb550[] = { func_ov036_0218f204, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_WALK16_TABLE[] = { func_ov036_0218f1f0, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb568[] = { func_ov036_0218f1dc, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb574[] = { func_ov036_0218f1c8, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb580[] = { func_ov036_0218f1b4, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc ACMD_WALK32_TABLE[] = { func_ov036_0218f1a0, func_ov036_0218f14c, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, func_ov036_02190ad0, func_ov036_0218f09c };
-
-const ActorAcmdFunc data_ov036_021cb5a4[] = { func_ov036_02191020, func_ov036_02191034, func_ov036_0218f09c };
-
-static const s32 data_ov036_021cb5b0[] = { 0x5000, 0x6000, 0x5000 };
-
 static BOOL (*const ACMD_TCB_FUNCS[])(FieldAcmdWork *work) = { FieldAcmdTCB_Begin,        FieldAcmdTCB_WaitAcmdReady,
                                                                FieldAcmdTCB_CommitAcmd,   FieldAcmdTCB_CheckSeqPerms,
                                                                FieldAcmdTCB_AdvanceQueue, FieldAcmdTCB_End };
 
-static const s32 data_ov036_021cb5d4[] = { 0x2000, 0x3000, 0x3000, 0x2000, 0x3000, 0x3000 };
-
-static const s32 data_ov036_021cb5ec[] = { 0x2500, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480 };
-
-static const s32 data_ov036_021cb608[] = { 0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000,
-                                           0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000 };
-
-static const fx32 data_ov036_021cb7bc[] = { 0,
-                                            FX32_CONST(2),
-                                            FX32_CONST(3),
-                                            FX32_CONST(4),
-                                            FX32_CONST(5),
-                                            FX32_CONST(6),
-                                            FX32_CONST(6),
-                                            FX32_CONST(6),
-                                            FX32_CONST(5),
-                                            FX32_CONST(5),
-                                            FX32_CONST(4),
-                                            FX32_CONST(3),
-                                            FX32_CONST(2),
-                                            0,
-                                            0,
-                                            0 };
-
-static const fx32 data_ov036_021cb7fc[] = { FX32_CONST(2),
-                                            FX32_CONST(4),
-                                            FX32_CONST(6),
-                                            FX32_CONST(8),
-                                            FX32_CONST(9),
-                                            FX32_CONST(10),
-                                            FX32_CONST(10),
-                                            FX32_CONST(10),
-                                            FX32_CONST(9),
-                                            FX32_CONST(8),
-                                            FX32_CONST(6),
-                                            FX32_CONST(5),
-                                            FX32_CONST(3),
-                                            FX32_CONST(2),
-                                            0,
-                                            0 };
-
-static const fx32 data_ov036_021cb83c[] = { FX32_CONST(4),
-                                            FX32_CONST(6),
-                                            FX32_CONST(8),
-                                            FX32_CONST(10),
-                                            FX32_CONST(11),
-                                            FX32_CONST(12),
-                                            FX32_CONST(12),
-                                            FX32_CONST(12),
-                                            FX32_CONST(11),
-                                            FX32_CONST(10),
-                                            FX32_CONST(9),
-                                            FX32_CONST(8),
-                                            FX32_CONST(6),
-                                            FX32_CONST(4),
-                                            0,
-                                            0 };
-
-static const fx32 *data_ov036_021d4d34[] = { data_ov036_021cb83c, data_ov036_021cb7bc, data_ov036_021cb7fc };
+static const s32 data_ov036_021cb5b0[];
+static const s32 data_ov036_021cb5d4[];
+static const s32 data_ov036_021cb5ec[];
+static const s32 data_ov036_021cb608[];
+static const fx32 *data_ov036_021d4d34[];
 
 void func_ov036_0218ed18(MMSys *system) {
     if (FldActSys_GetFieldBlAct(system) != NULL) {
@@ -874,7 +433,7 @@ void func_ov036_0218ee08(FieldActor *actor) {
         BlActSys *sys = FieldBlAct_GetBlActSys(FldAct_GetFieldBlAct(actor));
 
         CopyActorPosAllAdd(actor, &pos);
-        pos.y += func_ov036_02181324(GetMMSysField(GetActorMModelSystem(actor)));
+        pos.y += Field_GetActorYOffset(GetMMSysField(GetActorMModelSystem(actor)));
         BlActScene_SetActorPos(BlActSys_GetScene(sys), idx, &pos);
     }
 }
@@ -1399,6 +958,7 @@ static BOOL func_ov036_0218f690(FieldActor *actor) {
     FieldAcmdJumpWork *work = func_ov012_02167154(actor);
     VecFx32 offset;
     fx32 speed;
+    const fx32 *row;
     u16 index;
 
     if (work->speed != 0) {
@@ -1420,8 +980,9 @@ static BOOL func_ov036_0218f690(FieldActor *actor) {
         work->height = 0xf00;
     }
     index = work->height / 256;
+    row = data_ov036_021d4d34[work->heightTable];
     offset.x = 0;
-    offset.y = data_ov036_021d4d34[work->heightTable][index];
+    offset.y = row[index];
     offset.z = 0;
     SetActorWPosOffset(actor, &offset);
     work->frames--;
@@ -2593,7 +2154,7 @@ static BOOL func_ov036_02190f14(FieldActor *actor) {
     }
     work->time++;
     step--;
-    if (FldAct_GetObjCode(actor) == 0xd3) {
+    if (FldAct_GetObjCode(actor) == OBJ_CODE_211) {
         if (anim == 2 && work->lastFrame != step) {
             work->lastFrame = step;
             switch (step) {
@@ -2680,7 +2241,7 @@ static BOOL func_ov036_021910f4(FieldActor *actor) {
     }
     work->time++;
     step--;
-    if (FldAct_GetObjCode(actor) == 0xdd && anim == 0 && work->lastFrame != step) {
+    if (FldAct_GetObjCode(actor) == OBJ_CODE_221 && anim == 0 && work->lastFrame != step) {
         work->lastFrame = step;
         switch (step) {
         case 0:
@@ -2746,3 +2307,456 @@ static BOOL func_ov036_0219120c(FieldActor *actor) {
     }
     return FALSE;
 }
+
+// The command tables, after the functions. MWCC lays a file's data out sorted by size, and equal sizes come out in an
+// order set by where every object is declared, so these are in the order the game's layout needs: that of their start
+// functions (then update functions, for a shared start), except commands 88-91 (their index in
+// ACTOR_ACTION_COMMAND_TABLES), which follow command 83's table, 117-120, which follow 152's, and 153-158, which follow
+// 144's. The tables the functions read come last, declared at the top.
+const ActorAcmdFunc ACMD_DIR_TABLE[] = { func_ov036_0218f0d0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad0c[] = { func_ov036_0218f0dc, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad14[] = { func_ov036_0218f0e8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caccc[] = { func_ov036_0218f0f4, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_WALK32_TABLE[] = { func_ov036_0218f1a0, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb580[] = { func_ov036_0218f1b4, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb574[] = { func_ov036_0218f1c8, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb568[] = { func_ov036_0218f1dc, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_WALK16_TABLE[] = { func_ov036_0218f1f0, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb550[] = { func_ov036_0218f204, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb544[] = { func_ov036_0218f21c, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb538[] = { func_ov036_0218f230, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_WALK8_TABLE[] = { func_ov036_0218f244, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb520[] = { func_ov036_0218f25c, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb514[] = { func_ov036_0218f274, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb508[] = { func_ov036_0218f288, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_WALK4_TABLE[] = { func_ov036_0218f29c, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb4f0[] = { func_ov036_0218f2b0, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb4e4[] = { func_ov036_0218f2c4, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb4d8[] = { func_ov036_0218f2d8, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_WALK2_TABLE[] = { func_ov036_0218f2ec, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb4c0[] = { func_ov036_0218f304, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb4b4[] = { func_ov036_0218f31c, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb4a8[] = { func_ov036_0218f330, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb49c[] = { func_ov036_0218f348, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb490[] = { func_ov036_0218f35c, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb484[] = { func_ov036_0218f374, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb478[] = { func_ov036_0218f388, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_TURN32_TABLE[] = { func_ov036_0218f4c0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb460[] = { func_ov036_0218f4d0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb454[] = { func_ov036_0218f4e0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb448[] = { func_ov036_0218f4f0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_TURN16_TABLE[] = { func_ov036_0218f500, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb430[] = { func_ov036_0218f510, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb424[] = { func_ov036_0218f520, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb418[] = { func_ov036_0218f530, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_TURN8_TABLE[] = { func_ov036_0218f540, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb400[] = { func_ov036_0218f550, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb3f4[] = { func_ov036_0218f560, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb3e8[] = { func_ov036_0218f570, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_TURN4_TABLE[] = { func_ov036_0218f580, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb010[] = { func_ov036_0218f590, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb3c4[] = { func_ov036_0218f5a0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb3b8[] = { func_ov036_0218f5b0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_TURN2_TABLE[] = { func_ov036_0218f5c0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb3a0[] = { func_ov036_0218f5d0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb394[] = { func_ov036_0218f5e0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb388[] = { func_ov036_0218f5f0, func_ov036_0218f48c, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_JUMP16F[] = { func_ov036_0218f76c, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb370[] = { func_ov036_0218f790, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb364[] = { func_ov036_0218f7b4, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb358[] = { func_ov036_0218f7d4, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_JUMP8F[] = { func_ov036_0218f7f8, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb340[] = { func_ov036_0218f818, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb334[] = { func_ov036_0218f838, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb328[] = { func_ov036_0218f858, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb31c[] = { func_ov036_0218f878, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb310[] = { func_ov036_0218f898, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb304[] = { func_ov036_0218f8bc, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2f8[] = { func_ov036_0218f8e0, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2ec[] = { func_ov036_0218f900, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2e0[] = { func_ov036_0218f920, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2d4[] = { func_ov036_0218f944, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2c8[] = { func_ov036_0218f964, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_JUMP3G16F_TABLE[] = { func_ov036_0218f988, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1e4[] = { func_ov036_0218f9a8, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2a4[] = { func_ov036_0218f9c8, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb298[] = { func_ov036_0218f9ec, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb28c[] = { func_ov036_0218fad8, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb280[] = { func_ov036_0218fae4, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb250[] = { func_ov036_0218faf0, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb25c[] = { func_ov036_0218fafc, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb274[] = { func_ov036_0218fb08, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb2b0[] = { func_ov036_0218fb14, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb244[] = { func_ov036_0218fb20, func_ov036_0218fab8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb238[] = { func_ov036_0218fb2c, func_ov036_0218fb50, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb22c[] = { func_ov036_0218fb98, func_ov036_0218fbcc, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad04[] = { func_ov036_0218fc14, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacec[] = { func_ov036_0218fc28, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacac[] = { func_ov036_0218fc3c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacdc[] = { func_ov036_0218fc50, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacd4[] = { func_ov036_0218fc64, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacfc[] = { func_ov036_0218fc78, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cadb8[] = { func_ov036_0218fce8, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad28[] = { func_ov036_0218fcf8, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1c0[] = { func_ov036_0218fd08, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1b4[] = { func_ov036_0218fd18, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1a8[] = { func_ov036_0218fd38, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb19c[] = { func_ov036_0218fd48, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb190[] = { func_ov036_0218fd58, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb184[] = { func_ov036_0218fe04, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb178[] = { func_ov036_0218fe14, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb16c[] = { func_ov036_0218fe24, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb160[] = { func_ov036_0218fe34, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb154[] = { func_ov036_0218fe44, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb148[] = { func_ov036_0218fe54, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb13c[] = { func_ov036_0218fe64, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caec0[] = { func_ov036_0218fe74, func_ov036_0218fe84, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb124[] = { func_ov036_0218fe9c, func_ov036_0218fedc, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb118[] = { func_ov036_0218feac, func_ov036_0218fedc, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb10c[] = { func_ov036_0218febc, func_ov036_0218fedc, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb100[] = { func_ov036_0218fecc, func_ov036_0218fedc, func_ov036_0218f09c };
+
+const ActorAcmdFunc ACMD_RUN4F_TABLE[] = { func_ov036_0218f3a0, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0e8[] = { func_ov036_0218f3b8, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0dc[] = { func_ov036_0218f3d0, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0d0[] = { func_ov036_0218f3e4, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0c4[] = { func_ov036_0218fef4, func_ov036_0218ff34, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0b8[] = { func_ov036_0218ff04, func_ov036_0218ff34, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0ac[] = { func_ov036_0218ff14, func_ov036_0218ff34, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb0a0[] = { func_ov036_0218ff24, func_ov036_0218ff34, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb094[] = { func_ov036_0218ff4c, func_ov036_0218ff8c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb088[] = { func_ov036_0218ff5c, func_ov036_0218ff8c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb07c[] = { func_ov036_0218ff6c, func_ov036_0218ff8c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb070[] = { func_ov036_0218ff7c, func_ov036_0218ff8c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb064[] = { func_ov036_0218ffa4, func_ov036_02190028, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb058[] = { func_ov036_0218ffa4, func_ov036_02190080, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb04c[] = { func_ov036_0218ffc0, func_ov036_02190028, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb040[] = { func_ov036_0218ffc0, func_ov036_02190080, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb034[] = { func_ov036_0218ffdc, func_ov036_02190028, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb028[] = { func_ov036_0218ffdc, func_ov036_02190080, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb01c[] = { func_ov036_0218fff8, func_ov036_02190028, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae30[] = { func_ov036_02190010, func_ov036_02190028, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb004[] = { func_ov036_021900c8, func_ov036_02190110, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caff8[] = { func_ov036_021901d0, func_ov036_021901b0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafec[] = { func_ov036_021901e8, func_ov036_021901b0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafe0[] = { func_ov036_02190200, func_ov036_021901b0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafd4[] = { func_ov036_02190394, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafc8[] = { func_ov036_021903c8, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafbc[] = { func_ov036_021903f8, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafb0[] = { func_ov036_0219042c, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf80[] = { func_ov036_0219045c, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf8c[] = { func_ov036_0219048c, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cafa4[] = { func_ov036_021904c0, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1f0[] = { func_ov036_021904f4, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb208[] = { func_ov036_02190528, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb214[] = { func_ov036_0219055c, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb268[] = { func_ov036_02190590, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb3d0[] = { func_ov036_021905c0, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf44[] = { func_ov036_021905f0, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf38[] = { func_ov036_02190620, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf2c[] = { func_ov036_02190650, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cadc4[] = { func_ov036_02190680, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1d8[] = { func_ov036_021906b0, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1cc[] = { func_ov036_021906e4, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caefc[] = { func_ov036_02190718, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caef0[] = { func_ov036_02190748, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caee4[] = { func_ov036_0218fa10, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caed8[] = { func_ov036_0218fa34, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caecc[] = { func_ov036_0218fa58, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad94[] = { func_ov036_0218fa7c, func_ov036_0218f690, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caeb4[] = { func_ov036_02190778, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caea8[] = { func_ov036_021907ac, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae9c[] = { func_ov036_021907e0, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae90[] = { func_ov036_02190814, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae84[] = { func_ov036_02190848, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae78[] = { func_ov036_0219087c, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae6c[] = { func_ov036_021908b0, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae60[] = { func_ov036_021908e4, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae54[] = { func_ov036_02190918, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae48[] = { func_ov036_0219094c, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae3c[] = { func_ov036_02190980, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae00[] = { func_ov036_021909b4, func_ov036_02190350, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae18[] = { func_ov036_02190c4c, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae24[] = { func_ov036_02190c70, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf50[] = { func_ov036_02190c98, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf5c[] = { func_ov036_02190cc0, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf98[] = { func_ov036_02190ce8, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb1fc[] = { func_ov036_02190d0c, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb220[] = { func_ov036_02190d38, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb598[] = { func_ov036_02190d60, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cadd0[] = { func_ov036_02190d88, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad1c[] = { func_ov036_02190db0, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf08[] = { func_ov036_02190ddc, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cadac[] = { func_ov036_02190e04, func_ov036_02190ad0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cada0[] = { func_ov036_0218fd28, func_ov036_0218fcc0, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad40[] = { func_ov036_02190218, func_ov036_02190234, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad88[] = { func_ov036_0218f3fc, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad7c[] = { func_ov036_0218f414, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad70[] = { func_ov036_0218f42c, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caddc[] = { func_ov036_0218f440, func_ov036_0218f14c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cadf4[] = { func_ov036_02190e28, func_ov036_02190e44, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacbc[] = { func_ov036_02190e60, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf20[] = { func_ov036_02190e74, func_ov036_02190eac, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf68[] = { func_ov036_02190eec, func_ov036_02190f14, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacc4[] = { func_ov036_0219100c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cb5a4[] = { func_ov036_02191020, func_ov036_02191034, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cace4[] = { func_ov036_02191090, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf14[] = { func_ov036_021910b0, func_ov036_021910f4, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cacb4[] = { func_ov036_02191174, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cad4c[] = { func_ov036_02191188, func_ov036_021911e8, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cade8[] = { func_ov036_0219119c, func_ov036_0219120c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021cae0c[] = { func_ov036_021911b0, func_ov036_0219120c, func_ov036_0218f09c };
+
+const ActorAcmdFunc data_ov036_021caf74[] = { func_ov036_021911cc, func_ov036_0219120c, func_ov036_0218f09c };
+
+static const s32 data_ov036_021cb5b0[] = { 0x5000, 0x6000, 0x5000 };
+
+static const fx32 data_ov036_021cb7bc[] = { 0,
+                                            FX32_CONST(2),
+                                            FX32_CONST(3),
+                                            FX32_CONST(4),
+                                            FX32_CONST(5),
+                                            FX32_CONST(6),
+                                            FX32_CONST(6),
+                                            FX32_CONST(6),
+                                            FX32_CONST(5),
+                                            FX32_CONST(5),
+                                            FX32_CONST(4),
+                                            FX32_CONST(3),
+                                            FX32_CONST(2),
+                                            0,
+                                            0,
+                                            0 };
+
+static const s32 data_ov036_021cb5d4[] = { 0x2000, 0x3000, 0x3000, 0x2000, 0x3000, 0x3000 };
+
+static const s32 data_ov036_021cb608[] = { 0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000,
+                                           0x1000, 0x1000, 0x2000, 0x1000, 0x1000, 0x2000 };
+
+static const s32 data_ov036_021cb5ec[] = { 0x2500, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480, 0x2480 };
+
+static const fx32 data_ov036_021cb7fc[] = { FX32_CONST(2),
+                                            FX32_CONST(4),
+                                            FX32_CONST(6),
+                                            FX32_CONST(8),
+                                            FX32_CONST(9),
+                                            FX32_CONST(10),
+                                            FX32_CONST(10),
+                                            FX32_CONST(10),
+                                            FX32_CONST(9),
+                                            FX32_CONST(8),
+                                            FX32_CONST(6),
+                                            FX32_CONST(5),
+                                            FX32_CONST(3),
+                                            FX32_CONST(2),
+                                            0,
+                                            0 };
+
+static const fx32 data_ov036_021cb83c[] = { FX32_CONST(4),
+                                            FX32_CONST(6),
+                                            FX32_CONST(8),
+                                            FX32_CONST(10),
+                                            FX32_CONST(11),
+                                            FX32_CONST(12),
+                                            FX32_CONST(12),
+                                            FX32_CONST(12),
+                                            FX32_CONST(11),
+                                            FX32_CONST(10),
+                                            FX32_CONST(9),
+                                            FX32_CONST(8),
+                                            FX32_CONST(6),
+                                            FX32_CONST(4),
+                                            0,
+                                            0 };
+
+static const fx32 *data_ov036_021d4d34[] = { data_ov036_021cb83c, data_ov036_021cb7bc, data_ov036_021cb7fc };
