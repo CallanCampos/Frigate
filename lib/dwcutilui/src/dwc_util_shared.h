@@ -20,14 +20,6 @@
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 
-// A dialog over the main screen with the message (as DWCUtilScreen_Start shows it) and the buttons of a layout.
-// func_ov182_021b8f14 is the button chosen, -2 until one is; func_ov182_021b8eec closes the dialog, and
-// func_ov182_021b8f24 is TRUE until it has closed
-void func_ov182_021b8cf0(int msgIndex, int layout, int flag, int slot, int value);
-void func_ov182_021b8eec(void);
-int func_ov182_021b8f14(void);
-BOOL func_ov182_021b8f24(void);
-
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet
 extern const u16 data_ov182_021c059c[4];

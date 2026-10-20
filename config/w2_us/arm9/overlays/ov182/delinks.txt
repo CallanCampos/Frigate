@@ -428,3 +428,9 @@ lib/dwcutilui/src/dwc_util_usb_scan.c:
     .text       start:0x021b8874 end:0x021b8d30
     .rodata     start:0x021c04a8 end:0x021c04fc
     .bss        start:0x021c41b4 end:0x021c41b8
+
+lib/dwcutilui/src/dwc_util_dialog.c:
+    complete
+    .text       start:0x021b8d30 end:0x021b9428
+    .rodata     start:0x021c04fc end:0x021c05c0
+    .bss        start:0x021c41b8 end:0x021c41bc

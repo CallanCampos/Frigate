@@ -6,7 +6,7 @@ void func_ov182_021bc1a8(u16 x, u16 y, u16 *point) {
     point[1] = y;
 }
 
-void func_ov182_021bc1b0(u16 left, u16 top, u16 right, u16 bottom, u16 *rect) {
+void func_ov182_021bc1b0(int left, int top, int right, int bottom, u16 *rect) {
     rect[0] = left;
     rect[1] = top;
     rect[2] = right;

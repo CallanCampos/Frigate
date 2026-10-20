@@ -1,6 +1,7 @@
 #include "dwc_util_test_connect.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_connection.h"
+#include "dwc_util_dialog.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"

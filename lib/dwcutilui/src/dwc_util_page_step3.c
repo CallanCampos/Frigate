@@ -1,6 +1,7 @@
 #include "dwc_util_page_step3.h"
 #include "dwc_util_aoss_session.h"
 #include "dwc_util_bg_overlay.h"
+#include "dwc_util_dialog.h"
 #include "dwc_util_display.h"
 #include "dwc_util_fade.h"
 #include "dwc_util_gfx_resource.h"
