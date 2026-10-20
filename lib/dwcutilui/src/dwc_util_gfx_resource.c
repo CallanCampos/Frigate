@@ -62,9 +62,9 @@ void DWCUtilGfxResource_ShowStep(int variant) {
 
     DWCUtilMain_GetLayout(&layout, NULL);
     if (layout == 1) {
-        func_ov182_021b8154(variant);
+        DWCUtilSubScreen_SlideInRow(variant);
     } else if (layout == 2) {
-        func_ov182_021b84c0(variant);
+        DWCUtilSubScreen_ChangeRow(variant);
     }
 }
 

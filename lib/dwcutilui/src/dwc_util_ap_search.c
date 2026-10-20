@@ -50,8 +50,8 @@ void func_ov182_021b5000(void) {
     DWCUtilGfxResource_ShowStep(2);
     DWCUtilGfxResource_ShowMessage(0x33);
     DWCUtilUiEffect_Init(0);
-    func_ov182_021b74d4();
-    func_ov182_021b751c();
+    DWCUtilApScan_Init();
+    DWCUtilApScan_Start();
     DWCUtilSound_PlaySe(0xa);
     DWCUtilMain_SetUpdate(func_ov182_021b50c0);
 }
@@ -107,10 +107,10 @@ static void func_ov182_021b5158(void) {
         return;
     }
     DWCUtilSound_StopSe();
-    count = func_ov182_021b7630(&entries);
+    count = DWCUtilApScan_GetEntries(&entries);
     if (count == 0) {
         sApSearch.result = 2;
-        func_ov182_021b8cf0(0xf, 1, 1, -1, 0);
+        DWCUtilDialog_Open(0xf, 1, 1, -1, 0);
         DWCUtilSound_PlaySe(0x12);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b5334);
@@ -123,7 +123,7 @@ static void func_ov182_021b5158(void) {
     }
     if (i == count) {
         sApSearch.result = 3;
-        func_ov182_021b8cf0(0xe, 1, 1, -1, 0);
+        DWCUtilDialog_Open(0xe, 1, 1, -1, 0);
         DWCUtilSound_PlaySe(0x12);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b5334);
@@ -170,7 +170,7 @@ static void func_ov182_021b5268(void) {
 
 static void func_ov182_021b52a0(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
-        while (!func_ov182_021b75d0()) {
+        while (!DWCUtilApScan_Stop()) {
         }
         DWCUtilUiEffect_Destroy();
         DWCUtilText_DestroyScreenBg(0);
@@ -178,7 +178,7 @@ static void func_ov182_021b52a0(void) {
         DWCUtilDisplay_HidePlanes(1, 1);
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (sApSearch.result != 1) {
-            func_ov182_021b74f4();
+            DWCUtilApScan_Exit();
             func_ov182_021b7b20(func_ov182_021b781c()->index);
             DWCUtilMain_SetLayout(2, 1);
             DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
@@ -191,15 +191,15 @@ static void func_ov182_021b52a0(void) {
 }
 
 static void func_ov182_021b5334(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b5354);
     }
 }
 
 static void func_ov182_021b5354(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021b5250);
     }
 }

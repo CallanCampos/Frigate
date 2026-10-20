@@ -123,23 +123,23 @@ static void func_ov182_021b2290(void) {
 
 static void func_ov182_021b22c8(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        func_ov182_021acd80();
+        DWCUtilMenu_Open();
         DWCUtilSound_PlaySe(0x14);
         if (sAddressEdit->group == 0) {
-            func_ov182_021acfac(FALSE);
-            func_ov182_021acfcc(FALSE);
+            DWCUtilMenu_SetLeftEnabled(FALSE);
+            DWCUtilMenu_SetRightEnabled(FALSE);
         } else {
             if (func_ov182_021b2510(26)) {
-                func_ov182_021acfbc(FALSE);
+                DWCUtilMenu_SetDigitsEnabled(FALSE);
             }
-            func_ov182_021acfcc(FALSE);
+            DWCUtilMenu_SetRightEnabled(FALSE);
         }
         DWCUtilMain_SetUpdate(func_ov182_021b2324);
     }
 }
 
 static void func_ov182_021b2324(void) {
-    if (func_ov182_021acf9c() != 0x1f) {
+    if (DWCUtilMenu_GetKey() != 0x1f) {
         DWCUtilMain_SetUpdate(func_ov182_021b233c);
     }
 }
@@ -150,7 +150,7 @@ static void func_ov182_021b233c(void) {
 }
 
 static void func_ov182_021b2348(void) {
-    int key = func_ov182_021acf9c();
+    int key = DWCUtilMenu_GetKey();
     u8 *digits;
     int first;
 
@@ -167,16 +167,16 @@ static void func_ov182_021b2348(void) {
         }
         MI_CpuFill8(&sAddressEdit->digits[sAddressEdit->group * 3], 0, 3);
         if (sAddressEdit->group == 0 && sAddressEdit->digits[2] == 0) {
-            func_ov182_021acfac(FALSE);
+            DWCUtilMenu_SetLeftEnabled(FALSE);
         }
-        func_ov182_021acfbc(TRUE);
-        func_ov182_021acfcc(FALSE);
+        DWCUtilMenu_SetDigitsEnabled(TRUE);
+        DWCUtilMenu_SetRightEnabled(FALSE);
         break;
     case 0x11:
         if (sAddressEdit->group < ADDRESS_EDIT_LAST_GROUP && sAddressEdit->digits[sAddressEdit->group * 3 + 2] != 0) {
             DWCUtilSound_PlaySe(1);
             sAddressEdit->group++;
-            func_ov182_021acfcc(FALSE);
+            DWCUtilMenu_SetRightEnabled(FALSE);
         }
         break;
     case 0x12:
@@ -223,14 +223,14 @@ static void func_ov182_021b2348(void) {
                 sAddressEdit->group++;
             }
         }
-        func_ov182_021acfac(TRUE);
+        DWCUtilMenu_SetLeftEnabled(TRUE);
         if (sAddressEdit->group < ADDRESS_EDIT_LAST_GROUP) {
-            func_ov182_021acfcc(TRUE);
+            DWCUtilMenu_SetRightEnabled(TRUE);
         } else {
-            func_ov182_021acfcc(FALSE);
+            DWCUtilMenu_SetRightEnabled(FALSE);
         }
         if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && func_ov182_021b2510(26)) {
-            func_ov182_021acfbc(FALSE);
+            DWCUtilMenu_SetDigitsEnabled(FALSE);
         }
         break;
     }
@@ -270,7 +270,7 @@ static void func_ov182_021b256c(void) {
 
 static void func_ov182_021b2580(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
-        func_ov182_021acf7c();
+        DWCUtilMenu_Close();
         DWCUtilSound_PlaySe(0x15);
         DWCUtilMain_SetUpdate(func_ov182_021b25a4);
     }
@@ -278,17 +278,17 @@ static void func_ov182_021b2580(void) {
 
 // Once the keypad has closed, asks whether to keep the address, or shows that it isn't valid
 static void func_ov182_021b25a4(void) {
-    if (!func_ov182_021acfdc()) {
+    if (!DWCUtilMenu_IsOpen()) {
         if (sAddressEdit->result == ADDRESS_EDIT_CANCELLED) {
             DWCUtilMain_SetUpdate(func_ov182_021b2604);
             return;
         }
         if (sAddressEdit->result == ADDRESS_EDIT_INVALID) {
-            func_ov182_021b8cf0(6, 3, 1, -1, 0);
+            DWCUtilDialog_Open(6, 3, 1, -1, 0);
             DWCUtilMain_SetUpdate(func_ov182_021b28f0);
             return;
         }
-        func_ov182_021b8cf0(0x47, 2, 1, -1, 0);
+        DWCUtilDialog_Open(0x47, 2, 1, -1, 0);
         DWCUtilMain_SetUpdate(func_ov182_021b272c);
     }
 }
@@ -342,7 +342,7 @@ static void func_ov182_021b26f4(void) {
 }
 
 static void func_ov182_021b272c(void) {
-    sAddressEdit->result = func_ov182_021b8f14();
+    sAddressEdit->result = DWCUtilDialog_GetChoice();
     switch (sAddressEdit->result) {
     case 0:
         DWCUtilSound_PlaySe(7);
@@ -353,7 +353,7 @@ static void func_ov182_021b272c(void) {
     default:
         return;
     }
-    func_ov182_021b8eec();
+    DWCUtilDialog_Close();
     DWCUtilMain_SetUpdate(func_ov182_021b2764);
 }
 
@@ -364,7 +364,7 @@ static void func_ov182_021b2764(void) {
     };
     int field;
 
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         if (sAddressEdit->result == 0) {
             G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
             DWCUtilMain_SetUpdate(func_ov182_021b22c8);
@@ -441,15 +441,15 @@ static BOOL func_ov182_021b281c(void) {
 }
 
 static void func_ov182_021b28f0(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b2910);
     }
 }
 
 static void func_ov182_021b2910(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
         DWCUtilMain_SetUpdate(func_ov182_021b22c8);
     }

@@ -48,7 +48,7 @@ static void func_ov182_021b4488(void) {
 // Shows the message of the save once the screens have faded in
 static void func_ov182_021b44c0(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        func_ov182_021b8cf0(0x44, 5, 1, -1, 0);
+        DWCUtilDialog_Open(0x44, 5, 1, -1, 0);
         DWCUtilMain_SetUpdate(func_ov182_021b44f4);
     }
 }
@@ -56,7 +56,7 @@ static void func_ov182_021b44c0(void) {
 static void func_ov182_021b44f4(void) {
     func_ov182_021b4514();
     func_ov182_021b4518();
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021b451c);
     }
 }

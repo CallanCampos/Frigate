@@ -12,17 +12,17 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 
-static void func_ov182_021b8f38(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8f74(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8fe8(DWCUtilTask *task, void *arg);
-static void func_ov182_021b90b4(DWCUtilTask *task, void *arg);
-static void func_ov182_021b90f4(int y);
-static void func_ov182_021b9208(DWCUtilOamNode *node, int top);
-static void func_ov182_021b9250(int button);
-static void func_ov182_021b92c8(DWCUtilTask *task, void *arg);
-static void func_ov182_021b92ec(DWCUtilTask *task, void *arg);
-static void func_ov182_021b9340(DWCUtilTask *task, void *arg);
-static void func_ov182_021b9378(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_DarkenTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_SlideUpTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_ChooseTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_TimerTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_MoveTo(int y);
+static void DWCUtilDialog_ClipObjects(DWCUtilOamNode *node, int top);
+static void DWCUtilDialog_LightButton(int button);
+static void DWCUtilDialog_CloseDelayTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_SlideDownTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_BrightenTask(DWCUtilTask *task, void *arg);
+static void DWCUtilDialog_DestroyTask(DWCUtilTask *task, void *arg);
 
 #define DIALOG_LAYOUTS 6
 // The layout without buttons, which closes by itself
@@ -45,7 +45,7 @@ typedef struct DWCUtilDialog {
     u8 fade;
 } DWCUtilDialog;
 
-// The offset of the text in the frame, which nothing reads (func_ov182_021b90f4 adds 8 to each coordinate). For each
+// The offset of the text in the frame, which nothing reads (DWCUtilDialog_MoveTo adds 8 to each coordinate). For each
 // layout: the frame's cell and position, how many buttons it has, which of the two places each button takes,
 // the button that A and B press (-1 for none), each button's cell and size, the size of the text and the size of the
 // window that hides what is below the frame. With MWCC's sort of the file's data by size, this order gives the ROM's
@@ -78,7 +78,7 @@ static const u16 sDialogButtonPositions[DIALOG_LAYOUTS - 1][2][2] = {
 
 static DWCUtilDialog *sDialog;
 
-void func_ov182_021b8cf0(int msgIndex, int layout, BOOL fade, int slot, int value) {
+void DWCUtilDialog_Open(int msgIndex, int layout, BOOL fade, int slot, int value) {
     // Whether each layout's text has the effect of window 1
     u8 textEffects[DIALOG_LAYOUTS] = { 1, 1, 0, 0, 1, 1 };
     int textObjCount;
@@ -108,25 +108,25 @@ void func_ov182_021b8cf0(int msgIndex, int layout, BOOL fade, int slot, int valu
     DWCUtilDisplay_SetWindowPlanes(0, 1, 0x1f, textEffects[sDialog->layout]);
     DWCUtilDisplay_SetWindowPlanes(0, 3, 0x1f, TRUE);
     DWCUtilDisplay_SetWindow(0, 1, sDialogWindowRect);
-    func_ov182_021b90f4(0xc0);
+    DWCUtilDialog_MoveTo(0xc0);
     GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
     if (fade) {
-        sDialog->task = DWCUtilTask_Create(1, func_ov182_021b8f38, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_DarkenTask, NULL, 120);
     } else {
-        sDialog->task = DWCUtilTask_Create(1, func_ov182_021b8f74, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_SlideUpTask, NULL, 120);
     }
 }
 
-void func_ov182_021b8eec(void) {
+void DWCUtilDialog_Close(void) {
     DWCUtilTask_QueueRemoval(0, sDialog->task);
-    sDialog->task = DWCUtilTask_Create(1, func_ov182_021b92c8, NULL, 120);
+    sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_CloseDelayTask, NULL, 120);
 }
 
-int func_ov182_021b8f14(void) {
+int DWCUtilDialog_GetChoice(void) {
     return sDialog->choice;
 }
 
-BOOL func_ov182_021b8f24(void) {
+BOOL DWCUtilDialog_IsOpen(void) {
     if (sDialog != NULL) {
         return TRUE;
     }
@@ -134,36 +134,36 @@ BOOL func_ov182_021b8f24(void) {
 }
 
 // Darkens the screen behind the dialog
-static void func_ov182_021b8f38(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_DarkenTask(DWCUtilTask *task, void *arg) {
     sDialog->brightness--;
     G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, sDialog->brightness);
     if (sDialog->brightness <= -12) {
-        DWCUtilTask_SetCallback(task, func_ov182_021b8f74);
+        DWCUtilTask_SetCallback(task, DWCUtilDialog_SlideUpTask);
     }
 }
 
 // Slides the dialog up 12 pixels a frame to its place
-static void func_ov182_021b8f74(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_SlideUpTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     DWCUtilOam_GetNodePosition(sDialog->frame, 0, &x, &y);
     y -= 12;
     if (y > sDialogFramePositions[sDialog->layout][1]) {
-        func_ov182_021b90f4(y);
+        DWCUtilDialog_MoveTo(y);
         return;
     }
-    func_ov182_021b90f4(sDialogFramePositions[sDialog->layout][1]);
+    DWCUtilDialog_MoveTo(sDialogFramePositions[sDialog->layout][1]);
     if (sDialog->layout == DIALOG_LAYOUT_TIMED) {
-        sDialog->task = DWCUtilTask_Create(0, func_ov182_021b90b4, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(0, DWCUtilDialog_TimerTask, NULL, 120);
     } else {
-        sDialog->task = DWCUtilTask_Create(0, func_ov182_021b8fe8, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(0, DWCUtilDialog_ChooseTask, NULL, 120);
     }
     DWCUtilTask_QueueRemoval(1, task);
 }
 
 // The buttons: a touch on one, or A or B, chooses it
-static void func_ov182_021b8fe8(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_ChooseTask(DWCUtilTask *task, void *arg) {
     u16 rect[4];
     int i;
 
@@ -183,24 +183,24 @@ static void func_ov182_021b8fe8(DWCUtilTask *task, void *arg) {
     }
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         if (i == sDialog->choice) {
-            func_ov182_021b9250(i);
+            DWCUtilDialog_LightButton(i);
             return;
         }
     }
     sDialog->choice = -1;
 }
 
-static void func_ov182_021b90b4(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_TimerTask(DWCUtilTask *task, void *arg) {
     sDialog->choice = -1;
     sDialog->frames++;
     if (sDialog->frames >= 120) {
         DWCUtilTask_QueueRemoval(0, task);
-        sDialog->task = DWCUtilTask_Create(1, func_ov182_021b92c8, NULL, 120);
+        sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_CloseDelayTask, NULL, 120);
     }
 }
 
 // Puts the frame's top at y, with the text and the buttons, and the window below it
-static void func_ov182_021b90f4(int y) {
+static void DWCUtilDialog_MoveTo(int y) {
     u16 rect[4];
     const u16 *pos;
     int i;
@@ -209,13 +209,13 @@ static void func_ov182_021b90f4(int y) {
 
     DWCUtilOam_SetNodePosition(sDialog->frame, -1, sDialogFramePositions[sDialog->layout][0], y);
     DWCUtilOam_SetNodePosition(sDialog->textObjects, -1, sDialogFramePositions[sDialog->layout][0] + 8, y + 8);
-    func_ov182_021b9208(sDialog->frame, y);
-    func_ov182_021b9208(sDialog->textObjects, y);
+    DWCUtilDialog_ClipObjects(sDialog->frame, y);
+    DWCUtilDialog_ClipObjects(sDialog->textObjects, y);
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         pos = sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][i]];
         DWCUtilOam_SetNodePosition(sDialog->buttons[i], -1, pos[0],
                                    y + pos[1] - sDialogFramePositions[sDialog->layout][1]);
-        func_ov182_021b9208(sDialog->buttons[i], y);
+        DWCUtilDialog_ClipObjects(sDialog->buttons[i], y);
     }
     top = (u8)y;
     if (top >= 0xc0) {
@@ -234,7 +234,7 @@ static void func_ov182_021b90f4(int y) {
 }
 
 // Hides the objects of a node that are above top or below the screen
-static void func_ov182_021b9208(DWCUtilOamNode *node, int top) {
+static void DWCUtilDialog_ClipObjects(DWCUtilOamNode *node, int top) {
     int count = DWCUtilOam_GetCount(node);
     int x;
     int y;
@@ -253,7 +253,7 @@ static void func_ov182_021b9208(DWCUtilOamNode *node, int top) {
 }
 
 // Lights the button chosen
-static void func_ov182_021b9250(int button) {
+static void DWCUtilDialog_LightButton(int button) {
     DWCUtilCell_Copy(0, sDialogButtonCells[sDialog->layout][button] + 1,
                      DWCUtilOam_GetEntry(sDialog->buttons[button], 0));
     DWCUtilOam_SetNodePosition(sDialog->buttons[button], -1,
@@ -262,39 +262,39 @@ static void func_ov182_021b9250(int button) {
     DWCUtilOam_SetPriority(sDialog->buttons[button], -1, 0);
 }
 
-static void func_ov182_021b92c8(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_CloseDelayTask(DWCUtilTask *task, void *arg) {
     sDialog->delay++;
     if (sDialog->delay >= 8) {
-        DWCUtilTask_SetCallback(task, func_ov182_021b92ec);
+        DWCUtilTask_SetCallback(task, DWCUtilDialog_SlideDownTask);
     }
 }
 
 // Slides the dialog down 12 pixels a frame off the screen
-static void func_ov182_021b92ec(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_SlideDownTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     DWCUtilOam_GetNodePosition(sDialog->frame, 0, &x, &y);
     y += 12;
-    func_ov182_021b90f4(y);
+    DWCUtilDialog_MoveTo(y);
     if (y >= 0xc0) {
         if (sDialog->fade) {
-            DWCUtilTask_SetCallback(task, func_ov182_021b9340);
+            DWCUtilTask_SetCallback(task, DWCUtilDialog_BrightenTask);
         } else {
-            DWCUtilTask_SetCallback(task, func_ov182_021b9378);
+            DWCUtilTask_SetCallback(task, DWCUtilDialog_DestroyTask);
         }
     }
 }
 
-static void func_ov182_021b9340(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_BrightenTask(DWCUtilTask *task, void *arg) {
     sDialog->brightness++;
     G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, sDialog->brightness);
     if (sDialog->brightness >= 0) {
-        DWCUtilTask_SetCallback(task, func_ov182_021b9378);
+        DWCUtilTask_SetCallback(task, DWCUtilDialog_DestroyTask);
     }
 }
 
-static void func_ov182_021b9378(DWCUtilTask *task, void *arg) {
+static void DWCUtilDialog_DestroyTask(DWCUtilTask *task, void *arg) {
     int i;
 
     GX_SetVisibleWnd(GX_WNDMASK_NONE);

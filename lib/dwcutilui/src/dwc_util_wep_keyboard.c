@@ -41,28 +41,28 @@ typedef struct DWCUtilWepKeyboard {
     u8 result;
 } DWCUtilWepKeyboard;
 
-static void func_ov182_021b1ab4(void);
-static void func_ov182_021b1b34(void);
-static void func_ov182_021b1b6c(void);
-static void func_ov182_021b1bc4(void);
-static void func_ov182_021b1bdc(void);
-static void func_ov182_021b1be8(void);
+static void DWCUtilWepKeyboard_LoadGraphics(void);
+static void DWCUtilWepKeyboard_FadeIn(void);
+static void DWCUtilWepKeyboard_OpenKeyboard(void);
+static void DWCUtilWepKeyboard_WaitKeyboardOpen(void);
+static void DWCUtilWepKeyboard_Main(void);
+static void DWCUtilWepKeyboard_HandleInput(void);
 static void func_ov182_021b1d00(void);
-static void func_ov182_021b1d04(void);
-static void func_ov182_021b1d18(void);
-static void func_ov182_021b1d3c(void);
-static void func_ov182_021b1dc4(void);
-static void func_ov182_021b1e74(void);
-static void func_ov182_021b1f04(void);
-static void func_ov182_021b1f50(void);
-static void func_ov182_021b1f8c(void);
-static BOOL func_ov182_021b1ff8(void);
-static void func_ov182_021b20d4(void);
-static void func_ov182_021b20f4(void);
+static void DWCUtilWepKeyboard_StartClose(void);
+static void DWCUtilWepKeyboard_CloseKeyboard(void);
+static void DWCUtilWepKeyboard_WaitKeyboardClosed(void);
+static void DWCUtilWepKeyboard_Exit(void);
+static void DWCUtilWepKeyboard_DrawText(void);
+static void DWCUtilWepKeyboard_DrawCursor(void);
+static void DWCUtilWepKeyboard_WaitConfirmChoice(void);
+static void DWCUtilWepKeyboard_TakeText(void);
+static BOOL DWCUtilWepKeyboard_IsTextValid(void);
+static void DWCUtilWepKeyboard_WaitInvalidChoice(void);
+static void DWCUtilWepKeyboard_WaitInvalidClosed(void);
 
 static DWCUtilWepKeyboard *sWepKeyboard;
 
-void func_ov182_021b19f4(void) {
+void DWCUtilWepKeyboard_Init(void) {
     u8 msgIndices[2] = { 0x3e, 0x3d };
     int field;
     int fromList;
@@ -73,7 +73,7 @@ void func_ov182_021b19f4(void) {
         func_ov182_021b7a08(sWepKeyboard->str);
         sWepKeyboard->length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
-    func_ov182_021b1ab4();
+    DWCUtilWepKeyboard_LoadGraphics();
     DWCUtilBgOverlay_Show(field + 9);
     if (fromList == 1) {
         DWCUtilScreen_Start(0x35, -1, 0);
@@ -84,9 +84,9 @@ void func_ov182_021b19f4(void) {
     sWepKeyboard->text = DWCUtilText_CreateBg(0, 0);
     sWepKeyboard->cursor = DWCUtilCell_AllocOam(0, 0x3e);
     G2_SetOBJPriority(sWepKeyboard->cursor, 3);
-    func_ov182_021b1f04();
-    func_ov182_021b1e74();
-    DWCUtilMain_SetUpdate(func_ov182_021b1b34);
+    DWCUtilWepKeyboard_DrawCursor();
+    DWCUtilWepKeyboard_DrawText();
+    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_FadeIn);
 }
 
 // Where the characters are drawn: the two rows' y, the size of a character and each column's x
@@ -96,7 +96,7 @@ static const u8 sWepKeyboardColumnX[16] = {
     0x08, 0x17, 0x26, 0x35, 0x44, 0x53, 0x62, 0x71, 0x80, 0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9,
 };
 
-static void func_ov182_021b1ab4(void) {
+static void DWCUtilWepKeyboard_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
@@ -108,41 +108,41 @@ static void func_ov182_021b1ab4(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b1b34(void) {
+static void DWCUtilWepKeyboard_FadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
+    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
 }
 
-static void func_ov182_021b1b6c(void) {
+static void DWCUtilWepKeyboard_OpenKeyboard(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        func_ov182_021abb10();
+        DWCUtilKeyboard_Open();
         DWCUtilSound_PlaySe(0x14);
         if (sWepKeyboard->length == 0) {
-            func_ov182_021abda4(FALSE);
+            DWCUtilKeyboard_SetBackspaceEnabled(FALSE);
         }
         if (sWepKeyboard->length == WEP_KEYBOARD_LENGTH) {
-            func_ov182_021abdb8(FALSE);
+            DWCUtilKeyboard_SetCharsEnabled(FALSE);
         }
-        DWCUtilMain_SetUpdate(func_ov182_021b1bc4);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitKeyboardOpen);
     }
 }
 
-static void func_ov182_021b1bc4(void) {
-    if (func_ov182_021abd94() != 0xff) {
-        DWCUtilMain_SetUpdate(func_ov182_021b1bdc);
+static void DWCUtilWepKeyboard_WaitKeyboardOpen(void) {
+    if (DWCUtilKeyboard_GetKey() != 0xff) {
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Main);
     }
 }
 
-static void func_ov182_021b1bdc(void) {
-    func_ov182_021b1be8();
+static void DWCUtilWepKeyboard_Main(void) {
+    DWCUtilWepKeyboard_HandleInput();
     func_ov182_021b1d00();
 }
 
-static void func_ov182_021b1be8(void) {
-    int key = func_ov182_021abd94();
+static void DWCUtilWepKeyboard_HandleInput(void) {
+    int key = DWCUtilKeyboard_GetKey();
 
     switch (key) {
     case 0:
@@ -153,18 +153,18 @@ static void func_ov182_021b1be8(void) {
             sWepKeyboard->length--;
             sWepKeyboard->str[sWepKeyboard->length] = '\0';
             if (sWepKeyboard->length == 0) {
-                func_ov182_021abda4(FALSE);
+                DWCUtilKeyboard_SetBackspaceEnabled(FALSE);
             }
-            func_ov182_021abdb8(TRUE);
+            DWCUtilKeyboard_SetCharsEnabled(TRUE);
         }
         break;
     case 0x82:
         DWCUtilSound_PlaySe(7);
         sWepKeyboard->result = WEP_KEYBOARD_CANCELLED;
-        DWCUtilMain_SetUpdate(func_ov182_021b1d04);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_StartClose);
         return;
     case 0x83:
-        if (func_ov182_021b1ff8()) {
+        if (DWCUtilWepKeyboard_IsTextValid()) {
             DWCUtilSound_PlaySe(6);
             sWepKeyboard->result = WEP_KEYBOARD_ENTERED;
         } else {
@@ -172,7 +172,7 @@ static void func_ov182_021b1be8(void) {
             DWCUtilSound_PlaySe(9);
         }
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021b1d04);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_StartClose);
         return;
     case WEP_KEYBOARD_SPACE:
     default:
@@ -180,57 +180,57 @@ static void func_ov182_021b1be8(void) {
             DWCUtilSound_PlaySe(1);
             sWepKeyboard->str[sWepKeyboard->length] = key;
             sWepKeyboard->length++;
-            func_ov182_021abda4(TRUE);
+            DWCUtilKeyboard_SetBackspaceEnabled(TRUE);
             if (sWepKeyboard->length == WEP_KEYBOARD_LENGTH) {
-                func_ov182_021abdb8(FALSE);
+                DWCUtilKeyboard_SetCharsEnabled(FALSE);
             }
         }
         break;
     }
-    func_ov182_021b1e74();
-    func_ov182_021b1f04();
+    DWCUtilWepKeyboard_DrawText();
+    DWCUtilWepKeyboard_DrawCursor();
 }
 
 static void func_ov182_021b1d00(void) {
 }
 
-static void func_ov182_021b1d04(void) {
+static void DWCUtilWepKeyboard_StartClose(void) {
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021b1d18);
+    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_CloseKeyboard);
 }
 
-static void func_ov182_021b1d18(void) {
+static void DWCUtilWepKeyboard_CloseKeyboard(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
-        func_ov182_021abd6c();
+        DWCUtilKeyboard_Close();
         DWCUtilSound_PlaySe(0x15);
-        DWCUtilMain_SetUpdate(func_ov182_021b1d3c);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitKeyboardClosed);
     }
 }
 
 // Once the keyboard has closed, asks whether to keep the text, or shows that it isn't a WEP key
-static void func_ov182_021b1d3c(void) {
+static void DWCUtilWepKeyboard_WaitKeyboardClosed(void) {
     int msgIndices[2] = { 0x47, 0x48 };
     int fromList;
 
-    if (!func_ov182_021abdc8()) {
+    if (!DWCUtilKeyboard_IsOpen()) {
         if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
-            DWCUtilMain_SetUpdate(func_ov182_021b1dc4);
+            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Exit);
             return;
         }
         if (sWepKeyboard->result == WEP_KEYBOARD_INVALID) {
-            func_ov182_021b8cf0(6, 3, 1, -1, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b20d4);
+            DWCUtilDialog_Open(6, 3, 1, -1, 0);
+            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitInvalidChoice);
             return;
         }
         DWCUtilMain_GetScreenArgs(NULL, &fromList);
-        func_ov182_021b8cf0(msgIndices[fromList], 2, 1, -1, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021b1f50);
+        DWCUtilDialog_Open(msgIndices[fromList], 2, 1, -1, 0);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitConfirmChoice);
     }
 }
 
 // Frees the keyboard and goes back to the connection's settings or to the list of access points, or on to the
 // connection test
-static void func_ov182_021b1dc4(void) {
+static void DWCUtilWepKeyboard_Exit(void) {
     int field;
     int fromList;
 
@@ -258,7 +258,7 @@ static void func_ov182_021b1dc4(void) {
 }
 
 // Draws the text, one character at a time, as a string of one character
-static void func_ov182_021b1e74(void) {
+static void DWCUtilWepKeyboard_DrawText(void) {
     u16 rect[4] = { 0, 0, 0, 0 };
     u16 str[2];
     int i;
@@ -286,7 +286,7 @@ static void func_ov182_021b1e74(void) {
 }
 
 // Moves the cursor after the text
-static void func_ov182_021b1f04(void) {
+static void DWCUtilWepKeyboard_DrawCursor(void) {
     u8 length = sWepKeyboard->length;
     int column = length & 15;
     int row = length >> 4;
@@ -298,8 +298,8 @@ static void func_ov182_021b1f04(void) {
     DWCUtilOam_SetPosition(sWepKeyboard->cursor, sWepKeyboardColumnX[column], sWepKeyboardRowY[row]);
 }
 
-static void func_ov182_021b1f50(void) {
-    sWepKeyboard->result = func_ov182_021b8f14();
+static void DWCUtilWepKeyboard_WaitConfirmChoice(void) {
+    sWepKeyboard->result = DWCUtilDialog_GetChoice();
     switch (sWepKeyboard->result) {
     case 0:
         DWCUtilSound_PlaySe(7);
@@ -310,30 +310,30 @@ static void func_ov182_021b1f50(void) {
     default:
         return;
     }
-    func_ov182_021b8eec();
-    DWCUtilMain_SetUpdate(func_ov182_021b1f8c);
+    DWCUtilDialog_Close();
+    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_TakeText);
 }
 
 // Takes the text into the connection being edited as its SSID or its WEP key, or goes back to the keyboard
-static void func_ov182_021b1f8c(void) {
+static void DWCUtilWepKeyboard_TakeText(void) {
     void (*take[2])(const u8 *) = { func_ov182_021b7854, func_ov182_021b7874 };
     int field;
 
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         if (sWepKeyboard->result == 0) {
             G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
+            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
             return;
         }
         DWCUtilMain_GetScreenArgs(&field, NULL);
         take[field](sWepKeyboard->str);
-        DWCUtilMain_SetUpdate(func_ov182_021b1dc4);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Exit);
     }
 }
 
 // Whether the text can be kept: an SSID that isn't empty, or a WEP key of 5, 13 or 16 characters or of 10, 26 or 32
 // hexadecimal digits
-static BOOL func_ov182_021b1ff8(void) {
+static BOOL DWCUtilWepKeyboard_IsTextValid(void) {
     int field;
     int fromList;
     int length;
@@ -376,17 +376,17 @@ static BOOL func_ov182_021b1ff8(void) {
     }
 }
 
-static void func_ov182_021b20d4(void) {
-    if (func_ov182_021b8f14() == 0) {
+static void DWCUtilWepKeyboard_WaitInvalidChoice(void) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
-        DWCUtilMain_SetUpdate(func_ov182_021b20f4);
+        DWCUtilDialog_Close();
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitInvalidClosed);
     }
 }
 
-static void func_ov182_021b20f4(void) {
-    if (!func_ov182_021b8f24()) {
+static void DWCUtilWepKeyboard_WaitInvalidClosed(void) {
+    if (!DWCUtilDialog_IsOpen()) {
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
-        DWCUtilMain_SetUpdate(func_ov182_021b1b6c);
+        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
     }
 }

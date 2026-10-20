@@ -5,9 +5,9 @@
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
-static BOOL func_ov182_021b75a8(void);
-static void func_ov182_021b766c(void *arg);
-static void func_ov182_021b76b0(const WMStartScanExCallback *cb);
+static BOOL DWCUtilApScan_StartScan(void);
+static void DWCUtilApScan_WmCallback(void *arg);
+static void DWCUtilApScan_StoreResults(const WMStartScanExCallback *cb);
 
 #define DWC_UTIL_AP_SCAN_MAX 20
 
@@ -30,13 +30,13 @@ static const WMScanExParam sApScanParam = {
 
 static DWCUtilApScan *sApScan;
 
-void func_ov182_021b74d4(void) {
+void DWCUtilApScan_Init(void) {
     if (sApScan == NULL) {
         sApScan = DWCUtilHeap_AllocClear(sizeof(DWCUtilApScan), 32);
     }
 }
 
-void func_ov182_021b74f4(void) {
+void DWCUtilApScan_Exit(void) {
     if (sApScan != NULL) {
         while (WM_GetAllowedChannel() != 0x8000) {
         }
@@ -44,9 +44,9 @@ void func_ov182_021b74f4(void) {
     }
 }
 
-BOOL func_ov182_021b751c(void) {
+BOOL DWCUtilApScan_Start(void) {
     MI_CpuClear16(sApScan->entries, sizeof(sApScan->entries));
-    if (WM_Initialize(sApScan, func_ov182_021b766c, 3) != WM_ERRCODE_OPERATING) {
+    if (WM_Initialize(sApScan, DWCUtilApScan_WmCallback, 3) != WM_ERRCODE_OPERATING) {
         return FALSE;
     }
     do {
@@ -55,37 +55,37 @@ BOOL func_ov182_021b751c(void) {
     sApScan->param = sApScanParam;
     sApScan->param.scanBuf = (WMBssDesc *)sApScan->scanBuffer;
     sApScan->param.maxChannelTime = WM_GetDispersionScanPeriod();
-    if (func_ov182_021b75a8()) {
+    if (DWCUtilApScan_StartScan()) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_ov182_021b75a8(void) {
-    if (WM_StartScanEx(func_ov182_021b766c, &sApScan->param) == WM_ERRCODE_OPERATING) {
+static BOOL DWCUtilApScan_StartScan(void) {
+    if (WM_StartScanEx(DWCUtilApScan_WmCallback, &sApScan->param) == WM_ERRCODE_OPERATING) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov182_021b75d0(void) {
+BOOL DWCUtilApScan_Stop(void) {
     sApScan->stopping = TRUE;
     WM_ReadStatus(&sApScan->status);
     if (sApScan->status.state != WM_STATE_IDLE) {
-        if (WM_Reset(func_ov182_021b766c) != WM_ERRCODE_OPERATING) {
+        if (WM_Reset(DWCUtilApScan_WmCallback) != WM_ERRCODE_OPERATING) {
             return FALSE;
         }
         do {
             WM_ReadStatus(&sApScan->status);
         } while (sApScan->status.state != WM_STATE_IDLE);
     }
-    if (WM_End(func_ov182_021b766c) != WM_ERRCODE_OPERATING) {
+    if (WM_End(DWCUtilApScan_WmCallback) != WM_ERRCODE_OPERATING) {
         return FALSE;
     }
     return TRUE;
 }
 
-int func_ov182_021b7630(DWCUtilApEntry **entries) {
+int DWCUtilApScan_GetEntries(DWCUtilApEntry **entries) {
     int count = 0;
     DWCUtilApEntry *list = sApScan->entries;
     int i;
@@ -100,17 +100,17 @@ int func_ov182_021b7630(DWCUtilApEntry **entries) {
 }
 
 // The callback of the wireless: the scan is started again after each channel, and takes the access points found
-static void func_ov182_021b766c(void *arg) {
+static void DWCUtilApScan_WmCallback(void *arg) {
     WMStartScanExCallback *cb = arg;
 
     if (cb->errcode == WM_ERRCODE_SUCCESS && !sApScan->stopping && cb->apiid == WM_APIID_START_SCAN_EX) {
         switch (cb->state) {
         case WM_STATECODE_PARENT_FOUND:
-            func_ov182_021b76b0(cb);
-            func_ov182_021b75a8();
+            DWCUtilApScan_StoreResults(cb);
+            DWCUtilApScan_StartScan();
             break;
         case WM_STATECODE_PARENT_NOT_FOUND:
-            func_ov182_021b75a8();
+            DWCUtilApScan_StartScan();
             break;
         default:
             OS_Terminate();
@@ -120,7 +120,7 @@ static void func_ov182_021b766c(void *arg) {
 }
 
 // Keeps the access points found that have an SSID and aren't a game's, in the entry of their BSSID or a free one
-static void func_ov182_021b76b0(const WMStartScanExCallback *cb) {
+static void DWCUtilApScan_StoreResults(const WMStartScanExCallback *cb) {
     DWCUtilApEntry *list = sApScan->entries;
     WMOtherElements elements;
     WMBssDesc *desc;

@@ -183,7 +183,7 @@ static void func_ov182_021b6dcc(int result) {
         sUsbSetupState = USB_SETUP_RETRY;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(0x12);
-        func_ov182_021b8cf0(0x10, 1, 1, -1, 0);
+        DWCUtilDialog_Open(0x10, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b6e80);
         break;
@@ -195,7 +195,7 @@ static void func_ov182_021b6dcc(int result) {
     case DWC_UTIL_USB_SCAN_SEVERAL:
         DWCUtilSound_StopSe();
         func_ov182_021b89e8(NULL);
-        func_ov182_021b8cf0(0x11, 0, 1, -1, 0);
+        DWCUtilDialog_Open(0x11, 0, 1, -1, 0);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b6eb8);
         break;
@@ -209,22 +209,22 @@ static void func_ov182_021b6dcc(int result) {
 }
 
 static void func_ov182_021b6e80(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b6ea0);
     }
 }
 
 static void func_ov182_021b6ea0(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
     }
 }
 
 // The dialog of several connectors: the first button ends the setup, the second searches again
 static void func_ov182_021b6eb8(void) {
-    switch (func_ov182_021b8f14()) {
+    switch (DWCUtilDialog_GetChoice()) {
     case 1:
         sUsbSetupState = USB_SETUP_RETRY;
         DWCUtilSound_PlaySe(6);
@@ -236,12 +236,12 @@ static void func_ov182_021b6eb8(void) {
     default:
         return;
     }
-    func_ov182_021b8eec();
+    DWCUtilDialog_Close();
     DWCUtilMain_SetUpdate(func_ov182_021b6ef0);
 }
 
 static void func_ov182_021b6ef0(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         if (sUsbSetupState == USB_SETUP_DONE) {
             DWCUtilMain_SetUpdate(func_ov182_021b6cc8);
         } else {

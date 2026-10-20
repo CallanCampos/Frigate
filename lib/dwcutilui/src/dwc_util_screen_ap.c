@@ -160,7 +160,7 @@ static void func_ov182_021b5544(void) {
 }
 
 static void func_ov182_021b5570(void) {
-    if (DWCUtilUiObject_GetState() != -2 && func_ov182_021b854c() != TRUE) {
+    if (DWCUtilUiObject_GetState() != -2 && DWCUtilSubScreen_IsSliding() != TRUE) {
         DWCUtilUiObject_Enable();
         DWCUtilMain_SetUpdate(func_ov182_021b5598);
     }
@@ -227,7 +227,7 @@ static void func_ov182_021b564c(void) {
                 return;
             }
             DWCUtilSound_PlaySe(6);
-            func_ov182_021b8cf0(0x46, 0, 1, sScreenApMsgSlots[DWCUtilMain_GetLanguage()], index + 1);
+            DWCUtilDialog_Open(0x46, 0, 1, sScreenApMsgSlots[DWCUtilMain_GetLanguage()], index + 1);
             func_ov182_021b59f0();
             DWCUtilUiObject_Disable();
             DWCUtilMain_SetUpdate(func_ov182_021b5a48);
@@ -247,7 +247,7 @@ static void func_ov182_021b564c(void) {
 
 static void func_ov182_021b5710(void) {
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
-        func_ov182_021b849c();
+        DWCUtilSubScreen_SlideOutRow();
     }
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
@@ -273,7 +273,7 @@ static void func_ov182_021b5790(void) {
     if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
         return;
     }
-    if (!func_ov182_021b87b0() || !DWCUtilUiObject_IsIdle()) {
+    if (!DWCUtilSubScreen_IsNotSlidingOut() || !DWCUtilUiObject_IsIdle()) {
         return;
     }
     for (i = 0; i < SCREEN_AP_CONNECTIONS; i++) {
@@ -443,7 +443,7 @@ static void func_ov182_021b59f0(void) {
 static void func_ov182_021b5a48(void) {
     int index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
 
-    switch (func_ov182_021b8f14()) {
+    switch (DWCUtilDialog_GetChoice()) {
     case 1:
         DWCUtilSound_PlaySe(0xe);
         func_ov182_021b7e78(index);
@@ -464,12 +464,12 @@ static void func_ov182_021b5a48(void) {
     default:
         return;
     }
-    func_ov182_021b8eec();
+    DWCUtilDialog_Close();
     DWCUtilMain_SetUpdate(func_ov182_021b5b20);
 }
 
 static void func_ov182_021b5b20(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilUiObject_Enable();
         DWCUtilMain_SetUpdate(func_ov182_021b5598);
     }

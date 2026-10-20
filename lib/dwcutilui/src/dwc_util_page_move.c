@@ -48,7 +48,7 @@ void func_ov182_021b0198(void) {
     DWCUtilText_DrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
     DWCUtilText_MarkDirty(text);
     func_ov182_021ae224(func_ov182_021b0414);
-    func_ov182_021b8cf0(0x1d, 4, 0, -1, 0);
+    DWCUtilDialog_Open(0x1d, 4, 0, -1, 0);
     DWCUtilMain_SetUpdate(func_ov182_021b026c);
 }
 
@@ -74,7 +74,7 @@ static void func_ov182_021b0290(void) {
 }
 
 static void func_ov182_021b02a8(void) {
-    if (func_ov182_021b8f14() != -2) {
+    if (DWCUtilDialog_GetChoice() != -2) {
         DWCUtilMain_SetUpdate(func_ov182_021b02c4);
     }
 }
@@ -82,7 +82,7 @@ static void func_ov182_021b02a8(void) {
 static void func_ov182_021b02c4(void) {
     func_ov182_021b030c();
     func_ov182_021b0310();
-    switch (func_ov182_021b8f14()) {
+    switch (DWCUtilDialog_GetChoice()) {
     case 0:
         sPageMove.yes = FALSE;
         DWCUtilSound_PlaySe(7);
@@ -95,7 +95,7 @@ static void func_ov182_021b02c4(void) {
         return;
     }
     func_ov182_021ae224(NULL);
-    func_ov182_021b8eec();
+    DWCUtilDialog_Close();
     DWCUtilMain_SetUpdate(func_ov182_021b0314);
 }
 
@@ -106,7 +106,7 @@ static void func_ov182_021b0310(void) {
 }
 
 static void func_ov182_021b0314(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         if (!sPageMove.yes) {
             DWCUtilFade_Start(3, 1, 1, 8);
         }

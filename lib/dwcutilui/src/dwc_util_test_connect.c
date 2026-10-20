@@ -161,7 +161,7 @@ static void func_ov182_021b4a9c(void) {
         sTestConnectPassed = FALSE;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(9);
-        func_ov182_021b8cf0(0xd, 1, 1, -1, 0);
+        DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b4b30);
         break;
@@ -169,7 +169,7 @@ static void func_ov182_021b4a9c(void) {
         sTestConnectPassed = FALSE;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(0x12);
-        func_ov182_021b8cf0(0xe, 1, 1, -1, 0);
+        DWCUtilDialog_Open(0xe, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b4b30);
         break;
@@ -177,15 +177,15 @@ static void func_ov182_021b4a9c(void) {
 }
 
 static void func_ov182_021b4b30(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b4b50);
     }
 }
 
 static void func_ov182_021b4b50(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021b49c4);
     }
 }

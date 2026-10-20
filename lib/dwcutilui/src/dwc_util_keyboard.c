@@ -131,32 +131,32 @@ static int sSpecialSounds[KEYBOARD_SPECIAL_KEYS] = { 0, 0, 0, 2 };
 
 static DWCUtilKeyboard *sKeyboard;
 
-static void func_ov182_021abddc(DWCUtilTask *task, void *arg);
-static void func_ov182_021abe34(DWCUtilTask *task, void *arg);
-static void func_ov182_021abe8c(DWCUtilTask *task, void *arg);
-static void func_ov182_021abee8(DWCUtilTask *task, void *arg);
-static void func_ov182_021abf44(DWCUtilTask *task, void *arg);
-static void func_ov182_021abf9c(DWCUtilTask *task, void *arg);
-static void func_ov182_021abfb0(void);
-static void func_ov182_021ac0e8(void);
-static void func_ov182_021ac2bc(void);
-static void func_ov182_021ac2e4(void);
-static void func_ov182_021ac30c(void);
-static void func_ov182_021ac448(int key);
-static void func_ov182_021ac478(void);
-static void func_ov182_021ac608(int mode, int row, int y);
-static void func_ov182_021ac7a0(int mode);
-static void func_ov182_021ac808(int key, int pressed);
-static void func_ov182_021ac898(void);
-static void func_ov182_021ac928(int direction);
-static void func_ov182_021acbac(DWCUtilTask *task, void *arg);
-static void func_ov182_021acbf4(DWCUtilTask *task, void *arg);
-static void func_ov182_021acc34(DWCUtilTask *task, void *arg);
-static void func_ov182_021acc74(DWCUtilTask *task, void *arg);
-static void func_ov182_021accb0(DWCUtilTask *task, void *arg);
-static void func_ov182_021accec(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideInRow0Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideInRow1Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideInRow2Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideInRow3Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideInButtonsTask(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_UpdateTask(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_HandleTouchStart(void);
+static void DWCUtilKeyboard_HandleTouchEnd(void);
+static void DWCUtilKeyboard_ToggleCapitals(void);
+static void DWCUtilKeyboard_ToggleShift(void);
+static void DWCUtilKeyboard_HandleTouchHold(void);
+static void DWCUtilKeyboard_SetPressedKey(int key);
+static void DWCUtilKeyboard_HandlePad(void);
+static void DWCUtilKeyboard_MoveRow(int mode, int row, int y);
+static void DWCUtilKeyboard_SetMode(int mode);
+static void DWCUtilKeyboard_DrawKey(int key, int pressed);
+static void DWCUtilKeyboard_DrawCursor(void);
+static void DWCUtilKeyboard_MoveCursor(int direction);
+static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_SlideOutRow0Task(DWCUtilTask *task, void *arg);
+static void DWCUtilKeyboard_DestroyTask(DWCUtilTask *task, void *arg);
 
-void func_ov182_021abb10(void) {
+void DWCUtilKeyboard_Open(void) {
     u16 rect[4] = { 0, 0, 0, 0 };
     int objCount;
     u16 label[2];
@@ -208,105 +208,105 @@ void func_ov182_021abb10(void) {
     sKeyboard->cursor = DWCUtilCell_AllocOamRun(0, 0x40, TRUE);
     DWCUtilOam_SetEffect(sKeyboard->cursor, -1, 0x200, 0);
     DWCUtilOam_SetPriority(sKeyboard->cursor, -1, 2);
-    sKeyboard->task = DWCUtilTask_Create(0, func_ov182_021abddc, NULL, 0x78);
-    func_ov182_021ac608(sKeyboard->mode, 0, 0xc0);
+    sKeyboard->task = DWCUtilTask_Create(0, DWCUtilKeyboard_SlideInRow0Task, NULL, 0x78);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, 0xc0);
 }
 
-void func_ov182_021abd6c(void) {
+void DWCUtilKeyboard_Close(void) {
     DWCUtilOam_Free(sKeyboard->cursor);
-    DWCUtilTask_SetCallback(sKeyboard->task, func_ov182_021acbac);
+    DWCUtilTask_SetCallback(sKeyboard->task, DWCUtilKeyboard_SlideOutButtonsTask);
 }
 
-u8 func_ov182_021abd94(void) {
+u8 DWCUtilKeyboard_GetKey(void) {
     return sKeyboard->key;
 }
 
-void func_ov182_021abda4(u8 enabled) {
+void DWCUtilKeyboard_SetBackspaceEnabled(u8 enabled) {
     sKeyboard->backspaceEnabled = enabled;
 }
 
-void func_ov182_021abdb8(u8 enabled) {
+void DWCUtilKeyboard_SetCharsEnabled(u8 enabled) {
     sKeyboard->charsEnabled = enabled;
 }
 
-BOOL func_ov182_021abdc8(void) {
+BOOL DWCUtilKeyboard_IsOpen(void) {
     if (sKeyboard != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void func_ov182_021abddc(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideInRow0Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[0]).attr01 - 12;
 
     if (y > 0x51) {
-        func_ov182_021ac608(sKeyboard->mode, 0, y);
+        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, y);
         return;
     }
-    func_ov182_021ac608(sKeyboard->mode, 0, 0x51);
-    func_ov182_021ac608(sKeyboard->mode, 1, 0xc0);
-    DWCUtilTask_SetCallback(task, func_ov182_021abe34);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, 0x51);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideInRow1Task);
 }
 
-static void func_ov182_021abe34(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideInRow1Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[12]).attr01 - 12;
 
     if (y > 0x67) {
-        func_ov182_021ac608(sKeyboard->mode, 1, y);
+        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, y);
         return;
     }
-    func_ov182_021ac608(sKeyboard->mode, 1, 0x67);
-    func_ov182_021ac608(sKeyboard->mode, 2, 0xc0);
-    DWCUtilTask_SetCallback(task, func_ov182_021abe8c);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, 0x67);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideInRow2Task);
 }
 
-static void func_ov182_021abe8c(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideInRow2Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[24]).attr01 - 12;
 
     if (y > 0x7d) {
-        func_ov182_021ac608(sKeyboard->mode, 2, y);
+        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, y);
         return;
     }
-    func_ov182_021ac608(sKeyboard->mode, 2, 0x7d);
-    func_ov182_021ac608(sKeyboard->mode, 3, 0xc0);
-    DWCUtilTask_SetCallback(task, func_ov182_021abee8);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, 0x7d);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideInRow3Task);
 }
 
-static void func_ov182_021abee8(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideInRow3Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[36]).attr01 - 12;
 
     if (y > 0x93) {
-        func_ov182_021ac608(sKeyboard->mode, 3, y);
+        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, y);
         return;
     }
-    func_ov182_021ac608(sKeyboard->mode, 3, 0x93);
-    func_ov182_021ac608(sKeyboard->mode, 4, 0xc0);
-    DWCUtilTask_SetCallback(task, func_ov182_021abf44);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, 0x93);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, 0xc0);
+    DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideInButtonsTask);
 }
 
-static void func_ov182_021abf44(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideInButtonsTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
     DWCUtilOam_GetNodePosition(sKeyboard->buttons[0], 0, &x, &y);
     y -= 12;
     if (y > 0xaa) {
-        func_ov182_021ac608(sKeyboard->mode, 4, y);
+        DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, y);
         return;
     }
-    func_ov182_021ac608(sKeyboard->mode, 4, 0xaa);
-    func_ov182_021ac898();
-    DWCUtilTask_SetCallback(task, func_ov182_021abf9c);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, 0xaa);
+    DWCUtilKeyboard_DrawCursor();
+    DWCUtilTask_SetCallback(task, DWCUtilKeyboard_UpdateTask);
 }
 
-static void func_ov182_021abf9c(DWCUtilTask *task, void *arg) {
-    func_ov182_021abfb0();
-    func_ov182_021ac0e8();
-    func_ov182_021ac30c();
-    func_ov182_021ac478();
+static void DWCUtilKeyboard_UpdateTask(DWCUtilTask *task, void *arg) {
+    DWCUtilKeyboard_HandleTouchStart();
+    DWCUtilKeyboard_HandleTouchEnd();
+    DWCUtilKeyboard_HandleTouchHold();
+    DWCUtilKeyboard_HandlePad();
 }
 
-static void func_ov182_021abfb0(void) {
+static void DWCUtilKeyboard_HandleTouchStart(void) {
     u16 rect[4];
     int i;
 
@@ -347,7 +347,7 @@ static void func_ov182_021abfb0(void) {
     }
 }
 
-static void func_ov182_021ac0e8(void) {
+static void DWCUtilKeyboard_HandleTouchEnd(void) {
     u16 rect[4];
     int i;
     int j;
@@ -365,10 +365,10 @@ static void func_ov182_021ac0e8(void) {
             }
             sKeyboard->key = sKeyCodes[sKeyboard->mode][i];
             if (sKeyboard->mode == 1) {
-                func_ov182_021ac7a0(0);
+                DWCUtilKeyboard_SetMode(0);
             }
             sKeyboard->cursorPos = i;
-            func_ov182_021ac898();
+            DWCUtilKeyboard_DrawCursor();
             return;
         }
         i++;
@@ -382,10 +382,10 @@ static void func_ov182_021ac0e8(void) {
             }
             sKeyboard->key = sSpecialKeys[j];
             if (sKeyboard->mode == 1) {
-                func_ov182_021ac7a0(0);
+                DWCUtilKeyboard_SetMode(0);
             }
             sKeyboard->cursorPos = j + KEYBOARD_FIRST_SPECIAL;
-            func_ov182_021ac898();
+            DWCUtilKeyboard_DrawCursor();
             return;
         }
         j++;
@@ -399,7 +399,7 @@ static void func_ov182_021ac0e8(void) {
             }
             sKeyboard->key = sButtonKeys[j];
             sKeyboard->cursorPos = j + KEYBOARD_FIRST_BUTTON;
-            func_ov182_021ac898();
+            DWCUtilKeyboard_DrawCursor();
             return;
         }
         j++;
@@ -407,32 +407,32 @@ static void func_ov182_021ac0e8(void) {
     DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[0], &sSpecialSizes[0], rect);
     if (DWCUtilTouch_IsReleasedIn(rect)) {
         if (sKeyboard->touched == KEYBOARD_FIRST_SPECIAL) {
-            func_ov182_021ac2bc();
+            DWCUtilKeyboard_ToggleCapitals();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL;
-            func_ov182_021ac898();
+            DWCUtilKeyboard_DrawCursor();
             return;
         }
     } else {
         DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[1], &sSpecialSizes[1], rect);
         if (DWCUtilTouch_IsReleasedIn(rect) && sKeyboard->touched == KEYBOARD_FIRST_SPECIAL + 1) {
-            func_ov182_021ac2e4();
+            DWCUtilKeyboard_ToggleShift();
             sKeyboard->cursorPos = KEYBOARD_FIRST_SPECIAL + 1;
-            func_ov182_021ac898();
+            DWCUtilKeyboard_DrawCursor();
         }
     }
 }
 
-static void func_ov182_021ac2bc(void) {
-    func_ov182_021ac7a0(sKeyboard->mode == 2 ? 0 : 2);
+static void DWCUtilKeyboard_ToggleCapitals(void) {
+    DWCUtilKeyboard_SetMode(sKeyboard->mode == 2 ? 0 : 2);
     DWCUtilSound_PlaySe(1);
 }
 
-static void func_ov182_021ac2e4(void) {
-    func_ov182_021ac7a0(sKeyboard->mode == 1 ? 0 : 1);
+static void DWCUtilKeyboard_ToggleShift(void) {
+    DWCUtilKeyboard_SetMode(sKeyboard->mode == 1 ? 0 : 1);
     DWCUtilSound_PlaySe(1);
 }
 
-static void func_ov182_021ac30c(void) {
+static void DWCUtilKeyboard_HandleTouchHold(void) {
     u16 rect[4];
     int i;
     int key;
@@ -452,7 +452,7 @@ static void func_ov182_021ac30c(void) {
             DWCUtilDisplay_SetRectFromSize(&sSpecialPositions[i], &sSpecialSizes[i], rect);
             if (DWCUtilTouch_IsTouchedIn(rect)) {
                 if (sKeyboard->touched == i + KEYBOARD_FIRST_SPECIAL) {
-                    func_ov182_021ac448(i + KEYBOARD_FIRST_SPECIAL);
+                    DWCUtilKeyboard_SetPressedKey(i + KEYBOARD_FIRST_SPECIAL);
                     if (i != 3) {
                         return;
                     }
@@ -487,34 +487,34 @@ static void func_ov182_021ac30c(void) {
 release:
     key = -1;
 press:
-    func_ov182_021ac448(key);
+    DWCUtilKeyboard_SetPressedKey(key);
     sKeyboard->repeat = 0;
 }
 
-static void func_ov182_021ac448(int key) {
+static void DWCUtilKeyboard_SetPressedKey(int key) {
     if (key != sKeyboard->pressed) {
-        func_ov182_021ac808(key, 1);
-        func_ov182_021ac808(sKeyboard->pressed, 0);
+        DWCUtilKeyboard_DrawKey(key, 1);
+        DWCUtilKeyboard_DrawKey(sKeyboard->pressed, 0);
         sKeyboard->pressed = key;
     }
 }
 
 // The pad: the cross keys move the cursor (left 0x20, up 0x40, right 0x10, down 0x80), A (1) presses its key, B (2)
 // is backspace, and X (0x400) and Y (0x800) are the capitals and shift keys
-static void func_ov182_021ac478(void) {
+static void DWCUtilKeyboard_HandlePad(void) {
     int key;
 
     if (DWCUtilTouch_IsKeyRepeated(0x20)) {
-        func_ov182_021ac928(0);
+        DWCUtilKeyboard_MoveCursor(0);
     }
     if (DWCUtilTouch_IsKeyRepeated(0x40)) {
-        func_ov182_021ac928(1);
+        DWCUtilKeyboard_MoveCursor(1);
     }
     if (DWCUtilTouch_IsKeyRepeated(0x10)) {
-        func_ov182_021ac928(2);
+        DWCUtilKeyboard_MoveCursor(2);
     }
     if (DWCUtilTouch_IsKeyRepeated(0x80)) {
-        func_ov182_021ac928(3);
+        DWCUtilKeyboard_MoveCursor(3);
     }
     if (DWCUtilTouch_IsKeyPressed(1)) {
         key = sKeyboard->cursorPos;
@@ -527,16 +527,16 @@ static void func_ov182_021ac478(void) {
             if (sKeyboard->mode != 1) {
                 return;
             }
-            func_ov182_021ac7a0(0);
+            DWCUtilKeyboard_SetMode(0);
             return;
         }
         if (key - KEYBOARD_FIRST_SPECIAL < KEYBOARD_SPECIAL_KEYS) {
             switch (key - KEYBOARD_FIRST_SPECIAL) {
             case 0:
-                func_ov182_021ac2bc();
+                DWCUtilKeyboard_ToggleCapitals();
                 return;
             case 1:
-                func_ov182_021ac2e4();
+                DWCUtilKeyboard_ToggleShift();
                 return;
             case 2:
                 if (!sKeyboard->charsEnabled) {
@@ -552,7 +552,7 @@ static void func_ov182_021ac478(void) {
                 break;
             }
             if (sKeyboard->mode == 1) {
-                func_ov182_021ac7a0(0);
+                DWCUtilKeyboard_SetMode(0);
             }
             sKeyboard->key = sSpecialKeys[key - KEYBOARD_FIRST_SPECIAL];
             return;
@@ -573,15 +573,15 @@ static void func_ov182_021ac478(void) {
         sKeyboard->errorPlayed = FALSE;
     }
     if (DWCUtilTouch_IsKeyPressed(0x400)) {
-        func_ov182_021ac2bc();
+        DWCUtilKeyboard_ToggleCapitals();
     }
     if (DWCUtilTouch_IsKeyPressed(0x800)) {
-        func_ov182_021ac2e4();
+        DWCUtilKeyboard_ToggleShift();
     }
 }
 
 // Moves the row's keys, or with row 4 the two buttons, to y
-static void func_ov182_021ac608(int mode, int row, int y) {
+static void DWCUtilKeyboard_MoveRow(int mode, int row, int y) {
     const u8 charCounts[5] = { 12, 12, 12, 11, 0 };
     const u8 specialCounts[5] = { 1, 1, 1, 1, 0 };
     const u8 buttonCounts[5] = { 0, 0, 0, 0, 2 };
@@ -609,25 +609,25 @@ static void func_ov182_021ac608(int mode, int row, int y) {
     }
 }
 
-static void func_ov182_021ac7a0(int mode) {
+static void DWCUtilKeyboard_SetMode(int mode) {
     int i;
     int capitals = FALSE;
     int shift = FALSE;
 
     sKeyboard->mode = mode;
     for (i = 0; i < 4; i++) {
-        func_ov182_021ac608(mode, i, sCharKeyPositions[i * 12].y);
+        DWCUtilKeyboard_MoveRow(mode, i, sCharKeyPositions[i * 12].y);
     }
     if (mode == 2) {
         capitals = TRUE;
     } else if (mode == 1) {
         shift = TRUE;
     }
-    func_ov182_021ac808(KEYBOARD_FIRST_SPECIAL, capitals);
-    func_ov182_021ac808(KEYBOARD_FIRST_SPECIAL + 1, shift);
+    DWCUtilKeyboard_DrawKey(KEYBOARD_FIRST_SPECIAL, capitals);
+    DWCUtilKeyboard_DrawKey(KEYBOARD_FIRST_SPECIAL + 1, shift);
 }
 
-static void func_ov182_021ac808(int key, int pressed) {
+static void DWCUtilKeyboard_DrawKey(int key, int pressed) {
     if (key < 0) {
         return;
     }
@@ -640,7 +640,7 @@ static void func_ov182_021ac808(int key, int pressed) {
     }
 }
 
-static void func_ov182_021ac898(void) {
+static void DWCUtilKeyboard_DrawCursor(void) {
     int cell;
 
     switch (sKeyboard->cursorPos) {
@@ -670,7 +670,7 @@ static void func_ov182_021ac898(void) {
                                sCursorPositions[sKeyboard->cursorPos].y);
 }
 
-static void func_ov182_021ac928(int direction) {
+static void DWCUtilKeyboard_MoveCursor(int direction) {
     s8 previous = sKeyboard->cursorPos;
     s8 next;
 
@@ -801,56 +801,56 @@ static void func_ov182_021ac928(int direction) {
             break;
         }
     }
-    func_ov182_021ac898();
+    DWCUtilKeyboard_DrawCursor();
     DWCUtilSound_PlaySe(8);
 }
 
-static void func_ov182_021acbac(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(DWCUtilOam_GetEntry(sKeyboard->buttons[0], 0)).attr01 + 12;
 
-    func_ov182_021ac608(sKeyboard->mode, 4, y);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 4, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, func_ov182_021acbf4);
+        DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideOutRow3Task);
     }
 }
 
-static void func_ov182_021acbf4(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[36]).attr01 + 12;
 
-    func_ov182_021ac608(sKeyboard->mode, 3, y);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 3, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, func_ov182_021acc34);
+        DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideOutRow2Task);
     }
 }
 
-static void func_ov182_021acc34(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[24]).attr01 + 12;
 
-    func_ov182_021ac608(sKeyboard->mode, 2, y);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 2, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, func_ov182_021acc74);
+        DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideOutRow1Task);
     }
 }
 
-static void func_ov182_021acc74(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[12]).attr01 + 12;
 
-    func_ov182_021ac608(sKeyboard->mode, 1, y);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 1, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, func_ov182_021accb0);
+        DWCUtilTask_SetCallback(task, DWCUtilKeyboard_SlideOutRow0Task);
     }
 }
 
-static void func_ov182_021accb0(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_SlideOutRow0Task(DWCUtilTask *task, void *arg) {
     int y = (u8)DWCUtilOam_ReadAttr01(sKeyboard->charOams[0]).attr01 + 12;
 
-    func_ov182_021ac608(sKeyboard->mode, 0, y);
+    DWCUtilKeyboard_MoveRow(sKeyboard->mode, 0, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, func_ov182_021accec);
+        DWCUtilTask_SetCallback(task, DWCUtilKeyboard_DestroyTask);
     }
 }
 
-static void func_ov182_021accec(DWCUtilTask *task, void *arg) {
+static void DWCUtilKeyboard_DestroyTask(DWCUtilTask *task, void *arg) {
     int i;
     int j;
 

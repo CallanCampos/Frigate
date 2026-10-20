@@ -162,7 +162,7 @@ static void func_ov182_021b47d0(void) {
         sTestProgressPassed = FALSE;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(9);
-        func_ov182_021b8cf0(0xd, 1, 1, -1, 0);
+        DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021b482c);
         break;
@@ -170,15 +170,15 @@ static void func_ov182_021b47d0(void) {
 }
 
 static void func_ov182_021b482c(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b484c);
     }
 }
 
 static void func_ov182_021b484c(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021b46e8);
     }
 }

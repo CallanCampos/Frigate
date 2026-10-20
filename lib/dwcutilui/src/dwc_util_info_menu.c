@@ -121,7 +121,7 @@ static void func_ov182_021aec3c(void) {
         break;
     case 1:
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8cf0(0x18, 0, 1, -1, 0);
+        DWCUtilDialog_Open(0x18, 0, 1, -1, 0);
         DWCUtilUiObject_Disable();
         DWCUtilMain_SetUpdate(func_ov182_021aed60);
         break;
@@ -165,7 +165,7 @@ static void func_ov182_021aece0(void) {
 
 // The confirmation: 1 erases the settings
 static void func_ov182_021aed60(void) {
-    switch (func_ov182_021b8f14()) {
+    switch (DWCUtilDialog_GetChoice()) {
     case 1:
         DWCUtilSound_PlaySe(0xe);
         sErase = TRUE;
@@ -176,12 +176,12 @@ static void func_ov182_021aed60(void) {
     default:
         return;
     }
-    func_ov182_021b8eec();
+    DWCUtilDialog_Close();
     DWCUtilMain_SetUpdate(func_ov182_021aed98);
 }
 
 static void func_ov182_021aed98(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021aec84);
     }
 }

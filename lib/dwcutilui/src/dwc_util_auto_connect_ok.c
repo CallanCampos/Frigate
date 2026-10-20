@@ -63,7 +63,7 @@ static void func_ov182_021b6494(void) {
 
     DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from != 0) {
-        func_ov182_021b849c();
+        DWCUtilSubScreen_SlideOutRow();
     }
     DWCUtilFade_Start(3, 1, 1, 8);
     DWCUtilFade_Start(3, 0, 0x15, 8);
@@ -78,7 +78,7 @@ static void func_ov182_021b64cc(void) {
     if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
         return;
     }
-    if (!func_ov182_021b87b0()) {
+    if (!DWCUtilSubScreen_IsNotSlidingOut()) {
         return;
     }
     DWCUtilText_DestroyScreenBg(0);

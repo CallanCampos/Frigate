@@ -7,13 +7,13 @@
 // the buttons of one of six layouts, which slides up from the bottom of the screen, with the screen darkened behind it
 // when fade is TRUE, and slides down again once it is closed. Layout 5 has no buttons and closes after 120 frames.
 // The ROM does not embed this source file's name; dwc_util_dialog.c is descriptive.
-void func_ov182_021b8cf0(int msgIndex, int layout, BOOL fade, int slot, int value);
+void DWCUtilDialog_Open(int msgIndex, int layout, BOOL fade, int slot, int value);
 // Closes the dialog
-void func_ov182_021b8eec(void);
+void DWCUtilDialog_Close(void);
 // The button chosen, -2 until the dialog is up and -1 until one is
-int func_ov182_021b8f14(void);
+int DWCUtilDialog_GetChoice(void);
 // TRUE until the dialog has closed
-BOOL func_ov182_021b8f24(void);
+BOOL DWCUtilDialog_IsOpen(void);
 
 // The offset of the dialog's text in its frame, which nothing reads
 extern const u16 gDialogTextOffset[2];

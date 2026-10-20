@@ -119,7 +119,7 @@ static void func_ov182_021b0844(void) {
     case 2:
         if (sPageStep3.task != NULL) {
             DWCUtilSound_StopSe();
-            func_ov182_021b8cf0(0xc, 1, 1, -1, 0);
+            DWCUtilDialog_Open(0xc, 1, 1, -1, 0);
             DWCUtilSound_PlaySe(9);
             DWCUtilUiObject_Disable();
             DWCUtilTask_Remove(1, sPageStep3.task);
@@ -206,15 +206,15 @@ static void func_ov182_021b0a24(DWCUtilTask *task, void *arg) {
 }
 
 static void func_ov182_021b0a3c(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b0a5c);
     }
 }
 
 static void func_ov182_021b0a5c(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilMain_SetUpdate(func_ov182_021b0920);
     }
 }

@@ -71,7 +71,7 @@ void func_ov182_021af25c(void) {
     sOptionMenu.started = FALSE;
     func_ov182_021af2ec();
     DWCUtilBgOverlay_Show(0x10);
-    func_ov182_021b87d0(3);
+    DWCUtilSubScreen_LoadScreen(3);
     DWCUtilScreen_Start(0x39, -1, 0);
     sOptionMenu.cursor = DWCUtilCell_AllocOam(0, 0x5b);
     G2_SetOBJPosition(sOptionMenu.cursor, cursorPos[0], cursorPos[1]);

@@ -140,7 +140,7 @@ void func_ov182_021ae748(void) {
     func_ov182_021ae7a0();
     DWCUtilBgOverlay_Show(0);
     DWCUtilScreen_Start(0x2e, -1, 0);
-    func_ov182_021b87d0(4);
+    DWCUtilSubScreen_LoadScreen(4);
     DWCUtilButtonSprites_ShowFour(sCursorRects[sMainMenu.selection][0], sCursorRects[sMainMenu.selection][2],
                                   sCursorRects[sMainMenu.selection][1], sCursorRects[sMainMenu.selection][3]);
     DWCUtilMain_SetUpdate(func_ov182_021ae838);

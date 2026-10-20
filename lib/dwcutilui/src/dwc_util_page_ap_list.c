@@ -125,7 +125,7 @@ void func_ov182_021b0c28(void) {
         sApListPos.cursor = 0;
         sApListPos.scroll = 0;
     }
-    sApList->count = func_ov182_021b7630(&sApList->entries);
+    sApList->count = DWCUtilApScan_GetEntries(&sApList->entries);
     func_ov182_021b0cb4();
     DWCUtilBgOverlay_ShowConnectionSet();
     DWCUtilScreen_Start(0x34, -1, 0);
@@ -175,7 +175,7 @@ static void func_ov182_021b0d74(void) {
     if (kind != 0) {
         pos = FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax);
     }
-    func_ov182_021b70a0(kind, 0x55, 0xec, 0x3f, pos);
+    DWCUtilScrollbar_Create(kind, 0x55, 0xec, 0x3f, pos);
 }
 
 static void func_ov182_021b0de4(void) {
@@ -273,7 +273,7 @@ static void func_ov182_021b0f50(void) {
     }
     if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(1);
-        func_ov182_021b7174();
+        DWCUtilScrollbar_Lock();
     } else if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     } else if (DWCUtilTouch_IsKeyRepeated(0x200)) {
@@ -305,7 +305,7 @@ static void func_ov182_021b10c8(void) {
     if (sApList->dragDelay != 0) {
         sApList->dragDelay--;
     }
-    switch (func_ov182_021b7150()) {
+    switch (DWCUtilScrollbar_GetEvent()) {
     case 1:
         sApList->dragging = TRUE;
         DWCUtilUiObject_Disable();
@@ -313,7 +313,7 @@ static void func_ov182_021b10c8(void) {
     case 2:
         if (sApList->dragDelay == 0) {
             DWCUtilButtonSprites_Hide();
-            sApListPos.scroll = FX_DivS32(func_ov182_021b7144() * sApList->scrollMax, sApList->barLength);
+            sApListPos.scroll = FX_DivS32(DWCUtilScrollbar_GetPos() * sApList->scrollMax, sApList->barLength);
             func_ov182_021b14c0();
             sApList->dragDelay = 4;
         }
@@ -321,7 +321,7 @@ static void func_ov182_021b10c8(void) {
     case 3:
         sApList->dragging = FALSE;
         DWCUtilUiObject_Enable();
-        sApListPos.scroll = FX_DivS32(func_ov182_021b7144() * sApList->scrollMax, sApList->barLength);
+        sApListPos.scroll = FX_DivS32(DWCUtilScrollbar_GetPos() * sApList->scrollMax, sApList->barLength);
         DWCUtilSound_PlaySe(0x13);
         func_ov182_021b14c0();
         offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
@@ -381,9 +381,9 @@ static void func_ov182_021b1254(void) {
             index = sApListPos.cursor + FX_DivS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
             if (sApList->entries[index].security == 2) {
                 DWCUtilSound_PlaySe(9);
-                func_ov182_021b7174();
+                DWCUtilScrollbar_Lock();
                 DWCUtilUiObject_Disable();
-                func_ov182_021b8cf0(0xe, 1, 1, -1, 0);
+                DWCUtilDialog_Open(0xe, 1, 1, -1, 0);
                 DWCUtilMain_SetUpdate(func_ov182_021b19b4);
                 return;
             }
@@ -434,7 +434,7 @@ static void func_ov182_021b136c(void) {
         }
     }
     DWCUtilText_DestroyBg(sApList->text);
-    func_ov182_021b711c();
+    DWCUtilScrollbar_Destroy();
     DWCUtilButtonSprites_Hide();
     DWCUtilScreen_Stop();
     DWCUtilBgBuffer_Exit();
@@ -445,12 +445,12 @@ static void func_ov182_021b136c(void) {
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     if (!sApList->confirmed) {
-        func_ov182_021b74f4();
+        DWCUtilApScan_Exit();
         func_ov182_021b7b20(func_ov182_021b781c()->index);
         DWCUtilMain_SetLayout(2, 0);
         DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
     } else if (sApListPos.cursor == AP_LIST_BUTTON) {
-        func_ov182_021b74f4();
+        DWCUtilApScan_Exit();
         DWCUtilMain_SetLayout(0, 1);
         DWCUtilMain_SetUpdate(func_ov182_021b5000);
     } else {
@@ -459,7 +459,7 @@ static void func_ov182_021b136c(void) {
         if (sApList->entries[sApList->chosen].security != 0) {
             DWCUtilMain_SetLayout(0, 1);
             DWCUtilMain_SetScreenArgs(1, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b19f4);
+            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Init);
         } else {
             DWCUtilMain_SetLayout(0, 1);
             DWCUtilMain_SetScreenArgs(0, 1);
@@ -549,7 +549,7 @@ static void func_ov182_021b1658(void) {
 static void func_ov182_021b16d4(DWCUtilTask *task, void *arg) {
     int offset;
 
-    func_ov182_021b7174();
+    DWCUtilScrollbar_Lock();
     DWCUtilButtonSprites_Hide();
     if (sApListPos.scroll > 4) {
         sApListPos.scroll -= 4;
@@ -567,8 +567,8 @@ static void func_ov182_021b16d4(DWCUtilTask *task, void *arg) {
     }
     func_ov182_021b1658();
     if (offset == 0) {
-        func_ov182_021b715c(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
-        func_ov182_021b7164();
+        DWCUtilScrollbar_SetPos(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
+        DWCUtilScrollbar_Unlock();
         func_ov182_021b17f8();
         sApList->scrollTask = NULL;
         DWCUtilTask_QueueRemoval(0, task);
@@ -579,7 +579,7 @@ static void func_ov182_021b16d4(DWCUtilTask *task, void *arg) {
 static void func_ov182_021b1754(DWCUtilTask *task, void *arg) {
     int offset;
 
-    func_ov182_021b7174();
+    DWCUtilScrollbar_Lock();
     DWCUtilButtonSprites_Hide();
     sApListPos.scroll += 4;
     offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
@@ -589,8 +589,8 @@ static void func_ov182_021b1754(DWCUtilTask *task, void *arg) {
     }
     sApListPos.scroll -= offset;
     func_ov182_021b14c0();
-    func_ov182_021b715c(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
-    func_ov182_021b7164();
+    DWCUtilScrollbar_SetPos(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
+    DWCUtilScrollbar_Unlock();
     func_ov182_021b17f8();
     sApList->scrollTask = NULL;
     DWCUtilTask_QueueRemoval(0, task);
@@ -662,7 +662,7 @@ static void func_ov182_021b182c(int direction) {
             sApListPos.scroll = 0;
             sApListPos.cursor = 0;
             func_ov182_021b14c0();
-            func_ov182_021b715c(0);
+            DWCUtilScrollbar_SetPos(0);
         }
         break;
     }
@@ -711,17 +711,17 @@ static void func_ov182_021b1994(void) {
 }
 
 static void func_ov182_021b19b4(void) {
-    if (func_ov182_021b8f14() == 0) {
+    if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b8eec();
+        DWCUtilDialog_Close();
         DWCUtilMain_SetUpdate(func_ov182_021b19d4);
     }
 }
 
 static void func_ov182_021b19d4(void) {
-    if (!func_ov182_021b8f24()) {
+    if (!DWCUtilDialog_IsOpen()) {
         DWCUtilUiObject_Enable();
-        func_ov182_021b7164();
+        DWCUtilScrollbar_Unlock();
         DWCUtilMain_SetUpdate(func_ov182_021b0f40);
     }
 }
