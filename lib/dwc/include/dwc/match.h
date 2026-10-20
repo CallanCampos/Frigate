@@ -11,7 +11,8 @@
 // in the match (its aid). The ROM names none of it; what the functions do is read off their callers
 
 // A machine of the match, as the match's list keeps it: its profile ID, its public and local addresses, the address
-// of the host it was reached through and its aid
+// of the host it was reached through, its aid, whether it is behind a NAT (it has a private address), how often
+// connecting to it failed and when it is tried next, and its user data
 typedef struct DWCNodeInfo {
     s32 profileId;
     u32 publicIp;
@@ -21,10 +22,10 @@ typedef struct DWCNodeInfo {
     u32 hostIp;
     u16 hostPort;
     u8 aid;
-    u8 unk_17;
-    s32 unk_18;
-    u64 unk_1c;
-    u32 unk_24;
+    u8 hasPrivateAddress;
+    s32 connectFailureCount;
+    u64 nextConnectTick;
+    u32 userData;
 } DWCNodeInfo;
 
 // Asked how well another machine fits a random match, and the function's work

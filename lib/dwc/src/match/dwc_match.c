@@ -42,10 +42,10 @@ typedef struct MatchConnectionInfo {
     s32 profileId;
 } MatchConnectionInfo;
 
-// The console that a NAT negotiation goes to
+// The console that a NAT negotiation goes to, and how often it was tried again (the SDK's DWCNNInfo)
 typedef struct MatchTarget {
     u8 kind;
-    u8 unk_01;
+    u8 retryCount;
     u16 port;
     u32 ip;
     u32 cookie;
@@ -58,130 +58,131 @@ typedef int (*MatchCheckFunc)(void *userData, u32 param);
 
 typedef struct FriendsMatchControl FriendsMatchControl;
 
-// The match control (func_ov011_02167f6c returns it; it is FriendsMatchControl.match)
+// The match control (func_ov011_02167f6c returns it; it is FriendsMatchControl.match). The fields that the SDK's
+// DWCMatchControl also has take their names from it, and its command control (cmdCnt) is the cmd fields here
 typedef struct MatchControl {
     GPConnection *gp;
     FriendsMatchControl *fm;
     GTI2ConnectionCallbacks *callbacks;
     u8 retries;
-    u8 unk_0d;
+    u8 matched;
     u8 unk_0e[0x2];
     QR2Implementation *qr2;
     u8 mode;
     u8 matchType;
     u8 hostState;
-    u8 unk_17;
-    u8 unk_18;
+    u8 numEntry;
+    u8 qr2IsReserved;
     u8 unk_19;
     u8 unk_1a[0x2];
-    u32 unk_1c;
-    u64 unk_20;
+    u32 suspendAidBitmap;
+    u64 suspendSendTick;
     u32 suspend;
-    s32 unk_2c;
+    s32 suspendRequest;
     u8 unk_30;
     u8 unk_31[0x3];
-    MatchCallback unk_34;
-    u32 unk_38;
-    u64 unk_3c;
-    s32 unk_44;
-    s32 unk_48;
-    u8 unk_4c;
+    MatchCallback suspendCallback;
+    u32 suspendParam;
+    u64 suspendStartTick;
+    s32 suspendResend;
+    s32 suspendPending;
+    u8 qr2ShutdownFlag;
     u8 unk_4d[0x3];
-    s32 unk_50;
-    DWCNodeInfo unk_54[0x20];
+    s32 nodeCount;
+    DWCNodeInfo nodes[0x20];
     DWCNodeInfo self;
     DWCNodeInfo pending;
-    s32 unk_5a4;
-    s32 unk_5a8;
-    DWCNodeInfo unk_5ac;
-    u16 unk_5d4;
+    s32 memberConnecting;
+    s32 abortedMemberState;
+    DWCNodeInfo abortedMember;
+    u16 qr2Port;
     u8 unk_5d6[0x2];
-    s32 unk_5d8;
-    s32 unk_5dc;
+    s32 qr2Ip;
+    s32 qr2Reservation;
     ServerBrowser *sb;
-    s32 unk_5e4;
-    u64 unk_5e8;
-    u64 unk_5f0;
-    u8 unk_5f8;
-    u8 unk_5f9;
-    u16 unk_5fa;
-    s32 unk_5fc;
-    u64 unk_600;
-    u64 unk_608;
+    s32 sbUpdateFlag;
+    u64 sbUpdateTick;
+    u64 sbUpdateRequestTick;
+    u8 nnRecvCount;
+    u8 nnFailureCount;
+    u16 nnCookieRand;
+    s32 nnLastCookie;
+    u64 nnFailedTime;
+    u64 nnFinishTime;
     MatchTarget target;
     s32 state;
-    u8 unk_620;
-    u8 unk_621;
+    u8 clLinkProgress;
+    u8 friendIndex;
     u8 unk_622[0x6];
     u8 unk_628;
-    u8 unk_629;
-    u8 unk_62a;
-    u8 unk_62b;
-    u8 unk_62c;
-    u8 unk_62d;
-    u8 unk_62e;
+    u8 closeState;
+    u8 cancelState;
+    u8 scResvRetryCount;
+    u8 synResendCount;
+    u8 cancelSynResendCount;
+    u8 clWaitTimeoutCount;
     u8 unk_62f;
-    u16 unk_630;
-    u16 unk_632;
-    s32 unk_634;
-    s32 unk_638;
-    u64 unk_63c;
-    u32 unk_644;
-    u64 unk_648;
-    u32 unk_650;
-    u32 unk_654;
-    u64 unk_658;
-    u64 unk_660;
-    u64 unk_668;
+    u16 baseLatency;
+    u16 cancelBaseLatency;
+    s32 resvToken;
+    s32 cmdResendFlag;
+    u64 cmdResendTick;
+    u32 cmdTimeoutTime;
+    u64 cmdTimeoutStartTick;
+    u32 synAckBit;
+    u32 cancelSynAckBit;
+    u64 lastSynSent;
+    u64 lastCancelSynSent;
+    u64 closedTime;
     u64 unk_670;
     s32 profileId;
-    s32 unk_67c;
-    s32 unk_680;
+    s32 reqProfileId;
+    s32 cbEventPid;
     char *gameName;
     char *secretKey;
     DWCFriendData *friendList;
     s32 friendListLen;
     u8 friendOrder[0x40];
     s32 friendCount;
-    u8 unk_6d8;
-    u8 unk_6d9;
-    u16 unk_6da;
-    u32 unk_6dc;
-    u32 unk_6e0[0x20];
-    u32 unk_760;
-    u32 unk_764;
-    u64 unk_768;
+    u8 cmdCommand;
+    u8 cmdCount;
+    u16 cmdPort;
+    u32 cmdIp;
+    u32 cmdData[0x20];
+    u32 cmdProfileId;
+    u32 cmdLen;
+    u64 cmdSendTime;
     MatchNotifyFunc notifyFunc;
     void *notifyParam;
     DWCNewClientFunc newClientCallback;
     void *newClientParam;
     DWCEvalFunc evalCallback;
     void *evalParam;
-    u32 unk_788;
-    u32 unk_78c;
+    u32 newHostAckBit;
+    u32 connectedAidBit;
     s32 groupId;
-    u8 unk_794;
+    u8 groupSearchCount;
     u8 unk_795[0x3];
     s32 unk_798;
-    u8 unk_79c;
-    u8 unk_79d;
+    u8 newHostResendCount;
+    u8 newHostNakCount;
     u8 unk_79e[0x2];
-    u64 unk_7a0;
-    u8 unk_7a8;
+    u64 aidListSendTick;
+    u8 sbSearchHostsOnly;
     u8 unk_7a9[0x3];
-    u32 unk_7ac;
-    s32 unk_7b0;
+    u32 sbSearchCount;
+    s32 topology;
     u8 error;
-    u8 unk_7b5;
-    u8 unk_7b6;
+    u8 suppressMatchedCallback;
+    u8 scResvRetryMax;
     u8 unk_7b7;
     MatchCheckFunc checkFunc;
     int userData;
-    u32 unk_7c0;
-    u32 unk_7c4;
-    u32 unk_7c8;
-    u64 unk_7cc;
-    s32 unk_7d4;
+    u32 checkParam;
+    u32 unlocked;
+    u32 synId;
+    u64 suspendWaitTime;
+    s32 lockEnabled;
     DWCTransportInfo transport;
 } MatchControl;
 
@@ -199,7 +200,7 @@ struct FriendsMatchControl {
     int state;
     int prevState;
     u8 unk_2c;
-    u8 unk_2d;
+    u8 ownCloseFlag;
     u8 unk_2e[0x2];
     u16 name[0x1a];
     s32 profileId;
@@ -226,23 +227,24 @@ typedef struct MatchRoot {
 } MatchRoot;
 
 // What func_ov011_02167f6c returns (sMatchState.control), the query text of the match, and the clock of the last
-// state change
+// state change; and, as the SDK's file statics of those names, whether NAT negotiation is being run and its list is to
+// be freed once it returns, and whether the server browser is to be freed once its callbacks, counted, return
 typedef struct MatchState {
-    u32 unk_00;
+    u32 inNNThink;
     MatchControl *control;
-    u32 unk_08;
+    u32 nnFreeNegotiateList;
     char *query;
-    u32 unk_10;
-    u32 unk_14;
+    u32 needSbFree;
+    u32 sbCallbackLevel;
     u64 clock;
 } MatchState;
 
 // A key that is added to the match (key IDs 100 to 253): its ID (0 when the slot is free), whether its value is a
-// text, and the key's name and value
+// text, and the key's name and value (the SDK's DWCGameMatchKeyData)
 typedef struct MatchKey {
     u8 id;
     u8 isText;
-    u16 unk_02;
+    u16 pad;
     char *name;
     const void *value;
 } MatchKey;
@@ -254,7 +256,7 @@ typedef struct MatchPeerWire {
     u32 ip;
     u32 localIp;
     u32 ports;
-    u8 unk_14[4];
+    u8 userData[4];
 } MatchPeerWire;
 
 // A packet of the matchmaking: the magic "\xbbI\xccM", the version, the command, the size of its data, the public
@@ -493,7 +495,7 @@ void func_ov011_0215fa0c(DWCUserData *userData, int productId, const char *secre
     sMatchRoot.fm->userData = userData;
     sMatchRoot.fm->state = 0;
     sMatchRoot.fm->prevState = 0;
-    sMatchRoot.fm->unk_2d = 0;
+    sMatchRoot.fm->ownCloseFlag = 0;
     sMatchRoot.fm->profileId = 0;
     sMatchRoot.fm->gameName = gcd_gamename;
     sMatchRoot.fm->secretKey = gcd_secret_key;
@@ -528,7 +530,7 @@ void func_ov011_0215fb78(void) {
             qr2_shutdown(sMatchRoot.fm->match.qr2);
             sMatchRoot.fm->match.qr2 = NULL;
         }
-        sMatchRoot.fm->match.unk_4c = 0;
+        sMatchRoot.fm->match.qr2ShutdownFlag = 0;
         if (sMatchRoot.fm->match.sb != NULL) {
             ServerBrowserFree(sMatchRoot.fm->match.sb);
             sMatchRoot.fm->match.sb = NULL;
@@ -623,12 +625,12 @@ void func_ov011_0215fc50(void) {
         }
         break;
     }
-    if (sMatchRoot.fm->match.unk_4c == 1) {
+    if (sMatchRoot.fm->match.qr2ShutdownFlag == 1) {
         if (sMatchRoot.fm->match.qr2 != NULL) {
             qr2_shutdown(sMatchRoot.fm->match.qr2);
             sMatchRoot.fm->match.qr2 = NULL;
         }
-        sMatchRoot.fm->match.unk_4c = 0;
+        sMatchRoot.fm->match.qr2ShutdownFlag = 0;
     }
 }
 
@@ -778,7 +780,7 @@ int func_ov011_02160170(void) {
     BOOL found = FALSE;
     int i;
 
-    sMatchRoot.fm->match.unk_7b5 = TRUE;
+    sMatchRoot.fm->match.suppressMatchedCallback = TRUE;
     if (func_ov011_02160dac()) {
         return 1;
     }
@@ -802,7 +804,7 @@ int func_ov011_02160170(void) {
         func_ov011_021631a8();
         return 1;
     }
-    sMatchRoot.fm->unk_2d = 1;
+    sMatchRoot.fm->ownCloseFlag = 1;
     gt2CloseAllConnectionsHard(sMatchRoot.fm->socket);
     while (func_ov011_02168024() > 1) {
         for (i = 0; i < func_ov011_02168024(); i++) {
@@ -813,7 +815,7 @@ int func_ov011_02160170(void) {
             }
         }
     }
-    sMatchRoot.fm->unk_2d = 0;
+    sMatchRoot.fm->ownCloseFlag = 0;
     func_ov011_0216800c();
     func_ov011_02167f78(0);
     func_ov011_021631a8();
@@ -899,7 +901,7 @@ static u8 func_ov011_021603b8(void) {
     DWCNodeInfo *host;
 
     if (sMatchRoot.fm == NULL || sMatchRoot.fm->match.state == 0 || sMatchRoot.fm->match.state == 9 ||
-        sMatchRoot.fm->match.state == 10 || sMatchRoot.fm->match.state == 11 || sMatchRoot.fm->match.unk_0d == 0 ||
+        sMatchRoot.fm->match.state == 10 || sMatchRoot.fm->match.state == 11 || sMatchRoot.fm->match.matched == 0 ||
         sMatchRoot.fm->match.hostState == 0) {
         return 0xff;
     }
@@ -1172,7 +1174,7 @@ static void func_ov011_021607bc(int error, BOOL cancel, BOOL a2, BOOL a3, int in
     } else if (error == 0) {
         func_ov011_021605b4(5);
     }
-    if (sMatchRoot.fm->match.unk_7b5 == 0) {
+    if (sMatchRoot.fm->match.suppressMatchedCallback == 0) {
         sMatchRoot.fm->matchedCallback(error, cancel, a2, a3, index, sMatchRoot.fm->matchedParam);
     }
     if (error != 0 && sMatchRoot.fm != NULL && (sMatchRoot.fm->state == 4 || sMatchRoot.fm->state == 5)) {
@@ -1264,9 +1266,9 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
             isHost = TRUE;
         }
         profileId = func_ov011_021605c8(id);
-        sMatchRoot.fm->match.unk_1c &= ~(1 << id);
-        if (sMatchRoot.fm->match.unk_48 != 0 && isHost && func_ov011_021677e8() == 0) {
-            sMatchRoot.fm->match.unk_44 = 1;
+        sMatchRoot.fm->match.suspendAidBitmap &= ~(1 << id);
+        if (sMatchRoot.fm->match.suspendPending != 0 && isHost && func_ov011_021677e8() == 0) {
+            sMatchRoot.fm->match.suspendResend = 1;
         }
         if (profileId == 0) {
             profileId = ((MatchConnectionInfo *)gt2GetConnectionData(func_ov011_021604b0(id)))->profileId;
@@ -1275,15 +1277,15 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
             sConnections[connection->index] = NULL;
         }
     }
-    if (sMatchRoot.fm->match.unk_7c4 == 1 && func_ov011_02160408()) {
-        sMatchRoot.fm->match.unk_7c4 = 1;
+    if (sMatchRoot.fm->match.unlocked == 1 && func_ov011_02160408()) {
+        sMatchRoot.fm->match.unlocked = 1;
     } else if (sMatchRoot.fm->match.matchType == 3 || sMatchRoot.fm->match.matchType == 2) {
-        sMatchRoot.fm->match.unk_7c4 = 0;
+        sMatchRoot.fm->match.unlocked = 0;
     } else {
-        sMatchRoot.fm->match.unk_7c4 = func_ov011_021602a0() == 1;
+        sMatchRoot.fm->match.unlocked = func_ov011_021602a0() == 1;
     }
     if (func_ov011_021677e8() != 0) {
-        sMatchRoot.fm->match.unk_78c = 0;
+        sMatchRoot.fm->match.connectedAidBit = 0;
         for (i = 0; i < func_ov011_02168024();) {
             host = func_ov011_02168250(i);
             if (host->profileId != sMatchRoot.fm->match.profileId && func_ov011_021604b0(host->aid) == NULL) {
@@ -1293,18 +1295,18 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
                 }
                 func_ov011_021605c8(host->aid);
             } else {
-                sMatchRoot.fm->match.unk_78c |= 1 << func_ov011_02168250(i)->aid;
+                sMatchRoot.fm->match.connectedAidBit |= 1 << func_ov011_02168250(i)->aid;
                 i++;
             }
         }
     }
     if (closeType != 0 && func_ov011_02160408() == 1) {
-        sMatchRoot.fm->match.unk_7a0 = 0;
-        if (func_ov011_021686a0() != 0 && sMatchRoot.fm->match.state == 0x10 && sMatchRoot.fm->match.unk_6d8 == 8) {
-            sMatchRoot.fm->match.unk_768 = 0;
+        sMatchRoot.fm->match.aidListSendTick = 0;
+        if (func_ov011_021686a0() != 0 && sMatchRoot.fm->match.state == 0x10 && sMatchRoot.fm->match.cmdCommand == 8) {
+            sMatchRoot.fm->match.cmdSendTime = 0;
         }
     }
-    if (sMatchRoot.fm->unk_2d == 0 && sMatchRoot.fm->state == 5 && !hadHost) {
+    if (sMatchRoot.fm->ownCloseFlag == 0 && sMatchRoot.fm->state == 5 && !hadHost) {
         if (sMatchRoot.fm->match.mode != 2) {
             return;
         }
@@ -1323,7 +1325,7 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
         return;
     }
     if (sMatchRoot.fm->match.mode == 2) {
-        if (sMatchRoot.fm->unk_2d == 0) {
+        if (sMatchRoot.fm->ownCloseFlag == 0) {
             func_ov011_02162d80(-1);
         } else if (func_ov011_02168024() == 1) {
             func_ov011_02162d80(1);
@@ -1338,14 +1340,14 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
         sMatchRoot.fm->closedCallback(error, closeType == 0, isHost, id, DWCi_GetFriendListIndex(profileId),
                                       sMatchRoot.fm->closedParam);
     }
-    if (sMatchRoot.fm->unk_2d == 0 && sMatchRoot.fm->match.mode == 2) {
+    if (sMatchRoot.fm->ownCloseFlag == 0 && sMatchRoot.fm->match.mode == 2) {
         return;
     }
     if (func_ov011_02168468() == 1) {
         func_ov011_02167f78(1);
     }
     if (func_ov011_02168024() == 1) {
-        if (sMatchRoot.fm->unk_2d == 0) {
+        if (sMatchRoot.fm->ownCloseFlag == 0) {
             func_ov011_02167f78(0xb);
             return;
         }
@@ -1399,7 +1401,7 @@ u8 func_ov011_02160d6c(void) {
 static BOOL func_ov011_02160d88(void) {
     BOOL result = TRUE;
 
-    if (sMatchRoot.fm->match.matchType != 2 && sMatchRoot.fm->match.unk_0d == 0) {
+    if (sMatchRoot.fm->match.matchType != 2 && sMatchRoot.fm->match.matched == 0) {
         result = FALSE;
     }
     return result;
@@ -1415,7 +1417,7 @@ static BOOL func_ov011_02160dac(void) {
         func_ov011_02167f6c();
         result = FALSE;
     }
-    func_ov011_02167f6c()->unk_7b5 = 0;
+    func_ov011_02167f6c()->suppressMatchedCallback = 0;
     return result;
 }
 
@@ -1423,7 +1425,7 @@ static BOOL func_ov011_02160dd8(void) {
     if (DWCi_IsError()) {
         return FALSE;
     }
-    if (func_ov011_02167f6c() == NULL || func_ov011_021603a4() != 4 || func_ov011_02167f6c()->unk_62a != 0) {
+    if (func_ov011_02167f6c() == NULL || func_ov011_021603a4() != 4 || func_ov011_02167f6c()->cancelState != 0) {
         return FALSE;
     }
     return TRUE;
@@ -1445,7 +1447,7 @@ u8 func_ov011_02160e10(u8 keyId, const char *key, const int *valueSrc) {
     }
     sKeys[keyId - 100].id = keyId;
     sKeys[keyId - 100].isText = 0;
-    sKeys[keyId - 100].unk_02 = 0;
+    sKeys[keyId - 100].pad = 0;
     if (sKeys[keyId - 100].name != NULL) {
         DWC_Free(4, sKeys[keyId - 100].name, 0);
     }
@@ -1476,7 +1478,7 @@ u8 func_ov011_02160ed4(u8 keyId, const char *key, const char *value) {
     }
     sKeys[keyId - 100].id = keyId;
     sKeys[keyId - 100].isText = 1;
-    sKeys[keyId - 100].unk_02 = 0;
+    sKeys[keyId - 100].pad = 0;
     if (sKeys[keyId - 100].name != NULL) {
         DWC_Free(4, sKeys[keyId - 100].name, 0);
     }
@@ -1514,7 +1516,7 @@ static BOOL func_ov011_02160fd8(void) {
     if (func_ov011_02167fc4() == 0) {
         return FALSE;
     }
-    mask = func_ov011_02167f6c()->unk_1c;
+    mask = func_ov011_02167f6c()->suspendAidBitmap;
     mask &= func_ov011_02160344();
     if (func_ov011_02167f0c() == 0) {
         mask &= ~(1 << func_ov011_021602c0());
@@ -1538,8 +1540,8 @@ static void func_ov011_02161048(MatchControl *cnt, GPConnection *gp, FriendsMatc
     func_ov011_02167f6c()->fm = fm;
     func_ov011_02167f6c()->callbacks = callbacks;
     func_ov011_02167f6c()->qr2 = NULL;
-    func_ov011_02167f6c()->unk_5d8 = 0;
-    func_ov011_02167f6c()->unk_5d4 = 0;
+    func_ov011_02167f6c()->qr2Ip = 0;
+    func_ov011_02167f6c()->qr2Port = 0;
     func_ov011_02167f6c()->sb = NULL;
     func_ov011_02167f78(0);
     func_ov011_02167f6c()->unk_19 = 0;
@@ -1554,19 +1556,19 @@ static void func_ov011_02161048(MatchControl *cnt, GPConnection *gp, FriendsMatc
     func_ov011_02167f6c()->notifyParam = 0;
     func_ov011_02167f6c()->evalCallback = NULL;
     func_ov011_02167f6c()->evalParam = NULL;
-    func_ov011_02167f6c()->unk_788 = 0;
-    func_ov011_02167f6c()->unk_78c = 0;
+    func_ov011_02167f6c()->newHostAckBit = 0;
+    func_ov011_02167f6c()->connectedAidBit = 0;
     func_ov011_02167f6c()->groupId = 0;
-    func_ov011_02167f6c()->unk_794 = 0;
+    func_ov011_02167f6c()->groupSearchCount = 0;
     func_ov011_02167f6c()->unk_798 = 0;
     func_ov011_02167f6c()->matchType = 0;
     func_ov011_02167f6c()->hostState = 0;
-    func_ov011_02167f6c()->unk_5f0 = 0;
-    func_ov011_02167f6c()->unk_7c8 = 0;
-    func_ov011_02167f6c()->unk_7d4 = 1;
-    func_ov011_02167f6c()->unk_7b5 = 0;
-    func_ov011_02167f6c()->unk_7b6 = 0;
-    func_ov011_02167f6c()->unk_7b0 = 0;
+    func_ov011_02167f6c()->sbUpdateRequestTick = 0;
+    func_ov011_02167f6c()->synId = 0;
+    func_ov011_02167f6c()->lockEnabled = 1;
+    func_ov011_02167f6c()->suppressMatchedCallback = 0;
+    func_ov011_02167f6c()->scResvRetryMax = 0;
+    func_ov011_02167f6c()->topology = 0;
     func_ov011_0216800c();
     func_ov011_02168374();
     func_ov011_021664f0();
@@ -1598,8 +1600,8 @@ static int func_ov011_021611a8(s32 profileId) {
         }
         retries++;
     } while (retries < 1);
-    func_ov011_02167f6c()->unk_5d8 = 0;
-    func_ov011_02167f6c()->unk_5d4 = 0;
+    func_ov011_02167f6c()->qr2Ip = 0;
+    func_ov011_02167f6c()->qr2Port = 0;
     qr2_register_publicaddress_callback(func_ov011_02167f6c()->qr2, func_ov011_02167248);
     qr2_register_natneg_callback(func_ov011_02167f6c()->qr2, func_ov011_02167264);
     qr2_register_clientmessage_callback(func_ov011_02167f6c()->qr2, func_ov011_0216738c);
@@ -1633,7 +1635,7 @@ static void func_ov011_021612d0(int type, u8 numEntry, const char *query, DWCMat
     func_ov011_02167f6c()->newClientParam = newClientParam;
     func_ov011_02167f6c()->evalCallback = eval;
     func_ov011_02167f6c()->evalParam = evalParam;
-    func_ov011_02167f6c()->unk_7b0 = type;
+    func_ov011_02167f6c()->topology = type;
     func_ov011_02167838((MatchCheckFunc)attempt, attemptParam, (u32)param);
     func_ov011_02167f78(0x16);
     if (func_ov011_02167f6c()->sb == NULL) {
@@ -1662,12 +1664,12 @@ static void func_ov011_02161468(int type, u8 numEntry, DWCMatchedFunc matched, v
     func_ov011_021630f8(2, numEntry, matched, matchedParam);
     func_ov011_02167f6c()->newClientCallback = newClient;
     func_ov011_02167f6c()->newClientParam = newClientParam;
-    func_ov011_02167f6c()->unk_7b0 = type;
+    func_ov011_02167f6c()->topology = type;
     func_ov011_02167838((MatchCheckFunc)attempt, attemptParam, (u32)param);
     func_ov011_02167f78(0x16);
     if (func_ov011_02166670(func_ov011_02162d80(6)) == 0) {
         func_ov011_02167fa0(2);
-        func_ov011_02167f6c()->unk_7c4 = 1;
+        func_ov011_02167f6c()->unlocked = 1;
         if (func_ov011_02167f6c()->qr2 == NULL) {
             if (func_ov011_021611a8(func_ov011_02167f6c()->profileId) != 0) {
                 return;
@@ -1692,15 +1694,15 @@ static void func_ov011_0216156c(int type, s32 profileId, DWCMatchedFunc matched,
     DWCNodeInfo saved;
     DWCNodeInfo savedHost;
     DWCNodeInfo zero;
-    u8 unk_62b;
+    u8 scResvRetryCount;
 
     if (func_ov011_02167f6c()->unk_798 != 0) {
         saved = func_ov011_02167f6c()->self;
         savedHost = *func_ov011_02168224();
-        unk_62b = func_ov011_02167f6c()->unk_62b;
+        scResvRetryCount = func_ov011_02167f6c()->scResvRetryCount;
     }
     func_ov011_021630f8(3, 0, matched, matchedParam);
-    func_ov011_02167f6c()->unk_7b0 = type;
+    func_ov011_02167f6c()->topology = type;
     if (func_ov011_02167f6c()->unk_798 == 0) {
         MI_CpuFill8(&zero, 0, sizeof(zero));
         func_ov011_02168374();
@@ -1709,14 +1711,14 @@ static void func_ov011_0216156c(int type, s32 profileId, DWCMatchedFunc matched,
     } else {
         func_ov011_02167f6c()->self = saved;
         func_ov011_02168030(&savedHost);
-        MI_CpuCopy8(&savedHost.unk_24, &func_ov011_02167f6c()->userData, sizeof(int));
-        func_ov011_02167f6c()->unk_62b = unk_62b;
+        MI_CpuCopy8(&savedHost.userData, &func_ov011_02167f6c()->userData, sizeof(int));
+        func_ov011_02167f6c()->scResvRetryCount = scResvRetryCount;
     }
     func_ov011_02167f6c()->newClientCallback = newClient;
     func_ov011_02167f6c()->newClientParam = newClientParam;
     func_ov011_02167838((MatchCheckFunc)attempt, attemptParam, (u32)param);
-    func_ov011_02167f6c()->unk_18 = 1;
-    func_ov011_02167f6c()->unk_5dc = func_ov011_02167f6c()->profileId;
+    func_ov011_02167f6c()->qr2IsReserved = 1;
+    func_ov011_02167f6c()->qr2Reservation = func_ov011_02167f6c()->profileId;
     func_ov011_02167fa0(1);
     if (func_ov011_02167f6c()->unk_798 == 0) {
         func_ov011_02167f78(0x16);
@@ -1789,13 +1791,14 @@ static void func_ov011_021617b4(int a0) {
     }
     switch (func_ov011_02167f6c()->state) {
     case 3:
-        if (func_ov011_02167f6c()->unk_644 != 0 &&
-            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_648) > func_ov011_02167f6c()->unk_644) {
-            func_ov011_02167f6c()->unk_644 = 0;
+        if (func_ov011_02167f6c()->cmdTimeoutTime != 0 &&
+            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->cmdTimeoutStartTick) >
+                func_ov011_02167f6c()->cmdTimeoutTime) {
+            func_ov011_02167f6c()->cmdTimeoutTime = 0;
             if (func_ov011_02167f6c()->unk_798 != 0) {
                 func_ov011_02167f6c();
-                func_ov011_02167f6c()->unk_62b++;
-                if (func_ov011_02167f6c()->unk_62b > func_ov011_02167f6c()->unk_7b6) {
+                func_ov011_02167f6c()->scResvRetryCount++;
+                if (func_ov011_02167f6c()->scResvRetryCount > func_ov011_02167f6c()->scResvRetryMax) {
                     func_ov011_02162880(0x16, -80432);
                     return;
                 }
@@ -1808,8 +1811,8 @@ static void func_ov011_021617b4(int a0) {
             }
             if (func_ov011_02167f6c()->matchType == 3) {
                 func_ov011_02167f6c();
-                func_ov011_02167f6c()->unk_62b++;
-                if (func_ov011_02167f6c()->unk_62b > func_ov011_02167f6c()->unk_7b6) {
+                func_ov011_02167f6c()->scResvRetryCount++;
+                if (func_ov011_02167f6c()->scResvRetryCount > func_ov011_02167f6c()->scResvRetryMax) {
                     func_ov011_02162880(0x16, -80430);
                     return;
                 }
@@ -1828,8 +1831,8 @@ static void func_ov011_021617b4(int a0) {
                 }
             }
         }
-        if (func_ov011_02167f6c()->unk_638 != 0 &&
-            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_63c) >= 3000) {
+        if (func_ov011_02167f6c()->cmdResendFlag != 0 &&
+            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->cmdResendTick) >= 3000) {
             if (func_ov011_02164b78(func_ov011_02164b98(func_ov011_02167f6c()->self.profileId, 0)) != 0) {
                 return;
             }
@@ -1838,32 +1841,32 @@ static void func_ov011_021617b4(int a0) {
     case 2:
     case 4:
     case 22:
-        if (func_ov011_02167f6c()->unk_5e4 > 0) {
+        if (func_ov011_02167f6c()->sbUpdateFlag > 0) {
             if (func_ov011_02167f6c()->state == 2) {
-                if (func_ov011_02167f6c()->unk_5e4 == 1 || func_ov011_02167f6c()->unk_7ac <= 1) {
+                if (func_ov011_02167f6c()->sbUpdateFlag == 1 || func_ov011_02167f6c()->sbSearchCount <= 1) {
                     limit = 4000;
                 } else {
                     limit = 12000;
                 }
             } else if (func_ov011_02167f6c()->state == 22) {
                 limit = 4000;
-            } else if (func_ov011_02167f6c()->unk_5e4 == 1) {
+            } else if (func_ov011_02167f6c()->sbUpdateFlag == 1) {
                 limit = 4000;
             } else {
                 limit = 12000;
             }
-            if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_5e8) > limit) {
-                if (func_ov011_021666c4(func_ov011_0216322c(func_ov011_02167f6c()->unk_67c)) != 0) {
+            if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->sbUpdateTick) > limit) {
+                if (func_ov011_021666c4(func_ov011_0216322c(func_ov011_02167f6c()->reqProfileId)) != 0) {
                     return;
                 }
-                func_ov011_02167f6c()->unk_5e4 = 0;
+                func_ov011_02167f6c()->sbUpdateFlag = 0;
             }
         }
         break;
     case 6:
-        if (func_ov011_02167f6c()->unk_608 != 0) {
-            if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_608) > 25000) {
-                func_ov011_02167f6c()->unk_608 = 0;
+        if (func_ov011_02167f6c()->nnFinishTime != 0) {
+            if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->nnFinishTime) > 25000) {
+                func_ov011_02167f6c()->nnFinishTime = 0;
                 if (func_ov011_02168468() == 1) {
                     func_ov011_02167f78(1);
                 } else if (func_ov011_02165194(func_ov011_02167f6c()->self.profileId) == 0) {
@@ -1871,34 +1874,34 @@ static void func_ov011_021617b4(int a0) {
                     return;
                 }
             }
-        } else if (func_ov011_02167f6c()->unk_6d8 == 6 &&
-                   OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_768) > 6000) {
+        } else if (func_ov011_02167f6c()->cmdCommand == 6 &&
+                   OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->cmdSendTime) > 6000) {
             if (func_ov011_02168468() == 1) {
                 func_ov011_02162864();
                 func_ov011_02167f78(1);
             } else {
-                func_ov011_02167f6c()->unk_6d9++;
-                if (func_ov011_02167f6c()->unk_6d9 > 5) {
+                func_ov011_02167f6c()->cmdCount++;
+                if (func_ov011_02167f6c()->cmdCount > 5) {
                     func_ov011_02162864();
                     if (func_ov011_02165194(func_ov011_02167f6c()->self.profileId) == 0) {
                         func_ov011_02168374();
                         return;
                     }
                 } else if (func_ov011_02164b78(
-                               func_ov011_021637d8(6, func_ov011_02167f6c()->unk_760, func_ov011_02167f6c()->unk_6dc,
-                                                   func_ov011_02167f6c()->unk_6da, func_ov011_02167f6c()->unk_6e0,
-                                                   func_ov011_02167f6c()->unk_764)) != 0) {
+                               func_ov011_021637d8(6, func_ov011_02167f6c()->cmdProfileId, func_ov011_02167f6c()->cmdIp,
+                                                   func_ov011_02167f6c()->cmdPort, func_ov011_02167f6c()->cmdData,
+                                                   func_ov011_02167f6c()->cmdLen)) != 0) {
                     return;
                 }
             }
         }
         break;
     case 14:
-        if (func_ov011_02167f6c()->unk_6d8 == 2 &&
+        if (func_ov011_02167f6c()->cmdCommand == 2 &&
             ((func_ov011_02167f6c()->matchType == 0 &&
-              OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_768) > 6000) ||
+              OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->cmdSendTime) > 6000) ||
              (func_ov011_02167f6c()->matchType != 0 &&
-              OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_768) > 19000))) {
+              OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->cmdSendTime) > 19000))) {
             func_ov011_02162864();
             if (func_ov011_02168468() == 1) {
                 func_ov011_02167f78(1);
@@ -1908,10 +1911,10 @@ static void func_ov011_021617b4(int a0) {
         }
         break;
     case 16:
-        if (func_ov011_02167f6c()->unk_6d8 == 8 &&
-            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_768) > 30000) {
-            func_ov011_02167f6c()->unk_6d9++;
-            if (func_ov011_02167f6c()->unk_6d9 != 0) {
+        if (func_ov011_02167f6c()->cmdCommand == 8 &&
+            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->cmdSendTime) > 30000) {
+            func_ov011_02167f6c()->cmdCount++;
+            if (func_ov011_02167f6c()->cmdCount != 0) {
                 func_ov011_02162864();
                 if (func_ov011_02165164(func_ov011_02167f6c()->self.profileId) == 0) {
                     return;
@@ -1924,7 +1927,7 @@ static void func_ov011_021617b4(int a0) {
             OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_670) > 30000) {
             DWCNodeInfo *self = &func_ov011_02167f6c()->self;
 
-            if (func_ov011_02167f6c()->unk_62e >= 5) {
+            if (func_ov011_02167f6c()->clWaitTimeoutCount >= 5) {
                 if (func_ov011_02165194(self->profileId) == 0) {
                     return;
                 }
@@ -1935,7 +1938,7 @@ static void func_ov011_021617b4(int a0) {
                         func_ov011_021637d8(0x40, self->profileId, self->publicIp, self->publicPort, NULL, 0)) != 0) {
                     return;
                 }
-                func_ov011_02167f6c()->unk_62e++;
+                func_ov011_02167f6c()->clWaitTimeoutCount++;
                 now = OS_GetTick();
                 now -= OS_MilliSecondsToTicks(24000);
                 func_ov011_02167f6c()->unk_670 = now;
@@ -1945,14 +1948,14 @@ static void func_ov011_021617b4(int a0) {
     case 9:
         func_ov011_02168468();
         c = func_ov011_02167f6c();
-        c->unk_788 = 0;
-        c->unk_79c = 0;
-        c->unk_79d = 0;
+        c->newHostAckBit = 0;
+        c->newHostResendCount = 0;
+        c->newHostNakCount = 0;
         if (func_ov011_021677e8() == 0 && func_ov011_021604b0(func_ov011_02168250(0)->aid) == NULL) {
             func_ov011_02162880(0x16, -80431);
             return;
         }
-        c->unk_788 |= 1 << func_ov011_021665f0(c->profileId, 1);
+        c->newHostAckBit |= 1 << func_ov011_021665f0(c->profileId, 1);
         if (func_ov011_021677e8() != 0) {
             if (func_ov011_02167fd0() == 0) {
                 func_ov011_02162880(0x16, -80431);
@@ -1972,8 +1975,8 @@ static void func_ov011_021617b4(int a0) {
         if (func_ov011_021677e8() != 0) {
             if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_670) > 5000) {
                 func_ov011_02167778();
-                if (++func_ov011_02167f6c()->unk_79c > 5) {
-                    mask = ~(func_ov011_02167f6c()->unk_788 & func_ov011_02167f6c()->unk_78c);
+                if (++func_ov011_02167f6c()->newHostResendCount > 5) {
+                    mask = ~(func_ov011_02167f6c()->newHostAckBit & func_ov011_02167f6c()->connectedAidBit);
                     for (i = 0; i < func_ov011_02168024(); i++) {
                         u8 aid = func_ov011_02168250(i)->aid;
 
@@ -1981,10 +1984,10 @@ static void func_ov011_021617b4(int a0) {
                             func_ov011_02160710(aid);
                         }
                     }
-                    func_ov011_02167f6c()->unk_788 = func_ov011_02167f6c()->unk_78c;
+                    func_ov011_02167f6c()->newHostAckBit = func_ov011_02167f6c()->connectedAidBit;
                 }
             }
-            if ((func_ov011_02167f6c()->unk_788 ^ func_ov011_02167f6c()->unk_78c) == 0) {
+            if ((func_ov011_02167f6c()->newHostAckBit ^ func_ov011_02167f6c()->connectedAidBit) == 0) {
                 func_ov011_02167f78(11);
             }
         } else if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_670) > 60000) {
@@ -1998,7 +2001,7 @@ static void func_ov011_021617b4(int a0) {
                 break;
             }
             func_ov011_0216788c(0);
-            func_ov011_02167f6c()->unk_7a0 = 0;
+            func_ov011_02167f6c()->aidListSendTick = 0;
             func_ov011_02167fe8();
             func_ov011_02168620();
             qr2_send_statechanged(func_ov011_02167f6c()->qr2);
@@ -2007,41 +2010,42 @@ static void func_ov011_021617b4(int a0) {
         }
         break;
     case 12:
-        if (func_ov011_02167f6c()->unk_5e4 > 0) {
-            if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_5e8) > 8000) {
-                if (++func_ov011_02167f6c()->unk_794 > 0xf) {
+        if (func_ov011_02167f6c()->sbUpdateFlag > 0) {
+            if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->sbUpdateTick) > 8000) {
+                if (++func_ov011_02167f6c()->groupSearchCount > 0xf) {
                     func_ov011_02162880(0x16, -80432);
                     break;
                 }
                 if (func_ov011_021666c4(func_ov011_0216322c(0)) != 0) {
                     return;
                 }
-                func_ov011_02167f6c()->unk_5e4 = 0;
+                func_ov011_02167f6c()->sbUpdateFlag = 0;
             }
         }
         break;
     }
     if (func_ov011_02167f6c()->state == 0xe || func_ov011_02167f6c()->state == 5) {
-        if (func_ov011_02167f6c()->unk_600 != 0 &&
-            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_600) > 10000) {
+        if (func_ov011_02167f6c()->nnFailedTime != 0 &&
+            OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->nnFailedTime) > 10000) {
             func_ov011_02167428(1, 0, NULL, &func_ov011_02167f6c()->target);
         }
     }
-    if (func_ov011_021685ec() == 0 && func_ov011_02167f6c()->unk_5a4 == 0 && func_ov011_02167f6c()->state == 1 &&
-        func_ov011_02167f6c()->pending.profileId == 0 && func_ov011_02168024() > 2) {
+    if (func_ov011_021685ec() == 0 && func_ov011_02167f6c()->memberConnecting == 0 &&
+        func_ov011_02167f6c()->state == 1 && func_ov011_02167f6c()->pending.profileId == 0 &&
+        func_ov011_02168024() > 2) {
         for (i = 1; i < func_ov011_02168024(); i++) {
             DWCNodeInfo *node = func_ov011_02168250(i);
 
             if (func_ov011_02168224() != node && func_ov011_021604b0(node->aid) == NULL) {
-                if (node->unk_1c == 0) {
-                    node->unk_1c = func_ov011_021683b8();
+                if (node->nextConnectTick == 0) {
+                    node->nextConnectTick = func_ov011_021683b8();
                 }
-                if (node->unk_1c < OS_GetTick() && node->unk_18 <= sMatchChance[1]) {
-                    node->unk_1c = func_ov011_021683b8();
+                if (node->nextConnectTick < OS_GetTick() && node->connectFailureCount <= sMatchChance[1]) {
+                    node->nextConnectTick = func_ov011_021683b8();
                     func_ov011_02167f6c()->self = *node;
-                    func_ov011_02167f6c()->unk_5a4 = 1;
+                    func_ov011_02167f6c()->memberConnecting = 1;
                     if (func_ov011_02164b78(func_ov011_02164b98(node->profileId, 0)) != 0) {
-                        func_ov011_02167f6c()->unk_5a4 = 0;
+                        func_ov011_02167f6c()->memberConnecting = 0;
                         func_ov011_02168374();
                     } else {
                         func_ov011_021685fc();
@@ -2053,33 +2057,34 @@ static void func_ov011_021617b4(int a0) {
         }
     }
     if (func_ov011_02167f6c()->sb != NULL) {
-        sMatchState.unk_14 = 0;
-        sMatchState.unk_10 = 0;
-        sMatchState.unk_00 = 1;
+        sMatchState.sbCallbackLevel = 0;
+        sMatchState.needSbFree = 0;
+        sMatchState.inNNThink = 1;
         ServerBrowserThink(func_ov011_02167f6c()->sb);
-        if (sMatchState.unk_10 != 0) {
+        if (sMatchState.needSbFree != 0) {
             ServerBrowserFree(func_ov011_02167f6c()->sb);
             func_ov011_02167f6c()->sb = NULL;
         }
         if (func_ov011_02167f6c()->sb != NULL && ServerBrowserState(func_ov011_02167f6c()->sb) != 0 &&
-            func_ov011_02167f6c()->unk_5f0 != 0 && OS_GetTick() > func_ov011_02167f6c()->unk_5f0) {
+            func_ov011_02167f6c()->sbUpdateRequestTick != 0 &&
+            OS_GetTick() > func_ov011_02167f6c()->sbUpdateRequestTick) {
             func_ov011_02162880(6, -83986);
         }
     }
-    sMatchState.unk_08 = 0;
-    sMatchState.unk_00 = 1;
+    sMatchState.nnFreeNegotiateList = 0;
+    sMatchState.inNNThink = 1;
     func_ov011_02161788(func_ov011_02167f6c()->qr2);
     NNThink();
-    sMatchState.unk_00 = 0;
-    if (sMatchState.unk_08 == 1) {
-        sMatchState.unk_08 = 0;
+    sMatchState.inNNThink = 0;
+    if (sMatchState.nnFreeNegotiateList == 1) {
+        sMatchState.nnFreeNegotiateList = 0;
         NNFreeNegotiateList();
     }
     if (func_ov011_02167f6c()->fm != NULL) {
         func_ov011_0217d168(func_ov011_02167f6c()->fm->socket);
     }
     if (func_ov011_02167f6c()->state == 0x15 &&
-        OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_668) > 3000) {
+        OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->closedTime) > 3000) {
         if (func_ov011_02165b54() != 0) {
             return;
         }
@@ -2097,13 +2102,13 @@ static void func_ov011_021617b4(int a0) {
 static inline void MatchPeer_Read(DWCNodeInfo *peer, const MatchPeerWire *wire) {
     MI_CpuFill8(peer, 0, sizeof(DWCNodeInfo));
     peer->aid = wire->packed;
-    peer->unk_17 = wire->packed >> 16;
+    peer->hasPrivateAddress = wire->packed >> 16;
     peer->profileId = wire->id;
     peer->publicIp = wire->ip;
     peer->localIp = wire->localIp;
     peer->publicPort = wire->ports >> 16;
     peer->localPort = wire->ports;
-    memcpy(&peer->unk_24, wire->unk_14, sizeof(u32));
+    memcpy(&peer->userData, wire->userData, sizeof(u32));
 }
 
 static BOOL func_ov011_021623a0(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length) {
@@ -2144,7 +2149,7 @@ static void func_ov011_02162440(GTI2Socket *socket, GTI2Connection *connection, 
     if (func_ov011_02167f6c() != NULL && func_ov011_02167f6c()->state == 5) {
         return;
     }
-    if (func_ov011_02167f6c() == NULL || func_ov011_02167f6c()->state != 6 || func_ov011_02167f6c()->unk_62a != 0) {
+    if (func_ov011_02167f6c() == NULL || func_ov011_02167f6c()->state != 6 || func_ov011_02167f6c()->cancelState != 0) {
         func_ov011_0217d198(connection, "Init state", -1);
         return;
     }
@@ -2171,18 +2176,18 @@ static void func_ov011_02162440(GTI2Socket *socket, GTI2Connection *connection, 
             return;
         }
     }
-    func_ov011_02167f6c()->unk_608 = 0;
+    func_ov011_02167f6c()->nnFinishTime = 0;
     if (!func_ov011_0217d190(connection, func_ov011_02167f6c()->callbacks)) {
         func_ov011_02162880(6, -80410);
         return;
     }
     func_ov011_02162864();
-    if (func_ov011_02167f6c()->unk_5a4 == 0 && func_ov011_02168024() == 1) {
+    if (func_ov011_02167f6c()->memberConnecting == 0 && func_ov011_02168024() == 1) {
         half = latency >> 1;
         if (half >= 0xffff) {
             half = 0xffff;
         }
-        func_ov011_02167f6c()->unk_630 = half;
+        func_ov011_02167f6c()->baseLatency = half;
     }
     slotConn = func_ov011_02160540(slot);
     info = func_ov011_0216057c(slot);
@@ -2210,7 +2215,7 @@ static void func_ov011_02162640(GTI2Connection *connection, int result, const vo
 
     if (!(((func_ov011_02167f6c() != NULL &&
             (func_ov011_02167f6c()->state == 6 || func_ov011_02167f6c()->state == 0xf)) ||
-           func_ov011_02167f6c()->unk_5a8 == 0xf))) {
+           func_ov011_02167f6c()->abortedMemberState == 0xf))) {
         return;
     }
     if (result != 0) {
@@ -2218,7 +2223,7 @@ static void func_ov011_02162640(GTI2Connection *connection, int result, const vo
             func_ov011_02167f78(1);
             return;
         }
-        if (func_ov011_02167f6c()->unk_5a8 == 0xf) {
+        if (func_ov011_02167f6c()->abortedMemberState == 0xf) {
             func_ov011_021685fc();
             return;
         }
@@ -2256,16 +2261,16 @@ static void func_ov011_02162640(GTI2Connection *connection, int result, const vo
     info = func_ov011_0216057c(slot);
     *slotConn = connection;
     info->index = slot;
-    if (func_ov011_02167f6c()->unk_5a8 != 0xf) {
+    if (func_ov011_02167f6c()->abortedMemberState != 0xf) {
         info->aid = func_ov011_02167f6c()->self.aid;
         info->profileId = func_ov011_02167f6c()->self.profileId;
     } else {
-        info->aid = func_ov011_02167f6c()->unk_5ac.aid;
-        info->profileId = func_ov011_02167f6c()->unk_5ac.profileId;
+        info->aid = func_ov011_02167f6c()->abortedMember.aid;
+        info->profileId = func_ov011_02167f6c()->abortedMember.profileId;
     }
     DWCi_ResetLastSomeDataRecvTimeByAid(info->aid);
     gt2SetConnectionData(connection, info);
-    if (func_ov011_02167f6c()->state == 0xf || func_ov011_02167f6c()->unk_5a8 == 0xf) {
+    if (func_ov011_02167f6c()->state == 0xf || func_ov011_02167f6c()->abortedMemberState == 0xf) {
         func_ov011_02165280(0);
     } else {
         func_ov011_02165280(1);
@@ -2291,8 +2296,8 @@ static void func_ov011_02162804(void *unused, int id, const u8 *str) {
 }
 
 static void func_ov011_02162864(void) {
-    func_ov011_02167f6c()->unk_6d8 = 0xff;
-    func_ov011_02167f6c()->unk_6d9 = 0;
+    func_ov011_02167f6c()->cmdCommand = 0xff;
+    func_ov011_02167f6c()->cmdCount = 0;
 }
 
 static void func_ov011_02162880(int type, int code) {
@@ -2305,12 +2310,12 @@ static void func_ov011_02162880(int type, int code) {
         DWCi_SetError(type, code);
         flag = 1;
         func_ov011_02162d80(1);
-        if (func_ov011_02167f6c()->unk_680 != 0) {
+        if (func_ov011_02167f6c()->cbEventPid != 0) {
             flag = 0;
         }
         work = func_ov011_02167f6c();
         isHost = func_ov011_02167f6c()->mode == 2;
-        work->notifyFunc(type, 0, flag, isHost, DWCi_GetFriendListIndex(func_ov011_02167f6c()->unk_680),
+        work->notifyFunc(type, 0, flag, isHost, DWCi_GetFriendListIndex(func_ov011_02167f6c()->cbEventPid),
                          func_ov011_02167f6c()->notifyParam);
         func_ov011_021631a8();
     }
@@ -2318,7 +2323,7 @@ static void func_ov011_02162880(int type, int code) {
 
 static void func_ov011_02162908(void) {
     if (func_ov011_021603a4() == 3) {
-        func_ov011_02167f6c()->unk_17 = 0;
+        func_ov011_02167f6c()->numEntry = 0;
         func_ov011_02167f6c()->groupId = 0;
         qr2_send_statechanged(func_ov011_02167f6c()->qr2);
     }
@@ -2344,10 +2349,10 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
     case 2:
         if (func_ov011_02167f6c()->state == 1) {
             if (msg[0] == 1) {
-                func_ov011_02167f6c()->unk_680 = 0;
+                func_ov011_02167f6c()->cbEventPid = 0;
                 func_ov011_02167f6c()->pending.profileId = 0;
                 value = msg[1];
-                func_ov011_02167f6c()->unk_7c8 = value;
+                func_ov011_02167f6c()->synId = value;
                 if (func_ov011_021686a0()) {
                     func_ov011_02168030(&func_ov011_02167f6c()->self);
                 }
@@ -2357,8 +2362,8 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
                 MatchPeer_Read(&client, (const MatchPeerWire *)&msg[1]);
                 func_ov011_02167f6c()->pending = client;
                 value = msg[7];
-                func_ov011_02167f6c()->unk_7c8 = value;
-                func_ov011_02167f6c()->unk_680 = client.profileId;
+                func_ov011_02167f6c()->synId = value;
+                func_ov011_02167f6c()->cbEventPid = client.profileId;
             }
             if (func_ov011_02168024() == 1) {
                 duration = 90000;
@@ -2366,7 +2371,7 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
                 duration = func_ov011_02168024() * 12000;
             }
             func_ov011_02167f6c()->unk_670 = duration;
-            func_ov011_02167f6c()->unk_62e = 0;
+            func_ov011_02167f6c()->clWaitTimeoutCount = 0;
             func_ov011_02167f78(8);
             func_ov011_02165d2c(conn, 3);
         }
@@ -2374,17 +2379,17 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
     case 3:
         if (func_ov011_02167f6c()->state == 0x13) {
             value = ((const u8 *)msg)[0] | (((const u8 *)msg)[1] << 8);
-            func_ov011_02167f6c()->unk_650 |= 1 << conn;
-            if (value > func_ov011_02167f6c()->unk_630) {
-                func_ov011_02167f6c()->unk_630 = value;
+            func_ov011_02167f6c()->synAckBit |= 1 << conn;
+            if (value > func_ov011_02167f6c()->baseLatency) {
+                func_ov011_02167f6c()->baseLatency = value;
             }
-            if (func_ov011_02166604(0) == func_ov011_02167f6c()->unk_650) {
+            if (func_ov011_02166604(0) == func_ov011_02167f6c()->synAckBit) {
                 nextId = DWCi_GetMathRand32(0xfffffffe);
-                func_ov011_02167f6c()->unk_7c8 = nextId + 1;
+                func_ov011_02167f6c()->synId = nextId + 1;
                 func_ov011_021660f8();
-                func_ov011_02167f6c()->unk_62c = 0;
+                func_ov011_02167f6c()->synResendCount = 0;
                 now = OS_GetTick();
-                func_ov011_02167f6c()->unk_658 = now;
+                func_ov011_02167f6c()->lastSynSent = now;
             }
         } else {
             func_ov011_02165d2c(conn, 4);
@@ -2401,12 +2406,12 @@ static void func_ov011_02162958(int conn, int kind, const u32 *msg) {
                     func_ov011_02168030(&peer);
                 }
                 value = msg[1 + count * 6];
-                func_ov011_02167f6c()->unk_7c8 = value;
+                func_ov011_02167f6c()->synId = value;
                 func_ov011_02168030(&func_ov011_02167f6c()->self);
                 func_ov011_02168374();
             } else {
                 value = msg[1];
-                func_ov011_02167f6c()->unk_7c8 = value;
+                func_ov011_02167f6c()->synId = value;
             }
             func_ov011_02165280(3);
         }
@@ -2438,7 +2443,7 @@ static void func_ov011_02162c30(const u32 *msg) {
     u32 id = msg[2];
     DWCNodeInfo *peer;
 
-    if (func_ov011_02160408() == 0 && id == func_ov011_02167f6c()->unk_7c8) {
+    if (func_ov011_02160408() == 0 && id == func_ov011_02167f6c()->synId) {
         peer = func_ov011_02168238();
         if (peer != NULL && peer->profileId == first) {
             func_ov011_02162c00(mask);
@@ -2459,7 +2464,7 @@ static BOOL func_ov011_02162c68(int type, u32 code, s32 profileId) {
         func_ov011_02162880(type, code - 80000);
         return TRUE;
     }
-    if (func_ov011_02167f6c()->unk_62a == 1 || func_ov011_02167f6c()->unk_629 == 1) {
+    if (func_ov011_02167f6c()->cancelState == 1 || func_ov011_02167f6c()->closeState == 1) {
         return TRUE;
     }
     if (func_ov011_02167f6c()->target.cookie != 0) {
@@ -2467,8 +2472,8 @@ static BOOL func_ov011_02162c68(int type, u32 code, s32 profileId) {
         func_ov011_02167f6c()->target.cookie = 0;
     }
     if (func_ov011_02168024() > 1) {
-        if (func_ov011_02167f6c()->unk_629 == 0) {
-            func_ov011_02167f6c()->unk_629 = 2;
+        if (func_ov011_02167f6c()->closeState == 0) {
+            func_ov011_02167f6c()->closeState = 2;
             gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
         }
     } else if (func_ov011_02167f6c()->matchType == 3) {
@@ -2476,7 +2481,7 @@ static BOOL func_ov011_02162c68(int type, u32 code, s32 profileId) {
     } else if (func_ov011_02167f6c()->state == 1) {
         func_ov011_02167f78(0x15);
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_668 = now;
+        func_ov011_02167f6c()->closedTime = now;
     } else {
         func_ov011_021659ac(1);
     }
@@ -2484,7 +2489,7 @@ static BOOL func_ov011_02162c68(int type, u32 code, s32 profileId) {
 }
 
 static void func_ov011_02162d64(u32 id) {
-    if (func_ov011_02167f6c()->unk_629 != 1) {
+    if (func_ov011_02167f6c()->closeState != 1) {
         func_ov011_02165164(id);
     }
 }
@@ -2494,7 +2499,7 @@ int func_ov011_02162d80(int status) {
     char text[0x27];
     int players;
 
-    OS_SNPrintf(number, 12, "%u", func_ov011_02167f6c()->unk_17 + 1);
+    OS_SNPrintf(number, 12, "%u", func_ov011_02167f6c()->numEntry + 1);
     DWC_SetCommonKeyValueString("SCM", number, text, '/');
     players = func_ov011_02168024();
     if (func_ov011_02167f6c()->matchType == 2 && players == 0) {
@@ -2529,24 +2534,24 @@ static void func_ov011_02162e80(int mode) {
     MatchControl *work;
 
     func_ov011_02167f6c()->retries = 0;
-    func_ov011_02167f6c()->unk_5f8 = 0;
+    func_ov011_02167f6c()->nnRecvCount = 0;
     work = func_ov011_02167f6c();
-    work->unk_5fa = DWCi_GetMathRand32(0x10000);
-    func_ov011_02167f6c()->unk_5fc = 0;
-    func_ov011_02167f6c()->unk_600 = 0;
-    func_ov011_02167f6c()->unk_608 = 0;
-    func_ov011_02167f6c()->unk_620 = 0;
-    func_ov011_02167f6c()->unk_62a = 0;
-    func_ov011_02167f6c()->unk_62b = 0;
-    func_ov011_02167f6c()->unk_62c = 0;
-    func_ov011_02167f6c()->unk_62d = 0;
+    work->nnCookieRand = DWCi_GetMathRand32(0x10000);
+    func_ov011_02167f6c()->nnLastCookie = 0;
+    func_ov011_02167f6c()->nnFailedTime = 0;
+    func_ov011_02167f6c()->nnFinishTime = 0;
+    func_ov011_02167f6c()->clLinkProgress = 0;
+    func_ov011_02167f6c()->cancelState = 0;
+    func_ov011_02167f6c()->scResvRetryCount = 0;
+    func_ov011_02167f6c()->synResendCount = 0;
+    func_ov011_02167f6c()->cancelSynResendCount = 0;
     func_ov011_02167f6c()->unk_628 = 0;
-    func_ov011_02167f6c()->unk_629 = 0;
-    func_ov011_02167f6c()->unk_632 = 0;
-    func_ov011_02167f6c()->unk_658 = 0;
-    func_ov011_02167f6c()->unk_668 = 0;
-    MIi_CpuClear32(0, &func_ov011_02167f6c()->unk_6d8, 0x98);
-    func_ov011_02167f6c()->unk_5a4 = 0;
+    func_ov011_02167f6c()->closeState = 0;
+    func_ov011_02167f6c()->cancelBaseLatency = 0;
+    func_ov011_02167f6c()->lastSynSent = 0;
+    func_ov011_02167f6c()->closedTime = 0;
+    MIi_CpuClear32(0, &func_ov011_02167f6c()->cmdCommand, 0x98);
+    func_ov011_02167f6c()->memberConnecting = 0;
     func_ov011_021685fc();
     if (mode == 2) {
         if (func_ov011_02167fc4() == 2) {
@@ -2556,27 +2561,27 @@ static void func_ov011_02162e80(int mode) {
         }
         return;
     }
-    func_ov011_02167f6c()->unk_18 = 0;
-    func_ov011_02167f6c()->unk_5dc = 0;
-    func_ov011_02167f6c()->unk_5e4 = 0;
-    func_ov011_02167f6c()->unk_630 = 0;
-    func_ov011_02167f6c()->unk_621 = 0;
-    func_ov011_02167f6c()->unk_638 = 0;
-    func_ov011_02167f6c()->unk_63c = 0;
-    func_ov011_02167f6c()->unk_644 = 0;
-    func_ov011_02167f6c()->unk_648 = 0;
-    func_ov011_02167f6c()->unk_650 = 0;
-    func_ov011_02167f6c()->unk_67c = 0;
+    func_ov011_02167f6c()->qr2IsReserved = 0;
+    func_ov011_02167f6c()->qr2Reservation = 0;
+    func_ov011_02167f6c()->sbUpdateFlag = 0;
+    func_ov011_02167f6c()->baseLatency = 0;
+    func_ov011_02167f6c()->friendIndex = 0;
+    func_ov011_02167f6c()->cmdResendFlag = 0;
+    func_ov011_02167f6c()->cmdResendTick = 0;
+    func_ov011_02167f6c()->cmdTimeoutTime = 0;
+    func_ov011_02167f6c()->cmdTimeoutStartTick = 0;
+    func_ov011_02167f6c()->synAckBit = 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
     MIi_CpuClear32(0, &func_ov011_02167f6c()->target, 0xc);
-    func_ov011_02167f6c()->unk_788 = 0;
-    func_ov011_02167f6c()->unk_78c = 0;
-    func_ov011_02167f6c()->unk_794 = 0;
-    func_ov011_02167f6c()->unk_7a8 = 1;
-    func_ov011_02167f6c()->unk_7ac = 0;
+    func_ov011_02167f6c()->newHostAckBit = 0;
+    func_ov011_02167f6c()->connectedAidBit = 0;
+    func_ov011_02167f6c()->groupSearchCount = 0;
+    func_ov011_02167f6c()->sbSearchHostsOnly = 1;
+    func_ov011_02167f6c()->sbSearchCount = 0;
     func_ov011_02167f6c()->hostState = 0;
-    func_ov011_02167f6c()->unk_0d = 0;
+    func_ov011_02167f6c()->matched = 0;
     func_ov011_02167f6c()->checkFunc = 0;
-    func_ov011_02167f6c()->unk_7c0 = 0;
+    func_ov011_02167f6c()->checkParam = 0;
     func_ov011_0216800c();
     func_ov011_02168374();
     func_ov011_02167f6c()->pending.profileId = 0;
@@ -2587,10 +2592,10 @@ static void func_ov011_02162e80(int mode) {
         return;
     }
     func_ov011_02167f6c()->mode = 0;
-    func_ov011_02167f6c()->unk_17 = 0;
-    func_ov011_02167f6c()->unk_4c = 0;
-    func_ov011_02167f6c()->unk_680 = 0;
-    func_ov011_02167f6c()->unk_62e = 0;
+    func_ov011_02167f6c()->numEntry = 0;
+    func_ov011_02167f6c()->qr2ShutdownFlag = 0;
+    func_ov011_02167f6c()->cbEventPid = 0;
+    func_ov011_02167f6c()->clWaitTimeoutCount = 0;
     func_ov011_02167f6c()->unk_670 = 0;
     func_ov011_02167f6c()->newClientCallback = 0;
     func_ov011_02167f6c()->newClientParam = 0;
@@ -2600,33 +2605,33 @@ static void func_ov011_02162e80(int mode) {
 static void func_ov011_021630f8(u8 mode, u8 unk17, DWCMatchedFunc callback, void *param) {
     func_ov011_02162e80(0);
     func_ov011_02167f6c()->mode = mode;
-    func_ov011_02167f6c()->unk_17 = unk17;
+    func_ov011_02167f6c()->numEntry = unk17;
     func_ov011_02167f6c()->notifyFunc = callback;
     func_ov011_02167f6c()->notifyParam = param;
-    func_ov011_02167f6c()->unk_5f9 = 0;
-    func_ov011_02167f6c()->unk_2c = 0xff;
+    func_ov011_02167f6c()->nnFailureCount = 0;
+    func_ov011_02167f6c()->suspendRequest = 0xff;
     func_ov011_02167f6c()->unk_30 = 0;
     func_ov011_02167f6c()->hostState = 0;
-    func_ov011_02167f6c()->unk_7a8 = 1;
-    func_ov011_02167f6c()->unk_7ac = 0;
-    func_ov011_02167f6c()->unk_17 = unk17;
-    func_ov011_02167f6c()->unk_1c = 0;
+    func_ov011_02167f6c()->sbSearchHostsOnly = 1;
+    func_ov011_02167f6c()->sbSearchCount = 0;
+    func_ov011_02167f6c()->numEntry = unk17;
+    func_ov011_02167f6c()->suspendAidBitmap = 0;
     func_ov011_02167f6c()->suspend = 0;
-    func_ov011_02167f6c()->unk_20 = 0;
-    func_ov011_02167f6c()->unk_48 = 0;
-    func_ov011_02167f6c()->unk_7c4 = 1;
-    func_ov011_02167f6c()->unk_7cc = 0;
-    func_ov011_02167f6c()->unk_634 = 0;
+    func_ov011_02167f6c()->suspendSendTick = 0;
+    func_ov011_02167f6c()->suspendPending = 0;
+    func_ov011_02167f6c()->unlocked = 1;
+    func_ov011_02167f6c()->suspendWaitTime = 0;
+    func_ov011_02167f6c()->resvToken = 0;
 }
 
 static void func_ov011_021631a8(void) {
     if (func_ov011_02167f6c() != NULL) {
         if (func_ov011_02167f6c()->sb != 0) {
-            if (sMatchState.unk_14 == 0) {
+            if (sMatchState.sbCallbackLevel == 0) {
                 ServerBrowserFree(func_ov011_02167f6c()->sb);
                 func_ov011_02167f6c()->sb = 0;
             } else {
-                sMatchState.unk_10 = 1;
+                sMatchState.needSbFree = 1;
             }
         }
         func_ov011_021687ec();
@@ -2636,10 +2641,10 @@ static void func_ov011_021631a8(void) {
             sMatchState.query = NULL;
         }
         func_ov011_021664f0();
-        func_ov011_02167f6c()->unk_4c = 1;
+        func_ov011_02167f6c()->qr2ShutdownFlag = 1;
         func_ov011_0216800c();
         func_ov011_02168374();
-        func_ov011_02167f6c()->unk_7c4 = 1;
+        func_ov011_02167f6c()->unlocked = 1;
         func_ov011_02162d80(1);
     }
 }
@@ -2676,27 +2681,27 @@ static int func_ov011_0216322c(u32 pid) {
     switch (func_ov011_02167f6c()->state) {
     case 2:
         if (sMatchChance[0] == -2) {
-            roll = func_ov011_02167f6c()->unk_7a8 == 1 ? 2 : 3;
-            func_ov011_02167f6c()->unk_7a8 = 0;
+            roll = func_ov011_02167f6c()->sbSearchHostsOnly == 1 ? 2 : 3;
+            func_ov011_02167f6c()->sbSearchHostsOnly = 0;
         } else if (sMatchChance[0] == -1) {
-            roll = func_ov011_02167f6c()->unk_7a8 != 0 ? 2 : 0;
-            func_ov011_02167f6c()->unk_7a8 ^= 1;
+            roll = func_ov011_02167f6c()->sbSearchHostsOnly != 0 ? 2 : 0;
+            func_ov011_02167f6c()->sbSearchHostsOnly ^= 1;
         } else {
             roll = DWCi_GetMathRand32(100) < sMatchChance[0] ? 2 : 0;
         }
-        len = func_ov011_021634a0(text, func_ov011_02167f6c()->profileId, func_ov011_02167f6c()->unk_17,
+        len = func_ov011_021634a0(text, func_ov011_02167f6c()->profileId, func_ov011_02167f6c()->numEntry,
                                   func_ov011_02167f6c()->matchType, roll);
         if (sMatchState.query != NULL) {
             OS_SNPrintf(text + len, 0x1ff - len, " and (%s)", sMatchState.query);
             text[0x1fe] = 0;
         }
-        func_ov011_02167f6c()->unk_7ac++;
+        func_ov011_02167f6c()->sbSearchCount++;
         break;
     case 3:
     case 4:
     case 0x16:
         OS_SNPrintf(text, 0x1ff, "%s = %u", "dwc_pid", pid);
-        func_ov011_02167f6c()->unk_67c = pid;
+        func_ov011_02167f6c()->reqProfileId = pid;
         break;
     case 9:
     case 10:
@@ -2719,7 +2724,7 @@ static int func_ov011_0216322c(u32 pid) {
     }
     if (result == 0) {
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_5f0 = now + OS_MilliSecondsToTicks(30000);
+        func_ov011_02167f6c()->sbUpdateRequestTick = now + OS_MilliSecondsToTicks(30000);
     }
     return result;
 }
@@ -2763,8 +2768,8 @@ static int func_ov011_021635a0(int reset, u32 token, DWCNodeInfo *peer) {
 
     NNCancel(func_ov011_02167f6c()->target.cookie);
     if (reset == 0) {
-        token = (func_ov011_02167f6c()->unk_5fa << 16) | (u16)func_ov011_02167f6c()->profileId;
-        if (peer->unk_17 != 0) {
+        token = (func_ov011_02167f6c()->nnCookieRand << 16) | (u16)func_ov011_02167f6c()->profileId;
+        if (peer->hasPrivateAddress != 0) {
             if (peer->publicIp != ServerBrowserGetMyPublicIPAddr(func_ov011_02167f6c()->sb)) {
                 mismatch = 1;
             } else {
@@ -2780,26 +2785,26 @@ static int func_ov011_021635a0(int reset, u32 token, DWCNodeInfo *peer) {
             mismatch = 0;
         }
         if (mismatch) {
-            func_ov011_02167f6c()->unk_5fa = DWCi_GetMathRand32(0x10000);
+            func_ov011_02167f6c()->nnCookieRand = DWCi_GetMathRand32(0x10000);
             func_ov011_02167f6c()->target.cookie = token;
         } else {
             hostInfo[0] = SOC_GetHostID();
             hostInfo[1] = func_ov011_0217d38c(func_ov011_02167f6c()->fm->socket);
             int sent = func_ov011_021637d8(6, peer->profileId, peer->publicIp, peer->publicPort, hostInfo, 2);
-            func_ov011_02167f6c()->unk_6d9 = 0;
+            func_ov011_02167f6c()->cmdCount = 0;
             if (sent != 0) {
                 return 2;
             }
             func_ov011_02167f6c()->target.cookie = 0;
         }
         func_ov011_02167f6c()->target.kind = 0;
-        func_ov011_02167f6c()->target.unk_01 = 0;
+        func_ov011_02167f6c()->target.retryCount = 0;
         func_ov011_02167f6c()->target.port = peer->publicPort;
         func_ov011_02167f6c()->target.ip = peer->publicIp;
     } else {
         mismatch = 1;
         func_ov011_02167f6c()->target.kind = 1;
-        func_ov011_02167f6c()->target.unk_01 = 0;
+        func_ov011_02167f6c()->target.retryCount = 0;
         func_ov011_02167f6c()->target.port = 0;
         func_ov011_02167f6c()->target.ip = 0;
         func_ov011_02167f6c()->target.cookie = token;
@@ -2810,7 +2815,7 @@ static int func_ov011_021635a0(int reset, u32 token, DWCNodeInfo *peer) {
         u32 sock = gt2GetSocketSOCKET(func_ov011_02167f6c()->fm->socket);
 
         func_ov011_02167428(0, sock, 0, &func_ov011_02167f6c()->target);
-        func_ov011_02167f6c()->unk_608 = 0;
+        func_ov011_02167f6c()->nnFinishTime = 0;
     }
     return result;
 }
@@ -2877,15 +2882,15 @@ static int func_ov011_021637d8(int type, int id, u32 ip, u16 port, const u32 *da
         result = func_ov011_02163974(type, ip, port, data, count);
     }
     if (type == 2 || type == 6 || (u8)(type - 8) <= 1) {
-        func_ov011_02167f6c()->unk_6d8 = type;
-        func_ov011_02167f6c()->unk_6da = port;
-        func_ov011_02167f6c()->unk_6dc = ip;
-        func_ov011_02167f6c()->unk_760 = id;
-        func_ov011_02167f6c()->unk_764 = count;
+        func_ov011_02167f6c()->cmdCommand = type;
+        func_ov011_02167f6c()->cmdPort = port;
+        func_ov011_02167f6c()->cmdIp = ip;
+        func_ov011_02167f6c()->cmdProfileId = id;
+        func_ov011_02167f6c()->cmdLen = count;
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_768 = now;
+        func_ov011_02167f6c()->cmdSendTime = now;
         if (data != NULL && count != 0) {
-            MIi_CpuCopy32(data, func_ov011_02167f6c()->unk_6e0, count * 4);
+            MIi_CpuCopy32(data, func_ov011_02167f6c()->cmdData, count * 4);
         }
     }
     return result;
@@ -2901,8 +2906,8 @@ static void func_ov011_0216390c(MatchPacket *packet, int type, const u32 *data, 
     packet->header.version = 0x5a;
     packet->header.command = type;
     packet->header.size = count * 4;
-    packet->header.port = func_ov011_02167f6c()->unk_5d4;
-    packet->header.ip = func_ov011_02167f6c()->unk_5d8;
+    packet->header.port = func_ov011_02167f6c()->qr2Port;
+    packet->header.ip = func_ov011_02167f6c()->qr2Ip;
     packet->header.profileId = func_ov011_02167f6c()->profileId;
 }
 
@@ -2998,49 +3003,49 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         peer->publicPort = data[2];
         peer->localIp = data[3];
         peer->localPort = data[4];
-        peer->unk_17 = data[5];
+        peer->hasPrivateAddress = data[5];
         requestSkip = data[6];
         requestCookie = data[7];
-        memcpy(&peer->unk_24, &data[8], sizeof(u32));
+        memcpy(&peer->userData, &data[8], sizeof(u32));
         requestExtra = data[9];
         if (count >= 11 && data[10] == 1) {
             blocked = 1;
         }
         result = func_ov011_0216475c(peer->profileId, peer->publicIp, peer->publicPort, requestType, requestSkip != 0,
-                                     requestCookie, &peer->unk_24, blocked);
+                                     requestCookie, &peer->userData, blocked);
         if (result == 2) {
             func_ov011_02168374();
             func_ov011_02167f6c()->self = *peer;
             if (func_ov011_02164b78(func_ov011_02164aa0(profileId, ip, port)) != 0) {
                 return 0;
             }
-            if (func_ov011_02167f6c()->unk_5a4 != 0) {
+            if (func_ov011_02167f6c()->memberConnecting != 0) {
                 func_ov011_02167f6c()->self.aid = func_ov011_02168270(func_ov011_02167f6c()->self.profileId)->aid;
             }
-            if (func_ov011_02167f6c()->unk_5a4 == 0 && func_ov011_02167f6c()->mode == 2 &&
+            if (func_ov011_02167f6c()->memberConnecting == 0 && func_ov011_02167f6c()->mode == 2 &&
                 func_ov011_02167f6c()->state != 0xe &&
                 ((func_ov011_02167f6c()->matchType != 0 && func_ov011_02167f6c()->matchType != 1) ||
-                 func_ov011_02167f6c()->unk_0d != 0) &&
+                 func_ov011_02167f6c()->matched != 0) &&
                 func_ov011_02167f6c()->newClientCallback != NULL) {
                 func_ov011_02167f6c()->newClientCallback(DWCi_GetFriendListIndex(profileId),
                                                          func_ov011_02167f6c()->newClientParam);
             }
             host = func_ov011_02168224();
             n = 0;
-            reply[n++] = func_ov011_02167f6c()->unk_17;
+            reply[n++] = func_ov011_02167f6c()->numEntry;
             reply[n++] = host->aid;
             reply[n++] = host->profileId;
             reply[n++] = host->publicIp;
             reply[n++] = host->publicPort;
             reply[n++] = host->localIp;
             reply[n++] = host->localPort;
-            reply[n++] = host->unk_17;
-            reply[n++] = host->unk_24;
+            reply[n++] = host->hasPrivateAddress;
+            reply[n++] = host->userData;
             reply[n++] = func_ov011_02167f6c()->groupId;
             reply[n++] = func_ov011_02167f6c()->self.aid;
             reply[n++] = requestExtra;
             reply[n++] = func_ov011_02168024();
-            reply[n++] = func_ov011_02167f6c()->unk_5a4 != 0 ? 1 : 0;
+            reply[n++] = func_ov011_02167f6c()->memberConnecting != 0 ? 1 : 0;
             func_ov011_02167f6c();
             func_ov011_02167f78(0xe);
         } else if (result == 3) {
@@ -3058,16 +3063,16 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
     }
     case 2: {
         acceptedExtra = data[0];
-        if (func_ov011_02167f6c()->state != 3 || profileId != func_ov011_02167f6c()->unk_67c || profileId != data[2] ||
-            func_ov011_02167f6c()->unk_634 != data[11]) {
+        if (func_ov011_02167f6c()->state != 3 || profileId != func_ov011_02167f6c()->reqProfileId ||
+            profileId != data[2] || func_ov011_02167f6c()->resvToken != data[11]) {
             break;
         }
-        if (count >= 14 && (data[13] == 1) != func_ov011_02167f6c()->unk_5a4) {
+        if (count >= 14 && (data[13] == 1) != func_ov011_02167f6c()->memberConnecting) {
             break;
         }
         func_ov011_02167f6c()->unk_628 = 0;
-        func_ov011_02167f6c()->unk_644 = 0;
-        func_ov011_02167f6c()->unk_638 = 0;
+        func_ov011_02167f6c()->cmdTimeoutTime = 0;
+        func_ov011_02167f6c()->cmdResendFlag = 0;
         i = 1;
         MI_CpuFill8(&accepted, 0, sizeof(DWCNodeInfo));
         accepted.aid = data[i++];
@@ -3076,19 +3081,19 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         accepted.publicPort = data[i++];
         accepted.localIp = data[i++];
         accepted.localPort = data[i++];
-        accepted.unk_17 = data[i++];
-        memcpy(&accepted.unk_24, &data[i++], sizeof(u32));
+        accepted.hasPrivateAddress = data[i++];
+        memcpy(&accepted.userData, &data[i++], sizeof(u32));
         acceptedUnk24 = data[i++];
-        if (func_ov011_02167f6c()->unk_5a4 == 0) {
+        if (func_ov011_02167f6c()->memberConnecting == 0) {
             func_ov011_02168224()->aid = data[i++];
         }
         func_ov011_02167f6c()->self = accepted;
         if (func_ov011_02167f6c()->mode == 3) {
             func_ov011_02167f6c()->groupId = acceptedUnk24;
-            func_ov011_02167f6c()->unk_17 = acceptedExtra;
+            func_ov011_02167f6c()->numEntry = acceptedExtra;
         }
         if (func_ov011_02167f6c()->matchType == 1 && func_ov011_02167f6c()->evalCallback != NULL &&
-            func_ov011_02167f6c()->unk_5a4 == 0 && func_ov011_02167f6c()->unk_798 == 0) {
+            func_ov011_02167f6c()->memberConnecting == 0 && func_ov011_02167f6c()->unk_798 == 0) {
             func_ov011_02167f78(4);
             if (func_ov011_021666c4(func_ov011_0216322c(profileId)) != 0) {
                 return 0;
@@ -3102,7 +3107,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         break;
     }
     case 3: {
-        if (func_ov011_02167f6c()->state != 3 || profileId != func_ov011_02167f6c()->unk_67c) {
+        if (func_ov011_02167f6c()->state != 3 || profileId != func_ov011_02167f6c()->reqProfileId) {
             break;
         }
         code = data[0];
@@ -3114,7 +3119,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
             func_ov011_02162880(code == 0x10 ? 0xc : 0x15, 0);
             return 0;
         }
-        return func_ov011_02164f54(func_ov011_02167f6c()->unk_67c);
+        return func_ov011_02164f54(func_ov011_02167f6c()->reqProfileId);
     }
     case 4: {
         if (func_ov011_02167f6c()->state != 3) {
@@ -3125,42 +3130,43 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
             break;
         }
         if (func_ov011_02167f6c()->unk_798 != 0) {
-            if (profileId != func_ov011_02167f6c()->unk_67c || gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0) {
+            if (profileId != func_ov011_02167f6c()->reqProfileId ||
+                gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0) {
                 break;
             }
-            func_ov011_02167f6c()->unk_7b6 = 1;
-            func_ov011_02167f6c()->unk_62b = 0;
-            func_ov011_02167f6c()->unk_644 = 12000;
+            func_ov011_02167f6c()->scResvRetryMax = 1;
+            func_ov011_02167f6c()->scResvRetryCount = 0;
+            func_ov011_02167f6c()->cmdTimeoutTime = 12000;
             now = OS_GetTick();
-            func_ov011_02167f6c()->unk_648 = now;
+            func_ov011_02167f6c()->cmdTimeoutStartTick = now;
         } else {
-            if (profileId != func_ov011_02167f6c()->unk_67c) {
+            if (profileId != func_ov011_02167f6c()->reqProfileId) {
                 break;
             }
             now = OS_GetTick();
-            func_ov011_02167f6c()->unk_648 = now;
+            func_ov011_02167f6c()->cmdTimeoutStartTick = now;
             func_ov011_02167f6c()->unk_628 = 0;
             if (func_ov011_02167f6c()->matchType == 0) {
                 func_ov011_02168374();
                 func_ov011_02167f78(2);
-                func_ov011_02167f6c()->unk_5e4 = 1;
+                func_ov011_02167f6c()->sbUpdateFlag = 1;
                 now = OS_GetTick();
-                func_ov011_02167f6c()->unk_5e8 = now;
+                func_ov011_02167f6c()->sbUpdateTick = now;
             } else if (func_ov011_02167f6c()->matchType == 1) {
                 func_ov011_02168374();
                 func_ov011_02164d64(1, profileId, profileId);
             } else if (func_ov011_02167f6c()->matchType == 3) {
-                func_ov011_02167f6c()->unk_7b6 = 1;
-                func_ov011_02167f6c()->unk_62b = 0;
-                func_ov011_02167f6c()->unk_644 = 12000;
+                func_ov011_02167f6c()->scResvRetryMax = 1;
+                func_ov011_02167f6c()->scResvRetryCount = 0;
+                func_ov011_02167f6c()->cmdTimeoutTime = 12000;
                 now = OS_GetTick();
-                func_ov011_02167f6c()->unk_648 = now;
+                func_ov011_02167f6c()->cmdTimeoutStartTick = now;
             }
         }
         break;
     }
     case 5:
-        if (func_ov011_02167f6c()->unk_18 == 0 || profileId != func_ov011_02167f6c()->unk_5dc) {
+        if (func_ov011_02167f6c()->qr2IsReserved == 0 || profileId != func_ov011_02167f6c()->qr2Reservation) {
             break;
         }
         if (func_ov011_02168468() == 1) {
@@ -3182,22 +3188,23 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         if (func_ov011_02168388() == 0) {
             break;
         }
-        if (func_ov011_021686a0() == 0 && func_ov011_02167f6c()->mode == 3 && func_ov011_02167f6c()->unk_5a4 == 0) {
+        if (func_ov011_021686a0() == 0 && func_ov011_02167f6c()->mode == 3 &&
+            func_ov011_02167f6c()->memberConnecting == 0) {
             break;
         }
         if (func_ov011_02167f6c()->state == 1) {
             func_ov011_02167f78(5);
         } else if (!((func_ov011_02167f6c()->state == 5 || func_ov011_02167f6c()->state == 0xe) &&
-                     profileId == func_ov011_02167f6c()->unk_5dc)) {
+                     profileId == func_ov011_02167f6c()->qr2Reservation)) {
             break;
         }
-        func_ov011_02167f6c()->unk_6d8 = 0xff;
+        func_ov011_02167f6c()->cmdCommand = 0xff;
         address.port = MATCH_SWAP16(hostPort);
         address.addr = hostIp;
         func_ov011_02167f6c()->target.kind = 1;
         conn = gt2GetSocketSOCKET(func_ov011_02167f6c()->fm->socket);
         func_ov011_02167428(0, conn, &address, &func_ov011_02167f6c()->target);
-        func_ov011_02167f6c()->unk_608 = 0;
+        func_ov011_02167f6c()->nnFinishTime = 0;
         break;
     }
     case 7: {
@@ -3212,7 +3219,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         if (func_ov011_02167f6c()->pending.profileId != 0) {
             break;
         }
-        func_ov011_02167f6c()->unk_788 = 0;
+        func_ov011_02167f6c()->newHostAckBit = 0;
         if (func_ov011_021686a0() != 0) {
             func_ov011_02167f6c()->self.profileId = id;
             func_ov011_02167f6c()->self.aid = aid;
@@ -3226,11 +3233,11 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         break;
     }
     case 9: {
-        node = func_ov011_02168250(func_ov011_021686b8() - 1 - func_ov011_02167f6c()->unk_620);
+        node = func_ov011_02168250(func_ov011_021686b8() - 1 - func_ov011_02167f6c()->clLinkProgress);
         if (func_ov011_02167f6c()->state != 0x10 || node == NULL || node->profileId != data[0]) {
             break;
         }
-        func_ov011_02167f6c()->unk_620++;
+        func_ov011_02167f6c()->clLinkProgress++;
         func_ov011_02165280(0);
         break;
     }
@@ -3256,11 +3263,11 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         self->publicPort = data[4];
         self->localIp = data[5];
         self->localPort = data[6];
-        self->unk_17 = data[7];
-        memcpy(&self->unk_24, &data[8], sizeof(u32));
+        self->hasPrivateAddress = data[7];
+        memcpy(&self->userData, &data[8], sizeof(u32));
         func_ov011_02167f78(5);
-        func_ov011_02167f6c()->unk_644 = 0;
-        func_ov011_02167f6c()->unk_638 = 0;
+        func_ov011_02167f6c()->cmdTimeoutTime = 0;
+        func_ov011_02167f6c()->cmdResendFlag = 0;
         func_ov011_021635a0(0, 0, self);
         break;
     }
@@ -3290,7 +3297,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         if (func_ov011_02167f6c()->mode != 3) {
             break;
         }
-        func_ov011_02167f6c()->unk_680 = profileId;
+        func_ov011_02167f6c()->cbEventPid = profileId;
         func_ov011_02165bc8();
         func_ov011_021659ac(0);
         break;
@@ -3309,8 +3316,8 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         if (profileId != node->profileId) {
             return 1;
         }
-        saved = func_ov011_02167f6c()->unk_629;
-        func_ov011_02167f6c()->unk_629 = 1;
+        saved = func_ov011_02167f6c()->closeState;
+        func_ov011_02167f6c()->closeState = 1;
         for (k = 0; k < count; k++) {
             node = func_ov011_02168270(data[k]);
             if (node == NULL) {
@@ -3322,7 +3329,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
                 func_ov011_02160710(node->aid);
             }
         }
-        func_ov011_02167f6c()->unk_629 = saved;
+        func_ov011_02167f6c()->closeState = saved;
         break;
     }
     case 0x40:
@@ -3339,7 +3346,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         break;
     case 0x52: {
         inMask = 0;
-        if (func_ov011_02167f6c()->unk_0d == 0) {
+        if (func_ov011_02167f6c()->matched == 0) {
             break;
         }
         if (func_ov011_021677e8() != 0) {
@@ -3353,7 +3360,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
             return 0;
         }
         if (profileId == func_ov011_02168250(0)->profileId) {
-            inMask = (func_ov011_02167f6c()->unk_788 & (1 << index)) != 0;
+            inMask = (func_ov011_02167f6c()->newHostAckBit & (1 << index)) != 0;
         }
         if (func_ov011_02164b78(func_ov011_021637d8(inMask != 0 ? 0x53 : 0x54, profileId, ip, port, NULL, 0)) != 0) {
             return 0;
@@ -3367,7 +3374,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         break;
     }
     case 0x53: {
-        if (func_ov011_02167f6c()->unk_0d == 0) {
+        if (func_ov011_02167f6c()->matched == 0) {
             break;
         }
         if (func_ov011_021677e8() == 0) {
@@ -3377,18 +3384,18 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
         if (index == 0xff) {
             return 0;
         }
-        func_ov011_02167f6c()->unk_788 |= 1 << index;
+        func_ov011_02167f6c()->newHostAckBit |= 1 << index;
         if (func_ov011_02164b78(func_ov011_021637d8(0x53, profileId, ip, port, NULL, 0)) != 0) {
             return 0;
         }
         break;
     }
     case 0x54: {
-        if (func_ov011_02167f6c()->unk_0d == 0) {
+        if (func_ov011_02167f6c()->matched == 0) {
             break;
         }
         members = func_ov011_02168024();
-        if (++func_ov011_02167f6c()->unk_79d > members * 5) {
+        if (++func_ov011_02167f6c()->newHostNakCount > members * 5) {
             func_ov011_02160170();
         } else {
             now = OS_GetTick();
@@ -3425,12 +3432,12 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
                     break;
                 }
                 func_ov011_02167f6c()->unk_30 = 1;
-                func_ov011_02167f6c()->unk_7cc = 8000;
+                func_ov011_02167f6c()->suspendWaitTime = 8000;
                 now = OS_GetTick();
-                func_ov011_02167f6c()->unk_20 = now;
+                func_ov011_02167f6c()->suspendSendTick = now;
             } else {
                 func_ov011_02167f6c()->unk_30 = 1;
-                func_ov011_02167f6c()->unk_1c = data[3];
+                func_ov011_02167f6c()->suspendAidBitmap = data[3];
             }
         }
         break;
@@ -3445,7 +3452,7 @@ static int func_ov011_02163a30(int type, s32 profileId, u32 ip, u32 port, const 
 // Tells the game about the match, passing on the match's player and the game's own parameter
 static inline void MatchNotify(int error, BOOL cancel, BOOL self, BOOL isServer) {
     func_ov011_02167f6c()->notifyFunc(error, cancel, self, isServer,
-                                      DWCi_GetFriendListIndex(func_ov011_02167f6c()->unk_680),
+                                      DWCi_GetFriendListIndex(func_ov011_02167f6c()->cbEventPid),
                                       func_ov011_02167f6c()->notifyParam);
 }
 
@@ -3458,13 +3465,13 @@ static int func_ov011_0216475c(int profileId, int ip, int port, int nodeType, in
     switch (func_ov011_02167fc4()) {
     case 1:
         if (func_ov011_02168348(profileId) != 0) {
-            if (func_ov011_02167f6c()->unk_5a4 == 0) {
+            if (func_ov011_02167f6c()->memberConnecting == 0) {
                 if (func_ov011_02167f6c()->state == 1 && func_ov011_02167f6c()->pending.profileId == 0) {
-                    func_ov011_02167f6c()->unk_5a4 = 1;
+                    func_ov011_02167f6c()->memberConnecting = 1;
                     func_ov011_021685fc();
                     result = 2;
                     now = OS_GetTick();
-                    func_ov011_02167f6c()->unk_768 = now;
+                    func_ov011_02167f6c()->cmdSendTime = now;
                 } else {
                     result = 4;
                 }
@@ -3475,7 +3482,7 @@ static int func_ov011_0216475c(int profileId, int ip, int port, int nodeType, in
                     if (self->profileId < profileId) {
                         result = 2;
                         now = OS_GetTick();
-                        func_ov011_02167f6c()->unk_768 = now;
+                        func_ov011_02167f6c()->cmdSendTime = now;
                     } else {
                         result = 0xff;
                     }
@@ -3531,30 +3538,30 @@ static int func_ov011_0216484c(int profileId, int ip, int port, int nodeType, in
             }
         }
     }
-    if (func_ov011_02167f6c()->unk_17 + 1 == func_ov011_021679c0()) {
+    if (func_ov011_02167f6c()->numEntry + 1 == func_ov011_021679c0()) {
         result = 3;
         func_ov011_02167f6c()->error = 0x10;
     } else if (func_ov011_02167f6c()->state == 0x16) {
         result = 4;
-    } else if (func_ov011_02160fd8() != 0 || func_ov011_02167f6c()->unk_48 != 0) {
+    } else if (func_ov011_02160fd8() != 0 || func_ov011_02167f6c()->suspendPending != 0) {
         result = 3;
         func_ov011_02167f6c()->error = 0x11;
-    } else if (cookie != func_ov011_02167f6c()->unk_7b0) {
+    } else if (cookie != func_ov011_02167f6c()->topology) {
         result = 3;
         func_ov011_02167f6c()->error = 0x12;
     } else if (func_ov011_02168270(profileId) != NULL) {
         result = 0xff;
     } else if (!((func_ov011_02167f6c()->state == 0xd || func_ov011_02167f6c()->state == 2 ||
                   func_ov011_02167f6c()->state == 3) &&
-                 (func_ov011_02167f6c()->unk_5d8 != 0 || func_ov011_02167f6c()->unk_5d4 != 0) &&
+                 (func_ov011_02167f6c()->qr2Ip != 0 || func_ov011_02167f6c()->qr2Port != 0) &&
                  (ip != 0 || port != 0))) {
-        if (func_ov011_02167f6c()->state == 0xe && profileId == func_ov011_02167f6c()->unk_5dc) {
+        if (func_ov011_02167f6c()->state == 0xe && profileId == func_ov011_02167f6c()->qr2Reservation) {
             result = 0xff;
         } else {
             result = 4;
         }
-    } else if (func_ov011_02167f6c()->mode != 2 && func_ov011_02167f6c()->unk_67c != 0) {
-        if (profileId == func_ov011_02167f6c()->unk_67c) {
+    } else if (func_ov011_02167f6c()->mode != 2 && func_ov011_02167f6c()->reqProfileId != 0) {
+        if (profileId == func_ov011_02167f6c()->reqProfileId) {
             if (func_ov011_02167f6c()->profileId < profileId) {
                 result = 2;
             } else {
@@ -3569,7 +3576,7 @@ static int func_ov011_0216484c(int profileId, int ip, int port, int nodeType, in
     }
     if (result == 2) {
         if (func_ov011_02167f6c()->checkFunc != NULL &&
-            func_ov011_02167f6c()->checkFunc(userData, func_ov011_02167f6c()->unk_7c0) == 0) {
+            func_ov011_02167f6c()->checkFunc(userData, func_ov011_02167f6c()->checkParam) == 0) {
             func_ov011_02167f6c()->error = 0x16;
             return 3;
         }
@@ -3586,18 +3593,18 @@ static int func_ov011_02164aa0(int profileId, u32 ip, u32 port) {
     u8 aid;
     int i;
 
-    if (func_ov011_02167f6c()->unk_18 != 0 && profileId == func_ov011_02167f6c()->unk_5dc) {
+    if (func_ov011_02167f6c()->qr2IsReserved != 0 && profileId == func_ov011_02167f6c()->qr2Reservation) {
         return 0;
     }
-    func_ov011_02167f6c()->unk_18 = 1;
-    func_ov011_02167f6c()->unk_5dc = profileId;
-    func_ov011_02167f6c()->unk_638 = 0;
-    func_ov011_02167f6c()->unk_644 = 0;
+    func_ov011_02167f6c()->qr2IsReserved = 1;
+    func_ov011_02167f6c()->qr2Reservation = profileId;
+    func_ov011_02167f6c()->cmdResendFlag = 0;
+    func_ov011_02167f6c()->cmdTimeoutTime = 0;
     qr2_send_statechanged(func_ov011_02167f6c()->qr2);
-    func_ov011_02167f6c()->unk_67c = 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
     aid = func_ov011_021682ec();
     func_ov011_02167f6c()->self.aid = aid;
-    if (func_ov011_02167f6c()->unk_5a4 == 0) {
+    if (func_ov011_02167f6c()->memberConnecting == 0) {
         data[0] = func_ov011_02167f6c()->self.profileId;
         data[1] = func_ov011_02167f6c()->self.aid;
         self = func_ov011_02168224();
@@ -3630,19 +3637,19 @@ static int func_ov011_02164b98(int profileId, int flag) {
     u32 ip = 0;
     u16 port = 0;
 
-    if (flag != 0 || (func_ov011_02167f6c()->unk_5d8 == 0 && func_ov011_02167f6c()->unk_5d4 == 0)) {
-        func_ov011_02167f6c()->unk_638 = 1;
+    if (flag != 0 || (func_ov011_02167f6c()->qr2Ip == 0 && func_ov011_02167f6c()->qr2Port == 0)) {
+        func_ov011_02167f6c()->cmdResendFlag = 1;
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_63c = now;
-        func_ov011_02167f6c()->unk_67c = 0;
+        func_ov011_02167f6c()->cmdResendTick = now;
+        func_ov011_02167f6c()->reqProfileId = 0;
         return 0;
     }
     if (func_ov011_02167f6c()->matchType == 0) {
         ip = func_ov011_02167f6c()->self.publicIp;
         port = func_ov011_02167f6c()->self.publicPort;
-        func_ov011_02167f6c()->unk_67c = profileId;
+        func_ov011_02167f6c()->reqProfileId = profileId;
     } else {
-        func_ov011_02167f6c()->unk_67c = profileId;
+        func_ov011_02167f6c()->reqProfileId = profileId;
         if (gpIsBuddy(func_ov011_02167f6c()->gp, profileId) == 0) {
             ip = func_ov011_02167f6c()->self.publicIp;
             port = func_ov011_02167f6c()->self.publicPort;
@@ -3650,28 +3657,28 @@ static int func_ov011_02164b98(int profileId, int flag) {
     }
     if (func_ov011_02167f6c()->matchType == 3 ||
         (func_ov011_02167f6c()->unk_798 != 0 && gpIsBuddy(func_ov011_02167f6c()->gp, profileId) != 0)) {
-        func_ov011_02167f6c()->unk_7b6 = 0;
-        func_ov011_02167f6c()->unk_644 = 30000;
+        func_ov011_02167f6c()->scResvRetryMax = 0;
+        func_ov011_02167f6c()->cmdTimeoutTime = 30000;
     } else {
-        func_ov011_02167f6c()->unk_7b6 = 5;
-        func_ov011_02167f6c()->unk_644 = 12000;
+        func_ov011_02167f6c()->scResvRetryMax = 5;
+        func_ov011_02167f6c()->cmdTimeoutTime = 12000;
     }
     now = OS_GetTick();
-    func_ov011_02167f6c()->unk_648 = now;
-    func_ov011_02167f6c()->unk_638 = 0;
+    func_ov011_02167f6c()->cmdTimeoutStartTick = now;
+    func_ov011_02167f6c()->cmdResendFlag = 0;
     self = func_ov011_02168224();
     data[0] = func_ov011_02167f6c()->matchType;
     data[1] = self->publicIp;
     data[2] = self->publicPort;
     data[3] = self->localIp;
     data[4] = self->localPort;
-    data[5] = self->unk_17;
+    data[5] = self->hasPrivateAddress;
     data[6] = func_ov011_02167f6c()->unk_798;
-    data[7] = func_ov011_02167f6c()->unk_7b0;
+    data[7] = func_ov011_02167f6c()->topology;
     data[8] = func_ov011_02167f6c()->userData;
-    func_ov011_02167f6c()->unk_634 = DWCi_GetMathRand32(-2) + 1;
-    data[9] = func_ov011_02167f6c()->unk_634;
-    data[10] = func_ov011_02167f6c()->unk_5a4 != 0;
+    func_ov011_02167f6c()->resvToken = DWCi_GetMathRand32(-2) + 1;
+    data[9] = func_ov011_02167f6c()->resvToken;
+    data[10] = func_ov011_02167f6c()->memberConnecting != 0;
     return func_ov011_021637d8(1, profileId, ip, port, data, 11);
 }
 
@@ -3684,18 +3691,18 @@ static int func_ov011_02164d64(int a0, int a1, int a2) {
     int i;
 
     if (a1 == 0) {
-        func_ov011_02167f6c()->unk_621++;
-        func_ov011_02167f6c()->unk_621 = func_ov011_02167f6c()->unk_621 % func_ov011_02167f6c()->friendCount;
+        func_ov011_02167f6c()->friendIndex++;
+        func_ov011_02167f6c()->friendIndex = func_ov011_02167f6c()->friendIndex % func_ov011_02167f6c()->friendCount;
     }
     func_ov011_02167f6c()->mode = 3;
     for (i = 0; i < func_ov011_02167f6c()->friendCount;) {
         profileId = DWC_GetGsProfileId(
             DWCi_GetUserData(),
-            &func_ov011_02167f6c()->friendList[func_ov011_02167f6c()->friendOrder[func_ov011_02167f6c()->unk_621]]);
+            &func_ov011_02167f6c()->friendList[func_ov011_02167f6c()->friendOrder[func_ov011_02167f6c()->friendIndex]]);
         if (profileId != 0 && profileId != -1 &&
             DWCi_IsValidFriendData(
                 &func_ov011_02167f6c()
-                     ->friendList[func_ov011_02167f6c()->friendOrder[func_ov011_02167f6c()->unk_621]]) &&
+                     ->friendList[func_ov011_02167f6c()->friendOrder[func_ov011_02167f6c()->friendIndex]]) &&
             func_ov011_02168270(profileId) == NULL) {
             int err1 = gpGetBuddyIndex(func_ov011_02167f6c()->gp, profileId, &index);
             int err2 = gpGetBuddyStatus(func_ov011_02167f6c()->gp, index, &status);
@@ -3707,7 +3714,8 @@ static int func_ov011_02164d64(int a0, int a1, int a2) {
             }
         }
         i++;
-        func_ov011_02167f6c()->unk_621 = (i + func_ov011_02167f6c()->unk_621) % func_ov011_02167f6c()->friendCount;
+        func_ov011_02167f6c()->friendIndex =
+            (i + func_ov011_02167f6c()->friendIndex) % func_ov011_02167f6c()->friendCount;
     }
     if (found != 0) {
         if (profileId == a2) {
@@ -3718,19 +3726,19 @@ static int func_ov011_02164d64(int a0, int a1, int a2) {
         func_ov011_02167f6c()->self.profileId = profileId;
         return func_ov011_02164b98(profileId, a0);
     }
-    func_ov011_02167f6c()->unk_644 = 3000;
+    func_ov011_02167f6c()->cmdTimeoutTime = 3000;
     now = OS_GetTick();
-    func_ov011_02167f6c()->unk_648 = now;
-    func_ov011_02167f6c()->unk_638 = 0;
+    func_ov011_02167f6c()->cmdTimeoutStartTick = now;
+    func_ov011_02167f6c()->cmdResendFlag = 0;
     return 0;
 }
 
 static int func_ov011_02164f54(int a0) {
     u64 now;
-    func_ov011_02167f6c()->unk_67c = 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
     func_ov011_02167f6c()->unk_628 = 0;
     now = OS_GetTick();
-    func_ov011_02167f6c()->unk_648 = now;
+    func_ov011_02167f6c()->cmdTimeoutStartTick = now;
     func_ov011_02168374();
     if (func_ov011_02167f6c()->unk_798 != 0) {
         func_ov011_02167f78(0xc);
@@ -3740,9 +3748,9 @@ static int func_ov011_02164f54(int a0) {
     } else if (func_ov011_02167f6c()->matchType == 0) {
         func_ov011_02167f78(2);
         if (a0 != 0) {
-            func_ov011_02167f6c()->unk_5e4 = 1;
+            func_ov011_02167f6c()->sbUpdateFlag = 1;
             now = OS_GetTick();
-            func_ov011_02167f6c()->unk_5e8 = now;
+            func_ov011_02167f6c()->sbUpdateTick = now;
         } else {
             if (func_ov011_021666c4(func_ov011_0216322c(0)) != 0) {
                 return 0;
@@ -3767,7 +3775,7 @@ static int func_ov011_02165040(int unused) {
     }
     result = func_ov011_021637d8(5, func_ov011_02167f6c()->self.profileId, func_ov011_02167f6c()->self.publicIp,
                                  func_ov011_02167f6c()->self.publicPort, NULL, 0);
-    func_ov011_02167f6c()->unk_67c = 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
     return result;
 }
 
@@ -3777,18 +3785,18 @@ static int func_ov011_02165094(int profileId, int a1) {
     if (func_ov011_02168388() != 0) {
         func_ov011_02168374();
     }
-    func_ov011_02167f6c()->unk_6d8 = 0xff;
+    func_ov011_02167f6c()->cmdCommand = 0xff;
     if (func_ov011_02167f6c()->target.cookie != 0) {
         NNCancel(func_ov011_02167f6c()->target.cookie);
         func_ov011_02167f6c()->target.cookie = 0;
     }
-    func_ov011_02167f6c()->unk_67c = 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
     if (func_ov011_02167fc4() == 2) {
-        func_ov011_02167f6c()->unk_18 = 0;
-        func_ov011_02167f6c()->unk_5dc = 0;
+        func_ov011_02167f6c()->qr2IsReserved = 0;
+        func_ov011_02167f6c()->qr2Reservation = 0;
         func_ov011_02167f78(0x11);
-        func_ov011_02167f6c()->unk_654 = 0;
-        func_ov011_02167f6c()->unk_632 = 0;
+        func_ov011_02167f6c()->cancelSynAckBit = 0;
+        func_ov011_02167f6c()->cancelBaseLatency = 0;
         func_ov011_02165b7c(profileId);
         for (i = 1; i < func_ov011_02168024(); i++) {
             if (func_ov011_02166148(func_ov011_02168250(i)->profileId, 0xd) == 0) {
@@ -3808,7 +3816,7 @@ static int func_ov011_02165164(int profileId) {
     int a1 = 2;
 
     if (func_ov011_02167f6c()->matchType == 0 || func_ov011_02167f6c()->matchType == 1) {
-        if (func_ov011_02167f6c()->unk_0d == 0) {
+        if (func_ov011_02167f6c()->matched == 0) {
             a1 = 1;
         }
     }
@@ -3862,7 +3870,7 @@ static void func_ov011_02165280(int a0) {
     case 1:
         func_ov011_02167f78(1);
         if (func_ov011_02167f6c()->mode == 3) {
-            func_ov011_02167f6c()->unk_680 = func_ov011_02167f6c()->self.profileId;
+            func_ov011_02167f6c()->cbEventPid = func_ov011_02167f6c()->self.profileId;
         }
         break;
     case 2:
@@ -3873,8 +3881,8 @@ static void func_ov011_02165280(int a0) {
             func_ov011_02167fa0(1);
             func_ov011_02167f6c()->mode = 3;
             if (func_ov011_02167f6c()->matchType == 0 || func_ov011_02167f6c()->matchType == 1) {
-                func_ov011_02167f6c()->unk_18 = 1;
-                func_ov011_02167f6c()->unk_5dc = func_ov011_02167f6c()->profileId;
+                func_ov011_02167f6c()->qr2IsReserved = 1;
+                func_ov011_02167f6c()->qr2Reservation = func_ov011_02167f6c()->profileId;
             }
             func_ov011_02166648();
             if (func_ov011_021686a0() != 0) {
@@ -3899,11 +3907,11 @@ static void func_ov011_02165280(int a0) {
         }
         break;
     case 3:
-        func_ov011_02167f6c()->unk_0d = 1;
+        func_ov011_02167f6c()->matched = 1;
         func_ov011_0216549c();
         func_ov011_02167f6c()->unk_798 = 0;
         qr2_send_statechanged(func_ov011_02167f6c()->qr2);
-        MatchNotify(0, 0, func_ov011_02167f6c()->unk_680 == 0, 0);
+        MatchNotify(0, 0, func_ov011_02167f6c()->cbEventPid == 0, 0);
         if (func_ov011_02167f6c()->mode == 2) {
             if (func_ov011_02166670(func_ov011_02162d80(-1)) != 0) {
                 return;
@@ -3913,8 +3921,8 @@ static void func_ov011_02165280(int a0) {
             func_ov011_02162d80(2);
             func_ov011_02167f78(1);
         }
-        func_ov011_02167f6c()->unk_680 = 0;
-        func_ov011_02167f6c()->unk_62a = 0;
+        func_ov011_02167f6c()->cbEventPid = 0;
+        func_ov011_02167f6c()->cancelState = 0;
         func_ov011_02167fe8();
         break;
     }
@@ -3923,12 +3931,12 @@ static void func_ov011_02165280(int a0) {
 
         ServerBrowserClear(func_ov011_02167f6c()->sb);
         ctrl = func_ov011_02167f6c();
-        ctrl->unk_5f0 = 0;
+        ctrl->sbUpdateRequestTick = 0;
     }
 }
 
 static void func_ov011_0216549c(void) {
-    func_ov011_02167f6c()->unk_5f9 = 0;
+    func_ov011_02167f6c()->nnFailureCount = 0;
     if (func_ov011_021686a0() != 0) {
         func_ov011_02165540();
         return;
@@ -3975,25 +3983,25 @@ static int func_ov011_02165558(void) {
     int result = 0;
     u64 now;
 
-    if (func_ov011_02167f6c()->unk_5a4 != 0 || func_ov011_02167f6c()->unk_5a8 == 0xf) {
-        func_ov011_02167f6c()->unk_18 = 0;
-        func_ov011_02167f6c()->unk_5dc = 0;
+    if (func_ov011_02167f6c()->memberConnecting != 0 || func_ov011_02167f6c()->abortedMemberState == 0xf) {
+        func_ov011_02167f6c()->qr2IsReserved = 0;
+        func_ov011_02167f6c()->qr2Reservation = 0;
         func_ov011_02167f78(1);
         func_ov011_02168468();
         return 0;
     }
-    func_ov011_02167f6c()->unk_18 = 0;
-    func_ov011_02167f6c()->unk_5dc = 0;
-    if (func_ov011_02167f6c()->unk_0d == 0 && func_ov011_02168024() == 1) {
+    func_ov011_02167f6c()->qr2IsReserved = 0;
+    func_ov011_02167f6c()->qr2Reservation = 0;
+    if (func_ov011_02167f6c()->matched == 0 && func_ov011_02168024() == 1) {
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_7a0 = now;
+        func_ov011_02167f6c()->aidListSendTick = now;
     }
     qr2_send_statechanged(func_ov011_02167f6c()->qr2);
     if (func_ov011_02167f6c()->mode == 2) {
-        func_ov011_02167f6c()->unk_680 = func_ov011_02167f6c()->self.profileId;
+        func_ov011_02167f6c()->cbEventPid = func_ov011_02167f6c()->self.profileId;
     }
     func_ov011_02167f78(0x13);
-    func_ov011_02167f6c()->unk_650 = 0;
+    func_ov011_02167f6c()->synAckBit = 0;
     for (i = 1; i < func_ov011_02168024(); i++) {
         func_ov011_02165d2c(func_ov011_02168250(i)->aid, 2);
     }
@@ -4013,8 +4021,8 @@ static int func_ov011_02165654(void) {
 
     saved = func_ov011_02167f6c()->self;
     me = &saved;
-    if (func_ov011_02167f6c()->unk_620 < func_ov011_021686b8() - 1) {
-        index = (func_ov011_021686b8() - 1 - func_ov011_02167f6c()->unk_620) & 0xff;
+    if (func_ov011_02167f6c()->clLinkProgress < func_ov011_021686b8() - 1) {
+        index = (func_ov011_021686b8() - 1 - func_ov011_02167f6c()->clLinkProgress) & 0xff;
         func_ov011_02167f78(0x10);
         node = func_ov011_02168250(index);
         data[0] = node->profileId;
@@ -4024,10 +4032,10 @@ static int func_ov011_02165654(void) {
         data[4] = node->publicPort;
         data[5] = node->localIp;
         data[6] = node->localPort;
-        data[7] = node->unk_17;
-        data[8] = node->unk_24;
+        data[7] = node->hasPrivateAddress;
+        data[8] = node->userData;
     } else {
-        func_ov011_02167f6c()->unk_620 = 0;
+        func_ov011_02167f6c()->clLinkProgress = 0;
         return func_ov011_02165558();
     }
     if (func_ov011_02167f6c()->state != 0x13) {
@@ -4041,7 +4049,7 @@ static int func_ov011_02165654(void) {
             0) {
             return 0;
         }
-        func_ov011_02167f6c()->unk_6d9 = 0;
+        func_ov011_02167f6c()->cmdCount = 0;
     }
     return 0;
 }
@@ -4049,7 +4057,7 @@ static int func_ov011_02165654(void) {
 static void func_ov011_0216574c(void) {
     int hasConn;
 
-    func_ov011_02167f6c()->unk_680 = 0;
+    func_ov011_02167f6c()->cbEventPid = 0;
     hasConn = 0;
     if (func_ov011_02167f6c()->state == 0x16) {
         func_ov011_021658a4();
@@ -4058,13 +4066,13 @@ static void func_ov011_0216574c(void) {
     if (func_ov011_02160500() != 0) {
         hasConn = 1;
     }
-    func_ov011_02167f6c()->unk_62a = 1;
+    func_ov011_02167f6c()->cancelState = 1;
     if (func_ov011_02167f6c()->mode == 3) {
         if (func_ov011_02167f6c()->target.cookie != 0) {
             NNCancel(func_ov011_02167f6c()->target.cookie);
             func_ov011_02167f6c()->target.cookie = 0;
         }
-        func_ov011_02167f6c()->unk_62a = 1;
+        func_ov011_02167f6c()->cancelState = 1;
         if (hasConn != 0) {
             gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
         } else {
@@ -4078,7 +4086,7 @@ static void func_ov011_0216574c(void) {
     if (func_ov011_02167f6c()->state == 3 || func_ov011_02167f6c()->state == 4 || func_ov011_02167f6c()->state == 5 ||
         func_ov011_02167f6c()->state == 6 || func_ov011_02167f6c()->state == 0xe ||
         func_ov011_02167f6c()->state == 0xf) {
-        if (func_ov011_02167f6c()->unk_67c != 0) {
+        if (func_ov011_02167f6c()->reqProfileId != 0) {
             if (func_ov011_02164b78(func_ov011_02165040(0)) != 0) {
                 return;
             }
@@ -4092,7 +4100,7 @@ static void func_ov011_0216574c(void) {
         func_ov011_02167f6c()->target.cookie = 0;
     }
     if (hasConn != 0) {
-        func_ov011_02167f6c()->unk_62a = 1;
+        func_ov011_02167f6c()->cancelState = 1;
         gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
     }
     func_ov011_021658a4();
@@ -4103,11 +4111,11 @@ static void func_ov011_021658a4(void) {
 
     if (func_ov011_02166670(func_ov011_02162d80(1)) == 0) {
         func_ov011_021631a8();
-        if (func_ov011_02167f6c()->unk_680 == 0 && func_ov011_02167f6c()->mode != 2) {
+        if (func_ov011_02167f6c()->cbEventPid == 0 && func_ov011_02167f6c()->mode != 2) {
             flag = 0;
         }
-        MatchNotify(0, 1, func_ov011_02167f6c()->unk_680 == 0, flag);
-        func_ov011_02167f6c()->unk_62a = 0;
+        MatchNotify(0, 1, func_ov011_02167f6c()->cbEventPid == 0, flag);
+        func_ov011_02167f6c()->cancelState = 0;
     }
 }
 
@@ -4115,12 +4123,12 @@ static int func_ov011_0216592c(void) {
     u32 data = 0;
     int result = 0;
 
-    if (func_ov011_02167f6c()->unk_18 != 0 && func_ov011_02167f6c()->unk_5dc != 0 &&
-        func_ov011_02167f6c()->unk_5dc != func_ov011_02167f6c()->profileId) {
-        result = func_ov011_021637d8(0xc, func_ov011_02167f6c()->unk_5dc, func_ov011_02167f6c()->self.publicIp,
+    if (func_ov011_02167f6c()->qr2IsReserved != 0 && func_ov011_02167f6c()->qr2Reservation != 0 &&
+        func_ov011_02167f6c()->qr2Reservation != func_ov011_02167f6c()->profileId) {
+        result = func_ov011_021637d8(0xc, func_ov011_02167f6c()->qr2Reservation, func_ov011_02167f6c()->self.publicIp,
                                      func_ov011_02167f6c()->self.publicPort, &data, 1);
-        func_ov011_02167f6c()->unk_18 = 0;
-        func_ov011_02167f6c()->unk_5dc = 0;
+        func_ov011_02167f6c()->qr2IsReserved = 0;
+        func_ov011_02167f6c()->qr2Reservation = 0;
         func_ov011_02168374();
     }
     return result;
@@ -4133,12 +4141,12 @@ static void func_ov011_021659ac(int a0) {
     }
     func_ov011_02162e80(a0);
     if (func_ov011_02167f6c()->matchType == 2 || func_ov011_02167f6c()->matchType == 3) {
-        MatchNotify(0, 1, func_ov011_02167f6c()->unk_680 == 0, 0);
+        MatchNotify(0, 1, func_ov011_02167f6c()->cbEventPid == 0, 0);
         return;
     }
     if (func_ov011_02167f6c()->matchType == 0) {
-        if (func_ov011_02167f6c()->unk_0d != 0) {
-            MatchNotify(0, 1, func_ov011_02167f6c()->unk_680 == 0, 0);
+        if (func_ov011_02167f6c()->matched != 0) {
+            MatchNotify(0, 1, func_ov011_02167f6c()->cbEventPid == 0, 0);
         }
         if (a0 == 1) {
             func_ov011_02167fa0(0);
@@ -4148,8 +4156,8 @@ static void func_ov011_021659ac(int a0) {
             }
         }
     } else if (func_ov011_02167f6c()->matchType == 1) {
-        if (func_ov011_02167f6c()->unk_0d != 0) {
-            MatchNotify(0, 1, func_ov011_02167f6c()->unk_680 == 0, 0);
+        if (func_ov011_02167f6c()->matched != 0) {
+            MatchNotify(0, 1, func_ov011_02167f6c()->cbEventPid == 0, 0);
         }
         if (a0 == 1) {
             func_ov011_02167fa0(0);
@@ -4170,9 +4178,9 @@ static void func_ov011_02165b30(void) {
 }
 
 static int func_ov011_02165b54(void) {
-    func_ov011_02167f6c()->unk_18 = 0;
-    func_ov011_02167f6c()->unk_5dc = 0;
-    func_ov011_02167f6c()->unk_629 = 0;
+    func_ov011_02167f6c()->qr2IsReserved = 0;
+    func_ov011_02167f6c()->qr2Reservation = 0;
+    func_ov011_02167f6c()->closeState = 0;
     func_ov011_021659ac(1);
     return 0;
 }
@@ -4181,13 +4189,13 @@ static int func_ov011_02165b7c(int profileId) {
     GTI2Connection **conn;
     int result;
 
-    func_ov011_02167f6c()->unk_680 = profileId;
+    func_ov011_02167f6c()->cbEventPid = profileId;
     conn = func_ov011_0216054c(profileId, 0);
     if (conn != NULL) {
-        func_ov011_02167f6c()->unk_629 = 1;
+        func_ov011_02167f6c()->closeState = 1;
         result = 1;
         gt2CloseConnectionHard(*conn);
-        func_ov011_02167f6c()->unk_629 = 0;
+        func_ov011_02167f6c()->closeState = 0;
         func_ov011_02168184(profileId);
     } else {
         func_ov011_02168184(profileId);
@@ -4197,9 +4205,9 @@ static int func_ov011_02165b7c(int profileId) {
 }
 
 static void func_ov011_02165bc8(void) {
-    func_ov011_02167f6c()->unk_629 = 1;
+    func_ov011_02167f6c()->closeState = 1;
     gt2CloseAllConnectionsHard(func_ov011_02167f6c()->fm->socket);
-    func_ov011_02167f6c()->unk_629 = 0;
+    func_ov011_02167f6c()->closeState = 0;
 }
 
 static int func_ov011_02165bf0(u32 mask) {
@@ -4246,7 +4254,7 @@ static int func_ov011_02165bf0(u32 mask) {
             }
         }
     }
-    func_ov011_02167f6c()->unk_629 = 1;
+    func_ov011_02167f6c()->closeState = 1;
     if (addSelf != 0) {
         func_ov011_02160710(func_ov011_02167f6c()->self.aid);
         func_ov011_02168374();
@@ -4258,7 +4266,7 @@ static int func_ov011_02165bf0(u32 mask) {
             func_ov011_02160710(aid);
         }
     }
-    func_ov011_02167f6c()->unk_629 = 0;
+    func_ov011_02167f6c()->closeState = 0;
     return result;
 }
 
@@ -4282,17 +4290,17 @@ static void func_ov011_02165d2c(u32 aid, int type) {
             }
             data[0] = 0;
             self = &func_ov011_02167f6c()->self;
-            data[1] = ((self->unk_17 << 16) & 0xffff0000) | self->aid;
+            data[1] = ((self->hasPrivateAddress << 16) & 0xffff0000) | self->aid;
             data[2] = self->profileId;
             data[3] = self->publicIp;
             data[4] = self->localIp;
             data[5] = ((self->publicPort << 16) & 0xffff0000) | self->localPort;
-            data[6] = self->unk_24;
+            data[6] = self->userData;
         }
         break;
     case 3:
-        ((u8 *)data)[0] = func_ov011_02167f6c()->unk_630;
-        ((u8 *)data)[1] = func_ov011_02167f6c()->unk_630 >> 8;
+        ((u8 *)data)[0] = func_ov011_02167f6c()->baseLatency;
+        ((u8 *)data)[1] = func_ov011_02167f6c()->baseLatency >> 8;
         break;
     case 4:
         if (func_ov011_02168388() != 0 && aid == func_ov011_02167f6c()->self.aid) {
@@ -4308,7 +4316,7 @@ static void func_ov011_02165d2c(u32 aid, int type) {
                 ((u8 *)data)[1] = 0;
                 ((u8 *)data)[2] = 0;
                 ((u8 *)data)[3] = 0;
-                data[1] = func_ov011_02167f6c()->unk_7c8;
+                data[1] = func_ov011_02167f6c()->synId;
                 size = 8;
             } else {
                 u8 n;
@@ -4324,14 +4332,14 @@ static void func_ov011_02165d2c(u32 aid, int type) {
                 for (n = 0; n < count; n++) {
                     DWCNodeInfo *node = func_ov011_02168250(n + 1);
 
-                    data[pos++] = ((node->unk_17 << 16) & 0xffff0000) | node->aid;
+                    data[pos++] = ((node->hasPrivateAddress << 16) & 0xffff0000) | node->aid;
                     data[pos++] = node->profileId;
                     data[pos++] = node->publicIp;
                     data[pos++] = node->localIp;
                     data[pos++] = ((node->publicPort << 16) & 0xffff0000) | node->localPort;
-                    data[pos++] = node->unk_24;
+                    data[pos++] = node->userData;
                 }
-                data[pos] = func_ov011_02167f6c()->unk_7c8;
+                data[pos] = func_ov011_02167f6c()->synId;
             }
         } else {
             size = 8;
@@ -4339,7 +4347,7 @@ static void func_ov011_02165d2c(u32 aid, int type) {
             ((u8 *)data)[1] = 0;
             ((u8 *)data)[2] = 0;
             ((u8 *)data)[3] = 0;
-            data[1] = func_ov011_02167f6c()->unk_7c8;
+            data[1] = func_ov011_02167f6c()->synId;
         }
         break;
     }
@@ -4348,7 +4356,7 @@ static void func_ov011_02165d2c(u32 aid, int type) {
         DWC_Free(4, data, 0);
     }
     now = OS_GetTick();
-    func_ov011_02167f6c()->unk_658 = now;
+    func_ov011_02167f6c()->lastSynSent = now;
 }
 
 static int func_ov011_02165ef4(void) {
@@ -4356,7 +4364,7 @@ static int func_ov011_02165ef4(void) {
 
     if (func_ov011_02167f6c()->state == 8 || func_ov011_02167f6c()->state == 0x13 ||
         func_ov011_02167f6c()->state == 0x17 || func_ov011_02167f6c()->state == 0x14) {
-        ms = OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_658);
+        ms = OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->lastSynSent);
     } else {
         return 1;
     }
@@ -4372,13 +4380,13 @@ static int func_ov011_02165ef4(void) {
         break;
     case 0x13:
         if (ms > 6000) {
-            func_ov011_02167f6c()->unk_62c++;
-            if (func_ov011_02167f6c()->unk_62c > 5) {
+            func_ov011_02167f6c()->synResendCount++;
+            if (func_ov011_02167f6c()->synResendCount > 5) {
                 u64 now;
 
-                func_ov011_02167f6c()->unk_62c = 0;
+                func_ov011_02167f6c()->synResendCount = 0;
                 now = OS_GetTick();
-                func_ov011_02167f6c()->unk_658 = now;
+                func_ov011_02167f6c()->lastSynSent = now;
                 func_ov011_02166098();
             } else {
                 int i;
@@ -4386,7 +4394,7 @@ static int func_ov011_02165ef4(void) {
                 for (i = 1; i < func_ov011_02168024(); i++) {
                     u8 aid = func_ov011_02168250(i)->aid;
 
-                    if ((func_ov011_02167f6c()->unk_650 & (1 << aid)) == 0) {
+                    if ((func_ov011_02167f6c()->synAckBit & (1 << aid)) == 0) {
                         func_ov011_02165d2c(aid, 2);
                     }
                 }
@@ -4394,7 +4402,7 @@ static int func_ov011_02165ef4(void) {
                     DWCNodeInfo *self = &func_ov011_02167f6c()->self;
                     u8 aid = self->aid;
 
-                    if ((func_ov011_02167f6c()->unk_650 & (1 << aid)) == 0) {
+                    if ((func_ov011_02167f6c()->synAckBit & (1 << aid)) == 0) {
                         func_ov011_02165d2c(aid, 2);
                     }
                 }
@@ -4407,7 +4415,7 @@ static int func_ov011_02165ef4(void) {
         }
         break;
     case 0x14:
-        if (ms > func_ov011_02167f6c()->unk_630) {
+        if (ms > func_ov011_02167f6c()->baseLatency) {
             func_ov011_02165280(3);
         }
         break;
@@ -4418,15 +4426,15 @@ static int func_ov011_02165ef4(void) {
 static int func_ov011_02166098(void) {
     u64 now;
 
-    if (func_ov011_02165bf0(func_ov011_02167f6c()->unk_650) == 0) {
+    if (func_ov011_02165bf0(func_ov011_02167f6c()->synAckBit) == 0) {
         return 0;
     }
     if (func_ov011_02168024() > 1 || func_ov011_02168388() != 0) {
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_658 = now;
+        func_ov011_02167f6c()->lastSynSent = now;
         func_ov011_02167f78(0x17);
     } else {
-        if (func_ov011_02165164(func_ov011_02167f6c()->unk_680) == 0) {
+        if (func_ov011_02165164(func_ov011_02167f6c()->cbEventPid) == 0) {
             return 0;
         }
     }
@@ -4454,7 +4462,7 @@ static int func_ov011_02166148(int profileId, int message) {
     int count;
 
     if (message == 0xd) {
-        data = func_ov011_02167f6c()->unk_680;
+        data = func_ov011_02167f6c()->cbEventPid;
         count = 1;
     } else {
         count = 0;
@@ -4468,7 +4476,7 @@ static int func_ov011_02166148(int profileId, int message) {
         return 0;
     }
     now = OS_GetTick();
-    func_ov011_02167f6c()->unk_660 = now;
+    func_ov011_02167f6c()->lastCancelSynSent = now;
     return 1;
 }
 
@@ -4485,7 +4493,7 @@ static int func_ov011_021661b4(int profileId, int message, int value) {
     case 0xd:
         if (func_ov011_02167f6c()->state != 7) {
             func_ov011_02167f78(7);
-            func_ov011_02167f6c()->unk_680 = value;
+            func_ov011_02167f6c()->cbEventPid = value;
             if (func_ov011_02167f6c()->pending.profileId != 0) {
                 func_ov011_02167f6c()->pending.profileId = 0;
             }
@@ -4498,18 +4506,18 @@ static int func_ov011_021661b4(int profileId, int message, int value) {
     case 0xe:
         if (func_ov011_02167f6c()->state == 0x11) {
             now = OS_GetTick();
-            ms = OS_TicksToMilliSeconds(now - func_ov011_02167f6c()->unk_660) / 2;
+            ms = OS_TicksToMilliSeconds(now - func_ov011_02167f6c()->lastCancelSynSent) / 2;
             if (ms > 300) {
-                ms = OS_TicksToMilliSeconds(now - func_ov011_02167f6c()->unk_660) / 2 - 300;
-                if (func_ov011_02167f6c()->unk_632 < ms) {
-                    func_ov011_02167f6c()->unk_632 = ms;
+                ms = OS_TicksToMilliSeconds(now - func_ov011_02167f6c()->lastCancelSynSent) / 2 - 300;
+                if (func_ov011_02167f6c()->cancelBaseLatency < ms) {
+                    func_ov011_02167f6c()->cancelBaseLatency = ms;
                 }
             }
             aid = func_ov011_021665f0(profileId, 0);
             if (aid != 0xff) {
-                func_ov011_02167f6c()->unk_654 |= 1 << aid;
+                func_ov011_02167f6c()->cancelSynAckBit |= 1 << aid;
             }
-            if (func_ov011_02166604(1) == func_ov011_02167f6c()->unk_654) {
+            if (func_ov011_02166604(1) == func_ov011_02167f6c()->cancelSynAckBit) {
                 for (i = 1; i < func_ov011_02168024(); i++) {
                     if (func_ov011_02166148(func_ov011_02168250(i)->profileId, 0xf) == 0) {
                         return 0;
@@ -4539,7 +4547,7 @@ static int func_ov011_02166364(void) {
 
     if (func_ov011_02167f6c()->state == 7 || func_ov011_02167f6c()->state == 0x11 ||
         func_ov011_02167f6c()->state == 0x12) {
-        ms = OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_660);
+        ms = OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->lastCancelSynSent);
     } else {
         return 1;
     }
@@ -4553,15 +4561,15 @@ static int func_ov011_02166364(void) {
         break;
     case 0x11:
         if (ms > 6000) {
-            func_ov011_02167f6c()->unk_62d++;
-            if (func_ov011_02167f6c()->unk_62d > 5) {
-                if (func_ov011_02165bf0(func_ov011_02167f6c()->unk_654) == 0) {
+            func_ov011_02167f6c()->cancelSynResendCount++;
+            if (func_ov011_02167f6c()->cancelSynResendCount > 5) {
+                if (func_ov011_02165bf0(func_ov011_02167f6c()->cancelSynAckBit) == 0) {
                     return 0;
                 }
                 if (func_ov011_02168024() > 1) {
-                    func_ov011_02167f6c()->unk_62d = 0;
+                    func_ov011_02167f6c()->cancelSynResendCount = 0;
                     now = OS_GetTick();
-                    func_ov011_02167f6c()->unk_660 = now;
+                    func_ov011_02167f6c()->lastCancelSynSent = now;
                 } else {
                     func_ov011_021659ac(2);
                 }
@@ -4569,7 +4577,7 @@ static int func_ov011_02166364(void) {
                 for (i = 1; i < func_ov011_02168024(); i++) {
                     DWCNodeInfo *node = func_ov011_02168250(i);
 
-                    if ((func_ov011_02167f6c()->unk_654 & (1 << node->aid)) == 0 &&
+                    if ((func_ov011_02167f6c()->cancelSynAckBit & (1 << node->aid)) == 0 &&
                         func_ov011_02166148(node->profileId, 0xd) == 0) {
                         return 0;
                     }
@@ -4578,7 +4586,7 @@ static int func_ov011_02166364(void) {
         }
         break;
     case 0x12:
-        if (ms > func_ov011_02167f6c()->unk_632) {
+        if (ms > func_ov011_02167f6c()->cancelBaseLatency) {
             func_ov011_021659ac(2);
         }
         break;
@@ -4666,7 +4674,7 @@ static u32 func_ov011_02166604(int excludeSelf) {
 static void func_ov011_02166648(void) {
     u64 now;
 
-    func_ov011_02167f6c()->unk_62e = 0;
+    func_ov011_02167f6c()->clWaitTimeoutCount = 0;
     now = OS_GetTick();
     func_ov011_02167f6c()->unk_670 = now;
 }
@@ -4879,14 +4887,14 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
     int best;
     DWCNodeInfo peer;
 
-    sMatchState.unk_14++;
-    if (func_ov011_02167f6c()->unk_5f0 != 0) {
+    sMatchState.sbCallbackLevel++;
+    if (func_ov011_02167f6c()->sbUpdateRequestTick != 0) {
         if (reason == sbc_updatecomplete || reason == sbc_queryerror) {
-            func_ov011_02167f6c()->unk_5f0 = 0;
+            func_ov011_02167f6c()->sbUpdateRequestTick = 0;
         } else {
             u64 now = OS_GetTick();
 
-            func_ov011_02167f6c()->unk_5f0 = now + OS_MilliSecondsToTicks(30000);
+            func_ov011_02167f6c()->sbUpdateRequestTick = now + OS_MilliSecondsToTicks(30000);
         }
     }
     switch (reason) {
@@ -4894,7 +4902,7 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
         func_ov011_02166e48(server);
         break;
     case 4:
-        func_ov011_02167f6c()->unk_5f0 = 0;
+        func_ov011_02167f6c()->sbUpdateRequestTick = 0;
         for (index = 0; index < ServerBrowserCount(sb); index++) {
             server = ServerBrowserGetServer(sb, index);
             if (func_ov011_02166580(server) == 0) {
@@ -4906,10 +4914,10 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
         case 0x16:
             for (index = 0; index < ServerBrowserCount(sb); index++) {
                 server = ServerBrowserGetServer(sb, index);
-                if (func_ov011_02167f6c()->unk_5d8 != 0 &&
-                    func_ov011_02167f6c()->unk_5d8 == SBServerGetPublicInetAddress(server) &&
-                    func_ov011_02167f6c()->unk_5d4 != 0 &&
-                    func_ov011_02167f6c()->unk_5d4 == SBServerGetPublicQueryPort(server)) {
+                if (func_ov011_02167f6c()->qr2Ip != 0 &&
+                    func_ov011_02167f6c()->qr2Ip == SBServerGetPublicInetAddress(server) &&
+                    func_ov011_02167f6c()->qr2Port != 0 &&
+                    func_ov011_02167f6c()->qr2Port == SBServerGetPublicQueryPort(server)) {
                     break;
                 }
             }
@@ -4917,12 +4925,12 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
                 MI_CpuFill8(&peer, 0, 0x28);
                 peer.profileId = func_ov011_02167f6c()->profileId;
                 peer.aid = 0xff;
-                peer.publicIp = func_ov011_02167f6c()->unk_5d8;
-                peer.publicPort = func_ov011_02167f6c()->unk_5d4;
+                peer.publicIp = func_ov011_02167f6c()->qr2Ip;
+                peer.publicPort = func_ov011_02167f6c()->qr2Port;
                 peer.localIp = SBServerGetPrivateInetAddress(server);
                 peer.localPort = SBServerGetPrivateQueryPort(server);
-                peer.unk_17 = SBServerHasPrivateAddress(server);
-                MI_CpuCopy8(&func_ov011_02167f6c()->userData, &peer.unk_24, sizeof(u32));
+                peer.hasPrivateAddress = SBServerHasPrivateAddress(server);
+                MI_CpuCopy8(&func_ov011_02167f6c()->userData, &peer.userData, sizeof(u32));
                 if (func_ov011_02167f6c()->matchType != 0 && func_ov011_02167f6c()->matchType != 1) {
                     if (func_ov011_02167f6c()->matchType == 2) {
                         peer.aid = func_ov011_021682ec();
@@ -4934,11 +4942,11 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
                 func_ov011_02167c28();
                 break;
             }
-            func_ov011_02167f6c()->unk_5e4 = 2;
+            func_ov011_02167f6c()->sbUpdateFlag = 2;
             {
                 u64 now = OS_GetTick();
 
-                func_ov011_02167f6c()->unk_5e8 = now;
+                func_ov011_02167f6c()->sbUpdateTick = now;
             }
             break;
         case 2:
@@ -4953,14 +4961,14 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
                 func_ov011_02167f6c()->self.publicPort = SBServerGetPublicQueryPort(host);
                 func_ov011_02167f6c()->self.localIp = SBServerGetPrivateInetAddress(host);
                 func_ov011_02167f6c()->self.localPort = SBServerGetPrivateQueryPort(host);
-                func_ov011_02167f6c()->self.unk_17 = SBServerHasPrivateAddress(host);
+                func_ov011_02167f6c()->self.hasPrivateAddress = SBServerHasPrivateAddress(host);
                 func_ov011_02167924(func_ov011_02167f6c()->self.profileId);
             } else {
-                func_ov011_02167f6c()->unk_5e4 = 2;
+                func_ov011_02167f6c()->sbUpdateFlag = 2;
                 {
                     u64 now = OS_GetTick();
 
-                    func_ov011_02167f6c()->unk_5e8 = now;
+                    func_ov011_02167f6c()->sbUpdateTick = now;
                 }
                 func_ov011_02168374();
             }
@@ -4980,11 +4988,11 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
 
                 if (func_ov011_02167f6c()->matchType == 1) {
                     func_ov011_02167f6c();
-                    if (profileId != func_ov011_02167f6c()->unk_67c || func_ov011_02166e4c(0) == 0) {
-                        if (func_ov011_02164b78(func_ov011_02165040(func_ov011_02167f6c()->unk_67c)) == 0) {
+                    if (profileId != func_ov011_02167f6c()->reqProfileId || func_ov011_02166e4c(0) == 0) {
+                        if (func_ov011_02164b78(func_ov011_02165040(func_ov011_02167f6c()->reqProfileId)) == 0) {
                             func_ov011_02167f78(3);
                             func_ov011_02168374();
-                            func_ov011_02164b78(func_ov011_02164d64(0, 0, func_ov011_02167f6c()->unk_67c));
+                            func_ov011_02164b78(func_ov011_02164d64(0, 0, func_ov011_02167f6c()->reqProfileId));
                         }
                         break;
                     }
@@ -4993,11 +5001,11 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
                 ServerBrowserGetServer(sb, 0);
                 func_ov011_021667b8(func_ov011_021635a0(0, 0, &func_ov011_02167f6c()->self));
             } else {
-                func_ov011_02167f6c()->unk_5e4 = 2;
+                func_ov011_02167f6c()->sbUpdateFlag = 2;
                 {
                     u64 now = OS_GetTick();
 
-                    func_ov011_02167f6c()->unk_5e8 = now;
+                    func_ov011_02167f6c()->sbUpdateTick = now;
                 }
             }
             break;
@@ -5025,19 +5033,19 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
                 func_ov011_02167f6c()->self.publicPort = SBServerGetPublicQueryPort(chosen);
                 func_ov011_02167f6c()->self.localIp = SBServerGetPrivateInetAddress(chosen);
                 func_ov011_02167f6c()->self.localPort = SBServerGetPrivateQueryPort(chosen);
-                func_ov011_02167f6c()->self.unk_17 = SBServerHasPrivateAddress(chosen);
+                func_ov011_02167f6c()->self.hasPrivateAddress = SBServerHasPrivateAddress(chosen);
                 func_ov011_02167f6c()->matchType = SBServerGetIntValueA(chosen, "dwc_mtype", -1);
                 func_ov011_0216156c(func_ov011_021685ec(), SBServerGetIntValueA(chosen, "dwc_pid", 0),
                                     func_ov011_02167f6c()->notifyFunc, func_ov011_02167f6c()->notifyParam,
                                     func_ov011_02167f6c()->newClientCallback, func_ov011_02167f6c()->newClientParam,
                                     (DWCAttemptFunc)func_ov011_02167f6c()->checkFunc, &func_ov011_02167f6c()->userData,
-                                    (void *)func_ov011_02167f6c()->unk_7c0);
+                                    (void *)func_ov011_02167f6c()->checkParam);
             } else {
-                func_ov011_02167f6c()->unk_5e4 = 2;
+                func_ov011_02167f6c()->sbUpdateFlag = 2;
                 {
                     u64 now = OS_GetTick();
 
-                    func_ov011_02167f6c()->unk_5e8 = now;
+                    func_ov011_02167f6c()->sbUpdateTick = now;
                 }
             }
             break;
@@ -5046,7 +5054,7 @@ static void func_ov011_0216689c(ServerBrowser *sb, SBCallbackReason reason, SBSe
     case 5:
         break;
     }
-    sMatchState.unk_14--;
+    sMatchState.sbCallbackLevel--;
 }
 
 static void func_ov011_02166e48(SBServer *server) {
@@ -5156,7 +5164,7 @@ static void func_ov011_021670a4(int keyId, QR2Buffer *outBuf, void *userData) {
         qr2_buffer_add_int(outBuf, count);
         return;
     case 10:
-        qr2_buffer_add_int(outBuf, func_ov011_02167f6c()->unk_17);
+        qr2_buffer_add_int(outBuf, func_ov011_02167f6c()->numEntry);
         return;
     case 0x32:
         qr2_buffer_add_int(outBuf, func_ov011_02167f6c()->profileId);
@@ -5232,8 +5240,8 @@ static void func_ov011_02167240(int error, const char *errorMessage, void *userD
 }
 
 static void func_ov011_02167248(u32 ip, u16 port, void *userData) {
-    func_ov011_02167f6c()->unk_5d8 = ip;
-    func_ov011_02167f6c()->unk_5d4 = port;
+    func_ov011_02167f6c()->qr2Ip = ip;
+    func_ov011_02167f6c()->qr2Port = port;
 }
 
 static void func_ov011_02167264(int cookie, void *userData) {
@@ -5248,15 +5256,15 @@ static void func_ov011_02167264(int cookie, void *userData) {
     } else if (func_ov011_02167f6c()->state != 5 && func_ov011_02167f6c()->state != 0xe) {
         return;
     }
-    if (cookie == func_ov011_02167f6c()->unk_5fc) {
-        func_ov011_02167f6c()->unk_5f8++;
+    if (cookie == func_ov011_02167f6c()->nnLastCookie) {
+        func_ov011_02167f6c()->nnRecvCount++;
     } else {
-        func_ov011_02167f6c()->unk_5f8 = 0;
-        func_ov011_02167f6c()->unk_5fc = cookie;
+        func_ov011_02167f6c()->nnRecvCount = 0;
+        func_ov011_02167f6c()->nnLastCookie = cookie;
     }
-    func_ov011_02167f6c()->unk_600 = 0;
+    func_ov011_02167f6c()->nnFailedTime = 0;
     if (func_ov011_021667b8(func_ov011_021635a0(1, cookie, &func_ov011_02167f6c()->self)) == 0) {
-        func_ov011_02167f6c()->unk_6d8 = 0xff;
+        func_ov011_02167f6c()->cmdCommand = 0xff;
     }
 }
 
@@ -5323,9 +5331,9 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
             if (connection->kind != 0) {
                 func_ov011_02167f6c()->self.hostIp = address->addr;
                 func_ov011_02167f6c()->self.hostPort = MATCH_SWAP16(address->port);
-                func_ov011_02167f6c()->unk_5f8 = 0;
-                func_ov011_02167f6c()->unk_5fc = 0;
-                func_ov011_02167f6c()->unk_600 = 0;
+                func_ov011_02167f6c()->nnRecvCount = 0;
+                func_ov011_02167f6c()->nnLastCookie = 0;
+                func_ov011_02167f6c()->nnFailedTime = 0;
                 func_ov011_02167f78(func_ov011_02167f6c()->state == 0xe ? 0xf : 6);
                 func_ov011_02167f6c()->retries = 0;
                 func_ov011_0216261c(buffer, 0x18);
@@ -5333,8 +5341,8 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
                     func_ov011_02167f6c()->fm->socket, 0,
                     func_ov011_0217ed14(func_ov011_02167f6c()->self.hostIp, func_ov011_02167f6c()->self.hostPort, 0),
                     buffer, -1, 5000, func_ov011_02167f6c()->callbacks, 0);
-                if (func_ov011_02167f6c()->unk_5a4 != 0 && status != 0) {
-                    func_ov011_02168270(func_ov011_02167f6c()->self.profileId)->unk_18++;
+                if (func_ov011_02167f6c()->memberConnecting != 0 && status != 0) {
+                    func_ov011_02168270(func_ov011_02167f6c()->self.profileId)->connectFailureCount++;
                     func_ov011_02168468();
                     func_ov011_02167f78(1);
                     return;
@@ -5357,13 +5365,13 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
                 {
                     u64 now = OS_GetTick();
 
-                    func_ov011_02167f6c()->unk_608 = now;
+                    func_ov011_02167f6c()->nnFinishTime = now;
                 }
                 func_ov011_02167f78(6);
             }
         } else if (connection->cookie != 0) {
-            if (func_ov011_02167f6c()->unk_5a4 != 0) {
-                func_ov011_02168270(func_ov011_02167f6c()->self.profileId)->unk_18++;
+            if (func_ov011_02167f6c()->memberConnecting != 0) {
+                func_ov011_02168270(func_ov011_02167f6c()->self.profileId)->connectFailureCount++;
                 func_ov011_02168468();
                 func_ov011_02167f78(1);
                 return;
@@ -5374,7 +5382,7 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
             }
             {
                 if (connection->kind == 0) {
-                    if (mapped == 1 || mapped == 3 || (mapped == 2 && connection->unk_01 >= 1)) {
+                    if (mapped == 1 || mapped == 3 || (mapped == 2 && connection->retryCount >= 1)) {
                         NNCancel(func_ov011_02167f6c()->target.cookie);
                         connection->cookie = 0;
                         if (func_ov011_02167718(0) != 0) {
@@ -5383,7 +5391,7 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
                             }
                         }
                     } else {
-                        connection->unk_01++;
+                        connection->retryCount++;
                         if (func_ov011_021667b8(func_ov011_0216373c(connection)) != 0) {
                             return;
                         }
@@ -5391,8 +5399,8 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
                 } else {
                     u64 now = OS_GetTick();
 
-                    func_ov011_02167f6c()->unk_600 = now;
-                    if (mapped == 1 || mapped == 3 || (mapped == 2 && func_ov011_02167f6c()->unk_5f8 >= 1)) {
+                    func_ov011_02167f6c()->nnFailedTime = now;
+                    if (mapped == 1 || mapped == 3 || (mapped == 2 && func_ov011_02167f6c()->nnRecvCount >= 1)) {
                         NNCancel(func_ov011_02167f6c()->target.cookie);
                         connection->cookie = 0;
                         if (func_ov011_02167f6c()->matchType == 3 || func_ov011_02167f6c()->matchType == 2) {
@@ -5402,9 +5410,9 @@ static void func_ov011_02167428(int result, int gameSocket, SocAddrIn *address, 
                         } else if (func_ov011_02167718(0) == 0) {
                             return;
                         }
-                        func_ov011_02167f6c()->unk_5f8 = 0;
-                        func_ov011_02167f6c()->unk_5fc = 0;
-                        func_ov011_02167f6c()->unk_600 = 0;
+                        func_ov011_02167f6c()->nnRecvCount = 0;
+                        func_ov011_02167f6c()->nnLastCookie = 0;
+                        func_ov011_02167f6c()->nnFailedTime = 0;
                         if (func_ov011_02165164(func_ov011_02167f6c()->self.profileId) != 0) {
                             return;
                         }
@@ -5420,10 +5428,10 @@ static BOOL func_ov011_02167718(int skip) {
         return TRUE;
     }
     if (func_ov011_02167f6c()->matchType != 3) {
-        func_ov011_02167f6c()->unk_5f9++;
+        func_ov011_02167f6c()->nnFailureCount++;
     }
     if (func_ov011_02167f6c()->matchType == 3 || func_ov011_02167f6c()->unk_798 != 0 ||
-        func_ov011_02167f6c()->unk_5f9 >= 5) {
+        func_ov011_02167f6c()->nnFailureCount >= 5) {
         func_ov011_02162880(6, -86420);
         return FALSE;
     }
@@ -5441,7 +5449,7 @@ static BOOL func_ov011_02167778(void) {
         u32 data = func_ov011_02160344();
         u32 type;
 
-        if (func_ov011_02167f6c()->unk_788 & (1 << peer->aid)) {
+        if (func_ov011_02167f6c()->newHostAckBit & (1 << peer->aid)) {
             type = 0x55;
         } else {
             type = 0x52;
@@ -5478,7 +5486,7 @@ static void func_ov011_02167838(MatchCheckFunc a, const void *userData, u32 c) {
     } else {
         memset(&func_ov011_02167f6c()->userData, 0, sizeof(int));
     }
-    func_ov011_02167f6c()->unk_7c0 = c;
+    func_ov011_02167f6c()->checkParam = c;
 }
 
 static void func_ov011_0216788c(int isHost) {
@@ -5487,13 +5495,13 @@ static void func_ov011_0216788c(int isHost) {
     if (isHost != 0) {
         func_ov011_02167f6c()->groupId = func_ov011_02167810();
         func_ov011_02168224()->aid = 0;
-        func_ov011_02167f6c()->unk_7c4 = 1;
+        func_ov011_02167f6c()->unlocked = 1;
     }
     func_ov011_02167f6c()->mode = 2;
     func_ov011_02167f78(0xd);
     func_ov011_02167fa0(2);
-    func_ov011_02167f6c()->unk_5dc = 0;
-    func_ov011_02167f6c()->unk_18 = 0;
+    func_ov011_02167f6c()->qr2Reservation = 0;
+    func_ov011_02167f6c()->qr2IsReserved = 0;
     if (func_ov011_02167f6c()->matchType == 0) {
         mode = 3;
     } else {
@@ -5508,7 +5516,7 @@ static void func_ov011_0216788c(int isHost) {
         func_ov011_02167f6c()->matchType = 2;
     }
     func_ov011_02166670(func_ov011_02162d80(mode));
-    func_ov011_02167f6c()->unk_67c = 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
 }
 
 static void func_ov011_02167924(int profileId) {
@@ -5540,12 +5548,12 @@ int func_ov011_021679c8(BOOL force) {
     if (func_ov011_02167f6c()->state == 0x13 || func_ov011_02167f6c()->state == 0x14) {
         return 1;
     }
-    if (force != 0 || 15000 < OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_7a0)) {
+    if (force != 0 || 15000 < OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->aidListSendTick)) {
         u64 now;
 
         packet[0] = func_ov011_02167f6c()->profileId;
         packet[1] = func_ov011_02160344();
-        packet[2] = func_ov011_02167f6c()->unk_7c8;
+        packet[2] = func_ov011_02167f6c()->synId;
         for (i = 0; i < func_ov011_02168024(); i++) {
             DWCNodeInfo *peer = func_ov011_02168250(i);
 
@@ -5557,7 +5565,7 @@ int func_ov011_021679c8(BOOL force) {
             }
         }
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_7a0 = now;
+        func_ov011_02167f6c()->aidListSendTick = now;
     }
     return 1;
 }
@@ -5565,7 +5573,7 @@ int func_ov011_021679c8(BOOL force) {
 static BOOL func_ov011_02167ac4(u32 index, int set, int mode) {
     int count = 0;
     DWCNodeInfo *host = func_ov011_02168250(0);
-    u32 oldFlags = func_ov011_02167f6c()->unk_1c;
+    u32 oldFlags = func_ov011_02167f6c()->suspendAidBitmap;
     u32 flags;
     u32 packet[4];
     DWCNodeInfo *target;
@@ -5576,16 +5584,16 @@ static BOOL func_ov011_02167ac4(u32 index, int set, int mode) {
     if (set != 0) {
         MatchControl *match = func_ov011_02167f6c();
 
-        match->unk_1c = match->unk_1c | (1 << index);
+        match->suspendAidBitmap = match->suspendAidBitmap | (1 << index);
     } else {
         MatchControl *match = func_ov011_02167f6c();
 
-        match->unk_1c = match->unk_1c & ~(1 << index);
+        match->suspendAidBitmap = match->suspendAidBitmap & ~(1 << index);
     }
-    if (oldFlags != func_ov011_02167f6c()->unk_1c) {
+    if (oldFlags != func_ov011_02167f6c()->suspendAidBitmap) {
         func_ov011_02162d80(-1);
     }
-    flags = func_ov011_02167f6c()->unk_1c;
+    flags = func_ov011_02167f6c()->suspendAidBitmap;
     if (func_ov011_02167f0c() == 0) {
         flags &= ~(1 << func_ov011_021602c0());
     }
@@ -5642,7 +5650,7 @@ static BOOL func_ov011_02167c28(void) {
         return func_ov011_02164b78(func_ov011_02164d64(0, 1, 0)) == 0;
     } else if (func_ov011_02167f6c()->matchType == 2) {
         func_ov011_02167f78(0xd);
-        func_ov011_02167f6c()->unk_0d = 1;
+        func_ov011_02167f6c()->matched = 1;
         return TRUE;
     } else if (func_ov011_02167f6c()->matchType == 3) {
         MatchControl *match = func_ov011_02167f6c();
@@ -5655,36 +5663,36 @@ static BOOL func_ov011_02167c28(void) {
         }
         return TRUE;
     }
-    func_ov011_02167f6c()->unk_67c = 0;
-    return func_ov011_021666c4(func_ov011_0216322c(func_ov011_02167f6c()->unk_67c)) == 0;
+    func_ov011_02167f6c()->reqProfileId = 0;
+    return func_ov011_021666c4(func_ov011_0216322c(func_ov011_02167f6c()->reqProfileId)) == 0;
 }
 
 static void func_ov011_02167d24(int a, MatchCallback b, int c) {
     u64 now;
 
     func_ov011_02167f6c()->unk_30 = 0;
-    func_ov011_02167f6c()->unk_2c = a;
-    func_ov011_02167f6c()->unk_34 = b;
-    func_ov011_02167f6c()->unk_38 = c;
-    func_ov011_02167f6c()->unk_20 = 0;
+    func_ov011_02167f6c()->suspendRequest = a;
+    func_ov011_02167f6c()->suspendCallback = b;
+    func_ov011_02167f6c()->suspendParam = c;
+    func_ov011_02167f6c()->suspendSendTick = 0;
     now = OS_GetTick();
-    func_ov011_02167f6c()->unk_3c = now;
-    func_ov011_02167f6c()->unk_48 = 1;
+    func_ov011_02167f6c()->suspendStartTick = now;
+    func_ov011_02167f6c()->suspendPending = 1;
 }
 
 static BOOL func_ov011_02167d6c(void) {
     int value;
     int hasSet;
 
-    if (func_ov011_02167f6c()->unk_48 == 0) {
+    if (func_ov011_02167f6c()->suspendPending == 0) {
         return FALSE;
     }
-    if (func_ov011_02167f6c()->unk_44 != 0) {
-        func_ov011_02167d24(func_ov011_02167f6c()->unk_2c, func_ov011_02167f6c()->unk_34,
-                            func_ov011_02167f6c()->unk_38);
-        func_ov011_02167f6c()->unk_44 = 0;
+    if (func_ov011_02167f6c()->suspendResend != 0) {
+        func_ov011_02167d24(func_ov011_02167f6c()->suspendRequest, func_ov011_02167f6c()->suspendCallback,
+                            func_ov011_02167f6c()->suspendParam);
+        func_ov011_02167f6c()->suspendResend = 0;
     }
-    value = func_ov011_02167f6c()->unk_2c;
+    value = func_ov011_02167f6c()->suspendRequest;
     if (value == 0xff) {
         return FALSE;
     }
@@ -5709,11 +5717,12 @@ static BOOL func_ov011_02167de0(int value) {
         return TRUE;
     }
     if (func_ov011_02167f6c()->unk_30 != 0) {
-        if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_20) < func_ov011_02167f6c()->unk_7cc) {
+        if (OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->suspendSendTick) <
+            func_ov011_02167f6c()->suspendWaitTime) {
             return TRUE;
         }
     }
-    if (3000 < OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->unk_20)) {
+    if (3000 < OS_TicksToMilliSeconds(OS_GetTick() - func_ov011_02167f6c()->suspendSendTick)) {
         u64 now;
 
         self = func_ov011_02168224();
@@ -5727,8 +5736,8 @@ static BOOL func_ov011_02167de0(int value) {
             return FALSE;
         }
         now = OS_GetTick();
-        func_ov011_02167f6c()->unk_20 = now;
-        func_ov011_02167f6c()->unk_7cc = 3000;
+        func_ov011_02167f6c()->suspendSendTick = now;
+        func_ov011_02167f6c()->suspendWaitTime = 3000;
     }
     return TRUE;
 }
@@ -5780,7 +5789,7 @@ static u8 func_ov011_02167fc4(void) {
 }
 
 static BOOL func_ov011_02167fd0(void) {
-    if (func_ov011_02167f6c()->unk_7b0 != 1) {
+    if (func_ov011_02167f6c()->topology != 1) {
         return TRUE;
     }
     return FALSE;
@@ -5795,75 +5804,75 @@ static void func_ov011_02167fe8(void) {
 }
 
 static void func_ov011_0216800c(void) {
-    MI_CpuFill8(&func_ov011_02167f6c()->unk_50, 0, 0x504);
+    MI_CpuFill8(&func_ov011_02167f6c()->nodeCount, 0, 0x504);
 }
 
 int func_ov011_02168024(void) {
-    return func_ov011_02167f6c()->unk_50;
+    return func_ov011_02167f6c()->nodeCount;
 }
 
 static BOOL func_ov011_02168030(DWCNodeInfo *peer) {
     int i;
 
-    if (func_ov011_02167f6c()->unk_50 == 0x20) {
+    if (func_ov011_02167f6c()->nodeCount == 0x20) {
         return FALSE;
     }
-    for (i = func_ov011_02167f6c()->unk_50; i > 0; i--) {
-        func_ov011_02167f6c()->unk_54[i] = func_ov011_02167f6c()->unk_54[i - 1];
+    for (i = func_ov011_02167f6c()->nodeCount; i > 0; i--) {
+        func_ov011_02167f6c()->nodes[i] = func_ov011_02167f6c()->nodes[i - 1];
     }
-    func_ov011_02167f6c()->unk_54[0] = *peer;
-    func_ov011_02167f6c()->unk_50++;
+    func_ov011_02167f6c()->nodes[0] = *peer;
+    func_ov011_02167f6c()->nodeCount++;
     return TRUE;
 }
 
 static BOOL func_ov011_021680a4(DWCNodeInfo *peer) {
-    if (func_ov011_02167f6c()->unk_50 == 0x20) {
+    if (func_ov011_02167f6c()->nodeCount == 0x20) {
         return FALSE;
     }
-    func_ov011_02167f6c()->unk_54[func_ov011_02167f6c()->unk_50] = *peer;
-    func_ov011_02167f6c()->unk_50++;
+    func_ov011_02167f6c()->nodes[func_ov011_02167f6c()->nodeCount] = *peer;
+    func_ov011_02167f6c()->nodeCount++;
     return TRUE;
 }
 
 static BOOL func_ov011_021680e4(int index) {
     int i;
 
-    if (func_ov011_02167f6c()->unk_50 == 0) {
+    if (func_ov011_02167f6c()->nodeCount == 0) {
         return FALSE;
     }
-    for (i = 0; i < func_ov011_02167f6c()->unk_50; i++) {
-        if (index == func_ov011_02167f6c()->unk_54[i].aid) {
+    for (i = 0; i < func_ov011_02167f6c()->nodeCount; i++) {
+        if (index == func_ov011_02167f6c()->nodes[i].aid) {
             break;
         }
     }
-    if (i == func_ov011_02167f6c()->unk_50) {
+    if (i == func_ov011_02167f6c()->nodeCount) {
         return FALSE;
     }
-    for (; i < func_ov011_02167f6c()->unk_50 - 1; i++) {
-        func_ov011_02167f6c()->unk_54[i] = func_ov011_02167f6c()->unk_54[i + 1];
+    for (; i < func_ov011_02167f6c()->nodeCount - 1; i++) {
+        func_ov011_02167f6c()->nodes[i] = func_ov011_02167f6c()->nodes[i + 1];
     }
-    func_ov011_02167f6c()->unk_50--;
+    func_ov011_02167f6c()->nodeCount--;
     return TRUE;
 }
 
 static BOOL func_ov011_02168184(int id) {
     int i;
 
-    if (func_ov011_02167f6c()->unk_50 == 0) {
+    if (func_ov011_02167f6c()->nodeCount == 0) {
         return FALSE;
     }
-    for (i = 0; i < func_ov011_02167f6c()->unk_50; i++) {
-        if (id == func_ov011_02167f6c()->unk_54[i].profileId) {
+    for (i = 0; i < func_ov011_02167f6c()->nodeCount; i++) {
+        if (id == func_ov011_02167f6c()->nodes[i].profileId) {
             break;
         }
     }
-    if (i == func_ov011_02167f6c()->unk_50) {
+    if (i == func_ov011_02167f6c()->nodeCount) {
         return FALSE;
     }
-    for (; i < func_ov011_02167f6c()->unk_50 - 1; i++) {
-        func_ov011_02167f6c()->unk_54[i] = func_ov011_02167f6c()->unk_54[i + 1];
+    for (; i < func_ov011_02167f6c()->nodeCount - 1; i++) {
+        func_ov011_02167f6c()->nodes[i] = func_ov011_02167f6c()->nodes[i + 1];
     }
-    func_ov011_02167f6c()->unk_50--;
+    func_ov011_02167f6c()->nodeCount--;
     return TRUE;
 }
 
@@ -5872,15 +5881,15 @@ static DWCNodeInfo *func_ov011_02168224(void) {
 }
 
 static DWCNodeInfo *func_ov011_02168238(void) {
-    if (func_ov011_02167f6c()->unk_50 >= 1) {
-        return func_ov011_02167f6c()->unk_54;
+    if (func_ov011_02167f6c()->nodeCount >= 1) {
+        return func_ov011_02167f6c()->nodes;
     }
     return NULL;
 }
 
 DWCNodeInfo *func_ov011_02168250(int index) {
-    if (index < func_ov011_02167f6c()->unk_50) {
-        return &func_ov011_02167f6c()->unk_54[index];
+    if (index < func_ov011_02167f6c()->nodeCount) {
+        return &func_ov011_02167f6c()->nodes[index];
     }
     return NULL;
 }
@@ -5888,9 +5897,9 @@ DWCNodeInfo *func_ov011_02168250(int index) {
 static DWCNodeInfo *func_ov011_02168270(int id) {
     int i;
 
-    for (i = 0; i < func_ov011_02167f6c()->unk_50; i++) {
-        if (id == func_ov011_02167f6c()->unk_54[i].profileId) {
-            return &func_ov011_02167f6c()->unk_54[i];
+    for (i = 0; i < func_ov011_02167f6c()->nodeCount; i++) {
+        if (id == func_ov011_02167f6c()->nodes[i].profileId) {
+            return &func_ov011_02167f6c()->nodes[i];
         }
     }
     return NULL;
@@ -5899,9 +5908,9 @@ static DWCNodeInfo *func_ov011_02168270(int id) {
 static DWCNodeInfo *func_ov011_021682ac(int index) {
     int i;
 
-    for (i = 0; i < func_ov011_02167f6c()->unk_50; i++) {
-        if (index == func_ov011_02167f6c()->unk_54[i].aid) {
-            return &func_ov011_02167f6c()->unk_54[i];
+    for (i = 0; i < func_ov011_02167f6c()->nodeCount; i++) {
+        if (index == func_ov011_02167f6c()->nodes[i].aid) {
+            return &func_ov011_02167f6c()->nodes[i];
         }
     }
     return NULL;
@@ -5911,16 +5920,16 @@ static u8 func_ov011_021682ec(void) {
     u8 index;
     int i;
 
-    if (func_ov011_02167f6c()->unk_50 == 0x20) {
+    if (func_ov011_02167f6c()->nodeCount == 0x20) {
         return 0xff;
     }
     for (index = 0; index < 0x20; index++) {
-        for (i = 0; i < func_ov011_02167f6c()->unk_50; i++) {
-            if (index == func_ov011_02167f6c()->unk_54[i].aid) {
+        for (i = 0; i < func_ov011_02167f6c()->nodeCount; i++) {
+            if (index == func_ov011_02167f6c()->nodes[i].aid) {
                 break;
             }
         }
-        if (i == func_ov011_02167f6c()->unk_50) {
+        if (i == func_ov011_02167f6c()->nodeCount) {
             return index;
         }
     }
@@ -5994,44 +6003,44 @@ static u64 func_ov011_021683b8(void) {
 }
 
 static BOOL func_ov011_02168468(void) {
-    if (func_ov011_02167f6c()->unk_5a4 == 0) {
+    if (func_ov011_02167f6c()->memberConnecting == 0) {
         return FALSE;
     }
-    func_ov011_02167f6c()->unk_5a4 = 0;
-    func_ov011_02167f6c()->unk_5a8 = func_ov011_02167f6c()->state;
+    func_ov011_02167f6c()->memberConnecting = 0;
+    func_ov011_02167f6c()->abortedMemberState = func_ov011_02167f6c()->state;
     if (func_ov011_02168388() != 0) {
-        func_ov011_02167f6c()->unk_5ac = func_ov011_02167f6c()->self;
+        func_ov011_02167f6c()->abortedMember = func_ov011_02167f6c()->self;
     } else {
-        MI_CpuFill8(&func_ov011_02167f6c()->unk_5ac, 0, 0x28);
+        MI_CpuFill8(&func_ov011_02167f6c()->abortedMember, 0, 0x28);
     }
     if (func_ov011_02167f6c()->target.cookie != 0) {
         NNCancel(func_ov011_02167f6c()->target.cookie);
         func_ov011_02167f6c()->target.cookie = 0;
-        func_ov011_02167f6c()->unk_5f8 = 0;
-        func_ov011_02167f6c()->unk_5fc = 0;
-        func_ov011_02167f6c()->unk_600 = 0;
+        func_ov011_02167f6c()->nnRecvCount = 0;
+        func_ov011_02167f6c()->nnLastCookie = 0;
+        func_ov011_02167f6c()->nnFailedTime = 0;
     }
     if (func_ov011_02167f6c()->state == 3 || func_ov011_02167f6c()->state == 5 || func_ov011_02167f6c()->state == 6 ||
         func_ov011_02167f6c()->state == 0xe || func_ov011_02167f6c()->state == 0xf) {
-        if (func_ov011_02167f6c()->unk_67c != 0) {
+        if (func_ov011_02167f6c()->reqProfileId != 0) {
             if (func_ov011_02164b78(func_ov011_02165040(0)) != 0) {
                 func_ov011_02168374();
                 return TRUE;
             }
         }
-        func_ov011_02167f6c()->unk_18 = 0;
-        func_ov011_02167f6c()->unk_5dc = 0;
+        func_ov011_02167f6c()->qr2IsReserved = 0;
+        func_ov011_02167f6c()->qr2Reservation = 0;
     }
     func_ov011_02168374();
     return TRUE;
 }
 
 static int func_ov011_02168590(void) {
-    return func_ov011_02167f6c()->unk_7c4;
+    return func_ov011_02167f6c()->unlocked;
 }
 
 static BOOL func_ov011_021685a0(void) {
-    if (func_ov011_02167f6c()->unk_7d4 == 0) {
+    if (func_ov011_02167f6c()->lockEnabled == 0) {
         return FALSE;
     }
     if (func_ov011_02160408() != 0) {
@@ -6046,40 +6055,41 @@ static BOOL func_ov011_021685a0(void) {
 }
 
 static int func_ov011_021685ec(void) {
-    return func_ov011_02167f6c()->unk_7b0;
+    return func_ov011_02167f6c()->topology;
 }
 
 static void func_ov011_021685fc(void) {
-    func_ov011_02167f6c()->unk_5a8 = 0;
-    MI_CpuFill8(&func_ov011_02167f6c()->unk_5ac, 0, 0x28);
+    func_ov011_02167f6c()->abortedMemberState = 0;
+    MI_CpuFill8(&func_ov011_02167f6c()->abortedMember, 0, 0x28);
 }
 
 static void func_ov011_02168620(void) {
-    if (func_ov011_02167f6c()->unk_2c != 0xff) {
-        if (func_ov011_02167f6c()->unk_2c == 1) {
+    if (func_ov011_02167f6c()->suspendRequest != 0xff) {
+        if (func_ov011_02167f6c()->suspendRequest == 1) {
             MatchControl *match = func_ov011_02167f6c();
 
-            match->unk_1c = func_ov011_02160344();
+            match->suspendAidBitmap = func_ov011_02160344();
         } else {
-            func_ov011_02167f6c()->unk_1c = 0;
+            func_ov011_02167f6c()->suspendAidBitmap = 0;
         }
         func_ov011_02168654(0);
     }
 }
 
 static void func_ov011_02168654(int cancelled) {
-    if (func_ov011_02167f6c()->unk_34 != 0) {
-        func_ov011_02167f6c()->unk_34(cancelled, func_ov011_02167f6c()->unk_2c, func_ov011_02167f6c()->unk_38);
+    if (func_ov011_02167f6c()->suspendCallback != 0) {
+        func_ov011_02167f6c()->suspendCallback(cancelled, func_ov011_02167f6c()->suspendRequest,
+                                               func_ov011_02167f6c()->suspendParam);
     }
     if (cancelled == 0) {
         qr2_send_statechanged(func_ov011_02167f6c()->qr2);
     }
-    func_ov011_02167f6c()->unk_2c = 0xff;
-    func_ov011_02167f6c()->unk_48 = 0;
+    func_ov011_02167f6c()->suspendRequest = 0xff;
+    func_ov011_02167f6c()->suspendPending = 0;
 }
 
 static BOOL func_ov011_021686a0(void) {
-    if (func_ov011_02167f6c()->unk_7b0 == 2) {
+    if (func_ov011_02167f6c()->topology == 2) {
         return TRUE;
     }
     return FALSE;
@@ -6144,9 +6154,9 @@ void func_ov011_02168794(void) {
 
 static void func_ov011_021687ec(void) {
     NNCancel(func_ov011_02167f6c()->target.cookie);
-    if (sMatchState.unk_00 == 0) {
+    if (sMatchState.inNNThink == 0) {
         NNFreeNegotiateList();
     } else {
-        sMatchState.unk_08 = 1;
+        sMatchState.nnFreeNegotiateList = 1;
     }
 }
