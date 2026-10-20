@@ -300,3 +300,8 @@ lib/dwcutilui/src/dwc_util_address_settings.c:
     .rodata     start:0x021c017c end:0x021c0280
     .data       start:0x021c10e0 end:0x021c1160
     .bss        start:0x021c414c end:0x021c4158
+
+lib/dwcutilui/src/dwc_util_save_settings.c:
+    complete
+    .text       start:0x021b4444 end:0x021b45c8
+    .data       start:0x021c1160 end:0x021c11a4

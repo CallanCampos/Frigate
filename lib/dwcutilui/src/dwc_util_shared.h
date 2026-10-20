@@ -55,6 +55,8 @@ void func_ov182_021b77dc(void);
 void func_ov182_021b780c(void);
 // Erases the connections of the console's Wi-Fi settings and makes a new Wi-Fi ID
 void func_ov182_021b7ea0(void);
+// Saves the connection being edited into its connection of the console's Wi-Fi settings
+void func_ov182_021b7bb0(void);
 // Sets whether DHCP gives the address, the mask and the gateway, and the DNS servers, of the connection being edited
 void func_ov182_021b782c(BOOL autoAddress);
 void func_ov182_021b7840(BOOL autoDns);
@@ -133,8 +135,6 @@ void func_ov182_021b5bb8(void);
 void func_ov182_021b6588(void);
 // The screen of the button above the list of access points
 void func_ov182_021b5000(void);
-// The save of the connection being edited (its file is not written yet)
-void func_ov182_021b4404(void);
 // The connection test with auto-connect (its file is not written yet)
 void func_ov182_021b6104(void);
 

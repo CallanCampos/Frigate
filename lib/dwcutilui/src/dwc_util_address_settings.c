@@ -13,6 +13,7 @@
 #include "dwc_util_oam_attr.h"
 #include "dwc_util_oam_buf.h"
 #include "dwc_util_rom_resource.h"
+#include "dwc_util_save_settings.h"
 #include "dwc_util_screen.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_string.h"
