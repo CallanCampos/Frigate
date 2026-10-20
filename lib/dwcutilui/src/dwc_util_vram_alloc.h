@@ -17,10 +17,10 @@ struct DWCUtilVramNode {
     u16 size;
 };
 
-void func_ov182_021bccec(void);
+void DWCUtilVramAlloc_Init(void);
 // A block for size characters, the first that fits from the front if fromFront, else from the back, and its first
 // unit in pos
-DWCUtilVramNode *func_ov182_021bcdbc(int screen, int size, s16 fromFront, u32 *pos);
-void func_ov182_021bcec4(DWCUtilVramNode *node);
+DWCUtilVramNode *DWCUtilVramAlloc_Alloc(int screen, int size, s16 fromFront, u32 *pos);
+void DWCUtilVramAlloc_Free(DWCUtilVramNode *node);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_VRAM_ALLOC_H

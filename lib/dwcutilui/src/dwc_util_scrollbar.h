@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// The events of the scroll bar, from func_ov182_021b7150
+// The events of the scroll bar, from DWCUtilScrollbar_GetEvent
 enum {
     DWC_UTIL_SCROLLBAR_NONE,
     DWC_UTIL_SCROLLBAR_GRAB,     // the handle was touched
@@ -18,14 +18,14 @@ enum {
 // The connection utility's scroll bar of a list, on the main screen: a handle of one of three lengths (kind 0 to 2,
 // one that can't be dragged for 0) that travels range pixels down from x, y, an arrow above and an arrow below.
 // The ROM does not embed this source file's name; dwc_util_scrollbar.c is descriptive.
-void func_ov182_021b70a0(int kind, int range, u16 x, u16 y, int pos);
-void func_ov182_021b711c(void);
+void DWCUtilScrollbar_Create(int kind, int range, u16 x, u16 y, int pos);
+void DWCUtilScrollbar_Destroy(void);
 // The handle's position, in pixels from the top of the bar, and the event of this frame
-u8 func_ov182_021b7144(void);
-u8 func_ov182_021b7150(void);
-void func_ov182_021b715c(int pos);
+u8 DWCUtilScrollbar_GetPos(void);
+u8 DWCUtilScrollbar_GetEvent(void);
+void DWCUtilScrollbar_SetPos(int pos);
 // Unlocks and locks the scroll bar
-void func_ov182_021b7164(void);
-void func_ov182_021b7174(void);
+void DWCUtilScrollbar_Unlock(void);
+void DWCUtilScrollbar_Lock(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SCROLLBAR_H

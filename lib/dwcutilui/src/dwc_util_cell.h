@@ -18,19 +18,19 @@ struct DWCUtilStack {
     void *items[1];
 };
 
-void func_ov182_021bb8dc(int screen, const char *path);
-void func_ov182_021bb8fc(int screen);
-void func_ov182_021bb914(int screen, int cell, GXOamAttr *oam);
+void DWCUtilCell_Load(int screen, const char *path);
+void DWCUtilCell_Unload(int screen);
+void DWCUtilCell_Copy(int screen, int cell, GXOamAttr *oam);
 // Copies the cell into entries from the screen's OAM buffer, or into a run of entries
-GXOamAttr *func_ov182_021bb960(int screen, int cell);
-DWCUtilOamNode *func_ov182_021bb97c(int screen, int cell, BOOL fromFront);
+GXOamAttr *DWCUtilCell_AllocOam(int screen, int cell);
+DWCUtilOamNode *DWCUtilCell_AllocOamRun(int screen, int cell, BOOL fromFront);
 
 // An empty stack for count items, and one filled with the count items that start at first, stride bytes apart
-DWCUtilStack *func_ov182_021bb9ac(int count);
-DWCUtilStack *func_ov182_021bb9c8(int count, u8 *first, int stride);
-void func_ov182_021bb9ec(DWCUtilStack *stack);
-void func_ov182_021bba00(DWCUtilStack *stack, void *item);
+DWCUtilStack *DWCUtilStack_Create(int count);
+DWCUtilStack *DWCUtilStack_CreateFilled(int count, u8 *first, int stride);
+void DWCUtilStack_Destroy(DWCUtilStack *stack);
+void DWCUtilStack_Push(DWCUtilStack *stack, void *item);
 // The last item pushed, or NULL
-void *func_ov182_021bba38(DWCUtilStack *stack);
+void *DWCUtilStack_Pop(DWCUtilStack *stack);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_CELL_H

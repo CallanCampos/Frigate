@@ -18,44 +18,44 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static BOOL func_ov182_021b4588(void);
-static void func_ov182_021b45d0(void);
-static void func_ov182_021b4620(void);
-static void func_ov182_021b4644(void);
-static void func_ov182_021b4664(void);
-static void func_ov182_021b4684(void);
-static void func_ov182_021b46a0(void);
+static BOOL DWCUtilTestProgress_IsLidClosed(void);
+static void DWCUtilTestProgress_LoadGraphics(void);
+static void DWCUtilTestProgress_FadeIn(void);
+static void DWCUtilTestProgress_WaitFadeIn(void);
+static void DWCUtilTestProgress_WaitButtons(void);
+static void DWCUtilTestProgress_Main(void);
+static void DWCUtilTestProgress_HandleInput(void);
 static void func_ov182_021b46c4(void);
-static void func_ov182_021b46c8(void);
-static void func_ov182_021b46e8(void);
-static void func_ov182_021b4700(void);
-static void func_ov182_021b4748(void);
-static void func_ov182_021b47d0(void);
-static void func_ov182_021b482c(void);
-static void func_ov182_021b484c(void);
+static void DWCUtilTestProgress_HandleChoice(void);
+static void DWCUtilTestProgress_DisableButtons(void);
+static void DWCUtilTestProgress_FadeOut(void);
+static void DWCUtilTestProgress_WaitFadeOut(void);
+static void DWCUtilTestProgress_PollTest(void);
+static void DWCUtilTestProgress_WaitDialog(void);
+static void DWCUtilTestProgress_WaitDialogClosed(void);
 
 // Whether the test reached its second step; FALSE when it was ended or failed
 static u8 sTestProgressPassed;
 
 // A copy of gfl/ui.c's GCTX_HIDIsLidClosed
-static BOOL func_ov182_021b4588(void) {
+static BOOL DWCUtilTestProgress_IsLidClosed(void) {
     if (PAD_DetectFold()) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021b45a4(void) {
+void DWCUtilTestProgress_Init(void) {
     sTestProgressPassed = FALSE;
-    func_ov182_021b45d0();
-    func_ov182_021ab9ac();
-    func_ov182_021ab6f0(0x25);
+    DWCUtilTestProgress_LoadGraphics();
+    DWCUtilBgOverlay_ShowConnectionSet();
+    DWCUtilGfxResource_ShowMessage(0x25);
     DWCUtilUiEffect_Init(1);
-    func_ov182_021adfbc(func_ov182_021b4620);
+    DWCUtilMain_SetUpdate(DWCUtilTestProgress_FadeIn);
 }
 
-static void func_ov182_021b45d0(void) {
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilTestProgress_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -63,38 +63,39 @@ static void func_ov182_021b45d0(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b4620(void) {
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b4644);
+static void DWCUtilTestProgress_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitFadeIn);
 }
 
-static void func_ov182_021b4644(void) {
-    if (func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(1);
-        func_ov182_021adfbc(func_ov182_021b4664);
+static void DWCUtilTestProgress_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(1);
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitButtons);
     }
 }
 
-static void func_ov182_021b4664(void) {
+static void DWCUtilTestProgress_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        func_ov182_021adfbc(func_ov182_021b4684);
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_Main);
     }
 }
 
-static void func_ov182_021b4684(void) {
+static void DWCUtilTestProgress_Main(void) {
     OS_Sleep(10);
-    func_ov182_021b47d0();
-    func_ov182_021b46a0();
+    DWCUtilTestProgress_PollTest();
+    DWCUtilTestProgress_HandleInput();
     func_ov182_021b46c4();
-    func_ov182_021b46c8();
+    DWCUtilTestProgress_HandleChoice();
 }
 
-static void func_ov182_021b46a0(void) {
-    if (func_ov182_021bc798(2)) {
+static void DWCUtilTestProgress_HandleInput(void) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (func_ov182_021b4588()) {
+    } else if (DWCUtilTestProgress_IsLidClosed()) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -103,82 +104,83 @@ static void func_ov182_021b46c4(void) {
 }
 
 // The button ends the test
-static void func_ov182_021b46c8(void) {
+static void DWCUtilTestProgress_HandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
-        func_ov182_021b8138();
-        func_ov182_021b80f4(7);
-        func_ov182_021adfbc(func_ov182_021b46e8);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(7);
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_DisableButtons);
     }
 }
 
-static void func_ov182_021b46e8(void) {
+static void DWCUtilTestProgress_DisableButtons(void) {
     DWCUtilUiObject_Disable();
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b4700);
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilTestProgress_FadeOut);
 }
 
-static void func_ov182_021b4700(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+static void DWCUtilTestProgress_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         if (!sTestProgressPassed) {
             DWCUtilUiObject_Exit();
         }
         if (!sTestProgressPassed) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b4748);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b4748(void) {
-    if (func_ov182_021bbaac(0) == 0 && (sTestProgressPassed || func_ov182_021bbaac(1) == 0) &&
+static void DWCUtilTestProgress_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(0) == 0 && (sTestProgressPassed || DWCUtilFade_IsActive(1) == 0) &&
         DWCUtilUiObject_IsIdle()) {
         DWCUtilUiEffect_Destroy();
-        func_ov182_021bbf7c(0);
+        DWCUtilText_DestroyScreenBg(0);
         if (!sTestProgressPassed) {
             DWCUtilScreen_Stop();
-            func_ov182_021bc228(1, 1);
+            DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
-        func_ov182_021bc228(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sTestProgressPassed) {
-            func_ov182_021ae424();
-            func_ov182_021adfc8(2, 1);
-            func_ov182_021adfbc(func_ov182_021b5bb8);
+            DWCUtilConnection_Stop();
+            DWCUtilMain_SetLayout(2, 1);
+            DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
         } else {
-            func_ov182_021adfc8(0, 0);
-            func_ov182_021adfbc(func_ov182_021b4880);
+            DWCUtilMain_SetLayout(0, 0);
+            DWCUtilMain_SetUpdate(DWCUtilTestConnect_Init);
         }
     }
 }
 
 // What the test reports
-static void func_ov182_021b47d0(void) {
-    switch (func_ov182_021ae440()) {
+static void DWCUtilTestProgress_PollTest(void) {
+    switch (DWCUtilConnection_GetState()) {
     case 2:
         sTestProgressPassed = TRUE;
-        func_ov182_021adfbc(func_ov182_021b46e8);
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_DisableButtons);
         break;
     case 4:
         sTestProgressPassed = FALSE;
-        func_ov182_021b8138();
-        func_ov182_021b80f4(9);
-        func_ov182_021b8cf0(0xd, 1, 1, -1, 0);
+        DWCUtilSound_StopSe();
+        DWCUtilSound_PlaySe(9);
+        DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b482c);
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitDialog);
         break;
     }
 }
 
-static void func_ov182_021b482c(void) {
-    if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
-        func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b484c);
+static void DWCUtilTestProgress_WaitDialog(void) {
+    if (DWCUtilDialog_GetChoice() == 0) {
+        DWCUtilSound_PlaySe(6);
+        DWCUtilDialog_Close();
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitDialogClosed);
     }
 }
 
-static void func_ov182_021b484c(void) {
-    if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b46e8);
+static void DWCUtilTestProgress_WaitDialogClosed(void) {
+    if (!DWCUtilDialog_IsOpen()) {
+        DWCUtilMain_SetUpdate(DWCUtilTestProgress_DisableButtons);
     }
 }

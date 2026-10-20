@@ -50,10 +50,10 @@ typedef struct DWCUtilMain {
 static char sNasUrl[] = "https://nas.nintendowifi.net/ac";
 static DWCUtilMain sMain;
 
-static BOOL func_ov182_021adc4c(int language, int param);
-static void func_ov182_021adc9c(void);
-static void func_ov182_021add40(void);
-static void func_ov182_021adf6c(void);
+static BOOL DWCUtilMain_CheckParams(int language, int param);
+static void DWCUtilMain_InitSystem(void);
+static void DWCUtilMain_InitGraphics(void);
+static void DWCUtilMain_Exit(void);
 
 int DWC_StartUtility(void *work, int language, int param) {
     const char *nasUrl;
@@ -62,30 +62,30 @@ int DWC_StartUtility(void *work, int language, int param) {
         return -2;
     }
     sMain.work = work;
-    if (!func_ov182_021adc4c(language, param)) {
+    if (!DWCUtilMain_CheckParams(language, param)) {
         return -1;
     }
     nasUrl = func_ov011_021694e0();
     func_ov011_021694d4(sNasUrl);
     sMain.finished = FALSE;
-    func_ov182_021adc9c();
-    func_ov182_021add40();
-    func_ov182_021b8050();
-    func_ov182_021adfbc(func_ov182_021ae574);
+    DWCUtilMain_InitSystem();
+    DWCUtilMain_InitGraphics();
+    DWCUtilSound_Init();
+    DWCUtilMain_SetUpdate(DWCUtilMainMenu_InitUtility);
     do {
-        func_ov182_021bc5bc();
+        DWCUtilTouch_Update();
         sMain.update();
-        func_ov182_021bd19c(0);
-        func_ov182_021bca28();
+        DWCUtilTask_Run(0);
+        DWCUtilTouch_UpdateLid();
         func_ov182_021bd0ac();
         OS_WaitVBlankIntr();
     } while (!sMain.finished);
-    func_ov182_021adf6c();
+    DWCUtilMain_Exit();
     func_ov011_021694d4(nasUrl);
     return 0;
 }
 
-static BOOL func_ov182_021adc4c(int language, int param) {
+static BOOL DWCUtilMain_CheckParams(int language, int param) {
     sMain.language = language;
     sMain.param.raw = param;
     if (language < 0 || language > 6) {
@@ -106,7 +106,7 @@ static BOOL func_ov182_021adc4c(int language, int param) {
     return TRUE;
 }
 
-static void func_ov182_021adc9c(void) {
+static void DWCUtilMain_InitSystem(void) {
     void *work;
 
     OS_DisableIrq();
@@ -125,19 +125,19 @@ static void func_ov182_021adc9c(void) {
     RTC_Init();
     GX_DispOff();
     GXS_DispOff();
-    func_ov182_021bcf38();
-    func_ov182_021bc468(sMain.work);
-    func_ov182_021bcaac();
-    func_ov182_021bd0d4();
-    func_ov182_021bb18c();
-    func_ov182_021bc544();
-    func_ov182_021bba6c();
-    work = func_ov182_021bc4d8(DWC_BM_WORK_SIZE, 0x20);
+    DWCUtilBank_Init();
+    DWCUtilHeap_Init(sMain.work);
+    DWCUtilIrq_Init();
+    DWCUtilTask_Init();
+    DWCUtilRomResource_Init();
+    DWCUtilTouch_Init();
+    DWCUtilFade_Init();
+    work = DWCUtilHeap_AllocClear(DWC_BM_WORK_SIZE, 0x20);
     DWC_BM_Init(work);
-    func_ov182_021bc4f0(&work);
+    DWCUtilHeap_FreeAndNull(&work);
 }
 
-static void func_ov182_021add40(void) {
+static void DWCUtilMain_InitGraphics(void) {
     GX_VBlankIntr(FALSE);
     GX_SetBankForBG(GX_VRAM_BG_128_A);
     GX_SetBankForOBJ(GX_VRAM_OBJ_128_B);
@@ -186,43 +186,43 @@ static void func_ov182_021add40(void) {
     GX_SetBGScrOffset(GX_BGSCROFFSET_0x00000);
     GX_SetBGCharOffset(GX_BGCHAROFFSET_0x00000);
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
-    func_ov182_021bbc50();
-    func_ov182_021bcbc8();
-    func_ov182_021bccec();
-    func_ov182_021bb480();
+    DWCUtilText_Init();
+    DWCUtilOamBuf_Init();
+    DWCUtilVramAlloc_Init();
+    DWCUtilOam_Init();
     GX_DispOn();
     GXS_DispOn();
     GX_VBlankIntr(TRUE);
 }
 
-static void func_ov182_021adf6c(void) {
+static void DWCUtilMain_Exit(void) {
     GX_DispOff();
     GXS_DispOff();
     func_ov182_021bd0c8();
     PM_SetLCDPower(TRUE);
-    func_ov182_021bc598();
-    func_ov182_021bcaf8();
-    func_ov182_021b80d4();
-    func_ov182_021bb54c();
-    func_ov182_021bcc5c();
-    func_ov182_021bbd00();
-    func_ov182_021bba9c();
-    func_ov182_021bb2a4();
-    func_ov182_021bd16c();
-    func_ov182_021bc494();
-    func_ov182_021bcf9c();
+    DWCUtilTouch_Exit();
+    DWCUtilIrq_Exit();
+    DWCUtilSound_Exit();
+    DWCUtilOam_Exit();
+    DWCUtilOamBuf_Exit();
+    DWCUtilText_Exit();
+    DWCUtilFade_Exit();
+    DWCUtilRomResource_Exit();
+    DWCUtilTask_Exit();
+    DWCUtilHeap_Exit();
+    DWCUtilBank_Exit();
 }
 
-void func_ov182_021adfbc(void (*update)(void)) {
+void DWCUtilMain_SetUpdate(void (*update)(void)) {
     sMain.update = update;
 }
 
-void func_ov182_021adfc8(u32 value0, u32 value1) {
+void DWCUtilMain_SetLayout(u32 value0, u32 value1) {
     sMain.value0 = value0;
     sMain.value1 = value1;
 }
 
-void func_ov182_021adfd4(u32 *value0, u32 *value1) {
+void DWCUtilMain_GetLayout(u32 *value0, u32 *value1) {
     if (value0 != NULL) {
         *value0 = sMain.value0;
     }
@@ -231,12 +231,12 @@ void func_ov182_021adfd4(u32 *value0, u32 *value1) {
     }
 }
 
-void func_ov182_021adff0(int value2, int value3) {
+void DWCUtilMain_SetScreenArgs(int value2, int value3) {
     sMain.value2 = value2;
     sMain.value3 = value3;
 }
 
-void func_ov182_021adffc(int *value2, int *value3) {
+void DWCUtilMain_GetScreenArgs(int *value2, int *value3) {
     if (value2 != NULL) {
         *value2 = sMain.value2;
     }
@@ -245,22 +245,22 @@ void func_ov182_021adffc(int *value2, int *value3) {
     }
 }
 
-u8 func_ov182_021ae018(void) {
+u8 DWCUtilMain_GetLanguage(void) {
     return sMain.language;
 }
 
-u32 func_ov182_021ae024(void) {
+u32 DWCUtilMain_GetStartScreen(void) {
     return sMain.param.fields.mode;
 }
 
-BOOL func_ov182_021ae034(u32 mask) {
+BOOL DWCUtilMain_HasFlag(u32 mask) {
     if (mask & sMain.param.fields.flags) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021ae04c(void) {
+void DWCUtilMain_Finish(void) {
     sMain.finished = TRUE;
 }
 

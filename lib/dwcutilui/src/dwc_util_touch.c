@@ -49,10 +49,10 @@ static inline u16 PAD_Read(void) {
     return (u16)(((reg_PAD_KEYINPUT | *(vu16 *)HW_BUTTON_XY_BUF) ^ PAD_ALL_MASK) & PAD_ALL_MASK);
 }
 
-void func_ov182_021bc544(void) {
+void DWCUtilTouch_Init(void) {
     TPCalibrateParam calibrate;
 
-    sTouch.input = func_ov182_021bc4d8(sizeof(DWCUtilInput), 4);
+    sTouch.input = DWCUtilHeap_AllocClear(sizeof(DWCUtilInput), 4);
     if (!TP_GetUserInfo(&calibrate)) {
         OS_Terminate();
     }
@@ -62,23 +62,23 @@ void func_ov182_021bc544(void) {
     if (TP_CheckError(TP_REQUEST_COMMAND_FLAG_AUTO_ON)) {
         OS_Terminate();
     }
-    func_ov182_021bc5bc();
+    DWCUtilTouch_Update();
 }
 
-void func_ov182_021bc598(void) {
+void DWCUtilTouch_Exit(void) {
     do {
         TP_RequestAutoSamplingStopAsync();
         TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_OFF);
     } while (TP_CheckError(TP_REQUEST_COMMAND_FLAG_AUTO_OFF));
-    func_ov182_021bc4f0(&sTouch.input);
+    DWCUtilHeap_FreeAndNull(&sTouch.input);
 }
 
-void func_ov182_021bc5bc(void) {
-    func_ov182_021bc5c8();
-    func_ov182_021bc670();
+void DWCUtilTouch_Update(void) {
+    DWCUtilTouch_UpdateKeys();
+    DWCUtilTouch_UpdatePanel();
 }
 
-void func_ov182_021bc5c8(void) {
+void DWCUtilTouch_UpdateKeys(void) {
     u16 pad = PAD_Read();
     // Up hides down, and left hides right
     u16 held = pad & ~((pad & 0x40) << 1) & ~((pad & 0x20) >> 1);
@@ -105,7 +105,7 @@ void func_ov182_021bc5c8(void) {
     }
 }
 
-void func_ov182_021bc670(void) {
+void DWCUtilTouch_UpdatePanel(void) {
     int i;
     BOOL wasTouching = sTouch.input->touching ? TRUE : FALSE;
     u8 touching = FALSE;
@@ -120,7 +120,7 @@ void func_ov182_021bc670(void) {
         if (sample->touch == 1 && sample->validity == TP_VALIDITY_VALID) {
             touching = TRUE;
             TP_GetCalibratedPoint(&point, sample);
-            func_ov182_021bc1a8(point.x, point.y, &sTouch.input->point.x);
+            DWCUtilDisplay_SetPoint(point.x, point.y, &sTouch.input->point.x);
             break;
         }
     }
@@ -141,28 +141,28 @@ void func_ov182_021bc670(void) {
     }
 }
 
-BOOL func_ov182_021bc798(u16 keys) {
+BOOL DWCUtilTouch_IsKeyPressed(u16 keys) {
     if (PAD_DetectFold()) {
         return FALSE;
     }
     return keys == (sTouch.input->pressed & keys);
 }
 
-BOOL func_ov182_021bc7c8(u16 keys) {
+BOOL DWCUtilTouch_IsKeyRepeated(u16 keys) {
     if (PAD_DetectFold()) {
         return FALSE;
     }
     return keys == (sTouch.input->repeated & keys);
 }
 
-BOOL func_ov182_021bc7f8(u16 keys) {
+BOOL DWCUtilTouch_IsKeyReleased(u16 keys) {
     if (PAD_DetectFold()) {
         return FALSE;
     }
     return keys == (sTouch.input->released & keys);
 }
 
-BOOL func_ov182_021bc828(const u16 *rect) {
+BOOL DWCUtilTouch_IsTouchedIn(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -189,7 +189,7 @@ BOOL func_ov182_021bc828(const u16 *rect) {
     return TRUE;
 }
 
-BOOL func_ov182_021bc888(const u16 *rect) {
+BOOL DWCUtilTouch_IsTriggeredIn(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -216,7 +216,7 @@ BOOL func_ov182_021bc888(const u16 *rect) {
     return TRUE;
 }
 
-BOOL func_ov182_021bc8e8(const u16 *rect) {
+BOOL DWCUtilTouch_IsRepeatedIn(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -243,7 +243,7 @@ BOOL func_ov182_021bc8e8(const u16 *rect) {
     return TRUE;
 }
 
-BOOL func_ov182_021bc948(const u16 *rect) {
+BOOL DWCUtilTouch_IsReleasedIn(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -270,7 +270,7 @@ BOOL func_ov182_021bc948(const u16 *rect) {
     return TRUE;
 }
 
-BOOL func_ov182_021bc9a8(const u16 *area) {
+BOOL DWCUtilTouch_IsTriggeredInArea(const u16 *area) {
     u16 rect[4];
 
     if (PAD_DetectFold()) {
@@ -280,10 +280,10 @@ BOOL func_ov182_021bc9a8(const u16 *area) {
     rect[1] = area[1];
     rect[2] = area[0] + area[2];
     rect[3] = area[1] + area[3];
-    return func_ov182_021bc888(rect);
+    return DWCUtilTouch_IsTriggeredIn(rect);
 }
 
-BOOL func_ov182_021bc9e4(u16 *point) {
+BOOL DWCUtilTouch_GetPoint(u16 *point) {
     DWCUtilInput *input;
 
     if (PAD_DetectFold()) {
@@ -300,7 +300,7 @@ BOOL func_ov182_021bc9e4(u16 *point) {
     return TRUE;
 }
 
-void func_ov182_021bca28(void) {
+void DWCUtilTouch_UpdateLid(void) {
     if (sTouch.lidClosed) {
         if (!PAD_DetectFold()) {
             if (PM_SetLCDPower(TRUE)) {

@@ -26,51 +26,51 @@ typedef struct DWCUtilPageStep3 {
     DWCUtilTask *task;
 } DWCUtilPageStep3;
 
-static BOOL func_ov182_021b06d8(void);
-static void func_ov182_021b073c(void);
-static void func_ov182_021b07ac(void);
-static void func_ov182_021b07e4(void);
-static void func_ov182_021b0810(void);
-static void func_ov182_021b0844(void);
-static void func_ov182_021b08c8(void);
+static BOOL DWCUtilPageStep3_IsLidClosed(void);
+static void DWCUtilPageStep3_LoadGraphics(void);
+static void DWCUtilPageStep3_FadeIn(void);
+static void DWCUtilPageStep3_WaitFadeIn(void);
+static void DWCUtilPageStep3_WaitButtons(void);
+static void DWCUtilPageStep3_RunSetup(void);
+static void DWCUtilPageStep3_HandleInput(void);
 static void func_ov182_021b08ec(void);
-static void func_ov182_021b08f0(void);
-static void func_ov182_021b0920(void);
-static void func_ov182_021b094c(void);
-static void func_ov182_021b0990(void);
-static void func_ov182_021b0a24(DWCUtilTask *task, void *arg);
-static void func_ov182_021b0a3c(void);
-static void func_ov182_021b0a5c(void);
-static void func_ov182_021b0a74(void);
-static void func_ov182_021b0aac(void);
+static void DWCUtilPageStep3_HandleCancel(void);
+static void DWCUtilPageStep3_DisableButtons(void);
+static void DWCUtilPageStep3_FadeOut(void);
+static void DWCUtilPageStep3_WaitFadeOut(void);
+static void DWCUtilPageStep3_InputTask(DWCUtilTask *task, void *arg);
+static void DWCUtilPageStep3_WaitDialog(void);
+static void DWCUtilPageStep3_WaitDialogClosed(void);
+static void DWCUtilPageStep3_ShowSuccess(void);
+static void DWCUtilPageStep3_Cancel(void);
 
 static DWCUtilPageStep3 sPageStep3;
 
 // Whether the lid is closed
-static BOOL func_ov182_021b06d8(void) {
+static BOOL DWCUtilPageStep3_IsLidClosed(void) {
     if (PAD_DetectFold()) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021b06f4(void) {
+void DWCUtilPageStep3_Init(void) {
     sPageStep3.frames = 0;
-    func_ov182_021b073c();
-    func_ov182_021ab9ac();
+    DWCUtilPageStep3_LoadGraphics();
+    DWCUtilBgOverlay_ShowConnectionSet();
     DWCUtilScreen_Start(0x36, -1, 0);
-    func_ov182_021ab6a4(2);
-    func_ov182_021ab6f0(0x22);
+    DWCUtilGfxResource_ShowStep(2);
+    DWCUtilGfxResource_ShowMessage(0x22);
     DWCUtilUiEffect_Init(0);
-    func_ov182_021ada94();
-    func_ov182_021b80f4(0xb);
-    func_ov182_021adfbc(func_ov182_021b07ac);
+    DWCUtilAossSession_Init();
+    DWCUtilSound_PlaySe(0xb);
+    DWCUtilMain_SetUpdate(DWCUtilPageStep3_FadeIn);
 }
 
-static void func_ov182_021b073c(void) {
-    func_ov182_021ab67c("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
-    func_ov182_021ab67c("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
-    func_ov182_021ab67c("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
+static void DWCUtilPageStep3_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
+    DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
+    DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -78,62 +78,63 @@ static void func_ov182_021b073c(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b07ac(void) {
-    func_ov182_021bbac4(2, 1, 1, 8);
-    func_ov182_021bbac4(2, 0, 0x15, 8);
-    func_ov182_021bc1dc(1, 1);
-    func_ov182_021bc1dc(0, 0x15);
-    func_ov182_021adfbc(func_ov182_021b07e4);
+static void DWCUtilPageStep3_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitFadeIn);
 }
 
-static void func_ov182_021b07e4(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021ab6d0(1);
-        func_ov182_021adfbc(func_ov182_021b0810);
+static void DWCUtilPageStep3_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilGfxResource_ShowButtons(1);
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitButtons);
     }
 }
 
-static void func_ov182_021b0810(void) {
+static void DWCUtilPageStep3_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
-        sPageStep3.task = func_ov182_021bd200(1, func_ov182_021b0a24, NULL, 0x78);
-        func_ov182_021adfbc(func_ov182_021b0844);
+        sPageStep3.task = DWCUtilTask_Create(1, DWCUtilPageStep3_InputTask, NULL, 0x78);
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_RunSetup);
     }
 }
 
 // Runs the setup
-static void func_ov182_021b0844(void) {
-    func_ov182_021b08c8();
+static void DWCUtilPageStep3_RunSetup(void) {
+    DWCUtilPageStep3_HandleInput();
     func_ov182_021b08ec();
-    func_ov182_021b08f0();
-    switch (func_ov182_021adb74()) {
+    DWCUtilPageStep3_HandleCancel();
+    switch (DWCUtilAossSession_Run()) {
     case 0:
         break;
     case 1:
         if (sPageStep3.task != NULL) {
             sPageStep3.succeeded = TRUE;
-            func_ov182_021bd280(1, sPageStep3.task);
+            DWCUtilTask_Remove(1, sPageStep3.task);
             sPageStep3.task = NULL;
-            func_ov182_021adfbc(func_ov182_021b0a74);
+            DWCUtilMain_SetUpdate(DWCUtilPageStep3_ShowSuccess);
         }
         break;
     case 2:
         if (sPageStep3.task != NULL) {
-            func_ov182_021b8138();
-            func_ov182_021b8cf0(0xc, 1, 1, -1, 0);
-            func_ov182_021b80f4(9);
+            DWCUtilSound_StopSe();
+            DWCUtilDialog_Open(0xc, 1, 1, -1, 0);
+            DWCUtilSound_PlaySe(9);
             DWCUtilUiObject_Disable();
-            func_ov182_021bd280(1, sPageStep3.task);
+            DWCUtilTask_Remove(1, sPageStep3.task);
             sPageStep3.task = NULL;
-            func_ov182_021adfbc(func_ov182_021b0a3c);
+            DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitDialog);
         }
         break;
     }
 }
 
-static void func_ov182_021b08c8(void) {
-    if (func_ov182_021bc798(2)) {
+static void DWCUtilPageStep3_HandleInput(void) {
+    if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (func_ov182_021b06d8()) {
+    } else if (DWCUtilPageStep3_IsLidClosed()) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -142,98 +143,99 @@ static void func_ov182_021b08ec(void) {
 }
 
 // Cancels the setup
-static void func_ov182_021b08f0(void) {
+static void DWCUtilPageStep3_HandleCancel(void) {
     if (DWCUtilUiObject_GetState() == 0 && sPageStep3.task != NULL) {
-        func_ov182_021bd268(1, sPageStep3.task);
+        DWCUtilTask_QueueRemoval(1, sPageStep3.task);
         sPageStep3.task = NULL;
         DWCUtilUiObject_Disable();
-        func_ov182_021adfbc(func_ov182_021b0aac);
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_Cancel);
     }
 }
 
-static void func_ov182_021b0920(void) {
+static void DWCUtilPageStep3_DisableButtons(void) {
     DWCUtilUiObject_Disable();
     if (sPageStep3.task != NULL) {
-        func_ov182_021bd280(1, sPageStep3.task);
+        DWCUtilTask_Remove(1, sPageStep3.task);
     }
-    func_ov182_021bbbf4(8);
-    func_ov182_021adfbc(func_ov182_021b094c);
+    DWCUtilFade_StartWait(8);
+    DWCUtilMain_SetUpdate(DWCUtilPageStep3_FadeOut);
 }
 
-static void func_ov182_021b094c(void) {
-    if (func_ov182_021bbaac(1) == 0) {
+static void DWCUtilPageStep3_FadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sPageStep3.succeeded) {
-            func_ov182_021bbac4(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        func_ov182_021bbac4(3, 0, 0x15, 8);
-        func_ov182_021adfbc(func_ov182_021b0990);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b0990(void) {
-    if (func_ov182_021bbaac(0) != 0) {
+static void DWCUtilPageStep3_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(0) != 0) {
         return;
     }
-    if (!sPageStep3.succeeded && func_ov182_021bbaac(1) != 0) {
+    if (!sPageStep3.succeeded && DWCUtilFade_IsActive(1) != 0) {
         return;
     }
     if (!DWCUtilUiObject_IsIdle()) {
         return;
     }
-    func_ov182_021adb38(sPageStep3.succeeded != FALSE);
+    DWCUtilAossSession_Exit(sPageStep3.succeeded != FALSE);
     DWCUtilUiEffect_Destroy();
-    func_ov182_021bbf7c(0);
+    DWCUtilText_DestroyScreenBg(0);
     if (!sPageStep3.succeeded) {
         DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     }
-    func_ov182_021bc228(0, 0x15);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sPageStep3.succeeded) {
-        func_ov182_021adfc8(2, 1);
-        func_ov182_021adfbc(func_ov182_021b5bb8);
+        DWCUtilMain_SetLayout(2, 1);
+        DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
     } else {
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adfbc(func_ov182_021b0ad0);
+        DWCUtilMain_SetLayout(0, 0);
+        DWCUtilMain_SetUpdate(DWCUtilPageMulti4_Init);
     }
 }
 
-static void func_ov182_021b0a24(DWCUtilTask *task, void *arg) {
-    func_ov182_021bc5bc();
-    func_ov182_021bd19c(0);
-    func_ov182_021b08c8();
-    func_ov182_021b08f0();
+static void DWCUtilPageStep3_InputTask(DWCUtilTask *task, void *arg) {
+    DWCUtilTouch_Update();
+    DWCUtilTask_Run(0);
+    DWCUtilPageStep3_HandleInput();
+    DWCUtilPageStep3_HandleCancel();
 }
 
-static void func_ov182_021b0a3c(void) {
-    if (func_ov182_021b8f14() == 0) {
-        func_ov182_021b80f4(6);
-        func_ov182_021b8eec();
-        func_ov182_021adfbc(func_ov182_021b0a5c);
+static void DWCUtilPageStep3_WaitDialog(void) {
+    if (DWCUtilDialog_GetChoice() == 0) {
+        DWCUtilSound_PlaySe(6);
+        DWCUtilDialog_Close();
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitDialogClosed);
     }
 }
 
-static void func_ov182_021b0a5c(void) {
-    if (!func_ov182_021b8f24()) {
-        func_ov182_021adfbc(func_ov182_021b0920);
+static void DWCUtilPageStep3_WaitDialogClosed(void) {
+    if (!DWCUtilDialog_IsOpen()) {
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_DisableButtons);
     }
 }
 
 // Keeps the message of the success for 1080 frames
-static void func_ov182_021b0a74(void) {
-    func_ov182_021b08c8();
+static void DWCUtilPageStep3_ShowSuccess(void) {
+    DWCUtilPageStep3_HandleInput();
     func_ov182_021b08ec();
-    func_ov182_021b08f0();
+    DWCUtilPageStep3_HandleCancel();
     sPageStep3.frames++;
     if (sPageStep3.frames >= 1080) {
-        func_ov182_021b8138();
-        func_ov182_021adfbc(func_ov182_021b0920);
+        DWCUtilSound_StopSe();
+        DWCUtilMain_SetUpdate(DWCUtilPageStep3_DisableButtons);
     }
 }
 
-static void func_ov182_021b0aac(void) {
-    func_ov182_021b8138();
-    func_ov182_021b80f4(7);
+static void DWCUtilPageStep3_Cancel(void) {
+    DWCUtilSound_StopSe();
+    DWCUtilSound_PlaySe(7);
     sPageStep3.succeeded = FALSE;
-    func_ov182_021adfbc(func_ov182_021b0920);
+    DWCUtilMain_SetUpdate(DWCUtilPageStep3_DisableButtons);
 }

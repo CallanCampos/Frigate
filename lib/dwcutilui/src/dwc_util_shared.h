@@ -22,6 +22,6 @@
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet
-extern const u16 data_ov182_021c059c[4];
+extern const u16 gDWCUtilTouchScreenRect[4];
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SHARED_H

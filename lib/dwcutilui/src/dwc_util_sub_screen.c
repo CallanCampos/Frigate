@@ -9,18 +9,18 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static void func_ov182_021b8200(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8288(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8310(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8398(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8420(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8484(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8564(DWCUtilTask *task, void *arg);
-static void func_ov182_021b85bc(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8638(DWCUtilTask *task, void *arg);
-static void func_ov182_021b86b4(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8730(DWCUtilTask *task, void *arg);
-static void func_ov182_021b8804(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideInObject0Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideInObject1Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideInObject2Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideInObject3Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideInObject4Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideInDoneTask(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideOutObject4Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideOutObject3Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideOutObject2Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideOutObject1Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_SlideOutObject0Task(DWCUtilTask *task, void *arg);
+static void DWCUtilSubScreen_LoadScreenTask(DWCUtilTask *task, void *arg);
 
 #define SUB_SCREEN_OBJECTS 5
 
@@ -54,140 +54,140 @@ static DWCUtilSubScreenRow *sSubScreenRow;
 // The screen that the VBlank task loads
 static void *sSubScreenData;
 
-void func_ov182_021b8154(int step) {
+void DWCUtilSubScreen_SlideInRow(int step) {
     int i;
 
-    sSubScreenRow = func_ov182_021bc4d8(sizeof(DWCUtilSubScreenRow), 4);
+    sSubScreenRow = DWCUtilHeap_AllocClear(sizeof(DWCUtilSubScreenRow), 4);
     for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-        sSubScreenRow->objects[i] = func_ov182_021bb97c(1, sSubScreenCells[step][i], TRUE);
-        func_ov182_021bb878(sSubScreenRow->objects[i], -1, 0);
-        func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, -42, sSubScreenPositions[i][1]);
-        func_ov182_021bb778(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
+        sSubScreenRow->objects[i] = DWCUtilCell_AllocOamRun(1, sSubScreenCells[step][i], TRUE);
+        DWCUtilOam_SetPriority(sSubScreenRow->objects[i], -1, 0);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, -42, sSubScreenPositions[i][1]);
+        DWCUtilOam_SetMode(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
     }
-    sSubScreenRow->task = func_ov182_021bd200(0, func_ov182_021b8200, NULL, 120);
-    func_ov182_021b87d0(step);
-    func_ov182_021b80f4(0xd);
+    sSubScreenRow->task = DWCUtilTask_Create(0, DWCUtilSubScreen_SlideInObject0Task, NULL, 120);
+    DWCUtilSubScreen_LoadScreen(step);
+    DWCUtilSound_PlaySe(0xd);
 }
 
 // The slide in: the objects from the first that hasn't stopped on move 8 pixels a frame until it stops
-static void func_ov182_021b8200(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideInObject0Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[0], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[0], 0, &x, &y);
     x += 8;
     if (x < 0x20 || x > 0x100) {
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x20;
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8288);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject1Task);
     }
 }
 
-static void func_ov182_021b8288(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideInObject1Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[1], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[1], 0, &x, &y);
     x += 8;
     if (x < 0x50 || x > 0x100) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x50;
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8310);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject2Task);
     }
 }
 
-static void func_ov182_021b8310(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideInObject2Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[2], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[2], 0, &x, &y);
     x += 8;
     if (x < 0x68 || x > 0x100) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x68;
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8398);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject3Task);
     }
 }
 
-static void func_ov182_021b8398(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideInObject3Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[3], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[3], 0, &x, &y);
     x += 8;
     if (x < 0x98 || x > 0x100) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x98;
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8420);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject4Task);
     }
 }
 
-static void func_ov182_021b8420(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideInObject4Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[4], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[4], 0, &x, &y);
     x += 8;
     if (x < 0xb0 || x > 0x100) {
-        func_ov182_021bb7e0(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
     } else {
         x = 0xb0;
-        func_ov182_021bb7e0(sSubScreenRow->objects[4], -1, x, 0x21);
-        func_ov182_021bd264(task, func_ov182_021b8484);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInDoneTask);
     }
 }
 
-static void func_ov182_021b8484(DWCUtilTask *task, void *arg) {
-    func_ov182_021bd268(0, task);
+static void DWCUtilSubScreen_SlideInDoneTask(DWCUtilTask *task, void *arg) {
+    DWCUtilTask_QueueRemoval(0, task);
     sSubScreenRow->task = NULL;
 }
 
-void func_ov182_021b849c(void) {
+void DWCUtilSubScreen_SlideOutRow(void) {
     sSubScreenRow->leaving = TRUE;
-    sSubScreenRow->task = func_ov182_021bd200(0, func_ov182_021b8564, NULL, 120);
+    sSubScreenRow->task = DWCUtilTask_Create(0, DWCUtilSubScreen_SlideOutObject4Task, NULL, 120);
 }
 
-void func_ov182_021b84c0(int step) {
+void DWCUtilSubScreen_ChangeRow(int step) {
     int i;
 
     for (i = 0; i < SUB_SCREEN_OBJECTS; i += 2) {
-        func_ov182_021bb914(1, sSubScreenCells[step][i], func_ov182_021bb6ec(sSubScreenRow->objects[i], 0));
-        func_ov182_021bb878(sSubScreenRow->objects[i], -1, 0);
-        func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, sSubScreenPositions[i][0], sSubScreenPositions[i][1]);
-        func_ov182_021bb778(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
+        DWCUtilCell_Copy(1, sSubScreenCells[step][i], DWCUtilOam_GetEntry(sSubScreenRow->objects[i], 0));
+        DWCUtilOam_SetPriority(sSubScreenRow->objects[i], -1, 0);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, sSubScreenPositions[i][0], sSubScreenPositions[i][1]);
+        DWCUtilOam_SetMode(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
     }
-    func_ov182_021b87d0(step);
+    DWCUtilSubScreen_LoadScreen(step);
 }
 
-BOOL func_ov182_021b854c(void) {
+BOOL DWCUtilSubScreen_IsSliding(void) {
     if (sSubScreenRow->task != NULL) {
         return TRUE;
     }
@@ -196,102 +196,102 @@ BOOL func_ov182_021b854c(void) {
 
 // The slide out: the objects from the last that hasn't stopped on move 8 pixels a frame to the left until it reaches
 // the stop of the one before it, and then all of them off the screen
-static void func_ov182_021b8564(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideOutObject4Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[4], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[4], 0, &x, &y);
     x -= 8;
     if (x > 0x98) {
-        func_ov182_021bb7e0(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
     } else {
         x = 0x98;
-        func_ov182_021bb7e0(sSubScreenRow->objects[4], -1, x, 0x21);
-        func_ov182_021bd264(task, func_ov182_021b85bc);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject3Task);
     }
 }
 
-static void func_ov182_021b85bc(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideOutObject3Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[3], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[3], 0, &x, &y);
     x -= 8;
     if (x > 0x68) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x68;
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8638);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject2Task);
     }
 }
 
-static void func_ov182_021b8638(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideOutObject2Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[2], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[2], 0, &x, &y);
     x -= 8;
     if (x > 0x50) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x50;
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b86b4);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject1Task);
     }
 }
 
-static void func_ov182_021b86b4(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideOutObject1Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[1], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[1], 0, &x, &y);
     x -= 8;
     if (x > 0x20) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x20;
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        func_ov182_021bd264(task, func_ov182_021b8730);
+        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject0Task);
     }
 }
 
 // Once the row is off the left of the screen (its x wraps to 0x100 and above), frees it
-static void func_ov182_021b8730(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_SlideOutObject0Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
     int i;
 
-    func_ov182_021bb8bc(sSubScreenRow->objects[0], 0, &x, &y);
+    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[0], 0, &x, &y);
     x -= 8;
     for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-        func_ov182_021bb7e0(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
     }
     if (x <= 0x1d6 && x >= 0x100) {
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-            func_ov182_021bb690(sSubScreenRow->objects[i]);
+            DWCUtilOam_Free(sSubScreenRow->objects[i]);
         }
-        func_ov182_021bc4f0(&sSubScreenRow);
+        DWCUtilHeap_FreeAndNull(&sSubScreenRow);
     }
 }
 
-BOOL func_ov182_021b87b0(void) {
+BOOL DWCUtilSubScreen_IsNotSlidingOut(void) {
     DWCUtilSubScreenRow *row = sSubScreenRow;
 
     if (row == NULL) {
@@ -303,14 +303,14 @@ BOOL func_ov182_021b87b0(void) {
     return FALSE;
 }
 
-void func_ov182_021b87d0(int screen) {
-    sSubScreenData = func_ov182_021bb37c(func_ov182_021ab63c(sSubScreenNames[screen]), NULL, 4);
-    func_ov182_021bd200(1, func_ov182_021b8804, NULL, 120);
+void DWCUtilSubScreen_LoadScreen(int screen) {
+    sSubScreenData = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(sSubScreenNames[screen]), NULL, 4);
+    DWCUtilTask_Create(1, DWCUtilSubScreen_LoadScreenTask, NULL, 120);
 }
 
-static void func_ov182_021b8804(DWCUtilTask *task, void *arg) {
+static void DWCUtilSubScreen_LoadScreenTask(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sSubScreenData, 0x600);
     GXS_LoadBG1Scr(sSubScreenData, 0, 0x600);
-    func_ov182_021bb420(sSubScreenData);
-    func_ov182_021bd268(1, task);
+    DWCUtilRomResource_FreeFile(sSubScreenData);
+    DWCUtilTask_QueueRemoval(1, task);
 }

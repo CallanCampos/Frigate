@@ -7,8 +7,8 @@
 // The ROM does not embed this source file's name; dwc_util_string.c is descriptive.
 
 // The length of the string, at most max
-int func_ov182_021bcef8(const u8 *str, int max);
+int DWCUtilString_Length(const u8 *str, int max);
 // Copies the string into the size characters at dst, widening each byte, and returns its length
-int func_ov182_021bcf10(u16 *dst, const u8 *src, int size);
+int DWCUtilString_Widen(u16 *dst, const u8 *src, int size);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_STRING_H

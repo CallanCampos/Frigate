@@ -9,9 +9,9 @@
 // the two DNS servers, with buttons above and below it. A row opens its keyboard or keypad, and the buttons run the
 // connection test with the settings, save them, or go back.
 // The ROM does not embed this source file's name; dwc_util_address_settings.c is descriptive.
-void func_ov182_021b2d48(void);
+void DWCUtilAddressSettings_Init(void);
 // Where the settings were opened from: 0 from the first screen of the connection settings, 1 from the choice of the
 // setup of a connection
-void func_ov182_021b43f8(int from);
+void DWCUtilAddressSettings_SetFrom(int from);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_ADDRESS_SETTINGS_H
