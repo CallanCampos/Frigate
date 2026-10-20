@@ -1157,6 +1157,9 @@
 . 0x02018b10 IsZoneGameCommDisabled
 . 0x02018c10 IsZoneJoinAvenueSubZone
 . 0x02018ecc IsZoneInVictoryRoad
+. 0x02018f60 AreaData_IsInfinityDungeon
+. 0x02018f78 AreaData_IsJoinAvenue
+. 0x02018f90 AreaData_IsWbt
 . 0x0201906c CreateZoneChangeDataRail
 . 0x02019314 FieldStatus_GetInLinkedWorld
 . 0x02019318 FieldStatus_SetInLinkedWorld

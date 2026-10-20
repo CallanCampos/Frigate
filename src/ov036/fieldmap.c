@@ -221,13 +221,13 @@ Field *Field_Create(GameSystem *gsys, HeapID heapId) {
     areaId = ZoneData_GetAreaID(field->zoneId);
     if (AreaData_HasSeasons(areaId)) {
         season = GameSystem_GetSeason(gsys);
-    } else if (func_02018f60(areaId)) {
+    } else if (AreaData_IsInfinityDungeon(areaId)) {
         if (!func_ov036_0218141c(PlayerState_GetZoneID(GSYS_GetPlayerState(gsys)))) {
             season = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(field->gameData)));
         }
-    } else if (func_02018f78(areaId)) {
+    } else if (AreaData_IsJoinAvenue(areaId)) {
         season = GameData_GetJoinAvenueSeason(field->gameData);
-    } else if (func_02018f90(areaId)) {
+    } else if (AreaData_IsWbt(areaId)) {
         WbtSystem **wbt = GameData_GetWbtSystemPtr(field->gameData);
 
         if (wbt != NULL && *wbt != NULL) {
