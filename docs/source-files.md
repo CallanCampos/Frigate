@@ -1776,7 +1776,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 ### Overlay 182
 
-646 of 1113 functions are in source files.
+833 of 1113 functions are in source files.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
@@ -1813,6 +1813,18 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_wep_keyboard.c` | `0x021b19f4`–`0x021b2120` | 19 | complete | descriptive |
 | `dwc_util_address_edit.c` | `0x021b2120`–`0x021b293c` | 21 | complete | descriptive |
 | `dwc_util_error.c` | `0x021b293c`–`0x021b2d48` | 14 | complete | descriptive |
+| `dwc_util_address_settings.c` | `0x021b2d48`–`0x021b4404` | 40 | partial | descriptive |
+| `dwc_util_save_settings.c` | `0x021b4404`–`0x021b4588` | 9 | complete | descriptive |
+| `dwc_util_test_progress.c` | `0x021b4588`–`0x021b4864` | 16 | complete | descriptive |
+| `dwc_util_test_connect.c` | `0x021b4864`–`0x021b4b68` | 16 | complete | descriptive |
+| `dwc_util_test_done.c` | `0x021b4b68`–`0x021b4cc8` | 9 | complete | descriptive |
+| `dwc_util_test_start.c` | `0x021b4cc8`–`0x021b5000` | 16 | complete | descriptive |
+| `dwc_util_ap_search.c` | `0x021b5000`–`0x021b536c` | 15 | complete | descriptive |
+| `dwc_util_screen_ap.c` | `0x021b536c`–`0x021b5bb8` | 19 | complete | descriptive |
+| `dwc_util_screen_way.c` | `0x021b5bb8`–`0x021b6104` | 14 | complete | descriptive |
+| `dwc_util_auto_connect.c` | `0x021b6104`–`0x021b63dc` | 15 | complete | descriptive |
+| `dwc_util_auto_connect_ok.c` | `0x021b63dc`–`0x021b6588` | 9 | complete | descriptive |
+| `dwc_util_auto_connect_intro.c` | `0x021b6588`–`0x021b6728` | 9 | complete | descriptive |
 | `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
