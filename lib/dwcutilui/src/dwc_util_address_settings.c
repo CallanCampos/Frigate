@@ -618,12 +618,12 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
     case ADDRESS_ITEM_BACK:
         if (sAddressSettings.from == 0) {
             DWCUtilMain_SetLayout(2, 1);
-            next = func_ov182_021b536c;
+            next = DWCUtilScreenAp_Init;
         } else {
             edit = DWCUtilWifiSettings_GetEdit();
             DWCUtilWifiSettings_EditConnection(edit->index);
             DWCUtilMain_SetLayout(0, 1);
-            next = func_ov182_021b5bb8;
+            next = DWCUtilScreenWay_Init;
         }
         break;
     default:

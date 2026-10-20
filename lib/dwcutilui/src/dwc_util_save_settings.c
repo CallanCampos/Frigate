@@ -79,6 +79,6 @@ static void DWCUtilSaveSettings_WaitFadeOut(void) {
         DWCUtilDisplay_HidePlanes(1, 1);
         DWCUtilDisplay_HidePlanes(0, 0x14);
         DWCUtilMain_SetLayout(2, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021b536c);
+        DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
     }
 }

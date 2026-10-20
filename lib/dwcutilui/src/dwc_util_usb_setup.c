@@ -162,7 +162,7 @@ static void func_ov182_021b6d28(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (sUsbSetupState == USB_SETUP_CANCEL) {
             DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b536c);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
         } else if (sUsbSetupState == USB_SETUP_RETRY) {
             DWCUtilMain_SetLayout(2, 1);
             DWCUtilMain_SetUpdate(func_ov182_021b688c);

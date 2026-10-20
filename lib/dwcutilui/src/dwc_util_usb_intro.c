@@ -127,7 +127,7 @@ static void func_ov182_021b6a84(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sUsbIntroYes) {
             DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b536c);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
         } else {
             DWCUtilMain_SetLayout(2, 1);
             DWCUtilMain_SetUpdate(func_ov182_021b6b1c);

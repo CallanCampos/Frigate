@@ -13,11 +13,11 @@
 // The connection utility's message after a successful AOSS setup, which stays for 120 frames, before the message of
 // the connection test.
 // The ROM does not embed this source file's name; dwc_util_page_multi4.c is named after its screen, char/xb4Multi.
-void func_ov182_021b0ad0(void);
+void DWCUtilPageMulti4_Init(void);
 
 // The end of the message once both screens have faded out: it goes on to the message of the connection test.
 // dwc_util_test_done.c has the same function, DWCUtilTestDone_WaitFadeOut
-static inline void func_ov182_021b0bb8Inline(void) {
+static inline void DWCUtilPageMulti4_WaitFadeOutInline(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();

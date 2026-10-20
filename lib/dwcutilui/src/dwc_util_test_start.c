@@ -152,7 +152,7 @@ static void DWCUtilTestStart_WaitFadeOut(void) {
         if (!sTestStartPassed) {
             DWCUtilConnection_Stop();
             DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
+            DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
         } else {
             DWCUtilMain_SetLayout(0, 0);
             DWCUtilMain_SetUpdate(DWCUtilTestProgress_Init);

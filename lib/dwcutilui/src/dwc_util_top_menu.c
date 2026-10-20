@@ -294,6 +294,6 @@ static void func_ov182_021afb6c(void) {
         DWCUtilText_DestroyScreenBg(0);
         DWCUtilDisplay_HidePlanes(0, 0x15);
         DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021b043c);
+        DWCUtilMain_SetUpdate(DWCUtilPageMulti5_Init);
     }
 }

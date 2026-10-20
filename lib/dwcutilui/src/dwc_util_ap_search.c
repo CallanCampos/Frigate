@@ -181,11 +181,11 @@ static void DWCUtilApSearch_WaitFadeOut(void) {
             DWCUtilApScan_Exit();
             DWCUtilWifiSettings_EditConnection(DWCUtilWifiSettings_GetEdit()->index);
             DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
+            DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
         } else {
             DWCUtilMain_SetLayout(0, 1);
             DWCUtilMain_SetScreenArgs(0, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b0c28);
+            DWCUtilMain_SetUpdate(DWCUtilPageApList_Init);
         }
     }
 }

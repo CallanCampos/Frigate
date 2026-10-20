@@ -229,7 +229,7 @@ static void DWCUtilError_WaitFadeOut(void) {
         DWCUtilMain_GetScreenArgs(NULL, &from);
         if (from != 0) {
             DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b536c);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
         } else {
             DWCUtilMain_SetLayout(2, 0);
             DWCUtilMain_SetScreenArgs(0, 0);

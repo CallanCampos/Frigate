@@ -130,7 +130,7 @@ static void func_ov182_021ae6f8(void) {
             break;
         case 1:
             DWCUtilMain_SetLayout(1, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b536c);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
             break;
         }
     }
@@ -255,7 +255,7 @@ static void func_ov182_021aea18(void) {
         switch (sMainMenu.selection) {
         case 0:
             DWCUtilMain_SetLayout(1, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b536c);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
             break;
         case 1:
             DWCUtilMain_SetLayout(0, 0);

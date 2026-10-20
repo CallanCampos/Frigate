@@ -66,7 +66,7 @@ static void DWCUtilTestDone_FadeOut(void) {
 }
 
 static void DWCUtilTestDone_WaitFadeOut(void) {
-    func_ov182_021b0bb8Inline();
+    DWCUtilPageMulti4_WaitFadeOutInline();
 }
 
 static void DWCUtilTestDone_UpdateTimer(void) {

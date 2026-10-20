@@ -134,7 +134,7 @@ static void func_ov182_021b011c(void) {
             DWCUtilMain_SetUpdate(func_ov182_021af25c);
         } else {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b043c);
+            DWCUtilMain_SetUpdate(DWCUtilPageMulti5_Init);
         }
     }
 }

@@ -55,24 +55,24 @@ typedef struct DWCUtilScreenApState {
     DWCUtilScreenAp *work;
 } DWCUtilScreenApState;
 
-static void func_ov182_021b53b4(void);
-static void func_ov182_021b5464(void);
-static void func_ov182_021b550c(void);
-static void func_ov182_021b5544(void);
-static void func_ov182_021b5570(void);
-static void func_ov182_021b5598(void);
-static void func_ov182_021b55a8(void);
+static void DWCUtilScreenAp_LoadGraphics(void);
+static void DWCUtilScreenAp_CreateButtons(void);
+static void DWCUtilScreenAp_FadeIn(void);
+static void DWCUtilScreenAp_WaitFadeIn(void);
+static void DWCUtilScreenAp_WaitButtons(void);
+static void DWCUtilScreenAp_Main(void);
+static void DWCUtilScreenAp_HandleInput(void);
 static void func_ov182_021b5648(void);
-static void func_ov182_021b564c(void);
-static void func_ov182_021b5710(void);
-static void func_ov182_021b573c(void);
-static void func_ov182_021b5790(void);
-static void func_ov182_021b58a8(void);
-static void func_ov182_021b58f4(int direction);
-static void func_ov182_021b59f0(void);
-static void func_ov182_021b5a48(void);
-static void func_ov182_021b5b20(void);
-static void func_ov182_021b5b3c(void);
+static void DWCUtilScreenAp_HandleChoice(void);
+static void DWCUtilScreenAp_DisableButtons(void);
+static void DWCUtilScreenAp_FadeOut(void);
+static void DWCUtilScreenAp_WaitFadeOut(void);
+static void DWCUtilScreenAp_DrawCursor(void);
+static void DWCUtilScreenAp_MoveCursor(int direction);
+static void DWCUtilScreenAp_ShowErasePressed(void);
+static void DWCUtilScreenAp_WaitEraseAnswer(void);
+static void DWCUtilScreenAp_WaitDialogClosed(void);
+static void DWCUtilScreenAp_HighlightButton(void);
 
 // The cell of a connection's button by its status (DWCBmConnection.status, 3 for one not in use), where the cursor
 // frames each button and where it is touched (left, top, right and bottom), the slot of the erase prompt's number by
@@ -94,19 +94,19 @@ static const u16 sScreenApButtonPos[SCREEN_AP_CONNECTIONS * 2][2] = {
 
 static DWCUtilScreenApState sScreenAp;
 
-void func_ov182_021b536c(void) {
+void DWCUtilScreenAp_Init(void) {
     sScreenAp.work = DWCUtilHeap_AllocClear(sizeof(DWCUtilScreenAp), 4);
     sScreenAp.work->end = SCREEN_AP_RUNNING;
-    func_ov182_021b53b4();
+    DWCUtilScreenAp_LoadGraphics();
     DWCUtilBgOverlay_Show(1);
     DWCUtilScreen_Start(0x2f, -1, 0);
     DWCUtilGfxResource_ShowStep(0);
-    func_ov182_021b5464();
-    func_ov182_021b58a8();
-    DWCUtilMain_SetUpdate(func_ov182_021b550c);
+    DWCUtilScreenAp_CreateButtons();
+    DWCUtilScreenAp_DrawCursor();
+    DWCUtilMain_SetUpdate(DWCUtilScreenAp_FadeIn);
 }
 
-static void func_ov182_021b53b4(void) {
+static void DWCUtilScreenAp_LoadGraphics(void) {
     char palettePath[] = "char/ybBgStep11.ncl.l";
 
     DWCUtilGfxResource_Load("char/ybObjWay.ncl.l", GX_LoadOBJPltt);
@@ -122,7 +122,7 @@ static void func_ov182_021b53b4(void) {
 }
 
 // The buttons of the connections, and the erase buttons of those in use
-static void func_ov182_021b5464(void) {
+static void DWCUtilScreenAp_CreateButtons(void) {
     int i;
     int status;
 
@@ -144,42 +144,42 @@ static void func_ov182_021b5464(void) {
     }
 }
 
-static void func_ov182_021b550c(void) {
+static void DWCUtilScreenAp_FadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x14, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x14);
-    DWCUtilMain_SetUpdate(func_ov182_021b5544);
+    DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitFadeIn);
 }
 
-static void func_ov182_021b5544(void) {
+static void DWCUtilScreenAp_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(0);
-        DWCUtilMain_SetUpdate(func_ov182_021b5570);
+        DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitButtons);
     }
 }
 
-static void func_ov182_021b5570(void) {
+static void DWCUtilScreenAp_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2 && DWCUtilSubScreen_IsSliding() != TRUE) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021b5598);
+        DWCUtilMain_SetUpdate(DWCUtilScreenAp_Main);
     }
 }
 
-static void func_ov182_021b5598(void) {
-    func_ov182_021b55a8();
+static void DWCUtilScreenAp_Main(void) {
+    DWCUtilScreenAp_HandleInput();
     func_ov182_021b5648();
-    func_ov182_021b564c();
+    DWCUtilScreenAp_HandleChoice();
 }
 
-static void func_ov182_021b55a8(void) {
+static void DWCUtilScreenAp_HandleInput(void) {
     u32 i;
 
     for (i = 0; i < SCREEN_AP_BUTTONS; i++) {
         if (DWCUtilTouch_IsTriggeredIn(sScreenApTouchRects[i])) {
             DWCUtilUiObject_SetStateIfIdle(1);
             sScreenAp.cursor = i;
-            func_ov182_021b58a8();
+            DWCUtilScreenAp_DrawCursor();
             return;
         }
     }
@@ -188,20 +188,20 @@ static void func_ov182_021b55a8(void) {
     } else if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
-        func_ov182_021b58f4(1);
+        DWCUtilScreenAp_MoveCursor(1);
     } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
-        func_ov182_021b58f4(3);
+        DWCUtilScreenAp_MoveCursor(3);
     } else if (DWCUtilTouch_IsKeyRepeated(0x20)) {
-        func_ov182_021b58f4(0);
+        DWCUtilScreenAp_MoveCursor(0);
     } else if (DWCUtilTouch_IsKeyRepeated(0x10)) {
-        func_ov182_021b58f4(2);
+        DWCUtilScreenAp_MoveCursor(2);
     }
 }
 
 static void func_ov182_021b5648(void) {
 }
 
-static void func_ov182_021b564c(void) {
+static void DWCUtilScreenAp_HandleChoice(void) {
     int index;
 
     switch (DWCUtilUiObject_GetState()) {
@@ -228,33 +228,33 @@ static void func_ov182_021b564c(void) {
             }
             DWCUtilSound_PlaySe(6);
             DWCUtilDialog_Open(0x46, 0, 1, sScreenApMsgSlots[DWCUtilMain_GetLanguage()], index + 1);
-            func_ov182_021b59f0();
+            DWCUtilScreenAp_ShowErasePressed();
             DWCUtilUiObject_Disable();
-            DWCUtilMain_SetUpdate(func_ov182_021b5a48);
+            DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitEraseAnswer);
             return;
         }
         if (sScreenAp.cursor <= 2) {
             DWCUtilWifiSettings_EditConnection(sScreenAp.cursor);
         }
         DWCUtilSound_PlaySe(6);
-        func_ov182_021b5b3c();
+        DWCUtilScreenAp_HighlightButton();
         break;
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(func_ov182_021b5710);
+    DWCUtilMain_SetUpdate(DWCUtilScreenAp_DisableButtons);
 }
 
-static void func_ov182_021b5710(void) {
+static void DWCUtilScreenAp_DisableButtons(void) {
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
         DWCUtilSubScreen_SlideOutRow();
     }
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021b573c);
+    DWCUtilMain_SetUpdate(DWCUtilScreenAp_FadeOut);
 }
 
-static void func_ov182_021b573c(void) {
+static void DWCUtilScreenAp_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         if (sScreenAp.work->end == SCREEN_AP_CHOSEN &&
             (sScreenAp.cursor == SCREEN_AP_WIDE_BUTTON ||
@@ -263,11 +263,11 @@ static void func_ov182_021b573c(void) {
         }
         DWCUtilFade_Start(3, 1, 1, 8);
         DWCUtilFade_Start(3, 0, 0x14, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021b5790);
+        DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b5790(void) {
+static void DWCUtilScreenAp_WaitFadeOut(void) {
     u32 i;
 
     if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
@@ -302,7 +302,7 @@ static void func_ov182_021b5790(void) {
         case 2:
             DWCUtilMain_SetLayout(2, 0);
             if (DWCUtilWifiSettings_GetEdit()->connection.status == DWC_BM_CONNECTION_UNUSED) {
-                DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
+                DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
             } else {
                 DWCUtilMain_SetScreenArgs(0, 0);
                 DWCUtilAddressSettings_SetFrom(0);
@@ -320,7 +320,7 @@ static void func_ov182_021b5790(void) {
 
 // Frames the button under the cursor: the buttons of the top row and the wide button with the four corners, an erase
 // button with the pair of sprites
-static void func_ov182_021b58a8(void) {
+static void DWCUtilScreenAp_DrawCursor(void) {
     if (sScreenAp.cursor < SCREEN_AP_FIRST_ERASE) {
         DWCUtilButtonSprites_ShowFour(
             sScreenApCursorRects[sScreenAp.cursor][0], sScreenApCursorRects[sScreenAp.cursor][2],
@@ -332,7 +332,7 @@ static void func_ov182_021b58a8(void) {
 }
 
 // Moves the cursor left, up, right or down (0 to 3)
-static void func_ov182_021b58f4(int direction) {
+static void DWCUtilScreenAp_MoveCursor(int direction) {
     BOOL moved = TRUE;
 
     switch (sScreenAp.cursor) {
@@ -424,12 +424,12 @@ static void func_ov182_021b58f4(int direction) {
     }
     if (moved) {
         DWCUtilSound_PlaySe(8);
-        func_ov182_021b58a8();
+        DWCUtilScreenAp_DrawCursor();
     }
 }
 
 // Shows the chosen erase button pressed
-static void func_ov182_021b59f0(void) {
+static void DWCUtilScreenAp_ShowErasePressed(void) {
     int index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
 
     DWCUtilCell_Copy(0, 0x32, DWCUtilOam_GetEntry(sScreenAp.work->eraseButtons[index], 0));
@@ -440,7 +440,7 @@ static void func_ov182_021b59f0(void) {
 
 // The answer to whether to erase the connection: yes erases it and shows its button as not in use, no shows the erase
 // button again
-static void func_ov182_021b5a48(void) {
+static void DWCUtilScreenAp_WaitEraseAnswer(void) {
     int index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
 
     switch (DWCUtilDialog_GetChoice()) {
@@ -465,18 +465,18 @@ static void func_ov182_021b5a48(void) {
         return;
     }
     DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(func_ov182_021b5b20);
+    DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitDialogClosed);
 }
 
-static void func_ov182_021b5b20(void) {
+static void DWCUtilScreenAp_WaitDialogClosed(void) {
     if (!DWCUtilDialog_IsOpen()) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021b5598);
+        DWCUtilMain_SetUpdate(DWCUtilScreenAp_Main);
     }
 }
 
 // Lights up the chosen button: the palette row of its place, and the button's own palette by the connection's status
-static void func_ov182_021b5b3c(void) {
+static void DWCUtilScreenAp_HighlightButton(void) {
     u8 rows[4] = { 3, 4, 5, 7 };
     u8 palettes[4] = { 10, 9, 11, 6 };
     int status;

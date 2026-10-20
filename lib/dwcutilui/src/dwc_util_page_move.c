@@ -21,38 +21,38 @@ typedef struct DWCUtilPageMove {
     u8 yes;
 } DWCUtilPageMove;
 
-static void func_ov182_021b021c(void);
-static void func_ov182_021b026c(void);
-static void func_ov182_021b0290(void);
-static void func_ov182_021b02a8(void);
-static void func_ov182_021b02c4(void);
+static void DWCUtilPageMove_LoadGraphics(void);
+static void DWCUtilPageMove_FadeIn(void);
+static void DWCUtilPageMove_WaitFadeIn(void);
+static void DWCUtilPageMove_WaitDialog(void);
+static void DWCUtilPageMove_Main(void);
 static void func_ov182_021b030c(void);
 static void func_ov182_021b0310(void);
-static void func_ov182_021b0314(void);
-static void func_ov182_021b0350(void);
-static void func_ov182_021b0390(void);
-static void func_ov182_021b0414(int event);
+static void DWCUtilPageMove_FadeOut(void);
+static void DWCUtilPageMove_WaitFadeOut(void);
+static void DWCUtilPageMove_WaitMoveEnd(void);
+static void DWCUtilPageMove_OnMoveEvent(int event);
 
 static DWCUtilPageMove sPageMove;
 
-void func_ov182_021b0198(void) {
+void DWCUtilPageMove_Init(void) {
     const MBUserInfo *user = func_ov182_021ae240();
     DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
     u16 name[MB_USER_NAME_LENGTH + 1];
 
     sPageMove.yes = FALSE;
     sPageMove.interrupted = FALSE;
-    func_ov182_021b021c();
+    DWCUtilPageMove_LoadGraphics();
     MI_CpuClear16(name, sizeof(name));
     MI_CpuCopy16(user->name, name, user->nameLength * 2);
     DWCUtilText_DrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
     DWCUtilText_MarkDirty(text);
-    func_ov182_021ae224(func_ov182_021b0414);
+    func_ov182_021ae224(DWCUtilPageMove_OnMoveEvent);
     DWCUtilDialog_Open(0x1d, 4, 0, -1, 0);
-    DWCUtilMain_SetUpdate(func_ov182_021b026c);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeIn);
 }
 
-static void func_ov182_021b021c(void) {
+static void DWCUtilPageMove_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/jb5Move.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -61,25 +61,25 @@ static void func_ov182_021b021c(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b026c(void) {
+static void DWCUtilPageMove_FadeIn(void) {
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021b0290);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeIn);
 }
 
-static void func_ov182_021b0290(void) {
+static void DWCUtilPageMove_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(func_ov182_021b02a8);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitDialog);
     }
 }
 
-static void func_ov182_021b02a8(void) {
+static void DWCUtilPageMove_WaitDialog(void) {
     if (DWCUtilDialog_GetChoice() != -2) {
-        DWCUtilMain_SetUpdate(func_ov182_021b02c4);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_Main);
     }
 }
 
-static void func_ov182_021b02c4(void) {
+static void DWCUtilPageMove_Main(void) {
     func_ov182_021b030c();
     func_ov182_021b0310();
     switch (DWCUtilDialog_GetChoice()) {
@@ -96,7 +96,7 @@ static void func_ov182_021b02c4(void) {
     }
     func_ov182_021ae224(NULL);
     DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(func_ov182_021b0314);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeOut);
 }
 
 static void func_ov182_021b030c(void) {
@@ -105,30 +105,30 @@ static void func_ov182_021b030c(void) {
 static void func_ov182_021b0310(void) {
 }
 
-static void func_ov182_021b0314(void) {
+static void DWCUtilPageMove_FadeOut(void) {
     if (!DWCUtilDialog_IsOpen()) {
         if (!sPageMove.yes) {
             DWCUtilFade_Start(3, 1, 1, 8);
         }
         DWCUtilFade_Start(3, 0, 0x15, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021b0350);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeOut);
     }
 }
 
 // Sends the settings, or ends the move
-static void func_ov182_021b0350(void) {
+static void DWCUtilPageMove_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         if (!sPageMove.interrupted && sPageMove.yes == TRUE) {
             func_ov182_021ae238();
         } else {
             func_ov182_021ae1d4();
         }
-        DWCUtilMain_SetUpdate(func_ov182_021b0390);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitMoveEnd);
     }
 }
 
 // Waits for the end of the move, unless it goes on
-static void func_ov182_021b0390(void) {
+static void DWCUtilPageMove_WaitMoveEnd(void) {
     if ((sPageMove.interrupted || !sPageMove.yes) && !func_ov182_021ae210()) {
         return;
     }
@@ -149,6 +149,6 @@ static void func_ov182_021b0390(void) {
     }
 }
 
-static void func_ov182_021b0414(int event) {
+static void DWCUtilPageMove_OnMoveEvent(int event) {
     sPageMove.interrupted = TRUE;
 }
