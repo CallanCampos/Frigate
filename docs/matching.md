@@ -1409,7 +1409,7 @@ Same instructions, scheduled in another order.
   before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
   `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
   The pointer can be a parameter or a local: `field_rail.c`'s line searches `func_ov036_021b21b0` and
-  `func_ov036_021b1e8c` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
+  `RailDisabledLines_ContainsLine` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
   `FieldBlAct_IsAsyncLoadPending` with `const AsyncLoader *loader = blact->loader;` (its own field read through a
   plain pointer). In `SetWkToActorRailPos` neither a `const` local nor a `const` parameter of a `static inline`
   helper stops the hoist, so the count there is held some other way.
