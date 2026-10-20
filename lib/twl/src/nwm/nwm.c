@@ -490,7 +490,7 @@ static void func_02702d7c(void *arg) {
     s32 timeout;
     NWMSys *sys;
 
-    if (!func_02769520()) {
+    if (!PMi_GetExitType()) {
         return;
     }
     sys = func_027026dc();
