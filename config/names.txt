@@ -2511,6 +2511,8 @@
 . 0x02040a6c NetHandle_TestBit
 . 0x02040a9c NetHandle_Forget
 . 0x02040ad0 NetHandle_RecvData
+. 0x02040b38 NetHandle_SendTimingPairToMachines
+. 0x02040b68 NetHandle_SetNegotiationCommandBase
 . 0x02040b94 NetCommand_Init
 . 0x02040bfc NetCommand_Exit
 . 0x02040c20 NetCommand_AddTable
@@ -2524,6 +2526,7 @@
 . 0x02040dc0 NetCommand_HasCallback
 . 0x02040dd4 NetCommand_HasBufferFunc
 . 0x02040de8 NetCommand_GetRecvBuffer
+. 0x02040e0c NetCommand_RecvDummy
 . 0x02040e10 NetCommand_RecvHugeChunk
 . 0x02040ebc NetCommand_RecvHugeHeader
 . 0x02040f84 NetCommand_SendHuge
@@ -2688,6 +2691,7 @@
 . 0x02043028 NetIw_Free
 . 0x02043048 NetIw_FreeIfIdle
 . 0x02043068 NetIw_IsRunning
+. 0x0204307c NetIw_SetPeerFilter
 . 0x02043088 NetIw_SetCallbacks
 . 0x020430bc NetIw_AddCollectedMac
 . 0x0204313c NetIw_GetCollectedMac
@@ -2695,8 +2699,12 @@
 . 0x020431a8 NetIw_EndedCallback
 . 0x020431c0 NetIw_SetState
 . 0x020431cc NetIw_Update
+. 0x02043720 NetIw_GetBeaconData
+. 0x02043748 NetIw_GetBeaconSize
 . 0x02043764 NetIw_RecvCollectedMacs
+. 0x020437a0 NetIw_FinishCollecting
 . 0x020437dc NetIw_OverrideNetId
+. 0x0204381c NetIw_GetLinkedCount
 . 0x02043834 NetIw_SetGameCommandBase
 . 0x02043868 NetLdata_Init
 . 0x020438dc NetLdata_Exit

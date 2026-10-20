@@ -83,7 +83,7 @@ void NetHandle_RecvForget(int netId, int size, u8 *data);
 // Forgets a machine, as when it disconnects
 void NetHandle_Forget(int netID);
 void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHandle *handle);
-void func_02040b38(NetHandle *handle, int a1, int a2, int a3);
-void func_02040b68(NetHandle *handle, int value);
+void NetHandle_SendTimingPairToMachines(NetHandle *handle, int a1, int a2, int a3);
+void NetHandle_SetNegotiationCommandBase(NetHandle *handle, int value);
 
 #endif // POKEBW2_GFL_NET_HANDLE_H

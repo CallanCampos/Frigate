@@ -264,7 +264,7 @@ void GFL_NetIwGetCollectedMac(u8 *mac, int index) {
 }
 
 void GFL_NetIwSetPeerFilter(void *a0) {
-    func_0204307c(a0);
+    NetIw_SetPeerFilter(a0);
 }
 
 void GFL_NetIwFree(void) {
@@ -294,7 +294,7 @@ void GFL_NetSetChangeoverMode(int mode, int a1, const u8 *mac) {
 }
 
 BOOL GFL_NetIwFinishCollecting(void) {
-    return func_020437a0();
+    return NetIw_FinishCollecting();
 }
 
 void GFL_NetIwOverrideNetId(int a0) {
@@ -302,7 +302,7 @@ void GFL_NetIwOverrideNetId(int a0) {
 }
 
 u8 GFL_NetIwGetLinkedCount(void) {
-    return func_0204381c();
+    return NetIw_GetLinkedCount();
 }
 
 void GFL_NetSetTimeout(int a0) {
@@ -469,7 +469,7 @@ void GFL_NetSetGameCommandBase(u8 gameCommandBase, u8 unused) {
     GFLNetSys *pNet = GFL_NetGetSys();
 
     GFL_NetGetInitData()->gameCommandBase = gameCommandBase;
-    func_02040b68(NetHandle_Get(GFL_NET_NETID_SERVER), gameCommandBase);
+    NetHandle_SetNegotiationCommandBase(NetHandle_Get(GFL_NET_NETID_SERVER), gameCommandBase);
 }
 
 u8 GFL_NetGetGameCommandBase(void) {

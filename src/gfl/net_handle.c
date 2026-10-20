@@ -529,7 +529,7 @@ void NetHandle_RecvData(int netID, int size, const void *data, void *work, NetHa
     }
 }
 
-void func_02040b38(NetHandle *handle, int a1, int a2, int a3) {
+void NetHandle_SendTimingPairToMachines(NetHandle *handle, int a1, int a2, int a3) {
     if (handle != NULL) {
         handle->timingSend = a1 + (a2 << 8);
         handle->timingNetIds = a3;
@@ -541,7 +541,7 @@ void func_02040b38(NetHandle *handle, int a1, int a2, int a3) {
     }
 }
 
-void func_02040b68(NetHandle *handle, int value) {
+void NetHandle_SetNegotiationCommandBase(NetHandle *handle, int value) {
     if (handle != NULL) {
         int i;
 

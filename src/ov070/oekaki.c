@@ -1091,7 +1091,7 @@ static int Oekaki_SeqParentEndMsg(OekakiWork *wk, int seq) {
 static int Oekaki_SeqParentEndMsgWait(OekakiWork *wk, int seq) {
     if (Oekaki_IsMessageDone(wk)) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_PARENT_END_SYNC_WAIT);
-        func_02040b38(NetHandle_GetOwn(), 200, 0x29, (u16)wk->shareBit);
+        NetHandle_SendTimingPairToMachines(NetHandle_GetOwn(), 200, 0x29, (u16)wk->shareBit);
     }
     Oekaki_DrawOthers(wk);
     return seq;

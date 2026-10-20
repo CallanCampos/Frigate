@@ -1081,7 +1081,7 @@ static int Guru2ReceiptSeq_ParentCancelWait(Guru2ReceiptWork *wk, int procSeq) {
 static int Guru2ReceiptSeq_ParentCancelSync(Guru2ReceiptWork *wk, int procSeq) {
     NetHandle_GetOwn();
     wk->syncBits = wk->unk480C ^ Guru2Receipt_GetJoined(wk);
-    func_02040b38(NetHandle_GetOwn(), 0xcf, 40, (u16)wk->syncBits);
+    NetHandle_SendTimingPairToMachines(NetHandle_GetOwn(), 0xcf, 40, (u16)wk->syncBits);
     wk->seq = GURU2_RECEIPT_SEQ_PARENT_CANCEL_SYNC_WAIT;
     Guru2Receipt_SeqEnd(wk);
     return procSeq;

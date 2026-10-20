@@ -21,7 +21,7 @@ typedef struct {
     // The init data the networks are started with, the game's with the callbacks below swapped for this file's
     GFLNetInitData aNetInit;
     void *work;
-    // The filter of the infrared machines to link with (func_0204307c)
+    // The filter of the infrared machines to link with (NetIw_SetPeerFilter)
     void *peerFilter;
     // The game's callbacks from its init data
     void *(*getBeaconData)(void *work);
@@ -61,8 +61,8 @@ static NetIrcWireless *NetIwSys;
 static void NetIw_ConnectedCallback(void *work);
 static void NetIw_EndedCallback(void *work);
 static void NetIw_SetState(NetIrcWireless *sys, int state);
-static void *func_02043720(void *work);
-static int func_02043748(void *work);
+static void *NetIw_GetBeaconData(void *work);
+static int NetIw_GetBeaconSize(void *work);
 
 const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     NetIrcWireless *sys;
@@ -79,8 +79,8 @@ const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     sys->getBeaconSize = pNetInit->getBeaconSize;
     sys->aNetInit.bNetType = 3;
     sys->aNetInit.endCallback = NetIw_EndedCallback;
-    sys->aNetInit.getBeaconData = func_02043720;
-    sys->aNetInit.getBeaconSize = func_02043748;
+    sys->aNetInit.getBeaconData = NetIw_GetBeaconData;
+    sys->aNetInit.getBeaconSize = NetIw_GetBeaconSize;
     sys->bMPMode = sys->aNetInit.bMPMode;
     sys->aNetInit.bMPMode = FALSE;
     sys->maxConnectNum = sys->aNetInit.maxConnectNum;
@@ -110,7 +110,7 @@ BOOL NetIw_IsRunning(void) {
     return FALSE;
 }
 
-void func_0204307c(void *a0) {
+void NetIw_SetPeerFilter(void *a0) {
     NetIwSys->peerFilter = a0;
 }
 
@@ -409,7 +409,7 @@ void NetIw_Update(void) {
     }
 }
 
-static void *func_02043720(void *work) {
+static void *NetIw_GetBeaconData(void *work) {
     NetIrcWireless *sys = NetIwSys;
 
     if (sys == NULL) {
@@ -419,7 +419,7 @@ static void *func_02043720(void *work) {
     return &sys->collect;
 }
 
-static int func_02043748(void *work) {
+static int NetIw_GetBeaconSize(void *work) {
     NetIrcWireless *sys = NetIwSys;
 
     if (sys == NULL) {
@@ -445,7 +445,7 @@ void NetIw_RecvCollectedMacs(int netId, int size, const void *data, void *work, 
     }
 }
 
-BOOL func_020437a0(void) {
+BOOL NetIw_FinishCollecting(void) {
     if (NetIwSys == NULL) {
         return FALSE;
     }
@@ -466,7 +466,7 @@ void NetIw_OverrideNetId(int netId) {
     }
 }
 
-u8 func_0204381c(void) {
+u8 NetIw_GetLinkedCount(void) {
     if (NetIwSys == NULL) {
         return 0;
     }

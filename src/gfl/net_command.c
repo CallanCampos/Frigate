@@ -80,7 +80,7 @@ static int NetCommand_SendHugeHeader(void);
 
 // clang-format off
 static const NetCommand sBaseCommands[GFL_NET_CMD_BASE_COUNT] = {
-    { (void *)func_02040e0c, NULL },
+    { (void *)NetCommand_RecvDummy, NULL },
     { NetState_RecvExit, NULL },
     { NetState_RecvExitReply, NULL },
     { (void *)NetHandle_RecvNegotiation, NULL },
@@ -96,7 +96,7 @@ static const NetCommand sBaseCommands[GFL_NET_CMD_BASE_COUNT] = {
     { NetCommand_RecvHugeHeader, NULL },
     { NetLdata_RecvData, NetLdata_GetRecvPtr },
     { NetLdata_RecvHeader, NULL },
-    { (void *)func_02040e0c, NULL },
+    { (void *)NetCommand_RecvDummy, NULL },
 };
 
 // clang-format on
@@ -264,7 +264,7 @@ void *NetCommand_GetRecvBuffer(int command, int netId, int size) {
     return NULL;
 }
 
-void func_02040e0c(void) {
+void NetCommand_RecvDummy(void) {
 }
 
 void NetCommand_RecvHugeChunk(int netId, int size, const void *data, void *work, NetHandle *handle) {
