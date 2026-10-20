@@ -9238,6 +9238,16 @@ overlays/ov036 0x02187b6c MsgBGPrinter_GetPrintWindow
 overlays/ov036 0x02187f58 FieldMsgBG_GetWidestOption
 overlays/ov036 0x0218823c MsgStream_Free
 overlays/ov036 0x02188250 MsgStream_Update
+overlays/ov036 0x0218976c CheckerMsgWin_LoadPalette
+overlays/ov036 0x0218978c CheckerMsgWin_LoadFrameTile
+overlays/ov036 0x021897cc CheckerMsgWin_DrawFrame
+overlays/ov036 0x02189a18 FieldMsgBG_DrawTextLines
+overlays/ov036 0x02189a98 CheckerMsgWin_Create
+overlays/ov036 0x02189b50 CheckerMsgWin_Free
+overlays/ov036 0x02189bc4 CheckerMsgWin_PrintStrBuf
+overlays/ov036 0x02189c00 CheckerMsgWin_Update
+overlays/ov036 0x02189c34 CheckerMsgWin_CalcWidth
+overlays/ov036 0x02189c54 CheckerMsgWin_CalcHeight
 overlays/ov036 0x02189ce8 MsgBGCursor_Init
 overlays/ov036 0x02189d10 MsgBGCursor_Free
 overlays/ov036 0x02189d20 MsgBGCursor_IsShown
