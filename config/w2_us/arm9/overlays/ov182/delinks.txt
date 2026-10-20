@@ -368,3 +368,9 @@ lib/dwcutilui/src/dwc_util_auto_connect_intro.c:
     .text       start:0x021b65c8 end:0x021b6768
     .rodata     start:0x021c040c end:0x021c0418
     .data       start:0x021c1374 end:0x021c1388
+
+lib/dwcutilui/src/dwc_util_usb_done.c:
+    complete
+    .text       start:0x021b6768 end:0x021b68cc
+    .data       start:0x021c1388 end:0x021c139c
+    .bss        start:0x021c4184 end:0x021c4188
