@@ -7,10 +7,30 @@
 // TwlSDK's OS code in the LTD autoload: the DSi's parts of NitroSDK's OS functions, which main's OS code calls when
 // the game runs on a DSi. The functions keep their default names until the LTD autoload is analyzed
 
+// The pointer to the DSi's system settings, which the system puts in the shared memory
+#define HW_TWL_SETTINGS_BUF_PTR 0x02fffdfc
+
+// The DSi's system settings, of which only what os_ownerInfoEx.c and its DSi part read is named
+typedef struct TWLSettings {
+    u32 unk0_0 : 3;
+    u32 wirelessEnabled : 1; // bit 3: the wireless is enabled in the settings
+    u32 unk0_4 : 20;
+    u32 eulaFlags : 8; // bit 0: the EULA was agreed to
+    u8 unk_04;
+    u8 country;
+    u8 language;
+    u8 unk_07[9];
+    u8 agreedEULAVersion;
+    u8 unk_11[0x83];
+    TWLParentalControl parentalControl;
+} TWLSettings;
+
+#define TWL_SETTINGS (*(TWLSettings **)HW_TWL_SETTINGS_BUF_PTR)
+
 // The DSi's part of OS_IsAvailableWireless and of the function next to it: a bit of the DSi's settings and a byte of
 // the shared memory
-BOOL func_02769318(void);
-BOOL func_02769334(void);
+BOOL OSi_IsAvailableWirelessTwl(void);
+BOOL OSi_IsForceDisableWirelessTwl(void);
 // The DSi's cleanup before OS_ResetSystem resets, which the card's pull-out does too
 void func_02769578(void);
 // TwlSDK's body of OSi_EnterNDmaCallback
