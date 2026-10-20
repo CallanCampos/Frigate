@@ -14,18 +14,18 @@
 
 // The fields of an entry, for TournamentEntry_GetField and TournamentEntry_SetField
 enum {
-    TOURNAMENT_FIELD_UNKBC = 1,
-    TOURNAMENT_FIELD_UNK152,
+    TOURNAMENT_FIELD_VERSION_MASK = 1,
+    TOURNAMENT_FIELD_CUP_ID,
     TOURNAMENT_FIELD_UNK154,
-    TOURNAMENT_FIELD_UNK155,
-    TOURNAMENT_FIELD_UNK156,
-    TOURNAMENT_FIELD_UNK157,
-    TOURNAMENT_FIELD_UNK158,
-    TOURNAMENT_FIELD_UNK159,
-    TOURNAMENT_FIELD_UNK15A,
+    TOURNAMENT_FIELD_START_YEAR,
+    TOURNAMENT_FIELD_START_MONTH,
+    TOURNAMENT_FIELD_START_DAY,
+    TOURNAMENT_FIELD_END_YEAR,
+    TOURNAMENT_FIELD_END_MONTH,
+    TOURNAMENT_FIELD_END_DAY,
     TOURNAMENT_FIELD_UNK15B,
-    TOURNAMENT_FIELD_UNK15C,
-    TOURNAMENT_FIELD_UNK15D
+    TOURNAMENT_FIELD_VARIANT,
+    TOURNAMENT_FIELD_ALLOW_REMATCH
 };
 
 // The fields of a team's record, for TournamentTeam_GetField
@@ -33,20 +33,24 @@ enum { TOURNAMENT_TEAM_SPECIES, TOURNAMENT_TEAM_FORM, TOURNAMENT_TEAM_HAS_ITEM, 
 
 typedef struct {
     Regulation regulation;
-    u32 unkBC;
-    u8 unkC0[0x92];
-    s16 unk152;
+    // The game versions that may enter, a bit for each
+    u32 versionMask;
+    // The start of the competition's card, which the card info copies
+    u8 cardData[0x92];
+    s16 cupId;
     s8 unk154;
-    s8 unk155;
-    s8 unk156;
-    s8 unk157;
-    s8 unk158;
-    s8 unk159;
-    s8 unk15A;
+    // When the competition starts and ends
+    s8 startYear;
+    s8 startMonth;
+    s8 startDay;
+    s8 endYear;
+    s8 endMonth;
+    s8 endDay;
     // Field 10 of TournamentEntry_GetField
     s8 unk15B;
-    u8 unk15C;
-    u8 unk15D;
+    // What picks the card's colors, and whether an opponent already battled may be battled again
+    u8 variant;
+    u8 allowRematch;
     // getCRC16 of everything before it
     u16 crc;
 } TournamentEntry; // size: 0x160

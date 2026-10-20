@@ -252,7 +252,7 @@ void func_0200b760(Regulation *regulation, RegulationUnkAC *out) {
 void *func_0200b794(void *entry) {
     TournamentEntry *tournament = entry;
 
-    return tournament->unkC0;
+    return tournament->cardData;
 }
 
 u32 TournamentEntry_GetField(void *entry, u32 field) {
@@ -260,41 +260,41 @@ u32 TournamentEntry_GetField(void *entry, u32 field) {
     u32 value;
 
     switch (field) {
-    case TOURNAMENT_FIELD_UNKBC:
-        value = tournament->unkBC;
+    case TOURNAMENT_FIELD_VERSION_MASK:
+        value = tournament->versionMask;
         break;
-    case TOURNAMENT_FIELD_UNK152:
-        value = tournament->unk152;
+    case TOURNAMENT_FIELD_CUP_ID:
+        value = tournament->cupId;
         break;
     case TOURNAMENT_FIELD_UNK154:
         value = tournament->unk154;
         break;
-    case TOURNAMENT_FIELD_UNK155:
-        value = tournament->unk155;
+    case TOURNAMENT_FIELD_START_YEAR:
+        value = tournament->startYear;
         break;
-    case TOURNAMENT_FIELD_UNK156:
-        value = tournament->unk156;
+    case TOURNAMENT_FIELD_START_MONTH:
+        value = tournament->startMonth;
         break;
-    case TOURNAMENT_FIELD_UNK157:
-        value = tournament->unk157;
+    case TOURNAMENT_FIELD_START_DAY:
+        value = tournament->startDay;
         break;
-    case TOURNAMENT_FIELD_UNK158:
-        value = tournament->unk158;
+    case TOURNAMENT_FIELD_END_YEAR:
+        value = tournament->endYear;
         break;
-    case TOURNAMENT_FIELD_UNK159:
-        value = tournament->unk159;
+    case TOURNAMENT_FIELD_END_MONTH:
+        value = tournament->endMonth;
         break;
-    case TOURNAMENT_FIELD_UNK15A:
-        value = tournament->unk15A;
+    case TOURNAMENT_FIELD_END_DAY:
+        value = tournament->endDay;
         break;
     case TOURNAMENT_FIELD_UNK15B:
         value = tournament->unk15B;
         break;
-    case TOURNAMENT_FIELD_UNK15C:
-        value = tournament->unk15C;
+    case TOURNAMENT_FIELD_VARIANT:
+        value = tournament->variant;
         break;
-    case TOURNAMENT_FIELD_UNK15D:
-        value = tournament->unk15D;
+    case TOURNAMENT_FIELD_ALLOW_REMATCH:
+        value = tournament->allowRematch;
         break;
     }
     return value;
@@ -304,41 +304,41 @@ void TournamentEntry_SetField(void *entry, u32 field, u32 value) {
     TournamentEntry *tournament = entry;
 
     switch (field) {
-    case TOURNAMENT_FIELD_UNKBC:
-        tournament->unkBC = value;
+    case TOURNAMENT_FIELD_VERSION_MASK:
+        tournament->versionMask = value;
         break;
-    case TOURNAMENT_FIELD_UNK152:
-        tournament->unk152 = value;
+    case TOURNAMENT_FIELD_CUP_ID:
+        tournament->cupId = value;
         break;
     case TOURNAMENT_FIELD_UNK154:
         tournament->unk154 = value;
         break;
-    case TOURNAMENT_FIELD_UNK155:
-        tournament->unk155 = value;
+    case TOURNAMENT_FIELD_START_YEAR:
+        tournament->startYear = value;
         break;
-    case TOURNAMENT_FIELD_UNK156:
-        tournament->unk156 = value;
+    case TOURNAMENT_FIELD_START_MONTH:
+        tournament->startMonth = value;
         break;
-    case TOURNAMENT_FIELD_UNK157:
-        tournament->unk157 = value;
+    case TOURNAMENT_FIELD_START_DAY:
+        tournament->startDay = value;
         break;
-    case TOURNAMENT_FIELD_UNK158:
-        tournament->unk158 = value;
+    case TOURNAMENT_FIELD_END_YEAR:
+        tournament->endYear = value;
         break;
-    case TOURNAMENT_FIELD_UNK159:
-        tournament->unk159 = value;
+    case TOURNAMENT_FIELD_END_MONTH:
+        tournament->endMonth = value;
         break;
-    case TOURNAMENT_FIELD_UNK15A:
-        tournament->unk15A = value;
+    case TOURNAMENT_FIELD_END_DAY:
+        tournament->endDay = value;
         break;
     case TOURNAMENT_FIELD_UNK15B:
         tournament->unk15B = value;
         break;
-    case TOURNAMENT_FIELD_UNK15C:
-        tournament->unk15C = value;
+    case TOURNAMENT_FIELD_VARIANT:
+        tournament->variant = value;
         break;
-    case TOURNAMENT_FIELD_UNK15D:
-        tournament->unk15D = value;
+    case TOURNAMENT_FIELD_ALLOW_REMATCH:
+        tournament->allowRematch = value;
         break;
     }
 }

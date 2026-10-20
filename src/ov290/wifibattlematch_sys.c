@@ -713,7 +713,7 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         param->setup->fieldSituation.unk12 = SEQ_BGM_WIN2;
     } else if (sys->mode == 0) {
         entry = TournamentBlock_GetEntry(tournament, 0);
-        value = TournamentEntry_GetField(entry, 0xb);
+        value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
         param12 = Regulation_GetParam(func_0200b530(entry), REGULATION_PARAM_18);
         if (value == 1) {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_WCS;
@@ -729,7 +729,7 @@ static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, H
         }
     } else if (sys->mode == 1) {
         entry = TournamentBlock_GetEntry(tournament, 1);
-        value = TournamentEntry_GetField(entry, 0xb);
+        value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
         param12 = Regulation_GetParam(func_0200b530(entry), REGULATION_PARAM_18);
         if (value == 1) {
             param->setup->fieldSituation.bgm = SEQ_BGM_VS_WCS;
@@ -782,7 +782,7 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
     if (sys->mode == 0) {
         entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(sys->param.gameData)), 0);
         regulation = func_0200b530(entry);
-        value = TournamentEntry_GetField(entry, 2);
+        value = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
         if (result == 0) {
             WifiBattleMatchSys_BuildReport(&sys->report, sys->party, sys->otherParty, sys->otherPlayer, regulation,
                                            value, setup, &sys->battleResult, 0);
