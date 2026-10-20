@@ -19304,7 +19304,8 @@ overlays/ov182 0x021c2a40 sWep
 overlays/ov182 0x021c2aa0 sWcm
 overlays/ov182 0x021c2ac8 sBssid
 overlays/ov182 0x021c2ad0 sEssid
-overlays/ov182 0x021c2af0 sAcWork
+overlays/ov182 0x021c2af0 sAcHasSsid
+overlays/ov182 0x021c2b40 sAcSecure
 overlays/ov182 0x021c2b70 sAcWcmCallback
 overlays/ov182 0x021c2b74 sAcEvents
 overlays/ov182 0x021c2b84 sAcSocMutex

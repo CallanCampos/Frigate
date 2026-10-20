@@ -3299,11 +3299,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   order.
 - MWCC 2.0 without `-ipa file` reaches a file's statics and globals defined with an initializer (`= NULL`, `= 0`,
   `= { 0 }`) from one shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`), and a tentative definition or another
-  file's global by its own address. It lays the initialized ones out first in `.bss`. A "struct" of words reached from
-  that anchor is separate statics: `dwc_aoss_ap.c`'s `gAossApAlloc`, `gAossApOnModeChange`, `gAossApBlock` and
-  `gAossApFree`, four `= NULL` globals, give `DWC_Aoss_Init` its one literal for `0x021c2940` and the free callback at
-  + 0xc, while `dwc_aoss.c` loads the callback by its own address. It emits a jump table only when every value of the
-  range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
+  file's global by its own address. It lays the initialized ones out first in `.bss`, in the size heapsort of every
+  initialized object defined above the first function (`.data` and `.rodata` ones included), which
+  `rodata_order.py`'s `heapsort` of the reversed list predicts. A "struct" of words reached from that anchor, laid out
+  in size order in the ROM, is separate statics: `dwc_aoss_ap.c`'s `gAossApAlloc`, `gAossApOnModeChange`,
+  `gAossApBlock` and `gAossApFree`, four `= NULL` globals, give `DWC_Aoss_Init` its one literal for `0x021c2940` and
+  the free callback at + 0xc, while `dwc_aoss.c` loads the callback by its own address; `dwcutil_ac.c`'s work area is
+  32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
+  `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
+  so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM

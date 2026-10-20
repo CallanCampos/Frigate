@@ -1576,8 +1576,8 @@ sWep kind:bss addr:0x021c2a80
 sWcm kind:bss addr:0x021c2ae0
 sBssid kind:bss addr:0x021c2b08
 sEssid kind:bss addr:0x021c2b10
-sAcWork kind:bss addr:0x021c2b30
-data_ov182_021c2b40 kind:bss addr:0x021c2b80
+sAcHasSsid kind:bss addr:0x021c2b30
+sAcSecure kind:bss addr:0x021c2b80
 sAcWcmCallback kind:bss addr:0x021c2bb0
 sAcEvents kind:bss addr:0x021c2bb4
 sAcSocMutex kind:bss addr:0x021c2bc4
