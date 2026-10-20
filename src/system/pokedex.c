@@ -310,11 +310,11 @@ BOOL PokeDex_IsHabitatListEnabled(PokeDexSave *pokedex) {
 }
 
 void givePlayerPokedex(PokeDexSave *pokedex) {
-    pokedex->unk4_2 = 1;
+    pokedex->given = 1;
 }
 
 u32 func_0200d1dc(PokeDexSave *pokedex) {
-    return pokedex->unk4_2;
+    return pokedex->given;
 }
 
 void PokeDex_SetMode(PokeDexSave *pokedex, u32 mode) {

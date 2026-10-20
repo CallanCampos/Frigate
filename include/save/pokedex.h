@@ -29,8 +29,8 @@ struct PokeDexSave {
     u32 magic;
     u32 nationalObtained : 1;
     u32 habitatListEnabled : 1;
-    // Set to 1 with the Pokédex (func_0200d1dc)
-    u32 unk4_2 : 8;
+    // Set to 1 when the player is given the Pokédex, which the list's search and the detail screen check
+    u32 given : 8;
     // Which Pokédex the detail screen counts (PokeDex_GetMode)
     u32 mode : 2;
     // The species that the Pokédex's list was last on
