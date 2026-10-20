@@ -8,8 +8,9 @@
 // DWC's transport between the machines of a match (dwc_transport.c, in overlay 11): it sends the game's data to a
 // machine over its GT2 connection, in pieces no larger than the connection takes, keeps what GT2 could not take to send
 // again, and puts the pieces it receives back together in the game's buffer. The ROM names none of it; the types take
-// the names that TWL-DWC gives them (DWCTransportInfo, recalled from the SDK), and the functions keep their addresses.
-// The game's functions (sending, the receive buffers, the callbacks and the receive timeouts) are in dwc/dwc.h.
+// the names that TWL-DWC gives them (DWCTransportInfo, recalled from the SDK), and the functions take the SDK's, from
+// NitroDWC's dwc_transport.c and the Wii DWC's newer dwc_transport.h; those of the send pool, which neither has, are
+// ours. The game's functions (sending, the receive buffers, the callbacks and the receive timeouts) are in dwc/dwc.h.
 
 // The function called with the latency of a ping to a machine, in milliseconds
 typedef void (*DWCPingFunc)(int latency, u8 aid, void *param);
@@ -57,24 +58,24 @@ typedef struct DWCTransportInfo {
 
 // Sends the game's data to a machine, in pieces, returning FALSE if it can't be sent now; and sends data of the voice
 // chat unreliably, at most 0x5b6 bytes. lib/dwc/src/vct/vct_internal.h declares both for libVCT too
-BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
-BOOL func_ov011_02168b18(u8 aid, const void *data, int size);
+BOOL DWC_SendReliable(u8 aid, const void *data, int size);
+BOOL DWC_SendUnreliable(u8 aid, const void *data, int size);
 // Sends data of a kind (1 the game's, 2 to 4 the match's own) to a machine, returning FALSE if it can't be sent now
-BOOL func_ov011_02168a1c(int type, u8 aid, const void *data, int size);
+BOOL DWCi_SendReliable(int type, u8 aid, const void *data, int size);
 // Starts the transport in the memory the match gives it, and ends it
-void func_ov011_02168d0c(DWCTransportInfo *info);
-void func_ov011_02168fec(void);
+void DWCi_InitTransport(DWCTransportInfo *info);
+void DWCi_ShutdownTransport(void);
 // GT2's callbacks of a connection: a message received, and the latency of a ping
-void func_ov011_02168d40(GTI2Connection *connection, const void *message, int length, BOOL reliable);
-void func_ov011_02168d80(GTI2Connection *connection, u32 latency);
+void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable);
+void DWCi_PingCallback(GTI2Connection *connection, u32 latency);
 // Runs the transport for a frame: drops the machines that sent nothing for too long, calls the receive timeouts and
 // sends the next piece of the data being sent
-void func_ov011_02168db0(void);
+void DWCi_TransportProcess(void);
 // Clears the sending and receiving of a machine, and notes that data has just come from it
-void func_ov011_02168fa4(u8 aid);
-void func_ov011_02169000(u8 aid);
+void DWCi_ClearTransConnection(u8 aid);
+void DWCi_ResetLastSomeDataRecvTimeByAid(u8 aid);
 // Sends data from a machine (from) to another unreliably, through the server when there is no connection to it,
 // marked as relayed when relay is TRUE
-void func_ov011_021690a4(u8 from, u8 aid, const void *data, int size, BOOL relay);
+void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay);
 
 #endif // POKEBW2_DWC_TRANSPORT_H

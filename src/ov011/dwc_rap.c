@@ -333,10 +333,10 @@ BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3) {
         return FALSE;
     }
     _dWork->matchType = 0;
-    func_ov011_02168bb0(DWCRap_SendCallback, 0);
-    func_ov011_02168bd8(DWCRap_RecvCallback, 0);
+    DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
+    DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
     func_ov011_02160150(DWCRap_ClosedCallback, 0);
-    func_ov011_02168c00(DWCRap_TimeoutCallback, 0);
+    DWC_SetUserRecvTimeoutCallback(DWCRap_TimeoutCallback, 0);
     _dWork->sending = 0;
     _dWork->unk7A1 = 1;
     return TRUE;
@@ -360,10 +360,10 @@ BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFun
         return FALSE;
     }
     _dWork->matchType = 0;
-    func_ov011_02168bb0(DWCRap_SendCallback, 0);
-    func_ov011_02168bd8(DWCRap_RecvCallback, 0);
+    DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
+    DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
     func_ov011_02160150(DWCRap_ClosedCallback, 0);
-    func_ov011_02168c00(DWCRap_TimeoutCallback, 0);
+    DWC_SetUserRecvTimeoutCallback(DWCRap_TimeoutCallback, 0);
     _dWork->sending = 0;
     _dWork->unk7A1 = 1;
     _dWork->errorCode = 0x3ef;
@@ -462,7 +462,7 @@ BOOL DWCRap_SendPacket(const void *data, int size, int type) {
     MI_CpuCopy8(data, _dWork->data, size);
     _dWork->sending = 1;
     netIds = func_ov011_02160344();
-    if (netIds != func_ov011_02168ad4(netIds, &_dWork->header, size + 4)) {
+    if (netIds != DWC_SendReliableBitmap(netIds, &_dWork->header, size + 4)) {
         _dWork->sending = 0;
         return FALSE;
     }
@@ -557,16 +557,16 @@ static void DWCRap_SetRecvTimeouts(void) {
     int i;
 
     for (i = 0; i < DWCRAP_NETID_MAX; i++) {
-        func_ov011_02168ca4(i, 0);
+        DWC_SetRecvTimeoutTime(i, 0);
     }
     if (func_ov011_021602c0() == 0) {
         for (i = 0; i < _dWork->maxPlayers; i++) {
             if (i != func_ov011_021602c0() && (func_ov011_02160344() & (1 << i))) {
-                GFL_ASSERT_MSG(func_ov011_02168ca4(i, 10000), "DWC_SetRecvTimeoutTime\n");
+                GFL_ASSERT_MSG(DWC_SetRecvTimeoutTime(i, 10000), "DWC_SetRecvTimeoutTime\n");
             }
         }
     } else {
-        GFL_ASSERT_MSG(func_ov011_02168ca4(0, 10000), "DWC_SetRecvTimeoutTime\n");
+        GFL_ASSERT_MSG(DWC_SetRecvTimeoutTime(0, 10000), "DWC_SetRecvTimeoutTime\n");
     }
     _dWork->connected = 1;
     DWCRap_ResetIdleFrames();
@@ -781,7 +781,7 @@ static BOOL DWCRap_CanPing(void) {
     for (i = 0; i < _dWork->maxPlayers; i++) {
         if (i != func_ov011_021602c0() && func_ov011_02160370(i)) {
             found = TRUE;
-            if (!func_ov011_02168998(i)) {
+            if (!DWC_IsSendableReliable(i)) {
                 return FALSE;
             }
         }
@@ -793,7 +793,7 @@ static BOOL DWCRap_SendIdlePing(int index) {
     if (_dWork->sending == 0 && DWCRap_CanPing() && (func_ov011_02160344() & 0xfffe)) {
         _dWork->sending = 1;
         _dWork->header.word = 2 | (_dWork->unk794 << 8);
-        func_ov011_02168ad4(func_ov011_02160344(), &_dWork->header, 4);
+        DWC_SendReliableBitmap(func_ov011_02160344(), &_dWork->header, 4);
         _dWork->idleFrames[index] = 0;
         return TRUE;
     }
@@ -1183,10 +1183,10 @@ int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
         DWCRap_AllocRecvBuffer(i);
     }
     DWCRap_SetState(DWCRAP_STATE_MATCHING);
-    func_ov011_02168bb0(DWCRap_SendCallback, 0);
-    func_ov011_02168bd8(DWCRap_RecvCallback, 0);
+    DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
+    DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
     func_ov011_02160150(DWCRap_ClosedCallback, 0);
-    func_ov011_02168c00(DWCRap_TimeoutCallback, 0);
+    DWC_SetUserRecvTimeoutCallback(DWCRap_TimeoutCallback, 0);
     _dWork->sending = 0;
     return 0;
 }
@@ -1287,7 +1287,7 @@ static void DWCRap_AllocRecvBuffer(int aid) {
     DWCRap_FreeRecvBuffer(aid);
     if (_dWork->recvBuf[aid] == NULL) {
         _dWork->recvBuf[aid] = allocConfigDSSoftwareFeature(netInit->heapId, 0x1000, "dwc_rap.c", 2929);
-        func_ov011_02168b84(aid, _dWork->recvBuf[aid], 0x1000);
+        DWC_SetRecvBuffer(aid, _dWork->recvBuf[aid], 0x1000);
     }
 }
 

@@ -44,19 +44,19 @@ u8 DWC_GetFriendStatusData(const DWCFriendData *friendData, char *statusData, in
 BOOL DWC_SetOwnStatusData(const char *statusData, int size);
 
 // Overlay 11's transport, which sends to the machines of a match (dwc_transport.c; the rest is in dwc/transport.h)
-BOOL func_ov011_02168998(u8 netId);
-u32 func_ov011_02168ad4(u32 netIds, const void *data, int size);
-BOOL func_ov011_02168b84(u8 netId, void *buffer, int size);
-BOOL func_ov011_02168ca4(u8 netId, int timeout);
+BOOL DWC_IsSendableReliable(u8 netId);
+u32 DWC_SendReliableBitmap(u32 netIds, const void *data, int size);
+BOOL DWC_SetRecvBuffer(u8 netId, void *buffer, int size);
+BOOL DWC_SetRecvTimeoutTime(u8 netId, int timeout);
 // The functions called when data has been sent, when it has been received and when a machine has not sent for too
 // long, with the parameter they were set with; the setters of the transport's (dwc/transport.h) return FALSE while it
 // isn't running
 typedef void (*DWCSendFunc)(int size, u8 netId, void *param);
 typedef void (*DWCRecvFunc)(u8 netId, u8 *data, int size, void *param);
 typedef void (*DWCTimeoutFunc)(u8 netId, void *param);
-BOOL func_ov011_02168bb0(DWCSendFunc func, void *param);
-BOOL func_ov011_02168bd8(DWCRecvFunc func, void *param);
-BOOL func_ov011_02168c00(DWCTimeoutFunc func, void *param);
+BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param);
+BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param);
+BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param);
 
 // Overlay 11's, which the library's start in main (dwc_init.c) calls: chooses the servers that the library talks to
 // by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives), returning

@@ -511,7 +511,7 @@ void func_ov011_0215fa0c(DWCUserData *userData, int productId, const char *secre
     DWCi_FriendInit(&sMatchRoot.fm->friendControl, &sMatchRoot.fm->gp, sMatchRoot.fm->name, friendList, friendListLen);
     func_ov011_02161048(&sMatchRoot.fm->match, &sMatchRoot.fm->gp, sMatchRoot.fm, &sMatchRoot.fm->callbacks,
                         gcd_gamename, gcd_secret_key, friendList, friendListLen);
-    func_ov011_02168d0c(&sMatchRoot.fm->match.transport);
+    DWCi_InitTransport(&sMatchRoot.fm->match.transport);
     len = strlen(secretKey);
     if (len < 0x100) {
         len = strlen(secretKey);
@@ -549,7 +549,7 @@ void func_ov011_0215fb78(void) {
         DWCi_ShutdownLogin();
         DWCi_ShutdownFriend();
         func_ov011_02162e44();
-        func_ov011_02168fec();
+        DWCi_ShutdownTransport();
         if (sMatchRoot.fm->socket != NULL) {
             func_ov011_0217d158(sMatchRoot.fm->socket);
             sMatchRoot.fm->socket = NULL;
@@ -614,7 +614,7 @@ void func_ov011_0215fc50(void) {
         DWCi_FriendProcess();
         break;
     case 5:
-        func_ov011_02168db0();
+        DWCi_TransportProcess();
         DWCi_FriendProcess();
         if (sMatchRoot.fm->match.mode == 2 || sMatchRoot.fm->match.mode == 3) {
             func_ov011_021617b4(1);
@@ -1213,7 +1213,7 @@ static void func_ov011_02160870(GPConnection *connection, void *arg, void *param
 }
 
 static void func_ov011_02160934(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
-    func_ov011_02168d40(connection, message, length, reliable);
+    DWCi_RecvCallback(connection, message, length, reliable);
 }
 
 static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId, u8 netId) {
@@ -1258,7 +1258,7 @@ static void func_ov011_0216093c(GTI2Connection *conn, int closeType, int isNetId
         }
         hadHost = func_ov011_021682ac(id) != NULL;
         if (!isNetId) {
-            func_ov011_02168fa4(id);
+            DWCi_ClearTransConnection(id);
         }
         if (func_ov011_02168238() != NULL && id == func_ov011_02168238()->aid) {
             isHost = TRUE;
@@ -1369,7 +1369,7 @@ static void func_ov011_02160d10(GTI2Connection *conn, int closeType) {
 }
 
 static void func_ov011_02160d1c(GTI2Connection *connection, u32 latency) {
-    func_ov011_02168d80(connection, latency);
+    DWCi_PingCallback(connection, latency);
 }
 
 static void func_ov011_02160d24(GTI2Socket *socket) {
@@ -2190,7 +2190,7 @@ static void func_ov011_02162440(GTI2Socket *socket, GTI2Connection *connection, 
     info->index = slot;
     info->aid = func_ov011_02167f6c()->self.aid;
     info->profileId = func_ov011_02167f6c()->self.profileId;
-    func_ov011_02169000(info->aid);
+    DWCi_ResetLastSomeDataRecvTimeByAid(info->aid);
     gt2SetConnectionData(connection, info);
     func_ov011_02165280(2);
 }
@@ -2263,7 +2263,7 @@ static void func_ov011_02162640(GTI2Connection *connection, int result, const vo
         info->aid = func_ov011_02167f6c()->unk_5ac.aid;
         info->profileId = func_ov011_02167f6c()->unk_5ac.profileId;
     }
-    func_ov011_02169000(info->aid);
+    DWCi_ResetLastSomeDataRecvTimeByAid(info->aid);
     gt2SetConnectionData(connection, info);
     if (func_ov011_02167f6c()->state == 0xf || func_ov011_02167f6c()->unk_5a8 == 0xf) {
         func_ov011_02165280(0);
@@ -2859,7 +2859,7 @@ static int func_ov011_021637d8(int type, int id, u32 ip, u16 port, const u32 *da
     if (func_ov011_021637b0(type, id)) {
         peer = func_ov011_02168270(id);
         func_ov011_0216390c(&packet, type, data, count);
-        func_ov011_021690a4(func_ov011_021602c0(), peer->aid, &packet, packet.header.size + sizeof(MatchPacketHeader),
+        DWCi_SendUnreliable(func_ov011_021602c0(), peer->aid, &packet, packet.header.size + sizeof(MatchPacketHeader),
                             FALSE);
     } else if (gpIsBuddy(func_ov011_02167f6c()->gp, id)) {
         length = 0;
@@ -4343,7 +4343,7 @@ static void func_ov011_02165d2c(u32 aid, int type) {
         }
         break;
     }
-    func_ov011_02168a1c(type, aid, data, size);
+    DWCi_SendReliable(type, aid, data, size);
     if (data != local) {
         DWC_Free(4, data, 0);
     }
@@ -5790,7 +5790,7 @@ static void func_ov011_02167fe8(void) {
     int i;
 
     for (i = 0; i < func_ov011_02168024(); i++) {
-        func_ov011_02169000(func_ov011_02168250(i)->aid);
+        DWCi_ResetLastSomeDataRecvTimeByAid(func_ov011_02168250(i)->aid);
     }
 }
 
