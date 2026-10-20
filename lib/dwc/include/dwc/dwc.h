@@ -10,6 +10,7 @@
 // GameSpy's stats (gstats.c): the game's name, which the server URLs are made from, the secret key and the stats
 // server's host, which the start sets
 #include "dwc/gstats.h"
+#include "dwc/gt2Main.h"
 #include "dwc/init.h"
 #include "gfl/heap.h"
 #include "nitro/rtc.h"
@@ -78,18 +79,19 @@ void func_ov011_02160284(u8 netId);
 BOOL func_ov011_02160370(u8 netId);
 BOOL func_ov011_02168998(u8 netId);
 u32 func_ov011_02168ad4(u32 netIds, const void *data, int size);
-void func_ov011_02168b84(u8 netId, void *buffer, int size);
+BOOL func_ov011_02168b84(u8 netId, void *buffer, int size);
 BOOL func_ov011_02168ca4(u8 netId, int timeout);
 // The functions called when data has been sent, when it has been received, when a connection has been closed and
-// when a machine has not sent for too long
-typedef void (*DWCSendFunc)(int size, u8 netId);
-typedef void (*DWCRecvFunc)(u8 netId, u8 *data, int size);
+// when a machine has not sent for too long, with the parameter they were set with; the setters of the transport's
+// (dwc/transport.h) return FALSE while it isn't running
+typedef void (*DWCSendFunc)(int size, u8 netId, void *param);
+typedef void (*DWCRecvFunc)(u8 netId, u8 *data, int size, void *param);
 typedef void (*DWCClosedFunc)(int error, BOOL a1, BOOL a2, u8 netId, int index, void *param);
-typedef void (*DWCTimeoutFunc)(u8 netId);
-void func_ov011_02168bb0(DWCSendFunc func, int a1);
-void func_ov011_02168bd8(DWCRecvFunc func, int a1);
+typedef void (*DWCTimeoutFunc)(u8 netId, void *param);
+BOOL func_ov011_02168bb0(DWCSendFunc func, void *param);
+BOOL func_ov011_02168bd8(DWCRecvFunc func, void *param);
 void func_ov011_02160150(DWCClosedFunc func, int a1);
-void func_ov011_02168c00(DWCTimeoutFunc func, int a1);
+BOOL func_ov011_02168c00(DWCTimeoutFunc func, void *param);
 
 // Overlay 11's, used with the matching keys: adds a key with a value that is read when the match runs, and reads
 // a candidate's key
@@ -107,8 +109,8 @@ BOOL func_ov011_02169df8(int server);
 void func_ov011_021694d4(const char *url);
 const char *func_ov011_021694e0(void);
 
-// Overlay 11's dwc_match.c, which is not written yet: what friend.c calls in it (its functions that the game
-// calls are above)
+// Overlay 11's dwc_match.c, which is not written yet: what friend.c and dwc_transport.c call in it (its functions
+// that the game calls are above)
 
 // friend.c's: sets the player's status with the matching's texts (SCM, SCN, VER and LCK), returning GP's result; makes
 // the GT2 socket of the matching, returning GT2's result; keeps the profile ID that logged in, and registers the
@@ -118,5 +120,45 @@ int func_ov011_0216043c(void);
 void func_ov011_02168780(int profileId);
 void func_ov011_02168794(void);
 u8 func_ov011_021686c0(const GPBuddyStatus *status);
+
+// A machine of the match, as the match's list keeps it: its profile ID, its public and local addresses, the address
+// of the host it was reached through and its aid
+typedef struct DWCNodeInfo {
+    s32 profileId;
+    u32 publicIp;
+    u32 localIp;
+    u16 publicPort;
+    u16 localPort;
+    u32 hostIp;
+    u16 hostPort;
+    u8 aid;
+    u8 unk_17;
+    s32 unk_18;
+    u64 unk_1c;
+    u32 unk_24;
+} DWCNodeInfo;
+
+// The transport's: the GT2 connection to the machine with an aid (NULL if there is none) and the aid of a connection
+// (0xff if it has none); whether a connection to an aid is open; the number of machines; the node of an index of the
+// list; whether this machine is the server; the aids of the machines (returning their number); whether the match is
+// running and whether it is a match of a server; the server's aid (0xff if none); drops a machine; and redoes the
+// match after one was dropped (with TRUE)
+GTI2Connection *func_ov011_021604b0(u8 aid);
+u8 func_ov011_021604ec(GTI2Connection *connection);
+BOOL func_ov011_02160588(u8 aid);
+int func_ov011_02168024(void);
+DWCNodeInfo *func_ov011_02168250(int index);
+BOOL func_ov011_02160408(void);
+int func_ov011_021602f0(u8 **aids);
+BOOL func_ov011_02167f3c(void);
+BOOL func_ov011_021677e8(void);
+u8 func_ov011_02160d6c(void);
+int func_ov011_02160710(u8 aid);
+int func_ov011_021679c8(BOOL force);
+
+// The match's own data that the transport received from a machine (type 2 to 4), and a match command (a packet that
+// starts with 0xbb 'I' 0xcc 'M')
+void func_ov011_02162930(u8 aid, int type, const void *data);
+void func_ov011_0216731c(const u8 *data, int size);
 
 #endif // POKEBW2_DWC_DWC_H
