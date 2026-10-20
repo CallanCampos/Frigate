@@ -101,12 +101,13 @@ static void DWCUtilAutoConnect_StartAutoConnect(void) {
 static void DWCUtilAutoConnect_FadeIn(void) {
     int from;
 
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from == 0) {
-        DWCUtilFade_Start(2, 1, 1, 8);
-        DWCUtilDisplay_ShowPlanes(1, 1);
+        DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
     }
     DWCUtilMain_SetUpdate(DWCUtilAutoConnect_WaitFadeIn);
 }
@@ -133,7 +134,8 @@ static void func_ov182_021b62cc(void) {
 }
 
 static void DWCUtilAutoConnect_FadeOut(void) {
-    DWCUtilFade_Start(3, 0, 0x15, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
     DWCUtilMain_SetUpdate(DWCUtilAutoConnect_WaitFadeOut);
 }
 
@@ -153,7 +155,7 @@ static void DWCUtilAutoConnect_EndAutoConnect(void) {
         MI_CpuCopy8(DWCBm_GetPackedWifiIdInfo(), pages[1].wifiId, DWC_BM_PACKED_SIZE);
         DWCUtilUiEffect_Destroy();
         DWCUtilText_DestroyScreenBg(0);
-        DWCUtilDisplay_HidePlanes(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sAutoConnectSucceeded) {
             DWCUtilMain_SetLayout(0, 1);
             DWCUtilMain_SetUpdate(DWCUtilError_Init);

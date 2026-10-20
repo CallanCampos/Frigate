@@ -40,8 +40,9 @@ static void DWCUtilTestDone_LoadGraphics(void) {
 }
 
 static void DWCUtilTestDone_FadeIn(void) {
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilTestDone_WaitFadeIn);
 }
 
@@ -60,8 +61,9 @@ static void func_ov182_021b4c2c(void) {
 }
 
 static void DWCUtilTestDone_FadeOut(void) {
-    DWCUtilFade_Start(3, 1, 1, 8);
-    DWCUtilFade_Start(3, 0, 0x15, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
     DWCUtilMain_SetUpdate(DWCUtilTestDone_WaitFadeOut);
 }
 

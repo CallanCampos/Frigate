@@ -5,10 +5,6 @@
 #include "nitro/gx.h"
 #include "nitro/hw.h"
 
-#define DWC_UTIL_FADE_PLANES                                                                                           \
-    (GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 |               \
-     GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD)
-
 // The sub screen's fade, then the main screen's
 typedef struct DWCUtilFade {
     DWCUtilTask *task;

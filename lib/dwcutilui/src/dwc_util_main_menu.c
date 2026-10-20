@@ -58,8 +58,8 @@ static char *sMsgPaths[7] = {
 static DWCUtilMainMenu sMainMenu;
 
 void DWCUtilMainMenu_ExitUtility(void) {
-    DWCUtilFade_Start(3, 1, 0x3f, 0x14);
-    DWCUtilFade_Start(3, 0, 0x3f, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, DWC_UTIL_FADE_PLANES, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, DWC_UTIL_FADE_PLANES, 0x14);
     DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitExitUtility);
 }
 
@@ -110,14 +110,14 @@ void DWCUtilMainMenu_InitUtility(void) {
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG1Priority(3);
-    DWCUtilDisplay_ShowPlanes(1, 2);
-    DWCUtilDisplay_ShowPlanes(0, 2);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG1);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG1);
     DWCUtilMain_SetUpdate(DWCUtilMainMenu_FadeInUtility);
 }
 
 static void DWCUtilMainMenu_FadeInUtility(void) {
-    DWCUtilFade_Start(2, 1, 2, 0x14);
-    DWCUtilFade_Start(2, 0, 2, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG1, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG1, 0x14);
     DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitFadeInUtility);
 }
 
@@ -160,10 +160,10 @@ static void DWCUtilMainMenu_LoadGraphics(void) {
 }
 
 static void DWCUtilMainMenu_FadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x14, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitFadeIn);
 }
 
@@ -239,8 +239,9 @@ static void DWCUtilMainMenu_DisableButtons(void) {
 
 static void DWCUtilMainMenu_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilFade_Start(3, 1, 1, 8);
-        DWCUtilFade_Start(3, 0, 0x16, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilMainMenu_WaitFadeOut);
     }
 }
@@ -250,8 +251,8 @@ static void DWCUtilMainMenu_WaitFadeOut(void) {
         DWCUtilButtonSprites_Hide();
         DWCUtilScreen_Stop();
         DWCUtilRomResource_FreeFile(sMainMenu.palette);
-        DWCUtilDisplay_HidePlanes(1, 1);
-        DWCUtilDisplay_HidePlanes(0, 0x14);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         switch (sMainMenu.selection) {
         case 0:
             DWCUtilMain_SetLayout(1, 0);

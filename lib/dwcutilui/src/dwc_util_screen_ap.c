@@ -114,7 +114,7 @@ static void DWCUtilScreenAp_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/jb2Ap.nsc.l", GX_LoadBG2Scr);
     sScreenAp.work->palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
-    DWCUtilDisplay_ShowPlanes(1, 0x10);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_OBJ);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -145,10 +145,10 @@ static void DWCUtilScreenAp_CreateButtons(void) {
 }
 
 static void DWCUtilScreenAp_FadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x14, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitFadeIn);
 }
 
@@ -261,8 +261,8 @@ static void DWCUtilScreenAp_FadeOut(void) {
              DWCUtilWifiSettings_GetEdit()->connection.status != DWC_BM_CONNECTION_UNUSED)) {
             DWCUtilUiObject_Exit();
         }
-        DWCUtilFade_Start(3, 1, 1, 8);
-        DWCUtilFade_Start(3, 0, 0x14, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitFadeOut);
     }
 }
@@ -290,8 +290,8 @@ static void DWCUtilScreenAp_WaitFadeOut(void) {
     DWCUtilScreen_Stop();
     DWCUtilRomResource_FreeFile(sScreenAp.work->palette);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    DWCUtilDisplay_HidePlanes(1, 1);
-    DWCUtilDisplay_HidePlanes(0, 0x14);
+    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
         DWCUtilMain_SetLayout(0, 0);
         DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);

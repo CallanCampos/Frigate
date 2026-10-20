@@ -79,10 +79,11 @@ static void DWCUtilInfoMenu_LoadEraseGraphics(void) {
 }
 
 static void DWCUtilInfoMenu_EraseFadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitFadeIn);
 }
 
@@ -138,9 +139,10 @@ static void DWCUtilInfoMenu_EraseFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         if (!sErase) {
-            DWCUtilFade_Start(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(3, 0, 0x15, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilInfoMenu_EraseWaitFadeOut);
     }
 }
@@ -150,9 +152,9 @@ static void DWCUtilInfoMenu_EraseWaitFadeOut(void) {
         DWCUtilText_DestroyScreenBg(0);
         if (!sErase) {
             DWCUtilScreen_Stop();
-            DWCUtilDisplay_HidePlanes(1, 1);
+            DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
-        DWCUtilDisplay_HidePlanes(0, 0x15);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sErase) {
             DWCUtilMain_SetLayout(0, 1);
             DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
@@ -204,8 +206,9 @@ static void DWCUtilInfoMenu_LoadErasedGraphics(void) {
 }
 
 static void DWCUtilInfoMenu_ErasedFadeIn(void) {
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilInfoMenu_ErasedWaitFadeIn);
 }
 
@@ -253,8 +256,8 @@ static void DWCUtilInfoMenu_ErasedDisableButtons(void) {
 
 static void DWCUtilInfoMenu_ErasedFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilFade_Start(3, 1, 0x3f, 0x40);
-        DWCUtilFade_Start(3, 0, 0x3f, 0x40);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, DWC_UTIL_FADE_PLANES, 0x40);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, DWC_UTIL_FADE_PLANES, 0x40);
         DWCUtilMain_SetUpdate(DWCUtilInfoMenu_PowerOff);
     }
 }
@@ -321,10 +324,11 @@ static void DWCUtilInfoMenu_DrawConsoleInfo(void) {
 }
 
 static void DWCUtilInfoMenu_InfoFadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoWaitFadeIn);
 }
 
@@ -373,8 +377,9 @@ static void DWCUtilInfoMenu_InfoDisableButtons(void) {
 static void DWCUtilInfoMenu_InfoFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
-        DWCUtilFade_Start(3, 1, 1, 8);
-        DWCUtilFade_Start(3, 0, 0x15, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InfoWaitFadeOut);
     }
 }
@@ -383,8 +388,8 @@ static void DWCUtilInfoMenu_InfoWaitFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
         DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        DWCUtilDisplay_HidePlanes(1, 1);
-        DWCUtilDisplay_HidePlanes(0, 0x15);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCUtilMain_SetLayout(0, 1);
         DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     }

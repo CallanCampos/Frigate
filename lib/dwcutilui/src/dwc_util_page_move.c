@@ -62,8 +62,9 @@ static void DWCUtilPageMove_LoadGraphics(void) {
 }
 
 static void DWCUtilPageMove_FadeIn(void) {
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeIn);
 }
 
@@ -108,9 +109,10 @@ static void func_ov182_021b0310(void) {
 static void DWCUtilPageMove_FadeOut(void) {
     if (!DWCUtilDialog_IsOpen()) {
         if (!sPageMove.yes) {
-            DWCUtilFade_Start(3, 1, 1, 8);
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(3, 0, 0x15, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeOut);
     }
 }
@@ -133,16 +135,16 @@ static void DWCUtilPageMove_WaitMoveEnd(void) {
         return;
     }
     DWCUtilText_DestroyScreenBg(0);
-    DWCUtilDisplay_HidePlanes(0, 0x15);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sPageMove.yes) {
         DWCUtilScreen_Stop();
-        DWCUtilDisplay_HidePlanes(1, 1);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     }
     DWCUtilMain_SetLayout(0, 1);
     if (sPageMove.interrupted) {
         DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
     } else if (!sPageMove.yes) {
-        DWCUtilDisplay_HidePlanes(1, 1);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
     } else {
         DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitMove);

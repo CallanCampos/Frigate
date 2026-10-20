@@ -21,8 +21,8 @@ static inline void DWCUtilPageMulti4_WaitFadeOutInline(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        DWCUtilDisplay_HidePlanes(1, 1);
-        DWCUtilDisplay_HidePlanes(0, 0x15);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCUtilMain_SetLayout(0, 0);
         DWCUtilMain_SetScreenArgs(0, 1);
         DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);

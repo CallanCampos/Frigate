@@ -269,10 +269,12 @@ static void DWCUtilAddressSettings_InitCursor(void) {
 }
 
 static void DWCUtilAddressSettings_FadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x1d, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x1d);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ,
+                      8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilAddressSettings_WaitFadeIn);
 }
 
@@ -535,8 +537,10 @@ static void DWCUtilAddressSettings_StartExit(void) {
 
 static void DWCUtilAddressSettings_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilFade_Start(3, 1, 1, 8);
-        DWCUtilFade_Start(3, 0, 0x1d, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(
+            DWC_UTIL_FADE_TO_WHITE, 0,
+            GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilAddressSettings_WaitFadeOut);
     }
 }
@@ -570,8 +574,8 @@ static void DWCUtilAddressSettings_WaitFadeOut(void) {
         DWCUtilRomResource_FreeFile(sAddressSettings.work->palettes[i]);
     }
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    DWCUtilDisplay_HidePlanes(1, 1);
-    DWCUtilDisplay_HidePlanes(0, 0x1d);
+    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     G2_SetBG2ControlText(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16, GX_BG_SCRBASE_0x7000, GX_BG_CHARBASE_0x10000);

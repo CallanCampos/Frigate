@@ -109,10 +109,11 @@ static void DWCUtilWepKeyboard_LoadGraphics(void) {
 }
 
 static void DWCUtilWepKeyboard_FadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
 }
 
@@ -238,8 +239,8 @@ static void DWCUtilWepKeyboard_Exit(void) {
     DWCUtilOamBuf_Free(sWepKeyboard->cursor);
     DWCUtilText_DestroyScreenBg(0);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
-    DWCUtilDisplay_HidePlanes(1, 1);
-    DWCUtilDisplay_HidePlanes(0, 0x15);
+    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_GetScreenArgs(&field, &fromList);
     if (fromList == 0) {
         DWCUtilMain_SetLayout(2, 1);

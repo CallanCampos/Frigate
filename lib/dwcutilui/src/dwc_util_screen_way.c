@@ -110,10 +110,10 @@ static void DWCUtilScreenWay_LoadGraphics(void) {
 }
 
 static void DWCUtilScreenWay_FadeIn(void) {
-    DWCUtilFade_Start(2, 1, 1, 8);
-    DWCUtilFade_Start(2, 0, 0x14, 8);
-    DWCUtilDisplay_ShowPlanes(1, 1);
-    DWCUtilDisplay_ShowPlanes(0, 0x14);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilScreenWay_WaitFadeIn);
 }
 
@@ -196,8 +196,8 @@ static void DWCUtilScreenWay_FadeOut(void) {
         if (sScreenWay.chosen) {
             DWCUtilUiObject_Exit();
         }
-        DWCUtilFade_Start(3, 1, 1, 8);
-        DWCUtilFade_Start(3, 0, 0x14, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilScreenWay_WaitFadeOut);
     }
 }
@@ -212,8 +212,8 @@ static void DWCUtilScreenWay_WaitFadeOut(void) {
     DWCUtilButtonSprites_Hide();
     DWCUtilScreen_Stop();
     DWCUtilRomResource_FreeFile(sScreenWay.palette);
-    DWCUtilDisplay_HidePlanes(1, 1);
-    DWCUtilDisplay_HidePlanes(0, 0x14);
+    DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sScreenWay.chosen) {
         DWCUtilMain_SetLayout(2, 0);
         DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);

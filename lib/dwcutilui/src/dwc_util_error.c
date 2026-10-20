@@ -161,8 +161,9 @@ static void DWCUtilError_DrawMessage(void) {
 }
 
 static void DWCUtilError_FadeIn(void) {
-    DWCUtilFade_Start(2, 0, 0x15, 8);
-    DWCUtilDisplay_ShowPlanes(0, 0x15);
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeIn);
 }
 
@@ -211,8 +212,9 @@ static void DWCUtilError_DisableButtons(void) {
 static void DWCUtilError_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
-        DWCUtilFade_Start(3, 1, 1, 8);
-        DWCUtilFade_Start(3, 0, 0x15, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
         DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeOut);
     }
 }
@@ -224,8 +226,8 @@ static void DWCUtilError_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
         DWCUtilText_DestroyScreenBg(0);
         DWCUtilScreen_Stop();
-        DWCUtilDisplay_HidePlanes(1, 1);
-        DWCUtilDisplay_HidePlanes(0, 0x15);
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         DWCUtilMain_GetScreenArgs(NULL, &from);
         if (from != 0) {
             DWCUtilMain_SetLayout(2, 1);
