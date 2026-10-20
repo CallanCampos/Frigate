@@ -75,7 +75,7 @@ SaveControl *SaveControl_Create(HeapID heapId) {
                 case SAVE_LOAD_RESULT_OK:
                 case SAVE_LOAD_RESULT_OK_PARTIAL:
                     if (i == SAVE_EXTRA_ID_MUSICAL_DIST) {
-                        func_0200af08(getAddressOfMusicalDataInfo(ctrl), TRUE);
+                        MusicalSave_SetHasDistProgram(getAddressOfMusicalDataInfo(ctrl), TRUE);
                     }
                     break;
                 case SAVE_LOAD_RESULT_NONE:
@@ -83,12 +83,12 @@ SaveControl *SaveControl_Create(HeapID heapId) {
                 case SAVE_LOAD_RESULT_ERROR:
                     ctrl->errors |= SAVE_CONTROL_ERROR_EXTRA(i);
                     if (i == SAVE_EXTRA_ID_MUSICAL_DIST) {
-                        func_0200af08(getAddressOfMusicalDataInfo(ctrl), FALSE);
+                        MusicalSave_SetHasDistProgram(getAddressOfMusicalDataInfo(ctrl), FALSE);
                     }
                     break;
                 }
             } else if (i == SAVE_EXTRA_ID_MUSICAL_DIST) {
-                func_0200af08(getAddressOfMusicalDataInfo(ctrl), FALSE);
+                MusicalSave_SetHasDistProgram(getAddressOfMusicalDataInfo(ctrl), FALSE);
             }
         }
         break;
@@ -157,14 +157,14 @@ u32 SaveControl_Reload(SaveControl *save) {
     case SAVE_LOAD_RESULT_OK_PARTIAL:
         save->dataExists = TRUE;
         musical = getAddressOfMusicalDataInfo(save);
-        func_0200af08(musical, FALSE);
+        MusicalSave_SetHasDistProgram(musical, FALSE);
         if (TrainerDataSave_IsMarkerSet(save, SAVE_EXTRA_ID_MUSICAL_DIST) == TRUE) {
             extraResult = SaveControl_OpenExtraBlock(save, SAVE_EXTRA_ID_MUSICAL_DIST, HEAPID_USER);
             freeIntermediateSaveExtraBlksAfterLoad(save, SAVE_EXTRA_ID_MUSICAL_DIST);
             switch (extraResult) {
             case SAVE_LOAD_RESULT_OK:
             case SAVE_LOAD_RESULT_OK_PARTIAL:
-                func_0200af08(musical, TRUE);
+                MusicalSave_SetHasDistProgram(musical, TRUE);
                 break;
             }
         }

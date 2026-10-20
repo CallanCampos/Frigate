@@ -81,7 +81,7 @@ BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
     case 1: {
         u16 current = FALSE;
 
-        if (func_02010b0c(data, 0, NULL) <= func_0200af38(musical)) {
+        if (func_02010b0c(data, 0, NULL) <= MusicalSave_GetTotalPoints(musical)) {
             current = TRUE;
         }
         *result = current;

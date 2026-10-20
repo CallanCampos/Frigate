@@ -180,19 +180,19 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
     }
     switch (kind) {
     case 0:
-        *result = func_0200ae78(save);
+        *result = MusicalSave_GetShowCount(save);
         break;
     case 1:
-        *result = func_0200ae9c(save);
+        *result = MusicalSave_GetWinCount(save);
         break;
     case 2:
-        *result = func_0200aed4(save);
+        *result = MusicalSave_GetLastPoints(save);
         break;
     case 3:
         best = 0;
         mostIndex = 4;
         for (i = 0; i < 4; i++) {
-            value = func_0200aebc(save, i);
+            value = MusicalSave_GetPropKindCount(save, i);
             if (value > best) {
                 best = value;
                 mostIndex = i;
@@ -203,15 +203,15 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         *result = mostIndex;
         break;
     case 4:
-        *result = func_0200aee4(save);
+        *result = MusicalSave_GetProgram(save);
         break;
     case 5:
-        func_0200aef0(save, arg);
+        MusicalSave_SetProgram(save, arg);
         break;
     case 6:
         *result = 0;
         for (i = 0; i < 4; i++) {
-            if (func_0200aebc(save, i) != 0) {
+            if (MusicalSave_GetPropKindCount(save, i) != 0) {
                 *result = 1;
             }
         }
@@ -227,7 +227,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         best = 0xff;
         fewestIndex = 4;
         for (i = 0; i < 4; i++) {
-            value = func_0200aebc(save, i);
+            value = MusicalSave_GetPropKindCount(save, i);
             if (value <= best) {
                 best = value;
                 fewestIndex = i;
@@ -239,7 +239,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         best = 0;
         firstIndex = 4;
         for (i = 0; i < 4; i++) {
-            value = func_0200aebc(save, i);
+            value = MusicalSave_GetPropKindCount(save, i);
             if (value > best) {
                 best = value;
                 firstIndex = i;
@@ -253,7 +253,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         most = 0;
         second = 4;
         for (j = 0; j < 4; j++) {
-            value = func_0200aebc(save, j);
+            value = MusicalSave_GetPropKindCount(save, j);
             if (value > most) {
                 if (secondValue == most) {
                     second = 4;
@@ -286,7 +286,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 13:
-        entries = func_0200ad44(save);
+        entries = MusicalSave_GetEquips(save);
         *result = 0;
         for (i = 0; i < 8; i++) {
             if (entries[i].pos != 10) {
@@ -295,7 +295,7 @@ BOOL s0165_MusicalGetInfo(VM *vm, FieldScriptEnv *env) {
         }
         break;
     case 14:
-        if (func_0200aefc(save) == TRUE) {
+        if (MusicalSave_HasDistProgram(save) == TRUE) {
             *result = TRUE;
         } else {
             *result = FALSE;
@@ -343,7 +343,8 @@ BOOL s0166_MusicalGetAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 arg = ScriptReadAny(vm, env);
     u8 kind = VM_Read8(vm);
     u16 *result = ScriptReadVar(vm, env);
-    MusicalAudienceGift *entry = func_0200ae6c(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), arg);
+    MusicalAudienceGift *entry =
+        MusicalSave_GetAudienceGift(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), arg);
 
     switch (kind) {
     case 0:
@@ -457,7 +458,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
         musical = getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env));
         for (i = 0; i < 4; i++) {
             order[i] = i;
-            points[i] = func_0200aebc(musical, i);
+            points[i] = MusicalSave_GetPropKindCount(musical, i);
         }
         for (i = 1; i < 4; i++) {
             for (j = 0; j < 4 - i; j++) {
@@ -505,7 +506,7 @@ BOOL s005D_WordSetMusicalInfo(VM *vm, FieldScriptEnv *env) {
 BOOL s0169_MusicalClearAudienceGift(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
 
-    func_0200ae6c(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), index)->hasProp = 0;
+    MusicalSave_GetAudienceGift(getMusicalInfoBlkAddress(FieldScriptEnv_GetGameData(env)), index)->hasProp = 0;
     return FALSE;
 }
 

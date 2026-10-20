@@ -146,8 +146,8 @@ GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BO
     work->musicalSave = getMusicalInfoBlkAddress(gameData);
     work->ov210 = MusicalSystem_InitProgramData(HEAPID_GAMEEVENT);
     if (work->online == FALSE || MusComm_IsParent(work->commWork->comm) == TRUE) {
-        MusicalSystem_LoadProgramData(work->ov210, work->save, work->gameData, func_0200aee4(work->musicalSave),
-                                      HEAPID_MUSICAL_EVENT);
+        MusicalSystem_LoadProgramData(work->ov210, work->save, work->gameData,
+                                      MusicalSave_GetProgram(work->musicalSave), HEAPID_MUSICAL_EVENT);
     }
     if (work->online == TRUE) {
         work->state = 11;
@@ -155,7 +155,7 @@ GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BO
         MusComm_SetUp(work->comm, GetGameDataPlayerInfo(work->gameData), func_0201d620(work->pkm), work->gameComm,
                       work->ov210, HEAPID_GAMEEVENT);
     } else {
-        shots = func_0200af38(work->musicalSave);
+        shots = MusicalSave_GetTotalPoints(work->musicalSave);
         for (i = 0; i < 4; i++) {
             work->order[i] = i;
         }
@@ -188,7 +188,8 @@ static GameEventReturnCode MusicalEvent_Callback(GameEvent *event, u32 *state, v
             RivalDataSave *rivals;
 
             if (MusComm_IsParent(work->commWork->comm) == TRUE) {
-                work->program = MusicalProgram_Create(HEAPID_GAMEEVENT, work->ov210, func_0200af38(work->musicalSave));
+                work->program =
+                    MusicalProgram_Create(HEAPID_GAMEEVENT, work->ov210, MusicalSave_GetTotalPoints(work->musicalSave));
                 program = MusicalProgram_PackPoints(work->program);
                 cpus = MusicalProgram_PackNpcs(work->program);
             }
@@ -582,12 +583,12 @@ static void MusicalEvent_RecordShow(MusicalEventWork *work) {
 
     points = MusicalEvent_GetPoints(work, work->playerPos);
     topPoints = MusicalEvent_GetPoints(work, work->ranking[0]);
-    func_0200ae84(work->musicalSave);
+    MusicalSave_IncShowCount(work->musicalSave);
     if (points == topPoints && points != 0) {
-        func_0200aea4(work->musicalSave);
+        MusicalSave_IncWinCount(work->musicalSave);
     }
-    func_0200aedc(work->musicalSave, points);
-    func_0200af1c(work->musicalSave, points);
+    MusicalSave_SetLastPoints(work->musicalSave, points);
+    MusicalSave_AddTotalPoints(work->musicalSave, points);
     {
         u8 counts[4] = { 0 };
 
@@ -599,7 +600,7 @@ static void MusicalEvent_RecordShow(MusicalEventWork *work) {
             }
         }
         for (i = 0; i < 4; i++) {
-            func_0200aec8(work->musicalSave, i, counts[i]);
+            MusicalSave_SetPropKindCount(work->musicalSave, i, counts[i]);
         }
     }
     MusItemData_Free(items);
@@ -641,13 +642,13 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
     props = GFL_HeapAllocate(HEAPID_GAMEEVENT, 40, TRUE, "musical_event.c", 1041);
     total = 0;
     for (i = 0; i < 10; i++) {
-        entry = func_0200ae6c(work->musicalSave, i);
+        entry = MusicalSave_GetAudienceGift(work->musicalSave, i);
         entry->topKind = 4;
         entry->hasProp = 0;
         entry->prop = 0;
     }
     if (work->online == FALSE) {
-        total = func_0200af38(work->musicalSave) + MusicalEvent_GetPoints(work, work->playerPos);
+        total = MusicalSave_GetTotalPoints(work->musicalSave) + MusicalEvent_GetPoints(work, work->playerPos);
     } else {
         for (i = 0; i < 4; i++) {
             otherTotal = MusComm_GetPlayerMusicalId(work->comm, MusicalEvent_GetEntryIndex(work, i));
@@ -687,7 +688,7 @@ static void MusicalEvent_DrawAudienceGifts(MusicalEventWork *work) {
         }
     }
     for (i = 0; i < count; i++) {
-        entry = func_0200ae6c(work->musicalSave, order[i]);
+        entry = MusicalSave_GetAudienceGift(work->musicalSave, order[i]);
         chance = MusicalEvent_GetPoints(work, work->playerPos);
         entry->topKind = winner;
         if ((u8)GFL_RandomLCAlt(100) < chance && numProps != 0) {

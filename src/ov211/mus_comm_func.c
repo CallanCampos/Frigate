@@ -434,7 +434,7 @@ void MusComm_SetUp(MusCommWork *comm, PlayerInfo *info, BoxPkm *pkm, GameCommSys
             comm->players[i].equips[j] = 0xff;
         }
     }
-    comm->musicalId = func_0200af38(musical);
+    comm->musicalId = MusicalSave_GetTotalPoints(musical);
     comm->info = info;
     comm->pkm = pkm;
     comm->playerData = NULL;

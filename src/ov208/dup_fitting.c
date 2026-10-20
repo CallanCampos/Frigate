@@ -957,7 +957,7 @@ static void DupFitting_InitItems(DupFittingWork *work) {
     }
     work->badgeFrame = 0;
     {
-        MusicalSaveEquip *saved = func_0200ad44(work->param->save);
+        MusicalSaveEquip *saved = MusicalSave_GetEquips(work->param->save);
 
         for (i = 0; i < 8; i++) {
             if (saved[i].pos != DUP_FITTING_EQUIP_NONE) {
@@ -2166,11 +2166,11 @@ static void DupFitting_RotateHeld(DupFittingWork *work) {
 }
 
 static void DupFitting_SaveWornItems(DupFittingWork *work) {
-    MusicalSaveEquip *saved = func_0200ad44(work->param->save);
+    MusicalSaveEquip *saved = MusicalSave_GetEquips(work->param->save);
     DupFittingItemNode *node;
     u8 i = 0;
 
-    func_0200ad20(work->param->save);
+    MusicalSave_ClearEquips(work->param->save);
     for (node = DupFittingItemList_GetHead(work->wornList); node != NULL && i < 8;
          node = DupFittingItemNode_GetNext(node), i++) {
         u16 pos = DupFittingItemNode_GetEquipPos(node);
