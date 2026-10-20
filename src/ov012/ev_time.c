@@ -107,7 +107,7 @@ static void minutesPassed(GameData *gameData, s32 minutes, const RTCTime *time) 
     PokeParty *party = SaveControl_GetPokePartySave(GameData_GetSaveControl(gameData));
 
     ShayminForm_CheckNightPassed(gameData, party, minutes, time, GameData_GetSeason(gameData));
-    func_0200cb10(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
+    TrainerGameInfo_SubHallOfFameMinutes(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
 }
 
 RTCDate *getAddressAdventureTimeBlk(GameData *gameData) {

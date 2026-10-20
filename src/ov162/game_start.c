@@ -416,7 +416,7 @@ static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     SaveLocation location;
 
     gameInfoValues[0] = TrainerGameInfo_GetStartMenuFlags(wk->gameInfo);
-    gameInfoValues[1] = func_0200ca74(wk->gameInfo);
+    gameInfoValues[1] = TrainerGameInfo_GetKeyNotice(wk->gameInfo);
     SaveControl_Reload(save);
     Config_ApplyMsgLanguage((Config *)getTrainerDataBlkAddress(save));
     SaveControl_GetPlayerLocation(save, &location);
@@ -425,7 +425,7 @@ static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
         GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId, &location.pos, location.unk18));
     Config_SetCGearOn(wk->config, cgearOn);
     TrainerGameInfo_SetStartMenuFlags(wk->gameInfo, gameInfoValues[0]);
-    func_0200ca78(wk->gameInfo, gameInfoValues[1]);
+    TrainerGameInfo_SetKeyNotice(wk->gameInfo, gameInfoValues[1]);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }

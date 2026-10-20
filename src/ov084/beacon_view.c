@@ -465,7 +465,7 @@ static BOOL BeaconView_TakeNewBeacon(BeaconViewWork *work) {
         work->newPanel = BeaconView_FindPanel(work, work->newIndex);
     } else {
         work->newPanel = NULL;
-        work->passerbyCount = func_0200c928((TrainerGameInfoSave *)work->trainerCard);
+        work->passerbyCount = TrainerGameInfo_IncPasserbyCount((TrainerGameInfoSave *)work->trainerCard);
     }
     if (work->newPanel != NULL && work->newPanel->printTask != NULL) {
         work->subSeq = 0;

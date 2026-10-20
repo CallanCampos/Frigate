@@ -258,7 +258,7 @@ BOOL func_ov036_021a7c64(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u8 index = VM_Read8(vm);
 
-    WordSetNumber(wordSet, index, func_0200c924(info), 9, 1, TRUE);
+    WordSetNumber(wordSet, index, TrainerCard_GetPasserbyCount(info), 9, 1, TRUE);
     return FALSE;
 }
 
@@ -268,7 +268,7 @@ BOOL func_ov036_021a7cb4(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u8 index = VM_Read8(vm);
 
-    WordSetNumber(wordSet, index, func_0200c90c(info), 9, 1, TRUE);
+    WordSetNumber(wordSet, index, TrainerCard_GetThankedCount(info), 9, 1, TRUE);
     return FALSE;
 }
 

@@ -516,8 +516,8 @@ static u32 StartMenu_WaitPrint(StartMenuWork *wk) {
         if (StartMenu_CheckBrokenSave(wk) == TRUE) {
             return STATE_BROKEN_SAVE;
         }
-        if (func_0200ca74(wk->gameInfo) == TRUE) {
-            func_0200ca78(wk->gameInfo, 0);
+        if (TrainerGameInfo_GetKeyNotice(wk->gameInfo) == TRUE) {
+            TrainerGameInfo_SetKeyNotice(wk->gameInfo, 0);
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2, FALSE);
             StartMenu_SetItemActorsVisible(wk, FALSE);
             return StartMenu_WipeIn(wk, STATE_KEY_NOTICE);

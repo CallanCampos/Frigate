@@ -1000,7 +1000,7 @@ BOOL BeaconView_ShowBeaconMessage(BeaconViewWork *work, const GameBeacon *beacon
     case 50:
         return BeaconView_TakePassPower(work, beacon, TRUE);
     case 24:
-        GameBeacon_BroadcastThankedCount(func_0200c910((TrainerGameInfoSave *)work->trainerCard));
+        GameBeacon_BroadcastThankedCount(TrainerGameInfo_IncThankedCount((TrainerGameInfoSave *)work->trainerCard));
         break;
     }
     BeaconView_ShowTypeMessage(work, beacon);

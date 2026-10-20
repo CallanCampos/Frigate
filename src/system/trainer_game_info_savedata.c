@@ -100,22 +100,22 @@ void TrainerGameInfo_SetPalParkResult(TrainerGameInfoSave *info, u8 result) {
     info->palParkResult = result;
 }
 
-u32 func_0200c90c(TrainerCardSave *trainerCard) {
+u32 TrainerCard_GetThankedCount(TrainerCardSave *trainerCard) {
     return trainerCard->thankedCount;
 }
 
-u32 func_0200c910(TrainerGameInfoSave *info) {
+u32 TrainerGameInfo_IncThankedCount(TrainerGameInfoSave *info) {
     if (info->thankedCount < TRAINER_GAME_INFO_COUNT_MAX) {
         info->thankedCount++;
     }
     return info->thankedCount;
 }
 
-u32 func_0200c924(TrainerCardSave *trainerCard) {
+u32 TrainerCard_GetPasserbyCount(TrainerCardSave *trainerCard) {
     return trainerCard->passerbyCount;
 }
 
-u32 func_0200c928(TrainerGameInfoSave *info) {
+u32 TrainerGameInfo_IncPasserbyCount(TrainerGameInfoSave *info) {
     if (info->passerbyCount < TRAINER_GAME_INFO_COUNT_MAX) {
         info->passerbyCount++;
     }
@@ -226,11 +226,11 @@ void TrainerGameInfo_SetStartMenuFlags(TrainerGameInfoSave *info, u32 value) {
     info->startMenuFlags = value;
 }
 
-u32 func_0200ca74(TrainerGameInfoSave *info) {
+u32 TrainerGameInfo_GetKeyNotice(TrainerGameInfoSave *info) {
     return info->keyNotice;
 }
 
-void func_0200ca78(TrainerGameInfoSave *info, u32 value) {
+void TrainerGameInfo_SetKeyNotice(TrainerGameInfoSave *info, u32 value) {
     info->keyNotice = value;
 }
 
@@ -289,15 +289,15 @@ u32 getOneShotDRKeyFromSave(TrainerCardSave *trainerCard, int flag) {
     return trainerCard->drTable[flag];
 }
 
-u16 func_0200cb00(TrainerCardSave *trainerCard) {
+u16 TrainerCard_GetHallOfFameMinutes(TrainerCardSave *trainerCard) {
     return trainerCard->hallOfFameMinutes;
 }
 
-void func_0200cb08(TrainerCardSave *trainerCard, u16 value) {
+void TrainerCard_SetHallOfFameMinutes(TrainerCardSave *trainerCard, u16 value) {
     trainerCard->hallOfFameMinutes = value;
 }
 
-void func_0200cb10(TrainerGameInfoSave *info, u16 minutes) {
+void TrainerGameInfo_SubHallOfFameMinutes(TrainerGameInfoSave *info, u16 minutes) {
     if (minutes <= info->hallOfFameMinutes) {
         info->hallOfFameMinutes -= minutes;
     } else {

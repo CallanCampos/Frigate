@@ -487,11 +487,11 @@ u32 SurveyTextWork_GetRank(SurveyTextWork *work) {
 }
 
 u32 func_ov027_02170a4c(SurveyTextWork *work) {
-    return func_0200c924(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
+    return TrainerCard_GetPasserbyCount(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
 }
 
 u32 func_ov027_02170a60(SurveyTextWork *work) {
-    return func_0200c90c(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
+    return TrainerCard_GetThankedCount(getTrainerCardData_wrapper(GameData_GetSaveControl_(work->gameData)));
 }
 
 u32 GetTrainerCardTextMSGID(u32 type) {

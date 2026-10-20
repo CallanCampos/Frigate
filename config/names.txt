@@ -434,6 +434,10 @@
 . 0x0200c8d4 TrainerGameInfo_SetPalParkHighScore
 . 0x0200c8ec TrainerGameInfo_GetPalParkResult
 . 0x0200c8f8 TrainerGameInfo_SetPalParkResult
+. 0x0200c90c TrainerCard_GetThankedCount
+. 0x0200c910 TrainerGameInfo_IncThankedCount
+. 0x0200c924 TrainerCard_GetPasserbyCount
+. 0x0200c928 TrainerGameInfo_IncPasserbyCount
 . 0x0200c93c TrainerGameInfo_GetGreeting
 . 0x0200c940 TrainerGameInfo_SetGreeting
 . 0x0200c954 TrainerGameInfo_GetThanks
@@ -444,6 +448,8 @@
 . 0x0200ca50 TrainerGameInfo_GetStartMenuItemFlags
 . 0x0200ca64 TrainerGameInfo_GetStartMenuFlags
 . 0x0200ca6c TrainerGameInfo_SetStartMenuFlags
+. 0x0200ca74 TrainerGameInfo_GetKeyNotice
+. 0x0200ca78 TrainerGameInfo_SetKeyNotice
 . 0x0200ca7c TrainerGameInfo_GetSurveyQuestion
 . 0x0200ca84 TrainerGameInfo_SetSurveyQuestion
 . 0x0200ca8c TrainerGameInfo_GetSurveyAnswer
@@ -451,6 +457,9 @@
 . 0x0200ca9c TrainerGameInfo_GetSurveyCount
 . 0x0200caa8 TrainerGameInfo_SetSurveyCount
 . 0x0200cab4 TrainerGameInfo_AddSurveyCount
+. 0x0200cb00 TrainerCard_GetHallOfFameMinutes
+. 0x0200cb08 TrainerCard_SetHallOfFameMinutes
+. 0x0200cb10 TrainerGameInfo_SubHallOfFameMinutes
 . 0x0200cb30 TrainerCard_GetBattleRecorderColor
 . 0x0200cb3c TrainerCard_SetBattleRecorderColor
 . 0x0200cc94 MusicalDist_GetSaveSize

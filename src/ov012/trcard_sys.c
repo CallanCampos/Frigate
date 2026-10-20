@@ -495,7 +495,7 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     data->unk4C = TrainerCardData_SumRecords(records, 4, 999999999);
     data->unk50 = TrainerCardData_SumRecords(records, 5, 999999999);
     data->unk54 = TrainerCardData_SumRecords(records, 6, 999999999);
-    data->unk58 = func_0200c924(card);
+    data->unk58 = TrainerCard_GetPasserbyCount(card);
     data->unk5C = TrainerCardData_SumRecords(records, 7, 9999);
     highLink = getHighLinkBlockAddress(save);
     passPowerData = PassPowerData_Create(heapId);

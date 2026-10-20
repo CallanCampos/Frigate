@@ -376,7 +376,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
     view->wifiList = GameData_GetWifiList(view->gameData);
     view->bag = GameData_GetBag(view->gameData);
     view->trainerCard = getTrainerCardData_wrapper(save);
-    view->unk33C = func_0200c924(view->trainerCard);
+    view->unk33C = TrainerCard_GetPasserbyCount(view->trainerCard);
     info = SaveControl_GetPlayerInfo(save);
     view->trainerId = getTrainerID(info);
     view->gender = getTrainerGender(info);

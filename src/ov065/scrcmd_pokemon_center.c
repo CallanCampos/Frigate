@@ -663,8 +663,8 @@ static BOOL PokemonCenter_CheckStrengthRocks(MedalCheckContext *ctx, GameData *g
 }
 
 static BOOL func_ov065_021e6280(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
-    return PokemonCenter_MeetsThreshold(func_0200c924(getTrainerCardData_wrapper(GameData_GetSaveControl(gameData))),
-                                        threshold);
+    return PokemonCenter_MeetsThreshold(
+        TrainerCard_GetPasserbyCount(getTrainerCardData_wrapper(GameData_GetSaveControl(gameData))), threshold);
 }
 
 static BOOL func_ov065_021e629c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {

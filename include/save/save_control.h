@@ -254,8 +254,8 @@ void copyRivalNameIntoHollowBlock(RivalDataSave *data, const u16 *name);
 const u16 *getPtrToRivalName(RivalDataSave *data);
 u32 TrainerGameInfo_GetStartMenuFlags(TrainerGameInfoSave *info);
 void TrainerGameInfo_SetStartMenuFlags(TrainerGameInfoSave *info, u32 value);
-u32 func_0200ca74(TrainerGameInfoSave *info);
-void func_0200ca78(TrainerGameInfoSave *info, u32 value);
+u32 TrainerGameInfo_GetKeyNotice(TrainerGameInfoSave *info);
+void TrainerGameInfo_SetKeyNotice(TrainerGameInfoSave *info, u32 value);
 u32 getBadgeCount(TrainerGameInfoSave *info);
 // Two bits for each of the start menu's items that are added later: TrainerGameInfo_AddStartMenuItemFlags sets bits,
 // and TrainerGameInfo_GetStartMenuItemFlags returns them. 1 marks the item as new

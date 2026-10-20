@@ -277,7 +277,7 @@ void GimmickGate_ApplyTrainerCardFlag(GimmickGateWork *work) {
 
     save = GameData_GetSaveControl(work->gameData);
     card = getTrainerGameInfoAddress(save);
-    func_0200cb08(card, work->flag);
+    TrainerCard_SetHallOfFameMinutes(card, work->flag);
 }
 
 void GimmickGate_RestoreEventFlags(GimmickGateWork *work) {
@@ -337,7 +337,7 @@ void GimmickGate_InitFlag(GimmickGateWork *work) {
     if (work->value == 0) {
         save = GameData_GetSaveControl_(work->gameData);
         card = getTrainerCardData_wrapper(save);
-        work->flag = func_0200cb00(card);
+        work->flag = TrainerCard_GetHallOfFameMinutes(card);
         work->value = 1;
     }
 }

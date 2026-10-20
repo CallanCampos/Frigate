@@ -410,7 +410,7 @@ static void BeaconView_InitData(BeaconViewWork *work) {
     work->wifiList = GameData_GetWifiList(work->gameData);
     work->bag = GameData_GetBag(work->gameData);
     work->trainerCard = getTrainerCardData_wrapper(save);
-    work->passerbyCount = func_0200c924(work->trainerCard);
+    work->passerbyCount = TrainerCard_GetPasserbyCount(work->trainerCard);
     info = SaveControl_GetPlayerInfo(save);
     work->trainerId = (u16)getIDAsUInt(info);
     work->gender = getTrainerGender(info);

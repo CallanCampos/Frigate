@@ -59,8 +59,8 @@ void TrainerGameInfo_Init(TrainerGameInfoSave *info);
 void SetFavePokemonData(TrainerGameInfoSave *info, u32 species, u32 form, u32 isEgg, int sex);
 void GetFavePokemonData(const TrainerGameInfoSave *info, int *species, int *form, int *isEgg, int *isFemale);
 // Add one to the thanked and passerby counts, and return them
-u32 func_0200c910(TrainerGameInfoSave *info);
-u32 func_0200c928(TrainerGameInfoSave *info);
+u32 TrainerGameInfo_IncThankedCount(TrainerGameInfoSave *info);
+u32 TrainerGameInfo_IncPasserbyCount(TrainerGameInfoSave *info);
 // The species of the party that beat a Gym
 void SetGymDefeatPartyData(TrainerGameInfoSave *info, u32 gym, const u16 *species);
 void GetGymDefeatPartyData(TrainerGameInfoSave *info, u32 gym, u16 *species);
