@@ -37,17 +37,19 @@ typedef struct {
 
 typedef struct {
     u32 count;
-    u16 unk4;
-    u16 unk6;
-    s16 unk8;
-    s16 unkA;
+    // The size of the sprite's image, and its offset from the origin
+    u16 width;
+    u16 height;
+    s16 offsetX;
+    s16 offsetY;
     MCSSCell cells[];
 } MCSSBin;
 
 typedef struct {
-    u8 unk0;
+    // How many cells keep animating while the idle animation stops the others, listed in idleNodes (0xff: no idle)
+    u8 idleNodeCount;
     u8 unk1;
-    u8 unk2[];
+    u8 idleNodes[];
 } MCSSBinTail;
 
 struct MCSSSystem {
@@ -104,7 +106,7 @@ struct MCSS {
     // Only z is used, as the sprite's rotation
     VecFx32 rotation;
     VecFx32 shadowScale;
-    VecFx32 unk110;
+    VecFx32 shadowScaleOffset;
     // Added to the position, and multiplied into the scale
     VecFx32 posOffset;
     VecFx32 scaleOffset;
@@ -396,8 +398,9 @@ void MCSSSys_Draw(MCSSSystem *system) {
                      FX_Mul(FX_Mul(-mcSrt.py << 8, system->offsetScale), mcss->shadowScale.y), 0);
         G3_RotZ(-FX_SinIdx(mcss->shadowRotZ), FX_CosIdx(mcss->shadowRotZ));
         G3_RotZ(-FX_SinIdx(rot), FX_CosIdx(rot));
-        G3_Scale(FX_Mul(FX_Mul(FX_Mul(mcSrt.sx, mcss->shadowScale.x), mcss->unk110.x), mcss->scaleOffset.x),
-                 FX_Mul(FX_Mul(FX_Mul(mcSrt.sy, mcss->shadowScale.y), mcss->unk110.y), mcss->scaleOffset.y), FX32_ONE);
+        G3_Scale(FX_Mul(FX_Mul(FX_Mul(mcSrt.sx, mcss->shadowScale.x), mcss->shadowScaleOffset.x), mcss->scaleOffset.x),
+                 FX_Mul(FX_Mul(FX_Mul(mcSrt.sy, mcss->shadowScale.y), mcss->shadowScaleOffset.y), mcss->scaleOffset.y),
+                 FX32_ONE);
         G3_StoreMtx(30);
 
         MCSS_SetMaterial();
@@ -582,9 +585,9 @@ MCSS *MCSSSys_Add(MCSSSystem *system, fx32 x, fx32 y, fx32 z, const MCSSLoadInfo
             system->mcss[i]->shadowOffset.x = 0;
             system->mcss[i]->shadowOffset.y = 0;
             system->mcss[i]->shadowOffset.z = -FX32_ONE;
-            system->mcss[i]->unk110.x = FX32_ONE;
-            system->mcss[i]->unk110.y = FX32_ONE;
-            system->mcss[i]->unk110.z = FX32_ONE;
+            system->mcss[i]->shadowScaleOffset.x = FX32_ONE;
+            system->mcss[i]->shadowScaleOffset.y = FX32_ONE;
+            system->mcss[i]->shadowScaleOffset.z = FX32_ONE;
             system->mcss[i]->info = *info;
             system->mcss[i]->animSpeed = FX32_ONE;
             system->mcss[i]->ortho = TRUE;
@@ -696,15 +699,15 @@ void MCSS_SetShadowScale(MCSS *mcss, VecFx32 *a1) {
 }
 
 void func_0201ac28(MCSS *mcss, VecFx32 *out) {
-    out->x = mcss->unk110.x;
-    out->y = mcss->unk110.y;
-    out->z = mcss->unk110.z;
+    out->x = mcss->shadowScaleOffset.x;
+    out->y = mcss->shadowScaleOffset.y;
+    out->z = mcss->shadowScaleOffset.z;
 }
 
 void func_0201ac40(MCSS *mcss, VecFx32 *in) {
-    mcss->unk110.x = in->x;
-    mcss->unk110.y = in->y;
-    mcss->unk110.z = in->z;
+    mcss->shadowScaleOffset.x = in->x;
+    mcss->shadowScaleOffset.y = in->y;
+    mcss->shadowScaleOffset.z = in->z;
 }
 
 void MCSS_SetShadowRotX(MCSS *mcss, u16 a1) {
@@ -778,27 +781,27 @@ u16 MCSS_GetAnimationCount(MCSS *mcss) {
 }
 
 u8 func_0201add0(MCSS *mcss) {
-    return mcss->binTail->unk0;
+    return mcss->binTail->idleNodeCount;
 }
 
 u16 func_0201add8(MCSS *mcss, u8 index) {
-    return mcss->binTail->unk2[index];
+    return mcss->binTail->idleNodes[index];
 }
 
 u16 func_0201ade0(MCSS *mcss) {
-    return mcss->bin->unk4;
+    return mcss->bin->width;
 }
 
 u16 func_0201ade8(MCSS *mcss) {
-    return mcss->bin->unk6;
+    return mcss->bin->height;
 }
 
 s16 func_0201adf0(MCSS *mcss) {
-    return mcss->bin->unk8;
+    return mcss->bin->offsetX;
 }
 
 s16 func_0201adf8(MCSS *mcss) {
-    return mcss->bin->unkA;
+    return mcss->bin->offsetY;
 }
 
 u8 func_0201ae00(MCSS *mcss) {
