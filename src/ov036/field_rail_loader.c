@@ -680,7 +680,7 @@ static void func_ov036_02196c38(FieldActor *actor) {
             work->unk8 = 0;
             BlActSys_SetActorAnim(sys, work->index, work->dir);
             {
-                VecFx32 offset;
+                VecFx32 offset = { 0, 0, 0 };
 
                 CopyActorWPosOffset(actor, &offset);
             }

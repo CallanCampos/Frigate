@@ -407,6 +407,7 @@ src/ov036/fld_act_rail.c:
     .data       start:0x021d4db4 end:0x021d4dc0
 
 src/ov036/field_rail_loader.c:
+    complete
     .text       start:0x02196278 end:0x021974dc
     .rodata     start:0x021cf7fc end:0x021cf9d4
     .data       start:0x021d4e28 end:0x021d4e3c

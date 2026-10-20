@@ -515,7 +515,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `fld_act_rail.c` | `0x02195378`–`0x02195590` | 9 | complete | descriptive |
 | `fldmmdl_rail.c` | `0x02195590`–`0x02196208` | 64 | complete | descriptive |
 | `rail_data_handle.c` | `0x02196208`–`0x02196238` | 1 | complete | descriptive |
-| `field_rail_loader.c` | `0x02196238`–`0x0219749c` | 57 | partial | string at `0x021d4de8` |
+| `field_rail_loader.c` | `0x02196238`–`0x0219749c` | 57 | complete | string at `0x021d4de8` |
 | `fldmmdl_g3dobj_draw.c` | `0x0219749c`–`0x02197534` | 5 | complete | descriptive |
 | `field_fog.c` | `0x02197534`–`0x02197710` | 22 | complete | string at `0x021d4dfc` |
 | `field_zonefog.c` | `0x02197710`–`0x02197820` | 11 | complete | string at `0x021d4e08` |
