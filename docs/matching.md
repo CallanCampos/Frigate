@@ -1804,6 +1804,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `field--` and `field++` load the field again before the subtraction, even right after comparing it, where
   `field = field - 1` reuses the register: the phrase input's `PMSInput_SentenceKey` moves its edit position the
   second way.
+- A 0 loaded once from the literal pool, stored to one local's slot and copied from there to the others, is a local
+  zeroed by a statement after the early returns, not at its declaration: DWC's `DWCi_Prof_StartRequest`
+  (`dwc_nasfunc.c`) matches with `total = 0;` just before its loop.
 - A compound assignment to a narrow field narrows its right side first: `work->checkFlag &= 0xff ^ (1 << waza);` on a
   `u8` shifts the mask down to a byte before the `and`, while `work->checkFlag = work->checkFlag & (0xff ^ (1 << waza));`
   ands the full mask, as the PC box's `Box2Main_PokeFreeWazaCheck` does.

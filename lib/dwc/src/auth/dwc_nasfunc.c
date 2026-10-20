@@ -716,18 +716,17 @@ static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
     RTCTime time;
     OSOwnerInfo owner;
     u32 irq;
-    u64 id;
     const u8 *apMac;
     u8 *ssid;
     int i;
     u32 level;
 
     MI_CpuFill8(info, 0, sizeof(NasAuthInfo));
-    id = user->id;
-    if (id == 0) {
-        id = user->pendingId;
+    if (user->id != 0) {
+        OS_SNPrintf(info->userId, 0xe, "%013llu", user->id);
+    } else {
+        OS_SNPrintf(info->userId, 0xe, "%013llu", user->pendingId);
     }
-    OS_SNPrintf(info->userId, 0xe, "%013llu", id);
     OS_SNPrintf(info->password, 7, "%03u", user->number);
     if (*ROM_GAME_CODE == 0) {
         OS_Terminate();
@@ -974,17 +973,18 @@ static void DWCi_Http_Thread(void *arg) {
     static void *sNasRootCerts[12] = { &sNasCert10, &sNasCert9, &sNasCert11, &sNasCert12, &sNasCert1, &sNasCert2,
                                        &sNasCert3,  &sNasCert0, &sNasCert8,  &sNasCert7,  &sNasCert4, &sNasCert5 };
     DWCHttp *http = arg;
-    DWCHttpBuffer *response = &http->response;
-    CPSSoc *soc = &http->soc;
-    int headersDone = 0;
-    int timeout = http->param.timeout;
     CPSInAddr ip;
+    u64 lastData;
+    u32 length;
+    int headersDone = 0;
+    CPSSoc *soc = &http->soc;
+    DWCHttpSslConnection *con = &http->con;
+    DWCHttpBuffer *response = &http->response;
+    int timeout = http->param.timeout;
     char *request;
     int sent;
-    u32 length;
     int room;
     int size;
-    u64 lastData;
     u8 *data;
     char *old;
 
@@ -1000,10 +1000,10 @@ static void DWCi_Http_Thread(void *arg) {
     http->ip = ip;
     CPS_SocUse();
     if (http->secure == 1) {
-        MI_CpuFill8(&http->con, 0, sizeof(DWCHttpSslConnection));
-        http->con.validateCertificate = DWCi_Http_VerifyCertificate;
-        http->con.hostname = http->host;
-        soc->con = &http->con;
+        MI_CpuFill8(con, 0, sizeof(DWCHttpSslConnection));
+        con->validateCertificate = DWCi_Http_VerifyCertificate;
+        con->hostname = http->host;
+        soc->con = con;
         CPS_SslSetNamedParams(sNasRootCerts, 12);
         CPS_SetSsl(TRUE);
     }
@@ -1066,7 +1066,7 @@ static void DWCi_Http_Thread(void *arg) {
             }
             CPS_SocConsume(size);
         }
-        if (http->contentLength >= 0 && http->contentLength <= http->bodyLength) {
+        if (http->contentLength >= 0 && http->bodyLength >= http->contentLength) {
             break;
         }
         if (OS_TicksToMilliSeconds(OS_GetTick() - lastData) > timeout) {
@@ -1942,9 +1942,8 @@ static void DWCi_Netcheck_SetError(int state) {
 
 static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *type, int timeout, char *flags,
                                    int *profaneCount, const char *region) {
+    int total;
     u16 *joined = NULL;
-    int total = 0;
-    int limit;
     DWCHttpParam config;
     NasAuthInfo info;
     int i;
@@ -1955,6 +1954,7 @@ static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *typ
     if (words == NULL || count <= 0 || count > 50 || flags == NULL || profaneCount == NULL) {
         return FALSE;
     }
+    total = 0;
     for (i = 0; i < count; i++) {
         total += wcslen(words[i]) + 1;
     }
@@ -1984,7 +1984,11 @@ static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *typ
             config.alloc = DWCi_Prof_Alloc;
             config.free = DWCi_Prof_Free;
             config.ignoreCa = 0;
-            config.timeout = timeout > 0 ? timeout : 10000;
+            if (timeout <= 0) {
+                config.timeout = 10000;
+            } else {
+                config.timeout = timeout;
+            }
             if (DWC_Http_Create(&sWords->http, &config) == 0) {
                 sWords->active = 1;
                 if (DWCi_Auth_GetCurrentInfo(&info) && DWCi_Auth_AddCommonItems(&sWords->http, &info, sSendSsid) &&
