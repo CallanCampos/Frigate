@@ -65,15 +65,7 @@ static void func_ov182_021b0b90(void) {
 }
 
 static void func_ov182_021b0bb8(void) {
-    if (func_ov182_021bbaac(1) == 0 && func_ov182_021bbaac(0) == 0) {
-        func_ov182_021bbf7c(0);
-        DWCUtilScreen_Stop();
-        func_ov182_021bc228(1, 1);
-        func_ov182_021bc228(0, 0x15);
-        func_ov182_021adfc8(0, 0);
-        func_ov182_021adff0(0, 1);
-        func_ov182_021adfbc(func_ov182_021b6588);
-    }
+    func_ov182_021b0bb8Inline();
 }
 
 static void func_ov182_021b0c08(void) {

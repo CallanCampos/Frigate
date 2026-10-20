@@ -135,8 +135,6 @@ void func_ov182_021b5bb8(void);
 void func_ov182_021b6588(void);
 // The screen of the button above the list of access points
 void func_ov182_021b5000(void);
-// The message after the connection test connected (its file is not written yet)
-void func_ov182_021b4b68(void);
 // The connection test with auto-connect (its file is not written yet)
 void func_ov182_021b6104(void);
 
