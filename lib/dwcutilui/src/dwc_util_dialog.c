@@ -85,7 +85,7 @@ void DWCUtilDialog_Open(int msgIndex, int layout, BOOL fade, int slot, int value
     u16 *str;
     int i;
 
-    str = DWCUtilMsg_GetWithDigit(data_ov182_021c40b8, msgIndex, slot, value);
+    str = DWCUtilMsg_GetWithDigit(gDWCUtilMsg, msgIndex, slot, value);
     sDialog = DWCUtilHeap_AllocClear(sizeof(DWCUtilDialog), 4);
     sDialog->layout = layout;
     sDialog->choice = -2;

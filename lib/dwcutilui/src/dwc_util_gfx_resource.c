@@ -79,7 +79,7 @@ void DWCUtilGfxResource_ShowButtons(int variant) {
 
 void DWCUtilGfxResource_ShowMessage(int msgIndex) {
     DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
-    u16 *str = DWCUtilMsg_Get(data_ov182_021c40b8, msgIndex);
+    u16 *str = DWCUtilMsg_Get(gDWCUtilMsg, msgIndex);
 
     DWCUtilText_DrawRect(text, sMsgBox.x, sMsgBox.y, sMsgBox.width, sMsgBox.height, 2,
                          DWCUtilGfxResource_GetTextFlags(), str);
@@ -88,7 +88,7 @@ void DWCUtilGfxResource_ShowMessage(int msgIndex) {
 
 void DWCUtilGfxResource_ShowMessageWithString(const void *str, int msgIndex) {
     DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
-    u16 *msg = DWCUtilMsg_Get(data_ov182_021c40b8, msgIndex);
+    u16 *msg = DWCUtilMsg_Get(gDWCUtilMsg, msgIndex);
 
     DWCUtilText_DrawRect(text, sStrMsgBox.x, sStrMsgBox.y, sStrMsgBox.width, sStrMsgBox.height, 2,
                          DWCUtilGfxResource_GetTextFlags(), msg);

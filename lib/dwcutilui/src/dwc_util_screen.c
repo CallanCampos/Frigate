@@ -25,7 +25,7 @@ BOOL DWCUtilScreen_Start(int msgIndex, int slot, int value) {
     DWCUtilGfxResource_Load(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
     text = DWCUtilText_CreateBg(1, 0);
-    str = DWCUtilMsg_GetWithDigit(data_ov182_021c40b8, msgIndex, slot, value);
+    str = DWCUtilMsg_GetWithDigit(gDWCUtilMsg, msgIndex, slot, value);
     flags = DWCUtilGfxResource_GetTextFlags();
     DWCUtilText_DrawRect(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
     DWCUtilText_MarkDirty(text);

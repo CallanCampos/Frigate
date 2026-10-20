@@ -8,6 +8,6 @@
 // (dwc_util_test_done.h). A failure, or a connection that is not with a WEP key or none, shows a dialog, and B,
 // closing the lid or the button end the test and go back to the choice of the setup of a connection.
 // The ROM does not embed this source file's name; dwc_util_test_connect.c is descriptive.
-void func_ov182_021b4880(void);
+void DWCUtilTestConnect_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_TEST_CONNECT_H

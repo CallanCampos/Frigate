@@ -75,7 +75,7 @@ static void func_ov182_021b681c(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         DWCUtilMain_SetLayout(0, 0);
         DWCUtilMain_SetScreenArgs(0, 2);
-        DWCUtilMain_SetUpdate(func_ov182_021b6588);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
     }
 }
 

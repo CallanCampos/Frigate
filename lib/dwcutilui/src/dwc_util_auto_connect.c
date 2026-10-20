@@ -22,32 +22,32 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-static void func_ov182_021b616c(void);
-static void func_ov182_021b61dc(void);
-static void func_ov182_021b6248(void);
-static void func_ov182_021b6290(void);
-static void func_ov182_021b62b4(void);
+static void DWCUtilAutoConnect_LoadGraphics(void);
+static void DWCUtilAutoConnect_StartAutoConnect(void);
+static void DWCUtilAutoConnect_FadeIn(void);
+static void DWCUtilAutoConnect_WaitFadeIn(void);
+static void DWCUtilAutoConnect_Main(void);
 static void func_ov182_021b62c4(void);
 static void func_ov182_021b62c8(void);
 static void func_ov182_021b62cc(void);
-static void func_ov182_021b62d0(void);
-static void func_ov182_021b62ec(void);
-static void func_ov182_021b6304(void);
-static void func_ov182_021b637c(DWCUtilTask *task, void *arg);
-static void *func_ov182_021b63c4(u32 name, u32 size);
-static void func_ov182_021b63d0(u32 name, void *ptr, u32 size);
+static void DWCUtilAutoConnect_FadeOut(void);
+static void DWCUtilAutoConnect_WaitFadeOut(void);
+static void DWCUtilAutoConnect_EndAutoConnect(void);
+static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg);
+static void *DWCUtilAutoConnect_Alloc(u32 name, u32 size);
+static void DWCUtilAutoConnect_Free(u32 name, void *ptr, u32 size);
 
 // What auto-connect is started with: the utility's allocator, DMA channel 3 and the radio on
-static const DWCAcParam sAutoConnectParam = { func_ov182_021b63c4, func_ov182_021b63d0, 3, 1, 0, 0, 0, 0, 0 };
+static const DWCAcParam sAutoConnectParam = { DWCUtilAutoConnect_Alloc, DWCUtilAutoConnect_Free, 3, 1, 0, 0, 0, 0, 0 };
 
 // Whether the connection test succeeded
 static u8 sAutoConnectSucceeded;
 
-void func_ov182_021b6104(void) {
+void DWCUtilAutoConnect_Init(void) {
     int from;
 
     sAutoConnectSucceeded = FALSE;
-    func_ov182_021b616c();
+    DWCUtilAutoConnect_LoadGraphics();
     DWCUtilMain_GetScreenArgs(NULL, &from);
     if (from == 0) {
         DWCUtilScreen_Start(0x31, -1, 0);
@@ -58,13 +58,13 @@ void func_ov182_021b6104(void) {
     }
     DWCUtilGfxResource_ShowMessage(0x2c);
     DWCUtilUiEffect_Init(0);
-    func_ov182_021b61dc();
+    DWCUtilAutoConnect_StartAutoConnect();
     DWCUtilLinkIcon_Init(0);
     DWCUtilSound_PlaySe(0xc);
-    DWCUtilMain_SetUpdate(func_ov182_021b6248);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnect_FadeIn);
 }
 
-static void func_ov182_021b616c(void) {
+static void DWCUtilAutoConnect_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
@@ -77,7 +77,7 @@ static void func_ov182_021b616c(void) {
 
 // Starts auto-connect with the connection being edited, or with the console's settings when the utility was started
 // for that, and the task that waits for its result
-static void func_ov182_021b61dc(void) {
+static void DWCUtilAutoConnect_StartAutoConnect(void) {
     DWCUtilSettingsEdit *edit = func_ov182_021b781c();
     DWCAcParam param;
     int from;
@@ -95,10 +95,10 @@ static void func_ov182_021b61dc(void) {
     if (from == 0) {
         DWCAc_SetDsConnection(edit->index, edit);
     }
-    DWCUtilTask_Create(0, func_ov182_021b637c, NULL, 0x78);
+    DWCUtilTask_Create(0, DWCUtilAutoConnect_ProcessTask, NULL, 0x78);
 }
 
-static void func_ov182_021b6248(void) {
+static void DWCUtilAutoConnect_FadeIn(void) {
     int from;
 
     DWCUtilFade_Start(2, 0, 0x15, 8);
@@ -108,16 +108,16 @@ static void func_ov182_021b6248(void) {
         DWCUtilFade_Start(2, 1, 1, 8);
         DWCUtilDisplay_ShowPlanes(1, 1);
     }
-    DWCUtilMain_SetUpdate(func_ov182_021b6290);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnect_WaitFadeIn);
 }
 
-static void func_ov182_021b6290(void) {
+static void DWCUtilAutoConnect_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(func_ov182_021b62b4);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnect_Main);
     }
 }
 
-static void func_ov182_021b62b4(void) {
+static void DWCUtilAutoConnect_Main(void) {
     func_ov182_021b62c4();
     func_ov182_021b62c8();
     func_ov182_021b62cc();
@@ -132,20 +132,20 @@ static void func_ov182_021b62c8(void) {
 static void func_ov182_021b62cc(void) {
 }
 
-static void func_ov182_021b62d0(void) {
+static void DWCUtilAutoConnect_FadeOut(void) {
     DWCUtilFade_Start(3, 0, 0x15, 8);
-    DWCUtilMain_SetUpdate(func_ov182_021b62ec);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnect_WaitFadeOut);
 }
 
-static void func_ov182_021b62ec(void) {
+static void DWCUtilAutoConnect_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(func_ov182_021b6304);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnect_EndAutoConnect);
     }
 }
 
 // Once auto-connect is down, puts the Wi-Fi ID back into the first two pages of the settings, and goes on to the
 // message of a success or to the error screen
-static void func_ov182_021b6304(void) {
+static void DWCUtilAutoConnect_EndAutoConnect(void) {
     DWCBmNtrPage *pages = (DWCBmNtrPage *)func_ov182_021b7e6c();
 
     if (DWCAc_Destroy()) {
@@ -156,16 +156,16 @@ static void func_ov182_021b6304(void) {
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sAutoConnectSucceeded) {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b293c);
+            DWCUtilMain_SetUpdate(DWCUtilError_Init);
         } else {
             DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(func_ov182_021b63dc);
+            DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_Init);
         }
     }
 }
 
 // Runs auto-connect until it connects or fails, which keeps the error code for the error screen
-static void func_ov182_021b637c(DWCUtilTask *task, void *arg) {
+static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg) {
     s32 result = DWCAc_Process();
 
     if (result != 0) {
@@ -175,18 +175,18 @@ static void func_ov182_021b637c(DWCUtilTask *task, void *arg) {
             sAutoConnectSucceeded = TRUE;
             DWCUtilSound_PlaySe(0x11);
         } else {
-            func_ov182_021b2d3c(DWCAc_GetStatus());
+            DWCUtilError_SetCode(DWCAc_GetStatus());
             DWCUtilSound_PlaySe(0x12);
         }
-        DWCUtilMain_SetUpdate(func_ov182_021b62d0);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnect_FadeOut);
         DWCUtilTask_QueueRemoval(0, task);
     }
 }
 
-static void *func_ov182_021b63c4(u32 name, u32 size) {
+static void *DWCUtilAutoConnect_Alloc(u32 name, u32 size) {
     return DWCUtilHeap_AllocClear(size, 0x20);
 }
 
-static void func_ov182_021b63d0(u32 name, void *ptr, u32 size) {
+static void DWCUtilAutoConnect_Free(u32 name, void *ptr, u32 size) {
     DWCUtilHeap_Free(ptr);
 }

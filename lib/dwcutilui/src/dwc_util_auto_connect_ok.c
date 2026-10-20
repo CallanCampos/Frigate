@@ -11,26 +11,26 @@
 #include "dwc_util_text.h"
 #include "nitro/gx.h"
 
-static void func_ov182_021b6400(void);
-static void func_ov182_021b6448(void);
-static void func_ov182_021b646c(void);
-static void func_ov182_021b6484(void);
+static void DWCUtilAutoConnectOk_LoadGraphics(void);
+static void DWCUtilAutoConnectOk_FadeIn(void);
+static void DWCUtilAutoConnectOk_WaitFadeIn(void);
+static void DWCUtilAutoConnectOk_Main(void);
 static void func_ov182_021b6490(void);
-static void func_ov182_021b6494(void);
-static void func_ov182_021b64cc(void);
-static void func_ov182_021b6540(void);
+static void DWCUtilAutoConnectOk_FadeOut(void);
+static void DWCUtilAutoConnectOk_WaitFadeOut(void);
+static void DWCUtilAutoConnectOk_UpdateTimer(void);
 
 // The frames since the message appeared
 static u8 sAutoConnectOkFrames;
 
-void func_ov182_021b63dc(void) {
+void DWCUtilAutoConnectOk_Init(void) {
     sAutoConnectOkFrames = 0;
-    func_ov182_021b6400();
+    DWCUtilAutoConnectOk_LoadGraphics();
     DWCUtilGfxResource_ShowMessage(0x2d);
-    DWCUtilMain_SetUpdate(func_ov182_021b6448);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_FadeIn);
 }
 
-static void func_ov182_021b6400(void) {
+static void DWCUtilAutoConnectOk_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -38,27 +38,27 @@ static void func_ov182_021b6400(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b6448(void) {
+static void DWCUtilAutoConnectOk_FadeIn(void) {
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021b646c);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_WaitFadeIn);
 }
 
-static void func_ov182_021b646c(void) {
+static void DWCUtilAutoConnectOk_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(func_ov182_021b6484);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_Main);
     }
 }
 
-static void func_ov182_021b6484(void) {
-    func_ov182_021b6540();
+static void DWCUtilAutoConnectOk_Main(void) {
+    DWCUtilAutoConnectOk_UpdateTimer();
     func_ov182_021b6490();
 }
 
 static void func_ov182_021b6490(void) {
 }
 
-static void func_ov182_021b6494(void) {
+static void DWCUtilAutoConnectOk_FadeOut(void) {
     int from;
 
     DWCUtilMain_GetScreenArgs(NULL, &from);
@@ -67,12 +67,12 @@ static void func_ov182_021b6494(void) {
     }
     DWCUtilFade_Start(3, 1, 1, 8);
     DWCUtilFade_Start(3, 0, 0x15, 8);
-    DWCUtilMain_SetUpdate(func_ov182_021b64cc);
+    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_WaitFadeOut);
 }
 
 // Once the fades and the buttons are done, back to the settings of the connection, or to the menu that the utility
 // was started from
-static void func_ov182_021b64cc(void) {
+static void DWCUtilAutoConnectOk_WaitFadeOut(void) {
     int from;
 
     if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
@@ -96,7 +96,7 @@ static void func_ov182_021b64cc(void) {
 }
 
 // After three seconds, ends the utility's run when it was started for the connection test alone
-static void func_ov182_021b6540(void) {
+static void DWCUtilAutoConnectOk_UpdateTimer(void) {
     int from;
 
     sAutoConnectOkFrames++;
@@ -112,6 +112,6 @@ static void func_ov182_021b6540(void) {
             }
             break;
         }
-        DWCUtilMain_SetUpdate(func_ov182_021b6494);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_FadeOut);
     }
 }

@@ -252,7 +252,7 @@ static void DWCUtilWepKeyboard_Exit(void) {
     } else {
         DWCUtilMain_SetLayout(0, 0);
         DWCUtilMain_SetScreenArgs(0, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021b6588);
+        DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
     }
     DWCUtilHeap_FreeAndNull(&sWepKeyboard);
 }

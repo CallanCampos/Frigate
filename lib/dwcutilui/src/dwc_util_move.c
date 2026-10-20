@@ -38,8 +38,8 @@ void func_ov182_021ae134(DWCUtilMoveCallback callback) {
     sMove->entered = FALSE;
     sMove->ended = FALSE;
     game = sGame;
-    game.gameNamep = DWCUtilMsg_Get(data_ov182_021c40b8, 0);
-    game.gameIntroductionp = DWCUtilMsg_Get(data_ov182_021c40b8, 1);
+    game.gameNamep = DWCUtilMsg_Get(gDWCUtilMsg, 0);
+    game.gameIntroductionp = DWCUtilMsg_Get(gDWCUtilMsg, 1);
     game.maxPlayerNum = func_ov182_021ae058();
     func_ov182_021ba768(&sMove->context, &game);
     if (!func_ov182_021ba918()) {

@@ -606,7 +606,7 @@ static void func_ov182_021b3544(void) {
         }
         DWCUtilMain_SetLayout(2, 0);
         DWCUtilMain_SetScreenArgs(0, 0);
-        next = func_ov182_021b6104;
+        next = DWCUtilAutoConnect_Init;
         break;
     case ADDRESS_ITEM_SAVE:
         DWCUtilMain_SetLayout(0, 0);

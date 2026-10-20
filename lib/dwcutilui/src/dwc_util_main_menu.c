@@ -71,7 +71,7 @@ static void func_ov182_021ae51c(void) {
         DWCUtilCell_Unload(0);
         DWCUtilBgOverlay_Exit();
         DWCUtilButtonSprites_Exit();
-        DWCUtilMsg_Close(data_ov182_021c40b8);
+        DWCUtilMsg_Close(gDWCUtilMsg);
         DWCUtilMsg_Exit();
         func_ov182_021b780c();
         DWCUtilMain_Finish();
@@ -85,9 +85,9 @@ void func_ov182_021ae574(void) {
     DWCUtilBgOverlay_Init();
     DWCUtilScreen_Reset();
     if (DWCUtilMain_GetLanguage() == 1 && DWCUtilMain_HasFlag(2)) {
-        data_ov182_021c40b8 = DWCUtilMsg_Open("msg/usa.bmg.l");
+        gDWCUtilMsg = DWCUtilMsg_Open("msg/usa.bmg.l");
     } else {
-        data_ov182_021c40b8 = DWCUtilMsg_Open(sMsgPaths[DWCUtilMain_GetLanguage()]);
+        gDWCUtilMsg = DWCUtilMsg_Open(sMsgPaths[DWCUtilMain_GetLanguage()]);
     }
     DWCUtilCell_Load(1, DWCUtilGfxResource_LocalizePath("char/jtMain.nce.l"));
     DWCUtilCell_Load(0, DWCUtilGfxResource_LocalizePath("char/jbMain.nce.l"));

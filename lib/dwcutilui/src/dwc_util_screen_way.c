@@ -230,7 +230,7 @@ static void func_ov182_021b5f4c(void) {
         break;
     case 2:
         DWCUtilMain_SetLayout(2, 1);
-        DWCUtilMain_SetUpdate(func_ov182_021b4ce4);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_Init);
         break;
     case 3:
         DWCUtilMain_SetLayout(2, 0);

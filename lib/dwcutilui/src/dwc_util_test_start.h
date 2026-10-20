@@ -7,6 +7,6 @@
 // first step and goes on to the wait for the second (dwc_util_test_progress.h). A failure shows a dialog, and B,
 // closing the lid or the button end the test and go back to the choice of the setup of a connection.
 // The ROM does not embed this source file's name; dwc_util_test_start.c is descriptive.
-void func_ov182_021b4ce4(void);
+void DWCUtilTestStart_Init(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_TEST_START_H

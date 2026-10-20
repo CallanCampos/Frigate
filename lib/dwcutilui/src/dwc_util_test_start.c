@@ -18,46 +18,46 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static BOOL func_ov182_021b4cc8(void);
-static void func_ov182_021b4d28(void);
-static void func_ov182_021b4d98(void);
-static void func_ov182_021b4dd0(void);
-static void func_ov182_021b4e00(void);
-static void func_ov182_021b4e20(void);
-static void func_ov182_021b4e3c(void);
+static BOOL DWCUtilTestStart_IsLidClosed(void);
+static void DWCUtilTestStart_LoadGraphics(void);
+static void DWCUtilTestStart_FadeIn(void);
+static void DWCUtilTestStart_WaitFadeIn(void);
+static void DWCUtilTestStart_WaitButtons(void);
+static void DWCUtilTestStart_Main(void);
+static void DWCUtilTestStart_HandleInput(void);
 static void func_ov182_021b4e60(void);
-static void func_ov182_021b4e64(void);
-static void func_ov182_021b4e84(void);
-static void func_ov182_021b4e9c(void);
-static void func_ov182_021b4ee4(void);
-static void func_ov182_021b4f6c(void);
-static void func_ov182_021b4fc8(void);
-static void func_ov182_021b4fe8(void);
+static void DWCUtilTestStart_HandleChoice(void);
+static void DWCUtilTestStart_DisableButtons(void);
+static void DWCUtilTestStart_FadeOut(void);
+static void DWCUtilTestStart_WaitFadeOut(void);
+static void DWCUtilTestStart_PollTest(void);
+static void DWCUtilTestStart_WaitDialog(void);
+static void DWCUtilTestStart_WaitDialogClosed(void);
 
 // Whether the test reached its first step; FALSE when it was ended or failed
 static u8 sTestStartPassed;
 
 // A copy of gfl/ui.c's GCTX_HIDIsLidClosed
-static BOOL func_ov182_021b4cc8(void) {
+static BOOL DWCUtilTestStart_IsLidClosed(void) {
     if (PAD_DetectFold()) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021b4ce4(void) {
+void DWCUtilTestStart_Init(void) {
     sTestStartPassed = FALSE;
-    func_ov182_021b4d28();
+    DWCUtilTestStart_LoadGraphics();
     DWCUtilBgOverlay_ShowConnectionSet();
     DWCUtilScreen_Start(0x37, -1, 0);
     DWCUtilGfxResource_ShowStep(2);
     DWCUtilGfxResource_ShowMessage(0x24);
     DWCUtilUiEffect_Init(0);
     DWCUtilSound_PlaySe(0xb);
-    DWCUtilMain_SetUpdate(func_ov182_021b4d98);
+    DWCUtilMain_SetUpdate(DWCUtilTestStart_FadeIn);
 }
 
-static void func_ov182_021b4d28(void) {
+static void DWCUtilTestStart_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
@@ -68,42 +68,42 @@ static void func_ov182_021b4d28(void) {
     G2_SetBG2Priority(3);
 }
 
-static void func_ov182_021b4d98(void) {
+static void DWCUtilTestStart_FadeIn(void) {
     DWCUtilFade_Start(2, 1, 1, 8);
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(1, 1);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021b4dd0);
+    DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitFadeIn);
 }
 
 // Starts the test once the screens have faded in
-static void func_ov182_021b4dd0(void) {
+static void DWCUtilTestStart_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        func_ov182_021ae3d8();
+        DWCUtilConnection_Start();
         DWCUtilGfxResource_ShowButtons(1);
-        DWCUtilMain_SetUpdate(func_ov182_021b4e00);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitButtons);
     }
 }
 
-static void func_ov182_021b4e00(void) {
+static void DWCUtilTestStart_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021b4e20);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_Main);
     }
 }
 
-static void func_ov182_021b4e20(void) {
+static void DWCUtilTestStart_Main(void) {
     OS_Sleep(10);
-    func_ov182_021b4f6c();
-    func_ov182_021b4e3c();
+    DWCUtilTestStart_PollTest();
+    DWCUtilTestStart_HandleInput();
     func_ov182_021b4e60();
-    func_ov182_021b4e64();
+    DWCUtilTestStart_HandleChoice();
 }
 
-static void func_ov182_021b4e3c(void) {
+static void DWCUtilTestStart_HandleInput(void) {
     if (DWCUtilTouch_IsKeyPressed(2)) {
         DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (func_ov182_021b4cc8()) {
+    } else if (DWCUtilTestStart_IsLidClosed()) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
 }
@@ -112,21 +112,21 @@ static void func_ov182_021b4e60(void) {
 }
 
 // The button ends the test
-static void func_ov182_021b4e64(void) {
+static void DWCUtilTestStart_HandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(func_ov182_021b4e84);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_DisableButtons);
     }
 }
 
-static void func_ov182_021b4e84(void) {
+static void DWCUtilTestStart_DisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021b4e9c);
+    DWCUtilMain_SetUpdate(DWCUtilTestStart_FadeOut);
 }
 
-static void func_ov182_021b4e9c(void) {
+static void DWCUtilTestStart_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         if (!sTestStartPassed) {
             DWCUtilUiObject_Exit();
@@ -135,11 +135,11 @@ static void func_ov182_021b4e9c(void) {
             DWCUtilFade_Start(3, 1, 1, 8);
         }
         DWCUtilFade_Start(3, 0, 0x14, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021b4ee4);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitFadeOut);
     }
 }
 
-static void func_ov182_021b4ee4(void) {
+static void DWCUtilTestStart_WaitFadeOut(void) {
     if (DWCUtilFade_IsActive(0) == 0 && (sTestStartPassed || DWCUtilFade_IsActive(1) == 0) &&
         DWCUtilUiObject_IsIdle()) {
         DWCUtilUiEffect_Destroy();
@@ -150,22 +150,22 @@ static void func_ov182_021b4ee4(void) {
         }
         DWCUtilDisplay_HidePlanes(0, 0x15);
         if (!sTestStartPassed) {
-            func_ov182_021ae424();
+            DWCUtilConnection_Stop();
             DWCUtilMain_SetLayout(2, 1);
             DWCUtilMain_SetUpdate(func_ov182_021b5bb8);
         } else {
             DWCUtilMain_SetLayout(0, 0);
-            DWCUtilMain_SetUpdate(func_ov182_021b45a4);
+            DWCUtilMain_SetUpdate(DWCUtilTestProgress_Init);
         }
     }
 }
 
 // What the test reports
-static void func_ov182_021b4f6c(void) {
-    switch (func_ov182_021ae440()) {
+static void DWCUtilTestStart_PollTest(void) {
+    switch (DWCUtilConnection_GetState()) {
     case 1:
         sTestStartPassed = TRUE;
-        DWCUtilMain_SetUpdate(func_ov182_021b4e84);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_DisableButtons);
         break;
     case 4:
         sTestStartPassed = FALSE;
@@ -173,21 +173,21 @@ static void func_ov182_021b4f6c(void) {
         DWCUtilSound_PlaySe(9);
         DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
         DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(func_ov182_021b4fc8);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitDialog);
         break;
     }
 }
 
-static void func_ov182_021b4fc8(void) {
+static void DWCUtilTestStart_WaitDialog(void) {
     if (DWCUtilDialog_GetChoice() == 0) {
         DWCUtilSound_PlaySe(6);
         DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(func_ov182_021b4fe8);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitDialogClosed);
     }
 }
 
-static void func_ov182_021b4fe8(void) {
+static void DWCUtilTestStart_WaitDialogClosed(void) {
     if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilMain_SetUpdate(func_ov182_021b4e84);
+        DWCUtilMain_SetUpdate(DWCUtilTestStart_DisableButtons);
     }
 }

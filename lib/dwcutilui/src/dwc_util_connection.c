@@ -5,31 +5,32 @@
 #include "dwcutil/dwcutil_ac.h"
 #include "nitro/os.h"
 
-static void func_ov182_021ae4cc(const DWCUtilAcStatus *status);
-static void *func_ov182_021ae4e0(u32 size);
-static void func_ov182_021ae4ec(void *ptr);
+static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status);
+static void *DWCUtilConnection_Alloc(u32 size);
+static void DWCUtilConnection_Free(void *ptr);
 
 // Defined in this file, which doesn't read it, since dwc_util_main_menu.c reaches its own .bss from the address of
 // its first static
-DWCUtilMsg *data_ov182_021c40b8;
+DWCUtilMsg *gDWCUtilMsg;
 static DWCUtilAcStatus *sStatus;
 
-void func_ov182_021ae3d8(void) {
+void DWCUtilConnection_Start(void) {
     sStatus = DWCUtilHeap_AllocClear(sizeof(DWCUtilAcStatus), -4);
-    if (DWCUtilAc_Start(0xf, 0x40, func_ov182_021ae4cc, func_ov182_021ae4e0, func_ov182_021ae4ec, 0x800) != TRUE) {
+    if (DWCUtilAc_Start(0xf, 0x40, DWCUtilConnection_OnStatus, DWCUtilConnection_Alloc, DWCUtilConnection_Free,
+                        0x800) != TRUE) {
         OS_Terminate();
     }
     OS_Sleep(10);
 }
 
-void func_ov182_021ae424(void) {
+void DWCUtilConnection_Stop(void) {
     if (DWCUtilAc_Cancel() != TRUE) {
         OS_Terminate();
     }
     DWCUtilHeap_FreeAndNull(&sStatus);
 }
 
-int func_ov182_021ae440(void) {
+int DWCUtilConnection_GetState(void) {
     DWCUtilAcResult result;
 
     switch (sStatus->state) {
@@ -55,7 +56,7 @@ int func_ov182_021ae440(void) {
     }
 }
 
-void func_ov182_021ae4b0(void) {
+void DWCUtilConnection_SaveResult(void) {
     DWCUtilAcResult result;
 
     if (DWCUtilAc_GetResult(&result) != TRUE) {
@@ -64,14 +65,14 @@ void func_ov182_021ae4b0(void) {
     func_ov182_021b7c60(&result);
 }
 
-static void func_ov182_021ae4cc(const DWCUtilAcStatus *status) {
+static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status) {
     *sStatus = *status;
 }
 
-static void *func_ov182_021ae4e0(u32 size) {
+static void *DWCUtilConnection_Alloc(u32 size) {
     return DWCUtilHeap_AllocClear(size, 32);
 }
 
-static void func_ov182_021ae4ec(void *ptr) {
+static void DWCUtilConnection_Free(void *ptr) {
     DWCUtilHeap_Free(ptr);
 }

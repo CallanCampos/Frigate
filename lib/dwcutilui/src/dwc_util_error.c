@@ -17,18 +17,18 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static void func_ov182_021b2954(void);
-static void func_ov182_021b29a4(void);
-static void func_ov182_021b2bbc(void);
-static void func_ov182_021b2be0(void);
-static void func_ov182_021b2c08(void);
-static void func_ov182_021b2c28(void);
-static void func_ov182_021b2c38(void);
+static void DWCUtilError_LoadGraphics(void);
+static void DWCUtilError_DrawMessage(void);
+static void DWCUtilError_FadeIn(void);
+static void DWCUtilError_WaitFadeIn(void);
+static void DWCUtilError_WaitButtons(void);
+static void DWCUtilError_Main(void);
+static void DWCUtilError_HandleInput(void);
 static void func_ov182_021b2c4c(void);
-static void func_ov182_021b2c50(void);
-static void func_ov182_021b2c6c(void);
-static void func_ov182_021b2c84(void);
-static void func_ov182_021b2cbc(void);
+static void DWCUtilError_HandleChoice(void);
+static void DWCUtilError_DisableButtons(void);
+static void DWCUtilError_FadeOut(void);
+static void DWCUtilError_WaitFadeOut(void);
 
 // The font of the message by language, the message's box (left, top, width and height), and where the code is drawn
 // by language
@@ -41,13 +41,13 @@ static const u16 sErrorCodePos[7][2] = {
 // The DWC error code that the screen shows
 static int sErrorCode;
 
-void func_ov182_021b293c(void) {
-    func_ov182_021b2954();
-    func_ov182_021b29a4();
-    DWCUtilMain_SetUpdate(func_ov182_021b2bbc);
+void DWCUtilError_Init(void) {
+    DWCUtilError_LoadGraphics();
+    DWCUtilError_DrawMessage();
+    DWCUtilMain_SetUpdate(DWCUtilError_FadeIn);
 }
 
-static void func_ov182_021b2954(void) {
+static void DWCUtilError_LoadGraphics(void) {
     DWCUtilGfxResource_Load("char/jb4Error.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -57,7 +57,7 @@ static void func_ov182_021b2954(void) {
 }
 
 // Draws the error code and the message of its kind
-static void func_ov182_021b29a4(void) {
+static void DWCUtilError_DrawMessage(void) {
     int type = 0;
     int from;
     int code;
@@ -149,7 +149,7 @@ static void func_ov182_021b29a4(void) {
     }
 
     text = DWCUtilText_CreateBg(0, sErrorFonts[DWCUtilMain_GetLanguage()]);
-    msg = DWCUtilMsg_Get(data_ov182_021c40b8, type);
+    msg = DWCUtilMsg_Get(gDWCUtilMsg, type);
     OS_SNPrintf(digits, sizeof(digits), "%d", -sErrorCode);
     DWCUtilString_Widen(str, (u8 *)digits, 8);
     y = sErrorCodePos[DWCUtilMain_GetLanguage()][1];
@@ -160,33 +160,33 @@ static void func_ov182_021b29a4(void) {
     DWCUtilText_MarkDirty(text);
 }
 
-static void func_ov182_021b2bbc(void) {
+static void DWCUtilError_FadeIn(void) {
     DWCUtilFade_Start(2, 0, 0x15, 8);
     DWCUtilDisplay_ShowPlanes(0, 0x15);
-    DWCUtilMain_SetUpdate(func_ov182_021b2be0);
+    DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeIn);
 }
 
-static void func_ov182_021b2be0(void) {
+static void DWCUtilError_WaitFadeIn(void) {
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
         DWCUtilGfxResource_ShowButtons(4);
-        DWCUtilMain_SetUpdate(func_ov182_021b2c08);
+        DWCUtilMain_SetUpdate(DWCUtilError_WaitButtons);
     }
 }
 
-static void func_ov182_021b2c08(void) {
+static void DWCUtilError_WaitButtons(void) {
     if (DWCUtilUiObject_GetState() != -2) {
         DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(func_ov182_021b2c28);
+        DWCUtilMain_SetUpdate(DWCUtilError_Main);
     }
 }
 
-static void func_ov182_021b2c28(void) {
-    func_ov182_021b2c38();
+static void DWCUtilError_Main(void) {
+    DWCUtilError_HandleInput();
     func_ov182_021b2c4c();
-    func_ov182_021b2c50();
+    DWCUtilError_HandleChoice();
 }
 
-static void func_ov182_021b2c38(void) {
+static void DWCUtilError_HandleInput(void) {
     if (DWCUtilTouch_IsKeyPressed(1)) {
         DWCUtilUiObject_SetStateIfIdle(0);
     }
@@ -195,30 +195,30 @@ static void func_ov182_021b2c38(void) {
 static void func_ov182_021b2c4c(void) {
 }
 
-static void func_ov182_021b2c50(void) {
+static void DWCUtilError_HandleChoice(void) {
     if (DWCUtilUiObject_GetState() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilMain_SetUpdate(func_ov182_021b2c6c);
+        DWCUtilMain_SetUpdate(DWCUtilError_DisableButtons);
     }
 }
 
-static void func_ov182_021b2c6c(void) {
+static void DWCUtilError_DisableButtons(void) {
     DWCUtilUiObject_Disable();
     DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(func_ov182_021b2c84);
+    DWCUtilMain_SetUpdate(DWCUtilError_FadeOut);
 }
 
-static void func_ov182_021b2c84(void) {
+static void DWCUtilError_FadeOut(void) {
     if (DWCUtilFade_IsActive(1) == 0) {
         DWCUtilUiObject_Exit();
         DWCUtilFade_Start(3, 1, 1, 8);
         DWCUtilFade_Start(3, 0, 0x15, 8);
-        DWCUtilMain_SetUpdate(func_ov182_021b2cbc);
+        DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeOut);
     }
 }
 
 // Goes back to the first screen of the connection settings, or to the settings of the connection
-static void func_ov182_021b2cbc(void) {
+static void DWCUtilError_WaitFadeOut(void) {
     int from;
 
     if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
@@ -239,6 +239,6 @@ static void func_ov182_021b2cbc(void) {
     }
 }
 
-void func_ov182_021b2d3c(int code) {
+void DWCUtilError_SetCode(int code) {
     sErrorCode = code;
 }

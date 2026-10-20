@@ -62,7 +62,7 @@ void func_ov182_021b06f4(void) {
     DWCUtilGfxResource_ShowStep(2);
     DWCUtilGfxResource_ShowMessage(0x22);
     DWCUtilUiEffect_Init(0);
-    func_ov182_021ada94();
+    DWCUtilAossSession_Init();
     DWCUtilSound_PlaySe(0xb);
     DWCUtilMain_SetUpdate(func_ov182_021b07ac);
 }
@@ -105,7 +105,7 @@ static void func_ov182_021b0844(void) {
     func_ov182_021b08c8();
     func_ov182_021b08ec();
     func_ov182_021b08f0();
-    switch (func_ov182_021adb74()) {
+    switch (DWCUtilAossSession_Run()) {
     case 0:
         break;
     case 1:
@@ -181,7 +181,7 @@ static void func_ov182_021b0990(void) {
     if (!DWCUtilUiObject_IsIdle()) {
         return;
     }
-    func_ov182_021adb38(sPageStep3.succeeded != FALSE);
+    DWCUtilAossSession_Exit(sPageStep3.succeeded != FALSE);
     DWCUtilUiEffect_Destroy();
     DWCUtilText_DestroyScreenBg(0);
     if (!sPageStep3.succeeded) {
