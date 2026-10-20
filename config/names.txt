@@ -766,6 +766,10 @@
 . 0x02010d88 ZukanHabitatSave_GetSeason
 . 0x02010d90 ZukanHabitatSave_SetType
 . 0x02010d98 ZukanHabitatSave_GetType
+. 0x02010da0 ZukanHabitatSave_IsSeenMessageShown
+. 0x02010da8 ZukanHabitatSave_IsCaughtMessageShown
+. 0x02010db0 ZukanHabitatSave_SetSeenMessageShown
+. 0x02010db8 ZukanHabitatSave_SetCaughtMessageShown
 . 0x02010dc0 FestRecords_GetSize
 . 0x02010dc4 FestRecords_Init
 . 0x02010dec FestRecords_GetFromSave

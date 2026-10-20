@@ -93,18 +93,18 @@ u8 ZukanHabitatSave_GetType(void *data) {
     return save->type;
 }
 
-u8 func_02010da0(ZukanHabitatSave *save) {
+u8 ZukanHabitatSave_IsSeenMessageShown(ZukanHabitatSave *save) {
     return save->seenMessageShown;
 }
 
-u8 func_02010da8(ZukanHabitatSave *save) {
+u8 ZukanHabitatSave_IsCaughtMessageShown(ZukanHabitatSave *save) {
     return save->caughtMessageShown;
 }
 
-void func_02010db0(ZukanHabitatSave *save) {
+void ZukanHabitatSave_SetSeenMessageShown(ZukanHabitatSave *save) {
     save->seenMessageShown = TRUE;
 }
 
-void func_02010db8(ZukanHabitatSave *save) {
+void ZukanHabitatSave_SetCaughtMessageShown(ZukanHabitatSave *save) {
     save->caughtMessageShown = TRUE;
 }

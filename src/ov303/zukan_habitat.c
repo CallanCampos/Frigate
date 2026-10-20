@@ -1146,7 +1146,7 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
             strbuf = GFL_StrBufCreate(0x100, HEAPID_ZUKAN_HABITAT);
             format = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_YouveRegisteredEveryPokemon);
             GFL_WordSetFormatStrbuf(wk->wordSet, strbuf, format);
-            func_02010db8(wk->habitat);
+            ZukanHabitatSave_SetCaughtMessageShown(wk->habitat);
             ZukanHabitatGraphic_CreateMessageWindow(&wk->graphic, 10, 5);
             ZukanHabitatGraphic_StartMessage(strbuf, &wk->graphic);
             GFL_StrBufFree(format);
@@ -1219,9 +1219,9 @@ static void ZukanHabitat_SeqAward(ZukanHabitatWork *wk) {
         }
         ZukanHabitat_UpdateNewMarks(wk);
         wk->step++;
-        if (wk->award == AWARD_CAUGHT && func_02010da8(wk->habitat) != TRUE) {
+        if (wk->award == AWARD_CAUGHT && ZukanHabitatSave_IsCaughtMessageShown(wk->habitat) != TRUE) {
             ZukanHabitat_SetSequence(wk, SEQ_ALL_COMPLETE, ACTION_NONE);
-        } else if (wk->award == AWARD_SEEN && func_02010da0(wk->habitat) != TRUE) {
+        } else if (wk->award == AWARD_SEEN && ZukanHabitatSave_IsSeenMessageShown(wk->habitat) != TRUE) {
             ZukanHabitat_SetSequence(wk, SEQ_ALL_COMPLETE, ACTION_NONE);
         } else {
             ZukanHabitat_SetSequence(wk, SEQ_LIST, ACTION_NONE);
@@ -1238,10 +1238,10 @@ static void ZukanHabitat_SeqAllComplete(ZukanHabitatWork *wk) {
     case 0:
         if (wk->award == AWARD_CAUGHT) {
             strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_WhenAllPokemonHabitat_2);
-            func_02010db8(wk->habitat);
+            ZukanHabitatSave_SetCaughtMessageShown(wk->habitat);
         } else {
             strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ZukanHabitat_Text_WhenAllPokemonHabitat);
-            func_02010db0(wk->habitat);
+            ZukanHabitatSave_SetSeenMessageShown(wk->habitat);
         }
         ZukanHabitatGraphic_CreateMessageWindow(&wk->graphic, 8, 9);
         ZukanHabitatGraphic_StartMessage(strbuf, &wk->graphic);

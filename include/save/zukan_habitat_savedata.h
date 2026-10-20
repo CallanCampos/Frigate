@@ -42,9 +42,9 @@ void ZukanHabitatSave_SetHabitatFlag(ZukanHabitatSave *save, u8 habitat);
 // Sets what the player has done of a habitat's kind of habitat, ZUKAN_HABITAT_TYPE_*
 void ZukanHabitatSave_SetHabitatField(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value);
 // The two flags at the end of the list, and setting them
-u8 func_02010da0(ZukanHabitatSave *save);
-u8 func_02010da8(ZukanHabitatSave *save);
-void func_02010db0(ZukanHabitatSave *save);
-void func_02010db8(ZukanHabitatSave *save);
+u8 ZukanHabitatSave_IsSeenMessageShown(ZukanHabitatSave *save);
+u8 ZukanHabitatSave_IsCaughtMessageShown(ZukanHabitatSave *save);
+void ZukanHabitatSave_SetSeenMessageShown(ZukanHabitatSave *save);
+void ZukanHabitatSave_SetCaughtMessageShown(ZukanHabitatSave *save);
 
 #endif // POKEBW2_SAVE_ZUKAN_HABITAT_SAVEDATA_H
