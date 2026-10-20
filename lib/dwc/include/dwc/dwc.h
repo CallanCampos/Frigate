@@ -96,11 +96,12 @@ u8 func_ov011_02160e10(u8 keyId, const char *key, const int *valueSrc);
 int func_ov011_02160f98(int index, const char *key, int defaultValue);
 
 // Overlay 11's, which the library's start in main (dwc_init.c) calls: chooses the servers that the library talks to
-// by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives). It also
-// gives GameSpy its memory functions (malloc, free, realloc and memalign), with dwc/gsMemory.h's gsiMemoryCallbacksSet
-void func_ov011_02169df8(int server);
+// by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives), returning
+// FALSE for another. The start then gives GameSpy its memory functions (malloc, free, realloc and memalign), with
+// dwc/gsMemory.h's gsiMemoryCallbacksSet
+BOOL func_ov011_02169df8(int server);
 
-// Overlay 11's, in a file that is not written yet: sets the URL of the Nintendo authentication server, and reads it.
+// Overlay 11's dwc_nasfunc.c (see dwc/nasfunc.h): sets the URL of the Nintendo authentication server, and reads it.
 // The settings utility (overlay 182) sets its own for as long as it runs
 void func_ov011_021694d4(const char *url);
 const char *func_ov011_021694e0(void);

@@ -367,3 +367,8 @@ lib/dwc/src/serverbrowsing/sb_serverlist.c:
     .text       start:0x02183438 end:0x02185008
     .data       start:0x0218b9f0 end:0x0218ba40
     .bss        start:0x021922e4 end:0x02192300
+
+lib/dwc/src/auth/dwc_nasfunc.c:
+    .text       start:0x02169514 end:0x0216c560
+    .data       start:0x02185b28 end:0x02186ebc
+    .bss        start:0x0218e964 end:0x021906d8
