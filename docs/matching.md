@@ -300,6 +300,10 @@ Same instructions, registers swapped.
 - Variables declared in an inner block are allocated apart from the function's variables of the same name: in
   `ShinkaDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
   while the other branches keep theirs in registers.
+- `s02A1_MedalGetMostCompleteCategory` declares its ranking-loop counter `s32 j;` first in the function, before
+  `fx32 best = 0;`. With `j` in that position, `best` takes `r5` and both loop counters take `r4`; with `j` declared
+  inside the ranking block, those registers exchange. The unsigned medal counter and signed ranking counter remain
+  separate variables.
 - Two values that the original keeps in one register, one dead before the other is set, were one variable: the PC
   box's `GetDepositBlock` keeps the party position and then its result in the same variable, where two
   variables get two registers.
