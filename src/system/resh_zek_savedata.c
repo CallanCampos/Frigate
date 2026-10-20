@@ -21,11 +21,11 @@ ReshZekSave *getReshZekBlkAddress(SaveControl *save) {
 }
 
 void func_0200af8c(ReshZekSave *reshZek, const u32 *src) {
-    MI_CpuCopy8(src, &reshZek->unk0, sizeof(reshZek->unk0));
+    MI_CpuCopy8(src, &reshZek->cityState, sizeof(reshZek->cityState));
 }
 
 void func_0200af9c(ReshZekSave *reshZek, u32 *dest) {
-    MI_CpuCopy8(&reshZek->unk0, dest, sizeof(reshZek->unk0));
+    MI_CpuCopy8(&reshZek->cityState, dest, sizeof(reshZek->cityState));
 }
 
 PartyPkm *ReshZekSave_GetPkm(ReshZekSave *reshZek) {

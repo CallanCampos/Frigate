@@ -7,7 +7,8 @@
 
 // Save block 0x2b, which swan calls ReshZek: the Reshiram or Zekrom fused with Kyurem, kept while they are one
 struct ReshZekSave {
-    u32 unk0;
+    // A copy of the game data's own CityState, Black City's or White Forest's
+    u32 cityState;
     PartyPkm pkm;
 }; // size: 0xe0
 
