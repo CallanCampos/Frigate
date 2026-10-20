@@ -20,11 +20,16 @@
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 
-// The copy of a connection of the console's Wi-Fi settings that the screens edit, and which connection it is
+// The copy of a connection of the console's Wi-Fi settings that the screens edit: the connection, its subnet mask as
+// four bytes (the connection keeps the number of its bits), which connection it is, and whether DHCP gives the address,
+// the mask and the gateway, and the DNS servers
 struct DWCUtilSettingsEdit {
     DWCBmConnection connection;
-    u8 unk_ef[5];
+    u8 unk_ef;
+    u8 netmask[4];
     u8 index;
+    u8 autoAddress;
+    u8 autoDns;
 };
 
 DWCUtilSettingsEdit *func_ov182_021b781c(void);

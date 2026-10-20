@@ -14,7 +14,7 @@
 #define DWC_BM_PACKED_SIZE 14
 
 // What the settings keep of one connection (a slot of the console's Wi-Fi settings): the network name, the address
-// settings, and a byte that says whether the connection is in use. The first 0xEF bytes of a page
+// settings, the WEP mode, and a byte that says whether the connection is in use. The first 0xEF bytes of a page
 #define DWC_BM_CONNECTION_UNUSED 0xFF
 typedef struct DWCBmConnection {
     u8 unk0[0x40];
@@ -24,8 +24,10 @@ typedef struct DWCBmConnection {
     u8 gateway[4];
     u8 dns[2][4];   // the first is all 0 when the DNS servers come from DHCP
     u8 netmaskBits; // how many of the mask's high bits are set, 0x20 at most
-    u8 unkD1[0x16];
-    u8 status; // DWC_BM_CONNECTION_UNUSED; 0 to 2 are the kinds that an NTR console has, more are the TWL's
+    u8 unkD1[0x15];
+    u8 wepMode : 2;    // 0 for no WEP, 1 for a key of 5 bytes, 2 of 13 and 3 of 16
+    u8 wepKeyText : 6; // 1 when the key was entered as characters, 0 when as hex digits
+    u8 status;         // DWC_BM_CONNECTION_UNUSED; 0 to 2 are the kinds that an NTR console has, more are the TWL's
     u8 unkE8[7];
 } DWCBmConnection;
 
