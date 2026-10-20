@@ -85,7 +85,7 @@ typedef struct Gdb {
     int unk_00;
     Sake *sake;
     int state;
-    int operation;
+    GdbOperation operation;
     int result;
     int requestIndex;
 } Gdb;
@@ -110,32 +110,47 @@ static int Gdb_GetResultErrorCode(int operation, int error);
 static int Gdb_SetResultError(int operation, int sakeResult);
 static void Gdb_SetOperation(int operation);
 static void Gdb_NextRequest(void);
-static void Gdb_ReleaseUrls(void);
 static void Gdb_SetUrls(int server);
 
 // The names of the operations, for the log
+// Padded strings and the pointer table share the ROM's .data block.
 // clang-format off
+static char sOperationNameNone[8] = "none";
+static char sOperationNameUploadFile[12] = "upload file";
+static char sOperationNameInitialize[12] = "initialize";
+static char sOperationNameGetRecords[12] = "get records";
+static char sOperationNameRateRecord[12] = "rate record";
+static char sOperationNameDeleteRecord[16] = "delete record";
+static char sOperationNameSearchRecords[16] = "search records";
+static char sOperationNameGetMyRecords[16] = "get my records";
+static char sOperationNameCreateRecord[16] = "create record";
+static char sOperationNameUpdateRecord[16] = "update record";
+static char sOperationNameDownloadFile[16] = "download file";
+static char sOperationNameGetRecordLimit[20] = "get record limit";
+static char sOperationNameGetRecordCount[20] = "get record count";
+static char sOperationNameGetRandomRecord[20] = "get random record";
+
 static const char *sOperationNames[GDB_OPERATION_NUM] = {
-    "none",
-    "initialize",
-    "create record",
-    "delete record",
-    "update record",
-    "download file",
-    "upload file",
-    "get my records",
-    "get record limit",
-    "get records",
-    "rate record",
-    "search records",
-    "get random record",
-    "get record count",
+    [GDB_OPERATION_NONE] = sOperationNameNone,
+    [GDB_OPERATION_INITIALIZE] = sOperationNameInitialize,
+    [GDB_OPERATION_CREATE_RECORD] = sOperationNameCreateRecord,
+    [GDB_OPERATION_DELETE_RECORD] = sOperationNameDeleteRecord,
+    [GDB_OPERATION_UPDATE_RECORD] = sOperationNameUpdateRecord,
+    [GDB_OPERATION_DOWNLOAD_FILE] = sOperationNameDownloadFile,
+    [GDB_OPERATION_UPLOAD_FILE] = sOperationNameUploadFile,
+    [GDB_OPERATION_GET_MY_RECORDS] = sOperationNameGetMyRecords,
+    [GDB_OPERATION_GET_RECORD_LIMIT] = sOperationNameGetRecordLimit,
+    [GDB_OPERATION_GET_SPECIFIC_RECORDS] = sOperationNameGetRecords,
+    [GDB_OPERATION_RATE_RECORD] = sOperationNameRateRecord,
+    [GDB_OPERATION_SEARCH_RECORDS] = sOperationNameSearchRecords,
+    [GDB_OPERATION_GET_RANDOM_RECORD] = sOperationNameGetRandomRecord,
+    [GDB_OPERATION_GET_RECORD_COUNT] = sOperationNameGetRecordCount,
 };
 
 // clang-format on
 
-static Gdb sGdb;
 static GdbRequest sGdbRequests[2];
+static Gdb sGdb;
 
 int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     SakeLoginTicket ticket;
@@ -240,7 +255,7 @@ int Gdb_Shutdown(void) {
     return 0;
 }
 
-static void Gdb_ReleaseUrls(void) {
+void Gdb_ReleaseUrls(void) {
     char uploadUrl[128];
     char downloadUrl[128];
 
@@ -430,21 +445,20 @@ static void Gdb_RunLibrary(void) {
 
 static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *input, void *output, void *userData) {
     GdbRequest *slot;
-    SakeGetRecordsOutput *records = output;
-    int *values = output;
+    GdbOperation operation = sGdb.operation;
+    int state = sGdb.state;
 
-    if (sGdb.state != GDB_STATE_BUSY && sGdb.state != GDB_STATE_CANCELING) {
+    if (state != GDB_STATE_BUSY && state != GDB_STATE_CANCELING) {
         return;
     }
     if (error == 0) {
-        int operation = sGdb.operation;
         sGdb.result = 1;
         sGdb.state = GDB_STATE_IDLE;
         sGdb.operation = 0;
         switch (operation) {
         case GDB_OPERATION_CREATE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
-            *slot->u.create.recordId = values[0];
+            *slot->u.create.recordId = ((int *)output)[0];
             Gdb_Printf(1455, "%s[gdb=>%s field_num=>%d record_id=>%d].\n", sOperationNames[operation],
                        slot->u.create.input.tableId, slot->u.create.input.fieldNum, *slot->u.create.recordId);
             break;
@@ -460,21 +474,25 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
             break;
         case GDB_OPERATION_GET_MY_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
-            Gdb_Printf(1483, "%s[record_num=>%d].\n", sOperationNames[operation], records->recordNum);
-            slot->u.getMy.func(records->recordNum, records->records, userData);
+            Gdb_Printf(1483, "%s[record_num=>%d].\n", sOperationNames[operation],
+                       ((SakeGetRecordsOutput *)output)->recordNum);
+            slot->u.getMy.func(((SakeGetRecordsOutput *)output)->recordNum, ((SakeGetRecordsOutput *)output)->records,
+                               userData);
             break;
         case GDB_OPERATION_GET_RECORD_LIMIT:
             slot = &sGdbRequests[sGdb.requestIndex];
-            *slot->u.getRecordLimit.limitNum = values[0];
-            *slot->u.getRecordLimit.ownedNum = values[1];
+            *slot->u.getRecordLimit.limitNum = ((int *)output)[0];
+            *slot->u.getRecordLimit.ownedNum = ((int *)output)[1];
             Gdb_Printf(1496, "%s[gdb=>%s limit_num=>%d owned_num=>%d].\n", sOperationNames[operation],
                        slot->u.getRecordLimit.table, *slot->u.getRecordLimit.limitNum,
                        *slot->u.getRecordLimit.ownedNum);
             break;
         case GDB_OPERATION_GET_SPECIFIC_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
-            Gdb_Printf(1505, "%s[record_num=>%d].\n", sOperationNames[operation], records->recordNum);
-            slot->u.getSpecific.func(records->recordNum, records->records, userData);
+            Gdb_Printf(1505, "%s[record_num=>%d].\n", sOperationNames[operation],
+                       ((SakeGetRecordsOutput *)output)->recordNum);
+            slot->u.getSpecific.func(((SakeGetRecordsOutput *)output)->recordNum,
+                                     ((SakeGetRecordsOutput *)output)->records, userData);
             break;
         case GDB_OPERATION_RATE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -483,12 +501,14 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
             break;
         case GDB_OPERATION_SEARCH_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
-            Gdb_Printf(1525, "%s[record_num=>%d].\n", sOperationNames[operation], records->recordNum);
-            slot->u.search.func(records->recordNum, records->records, userData);
+            Gdb_Printf(1525, "%s[record_num=>%d].\n", sOperationNames[operation],
+                       ((SakeGetRecordsOutput *)output)->recordNum);
+            slot->u.search.func(((SakeGetRecordsOutput *)output)->recordNum, ((SakeGetRecordsOutput *)output)->records,
+                                userData);
             break;
         case GDB_OPERATION_GET_RANDOM_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
-            if (values[0] != 0) {
+            if (((int *)output)[0] != 0) {
                 Gdb_Printf(1535, "%s[record_num=>1].\n", sOperationNames[operation]);
                 slot->u.getRandom.func(1, output, userData);
             } else {
@@ -498,7 +518,7 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
             break;
         case GDB_OPERATION_GET_RECORD_COUNT:
             slot = &sGdbRequests[sGdb.requestIndex];
-            *slot->u.getRecordCount.count = values[0];
+            *slot->u.getRecordCount.count = ((int *)output)[0];
             Gdb_Printf(1549, "%s[count=>%d].\n", sOperationNames[operation], *slot->u.getRecordCount.count);
             break;
         default:

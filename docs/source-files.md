@@ -2334,7 +2334,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
 | `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
 | `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
-| `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | partial | descriptive |
+| `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
 | `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 
 ### Overlay 261
