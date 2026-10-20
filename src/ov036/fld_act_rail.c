@@ -61,7 +61,7 @@ static BOOL RailJump_Update(FieldActor *actor) {
         offset.z = 0;
         SetActorWPosOffset(actor, &offset);
     }
-    if (work->timer > 0 || func_ov036_021b09f4(unit)) {
+    if (work->timer > 0 || RailUnit_IsMovePending(unit)) {
         return FALSE;
     }
     {

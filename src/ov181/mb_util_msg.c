@@ -76,12 +76,13 @@ struct MBUtilMsg {
 static void MBUtilMsg_FreeSubWindow(MBUtilMsg *msg);
 
 MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL useTalkWin, BOOL useKeys) {
+    u32 keyCursorUseKeys = useKeys;
     MBUtilMsg *msg = GFL_HeapAllocate(heapId, sizeof(MBUtilMsg), TRUE, "mb_util_msg.c", 104);
 
     msg->heapId = heapId;
     msg->msgBg = msgBg;
     msg->menuBg = menuBg;
-    msg->useKeys = useKeys;
+    msg->useKeys = keyCursorUseKeys;
     msg->window = NULL;
     msg->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, msg->heapId);
     msg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, fileId, msg->heapId);
@@ -100,7 +101,7 @@ MBUtilMsg *MBUtilMsg_Create(HeapID heapId, u8 msgBg, u8 menuBg, u32 fileId, BOOL
     msg->menuRes = AppTaskMenuRes_Create(msg->menuBg, 10, msg->font, msg->queue, msg->heapId);
     msg->menu = NULL;
     msg->confirm = NULL;
-    msg->cursor = KeyCursor_Create(15, useKeys, TRUE, msg->heapId);
+    msg->cursor = KeyCursor_Create(15, keyCursorUseKeys, TRUE, msg->heapId);
     if (useTalkWin == TRUE) {
         TalkMsgWinSetup setup;
 
@@ -172,10 +173,10 @@ void MBUtilMsg_Update(MBUtilMsg *msg) {
         }
     }
     PrintQueue_Main(msg->queue);
-    if (msg->queuedSubWindow != NULL && msg->subQueued) {
+    if (msg->queuedSubWindow != NULL) {
         PrintQueue *queue = msg->queue;
 
-        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(msg->queuedSubWindow))) {
+        if (msg->subQueued && !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(msg->queuedSubWindow))) {
             BmpWin_FlushChar(msg->queuedSubWindow);
             msg->subQueued = FALSE;
         }
