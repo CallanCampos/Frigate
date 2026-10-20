@@ -1,0 +1,129 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_105",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0395",
+            "script": 3,
+            "direction": "DIR_UP",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 18,
+                "z": 20,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_POKEMON_AZELF",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0394",
+            "script": 2000,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 27,
+                "z": 18,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_POKEMON_UXIE",
+            "movement": 15,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0394",
+            "script": 2000,
+            "direction": "DIR_DOWN",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 17,
+                "z": 7,
+                "y": 0
+            }
+        },
+        {
+            "id": 3,
+            "model": "OBJ_CODE_POKEMON_MESPRIT",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x0394",
+            "script": 2000,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 9,
+                "z": 16,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_ROUTE_20",
+            "warp": 1,
+            "unk4": 1,
+            "transition": 4,
+            "grid": {
+                "x": 296,
+                "y": 0,
+                "z": 488,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 1,
+            "var": "EVENT_WORK_0x4115",
+            "value": 2,
+            "type": 0,
+            "grid": {
+                "x": 16,
+                "z": 22,
+                "width": 5,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        },
+        {
+            "script": 2,
+            "var": "EVENT_WORK_0x4115",
+            "value": 3,
+            "type": 0,
+            "grid": {
+                "x": 14,
+                "z": 20,
+                "width": 9,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": []
+}

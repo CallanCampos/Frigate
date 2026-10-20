@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Dizzy Punch",
+    "description": "The target is hit with rhythmically\nlaunched punches that may also\nleave it confused.",
+    "type": "TYPE_NORMAL",
+    "quality": "MOVE_QUALITY_DAMAGE_INFLICT",
+    "category": "MOVE_CATEGORY_PHYSICAL",
+    "power": 70,
+    "accuracy": 100,
+    "pp": 10,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_CONFUSION",
+        "chance": 20,
+        "duration": 2,
+        "min_turns": 2,
+        "max_turns": 5
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_CONFUSE_HIT",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_SELECTED",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_CONTACT", "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE", "MOVE_FLAG_PUNCH" ]
+}

@@ -127,7 +127,7 @@ void MBComm_Delete(MBCommSys *comm) {
         GFL_HeapFree(comm->parentInfo);
     }
     if (comm->netStarted == TRUE) {
-        func_020438dc();
+        NetLdata_Exit();
     }
     GFL_HeapFree(comm->pokemon);
     GFL_HeapFree(comm);
@@ -136,24 +136,24 @@ void MBComm_Delete(MBCommSys *comm) {
 void MBComm_Update(MBCommSys *comm) {
     switch (comm->seq) {
     case MB_COMM_SEQ_WAIT_CONNECT:
-        if (func_02040504() == TRUE) {
+        if (NetHandle_SendNegotiation() == TRUE) {
             comm->seq = MB_COMM_SEQ_WAIT_NEGOTIATION;
         }
         break;
     case MB_COMM_SEQ_WAIT_NEGOTIATION:
-        if (func_0204044c(func_02040440()) == TRUE) {
+        if (NetHandle_IsNegotiated(NetHandle_GetOwn()) == TRUE) {
             comm->seq = MB_COMM_SEQ_WAIT_TIMING;
         }
         break;
     case MB_COMM_SEQ_WAIT_TIMING:
-        if (func_02042bd8(func_02040440()) == TRUE) {
+        if (GFL_NetIsHandleNegotiated(NetHandle_GetOwn()) == TRUE) {
             comm->seq = MB_COMM_SEQ_CONNECTED;
             func_02042e9c(TRUE);
             func_02042e94(TRUE);
         }
         break;
     case MB_COMM_SEQ_WAIT_DISCONNECT_TIMING:
-        if (func_02040664(func_02040440(), 0x40, 4) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x40, 4) == TRUE) {
             comm->seq = MB_COMM_SEQ_DISCONNECTED;
             func_02042e94(FALSE);
             func_02042e9c(FALSE);
@@ -210,7 +210,7 @@ void MBComm_StartNet(MBCommSys *comm) {
     };
 
     init.parentHeapId = comm->heapId;
-    func_020425ec(&init, NULL, comm);
+    GFL_NetInit(&init, NULL, comm);
     comm->result = 0;
     comm->parentInfoReceived = FALSE;
     comm->boxSpace = 0;
@@ -234,22 +234,22 @@ void MBComm_StartNet(MBCommSys *comm) {
     comm->finish = FALSE;
     comm->end = FALSE;
     comm->answer = 0;
-    func_02043868(comm->heapId, FALSE);
+    NetLdata_Init(comm->heapId, FALSE);
 }
 
 void MBComm_EndNet(MBCommSys *comm) {
-    func_02042860(NULL);
-    func_020438dc();
+    GFL_NetExit(NULL);
+    NetLdata_Exit();
     comm->netStarted = FALSE;
     comm->seq = MB_COMM_SEQ_NONE;
 }
 
 BOOL MBComm_IsNetReady(MBCommSys *comm) {
-    return func_02042788();
+    return GFL_NetIsInitialized();
 }
 
 BOOL MBComm_IsNetEnded(MBCommSys *comm) {
-    return func_020427a4();
+    return GFL_NetIsEnded();
 }
 
 void MBComm_Connect(MBCommSys *comm) {
@@ -258,7 +258,7 @@ void MBComm_Connect(MBCommSys *comm) {
 }
 
 void MBComm_StartDisconnect(MBCommSys *comm) {
-    func_02040624(func_02040440(), 0x40, 4);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), 0x40, 4);
     comm->seq = MB_COMM_SEQ_WAIT_DISCONNECT_TIMING;
 }
 
@@ -366,7 +366,7 @@ BOOL MBComm_HasItem(MBCommSys *comm) {
 }
 
 void MBComm_SendProgram(MBCommSys *comm, void *data, u32 size) {
-    func_0204393c(data, size, 2, TRUE);
+    NetLdata_StartSend(data, size, 2, TRUE);
 }
 
 void MBComm_ClearPokemon(MBCommSys *comm) {
@@ -410,14 +410,15 @@ BOOL MBComm_SendCommand(MBCommSys *comm, u8 command, u32 value) {
     NetHandle *handle;
     MBCommPacket packet;
 
-    if (func_02042bc4() == TRUE) {
-        handle = func_02040414(0xff);
+    if (GFL_NetIsParent() == TRUE) {
+        handle = NetHandle_Get(0xff);
     } else {
-        handle = func_02040440();
+        handle = NetHandle_GetOwn();
     }
     packet.command = command;
     packet.value = value;
-    return func_02042c18(handle, 0xff, MB_COMM_NETCMD_PACKET, sizeof(MBCommPacket), &packet, TRUE, FALSE, FALSE);
+    return GFL_NetSendCommandToMachine(handle, 0xff, MB_COMM_NETCMD_PACKET, sizeof(MBCommPacket), &packet, TRUE, FALSE,
+                                       FALSE);
 }
 
 static void MBComm_RecvPacket(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -493,12 +494,13 @@ static void MBComm_RecvPacket(int netId, int size, const void *data, void *work,
 }
 
 BOOL MBComm_SendParentInfo(MBCommSys *comm, MBCommParentInfo *info) {
-    NetHandle *handle = func_02040414(0xff);
+    NetHandle *handle = NetHandle_Get(0xff);
 
-    if (func_02042a78() < 2) {
+    if (GFL_NetGetNegotiatedCount() < 2) {
         return FALSE;
     }
-    return func_02042c18(handle, 1, MB_COMM_NETCMD_PARENT_INFO, sizeof(MBCommParentInfo), info, TRUE, FALSE, TRUE);
+    return GFL_NetSendCommandToMachine(handle, 1, MB_COMM_NETCMD_PARENT_INFO, sizeof(MBCommParentInfo), info, TRUE,
+                                       FALSE, TRUE);
 }
 
 static void MBComm_RecvParentInfo(int netId, int size, const void *data, void *work, NetHandle *handle) {

@@ -1,0 +1,36 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Tihana",
+    "class": "TRAINER_CLASS_PARASOL_LADY",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_CASTFORM",
+            "form": 0,
+            "level": 28,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_HAIL", "MOVE_POWDER_SNOW", "MOVE_EMBER", "MOVE_WATER_GUN" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Water fun with Pokémon!\nDo you want to play with us?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "My oh my...\nI lost!"
+        },
+        {
+            "type": 2,
+            "text": "I'll go home and get my boyfriend to...\nNo, I'll get my Pokémon to cheer me up!"
+        }
+    ]
+}

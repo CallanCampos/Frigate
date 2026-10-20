@@ -182,7 +182,7 @@ static void WH_StateOutStartParent(void *arg) {
         break;
     case WM_STATECODE_CONNECTED:
         if (_pWmInfo->sScanFilter != NULL) {
-            accept = _pWmInfo->sScanFilter(cb, func_02042d94());
+            accept = _pWmInfo->sScanFilter(cb, GFL_NetGetWork());
         }
         if (!accept) {
             int result = WM_Disconnect(NULL, cb->aid);
@@ -205,9 +205,9 @@ static void WH_StateOutStartParent(void *arg) {
             if (_pWmInfo->sDisconnectCallback != NULL) {
                 _pWmInfo->sDisconnectCallback(cb->aid);
             }
-            func_ov030_02174088();
-            func_02040a9c(cb->aid);
-            func_0204049c(cb->aid);
+            NetWhpipe_StopIfLocked();
+            NetHandle_Forget(cb->aid);
+            NetHandle_RequestReply(cb->aid);
         }
         break;
     case WM_STATECODE_PARENT_START:
@@ -228,15 +228,15 @@ static BOOL WH_StateInStartParentMP(void) {
     WM_GetMPReceiveBufferSize();
     WM_GetMPSendBufferSize();
     if (_pWmInfo->sRecvBuf != NULL) {
-        func_02042ed0(_pWmInfo->sRecvBuf);
-        func_02042ed0(_pWmInfo->sSendBuf);
+        GFL_NetFreeAligned32(_pWmInfo->sRecvBuf);
+        GFL_NetFreeAligned32(_pWmInfo->sSendBuf);
     }
     _pWmInfo->sRecvBufSize = WM_GetMPReceiveBufferSize();
     _pWmInfo->sSendBufSize = WM_GetMPSendBufferSize();
     _pWmInfo->sRecvBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sRecvBufSize + 0x20, "wih.c", 1192);
     _pWmInfo->sSendBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sSendBufSize + 0x20, "wih.c", 1193);
     result = WM_StartMP(WH_StateOutStartParentMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
-                        _pWmInfo->sSendBufSize, func_02042d34() == 0x35 ? 1 : 2);
+                        _pWmInfo->sSendBufSize, GFL_NetGetGameCommandBase() == 0x35 ? 1 : 2);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -260,12 +260,12 @@ static void WH_StateOutStartParentMP(void *arg) {
     switch (cb->state) {
     case WM_STATECODE_MP_START:
         if (_pWmInfo->sConnectMode == WH_CONNECTMODE_DS_PARENT) {
-            machines = func_02042de8();
-            lastAid = func_02042dc0() - 1;
+            machines = GFL_NetGetMaxSendSize();
+            lastAid = GFL_NetGetMaxConnectNum() - 1;
             aidBitmap = (1 << (lastAid + 1)) - 1;
             doubleMode = TRUE;
 
-            if (func_02042d34() == 0x35) {
+            if (GFL_NetGetGameCommandBase() == 0x35) {
                 doubleMode = FALSE;
             }
             result = WM_StartDataSharing(&_pWmInfo->sDataSharing, 13, aidBitmap, machines, doubleMode);
@@ -490,9 +490,9 @@ static void WH_StateOutStartScan(void *arg) {
         WMBssDesc *bssDesc = &_pWmInfo->sBssDesc;
 
         MI_CpuCopy8(cb->bssDesc[i], bssDesc, sizeof(WMBssDesc));
-        func_02012ebc(cb->linkLevel[i]);
+        WihDwc_SetBestLinkLevel(cb->linkLevel[i]);
         if (_pWmInfo->sScanInfoCallback != NULL) {
-            _pWmInfo->sScanInfoCallback(bssDesc, func_02042d94(), cb->linkLevel[i]);
+            _pWmInfo->sScanInfoCallback(bssDesc, GFL_NetGetWork(), cb->linkLevel[i]);
         }
         if (WH_CheckBssDesc(bssDesc)) {
             GFL_ASSERT(_pWmInfo->sScanCallback);
@@ -621,15 +621,15 @@ static BOOL WH_StateInStartChildMP(void) {
     WM_GetMPReceiveBufferSize();
     WM_GetMPSendBufferSize();
     if (_pWmInfo->sRecvBuf != NULL) {
-        func_02042ed0(_pWmInfo->sRecvBuf);
-        func_02042ed0(_pWmInfo->sSendBuf);
+        GFL_NetFreeAligned32(_pWmInfo->sRecvBuf);
+        GFL_NetFreeAligned32(_pWmInfo->sSendBuf);
     }
     _pWmInfo->sRecvBufSize = WM_GetMPReceiveBufferSize();
     _pWmInfo->sSendBufSize = WM_GetMPSendBufferSize();
     _pWmInfo->sRecvBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sRecvBufSize + 0x20, "wih.c", 2043);
     _pWmInfo->sSendBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sSendBufSize + 0x20, "wih.c", 2044);
     result = WM_StartMP(WH_StateOutStartChildMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
-                        _pWmInfo->sSendBufSize, func_02042d34() == 0x35 ? 1 : 2);
+                        _pWmInfo->sSendBufSize, GFL_NetGetGameCommandBase() == 0x35 ? 1 : 2);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -656,12 +656,12 @@ static void WH_StateOutStartChildMP(void *arg) {
     switch (cb->state) {
     case WM_STATECODE_MP_START:
         if (_pWmInfo->sConnectMode == WH_CONNECTMODE_DS_CHILD) {
-            machines = func_02042de8();
-            lastAid = func_02042dc0() - 1;
+            machines = GFL_NetGetMaxSendSize();
+            lastAid = GFL_NetGetMaxConnectNum() - 1;
             aidBitmap = (1 << (lastAid + 1)) - 1;
             doubleMode = TRUE;
 
-            if (func_02042d34() == 0x35) {
+            if (GFL_NetGetGameCommandBase() == 0x35) {
                 doubleMode = FALSE;
             }
             result = WM_StartDataSharing(&_pWmInfo->sDataSharing, 13, aidBitmap, machines, doubleMode);
@@ -974,9 +974,9 @@ BOOL WH_Initialize(HeapID heapId, WHCallback callback, u32 extended) {
 // WH_Release: frees the work and its buffers
 void WH_Release(void) {
     if (_pWmInfo != NULL) {
-        func_02042ed0(_pWmInfo->sRecvBuf);
-        func_02042ed0(_pWmInfo->sSendBuf);
-        func_02042ed0(_pWmInfo);
+        GFL_NetFreeAligned32(_pWmInfo->sRecvBuf);
+        GFL_NetFreeAligned32(_pWmInfo->sSendBuf);
+        GFL_NetFreeAligned32(_pWmInfo);
         _pWmInfo = NULL;
     }
 }
@@ -1052,9 +1052,9 @@ BOOL WH_ParentConnect(u16 mode, u16 tgid, u16 channel, u16 maxEntry) {
     if (func_02042df4() != 0) {
         _pWmInfo->sParentParam.parentMaxSize = func_02042df4();
     } else {
-        _pWmInfo->sParentParam.parentMaxSize = func_02042de8() * func_02042dc0() + 4;
+        _pWmInfo->sParentParam.parentMaxSize = GFL_NetGetMaxSendSize() * GFL_NetGetMaxConnectNum() + 4;
     }
-    _pWmInfo->sParentParam.childMaxSize = func_02042de8();
+    _pWmInfo->sParentParam.childMaxSize = GFL_NetGetMaxSendSize();
     _pWmInfo->sParentParam.maxEntry = maxEntry;
     _pWmInfo->sParentParam.CS_Flag = 0;
     _pWmInfo->sParentParam.multiBootFlag = 0;

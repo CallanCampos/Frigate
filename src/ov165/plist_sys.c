@@ -118,26 +118,21 @@ static void PokeList_MessageDoneDemo(PokeListWork *wk);
 static void PokeList_SetHeldItem(PokeListWork *wk, PartyPkm *pkm, u16 item);
 static u16 PokeList_GetBagCount(PokeListWork *wk, u16 item);
 
-static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(128) };
-static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
-static const VecFx32 sCameraTarget = { 0, 0, 0 };
-
-static const BGSysLCDConfig sLCDConfig = { 1, 0, 0, 0 };
-
-static const BGSetup sBG5Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 4, 0x8000, 1, 1, 0, 0 };
-static const BGSetup sBG6Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xd, 2, 0x8000, 1, 2, 0, 0 };
-static const BGSetup sBG7Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xc, 0, 0x6000, 1, 3, 0, 0 };
+// BG 0's setup, which PokeList_CreateBG0 builds, again after plist_demo.c's 3D demo. The other BGs' setups are statics
+// of PokeList_InitGraphics; this one is declared ahead of them, and its place there sets its place in .rodata
 static const BGSetup sBG0Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 0, 0, 0, 0 };
-static const BGSetup sBG1Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xa, 2, 0x8000, 0, 1, 0, 0 };
-static const BGSetup sBG2Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xc, 4, 0x8000, 0, 2, 1, 0 };
-static const BGSetup sBG3Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 0, 0x5000, 1, 3, 0, 0 };
-static const BGSetup sBG4Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 1, 0, 0, 0 };
+
+// The moves outside battle, by the index of their check in CheckAllowHidenEvent
+static const u16 sHidenMoves[] = {
+    MOVE_CUT, MOVE_SURF,        MOVE_WATERFALL, MOVE_STRENGTH, MOVE_FLY,        MOVE_FLASH,      MOVE_TELEPORT,
+    MOVE_DIG, MOVE_SWEET_SCENT, MOVE_CHATTER,   MOVE_DIVE,     MOVE_MILK_DRINK, MOVE_SOFTBOILED,
+};
 
 BOOL PokeList_Init(PokeListWork *wk) {
     u8 count = PokeParty_GetPkmCount(wk->param->party);
     u8 i;
 
-    wk->touch = func_0203d554();
+    wk->touch = GCTX_HIDIsUsingTouch();
     wk->menuItem = 0x19;
     wk->state = 0;
     wk->subState = 0;
@@ -211,7 +206,7 @@ BOOL PokeList_Init(PokeListWork *wk) {
     GFL_BGSysQueueScrLoad(3);
     GFL_BGSysQueueScrLoad(2);
     GFL_BGSysQueueScrLoad(7);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return TRUE;
 }
 
@@ -253,7 +248,7 @@ BOOL PokeList_Exit(PokeListWork *wk) {
     if (wk->wasMode1A == TRUE) {
         wk->param->mode = 0x1a;
     }
-    func_0203d564(wk->touch);
+    GCTX_HIDSetUsingTouch(wk->touch);
     return TRUE;
 }
 
@@ -314,7 +309,7 @@ BOOL PokeList_Main(PokeListWork *wk) {
             PokeListMenu_SetButtonPressed(wk->buttons[0], 0);
             if (wk->wasMode1A == TRUE) {
                 // Overlay 164's sync takes the parameters as its work
-                if (func_ov164_02199944((NetSyncWork *)wk->param, 0, 0) == TRUE) {
+                if (NetSync_Send((NetSyncWork *)wk->param, 0, 0) == TRUE) {
                     wk->state = 17;
                     PokeListMenu_FreeButton(wk->buttons[0]);
                     PokeListMenu_FreeButton(wk->buttons[1]);
@@ -342,11 +337,11 @@ BOOL PokeList_Main(PokeListWork *wk) {
         PokeListDemo_End(wk);
         break;
     case 17:
-        func_ov164_021999a8((u32)wk->param, 2);
+        NetSync_StartTiming((u32)wk->param, 2);
         wk->state = 18;
         break;
     case 18:
-        if (func_ov164_021999bc((NetSyncWork *)wk->param, 2) == TRUE) {
+        if (NetSync_IsTimingDone((NetSyncWork *)wk->param, 2) == TRUE) {
             wk->state = 19;
         }
         break;
@@ -355,7 +350,7 @@ BOOL PokeList_Main(PokeListWork *wk) {
         wk->state = 21;
         break;
     case 19:
-        if (wk->pressedButton == NULL || func_0204c560(wk->pressedButton) == FALSE) {
+        if (wk->pressedButton == NULL || ClActor_IsAnimActive(wk->pressedButton) == FALSE) {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
             wk->state = 21;
         }
@@ -376,8 +371,8 @@ BOOL PokeList_Main(PokeListWork *wk) {
         PokeListMenu_UpdateButton(wk->buttons[0]);
         PokeListMenu_UpdateButton(wk->buttons[1]);
     }
-    func_02021a3c(wk->printQueue);
-    func_0204b794();
+    PrintQueue_Main(wk->printQueue);
+    ClActSys_Draw();
     return FALSE;
 }
 
@@ -411,17 +406,19 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         }
     }
     {
+        // The glow angle's step. Its reads are folded, but a function's static constant stays in .rodata
+        static const u16 angleStep = 0x400;
         u16 glowColors[3] = { 0x7ff4, 0x7fff, 0x7be9 };
         u16 baseColors[3] = { 0x4a0a, 0x5ef7, 0x4140 };
-        fx32 ratio;
         u8 i;
         u8 j;
+        fx32 ratio;
 
         if (wk->glowPaused == FALSE) {
-            if (wk->glowAngle + 0x400 >= 0x10000) {
-                wk->glowAngle = wk->glowAngle + 0x400 - 0x10000;
+            if (wk->glowAngle + angleStep >= 0x10000) {
+                wk->glowAngle = wk->glowAngle + angleStep - 0x10000;
             } else {
-                wk->glowAngle = wk->glowAngle + 0x400;
+                wk->glowAngle = wk->glowAngle + angleStep;
             }
         } else {
             wk->glowAngle = 0xc000;
@@ -429,23 +426,21 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
         ratio = (FX_SinIdx(wk->glowAngle) + FX32_ONE) / 2;
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
-                u8 glowG = (glowColors[j] & 0x3e0) >> 5;
-                s8 dg = ((u8)((baseColors[j] & 0x3e0) >> 5) - glowG) * ratio >> FX32_SHIFT;
-                u8 glowR = glowColors[j] & 0x1f;
-                u8 glowB = (glowColors[j] & 0x7c00) >> 10;
-                s8 db = ((u8)((baseColors[j] & 0x7c00) >> 10) - glowB) * ratio >> FX32_SHIFT;
-                s8 dr = ((u8)(baseColors[j] & 0x1f) - glowR) * ratio >> FX32_SHIFT;
-                s32 value;
-                u8 r;
-                u8 g;
-                u8 b;
+                u16 glow = glowColors[j];
+                u16 base = baseColors[j];
+                u8 glowR = glow & 0x1f;
+                u8 glowG = (glow & 0x3e0) >> 5;
+                u8 glowB = (glow & 0x7c00) >> 10;
+                u8 baseR = base & 0x1f;
+                u8 baseG = (base & 0x3e0) >> 5;
+                u8 baseB = (base & 0x7c00) >> 10;
+                s8 dr = (baseR - glowR) * ratio >> FX32_SHIFT;
+                s8 dg = (baseG - glowG) * ratio >> FX32_SHIFT;
+                s8 db = (baseB - glowB) * ratio >> FX32_SHIFT;
+                u8 r = MATH_CLAMP(glowR + dr, 0, 31);
+                u8 g = MATH_CLAMP(glowG + dg, 0, 31);
+                u8 b = MATH_CLAMP(glowB + db, 0, 31);
 
-                value = glowR + dr;
-                r = value > 31 ? 31 : value < 0 ? 0 : value;
-                value = glowG + dg;
-                g = value > 31 ? 31 : value < 0 ? 0 : value;
-                value = glowB + db;
-                b = value > 31 ? 31 : value < 0 ? 0 : value;
                 wk->colors[i][2 + j] = GX_RGB(r, g, b);
             }
         }
@@ -461,10 +456,18 @@ static void PokeList_VBlank(TCB *tcb, void *data) {
     } else {
         GX_SetVisibleWnd(GX_WNDMASK_NONE);
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void PokeList_InitGraphics(PokeListWork *wk) {
+    static const BGSysLCDConfig sLCDConfig = { 1, 0, 0, 0 };
+    static const BGSetup sBG1Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xa, 2, 0x8000, 0, 1, 0, 0 };
+    static const BGSetup sBG2Setup = { 0, 0, 0x1000, 0, 3, GX_BG_COLORMODE_16, 0xc, 4, 0x8000, 0, 2, 1, 0 };
+    static const BGSetup sBG3Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 0, 0x5000, 1, 3, 0, 0 };
+    static const BGSetup sBG4Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xf, 6, 0x8000, 1, 0, 0, 0 };
+    static const BGSetup sBG5Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xe, 4, 0x8000, 1, 1, 0, 0 };
+    static const BGSetup sBG6Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xd, 2, 0x8000, 1, 2, 0, 0 };
+    static const BGSetup sBG7Setup = { 0, 0, 0x800, 0, 1, GX_BG_COLORMODE_16, 0xc, 0, 0x6000, 1, 3, 0, 0 };
     BGSysVRAMConfig vramConfig = {
         GX_VRAM_BG_128_A,  GX_VRAM_BGEXTPLTT_NONE,  GX_VRAM_SUB_BG_128_C,        GX_VRAM_SUB_BGEXTPLTT_NONE,
         GX_VRAM_OBJ_128_B, GX_VRAM_OBJEXTPLTT_NONE, GX_VRAM_SUB_OBJ_NONE,        GX_VRAM_SUB_OBJEXTPLTT_NONE,
@@ -516,6 +519,13 @@ void PokeList_CreateBG0(PokeListWork *wk) {
 }
 
 void PokeList_Init3D(PokeListWork *wk) {
+    static const VecFx32 sCameraPos = { 0, 0, FX32_CONST(128) };
+    static const VecFx32 sCameraUp = { 0, FX32_ONE, 0 };
+    static const VecFx32 sCameraTarget = { 0, 0, 0 };
+    // Nothing reads it, but the original's .rodata has these 16 zero bytes after the LCD config. Its type and name are
+    // a guess: the eight colors that G3X_SetEdgeColorTable takes, for the edge marking turned on below
+    static const GXRgb sEdgeColors[8] = { 0 };
+
     GX_SetGraphicsMode(1, 0, 1);
     GFL_G3DSysCreate(FALSE, 1, FALSE, 1, 0, wk->heapId, NULL);
     G2_SetBG0Priority(0);
@@ -527,12 +537,12 @@ void PokeList_Init3D(PokeListWork *wk) {
     GFL_G3DCameraFlush(wk->camera);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 10);
-    func_0204f918(wk->heapId);
+    Particle_Init(wk->heapId);
 }
 
 static void PokeList_ExitGraphics(PokeListWork *wk) {
     GfdClearVramTransferQueue();
-    func_0204b758();
+    ClActSys_Delete();
     PokeList_ReleaseBG0(wk);
     GFL_BGSysReleaseBG(3);
     GFL_BGSysReleaseBG(2);
@@ -550,7 +560,7 @@ void PokeList_ReleaseBG0(PokeListWork *wk) {
 }
 
 void PokeList_Exit3D(PokeListWork *wk) {
-    func_0204fb4c();
+    Particle_Free();
     GFL_G3DCameraFree(wk->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -568,49 +578,49 @@ static void PokeList_CreateActors(PokeListWork *wk) {
     ClActorSetup cursorSetup;
     ClActorSetup setup;
 
-    wk->actorUnit = func_0204bf1c(10, 8, wk->heapId);
-    func_0204c028(wk->actorUnit);
+    wk->actorUnit = ClActUnit_Create(10, 8, wk->heapId);
+    ClActUnit_UseSystemRenderer(wk->actorUnit);
     cursorSetup.x = 0;
     cursorSetup.y = 0;
     cursorSetup.sequence = 0;
     cursorSetup.priority = 10;
     cursorSetup.bgPriority = 3;
-    wk->cursor = func_0204c040(wk->actorUnit, wk->clResources[CL_RES_CHAR(0)], wk->clResources[CL_RES_PLTT(0)],
-                               wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
-    wk->subCursor = func_0204c040(wk->actorUnit, wk->clResources[CL_RES_CHAR(0)], wk->clResources[CL_RES_PLTT(0)],
-                                  wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
+    wk->cursor = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(0)], wk->clResources[CL_RES_PLTT(0)],
+                                wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
+    wk->subCursor = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(0)], wk->clResources[CL_RES_PLTT(0)],
+                                   wk->clResources[CL_RES_CELL(0)], &cursorSetup, 0, wk->heapId);
     func_0204c520(wk->cursor, TRUE);
     func_0204c520(wk->subCursor, TRUE);
-    func_0204c124(wk->cursor, FALSE);
-    func_0204c124(wk->subCursor, FALSE);
+    ClActor_SetVisible(wk->cursor, FALSE);
+    ClActor_SetVisible(wk->subCursor, FALSE);
     setup.x = 224;
     setup.y = 168;
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 0;
-    wk->exitButton = func_0204c040(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
-                                   wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
+    wk->exitButton = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
+                                    wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
     func_0204c520(wk->exitButton, TRUE);
     setup.x = 204;
     setup.sequence = 0;
-    wk->shortcutButton = func_0204c040(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
-                                       wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
+    wk->shortcutButton = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
+                                        wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
     func_0204c520(wk->shortcutButton, TRUE);
     setup.y = 172;
     setup.x = 184;
     setup.sequence = 6;
-    wk->shortcutMark = func_0204c040(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
-                                     wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
+    wk->shortcutMark = ClActor_Create(wk->actorUnit, wk->clResources[CL_RES_CHAR(2)], wk->clResources[CL_RES_PLTT(1)],
+                                      wk->clResources[CL_RES_CELL(2)], &setup, 0, wk->heapId);
     func_0204c520(wk->shortcutMark, TRUE);
 }
 
 static void PokeList_FreeActors(PokeListWork *wk) {
-    func_0204c108(wk->exitButton);
-    func_0204c108(wk->shortcutButton);
-    func_0204c108(wk->shortcutMark);
-    func_0204c108(wk->cursor);
-    func_0204c108(wk->subCursor);
-    func_0204bf98(wk->actorUnit);
+    ClActor_Delete(wk->exitButton);
+    ClActor_Delete(wk->shortcutButton);
+    ClActor_Delete(wk->shortcutMark);
+    ClActor_Delete(wk->cursor);
+    ClActor_Delete(wk->subCursor);
+    ClActUnit_Delete(wk->actorUnit);
 }
 
 static void PokeList_InitText(PokeListWork *wk) {
@@ -619,20 +629,20 @@ static void PokeList_InitText(PokeListWork *wk) {
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_11, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, 0x1c0, 0x20, wk->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x1c0, 0x20, wk->heapId);
-    wk->printQueue = func_020219a8(0x1800, wk->heapId);
-    func_020232d8();
+    wk->printQueue = PrintQueue_Create(0x1800, wk->heapId);
+    GFL_TextRndResetColorIndexLUT();
 }
 
 static void PokeList_ExitText(PokeListWork *wk) {
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->smallFont);
     GFL_FontFree(wk->font);
 }
 
 static void PokeList_LoadResources(PokeListWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(0x4b, wk->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PLIST, wk->heapId);
     ArcTool *iconArc;
     ArcTool *commonArc;
 
@@ -645,44 +655,50 @@ static void PokeList_LoadResources(PokeListWork *wk) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 5, 4, 0, 0, wk->heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 0xe, 7, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 0x13, 7, 0, 0, FALSE, wk->heapId);
-    wk->clResources[CL_RES_PLTT(0)] = func_0204bbb8(arc, 4, 0, 0, 0, 3, wk->heapId);
-    wk->clResources[CL_RES_CHAR(0)] = func_0204b81c(arc, 0xb, FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CHAR(1)] = func_0204b81c(arc, 8, FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(0)] = func_0204bde0(arc, 0x17, 0x1a, wk->heapId);
-    wk->clResources[CL_RES_CELL(1)] = func_0204bde0(arc, 0x16, 0x19, wk->heapId);
+    wk->clResources[CL_RES_PLTT(0)] = ClActSys_LoadPlttRange(arc, 4, 0, 0, 0, 3, wk->heapId);
+    wk->clResources[CL_RES_CHAR(0)] = ClActSys_LoadChars(arc, 0xb, FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CHAR(1)] = ClActSys_LoadChars(arc, 8, FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(0)] = ClActSys_LoadCellAnims(arc, 0x17, 0x1a, wk->heapId);
+    wk->clResources[CL_RES_CELL(1)] = ClActSys_LoadCellAnims(arc, 0x16, 0x19, wk->heapId);
     GFL_ArcToolFree(arc);
 
     iconArc = GFL_ArcSysCreateFileHandle(7, wk->heapId);
-    wk->clResources[CL_RES_PLTT(6)] = func_0204bc48(iconArc, PokeIcon_GetPaletteFile(), 0, 0xc0, wk->heapId);
+    wk->clResources[CL_RES_PLTT(6)] = ClActSys_LoadPlttEx(iconArc, PokeIcon_GetPaletteFile(), 0, 0xc0, wk->heapId);
     wk->clResources[CL_RES_CELL(7)] =
-        func_0204bde0(iconArc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
+        ClActSys_LoadCellAnims(iconArc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), wk->heapId);
     GFL_ArcToolFree(iconArc);
 
     commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), wk->heapId);
     // BUG: The BG of the common bar is loaded from the closed handle of the first archive, rather than the common
     // archive's, which works as long as the handle's memory is given to the new handle
 #ifdef BUGFIX
-    GFL_G2DIOLoadArcNCLRDefault(commonArc, func_0202d820(), 0, 0x160, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(commonArc, func_0202d824(), 1, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(commonArc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0x160, 0x20, wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(commonArc, AppMenuCommon_GetBarBgCharFile(), 1, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(commonArc, func_0202d82c(), 1, 0, 0, FALSE, wk->heapId);
 #else
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 0, 0x160, 0x20, wk->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), 1, 0, 0, FALSE, wk->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0x160, 0x20, wk->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), 1, 0, 0, FALSE, wk->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d82c(), 1, 0, 0, FALSE, wk->heapId);
 #endif
     GFL_BGSysSetScrPaletteNo(1, 0, 0, 0x40, 0x20, 0xb);
-    wk->clResources[CL_RES_PLTT(5)] = func_0204bbb8(commonArc, func_0202d954(), 0, 0xa0, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(6)] = func_0204b81c(commonArc, func_0202d958(2), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(6)] = func_0204bde0(commonArc, func_0202d95c(2), func_0202d960(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(1)] = func_0204bbb8(commonArc, func_0202d810(), 0, 0x120, 0, 3, wk->heapId);
-    wk->clResources[CL_RES_CHAR(2)] = func_0204b81c(commonArc, func_0202d814(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(2)] = func_0204bde0(commonArc, func_0202d818(2), func_0202d81c(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(2)] = func_0204bbb8(commonArc, func_0202d890(), 0, 0x60, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(3)] = func_0204b81c(commonArc, func_0202d894(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(3)] = func_0204bde0(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
-    wk->clResources[CL_RES_PLTT(4)] = func_0204bbb8(commonArc, func_0202d8b0(), 0, 0x80, 0, 1, wk->heapId);
-    wk->clResources[CL_RES_CHAR(5)] = func_0204b81c(commonArc, func_0202d8b4(), FALSE, 0, wk->heapId);
-    wk->clResources[CL_RES_CELL(5)] = func_0204bde0(commonArc, func_0202d8b8(2), func_0202d8bc(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(5)] = ClActSys_LoadPlttRange(commonArc, func_0202d954(), 0, 0xa0, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(6)] = ClActSys_LoadChars(commonArc, func_0202d958(2), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(6)] = ClActSys_LoadCellAnims(commonArc, func_0202d95c(2), func_0202d960(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(1)] =
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0x120, 0, 3, wk->heapId);
+    wk->clResources[CL_RES_CHAR(2)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(2)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                             AppMenuCommon_GetTouchBarAnimFile(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(2)] = ClActSys_LoadPlttRange(commonArc, func_0202d890(), 0, 0x60, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(3)] = ClActSys_LoadChars(commonArc, func_0202d894(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(3)] = ClActSys_LoadCellAnims(commonArc, func_0202d898(2), func_0202d89c(2), wk->heapId);
+    wk->clResources[CL_RES_PLTT(4)] =
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetStatusIconPaletteFile(), 0, 0x80, 0, 1, wk->heapId);
+    wk->clResources[CL_RES_CHAR(5)] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetStatusIconCharFile(), FALSE, 0, wk->heapId);
+    wk->clResources[CL_RES_CELL(5)] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetStatusIconCellFile(2),
+                                                             AppMenuCommon_GetStatusIconAnimFile(2), wk->heapId);
     GFL_ArcToolFree(commonArc);
     MIi_CpuCopy16((void *)(HW_BG_PLTT + 0xc0), wk->baseColors, sizeof(wk->baseColors));
 }
@@ -693,17 +709,17 @@ static void PokeList_FreeResources(PokeListWork *wk) {
     GFL_HeapFree(wk->plateScreenFile);
     for (i = 0; i < CL_RES_PLTT_COUNT; i++) {
         if (wk->clResources[i] != CL_RES_NONE) {
-            func_0204bcd0(wk->clResources[i]);
+            ClActSys_FreePltt(wk->clResources[i]);
         }
     }
     for (i = CL_RES_CHAR(0); i < CL_RES_CHAR(CL_RES_CHAR_COUNT); i++) {
         if (wk->clResources[i] != CL_RES_NONE) {
-            func_0204b98c(wk->clResources[i]);
+            ClActSys_FreeChars(wk->clResources[i]);
         }
     }
     for (i = CL_RES_CELL(0); i < CL_RES_CELL(CL_RES_CELL_COUNT); i++) {
         if (wk->clResources[i] != CL_RES_NONE) {
-            func_0204be64(wk->clResources[i]);
+            ClActSys_FreeCellAnims(wk->clResources[i]);
         }
     }
 }
@@ -891,7 +907,7 @@ static void PokeList_ShowModeMessage(PokeListWork *wk) {
         break;
     case 1:
         PokeListBattle_ShowMessage(wk);
-        func_0204c124(wk->exitButton, FALSE);
+        ClActor_SetVisible(wk->exitButton, FALSE);
         wk->showShortcutButtons = FALSE;
         break;
     case 22:
@@ -933,7 +949,7 @@ static void PokeList_ShowModeMessage(PokeListWork *wk) {
     case 27:
         PokeListMessage_Open(wk, wk->message, 0);
         PokeListMessage_Print(wk, wk->message, 0xaf);
-        func_0204c124(wk->exitButton, FALSE);
+        ClActor_SetVisible(wk->exitButton, FALSE);
         wk->showShortcutButtons = FALSE;
         break;
     }
@@ -968,7 +984,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
 
             if (result == 2) {
                 if (used) {
-                    func_02038bc8(9);
+                    JoinAvenue_RecordActivity(9);
                 }
                 PokeListPlate_SetPkm(wk, wk->plates[wk->cursorPos], wk->pkm, 0);
             } else {
@@ -1077,7 +1093,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
     }
     case 14:
         if (PokeParty_GetParam(wk->pkm, PKM_PARAM_ITEM, NULL) == 0) {
-            MailData *mail = func_020097f4(wk->param->unk08, 0, wk->param->unk6C, wk->heapId);
+            MailData *mail = MailBox_CopyMail(wk->param->unk08, 0, wk->param->unk6C, wk->heapId);
 
             PokeParty_SetParam(wk->pkm, PKM_PARAM_MAIL, (u32)mail);
             GFL_HeapFree(mail);
@@ -1305,7 +1321,7 @@ static void func_ov165_0219bb68(PokeListWork *wk) {
             PokeListMenu_SetButtonActive(wk->buttons[(u8)(wk->cursorPos - 6)], TRUE);
         }
     } else {
-        func_0204c124(wk->cursor, FALSE);
+        ClActor_SetVisible(wk->cursor, FALSE);
         if (wk->cursorPos <= 5) {
             if (wk->state == 3 || wk->state == 22 || wk->state == 23) {
                 PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], TRUE);
@@ -1316,13 +1332,13 @@ static void func_ov165_0219bb68(PokeListWork *wk) {
             PokeListMenu_SetButtonActive(wk->buttons[(u8)(wk->cursorPos - 6)], FALSE);
         }
     }
-    func_0204c124(wk->shortcutButton, wk->showShortcutButtons);
-    func_0204c124(wk->shortcutMark, wk->showShortcutButtons);
-    func_0204c488(wk->shortcutMark, wk->param->keyItemRegistered + 6);
+    ClActor_SetVisible(wk->shortcutButton, wk->showShortcutButtons);
+    ClActor_SetVisible(wk->shortcutMark, wk->showShortcutButtons);
+    ClActor_SetSequence(wk->shortcutMark, wk->param->keyItemRegistered + 6);
     if (PokeList_IsBattle(wk) == TRUE || func_ov165_0219da88(wk) == FALSE) {
-        func_0204c124(wk->exitButton, FALSE);
+        ClActor_SetVisible(wk->exitButton, FALSE);
     } else {
-        func_0204c124(wk->exitButton, TRUE);
+        ClActor_SetVisible(wk->exitButton, TRUE);
     }
 }
 
@@ -1345,7 +1361,7 @@ static void func_ov165_0219bc7c(PokeListWork *wk) {
     }
     switch (wk->input) {
     case 3:
-        func_0204c124(wk->cursor, FALSE);
+        ClActor_SetVisible(wk->cursor, FALSE);
         wk->pkm = PokeParty_GetPkm(wk->param->party, wk->cursorPos);
         wk->param->index = wk->cursorPos;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1364,7 +1380,7 @@ static void func_ov165_0219bc7c(PokeListWork *wk) {
     case 1:
         if (wk->cursorPos <= 5) {
             PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-            func_0204c124(wk->cursor, FALSE);
+            ClActor_SetVisible(wk->cursor, FALSE);
         }
         if (PokeList_IsBattle(wk) == TRUE) {
             PokeListMenu_SetButtonActive(wk->buttons[0], FALSE);
@@ -1374,7 +1390,7 @@ static void func_ov165_0219bc7c(PokeListWork *wk) {
         } else {
             wk->state = 19;
             wk->pressedButton = wk->exitButton;
-            func_0204c488(wk->pressedButton, 9);
+            ClActor_SetSequence(wk->pressedButton, 9);
         }
         wk->param->index = 7;
         wk->param->result = 0;
@@ -1383,14 +1399,14 @@ static void func_ov165_0219bc7c(PokeListWork *wk) {
     case 2:
         if (wk->cursorPos <= 5) {
             PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-            func_0204c124(wk->cursor, FALSE);
+            ClActor_SetVisible(wk->cursor, FALSE);
         }
         wk->state = 19;
         wk->param->index = 8;
         wk->param->result = 0;
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
         wk->pressedButton = wk->shortcutButton;
-        func_0204c488(wk->pressedButton, 8);
+        ClActor_SetSequence(wk->pressedButton, 8);
         break;
     }
 }
@@ -1409,7 +1425,7 @@ static void func_ov165_0219be4c(PokeListWork *wk) {
         wk->state = 2;
         func_ov165_0219cdd8(wk, wk->cursorPos);
         PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
-        func_0204c124(wk->subCursor, FALSE);
+        ClActor_SetVisible(wk->subCursor, FALSE);
         wk->selectPos = 9;
         wk->param->index = wk->cursorPos;
         PokeList_ShowModeMessage(wk);
@@ -1448,7 +1464,7 @@ static void func_ov165_0219bf40(PokeListWork *wk) {
         wk->state = 2;
         func_ov165_0219cdd8(wk, wk->cursorPos);
         PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
-        func_0204c124(wk->subCursor, FALSE);
+        ClActor_SetVisible(wk->subCursor, FALSE);
         wk->selectPos = 9;
         wk->param->index = wk->cursorPos;
         PokeList_ShowModeMessage(wk);
@@ -1468,7 +1484,7 @@ static void func_ov165_0219bf40(PokeListWork *wk) {
             func_ov165_0219cdd8(wk, wk->cursorPos);
             PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
             PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-            func_0204c124(wk->subCursor, FALSE);
+            ClActor_SetVisible(wk->subCursor, FALSE);
             wk->param->index = wk->cursorPos;
         }
     }
@@ -1489,7 +1505,7 @@ static void func_ov165_0219c038(PokeListWork *wk) {
             func_ov165_0219cdd8(wk, wk->cursorPos);
             PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos2], FALSE);
             PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-            func_0204c124(wk->subCursor, FALSE);
+            ClActor_SetVisible(wk->subCursor, FALSE);
             wk->param->index = wk->cursorPos;
         } else {
             PartyPkm *user;
@@ -1504,7 +1520,7 @@ static void func_ov165_0219c038(PokeListWork *wk) {
             wk->hpDoneFunc = PokeList_ShareHpDone;
             func_ov165_0219cdd8(wk, wk->cursorPos);
             PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos2], FALSE);
-            func_0204c124(wk->subCursor, FALSE);
+            ClActor_SetVisible(wk->subCursor, FALSE);
             user = PokeParty_GetPkm(wk->param->party, wk->selectPos2);
             userMaxHp = PokeParty_GetParam(user, PKM_PARAM_MAX_HP, NULL);
             userHp = PokeParty_GetParam(user, PKM_PARAM_HP, NULL);
@@ -1524,7 +1540,7 @@ static void func_ov165_0219c038(PokeListWork *wk) {
         wk->state = 2;
         func_ov165_0219cdd8(wk, wk->cursorPos);
         PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos2], FALSE);
-        func_0204c124(wk->subCursor, FALSE);
+        ClActor_SetVisible(wk->subCursor, FALSE);
         wk->selectPos2 = 9;
         wk->param->index = wk->cursorPos;
         PokeList_ShowModeMessage(wk);
@@ -1539,7 +1555,7 @@ static void func_ov165_0219c20c(PokeListWork *wk) {
     if (wk->cursorPos != 6) {
         if (wk->cursorPos <= 5) {
             PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-            func_0204c124(wk->cursor, FALSE);
+            ClActor_SetVisible(wk->cursor, FALSE);
         }
         wk->cursorPos = 6;
     }
@@ -1664,7 +1680,7 @@ static void func_ov165_0219c578(PokeListWork *wk, u32 msgId) {
     func_ov165_0219cdd8(wk, wk->cursorPos);
     PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
     PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-    func_0204c124(wk->subCursor, FALSE);
+    ClActor_SetVisible(wk->subCursor, FALSE);
     PokeList_ShowMessage(wk, msgId, TRUE, PokeList_MessageDoneSelect);
 }
 
@@ -1702,7 +1718,7 @@ static void func_ov165_0219c5d0(PokeListWork *wk) {
             func_ov165_0219cdd8(wk, wk->cursorPos);
             PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
             PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-            func_0204c124(wk->subCursor, FALSE);
+            ClActor_SetVisible(wk->subCursor, FALSE);
             if (dstItem == 0) {
                 PokeList_ShowMessage(wk, 0x5c, TRUE, PokeList_MessageDoneSelect);
             } else {
@@ -1718,7 +1734,7 @@ static void func_ov165_0219c5d0(PokeListWork *wk) {
         func_ov165_0219cdd8(wk, wk->cursorPos);
         PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
         PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], FALSE);
-        func_0204c124(wk->subCursor, FALSE);
+        ClActor_SetVisible(wk->subCursor, FALSE);
         // BUG: The selection of the Pokémon giving its item is kept, and that of Soft-Boiled's user is cleared instead
 #ifdef BUGFIX
         wk->selectPos = 9;
@@ -1762,19 +1778,19 @@ static void func_ov165_0219c820(PokeListWork *wk) {
 
 // Moves the cursor with the keys, and takes A, B, X and Y
 static void func_ov165_0219c87c(PokeListWork *wk) {
-    static const u8 sUpFromButtonsTwo[] = { 0, 0, 2, 2, 4, 4 };
     static const u8 sUpFromButtons[] = { 0, 1, 1, 3, 3, 5 };
+    static const u8 sUpFromButtonsTwo[] = { 0, 0, 2, 2, 4, 4 };
     u32 trg = GCTX_HIDGetPressedKeys();
     u32 rep = GCTX_HIDGetTypedKeys();
 
-    if (wk->touch == TRUE && func_0204c138(wk->cursor) == FALSE) {
+    if (wk->touch == TRUE && ClActor_IsVisible(wk->cursor) == FALSE) {
         if (trg != 0 && !(trg & (PAD_BUTTON_B | PAD_BUTTON_X))) {
             if (wk->cursorPos <= 5) {
                 func_ov165_0219cdd8(wk, wk->cursorPos);
                 PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], TRUE);
             } else {
                 PokeListMenu_SetButtonActive(wk->buttons[(u8)(wk->cursorPos - 6)], TRUE);
-                func_0204c124(wk->cursor, FALSE);
+                ClActor_SetVisible(wk->cursor, FALSE);
             }
             GFL_SndSEPlay(SEQ_SE_SELECT1);
             wk->touch = FALSE;
@@ -1858,7 +1874,7 @@ static void func_ov165_0219c87c(PokeListWork *wk) {
                     PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], TRUE);
                 } else {
                     PokeListMenu_SetButtonActive(wk->buttons[(u8)(wk->cursorPos - 6)], TRUE);
-                    func_0204c124(wk->cursor, FALSE);
+                    ClActor_SetVisible(wk->cursor, FALSE);
                 }
                 if (prevPos <= 5) {
                     PokeListPlate_SetSelected(wk, wk->plates[prevPos], FALSE);
@@ -1874,20 +1890,20 @@ static void func_ov165_0219c87c(PokeListWork *wk) {
         if ((PokeList_IsBattle(wk) == FALSE || func_ov165_0219da74(wk) == TRUE) && func_ov165_0219da88(wk) == TRUE) {
             wk->input = 1;
             wk->pressedButton = wk->exitButton;
-            func_0204c488(wk->pressedButton, 9);
+            ClActor_SetSequence(wk->pressedButton, 9);
             wk->touch = FALSE;
         }
     } else if (trg & PAD_BUTTON_X) {
         if (wk->showShortcutButtons == TRUE) {
             wk->input = 2;
             wk->pressedButton = wk->shortcutButton;
-            func_0204c488(wk->pressedButton, 8);
+            ClActor_SetSequence(wk->pressedButton, 8);
             wk->touch = FALSE;
         }
     } else if (trg & PAD_BUTTON_Y) {
         if (wk->showShortcutButtons == TRUE) {
             wk->param->keyItemRegistered ^= 1;
-            func_0204c488(wk->shortcutMark, wk->param->keyItemRegistered + 6);
+            ClActor_SetSequence(wk->shortcutMark, wk->param->keyItemRegistered + 6);
             GFL_SndSEPlay(SEQ_SE_SYS_07);
             wk->touch = FALSE;
         }
@@ -1910,7 +1926,7 @@ static void func_ov165_0219cb80(PokeListWork *wk) {
         }
     }
     plateRects[count].top = TOUCH_RECT_END;
-    hit = func_0203da0c(plateRects);
+    hit = GFL_HIDGetTouchPressedRect(plateRects);
     if (hit != TOUCH_RECT_NONE) {
         if (wk->unk28 == FALSE && hit <= 5 && PokeListPlate_IsEgg(wk, wk->plates[hit]) == TRUE) {
             GFL_SndSEPlay(SEQ_SE_BEEP);
@@ -1931,7 +1947,7 @@ static void func_ov165_0219cb80(PokeListWork *wk) {
                 PokeListPlate_SetSelected(wk, wk->plates[wk->cursorPos], TRUE);
             } else {
                 PokeListMenu_SetButtonActive(wk->buttons[(u8)(wk->cursorPos - 6)], TRUE);
-                func_0204c124(wk->cursor, FALSE);
+                ClActor_SetVisible(wk->cursor, FALSE);
             }
             wk->flashTimer = 12;
         }
@@ -1975,12 +1991,12 @@ static void func_ov165_0219cb80(PokeListWork *wk) {
                 buttonRects[2].right = 232;
             }
         }
-        hit = func_0203da0c(buttonRects);
+        hit = GFL_HIDGetTouchPressedRect(buttonRects);
         if (hit != TOUCH_RECT_NONE) {
             wk->input = hit;
             wk->touch = TRUE;
             if (hit == 1) {
-                func_0204c488(wk->exitButton, 9);
+                ClActor_SetSequence(wk->exitButton, 9);
             }
         }
     }
@@ -1994,9 +2010,9 @@ static void func_ov165_0219cb80(PokeListWork *wk) {
         markRects[0].bottom = 192;
         markRects[0].left = 184;
         markRects[0].right = 208;
-        if (func_0203da0c(markRects) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchPressedRect(markRects) != TOUCH_RECT_NONE) {
             wk->param->keyItemRegistered ^= 1;
-            func_0204c488(wk->shortcutMark, wk->param->keyItemRegistered + 6);
+            ClActor_SetSequence(wk->shortcutMark, wk->param->keyItemRegistered + 6);
             GFL_SndSEPlay(SEQ_SE_SYS_07);
             wk->touch = TRUE;
         }
@@ -2008,13 +2024,13 @@ static void func_ov165_0219cdd8(PokeListWork *wk, s32 pos) {
     ClActorPos actorPos;
 
     PokeListPlate_GetCursorPos(wk, wk->plates[pos], &actorPos);
-    func_0204c140(wk->cursor, &actorPos, 0);
-    func_0204c124(wk->cursor, TRUE);
-    func_0204c468(wk->cursor, 3);
+    ClActor_SetSurfacePos(wk->cursor, &actorPos, 0);
+    ClActor_SetVisible(wk->cursor, TRUE);
+    ClActor_SetBgPriority(wk->cursor, 3);
     if (pos == 0) {
-        func_0204c488(wk->cursor, 0);
+        ClActor_SetSequence(wk->cursor, 0);
     } else {
-        func_0204c488(wk->cursor, 1);
+        ClActor_SetSequence(wk->cursor, 1);
     }
 }
 
@@ -2023,13 +2039,13 @@ static void func_ov165_0219ce34(PokeListWork *wk, s32 pos) {
     ClActorPos actorPos;
 
     PokeListPlate_GetCursorPos(wk, wk->plates[pos], &actorPos);
-    func_0204c140(wk->subCursor, &actorPos, 0);
-    func_0204c124(wk->subCursor, TRUE);
-    func_0204c468(wk->subCursor, 2);
+    ClActor_SetSurfacePos(wk->subCursor, &actorPos, 0);
+    ClActor_SetVisible(wk->subCursor, TRUE);
+    ClActor_SetBgPriority(wk->subCursor, 2);
     if (pos == 0) {
-        func_0204c488(wk->subCursor, 2);
+        ClActor_SetSequence(wk->subCursor, 2);
     } else {
-        func_0204c488(wk->subCursor, 3);
+        ClActor_SetSequence(wk->subCursor, 3);
     }
 }
 
@@ -2072,34 +2088,28 @@ static void func_ov165_0219ceec(PokeListWork *wk) {
     G2_SetWndOutsidePlane(GX_PLANEMASK_BG0 | GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ,
                           TRUE);
     wk->glowPaused = TRUE;
-    func_0204c124(wk->shortcutButton, FALSE);
-    func_0204c124(wk->exitButton, FALSE);
-    func_0204c124(wk->shortcutMark, FALSE);
+    ClActor_SetVisible(wk->shortcutButton, FALSE);
+    ClActor_SetVisible(wk->exitButton, FALSE);
+    ClActor_SetVisible(wk->shortcutMark, FALSE);
     GFL_BGSysQueueScrLoad(0);
-    func_0203d564(wk->touch);
+    GCTX_HIDSetUsingTouch(wk->touch);
 }
 
 static void func_ov165_0219cf70(PokeListWork *wk) {
     PokeListMenu_Close(wk, wk->menu);
     PokeListMessage_Close(wk, wk->message);
     if (PokeList_IsBattle(wk) == TRUE || func_ov165_0219da88(wk) == FALSE) {
-        func_0204c124(wk->exitButton, FALSE);
+        ClActor_SetVisible(wk->exitButton, FALSE);
     } else {
-        func_0204c124(wk->exitButton, TRUE);
+        ClActor_SetVisible(wk->exitButton, TRUE);
     }
     if (wk->menuItem != 4 && wk->menuItem != 5) {
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ, GX_PLANEMASK_BG3, 16, 10);
         wk->glowPaused = FALSE;
     }
     GFL_BGSysFillScrAsync(0, 0);
-    wk->touch = func_0203d554();
+    wk->touch = GCTX_HIDIsUsingTouch();
 }
-
-// The moves outside battle, by the index of their check in CheckAllowHidenEvent
-static const u16 sHidenMoves[] = {
-    MOVE_CUT, MOVE_SURF,        MOVE_WATERFALL, MOVE_STRENGTH, MOVE_FLY,        MOVE_FLASH,      MOVE_TELEPORT,
-    MOVE_DIG, MOVE_SWEET_SCENT, MOVE_CHATTER,   MOVE_DIVE,     MOVE_MILK_DRINK, MOVE_SOFTBOILED,
-};
 
 // Does what the menu item picked does
 static void PokeList_DoMenuItem(PokeListWork *wk) {
@@ -2189,7 +2199,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             wk->cursorPos = 6;
             if (wk->touch == FALSE) {
                 PokeListMenu_SetButtonActive(wk->buttons[(u8)(wk->cursorPos - 6)], TRUE);
-                func_0204c124(wk->cursor, FALSE);
+                ClActor_SetVisible(wk->cursor, FALSE);
             }
         } else if (wk->touch == FALSE) {
             func_ov165_0219cdd8(wk, wk->cursorPos);
@@ -2328,8 +2338,8 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                         func_ov165_0219cdd8(wk, wk->cursorPos);
                         func_ov165_0219ce34(wk, wk->cursorPos);
                         wk->selectPos2 = wk->cursorPos;
-                        wk->state = 4;
                         wk->pkm = NULL;
+                        wk->state = 4;
                         wk->showShortcutButtons = FALSE;
                         PokeListMessage_Open(wk, wk->message, 0);
                         PokeListMessage_Print(wk, wk->message, 0x11);
@@ -2353,7 +2363,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                     break;
                 case 3:
                     PokeListMessage_CreateWordSet(wk, wk->message);
-                    PokeListMessage_SetMoveName(wk, wk->message, 0, sHidenMoves[hiden - 11]);
+                    PokeListMessage_SetMoveName(wk, wk->message, 0, *(sHidenMoves + hiden - 11));
                     PokeList_ShowMessage(wk, 0xab, TRUE, PokeList_MessageDoneSelect);
                     PokeListMessage_FreeWordSet(wk, wk->message);
                     break;
@@ -2379,7 +2389,7 @@ static void PokeList_WaitMessage(PokeListWork *wk) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             wk->touch = FALSE;
         }
-        if (func_0203da48() == TRUE) {
+        if (GFL_HIDIsTouchPressed() == TRUE) {
             wk->touch = TRUE;
         }
         wk->msgDoneFunc(wk);
@@ -2392,9 +2402,9 @@ void PokeList_ShowMessage(PokeListWork *wk, u32 msgId, BOOL waitInput, void (*do
     wk->msgDoneFunc = doneFunc;
     PokeListMessage_Open(wk, wk->message, 3);
     PokeListMessage_PrintStream(wk, wk->message, msgId, waitInput);
-    func_0204c124(wk->exitButton, FALSE);
-    func_0204c124(wk->shortcutButton, FALSE);
-    func_0204c124(wk->shortcutMark, FALSE);
+    ClActor_SetVisible(wk->exitButton, FALSE);
+    ClActor_SetVisible(wk->shortcutButton, FALSE);
+    ClActor_SetVisible(wk->shortcutMark, FALSE);
 }
 
 static void PokeList_UpdateSubMenu(PokeListWork *wk) {
@@ -2451,8 +2461,8 @@ static void PokeList_StartSwap(PokeListWork *wk) {
     wk->subState = 3;
     wk->unk108 = 0;
     GFL_SndSEPlay(SEQ_SE_SYS_02);
-    func_0204c124(wk->cursor, FALSE);
-    func_0204c124(wk->subCursor, FALSE);
+    ClActor_SetVisible(wk->cursor, FALSE);
+    ClActor_SetVisible(wk->subCursor, FALSE);
 }
 
 static void PokeList_EndSwap(PokeListWork *wk) {
@@ -2460,7 +2470,7 @@ static void PokeList_EndSwap(PokeListWork *wk) {
     wk->state = 2;
     func_ov165_0219cdd8(wk, wk->cursorPos);
     PokeListPlate_SetSelected(wk, wk->plates[wk->selectPos], FALSE);
-    func_0204c124(wk->subCursor, FALSE);
+    ClActor_SetVisible(wk->subCursor, FALSE);
     wk->selectPos = 9;
     wk->param->index = wk->cursorPos;
     PokeList_ShowModeMessage(wk);
@@ -2599,14 +2609,14 @@ BOOL PokeList_CanEvolveWithItem(PokeListWork *wk, PartyPkm *pkm, u16 item) {
 void PokeList_PrintString(PokeListWork *wk, BmpWin *window, u16 msgId, u16 x, s16 y, u16 color) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->font, color);
     GFL_StrBufFree(str);
 }
 
 void PokeList_PrintStringSmall(PokeListWork *wk, BmpWin *window, u32 msgId, int x, s16 y, u16 color) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->smallFont, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, str, wk->smallFont, color);
     GFL_StrBufFree(str);
 }
 
@@ -2624,7 +2634,7 @@ void PokeList_PrintWordSetString(PokeListWork *wk, BmpWin *window, WordSet *word
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wordSet, buf, str);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->font, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->font, color);
     GFL_StrBufFree(str);
     GFL_StrBufFree(buf);
 }
@@ -2635,7 +2645,7 @@ void PokeList_PrintWordSetStringSmall(PokeListWork *wk, BmpWin *window, WordSet 
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     GFL_WordSetFormatStrbuf(wordSet, buf, str);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->smallFont, color);
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(window), x, y, buf, wk->smallFont, color);
     GFL_StrBufFree(str);
     GFL_StrBufFree(buf);
 }
@@ -2862,13 +2872,13 @@ static void PokeList_AskTakeMail(PokeListWork *wk) {
 static void PokeList_AnswerTakeMail(PokeListWork *wk, u32 item) {
     PokeListMessage_Close(wk, wk->message);
     if (item == 14) {
-        s32 slot = func_020097c4(wk->param->unk08, 0);
+        s32 slot = MailBox_GetFreeSlot(wk->param->unk08, 0);
 
         if (slot >= 0) {
             MailData *mail = CreateMailData(wk->heapId);
 
             PokeParty_GetParam(wk->pkm, PKM_PARAM_MAIL, mail);
-            func_020097e0(wk->param->unk08, 0, slot, mail);
+            MailBox_SetMail(wk->param->unk08, 0, slot, mail);
             GFL_HeapFree(mail);
             PokeParty_SetParam(wk->pkm, PKM_PARAM_ITEM, 0);
             PokeListPlate_Redraw(wk, wk->plates[wk->cursorPos]);

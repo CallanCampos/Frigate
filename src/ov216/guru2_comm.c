@@ -77,18 +77,18 @@ void Guru2Comm_Free(Guru2CommWork *g2c) {
 }
 
 void Guru2Comm_AddCommands(Guru2CommWork *g2c) {
-    func_02040c20(GURU2_NET_CMD_BASE, sGuru2Commands, GURU2_NET_CMD_COUNT, g2c);
+    NetCommand_AddTable(GURU2_NET_CMD_BASE, sGuru2Commands, GURU2_NET_CMD_COUNT, g2c);
 }
 
 void Guru2Comm_End(Guru2CommWork *g2c) {
 }
 
 static BOOL Guru2Comm_SendData(Guru2CommWork *g2c, u32 command, const void *data, u32 size) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     Guru2CommSendBuffer *send = &g2c->send;
 
     MI_CpuCopy8(data, send->data, size);
-    return func_02042be8(handle, (u16)command, size + 4, send->data);
+    return GFL_NetSendCommand(handle, (u16)command, size + 4, send->data);
 }
 
 BOOL Guru2Comm_Send(Guru2CommWork *g2c, u32 command, const void *data, u32 size) {
@@ -105,7 +105,7 @@ static void Guru2Comm_RecvBlock(int netId, int size, const void *data, void *wor
 static void Guru2Comm_RecvStart(int netId, int size, const void *data, void *work, NetHandle *handle) {
     Guru2CommWork *g2c = work;
 
-    if (func_0203ffc4() != 0) {
+    if (NetSystem_GetNetId() != 0) {
         g2c->startCount = 0;
         g2c->started = TRUE;
         Guru2Receipt_SetSeq(g2c->g2p->g2r, GURU2_RECEIPT_SEQ_START, netId);
@@ -118,7 +118,7 @@ static void Guru2Comm_RecvSignal(int netId, int size, const void *data, void *wo
 
     if (netId != 0) {
         // A member's signal reaches the parent, which answers it
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             Guru2CommSignal answer = *signal;
 
             answer.netId = netId;
@@ -143,7 +143,7 @@ static void Guru2Comm_RecvSignal(int netId, int size, const void *data, void *wo
         case GURU2_SIGNAL_LEAVE_REQUEST: {
             u8 id = signal->netId;
 
-            if (id == func_0203ffc4()) {
+            if (id == NetSystem_GetNetId()) {
                 if (!signal->ok) {
                     Guru2Receipt_SetSeq(g2c->g2p->g2r, GURU2_RECEIPT_SEQ_CANCEL_REFUSED, id);
                 } else {
@@ -163,13 +163,13 @@ static void Guru2Comm_RecvSignal(int netId, int size, const void *data, void *wo
 static void Guru2Comm_RecvCancel(int netId, int size, const void *data, void *work, NetHandle *handle) {
     Guru2CommWork *g2c = work;
 
-    if (func_0203ffc4() != 0) {
+    if (NetSystem_GetNetId() != 0) {
         Guru2Receipt_SetSeq(g2c->g2p->g2r, GURU2_RECEIPT_SEQ_PARENT_CANCEL_MSG, 0);
     }
 }
 
 static void Guru2Comm_Recv3(int netId, int size, const void *data, void *work, NetHandle *handle) {
-    func_0203ffc4();
+    NetSystem_GetNetId();
 }
 
 static void Guru2Comm_RecvJoin(int netId, int size, const void *data, void *work, NetHandle *handle) {
@@ -177,7 +177,7 @@ static void Guru2Comm_RecvJoin(int netId, int size, const void *data, void *work
     const u8 *id = data;
 
     Guru2Receipt_SetSeqOnJoin(g2c->g2p->g2r, GURU2_RECEIPT_SEQ_1, *id);
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         g2c->unk34 = 0;
     }
 }

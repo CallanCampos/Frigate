@@ -131,8 +131,8 @@ static GameEventReturnCode GimmickDT9_ReleaseEvent(GameEvent *event, u32 *state,
     Field *field = GSYS_GetField(GameEvent_GetGameSystem(event));
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(field);
     DT9GimmickWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
-    fx32 frame = func_ov036_021b8520(expObj, 0, MODEL_RELEASE, 0);
-    fx32 lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, MODEL_RELEASE, 0));
+    fx32 frame = FieldExpObj_GetAnmFrame(expObj, 0, MODEL_RELEASE, 0);
+    fx32 lastFrame = FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, MODEL_RELEASE, 0));
 
     if (frame >= 0 && work->played[0] == FALSE) {
         GFL_SndStop();
@@ -264,7 +264,7 @@ static GameEventReturnCode GimmickDT9_ThrowEvent(GameEvent *event, u32 *state, v
 
 static GameEventReturnCode GimmickDT9_PastFifthFrameEvent(GameEvent *event, u32 *state, void *data) {
     FieldExpObjSystem *expObj = Field_GetExpObjSystem(GSYS_GetField(GameEvent_GetGameSystem(event)));
-    fx32 frame = func_ov036_021b8520(expObj, 0, MODEL_THROWN, 0);
+    fx32 frame = FieldExpObj_GetAnmFrame(expObj, 0, MODEL_THROWN, 0);
 
     if (frame >= FX32_CONST(5)) {
         return GAMEEVENT_DONE;

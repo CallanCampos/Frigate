@@ -1,0 +1,25 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Saber",
+    "class": "TRAINER_CLASS_HIKER",
+    "pokemon": [
+        "roggenrola_2",
+        "mienfoo_2",
+        "sandile_2",
+        "golett_2",
+        "timburr_2",
+        "dwebble_2",
+        "drilbur_2",
+        "scraggy_2",
+        "krokorok_2",
+        "tirtouga_2",
+        "palpitoad_2",
+        "boldore_2",
+        "archen_2"
+    ],
+    "messages": [
+        "I am no mere Hiker.\nCall me an alpinist.",
+        "A mountain maniac like me\nis properly called an alpinist.",
+        "A specialist in mountainous matters.\nThat is an alpinist."
+    ]
+}

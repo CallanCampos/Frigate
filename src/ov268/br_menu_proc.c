@@ -121,7 +121,7 @@ static BOOL BrMenu_ProcMain(GameProc *proc, u32 *state, void *param, void *work)
             u32 x;
             u32 y;
 
-            if (func_0203dac8(&x, &y) && (x < 8 || x > 248)) {
+            if (GFL_HIDGetTouchPressedPoint(&x, &y) && (x < 8 || x > 248)) {
                 GFL_SndSEPlay(SEQ_SE_BREC_06);
                 *state = SEQ_COLOR_FADEOUT_START;
                 break;

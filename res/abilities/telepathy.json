@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Telepathy",
+    "description": "Anticipates an ally's\nattack and dodges it."
+}

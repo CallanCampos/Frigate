@@ -37,14 +37,14 @@ static const NetCommand sOekakiCommands[OEKAKI_NET_CMD_COUNT] = {
 };
 
 void OekakiComm_AddCommands(OekakiWork *wk) {
-    func_02040c20(OEKAKI_NET_CMD_BASE, sOekakiCommands, OEKAKI_NET_CMD_COUNT, wk);
+    NetCommand_AddTable(OEKAKI_NET_CMD_BASE, sOekakiCommands, OEKAKI_NET_CMD_COUNT, wk);
 }
 
 static void OekakiComm_RecvPicture(int netId, int size, const void *data, void *work, NetHandle *handle) {
     const OekakiPictureChunk *chunk = data;
     OekakiWork *wk = work;
 
-    if (func_0203ffc4() != 0) {
+    if (NetSystem_GetNetId() != 0) {
         // A child puts the chunk into its picture
         if (chunk->index * OEKAKI_CHUNK_SIZE > OEKAKI_PICTURE_SIZE) {
             MIi_CpuCopyFast(chunk, wk->picture + chunk->index * OEKAKI_CHUNK_SIZE, 400);
@@ -100,7 +100,7 @@ static void OekakiComm_RecvSignal(int netId, int size, const void *data, void *w
 
     if (netId != 0) {
         // A member's signal reaches the parent, which answers it
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             wk->signal.netId = signal->netId;
             wk->signal.count = signal->count;
             wk->signal.type = signal->type;
@@ -127,7 +127,7 @@ static void OekakiComm_RecvSignal(int netId, int size, const void *data, void *w
         case OEKAKI_SIGNAL_LEAVE_REQUEST: {
             u8 id = signal->netId;
 
-            if (id == func_0203ffc4()) {
+            if (id == NetSystem_GetNetId()) {
                 if (!signal->ok) {
                     Oekaki_SetStatus(wk, OEKAKI_SEQ_END_REFUSED, id);
                 } else {
@@ -150,7 +150,7 @@ static void OekakiComm_RecvSignal(int netId, int size, const void *data, void *w
 static void OekakiComm_RecvLeaving(int netId, int size, const void *data, void *work, NetHandle *handle) {
     OekakiWork *wk = work;
 
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         wk->leavingBits |= 1 << netId;
     }
 }
@@ -162,7 +162,7 @@ static void OekakiComm_RecvNewcomer(int netId, int size, const void *data, void 
     if (!wk->parentEnded) {
         Oekaki_SetStatus(wk, OEKAKI_SEQ_NEWCOMER, *id);
         // The parent starts sending the picture
-        if (func_0203ffc4() == 0 && wk->procSeq == OEKAKI_PROC_SEQ_MAIN) {
+        if (NetSystem_GetNetId() == 0 && wk->procSeq == OEKAKI_PROC_SEQ_MAIN) {
             wk->sendChunk = 0;
             OekakiComm_SendPicture(wk, 0, handle);
         }
@@ -173,7 +173,7 @@ static void OekakiComm_RecvParentEnd(int netId, int size, const void *data, void
     OekakiWork *wk = work;
 
     wk->parentEnded = TRUE;
-    if (func_0203ffc4() != 0) {
+    if (NetSystem_GetNetId() != 0) {
         Oekaki_SetStatus(wk, OEKAKI_SEQ_PARENT_END_MSG, 0);
     }
 }
@@ -195,8 +195,8 @@ static void OekakiComm_SendPicture(OekakiWork *wk, int index, NetHandle *handle)
     wk->sendChunkData.checksum = checksum;
     wk->sendChunkData.index = index;
     joined = UnionApp_GetJoined(wk->param->app);
-    func_02040f84(func_02040414(GFL_NET_NETID_SERVER), joined, OEKAKI_NET_CMD_PICTURE, sizeof(OekakiPictureChunk),
-                  &wk->sendChunkData);
+    NetCommand_SendHuge(NetHandle_Get(GFL_NET_NETID_SERVER), joined, OEKAKI_NET_CMD_PICTURE, sizeof(OekakiPictureChunk),
+                        &wk->sendChunkData);
 }
 
 static void *OekakiComm_GetPictureRecvBuffer(int netId, void *work, int size) {

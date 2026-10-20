@@ -82,7 +82,7 @@ static BOOL SubwayMap_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->param = param;
     wk->graphic = SubwayMapGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(1, 1);
     GFL_BGSysSetBGPriority(2, 0);
     wk->vblankTask = GFL_VBlankTCBAdd(SubwayMap_VBlank, wk, 1);
@@ -111,7 +111,7 @@ static BOOL SubwayMap_Init(GameProc *proc, u32 *state, void *param, void *work) 
     GFL_ArcToolFree(arc);
     GFL_BGSysLoadScr(BG_SUB_MAP);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, 0);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     return TRUE;
 }
 
@@ -126,8 +126,8 @@ static BOOL SubwayMap_Exit(GameProc *proc, u32 *state, void *param, void *work) 
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     SubwayMap_Unused(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     SubwayMapGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -153,11 +153,11 @@ static BOOL SubwayMap_Main(GameProc *proc, u32 *state, void *param, void *work) 
     case STEP_WAIT_INPUT:
         done = FALSE;
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             done = TRUE;
-        } else if (func_0203dac8(&x, &y)) {
+        } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             done = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (done) {
             *state = STEP_WAIT_FADE_OUT;
@@ -172,7 +172,7 @@ static BOOL SubwayMap_Main(GameProc *proc, u32 *state, void *param, void *work) 
     case STEP_END:
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     SubwayMapGraphic_Update(wk->graphic);
     return FALSE;
 }

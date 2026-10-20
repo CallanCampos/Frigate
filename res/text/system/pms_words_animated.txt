@@ -1,0 +1,10 @@
+PmsWordsAnimated_Text_GoodDay = 絵_GOOD DAY!
+PmsWordsAnimated_Text_Hello = 絵_HELLO!
+PmsWordsAnimated_Text_Love = 絵_I LOVE IT!
+PmsWordsAnimated_Text_GoodLuck = 絵_GOOD LUCK!
+PmsWordsAnimated_Text_ItsFun = 絵_IT'S FUN!
+PmsWordsAnimated_Text_Happy = 絵_HAPPY!
+PmsWordsAnimated_Text_Thank = 絵_THANK YOU!
+PmsWordsAnimated_Text_Super = 絵_SUPER! ♪
+PmsWordsAnimated_Text_Sorry = 絵_SORRY...
+PmsWordsAnimated_Text_ByeBye = 絵_BYE-BYE!

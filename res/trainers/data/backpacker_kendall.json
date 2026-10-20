@@ -1,0 +1,36 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kendall",
+    "class": "TRAINER_CLASS_BACKPACKER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 6,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HERDIER",
+            "form": 0,
+            "level": 18,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_TACKLE", "MOVE_BITE", "MOVE_ODOR_SLEUTH", "MOVE_WORK_UP" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It's “The Waving Weaving Walk\"--\nWawalk for short!{be01}\nI wonder what kind of Pokémon\nwe'll meet today?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your Pokémon have good Abilities,\ndon't they?"
+        },
+        {
+            "type": 2,
+            "text": "I totally loved the Wawalk TV show, but\nthey took it off the air."
+        }
+    ]
+}

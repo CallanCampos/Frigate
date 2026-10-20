@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ABOMASNOW",
+    "moves": [ "MOVE_BLIZZARD", "MOVE_LEECH_SEED", "MOVE_PROTECT", "MOVE_SHEER_COLD" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_FOCUS_SASH",
+    "form": 0
+}

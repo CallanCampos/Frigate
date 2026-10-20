@@ -230,11 +230,11 @@ static void DigitalCardCheck_TaskCardType1(WifiBattleMatchTask *task, u32 *seq, 
         *seq = 14;
         break;
     case 14:
-        func_0201782c(check->param.gameData);
+        GameData_StartSave(check->param.gameData);
         *seq = 15;
         break;
     case 15:
-        result = func_02017850(check->param.gameData);
+        result = GameData_UpdateSave(check->param.gameData);
         if (result == 2) {
             *seq = 16;
         } else if (result == 3) {
@@ -366,11 +366,11 @@ static void DigitalCardCheck_TaskCardType2(WifiBattleMatchTask *task, u32 *seq, 
         *seq = 14;
         break;
     case 14:
-        func_0201782c(check->param.gameData);
+        GameData_StartSave(check->param.gameData);
         *seq = 15;
         break;
     case 15:
-        result = func_02017850(check->param.gameData);
+        result = GameData_UpdateSave(check->param.gameData);
         if (result == 2) {
             *seq = 16;
         } else if (result == 3) {
@@ -620,7 +620,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
         MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
-        results = func_0200f2d0(record);
+        results = RecordSave_GetRndMatch(record);
         info.unkA0 = RndMatchData_GetParam(results, 10, 0);
         first = RndMatchData_GetParam(results, 10, 1);
         info.unkA4 = first + RndMatchData_GetParam(results, 10, 2);
@@ -639,10 +639,10 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
         MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
-        results = func_0200f2d8(record);
-        info.unkA0 = func_0200f1d8(results, 1);
-        info.unkA2 = func_0200f1d8(results, 2);
-        info.unkA4 = func_0200f1d8(results, 0);
+        results = RecordSave_GetLiveMatch(record);
+        info.unkA0 = LiveMatchData_GetCount(results, 1);
+        info.unkA2 = LiveMatchData_GetCount(results, 2);
+        info.unkA4 = LiveMatchData_GetCount(results, 0);
         info.unkA6 = Regulation_GetParam(regulation, 0x16);
         info.look = func_02008bf4(playerInfo);
         info.startDate = DigitalCardCheck_PackBytes(

@@ -49,5 +49,6 @@ src/ov143/monolith_mission_select.c:
     .data       start:0x021a0504 end:0x021a0560
 
 src/ov143/monolith_mission_info.c:
+    complete
     .text       start:0x0219f68c end:0x0219feb0
     .rodata     start:0x021a0380 end:0x021a045c

@@ -1,0 +1,176 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [],
+    "npcs": [
+        {
+            "id": 0,
+            "model": "OBJ_CODE_WORKER_44",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 3,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 12,
+                "z": 19,
+                "y": 0
+            }
+        },
+        {
+            "id": 1,
+            "model": "OBJ_CODE_355",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02f1",
+            "script": 2,
+            "direction": "DIR_LEFT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 10,
+                "z": 14,
+                "y": 0
+            }
+        },
+        {
+            "id": 2,
+            "model": "OBJ_CODE_291",
+            "movement": 0,
+            "type": 0,
+            "flag": "EVENT_FLAG_0x02f2",
+            "script": 2000,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 2,
+                "z": 14,
+                "y": 16384
+            }
+        },
+        {
+            "id": 3,
+            "model": "OBJ_CODE_ROUGHNECK",
+            "movement": 0,
+            "type": 0,
+            "flag": 0,
+            "script": 8,
+            "direction": "DIR_RIGHT",
+            "params": [ 0, 0, 0 ],
+            "area": {
+                "width": 0,
+                "height": 0
+            },
+            "grid": {
+                "x": 15,
+                "z": 14,
+                "y": 0
+            }
+        }
+    ],
+    "warps": [
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "warp": 14,
+            "unk4": 4,
+            "transition": 36,
+            "grid": {
+                "x": 24,
+                "y": 4,
+                "z": 152,
+                "width": 1,
+                "height": 3,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_CITY",
+            "warp": 1,
+            "unk4": 4,
+            "transition": 36,
+            "grid": {
+                "x": 24,
+                "y": 4,
+                "z": 200,
+                "width": 1,
+                "height": 8,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_CASTELIA_SEWERS",
+            "warp": 0,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 296,
+                "y": 65520,
+                "z": 280,
+                "width": 1,
+                "height": 2,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "script": 6,
+            "var": "EVENT_WORK_0x40b2",
+            "value": 3,
+            "type": 0,
+            "grid": {
+                "x": 9,
+                "z": 19,
+                "width": 3,
+                "height": 1,
+                "y": 0
+            },
+            "unk14": 0
+        },
+        {
+            "script": 7,
+            "var": "EVENT_WORK_0x40b2",
+            "value": 3,
+            "type": 0,
+            "grid": {
+                "x": 4,
+                "z": 9,
+                "width": 1,
+                "height": 10,
+                "y": 0
+            },
+            "unk14": 0
+        }
+    ],
+    "init_scripts": [
+        {
+            "type": 2,
+            "script": 4
+        },
+        {
+            "type": 4,
+            "script": 5
+        },
+        {
+            "type": 1,
+            "conditions": [
+                {
+                    "var": "EVENT_WORK_0x40b2",
+                    "value": 1,
+                    "script": 1
+                }
+            ]
+        }
+    ]
+}

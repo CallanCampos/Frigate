@@ -90,7 +90,7 @@ static void ZknListMain_VBlankTask(TCB *tcb, void *data) {
     ZknListWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
@@ -334,9 +334,10 @@ void ZknListMain_LoadGraphics(void) {
 
     // The touch bar, at the bottom of BG 1
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_LIST);
-    GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), 1, 0, FALSE, HEAPID_ZUKAN_LIST);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20, HEAPID_ZUKAN_LIST);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 1, 0, 0, FALSE, HEAPID_ZUKAN_LIST);
+    GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), 1, 0, FALSE, HEAPID_ZUKAN_LIST);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20,
+                                HEAPID_ZUKAN_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE, HEAPID_ZUKAN_LIST);
     GFL_BGSysSetScrPaletteNo(1, 0, TOUCHBAR_Y, 32, TOUCHBAR_HEIGHT, 14);
     GFL_BGSysQueueScrLoad(1);
     GFL_ArcToolFree(arc);
@@ -394,13 +395,13 @@ void ZknListMain_InitMsg(ZknListWork *wk) {
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_GAME_START_3, HEAPID_ZUKAN_LIST);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_ZUKAN_LIST);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_LIST);
-    wk->printQueue = func_02021998(HEAPID_ZUKAN_LIST);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_LIST);
     wk->strbuf = GFL_StrBufCreate(0x80, HEAPID_ZUKAN_LIST);
 }
 
 void ZknListMain_ExitMsg(ZknListWork *wk) {
     GFL_StrBufFree(wk->strbuf);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->font);
     GFL_MsgDataFree(wk->msgData);
@@ -452,7 +453,7 @@ BOOL ZknListMain_UpdateFrameMove(ZknListWork *wk) {
 
 void ZknListMain_InitList(ZknListWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    u16 last = func_0200d214(wk->param->pokedex);
+    u16 last = PokeDex_GetLastSpecies(wk->param->pokedex);
     FrameListSetup setup = sZknListSetup;
     unsigned long i;
 

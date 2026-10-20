@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Klutz",
-    "description": "The Pokémon can't use\nany held items."
-}

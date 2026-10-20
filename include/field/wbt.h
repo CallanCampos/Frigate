@@ -249,78 +249,78 @@ typedef struct {
 // wbt_system.c
 WbtSystem *WbtSystem_Create(HeapID heapId, BOOL a1);
 void WbtSystem_Free(WbtSystem *sys);
-void func_ov055_021e5ca0(WbtSystem *sys, u32 tournament);
-u32 func_ov055_021e5ca4(WbtSystem *sys);
-void func_ov055_021e5ca8(WbtSystem *sys, u32 style);
-u32 func_ov055_021e5cac(WbtSystem *sys);
-void func_ov055_021e5cb0(WbtSystem *sys, u8 type);
-u8 func_ov055_021e5cb4(WbtSystem *sys);
-void func_ov055_021e5cb8(WbtSystem *sys, u32 value);
-u32 func_ov055_021e5cbc(WbtSystem *sys);
-void func_ov055_021e5cc0(WbtSystem *sys, u32 round);
-u32 func_ov055_021e5cc4(WbtSystem *sys);
-u64 func_ov055_021e5cc8(WbtSystem *sys);
-void func_ov055_021e5cd0(WbtSystem *sys, u8 value);
-u8 func_ov055_021e5cd4(WbtSystem *sys);
-void func_ov055_021e5cd8(WbtSystem *sys, u16 *var);
-u16 *func_ov055_021e5ce4(WbtSystem *sys);
-void func_ov055_021e5cf0(WbtSystem *sys, u8 value);
-void func_ov055_021e5cfc(WbtSystem *sys, void *value);
-void *func_ov055_021e5d08(WbtSystem *sys);
-void func_ov055_021e5d14(WbtSystem *sys, u32 value);
-WbtEntrant *func_ov055_021e5d20(WbtSystem *sys, u32 index);
-WbtEntrant *func_ov055_021e5d28(WbtSystem *sys);
-void func_ov055_021e5d44(WbtSystem *sys, u32 tournament, StrBuf *strbuf);
-PokeParty *func_ov055_021e5d68(WbtSystem *sys);
-PokeParty *func_ov055_021e5d74(WbtSystem *sys);
+void WbtSystem_SetTournament(WbtSystem *sys, u32 tournament);
+u32 WbtSystem_GetTournament(WbtSystem *sys);
+void WbtSystem_SetStyle(WbtSystem *sys, u32 style);
+u32 WbtSystem_GetStyle(WbtSystem *sys);
+void WbtSystem_SetType(WbtSystem *sys, u8 type);
+u8 WbtSystem_GetType(WbtSystem *sys);
+void WbtSystem_SetCategory(WbtSystem *sys, u32 value);
+u32 WbtSystem_GetCategory(WbtSystem *sys);
+void WbtSystem_SetRound(WbtSystem *sys, u32 round);
+u32 WbtSystem_GetRound(WbtSystem *sys);
+u64 WbtSystem_GetSeed(WbtSystem *sys);
+void WbtSystem_SetDownloadSlot(WbtSystem *sys, u8 value);
+u8 WbtSystem_GetDownloadSlot(WbtSystem *sys);
+void WbtSystem_SetResultVar(WbtSystem *sys, u16 *var);
+u16 *WbtSystem_GetResultVar(WbtSystem *sys);
+void WbtSystem_SetUseBattleBox(WbtSystem *sys, u8 value);
+void WbtSystem_SetPartyList(WbtSystem *sys, void *value);
+void *WbtSystem_GetPartyList(WbtSystem *sys);
+void WbtSystem_SetRentalMode(WbtSystem *sys, u32 value);
+WbtEntrant *WbtSystem_GetEntrant(WbtSystem *sys, u32 index);
+WbtEntrant *WbtSystem_GetPlayerEntrant(WbtSystem *sys);
+void WbtSystem_LoadTournamentName(WbtSystem *sys, u32 tournament, StrBuf *strbuf);
+PokeParty *WbtSystem_GetPlayerParty(WbtSystem *sys);
+PokeParty *WbtSystem_GetOpponentParty(WbtSystem *sys);
 // The number of Pokémon each Trainer enters with, by the battle style
-u32 func_ov055_021e5d7c(WbtSystem *sys);
-u32 func_ov055_021e5e10(WbtEntrant *entrant);
-u8 func_ov055_021e5e18(WbtEntrant *entrant);
-u32 func_ov055_021e5e20(WbtEntrant *entrant);
-u8 func_ov055_021e5e28(WbtEntrant *entrant);
-u16 func_ov055_021e5e2c(WbtEntrant *entrant);
-u32 func_ov055_021e5e34(WbtEntrant *entrant);
-void func_ov055_021e5e3c(const WbtEntrant *entrant, StrBuf *dest);
-u32 func_ov055_021e5e4c(WbtEntrant *entrant);
-void func_ov055_021e5e54(WbtSystem *sys, GameData *gameData);
-u8 func_ov055_021e5f38(WbtSystem *sys);
-Regulation *func_ov055_021e5f78(WbtSystem *sys);
+u32 WbtSystem_GetEntryCount(WbtSystem *sys);
+u32 WbtEntrant_GetRank(WbtEntrant *entrant);
+u8 WbtEntrant_GetIv(WbtEntrant *entrant);
+u32 WbtEntrant_GetDownloadedRound(WbtEntrant *entrant);
+u8 WbtEntrant_GetTrainerId(WbtEntrant *entrant);
+u16 WbtEntrant_GetTrainerClass(WbtEntrant *entrant);
+u32 WbtEntrant_GetKind(WbtEntrant *entrant);
+void WbtEntrant_GetName(const WbtEntrant *entrant, StrBuf *dest);
+u32 WbtEntrant_HasSpecialPokemon(WbtEntrant *entrant);
+void WbtSystem_SetPickedParty(WbtSystem *sys, GameData *gameData);
+u8 WbtSystem_GetRegulationId(WbtSystem *sys);
+Regulation *WbtSystem_GetRegulation(WbtSystem *sys);
 WbtUnk18A *func_ov055_021e6024(WbtSystem *sys);
-u32 func_ov055_021e607c(WbtSystem *sys);
-void func_ov055_021e62b0(WbtSystem *sys, MATHRandContext32 *rand);
+u32 WbtSystem_GetOpponentSeat(WbtSystem *sys);
+void WbtSystem_PlayFirstRounds(WbtSystem *sys, MATHRandContext32 *rand);
 
 // wbt_tool.c
 // Load a Trainer's name and Trainer class from message files 409 and 410
-void func_ov055_021e6388(HeapID heapId, u32 message, StrBuf *strbuf);
-void func_ov055_021e63b4(HeapID heapId, u32 message, StrBuf *strbuf);
-WbtTrainers *func_ov055_021e63e0(HeapID heapId);
-void func_ov055_021e6438(WbtTrainers *trainers);
-void func_ov055_021e6440(WbtTrainers *trainers, u32 index, WbtTrainer *dest);
-BOOL func_ov055_021e6458(WbtTrainers *trainers, u8 index);
-u16 func_ov055_021e6468(WbtTrainers *trainers, u8 index);
-int func_ov055_021e6470(WbtTrainers *trainers, u8 index);
+void WbtTool_LoadTrainerName(HeapID heapId, u32 message, StrBuf *strbuf);
+void WbtTool_LoadTrainerClassName(HeapID heapId, u32 message, StrBuf *strbuf);
+WbtTrainers *WbtTrainers_Load(HeapID heapId);
+void WbtTrainers_Free(WbtTrainers *trainers);
+void WbtTrainers_Get(WbtTrainers *trainers, u32 index, WbtTrainer *dest);
+BOOL WbtTrainers_IsValid(WbtTrainers *trainers, u8 index);
+u16 WbtTrainers_GetObjCode(WbtTrainers *trainers, u8 index);
+int WbtTrainers_GetRank(WbtTrainers *trainers, u8 index);
 // The battle styles: single, double, triple and rotation
-void func_ov055_021e6488(int style, StrBuf *strbuf);
-u8 func_ov055_021e64c0(int style);
-u32 func_ov055_021e64d4(int style);
-int func_ov055_021e64e8(int style);
+void WbtStyle_LoadName(int style, StrBuf *strbuf);
+u8 WbtStyle_GetPokemonCount(int style);
+u32 WbtStyle_GetBattleMode(int style);
+int WbtStyle_Clamp(int style);
 // The type that most of the party's Pokémon have, or a random one of those that tie
-u8 func_ov055_021e64f0(PokeParty *party, u64 seed);
+u8 WbtTool_GetPartyMainType(PokeParty *party, u64 seed);
 // Whether the tournament is open, by the wins that the save counts
-BOOL func_ov055_021e66dc(GameData *gameData, u32 tournament);
+BOOL WbtTournament_IsOpen(GameData *gameData, u32 tournament);
 // Whether winning the tournament would open another
-BOOL func_ov055_021e66fc(GameData *gameData, u32 won, u32 tournament);
+BOOL WbtTournament_WouldOpen(GameData *gameData, u32 won, u32 tournament);
 // The save's count of the tournament, where type is the Type Expert Tournament's
-u32 func_ov055_021e6750(u32 tournament, u32 type);
+u32 WbtTournament_GetRecord(u32 tournament, u32 type);
 // The tournament whose wins a count of the save counts
-u32 func_ov055_021e6760(int record);
-u32 func_ov055_021e6794(u32 tournament);
-BOOL func_ov055_021e67a0(u32 tournament, u32 value);
-u16 func_ov055_021e67b8(u32 tournament);
+u32 WbtTournament_FromRecord(int record);
+u32 WbtTournament_GetKind(u32 tournament);
+BOOL WbtTournament_IsInCategory(u32 tournament, u32 value);
+u16 WbtTournament_GetTrainerArc(u32 tournament);
 // The Battle Points for winning the tournament in the battle style
-u32 func_ov055_021e67cc(u32 tournament, int style);
-u8 func_ov055_021e67e4(u32 index);
+u32 WbtTournament_GetBattlePoints(u32 tournament, int style);
+u8 WbtTool_GetDownloadedTrainerClass(u32 index);
 
 // What wbt_setup.c fills in for overlay 326's screens
 typedef struct {
@@ -341,13 +341,13 @@ typedef struct {
 } WbtOv326Param2;
 
 // wbt_setup.c
-WbtSetup *func_ov055_021e67f4(HeapID heapId, GameSystem *gsys);
-void func_ov055_021e6870(WbtSetup *setup);
-void func_ov055_021e68a8(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup);
-WbtOv326Param *func_ov055_021e6a64(HeapID heapId, GameSystem *gsys, u16 *var);
-void func_ov055_021e6ac0(WbtOv326Param *param);
-WbtOv326Param2 *func_ov055_021e6ac8(HeapID heapId, GameSystem *gsys, u32 a2, u16 *var1, u16 *var2);
-void func_ov055_021e6afc(WbtOv326Param2 *param);
+WbtSetup *WbtSetup_Create(HeapID heapId, GameSystem *gsys);
+void WbtSetup_Free(WbtSetup *setup);
+void WbtSetup_Load(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup);
+WbtOv326Param *WbtSetup_CreateWinRecordParam(HeapID heapId, GameSystem *gsys, u16 *var);
+void WbtSetup_FreeWinRecordParam(WbtOv326Param *param);
+WbtOv326Param2 *WbtSetup_CreateDownloadParam(HeapID heapId, GameSystem *gsys, u32 a2, u16 *var1, u16 *var2);
+void WbtSetup_FreeDownloadParam(WbtOv326Param2 *param);
 
 // wbt_party.c
 // What a party picked from the Battle Subway's Pokémon may not repeat: the species, unless unk0 is set, the held
@@ -363,15 +363,15 @@ typedef struct {
     u16 *files;
 } WbtPartyFilter;
 
-WbtPartyFilter *func_ov055_021e6b58(HeapID heapId, u32 tournament);
-void func_ov055_021e6bdc(WbtPartyFilter *filter);
-void func_ov055_021e6bfc(WbtPartyFilter *filter, u16 item);
-void func_ov055_021e6c20(WbtPartyFilter *filter, u16 species);
-void func_ov055_021e6c44(WbtPartyFilter *filter, s16 file);
+WbtPartyFilter *WbtPartyFilter_Create(HeapID heapId, u32 tournament);
+void WbtPartyFilter_Free(WbtPartyFilter *filter);
+void WbtPartyFilter_AddItem(WbtPartyFilter *filter, u16 item);
+void WbtPartyFilter_AddSpecies(WbtPartyFilter *filter, u16 species);
+void WbtPartyFilter_AddFile(WbtPartyFilter *filter, s16 file);
 // Picks count of the files at random, as the filter allows, and adds them to the filter
-void func_ov055_021e6f34(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files, u32 arcId,
-                         u8 count, MATHRandContext32 *rand);
-void func_ov055_021e713c(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 placeName);
-void func_ov055_021e71ec(WbtSystem *sys);
+void WbtParty_PickFiles(u16 *dest, WbtPartyFilter *filter, HeapID heapId, u16 fileCount, const u16 *files, u32 arcId,
+                        u8 count, MATHRandContext32 *rand);
+void WbtParty_MakeRentalParty(WbtSystem *sys, u32 a1, PlayerInfo *playerInfo, u16 placeName);
+void WbtParty_MakeOpponentParty(WbtSystem *sys);
 
 #endif // POKEBW2_FIELD_WBT_H

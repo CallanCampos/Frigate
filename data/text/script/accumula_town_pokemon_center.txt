@@ -1,3 +1,0 @@
-AccumulaTownPokemonCenter_Text_ImLookingPcBoxes = I'm looking at my PC Boxes and\ngoing over my journey so far.{be01}\nYou know, remembering when I met this\nPokémon or where I caught that one.{be01}\n...Just mulling over things like that.{be01}\nMaybe I'll change my party Pokémon\nand go back to one of those places again.
-AccumulaTownPokemonCenter_Text_OhWowPokedexHey = Oh wow! A Pokédex!\nHey! How full is your Habitat List?
-\pad{1c}

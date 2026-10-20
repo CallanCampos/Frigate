@@ -4,6 +4,7 @@
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_map.h"
+#include "field/field_slope_slip.h"
 #include "gfl/sound.h"
 #include "system/game_event.h"
 
@@ -37,8 +38,6 @@ static const SlopeSlipTileConfig SLOPE_SLIP_TILES[4] = {
 const SlopeSlipTileConfig *GetSlopeSlipTileConfig(u32 tileClass);
 BOOL IsTileSlopeSlip_(u32 tileClass);
 GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, SlopeSlipWork *work);
-GameEvent *EventSlopeSlip_Create(GameEvent *parent, GameSystem *gsys, Field *field);
-BOOL IsTileSlopeSlip(u32 tileClass);
 u16 func_ov036_021c2394(SlopeSlipWork *work);
 u16 func_ov036_021c23a4(SlopeSlipWork *work);
 u16 func_ov036_021c23b4(SlopeSlipWork *work);
@@ -79,7 +78,7 @@ GameEventReturnCode func_ov036_021c22d4(GameEvent *event, u32 *state, SlopeSlipW
         break;
     case 1:
         func_ov036_021c23e8(work);
-        if (func_ov012_02166ecc(work->actor)) {
+        if (FldAct_CheckAcmdEnd(work->actor)) {
             func_ov036_021c2460(work);
             if (func_ov036_021c2474(work)) {
                 GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_35));

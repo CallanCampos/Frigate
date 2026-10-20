@@ -8,7 +8,7 @@
 
 void SystemInit(void);
 // Exits the application once the DSi asked for it and nothing blocks the reset
-void func_02005430(void);
+void Machine_ProcessExitRequest(void);
 // Does the VRAM transfers queued during the frame
 void SystemUpdateVBlank(void);
 // The game's CTRDG_Init, which replaces the SDK's weak one, is declared in nitro/ctrdg.h

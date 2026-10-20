@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_SPINDA",
+    "moves": [ "MOVE_THRASH", "MOVE_SUCKER_PUNCH", "MOVE_TEETER_DANCE", "MOVE_ASSIST" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": true,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_JOLLY",
+    "item": "ITEM_DARK_GEM",
+    "form": 0
+}

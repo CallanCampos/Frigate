@@ -14,9 +14,9 @@ void initKeyBlk(void) {
     setKeyBlkStarted(sKeyRemaps);
 }
 
-Config *func_0200898c(u32 heapId) {
+Config *Config_Create(u32 heapId) {
     Config *config = GFL_HeapAllocate(heapId, sizeof(Config), FALSE, "config.c", 77);
-    func_020089c0(config);
+    Config_Init(config);
     return config;
 }
 
@@ -25,7 +25,7 @@ void initConfig(const Config *config, Config *dest) {
 }
 
 // The original clears each option after the memset
-void func_020089c0(Config *config) {
+void Config_Init(Config *config) {
     MI_CpuFill8(config, 0, sizeof(Config));
     config->textSpeed = 1;
     config->soundFlags = 0;
@@ -36,11 +36,11 @@ void func_020089c0(Config *config) {
     config->cgearOn = 0;
 }
 
-u32 func_02008a14(const Config *config) {
+u32 Config_GetTextSpeed(const Config *config) {
     return config->textSpeed;
 }
 
-void func_02008a1c(Config *config, u32 value) {
+void Config_SetTextSpeed(Config *config, u32 value) {
     config->textSpeed = value;
 }
 
@@ -48,51 +48,51 @@ u32 getSoundFlags(const Config *config) {
     return config->soundFlags;
 }
 
-void func_02008a38(Config *config, u32 value) {
+void Config_SetSoundFlags(Config *config, u32 value) {
     config->soundFlags = value;
 }
 
-BOOL func_02008a4c(const Config *config) {
+BOOL Config_GetBattleScene(const Config *config) {
     return config->unk7;
 }
 
-void func_02008a54(Config *config, u32 value) {
+void Config_SetBattleScene(Config *config, u32 value) {
     config->unk7 = value;
 }
 
-BOOL func_02008a68(const Config *config) {
+BOOL Config_GetBattleStyle(const Config *config) {
     return config->unk6;
 }
 
-void func_02008a70(Config *config, u32 value) {
+void Config_SetBattleStyle(Config *config, u32 value) {
     config->unk6 = value;
 }
 
-u32 func_02008a84(const Config *config) {
+u32 Config_GetKanji(const Config *config) {
     return config->kanji;
 }
 
-void func_02008a8c(Config *config, u32 value) {
+void Config_SetKanji(Config *config, u32 value) {
     config->kanji = value;
     GFL_MsgDataSetDefaultLangID(config->kanji);
 }
 
-void func_02008ab4(const Config *config) {
+void Config_ApplyMsgLanguage(const Config *config) {
     GFL_MsgDataSetDefaultLangID(config->kanji);
 }
 
-u32 func_02008ac8(const Config *config) {
+u32 Config_GetSaveBeforeIR(const Config *config) {
     return config->unk9;
 }
 
-void func_02008ad0(Config *config, u32 value) {
+void Config_SetSaveBeforeIR(Config *config, u32 value) {
     config->unk9 = value;
 }
 
-u32 func_02008ae8(const Config *config) {
+u32 Config_GetCGearOn(const Config *config) {
     return config->cgearOn;
 }
 
-void func_02008af0(Config *config, u32 value) {
+void Config_SetCGearOn(Config *config, u32 value) {
     config->cgearOn = value;
 }

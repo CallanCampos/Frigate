@@ -1,7 +1,0 @@
-WhiteForest2_Text_HoHooWelcomeWhite = Ho! Hoo!\nWelcome to White Forest!{be01}\nIn White Forest, people live\nin harmony with nature and with Pokémon.{be01}\nPlease listen to the voice of the forest\nand of the White Treehollow.{be01}\nThey're saying “Bienvenue!"\nHo! Hoo! Hoo!
-WhiteForest2_Text_HoHooSeemsIf = Ho! Hoo!{be01}\nIt seems as if you have heard\nthe voice of the White Treehollow.{be01}\nBut you can't hear its true voice\nuntil you go to the deepest part.{be01}\nCome now, do your best!\nHo! Hoo! Hoo!
-WhiteForest2_Text_HoHooHooSeems = Ho! Hoo! Hoo!{be01}\nIt seems as if you have heard the\nvoice of the White Treehollow's heart.{be00}\nPlease let me hear it...{be01}\nNo, wait!\nThings like these shouldn't be{be00}\nheard from someone else!{be01}\nIf I want to hear the true voice,\nI should go to the deepest part{be00}\non my own.{be01}\nWell, I guess I'll just have to\ndo my best, then!{be01}\nHo! Hoo! Hoo!
-WhiteForest2_Text_WhenPeopleBuildToo = When people build too many\ntall buildings, the sky gets smaller,{be00}\nand you can't see the sun anymore!
-WhiteForest2_Text_WantKnowAboutHow = I want to know about how Pokémon\nfeel, so I live in nature with them.
-WhiteForest2_Text_IfKnowHowDelicious = If you know how delicious a meal of\nBerries can be, you don't have to worry{be00}\nabout wanting to eat this and that!
-\pad{78}

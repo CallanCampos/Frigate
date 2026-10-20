@@ -15,17 +15,17 @@ void GFL_SndBGMSetVolume(u16 trackMask, s32 volume);
 // not -1
 void GFL_SndBGMSetParams(u16 trackMask, s32 tempoRatio, s32 pitch, s32 pan);
 // The sound handle that plays the BGM
-NNSSndHandle *func_02005c94(void);
+NNSSndHandle *GFL_SndBGMGetHandle(void);
 // The sound heap, which sounds loaded for a while are loaded into above a saved level
-NNSSndHeapHandle func_02005ce4(void);
+NNSSndHeapHandle GFL_SndGetHeap(void);
 // The BGM about to play: the next one while the BGM changes with a fade, else the one playing
-u32 func_02005ca4(void);
+u32 GFL_SndBGMGetRequestedID(void);
 // Whether the sound thread is still loading the next BGM
 BOOL func_02005cbc(void);
 // Whether the card's data transfer interrupt is enabled
 BOOL GFL_IRQCartDataTransferIsEnabled(void);
 // Sets the output to stereo or mono
-void func_02005c80(BOOL stereo);
+void GFL_SndSetStereo(BOOL stereo);
 void GFL_SndUpdate(void);
 BOOL GFL_SndBGMIsFading(void);
 // The tick count of the BGM's sequence player
@@ -40,7 +40,7 @@ void GFL_SndBGMPlay(u32 bgm, u32 channelMask);
 // Plays a BGM on the BGM2 player, over the BGM's (swan's name says otherwise)
 void GFL_SndBGMStop(u32 bgm);
 // Changes the BGM, fading the one playing out and the next one in over the frames given, while a thread loads it
-void func_02005e08(u32 bgm, u16 channelMask, s32 fadeOutFrames, s32 fadeInFrames);
+void GFL_SndBGMRequestChange(u32 bgm, u16 channelMask, s32 fadeOutFrames, s32 fadeInFrames);
 void GFL_SndBGMPop(void);
 void GFL_SndBGMPush(void);
 void GFL_SndBGMSetPaused(BOOL paused);
@@ -49,7 +49,7 @@ void GFL_SndInit(void);
 // The player that plays a sequence
 s32 GFL_SndSeqGetPlayerIndex(u32 seq);
 // A sound player's handle
-NNSSndHandle *func_020061a8(s32 player);
+NNSSndHandle *GFL_SndPlayerGetHandle(s32 player);
 BOOL GFL_SndPlayerIsActive(s32 player);
 BOOL GFL_SndPlayerIsActiveAny(void);
 void GFL_SndPlayerStop(s32 player);
@@ -62,14 +62,14 @@ void GFL_SndSEPlay(u32 se);
 void GFL_SndSEPlayEx(u32 se, u32 volume);
 void GFL_SEPlayKeepVol(u32 se, s32 player);
 // Called once with start TRUE for a sequence, then each frame with FALSE until it returns TRUE
-BOOL func_02006424(u32 seq, u32 *step, BOOL start);
-void func_02005d8c(void);
+BOOL GFL_SndBGMLoadStep(u32 seq, u32 *step, BOOL start);
+void GFL_SndBGMStopImmediate(void);
 // Sound the musical's stage plays: names unknown
-BOOL func_020064b8(void *seqData, void *bankData, u32 seq);
+BOOL GFL_SndBGMSetLoadedData(void *seqData, void *bankData, u32 seq);
 // Points wave index of the loaded wave archive waveArc at wave srcIndex of srcWaveArc
 BOOL func_02006528(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex);
-void func_02006564(u16 seq);
-void func_02006574(void);
+void GFL_SndBGMStartSeq(u16 seq);
+void GFL_SndBGMStopSeq(void);
 void func_02006588(void);
 // Sets the callback that says whether a sequence may play while the sound thread is loading
 void GFL_SndSetSeqVerifyCallback(BOOL (*callback)(u32 seq));
@@ -80,25 +80,26 @@ BOOL GFL_SndIsVolumeControlCallbackSet(void);
 // Sets the players in playerMask to full volume when on, else silences them
 void GFL_SndPlayerSetMuteStateEx(BOOL on, u32 playerMask);
 // The BGM stack (snd_bgm_stack.c): the BGM player's handle and sequence at each level, with the sound heap's levels.
-// func_02005838 gives it the sound heap, func_020058e4 resets it for the BGM player. GFL_SndGetLastResID is the
-// sequence of the current level, or 0, and func_0200595c the level. func_02005980 loads a BGM's sequence, bank and
-// waves; func_020059d8 and func_020059fc record the heap's level after a thread loaded the sequence and bank, and the
-// waves of seq. func_02005a24 frees the current BGM's files. func_02005a5c pushes a level, freeing the waves of the
-// BGM below, and func_02005aa8 pops one, loading them again
-void func_02005838(NNSSndHeapHandle *heap);
-void func_020058e4(u16 player);
+// GFL_SndBGMStack_SetHeap gives it the sound heap, GFL_SndBGMStack_Init resets it for the BGM player.
+// GFL_SndGetLastResID is the sequence of the current level, or 0, and GFL_SndBGMStack_GetDepth the level.
+// GFL_SndBGMStack_LoadSeq loads a BGM's sequence, bank and waves; func_020059d8 and func_020059fc record the heap's
+// level after a thread loaded the sequence and bank, and the waves of seq. func_02005a24 frees the current BGM's files.
+// GFL_SndBGMStack_Push pushes a level, freeing the waves of the BGM below, and GFL_SndBGMStack_Pop pops one, loading
+// them again
+void GFL_SndBGMStack_SetHeap(NNSSndHeapHandle *heap);
+void GFL_SndBGMStack_Init(u16 player);
 u32 GFL_SndGetLastResID(void);
-s32 func_0200595c(void);
-NNSSndHandle *func_02005968(void);
-BOOL func_02005980(u32 seq);
+s32 GFL_SndBGMStack_GetDepth(void);
+NNSSndHandle *GFL_SndBGMStack_GetHandle(void);
+BOOL GFL_SndBGMStack_LoadSeq(u32 seq);
 void func_020059d8(void);
 BOOL func_020059fc(u32 seq);
 void func_02005a24(void);
-BOOL func_02005a5c(void);
-BOOL func_02005aa8(void);
+BOOL GFL_SndBGMStack_Push(void);
+BOOL GFL_SndBGMStack_Pop(void);
 // Loads sound sequences ahead of time, and frees them
-u32 func_02005af4(const u32 *seqs, u32 count);
-void func_02005b60(u32 handle);
+u32 GFL_SndBGMStack_Preload(const u32 *seqs, u32 count);
+void GFL_SndBGMStack_Unload(u32 handle);
 
 // A stream of music, which the title screen plays
 void GFL_SndStreamInit(HeapID heapId);
@@ -160,12 +161,12 @@ void PokeVoice_SetMasterVolume(u32 volume);
 // The microphone, which records Chatot's cry: set up, free, and record into a buffer, calling back when done
 void setupMic(HeapID heapId);
 void ampOffFreeBlocks(void);
-void func_02006e0c(u32 a0);
-BOOL func_02006e3c(void);
+void SndMic_AddCount(u32 a0);
+BOOL SndMic_IsOverLimit(void);
 // 0 once the recording has started
-u32 func_02006e80(void (*callback)(u32 result, u32 *done), u32 *done);
+u32 SndMic_StartRecording(void (*callback)(u32 result, u32 *done), u32 *done);
 // Saves the recording as the Chatot's
-void func_02006ec0(void *chatter);
+void SndMic_EncodeChatter(void *chatter);
 
 // The BGM info archive: which interactive sound subsystem each BGM uses (ISS_SUBSYSTEM_*), or 0 for none
 BGMInfo *BGMInfo_Create(HeapID heapId);

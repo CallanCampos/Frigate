@@ -222,10 +222,10 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         (*state)++;
         break;
     case 1:
-        if (!func_ov012_02166ecc(push->rock)) {
+        if (!FldAct_CheckAcmdEnd(push->rock)) {
             break;
         }
-        if (!func_ov012_02166ecc(push->player)) {
+        if (!FldAct_CheckAcmdEnd(push->player)) {
             break;
         }
         if (push->fillsHole == 0) {
@@ -239,8 +239,8 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         } else {
             push->height -= FX32_CONST(26);
         }
-        func_ov012_0216763c(push->rock, TRUE);
-        func_ov012_02167580(push->rock, FALSE);
+        FldAct_SetHeightCalcDisabled(push->rock, TRUE);
+        SetActorCollisionEnabled(push->rock, FALSE);
         GFL_SndSEPlay(1653);
         (*state)++;
         break;
@@ -264,7 +264,7 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         }
         break;
     case 3:
-        func_ov012_0216734c(push->rock, &push->offset);
+        FldAct_SetOuterDrawOffset(push->rock, &push->offset);
         push->offset.y = -push->offset.y;
         push->counter++;
         if (push->counter & 4) {
@@ -277,8 +277,8 @@ static GameEventReturnCode EventStrengthRockPush_Callback(GameEvent *event, u32 
         if (push->offset.y == 0) {
             CopyActorWPos(push->rock, &settlePos);
             SetActorWPosAll(push->rock, &settlePos, push->dir);
-            func_ov012_0216734c(push->rock, &push->offset);
-            func_ov012_021681b0(push->rock);
+            FldAct_SetOuterDrawOffset(push->rock, &push->offset);
+            SaveActorStrengthRockPosition(push->rock);
             (*state)++;
         }
         break;
@@ -369,10 +369,10 @@ static void FieldSurfTCB_Callback(TCB *tcb, void *work) {
         surf->state++;
         break;
     case 3:
-        if (!func_ov012_02166ecc(actor)) {
+        if (!FldAct_CheckAcmdEnd(actor)) {
             break;
         }
-        func_ov012_02166ef8(actor);
+        FldAct_EndAcmd(actor);
         func_ov036_021a4504((FieldEffectTask *)func_ov036_0219a5c4(surf->player), 1);
         FieldPlayer_SetSpecialSeq(surf->player, 4);
         surf->state++;
@@ -428,7 +428,7 @@ static void func_ov036_021bae58(FieldActor *actor, const VecFx32 *shake) {
 
     offset.y += FX32_CONST(1);
     offset.z += FX32_CONST(5);
-    func_ov012_0216734c(actor, &offset);
+    FldAct_SetOuterDrawOffset(actor, &offset);
 }
 
 static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
@@ -443,7 +443,7 @@ static BOOL func_ov036_021bae8c(WaterfallTCB *waterfall) {
     u32 kind;
     u32 effectId;
 
-    func_ov012_0216763c(actor, TRUE);
+    FldAct_SetHeightCalcDisabled(actor, TRUE);
     CopyActorWPos(actor, &pos);
     posA = pos;
     posB = posA;
@@ -569,7 +569,7 @@ static BOOL func_ov036_021bb190(WaterfallTCB *waterfall) {
     FieldActor *actor = FieldPlayer_GetActor(waterfall->player);
     FieldEffectTask *task;
 
-    func_ov012_0216763c(actor, FALSE);
+    FldAct_SetHeightCalcDisabled(actor, FALSE);
     SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
     task = (FieldEffectTask *)func_ov036_0219a5c4(waterfall->player);
     func_ov036_021a4504(task, 1);
@@ -609,7 +609,7 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
     switch (waterfall->state) {
     case 0:
         one = TRUE;
-        func_ov012_0216763c(actor, TRUE);
+        FldAct_SetHeightCalcDisabled(actor, TRUE);
         CopyActorWPos(actor, &startPos);
         posA = startPos;
         posB = posA;
@@ -685,7 +685,7 @@ static void func_ov036_021bb220(WaterfallTCB *waterfall) {
         waterfall->counter++;
         if (waterfall->counter >= 16) {
             effects = Field_GetFieldEffects(waterfall->field);
-            func_ov012_0216763c(actor, FALSE);
+            FldAct_SetHeightCalcDisabled(actor, FALSE);
             SetActorWPosAll(actor, &waterfall->dest, waterfall->dir);
             func_ov036_021a3a70(waterfall->splash);
             FieldEffects_FreeEffect(effects, 8);

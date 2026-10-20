@@ -102,7 +102,7 @@ PMSSelectGraphic *PMSSelectGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     PMSSelectGraphic_BGInit(&graphic->bg, heapId);
     PMSSelectGraphic_ClActInit(&graphic->clact, &sPMSSelectVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(PMSSelectGraphic_VBlank, graphic, 0);
@@ -113,7 +113,7 @@ void PMSSelectGraphic_Delete(PMSSelectGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     PMSSelectGraphic_ClActExit(&graphic->clact);
     PMSSelectGraphic_BGExit(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -173,24 +173,24 @@ static void PMSSelectGraphic_BGVBlank(PMSSelectBG *bg) {
 static void PMSSelectGraphic_ClActInit(PMSSelectClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(PMSSelectClAct));
     ClActSys_Create(&sPMSSelectClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void PMSSelectGraphic_ClActExit(PMSSelectClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(PMSSelectClAct));
 }
 
 static void PMSSelectGraphic_ClActMain(PMSSelectClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void PMSSelectGraphic_ClActVBlank(PMSSelectClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *PMSSelectGraphic_ClActGetUnit(PMSSelectClAct *clact) {

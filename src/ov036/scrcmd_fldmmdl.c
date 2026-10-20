@@ -522,7 +522,7 @@ BOOL s006B_ActorAdd(VM *vm, FieldScriptEnv *env) {
 
     if (count != 0) {
         EventWork *eventWork = GameData_GetEventWork(gameData);
-        FieldActor *actor = func_ov012_021668f8(mmSys, GetZoneNPCs(eventData), zoneId, count, eventWork, uid);
+        FieldActor *actor = SpawnZoneNPCByUID(mmSys, GetZoneNPCs(eventData), zoneId, count, eventWork, uid);
 
         if (actor != NULL) {
             DisableActorMovement(actor);
@@ -585,7 +585,7 @@ static BOOL WaitAndDisableEventMovement(VM *vm, void *data) {
     FieldActor *actor = FindScrEnvPlayerActor(env);
     MMSys *mmSys = GetScrEnvMMdlSys(env);
 
-    if ((g_ScrEventActorFlags & EVENT_ACTOR_PLAYER) && func_ov012_02166ecc(actor) == TRUE) {
+    if ((g_ScrEventActorFlags & EVENT_ACTOR_PLAYER) && FldAct_CheckAcmdEnd(actor) == TRUE) {
         DisableActorMovement(actor);
         g_ScrEventActorFlags &= ~EVENT_ACTOR_PLAYER;
     }
@@ -627,7 +627,7 @@ static BOOL DisableAllButEventActorsMovement(VM *vm, FieldScriptEnv *env) {
 
     g_ScrEventActorFlags = 0;
     DisableAllActorsMovement(mmSys);
-    if (func_ov012_02166ecc(player) == FALSE) {
+    if (FldAct_CheckAcmdEnd(player) == FALSE) {
         g_ScrEventActorFlags |= EVENT_ACTOR_PLAYER;
         EnableActorMovement(player);
     }
@@ -688,7 +688,7 @@ BOOL s0074_ActorSetEyeToEye(VM *vm, FieldScriptEnv *env) {
 
     if (actor != NULL) {
         CheckSetActorFaceDir(actor, dir);
-        func_ov012_021670f4(actor, 0);
+        FldAct_SetDrawStatus(actor, 0);
     }
     return FALSE;
 }

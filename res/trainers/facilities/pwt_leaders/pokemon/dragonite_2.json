@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_DRAGONITE",
+    "moves": [ "MOVE_TOXIC", "MOVE_THUNDER_WAVE", "MOVE_ROOST", "MOVE_ROCK_SLIDE" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_IMPISH",
+    "item": "ITEM_CUSTAP_BERRY",
+    "form": 0
+}

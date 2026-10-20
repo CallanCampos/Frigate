@@ -102,7 +102,7 @@ typedef struct {
 } BlActScene;
 
 BlActScene *BlActScene_Create(const BlActSceneSetup *setup, HeapID heapId);
-void func_0204e450(BlActScene *scene);
+void BlActScene_Delete(BlActScene *scene);
 void BlActScene_SetCustomNormal(BlActScene *scene, VecFx16 *normal);
 void BlActScene_SetScale(BlActScene *scene, const VecFx32 *scale);
 void BlActScene_SetColDiffuse(BlActScene *scene, const GXRgb *color);
@@ -114,50 +114,52 @@ void BlActScene_SetGeomOrigin(BlActScene *scene, u8 origin);
 void BlActScene_SetTexcoordOffset(BlActScene *scene, s16 s, s16 t);
 // The width and height of a texture of a BLACT size, its width's GX_TEXSIZE_S* in bits 4 to 6 and its height's in
 // bits 0 to 2
-void func_0204e4d0(int size, u16 *width, u16 *height);
+void BlAct_GetTexDimensions(int size, u16 *width, u16 *height);
 
 // Add a material of a texture resource, of one read from an archive, or of a texture already in VRAM, faceWidth by
 // faceHeight pixels a face, and return its index
 u32 BlActScene_AddMaterialNewTex(BlActScene *scene, void *texResource, u32 format, int size, u8 faceWidth,
                                  u8 faceHeight);
-u32 func_0204e614(BlActScene *scene, u32 arcId, u32 fileId, u32 format, int size, u8 faceWidth, u8 faceHeight);
+u32 BlActScene_AddMaterialArcTex(BlActScene *scene, u32 arcId, u32 fileId, u32 format, int size, u8 faceWidth,
+                                 u8 faceHeight);
 u32 BlActScene_AddMaterialExistTex(BlActScene *scene, NNSGfdTexKey texKey, NNSGfdPlttKey plttKey, u32 format, int size,
                                    u8 faceWidth, u8 faceHeight);
 // Free a material's texture image from main memory, once it is in VRAM
 void BlActScene_TrimMatTex(BlActScene *scene, u32 material);
 void BlActScene_FreeMaterial(BlActScene *scene, u32 material);
 // Free a material that has its own VRAM, if it has a texture, or always
-void func_0204e73c(BlActScene *scene, u32 material);
-void func_0204e77c(BlActScene *scene, u32 material);
-void func_0204e7b8(BlActScene *scene);
-void func_0204e7d8(BlActScene *scene, u32 material, u32 *texAddr);
-void func_0204e7e8(BlActScene *scene, u32 material, u32 *plttAddr);
-void func_0204e7f8(BlActScene *scene, u32 material, NNSGfdTexKey *texKey);
-void func_0204e808(BlActScene *scene, u32 material, NNSGfdTexKey texKey);
-void func_0204e820(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey);
+void BlActScene_FreeMaterialVramIfTex(BlActScene *scene, u32 material);
+void BlActScene_FreeMaterialVram(BlActScene *scene, u32 material);
+void BlActScene_FreeAllMaterials(BlActScene *scene);
+void BlActScene_GetMaterialTexAddr(BlActScene *scene, u32 material, u32 *texAddr);
+void BlActScene_GetMaterialPlttAddr(BlActScene *scene, u32 material, u32 *plttAddr);
+void BlActScene_GetMaterialTexKey(BlActScene *scene, u32 material, NNSGfdTexKey *texKey);
+void BlActScene_SetMaterialTexKey(BlActScene *scene, u32 material, NNSGfdTexKey texKey);
+void BlActScene_GetMaterialPlttKey(BlActScene *scene, u32 material, NNSGfdPlttKey *plttKey);
 // Where a face is in its material's texture, and how big it is
-void func_0204e830(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize, u8 byRow);
+void BlActScene_GetMaterialFaceLocation(BlActScene *scene, u32 material, int face, u32 *offset, u32 *faceSize,
+                                        u8 byRow);
 
 u32 BlActScene_AddNewActor(BlActScene *scene, u32 material, s16 scaleX, s16 scaleY, const VecFx32 *pos, u8 alpha,
                            u32 lights, u32 type);
 void BlActScene_ClearActorMaterial(BlActScene *scene, u32 actor);
-void func_0204e9f8(BlActScene *scene, u32 actor, u16 *material);
-void func_0204ea08(BlActScene *scene, u32 actor, const u16 *material);
+void BlActScene_GetActorMaterial(BlActScene *scene, u32 actor, u16 *material);
+void BlActScene_SetActorMaterial(BlActScene *scene, u32 actor, const u16 *material);
 void BlActScene_SetActorPos(BlActScene *scene, u32 actor, const VecFx32 *pos);
-void func_0204ea3c(BlActScene *scene, u32 actor, u16 *face);
-void func_0204ea4c(BlActScene *scene, u32 actor, const u16 *face);
-void func_0204ea5c(BlActScene *scene, u32 actor, const s16 *scaleX, const s16 *scaleY);
-void func_0204ea78(BlActScene *scene, u32 actor, const u8 *alpha);
-void func_0204ea98(BlActScene *scene, u32 actor, const u8 *polygonId);
-BOOL func_0204eab8(BlActScene *scene, u32 actor);
+void BlActScene_GetActorFace(BlActScene *scene, u32 actor, u16 *face);
+void BlActScene_SetActorFace(BlActScene *scene, u32 actor, const u16 *face);
+void BlActScene_SetActorScale(BlActScene *scene, u32 actor, const s16 *scaleX, const s16 *scaleY);
+void BlActScene_SetActorAlpha(BlActScene *scene, u32 actor, const u8 *alpha);
+void BlActScene_SetActorPolygonId(BlActScene *scene, u32 actor, const u8 *polygonId);
+BOOL BlActScene_IsActorVisible(BlActScene *scene, u32 actor);
 // Despite its name, shows the actor when hidden is TRUE
 void BlActScene_SetActorHidden(BlActScene *scene, u32 actor, const BOOL *hidden);
 void BlActScene_EnableActorLight(BlActScene *scene, u32 actor, u32 lights);
 void BlActScene_DisableActorLight(BlActScene *scene, u32 actor, u32 lights);
-BOOL func_0204eb48(BlActScene *scene, u32 actor);
-void func_0204eb58(BlActScene *scene, u32 actor, const BOOL *flip);
-void func_0204eb7c(BlActScene *scene, u32 actor, const BOOL *flip);
-void func_0204eba0(BlActScene *scene, u32 actor, const u16 *rotation);
+BOOL BlActScene_GetActorFlipS(BlActScene *scene, u32 actor);
+void BlActScene_SetActorFlipS(BlActScene *scene, u32 actor, const BOOL *flip);
+void BlActScene_SetActorFlipT(BlActScene *scene, u32 actor, const BOOL *flip);
+void BlActScene_SetActorRotation(BlActScene *scene, u32 actor, const u16 *rotation);
 void BlActScene_Draw(BlActScene *scene, G3DCamera *camera, G3DLight *lights);
 
 // The system over a scene: materials and actors allocated in runs, and actors that play animations of faces
@@ -253,28 +255,28 @@ void BlActSys_Free(BlActSys *sys);
 BlActScene *BlActSys_GetScene(BlActSys *sys);
 // Load materials or actors and return the first's index, or BLACT_NONE for actors that do not fit
 u16 BlActSys_ExecMatLoadRequests(BlActSys *sys, const BlActMatRequest *requests, u32 count);
-u16 func_0204f31c(BlActSys *sys, u16 material, void *texResource);
+u16 BlActSys_AddTexMat(BlActSys *sys, u32 material, void *texResource);
 void BlActSys_FreeMaterials(BlActSys *sys, u16 first, u32 count);
-void func_0204f3a0(BlActSys *sys, u32 texMat);
-u16 func_0204f3bc(BlActSys *sys, u32 texMat);
+void BlActSys_FreeTexMat(BlActSys *sys, u32 texMat);
+u16 BlActSys_GetTexMatMaterial(BlActSys *sys, u32 texMat);
 u16 BlActSys_ExecActorRequests(BlActSys *sys, u16 firstTexMat, const BlActActorRequest *requests, u32 count, u32 type);
 void BlActSys_DeleteActors(BlActSys *sys, u32 first, u32 count);
 void BlActSys_UpdateActors(BlActSys *sys);
 void BlActSys_Draw(BlActSys *sys, G3DCamera *camera, G3DLight *lights);
-void func_0204f664(BlActSys *sys, u32 actor, BOOL visible);
-BOOL func_0204f684(BlActSys *sys, u32 actor);
+void BlActSys_SetActorVisible(BlActSys *sys, u32 actor, BOOL visible);
+BOOL BlActSys_IsActorVisible(BlActSys *sys, u32 actor);
 void BlActSys_SetActorLight(BlActSys *sys, u32 actor, BOOL enable, u32 light);
-void func_0204f6c8(BlActSys *sys, u32 actor, BOOL animate);
-void func_0204f6d4(BlActSys *sys, u32 actor, const BlActAnimStep *const *anims, u16 animCount);
-void func_0204f6ec(BlActSys *sys, u32 actor, u16 anim);
-u16 func_0204f700(BlActSys *sys, u32 actor);
-void func_0204f70c(BlActSys *sys, u32 actor, u16 step);
-u16 func_0204f724(BlActSys *sys, u32 actor);
+void BlActSys_SetActorAnimating(BlActSys *sys, u32 actor, BOOL animate);
+void BlActSys_SetActorAnims(BlActSys *sys, u32 actor, const BlActAnimStep *const *anims, u16 animCount);
+void BlActSys_SetActorAnim(BlActSys *sys, u32 actor, u16 anim);
+u16 BlActSys_GetActorAnim(BlActSys *sys, u32 actor);
+void BlActSys_SetActorStep(BlActSys *sys, u32 actor, u16 step);
+u16 BlActSys_GetActorStep(BlActSys *sys, u32 actor);
 // Make the actor's material use another's palette
-void func_0204f730(BlActSys *sys, u32 actor, u32 texMat);
-u32 func_0204f750(BlActSys *sys, u32 actor);
+void BlActSys_ShareActorPltt(BlActSys *sys, u32 actor, u32 texMat);
+u32 BlActSys_GetSceneActor(BlActSys *sys, u32 actor);
 u16 BlActSys_GetMatByActor(BlActSys *sys, u32 actor);
 // The last command the actor's animation ran, and whether it was one
-BOOL func_0204f768(BlActSys *sys, u32 actor, u16 *cmd);
+BOOL BlActSys_GetActorLastCmd(BlActSys *sys, u32 actor, u16 *cmd);
 
 #endif // POKEBW2_GFL_BLACT_H

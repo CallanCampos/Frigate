@@ -13,6 +13,7 @@
 #include "battle/btlv_effect.h"
 #include "battle/btlv_gauge.h"
 #include "battle/btlv_mcss.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -1132,11 +1133,11 @@ static BOOL BtlvEffvm_CmdParticleLoad(VM *vm, void *env) {
 
     if (BtlvEffvm_FindOrAddParticleId(wk, fileId, &index) == TRUE) {
         work = GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), 0x4800, FALSE, "btlv_effvm.c", 1912);
-        resource = func_0204fdf8(6, fileId, HEAPID_TAIL(wk->heapId));
+        resource = Particle_ReadResource(6, fileId, HEAPID_TAIL(wk->heapId));
         if (work != NULL && resource != NULL) {
-            wk->particles[index] = func_0204f980(work, 0x4800, FALSE, 5, 6, 54, HEAPID_TAIL(wk->heapId));
+            wk->particles[index] = Particle_CreateSystemEx(work, 0x4800, FALSE, 5, 6, 54, HEAPID_TAIL(wk->heapId));
             if (wk->particles[index] != NULL) {
-                func_0204fef8(wk->particles[index], resource);
+                Particle_SetResourceNoUpload(wk->particles[index], resource);
                 vblank = GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), sizeof(BtlvEffvmParticleVBlankWork), FALSE,
                                           "btlv_effvm.c", 1922);
                 vblank->wk = wk;
@@ -1216,7 +1217,8 @@ static BOOL BtlvEffvm_CmdEmitterAddAt(VM *vm, void *env) {
     param->scaleScale = VM_Read32(vm);
     param->cameraScale = VM_Read32(vm);
     if (index != 16) {
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(param);
         }
     } else {
@@ -1265,8 +1267,8 @@ static BOOL BtlvEffvm_CmdEmitterAddOrtho(VM *vm, void *env) {
         projection.far = FX32_CONST(512);
         projection.ndcRangeOverride = FX32_ONE;
 
-        if (func_02050194(wk->particles[index]) == NULL) {
-            func_020500cc(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
+        if (Particle_GetCamera(wk->particles[index]) == NULL) {
+            Particle_SetCamera(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
         }
         BtlvEffvm_AddEmitters(wk, param, index, resourceId);
     }
@@ -1311,8 +1313,9 @@ static BOOL BtlvEffvm_CmdEmitterAddAll(VM *vm, void *env) {
             projection.far = FX32_CONST(512);
             projection.ndcRangeOverride = FX32_ONE;
 
-            if (func_02050194(wk->particles[index]) == NULL) {
-                func_020500cc(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
+            if (Particle_GetCamera(wk->particles[index]) == NULL) {
+                Particle_SetCamera(wk->particles[index], &projection, 0x2000, &pos, &up, &target,
+                                   HEAPID_TAIL(wk->heapId));
             }
             param->offsetMode = 2;
         }
@@ -1364,7 +1367,8 @@ static BOOL BtlvEffvm_CmdEmitterMove(VM *vm, void *env) {
         param->turns = 1;
     }
     if (index != 16) {
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(param);
         }
     } else {
@@ -1401,7 +1405,8 @@ static BOOL BtlvEffvm_CmdEmitterMoveFrom(VM *vm, void *env) {
         param->turns = 1;
     }
     if (index != 16) {
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(param);
         }
     } else {
@@ -1450,10 +1455,11 @@ static BOOL BtlvEffvm_CmdEmitterMoveOrtho(VM *vm, void *env) {
         projection.far = FX32_CONST(512);
         projection.ndcRangeOverride = FX32_ONE;
 
-        if (func_02050194(wk->particles[index]) == NULL) {
-            func_020500cc(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
+        if (Particle_GetCamera(wk->particles[index]) == NULL) {
+            Particle_SetCamera(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
         }
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(param);
         }
     } else {
@@ -1501,10 +1507,11 @@ static BOOL BtlvEffvm_CmdEmitterMoveFromOrtho(VM *vm, void *env) {
         projection.far = FX32_CONST(512);
         projection.ndcRangeOverride = FX32_ONE;
 
-        if (func_02050194(wk->particles[index]) == NULL) {
-            func_020500cc(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
+        if (Particle_GetCamera(wk->particles[index]) == NULL) {
+            Particle_SetCamera(wk->particles[index], &projection, 0x2000, &pos, &up, &target, HEAPID_TAIL(wk->heapId));
         }
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, param) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(param);
         }
     } else {
@@ -1869,8 +1876,8 @@ static BOOL BtlvEffvm_CmdLoadBg(VM *vm, void *env) {
     u32 fileId = VM_Read32(vm);
 
     GFL_BGSysSetBGPriority(3, 1);
-    GFL_BGSysLoadNCGRStatic(94, fileId + 1, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
-    loadBGScrToVramByNarcNoReserveNegAlign(94, fileId, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
+    GFL_BGSysLoadNCGRStatic(ARCID_BTLV_EFFVM_BG, fileId + 1, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
+    loadBGScrToVramByNarcNoReserveNegAlign(ARCID_BTLV_EFFVM_BG, fileId, 3, 0, 0, FALSE, HEAPID_TAIL(wk->heapId));
     PaletteFade_LoadNCLREx(BtlvEffect_GetPaletteFade(), 94, fileId + 2, HEAPID_TAIL(wk->heapId), 0, 0, 0x80, 0);
     wk->bgX = GFL_BGSysGetBGOffsetX(3);
     wk->bgY = GFL_BGSysGetBGOffsetY(3);
@@ -1919,7 +1926,7 @@ static BOOL BtlvEffvm_CmdBgPalAnim(VM *vm, void *env) {
 
     work->wk = wk;
     work->loops = loops;
-    data = GFL_ArcSysReadHeapNewLZ(231, fileId, FALSE, HEAPID_TAIL(wk->heapId));
+    data = GFL_ArcSysReadHeapNewLZ(ARCID_BTLV_EFFVM_PAL_ANIM, fileId, FALSE, HEAPID_TAIL(wk->heapId));
     work->fileId = fileId + 1;
     palettes = data;
     for (i = 0; *palettes != 0xff; i++) {
@@ -2097,8 +2104,6 @@ static BOOL BtlvEffvm_CmdClactDelete(VM *vm, void *env) {
     return wk->ret;
 }
 
-// NONMATCHING: the original keeps &positions in r6 from the prologue on and recomputes &offset at each use; this
-// keeps &offset in r6 and recomputes &positions, 2 bytes longer
 static BOOL BtlvEffvm_CmdGauge(VM *vm, void *env) {
     BtlvEffvm *wk = env;
     u32 mode = VM_Read32(vm);
@@ -2136,21 +2141,24 @@ static BOOL BtlvEffvm_CmdGauge(VM *vm, void *env) {
         case 0:
             for (i = 0; i < 8; i += 2) {
                 if (BtlvEffect_CheckExist(i)) {
-                    positions[count++] = i;
+                    positions[count] = i;
+                    count++;
                 }
             }
             break;
         case 1:
             for (i = 1; i < 8; i += 2) {
                 if (BtlvEffect_CheckExist(i)) {
-                    positions[count++] = i;
+                    positions[count] = i;
+                    count++;
                 }
             }
             break;
         case 2:
             for (i = 0; i < 8; i++) {
                 if (BtlvEffect_CheckExist(i)) {
-                    positions[count++] = i;
+                    positions[count] = i;
+                    count++;
                 }
             }
             break;
@@ -2165,16 +2173,14 @@ static BOOL BtlvEffvm_CmdGauge(VM *vm, void *env) {
         if (count != 0) {
             for (i = 0; i < count; i++) {
                 ClActorPos offset = { 0, 0 };
+                int *pos;
 
-                if (mode == 2) {
-                    offset.x = 128;
-                } else {
-                    offset.x = -16;
-                }
-                if (positions[i] & 1) {
+                offset.x = mode == 2 ? 128 : -16;
+                pos = &positions[i];
+                if (*pos & 1) {
                     offset.x *= -1;
                 }
-                BtlvGauge_SetPos(BtlvEffect_GetGauge(), positions[i], &offset);
+                BtlvGauge_SetPos(BtlvEffect_GetGauge(), *pos, &offset);
             }
         }
     }
@@ -2643,7 +2649,7 @@ static BOOL BtlvEffvm_CmdEnd(VM *vm, void *env) {
         BtlvScu *scu = BtlvEffect_GetScu();
 
         if (scu != NULL) {
-            func_ov167_021d0ff8(scu);
+            BtlvScu_RestoreBG3(scu);
         }
         GFL_BGSysSetBGPriority(3, 0);
         wk->bgMoved = FALSE;
@@ -2751,7 +2757,7 @@ static BOOL BtlvEffvm_WaitNative(VM *vm, void *env) {
     }
     if (wk->waitKind == 0 || wk->waitKind == 2) {
         for (i = 0; i < 16; i++) {
-            if (wk->particles[i] != NULL && func_020500a8(wk->particles[i])) {
+            if (wk->particles[i] != NULL && Particle_GetEmitterCount(wk->particles[i])) {
                 return FALSE;
             }
         }
@@ -3114,7 +3120,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
             case 9:
             case 13:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    positions[0] = (wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4024[wk->attacker];
@@ -3126,7 +3132,7 @@ static int BtlvEffvm_GetDefenderPositions(BtlvEffvm *wk, int code, int *position
                 break;
             case 11:
                 if (rule == 1) {
-                    positions[0] = (wk->attacker & 1) ? 0 : 1;
+                    positions[0] = (wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY;
                     count = 1;
                 } else if (wk->attacker != 4 && wk->attacker != 5) {
                     positions[0] = data_ov168_021f4044[wk->attacker];
@@ -3346,9 +3352,8 @@ static u32 BtlvEffvm_GetEmitterCount(BtlvEffvm *wk, int index) {
     return wk->emitterCounts[index];
 }
 
-// NONMATCHING: the swap of motion type 4 is scheduled differently (from.z spilled, stores interleaved)
 static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
-    BtlvEffvmEmitParam *param = func_02050188();
+    BtlvEffvmEmitParam *param = Particle_GetCallbackParam();
     BOOL flip = param->flip;
     VecFx32 from;
     VecFx32 to;
@@ -3504,8 +3509,8 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         wk->allocs[wk->allocCount] =
             GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), sizeof(BtlvEffvmEmitterMotionWork), FALSE, "btlv_effvm.c", 6693);
         work = wk->allocs[wk->allocCount];
-        func_0205035c(emitter, work);
-        func_02050354(emitter, BtlvEffvm_MoveEmitterArc);
+        ParticleEmitter_SetUserData(emitter, work);
+        ParticleEmitter_SetUpdateCallback(emitter, BtlvEffvm_MoveEmitterArc);
         wk->allocCount++;
         work->angle = 0;
         work->wait = 0;
@@ -3533,16 +3538,19 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
             work->height = param->motionHeight;
         }
         if (param->motionType == 4) {
-            fx32 x = from.x;
-            fx32 y = from.y;
-            fx32 z = from.z;
+            fx32 x;
+            fx32 y;
+            fx32 z;
 
+            x = from.x;
             from.x = to.x;
+            y = from.y;
             from.y = to.y;
+            z = from.z;
             from.z = to.z;
-            to.x += x;
-            to.y += y;
-            to.z += z;
+            to.x = x + from.x;
+            to.y = y + from.y;
+            to.z = z + from.z;
         }
         dir.x = to.x - from.x;
         dir.y = to.y - from.y;
@@ -3564,12 +3572,12 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         to.x -= from.x;
         to.y -= from.y;
         to.z -= from.z;
-        func_02050310(emitter, &to);
-        func_0205033c(emitter, &to);
+        ParticleEmitter_SetMagnetTarget(emitter, &to);
+        ParticleEmitter_SetConvergenceTarget(emitter, &to);
         flat.x = to.x;
         flat.y = 0;
         flat.z = to.z;
-        func_020501b8(emitter, &emitterAxis);
+        ParticleEmitter_GetAxis(emitter, &emitterAxis);
         vec.x = emitterAxis.x;
         vec.y = 0;
         vec.z = emitterAxis.z;
@@ -3591,53 +3599,54 @@ static void BtlvEffvm_InitEmitter(SPLEmitter *emitter) {
         emitterAxis.x = vec.x;
         emitterAxis.y = vec.y;
         emitterAxis.z = vec.z;
-        if (!((angle >= 0x2000 && angle <= 0x6000) || (angle >= 0xa000 && angle <= 0xe000))) {
+        if (angle < 0x2000 || (angle > 0x6000 && angle < 0xa000) || angle > 0xe000) {
             spinAxis = 0;
         }
-        func_02050328(emitter, &spinAxis);
-        func_02050230(emitter, &emitterAxis);
+        ParticleEmitter_SetSpinAxis(emitter, &spinAxis);
+        ParticleEmitter_SetAxis(emitter, &emitterAxis);
     }
     if ((param->offsetMode != 0 && (param->from & 1)) || param->offsetMode == 0 || param->offsetMode == 2 ||
         param->offsetMode == 3) {
-        fx32 radius = func_020501d0(emitter);
-        fx32 lifeTime = func_02050200(emitter) << FX32_SHIFT;
-        fx16 scale = func_020501f8(emitter);
-        fx32 length = func_020501d8(emitter);
+        fx32 radius = ParticleEmitter_GetRadius(emitter);
+        fx32 lifeTime = ParticleEmitter_GetParticleLifeTime(emitter) << FX32_SHIFT;
+        fx16 scale = ParticleEmitter_GetBaseScale(emitter);
+        fx32 length = ParticleEmitter_GetLength(emitter);
         fx16 amplifier;
 
         if (param->radiusScale != 0) {
-            func_020501d4(emitter, FX_Mul(radius, param->radiusScale));
-            func_020501dc(emitter, FX_Mul(length, param->radiusScale));
+            ParticleEmitter_SetRadius(emitter, FX_Mul(radius, param->radiusScale));
+            ParticleEmitter_SetLength(emitter, FX_Mul(length, param->radiusScale));
         }
         if (param->lifeTimeScale != 0) {
-            func_0205024c(emitter, FX_Mul(lifeTime, param->lifeTimeScale) >> FX32_SHIFT);
+            ParticleEmitter_SetParticleLifeTime(emitter, FX_Mul(lifeTime, param->lifeTimeScale) >> FX32_SHIFT);
         }
         if (param->scaleScale != 0) {
-            func_02050248(emitter, (fx16)FX_Mul(scale, param->scaleScale));
+            ParticleEmitter_SetBaseScale(emitter, (fx16)FX_Mul(scale, param->scaleScale));
         }
         if (param->cameraScale != 0) {
-            // func_02050198 and func_020501a8 take the emitter here, though gfl/particle.h types them for a system
-            func_02050198((ParticleSystem *)emitter, &cameraPos);
+            // Particle_GetCameraPos and Particle_SetCameraPos take the emitter here, though gfl/particle.h types them
+            // for a system
+            Particle_GetCameraPos((ParticleSystem *)emitter, &cameraPos);
             cameraPos.x = FX_MUL(cameraPos.x, param->cameraScale);
             cameraPos.y = FX_MUL(cameraPos.y, param->cameraScale);
             cameraPos.z = FX_MUL(cameraPos.z, param->cameraScale);
-            func_020501a8((ParticleSystem *)emitter, &cameraPos);
-            amplifier = func_020501e0(emitter);
-            func_020501e8(emitter, (fx16)FX_MUL(amplifier, param->cameraScale));
-            amplifier = func_020501ec(emitter);
-            func_020501f4(emitter, (fx16)FX_MUL(amplifier, param->cameraScale));
+            Particle_SetCameraPos((ParticleSystem *)emitter, &cameraPos);
+            amplifier = ParticleEmitter_GetInitVelPositionAmplifier(emitter);
+            ParticleEmitter_SetInitVelPositionAmplifier(emitter, (fx16)FX_MUL(amplifier, param->cameraScale));
+            amplifier = ParticleEmitter_GetInitVelAxisAmplifier(emitter);
+            ParticleEmitter_SetInitVelAxisAmplifier(emitter, (fx16)FX_MUL(amplifier, param->cameraScale));
         }
     }
     if (param->offsetMode == 3) {
-        func_02050208(emitter, &start);
+        ParticleEmitter_SetPosition(emitter, &start);
     } else {
-        func_02050208(emitter, &from);
+        ParticleEmitter_SetPosition(emitter, &from);
     }
     GFL_HeapFree(param);
 }
 
 static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
-    BtlvEffvmEmitterMotionWork *work = func_02050364(emitter);
+    BtlvEffvmEmitterMotionWork *work = ParticleEmitter_GetUserData(emitter);
     VecFx32 pos;
     u16 angle;
     u16 angle2;
@@ -3677,22 +3686,22 @@ static void BtlvEffvm_MoveEmitterArc(SPLEmitter *emitter, u32 type) {
         if (work->offsetMode != 0) {
             BtlvEffvm_ProjectToScreen(&pos, NULL);
         }
-        func_02050208(emitter, &pos);
+        ParticleEmitter_SetPosition(emitter, &pos);
     }
 }
 
 static void BtlvEffvm_InitCircleEmitter(SPLEmitter *emitter) {
-    BtlvEffvmEmitterCircleWork *work = func_02050188();
+    BtlvEffvmEmitterCircleWork *work = Particle_GetCallbackParam();
 
     if (work->ortho && work->center.z < 0) {
-        func_02050248(emitter, FX32_HALF);
+        ParticleEmitter_SetBaseScale(emitter, FX32_HALF);
     }
-    func_0205035c(emitter, work);
-    func_02050354(emitter, BtlvEffvm_MoveCircleEmitter);
+    ParticleEmitter_SetUserData(emitter, work);
+    ParticleEmitter_SetUpdateCallback(emitter, BtlvEffvm_MoveCircleEmitter);
 }
 
 static void BtlvEffvm_MoveCircleEmitter(SPLEmitter *emitter, u32 type) {
-    BtlvEffvmEmitterCircleWork *work = func_02050364(emitter);
+    BtlvEffvmEmitterCircleWork *work = ParticleEmitter_GetUserData(emitter);
     VecFx32 pos;
 
     if (type != 0) {
@@ -3715,7 +3724,7 @@ static void BtlvEffvm_MoveCircleEmitter(SPLEmitter *emitter, u32 type) {
                 if (work->ortho) {
                     BtlvEffvm_ProjectToScreen(&pos, NULL);
                 }
-                func_02050208(emitter, &pos);
+                ParticleEmitter_SetPosition(emitter, &pos);
                 if (work->frames != 0) {
                     work->frames--;
                 } else {
@@ -3732,9 +3741,9 @@ static void BtlvEffvm_MoveCircleEmitter(SPLEmitter *emitter, u32 type) {
 }
 
 static void BtlvEffvm_DeleteParticle(ParticleSystem *particle) {
-    void *work = func_020500c8(particle);
+    void *work = Particle_GetWork(particle);
 
-    func_0204fa84(particle);
+    Particle_DeleteSystem(particle);
     GFL_HeapFree(work);
 }
 
@@ -3753,12 +3762,12 @@ static void BtlvEffvm_PlaySENow(u32 se, u32 player, int pan, int arg3, int arg4,
     } else {
         GFL_SEPlayKeepVol(se, player);
     }
-    NNS_SndPlayerSetVolume(func_020061a8(player), arg4);
+    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), arg4);
     GFL_SndPlayerSetParams(player, -1, -1, pan);
     GFL_SndPlayerSetParams(player, -1, arg3, -1);
     if (vol != 0) {
-        NNS_SndPlayerSetTrackModDepth(func_020061a8(player), 0xffff, vol);
-        NNS_SndPlayerSetTrackModSpeed(func_020061a8(player), 0xffff, pitch);
+        NNS_SndPlayerSetTrackModDepth(GFL_SndPlayerGetHandle(player), 0xffff, vol);
+        NNS_SndPlayerSetTrackModSpeed(GFL_SndPlayerGetHandle(player), 0xffff, pitch);
     }
 }
 
@@ -3912,7 +3921,8 @@ static void BtlvEffvm_AddEmitters(BtlvEffvm *wk, BtlvEffvmEmitParam *param, int 
                 *emit = *param;
                 emit->from = positions[i];
                 emit->to = positions[i];
-                if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, emit) == (SPLEmitter *)-1) {
+                if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, emit) ==
+                    (SPLEmitter *)-1) {
                     GFL_HeapFree(emit);
                 }
             }
@@ -3949,7 +3959,8 @@ static void BtlvEffvm_AddEmitters(BtlvEffvm *wk, BtlvEffvmEmitParam *param, int 
                 *emit = *param;
                 emit->from = targets[i];
                 emit->to = targets[i];
-                if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, emit) == (SPLEmitter *)-1) {
+                if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, emit) ==
+                    (SPLEmitter *)-1) {
                     GFL_HeapFree(emit);
                 }
             }
@@ -3957,7 +3968,8 @@ static void BtlvEffvm_AddEmitters(BtlvEffvm *wk, BtlvEffvmEmitParam *param, int 
     } else {
         emit = GFL_HeapAllocate(HEAPID_TAIL(wk->heapId), sizeof(BtlvEffvmEmitParam), TRUE, "btlv_effvm.c", 7509);
         *emit = *param;
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, emit) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitEmitter, emit) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(emit);
         }
     }
@@ -3989,7 +4001,7 @@ static BOOL BtlvEffvm_AddCircleEmitter(VM *vm, BtlvEffvm *wk, BOOL ortho) {
     work->angleStep = 0x10000 / work->frames;
     work->ortho = ortho;
     if (index != 16) {
-        if (ortho == TRUE && func_02050194(wk->particles[index]) == NULL) {
+        if (ortho == TRUE && Particle_GetCamera(wk->particles[index]) == NULL) {
             G3DCameraProjection projection;
             VecFx32 camPos = { 0, 0, 0 };
             VecFx32 up = data_ov168_021f2ff8;
@@ -4003,7 +4015,8 @@ static BOOL BtlvEffvm_AddCircleEmitter(VM *vm, BtlvEffvm *wk, BOOL ortho) {
             projection.near = FX32_ONE;
             projection.far = FX32_CONST(512);
             projection.ndcRangeOverride = FX32_ONE;
-            func_020500cc(wk->particles[index], &projection, 0x2000, &camPos, &up, &target, HEAPID_TAIL(wk->heapId));
+            Particle_SetCamera(wk->particles[index], &projection, 0x2000, &camPos, &up, &target,
+                               HEAPID_TAIL(wk->heapId));
         }
         switch (work->type) {
         case 0:
@@ -4027,7 +4040,8 @@ static BOOL BtlvEffvm_AddCircleEmitter(VM *vm, BtlvEffvm *wk, BOOL ortho) {
             work->angle = 0x8000;
         }
         work->center.y += offsetY;
-        if (func_0205007c(wk->particles[index], resourceId, BtlvEffvm_InitCircleEmitter, work) == (SPLEmitter *)-1) {
+        if (Particle_CreateEmitterWithCallback(wk->particles[index], resourceId, BtlvEffvm_InitCircleEmitter, work) ==
+            (SPLEmitter *)-1) {
             GFL_HeapFree(work);
         }
     }
@@ -4209,7 +4223,7 @@ static void BtlvEffvm_SeMoveTask(TCB *tcb, void *data) {
             GFL_SndPlayerSetParams(work->player, -1, value, -1);
             break;
         case 1:
-            NNS_SndPlayerSetVolume(func_020061a8(work->player), value);
+            NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(work->player), value);
             break;
         case 2:
             GFL_SndPlayerSetParams(work->player, -1, -1, value);
@@ -4277,14 +4291,12 @@ static void BtlvEffvm_BgmFadeTask(TCB *tcb, void *data) {
     BOOL done = TRUE;
 
     BtlvEffTool_Step(&work->volume, &work->step, &work->target, &done);
-    func_02011bdc(0xffff, work->volume >> FX32_SHIFT);
+    NetBgmVolume_Set(0xffff, work->volume >> FX32_SHIFT);
     if (done) {
         BtlvEffect_EndTask(tcb);
     }
 }
 
-// NONMATCHING: the original masks the vertical bounds with 0xffff (an `ands` against a mask built as 0xff << 8 | 0xff,
-// shared by both stores) where MWCC drops the mask under the 16-bit store, and loads winV before winH, 12 bytes
 static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
     BtlvEffvmWindowWork *work = data;
 
@@ -4294,8 +4306,7 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
         G2_SetWnd1InsidePlane(work->winInOut & 0xff, FALSE);
         G2_SetWndOutsidePlane((work->winInOut & 0xff00) >> 8, FALSE);
         GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
-        reg_G2_WIN1H = 0;
-        reg_G2_WIN1V = 0;
+        G2_SetWnd1Position(0, 0, 0, 0);
         work->state++;
     case 1:
         if (work->wait == 0) {
@@ -4318,14 +4329,11 @@ static void BtlvEffvm_WindowTask(TCB *tcb, void *data) {
                 work->winH--;
                 break;
             }
-            reg_G2_WIN0H = work->winH;
-            reg_G2_WIN0V = work->winV & 0xffff;
+            G2_SetWnd0Position(work->winH >> 8, work->winV >> 8, work->winH & 0xff, work->winV & 0xff);
             if ((u8)work->winH == 0xff) {
-                reg_G2_WIN1H = 0x100;
-                reg_G2_WIN1V = work->winV & 0xffff;
+                G2_SetWnd1Position(1, work->winV >> 8, 256, work->winV & 0xff);
             } else {
-                reg_G2_WIN1H = 0;
-                reg_G2_WIN1V = 0;
+                G2_SetWnd1Position(0, 0, 0, 0);
             }
             if (--work->count == 0) {
                 BtlvEffect_EndTask(tcb);
@@ -4393,7 +4401,7 @@ static void BtlvEffvm_ParticleUploadTask(TCB *tcb, void *data) {
     u16 vcount = reg_GX_VCOUNT;
 
     if (vcount >= 192 && vcount <= 200) {
-        func_0204ff04(work->particle);
+        Particle_UploadResource(work->particle);
         work->wk->particleLoading = FALSE;
         BtlvEffect_EndTask(tcb);
     }
@@ -4415,7 +4423,7 @@ static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data) {
             return;
         }
         offset = (work->palettes[work->index] - 8) * 16;
-        file = GFL_G2DIOReadNCLR(231, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
+        file = GFL_G2DIOReadNCLR(ARCID_BTLV_EFFVM_PAL_ANIM, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
         MIi_CpuCopy16((u16 *)palette->rawData + offset,
                       PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 0) + 0x80, 0x20);
         PaletteFade_ApplyPalette(BtlvEffect_GetPaletteFade(), 8, 0);

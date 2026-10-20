@@ -1,7 +1,0 @@
-Global10390_Text_RemnantPokemonsDreamHere = This is a remnant of your\nPokémon's dream.{be00}\nHere, take it.{be01}
-Global10390_Text_IveGivenAllDream = I've given you all the Dream Remnants.{be01}\nNext time your Pokémon dreams, come\nback and see me again.
-Global10390_Text_WhenPokemonHasAnother = When your Pokémon has another dream,\ncome back and see me again.
-Global10390_Text_ReceivedItemS = {0100:0} received\nthe item(s)!
-Global10390_Text_HaveNoMoreRoom = You have no more room in your Bag\nfor {0109:0}. If you remove some,{be00}\nI'll give you the rest.{be01}
-Global10390_Text_X =  x {0200:0}
-\pad{f2}

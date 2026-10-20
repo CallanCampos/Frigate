@@ -1,0 +1,92 @@
+{
+    "$schema": "events.schema.json",
+    "bg_events": [
+        {
+            "script": 8058,
+            "condition": 2,
+            "direction": 4,
+            "grid": {
+                "x": 6,
+                "y": 7,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 6,
+                "y": 5,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 4,
+                "y": 7,
+                "z": 0
+            }
+        },
+        {
+            "script": 0,
+            "condition": 4,
+            "direction": 4,
+            "grid": {
+                "x": 8,
+                "y": 7,
+                "z": 0
+            }
+        }
+    ],
+    "npcs": [],
+    "warps": [
+        {
+            "zone": "ZONE_RELIC_CASTLE_16",
+            "warp": 0,
+            "unk4": 4,
+            "transition": 4,
+            "grid": {
+                "x": 8,
+                "y": 0,
+                "z": 120,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_RELIC_CASTLE_17",
+            "warp": 1,
+            "unk4": 3,
+            "transition": 4,
+            "grid": {
+                "x": 200,
+                "y": 0,
+                "z": 120,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        },
+        {
+            "zone": "ZONE_RELIC_CASTLE_23",
+            "warp": 0,
+            "unk4": 2,
+            "transition": 4,
+            "grid": {
+                "x": 104,
+                "y": 0,
+                "z": 24,
+                "width": 1,
+                "height": 1,
+                "unk0a": 0
+            }
+        }
+    ],
+    "triggers": [],
+    "init_scripts": []
+}

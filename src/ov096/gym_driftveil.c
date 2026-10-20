@@ -393,7 +393,7 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
             matrix->translation.x = pads[i].x + FX32_CONST(8);
             matrix->translation.y = pads[i].y;
             matrix->translation.z = pads[i].z + FX32_CONST(8);
-            func_ov036_021b8248(work->expObj, 0, i, 1);
+            FieldExpObj_SetActorCulling(work->expObj, 0, i, 1);
             FieldExpObj_SetActorHidden(work->expObj, 0, i, FALSE);
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, i, ANM_MAIN);
             FieldExpObj_SetAnm(work->expObj, 0, i, ANM_MAIN, TRUE);
@@ -408,7 +408,7 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
         matrix->translation.x = TILE(10) * (i % SWITCH_COLUMNS) + TILE(6) + HALF_TILE;
         matrix->translation.y = 0;
         matrix->translation.z = TILE(11) * (i / SWITCH_COLUMNS) + TILE(7) + HALF_TILE;
-        func_ov036_021b8248(work->expObj, 0, actor, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, actor, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, actor, TRUE);
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, actor, ANM_MAIN);
         FieldExpObj_SetAnm(work->expObj, 0, actor, ANM_MAIN, TRUE);
@@ -429,7 +429,7 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
             matrix->translation.x = elevators[i].x;
             matrix->translation.y = elevators[i].y;
             matrix->translation.z = elevators[i].z;
-            func_ov036_021b8248(work->expObj, 0, actor, 1);
+            FieldExpObj_SetActorCulling(work->expObj, 0, actor, 1);
             FieldExpObj_SetActorHidden(work->expObj, 0, actor, FALSE);
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, actor, ANM_MAIN);
             FieldExpObj_SetAnm(work->expObj, 0, actor, ANM_MAIN, TRUE);
@@ -441,7 +441,7 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
     matrix->translation.x = FX32_CONST(744);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(296);
-    func_ov036_021b8248(work->expObj, 0, ACTOR_FREIGHT_RIDER, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, ACTOR_FREIGHT_RIDER, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, ACTOR_FREIGHT_RIDER, FALSE);
     anm = FieldExpObj_GetAnmInfo(work->expObj, 0, ACTOR_FREIGHT_RIDER, ANM_MAIN);
     FieldExpObj_SetAnm(work->expObj, 0, ACTOR_FREIGHT_RIDER, ANM_MAIN, TRUE);
@@ -451,7 +451,7 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
     matrix->translation.x = FX32_CONST(184);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(1400);
-    func_ov036_021b8248(work->expObj, 0, ACTOR_FREIGHT, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, ACTOR_FREIGHT, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, ACTOR_FREIGHT, FALSE);
     anm = FieldExpObj_GetAnmInfo(work->expObj, 0, ACTOR_FREIGHT, ANM_MAIN);
     FieldExpObj_SetAnm(work->expObj, 0, ACTOR_FREIGHT, ANM_MAIN, TRUE);
@@ -463,7 +463,7 @@ static void DriftveilGym_InitObjects(DriftveilGymWork *work) {
         matrix->translation.x = 0;
         matrix->translation.y = 0;
         matrix->translation.z = 0;
-        func_ov036_021b8248(work->expObj, 0, actor, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, actor, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, actor, TRUE);
     }
 }
@@ -597,7 +597,7 @@ static void DriftveilGym_StartPadAnimation(FieldExpObjSystem *expObj, u32 pad, u
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(expObj, 0, pad >> 1, ANM_MAIN);
     fx32 step;
 
-    if (func_ov036_021b84ec(anm) == 1) {
+    if (FieldExpObjAnm_IsPaused(anm) == 1) {
         switch (direction) {
         case 0:
         case 3:
@@ -617,7 +617,7 @@ static void DriftveilGym_StartPadAnimation(FieldExpObjSystem *expObj, u32 pad, u
 static void DriftveilGym_StopPadAnimation(FieldExpObjSystem *expObj, u32 pad) {
     FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(expObj, 0, pad >> 1, ANM_MAIN);
 
-    if (!func_ov036_021b84ec(anm)) {
+    if (!FieldExpObjAnm_IsPaused(anm)) {
         FieldExpObjAnm_SetPaused(anm, TRUE);
     }
     GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_SW_GRGYM_01));

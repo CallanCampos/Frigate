@@ -390,7 +390,7 @@ void GFL_BGSysMoveBG(u8 bg, u8 op, int value) {
         break;
     case 1:
         G2_SetBG1Offset(x, y);
-        func_02042ee0(x, y);
+        GFL_NetSetBG1Offset(x, y);
         break;
     case 2:
         if (sBGSys->bgs[2].mode == BGMODE_TEXT) {
@@ -955,7 +955,7 @@ static void GFL_BGSysFlushTransform(void) {
     }
     if ((sBGSys->transformRequests & (1 << 1)) != 0) {
         G2_SetBG1Offset(sBGSys->bgs[1].x, sBGSys->bgs[1].y);
-        func_02042ee0(sBGSys->bgs[1].x, sBGSys->bgs[1].y);
+        GFL_NetSetBG1Offset(sBGSys->bgs[1].x, sBGSys->bgs[1].y);
     }
     if ((sBGSys->transformRequests & (1 << 2)) != 0) {
         if (sBGSys->bgs[2].mode == BGMODE_TEXT) {

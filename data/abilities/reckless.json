@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Reckless",
-    "description": "Powers up moves that\nhave recoil damage."
-}

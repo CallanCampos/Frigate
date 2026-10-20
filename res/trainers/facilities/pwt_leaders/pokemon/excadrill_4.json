@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_EXCADRILL",
+    "moves": [ "MOVE_SANDSTORM", "MOVE_EARTHQUAKE", "MOVE_ROCK_SLIDE", "MOVE_POISON_JAB" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_ADAMANT",
+    "item": "ITEM_BRIGHT_POWDER",
+    "form": 0
+}

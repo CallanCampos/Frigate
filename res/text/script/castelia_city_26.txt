@@ -1,0 +1,9 @@
+CasteliaCity26_Text_AmPokemonFanaticAm = I am a Pokémon fanatic.\nI am famous in Castelia, too!{be01}\nOh, look!\nYou have a Pokédex!{be01}\nHow many Pokémon\nhave you found so far?{be01}\n...\n{0202:0} Pokémon!{be01}\nIf you have 40 Pokémon or more,\nI'll give you something good!
+CasteliaCity26_Text_AmPokemonFanaticAm_2 = I am a Pokémon fanatic.\nI am famous in Castelia, too!{be01}\nOh, look!\nYou have a Pokédex!{be01}\nWell, how many Pokémon\nhave you found so far?{be01}\n...\n{0202:0} Pokémon!{be00}\nThis is quite a Pokédex!{be01}\nI am quite impressed, so\nI will give this to you!{be01}
+CasteliaCity26_Text_EvioliteGreatBothDefense = Eviolite is great!{be01}\nBoth Defense and Special Defense\nof the Pokémon who holds it will increase!{be01}\nHowever, it's a peculiar stone because\nit's only effective on Pokémon that{be00}\ncan still evolve.
+CasteliaCity26_Text_IveBeenThinkingAbout = I've been thinking about starting\na new business...{be01}\nBut it's quite a chore.
+CasteliaCity26_Text_DontThinkServiceTeaches = Don't you think a service that teaches\nPokémon moves would be successful?{be01}\nWhat?\nThere are already people who do that?
+CasteliaCity26_Text_WhatKindsAbilitiesPokemon = What kinds of Abilities do\nyour Pokémon have?
+CasteliaCity26_Text_PatratsAbilityRunAway = My Patrat's Ability is Run Away!{be01}\nIt can always get away\nfrom wild Pokémon!
+CasteliaCity26_Text_Squeak = Squeak!
+CasteliaCity26_Text_HmmmFantasticExcellentBurghs = Hmmm! Fantastic! Excellent!\nBurgh's paintings are magnificent!

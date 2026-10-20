@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_VENUSAUR",
+    "moves": [ "MOVE_LEECH_SEED", "MOVE_SUBSTITUTE", "MOVE_SLUDGE_BOMB", "MOVE_PROTECT" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_BLACK_SLUDGE",
+    "form": 0
+}

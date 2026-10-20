@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Magic Guard",
+    "description": "The Pokémon only takes\ndamage from attacks."
+}

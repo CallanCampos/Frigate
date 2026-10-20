@@ -68,24 +68,24 @@ int SOC_Bind(int sock, const SocAddrIn *address) {
 }
 
 int SOC_Connect(int sock, const SocAddrIn *address) {
-    return SOCL_Connect((SOCLSocket *)sock, SOC_Swap16(address->port), SOC_Swap32(address->addr));
+    return SOCL_Connect(sock, SOC_Swap16(address->port), SOC_Swap32(address->addr));
 }
 
 int SOC_Read(int sock, void *buffer, int size, int flags) {
     return SOCLi_ReadFrom((SOCLSocket *)sock, buffer, size, NULL, NULL, flags);
 }
 
-int SOC_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from) {
-    CPSInAddr ip;
+int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from) {
     u16 port;
+    CPSInAddr ip;
     int result;
 
     result = SOCLi_ReadFrom((SOCLSocket *)sock, buffer, size, &port, &ip, flags);
-    if (result >= 0) {
-        if (from != NULL) {
-            from->port = SOC_Swap16(port);
-            from->addr = SOC_Swap32(ip);
-        }
+    if (result >= 0 && from != NULL) {
+        SocAddrIn *addr = (SocAddrIn *)from;
+
+        addr->port = SOC_Swap16(port);
+        addr->addr = SOC_Swap32(ip);
     }
     return result;
 }
@@ -136,19 +136,14 @@ SocHostEnt *SOC_GetHostByName(const char *host) {
 }
 
 int SOC_GetSockName(int sock, SocAddrIn *address) {
-    SOCLSocket *socket = (SOCLSocket *)sock;
     CPSInAddr host_ip;
     u32 port;
 
-    if (socket == NULL) {
+    if (sock == 0) {
         return SOCL_ENETRESET;
     }
     host_ip = SOCL_GetHostID();
-    if (socket != NULL) {
-        port = socket->local_port;
-    } else {
-        port = 0;
-    }
+    port = SOCL_GetHostPort(sock);
     if (host_ip == 0) {
         port = 0;
     }

@@ -199,7 +199,7 @@ static BOOL BrBtlSubway_ProcInit(GameProc *proc, u32 *state, void *param, void *
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
     wk->bmpoam = BmpOam_Init(wk->heapId, p->unit);
-    wk->que = func_02021998(wk->heapId);
+    wk->que = PrintQueue_CreateDefault(wk->heapId);
     wk->ballEff = BrBallEff_Init(p->unit, p->res, CLACT_SURFACE_SUB, wk->heapId);
     BrRes_LoadOBJ(p->res, BR_RES_OBJ_BTLSUBWAY_BP, wk->heapId);
 
@@ -218,7 +218,7 @@ static BOOL BrBtlSubway_ProcExit(GameProc *proc, u32 *state, void *param, void *
     GFL_BGSysLoadScr(1);
     BrRes_UnloadOBJ(p->res, BR_RES_OBJ_BTLSUBWAY_BP);
     BrBallEff_Exit(wk->ballEff);
-    func_02021a18(wk->que);
+    PrintQueue_Free(wk->que);
     BmpOam_Exit(wk->bmpoam);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -255,7 +255,7 @@ static BOOL BrBtlSubway_ProcMain(GameProc *proc, u32 *state, void *param, void *
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             wk->select = BrBtlSubway_GetTrgMenu(wk, x, y);
             if (wk->select != BR_BTLSUBWAY_PAGE_TOP) {
                 *state = SEQ_CHANGE_FADEOUT_START;
@@ -328,7 +328,7 @@ static BOOL BrBtlSubway_ProcMain(GameProc *proc, u32 *state, void *param, void *
             BrMsgWin_Main(wk->msgWin[i]);
         }
     }
-    func_02021a3c(wk->que);
+    PrintQueue_Main(wk->que);
     if (wk->text != NULL) {
         BrText_Main(wk->text);
     }
@@ -802,15 +802,15 @@ static void BrBtlSubwayBp_Init(BrBtlSubwayBp *bp, ClActUnit *unit, const BrResOb
     setup.x = x;
     setup.y = y;
     setup.sequence = 10;
-    bp->icon = func_0204c040(unit, obj->chr, obj->plt, obj->cell, &setup, 0, heapId);
-    func_0204c318(bp->icon, 1);
+    bp->icon = ClActor_Create(unit, obj->chr, obj->plt, obj->cell, &setup, 0, heapId);
+    ClActor_SetObjMode(bp->icon, 1);
 
     setup.sequence = 0;
     for (i = 0; i < BR_BTLSUBWAY_BP_DIGITS; i++) {
         setup.x = x + 20 + i * 16;
         setup.y = y;
-        bp->digit[i] = func_0204c040(unit, obj->chr, obj->plt, obj->cell, &setup, 0, heapId);
-        func_0204c318(bp->digit[i], 1);
+        bp->digit[i] = ClActor_Create(unit, obj->chr, obj->plt, obj->cell, &setup, 0, heapId);
+        ClActor_SetObjMode(bp->digit[i], 1);
     }
     BrBtlSubwayBp_SetValue(bp, value);
 }
@@ -820,11 +820,11 @@ static void BrBtlSubwayBp_Exit(BrBtlSubwayBp *bp) {
 
     for (i = 0; i < BR_BTLSUBWAY_BP_DIGITS; i++) {
         if (bp->digit[i] != NULL) {
-            func_0204c108(bp->digit[i]);
+            ClActor_Delete(bp->digit[i]);
             bp->digit[i] = NULL;
         }
     }
-    func_0204c108(bp->icon);
+    ClActor_Delete(bp->icon);
     MI_CpuFill8(bp, 0, sizeof(BrBtlSubwayBp));
 }
 
@@ -846,11 +846,11 @@ static void BrBtlSubwayBp_SetValue(BrBtlSubwayBp *bp, u32 value) {
     }
 
     for (i = 0; i < BR_BTLSUBWAY_BP_DIGITS; i++) {
-        func_0204c488(bp->digit[i], 0);
+        ClActor_SetSequence(bp->digit[i], 0);
     }
     for (i = 0; i < BR_BTLSUBWAY_BP_DIGITS; i++) {
         u32 number = value % sBrBtlSubwayBpDigits[i + 1] / sBrBtlSubwayBpDigits[i];
 
-        func_0204c488(bp->digit[BR_BTLSUBWAY_BP_DIGITS - 1 - i], number);
+        ClActor_SetSequence(bp->digit[BR_BTLSUBWAY_BP_DIGITS - 1 - i], number);
     }
 }

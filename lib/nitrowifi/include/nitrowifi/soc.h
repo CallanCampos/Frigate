@@ -90,6 +90,12 @@ typedef struct SocAddrIn {
     u16 port;
     u32 addr;
 } SocAddrIn;
+// A socket address of any family, which an address in network order (SocAddrIn) is one of
+typedef struct SocSockAddr {
+    u8 len;
+    u8 family;
+    u8 data[6];
+} SocSockAddr;
 typedef struct SocHostEnt {
     char *name;
     char **aliases;
@@ -139,7 +145,7 @@ int SOC_Connect(int sock, const SocAddrIn *address);
 int SOC_Read(int sock, void *buffer, int size, int flags);
 // On a nonnegative result, only from->port/addr are written when from is nonnull; len/family are unchanged.
 // SSL command reads do not supply peer outputs, so this wrapper does not establish a valid peer on that path.
-int SOC_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from);
+int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from);
 // Copies caller data into the send ring before return; SendTo also copies destination scalars without retaining to.
 // Positive results count admitted payload bytes, not transmission completion. Nonblocking sends can return a prefix;
 // a later admission failure can return an error after an earlier prefix was queued.
@@ -188,6 +194,12 @@ int SOCL_Startup(SOCLConfig *config);
 extern SOCLConfig *SOCLiConfigPtr;
 // The wait between CPS's yields, which DWC's AC sets to 4 before SOC_Startup
 extern u32 SOCLiYieldWait;
+// TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
+// (gsiCloseSocketSecure, SOC_Close's caller in DWC's GameSpy code, asks it after a failed close; no counterpart in
+// pokediamond's NitroWiFi)
+BOOL SOCL_IsNotClosing(int socket);
+// The address of the host (socl_cleanup.c), which DWC's GameSpy code also gives as the local host's
+CPSInAddr SOCL_GetHostID(void);
 // Asks the sockets to close; SOCL_EINPROGRESS (nonzero) while it has not finished
 int SOCL_CalmDown(void);
 // Reads param synchronously without retaining its pointer. Owned buffer/pipe storage is in the socket allocation;

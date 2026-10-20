@@ -45,7 +45,7 @@ static void DwcRapUtil_StartUtility(HeapID heapId) {
 
 static BOOL DwcRapUtil_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_DWC_UTILITY, 0x40100);
-    func_020116c0(GFL_NET_TYPE_WIFI);
+    NetDefine_LoadDevice(GFL_NET_TYPE_WIFI);
     GFL_OvlLoad(OVERLAY_ID(181));
     return TRUE;
 }
@@ -62,7 +62,7 @@ static BOOL DwcRapUtil_ResetProcExit(GameProc *proc, u32 *state, void *param, vo
 }
 
 static BOOL DwcRapUtil_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
-    func_02011778(GFL_NET_TYPE_WIFI);
+    NetDefine_UnloadDevice(GFL_NET_TYPE_WIFI);
     GFL_OvlUnload(OVERLAY_ID(181));
     GFL_HeapDelete(HEAPID_DWC_UTILITY);
     downloadPlayConfigForWifi();

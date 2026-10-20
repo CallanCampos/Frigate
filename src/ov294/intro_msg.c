@@ -65,7 +65,7 @@ IntroMsg *IntroMsg_Create(HeapID heapId) {
 
     msg->heapId = heapId;
     msg->wordSet = GFL_WordSetSystemCreateDefault(heapId);
-    msg->printQueue = func_02021998(heapId);
+    msg->printQueue = PrintQueue_CreateDefault(heapId);
     msg->tcbManager = GFL_TCBExMgrCreate(msg->heapId, msg->heapId, 2, 0);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 0, WINDOW_PALETTE * 0x20, 0x20, heapId);
     LoadSysMsgBox(1, FRAME_0_CHAR, FRAME_0_PALETTE, 0, heapId);
@@ -92,14 +92,14 @@ void IntroMsg_Free(IntroMsg *msg) {
     GFL_StrBufFree(msg->expanded);
     GFL_FontFree(msg->font);
     if (msg->printStream != NULL) {
-        func_020223cc(msg->printStream);
+        PrintStream_Delete(msg->printStream);
     }
     BmpWin_Free(msg->window);
     if (msg->menuWindow != NULL) {
         BmpWin_Free(msg->menuWindow);
     }
     GFL_TCBExMgrFree(msg->tcbManager);
-    func_02021a18(msg->printQueue);
+    PrintQueue_Free(msg->printQueue);
     if (msg->msgData != NULL) {
         GFL_MsgDataFree(msg->msgData);
     }
@@ -116,11 +116,11 @@ void IntroMsg_LoadMessages(IntroMsg *msg, BOOL preload, u16 fileId) {
 
 void IntroMsg_Update(IntroMsg *msg) {
     GFL_TCBExMgrUpdate(msg->tcbManager);
-    func_02021a3c(msg->printQueue);
+    PrintQueue_Main(msg->printQueue);
 }
 
 void IntroMsg_Print(IntroMsg *msg, u32 messageId, BOOL frame) {
-    s32 wait = func_02017bcc();
+    s32 wait = TextSpeed_GetCurrentWait();
     BmpWin *window = msg->window;
 
     GFL_BitmapFill(BmpWin_GetBitmap(window), 15);
@@ -128,7 +128,7 @@ void IntroMsg_Print(IntroMsg *msg, u32 messageId, BOOL frame) {
     GFL_MsgDataLoadStrbuf(msg->msgData, messageId, msg->strbuf);
     GFL_WordSetFormatStrbuf(msg->wordSet, msg->expanded, msg->strbuf);
     msg->printStream =
-        func_02022268(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff, msg->heapId, 15);
+        PrintStream_Create(window, 4, 0, msg->expanded, msg->font, wait, msg->tcbManager, 0xffff, msg->heapId, 15);
     if (!frame) {
         BmpWin_DrawFrame(window, WINFRAME_TRANSFER_VBLANK, FRAME_0_CHAR, FRAME_0_PALETTE);
     } else {
@@ -147,28 +147,28 @@ u32 IntroMsg_GetPrintState(IntroMsg *msg) {
     if (msg->printStream == NULL) {
         return PRINT_STREAM_DONE;
     }
-    return func_020223b4(msg->printStream);
+    return PrintStream_GetState(msg->printStream);
 }
 
 // Prints the message on, with A, B or a touch hurrying it and going past its pauses. Returns TRUE once it has ended
 BOOL IntroMsg_UpdatePrint(IntroMsg *msg) {
     if (msg->printStream != NULL) {
         KeyCursor_Update(msg->keyCursor, msg->printStream, msg->window);
-        switch (func_020223b4(msg->printStream)) {
+        switch (PrintStream_GetState(msg->printStream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(msg->printStream);
+            PrintStream_Delete(msg->printStream);
             msg->printStream = NULL;
             return TRUE;
         case PRINT_STREAM_PAUSED:
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GCTX_HIDGetPressedKeys() == PAD_BUTTON_B ||
-                func_0203da48()) {
-                func_020223bc(msg->printStream);
+                GFL_HIDIsTouchPressed()) {
+                PrintStream_Continue(msg->printStream);
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
             }
             break;
         case PRINT_STREAM_RUNNING:
-            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-                func_020223e0(msg->printStream, 0);
+            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
+                PrintStream_SkipWait(msg->printStream, 0);
             }
             break;
         }

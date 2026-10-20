@@ -106,7 +106,7 @@ void IntroMcss_SetAnimation(IntroMcss *mcss, u8 index, u32 animation, BOOL resta
 BOOL IntroMcss_IsAnimationEnded(IntroMcss *mcss, u8 index);
 void IntroMcss_ClearAnimationEnded(IntroMcss *mcss, u8 index);
 void IntroMcss_SetAlpha(IntroMcss *mcss, u8 index, u32 alpha);
-void func_ov294_021a3798(IntroMcss *mcss, u8 index, BOOL a2);
+void IntroMcss_SetFlipV(IntroMcss *mcss, u8 index, BOOL a2);
 BOOL IntroMcss_MoveX(IntroMcss *mcss, u8 index, fx32 step, fx32 target);
 BOOL IntroMcss_DecreaseY(IntroMcss *mcss, fx32 step, fx32 min);
 void IntroMcss_Update(IntroMcss *mcss);

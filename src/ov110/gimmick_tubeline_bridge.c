@@ -61,7 +61,7 @@ static const G3DSceneActorSetup sActors[TRAIN_COUNT] = {
 
 static G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov110_021eec80(Field *field) {
+void TubelineBridge_Setup(Field *field) {
     u16 heapId;
     GimmickWork *work;
 
@@ -73,7 +73,7 @@ void func_ov110_021eec80(Field *field) {
     ISS3DSoundSys_ReqChangeMasterVolume(work->soundSys, 127);
 }
 
-void func_ov110_021eecc4(Field *field) {
+void TubelineBridge_End(Field *field) {
     s32 i;
     GimmickWork *work;
 
@@ -86,7 +86,7 @@ void func_ov110_021eecc4(Field *field) {
     Field_DeleteGimmickWorkBlock(field, 0);
 }
 
-void func_ov110_021eecfc(Field *field) {
+void TubelineBridge_Update(Field *field) {
     s32 i;
     GimmickWork *work;
     G3DCamera *camera;

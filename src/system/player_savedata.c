@@ -66,7 +66,7 @@ void SaveControl_LoadPlayerState(SaveControl *save, PlayerState *state) {
     state->exState = playerSave->location.exState;
 }
 
-void func_02008fb8(SaveControl *save, SaveLocation *location) {
+void SaveControl_GetPlayerLocation(SaveControl *save, SaveLocation *location) {
     PlayerSave *playerSave = SaveControl_GetPlayerSave(save);
     *location = playerSave->location;
 }

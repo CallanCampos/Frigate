@@ -29,8 +29,8 @@ static const VecFx32 sBalloonPositions[] = {
 };
 
 CtvtGameBalloon *CtvtGameBalloon_Create(CtvtGame *game, u16 netId, u8 pos, BOOL active, HeapID heapId) {
-    u8 selfNetId = func_02042a6c(func_02040440());
-    u8 memberCount = func_02042a78();
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
+    u8 memberCount = GFL_NetGetNegotiatedCount();
     CtvtGameBalloon *balloon = GFL_HeapAllocate(heapId, sizeof(CtvtGameBalloon), TRUE, "ctvt_game_balloon.c", 482);
 
     balloon->active = active;

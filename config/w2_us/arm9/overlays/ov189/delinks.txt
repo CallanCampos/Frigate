@@ -146,6 +146,7 @@ lib/dwc/src/nhttp/d_nhttp_common.c:
     .bss        start:0x021ae704 end:0x021b2880
 
 lib/dwc/src/ghttp/ghttpEncryption.c:
+    complete
     .text       start:0x021a2418 end:0x021a2c90
     .data       start:0x021ad40c end:0x021adb08
     .bss        start:0x021b28c0 end:0x021b28e4

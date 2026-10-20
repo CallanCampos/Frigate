@@ -18,12 +18,12 @@
 
 static s64 getSeconds(void);
 
-u32 func_0200f29c(void) {
+u32 RecordSave_GetSize(void) {
     return sizeof(RecordSave);
 }
 
-void func_0200f2a0(RecordSave *record) {
-    func_0200f1c4(&record->liveMatch);
+void RecordSave_Init(RecordSave *record) {
+    LiveMatchData_Init(&record->liveMatch);
     RndMatchData_Init(record->rndMatch);
     OS_GetMacAddress(record->macAddress);
 }
@@ -36,7 +36,7 @@ RecordSave *getRecordBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_RECORD);
 }
 
-void *func_0200f2d0(RecordSave *record) {
+void *RecordSave_GetRndMatch(RecordSave *record) {
     return record->rndMatch;
 }
 
@@ -44,25 +44,25 @@ void *func_0200f2d4(RecordSave *record) {
     return record->rndMatch;
 }
 
-void *func_0200f2d8(RecordSave *record) {
+void *RecordSave_GetLiveMatch(RecordSave *record) {
     return &record->liveMatch;
 }
 
-void func_0200f2dc(RecordSave *record) {
+void RecordSave_SetMatchInProgress(RecordSave *record) {
     OS_GetMacAddress(record->macAddress);
     record->matchInProgress = TRUE;
-    func_0200f368(record);
+    RecordSave_UpdateMatchSeconds(record);
 }
 
 void RecordSave_ClearMatchInProgress(RecordSave *record) {
     record->matchInProgress = FALSE;
 }
 
-u8 func_0200f300(RecordSave *record) {
+u8 RecordSave_IsMatchInProgress(RecordSave *record) {
     return record->matchInProgress;
 }
 
-u32 func_0200f308(RecordSave *record) {
+u32 RecordSave_IsMacAddressSame(RecordSave *record) {
     u8 macAddress[BATTLEMATCH_MAC_ADDRESS_SIZE];
 
     OS_GetMacAddress(macAddress);
@@ -72,8 +72,8 @@ u32 func_0200f308(RecordSave *record) {
     return FALSE;
 }
 
-u32 func_0200f334(RecordSave *record) {
-    if (func_0200f300(record)) {
+u32 RecordSave_IsMatchTimedOut(RecordSave *record) {
+    if (RecordSave_IsMatchInProgress(record)) {
         if (getSeconds() - record->matchSeconds > MATCH_TIMEOUT_SECONDS) {
             return TRUE;
         }
@@ -81,7 +81,7 @@ u32 func_0200f334(RecordSave *record) {
     return FALSE;
 }
 
-void func_0200f368(RecordSave *record) {
+void RecordSave_UpdateMatchSeconds(RecordSave *record) {
     record->matchSeconds = getSeconds();
 }
 

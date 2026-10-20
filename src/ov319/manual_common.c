@@ -31,9 +31,9 @@ ManualCommon *ManualCommon_Create(GameData *gameData, HeapID heapId) {
     common->heapId = heapId;
     common->graphic = ManualGraphic_Create(1, common->heapId);
     common->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, common->heapId);
-    common->titleQueue = func_02021998(common->heapId);
-    common->queue = func_02021998(common->heapId);
-    common->touchBarQueue = func_02021998(common->heapId);
+    common->titleQueue = PrintQueue_CreateDefault(common->heapId);
+    common->queue = PrintQueue_CreateDefault(common->heapId);
+    common->touchBarQueue = PrintQueue_CreateDefault(common->heapId);
     common->msgSystem = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_7, common->heapId);
     common->msgManual = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_8, common->heapId);
     common->arc = GFL_ArcSysCreateFileHandle(ARCID_MANUAL, common->heapId);
@@ -56,21 +56,21 @@ void ManualCommon_Free(ManualCommon *common) {
     GFL_ArcToolFree(common->imageArc);
     GFL_MsgDataFree(common->msgSystem);
     GFL_MsgDataFree(common->msgManual);
-    func_02021c44(common->titleQueue);
-    func_02021a18(common->titleQueue);
-    func_02021c44(common->queue);
-    func_02021a18(common->queue);
-    func_02021c44(common->touchBarQueue);
-    func_02021a18(common->touchBarQueue);
+    PrintQueue_Clear(common->titleQueue);
+    PrintQueue_Free(common->titleQueue);
+    PrintQueue_Clear(common->queue);
+    PrintQueue_Free(common->queue);
+    PrintQueue_Clear(common->touchBarQueue);
+    PrintQueue_Free(common->touchBarQueue);
     GFL_FontFree(common->font);
     ManualGraphic_Free(common->graphic);
     GFL_HeapFree(common);
 }
 
 void ManualCommon_Main(ManualCommon *common) {
-    func_02021a3c(common->titleQueue);
-    func_02021a3c(common->queue);
-    func_02021a3c(common->touchBarQueue);
+    PrintQueue_Main(common->titleQueue);
+    PrintQueue_Main(common->queue);
+    PrintQueue_Main(common->touchBarQueue);
     ManualGraphic_Update(common->graphic);
 }
 

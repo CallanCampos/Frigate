@@ -159,7 +159,7 @@ BOOL GdsRap_SendBattleVideoUpload(GdsRapWork *gdsrap, GdsProfile *profile) {
     }
 
     // Keep the nicknames, in case the check of the Pokémon takes them out of the video
-    func_0200bef4(video->header.mode, &clientCount, &pkmCount);
+    BattleRec_GetModeCounts(video->header.mode, &clientCount, &pkmCount);
     for (i = 0; i < BATTLE_REC_HEADER_PKM_MAX; i++) {
         if (!GdsRap_GetVideoPokemonPos(gdsrap, i, &client, &pos)) {
             break;
@@ -314,11 +314,11 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
             BOOL ret;
 
             GFL_ASSERT(gdsrap->p_nhttp == NULL);
-            gdsrap->p_nhttp = NHttpRap_Create(gdsrap->heapId, func_02008bdc(GetGameDataPlayerInfo(gdsrap->gameData)),
-                                              gdsrap->loginBuffer);
+            gdsrap->p_nhttp = NHttpRap_Create(
+                gdsrap->heapId, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(gdsrap->gameData)), gdsrap->loginBuffer);
             NHttpRap_BeginPost(gdsrap->p_nhttp, gdsrap->heapId, sizeof(BattleRecPkm) * BATTLE_REC_HEADER_PKM_MAX,
                                GDS_RAP_CHECK_TYPE);
-            func_0200bef4(video->header.mode, &clientCount, &pkmCount);
+            BattleRec_GetModeCounts(video->header.mode, &clientCount, &pkmCount);
             gdsrap->pkmCount = 0;
             for (i = 0; i < clientCount; i++) {
                 NHttpRap_AddPostData(gdsrap->p_nhttp, video->body.parties[i].pkm,
@@ -382,7 +382,7 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
                     if (gdsrap->checkCount == 1) {
                         gdsrap->checkFailed = TRUE;
                     }
-                    func_0200bef4(video->header.mode, &clientCount, &pkmCount);
+                    BattleRec_GetModeCounts(video->header.mode, &clientCount, &pkmCount);
                     for (i = 0; i < gdsrap->pkmCount; i++) {
                         gdsrap->checkResult = NHttpRap_GetCheckResult(answer, i);
                         if (gdsrap->checkResult != 0 && gdsrap->checkCount == 0) {
@@ -397,7 +397,7 @@ static BOOL GdsRap_MainSend(GdsRapWork *gdsrap, BOOL *checkError) {
                         }
                     }
                     if (gdsrap->checkCount == 0) {
-                        func_0200c1dc(func_0200c0b4());
+                        BattleRec_UpdateBodyCRC(BattleRec_GetBody());
                         gdsrap->uploadSeq = GDS_RAP_UPLOAD_SEQ_CHECK_START;
                         gdsrap->checkCount++;
                     } else {
@@ -525,7 +525,7 @@ static BOOL GdsRap_SubProcSaveDataNumber(GdsRapWork *gdsrap, GdsRapSubProc *sub)
         s32 pkmCount;
 
         func_0200bbb4();
-        func_0200bef4(video->header.mode, &clientCount, &pkmCount);
+        BattleRec_GetModeCounts(video->header.mode, &clientCount, &pkmCount);
         for (i = 0; i < BATTLE_REC_HEADER_PKM_MAX; i++) {
             if (!GdsRap_GetVideoPokemonPos(gdsrap, i, &client, &pos)) {
                 break;
@@ -533,7 +533,7 @@ static BOOL GdsRap_SubProcSaveDataNumber(GdsRapWork *gdsrap, GdsRapSubProc *sub)
             pkm = &video->body.parties[client].pkm[pos];
             GdsRap_CopyNickname(gdsrap->nicknames[i], pkm->nickname, 11);
         }
-        func_0200c1dc(func_0200c0b4());
+        BattleRec_UpdateBodyCRC(BattleRec_GetBody());
         func_0200bbdc();
     }
 
@@ -569,7 +569,7 @@ static BOOL GdsRap_GetVideoPokemonPos(GdsRapWork *gdsrap, int index, s32 *client
     s32 clientCount;
     s32 pkmCount;
 
-    func_0200bef4(video->header.mode, &clientCount, &pkmCount);
+    BattleRec_GetModeCounts(video->header.mode, &clientCount, &pkmCount);
     for (*client = 0; *client < clientCount; (*client)++) {
         for (*pos = 0; *pos < video->body.parties[*client].count; (*pos)++) {
             if (count == index) {

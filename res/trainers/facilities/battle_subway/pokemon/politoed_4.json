@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_POLITOED",
+    "moves": [ "MOVE_HYDRO_PUMP", "MOVE_BLIZZARD", "MOVE_FOCUS_BLAST", "MOVE_HYPNOSIS" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": true
+    },
+    "nature": "NATURE_MODEST",
+    "item": "ITEM_WIDE_LENS",
+    "form": 0
+}

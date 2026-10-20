@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lumina",
+    "class": "TRAINER_CLASS_SCIENTIST_F_46",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_X_DEFEND" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 12,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_VENIPEDE",
+            "form": 0,
+            "level": 17,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_KOFFING",
+            "form": 0,
+            "level": 17,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "The sewer and this Relic Passage...{be01}\nIs it really simple coincidence that they\nexist so close to each other?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "No, there must be a reason why...\nOh! When did I lose?"
+        },
+        {
+            "type": 2,
+            "text": "Modern men make sewers,\nancient man made these paths...{be01}\nHave there always been people who just\ncouldn't get enough of digging holes?"
+        }
+    ]
+}

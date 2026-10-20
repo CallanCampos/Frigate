@@ -1,8 +1,0 @@
-S019aCgearControlWarning_Text_TurnCGearEstablish = Turn on the C-Gear and\nestablish communications?
-S019aCgearControlWarning_Text_WhenCommunicationsClosingSystem = When communications are on, closing the\nsystem will put it into Sleep Mode if the\nbattery is low. Please watch the battery.
-S019aCgearControlWarning_Text_WillTurnCGear = Will you turn C-Gear off to stop\ncommunications?
-S019aCgearControlWarning_Text_WarningPleaseTurnC = {ff00:1}Warning!{ff00:0}\nPlease turn C-Gear off\nin places--such as airplanes\nand hospitals--where wireless\ncommunications are prohibited.
-S019aCgearControlWarning_Text_CGearCannotTurned = C-Gear cannot be turned on.\nWireless communications are turned OFF.\nTurn wireless communications ON in the\nSystem Settings.\nError code: 50699
-S019aCgearControlWarning_Text_Yes = YES
-S019aCgearControlWarning_Text_No = NO
-\pad{20}

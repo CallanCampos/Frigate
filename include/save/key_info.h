@@ -30,34 +30,34 @@ typedef struct {
 } KeySystemData; // size: 0x214
 
 // Clears the key information and draws its seed
-void func_02010474(KeyInfoSave *keyInfo);
+void KeyInfoSave_Init(KeyInfoSave *keyInfo);
 // The key information in the save, which is in block 0x45
 KeyInfoSave *getKeyInfoSaveBlk(SaveControl *save);
 // Whether a key is unlocked
-BOOL func_020104c4(KeyInfoSave *keyInfo, u32 key);
+BOOL KeyInfo_IsKeyUnlocked(KeyInfoSave *keyInfo, u32 key);
 
 // Unlocks a key, and enables what it unlocks
-void func_020104b0(KeyInfoSave *keyInfo, u32 key);
-void func_020104e0(KeyInfoSave *keyInfo, u32 key);
+void KeyInfo_UnlockKey(KeyInfoSave *keyInfo, u32 key);
+void KeyInfo_EnableKey(KeyInfoSave *keyInfo, u32 key);
 // Whether what a key unlocks is enabled
 BOOL keyEnabler(KeyInfoSave *keyInfo, u32 key);
 void SetGameDifficulty(KeyInfoSave *keyInfo, u32 difficulty);
 // Sets the city, and the chamber the mystery door leads to
-void func_02010550(KeyInfoSave *keyInfo, u32 city);
-void func_0201058c(KeyInfoSave *keyInfo, u32 chamber);
+void KeyInfo_SetCityKey(KeyInfoSave *keyInfo, u32 city);
+void KeyInfo_SetChamberKey(KeyInfoSave *keyInfo, u32 chamber);
 // Returns 1 if the key that switches the city is set
 u32 KeyInfo_GetCityKey(KeyInfoSave *keyInfo);
 // The difficulty that the keys set, GAME_DIFFICULTY_*
 u32 GetGameDifficulty(KeyInfoSave *keyInfo);
 // 1 or 2 if a key that opens a chamber is set
-u32 func_020105a0(KeyInfoSave *keyInfo);
+u32 KeyInfo_GetChamberKey(KeyInfoSave *keyInfo);
 // Returns its argument, as the key information in data that ov331 reads
-KeyInfoSave *func_0201046c(void *a0);
+KeyInfoSave *KeySystemData_GetKeyInfo(void *a0);
 // The Memory Link's data, at 0x38 in the same data
-void *func_02010470(void *a0);
+void *KeySystemData_GetMemoryLink(void *a0);
 // Clears the key system's data, and the copy of the key information into the save
-void func_02010448(void *a0);
-void func_02010490(KeyInfoSave *dest, const KeyInfoSave *src);
+void KeySystemData_Init(void *a0);
+void KeyInfoSave_Copy(KeyInfoSave *dest, const KeyInfoSave *src);
 
 #define GAME_DIFFICULTY_EASY 0
 #define GAME_DIFFICULTY_NORMAL 1

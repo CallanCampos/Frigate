@@ -7,6 +7,7 @@
 #include "battle/btl_pokeparam.h"
 #include "battle/btl_string.h"
 #include "battle/btlv_effect.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/bmp.h"
 #include "gfl/clact.h"
@@ -36,7 +37,7 @@ struct BtlvClact {
     BtlvClactEntry popup[2]; // 0x198  the popup and the message drawn into the gauge's characters
     u32 moveFlags;           // 0x1b8  bit n: entries[n] moves, bit 31: the popup shows
     u32 scaleFlags;          // 0x1bc  bit n: entries[n] scales
-    u32 mode;                // 0x1c0  func_ov167_0219c988's value. 1: the gauge, 2: no effect actors
+    u32 mode;                // 0x1c0  GetStudioMode's value. 1: the gauge, 2: no effect actors
     HeapID heapId;           // 0x1c4
 };
 
@@ -73,7 +74,7 @@ BtlvClact *BtlvClact_Create(TCBManager *tcbManager, HeapID heapId, u32 mode) {
     wk->tcbManager = tcbManager;
     wk->heapId = heapId;
     wk->mode = mode;
-    wk->unit = func_0204bf1c(25, 0, heapId);
+    wk->unit = ClActUnit_Create(25, 0, heapId);
     BtlvClact_InitGauge(wk);
     return wk;
 }
@@ -87,12 +88,12 @@ void BtlvClact_Delete(BtlvClact *wk) {
             BtlvClact_DeleteActor(wk, i);
         }
     }
-    func_0204bf98(wk->unit);
+    ClActUnit_Delete(wk->unit);
     GFL_HeapFree(wk);
 }
 
 void BtlvClact_Draw(BtlvClact *wk) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 int BtlvClact_AddActor(BtlvClact *wk, u32 arcId, u32 fileId, s16 x, s16 y, fx32 scaleX, fx32 scaleY) {
@@ -116,22 +117,22 @@ int BtlvClact_AddActorEx(BtlvClact *wk, u32 arcId, u32 charFileId, u32 plttFileI
             break;
         }
     }
-    wk->entries[i].chars = func_0204b81c(arc, charFileId, FALSE, CLACT_VRAM_MAIN, wk->heapId);
-    wk->entries[i].palette = func_0204bc48(arc, plttFileId, CLACT_VRAM_MAIN, 0x20 * i + 0x140, wk->heapId);
-    wk->entries[i].cellAnims = func_0204bde0(arc, cellFileId, animFileId, wk->heapId);
+    wk->entries[i].chars = ClActSys_LoadChars(arc, charFileId, FALSE, CLACT_VRAM_MAIN, wk->heapId);
+    wk->entries[i].palette = ClActSys_LoadPlttEx(arc, plttFileId, CLACT_VRAM_MAIN, 0x20 * i + 0x140, wk->heapId);
+    wk->entries[i].cellAnims = ClActSys_LoadCellAnims(arc, cellFileId, animFileId, wk->heapId);
     fade = BtlvEffect_GetPaletteFade();
     PaletteFade_LoadNCLR(fade, arcId, plttFileId, wk->heapId, PALFADE_BUFFER_MAIN_OBJ, 0x20,
-                         (func_0204bdc0(wk->entries[i].palette, FALSE) & 0x3ff) / 2);
+                         (ClActSys_GetPlttVramAddr(wk->entries[i].palette, FALSE) & 0x3ff) / 2);
     setup.base.x = x;
     setup.base.y = y;
     if (scaleX == 0 && scaleY == 0) {
-        wk->entries[i].actor = func_0204c040(wk->unit, wk->entries[i].chars, wk->entries[i].palette,
-                                             wk->entries[i].cellAnims, &setup.base, 0, wk->heapId);
+        wk->entries[i].actor = ClActor_Create(wk->unit, wk->entries[i].chars, wk->entries[i].palette,
+                                              wk->entries[i].cellAnims, &setup.base, 0, wk->heapId);
     } else {
         setup.scaleX = scaleX;
         setup.scaleY = scaleY;
-        wk->entries[i].actor = func_0204c0a4(wk->unit, wk->entries[i].chars, wk->entries[i].palette,
-                                             wk->entries[i].cellAnims, &setup, 0, wk->heapId);
+        wk->entries[i].actor = ClActor_CreateEx(wk->unit, wk->entries[i].chars, wk->entries[i].palette,
+                                                wk->entries[i].cellAnims, &setup, 0, wk->heapId);
     }
     func_0204c520(wk->entries[i].actor, TRUE);
     GFL_ArcToolFree(arc);
@@ -149,23 +150,23 @@ static void BtlvClact_InitGauge(BtlvClact *wk) {
         return;
     }
 
-    arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(wk->heapId));
-    wk->gauge[0].chars = func_0204b81c(arc, 0x22b, FALSE, CLACT_VRAM_MAIN, wk->heapId);
-    wk->gauge[0].palette = func_0204bba0(arc, 0x22a, CLACT_VRAM_MAIN, 0x1a0, wk->heapId);
-    wk->gauge[0].cellAnims = func_0204bde0(arc, 0x22c, 0x22d, wk->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(wk->heapId));
+    wk->gauge[0].chars = ClActSys_LoadChars(arc, 0x22b, FALSE, CLACT_VRAM_MAIN, wk->heapId);
+    wk->gauge[0].palette = ClActSys_LoadPltt(arc, 0x22a, CLACT_VRAM_MAIN, 0x1a0, wk->heapId);
+    wk->gauge[0].cellAnims = ClActSys_LoadCellAnims(arc, 0x22c, 0x22d, wk->heapId);
     fade = BtlvEffect_GetPaletteFade();
     // BUG: The offset is the first effect actor's palette's, not the gauge's
 #ifdef BUGFIX
     PaletteFade_LoadNCLR(fade, 11, 0x22a, wk->heapId, PALFADE_BUFFER_MAIN_OBJ, 0x20,
-                         (func_0204bdc0(wk->gauge[0].palette, FALSE) & 0x3ff) / 2);
+                         (ClActSys_GetPlttVramAddr(wk->gauge[0].palette, FALSE) & 0x3ff) / 2);
 #else
     PaletteFade_LoadNCLR(fade, 11, 0x22a, wk->heapId, PALFADE_BUFFER_MAIN_OBJ, 0x20,
-                         (func_0204bdc0(wk->entries[0].palette, FALSE) & 0x3ff) / 2);
+                         (ClActSys_GetPlttVramAddr(wk->entries[0].palette, FALSE) & 0x3ff) / 2);
 #endif
     for (i = 0; i < 22; i++) {
         setup.x = i * 8;
-        wk->gauge[i].actor = func_0204c040(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
-                                           &setup, 0, wk->heapId);
+        wk->gauge[i].actor = ClActor_Create(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
+                                            &setup, 0, wk->heapId);
         func_0204c520(wk->gauge[i].actor, TRUE);
     }
     BtlvClact_SetGauge(wk, 10, 0);
@@ -173,21 +174,21 @@ static void BtlvClact_InitGauge(BtlvClact *wk) {
     setupEx.base.x = 128;
     setupEx.base.y = 96;
     setupEx.affineMode = 1;
-    wk->popup[0].actor = func_0204c0a4(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
-                                       &setupEx, 0, wk->heapId);
+    wk->popup[0].actor = ClActor_CreateEx(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
+                                          &setupEx, 0, wk->heapId);
     func_0204c520(wk->popup[0].actor, TRUE);
-    func_0204c124(wk->popup[0].actor, FALSE);
-    func_0204c488(wk->popup[0].actor, 20);
-    func_0204c438(wk->popup[0].actor, 1);
+    ClActor_SetVisible(wk->popup[0].actor, FALSE);
+    ClActor_SetSequence(wk->popup[0].actor, 20);
+    ClActor_SetPriority(wk->popup[0].actor, 1);
 
     setup.x = 128;
     setup.y = 96;
-    wk->popup[1].actor = func_0204c040(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
-                                       &setup, 0, wk->heapId);
+    wk->popup[1].actor = ClActor_Create(wk->unit, wk->gauge[0].chars, wk->gauge[0].palette, wk->gauge[0].cellAnims,
+                                        &setup, 0, wk->heapId);
     func_0204c520(wk->popup[1].actor, TRUE);
     func_0204c520(wk->popup[1].actor, TRUE);
-    func_0204c124(wk->popup[1].actor, FALSE);
-    func_0204c488(wk->popup[1].actor, 21);
+    ClActor_SetVisible(wk->popup[1].actor, FALSE);
+    ClActor_SetSequence(wk->popup[1].actor, 21);
     GFL_ArcToolFree(arc);
 }
 
@@ -196,9 +197,9 @@ void BtlvClact_SetGauge(BtlvClact *wk, int count, int pos) {
     int sequence;
 
     if (pos == 0) {
-        func_0204c488(wk->gauge[0].actor, 3);
+        ClActor_SetSequence(wk->gauge[0].actor, 3);
     } else {
-        func_0204c488(wk->gauge[0].actor, 4);
+        ClActor_SetSequence(wk->gauge[0].actor, 4);
     }
     for (i = 0; i < count; i++) {
         if (i < pos) {
@@ -208,20 +209,20 @@ void BtlvClact_SetGauge(BtlvClact *wk, int count, int pos) {
         } else if (i > pos) {
             sequence = 0;
         }
-        func_0204c488(wk->gauge[i + 1].actor, sequence);
+        ClActor_SetSequence(wk->gauge[i + 1].actor, sequence);
     }
-    func_0204c488(wk->gauge[i + 1].actor, 5);
+    ClActor_SetSequence(wk->gauge[i + 1].actor, 5);
     for (i += 2; i < 22; i++) {
-        func_0204c488(wk->gauge[i].actor, 17);
+        ClActor_SetSequence(wk->gauge[i].actor, 17);
     }
 }
 
 void BtlvClact_DeleteActor(BtlvClact *wk, int index) {
     if (wk->entries[index].actor != NULL) {
-        func_0204b98c(wk->entries[index].chars);
-        func_0204bcd0(wk->entries[index].palette);
-        func_0204be64(wk->entries[index].cellAnims);
-        func_0204c108(wk->entries[index].actor);
+        ClActSys_FreeChars(wk->entries[index].chars);
+        ClActSys_FreePltt(wk->entries[index].palette);
+        ClActSys_FreeCellAnims(wk->entries[index].cellAnims);
+        ClActor_Delete(wk->entries[index].actor);
         wk->entries[index].actor = NULL;
     }
 }
@@ -231,23 +232,23 @@ static void BtlvClact_ExitGauge(BtlvClact *wk) {
 
     if (wk->mode == 1) {
         for (i = 0; i < 2; i++) {
-            func_0204c108(wk->popup[i].actor);
+            ClActor_Delete(wk->popup[i].actor);
             wk->popup[i].actor = NULL;
         }
         for (i = 0; i < 22; i++) {
-            func_0204c108(wk->gauge[i].actor);
+            ClActor_Delete(wk->gauge[i].actor);
             wk->gauge[i].actor = NULL;
         }
         // BUG: These are the first effect actor's resources, which BtlvClact_Delete frees again, and the gauge's
         // are never freed
 #ifdef BUGFIX
-        func_0204b98c(wk->gauge[0].chars);
-        func_0204bcd0(wk->gauge[0].palette);
-        func_0204be64(wk->gauge[0].cellAnims);
+        ClActSys_FreeChars(wk->gauge[0].chars);
+        ClActSys_FreePltt(wk->gauge[0].palette);
+        ClActSys_FreeCellAnims(wk->gauge[0].cellAnims);
 #else
-        func_0204b98c(wk->entries[0].chars);
-        func_0204bcd0(wk->entries[0].palette);
-        func_0204be64(wk->entries[0].cellAnims);
+        ClActSys_FreeChars(wk->entries[0].chars);
+        ClActSys_FreePltt(wk->entries[0].palette);
+        ClActSys_FreeCellAnims(wk->entries[0].cellAnims);
 #endif
     }
 }
@@ -261,7 +262,7 @@ void BtlvClact_StartMove(BtlvClact *wk, int index, int type, ClActorPos *pos, in
         end.x = pos->x << FX32_SHIFT;
         end.y = pos->y << FX32_SHIFT;
         end.z = 0;
-        func_0204c178(wk->entries[index].actor, &current, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(wk->entries[index].actor, &current, CLACT_SURFACE_MAIN);
         start.x = current.x << FX32_SHIFT;
         start.y = current.y << FX32_SHIFT;
         start.z = 0;
@@ -291,7 +292,7 @@ void BtlvClact_StartScale(BtlvClact *wk, int index, int type, VecFx32 *scale, in
 
 void BtlvClact_SetAnimSeq(BtlvClact *wk, int index, int sequence) {
     if (wk->entries[index].actor != NULL) {
-        func_0204c488(wk->entries[index].actor, sequence);
+        ClActor_SetSequence(wk->entries[index].actor, sequence);
     }
 }
 
@@ -299,7 +300,7 @@ void BtlvClact_StartPalFade(BtlvClact *wk, int index, u8 start, u8 end, s8 delay
     u16 mask;
 
     if (wk->entries[index].actor != NULL) {
-        mask = 1 << ((func_0204bdc0(wk->entries[index].palette, FALSE) & 0x3ff) / 32);
+        mask = 1 << ((ClActSys_GetPlttVramAddr(wk->entries[index].palette, FALSE) & 0x3ff) / 32);
         PaletteFade_StartFade(BtlvEffect_GetPaletteFade(), 1 << PALFADE_BUFFER_MAIN_OBJ, mask, delay, start, end, color,
                               BtlvEffect_GetTCBManager());
     }
@@ -359,7 +360,7 @@ static void BtlvClact_MoveTask(TCB *tcb, void *data) {
 
     pos.x = FX_Whole(task->value.x);
     pos.y = FX_Whole(task->value.y);
-    func_0204c140(wk->entries[task->index].actor, &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->entries[task->index].actor, &pos, CLACT_SURFACE_MAIN);
     if (done == TRUE) {
         BtlvEffect_EndTask(tcb);
     }
@@ -379,8 +380,8 @@ static void BtlvClact_ScaleTask(TCB *tcb, void *data) {
 
     scale.x = task->value.x;
     scale.y = task->value.y;
-    func_0204c244(wk->entries[task->index].actor, 1);
-    func_0204c270(wk->entries[task->index].actor, &scale);
+    ClActor_SetAffineMode(wk->entries[task->index].actor, 1);
+    ClActor_SetScale(wk->entries[task->index].actor, &scale);
     if (done == TRUE) {
         BtlvEffect_EndTask(tcb);
     }
@@ -397,13 +398,13 @@ static void BtlvClact_PopupTask(TCB *tcb, void *data) {
 
     switch (task->move.count) {
     case 0:
-        if (func_0204c560(task->wk->popup[0].actor) == FALSE) {
+        if (ClActor_IsAnimActive(task->wk->popup[0].actor) == FALSE) {
             task->move.count++;
         }
         break;
     case 1:
-        func_0204c124(task->wk->popup[0].actor, FALSE);
-        func_0204c124(task->wk->popup[1].actor, FALSE);
+        ClActor_SetVisible(task->wk->popup[0].actor, FALSE);
+        ClActor_SetVisible(task->wk->popup[1].actor, FALSE);
         task->move.count++;
         break;
     case 2:
@@ -436,10 +437,10 @@ static void BtlvClact_StartPopupTask(BtlvClact *wk, int number) {
 }
 
 void BtlvClact_ShowPopup(BtlvClact *wk, int number, Font *font) {
-    func_0204c124(wk->popup[0].actor, TRUE);
-    func_0204c56c(wk->popup[0].actor);
-    func_0204c124(wk->popup[1].actor, TRUE);
-    func_0204c56c(wk->popup[1].actor);
+    ClActor_SetVisible(wk->popup[0].actor, TRUE);
+    ClActor_RestartAnim(wk->popup[0].actor);
+    ClActor_SetVisible(wk->popup[1].actor, TRUE);
+    ClActor_RestartAnim(wk->popup[1].actor);
     BtlvClact_PrintPopupMessage(wk, number, font);
     BtlvClact_StartPopupTask(wk, number);
 }
@@ -450,11 +451,11 @@ static void BtlvClact_PrintPopupMessage(BtlvClact *wk, int number, Font *font) {
     GFLBitmap *bitmap = GFL_BitmapCreate(8, 2, 0x20, wk->heapId);
     int width;
 
-    func_ov167_021d4ec0(strbuf, number + 0xc9, 0);
+    BtlString_FormatStdMsg(strbuf, number + 0xc9, 0);
     width = GFL_FontGetBlockWidth(strbuf, font, 0);
     GFL_BitmapFill(bitmap, 0xff);
     GFL_TextRendererDrawToBitmapEx(bitmap, 32 - width / 2, 0, strbuf, font, 0x1d0f);
-    func_0204bab8(wk->gauge[0].chars, GFL_BitmapGetPixelData(bitmap), 0x200, 0x680, CLACT_VRAM_MAIN);
+    ClActSys_WriteCharData(wk->gauge[0].chars, GFL_BitmapGetPixelData(bitmap), 0x200, 0x680, CLACT_VRAM_MAIN);
     GFL_StrBufFree(strbuf);
     GFL_BitmapFree(bitmap);
 }

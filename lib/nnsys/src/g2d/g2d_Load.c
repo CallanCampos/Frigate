@@ -22,6 +22,7 @@ void NNSi_G2dUnpackUserExCellAttrBank(NNSG2dUserExCellAttrBank *attrBank) {
 
     NNSi_G2dUnpackOffset(attrBank->pCellAttrArray, attrBank);
     for (i = 0; i < attrBank->numCells; i++) {
-        NNSi_G2dUnpackOffset(attrBank->pCellAttrArray[i].pAttr, attrBank);
+        // The SDK assigns the macro's result again here
+        attrBank->pCellAttrArray[i].pAttr = NNSi_G2dUnpackOffset(attrBank->pCellAttrArray[i].pAttr, attrBank);
     }
 }

@@ -26,7 +26,7 @@ GameEvent *EventFestMissionMessage_Create(GameSystem *gsys, void *args);
 // args is the field
 GameEvent *EventFestMissionMenu_Create(GameSystem *gsys, void *args);
 GameEvent *EventFestMissionInfo_Create(GameSystem *gsys, void *args);
-GameEvent *func_ov157_021f5ae4(GameSystem *gsys, void *args);
-GameEvent *func_ov157_021f5b18(GameSystem *gsys, void *args);
+GameEvent *EventFestMissionRetire_Create(GameSystem *gsys, void *args);
+GameEvent *EventFestMissionDisconnect_Create(GameSystem *gsys, void *args);
 
 #endif // POKEBW2_FIELD_EVENT_FEST_MISSION_H

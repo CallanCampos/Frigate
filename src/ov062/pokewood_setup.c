@@ -37,10 +37,10 @@ typedef struct {
     u16 *var;
 } PokewoodSaveEvent;
 
-void *func_ov062_021e6680(HeapID heapId, GameSystem *gsys, u16 *var) {
+void *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     Ov062Param6680 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param6680), TRUE, "pokewood_setup.c", 75);
 
     param->playerInfo = playerInfo;
@@ -49,14 +49,14 @@ void *func_ov062_021e6680(HeapID heapId, GameSystem *gsys, u16 *var) {
     return param;
 }
 
-void func_ov062_021e66b8(void *param) {
+void PokewoodSetup_FreeBookParam(void *param) {
     GFL_HeapFree(param);
 }
 
-void *func_ov062_021e66c0(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var) {
+void *PokewoodSetup_CreateMenuParam(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     SaveControl *saveControl = GameData_GetSaveControl(gameData);
     Ov062Param66c0 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param66c0), TRUE, "pokewood_setup.c", 111);
 
@@ -68,14 +68,14 @@ void *func_ov062_021e66c0(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var) {
     return param;
 }
 
-void func_ov062_021e670c(void *param) {
+void PokewoodSetup_FreeMenuParam(void *param) {
     GFL_HeapFree(param);
 }
 
-void *func_ov062_021e6714(HeapID heapId, GameSystem *gsys) {
+void *PokewoodSetup_CreateRecordMonitorParam(HeapID heapId, GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
-    PokewoodSave *save = func_02011040(gameData);
+    PokewoodSave *save = PokewoodSave_Get(gameData);
     Ov062Param6714 *param = GFL_HeapAllocate(heapId, sizeof(Ov062Param6714), TRUE, "pokewood_setup.c", 189);
 
     param->playerInfo = playerInfo;
@@ -83,33 +83,33 @@ void *func_ov062_021e6714(HeapID heapId, GameSystem *gsys) {
     return param;
 }
 
-void func_ov062_021e674c(void *param) {
+void PokewoodSetup_FreeRecordMonitorParam(void *param) {
     GFL_HeapFree(param);
 }
 
-static void func_ov062_021e6754(PokewoodSystem *sys, GameData *gameData, PokewoodSave *save, u32 slot) {
+static void Pokewood_KeepMovieResults(PokewoodSystem *sys, GameData *gameData, PokewoodSave *save, u32 slot) {
     func_02011124(save, PokewoodSystem_GetMovie(sys));
     func_020111a8(save, slot, 0);
-    func_ov062_021e663c(gameData, sys, slot);
+    PokewoodSystem_PushLastSeries(gameData, sys, slot);
     Pokewood_CheckMedals(gameData);
     PokewoodSystem_KeepBestRecord(gameData, sys);
-    func_ov062_021e6584(gameData, sys);
+    PokewoodSystem_RecordScore(gameData, sys);
     PokewoodSystem_UpdateCastFame(gameData, sys);
     RecordAddOne(getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData)), 0x83);
 }
 
-static GameEventReturnCode func_ov062_021e67b0(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventPokewoodSave_Callback(GameEvent *event, u32 *state, void *data) {
     PokewoodSaveEvent *wk = data;
-    PokewoodSave *save = func_02011040(wk->gameData);
+    PokewoodSave *save = PokewoodSave_Get(wk->gameData);
 
     switch (*state) {
     case 0:
-        func_ov062_021e6754(wk->sys, wk->gameData, save, wk->slot);
+        Pokewood_KeepMovieResults(wk->sys, wk->gameData, save, wk->slot);
         allocatePokewoodBlk(HEAPID_FIELDMAP);
         setPokewoodBlk(PokewoodSystem_GetPokewoodBlk(wk->sys));
         *state = 1;
     case 1:
-        switch (func_020106ec(wk->gameData, HEAPID_FIELDMAP, wk->slot, &wk->state)) {
+        switch (Pokewood_SaveDownloadedMovie(wk->gameData, HEAPID_FIELDMAP, wk->slot, &wk->state)) {
         case 3:
             if (wk->var != NULL) {
                 *wk->var = 0;
@@ -131,13 +131,13 @@ static GameEventReturnCode func_ov062_021e67b0(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov062_021e682c(GameSystem *gsys, u16 *var) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov062_021e67b0, sizeof(PokewoodSaveEvent));
+GameEvent *EventPokewoodSave_Create(GameSystem *gsys, u16 *var) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventPokewoodSave_Callback, sizeof(PokewoodSaveEvent));
     PokewoodSaveEvent *wk = GameEvent_GetData(event);
 
     wk->gameData = GSYS_GetGameData(gsys);
-    wk->sys = *func_02017a04(wk->gameData);
-    wk->slot = func_ov062_021e62c8(wk->sys);
+    wk->sys = *GameData_GetPokewoodSystemPtr(wk->gameData);
+    wk->slot = PokewoodSystem_GetSaveSlot(wk->sys);
     wk->state = 0;
     wk->var = var;
     return event;

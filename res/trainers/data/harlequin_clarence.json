@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Clarence",
+    "class": "TRAINER_CLASS_HARLEQUIN_233",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_SEWADDLE",
+            "form": 0,
+            "level": 20,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SEWADDLE",
+            "form": 0,
+            "level": 20,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "What do you think? This Pokémon Gym...\nHow should I say? Isn't it full of...{be00}\noutrageous and mysterious charms?{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You've got quite a bit of charm\nyourself, don't you?"
+        },
+        {
+            "type": 2,
+            "text": "Look carefully at the direction in which\nthe string extends from the cocoon.{be01}\nFind the end of the string, and\nproceed in that direction!"
+        }
+    ]
+}

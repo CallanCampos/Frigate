@@ -152,7 +152,7 @@ BOOL func_ov036_021aaf1c(VM *vm, FieldScriptEnv *env) {
         a2 = TRUE;
         break;
     }
-    event = func_ov097_021eede4(gsys, a1, a2);
+    event = DriftveilLift_CreateMoveEvent(gsys, a1, a2);
     if (event == NULL) {
         return TRUE;
     }
@@ -168,7 +168,7 @@ BOOL func_ov036_021aaf78(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021aaf88(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov097_021eefe4(gsys, VM_Read16(vm));
+    DriftveilLift_PlaceAtBottom(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -193,7 +193,7 @@ BOOL s02BB_Gym0601FanAmbienceStart(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab004(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov098_021eee0c(gsys, VM_Read16(vm));
+    GameEvent *event = GymIcirrus_CreateSwitchAnimEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;
@@ -205,7 +205,7 @@ BOOL func_ov036_021ab004(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab03c(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    GameEvent *event = func_ov098_021eee48(gsys, VM_Read16(vm));
+    GameEvent *event = GymIcirrus_CreateFlipSwitchEvent(gsys, VM_Read16(vm));
 
     if (event == NULL) {
         return TRUE;
@@ -217,7 +217,7 @@ BOOL func_ov036_021ab03c(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021ab074(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov098_021eee84(gsys, VM_Read16(vm));
+    GymIcirrus_ToggleMovementAtPlace(gsys, VM_Read16(vm));
     return FALSE;
 }
 
@@ -264,14 +264,14 @@ BOOL func_ov036_021ab134(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
 
-    func_ov100_021eed10(gsys, VM_Read16(vm));
+    GymVirbank_StopModelAnimations(gsys, VM_Read16(vm));
     return TRUE;
 }
 
 BOOL func_ov036_021ab158(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
-    func_ov100_021eed64(gsys, VM_Read16(vm));
+    GymVirbank_SetActorFlag(gsys, VM_Read16(vm));
     return TRUE;
 }
 

@@ -19,11 +19,11 @@ struct WorldTradeData {
 
 u32 WorldTradeData_GetBlockSize(void);
 void WorldTradeData_Init(WorldTradeData *data);
-u16 func_0200b4a8(WorldTradeData *data);
-void func_0200b4b0(WorldTradeData *data, u16 flag);
+u16 WorldTradeData_GetFlag(WorldTradeData *data);
+void WorldTradeData_SetFlag(WorldTradeData *data, u16 flag);
 // Copies the deposited Pokémon out, or in
 void WorldTradeData_GetPkm(WorldTradeData *data, PartyPkm *pkm);
-PartyPkm *func_0200b4d0(WorldTradeData *data);
+PartyPkm *WorldTradeData_GetPkmPtr(WorldTradeData *data);
 // Its callers pass the box the Pokémon came from as well, which it ignores
 void WorldTradeData_SetPkm(WorldTradeData *data, PartyPkm *pkm, u32 box);
 void func_0200b4ec(WorldTradeData *data, u32 value);

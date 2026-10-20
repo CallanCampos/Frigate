@@ -67,10 +67,10 @@ GameEventReturnCode func_ov033_0217b3ac(GameEvent *event, u32 *state, void *data
 // Overlay 12's event_trial_house.c
 // The party screen for picking the Pokémon to enter, from the party or the Battle Box; result is set to whether
 // Pokémon were picked
-GameEvent *func_ov012_02162c48(GameSystem *gsys, TrialHouseWork *work, u32 mode, BOOL battleBox, u16 *result);
+GameEvent *CallTrialHouseTeamSelect(GameSystem *gsys, TrialHouseWork *work, u32 mode, BOOL battleBox, u16 *result);
 GameEvent *CallTrialHouseBattle(GameSystem *gsys, TrialHouseWork *work);
 void SyncTrialHouseWkStatsFromBattle(TrialHouseWork *work, BtlSetup *setup);
 // Overlay 313's results screen
-GameEvent *func_ov012_02162eb4(GameSystem *gsys, u32 a1, u32 a2);
+GameEvent *CallTrialHouseResults(GameSystem *gsys, u32 a1, u32 a2);
 
 #endif // POKEBW2_FIELD_TRIAL_HOUSE_H

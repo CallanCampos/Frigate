@@ -1,0 +1,91 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "N",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_N",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_FULL_RESTORE", "ITEM_FULL_RESTORE", "ITEM_FULL_RESTORE", "ITEM_FULL_RESTORE" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 50,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_HIPPOWDON",
+            "form": 0,
+            "level": 77,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_LIFE_ORB",
+            "moves": [ "MOVE_STONE_EDGE", "MOVE_CRUNCH", "MOVE_SUPERPOWER", "MOVE_STEALTH_ROCK" ]
+        },
+        {
+            "species": "SPECIES_GASTRODON",
+            "form": 0,
+            "level": 75,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_SMOOTH_ROCK",
+            "moves": [ "MOVE_EARTH_POWER", "MOVE_MUDDY_WATER", "MOVE_ICE_BEAM", "MOVE_SANDSTORM" ]
+        },
+        {
+            "species": "SPECIES_CRADILY",
+            "form": 0,
+            "level": 75,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_SMOOTH_ROCK",
+            "moves": [ "MOVE_SANDSTORM", "MOVE_GIGA_DRAIN", "MOVE_CONFUSE_RAY", "MOVE_STOCKPILE" ]
+        },
+        {
+            "species": "SPECIES_ARMALDO",
+            "form": 0,
+            "level": 75,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 0,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_ROCK_SLIDE", "MOVE_X_SCISSOR", "MOVE_AQUA_TAIL", "MOVE_ROCK_POLISH" ]
+        },
+        {
+            "species": "SPECIES_SCIZOR",
+            "form": 0,
+            "level": 75,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_BULLET_PUNCH", "MOVE_DOUBLE_HIT", "MOVE_BUG_BITE", "MOVE_AERIAL_ACE" ]
+        },
+        {
+            "species": "SPECIES_RHYPERIOR",
+            "form": 0,
+            "level": 75,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "item": "ITEM_NONE",
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_STONE_EDGE", "MOVE_FIRE_PUNCH", "MOVE_ICE_PUNCH" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "More!\nLet me hear the voice of your Pokémon!"
+        },
+        {
+            "type": 19,
+            "text": "For the sake of my friend who saved me, I\nwill never give up!"
+        },
+        {
+            "type": 20,
+            "text": "You've got to value this time that you\nhave to get to know each other!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Your Pokémon are happy...\nThey are happy to be with you."
+        }
+    ]
+}

@@ -219,7 +219,7 @@ static inline void GimmickGC6_InitModel(GiantChasm6Work *work, u16 model, fx32 x
     matrix->translation.x = x;
     matrix->translation.y = 0;
     matrix->translation.z = z;
-    func_ov036_021b8248(work->expObj, 0, model, 0);
+    FieldExpObj_SetActorCulling(work->expObj, 0, model, 0);
     FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
     for (i = 0; i < 2; i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, i);

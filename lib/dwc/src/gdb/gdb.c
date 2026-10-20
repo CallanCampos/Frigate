@@ -149,14 +149,14 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
         DWCi_SetError(8, Gdb_GetErrorCode(1, 4));
         return 4;
     }
-    func_ov011_0216c77c();
+    gsCoreInitialize();
     error = sakeStartup(&sGdb.sake);
     if (error != 0) {
         Gdb_Printf(295, "sakeStartup failed.[%d]\n", error);
         Gdb_RunLibrary();
         return Gdb_SetStartupError(error);
     }
-    Sake_SetGame(sGdb.sake, data_ov011_021917bc, gameId, data_ov011_021918bc);
+    Sake_SetGame(sGdb.sake, gcd_gamename, gameId, gcd_secret_key);
     Sake_SetLoginTicket(sGdb.sake, ((const GdbUserData *)userData)->profileId, &ticket);
     Gdb_SetUrls(server);
     DWC_InitGHTTP(0);
@@ -167,6 +167,10 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     return 0;
 }
 
+static inline GdbRequest *Gdb_GetCurrentRequest(void) {
+    return &sGdbRequests[sGdb.requestIndex];
+}
+
 int Gdb_Cancel(void) {
     if (sGdb.state != GDB_STATE_BUSY) {
         Gdb_Printf(335, "not in async process.\n");
@@ -175,43 +179,42 @@ int Gdb_Cancel(void) {
     sGdb.state = GDB_STATE_CANCELING;
     switch (sGdb.operation) {
     case GDB_OPERATION_CREATE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_DELETE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_UPDATE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_MY_RECORDS:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_RECORD_LIMIT:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_SPECIFIC_RECORDS:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_RATE_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_SEARCH_RECORDS:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_RANDOM_RECORD:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_GET_RECORD_COUNT:
-        Sake_CancelRequest(sGdb.sake, sGdbRequests[sGdb.requestIndex].request);
+        Sake_CancelRequest(sGdb.sake, Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_DOWNLOAD_FILE:
-        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState((int)sGdbRequests[sGdb.requestIndex].request));
-        ghttpCancelRequest((int)sGdbRequests[sGdb.requestIndex].request);
+        Gdb_Printf(385, "cancel ghttp. state[%d]\n", ghttpGetState((int)Gdb_GetCurrentRequest()->request));
+        ghttpCancelRequest((int)Gdb_GetCurrentRequest()->request);
         break;
     case GDB_OPERATION_UPLOAD_FILE:
-        Gdb_Printf(392, "cancel ghttp. state[%d]\n",
-                   ghttpGetState((int)sGdbRequests[sGdb.requestIndex].u.delete.table));
-        ghttpCancelRequest((int)sGdbRequests[sGdb.requestIndex].u.delete.table);
+        Gdb_Printf(392, "cancel ghttp. state[%d]\n", ghttpGetState((int)Gdb_GetCurrentRequest()->u.delete.table));
+        ghttpCancelRequest((int)Gdb_GetCurrentRequest()->u.delete.table);
         break;
     default:
         Gdb_Printf(399, "illegal process[%d].\n", sGdb.operation);
@@ -249,8 +252,8 @@ static void Gdb_ReleaseUrls(void) {
 }
 
 void Gdb_Update(void) {
-    if (func_ov011_0216c9f4() != 2) {
-        func_ov011_0216c910(0);
+    if (gsCoreIsShutdown() != 2) {
+        gsCoreThink(0);
     }
     DWC_ProcessGHTTP();
 }
@@ -418,16 +421,15 @@ static BOOL Gdb_CheckReady(int *error) {
 }
 
 static void Gdb_RunLibrary(void) {
-    func_ov011_0216c998();
-    func_ov011_0216c910(0);
-    if (func_ov011_0216c9f4() != 2) {
-        func_ov011_0216c910(0);
+    gsCoreShutdown();
+    gsCoreThink(0);
+    if (gsCoreIsShutdown() != 2) {
+        gsCoreThink(0);
     }
 }
 
 static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *input, void *output, void *userData) {
     GdbRequest *slot;
-    int operation = sGdb.operation;
     SakeGetRecordsOutput *records = output;
     int *values = output;
 
@@ -435,6 +437,7 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
         return;
     }
     if (error == 0) {
+        int operation = sGdb.operation;
         sGdb.result = 1;
         sGdb.state = GDB_STATE_IDLE;
         sGdb.operation = 0;
@@ -694,27 +697,25 @@ static void Gdb_SetUrls(int server) {
     switch (server) {
     case 1:
         OS_SNPrintf(gSakeStorageUrl, 128,
-                    "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                    data_ov011_021917bc);
+                    "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx", gcd_gamename);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         OS_SNPrintf(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(uploadUrl);
         OS_SNPrintf(downloadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     case 0:
     default:
         OS_SNPrintf(gSakeStorageUrl, 128,
-                    "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                    data_ov011_021917bc);
+                    "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx", gcd_gamename);
         DWCi_SetGHTTPRootCA(gSakeStorageUrl);
         OS_SNPrintf(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(uploadUrl);
         OS_SNPrintf(downloadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/download.aspx",
-                    data_ov011_021917bc);
+                    gcd_gamename);
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     }

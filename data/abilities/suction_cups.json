@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Suction Cups",
-    "description": "Negates all moves that\nforce switching out."
-}

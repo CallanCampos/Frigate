@@ -26,23 +26,23 @@ void func_0202d7dc(void);
 u32 getUINarcIdx(void);
 
 // The type and contest category icons: the palette, each icon's palette within it, the icons, cells and animations
-u32 func_0202d7e4(void);
-u8 func_0202d7e8(u8 type);
-u32 func_0202d7f4(u8 type);
-u32 func_0202d7f8(u32 mapping);
-u32 func_0202d7fc(u32 mapping);
-u8 func_0202d800(u8 index);
-u32 func_0202d80c(u8 index);
+u32 AppMenuCommon_GetTypeIconPaletteFile(void);
+u8 AppMenuCommon_GetTypeIconPaletteIndex(u8 type);
+u32 AppMenuCommon_GetTypeIconCharFile(u8 type);
+u32 AppMenuCommon_GetTypeIconCellFile(u32 mapping);
+u32 AppMenuCommon_GetTypeIconAnimFile(u32 mapping);
+u8 AppMenuCommon_GetCategoryIconPaletteIndex(u8 index);
+u32 AppMenuCommon_GetCategoryIconCharFile(u8 index);
 
 // The touch bar's icons: their palette, characters, and cells and animations for an OBJ VRAM mapping mode
-u32 func_0202d810(void);
-u32 func_0202d814(void);
-u32 func_0202d818(u32 mapping);
-u32 func_0202d81c(u32 mapping);
+u32 AppMenuCommon_GetTouchBarPaletteFile(void);
+u32 AppMenuCommon_GetTouchBarCharFile(void);
+u32 AppMenuCommon_GetTouchBarCellFile(u32 mapping);
+u32 AppMenuCommon_GetTouchBarAnimFile(u32 mapping);
 // The touch bar's BG: its palette, characters and screen
-u32 func_0202d820(void);
-u32 func_0202d824(void);
-u32 func_0202d828(void);
+u32 AppMenuCommon_GetBarBgPaletteFile(void);
+u32 AppMenuCommon_GetBarBgCharFile(void);
+u32 AppMenuCommon_GetBarScreenFile(void);
 u32 func_0202d82c(void);
 
 // Loads the menu bar's screen into the bottom three rows of bg's screen buffer, with its characters starting at
@@ -57,24 +57,24 @@ u32 func_0202d8a0(void);
 u32 func_0202d8a4(void);
 u32 func_0202d8a8(u32 mapping);
 u32 func_0202d8ac(u32 mapping);
-u32 func_0202d8b0(void);
-u32 func_0202d8b4(void);
-u32 func_0202d8b8(u32 mapping);
-u32 func_0202d8bc(u32 mapping);
+u32 AppMenuCommon_GetStatusIconPaletteFile(void);
+u32 AppMenuCommon_GetStatusIconCharFile(void);
+u32 AppMenuCommon_GetStatusIconCellFile(u32 mapping);
+u32 AppMenuCommon_GetStatusIconAnimFile(u32 mapping);
 
 // The status icon (APP_STATUS_ICON_*) of a party Pokémon: fainted, its status condition, or none
 u32 AppMenuCommon_GetStatusIcon(PartyPkm *pkm);
 
-u32 func_0202d90c(u32 mapping);
-u32 func_0202d910(u32 mapping);
-u32 func_0202d914(u32 mapping);
-u32 func_0202d918(u32 mapping);
+u32 AppMenuCommon_GetPokemonSpriteCellFile(u32 mapping);
+u32 AppMenuCommon_GetPokemonSpriteAnimFile(u32 mapping);
+u32 AppMenuCommon_GetTrainerSpriteCellFile(u32 mapping);
+u32 AppMenuCommon_GetTrainerSpriteAnimFile(u32 mapping);
 // The files of a Poké Ball's icon: its palette and characters, where ball 0 counts as 4, then its cells and
 // animations, the same for every ball
-u32 func_0202d91c(u32 ball);
-u32 func_0202d928(u32 ball);
-u32 func_0202d934(u32 ball, u32 mapping);
-u32 func_0202d93c(u32 ball, u32 mapping);
+u32 AppMenuCommon_GetBallPaletteFile(u32 ball);
+u32 AppMenuCommon_GetBallCharFile(u32 ball);
+u32 AppMenuCommon_GetBallCellFile(u32 ball, u32 mapping);
+u32 AppMenuCommon_GetBallAnimFile(u32 ball, u32 mapping);
 u32 func_0202d944(void);
 u32 func_0202d948(u32 mapping);
 u32 func_0202d94c(u32 mapping);

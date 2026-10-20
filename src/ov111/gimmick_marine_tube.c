@@ -30,14 +30,14 @@ typedef struct {
     MarineTubeState *state;
 } MarineTubeWork;
 
-static void func_ov111_021eedac(MarineTubeWork *work);
-static void func_ov111_021eed08(MarineTubeWork *work);
-static void func_ov111_021eef70(MarineTubeWork *work);
-static void func_ov111_021eef7c(MarineTubeWork *work);
-static void func_ov111_021eef88(FieldExpObjSystem *expObj, u16 model, int animCount, VecFx32 pos);
-static void func_ov111_021ef010(FieldExpObjSystem *expObj, u16 model);
-static void func_ov111_021ef074(MarineTubeWork *work);
-static void func_ov111_021ef0c8(MarineTubeWork *work);
+static void MarineTube_PlaceModels(MarineTubeWork *work);
+static void MarineTube_ShowStage(MarineTubeWork *work);
+static void MarineTube_FreeScene(MarineTubeWork *work);
+static void MarineTube_StepAnimations(MarineTubeWork *work);
+static void MarineTube_InitModel(FieldExpObjSystem *expObj, u16 model, int animCount, VecFx32 pos);
+static void MarineTube_ShowModel(FieldExpObjSystem *expObj, u16 model);
+static void MarineTube_SaveFrames(MarineTubeWork *work);
+static void MarineTube_LoadFrames(MarineTubeWork *work);
 
 static const G3DSceneResourceSetup sResources[29] = {
     { GIMMICK_ARCID, 0, 0 },  { GIMMICK_ARCID, 1, 0 },  { GIMMICK_ARCID, 2, 0 },  { GIMMICK_ARCID, 3, 0 },
@@ -85,7 +85,7 @@ static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActo
 // How many animations each model has
 static const int sAnimationCounts[MODEL_COUNT] = { 1, 1, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1 };
 
-void func_ov111_021eec80(Field *field) {
+void MarineTube_Init(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     MarineTubeWork *work;
 
@@ -94,54 +94,54 @@ void func_ov111_021eec80(Field *field) {
     work->field = field;
     work->expObj = Field_GetExpObjSystem(field);
     work->state = GimmickState_GetUserData(GameData_GetGimmickState(gameData), GIMMICK_STATE_ID);
-    func_ov111_021eedac(work);
-    func_ov111_021eed08(work);
-    func_ov111_021ef0c8(work);
+    MarineTube_PlaceModels(work);
+    MarineTube_ShowStage(work);
+    MarineTube_LoadFrames(work);
 }
 
-void func_ov111_021eecd8(Field *field) {
+void MarineTube_End(Field *field) {
     MarineTubeWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
-    func_ov111_021ef074(work);
-    func_ov111_021eef70(work);
+    MarineTube_SaveFrames(work);
+    MarineTube_FreeScene(work);
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
-void func_ov111_021eecf8(Field *field) {
-    func_ov111_021eef7c(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
+void MarineTube_Update(Field *field) {
+    MarineTube_StepAnimations(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
 }
 
 // Shows the models of the saved stage, which loop
-static void func_ov111_021eed08(MarineTubeWork *work) {
+static void MarineTube_ShowStage(MarineTubeWork *work) {
     switch (work->state->stage) {
     case 0:
-        func_ov111_021ef010(work->expObj, 0);
-        func_ov111_021ef010(work->expObj, 1);
-        func_ov111_021ef010(work->expObj, 2);
-        func_ov111_021ef010(work->expObj, 3);
-        func_ov111_021ef010(work->expObj, 5);
-        func_ov111_021ef010(work->expObj, 6);
-        func_ov111_021ef010(work->expObj, 7);
-        func_ov111_021ef010(work->expObj, 8);
+        MarineTube_ShowModel(work->expObj, 0);
+        MarineTube_ShowModel(work->expObj, 1);
+        MarineTube_ShowModel(work->expObj, 2);
+        MarineTube_ShowModel(work->expObj, 3);
+        MarineTube_ShowModel(work->expObj, 5);
+        MarineTube_ShowModel(work->expObj, 6);
+        MarineTube_ShowModel(work->expObj, 7);
+        MarineTube_ShowModel(work->expObj, 8);
         break;
     case 1:
-        func_ov111_021ef010(work->expObj, 0);
-        func_ov111_021ef010(work->expObj, 1);
-        func_ov111_021ef010(work->expObj, 2);
-        func_ov111_021ef010(work->expObj, 3);
-        func_ov111_021ef010(work->expObj, 9);
-        func_ov111_021ef010(work->expObj, 10);
-        func_ov111_021ef010(work->expObj, 11);
-        func_ov111_021ef010(work->expObj, 12);
+        MarineTube_ShowModel(work->expObj, 0);
+        MarineTube_ShowModel(work->expObj, 1);
+        MarineTube_ShowModel(work->expObj, 2);
+        MarineTube_ShowModel(work->expObj, 3);
+        MarineTube_ShowModel(work->expObj, 9);
+        MarineTube_ShowModel(work->expObj, 10);
+        MarineTube_ShowModel(work->expObj, 11);
+        MarineTube_ShowModel(work->expObj, 12);
         break;
     case 2:
-        func_ov111_021ef010(work->expObj, 4);
+        MarineTube_ShowModel(work->expObj, 4);
         break;
     }
 }
 
 // Places the models, hidden
-static void func_ov111_021eedac(MarineTubeWork *work) {
+static void MarineTube_PlaceModels(MarineTubeWork *work) {
     VecFx32 positions[7] = {
         { FX32_CONST(256), FX32_CONST(0), FX32_CONST(256) },  { FX32_CONST(256), FX32_CONST(0), FX32_CONST(768) },
         { FX32_CONST(256), FX32_CONST(0), FX32_CONST(1280) }, { FX32_CONST(256), FX32_CONST(0), FX32_CONST(1792) },
@@ -154,33 +154,33 @@ static void func_ov111_021eedac(MarineTubeWork *work) {
 
     LoadFieldExpandObjData(work->expObj, &sSceneSetup, 0);
     posA = positions[3];
-    func_ov111_021eef88(work->expObj, 0, 1, posA);
+    MarineTube_InitModel(work->expObj, 0, 1, posA);
     posB = positions[1];
-    func_ov111_021eef88(work->expObj, 1, 1, posB);
-    func_ov111_021eef88(work->expObj, 2, 1, posA);
-    func_ov111_021eef88(work->expObj, 3, 1, posB);
-    func_ov111_021eef88(work->expObj, 4, 2, posA);
+    MarineTube_InitModel(work->expObj, 1, 1, posB);
+    MarineTube_InitModel(work->expObj, 2, 1, posA);
+    MarineTube_InitModel(work->expObj, 3, 1, posB);
+    MarineTube_InitModel(work->expObj, 4, 2, posA);
     posC = positions[4];
-    func_ov111_021eef88(work->expObj, 5, 1, posC);
-    func_ov111_021eef88(work->expObj, 6, 1, posB);
-    func_ov111_021eef88(work->expObj, 7, 2, posC);
-    func_ov111_021eef88(work->expObj, 8, 2, posB);
-    func_ov111_021eef88(work->expObj, 9, 1, posA);
-    func_ov111_021eef88(work->expObj, 10, 1, posB);
-    func_ov111_021eef88(work->expObj, 11, 1, posA);
-    func_ov111_021eef88(work->expObj, 12, 1, posB);
+    MarineTube_InitModel(work->expObj, 5, 1, posC);
+    MarineTube_InitModel(work->expObj, 6, 1, posB);
+    MarineTube_InitModel(work->expObj, 7, 2, posC);
+    MarineTube_InitModel(work->expObj, 8, 2, posB);
+    MarineTube_InitModel(work->expObj, 9, 1, posA);
+    MarineTube_InitModel(work->expObj, 10, 1, posB);
+    MarineTube_InitModel(work->expObj, 11, 1, posA);
+    MarineTube_InitModel(work->expObj, 12, 1, posB);
 }
 
-static void func_ov111_021eef70(MarineTubeWork *work) {
+static void MarineTube_FreeScene(MarineTubeWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov111_021eef7c(MarineTubeWork *work) {
+static void MarineTube_StepAnimations(MarineTubeWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
 // Places the model, hidden, with its animations set looping and paused
-static void func_ov111_021eef88(FieldExpObjSystem *expObj, u16 model, int animCount, VecFx32 pos) {
+static void MarineTube_InitModel(FieldExpObjSystem *expObj, u16 model, int animCount, VecFx32 pos) {
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
     int i;
@@ -191,7 +191,7 @@ static void func_ov111_021eef88(FieldExpObjSystem *expObj, u16 model, int animCo
     matrix->translation.x = pos.x;
     matrix->translation.y = y;
     matrix->translation.z = z;
-    func_ov036_021b8248(expObj, 0, model, 0);
+    FieldExpObj_SetActorCulling(expObj, 0, model, 0);
     FieldExpObj_SetActorHidden(expObj, 0, model, TRUE);
     for (i = 0; i < animCount; i++) {
         anm = FieldExpObj_GetAnmInfo(expObj, 0, model, i);
@@ -202,7 +202,7 @@ static void func_ov111_021eef88(FieldExpObjSystem *expObj, u16 model, int animCo
 }
 
 // Shows the model with its animations playing in a loop
-static void func_ov111_021ef010(FieldExpObjSystem *expObj, u16 model) {
+static void MarineTube_ShowModel(FieldExpObjSystem *expObj, u16 model) {
     int animCount = sAnimationCounts[model];
     FieldExpObjAnm *anm;
     int i;
@@ -217,7 +217,7 @@ static void func_ov111_021ef010(FieldExpObjSystem *expObj, u16 model) {
 }
 
 // Keeps the frame of each animation in the save
-static void func_ov111_021ef074(MarineTubeWork *work) {
+static void MarineTube_SaveFrames(MarineTubeWork *work) {
     FieldExpObjSystem *expObj = work->expObj;
     MarineTubeState *state = work->state;
     int i;
@@ -227,13 +227,13 @@ static void func_ov111_021ef074(MarineTubeWork *work) {
     for (i = 0; i < MODEL_COUNT; i++) {
         animCount = sAnimationCounts[i];
         for (j = 0; j < animCount; j++) {
-            state->frames[i + j] = func_ov036_021b8520(expObj, 0, i, (u16)j);
+            state->frames[i + j] = FieldExpObj_GetAnmFrame(expObj, 0, i, (u16)j);
         }
     }
 }
 
 // Sets each animation to the frame that the save kept
-static void func_ov111_021ef0c8(MarineTubeWork *work) {
+static void MarineTube_LoadFrames(MarineTubeWork *work) {
     FieldExpObjSystem *expObj = work->expObj;
     MarineTubeState *state = work->state;
     int i;

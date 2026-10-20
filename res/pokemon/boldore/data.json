@@ -1,0 +1,125 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Boldore",
+    "pokedex": {
+        "category": "Ore Pokémon",
+        "entry": "When it is healthy, its core sticks out.\nAlways facing the same way, it swiftly\nmoves front to back and left to right.",
+        "height": "2'11\"",
+        "weight": "224.9 lbs.",
+        "languages": {
+            "ja": {
+                "category": "こうせきポケモン"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 70,
+        "attack": 105,
+        "defense": 105,
+        "speed": 20,
+        "special_attack": 50,
+        "special_defense": 40
+    },
+    "types": [ "TYPE_ROCK", "TYPE_ROCK" ],
+    "catch_rate": 120,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 1,
+        "defense": 1,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_EVERSTONE",
+        "rare": "ITEM_HARD_STONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_MINERAL", "EGG_GROUP_MINERAL" ],
+    "abilities": [ "ABILITY_STURDY", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_SAND_FORCE",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BLUE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 137,
+    "height": 9,
+    "weight": 1020,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_HARDEN" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 1, "MOVE_HEADBUTT" ],
+            [ 4, "MOVE_HARDEN" ],
+            [ 7, "MOVE_SAND_ATTACK" ],
+            [ 10, "MOVE_HEADBUTT" ],
+            [ 14, "MOVE_ROCK_BLAST" ],
+            [ 17, "MOVE_MUD_SLAP" ],
+            [ 20, "MOVE_IRON_DEFENSE" ],
+            [ 23, "MOVE_SMACK_DOWN" ],
+            [ 25, "MOVE_POWER_GEM" ],
+            [ 30, "MOVE_ROCK_SLIDE" ],
+            [ 36, "MOVE_STEALTH_ROCK" ],
+            [ 42, "MOVE_SANDSTORM" ],
+            [ 48, "MOVE_STONE_EDGE" ],
+            [ 55, "MOVE_EXPLOSION" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM17",
+            "TM21",
+            "TM23",
+            "TM26",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM48",
+            "TM64",
+            "TM69",
+            "TM71",
+            "TM78",
+            "TM80",
+            "TM87",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_BLOCK",
+            "MOVE_EARTH_POWER",
+            "MOVE_GRAVITY",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_SNORE",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE",
+            "param": 0,
+            "species": "SPECIES_GIGALITH"
+        }
+    ],
+    "regional_dex_number": 69,
+    "baby_species": "SPECIES_ROGGENROLA",
+    "cry_volume": 120
+}

@@ -54,7 +54,7 @@
 #define LIST_ABILITY_LETTER 10
 #define LIST_LETTER_2 11
 
-// The criteria of Box2SearchParam that func_ov255_021d6a48 sets
+// The criteria of Box2SearchParam that SetCriterion sets
 #define CRITERION_SPECIES 0
 #define CRITERION_ITEM 1
 #define CRITERION_NATURE 2
@@ -93,128 +93,128 @@ typedef struct {
 
 typedef int (*BoxSearchSeqFunc)(BoxSearchWork *wk, int seq);
 
-static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov255_021d3c90(GameProc *proc, u32 *state, void *param, void *work);
-static BOOL func_ov255_021d3d00(GameProc *proc, u32 *state, void *param, void *work);
-static void func_ov255_021d3df0(HeapID heapId);
-static TouchBar *func_ov255_021d3e9c(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId);
-static void func_ov255_021d3eec(BoxSearchWork *wk);
-static void func_ov255_021d3ef8(TouchBar *bar);
-static void func_ov255_021d3f00(BoxSearchWork *wk);
-static void func_ov255_021d3f5c(BoxSearchWork *wk);
-static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId);
-static void func_ov255_021d40cc(BoxSearchWork *wk);
-static void func_ov255_021d40e8(BoxSearchWork *wk, int mode);
-static void func_ov255_021d41b0(BmpWin *window);
-static void func_ov255_021d41c4(BoxSearchWork *wk);
-static void func_ov255_021d4210(BoxSearchWork *wk, u32 index);
-static void func_ov255_021d4248(BoxSearchWork *wk, MsgData *msgData, u32 msgId);
-static void func_ov255_021d4288(BoxSearchWork *wk);
-static void func_ov255_021d42d4(BoxSearchWork *wk);
-static void func_ov255_021d4320(BoxSearchWork *wk, BOOL visible);
-static int func_ov255_021d434c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d43cc(BoxSearchWork *wk, int seq, u32 pos);
-static int func_ov255_021d4484(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4570(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4574(BoxSearchWork *wk, int seq);
-static int func_ov255_021d45d8(BoxSearchWork *wk, int seq);
-static int func_ov255_021d481c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4844(BoxSearchWork *wk, int seq);
-static int func_ov255_021d48dc(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4b5c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4b7c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4be0(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4db8(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4dc8(BoxSearchWork *wk, int seq);
-static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5068(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5090(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5128(BoxSearchWork *wk, int seq);
-static int func_ov255_021d539c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d53bc(BoxSearchWork *wk, int seq);
-static int func_ov255_021d541c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d555c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d556c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d55cc(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5700(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5710(BoxSearchWork *wk, int seq);
-static int func_ov255_021d57a0(BoxSearchWork *wk, int seq);
-static int func_ov255_021d58dc(BoxSearchWork *wk, int seq);
-static int func_ov255_021d58ec(BoxSearchWork *wk, int seq);
-static int func_ov255_021d591c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d594c(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5980(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5984(BoxSearchWork *wk, int seq);
-static int func_ov255_021d59b0(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5a10(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5a14(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5a54(BoxSearchWork *wk, int seq);
-static void func_ov255_021d5a68(BoxSearchWork *wk, int seq);
-static int func_ov255_021d5a70(BoxSearchWork *wk, int actor, u32 anim, int next);
-static int func_ov255_021d5a98(BoxSearchWork *wk, int actor, u32 anim, int next);
-static void func_ov255_021d5abc(void *work, int pos, int prevPos);
-static void func_ov255_021d5b00(void *work, int pos, int prevPos);
-static void func_ov255_021d5b28(void *work, int pos, int prevPos);
-static void func_ov255_021d5b6c(void *work, int pos, int prevPos);
-static void func_ov255_021d5b70(BoxSearchWork *wk, u32 type);
-static void func_ov255_021d5ba4(BoxSearchWork *wk);
-static void func_ov255_021d5bc4(BoxSearchWork *wk);
-static void func_ov255_021d5c0c(BoxSearchWork *wk);
-static void func_ov255_021d5c2c(BoxSearchWork *wk, u32 win, u32 string, int x, int y);
-static void func_ov255_021d5c84(BoxSearchWork *wk, u32 win, u32 msgId, int x, int y);
-static void func_ov255_021d5ce4(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d5d38(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d5d8c(void *work, u32 index, BOOL moved);
-static void func_ov255_021d5d90(void *work, s16 delta);
-static void func_ov255_021d5da8(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d5ddc(void *work, u32 index, BOOL moved);
-static void func_ov255_021d5df4(void *work, s16 delta);
-static void func_ov255_021d5e24(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d5ec8(void *work, u32 index, BOOL moved);
-static void func_ov255_021d5f50(void *work, s16 delta);
-static void func_ov255_021d5f68(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d5fa0(void *work, u32 index, BOOL moved);
-static void func_ov255_021d5fb8(void *work, s16 delta);
-static void func_ov255_021d5fe8(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d5ff4(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d6000(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
-static void func_ov255_021d6038(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId,
-                                u16 color, int y);
-static void func_ov255_021d6098(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId);
-static void func_ov255_021d60b4(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
-static void func_ov255_021d60ec(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
-static int func_ov255_021d612c(int letter, int group);
-static void func_ov255_021d6150(BoxSearchWork *wk);
-static int func_ov255_021d6214(BoxSearchWork *wk, int letter, int group);
-static int func_ov255_021d622c(int letter, int group);
-static void func_ov255_021d6250(BoxSearchWork *wk, u32 ability);
-static void func_ov255_021d6308(BoxSearchWork *wk, u32 species);
-static void func_ov255_021d63cc(BoxSearchWork *wk, u32 mode, int pos);
-static void func_ov255_021d6798(BoxSearchWork *wk);
-static void func_ov255_021d67b0(BoxSearchWork *wk);
-static void func_ov255_021d6804(BoxSearchWork *wk, u32 actor, s16 y);
-static void func_ov255_021d6828(BoxSearchWork *wk, u32 actor, int row);
-static void func_ov255_021d683c(BoxSearchWork *wk, s8 delta);
-static void func_ov255_021d6894(BoxSearchWork *wk, u32 actor, int count, int value);
-static u16 *func_ov255_021d68d8(u32 heapId, u32 *count);
-static void func_ov255_021d68fc(BoxSearchWork *wk, u32 screen);
-static void func_ov255_021d6940(BoxSearchWork *wk, BOOL show);
-static void func_ov255_021d6a48(BoxSearchWork *wk, u32 criterion, u32 value);
-static void func_ov255_021d6a88(BoxSearchWork *wk, u32 mark, u32 on);
-static u32 func_ov255_021d6aac(BoxSearchWork *wk, u32 mark);
-static void func_ov255_021d6ac0(BoxSearchWork *wk, u32 actor, u32 anim);
-static void func_ov255_021d6ae8(BoxSearchWork *wk, u32 actor);
-static void func_ov255_021d6b1c(BoxSearchWork *wk, u32 layout);
-static void func_ov255_021d6b5c(BoxSearchWork *wk, u32 actor, BOOL visible);
-static void func_ov255_021d6b80(BoxSearchWork *wk);
-static void func_ov255_021d6bac(BoxSearchWork *wk);
-static void func_ov255_021d6bf0(BoxSearchWork *wk, BOOL keep);
-static void func_ov255_021d6c94(BoxSearchWork *wk);
-static BOOL func_ov255_021d6cd4(BoxSearchWork *wk);
-static int func_ov255_021d6cf8(BoxSearchWork *wk);
+static BOOL BoxSearchProc_Init(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL BoxSearchProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
+static BOOL BoxSearchProc_Main(GameProc *proc, u32 *state, void *param, void *work);
+static void BoxSearch_LoadBgGraphics(HeapID heapId);
+static TouchBar *BoxSearch_CreateTouchBar(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId);
+static void BoxSearch_FreeTouchBar(BoxSearchWork *wk);
+static void BoxSearch_UpdateTouchBar(TouchBar *bar);
+static void BoxSearch_CreateWindows(BoxSearchWork *wk);
+static void BoxSearch_FreeWindows(BoxSearchWork *wk);
+static void BoxSearch_LoadObjs(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId);
+static void BoxSearch_FreeObjs(BoxSearchWork *wk);
+static void BoxSearch_PrintInfo(BoxSearchWork *wk, int mode);
+static void BoxSearch_PushWindowScreen(BmpWin *window);
+static void BoxSearch_PrintMainMenu(BoxSearchWork *wk);
+static void BoxSearch_PrintListTitle(BoxSearchWork *wk, u32 index);
+static void BoxSearch_PrintChoice(BoxSearchWork *wk, MsgData *msgData, u32 msgId);
+static void BoxSearch_ShowMainMenu(BoxSearchWork *wk);
+static void BoxSearch_HideMainMenu(BoxSearchWork *wk);
+static void BoxSearch_SetMainMenuActorsVisible(BoxSearchWork *wk, BOOL visible);
+static int BoxSearch_SeqMainMenuStart(BoxSearchWork *wk, int seq);
+static int BoxSearch_ChooseMainMenuButton(BoxSearchWork *wk, int seq, u32 pos);
+static int BoxSearch_SeqMainMenu(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqUnused1(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSpeciesLetterOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSpeciesLetterList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSpeciesLetterClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSpeciesOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSpeciesList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSpeciesClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqNatureOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqNatureList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqNatureClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqAbilityLetterOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqAbilityLetterList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqAbilityLetterClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqAbilityOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqAbilityList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqAbilityClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSexOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSexList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSexClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqItemOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqItemList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqItemClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqMarkingOpen(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqMarkingList(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqMarkingClose(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSearchOn(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqSearchOff(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqClearCriteria(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqUnused2(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqListWait(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqListArrowWait(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqUnused3(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqButtonAnmWait(BoxSearchWork *wk, int seq);
+static int BoxSearch_SeqStartChosenList(BoxSearchWork *wk, int seq);
+static void BoxSearch_SetNextSeq(BoxSearchWork *wk, int seq);
+static int BoxSearch_StartTouchBarAnm(BoxSearchWork *wk, int actor, u32 anim, int next);
+static int BoxSearch_StartButtonAnm(BoxSearchWork *wk, int actor, u32 anim, int next);
+static void BoxSearch_MainMenuCursorOn(void *work, int pos, int prevPos);
+static void BoxSearch_MainMenuCursorOff(void *work, int pos, int prevPos);
+static void BoxSearch_MainMenuCursorMove(void *work, int pos, int prevPos);
+static void BoxSearch_MainMenuCursorTouch(void *work, int pos, int prevPos);
+static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, u32 type);
+static void BoxSearch_ShowSwitch(BoxSearchWork *wk);
+static void BoxSearch_LoadStrings(BoxSearchWork *wk);
+static void BoxSearch_FreeStrings(BoxSearchWork *wk);
+static void BoxSearch_PrintString(BoxSearchWork *wk, u32 win, u32 string, int x, int y);
+static void BoxSearch_PrintMsg(BoxSearchWork *wk, u32 win, u32 msgId, int x, int y);
+static void AbilityLetterList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void SpeciesLetterList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void ListMoveNone(void *work, u32 index, BOOL moved);
+static void ListScroll(void *work, s16 delta);
+static void SpeciesList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void SpeciesList_Move(void *work, u32 index, BOOL moved);
+static void SpeciesList_Scroll(void *work, s16 delta);
+static void NatureList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void NatureList_Move(void *work, u32 index, BOOL moved);
+static void NatureList_Scroll(void *work, s16 delta);
+static void AbilityList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void AbilityList_Move(void *work, u32 index, BOOL moved);
+static void AbilityList_Scroll(void *work, s16 delta);
+static void SexList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void ItemList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void MarkingList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG);
+static void PrintCenteredMsg(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId,
+                             u16 color, int y);
+static void PrintListMsg(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId);
+static void PrintListRow(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
+static void PrintListRowGray(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData);
+static int GetSpeciesGroupSize(int letter, int group);
+static void CountCaughtSpecies(BoxSearchWork *wk);
+static int GetCaughtGroupCount(BoxSearchWork *wk, int letter, int group);
+static int GetAbilityGroupSize(int letter, int group);
+static void PrintAbilityInfo(BoxSearchWork *wk, u32 ability);
+static void PrintSpeciesInfo(BoxSearchWork *wk, u32 species);
+static void CreateList(BoxSearchWork *wk, u32 mode, int pos);
+static void ClearListScreens(BoxSearchWork *wk);
+static void HideListMarkers(BoxSearchWork *wk);
+static void PutListMarker(BoxSearchWork *wk, u32 actor, s16 y);
+static void PutListMarkerAtRow(BoxSearchWork *wk, u32 actor, int row);
+static void ScrollListMarkers(BoxSearchWork *wk, s8 delta);
+static void PutCursorAtValue(BoxSearchWork *wk, u32 actor, int count, int value);
+static u16 *LoadSpeciesOrder(u32 heapId, u32 *count);
+static void LoadBg3Screen(BoxSearchWork *wk, u32 screen);
+static void PrintCriteria(BoxSearchWork *wk, BOOL show);
+static void SetCriterion(BoxSearchWork *wk, u32 criterion, u32 value);
+static void SetMark(BoxSearchWork *wk, u32 mark, u32 on);
+static u32 GetMark(BoxSearchWork *wk, u32 mark);
+static void SetActorAnim(BoxSearchWork *wk, u32 actor, u32 anim);
+static void ShowMarks(BoxSearchWork *wk, u32 actor);
+static void PutMarkActors(BoxSearchWork *wk, u32 layout);
+static void SetActorsVisible(BoxSearchWork *wk, u32 actor, BOOL visible);
+static void ShowScrollBar(BoxSearchWork *wk);
+static void MoveScrollBar(BoxSearchWork *wk);
+static void ShowListArrows(BoxSearchWork *wk, BOOL keep);
+static void ClearAllCriteria(BoxSearchWork *wk);
+static BOOL IsReturnPressed(BoxSearchWork *wk);
+static int GetTouchedRow(BoxSearchWork *wk);
 
 // The data is declared in the order that gives the ROM's layout once MWCC sorts it by size. The windows are listed in
-// data_ov255_021d967c, and the callbacks of each list are given in func_ov255_021d63cc
+// data_ov255_021d967c, and the callbacks of each list are given in CreateList
 
 // Where the scroll bar starts
 static const ClActorPos data_ov255_021d8db0 = { 244, 12 };
@@ -231,9 +231,9 @@ static const u16 data_ov255_021d8dc0[] = { 199, 200, 201, 202 };
 static const BoxSearchWindowData data_ov255_021d8e58 = { 0, 16, 15, 14, 3, 14, PRINT_COLOR(15, 2, 0) };
 
 static const FrameListCallbacks data_ov255_021d8eac = {
-    func_ov255_021d6000,
-    func_ov255_021d5d8c,
-    func_ov255_021d5d90,
+    MarkingList_PrintRow,
+    ListMoveNone,
+    ListScroll,
 };
 
 static const BoxSearchWindowData data_ov255_021d8e7c = { 0, 16, 6, 14, 3, 1, PRINT_COLOR(15, 2, 0) };
@@ -249,9 +249,9 @@ static const BoxSearchWindowData data_ov255_021d8e34 = { 0, 1, 11, 12, 2, 14, PR
 static const BoxSearchWindowData data_ov255_021d8dd4 = { 0, 16, 9, 14, 3, 1, PRINT_COLOR(15, 2, 0) };
 
 static const FrameListCallbacks data_ov255_021d8e70 = {
-    func_ov255_021d5ce4,
-    func_ov255_021d5d8c,
-    func_ov255_021d5d90,
+    AbilityLetterList_PrintRow,
+    ListMoveNone,
+    ListScroll,
 };
 
 static const BoxSearchWindowData data_ov255_021d8ec4 = { 4, 1, 1, 20, 2, 14, PRINT_COLOR(1, 2, 0) };
@@ -263,29 +263,29 @@ static const BoxSearchWindowData data_ov255_021d8df8 = { 4, 1, 10, 30, 2, 14, PR
 static const BoxSearchWindowData data_ov255_021d8e88 = { 0, 16, 0, 14, 3, 1, PRINT_COLOR(15, 2, 0) };
 
 static const FrameListCallbacks data_ov255_021d8de0 = {
-    func_ov255_021d5ff4,
-    func_ov255_021d5d8c,
-    func_ov255_021d5d90,
+    ItemList_PrintRow,
+    ListMoveNone,
+    ListScroll,
 };
 
 static const FrameListCallbacks data_ov255_021d8e04 = {
-    func_ov255_021d5fe8,
-    func_ov255_021d5d8c,
-    func_ov255_021d5d90,
+    SexList_PrintRow,
+    ListMoveNone,
+    ListScroll,
 };
 
 static const BoxSearchWindowData data_ov255_021d8e4c = { 0, 1, 8, 12, 2, 14, PRINT_COLOR(1, 2, 0) };
 
 static const FrameListCallbacks data_ov255_021d8ef4 = {
-    func_ov255_021d5da8,
-    func_ov255_021d5ddc,
-    func_ov255_021d5df4,
+    SpeciesList_PrintRow,
+    SpeciesList_Move,
+    SpeciesList_Scroll,
 };
 
 static const FrameListCallbacks data_ov255_021d8e64 = {
-    func_ov255_021d5d38,
-    func_ov255_021d5d8c,
-    func_ov255_021d5d90,
+    SpeciesLetterList_PrintRow,
+    ListMoveNone,
+    ListScroll,
 };
 
 // The string of each list's title
@@ -294,9 +294,9 @@ static const u8 data_ov255_021d8ee8[] = { 0, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 2 };
 static const BoxSearchWindowData data_ov255_021d8edc = { 0, 3, 0, 9, 3, 14, PRINT_COLOR(15, 2, 0) };
 
 static const FrameListCallbacks data_ov255_021d8ed0 = {
-    func_ov255_021d5e24,
-    func_ov255_021d5ec8,
-    func_ov255_021d5f50,
+    NatureList_PrintRow,
+    NatureList_Move,
+    NatureList_Scroll,
 };
 
 static const BoxSearchWindowData data_ov255_021d8e28 = { 0, 3, 15, 9, 3, 14, PRINT_COLOR(15, 2, 0) };
@@ -306,9 +306,9 @@ static const BoxSearchWindowData data_ov255_021d8eb8 = { 4, 1, 13, 30, 10, 14, P
 static const BoxSearchWindowData data_ov255_021d8e1c = { 0, 16, 3, 14, 3, 1, PRINT_COLOR(15, 2, 0) };
 
 static const FrameListCallbacks data_ov255_021d8ea0 = {
-    func_ov255_021d5f68,
-    func_ov255_021d5fa0,
-    func_ov255_021d5fb8,
+    AbilityList_PrintRow,
+    AbilityList_Move,
+    AbilityList_Scroll,
 };
 
 static const BoxSearchWindowData data_ov255_021d8e94 = { 0, 3, 3, 9, 3, 14, PRINT_COLOR(15, 2, 0) };
@@ -324,10 +324,10 @@ static const u16 data_ov255_021d8f10[BOX_SEARCH_STRING_COUNT - 1] = { 149, 150, 
 
 // The main menu's cursor
 static const CursorMoveCallbacks data_ov255_021d8f20 = {
-    func_ov255_021d5abc,
-    func_ov255_021d5b00,
-    func_ov255_021d5b28,
-    func_ov255_021d5b6c,
+    BoxSearch_MainMenuCursorOn,
+    BoxSearch_MainMenuCursorOff,
+    BoxSearch_MainMenuCursorMove,
+    BoxSearch_MainMenuCursorTouch,
 };
 
 // How many groups of species each first letter has
@@ -410,9 +410,9 @@ static const u16 data_ov255_021d906c[] = {
 };
 
 const GameProcFunctions BOX_SEARCH_PROC_FUNCTIONS = {
-    func_ov255_021d3b64,
-    func_ov255_021d3d00,
-    func_ov255_021d3c90,
+    BoxSearchProc_Init,
+    BoxSearchProc_Main,
+    BoxSearchProc_Exit,
 };
 
 // The first group of each first letter
@@ -451,15 +451,15 @@ static const u8 data_ov255_021d9248[] = {
 
 // clang-format off
 static const BoxSearchSeqFunc data_ov255_021d92ec[] = {
-    func_ov255_021d434c, func_ov255_021d4484, func_ov255_021d4570, func_ov255_021d4574, func_ov255_021d45d8,
-    func_ov255_021d481c, NULL,                NULL,                NULL,                func_ov255_021d4844,
-    func_ov255_021d48dc, func_ov255_021d4b5c, func_ov255_021d4b7c, func_ov255_021d4be0, func_ov255_021d4db8,
-    func_ov255_021d4dc8, func_ov255_021d4e2c, func_ov255_021d5068, NULL,                NULL,
-    NULL,                func_ov255_021d5090, func_ov255_021d5128, func_ov255_021d539c, func_ov255_021d53bc,
-    func_ov255_021d541c, func_ov255_021d555c, func_ov255_021d556c, func_ov255_021d55cc, func_ov255_021d5700,
-    func_ov255_021d5710, func_ov255_021d57a0, func_ov255_021d58dc, func_ov255_021d58ec, func_ov255_021d591c,
-    func_ov255_021d594c, func_ov255_021d5980, func_ov255_021d5984, func_ov255_021d59b0, func_ov255_021d5a10,
-    func_ov255_021d5a14, func_ov255_021d5a54,
+    BoxSearch_SeqMainMenuStart, BoxSearch_SeqMainMenu, BoxSearch_SeqUnused1, BoxSearch_SeqSpeciesLetterOpen, BoxSearch_SeqSpeciesLetterList,
+    BoxSearch_SeqSpeciesLetterClose, NULL,                NULL,                NULL,                BoxSearch_SeqSpeciesOpen,
+    BoxSearch_SeqSpeciesList, BoxSearch_SeqSpeciesClose, BoxSearch_SeqNatureOpen, BoxSearch_SeqNatureList, BoxSearch_SeqNatureClose,
+    BoxSearch_SeqAbilityLetterOpen, BoxSearch_SeqAbilityLetterList, BoxSearch_SeqAbilityLetterClose, NULL,                NULL,
+    NULL,                BoxSearch_SeqAbilityOpen, BoxSearch_SeqAbilityList, BoxSearch_SeqAbilityClose, BoxSearch_SeqSexOpen,
+    BoxSearch_SeqSexList, BoxSearch_SeqSexClose, BoxSearch_SeqItemOpen, BoxSearch_SeqItemList, BoxSearch_SeqItemClose,
+    BoxSearch_SeqMarkingOpen, BoxSearch_SeqMarkingList, BoxSearch_SeqMarkingClose, BoxSearch_SeqSearchOn, BoxSearch_SeqSearchOff,
+    BoxSearch_SeqClearCriteria, BoxSearch_SeqUnused2, BoxSearch_SeqListWait, BoxSearch_SeqListArrowWait, BoxSearch_SeqUnused3,
+    BoxSearch_SeqButtonAnmWait, BoxSearch_SeqStartChosenList,
 };
 
 // clang-format on
@@ -492,7 +492,7 @@ static const BoxSearchWindowData *data_ov255_021d967c[BOX_SEARCH_WINDOW_COUNT] =
     &data_ov255_021d8e4c, &data_ov255_021d8e34,
 };
 
-static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL BoxSearchProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     BoxSearchParam *searchParam = param;
     BoxSearchWork *wk;
 
@@ -503,7 +503,7 @@ static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *w
     wk->param = searchParam;
     wk->heapId = HEAPID_BOX_SEARCH;
     wk->pokedex = GameData_GetPokedex(searchParam->syswk->param->gameData);
-    wk->graphic = func_ov255_021d6d28(0, wk->heapId);
+    wk->graphic = BoxSearchGraphic_Create(0, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_BOX_MAIN_SAVE_INIT, wk->heapId);
@@ -511,38 +511,38 @@ static BOOL func_ov255_021d3b64(GameProc *proc, u32 *state, void *param, void *w
     wk->abilityNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_NAMES, wk->heapId);
     wk->abilityInfo = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ABILITY_DESCRIPTIONS, wk->heapId);
     wk->speciesNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
-    func_ov255_021d3df0(wk->heapId);
-    func_ov255_021d5bc4(wk);
-    wk->touchBar = func_ov255_021d3e9c(wk, func_ov255_021d6e38(wk->graphic), wk->heapId);
-    func_ov255_021d3f74(wk, func_ov255_021d6e38(wk->graphic), wk->heapId);
-    func_ov255_021d3f00(wk);
-    func_ov255_021d6150(wk);
-    func_ov255_021d41c4(wk);
-    func_ov255_021d434c(wk, 0);
-    func_02042ba8(TRUE, wk->heapId);
+    BoxSearch_LoadBgGraphics(wk->heapId);
+    BoxSearch_LoadStrings(wk);
+    wk->touchBar = BoxSearch_CreateTouchBar(wk, BoxSearchGraphic_GetClActUnit(wk->graphic), wk->heapId);
+    BoxSearch_LoadObjs(wk, BoxSearchGraphic_GetClActUnit(wk->graphic), wk->heapId);
+    BoxSearch_CreateWindows(wk);
+    CountCaughtSpecies(wk);
+    BoxSearch_PrintMainMenu(wk);
+    BoxSearch_SeqMainMenuStart(wk, 0);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
     return TRUE;
 }
 
-static BOOL func_ov255_021d3c90(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL BoxSearchProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BoxSearchWork *wk = work;
     HeapID heapId;
 
-    func_ov255_021d5c0c(wk);
-    func_ov255_021d40cc(wk);
-    func_ov255_021d3f5c(wk);
-    func_ov255_021d3eec(wk);
+    BoxSearch_FreeStrings(wk);
+    BoxSearch_FreeObjs(wk);
+    BoxSearch_FreeWindows(wk);
+    BoxSearch_FreeTouchBar(wk);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_MsgDataFree(wk->speciesNames);
     GFL_MsgDataFree(wk->natureNames);
     GFL_MsgDataFree(wk->abilityNames);
     GFL_MsgDataFree(wk->abilityInfo);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
-    func_ov255_021d6dc8(wk->graphic);
+    BoxSearchGraphic_Delete(wk->graphic);
     heapId = wk->heapId;
     GFL_ProcReleaseSubsystem(proc);
     GFL_HeapDelete(heapId);
@@ -550,7 +550,7 @@ static BOOL func_ov255_021d3c90(GameProc *proc, u32 *state, void *param, void *w
     return TRUE;
 }
 
-static BOOL func_ov255_021d3d00(GameProc *proc, u32 *state, void *param, void *work) {
+static BOOL BoxSearchProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     BoxSearchWork *wk = work;
     u32 i;
 
@@ -562,12 +562,12 @@ static BOOL func_ov255_021d3d00(GameProc *proc, u32 *state, void *param, void *w
         }
         break;
     case 1:
-        if (func_02021c0c(wk->printQueue)) {
+        if (PrintQueue_IsEmpty(wk->printQueue)) {
             wk->seq = data_ov255_021d92ec[wk->seq](wk, wk->seq);
             if (wk->seq == SEQ_END) {
                 *state = 2;
             }
-            func_ov255_021d3ef8(wk->touchBar);
+            BoxSearch_UpdateTouchBar(wk->touchBar);
         }
         break;
     case 2:
@@ -580,18 +580,18 @@ static BOOL func_ov255_021d3d00(GameProc *proc, u32 *state, void *param, void *w
         }
         break;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < BOX_SEARCH_WINDOW_COUNT; i++) {
         PrintWindow_Flush(&wk->printWindows[i], wk->printQueue);
     }
-    func_ov255_021d6e1c(wk->graphic);
-    func_ov255_021d6e30(wk->graphic);
-    func_ov255_021d6e34(wk->graphic);
+    BoxSearchGraphic_Update(wk->graphic);
+    BoxSearchGraphic_Begin3D(wk->graphic);
+    BoxSearchGraphic_End3D(wk->graphic);
     return FALSE;
 }
 
 // Loads the BGs' graphics
-static void func_ov255_021d3df0(HeapID heapId) {
+static void BoxSearch_LoadBgGraphics(HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BOX2, heapId);
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 84, 0, 0, 0x80, heapId);
@@ -606,7 +606,7 @@ static void func_ov255_021d3df0(HeapID heapId) {
 }
 
 // Creates the bar at the bottom with its return button
-static TouchBar *func_ov255_021d3e9c(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId) {
+static TouchBar *BoxSearch_CreateTouchBar(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId) {
     TouchBarSetup setup;
     TouchBarItem item = { 1, { 232, 168 } };
 
@@ -621,15 +621,15 @@ static TouchBar *func_ov255_021d3e9c(BoxSearchWork *wk, ClActUnit *unit, HeapID 
     return TouchBar_Create(&setup, heapId);
 }
 
-static void func_ov255_021d3eec(BoxSearchWork *wk) {
+static void BoxSearch_FreeTouchBar(BoxSearchWork *wk) {
     TouchBar_Free(wk->touchBar);
 }
 
-static void func_ov255_021d3ef8(TouchBar *bar) {
+static void BoxSearch_UpdateTouchBar(TouchBar *bar) {
     TouchBar_Main(bar);
 }
 
-static void func_ov255_021d3f00(BoxSearchWork *wk) {
+static void BoxSearch_CreateWindows(BoxSearchWork *wk) {
     u32 i;
 
     for (i = 0; i < BOX_SEARCH_WINDOW_COUNT; i++) {
@@ -643,7 +643,7 @@ static void func_ov255_021d3f00(BoxSearchWork *wk) {
     }
 }
 
-static void func_ov255_021d3f5c(BoxSearchWork *wk) {
+static void BoxSearch_FreeWindows(BoxSearchWork *wk) {
     u32 i;
 
     for (i = 0; i < BOX_SEARCH_WINDOW_COUNT; i++) {
@@ -652,7 +652,7 @@ static void func_ov255_021d3f5c(BoxSearchWork *wk) {
 }
 
 // Loads the OBJs' resources and creates the actors
-static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId) {
+static void BoxSearch_LoadObjs(BoxSearchWork *wk, ClActUnit *unit, HeapID heapId) {
     UIObjResSetup setup = data_ov255_021d8f88;
     int i;
 
@@ -668,10 +668,10 @@ static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapI
     setup.paletteStart = 0;
     setup.paletteCount = 1;
     UIObjRes_Load(&wk->objRes[1], &setup, unit, heapId);
-    setup.paletteFile = func_0202d810();
-    setup.charFile = func_0202d814();
-    setup.cellFile = func_0202d818(2);
-    setup.animFile = func_0202d81c(2);
+    setup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+    setup.charFile = AppMenuCommon_GetTouchBarCharFile();
+    setup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+    setup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
     setup.paletteOffset = 10;
     setup.paletteStart = 0;
     setup.paletteCount = 3;
@@ -681,15 +681,15 @@ static void func_ov255_021d3f74(BoxSearchWork *wk, ClActUnit *unit, HeapID heapI
 
         wk->actors[i] =
             UIObjRes_CreateActor(&wk->objRes[data->res], unit, data_ov255_021d9394[i].x, data->y, data->anim, heapId);
-        func_0204c468(wk->actors[i], data->bgPriority);
-        func_0204c124(wk->actors[i], data->visible);
+        ClActor_SetBgPriority(wk->actors[i], data->bgPriority);
+        ClActor_SetVisible(wk->actors[i], data->visible);
         func_0204c520(wk->actors[i], TRUE);
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     GFL_BGSysLoadNCLRDefault(ARCID_BOX2, 94, 1, 9 * 0x20, 0x20, heapId);
 }
 
-static void func_ov255_021d40cc(BoxSearchWork *wk) {
+static void BoxSearch_FreeObjs(BoxSearchWork *wk) {
     int i;
 
     for (i = 0; i < 3; i++) {
@@ -698,90 +698,90 @@ static void func_ov255_021d40cc(BoxSearchWork *wk) {
 }
 
 // Prints the title of a list, or the explanation of the item under the cursor
-static void func_ov255_021d40e8(BoxSearchWork *wk, int mode) {
+static void BoxSearch_PrintInfo(BoxSearchWork *wk, int mode) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[WINDOW_INFO]), 0);
     switch (mode) {
     case 0:
-        func_ov255_021d5c84(wk, WINDOW_INFO, 115, 1, 0);
+        BoxSearch_PrintMsg(wk, WINDOW_INFO, 115, 1, 0);
         break;
     case 3:
-        func_ov255_021d5c84(wk, WINDOW_INFO, 116, 1, 0);
+        BoxSearch_PrintMsg(wk, WINDOW_INFO, 116, 1, 0);
         break;
     case 9:
-        func_ov255_021d6308(wk, FrameList_GetValue(wk->list, 0));
+        PrintSpeciesInfo(wk, FrameList_GetValue(wk->list, 0));
         break;
     case 15:
-        func_ov255_021d5c84(wk, WINDOW_INFO, 144, 1, 0);
+        BoxSearch_PrintMsg(wk, WINDOW_INFO, 144, 1, 0);
         break;
     case 21:
-        func_ov255_021d6250(wk, FrameList_GetValue(wk->list, 0));
+        PrintAbilityInfo(wk, FrameList_GetValue(wk->list, 0));
         break;
     case 24:
-        func_ov255_021d5c84(wk, WINDOW_INFO, 146, 1, 0);
+        BoxSearch_PrintMsg(wk, WINDOW_INFO, 146, 1, 0);
         break;
     case 27:
-        func_ov255_021d5c84(wk, WINDOW_INFO, 147, 1, 0);
+        BoxSearch_PrintMsg(wk, WINDOW_INFO, 147, 1, 0);
         break;
     case 30:
-        func_ov255_021d5c84(wk, WINDOW_INFO, 148, 1, 0);
+        BoxSearch_PrintMsg(wk, WINDOW_INFO, 148, 1, 0);
         break;
     }
-    func_ov255_021d41b0(wk->windows[WINDOW_INFO]);
+    BoxSearch_PushWindowScreen(wk->windows[WINDOW_INFO]);
 }
 
-static void func_ov255_021d41b0(BmpWin *window) {
+static void BoxSearch_PushWindowScreen(BmpWin *window) {
     BmpWin_FlushMap(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
 }
 
 // Prints the main menu
-static void func_ov255_021d41c4(BoxSearchWork *wk) {
+static void BoxSearch_PrintMainMenu(BoxSearchWork *wk) {
     u32 i;
 
-    func_ov255_021d5c2c(wk, 0, 8, 0, 0);
-    func_ov255_021d41b0(wk->windows[0]);
-    func_ov255_021d5c2c(wk, 13, 7, 1, 0);
-    func_ov255_021d41b0(wk->windows[13]);
+    BoxSearch_PrintString(wk, 0, 8, 0, 0);
+    BoxSearch_PushWindowScreen(wk->windows[0]);
+    BoxSearch_PrintString(wk, 13, 7, 1, 0);
+    BoxSearch_PushWindowScreen(wk->windows[13]);
     for (i = 0; i < 6; i++) {
-        func_ov255_021d5c2c(wk, i + 1, i, 0, 4);
+        BoxSearch_PrintString(wk, i + 1, i, 0, 4);
     }
 }
 
-static void func_ov255_021d4210(BoxSearchWork *wk, u32 index) {
+static void BoxSearch_PrintListTitle(BoxSearchWork *wk, u32 index) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[15]), 0);
-    func_ov255_021d5c2c(wk, 15, data_ov255_021d8ee8[index], 0, 0);
-    func_ov255_021d41b0(wk->windows[15]);
+    BoxSearch_PrintString(wk, 15, data_ov255_021d8ee8[index], 0, 0);
+    BoxSearch_PushWindowScreen(wk->windows[15]);
 }
 
-static void func_ov255_021d4248(BoxSearchWork *wk, MsgData *msgData, u32 msgId) {
+static void BoxSearch_PrintChoice(BoxSearchWork *wk, MsgData *msgData, u32 msgId) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[16]), 0);
-    func_ov255_021d6038(wk, &wk->printWindows[16], wk->printQueue, msgData, msgId, PRINT_COLOR(15, 2, 0), 0);
-    func_ov255_021d41b0(wk->windows[16]);
+    PrintCenteredMsg(wk, &wk->printWindows[16], wk->printQueue, msgData, msgId, PRINT_COLOR(15, 2, 0), 0);
+    BoxSearch_PushWindowScreen(wk->windows[16]);
 }
 
 // Shows the main menu
-static void func_ov255_021d4288(BoxSearchWork *wk) {
+static void BoxSearch_ShowMainMenu(BoxSearchWork *wk) {
     u32 i;
 
-    func_ov255_021d40e8(wk, 0);
-    func_ov255_021d68fc(wk, 0);
+    BoxSearch_PrintInfo(wk, 0);
+    LoadBg3Screen(wk, 0);
     for (i = 0; i < 6; i++) {
-        func_ov255_021d41b0(wk->windows[i + 1]);
+        BoxSearch_PushWindowScreen(wk->windows[i + 1]);
     }
-    func_ov255_021d6940(wk, TRUE);
-    func_ov255_021d5ba4(wk);
-    func_ov255_021d6ae8(wk, 22);
-    func_ov255_021d6b1c(wk, 0);
-    func_ov255_021d4320(wk, TRUE);
+    PrintCriteria(wk, TRUE);
+    BoxSearch_ShowSwitch(wk);
+    ShowMarks(wk, 22);
+    PutMarkActors(wk, 0);
+    BoxSearch_SetMainMenuActorsVisible(wk, TRUE);
 }
 
 // Hides the main menu
-static void func_ov255_021d42d4(BoxSearchWork *wk) {
+static void BoxSearch_HideMainMenu(BoxSearchWork *wk) {
     int i;
 
-    func_ov255_021d4320(wk, FALSE);
+    BoxSearch_SetMainMenuActorsVisible(wk, FALSE);
     for (i = 6; i <= 10; i++) {
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     for (i = 1; i <= 6; i++) {
         BmpWin *window = wk->windows[i];
@@ -789,46 +789,46 @@ static void func_ov255_021d42d4(BoxSearchWork *wk) {
         BmpWin_ClearScreen(window);
         GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     }
-    func_ov255_021d6940(wk, FALSE);
+    PrintCriteria(wk, FALSE);
 }
 
-static void func_ov255_021d4320(BoxSearchWork *wk, BOOL visible) {
+static void BoxSearch_SetMainMenuActorsVisible(BoxSearchWork *wk, BOOL visible) {
     u32 i;
 
     for (i = 0; i <= 10; i++) {
-        func_0204c124(wk->actors[i], visible);
+        ClActor_SetVisible(wk->actors[i], visible);
     }
-    func_ov255_021d6b5c(wk, 22, visible);
+    SetActorsVisible(wk, 22, visible);
 }
 
 // Starts the main menu
-static int func_ov255_021d434c(BoxSearchWork *wk, int seq) {
-    if (func_0203d554() == FALSE) {
+static int BoxSearch_SeqMainMenuStart(BoxSearchWork *wk, int seq) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         wk->cursorMove =
             CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, TRUE, wk->menuPos, wk->heapId);
-        func_ov255_021d5abc(wk, wk->menuPos, wk->menuPos);
+        BoxSearch_MainMenuCursorOn(wk, wk->menuPos, wk->menuPos);
     } else {
         wk->cursorMove =
             CursorMove_Create(data_ov255_021d91d0, &data_ov255_021d8f20, wk, FALSE, wk->menuPos, wk->heapId);
     }
     CursorMove_SetHideOnTouch(wk->cursorMove);
-    func_ov255_021d6798(wk);
-    func_ov255_021d4288(wk);
+    ClearListScreens(wk);
+    BoxSearch_ShowMainMenu(wk);
     return 1;
 }
 
 // A button of the main menu was chosen
-static int func_ov255_021d43cc(BoxSearchWork *wk, int seq, u32 pos) {
+static int BoxSearch_ChooseMainMenuButton(BoxSearchWork *wk, int seq, u32 pos) {
     switch (pos) {
     case 7:
         CursorMove_Delete(wk->cursorMove);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        seq = func_ov255_021d5a70(wk, 7, 14, 33);
+        seq = BoxSearch_StartTouchBarAnm(wk, 7, 14, 33);
         break;
     case 8:
         CursorMove_Delete(wk->cursorMove);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        seq = func_ov255_021d5a70(wk, 8, 17, 34);
+        seq = BoxSearch_StartTouchBarAnm(wk, 8, 17, 34);
         break;
     case 0:
     case 1:
@@ -839,15 +839,15 @@ static int func_ov255_021d43cc(BoxSearchWork *wk, int seq, u32 pos) {
         wk->group = 0;
         CursorMove_Delete(wk->cursorMove);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        seq = func_ov255_021d5a70(wk, pos, 8, 41);
+        seq = BoxSearch_StartTouchBarAnm(wk, pos, 8, 41);
         break;
     case 6:
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        seq = func_ov255_021d5a70(wk, 6, 11, 35);
+        seq = BoxSearch_StartTouchBarAnm(wk, 6, 11, 35);
         break;
     case 9:
         CursorMove_Delete(wk->cursorMove);
-        seq = func_ov255_021d5a70(wk, -1, 0, SEQ_END);
+        seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, SEQ_END);
         break;
     }
     wk->menuPos = pos;
@@ -855,27 +855,27 @@ static int func_ov255_021d43cc(BoxSearchWork *wk, int seq, u32 pos) {
 }
 
 // The main menu
-static int func_ov255_021d4484(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqMainMenu(BoxSearchWork *wk, int seq) {
     u32 ret;
 
-    if (func_ov255_021d6cd4(wk) == TRUE) {
+    if (IsReturnPressed(wk) == TRUE) {
         CursorMove_Delete(wk->cursorMove);
-        return func_ov255_021d5a70(wk, -1, 0, SEQ_END);
+        return BoxSearch_StartTouchBarAnm(wk, -1, 0, SEQ_END);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         CursorMove_SetPos(wk->cursorMove, 6);
         CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        return func_ov255_021d5a70(wk, 6, 11, 35);
+        return BoxSearch_StartTouchBarAnm(wk, 6, 11, 35);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         CursorMove_SetPos(wk->cursorMove, 7);
         CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         CursorMove_Delete(wk->cursorMove);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        return func_ov255_021d5a70(wk, 7, 14, 33);
+        return BoxSearch_StartTouchBarAnm(wk, 7, 14, 33);
     }
     ret = CursorMove_Update(wk->cursorMove);
     switch (ret) {
@@ -891,36 +891,36 @@ static int func_ov255_021d4484(BoxSearchWork *wk, int seq) {
         GFL_SndSEPlay(SEQ_SE_SELECT1);
         break;
     default:
-        seq = func_ov255_021d43cc(wk, seq, ret);
+        seq = BoxSearch_ChooseMainMenuButton(wk, seq, ret);
         break;
     }
     return seq;
 }
 
-static int func_ov255_021d4570(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqUnused1(BoxSearchWork *wk, int seq) {
     return seq;
 }
 
 // Opens the list of first letters of species
-static int func_ov255_021d4574(BoxSearchWork *wk, int seq) {
-    func_ov255_021d42d4(wk);
-    func_ov255_021d63cc(wk, LIST_SPECIES_LETTER, wk->group);
-    func_ov255_021d6bf0(wk, FALSE);
-    func_ov255_021d40e8(wk, 3);
-    func_ov255_021d68fc(wk, 1);
-    func_ov255_021d4210(wk, 8);
+static int BoxSearch_SeqSpeciesLetterOpen(BoxSearchWork *wk, int seq) {
+    BoxSearch_HideMainMenu(wk);
+    CreateList(wk, LIST_SPECIES_LETTER, wk->group);
+    ShowListArrows(wk, FALSE);
+    BoxSearch_PrintInfo(wk, 3);
+    LoadBg3Screen(wk, 1);
+    BoxSearch_PrintListTitle(wk, 8);
     if (wk->param->syswk->search.species == 0) {
-        func_ov255_021d4248(wk, wk->msgData, 199);
+        BoxSearch_PrintChoice(wk, wk->msgData, 199);
     } else {
-        func_ov255_021d4248(wk, wk->speciesNames, wk->param->syswk->search.species);
+        BoxSearch_PrintChoice(wk, wk->speciesNames, wk->param->syswk->search.species);
     }
-    func_ov255_021d6b80(wk);
-    func_ov255_021d5a68(wk, 4);
+    ShowScrollBar(wk);
+    BoxSearch_SetNextSeq(wk, 4);
     return SEQ_LIST_WAIT;
 }
 
 // The list of first letters of species
-static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSpeciesLetterList(BoxSearchWork *wk, int seq) {
     int pos;
 
     switch (FrameList_Main(wk->list)) {
@@ -934,13 +934,13 @@ static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
         wk->group = FrameList_GetSelected(wk->list);
         if (wk->group == 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            func_ov255_021d6a48(wk, CRITERION_SPECIES, 0);
-            func_ov255_021d6828(wk, 11, 0);
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            SetCriterion(wk, CRITERION_SPECIES, 0);
+            PutListMarkerAtRow(wk, 11, 0);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             return 5;
         }
-        func_0204c124(wk->actors[11], FALSE);
-        if (func_ov255_021d6214(wk, wk->group - 1, 0) != 0) {
+        ClActor_SetVisible(wk->actors[11], FALSE);
+        if (GetCaughtGroupCount(wk, wk->group - 1, 0) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return 5;
         }
@@ -950,46 +950,46 @@ static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
     case -10:
     case -9:
     case -8:
-        func_ov255_021d6bf0(wk, FALSE);
+        ShowListArrows(wk, FALSE);
         break;
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         if (wk->param->syswk->search.species == 0) {
-            func_ov255_021d6894(wk, 11, 8, 0);
+            PutCursorAtValue(wk, 11, 8, 0);
         } else {
-            func_0204c124(wk->actors[11], FALSE);
+            ClActor_SetVisible(wk->actors[11], FALSE);
         }
         break;
     case -7:
-        return func_ov255_021d5a98(wk, 34, 12, 4);
+        return BoxSearch_StartButtonAnm(wk, 34, 12, 4);
     case -6:
-        return func_ov255_021d5a98(wk, 35, 13, 4);
+        return BoxSearch_StartButtonAnm(wk, 35, 13, 4);
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_SPECIES, 0);
+            SetCriterion(wk, CRITERION_SPECIES, 0);
             if (FrameList_GetScroll(wk->list) == 0) {
-                func_ov255_021d6828(wk, 11, 0);
+                PutListMarkerAtRow(wk, 11, 0);
             }
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
+        } else if (IsReturnPressed(wk) == TRUE) {
             wk->group = 0;
-            seq = func_ov255_021d5a70(wk, -1, 0, 5);
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 5);
         } else {
-            pos = func_ov255_021d6cf8(wk);
+            pos = GetTouchedRow(wk);
             if (pos >= 0 && pos <= 6) {
                 wk->group = pos + FrameList_GetScroll(wk->list);
                 if (wk->group == 0) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
-                    func_ov255_021d6a48(wk, CRITERION_SPECIES, 0);
-                    func_ov255_021d6828(wk, 11, pos);
-                    func_ov255_021d4248(wk, wk->msgData, 199);
+                    SetCriterion(wk, CRITERION_SPECIES, 0);
+                    PutListMarkerAtRow(wk, 11, pos);
+                    BoxSearch_PrintChoice(wk, wk->msgData, 199);
                     FrameList_SetCursor(wk->list, pos);
                     return 5;
                 }
-                func_0204c124(wk->actors[11], FALSE);
-                if (func_ov255_021d6214(wk, wk->group - 1, 0) != 0) {
+                ClActor_SetVisible(wk->actors[11], FALSE);
+                if (GetCaughtGroupCount(wk, wk->group - 1, 0) != 0) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     FrameList_SetCursor(wk->list, pos);
                     return 5;
@@ -1000,11 +1000,11 @@ static int func_ov255_021d45d8(BoxSearchWork *wk, int seq) {
         }
         break;
     }
-    func_ov255_021d6bac(wk);
+    MoveScrollBar(wk);
     return seq;
 }
 
-static int func_ov255_021d481c(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSpeciesLetterClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     if (wk->group != 0) {
         wk->subGroup = 0;
@@ -1014,34 +1014,34 @@ static int func_ov255_021d481c(BoxSearchWork *wk, int seq) {
 }
 
 // Opens the list of species of a first letter
-static int func_ov255_021d4844(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSpeciesOpen(BoxSearchWork *wk, int seq) {
     u16 count;
     u16 i;
 
-    func_ov255_021d67b0(wk);
-    func_ov255_021d63cc(wk, LIST_SPECIES, 0);
-    func_ov255_021d40e8(wk, 9);
-    count = func_ov255_021d6214(wk, wk->group - 1, wk->subGroup);
+    HideListMarkers(wk);
+    CreateList(wk, LIST_SPECIES, 0);
+    BoxSearch_PrintInfo(wk, 9);
+    count = GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup);
     if (count <= 7) {
-        func_ov255_021d68fc(wk, 2);
+        LoadBg3Screen(wk, 2);
     } else {
-        func_ov255_021d68fc(wk, 1);
-        func_ov255_021d6bf0(wk, FALSE);
-        func_ov255_021d6b80(wk);
+        LoadBg3Screen(wk, 1);
+        ShowListArrows(wk, FALSE);
+        ShowScrollBar(wk);
         count = 7;
     }
     for (i = 0; i < count; i++) {
         if (wk->param->syswk->search.species == FrameList_GetValue(wk->list, i)) {
-            func_ov255_021d6828(wk, 11, i);
+            PutListMarkerAtRow(wk, 11, i);
             break;
         }
     }
-    func_ov255_021d5a68(wk, 10);
+    BoxSearch_SetNextSeq(wk, 10);
     return SEQ_LIST_WAIT;
 }
 
 // The list of species of a first letter
-static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSpeciesList(BoxSearchWork *wk, int seq) {
     u32 ret;
     int i, count, scroll;
 
@@ -1054,10 +1054,10 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
     case 4:
     case 5:
     case 6:
-        if (wk->listCount > 7 || func_0203d554() == FALSE) {
-            func_ov255_021d6a48(wk, CRITERION_SPECIES, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
-            func_ov255_021d6828(wk, 11, ret);
-            func_ov255_021d4248(wk, wk->speciesNames, wk->param->syswk->search.species);
+        if (wk->listCount > 7 || GCTX_HIDIsUsingTouch() == FALSE) {
+            SetCriterion(wk, CRITERION_SPECIES, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
+            PutListMarkerAtRow(wk, 11, ret);
+            BoxSearch_PrintChoice(wk, wk->speciesNames, wk->param->syswk->search.species);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             wk->chosen = TRUE;
             seq = 11;
@@ -1067,52 +1067,51 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
     case -10:
     case -9:
     case -8:
-        if (func_ov255_021d6214(wk, wk->group - 1, wk->subGroup) > 7) {
-            func_ov255_021d6bf0(wk, FALSE);
+        if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
+            ShowListArrows(wk, FALSE);
         }
         break;
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
-        func_0204c124(wk->actors[11], FALSE);
+        ClActor_SetVisible(wk->actors[11], FALSE);
         scroll = FrameList_GetScroll(wk->list);
-        count = func_ov255_021d6214(wk, wk->group - 1, wk->subGroup);
+        count = GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup);
         if (count > 8) {
             count = 8;
         }
         for (i = 0; i < count; i++) {
             if (wk->param->syswk->search.species == FrameList_GetValue(wk->list, scroll + i)) {
-                func_ov255_021d6828(wk, 11, i);
+                PutListMarkerAtRow(wk, 11, i);
                 break;
             }
         }
         break;
     case -7:
-        if (func_ov255_021d6214(wk, wk->group - 1, wk->subGroup) > 7) {
-            return func_ov255_021d5a98(wk, 34, 12, 10);
+        if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
+            return BoxSearch_StartButtonAnm(wk, 34, 12, 10);
         }
         break;
     case -6:
-        if (func_ov255_021d6214(wk, wk->group - 1, wk->subGroup) > 7) {
-            return func_ov255_021d5a98(wk, 35, 13, 10);
+        if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
+            return BoxSearch_StartButtonAnm(wk, 35, 13, 10);
         }
         break;
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_SPECIES, 0);
-            func_0204c124(wk->actors[11], FALSE);
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            SetCriterion(wk, CRITERION_SPECIES, 0);
+            ClActor_SetVisible(wk->actors[11], FALSE);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
+        } else if (IsReturnPressed(wk) == TRUE) {
             wk->chosen = FALSE;
-            seq = func_ov255_021d5a70(wk, -1, 0, 11);
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 11);
         } else {
-            i = func_ov255_021d6cf8(wk);
+            i = GetTouchedRow(wk);
             if (i >= 0 && i <= 6 && i < wk->listRows) {
-                func_ov255_021d6a48(wk, CRITERION_SPECIES,
-                                    FrameList_GetValue(wk->list, i + FrameList_GetScroll(wk->list)));
-                func_ov255_021d6828(wk, 11, i);
-                func_ov255_021d4248(wk, wk->speciesNames, wk->param->syswk->search.species);
+                SetCriterion(wk, CRITERION_SPECIES, FrameList_GetValue(wk->list, i + FrameList_GetScroll(wk->list)));
+                PutListMarkerAtRow(wk, 11, i);
+                BoxSearch_PrintChoice(wk, wk->speciesNames, wk->param->syswk->search.species);
                 FrameList_SetCursor(wk->list, i);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 wk->chosen = TRUE;
@@ -1121,13 +1120,13 @@ static int func_ov255_021d48dc(BoxSearchWork *wk, int seq) {
         }
         break;
     }
-    if (func_ov255_021d6214(wk, wk->group - 1, wk->subGroup) > 7) {
-        func_ov255_021d6bac(wk);
+    if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
+        MoveScrollBar(wk);
     }
     return seq;
 }
 
-static int func_ov255_021d4b5c(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSpeciesClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     if (wk->chosen == FALSE) {
         return 3;
@@ -1136,25 +1135,25 @@ static int func_ov255_021d4b5c(BoxSearchWork *wk, int seq) {
 }
 
 // Opens the list of natures
-static int func_ov255_021d4b7c(BoxSearchWork *wk, int seq) {
-    func_ov255_021d42d4(wk);
-    func_ov255_021d63cc(wk, LIST_NATURE, 0);
-    func_ov255_021d6bf0(wk, FALSE);
-    func_ov255_021d40e8(wk, 12);
-    func_ov255_021d68fc(wk, 1);
-    func_ov255_021d4210(wk, 1);
+static int BoxSearch_SeqNatureOpen(BoxSearchWork *wk, int seq) {
+    BoxSearch_HideMainMenu(wk);
+    CreateList(wk, LIST_NATURE, 0);
+    ShowListArrows(wk, FALSE);
+    BoxSearch_PrintInfo(wk, 12);
+    LoadBg3Screen(wk, 1);
+    BoxSearch_PrintListTitle(wk, 1);
     if (wk->param->syswk->search.nature == 0) {
-        func_ov255_021d4248(wk, wk->msgData, 199);
+        BoxSearch_PrintChoice(wk, wk->msgData, 199);
     } else {
-        func_ov255_021d4248(wk, wk->natureNames, wk->param->syswk->search.nature - 1);
+        BoxSearch_PrintChoice(wk, wk->natureNames, wk->param->syswk->search.nature - 1);
     }
-    func_ov255_021d6b80(wk);
-    func_ov255_021d5a68(wk, 13);
+    ShowScrollBar(wk);
+    BoxSearch_SetNextSeq(wk, 13);
     return SEQ_LIST_WAIT;
 }
 
 // The list of natures
-static int func_ov255_021d4be0(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqNatureList(BoxSearchWork *wk, int seq) {
     u32 ret;
     int pos;
 
@@ -1167,12 +1166,12 @@ static int func_ov255_021d4be0(BoxSearchWork *wk, int seq) {
     case 4:
     case 5:
     case 6:
-        func_ov255_021d6a48(wk, CRITERION_NATURE, FrameList_GetSelected(wk->list));
-        func_ov255_021d6828(wk, 11, ret);
+        SetCriterion(wk, CRITERION_NATURE, FrameList_GetSelected(wk->list));
+        PutListMarkerAtRow(wk, 11, ret);
         if (wk->param->syswk->search.nature == 0) {
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
         } else {
-            func_ov255_021d4248(wk, wk->natureNames, wk->param->syswk->search.nature - 1);
+            BoxSearch_PrintChoice(wk, wk->natureNames, wk->param->syswk->search.nature - 1);
         }
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         seq = 14;
@@ -1181,38 +1180,38 @@ static int func_ov255_021d4be0(BoxSearchWork *wk, int seq) {
     case -10:
     case -9:
     case -8:
-        func_ov255_021d6bf0(wk, FALSE);
+        ShowListArrows(wk, FALSE);
         break;
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
-        func_ov255_021d6894(wk, 11, 8, wk->param->syswk->search.nature);
+        PutCursorAtValue(wk, 11, 8, wk->param->syswk->search.nature);
         break;
     case -7:
-        return func_ov255_021d5a98(wk, 34, 12, 13);
+        return BoxSearch_StartButtonAnm(wk, 34, 12, 13);
     case -6:
-        return func_ov255_021d5a98(wk, 35, 13, 13);
+        return BoxSearch_StartButtonAnm(wk, 35, 13, 13);
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_NATURE, 0);
+            SetCriterion(wk, CRITERION_NATURE, 0);
             if (FrameList_GetScroll(wk->list) == 0) {
-                func_ov255_021d6828(wk, 11, 0);
+                PutListMarkerAtRow(wk, 11, 0);
             } else {
-                func_0204c124(wk->actors[11], FALSE);
+                ClActor_SetVisible(wk->actors[11], FALSE);
             }
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
-            seq = func_ov255_021d5a70(wk, -1, 0, 14);
+        } else if (IsReturnPressed(wk) == TRUE) {
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 14);
         } else {
-            pos = func_ov255_021d6cf8(wk);
+            pos = GetTouchedRow(wk);
             if (pos >= 0 && pos <= 6) {
-                func_ov255_021d6a48(wk, CRITERION_NATURE, pos + FrameList_GetScroll(wk->list));
-                func_ov255_021d6828(wk, 11, pos);
+                SetCriterion(wk, CRITERION_NATURE, pos + FrameList_GetScroll(wk->list));
+                PutListMarkerAtRow(wk, 11, pos);
                 if (wk->param->syswk->search.nature == 0) {
-                    func_ov255_021d4248(wk, wk->msgData, 199);
+                    BoxSearch_PrintChoice(wk, wk->msgData, 199);
                 } else {
-                    func_ov255_021d4248(wk, wk->natureNames, wk->param->syswk->search.nature - 1);
+                    BoxSearch_PrintChoice(wk, wk->natureNames, wk->param->syswk->search.nature - 1);
                 }
                 FrameList_SetCursor(wk->list, pos);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1221,35 +1220,35 @@ static int func_ov255_021d4be0(BoxSearchWork *wk, int seq) {
         }
         break;
     }
-    func_ov255_021d6bac(wk);
+    MoveScrollBar(wk);
     return seq;
 }
 
-static int func_ov255_021d4db8(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqNatureClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     return 0;
 }
 
 // Opens the list of first letters of abilities
-static int func_ov255_021d4dc8(BoxSearchWork *wk, int seq) {
-    func_ov255_021d42d4(wk);
-    func_ov255_021d63cc(wk, LIST_ABILITY_LETTER, wk->group);
-    func_ov255_021d6bf0(wk, FALSE);
-    func_ov255_021d40e8(wk, 15);
-    func_ov255_021d68fc(wk, 1);
-    func_ov255_021d4210(wk, 10);
+static int BoxSearch_SeqAbilityLetterOpen(BoxSearchWork *wk, int seq) {
+    BoxSearch_HideMainMenu(wk);
+    CreateList(wk, LIST_ABILITY_LETTER, wk->group);
+    ShowListArrows(wk, FALSE);
+    BoxSearch_PrintInfo(wk, 15);
+    LoadBg3Screen(wk, 1);
+    BoxSearch_PrintListTitle(wk, 10);
     if (wk->param->syswk->search.ability == 0) {
-        func_ov255_021d4248(wk, wk->msgData, 199);
+        BoxSearch_PrintChoice(wk, wk->msgData, 199);
     } else {
-        func_ov255_021d4248(wk, wk->abilityNames, wk->param->syswk->search.ability);
+        BoxSearch_PrintChoice(wk, wk->abilityNames, wk->param->syswk->search.ability);
     }
-    func_ov255_021d6b80(wk);
-    func_ov255_021d5a68(wk, 16);
+    ShowScrollBar(wk);
+    BoxSearch_SetNextSeq(wk, 16);
     return SEQ_LIST_WAIT;
 }
 
 // The list of first letters of abilities
-static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqAbilityLetterList(BoxSearchWork *wk, int seq) {
     int pos;
 
     switch (FrameList_Main(wk->list)) {
@@ -1263,13 +1262,13 @@ static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
         wk->group = FrameList_GetSelected(wk->list);
         if (wk->group == 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            func_ov255_021d6a48(wk, CRITERION_ABILITY, 0);
-            func_ov255_021d6828(wk, 11, 0);
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            SetCriterion(wk, CRITERION_ABILITY, 0);
+            PutListMarkerAtRow(wk, 11, 0);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             return 17;
         }
-        func_0204c124(wk->actors[11], FALSE);
-        if (func_ov255_021d622c(wk->group - 1, 0) != 0) {
+        ClActor_SetVisible(wk->actors[11], FALSE);
+        if (GetAbilityGroupSize(wk->group - 1, 0) != 0) {
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             return 17;
         }
@@ -1279,45 +1278,45 @@ static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
     case -10:
     case -9:
     case -8:
-        func_ov255_021d6bf0(wk, FALSE);
+        ShowListArrows(wk, FALSE);
         break;
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
         if (wk->param->syswk->search.ability == 0) {
-            func_ov255_021d6894(wk, 11, 8, 0);
+            PutCursorAtValue(wk, 11, 8, 0);
         } else {
-            func_0204c124(wk->actors[11], FALSE);
+            ClActor_SetVisible(wk->actors[11], FALSE);
         }
         break;
     case -7:
-        return func_ov255_021d5a98(wk, 34, 12, 16);
+        return BoxSearch_StartButtonAnm(wk, 34, 12, 16);
     case -6:
-        return func_ov255_021d5a98(wk, 35, 13, 16);
+        return BoxSearch_StartButtonAnm(wk, 35, 13, 16);
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_ABILITY, 0);
+            SetCriterion(wk, CRITERION_ABILITY, 0);
             if (FrameList_GetScroll(wk->list) == 0) {
-                func_ov255_021d6828(wk, 11, 0);
+                PutListMarkerAtRow(wk, 11, 0);
             }
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
+        } else if (IsReturnPressed(wk) == TRUE) {
             wk->group = 0;
-            seq = func_ov255_021d5a70(wk, -1, 0, 17);
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 17);
         } else {
-            pos = func_ov255_021d6cf8(wk);
+            pos = GetTouchedRow(wk);
             if (pos >= 0 && pos <= 6) {
                 wk->group = pos + FrameList_GetScroll(wk->list);
                 if (wk->group == 0) {
-                    func_ov255_021d6a48(wk, CRITERION_ABILITY, 0);
-                    func_ov255_021d6828(wk, 11, pos);
-                    func_ov255_021d4248(wk, wk->msgData, 199);
+                    SetCriterion(wk, CRITERION_ABILITY, 0);
+                    PutListMarkerAtRow(wk, 11, pos);
+                    BoxSearch_PrintChoice(wk, wk->msgData, 199);
                     FrameList_SetCursor(wk->list, pos);
                     return 17;
                 }
-                func_0204c124(wk->actors[11], FALSE);
-                if (func_ov255_021d622c(wk->group - 1, 0) != 0) {
+                ClActor_SetVisible(wk->actors[11], FALSE);
+                if (GetAbilityGroupSize(wk->group - 1, 0) != 0) {
                     GFL_SndSEPlay(SEQ_SE_DECIDE1);
                     FrameList_SetCursor(wk->list, pos);
                     return 17;
@@ -1328,11 +1327,11 @@ static int func_ov255_021d4e2c(BoxSearchWork *wk, int seq) {
         }
         break;
     }
-    func_ov255_021d6bac(wk);
+    MoveScrollBar(wk);
     return seq;
 }
 
-static int func_ov255_021d5068(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqAbilityLetterClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     if (wk->group != 0) {
         wk->subGroup = 0;
@@ -1342,34 +1341,34 @@ static int func_ov255_021d5068(BoxSearchWork *wk, int seq) {
 }
 
 // Opens the list of abilities of a first letter
-static int func_ov255_021d5090(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqAbilityOpen(BoxSearchWork *wk, int seq) {
     u16 count;
     u16 i;
 
-    func_ov255_021d67b0(wk);
-    func_ov255_021d63cc(wk, LIST_ABILITY, 0);
-    func_ov255_021d40e8(wk, 21);
-    count = func_ov255_021d622c(wk->group - 1, wk->subGroup);
+    HideListMarkers(wk);
+    CreateList(wk, LIST_ABILITY, 0);
+    BoxSearch_PrintInfo(wk, 21);
+    count = GetAbilityGroupSize(wk->group - 1, wk->subGroup);
     if (count <= 7) {
-        func_ov255_021d68fc(wk, 2);
+        LoadBg3Screen(wk, 2);
     } else {
-        func_ov255_021d68fc(wk, 1);
-        func_ov255_021d6bf0(wk, FALSE);
-        func_ov255_021d6b80(wk);
+        LoadBg3Screen(wk, 1);
+        ShowListArrows(wk, FALSE);
+        ShowScrollBar(wk);
         count = 7;
     }
     for (i = 0; i < count; i++) {
         if (wk->param->syswk->search.ability == FrameList_GetValue(wk->list, i)) {
-            func_ov255_021d6828(wk, 11, i);
+            PutListMarkerAtRow(wk, 11, i);
             break;
         }
     }
-    func_ov255_021d5a68(wk, 22);
+    BoxSearch_SetNextSeq(wk, 22);
     return SEQ_LIST_WAIT;
 }
 
 // The list of abilities of a first letter
-static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqAbilityList(BoxSearchWork *wk, int seq) {
     u32 ret;
     int i, count, scroll;
 
@@ -1382,10 +1381,10 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
     case 4:
     case 5:
     case 6:
-        if (wk->listCount > 7 || func_0203d554() == FALSE) {
-            func_ov255_021d6a48(wk, CRITERION_ABILITY, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
-            func_ov255_021d6828(wk, 11, ret);
-            func_ov255_021d4248(wk, wk->abilityNames, wk->param->syswk->search.ability);
+        if (wk->listCount > 7 || GCTX_HIDIsUsingTouch() == FALSE) {
+            SetCriterion(wk, CRITERION_ABILITY, FrameList_GetValue(wk->list, FrameList_GetSelected(wk->list)));
+            PutListMarkerAtRow(wk, 11, ret);
+            BoxSearch_PrintChoice(wk, wk->abilityNames, wk->param->syswk->search.ability);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             wk->chosen = TRUE;
             seq = 23;
@@ -1395,52 +1394,51 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
     case -10:
     case -9:
     case -8:
-        if (func_ov255_021d622c(wk->group - 1, wk->subGroup) > 7) {
-            func_ov255_021d6bf0(wk, FALSE);
+        if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
+            ShowListArrows(wk, FALSE);
         }
         break;
     case -3:
     case -2:
         FrameList_SetCursor(wk->list, FrameList_GetCursor(wk->list));
-        func_0204c124(wk->actors[11], FALSE);
+        ClActor_SetVisible(wk->actors[11], FALSE);
         scroll = FrameList_GetScroll(wk->list);
-        count = func_ov255_021d622c(wk->group - 1, wk->subGroup);
+        count = GetAbilityGroupSize(wk->group - 1, wk->subGroup);
         if (count > 8) {
             count = 8;
         }
         for (i = 0; i < count; i++) {
             if (wk->param->syswk->search.ability == FrameList_GetValue(wk->list, scroll + i)) {
-                func_ov255_021d6828(wk, 11, i);
+                PutListMarkerAtRow(wk, 11, i);
                 break;
             }
         }
         break;
     case -7:
-        if (func_ov255_021d622c(wk->group - 1, wk->subGroup) > 7) {
-            return func_ov255_021d5a98(wk, 34, 12, 22);
+        if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
+            return BoxSearch_StartButtonAnm(wk, 34, 12, 22);
         }
         break;
     case -6:
-        if (func_ov255_021d622c(wk->group - 1, wk->subGroup) > 7) {
-            return func_ov255_021d5a98(wk, 35, 13, 22);
+        if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
+            return BoxSearch_StartButtonAnm(wk, 35, 13, 22);
         }
         break;
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_ABILITY, 0);
-            func_0204c124(wk->actors[11], FALSE);
-            func_ov255_021d4248(wk, wk->msgData, 199);
+            SetCriterion(wk, CRITERION_ABILITY, 0);
+            ClActor_SetVisible(wk->actors[11], FALSE);
+            BoxSearch_PrintChoice(wk, wk->msgData, 199);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
+        } else if (IsReturnPressed(wk) == TRUE) {
             wk->chosen = FALSE;
-            seq = func_ov255_021d5a70(wk, -1, 0, 23);
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 23);
         } else {
-            i = func_ov255_021d6cf8(wk);
+            i = GetTouchedRow(wk);
             if (i >= 0 && i <= 6 && i < wk->listRows) {
-                func_ov255_021d6a48(wk, CRITERION_ABILITY,
-                                    FrameList_GetValue(wk->list, i + FrameList_GetScroll(wk->list)));
-                func_ov255_021d6828(wk, 11, i);
-                func_ov255_021d4248(wk, wk->abilityNames, wk->param->syswk->search.ability);
+                SetCriterion(wk, CRITERION_ABILITY, FrameList_GetValue(wk->list, i + FrameList_GetScroll(wk->list)));
+                PutListMarkerAtRow(wk, 11, i);
+                BoxSearch_PrintChoice(wk, wk->abilityNames, wk->param->syswk->search.ability);
                 FrameList_SetCursor(wk->list, i);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 wk->chosen = TRUE;
@@ -1449,13 +1447,13 @@ static int func_ov255_021d5128(BoxSearchWork *wk, int seq) {
         }
         break;
     }
-    if (func_ov255_021d622c(wk->group - 1, wk->subGroup) > 7) {
-        func_ov255_021d6bac(wk);
+    if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
+        MoveScrollBar(wk);
     }
     return seq;
 }
 
-static int func_ov255_021d539c(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqAbilityClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     if (wk->chosen == FALSE) {
         return 15;
@@ -1464,20 +1462,20 @@ static int func_ov255_021d539c(BoxSearchWork *wk, int seq) {
 }
 
 // Opens the list of sexes
-static int func_ov255_021d53bc(BoxSearchWork *wk, int seq) {
-    func_ov255_021d42d4(wk);
-    func_ov255_021d63cc(wk, LIST_SEX, 0);
-    func_ov255_021d40e8(wk, 24);
-    func_ov255_021d68fc(wk, 2);
-    func_ov255_021d4210(wk, 3);
-    func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
-    func_ov255_021d6828(wk, 11, wk->param->syswk->search.sex);
-    func_ov255_021d5a68(wk, 25);
+static int BoxSearch_SeqSexOpen(BoxSearchWork *wk, int seq) {
+    BoxSearch_HideMainMenu(wk);
+    CreateList(wk, LIST_SEX, 0);
+    BoxSearch_PrintInfo(wk, 24);
+    LoadBg3Screen(wk, 2);
+    BoxSearch_PrintListTitle(wk, 3);
+    BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
+    PutListMarkerAtRow(wk, 11, wk->param->syswk->search.sex);
+    BoxSearch_SetNextSeq(wk, 25);
     return SEQ_LIST_WAIT;
 }
 
 // The list of sexes
-static int func_ov255_021d541c(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSexList(BoxSearchWork *wk, int seq) {
     u32 ret;
     int pos;
 
@@ -1487,10 +1485,10 @@ static int func_ov255_021d541c(BoxSearchWork *wk, int seq) {
     case 1:
     case 2:
     case 3:
-        if (func_0203d554() == FALSE) {
-            func_ov255_021d6a48(wk, CRITERION_SEX, ret);
-            func_ov255_021d6828(wk, 11, ret);
-            func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
+            SetCriterion(wk, CRITERION_SEX, ret);
+            PutListMarkerAtRow(wk, 11, ret);
+            BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             seq = 26;
         }
@@ -1501,18 +1499,18 @@ static int func_ov255_021d541c(BoxSearchWork *wk, int seq) {
         break;
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_SEX, 0);
-            func_ov255_021d6828(wk, 11, 0);
-            func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
+            SetCriterion(wk, CRITERION_SEX, 0);
+            PutListMarkerAtRow(wk, 11, 0);
+            BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
-            seq = func_ov255_021d5a70(wk, -1, 0, 26);
+        } else if (IsReturnPressed(wk) == TRUE) {
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 26);
         } else {
-            pos = func_ov255_021d6cf8(wk);
+            pos = GetTouchedRow(wk);
             if (pos >= 0 && pos <= 3) {
-                func_ov255_021d6a48(wk, CRITERION_SEX, pos);
-                func_ov255_021d6828(wk, 11, pos);
-                func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
+                SetCriterion(wk, CRITERION_SEX, pos);
+                PutListMarkerAtRow(wk, 11, pos);
+                BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dc0[wk->param->syswk->search.sex]);
                 FrameList_SetCursor(wk->list, pos);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 seq = 26;
@@ -1523,26 +1521,26 @@ static int func_ov255_021d541c(BoxSearchWork *wk, int seq) {
     return seq;
 }
 
-static int func_ov255_021d555c(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqSexClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     return 0;
 }
 
 // Opens the list of held item choices
-static int func_ov255_021d556c(BoxSearchWork *wk, int seq) {
-    func_ov255_021d42d4(wk);
-    func_ov255_021d63cc(wk, LIST_ITEM, 0);
-    func_ov255_021d40e8(wk, 27);
-    func_ov255_021d68fc(wk, 2);
-    func_ov255_021d4210(wk, 4);
-    func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
-    func_ov255_021d6828(wk, 11, wk->param->syswk->search.item);
-    func_ov255_021d5a68(wk, 28);
+static int BoxSearch_SeqItemOpen(BoxSearchWork *wk, int seq) {
+    BoxSearch_HideMainMenu(wk);
+    CreateList(wk, LIST_ITEM, 0);
+    BoxSearch_PrintInfo(wk, 27);
+    LoadBg3Screen(wk, 2);
+    BoxSearch_PrintListTitle(wk, 4);
+    BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
+    PutListMarkerAtRow(wk, 11, wk->param->syswk->search.item);
+    BoxSearch_SetNextSeq(wk, 28);
     return SEQ_LIST_WAIT;
 }
 
 // The list of held item choices
-static int func_ov255_021d55cc(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqItemList(BoxSearchWork *wk, int seq) {
     u32 ret;
     int pos;
 
@@ -1551,10 +1549,10 @@ static int func_ov255_021d55cc(BoxSearchWork *wk, int seq) {
     case 0:
     case 1:
     case 2:
-        if (func_0203d554() == FALSE) {
-            func_ov255_021d6a48(wk, CRITERION_ITEM, ret);
-            func_ov255_021d6828(wk, 11, ret);
-            func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
+            SetCriterion(wk, CRITERION_ITEM, ret);
+            PutListMarkerAtRow(wk, 11, ret);
+            BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             seq = 29;
         }
@@ -1565,18 +1563,18 @@ static int func_ov255_021d55cc(BoxSearchWork *wk, int seq) {
         break;
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_ov255_021d6a48(wk, CRITERION_ITEM, 0);
-            func_ov255_021d6828(wk, 11, 0);
-            func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
+            SetCriterion(wk, CRITERION_ITEM, 0);
+            PutListMarkerAtRow(wk, 11, 0);
+            BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
-            seq = func_ov255_021d5a70(wk, -1, 0, 29);
+        } else if (IsReturnPressed(wk) == TRUE) {
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 29);
         } else {
-            pos = func_ov255_021d6cf8(wk);
+            pos = GetTouchedRow(wk);
             if (pos >= 0 && pos <= 2) {
-                func_ov255_021d6a48(wk, CRITERION_ITEM, pos);
-                func_ov255_021d6828(wk, 11, pos);
-                func_ov255_021d4248(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
+                SetCriterion(wk, CRITERION_ITEM, pos);
+                PutListMarkerAtRow(wk, 11, pos);
+                BoxSearch_PrintChoice(wk, wk->msgData, data_ov255_021d8dba[wk->param->syswk->search.item]);
                 FrameList_SetCursor(wk->list, pos);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 seq = 29;
@@ -1587,35 +1585,35 @@ static int func_ov255_021d55cc(BoxSearchWork *wk, int seq) {
     return seq;
 }
 
-static int func_ov255_021d5700(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqItemClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     return 0;
 }
 
 // Opens the list of markings
-static int func_ov255_021d5710(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqMarkingOpen(BoxSearchWork *wk, int seq) {
     int i;
 
-    func_ov255_021d42d4(wk);
-    func_ov255_021d63cc(wk, LIST_MARKING, 0);
-    func_ov255_021d40e8(wk, 30);
-    func_ov255_021d68fc(wk, 2);
-    func_ov255_021d4210(wk, 5);
+    BoxSearch_HideMainMenu(wk);
+    CreateList(wk, LIST_MARKING, 0);
+    BoxSearch_PrintInfo(wk, 30);
+    LoadBg3Screen(wk, 2);
+    BoxSearch_PrintListTitle(wk, 5);
     for (i = 0; i < 6; i++) {
-        func_ov255_021d6828(wk, i + 11, i);
-        func_0204c124(wk->actors[i + 11], func_ov255_021d6aac(wk, i));
+        PutListMarkerAtRow(wk, i + 11, i);
+        ClActor_SetVisible(wk->actors[i + 11], GetMark(wk, i));
     }
-    func_ov255_021d6ae8(wk, 22);
-    func_ov255_021d6ae8(wk, 28);
-    func_ov255_021d6b1c(wk, 1);
-    func_ov255_021d6b5c(wk, 22, TRUE);
-    func_ov255_021d6b5c(wk, 28, TRUE);
-    func_ov255_021d5a68(wk, 31);
+    ShowMarks(wk, 22);
+    ShowMarks(wk, 28);
+    PutMarkActors(wk, 1);
+    SetActorsVisible(wk, 22, TRUE);
+    SetActorsVisible(wk, 28, TRUE);
+    BoxSearch_SetNextSeq(wk, 31);
     return SEQ_LIST_WAIT;
 }
 
 // The list of markings, which turns each on and off
-static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqMarkingList(BoxSearchWork *wk, int seq) {
     // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
     unsigned long ret;
     u32 i;
@@ -1630,14 +1628,14 @@ static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
     case 3:
     case 4:
     case 5:
-        if (func_0203d554() != FALSE) {
+        if (GCTX_HIDIsUsingTouch() != FALSE) {
             break;
         }
-        on = func_ov255_021d6aac(wk, ret) ^ 1;
-        func_ov255_021d6a88(wk, ret, on);
-        func_0204c124(wk->actors[ret + 11], on);
-        func_ov255_021d6ae8(wk, 22);
-        func_ov255_021d6ae8(wk, 28);
+        on = GetMark(wk, ret) ^ 1;
+        SetMark(wk, ret, on);
+        ClActor_SetVisible(wk->actors[ret + 11], on);
+        ShowMarks(wk, 22);
+        ShowMarks(wk, 28);
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         break;
     case -3:
@@ -1647,23 +1645,23 @@ static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
     case -1:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
             for (i = 0; i < 6; i++) {
-                func_ov255_021d6a88(wk, i, FALSE);
-                func_0204c124(wk->actors[i + 11], FALSE);
+                SetMark(wk, i, FALSE);
+                ClActor_SetVisible(wk->actors[i + 11], FALSE);
             }
-            func_ov255_021d6ae8(wk, 22);
-            func_ov255_021d6ae8(wk, 28);
+            ShowMarks(wk, 22);
+            ShowMarks(wk, 28);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        } else if (func_ov255_021d6cd4(wk) == TRUE) {
-            seq = func_ov255_021d5a70(wk, -1, 0, 26);
+        } else if (IsReturnPressed(wk) == TRUE) {
+            seq = BoxSearch_StartTouchBarAnm(wk, -1, 0, 26);
         } else {
-            pos = func_ov255_021d6cf8(wk);
+            pos = GetTouchedRow(wk);
             if (pos >= 0 && pos <= 5) {
-                on = func_ov255_021d6aac(wk, pos) ^ 1;
-                func_ov255_021d6a88(wk, pos, on);
-                func_0204c124(wk->actors[pos + 11], on);
+                on = GetMark(wk, pos) ^ 1;
+                SetMark(wk, pos, on);
+                ClActor_SetVisible(wk->actors[pos + 11], on);
                 FrameList_SetCursor(wk->list, pos);
-                func_ov255_021d6ae8(wk, 22);
-                func_ov255_021d6ae8(wk, 28);
+                ShowMarks(wk, 22);
+                ShowMarks(wk, 28);
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }
         }
@@ -1672,50 +1670,50 @@ static int func_ov255_021d57a0(BoxSearchWork *wk, int seq) {
     return seq;
 }
 
-static int func_ov255_021d58dc(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqMarkingClose(BoxSearchWork *wk, int seq) {
     FrameList_Free(wk->list);
     return 0;
 }
 
 // Turns the search on
-static int func_ov255_021d58ec(BoxSearchWork *wk, int seq) {
-    func_ov255_021d5b70(wk, 7);
-    func_ov255_021d6a48(wk, CRITERION_ACTIVE, TRUE);
+static int BoxSearch_SeqSearchOn(BoxSearchWork *wk, int seq) {
+    BoxSearch_SetSwitchAnims(wk, 7);
+    SetCriterion(wk, CRITERION_ACTIVE, TRUE);
     if (CursorMove_IsCursorVisible(wk->cursorMove) == TRUE) {
-        func_0204c488(wk->actors[7], 13);
+        ClActor_SetSequence(wk->actors[7], 13);
     }
     return SEQ_END;
 }
 
 // Turns the search off
-static int func_ov255_021d591c(BoxSearchWork *wk, int seq) {
-    func_ov255_021d5b70(wk, 8);
-    func_ov255_021d6a48(wk, CRITERION_ACTIVE, FALSE);
+static int BoxSearch_SeqSearchOff(BoxSearchWork *wk, int seq) {
+    BoxSearch_SetSwitchAnims(wk, 8);
+    SetCriterion(wk, CRITERION_ACTIVE, FALSE);
     if (CursorMove_IsCursorVisible(wk->cursorMove) == TRUE) {
-        func_0204c488(wk->actors[8], 16);
+        ClActor_SetSequence(wk->actors[8], 16);
     }
     return SEQ_END;
 }
 
 // Clears the criteria
-static int func_ov255_021d594c(BoxSearchWork *wk, int seq) {
-    func_ov255_021d6c94(wk);
-    func_ov255_021d6940(wk, TRUE);
-    func_ov255_021d6ae8(wk, 22);
+static int BoxSearch_SeqClearCriteria(BoxSearchWork *wk, int seq) {
+    ClearAllCriteria(wk);
+    PrintCriteria(wk, TRUE);
+    ShowMarks(wk, 22);
     if (CursorMove_IsCursorVisible(wk->cursorMove) == TRUE) {
-        func_0204c488(wk->actors[6], 10);
+        ClActor_SetSequence(wk->actors[6], 10);
     }
     return 1;
 }
 
-static int func_ov255_021d5980(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqUnused2(BoxSearchWork *wk, int seq) {
     return seq;
 }
 
 // Waits for a list to be drawn
-static int func_ov255_021d5984(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqListWait(BoxSearchWork *wk, int seq) {
     if (FrameList_Draw(wk->list) == FALSE) {
-        if (func_0203d554() == FALSE) {
+        if (GCTX_HIDIsUsingTouch() == FALSE) {
             FrameList_ShowCursor(wk->list);
         }
         seq = wk->nextSeq;
@@ -1724,18 +1722,18 @@ static int func_ov255_021d5984(BoxSearchWork *wk, int seq) {
 }
 
 // Waits for a list's arrow to be animated
-static int func_ov255_021d59b0(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqListArrowWait(BoxSearchWork *wk, int seq) {
     switch (wk->btnAnmSeq) {
     case 0:
         if (FrameList_Main(wk->list) == FRAMELIST_NONE) {
             wk->btnAnmSeq++;
         }
-        func_ov255_021d6bac(wk);
+        MoveScrollBar(wk);
         break;
     case 1:
-        if (func_0204c560(wk->actors[wk->btnActor]) == FALSE) {
+        if (ClActor_IsAnimActive(wk->actors[wk->btnActor]) == FALSE) {
             wk->btnAnmSeq = 0;
-            func_ov255_021d6bf0(wk, FALSE);
+            ShowListArrows(wk, FALSE);
             return wk->nextSeq;
         }
         break;
@@ -1743,101 +1741,101 @@ static int func_ov255_021d59b0(BoxSearchWork *wk, int seq) {
     return SEQ_BUTTON_ANM;
 }
 
-static int func_ov255_021d5a10(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqUnused3(BoxSearchWork *wk, int seq) {
     return seq;
 }
 
 // Waits for a button to be animated
-static int func_ov255_021d5a14(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqButtonAnmWait(BoxSearchWork *wk, int seq) {
     if (wk->btnActor == -1) {
         if (TouchBar_GetDecided(wk->touchBar) == TRUE) {
             return wk->nextSeq;
         }
-    } else if (func_0204c560(wk->actors[wk->btnActor]) == FALSE) {
+    } else if (ClActor_IsAnimActive(wk->actors[wk->btnActor]) == FALSE) {
         return wk->nextSeq;
     }
     return seq;
 }
 
-static int func_ov255_021d5a54(BoxSearchWork *wk, int seq) {
+static int BoxSearch_SeqStartChosenList(BoxSearchWork *wk, int seq) {
     return data_ov255_021d9664[wk->menuPos];
 }
 
-static void func_ov255_021d5a68(BoxSearchWork *wk, int seq) {
+static void BoxSearch_SetNextSeq(BoxSearchWork *wk, int seq) {
     wk->nextSeq = seq;
 }
 
 // Animates a button, then goes on to next
-static int func_ov255_021d5a70(BoxSearchWork *wk, int actor, u32 anim, int next) {
+static int BoxSearch_StartTouchBarAnm(BoxSearchWork *wk, int actor, u32 anim, int next) {
     if (actor != -1) {
-        func_ov255_021d6ac0(wk, actor, anim);
+        SetActorAnim(wk, actor, anim);
     }
     wk->btnActor = actor;
-    func_ov255_021d5a68(wk, next);
+    BoxSearch_SetNextSeq(wk, next);
     return SEQ_TOUCH_BAR_ANM;
 }
 
-static int func_ov255_021d5a98(BoxSearchWork *wk, int actor, u32 anim, int next) {
-    func_ov255_021d6ac0(wk, actor, anim);
+static int BoxSearch_StartButtonAnm(BoxSearchWork *wk, int actor, u32 anim, int next) {
+    SetActorAnim(wk, actor, anim);
     wk->btnActor = actor;
     wk->btnAnmSeq = 0;
-    func_ov255_021d5a68(wk, next);
+    BoxSearch_SetNextSeq(wk, next);
     return SEQ_BUTTON_ANM;
 }
 
 // The main menu's cursor shows on a button
-static void func_ov255_021d5abc(void *work, int pos, int prevPos) {
+static void BoxSearch_MainMenuCursorOn(void *work, int pos, int prevPos) {
     BoxSearchWork *wk = work;
     int i;
 
     for (i = 0; i <= 8; i++) {
         if (pos == i) {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][1]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][1]);
         } else {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][0]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][0]);
         }
     }
 }
 
-static void func_ov255_021d5b00(void *work, int pos, int prevPos) {
+static void BoxSearch_MainMenuCursorOff(void *work, int pos, int prevPos) {
     BoxSearchWork *wk = work;
     int i;
 
     for (i = 0; i <= 8; i++) {
-        func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][0]);
+        ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][0]);
     }
 }
 
-static void func_ov255_021d5b28(void *work, int pos, int prevPos) {
+static void BoxSearch_MainMenuCursorMove(void *work, int pos, int prevPos) {
     BoxSearchWork *wk = work;
     int i;
 
     for (i = 0; i <= 8; i++) {
         if (pos == i) {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][1]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][1]);
         } else {
-            func_0204c488(wk->actors[i], data_ov255_021d8f4a[i][0]);
+            ClActor_SetSequence(wk->actors[i], data_ov255_021d8f4a[i][0]);
         }
     }
 }
 
-static void func_ov255_021d5b6c(void *work, int pos, int prevPos) {
+static void BoxSearch_MainMenuCursorTouch(void *work, int pos, int prevPos) {
 }
 
-static void func_ov255_021d5b70(BoxSearchWork *wk, u32 type) {
-    func_0204c488(wk->actors[9], data_ov255_021d8f00[type - 7][0]);
-    func_0204c488(wk->actors[10], data_ov255_021d8f00[type - 7][1]);
+static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, u32 type) {
+    ClActor_SetSequence(wk->actors[9], data_ov255_021d8f00[type - 7][0]);
+    ClActor_SetSequence(wk->actors[10], data_ov255_021d8f00[type - 7][1]);
 }
 
-static void func_ov255_021d5ba4(BoxSearchWork *wk) {
+static void BoxSearch_ShowSwitch(BoxSearchWork *wk) {
     if (wk->param->syswk->search.active) {
-        func_ov255_021d5b70(wk, 7);
+        BoxSearch_SetSwitchAnims(wk, 7);
     } else {
-        func_ov255_021d5b70(wk, 8);
+        BoxSearch_SetSwitchAnims(wk, 8);
     }
 }
 
-static void func_ov255_021d5bc4(BoxSearchWork *wk) {
+static void BoxSearch_LoadStrings(BoxSearchWork *wk) {
     int i;
 
     for (i = 0; i < BOX_SEARCH_STRING_COUNT - 1; i++) {
@@ -1851,7 +1849,7 @@ static void func_ov255_021d5bc4(BoxSearchWork *wk) {
     wk->strbuf = GFL_StrBufCreate(128, wk->heapId);
 }
 
-static void func_ov255_021d5c0c(BoxSearchWork *wk) {
+static void BoxSearch_FreeStrings(BoxSearchWork *wk) {
     int i;
 
     GFL_StrBufFree(wk->strbuf);
@@ -1860,12 +1858,12 @@ static void func_ov255_021d5c0c(BoxSearchWork *wk) {
     }
 }
 
-static void func_ov255_021d5c2c(BoxSearchWork *wk, u32 win, u32 string, int x, int y) {
+static void BoxSearch_PrintString(BoxSearchWork *wk, u32 win, u32 string, int x, int y) {
     PrintWindow_Print(&wk->printWindows[win], wk->printQueue, x, y, wk->strings[string], wk->font,
                       data_ov255_021d967c[win]->color);
 }
 
-static void func_ov255_021d5c84(BoxSearchWork *wk, u32 win, u32 msgId, int x, int y) {
+static void BoxSearch_PrintMsg(BoxSearchWork *wk, u32 win, u32 msgId, int x, int y) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(wk->msgData, msgId);
 
     PrintWindow_Print(&wk->printWindows[win], wk->printQueue, x, y, str, wk->font, data_ov255_021d967c[win]->color);
@@ -1873,68 +1871,68 @@ static void func_ov255_021d5c84(BoxSearchWork *wk, u32 win, u32 msgId, int x, in
 }
 
 // Prints a first letter of abilities, grayed out when no ability starts with it
-static void func_ov255_021d5ce4(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void AbilityLetterList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
 
-    if (index == 0 || func_ov255_021d622c(index - 1, 0) != 0) {
-        func_ov255_021d60b4(wk, index, window, wk->msgData);
+    if (index == 0 || GetAbilityGroupSize(index - 1, 0) != 0) {
+        PrintListRow(wk, index, window, wk->msgData);
     } else {
-        func_ov255_021d60ec(wk, index, window, wk->msgData);
+        PrintListRowGray(wk, index, window, wk->msgData);
     }
     if (index == 0 && wk->param->syswk->search.ability == 0) {
-        func_ov255_021d6804(wk, 11, y + 12);
+        PutListMarker(wk, 11, y + 12);
     }
 }
 
 // Prints a first letter of species, grayed out when no species caught starts with it
-static void func_ov255_021d5d38(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void SpeciesLetterList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
 
-    if (index == 0 || func_ov255_021d6214(wk, index - 1, 0) != 0) {
-        func_ov255_021d60b4(wk, index, window, wk->msgData);
+    if (index == 0 || GetCaughtGroupCount(wk, index - 1, 0) != 0) {
+        PrintListRow(wk, index, window, wk->msgData);
     } else {
-        func_ov255_021d60ec(wk, index, window, wk->msgData);
+        PrintListRowGray(wk, index, window, wk->msgData);
     }
     if (index == 0 && wk->param->syswk->search.species == 0) {
-        func_ov255_021d6804(wk, 11, y + 12);
+        PutListMarker(wk, 11, y + 12);
     }
 }
 
-static void func_ov255_021d5d8c(void *work, u32 index, BOOL moved) {
+static void ListMoveNone(void *work, u32 index, BOOL moved) {
 }
 
-static void func_ov255_021d5d90(void *work, s16 delta) {
+static void ListScroll(void *work, s16 delta) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d683c(wk, -delta);
-    func_ov255_021d6bf0(wk, TRUE);
+    ScrollListMarkers(wk, -delta);
+    ShowListArrows(wk, TRUE);
 }
 
-static void func_ov255_021d5da8(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void SpeciesList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d60b4(wk, index, window, wk->speciesNames);
+    PrintListRow(wk, index, window, wk->speciesNames);
     if (wk->param->syswk->search.species == FrameList_GetValue(wk->list, index)) {
-        func_ov255_021d6804(wk, 11, y + 12);
+        PutListMarker(wk, 11, y + 12);
     }
 }
 
-static void func_ov255_021d5ddc(void *work, u32 index, BOOL moved) {
+static void SpeciesList_Move(void *work, u32 index, BOOL moved) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d6308(wk, FrameList_GetValue(wk->list, index));
+    PrintSpeciesInfo(wk, FrameList_GetValue(wk->list, index));
 }
 
-static void func_ov255_021d5df4(void *work, s16 delta) {
+static void SpeciesList_Scroll(void *work, s16 delta) {
     BoxSearchWork *wk = work;
 
-    if (func_ov255_021d6214(wk, wk->group - 1, wk->subGroup) > 7) {
-        func_ov255_021d683c(wk, -delta);
-        func_ov255_021d6bf0(wk, TRUE);
+    if (GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup) > 7) {
+        ScrollListMarkers(wk, -delta);
+        ShowListArrows(wk, TRUE);
     }
 }
 
-static void func_ov255_021d5e24(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void NatureList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
     int width, windowWidth;
     PrintQueue *queue = FrameList_GetPrintQueue(wk->list);
@@ -1953,11 +1951,11 @@ static void func_ov255_021d5e24(void *work, u32 index, PrintWindow *window, s16 
         GFL_StrBufFree(str);
     }
     if (wk->param->syswk->search.nature == nature) {
-        func_ov255_021d6804(wk, 11, y + 12);
+        PutListMarker(wk, 11, y + 12);
     }
 }
 
-static void func_ov255_021d5ec8(void *work, u32 index, BOOL moved) {
+static void NatureList_Move(void *work, u32 index, BOOL moved) {
     BoxSearchWork *wk = work;
     StrBuf *str;
 
@@ -1967,66 +1965,66 @@ static void func_ov255_021d5ec8(void *work, u32 index, BOOL moved) {
         PrintWindow_Print(&wk->printWindows[WINDOW_INFO], wk->printQueue, 1, 0, str, wk->font,
                           data_ov255_021d967c[WINDOW_INFO]->color);
         GFL_StrBufFree(str);
-        func_ov255_021d41b0(wk->windows[WINDOW_INFO]);
+        BoxSearch_PushWindowScreen(wk->windows[WINDOW_INFO]);
     } else {
         BmpWin_Transfer(wk->windows[WINDOW_INFO]);
     }
 }
 
-static void func_ov255_021d5f50(void *work, s16 delta) {
+static void NatureList_Scroll(void *work, s16 delta) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d683c(wk, -delta);
-    func_ov255_021d6bf0(wk, TRUE);
+    ScrollListMarkers(wk, -delta);
+    ShowListArrows(wk, TRUE);
 }
 
-static void func_ov255_021d5f68(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void AbilityList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d60b4(wk, index, window, wk->abilityNames);
+    PrintListRow(wk, index, window, wk->abilityNames);
     if (wk->param->syswk->search.ability == FrameList_GetValue(wk->list, index)) {
-        func_ov255_021d6804(wk, 11, y + 12);
+        PutListMarker(wk, 11, y + 12);
     }
 }
 
-static void func_ov255_021d5fa0(void *work, u32 index, BOOL moved) {
+static void AbilityList_Move(void *work, u32 index, BOOL moved) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d6250(wk, FrameList_GetValue(wk->list, index));
+    PrintAbilityInfo(wk, FrameList_GetValue(wk->list, index));
 }
 
-static void func_ov255_021d5fb8(void *work, s16 delta) {
+static void AbilityList_Scroll(void *work, s16 delta) {
     BoxSearchWork *wk = work;
 
-    if (func_ov255_021d622c(wk->group - 1, wk->subGroup) > 7) {
-        func_ov255_021d683c(wk, -delta);
-        func_ov255_021d6bf0(wk, TRUE);
+    if (GetAbilityGroupSize(wk->group - 1, wk->subGroup) > 7) {
+        ScrollListMarkers(wk, -delta);
+        ShowListArrows(wk, TRUE);
     }
 }
 
-static void func_ov255_021d5fe8(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void SexList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d60b4(wk, index, window, wk->msgData);
+    PrintListRow(wk, index, window, wk->msgData);
 }
 
-static void func_ov255_021d5ff4(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void ItemList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
 
-    func_ov255_021d60b4(wk, index, window, wk->msgData);
+    PrintListRow(wk, index, window, wk->msgData);
 }
 
-static void func_ov255_021d6000(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
+static void MarkingList_PrintRow(void *work, u32 index, PrintWindow *window, s16 y, BOOL firstBG) {
     BoxSearchWork *wk = work;
     PrintQueue *queue = FrameList_GetPrintQueue(wk->list);
 
-    func_02021c7c(queue, BmpWin_GetBitmap(window->window), 0, 4, wk->strings[6], wk->font, 0);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(window->window), 0, 4, wk->strings[6], wk->font, 0);
     window->flushPending = TRUE;
 }
 
 // Prints a message centered in a list's row
-static void func_ov255_021d6038(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId,
-                                u16 color, int y) {
+static void PrintCenteredMsg(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId,
+                             u16 color, int y) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     int width = GFL_FontGetBlockWidth(str, wk->font, 0);
     int windowWidth = BmpWin_GetSizeX(window->window) * 8;
@@ -2035,42 +2033,41 @@ static void func_ov255_021d6038(BoxSearchWork *wk, PrintWindow *window, PrintQue
     GFL_StrBufFree(str);
 }
 
-static void func_ov255_021d6098(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData,
-                                u32 msgId) {
-    func_ov255_021d6038(wk, window, queue, msgData, msgId, PRINT_COLOR(15, 14, 0), 4);
+static void PrintListMsg(BoxSearchWork *wk, PrintWindow *window, PrintQueue *queue, MsgData *msgData, u32 msgId) {
+    PrintCenteredMsg(wk, window, queue, msgData, msgId, PRINT_COLOR(15, 14, 0), 4);
 }
 
-static void func_ov255_021d60b4(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData) {
+static void PrintListRow(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData) {
     PrintQueue *queue = FrameList_GetPrintQueue(wk->list);
 
-    func_ov255_021d6098(wk, window, queue, msgData, FrameList_GetValue(wk->list, index));
+    PrintListMsg(wk, window, queue, msgData, FrameList_GetValue(wk->list, index));
 }
 
 // Prints an item grayed out
-static void func_ov255_021d60ec(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData) {
+static void PrintListRowGray(BoxSearchWork *wk, u32 index, PrintWindow *window, MsgData *msgData) {
     PrintQueue *queue = FrameList_GetPrintQueue(wk->list);
 
-    func_ov255_021d6038(wk, window, queue, msgData, FrameList_GetValue(wk->list, index), PRINT_COLOR(13, 12, 0), 4);
+    PrintCenteredMsg(wk, window, queue, msgData, FrameList_GetValue(wk->list, index), PRINT_COLOR(13, 12, 0), 4);
 }
 
 // How many species a group has
-static int func_ov255_021d612c(int letter, int group) {
+static int GetSpeciesGroupSize(int letter, int group) {
     return data_ov255_021d9004[data_ov255_021d9168[letter] + group] -
            data_ov255_021d8fd0[data_ov255_021d9168[letter] + group];
 }
 
 // Counts the species caught of each group
-static void func_ov255_021d6150(BoxSearchWork *wk) {
+static void CountCaughtSpecies(BoxSearchWork *wk) {
     u32 letter, i;
     u32 len;
     u16 *species;
     u32 group;
 
     MI_CpuFill8(wk->caughtCounts, 0, sizeof(wk->caughtCounts));
-    species = func_ov255_021d68d8(wk->heapId, &len);
+    species = LoadSpeciesOrder(wk->heapId, &len);
     for (letter = 0; letter < 26; letter++) {
         for (group = 0; group < data_ov255_021d8f30[letter]; group++) {
-            u32 count = func_ov255_021d612c(letter, group);
+            u32 count = GetSpeciesGroupSize(letter, group);
             u16 start = data_ov255_021d8fd0[data_ov255_021d9168[letter] + group];
             u32 *caught = &wk->caughtCounts[group + data_ov255_021d9168[letter]];
 
@@ -2085,18 +2082,18 @@ static void func_ov255_021d6150(BoxSearchWork *wk) {
     GFL_HeapFree(species);
 }
 
-static int func_ov255_021d6214(BoxSearchWork *wk, int letter, int group) {
+static int GetCaughtGroupCount(BoxSearchWork *wk, int letter, int group) {
     return wk->caughtCounts[data_ov255_021d9168[letter] + group];
 }
 
 // How many abilities a group has
-static int func_ov255_021d622c(int letter, int group) {
+static int GetAbilityGroupSize(int letter, int group) {
     return data_ov255_021d9038[data_ov255_021d9168[letter] + group][1] -
            data_ov255_021d9038[data_ov255_021d9168[letter] + group][0];
 }
 
 // Prints an ability's name and explanation
-static void func_ov255_021d6250(BoxSearchWork *wk, u32 ability) {
+static void PrintAbilityInfo(BoxSearchWork *wk, u32 ability) {
     StrBuf *fmt;
     StrBuf *str;
 
@@ -2111,11 +2108,11 @@ static void func_ov255_021d6250(BoxSearchWork *wk, u32 ability) {
     PrintWindow_Print(&wk->printWindows[WINDOW_INFO], wk->printQueue, 1, 48, str, wk->font,
                       data_ov255_021d967c[WINDOW_INFO]->color);
     GFL_StrBufFree(str);
-    func_ov255_021d41b0(wk->windows[WINDOW_INFO]);
+    BoxSearch_PushWindowScreen(wk->windows[WINDOW_INFO]);
 }
 
 // Prints a species' name and types
-static void func_ov255_021d6308(BoxSearchWork *wk, u32 species) {
+static void PrintSpeciesInfo(BoxSearchWork *wk, u32 species) {
     void *personal = PML_PersonalLoad(species, 0, wk->heapId);
     u32 type1 = PML_PersonalGetParam(personal, PERSONAL_TYPE_1);
     u32 type2 = PML_PersonalGetParam(personal, PERSONAL_TYPE_2);
@@ -2135,11 +2132,11 @@ static void func_ov255_021d6308(BoxSearchWork *wk, u32 species) {
     PrintWindow_Print(&wk->printWindows[WINDOW_INFO], wk->printQueue, 1, 0, wk->strbuf, wk->font,
                       data_ov255_021d967c[WINDOW_INFO]->color);
     GFL_StrBufFree(fmt);
-    func_ov255_021d41b0(wk->windows[WINDOW_INFO]);
+    BoxSearch_PushWindowScreen(wk->windows[WINDOW_INFO]);
 }
 
 // Creates a list, with the cursor on pos
-static void func_ov255_021d63cc(BoxSearchWork *wk, u32 mode, int pos) {
+static void CreateList(BoxSearchWork *wk, u32 mode, int pos) {
     FrameListSetup setup = data_ov255_021d8fa8;
     u32 len;
     ArcTool *arc;
@@ -2158,7 +2155,7 @@ static void func_ov255_021d63cc(BoxSearchWork *wk, u32 mode, int pos) {
         setup.callbacks = &data_ov255_021d8e64;
         break;
     case LIST_SPECIES:
-        setup.count = func_ov255_021d6214(wk, wk->group - 1, wk->subGroup);
+        setup.count = GetCaughtGroupCount(wk, wk->group - 1, wk->subGroup);
         setup.callbacks = &data_ov255_021d8ef4;
         if (setup.count < wk->listRows) {
             wk->listRows = setup.count;
@@ -2174,7 +2171,7 @@ static void func_ov255_021d63cc(BoxSearchWork *wk, u32 mode, int pos) {
         break;
     case LIST_ABILITY:
         setup.callbacks = &data_ov255_021d8ea0;
-        setup.count = func_ov255_021d622c(wk->group - 1, wk->subGroup);
+        setup.count = GetAbilityGroupSize(wk->group - 1, wk->subGroup);
         if (setup.count < wk->listRows) {
             wk->listRows = setup.count;
         }
@@ -2228,8 +2225,8 @@ static void func_ov255_021d63cc(BoxSearchWork *wk, u32 mode, int pos) {
         break;
     case LIST_SPECIES:
         start = data_ov255_021d8fd0[data_ov255_021d9168[wk->group - 1] + wk->subGroup];
-        species = func_ov255_021d68d8(wk->heapId, &len);
-        for (i = 0; i < func_ov255_021d612c(wk->group - 1, wk->subGroup); i++) {
+        species = LoadSpeciesOrder(wk->heapId, &len);
+        for (i = 0; i < GetSpeciesGroupSize(wk->group - 1, wk->subGroup); i++) {
             if (PokeDex_IsCaught(wk->pokedex, species[start + i])) {
                 FrameList_AddItem(wk->list, 0, species[start + i]);
             }
@@ -2276,73 +2273,73 @@ static void func_ov255_021d63cc(BoxSearchWork *wk, u32 mode, int pos) {
     }
 }
 
-static void func_ov255_021d6798(BoxSearchWork *wk) {
+static void ClearListScreens(BoxSearchWork *wk) {
     GFL_BGSysClearScr(0);
     GFL_BGSysQueueScrLoad(0);
-    func_ov255_021d67b0(wk);
+    HideListMarkers(wk);
 }
 
 // Hides the list's cursor, markings and arrows
-static void func_ov255_021d67b0(BoxSearchWork *wk) {
+static void HideListMarkers(BoxSearchWork *wk) {
     u32 i;
 
     GFL_BGSysClearScr(2);
     GFL_BGSysQueueScrLoad(2);
     for (i = 11; i <= 21; i++) {
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
-    func_ov255_021d6b5c(wk, 22, FALSE);
-    func_ov255_021d6b5c(wk, 28, FALSE);
-    func_0204c124(wk->actors[34], FALSE);
-    func_0204c124(wk->actors[35], FALSE);
+    SetActorsVisible(wk, 22, FALSE);
+    SetActorsVisible(wk, 28, FALSE);
+    ClActor_SetVisible(wk->actors[34], FALSE);
+    ClActor_SetVisible(wk->actors[35], FALSE);
 }
 
-static void func_ov255_021d6804(BoxSearchWork *wk, u32 actor, s16 y) {
+static void PutListMarker(BoxSearchWork *wk, u32 actor, s16 y) {
     ClActorPos pos;
 
     pos.x = 127;
     pos.y = y;
-    func_0204c210(wk->actors[actor], &pos);
-    func_0204c124(wk->actors[actor], TRUE);
+    ClActor_SetPos(wk->actors[actor], &pos);
+    ClActor_SetVisible(wk->actors[actor], TRUE);
 }
 
-static void func_ov255_021d6828(BoxSearchWork *wk, u32 actor, int row) {
-    func_ov255_021d6804(wk, actor, row * 24 + 12);
+static void PutListMarkerAtRow(BoxSearchWork *wk, u32 actor, int row) {
+    PutListMarker(wk, actor, row * 24 + 12);
 }
 
 // Scrolls the list's cursor and markings, hiding them off the list
-static void func_ov255_021d683c(BoxSearchWork *wk, s8 delta) {
+static void ScrollListMarkers(BoxSearchWork *wk, s8 delta) {
     ClActorPos pos;
     u32 i;
 
     for (i = 11; i <= 20; i++) {
-        if (func_0204c138(wk->actors[i])) {
-            func_0204c21c(wk->actors[i], &pos);
+        if (ClActor_IsVisible(wk->actors[i])) {
+            ClActor_GetPos(wk->actors[i], &pos);
             pos.y += delta;
-            func_0204c210(wk->actors[i], &pos);
+            ClActor_SetPos(wk->actors[i], &pos);
             if (pos.y <= -12 || pos.y >= 204) {
-                func_0204c124(wk->actors[i], FALSE);
+                ClActor_SetVisible(wk->actors[i], FALSE);
             }
         }
     }
 }
 
 // Puts the cursor on the row of value, if it shows
-static void func_ov255_021d6894(BoxSearchWork *wk, u32 actor, int count, int value) {
+static void PutCursorAtValue(BoxSearchWork *wk, u32 actor, int count, int value) {
     int scroll = FrameList_GetScroll(wk->list);
     int i;
 
     for (i = 0; i < count; i++) {
         if (value == scroll + i) {
-            func_ov255_021d6828(wk, actor, i);
+            PutListMarkerAtRow(wk, actor, i);
             return;
         }
     }
-    func_0204c124(wk->actors[actor], FALSE);
+    ClActor_SetVisible(wk->actors[actor], FALSE);
 }
 
 // Loads the species in the order of their names
-static u16 *func_ov255_021d68d8(u32 heapId, u32 *count) {
+static u16 *LoadSpeciesOrder(u32 heapId, u32 *count) {
     u32 size;
     u16 *species = GFL_ArcSysReadHeapNewLZGetLen(ARCID_ZUKAN_DATA, 5, FALSE, heapId, &size);
 
@@ -2350,7 +2347,7 @@ static u16 *func_ov255_021d68d8(u32 heapId, u32 *count) {
     return species;
 }
 
-static void func_ov255_021d68fc(BoxSearchWork *wk, u32 screen) {
+static void LoadBg3Screen(BoxSearchWork *wk, u32 screen) {
     NNSG2dScreenData *scr;
     void *buf = GFL_G2DIOReadNSCR(ARCID_BOX2, data_ov255_021d8db4[screen], FALSE, &scr, wk->heapId);
 
@@ -2360,7 +2357,7 @@ static void func_ov255_021d68fc(BoxSearchWork *wk, u32 screen) {
 }
 
 // Prints the criteria of the main menu, or clears them
-static void func_ov255_021d6940(BoxSearchWork *wk, BOOL show) {
+static void PrintCriteria(BoxSearchWork *wk, BOOL show) {
     Box2SearchParam *search = &wk->param->syswk->search;
     int i;
 
@@ -2373,22 +2370,22 @@ static void func_ov255_021d6940(BoxSearchWork *wk, BOOL show) {
             GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[i]), 0);
         }
         if (search->species == 0) {
-            func_ov255_021d6098(wk, &wk->printWindows[7], wk->printQueue, wk->msgData, 199);
+            PrintListMsg(wk, &wk->printWindows[7], wk->printQueue, wk->msgData, 199);
         } else {
-            func_ov255_021d6098(wk, &wk->printWindows[7], wk->printQueue, wk->speciesNames, search->species);
+            PrintListMsg(wk, &wk->printWindows[7], wk->printQueue, wk->speciesNames, search->species);
         }
         if (search->nature == 0) {
-            func_ov255_021d6098(wk, &wk->printWindows[8], wk->printQueue, wk->msgData, 199);
+            PrintListMsg(wk, &wk->printWindows[8], wk->printQueue, wk->msgData, 199);
         } else {
-            func_ov255_021d6098(wk, &wk->printWindows[8], wk->printQueue, wk->natureNames, search->nature - 1);
+            PrintListMsg(wk, &wk->printWindows[8], wk->printQueue, wk->natureNames, search->nature - 1);
         }
         if (search->ability == 0) {
-            func_ov255_021d6098(wk, &wk->printWindows[9], wk->printQueue, wk->msgData, 199);
+            PrintListMsg(wk, &wk->printWindows[9], wk->printQueue, wk->msgData, 199);
         } else {
-            func_ov255_021d6098(wk, &wk->printWindows[9], wk->printQueue, wk->abilityNames, search->ability);
+            PrintListMsg(wk, &wk->printWindows[9], wk->printQueue, wk->abilityNames, search->ability);
         }
-        func_ov255_021d6098(wk, &wk->printWindows[10], wk->printQueue, wk->msgData, data_ov255_021d8dc0[search->sex]);
-        func_ov255_021d6098(wk, &wk->printWindows[11], wk->printQueue, wk->msgData, data_ov255_021d8dba[search->item]);
+        PrintListMsg(wk, &wk->printWindows[10], wk->printQueue, wk->msgData, data_ov255_021d8dc0[search->sex]);
+        PrintListMsg(wk, &wk->printWindows[11], wk->printQueue, wk->msgData, data_ov255_021d8dba[search->item]);
         for (i = 7; i <= 11; i++) {
             BmpWin_FlushMap(wk->windows[i]);
         }
@@ -2396,7 +2393,7 @@ static void func_ov255_021d6940(BoxSearchWork *wk, BOOL show) {
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(wk->windows[7]));
 }
 
-static void func_ov255_021d6a48(BoxSearchWork *wk, u32 criterion, u32 value) {
+static void SetCriterion(BoxSearchWork *wk, u32 criterion, u32 value) {
     Box2SearchParam *search = &wk->param->syswk->search;
 
     switch (criterion) {
@@ -2424,34 +2421,34 @@ static void func_ov255_021d6a48(BoxSearchWork *wk, u32 criterion, u32 value) {
     }
 }
 
-static void func_ov255_021d6a88(BoxSearchWork *wk, u32 mark, u32 on) {
+static void SetMark(BoxSearchWork *wk, u32 mark, u32 on) {
     Box2SearchParam *search = &wk->param->syswk->search;
 
     search->marks = (u8)(search->marks & (0xff ^ (1 << mark))) | (on << mark);
 }
 
-static u32 func_ov255_021d6aac(BoxSearchWork *wk, u32 mark) {
+static u32 GetMark(BoxSearchWork *wk, u32 mark) {
     return (wk->param->syswk->search.marks >> mark) & 1;
 }
 
-static void func_ov255_021d6ac0(BoxSearchWork *wk, u32 actor, u32 anim) {
-    func_0204c4d4(wk->actors[actor], 0);
-    func_0204c488(wk->actors[actor], anim);
+static void SetActorAnim(BoxSearchWork *wk, u32 actor, u32 anim) {
+    ClActor_SetAnimTime(wk->actors[actor], 0);
+    ClActor_SetSequence(wk->actors[actor], anim);
     func_0204c520(wk->actors[actor], TRUE);
 }
 
 // Shows each marking on or off
-static void func_ov255_021d6ae8(BoxSearchWork *wk, u32 actor) {
+static void ShowMarks(BoxSearchWork *wk, u32 actor) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        u32 on = func_ov255_021d6aac(wk, i);
+        u32 on = GetMark(wk, i);
 
-        func_0204c488(wk->actors[actor + i], on + i * 2);
+        ClActor_SetSequence(wk->actors[actor + i], on + i * 2);
     }
 }
 
-static void func_ov255_021d6b1c(BoxSearchWork *wk, u32 layout) {
+static void PutMarkActors(BoxSearchWork *wk, u32 layout) {
     ClActorPos pos;
     u32 i;
 
@@ -2463,76 +2460,76 @@ static void func_ov255_021d6b1c(BoxSearchWork *wk, u32 layout) {
         pos.y = 92;
     }
     for (i = 22; i <= 27; i++) {
-        func_0204c140(wk->actors[i], &pos, 0);
+        ClActor_SetSurfacePos(wk->actors[i], &pos, 0);
         pos.x += 16;
     }
 }
 
-static void func_ov255_021d6b5c(BoxSearchWork *wk, u32 actor, BOOL visible) {
+static void SetActorsVisible(BoxSearchWork *wk, u32 actor, BOOL visible) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        func_0204c124(wk->actors[actor + i], visible);
+        ClActor_SetVisible(wk->actors[actor + i], visible);
     }
 }
 
 // Shows the scroll bar
-static void func_ov255_021d6b80(BoxSearchWork *wk) {
+static void ShowScrollBar(BoxSearchWork *wk) {
     ClActorPos pos = data_ov255_021d8db0;
 
-    func_0204c140(wk->actors[21], &pos, 0);
-    func_0204c124(wk->actors[21], TRUE);
+    ClActor_SetSurfacePos(wk->actors[21], &pos, 0);
+    ClActor_SetVisible(wk->actors[21], TRUE);
 }
 
 // Moves the scroll bar
-static void func_ov255_021d6bac(BoxSearchWork *wk) {
+static void MoveScrollBar(BoxSearchWork *wk) {
     ClActorPos pos;
 
-    func_0204c21c(wk->actors[21], &pos);
+    ClActor_GetPos(wk->actors[21], &pos);
     pos.y = FrameList_ClampBarPos(wk->list, pos.y);
     if (pos.y < 12) {
         pos.y = 12;
     } else if (pos.y > 156) {
         pos.y = 156;
     }
-    func_0204c210(wk->actors[21], &pos);
+    ClActor_SetPos(wk->actors[21], &pos);
 }
 
 // Shows the list's arrows, grayed out at its ends
-static void func_ov255_021d6bf0(BoxSearchWork *wk, BOOL keep) {
+static void ShowListArrows(BoxSearchWork *wk, BOOL keep) {
     int pos = FrameList_GetCursor(wk->list);
 
     if (keep == FALSE) {
-        func_0204c124(wk->actors[34], TRUE);
-        func_0204c124(wk->actors[35], TRUE);
+        ClActor_SetVisible(wk->actors[34], TRUE);
+        ClActor_SetVisible(wk->actors[35], TRUE);
     }
-    if (func_0204c4a0(wk->actors[34]) != 12 || keep == FALSE) {
+    if (ClActor_GetSequence(wk->actors[34]) != 12 || keep == FALSE) {
         if (FrameList_GetScroll(wk->list) == 0 && pos == 0) {
-            func_ov255_021d6ac0(wk, 34, 18);
+            SetActorAnim(wk, 34, 18);
         } else {
-            func_ov255_021d6ac0(wk, 34, 4);
+            SetActorAnim(wk, 34, 4);
         }
     }
-    if (func_0204c4a0(wk->actors[35]) != 13 || keep == FALSE) {
+    if (ClActor_GetSequence(wk->actors[35]) != 13 || keep == FALSE) {
         if (FrameList_CanScrollDown(wk->list) == FALSE && pos == wk->listRows - 1) {
-            func_ov255_021d6ac0(wk, 35, 19);
+            SetActorAnim(wk, 35, 19);
         } else {
-            func_ov255_021d6ac0(wk, 35, 5);
+            SetActorAnim(wk, 35, 5);
         }
     }
 }
 
-static void func_ov255_021d6c94(BoxSearchWork *wk) {
-    func_ov255_021d6a48(wk, CRITERION_SPECIES, 0);
-    func_ov255_021d6a48(wk, CRITERION_ITEM, 0);
-    func_ov255_021d6a48(wk, CRITERION_NATURE, 0);
-    func_ov255_021d6a48(wk, CRITERION_ABILITY, 0);
-    func_ov255_021d6a48(wk, CRITERION_SEX, 0);
-    func_ov255_021d6a48(wk, CRITERION_MARKS, 0);
+static void ClearAllCriteria(BoxSearchWork *wk) {
+    SetCriterion(wk, CRITERION_SPECIES, 0);
+    SetCriterion(wk, CRITERION_ITEM, 0);
+    SetCriterion(wk, CRITERION_NATURE, 0);
+    SetCriterion(wk, CRITERION_ABILITY, 0);
+    SetCriterion(wk, CRITERION_SEX, 0);
+    SetCriterion(wk, CRITERION_MARKS, 0);
 }
 
 // Whether the return button or B was pressed
-static BOOL func_ov255_021d6cd4(BoxSearchWork *wk) {
+static BOOL IsReturnPressed(BoxSearchWork *wk) {
     if (TouchBar_GetTouched(wk->touchBar) == TRUE) {
         return TRUE;
     }
@@ -2543,11 +2540,11 @@ static BOOL func_ov255_021d6cd4(BoxSearchWork *wk) {
 }
 
 // The row of the list touched, or TOUCH_RECT_NONE
-static int func_ov255_021d6cf8(BoxSearchWork *wk) {
-    int pos = func_0203da0c(data_ov255_021d8f65);
+static int GetTouchedRow(BoxSearchWork *wk) {
+    int pos = GFL_HIDGetTouchPressedRect(data_ov255_021d8f65);
 
-    if (pos >= 0 && pos < wk->listRows && func_0203d554() == FALSE) {
-        func_0203d564(TRUE);
+    if (pos >= 0 && pos < wk->listRows && GCTX_HIDIsUsingTouch() == FALSE) {
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     return pos;
 }

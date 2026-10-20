@@ -16,9 +16,9 @@
 
 #define HEAPID_BATTLE_PROC 0x76
 
-const GameProcFunctions data_ov010_0215039c = { func_ov010_0214ff00, func_ov010_0214ff58, func_ov010_0214ff28 };
+const GameProcFunctions data_ov010_0215039c = { BattleProc_Init, BattleProc_Main, BattleProc_Exit };
 
-BOOL func_ov010_0214ff00(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL BattleProc_Init(GameProc *proc, u32 *state, void *param, void *work) {
     BattleProcWork *procWork;
 
     GFL_HeapCreateChild(1, HEAPID_BATTLE_PROC, 0x4000);
@@ -27,7 +27,7 @@ BOOL func_ov010_0214ff00(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
-BOOL func_ov010_0214ff28(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL BattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BattleParam *battle = param;
     BattleProcWork *procWork = work;
 
@@ -40,7 +40,7 @@ BOOL func_ov010_0214ff28(GameProc *proc, u32 *state, void *param, void *work) {
     return TRUE;
 }
 
-BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
+BOOL BattleProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     BattleParam *battle = param;
     BattleProcWork *procWork = work;
     BOOL running = GFL_ProcMgrUpdate(procWork->manager);
@@ -55,7 +55,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
 
     if (running != TRUE && GFL_NetErrCheck() && (s32)*state >= 0 && (s32)*state < 13) {
         if (procWork->commandsSet == TRUE) {
-            func_02040c64(0x100);
+            NetCommand_RemoveTable(0x100);
         }
         if (procWork->ov167Loaded == TRUE) {
             GFL_OvlUnload(OVERLAY_ID(167));
@@ -86,11 +86,11 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         }
         break;
     case 2:
-        func_02042d04(func_02040440(), 0xc9);
+        GFL_NetSendTiming(NetHandle_GetOwn(), 0xc9);
         *state = 3;
         break;
     case 3:
-        if (func_02042d0c(func_02040440(), 0xc9)) {
+        if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xc9)) {
             *state = 4;
         }
         break;
@@ -117,18 +117,18 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         procWork->ov167Loaded = TRUE;
         GFL_OvlLoad(OVERLAY_ID(167));
         procWork->commandsSet = TRUE;
-        func_02040c20(0x100, data_ov167_021d7448, 9, NULL);
-        func_02042d04(func_02040440(), 0xc8);
+        NetCommand_AddTable(0x100, data_ov167_021d7448, 9, NULL);
+        GFL_NetSendTiming(NetHandle_GetOwn(), 0xc8);
         *state = 7;
         break;
     case 7:
-        if (func_02042d0c(func_02040440(), 0xc8)) {
+        if (GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xc8)) {
             *state = 8;
         }
         break;
     case 8:
         procWork->vsPlayerLoaded = TRUE;
-        func_0200bb24(HEAPID_BATTLE_PROC);
+        BattleRec_Init(HEAPID_BATTLE_PROC);
         QueueGameProc(procWork->manager, -1, &data_ov167_021d6ce0, battle->setup);
         *state = 9;
         break;
@@ -142,20 +142,20 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         *state = 11;
         break;
     case 11:
-        func_02042d04(func_02040440(), 0xca);
+        GFL_NetSendTiming(NetHandle_GetOwn(), 0xca);
         *state = 12;
         break;
     case 12:
-        if (!func_02042d0c(func_02040440(), 0xca)) {
+        if (!GFL_NetIsTimingRecv(NetHandle_GetOwn(), 0xca)) {
             break;
         }
-        func_02040c64(0x100);
+        NetCommand_RemoveTable(0x100);
         procWork->commandsSet = FALSE;
         GFL_OvlUnload(OVERLAY_ID(167));
         procWork->ov167Loaded = FALSE;
-        func_0200c1f0();
+        BattleRec_LoadToolOverlay();
         BattleRecTool_StoreSetup(battle->setup);
-        func_0200c200();
+        BattleRec_UnloadToolOverlay();
         *state = 13;
         break;
     case 13:
@@ -230,7 +230,7 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
         if (battle->setup->unkB0 == NULL) {
             saved = FALSE;
         } else {
-            saved = func_0200c1d0(battle->setup->unkAD) ? TRUE : FALSE;
+            saved = BattleRec_IsVersionSupported(battle->setup->unkAD) ? TRUE : FALSE;
         }
         battle->ov306Param.gameData = battle->gameData;
         battle->ov306Param.unk4 = saved;
@@ -258,11 +258,11 @@ BOOL func_ov010_0214ff58(GameProc *proc, u32 *state, void *param, void *work) {
 GameEvent *eventMakeFunc(GameSystem *gsys, void *data) {
     const EventMakeArgs *args = data;
 
-    return func_ov010_02150310(gsys, args->setup, args->players, args->unk08);
+    return EventMake_Create(gsys, args->setup, args->players, args->unk08);
 }
 
-GameEvent *func_ov010_02150310(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov010_0215033c, sizeof(EventMakeWork));
+GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventMake_Callback, sizeof(EventMakeWork));
     EventMakeWork *work = GameEvent_GetData(event);
 
     work->gsys = gsys;
@@ -272,7 +272,7 @@ GameEvent *func_ov010_02150310(GameSystem *gsys, BtlSetup *setup, BattlePlayers 
     return event;
 }
 
-GameEventReturnCode func_ov010_0215033c(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data) {
     EventMakeWork *work = data;
     GameSystem *gsys = work->gsys;
     BattleParam *param;

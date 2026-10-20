@@ -7,6 +7,7 @@
 #include "app/gtsnego_local.h"
 #include "app/ui/touchbar.h"
 #include "app/ui/ui_scene.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"
@@ -27,10 +28,6 @@
 #include "system/blink_palanm.h"
 #include "system/bmp_winframe.h"
 #include "system/palanm.h"
-
-// The archives of the screens' graphics and of the people's icons, which have no names yet
-#define GTSNEGO_ARCID 0x90
-#define GTSNEGO_ARCID_AVATAR 0x1f
 
 #define GTSNEGO_AVATAR_COUNT 16
 #define GTSNEGO_ARROW_COUNT 12
@@ -155,7 +152,7 @@ GtsNegoDisp *GtsNegoDisp_Create(HeapID heapId, GameData *gameData) {
     GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     ClActSys_Create(&sGtsNegoDispClActSetup, &sGtsNegoDispVRAMConfig, disp->heapId);
-    disp->clUnit = func_0204bf1c(64, 0, disp->heapId);
+    disp->clUnit = ClActUnit_Create(64, 0, disp->heapId);
     GFL_BGSysSetVRAMBanks(&sGtsNegoDispVRAMConfig);
     GFL_BGSysSetLCDConfig(&sGtsNegoDispLCDConfig);
     GtsNegoDisp_CreateBGs(disp);
@@ -171,7 +168,7 @@ GtsNegoDisp *GtsNegoDisp_Create(HeapID heapId, GameData *gameData) {
 }
 
 void GtsNegoDisp_Main(GtsNegoDisp *disp) {
-    func_0204b794();
+    ClActSys_Draw();
     if (disp->blinkMain != NULL) {
         BlinkPalAnm_Main(disp->blinkMain);
     }
@@ -184,30 +181,30 @@ void GtsNegoDisp_Main(GtsNegoDisp *disp) {
 void GtsNegoDisp_Free(GtsNegoDisp *disp) {
     int i;
 
-    func_0204c108(disp->cursor);
+    ClActor_Delete(disp->cursor);
     GtsNegoDisp_FreeTouchBar(disp);
     GtsNegoDisp_FreeListFooter(disp);
     GtsNegoDisp_FreeListScreen(disp);
     GFL_HeapFree(disp->objPalette);
     GFL_HeapFree(disp->bgPalette);
     GtsNegoDisp_FreeArrows(disp);
-    func_0204bcd0(disp->res[GTSNEGO_RES_PLTT_SUB]);
-    func_0204bcd0(disp->res[GTSNEGO_RES_PLTT_MAIN]);
-    func_0204b98c(disp->res[GTSNEGO_RES_CHAR_SUB]);
-    func_0204b98c(disp->res[GTSNEGO_RES_CHAR_MAIN]);
-    func_0204be64(disp->res[GTSNEGO_RES_ANIM_SUB]);
-    func_0204be64(disp->res[GTSNEGO_RES_ANIM_MAIN]);
-    func_0204bcd0(disp->res[GTSNEGO_RES_PLTT_FOOTER]);
-    func_0204b98c(disp->res[GTSNEGO_RES_CHAR_FOOTER]);
-    func_0204be64(disp->res[GTSNEGO_RES_ANIM_FOOTER]);
-    func_0204bcd0(disp->res[GTSNEGO_RES_PLTT_AVATAR]);
+    ClActSys_FreePltt(disp->res[GTSNEGO_RES_PLTT_SUB]);
+    ClActSys_FreePltt(disp->res[GTSNEGO_RES_PLTT_MAIN]);
+    ClActSys_FreeChars(disp->res[GTSNEGO_RES_CHAR_SUB]);
+    ClActSys_FreeChars(disp->res[GTSNEGO_RES_CHAR_MAIN]);
+    ClActSys_FreeCellAnims(disp->res[GTSNEGO_RES_ANIM_SUB]);
+    ClActSys_FreeCellAnims(disp->res[GTSNEGO_RES_ANIM_MAIN]);
+    ClActSys_FreePltt(disp->res[GTSNEGO_RES_PLTT_FOOTER]);
+    ClActSys_FreeChars(disp->res[GTSNEGO_RES_CHAR_FOOTER]);
+    ClActSys_FreeCellAnims(disp->res[GTSNEGO_RES_ANIM_FOOTER]);
+    ClActSys_FreePltt(disp->res[GTSNEGO_RES_PLTT_AVATAR]);
     for (i = 0; i < GTSNEGO_AVATAR_COUNT; i++) {
-        func_0204b98c(disp->res[GTSNEGO_RES_CHAR_AVATAR + i]);
-        func_0204be64(disp->res[GTSNEGO_RES_ANIM_AVATAR + i]);
+        ClActSys_FreeChars(disp->res[GTSNEGO_RES_CHAR_AVATAR + i]);
+        ClActSys_FreeCellAnims(disp->res[GTSNEGO_RES_ANIM_AVATAR + i]);
     }
     GFL_TCBRemove(disp->vblankTask);
-    func_0204bf98(disp->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(disp->clUnit);
+    ClActSys_Delete();
     BlinkPalAnm_Free(disp->blinkMain);
     BlinkPalAnm_Free(disp->blinkSub);
     GFL_BGSysFreeCharMemory(7, CHAR_POS(disp->barChars), CHAR_SIZE(disp->barChars));
@@ -523,7 +520,7 @@ void GtsNegoDisp_SetDim(GtsNegoDisp *disp, BOOL dim, u32 type) {
 static void GtsNegoDisp_VBlank(TCB *tcb, void *work) {
     GtsNegoDisp *disp = work;
 
-    func_0204b7c8();
+    ClActSys_VBlank();
     if (disp->scrollPending) {
         GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, disp->listScroll + 72);
         GFL_BGSysMoveBG(6, BG_MOVE_SET_Y, disp->listScroll + 72);
@@ -532,7 +529,7 @@ static void GtsNegoDisp_VBlank(TCB *tcb, void *work) {
 }
 
 static void GtsNegoDisp_LoadGraphics(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     int i = 0;
 
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, PALTYPE_SUB_BG, 0, 0xc0, disp->heapId);
@@ -544,26 +541,26 @@ static void GtsNegoDisp_LoadGraphics(GtsNegoDisp *disp) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_MAIN_BG, 0, 0, disp->heapId);
     disp->mainChars = GFL_BGSysLoadArcNCGRDynamic(arc, 6, 0, 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 12, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
-    disp->res[GTSNEGO_RES_CHAR_FOOTER] = func_0204b81c(arc, 5, FALSE, CLACT_VRAM_SUB, disp->heapId);
-    disp->res[GTSNEGO_RES_PLTT_FOOTER] = func_0204bbb8(arc, 0, CLACT_VRAM_SUB, 0x140, 0, 1, disp->heapId);
-    disp->res[GTSNEGO_RES_ANIM_FOOTER] = func_0204bde0(arc, 10, 22, disp->heapId);
-    disp->res[GTSNEGO_RES_CHAR_SUB] = func_0204b81c(arc, 7, FALSE, CLACT_VRAM_SUB, disp->heapId);
-    disp->res[GTSNEGO_RES_PLTT_SUB] = func_0204bbb8(arc, 2, CLACT_VRAM_SUB, 0x100, 0, 8, disp->heapId);
-    disp->res[GTSNEGO_RES_ANIM_SUB] = func_0204bde0(arc, 11, 23, disp->heapId);
-    disp->res[GTSNEGO_RES_CHAR_MAIN] = func_0204b81c(arc, 7, FALSE, CLACT_VRAM_MAIN, disp->heapId);
-    disp->res[GTSNEGO_RES_PLTT_MAIN] = func_0204bbb8(arc, 2, CLACT_VRAM_MAIN, 0, 0, 8, disp->heapId);
-    disp->res[GTSNEGO_RES_ANIM_MAIN] = func_0204bde0(arc, 11, 23, disp->heapId);
+    disp->res[GTSNEGO_RES_CHAR_FOOTER] = ClActSys_LoadChars(arc, 5, FALSE, CLACT_VRAM_SUB, disp->heapId);
+    disp->res[GTSNEGO_RES_PLTT_FOOTER] = ClActSys_LoadPlttRange(arc, 0, CLACT_VRAM_SUB, 0x140, 0, 1, disp->heapId);
+    disp->res[GTSNEGO_RES_ANIM_FOOTER] = ClActSys_LoadCellAnims(arc, 10, 22, disp->heapId);
+    disp->res[GTSNEGO_RES_CHAR_SUB] = ClActSys_LoadChars(arc, 7, FALSE, CLACT_VRAM_SUB, disp->heapId);
+    disp->res[GTSNEGO_RES_PLTT_SUB] = ClActSys_LoadPlttRange(arc, 2, CLACT_VRAM_SUB, 0x100, 0, 8, disp->heapId);
+    disp->res[GTSNEGO_RES_ANIM_SUB] = ClActSys_LoadCellAnims(arc, 11, 23, disp->heapId);
+    disp->res[GTSNEGO_RES_CHAR_MAIN] = ClActSys_LoadChars(arc, 7, FALSE, CLACT_VRAM_MAIN, disp->heapId);
+    disp->res[GTSNEGO_RES_PLTT_MAIN] = ClActSys_LoadPlttRange(arc, 2, CLACT_VRAM_MAIN, 0, 0, 8, disp->heapId);
+    disp->res[GTSNEGO_RES_ANIM_MAIN] = ClActSys_LoadCellAnims(arc, 11, 23, disp->heapId);
     disp->blinkMain = BlinkPalAnm_Create(0, 16, 0, disp->heapId);
     BlinkPalAnm_SetPalBufferArcTool(disp->blinkMain, arc, 1, 0, 16);
     disp->blinkSub = BlinkPalAnm_Create(0, 16, 7, disp->heapId);
     BlinkPalAnm_SetPalBufferArcTool(disp->blinkSub, arc, 1, 0, 16);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID_AVATAR, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, disp->heapId);
     for (; i < GTSNEGO_AVATAR_COUNT; i++) {
-        disp->res[GTSNEGO_RES_CHAR_AVATAR + i] = func_0204b81c(arc, 1 + i, FALSE, CLACT_VRAM_SUB, disp->heapId);
-        disp->res[GTSNEGO_RES_ANIM_AVATAR + i] = func_0204bde0(arc, 17 + i * 2, 18 + i * 2, disp->heapId);
+        disp->res[GTSNEGO_RES_CHAR_AVATAR + i] = ClActSys_LoadChars(arc, 1 + i, FALSE, CLACT_VRAM_SUB, disp->heapId);
+        disp->res[GTSNEGO_RES_ANIM_AVATAR + i] = ClActSys_LoadCellAnims(arc, 17 + i * 2, 18 + i * 2, disp->heapId);
     }
-    disp->res[GTSNEGO_RES_PLTT_AVATAR] = func_0204bbb8(arc, 0, CLACT_VRAM_SUB, 0, 0, 8, disp->heapId);
+    disp->res[GTSNEGO_RES_PLTT_AVATAR] = ClActSys_LoadPlttRange(arc, 0, CLACT_VRAM_SUB, 0, 0, 8, disp->heapId);
     GFL_ArcToolFree(arc);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2,
                        GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 15, 9);
@@ -576,7 +573,7 @@ void GtsNegoDisp_ShowSearchMenu(GtsNegoDisp *disp) {
     ArcTool *arc;
 
     GtsNegoDisp_Dummy(disp, FALSE);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 19, 4, 0, CHAR_POS(disp->subChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 20, 4, 0, CHAR_POS(disp->subChars), 0xc0, FALSE, disp->heapId);
     GFL_ArcToolFree(arc);
@@ -589,7 +586,7 @@ void GtsNegoDisp_ShowSearchMenu(GtsNegoDisp *disp) {
 }
 
 void GtsNegoDisp_HideSearchMenu(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GtsNegoDisp_FreeArrows(disp);
     GFL_BGSysFillScrArea(6, 0, 0, 0, 32, 32, 17);
@@ -637,11 +634,11 @@ static void GtsNegoDisp_CreateCursor(GtsNegoDisp *disp) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 2;
-    disp->cursor = func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
-                                 disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
+    disp->cursor = ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
+                                  disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
     func_0204c520(disp->cursor, TRUE);
-    func_0204c124(disp->cursor, FALSE);
-    func_0204c318(disp->cursor, GX_OAM_MODE_XLU);
+    ClActor_SetVisible(disp->cursor, FALSE);
+    ClActor_SetObjMode(disp->cursor, GX_OAM_MODE_XLU);
 }
 
 static GtsNegoCursorPos sGtsNegoDispCursors[] = {
@@ -662,10 +659,10 @@ void GtsNegoDisp_SetCursor(GtsNegoDisp *disp, AppTaskMenuWin *button, int cursor
 
     switch (cursor) {
     case GTSNEGO_CURSOR_NONE:
-        func_0204c124(disp->cursor, FALSE);
+        ClActor_SetVisible(disp->cursor, FALSE);
         return;
     case GTSNEGO_CURSOR_SEARCH:
-        func_0204c124(disp->cursor, FALSE);
+        ClActor_SetVisible(disp->cursor, FALSE);
         if (button != NULL) {
             AppTaskMenuWin_SetActive(button, TRUE);
         }
@@ -683,16 +680,16 @@ void GtsNegoDisp_SetCursor(GtsNegoDisp *disp, AppTaskMenuWin *button, int cursor
     }
     pos.x = sGtsNegoDispCursors[cursor].x;
     pos.y = sGtsNegoDispCursors[cursor].y;
-    func_0204c140(disp->cursor, &pos, 1);
-    func_0204c488(disp->cursor, sGtsNegoDispCursors[cursor].anim);
-    func_0204c124(disp->cursor, TRUE);
+    ClActor_SetSurfacePos(disp->cursor, &pos, 1);
+    ClActor_SetSequence(disp->cursor, sGtsNegoDispCursors[cursor].anim);
+    ClActor_SetVisible(disp->cursor, TRUE);
 }
 
 BOOL GtsNegoDisp_PressCursor(GtsNegoDisp *disp, int cursor) {
     if (disp->cursor == NULL) {
         return FALSE;
     }
-    func_0204c488(disp->cursor, sGtsNegoDispCursors[cursor].pressAnim);
+    ClActor_SetSequence(disp->cursor, sGtsNegoDispCursors[cursor].pressAnim);
     return TRUE;
 }
 
@@ -700,8 +697,8 @@ BOOL GtsNegoDisp_IsCursorPressDone(GtsNegoDisp *disp) {
     if (disp->cursor == NULL) {
         return FALSE;
     }
-    if (func_0204c4a0(disp->cursor) >= 29) {
-        if (!func_0204c560(disp->cursor)) {
+    if (ClActor_GetSequence(disp->cursor) >= 29) {
+        if (!ClActor_IsAnimActive(disp->cursor)) {
             return TRUE;
         }
         return FALSE;
@@ -723,10 +720,10 @@ static void GtsNegoDisp_AddArrow(GtsNegoDisp *disp, int x, int y, BOOL right) {
             setup.priority = 0;
             setup.bgPriority = 1;
             disp->arrows[i] =
-                func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
-                              disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
+                ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
+                               disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
             func_0204c520(disp->arrows[i], TRUE);
-            func_0204c124(disp->arrows[i], TRUE);
+            ClActor_SetVisible(disp->arrows[i], TRUE);
             return;
         }
     }
@@ -737,7 +734,7 @@ void GtsNegoDisp_FreeArrows(GtsNegoDisp *disp) {
 
     for (i = 0; i < GTSNEGO_ARROW_COUNT; i++) {
         if (disp->arrows[i] != NULL) {
-            func_0204c108(disp->arrows[i]);
+            ClActor_Delete(disp->arrows[i]);
             disp->arrows[i] = NULL;
         }
     }
@@ -745,13 +742,13 @@ void GtsNegoDisp_FreeArrows(GtsNegoDisp *disp) {
 
 // Plays an arrow's animation of a press: the one after its own
 void GtsNegoDisp_PressArrow(GtsNegoDisp *disp, int arrow) {
-    int sequence = func_0204c4a0(disp->arrows[arrow]);
+    int sequence = ClActor_GetSequence(disp->arrows[arrow]);
     int pressed = 1;
 
     if (sequence >= 2) {
         pressed = 3;
     }
-    func_0204c488(disp->arrows[arrow], pressed);
+    ClActor_SetSequence(disp->arrows[arrow], pressed);
     func_0204c520(disp->arrows[arrow], TRUE);
 }
 
@@ -761,11 +758,11 @@ void GtsNegoDisp_ShowFriendList(GtsNegoDisp *disp, BOOL scrollable) {
     GtsNegoDisp_FreeTouchBar(disp);
     GtsNegoDisp_CreateTouchBar(disp, 8);
     GtsNegoDisp_Dummy(disp, TRUE);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     disp->listScreenFile = GFL_G2DIOReadNSCRArc(arc, 21, FALSE, &disp->listScreen, disp->heapId);
     GFL_G2DIOLoadArcNCLR(arc, 0, PALTYPE_SUB_OBJ, 0, 0x140, 0x20, disp->heapId);
     GFL_ArcToolFree(arc);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID_AVATAR, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, disp->heapId);
     GFL_G2DIOLoadArcNCLR(arc, 0, PALTYPE_SUB_OBJ, 0, 0, 0x100, disp->heapId);
     GFL_ArcToolFree(arc);
     GtsNegoDisp_CreateListFooter(disp);
@@ -825,12 +822,12 @@ void GtsNegoDisp_DrawListRows(GtsNegoDisp *disp, GameData *gameData, int top) {
 }
 
 void GtsNegoDisp_LeaveFriendList(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     int i;
 
     for (i = 0; i < GTSNEGO_LIST_ROWS; i++) {
         if (disp->friendIcons[i] != NULL) {
-            func_0204c108(disp->friendIcons[i]);
+            ClActor_Delete(disp->friendIcons[i]);
             disp->friendIcons[i] = NULL;
         }
     }
@@ -841,7 +838,7 @@ void GtsNegoDisp_LeaveFriendList(GtsNegoDisp *disp) {
 }
 
 void GtsNegoDisp_HideFriendList(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GtsNegoDisp_FreeListScreen(disp);
     GtsNegoDisp_FreeListActors(disp);
@@ -900,15 +897,15 @@ static void GtsNegoDisp_CreateListFooter(GtsNegoDisp *disp) {
     setup.priority = 1;
     setup.bgPriority = 1;
     disp->listFooter =
-        func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_FOOTER], disp->res[GTSNEGO_RES_PLTT_FOOTER],
-                      disp->res[GTSNEGO_RES_ANIM_FOOTER], &setup, 1, disp->heapId);
+        ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_FOOTER], disp->res[GTSNEGO_RES_PLTT_FOOTER],
+                       disp->res[GTSNEGO_RES_ANIM_FOOTER], &setup, 1, disp->heapId);
     func_0204c520(disp->listFooter, TRUE);
-    func_0204c124(disp->listFooter, TRUE);
+    ClActor_SetVisible(disp->listFooter, TRUE);
 }
 
 void GtsNegoDisp_FreeListFooter(GtsNegoDisp *disp) {
     if (disp->listFooter != NULL) {
-        func_0204c108(disp->listFooter);
+        ClActor_Delete(disp->listFooter);
     }
     disp->listFooter = NULL;
 }
@@ -932,10 +929,10 @@ static void GtsNegoDisp_CreateListActors(GtsNegoDisp *disp, BOOL scrollable) {
         setup.priority = i;
         setup.bgPriority = bgPriorities[i];
         disp->listActors[i] =
-            func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
-                          disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
+            ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_SUB], disp->res[GTSNEGO_RES_PLTT_SUB],
+                           disp->res[GTSNEGO_RES_ANIM_SUB], &setup, 1, disp->heapId);
         func_0204c520(disp->listActors[i], TRUE);
-        func_0204c124(disp->listActors[i], TRUE);
+        ClActor_SetVisible(disp->listActors[i], TRUE);
     }
 }
 
@@ -944,7 +941,7 @@ void GtsNegoDisp_FreeListActors(GtsNegoDisp *disp) {
 
     for (i = 0; i < GTSNEGO_LIST_ACTOR_COUNT; i++) {
         if (disp->listActors[i] != NULL) {
-            func_0204c108(disp->listActors[i]);
+            ClActor_Delete(disp->listActors[i]);
             disp->listActors[i] = NULL;
         }
     }
@@ -952,7 +949,7 @@ void GtsNegoDisp_FreeListActors(GtsNegoDisp *disp) {
 
 void GtsNegoDisp_SetKnobAnimating(GtsNegoDisp *disp, BOOL animating) {
     if (disp->listActors[GTSNEGO_LIST_ACTOR_KNOB] != NULL) {
-        func_0204c56c(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB]);
+        ClActor_RestartAnim(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB]);
         func_0204c520(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], animating);
     }
 }
@@ -1026,7 +1023,7 @@ void GtsNegoDisp_CreateFriendIcon(GtsNegoDisp *disp, int row, int avatar) {
     ClActorSetup setup;
 
     if (disp->friendIcons[row] != NULL) {
-        func_0204c108(disp->friendIcons[row]);
+        ClActor_Delete(disp->friendIcons[row]);
     }
     setup.x = 0;
     setup.y = 0;
@@ -1034,10 +1031,10 @@ void GtsNegoDisp_CreateFriendIcon(GtsNegoDisp *disp, int row, int avatar) {
     setup.priority = 10;
     setup.bgPriority = 2;
     disp->friendIcons[row] =
-        func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_AVATAR + avatar], disp->res[GTSNEGO_RES_PLTT_AVATAR],
-                      disp->res[GTSNEGO_RES_ANIM_AVATAR + avatar], &setup, 1, disp->heapId);
+        ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_AVATAR + avatar], disp->res[GTSNEGO_RES_PLTT_AVATAR],
+                       disp->res[GTSNEGO_RES_ANIM_AVATAR + avatar], &setup, 1, disp->heapId);
     func_0204c520(disp->friendIcons[row], TRUE);
-    func_0204c124(disp->friendIcons[row], FALSE);
+    ClActor_SetVisible(disp->friendIcons[row], FALSE);
 }
 
 void GtsNegoDisp_ShowFriendIcon(GtsNegoDisp *disp, int row, int x, int y) {
@@ -1046,8 +1043,8 @@ void GtsNegoDisp_ShowFriendIcon(GtsNegoDisp *disp, int row, int x, int y) {
 
         pos.x = x;
         pos.y = y;
-        func_0204c140(disp->friendIcons[row], &pos, 1);
-        func_0204c124(disp->friendIcons[row], TRUE);
+        ClActor_SetSurfacePos(disp->friendIcons[row], &pos, 1);
+        ClActor_SetVisible(disp->friendIcons[row], TRUE);
     }
 }
 
@@ -1063,9 +1060,9 @@ void GtsNegoDisp_MoveFriendIcon(GtsNegoDisp *disp, int row, int y) {
     if (disp->friendIcons[row] != NULL) {
         ClActorPos pos;
 
-        func_0204c178(disp->friendIcons[row], &pos, 1);
+        ClActor_GetSurfacePos(disp->friendIcons[row], &pos, 1);
         pos.y += y;
-        func_0204c140(disp->friendIcons[row], &pos, 1);
+        ClActor_SetSurfacePos(disp->friendIcons[row], &pos, 1);
     }
 }
 
@@ -1074,7 +1071,7 @@ void GtsNegoDisp_ShiftFriendIconsUp(GtsNegoDisp *disp, PlayerInfo *friend) {
         int i;
 
         if (disp->friendIcons[0] != NULL) {
-            func_0204c108(disp->friendIcons[0]);
+            ClActor_Delete(disp->friendIcons[0]);
         }
         for (i = 0; i < GTSNEGO_LIST_ROWS - 1; i++) {
             disp->friendIcons[i] = disp->friendIcons[i + 1];
@@ -1089,7 +1086,7 @@ void GtsNegoDisp_ShiftFriendIconsDown(GtsNegoDisp *disp, PlayerInfo *friend) {
         int i;
 
         if (disp->friendIcons[GTSNEGO_LIST_ROWS - 1] != NULL) {
-            func_0204c108(disp->friendIcons[GTSNEGO_LIST_ROWS - 1]);
+            ClActor_Delete(disp->friendIcons[GTSNEGO_LIST_ROWS - 1]);
         }
         for (i = GTSNEGO_LIST_ROWS - 1; i > 0; i--) {
             disp->friendIcons[i] = disp->friendIcons[i - 1];
@@ -1143,9 +1140,9 @@ void GtsNegoDisp_SetKnob(GtsNegoDisp *disp, int pos, int count) {
     if (disp->listActors[GTSNEGO_LIST_ACTOR_KNOB] != NULL) {
         ClActorPos knob;
 
-        func_0204c178(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
+        ClActor_GetSurfacePos(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
         knob.y = GtsNegoDisp_GetKnobY(disp, pos, count) + GTSNEGO_KNOB_TOP;
-        func_0204c140(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
+        ClActor_SetSurfacePos(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
     }
 }
 
@@ -1155,9 +1152,9 @@ int GtsNegoDisp_DragKnob(GtsNegoDisp *disp, int y, int count) {
     if (disp->listActors[GTSNEGO_LIST_ACTOR_KNOB] != NULL) {
         ClActorPos knob;
 
-        func_0204c178(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
+        ClActor_GetSurfacePos(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
         knob.y = y;
-        func_0204c140(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
+        ClActor_SetSurfacePos(disp->listActors[GTSNEGO_LIST_ACTOR_KNOB], &knob, 1);
         pos = GtsNegoDisp_GetKnobPos(disp, y, count);
     }
     return pos;
@@ -1166,12 +1163,12 @@ int GtsNegoDisp_DragKnob(GtsNegoDisp *disp, int y, int count) {
 // The search's trainer cycles through the looks, a sequence each
 static void GtsNegoDisp_OnSearchAnimEnd(u32 param, fx32 frame) {
     GtsNegoDisp *disp = (GtsNegoDisp *)param;
-    u16 sequence = func_0204c4a0(disp->searchActors[1]) + 1;
+    u16 sequence = ClActor_GetSequence(disp->searchActors[1]) + 1;
 
     if (sequence > 26) {
         sequence = 11;
     }
-    func_0204c488(disp->searchActors[1], sequence);
+    ClActor_SetSequence(disp->searchActors[1], sequence);
 }
 
 static void GtsNegoDisp_CreateSearchActors(GtsNegoDisp *disp) {
@@ -1184,49 +1181,49 @@ static void GtsNegoDisp_CreateSearchActors(GtsNegoDisp *disp) {
     setup.priority = 2;
     setup.bgPriority = 1;
     disp->searchActors[0] =
-        func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_MAIN], disp->res[GTSNEGO_RES_PLTT_MAIN],
-                      disp->res[GTSNEGO_RES_ANIM_MAIN], &setup, 0, disp->heapId);
+        ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_MAIN], disp->res[GTSNEGO_RES_PLTT_MAIN],
+                       disp->res[GTSNEGO_RES_ANIM_MAIN], &setup, 0, disp->heapId);
     func_0204c520(disp->searchActors[0], TRUE);
-    func_0204c124(disp->searchActors[0], TRUE);
+    ClActor_SetVisible(disp->searchActors[0], TRUE);
     setup.sequence = 11;
     setup.priority = 1;
     disp->searchActors[1] =
-        func_0204c040(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_MAIN], disp->res[GTSNEGO_RES_PLTT_MAIN],
-                      disp->res[GTSNEGO_RES_ANIM_MAIN], &setup, 0, disp->heapId);
+        ClActor_Create(disp->clUnit, disp->res[GTSNEGO_RES_CHAR_MAIN], disp->res[GTSNEGO_RES_PLTT_MAIN],
+                       disp->res[GTSNEGO_RES_ANIM_MAIN], &setup, 0, disp->heapId);
     func_0204c520(disp->searchActors[1], TRUE);
-    func_0204c124(disp->searchActors[1], TRUE);
+    ClActor_SetVisible(disp->searchActors[1], TRUE);
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (u32)disp;
     callback.func = GtsNegoDisp_OnSearchAnimEnd;
-    func_0204c5b0(disp->searchActors[1], &callback);
+    ClActor_SetAnimCallback(disp->searchActors[1], &callback);
     GFL_BGSysSetEnabledBGsA(GX_PLANEMASK_ALL);
 }
 
 static void GtsNegoDisp_FreeSearchActors(GtsNegoDisp *disp) {
-    func_0204c124(disp->searchActors[0], FALSE);
-    func_0204c108(disp->searchActors[0]);
-    func_0204c124(disp->searchActors[1], FALSE);
-    func_0204c108(disp->searchActors[1]);
+    ClActor_SetVisible(disp->searchActors[0], FALSE);
+    ClActor_Delete(disp->searchActors[0]);
+    ClActor_SetVisible(disp->searchActors[1], FALSE);
+    ClActor_Delete(disp->searchActors[1]);
 }
 
 // Stops the search's trainer on the partner's look
 void GtsNegoDisp_ShowPartner(GtsNegoDisp *disp, int avatar) {
     int sequences[GTSNEGO_AVATAR_COUNT] = { 0, 6, 8, 12, 14, 3, 4, 10, 11, 1, 13, 5, 7, 9, 15, 2 };
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 15, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_ArcToolFree(arc);
     func_0204c520(disp->searchActors[1], FALSE);
-    func_0204c488(disp->searchActors[1], sequences[avatar] + 11);
-    func_0204c504(disp->searchActors[1], 4);
-    func_0204c488(disp->searchActors[0], 28);
+    ClActor_SetSequence(disp->searchActors[1], sequences[avatar] + 11);
+    ClActor_SetAnimFrame(disp->searchActors[1], 4);
+    ClActor_SetSequence(disp->searchActors[0], 28);
     GFL_BGSysQueueScrLoad(0);
     disp->topScroll = 0;
     disp->topScrolling = FALSE;
 }
 
 void GtsNegoDisp_ShowSearching(GtsNegoDisp *disp) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
 
     GFL_G2DIOLoadNSCRSync(arc, 14, 2, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 13, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
@@ -1253,8 +1250,8 @@ void GtsNegoDisp_Reset(GtsNegoDisp *disp) {
 
     for (i = 0; i < GTSNEGO_LIST_ROWS; i++) {
         if (disp->friendIcons[i] != NULL) {
-            func_0204c124(disp->friendIcons[i], FALSE);
-            func_0204c108(disp->friendIcons[i]);
+            ClActor_SetVisible(disp->friendIcons[i], FALSE);
+            ClActor_Delete(disp->friendIcons[i]);
             disp->friendIcons[i] = NULL;
         }
     }
@@ -1263,7 +1260,7 @@ void GtsNegoDisp_Reset(GtsNegoDisp *disp) {
     GtsNegoDisp_FreeSearchActors(disp);
     GtsNegoDisp_FreeListActors(disp);
     GtsNegoDisp_FreeArrows(disp);
-    arc = GFL_ArcSysCreateFileHandle(GTSNEGO_ARCID, disp->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_GTSNEGO_DISP, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 12, 0, 0, CHAR_POS(disp->mainChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 18, 4, 0, CHAR_POS(disp->subChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadArcNCLR(arc, 2, PALTYPE_SUB_OBJ, 0, 0x100, 0x100, disp->heapId);

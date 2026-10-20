@@ -1,0 +1,61 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 1,
+            "dark_grass": 3,
+            "shaking_grass": 1,
+            "surf": 0,
+            "rippling_surf": 0,
+            "fishing": 0,
+            "rippling_fishing": 0,
+            "flags": 0
+        },
+        "grass": [
+            [ "SPECIES_GURDURR", 47, 47 ],
+            [ "SPECIES_GURDURR", 47, 47 ],
+            [ "SPECIES_GURDURR", 48, 48 ],
+            [ "SPECIES_THROH", 48, 48 ],
+            [ "SPECIES_GURDURR", 49, 49 ],
+            [ "SPECIES_THROH", 49, 49 ],
+            [ "SPECIES_GURDURR", 50, 50 ],
+            [ "SPECIES_THROH", 50, 50 ],
+            [ "SPECIES_GURDURR", 50, 50 ],
+            [ "SPECIES_THROH", 50, 50 ],
+            [ "SPECIES_GURDURR", 50, 50 ],
+            [ "SPECIES_THROH", 50, 50 ]
+        ],
+        "dark_grass": [
+            [ "SPECIES_GURDURR", 52, 52 ],
+            [ "SPECIES_GURDURR", 52, 52 ],
+            [ "SPECIES_GURDURR", 53, 53 ],
+            [ "SPECIES_THROH", 53, 53 ],
+            [ "SPECIES_GURDURR", 54, 54 ],
+            [ "SPECIES_THROH", 54, 54 ],
+            [ "SPECIES_GURDURR", 55, 55 ],
+            [ "SPECIES_THROH", 55, 55 ],
+            [ "SPECIES_GURDURR", 55, 55 ],
+            [ "SPECIES_THROH", 55, 55 ],
+            [ "SPECIES_GURDURR", 55, 55 ],
+            [ "SPECIES_THROH", 55, 55 ]
+        ],
+        "shaking_grass": [
+            [ "SPECIES_AUDINO", 47, 47 ],
+            [ "SPECIES_AUDINO", 47, 47 ],
+            [ "SPECIES_AUDINO", 48, 48 ],
+            [ "SPECIES_AUDINO", 48, 48 ],
+            [ "SPECIES_AUDINO", 49, 49 ],
+            [ "SPECIES_AUDINO", 49, 49 ],
+            [ "SPECIES_AUDINO", 50, 50 ],
+            [ "SPECIES_AUDINO", 50, 50 ],
+            [ "SPECIES_AUDINO", 50, 50 ],
+            [ "SPECIES_SAWK", 50, 50 ],
+            [ "SPECIES_AUDINO", 50, 50 ],
+            [ "SPECIES_SAWK", 50, 50 ]
+        ],
+        "surf": [],
+        "rippling_surf": [],
+        "fishing": [],
+        "rippling_fishing": []
+    }
+}

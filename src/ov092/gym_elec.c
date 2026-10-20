@@ -661,7 +661,7 @@ static void GymElecObject_ShowEnd(GymElecObject *obj) {
         FieldExpObj_SetAnm(obj->expObj, obj->scene, obj->actor, i, TRUE);
         anm = FieldExpObj_GetAnmInfo(obj->expObj, obj->scene, obj->actor, i);
         FieldExpObjAnm_SetPaused(anm, TRUE);
-        FieldExpObj_SetAnmFrame(obj->expObj, obj->scene, obj->actor, i, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(obj->expObj, obj->scene, obj->actor, i, FieldExpObjAnm_GetLastFrame(anm));
     }
 }
 

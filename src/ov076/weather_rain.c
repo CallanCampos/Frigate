@@ -346,7 +346,7 @@ static void RainDrop_Move(WeatherObj *obj) {
             } else {
                 drop->state = 1;
                 drop->frame = 4;
-                func_0204c504(actor, 3);
+                ClActor_SetAnimFrame(actor, 3);
             }
         }
         func_ov036_02199cf0(obj, &pos);
@@ -384,7 +384,7 @@ static void Rain_AddDrops(WeatherTask *task, int count, HeapID heapId) {
         random = GFL_RandomLC(0);
         drop->frame = 0;
         size = random % 3;
-        func_0204c504(actor, size);
+        ClActor_SetAnimFrame(actor, size);
         slant = random % 20;
         drop->speedY = slant + (size + 1) * 16;
         if (size == 2) {
@@ -566,7 +566,7 @@ static void Thunder_AddDrops(WeatherTask *task, int count, HeapID heapId) {
         actor = func_ov036_02199c64(obj);
         random = GFL_RandomLC(0);
         size = random % 3;
-        func_0204c504(actor, size);
+        ClActor_SetAnimFrame(actor, size);
         drop->speedX = (random & 15) + (size + 1) * 14;
         drop->speedY = drop->speedX;
         drop->speedX = sThunderSpeedScale[work->frame / 60] * drop->speedX / 10;
@@ -782,7 +782,7 @@ static void GustSlant_Init(WeatherObj *obj, const GustWork *work, GustParticleDa
     func_ov036_02199cf0(obj, &pos);
     data->x = pos.x << 3;
     data->y = pos.y << 3;
-    func_0204c488(actor, 0);
+    ClActor_SetSequence(actor, 0);
     func_0204c520(actor, 1);
     func_0204c53c(actor, 1 << 13);
 }
@@ -814,7 +814,7 @@ static void GustStreak_Init(WeatherObj *obj, const GustWork *work, GustParticleD
     func_ov036_02199cf0(obj, &pos);
     data->x = pos.x << 3;
     data->y = pos.y << 3;
-    func_0204c488(actor, 1);
+    ClActor_SetSequence(actor, 1);
     func_0204c520(actor, 1);
     func_0204c53c(actor, 1 << 13);
 }
@@ -859,7 +859,7 @@ static void GustDriven_Init(WeatherObj *obj, const GustWork *work, GustParticleD
     func_ov036_02199cf0(obj, &pos);
     data->x = pos.x << 3;
     data->y = pos.y << 3;
-    func_0204c488(actor, 2);
+    ClActor_SetSequence(actor, 2);
     func_0204c520(actor, 1);
     func_0204c53c(actor, 1 << 13);
 }

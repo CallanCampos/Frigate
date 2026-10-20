@@ -8,8 +8,9 @@
 
 static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet);
 
-static SOCLCommandPacket *SOCLiCommandPackets;
-static OSMessageQueue SOCLiCommandPacketQueue;
+// With their explicit zeros the code reaches both from one base, as the original does
+static SOCLCommandPacket *SOCLiCommandPackets = NULL;
+static OSMessageQueue SOCLiCommandPacketQueue = { 0 };
 
 int SOCLi_StartupCommandPacketQueue(u32 max) {
     int packets_offset = (max * sizeof(OSMessage) + 3) & ~3;
@@ -53,11 +54,11 @@ SOCLCommandPacket *SOCLi_CreateCommandPacket(SOCLCommandHandler handler, SOCLSoc
     SOCLCommandPacket *packet = SOCLi_AllocCommandPacket(flag_block);
 
     if (packet != NULL) {
-        packet->handler = handler;
-        packet->socket = socket;
-        packet->reply_queue = NULL;
-        packet->socket_flag = socket->flag;
-        packet->flag_block = flag_block;
+        packet->h.handler = handler;
+        packet->h.socket = socket;
+        packet->h.reply_queue = NULL;
+        packet->h.socket_flag = socket->flag;
+        packet->h.flag_block = flag_block;
     }
     return packet;
 }
@@ -69,17 +70,12 @@ void SOCLi_FreeCommandPacket(SOCLCommandPacket *packet) {
 }
 
 SOCLCommandPipe *SOCLi_GetCtrlPipe(SOCLSocket *socket) {
-    SOCLCommandPipe *pipe = socket->recv_pipe;
-
-    if (pipe == NULL) {
-        pipe = socket->send_pipe;
-    }
-    return pipe;
+    return socket->recv_pipe != NULL ? &socket->recv_pipe->base : &socket->send_pipe->base;
 }
 
 int SOCLi_SendCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet) {
     BOOL sent = OS_SendMessage(&pipe->queue, packet,
-                               packet == NULL || (packet->flag_block & 1) ? OS_MESSAGE_BLOCK : OS_MESSAGE_NOBLOCK);
+                               packet == NULL || (packet->h.flag_block & 1) ? OS_MESSAGE_BLOCK : OS_MESSAGE_NOBLOCK);
 
     if (!sent) {
         SOCLi_FreeCommandPacket(packet);
@@ -96,24 +92,24 @@ static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *pac
     OSMessage message[1];
     OSMessageQueue queue;
 
-    if (packet->flag_block == 1) {
+    if (packet->h.flag_block == 1) {
         OS_InitMessageQueue(&queue, message, 1);
-        packet->reply_queue = &queue;
+        packet->h.reply_queue = &queue;
         SOCLi_SendCommandPacket(pipe, packet);
         OS_ReceiveMessage(&queue, &result, OS_MESSAGE_BLOCK);
     } else {
-        packet->reply_queue = NULL;
+        packet->h.reply_queue = NULL;
         result = (OSMessage)SOCLi_SendCommandPacket(pipe, packet);
     }
     return (int)result;
 }
 
 int SOCLi_ExecCommandPacketInRecvPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
-    return SOCLi_ExecCommandPacket(socket->recv_pipe, packet);
+    return SOCLi_ExecCommandPacket(&socket->recv_pipe->base, packet);
 }
 
 int SOCLi_ExecCommandPacketInSendPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
-    return SOCLi_ExecCommandPacket(socket->send_pipe, packet);
+    return SOCLi_ExecCommandPacket(&socket->send_pipe->base, packet);
 }
 
 int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
@@ -131,15 +127,15 @@ void SOCLi_CommandPacketHandler(OSMessageQueue *queue) {
         if (packet == NULL) {
             return;
         }
-        result = packet->handler(packet);
+        result = packet->h.handler(packet);
         irq = OS_DisableInterrupts();
         OS_DisableScheduler();
         OS_ReceiveMessage(queue, NULL, OS_MESSAGE_NOBLOCK);
-        if (packet->socket != NULL) {
-            packet->socket->result = result;
+        if (packet->h.socket != NULL) {
+            packet->h.socket->result = result;
         }
-        if (packet->reply_queue != NULL) {
-            OS_SendMessage(packet->reply_queue, (OSMessage)result, OS_MESSAGE_NOBLOCK);
+        if (packet->h.reply_queue != NULL) {
+            OS_SendMessage(packet->h.reply_queue, (OSMessage)result, OS_MESSAGE_NOBLOCK);
         }
         SOCLi_FreeCommandPacket(packet);
         OS_EnableScheduler();

@@ -1,0 +1,191 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Ambipom",
+    "pokedex": {
+        "category": "Long Tail Pokémon",
+        "entry": "Split into two, the tails are so\nadept at handling and doing things,\nAmbipom rarely uses its hands.",
+        "height": "3'11\"",
+        "weight": "44.8 lbs.",
+        "languages": {
+            "en": {
+                "name": "Ambipom",
+                "category": "Long Tail Pokémon",
+                "entry": "Split into two, the tails are so\nadept at handling and doing things,\nAmbipom rarely uses its hands.",
+                "height": "3'11\"",
+                "weight": "44.8 lbs."
+            },
+            "fr": {
+                "name": "Capidextre",
+                "category": "Pokémon Longqueue",
+                "entry": "Ses queues jumelles sont si agiles\net efficaces qu'il ne se sert que\ntrès rarement de ses bras.",
+                "height": "1,2 m",
+                "weight": "20,3 kg"
+            },
+            "de": {
+                "name": "Ambidiffel",
+                "category": "Langschweif",
+                "entry": "Es ist mit seinen beiden Schweifen\nso geschickt, dass es seine Hände\nnur noch selten gebraucht.",
+                "height": "1,2 m",
+                "weight": "20,3 kg"
+            },
+            "it": {
+                "name": "Ambipom",
+                "category": "Pokémon Lungacoda",
+                "entry": "È talmente abile nel maneggiare gli\noggetti con le sue due code che\nsolo raramente usa le mani.",
+                "height": "1,2 m",
+                "weight": "20,3 kg"
+            },
+            "ko": {
+                "name": "겟핸보숭",
+                "category": "긴꼬리포켓몬",
+                "entry": "2개로 나뉜 꼬리를\n능숙하게 사용할 수 있어서\n거의 손을 쓰지 않게 됐다.",
+                "height": "1.2 m",
+                "weight": "20.3 kg"
+            },
+            "es": {
+                "name": "Ambipom",
+                "category": "Pokémon Cola Larga",
+                "entry": "Tiene dos colas muy útiles y hábiles\npara manejar cosas, así que rara\nvez utiliza las manos.",
+                "height": "1,2 m",
+                "weight": "20,3 kg"
+            },
+            "ja": {
+                "name": "エテボース",
+                "category": "おながポケモン",
+                "entry": "\\x{ff12}ほんに\\x{3000}わかれた\\x{3000}しっぽは\nいろんなことが\\x{3000}きように\\x{3000}できるので\nほとんど\\x{3000}てを\\x{3000}つかわなくなった。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4d}",
+                "weight": "\\x{ff12}\\x{ff10}\\x{ff0e}\\x{ff13}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 75,
+        "attack": 100,
+        "defense": 66,
+        "speed": 115,
+        "special_attack": 60,
+        "special_defense": 66
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_NORMAL" ],
+    "catch_rate": 45,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 2,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 100,
+    "growth_rate": "GROWTH_FAST",
+    "egg_groups": [ "EGG_GROUP_FIELD", "EGG_GROUP_FIELD" ],
+    "abilities": [ "ABILITY_TECHNICIAN", "ABILITY_PICKUP" ],
+    "hidden_ability": "ABILITY_SKILL_LINK",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 169,
+    "height": 12,
+    "weight": 203,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SCRATCH" ],
+            [ 1, "MOVE_TAIL_WHIP" ],
+            [ 1, "MOVE_SAND_ATTACK" ],
+            [ 1, "MOVE_ASTONISH" ],
+            [ 4, "MOVE_SAND_ATTACK" ],
+            [ 8, "MOVE_ASTONISH" ],
+            [ 11, "MOVE_BATON_PASS" ],
+            [ 15, "MOVE_TICKLE" ],
+            [ 18, "MOVE_FURY_SWIPES" ],
+            [ 22, "MOVE_SWIFT" ],
+            [ 25, "MOVE_SCREECH" ],
+            [ 29, "MOVE_AGILITY" ],
+            [ 32, "MOVE_DOUBLE_HIT" ],
+            [ 36, "MOVE_FLING" ],
+            [ 39, "MOVE_NASTY_PLOT" ],
+            [ 43, "MOVE_LAST_RESORT" ]
+        ],
+        "by_tm": [
+            "TM01",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM22",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM28",
+            "TM30",
+            "TM31",
+            "TM32",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM47",
+            "TM48",
+            "TM56",
+            "TM62",
+            "TM65",
+            "TM66",
+            "TM67",
+            "TM68",
+            "TM73",
+            "TM83",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM89",
+            "TM90",
+            "TM94",
+            "HM01",
+            "HM04"
+        ],
+        "by_tutor": [
+            "MOVE_COVET",
+            "MOVE_SEED_BOMB",
+            "MOVE_BOUNCE",
+            "MOVE_LOW_KICK",
+            "MOVE_GUNK_SHOT",
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_FOUL_PLAY",
+            "MOVE_LAST_RESORT",
+            "MOVE_IRON_TAIL",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_ROLE_PLAY",
+            "MOVE_SPITE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_AIPOM",
+    "cry_volume": 120
+}

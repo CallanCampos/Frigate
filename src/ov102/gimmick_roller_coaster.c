@@ -255,7 +255,7 @@ static inline void RollerCoaster_ShowSwitchState(FieldExpObjSystem *expObj, u8 a
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 0), FALSE);
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 1), FALSE);
     FieldExpObj_SetAnmFrame(expObj, 0, actor, state,
-                            func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
+                            FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
 }
 
 static u8 RollerCoaster_FindSpot(int x, int z) {
@@ -394,14 +394,14 @@ static void RollerCoaster_Task(TCB *task, void *data) {
                     GFL_SndSEPlay(SEQ_SE_FLD_76);
                     player = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_76);
                     FieldSnd_SetAmbienceVolume(fieldSound, SEQ_SE_FLD_25, 127);
-                    NNS_SndPlayerSetVolume(func_020061a8(player), 0);
+                    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), 0);
                 }
                 work->stations[i] = NO_SPOT;
             }
         } else {
             u8 index;
 
-            if (RollerCoaster_IsAtStation(path, func_ov036_021b8520(expObj, 0, actor, anm), &index)) {
+            if (RollerCoaster_IsAtStation(path, FieldExpObj_GetAnmFrame(expObj, 0, actor, anm), &index)) {
                 FieldExpObjAnm_SetPaused(anmInfo, TRUE);
                 if (work->ridePath != NO_PATH && i == work->ridePath / 2) {
                     FieldSnd_StopAmbience(fieldSound, SEQ_SE_FLD_25);
@@ -417,7 +417,7 @@ static void RollerCoaster_Task(TCB *task, void *data) {
         VecFx32 pos = { 0, FX32_CONST(32), 0 };
         u8 car = work->ridePath / 2;
         u8 anm = work->ridePath + 1;
-        fx32 frame = func_ov036_021b8520(expObj, 0, car, anm);
+        fx32 frame = FieldExpObj_GetAnmFrame(expObj, 0, car, anm);
 
         if (GFL_G3DCurveGetNowTranslationLoop(work->curve, &pos, frame / FX32_ONE)) {
             pos.x += sCarOrigins[car].x;
@@ -687,7 +687,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
             work->waitCar = NO_CAR;
             FieldSnd_PlayAmbience(fieldSound, SEQ_SE_FLD_25);
             GFL_SndSEPlay(SEQ_SE_FLD_76);
-            NNS_SndPlayerSetVolume(func_020061a8(player), 0);
+            NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), 0);
             FieldSnd_SetAmbienceVolume(fieldSound, SEQ_SE_FLD_25, 127);
             work->riding = TRUE;
             (*state)++;
@@ -813,7 +813,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         VecFx32 move;
 
         anm = work->ridePath + 1;
-        lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, anm));
+        lastFrame = FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, actor, anm));
         frame = RollerCoaster_GetAnmFrame(expObj, actor, anm);
         nextFrame = frame + FX32_ONE;
         if (nextFrame >= lastFrame) {
@@ -835,7 +835,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     } else if (speed >= SPEED_SLOW) {
         volume = 30;
     }
-    NNS_SndPlayerSetVolume(func_020061a8(player), volume);
+    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), volume);
     return GAMEEVENT_CONTINUE;
 }
 
@@ -931,7 +931,7 @@ static void RollerCoaster_SwitchPath(FieldExpObjSystem *expObj, u8 oldSwitch, u8
     FieldExpObj_SetAnm(expObj, 0, actor, oldAnm, FALSE);
     FieldExpObj_SetAnm(expObj, 0, actor, newAnm, TRUE);
     RollerCoaster_SetAnmFrame(expObj, actor, newAnm, frame);
-    paused = func_ov036_021b84ec(FieldExpObj_GetAnmInfo(expObj, 0, actor, oldAnm));
+    paused = FieldExpObjAnm_IsPaused(FieldExpObj_GetAnmInfo(expObj, 0, actor, oldAnm));
     FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(expObj, 0, actor, newAnm), paused);
 }
 
@@ -985,79 +985,85 @@ static void RollerCoaster_GetJointTrans(const NNSG3dResJntAnm *anm, u32 node, fx
 }
 
 // A translation component at a frame, from values stored every 1, 2 or 4 frames and interpolated between, as
-// NitroSystem's joint animation reads them.
+// NitroSystem's joint animation reads them. The cases end in two blocks that several of them jump to: `average` makes a
+// frame between two stored values, and `read` reads a stored one.
 static void RollerCoaster_GetTransData(fx32 *value, fx32 frame, const u32 *data, const NNSG3dResJntAnm *anm) {
-    u32 index = frame >> FX32_SHIFT;
+    u32 frameIndex = frame >> FX32_SHIFT;
     const void *values = (const u8 *)anm + data[1];
-    BOOL interp = FALSE;
-    u32 pairIndex;
+    u32 lastInterp;
+    u32 index;
 
-    if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_MASK) {
-        u32 lastInterp = (data[0] & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
-
-        if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_2) {
-            if (index & 1) {
-                if (index > lastInterp) {
-                    index = (lastInterp >> 1) + 1;
-                } else {
-                    pairIndex = index >> 1;
-                    interp = TRUE;
-                }
-            } else {
-                index >>= 1;
-            }
-        } else {
-            if (index & 3) {
-                if (index > lastInterp) {
-                    index = (lastInterp >> 2) + (index & 3);
-                } else if (index & 1) {
-                    u32 first;
-                    u32 second;
-                    fx32 v;
-                    fx32 subV;
-
-                    if (index & 2) {
-                        second = index >> 2;
-                        first = second + 1;
-                    } else {
-                        first = index >> 2;
-                        second = first + 1;
-                    }
-                    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-                        const fx16 *array = values;
-
-                        v = array[first];
-                        subV = array[second];
-                        *value = (v + v + v + subV) >> 2;
-                    } else {
-                        const fx32 *array = values;
-                        fx64 tripled = (fx64)array[first] * 3;
-                        fx64 sub = array[second];
-
-                        *value = (fx32)((tripled + sub) >> 2);
-                    }
-                    return;
-                } else {
-                    pairIndex = index >> 2;
-                    interp = TRUE;
-                }
-            } else {
-                index >>= 2;
-            }
-        }
+    if (!(data[0] & NNS_G3D_JNTANM_TINFO_STEP_MASK)) {
+        index = frameIndex;
+        goto read;
     }
 
-    if (interp) {
-        if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
-            const fx16 *pair = &((const fx16 *)values)[pairIndex];
-
-            *value = (pair[0] + pair[1]) >> 1;
-        } else {
-            const fx32 *pair = &((const fx32 *)values)[pairIndex];
-
-            *value = (pair[0] >> 1) + (pair[1] >> 1);
+    lastInterp = (data[0] & NNS_G3D_JNTANM_TINFO_LAST_INTERP_MASK) >> NNS_G3D_JNTANM_TINFO_LAST_INTERP_SHIFT;
+    if (data[0] & NNS_G3D_JNTANM_TINFO_STEP_2) {
+        if (frameIndex & 1) {
+            if (frameIndex > lastInterp) {
+                index = (lastInterp >> 1) + 1;
+                goto read;
+            }
+            index = frameIndex >> 1;
+            goto average;
         }
-    } else if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        index = frameIndex >> 1;
+        goto read;
+    }
+    if (frameIndex & 3) {
+        if (frameIndex > lastInterp) {
+            index = (lastInterp >> 2) + (frameIndex & 3);
+            goto read;
+        }
+        if (frameIndex & 1) {
+            u32 second;
+            fx32 v;
+            fx32 subV;
+
+            if (frameIndex & 2) {
+                second = frameIndex >> 2;
+                index = second + 1;
+            } else {
+                index = frameIndex >> 2;
+                second = index + 1;
+            }
+            if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+                const fx16 *array = values;
+
+                v = array[index];
+                subV = array[second];
+                *value = (v + v + v + subV) >> 2;
+            } else {
+                const fx32 *array = values;
+
+                v = array[index];
+                subV = array[second];
+                *value = ((fx64)v + v + v + subV) >> 2;
+            }
+            return;
+        }
+        index = frameIndex >> 2;
+        goto average;
+    }
+    index = frameIndex >> 2;
+    goto read;
+
+average:
+    // The frame between two stored values is their average
+    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        const fx16 *array = values;
+
+        *value = (*(array + index) + *(array + index + 1)) >> 1;
+    } else {
+        const fx32 *array = values;
+
+        *value = (*(array + index) >> 1) + (*(array + index + 1) >> 1);
+    }
+    return;
+
+read:
+    if (data[0] & NNS_G3D_JNTANM_TINFO_FX16ARR) {
         *value = ((const fx16 *)values)[index];
     } else {
         *value = ((const fx32 *)values)[index];
@@ -1120,7 +1126,7 @@ static void RollerCoaster_UpdateAmbience(Field *field, RollerCoasterWork *work) 
         fx32 nextFrame;
         NNSG3dAnmObj *anmObj;
 
-        lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, nearestCar, nearestAnm));
+        lastFrame = FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, nearestCar, nearestAnm));
         frame = RollerCoaster_GetAnmFrame(expObj, nearestCar, nearestAnm);
         nextFrame = frame + FX32_ONE;
         if (nextFrame >= lastFrame) {

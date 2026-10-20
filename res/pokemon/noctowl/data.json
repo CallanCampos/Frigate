@@ -1,0 +1,173 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Noctowl",
+    "pokedex": {
+        "category": "Owl Pokémon",
+        "entry": "Its eyes are specially developed\nto enable it to see clearly even in\nmurky darkness and minimal light.",
+        "height": "5'03\"",
+        "weight": "89.9 lbs.",
+        "languages": {
+            "en": {
+                "name": "Noctowl",
+                "category": "Owl Pokémon",
+                "entry": "Its eyes are specially developed\nto enable it to see clearly even in\nmurky darkness and minimal light.",
+                "height": "5'03\"",
+                "weight": "89.9 lbs."
+            },
+            "fr": {
+                "name": "Noarfang",
+                "category": "Pokémon Hibou",
+                "entry": "Ses yeux sont capables de voir\ndistinctement même quand il fait\ntrès sombre.",
+                "height": "1,6 m",
+                "weight": "40,8 kg"
+            },
+            "de": {
+                "name": "Noctuh",
+                "category": "Eule",
+                "entry": "Seine Augen sind so gut entwickelt,\ndass es selbst in tiefster Dunkelheit\nnoch klar sehen kann.",
+                "height": "1,6 m",
+                "weight": "40,8 kg"
+            },
+            "it": {
+                "name": "Noctowl",
+                "category": "Pokémon Gufo",
+                "entry": "Ha una vista acutissima, che gli permette\ndi vedere anche nel buio più profondo e\ncon la luce più fioca.",
+                "height": "1,6 m",
+                "weight": "40,8 kg"
+            },
+            "ko": {
+                "name": "야부엉",
+                "category": "부엉이포켓몬",
+                "entry": "특수한 구조의 두 눈은\n약간의 빛만 있으면\n어둠 속에서도 낮처럼 볼 수 있다.",
+                "height": "1.6 m",
+                "weight": "40.8 kg"
+            },
+            "es": {
+                "name": "Noctowl",
+                "category": "Pokémon Búho",
+                "entry": "Tiene los ojos muy desarrollados y\npuede ver con increíble claridad\nen la oscuridad más densa.",
+                "height": "1,6 m",
+                "weight": "40,8 kg"
+            },
+            "ja": {
+                "name": "ヨルノズク",
+                "category": "ふくろうポケモン",
+                "entry": "とくしゅな\\x{3000}つくりの\\x{3000}りょうめは\nわずかな\\x{3000}ひかりさえ\\x{3000}あれば\nくらやみでも\\x{3000}ひるのように\\x{3000}みえる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff14}\\x{ff10}\\x{ff0e}\\x{ff18}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 100,
+        "attack": 50,
+        "defense": 50,
+        "speed": 70,
+        "special_attack": 76,
+        "special_defense": 96
+    },
+    "types": [ "TYPE_NORMAL", "TYPE_FLYING" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 2,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 15,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_FAST",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_INSOMNIA", "ABILITY_KEEN_EYE" ],
+    "hidden_ability": "ABILITY_TINTED_LENS",
+    "flee_rate": 60,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_BROWN",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 155,
+    "height": 16,
+    "weight": 408,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_SKY_ATTACK" ],
+            [ 1, "MOVE_TACKLE" ],
+            [ 1, "MOVE_GROWL" ],
+            [ 1, "MOVE_FORESIGHT" ],
+            [ 1, "MOVE_HYPNOSIS" ],
+            [ 5, "MOVE_HYPNOSIS" ],
+            [ 9, "MOVE_PECK" ],
+            [ 13, "MOVE_UPROAR" ],
+            [ 17, "MOVE_REFLECT" ],
+            [ 22, "MOVE_CONFUSION" ],
+            [ 27, "MOVE_ECHOED_VOICE" ],
+            [ 32, "MOVE_TAKE_DOWN" ],
+            [ 37, "MOVE_AIR_SLASH" ],
+            [ 42, "MOVE_ZEN_HEADBUTT" ],
+            [ 47, "MOVE_SYNCHRONOISE" ],
+            [ 52, "MOVE_EXTRASENSORY" ],
+            [ 57, "MOVE_PSYCHO_SHIFT" ],
+            [ 62, "MOVE_ROOST" ],
+            [ 67, "MOVE_DREAM_EATER" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM15",
+            "TM17",
+            "TM18",
+            "TM21",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM40",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM68",
+            "TM77",
+            "TM83",
+            "TM85",
+            "TM87",
+            "TM88",
+            "TM90",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_MAGIC_COAT",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_HEAT_WAVE",
+            "MOVE_TAILWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_ROOST",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_HOOTHOOT",
+    "cry_volume": 110
+}

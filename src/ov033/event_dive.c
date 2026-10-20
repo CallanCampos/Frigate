@@ -55,7 +55,7 @@ GameEventReturnCode EventDiveIn_Callback(GameEvent *event, u32 *state, void *eve
         (*state)++;
         break;
     case 4:
-        if (func_ov012_02166ecc(FieldPlayer_GetActor(Field_GetPlayer(data->field)))) {
+        if (FldAct_CheckAcmdEnd(FieldPlayer_GetActor(Field_GetPlayer(data->field)))) {
             return GAMEEVENT_DONE;
         }
         break;

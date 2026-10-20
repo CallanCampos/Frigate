@@ -44,13 +44,13 @@ GameEventReturnCode EventSave_Callback(GameEvent *event, u32 *state, void *data)
     }
 }
 
-void func_ov012_0215c574(FieldAppCallWork *work, s32 appParam) {
+void FieldProcLink_CallInfDungeonRetire(FieldAppCallWork *work, s32 appParam) {
     FieldAppCallInput *input = work->input;
     GameEvent *event = InfDungeonRetire_CreateEvent(input->gameSystem, input->field, input->screenId, &work->result);
     GameEvent_ChainNext(work->event, event);
 }
 
-void func_ov012_0215c594(void *param) {
+void FieldProcLink_FreeParam(void *param) {
     GFL_HeapFree(param);
 }
 
@@ -61,7 +61,7 @@ typedef enum {
     THIRD_ACTOR_PRESENT,
 } ThirdActorKind;
 
-GameEventReturnCode func_ov012_0215c59c(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventPrepareResidentActors_Callback(GameEvent *event, u32 *state, void *data) {
     PrepareResidentActorsWork *work = data;
     Field *field = work->field;
     MMSys *actorSystem;
@@ -77,7 +77,7 @@ GameEventReturnCode func_ov012_0215c59c(GameEvent *event, u32 *state, void *data
         actor = FindActorByMoveCode(actorSystem, 0x30);
         work->movingActors = 0;
         DisableAllActorsMovement(actorSystem);
-        if (!func_ov012_02166ecc(player)) {
+        if (!FldAct_CheckAcmdEnd(player)) {
             work->movingActors |= 1;
             EnableActorMovement(player);
         }
@@ -96,7 +96,7 @@ GameEventReturnCode func_ov012_0215c59c(GameEvent *event, u32 *state, void *data
     case 1:
         actorSystem = Field_GetActorSystem(field);
         player = FindPlayerFieldActor(actorSystem);
-        if ((work->movingActors & 1) && func_ov012_02166ecc(player) == TRUE) {
+        if ((work->movingActors & 1) && FldAct_CheckAcmdEnd(player) == TRUE) {
             DisableActorMovement(player);
             work->movingActors &= ~1;
         }

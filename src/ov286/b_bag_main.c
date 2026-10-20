@@ -36,7 +36,7 @@
 #include "system/printsys.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
-#include "text/system/0001.h"
+#include "text/system/b_bag_main.h"
 
 // The battle bag's entry, task and states (b_bag_main.c, named by the ROM's embedded string): the bag runs one state
 // function a frame, each returning the next state, until state 20 frees everything and sets the parameter's done.
@@ -107,10 +107,10 @@ void BBagMain_Start(BBagParam *param) {
     }
     if (work->param->mode != 1) {
         for (i = 0; i < 4; i++) {
-            func_020088a8(work->param->bagCursor, i, &work->param->rows[i], &work->param->pages[i]);
+            BagCursor_GetBattlePocketPosition(work->param->bagCursor, i, &work->param->rows[i], &work->param->pages[i]);
         }
-        work->lastItem = func_020088bc(work->param->bagCursor);
-        work->lastPocket = func_020088c0(work->param->bagCursor);
+        work->lastItem = BagCursor_GetBattleLastItem(work->param->bagCursor);
+        work->lastPocket = BagCursor_GetBattleLastPocket(work->param->bagCursor);
         BBagItem_CheckLastItem(work);
     } else {
         for (i = 0; i < 4; i++) {
@@ -171,7 +171,7 @@ static int BBagMain_StateInit(BBagWork *work) {
     } else {
         BBagUi_CreateCursor(work, work->page, 0);
     }
-    func_02042ba8(FALSE, work->param->heapId);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, PALFADE_VRAM_SUB_OBJ, 0xe0, 0x20);
     PaletteFade_StartFade(work->paletteFade, 0xa, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
     if (work->param->mode == 3) {
@@ -205,7 +205,7 @@ static int BBagMain_StateInitLauncher(BBagWork *work) {
     }
     BAppCursor_SetVisible(work->cursor, work->cursorVisible);
     BBagUi_CreateCursor(work, work->page, 0);
-    func_02042ba8(FALSE, work->param->heapId);
+    GFL_NetSetIconScreen(FALSE, work->param->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, PALFADE_VRAM_SUB_OBJ, 0xe0, 0x20);
     PaletteFade_StartFade(work->paletteFade, 0xa, 0xffff, 0, 16, 0, 0, BtlvEffect_GetTCBManager());
     work->initialized = TRUE;
@@ -213,7 +213,7 @@ static int BBagMain_StateInitLauncher(BBagWork *work) {
 }
 
 static int BBagMain_StateStartWipe(BBagWork *work) {
-    if (func_02021c0c(work->printQueue) == TRUE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == TRUE) {
         GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, work->param->heapId);
         return 3;
     }
@@ -404,7 +404,7 @@ static int BBagMain_StateStepPage(BBagWork *work) {
 }
 
 static int BBagMain_StateWaitStepPage(BBagWork *work) {
-    if (func_02021c0c(work->printQueue) == TRUE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == TRUE) {
         BBagBmp_TransferPage(work);
         BBagObj_SetPage(work, work->page);
         BBagAnm_PutPageButtons(work, work->page);
@@ -459,45 +459,45 @@ static int BBagMain_CheckUse(BBagWork *work) {
     BBagParam *param = work->param;
 
     if (param->mode == 1 && param->shooterEnergy < BBagItem_GetShooterCost(param->item)) {
-        GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsNotChargedEnough, work->strBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_ItsNotChargedEnough, work->strBuf);
         BBagBmp_OpenMessage(work);
         work->nextSeq = 0xd;
         return 0xe;
     }
     if (work->pocket == 2) {
         if (param->ballError == 1) {
-            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ThereNoRoomLeft, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_ThereNoRoomLeft, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 2) {
-            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsNoGoodIts, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_ItsNoGoodIts, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 3) {
-            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsImpossibleAimWithout, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_ItsImpossibleAimWithout, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 4) {
-            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsNoGoodIts_2, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_ItsNoGoodIts_2, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
         if (param->ballError == 5) {
-            GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_ItsImpossibleUsePoke, work->strBuf);
+            GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_ItsImpossibleUsePoke, work->strBuf);
             BBagBmp_OpenMessage(work);
             work->nextSeq = 0xd;
             return 0xe;
         }
     }
     if (param->isWild == FALSE && GetItemParam(param->item, ITEM_PARAM_BATTLE_FUNC, param->heapId) == 3) {
-        GFL_MsgDataLoadStrbuf(work->msgData, Bank0001_Text_JunipersWordsEchoedTheres, work->strBuf);
+        GFL_MsgDataLoadStrbuf(work->msgData, BBagMain_Text_JunipersWordsEchoedTheres, work->strBuf);
         BBagBmp_OpenMessage(work);
         work->nextSeq = 0xd;
         return 0xe;
@@ -527,7 +527,7 @@ static int BBagMain_StateToPage2(BBagWork *work) {
 }
 
 static int BBagMain_StateWaitPagePrint(BBagWork *work) {
-    if (func_02021c0c(work->printQueue) == TRUE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == TRUE) {
         BBagMain_ChangePage(work, work->page);
         return work->nextSeq;
     }
@@ -540,23 +540,23 @@ static int BBagMain_StateCloseMessage(BBagWork *work) {
 }
 
 static int BBagMain_StatePrintMessage(BBagWork *work) {
-    switch (func_020223b4(work->printStream)) {
+    switch (PrintStream_GetState(work->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
-            func_020223e0(work->printStream, 0);
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+            PrintStream_SkipWait(work->printStream, 0);
         }
         work->streamAdvanced = FALSE;
         break;
     case PRINT_STREAM_PAUSED:
         if (work->streamAdvanced == FALSE &&
-            (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             BBagMain_PlayMessageSE(work, SEQ_SE_MESSAGE);
-            func_020223bc(work->printStream);
+            PrintStream_Continue(work->printStream);
             work->streamAdvanced = TRUE;
         }
         break;
     case PRINT_STREAM_DONE:
-        func_020223cc(work->printStream);
+        PrintStream_Delete(work->printStream);
         work->printStream = NULL;
         work->streamAdvanced = FALSE;
         return 0xf;
@@ -568,7 +568,7 @@ static int BBagMain_StateWaitMessageKey(BBagWork *work) {
     if (BBagMain_CheckQuit(work) == TRUE) {
         return 0x12;
     }
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
         return work->nextSeq;
     }
     return 0xf;
@@ -595,9 +595,9 @@ static int BBagMain_StateWaitFadeOut(BBagWork *work) {
 
 static BOOL BBagMain_Exit(TCB *tcb, BBagWork *work) {
     if (work->initialized == TRUE) {
-        if (func_02021c0c(work->printQueue) == FALSE) {
+        if (PrintQueue_IsEmpty(work->printQueue) == FALSE) {
             if (work->param->abort == 1) {
-                func_02021c44(work->printQueue);
+                PrintQueue_Clear(work->printQueue);
             } else {
                 return FALSE;
             }
@@ -610,7 +610,7 @@ static BOOL BBagMain_Exit(TCB *tcb, BBagWork *work) {
             }
         }
         if (work->printStream != NULL) {
-            func_020223cc(work->printStream);
+            PrintStream_Delete(work->printStream);
         }
         BBagAnm_DeleteButtons(work);
         BBagObj_Exit(work);
@@ -790,7 +790,7 @@ static void BBagMain_ExitBG(void) {
 }
 
 static void BBagMain_LoadGraphics(BBagWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(98, HEAPID_TAIL(work->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_BAG, HEAPID_TAIL(work->param->heapId));
 
     GFL_BGSysLoadArcNCGRStatic(arc, 0, 6, 0, 0, TRUE, work->param->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 4, 6, 0, 0, TRUE, work->param->heapId);
@@ -807,16 +807,16 @@ static void BBagMain_LoadGraphics(BBagWork *work) {
 }
 
 static void BBagMain_InitText(BBagWork *work) {
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0001, work->param->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_B_BAG_MAIN, work->param->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->param->heapId);
-    work->printQueue = func_02021998(work->param->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->param->heapId);
     work->strBuf = GFL_StrBufCreate(0x200, work->param->heapId);
 }
 
 static void BBagMain_ExitText(BBagWork *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_WordSetSystemFree(work->wordSet);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_StrBufFree(work->strBuf);
 }
 

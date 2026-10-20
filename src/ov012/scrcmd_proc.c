@@ -66,10 +66,10 @@ void CreateScrCmdOverlayProcess(VM *vm, FieldScriptEnv *env, s32 overlayId, cons
     work->cleanup = cleanup;
     GSYS_QueueProc(gsys, overlayId, functions, resource);
     *heapPtr = work;
-    VM_SetNativeCallback(vm, func_ov012_02157554);
+    VM_SetNativeCallback(vm, WaitScrCmdOverlayProcess);
 }
 
-BOOL func_ov012_02157554(VM *vm, void *data) {
+BOOL WaitScrCmdOverlayProcess(VM *vm, void *data) {
     FieldScriptEnv *env = data;
     GameSystem *gsys;
     ScriptWork *scriptWork;
@@ -100,7 +100,7 @@ BOOL s014C_RTFreeUserHeap(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-void func_ov012_021575b8(ScriptOverlayWork *work) {
+void CallBag_ReadResult(ScriptOverlayWork *work) {
     BagProcessData *bag = work->resource;
     BagScriptResult *result = work->data;
     if (bag->result == 0) {
@@ -136,11 +136,11 @@ BOOL s014E_CallBag(VM *vm, FieldScriptEnv *env) {
     result = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(BagScriptResult), TRUE, "scrcmd_proc.c", 280);
     result->hasSelection = hasSelection;
     result->item = item;
-    CreateScrCmdOverlayProcess(vm, env, OVERLAY_BAG, &BAG_PROC_FUNCTIONS, bag, func_ov012_021575b8, result);
+    CreateScrCmdOverlayProcess(vm, env, OVERLAY_BAG, &BAG_PROC_FUNCTIONS, bag, CallBag_ReadResult, result);
     return TRUE;
 }
 
-void func_ov012_0215767c(void *arg) {
+void CallMailbox_ReadResult(void *arg) {
     ScriptProcCallbackWork *work = arg;
     MailboxProcessData *mailbox = work->resource;
 
@@ -171,11 +171,11 @@ BOOL s0150_CallMailbox(VM *vm, FieldScriptEnv *env) {
     work->data = ScriptReadVar(vm, env);
     ScriptWork_CallEvent(scriptWork, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_MAILBOX,
                                                                                  &MAILBOX_PROC_FUNCTIONS, mailbox,
-                                                                                 func_ov012_0215767c, work));
+                                                                                 CallMailbox_ReadResult, work));
     return TRUE;
 }
 
-void func_ov012_02157728(void *arg) {
+void MoveReminder_ReadResult(void *arg) {
     ScriptProcCallbackWork *work = arg;
     MoveReminderProcessData *data;
     u16 result;
@@ -192,7 +192,7 @@ void func_ov012_02157728(void *arg) {
     }
     *(u16 *)work->data = result;
     GFL_HeapFree(((MoveReminderProcessData *)work->resource)->moves);
-    func_ov012_02169ca4(work->resource);
+    MoveReminderProcessData_Free(work->resource);
 }
 
 BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
@@ -219,7 +219,7 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     pkm = PokeParty_GetPkm(GameData_GetParty(gameData), slot);
     playerInfo = GetGameDataPlayerInfo(gameData);
     moves = PokeParty_GetRememberableMoves(pkm, HEAPID_GAMEEVENT);
-    data = func_ov012_02169c7c(HEAPID_GAMEEVENT);
+    data = MoveReminderProcessData_Create(HEAPID_GAMEEVENT);
     data->pkm = pkm;
     data->playerInfo = playerInfo;
     data->trainerData = NULL;
@@ -229,13 +229,13 @@ BOOL s01D6_MoveReminderCallMoveSelect(VM *vm, FieldScriptEnv *env) {
     work = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ScriptProcCallbackWork), FALSE, "scrcmd_proc.c", 411);
     work->resource = data;
     work->data = result;
-    ScriptWork_CallEvent(
-        scriptWork, EventFieldSubprocessTransition_CreateWithCallback(
-                        gsys, field, OVERLAY_MOVE_REMINDER, &WazaOshieProcFunctions, data, func_ov012_02157728, work));
+    ScriptWork_CallEvent(scriptWork, EventFieldSubprocessTransition_CreateWithCallback(
+                                         gsys, field, OVERLAY_MOVE_REMINDER, &WazaOshieProcFunctions, data,
+                                         MoveReminder_ReadResult, work));
     return TRUE;
 }
 
-BOOL func_ov012_02157814(VM *vm, FieldScriptEnv *env) {
+BOOL s016E_CallMonolith(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys;
     GameCommSys *commSys;
     GameData *gameData;
@@ -247,12 +247,12 @@ BOOL func_ov012_02157814(VM *vm, FieldScriptEnv *env) {
     commSys = GSYS_GetGameCommSystem(gsys);
     gameData = GSYS_GetGameData(gsys);
     FieldScriptEnv_GetScriptWork(env);
-    func_ov012_02153608(commSys);
+    Intrude_GetCommWork(commSys);
     param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MonolithParam), TRUE, "scrcmd_proc.c", 444);
     saveBytes = param->powerFlags;
     highLink = getHighLinkBlockAddress(GameData_GetSaveControl(gameData));
     MI_CpuFill8(saveBytes, 0, sizeof(param->powerFlags));
-    func_0200c6d8(highLink, saveBytes, 2);
+    HighLinkSave_GetSpecialFlags(highLink, saveBytes, 2);
     saveBytes[2] = 1;
     param->unk31 = 0;
     param->gsys = gsys;
@@ -295,7 +295,7 @@ BOOL s0151_CallPokedexDiploma(VM *vm, FieldScriptEnv *env) {
     mode = ScriptReadAny(vm, env);
     value = ScriptReadAny(vm, env);
     if (mode <= 1) {
-        func_ov012_0215fdbc();
+        GameBeacon_BroadcastPokedexComplete();
     }
     switch (mode) {
     case 0:
@@ -339,7 +339,7 @@ BOOL s0153_callPoke3Select(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_02157a78(VM *vm, FieldScriptEnv *env) {
+BOOL s015F_Nop(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetScriptWork(env);
     FieldScriptEnv_GetGameSystem(env);
     return TRUE;
@@ -422,7 +422,7 @@ BOOL func_ov012_02157b7c(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     value = ScriptReadAny(vm, env);
     GFL_OvlLoad(OVERLAY_ID(90));
-    func_ov090_021eec80(gsys, value);
+    GimmickState_SetNimbasaGym(gsys, value);
     GFL_OvlUnload(OVERLAY_ID(90));
     return FALSE;
 }
@@ -432,7 +432,7 @@ BOOL func_ov012_02157bb4(VM *vm, FieldScriptEnv *env) {
 
     gsys = FieldScriptEnv_GetGameSystem(env);
     GFL_OvlLoad(OVERLAY_ID(90));
-    func_ov090_021eec98(gsys);
+    GimmickState_ResetOpelucid(gsys);
     GFL_OvlUnload(OVERLAY_ID(90));
     return FALSE;
 }
@@ -446,7 +446,7 @@ BOOL func_ov012_02157bdc(VM *vm, FieldScriptEnv *env) {
     first = ScriptReadVar(vm, env);
     second = ScriptReadVar(vm, env);
     GFL_OvlLoad(OVERLAY_ID(90));
-    func_ov090_021eecc0(gsys, *first, *second);
+    GimmickState_SetNimbasaFlags(gsys, *first, *second);
     GFL_OvlUnload(OVERLAY_ID(90));
     return FALSE;
 }

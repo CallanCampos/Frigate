@@ -182,16 +182,16 @@ static void IrcAppBar_LoadObjRes(IrcAppBar *bar, u32 vramType, u32 unused2, u32 
                                  HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(93, heapId);
 
-    bar->palRes = func_0204bbb8(arc, 41, vramType, (u16)(objPalette << 5), 0, 1, heapId);
-    bar->charRes = func_0204b81c(arc, 40, FALSE, vramType, heapId);
-    bar->cellRes = func_0204bde0(arc, 39, 38, heapId);
+    bar->palRes = ClActSys_LoadPlttRange(arc, 41, vramType, (u16)(objPalette << 5), 0, 1, heapId);
+    bar->charRes = ClActSys_LoadChars(arc, 40, FALSE, vramType, heapId);
+    bar->cellRes = ClActSys_LoadCellAnims(arc, 39, 38, heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void IrcAppBar_FreeObjRes(IrcAppBar *bar) {
-    func_0204be64(bar->cellRes);
-    func_0204b98c(bar->charRes);
-    func_0204bcd0(bar->palRes);
+    ClActSys_FreeCellAnims(bar->cellRes);
+    ClActSys_FreeChars(bar->charRes);
+    ClActSys_FreePltt(bar->palRes);
 }
 
 static void IrcAppBar_CreateActor(IrcAppBar *bar, ClActUnit *unit, u32 unused2, u32 surface, u8 priority,
@@ -203,7 +203,7 @@ static void IrcAppBar_CreateActor(IrcAppBar *bar, ClActUnit *unit, u32 unused2, 
     setup.y = 96;
     setup.sequence = 0;
     setup.bgPriority = priority + 1;
-    bar->actors[0] = func_0204c040(unit, bar->charRes, bar->palRes, bar->cellRes, &setup, surface, heapId);
+    bar->actors[0] = ClActor_Create(unit, bar->charRes, bar->palRes, bar->cellRes, &setup, surface, heapId);
 }
 
 static void IrcAppBar_FreeActors(IrcAppBar *bar) {
@@ -211,7 +211,7 @@ static void IrcAppBar_FreeActors(IrcAppBar *bar) {
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (bar->actors[i] != NULL) {
-            func_0204c108(bar->actors[i]);
+            ClActor_Delete(bar->actors[i]);
         }
     }
 }

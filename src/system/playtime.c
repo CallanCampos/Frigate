@@ -10,11 +10,11 @@
 
 PlayTime *setupPlaytimeCounters(HeapID heapId) {
     PlayTime *time = GFL_HeapAllocate(heapId, sizeof(PlayTime), TRUE, "playtime.c", 32);
-    func_02008c40(time);
+    PlayTime_Init(time);
     return time;
 }
 
-void func_02008c40(PlayTime *time) {
+void PlayTime_Init(PlayTime *time) {
     time->hours = 0;
     time->minutes = 0;
     time->seconds = 0;
@@ -54,23 +54,23 @@ void updateGameTime(PlayTime *time, u32 addSeconds) {
     time->seconds = seconds;
 }
 
-void func_02008cdc(PlayTime *dest, const PlayTime *src) {
+void PlayTime_Copy(PlayTime *dest, const PlayTime *src) {
     MI_CpuCopy8(src, dest, sizeof(PlayTime));
 }
 
-u16 func_02008cec(PlayTime *time) {
+u16 PlayTime_GetHours(PlayTime *time) {
     return time->hours;
 }
 
-u8 func_02008cf0(PlayTime *time) {
+u8 PlayTime_GetMinutes(PlayTime *time) {
     return time->minutes;
 }
 
-u8 func_02008cf4(PlayTime *time) {
+u8 PlayTime_GetSeconds(PlayTime *time) {
     return time->seconds;
 }
 
-void func_02008cf8(PlayTime *time) {
+void PlayTime_SetLastSavedToNow(PlayTime *time) {
     RTCDate date;
     RTCTime now;
 
@@ -83,30 +83,30 @@ void func_02008cf8(PlayTime *time) {
     time->minute = now.minute;
 }
 
-u32 func_02008d68(PlayTime *time) {
+u32 PlayTime_GetLastSavedYear(PlayTime *time) {
     return time->year;
 }
 
-u32 func_02008d70(PlayTime *time) {
+u32 PlayTime_GetLastSavedMonth(PlayTime *time) {
     return time->month;
 }
 
-u32 func_02008d78(PlayTime *time) {
+u32 PlayTime_GetLastSavedDay(PlayTime *time) {
     return time->day;
 }
 
-u32 func_02008d80(PlayTime *time) {
+u32 PlayTime_GetLastSavedHour(PlayTime *time) {
     return time->hour;
 }
 
-u32 func_02008d88(PlayTime *time) {
+u32 PlayTime_GetLastSavedMinute(PlayTime *time) {
     return time->minute;
 }
 
-void func_02008d90(PlayTime *time, u32 *copy) {
+void PlayTime_GetLastSaved(PlayTime *time, u32 *copy) {
     *copy = time->lastSaved;
 }
 
-void func_02008d98(PlayTime *time, u32 *copy) {
+void PlayTime_SetLastSaved(PlayTime *time, u32 *copy) {
     time->lastSaved = *copy;
 }

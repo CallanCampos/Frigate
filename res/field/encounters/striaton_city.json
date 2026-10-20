@@ -1,0 +1,82 @@
+{
+    "$schema": "encounters.schema.json",
+    "all_year": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": {
+            "black2": [
+                [ "SPECIES_BASCULIN", 45, 60 ],
+                [ "SPECIES_CORPHISH", 45, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60 ]
+            ],
+            "white2": [
+                [ "SPECIES_BASCULIN", 45, 60, 1 ],
+                [ "SPECIES_CORPHISH", 45, 60 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ],
+                [ "SPECIES_BASCULIN", 50, 60, 1 ]
+            ]
+        },
+        "rippling_surf": {
+            "black2": [
+                [ "SPECIES_BASCULIN", 45, 60, 1 ],
+                [ "SPECIES_BASCULIN", 45, 60, 1 ],
+                [ "SPECIES_CRAWDAUNT", 50, 60 ],
+                [ "SPECIES_CRAWDAUNT", 50, 60 ],
+                [ "SPECIES_CRAWDAUNT", 50, 60 ]
+            ],
+            "white2": [
+                [ "SPECIES_BASCULIN", 45, 60 ],
+                [ "SPECIES_BASCULIN", 45, 60 ],
+                [ "SPECIES_CRAWDAUNT", 50, 60 ],
+                [ "SPECIES_CRAWDAUNT", 50, 60 ],
+                [ "SPECIES_CRAWDAUNT", 50, 60 ]
+            ]
+        },
+        "fishing": {
+            "black2": [
+                [ "SPECIES_GOLDEEN", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ]
+            ],
+            "white2": [
+                [ "SPECIES_GOLDEEN", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60, 1 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ],
+                [ "SPECIES_GOLDEEN", 50, 70 ]
+            ]
+        },
+        "rippling_fishing": {
+            "black2": [
+                [ "SPECIES_GOLDEEN", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60, 1 ],
+                [ "SPECIES_SEAKING", 50, 70 ],
+                [ "SPECIES_SEAKING", 50, 70 ],
+                [ "SPECIES_SEAKING", 50, 70 ]
+            ],
+            "white2": [
+                [ "SPECIES_GOLDEEN", 40, 60 ],
+                [ "SPECIES_BASCULIN", 40, 60 ],
+                [ "SPECIES_SEAKING", 50, 70 ],
+                [ "SPECIES_SEAKING", 50, 70 ],
+                [ "SPECIES_SEAKING", 50, 70 ]
+            ]
+        }
+    }
+}

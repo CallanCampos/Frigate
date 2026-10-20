@@ -192,7 +192,7 @@ u32 NetCommonDownload_Update(NetCommonDownload *download) {
         if (download->session.initialized) {
             return NET_COMMON_DOWNLOAD_UPDATE_RUNNING;
         }
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             switch (DWCRapCommon_CheckError(TRUE, FALSE)) {
             case 0:
                 download->update = NET_COMMON_DOWNLOAD_UPDATE_RUNNING;
@@ -306,7 +306,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     case 6:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 7, 7);
         }
@@ -349,7 +349,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     case DOWNLOAD_WAIT:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 9, 9);
         }
@@ -370,7 +370,7 @@ static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 
     case DOWNLOAD_WAIT_CLEANUP:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             *state = session->nextState;
         }
         if (sNdState.done) {
@@ -432,7 +432,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     case 3:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 4, 4);
         }
@@ -475,7 +475,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     case DOWNLOAD_WAIT:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             download->status = NET_COMMON_DOWNLOAD_STATUS_TIMEOUT;
             NetCommonDownload_Cleanup(session, 3, state, 6, 6);
         }
@@ -496,7 +496,7 @@ static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *sta
     case DOWNLOAD_WAIT_CLEANUP:
         NdReportResults();
         if (session->timeout++ > DOWNLOAD_TIMEOUT) {
-            func_020424ac(0, 0, 0, 1013);
+            NetState_RecordError(0, 0, 0, 1013);
             *state = session->nextState;
         }
         if (sNdState.done) {
@@ -528,21 +528,21 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         init.dataNum = 1;
         init.flag4 = 0;
         init.heapId = download->param.heapId;
-        download->beacon = func_ov012_02152990(&init);
-        func_ov012_02152b64(download->beacon);
+        download->beacon = DeliveryBeacon_Init(&init);
+        DeliveryBeacon_RecvStart(download->beacon);
         download->stopBeacon = FALSE;
         download->status = NET_COMMON_DOWNLOAD_STATUS_NONE;
         (*state)++;
         break;
     case 1:
-        if (func_02042788()) {
-            func_02042ba8(TRUE, download->param.heapId);
+        if (GFL_NetIsInitialized()) {
+            GFL_NetSetIconScreen(TRUE, download->param.heapId);
             (*state)++;
         }
         break;
     case 2:
-        func_ov012_02152bec(download->beacon);
-        if (func_ov012_02152bd4(download->beacon)) {
+        DeliveryBeacon_Main(download->beacon);
+        if (DeliveryBeacon_IsReceiveDone(download->beacon)) {
             download->status = NET_COMMON_DOWNLOAD_STATUS_DONE;
             *state = 3;
         } else if (download->stopBeacon) {
@@ -551,11 +551,11 @@ static BOOL NetCommonDownload_ReceiveBeacons(NetCommonDownload *download, u32 *s
         }
         break;
     case 3:
-        func_ov012_02152bfc(download->beacon);
+        DeliveryBeacon_End(download->beacon);
         (*state)++;
         break;
     case 4:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             (*state)++;
         }
         break;

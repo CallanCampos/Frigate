@@ -27,10 +27,10 @@ typedef struct {
     VecFx32 pos;
 } ActorHoldData;
 
-static GameEventReturnCode func_ov012_021648d0(GameEvent *event, u32 *state, void *work);
-static GameEventReturnCode func_ov012_02164988(GameEvent *event, u32 *state, void *work);
+static GameEventReturnCode EventActorMoveHeight_Callback(GameEvent *event, u32 *state, void *work);
+static GameEventReturnCode EventActorHold_Callback(GameEvent *event, u32 *state, void *work);
 
-BOOL func_ov012_02164838(VM *vm, FieldScriptEnv *env) {
+BOOL s0212_ActorMoveToHeight(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 actorId;
@@ -46,7 +46,7 @@ BOOL func_ov012_02164838(VM *vm, FieldScriptEnv *env) {
     actorId = ScriptReadAny(vm, env);
     height = ScriptReadAny(vm, env);
     frames = ScriptReadAny(vm, env);
-    event = GameEvent_Create(gsys, NULL, func_ov012_021648d0, sizeof(ActorMoveHeightData));
+    event = GameEvent_Create(gsys, NULL, EventActorMoveHeight_Callback, sizeof(ActorMoveHeightData));
     data = GameEvent_GetData(event);
     data->frames = frames;
     data->frame = 0;
@@ -60,7 +60,7 @@ BOOL func_ov012_02164838(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static GameEventReturnCode func_ov012_021648d0(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventActorMoveHeight_Callback(GameEvent *event, u32 *state, void *work) {
     ActorMoveHeightData *data = work;
     VecFx32 pos;
 
@@ -74,7 +74,7 @@ static GameEventReturnCode func_ov012_021648d0(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-BOOL func_ov012_0216491c(VM *vm, FieldScriptEnv *env) {
+BOOL s0213_ActorHoldPos(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     u16 actorId;
@@ -86,7 +86,7 @@ BOOL func_ov012_0216491c(VM *vm, FieldScriptEnv *env) {
     work = FieldScriptEnv_GetScriptWork(env);
     gsys = FieldScriptEnv_GetGameSystem(env);
     actorId = ScriptReadAny(vm, env);
-    event = GameEvent_Create(gsys, NULL, func_ov012_02164988, sizeof(ActorHoldData));
+    event = GameEvent_Create(gsys, NULL, EventActorHold_Callback, sizeof(ActorHoldData));
     data = GameEvent_GetData(event);
     data->frame = 0;
     actor = FindFieldActor(Field_GetActorSystem(GSYS_GetField(gsys)), actorId);
@@ -96,7 +96,7 @@ BOOL func_ov012_0216491c(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static GameEventReturnCode func_ov012_02164988(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventActorHold_Callback(GameEvent *event, u32 *state, void *work) {
     ActorHoldData *data = work;
     VecFx32 pos = data->pos;
 

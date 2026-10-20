@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_ELECTRODE",
+    "moves": [ "MOVE_ELECTRO_BALL", "MOVE_TAUNT", "MOVE_PROTECT", "MOVE_EXPLOSION" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": false
+    },
+    "nature": "NATURE_HASTY",
+    "item": "ITEM_FOCUS_SASH",
+    "form": 0
+}

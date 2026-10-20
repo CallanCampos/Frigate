@@ -19,44 +19,44 @@ The others (2, 3) need a reader: the `decomp-reviewer` agent and pull request re
 
 **Do:** return where the function returns, and break out of a loop where the loop ends.
 
-**Don't:** jump to a label that only returns, or to a copy of the compiler's shared tail.
+**Don't:** jump to a label that only returns, or to a copy of the compiler's shared tail, and don't move the loop into
+a `static inline` whose `return` from inside it does the same jump: for the loop below, a helper that returns the
+index it finds and gives -1 after the loop is that `goto` under another name.
 
 ```c
 /* Wrong: the goto only stands in for a return */
-        for (j = 0; j < 6; j++) {
-            if (mac[j] != 0) {
-                code = 0xf1;
-                goto end;
-            }
+    for (i = 0; i < count; i++) {
+        if (list[i] == id) {
+            index = i;
+            goto end;
         }
-        DSProt_CallCrash(NULL, NULL);
-        code = 0xfb;
     }
+    index = -1;
 end:
-    return code * 0xbf;
+    return index;
 ```
 
 ```c
 /* Right */
-        for (j = 0; j < 6; j++) {
-            if (mac[j] != 0) {
-                break;
-            }
-        }
-        if (j == 6) {
-            DSProt_CallCrash(NULL, NULL);
-            code = 0xfb;
-        } else {
-            code = 0xf1;
+    for (i = 0; i < count; i++) {
+        if (list[i] == id) {
+            return i;
         }
     }
-    return code * 0xbf;
+    return -1;
 ```
 
 **Does not apply when:** the label is a shared cleanup or error exit that frees or resets something (`fail:` in
 `nhttp_request.c`), a retry (`goto retry`), or leaves a search loop to skip its fallback (`goto inserted` in
-`vct_audio.c`). A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and locals between
-its `break`s (`btl_server_flow.c`), never as a wrapper around one statement.
+`vct_buffer.c`), or jumps forward to a labelled tail block that does real work for several paths and then returns, in
+place of a flag tested at the end (`goto TRANS_INTERP_2` and `goto TRANS_NONINTERP` in NitroSystem's `nsbca.c`, where
+one block averages a pair of stored values and the other reads one). A label whose code only repeats a `return` or an
+epilogue is still the compiler's shared tail, unless another decompilation of the same library writes that `goto` too,
+which is evidence its authors did: DS Protect's emulator checks (`dsprot_detect.c`) leave the loop over the MAC address
+with `goto end` to `return code * 0xbf`, as pret's pokeheartgold has an older DS Protect's MAC check
+(`lib/dsprot/src/mac_owner.c`) jump to `EXIT`. Mark such a `goto` with `// style-ok: goto-return` and the evidence. The
+user chose this on 2026-10-19. A `do { ... } while (0)` is fine as a macro's body, or as a breakable block with code and
+locals between its `break`s (`btl_server_flow.c`), never as a wrapper around one statement.
 
 **Checked:** a `goto` whose label is followed by nothing but a `return` or the function's end.
 
@@ -200,7 +200,11 @@ in the `#else`. A mistake of an earlier decompilation is just fixed: it isn't th
 tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, since the macro turns the expression into
 a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
 
-**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version.
+**Don't:** put a comment between a declaration's specifiers and the rest (`static // Connects ...` above
+`int AossAp_Connect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
+
+**Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version, and a comment
+right after `static`, `inline`, `extern` or `const` that starts a line.
 
 ## 12. Rows of the nonmatching functions
 

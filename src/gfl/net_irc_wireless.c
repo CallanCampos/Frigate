@@ -52,13 +52,13 @@ typedef struct {
 
 static NetIrcWireless *NetIwSys;
 
-static void func_02043170(void *work);
-static void func_020431a8(void *work);
-static void func_020431c0(NetIrcWireless *sys, int state);
+static void NetIw_ConnectedCallback(void *work);
+static void NetIw_EndedCallback(void *work);
+static void NetIw_SetState(NetIrcWireless *sys, int state);
 static void *func_02043720(void *work);
 static int func_02043748(void *work);
 
-const GFLNetInitData *func_02042f74(const GFLNetInitData *pNetInit, void *work) {
+const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     NetIrcWireless *sys;
 
     if (NetIwSys != NULL && NetIwSys->unk101 == TRUE) {
@@ -72,7 +72,7 @@ const GFLNetInitData *func_02042f74(const GFLNetInitData *pNetInit, void *work) 
     sys->unk18 = pNetInit->unk18;
     sys->unk1C = pNetInit->unk1C;
     sys->aNetInit.bNetType = 3;
-    sys->aNetInit.unk2C = func_020431a8;
+    sys->aNetInit.unk2C = NetIw_EndedCallback;
     sys->aNetInit.unk18 = func_02043720;
     sys->aNetInit.unk1C = func_02043748;
     sys->bMPMode = sys->aNetInit.bMPMode;
@@ -83,7 +83,7 @@ const GFLNetInitData *func_02042f74(const GFLNetInitData *pNetInit, void *work) 
     return &NetIwSys->aNetInit;
 }
 
-void func_02043028(void) {
+void NetIw_Free(void) {
     if (NetIwSys != NULL) {
         GCTX_HIDUnblockSleep(0x20);
         GFL_HeapFree(NetIwSys);
@@ -91,13 +91,13 @@ void func_02043028(void) {
     }
 }
 
-void func_02043048(void) {
+void NetIw_FreeIfIdle(void) {
     if (NetIwSys != NULL && NetIwSys->unk101 == 0) {
-        func_02043028();
+        NetIw_Free();
     }
 }
 
-BOOL func_02043068(void) {
+BOOL NetIw_IsRunning(void) {
     if (NetIwSys != NULL) {
         return TRUE;
     }
@@ -108,7 +108,8 @@ void func_0204307c(void *a0) {
     NetIwSys->unk74 = a0;
 }
 
-void (*func_02043088(void (*a0)(void *work), void (*a1)(void *work, BOOL a1), void (*a2)(void *work)))(void *work) {
+void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1),
+                          void (*a2)(void *work)))(void *work) {
     if (NetIwSys == NULL) {
         return a0;
     }
@@ -121,10 +122,10 @@ void (*func_02043088(void (*a0)(void *work), void (*a1)(void *work, BOOL a1), vo
     if (a2 != NULL) {
         NetIwSys->unk8C = a2;
     }
-    return func_02043170;
+    return NetIw_ConnectedCallback;
 }
 
-void func_020430bc(const u8 *mac) {
+void NetIw_AddCollectedMac(const u8 *mac) {
     int i;
     u8 empty[6];
     u8 *p = empty;
@@ -150,10 +151,10 @@ void func_020430bc(const u8 *mac) {
             return;
         }
     }
-    func_02042454(1);
+    NetState_SetError(1);
 }
 
-void func_0204313c(u8 *mac, int index) {
+void NetIw_GetCollectedMac(u8 *mac, int index) {
     if (NetIwSys != NULL) {
         MI_CpuCopy8(NetIwSys->collect.macs[index], mac, 6);
     } else {
@@ -161,28 +162,28 @@ void func_0204313c(u8 *mac, int index) {
     }
 }
 
-static void func_02043170(void *work) {
+static void NetIw_ConnectedCallback(void *work) {
     if (NetIwSys != NULL) {
         NetIwSys->connected = TRUE;
         if (NetIwSys->netIdOverride != 0) {
             NetIwSys->netId = NetIwSys->netIdOverride - 1;
         } else {
-            NetIwSys->netId = func_0203ffc4();
+            NetIwSys->netId = NetSystem_GetNetId();
         }
     }
 }
 
-static void func_020431a8(void *work) {
+static void NetIw_EndedCallback(void *work) {
     if (NetIwSys != NULL) {
         NetIwSys->ended = TRUE;
     }
 }
 
-static void func_020431c0(NetIrcWireless *sys, int state) {
+static void NetIw_SetState(NetIrcWireless *sys, int state) {
     sys->state = state;
 }
 
-void func_020431cc(void) {
+void NetIw_Update(void) {
     NetIrcWireless *sys = NetIwSys;
 
     if (sys == NULL) {
@@ -192,92 +193,92 @@ void func_020431cc(void) {
     case 0:
         if (sys->connected == TRUE) {
             sys->unk101 = TRUE;
-            func_02040624(func_02040440(), 3, 0);
-            func_020431c0(sys, 1);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0);
+            NetIw_SetState(sys, 1);
         }
         break;
     case 1:
-        if (func_02040664(func_02040440(), 3, 0)) {
-            func_020431c0(sys, 2);
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 3, 0)) {
+            NetIw_SetState(sys, 2);
         }
         break;
     case 2:
-        if (func_0203ffc4() == 0) {
-            if (func_02042be8(func_02040440(), 1, 0, NULL)) {
-                func_020431c0(sys, 3);
+        if (NetSystem_GetNetId() == 0) {
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), 1, 0, NULL)) {
+                NetIw_SetState(sys, 3);
                 sys->timer = 200;
             }
-        } else if (func_02042be8(func_02040440(), 16, 0, NULL)) {
-            func_020431c0(sys, 3);
+        } else if (GFL_NetSendCommand(NetHandle_GetOwn(), 16, 0, NULL)) {
+            NetIw_SetState(sys, 3);
         }
         break;
     case 3:
         sys->timer--;
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             if (NetIwSys->unk8C != NULL) {
                 NetIwSys->unk8C(NetIwSys->work);
             }
             if (sys->unk10A && sys->aNetInit.maxConnectNum == 4 && sys->netId == 0) {
-                func_020431c0(sys, 14);
+                NetIw_SetState(sys, 14);
                 sys->unk108++;
             } else if (sys->netId == 0 && sys->aNetInit.maxConnectNum == 4) {
                 sys->unk108++;
-                func_02042860(NULL);
+                GFL_NetExit(NULL);
                 sys->unk88(sys->work, TRUE);
-                func_020431c0(sys, 4);
+                NetIw_SetState(sys, 4);
             } else {
                 sys->unk88(sys->work, FALSE);
-                func_020431c0(sys, 9);
+                NetIw_SetState(sys, 9);
             }
         }
         if (sys->timer == 0) {
-            func_02042860(NULL);
+            GFL_NetExit(NULL);
         }
         break;
     case 4:
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             sys->aNetInit.bNetType = 3;
-            sys->aNetInit.unk2C = func_020431a8;
+            sys->aNetInit.unk2C = NetIw_EndedCallback;
             if (sys->gameCommandBase != 0) {
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
             }
             sys->connected = FALSE;
             sys->ended = FALSE;
-            func_020425ec(&sys->aNetInit, NULL, sys->work);
-            func_020431c0(sys, 5);
+            GFL_NetInit(&sys->aNetInit, NULL, sys->work);
+            NetIw_SetState(sys, 5);
         }
         break;
     case 5:
-        if (func_02042788() == TRUE) {
-            func_02042e78()->pDevTable->unkC8(NetIwSys->unk74);
-            func_020429f8(func_02043170);
-            func_020431c0(sys, 6);
+        if (GFL_NetIsInitialized() == TRUE) {
+            GFL_NetGetSys()->pDevTable->unkC8(NetIwSys->unk74);
+            func_020429f8(NetIw_ConnectedCallback);
+            NetIw_SetState(sys, 6);
         }
         break;
     case 6:
         if (sys->connected == TRUE) {
             sys->unk101 = TRUE;
-            if (func_02042be8(func_02040440(), 9, sizeof(NetIwCollectMac), &NetIwSys->collect)) {
-                func_020431c0(sys, 7);
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), 9, sizeof(NetIwCollectMac), &NetIwSys->collect)) {
+                NetIw_SetState(sys, 7);
             }
         }
         break;
     case 7:
-        if (sys->connected == TRUE && func_02042be8(func_02040440(), 1, 0, NULL)) {
+        if (sys->connected == TRUE && GFL_NetSendCommand(NetHandle_GetOwn(), 1, 0, NULL)) {
             func_02042a50(200);
-            func_020431c0(sys, 8);
+            NetIw_SetState(sys, 8);
         }
         break;
     case 8:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             if (NetIwSys->unk8C != NULL) {
                 NetIwSys->unk8C(NetIwSys->work);
             }
-            func_020431c0(sys, 9);
+            NetIw_SetState(sys, 9);
         }
         break;
     case 9:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             if (sys->gameCommandBase != 0) {
                 sys->aNetInit.unk6E = 0;
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
@@ -285,22 +286,22 @@ void func_020431cc(void) {
             sys->aNetInit.bNetType = 0;
             sys->aNetInit.unk2C = sys->exitCallback;
             sys->aNetInit.bMPMode = sys->bMPMode;
-            func_020425ec(&sys->aNetInit, NULL, sys->work);
+            GFL_NetInit(&sys->aNetInit, NULL, sys->work);
             NetIwSys->unk101 = FALSE;
-            func_020431c0(sys, 10);
+            NetIw_SetState(sys, 10);
         }
         break;
     case 10:
-        if (func_02042788() == TRUE) {
+        if (GFL_NetIsInitialized() == TRUE) {
             if (sys->netId == 0) {
                 func_02042970();
-                func_020431c0(sys, 12);
+                NetIw_SetState(sys, 12);
             } else if (sys->aNetInit.maxConnectNum == 4) {
                 func_02042968();
-                func_020431c0(sys, 11);
+                NetIw_SetState(sys, 11);
             } else {
-                func_02042950(sys->collect.macs[0]);
-                func_020431c0(sys, 12);
+                GFL_NetStartAsParent(sys->collect.macs[0]);
+                NetIw_SetState(sys, 12);
             }
         }
         break;
@@ -312,15 +313,15 @@ void func_020431cc(void) {
         // Find the beacon of the machine that collected this machine's MAC address
         OS_GetMacAddress(mac);
         for (;;) {
-            NetIwCollectMac *collect = func_020428a8(index);
+            NetIwCollectMac *collect = GFL_NetGetBeaconData(index);
 
             if (collect == NULL) {
                 break;
             }
             for (i = 0; i < _COLLECTMAC_NUM; i++) {
                 if (GFL_STD_MemCmp(mac, collect->macs[i], 6) == 0) {
-                    func_0204295c(func_020428c8(index));
-                    func_020431c0(sys, 12);
+                    GFL_NetStartAsChild(GFL_NetGetBeaconMac(index));
+                    NetIw_SetState(sys, 12);
                     break;
                 }
             }
@@ -330,11 +331,11 @@ void func_020431cc(void) {
     }
     case 12:
         if (sys->netId == 0) {
-            if (func_02040474() != 0 && func_02040504() == TRUE) {
-                func_020431c0(sys, 13);
+            if (NetHandle_CountNegotiated() != 0 && NetHandle_SendNegotiation() == TRUE) {
+                NetIw_SetState(sys, 13);
             }
-        } else if (func_02040504() == TRUE) {
-            func_020431c0(sys, 13);
+        } else if (NetHandle_SendNegotiation() == TRUE) {
+            NetIw_SetState(sys, 13);
         }
         break;
     case 13:
@@ -342,59 +343,60 @@ void func_020431cc(void) {
             if (sys->unk84 != NULL) {
                 sys->unk84(sys->work);
             }
-            func_02043048();
-        } else if (func_02040474() >= sys->maxConnectNum) {
+            NetIw_FreeIfIdle();
+        } else if (NetHandle_CountNegotiated() >= sys->maxConnectNum) {
             if (sys->unk84 != NULL) {
                 sys->unk84(sys->work);
             }
-            func_02043048();
+            NetIw_FreeIfIdle();
         }
         break;
     case 14:
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             sys->aNetInit.bNetType = 3;
-            sys->aNetInit.unk2C = func_020431a8;
+            sys->aNetInit.unk2C = NetIw_EndedCallback;
             sys->connected = FALSE;
             sys->ended = FALSE;
-            func_020425ec(&sys->aNetInit, NULL, sys->work);
-            func_020431c0(sys, 15);
+            GFL_NetInit(&sys->aNetInit, NULL, sys->work);
+            NetIw_SetState(sys, 15);
         }
         break;
     case 15:
-        if (func_02042788() == TRUE) {
-            func_02042e78()->pDevTable->unkC8(NetIwSys->unk74);
-            func_020429f8(func_02043170);
-            func_020431c0(sys, 16);
+        if (GFL_NetIsInitialized() == TRUE) {
+            GFL_NetGetSys()->pDevTable->unkC8(NetIwSys->unk74);
+            func_020429f8(NetIw_ConnectedCallback);
+            NetIw_SetState(sys, 16);
         }
         break;
     case 16:
         if (sys->connected == TRUE) {
-            func_02040624(func_02040440(), 3, 0);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, 0);
             NetIwSys->unk101 = TRUE;
-            func_020431c0(sys, 17);
+            NetIw_SetState(sys, 17);
         }
         break;
     case 17:
-        if (func_02040664(func_02040440(), 3, 0) && func_02042be8(func_02040440(), 1, 0, NULL)) {
-            func_020431c0(sys, 18);
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 3, 0) &&
+            GFL_NetSendCommand(NetHandle_GetOwn(), 1, 0, NULL)) {
+            NetIw_SetState(sys, 18);
             sys->timer = 200;
         }
         break;
     case 18:
         sys->timer--;
-        if (func_02042ab8() || sys->timer == 0) {
+        if (GFL_NetIsNotInitialized() || sys->timer == 0) {
             if (NetIwSys->unk8C != NULL) {
                 NetIwSys->unk8C(NetIwSys->work);
             }
             if (sys->unk10A && sys->unk108 < 3) {
                 sys->unk108++;
                 if (sys->unk108 >= 3) {
-                    func_020431c0(sys, 9);
+                    NetIw_SetState(sys, 9);
                 } else {
-                    func_020431c0(sys, 14);
+                    NetIw_SetState(sys, 14);
                 }
             } else {
-                func_020431c0(sys, 9);
+                NetIw_SetState(sys, 9);
             }
         }
         break;
@@ -420,7 +422,7 @@ static int func_02043748(void *work) {
     return sys->unk1C(work) + sizeof(NetIwCollectMac);
 }
 
-void func_02043764(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetIw_RecvCollectedMacs(int netId, int size, const void *data, void *work, NetHandle *handle) {
     NetIwCollectMac *pTemp = data;
     int i;
     int num;
@@ -433,7 +435,7 @@ void func_02043764(int netId, int size, const void *data, void *work, NetHandle 
         num = _COLLECTMAC_NUM;
     }
     for (i = 0; i < num; i++) {
-        func_020430bc(pTemp->macs[i]);
+        NetIw_AddCollectedMac(pTemp->macs[i]);
     }
 }
 
@@ -443,14 +445,14 @@ BOOL func_020437a0(void) {
     }
     if (NetIwSys->state == 16) {
         NetIwSys->maxConnectNum = NetIwSys->unk108 + 1;
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
         NetIwSys->state = 9;
         return TRUE;
     }
     return FALSE;
 }
 
-void func_020437dc(int netId) {
+void NetIw_OverrideNetId(int netId) {
     GFL_ASSERT(NetIwSys);
     if (NetIwSys != NULL) {
         NetIwSys->netIdOverride = netId + 1;
@@ -465,7 +467,7 @@ u8 func_0204381c(void) {
     return NetIwSys->unk108;
 }
 
-void func_02043834(int gameCommandBase) {
+void NetIw_SetGameCommandBase(int gameCommandBase) {
     GFL_ASSERT(NetIwSys);
     if (NetIwSys != NULL) {
         NetIwSys->gameCommandBase = gameCommandBase;

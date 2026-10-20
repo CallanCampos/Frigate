@@ -1,0 +1,117 @@
+{
+    "$schema": "../../../wave_archive.schema.json",
+    "waves": [
+        {},
+        {},
+        {
+            "loop_start": 5560
+        },
+        {},
+        {
+            "loop_start": 5144
+        },
+        {
+            "loop_start": 2512
+        },
+        {
+            "loop_start": 10560
+        },
+        {
+            "loop_start": 9192
+        },
+        {
+            "loop_start": 3184
+        },
+        {
+            "loop_start": 3176
+        },
+        {
+            "loop_start": 3608
+        },
+        {
+            "loop_start": 7208
+        },
+        {},
+        {
+            "loop_start": 3744
+        },
+        {},
+        {
+            "loop_start": 4456
+        },
+        {
+            "loop_start": 3384
+        },
+        {
+            "loop_start": 2248,
+            "timer": 1043
+        },
+        {
+            "loop_start": 3200
+        },
+        {
+            "loop_start": 2040
+        },
+        {},
+        {},
+        {},
+        {},
+        {
+            "loop_start": 4704
+        },
+        {
+            "loop_start": 2128
+        },
+        {
+            "loop_start": 3512
+        },
+        {
+            "loop_start": 1592
+        },
+        {
+            "loop_start": 8696
+        },
+        {
+            "loop_start": 7928
+        },
+        {
+            "loop_start": 6296
+        },
+        {
+            "loop_start": 6432
+        },
+        {
+            "loop_start": 480
+        },
+        {
+            "loop_start": 2544
+        },
+        {
+            "loop_start": 2616
+        },
+        {
+            "loop_start": 4288
+        },
+        {
+            "loop_start": 2064
+        },
+        {
+            "loop_start": 2512
+        },
+        {
+            "loop_start": 1936
+        },
+        {
+            "loop_start": 11488
+        },
+        {
+            "loop_start": 11792
+        },
+        {
+            "loop_start": 10288
+        },
+        {
+            "loop_start": 1744
+        }
+    ]
+}

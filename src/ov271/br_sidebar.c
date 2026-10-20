@@ -201,16 +201,16 @@ static void BrSidebarWork_Init(BrSidebarWork *p_wk, ClActUnit *unit, BrRes *res,
     p_wk->x = FX32_CONST(setup.x);
     p_wk->y = FX32_CONST(setup.y);
     p_wk->scale = cp_data->scale;
-    p_wk->clwk = func_0204c040(unit, obj.chr, obj.plt, obj.cell, &setup, p_wk->data.display, heapId);
-    func_0204c244(p_wk->clwk, 2);
-    func_0204c288(p_wk->clwk, p_wk->scale, 0);
-    func_0204c318(p_wk->clwk, 0);
-    func_0204c124(p_wk->clwk, FALSE);
+    p_wk->clwk = ClActor_Create(unit, obj.chr, obj.plt, obj.cell, &setup, p_wk->data.display, heapId);
+    ClActor_SetAffineMode(p_wk->clwk, 2);
+    ClActor_SetScaleAxis(p_wk->clwk, p_wk->scale, 0);
+    ClActor_SetObjMode(p_wk->clwk, 0);
+    ClActor_SetVisible(p_wk->clwk, FALSE);
     p_wk->is_use = TRUE;
 }
 
 static void BrSidebarWork_Exit(BrSidebarWork *p_wk) {
-    func_0204c108(p_wk->clwk);
+    ClActor_Delete(p_wk->clwk);
     MI_CpuFill8(p_wk, 0, sizeof(BrSidebarWork));
 }
 
@@ -225,7 +225,7 @@ static BOOL BrSidebarWork_IsUse(const BrSidebarWork *cp_wk) {
 }
 
 static void BrSidebarWork_SetVisible(BrSidebarWork *p_wk, BOOL isVisible) {
-    func_0204c124(p_wk->clwk, isVisible);
+    ClActor_SetVisible(p_wk->clwk, isVisible);
 }
 
 static void BrSidebarWork_StartMove(BrSidebarWork *p_wk, u32 type) {
@@ -248,8 +248,8 @@ static void BrSidebarWork_StartMove(BrSidebarWork *p_wk, u32 type) {
 
 static void BrSidebarWork_SetEndPos(BrSidebarWork *p_wk) {
     p_wk->scale = BR_SIDEBAR_SCALE_END;
-    func_0204c1a8(p_wk->clwk, p_wk->data.end_x, p_wk->data.display, 0);
-    func_0204c288(p_wk->clwk, p_wk->scale, 0);
+    ClActor_SetSurfacePosAxis(p_wk->clwk, p_wk->data.end_x, p_wk->data.display, 0);
+    ClActor_SetScaleAxis(p_wk->clwk, p_wk->scale, 0);
 }
 
 // The sign of a sidebar's sway: 1 when its data's dir is set, otherwise -1
@@ -271,7 +271,7 @@ static void BrSidebarWork_Move_Open(BrSidebarWork *p_wk) {
 
     switch (p_wk->seq) {
     case 0:
-        func_0204c124(p_wk->clwk, TRUE);
+        ClActor_SetVisible(p_wk->clwk, TRUE);
         p_wk->cnt = 0;
         p_wk->scale = p_wk->data.scale;
         p_wk->seq = 1;
@@ -279,7 +279,7 @@ static void BrSidebarWork_Move_Open(BrSidebarWork *p_wk) {
     case 1:
         if (p_wk->cnt == 3) {
             p_wk->seq = 2;
-            p_wk->now_x = FX32_CONST(func_0204c1dc(p_wk->clwk, p_wk->data.display, 0));
+            p_wk->now_x = FX32_CONST(ClActor_GetSurfacePosAxis(p_wk->clwk, p_wk->data.display, 0));
             p_wk->cnt = 0;
         } else {
             p_wk->cnt++;
@@ -294,16 +294,16 @@ static void BrSidebarWork_Move_Open(BrSidebarWork *p_wk) {
         } else {
             u16 rot = 0xffff * p_wk->theta / 360;
 
-            p_wk->now_x += -dir * func_02044360(rot);
+            p_wk->now_x += -dir * GFL_MathSinDegWrap(rot);
             p_wk->theta += 32;
             p_wk->theta %= 360;
-            func_0204c1a8(p_wk->clwk, p_wk->now_x >> FX32_SHIFT, p_wk->data.display, 0);
+            ClActor_SetSurfacePosAxis(p_wk->clwk, p_wk->now_x >> FX32_SHIFT, p_wk->data.display, 0);
             p_wk->cnt++;
         }
         break;
     }
     case 3: {
-        s16 x = func_0204c1dc(p_wk->clwk, p_wk->data.display, 0);
+        s16 x = ClActor_GetSurfacePosAxis(p_wk->clwk, p_wk->data.display, 0);
 
         if (p_wk->cnt == 0) {
             p_wk->dx = p_wk->data.end_x - x;
@@ -316,7 +316,7 @@ static void BrSidebarWork_Move_Open(BrSidebarWork *p_wk) {
             x += (s16)p_wk->dx;
             p_wk->cnt++;
         }
-        func_0204c1a8(p_wk->clwk, x, p_wk->data.display, 0);
+        ClActor_SetSurfacePosAxis(p_wk->clwk, x, p_wk->data.display, 0);
         break;
     }
     case 4:
@@ -326,7 +326,7 @@ static void BrSidebarWork_Move_Open(BrSidebarWork *p_wk) {
 
     if (p_wk->seq == 3 && p_wk->scale > BR_SIDEBAR_SCALE_END) {
         p_wk->scale -= BR_SIDEBAR_SCALE_END;
-        func_0204c288(p_wk->clwk, p_wk->scale, 0);
+        ClActor_SetScaleAxis(p_wk->clwk, p_wk->scale, 0);
     }
 }
 
@@ -339,8 +339,8 @@ static void BrSidebarWork_Move_Bound(BrSidebarWork *p_wk) {
 
     switch (p_wk->seq) {
     case 0:
-        func_0204c124(p_wk->clwk, TRUE);
-        func_0204c1a8(p_wk->clwk, p_wk->data.end_x, p_wk->data.display, 0);
+        ClActor_SetVisible(p_wk->clwk, TRUE);
+        ClActor_SetSurfacePosAxis(p_wk->clwk, p_wk->data.end_x, p_wk->data.display, 0);
         p_wk->now_x = FX32_CONST(p_wk->data.end_x);
         p_wk->theta = p_wk->data.theta;
         p_wk->seq = 1;
@@ -351,17 +351,17 @@ static void BrSidebarWork_Move_Bound(BrSidebarWork *p_wk) {
         fx32 x;
 
         rot = 0xffff * p_wk->theta / 360;
-        x = p_wk->now_x + -dir * (func_02044360(rot) * 3);
+        x = p_wk->now_x + -dir * (GFL_MathSinDegWrap(rot) * 3);
         p_wk->theta += p_wk->data.theta_add;
         p_wk->theta %= 360;
-        func_0204c1a8(p_wk->clwk, x >> FX32_SHIFT, p_wk->data.display, 0);
+        ClActor_SetSurfacePosAxis(p_wk->clwk, x >> FX32_SHIFT, p_wk->data.display, 0);
         break;
     }
     }
 
     if (p_wk->scale > BR_SIDEBAR_SCALE_END) {
         p_wk->scale -= BR_SIDEBAR_SCALE_END;
-        func_0204c288(p_wk->clwk, p_wk->scale, 0);
+        ClActor_SetScaleAxis(p_wk->clwk, p_wk->scale, 0);
     }
 }
 
@@ -374,13 +374,13 @@ static void BrSidebarWork_Move_Close(BrSidebarWork *p_wk) {
 
     switch (p_wk->seq) {
     case 0:
-        func_0204c124(p_wk->clwk, TRUE);
+        ClActor_SetVisible(p_wk->clwk, TRUE);
         p_wk->cnt = 0;
         p_wk->seq = 1;
         break;
     case 1: {
-        s16 x = func_0204c1dc(p_wk->clwk, p_wk->data.display, 0);
-        fx32 scale = func_0204c294(p_wk->clwk, 0);
+        s16 x = ClActor_GetSurfacePosAxis(p_wk->clwk, p_wk->data.display, 0);
+        fx32 scale = ClActor_GetScaleAxis(p_wk->clwk, 0);
 
         if (p_wk->cnt == 0) {
             p_wk->dx = p_wk->data.x - x;
@@ -397,8 +397,8 @@ static void BrSidebarWork_Move_Close(BrSidebarWork *p_wk) {
             scale += p_wk->dscale;
             p_wk->cnt++;
         }
-        func_0204c1a8(p_wk->clwk, x, p_wk->data.display, 0);
-        func_0204c288(p_wk->clwk, scale, 0);
+        ClActor_SetSurfacePosAxis(p_wk->clwk, x, p_wk->data.display, 0);
+        ClActor_SetScaleAxis(p_wk->clwk, scale, 0);
         break;
     }
     case 2:

@@ -25,10 +25,10 @@
 #define GRID_CENTER(n) ((n) * FX32_CONST(16) + FX32_CONST(8))
 #define GRID_HEIGHT(n) ((n) * FX32_CONST(8))
 
-static BOOL func_ov012_02165808(PokeParty *party, u16 species, u16 move, u8 form, u32 kind, u16 *slot,
-                                PlayerInfo *playerInfo);
+static BOOL FindSpecialTransferPkm(PokeParty *party, u16 species, u16 move, u8 form, u32 kind, u16 *slot,
+                                   PlayerInfo *playerInfo);
 
-BOOL func_ov012_02165598(VM *vm, FieldScriptEnv *env) {
+BOOL s020E_SpPokeJump(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -63,7 +63,7 @@ BOOL func_ov012_02165598(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_0216564c(VM *vm, FieldScriptEnv *env) {
+BOOL s020F_SpPokeAppear(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a1 = ScriptReadAny(vm, env);
     u16 x = ScriptReadAny(vm, env);
@@ -78,7 +78,7 @@ BOOL func_ov012_0216564c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_021656a8(VM *vm, FieldScriptEnv *env) {
+BOOL s0210_SpPokeWaitAnimEnd(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = SpPokeEvent_CreateWaitAnimEnd(gsys, ScriptReadAny(vm, env));
@@ -90,7 +90,7 @@ BOOL func_ov012_021656a8(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-BOOL func_ov012_021656e0(VM *vm, FieldScriptEnv *env) {
+BOOL s0211_SpPokeWaitFrame(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameEvent *event = SpPokeEvent_CreateWaitFrame(gsys, ScriptReadAny(vm, env));
@@ -159,13 +159,13 @@ BOOL s020D_PokePartyFindEx(VM *vm, FieldScriptEnv *env) {
     if (checkMove == FALSE) {
         move = 0;
     }
-    *found = func_ov012_02165808(party, species, move, form, kind, slot, playerInfo);
+    *found = FindSpecialTransferPkm(party, species, move, form, kind, slot, playerInfo);
     return FALSE;
 }
 
 // Finds the first Pokémon of the species given at the event of the kind, that doesn't know the move and is of the form
-static BOOL func_ov012_02165808(PokeParty *party, u16 species, u16 move, u8 form, u32 kind, u16 *slot,
-                                PlayerInfo *playerInfo) {
+static BOOL FindSpecialTransferPkm(PokeParty *party, u16 species, u16 move, u8 form, u32 kind, u16 *slot,
+                                   PlayerInfo *playerInfo) {
     BOOL found;
     int count = PokeParty_GetPkmCount(party);
     int i;
@@ -194,7 +194,7 @@ static BOOL func_ov012_02165808(PokeParty *party, u16 species, u16 move, u8 form
     return found;
 }
 
-BOOL func_ov012_021658c8(VM *vm, FieldScriptEnv *env) {
+BOOL s0215_SetSpecialTransferUsed(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PokeParty *party = GameData_GetParty(gameData);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);

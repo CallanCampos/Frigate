@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_TORKOAL",
+    "moves": [ "MOVE_FIRE_BLAST", "MOVE_STONE_EDGE", "MOVE_GYRO_BALL", "MOVE_YAWN" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": false,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BRAVE",
+    "item": "ITEM_FIRE_GEM",
+    "form": 0
+}

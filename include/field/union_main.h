@@ -40,60 +40,60 @@ void UnionMain_OnFieldIn(void *param, void *work, Field *field);
 void UnionMain_OnFieldOut(void *param, void *work, Field *field);
 
 // Accessors of the system that the field and overlay 82 use
-u32 func_ov028_021710a4(UnionSystem *sys);
-u32 func_ov028_021710b0(UnionSystem *sys);
-void func_ov028_021710bc(UnionSystem *sys, u8 value);
-u8 func_ov028_021710c8(UnionSystem *sys);
+u32 UnionMain_GetAtCounter(UnionSystem *sys);
+u32 UnionMain_GetExiting(UnionSystem *sys);
+void UnionMain_SetSituUnk02(UnionSystem *sys, u8 value);
+u8 UnionMain_GetSituUnk02(UnionSystem *sys);
 // Whether the Union Room is up and idle
 BOOL UnionMain_IsIdle(GameSystem *gsys);
 
 // The net commands of union_comm.c's table: a command's handler, and for those with data in chunks, where it goes
 void *UnionNet_GetRecvBuffer(int netId, void *work, int size);
-void func_ov028_02171138(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171170(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021711b4(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021711f8(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171254(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021712ac(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171308(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021713e0(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_0217144c(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171478(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021714bc(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171570(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021715a4(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021715d8(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171638(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_0217168c(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021716ec(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171758(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021717e8(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171848(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_021718e4(int netId, int size, const void *data, void *work, NetHandle *handle);
-void func_ov028_02171920(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvGroupDone(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvUnk19(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvUnk1A(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvMac(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvUnk46_2(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvCard(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvColosseumMember(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvColosseumUnkDE(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvColosseumUnkCA(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvEntryRequest(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvEntryReply2(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvEntryReply1(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvEnqueue(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvUnkE(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvRequestStatus(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvStatus(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvAppProfile(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvProfile(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvConfirmProfile(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvLeave(int netId, int size, const void *data, void *work, NetHandle *handle);
+void UnionNet_RecvJoinAvenue(int netId, int size, const void *data, void *work, NetHandle *handle);
 
 // The senders of those commands. The first goes to every machine, those with a mask go to the machines in it
-BOOL func_ov028_0217115c(void);
-BOOL func_ov028_02171194(u32 value);
-BOOL func_ov028_021711d8(u32 value);
-BOOL func_ov028_02171220(void);
-BOOL func_ov028_0217128c(u32 value);
-BOOL func_ov028_021712dc(UnionSystem *sys);
+BOOL UnionMain_SendGroupDone(void);
+BOOL UnionMain_SendUnk19(u32 value);
+BOOL UnionMain_SendUnk1A(u32 value);
+BOOL UnionMain_SendMac(void);
+BOOL UnionMain_SendUnk46_2(u32 value);
+BOOL UnionMain_SendPlayerInfo(UnionSystem *sys);
 // The group's card, in two sizes
-BOOL func_ov028_02171340(UnionSystem *sys);
-BOOL func_ov028_02171390(UnionSystem *sys);
-BOOL func_ov028_021714a4(void);
-BOOL func_ov028_0217152c(UnionSystem *sys);
+BOOL UnionMain_SendCard(UnionSystem *sys);
+BOOL UnionMain_SendCardHead(UnionSystem *sys);
+BOOL UnionMain_SendColosseumUnkCA(void);
+BOOL UnionMain_SendEntryRequest(UnionSystem *sys);
 // The reply to an entry request: refused, and accepted
-BOOL func_ov028_0217157c(u8 sendTo);
-BOOL func_ov028_021715b0(u8 sendTo);
-BOOL func_ov028_0217199c(UnionSystem *sys);
+BOOL UnionMain_SendEntryReply2(u8 sendTo);
+BOOL UnionMain_SendEntryReply1(u8 sendTo);
+BOOL UnionMain_SendJoinAvenue(UnionSystem *sys);
 
 // Sends union_app.c's commands
-BOOL func_ov028_02171664(u8 netId);
-BOOL func_ov028_02171724(const UnionAppStatus *status, u8 sendTo);
-BOOL func_ov028_0217181c(u8 sendTo, const UnionAppMember *member);
-BOOL func_ov028_0217196c(u8 sendTo, u8 leftNetId);
+BOOL UnionMain_SendUnkE(u8 netId);
+BOOL UnionMain_SendStatus(const UnionAppStatus *status, u8 sendTo);
+BOOL UnionMain_SendProfile(u8 sendTo, const UnionAppMember *member);
+BOOL UnionMain_SendLeave(u8 sendTo, u8 leftNetId);
 // The senders that union_subproc.c's commands use
 BOOL UnionMain_SendEnqueue(void);
 BOOL UnionMain_SendRequestStatus(void);
@@ -109,8 +109,5 @@ BOOL UnionCommand_IsActive(UnionSystem *sys);
 // The procs of the activities that run in the Union Room, in overlays 70 and 216
 extern const GameProcFunctions OEKAKI_PROC_FUNCTIONS;
 extern const GameProcFunctions GURU2_PROC_FUNCTIONS;
-
-// Overlay 36's, which puts a colosseum player's info into a table of the field's players
-void func_ov036_021c3f34(void *players, u32 netId, const PlayerInfo *info, u8 flag, const u8 *mac);
 
 #endif // POKEBW2_FIELD_UNION_MAIN_H

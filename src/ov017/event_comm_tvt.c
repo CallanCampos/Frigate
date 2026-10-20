@@ -21,9 +21,9 @@ struct EventCommTvt {
     u32 unused30;
 };
 
-GameEventReturnCode func_ov017_0216e660(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventCommTvt_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEventReturnCode func_ov017_0216e660(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventCommTvt_Callback(GameEvent *event, u32 *state, void *data) {
     EventCommTvt *work = data;
     GameSystem *gsys = work->gsys;
     GameCommSys *comm = GSYS_GetGameCommSystem(gsys);
@@ -94,8 +94,8 @@ GameEventReturnCode func_ov017_0216e660(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov017_0216e79c(GameSystem *gsys, void *args) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov017_0216e660, sizeof(EventCommTvt));
+GameEvent *EventCommTvt_Create(GameSystem *gsys, void *args) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventCommTvt_Callback, sizeof(EventCommTvt));
     EventCommTvt *work = GameEvent_GetData(event);
 
     work->gameData = GSYS_GetGameData(gsys);

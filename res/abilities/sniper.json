@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Sniper",
+    "description": "Powers up moves if they\nbecome critical hits."
+}

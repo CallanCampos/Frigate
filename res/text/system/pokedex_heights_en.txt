@@ -1,0 +1,2 @@
+\from{species.pokedex.en.height}
+\from{species.pokedex.en.forms.height}

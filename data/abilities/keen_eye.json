@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Keen Eye",
-    "description": "Prevents other Pokémon\nfrom lowering accuracy."
-}

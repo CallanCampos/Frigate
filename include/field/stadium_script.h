@@ -20,6 +20,6 @@ BOOL s01E5_StadiumResetTrainerFlags(VM *vm, FieldScriptEnv *env);
 u32 FindStadiumTrainerIndex(StadiumTrainerEntry *trainers, u16 a, u16 b);
 
 // Picks six different numbers from 0x50 to 0x83 into the script variables
-BOOL func_ov012_02159f90(VM *vm, FieldScriptEnv *env);
+BOOL s0249_GetRandomDistinctSix(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_STADIUM_SCRIPT_H

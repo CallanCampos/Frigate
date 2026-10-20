@@ -1,4 +1,11 @@
+// The field script system: the supervisor of the scripts' VMs, the script call event, the VMs' setup, the global
+// scripts and the opcode guard. Function and data names from swan (https://github.com/ds-pokemon-hacking/swan,
+// GPL-3.0)
+
 #include "types.h"
+#include "constants/arc.h"
+#include "constants/field_scripts.h"
+#include "constants/script_text_banks.h"
 #include "field/event_data.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"
@@ -17,6 +24,189 @@
 #include "system/game_system.h"
 #include "system/main.h"
 #include "system/vm.h"
+
+// A range of global script IDs, with its script file and text bank
+struct GlobalScriptEntry {
+    u16 start;
+    u16 end;
+    u16 fileId;
+    u16 msgArcId;
+    u16 msgFileNo;
+};
+
+// The feature levels at which a command may run
+struct OpcodePermissions {
+    u8 level0 : 1;
+    u8 level1 : 1;
+    u8 level2 : 1;
+};
+
+// The global scripts: each range of script IDs with its script file and text bank. FieldScript_ResolveSCRID takes
+// the first entry that starts at or below the ID, so the ranges come in descending order. Ranges that share a script
+// file or text bank share its constant, which the generated lists name after one of those ranges
+static const GlobalScriptEntry GLOBAL_SCRIPT_TABLE[60] = {
+    { 10885, 10914, SCRIPTS_GLOBAL_10885, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10885 },
+    { 10865, 10884, SCRIPTS_GLOBAL_10865, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10865 },
+    { 10860, 10864, SCRIPTS_GLOBAL_10860, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10860 },
+    { 10850, 10859, SCRIPTS_GLOBAL_10850, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10850 },
+    { 10815, 10834, SCRIPTS_GLOBAL_10815, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10815 },
+    { 10795, 10814, SCRIPTS_GLOBAL_10795, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10795 },
+    { 10785, 10794, SCRIPTS_GLOBAL_10785, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10785 },
+    { 10735, 10784, SCRIPTS_GLOBAL_10735, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10735 },
+    { 10685, 10734, SCRIPTS_GLOBAL_10685, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685 },
+    { 10675, 10684, SCRIPTS_GLOBAL_10675, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10675 },
+    { 10665, 10674, SCRIPTS_GLOBAL_10665, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10665 },
+    { 10655, 10664, SCRIPTS_GLOBAL_10655, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10655 },
+    { 10635, 10654, SCRIPTS_GLOBAL_10635, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10635 },
+    { 10535, 10634, SCRIPTS_GLOBAL_10535, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10535 },
+    { 10530, 10534, SCRIPTS_GLOBAL_10530, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10530 },
+    { 10520, 10529, SCRIPTS_GLOBAL_10520, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+    { 10510, 10519, SCRIPTS_GLOBAL_10510, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10510 },
+    { 10490, 10509, SCRIPTS_GLOBAL_10490, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10490 },
+    { 10480, 10489, SCRIPTS_GLOBAL_10480, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10480 },
+    { 10470, 10479, SCRIPTS_GLOBAL_10470, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10470 },
+    { 10450, 10469, SCRIPTS_GLOBAL_10450, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10450 },
+    { 10445, 10449, SCRIPTS_GLOBAL_10445, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10445 },
+    { 10440, 10444, SCRIPTS_GLOBAL_10440, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10440 },
+    { 10435, 10439, SCRIPTS_GLOBAL_10435, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10435 },
+    { 10405, 10434, SCRIPTS_GLOBAL_10405, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10405 },
+    { 10400, 10404, SCRIPTS_GLOBAL_10400, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10400 },
+    { 10395, 10399, SCRIPTS_GLOBAL_10395, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10395 },
+    { 10390, 10394, SCRIPTS_GLOBAL_10390, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10390 },
+    { 10380, 10389, SCRIPTS_GLOBAL_10380, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10380 },
+    { 10350, 10379, SCRIPTS_GLOBAL_10350, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10350 },
+    { 10330, 10349, SCRIPTS_GLOBAL_10330, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10330 },
+    { 10325, 10329, SCRIPTS_GLOBAL_10325, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10325 },
+    { 10315, 10324, SCRIPTS_GLOBAL_10315, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10315 },
+    { 10310, 10314, SCRIPTS_GLOBAL_10310, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10310 },
+    { 10290, 10309, SCRIPTS_GLOBAL_10290, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10290 },
+    { 10280, 10289, SCRIPTS_GLOBAL_10280, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10280 },
+    { 10270, 10279, SCRIPTS_GLOBAL_10270, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10270 },
+    { 10260, 10269, SCRIPTS_GLOBAL_10260, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10260 },
+    { 10250, 10259, SCRIPTS_GLOBAL_10250, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+    { 10200, 10249, SCRIPTS_GLOBAL_10200, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10200 },
+    { 10130, 10149, SCRIPTS_GLOBAL_10130, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10130 },
+    { 10110, 10119, SCRIPTS_GLOBAL_10110, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10110 },
+    { 10105, 10109, SCRIPTS_GLOBAL_10105, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10105 },
+    { 10100, 10104, SCRIPTS_GLOBAL_10100, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10100 },
+    { 10090, 10099, SCRIPTS_GLOBAL_10090, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10090 },
+    { 10000, 10089, SCRIPTS_GLOBAL_10000, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10000 },
+    { 9600, 9699, SCRIPTS_GLOBAL_9600, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+    { 8000, 8799, SCRIPTS_GLOBAL_8000, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+    { 7000, 7799, SCRIPTS_GLOBAL_7000, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_7000 },
+    { 5000, 6999, SCRIPTS_GLOBAL_3000, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+    { 3000, 4999, SCRIPTS_GLOBAL_3000, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+    { 2800, 2819, SCRIPTS_GLOBAL_2800, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_7000 },
+    { 2500, 2799, SCRIPTS_GLOBAL_2500, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2500 },
+    { 2280, 2299, SCRIPTS_GLOBAL_2280, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2280 },
+    { 2260, 2279, SCRIPTS_GLOBAL_2260, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2260 },
+    { 2250, 2259, SCRIPTS_GLOBAL_2250, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2250 },
+    { 2225, 2249, SCRIPTS_GLOBAL_2225, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2225 },
+    { 2200, 2224, SCRIPTS_GLOBAL_2200, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2200 },
+    { 2100, 2199, SCRIPTS_GLOBAL_2100, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_2100 },
+    { 2000, 2099, SCRIPTS_GLOBAL_2000, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10520 },
+};
+
+// The feature levels at which each command of EVCMD_TABLE may run, which FieldScript_OpcodeGuard checks: level 0 is
+// the full feature set, 1 and 2 the reduced ones. It is placed with its only reader: as script_work.c's first object
+// it would give the same bytes
+static const struct OpcodePermissions EVCMD_PERM_TABLE[] = {
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x000
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x008
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x010
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x018
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x020
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x028
+    { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x030
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x038
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x040
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x048
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x050
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x058
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, // 0x060
+    { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, // 0x068
+    { 1, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x070
+    { 1, 1, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x078
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x080
+    { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x088
+    { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x090
+    { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x098
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x0a0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x0a8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x0b0
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x0b8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x0c0
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x0c8
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x0d0
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x0d8
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x0e0
+    { 1, 1, 1 }, { 0, 0, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x0e8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x0f0
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x0f8
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x100
+    { 1, 1, 1 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x108
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, // 0x110
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x118
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, // 0x120
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, // 0x128
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, // 0x130
+    { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x138
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x140
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x148
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x150
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, // 0x158
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x160
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, // 0x168
+    { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x170
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, // 0x178
+    { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x180
+    { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x188
+    { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, // 0x190
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, // 0x198
+    { 0, 0, 0 }, { 1, 0, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x1a0
+    { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x1a8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, // 0x1b0
+    { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, // 0x1b8
+    { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x1c0
+    { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 1 }, { 1, 0, 1 }, // 0x1c8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, // 0x1d0
+    { 1, 1, 1 }, { 0, 0, 1 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x1d8
+    { 0, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 0, 1, 1 }, { 0, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x1e0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x1e8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x1f0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x1f8
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x200
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x208
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x210
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, // 0x218
+    { 1, 1, 1 }, { 1, 1, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, // 0x220
+    { 1, 1, 1 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, // 0x228
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x230
+    { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 0, 0, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x238
+    { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x240
+    { 1, 0, 0 }, { 0, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 0, 1, 0 }, { 1, 1, 1 }, { 1, 0, 0 }, // 0x248
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, // 0x250
+    { 0, 0, 0 }, { 0, 0, 0 }, { 0, 1, 1 }, { 0, 1, 0 }, { 1, 1, 0 }, { 1, 1, 0 }, { 0, 0, 0 }, { 1, 1, 0 }, // 0x258
+    { 0, 0, 0 }, { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x260
+    { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 0, 0, 0 }, // 0x268
+    { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x270
+    { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x278
+    { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, // 0x280
+    { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x288
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x290
+    { 1, 1, 1 }, { 1, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x298
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x2a0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x2a8
+    { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x2b0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 1, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, // 0x2b8
+    { 1, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x2c0
+    { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 0, 0 }, // 0x2c8
+    { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 0 }, { 0, 0, 0 }, { 1, 1, 0 }, // 0x2d0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, // 0x2d8
+    { 0, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 1, 1, 1 }, { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 0 }, // 0x2e0
+    { 1, 0, 0 }, { 1, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 }, // 0x2e8
+    { 0, 0, 0 }, { 1, 1, 1 }, { 1, 1, 1 },                                                                  // 0x2f0
+};
 
 struct EventScriptCallData {
     ScriptWork *work;
@@ -399,10 +589,10 @@ u32 FieldScript_ResolveSCRID(u32 zoneId, u16 scriptId, u16 *fileId, u16 *msgArcI
     u32 i;
     u16 zoneScriptFile;
     u16 zoneTextFile;
-    register const GlobalScriptEntry *table;
+    const GlobalScriptEntry *table;
 
     table = GLOBAL_SCRIPT_TABLE;
-    for (i = 0; i < 60; i++) {
+    for (i = 0; i < NELEMS(GLOBAL_SCRIPT_TABLE); i++) {
         if (scriptId >= table[i].start) {
             GFL_ASSERT_MSG(scriptId <= table[i].end, "id=%d end=%d", scriptId, table[i].end);
             *fileId = table[i].fileId;
@@ -415,13 +605,13 @@ u32 FieldScript_ResolveSCRID(u32 zoneId, u16 scriptId, u16 *fileId, u16 *msgArcI
         zoneScriptFile = ZoneData_GetScriptDatID(zoneId);
         zoneTextFile = ZoneData_GetTextDatID(zoneId);
         *fileId = zoneScriptFile;
-        *msgArcId = 3;
+        *msgArcId = ARCID_SCRIPT_MESSAGE;
         *msgFileNo = zoneTextFile;
         return (u16)(scriptId - 1);
     }
-    *fileId = 0x4ce;
-    *msgArcId = 3;
-    *msgFileNo = 0xd0;
+    *fileId = SCRIPTS_GLOBAL_2000;
+    *msgArcId = ARCID_SCRIPT_MESSAGE;
+    *msgFileNo = SCRIPT_TEXT_GLOBAL_10520;
     return 0;
 }
 
@@ -437,7 +627,7 @@ void *FieldScript_LoadData(u16 fileId, HeapID heapId) {
     void *data = NULL;
 
     if (source == SCRIPT_SOURCE_ARCHIVE) {
-        data = GFL_ArcSysReadHeapNewLZ(0x38, fileId, FALSE, heapId);
+        data = GFL_ArcSysReadHeapNewLZ(ARCID_EVENT_SCRIPT, fileId, FALSE, heapId);
     }
     return data;
 }
@@ -460,16 +650,16 @@ u32 FieldScript_IsVMFeatureSetReduced(u32 featureLevel) {
 }
 
 void FieldScript_ThrowOpcodeAccessError(void) {
-    if (func_02042788()) {
-        func_020428a0();
-        func_02042860(0);
-        func_020429f0();
+    if (GFL_NetIsInitialized()) {
+        GFL_NetCancelEnd();
+        GFL_NetExit(0);
+        GFL_NetIwFree();
         do {
-            func_020428e0();
-        } while (!func_020427a4());
+            GFL_NetMainWhileWaiting();
+        } while (!GFL_NetIsEnded());
     }
     while (TRUE) {
-        func_02005430();
+        Machine_ProcessExitRequest();
     }
 }
 

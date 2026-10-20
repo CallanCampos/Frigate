@@ -15,28 +15,28 @@
 
 static u32 getAnswerIndex(u16 question, int answer);
 
-u32 func_0200ec00(void) {
+u32 SurveySave_GetSize(void) {
     return sizeof(SurveySave);
 }
 
-void func_0200ec08(SurveySave *survey) {
+void SurveySave_Init(SurveySave *survey) {
     MI_CpuFill8(survey, 0, sizeof(SurveySave));
     survey->questions[0] = 0;
     survey->questions[1] = 8;
     survey->questions[2] = 29;
 }
 
-SurveySave *func_0200ec2c(SaveControl *save) {
+SurveySave *SurveySave_Get(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_SURVEY);
 }
 
-u8 *func_0200ec38(SurveySave *survey) {
+u8 *SurveySave_GetOwnAnswers(SurveySave *survey) {
     return survey->ownAnswers;
 }
 
-u32 func_0200ec3c(u8 *answers, u8 question) {
-    u32 offset = func_02011478(question);
-    u32 count = func_02011450(question);
+u32 SurveySave_ReadAnswer(u8 *answers, u8 question) {
+    u32 offset = SurveyQuestion_GetFirstBit(question);
+    u32 count = SurveyQuestion_GetBitCount(question);
     u32 byte = offset / 8;
     u32 bit = offset % 8;
     u32 answer = 0;
@@ -54,9 +54,9 @@ u32 func_0200ec3c(u8 *answers, u8 question) {
     return answer;
 }
 
-void func_0200ec80(u8 *answers, u8 question, u32 answer) {
-    u32 offset = func_02011478(question);
-    u32 count = func_02011450(question);
+void SurveySave_WriteAnswer(u8 *answers, u8 question, u32 answer) {
+    u32 offset = SurveyQuestion_GetFirstBit(question);
+    u32 count = SurveyQuestion_GetBitCount(question);
     u32 byte = offset / 8;
     u32 bit = offset % 8;
 
@@ -72,51 +72,51 @@ void func_0200ec80(u8 *answers, u8 question, u32 answer) {
     }
 }
 
-void func_0200ecd8(SurveySave *survey, u8 question, u32 index) {
+void SurveySave_SetQuestion(SurveySave *survey, u8 question, u32 index) {
     survey->questions[index] = question;
 }
 
-u8 func_0200ece4(SurveySave *survey, u32 index) {
+u8 SurveySave_GetQuestion(SurveySave *survey, u32 index) {
     return survey->questions[index];
 }
 
-u16 func_0200ecf0(SurveySave *survey, int question) {
+u16 SurveySave_GetTodayCount(SurveySave *survey, int question) {
     return survey->todayCounts[question];
 }
 
-void func_0200ecf8(SurveySave *survey, u32 question, u32 count) {
+void SurveySave_AddTodayCount(SurveySave *survey, u32 question, u32 count) {
     survey->todayCounts[question] += (u16)count;
     if (survey->todayCounts[question] > SURVEY_TODAY_COUNT_MAX) {
         survey->todayCounts[question] = SURVEY_TODAY_COUNT_MAX;
     }
 }
 
-u32 func_0200ed14(SurveySave *survey, int question) {
+u32 SurveySave_GetTotalCount(SurveySave *survey, int question) {
     return survey->totalCounts[question];
 }
 
 // Answers are numbered from 1
 static u32 getAnswerIndex(u16 question, int answer) {
-    u32 first = func_02011464(question);
+    u32 first = SurveyQuestion_GetFirstAnswer(question);
 
     return first + (answer - 1);
 }
 
-BOOL func_0200ed34(SurveySave *survey, u16 question, int answer) {
-    if (func_0200ed48(survey, question, answer) >= SURVEY_TODAY_ANSWER_MAX) {
+BOOL SurveySave_IsTodayAnswerFull(SurveySave *survey, u16 question, int answer) {
+    if (SurveySave_GetTodayAnswerCount(survey, question, answer) >= SURVEY_TODAY_ANSWER_MAX) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_0200ed48(SurveySave *survey, u16 question, int answer) {
+u32 SurveySave_GetTodayAnswerCount(SurveySave *survey, u16 question, int answer) {
     if (answer == 0) {
         return 0;
     }
     return survey->todayAnswers[getAnswerIndex(question, answer)];
 }
 
-void func_0200ed64(SurveySave *survey, u16 question, int answer, int count) {
+void SurveySave_AddTodayAnswerCount(SurveySave *survey, u16 question, int answer, int count) {
     u32 index;
 
     if (answer == 0) {
@@ -130,7 +130,7 @@ void func_0200ed64(SurveySave *survey, u16 question, int answer, int count) {
     }
 }
 
-u32 func_0200ed90(SurveySave *survey, u16 question, int answer) {
+u32 SurveySave_GetTotalAnswerCount(SurveySave *survey, u16 question, int answer) {
     if (answer == 0) {
         return 0;
     }
@@ -138,7 +138,7 @@ u32 func_0200ed90(SurveySave *survey, u16 question, int answer) {
 }
 
 // Adds today's counts to the totals and clears them
-void func_0200edb0(SurveySave *survey) {
+void SurveySave_FinishDay(SurveySave *survey) {
     int i;
 
     for (i = 0; i < SURVEY_QUESTION_COUNT; i++) {

@@ -128,7 +128,7 @@ static const CursorMoveData sZknSearchCursorData[] = {
 };
 
 void ZknSearchUI_InitCursor(ZknSearchWork *wk, u32 pos) {
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         wk->cursorMove =
             CursorMove_Create(sZknSearchCursorData, &sZknSearchCursorCallbacks, wk, FALSE, pos, HEAPID_ZUKAN_SEARCH);
     } else {
@@ -163,35 +163,35 @@ u32 ZknSearchUI_Main(ZknSearchWork *wk) {
         return ret;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNSEARCH_UI_EXIT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_Y) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNSEARCH_UI_SHORTCUT;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ZknSearchUI_MoveCursor(wk, ZKNSEARCH_UI_START);
         return ZKNSEARCH_UI_START;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         ZknSearchUI_MoveCursor(wk, ZKNSEARCH_UI_RESET);
         return ZKNSEARCH_UI_RESET;
     }
     // Any other key only shows the cursor again
-    if (GCTX_HIDGetPressedKeys() != 0 && func_0203d554() == TRUE) {
-        func_0203d564(FALSE);
+    if (GCTX_HIDGetPressedKeys() != 0 && GCTX_HIDIsUsingTouch() == TRUE) {
+        GCTX_HIDSetUsingTouch(FALSE);
         CursorMove_SetCursorVisible(wk->cursorMove, TRUE);
         return CURSOR_MOVE_CURSOR_ON;
     }
@@ -246,13 +246,13 @@ BOOL ZknSearchUI_WaitResult(ZknSearchWork *wk) {
         return TRUE;
     }
     wk->timer++;
-    if (func_0203da48()) {
-        func_0203d564(TRUE);
+    if (GFL_HIDIsTouchPressed()) {
+        GCTX_HIDSetUsingTouch(TRUE);
         wk->timer = 0;
         return TRUE;
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         wk->timer = 0;
         return TRUE;
     }
@@ -260,23 +260,23 @@ BOOL ZknSearchUI_WaitResult(ZknSearchWork *wk) {
 }
 
 int ZknSearchUI_ListMain(ZknSearchWork *wk) {
-    int ret = func_0203da0c(sZknSearchListTouch);
+    int ret = GFL_HIDGetTouchPressedRect(sZknSearchListTouch);
 
     if (ret != -1) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return ret;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNSEARCH_UI_LIST_CANCEL;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNSEARCH_UI_LIST_CANCEL;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        if (func_0203d554() == TRUE) {
-            func_0203d564(FALSE);
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
+            GCTX_HIDSetUsingTouch(FALSE);
             FrameList_ShowCursor(wk->frameList);
         }
         return ZKNSEARCH_UI_LIST_RESET;
@@ -285,23 +285,23 @@ int ZknSearchUI_ListMain(ZknSearchWork *wk) {
 }
 
 int ZknSearchUI_ShapeListMain(ZknSearchWork *wk) {
-    int ret = func_0203da0c(sZknSearchShapeListTouch);
+    int ret = GFL_HIDGetTouchPressedRect(sZknSearchShapeListTouch);
 
     if (ret != -1) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return ret;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNSEARCH_UI_LIST_CANCEL;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_START) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return ZKNSEARCH_UI_LIST_CANCEL;
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-        if (func_0203d554() == TRUE) {
-            func_0203d564(FALSE);
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
+            GCTX_HIDSetUsingTouch(FALSE);
             FrameList_ShowCursor(wk->frameList);
         }
         return ZKNSEARCH_UI_LIST_RESET;

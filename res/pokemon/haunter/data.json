@@ -1,0 +1,191 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Haunter",
+    "pokedex": {
+        "category": "Gas Pokémon",
+        "entry": "It likes to lurk in the dark and tap\nshoulders with a gaseous hand. Its\ntouch causes endless shuddering.",
+        "height": "5'03\"",
+        "weight": "0.2 lbs.",
+        "languages": {
+            "en": {
+                "name": "Haunter",
+                "category": "Gas Pokémon",
+                "entry": "It likes to lurk in the dark and tap\nshoulders with a gaseous hand. Its\ntouch causes endless shuddering.",
+                "height": "5'03\"",
+                "weight": "0.2 lbs."
+            },
+            "fr": {
+                "name": "Spectrum",
+                "category": "Pokémon Gaz",
+                "entry": "Il adore se tapir dans l'ombre et\nfaire frissonner ses proies en leur\ntouchant l'épaule.",
+                "height": "1,6 m",
+                "weight": "0,1 kg"
+            },
+            "de": {
+                "name": "Alpollo",
+                "category": "Gas",
+                "entry": "Lauert in der Dunkelheit. Die\nBerührung seiner gasförmigen\nHand erzeugt endloses Schaudern.",
+                "height": "1,6 m",
+                "weight": "0,1 kg"
+            },
+            "it": {
+                "name": "Haunter",
+                "category": "Pokémon Gas",
+                "entry": "Adora tendere agguati in luoghi bui.\nIl suo tocco causa brividi incontenibili.",
+                "height": "1,6 m",
+                "weight": "0,1 kg"
+            },
+            "ko": {
+                "name": "고우스트",
+                "category": "가스포켓몬",
+                "entry": "어둠을 틈타 가스로 된 손을 뻗쳐\n사람의 어깨를 두드리기 좋아한다.\n그 손에 닿으면 떨림이 멈추지 않는다.",
+                "height": "1.6 m",
+                "weight": "0.1 kg"
+            },
+            "es": {
+                "name": "Haunter",
+                "category": "Pokémon Gas",
+                "entry": "Le gusta acechar en la oscuridad y tocar\nel hombro a sus víctimas, que se quedan\ntemblando para siempre.",
+                "height": "1,6 m",
+                "weight": "0,1 kg"
+            },
+            "ja": {
+                "name": "ゴースト",
+                "category": "ガスじょうポケモン",
+                "entry": "くらやみにまぎれ\\x{3000}ガスのてを\\x{3000}のばし\nひとのかたを\\x{3000}たたくのが\\x{3000}すき。\nさわられると\\x{3000}ふるえが\\x{3000}とまらない。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff16}\\x{ff4d}",
+                "weight": "\\x{ff10}\\x{ff0e}\\x{ff11}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 45,
+        "attack": 50,
+        "defense": 45,
+        "speed": 95,
+        "special_attack": 115,
+        "special_defense": 55
+    },
+    "types": [ "TYPE_GHOST", "TYPE_POISON" ],
+    "catch_rate": 90,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 2,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_MEDIUM_SLOW",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_LEVITATE", "ABILITY_NONE" ],
+    "hidden_ability": "ABILITY_NONE",
+    "flee_rate": 90,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 142,
+    "height": 16,
+    "weight": 1,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_HYPNOSIS" ],
+            [ 1, "MOVE_LICK" ],
+            [ 1, "MOVE_SPITE" ],
+            [ 5, "MOVE_SPITE" ],
+            [ 8, "MOVE_MEAN_LOOK" ],
+            [ 12, "MOVE_CURSE" ],
+            [ 15, "MOVE_NIGHT_SHADE" ],
+            [ 19, "MOVE_CONFUSE_RAY" ],
+            [ 22, "MOVE_SUCKER_PUNCH" ],
+            [ 25, "MOVE_SHADOW_PUNCH" ],
+            [ 28, "MOVE_PAYBACK" ],
+            [ 33, "MOVE_SHADOW_BALL" ],
+            [ 39, "MOVE_DREAM_EATER" ],
+            [ 44, "MOVE_DARK_PULSE" ],
+            [ 50, "MOVE_DESTINY_BOND" ],
+            [ 55, "MOVE_HEX" ],
+            [ 61, "MOVE_NIGHTMARE" ]
+        ],
+        "by_tm": [
+            "TM06",
+            "TM09",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM36",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM53",
+            "TM56",
+            "TM61",
+            "TM63",
+            "TM64",
+            "TM65",
+            "TM66",
+            "TM77",
+            "TM84",
+            "TM85",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_UPROAR",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_FOUL_PLAY",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_GIGA_DRAIN",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_WONDER_ROOM",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": []
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_TRADE",
+            "param": 0,
+            "species": "SPECIES_GENGAR"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_GASTLY",
+    "cry_volume": 110
+}

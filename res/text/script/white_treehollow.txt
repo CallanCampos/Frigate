@@ -1,0 +1,8 @@
+WhiteTreehollow_Text_ArghDoingVeryWell = Argh!\nI was doing very well. I was so close!{be00}\nBut I lost.{be01}\nI shouldn't have forced myself to battle\nand should have looked for a Nurse.{be01}\nThe White Treehollow is not known as\nUnova's Challenge for nothing.
+WhiteTreehollow_Text_HeardAlreadyClearedArea = I heard you already cleared\nArea 5!{be01}\nArgh! I have to keep up!\nI'll catch up with you soon!
+WhiteTreehollow_Text_HeyHeardFinishedAll = Hey, you! I heard you finished\nall of the Areas.{be01}\nI can't believe it...\nBut anyway, congratulations!
+WhiteTreehollow_Text_WhatThereLowestLevel = What is there at the lowest level of\nUnova's Challenge,{be00}\nthe White Treehollow...?{be01}\n...Hmm. I will be the first one\nto solve the mystery!
+WhiteTreehollow_Text_HeHeHeListen = He he he! Listen!\nI finally went to Area 3!{be01}\n...What? You already cleared Area 5?\nThere's always somebody above me...
+WhiteTreehollow_Text_HeHeGoingThrough = He he! Going through fierce battles,\nI finally cleared the Area!{be00}\nThat dangerous Area 5!{be01}\n...You.\nDid you go to the lowest level?{be01}\nHaha... You're something...{be01}\n...Someday, I want to see\nthe lowest level with my own eyes, too...
+WhiteTreehollow_Text_WhatTrainerNamedBenga = What? That Trainer named Benga is\nAlder's grandson?{be01}\nI should ask Alder in Floccesy Town\nto train me, too.
+\pad{4c}

@@ -25,7 +25,7 @@ struct VCTPacket {
     u8 *data;
 };
 
-// vct_dsp.c: packet memory, microphone levels and echo
+// vct_packet_pool.c: packet memory; vct_vad.c: microphone levels; vct_dsp.c: the filter and the echo; vct_mixer.c
 BOOL VCT_InitPacketPool(void *buffer, u32 size);
 void VCT_ClearPacketPool(void);
 VCTPacket *VCT_AllocPacket(void);

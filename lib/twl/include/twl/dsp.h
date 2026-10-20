@@ -18,8 +18,9 @@ BOOL DSP_OpenStaticComponentG711Core(FSFile *file);
 BOOL DSP_LoadG711Core(FSFile *file, int slotB, int slotC);
 void DSP_UnloadG711Core(void);
 
-// The COFF images of the G.711 and the graphics component, in the LTD autoload's .rodata after its code, which no
-// source file owns yet. The openers hand them to the file system as memory files with this size, more than they are
+// The COFF images of the G.711 and the graphics component, in the LTD autoload's .rodata after its code
+// (dsp_g711_image.c, dsp_graphics_image.c). The openers hand them to the file system as memory files of this size,
+// more than either image takes
 #define DSP_COMPONENT_IMAGE_SIZE 0x1000000
 extern const u8 DSP_G711Image[];
 extern const u8 DSP_GraphicsImage[];

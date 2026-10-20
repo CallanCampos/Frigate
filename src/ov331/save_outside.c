@@ -84,10 +84,10 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
         loaded[i] = FALSE;
         broken[i] = FALSE;
     }
-    loaded[BLOCK_GIFTS] = func_0203bf30(GIFTS_ADDR, blocks[BLOCK_GIFTS], sizeof(SaveOutsideGiftsBlock));
+    loaded[BLOCK_GIFTS] = BackupSystem_Read(GIFTS_ADDR, blocks[BLOCK_GIFTS], sizeof(SaveOutsideGiftsBlock));
     loaded[BLOCK_GIFTS_BACKUP] =
-        func_0203bf30(GIFTS_BACKUP_ADDR, blocks[BLOCK_GIFTS_BACKUP], sizeof(SaveOutsideGiftsBlock));
-    loaded[BLOCK_KEYS] = func_0203bf30(KEYS_ADDR, blocks[BLOCK_KEYS], sizeof(SaveOutsideKeysBlock));
+        BackupSystem_Read(GIFTS_BACKUP_ADDR, blocks[BLOCK_GIFTS_BACKUP], sizeof(SaveOutsideGiftsBlock));
+    loaded[BLOCK_KEYS] = BackupSystem_Read(KEYS_ADDR, blocks[BLOCK_KEYS], sizeof(SaveOutsideKeysBlock));
     blocks[BLOCK_GIFTS]->size = sizeof(SaveOutsideGifts);
     blocks[BLOCK_GIFTS_BACKUP]->size = sizeof(SaveOutsideGifts);
     blocks[BLOCK_KEYS]->size = KEY_DATA_SIZE;
@@ -144,10 +144,10 @@ SaveOutside *SaveOutside_Load(HeapID heapId) {
     work->keysLoaded = FALSE;
     work->keysBroken = FALSE;
     if (loaded[BLOCK_KEYS] == FALSE) {
-        func_02010448(work->keys.data);
+        KeySystemData_Init(work->keys.data);
     } else if (broken[BLOCK_KEYS] == TRUE) {
         work->keysBroken = TRUE;
-        func_02010448(work->keys.data);
+        KeySystemData_Init(work->keys.data);
     } else {
         work->keysLoaded = TRUE;
     }
@@ -192,20 +192,20 @@ BOOL SaveOutside_Save(SaveOutside *work) {
     switch (work->saveSeq) {
     case 0:
     case 2:
-        work->lockId =
-            func_0203bf00(work->saveSlot == 0 ? GIFTS_ADDR : GIFTS_BACKUP_ADDR, work, sizeof(SaveOutsideGiftsBlock));
+        work->lockId = BackupSystem_WriteStart(work->saveSlot == 0 ? GIFTS_ADDR : GIFTS_BACKUP_ADDR, work,
+                                               sizeof(SaveOutsideGiftsBlock));
         work->saveSeq++;
         break;
     case 1:
     case 3:
     case 5:
-        if (func_0203bf18(work->lockId, &result) == TRUE) {
+        if (BackupSystem_FinishWrite(work->lockId, &result) == TRUE) {
             work->saveSlot ^= 1;
             work->saveSeq++;
         }
         break;
     case 4:
-        work->lockId = func_0203bf00(KEYS_ADDR, &work->keys, sizeof(SaveOutsideKeysBlock));
+        work->lockId = BackupSystem_WriteStart(KEYS_ADDR, &work->keys, sizeof(SaveOutsideKeysBlock));
         work->saveSeq++;
         break;
     default:
@@ -254,7 +254,7 @@ void SaveOutside_Erase(HeapID heapId) {
     void *buf = GFL_HeapAllocate(heapId, SAVE_OUTSIDE_SIZE, FALSE, "save_outside.c", 431);
 
     MIi_CpuClear32(0xffffffff, buf, SAVE_OUTSIDE_SIZE);
-    func_0203bee8(GIFTS_ADDR, buf, SAVE_OUTSIDE_SIZE);
+    BackupSystem_WriteWait(GIFTS_ADDR, buf, SAVE_OUTSIDE_SIZE);
     GFL_HeapFree(buf);
 }
 
@@ -262,7 +262,7 @@ void SaveOutside_EraseKeys(HeapID heapId) {
     void *buf = GFL_HeapAllocate(heapId, KEYS_SIZE, FALSE, "save_outside.c", 448);
 
     MIi_CpuClear32(0xffffffff, buf, KEYS_SIZE);
-    func_0203bee8(KEYS_ADDR, buf, KEYS_SIZE);
+    BackupSystem_WriteWait(KEYS_ADDR, buf, KEYS_SIZE);
     GFL_HeapFree(buf);
 }
 
@@ -279,7 +279,7 @@ void *SaveOutside_GetKeyData(SaveOutside *work) {
 }
 
 void SaveOutside_CopyKeysToSave(SaveOutside *work, SaveControl *save) {
-    KeyInfoSave *keyInfo = func_0201046c(SaveOutside_GetKeyData(work));
+    KeyInfoSave *keyInfo = KeySystemData_GetKeyInfo(SaveOutside_GetKeyData(work));
 
-    func_02010490(getKeyInfoSaveBlk(save), keyInfo);
+    KeyInfoSave_Copy(getKeyInfoSaveBlk(save), keyInfo);
 }

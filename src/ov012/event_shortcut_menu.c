@@ -2,7 +2,7 @@
 #include "constants/pokemon.h"
 #include "field/field.h"
 #include "field/field_actor.h"
-#include "field/field_menu.h"
+#include "field/field_msgbg.h"
 #include "field/field_script.h"
 #include "field/field_script_event.h"
 #include "field/hidden_event.h"
@@ -11,7 +11,6 @@
 #include "field/player_action.h"
 #include "field/player_state.h"
 #include "field/shortcut_menu.h"
-#include "field/subscreen.h"
 #include "gfl/graphics.h"
 #include "gfl/heap.h"
 #include "gfl/key.h"
@@ -23,47 +22,6 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
-
-u32 func_ov012_0215aa68(u32 index) {
-    return data_ov012_0216cb74[index];
-}
-
-BOOL func_ov012_0215aa74(FieldAppCallInput *input, void *arg) {
-    FieldMenuWork *menu = arg;
-    FieldSubscreen *subscreen = Field_GetSubscreen(menu->field);
-
-    if (input->eventType == 0) {
-        func_ov036_0219886c(subscreen, menu->unk10);
-    }
-    return TRUE;
-}
-
-BOOL func_ov012_0215aa90(FieldAppCallInput *input, void *arg) {
-    return TRUE;
-}
-
-BOOL func_ov012_0215aa94(FieldAppCallInput *input, void *arg) {
-    FieldMenuWork *menu = arg;
-    GameData *gameData = GSYS_GetGameData(menu->gameSystem);
-
-    switch (input->eventType) {
-    case 4:
-        GameData_SetLastSubscreen(gameData, 6);
-        break;
-    case 0:
-        GameData_SetLastSubscreen(gameData, 1);
-        break;
-    case 5:
-        GameData_SetLastSubscreen(gameData, 0);
-        break;
-    case 1:
-    case 2:
-    case 3:
-        GameData_SetLastSubscreen(gameData, menu->screenId);
-        break;
-    }
-    return TRUE;
-}
 
 BOOL IsExistAnyYShortcut(GameSystem *gsys) {
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -97,12 +55,12 @@ GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code) {
     work->input->parent = event;
     work->input->appParam = -1;
     if (ShortcutSave_GetShortcutCount(shortcut) != 1) {
-        work->input->canRetry = func_ov012_0215b32c;
-        work->input->callback1 = func_ov012_0215b39c;
+        work->input->canRetry = ShortcutMenu_CanRetry;
+        work->input->callback1 = ShortcutMenu_CanLeaveField;
         work->input->arg = work;
     }
     DisableAllActorsMovement(Field_GetActorSystem(work->field));
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     return event;
 }
 
@@ -126,7 +84,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         *state = 1;
         break;
     case 1:
-        func_ov012_0215b284(0, work);
+        ShortcutMenu_Open(0, work);
         *state = 2;
         break;
     case 2:
@@ -185,14 +143,14 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         }
         break;
     case 7:
-        if (func_ov012_0215b2d0(work)) {
+        if (ShortcutMenu_Close(work)) {
             GFL_HeapFree(work->input);
             EnableAllActorsMovement(Field_GetActorSystem(work->field));
             return GAMEEVENT_DONE;
         }
         break;
     case 8:
-        func_ov012_0215b284(1, work);
+        ShortcutMenu_Open(1, work);
         *state = 4;
         break;
     case 9:
@@ -215,7 +173,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         }
         break;
     case 11:
-        if (func_ov012_0215b2d0(work)) {
+        if (ShortcutMenu_Close(work)) {
             id = work->input->eventId;
             GFL_HeapFree(work->input);
             work->input = NULL;
@@ -224,7 +182,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         }
         break;
     case 12:
-        if (func_ov012_0215b2d0(work)) {
+        if (ShortcutMenu_Close(work)) {
             EventFieldItemUseBlock_Call(event, work->gameSystem, work->input->eventId, work->blocked);
             GFL_HeapFree(work->input);
             work->input = NULL;
@@ -235,7 +193,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
     case 14:
-        if (func_ov012_0215b2d0(work)) {
+        if (ShortcutMenu_Close(work)) {
             GFL_HeapFree(work->input);
             work->input = NULL;
             GameEvent_ChainNext(event, EventFieldItemUseBlock_Create(work->gameSystem, 2, 0));
@@ -248,7 +206,7 @@ GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *sta
     case 16:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
-        func_ov012_02159418(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
+        HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
         next = CreateHidenEvent(work->input->eventId, &args, &possibilities);
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
@@ -310,7 +268,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         return GAMEEVENT_DONE;
     case 2:
-        if (func_ov012_0215b2d0(work)) {
+        if (ShortcutMenu_Close(work)) {
             GameEvent_ChainNext(event, EventFieldAppCall_Create(work->input, work->code));
             *state = 3;
         }
@@ -354,7 +312,7 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
     case 9:
         EnableAllActorsMovement(Field_GetActorSystem(work->field));
         CalcPlayerActionPossibilities(work->field, &possibilities);
-        func_ov012_02159418(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
+        HiddenEventArgs_Set(&args, work->input->partySlot, work->input->eventId, work->input->eventValue);
         next = CreateHidenEvent(work->input->eventId, &args, &possibilities);
         if (next != NULL) {
             GameEvent_ChainNext(event, next);
@@ -538,22 +496,24 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
     }
 }
 
-void func_ov012_0215b284(u32 arg0, ShortcutMenuWork *work) {
+void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
     GameData *gameData;
     u16 *param;
+    void *msgBGSys;
 
     if (work->app == NULL && work->done == 0) {
         GFL_BGSysSetBGEnabled(1, 0);
-        if (Field_GetMsgBGSys(work->field)) {
-            func_ov036_02187834();
+        msgBGSys = Field_GetMsgBGSys(work->field);
+        if (msgBGSys != NULL) {
+            func_ov036_02187834(msgBGSys);
         }
         gameData = GSYS_GetGameData(work->gameSystem);
-        param = func_02017670(gameData);
+        param = GameData_GetShortcutMenuPos(gameData);
         work->app = func_ov036_021bedd8(gameData, arg0, param, 0x50, 0x15);
     }
 }
 
-BOOL func_ov012_0215b2d0(ShortcutMenuWork *work) {
+BOOL ShortcutMenu_Close(ShortcutMenuWork *work) {
     if (work->done == 0) {
         switch (work->state) {
         case 0:
@@ -567,8 +527,7 @@ BOOL func_ov012_0215b2d0(ShortcutMenuWork *work) {
             }
             break;
         case 1:
-            Field_GetMsgBGSys(work->field);
-            func_ov036_02187888();
+            func_ov036_02187888(Field_GetMsgBGSys(work->field));
             work->state = 2;
             break;
         case 2:
@@ -580,7 +539,7 @@ BOOL func_ov012_0215b2d0(ShortcutMenuWork *work) {
     return TRUE;
 }
 
-BOOL func_ov012_0215b32c(FieldAppCallInput *input, void *arg) {
+BOOL ShortcutMenu_CanRetry(FieldAppCallInput *input, void *arg) {
     ShortcutMenuWork *work = arg;
     GameData *gameData;
     SaveControl *save;
@@ -597,7 +556,7 @@ BOOL func_ov012_0215b32c(FieldAppCallInput *input, void *arg) {
         } else if (input->eventType == 1 || input->eventType == 3 || input->eventType == 2 || input->eventType == 5) {
             work->state = 2;
         } else {
-            func_ov012_0215b284(1, work);
+            ShortcutMenu_Open(1, work);
             work->state = 1;
         }
         break;
@@ -613,8 +572,8 @@ BOOL func_ov012_0215b32c(FieldAppCallInput *input, void *arg) {
     return FALSE;
 }
 
-BOOL func_ov012_0215b39c(FieldAppCallInput *input, void *arg) {
-    return func_ov012_0215b2d0(arg);
+BOOL ShortcutMenu_CanLeaveField(FieldAppCallInput *input, void *arg) {
+    return ShortcutMenu_Close(arg);
 }
 
 void EventFieldItemUseBlock_Call(GameEvent *parent, GameSystem *gsys, u32 action, u32 kind) {

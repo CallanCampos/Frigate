@@ -117,7 +117,7 @@ PkwdBookGraphic *PkwdBookGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     PkwdBookBG_Init(&graphic->bg, heapId);
     PkwdBookClAct_Init(&graphic->clact, &sPkwdBookVRAMConfig, heapId);
     graphic->paletteFade = PaletteFade_Create(heapId);
@@ -130,7 +130,7 @@ void PkwdBookGraphic_Free(PkwdBookGraphic *graphic) {
     PkwdBookClAct_Free(&graphic->clact);
     PkwdBookBG_Free(&graphic->bg);
     PaletteFade_Free(graphic->paletteFade);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -197,24 +197,24 @@ static void PkwdBookBG_VBlank(PkwdBookBG *bg) {
 static void PkwdBookClAct_Init(PkwdBookClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(PkwdBookClAct));
     ClActSys_Create(&sPkwdBookClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void PkwdBookClAct_Free(PkwdBookClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(PkwdBookClAct));
 }
 
 static void PkwdBookClAct_Update(PkwdBookClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void PkwdBookClAct_VBlank(PkwdBookClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *PkwdBookClAct_GetUnit(PkwdBookClAct *clact) {

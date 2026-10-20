@@ -81,7 +81,7 @@ void func_ov036_0219f178(Field *field, VecFx32 *pos) {
 }
 
 static void func_ov036_0219f180(Field *field) {
-    func_ov012_02166f2c(FieldPlayer_GetActor(Field_GetPlayer(field)));
+    FldAct_FreeAcmd(FieldPlayer_GetActor(Field_GetPlayer(field)));
 }
 
 GameEvent *func_ov036_0219f190(WarpSequence *warp) {
@@ -431,7 +431,7 @@ static void func_ov036_0219f7c0(Field *field, VecFx32 *pos) {
 // On the grid: a tile in front of the player, at the map's height there
 static void func_ov036_0219f7e4(Field *field, VecFx32 *pos) {
     FieldPlayer *player = Field_GetPlayer(field);
-    u32 dir = FieldPlayer_GetFaceDir(player);
+    u16 dir = FieldPlayer_GetFaceDir(player);
     VecFx32 playerPos;
     VecFx32 dirVec;
     VecFx32 front;

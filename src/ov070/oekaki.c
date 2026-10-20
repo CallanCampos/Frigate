@@ -46,9 +46,6 @@
 // in a frame and sends it back to all of them, so that each machine draws the same lines; a newcomer gets the
 // picture so far in chunks. Names are ours
 
-// The screen's graphics
-#define OEKAKI_ARCID 188
-
 #define OEKAKI_COLOR_TEXT PRINT_COLOR(1, 2, 15)
 #define OEKAKI_COLOR_NAME_MINE PRINT_COLOR(3, 4, 0)
 
@@ -218,7 +215,7 @@ static BOOL Oekaki_Init(GameProc *proc, u32 *state, void *param, void *work) {
         Oekaki_InitBG();
         GFL_WipeSet(WIPE_MODE_BOTH, 9, 9, WIPE_COLOR_BLACK, 16, 1, HEAPID_OEKAKI);
         wk->param = param;
-        arc = GFL_ArcSysCreateFileHandle(OEKAKI_ARCID, HEAPID_OEKAKI);
+        arc = GFL_ArcSysCreateFileHandle(ARCID_OEKAKI, HEAPID_OEKAKI);
         Oekaki_LoadGraphics(wk, arc);
         wk->vblankTcb = GFL_VBlankTCBAdd(Oekaki_VBlank, wk, 0);
         Oekaki_InitWork(wk);
@@ -228,7 +225,7 @@ static BOOL Oekaki_Init(GameProc *proc, u32 *state, void *param, void *work) {
         Oekaki_ShowScreens();
         OekakiComm_AddCommands(wk);
         Oekaki_RecordMetTrainers(wk);
-        func_02042ba8(TRUE, HEAPID_OEKAKI);
+        GFL_NetSetIconScreen(TRUE, HEAPID_OEKAKI);
         GFL_ArcToolFree(arc);
         (*state)++;
         break;
@@ -243,7 +240,7 @@ static BOOL Oekaki_Main(GameProc *proc, u32 *state, void *param, void *work) {
     OekakiWork *wk = work;
 
     // The parent forgets the leaving children that are gone
-    if (func_0203ffc4() == 0 && wk->leavingBits != 0) {
+    if (NetSystem_GetNetId() == 0 && wk->leavingBits != 0) {
         wk->leavingBits &= Oekaki_GetJoined(wk);
     }
     wk->procSeq = *state;
@@ -252,7 +249,7 @@ static BOOL Oekaki_Main(GameProc *proc, u32 *state, void *param, void *work) {
     case OEKAKI_PROC_SEQ_FADE_IN:
         if (GFL_WipeIsFinished()) {
             UnionApp_SetCallbacks(wk->param->app, Oekaki_OnJoin, Oekaki_OnLeave, wk);
-            if (func_0203ffc4() == 0) {
+            if (NetSystem_GetNetId() == 0) {
                 OekakiComm_LimitEntry(wk, 1);
             }
             *state = OEKAKI_PROC_SEQ_MAIN;
@@ -263,7 +260,7 @@ static BOOL Oekaki_Main(GameProc *proc, u32 *state, void *param, void *work) {
             *state = sSeqTable[wk->seq].func(wk, *state);
         }
         Oekaki_PrintNames(wk->nameWindows, OEKAKI_COLOR_TEXT, wk);
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             int next = Oekaki_UpdateParent(wk);
 
             if (*state == OEKAKI_PROC_SEQ_MAIN) {
@@ -279,7 +276,7 @@ static BOOL Oekaki_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     case OEKAKI_PROC_SEQ_FADE_OUT:
         if (GFL_WipeIsFinished()) {
-            func_02040c64(OEKAKI_NET_CMD_BASE);
+            NetCommand_RemoveTable(OEKAKI_NET_CMD_BASE);
             UnionApp_RequestStart(wk->param->app);
             *state = OEKAKI_PROC_SEQ_START_WAIT;
         }
@@ -291,7 +288,7 @@ static BOOL Oekaki_Main(GameProc *proc, u32 *state, void *param, void *work) {
         break;
     }
     Oekaki_SendRequest(wk);
-    func_0204b794();
+    ClActSys_Draw();
     GFL_TCBExMgrUpdate(wk->tcbManager);
     Oekaki_FlushPrint(wk);
     if (GFL_WipeIsFinished() && GFL_NetErrCheck()) {
@@ -306,17 +303,17 @@ static BOOL Oekaki_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     switch (*state) {
     case 0:
         GFL_TCBRemove(wk->vblankTcb);
-        func_0204b98c(wk->resources[OEKAKI_RES_SUB].chars);
-        func_0204bcd0(wk->resources[OEKAKI_RES_SUB].palette);
-        func_0204be64(wk->resources[OEKAKI_RES_SUB].cellAnims);
-        func_0204b98c(wk->resources[OEKAKI_RES_COMMON].chars);
-        func_0204bcd0(wk->resources[OEKAKI_RES_COMMON].palette);
-        func_0204be64(wk->resources[OEKAKI_RES_COMMON].cellAnims);
-        func_0204b98c(wk->resources[OEKAKI_RES_MAIN].chars);
-        func_0204bcd0(wk->resources[OEKAKI_RES_MAIN].palette);
-        func_0204be64(wk->resources[OEKAKI_RES_MAIN].cellAnims);
-        func_0204bf98(wk->actorUnit);
-        func_0204b758();
+        ClActSys_FreeChars(wk->resources[OEKAKI_RES_SUB].chars);
+        ClActSys_FreePltt(wk->resources[OEKAKI_RES_SUB].palette);
+        ClActSys_FreeCellAnims(wk->resources[OEKAKI_RES_SUB].cellAnims);
+        ClActSys_FreeChars(wk->resources[OEKAKI_RES_COMMON].chars);
+        ClActSys_FreePltt(wk->resources[OEKAKI_RES_COMMON].palette);
+        ClActSys_FreeCellAnims(wk->resources[OEKAKI_RES_COMMON].cellAnims);
+        ClActSys_FreeChars(wk->resources[OEKAKI_RES_MAIN].chars);
+        ClActSys_FreePltt(wk->resources[OEKAKI_RES_MAIN].palette);
+        ClActSys_FreeCellAnims(wk->resources[OEKAKI_RES_MAIN].cellAnims);
+        ClActUnit_Delete(wk->actorUnit);
+        ClActSys_Delete();
         if (wk->menu != NULL) {
             Oekaki_FreeMenu(wk);
         }
@@ -349,14 +346,14 @@ static BOOL Oekaki_Exit(GameProc *proc, u32 *state, void *param, void *work) {
 }
 
 static void Oekaki_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
 static void Oekaki_OnJoin(u8 netId, UnionAppMember *member, void *work) {
     OekakiWork *wk = work;
 
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         Oekaki_RequestSend(wk, OEKAKI_NET_CMD_NEWCOMER, netId);
     }
     Oekaki_RecordMetTrainers(wk);
@@ -509,7 +506,7 @@ static void Oekaki_InitWork(OekakiWork *wk) {
     wk->joining = FALSE;
     wk->joiningBits = 0;
     wk->menu = NULL;
-    func_0203ffc4();
+    NetSystem_GetNetId();
     Oekaki_SetNextSeq(wk, OEKAKI_SEQ_MAIN);
     GFL_MsgDataLoadStrbuf(wk->msgData, EventMapchange_Text_Empty, wk->endBuf);
     wk->buffer = GFL_HeapAllocate(HEAPID_OEKAKI, 0x3c00, FALSE, "oekaki.c", 0x31d);
@@ -555,18 +552,19 @@ static void Oekaki_LoadActorResources(OekakiWork *wk, ArcTool *arc) {
     ArcTool *commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_OEKAKI);
 
     ClActSys_Create(&data_02093f08, &sOekakiVRAMConfig, HEAPID_OEKAKI);
-    wk->actorUnit = func_0204bf1c(53, 1, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_MAIN].chars = func_0204b81c(arc, 3, FALSE, 0, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_MAIN].palette = func_0204bba0(arc, 0, 0, 0, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_MAIN].cellAnims = func_0204bde0(arc, 5, 8, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_COMMON].chars = func_0204b81c(commonArc, func_0202d814(), FALSE, 0, HEAPID_OEKAKI);
+    wk->actorUnit = ClActUnit_Create(53, 1, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_MAIN].chars = ClActSys_LoadChars(arc, 3, FALSE, 0, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_MAIN].palette = ClActSys_LoadPltt(arc, 0, 0, 0, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_MAIN].cellAnims = ClActSys_LoadCellAnims(arc, 5, 8, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_COMMON].chars =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, HEAPID_OEKAKI);
     wk->resources[OEKAKI_RES_COMMON].palette =
-        func_0204bbb8(commonArc, func_0202d810(), 0, 11 * 0x20, 0, 3, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_COMMON].cellAnims =
-        func_0204bde0(commonArc, func_0202d818(0), func_0202d81c(0), HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_SUB].chars = func_0204b81c(arc, 3, FALSE, 1, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_SUB].palette = func_0204bba0(arc, 0, 1, 0, HEAPID_OEKAKI);
-    wk->resources[OEKAKI_RES_SUB].cellAnims = func_0204bde0(arc, 5, 8, HEAPID_OEKAKI);
+        ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 11 * 0x20, 0, 3, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_COMMON].cellAnims = ClActSys_LoadCellAnims(
+        commonArc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0), HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_SUB].chars = ClActSys_LoadChars(arc, 3, FALSE, 1, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_SUB].palette = ClActSys_LoadPltt(arc, 0, 1, 0, HEAPID_OEKAKI);
+    wk->resources[OEKAKI_RES_SUB].cellAnims = ClActSys_LoadCellAnims(arc, 5, 8, HEAPID_OEKAKI);
     GFL_ArcToolFree(commonArc);
 }
 
@@ -589,44 +587,44 @@ static void Oekaki_CreateActors(OekakiWork *wk) {
         setup.x = i * 40 + 24;
         setup.y = 64;
         wk->cursors[i] =
-            func_0204c040(wk->actorUnit, wk->resources[OEKAKI_RES_MAIN].chars, wk->resources[OEKAKI_RES_MAIN].palette,
-                          wk->resources[OEKAKI_RES_MAIN].cellAnims, &setup, 0, HEAPID_OEKAKI);
+            ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_MAIN].chars, wk->resources[OEKAKI_RES_MAIN].palette,
+                           wk->resources[OEKAKI_RES_MAIN].cellAnims, &setup, 0, HEAPID_OEKAKI);
         func_0204c520(wk->cursors[i], TRUE);
-        func_0204c488(wk->cursors[i], i);
-        func_0204c124(wk->cursors[i], FALSE);
+        ClActor_SetSequence(wk->cursors[i], i);
+        ClActor_SetVisible(wk->cursors[i], FALSE);
     }
     for (i = 0; i < OEKAKI_BUTTON_COUNT; i++) {
         setup.x = sButtonData[i].x;
         setup.y = sButtonData[i].y;
         wk->buttons[i] =
-            func_0204c040(wk->actorUnit, wk->resources[OEKAKI_RES_MAIN].chars, wk->resources[OEKAKI_RES_MAIN].palette,
-                          wk->resources[OEKAKI_RES_MAIN].cellAnims, &setup, 0, HEAPID_OEKAKI);
+            ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_MAIN].chars, wk->resources[OEKAKI_RES_MAIN].palette,
+                           wk->resources[OEKAKI_RES_MAIN].cellAnims, &setup, 0, HEAPID_OEKAKI);
         func_0204c520(wk->buttons[i], TRUE);
-        func_0204c488(wk->buttons[i], sButtonData[i].sequence);
+        ClActor_SetSequence(wk->buttons[i], sButtonData[i].sequence);
         if (i >= OEKAKI_BUTTON_END) {
-            func_0204c468(wk->buttons[i], 2);
+            ClActor_SetBgPriority(wk->buttons[i], 2);
         }
     }
-    func_0204c488(wk->buttons[0], 6);
+    ClActor_SetSequence(wk->buttons[0], 6);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         setup.x = 24;
         setup.y = i * 32 + 32 + OEKAKI_SUB_SURFACE_Y;
         wk->nameActors[i] =
-            func_0204c040(wk->actorUnit, wk->resources[OEKAKI_RES_SUB].chars, wk->resources[OEKAKI_RES_SUB].palette,
-                          wk->resources[OEKAKI_RES_SUB].cellAnims, &setup, 1, HEAPID_OEKAKI);
+            ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_SUB].chars, wk->resources[OEKAKI_RES_SUB].palette,
+                           wk->resources[OEKAKI_RES_SUB].cellAnims, &setup, 1, HEAPID_OEKAKI);
         func_0204c520(wk->nameActors[i], TRUE);
-        func_0204c488(wk->nameActors[i], i);
-        func_0204c438(wk->nameActors[i], 1);
-        func_0204c124(wk->nameActors[i], FALSE);
+        ClActor_SetSequence(wk->nameActors[i], i);
+        ClActor_SetPriority(wk->nameActors[i], 1);
+        ClActor_SetVisible(wk->nameActors[i], FALSE);
     }
     setup.x = 212;
     setup.y = 160;
     wk->endButton =
-        func_0204c040(wk->actorUnit, wk->resources[OEKAKI_RES_COMMON].chars, wk->resources[OEKAKI_RES_COMMON].palette,
-                      wk->resources[OEKAKI_RES_COMMON].cellAnims, &setup, 0, HEAPID_OEKAKI);
+        ClActor_Create(wk->actorUnit, wk->resources[OEKAKI_RES_COMMON].chars, wk->resources[OEKAKI_RES_COMMON].palette,
+                       wk->resources[OEKAKI_RES_COMMON].cellAnims, &setup, 0, HEAPID_OEKAKI);
     func_0204c520(wk->endButton, TRUE);
-    func_0204c488(wk->endButton, 1);
-    func_0204c124(wk->endButton, TRUE);
+    ClActor_SetSequence(wk->endButton, 1);
+    ClActor_SetVisible(wk->endButton, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
@@ -641,8 +639,8 @@ static void Oekaki_CreateWindows(OekakiWork *wk, GameProc *proc) {
     wk->drawWindow = BmpWin_CreateDynamic(1, 1, 2, 30, 15, 0, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->drawWindow), 2);
     wk->tcbManager = GFL_TCBExMgrCreate(HEAPID_OEKAKI, HEAPID_OEKAKI, 32, 32);
-    wk->nameQueue = func_02021998(HEAPID_OEKAKI);
-    wk->printQueue = func_02021998(HEAPID_OEKAKI);
+    wk->nameQueue = PrintQueue_CreateDefault(HEAPID_OEKAKI);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_OEKAKI);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         wk->nameWindows[i] = BmpWin_CreateDynamic(4, 5, i * 4 + 3, 10, 2, 13, TRUE);
         GFL_BitmapFill(BmpWin_GetBitmap(wk->nameWindows[i]), 0);
@@ -657,10 +655,10 @@ static void Oekaki_FreeWindows(OekakiWork *wk) {
 
     GFL_TCBExMgrFreeTasks(wk->tcbManager);
     GFL_TCBExMgrFree(wk->tcbManager);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
-    func_02021c44(wk->nameQueue);
-    func_02021a18(wk->nameQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
+    PrintQueue_Clear(wk->nameQueue);
+    PrintQueue_Free(wk->nameQueue);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         BmpWin_Free(wk->nameWindows[i]);
     }
@@ -675,7 +673,7 @@ static void Oekaki_SetCursorPos(ClActor *actor, int x, int y) {
 
     pos.x = x;
     pos.y = y - 8;
-    func_0204c210(actor, &pos);
+    ClActor_SetPos(actor, &pos);
 }
 
 // The touch of a frame in which the pen is up
@@ -714,7 +712,7 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
     int button;
     int drawArea;
 
-    button = func_0203da0c(sOekakiButtonRects);
+    button = GFL_HIDGetTouchPressedRect(sOekakiButtonRects);
     if (button != TOUCH_RECT_NONE) {
         switch (button) {
         case OEKAKI_BUTTON_COLOR:
@@ -733,7 +731,7 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
             break;
         case OEKAKI_BUTTON_END:
             if (wk->seq == OEKAKI_SEQ_MAIN) {
-                if (func_0203ffc4() == 0) {
+                if (NetSystem_GetNetId() == 0) {
                     // Not while a member that joined has yet to get the picture
                     if (wk->shareBit != Oekaki_GetJoined(wk)) {
                         GFL_SndSEPlay(SEQ_SE_SELECT4);
@@ -766,9 +764,9 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
 
             for (i = 0; i < OEKAKI_BRUSH_COUNT; i++) {
                 if (button - OEKAKI_BUTTON_BRUSH == i) {
-                    func_0204c488(wk->buttons[OEKAKI_BUTTON_BRUSH + i], i * 2 + 30);
+                    ClActor_SetSequence(wk->buttons[OEKAKI_BUTTON_BRUSH + i], i * 2 + 30);
                 } else {
-                    func_0204c488(wk->buttons[OEKAKI_BUTTON_BRUSH + i], i * 2 + 29);
+                    ClActor_SetSequence(wk->buttons[OEKAKI_BUTTON_BRUSH + i], i * 2 + 29);
                 }
             }
             if (wk->brush != button - OEKAKI_BUTTON_BRUSH) {
@@ -781,19 +779,19 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
     }
 
     // The player's own pen
-    drawArea = func_0203d9c8(sDrawAreaRects);
-    func_0204c124(wk->cursors[func_0203ffc4()], FALSE);
+    drawArea = GFL_HIDGetTouchHeldRect(sDrawAreaRects);
+    ClActor_SetVisible(wk->cursors[NetSystem_GetNetId()], FALSE);
     if (drawArea != TOUCH_RECT_NONE) {
-        func_0203da84(&cursorX, &cursorY);
-        Oekaki_SetCursorPos(wk->cursors[func_0203ffc4()], cursorX, cursorY);
-        func_0204c124(wk->cursors[func_0203ffc4()], TRUE);
+        GFL_HIDGetTouchHeldPoint(&cursorX, &cursorY);
+        Oekaki_SetCursorPos(wk->cursors[NetSystem_GetNetId()], cursorX, cursorY);
+        ClActor_SetVisible(wk->cursors[NetSystem_GetNetId()], TRUE);
     }
 
     x = 0;
     y = 0;
-    if (func_0203da2c() == TRUE) {
+    if (GFL_HIDIsTouchHeld() == TRUE) {
         // A line from the point of the frame before
-        func_0203da84(&x, &y);
+        GFL_HIDGetTouchHeldPoint(&x, &y);
         touchData.size = 2;
         touchData.points[0].x = wk->touchData.points[1].x;
         touchData.points[0].y = wk->touchData.points[1].y;
@@ -809,7 +807,7 @@ static void Oekaki_UpdateTouch(OekakiWork *wk) {
         Oekaki_MakeEmptyTouch(&info, wk->color, wk->brush);
     }
     Oekaki_QueuePush(&info, &wk->queue, 0);
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         Oekaki_QueueAdvanceParent(&wk->queue);
     } else {
         Oekaki_QueueAdvanceChild(&wk->queue);
@@ -823,24 +821,24 @@ static void Oekaki_SetColorButtons(ClActor **buttons, int color) {
 
     for (i = 0; i < OEKAKI_COLOR_COUNT; i++) {
         if (i == color) {
-            func_0204c488(buttons[i], sButtonData[i].sequence + 1);
+            ClActor_SetSequence(buttons[i], sButtonData[i].sequence + 1);
         } else {
-            func_0204c488(buttons[i], sButtonData[i].sequence);
+            ClActor_SetSequence(buttons[i], sButtonData[i].sequence);
         }
     }
 }
 
 static void Oekaki_SetEndButton(ClActor *actor, BOOL pressed) {
     if (pressed == TRUE) {
-        func_0204c488(actor, 9);
+        ClActor_SetSequence(actor, 9);
     } else {
-        func_0204c488(actor, 1);
+        ClActor_SetSequence(actor, 1);
     }
 }
 
 static int Oekaki_SeqMain(OekakiWork *wk, int seq) {
     Oekaki_UpdateTouch(wk);
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         // A parent with no children has nobody to send to
         if (Oekaki_CountMembers(wk) != 1) {
             Oekaki_SendTouch(wk);
@@ -860,7 +858,7 @@ static void Oekaki_DrawOthers(OekakiWork *wk) {
 }
 
 static int Oekaki_SeqNewcomer(OekakiWork *wk, int seq) {
-    if (wk->newcomerId == func_0203ffc4()) {
+    if (wk->newcomerId == NetSystem_GetNetId()) {
         Oekaki_PrintMessage(wk, EventMapchange_Text_JoinedDrawingSession, FALSE);
     } else {
         Oekaki_PrintMessage(wk, EventMapchange_Text_HasJoined, FALSE);
@@ -879,7 +877,7 @@ static int Oekaki_SeqNewcomerWait(OekakiWork *wk, int seq) {
     int i;
 
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
-        func_0204c124(wk->cursors[i], FALSE);
+        ClActor_SetVisible(wk->cursors[i], FALSE);
     }
     return seq;
 }
@@ -907,7 +905,7 @@ static int Oekaki_SeqEndSelectMsgWait(OekakiWork *wk, int seq) {
 static int Oekaki_SeqEndSelect(OekakiWork *wk, int seq) {
     wk->myTouch.size = 0;
     // The parent has its own menu open
-    if (wk->allTouch[0].banFlag == OEKAKI_BAN_ON && func_0203ffc4() != 0) {
+    if (wk->allTouch[0].banFlag == OEKAKI_BAN_ON && NetSystem_GetNetId() != 0) {
         Oekaki_DrawOthers(wk);
         AppTaskMenu_UpdateText(wk->menu);
         if (Oekaki_IsMenuAreaTouched(wk)) {
@@ -915,14 +913,14 @@ static int Oekaki_SeqEndSelect(OekakiWork *wk, int seq) {
         }
         return seq;
     }
-    if (func_0203ffc4() == 0 && wk->leavingBits != 0) {
+    if (NetSystem_GetNetId() == 0 && wk->leavingBits != 0) {
         Oekaki_DrawOthers(wk);
         AppTaskMenu_UpdateText(wk->menu);
         return seq;
     }
     switch (Oekaki_UpdateMenu(wk)) {
     case 0:
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             Oekaki_SetNextSeq(wk, OEKAKI_SEQ_PARENT_END_SELECT_MSG_WAIT);
             Oekaki_PrintMessage(wk, EventMapchange_Text_IfLeaderDropsOut, TRUE);
         } else {
@@ -936,7 +934,7 @@ static int Oekaki_SeqEndSelect(OekakiWork *wk, int seq) {
         Oekaki_SetEndButton(wk->endButton, FALSE);
         BmpWin_ClearFrame(wk->msgWindow, 2);
         BmpWin_TransferNow(wk->drawWindow);
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             OekakiComm_LimitEntry(wk, 1);
             wk->banFlag = OEKAKI_BAN_NONE;
         }
@@ -952,8 +950,8 @@ static int Oekaki_SeqEndRequest(OekakiWork *wk, int seq) {
 
     MI_CpuFill8(&signal, 0, sizeof(signal));
     signal.type = OEKAKI_SIGNAL_LEAVE_REQUEST;
-    signal.netId = func_0203ffc4();
-    if (func_02042be8(func_02040440(), OEKAKI_NET_CMD_SIGNAL, sizeof(signal), &signal)) {
+    signal.netId = NetSystem_GetNetId();
+    if (GFL_NetSendCommand(NetHandle_GetOwn(), OEKAKI_NET_CMD_SIGNAL, sizeof(signal), &signal)) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_END_ANSWER_WAIT);
     }
     Oekaki_DrawOthers(wk);
@@ -983,8 +981,8 @@ static int Oekaki_SeqEndLeave(OekakiWork *wk, int seq) {
 
     MI_CpuFill8(&signal, 0, sizeof(signal));
     signal.type = OEKAKI_SIGNAL_LEAVE;
-    signal.netId = func_0203ffc4();
-    if (func_02042be8(func_02040440(), OEKAKI_NET_CMD_SIGNAL, sizeof(signal), &signal)) {
+    signal.netId = NetSystem_GetNetId();
+    if (GFL_NetSendCommand(NetHandle_GetOwn(), OEKAKI_NET_CMD_SIGNAL, sizeof(signal), &signal)) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_END_MSG);
     }
     Oekaki_DrawOthers(wk);
@@ -1053,7 +1051,7 @@ static int Oekaki_SeqParentEndSelect(OekakiWork *wk, int seq) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_MAIN);
         Oekaki_SetEndButton(wk->endButton, FALSE);
         BmpWin_ClearFrame(wk->msgWindow, 2);
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             OekakiComm_LimitEntry(wk, 1);
             wk->banFlag = OEKAKI_BAN_NONE;
         }
@@ -1073,7 +1071,7 @@ static void Oekaki_SetPlayerName(OekakiWork *wk, int index, int netId) {
 }
 
 static int Oekaki_SeqParentEndSend(OekakiWork *wk, int seq) {
-    if (func_02042be8(func_02040414(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_PARENT_END, 0, NULL)) {
+    if (GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_PARENT_END, 0, NULL)) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_PARENT_END_MSG);
         Oekaki_SetPlayerName(wk, 0, 0);
         seq = OEKAKI_PROC_SEQ_END;
@@ -1093,7 +1091,7 @@ static int Oekaki_SeqParentEndMsg(OekakiWork *wk, int seq) {
 static int Oekaki_SeqParentEndMsgWait(OekakiWork *wk, int seq) {
     if (Oekaki_IsMessageDone(wk)) {
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_PARENT_END_SYNC_WAIT);
-        func_02040b38(func_02040440(), 200, 0x29, (u16)wk->shareBit);
+        func_02040b38(NetHandle_GetOwn(), 200, 0x29, (u16)wk->shareBit);
     }
     Oekaki_DrawOthers(wk);
     return seq;
@@ -1101,16 +1099,16 @@ static int Oekaki_SeqParentEndMsgWait(OekakiWork *wk, int seq) {
 
 // Waits until every member is at the same point, or gone
 static int Oekaki_SeqParentEndSyncWait(OekakiWork *wk, int seq) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     int i;
     u32 bits = 0;
 
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
-        if (func_02042a80((u8)i) == TRUE) {
+        if (GFL_NetIsNegotiated((u8)i) == TRUE) {
             bits |= 1 << i;
         }
     }
-    if (func_02040664(handle, 200, 0x29) || Oekaki_CountJoined(wk) == 1 || bits != wk->shareBit) {
+    if (NetHandle_IsTimingPairRecv(handle, 200, 0x29) || Oekaki_CountJoined(wk) == 1 || bits != wk->shareBit) {
         GFL_WipeSet(WIPE_MODE_BOTH, 8, 8, WIPE_COLOR_BLACK, 16, 1, HEAPID_OEKAKI);
         seq = OEKAKI_PROC_SEQ_FADE_OUT;
     }
@@ -1142,7 +1140,7 @@ static int Oekaki_SeqMemberLeft(OekakiWork *wk, int seq) {
     Oekaki_CloseMenu(wk);
     Oekaki_SetNextSeq(wk, OEKAKI_SEQ_MEMBER_LEFT_MSG_WAIT);
     GFL_SndSEPlay(SEQ_SE_DECIDE1);
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         Oekaki_SetEntry(wk, 0);
     }
     wk->leftCount = Oekaki_CountJoined(wk);
@@ -1170,7 +1168,7 @@ static int Oekaki_SeqMemberLeftWait(OekakiWork *wk, int seq) {
     if (wk->wait > 60 && wk->leftCount == 0) {
         Oekaki_ClearMessage(wk);
         Oekaki_SetNextSeq(wk, OEKAKI_SEQ_MAIN);
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             wk->banFlag = OEKAKI_BAN_NONE;
             Oekaki_SetEntry(wk, 1);
         }
@@ -1203,10 +1201,10 @@ void Oekaki_SetStatus(OekakiWork *wk, int seq, int netId) {
             return;
         }
         Oekaki_SetPlayerName(wk, 0, netId);
-        if (netId == func_0203ffc4()) {
+        if (netId == NetSystem_GetNetId()) {
             return;
         }
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             wk->leavingBits &= 0xffff ^ netId;
         }
         if (wk->seq == OEKAKI_SEQ_END_SELECT || wk->seq == OEKAKI_SEQ_PARENT_END_SELECT) {
@@ -1216,7 +1214,7 @@ void Oekaki_SetStatus(OekakiWork *wk, int seq, int netId) {
         Oekaki_SetEndButton(wk->endButton, FALSE);
         break;
     case OEKAKI_SEQ_END_OK:
-        Oekaki_RequestSend(wk, OEKAKI_NET_CMD_LEAVING, func_0203ffc4());
+        Oekaki_RequestSend(wk, OEKAKI_NET_CMD_LEAVING, NetSystem_GetNetId());
         break;
     case OEKAKI_SEQ_END_REFUSED:
     case OEKAKI_SEQ_PARENT_END_MSG:
@@ -1452,12 +1450,12 @@ static void Oekaki_UpdateCursors(OekakiWork *wk) {
     int i;
 
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
-        if (i != func_0203ffc4()) {
+        if (i != NetSystem_GetNetId()) {
             if (touch[i].size != 0 && UnionApp_GetMember(wk->param->app, i) != NULL) {
-                func_0204c124(wk->cursors[i], TRUE);
+                ClActor_SetVisible(wk->cursors[i], TRUE);
                 Oekaki_SetCursorPos(wk->cursors[i], touch[i].x[touch[i].size - 1], touch[i].y[touch[i].size - 1]);
             } else {
-                func_0204c124(wk->cursors[i], FALSE);
+                ClActor_SetVisible(wk->cursors[i], FALSE);
             }
         }
     }
@@ -1471,7 +1469,7 @@ static void Oekaki_UpdatePalette(u16 *angle) {
     if (*angle > 360) {
         *angle = 0;
     }
-    color = GX_RGB(29, func_02044360(*angle) * 10 / FX16_ONE + 15, 0);
+    color = GX_RGB(29, GFL_MathSinDegWrap(*angle) * 10 / FX16_ONE + 15, 0);
     GX_LoadOBJPltt(&color, 12 * sizeof(u16), sizeof(u16));
 }
 
@@ -1489,7 +1487,7 @@ static int Oekaki_CountMembers(OekakiWork *wk) {
 
 // Prints the members' names on the top screen when the members have changed
 static void Oekaki_PrintNames(BmpWin **windows, u16 color, OekakiWork *wk) {
-    int myId = func_0203ffc4();
+    int myId = NetSystem_GetNetId();
     int i;
 
     if (!Oekaki_UpdateMembers(wk)) {
@@ -1497,12 +1495,12 @@ static void Oekaki_PrintNames(BmpWin **windows, u16 color, OekakiWork *wk) {
     }
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         if (wk->members[i].member == NULL) {
-            func_0204c124(wk->nameActors[i], FALSE);
+            ClActor_SetVisible(wk->nameActors[i], FALSE);
         } else {
-            func_0204c124(wk->nameActors[i], TRUE);
+            ClActor_SetVisible(wk->nameActors[i], TRUE);
         }
     }
-    func_02021c44(wk->nameQueue);
+    PrintQueue_Clear(wk->nameQueue);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         GFL_BitmapFillArea(BmpWin_GetBitmap(windows[i]), 0, 0, 80, 16, 0);
     }
@@ -1524,20 +1522,21 @@ static void Oekaki_PrintNames(BmpWin **windows, u16 color, OekakiWork *wk) {
 static void Oekaki_SendTouch(OekakiWork *wk) {
     NetHandle *handle;
 
-    if (func_0203ffc4() == 0) {
-        handle = func_02040440();
-        if (func_02042cfc(handle)) {
+    if (NetSystem_GetNetId() == 0) {
+        handle = NetHandle_GetOwn();
+        if (GFL_NetIsSendQueueEmpty(handle)) {
             Oekaki_QueuePopAll(wk->sendTouch, &wk->queue);
             wk->sendTouch[0].banFlag = wk->banFlag;
-            if (func_02042be8(handle, OEKAKI_NET_CMD_ALL_TOUCH, sizeof(wk->sendTouch), wk->sendTouch) == TRUE) {
+            if (GFL_NetSendCommand(handle, OEKAKI_NET_CMD_ALL_TOUCH, sizeof(wk->sendTouch), wk->sendTouch) == TRUE) {
                 Oekaki_QueueNext(&wk->queue);
             }
         }
     } else {
-        handle = func_02040440();
+        handle = NetHandle_GetOwn();
         Oekaki_QueuePop(&wk->myTouch, &wk->queue);
-        if (func_02042cfc(handle)) {
-            if (func_02042be8(func_02040440(), OEKAKI_NET_CMD_TOUCH, sizeof(wk->myTouch), &wk->myTouch) == TRUE) {
+        if (GFL_NetIsSendQueueEmpty(handle)) {
+            if (GFL_NetSendCommand(NetHandle_GetOwn(), OEKAKI_NET_CMD_TOUCH, sizeof(wk->myTouch), &wk->myTouch) ==
+                TRUE) {
                 Oekaki_QueueNext(&wk->queue);
             }
         }
@@ -1575,29 +1574,29 @@ static void Oekaki_PrintMessage(OekakiWork *wk, int messageId, BOOL stream) {
     GFL_BitmapFill(BmpWin_GetBitmap(wk->msgWindow), 15);
     BmpWin_DrawFrame(wk->msgWindow, FALSE, 1, 10);
     if (wk->stream != NULL) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
     }
     if (!stream) {
         PrintWindow_Print(&wk->msgPrint, wk->printQueue, 0, 0, wk->msgBuf, wk->font, OEKAKI_COLOR_TEXT);
     } else {
-        wk->stream = func_02022268(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, func_02017bcc(), wk->tcbManager, 1,
-                                   HEAPID_OEKAKI, 0xf0f);
+        wk->stream = PrintStream_Create(wk->msgWindow, 0, 0, wk->msgBuf, wk->font, TextSpeed_GetCurrentWait(),
+                                        wk->tcbManager, 1, HEAPID_OEKAKI, 0xf0f);
     }
     BmpWin_TransferNow(wk->msgWindow);
 }
 
 static BOOL Oekaki_IsMessageDone(OekakiWork *wk) {
-    u32 state = func_020223b4(wk->stream);
+    u32 state = PrintStream_GetState(wk->stream);
 
     if (state == PRINT_STREAM_PAUSED) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-            func_020223bc(wk->stream);
+            PrintStream_Continue(wk->stream);
         }
         return FALSE;
     }
     if (state == PRINT_STREAM_DONE) {
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->stream = NULL;
         return TRUE;
     }
@@ -1613,7 +1612,7 @@ static void Oekaki_ClearMessage(OekakiWork *wk) {
 
 // The parent's: lets up to `limit` more players enter
 static void Oekaki_SetEntry(OekakiWork *wk, u8 limit) {
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         Oekaki_CountJoined(wk);
         OekakiComm_LimitEntry(wk, limit);
     }
@@ -1633,7 +1632,7 @@ static int Oekaki_UpdateParent(OekakiWork *wk) {
             wk->nextSeq = OEKAKI_SEQ_NO_MEMBERS_MSG;
             if (wk->menuOpen) {
                 Oekaki_CloseMenu(wk);
-                func_0204c488(wk->buttons[OEKAKI_BUTTON_END], 21);
+                ClActor_SetSequence(wk->buttons[OEKAKI_BUTTON_END], 21);
             }
             return OEKAKI_PROC_SEQ_END;
         }
@@ -1706,7 +1705,7 @@ static const TouchRect sMenuAreaRects[] = {
 };
 
 static BOOL Oekaki_IsMenuAreaTouched(OekakiWork *wk) {
-    if (func_0203da0c(sMenuAreaRects) != TOUCH_RECT_NONE) {
+    if (GFL_HIDGetTouchPressedRect(sMenuAreaRects) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -1820,7 +1819,7 @@ static void Oekaki_RecordMetTrainers(OekakiWork *wk) {
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         UnionAppMember *member = UnionApp_GetMember(wk->param->app, i);
 
-        if (member != NULL && i != func_0203ffc4()) {
+        if (member != NULL && i != NetSystem_GetNetId()) {
             Misc_AddMetTrainer(rivalData, getIDAsUInt(&member->info));
         }
     }
@@ -1829,8 +1828,8 @@ static void Oekaki_RecordMetTrainers(OekakiWork *wk) {
 static void Oekaki_FlushPrint(OekakiWork *wk) {
     int i;
 
-    func_02021a3c(wk->nameQueue);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->nameQueue);
+    PrintQueue_Main(wk->printQueue);
     for (i = 0; i < OEKAKI_MEMBER_MAX; i++) {
         PrintWindow_Flush(&wk->namePrint[i], wk->nameQueue);
     }
@@ -1841,23 +1840,23 @@ static void Oekaki_FlushPrint(OekakiWork *wk) {
 static void Oekaki_SendRequest(OekakiWork *wk) {
     switch (wk->sendCommand) {
     case OEKAKI_NET_CMD_NEWCOMER:
-        if (func_02042be8(func_02040414(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_NEWCOMER, 1, &wk->sendArg)) {
+        if (GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_NEWCOMER, 1, &wk->sendArg)) {
             wk->sendCommand = 0;
         }
         break;
     case OEKAKI_NET_CMD_PICTURE_END:
-        if (func_02042be8(func_02040414(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_PICTURE_END, 0, NULL)) {
+        if (GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_PICTURE_END, 0, NULL)) {
             wk->sendCommand = 0;
         }
         break;
     case OEKAKI_NET_CMD_SIGNAL:
-        if (func_02042be8(func_02040414(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_SIGNAL, sizeof(OekakiSignal),
-                          &wk->signal)) {
+        if (GFL_NetSendCommand(NetHandle_Get(GFL_NET_NETID_SERVER), OEKAKI_NET_CMD_SIGNAL, sizeof(OekakiSignal),
+                               &wk->signal)) {
             wk->sendCommand = 0;
         }
         break;
     case OEKAKI_NET_CMD_LEAVING:
-        if (func_02042be8(func_02040440(), OEKAKI_NET_CMD_LEAVING, 0, NULL)) {
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), OEKAKI_NET_CMD_LEAVING, 0, NULL)) {
             wk->sendCommand = 0;
         }
         break;

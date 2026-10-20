@@ -9,9 +9,8 @@
 // The choice of a starter Pokémon, overlay 316 (psel.c)
 #define OVERLAY_PSEL OVERLAY_ID(316)
 
-// The screen's heap and its archive of graphics. Our names, not swan's
+// The screen's heap. Our name, not swan's
 #define HEAPID_PSEL 0x87
-#define ARCID_PSEL 202
 
 // What the screen is called with. It writes the chosen Pokémon to *result: 0 for Snivy, 1 for Tepig and 2 for
 // Oshawott, and to choice as well

@@ -1,0 +1,24 @@
+{
+    "$schema": "../../../bank.schema.json",
+    "wave_archives": [ "WAVE_SE_WB_W248_TIKIRIN", null, null, null ],
+    "instruments": [
+        {
+            "program": 24,
+            "type": "split",
+            "regions": [
+                {
+                    "up_to": "G9",
+                    "type": "wave",
+                    "wave_archive": "WAVE_SE_WB_W248_TIKIRIN",
+                    "wave": 0,
+                    "base_key": "G2",
+                    "attack": 127,
+                    "decay": 60,
+                    "sustain": 30,
+                    "release": 120,
+                    "pan": 64
+                }
+            ]
+        }
+    ]
+}

@@ -2,12 +2,12 @@
 #define POKEBW2_FIELD_C_GEAR_SW_H
 
 #include "types.h"
+#include "gfl/overlay.h"
 #include "struct_decls.h"
 
 // The C-Gear, the field's touch screen while it is on: overlay 79, named after the ROM's "c_gear_sw.c". Overlay 36's
 // field subscreen table calls these. The names are ours
-
-typedef struct CGearSw CGearSw;
+#define OVERLAY_C_GEAR_SW OVERLAY_ID(79)
 
 typedef void (*CGearSwCallback)(void *work);
 
@@ -21,8 +21,8 @@ void CGearSw_Draw(CGearSw *work);
 void CGearSw_Free(CGearSw *work);
 // Loads everything again, as after the skin was changed, and returns whether it did, which it does only while idle
 BOOL CGearSw_Reload(CGearSw *work);
-// The event of what the player touched, or NULL
-GameEvent *CGearSw_CheckEvent(CGearSw *work, BOOL enabled);
+// The event of what the player touched, or NULL. The field subscreen passes itself, which goes unused
+GameEvent *CGearSw_CheckEvent(CGearSw *work, BOOL enabled, FieldSubscreen *subscreen);
 // Whether the C-Gear is leaving for the Xtransceiver
 BOOL CGearSw_IsStartingTvt(CGearSw *work);
 void CGearSw_StopRinging(CGearSw *work);

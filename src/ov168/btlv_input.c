@@ -1,6 +1,5 @@
 // The battle's lower screen. The name is the ROM's string, from GFL_HeapAllocate's asserts. The names are ours; swan
-// has none for this file. Another session's notes, ~/Projects/White2Decomp/docs/battle-ui-spec.md (White 2 addresses,
-// +0x40), were the source of our understanding of the screens and their transitions, not of names or code
+// has none for this file
 
 #include "battle/btlv_input.h"
 #include "types.h"
@@ -46,7 +45,7 @@
 #include "system/palanm.h"
 #include "system/printsys.h"
 #include "system/wordset.h"
-#include "text/system/0021.h"
+#include "text/system/btlv_input.h"
 
 // An actor slot; the second word is never touched
 typedef struct {
@@ -296,7 +295,7 @@ static const BtlvInputTypeAnim data_ov168_021f361c[3] = { { 4, 4 }, { 4, 4 }, { 
 static const int data_ov168_021f3628[2][2] = { { 136, 136 }, { 24, 48 } };
 // Where each move tile's type icon goes
 static const ClActorPos data_ov168_021f3638[4] = { { 34, 65 }, { 162, 65 }, { 34, 113 }, { 162, 113 } };
-static const BGSysLCDConfig data_ov168_021f3648 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_2D };
+static const BGSysLCDConfig data_ov168_021f3648 = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_3, GX_BG0_AS_3D };
 static const u32 data_ov168_021f3658[3][2] = { { 0x247, 0x246 }, { 0x245, 0 }, { 0, 0x245 } };
 static const s32 data_ov168_021f368c[7] = { 0x200, 0x400, 0x800, 0x1000, 0x10, 0x4, 0x8 };
 static const s32 data_ov168_021f36a8[7] = { 0, 0, 0, 0, 1, 0, 0 };
@@ -309,11 +308,6 @@ static const TouchRect data_ov168_021f3760[8] = {
 static const BtlvInputButtonSet data_ov168_021f3604 = { data_ov168_021f3760, data_ov168_021f36a8, data_ov168_021f36c4 };
 static const s32 data_ov168_021f3670[7] = { 0, 0, 0, 0, 1, 0, 0 };
 static const BtlvInputScroll data_ov168_021f36e0[2][2] = { { { 256, 0 }, { 0, 192 } }, { { 256, 0 }, { 0, 0 } } };
-static const TouchRect data_ov168_021f3700[8] = {
-    { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 }, { 0x50, 0x80, 0x80, 0xff },
-    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
-};
-static const BtlvInputButtonSet data_ov168_021f3610 = { data_ov168_021f3700, data_ov168_021f3670, data_ov168_021f368c };
 // Where each party icon goes, by rule
 static const ClActorPos data_ov168_021f3780[4][3] = {
     { { 128, 112 }, { -1, -1 }, { -1, -1 } },
@@ -321,12 +315,20 @@ static const ClActorPos data_ov168_021f3780[4][3] = {
     { { 88, 112 }, { 128, 112 }, { 168, 112 } },
     { { 104, 112 }, { 152, 112 }, { -1, -1 } },
 };
+static const TouchRect data_ov168_021f3700[8] = {
+    { 0x20, 0x50, 0x00, 0x80 }, { 0x20, 0x50, 0x80, 0xff }, { 0x50, 0x80, 0x00, 0x80 }, { 0x50, 0x80, 0x80, 0xff },
+    { 0x90, 0xc0, 0xb0, 0xff }, { 0x98, 0xc0, 0x00, 0x50 }, { 0x98, 0xc0, 0x50, 0xa0 }, { TOUCH_RECT_END, 0, 0, 0 },
+};
 // Where each move tile's name is centered
 static const s32 data_ov168_021f3720[4][2] = { { 64, 10 }, { 192, 10 }, { 64, 58 }, { 192, 58 } };
-// The tile palette of each move type
-static const u32 data_ov168_021f3864[17] = {
+// The tile palette of each move type. The explicit alignment is a guess, from the code of BtlvInput_DrawMoveTiles,
+// the only function that reads the table: MWCC keeps the loop of a function that reads an aligned object entered at
+// its test (docs/matching.md). An alignment of 1, 2 or 4 gives the same code and layout, and the table's address
+// allows nothing above 4.
+static const u32 data_ov168_021f3864[17] ATTRIBUTE_ALIGN(4) = {
     464, 470, 473, 471, 472, 476, 475, 477, 479, 465, 466, 468, 467, 469, 478, 474, 480,
 };
+static const BtlvInputButtonSet data_ov168_021f3610 = { data_ov168_021f3700, data_ov168_021f3670, data_ov168_021f368c };
 // The scroll of BG 4 for the button rise of each slot
 static const BtlvInputScroll data_ov168_021f3740[4] = { { 256, 448 }, { 256, 192 }, { 0, 192 }, { 0, 448 } };
 // The key cursor's stops of the move screen, without a usable move and with one, per slot
@@ -402,7 +404,7 @@ static const BtlvInputBGSetup data_ov168_021f3b88[4] = {
     { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_16, 0, 4, 0x8000, 0, 1, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_16, 4, 4, 0x8000, 0, 1, 0, 0 }, BGMODE_TEXT },
     { { 0, 0, 0x1000, 0, BGRES_512x256, GX_BG_COLORMODE_16, 8, 6, 0x8000, 0, 0, 0, 0 }, BGMODE_TEXT },
-    { { 0, 0, 0x2000, 0, BGRES_128x128, GX_BG_COLORMODE_16, 0, 0, 0x8000, 0, 1, 0, 0 }, BGMODE_EXTENDED },
+    { { 0, 0, 0x2000, 0, BGRES_512x512, GX_BG_COLORMODE_256, 12, 2, 0x8000, 0, 1, 0, 0 }, BGMODE_EXTENDED },
 };
 // The target screen's BG 4 map, by rule, attacker and move range
 static const u32 data_ov168_021f3c18[2][3][15] = {
@@ -455,7 +457,7 @@ static void BtlvInput_SetTypeBit(u32 *mask, int bit);
 static void BtlvInput_ApplyTypeMask(BtlvInput *work);
 static void BtlvInput_ShowTypeScreen(BtlvInput *work);
 static void BtlvInput_LoadTypePalettes(BtlvInput *work);
-static void BtlvInput_LoadTypePalette(const BtlvInput *work, int palette);
+static void BtlvInput_LoadTypePalette(BtlvInput *work, int palette);
 static void BtlvInput_UpdateTypePaletteAnim(BtlvInput *work);
 static void BtlvInput_SetTypeAnimIndex(BtlvInput *work, int index);
 static int BtlvInput_PickTypeAnimIndex(BtlvInput *work, int current);
@@ -591,7 +593,7 @@ static BtlvInput *BtlvInput_Create(GameData *gameData, u32 rule, u32 unk54, Pale
     for (i = 0; i < 4; i++) {
         work->moveChars[i] = -1;
     }
-    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0021, work->heapId);
+    work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTLV_INPUT, work->heapId);
     work->pressedButton = -1;
     work->typeLoaded = FALSE;
     work->typePalBuf = NULL;
@@ -639,14 +641,14 @@ static void BtlvInput_CoreTask(TCB *tcb, void *data) {
 
 static void BtlvInput_InitGraphics(BtlvInput *work) {
     GFL_BGSysSetLCDConfigForEngine(&data_ov168_021f3648, BGSYS_ENGINE_SUB);
-    work->arc = GFL_ArcSysCreateFileHandle(11, work->heapId);
-    work->moveUnit = func_0204bf1c(4, 2, work->heapId);
-    work->pokeUnit = func_0204bf1c(12, 2, work->heapId);
-    work->cursorUnit = func_0204bf1c(6, 0, work->heapId);
-    work->iconUnit = func_0204bf1c(3, 2, work->heapId);
-    work->unit20c = func_0204bf1c(2, 2, work->heapId);
-    work->unit218 = func_0204bf1c(1, 1, work->heapId);
-    work->typeUnit = func_0204bf1c(22, 1, work->heapId);
+    work->arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, work->heapId);
+    work->moveUnit = ClActUnit_Create(4, 2, work->heapId);
+    work->pokeUnit = ClActUnit_Create(12, 2, work->heapId);
+    work->cursorUnit = ClActUnit_Create(6, 0, work->heapId);
+    work->iconUnit = ClActUnit_Create(3, 2, work->heapId);
+    work->unit20c = ClActUnit_Create(2, 2, work->heapId);
+    work->unit218 = ClActUnit_Create(1, 1, work->heapId);
+    work->typeUnit = ClActUnit_Create(22, 1, work->heapId);
     BtlvInput_CreateBGs(work);
     BtlvInput_LoadGraphics(work);
     BtlvInput_CreateCursorActors(work);
@@ -665,7 +667,7 @@ static void BtlvInput_InitGraphics(BtlvInput *work) {
     InfoWin_Init(6, 15, work->gameData, work->heapId);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, 0xe0, 0x20);
     work->cursorRefresh = TRUE;
     if (work->inBattle == TRUE) {
@@ -683,37 +685,37 @@ static void BtlvInput_FreeGraphics(BtlvInput *work) {
     BtlvInput_DeletePartyIcons(work);
     BtlvInput_DeleteBallSlideActors(work);
     if (work->chars != -1) {
-        func_0204b98c(work->chars);
+        ClActSys_FreeChars(work->chars);
         work->chars = -1;
     }
     if (work->palette != -1) {
-        func_0204bcd0(work->palette);
+        ClActSys_FreePltt(work->palette);
         work->palette = -1;
     }
     if (work->cellAnims != -1) {
-        func_0204be64(work->cellAnims);
+        ClActSys_FreeCellAnims(work->cellAnims);
         work->cellAnims = -1;
     }
     if (work->chars2 != -1) {
-        func_0204b98c(work->chars2);
+        ClActSys_FreeChars(work->chars2);
         work->chars2 = -1;
     }
     if (work->cellAnims2 != -1) {
-        func_0204be64(work->cellAnims2);
+        ClActSys_FreeCellAnims(work->cellAnims2);
         work->cellAnims2 = -1;
     }
     for (i = 0; i < 4; i++) {
         if (work->moveChars[i] != -1) {
-            func_0204b98c(work->moveChars[i]);
+            ClActSys_FreeChars(work->moveChars[i]);
             work->moveChars[i] = -1;
         }
     }
     if (work->moveCellAnims != -1) {
-        func_0204be64(work->moveCellAnims);
+        ClActSys_FreeCellAnims(work->moveCellAnims);
         work->moveCellAnims = -1;
     }
     if (work->movePalette != -1) {
-        func_0204bcd0(work->movePalette);
+        ClActSys_FreePltt(work->movePalette);
         work->movePalette = -1;
     }
     if (work->typeLoaded) {
@@ -721,31 +723,31 @@ static void BtlvInput_FreeGraphics(BtlvInput *work) {
         work->typeLoaded = FALSE;
     }
     if (work->moveUnit != NULL) {
-        func_0204bf98(work->moveUnit);
+        ClActUnit_Delete(work->moveUnit);
         work->moveUnit = NULL;
     }
     if (work->pokeUnit != NULL) {
-        func_0204bf98(work->pokeUnit);
+        ClActUnit_Delete(work->pokeUnit);
         work->pokeUnit = NULL;
     }
     if (work->cursorUnit != NULL) {
-        func_0204bf98(work->cursorUnit);
+        ClActUnit_Delete(work->cursorUnit);
         work->cursorUnit = NULL;
     }
     if (work->iconUnit != NULL) {
-        func_0204bf98(work->iconUnit);
+        ClActUnit_Delete(work->iconUnit);
         work->iconUnit = NULL;
     }
     if (work->unit20c != NULL) {
-        func_0204bf98(work->unit20c);
+        ClActUnit_Delete(work->unit20c);
         work->unit20c = NULL;
     }
     if (work->unit218 != NULL) {
-        func_0204bf98(work->unit218);
+        ClActUnit_Delete(work->unit218);
         work->unit218 = NULL;
     }
     if (work->typeUnit != NULL) {
-        func_0204bf98(work->typeUnit);
+        ClActUnit_Delete(work->typeUnit);
     }
     if (work->typePalBuf != NULL) {
         GFL_HeapFree(work->typePalBuf);
@@ -868,11 +870,11 @@ void BtlvInput_SetScreen(BtlvInput *work, u32 screen, void *param) {
                                   BtlvInput_ScreenTaskEnd);
             }
             PaletteFade_RestartFade(work->paletteFade, 2, 3, 1, 0, 12, 0x842, work->tcbMgr);
-            if (func_0204bfe8(work->cursorUnit)) {
+            if (ClActUnit_IsActive(work->cursorUnit)) {
                 work->cursor = 0;
                 work->prevCursor = 0xf;
                 work->cursorRefresh = TRUE;
-                func_0204bfd4(work->cursorUnit, FALSE);
+                ClActUnit_SetActive(work->cursorUnit, FALSE);
             }
         }
         break;
@@ -1026,12 +1028,12 @@ void BtlvInput_SetScreen(BtlvInput *work, u32 screen, void *param) {
         BtlvInputScreenTask *task;
         const BtlvInputRecorderParam *recorder = param;
         StrBuf *strbuf = NULL;
-        // func_ov167_0219c988 is the battle's Pokestar Studios mode, 0 for none; mode 2 shows this screen without its
+        // GetStudioMode is the battle's Pokestar Studios mode, 0 for none; mode 2 shows this screen without its
         // count and animation
         BOOL studioMode2 = FALSE;
         int i;
 
-        if (func_ov167_0219c988(BtlvEffect_GetMainModule()) == 2) {
+        if (GetStudioMode(BtlvEffect_GetMainModule()) == 2) {
             studioMode2 = TRUE;
         }
         for (i = 0; i < 3; i++) {
@@ -1100,7 +1102,7 @@ void BtlvInput_SetScreen(BtlvInput *work, u32 screen, void *param) {
 }
 
 static s32 BtlvInput_CheckRecorderInput(BtlvInput *work, const BtlvInputButtonSet *set, s32 arg2) {
-    s32 button = func_0203da0c(set->rects);
+    s32 button = GFL_HIDGetTouchPressedRect(set->rects);
 
     if (button != -1) {
         if (!work->buttonEnabled[button]) {
@@ -1156,7 +1158,7 @@ s32 BtlvInput_CheckInput(BtlvInput *work, const BtlvInputButtonSet *set, const B
         return BtlvInput_CheckRecorderCancel(work, set, -1);
     }
 
-    touched = func_0203da0c(set->rects);
+    touched = GFL_HIDGetTouchPressedRect(set->rects);
     button = BtlvInput_KeyInput(work, set, stops, NULL, touched, work->noMoveInfo);
     if (button != -1) {
         keys = GCTX_HIDGetHeldKeys();
@@ -1282,12 +1284,12 @@ BOOL BtlvInput_MoveScreenMain(BtlvInput *work, u8 *outSlot, s32 *outButton) {
     }
 
     if (work->noUsableMove == TRUE) {
-        touch = func_0203da0c(data_ov168_021f3604.rects);
+        touch = GFL_HIDGetTouchPressedRect(data_ov168_021f3604.rects);
         transformed = TransformCheck(work->mons[work->pokeSlot]);
         button = BtlvInput_KeyInput(work, &data_ov168_021f3604, data_ov168_021f41a4[work->pokeSlot], NULL, touch,
                                     transformed);
     } else {
-        touch = func_0203da0c(data_ov168_021f3610.rects);
+        touch = GFL_HIDGetTouchPressedRect(data_ov168_021f3610.rects);
         transformed = TransformCheck(work->mons[work->pokeSlot]);
         button = BtlvInput_KeyInput(work, &data_ov168_021f3610, data_ov168_021f41bc[work->pokeSlot],
                                     data_ov168_021f35cf, touch, transformed);
@@ -1375,19 +1377,20 @@ static void BtlvInput_LoadGraphics(BtlvInput *work) {
                           0x20);
         }
     }
-    work->chars = func_0204b81c(work->arc, 0x1a4, FALSE, 1, work->heapId);
-    work->cellAnims = func_0204bde0(work->arc, 0x1a6, 0x1a7, work->heapId);
-    work->palette = func_0204bba0(work->arc, 0x1a5, 1, 0, work->heapId);
-    PaletteFade_LoadFromVRAM(work->paletteFade, 3, func_0204bdc0(work->palette, TRUE) / 2, 0x100);
-    work->chars2 = func_0204b81c(work->arc, 0x1a8, FALSE, 1, work->heapId);
-    work->cellAnims2 = func_0204bde0(work->arc, 0x1a9, 0x1aa, work->heapId);
+    work->chars = ClActSys_LoadChars(work->arc, 0x1a4, FALSE, 1, work->heapId);
+    work->cellAnims = ClActSys_LoadCellAnims(work->arc, 0x1a6, 0x1a7, work->heapId);
+    work->palette = ClActSys_LoadPltt(work->arc, 0x1a5, 1, 0, work->heapId);
+    PaletteFade_LoadFromVRAM(work->paletteFade, 3, ClActSys_GetPlttVramAddr(work->palette, TRUE) / 2, 0x100);
+    work->chars2 = ClActSys_LoadChars(work->arc, 0x1a8, FALSE, 1, work->heapId);
+    work->cellAnims2 = ClActSys_LoadCellAnims(work->arc, 0x1a9, 0x1aa, work->heapId);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(work->heapId));
-    work->moveCellAnims = func_0204bde0(arc, func_0202d7f8(0), func_0202d7fc(0), work->heapId);
-    work->movePalette = func_0204bba0(arc, func_0202d7e4(), 1, 0x100, work->heapId);
-    PaletteFade_LoadFromVRAM(work->paletteFade, 3, func_0204bdc0(work->movePalette, TRUE) / 2, 0x60);
+    work->moveCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTypeIconCellFile(0),
+                                                 AppMenuCommon_GetTypeIconAnimFile(0), work->heapId);
+    work->movePalette = ClActSys_LoadPltt(arc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0x100, work->heapId);
+    PaletteFade_LoadFromVRAM(work->paletteFade, 3, ClActSys_GetPlttVramAddr(work->movePalette, TRUE) / 2, 0x60);
     for (i = 0; i < 4; i++) {
-        work->moveChars[i] = func_0204b81c(arc, func_0202d7f4(0), FALSE, 1, work->heapId);
+        work->moveChars[i] = ClActSys_LoadChars(arc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, 1, work->heapId);
     }
     GFL_ArcToolFree(arc);
 }
@@ -1472,7 +1475,7 @@ static void BtlvInput_StandbyToMovesTask(TCB *tcb, void *data) {
     default:
         if (param->work->subTaskCount == 0) {
             BmpWin_FlushChar(param->work->msgWin);
-            func_0204bfd4(param->work->moveUnit, TRUE);
+            ClActUnit_SetActive(param->work->moveUnit, TRUE);
             BtlvInput_StartSetLayers(param->work, 5, 0x100, 0xc0, 2, 2, 2, 2);
             BtlvInput_EndTask(param->work, tcb);
         }
@@ -1508,7 +1511,7 @@ static void BtlvInput_CommandToMovesTask(TCB *tcb, void *data) {
     default:
         if (param->work->subTaskCount == 0) {
             BmpWin_FlushChar(param->work->msgWin);
-            func_0204bfd4(param->work->moveUnit, TRUE);
+            ClActUnit_SetActive(param->work->moveUnit, TRUE);
             BtlvInput_StartSetLayers(param->work, 5, 0x100, 0xc0, 2, 2, 2, 2);
             BtlvInput_EndTask(param->work, tcb);
         }
@@ -1596,7 +1599,7 @@ static void BtlvInput_TargetToMovesTask(TCB *tcb, void *data) {
         loadBGScrToVramByFileNoReserveNegAlign(param->work->arc, BtlvInput_FileId(0x174, param->work), 5, 0, 0, FALSE,
                                                param->work->heapId);
         BmpWin_FlushChar(param->work->msgWin);
-        func_0204bfd4(param->work->moveUnit, TRUE);
+        ClActUnit_SetActive(param->work->moveUnit, TRUE);
         BtlvInput_StartSetLayers(param->work, 5, 0x100, 0xc0, 2, 2, 2, 2);
         BtlvInput_EndTask(param->work, tcb);
         break;
@@ -1753,7 +1756,7 @@ static void BtlvInput_StandbyToMovesSlotTask(TCB *tcb, void *data) {
     default:
         if (param->work->subTaskCount == 0) {
             BmpWin_FlushChar(param->work->msgWin);
-            func_0204bfd4(param->work->moveUnit, TRUE);
+            ClActUnit_SetActive(param->work->moveUnit, TRUE);
             BtlvInput_StartSetLayers(param->work, 5, 0x100, 0xc0, 2, 2, 2, 2);
             BtlvInput_EndTask(param->work, tcb);
         }
@@ -1766,7 +1769,7 @@ static void BtlvInput_StandbyToMessageTask(TCB *tcb, void *data) {
     BtlvInputScreenTask *param = data;
     BOOL studioMode2 = FALSE;
 
-    if (func_ov167_0219c988(BtlvEffect_GetMainModule()) == 2) {
+    if (GetStudioMode(BtlvEffect_GetMainModule()) == 2) {
         studioMode2 = TRUE;
     }
     switch (param->seq) {
@@ -1798,7 +1801,7 @@ static void BtlvInput_StandbyToMessageTask(TCB *tcb, void *data) {
                 BtlvInput_StartSetLayers(param->work, 4, param->x, param->y, 1, 1, 2, 0);
             }
             BtlvInput_EndTask(param->work, tcb);
-            func_ov167_0219c988(BtlvEffect_GetMainModule());
+            GetStudioMode(BtlvEffect_GetMainModule());
         }
         break;
     }
@@ -1812,10 +1815,10 @@ static void BtlvInput_LoadTypeIcons(BtlvInput *work) {
     ClActorSetup setup;
     int i;
 
-    work->typeCellAnims = func_0204bde0(work->arc, 0x238, 0x239, work->heapId);
-    work->typePalette = func_0204bbb8(work->arc, 0x23a, 1, 0, 0, 4, work->heapId);
+    work->typeCellAnims = ClActSys_LoadCellAnims(work->arc, 0x238, 0x239, work->heapId);
+    work->typePalette = ClActSys_LoadPlttRange(work->arc, 0x23a, 1, 0, 0, 4, work->heapId);
     buf = GFL_G2DIOReadOBJNCGRArc(work->arc, 0x237, FALSE, &character, work->heapId);
-    func_0204ba40(work->chars, character);
+    ClActSys_ReplaceCharData(work->chars, character);
     GFL_HeapFree(buf);
     PaletteFade_LoadFromVRAM(work->paletteFade, 3, 0, 0x1e0);
 
@@ -1826,10 +1829,10 @@ static void BtlvInput_LoadTypeIcons(BtlvInput *work) {
         s.y = data_ov168_021f3a70[i].y;
         s.priority = 0x80 - i;
         work->typeActors[i] =
-            func_0204c040(work->typeUnit, work->chars, work->typePalette, work->typeCellAnims, &s, 1, work->heapId);
+            ClActor_Create(work->typeUnit, work->chars, work->typePalette, work->typeCellAnims, &s, 1, work->heapId);
         func_0204c520(work->typeActors[i], FALSE);
-        func_0204c124(work->typeActors[i], TRUE);
-        func_0204c378(work->typeActors[i], data_ov168_021f3a70[i].palette, 1);
+        ClActor_SetVisible(work->typeActors[i], TRUE);
+        ClActor_SetPalette(work->typeActors[i], data_ov168_021f3a70[i].palette, 1);
     }
     work->typeLoaded = TRUE;
     BtlvInput_LoadTypePalettes(work);
@@ -1841,12 +1844,12 @@ static void BtlvInput_FreeTypeIcons(BtlvInput *work) {
 
     for (i = 0; i < BTLV_INPUT_TYPE_COUNT; i++) {
         if (work->typeActors[i] != NULL) {
-            func_0204c108(work->typeActors[i]);
+            ClActor_Delete(work->typeActors[i]);
             work->typeActors[i] = NULL;
         }
     }
-    func_0204be64(work->typeCellAnims);
-    func_0204bcd0(work->typePalette);
+    ClActSys_FreeCellAnims(work->typeCellAnims);
+    ClActSys_FreePltt(work->typePalette);
 }
 
 static BOOL BtlvInput_TestTypeBit(u32 mask, int bit) {
@@ -1895,11 +1898,11 @@ static void BtlvInput_ShowTypeScreen(BtlvInput *work) {
 
 // Shows or hides one type icon, with its animation
 void BtlvInput_SetTypeIconVisible(BtlvInput *work, BOOL visible, int index, int sequence) {
-    func_0204c124(work->typeActors[index], visible);
+    ClActor_SetVisible(work->typeActors[index], visible);
     if (visible) {
-        func_0204c488(work->typeActors[index], sequence);
+        ClActor_SetSequence(work->typeActors[index], sequence);
         func_0204c520(work->typeActors[index], TRUE);
-        func_0204c378(work->typeActors[index], data_ov168_021f3a70[index].palette, 1);
+        ClActor_SetPalette(work->typeActors[index], data_ov168_021f3a70[index].palette, 1);
     }
 }
 
@@ -1932,9 +1935,15 @@ static void BtlvInput_LoadTypePalettes(BtlvInput *work) {
 }
 
 // Loads one of the copied palettes into the fade buffers
-static void BtlvInput_LoadTypePalette(const BtlvInput *work, int palette) {
-    PaletteFade_LoadData(work->paletteFade, work->typePalBuf + palette * 0x80, 3, 0, 0x80);
-    PaletteFade_LoadData(work->paletteFade, work->typePalBuf2 + palette * 0xa0, 1, 0, 0xa0);
+static void BtlvInput_LoadTypePalette(BtlvInput *work, int palette) {
+    const u8 *src;
+
+    src = work->typePalBuf;
+    src += palette * 0x80;
+    PaletteFade_LoadData(work->paletteFade, src, 3, 0, 0x80);
+    src = work->typePalBuf2;
+    src += palette * 0xa0;
+    PaletteFade_LoadData(work->paletteFade, src, 1, 0, 0xa0);
 }
 
 // Animates the type icons' palettes: every 5 frames the next palette of the current step, a new random step when
@@ -2059,7 +2068,7 @@ static void BtlvInput_RotationScreenTask(TCB *tcb, void *data) {
     default:
         if (task->work->subTaskCount == 0) {
             BmpWin_FlushChar(task->work->msgWin);
-            func_0204bfd4(task->work->moveUnit, TRUE);
+            ClActUnit_SetActive(task->work->moveUnit, TRUE);
             BtlvInput_StartSetLayers(task->work, 5, 256, 192, 2, 2, 2, 2);
             BtlvInput_EndTask(task->work, tcb);
         }
@@ -2089,7 +2098,7 @@ static void BtlvInput_RotationSwitchTask(TCB *tcb, void *data) {
     default:
         if (task->work->subTaskCount == 0) {
             BmpWin_FlushChar(task->work->msgWin);
-            func_0204bfd4(task->work->moveUnit, TRUE);
+            ClActUnit_SetActive(task->work->moveUnit, TRUE);
             BtlvInput_StartSetLayers(task->work, 5, 256, 192, 2, 2, 2, 2);
             BtlvInput_EndTask(task->work, tcb);
         }
@@ -2215,18 +2224,18 @@ static void BtlvInput_StartTileAnim(BtlvInput *work, int set, int which) {
     int i;
 
     param->work = work;
-    param->unit = func_0204bf1c(6, 0, work->heapId);
+    param->unit = ClActUnit_Create(6, 0, work->heapId);
     for (i = 0; i < 6; i++) {
         if (data_ov168_021f3b28[set].pos[i].x == -1) {
             param->actors[i] = NULL;
             continue;
         }
         param->actors[i] =
-            func_0204c040(param->unit, work->chars, work->palette, work->cellAnims, &setup, 1, work->heapId);
-        func_0204c140(param->actors[i], &data_ov168_021f3b28[set].pos[i], 1);
-        func_0204c244(param->actors[i], 2);
+            ClActor_Create(param->unit, work->chars, work->palette, work->cellAnims, &setup, 1, work->heapId);
+        ClActor_SetSurfacePos(param->actors[i], &data_ov168_021f3b28[set].pos[i], 1);
+        ClActor_SetAffineMode(param->actors[i], 2);
         func_0204c520(param->actors[i], TRUE);
-        func_0204c488(param->actors[i], data_ov168_021f3b28[set].sequences[which]);
+        ClActor_SetSequence(param->actors[i], data_ov168_021f3b28[set].sequences[which]);
     }
     BtlvInput_AddTask(work, GFL_TCBMgrAddTask(work->tcbMgr, BtlvInput_TileAnimTask, param, 0), BtlvInput_TileAnimEnd);
     work->subTaskCount++;
@@ -2237,7 +2246,7 @@ static void BtlvInput_TileAnimTask(TCB *tcb, void *data) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        if (param->actors[i] != NULL && func_0204c560(param->actors[i])) {
+        if (param->actors[i] != NULL && ClActor_IsAnimActive(param->actors[i])) {
             return;
         }
     }
@@ -2250,10 +2259,10 @@ static void BtlvInput_TileAnimEnd(TCB *tcb) {
 
     for (i = 0; i < 6; i++) {
         if (param->actors[i] != NULL) {
-            func_0204c108(param->actors[i]);
+            ClActor_Delete(param->actors[i]);
         }
     }
-    func_0204bf98(param->unit);
+    ClActUnit_Delete(param->unit);
     param->work->subTaskCount--;
 }
 
@@ -2287,7 +2296,7 @@ static void BtlvInput_ActorSlideTask(TCB *tcb, void *data) {
             break;
         }
         for (i = 0; i < 6; i++) {
-            func_0204c178(actors[i].actor, &pos, 1);
+            ClActor_GetSurfacePos(actors[i].actor, &pos, 1);
             if (pos.y > target) {
                 pos.y -= 4;
                 moving = TRUE;
@@ -2295,7 +2304,7 @@ static void BtlvInput_ActorSlideTask(TCB *tcb, void *data) {
                 pos.y += 4;
                 moving = TRUE;
             }
-            func_0204c140(actors[i].actor, &pos, 1);
+            ClActor_SetSurfacePos(actors[i].actor, &pos, 1);
         }
     }
     if (!moving) {
@@ -2367,12 +2376,12 @@ static void BtlvInput_SlideActorsLeftTask(TCB *tcb, void *data) {
     BtlvInputWorkTask *param = data;
     ClActorPos pos;
 
-    func_0204c178(param->work->actors210[0], &pos, 1);
+    ClActor_GetSurfacePos(param->work->actors210[0], &pos, 1);
     pos.x -= 8;
-    func_0204c140(param->work->actors210[0], &pos, 1);
-    func_0204c178(param->work->actors210[1], &pos, 1);
+    ClActor_SetSurfacePos(param->work->actors210[0], &pos, 1);
+    ClActor_GetSurfacePos(param->work->actors210[1], &pos, 1);
     pos.x -= 8;
-    func_0204c140(param->work->actors210[1], &pos, 1);
+    ClActor_SetSurfacePos(param->work->actors210[1], &pos, 1);
     if (pos.x == 224) {
         BtlvInput_EndTask(param->work, tcb);
     }
@@ -2460,6 +2469,28 @@ static void BtlvInput_GetStringWidth(const StrBuf *strbuf, Font *font, int *widt
     *blocks = b;
 }
 
+// The letter, shadow and background colors of a PP color, 5 bits each, as printsys.c's TEXT_COLOR_* macros read a
+// PRINT_COLOR. Getters rather than the shifts in the arguments: in BtlvInput_DrawMoveTiles the original computes the
+// three from the background back to the letter, each narrowed to u8, as these give
+static inline u8 BtlvInput_ColorLetter(s32 color) {
+    return (color >> 10) & 0x1f;
+}
+
+static inline u8 BtlvInput_ColorShadow(s32 color) {
+    return (color >> 5) & 0x1f;
+}
+
+static inline u8 BtlvInput_ColorBackground(s32 color) {
+    return color & 0x1f;
+}
+
+// The heap ID that allocates from the tail of the heap, for temporary buffers. A getter rather than HEAPID_TAIL in the
+// arguments: in BtlvInput_DrawMoveTiles the original computes it and spills it before the getUINarcIdx call of an
+// earlier argument, as an inline argument is
+static inline HeapID BtlvInput_TempHeapId(const BtlvInput *work) {
+    return HEAPID_TAIL(work->heapId);
+}
+
 // Draws the four move tiles' text and type icons
 static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *param) {
     const s32 ppLabelPos[4][2] = { { 53, 26 }, { 181, 26 }, { 53, 74 }, { 181, 74 } };
@@ -2473,39 +2504,39 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
     u8 shadow;
     u8 background;
     WordSet *wordSet;
+    u32 palette;
     StrBuf *nameBuf;
     StrBuf *nameFmt;
-    StrBuf *ppLabel;
     StrBuf *ppBuf;
     StrBuf *ppFmt;
+    StrBuf *ppLabel;
     void *charBuf;
     void *palBuf;
-    u32 palette;
     s32 type;
     s32 color;
     int i;
 
     nameBuf = GFL_StrBufCreate(16, work->heapId);
-    nameFmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty);
-    ppLabel = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Pp);
+    nameFmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty);
+    ppLabel = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Pp);
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     ppBuf = GFL_StrBufCreate(16, work->heapId);
-    ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_2);
-    func_0204bfd4(work->moveUnit, FALSE);
+    ppFmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_2);
+    ClActUnit_SetActive(work->moveUnit, FALSE);
 
     for (i = 0; i < 4; i++) {
         if (param->moves[i] != MOVE_NONE) {
-            HeapID heapId = HEAPID_TAIL(work->heapId);
             type = PML_MoveGetParam(param->moves[i], MOVE_PARAM_TYPE);
             palette = data_ov168_021f3864[type];
-            work->moveActors[i] = func_0204c040(work->moveUnit, work->moveChars[i], work->movePalette,
-                                                work->moveCellAnims, &data_ov168_021f35f2, 1, work->heapId);
-            func_0204c140(work->moveActors[i], &data_ov168_021f3638[i], 1);
-            charBuf = GFL_G2DIOReadOBJNCGR(getUINarcIdx(), func_0202d7f4(type), FALSE, &character, heapId);
-            func_0204c378(work->moveActors[i], func_0202d7e8(type), 1);
-            func_0204c40c(work->moveActors[i], &proxy);
+            work->moveActors[i] = ClActor_Create(work->moveUnit, work->moveChars[i], work->movePalette,
+                                                 work->moveCellAnims, &data_ov168_021f35f2, 1, work->heapId);
+            ClActor_SetSurfacePos(work->moveActors[i], &data_ov168_021f3638[i], 1);
+            charBuf = GFL_G2DIOReadOBJNCGR(getUINarcIdx(), AppMenuCommon_GetTypeIconCharFile(type), FALSE, &character,
+                                           BtlvInput_TempHeapId(work));
+            ClActor_SetPalette(work->moveActors[i], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
+            ClActor_GetImageProxy(work->moveActors[i], &proxy);
             MI_CpuCopy16(character->rawData,
-                         (void *)(HW_DB_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]), 0x100);
+                         (u8 *)G2S_GetOBJCharPtr() + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB], 0x100);
             GFL_HeapFree(charBuf);
 
             GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
@@ -2520,7 +2551,8 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
             WordSetNumber(wordSet, 1, param->maxPP[i], 2, 1, TRUE);
             GFL_WordSetFormatStrbuf(wordSet, ppBuf, ppFmt);
             color = BtlvInput_GetPPColor(param->pp[i], param->maxPP[i]);
-            GFL_TextRndUpdateColorIndexLUT((color >> 10) & 0x1f, (color >> 5) & 0x1f, color & 0x1f);
+            GFL_TextRndUpdateColorIndexLUT(BtlvInput_ColorLetter(color), BtlvInput_ColorShadow(color),
+                                           BtlvInput_ColorBackground(color));
             GFL_TextRendererDrawToBitmap(work->msgBitmap, ppLabelPos[i][0], ppLabelPos[i][1], ppLabel, work->font);
             BtlvInput_GetStringWidth(ppBuf, work->font, &width, &blocks);
             GFL_TextRendererDrawToBitmap(work->msgBitmap, ppPos[i][0] - width / 2, ppPos[i][1], ppBuf, work->font);
@@ -2531,7 +2563,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
         } else {
             palette = 463;
         }
-        palBuf = GFL_G2DIOReadNCLR(11, palette, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, palette, &paletteData, BtlvInput_TempHeapId(work));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x90, 0x20);
         GFL_HeapFree(palBuf);
     }
@@ -2594,12 +2626,12 @@ static void BtlvInput_DrawTargetPanels(BtlvInput *work, BtlvInputScreenTask *tas
 
     count = (work->rule == 2) ? 3 : 2;
     for (i = 0; i < count; i++) {
-        palBuf = GFL_G2DIOReadNCLR(11, 481, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 481, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
     for (; i < count * 2; i++) {
-        palBuf = GFL_G2DIOReadNCLR(11, 482, &paletteData, HEAPID_TAIL(work->heapId));
+        palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 482, &paletteData, HEAPID_TAIL(work->heapId));
         PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
@@ -2632,7 +2664,7 @@ static void BtlvInput_SetupMoveScreen(BtlvInput *work) {
         param.maxPP[i] = 0;
     }
     for (i = 0; i < GetBattleMonMoveCount(work->mons[work->pokeSlot]); i++) {
-        param.moves[i] = func_ov167_021bad28(work->mons[work->pokeSlot], i, &param.pp[i], &param.maxPP[i]);
+        param.moves[i] = BattleMon_GetMoveInfo(work->mons[work->pokeSlot], i, &param.pp[i], &param.maxPP[i]);
     }
     BtlvInput_DrawMoveTiles(work, &param);
     work->buttonEnabled[5] = data_ov168_021f35dc[work->pokeSlot][0];
@@ -2673,7 +2705,7 @@ static void BtlvInput_DrawRecorderCount(BtlvInput *work, const BtlvInputRecorder
 
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     buf = GFL_StrBufCreate(8, work->heapId);
-    fmt = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_6);
+    fmt = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_6);
     GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
     GFL_TextRndUpdateColorIndexLUT(9, 10, 0);
     WordSetNumber(wordSet, 0, param->unk8, 3, 2, TRUE);
@@ -2686,7 +2718,7 @@ static void BtlvInput_DrawRecorderCount(BtlvInput *work, const BtlvInputRecorder
     GFL_WordSetFormatStrbuf(wordSet, buf, fmt);
     GFL_TextRendererDrawToBitmap(work->msgBitmap, 96, 8, buf, work->font);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
-    label = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_7);
+    label = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_7);
     GFL_TextRendererDrawToBitmap(work->msgBitmap, 124, 8, label, work->font);
     GFL_StrBufFree(label);
     GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
@@ -2766,9 +2798,10 @@ static void BtlvInput_CreatePartyIcons(BtlvInput *work, const BtlvInputCommandPa
         return;
     }
     arc = GFL_ArcSysCreateFileHandle(7, HEAPID_TAIL(work->heapId));
-    work->iconCellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), work->heapId);
-    work->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 1, 0x160, work->heapId);
-    PaletteFade_LoadFromVRAM(work->paletteFade, 3, (u16)(func_0204bdc0(work->iconPalette, TRUE) >> 1), 0x60);
+    work->iconCellAnims =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), work->heapId);
+    work->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 1, 0x160, work->heapId);
+    PaletteFade_LoadFromVRAM(work->paletteFade, 3, (u16)(ClActSys_GetPlttVramAddr(work->iconPalette, TRUE) >> 1), 0x60);
     G2S_SetWnd0Position(1, 0, 0, 0);
     G2S_SetWnd1Position(1, 0, 0, 0);
     if (count > 1) {
@@ -2782,14 +2815,14 @@ static void BtlvInput_CreatePartyIcons(BtlvInput *work, const BtlvInputCommandPa
             continue;
         }
         work->iconChars[i] =
-            func_0204b81c(arc, PokeParty_GetIconIndex(param->species[i], param->forms[i], param->sexes[i], FALSE),
-                          FALSE, 1, work->heapId);
-        work->iconActors[i].actor = func_0204c040(work->iconUnit, work->iconChars[i], work->iconPalette,
-                                                  work->iconCellAnims, &data_ov168_021f35f2, 1, work->heapId);
-        func_0204c140(work->iconActors[i].actor, &data_ov168_021f3780[work->rule][i], 1);
+            ClActSys_LoadChars(arc, PokeParty_GetIconIndex(param->species[i], param->forms[i], param->sexes[i], FALSE),
+                               FALSE, 1, work->heapId);
+        work->iconActors[i].actor = ClActor_Create(work->iconUnit, work->iconChars[i], work->iconPalette,
+                                                   work->iconCellAnims, &data_ov168_021f35f2, 1, work->heapId);
+        ClActor_SetSurfacePos(work->iconActors[i].actor, &data_ov168_021f3780[work->rule][i], 1);
         func_0204c520(work->iconActors[i].actor, TRUE);
         if (param->pokePos == i) {
-            func_0204c488(work->iconActors[i].actor, 1);
+            ClActor_SetSequence(work->iconActors[i].actor, 1);
         } else if (windows == 0) {
             x = data_ov168_021f3780[work->rule][i].x;
             y = data_ov168_021f3780[work->rule][i].y;
@@ -2800,8 +2833,8 @@ static void BtlvInput_CreatePartyIcons(BtlvInput *work, const BtlvInputCommandPa
             y = data_ov168_021f3780[work->rule][i].y;
             G2S_SetWnd1Position(x - 16, y - 16, x + 16, y + 16);
         }
-        func_0204c378(work->iconActors[i].actor,
-                      PokeIcon_GetPalette(param->species[i], param->forms[i], param->sexes[i], FALSE), 0);
+        ClActor_SetPalette(work->iconActors[i].actor,
+                           PokeIcon_GetPalette(param->species[i], param->forms[i], param->sexes[i], FALSE), 0);
     }
     GFL_ArcToolFree(arc);
 }
@@ -2815,19 +2848,19 @@ static void BtlvInput_DeletePartyIcons(BtlvInput *work) {
     none = TRUE;
     for (i = 0; i < 3; i++) {
         if (work->iconActors[i].actor != NULL) {
-            func_0204c108(work->iconActors[i].actor);
-            func_0204b98c(work->iconChars[i]);
+            ClActor_Delete(work->iconActors[i].actor);
+            ClActSys_FreeChars(work->iconChars[i]);
             work->iconActors[i].actor = NULL;
             work->iconChars[i] = -1;
             none = FALSE;
         }
     }
     if (work->iconCellAnims != -1) {
-        func_0204be64(work->iconCellAnims);
+        ClActSys_FreeCellAnims(work->iconCellAnims);
         work->iconCellAnims = -1;
     }
     if (work->iconPalette != -1) {
-        func_0204bcd0(work->iconPalette);
+        ClActSys_FreePltt(work->iconPalette);
         work->iconPalette = -1;
     }
     if (!none) {
@@ -2839,7 +2872,7 @@ static void BtlvInput_DeletePartyIcons(BtlvInput *work) {
 
 // Shows or hides the party icons
 static void BtlvInput_SetPartyIconsActive(BtlvInput *work, BOOL active) {
-    func_0204bfd4(work->iconUnit, active);
+    ClActUnit_SetActive(work->iconUnit, active);
 }
 
 // Creates the two actors of the ball count's slide for the ball index and starts its task
@@ -2853,21 +2886,21 @@ static void BtlvInput_CreateBallSlideActors(BtlvInput *work, int index) {
     if (index == 0) {
         return;
     }
-    work->actors210[0] = func_0204c040(work->unit20c, work->chars, work->palette, work->cellAnims, &data_ov168_021f35f2,
-                                       1, work->heapId);
+    work->actors210[0] = ClActor_Create(work->unit20c, work->chars, work->palette, work->cellAnims,
+                                        &data_ov168_021f35f2, 1, work->heapId);
     pos.x = xs[index - 1] + 304;
     pos.y = ys[index - 1] + 32;
-    func_0204c140(work->actors210[0], &pos, 1);
+    ClActor_SetSurfacePos(work->actors210[0], &pos, 1);
     func_0204c520(work->actors210[0], TRUE);
-    func_0204c488(work->actors210[0], index + 14);
-    work->actors210[1] = func_0204c040(work->unit20c, work->chars, work->palette, work->cellAnims, &data_ov168_021f35f2,
-                                       1, work->heapId);
+    ClActor_SetSequence(work->actors210[0], index + 14);
+    work->actors210[1] = ClActor_Create(work->unit20c, work->chars, work->palette, work->cellAnims,
+                                        &data_ov168_021f35f2, 1, work->heapId);
     pos.x = 304;
     pos.y = 32;
-    func_0204c140(work->actors210[1], &pos, 1);
+    ClActor_SetSurfacePos(work->actors210[1], &pos, 1);
     func_0204c520(work->actors210[1], TRUE);
-    func_0204c488(work->actors210[1], 14);
-    func_0204c378(work->actors210[1], (u8)palettes[index - 1], 0);
+    ClActor_SetSequence(work->actors210[1], 14);
+    ClActor_SetPalette(work->actors210[1], (u8)palettes[index - 1], 0);
     data = GFL_HeapAllocate(HEAPID_TAIL(work->heapId), sizeof(BtlvInputWorkTask), FALSE, "btlv_input.c", 5461);
     data->work = work;
     BtlvInput_AddTask(work, GFL_TCBMgrAddTask(work->tcbMgr, BtlvInput_SlideActorsLeftTask, data, 0),
@@ -2881,7 +2914,7 @@ static void BtlvInput_DeleteBallSlideActors(BtlvInput *work) {
 
     for (i = 0; i < 2; i++) {
         if (work->actors210[i] != NULL) {
-            func_0204c108(work->actors210[i]);
+            ClActor_Delete(work->actors210[i]);
             work->actors210[i] = NULL;
         }
     }
@@ -2909,11 +2942,11 @@ static void BtlvInput_CreatePokeListIcons(BtlvInput *work, int side) {
         base = 0;
     }
     for (i = 0; i < 6; i++) {
-        actors[i].actor = func_0204c040(work->pokeUnit, work->chars, work->palette, work->cellAnims,
-                                        &data_ov168_021f35f2, 1, work->heapId);
-        func_0204c140(actors[i].actor, &pos, 1);
+        actors[i].actor = ClActor_Create(work->pokeUnit, work->chars, work->palette, work->cellAnims,
+                                         &data_ov168_021f35f2, 1, work->heapId);
+        ClActor_SetSurfacePos(actors[i].actor, &pos, 1);
         func_0204c520(actors[i].actor, TRUE);
-        func_0204c488(actors[i].actor, base + work->pokeEntries[side][i].iconAnim);
+        ClActor_SetSequence(actors[i].actor, base + work->pokeEntries[side][i].iconAnim);
         pos.x += step;
     }
 }
@@ -2928,7 +2961,7 @@ static void BtlvInput_DeletePokeListIcons(BtlvInput *work) {
         actors = (side != 0) ? work->pokeActors[1] : work->pokeActors[0];
         for (i = 0; i < 6; i++) {
             if (actors[i].actor != NULL) {
-                func_0204c108(actors[i].actor);
+                ClActor_Delete(actors[i].actor);
                 actors[i].actor = NULL;
             }
         }
@@ -2941,11 +2974,11 @@ static void BtlvInput_CreateCursorActors(BtlvInput *work) {
     int i;
 
     for (i = 0; i < 6; i++) {
-        work->cursorActors[i].actor = func_0204c040(work->cursorUnit, work->chars2, work->palette, work->cellAnims2,
-                                                    &data_ov168_021f35f2, 1, work->heapId);
+        work->cursorActors[i].actor = ClActor_Create(work->cursorUnit, work->chars2, work->palette, work->cellAnims2,
+                                                     &data_ov168_021f35f2, 1, work->heapId);
         func_0204c520(work->cursorActors[i].actor, TRUE);
-        func_0204c488(work->cursorActors[i].actor, sequences[i]);
-        func_0204c124(work->cursorActors[i].actor, FALSE);
+        ClActor_SetSequence(work->cursorActors[i].actor, sequences[i]);
+        ClActor_SetVisible(work->cursorActors[i].actor, FALSE);
     }
 }
 
@@ -2955,7 +2988,7 @@ static void BtlvInput_DeleteCursorActors(BtlvInput *work) {
 
     for (i = 0; i < 6; i++) {
         if (work->cursorActors[i].actor != NULL) {
-            func_0204c108(work->cursorActors[i].actor);
+            ClActor_Delete(work->cursorActors[i].actor);
             work->cursorActors[i].actor = NULL;
         }
     }
@@ -2967,7 +3000,7 @@ static void BtlvInput_DeleteMoveTypeIcons(BtlvInput *work) {
 
     for (i = 0; i < 4; i++) {
         if (work->moveActors[i] != NULL) {
-            func_0204c108(work->moveActors[i]);
+            ClActor_Delete(work->moveActors[i]);
             work->moveActors[i] = NULL;
         }
     }
@@ -2984,17 +3017,18 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     GFLBitmap *bitmap;
     u8 *pixels;
     int i;
+    void *vram = G2S_GetOBJCharPtr();
 
-    work->actor21c = func_0204c040(work->unit218, work->chars, work->palette, work->cellAnims, &data_ov168_021f35f2, 1,
-                                   work->heapId);
+    work->actor21c = ClActor_Create(work->unit218, work->chars, work->palette, work->cellAnims, &data_ov168_021f35f2, 1,
+                                    work->heapId);
     pos.x = 128;
     pos.y = 80;
-    func_0204c140(work->actor21c, &pos, 1);
+    ClActor_SetSurfacePos(work->actor21c, &pos, 1);
     func_0204c520(work->actor21c, TRUE);
-    func_0204c488(work->actor21c, 20);
+    ClActor_SetSequence(work->actor21c, 20);
 
     strbuf = GFL_StrBufCreate(16, work->heapId);
-    src = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty);
+    src = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty);
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     bitmap = GFL_BitmapCreate(14, 4, 0x20, work->heapId);
     GFL_BitmapFill(bitmap, 0);
@@ -3007,20 +3041,20 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
     GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
 
     pixels = GFL_BitmapGetPixelData(bitmap);
-    func_0204c40c(work->actor21c, &proxy);
+    ClActor_GetImageProxy(work->actor21c, &proxy);
     for (i = 0; i < 4; i++) {
-        MI_CpuCopy16(&pixels[i * 0x1c0],
-                     (void *)(HW_DB_OBJ_VRAM + (0xde + i * 8) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x100);
-        MI_CpuCopy16(&pixels[i * 0x1c0 + 0x100],
-                     (void *)(HW_DB_OBJ_VRAM + (0xfe + i * 4) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x80);
-        MI_CpuCopy16(&pixels[i * 0x1c0 + 0x180],
-                     (void *)(HW_DB_OBJ_VRAM + (0x10e + i * 2) * 0x20 +
-                              proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
-                     0x40);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0],
+            (void *)((u32)vram + (0xde + i * 8) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x100);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0 + 0x100],
+            (void *)((u32)vram + (0xfe + i * 4) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x80);
+        MI_CpuCopy16(
+            &pixels[i * 0x1c0 + 0x180],
+            (void *)((u32)vram + (0x10e + i * 2) * 0x20 + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB]),
+            0x40);
     }
 
     GFL_StrBufFree(strbuf);
@@ -3031,7 +3065,7 @@ static void BtlvInput_CreateStruggleActor(BtlvInput *work) {
 
 static void BtlvInput_DeleteStruggleActor(BtlvInput *work) {
     if (work->actor21c != NULL) {
-        func_0204c108(work->actor21c);
+        ClActor_Delete(work->actor21c);
         work->actor21c = NULL;
     }
 }
@@ -3053,7 +3087,7 @@ static s32 BtlvInput_KeyInput(BtlvInput *work, const BtlvInputButtonSet *set, co
         work->cursorRefresh = 0;
         BtlvInput_RestoreKeyCursor(work);
         BtlvInput_UpdateKeyCursorActors(work, set->rects, stops);
-        func_0204bfd4(work->cursorUnit, TRUE);
+        ClActUnit_SetActive(work->cursorUnit, TRUE);
     }
     if (result != -1) {
         *work->keyCursorFlag = 0;
@@ -3173,7 +3207,7 @@ static s32 BtlvInput_KeyInput(BtlvInput *work, const BtlvInputButtonSet *set, co
         work->cursor = 0;
         work->prevCursor = 0xf;
         work->cursorRefresh = 1;
-        func_0204bfd4(work->cursorUnit, FALSE);
+        ClActUnit_SetActive(work->cursorUnit, FALSE);
     }
     return result;
 }
@@ -3234,10 +3268,10 @@ static void BtlvInput_UpdateKeyCursorActors(BtlvInput *work, const TouchRect *re
                 pos.y = rect->bottom;
                 break;
             }
-            func_0204c124(work->cursorActors[i].actor, *work->keyCursorFlag);
-            func_0204c140(work->cursorActors[i].actor, &pos, 1);
+            ClActor_SetVisible(work->cursorActors[i].actor, *work->keyCursorFlag);
+            ClActor_SetSurfacePos(work->cursorActors[i].actor, &pos, 1);
         } else {
-            func_0204c124(work->cursorActors[i].actor, FALSE);
+            ClActor_SetVisible(work->cursorActors[i].actor, FALSE);
         }
     }
 }
@@ -3326,7 +3360,7 @@ static void BtlvInput_PrintLauncherPoints(BtlvInput *work, BtlvInputCommandParam
     }
     wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     strbuf = GFL_StrBufCreate(6, work->heapId);
-    src = GFL_MsgDataLoadStrbufNew(work->msgData, Bank0021_Text_Empty_8);
+    src = GFL_MsgDataLoadStrbufNew(work->msgData, BtlvInput_Text_Empty_8);
     GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     WordSetNumber(wordSet, 0, param->launcherPoints, 2, 0, TRUE);

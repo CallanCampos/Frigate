@@ -34,9 +34,6 @@
 #define HEAPID_MAILBOX_PROC 0x65
 #define HEAPID_MAILBOX_VIEW 0x66
 
-// The archive with the mailbox's graphics
-#define ARCID_MAILBOX 0x99
-
 // The message file of the mailbox's texts, which the battle server flow's second file holds
 #define MAILBOX_MSG_FILE TEXT_BANK_BTL_SERVER_FLOW_2
 

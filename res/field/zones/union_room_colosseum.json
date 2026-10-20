@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 6,
+    "npc_cache": 24,
+    "area": "AREA_UNION_ROOM_COLOSSEUM",
+    "matrix": "MAP_MATRIX_UNION_ROOM_COLOSSEUM",
+    "scripts": "SCRIPTS_UNION_ROOM_COLOSSEUM",
+    "text": "SCRIPT_TEXT_UNION_ROOM_COLOSSEUM",
+    "bgm": "SEQ_BGM_POKECEN",
+    "encounters": null,
+    "enc_slot": 6,
+    "parent": "ZONE_UNION_ROOM",
+    "place": "PLACE_NONE",
+    "place_display": 0,
+    "weather": 0,
+    "projection": 0,
+    "camera": 0,
+    "transition": 1,
+    "battle_bg": 9,
+    "cycling": false,
+    "escape_rope": false,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 89,
+    "name_icon": 15,
+    "easy_level": 0,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

@@ -6,21 +6,10 @@
 // emulator check and of the flashcart check of dsprot_detect.c, which report to the caller's arguments instead of
 // crashing the game when a check fails. The ROM doesn't name this file; it is named for what it does.
 
-// The card's registers, which the flashcart check reads the ROM through
-#define REG_AUXSPICNT_H (*(vu8 *)0x040001a1)
-#define REG_ROMCTRL (*(vu32 *)0x040001a4)
-#define REG_ROMCMD(n) (*(vu8 *)(0x040001a8 + (n)))
-#define REG_CARD_DATA (*(vu32 *)0x04100010)
-#define REG_SCFG_A9ROM (*(vu8 *)0x04004000)
-
-// The card's ROM control word that the system copied from the header, at 0x027ffe60, or 0x02fffe60 in TWL mode. DS
-// Protect computes the address from the TWL bit instead of choosing between the two.
-#define HW_ROM_HEADER_CARD_CTRL(twl) (*(u32 *)((((twl) + 5) << 23) - 0x1a0))
-
-// Bytes of the first MAC address whose reversed bits an emulator has
+// The MAC address that the check treats as an emulator's, 00:09:bf:00:00:31, with each byte inverted
 static const u8 sEmulatorMacMulti[6] = { 0xff, 0xf6, 0x40, 0xff, 0xff, 0xce };
 
-// Has the game's second function of the pair run with its arguments, and records its result and `flag` for the caller
+// Calls the second function of the pair with the caller's arguments, and records its result and `flag` for the caller
 static inline void DSProt_Tamper(DSProtCheckArgs *args, u32 flag) {
     args->result = args->tamper(args->arg0, args->arg1);
     args->failed = flag;
@@ -47,16 +36,15 @@ u32 DSProt_CheckEmulatorA(DSProtCheckArgs *args) {
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                break;
+                code = 0xf1;
+                // style-ok: goto-return pret's pokeheartgold DS Protect (mac_owner.c) jumps to its exit the same way
+                goto end;
             }
         }
-        if (j == 6) {
-            DSProt_Tamper(args, 0xfb);
-            code = 0xfb;
-        } else {
-            code = 0xf1;
-        }
+        DSProt_Tamper(args, 0xfb);
+        code = 0xfb;
     }
+end:
     return code * 0xbf;
 }
 
@@ -76,22 +64,22 @@ u32 DSProt_CheckEmulatorB(DSProtCheckArgs *args) {
     }
     OS_GetOwnerInfo(&owner);
     if (i == 6 && owner.birthday.month == 1 && owner.birthday.day == 1 && owner.nickNameLength == 0) {
+        // Unlike the other failures, this one records twice its code as the flag
         args->result = args->tamper(args->arg0, args->arg1);
         code = 0xf1;
         args->failed = code + 0xf1;
     } else {
         for (j = 0; j < 6; j++) {
             if (mac[j] != 0) {
-                break;
+                code = 0xfb;
+                // style-ok: goto-return pret's pokeheartgold DS Protect (mac_owner.c) jumps to its exit the same way
+                goto end;
             }
         }
-        if (j == 6) {
-            DSProt_Tamper(args, 0x78);
-            code = 0xf1;
-        } else {
-            code = 0xfb;
-        }
+        DSProt_Tamper(args, 0x78);
+        code = 0xf1;
     }
+end:
     return code * 0xb5;
 }
 
@@ -114,69 +102,80 @@ u32 DSProt_Crc32Multi(const u8 *data, u32 size) {
 }
 
 // Reads the 0x200 bytes at a card address with the card's registers, restoring the command registers and the
-// memory controller afterwards. `flag` is the sixth byte of the command.
-static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
-    u16 exmemcnt = reg_MI_EXMEMCNT;
-    u8 savedCommand[8];
-    u32 control;
-    int offset;
+// memory controller afterwards. `flag` is the sixth byte of the command. The register block is reached from a base
+// built at run time (1 shifted by 26) and a second pointer to 0x04000000 for the command bytes, the way the original's
+// constants are built.
+static inline void DSProt_ReadCardRaw(u8 *dest, u32 address, u32 flag) {
+    u32 page;
     int i;
+    u16 exmemcnt = reg_MI_EXMEMCNT;
+    vu8 *regs;
+    int offset;
+    u32 control;
+    u32 header;
+    u8 savedCommand[8];
+    u32 base;
 
+    regs = (vu8 *)0x04000000;
+    base = 1;
+    base <<= REG_BASE_SHIFT;
     reg_MI_EXMEMCNT &= ~0x0800;
-    control = (HW_ROM_HEADER_CARD_CTRL(REG_SCFG_A9ROM & 1) & ~0x07000000) | 0xa1000000;
+    header = 5;
+    header += *(vu8 *)(base + OFFSET_SCFG_A9ROM) & 1;
+    header <<= 18;
+    header -= 13;
+    header <<= 5;
+    control = (*(u32 *)header & ~0x07000000) | 0xa1000000;
     offset = -(int)(address & 0x1ff);
-    while (REG_ROMCTRL & 0x80000000) {
+    while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000) {
     }
-    REG_AUXSPICNT_H = 0x80;
+    *(vu8 *)(base + OFFSET_AUXSPICNT_H) = 0x80;
     for (i = 0; i < 8; i++) {
         savedCommand[i] = REG_ROMCMD(i);
     }
-    if (offset < 0x200) {
-        u32 page = address + offset;
-
+    page = address + offset;
+    while (offset < 0x200) {
+        regs[OFFSET_ROMCMD + 0] = 0xb7;
+        regs[OFFSET_ROMCMD + 1] = page >> 24;
+        regs[OFFSET_ROMCMD + 2] = page >> 16;
+        regs[OFFSET_ROMCMD + 3] = page >> 8;
+        regs[OFFSET_ROMCMD + 4] = page;
+        regs[OFFSET_ROMCMD + 5] = flag;
+        regs[OFFSET_ROMCMD + 6] = 0;
+        regs[OFFSET_ROMCMD + 7] = 0;
+        *(vu32 *)(base + OFFSET_ROMCTRL) = control;
         do {
-            REG_ROMCMD(0) = 0xb7;
-            REG_ROMCMD(1) = page >> 24;
-            REG_ROMCMD(2) = page >> 16;
-            REG_ROMCMD(3) = page >> 8;
-            REG_ROMCMD(4) = page;
-            REG_ROMCMD(5) = flag;
-            REG_ROMCMD(6) = 0;
-            REG_ROMCMD(7) = 0;
-            REG_ROMCTRL = control;
-            do {
-                if (REG_ROMCTRL & 0x800000) {
-                    u32 word = REG_CARD_DATA;
+            if (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x800000) {
+                u32 word = *(vu32 *)(base + OFFSET_CARD_DATA);
 
-                    if (offset >= 0 && offset < 0x200) {
-                        *(u32 *)((u8 *)dest + offset) = word;
-                    }
-                    offset += 4;
+                if (offset >= 0 && offset < 0x200) {
+                    *(u32 *)(dest + offset) = word;
                 }
-            } while (REG_ROMCTRL & 0x80000000);
-            page += 0x200;
-        } while (offset < 0x200);
+                offset += 4;
+            }
+        } while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000);
+        page += 0x200;
     }
     for (i = 0; i < 8; i++) {
         REG_ROMCMD(i) = savedCommand[i];
     }
-    reg_MI_EXMEMCNT = exmemcnt;
+    *(vu16 *)(base + OFFSET_EXMEMCNT) = exmemcnt;
 }
 
 // Reads the same places of the card with the card's registers and through the SDK, and has the second function run if a
 // flashcart gives different data
 u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
-    u32 crcs[20];
     u32 page[128];
+    u32 crcs[20];
+    u16 lockId;
     u32 offset = 0x7000;
     u32 address = 0x1000;
-    u32 lockId;
-    u32 i;
+    int i;
 
-    lockId = (u16)OS_GetLockID();
+    lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw((u8 *)page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -191,7 +190,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     }
     address += 0x1e000;
     for (; i < 8; i++) {
-        DSProt_ReadCardRaw(page, address, 0);
+        DSProt_ReadCardRaw((u8 *)page, address, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -199,7 +198,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     }
     address -= 0x1d000;
     for (; i < 10; i++) {
-        DSProt_ReadCardRaw(page, address, 0x11);
+        DSProt_ReadCardRaw((u8 *)page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 10] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -207,6 +206,7 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     }
     CARD_UnlockRom(lockId);
     OS_ReleaseLockID(lockId);
+    // Overwrites the last page read
     for (i = 0; i < 128; i++) {
         page[i] = i;
     }
@@ -237,17 +237,17 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
 
 // The same, with other codes
 u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
-    u32 crcs[20];
     u32 page[128];
+    u32 crcs[20];
+    u16 lockId;
     u32 offset = 0x7000;
     u32 address = 0x1000;
-    u32 lockId;
-    u32 i;
+    int i;
 
-    lockId = (u16)OS_GetLockID();
+    lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw((u8 *)page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -262,7 +262,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     }
     address += 0x1e000;
     for (; i < 8; i++) {
-        DSProt_ReadCardRaw(page, address, 0);
+        DSProt_ReadCardRaw((u8 *)page, address, 0);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -270,7 +270,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     }
     address -= 0x1d000;
     for (; i < 10; i++) {
-        DSProt_ReadCardRaw(page, address, 0x11);
+        DSProt_ReadCardRaw((u8 *)page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
         crcs[i + 10] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -278,6 +278,7 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     }
     CARD_UnlockRom(lockId);
     OS_ReleaseLockID(lockId);
+    // Overwrites the last page read
     for (i = 0; i < 128; i++) {
         page[i] = i;
     }
@@ -306,6 +307,8 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     return 0xc127;
 }
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckFlashcartA, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args) {
     orr ip, pc, pc
@@ -355,6 +358,8 @@ asm u32 DSProt_CallCheckFlashcartA(DSProtCheckArgs *args) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckFlashcartB, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args) {
     orr ip, pc, pc
@@ -404,6 +409,8 @@ asm u32 DSProt_CallCheckFlashcartB(DSProtCheckArgs *args) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckEmulatorA, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckEmulatorA(DSProtCheckArgs *args) {
     orr ip, pc, pc
@@ -453,6 +460,8 @@ asm u32 DSProt_CallCheckEmulatorA(DSProtCheckArgs *args) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_CheckEmulatorB, run it and encrypt it again
 // clang-format off
 asm u32 DSProt_CallCheckEmulatorB(DSProtCheckArgs *args) {
     orr ip, pc, pc

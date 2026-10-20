@@ -122,7 +122,7 @@ u16 LocalTvtCallData_GetExtraMsg(LocalTvtCallData *data, u16 person) {
 BOOL LocalTvtCallData_CanCall(LocalTvtCallData *data, u16 person) {
     if (person == LOCAL_TVT_CALL_SECRET) {
         BOOL unk74 = func_0200ff74(data->save) == 0;
-        BOOL flag = func_0200ff60(data->save, LOCAL_TVT_CALL_SECRET);
+        BOOL flag = HollowRivalSave_GetFlag(data->save, LOCAL_TVT_CALL_SECRET);
         u32 callCount = LocalTvtCallData_GetCallCount(data, LOCAL_TVT_CALL_SECRET);
         u32 stage = LocalTvtSecret_GetStage(callCount);
         u32 unk0378 = LocalTvtSecret_GetStage0378(stage);
@@ -144,7 +144,7 @@ BOOL LocalTvtCallData_CanCall(LocalTvtCallData *data, u16 person) {
         }
         return FALSE;
     }
-    return func_0200ff60(data->save, person);
+    return HollowRivalSave_GetFlag(data->save, person);
 }
 
 BOOL LocalTvtCallData_IsListed(LocalTvtCallData *data, u16 person) {
@@ -211,7 +211,7 @@ u32 LocalTvtCallData_GetZoneObject(LocalTvtCallData *data, u16 zoneId) {
 }
 
 u16 LocalTvtCallData_GetCallCount(LocalTvtCallData *data, u16 person) {
-    return func_0200ff54(data->save, person);
+    return HollowRivalSave_GetValue(data->save, person);
 }
 
 BOOL LocalTvtCallData_IsPlayerMale(LocalTvtCallData *data) {
@@ -222,10 +222,10 @@ BOOL LocalTvtCallData_IsPlayerMale(LocalTvtCallData *data) {
 }
 
 void LocalTvtCallData_AddCall(LocalTvtCallData *data, u16 person, u32 max) {
-    u32 callCount = func_0200ff54(data->save, person);
+    u32 callCount = HollowRivalSave_GetValue(data->save, person);
 
     if (callCount < max) {
-        func_0200ff50(data->save, person, callCount + 1);
+        HollowRivalSave_SetValue(data->save, person, callCount + 1);
     }
 }
 
@@ -234,7 +234,7 @@ void LocalTvtCallData_Set0200ff68(LocalTvtCallData *data, u32 value) {
 }
 
 static LocalTvtCallEntry *LocalTvtCallData_GetEntry(LocalTvtCallData *data, u16 person) {
-    u16 callCount = func_0200ff54(data->save, person);
+    u16 callCount = HollowRivalSave_GetValue(data->save, person);
     int i;
 
     for (i = 0; i < CALL_DATA_COUNT; i++) {
@@ -264,7 +264,7 @@ void LocalTvtCallData_Reset0200ffcc(LocalTvtCallData *data) {
 }
 
 BOOL LocalTvtCallData_IsSecretUnknown(LocalTvtCallData *data) {
-    if (func_0200ff60(data->save, LOCAL_TVT_CALL_SECRET) == 0) {
+    if (HollowRivalSave_GetFlag(data->save, LOCAL_TVT_CALL_SECRET) == 0) {
         return TRUE;
     }
     return FALSE;

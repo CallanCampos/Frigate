@@ -84,6 +84,15 @@ struct ZoneBGEntity {
     } pos;
 };
 
+// A trigger's rectangle of the grid
+struct ZoneTriggerGridPosition {
+    u16 x;
+    u16 z;
+    u16 width;
+    u16 height;
+    s16 y;
+};
+
 // Field names from swan.
 struct ZoneTrigger {
     u16 scrId;
@@ -92,13 +101,7 @@ struct ZoneTrigger {
     u16 type;
     u16 isRail;
     union {
-        struct {
-            u16 x;
-            u16 z;
-            u16 width;
-            u16 height;
-            s16 y;
-        } grid;
+        ZoneTriggerGridPosition grid;
         struct {
             u16 componentId;
             u16 posFront;
@@ -153,26 +156,26 @@ extern const u16 GEAR_STATION_PLATFORM_ZONES[9];
 u16 ConvDirToWarpDir(u16 dir);
 u32 ConvDirToRailDir(u32 direction);
 u32 ConvDirToTriggerDir(u32 dir);
-s16 GetDirectionVectorCompX(u32 direction);
-s16 GetDirectionVectorCompZ(u32 direction);
+s16 GetDirectionVectorCompX(u16 direction);
+s16 GetDirectionVectorCompZ(u16 direction);
 void VecGPosToWPos(s32 x, s32 y, s32 z, VecFx32 *position);
 u16 GetInverseDirection(u32 direction);
 u16 GetDirFromPosToPos(s32 x1, s32 z1, s32 x2, s32 z2);
-u32 func_ov012_0215ed38(u32 direction, u16 angle);
+u8 RotateDirByAngle(u32 direction, u16 angle);
 BOOL CheckWarpPositionMatch(const ZoneWarp *warp, const VecFx32 *position);
 BOOL CheckWarpPositionMatchRail(const ZoneWarp *warp, const RailPosition *position);
 BOOL CheckBGPositionMatchRail(const ZoneBGEntity *entity, const RailPosition *position);
 BOOL CheckBGPositionMatchGrid(const ZoneBGEntity *entity, const VecFx32 *position);
-void func_ov012_0215d4d0(const ZoneBGEntity *entity, VecFx32 *position);
-void func_ov012_0215d4ec(const ZoneBGEntity *entity, RailPosition *position);
+void GetBGEntityCenterPosGrid(const ZoneBGEntity *entity, VecFx32 *position);
+void GetBGEntityPosRail(const ZoneBGEntity *entity, RailPosition *position);
 void GetTriggerCenterPos(const ZoneTrigger *trigger, VecFx32 *position);
 void SetBGEntityLocation(EventData *data, u32 index, u16 x, u16 z, u16 y);
 u16 ZoneWarp_CalcPosWeightBitsGrid_(ZoneWarp *warp, const VecFx32 *position);
-u16 func_ov012_0215d654(ZoneWarp *warp, const RailPosition *position);
+u16 ZoneWarp_CalcPosWeightBitsRail_(ZoneWarp *warp, const RailPosition *position);
 u16 ZoneWarp_CalcPosWeightBitsGrid(ZoneWarp *warp, const VecFx32 *position);
-u16 func_ov012_0215d104(ZoneWarp *warp, const RailPosition *position);
-void func_ov012_0215d88c(const ZoneBGEntity *entity, VecFx32 *position);
-void func_ov012_0215d8fc(const ZoneBGEntity *entity, RailPosition *position);
+u16 ZoneWarp_CalcPosWeightBitsRail(ZoneWarp *warp, const RailPosition *position);
+void GetBGEntityPosGrid_(const ZoneBGEntity *entity, VecFx32 *position);
+void GetBGEntityPosRail_(const ZoneBGEntity *entity, RailPosition *position);
 void GetTriggerCenterPos_(const ZoneTrigger *trigger, VecFx32 *position);
 BOOL CheckTriggerPositionMatchRail(const ZoneTrigger *trigger, const RailPosition *position);
 BOOL CheckTriggerPositionMatchXYZ(const ZoneTrigger *trigger, const VecFx32 *position);
@@ -209,9 +212,9 @@ BOOL GetZoneIsHiddenGroto(u16 zoneId);
 ZoneTrigger *FindCollidingZoneTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
 ZoneTrigger *FindTriggerAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
 ZoneTrigger *FindTriggerAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);
-u32 GetTriggerSCRIDAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
-u32 GetSCRIDOfCollidingTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
-u32 GetTriggerSCRIDAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);
+u16 GetTriggerSCRIDAtPosGrid(EventData *eventData, EventWork *eventWork, const VecFx32 *position, u32 direction);
+u16 GetSCRIDOfCollidingTriggerAtLocation(EventData *eventData, EventWork *eventWork, const VecFx32 *position);
+u16 GetTriggerSCRIDAtPosRail(EventData *eventData, EventWork *eventWork, const RailPosition *position);
 u32 GetZoneFlashFlags(u16 zoneId);
 BOOL GetZoneIsMusicalTheater(u16 zoneId);
 BOOL GetZoneIsPWTBattleStage(u16 zoneId);

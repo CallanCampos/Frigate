@@ -353,9 +353,9 @@ static void func_ov036_021a4710(FieldEffectTask *task, void *work) {
         if (objCode == 160 || objCode == 161) {
             offset.y = namiTask->bob + FX32_CONST(8);
         }
-        func_ov012_0216734c(namiTask->params.actor, &offset);
+        FldAct_SetOuterDrawOffset(namiTask->params.actor, &offset);
     } else if (namiTask->mode == 2) {
-        func_ov012_0216733c(namiTask->params.actor, &offset);
+        FldAct_GetOuterDrawOffset(namiTask->params.actor, &offset);
     }
     CopyActorPosAllAdd(namiTask->params.actor, &pos);
     pos.x -= offset.x;
@@ -482,7 +482,7 @@ static void func_ov036_021a4944(FieldEffectTask *task, void *work) {
         offset.x = FX_Mul(-up.x, FX32_CONST(7));
         offset.y = namiTask->bob + FX32_CONST(5);
         offset.z = FX_Mul(-up.z, FX32_CONST(7));
-        func_ov012_0216734c(namiTask->params.actor, &offset);
+        FldAct_SetOuterDrawOffset(namiTask->params.actor, &offset);
     }
     CopyActorPosAllAdd(namiTask->params.actor, &pos);
     pos.x -= offset.x;
