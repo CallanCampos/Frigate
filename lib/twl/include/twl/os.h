@@ -14,7 +14,7 @@ BOOL func_02769334(void);
 // The DSi's cleanup before OS_ResetSystem resets, which the card's pull-out does too
 void func_02769578(void);
 // TwlSDK's body of OSi_EnterNDmaCallback
-void func_027692b8(u32 ndmaNo, OSIrqCallback callback, void *arg);
+void OSi_EnterNDmaCallbackCore(u32 ndmaNo, OSIrqCallback callback, void *arg);
 // The DSi-only part of OS_InitArenaEx
 void func_027692ec(void);
 // Looks a title ID up in the list that the system leaves in the shared memory (a count of at most 0x76 at 0x02ffd800,
