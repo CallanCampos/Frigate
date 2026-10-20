@@ -357,7 +357,7 @@ static BOOL GameBeaconSys_CountSurveyAnswers(GameBeaconSystem *sys, const GameBe
         if (question == 0xff) {
             continue;
         }
-        if (fromBW1 && func_0201148c(question)) {
+        if (fromBW1 && SurveyQuestion_IsNewInB2W2(question)) {
             continue;
         }
         if (question == SURVEY_QUESTION_PLAY_TIME) {
@@ -439,7 +439,7 @@ static void GameBeacon_PrepareSend(GameBeacon *beacon, BOOL b2w2Only) {
     }
     // Black and White don't have these questions
     for (i = 0; i <= SURVEY_QUESTION_LAST; i++) {
-        if (func_0201148c(i)) {
+        if (SurveyQuestion_IsNewInB2W2(i)) {
             SurveySave_WriteAnswer(beacon->surveyAnswers, i, 0);
         }
     }

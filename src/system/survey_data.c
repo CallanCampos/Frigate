@@ -125,7 +125,7 @@ u8 SurveyQuestion_GetFirstBit(u8 question) {
     return sQuestions[question].firstBit;
 }
 
-BOOL func_0201148c(u8 question) {
+BOOL SurveyQuestion_IsNewInB2W2(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return TRUE;
     }

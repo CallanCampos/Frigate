@@ -846,6 +846,7 @@
 . 0x02011450 SurveyQuestion_GetBitCount
 . 0x02011464 SurveyQuestion_GetFirstAnswer
 . 0x02011478 SurveyQuestion_GetFirstBit
+. 0x0201148c SurveyQuestion_IsNewInB2W2
 . 0x020114a4 getNameSize
 . 0x020114a8 CGearName_Init
 . 0x020114f0 CGearName_GetFromSave
