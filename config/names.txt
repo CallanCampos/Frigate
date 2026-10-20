@@ -145,9 +145,13 @@
 . 0x02008da4 TrainerDataSave_Init
 . 0x02008dd0 SaveControl_GetPlayerInfo
 . 0x02008de8 SaveControl_GetPlayTime
+. 0x02008df4 TrainerDataSave_IsIntroSave
+. 0x02008e04 TrainerDataSave_SetIntroSave
+. 0x02008e14 TrainerDataSave_ClearIntroSave
 . 0x02008e24 TrainerDataSave_IsMarkerSet
 . 0x02008e48 TrainerDataSave_SetMarker
 . 0x02008e60 TrainerDataSave_ClearMarker
+. 0x02008e74 TrainerDataSave_GetExtraSaveCount
 . 0x02008e88 TrainerDataSave_StorePlayerInfo
 . 0x02008ea8 TrainerDataSave_LoadPlayerInfo
 . 0x02008fb8 SaveControl_GetPlayerLocation

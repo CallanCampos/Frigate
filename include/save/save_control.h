@@ -108,7 +108,7 @@ struct SaveControl {
     u8 dataExists;
     // Cleared when both copies of the save loaded right
     u8 unk2;
-    // func_02008df4 at the start of a save, which canceling restores
+    // TrainerDataSave_IsIntroSave at the start of a save, which canceling restores
     u8 unk3;
     // What SaveOutside told of the data outside the save
     u8 giftsLoaded;

@@ -35,17 +35,17 @@ PlayTime *SaveControl_GetPlayTime(SaveControl *save) {
     return &data->playTime;
 }
 
-u8 func_02008df4(SaveControl *save) {
+u8 TrainerDataSave_IsIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     return data->isIntroSave;
 }
 
-void func_02008e04(SaveControl *save) {
+void TrainerDataSave_SetIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     data->isIntroSave = 1;
 }
 
-void func_02008e14(SaveControl *save) {
+void TrainerDataSave_ClearIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     data->isIntroSave = 0;
 }
@@ -65,7 +65,7 @@ void TrainerDataSave_ClearMarker(SaveControl *save, u32 index) {
     data->markers[index] = 0;
 }
 
-u32 *func_02008e74(SaveControl *save, u32 index) {
+u32 *TrainerDataSave_GetExtraSaveCount(SaveControl *save, u32 index) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     return &data->extraSaveCounts[index];
 }
