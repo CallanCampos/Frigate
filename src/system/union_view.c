@@ -6,8 +6,9 @@
 
 typedef struct {
     u16 trainerType;
-    u8 unk2;
-    u8 unk3;
+    // The message of the trainer class's name, and the trainer class of the graphics
+    u8 classNameId;
+    u8 trainerClass;
 } UnionView;
 
 static const UnionView sUnionViews[] = {
@@ -27,14 +28,14 @@ u8 func_0202b5e8(u32 view) {
     if (view >= NELEMS(sUnionViews)) {
         return 2;
     }
-    return sUnionViews[view].unk3;
+    return sUnionViews[view].trainerClass;
 }
 
 u8 func_0202b5fc(u32 view) {
     if (view >= NELEMS(sUnionViews)) {
         return 2;
     }
-    return sUnionViews[view].unk2;
+    return sUnionViews[view].classNameId;
 }
 
 u32 UnionView_FindTrainerType(u32 trainerType) {
@@ -52,7 +53,7 @@ u32 func_0202b630(u32 value) {
     u32 i;
 
     for (i = 0; i < NELEMS(sUnionViews); i++) {
-        if (value == sUnionViews[i].unk3) {
+        if (value == sUnionViews[i].trainerClass) {
             return i;
         }
     }
