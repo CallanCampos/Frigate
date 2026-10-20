@@ -42,8 +42,8 @@ typedef struct DWCUtilMain {
     void (*update)(void);
     u32 value0;
     u32 value1;
-    u32 value2;
-    u32 value3;
+    int value2;
+    int value3;
 } DWCUtilMain;
 
 static char sNasUrl[] = "https://nas.nintendowifi.net/ac";
@@ -230,12 +230,12 @@ void func_ov182_021adfd4(u32 *value0, u32 *value1) {
     }
 }
 
-void func_ov182_021adff0(u32 value2, u32 value3) {
+void func_ov182_021adff0(int value2, int value3) {
     sMain.value2 = value2;
     sMain.value3 = value3;
 }
 
-void func_ov182_021adffc(u32 *value2, u32 *value3) {
+void func_ov182_021adffc(int *value2, int *value3) {
     if (value2 != NULL) {
         *value2 = sMain.value2;
     }

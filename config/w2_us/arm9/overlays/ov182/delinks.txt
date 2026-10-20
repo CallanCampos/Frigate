@@ -248,3 +248,49 @@ lib/dwcutilui/src/dwc_util_page_move.c:
     .text       start:0x021b01d8 end:0x021b0460
     .data       start:0x021c0f18 end:0x021c0f2c
     .bss        start:0x021c4124 end:0x021c4128
+
+lib/dwcutilui/src/dwc_util_page_multi5.c:
+    complete
+    .text       start:0x021b0460 end:0x021b0718
+    .data       start:0x021c0f2c end:0x021c0f40
+    .bss        start:0x021c4128 end:0x021c412c
+
+lib/dwcutilui/src/dwc_util_page_step3.c:
+    complete
+    .text       start:0x021b0718 end:0x021b0b10
+    .data       start:0x021c0f40 end:0x021c0f84
+    .bss        start:0x021c412c end:0x021c4134
+
+lib/dwcutilui/src/dwc_util_page_multi4.c:
+    complete
+    .text       start:0x021b0b10 end:0x021b0c68
+    .data       start:0x021c0f84 end:0x021c0f98
+    .bss        start:0x021c4134 end:0x021c4138
+
+lib/dwcutilui/src/dwc_util_page_ap_list.c:
+    complete
+    .text       start:0x021b0c68 end:0x021b1a34
+    .rodata     start:0x021c0078 end:0x021c0108
+    .data       start:0x021c0f98 end:0x021c0fb0
+    .bss        start:0x021c4138 end:0x021c4140
+
+lib/dwcutilui/src/dwc_util_wep_keyboard.c:
+    complete
+    .text       start:0x021b1a34 end:0x021b2160
+    .rodata     start:0x021c0108 end:0x021c012c
+    .data       start:0x021c0fb0 end:0x021c1028
+    .bss        start:0x021c4140 end:0x021c4144
+
+lib/dwcutilui/src/dwc_util_address_edit.c:
+    complete
+    .text       start:0x021b2160 end:0x021b297c
+    .rodata     start:0x021c012c end:0x021c0150
+    .data       start:0x021c1028 end:0x021c10c8
+    .bss        start:0x021c4144 end:0x021c4148
+
+lib/dwcutilui/src/dwc_util_error.c:
+    complete
+    .text       start:0x021b297c end:0x021b2d88
+    .rodata     start:0x021c0150 end:0x021c017c
+    .data       start:0x021c10c8 end:0x021c10e0
+    .bss        start:0x021c4148 end:0x021c414c
