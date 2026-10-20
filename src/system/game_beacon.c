@@ -834,7 +834,7 @@ void GameBeaconSendSlot_SetMissionEx(GameBeaconSendSlot *slot, u16 type, u32 val
     }
     beacon->type = type;
     beacon->arg.mission.missionId = config->missionId;
-    beacon->missionWord = config->unk1C;
+    beacon->missionWord = config->seed;
     GameBeacon_ClearRecent(beacon);
     if (type != 0x3c) {
         FestMissionLog_AddBeacon(festival, &newSlot.beacon, LinkFestival_GetScore(festival), 2, 1);

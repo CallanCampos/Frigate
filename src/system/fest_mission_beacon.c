@@ -289,7 +289,7 @@ BOOL FestMission_IsBeaconInvalid(LinkFestival *festival, const GameBeacon *beaco
         return FALSE;
     }
     if (info->seconds > FEST_MISSION_SECONDS_MAX || info->count > FEST_MISSION_SCORE_MAX || info->unk8_30 >= 3 ||
-        info->unk10_9 >= 4 || info->unk4_10 > 100 || info->unk10_0 > 50) {
+        info->extraSecondsIndex >= 4 || info->unk4_10 > 100 || info->unk10_0 > 50) {
         return TRUE;
     }
     if (PML_ItemIsDummy(info->unk4_0) || PML_ItemIsUnholdable(info->unk4_0) || info->unk4_0 == ITEM_MASTER_BALL) {

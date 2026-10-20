@@ -178,7 +178,7 @@ void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined)
 
 void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1) {
     if (isFesMissionAvailable(&festival->config)) {
-        if (festival->config.unk24 == -1) {
+        if (festival->config.startSeconds == -1) {
             FestMissionConfig_StartTimer(&festival->config);
         }
         LinkFestival_SetState(festival, 2);
@@ -492,12 +492,12 @@ static BOOL LinkFestival_HasRecord(LinkFestival *festival, FestMissionConfig *co
 }
 
 static void FestMissionRecord_Set(FestMissionRecord *record, const FestMissionConfig *config) {
-    record->mission.unk4 = config->unk1C;
+    record->mission.unk4 = config->seed;
     record->mission.unk0 = config->unk00[0];
 }
 
 static BOOL FestMissionRecord_Matches(const FestMissionRecord *record, const FestMissionConfig *config) {
-    if (record->mission.unk4 != config->unk1C || record->mission.unk0 != config->unk00[0]) {
+    if (record->mission.unk4 != config->seed || record->mission.unk0 != config->unk00[0]) {
         return FALSE;
     }
     return TRUE;

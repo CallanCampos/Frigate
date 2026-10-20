@@ -1308,7 +1308,7 @@ static u32 BeaconView_CheckMissionRefusal(BeaconViewWork *work, FestMissionConfi
         }
         return 1;
     }
-    if (config->info.unk8_18 != 0 && !EventWork_FlagGet(eventWork, config->info.unk8_18)) {
+    if (config->info.requiredFlag != 0 && !EventWork_FlagGet(eventWork, config->info.requiredFlag)) {
         return 3;
     }
     return 0;

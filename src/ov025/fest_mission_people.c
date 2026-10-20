@@ -213,7 +213,7 @@ void FesMissionPeople_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
     MI_CpuFill8(work->params, 0, sizeof(work->params));
     MI_CpuFill8(work->actors, 0, sizeof(work->actors));
-    FestMission_InitRand(mission->unk1C, FestMission_GetMissionZone(zoneId), &rand);
+    FestMission_InitRand(mission->seed, FestMission_GetMissionZone(zoneId), &rand);
     FesMissionPeople_PickPlaces(gsys, work, mission, zoneId, &rand);
     FesMissionPeople_AddZone(work, zoneId);
     if (work->actorCount != 0) {
