@@ -16,7 +16,7 @@ void func_02769578(void);
 // TwlSDK's body of OSi_EnterNDmaCallback
 void OSi_EnterNDmaCallbackCore(u32 ndmaNo, OSIrqCallback callback, void *arg);
 // The DSi-only part of OS_InitArenaEx
-void func_027692ec(void);
+void OSi_InitArenaExTwl(void);
 // Looks a title ID up in the list that the system leaves in the shared memory (a count of at most 0x76 at 0x02ffd800,
 // the 64-bit IDs from 0x02ffd850). Gives the first entry that equals titleId on the bits of mask and has bit 35 clear,
 // or 0 when there is none

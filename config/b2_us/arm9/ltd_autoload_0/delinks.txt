@@ -115,3 +115,7 @@ lib/twl/src/mi/mi_sharedWram_twl.c:
 
 lib/twl/src/os/os_interrupt_twl.c:
     .ltdmain    start:0x027692b8 end:0x027692ec
+
+lib/twl/src/os/os_arena_twl.c:
+    complete
+    .ltdmain    start:0x027692ec end:0x02769318

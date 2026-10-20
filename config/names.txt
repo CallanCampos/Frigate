@@ -5695,6 +5695,7 @@ ltd_autoload_0 0x0276926c MIi_UnlockWram
 ltd_autoload_0 0x02769294 MIi_EnterWramCritical
 ltd_autoload_0 0x027692a8 MIi_LeaveWramCritical
 ltd_autoload_0 0x027692b8 OSi_EnterNDmaCallbackCore
+ltd_autoload_0 0x027692ec OSi_InitArenaExTwl
 ltd_autoload_0 0x027694dc PM_ReadyToExit
 ltd_autoload_0 0x0276952c PM_AppendPreExitCallback
 ltd_autoload_0 0x02769550 PM_InsertPreExitCallback

@@ -87,6 +87,7 @@ u32 OS_GetDTCMAddress(void);
 // to 5, n for 2^(n + 1) bytes): 4 KB is n = 11 and 4 MB is n = 21
 #define OS_PROTECTION_SIZE_4KB (11 << 1)
 #define OS_PROTECTION_SIZE_4MB (21 << 1)
+#define OS_PROTECTION_SIZE_64MB (25 << 1)
 void OS_SetProtectionRegion(int regionNo, u32 address, u32 size); // swan's SetMemoryProtectionRegion
 
 // The start of DTCM, where the linker places the DTCM module
