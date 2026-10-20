@@ -30,6 +30,11 @@ Leave out `--compilers` for library code with its own compiler. Classify by what
 
 Fix them in that order. Registers and stack slots move with every structural change, so don't tune them first.
 
+Keep instruction bytes intact for aligned diagnosis. If a scratch comparison normalizes calls, disassemble first
+and label each stream's actual call sites with their callees, using that stream's relocations. Use byte masks only
+for raw-byte scores: zeroing the original at the compiled relocation offsets can erase non-call instructions and
+misclassify a structural improvement.
+
 ## 2. Look up the levers
 
 [levers.md](levers.md) indexes every known lever by these classes, with the passage of `docs/matching.md` that explains it. Read the
