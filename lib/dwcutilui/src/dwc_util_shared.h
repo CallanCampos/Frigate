@@ -83,6 +83,10 @@ struct DWCUtilApEntry {
     u8 security;
 };
 
+// The scan for access points: allocates it, starts it (TRUE when it started), and stops it (TRUE once it has stopped)
+void func_ov182_021b74d4(void);
+BOOL func_ov182_021b751c(void);
+BOOL func_ov182_021b75d0(void);
 // Stops the scan for access points and frees it, and the access points it found and their count
 void func_ov182_021b74f4(void);
 int func_ov182_021b7630(DWCUtilApEntry **entries);
@@ -133,8 +137,6 @@ void func_ov182_021b536c(void);
 void func_ov182_021b5bb8(void);
 // The message before the connection test
 void func_ov182_021b6588(void);
-// The screen of the button above the list of access points
-void func_ov182_021b5000(void);
 // The connection test with auto-connect (its file is not written yet)
 void func_ov182_021b6104(void);
 

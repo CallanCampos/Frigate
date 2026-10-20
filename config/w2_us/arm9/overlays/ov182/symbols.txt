@@ -1647,7 +1647,7 @@ sTestProgressPassed kind:bss addr:0x021c4158
 sTestConnectPassed kind:bss addr:0x021c415c
 sTestDoneFrames kind:bss addr:0x021c4160
 sTestStartPassed kind:bss addr:0x021c4164
-data_ov182_021c4128 kind:bss addr:0x021c4168
+sApSearch kind:bss addr:0x021c4168
 data_ov182_021c412c kind:bss addr:0x021c416c
 data_ov182_021c4130 kind:bss addr:0x021c4170
 data_ov182_021c4134 kind:bss addr:0x021c4174

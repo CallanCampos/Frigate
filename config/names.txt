@@ -11378,6 +11378,7 @@ overlays/ov182 0x021c4118 sTestProgressPassed
 overlays/ov182 0x021c411c sTestConnectPassed
 overlays/ov182 0x021c4120 sTestDoneFrames
 overlays/ov182 0x021c4124 sTestStartPassed
+overlays/ov182 0x021c4128 sApSearch
 overlays/ov182 0x021c4180 gWork
 overlays/ov182 0x021c4188 sDownloadPlaySysWork
 overlays/ov182 0x021c418c sResource
