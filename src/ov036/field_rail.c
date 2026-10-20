@@ -1,6 +1,7 @@
 // The rail system of the no-grid maps: the rail units that move along the lines and points of a map's rails, and
 // the camera the rails set. The name is the ROM's own, from GFL_HeapAllocate's file argument. The curves' conversions
 // between rail and world positions and the camera functions that follow in the ROM are field_rail_func.c
+// RailUnit_MoveOnLine is our descriptive name.
 #include "types.h"
 #include "field/field_rail.h"
 #include "gfl/heap.h"
@@ -26,7 +27,7 @@ static RailCurve *GetRailCurve(RailDataHandle *data, u32 id);
 static RailCameraFunc GetRailCameraCurveFunc(RailDataHandle *data, u32 id);
 static RailToWorldFunc GetHandler1CurveFunc(RailDataHandle *data, u32 id);
 static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id);
-static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step);
+static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step);
 static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail);
 static void RailUnit_SetData(RailUnit *unit, RailDataHandle *data);
 static u32 RailUnit_GetState(RailUnit *unit);
@@ -517,29 +518,29 @@ BOOL func_ov036_021b0a94(RailUnit *unit, u32 a, u32 b) {
 }
 
 void func_ov036_021b0ac0(RailUnit *unit) {
-    u32 moved;
+    u32 resultDir;
     u16 onLine;
     u8 step;
-    u16 argB;
+    u16 dir;
     s32 rem;
 
     if (unit->rail->loaded == 0 || unit->active == 0 || !func_ov036_021b1b60(unit)) {
         return;
     }
-    moved = 0;
+    resultDir = 0;
     unit->unk34 = 0;
     if (unit->pending == 0) {
         return;
     }
-    argB = unit->pendingArgB;
+    dir = unit->pendingArgB;
     onLine = unit->onLine;
     step = sPendingSteps[unit->pendingArgA];
     unit->counter += (s8)step;
     if (onLine == 1) {
-        moved = func_ov036_021b1290(unit, argB, step);
+        resultDir = RailUnit_MoveOnLine(unit, dir, step);
     }
-    if (moved != 0) {
-        unit->unk32 = moved;
+    if (resultDir != 0) {
+        unit->unk32 = resultDir;
         unit->unk33 = unit->pendingArgA;
         unit->unk34 = 1;
         func_ov036_021b1bac(unit, &unit->calcPos);
@@ -547,7 +548,7 @@ void func_ov036_021b0ac0(RailUnit *unit) {
     if (onLine != unit->onLine) {
         func_ov036_021b2130(unit);
     }
-    if (unit->counter < 16 && moved != 0) {
+    if (unit->counter < 16 && resultDir != 0) {
         return;
     }
     unit->pending = 0;
@@ -973,310 +974,320 @@ static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
     return data->worldToRailFuncs[0];
 }
 
-static s32 func_ov036_021b1290(RailUnit *m, u32 dir, s32 step) {
-    RailLine *line = m->component.line;
-    s32 len = m->length;
+// step uses sixteenths of a tile; the result is dir (1 up, 2 right, 3 down, 4 left) or 0.
+static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
+    RailLine *line = unit->component.line;
+    s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     RailLine *next1;
     RailLine *next2;
-    BOOL flag;
+    BOOL outsideWidth;
     s32 width;
-    s32 r;
-    s32 ax;
+    s32 resultDir;
+    s32 absOffset;
 
     if (dir == line->dir) {
-        point = GetRailPoint(m->handle, line->pointB);
-        flag = FALSE;
-        next0 = GetLineContinueInDirection(point, dir, m->handle, m->disabled, 0);
-        next1 = GetLineContinueInDirection(point, func_ov036_021b1de8(dir), m->handle, m->disabled, 0);
-        next2 = GetLineContinueInDirection(point, func_ov036_021b1db8(dir), m->handle, m->disabled, 0);
-        func_ov036_021b1ee4(m->disabled, m, step, 0, dir);
-        if (len > m->front) {
-            width = GetLerpedLineWidthByLineYPos(line, m->front, len, m->handle);
-            ax = m->side;
-            if (ax < 0) {
-                ax = -ax;
+        point = GetRailPoint(unit->handle, line->pointB);
+        outsideWidth = FALSE;
+        next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
+        next1 = GetLineContinueInDirection(point, func_ov036_021b1de8(dir), unit->handle, unit->disabled, 0);
+        next2 = GetLineContinueInDirection(point, func_ov036_021b1db8(dir), unit->handle, unit->disabled, 0);
+        func_ov036_021b1ee4(unit->disabled, unit, step, 0, dir);
+        if (length > unit->front) {
+            width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
+            absOffset = unit->side;
+            if (absOffset < 0) {
+                absOffset = -absOffset;
             }
-            if (ax <= width) {
+            if (absOffset <= width) {
                 return dir;
             }
-            flag = TRUE;
+            outsideWidth = TRUE;
         }
-        if (next0 != NULL && !flag) {
-            func_ov036_021b2060(point, m->handle);
-            s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-            width = GetLerpedLineWidthByLineYPos(next0, m->front - len, tileLen, m->handle);
-            r = func_ov036_021b0f00(m, next0, dir, m->front - len, m->side, tileLen, width);
-            if (r != 0) {
-                return r;
+        if (next0 != NULL && !outsideWidth) {
+            func_ov036_021b2060(point, unit->handle);
+            s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next0, unit->front - length, nextLength, unit->handle);
+            resultDir = func_ov036_021b0f00(unit, next0, dir, unit->front - length, unit->side, nextLength, width);
+            if (resultDir != 0) {
+                return resultDir;
             }
         }
-        if (next1 != NULL && m->side <= 0) {
-            if (func_ov036_021b1028(m->handle, next1, point)) {
-                func_ov036_021b2060(point, m->handle);
-                s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
-                width = GetLerpedLineWidthByLineYPos(next1, -m->side, tileLen, m->handle);
-                r = func_ov036_021b0f00(m, next1, dir, -m->side, m->front - len, tileLen, width);
-                if (r != 0) {
-                    return r;
+        if (next1 != NULL && unit->side <= 0) {
+            if (func_ov036_021b1028(unit->handle, next1, point)) {
+                func_ov036_021b2060(point, unit->handle);
+                s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next1, -unit->side, nextLength, unit->handle);
+                resultDir = func_ov036_021b0f00(unit, next1, dir, -unit->side, unit->front - length, nextLength, width);
+                if (resultDir != 0) {
+                    return resultDir;
                 }
-            } else if (func_ov036_021b1040(m->handle, next1, point)) {
-                func_ov036_021b2060(point, m->handle);
-                s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
-                width = GetLerpedLineWidthByLineYPos(next1, tileLen + m->side, tileLen, m->handle);
-                r = func_ov036_021b0f00(m, next1, dir, tileLen + m->side, -(m->front - len), tileLen, width);
-                if (r != 0) {
-                    return r;
-                }
-            }
-        }
-        if (next2 != NULL && m->side >= 0) {
-            if (func_ov036_021b1028(m->handle, next2, point)) {
-                func_ov036_021b2060(point, m->handle);
-                s32 tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
-                width = GetLerpedLineWidthByLineYPos(next2, m->side, tileLen, m->handle);
-                r = func_ov036_021b0f00(m, next2, dir, m->side, -(m->front - len), tileLen, width);
-                if (r != 0) {
-                    return r;
-                }
-            } else if (func_ov036_021b1040(m->handle, next2, point)) {
-                func_ov036_021b2060(point, m->handle);
-                s32 tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
-                width = GetLerpedLineWidthByLineYPos(next2, tileLen - m->side, tileLen, m->handle);
-                r = func_ov036_021b0f00(m, next2, dir, tileLen - m->side, m->front - len, tileLen, width);
-                if (r != 0) {
-                    return r;
+            } else if (func_ov036_021b1040(unit->handle, next1, point)) {
+                func_ov036_021b2060(point, unit->handle);
+                s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next1, nextLength + unit->side, nextLength, unit->handle);
+                resultDir = func_ov036_021b0f00(unit, next1, dir, nextLength + unit->side, -(unit->front - length),
+                                                nextLength, width);
+                if (resultDir != 0) {
+                    return resultDir;
                 }
             }
         }
-        if (!flag) {
-            if (m->front <= len) {
+        if (next2 != NULL && unit->side >= 0) {
+            if (func_ov036_021b1028(unit->handle, next2, point)) {
+                func_ov036_021b2060(point, unit->handle);
+                s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next2, unit->side, nextLength, unit->handle);
+                resultDir =
+                    func_ov036_021b0f00(unit, next2, dir, unit->side, -(unit->front - length), nextLength, width);
+                if (resultDir != 0) {
+                    return resultDir;
+                }
+            } else if (func_ov036_021b1040(unit->handle, next2, point)) {
+                func_ov036_021b2060(point, unit->handle);
+                s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
+                width = GetLerpedLineWidthByLineYPos(next2, nextLength - unit->side, nextLength, unit->handle);
+                resultDir = func_ov036_021b0f00(unit, next2, dir, nextLength - unit->side, unit->front - length,
+                                                nextLength, width);
+                if (resultDir != 0) {
+                    return resultDir;
+                }
+            }
+        }
+        if (!outsideWidth) {
+            if (unit->front <= length) {
                 return dir;
             }
-            m->front -= step;
+            unit->front -= step;
             return 0;
         }
-        return func_ov036_021b1cec(m, line, len, dir);
+        return func_ov036_021b1cec(unit, line, length, dir);
     }
     if (dir != func_ov036_021b1d88(line->dir)) {
         if (dir != func_ov036_021b1db8(line->dir)) {
             if (dir != func_ov036_021b1de8(line->dir)) {
                 return 0;
             }
-            func_ov036_021b1ee4(m->disabled, m, 0, -step, dir);
-            if (m->side < 0 && m->side % 16 == 0) {
-                point = GetRailPoint(m->handle, line->pointA);
-                next0 = GetLineContinueInDirection(point, dir, m->handle, m->disabled, 0);
+            func_ov036_021b1ee4(unit->disabled, unit, 0, -step, dir);
+            if (unit->side < 0 && unit->side % 16 == 0) {
+                point = GetRailPoint(unit->handle, line->pointA);
+                next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
                 if (next0 != NULL) {
-                    if (func_ov036_021b1028(m->handle, next0, point)) {
-                        func_ov036_021b2060(point, m->handle);
-                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                    if (func_ov036_021b1028(unit->handle, next0, point)) {
+                        func_ov036_021b2060(point, unit->handle);
+                        s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        width = GetLerpedLineWidthByLineYPos(next0, ax, tileLen, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                        width = GetLerpedLineWidthByLineYPos(next0, absOffset, nextLength, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        r = func_ov036_021b0f00(m, next0, dir, ax, m->front, tileLen, width);
-                        if (r != 0) {
-                            return r;
+                        resultDir = func_ov036_021b0f00(unit, next0, dir, absOffset, unit->front, nextLength, width);
+                        if (resultDir != 0) {
+                            return resultDir;
                         }
                     }
-                    if (func_ov036_021b1040(m->handle, next0, point)) {
-                        func_ov036_021b2060(point, m->handle);
-                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                    if (func_ov036_021b1040(unit->handle, next0, point)) {
+                        func_ov036_021b2060(point, unit->handle);
+                        s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        width = GetLerpedLineWidthByLineYPos(next0, tileLen - ax, tileLen, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                        width = GetLerpedLineWidthByLineYPos(next0, nextLength - absOffset, nextLength, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        r = func_ov036_021b0f00(m, next0, dir, tileLen - ax, -m->front, tileLen, width);
-                        if (r != 0) {
-                            return r;
+                        resultDir = func_ov036_021b0f00(unit, next0, dir, nextLength - absOffset, -unit->front,
+                                                        nextLength, width);
+                        if (resultDir != 0) {
+                            return resultDir;
                         }
                     }
                 }
-                point = GetRailPoint(m->handle, line->pointB);
-                next0 = GetLineContinueInDirection(point, dir, m->handle, m->disabled, 0);
+                point = GetRailPoint(unit->handle, line->pointB);
+                next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
                 if (next0 != NULL) {
-                    if (func_ov036_021b1028(m->handle, next0, point)) {
-                        func_ov036_021b2060(point, m->handle);
-                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                    if (func_ov036_021b1028(unit->handle, next0, point)) {
+                        func_ov036_021b2060(point, unit->handle);
+                        s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        width = GetLerpedLineWidthByLineYPos(next0, ax, tileLen, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                        width = GetLerpedLineWidthByLineYPos(next0, absOffset, nextLength, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        r = func_ov036_021b0f00(m, next0, dir, ax, -(len - m->front), tileLen, width);
-                        if (r != 0) {
-                            return r;
+                        resultDir = func_ov036_021b0f00(unit, next0, dir, absOffset, -(length - unit->front),
+                                                        nextLength, width);
+                        if (resultDir != 0) {
+                            return resultDir;
                         }
                     }
-                    if (func_ov036_021b1040(m->handle, next0, point)) {
-                        func_ov036_021b2060(point, m->handle);
-                        s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                    if (func_ov036_021b1040(unit->handle, next0, point)) {
+                        func_ov036_021b2060(point, unit->handle);
+                        s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        width = GetLerpedLineWidthByLineYPos(next0, tileLen - ax, tileLen, m->handle);
-                        ax = m->side;
-                        if (ax < 0) {
-                            ax = -ax;
+                        width = GetLerpedLineWidthByLineYPos(next0, nextLength - absOffset, nextLength, unit->handle);
+                        absOffset = unit->side;
+                        if (absOffset < 0) {
+                            absOffset = -absOffset;
                         }
-                        r = func_ov036_021b0f00(m, next0, dir, tileLen - ax, len - m->front, tileLen, width);
-                        if (r != 0) {
-                            return r;
+                        resultDir = func_ov036_021b0f00(unit, next0, dir, nextLength - absOffset, length - unit->front,
+                                                        nextLength, width);
+                        if (resultDir != 0) {
+                            return resultDir;
                         }
                     }
                 }
             }
-            if (m->side < 0 && -m->side <= m->width) {
-                return func_ov036_021b1cec(m, line, len, dir);
+            if (unit->side < 0 && -unit->side <= unit->width) {
+                return func_ov036_021b1cec(unit, line, length, dir);
             }
             return dir;
         }
-        func_ov036_021b1ee4(m->disabled, m, 0, step, dir);
-        if (m->side > 0 && m->side % 16 == 0) {
-            point = GetRailPoint(m->handle, line->pointA);
-            next0 = GetLineContinueInDirection(point, dir, m->handle, m->disabled, 0);
+        func_ov036_021b1ee4(unit->disabled, unit, 0, step, dir);
+        if (unit->side > 0 && unit->side % 16 == 0) {
+            point = GetRailPoint(unit->handle, line->pointA);
+            next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
             if (next0 != NULL) {
-                if (func_ov036_021b1028(m->handle, next0, point)) {
-                    func_ov036_021b2060(point, m->handle);
-                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                    width = GetLerpedLineWidthByLineYPos(next0, m->side, tileLen, m->handle);
-                    r = func_ov036_021b0f00(m, next0, dir, m->side, -m->front, tileLen, width);
-                    if (r != 0) {
-                        return r;
+                if (func_ov036_021b1028(unit->handle, next0, point)) {
+                    func_ov036_021b2060(point, unit->handle);
+                    s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next0, unit->side, nextLength, unit->handle);
+                    resultDir = func_ov036_021b0f00(unit, next0, dir, unit->side, -unit->front, nextLength, width);
+                    if (resultDir != 0) {
+                        return resultDir;
                     }
                 }
-                if (func_ov036_021b1040(m->handle, next0, point)) {
-                    func_ov036_021b2060(point, m->handle);
-                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                    width = GetLerpedLineWidthByLineYPos(next0, tileLen - m->side, tileLen, m->handle);
-                    r = func_ov036_021b0f00(m, next0, dir, tileLen - m->side, m->front, tileLen, width);
-                    if (r != 0) {
-                        return r;
+                if (func_ov036_021b1040(unit->handle, next0, point)) {
+                    func_ov036_021b2060(point, unit->handle);
+                    s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next0, nextLength - unit->side, nextLength, unit->handle);
+                    resultDir =
+                        func_ov036_021b0f00(unit, next0, dir, nextLength - unit->side, unit->front, nextLength, width);
+                    if (resultDir != 0) {
+                        return resultDir;
                     }
                 }
             }
-            point = GetRailPoint(m->handle, line->pointB);
-            next0 = GetLineContinueInDirection(point, dir, m->handle, m->disabled, 0);
+            point = GetRailPoint(unit->handle, line->pointB);
+            next0 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
             if (next0 != NULL) {
-                if (func_ov036_021b1028(m->handle, next0, point)) {
-                    func_ov036_021b2060(point, m->handle);
-                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                    width = GetLerpedLineWidthByLineYPos(next0, m->side, tileLen, m->handle);
-                    r = func_ov036_021b0f00(m, next0, dir, m->side, len - m->front, tileLen, width);
-                    if (r != 0) {
-                        return r;
+                if (func_ov036_021b1028(unit->handle, next0, point)) {
+                    func_ov036_021b2060(point, unit->handle);
+                    s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next0, unit->side, nextLength, unit->handle);
+                    resultDir =
+                        func_ov036_021b0f00(unit, next0, dir, unit->side, length - unit->front, nextLength, width);
+                    if (resultDir != 0) {
+                        return resultDir;
                     }
                 }
-                if (func_ov036_021b1040(m->handle, next0, point)) {
-                    func_ov036_021b2060(point, m->handle);
-                    s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-                    width = GetLerpedLineWidthByLineYPos(next0, tileLen - m->side, tileLen, m->handle);
-                    r = func_ov036_021b0f00(m, next0, dir, tileLen - m->side, -(len - m->front), tileLen, width);
-                    if (r != 0) {
-                        return r;
+                if (func_ov036_021b1040(unit->handle, next0, point)) {
+                    func_ov036_021b2060(point, unit->handle);
+                    s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+                    width = GetLerpedLineWidthByLineYPos(next0, nextLength - unit->side, nextLength, unit->handle);
+                    resultDir = func_ov036_021b0f00(unit, next0, dir, nextLength - unit->side, -(length - unit->front),
+                                                    nextLength, width);
+                    if (resultDir != 0) {
+                        return resultDir;
                     }
                 }
             }
         }
-        if (m->side > 0 && m->side <= m->width) {
-            return func_ov036_021b1cec(m, line, len, dir);
+        if (unit->side > 0 && unit->side <= unit->width) {
+            return func_ov036_021b1cec(unit, line, length, dir);
         }
         return dir;
     }
-    point = GetRailPoint(m->handle, line->pointA);
-    flag = FALSE;
-    next0 = GetLineContinueInDirection(point, func_ov036_021b1db8(dir), m->handle, m->disabled, 0);
-    next1 = GetLineContinueInDirection(point, func_ov036_021b1de8(dir), m->handle, m->disabled, 0);
-    next2 = GetLineContinueInDirection(point, dir, m->handle, m->disabled, 0);
-    func_ov036_021b1ee4(m->disabled, m, -step, 0, dir);
-    if (m->front >= 0) {
-        width = GetLerpedLineWidthByLineYPos(line, m->front, len, m->handle);
-        ax = m->side;
-        if (ax < 0) {
-            ax = -ax;
+    point = GetRailPoint(unit->handle, line->pointA);
+    outsideWidth = FALSE;
+    next0 = GetLineContinueInDirection(point, func_ov036_021b1db8(dir), unit->handle, unit->disabled, 0);
+    next1 = GetLineContinueInDirection(point, func_ov036_021b1de8(dir), unit->handle, unit->disabled, 0);
+    next2 = GetLineContinueInDirection(point, dir, unit->handle, unit->disabled, 0);
+    func_ov036_021b1ee4(unit->disabled, unit, -step, 0, dir);
+    if (unit->front >= 0) {
+        width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
+        absOffset = unit->side;
+        if (absOffset < 0) {
+            absOffset = -absOffset;
         }
-        if (ax <= width) {
+        if (absOffset <= width) {
             return dir;
         }
-        flag = TRUE;
+        outsideWidth = TRUE;
     }
-    if (next2 != NULL && !flag) {
-        func_ov036_021b2060(point, m->handle);
-        s32 tileLen = GetLineTileLengthWorldSpace(next2, m->tileWidth, m->handle);
-        ax = m->front;
-        if (ax < 0) {
-            ax = -ax;
+    if (next2 != NULL && !outsideWidth) {
+        func_ov036_021b2060(point, unit->handle);
+        s32 nextLength = GetLineTileLengthWorldSpace(next2, unit->tileWidth, unit->handle);
+        absOffset = unit->front;
+        if (absOffset < 0) {
+            absOffset = -absOffset;
         }
-        width = GetLerpedLineWidthByLineYPos(next2, tileLen - ax, tileLen, m->handle);
-        ax = m->front;
-        if (ax < 0) {
-            ax = -ax;
+        width = GetLerpedLineWidthByLineYPos(next2, nextLength - absOffset, nextLength, unit->handle);
+        absOffset = unit->front;
+        if (absOffset < 0) {
+            absOffset = -absOffset;
         }
-        r = func_ov036_021b0f00(m, next2, dir, tileLen - ax, m->side, tileLen, width);
-        if (r != 0) {
-            return r;
-        }
-    }
-    if (next0 != NULL && m->side <= 0) {
-        if (func_ov036_021b1028(m->handle, next0, point)) {
-            func_ov036_021b2060(point, m->handle);
-            s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-            width = GetLerpedLineWidthByLineYPos(next0, -m->side, tileLen, m->handle);
-            r = func_ov036_021b0f00(m, next0, dir, -m->side, m->front, tileLen, width);
-            if (r != 0) {
-                return r;
-            }
-        } else if (func_ov036_021b1040(m->handle, next0, point)) {
-            func_ov036_021b2060(point, m->handle);
-            s32 tileLen = GetLineTileLengthWorldSpace(next0, m->tileWidth, m->handle);
-            width = GetLerpedLineWidthByLineYPos(next0, tileLen + m->side, tileLen, m->handle);
-            r = func_ov036_021b0f00(m, next0, dir, tileLen + m->side, -m->front, tileLen, width);
-            if (r != 0) {
-                return r;
-            }
+        resultDir = func_ov036_021b0f00(unit, next2, dir, nextLength - absOffset, unit->side, nextLength, width);
+        if (resultDir != 0) {
+            return resultDir;
         }
     }
-    if (next1 != NULL && m->side >= 0) {
-        if (func_ov036_021b1028(m->handle, next1, point)) {
-            func_ov036_021b2060(point, m->handle);
-            s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
-            width = GetLerpedLineWidthByLineYPos(next1, m->side, tileLen, m->handle);
-            r = func_ov036_021b0f00(m, next1, dir, m->side, -m->front, tileLen, width);
-            if (r != 0) {
-                return r;
+    if (next0 != NULL && unit->side <= 0) {
+        if (func_ov036_021b1028(unit->handle, next0, point)) {
+            func_ov036_021b2060(point, unit->handle);
+            s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next0, -unit->side, nextLength, unit->handle);
+            resultDir = func_ov036_021b0f00(unit, next0, dir, -unit->side, unit->front, nextLength, width);
+            if (resultDir != 0) {
+                return resultDir;
             }
-        }
-        if (func_ov036_021b1040(m->handle, next1, point)) {
-            func_ov036_021b2060(point, m->handle);
-            s32 tileLen = GetLineTileLengthWorldSpace(next1, m->tileWidth, m->handle);
-            width = GetLerpedLineWidthByLineYPos(next1, tileLen - m->side, tileLen, m->handle);
-            r = func_ov036_021b0f00(m, next1, dir, tileLen - m->side, m->front, tileLen, width);
-            if (r != 0) {
-                return r;
+        } else if (func_ov036_021b1040(unit->handle, next0, point)) {
+            func_ov036_021b2060(point, unit->handle);
+            s32 nextLength = GetLineTileLengthWorldSpace(next0, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next0, nextLength + unit->side, nextLength, unit->handle);
+            resultDir = func_ov036_021b0f00(unit, next0, dir, nextLength + unit->side, -unit->front, nextLength, width);
+            if (resultDir != 0) {
+                return resultDir;
             }
         }
     }
-    if (flag) {
-        return func_ov036_021b1cec(m, line, len, dir);
+    if (next1 != NULL && unit->side >= 0) {
+        if (func_ov036_021b1028(unit->handle, next1, point)) {
+            func_ov036_021b2060(point, unit->handle);
+            s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next1, unit->side, nextLength, unit->handle);
+            resultDir = func_ov036_021b0f00(unit, next1, dir, unit->side, -unit->front, nextLength, width);
+            if (resultDir != 0) {
+                return resultDir;
+            }
+        }
+        if (func_ov036_021b1040(unit->handle, next1, point)) {
+            func_ov036_021b2060(point, unit->handle);
+            s32 nextLength = GetLineTileLengthWorldSpace(next1, unit->tileWidth, unit->handle);
+            width = GetLerpedLineWidthByLineYPos(next1, nextLength - unit->side, nextLength, unit->handle);
+            resultDir = func_ov036_021b0f00(unit, next1, dir, nextLength - unit->side, unit->front, nextLength, width);
+            if (resultDir != 0) {
+                return resultDir;
+            }
+        }
     }
-    m->front += step;
+    if (outsideWidth) {
+        return func_ov036_021b1cec(unit, line, length, dir);
+    }
+    unit->front += step;
     return 0;
 }
 
