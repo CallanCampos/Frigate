@@ -19,16 +19,16 @@ void ResetMailData(MailData *mail) {
     mail->trainerGender = 0;
     mail->region = region;
     mail->gameVersion = game_version;
-    mail->unk07 = 0xff;
+    mail->design = 0xff;
     MIi_CpuClear16(GFL_StrBufGetTerminator(), mail->trainerName, sizeof(mail->trainerName));
-    mail->unk1E = 0xffff;
+    mail->stampWord = 0xffff;
     for (i = 0; i < 3; i++) {
         PMSData_Clear(&mail->message[i]);
     }
 }
 
 BOOL MailData_IsValid(const MailData *mail) {
-    if (mail->unk07 > MAIL_DESIGN_MAX) {
+    if (mail->design > MAIL_DESIGN_MAX) {
         return FALSE;
     }
     return TRUE;
@@ -48,7 +48,7 @@ void MailData_InitForPlayer(MailData *mail, u32 design, u32 unused, GameData *ga
     PlayerInfo *info;
 
     ResetMailData(mail);
-    mail->unk07 = design;
+    mail->design = design;
     info = GetGameDataPlayerInfo(gameData);
     MI_CpuCopy8(GetPlayerName(info), mail->trainerName, sizeof(mail->trainerName));
     mail->trainerGender = getTrainerGender(info);
@@ -72,12 +72,12 @@ u8 MailData_GetTrainerGender(const MailData *mail) {
 }
 
 u8 MailData_GetDesign(const MailData *mail) {
-    return mail->unk07;
+    return mail->design;
 }
 
 void MailData_SetDesign(MailData *mail, u32 design) {
     if (design < MAIL_DESIGN_COUNT) {
-        mail->unk07 = design;
+        mail->design = design;
     }
 }
 
@@ -90,11 +90,11 @@ u8 MailData_GetGameVersion(const MailData *mail) {
 }
 
 u16 func_02009764(const MailData *mail) {
-    return mail->unk1E;
+    return mail->stampWord;
 }
 
 void func_02009768(MailData *mail, u16 value) {
-    mail->unk1E = value;
+    mail->stampWord = value;
 }
 
 PMSData *MailData_GetMessage(MailData *mail, u8 index) {

@@ -12,11 +12,11 @@ typedef struct MailData {
     u8 trainerGender;
     u8 region;
     u8 gameVersion;
-    u8 unk07;
+    u8 design;
     u16 trainerName[8];
     u16 unk18[3];
-    // 0xffff when there is none
-    u16 unk1E;
+    // The word of the mail's stamp, 0xffff when there is none
+    u16 stampWord;
     PMSData message[3];
 } MailData;
 
