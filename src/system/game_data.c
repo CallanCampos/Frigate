@@ -110,13 +110,15 @@ struct GameData {
     u32 lastBtlResult;
     // Set while the save is being written
     u8 saving;
-    u8 unk1C1;
+    // Set by the battle input when the player uses the keys, kept from one battle to the next
+    u8 battleKeyCursorFlag;
     u8 entreeForestArea;
     u32 stepTotal;
     u8 season;
     u8 weather;
     u8 lastSubscreen;
-    u8 unk1CB;
+    // The field menu item selected last, where the menu opens again
+    u8 fieldMenuItem;
     u8 cGearPowerRequest;
     u8 savedCGearPowerRequest;
     u8 skipFrame;
@@ -149,8 +151,10 @@ struct GameData {
     u32 picks[GAME_DATA_PICK_MAX];
     u32 lensFlareEntryIdx;
     u8 lensFlareRequested;
-    u8 unk30D;
-    u8 unk30E;
+    // The medal under the Medal Box cursor, 0xff for none
+    u8 medalBoxCursorMedal;
+    // The season of the Join Avenue areas, which entering Join Avenue sets
+    u8 joinAvenueSeason;
     u8 funfestMission;
     JoinAvenuePersonList *joinAvenuePersonList;
     ResortWork *resortWork;
@@ -244,7 +248,7 @@ GameData *GameData_Create(HeapID heapId) {
     gameData->pokewoodSystem = NULL;
     gameData->scrPluginNo = 0;
     gameData->resortWork = ResortWork_Create(heapId, gameData->saveControl);
-    gameData->unk30D = 0xff;
+    gameData->medalBoxCursorMedal = 0xff;
     gameData->lensFlareEntryIdx = 67;
 
     func_02017a78(gameData);
@@ -441,11 +445,11 @@ void GameData_SetLastSubscreen(GameData *gameData, u8 subscreen) {
 }
 
 u8 func_020173ec(GameData *gameData) {
-    return gameData->unk1CB;
+    return gameData->fieldMenuItem;
 }
 
 void func_020173f8(GameData *gameData, u8 value) {
-    gameData->unk1CB = value;
+    gameData->fieldMenuItem = value;
 }
 
 u8 GameData_GetCGearPowerRequest(GameData *gameData) {
@@ -514,11 +518,11 @@ void GameData_SetLastBtlResult(GameData *gameData, u32 result) {
 }
 
 void func_020174bc(GameData *gameData, u8 value) {
-    gameData->unk1C1 = value;
+    gameData->battleKeyCursorFlag = value;
 }
 
 u8 func_020174c8(GameData *gameData) {
-    return gameData->unk1C1;
+    return gameData->battleKeyCursorFlag;
 }
 
 BeaconStatus *GameData_GetBeaconStatus(GameData *gameData) {
@@ -1014,19 +1018,19 @@ void GameData_SetFunfestMission(GameData *gameData, BOOL flag) {
 }
 
 void func_02017b4c(GameData *gameData, u8 value) {
-    gameData->unk30D = value;
+    gameData->medalBoxCursorMedal = value;
 }
 
 u8 func_02017b58(GameData *gameData) {
-    return gameData->unk30D;
+    return gameData->medalBoxCursorMedal;
 }
 
 void func_02017b64(GameData *gameData, u8 a1) {
-    gameData->unk30E = a1;
+    gameData->joinAvenueSeason = a1;
 }
 
 u8 func_02017b70(GameData *gameData) {
-    return gameData->unk30E;
+    return gameData->joinAvenueSeason;
 }
 
 JoinAvenuePersonList **GameData_GetJoinAvenuePersonListPtr(GameData *gameData) {
