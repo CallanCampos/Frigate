@@ -278,52 +278,60 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
 // Draws a glyph into a canvas whose characters are in rows of param characters: a BG's, or a 2D OBJ area's
 static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
                             const NNSG2dGlyph *pGlyph) {
-    u32 left, top, right, bottom;
-    int numX, numY;
-    DrawGlyphParam param;
+    int cx;
+    int cy;
+    int xBase;
+    int yStart;
+    int xEnd;
     int yEnd;
     int lineSkip;
-    int xEnd;
-    int cx;
     u8 *pChar;
+    u8 glyphWidth;
+    u8 glyphHeight;
     const int charSize = CharSize(pCC->dstBpp);
-    const int areaWidth = pCC->areaWidth;
-    const int areaHeight = pCC->areaHeight;
-    u8 *charBase = pCC->charBase;
-    const int glyphWidth = pGlyph->pWidths->glyphWidth;
-    const int glyphHeight = pFont->pRes->pGlyph->cellHeight;
+    DrawGlyphParam param;
 
-    if (glyphWidth == 0 || x + glyphWidth < 0 || y + glyphHeight < 0) {
-        return;
-    }
+    {
+        int numX;
+        int numY;
+        const u32 areaWidth = pCC->areaWidth;
+        const u32 areaHeight = pCC->areaHeight;
+        u8 *const charBase = pCC->charBase;
+        u32 left, top, right, bottom;
 
-    // The characters the glyph covers
-    left = (x <= 0) ? 0 : (u32)x / 8;
-    top = (y <= 0) ? 0 : (u32)y / 8;
-    right = (u32)(x + glyphWidth + 7) / 8;
-    if (right >= areaWidth) {
-        right = areaWidth;
-    }
-    bottom = (u32)(y + glyphHeight + 7) / 8;
-    if (bottom >= areaHeight) {
-        bottom = areaHeight;
-    }
-    numX = right - left;
-    numY = bottom - top;
-    if (numX < 0 || numY < 0) {
-        return;
-    }
+        glyphWidth = pGlyph->pWidths->glyphWidth;
+        glyphHeight = pFont->pRes->pGlyph->cellHeight;
 
-    pChar = charBase + charSize * (left + pCC->param * top);
-    lineSkip = (pCC->param - numX) * charSize;
-    if (x >= 0) {
-        x &= 7;
+        if (glyphWidth <= 0) {
+            return;
+        }
+        if (x + glyphWidth < 0 || y + glyphHeight < 0) {
+            return;
+        }
+
+        left = (x <= 0) ? 0 : (u32)x / 8;
+        top = (y <= 0) ? 0 : (u32)y / 8;
+        right = (u32)(x + glyphWidth + 7) / 8;
+        if (right >= areaWidth) {
+            right = areaWidth;
+        }
+        bottom = (u32)(y + glyphHeight + 7) / 8;
+        if (bottom >= areaHeight) {
+            bottom = areaHeight;
+        }
+        numX = right - left;
+        numY = bottom - top;
+        if (numX < 0 || numY < 0) {
+            return;
+        }
+
+        pChar = charBase + (pCC->param * top + left) * charSize;
+        lineSkip = (pCC->param - numX) * charSize;
+        xBase = (x < 0) ? x : x & 7;
+        yStart = (y < 0) ? y : y & 7;
+        xEnd = xBase - 8 * numX;
+        yEnd = yStart - 8 * numY;
     }
-    if (y >= 0) {
-        y &= 7;
-    }
-    xEnd = x - numX * 8;
-    yEnd = y - numY * 8;
 
     param.pSrc = pGlyph->image;
     param.width = glyphWidth;
@@ -333,9 +341,9 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
     param.dstBpp = pCC->dstBpp;
     param.srcLineBits = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
 
-    for (; y > yEnd; y -= 8) {
-        param.y = y;
-        for (cx = x; cx > xEnd; cx -= 8) {
+    for (cy = yStart; cy > yEnd; cy -= 8) {
+        param.y = cy;
+        for (cx = xBase; cx > xEnd; cx -= 8) {
             param.pChar = (u32 *)pChar;
             param.x = cx;
             DrawGlyphChar(&param);

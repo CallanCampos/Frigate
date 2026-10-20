@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-"""The trainers in data/trainers/, one JSON file per trainer with its party, as pokeplatinum's res/trainers/data/: dump
+"""The trainers in res/trainers/data/, one JSON file per trainer with its party, as pokeplatinum's res/trainers/data/: dump
 writes them from the ROM once, and pack builds the trainer (a/0/9/1) and party (a/0/9/2) archives from them, which the
 build does.
 
-    trainer_data.py dump extract/b2_us/files data/trainers
-    trainer_data.py pack data/trainers TRAINERS PARTIES MESSAGE_TABLE MESSAGE_OFFSETS
+    trainer_data.py dump extract/b2_us/files res/trainers/data
+    trainer_data.py pack res/trainers/data TRAINERS PARTIES MESSAGE_TABLE MESSAGE_OFFSETS
 
-Each trainer is data/trainers/<trainer>.json, named after its constant (smasher_elena.json for
-TRAINER_SMASHER_ELENA), and the archives have them in the order of data/constants/trainers.txt. TRAINER_NONE has no
+Each trainer is res/trainers/data/<trainer>.json, named after its constant (smasher_elena.json for
+TRAINER_SMASHER_ELENA), and the archives have them in the order of generated/trainers.txt. TRAINER_NONE has no
 file: its entries are the empty placeholder the game has, a 16-byte record and a 6-byte party. trainer.schema.json
 describes each field.
 
 A trainer's file also holds its name and its messages, which the text files take with \\from{trainers.name} and
 \\from{trainers.messages} (see text_sources.py). The messages are lines of system message file 381, in the order of
 the trainer message table (a/0/8/9), which pairs each with its trainer and type, and whose offset for each trainer is
-in a/0/9/0 (TrainerMsg_Load). That order is the trainers of data/trainers/message_order.json, then any others with
+in a/0/9/0 (TrainerMsg_Load). That order is the trainers of res/trainers/data/message_order.json, then any others with
 messages, in ID order; the packer writes both tables from it.
 """
 import argparse
@@ -168,10 +168,10 @@ def pack(root: Path, trainers_output: Path, parties_output: Path, table_output: 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
-    dump_parser = commands.add_parser("dump", help="write data/trainers/ from the extracted files")
+    dump_parser = commands.add_parser("dump", help="write res/trainers/data/ from the extracted files")
     dump_parser.add_argument("files", type=Path, help="the extracted files/ directory")
     dump_parser.add_argument("output", type=Path)
-    pack_parser = commands.add_parser("pack", help="build the trainer archives from data/trainers/")
+    pack_parser = commands.add_parser("pack", help="build the trainer archives from res/trainers/data/")
     pack_parser.add_argument("root", type=Path)
     pack_parser.add_argument("outputs", type=Path, nargs=4, metavar="ARCHIVE",
                              help="the trainer, party, trainer message table and message offset archives")

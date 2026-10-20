@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_WALREIN",
+    "moves": [ "MOVE_FROST_BREATH", "MOVE_SNORE", "MOVE_STOCKPILE", "MOVE_REST" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_CALM",
+    "item": "ITEM_CHESTO_BERRY",
+    "form": 0
+}

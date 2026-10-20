@@ -1,0 +1,5 @@
+BeaconViewCommon_Text_Yes = YES
+BeaconViewCommon_Text_No = NO
+BeaconViewCommon_Text_Check = CHECK
+BeaconViewCommon_Text_Close = CLOSE
+\pad{3e}

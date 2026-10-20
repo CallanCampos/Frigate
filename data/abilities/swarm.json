@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Swarm",
-    "description": "Powers up Bug-type\nmoves in a pinch."
-}

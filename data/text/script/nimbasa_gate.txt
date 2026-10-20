@@ -1,3 +1,0 @@
-NimbasaGate_Text_IfYouveComeFrom = If you've come from Route 4,\nNimbasa City is ahead.{be01}\nNext! If you've come from Nimbasa City,\nRoute 4 is ahead!
-NimbasaGate_Text_ImAlwaysKnowAbout = I'm always in the know about Nimbasa City\nthanks to this electric bulletin board!
-\pad{f6}

@@ -1,0 +1,5 @@
+{
+    "$schema": "../map_model.schema.json",
+    "texture_set": "MAP_TEXTURE_SET_SHARED_D0_MIZ",
+    "transformed": true
+}

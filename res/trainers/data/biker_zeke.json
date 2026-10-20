@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Zeke",
+    "class": "TRAINER_CLASS_BIKER",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PAWNIARD",
+            "form": 0,
+            "level": 43,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Do you want to pass through here?{be01}\nThen, you must greet me!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You!!\nWhat great strength you have!"
+        },
+        {
+            "type": 2,
+            "text": "Chase the sun during the day,\nand sleep all night...{be00}\nThat might be a good life for me."
+        }
+    ]
+}

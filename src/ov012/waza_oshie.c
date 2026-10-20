@@ -29,7 +29,7 @@ static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
     return entry.level;
 }
 
-MoveReminderProcessData *func_ov012_02169c7c(HeapID heapId) {
+MoveReminderProcessData *MoveReminderProcessData_Create(HeapID heapId) {
     MoveReminderProcessData *data =
         GFL_HeapAllocate(heapId, sizeof(MoveReminderProcessData), FALSE, "waza_oshie.c", 35);
 
@@ -37,7 +37,7 @@ MoveReminderProcessData *func_ov012_02169c7c(HeapID heapId) {
     return data;
 }
 
-void func_ov012_02169ca4(MoveReminderProcessData *data) {
+void MoveReminderProcessData_Free(MoveReminderProcessData *data) {
     GFL_HeapFree(data);
 }
 

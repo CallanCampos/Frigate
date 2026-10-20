@@ -21,13 +21,13 @@ typedef struct {
     u8 data[0x3c];
 } BtlRecTool;
 
-void func_ov167_021d48a0(BtlRecTool *tool, BOOL chapter);
-void *func_ov167_021d48c4(BtlRecTool *tool, u32 *size, BOOL chapter);
-void func_ov167_021d48e0(BtlRecTool *tool, u8 clientId, const void *actions, u8 count);
-void *func_ov167_021d4958(BtlRecTool *tool, u8 value, u32 *size);
-void *func_ov167_021d4990(BtlRecTool *tool, u32 *size);
-void func_ov167_021d49a0(BtlRecTool *tool, const void *data, u32 size);
-BOOL func_ov167_021d49d0(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, void *actions);
+void BtlRecTool_Init(BtlRecTool *tool, BOOL chapter);
+void *BtlRecTool_MakeTurnChunk(BtlRecTool *tool, u32 *size, BOOL chapter);
+void BtlRecTool_AddClientActions(BtlRecTool *tool, u8 clientId, const void *actions, u8 count);
+void *BtlRecTool_FinishChunk(BtlRecTool *tool, u8 value, u32 *size);
+void *BtlRecTool_MakeTimeoutChunk(BtlRecTool *tool, u32 *size);
+void BtlRecTool_SetData(BtlRecTool *tool, const void *data, u32 size);
+BOOL BtlRecTool_ReadClientActions(BtlRecTool *tool, u32 *pos, u8 *clientId, u8 *count, void *actions);
 
 // A recording is a stream of chunks, each starting with a header byte: the count in bits 0 to 3, the chunk type in bits
 // 4 to 6 (1 for the clients' actions, 2 for a turn without them, 3 for a timeout) and the start of a chapter in bit 7.
@@ -46,16 +46,16 @@ typedef struct {
     BattleAction actions[4][16];
 } BtlRecReader;
 
-BtlRecorder *func_ov167_021d45b0(HeapID heapId, u32 type);
-void func_ov167_021d45e8(BtlRecorder *recorder);
-void func_ov167_021d45f0(BtlRecorder *recorder, const void *data, u32 size);
-u8 func_ov167_021d4624(const void *data);
-void *func_ov167_021d4628(BtlRecorder *recorder, u32 *size);
-void func_ov167_021d4630(BtlRecReader *reader, const void *data, u32 size);
-void func_ov167_021d4660(BtlRecReader *reader);
-BOOL func_ov167_021d4674(BtlRecReader *reader, u8 clientId);
-BattleAction *func_ov167_021d46a4(BtlRecReader *reader, u8 clientId, u8 *count, u8 *chapter);
-u32 func_ov167_021d481c(BtlRecReader *reader);
-BOOL func_ov167_021d4880(BtlRecReader *reader, u8 clientId);
+BtlRecorder *BtlRecorder_Create(HeapID heapId, u32 type);
+void BtlRecorder_Delete(BtlRecorder *recorder);
+void BtlRecorder_AddData(BtlRecorder *recorder, const void *data, u32 size);
+u8 BtlRec_GetCmdCheckReq(const void *data);
+void *BtlRecorder_GetData(BtlRecorder *recorder, u32 *size);
+void BtlRecReader_Init(BtlRecReader *reader, const void *data, u32 size);
+void BtlRecReader_Reset(BtlRecReader *reader);
+BOOL BtlRecReader_SkipTurnChunk(BtlRecReader *reader, u8 clientId);
+BattleAction *BtlRecReader_ReadActions(BtlRecReader *reader, u8 clientId, u8 *count, u8 *chapter);
+u32 BtlRecReader_CountChapters(BtlRecReader *reader);
+BOOL BtlRecReader_IsReadComplete(BtlRecReader *reader, u8 clientId);
 
 #endif // POKEBW2_BATTLE_BTL_REC_H

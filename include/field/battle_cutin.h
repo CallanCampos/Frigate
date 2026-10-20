@@ -7,7 +7,8 @@
 struct BattleCutinParam {
     u32 cutin;
     u32 animation;
-    u32 color;
+    u16 color;
+    u16 color2;
 };
 
 extern const BattleCutinParam BATTLE_CUTIN_DB[];

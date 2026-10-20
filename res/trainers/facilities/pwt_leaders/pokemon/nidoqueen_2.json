@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_NIDOQUEEN",
+    "moves": [ "MOVE_CHIP_AWAY", "MOVE_SWAGGER", "MOVE_HELPING_HAND", "MOVE_FLATTER" ],
+    "ev_flags": {
+        "hp": true,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_RELAXED",
+    "item": "ITEM_PAYAPA_BERRY",
+    "form": 0
+}

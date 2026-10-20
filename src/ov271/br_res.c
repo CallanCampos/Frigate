@@ -59,7 +59,7 @@ BrRes *BrRes_Init(u32 color, BOOL isUseColor, HeapID heapId) {
     }
 
     p_wk->font = GFL_FontCreate(23, 0, 0, FALSE, heapId);
-    p_wk->msg = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0008, heapId);
+    p_wk->msg = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BR_RES, heapId);
     p_wk->wordset = GFL_WordSetSystemCreate(8, 64, heapId);
     BrRes_LoadCommonPltt(p_wk, CLACT_VRAM_MAIN, heapId);
     BrRes_LoadCommonPltt(p_wk, CLACT_VRAM_SUB, heapId);
@@ -76,7 +76,7 @@ void BrRes_Exit(BrRes *p_wk) {
 }
 
 void BrRes_LoadBG(BrRes *p_wk, u32 bgID, HeapID heapId) {
-    ArcTool *handle = GFL_ArcSysCreateFileHandle(137, heapId);
+    ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
 
     switch (bgID) {
     case 0:
@@ -274,101 +274,101 @@ void BrRes_LoadOBJ(BrRes *p_wk, u32 objID, HeapID heapId) {
 
     switch (objID) {
     case BR_RES_OBJ_SIDEBAR_M:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_MAIN];
-        p_data->chr = func_0204b81c(handle, 36, FALSE, CLACT_VRAM_MAIN, heapId);
-        p_data->cell = func_0204bde0(handle, 21, 20, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 36, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 21, 20, heapId);
         GFL_ArcToolFree(handle);
         break;
     case BR_RES_OBJ_SIDEBAR_S:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_SUB];
-        p_data->chr = func_0204b81c(handle, 36, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 21, 20, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 36, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 21, 20, heapId);
         GFL_ArcToolFree(handle);
         break;
     case BR_RES_OBJ_BROWSE_BTN_M:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_MAIN];
-        p_data->chr = func_0204b81c(handle, 34, FALSE, CLACT_VRAM_MAIN, heapId);
-        p_data->cell = func_0204bde0(handle, 9, 10, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 34, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 9, 10, heapId);
         GFL_ArcToolFree(handle);
         break;
     case BR_RES_OBJ_BROWSE_BTN_S:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_SUB];
-        p_data->chr = func_0204b81c(handle, 34, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 9, 10, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 34, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 9, 10, heapId);
         GFL_ArcToolFree(handle);
         break;
     case BR_RES_OBJ_MUSICAL_BTN_M:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_MAIN];
-        p_data->chr = func_0204b81c(handle, 63, FALSE, CLACT_VRAM_MAIN, heapId);
-        p_data->cell = func_0204bde0(handle, 61, 62, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 63, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 61, 62, heapId);
         GFL_ArcToolFree(handle);
         break;
     case BR_RES_OBJ_MUSICAL_BTN_S:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_SUB];
-        p_data->chr = func_0204b81c(handle, 63, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 61, 62, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 63, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 61, 62, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 6:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_SUB];
-        p_data->chr = func_0204b81c(handle, 35, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 7, 8, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 35, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 7, 8, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 8:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_SUB];
-        p_data->chr = func_0204b81c(handle, 86, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 85, 84, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 86, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 85, 84, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 7:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_MAIN];
-        p_data->chr = func_0204b81c(handle, 86, FALSE, CLACT_VRAM_MAIN, heapId);
-        p_data->cell = func_0204bde0(handle, 85, 84, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 86, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 85, 84, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 11:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
-        p_data->plt = func_0204bbb8(handle, 19, CLACT_VRAM_SUB, 0x80, 0, 1, heapId);
-        p_data->chr = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 16, 17, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
+        p_data->plt = ClActSys_LoadPlttRange(handle, 19, CLACT_VRAM_SUB, 0x80, 0, 1, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 16, 17, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 12:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
-        p_data->plt = func_0204bbb8(handle, 51, CLACT_VRAM_SUB, 0xa0, 0, 1, heapId);
-        p_data->chr = func_0204b81c(handle, 50, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 48, 49, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
+        p_data->plt = ClActSys_LoadPlttRange(handle, 51, CLACT_VRAM_SUB, 0xa0, 0, 1, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 50, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 48, 49, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 9:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_MAIN];
-        p_data->chr = func_0204b81c(handle, 54, FALSE, CLACT_VRAM_MAIN, heapId);
-        p_data->cell = func_0204bde0(handle, 52, 53, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 54, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 52, 53, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 10:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_SUB];
-        p_data->chr = func_0204b81c(handle, 54, FALSE, CLACT_VRAM_SUB, heapId);
-        p_data->cell = func_0204bde0(handle, 52, 53, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 54, FALSE, CLACT_VRAM_SUB, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 52, 53, heapId);
         GFL_ArcToolFree(handle);
         break;
     case 13:
-        handle = GFL_ArcSysCreateFileHandle(137, heapId);
+        handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
         p_data->plt = p_wk->common_obj_plt[CLACT_VRAM_MAIN];
-        p_data->cell = func_0204bde0(handle, 41, 42, heapId);
-        p_data->chr = func_0204b81c(handle, 37, FALSE, CLACT_VRAM_MAIN, heapId);
+        p_data->cell = ClActSys_LoadCellAnims(handle, 41, 42, heapId);
+        p_data->chr = ClActSys_LoadChars(handle, 37, FALSE, CLACT_VRAM_MAIN, heapId);
         GFL_ArcToolFree(handle);
         break;
     }
@@ -382,9 +382,9 @@ void BrRes_UnloadOBJ(BrRes *p_wk, u32 objID) {
     switch (objID) {
     case 11:
     case 12:
-        func_0204bcd0(p_data->plt);
-        func_0204b98c(p_data->chr);
-        func_0204be64(p_data->cell);
+        ClActSys_FreePltt(p_data->plt);
+        ClActSys_FreeChars(p_data->chr);
+        ClActSys_FreeCellAnims(p_data->cell);
         break;
     case BR_RES_OBJ_BROWSE_BTN_M:
     case BR_RES_OBJ_BROWSE_BTN_S:
@@ -396,8 +396,8 @@ void BrRes_UnloadOBJ(BrRes *p_wk, u32 objID) {
     case 9:
     case 10:
     case 13:
-        func_0204b98c(p_data->chr);
-        func_0204be64(p_data->cell);
+        ClActSys_FreeChars(p_data->chr);
+        ClActSys_FreeCellAnims(p_data->cell);
         break;
     }
     p_wk->obj_flag[objID] = FALSE;
@@ -411,10 +411,10 @@ BOOL BrRes_GetObjData(const BrRes *p_wk, u32 objID, BrResObjData *p_data) {
 }
 
 void BrRes_LoadCommonPltt(BrRes *p_wk, u32 vramType, HeapID heapId) {
-    ArcTool *handle = GFL_ArcSysCreateFileHandle(137, heapId);
+    ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
 
     p_wk->common_obj_plt[vramType] =
-        func_0204bbb8(handle, BrRes_GetCommonObjPltt(p_wk->color), vramType, 0, 0, 13, heapId);
+        ClActSys_LoadPlttRange(handle, BrRes_GetCommonObjPltt(p_wk->color), vramType, 0, 0, 13, heapId);
     if (vramType == CLACT_VRAM_MAIN) {
         GFL_G2DIOLoadArcNCLRDefault(handle, BrRes_GetCommonBgPltt(p_wk->color), 0, 0, 0, heapId);
         GFL_G2DIOLoadArcNCLRDefault(handle, BrRes_GetCommonFontPltt(p_wk->color), 0, 0x1c0, 0x20, heapId);
@@ -426,7 +426,7 @@ void BrRes_LoadCommonPltt(BrRes *p_wk, u32 vramType, HeapID heapId) {
 }
 
 void BrRes_UnloadCommonPltt(BrRes *p_wk, u32 vramType) {
-    func_0204bcd0(p_wk->common_obj_plt[vramType]);
+    ClActSys_FreePltt(p_wk->common_obj_plt[vramType]);
     p_wk->common_obj_plt[vramType] = 0xffffffff;
 }
 
@@ -456,7 +456,7 @@ u32 BrRes_GetColor(const BrRes *p_wk) {
 
 // Loads the palettes of the color into the fade's buffers, to change the color with a fade
 void BrRes_LoadColorPlttToFade(BrRes *p_wk, BrFade *fade, HeapID heapId) {
-    ArcTool *handle = GFL_ArcSysCreateFileHandle(137, heapId);
+    ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_BR_RES, heapId);
 
     BrFade_LoadPlttArc(fade, handle, BrRes_GetCommonObjPltt(p_wk->color), 2, 0, 0x1c0, heapId);
     BrFade_LoadPlttArc(fade, handle, BrRes_GetCommonObjPltt(p_wk->color), 3, 0, 0x1c0, heapId);

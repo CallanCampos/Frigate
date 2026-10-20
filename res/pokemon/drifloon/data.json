@@ -1,0 +1,193 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Drifloon",
+    "pokedex": {
+        "category": "Balloon Pokémon",
+        "entry": "These Pokémon are called the\n“Signpost for Wandering Spirits.\"\nChildren holding them sometimes vanish.",
+        "height": "1'04\"",
+        "weight": "2.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Drifloon",
+                "category": "Balloon Pokémon",
+                "entry": "Because of the way it floats\naimlessly, an old folktale calls it a\n“Signpost for Wandering Spirits.\"",
+                "height": "1'04\"",
+                "weight": "2.6 lbs."
+            },
+            "fr": {
+                "name": "Baudrive",
+                "category": "Pokémon Bouboule",
+                "entry": "Sa façon de flotter sans but au\ngré du vent lui a valu le surnom\nde “bouée des esprits égarés\".",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "de": {
+                "name": "Driftlon",
+                "category": "Ballon",
+                "entry": "Laut einer alten Volkssage nennt man\nes den „Wegweiser für umherstreifende\nGeister“.",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "it": {
+                "name": "Drifloon",
+                "category": "Pokémon Pallone",
+                "entry": "Fluttua qua e là senza motivo e per\nquesto una leggenda lo definisce\n“Guida degli spiriti vaganti\".",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "ko": {
+                "name": "흔들풍손",
+                "category": "풍선포켓몬",
+                "entry": "정처없이 떠있는 모습에서\n길잃은 영혼의 이정표라고\n전해지는 옛날이야기도 있다.",
+                "height": "0.4 m",
+                "weight": "1.2 kg"
+            },
+            "es": {
+                "name": "Drifloon",
+                "category": "Pokémon Globo",
+                "entry": "Por esa forma que tiene de flotar\nsin rumbo, en un cuento se le apodó\nGlobo Aeroerrático.",
+                "height": "0,4 m",
+                "weight": "1,2 kg"
+            },
+            "ja": {
+                "name": "フワンテ",
+                "category": "ふうせんポケモン",
+                "entry": "あてもなく\\x{3000}うかぶ\\x{3000}ようすから\nまよえる\\x{3000}たましいの\\x{3000}みちしるべ\\x{3000}と\nつたえる\\x{3000}むかしばなしも\\x{3000}ある。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff11}\\x{ff0e}\\x{ff12}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 90,
+        "attack": 50,
+        "defense": 34,
+        "speed": 70,
+        "special_attack": 60,
+        "special_defense": 44
+    },
+    "types": [ "TYPE_GHOST", "TYPE_FLYING" ],
+    "catch_rate": 125,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 1,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 30,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_FLUCTUATING",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_AFTERMATH", "ABILITY_UNBURDEN" ],
+    "hidden_ability": "ABILITY_FLARE_BOOST",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_PURPLE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 70,
+    "height": 4,
+    "weight": 12,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_CONSTRICT" ],
+            [ 1, "MOVE_MINIMIZE" ],
+            [ 4, "MOVE_ASTONISH" ],
+            [ 8, "MOVE_GUST" ],
+            [ 13, "MOVE_FOCUS_ENERGY" ],
+            [ 16, "MOVE_PAYBACK" ],
+            [ 20, "MOVE_OMINOUS_WIND" ],
+            [ 25, "MOVE_STOCKPILE" ],
+            [ 27, "MOVE_HEX" ],
+            [ 32, "MOVE_SWALLOW" ],
+            [ 32, "MOVE_SPIT_UP" ],
+            [ 36, "MOVE_SHADOW_BALL" ],
+            [ 40, "MOVE_AMNESIA" ],
+            [ 44, "MOVE_BATON_PASS" ],
+            [ 50, "MOVE_EXPLOSION" ]
+        ],
+        "by_tm": [
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM21",
+            "TM24",
+            "TM25",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM57",
+            "TM61",
+            "TM62",
+            "TM63",
+            "TM64",
+            "TM66",
+            "TM70",
+            "TM73",
+            "TM74",
+            "TM77",
+            "TM85",
+            "TM87",
+            "TM90",
+            "HM01"
+        ],
+        "by_tutor": [
+            "MOVE_MAGIC_COAT",
+            "MOVE_ICY_WIND",
+            "MOVE_BIND",
+            "MOVE_SNORE",
+            "MOVE_KNOCK_OFF",
+            "MOVE_TAILWIND",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_SPITE",
+            "MOVE_TRICK",
+            "MOVE_RECYCLE",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": [
+            "MOVE_MEMENTO",
+            "MOVE_BODY_SLAM",
+            "MOVE_DESTINY_BOND",
+            "MOVE_DISABLE",
+            "MOVE_HAZE",
+            "MOVE_HYPNOSIS",
+            "MOVE_WEATHER_BALL",
+            "MOVE_CLEAR_SMOG",
+            "MOVE_DEFOG"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 28,
+            "species": "SPECIES_DRIFBLIM"
+        }
+    ],
+    "regional_dex_number": 208,
+    "baby_species": "SPECIES_DRIFLOON",
+    "cry_volume": 120
+}

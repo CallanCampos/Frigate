@@ -45,8 +45,6 @@
 // guess from its graphic file's, "gpower_app_graphic.c"
 
 #define HEAPID_GPOWER_APP 0xa0
-// The screen's graphics and its table of positions
-#define ARCID_GPOWER_APP 285
 
 #define WINDOW_COUNT 22
 #define BUTTON_COUNT 4
@@ -388,7 +386,7 @@ static BOOL GPowerApp_Init(GameProc *proc, u32 *state, void *param, void *data) 
     work->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_TITLE, work->heapId);
     work->msgData[1] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PASS_POWERS, work->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     work->yesNoWins[0] = NULL;
     work->yesNoWins[1] = NULL;
     work->taskMenuRes = AppTaskMenuRes_Create(1, 10, work->font, work->printQueue, work->heapId);
@@ -410,7 +408,7 @@ static BOOL GPowerApp_Exit(GameProc *proc, u32 *state, void *param, void *data) 
         }
     }
     GFL_WordSetSystemFree(work->wordSet);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_FontFree(work->font);
     GPowerApp_FreeYesNo(work);
     AppTaskMenuRes_Free(work->taskMenuRes);
@@ -432,7 +430,7 @@ static BOOL GPowerApp_Main(GameProc *proc, u32 *state, void *param, void *data) 
         }
         break;
     case 1:
-        if (work->seq == SEQ_END && func_02021c0c(work->printQueue) == TRUE) {
+        if (work->seq == SEQ_END && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -484,7 +482,7 @@ static void GPowerApp_InitWork(GPowerApp *work) {
     GPowerApp_InitWindows(work);
     GPowerApp_InitObj(work);
     GPowerApp_InitPaletteAnim(work);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         work->flags |= FLAG_KEYS;
         GPowerApp_SetActorPalette(work, ACTOR_BUTTON, work->cursor, 2);
     }
@@ -600,7 +598,7 @@ static void GPowerApp_UpdateSeq(GPowerApp *work) {
             work->seq = SEQ_SELECT;
             work->flags |= FLAG_REDRAW;
             GPowerApp_SetActorVisible(work, ACTOR_RETURN, 0, TRUE);
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 work->flags &= ~FLAG_KEYS;
                 GPowerApp_SetActorPalette(work, ACTOR_BUTTON, work->cursor, 0);
             }
@@ -641,7 +639,7 @@ static void GPowerApp_UpdateSeq(GPowerApp *work) {
             } else {
                 work->seq = SEQ_SELECT;
                 work->flags |= FLAG_REDRAW;
-                if (func_0203d554() == TRUE) {
+                if (GCTX_HIDIsUsingTouch() == TRUE) {
                     work->flags &= ~FLAG_KEYS;
                     GPowerApp_SetActorPalette(work, ACTOR_BUTTON, work->cursor, 0);
                 }
@@ -659,7 +657,7 @@ static void GPowerApp_UpdateSeq(GPowerApp *work) {
 static void GPowerApp_UpdatePrint(GPowerApp *work) {
     int i;
 
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&work->windows[i], work->printQueue);
     }
@@ -713,9 +711,9 @@ static void GPowerApp_LoadTouchBar(GPowerApp *work, u32 bg, u32 paletteType, u32
     int x;
     int y;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), paletteType, palette * 32, 32, work->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, work->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, work->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), paletteType, palette * 32, 32, work->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, work->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, work->heapId);
     screen = GFL_BGSysIsScrHeapExists(bg);
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 32; x++) {
@@ -767,23 +765,23 @@ static void GPowerApp_AddActors(GPowerApp *work, u32 vramType, const GPowerAppAc
         setup.sequence = setups->sequence;
         setup.priority = setups->priority;
         setup.bgPriority = setups->bgPriority;
-        actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells],
-                                  &setup, vramType, work->heapId);
+        actors[i] = ClActor_Create(unit, work->resources[chars], work->resources[palette], work->resources[cells],
+                                   &setup, vramType, work->heapId);
         visible = FALSE;
         if (setups->visible == TRUE) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         autoAnim = FALSE;
         if (setups->flags & ACTOR_AUTO_ANIM) {
             autoAnim = TRUE;
         }
         func_0204c520(actors[i], autoAnim);
         if (setups->flags & ACTOR_FLIP_Y) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (setups->flags & ACTOR_FLIP_X) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
         setups++;
     }
@@ -795,9 +793,9 @@ static void GPowerApp_LoadObjResources(GPowerApp *work, u32 vramType, const GPow
 
     GPowerAppGraphic_GetClActUnit(work->graphic);
     work->resources[files[0].resource] =
-        func_0204bbb8(arc, files[0].file, vramType, files[0].offset, 0, files[0].count, work->heapId);
-    work->resources[files[1].resource] = func_0204b81c(arc, files[1].file, FALSE, vramType, work->heapId);
-    work->resources[files[2].resource] = func_0204bde0(arc, files[2].file, files[3].file, work->heapId);
+        ClActSys_LoadPlttRange(arc, files[0].file, vramType, files[0].offset, 0, files[0].count, work->heapId);
+    work->resources[files[1].resource] = ClActSys_LoadChars(arc, files[1].file, FALSE, vramType, work->heapId);
+    work->resources[files[2].resource] = ClActSys_LoadCellAnims(arc, files[2].file, files[3].file, work->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -810,13 +808,13 @@ static void GPowerApp_LoadCommonObjResources(GPowerApp *work, u32 vramType) {
     u32 anims;
 
     GPowerAppGraphic_GetClActUnit(work->graphic);
-    palette = func_0202d810();
-    chars = func_0202d814();
-    cells = func_0202d818(2);
-    anims = func_0202d81c(2);
-    work->resources[RES_COMMON_PALETTE] = func_0204bbb8(arc, palette, vramType, 8 * 32, 0, 4, work->heapId);
-    work->resources[RES_COMMON_CHARS] = func_0204b81c(arc, chars, FALSE, vramType, work->heapId);
-    work->resources[RES_COMMON_CELLS] = func_0204bde0(arc, cells, anims, work->heapId);
+    palette = AppMenuCommon_GetTouchBarPaletteFile();
+    chars = AppMenuCommon_GetTouchBarCharFile();
+    cells = AppMenuCommon_GetTouchBarCellFile(2);
+    anims = AppMenuCommon_GetTouchBarAnimFile(2);
+    work->resources[RES_COMMON_PALETTE] = ClActSys_LoadPlttRange(arc, palette, vramType, 8 * 32, 0, 4, work->heapId);
+    work->resources[RES_COMMON_CHARS] = ClActSys_LoadChars(arc, chars, FALSE, vramType, work->heapId);
+    work->resources[RES_COMMON_CELLS] = ClActSys_LoadCellAnims(arc, cells, anims, work->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -828,9 +826,9 @@ static void GPowerApp_InitObj(GPowerApp *work) {
     GPowerApp_LoadCommonObjResources(work, CLACT_VRAM_MAIN);
     GPowerApp_AddActors(work, CLACT_VRAM_MAIN, sGPowerAppButtonActorSetups, &sGPowerAppButtonActorGroup);
     GPowerApp_AddActors(work, CLACT_VRAM_MAIN, sGPowerAppReturnActorSetups, &sGPowerAppReturnActorGroup);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, work->heapId);
-    work->resources[RES_FONT_PALETTE] = func_0204bc48(arc, 6, CLACT_VRAM_MAIN, 4 * 32, work->heapId);
+    work->resources[RES_FONT_PALETTE] = ClActSys_LoadPlttEx(arc, 6, CLACT_VRAM_MAIN, 4 * 32, work->heapId);
     GFL_ArcToolFree(arc);
     work->bmpOam = BmpOam_Init(work->heapId, unit);
     GPowerApp_AddLabels(work, CLACT_VRAM_MAIN, sGPowerAppLabelSetups, RES_FONT_PALETTE);
@@ -840,16 +838,16 @@ static void GPowerApp_FreeObj(GPowerApp *work) {
     int i;
 
     for (i = 0; i < BUTTON_COUNT; i++) {
-        func_0204c108(work->buttons[i]);
+        ClActor_Delete(work->buttons[i]);
     }
-    func_0204c108(work->returnButton[0]);
-    func_0204bcd0(work->resources[RES_PALETTE]);
-    func_0204b98c(work->resources[RES_CHARS]);
-    func_0204be64(work->resources[RES_CELLS]);
-    func_0204bcd0(work->resources[RES_COMMON_PALETTE]);
-    func_0204b98c(work->resources[RES_COMMON_CHARS]);
-    func_0204be64(work->resources[RES_COMMON_CELLS]);
-    func_0204bcd0(work->resources[RES_FONT_PALETTE]);
+    ClActor_Delete(work->returnButton[0]);
+    ClActSys_FreePltt(work->resources[RES_PALETTE]);
+    ClActSys_FreeChars(work->resources[RES_CHARS]);
+    ClActSys_FreeCellAnims(work->resources[RES_CELLS]);
+    ClActSys_FreePltt(work->resources[RES_COMMON_PALETTE]);
+    ClActSys_FreeChars(work->resources[RES_COMMON_CHARS]);
+    ClActSys_FreeCellAnims(work->resources[RES_COMMON_CELLS]);
+    ClActSys_FreePltt(work->resources[RES_FONT_PALETTE]);
     for (i = 0; i < BUTTON_COUNT; i++) {
         BmpOam_ActorDel(work->labels[i]);
         GFL_BitmapFree(work->labelBitmaps[i]);
@@ -860,12 +858,12 @@ static void GPowerApp_FreeObj(GPowerApp *work) {
 static void GPowerApp_SetActorAnim(GPowerApp *work, int type, int index, u32 sequence) {
     if (type == ACTOR_BUTTON) {
         if (index < BUTTON_COUNT) {
-            func_0204c488(work->buttons[index], (u16)sequence);
+            ClActor_SetSequence(work->buttons[index], (u16)sequence);
             func_0204c520(work->buttons[index], TRUE);
         }
     } else if (type == ACTOR_RETURN) {
         if (index < 1) {
-            func_0204c488(work->returnButton[index], (u16)sequence);
+            ClActor_SetSequence(work->returnButton[index], (u16)sequence);
             func_0204c520(work->returnButton[index], TRUE);
         }
     }
@@ -874,11 +872,11 @@ static void GPowerApp_SetActorAnim(GPowerApp *work, int type, int index, u32 seq
 static void GPowerApp_SetActorVisible(GPowerApp *work, int type, int index, BOOL visible) {
     if (type == ACTOR_BUTTON) {
         if (index < BUTTON_COUNT) {
-            func_0204c124(work->buttons[index], visible);
+            ClActor_SetVisible(work->buttons[index], visible);
         }
     } else if (type == ACTOR_RETURN) {
         if (index < 1) {
-            func_0204c124(work->returnButton[index], visible);
+            ClActor_SetVisible(work->returnButton[index], visible);
         }
     }
 }
@@ -886,11 +884,11 @@ static void GPowerApp_SetActorVisible(GPowerApp *work, int type, int index, BOOL
 static void GPowerApp_SetActorPalette(GPowerApp *work, int type, int index, u32 palette) {
     if (type == ACTOR_BUTTON) {
         if (index < BUTTON_COUNT) {
-            func_0204c378(work->buttons[index], (u8)palette, 1);
+            ClActor_SetPalette(work->buttons[index], (u8)palette, 1);
         }
     } else if (type == ACTOR_RETURN) {
         if (index < 1) {
-            func_0204c378(work->returnButton[index], (u8)palette, 1);
+            ClActor_SetPalette(work->returnButton[index], (u8)palette, 1);
         }
     }
 }
@@ -902,14 +900,14 @@ static BOOL GPowerApp_IsActorAnimActive(GPowerApp *work, int type, int index) {
         if (index >= BUTTON_COUNT) {
             return FALSE;
         }
-        if (!func_0204c560(work->buttons[index])) {
+        if (!ClActor_IsAnimActive(work->buttons[index])) {
             active = FALSE;
         }
     } else if (type == ACTOR_RETURN) {
         if (index >= 1) {
             return FALSE;
         }
-        if (!func_0204c560(work->returnButton[index])) {
+        if (!ClActor_IsAnimActive(work->returnButton[index])) {
             active = FALSE;
         }
     }
@@ -1036,20 +1034,20 @@ static void GPowerApp_UpdateSelect(GPowerApp *work) {
         work->flags |= FLAG_KEYS;
         changed = 1;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (touch == TOUCH_RETURN) {
         changed = 2;
         GPowerApp_SetActorAnim(work, ACTOR_RETURN, 0, 9);
         work->seq = SEQ_RETURN;
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (changed == 0) {
         if (!(work->flags & FLAG_KEYS) && GCTX_HIDGetPressedKeys()) {
             work->flags |= FLAG_KEYS;
             changed = 1;
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
         if (GCTX_HIDGetTypedKeys() & PAD_KEY_UP) {
             if ((work->flags & FLAG_KEYS) && changed == 0) {
@@ -1071,7 +1069,7 @@ static void GPowerApp_UpdateSelect(GPowerApp *work) {
                 if (work->cursor != cursor) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
                 }
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
         } else if (GCTX_HIDGetTypedKeys() & PAD_KEY_DOWN) {
             if ((work->flags & FLAG_KEYS) && changed == 0) {
@@ -1093,21 +1091,21 @@ static void GPowerApp_UpdateSelect(GPowerApp *work) {
                 if (work->cursor != cursor) {
                     GFL_SndSEPlay(SEQ_SE_SELECT1);
                 }
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             }
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             changed = 2;
             GPowerApp_SetActorAnim(work, ACTOR_RETURN, 0, 9);
             work->seq = SEQ_RETURN;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             if ((work->flags & FLAG_KEYS) && changed == 0) {
                 changed = 2;
                 decided = TRUE;
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
             }
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
     }
     if (decided == TRUE) {
@@ -1220,7 +1218,7 @@ static void GPowerApp_DrawEntralinkButton(GPowerApp *work) {
 // The button touched, TOUCH_RETURN, or -1. A touch on a button that is off shows the cursor nowhere
 static int GPowerApp_CheckTouch(GPowerApp *work) {
     int result = -1;
-    int hit = func_0203da0c(sGPowerAppSelectTouchRects);
+    int hit = GFL_HIDGetTouchPressedRect(sGPowerAppSelectTouchRects);
 
     if (hit >= 0 && hit <= 2) {
         if (work->powerCount > hit) {
@@ -1413,7 +1411,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
     if (work->yesNoWins[0] == NULL || work->yesNoWins[1] == NULL) {
         return FALSE;
     }
-    hit = func_0203da0c(sGPowerAppYesNoTouchRects);
+    hit = GFL_HIDGetTouchPressedRect(sGPowerAppYesNoTouchRects);
     if (hit == 0) {
         AppTaskMenuWin_SetFlashing(work->yesNoWins[0], TRUE);
         AppTaskMenuWin_SetActive(work->yesNoWins[1], FALSE);
@@ -1421,7 +1419,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
         work->yesNoCursor = 0;
         touched = TRUE;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     } else if (hit == 1) {
         AppTaskMenuWin_SetActive(work->yesNoWins[0], FALSE);
         AppTaskMenuWin_SetFlashing(work->yesNoWins[1], TRUE);
@@ -1429,7 +1427,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
         work->yesNoCursor = 1;
         touched = TRUE;
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     if (!touched) {
         if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
@@ -1439,7 +1437,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
             AppTaskMenuWin_SetActive(work->yesNoWins[0], TRUE);
             AppTaskMenuWin_SetActive(work->yesNoWins[1], FALSE);
             work->yesNoCursor = 0;
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_RIGHT) {
             if (work->yesNoCursor != 1) {
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
@@ -1447,7 +1445,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
             AppTaskMenuWin_SetActive(work->yesNoWins[0], FALSE);
             AppTaskMenuWin_SetActive(work->yesNoWins[1], TRUE);
             work->yesNoCursor = 1;
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
             if (work->yesNoCursor == 0) {
                 AppTaskMenuWin_SetFlashing(work->yesNoWins[0], TRUE);
@@ -1457,7 +1455,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
                 AppTaskMenuWin_SetFlashing(work->yesNoWins[1], TRUE);
             }
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             decided = TRUE;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             AppTaskMenuWin_SetActive(work->yesNoWins[0], FALSE);
@@ -1465,7 +1463,7 @@ static BOOL GPowerApp_UpdateYesNoInput(GPowerApp *work) {
             decided = TRUE;
             work->yesNoCursor = 1;
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
     }
     return decided;
@@ -1486,11 +1484,11 @@ static BOOL GPowerApp_CheckAnyInput(GPowerApp *work) {
     BOOL result = FALSE;
 
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         result = TRUE;
     }
-    if (func_0203da48() == TRUE) {
-        func_0203d564(TRUE);
+    if (GFL_HIDIsTouchPressed() == TRUE) {
+        GCTX_HIDSetUsingTouch(TRUE);
         result = TRUE;
     }
     return result;

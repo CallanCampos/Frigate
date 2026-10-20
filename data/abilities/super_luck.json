@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Super Luck",
-    "description": "Heightens the critical-\nhit ratios of moves."
-}

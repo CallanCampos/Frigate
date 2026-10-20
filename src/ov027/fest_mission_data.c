@@ -25,43 +25,43 @@ FestivalText *getTextFileForFestMissions(HeapID heapId) {
     return text;
 }
 
-void func_ov027_02170b00(FestivalText *text) {
+void FestivalText_Free(FestivalText *text) {
     GFL_MsgDataFree(text->message);
     GFL_ArcToolFree(text->archive);
     GFL_HeapFree(text);
 }
 
-void *func_ov027_02170b18(ArcTool *arc, HeapID heapId) {
+void *FestMissionData_LoadHeaders(ArcTool *arc, HeapID heapId) {
     return GFL_ArcToolReadHeapNew(arc, 0, heapId);
 }
 
-void func_ov027_02170b24(ArcTool *arc, u8 index, FestMissionData *dest) {
+void FestMissionData_Load(ArcTool *arc, u8 index, FestMissionData *dest) {
     GFL_ArcToolReadRange(arc, 0, index * sizeof(dest->header), sizeof(dest->header), &dest->header);
     GFL_ArcToolReadRange(arc, 1, index * sizeof(dest->params), sizeof(dest->params), &dest->params);
 }
 
-FestMissionData *func_ov027_02170b50(ArcTool *arc, HeapID heapId) {
+FestMissionData *FestMissionData_LoadAll(ArcTool *arc, HeapID heapId) {
     s32 i;
     FestMissionData *missions;
 
     missions =
         GFL_HeapAllocate(heapId, sizeof(FestMissionData) * FEST_MISSION_COUNT, TRUE, "fest_mission_data.c", 0x91);
     for (i = 0; i < FEST_MISSION_COUNT; i++) {
-        func_ov027_02170b24(arc, i, &missions[i]);
+        FestMissionData_Load(arc, i, &missions[i]);
     }
     return missions;
 }
 
-FestMissionData *func_ov027_02170b8c(FestivalText *text, HeapID heapId) {
-    return func_ov027_02170b50(text->archive, heapId);
+FestMissionData *FestivalText_LoadAllMissions(FestivalText *text, HeapID heapId) {
+    return FestMissionData_LoadAll(text->archive, heapId);
 }
 
-void func_ov027_02170b98(ArcTool *arc, u8 index, u32 level, FestMission *mission) {
+void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMission *mission) {
     FestMissionData data;
     FestMissionParams *params;
 
     MI_CpuFill8(mission, 0, sizeof(FestMission));
-    func_ov027_02170b24(arc, index, &data);
+    FestMissionData_Load(arc, index, &data);
     params = &data.params;
     mission->index = index;
     mission->level = level;
@@ -87,15 +87,15 @@ void func_ov027_02170b98(ArcTool *arc, u8 index, u32 level, FestMission *mission
     mission->header = data.header;
 }
 
-void func_ov027_02170cf8(FestivalText *text, u8 index, u32 level, FestMission *mission) {
-    func_ov027_02170b98(text->archive, index, level, mission);
+void FestivalText_LoadMission(FestivalText *text, u8 index, u32 level, FestMission *mission) {
+    FestMission_Load(text->archive, index, level, mission);
 }
 
-void func_ov027_02170d04(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId) {
+void FestMission_GetMessage(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId) {
     WordSet *wordSet = GFL_WordSetSystemCreate(2, 0x49, HEAPID_TAIL(heapId));
     StrBuf *message = GFL_StrBufCreate(0x25, HEAPID_TAIL(heapId));
 
-    func_ov027_02170e1c(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->target);
+    FestMission_SetTargetWord(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->target);
     WordSetNumber(wordSet, 1, mission->count, 3, 0, 1);
     GFL_MsgDataLoadStrbuf(text->message, mission->messageId, message);
     GFL_WordSetFormatStrbuf(wordSet, dest, message);
@@ -103,11 +103,11 @@ void func_ov027_02170d04(FestivalText *text, StrBuf *dest, const FestMission *mi
     GFL_WordSetSystemFree(wordSet);
 }
 
-void func_ov027_02170d90(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId) {
+void FestMission_GetResultMessage(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId) {
     WordSet *wordSet = GFL_WordSetSystemCreate(2, 0x49, HEAPID_TAIL(heapId));
     StrBuf *message = GFL_StrBufCreate(0xa1, HEAPID_TAIL(heapId));
 
-    func_ov027_02170e1c(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->target);
+    FestMission_SetTargetWord(wordSet, message, 0, data_ov027_021711c0[mission->header.kind], mission->target);
     WordSetNumber(wordSet, 1, mission->count, 5, 0, 1);
     GFL_MsgDataLoadStrbuf(text->message, mission->resultMessageId, message);
     GFL_WordSetFormatStrbuf(wordSet, dest, message);
@@ -115,7 +115,7 @@ void func_ov027_02170d90(FestivalText *text, StrBuf *dest, const FestMission *mi
     GFL_WordSetSystemFree(wordSet);
 }
 
-void func_ov027_02170e1c(WordSet *wordSet, StrBuf *unused, u32 index, u32 kind, u32 target) {
+void FestMission_SetTargetWord(WordSet *wordSet, StrBuf *unused, u32 index, u32 kind, u32 target) {
     switch (kind) {
     case 1:
         WordSet_LoadSpeciesName(wordSet, index, (u16)target);

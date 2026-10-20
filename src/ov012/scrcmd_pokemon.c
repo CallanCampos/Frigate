@@ -1,4 +1,7 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). swan gives wf_location, stats_list and iv_set
+// one byte after each table, and calls iv_set's second column iv_val
 #include "types.h"
+#include "constants/places.h"
 #include "constants/pokemon.h"
 #include "field/field.h"
 #include "field/field_script.h"
@@ -710,12 +713,15 @@ BOOL s01D5_MoveReminderCheckPkm(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
+// The place s0119_PokePartyIsFromWhiteForest checks the egg location against, by the index the script gives
+static const u16 wf_location[1] = { PLACE_WHITE_FOREST };
+
 BOOL s0119_PokePartyIsFromWhiteForest(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
     u16 city = ScriptReadAny(vm, env);
-    u16 metLocation = GetScrPokeStat(env, index, 0x95);
-    if (metLocation == data_ov012_0216ca04[city]) {
+    u16 eggLocation = GetScrPokeStat(env, index, PKM_PARAM_EGG_LOCATION);
+    if (eggLocation == wf_location[city]) {
         *result = TRUE;
     } else {
         *result = FALSE;
@@ -742,6 +748,17 @@ BOOL s011A_PokePartyGetMetDate(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
+// The IVs that s0111_PokePartySetIV may set, each with its highest value
+typedef struct {
+    u16 param;
+    u16 max;
+} ScrPokeIVLimit;
+
+static const ScrPokeIVLimit iv_set[6] = {
+    { PKM_PARAM_IV_HP, 31 },    { PKM_PARAM_IV_ATTACK, 31 },    { PKM_PARAM_IV_DEFENSE, 31 },
+    { PKM_PARAM_IV_SPEED, 31 }, { PKM_PARAM_IV_SP_ATTACK, 31 }, { PKM_PARAM_IV_SP_DEFENSE, 31 },
+};
+
 BOOL s0111_PokePartySetIV(VM *vm, FieldScriptEnv *env) {
     u16 index = ScriptReadAny(vm, env);
     u16 param = ScriptReadAny(vm, env);
@@ -749,8 +766,8 @@ BOOL s0111_PokePartySetIV(VM *vm, FieldScriptEnv *env) {
     u32 i;
 
     for (i = 0; i < 6; i++) {
-        if (param == data_ov012_0216ca1a[2 * i]) {
-            if (value <= data_ov012_0216ca1c[2 * i]) {
+        if (param == iv_set[i].param) {
+            if (value <= iv_set[i].max) {
                 PartyPkm *pkm;
                 if (CheckGetPartyPokemon(env, index, &pkm) == TRUE) {
                     PokeParty_SetParam(pkm, param, value);
@@ -763,6 +780,14 @@ BOOL s0111_PokePartySetIV(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
+// The parameters s0110_PokePartyGetParam may read
+static const u8 stats_list[20] = {
+    PKM_PARAM_SPECIES,   PKM_PARAM_ITEM,      PKM_PARAM_ABILITY,    PKM_PARAM_REGION,       PKM_PARAM_FATEFUL_ENCOUNTER,
+    PKM_PARAM_SEX,       PKM_PARAM_FORM,      PKM_PARAM_NATURE,     PKM_PARAM_IS_NICKNAMED, PKM_PARAM_ORIGIN_GAME,
+    PKM_PARAM_MET_LEVEL, PKM_PARAM_OT_GENDER, PKM_PARAM_LEVEL,      PKM_PARAM_ATTACK,       PKM_PARAM_DEFENSE,
+    PKM_PARAM_SPEED,     PKM_PARAM_SP_ATTACK, PKM_PARAM_SP_DEFENSE, PKM_PARAM_N_POKEMON,    PKM_PARAM_HP,
+};
+
 BOOL s0110_PokePartyGetParam(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
     u16 index = ScriptReadAny(vm, env);
@@ -770,7 +795,7 @@ BOOL s0110_PokePartyGetParam(VM *vm, FieldScriptEnv *env) {
     u32 i;
 
     for (i = 0; i < 20; i++) {
-        if (param == data_ov012_0216ca06[i]) {
+        if (param == stats_list[i]) {
             *result = GetScrPokeStat(env, index, param);
             return FALSE;
         }

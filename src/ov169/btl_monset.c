@@ -196,18 +196,19 @@ void BtlMonSet_RemoveFainted(BtlMonSet *set) {
 }
 
 void SortBySpeed(BtlMonSet *set, BtlServerFlow *flow) {
-    u32 i;
-    u32 j;
+    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
+    unsigned long i;
+    unsigned long j;
 
     if (set->count > 1) {
         for (i = 0; i < set->count; i++) {
-            set->speed[i] = func_ov167_021abd08(flow, set->mons[i], TRUE);
+            set->speed[i] = BtlServerFlow_CalcSpeed(flow, set->mons[i], TRUE);
         }
         for (i = 0; i < set->count; i++) {
             for (j = i + 1; j < set->count; j++) {
                 if (set->speed[j] > set->speed[i] || (set->speed[j] == set->speed[i] && BattleRandom(2))) {
-                    u16 damage = set->damage[i];
                     BattleMon *mon = set->mons[i];
+                    u16 damage = set->damage[i];
                     u16 speed = set->speed[i];
 
                     set->mons[i] = set->mons[j];

@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Kelsey",
+    "class": "TRAINER_CLASS_ACE_TRAINER_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_FURRET",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BRAVIARY",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SEISMITOAD",
+            "form": 0,
+            "level": 63,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Hey, Trainer! Let's have a refreshing\nbattle and blow away all my troubles!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You guys...\nYou feel like an unbeatable combination."
+        },
+        {
+            "type": 2,
+            "text": "I've been thinking lately.{be01}\nEven if I were somehow separated from my\nPokémon, would they choose me as their{be00}\nTrainer again...?"
+        }
+    ]
+}

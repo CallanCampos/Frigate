@@ -112,8 +112,8 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
         menu->actors[i] = UIObjRes_CreateActor(&menu->objRes, menu->unit, TwoChoiceMenu_GetActorPos(menu->cursor, i, 0),
                                                TwoChoiceMenu_GetActorPos(menu->cursor, i, 1), i, menu->heapId);
-        func_0204c468(menu->actors[i], menu->actorPriority);
-        func_0204c124(menu->actors[i], FALSE);
+        ClActor_SetBgPriority(menu->actors[i], menu->actorPriority);
+        ClActor_SetVisible(menu->actors[i], FALSE);
         func_0204c520(menu->actors[i], FALSE);
     }
     if (menu->isSub == FALSE) {
@@ -128,7 +128,7 @@ void TwoChoiceMenu_Free(TwoChoiceMenu *menu) {
     u8 i;
 
     for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
-        func_0204c108(menu->actors[i]);
+        ClActor_Delete(menu->actors[i]);
     }
     UIObjRes_Free(&menu->objRes);
     BmpWin_Free(menu->firstWindow);
@@ -150,7 +150,7 @@ void TwoChoiceMenu_Open(TwoChoiceMenu *menu, StrBuf *first, StrBuf *second) {
 
         pos.x = TwoChoiceMenu_GetActorPos(menu->cursor, i, 0);
         pos.y = TwoChoiceMenu_GetActorPos(menu->cursor, i, 1);
-        func_0204c140(menu->actors[i], &pos, menu->isSub);
+        ClActor_SetSurfacePos(menu->actors[i], &pos, menu->isSub);
     }
     TwoChoiceMenu_LoadPalette(menu->palType, menu->framePalette, menu->palettes[0]);
     TwoChoiceMenu_LoadPalette(menu->palType, menu->framePalette2, menu->palettes[0]);
@@ -160,24 +160,26 @@ void TwoChoiceMenu_Open(TwoChoiceMenu *menu, StrBuf *first, StrBuf *second) {
     GFL_BitmapFill(BmpWin_GetBitmap(menu->secondWindow), 0);
     width = GFL_FontGetBlockWidth(first, menu->font, 0);
     x = (256 - width) / 2;
-    func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->firstWindow), x, 16, first, menu->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(menu->queue, BmpWin_GetBitmap(menu->firstWindow), x, 16, first, menu->font,
+                          PRINT_COLOR(15, 2, 0));
     width = GFL_FontGetBlockWidth(second, menu->font, 0);
     x = (256 - width) / 2;
-    func_02021c7c(menu->queue, BmpWin_GetBitmap(menu->secondWindow), x, 16, second, menu->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(menu->queue, BmpWin_GetBitmap(menu->secondWindow), x, 16, second, menu->font,
+                          PRINT_COLOR(15, 2, 0));
     menu->firstSent = FALSE;
     menu->secondSent = FALSE;
     GFL_BGSysSetBGEnabled(menu->textBg, TRUE);
-    if (!menu->firstSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
+    if (!menu->firstSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
         BmpWin_Transfer(menu->firstWindow);
         menu->firstSent = TRUE;
     }
-    if (!menu->secondSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
+    if (!menu->secondSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
         BmpWin_Transfer(menu->secondWindow);
         menu->secondSent = TRUE;
     }
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
-            func_0204c124(menu->actors[i], TRUE);
+            ClActor_SetVisible(menu->actors[i], TRUE);
             func_0204c520(menu->actors[i], TRUE);
         }
     }
@@ -193,7 +195,7 @@ void TwoChoiceMenu_Close(TwoChoiceMenu *menu) {
     BmpWin_Transfer(menu->firstWindow);
     BmpWin_Transfer(menu->secondWindow);
     for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
-        func_0204c124(menu->actors[i], FALSE);
+        ClActor_SetVisible(menu->actors[i], FALSE);
         func_0204c520(menu->actors[i], FALSE);
     }
     menu->state = TWO_CHOICE_MENU_STATE_CLOSED;
@@ -207,7 +209,7 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
     u32 keys = GCTX_HIDGetPressedKeys();
     u32 touchX;
     u32 touchY;
-    BOOL touched = func_0203dac8(&touchX, &touchY);
+    BOOL touched = GFL_HIDGetTouchPressedPoint(&touchX, &touchY);
     u8 i;
 
     switch (menu->state) {
@@ -223,9 +225,9 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
             GFL_SndSEPlay(SEQ_SE_CANCEL2);
             menu->result = TWO_CHOICE_MENU_SECOND;
             decided = TRUE;
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
-        if (!decided && !func_0203d554() && keys != 0) {
+        if (!decided && !GCTX_HIDIsUsingTouch() && keys != 0) {
             BOOL moved = FALSE;
 
             if (keys & PAD_BUTTON_A) {
@@ -254,7 +256,7 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
 
                     pos.x = TwoChoiceMenu_GetActorPos(menu->cursor, i, 0);
                     pos.y = TwoChoiceMenu_GetActorPos(menu->cursor, i, 1);
-                    func_0204c140(menu->actors[i], &pos, menu->isSub);
+                    ClActor_SetSurfacePos(menu->actors[i], &pos, menu->isSub);
                 }
                 GFL_SndSEPlay(SEQ_SE_SELECT1);
             }
@@ -265,7 +267,7 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
                 { 0x50, 0x7f, 0x08, 0xf7 },
                 { TOUCH_RECT_END, 0, 0, 0 },
             };
-            s32 hit = func_0203dadc(rects, touchX, touchY);
+            s32 hit = GFL_HIDGetTouchRectAt(rects, touchX, touchY);
 
             if (hit != TOUCH_RECT_NONE) {
                 if (hit == 0) {
@@ -276,20 +278,20 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
                     menu->result = TWO_CHOICE_MENU_SECOND;
                 }
                 decided = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
-        if (!decided && func_0203d554() == TRUE && keys != 0) {
+        if (!decided && GCTX_HIDIsUsingTouch() == TRUE && keys != 0) {
             for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
-                func_0204c124(menu->actors[i], TRUE);
+                ClActor_SetVisible(menu->actors[i], TRUE);
                 func_0204c520(menu->actors[i], TRUE);
             }
             GFL_SndSEPlay(SEQ_SE_SELECT1);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
         }
         if (decided) {
             for (i = 0; i < TWO_CHOICE_MENU_ACTORS; i++) {
-                func_0204c124(menu->actors[i], FALSE);
+                ClActor_SetVisible(menu->actors[i], FALSE);
                 func_0204c520(menu->actors[i], FALSE);
             }
             menu->state = TWO_CHOICE_MENU_STATE_FLASHING;
@@ -316,11 +318,11 @@ void TwoChoiceMenu_Main(TwoChoiceMenu *menu) {
     }
 
     if (menu->state != TWO_CHOICE_MENU_STATE_CLOSED) {
-        if (!menu->firstSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
+        if (!menu->firstSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->firstWindow))) {
             BmpWin_Transfer(menu->firstWindow);
             menu->firstSent = TRUE;
         }
-        if (!menu->secondSent && !func_02021c1c(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
+        if (!menu->secondSent && !PrintQueue_IsBitmapPending(menu->queue, BmpWin_GetBitmap(menu->secondWindow))) {
             BmpWin_Transfer(menu->secondWindow);
             menu->secondSent = TRUE;
         }

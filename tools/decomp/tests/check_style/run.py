@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Tests check_style.py against its fixtures: every rule found in src/flagged.c and lib/flagged.c as expected.txt lists,
-nothing in src/clean.c (near misses: forward declarations, commented volatiles, macros, a shared cleanup goto, pointer
-sums, an allowed exception, words in strings, a BUGFIX), exit 1 with --strict and 2 on a path it cannot read.
+nothing in src/clean.c (near misses: forward declarations, an aligned global, commented volatiles, macros, a shared
+cleanup goto, gotos to shared tail blocks, pointer sums, an allowed exception, words in strings, a BUGFIX), exit 1
+with --strict and 2 on a path it cannot read.
 
     python3 tools/decomp/tests/check_style/run.py [CHECKER]    (CHECKER: another copy of check_style.py, to test it)
 """

@@ -1,0 +1,13 @@
+VirbankCityGym2_Text_ItsTooLoudShe = It's too loud!\nShe can't hear your voice!
+VirbankCityGym2_Text_GetReadyImGonna = Get ready! I'm gonna knock\nsome sense outta ya!{be01}
+VirbankCityGym2_Text_SighWhatDoingLosing = Sigh!\nWhat are you doing losing, Roxie?!{be01}\nWell...\nI guess that means you're strong!{be01}\nThis stinks,\nbut I gave it everything I had, and{be00}\nI feel revitalized and refreshed now!{be01}\nHere!\nProof that you beat me!{be01}
+VirbankCityGym2_Text_ReceivedToxicBadgeFrom = {0100:0} received the\nToxic Badge from Roxie!{be01}
+VirbankCityGym2_Text_TwoBadgesNowPokemon = Two Badges!{be01}\nNow Pokémon up to Lv. 30,\neven Pokémon you got in trades,{be00}\nwill realize how good you are{be00}\nand won't ignore your commands!{be01}\nAlso, here!\nUse this TM!{be01}
+VirbankCityGym2_Text_Tm09VenoshockCoversTarget = TM09 is Venoshock!\nIt covers the target in{be00}\na special poisonous liquid!{be01}\nEven better, if your target's already\npoisoned, it does double damage!{be00}\nHeh heh! It almost packs too much{be00}\nof a punch!
+VirbankCityGym2_Text_PokemonWantedWinKeep = Your Pokémon WANTED this win!{be01}\nKeep on going on like this,\nand do all sorts of stuff!
+VirbankCityGym2_Text_YoureGoingPokestarStudios = You're going to Pokéstar Studios?!{be01}\nOH! I forgot! The old man!\nI have to get him back to work{be00}\nas captain!{be01}
+VirbankCityGym2_Text_UsingPokemonLikeGetting = Using the Pokémon I like and\ngetting through to people with{be00}\nthe music I like is who I am!{be01}\nIf you can do what you enjoy\nin the way you want, then great!{be01}\nJust be sure not to cause\nanyone any trouble!
+VirbankCityGym2_Text_ThatsGymLeaderShe = That's a Gym Leader for you!\nShe really brings out the charms{be00}\nof her Pokémon!{be01}\nBut she's too wrapped up\nin what she's doing here...
+VirbankCityGym2_Text_HeyFeltLikeWere = Hey you!{be01}\nI felt like you were something special\nduring your battle with Roxie.{be01}\nPlease come with me to Pokéstar Studios!{be01}
+VirbankCityGym2_Text_ImRunningPaBalance = I'm running the PA!{be01}\nI balance the sound in the venue\nso it's easy to hear!{be01}\nAre you a Trainer?{be01}\nSo does that mean you're thinking about\nthe type balance of the Pokémon in{be00}\nyour party?
+\pad{54}

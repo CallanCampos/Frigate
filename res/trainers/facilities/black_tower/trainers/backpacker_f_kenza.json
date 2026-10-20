@@ -1,0 +1,27 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Kenza",
+    "class": "TRAINER_CLASS_BACKPACKER_F",
+    "pokemon": [
+        "zigzagoon_1",
+        "zubat_1",
+        "spearow_1",
+        "diglett_1",
+        "taillow_1",
+        "meditite_1",
+        "tympole_1",
+        "electrike_1",
+        "blitzle_1",
+        "vulpix_1",
+        "pikachu_1",
+        "minccino_1",
+        "pansage_1",
+        "pansear_1",
+        "panpour_1",
+        "stunky_1",
+        "voltorb_1",
+        "staryu_1",
+        "skiploom_1",
+        "staravia_1"
+    ]
+}

@@ -1,0 +1,8 @@
+Route13_Text_Kawbraa = Kawbraa!
+Route13_Text_CobalionRanAwayBeyond = Cobalion ran away\nbeyond the road...
+Route13_Text_WhatAmDoingIm = What am I doing?\nI'm hunting for TREASURE!{be01}\nTreasure hunting is fun. Sometimes things\nare buried in the sand dunes.{be01}\nActually, I just found something!{be01}\nBut it's the same one as I found before,\nso I will give this to you.{be01}
+Route13_Text_JustFoundTreasureBut = I just found a treasure.{be01}\nBut it's the same one as I found before,\nso I'll give you this one.{be01}
+Route13_Text_IllHuntingTreasureHere = I'll be hunting for treasure here\ntomorrow, too.{be01}\nI may find something, so if you have\ntime, stop by.{be01}\nI don't find as many things\nas I used to, though...
+Route13_Text_Route13 = Route 13
+Route13_Text_Route13_2 = Route 13
+Route13_Text_TrainerTipsChangeType = Trainer Tips!\n{be01}\nChange your type on the Trainer Card\nto change how other players see you.{be01}\nYou'll look different to others in the\nUnion Room and the Tag Log!{be01}\nMatch it with your introduction or\ncharacter to show your individuality!

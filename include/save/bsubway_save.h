@@ -133,7 +133,7 @@ void BSubwayPlayData_ResetRound(BSubwayPlayData *data);
 void BSubwayPlayData_IncRound(BSubwayPlayData *data);
 u16 BSubwayPlayData_GetRound(BSubwayPlayData *data);
 
-// Block 0x39, which func_0201795c also returns. BSubwayScoreData_AddBattlePoints adds Battle Points
+// Block 0x39, which GameData_GetBSubwayScoreData also returns. BSubwayScoreData_AddBattlePoints adds Battle Points
 u32 BSubwayScoreData_GetSize(void);
 void BSubwayScoreData_Init(BSubwayScoreData *score);
 void BSubwayScoreData_AddBattlePoints(BSubwayScoreData *score, u16 amount);

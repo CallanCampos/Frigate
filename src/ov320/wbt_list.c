@@ -38,7 +38,7 @@
 #include "system/text_speed.h"
 #include "system/wipe.h"
 #include "system/wordset.h"
-#include "text/system/0406.h"
+#include "text/system/wbt_list.h"
 
 // The Pokémon World Tournament's list of Trainers: the upper screen's bracket of the eight entrants, which an
 // announcer's messages go through on the lower screen. The ROM has no name for this file; "wbt_list.c" is a guess from
@@ -325,9 +325,9 @@ static const s16 sWbtListTitleX[2] = { 112, 112 };
 static const s16 sWbtListColumnX[2][2] = { { -72, 0 }, { 220, 148 } };
 
 static const WbtListMessages sWbtListMessages[4] = {
-    { Bank0406_Text_The, Bank0406_Text_StartsNow, Bank0406_Text_The, Bank0406_Text_ThesePokemonTrainersWho },
-    { Bank0406_Text_FirstRoundVs, Bank0406_Text_LetsMoveNextBattle, 0, 0 },
-    { Bank0406_Text_SecondRoundVs, Bank0406_Text_WhichTrainerWillWin, 0, 0 },
+    { WbtList_Text_The, WbtList_Text_StartsNow, WbtList_Text_The, WbtList_Text_ThesePokemonTrainersWho },
+    { WbtList_Text_FirstRoundVs, WbtList_Text_LetsMoveNextBattle, 0, 0 },
+    { WbtList_Text_SecondRoundVs, WbtList_Text_WhichTrainerWillWin, 0, 0 },
     { 0, 0, 0, 0 }
 };
 
@@ -439,9 +439,9 @@ static BOOL WbtListProc_Init(GameProc *proc, u32 *state, void *param, void *work
     list->setup = param;
     list->graphic = WbtListGraphic_Create(1, list->heapId);
     list->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, list->heapId);
-    list->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0406, list->heapId);
+    list->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WBT_LIST, list->heapId);
     list->unk7C = NULL;
-    list->queue = func_02021998(list->heapId);
+    list->queue = PrintQueue_CreateDefault(list->heapId);
     list->tcbManager = GFL_TCBExMgrCreate(list->heapId, list->heapId, 32, 32);
     list->stream = NULL;
     list->strbuf = NULL;
@@ -463,7 +463,7 @@ static BOOL WbtListProc_Exit(GameProc *proc, u32 *state, void *param, void *work
     if (list->unk7C != NULL) {
         GFL_MsgDataFree(list->unk7C);
     }
-    func_02021a18(list->queue);
+    PrintQueue_Free(list->queue);
     GFL_FontFree(list->font);
     GFL_TCBExMgrFree(list->tcbManager);
     WbtListGraphic_Free(list->graphic);
@@ -484,7 +484,7 @@ static BOOL WbtListProc_Main(GameProc *proc, u32 *state, void *param, void *work
         }
         break;
     case 1:
-        if (list->state == STATE_END && func_02021c0c(list->queue) == TRUE) {
+        if (list->state == STATE_END && PrintQueue_IsEmpty(list->queue) == TRUE) {
             (*state)++;
         }
         break;
@@ -553,7 +553,7 @@ static void WbtList_CreateTrainerActors(WbtList *work, const WbtListTrainerSetup
         NsbtxToClwk_LoadTexture(work->trainerActors[i], ARCID_MMODEL_GRA, work->setup->entrants[i].unk4,
                                 work->setup->entrants[i].unk6, 4, 4, 0, resSetup.vramType, work->heapId);
         work->trainerActorCount++;
-        func_0204c438(work->trainerActors[i], setups->priority);
+        ClActor_SetPriority(work->trainerActors[i], setups->priority);
         setups++;
     }
 }
@@ -562,7 +562,7 @@ static void WbtList_FreeTrainerActors(WbtList *work) {
     u32 i;
 
     for (i = 0; i < work->trainerActorCount; i++) {
-        func_0204c108(work->trainerActors[i]);
+        ClActor_Delete(work->trainerActors[i]);
     }
     UIObjRes_Free(&work->trainerRes);
 }
@@ -626,7 +626,7 @@ static void WbtList_FreeView(WbtList *work) {
 static void WbtList_FlushWindows(WbtList *work) {
     s32 i;
 
-    func_02021a3c(work->queue);
+    PrintQueue_Main(work->queue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&work->windows[i], work->queue);
     }
@@ -820,7 +820,7 @@ static void WbtList_FreeWindows(WbtList *work) {
         GFL_StrBufFree(work->strbuf);
     }
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     KeyCursor_Free(work->keyCursor);
 }
@@ -834,7 +834,7 @@ static void WbtList_InitObjects(WbtList *work) {
     WbtList_CreateNameActors(work, CLACT_VRAM_MAIN, sWbtListNames, sWbtListObjRes);
     WbtList_CreateTrainerActors(work, sWbtListTrainers);
     WbtList_SavePalettes(work, PALETTE_COUNT, TRAINER_PALETTE, CLACT_VRAM_MAIN);
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
 }
 
 static void WbtList_LoadObjResources(WbtList *work, u32 vramType, const WbtListObjResSetup *resSetups) {
@@ -842,12 +842,12 @@ static void WbtList_LoadObjResources(WbtList *work, u32 vramType, const WbtListO
 
     WbtListGraphic_GetClActUnit(work->graphic);
     work->objRes[resSetups[OBJ_RES_PALETTE].index] =
-        func_0204bbb8(arc, resSetups[OBJ_RES_PALETTE].fileId, vramType, resSetups[OBJ_RES_PALETTE].offset, 0,
-                      resSetups[OBJ_RES_PALETTE].count, work->heapId);
+        ClActSys_LoadPlttRange(arc, resSetups[OBJ_RES_PALETTE].fileId, vramType, resSetups[OBJ_RES_PALETTE].offset, 0,
+                               resSetups[OBJ_RES_PALETTE].count, work->heapId);
     work->objRes[resSetups[OBJ_RES_CHARS].index] =
-        func_0204b81c(arc, resSetups[OBJ_RES_CHARS].fileId, FALSE, vramType, work->heapId);
+        ClActSys_LoadChars(arc, resSetups[OBJ_RES_CHARS].fileId, FALSE, vramType, work->heapId);
     work->objRes[resSetups[OBJ_RES_CELL].index] =
-        func_0204bde0(arc, resSetups[OBJ_RES_CELL].fileId, resSetups[OBJ_RES_ANIM].fileId, work->heapId);
+        ClActSys_LoadCellAnims(arc, resSetups[OBJ_RES_CELL].fileId, resSetups[OBJ_RES_ANIM].fileId, work->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -876,24 +876,24 @@ static void WbtList_CreateActors(WbtList *work, u32 vramType, const WbtListActor
         setup.sequence = setups->sequence;
         setup.priority = setups->priority;
         setup.bgPriority = setups->bgPriority;
-        work->actors[i] = func_0204c040(unit, work->objRes[resSetups[OBJ_RES_CHARS].index],
-                                        work->objRes[resSetups[OBJ_RES_PALETTE].index],
-                                        work->objRes[resSetups[OBJ_RES_CELL].index], &setup, vramType, work->heapId);
+        work->actors[i] = ClActor_Create(unit, work->objRes[resSetups[OBJ_RES_CHARS].index],
+                                         work->objRes[resSetups[OBJ_RES_PALETTE].index],
+                                         work->objRes[resSetups[OBJ_RES_CELL].index], &setup, vramType, work->heapId);
         visible = FALSE;
         if (setups->visible == TRUE) {
             visible = TRUE;
         }
-        func_0204c124(work->actors[i], visible);
+        ClActor_SetVisible(work->actors[i], visible);
         animate = FALSE;
         if (setups->flags & ACTOR_FLAG_ANIMATE) {
             animate = TRUE;
         }
         func_0204c520(work->actors[i], animate);
         if (setups->flags & ACTOR_FLAG_FLIP_Y) {
-            func_0204c2b0(work->actors[i], 1, TRUE);
+            ClActor_SetFlip(work->actors[i], 1, TRUE);
         }
         if (setups->flags & ACTOR_FLAG_FLIP_X) {
-            func_0204c2b0(work->actors[i], 0, TRUE);
+            ClActor_SetFlip(work->actors[i], 0, TRUE);
         }
         setups++;
     }
@@ -944,12 +944,12 @@ static void WbtList_FreeObjects(WbtList *work) {
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (work->actors[i] != NULL) {
-            func_0204c108(work->actors[i]);
+            ClActor_Delete(work->actors[i]);
         }
     }
-    func_0204bcd0(work->objRes[OBJ_RES_PALETTE]);
-    func_0204b98c(work->objRes[OBJ_RES_CHARS]);
-    func_0204be64(work->objRes[OBJ_RES_CELL]);
+    ClActSys_FreePltt(work->objRes[OBJ_RES_PALETTE]);
+    ClActSys_FreeChars(work->objRes[OBJ_RES_CHARS]);
+    ClActSys_FreeCellAnims(work->objRes[OBJ_RES_CELL]);
     for (i = 0; i < ENTRANT_COUNT; i++) {
         BmpOam_ActorDel(work->nameActors[i]);
         GFL_BitmapFree(work->nameBitmaps[i]);
@@ -958,18 +958,18 @@ static void WbtList_FreeObjects(WbtList *work) {
 }
 
 static void WbtList_SetActorAnim(WbtList *work, s32 actor, s32 sequence) {
-    func_0204c488(work->actors[actor], sequence);
+    ClActor_SetSequence(work->actors[actor], sequence);
     func_0204c520(work->actors[actor], TRUE);
 }
 
 static void WbtList_SetActorVisible(WbtList *work, s32 actor, BOOL visible) {
-    func_0204c124(work->actors[actor], visible);
+    ClActor_SetVisible(work->actors[actor], visible);
 }
 
 static BOOL WbtList_IsActorAnimating(WbtList *work, s32 actor) {
     BOOL animating = TRUE;
 
-    if (!func_0204c560(work->actors[actor])) {
+    if (!ClActor_IsAnimActive(work->actors[actor])) {
         animating = FALSE;
     }
     return animating;
@@ -1112,12 +1112,12 @@ static void WbtList_PlaceEntrant(WbtList *work, s32 entrant, BOOL hidden) {
         nameY = WbtList_GetPosition(work, 91);
     }
     plates = &work->actors[ACTOR_PLATE];
-    func_0204c178(plates[entrant], &pos, 0);
+    ClActor_GetSurfacePos(plates[entrant], &pos, 0);
     pos.x = right;
     if (entrant < COLUMN_SIZE) {
         pos.x = left;
     }
-    func_0204c140(plates[entrant], &pos, 0);
+    ClActor_SetSurfacePos(plates[entrant], &pos, 0);
     BmpOam_ActorSetPos(work->nameActors[entrant], pos.x + nameX, pos.y + nameY);
 }
 
@@ -1138,9 +1138,9 @@ static void WbtList_MoveColumns(WbtList *work) {
     leftNameY = WbtList_GetPosition(work, 89);
     for (i = 0; i < COLUMN_SIZE; i++) {
         if (work->mask & (1 << i)) {
-            func_0204c178(work->actors[ACTOR_PLATE + i], &leftPos, 0);
+            ClActor_GetSurfacePos(work->actors[ACTOR_PLATE + i], &leftPos, 0);
             leftPos.x = leftX;
-            func_0204c140(work->actors[ACTOR_PLATE + i], &leftPos, 0);
+            ClActor_SetSurfacePos(work->actors[ACTOR_PLATE + i], &leftPos, 0);
             BmpOam_ActorSetPos(work->nameActors[i], leftPos.x + leftNameX, leftPos.y + leftNameY);
         }
     }
@@ -1149,9 +1149,9 @@ static void WbtList_MoveColumns(WbtList *work) {
     rightNameY = WbtList_GetPosition(work, 91);
     for (i = 0; i < COLUMN_SIZE; i++) {
         if (work->mask & (1 << (i + COLUMN_SIZE))) {
-            func_0204c178(work->actors[ACTOR_PLATE + COLUMN_SIZE + i], &rightPos, 0);
+            ClActor_GetSurfacePos(work->actors[ACTOR_PLATE + COLUMN_SIZE + i], &rightPos, 0);
             rightPos.x = rightX;
-            func_0204c140(work->actors[ACTOR_PLATE + COLUMN_SIZE + i], &rightPos, 0);
+            ClActor_SetSurfacePos(work->actors[ACTOR_PLATE + COLUMN_SIZE + i], &rightPos, 0);
             BmpOam_ActorSetPos(work->nameActors[COLUMN_SIZE + i], rightPos.x + rightNameX, rightPos.y + rightNameY);
         }
     }
@@ -1190,7 +1190,7 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
         }
     }
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     if (work->strbuf != NULL) {
         GFL_StrBufFree(work->strbuf);
@@ -1198,8 +1198,8 @@ static void WbtList_PrintMessage(WbtList *work, u32 messageId) {
     }
     src = GFL_MsgDataLoadStrbufNew(work->msgData, messageId);
     GFL_WordSetFormatStrbuf(wordSet, work->strbuf, src);
-    work->stream = func_02022268(work->windows[WINDOW_MESSAGE].window, 0, 0, work->strbuf, work->font, func_02017bcc(),
-                                 work->tcbManager, 4, work->heapId, 15);
+    work->stream = PrintStream_Create(work->windows[WINDOW_MESSAGE].window, 0, 0, work->strbuf, work->font,
+                                      TextSpeed_GetCurrentWait(), work->tcbManager, 4, work->heapId, 15);
     window = work->windows[WINDOW_MESSAGE].window;
     BmpWin_TransferNow(window);
     GFL_WordSetSystemFree(wordSet);
@@ -1289,25 +1289,25 @@ static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side) {
     ClActorPos pos;
 
     index += side * LINE_VALUE_COUNT;
-    func_0204c488(work->actors[ACTOR_LINE + line], sWbtListLines[drawn + (index + LINE_SEQUENCE)]);
-    func_0204c124(work->actors[ACTOR_LINE + line], TRUE);
+    ClActor_SetSequence(work->actors[ACTOR_LINE + line], sWbtListLines[drawn + (index + LINE_SEQUENCE)]);
+    ClActor_SetVisible(work->actors[ACTOR_LINE + line], TRUE);
     func_0204c520(work->actors[ACTOR_LINE + line], TRUE);
     position = sWbtListLines[index + LINE_POSITION];
     // The sum's order folds the column into the load's base, as *(data + pos + 1) does
     flags = *(sWbtListLines + index + LINE_FLAGS);
     if (flags & ACTOR_FLAG_FLIP_Y) {
-        func_0204c2b0(work->actors[ACTOR_LINE + line], 1, TRUE);
+        ClActor_SetFlip(work->actors[ACTOR_LINE + line], 1, TRUE);
     } else {
-        func_0204c2b0(work->actors[ACTOR_LINE + line], 1, FALSE);
+        ClActor_SetFlip(work->actors[ACTOR_LINE + line], 1, FALSE);
     }
     if (flags & ACTOR_FLAG_FLIP_X) {
-        func_0204c2b0(work->actors[ACTOR_LINE + line], 0, TRUE);
+        ClActor_SetFlip(work->actors[ACTOR_LINE + line], 0, TRUE);
     } else {
-        func_0204c2b0(work->actors[ACTOR_LINE + line], 0, FALSE);
+        ClActor_SetFlip(work->actors[ACTOR_LINE + line], 0, FALSE);
     }
     pos.x = WbtList_GetPosition(work, position * 2);
     pos.y = WbtList_GetPosition(work, position * 2 + 1);
-    func_0204c140(work->actors[ACTOR_LINE + line], &pos, 0);
+    ClActor_SetSurfacePos(work->actors[ACTOR_LINE + line], &pos, 0);
 }
 
 static BOOL WbtList_IsLineAnimating(WbtList *work, s32 line) {
@@ -1487,7 +1487,7 @@ static void WbtList_InitMatches(WbtList *work) {
             work->matches[i].first = work->matches[5].winner;
             work->matches[i].second = work->matches[6].winner;
         }
-        work->matches[i].message = Bank0406_Text_LetsMoveNextBattle;
+        work->matches[i].message = WbtList_Text_LetsMoveNextBattle;
     }
     if (work->mode == MODE_SECOND_ROUND) {
         for (i = 0; i < 2; i++) {
@@ -1511,7 +1511,7 @@ static void WbtList_InitMatches(WbtList *work) {
         i = 10;
         work->matches[i].mask = 1 << work->matches[8].winner;
         work->matches[i].mask |= 1 << work->matches[9].winner;
-        work->matches[i].message = Bank0406_Text_WhichTrainerWillWin;
+        work->matches[i].message = WbtList_Text_WhichTrainerWillWin;
         work->matches[i].first = work->matches[8].winner;
         work->matches[i].second = work->matches[9].winner;
     }

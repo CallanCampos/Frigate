@@ -191,7 +191,7 @@ static LocalTvtSecret *LocalTvtSecret_Create(GameData *gameData, BOOL unk, HeapI
 
     secret->heapId = heapId;
     secret->gameData = gameData;
-    secret->surveyAnswers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(gameData)));
+    secret->surveyAnswers = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(gameData)));
     secret->unk18 = unk;
     return secret;
 }
@@ -499,7 +499,7 @@ static void LocalTvtSecret_GetSurveyAnswer(u8 *surveyAnswers, u8 callCount, u32 
         return;
     }
     question = sLocalTvtSecretQuestions[callCount];
-    answer = func_0200ec3c(surveyAnswers, question);
+    answer = SurveySave_ReadAnswer(surveyAnswers, question);
     *asked = TRUE;
     if (answer == 0) {
         *answerMsg = 0;

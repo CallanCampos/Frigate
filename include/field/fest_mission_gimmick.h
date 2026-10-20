@@ -20,7 +20,7 @@ typedef struct {
     u8 removed[4];
 } FesMissionZone;
 
-// The work of a type 5 mission, kept by the festival (func_02014864)
+// The work of a type 5 mission, kept by the festival (LinkFestival_GetEntries)
 typedef struct {
     LinkFestival *festival;
     u16 zoneId;
@@ -59,7 +59,9 @@ typedef struct {
     GameData *gameData;
     LinkFestival *festival;
     FestMission *mission;
-    u8 unk10[8];
+    // Whether overlay 71, 72 or 73 is loaded for the mission, and which
+    BOOL overlayLoaded;
+    u32 overlayId;
     Field *field;
     MMSys *actors;
     FieldPlayer *player;
@@ -77,18 +79,16 @@ typedef struct {
 // The festival's total, at most 9999
 int LinkFestival_GetTotalScore(LinkFestival *festival);
 
-// The first actor on a rail position, other than exclude
-FieldActor *func_ov036_0219584c(MMSys *system, const RailPosition *position, BOOL checkInit, FieldActor *exclude);
-
-void func_ov072_021e8be0(FesGimmick *gimmick, FesMissionWork *work);
-void func_ov072_021e8bf8(FesGimmick *gimmick, FesMissionWork *work);
-void func_ov072_021e8c08(FesGimmick *gimmick, FesMissionWork *work, u16 zoneId, int index);
-BOOL func_ov072_021e8c3c(FesGimmick *gimmick, FesMissionWork *work);
-void func_ov072_021e8c74(FesGimmick *gimmick, PokeParty *party);
-void func_ov072_021e8d08(FesGimmick *gimmick, FieldActor *actor, u16 arg0, u16 arg1, u16 *out0, u16 *out1);
-void func_ov072_021e8d70(FesGimmick *gimmick, FieldActor *actor, u16 *item, u16 *price);
-void func_ov072_021e8ddc(FesGimmick *gimmick, u16 *count, u16 *answer, u16 *answerChoice);
-u16 func_ov072_021e8ee8(FesGimmick *gimmick, u8 index);
-u16 func_ov072_021e8ef4(FesGimmick *gimmick, u8 index);
+void FesMissionGimmick_LoadActorResource(FesGimmick *gimmick, FesMissionWork *work);
+void FesMissionGimmick_RemoveBlockedPeople(FesGimmick *gimmick, FesMissionWork *work);
+void FesMissionGimmick_RemovePerson(FesGimmick *gimmick, FesMissionWork *work, u16 zoneId, int index);
+BOOL FesMissionGimmick_End(FesGimmick *gimmick, FesMissionWork *work);
+void FesMissionGimmick_BoostPartyLevels(FesGimmick *gimmick, PokeParty *party);
+void FesMissionGimmick_GetItemExchangeInfo(FesGimmick *gimmick, FieldActor *actor, u16 arg0, u16 arg1, u16 *out0,
+                                           u16 *out1);
+void FesMissionGimmick_GetItemSaleInfo(FesGimmick *gimmick, FieldActor *actor, u16 *item, u16 *price);
+void FesMissionGimmick_MakePokemonQuiz(FesGimmick *gimmick, u16 *count, u16 *answer, u16 *answerChoice);
+u16 FesMissionGimmick_GetQuizSpecies(FesGimmick *gimmick, u8 index);
+u16 FesMissionGimmick_GetQuizChoice(FesGimmick *gimmick, u8 index);
 
 #endif // POKEBW2_FIELD_FEST_MISSION_GIMMICK_H

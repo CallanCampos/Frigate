@@ -1,9 +1,0 @@
-VirbankComplex_Text_VirbankComplexWhereFire = Virbank Complex\nWhere Fire Meets Steel
-VirbankComplex_Text_YoGoodDealWhy = Yo! This is a good deal.{be01}\nWhy don't you trade your Poké Ball\nfor my Great Ball?
-VirbankComplex_Text_HehThanksEnjoyGreat = Heh, thanks! Enjoy the Great Ball!
-VirbankComplex_Text_OhSeriouslyMustKidding = Oh! Seriously? You must be kidding.\nDon't you have a Poké Ball?!
-VirbankComplex_Text_OhSeriouslyMustKidding_2 = Oh! Seriously? You must be kidding.\nUsually people are happy to trade!
-VirbankComplex_Text_SeeItsGoodDeal = See? It's a good deal, isn't it?\nWe can trade again tomorrow if you want!
-VirbankComplex_Text_OhSeriouslyMustKidding_3 = Oh! Seriously? You must be kidding.\nYou have way too many Great Balls!
-VirbankComplex_Text_GaveExchange = Gave the {0109:0} in exchange for\nthe {0109:2}!
-\pad{ae}

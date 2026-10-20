@@ -1,0 +1,641 @@
+// Script commands of the party Pokémon that follow the item commands: the Pokémon selection screen, the Trainer Card's
+// favourite Pokémon, IVs, the Pokédex, the move tutors, Pokérus, name input, move replacement, egg hatching and
+// in-game trades. The ROM has no name for the file; scrcmd_pokemon_misc.c is descriptive. Function names from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+#include "types.h"
+#include "constants/bag.h"
+#include "constants/items.h"
+#include "constants/moves.h"
+#include "constants/pokemon.h"
+#include "field/event_egg_demo.h"
+#include "field/event_field_trade.h"
+#include "field/event_poke_status.h"
+#include "field/field.h"
+#include "field/field_event.h"
+#include "field/field_script.h"
+#include "field/fld_trade.h"
+#include "field/scrcmd_pokemon.h"
+#include "field/scrcmd_pokemon_fld.h"
+#include "field/scrcmd_pokemon_misc.h"
+#include "gfl/overlay.h"
+#include "gfl/random.h"
+#include "gfl/std.h"
+#include "gfl/str.h"
+#include "pml/item.h"
+#include "pml/poke_party.h"
+#include "save/bag.h"
+#include "save/pokedex.h"
+#include "save/save_control.h"
+#include "save/traded_pokemon.h"
+#include "save/trainer_game_info.h"
+#include "system/game_data.h"
+#include "system/game_event.h"
+#include "system/game_system.h"
+#include "system/vm.h"
+#include "system/wordset.h"
+
+static u16 PokeParty_GetTutorMoveID(PartyPkm *pkm, u32 tutor);
+static u32 PML_PkmGetHapinessMax(u32 unused);
+static BOOL PokeParty_CheckTutorMoveCompat(PartyPkm *pkm, u32 tutor);
+static u32 CheckPartyAllMoveTutor(VM *vm, FieldScriptEnv *env, u32 tutor, u8 *learnable, BOOL needMaxHappiness);
+
+BOOL s0107_CallPokeSelect(VM *vm, FieldScriptEnv *env) {
+    PokeSelectArgs args;
+    u16 flag = VM_Read16(vm);
+    u16 *picked = ScriptReadVar(vm, env);
+    u16 *index = ScriptReadVar(vm, env);
+    ScriptWork *work;
+    GameSystem *gsys;
+    u32 mode;
+
+    ScriptReadAny(vm, env);
+    work = FieldScriptEnv_GetScriptWork(env);
+    gsys = FieldScriptEnv_GetGameSystem(env);
+    MI_CpuFill8(&args, 0, sizeof(args));
+    args.picked = picked;
+    args.index = index;
+    mode = 3;
+    if (flag != 0) {
+        mode = 0x1b;
+    }
+    args.mode = mode;
+    ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(20), EventPokeSelect_Create, &args));
+    return TRUE;
+}
+
+BOOL s011D_TrainerCardSetFavePokemon(VM *vm, FieldScriptEnv *env) {
+    PartyPkm *pkm;
+    u32 index = ScriptReadAny(vm, env);
+
+    if (CheckGetPartyPokemon(env, index, &pkm) == TRUE) {
+        TrainerGameInfoSave *info = getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env));
+        u16 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
+        u16 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
+        u16 isEgg = PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL);
+        u16 sex = PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL);
+
+        SetFavePokemonData(info, species, form, isEgg, sex);
+    }
+    return FALSE;
+}
+
+BOOL s011E_TrainerCardSaveGymVictoryParty(VM *vm, FieldScriptEnv *env) {
+    GameData *gameData = FieldScriptEnv_GetGameData(env);
+    PokeParty *party = GameData_GetParty(gameData);
+    u16 gym = ScriptReadAny(vm, env);
+    u16 species[6];
+    int i;
+    int count;
+
+    for (i = 0; i < 6; i++) {
+        species[i] = 0;
+    }
+    count = 0;
+    for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
+        PartyPkm *pkm = PokeParty_GetPkm(party, i);
+
+        if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 0) {
+            species[count++] = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
+        }
+    }
+    SetGymDefeatPartyData(getTrainerCardDataBlkAddress(gameData), gym, species);
+    return FALSE;
+}
+
+BOOL s011F_WordSetGymVictoryParty(VM *vm, FieldScriptEnv *env) {
+    GameData *gameData = FieldScriptEnv_GetGameData(env);
+    WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
+    u16 gym = ScriptReadAny(vm, env);
+    u16 *count = ScriptReadVar(vm, env);
+    u16 species[6];
+    int i;
+    int loaded;
+
+    GetGymDefeatPartyData(getTrainerCardDataBlkAddress(gameData), gym, species);
+    i = 0;
+    loaded = 0;
+    for (; i < 6; i++) {
+        if (species[i] != 0) {
+            WordSet_LoadSpeciesName(wordSet, loaded, species[i]);
+            loaded++;
+        }
+    }
+    *count = loaded;
+    return FALSE;
+}
+
+BOOL s0224_PokePartyGetIV(VM *vm, FieldScriptEnv *env) {
+    PartyPkm *pkm;
+    u32 index = ScriptReadAny(vm, env);
+    u32 type = ScriptReadAny(vm, env);
+    u16 *result = ScriptReadVar(vm, env);
+    u16 ivs[6];
+    u16 total;
+    u16 highest;
+    u32 i;
+
+    if (!CheckGetPartyPokemon(env, index, &pkm)) {
+        *result = 0;
+        return FALSE;
+    }
+    total = 0;
+    ivs[0] = PokeParty_GetParam(pkm, PKM_PARAM_IV_HP, NULL);
+    ivs[1] = PokeParty_GetParam(pkm, PKM_PARAM_IV_ATTACK, NULL);
+    ivs[2] = PokeParty_GetParam(pkm, PKM_PARAM_IV_DEFENSE, NULL);
+    ivs[3] = PokeParty_GetParam(pkm, PKM_PARAM_IV_SPEED, NULL);
+    ivs[4] = PokeParty_GetParam(pkm, PKM_PARAM_IV_SP_ATTACK, NULL);
+    ivs[5] = PokeParty_GetParam(pkm, PKM_PARAM_IV_SP_DEFENSE, NULL);
+    highest = 0;
+    for (i = 0; i < 6; i++) {
+        total += ivs[i];
+        if (highest < ivs[i]) {
+            highest = ivs[i];
+        }
+    }
+    switch (type) {
+    case 0:
+        *result = total;
+        break;
+    case 1:
+        *result = highest;
+        break;
+    case 2:
+        *result = ivs[0];
+        break;
+    case 3:
+        *result = ivs[1];
+        break;
+    case 4:
+        *result = ivs[2];
+        break;
+    case 5:
+        *result = ivs[3];
+        break;
+    case 6:
+        *result = ivs[4];
+        break;
+    case 7:
+        *result = ivs[5];
+        break;
+    }
+    return FALSE;
+}
+
+BOOL s01C5_PokeDexGetEvaluationParams(VM *vm, FieldScriptEnv *env) {
+    u16 mode = ScriptReadAny(vm, env);
+    u16 *message = ScriptReadVar(vm, env);
+    u16 *count = ScriptReadVar(vm, env);
+    u16 *unk = ScriptReadVar(vm, env);
+    HeapID heapId = FieldScriptEnv_GetHeapID(env);
+    PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
+
+    PokeDex_GetEvaluationParams(pokedex, mode, heapId, message, count, unk);
+    return FALSE;
+}
+
+BOOL s01C4_PokeDexIsComplete(VM *vm, FieldScriptEnv *env) {
+    PokeDexSave *pokedex = GameData_GetPokedex(FieldScriptEnv_GetGameData(env));
+    Field *field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
+    u16 *result = ScriptReadVar(vm, env);
+    u16 kind = ScriptReadAny(vm, env);
+
+    switch (kind) {
+    case 1:
+        *result = PokeDex_IsCompleteNational(pokedex);
+        break;
+    case 3:
+        *result = PokeDex_IsCompleteUnova(pokedex, Field_GetHeapID(field));
+        break;
+    case 2:
+        *result = PokeDex_IsSeenAllUnova(pokedex, Field_GetHeapID(field));
+        break;
+    }
+    return FALSE;
+}
+
+static u16 PokeParty_GetTutorMoveID(PartyPkm *pkm, u32 tutor) {
+    switch (tutor) {
+    case 1:
+        if (PokeParty_CheckMoveTutorNormal(pkm, 3)) {
+            return MOVE_FRENZY_PLANT;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, 4)) {
+            return MOVE_BLAST_BURN;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, 5)) {
+            return MOVE_HYDRO_CANNON;
+        }
+        break;
+    case 0:
+        return MOVE_DRACO_METEOR;
+    case 2:
+        if (PokeParty_CheckMoveTutorNormal(pkm, 0)) {
+            return MOVE_GRASS_PLEDGE;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, 1)) {
+            return MOVE_FIRE_PLEDGE;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, 2)) {
+            return MOVE_WATER_PLEDGE;
+        }
+        break;
+    }
+    return MOVE_BLAST_BURN;
+}
+
+static u32 PML_PkmGetHapinessMax(u32 unused) {
+    return 0xff;
+}
+
+static BOOL PokeParty_CheckTutorMoveCompat(PartyPkm *pkm, u32 tutor) {
+    switch (tutor) {
+    case 1:
+        if (PokeParty_CheckMoveTutorNormal(pkm, 3)) {
+            return TRUE;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, 4)) {
+            return TRUE;
+        }
+        if (PokeParty_CheckMoveTutorNormal(pkm, 5)) {
+            return TRUE;
+        }
+        return FALSE;
+    case 0:
+        if (PokeParty_CheckMoveTutorNormal(pkm, 6)) {
+            return TRUE;
+        }
+        return FALSE;
+    case 2: {
+        BOOL yes = FALSE;
+
+        if (PokeParty_CheckMoveTutorNormal(pkm, 0)) {
+            return TRUE;
+        }
+        yes = TRUE;
+        if (PokeParty_CheckMoveTutorNormal(pkm, 1)) {
+            return yes;
+        }
+        if (!PokeParty_CheckMoveTutorNormal(pkm, 2)) {
+            yes = FALSE;
+        }
+        return yes;
+    }
+    }
+    return FALSE;
+}
+
+static u32 CheckPartyAllMoveTutor(VM *vm, FieldScriptEnv *env, u32 tutor, u8 *learnable, BOOL needMaxHappiness) {
+    PokeParty *party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
+    int count = PokeParty_GetPkmCount(party);
+    BOOL anyCompatible = FALSE;
+    BOOL anyReady = FALSE;
+    int i;
+
+    *learnable = 0;
+    for (i = 0; i < count; i++) {
+        PartyPkm *pkm = PokeParty_GetPkm(party, i);
+
+        if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) != 1 && PokeParty_CheckTutorMoveCompat(pkm, tutor)) {
+            anyCompatible = TRUE;
+            if (needMaxHappiness && PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL) < PML_PkmGetHapinessMax(tutor)) {
+                continue;
+            }
+            anyReady = TRUE;
+            *learnable |= 1 << i;
+        }
+    }
+    if (!anyCompatible) {
+        return 1;
+    }
+    if (anyReady == 0) {
+        return 2;
+    }
+    return 0;
+}
+
+BOOL s01D1_MoveTutorCheckParty(VM *vm, FieldScriptEnv *env) {
+    u8 learnable;
+    u16 tutor = ScriptReadAny(vm, env);
+    u16 *result = ScriptReadVar(vm, env);
+
+    *result = CheckPartyAllMoveTutor(vm, env, tutor, &learnable, TRUE);
+    return FALSE;
+}
+
+BOOL s01D3_MoveTutorGetMoveID(VM *vm, FieldScriptEnv *env) {
+    PartyPkm *pkm;
+    u16 tutor = ScriptReadAny(vm, env);
+    u16 index = ScriptReadAny(vm, env);
+    u16 *result = ScriptReadVar(vm, env);
+
+    if (CheckGetPartyPokemon(env, index, &pkm) == TRUE) {
+        *result = PokeParty_GetTutorMoveID(pkm, tutor);
+    } else {
+        *result = 0;
+    }
+    return FALSE;
+}
+
+BOOL s01D2_MoveTutorCheckPkm(VM *vm, FieldScriptEnv *env) {
+    PartyPkm *pkm;
+    u32 tutor = ScriptReadAny(vm, env);
+    u32 index = ScriptReadAny(vm, env);
+    u16 *result = ScriptReadVar(vm, env);
+
+    *result = 1;
+    if (!CheckGetPartyPokemon(env, index, &pkm)) {
+        return FALSE;
+    }
+    if (!PokeParty_CheckTutorMoveCompat(pkm, tutor)) {
+        *result = 1;
+    } else if (CheckPokeMoveLearned_NonEgg(pkm, PokeParty_GetTutorMoveID(pkm, tutor)) == TRUE) {
+        *result = 3;
+    } else if (PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL) < PML_PkmGetHapinessMax(tutor)) {
+        *result = 2;
+    } else {
+        *result = 0;
+    }
+    return FALSE;
+}
+
+BOOL s01D4_MoveTutorCallPokeSelect(VM *vm, FieldScriptEnv *env) {
+    u8 learnable;
+    MoveTutorPokeSelectArgs args;
+    u16 tutor = ScriptReadAny(vm, env);
+    u16 *picked = ScriptReadVar(vm, env);
+    u16 *index = ScriptReadVar(vm, env);
+    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
+
+    if (CheckPartyAllMoveTutor(vm, env, tutor, &learnable, FALSE) != 0) {
+        *picked = 0;
+    } else {
+        MI_CpuFill8(&args, 0, sizeof(args));
+        switch (tutor) {
+        case 1:
+            args.move = 0xfffe;
+            break;
+        case 2:
+            args.move = 0xfffd;
+            break;
+        case 0:
+            args.move = MOVE_DRACO_METEOR;
+            break;
+        default:
+            args.move = 0xa5;
+            break;
+        }
+        args.picked = picked;
+        args.index = index;
+        args.learnable = learnable;
+        ScriptWork_CallEvent(
+            work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(20), EventMoveTutorPokeSelect_Create, &args));
+    }
+    return TRUE;
+}
+
+BOOL s0100_PokePartyCheckPokerus(VM *vm, FieldScriptEnv *env) {
+    u16 *result = ScriptReadVar(vm, env);
+    PokeParty *party;
+    u32 count;
+    u32 i;
+
+    i = 0;
+    *result = 0;
+    party = GameData_GetParty(FieldScriptEnv_GetGameData(env));
+    count = PokeParty_GetPkmCount(party);
+    for (; i < count; i++) {
+        if (PokeParty_GetParam(PokeParty_GetPkm(party, i), PKM_PARAM_POKERUS, NULL) != 0) {
+            *result = 1;
+            break;
+        }
+    }
+    return FALSE;
+}
+
+BOOL s0223_PokePartyGetHiddenPowerType(VM *vm, FieldScriptEnv *env) {
+    PartyPkm *pkm;
+    u16 *result = ScriptReadVar(vm, env);
+    u32 index = ScriptReadAny(vm, env);
+    u8 tm = PML_ItemGetTMBitMask(ITEM_TM10);
+    u16 type;
+
+    if (!CheckGetPartyPokemon(env, index, &pkm) || !canPkmLearnTM_Wrapper(pkm, tm)) {
+        type = 0xffff;
+    } else {
+        type = getHiddenPowerType(pkm);
+    }
+    *result = type;
+    return FALSE;
+}
+
+BOOL s0105_CallPokeNameInput(VM *vm, FieldScriptEnv *env) {
+    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
+    u16 *result = ScriptReadVar(vm, env);
+    u32 slot = ScriptReadAny(vm, env);
+
+    ScriptWork_CallEvent(work, prepareForPokemonNameEntryData(gsys, result, slot, ScriptReadAny(vm, env)));
+    return TRUE;
+}
+
+BOOL s0109_CallPokeMoveReplace(VM *vm, FieldScriptEnv *env) {
+    PokeMoveReplaceArgs args;
+    u16 *forgot = ScriptReadVar(vm, env);
+    u16 *slot = ScriptReadVar(vm, env);
+    u16 partyIndex = ScriptReadAny(vm, env);
+    u16 move = ScriptReadAny(vm, env);
+    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
+
+    GSYS_GetField(gsys);
+    MI_CpuFill8(&args, 0, sizeof(args));
+    args.forgot = forgot;
+    args.slot = slot;
+    args.partyIndex = partyIndex;
+    args.forgetHm = move == 0;
+    args.move = move;
+    ScriptWork_CallEvent(work,
+                         GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(20), EventPokeMoveReplace_Create, &args));
+    return TRUE;
+}
+
+BOOL s0106_CallEggHatch(VM *vm, FieldScriptEnv *env) {
+    u16 *result = ScriptReadVar(vm, env);
+    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
+    GameData *gameData;
+    PokeParty *party;
+    int count;
+    int i;
+
+    Field_GetHeapID(GSYS_GetField(gsys));
+    gameData = GSYS_GetGameData(gsys);
+    GetGameDataPlayerInfo(gameData);
+    party = GameData_GetParty(gameData);
+    count = PokeParty_GetPkmCount(party);
+    for (i = 0; i < count; i++) {
+        PartyPkm *pkm = PokeParty_GetPkm(party, i);
+        u32 isEgg = PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL);
+        u32 isBadEgg = PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL);
+        u32 happiness = PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL);
+
+        if (isEgg != 0 && isBadEgg == 0 && happiness == 0) {
+            ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(16),
+                                                                       (GameEventProvider)EventEggDemo_Create, pkm));
+            *result = i;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+BOOL s01B5_FieldTradeCheck(VM *vm, FieldScriptEnv *env) {
+    PartyPkm *pkm;
+    FieldTradeInput *input;
+    GameSystem *gsys;
+    GameData *gameData;
+    HeapID heapId;
+    u16 *result;
+    u32 offerIndex;
+    u32 partyIndex;
+
+    FieldScriptEnv_GetScriptWork(env);
+    gsys = FieldScriptEnv_GetGameSystem(env);
+    gameData = GSYS_GetGameData(gsys);
+    heapId = Field_GetHeapID(GSYS_GetField(gsys));
+    result = ScriptReadVar(vm, env);
+    offerIndex = ScriptReadAny(vm, env);
+    partyIndex = ScriptReadAny(vm, env);
+    pkm = PokeParty_GetPkm(GameData_GetParty(gameData), partyIndex);
+    input = FieldTradeInput_Create(heapId, offerIndex);
+
+    *result = 0;
+    if (*result == 0) {
+        u32 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
+        u32 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
+
+        if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 1) {
+            *result = 4;
+        }
+        if (isKyuremTransformed(species, form) == 1) {
+            *result = 4;
+        }
+    }
+    if (*result == 0 && PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 1) {
+        *result = 1;
+    }
+    if (*result == 0 && PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) != FieldTradeInput_GetWantedSpecies(input)) {
+        *result = 2;
+    }
+    if (*result == 0 && FieldTradeInput_GetWantedSex(input) != 2 &&
+        PokeParty_GetParam(pkm, PKM_PARAM_SEX, NULL) != FieldTradeInput_GetWantedSex(input)) {
+        *result = 3;
+    }
+    FieldTradeInput_Free(input);
+    return FALSE;
+}
+
+BOOL s01B4_FieldTradeStart(VM *vm, FieldScriptEnv *env) {
+    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
+    u32 offerIndex = ScriptReadAny(vm, env);
+    u32 partyIndex = ScriptReadAny(vm, env);
+
+    ScriptWork_CallEvent(work, EventFieldTrade_Create(gsys, offerIndex, partyIndex));
+    return TRUE;
+}
+
+BOOL s02C0_FieldTradeGetSpecies(VM *vm, FieldScriptEnv *env) {
+    FieldTradeInput *input;
+    GameSystem *gsys;
+    HeapID heapId;
+    u16 *result;
+
+    FieldScriptEnv_GetScriptWork(env);
+    gsys = FieldScriptEnv_GetGameSystem(env);
+    GSYS_GetGameData(gsys);
+    heapId = Field_GetHeapID(GSYS_GetField(gsys));
+    result = ScriptReadVar(vm, env);
+    input = FieldTradeInput_Create(heapId, ScriptReadAny(vm, env));
+    *result = FieldTradeInput_GetSpecies(input);
+    FieldTradeInput_Free(input);
+    return FALSE;
+}
+
+BOOL s0225_ItemGetRandomOwnedTMMove(VM *vm, FieldScriptEnv *env) {
+    u16 *result = ScriptReadVar(vm, env);
+    BagSave *bag = GameData_GetBag(FieldScriptEnv_GetGameData(env));
+    s32 count = BagSave_GetPocketItemCount(bag, BAG_POCKET_TMS_HMS);
+    u16 move;
+    u32 index = GFL_RandomLC(count);
+
+    if (count == 0) {
+        move = 0;
+    } else {
+        move = PML_ItemGetTMWazaID(BagSave_GetItemIndexHandle(bag, BAG_POCKET_TMS_HMS, index)->item);
+    }
+    *result = move;
+    return FALSE;
+}
+
+BOOL s0120_FieldTradeSavePokemon(VM *vm, FieldScriptEnv *env) {
+    GameData *gameData;
+    TradedPokemonSave *block;
+    PokeParty *party;
+    u32 partyIndex;
+    u32 slot;
+
+    FieldScriptEnv_GetScriptWork(env);
+    gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
+    block = GetTradedPokemonBlock(gameData);
+    party = GameData_GetParty(gameData);
+    partyIndex = ScriptReadAny(vm, env);
+    slot = ScriptReadAny(vm, env);
+    SetTradedPokemonData(block, slot, PokeParty_GetPkm(party, partyIndex));
+    return FALSE;
+}
+
+BOOL s022F_WordSetLoadPastTradePkmName(VM *vm, FieldScriptEnv *env) {
+    ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
+    TradedPokemonSave *block = GetTradedPokemonBlock(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
+    u32 tradeIndex = ScriptReadAny(vm, env);
+    u32 wordIndex = ScriptReadAny(vm, env);
+    StrBuf *buf = ScriptWork_GetAltStrBuf(work);
+    WordSet *wordSet = ScriptWork_GetWordSet(work);
+
+    if (TradedPokemonSave_IsTraded(block, tradeIndex)) {
+        GFL_StrBufLoadString(buf, TradedPokemonSave_GetNickname(block, tradeIndex));
+    } else {
+        u16 empty[1] = { 0 };
+
+        empty[0] = GFL_StrBufGetTerminator();
+        GFL_StrBufLoadString(buf, empty);
+    }
+    func_0202437c(wordSet, wordIndex, buf, 0, 1, 2);
+    return FALSE;
+}
+
+BOOL func_ov036_021af9dc(VM *vm, FieldScriptEnv *env) {
+    u16 kind = ScriptReadAny(vm, env);
+    u16 *result = ScriptReadVar(vm, env);
+    GameData *gameData = FieldScriptEnv_GetGameData(env);
+
+    switch (kind) {
+    case 0:
+        if (GetOTZekromPartyIdx(gameData) < 0) {
+            *result = 0;
+        } else {
+            *result = 1;
+        }
+        break;
+    case 1:
+        func_ov036_021afc28(env);
+        break;
+    case 2:
+        func_ov036_021afa2c(env, *result);
+        func_ov036_021afc28(env);
+        break;
+    }
+    return FALSE;
+}

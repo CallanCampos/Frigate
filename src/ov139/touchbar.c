@@ -258,21 +258,26 @@ static void TouchBarGfx_Load(TouchBarGfx *gfx, u8 bg, u32 vramType, u32 bgScreen
     gfx->bg = bg;
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     if (!noBg) {
-        GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), bgScreenType, bgPalette * 32, 0x20, heapId);
-        gfx->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), gfx->bg, 0x20 << 6, FALSE, heapId);
-        LoadBarScreen(arc, func_0202d828(), gfx->bg, CHAR_POS(gfx->bgChars), 0, 21, 32, 24, 0, 21, 32, 3, bgPalette,
-                      FALSE, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), bgScreenType, bgPalette * 32, 0x20,
+                                    heapId);
+        gfx->bgChars =
+            GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), gfx->bg, 0x20 << 6, FALSE, heapId);
+        LoadBarScreen(arc, AppMenuCommon_GetBarScreenFile(), gfx->bg, CHAR_POS(gfx->bgChars), 0, 21, 32, 24, 0, 21, 32,
+                      3, bgPalette, FALSE, heapId);
     }
-    gfx->res[TOUCHBAR_RES_PALETTE] = func_0204bbb8(arc, func_0202d810(), vramType, objPalette * 32, 0, 3, heapId);
-    gfx->res[TOUCHBAR_RES_CHARS] = func_0204b81c(arc, func_0202d814(), FALSE, vramType, heapId);
-    gfx->res[TOUCHBAR_RES_CELL_ANIMS] = func_0204bde0(arc, func_0202d818(mapping), func_0202d81c(mapping), heapId);
+    gfx->res[TOUCHBAR_RES_PALETTE] =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), vramType, objPalette * 32, 0, 3, heapId);
+    gfx->res[TOUCHBAR_RES_CHARS] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, vramType, heapId);
+    gfx->res[TOUCHBAR_RES_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(mapping),
+                                                               AppMenuCommon_GetTouchBarAnimFile(mapping), heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void TouchBarGfx_Unload(TouchBarGfx *gfx) {
-    func_0204be64(gfx->res[TOUCHBAR_RES_CELL_ANIMS]);
-    func_0204b98c(gfx->res[TOUCHBAR_RES_CHARS]);
-    func_0204bcd0(gfx->res[TOUCHBAR_RES_PALETTE]);
+    ClActSys_FreeCellAnims(gfx->res[TOUCHBAR_RES_CELL_ANIMS]);
+    ClActSys_FreeChars(gfx->res[TOUCHBAR_RES_CHARS]);
+    ClActSys_FreePltt(gfx->res[TOUCHBAR_RES_PALETTE]);
     GFL_BGSysFreeCharMemory(gfx->bg, CHAR_POS(gfx->bgChars), CHAR_SIZE(gfx->bgChars));
     MI_CpuFill8(gfx, 0, sizeof(TouchBarGfx));
 }
@@ -336,7 +341,7 @@ static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *
     }
     icon->anim = icon->item.anims[0];
     setup.sequence = icon->item.anims[0];
-    icon->actor = func_0204c040(unit, chars, palette, cellAnims, &setup, surface, heapId);
+    icon->actor = ClActor_Create(unit, chars, palette, cellAnims, &setup, surface, heapId);
     func_0204c520(icon->actor, TRUE);
     switch (icon->kind) {
     case TOUCHBAR_KIND_PRESS:
@@ -351,7 +356,7 @@ static void TouchBarIcon_Init(TouchBarIcon *icon, ClActUnit *unit, TouchBarGfx *
 }
 
 static void TouchBarIcon_Delete(TouchBarIcon *icon) {
-    func_0204c108(icon->actor);
+    ClActor_Delete(icon->actor);
     MI_CpuFill8(icon, 0, sizeof(TouchBarIcon));
 }
 
@@ -359,17 +364,17 @@ static void TouchBarIcon_Delete(TouchBarIcon *icon) {
 static BOOL TouchBarIcon_CheckTouch(TouchBarIcon *icon) {
     BOOL touched = FALSE;
 
-    if (func_0204c138(icon->actor) & icon->active) {
+    if (ClActor_IsVisible(icon->actor) & icon->active) {
         u32 x, y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (x - icon->item.pos.x <= 24 && y - icon->item.pos.y <= 24) {
                 touched = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         if (icon->item.key != 0 && (GCTX_HIDGetPressedKeys() & icon->item.key)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             touched = TRUE;
         }
         if (touched) {
@@ -381,7 +386,7 @@ static BOOL TouchBarIcon_CheckTouch(TouchBarIcon *icon) {
 }
 
 static BOOL TouchBarIcon_IsAnimEnded(TouchBarIcon *icon) {
-    if (func_0204c560(icon->actor) == 0) {
+    if (ClActor_IsAnimActive(icon->actor) == 0) {
         return TRUE;
     }
     return FALSE;
@@ -392,7 +397,7 @@ static u32 TouchBarIcon_GetId(const TouchBarIcon *icon) {
 }
 
 static void TouchBarIcon_SetVisible(TouchBarIcon *icon, BOOL visible) {
-    func_0204c124(icon->actor, visible);
+    ClActor_SetVisible(icon->actor, visible);
 }
 
 static void TouchBarIcon_SetActive(TouchBarIcon *icon, BOOL active) {
@@ -413,7 +418,7 @@ static void TouchBarIcon_SetPressed(TouchBarIcon *icon, BOOL pressed) {
     } else {
         icon->anim = icon->item.anims[TOUCHBAR_ANIM_REST];
     }
-    func_0204c488(icon->actor, icon->anim);
+    ClActor_SetSequence(icon->actor, icon->anim);
 }
 
 static BOOL TouchBarIcon_IsPressed(TouchBarIcon *icon) {
@@ -427,16 +432,16 @@ static BOOL TouchBarIcon_IsPressed(TouchBarIcon *icon) {
 }
 
 static void TouchBarIcon_SetPriority(TouchBarIcon *icon, u8 priority) {
-    func_0204c438(icon->actor, priority);
+    ClActor_SetPriority(icon->actor, priority);
 }
 
 static void TouchBarIcon_SetBgPriority(TouchBarIcon *icon, u8 bgPriority) {
-    func_0204c468(icon->actor, bgPriority);
+    ClActor_SetBgPriority(icon->actor, bgPriority);
 }
 
 static void TouchBarIcon_OnTouchPress(TouchBarIcon *icon) {
     icon->anim = icon->item.anims[TOUCHBAR_ANIM_PRESSED];
-    func_0204c488(icon->actor, icon->anim);
+    ClActor_SetSequence(icon->actor, icon->anim);
     if (icon->item.se != 0) {
         GFL_SndSEPlay(icon->item.se);
     }
@@ -455,9 +460,9 @@ static void TouchBarIcon_SetActivePress(TouchBarIcon *icon, BOOL active) {
         if (icon->anim == icon->item.anims[TOUCHBAR_ANIM_PRESSED]) {
             icon->anim = icon->item.anims[TOUCHBAR_ANIM_REST];
         }
-        func_0204c488(icon->actor, icon->anim);
+        ClActor_SetSequence(icon->actor, icon->anim);
     } else {
-        func_0204c488(icon->actor, icon->item.anims[TOUCHBAR_ANIM_INACTIVE]);
+        ClActor_SetSequence(icon->actor, icon->item.anims[TOUCHBAR_ANIM_INACTIVE]);
     }
 }
 
@@ -469,13 +474,13 @@ static void TouchBarIcon_SetActiveToggle(TouchBarIcon *icon, BOOL active) {
         } else if (icon->anim == icon->item.anims[TOUCHBAR_ANIM_INACTIVE]) {
             icon->anim = icon->item.anims[TOUCHBAR_ANIM_REST];
         }
-        func_0204c488(icon->actor, icon->anim);
+        ClActor_SetSequence(icon->actor, icon->anim);
     } else {
         if (icon->anim == icon->item.anims[TOUCHBAR_ANIM_TOGGLED]) {
             icon->anim = icon->item.anims[TOUCHBAR_ANIM_PRESSED];
         } else if (icon->anim == icon->item.anims[TOUCHBAR_ANIM_REST]) {
             icon->anim = icon->item.anims[TOUCHBAR_ANIM_INACTIVE];
         }
-        func_0204c488(icon->actor, icon->item.anims[TOUCHBAR_ANIM_INACTIVE]);
+        ClActor_SetSequence(icon->actor, icon->item.anims[TOUCHBAR_ANIM_INACTIVE]);
     }
 }

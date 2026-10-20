@@ -18,9 +18,9 @@ struct EventMedalInfoBeacon {
     u8 mode;
 };
 
-GameEventReturnCode func_ov015_0216e660(GameEvent *event, u32 *state, void *data);
+GameEventReturnCode EventMedalInfoBeacon_Callback(GameEvent *event, u32 *state, void *data);
 
-GameEventReturnCode func_ov015_0216e660(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode EventMedalInfoBeacon_Callback(GameEvent *event, u32 *state, void *data) {
     EventMedalInfoBeacon *work = data;
     GameSystem *gsys = work->gsys;
     GameData *gameData = GSYS_GetGameData(gsys);
@@ -74,9 +74,9 @@ GameEventReturnCode func_ov015_0216e660(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov015_0216e770(GameSystem *gsys, const u32 *args) {
+GameEvent *EventMedalInfoBeacon_Create(GameSystem *gsys, const u32 *args) {
     u32 packed = args[0];
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov015_0216e660, sizeof(EventMedalInfoBeacon));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventMedalInfoBeacon_Callback, sizeof(EventMedalInfoBeacon));
     EventMedalInfoBeacon *work = GameEvent_GetData(event);
 
     work->gameData = GSYS_GetGameData(gsys);

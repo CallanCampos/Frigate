@@ -1,0 +1,36 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Vincent",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_TYRANITAR",
+            "form": 0,
+            "level": 70,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_STONE_EDGE", "MOVE_FOCUS_BLAST", "MOVE_ICE_BEAM", "MOVE_FIRE_BLAST" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Down in a valley...\nyou and I face each other...{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "If you were the challenger, I'm sure even\nTeam Plasma would fall before you!"
+        },
+        {
+            "type": 2,
+            "text": "Even if Team Plasma had succeeded in\nreleasing all of the Pokémon...{be01}\nI'm sure that people would have just\nfound other ways to fight."
+        }
+    ]
+}

@@ -35,7 +35,8 @@ const fx32 JUMP_ANY_HEIGHT_TABLE[16] = {
 };
 
 GameEvent *CallEventPrepareResidentActorsForZoneChange(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_0215c59c, sizeof(PrepareResidentActorsWork));
+    GameEvent *event =
+        GameEvent_Create(gsys, NULL, EventPrepareResidentActors_Callback, sizeof(PrepareResidentActorsWork));
     PrepareResidentActorsWork *work = GameEvent_GetData(event);
     work->gameSystem = gsys;
     work->field = field;
@@ -255,6 +256,6 @@ FieldAcmdTCB *FieldAcmdTCB_CreateWalkOneTile(FieldActor *actor, u32 direction) {
         queue = ACMD_QUEUE_WALK_E_8F;
         break;
     }
-    func_ov012_02166f2c(actor);
+    FldAct_FreeAcmd(actor);
     return FieldAcmdTCB_Create(actor, queue);
 }

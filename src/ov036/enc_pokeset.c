@@ -32,7 +32,7 @@ static BOOL createSwarm(EncData *encData, EncountManager *manager, u16 zoneId, W
 static u8 FieldEncount_PrepareActiveSlots(EncData *encData, EncountManager *manager, u16 zoneId, WildEncSlot *slots);
 static void FieldEncount_SetupFromData(const WildEncSlot *slot, WildPkmParam *param);
 static u8 GetEncountIndexForPreferredType(EncountManager *manager, const WildEncSlot *slots, u8 type);
-static void FieldEncount_CheckApplyHighLevelWilds(EncountManager *manager, const WildEncSlot *slots,
+static void FieldEncount_CheckApplyHighLevelWilds(const EncountManager *manager, const WildEncSlot *slots,
                                                   WildPkmParam *param);
 static void FieldEncount_GenWildPokeParam(EncountManager *manager, const WildEncSlot *slots, WildPkmParam *param);
 static void FieldEncount_SetRandomHeldItem(PartyPkm *pkm, void *personal, BOOL compoundEyes, BOOL doubleBattle);
@@ -569,12 +569,12 @@ static u8 GetEncountIndexForPreferredType(EncountManager *manager, const WildEnc
     return candidates[GFL_RandomLC(count)];
 }
 
-static void FieldEncount_CheckApplyHighLevelWilds(EncountManager *manager, const WildEncSlot *slots,
+static void FieldEncount_CheckApplyHighLevelWilds(const EncountManager *manager, const WildEncSlot *slots,
                                                   WildPkmParam *param) {
     u8 level = param->level;
-    BOOL hasRange = FALSE;
-    u8 maxLevel = level;
     int i;
+    u8 maxLevel = level;
+    BOOL hasRange = FALSE;
 
     if (!manager->higherLevel) {
         return;

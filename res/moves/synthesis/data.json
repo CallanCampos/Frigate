@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Synthesis",
+    "description": "The user restores its own HP.\nThe amount of HP regained varies\nwith the weather.",
+    "type": "TYPE_GRASS",
+    "quality": "MOVE_QUALITY_HEAL",
+    "category": "MOVE_CATEGORY_STATUS",
+    "power": 0,
+    "accuracy": 101,
+    "pp": 5,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 0,
+    "effect": "BATTLE_EFFECT_HEAL_HALF_MORE_IN_SUN",
+    "drain": 0,
+    "heal": 50,
+    "target": "MOVE_TARGET_USER",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_SNATCH", "MOVE_FLAG_HEAL" ]
+}

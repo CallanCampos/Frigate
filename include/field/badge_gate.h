@@ -8,9 +8,9 @@
 // The badge gates on the way to Victory Road, in Victory Road's gimmick (overlay 103)
 
 // Victory Road's gimmick callbacks
-void func_ov103_021eec80(Field *field);
-void func_ov103_021eefe0(Field *field);
-void func_ov103_021ef010(Field *field);
+void BadgeGate_Setup(Field *field);
+void BadgeGate_End(Field *field);
+void BadgeGate_Update(Field *field);
 // Plays the gate of badge (0 to 7) checking its badge
 GameEvent *BadgeGate_CreateCheckEvent(GameSystem *gsys, u8 badge);
 // Plays the last gate, after the eight badge gates, with the camera

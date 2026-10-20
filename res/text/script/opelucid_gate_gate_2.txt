@@ -1,0 +1,2 @@
+OpelucidGateGate2_Text_TrainerWhoCameOpelucid = Trainer who came to Opelucid City! Hello!{be01}\nTrainer who is going to Route 11!\nPlease come again!
+OpelucidGateGate2_Text_TrainerWhoCameOpelucid_2 = Trainer who came to Opelucid City! Hello!{be01}\nTrainer who is going to Route 11!\nPlease come again!

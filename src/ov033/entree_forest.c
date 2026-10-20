@@ -20,8 +20,8 @@ typedef struct {
     u8 areaH;
 } EntreeForestActorAppearance;
 
-// Where the Pokémon of an area stand, as pairs of grid X and Z, by which of func_ov012_02160974 and
-// func_ov012_0216099c holds for the area
+// Where the Pokémon of an area stand, as pairs of grid X and Z, by which of SymbolMap_IsTopArea and
+// SymbolMap_IsUpperRowArea holds for the area
 static const u8 sPokemonPositions1[] = {
     13, 20, 18, 13, 18, 21, 13, 12, 9, 19, 22, 14, 22, 19, 9, 14, 18, 18, 13, 15,
 };
@@ -131,9 +131,9 @@ void EntreeForest_SpawnAllPokemon(Field *field, u32 actorIdBase, const EntreeFor
     s32 x;
     s32 z;
 
-    if (func_ov012_02160974(area)) {
+    if (SymbolMap_IsTopArea(area)) {
         positions = sPokemonPositions0;
-    } else if (func_ov012_0216099c(area)) {
+    } else if (SymbolMap_IsUpperRowArea(area)) {
         positions = sPokemonPositions1;
     } else {
         positions = sPokemonPositions2;

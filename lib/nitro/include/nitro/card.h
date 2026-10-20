@@ -169,10 +169,37 @@ typedef struct CARDAccessControl {
     u32 : 15;
 } CARDAccessControl;
 
-// The header of a DSi game, of which only the access control is known
+// The header of a DSi game: the load tables of the DS header in its first 0x60 bytes, then where the DSi loads its own
+// two images, and the keyed hashes of the ranges that the boot code verifies before it loads them. Only the fields that
+// the boot code reads are named, and each hash's name says which range it verifies
 typedef struct CARDTwlRomHeader {
-    u8 unk_000[0x1b4];
+    u8 unk_000[0x1c];
+    // 0x1c: the card's security flag; bit 0 says the boot code checks the images against the hashes. The card library
+    // reads the same byte as its CARD_TWL_BOOT_FLAGS
+    u8 bootFlags;
+    u8 unk_01d[0x3];
+    u32 arm9RomOffset;
+    u32 arm9Entry;
+    ROMHeaderLoad arm9;
+    u32 arm7RomOffset;
+    u32 arm7Entry;
+    ROMHeaderLoad arm7;
+    u8 unk_040[0x174];
     CARDAccessControl accessControl;
+    u8 unk_1b8[0x8];
+    u32 arm9iRomOffset;
+    u32 arm9iEntry;
+    ROMHeaderLoad arm9i;
+    u32 arm7iRomOffset;
+    u32 arm7iEntry;
+    ROMHeaderLoad arm7i;
+    u8 unk_1e0[0x134];
+    u8 arm7Hash[0x14];
+    u8 unk_328[0x28];
+    u8 arm9iHash[0x14];
+    u8 arm7iHash[0x14];
+    u8 unk_378[0x28];
+    u8 arm9Hash[0x14];
 } CARDTwlRomHeader;
 
 // A function that the library calls with each event, such as the card being pulled out. Linked through next
@@ -259,6 +286,9 @@ extern const char CARDi_BackupSignature[];
 
 // What card_rom.c gives card_common.c: the object that holds the ROM's base address, and the setup of the ROM reads
 extern u32 cardi_rom_base;
+// The ROM reader switches to TwlSDK's secure reader during DSi card initialization.
+typedef u32 (*CARDiRomReader)(void *arg, void *dst, u32 src, u32 len);
+extern CARDiRomReader sRomReader;
 void CARDi_InitRom(void);
 
 // A ROM read by DMA, which the card-data interrupt moves on a page at a time. The callback is called with the argument

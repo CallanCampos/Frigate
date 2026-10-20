@@ -11,9 +11,8 @@
 // rows of Poké Balls around a "VS", and after the battle the Pokémon each side has left and who won
 #define OVERLAY_COMM_BTL_DEMO OVERLAY_ID(305)
 
-// The screen's heap and its archive of graphics. Our names, not swan's
+// The screen's heap. Our name, not swan's
 #define HEAPID_COMM_BTL_DEMO 0x74
-#define ARCID_COMM_BTL_DEMO 178
 
 // What the screen shows, BattlePlayers' unk44: the introduction or the result, of a battle of two or of four players
 enum {

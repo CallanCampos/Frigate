@@ -343,7 +343,7 @@ static int DDemoSeq_Exit2nd(DDemoWork *wk) {
 // and again, until A, B or a touch ends the demo
 static int DDemoSeq_Main2nd(DDemoWork *wk) {
     if (wk->end == TRUE && GFL_WipeIsFinished() == TRUE && GFL_SndBGMIsFading() == FALSE) {
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
         return SEQ_2ND_EXIT;
     }
     switch (wk->subSeq) {
@@ -456,7 +456,7 @@ static int DDemoSeq_Main2nd(DDemoWork *wk) {
         DDemoObj_MainConfetti(wk);
     }
     if (wk->subSeq >= 8 && wk->end == FALSE) {
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
             wk->end = TRUE;
             GFL_SndBGMFadeOut(220);
             DDemoSeq_SetFadeOut(wk, SEQ_2ND_EXIT, 188);

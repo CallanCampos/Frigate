@@ -1,0 +1,35 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Melina",
+    "class": "TRAINER_CLASS_ACE_TRAINER_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_ALOMOMOLA",
+            "form": 0,
+            "level": 48,
+            "difficulty": 100,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "It is said that water will not grow\nstagnant as long as it keeps flowing...{be00}\nSo as long as I keep moving onward...{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "I won't give up, even if I am defeated!\nThat toughness is the pride of an{be00}\nAce Trainer!"
+        },
+        {
+            "type": 2,
+            "text": "When riding leaves, the direction they\nfloat in will depend on which side you{be00}\ngot on from.{be01}\nDon't worry! If you keep trying, you'll\nfind our Leader sooner or later!"
+        }
+    ]
+}

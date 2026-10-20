@@ -1,0 +1,5 @@
+{
+    "$schema": "ability.schema.json",
+    "name": "Cloud Nine",
+    "description": "Eliminates the effects of\nweather."
+}

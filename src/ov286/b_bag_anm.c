@@ -1,6 +1,7 @@
 #include "battle/b_bag_anm.h"
 #include "battle/b_bag_item.h"
 #include "battle/b_bag_main.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
 #include "system/bgwinfrm.h"
@@ -27,7 +28,7 @@ void BBagAnm_CreateButtons(BBagWork *work) {
     u32 i;
 
     work->buttons = BGWinFrame_Create(2, 14, work->param->heapId);
-    arc = GFL_ArcSysCreateFileHandle(98, HEAPID_TAIL(work->param->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_B_BAG, HEAPID_TAIL(work->param->heapId));
     for (i = 0; i < 14; i++) {
         BGWinFrame_InitFrame(work->buttons, i, 6, data_ov286_021f6e90[i].width, data_ov286_021f6e90[i].height);
         BGWinFrame_SetArea(work->buttons, i, 0, 64, 0, 64);

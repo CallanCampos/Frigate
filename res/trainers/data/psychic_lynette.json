@@ -1,0 +1,51 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Lynette",
+    "class": "TRAINER_CLASS_PSYCHIC_F",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_DRIFLOON",
+            "form": 0,
+            "level": 36,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SPOINK",
+            "form": 0,
+            "level": 36,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DRIFBLIM",
+            "form": 0,
+            "level": 36,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "You... Who are you?{be01}\nThere is another person here besides me?\nWe don't need any Trainers here!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "So you are a normal person...\nA normal ⒆⒇ Trainer..."
+        },
+        {
+            "type": 2,
+            "text": "This house...\nIt brims with fear, sorrow, defeat...{be01}\nSo many feelings fill these walls, giving\nrise to a mysterious energy."
+        }
+    ]
+}

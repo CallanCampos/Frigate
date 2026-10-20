@@ -255,7 +255,7 @@ static void func_ov036_021c2a84(FieldEffectTask *task, void *work) {
 static void func_ov036_021c2ab0(FieldEffectTask *task, void *work) {
     StoneTask *stoneTask = work;
 
-    if (func_ov012_0216749c(stoneTask->actor)) {
+    if (FldAct_IsInUse(stoneTask->actor)) {
         VecFx32 pos;
 
         CopyActorWPos(stoneTask->actor, &pos);

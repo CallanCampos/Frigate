@@ -45,7 +45,7 @@ void decryptNpcData(AreaNPCSave *npcData) {
 }
 
 // Decrypts the block
-void func_0200e904(AreaNPCSave *npcData) {
+void SymbolSave_Decrypt(AreaNPCSave *npcData) {
     _decryptData(npcData, offsetof(AreaNPCSave, checksum), npcData->checksum + (npcData->seed << 16));
     npcData->seed = 0;
 }
@@ -106,32 +106,32 @@ static void removeSlot(AreaNPCSave *npcData, u32 slot) {
 }
 
 // The first free slot of a kind, or SYMBOL_SLOT_NONE
-u32 func_0200e9fc(AreaNPCSave *npcData, u32 kind) {
+u32 SymbolSave_FindFreeSlot(AreaNPCSave *npcData, u32 kind) {
     u32 slot;
 
-    func_0200e904(npcData);
+    SymbolSave_Decrypt(npcData);
     slot = findFreeSlot(npcData, kind);
     decryptNpcData(npcData);
     return slot;
 }
 
-u32 func_0200ea1c(u32 index) {
+u32 SymbolSave_GetKindOfSlot(u32 index) {
     return getKindOfSlot(index);
 }
 
-void func_0200ea24(AreaNPCSave *npcData, u32 index) {
-    func_0200e904(npcData);
+void SymbolSave_RemoveSlot(AreaNPCSave *npcData, u32 index) {
+    SymbolSave_Decrypt(npcData);
     removeSlot(npcData, index);
     decryptNpcData(npcData);
 }
 
-void func_0200ea40(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8 form, u8 a5, u32 size) {
+void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8 form, u8 a5, u32 size) {
     u32 start;
     u32 end;
     u32 slot;
     EntreeForestPokemon *pokemon;
 
-    func_0200e904(npcData);
+    SymbolSave_Decrypt(npcData);
     start = sSlotRanges[size].start;
     end = sSlotRanges[size].end;
     slot = findFreeSlot(npcData, size);
@@ -151,13 +151,13 @@ void func_0200ea40(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8 form, u
             npcData->unk848++;
         }
     } else if (size == SYMBOL_KIND_FREE_SMALL) {
-        func_0200eb14(npcData, slot);
+        SymbolSave_UpdateDeepestArea(npcData, slot);
     }
     decryptNpcData(npcData);
 }
 
 // Records how deep the slot is, once it is past the first two deep areas
-void func_0200eb14(AreaNPCSave *npcData, u16 index) {
+void SymbolSave_UpdateDeepestArea(AreaNPCSave *npcData, u16 index) {
     u8 area = (index - SYMBOL_DEEP_AREA_FIRST_SLOT) / SYMBOL_DEEP_AREA_SLOTS - 1;
 
     if (index != SYMBOL_SLOT_NONE && index >= SYMBOL_DEEP_AREA_FIRST_SLOT + 2 * SYMBOL_DEEP_AREA_SLOTS &&
@@ -169,7 +169,7 @@ void func_0200eb14(AreaNPCSave *npcData, u16 index) {
     }
 }
 
-BOOL func_0200eb54(SaveControl *save, u32 *pokemon, HeapID heapId, BOOL check) {
+BOOL SymbolSave_HasPokemon(SaveControl *save, u32 *pokemon, HeapID heapId, BOOL check) {
     BOOL found = FALSE;
     AreaNPCSave *npcData = GFL_HeapAllocate(heapId, sizeof(AreaNPCSave), TRUE, "symbol_save.c", 428);
     const EntreeForestPokemon *wanted = (const EntreeForestPokemon *)pokemon;
@@ -177,8 +177,8 @@ BOOL func_0200eb54(SaveControl *save, u32 *pokemon, HeapID heapId, BOOL check) {
     int i;
 
     for (copy = 0; copy < 2; copy++) {
-        if (func_020074c4(save, SAVE_BLOCK_SYMBOL, copy, npcData, sizeof(AreaNPCSave)) == TRUE) {
-            func_0200e904(npcData);
+        if (SaveControl_ReadBlockCopy(save, SAVE_BLOCK_SYMBOL, copy, npcData, sizeof(AreaNPCSave)) == TRUE) {
+            SymbolSave_Decrypt(npcData);
             for (i = 0; i < SYMBOL_POKEMON_MAX; i++) {
                 if (check == TRUE) {
                     if (wanted->species == npcData->pokemon[i].species && wanted->form == npcData->pokemon[i].form) {

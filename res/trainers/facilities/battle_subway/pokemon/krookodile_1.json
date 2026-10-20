@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_KROOKODILE",
+    "moves": [ "MOVE_CRUNCH", "MOVE_BULLDOZE", "MOVE_TAUNT", "MOVE_COUNTER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_NAUGHTY",
+    "item": "ITEM_BLACK_GLASSES",
+    "form": 0
+}

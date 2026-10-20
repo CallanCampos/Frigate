@@ -7,8 +7,10 @@
 // receiving side calls with it, and an error bit. PXI_IsCallbackReady (NitroSDK's PXI_IsCallbackReady) tells whether
 // the ARM7 is ready for a tag
 
-// The FIFO's registers: the four bits each processor sets for the other, and the FIFO's control and ports
-#define reg_PXI_MAINP_INTF (*(vu16 *)0x04000180)
+// The FIFO's registers: the four bits each processor sets for the other, and the FIFO's control and ports. The
+// register's address is its own macro for the boot code's assembly, which loads the register instead of reading it
+#define REG_PXI_MAINP_INTF_ADDR 0x04000180
+#define reg_PXI_MAINP_INTF (*(vu16 *)REG_PXI_MAINP_INTF_ADDR)
 #define REG_PXI_MAINP_INTF_RECV_MASK 0x000f
 #define REG_PXI_MAINP_INTF_SEND_SHIFT 8
 #define reg_PXI_FIFO_CNT (*(vu16 *)0x04000184)

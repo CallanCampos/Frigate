@@ -1,0 +1,23 @@
+SkyarrowBridge_Text_HelloExcuseImTerribly = Hello. Excuse me.{be01}\nI'm terribly sorry to ask, but\nwill you buy a bottle of Fresh Water{be00}\nfor $300?
+SkyarrowBridge_Text_ThankVeryMuchBuying = Thank you very much!{be01}\nBuying Fresh Water for $300,\nwhich is more expensive than usual...{be00}\nWhat a generous person you are!{be01}\nI'll never forget your kindness\nfor the rest of my life!
+SkyarrowBridge_Text_YesKnowKnow300 = Yes, I know.\nI know!{be01}\n$300 a bottle is expensive!{be01}\nBut, if I don't sell this,\nI'll be in trouble...{be01}
+SkyarrowBridge_Text_WifeWantsBuyBag = My wife wants to buy a Bag\nfrom a really expensive brand...{be01}\nIf I don't buy it for her,\nour relationship might go sour...{be01}
+SkyarrowBridge_Text_HaveDaughterWhosTrainer = I have a daughter who's a Trainer.{be01}\nIt's natural for a father to want to buy\na lot of things like new Ultra Balls and{be00}\nHyper Potions for his daughter...{be01}
+SkyarrowBridge_Text_SonHisWifeSend = My son and his wife send me money,\nbut they can't send very much...{be01}\nI know I shouldn't rely on them,\nbut there is a lot going on.{be01}
+SkyarrowBridge_Text_WantBuySomeToys = I want to buy some toys\nfor my adorable grandchildren.{be01}\nTheir tastes are quite expensive.\nBut I want to see their happy faces...{be01}
+SkyarrowBridge_Text_DontReallyHaveAny = I don't really have\nany special reasons...{be01}\nBut the full-course meal I ate\nyesterday was incredibly expensive!{be01}
+SkyarrowBridge_Text_HelpOldManPlease = So, to help this old man...{be01}\nPlease buy my Fresh Water\nfor $300. Please.
+SkyarrowBridge_Text_SighWellSinceYoure = Sigh...{be01}\nWell, since you're stubborn,\nI'll stop asking.{be01}\nBut when you change your mind,\nplease come back anytime.{be01}\nI'll be selling Fresh Water\nfor $300 right here!
+SkyarrowBridge_Text_Y300DontHave = Y-you... $300...\nYou don't have it?!{be01}\nI didn't say anything! Don't worry.\nYou don't have to buy Fresh Water.
+SkyarrowBridge_Text_CantCarryAnyMore = You... You can't carry any more\nFresh Water!{be01}\nWow! You're a Fresh Water maniac!\nPlease buy it from me{be00}\nnext time you need some!
+SkyarrowBridge_Text_OhOhThirstyG = {be09:2}Oh... Oh...\nSo...thirsty...{be01}\nG-g-give me...\nFresh Water...?{be09:0}
+SkyarrowBridge_Text_RefreshedIm100Rehydrated = Refreshed!!{be01}\nI'm 100% rehydrated!\nI feel better now! Thank you!{be01}\nI'll dash to the next bridge!
+SkyarrowBridge_Text_ButDontHaveFresh = {be09:2}But... You don't have Fresh Water...\nI appreciate the thought, though...{be09:0}
+SkyarrowBridge_Text_ThankWhatOhWithout = {be09:2}Thank...{be01}\nWhat?\nOh...{be01}\nWithout Fresh Water...\nI can't run on bridges anymore.{be09:0}
+SkyarrowBridge_Text_YayRanAllBridges = Yay! I ran on all the bridges\nin the Unova region!{be01}\nIt's all thanks to you!\nPlease! Accept these!{be01}
+SkyarrowBridge_Text_OhBagFull = Oh... Your Bag is full.
+SkyarrowBridge_Text_BridgeLikeBestRunning = The bridge I like best for running\nis the Tubeline Bridge.{be01}\nI get to race the trains!\nThat gives me power!
+SkyarrowBridge_Text_CurveHereLikeErrrrk = The curve here is like...errrrk...\nand then when you pass the curve,{be00}\nwhoooosh, zoooom!{be01}\n...Do you understand the dialect\nof Goldenrod City?
+SkyarrowBridge_Text_HmmManHesStanding = Hmm! That man!{be01}\nHe's standing right in the middle of\nthe Skyarrow Bridge... I think.
+SkyarrowBridge_Text_GoodByeCasteliaCity = Good-bye, Castelia City...\nGood-bye, old me...
+\pad{2c}

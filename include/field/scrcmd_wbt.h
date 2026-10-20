@@ -8,51 +8,51 @@
 // WBT_SCRIPT_COMMANDS lists. Overlay 55 has the commands both plugins use, and overlays 56 and 57 the others
 
 // The tournament's system, which the plugins' commands work on
-WbtSystem *func_ov055_021e5800(FieldScriptEnv *env);
+WbtSystem *WbtCmd_GetSystem(FieldScriptEnv *env);
 
 // Overlay 56
 BOOL WbtCmd_AwardBattlePoints(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7620(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7674(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_IsTournamentAvailable(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_WouldOpenTournament(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_CheckRegulation(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e76f4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7710(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7750(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetRegulationId(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CheckEntryParties(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CallEntryPartySelect(VM *vm, FieldScriptEnv *env);
 BOOL func_ov056_021e77b0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7808(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SetUseBattleBox(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_MakeRentalParty(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7894(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7988(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e79c0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e79f0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7a30(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7a4c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7a9c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov056_021e7b00(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetSlotTrainerObjCodes(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetSlot(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CountDownloads(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SetDownloadSlot(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetDownloadSlot(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CallPokeSelect(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowDownloads(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowWinRecord(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_Download(VM *vm, FieldScriptEnv *env);
 
 // Overlay 57
-BOOL func_ov057_021e760c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7630(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e76a8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e770c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e777c(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetOpponentObjCode(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowOpponentLine(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_CallBattle(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowOpponentLine7(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_WordSetOpponentName(VM *vm, FieldScriptEnv *env);
 BOOL WbtCmd_MakeOpponentParty(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7814(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7850(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7878(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7894(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e78a4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e78c8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e78fc(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7948(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e79e8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e79ec(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e79fc(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7b20(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7b60(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7ba0(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7bb4(VM *vm, FieldScriptEnv *env);
-BOOL func_ov057_021e7bec(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_GetRoundRemaining(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowPartyList(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ClosePartyList(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ResetPicks(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_RandomPick(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SetPick(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_WordSetPickSpecies(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ListPartyPokemon(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_Dummy(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SwapPickedPokemon(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SetNamePlates(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_ShowPortraits(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_LoadPortraitScene(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_PlayStadiumIntro(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_SwitchLights(VM *vm, FieldScriptEnv *env);
+BOOL WbtCmd_PlayCrowd(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_WBT_H

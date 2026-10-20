@@ -16,8 +16,8 @@ u32 func_0200c90c(TrainerCardSave *trainerCard);
 u16 func_0200cb00(TrainerCardSave *trainerCard);
 void func_0200cb08(TrainerCardSave *trainerCard, u16 value);
 // The color of the Battle Recorder
-u8 func_0200cb30(TrainerCardSave *trainerCard);
-void func_0200cb3c(TrainerCardSave *trainerCard, u8 color);
+u8 TrainerCard_GetBattleRecorderColor(TrainerCardSave *trainerCard);
+void TrainerCard_SetBattleRecorderColor(TrainerCardSave *trainerCard, u8 color);
 // When the survey started, in seconds since 2000
 s64 getSecondsFromTrainerCardData(TrainerGameInfoSave *info);
 // Adds to the play time

@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Norbert",
+    "class": "TRAINER_CLASS_POKEFAN_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_SUPER_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 16,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_GROWLITHE",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 2
+        },
+        {
+            "species": "SPECIES_SANDSHREW",
+            "form": 0,
+            "level": 21,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "This may be a bit sudden, but please,\ncheck out my Pokémon!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Even if my Pokémon lose,\nthey are still so cute!"
+        },
+        {
+            "type": 2,
+            "text": "Anytime, anywhere, no matter what,\nmy Pokémon are always the best for me!"
+        }
+    ]
+}

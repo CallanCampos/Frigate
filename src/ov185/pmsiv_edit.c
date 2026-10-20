@@ -134,10 +134,10 @@ void PMSIVEdit_Delete(PMSIVEdit *wk) {
         BmpCursor_Free(wk->bmpCursor);
     }
     if (wk->cursor[0]) {
-        func_0204c108(wk->cursor[0]);
+        ClActor_Delete(wk->cursor[0]);
     }
     if (wk->cursor[1]) {
-        func_0204c108(wk->cursor[1]);
+        ClActor_Delete(wk->cursor[1]);
     }
     if (wk->msgData) {
         GFL_MsgDataFree(wk->msgData);
@@ -223,11 +223,11 @@ BOOL PMSIVEdit_ScrollWait(PMSIVEdit *wk) {
     wk->frameY = wk->frameY + step;
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->scrollY);
     for (i = 0; i < 2; i++) {
-        y = func_0204c1dc(wk->cursor[i], i, 1) - step;
-        func_0204c1a8(wk->cursor[i], y, i, 1);
+        y = ClActor_GetSurfacePosAxis(wk->cursor[i], i, 1) - step;
+        ClActor_SetSurfacePosAxis(wk->cursor[i], y, i, 1);
         for (j = 0; j < 2; j++) {
-            y = func_0204c1dc(wk->numberAct[j][i], i, 1) - step;
-            func_0204c1a8(wk->numberAct[j][i], y, i, 1);
+            y = ClActor_GetSurfacePosAxis(wk->numberAct[j][i], i, 1) - step;
+            ClActor_SetSurfacePosAxis(wk->numberAct[j][i], y, i, 1);
         }
     }
     wk->scrollCount++;
@@ -294,7 +294,7 @@ static void PMSIVEdit_SetupWordActors(PMSIVEdit *wk) {
         PMSIView_GetObjRes2(wk->vwk, &res, i);
         for (j = 0; j < 2; j++) {
             wk->numberAct[j][i] = PMSIView_AddActor(wk->vwk, &res, 0, 0, 2, i + 1);
-            func_0204c124(wk->numberAct[j][i], FALSE);
+            ClActor_SetVisible(wk->numberAct[j][i], FALSE);
         }
     }
 }
@@ -311,8 +311,8 @@ static void PMSIVEdit_SetupCursorActors(PMSIVEdit *wk) {
     }
     PMSIView_GetObjRes(wk->vwk, &res, 1, 0);
     wk->cursor[1] = PMSIView_AddActor(wk->vwk, &res, pos.x, pos.y + 192, 0, NNS_G2D_VRAM_TYPE_2DSUB);
-    func_0204c488(wk->cursor[1], 1);
-    func_0204c468(wk->cursor[1], 1);
+    ClActor_SetSequence(wk->cursor[1], 1);
+    ClActor_SetBgPriority(wk->cursor[1], 1);
     PMSIView_GetObjRes(wk->vwk, &res, 0, 0);
     wk->cursor[0] = PMSIView_AddActor(wk->vwk, &res, pos.x, pos.y, 0, NNS_G2D_VRAM_TYPE_2DMAIN);
     PMSIVEdit_SetCursorActive(wk, TRUE);
@@ -325,7 +325,7 @@ void PMSIVEdit_UpdateEditArea(PMSIVEdit *wk) {
     for (lcd = 0; lcd < 2; lcd++) {
         for (i = 0; i < 2; i++) {
             if (wk->numberAct[i][lcd]) {
-                func_0204c124(wk->numberAct[i][lcd], FALSE);
+                ClActor_SetVisible(wk->numberAct[i][lcd], FALSE);
             }
         }
         GFL_BitmapFill(BmpWin_GetBitmap(wk->win[lcd]), 15);
@@ -512,10 +512,10 @@ static void PMSIVEdit_PrintWord(PMSIVEdit *wk, BmpWin *win, const ClActorPos *po
         if (engine == 1) {
             actPos.y += 192;
         }
-        func_0204c488(numberAct, number);
-        func_0204c140(numberAct, &actPos, engine);
-        func_0204c124(numberAct, TRUE);
-        func_0204c468(numberAct, GFL_BGSysGetBGPriority(BmpWin_GetBGIndex(win)));
+        ClActor_SetSequence(numberAct, number);
+        ClActor_SetSurfacePos(numberAct, &actPos, engine);
+        ClActor_SetVisible(numberAct, TRUE);
+        ClActor_SetBgPriority(numberAct, GFL_BGSysGetBGPriority(BmpWin_GetBGIndex(win)));
     } else {
         loadSayingToString(word, wk->str, HEAPID_PMS_INPUT);
         GFL_TextRndUpdateColorIndexLUT(3, 4, 14);
@@ -526,15 +526,15 @@ static void PMSIVEdit_PrintWord(PMSIVEdit *wk, BmpWin *win, const ClActorPos *po
 static void PMSIVEdit_SetCursorActive(PMSIVEdit *wk, BOOL active) {
     if (wk->wordCount) {
         if (active) {
-            func_0204c488(wk->cursor[0], 0);
+            ClActor_SetSequence(wk->cursor[0], 0);
         } else {
-            func_0204c488(wk->cursor[0], 1);
+            ClActor_SetSequence(wk->cursor[0], 1);
         }
     } else {
         if (active) {
-            func_0204c488(wk->cursor[0], 14);
+            ClActor_SetSequence(wk->cursor[0], 14);
         } else {
-            func_0204c488(wk->cursor[0], 15);
+            ClActor_SetSequence(wk->cursor[0], 15);
         }
     }
 }
@@ -563,8 +563,8 @@ void PMSIVEdit_ActiveCursor(PMSIVEdit *wk) {
 }
 
 void PMSIVEdit_VisibleCursor(PMSIVEdit *wk, BOOL visible) {
-    func_0204c124(wk->cursor[0], visible);
-    func_0204c124(wk->cursor[1], visible);
+    ClActor_SetVisible(wk->cursor[0], visible);
+    ClActor_SetVisible(wk->cursor[1], visible);
     PMSIVEdit_SetCursorActive(wk, TRUE);
 }
 
@@ -586,8 +586,8 @@ void PMSIVEdit_MoveCursor(PMSIVEdit *wk, u32 pos) {
         actPos.x = 128;
         actPos.y = 24;
     }
-    func_0204c140(wk->cursor[0], &actPos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->cursor[0], &actPos, CLACT_SURFACE_MAIN);
     actPos.y += 192;
-    func_0204c140(wk->cursor[1], &actPos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(wk->cursor[1], &actPos, CLACT_SURFACE_SUB);
     PMSIVEdit_SetCursorActive(wk, TRUE);
 }

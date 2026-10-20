@@ -351,7 +351,7 @@ StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
             stage->playerPos = 1;
         }
     } else {
-        stage->playerPos = func_ov211_021f0470(stage->param->comm);
+        stage->playerPos = MusComm_GetSelfPos(stage->param->comm);
     }
     for (i = 0; i < 4; i++) {
         stage->bonusPoints[i] = 0;
@@ -383,7 +383,7 @@ StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
     stage->button = StaActButton_InitSystem(stage->heapId, stage, stage->param->pokes[stage->playerPos]);
     stage->scriptSys = StaActScript_InitSystem(stage->heapId, stage);
     StaActing_InitAppealEffect(stage);
-    func_02042ba8(FALSE, stage->heapId);
+    GFL_NetSetIconScreen(FALSE, stage->heapId);
     StaActing_LoadBg(stage, 0);
     stage->sound[0] = stage->param->ov210->sound[0];
     stage->sound[1] = stage->param->ov210->sound[1];
@@ -394,10 +394,10 @@ StaActing *StaActing_Init(MusicalStageParam *param, HeapID heapId) {
 
 void StaActing_Term(StaActing *stage) {
     if (stage->bgmPlaying == TRUE) {
-        func_02005d8c();
+        GFL_SndBGMStopImmediate();
     }
     if (stage->seqPlaying == TRUE) {
-        func_02006574();
+        GFL_SndBGMStopSeq();
     }
     if (stage->strmPlaying == TRUE) {
         func_02006588();
@@ -411,8 +411,8 @@ void StaActing_Term(StaActing *stage) {
     if (stage->msgStr != NULL) {
         GFL_StrBufFree(stage->msgStr);
     }
-    func_02021c44(stage->printQueue);
-    func_02021a18(stage->printQueue);
+    PrintQueue_Clear(stage->printQueue);
+    PrintQueue_Free(stage->printQueue);
     GFL_MsgDataFree(stage->msgData);
     BmpWin_Free(stage->msgWin);
     GFL_FontFree(stage->font);
@@ -426,8 +426,8 @@ void StaActing_Term(StaActing *stage) {
     StaActPoke_TermSystem(stage->pokeSys);
     MusPokeDraw_TermSystem(stage->pokeDraw);
     MusItemDraw_TermSystem(stage->itemDraw);
-    func_0204b758();
-    func_0204e450(stage->blact);
+    ClActSys_Delete();
+    BlActScene_Delete(stage->blact);
     GFL_G3DCameraFree(stage->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);
@@ -458,7 +458,7 @@ BOOL StaActing_Main(StaActing *stage) {
         if (GFL_WipeIsFinished() == TRUE) {
             if (stage->param->comm != NULL) {
                 stage->seq = STA_ACTING_SEQ_SYNC;
-                func_ov211_021ef988(stage->param->comm, 200);
+                MusComm_SendTiming(stage->param->comm, 200);
             } else {
                 stage->seq = STA_ACTING_SEQ_WAIT;
             }
@@ -498,7 +498,7 @@ BOOL StaActing_Main(StaActing *stage) {
         }
         break;
     case STA_ACTING_SEQ_SYNC:
-        if (func_ov211_021ef99c(stage->param->comm, 200) == TRUE) {
+        if (MusComm_IsTimingReached(stage->param->comm, 200) == TRUE) {
             stage->seq = STA_ACTING_SEQ_WAIT;
         }
         break;
@@ -530,7 +530,7 @@ BOOL StaActing_Main(StaActing *stage) {
     StaActEffect_DrawSystem(stage->effectSys);
     StaActing_DrawDebug(stage);
     GFL_G3DSysReqSwapBuffers();
-    func_0204b794();
+    ClActSys_Draw();
     if (stage->param->comm != NULL && stage->seq != STA_ACTING_SEQ_FADE_IN &&
         stage->seq != STA_ACTING_SEQ_WAIT_FADE_IN && stage->seq != STA_ACTING_SEQ_FADE_OUT &&
         stage->seq != STA_ACTING_SEQ_WAIT_FADE_OUT && GFL_NetErrCheck() != FALSE) {
@@ -540,7 +540,7 @@ BOOL StaActing_Main(StaActing *stage) {
 }
 
 static void StaActing_VBlank(TCB *tcb, void *work) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void StaActing_InitGraphics(StaActing *stage) {
@@ -824,18 +824,18 @@ static void StaActing_InitMessage(StaActing *stage) {
     stage->printStream = NULL;
     stage->msgStr = NULL;
     stage->printing = FALSE;
-    stage->printQueue = func_02021998(stage->heapId);
+    stage->printQueue = PrintQueue_CreateDefault(stage->heapId);
 }
 
 static void StaActing_UpdateMessage(StaActing *stage) {
     GFL_TCBExMgrUpdate(stage->tcbExMgr);
-    if (stage->printStream != NULL && func_020223b4(stage->printStream) == 2) {
-        func_020223cc(stage->printStream);
+    if (stage->printStream != NULL && PrintStream_GetState(stage->printStream) == 2) {
+        PrintStream_Delete(stage->printStream);
         stage->printStream = NULL;
     }
     if (stage->printing == TRUE) {
-        func_02021a3c(stage->printQueue);
-        if (func_02021c0c(stage->printQueue) == TRUE) {
+        PrintQueue_Main(stage->printQueue);
+        if (PrintQueue_IsEmpty(stage->printQueue) == TRUE) {
             BmpWin_FlushChar(stage->msgWin);
             stage->printing = FALSE;
         }
@@ -844,7 +844,7 @@ static void StaActing_UpdateMessage(StaActing *stage) {
 
 void StaActing_PrintMessage(StaActing *stage, u16 msgId, u32 wait) {
     if (stage->printStream != NULL) {
-        func_020223cc(stage->printStream);
+        PrintStream_Delete(stage->printStream);
         stage->printStream = NULL;
     }
     if (stage->msgStr != NULL) {
@@ -854,10 +854,10 @@ void StaActing_PrintMessage(StaActing *stage, u16 msgId, u32 wait) {
     GFL_BitmapFill(BmpWin_GetBitmap(stage->msgWin), 0);
     stage->msgStr = GFL_MsgDataLoadStrbufNew(stage->msgData, msgId);
     if (wait != 0xff) {
-        stage->printStream =
-            func_02022268(stage->msgWin, 0, 0, stage->msgStr, stage->font, wait, stage->tcbExMgr, 2, stage->heapId, 0);
+        stage->printStream = PrintStream_Create(stage->msgWin, 0, 0, stage->msgStr, stage->font, wait, stage->tcbExMgr,
+                                                2, stage->heapId, 0);
     } else {
-        func_02021c54(stage->printQueue, BmpWin_GetBitmap(stage->msgWin), 0, 0, stage->msgStr, stage->font);
+        PrintQueue_Print(stage->printQueue, BmpWin_GetBitmap(stage->msgWin), 0, 0, stage->msgStr, stage->font);
         stage->printing = TRUE;
         GFL_StrBufFree(stage->msgStr);
         stage->msgStr = NULL;
@@ -866,7 +866,7 @@ void StaActing_PrintMessage(StaActing *stage, u16 msgId, u32 wait) {
 
 void StaActing_ClearMessage(StaActing *stage) {
     if (stage->printStream != NULL) {
-        func_020223cc(stage->printStream);
+        PrintStream_Delete(stage->printStream);
         stage->printStream = NULL;
     }
     if (stage->msgStr != NULL) {
@@ -949,17 +949,17 @@ static void StaActing_UpdateRanks(StaActing *stage) {
 
 void StaActing_PlayStrm(StaActing *stage, u16 seq) {
     stage->strmPlaying = TRUE;
-    func_020064b8(stage->sound[0], stage->sound[1], seq);
+    GFL_SndBGMSetLoadedData(stage->sound[0], stage->sound[1], seq);
 }
 
 void StaActing_PlaySeq(StaActing *stage, u16 seq) {
     stage->seqPlaying = TRUE;
-    func_02006564(seq);
+    GFL_SndBGMStartSeq(seq);
 }
 
 void StaActing_StopSeq(StaActing *stage) {
     stage->seqPlaying = FALSE;
-    func_02006574();
+    GFL_SndBGMStopSeq();
 }
 
 void StaActing_PlayWave(StaActing *stage, u16 waveArc, u16 a2, u16 a3) {
@@ -973,7 +973,7 @@ void StaActing_PlayBgm(StaActing *stage, u32 bgm) {
 
 void StaActing_StopBgm(StaActing *stage) {
     stage->bgmPlaying = FALSE;
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
 }
 
 void StaActing_PlayApplause(StaActing *stage) {
@@ -1029,7 +1029,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 
     StaActing_UpdateNpcItemUse(stage);
     if (stage->param->comm != NULL && stage->commSendPending == TRUE &&
-        func_ov211_021f0460(stage->param->comm, stage->commSendEquip) == TRUE) {
+        MusComm_RequestEquip(stage->param->comm, stage->commSendEquip) == TRUE) {
         stage->commSendPending = FALSE;
     }
     if (stage->param->comm == NULL) {
@@ -1059,7 +1059,7 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
             stage->audienceRefresh = TRUE;
         }
     } else {
-        u8 lightUpPos = func_ov211_021f0598(stage->param->comm);
+        u8 lightUpPos = MusComm_GetLimelightPos(stage->param->comm);
 
         if (lightUpPos < STA_ACTING_NO_POKE) {
             if (stage->lightUpPos == STA_ACTING_NO_POKE) {
@@ -1069,16 +1069,16 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
             }
             stage->lightUpTimer = STA_ACTING_LIGHT_UP_FRAMES;
             stage->lightUpPos = lightUpPos;
-            stage->lightUpEquip = func_ov211_021f053c(stage->param->comm, lightUpPos);
+            stage->lightUpEquip = MusComm_GetEquipUsed(stage->param->comm, lightUpPos);
             stage->audienceRefresh = TRUE;
-            func_ov211_021f05b4(stage->param->comm);
+            MusComm_ClearLimelightPos(stage->param->comm);
         }
         for (i = 0; i < 4; i++) {
-            u8 equip = func_ov211_021f053c(stage->param->comm, i);
+            u8 equip = MusComm_GetEquipUsed(stage->param->comm, i);
 
             if (equip != STA_ACTING_EQUIP_NONE) {
                 StaActPoke_StartItemEffect(stage->pokeSys, stage->pokes[i], equip);
-                func_ov211_021f056c(stage->param->comm, i);
+                MusComm_ClearEquipUsed(stage->param->comm, i);
                 if (equip == STA_ACTING_EQUIP_HAND_R) {
                     stage->handPropUsed[i][0] = TRUE;
                 } else if (equip == STA_ACTING_EQUIP_HAND_L) {
@@ -1099,11 +1099,11 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 
                     stage->param->pokes[stage->lightUpPos]->unk54[stage->lightUpEquip] = TRUE;
                     GFL_SndSEPlay(se);
-                } else if (func_02042bc4() == TRUE) {
+                } else if (GFL_NetIsParent() == TRUE) {
                     if (StaActing_ScoreItem(stage, stage->lightUpPos, stage->lightUpEquip) == SEQ_SE_MSCL_11) {
-                        func_ov211_021f05c0(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 1);
+                        MusComm_QueueEquipResult(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 1);
                     } else {
-                        func_ov211_021f05c0(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 2);
+                        MusComm_QueueEquipResult(stage->param->comm, stage->lightUpPos, stage->lightUpEquip, 2);
                     }
                 }
             }
@@ -1115,9 +1115,9 @@ static void StaActing_UpdateItemUse(StaActing *stage) {
 
 // Adds the points of a prop to the Pokémon's, and returns the sound of the audience's reaction
 static u32 StaActing_ScoreItem(StaActing *stage, u8 pos, u8 equip) {
-    u8 points =
-        func_ov012_02152644(stage->param->program, func_ov210_021ef164(StaActing_GetItemData(stage),
-                                                                       stage->param->pokes[pos]->equips[equip].itemId));
+    u8 points = MusicalProgram_GetPropPoints(
+        stage->param->program,
+        MusItemData_GetKind(StaActing_GetItemData(stage), stage->param->pokes[pos]->equips[equip].itemId));
 
     stage->bonusPoints[pos] += points;
     StaActing_UpdateRanks(stage);
@@ -1130,7 +1130,7 @@ static u32 StaActing_ScoreItem(StaActing *stage, u8 pos, u8 equip) {
 static void StaActing_UpdateNpcItemUse(StaActing *stage) {
     u8 i;
 
-    if (stage->param->comm == NULL || func_02042bc4() == TRUE) {
+    if (stage->param->comm == NULL || GFL_NetIsParent() == TRUE) {
         for (i = 0; i < 4; i++) {
             if (stage->npcUseWait[i] != 0) {
                 stage->npcUseWait[i]--;
@@ -1138,7 +1138,7 @@ static void StaActing_UpdateNpcItemUse(StaActing *stage) {
                     if (stage->param->comm == NULL) {
                         StaActing_RequestItemUse(stage, i, stage->npcUseEquip[i]);
                     } else {
-                        func_ov211_021f0510(stage->param->comm, i, stage->npcUseEquip[i]);
+                        MusComm_SetEquipRequest(stage->param->comm, i, stage->npcUseEquip[i]);
                     }
                 }
             }
@@ -1156,7 +1156,7 @@ static inline u8 StaActing_RandomHand(void) {
 void StaActing_SetNpcItemTiming(StaActing *stage, u32 timing, u8 pos) {
     u8 i;
 
-    if (stage->param->comm == NULL || func_02042bc4() == TRUE) {
+    if (stage->param->comm == NULL || GFL_NetIsParent() == TRUE) {
         for (i = 0; i < 4; i++) {
             BOOL hand[2] = { FALSE, FALSE };
             MusicalPoke *poke = stage->param->pokes[i];

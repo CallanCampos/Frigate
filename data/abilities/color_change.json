@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Color Change",
-    "description": "Changes the Pokémon's\ntype to the foe's move."
-}

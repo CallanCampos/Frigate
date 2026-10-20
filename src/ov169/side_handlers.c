@@ -204,7 +204,7 @@ static void CommonScreenEffect(BtlServerFlow *flow, u8 side, u32 screen) {
 
     if (side == GetSideFromMonID(BattleEventVar_GetValue(4)) && screen == BattleEventVar_GetValue(0x1a) &&
         BattleEventVar_GetValue(0x45) == 0) {
-        battleType = func_ov167_021abc9c(flow);
+        battleType = BtlServerFlow_GetBattleStyle(flow);
         if (battleType == 0 || battleType == 3) {
             multiplier = 0x800;
         } else {
@@ -339,7 +339,7 @@ static void HandlerSideStealthRock(BattleEventItem *item, BtlServerFlow *flow, u
     monId = BattleEventVar_GetValue(2);
     if (side == GetSideFromMonID(monId)) {
         mon = GetBattleMon(flow, monId);
-        switch (func_ov167_021bd1b0(TYPE_ROCK, GetPokeType(mon))) {
+        switch (BtlCalc_GetTypePairEffectiveness(TYPE_ROCK, GetPokeType(mon))) {
         case TYPE_EFFECTIVENESS_IMMUNE:
         case TYPE_EFFECTIVENESS_QUARTER:
         default:
@@ -435,7 +435,7 @@ static void HandlerSideSpikes(BattleEventItem *item, BtlServerFlow *flow, u8 sid
     BattleHandlerDamageParam *damage;
 
     monId = BattleEventVar_GetValue(2);
-    if (side == GetSideFromMonID(monId) && !func_ov167_021abd74(flow, monId)) {
+    if (side == GetSideFromMonID(monId) && !BtlServerFlow_IsFloating(flow, monId)) {
         switch (GetSideEffectLayersOfItem(item, side)) {
         case 1:
         default:
@@ -474,7 +474,7 @@ static void HandlerSideToxicSpikes(BattleEventItem *item, BtlServerFlow *flow, u
     BattleHandlerAddConditionParam *condition;
 
     monId = BattleEventVar_GetValue(2);
-    if (side == GetSideFromMonID(monId) && !func_ov167_021abd74(flow, monId)) {
+    if (side == GetSideFromMonID(monId) && !BtlServerFlow_IsFloating(flow, monId)) {
         if (DoesMonHaveType(GetBattleMon(flow, monId), TYPE_POISON)) {
             remove = BattleHandler_PushWork(flow, 0x1a, monId);
             remove->side = side;
@@ -485,7 +485,7 @@ static void HandlerSideToxicSpikes(BattleEventItem *item, BtlServerFlow *flow, u
             condition = BattleHandler_PushWork(flow, 0xc, 0x1f);
             condition->condition = 5;
             if (GetSideEffectLayersOfItem(item, side) > 1) {
-                condition->value = func_ov167_021ce298();
+                condition->value = MakeConditionBadlyPoisoned();
             } else {
                 condition->value = MakeConditionPermanent();
             }
@@ -538,12 +538,12 @@ static void HandlerSideSeaOfFire(BattleEventItem *item, BtlServerFlow *flow, u8 
     BattleHandlerDamageParam *damage;
 
     monId = BattleEventVar_GetValue(2);
-    if (monId != 0x1f && func_ov167_021abc8c(flow, monId) && !func_ov167_021abf14(flow) &&
+    if (monId != 0x1f && BtlServerFlow_IsMonInBattle(flow, monId) && !BtlServerFlow_CheckMatchup(flow) &&
         side == GetSideFromMonID(monId)) {
         mon = GetBattleMon(flow, monId);
         if (!DoesMonHaveType(mon, TYPE_FIRE)) {
             effect = BattleHandler_PushWork(flow, 0x37, monId);
-            effect->pos1 = func_ov167_021abb50(flow, monId);
+            effect->pos1 = BtlServerFlow_MonIDToPos(flow, monId);
             effect->pos2 = 6;
             effect->effect = 0x28e;
             BattleHandler_PopWork(flow, effect);

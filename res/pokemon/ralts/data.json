@@ -1,0 +1,204 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Ralts",
+    "pokedex": {
+        "category": "Feeling Pokémon",
+        "entry": "If its horns capture the warm\nfeelings of people or Pokémon,\nits body warms up slightly.",
+        "height": "1'04\"",
+        "weight": "14.6 lbs.",
+        "languages": {
+            "en": {
+                "name": "Ralts",
+                "category": "Feeling Pokémon",
+                "entry": "If its horns capture the warm\nfeelings of people or Pokémon,\nits body warms up slightly.",
+                "height": "1'04\"",
+                "weight": "14.6 lbs."
+            },
+            "fr": {
+                "name": "Tarsal",
+                "category": "Pokémon Sentiment",
+                "entry": "Quand ses cornes captent les ondes\npositives d'un Pokémon ou d'un\nhumain, son corps se réchauffe.",
+                "height": "0,4 m",
+                "weight": "6,6 kg"
+            },
+            "de": {
+                "name": "Trasla",
+                "category": "Gefühl",
+                "entry": "Es erfasst warme Gefühle von\nMenschen und Pokémon mit seinen\nHörnern und wärmt sich daran auf.",
+                "height": "0,4 m",
+                "weight": "6,6 kg"
+            },
+            "it": {
+                "name": "Ralts",
+                "category": "Pokémon Sensazione",
+                "entry": "Se con le corna avverte emozioni positive\ndi persone o Pokémon, il suo corpo\nsi scalda leggermente.",
+                "height": "0,4 m",
+                "weight": "6,6 kg"
+            },
+            "ko": {
+                "name": "랄토스",
+                "category": "느낌포켓몬",
+                "entry": "빨간 뿔로 사람이나 포켓몬의\n따뜻한 마음을 캐치하면\n전신이 미약하게 뜨거워진다.",
+                "height": "0.4 m",
+                "weight": "6.6 kg"
+            },
+            "es": {
+                "name": "Ralts",
+                "category": "Pokémon Sensible",
+                "entry": "Si sus cuernos perciben emociones\npositivas de personas o Pokémon,\nsu cuerpo se calienta un poco.",
+                "height": "0,4 m",
+                "weight": "6,6 kg"
+            },
+            "ja": {
+                "name": "ラルトス",
+                "category": "きもちポケモン",
+                "entry": "あかいツノで\\x{3000}ひとや\\x{3000}ポケモンの\nあたたかな\\x{3000}きもちを\\x{3000}キャッチすると\nぜんしんが\\x{3000}ほのかに\\x{3000}あつくなる。",
+                "height": "\\x{ff10}\\x{ff0e}\\x{ff14}\\x{ff4d}",
+                "weight": "\\x{ff16}\\x{ff0e}\\x{ff16}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 28,
+        "attack": 25,
+        "defense": 25,
+        "speed": 40,
+        "special_attack": 45,
+        "special_defense": 35
+    },
+    "types": [ "TYPE_PSYCHIC", "TYPE_PSYCHIC" ],
+    "catch_rate": 235,
+    "evolution_stage": 1,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 0,
+        "speed": 0,
+        "special_attack": 1,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 20,
+    "base_friendship": 35,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_AMORPHOUS", "EGG_GROUP_AMORPHOUS" ],
+    "abilities": [ "ABILITY_SYNCHRONIZE", "ABILITY_TRACE" ],
+    "hidden_ability": "ABILITY_TELEPATHY",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_WHITE",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 40,
+    "height": 4,
+    "weight": 66,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_GROWL" ],
+            [ 6, "MOVE_CONFUSION" ],
+            [ 10, "MOVE_DOUBLE_TEAM" ],
+            [ 12, "MOVE_TELEPORT" ],
+            [ 17, "MOVE_LUCKY_CHANT" ],
+            [ 21, "MOVE_MAGICAL_LEAF" ],
+            [ 23, "MOVE_HEAL_PULSE" ],
+            [ 28, "MOVE_CALM_MIND" ],
+            [ 32, "MOVE_PSYCHIC" ],
+            [ 34, "MOVE_IMPRISON" ],
+            [ 39, "MOVE_FUTURE_SIGHT" ],
+            [ 43, "MOVE_CHARM" ],
+            [ 45, "MOVE_HYPNOSIS" ],
+            [ 50, "MOVE_DREAM_EATER" ],
+            [ 54, "MOVE_STORED_POWER" ]
+        ],
+        "by_tm": [
+            "TM03",
+            "TM04",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM16",
+            "TM17",
+            "TM18",
+            "TM19",
+            "TM20",
+            "TM21",
+            "TM24",
+            "TM27",
+            "TM29",
+            "TM30",
+            "TM32",
+            "TM33",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM49",
+            "TM51",
+            "TM56",
+            "TM57",
+            "TM61",
+            "TM70",
+            "TM73",
+            "TM77",
+            "TM85",
+            "TM86",
+            "TM87",
+            "TM90",
+            "TM92"
+        ],
+        "by_tutor": [
+            "MOVE_SIGNAL_BEAM",
+            "MOVE_THUNDER_PUNCH",
+            "MOVE_FIRE_PUNCH",
+            "MOVE_ICE_PUNCH",
+            "MOVE_MAGIC_COAT",
+            "MOVE_ICY_WIND",
+            "MOVE_ZEN_HEADBUTT",
+            "MOVE_HYPER_VOICE",
+            "MOVE_SNORE",
+            "MOVE_PAIN_SPLIT",
+            "MOVE_HELPING_HAND",
+            "MOVE_TRICK",
+            "MOVE_MAGIC_ROOM",
+            "MOVE_WONDER_ROOM",
+            "MOVE_RECYCLE",
+            "MOVE_SNATCH",
+            "MOVE_SLEEP_TALK",
+            "MOVE_SKILL_SWAP"
+        ],
+        "egg_moves": [
+            "MOVE_DISABLE",
+            "MOVE_MEAN_LOOK",
+            "MOVE_MEMENTO",
+            "MOVE_DESTINY_BOND",
+            "MOVE_GRUDGE",
+            "MOVE_SHADOW_SNEAK",
+            "MOVE_CONFUSE_RAY",
+            "MOVE_ENCORE",
+            "MOVE_SYNCHRONOISE",
+            "MOVE_SKILL_SWAP"
+        ]
+    },
+    "evolutions": [
+        {
+            "method": "EVO_METHOD_LEVEL",
+            "param": 20,
+            "species": "SPECIES_KIRLIA"
+        }
+    ],
+    "regional_dex_number": null,
+    "baby_species": "SPECIES_RALTS",
+    "cry_volume": 120
+}

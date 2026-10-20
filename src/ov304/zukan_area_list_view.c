@@ -176,7 +176,7 @@ void ZukanAreaListView_Exit(ZukanAreaListView *view) {
 }
 
 void ZukanAreaListView_VBlank(ZukanAreaListView *view) {
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(view->paletteFade);
 }
 
@@ -210,7 +210,7 @@ void ZukanAreaListView_Main(ZukanAreaListView *view) {
         GFL_BGSysMoveBGReq(7, BG_MOVE_RIGHT, 1);
         view->scrollTimer = 0;
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 u32 ZukanAreaListView_ListMain(ZukanAreaListView *view) {
@@ -417,8 +417,8 @@ static void ZukanAreaListView_InitBG(void) {
 
 static void ZukanAreaListView_InitActorSys(ZukanAreaListView *view) {
     ZukanAreaListView_CreateActorSys();
-    view->actorUnit = func_0204bf1c(112, 0, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c028(view->actorUnit);
+    view->actorUnit = ClActUnit_Create(112, 0, HEAPID_ZUKAN_AREA_LIST);
+    ClActUnit_UseSystemRenderer(view->actorUnit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
@@ -426,7 +426,7 @@ static void ZukanAreaListView_InitActorSys(ZukanAreaListView *view) {
 // The windows cover the whole of their screens, the lower and the upper
 static void ZukanAreaListView_InitWindows(ZukanAreaListView *view) {
     BmpWin_InitAllocator(HEAPID_ZUKAN_AREA_LIST);
-    view->printQueue = func_02021998(HEAPID_ZUKAN_AREA_LIST);
+    view->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_AREA_LIST);
 
     view->windows[ZUKAN_AREA_LIST_WIN_MAIN] = BmpWin_CreateDynamic(0, 0, 0, 32, 24, 15, 0);
     BmpWin_FlushMap(view->windows[ZUKAN_AREA_LIST_WIN_MAIN]);
@@ -468,9 +468,11 @@ static void ZukanAreaListView_LoadGraphics(void) {
 
     // The touch bar
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_AREA_LIST);
-    GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), 1, 0, FALSE, HEAPID_ZUKAN_AREA_LIST);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20, HEAPID_ZUKAN_AREA_LIST);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 1, 0, 0, FALSE, HEAPID_ZUKAN_AREA_LIST);
+    GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), 1, 0, FALSE, HEAPID_ZUKAN_AREA_LIST);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20,
+                                HEAPID_ZUKAN_AREA_LIST);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 1, 0, 0, FALSE,
+                                           HEAPID_ZUKAN_AREA_LIST);
     GFL_BGSysSetScrPaletteNo(1, 0, 21, 32, 3, 14);
     GFL_BGSysQueueScrLoad(1);
     GFL_ArcToolFree(arc);
@@ -518,10 +520,10 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
         setup.vramType = 0;
         setup.flags = 0;
         setup.arcId = getUINarcIdx();
-        setup.paletteFile = func_0202d810();
-        setup.charFile = func_0202d814();
-        setup.cellFile = func_0202d818(2);
-        setup.animFile = func_0202d81c(2);
+        setup.paletteFile = AppMenuCommon_GetTouchBarPaletteFile();
+        setup.charFile = AppMenuCommon_GetTouchBarCharFile();
+        setup.cellFile = AppMenuCommon_GetTouchBarCellFile(2);
+        setup.animFile = AppMenuCommon_GetTouchBarAnimFile(2);
         setup.paletteOffset = 10;
         setup.paletteStart = 0;
         setup.paletteCount = 3;
@@ -531,59 +533,59 @@ static void ZukanAreaListView_CreateActors(ZukanAreaListView *view) {
     for (i = ZUKAN_AREA_LIST_OBJ_MARK; i < ZUKAN_AREA_LIST_OBJ_MARK + ZUKAN_AREA_LIST_MARK_COUNT; i++) {
         view->actors[i] = UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 12,
                                                HEAPID_ZUKAN_AREA_LIST);
-        func_0204c124(view->actors[i], FALSE);
-        func_0204c468(view->actors[i], 2);
-        func_0204c318(view->actors[i], GX_OAM_MODE_XLU);
+        ClActor_SetVisible(view->actors[i], FALSE);
+        ClActor_SetBgPriority(view->actors[i], 2);
+        ClActor_SetObjMode(view->actors[i], GX_OAM_MODE_XLU);
     }
     for (i = ZUKAN_AREA_LIST_OBJ_MARK_SUB; i < ZUKAN_AREA_LIST_OBJ_MARK_SUB + ZUKAN_AREA_LIST_MARK_COUNT; i++) {
         view->actors[i] = UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_SUB], view->actorUnit, 0, 0, 12,
                                                HEAPID_ZUKAN_AREA_LIST);
-        func_0204c124(view->actors[i], FALSE);
-        func_0204c468(view->actors[i], 2);
-        func_0204c318(view->actors[i], GX_OAM_MODE_XLU);
+        ClActor_SetVisible(view->actors[i], FALSE);
+        ClActor_SetBgPriority(view->actors[i], 2);
+        ClActor_SetObjMode(view->actors[i], GX_OAM_MODE_XLU);
     }
     // The marks' windows on the upper screen show the row under them unblended
     for (i = ZUKAN_AREA_LIST_OBJ_MARK_WINDOW; i < ZUKAN_AREA_LIST_OBJ_MARK_WINDOW + ZUKAN_AREA_LIST_MARK_COUNT; i++) {
         view->actors[i] = UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_SUB], view->actorUnit, 0, 0, 12,
                                                HEAPID_ZUKAN_AREA_LIST);
-        func_0204c124(view->actors[i], TRUE);
-        func_0204c318(view->actors[i], 2);
+        ClActor_SetVisible(view->actors[i], TRUE);
+        ClActor_SetObjMode(view->actors[i], 2);
     }
 
     view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE] =
         UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 64, 15, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
+    ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
     func_0204c520(view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE], TRUE);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_MODE_UPPER] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 110, 13, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_UPPER], TRUE);
-    func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_UPPER], 2);
+    ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_UPPER], TRUE);
+    ClActor_SetBgPriority(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_UPPER], 2);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_MODE_LOWER] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 133, 13, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_LOWER], TRUE);
-    func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_LOWER], 2);
+    ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_LOWER], TRUE);
+    ClActor_SetBgPriority(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_LOWER], 2);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 156, 14, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT], TRUE);
-    func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT], 2);
+    ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT], TRUE);
+    ClActor_SetBgPriority(view->actors[ZUKAN_AREA_LIST_OBJ_MODE_HABITAT], 2);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_MODE] =
         UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 32, 180, 1, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MODE], TRUE);
+    ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_MODE], TRUE);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_BAR] =
         UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 2, HEAPID_ZUKAN_AREA_LIST);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL] =
         UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 252, 84, 3, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL], 1);
+    ClActor_SetBgPriority(view->actors[ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL], 1);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME] =
         UIObjRes_CreateActor(&view->res[ZUKAN_AREA_LIST_RES_MAIN], view->actorUnit, 0, 0, 32, HEAPID_ZUKAN_AREA_LIST);
-    func_0204c468(view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME], 1);
+    ClActor_SetBgPriority(view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME], 1);
 
     view->actors[ZUKAN_AREA_LIST_OBJ_PAGE_UP] = UIObjRes_CreateActor(
         &view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR], view->actorUnit, 132, 168, 4, HEAPID_ZUKAN_AREA_LIST);
@@ -641,8 +643,8 @@ static void ZukanAreaListView_ExitActors(ZukanAreaListView *view) {
     UIObjRes_Free(&view->res[ZUKAN_AREA_LIST_RES_MAIN]);
     UIObjRes_Free(&view->res[ZUKAN_AREA_LIST_RES_SUB]);
     UIObjRes_Free(&view->res[ZUKAN_AREA_LIST_RES_TOUCHBAR]);
-    func_0204bf98(view->actorUnit);
-    func_0204b758();
+    ClActUnit_Delete(view->actorUnit);
+    ClActSys_Delete();
 }
 
 static void ZukanAreaListView_ExitPaletteFade(ZukanAreaListView *view) {
@@ -654,8 +656,8 @@ static void ZukanAreaListView_ExitPaletteFade(ZukanAreaListView *view) {
 }
 
 static void ZukanAreaListView_ExitWindows(ZukanAreaListView *view) {
-    func_02021c44(view->printQueue);
-    func_02021a18(view->printQueue);
+    PrintQueue_Clear(view->printQueue);
+    PrintQueue_Free(view->printQueue);
     GFL_FontFree(view->font);
     BmpWin_FreeAllocator();
     BmpWin_Free(view->windows[ZUKAN_AREA_LIST_WIN_MAIN]);
@@ -701,15 +703,15 @@ static void ZukanAreaListView_Update(ZukanAreaListView *view) {
     int window;
 
     view->printed = FALSE;
-    func_02021a3c(view->printQueue);
+    PrintQueue_Main(view->printQueue);
     for (i = 0; i < ZUKAN_AREA_LIST_MARK_COUNT; i++) {
         ClActor *actor = view->actors[ZUKAN_AREA_LIST_OBJ_MARK + i];
         ZukanAreaListMark *mark = &view->marks[0][i];
 
         if (mark->changed == TRUE) {
-            func_0204c124(actor, mark->visible);
-            func_0204c488(actor, mark->anim);
-            func_0204c140(actor, &mark->pos, 0);
+            ClActor_SetVisible(actor, mark->visible);
+            ClActor_SetSequence(actor, mark->anim);
+            ClActor_SetSurfacePos(actor, &mark->pos, 0);
             mark->changed = FALSE;
         }
     }
@@ -719,13 +721,13 @@ static void ZukanAreaListView_Update(ZukanAreaListView *view) {
         ClActor *window = view->actors[i + ZUKAN_AREA_LIST_OBJ_MARK_WINDOW - ZUKAN_AREA_LIST_OBJ_MARK_SUB];
 
         if (mark->changed == TRUE) {
-            func_0204c124(actor, mark->visible);
-            func_0204c488(actor, mark->anim);
-            func_0204c140(actor, &mark->pos, 1);
+            ClActor_SetVisible(actor, mark->visible);
+            ClActor_SetSequence(actor, mark->anim);
+            ClActor_SetSurfacePos(actor, &mark->pos, 1);
             mark->changed = FALSE;
-            func_0204c124(window, mark->visible);
-            func_0204c140(window, &mark->pos, 1);
-            func_0204c488(window, mark->anim);
+            ClActor_SetVisible(window, mark->visible);
+            ClActor_SetSurfacePos(window, &mark->pos, 1);
+            ClActor_SetSequence(window, mark->anim);
         }
     }
     for (window = 0; window < ZUKAN_AREA_LIST_WIN_COUNT; window++) {
@@ -827,8 +829,8 @@ void ZukanAreaListView_InitList(ZukanAreaListView *view, u32 count, ZukanHabitat
     GFL_ArcToolFree(arc);
 
     if (count <= ZUKAN_AREA_LIST_ROWS) {
-        func_0204c124(ZukanAreaListView_GetActor(view, ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL), FALSE);
-        func_0204c124(ZukanAreaListView_GetActor(view, ZUKAN_AREA_LIST_OBJ_SCROLL_BAR), FALSE);
+        ClActor_SetVisible(ZukanAreaListView_GetActor(view, ZUKAN_AREA_LIST_OBJ_SCROLL_RAIL), FALSE);
+        ClActor_SetVisible(ZukanAreaListView_GetActor(view, ZUKAN_AREA_LIST_OBJ_SCROLL_BAR), FALSE);
     } else {
         ZukanAreaListView_UpdateScrollBar(view);
     }
@@ -907,7 +909,7 @@ static void ZukanAreaListView_SelectItem(void *work, u32 index, BOOL moved) {
     ZukanAreaListView *view = work;
 
     ZukanAreaListView_MoveMarkFrame(view);
-    if (func_0203da48()) {
+    if (GFL_HIDIsTouchPressed()) {
         ZukanAreaListView_UpdateDecideButton(view);
     }
 }
@@ -995,7 +997,7 @@ static void ZukanAreaListView_UpdateScrollBar(ZukanAreaListView *view) {
     ClActorPos pos;
     u32 y;
 
-    func_0204c178(actor, &pos, 0);
+    ClActor_GetSurfacePos(actor, &pos, 0);
     y = FrameList_ClampBarPos(view->list, pos.y);
     if (y < SCROLL_BAR_TOP) {
         y = SCROLL_BAR_TOP;
@@ -1004,7 +1006,7 @@ static void ZukanAreaListView_UpdateScrollBar(ZukanAreaListView *view) {
     }
     pos.x = 252;
     pos.y = y;
-    func_0204c140(actor, &pos, 0);
+    ClActor_SetSurfacePos(actor, &pos, 0);
 }
 
 void ZukanAreaListView_HideUndrawnMarks(ZukanAreaListView *view) {
@@ -1063,21 +1065,21 @@ ZukanHabitatSummary *ZukanAreaListView_GetArea(ZukanAreaListView *view, u32 inde
 void ZukanAreaListView_SetActorAnim(ZukanAreaListView *view, u32 index, u32 anim) {
     ClActor *actor = ZukanAreaListView_GetActor(view, index);
 
-    func_0204c488(actor, anim);
-    func_0204c4d4(actor, 0);
+    ClActor_SetSequence(actor, anim);
+    ClActor_SetAnimTime(actor, 0);
     func_0204c520(actor, TRUE);
 }
 
 static BOOL ZukanAreaListView_IsActorAnimating(ZukanAreaListView *view, u32 index) {
-    return func_0204c560(view->actors[index]);
+    return ClActor_IsAnimActive(view->actors[index]);
 }
 
 static u16 ZukanAreaListView_GetActorAnim(ZukanAreaListView *view, u32 index) {
-    return func_0204c4a0(view->actors[index]);
+    return ClActor_GetSequence(view->actors[index]);
 }
 
 static void ZukanAreaListView_ShowMarkFrame(ZukanAreaListView *view, BOOL visible) {
-    func_0204c124(view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME], visible);
+    ClActor_SetVisible(view->actors[ZUKAN_AREA_LIST_OBJ_MARK_FRAME], visible);
 }
 
 // Puts the frame around the marks of the cursor's row, as wide as the marks it has
@@ -1098,7 +1100,7 @@ static void ZukanAreaListView_MoveMarkFrame(ZukanAreaListView *view) {
             pos.x -= 16;
         }
     }
-    func_0204c140(actor, &pos, 0);
+    ClActor_SetSurfacePos(actor, &pos, 0);
     ZukanAreaListView_SetActorAnim(view, ZUKAN_AREA_LIST_OBJ_MARK_FRAME, anims[count]);
 }
 
@@ -1134,9 +1136,9 @@ void ZukanAreaListView_Slide(ZukanAreaListView *view, int offset, BOOL touchbar)
             ClActor *actor = view->actors[i];
             ClActorPos pos;
 
-            func_0204c178(actor, &pos, 0);
+            ClActor_GetSurfacePos(actor, &pos, 0);
             pos.y += (s16)offset;
-            func_0204c140(actor, &pos, 0);
+            ClActor_SetSurfacePos(actor, &pos, 0);
         }
     } else {
         GFL_BGSysMoveBGReq(4, BG_MOVE_UP, offset);
@@ -1148,10 +1150,10 @@ static void ZukanAreaListView_UpdateDecideButton(ZukanAreaListView *view) {
     ClActor *actor = view->actors[ZUKAN_AREA_LIST_OBJ_DECIDE];
 
     if (view->listBusy == FALSE) {
-        func_0204c4d4(actor, 0);
-        func_0204c488(actor, 40);
+        ClActor_SetAnimTime(actor, 0);
+        ClActor_SetSequence(actor, 40);
     } else {
-        func_0204c488(actor, 15);
+        ClActor_SetSequence(actor, 15);
     }
 }
 

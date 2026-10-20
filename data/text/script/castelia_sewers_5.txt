@@ -1,5 +1,0 @@
-CasteliaSewers5_Text_LotsToxinsBuildUp = Lots of toxins build up in the sewer\nsystem. I think I can use them to make{be00}\nmedicines. So I'm running an experiment!{be01}\nIf this works, I might be able to use the\nvenom of Poison-type Pokémon to make{be00}\ndifferent medicines. How exciting!{be01}\nWell, well...\nThe result of today's experiment was...{be01}
-CasteliaSewers5_Text_WellTodaysExperimentCould = Well, today's experiment could have\ngone better.{be01}\nBut I did manage to make a Potion.\nHere, you can have it!{be01}
-CasteliaSewers5_Text_TodaysExperimentSuccessHere = Today's experiment was a success!{be01}\nHere! Please accept the\nSuper Potion I made.{be01}
-CasteliaSewers5_Text_WowTodaysExperimentSuper = Wow! Today's experiment\nwas super successful!{be01}\nHere! Please accept\nthe Revive I made!{be01}
-CasteliaSewers5_Text_IllKeepExperimentingEvery = I'll keep experimenting every day!\nIt's important to keep trying.{be00}\nCome back and see how it's going!

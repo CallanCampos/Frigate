@@ -1,0 +1,31 @@
+{
+    "$schema": "../move.schema.json",
+    "name": "Twister",
+    "description": "The user whips up a vicious tornado\nto tear at the opposing team.\nIt may also make targets flinch.",
+    "type": "TYPE_DRAGON",
+    "quality": "MOVE_QUALITY_DAMAGE",
+    "category": "MOVE_CATEGORY_SPECIAL",
+    "power": 40,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": 0,
+    "hits": {
+        "min": 0,
+        "max": 0
+    },
+    "inflicts": {
+        "condition": "CONDITION_NONE",
+        "chance": 0,
+        "duration": 0,
+        "min_turns": 0,
+        "max_turns": 0
+    },
+    "crit_stage": 0,
+    "flinch_chance": 20,
+    "effect": "BATTLE_EFFECT_FLINCH_DOUBLE_DAMAGE_FLY_OR_BOUNCE",
+    "drain": 0,
+    "heal": 0,
+    "target": "MOVE_TARGET_ADJACENT_FOES",
+    "stat_changes": [],
+    "flags": [ "MOVE_FLAG_PROTECT", "MOVE_FLAG_MIRROR_MOVE" ]
+}

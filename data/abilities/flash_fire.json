@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Flash Fire",
-    "description": "It powers up Fire-type\nmoves if it's hit by one."
-}

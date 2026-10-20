@@ -15,9 +15,9 @@ typedef void (*BackupWriteErrorCallback)(BOOL noResponse);
 // Whether the card has the 4-megabit flash the game expects
 BOOL identifyGameCardBackup(void);
 // Writes and waits, returning whether the write succeeded
-BOOL func_0203bfd4(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback);
+BOOL writeFlashWaitSuccess(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback);
 BOOL readFlashWaitSuccess(u32 src, void *dest, u32 size, BackupReadErrorCallback callback);
-u16 func_0203c07c(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback);
+u16 startWriteFlash(u32 dest, const void *src, u32 size, BackupWriteErrorCallback callback);
 // Returns whether the write has ended, and if so whether it succeeded in *result
 BOOL finishBackupGetResult(u16 lockId, BOOL *result, BackupWriteErrorCallback callback);
 void cancelCardProcess(u16 lockId);

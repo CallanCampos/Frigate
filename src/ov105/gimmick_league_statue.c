@@ -12,9 +12,9 @@ typedef struct {
     u16 heapId;
 } GimmickWork;
 
-void func_ov105_021eecd4(GimmickWork *work, Field *field);
-void func_ov105_021eee24(GimmickWork *work, Field *field);
-void func_ov105_021eee28(GimmickWork *work, Field *field);
+void LeagueStatue_LoadScene(GimmickWork *work, Field *field);
+void LeagueStatue_DummyInit(GimmickWork *work, Field *field);
+void LeagueStatue_DummyEnd(GimmickWork *work, Field *field);
 
 static const G3DSceneAnimationSetup sAnimations01[] = { { 1, 0 } };
 static const G3DSceneAnimationSetup sAnimations08[] = { { 8, 0 }, { 9, 0 } };
@@ -60,30 +60,30 @@ static const VecFx32 sActorPositions[6] = {
 
 // clang-format on
 
-void func_ov105_021eec80(Field *field) {
+void LeagueStatue_Init(Field *field) {
     u16 heapId;
     GimmickWork *work;
 
     heapId = Field_GetHeapID(field);
     work = Field_AllocGimmickWorkBlock(field, 0, heapId, sizeof(GimmickWork));
     work->heapId = heapId;
-    func_ov105_021eecd4(work, field);
-    func_ov105_021eee24(work, field);
+    LeagueStatue_LoadScene(work, field);
+    LeagueStatue_DummyInit(work, field);
 }
 
-void func_ov105_021eecac(Field *field) {
+void LeagueStatue_End(Field *field) {
     GimmickWork *work;
 
     work = Field_GetGimmickWorkBlock(field, 0);
-    func_ov105_021eee28(work, field);
+    LeagueStatue_DummyEnd(work, field);
     Field_DeleteGimmickWorkBlock(field, 0);
 }
 
-void func_ov105_021eecc8(Field *field) {
+void LeagueStatue_Update(Field *field) {
     FieldExpObj_StepAllAnimations(Field_GetExpObjSystem(field));
 }
 
-void func_ov105_021eecd4(GimmickWork *work, Field *field) {
+void LeagueStatue_LoadScene(GimmickWork *work, Field *field) {
     EventWork *eventWork;
     FieldExpObjSystem *system;
     SRTMatrix *matrix;
@@ -129,8 +129,8 @@ void func_ov105_021eecd4(GimmickWork *work, Field *field) {
     }
 }
 
-void func_ov105_021eee24(GimmickWork *work, Field *field) {
+void LeagueStatue_DummyInit(GimmickWork *work, Field *field) {
 }
 
-void func_ov105_021eee28(GimmickWork *work, Field *field) {
+void LeagueStatue_DummyEnd(GimmickWork *work, Field *field) {
 }

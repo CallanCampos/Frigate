@@ -20,7 +20,7 @@
 #include "system/game_beacon.h"
 #include "system/game_comm.h"
 
-BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
+BtlServer *BattleServer_Create(BtlMainModule *mainModule, const MATHRandContext32 *rand, BtlPokeCon *pokeCon, u32 a3,
                                HeapID heapId) {
     BtlServer *server = GFL_HeapAllocate(heapId, sizeof(BtlServer), TRUE, "btl_server.c", 0xae);
     int i;
@@ -36,150 +36,150 @@ BtlServer *func_ov167_0219e3cc(BtlMainModule *mainModule, const MATHRandContext3
     server->unk4C = a3;
     server->rand = *rand;
     server->strBuf = GFL_StrBufCreate(0x20, heapId);
-    func_ov167_021bd090(rand);
+    BtlCalc_ResetRand(rand);
     for (i = 0; i < 4; i++) {
-        func_ov167_0219f22c(&server->clients[i]);
+        ServerClient_Clear(&server->clients[i]);
     }
-    server->flow =
-        func_ov167_0219f390(server, server->mainModule, server->pokeCon, &server->queue, server->unk4C, server->heapId);
-    server->clientIdList = func_ov167_0219ffe4(server->flow);
-    func_ov167_0219e5f0(server, func_ov167_0219e608);
+    server->flow = BtlServerFlow_Create(server, server->mainModule, server->pokeCon, &server->queue, server->unk4C,
+                                        server->heapId);
+    server->clientIdList = BtlServerFlow_GetClientIDList(server->flow);
+    BattleServer_SetProc(server, BattleServer_ProcStart);
     return server;
 }
 
-void func_ov167_0219e498(BtlServer *server, BtlAdapter *adapter, u8 clientId, u8 numCoverPos) {
+void BattleServer_AttachClient(BtlServer *server, BtlAdapter *adapter, u8 clientId, u8 numCoverPos) {
     BattleParty *party = GetPartyData(server->pokeCon, clientId);
 
-    func_ov167_0219f244(&server->clients[clientId], clientId, adapter, TRUE);
-    func_ov167_0219f24c(&server->clients[clientId], party, numCoverPos);
+    ServerClient_Attach(&server->clients[clientId], clientId, adapter, TRUE);
+    ServerClient_SetParty(&server->clients[clientId], party, numCoverPos);
 }
 
-void func_ov167_0219e4d0(BtlServer *server, u32 mode, void *netHandle, u8 clientId, u8 numCoverPos) {
+void BattleServer_AttachNetClient(BtlServer *server, u32 mode, void *netHandle, u8 clientId, u8 numCoverPos) {
     BattleParty *party = GetPartyData(server->pokeCon, clientId);
-    BtlAdapter *adapter = func_ov167_021d4a44(netHandle, clientId, TRUE, server->heapId);
+    BtlAdapter *adapter = BtlAdapter_Create(netHandle, clientId, TRUE, server->heapId);
 
-    func_ov167_0219f244(&server->clients[clientId], clientId, adapter, FALSE);
-    func_ov167_0219f24c(&server->clients[clientId], party, numCoverPos);
+    ServerClient_Attach(&server->clients[clientId], clientId, adapter, FALSE);
+    ServerClient_SetParty(&server->clients[clientId], party, numCoverPos);
 }
 
-void func_ov167_0219e514(BtlServer *server, u8 clientId, u8 numCoverPos) {
+void BattleServer_AttachCmdCheckClient(BtlServer *server, u8 clientId, u8 numCoverPos) {
     BattleParty *party = GetPartyData(server->pokeCon, clientId);
 
-    func_ov167_0219f244(&server->clients[clientId], clientId, NULL, FALSE);
-    func_ov167_0219f24c(&server->clients[clientId], party, numCoverPos);
+    ServerClient_Attach(&server->clients[clientId], clientId, NULL, FALSE);
+    ServerClient_SetParty(&server->clients[clientId], party, numCoverPos);
 }
 
-void func_ov167_0219e544(BtlServer *server) {
-    func_ov167_0219e5f0(server, func_ov167_0219e608);
-    func_ov167_0219f200(server);
-    func_ov167_0219f3f8(server->flow);
+void BattleServer_Start(BtlServer *server) {
+    BattleServer_SetProc(server, BattleServer_ProcStart);
+    BattleServer_ResetAdapters(server);
+    BtlServerFlow_ResetSystem(server->flow);
 }
 
-void func_ov167_0219e560(BtlServer *server) {
+void BattleServer_Delete(BtlServer *server) {
     int i;
 
     GFL_StrBufFree(server->strBuf);
-    func_ov167_0219f570(server->flow);
+    BtlServerFlow_Delete(server->flow);
     for (i = 0; i < 4; i++) {
         if (server->clients[i].clientId != 0xff && server->clients[i].adapter != NULL &&
             !server->clients[i].isAttached) {
-            func_ov167_021d4acc(server->clients[i].adapter);
+            BtlAdapter_Delete(server->clients[i].adapter);
         }
     }
     GFL_HeapFree(server);
 }
 
-BOOL func_ov167_0219e5a0(BtlServer *server) {
+BOOL BattleServer_Main(BtlServer *server) {
     if (server->state != 2) {
         if (server->proc(server, &server->seq)) {
-            func_ov167_0219f128(server, 9, server->clientIdList, sizeof(BtlClientIDList));
+            BattleServer_BroadcastCmdData(server, 9, server->clientIdList, sizeof(BtlClientIDList));
             server->state = 2;
         }
-    } else if (func_ov167_0219f19c(server)) {
+    } else if (BattleServer_AllClientsReplied(server)) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov167_0219e5e0(BtlServer *server, BtlClientIDList *out) {
+void BattleServer_GetClientIDList(BtlServer *server, BtlClientIDList *out) {
     *out = *server->clientIdList;
 }
 
-void func_ov167_0219e5f0(BtlServer *server, BtlServerProc proc) {
+void BattleServer_SetProc(BtlServer *server, BtlServerProc proc) {
     server->proc = proc;
     server->seq = 0;
 }
 
-void func_ov167_0219e5f8(BtlServer *server) {
-    func_ov167_0219e5f0(server, func_ov167_0219e6b0);
+void BattleServer_SetSelectActionProc(BtlServer *server) {
+    BattleServer_SetProc(server, BattleServer_ProcSelectAction);
 }
 
-BOOL func_ov167_0219e608(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcStart(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f11c(server, 1);
+        BattleServer_BroadcastCmd(server, 1);
         (*seq)++;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             if (BtlSetup_GetBattleType(server->mainModule) != 4) {
-                func_ov167_0219f000(server, func_ov167_0219f588(server->flow));
+                BattleServer_SendRecStartChunk(server, BtlServerFlow_StartBattle(server->flow));
                 (*seq)++;
             } else {
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             }
         }
         break;
     case 2:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 3:
-        func_ov167_0219f128(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 4:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
-            func_ov167_0219e5f8(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
+            BattleServer_SetSelectActionProc(server);
         }
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219e6b0(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcSelectAction(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
         if (func_ov167_0219fe24(server->flow)) {
-            func_ov167_0219f128(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+            BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
             (*seq)++;
         } else {
             *seq += 2;
         }
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 2:
-        func_ov167_0219f11c(server, 3);
+        BattleServer_BroadcastCmd(server, 3);
         (*seq)++;
         break;
     case 3:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
-            if (func_ov167_0219df10(server->mainModule)) {
-                func_ov167_0219e5f0(server, func_ov167_0219ec0c);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
+            if (IsGameTimeUp(server->mainModule)) {
+                BattleServer_SetProc(server, BattleServer_ProcTimeUp);
             } else if (func_ov167_0219df50(server->mainModule)) {
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             } else {
-                func_ov167_0219f0ac(server);
-                if (func_ov167_0219f02c(server, 1, func_ov167_0219e860(server))) {
+                BattleServer_StoreClientActions(server);
+                if (BattleServer_SendRecActionsChunk(server, 1, BattleServer_IsActionChapter(server))) {
                     (*seq)++;
                 } else {
                     *seq += 2;
@@ -188,29 +188,29 @@ BOOL func_ov167_0219e6b0(BtlServer *server, int *seq) {
         }
         break;
     case 4:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 5:
-        func_ov167_0219f65c(server->flow);
-        func_ov167_0219f1d4(server);
+        BtlServerFlow_PrepareTurn(server->flow);
+        BattleServer_FinishCmd(server);
         (*seq)++;
     case 6:
-        server->flowResult = func_ov167_0219f66c(server->flow, &server->clientActions);
-        if (func_ov167_0219bee4(server->mainModule)) {
+        server->flowResult = BtlServerFlow_RunTurn(server->flow, &server->clientActions);
+        if (GetCommMode(server->mainModule)) {
             func_ov167_0219ef70(&server->clientActions);
         }
-        func_ov167_0219f128(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 7:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             switch (server->flowResult) {
             case 0:
-                func_ov167_0219e5f8(server);
+                BattleServer_SetSelectActionProc(server);
                 break;
             case 3:
                 *seq = 6;
@@ -220,22 +220,22 @@ BOOL func_ov167_0219e6b0(BtlServer *server, int *seq) {
                 u32 battleStyle = BtlSetup_GetBattleStyle(server->mainModule);
 
                 if (battleType == 0 && battleStyle == 0) {
-                    func_ov167_0219e5f0(server, func_ov167_0219e864);
+                    BattleServer_SetProc(server, BattleServer_ProcAskEscape);
                 } else {
-                    func_ov167_0219e5f0(server, func_ov167_0219e8fc);
+                    BattleServer_SetProc(server, BattleServer_ProcChangePokemonEndTurn);
                 }
                 break;
             }
             case 1:
-                func_ov167_0219e5f0(server, func_ov167_0219eae4);
+                BattleServer_SetProc(server, BattleServer_ProcChangePokemonMidTurn);
                 break;
             case 6:
                 func_ov167_0219c9fc(server->mainModule, func_ov167_0219fff0(server->flow));
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 return FALSE;
             case 4:
-                func_ov167_0219ca48(server->mainModule, func_ov167_021ac018(server->flow));
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 return FALSE;
             case 5:
             default:
@@ -247,68 +247,68 @@ BOOL func_ov167_0219e6b0(BtlServer *server, int *seq) {
     return FALSE;
 }
 
-BOOL func_ov167_0219e860(BtlServer *server) {
+BOOL BattleServer_IsActionChapter(BtlServer *server) {
     return TRUE;
 }
 
-BOOL func_ov167_0219e864(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcAskEscape(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f11c(server, 7);
+        BattleServer_BroadcastCmd(server, 7);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
+        if (BattleServer_AllClientsReplied(server)) {
             u8 clientId = GetPlayerClientID(server->mainModule);
             u8 *reply;
 
-            func_ov167_0219f1d4(server);
-            reply = func_ov167_021d4b50(server->clients[clientId].adapter, NULL);
+            BattleServer_FinishCmd(server);
+            reply = BtlAdapter_GetReturnData(server->clients[clientId].adapter, NULL);
             if (*reply == 0) {
-                func_ov167_0219e5f0(server, func_ov167_0219e8fc);
+                BattleServer_SetProc(server, BattleServer_ProcChangePokemonEndTurn);
                 break;
             }
-            server->flowResult = func_ov167_0219fdf4(server->flow);
-            func_ov167_0219f128(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+            server->flowResult = BtlServerFlow_TryEscape(server->flow);
+            BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             if (server->flowResult) {
                 return TRUE;
             }
-            func_ov167_0219e5f0(server, func_ov167_0219e8fc);
+            BattleServer_SetProc(server, BattleServer_ProcChangePokemonEndTurn);
         }
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219e8fc(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcChangePokemonEndTurn(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 5, server->posList, server->count);
+        BattleServer_BroadcastCmdData(server, 5, server->posList, server->count);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
+        if (BattleServer_AllClientsReplied(server)) {
             if (DoesSwitchModeNeedConfirming(server)) {
                 server->switchModeMonId = GetNextEnemyForSwitchMode(server);
-                func_ov167_0219f16c(server, 4, 0, &server->switchModeMonId, 1);
+                BattleServer_SendCmdToClient(server, 4, 0, &server->switchModeMonId, 1);
             }
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             if (func_ov167_0219df50(server->mainModule)) {
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             } else {
-                func_ov167_0219f0ac(server);
-                if (func_ov167_0219f02c(server, 2, FALSE)) {
+                BattleServer_StoreClientActions(server);
+                if (BattleServer_SendRecActionsChunk(server, 2, FALSE)) {
                     (*seq)++;
                 } else {
                     *seq += 2;
@@ -317,23 +317,23 @@ BOOL func_ov167_0219e8fc(BtlServer *server, int *seq) {
         }
         break;
     case 3:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 4:
-        func_ov167_0219f1d4(server);
-        func_ov167_0219f7a8(server->flow);
+        BattleServer_FinishCmd(server);
+        BtlServerFlow_PrepareFaintSwitch(server->flow);
         (*seq)++;
     case 5:
-        server->flowResult = func_ov167_0219f7b4(server->flow, &server->clientActions);
-        func_ov167_0219f128(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        server->flowResult = BtlServerFlow_RunFaintSwitch(server->flow, &server->clientActions);
+        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 6:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             switch (server->flowResult) {
             case 2:
                 *seq = 0;
@@ -342,13 +342,13 @@ BOOL func_ov167_0219e8fc(BtlServer *server, int *seq) {
                 *seq = 5;
                 break;
             case 4:
-                func_ov167_0219ca48(server->mainModule, func_ov167_021ac018(server->flow));
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 break;
             case 5:
                 return TRUE;
             default:
-                func_ov167_0219e5f8(server);
+                BattleServer_SetSelectActionProc(server);
                 break;
             }
         }
@@ -364,7 +364,7 @@ BOOL DoesSwitchModeNeedConfirming(BtlServer *server) {
 
     if (IsSwitchMode(server->mainModule) && server->count != 0) {
         for (i = 0; i < server->count; i++) {
-            if (func_ov167_0219c650(server->mainModule, server->posList[i]) == 0) {
+            if (GetClientIDFromPos(server->mainModule, server->posList[i]) == 0) {
                 return FALSE;
             }
         }
@@ -384,7 +384,7 @@ u8 GetNextEnemyForSwitchMode(BtlServer *server) {
 
     client = &server->clients[1];
     if (IsSwitchModeEnabled(client)) {
-        action = func_ov167_021d4b50(client->adapter, NULL);
+        action = BtlAdapter_GetReturnData(client->adapter, NULL);
         if (BattleAction_GetAction(action) == 3) {
             slot = action->change.slot;
             return GetMonID(GetClientMonData(server->pokeCon, 1, slot));
@@ -393,20 +393,20 @@ u8 GetNextEnemyForSwitchMode(BtlServer *server) {
     return 31;
 }
 
-BOOL func_ov167_0219eae4(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcChangePokemonMidTurn(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 6, server->posList, server->count);
+        BattleServer_BroadcastCmdData(server, 6, server->posList, server->count);
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             if (func_ov167_0219df50(server->mainModule)) {
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
             } else {
-                func_ov167_0219f0ac(server);
-                if (func_ov167_0219f02c(server, 3, FALSE)) {
+                BattleServer_StoreClientActions(server);
+                if (BattleServer_SendRecActionsChunk(server, 3, FALSE)) {
                     (*seq)++;
                 } else {
                     *seq += 2;
@@ -415,24 +415,24 @@ BOOL func_ov167_0219eae4(BtlServer *server, int *seq) {
         }
         break;
     case 2:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 3:
-        func_ov167_0219f1d4(server);
-        func_ov167_0219f748(server->flow);
+        BattleServer_FinishCmd(server);
+        BtlServerFlow_PrepareMidTurnSwitch(server->flow);
         (*seq)++;
     case 4:
         BtlServerCmdQueue_Init(server->queuePtr);
-        server->flowResult = func_ov167_0219f754(server->flow, &server->clientActions);
-        func_ov167_0219f128(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
+        server->flowResult = BtlServerFlow_RunMidTurnSwitch(server->flow, &server->clientActions);
+        BattleServer_BroadcastCmdData(server, 8, server->queuePtr->buffer, server->queuePtr->writePtr);
         (*seq)++;
         break;
     case 5:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             switch (server->flowResult) {
             case 1:
                 *seq = 0;
@@ -441,16 +441,16 @@ BOOL func_ov167_0219eae4(BtlServer *server, int *seq) {
                 *seq = 4;
                 break;
             case 2:
-                func_ov167_0219e5f0(server, func_ov167_0219e8fc);
+                BattleServer_SetProc(server, BattleServer_ProcChangePokemonEndTurn);
                 break;
             case 4:
-                func_ov167_0219ca48(server->mainModule, func_ov167_021ac018(server->flow));
-                func_ov167_0219e5f0(server, func_ov167_0219ec84);
+                SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
+                BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
                 break;
             case 5:
                 return TRUE;
             default:
-                func_ov167_0219e5f8(server);
+                BattleServer_SetSelectActionProc(server);
                 break;
             }
         }
@@ -459,75 +459,75 @@ BOOL func_ov167_0219eae4(BtlServer *server, int *seq) {
     return FALSE;
 }
 
-BOOL func_ov167_0219ec0c(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcTimeUp(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0: {
         u32 size;
-        void *data = func_ov167_021d4990(&server->recTool, &size);
+        void *data = BtlRecTool_MakeTimeoutChunk(&server->recTool, &size);
 
-        func_ov167_0219f128(server, 10, data, size);
+        BattleServer_BroadcastCmdData(server, 10, data, size);
         (*seq)++;
         break;
     }
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
-            func_ov167_0219f11c(server, 0x10);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
+            BattleServer_BroadcastCmd(server, 0x10);
             (*seq)++;
         }
         break;
     case 2:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
-            func_ov167_0219ca48(server->mainModule, func_ov167_021ac018(server->flow));
-            func_ov167_0219e5f0(server, func_ov167_0219ec84);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
+            SetBattleResult(server->mainModule, BtlServerFlow_GetBattleResult(server->flow));
+            BattleServer_SetProc(server, BattleServer_ProcBattleEnd);
         }
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219ec84(BtlServer *server, int *seq) {
-    u32 result = func_ov167_0219ca58(server->mainModule);
+BOOL BattleServer_ProcBattleEnd(BtlServer *server, int *seq) {
+    u32 result = GetBattleResult(server->mainModule);
 
     server->exitData.result = result;
     server->exitData.playerClientId = GetPlayerClientID(server->mainModule);
     switch (BtlSetup_GetBattleType(server->mainModule)) {
     case 1:
-        func_ov167_0219e5f0(server, func_ov167_0219ee40);
+        BattleServer_SetProc(server, BattleServer_ProcTrainerEnd);
         break;
     case 2:
-        func_ov167_0219e5f0(server, func_ov167_0219ee88);
+        BattleServer_SetProc(server, BattleServer_ProcFacilityEnd);
         break;
     case 3:
-        func_ov167_0219e5f0(server, func_ov167_0219edfc);
+        BattleServer_SetProc(server, BattleServer_ProcCommEnd);
         break;
     case 0:
         if (result == 1) {
-            func_ov167_0219e5f0(server, func_ov167_0219ed6c);
+            BattleServer_SetProc(server, BattleServer_ProcWildWin);
         } else if (result == 0 || result == 2) {
-            func_ov167_0219e5f0(server, func_ov167_0219edb4);
+            BattleServer_SetProc(server, BattleServer_ProcWildLose);
         } else {
-            func_ov167_0219e5f0(server, func_ov167_0219ed24);
+            BattleServer_SetProc(server, BattleServer_ProcWaitExit);
         }
         break;
     default:
         if (result == 1) {
-            GFL_SndBGMPlay(func_ov167_0219bf00(server->mainModule), 0xffff);
+            GFL_SndBGMPlay(GetWinBGM(server->mainModule), 0xffff);
         }
-        func_ov167_0219e5f0(server, func_ov167_0219ed24);
+        BattleServer_SetProc(server, BattleServer_ProcWaitExit);
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219ed24(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcWaitExit(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0: {
         BOOL done = FALSE;
 
-        if (!func_ov167_0219c980(server->mainModule)) {
-            if ((GCTX_HIDGetPressedKeys() & 3) || func_0203da48()) {
+        if (!IsRecPlayMode(server->mainModule)) {
+            if ((GCTX_HIDGetPressedKeys() & 3) || GFL_HIDIsTouchPressed()) {
                 done = TRUE;
             }
         } else {
@@ -545,53 +545,53 @@ BOOL func_ov167_0219ed24(BtlServer *server, int *seq) {
     return FALSE;
 }
 
-BOOL func_ov167_0219ed6c(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcWildWin(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 0xe, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, 0xe, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 2:
-        func_ov167_0219e5f0(server, func_ov167_0219ed24);
+        BattleServer_SetProc(server, BattleServer_ProcWaitExit);
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219edb4(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcWildLose(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 0xf, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, 0xf, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 2:
-        func_ov167_0219e5f0(server, func_ov167_0219ed24);
+        BattleServer_SetProc(server, BattleServer_ProcWaitExit);
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219edfc(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcCommEnd(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 0xd, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, 0xd, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
@@ -601,40 +601,40 @@ BOOL func_ov167_0219edfc(BtlServer *server, int *seq) {
     return FALSE;
 }
 
-BOOL func_ov167_0219ee40(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcTrainerEnd(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 0xb, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, 0xb, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 2:
-        func_ov167_0219e5f0(server, func_ov167_0219ed24);
+        BattleServer_SetProc(server, BattleServer_ProcWaitExit);
         break;
     }
     return FALSE;
 }
 
-BOOL func_ov167_0219ee88(BtlServer *server, int *seq) {
+BOOL BattleServer_ProcFacilityEnd(BtlServer *server, int *seq) {
     switch (*seq) {
     case 0:
-        func_ov167_0219f128(server, 0xc, &server->exitData, sizeof(server->exitData));
+        BattleServer_BroadcastCmdData(server, 0xc, &server->exitData, sizeof(server->exitData));
         (*seq)++;
         break;
     case 1:
-        if (func_ov167_0219f19c(server)) {
-            func_ov167_0219f1d4(server);
+        if (BattleServer_AllClientsReplied(server)) {
+            BattleServer_FinishCmd(server);
             (*seq)++;
         }
         break;
     case 2:
-        if (!func_ov167_0219bee4(server->mainModule)) {
-            func_ov167_0219e5f0(server, func_ov167_0219ed24);
+        if (!GetCommMode(server->mainModule)) {
+            BattleServer_SetProc(server, BattleServer_ProcWaitExit);
             break;
         }
         return TRUE;
@@ -643,7 +643,7 @@ BOOL func_ov167_0219ee88(BtlServer *server, int *seq) {
 }
 
 // Reads the actions of a recorded turn
-void func_ov167_0219eee4(BtlServer *server, const void *data, u32 size) {
+void BattleServer_ReadRecActions(BtlServer *server, const void *data, u32 size) {
     BattleAction actions[3];
     u32 pos;
     u8 clientId;
@@ -654,8 +654,8 @@ void func_ov167_0219eee4(BtlServer *server, const void *data, u32 size) {
     for (i = 0; i < 4; i++) {
         server->clientActions.count[i] = 0;
     }
-    func_ov167_021d49a0(&server->recTool, data, size);
-    while (func_ov167_021d49d0(&server->recTool, &pos, &clientId, &count, actions)) {
+    BtlRecTool_SetData(&server->recTool, data, size);
+    while (BtlRecTool_ReadClientActions(&server->recTool, &pos, &clientId, &count, actions)) {
         for (i = 0; i < count; i++) {
             server->clientActions.actions[clientId][i] = actions[i];
         }
@@ -667,23 +667,23 @@ void func_ov167_0219ef70(BtlClientActions *clientActions) {
 }
 
 // Whether running the step mode writes commands different from data
-BOOL func_ov167_0219ef74(BtlServer *server, u32 mode, const void *data, u32 size) {
+BOOL BattleServer_CheckCmdMismatch(BtlServer *server, u32 mode, const void *data, u32 size) {
     BtlServerCmdQueue_Init(server->queuePtr);
     switch (mode) {
     case 4:
-        func_ov167_0219f588(server->flow);
+        BtlServerFlow_StartBattle(server->flow);
         break;
     case 1:
-        func_ov167_0219f65c(server->flow);
-        func_ov167_0219f66c(server->flow, &server->clientActions);
+        BtlServerFlow_PrepareTurn(server->flow);
+        BtlServerFlow_RunTurn(server->flow, &server->clientActions);
         break;
     case 2:
-        func_ov167_0219f7a8(server->flow);
-        func_ov167_0219f7b4(server->flow, &server->clientActions);
+        BtlServerFlow_PrepareFaintSwitch(server->flow);
+        BtlServerFlow_RunFaintSwitch(server->flow, &server->clientActions);
         break;
     case 3:
-        func_ov167_0219f748(server->flow);
-        func_ov167_0219f754(server->flow, &server->clientActions);
+        BtlServerFlow_PrepareMidTurnSwitch(server->flow);
+        BtlServerFlow_RunMidTurnSwitch(server->flow, &server->clientActions);
         break;
     }
     if (server->queuePtr->writePtr == size && GFL_STD_MemCmp(server->queuePtr->buffer, data, size) == 0) {
@@ -692,43 +692,43 @@ BOOL func_ov167_0219ef74(BtlServer *server, u32 mode, const void *data, u32 size
     return TRUE;
 }
 
-BOOL func_ov167_0219f000(BtlServer *server, u8 value) {
+BOOL BattleServer_SendRecStartChunk(BtlServer *server, BOOL value) {
     u32 size;
     void *data;
 
-    func_ov167_021d48a0(&server->recTool, TRUE);
-    data = func_ov167_021d48c4(&server->recTool, &size, value);
-    func_ov167_0219f128(server, 10, data, size);
+    BtlRecTool_Init(&server->recTool, TRUE);
+    data = BtlRecTool_MakeTurnChunk(&server->recTool, &size, value);
+    BattleServer_BroadcastCmdData(server, 10, data, size);
     return TRUE;
 }
 
-BOOL func_ov167_0219f02c(BtlServer *server, u8 value, BOOL flag) {
+BOOL BattleServer_SendRecActionsChunk(BtlServer *server, u8 value, BOOL flag) {
     u32 size;
-    void *data = func_ov167_0219f054(server, value, flag, &size);
+    void *data = BattleServer_MakeRecActionsChunk(server, value, flag, &size);
 
     if (data != NULL) {
-        func_ov167_0219f128(server, 10, data, size);
+        BattleServer_BroadcastCmdData(server, 10, data, size);
         return TRUE;
     }
     return FALSE;
 }
 
-void *func_ov167_0219f054(BtlServer *server, u8 value, BOOL flag, u32 *size) {
+void *BattleServer_MakeRecActionsChunk(BtlServer *server, u8 value, BOOL flag, u32 *size) {
     u32 i;
 
-    func_ov167_021d48a0(&server->recTool, flag);
+    BtlRecTool_Init(&server->recTool, flag);
     for (i = 0; i < 4; i++) {
         if (server->clients[i].clientId != 0xff) {
             u32 actionSize;
-            void *actions = func_ov167_021d4b50(server->clients[i].adapter, &actionSize);
+            void *actions = BtlAdapter_GetReturnData(server->clients[i].adapter, &actionSize);
 
-            func_ov167_021d48e0(&server->recTool, i, actions, actionSize / sizeof(BattleAction));
+            BtlRecTool_AddClientActions(&server->recTool, i, actions, actionSize / sizeof(BattleAction));
         }
     }
-    return func_ov167_021d4958(&server->recTool, value, size);
+    return BtlRecTool_FinishChunk(&server->recTool, value, size);
 }
 
-void func_ov167_0219f0ac(BtlServer *server) {
+void BattleServer_StoreClientActions(BtlServer *server) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
@@ -737,7 +737,7 @@ void func_ov167_0219f0ac(BtlServer *server) {
         server->clientActions.count[i] = 0;
         if (IsSwitchModeEnabled(client)) {
             u32 size;
-            BattleAction *actions = func_ov167_021d4b50(client->adapter, &size);
+            BattleAction *actions = BtlAdapter_GetReturnData(client->adapter, &size);
             u32 j;
             u32 count = size / sizeof(BattleAction);
 
@@ -749,64 +749,64 @@ void func_ov167_0219f0ac(BtlServer *server) {
     }
 }
 
-void func_ov167_0219f11c(BtlServer *server, u32 cmd) {
-    func_ov167_0219f128(server, cmd, NULL, 0);
+void BattleServer_BroadcastCmd(BtlServer *server, u32 cmd) {
+    BattleServer_BroadcastCmdData(server, cmd, NULL, 0);
 }
 
-void func_ov167_0219f128(BtlServer *server, u32 cmd, const void *data, u32 size) {
+void BattleServer_BroadcastCmdData(BtlServer *server, u32 cmd, const void *data, u32 size) {
     int i;
 
-    func_ov167_021d4ad4();
+    BtlAdapter_ClearNetReplies();
     for (i = 0; i < 4; i++) {
         if (IsSwitchModeEnabled(&server->clients[i])) {
-            func_ov167_021d4aec(server->clients[i].adapter, cmd, data, size);
+            BtlAdapter_SetCmd(server->clients[i].adapter, cmd, data, size);
         }
     }
     func_ov167_021d4ae8();
 }
 
-void func_ov167_0219f16c(BtlServer *server, u32 cmd, u8 clientId, const void *data, u32 size) {
+void BattleServer_SendCmdToClient(BtlServer *server, u32 cmd, u8 clientId, const void *data, u32 size) {
     BtlServerClient *client = &server->clients[clientId];
 
     if (IsSwitchModeEnabled(client)) {
-        func_ov167_021d4b5c(client->adapter);
-        func_ov167_021d4aec(client->adapter, cmd, data, size);
+        BtlAdapter_SetIdle(client->adapter);
+        BtlAdapter_SetCmd(client->adapter, cmd, data, size);
     }
 }
 
-BOOL func_ov167_0219f19c(BtlServer *server) {
+BOOL BattleServer_AllClientsReplied(BtlServer *server) {
     BOOL done = TRUE;
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (IsSwitchModeEnabled(&server->clients[i]) && !func_ov167_021d4b18(server->clients[i].adapter)) {
+        if (IsSwitchModeEnabled(&server->clients[i]) && !BtlAdapter_WaitCmd(server->clients[i].adapter)) {
             done = FALSE;
         }
     }
     return done;
 }
 
-void func_ov167_0219f1d4(BtlServer *server) {
+void BattleServer_FinishCmd(BtlServer *server) {
     int i;
 
     for (i = 0; i < 4; i++) {
         if (IsSwitchModeEnabled(&server->clients[i])) {
-            func_ov167_021d4b5c(server->clients[i].adapter);
+            BtlAdapter_SetIdle(server->clients[i].adapter);
         }
     }
 }
 
-void func_ov167_0219f200(BtlServer *server) {
+void BattleServer_ResetAdapters(BtlServer *server) {
     int i;
 
     for (i = 0; i < 4; i++) {
         if (IsSwitchModeEnabled(&server->clients[i])) {
-            func_ov167_021d4abc(server->clients[i].adapter);
+            BtlAdapter_ResetState(server->clients[i].adapter);
         }
     }
 }
 
-void func_ov167_0219f22c(BtlServerClient *client) {
+void ServerClient_Clear(BtlServerClient *client) {
     client->clientId = 0xff;
 }
 
@@ -818,72 +818,72 @@ BOOL IsSwitchModeEnabled(BtlServerClient *client) {
     return FALSE;
 }
 
-void func_ov167_0219f244(BtlServerClient *client, u8 clientId, BtlAdapter *adapter, u8 isAttached) {
+void ServerClient_Attach(BtlServerClient *client, u8 clientId, BtlAdapter *adapter, u8 isAttached) {
     client->clientId = clientId;
     client->adapter = adapter;
     client->isAttached = isAttached;
 }
 
-void func_ov167_0219f24c(BtlServerClient *client, BattleParty *party, u8 numCoverPos) {
+void ServerClient_SetParty(BtlServerClient *client, BattleParty *party, u8 numCoverPos) {
     client->party = party;
     client->numMons = GetNumMonsInParty(party);
     client->numCoverPos = numCoverPos;
 }
 
-BtlServerClient *func_ov167_0219f260(BtlServer *server, u8 clientId) {
+BtlServerClient *BattleServer_GetClient(BtlServer *server, u8 clientId) {
     if (clientId < 4 && server->clients[clientId].clientId != 0xff) {
         return &server->clients[clientId];
     }
     return NULL;
 }
 
-BtlServerClient *func_ov167_0219f27c(BtlServer *server, u8 clientId) {
+BtlServerClient *BattleServer_GetClientNoCheck(BtlServer *server, u8 clientId) {
     if (server->clients[clientId].clientId != 0xff) {
         return &server->clients[clientId];
     }
     return NULL;
 }
 
-BOOL func_ov167_0219f294(BtlServer *server, u8 clientId) {
+BOOL BattleServer_IsClientActive(BtlServer *server, u8 clientId) {
     if (clientId < 4) {
         return IsSwitchModeEnabled(&server->clients[clientId]);
     }
     return FALSE;
 }
 
-u8 func_ov167_0219f2ac(const BtlClientActions *clientActions, u8 clientId) {
+u8 ClientActions_GetCount(const BtlClientActions *clientActions, u8 clientId) {
     return clientActions->count[clientId];
 }
 
-BattleAction func_ov167_0219f2b4(const BtlClientActions *clientActions, u8 clientId, u8 index) {
+BattleAction ClientActions_GetAction(const BtlClientActions *clientActions, u8 clientId, u8 index) {
     return clientActions->actions[clientId][index];
 }
 
-void func_ov167_0219f2c0(BtlServer *server, BattleMon *mon) {
+void BattleServer_SendNicknameBeacon(BtlServer *server, BattleMon *mon) {
     PokeParty_GetParam(GetSrcData(mon), PKM_PARAM_NICKNAME, server->strBuf);
-    func_0202d2c8(server->strBuf);
+    GameBeaconSys_SendNickname(server->strBuf);
 }
 
-void func_ov167_0219f2e0(BtlServer *server, BattleMon *mon) {
+void BattleServer_NotifyCapture(BtlServer *server, BattleMon *mon) {
     u32 species = PokeParty_GetParam(GetSrcData(mon), PKM_PARAM_SPECIES, NULL);
     BOOL a = BtlSetup_IsBattleType(server->mainModule, 0x4000);
     BOOL b = BtlSetup_IsBattleType(server->mainModule, 0x8000);
 
     GameBeaconSys_SendCapture(species, a, b);
-    func_ov167_0219dad0(server->mainModule, 7);
-    func_ov167_0219dad0(server->mainModule, 0x54);
-    func_02038bc8(0x1f);
+    IncRecord(server->mainModule, 7);
+    IncRecord(server->mainModule, 0x54);
+    JoinAvenue_RecordActivity(0x1f);
 }
 
-void func_ov167_0219f330(BtlServer *server, u32 money) {
-    func_ov167_0219cac0(server->mainModule, money);
+void BattleServer_AddPayDayMoney(BtlServer *server, u32 money) {
+    AddBonusMoney(server->mainModule, money);
 }
 
-void func_ov167_0219f33c(BtlServer *server) {
-    func_ov167_0219cb10(server->mainModule);
+void BattleServer_SetDoublePrizeMoney(BtlServer *server) {
+    SetMoneyDoubled(server->mainModule);
 }
 
-void func_ov167_0219f348(BtlServer *server) {
+void BattleServer_ClearChangeRequests(BtlServer *server) {
     server->count = 0;
     server->unkCBF = 0;
 }
@@ -900,6 +900,6 @@ void RequestChangePokemon(BtlServer *server, u8 pos) {
     server->posList[server->count++] = pos;
 }
 
-BtlServerFlow *func_ov167_0219f38c(BtlServer *server) {
+BtlServerFlow *BattleServer_GetFlow(BtlServer *server) {
     return server->flow;
 }

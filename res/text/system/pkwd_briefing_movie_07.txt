@@ -1,0 +1,22 @@
+PkwdBriefingMovie07_Text_UnovaDefenseForceUdf = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+PkwdBriefingMovie07_Text_StoryTheirValiantStruggle = {bd02}This is the story of\n{bd02}their valiant struggle...
+PkwdBriefingMovie07_Text_MysteriousFlyingObjectAppeared = {bd02}A mysterious flying object\n{bd02}appeared suddenly in the sky\n{bd02}above a major metropolis.
+PkwdBriefingMovie07_Text_DiscoverItsTrueIdentity = {bd02}To discover its true identity,\n{bd02}the young recruit {0100:1}\n{bd02}hurried to the scene.
+PkwdBriefingMovie07_Text_Empty = なし
+PkwdBriefingMovie07_Text_Empty_2 = なし
+PkwdBriefingMovie07_Text_Empty_3 = なし
+PkwdBriefingMovie07_Text_Empty_4 = なし
+PkwdBriefingMovie07_Text_Empty_5 = なし
+PkwdBriefingMovie07_Text_Empty_6 = なし
+PkwdBriefingMovie07_Text_UnovaDefenseForceUdf_2 = {bd02}The Unova Defense Force (UDF)...\n\n{bd02}This organization strives to keep\n{bd02}the Unova region at peace...
+PkwdBriefingMovie07_Text_StoryTheirValiantStruggle_2 = {bd02}This is the story of\n{bd02}their valiant struggle...
+PkwdBriefingMovie07_Text_MysteriousFlyingObjectAppeared_2 = {bd02}A mysterious flying object\n{bd02}appeared suddenly in the sky\n{bd02}above a major metropolis.
+PkwdBriefingMovie07_Text_DiscoverItsTrueIdentity_2 = {bd02}To discover its true identity,\n{bd02}the young recruit {0100:1}\n{bd02}hurried to the scene.
+PkwdBriefingMovie07_Text_Empty_7 = なし
+PkwdBriefingMovie07_Text_Empty_8 = なし
+PkwdBriefingMovie07_Text_Empty_9 = なし
+PkwdBriefingMovie07_Text_Empty_10 = なし
+PkwdBriefingMovie07_Text_Empty_11 = なし
+PkwdBriefingMovie07_Text_Empty_12 = なし
+PkwdBriefingMovie07_Text_Empty_13 = なし
+\pad{30}

@@ -1,0 +1,6 @@
+BlackGateGate_Text_IfPassThroughGate = If you pass through this gate...\nWhere could it be connected to?
+BlackGateGate_Text_PeopleComeGoFrom = People come and go from\nthe cities and the country while{be00}\nsearching for a place where they belong.
+BlackGateGate_Text_UnovasChallengeBlackTower = Unova's Challenge...\nBlack Tower or White Treehollow...{be00}\nWhat in the world are they like?
+BlackGateGate_Text_NoData = no data
+BlackGateGate_Text_NoData_2 = no data
+BlackGateGate_Text_NoData_3 = no data

@@ -56,7 +56,7 @@ struct GimmickGateEventData {
     VecFx32 targetOffset;
 };
 
-Elboard *func_ov104_021efbd8(ElboardInit *init) {
+Elboard *Elboard_Create(ElboardInit *init) {
     s32 i;
     Elboard *state = GFL_HeapAllocate(init->heapId, sizeof(Elboard), FALSE, "gimmick_obj_elboard.c", 0x5f);
 
@@ -79,47 +79,47 @@ Elboard *func_ov104_021efbd8(ElboardInit *init) {
     return state;
 }
 
-void func_ov104_021efc6c(Elboard *state, const ElboardMessageArg *arg) {
+void Elboard_AddMessage(Elboard *state, const ElboardMessageArg *arg) {
     if (state->capacity > state->count) {
-        state->messages[state->count] = func_ov104_021efe88(state, arg, state->count);
+        state->messages[state->count] = ElboardMessage_Create(state, arg, state->count);
         state->count++;
     }
 }
 
-void func_ov104_021efc8c(Elboard *state) {
+void Elboard_Free(Elboard *state) {
     s32 i;
 
     GFL_FontFree(state->font);
     for (i = 0; i < state->count; i++) {
-        func_ov104_021f0080(state->messages[i]);
+        ElboardMessage_Free(state->messages[i]);
     }
     GFL_HeapFree(state->messages);
     GFL_HeapFree(state->flags);
     GFL_HeapFree(state);
 }
 
-void func_ov104_021efcc4(Elboard *state, u32 amount) {
+void Elboard_Update(Elboard *state, u32 amount) {
     s32 i;
 
     for (i = 0; i < state->count; i++) {
-        func_ov104_021f00bc(state, state->messages[i], amount);
+        Elboard_UpdateMessage(state, state->messages[i], amount);
     }
     state->current += amount;
 }
 
-s32 func_ov104_021efcf0(Elboard *state) {
+s32 Elboard_GetTime(Elboard *state) {
     return state->current;
 }
 
-u16 func_ov104_021efcf4(Elboard *state) {
+u16 Elboard_GetHeapID(Elboard *state) {
     return state->heapId;
 }
 
-u8 func_ov104_021efcf8(Elboard *state) {
+u8 Elboard_GetMessageCount(Elboard *state) {
     return state->count;
 }
 
-void func_ov104_021efcfc(Elboard *state, fx32 time) {
+void Elboard_SetTime(Elboard *state, fx32 time) {
     s32 seconds = FX_Whole(time);
     s32 *starts =
         GFL_HeapAllocate(HEAPID_TAIL(state->heapId), state->count * sizeof(s32), FALSE, "gimmick_obj_elboard.c", 0x119);
@@ -171,7 +171,7 @@ void func_ov104_021efcfc(Elboard *state, fx32 time) {
     GFL_HeapFree(frames);
 }
 
-ElboardMessage *func_ov104_021efe88(Elboard *state, const ElboardMessageArg *arg, u32 index) {
+ElboardMessage *ElboardMessage_Create(Elboard *state, const ElboardMessageArg *arg, u32 index) {
     ElboardMessage *message =
         GFL_HeapAllocate(state->heapId, sizeof(ElboardMessage), FALSE, "gimmick_obj_elboard.c", 0x17f);
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, arg->messageArc, arg->messageFile, state->heapId);
@@ -218,12 +218,12 @@ ElboardMessage *func_ov104_021efe88(Elboard *state, const ElboardMessageArg *arg
     return message;
 }
 
-void func_ov104_021f0080(ElboardMessage *message) {
+void ElboardMessage_Free(ElboardMessage *message) {
     ElScoreboard_Free(message->scoreboard);
     GFL_HeapFree(message);
 }
 
-void func_ov104_021f0094(ElboardMessage *message) {
+void ElboardMessage_Start(ElboardMessage *message) {
     if (message->active != 1) {
         message->active = 1;
         message->pending = 0;
@@ -233,7 +233,7 @@ void func_ov104_021f0094(ElboardMessage *message) {
     }
 }
 
-void func_ov104_021f00bc(Elboard *state, ElboardMessage *message, u32 amount) {
+void Elboard_UpdateMessage(Elboard *state, ElboardMessage *message, u32 amount) {
     s32 next;
 
     if (message->active == 1) {
@@ -246,15 +246,15 @@ void func_ov104_021f00bc(Elboard *state, ElboardMessage *message, u32 amount) {
             message->pending = 1;
         }
         if (message->duration < message->elapsed) {
-            func_ov104_021f0130(message);
+            ElboardMessage_Stop(message);
         }
     } else if (state->flags[message->index] == 1) {
-        func_ov104_021f0094(message);
+        ElboardMessage_Start(message);
         state->flags[message->index] = 0;
     }
 }
 
-void func_ov104_021f0130(ElboardMessage *message) {
+void ElboardMessage_Stop(ElboardMessage *message) {
     if (message->active == 1) {
         message->active = 0;
         GFL_G3DActorUnbindAnm(message->actor, message->animation);
@@ -262,12 +262,12 @@ void func_ov104_021f0130(ElboardMessage *message) {
     }
 }
 
-BOOL func_ov104_021f0150(void *dest, u32 arcId, u32 fileId) {
+BOOL GimmickGateZoneData_Load(void *dest, u32 arcId, u32 fileId) {
     GFL_ArcSysReadRange(dest, arcId, fileId, 0, 0x7c);
     return TRUE;
 }
 
-GameEventReturnCode func_ov104_021f0160(GameEvent *event, u32 *state, void *data) {
+GameEventReturnCode GimmickGateEvent_ViewBoard(GameEvent *event, u32 *state, void *data) {
     GimmickGateEventData *work = data;
     Field *field = work->field;
     FieldCamera *camera = Field_GetCameraSystem(field);
@@ -291,7 +291,7 @@ GameEventReturnCode func_ov104_021f0160(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        switch (func_ov104_021eed44(field)) {
+        switch (GimmickGate_GetDirection(field)) {
         case 1:
         default:
             pitch = 0xee5;
@@ -353,11 +353,11 @@ GameEventReturnCode func_ov104_021f0160(GameEvent *event, u32 *state, void *data
     return GAMEEVENT_CONTINUE;
 }
 
-GameEvent *func_ov104_021f02fc(GameSystem *gsys, Field *field, u32 duration) {
+GameEvent *GimmickGateEvent_Create(GameSystem *gsys, Field *field, u32 duration) {
     GameEvent *event;
     GimmickGateEventData *data;
 
-    event = GameEvent_Create(gsys, 0, func_ov104_021f0160, sizeof(struct GimmickGateEventData));
+    event = GameEvent_Create(gsys, 0, GimmickGateEvent_ViewBoard, sizeof(struct GimmickGateEventData));
     data = GameEvent_GetData(event);
     data->gameSystem = gsys;
     data->field = field;
@@ -365,12 +365,12 @@ GameEvent *func_ov104_021f02fc(GameSystem *gsys, Field *field, u32 duration) {
     return event;
 }
 
-BOOL func_ov104_021f0324(GimmickGateBoardEntry *entry, u32 arcId, u32 fileId) {
+BOOL GimmickGateBoardEntry_Load(GimmickGateBoardEntry *entry, u32 arcId, u32 fileId) {
     GFL_ArcSysReadRange(entry, arcId, fileId, 0, 0x24);
     return TRUE;
 }
 
-BOOL func_ov104_021f0334(GimmickGateBoardEntry *entry, u16 zone) {
+BOOL GimmickGateBoardEntry_MatchesZone(GimmickGateBoardEntry *entry, u16 zone) {
     if (entry->zones[0] == 0x267 && entry->zones[1] == 0x267 && entry->zones[2] == 0x267 && entry->zones[3] == 0x267) {
         return TRUE;
     }
@@ -380,7 +380,7 @@ BOOL func_ov104_021f0334(GimmickGateBoardEntry *entry, u16 zone) {
     return FALSE;
 }
 
-BOOL func_ov104_021f037c(GimmickGateBoardEntry *entry) {
+BOOL GimmickGateBoardEntry_MatchesVersion(GimmickGateBoardEntry *entry) {
     if (entry->unk00 == 0) {
         return TRUE;
     }

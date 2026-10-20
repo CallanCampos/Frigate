@@ -1,0 +1,58 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Chester",
+    "class": "TRAINER_CLASS_VETERAN_M",
+    "battle_style": "BTL_STYLE_ROTATION",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 20,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_STARAPTOR",
+            "form": 0,
+            "level": 68,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 0,
+            "moves": [ "MOVE_CLOSE_COMBAT", "MOVE_BRAVE_BIRD", "MOVE_ENDEAVOR", "MOVE_WHIRLWIND" ]
+        },
+        {
+            "species": "SPECIES_RELICANTH",
+            "form": 0,
+            "level": 68,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_STONE_EDGE", "MOVE_WATERFALL", "MOVE_EARTHQUAKE", "MOVE_AMNESIA" ]
+        },
+        {
+            "species": "SPECIES_KROOKODILE",
+            "form": 0,
+            "level": 68,
+            "difficulty": 200,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_EARTHQUAKE", "MOVE_OUTRAGE", "MOVE_STONE_EDGE", "MOVE_CRUNCH" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 24,
+            "text": "I would love it if you would join me in\na Rotation Battle."
+        },
+        {
+            "type": "TRMSG_START",
+            "text": "Your Pokémon and your strategy!\nI'll be taking notes on both!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Now that I am a Veteran, I find there is\nso much more to learn..."
+        },
+        {
+            "type": 2,
+            "text": "Stronger Pokémon than anyone else...\nAn unbeatable strategy...{be01}\nThere are no such certitudes in Pokémon\nbattle...and that is why it is so deep!"
+        }
+    ]
+}

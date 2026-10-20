@@ -373,7 +373,7 @@ static BOOL ZukanDetailVoice_Main(ZukanDetailProcSys *sys, int *seq, void *param
         GFL_BGSysSetBGPriority(4, 3);
         ZukanDetailVoice_CreateActors(param, wk, common);
         ZukanDetailVoice_CreatePokemon(param, wk, common, wk->pokemon);
-        func_0204c318(wk->pokemonActors[wk->pokemon], 1);
+        ClActor_SetObjMode(wk->pokemonActors[wk->pokemon], 1);
         ZukanDetailVoice_CreateName(param, wk, common);
         ZukanDetailVoice_PrintName(param, wk, common);
         ZukanDetailVoice_CreateTime(param, wk, common);
@@ -610,12 +610,12 @@ static void ZukanDetailVoice_CreateActors(ZukanDetailVoiceParam *param, ZukanDet
     ClActorSetup setup;
     u8 i;
 
-    wk->resources[RES_MAIN_PALETTE] = func_0204bbb8(arc, 3, CLACT_VRAM_MAIN, 0, 0, 4, param->heapId);
-    wk->resources[RES_MAIN_CHARS] = func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
-    wk->resources[RES_MAIN_CELL_ANIMS] = func_0204bde0(arc, 28, 45, param->heapId);
-    wk->resources[RES_SUB_PALETTE] = func_0204bbb8(arc, 8, CLACT_VRAM_SUB, 2 * 32, 0, 1, param->heapId);
-    wk->resources[RES_SUB_CHARS] = func_0204b81c(arc, 25, FALSE, CLACT_VRAM_SUB, param->heapId);
-    wk->resources[RES_SUB_CELL_ANIMS] = func_0204bde0(arc, 31, 48, param->heapId);
+    wk->resources[RES_MAIN_PALETTE] = ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_MAIN, 0, 0, 4, param->heapId);
+    wk->resources[RES_MAIN_CHARS] = ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, param->heapId);
+    wk->resources[RES_MAIN_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, 28, 45, param->heapId);
+    wk->resources[RES_SUB_PALETTE] = ClActSys_LoadPlttRange(arc, 8, CLACT_VRAM_SUB, 2 * 32, 0, 1, param->heapId);
+    wk->resources[RES_SUB_CHARS] = ClActSys_LoadChars(arc, 25, FALSE, CLACT_VRAM_SUB, param->heapId);
+    wk->resources[RES_SUB_CELL_ANIMS] = ClActSys_LoadCellAnims(arc, 31, 48, param->heapId);
     GFL_ArcToolFree(arc);
 
     for (i = 0; i < ACTOR_COUNT; i++) {
@@ -625,12 +625,12 @@ static void ZukanDetailVoice_CreateActors(ZukanDetailVoiceParam *param, ZukanDet
         setup.sequence = sZukanDetailVoiceActors[i].anim;
         setup.priority = sZukanDetailVoiceActors[i].priority;
         setup.bgPriority = sZukanDetailVoiceActors[i].bgPriority;
-        wk->actors[i] = func_0204c040(wk->unit, wk->resources[sZukanDetailVoiceActors[i].chars],
-                                      wk->resources[sZukanDetailVoiceActors[i].palette],
-                                      wk->resources[sZukanDetailVoiceActors[i].cellAnims], &setup,
-                                      sZukanDetailVoiceActors[i].surface, param->heapId);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], 1);
+        wk->actors[i] = ClActor_Create(wk->unit, wk->resources[sZukanDetailVoiceActors[i].chars],
+                                       wk->resources[sZukanDetailVoiceActors[i].palette],
+                                       wk->resources[sZukanDetailVoiceActors[i].cellAnims], &setup,
+                                       sZukanDetailVoiceActors[i].surface, param->heapId);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
     func_0204c520(wk->actors[ACTOR_ICON], TRUE);
 }
@@ -640,14 +640,14 @@ static void ZukanDetailVoice_FreeActors(ZukanDetailVoiceParam *param, ZukanDetai
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204bcd0(wk->resources[RES_MAIN_PALETTE]);
-    func_0204b98c(wk->resources[RES_MAIN_CHARS]);
-    func_0204be64(wk->resources[RES_MAIN_CELL_ANIMS]);
-    func_0204bcd0(wk->resources[RES_SUB_PALETTE]);
-    func_0204b98c(wk->resources[RES_SUB_CHARS]);
-    func_0204be64(wk->resources[RES_SUB_CELL_ANIMS]);
+    ClActSys_FreePltt(wk->resources[RES_MAIN_PALETTE]);
+    ClActSys_FreeChars(wk->resources[RES_MAIN_CHARS]);
+    ClActSys_FreeCellAnims(wk->resources[RES_MAIN_CELL_ANIMS]);
+    ClActSys_FreePltt(wk->resources[RES_SUB_PALETTE]);
+    ClActSys_FreeChars(wk->resources[RES_SUB_CHARS]);
+    ClActSys_FreeCellAnims(wk->resources[RES_SUB_CELL_ANIMS]);
 }
 
 // Shows the time on the digits' frames, up to 99.99
@@ -668,7 +668,7 @@ static void ZukanDetailVoice_SetTimeDigits(ZukanDetailVoiceParam *param, ZukanDe
     }
     digits[3] = hundredths % 10;
     for (i = 0; i < DIGIT_COUNT; i++) {
-        func_0204c504(wk->actors[actors[i]], digits[i]);
+        ClActor_SetAnimFrame(wk->actors[actors[i]], digits[i]);
     }
 }
 
@@ -684,7 +684,7 @@ static void ZukanDetailVoice_CreatePokemon(ZukanDetailVoiceParam *param, ZukanDe
     ArcTool *arc;
     ClActorSetupEx setup;
 
-    func_0200d3c8(pokedex, species, &sex, &rare, &form, param->heapId);
+    PokeDex_GetShownSexRareForm(pokedex, species, &sex, &rare, &form, param->heapId);
     if (species == SPECIES_SPINDA) {
         personality = func_0200da18(pokedex, personality);
     }
@@ -712,20 +712,20 @@ static void ZukanDetailVoice_CreatePokemon(ZukanDetailVoiceParam *param, ZukanDe
     setup.scaleY = FX32_ONE;
     setup.rotation = 0;
     setup.affineMode = 2;
-    wk->pokemonActors[index] = func_0204c0a4(wk->unit, wk->pokemonChars[index], wk->pokemonPalettes[index],
-                                             wk->pokemonCellAnims[index], &setup, CLACT_SURFACE_SUB, param->heapId);
-    func_0204c318(wk->pokemonActors[index], 0);
+    wk->pokemonActors[index] = ClActor_CreateEx(wk->unit, wk->pokemonChars[index], wk->pokemonPalettes[index],
+                                                wk->pokemonCellAnims[index], &setup, CLACT_SURFACE_SUB, param->heapId);
+    ClActor_SetObjMode(wk->pokemonActors[index], 0);
     wk->stretch = STRETCH_NONE;
 }
 
 static void ZukanDetailVoice_FreePokemon(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                          ZukanDetailCommon *common, int index) {
     if (wk->pokemonActors[index] != NULL) {
-        func_0204c108(wk->pokemonActors[index]);
+        ClActor_Delete(wk->pokemonActors[index]);
         wk->pokemonActors[index] = NULL;
-        func_0204bcd0(wk->pokemonPalettes[index]);
-        func_0204b98c(wk->pokemonChars[index]);
-        func_0204be64(wk->pokemonCellAnims[index]);
+        ClActSys_FreePltt(wk->pokemonPalettes[index]);
+        ClActSys_FreeChars(wk->pokemonChars[index]);
+        ClActSys_FreeCellAnims(wk->pokemonCellAnims[index]);
     }
 }
 
@@ -740,8 +740,8 @@ static void ZukanDetailVoice_UpdateStretch(ZukanDetailVoiceParam *param, ZukanDe
     case STRETCH_NONE:
         break;
     case STRETCH_GROWING:
-        func_0204c178(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
-        func_0204c27c(wk->pokemonActors[wk->pokemon], &scale);
+        ClActor_GetSurfacePos(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
+        ClActor_GetScale(wk->pokemonActors[wk->pokemon], &scale);
         scaleY = scale.y / (f32)FX32_ONE;
         scaleY += 0.01f;
         if (scaleY >= 1.1f) {
@@ -750,14 +750,14 @@ static void ZukanDetailVoice_UpdateStretch(ZukanDetailVoiceParam *param, ZukanDe
         }
         pos.y = 128 - (int)((scaleY - 1.0f) * 96.0f / 2.0f);
         scale.y = FX32_CONST(scaleY);
-        func_0204c140(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
-        func_0204c270(wk->pokemonActors[wk->pokemon], &scale);
+        ClActor_SetSurfacePos(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetScale(wk->pokemonActors[wk->pokemon], &scale);
         break;
     case STRETCH_GROWN:
         break;
     case STRETCH_SHRINKING:
-        func_0204c178(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
-        func_0204c27c(wk->pokemonActors[wk->pokemon], &scale);
+        ClActor_GetSurfacePos(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
+        ClActor_GetScale(wk->pokemonActors[wk->pokemon], &scale);
         scaleY = scale.y / (f32)FX32_ONE;
         scaleY -= 0.01f;
         if (scaleY <= 1.0f) {
@@ -768,8 +768,8 @@ static void ZukanDetailVoice_UpdateStretch(ZukanDetailVoiceParam *param, ZukanDe
             pos.y = 128 - (int)((scaleY - 1.0f) * 96.0f / 2.0f);
         }
         scale.y = FX32_CONST(scaleY);
-        func_0204c140(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
-        func_0204c270(wk->pokemonActors[wk->pokemon], &scale);
+        ClActor_SetSurfacePos(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetScale(wk->pokemonActors[wk->pokemon], &scale);
         break;
     }
 }
@@ -783,8 +783,8 @@ static void ZukanDetailVoice_StartStretch(ZukanDetailVoiceParam *param, ZukanDet
     pos.y = 128;
     scale.x = FX32_ONE;
     scale.y = FX32_ONE;
-    func_0204c140(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
-    func_0204c270(wk->pokemonActors[wk->pokemon], &scale);
+    ClActor_SetSurfacePos(wk->pokemonActors[wk->pokemon], &pos, CLACT_SURFACE_SUB);
+    ClActor_SetScale(wk->pokemonActors[wk->pokemon], &scale);
     wk->stretch = STRETCH_GROWING;
 }
 
@@ -807,7 +807,7 @@ static void ZukanDetailVoice_CreateName(ZukanDetailVoiceParam *param, ZukanDetai
 static void ZukanDetailVoice_FreeName(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                       ZukanDetailCommon *common) {
     wk->nameFlushPending = FALSE;
-    func_02021c44(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
     BmpWin_Free(wk->nameWindow);
 }
 
@@ -818,7 +818,8 @@ static void ZukanDetailVoice_PrintName(ZukanDetailVoiceParam *param, ZukanDetail
     int windowWidth = GFL_BitmapGetWidth(BmpWin_GetBitmap(wk->nameWindow));
     u16 x = (windowWidth - width) / 2;
 
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow), x, 1, name, wk->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow), x, 1, name, wk->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(name);
     wk->nameFlushPending = TRUE;
     ZukanDetailVoice_FlushName(param, wk, common);
@@ -827,13 +828,13 @@ static void ZukanDetailVoice_PrintName(ZukanDetailVoiceParam *param, ZukanDetail
 static void ZukanDetailVoice_ClearName(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                        ZukanDetailCommon *common) {
     wk->nameFlushPending = FALSE;
-    func_02021c44(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->nameWindow), 0);
 }
 
 static void ZukanDetailVoice_FlushName(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                        ZukanDetailCommon *common) {
-    if (wk->nameFlushPending && !func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow))) {
+    if (wk->nameFlushPending && !PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->nameWindow))) {
         BmpWin_Transfer(wk->nameWindow);
         wk->nameFlushPending = FALSE;
     }
@@ -909,7 +910,7 @@ static void ZukanDetailVoice_StopVoice(ZukanDetailVoiceParam *param, ZukanDetail
 static void ZukanDetailVoice_ChangePokemon(ZukanDetailVoiceParam *param, ZukanDetailVoiceWork *wk,
                                            ZukanDetailCommon *common) {
     if (wk->pokemonActors[wk->pokemon] != NULL) {
-        func_0204c124(wk->pokemonActors[wk->pokemon], FALSE);
+        ClActor_SetVisible(wk->pokemonActors[wk->pokemon], FALSE);
     }
     wk->pokemon = (wk->pokemon + 1) % 2;
     ZukanDetailVoice_ClearName(param, wk, common);
@@ -927,15 +928,15 @@ static void ZukanDetailVoice_CheckInput(ZukanDetailVoiceParam *param, ZukanDetai
 
     if (wk->inputEnabled) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             play = TRUE;
         } else {
             u32 x;
             u32 y;
 
-            if (func_0203dac8(&x, &y) && x < 256 && y < 168) {
+            if (GFL_HIDGetTouchPressedPoint(&x, &y) && x < 256 && y < 168) {
                 play = TRUE;
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
     }
@@ -947,7 +948,7 @@ static void ZukanDetailVoice_CheckInput(ZukanDetailVoiceParam *param, ZukanDetai
         u32 sex;
         u32 rare;
 
-        func_0200d3c8(pokedex, species, &sex, &rare, &form, param->heapId);
+        PokeDex_GetShownSexRareForm(pokedex, species, &sex, &rare, &form, param->heapId);
         wk->voice = PokeVoice_Play(species, form, 64, 0, 0, 0, 0, NULL);
         wk->time = 0;
         wk->startTime = OS_GetTick();
@@ -1153,11 +1154,11 @@ static void ZukanDetailVoice_SetActorsOpaque(ZukanDetailVoiceParam *param, Zukan
 
     for (i = 0; i < 2; i++) {
         if (wk->pokemonActors[i] != NULL) {
-            func_0204c318(wk->pokemonActors[i], 0);
+            ClActor_SetObjMode(wk->pokemonActors[i], 0);
         }
     }
     for (i = 0; i < ACTOR_ICON; i++) {
-        func_0204c318(wk->actors[i], 0);
+        ClActor_SetObjMode(wk->actors[i], 0);
     }
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2,
                        GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG2 |
@@ -1175,11 +1176,11 @@ static void ZukanDetailVoice_SetActorsBlended(ZukanDetailVoiceParam *param, Zuka
 
     for (i = 0; i < 2; i++) {
         if (wk->pokemonActors[i] != NULL) {
-            func_0204c318(wk->pokemonActors[i], 1);
+            ClActor_SetObjMode(wk->pokemonActors[i], 1);
         }
     }
     for (i = 0; i < ACTOR_ICON; i++) {
-        func_0204c318(wk->actors[i], 1);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
     ZukanDetailBlend_InitPlanes(wk->blendMain);
     ZukanDetailBlend_InitPlanes(wk->blendSub);

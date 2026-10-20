@@ -1,0 +1,45 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cheren",
+    "class": "TRAINER_CLASS_LEADER_CHEREN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [ "ITEM_POTION" ],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 0,
+            "level": 11,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_WORK_UP", "MOVE_BITE", "MOVE_TACKLE" ]
+        },
+        {
+            "species": "SPECIES_LILLIPUP",
+            "form": 0,
+            "level": 13,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_WORK_UP", "MOVE_BITE", "MOVE_TACKLE" ]
+        }
+    ],
+    "messages": [
+        {
+            "type": 17,
+            "text": "To have chosen that move...\nI see! You'll be a powerful opponent!"
+        },
+        {
+            "type": 19,
+            "text": "As a Gym Leader, I aim to be a wall for\nyou to overcome!"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This! This is what a real\nPokémon battle is!"
+        }
+    ]
+}

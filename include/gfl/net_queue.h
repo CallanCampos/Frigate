@@ -50,13 +50,13 @@ typedef struct {
 // The header before each command's data: the command, the size and the sender
 #define NET_QUEUE_HEADER_SIZE 5
 
-BOOL func_0203e174(NetQueue *queue);
-BOOL func_0203e2c0(NetQueue *queue, int command, u8 *data, int size, u32 unused, BOOL copy, int netId);
+BOOL NetQueue_IsEmpty(NetQueue *queue);
+BOOL NetQueue_Push(NetQueue *queue, int command, u8 *data, int size, u32 unused, BOOL copy, int netId);
 // Fills the buffer, returning FALSE if a command did not fit and continues next time
-BOOL func_0203e3bc(NetQueue *queue, NetSendBuffer *buffer);
-void func_0203e418(NetQueue *queue, int count, NetRingBuff *ring, HeapID heapId);
-void func_0203e44c(NetQueue *queue);
-void func_0203e46c(NetQueue *queue);
-BOOL func_0203e478(NetQueue *queue, u16 command);
+BOOL NetQueue_FillBuffer(NetQueue *queue, NetSendBuffer *buffer);
+void NetQueue_Init(NetQueue *queue, int count, NetRingBuff *ring, HeapID heapId);
+void NetQueue_Clear(NetQueue *queue);
+void NetQueue_Free(NetQueue *queue);
+BOOL NetQueue_HasCommand(NetQueue *queue, u16 command);
 
 #endif // POKEBW2_GFL_NET_QUEUE_H

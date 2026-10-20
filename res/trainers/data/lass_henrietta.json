@@ -1,0 +1,67 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Henrietta",
+    "class": "TRAINER_CLASS_LASS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BUTTERFREE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_ILLUMISE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_BEAUTIFLY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_WORMADAM",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_LEAVANNY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I always lose...{be01}\nBut I just want to see my Pokémon use\ntheir moves and do their best!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Phew...\nYour Pokémon... That was amazing!"
+        },
+        {
+            "type": 2,
+            "text": "I always lose...{be01}\nBut after battling so many times, I seem\nto have become a little stronger!"
+        }
+    ]
+}

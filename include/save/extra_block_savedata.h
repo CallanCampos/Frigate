@@ -4,7 +4,8 @@
 #include "types.h"
 
 // Two extra save blocks that are only cleared here (extra_block_savedata.c, a descriptive name): one of 0xc8 bytes,
-// and the downloaded tournament of the Pokémon World Tournament, whose checksum save/wbt_save.h's func_02010428 checks.
+// and the downloaded tournament of the Pokémon World Tournament, whose checksum save/wbt_save.h's
+// WbtDownloadData_IsCRCValid checks.
 
 typedef struct {
     u8 data[0x1210];
@@ -16,7 +17,7 @@ typedef struct {
 u32 func_020103f4(void);
 void func_020103f8(void *block);
 // The size of a downloaded tournament and its initial state
-u32 func_0201040c(void);
-void func_02010414(void *block);
+u32 WbtDownloadData_GetSize(void);
+void WbtDownloadData_Clear(void *block);
 
 #endif // POKEBW2_SAVE_EXTRA_BLOCK_SAVEDATA_H

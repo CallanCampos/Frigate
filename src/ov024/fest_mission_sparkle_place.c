@@ -62,7 +62,7 @@ void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFesti
     MI_CpuFill8(work->places, 0, sizeof(work->places));
     MI_CpuFill8(work->placeIndex, 0, sizeof(work->placeIndex));
     MI_CpuFill8(work->values, 0, sizeof(work->values));
-    func_ov012_02168348(mission->unk1C, func_ov012_02168320(zoneId), &rand);
+    FestMission_InitRand(mission->unk1C, FestMission_GetMissionZone(zoneId), &rand);
     FestSparklePlace_PickPlaces(gsys, work, mission, zoneId, &rand);
     FestSparklePlace_AddZone(work, zoneId);
 }
@@ -98,7 +98,7 @@ static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work,
         return FALSE;
     }
     pattern = (mission->unk8_0 >> (level * 3)) & 7;
-    work->count = sSparkleCounts[pattern][func_ov012_021683a8(rand, 8, NULL, 0)];
+    work->count = sSparkleCounts[pattern][FestMission_RandExcluding(rand, 8, NULL, 0)];
     if (work->count > work->unk2) {
         work->count = work->unk2;
     }
@@ -106,7 +106,7 @@ static BOOL FestSparklePlace_PickPlaces(GameSystem *gsys, FestSparkleWork *work,
         return FALSE;
     }
     for (i = 0; i < work->count; i++) {
-        work->placeIndex[i] = func_ov012_021683a8(rand, work->unk2, picked, i);
+        work->placeIndex[i] = FestMission_RandExcluding(rand, work->unk2, picked, i);
         work->values[i] = FestSparklePlace_PickSpecies(work, mission, rand);
         picked[i] = work->placeIndex[i];
     }
@@ -124,7 +124,7 @@ static u16 FestSparklePlace_PickSpecies(FestSparkleWork *work, FestMission *miss
     } else {
         set = sSpecies[mission->target];
     }
-    roll = func_ov012_021683a8(rand, 100000, NULL, 0);
+    roll = FestMission_RandExcluding(rand, 100000, NULL, 0);
     for (i = 0; i < 6; i++) {
         total += set[i].weight * 1000;
         if (roll < total) {

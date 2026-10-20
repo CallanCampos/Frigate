@@ -21,13 +21,13 @@ void AppPrintsysCommon_Init(AppPrintsysCommon *work, u32 flags) {
 
 BOOL AppPrintsysCommon_Update(AppPrintsysCommon *work, PrintStream *stream) {
     if (stream != NULL) {
-        switch (func_020223b4(stream)) {
+        switch (PrintStream_GetState(stream)) {
         case PRINT_STREAM_DONE:
             return TRUE;
         case PRINT_STREAM_PAUSED:
             if (AppPrintsysCommon_IsPressed(work->flags)) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(stream);
+                PrintStream_Continue(stream);
             }
             break;
         case PRINT_STREAM_RUNNING:
@@ -38,7 +38,7 @@ BOOL AppPrintsysCommon_Update(AppPrintsysCommon *work, PrintStream *stream) {
                         work->released = TRUE;
                     }
                 } else if (AppPrintsysCommon_IsHeld(work->flags)) {
-                    func_020223e0(stream, 0);
+                    PrintStream_SkipWait(stream, 0);
                 }
             }
             break;
@@ -56,14 +56,14 @@ BOOL AppPrintsysCommon_IsPressed(u32 flags) {
     }
     if (flags & APP_PRINTSYS_COMMON_KEYS) {
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             pressed = TRUE;
         }
     }
     if (flags & APP_PRINTSYS_COMMON_TOUCH) {
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             pressed = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     }
     return pressed;
@@ -81,7 +81,7 @@ static BOOL AppPrintsysCommon_IsHeld(u32 flags) {
         }
     }
     if (flags & APP_PRINTSYS_COMMON_TOUCH) {
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             held = TRUE;
         }
     }
@@ -100,7 +100,7 @@ static BOOL AppPrintsysCommon_IsReleased(u32 flags) {
         }
     }
     if (flags & APP_PRINTSYS_COMMON_TOUCH) {
-        if (func_0203da2c() == FALSE) {
+        if (GFL_HIDIsTouchHeld() == FALSE) {
             released = TRUE;
         }
     }

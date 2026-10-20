@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_GASTRODON",
+    "moves": [ "MOVE_MUDDY_WATER", "MOVE_EARTH_POWER", "MOVE_STOCKPILE", "MOVE_RECOVER" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": false,
+        "defense": true,
+        "speed": false,
+        "special_attack": false,
+        "special_defense": true
+    },
+    "nature": "NATURE_BOLD",
+    "item": "ITEM_APICOT_BERRY",
+    "form": 0
+}

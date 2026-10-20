@@ -1,8 +1,8 @@
-func_ov149_021f59e0 kind:function(thumb,size=0xe) addr:0x021f59e0
-func_ov149_021f59f0 kind:function(thumb,size=0xe) addr:0x021f59f0
-func_ov149_021f5a00 kind:function(thumb,size=0xe) addr:0x021f5a00
-func_ov149_021f5a10 kind:function(thumb,size=0xe) addr:0x021f5a10
-func_ov149_021f5a20 kind:function(thumb,size=0xe) addr:0x021f5a20
+EncEffModel_CreateModel7 kind:function(thumb,size=0xe) addr:0x021f59e0
+EncEffModel_CreateModel9 kind:function(thumb,size=0xe) addr:0x021f59f0
+EncEffModel_CreateModel5 kind:function(thumb,size=0xe) addr:0x021f5a00
+EncEffModel_CreateModel3 kind:function(thumb,size=0xe) addr:0x021f5a10
+EncEffModel_CreateModel1 kind:function(thumb,size=0xe) addr:0x021f5a20
 EncEffModel_CreateZoroark kind:function(thumb,size=0x28) addr:0x021f5a30
 EncEffModel_Create kind:function(thumb,size=0x4c) addr:0x021f5a58
 EncEffModel_Render kind:function(thumb,size=0xe) addr:0x021f5aa4

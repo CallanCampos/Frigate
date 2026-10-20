@@ -56,12 +56,12 @@ DSProt_CallCheckEmulatorA kind:function(arm,size=0xac,dsprot=0x94) addr:0x021822
 DSProt_CallCheckEmulatorB kind:function(arm,size=0xac,dsprot=0x94) addr:0x02182348
 DSProt_DecryptDetectMulti kind:function(arm,size=0x3c) addr:0x021823f4
 DSProt_EncryptCodeEntryMulti kind:data(any) addr:0x02182430
-data_ov337_021823f4 kind:data(any) addr:0x02182434
+sCipherFunctionsMulti kind:data(any) addr:0x02182434
 DSProt_DecryptCodeEntryMulti kind:data(any) addr:0x02182448
 sEncryptedKeyMulti kind:data(any) addr:0x0218244c
 data_ov337_02182424 kind:data(any) addr:0x02182464
 data_ov337_02182428 kind:data(any) addr:0x02182468
-data_ov337_0218242c kind:data(any) addr:0x0218246c
+sEmulatorMacMulti kind:data(any) addr:0x0218246c
 data_ov337_02182440 kind:bss addr:0x02182480
 data_ov337_02182444 kind:bss addr:0x02182484
 DSProt_WorkMulti kind:bss addr:0x0218248c

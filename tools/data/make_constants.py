@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Write the constant lists in data/constants/ for moves, abilities, items, species and types, named after the game's
+"""Write the constant lists in generated/ for moves, abilities, items, species and types, named after the game's
 own text, for sound sequences, named after the sound archive's symbols, and for trainer classes. This bootstraps the
 lists from the ROM once; after that the committed lists are the source of truth, edited by hand, and the build
 generates the headers from them with gen_constants.py.
 
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --sdat extract/b2_us/files/swan_sound_data.sdat
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --trainer-classes extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --trainers extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --zones extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --encounters extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --trades extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --places
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --files
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --flags
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --map-matrices extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --field-graphics extract/b2_us
-    make_constants.py extract/b2_us/files/a/0/0/2 data/constants --areas extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --sdat extract/b2_us/files/swan_sound_data.sdat
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --trainer-classes extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --trainers extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --zones extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --encounters extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --trades extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --places
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --files
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --flags
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --map-matrices extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --field-graphics extract/b2_us
+    make_constants.py extract/b2_us/files/a/0/0/2 generated --areas extract/b2_us
 
 Names are the English names in upper case, with words split at spaces, hyphens and capitals inside a word, so that
 "ThunderPunch" becomes MOVE_THUNDER_PUNCH. Items named "???" are unused, and are named after their ID, as
@@ -301,7 +301,7 @@ def file_names() -> dict[str, dict[int, str]]:
 
     root = Path(__file__).parents[2]
     zone_files = {}
-    for path in (root / "data/zones").glob("*.json"):
+    for path in (root / "res/field/zones").glob("*.json"):
         if path.name.endswith("schema.json"):
             continue
         zone = json.loads(path.read_text())
@@ -315,7 +315,7 @@ def file_names() -> dict[str, dict[int, str]]:
     for entry in json.loads((root / "tools/script/field_commands.json").read_text())["global_scripts"]:
         scripts[entry["file"]] = f"SCRIPTS_GLOBAL_{entry['first']}"
         script_text.setdefault(entry["text_file"], f"SCRIPT_TEXT_GLOBAL_{entry['first']}")
-    field_scripts = sorted(int(path.stem[:4]) for path in (root / "data/field_scripts").glob("*.s"))
+    field_scripts = sorted(int(path.stem[:4]) for path in (root / "res/field/scripts").glob("*.s"))
     for number in field_scripts:
         scripts.setdefault(number, f"SCRIPTS_{number:04d}")
 
@@ -335,8 +335,8 @@ def file_names() -> dict[str, dict[int, str]]:
 
     return {
         "field_scripts": dict(sorted(scripts.items())),
-        "script_text_banks": by_file_names(root / "data/text/script", "SCRIPT_TEXT_", script_text),
-        "text_banks": by_file_names(root / "data/text/system", "TEXT_BANK_", {}),
+        "script_text_banks": by_file_names(root / "res/text/script", "SCRIPT_TEXT_", script_text),
+        "text_banks": by_file_names(root / "res/text/system", "TEXT_BANK_", {}),
     }
 
 
@@ -517,7 +517,7 @@ def load_zone_list() -> dict[str, int]:
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("archive", type=Path, help="the system message archive, files/a/0/0/2")
-    parser.add_argument("output", type=Path, help="the directory for the lists, data/constants")
+    parser.add_argument("output", type=Path, help="the directory for the lists, generated")
     parser.add_argument("--sdat", type=Path, help="the sound archive, files/swan_sound_data.sdat, for sound.txt")
     parser.add_argument("--trainer-classes", type=Path, metavar="EXTRACT",
                         help="write only trainer_classes.txt, from an extracted version such as extract/b2_us")
@@ -538,7 +538,7 @@ def main():
                         help="write only flags.txt and vars.txt, every flag and variable, keeping the names they have")
     parser.add_argument("--files", action="store_true",
                         help="write only field_scripts.txt, script_text_banks.txt and text_banks.txt, from the zones, "
-                             "the global scripts and the names of the files in data/")
+                             "the global scripts and the names of the files in res/")
     parser.add_argument("--trades", type=Path, metavar="EXTRACT",
                         help="write only trades.txt, from an extracted version such as extract/b2_us")
     parser.add_argument("--encounters", type=Path, metavar="EXTRACT",

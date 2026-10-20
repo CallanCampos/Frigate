@@ -1,0 +1,16 @@
+{
+    "$schema": "../../set.schema.json",
+    "species": "SPECIES_FLAREON",
+    "moves": [ "MOVE_DIG", "MOVE_FLAIL", "MOVE_WORK_UP", "MOVE_FIRE_BLAST" ],
+    "ev_flags": {
+        "hp": false,
+        "attack": true,
+        "defense": false,
+        "speed": false,
+        "special_attack": true,
+        "special_defense": false
+    },
+    "nature": "NATURE_NAUGHTY",
+    "item": "ITEM_FOCUS_SASH",
+    "form": 0
+}

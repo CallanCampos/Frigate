@@ -1,4 +1,0 @@
-Route23_Text_MysteriousPresenceCanFelt = A mysterious presence can be felt here!\nCheck the surrounding area?
-Route23_Text_Kyuuun = Kyuuun!
-Route23_Text_AzelfWentFlyingOff = Azelf went flying off somewhere...
-\pad{b4}

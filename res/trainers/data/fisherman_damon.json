@@ -1,0 +1,43 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Damon",
+    "class": "TRAINER_CLASS_FISHERMAN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_BASCULIN",
+            "form": 0,
+            "level": 39,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_STARYU",
+            "form": 0,
+            "level": 39,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Argh! It got away!\nI almost caught it, too!{be00}\nTimes like this call for a Pokémon battle!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Phew! I lost again, but it was nice\nto take my mind off fishing for a bit!"
+        },
+        {
+            "type": 2,
+            "text": "You've got to remain optimistic if\nyou want to be a good Fisherman!{be00}\nEven if your catch gets away,{be00}\nthere's no use crying about it!"
+        }
+    ]
+}

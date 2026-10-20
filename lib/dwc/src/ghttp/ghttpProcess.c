@@ -38,7 +38,7 @@ BOOL ghiParseURL(GHIConnection *connection) {
     length = strcspn(url, ":/");
     saved = url[length];
     url[length] = '\0';
-    connection->serverAddress = func_ov011_0216e2c8(url);
+    connection->serverAddress = goastrdup(url);
     if (connection->serverAddress == NULL) {
         return FALSE;
     }
@@ -63,7 +63,7 @@ BOOL ghiParseURL(GHIConnection *connection) {
     if (url[0] == '\0') {
         url = "/";
     }
-    path = func_ov011_0216e2c8(url);
+    path = goastrdup(url);
     connection->requestPath = path;
     space = strchr(path, ' ');
     while (space != NULL) {
@@ -83,9 +83,9 @@ BOOL ghiParseURL(GHIConnection *connection) {
 
 // Starts a connection: reads its URL and, for a secure one, makes sure that there is an encryption engine
 void ghiDoSocketInit(GHIConnection *connection) {
-    func_ov011_0216cca8(8, 3, 0x10, "Socket Initialization\n");
+    gsDebugFormat(8, 3, 0x10, "Socket Initialization\n");
     ghiCallProgressCallback(connection, NULL, 0);
-    func_ov011_0216e31c();
+    SocketStartUp();
     if (!ghiParseURL(connection)) {
         connection->completed = TRUE;
         connection->result = 3;
@@ -93,17 +93,17 @@ void ghiDoSocketInit(GHIConnection *connection) {
     }
 
     if (connection->secure == TRUE && connection->encryptor.engine == 0) {
-        func_ov011_0216cca8(8, 0, 2, "Encryption engine not set for HTTPS.  Using default engine\r\n");
+        gsDebugFormat(8, 0, 2, "Encryption engine not set for HTTPS.  Using default engine\r\n");
         ghttpSetRequestEncryptionEngine(connection->request, 5);
     } else if (connection->secure != TRUE && connection->encryptor.engine != 0) {
         ghttpSetRequestEncryptionEngine(connection->request, 0);
-        func_ov011_0216cca8(8, 0, 2, "Encryption engine set for unsecured URL. Removing encryption.\r\n");
+        gsDebugFormat(8, 0, 2, "Encryption engine set for unsecured URL. Removing encryption.\r\n");
     }
 
     if (connection->secure == TRUE && connection->encryptor.open == 0) {
-        func_ov011_0216cca8(8, 3, 15, "Initializing SSL engine\n");
+        gsDebugFormat(8, 3, 15, "Initializing SSL engine\n");
         if (connection->encryptor.init(connection, &connection->encryptor) == 3) {
-            func_ov011_0216cca8(8, 3, 2, "Failed to initialize SSL engine\n");
+            gsDebugFormat(8, 3, 2, "Failed to initialize SSL engine\n");
             connection->completed = TRUE;
             connection->result = 0x11;
             return;
@@ -122,7 +122,7 @@ void ghiDoHostLookup(GHIConnection *connection) {
         ghiCallProgressCallback(connection, NULL, 0);
         return;
     }
-    func_ov011_0216cca8(8, 3, 0x10, "Host Lookup\n");
+    gsDebugFormat(8, 3, 0x10, "Host Lookup\n");
     host = connection->proxyAddress;
     if (host == NULL) {
         host = ghiProxyAddress;
@@ -130,10 +130,10 @@ void ghiDoHostLookup(GHIConnection *connection) {
             host = connection->serverAddress;
         }
     }
-    connection->serverIp = func_ov011_0216df90(host);
+    connection->serverIp = inet_addr(host);
     if (connection->serverIp == -1) {
-        if (func_ov011_0216e26c(host, &connection->hostLookup) == -1) {
-            func_ov011_0216cca8(8, 3, 1, "Thread Creation Failed\n");
+        if (gsiStartResolvingHostname(host, &connection->hostLookup) == -1) {
+            gsDebugFormat(8, 3, 1, "Thread Creation Failed\n");
             connection->hostLookup = NULL;
             connection->completed = TRUE;
             connection->result = 4;
@@ -151,9 +151,9 @@ void ghiDoHostLookup(GHIConnection *connection) {
 
 // Waits for the lookup to end
 void ghiDoLookupPending(GHIConnection *connection) {
-    connection->serverIp = func_ov011_0216e2bc(connection->hostLookup);
+    connection->serverIp = gsiGetResolvedIP(connection->hostLookup);
     if (connection->serverIp == -1) {
-        func_ov011_0216cca8(8, 3, 1, "Error resolving hostname\n");
+        gsDebugFormat(8, 3, 1, "Error resolving hostname\n");
         connection->hostLookup = NULL;
         connection->completed = TRUE;
         connection->result = 4;
@@ -165,7 +165,7 @@ void ghiDoLookupPending(GHIConnection *connection) {
         return;
     }
     connection->hostLookup = NULL;
-    func_ov011_0216cca8(8, 3, 0x10, "DNS lookup complete\n");
+    gsDebugFormat(8, 3, 0x10, "DNS lookup complete\n");
     connection->state = 3;
     ghiCallProgressCallback(connection, NULL, 0);
 }
@@ -174,23 +174,23 @@ void ghiDoLookupPending(GHIConnection *connection) {
 void ghiDoConnecting(GHIConnection *connection) {
     int result;
 
-    func_ov011_0216cca8(8, 3, 0x10, "Connecting\n");
+    gsDebugFormat(8, 3, 0x10, "Connecting\n");
     if (connection->socket == -1) {
-        connection->socket = func_ov011_0216de20(2, 1, 0);
+        connection->socket = gsiSocket(2, 1, 0);
         if (connection->socket == -1) {
             connection->completed = TRUE;
             connection->result = 5;
-            connection->socketError = func_ov011_0216dfa8(connection->socket);
+            connection->socketError = GOAGetLastError(connection->socket);
             return;
         }
-        if (!func_ov011_0216e054(connection->socket, 0)) {
+        if (!SetSockBlocking(connection->socket, 0)) {
             connection->completed = TRUE;
             connection->result = 5;
-            connection->socketError = func_ov011_0216dfa8(connection->socket);
+            connection->socketError = GOAGetLastError(connection->socket);
             return;
         }
         if (connection->throttle != 0) {
-            func_ov011_0216e0d0(connection->socket, ghiThrottleBytes);
+            SetReceiveBufferSize(connection->socket, ghiThrottleBytes);
         }
         if (connection->encryptor.engine == 4) {
             if (connection->encryptor.start(connection, &connection->encryptor) == 3) {
@@ -213,10 +213,10 @@ void ghiDoConnecting(GHIConnection *connection) {
                 address.port = GHI_SWAP16(connection->serverPort);
             }
             address.addr = connection->serverIp;
-            result = func_ov011_0216dec4(connection->socket, &address, 8);
+            result = connect(connection->socket, &address, 8);
         }
         if (result == -1) {
-            int error = func_ov011_0216dfa8(connection->socket);
+            int error = GOAGetLastError(connection->socket);
 
             if (error != -6 && error != -26 && error != -76) {
                 connection->completed = TRUE;
@@ -231,12 +231,12 @@ void ghiDoConnecting(GHIConnection *connection) {
         int ready;
         int failed;
 
-        result = func_ov011_0216dfb4(connection->socket, NULL, &ready, &failed);
+        result = GSISocketSelect(connection->socket, NULL, &ready, &failed);
         if (result == -1 || (result == 1 && failed != 0)) {
             connection->completed = TRUE;
             connection->result = 6;
             if (result == -1) {
-                connection->socketError = func_ov011_0216dfa8(connection->socket);
+                connection->socketError = GOAGetLastError(connection->socket);
             } else {
                 connection->socketError = 0;
             }
@@ -260,7 +260,7 @@ void ghiDoSecuringSession(GHIConnection *connection) {
     int result;
 
     if (connection->encryptor.unk_0C == 0) {
-        func_ov011_0216cca8(8, 3, 0x10, "Securing Session\n");
+        gsDebugFormat(8, 3, 0x10, "Securing Session\n");
         if (connection->encryptor.start != NULL) {
             if (connection->encryptor.start(connection, &connection->encryptor) == 3) {
                 connection->completed = TRUE;
@@ -330,7 +330,7 @@ void ghiDoSendingRequest(GHIConnection *connection) {
     const char *method;
     char length[16];
 
-    func_ov011_0216cca8(8, 3, 0x10, "Sending Request\n");
+    gsDebugFormat(8, 3, 0x10, "Sending Request\n");
     if (connection->sendBuffer.length == 0) {
         if (connection->encryptor.engine == 0 || connection->encryptor.mode == 0) {
             buffer = &connection->sendBuffer;
@@ -410,13 +410,13 @@ void ghiDoPosting(GHIConnection *connection) {
     int result;
     int readable;
 
-    func_ov011_0216cca8(8, 3, 0x10, "Posting\n");
+    gsDebugFormat(8, 3, 0x10, "Posting\n");
     bytesPosted = connection->postingState.bytesPosted;
     result = ghiPostDoPosting(connection);
     if (result == 0) {
         readable = 0;
         ghiPostCleanupState(connection);
-        if (func_ov011_0216dfb4(connection->socket, &readable, NULL, NULL) == 1 && readable != 0) {
+        if (GSISocketSelect(connection->socket, &readable, NULL, NULL) == 1 && readable != 0) {
             connection->state = 8;
             ghiCallProgressCallback(connection, NULL, 0);
         }
@@ -443,13 +443,13 @@ void ghiDoWaiting(GHIConnection *connection) {
     int failed;
     int result;
 
-    func_ov011_0216cca8(8, 3, 0x10, "Waiting\n");
-    result = func_ov011_0216dfb4(connection->socket, &readable, NULL, &failed);
+    gsDebugFormat(8, 3, 0x10, "Waiting\n");
+    result = GSISocketSelect(connection->socket, &readable, NULL, &failed);
     if (result == -1 || (result == 1 && failed != 0)) {
         connection->completed = TRUE;
         connection->result = 5;
         if (result == -1) {
-            connection->socketError = func_ov011_0216dfa8(connection->socket);
+            connection->socketError = GOAGetLastError(connection->socket);
         } else {
             connection->socketError = 0;
         }
@@ -493,7 +493,7 @@ void ghiDoReceivingStatus(GHIConnection *connection) {
     char *lineEnd;
     int lineLength;
 
-    func_ov011_0216cca8(8, 3, 0x10, "Receiving Status\n");
+    gsDebugFormat(8, 3, 0x10, "Receiving Status\n");
     size = sizeof(buffer);
     result = ghiDoReceive(connection, buffer, &size);
     if (result == 3 || result == 1) {
@@ -529,7 +529,7 @@ void ghiDoReceivingStatus(GHIConnection *connection) {
             ghiResetBuffer(&connection->recvBuffer);
             connection->state = 6;
             ghiCallProgressCallback(connection, NULL, 0);
-            func_ov011_0216cca8(8, 0, 0x10, "Got HTTP continue\r\n");
+            gsDebugFormat(8, 0, 0x10, "Got HTTP continue\r\n");
             return;
         }
         connection->state = 9;
@@ -537,7 +537,7 @@ void ghiDoReceivingStatus(GHIConnection *connection) {
     } else if (result == 2) {
         connection->completed = TRUE;
         connection->result = 7;
-        connection->socketError = func_ov011_0216dfa8(connection->socket);
+        connection->socketError = GOAGetLastError(connection->socket);
     }
 }
 
@@ -619,10 +619,10 @@ BOOL ghiProcessIncomingFileData(GHIConnection *connection, const char *data, int
                     }
                     if (chunkSize == 0) {
                         connection->chunkState = 3;
-                        func_ov011_0216cca8(8, 0, 0x20, "Reading footer\n");
+                        gsDebugFormat(8, 0, 0x20, "Reading footer\n");
                     } else {
                         connection->chunkState = 1;
-                        func_ov011_0216cca8(8, 0, 0x20, "Reading %d byte chunk\n", chunkSize);
+                        gsDebugFormat(8, 0, 0x20, "Reading %d byte chunk\n", chunkSize);
                     }
                 } else {
                     ghiAppendChunkHeader(connection, data, size);
@@ -634,7 +634,7 @@ BOOL ghiProcessIncomingFileData(GHIConnection *connection, const char *data, int
                 if (count >= size) {
                     count = size;
                 }
-                func_ov011_0216cca8(8, 0, 0x20, "Read %d bytes of chunk\n", count);
+                gsDebugFormat(8, 0, 0x20, "Read %d bytes of chunk\n", count);
                 if (!ghiDeliverIncomingFileData(connection, data, count)) {
                     return FALSE;
                 }
@@ -656,10 +656,10 @@ BOOL ghiProcessIncomingFileData(GHIConnection *connection, const char *data, int
                 connection->chunkHeaderLength = 0;
                 connection->chunkRemaining = 0;
                 connection->chunkState = 0;
-                func_ov011_0216cca8(8, 0, 0x20, "Read chunk footer\n");
+                gsDebugFormat(8, 0, 0x20, "Read chunk footer\n");
             } else if (connection->chunkState == 3) {
                 connection->completed = TRUE;
-                func_ov011_0216cca8(8, 0, 0x20, "Finished reading chunks\n");
+                gsDebugFormat(8, 0, 0x20, "Finished reading chunks\n");
                 return TRUE;
             } else {
                 return FALSE;
@@ -672,7 +672,7 @@ BOOL ghiProcessIncomingFileData(GHIConnection *connection, const char *data, int
 
 static void ghiFreeIfSet(void *pointer) {
     if (pointer != NULL) {
-        func_ov011_0216ddfc(pointer);
+        gsifree(pointer);
     }
 }
 
@@ -691,7 +691,7 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
     char *headers;
     BOOL skipCR = TRUE;
 
-    buffer = func_ov011_0216dddc(0x1000);
+    buffer = gsimalloc(0x1000);
     if (buffer == NULL) {
         connection->completed = TRUE;
         connection->result = 1;
@@ -790,8 +790,7 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
                 }
                 end[0] = '\0';
                 if (location[0] == '/') {
-                    connection->redirectUrl =
-                        func_ov011_0216dddc(strlen(connection->serverAddress) + 14 + strlen(location));
+                    connection->redirectUrl = gsimalloc(strlen(connection->serverAddress) + 14 + strlen(location));
                     if (connection->redirectUrl == NULL) {
                         connection->completed = TRUE;
                         connection->result = 1;
@@ -799,7 +798,7 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
                     OS_SPrintf(connection->redirectUrl, "http://%s:%d%s", connection->serverAddress,
                                connection->serverPort, location);
                 } else {
-                    connection->redirectUrl = func_ov011_0216e2c8(location);
+                    connection->redirectUrl = goastrdup(location);
                     if (connection->redirectUrl == NULL) {
                         connection->completed = TRUE;
                         connection->result = 1;
@@ -862,26 +861,26 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
     } else if (result == 2) {
         connection->completed = TRUE;
         connection->result = 7;
-        connection->socketError = func_ov011_0216dfa8(connection->socket);
+        connection->socketError = GOAGetLastError(connection->socket);
     }
     ghiFreeIfSet(buffer);
 }
 
 // Reads the file the request asks for, as long as it can for a while, and gives it to the game
 void ghiDoReceivingFile(GHIConnection *connection) {
-    u32 startTime = func_ov011_0216e324();
+    u32 startTime = current_time();
     int size = 0;
     char *buffer;
     u32 elapsed = 0;
     int result;
 
-    buffer = func_ov011_0216dddc(0x2000);
+    buffer = gsimalloc(0x2000);
     if (buffer == NULL) {
         connection->completed = TRUE;
         connection->result = 1;
         return;
     }
-    func_ov011_0216cca8(8, 3, 0x10, "Receiving File\n");
+    gsDebugFormat(8, 3, 0x10, "Receiving File\n");
 
     while (!connection->completed && elapsed < connection->maxRecvTime) {
         size = 0x2000;
@@ -889,14 +888,14 @@ void ghiDoReceivingFile(GHIConnection *connection) {
         if (result == 1) {
             ghiFreeIfSet(buffer);
             if (connection->lastRecvTime == 0) {
-                connection->lastRecvTime = func_ov011_0216e324();
+                connection->lastRecvTime = current_time();
                 return;
             }
-            if (func_ov011_0216e324() - connection->lastRecvTime < 30000) {
+            if (current_time() - connection->lastRecvTime < 30000) {
                 return;
             }
-            func_ov011_0216cca8(8, 0, 1, "Receive File Idle Timeout %d ===== \r\n",
-                                func_ov011_0216e324() - connection->lastRecvTime);
+            gsDebugFormat(8, 0, 1, "Receive File Idle Timeout %d ===== \r\n",
+                          current_time() - connection->lastRecvTime);
             connection->lastRecvTime = 0;
             connection->completed = TRUE;
             connection->result = 19;
@@ -944,7 +943,7 @@ void ghiDoReceivingFile(GHIConnection *connection) {
                 return;
             }
         }
-        elapsed = func_ov011_0216e324() - startTime;
+        elapsed = current_time() - startTime;
     }
     ghiFreeIfSet(buffer);
 }

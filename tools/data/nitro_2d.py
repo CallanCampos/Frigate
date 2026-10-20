@@ -1,6 +1,7 @@
-"""Small Nitro 2D graphics helpers shared by Pokémon asset packers."""
+"""Small Nitro 2D graphics helpers shared by the graphics packers."""
 
 import struct
+import sys
 import zlib
 
 
@@ -95,6 +96,20 @@ def patch_palette(blob, colors):
     return bytes(raw)
 
 
+def color5(color):
+    """Returns an 8-bit color as the 5-bit one the DS shows."""
+    return tuple(round(axis * 31 / 255) for axis in color)
+
+
+def palette_resource(colors, fmt, count=None):
+    """Returns a Nitro palette resource (NCLR) of the colors, padded with black to count, whose header gives fmt, the
+    palette's GXTexFmt as the game's file of that kind has it."""
+    colors = list(colors) + [(0, 0, 0)] * ((count or len(colors)) - len(colors))
+    data = b"".join(struct.pack("<H", r | g << 5 | b << 10) for r, g, b in map(color5, colors))
+    section = struct.pack("<4sIIIII", b"TTLP", 0x18 + len(data), fmt, 0, len(data), 0x10) + data
+    return struct.pack("<4sHHIHH", b"RLCN", 0xFEFF, 0x0100, 0x10 + len(section), 0x10, 1) + section
+
+
 def write_palette(colors):
     return "JASC-PAL\n0100\n" + str(len(colors)) + "\n" + "".join(
         f"{r} {g} {b}\n" for r, g, b in colors)
@@ -110,24 +125,38 @@ def read_palette(path):
     return colors
 
 
+# The OBJs of a single-cell sprite, in the order its characters store them, as (x, y, width, height) in pixels: a
+# 96 by 96 Pokémon sprite and an 80 by 80 trainer sprite, each a square OBJ with the strips right of and below it
+SINGLE_CELL_96 = ((0, 0, 64, 64), (64, 0, 32, 64), (0, 64, 64, 32), (64, 64, 32, 32))
+SINGLE_CELL_80 = ((0, 0, 64, 64), (64, 0, 16, 64), (0, 64, 64, 16), (64, 64, 16, 16))
+
+
+def obj_reorder(chars, width, objs, reverse=False):
+    """Returns characters stored OBJ by OBJ, each OBJ's tiles in rows, as the tiles of one image in rows, or with
+    reverse the other way round."""
+    tiles = [chars[i:i + 32] for i in range(0, len(chars), 32)]
+    order = [(y // 8) * (width // 8) + x // 8
+             for ox, oy, ow, oh in objs for y in range(oy, oy + oh, 8) for x in range(ox, ox + ow, 8)]
+    if sorted(order) != list(range(len(tiles))):
+        raise ValueError("the OBJs don't cover the sprite's characters")
+    output = [b""] * len(tiles)
+    for stored, tiled in enumerate(order):
+        if reverse:
+            output[stored] = tiles[tiled]
+        else:
+            output[tiled] = tiles[stored]
+    return b"".join(output)
+
+
 def single_cell_reorder(chars, reverse=False):
     if len(chars) != 0x1200:
         raise ValueError("single-cell Pokémon sprite must be 96 by 96")
-    output = bytearray(len(chars))
-    # Four OBJ blocks (64x64, 32x64, 64x32, 32x32) become one 96x96 tiled image.
-    spans = ([(i * 0x100, i * 0x180, 0x100) for i in range(8)]
-             + [(0x800 + i * 0x80, i * 0x180 + 0x100, 0x80) for i in range(8)]
-             + [(0xc00 + i * 0x100, 0xc00 + i * 0x180, 0x100) for i in range(4)]
-             + [(0x1000 + i * 0x80, 0xc00 + i * 0x180 + 0x100, 0x80) for i in range(4)])
-    for source, target, size in spans:
-        if reverse:
-            output[source:source + size] = chars[target:target + size]
-        else:
-            output[target:target + size] = chars[source:source + size]
-    return bytes(output)
+    return obj_reorder(chars, 96, SINGLE_CELL_96, reverse)
 
 
-def character_pixels(blob, width=None, height=None, single_cell=False, linear=False):
+def character_pixels(blob, width=None, height=None, single_cell=False, linear=False, objs=None):
+    """Returns a character resource's width, height and pixels, from tiles in rows, OBJs in the order of objs, the
+    96 by 96 single-cell layout with single_cell, or rows of pixels with linear."""
     raw = resource_data(blob, b"RGCN", b"RAHC")
     tile_height, tile_width = struct.unpack_from("<HH", raw, 24)
     size = struct.unpack_from("<I", raw, 40)[0]
@@ -140,6 +169,8 @@ def character_pixels(blob, width=None, height=None, single_cell=False, linear=Fa
         raise ValueError("invalid Nitro character data")
     if single_cell:
         chars = single_cell_reorder(chars)
+    if objs:
+        chars = obj_reorder(chars, width, objs)
     if linear:
         return width, height, bytes(value for byte in chars for value in (byte & 15, byte >> 4))
     pixels = bytearray(width * height)
@@ -156,32 +187,76 @@ def character_pixels(blob, width=None, height=None, single_cell=False, linear=Fa
     return width, height, bytes(pixels)
 
 
+def encode_characters(width, height, pixels, linear=False):
+    """Returns 4bpp pixels as character data: in 8 by 8 tiles, or with linear in rows."""
+    if len(pixels) != width * height or width % 8 or height % 8:
+        raise ValueError("invalid Nitro character dimensions")
+    if any(value > 15 for value in pixels):
+        raise ValueError("Nitro character index exceeds 4bpp")
+    if linear:
+        return bytes(left | right << 4 for left, right in zip(pixels[::2], pixels[1::2]))
+    chars = bytearray(width * height // 2)
+    cursor = 0
+    for ty in range(0, height, 8):
+        for tx in range(0, width, 8):
+            for y in range(8):
+                for x in range(0, 8, 2):
+                    base = (ty + y) * width + tx + x
+                    chars[cursor] = pixels[base] | pixels[base + 1] << 4
+                    cursor += 1
+    return bytes(chars)
+
+
+def character_resource(width, height, pixels, linear=False, position=None, objs=None, mapping=0, sized=True):
+    """Returns a Nitro character resource (NCGR) of 4bpp pixels, tiled, in the OBJs of objs or with linear in rows:
+    with position, a (width, height) in tiles, the character position section (SOPC) that some resources add, the OBJ
+    VRAM mapping, and without sized the 0xFFFF size that OBJ characters can have."""
+    chars = encode_characters(width, height, pixels, linear)
+    if objs:
+        chars = obj_reorder(chars, width, objs, reverse=True)
+    tiles = (height // 8, width // 8) if sized else (0xFFFF, 0xFFFF)
+    sections = [struct.pack("<4sIHHIIIII", b"RAHC", 0x20 + len(chars), *tiles, 3, mapping, int(linear), len(chars),
+                            0x18) + chars]
+    if position:
+        sections.append(struct.pack("<4sIIHH", b"SOPC", 0x10, 0, *position))
+    body = b"".join(sections)
+    return struct.pack("<4sHHIHH", b"RGCN", 0xFEFF, 0x0101, 0x10 + len(body), 0x10, len(sections)) + body
+
+
 def patch_characters(blob, width, height, pixels, single_cell=False, linear=False):
     raw = bytearray(resource_data(blob, b"RGCN", b"RAHC"))
     old_width, old_height, _ = character_pixels(blob, width, height, single_cell, linear)
     if (width, height) != (old_width, old_height) or len(pixels) != width * height:
         raise ValueError("Nitro character dimensions changed")
-    chars = bytearray(width * height // 2)
-    cursor = 0
-    if linear:
-        for left, right in zip(pixels[::2], pixels[1::2]):
-            if left > 15 or right > 15:
-                raise ValueError("Nitro character index exceeds 4bpp")
-            chars[cursor] = left | right << 4
-            cursor += 1
-    else:
-        for ty in range(0, height, 8):
-            for tx in range(0, width, 8):
-                for y in range(8):
-                    for x in range(0, 8, 2):
-                        base = (ty + y) * width + tx + x
-                        left, right = pixels[base:base + 2]
-                        if left > 15 or right > 15:
-                            raise ValueError("Nitro character index exceeds 4bpp")
-                        chars[cursor] = left | right << 4
-                        cursor += 1
+    chars = encode_characters(width, height, pixels, linear)
     raw[48:48 + len(chars)] = single_cell_reorder(chars, reverse=True) if single_cell else chars
     return compress_literals(bytes(raw), blob[0]) if blob[0] in (0x10, 0x11) else bytes(raw)
+
+
+def palette_indices(path, pixels, png_colors, colors):
+    """Returns a PNG's pixels as indices of the sprite's palette, whose .pal file sets the colors: its own indices
+    where the PNG's palette agrees with the sprite's, as exported, the sprite's index of the same color where an
+    editor reordered or compacted the PNG's palette on saving, and its own index where the color is nowhere in the
+    sprite's palette, as after the .pal file's colors were changed. Index 0 is transparent and stays 0."""
+    target = [color5(color) for color in colors]
+    mapping = {0: 0}
+    for i in sorted(set(pixels) - {0}):
+        if i >= len(png_colors):
+            raise ValueError(f"{path}: a pixel's index {i} is outside the PNG's palette")
+        color = color5(png_colors[i])
+        matches = [j for j, other in enumerate(target) if j and other == color]
+        if (i < len(target) and target[i] == color) or not matches:
+            if i >= len(target):
+                raise ValueError(f"{path}: a pixel's index {i} is outside the sprite's {len(target)} colors")
+            if target[i] != color:
+                print(f"{path}: the PNG's color {png_colors[i]} at index {i} is not in the sprite's palette; the "
+                      ".pal file's color is used, so recolor a sprite in its .pal file", file=sys.stderr)
+            mapping[i] = i
+            continue
+        mapping[i] = matches[0]
+    if all(i == j for i, j in mapping.items()):
+        return pixels
+    return bytes(mapping[i] for i in pixels)
 
 
 def png_chunk(kind, data):

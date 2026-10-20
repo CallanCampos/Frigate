@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Gerard",
+    "class": "TRAINER_CLASS_PSYCHIC_M",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EXPERT" ],
+    "heals": false,
+    "money": 8,
+    "reward": "ITEM_ULTRA_BALL",
+    "party": [
+        {
+            "species": "SPECIES_GIRAFARIG",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_SIGILYPH",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CLAYDOL",
+            "form": 0,
+            "level": 61,
+            "difficulty": 50,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "Which team will score next?!\nIf you can win, I will tell you!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Aha!\nThat team will score next!"
+        },
+        {
+            "type": 15,
+            "text": "Aha! I've got it!\nI'll give you this!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "My psychic power only works\nright before a player scores a point."
+        }
+    ]
+}

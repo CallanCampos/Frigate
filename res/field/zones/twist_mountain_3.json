@@ -1,0 +1,33 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 16,
+    "npc_cache": 24,
+    "area": "AREA_TWIST_MOUNTAIN_3",
+    "matrix": "MAP_MATRIX_TWIST_MOUNTAIN_3",
+    "scripts": "SCRIPTS_TWIST_MOUNTAIN_3",
+    "text": "SCRIPT_TEXT_TWIST_MOUNTAIN_3",
+    "bgm": "SEQ_BGM_D_03",
+    "encounters": "ENCOUNTERS_TWIST_MOUNTAIN",
+    "enc_slot": 2,
+    "parent": "ZONE_TWIST_MOUNTAIN",
+    "place": "PLACE_TWIST_MOUNTAIN",
+    "place_display": 3,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 3,
+    "battle_bg": 4,
+    "cycling": true,
+    "escape_rope": true,
+    "fly_from": false,
+    "cycle_surf_bgm": true,
+    "entralink_warp": false,
+    "cam_bound": 94,
+    "name_icon": 15,
+    "easy_level": 5,
+    "fly": {
+        "x": 5,
+        "y": 0,
+        "z": 4
+    }
+}

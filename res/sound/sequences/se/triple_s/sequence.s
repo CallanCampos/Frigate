@@ -1,0 +1,104 @@
+track_00:
+    note_wait 0
+    tempo 170
+    program 0
+    volume 127
+    pan 64
+    bend_range 12
+    pitch_bend 12
+    note G7, 126, 8
+    rest 2
+    pitch_bend -8
+    rest 2
+    pitch_bend -28
+    pan 69
+    volume 105
+    rest 3
+    pitch_bend -62
+    pan 58
+    volume 86
+    rest 2
+    pitch_bend -82
+    pan 64
+    volume 29
+    rest 3
+    pitch_bend 0
+    volume 127
+    note G7, 106, 7
+    rest 2
+    pitch_bend -21
+    rest 2
+    pitch_bend -40
+    pan 69
+    volume 105
+    rest 3
+    pitch_bend -74
+    pan 58
+    volume 86
+    rest 2
+    pitch_bend -94
+    pan 64
+    volume 29
+    rest 3
+    pitch_bend -2
+    volume 127
+    note G7, 48, 7
+    rest 2
+    pitch_bend -22
+    rest 2
+    pitch_bend -41
+    pan 69
+    volume 105
+    rest 3
+    pitch_bend -76
+    pan 58
+    volume 86
+    rest 2
+    pitch_bend -96
+    pan 64
+    volume 29
+    rest 3
+    pitch_bend -2
+    volume 127
+    note G7, 13, 7
+    rest 2
+    pitch_bend -22
+    rest 2
+    pitch_bend -41
+    pan 69
+    volume 105
+    rest 3
+    pitch_bend -76
+    pan 58
+    volume 86
+    rest 2
+    pitch_bend -96
+    pan 64
+    volume 29
+    rest 3
+    call label_00be
+    pan 64
+    rest 2
+    pan 69
+    rest 2
+    pan 58
+    rest 3
+    pan 72
+    rest 2
+    pan 54
+    rest 3
+    call label_00be
+    pan 64
+    end
+label_00be:
+    rest 2
+    pan 69
+    rest 2
+    pan 58
+    rest 3
+    pan 72
+    rest 2
+    pan 54
+    rest 3
+    return
+    .byte 0xff, 0x00, 0x00

@@ -39,9 +39,6 @@
 // microphone, and the louder, the more the speaker on the screen shakes and the more notes it sends up. The Back
 // button on the lower screen returns to the title screen
 
-// The microphone test's graphics, archive 107
-#define ARCID_MIC_TEST 107
-
 #define BG_COUNT 5
 #define WINDOW_COUNT 3
 #define ACTOR_COUNT 7
@@ -367,7 +364,7 @@ static void MicTest_SeqListen(MicTestSeq *seq, u32 *state) {
         break;
     case 1:
         if (MicTest_IsExitPressed()) {
-            if (func_02006e3c()) {
+            if (SndMic_IsOverLimit()) {
                 GFL_SndSEPlay(SEQ_SE_CANCEL1);
                 *state = 2;
             }
@@ -388,11 +385,11 @@ static void MicTest_SeqPressBack(MicTestSeq *seq, u32 *state) {
 
     switch (*state) {
     case 0:
-        func_0204c488(wk->actors[ACTOR_BACK_BUTTON], 1);
+        ClActor_SetSequence(wk->actors[ACTOR_BACK_BUTTON], 1);
         *state = 1;
         break;
     case 1:
-        if (!func_0204c560(wk->actors[ACTOR_BACK_BUTTON])) {
+        if (!ClActor_IsAnimActive(wk->actors[ACTOR_BACK_BUTTON])) {
             *state = 2;
         }
         break;
@@ -462,16 +459,16 @@ static void MicTest_InitClAct(MicTestWork *wk, u32 heapId) {
 }
 
 static void MicTest_FreeClAct(MicTestWork *wk) {
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void MicTest_UpdateClAct(MicTestWork *wk) {
     u16 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c4e0(wk->actors[i], FX32_ONE);
+        ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void MicTest_CreateActors(MicTestWork *wk, HeapID heapId) {
@@ -479,45 +476,45 @@ static void MicTest_CreateActors(MicTestWork *wk, HeapID heapId) {
     ArcTool *arc;
     ArcTool *commonArc;
 
-    wk->unit = func_0204bf1c(32, 0, heapId);
+    wk->unit = ClActUnit_Create(32, 0, heapId);
     arc = GFL_ArcSysCreateFileHandle(ARCID_MIC_TEST, heapId);
     commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    wk->resources[RES_SPEAKER + 1] = func_0204bba0(arc, 6, 0, 0, heapId);
-    wk->resources[RES_SPEAKER] = func_0204b81c(arc, 7, 0, 0, heapId);
-    wk->resources[RES_SPEAKER + 2] = func_0204bde0(arc, 8, 9, heapId);
-    wk->resources[RES_CENTER + 1] = func_0204bba0(arc, 10, 0, 32, heapId);
-    wk->resources[RES_CENTER] = func_0204b81c(arc, 11, 0, 0, heapId);
-    wk->resources[RES_CENTER + 2] = func_0204bde0(arc, 12, 13, heapId);
-    wk->resources[RES_NOTE + 1] = func_0204bba0(arc, 14, 0, 64, heapId);
-    wk->resources[RES_NOTE] = func_0204b81c(arc, 15, 0, 0, heapId);
-    wk->resources[RES_NOTE + 2] = func_0204bde0(arc, 16, 17, heapId);
-    wk->resources[RES_BACK_BUTTON + 1] = func_0204bba0(commonArc, 31, 1, 0, heapId);
-    wk->resources[RES_BACK_BUTTON] = func_0204b81c(commonArc, 32, 0, 1, heapId);
-    wk->resources[RES_BACK_BUTTON + 2] = func_0204bde0(arc, 18, 19, heapId);
+    wk->resources[RES_SPEAKER + 1] = ClActSys_LoadPltt(arc, 6, 0, 0, heapId);
+    wk->resources[RES_SPEAKER] = ClActSys_LoadChars(arc, 7, 0, 0, heapId);
+    wk->resources[RES_SPEAKER + 2] = ClActSys_LoadCellAnims(arc, 8, 9, heapId);
+    wk->resources[RES_CENTER + 1] = ClActSys_LoadPltt(arc, 10, 0, 32, heapId);
+    wk->resources[RES_CENTER] = ClActSys_LoadChars(arc, 11, 0, 0, heapId);
+    wk->resources[RES_CENTER + 2] = ClActSys_LoadCellAnims(arc, 12, 13, heapId);
+    wk->resources[RES_NOTE + 1] = ClActSys_LoadPltt(arc, 14, 0, 64, heapId);
+    wk->resources[RES_NOTE] = ClActSys_LoadChars(arc, 15, 0, 0, heapId);
+    wk->resources[RES_NOTE + 2] = ClActSys_LoadCellAnims(arc, 16, 17, heapId);
+    wk->resources[RES_BACK_BUTTON + 1] = ClActSys_LoadPltt(commonArc, 31, 1, 0, heapId);
+    wk->resources[RES_BACK_BUTTON] = ClActSys_LoadChars(commonArc, 32, 0, 1, heapId);
+    wk->resources[RES_BACK_BUTTON + 2] = ClActSys_LoadCellAnims(arc, 18, 19, heapId);
     GFL_ArcToolFree(commonArc);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ACTOR_COUNT; i++) {
         const MicTestActorSetup *actor = &sMicTestActors[i];
 
-        wk->actors[i] = func_0204c040(wk->unit, wk->resources[actor->resource], wk->resources[actor->resource + 1],
-                                      wk->resources[actor->resource + 2], &sMicTestActorSetups[actor->setup],
-                                      (u16)actor->surface, heapId);
+        wk->actors[i] = ClActor_Create(wk->unit, wk->resources[actor->resource], wk->resources[actor->resource + 1],
+                                       wk->resources[actor->resource + 2], &sMicTestActorSetups[actor->setup],
+                                       (u16)actor->surface, heapId);
         func_0204c520(wk->actors[i], TRUE);
     }
     for (i = 0; i < NOTE_COUNT; i++) {
-        func_0204c124(wk->actors[ACTOR_NOTE_FIRST + i], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_NOTE_FIRST + i], FALSE);
     }
-    func_0204c244(wk->actors[0], 0);
-    func_0204c2b0(wk->actors[0], 1, 1);
+    ClActor_SetAffineMode(wk->actors[0], 0);
+    ClActor_SetFlip(wk->actors[0], 1, 1);
     wk->spawnTimer = NOTE_INTERVAL;
 }
 
 static void MicTest_FreeActors(MicTestWork *wk) {
-    func_0204bf98(wk->unit);
+    ClActUnit_Delete(wk->unit);
 }
 
 static void MicTest_VBlankClAct(MicTestWork *wk) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void MicTest_InitBG(MicTestBG *bg, u32 heapId) {
@@ -621,7 +618,7 @@ static void MicTestMic_Init(MicTestMic *mic, u32 heapId, MICCallback callback, v
     mic->param.size -= 0x20;
     mic->param.fullCallback = callback;
     mic->param.fullArg = arg;
-    mic->wasOpen = func_02006e3c();
+    mic->wasOpen = SndMic_IsOverLimit();
 }
 
 static void MicTestMic_Free(MicTestMic *mic) {
@@ -633,8 +630,8 @@ static void MicTestMic_Free(MicTestMic *mic) {
 static void MicTestMic_Update(MicTestMic *mic) {
     BOOL open;
 
-    func_02006e0c(1);
-    open = func_02006e3c();
+    SndMic_AddCount(1);
+    open = SndMic_IsOverLimit();
     if (!open || !mic->wasOpen) {
         if (!mic->asleep) {
             if (mic->sampling) {
@@ -708,7 +705,7 @@ static void MicTest_OnBufferFull(MICResult result, void *arg) {
     }
     if (level != 0) {
         if (mic->newPeak) {
-            func_0204c488(wk->actors[ACTOR_CENTER], 1);
+            ClActor_SetSequence(wk->actors[ACTOR_CENTER], 1);
             mic->newPeak = FALSE;
         }
         if (MicTest_AreNotesFree(wk)) {
@@ -720,12 +717,12 @@ static void MicTest_OnBufferFull(MICResult result, void *arg) {
                 wk->spawnTimer = NOTE_INTERVAL;
             }
         }
-        func_0204c488(wk->actors[0], level);
-        func_0204c488(wk->actors[1], level);
+        ClActor_SetSequence(wk->actors[0], level);
+        ClActor_SetSequence(wk->actors[1], level);
     } else if (level == 0) {
-        func_0204c488(wk->actors[ACTOR_CENTER], 0);
-        func_0204c488(wk->actors[0], 0);
-        func_0204c488(wk->actors[1], 0);
+        ClActor_SetSequence(wk->actors[ACTOR_CENTER], 0);
+        ClActor_SetSequence(wk->actors[0], 0);
+        ClActor_SetSequence(wk->actors[1], 0);
     }
     sMicTestBufferFullCount++;
 }
@@ -794,14 +791,14 @@ static void MicTestNote_Start(TCBManager *tcbManager, ClActor *actor, MicTestNot
     work->position.x = FX32_CONST(x);
     work->position.y = FX32_CONST(y);
     work->position.z = 0;
-    work->velocity.x = FX_Mul(speed, func_02044304(angle + 90));
-    work->velocity.y = -FX_Mul(speed, func_02044304(angle));
+    work->velocity.x = FX_Mul(speed, GFL_MathSinDeg(angle + 90));
+    work->velocity.y = -FX_Mul(speed, GFL_MathSinDeg(angle));
     work->velocity.z = 0;
     work->phase = 0;
     work->phaseStep = FX32_CONST(6);
     work->swayRadius = swayRadius;
-    func_0204c228(work->actor, x, 0);
-    func_0204c228(work->actor, y, 1);
+    ClActor_SetPosAxis(work->actor, x, 0);
+    ClActor_SetPosAxis(work->actor, y, 1);
 }
 
 static void MicTestNote_Task(TCB *tcb, void *data) {
@@ -813,7 +810,7 @@ static void MicTestNote_Task(TCB *tcb, void *data) {
     if (note->delay != 0) {
         note->delay--;
         if (note->delay == 0) {
-            func_0204c124(note->actor, TRUE);
+            ClActor_SetVisible(note->actor, TRUE);
         }
         return;
     }
@@ -824,12 +821,12 @@ static void MicTestNote_Task(TCB *tcb, void *data) {
     while (note->phase > FX32_CONST(360)) {
         note->phase -= FX32_CONST(360);
     }
-    sway = (func_02044304(note->phase >> FX32_SHIFT) * note->swayRadius) >> FX32_SHIFT;
+    sway = (GFL_MathSinDeg(note->phase >> FX32_SHIFT) * note->swayRadius) >> FX32_SHIFT;
     x += sway;
-    func_0204c228(note->actor, x, 0);
-    func_0204c228(note->actor, y, 1);
+    ClActor_SetPosAxis(note->actor, x, 0);
+    ClActor_SetPosAxis(note->actor, y, 1);
     if (y < -16) {
-        func_0204c124(note->actor, FALSE);
+        ClActor_SetVisible(note->actor, FALSE);
         GFL_TCBRemove(tcb);
         note->task = NULL;
     }
@@ -847,7 +844,7 @@ static void MicTest_StopNotes(MicTestWork *wk) {
 }
 
 static s32 MicTest_GetTouchedRect(void) {
-    return func_0203da0c(sMicTestExitRects);
+    return GFL_HIDGetTouchPressedRect(sMicTestExitRects);
 }
 
 static BOOL MicTest_IsExitPressed(void) {

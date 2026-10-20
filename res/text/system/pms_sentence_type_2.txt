@@ -1,0 +1,21 @@
+PmsSentenceType2_Text_Win = I win!\n{011c:0}!
+PmsSentenceType2_Text_OweVictory = I owe my victory\nto {011c:0}!
+PmsSentenceType2_Text_StrongIsnt = {011c:0} is strong,\nisn't it?
+PmsSentenceType2_Text_ItsAfterAll = It's {011c:0}\n{011c:1} after all!
+PmsSentenceType2_Text_WhenComesChoiceAlways = When it comes to {011c:0},\nmy choice is always {011c:1}!
+PmsSentenceType2_Text_VictoryBattle = Victory in a\n{011c:0} battle!
+PmsSentenceType2_Text_Yay = Yay, {011c:0}!\n{011c:1}!
+PmsSentenceType2_Text_SorryIts = Sorry, it's {011c:0}\n{011c:1}.
+PmsSentenceType2_Text_Thank = {011c:0}!\nThank you!
+PmsSentenceType2_Text_WayFeelNow = The way I feel now is\n{011c:0}!
+PmsSentenceType2_Text_Sure = {011c:0} sure is\n{011c:1}!
+PmsSentenceType2_Text_ItsAllThanks = It's all thanks to\n{011c:0}.
+PmsSentenceType2_Text_Toughest = {011c:0} is the toughest!
+PmsSentenceType2_Text_WowImGlad = {011c:0}?\nWow, I'm so glad!
+PmsSentenceType2_Text_SoundsGood = {011c:0}?\nThat sounds good!
+PmsSentenceType2_Text_HaveNoTroubleDealing = I have no trouble\ndealing with {011c:0}.
+PmsSentenceType2_Text_MuchFun = {011c:0} is so much fun.
+PmsSentenceType2_Text_Huh = Huh?\n{011c:0}?!
+PmsSentenceType2_Text_PowerAwesome = The power of {011c:0}\nis awesome!
+PmsSentenceType2_Text_Everyone = Everyone!\n{011c:0}!
+\pad{46}

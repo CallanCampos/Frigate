@@ -26,8 +26,6 @@
 #include "system/wordset.h"
 
 #define HEAPID_FMISSION_APP 0xa7
-// The screen's graphics and its table of positions
-#define ARCID_FMISSION_APP 270
 // The missions' data
 #define ARCID_FMISSION_DATA 289
 

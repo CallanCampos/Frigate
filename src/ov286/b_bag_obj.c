@@ -4,6 +4,7 @@
 #include "battle/b_bag_main.h"
 #include "battle/btlv_effect.h"
 #include "battle/btlv_finger_cursor.h"
+#include "constants/arc.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/clact.h"
@@ -113,11 +114,12 @@ static void BBagObj_LoadItemIconRes(BBagWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(PML_ItemGetIconArcID(), HEAPID_TAIL(wk->param->heapId));
     for (i = 0; i < 7; i++) {
         wk->charRes[i] =
-            func_0204b81c(arc, GetItemGraphicsDatID(item, charType), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+            ClActSys_LoadChars(arc, GetItemGraphicsDatID(item, charType), FALSE, CLACT_VRAM_SUB, wk->param->heapId);
         wk->plttRes[i] =
-            func_0204bba0(arc, GetItemGraphicsDatID(item, plttType), CLACT_VRAM_SUB, i * 0x20, wk->param->heapId);
+            ClActSys_LoadPltt(arc, GetItemGraphicsDatID(item, plttType), CLACT_VRAM_SUB, i * 0x20, wk->param->heapId);
     }
-    wk->cellRes[0] = func_0204bde0(arc, PML_ItemGetIconCellDatID(), PML_ItemGetIconAnimDatID(), wk->param->heapId);
+    wk->cellRes[0] =
+        ClActSys_LoadCellAnims(arc, PML_ItemGetIconCellDatID(), PML_ItemGetIconAnimDatID(), wk->param->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -138,7 +140,7 @@ static void BBagObj_LoadItemIcon(BBagWork *wk, u16 item, u32 chars, u32 row) {
     }
     arc = GFL_ArcSysCreateFileHandle(PML_ItemGetIconArcID(), HEAPID_TAIL(param->heapId));
     file = GFL_G2DIOReadOBJNCGRArc(arc, GetItemGraphicsDatID(item, charType), FALSE, &charData, wk->param->heapId);
-    func_0204ba40(wk->charRes[chars], charData);
+    ClActSys_ReplaceCharData(wk->charRes[chars], charData);
     GFL_HeapFree(file);
     PaletteFade_LoadArcNCLR(wk->paletteFade, arc, GetItemGraphicsDatID(item, plttType), wk->param->heapId,
                             PALFADE_BUFFER_SUB_OBJ, 0x20, row * 16);
@@ -158,23 +160,23 @@ static void BBagObj_LoadItemIconPalette(BBagWork *wk, u16 item, u32 row) {
 }
 
 static void BBagObj_LoadGaugeRes(BBagWork *wk) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(98, HEAPID_TAIL(wk->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_B_BAG, HEAPID_TAIL(wk->param->heapId));
 
-    wk->charRes[7] = func_0204b81c(arc, 14, TRUE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[7] = func_0204bba0(arc, 15, CLACT_VRAM_SUB, 0xe0, wk->param->heapId);
-    wk->cellRes[1] = func_0204bde0(arc, 16, 17, wk->param->heapId);
+    wk->charRes[7] = ClActSys_LoadChars(arc, 14, TRUE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[7] = ClActSys_LoadPltt(arc, 15, CLACT_VRAM_SUB, 0xe0, wk->param->heapId);
+    wk->cellRes[1] = ClActSys_LoadCellAnims(arc, 16, 17, wk->param->heapId);
     PaletteFade_LoadArcNCLR(wk->paletteFade, arc, 15, wk->param->heapId, PALFADE_BUFFER_SUB_OBJ, 0x20, 0x70);
     GFL_ArcToolFree(arc);
 }
 
 static void BBagObj_LoadCursorRes(BBagWork *wk) {
     NNSG2dPaletteData *palette;
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(11, HEAPID_TAIL(wk->param->heapId));
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(wk->param->heapId));
     void *file;
 
-    wk->charRes[8] = func_0204b81c(arc, 424, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
-    wk->plttRes[8] = func_0204bbb8(arc, 421, CLACT_VRAM_SUB, 0x100, 4, 1, wk->param->heapId);
-    wk->cellRes[2] = func_0204bde0(arc, 425, 426, wk->param->heapId);
+    wk->charRes[8] = ClActSys_LoadChars(arc, 424, FALSE, CLACT_VRAM_SUB, wk->param->heapId);
+    wk->plttRes[8] = ClActSys_LoadPlttRange(arc, 421, CLACT_VRAM_SUB, 0x100, 4, 1, wk->param->heapId);
+    wk->cellRes[2] = ClActSys_LoadCellAnims(arc, 425, 426, wk->param->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 421, &palette, HEAPID_TAIL(wk->param->heapId));
     PaletteFade_LoadData(wk->paletteFade, (u16 *)palette->rawData + 4 * 16, PALFADE_BUFFER_SUB_OBJ, 0x80, 0x20);
     GFL_HeapFree(file);
@@ -189,14 +191,14 @@ static ClActor *BBagObj_CreateActor(BBagWork *wk, const BBagActorSetup *data) {
     setup.sequence = 0;
     setup.priority = 1;
     setup.bgPriority = 1;
-    return func_0204c040(wk->actorUnit, wk->charRes[data->chars], wk->plttRes[data->palette],
-                         wk->cellRes[data->cellAnims], &setup, CLACT_SURFACE_SUB, wk->param->heapId);
+    return ClActor_Create(wk->actorUnit, wk->charRes[data->chars], wk->plttRes[data->palette],
+                          wk->cellRes[data->cellAnims], &setup, CLACT_SURFACE_SUB, wk->param->heapId);
 }
 
 static void BBagObj_CreateActors(BBagWork *wk) {
     u32 i;
 
-    wk->actorUnit = func_0204bf1c(BBAG_ACTOR_MAX + 4, 0, wk->param->heapId);
+    wk->actorUnit = ClActUnit_Create(BBAG_ACTOR_MAX + 4, 0, wk->param->heapId);
     for (i = 0; i < NELEMS(wk->actors); i++) {
         wk->actors[i] = BBagObj_CreateActor(wk, &data_ov286_021f6f08[i]);
     }
@@ -207,37 +209,37 @@ void BBagObj_Exit(BBagWork *wk) {
 
     BBagObj_DeleteFingerCursor(wk);
     for (i = 0; i < NELEMS(wk->actors); i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
     BBagObj_ExitCursor(wk);
     for (i = 0; i < NELEMS(wk->charRes); i++) {
         if (wk->charRes[i] != -1) {
-            func_0204b98c(wk->charRes[i]);
+            ClActSys_FreeChars(wk->charRes[i]);
         }
     }
     for (i = 0; i < NELEMS(wk->plttRes); i++) {
         if (wk->plttRes[i] != -1) {
-            func_0204bcd0(wk->plttRes[i]);
+            ClActSys_FreePltt(wk->plttRes[i]);
         }
     }
     for (i = 0; i < NELEMS(wk->cellRes); i++) {
         if (wk->cellRes[i] != -1) {
-            func_0204be64(wk->cellRes[i]);
+            ClActSys_FreeCellAnims(wk->cellRes[i]);
         }
     }
-    func_0204bf98(wk->actorUnit);
+    ClActUnit_Delete(wk->actorUnit);
 }
 
 static void BBagObj_ShowAt(ClActor *actor, const ClActorPos *pos) {
-    func_0204c124(actor, TRUE);
-    func_0204c140(actor, pos, CLACT_SURFACE_SUB);
+    ClActor_SetVisible(actor, TRUE);
+    ClActor_SetSurfacePos(actor, pos, CLACT_SURFACE_SUB);
 }
 
 void BBagObj_SetPage(BBagWork *wk, u8 page) {
     u32 i;
 
     for (i = 0; i < NELEMS(wk->actors); i++) {
-        func_0204c124(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
     BBagObj_HideFingerCursor(wk);
     switch (page) {
@@ -332,7 +334,7 @@ static void BBagObj_ShowCost(BBagWork *wk, u16 actor, u8 cost, u8 spent, const C
     u16 i;
 
     BBagObj_ShowAt(wk->actors[actor], pos);
-    func_0204c488(wk->actors[actor], cost);
+    ClActor_SetSequence(wk->actors[actor], cost);
     actor++;
     c = cost;
     s = spent;
@@ -341,24 +343,24 @@ static void BBagObj_ShowCost(BBagWork *wk, u16 actor, u8 cost, u8 spent, const C
     for (i = 0; i < 7; i++) {
         if (c <= 0) {
             if (s <= 0) {
-                func_0204c488(wk->actors[actor], 15);
+                ClActor_SetSequence(wk->actors[actor], 15);
             } else if (s == 1) {
-                func_0204c488(wk->actors[actor], 19);
+                ClActor_SetSequence(wk->actors[actor], 19);
                 s -= 1;
             } else {
-                func_0204c488(wk->actors[actor], 20);
+                ClActor_SetSequence(wk->actors[actor], 20);
                 s -= 2;
             }
         } else if (c == 1) {
             if (s == 0) {
-                func_0204c488(wk->actors[actor], 16);
+                ClActor_SetSequence(wk->actors[actor], 16);
             } else if (s > 0) {
-                func_0204c488(wk->actors[actor], 18);
+                ClActor_SetSequence(wk->actors[actor], 18);
                 s -= 1;
             }
             c -= 1;
         } else {
-            func_0204c488(wk->actors[actor], 17);
+            ClActor_SetSequence(wk->actors[actor], 17);
             c -= 2;
         }
         BBagObj_ShowAt(wk->actors[actor], &p);

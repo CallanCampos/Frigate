@@ -13,15 +13,15 @@
 // Year 0xda, January 1st, Sunday, which no real sync date can be
 #define DREAM_WORLD_SYNC_DATE_NONE 0xda010100
 
-u32 func_02009930(void) {
+u32 DreamWorldSave_GetSize(void) {
     return sizeof(DreamWorldSave);
 }
 
-void func_02009938(DreamWorldSave *dreamWorld) {
+void DreamWorldSave_Init(DreamWorldSave *dreamWorld) {
     u8 i = 0;
 
-    MI_CpuFill8(dreamWorld, 0, func_02009930());
-    func_02009ad4(dreamWorld, DREAM_WORLD_SYNC_DATE_NONE);
+    MI_CpuFill8(dreamWorld, 0, DreamWorldSave_GetSize());
+    DreamWorldSave_SetSyncDate(dreamWorld, DREAM_WORLD_SYNC_DATE_NONE);
     dreamWorld->lastResultId = -1;
     dreamWorld->unk1A7 = 0;
     dreamWorld->unk1A8 = 0;
@@ -32,15 +32,15 @@ void func_02009938(DreamWorldSave *dreamWorld) {
     }
 }
 
-PartyPkm *func_02009998(DreamWorldSave *dreamWorld) {
+PartyPkm *DreamWorldSave_GetPkm(DreamWorldSave *dreamWorld) {
     return &dreamWorld->pkm;
 }
 
-void func_0200999c(DreamWorldSave *dreamWorld, PartyPkm *pkm) {
+void DreamWorldSave_SetPkm(DreamWorldSave *dreamWorld, PartyPkm *pkm) {
     MI_CpuCopy8(pkm, &dreamWorld->pkm, PokeParty_GetPkmRawSize());
 }
 
-BOOL func_020099b4(const u8 *flags, int species) {
+BOOL DreamWorldSave_TestSpeciesFlag(const u8 *flags, int species) {
     // The byte index is unsigned and the bit signed, as the original divides
     if (flags[(u32)species >> 3] & (1 << (species % 8))) {
         return TRUE;
@@ -56,15 +56,15 @@ u8 func_020099e0(DreamWorldSave *dreamWorld) {
     return dreamWorld->unk1A4;
 }
 
-void func_020099e8(DreamWorldSave *dreamWorld, u8 value) {
+void DreamWorldSave_SetIDShown(DreamWorldSave *dreamWorld, u8 value) {
     dreamWorld->idShown = value;
 }
 
-u8 func_020099f4(DreamWorldSave *dreamWorld) {
+u8 DreamWorldSave_GetIDShown(DreamWorldSave *dreamWorld) {
     return dreamWorld->idShown;
 }
 
-void func_02009a00(DreamWorldSave *dreamWorld, u8 asleep) {
+void DreamWorldSave_SetPokemonAsleep(DreamWorldSave *dreamWorld, u8 asleep) {
     dreamWorld->asleep = asleep;
 }
 
@@ -74,7 +74,7 @@ BOOL DreamWorldSave_IsPokemonAsleep(DreamWorldSave *dreamWorld) {
 
 // BUG: the three item functions accept index DREAM_WORLD_ITEM_MAX, one past the arrays, which reads and writes
 // the first item counts and the first result
-u16 func_02009a18(DreamWorldSave *dreamWorld, int index) {
+u16 DreamWorldSave_GetItem(DreamWorldSave *dreamWorld, int index) {
 #ifdef BUGFIX
     if (index >= DREAM_WORLD_ITEM_MAX) {
 #else
@@ -88,7 +88,7 @@ u16 func_02009a18(DreamWorldSave *dreamWorld, int index) {
     return dreamWorld->items[index];
 }
 
-u8 func_02009a38(DreamWorldSave *dreamWorld, int index) {
+u8 DreamWorldSave_GetItemCount(DreamWorldSave *dreamWorld, int index) {
 #ifdef BUGFIX
     if (index >= DREAM_WORLD_ITEM_MAX) {
 #else
@@ -102,7 +102,7 @@ u8 func_02009a38(DreamWorldSave *dreamWorld, int index) {
     return dreamWorld->itemCounts[index];
 }
 
-void func_02009a50(DreamWorldSave *dreamWorld, int index, u16 item, u8 count) {
+void DreamWorldSave_SetItem(DreamWorldSave *dreamWorld, int index, u16 item, u8 count) {
 #ifdef BUGFIX
     if (index < DREAM_WORLD_ITEM_MAX) {
 #else
@@ -113,52 +113,52 @@ void func_02009a50(DreamWorldSave *dreamWorld, int index, u16 item, u8 count) {
     }
 }
 
-void func_02009a6c(DreamWorldSave *dreamWorld, int index) {
-    func_02009a50(dreamWorld, index, 0, 0);
+void DreamWorldSave_ClearItem(DreamWorldSave *dreamWorld, int index) {
+    DreamWorldSave_SetItem(dreamWorld, index, 0, 0);
 }
 
-s32 func_02009a78(DreamWorldSave *dreamWorld) {
+s32 DreamWorldSave_CountItems(DreamWorldSave *dreamWorld) {
     s32 count = 0;
     s32 i;
 
     for (i = 0; i < DREAM_WORLD_ITEM_MAX; i++) {
-        if (func_02009a38(dreamWorld, i) != 0) {
+        if (DreamWorldSave_GetItemCount(dreamWorld, i) != 0) {
             count++;
         }
     }
     return count;
 }
 
-u16 *func_02009a98(DreamWorldSave *dreamWorld, int index) {
+u16 *DreamWorldSave_GetResult(DreamWorldSave *dreamWorld, int index) {
     if (index < DREAM_WORLD_RESULT_MAX) {
         return dreamWorld->results[index];
     }
     return NULL;
 }
 
-void func_02009ab0(DreamWorldSave *dreamWorld, int index, const void *entry) {
+void DreamWorldSave_SetResult(DreamWorldSave *dreamWorld, int index, const void *entry) {
     if (index < DREAM_WORLD_RESULT_MAX) {
         MI_CpuCopy8(entry, dreamWorld->results[index], sizeof(dreamWorld->results[index]));
     }
 }
 
-u32 func_02009ad0(DreamWorldSave *dreamWorld) {
+u32 DreamWorldSave_GetSyncDate(DreamWorldSave *dreamWorld) {
     return dreamWorld->syncDate;
 }
 
-void func_02009ad4(DreamWorldSave *dreamWorld, u32 date) {
+void DreamWorldSave_SetSyncDate(DreamWorldSave *dreamWorld, u32 date) {
     dreamWorld->syncDate = date;
 }
 
-u32 func_02009ad8(DreamWorldSave *dreamWorld) {
+u32 DreamWorldSave_GetLastResultID(DreamWorldSave *dreamWorld) {
     return dreamWorld->lastResultId;
 }
 
-void func_02009adc(DreamWorldSave *dreamWorld, u32 id) {
+void DreamWorldSave_SetLastResultID(DreamWorldSave *dreamWorld, u32 id) {
     dreamWorld->lastResultId = id;
 }
 
-u32 func_02009ae0(DreamWorldSave *dreamWorld) {
+u32 DreamWorldSave_GetResultIndex(DreamWorldSave *dreamWorld) {
     u32 value = dreamWorld->resultIndex;
     if (value >= DREAM_WORLD_RESULT_MAX && value != DREAM_WORLD_RESULT_INDEX_NONE) {
         return DREAM_WORLD_RESULT_INDEX_NONE;
@@ -166,7 +166,7 @@ u32 func_02009ae0(DreamWorldSave *dreamWorld) {
     return value;
 }
 
-void func_02009af8(DreamWorldSave *dreamWorld, int value) {
+void DreamWorldSave_SetResultIndex(DreamWorldSave *dreamWorld, int value) {
     if (value < DREAM_WORLD_RESULT_MAX || value == DREAM_WORLD_RESULT_INDEX_NONE) {
         dreamWorld->resultIndex = (u8)value;
     }

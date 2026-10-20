@@ -1,5 +1,0 @@
-{
-    "$schema": "ability.schema.json",
-    "name": "Defeatist",
-    "description": "Lowers stats when HP\nbecomes half or less."
-}

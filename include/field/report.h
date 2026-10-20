@@ -3,11 +3,13 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "gfl/overlay.h"
 #include "struct_decls.h"
 
 // The report's touch screen, shown while the game saves: the player's name, the date, the time, the location, the
 // badges, the Pokédex, the play time and the last save, the party's icons and a bar of ten icons that fills as the
 // save is written. Overlay 87, named after the ROM's "report.c". Overlay 36's field subscreen table calls these
+#define OVERLAY_REPORT OVERLAY_ID(87)
 
 typedef struct ReportScreen ReportScreen;
 

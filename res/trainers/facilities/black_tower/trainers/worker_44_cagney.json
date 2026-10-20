@@ -1,0 +1,17 @@
+{
+    "$schema": "../../facility.schema.json",
+    "name": "Cagney",
+    "class": "TRAINER_CLASS_WORKER_44",
+    "pokemon": [
+        "poliwrath_1",
+        "drapion_1",
+        "steelix_1",
+        "gliscor_1",
+        "klinklang_1",
+        "cloyster_1",
+        "hippowdon_1",
+        "leafeon_1",
+        "aggron_1",
+        "tangrowth_1"
+    ]
+}

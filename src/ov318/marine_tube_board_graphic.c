@@ -87,7 +87,7 @@ MarineTubeBoardGraphic *MarineTubeBoardGraphic_Create(u32 layout, HeapID heapId)
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MarineTubeBoardBG_Init(&graphic->bg, heapId);
     MarineTubeBoardClAct_Init(&graphic->clact, &sMarineTubeBoardVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(MarineTubeBoardGraphic_VBlank, graphic, 0);
@@ -98,7 +98,7 @@ void MarineTubeBoardGraphic_Free(MarineTubeBoardGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     MarineTubeBoardClAct_Free(&graphic->clact);
     MarineTubeBoardBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -155,22 +155,22 @@ static void MarineTubeBoardBG_VBlank(MarineTubeBoardBG *bg) {
 static void MarineTubeBoardClAct_Init(MarineTubeBoardClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(MarineTubeBoardClAct));
     ClActSys_Create(&sMarineTubeBoardClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void MarineTubeBoardClAct_Free(MarineTubeBoardClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(MarineTubeBoardClAct));
 }
 
 static void MarineTubeBoardClAct_Update(MarineTubeBoardClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void MarineTubeBoardClAct_VBlank(MarineTubeBoardClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }

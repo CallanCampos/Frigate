@@ -95,7 +95,7 @@ ManualGraphic *ManualGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     ManualBG_Init(&graphic->bg, heapId);
     ManualClAct_Init(&graphic->clact, &sManualVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(ManualGraphic_VBlank, graphic, 0);
@@ -106,7 +106,7 @@ void ManualGraphic_Free(ManualGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     ManualClAct_Free(&graphic->clact);
     ManualBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -166,24 +166,24 @@ static void ManualBG_VBlank(ManualBG *bg) {
 static void ManualClAct_Init(ManualClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(ManualClAct));
     ClActSys_Create(&sManualClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void ManualClAct_Free(ManualClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(ManualClAct));
 }
 
 static void ManualClAct_Update(ManualClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void ManualClAct_VBlank(ManualClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *ManualClAct_GetUnit(ManualClAct *clact) {

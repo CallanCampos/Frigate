@@ -141,7 +141,7 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
                 engine->excluded[i] = 1;
                 continue;
             }
-            func_0200d3c8(engine->pokedex, species, &sex, &rare, &shownForm, heapId);
+            PokeDex_GetShownSexRareForm(engine->pokedex, species, &sex, &rare, &shownForm, heapId);
             displayedForm = shownForm;
             if (engine->total == NATIONAL_COUNT) {
                 form = displayedForm;

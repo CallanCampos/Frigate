@@ -3,6 +3,8 @@
 // nothing here; the file's name and its functions' are those of the Generation 4 library, or guesses after them. The
 // two halves may be two files (poke_net.c and a platform file), which nothing in the ROM tells apart.
 
+#include <string.h>
+// The standard header comes first so memset uses the compiler's in-place fixed-size clear
 #include "types.h"
 #include "dwc/ext.h"
 #include "nitro/mi.h"
@@ -450,10 +452,10 @@ BOOL POKE_NET_Connecting(void) {
     s32 start;
     int result;
 
-    address.len = sizeof(SocAddrIn);
-    address.family = POKE_NET_SOC_AF_INET;
     address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
     address.addr = gPOKE_NET_Control.ServerAddr;
+    address.len = sizeof(SocAddrIn);
+    address.family = POKE_NET_SOC_AF_INET;
     start = POKE_NET_GetTime();
 
     for (;;) {

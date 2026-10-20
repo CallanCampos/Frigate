@@ -1,6 +1,6 @@
-func_ov110_021eec80 kind:function(thumb,size=0x44) addr:0x021eecc0
-func_ov110_021eecc4 kind:function(thumb,size=0x38) addr:0x021eed04
-func_ov110_021eecfc kind:function(thumb,size=0x76) addr:0x021eed3c
+TubelineBridge_Setup kind:function(thumb,size=0x44) addr:0x021eecc0
+TubelineBridge_End kind:function(thumb,size=0x38) addr:0x021eed04
+TubelineBridge_Update kind:function(thumb,size=0x76) addr:0x021eed3c
 TubelineBridge_Init kind:function(thumb,size=0xbe) addr:0x021eedb4
 TubelineBridge_LoadWaitRanges kind:function(thumb,size=0x3c) addr:0x021eee74
 TubelineBridge_SaveFrames kind:function(thumb,size=0x32) addr:0x021eeeb0

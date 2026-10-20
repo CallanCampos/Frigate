@@ -79,7 +79,7 @@ void ZknSearchObj_Init(ZknSearchWork *wk) {
 void ZknSearchObj_Exit(ZknSearchWork *wk) {
     ZknSearchObj_DeleteActors(wk);
     ZknSearchObj_FreeResources(wk);
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 void ZknSearchObj_Update(ZknSearchWork *wk) {
@@ -87,15 +87,15 @@ void ZknSearchObj_Update(ZknSearchWork *wk) {
 
     for (i = 0; i < ZKNSEARCH_OBJ_COUNT; i++) {
         if (wk->actors[i] != NULL && func_0204c534(wk->actors[i]) != TRUE) {
-            func_0204c4e0(wk->actors[i], FX32_ONE);
+            ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 void ZknSearchObj_SetAnmSeq(ZknSearchWork *wk, u32 id, u32 anm) {
-    func_0204c4d4(wk->actors[id], 0);
-    func_0204c488(wk->actors[id], anm);
+    ClActor_SetAnimTime(wk->actors[id], 0);
+    ClActor_SetSequence(wk->actors[id], anm);
 }
 
 void ZknSearchObj_SetAnm(ZknSearchWork *wk, u32 id, u32 anm) {
@@ -104,28 +104,28 @@ void ZknSearchObj_SetAnm(ZknSearchWork *wk, u32 id, u32 anm) {
 }
 
 u32 ZknSearchObj_GetAnm(ZknSearchWork *wk, u32 id) {
-    return func_0204c4a0(wk->actors[id]);
+    return ClActor_GetSequence(wk->actors[id]);
 }
 
 BOOL ZknSearchObj_IsAnmPlaying(ZknSearchWork *wk, u32 id) {
-    return func_0204c560(wk->actors[id]);
+    return ClActor_IsAnimActive(wk->actors[id]);
 }
 
 void ZknSearchObj_SetVisible(ZknSearchWork *wk, u32 id, BOOL visible) {
     if (wk->actors[id] != NULL) {
-        func_0204c124(wk->actors[id], visible);
+        ClActor_SetVisible(wk->actors[id], visible);
     }
 }
 
 BOOL ZknSearchObj_IsVisible(ZknSearchWork *wk, u32 id) {
-    return func_0204c138(wk->actors[id]);
+    return ClActor_IsVisible(wk->actors[id]);
 }
 
 void ZknSearchObj_SetBlend(ZknSearchWork *wk, u32 id, BOOL blend) {
     if (blend == TRUE) {
-        func_0204c318(wk->actors[id], GX_OAM_MODE_XLU);
+        ClActor_SetObjMode(wk->actors[id], GX_OAM_MODE_XLU);
     } else {
-        func_0204c318(wk->actors[id], GX_OAM_MODE_NORMAL);
+        ClActor_SetObjMode(wk->actors[id], GX_OAM_MODE_NORMAL);
     }
 }
 
@@ -134,19 +134,19 @@ void ZknSearchObj_SetPos(ZknSearchWork *wk, u32 id, s16 x, s16 y, u16 surface) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(wk->actors[id], &pos, surface);
+    ClActor_SetSurfacePos(wk->actors[id], &pos, surface);
 }
 
 void ZknSearchObj_GetPos(ZknSearchWork *wk, u32 id, s16 *x, s16 *y, u16 surface) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[id], &pos, surface);
+    ClActor_GetSurfacePos(wk->actors[id], &pos, surface);
     *x = pos.x;
     *y = pos.y;
 }
 
 void ZknSearchObj_SetBGPriority(ZknSearchWork *wk, u32 id, u32 priority) {
-    func_0204c468(wk->actors[id], (u8)priority);
+    ClActor_SetBgPriority(wk->actors[id], (u8)priority);
 }
 
 static void ZknSearchObj_InitSystem(void) {
@@ -184,26 +184,28 @@ static void ZknSearchObj_LoadResources(ZknSearchWork *wk) {
     }
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
-    wk->charRes[CHAR_RES_LIST] = func_0204b81c(arc, 80, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
-    wk->paletteRes[CHAR_RES_LIST] = func_0204bba0(arc, 77, CLACT_VRAM_MAIN, 0 * 0x20, HEAPID_ZUKAN_SEARCH);
-    wk->cellRes[CELL_RES_LIST] = func_0204bde0(arc, 86, 102, HEAPID_ZUKAN_SEARCH);
-    wk->charRes[CHAR_RES_LIST_SUB] = func_0204b81c(arc, 80, FALSE, CLACT_VRAM_SUB, HEAPID_ZUKAN_SEARCH);
-    wk->paletteRes[CHAR_RES_LIST_SUB] = func_0204bba0(arc, 77, CLACT_VRAM_SUB, 0 * 0x20, HEAPID_ZUKAN_SEARCH);
-    wk->charRes[CHAR_RES_LOADING] = func_0204b81c(arc, 79, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
-    wk->paletteRes[CHAR_RES_LOADING] = func_0204bba0(arc, 74, CLACT_VRAM_MAIN, 3 * 0x20, HEAPID_ZUKAN_SEARCH);
-    wk->cellRes[CELL_RES_LOADING] = func_0204bde0(arc, 85, 101, HEAPID_ZUKAN_SEARCH);
-    wk->charRes[CHAR_RES_SHAPE] = func_0204b81c(arc, 84, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
-    wk->paletteRes[CHAR_RES_SHAPE] = func_0204bba0(arc, 78, CLACT_VRAM_MAIN, 4 * 0x20, HEAPID_ZUKAN_SEARCH);
-    wk->cellRes[CELL_RES_SHAPE] = func_0204bde0(arc, 87, 103, HEAPID_ZUKAN_SEARCH);
-    wk->charRes[CHAR_RES_SHAPE_SUB] = func_0204b81c(arc, 84, FALSE, CLACT_VRAM_SUB, HEAPID_ZUKAN_SEARCH);
-    wk->paletteRes[CHAR_RES_SHAPE_SUB] = func_0204bba0(arc, 78, CLACT_VRAM_SUB, 3 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_LIST] = ClActSys_LoadChars(arc, 80, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
+    wk->paletteRes[CHAR_RES_LIST] = ClActSys_LoadPltt(arc, 77, CLACT_VRAM_MAIN, 0 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->cellRes[CELL_RES_LIST] = ClActSys_LoadCellAnims(arc, 86, 102, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_LIST_SUB] = ClActSys_LoadChars(arc, 80, FALSE, CLACT_VRAM_SUB, HEAPID_ZUKAN_SEARCH);
+    wk->paletteRes[CHAR_RES_LIST_SUB] = ClActSys_LoadPltt(arc, 77, CLACT_VRAM_SUB, 0 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_LOADING] = ClActSys_LoadChars(arc, 79, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
+    wk->paletteRes[CHAR_RES_LOADING] = ClActSys_LoadPltt(arc, 74, CLACT_VRAM_MAIN, 3 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->cellRes[CELL_RES_LOADING] = ClActSys_LoadCellAnims(arc, 85, 101, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_SHAPE] = ClActSys_LoadChars(arc, 84, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
+    wk->paletteRes[CHAR_RES_SHAPE] = ClActSys_LoadPltt(arc, 78, CLACT_VRAM_MAIN, 4 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->cellRes[CELL_RES_SHAPE] = ClActSys_LoadCellAnims(arc, 87, 103, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_SHAPE_SUB] = ClActSys_LoadChars(arc, 84, FALSE, CLACT_VRAM_SUB, HEAPID_ZUKAN_SEARCH);
+    wk->paletteRes[CHAR_RES_SHAPE_SUB] = ClActSys_LoadPltt(arc, 78, CLACT_VRAM_SUB, 3 * 0x20, HEAPID_ZUKAN_SEARCH);
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
-    wk->charRes[CHAR_RES_TOUCHBAR] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
+    wk->charRes[CHAR_RES_TOUCHBAR] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_SEARCH);
     wk->paletteRes[CHAR_RES_TOUCHBAR] =
-        func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, 5 * 0x20, HEAPID_ZUKAN_SEARCH);
-    wk->cellRes[CELL_RES_TOUCHBAR] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), HEAPID_ZUKAN_SEARCH);
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 5 * 0x20, HEAPID_ZUKAN_SEARCH);
+    wk->cellRes[CELL_RES_TOUCHBAR] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                            AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_ZUKAN_SEARCH);
     GFL_ArcToolFree(arc);
 }
 
@@ -212,17 +214,17 @@ static void ZknSearchObj_FreeResources(ZknSearchWork *wk) {
 
     for (i = 0; i < ZKNSEARCH_CHAR_RES_COUNT; i++) {
         if (wk->charRes[i] != -1) {
-            func_0204b98c(wk->charRes[i]);
+            ClActSys_FreeChars(wk->charRes[i]);
         }
     }
     for (i = 0; i < ZKNSEARCH_PALETTE_RES_COUNT; i++) {
         if (wk->paletteRes[i] != -1) {
-            func_0204bcd0(wk->paletteRes[i]);
+            ClActSys_FreePltt(wk->paletteRes[i]);
         }
     }
     for (i = 0; i < ZKNSEARCH_CELL_RES_COUNT; i++) {
         if (wk->cellRes[i] != -1) {
-            func_0204be64(wk->cellRes[i]);
+            ClActSys_FreeCellAnims(wk->cellRes[i]);
         }
     }
 }
@@ -230,7 +232,7 @@ static void ZknSearchObj_FreeResources(ZknSearchWork *wk) {
 static void ZknSearchObj_CreateActors(ZknSearchWork *wk) {
     u32 i;
 
-    wk->actorUnit = func_0204bf1c(ZKNSEARCH_OBJ_COUNT, 0, HEAPID_ZUKAN_SEARCH);
+    wk->actorUnit = ClActUnit_Create(ZKNSEARCH_OBJ_COUNT, 0, HEAPID_ZUKAN_SEARCH);
     for (i = 0; i < ZKNSEARCH_OBJ_COUNT; i++) {
         wk->actors[i] = NULL;
     }
@@ -257,8 +259,8 @@ static void ZknSearchObj_CreateActors(ZknSearchWork *wk) {
     ZknSearchObj_SetVisible(wk, ZKNSEARCH_OBJ_MARK_SUB + 1, FALSE);
     ZknSearchObj_SetVisible(wk, ZKNSEARCH_OBJ_MARK_WINDOW, FALSE);
     ZknSearchObj_SetVisible(wk, ZKNSEARCH_OBJ_MARK_WINDOW + 1, FALSE);
-    func_0204c318(wk->actors[ZKNSEARCH_OBJ_MARK_WINDOW], OAM_MODE_OBJWND);
-    func_0204c318(wk->actors[ZKNSEARCH_OBJ_MARK_WINDOW + 1], OAM_MODE_OBJWND);
+    ClActor_SetObjMode(wk->actors[ZKNSEARCH_OBJ_MARK_WINDOW], OAM_MODE_OBJWND);
+    ClActor_SetObjMode(wk->actors[ZKNSEARCH_OBJ_MARK_WINDOW + 1], OAM_MODE_OBJWND);
     ZknSearchObj_SetBlend(wk, ZKNSEARCH_OBJ_MARK_SUB, TRUE);
     ZknSearchObj_SetBlend(wk, ZKNSEARCH_OBJ_MARK_SUB + 1, TRUE);
 
@@ -292,14 +294,14 @@ static void ZknSearchObj_CreateActors(ZknSearchWork *wk) {
             wk->actors[ZKNSEARCH_OBJ_SHAPE_ICON_WINDOW + i] =
                 ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_SEARCH);
             ZknSearchObj_SetVisible(wk, ZKNSEARCH_OBJ_SHAPE_ICON_WINDOW + i, FALSE);
-            func_0204c318(wk->actors[ZKNSEARCH_OBJ_SHAPE_ICON_WINDOW + i], OAM_MODE_OBJWND);
+            ClActor_SetObjMode(wk->actors[ZKNSEARCH_OBJ_SHAPE_ICON_WINDOW + i], OAM_MODE_OBJWND);
         }
     }
 }
 
 static void ZknSearchObj_DeleteActor(ZknSearchWork *wk, u32 id) {
     if (wk->actors[id] != NULL) {
-        func_0204c108(wk->actors[id]);
+        ClActor_Delete(wk->actors[id]);
         wk->actors[id] = NULL;
     }
 }
@@ -310,7 +312,7 @@ static void ZknSearchObj_DeleteActors(ZknSearchWork *wk) {
     for (i = 0; i < ZKNSEARCH_OBJ_COUNT; i++) {
         ZknSearchObj_DeleteActor(wk, i);
     }
-    func_0204bf98(wk->actorUnit);
+    ClActUnit_Delete(wk->actorUnit);
 }
 
 void ZknSearchObj_HideList(ZknSearchWork *wk) {

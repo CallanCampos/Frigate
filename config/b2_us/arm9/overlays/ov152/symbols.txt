@@ -1,5 +1,5 @@
-func_ov152_021f6200 kind:function(thumb,size=0x3c) addr:0x021f6200
-func_ov152_021f623c kind:function(thumb,size=0x28) addr:0x021f623c
-func_ov152_021f6264 kind:function(thumb,size=0x3e) addr:0x021f6264
-func_ov152_021f62a4 kind:function(thumb,size=0x4a) addr:0x021f62a4
+EncEffCells_Create kind:function(thumb,size=0x3c) addr:0x021f6200
+EncEffCells_CreateGridEvent kind:function(thumb,size=0x28) addr:0x021f623c
+EncEffCells_Update kind:function(thumb,size=0x3e) addr:0x021f6264
+EncEffCells_UpdateCell kind:function(thumb,size=0x4a) addr:0x021f62a4
 data_ov152_021f62f0 kind:data(any) addr:0x021f62f0

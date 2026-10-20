@@ -1,0 +1,4 @@
+StriatonCity4_Text_BillLanetteBebeAmanita = Bill, Lanette, Bebe, and Amanita.{be01}\nThey're all admins of the\nPokémon Storage System.
+StriatonCity4_Text_DontReallyKnowWhat = I don't really know what it means,\nbut the current C-Gear is version 3.0.
+StriatonCity4_Text_Gwoorf = Gwoorf!
+\pad{5e}

@@ -42,7 +42,7 @@ static const FieldCameraCoords data_ov012_0216dc3c = {
     0x1d7d, 0, 0x16c000, { 0x1f8000, -0x40000, 0x264000 }, { 0, 0x9d000, 0x90000 },
 };
 
-static GameEvent *func_ov012_02165e80(GameSystem *gsys, Field *field);
+static GameEvent *EventLeagueLiftArrival_Create(GameSystem *gsys, Field *field);
 
 static GameEventReturnCode EventLeagueLiftWarp_Callback(GameEvent *event, u32 *state, void *work) {
     LeagueLiftWarpData *data = work;
@@ -96,7 +96,7 @@ static GameEventReturnCode EventLeagueLiftWarp_Callback(GameEvent *event, u32 *s
         (*state)++;
         break;
     case 6:
-        GameEvent_Replace(event, func_ov012_02165e80(gsys, field));
+        GameEvent_Replace(event, EventLeagueLiftArrival_Create(gsys, field));
         (*state)++;
         break;
     case 7:
@@ -123,12 +123,12 @@ GameEvent *EventLeagueLiftWarp_Create(GameSystem *gsys, Field *field) {
     return event;
 }
 
-static BOOL func_ov012_02165ca4(LeagueLiftArrivalData *data) {
+static BOOL LeagueLiftArrival_StepCurve(LeagueLiftArrivalData *data) {
     return GFL_G3DCurveFrameStepLoop(data->curve, FX32_ONE);
 }
 
 // Moves the lift to the curve
-static void func_ov012_02165cb4(LeagueLiftArrivalData *data) {
+static void LeagueLiftArrival_MoveLift(LeagueLiftArrivalData *data) {
     VecFx32 translation;
 
     GFL_G3DCurveGetNowTranslation(data->curve, &translation);
@@ -136,7 +136,7 @@ static void func_ov012_02165cb4(LeagueLiftArrivalData *data) {
 }
 
 // Puts the player on the lift, in the middle of its square
-static void func_ov012_02165cd8(LeagueLiftArrivalData *data) {
+static void LeagueLiftArrival_PlacePlayer(LeagueLiftArrivalData *data) {
     SRTMatrix *matrix = FieldExpObj_GetActorMatrixPtr(Field_GetExpObjSystem(data->field), 0, 0);
     FieldPlayer *player = Field_GetPlayer(data->field);
     VecFx32 pos;
@@ -147,7 +147,7 @@ static void func_ov012_02165cd8(LeagueLiftArrivalData *data) {
     FieldPlayer_SetWPos(player, &pos);
 }
 
-static GameEventReturnCode func_ov012_02165d30(GameEvent *event, u32 *state, void *work) {
+static GameEventReturnCode EventLeagueLiftArrival_Callback(GameEvent *event, u32 *state, void *work) {
     LeagueLiftArrivalData *data = work;
     BOOL done;
     FieldEvCameraShake shake;
@@ -160,8 +160,8 @@ static GameEventReturnCode func_ov012_02165d30(GameEvent *event, u32 *state, voi
     switch (*state) {
     case 0:
         data->curve = GFL_G3DCurveLoadFileAll(data->heapId, 0x9b, 0x19);
-        func_ov012_02165cb4(data);
-        func_ov012_02165cd8(data);
+        LeagueLiftArrival_MoveLift(data);
+        LeagueLiftArrival_PlacePlayer(data);
         FieldCamera_FinishDelay(data->camera);
         (*state)++;
         break;
@@ -171,16 +171,16 @@ static GameEventReturnCode func_ov012_02165d30(GameEvent *event, u32 *state, voi
         }
         break;
     case 2:
-        func_ov106_021eecd4(data->field);
-        func_ov106_021eed78(data->field);
+        GimmickLeagueLift_PlayLiftAnim(data->field);
+        GimmickLeagueLift_PlayArrivalModel(data->field);
         GameEvent_ChainNext(event, CallFieldMapEntranceInTransition(data->gsys, data->field, 0, 0, 1, 0, 0));
         (*state)++;
         break;
     case 3:
-        done = func_ov012_02165ca4(data);
+        done = LeagueLiftArrival_StepCurve(data);
         if (!done) {
-            func_ov012_02165cb4(data);
-            func_ov012_02165cd8(data);
+            LeagueLiftArrival_MoveLift(data);
+            LeagueLiftArrival_PlacePlayer(data);
         }
         if (done) {
             GFL_G3DCurveFree(data->curve);
@@ -202,9 +202,9 @@ static GameEventReturnCode func_ov012_02165d30(GameEvent *event, u32 *state, voi
         }
         break;
     case 4:
-        if (func_ov106_021eed18(data->field) && func_ov106_021eedc8(data->field)) {
-            func_ov106_021eed04(data->field);
-            func_ov106_021eed48(data->field);
+        if (GimmickLeagueLift_IsLiftAnimDone(data->field) && GimmickLeagueLift_IsArrivalModelDone(data->field)) {
+            GimmickLeagueLift_StopLiftAnim(data->field);
+            GimmickLeagueLift_HideArrivalModel(data->field);
             (*state)++;
         }
         break;
@@ -223,8 +223,8 @@ static GameEventReturnCode func_ov012_02165d30(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov012_02165e80(GameSystem *gsys, Field *field) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02165d30, sizeof(LeagueLiftArrivalData));
+static GameEvent *EventLeagueLiftArrival_Create(GameSystem *gsys, Field *field) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventLeagueLiftArrival_Callback, sizeof(LeagueLiftArrivalData));
     LeagueLiftArrivalData *data = GameEvent_GetData(event);
 
     data->heapId = Field_GetHeapID(field);

@@ -38,8 +38,8 @@ ElScoreboard *ElScoreboard_Create(void *texture, const char *texName, const char
     ElScoreboard *board = GFL_HeapAllocate(heapId, sizeof(ElScoreboard), TRUE, "el_scoreboard.c", 412);
 
     board->unk0 = 0;
-    board->unk4 = func_ov012_02169fb0() - 1;
-    board->unk6 = func_ov012_02169fb0() - 1;
+    board->unk4 = G3DTextDraw_GetTexDimCount() - 1;
+    board->unk6 = G3DTextDraw_GetTexDimCount() - 1;
     board->unk10 = -1;
     board->unk14 = -1;
     if (G3DTextDraw_CreateResource(texture, texName, 0, plName, text, a4, a5, 0xc40, heapId, &resource)) {

@@ -1,6 +1,0 @@
-UndellaBay_Text_Jelliiii = Jelliiii!
-UndellaBay_Text_JellicentDoveDownInto = Jellicent dove down into\nthe depths of the ocean...
-UndellaBay_Text_Jeeelliii = Jeeelliii. ♪
-UndellaBay_Text_JellicentDoveDownInto_2 = Jellicent dove down into\nthe depths of the ocean...
-UndellaBay_Text_XtransceiverRinging = The Xtransceiver is ringing.
-UndellaBay_Text_PickedUpXtransceiver = {0100:0} picked up the Xtransceiver.{be01}

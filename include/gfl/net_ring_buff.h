@@ -17,17 +17,17 @@ typedef struct {
     volatile s16 endPos;
 } NetRingBuff;
 
-void func_0203dfc0(NetRingBuff *ring, u8 *pDataArea, int size);
+void NetRingBuff_Init(NetRingBuff *ring, u8 *pDataArea, int size);
 // Writes size bytes, or sets the network error if they do not fit
-void func_0203dfd0(NetRingBuff *ring, const u8 *pDataArea, int size);
+void NetRingBuff_Write(NetRingBuff *ring, const u8 *pDataArea, int size);
 // Reads up to size bytes, and at most max, returning how many it read
-int func_0203e038(NetRingBuff *ring, u8 *dest, int size, int max);
-u8 func_0203e054(NetRingBuff *ring);
+int NetRingBuff_Read(NetRingBuff *ring, u8 *dest, int size, int max);
+u8 NetRingBuff_ReadByte(NetRingBuff *ring);
 // A big-endian u16
-int func_0203e080(NetRingBuff *ring);
-int func_0203e0f4(NetRingBuff *ring);
-int func_0203e110(NetRingBuff *ring);
+int NetRingBuff_ReadU16(NetRingBuff *ring);
+int NetRingBuff_GetUsedSize(NetRingBuff *ring);
+int NetRingBuff_GetFreeSize(NetRingBuff *ring);
 // Makes what has been written readable, which needs nothing here
-void func_0203e150(NetRingBuff *ring);
+void NetRingBuff_Commit(NetRingBuff *ring);
 
 #endif // POKEBW2_GFL_NET_RING_BUFF_H

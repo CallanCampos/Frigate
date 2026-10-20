@@ -41,6 +41,9 @@ enum {
 // A WCM_Init's work, and the configuration that WCM_StartupAsync starts with
 #define WCM_WORK_SIZE 0x2300
 
+// The bytes of an access point's description that an AP list entry keeps (WCM_PointApList's result)
+#define WCM_APLIST_SIZE 192
+
 // The configuration is consumed during startup. Its writable AP-list buffer is borrowed until replaced or Finish.
 // WCM aligns the buffer upward to four bytes, subtracts the skipped bytes, and clears the usable region.
 // At least 12 aligned bytes are needed for the AP-list header.
@@ -57,7 +60,8 @@ s32 WCM_Init(void *work, s32 size);
 // WCM_Init selects mode 1 (DS). The core also accepts 2 (DSi, requiring 0x4800 bytes), or 0 to use the stored
 // preference or hardware default. Main's direct caller selects mode 2; this parameter is a mode, not a boolean.
 s32 WCM_InitCore(void *work, s32 size, s32 requestedMode);
-void WCM_Finish(void);
+// Releases the work buffer: 0, or 1 when WCM is not initialized or not idle (state 1)
+s32 WCM_Finish(void);
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify);
 s32 WCM_CleanupAsync(void);
 // Either NULL pointer requests a stop; option is ignored on that path.

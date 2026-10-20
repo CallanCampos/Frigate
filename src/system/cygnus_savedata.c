@@ -71,7 +71,7 @@ u32 ValidateDreamRadarSave(CygnusSaveData *data) {
     return CYGNUS_DATA_BROKEN;
 }
 
-void func_020113c4(void *data, u32 seed, u32 received) {
+void CygnusSaveData_Store(void *data, u32 seed, u32 received) {
     CygnusSaveData *cygnus = data;
     u32 mask = getNextSeed(seed) >> 32;
 
@@ -85,7 +85,7 @@ void func_020113c4(void *data, u32 seed, u32 received) {
     cygnus->headerCrc = getCRC16(cygnus, offsetof(CygnusSaveData, headerCrc));
 }
 
-u32 func_02011400(void *data, u32 seed, u32 *words) {
+u32 CygnusSaveData_Load(void *data, u32 seed, u32 *words) {
     CygnusSaveData *cygnus = data;
     u32 i = 0;
     u32 mask = getNextSeed(seed) >> 32;

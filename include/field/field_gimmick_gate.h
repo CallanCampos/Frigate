@@ -31,9 +31,12 @@ struct GimmickGateBoardEntry {
 };
 
 // The gimmick's entry points, from the gimmick table in overlay 36
-void func_ov104_021eec80(Field *field);
-void func_ov104_021eed00(Field *field);
-void func_ov104_021eed20(Field *field);
-u32 func_ov104_021eed44(Field *field);
+void GimmickGate_Setup(Field *field);
+void GimmickGate_Delete(Field *field);
+void GimmickGate_Update(Field *field);
+u32 GimmickGate_GetDirection(Field *field);
+
+// Script command 0x17a: plays a sound and runs the news board's event for as long as the script says
+BOOL GimmickGateCmd_ViewBoard(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_GIMMICK_GATE_H

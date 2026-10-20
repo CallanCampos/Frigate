@@ -200,7 +200,7 @@ static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data
     work->wordSet = GFL_WordSetSystemCreateDefault(work->heapId);
     work->msgData[0] = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_TITLE_4, work->heapId);
     work->msgData[1] = NULL;
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 32, 32);
     work->stream = NULL;
     work->message = NULL;
@@ -208,7 +208,7 @@ static BOOL FMissionApp_Init(GameProc *proc, u32 *state, void *param, void *data
     work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, work->heapId);
     work->missionText = getTextFileForFestMissions(work->heapId);
     work->missionArc = GFL_ArcSysCreateFileHandle(ARCID_FMISSION_DATA, work->heapId);
-    work->missions = func_ov027_02170b50(work->missionArc, work->heapId);
+    work->missions = FestMissionData_LoadAll(work->missionArc, work->heapId);
     work->best = LinkFestivalBest_Create(work->heapId);
     work->log = FMissionLogFApp_Create(work->heapId);
     LinkFestival_GetRanking(work->param->festival, &work->ranking);
@@ -237,14 +237,14 @@ static BOOL FMissionApp_Exit(GameProc *proc, u32 *state, void *param, void *data
         }
     }
     GFL_WordSetSystemFree(work->wordSet);
-    func_ov027_02170b00(work->missionText);
+    FestivalText_Free(work->missionText);
     work->missionText = NULL;
     GFL_ArcToolFree(work->missionArc);
     GFL_HeapFree(work->missions);
     LinkFestivalBest_Free(work->best);
     FMissionLogFApp_Free(work->log);
     KeyCursor_Free(work->keyCursor);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_TCBExMgrFree(work->tcbManager);
     GFL_FontFree(work->font);
     FMissionAppGra_Free(work->graphic);
@@ -265,7 +265,7 @@ static BOOL FMissionApp_Main(GameProc *proc, u32 *state, void *param, void *data
         }
         break;
     case 1:
-        if (work->seq == SEQ_END && func_02021c0c(work->printQueue) == TRUE) {
+        if (work->seq == SEQ_END && PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             (*state)++;
         }
         break;
@@ -289,7 +289,7 @@ static BOOL FMissionApp_Main(GameProc *proc, u32 *state, void *param, void *data
     FMissionAppGra_Update(work->graphic);
     FMissionAppGra_Begin3D(work->graphic);
     FMissionAppGra_End3D(work->graphic);
-    func_02012be4(work->wifiList);
+    WihDwc_GetStatus(work->wifiList);
     return FALSE;
 }
 
@@ -360,7 +360,7 @@ static void FMissionApp_FreeWork(FMissionApp *work) {
 static void FMissionApp_UpdatePrint(FMissionApp *work) {
     int i;
 
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < FMISSION_APP_WINDOW_COUNT; i++) {
         if (work->windows[i].window != NULL) {
             PrintWindow_Flush(&work->windows[i], work->printQueue);
@@ -477,7 +477,7 @@ static void FMissionApp_CheckMission(FMissionApp *work) {
     }
     LinkFestival_GetRanking(work->param->festival, &work->ranking);
     if (work->lastSeconds != 0) {
-        u16 seconds = func_020145dc(work->param->festival);
+        u16 seconds = LinkFestival_GetSecondsLeft(work->param->festival);
 
         if (work->lastSeconds != seconds) {
             s16 i;
@@ -517,7 +517,7 @@ static void FMissionApp_CheckMission(FMissionApp *work) {
         work->flags |= FLAG_REDRAW;
         work->lastScore = score;
     }
-    if (func_02014a4c(work->param->festival) == TRUE) {
+    if (LinkFestival_IsBestChanged(work->param->festival) == TRUE) {
         work->flags |= FLAG_REDRAW;
     }
 }
@@ -564,7 +564,7 @@ static void FMissionApp_UpdateLog(FMissionApp *work) {
 }
 
 static void FMissionApp_InitResult(FMissionApp *work) {
-    func_02010dec(GameData_GetSaveControl(work->param->gameData));
+    FestRecords_GetFromSave(GameData_GetSaveControl(work->param->gameData));
     FMissionAppDraw_SetActorVisible(work, FMISSION_APP_ACTOR_LOWER, 0, FALSE);
     if (work->ranking.count <= 1) {
         work->flags |= FLAG_ALONE;
@@ -808,10 +808,12 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
 
     if (text == TEXT_RESULT) {
         strbuf = GFL_StrBufCreate(256, work->heapId);
-        func_ov027_02170d90(work->missionText, strbuf, (const FestMission *)work->param->missionConfig, work->heapId);
+        FestMission_GetResultMessage(work->missionText, strbuf, (const FestMission *)work->param->missionConfig,
+                                     work->heapId);
     } else if (text == TEXT_MISSION) {
         strbuf = GFL_StrBufCreate(128, work->heapId);
-        func_ov027_02170d04(work->missionText, strbuf, (const FestMission *)work->param->missionConfig, work->heapId);
+        FestMission_GetMessage(work->missionText, strbuf, (const FestMission *)work->param->missionConfig,
+                               work->heapId);
     } else if (text == TEXT_GOAL) {
         u32 unit = work->missions[index].params.unk05;
 
@@ -846,7 +848,7 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
     } else if (text == TEXT_BEST_SCORE) {
         u32 unit;
 
-        func_02014a78(work->param->festival, work->best);
+        LinkFestival_GetBest(work->param->festival, work->best);
         if (work->best->name == NULL) {
             return;
         }
@@ -857,7 +859,7 @@ static void FMissionApp_PrintText(FMissionApp *work, int text, int window, int x
         GFL_WordSetFormatStrbuf(work->wordSet, strbuf, format);
         GFL_StrBufFree(format);
     } else if (text == TEXT_BEST_NAME) {
-        func_02014a78(work->param->festival, work->best);
+        LinkFestival_GetBest(work->param->festival, work->best);
         if (work->best->name == NULL) {
             return;
         }
@@ -972,7 +974,7 @@ static void FMissionApp_ReadLog(FMissionApp *work) {
     int i;
     int count;
 
-    FMissionLogFApp_Read(func_020146fc(work->param->festival), work->log);
+    FMissionLogFApp_Read(LinkFestival_GetLog(work->param->festival), work->log);
     for (i = 0; i < FMISSION_LOG_FAPP_COUNT; i++) {
         FMissionApp_AddLogEntry(work, FMISSION_LOG_FAPP_COUNT - 1 - i);
     }

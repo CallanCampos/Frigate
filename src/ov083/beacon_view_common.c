@@ -73,19 +73,19 @@ void BeaconView_SetActorPos(ClActor *actor, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(actor, &pos, 0);
+    ClActor_SetSurfacePos(actor, &pos, 0);
 }
 
 void BeaconView_SetActorAnim(ClActor *actor, u16 sequence) {
-    func_0204c488(actor, sequence);
-    func_0204c56c(actor);
+    ClActor_SetSequence(actor, sequence);
+    ClActor_RestartAnim(actor);
 }
 
 void BeaconView_SetPrintTimeLimit(PrintQueue *queue, BOOL longer) {
     if (longer) {
-        func_02021a34(queue, 2000);
+        PrintQueue_SetTimeLimit(queue, 2000);
     } else {
-        func_02021a34(queue, 500);
+        PrintQueue_SetTimeLimit(queue, 500);
     }
 }
 
@@ -95,7 +95,7 @@ BeaconViewMenu *BeaconViewMenu_Create(u8 bg, u8 palette, Font *font, PrintQueue 
 
     menu->heapId = heapId;
     menu->res = AppTaskMenuRes_Create(bg, palette, font, queue, heapId);
-    menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0012, heapId);
+    menu->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BEACON_VIEW_COMMON, heapId);
     for (i = 0; i < BEACON_VIEW_MENU_STR_MAX; i++) {
         menu->strs[i] = GFL_MsgDataLoadStrbufNew(menu->msgData, i);
     }
@@ -203,14 +203,14 @@ BOOL BeaconView_WaitTimerOrTouch(u8 *timer, u8 bg) {
         *timer = 0;
         return TRUE;
     }
-    if (func_0203dac8(&x, &y) && GFL_BGSysIsPixelOfColor(bg, x, y + 64, &colors)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && GFL_BGSysIsPixelOfColor(bg, x, y + 64, &colors)) {
         *timer = 0;
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov083_021eab38(const GameBeacon *beacon) {
+u32 BeaconView_GetTypeMsgId(const GameBeacon *beacon) {
     int type = GameBeacon_GetType(beacon);
 
     if (type == 0 || type >= 60) {
@@ -292,7 +292,7 @@ static void BeaconViewOam_PrintEx(BeaconViewOam *oam, const StrBuf *strbuf, u16 
         GFL_TextRendererDrawToBitmapEx(oam->bitmap, 0, 0, strbuf, oam->font, color);
         BmpOam_ActorBmpTrans(oam->actor);
     } else {
-        func_02021c7c(oam->queue, oam->bitmap, 0, 0, strbuf, oam->font, color);
+        PrintQueue_PrintColor(oam->queue, oam->bitmap, 0, 0, strbuf, oam->font, color);
         BeaconViewOam_StartFlushTask(oam, pending);
     }
 }
@@ -316,7 +316,7 @@ static void BeaconViewOam_StartFlushTask(BeaconViewOam *oam, int *pending) {
 static void BeaconViewOam_FlushTask(TCBEx *task, void *data) {
     BeaconViewOamTask *flush = data;
 
-    if (!func_02021c1c(flush->oam->queue, flush->oam->bitmap)) {
+    if (!PrintQueue_IsBitmapPending(flush->oam->queue, flush->oam->bitmap)) {
         BmpOam_ActorBmpTrans(flush->oam->actor);
         if (flush->pending != NULL) {
             (*flush->pending)--;

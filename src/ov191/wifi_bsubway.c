@@ -60,8 +60,8 @@
 #include "system/union_view.h"
 #include "system/version.h"
 #include "system/wordset.h"
-#include "text/system/0413.h"
 #include "text/system/ability_handlers_btl_main.h"
+#include "text/system/wifi_bsubway.h"
 
 // The Wi-Fi Battle Subway's screen: its proc, the three things it does with the Battle Subway's server (sending the
 // player's record, downloading a train's trainers and downloading a train's leaders), the requests behind them and the
@@ -401,7 +401,7 @@ static BOOL WifiBSubway_ProcInit(GameProc *proc, u32 *state, void *paramPtr, voi
     wk->wifiList = GameData_GetWifiList(gameData);
     wk->playerInfo = GetGameDataPlayerInfo(gameData);
     wk->wifiData = func_02017968(gameData);
-    wk->score = func_0201795c(gameData);
+    wk->score = GameData_GetBSubwayScoreData(gameData);
     WifiBSubwayRoom_Init(&wk->room);
     WifiBSubwayUpload_Init(&wk->upload, HEAPID_WIFI_BSUBWAY);
     WifiBSubwayError_Init(&wk->error);
@@ -454,7 +454,7 @@ static BOOL WifiBSubway_ProcMain(GameProc *proc, u32 *state, void *param, void *
         break;
     case STATE_CONNECT:
         WifiBSubway_Connect(wk);
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_CommunicatingPleaseStandBy);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_CommunicatingPleaseStandBy);
         WifiBSubwayView_StartWaitIcon(&wk->view);
         (*state)++;
         break;
@@ -671,7 +671,7 @@ static void WifiBSubwayRoom_SaveLeaders(WifiBSubwayRoom *room, BSubwayWifiData *
 
 static void WifiBSubwayUpload_Init(WifiBSubwayUpload *upload, HeapID heapId) {
     MI_CpuFill8(upload, 0, sizeof(WifiBSubwayUpload));
-    upload->playerInfo = func_02008b0c(heapId);
+    upload->playerInfo = PlayerInfo_Create(heapId);
 }
 
 static void WifiBSubwayUpload_Free(WifiBSubwayUpload *upload) {
@@ -687,7 +687,7 @@ static void WifiBSubwayUpload_CheckName(WifiBSubwayUpload *upload, GameData *gam
     const u16 *chars;
     u32 i;
 
-    func_02008b34(GetGameDataPlayerInfo(gameData), upload->playerInfo);
+    PlayerInfo_Copy(GetGameDataPlayerInfo(gameData), upload->playerInfo);
     name = copyTrainerNameToNewStrbuf(upload->playerInfo->name, heapId);
     MI_CpuFill8(&upload->nameCheck, 0, sizeof(WifiBSubwayNameCheck));
     upload->nameCheck.heapId = heapId;
@@ -733,7 +733,7 @@ static u32 WifiBSubwayUpload_WaitCheckName(WifiBSubwayUpload *upload, HeapID hea
 static void WifiBSubwayUpload_SetProfile(WifiBSubwayUpload *upload, GameData *gameData, WifiBSubwayError *error) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     BSubwayWifiData *wifiData = func_02017968(gameData);
-    BSubwayScoreData *score = func_0201795c(gameData);
+    BSubwayScoreData *score = GameData_GetBSubwayScoreData(gameData);
     PlayerInfo *playerInfo = upload->playerInfo;
 
     DpwProfile_Fill(&upload->profile, playerInfo);
@@ -758,7 +758,7 @@ static void WifiBSubwayUpload_FillPlayer(Dpw_Bt_Player *player, GameData *gameDa
     SaveControl *save = GameData_GetSaveControl(gameData);
     UnityTowerSurveySave *survey = getUnityTower_SurveySaveBlkAddrress(save);
     WifiList *wifiList = GameData_GetWifiList(gameData);
-    BSubwayScoreData *score = func_0201795c(gameData);
+    BSubwayScoreData *score = GameData_GetBSubwayScoreData(gameData);
     void *cgear = getCGearDataBlkAddress(save);
     int i;
 
@@ -792,7 +792,7 @@ static void WifiBSubwayUpload_OnError(void *work, int code, int type, int error)
 // Asks the server to check the team's Pokémon
 static void WifiBSubwayUpload_CheckPokemon(WifiBSubwayUpload *upload, WifiBSubwayError *error, void *loginBuffer,
                                            HeapID heapId) {
-    upload->nhttp = NHttpRap_Create(heapId, func_02008bdc(upload->playerInfo), loginBuffer);
+    upload->nhttp = NHttpRap_Create(heapId, PlayerInfo_GetProfileId(upload->playerInfo), loginBuffer);
     DWCRap_SetErrorFunc(WifiBSubwayUpload_OnError, upload);
     NHttpRap_BeginPost(upload->nhttp, heapId, sizeof(upload->player.pokemon), 4);
     NHttpRap_AddPostData(upload->nhttp, upload->player.pokemon, sizeof(upload->player.pokemon));
@@ -968,47 +968,47 @@ static u32 WifiBSubwayError_GetMessage(const WifiBSubwayError *error) {
     if (error->dpwResult < 0) {
         switch (error->dpwResult) {
         case -2:
-            message = Bank0413_Text_UnableConnectWiFi;
+            message = WifiBsubway_Text_UnableConnectWiFi;
             break;
         case -6:
-            message = Bank0413_Text_UnableConnectWiFi_2;
+            message = WifiBsubway_Text_UnableConnectWiFi_2;
             break;
         case -1:
-            message = Bank0413_Text_WiFiTrainVery_2;
+            message = WifiBsubway_Text_WiFiTrainVery_2;
             break;
         case -7:
-            message = Bank0413_Text_WereDisconnectedFromWi_2;
+            message = WifiBsubway_Text_WereDisconnectedFromWi_2;
             break;
         case -4:
-            message = Bank0413_Text_WereDisconnectedFromWi;
+            message = WifiBsubway_Text_WereDisconnectedFromWi;
             break;
         case -3:
-            message = Bank0413_Text_NumberCannotSpecifiedWi;
+            message = WifiBsubway_Text_NumberCannotSpecifiedWi;
             break;
         default:
-            message = Bank0413_Text_CommunicationErrorErrorCode;
+            message = WifiBsubway_Text_CommunicationErrorErrorCode;
             break;
         }
     } else if (error->serverState != 0) {
         switch (error->serverState) {
         case 1:
-            message = Bank0413_Text_WiFiTrainCurrently;
+            message = WifiBsubway_Text_WiFiTrainCurrently;
             break;
         case 2:
-            message = Bank0413_Text_WiFiTrainVery;
+            message = WifiBsubway_Text_WiFiTrainVery;
             break;
         }
     } else if (error->checkError != CHECK_ERROR_NONE) {
         switch (error->checkError) {
         case CHECK_ERROR_POKEMON:
-            message = Bank0413_Text_ThereAppearsProblemPokemon;
+            message = WifiBsubway_Text_ThereAppearsProblemPokemon;
             break;
         case CHECK_ERROR_STATUS:
-            message = Bank0413_Text_ThereAppearsProblemPokemon;
+            message = WifiBsubway_Text_ThereAppearsProblemPokemon;
             break;
         }
     } else if (error->timeout) {
-        message = Bank0413_Text_UnableConnectWiFi;
+        message = WifiBsubway_Text_UnableConnectWiFi;
     }
     return message;
 }
@@ -1033,7 +1033,7 @@ static BOOL WifiBSubwayError_ShowHttpError(const WifiBSubwayError *error) {
             message = 0x43;
             break;
         }
-        func_020120f0(message);
+        GFL_NetErrRecordWifi(message);
         return TRUE;
     }
     return FALSE;
@@ -1143,7 +1143,7 @@ static u32 WifiBSubway_RunMode(WifiBSubwayWork *wk, HeapID heapId) {
 static u32 WifiBSubway_UploadMain(WifiBSubwayWork *wk, HeapID heapId) {
     switch (wk->seq) {
     case 0:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_SendingRecordDataDont);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_SendingRecordDataDont);
         wk->seq++;
         break;
     case 1:
@@ -1186,7 +1186,7 @@ static u32 WifiBSubway_UploadMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 8:
         if (WifiBSubway_WaitSave(wk)) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_DataHasBeenSent);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_DataHasBeenSent);
             wk->seq++;
         }
         break;
@@ -1220,7 +1220,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
         WifiBSubwayView_StopWaitIcon(&wk->view);
         WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetCount(&wk->room),
                                   WifiBSubwayRoom_GetCountDigits(&wk->room));
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_EnterTrainNumber01);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_EnterTrainNumber01);
         wk->seq++;
         break;
     case 3:
@@ -1265,7 +1265,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
                 WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetNumber(&wk->room),
                                           WifiBSubwayRoom_GetCountDigits(&wk->room));
                 WifiBSubwayView_SetNumber(&wk->view, 1, WifiBSubwayRoom_GetRank(&wk->room), 2);
-                WifiBSubwayView_Print(&wk->view, Bank0413_Text_ReceivingDataRankTrain);
+                WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_ReceivingDataRankTrain);
                 WifiBSubwayView_StartWaitIcon(&wk->view);
                 wk->seq++;
             }
@@ -1286,7 +1286,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 11:
         if (WifiBSubway_WaitSave(wk)) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_DataHasBeenReceived);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_DataHasBeenReceived);
             wk->seq++;
         }
         break;
@@ -1298,7 +1298,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 13:
         return MODE_RESULT_END;
     case 14:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_MayNotChallengeTrain);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_MayNotChallengeTrain);
         wk->seq++;
         break;
     case 15:
@@ -1307,7 +1307,7 @@ static u32 WifiBSubway_DownloadTrainMain(WifiBSubwayWork *wk, HeapID heapId) {
         }
         break;
     case 16:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_CancelChallenge);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_CancelChallenge);
         wk->seq++;
         break;
     case 17:
@@ -1338,7 +1338,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
     switch (wk->seq) {
     case 0:
         WifiBSubwayView_StopWaitIcon(&wk->view);
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_EnterRankTrain01);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_EnterRankTrain01);
         wk->seq++;
         break;
     case 1:
@@ -1371,7 +1371,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
         if (!GFL_FadeIsRunning()) {
             if (wk->inputNumber >= 1 && wk->inputNumber <= RANK_MAX) {
                 WifiBSubwayRoom_RequestCount(&wk->room, &wk->error, wk->inputNumber);
-                WifiBSubwayView_Print(&wk->view, Bank0413_Text_CommunicatingPleaseStandBy);
+                WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_CommunicatingPleaseStandBy);
                 WifiBSubwayView_StartWaitIcon(&wk->view);
                 wk->seq++;
             } else {
@@ -1384,7 +1384,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
             WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetCount(&wk->room),
                                       WifiBSubwayRoom_GetCountDigits(&wk->room));
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_EnterTrainNumber01_2);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_EnterTrainNumber01_2);
             wk->seq++;
         }
         break;
@@ -1425,7 +1425,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
                 WifiBSubwayView_SetNumber(&wk->view, 0, WifiBSubwayRoom_GetNumber(&wk->room),
                                           WifiBSubwayRoom_GetCountDigits(&wk->room));
                 WifiBSubwayView_SetNumber(&wk->view, 1, WifiBSubwayRoom_GetRank(&wk->room), 2);
-                WifiBSubwayView_Print(&wk->view, Bank0413_Text_ReceivingDataRankTrain);
+                WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_ReceivingDataRankTrain);
                 WifiBSubwayView_StartWaitIcon(&wk->view);
                 wk->seq++;
             }
@@ -1445,7 +1445,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 16:
         if (WifiBSubway_WaitSave(wk)) {
             WifiBSubwayView_StopWaitIcon(&wk->view);
-            WifiBSubwayView_Print(&wk->view, Bank0413_Text_DataHasBeenReceived);
+            WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_DataHasBeenReceived);
             wk->seq++;
         }
         break;
@@ -1457,7 +1457,7 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
     case 18:
         return MODE_RESULT_END;
     case 19:
-        WifiBSubwayView_Print(&wk->view, Bank0413_Text_WouldLikeCancelData);
+        WifiBSubwayView_Print(&wk->view, WifiBsubway_Text_WouldLikeCancelData);
         wk->seq++;
         break;
     case 20:
@@ -1486,11 +1486,11 @@ static u32 WifiBSubway_DownloadLeadersMain(WifiBSubwayWork *wk, HeapID heapId) {
 
 // Starts the server library and asks for the server's state
 static void WifiBSubway_Connect(WifiBSubwayWork *wk) {
-    DWCUserData *userData = func_02009f7c(wk->wifiList);
+    DWCUserData *userData = WifiList_GetMyUserData(wk->wifiList);
     s32 profileId;
 
-    func_02008be0(wk->playerInfo, WifiList_GetMyGSID(wk->wifiList));
-    profileId = func_02008bdc(wk->playerInfo);
+    PlayerInfo_InitProfileId(wk->playerInfo, WifiList_GetMyGSID(wk->wifiList));
+    profileId = PlayerInfo_GetProfileId(wk->playerInfo);
     DpwBt_Init(profileId, DWC_CreateFriendKey(userData), 0);
     DpwBt_GetServerState();
     WifiBSubwayError_StartDpw(&wk->error);
@@ -1532,7 +1532,7 @@ static BOOL WifiBSubway_PrintError(WifiBSubwayWork *wk) {
         return FALSE;
     }
     if (GFL_NetErrCheck()) {
-        func_02042540();
+        NetState_GetErrorInfo();
         return FALSE;
     }
     if (WifiBSubwayError_Check(&wk->error)) {
@@ -1563,7 +1563,7 @@ static void WifiBSubwayView_Init(WifiBSubwayView *view, HeapID heapId) {
     BmpWin_FlushMap(view->window);
     BmpWin_FlushChar(view->window);
     GFL_BGSysQueueScrLoad(MESSAGE_BG);
-    view->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_0413, heapId);
+    view->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_WIFI_BSUBWAY, heapId);
     view->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     view->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     view->message = GFL_StrBufCreate(0x80, heapId);
@@ -1572,13 +1572,13 @@ static void WifiBSubwayView_Init(WifiBSubwayView *view, HeapID heapId) {
     view->initialized = TRUE;
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    func_02042ba8(TRUE, heapId);
+    GFL_NetSetIconScreen(TRUE, heapId);
 }
 
 static void WifiBSubwayView_Free(WifiBSubwayView *view) {
     if (view->initialized) {
         if (view->stream != NULL) {
-            func_020223cc(view->stream);
+            PrintStream_Delete(view->stream);
         }
         GFL_TCBExMgrFree(view->tcbManager);
         GFL_MsgDataFree(view->msgData);
@@ -1594,7 +1594,7 @@ static void WifiBSubwayView_Free(WifiBSubwayView *view) {
         }
         BmpWin_Free(view->window);
         WifiBSubwayGraphic_Free(view->graphic);
-        func_020232d8();
+        GFL_TextRndResetColorIndexLUT();
         MI_CpuFill8(view, 0, sizeof(WifiBSubwayView));
     }
 }
@@ -1707,15 +1707,15 @@ static void WifiBSubwayView_FreeGraphics(WifiBSubwayView *view) {
 // Prints a message into the window, with the numbers that were set
 static void WifiBSubwayView_Print(WifiBSubwayView *view, u32 message) {
     if (view->stream != NULL) {
-        func_020223cc(view->stream);
+        PrintStream_Delete(view->stream);
         view->stream = NULL;
     }
     GFL_MsgDataLoadStrbuf(view->msgData, message, view->message);
     GFL_WordSetFormatStrbuf(view->wordSet, view->expanded, view->message);
     GFL_BitmapFill(BmpWin_GetBitmap(view->window), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
-    view->stream = func_02022268(view->window, 0, 0, view->expanded, view->font, func_02017bcc(), view->tcbManager, 2,
-                                 view->heapId, 15);
+    view->stream = PrintStream_Create(view->window, 0, 0, view->expanded, view->font, TextSpeed_GetCurrentWait(),
+                                      view->tcbManager, 2, view->heapId, 15);
     BmpWin_DrawFrame(view->window, 1, view->messageFrameChars, FRAME_PALETTE);
     BmpWin_FlushChar(view->window);
 }
@@ -1727,15 +1727,15 @@ static BOOL WifiBSubwayView_WaitPrint(WifiBSubwayView *view) {
     if (view->stream == NULL) {
         return TRUE;
     }
-    state = func_020223b4(view->stream);
+    state = PrintStream_GetState(view->stream);
     if (state == PRINT_STREAM_DONE) {
-        func_020223cc(view->stream);
+        PrintStream_Delete(view->stream);
         view->stream = NULL;
         return TRUE;
     }
     if (state == PRINT_STREAM_PAUSED) {
-        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || func_0203da48()) {
-            func_020223bc(view->stream);
+        if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A || GFL_HIDIsTouchPressed()) {
+            PrintStream_Continue(view->stream);
         }
     }
     return FALSE;
@@ -1776,7 +1776,7 @@ static void WifiBSubwayView_StopWaitIcon(WifiBSubwayView *view) {
 }
 
 static void WifiBSubway_StartSave(WifiBSubwayWork *wk) {
-    func_0201782c(wk->gameData);
+    GameData_StartSave(wk->gameData);
     wk->saving = TRUE;
 }
 
@@ -1784,7 +1784,7 @@ static BOOL WifiBSubway_WaitSave(WifiBSubwayWork *wk) {
     if (!wk->saving) {
         return TRUE;
     }
-    if (func_02017850(wk->gameData) == 2) {
+    if (GameData_UpdateSave(wk->gameData) == 2) {
         wk->saving = FALSE;
         return TRUE;
     }

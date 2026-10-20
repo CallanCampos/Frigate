@@ -272,9 +272,9 @@ static void ItemMenuDisp_LoadPocketTabRes(ItemMenuWork *work, ArcTool *arc) {
         cells = 10;
         anims = 9;
     }
-    work->pocketTabPlt = func_0204bbb8(arc, palette, 0, 0xc0, 0, 5, work->heapId);
-    work->pocketTabChr = func_0204b81c(arc, chars, FALSE, 0, work->heapId);
-    work->pocketTabCel = func_0204bde0(arc, cells, anims, work->heapId);
+    work->pocketTabPlt = ClActSys_LoadPlttRange(arc, palette, 0, 0xc0, 0, 5, work->heapId);
+    work->pocketTabChr = ClActSys_LoadChars(arc, chars, FALSE, 0, work->heapId);
+    work->pocketTabCel = ClActSys_LoadCellAnims(arc, cells, anims, work->heapId);
 }
 
 static const ClActSysSetup sItemMenuClActSetup = { 0, 0, 0, 512, 4, 124, 4, 124, 0, 100, 100, 100, 100, 16, 16 };
@@ -297,7 +297,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     G2_BlendNone();
     GFL_BGSysCreate(work->heapId);
     BmpWin_InitAllocator(work->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sItemMenuVRAMConfig);
     ClActSys_Create(&sItemMenuClActSetup, &sItemMenuVRAMConfig, work->heapId);
     {
@@ -308,10 +308,10 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     ItemMenuDisp_InitBGs();
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     work->cursorImageChars = LoadCursorImageEndOfHeap(3, 13, 0, work->heapId);
 
-    arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 8, PALTYPE_SUB_BG, 0, 0, work->heapId);
     if (getTrainerGender(work->playerInfo) == 0) {
         GFL_G2DIOLoadArcNCLR(arc, 8, PALTYPE_SUB_BG, 0x20, 0, 0x20, work->heapId);
@@ -331,7 +331,7 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     GFL_ArcToolFree(arc);
 
     GFL_BGSysLoadNCLRDefault(23, 5, PALTYPE_MAIN_BG, 0x180, 0x20, work->heapId);
-    work->actorUnit = func_0204bf1c(54, 0, work->heapId);
+    work->actorUnit = ClActUnit_Create(54, 0, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 
@@ -340,22 +340,25 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     work->bg1Chars = GFL_BGSysLoadArcNCGRDynamic(arc, 28, 1, 0, FALSE, work->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 29, 1, 0, CHAR_POS(work->bg1Chars) + 0x8000, 0, FALSE, work->heapId);
     GFL_BGSysLoadScr(1);
-    work->buttonPlt = func_0204bbb8(arc, 19, 0, 0x160, 0, 3, work->heapId);
-    work->buttonChr = func_0204b81c(arc, 20, FALSE, 0, work->heapId);
-    work->buttonCel = func_0204bde0(arc, 23, 26, work->heapId);
-    work->filterButtonChr = func_0204b81c(arc, 175, FALSE, 0, work->heapId);
-    work->filterButtonCel = func_0204bde0(arc, 174, 173, work->heapId);
+    work->buttonPlt = ClActSys_LoadPlttRange(arc, 19, 0, 0x160, 0, 3, work->heapId);
+    work->buttonChr = ClActSys_LoadChars(arc, 20, FALSE, 0, work->heapId);
+    work->buttonCel = ClActSys_LoadCellAnims(arc, 23, 26, work->heapId);
+    work->filterButtonChr = ClActSys_LoadChars(arc, 175, FALSE, 0, work->heapId);
+    work->filterButtonCel = ClActSys_LoadCellAnims(arc, 174, 173, work->heapId);
     GFL_ArcToolFree(arc);
     ItemMenuDisp_CreateButtons(work);
 
     uiArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), work->heapId);
-    work->typeIconPlt = func_0204bbb8(uiArc, func_0202d7e4(), 1, 0x80, 0, 3, work->heapId);
-    work->typeIconCel = func_0204bde0(uiArc, func_0202d7f8(2), func_0202d7fc(2), work->heapId);
+    work->typeIconPlt =
+        ClActSys_LoadPlttRange(uiArc, AppMenuCommon_GetTypeIconPaletteFile(), 1, 0x80, 0, 3, work->heapId);
+    work->typeIconCel = ClActSys_LoadCellAnims(uiArc, AppMenuCommon_GetTypeIconCellFile(2),
+                                               AppMenuCommon_GetTypeIconAnimFile(2), work->heapId);
     for (i = 0; i < NELEMS(work->categoryIconChr); i++) {
-        work->categoryIconChr[i] = func_0204b81c(uiArc, func_0202d80c(i), FALSE, 1, work->heapId);
+        work->categoryIconChr[i] =
+            ClActSys_LoadChars(uiArc, AppMenuCommon_GetCategoryIconCharFile(i), FALSE, 1, work->heapId);
     }
     for (i = 0; i < NELEMS(work->typeIconChr); i++) {
-        work->typeIconChr[i] = func_0204b81c(uiArc, func_0202d7f4(i), FALSE, 1, work->heapId);
+        work->typeIconChr[i] = ClActSys_LoadChars(uiArc, AppMenuCommon_GetTypeIconCharFile(i), FALSE, 1, work->heapId);
     }
     GFL_ArcToolFree(uiArc);
 
@@ -365,10 +368,10 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     categorySetup.bgPriority = 1;
     categorySetup.sequence = 0;
     for (i = 0; i < NELEMS(work->categoryIcons); i++) {
-        work->categoryIcons[i] = func_0204c040(work->actorUnit, work->categoryIconChr[i], work->typeIconPlt,
-                                               work->typeIconCel, &categorySetup, 1, work->heapId);
-        func_0204c378(work->categoryIcons[i], func_0202d800(i), 1);
-        func_0204c124(work->categoryIcons[i], FALSE);
+        work->categoryIcons[i] = ClActor_Create(work->actorUnit, work->categoryIconChr[i], work->typeIconPlt,
+                                                work->typeIconCel, &categorySetup, 1, work->heapId);
+        ClActor_SetPalette(work->categoryIcons[i], AppMenuCommon_GetCategoryIconPaletteIndex(i), 1);
+        ClActor_SetVisible(work->categoryIcons[i], FALSE);
         func_0204c5c8(work->categoryIcons[i], FALSE);
     }
     typeSetup.x = 82;
@@ -377,27 +380,27 @@ void ItemMenuDisp_Init(ItemMenuWork *work) {
     typeSetup.bgPriority = 1;
     typeSetup.sequence = 0;
     for (i = 0; i < NELEMS(work->typeIcons); i++) {
-        work->typeIcons[i] = func_0204c040(work->actorUnit, work->typeIconChr[i], work->typeIconPlt, work->typeIconCel,
-                                           &typeSetup, 1, work->heapId);
-        func_0204c378(work->typeIcons[i], func_0202d7e8(i), 1);
-        func_0204c124(work->typeIcons[i], FALSE);
+        work->typeIcons[i] = ClActor_Create(work->actorUnit, work->typeIconChr[i], work->typeIconPlt, work->typeIconCel,
+                                            &typeSetup, 1, work->heapId);
+        ClActor_SetPalette(work->typeIcons[i], AppMenuCommon_GetTypeIconPaletteIndex(i), 1);
+        ClActor_SetVisible(work->typeIcons[i], FALSE);
         func_0204c5c8(work->typeIcons[i], FALSE);
     }
 
-    arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
-    work->sortButtonPlt = func_0204bbb8(arc, 39, 0, 0x80, 0, 2, work->heapId);
-    work->sortButtonChr = func_0204b81c(arc, 38, FALSE, 0, work->heapId);
-    work->sortButtonCel = func_0204bde0(arc, 37, 36, work->heapId);
+    arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
+    work->sortButtonPlt = ClActSys_LoadPlttRange(arc, 39, 0, 0x80, 0, 2, work->heapId);
+    work->sortButtonChr = ClActSys_LoadChars(arc, 38, FALSE, 0, work->heapId);
+    work->sortButtonCel = ClActSys_LoadCellAnims(arc, 37, 36, work->heapId);
     GFL_ArcToolFree(arc);
     sortSetup.priority = 10;
     sortSetup.bgPriority = 1;
     sortSetup.x = 146;
     sortSetup.y = 176;
     sortSetup.sequence = 0;
-    work->sortButton = func_0204c040(work->actorUnit, work->sortButtonChr, work->sortButtonPlt, work->sortButtonCel,
-                                     &sortSetup, 0, work->heapId);
+    work->sortButton = ClActor_Create(work->actorUnit, work->sortButtonChr, work->sortButtonPlt, work->sortButtonCel,
+                                      &sortSetup, 0, work->heapId);
     func_0204c520(work->sortButton, TRUE);
-    func_0204c124(work->sortButton, TRUE);
+    ClActor_SetVisible(work->sortButton, TRUE);
     func_0204c5c8(work->sortButton, FALSE);
     ItemMenuDisp_UpdateSortButton(work);
 }
@@ -426,12 +429,12 @@ void ItemMenuDisp_ShowTMIcons(ItemMenuWork *work, BOOL show) {
         work->tmInfoRequest = 2;
     }
     if (work->selIcon != NULL) {
-        func_0204c124(work->selIcon, show);
+        ClActor_SetVisible(work->selIcon, show);
     }
     move = PML_ItemGetTMWazaID(ItemMenu_GetSlot(work, ItemMenu_GetCursorIndex(work))->item);
     if (move != 0) {
-        func_0204c124(work->categoryIcons[PML_MoveGetCategory(move)], show);
-        func_0204c124(work->typeIcons[PML_MoveGetType(move)], show);
+        ClActor_SetVisible(work->categoryIcons[PML_MoveGetCategory(move)], show);
+        ClActor_SetVisible(work->typeIcons[PML_MoveGetType(move)], show);
     }
 }
 
@@ -445,10 +448,10 @@ void ItemMenuDisp_DrawItemInfo(ItemMenuWork *work) {
     u32 x;
 
     for (i = 0; i < NELEMS(work->categoryIcons); i++) {
-        func_0204c124(work->categoryIcons[i], FALSE);
+        ClActor_SetVisible(work->categoryIcons[i], FALSE);
     }
     for (i = 0; i < NELEMS(work->typeIcons); i++) {
-        func_0204c124(work->typeIcons[i], FALSE);
+        ClActor_SetVisible(work->typeIcons[i], FALSE);
     }
     slot = ItemMenu_GetSlot(work, ItemMenu_GetCursorIndex(work));
     if (slot == NULL || slot->item == ITEM_NONE) {
@@ -517,10 +520,10 @@ void ItemMenuDisp_HideItemInfo(ItemMenuWork *work) {
     ItemMenuDisp_ShowTMIcons(work, FALSE);
     BmpWin_ClearScreen(work->tmInfoWindow.window);
     for (i = 0; i < NELEMS(work->categoryIcons); i++) {
-        func_0204c124(work->categoryIcons[i], FALSE);
+        ClActor_SetVisible(work->categoryIcons[i], FALSE);
     }
     for (i = 0; i < NELEMS(work->typeIcons); i++) {
-        func_0204c124(work->typeIcons[i], FALSE);
+        ClActor_SetVisible(work->typeIcons[i], FALSE);
     }
 }
 
@@ -535,18 +538,18 @@ void ItemMenuDisp_Exit(ItemMenuWork *work) {
     BmpWin_Free(work->quantityWindow.window);
     BmpWin_Free(work->priceWindow.window);
     BmpWin_Free(work->menuTitleWindow.window);
-    func_0204c108(work->scrollBar);
+    ClActor_Delete(work->scrollBar);
     if (work->selIcon != NULL) {
-        func_0204c108(work->selIcon);
-        func_0204b98c(work->selIconChr);
-        func_0204bcd0(work->selIconPlt);
+        ClActor_Delete(work->selIcon);
+        ClActSys_FreeChars(work->selIconChr);
+        ClActSys_FreePltt(work->selIconPlt);
     }
-    func_0204be64(work->selIconCel);
+    ClActSys_FreeCellAnims(work->selIconCel);
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
         GFL_BitmapFree(work->rowNameBitmaps[i]);
     }
-    func_0204bf98(work->actorUnit);
-    func_0204b758();
+    ClActUnit_Delete(work->actorUnit);
+    ClActSys_Delete();
 }
 
 // Draws the title of the menu
@@ -581,7 +584,7 @@ void ItemMenuDisp_CreateWindows(ItemMenuWork *work) {
     BmpWin_FlushMap(work->tmInfoWindow.window);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, work->heapId);
-    work->selIconCel = func_0204bde0(arc, 1, 0, work->heapId);
+    work->selIconCel = ClActSys_LoadCellAnims(arc, 1, 0, work->heapId);
     GFL_ArcToolFree(arc);
 
     GFL_MsgDataLoadStrbuf(work->msgData, 102, work->strbuf);
@@ -594,16 +597,16 @@ void ItemMenuDisp_CreateWindows(ItemMenuWork *work) {
     ItemMenuDisp_Print(work, &work->tmInfoWindow, work->strbuf, 112, 24, ITEMMENU_TEXT_COLOR);
     GFL_MsgDataLoadStrbuf(work->msgData, 90, work->strbuf);
     ItemMenuDisp_Print(work, &work->tmInfoWindow, work->strbuf, 208, 4, ITEMMENU_TEXT_COLOR);
-    if (func_0203d554() == FALSE) {
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         ItemMenuDisp_DrawItemInfo(work);
     }
 }
 
 static void ItemMenuDisp_FreeSelIcon(ItemMenuWork *work) {
     if (work->selIcon != NULL) {
-        func_0204c108(work->selIcon);
-        func_0204b98c(work->selIconChr);
-        func_0204bcd0(work->selIconPlt);
+        ClActor_Delete(work->selIcon);
+        ClActSys_FreeChars(work->selIconChr);
+        ClActSys_FreePltt(work->selIconPlt);
         work->selIcon = NULL;
     }
 }
@@ -617,8 +620,8 @@ static void ItemMenuDisp_ShowSelIcon(ItemMenuWork *work, u32 item) {
         ItemMenuDisp_FreeSelIcon(work);
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, work->heapId);
-    work->selIconPlt = func_0204bbb8(arc, GetItemGraphicsDatID(item, 2), 1, 0, 0, 1, work->heapId);
-    work->selIconChr = func_0204b81c(arc, GetItemGraphicsDatID(item, 1), FALSE, 1, work->heapId);
+    work->selIconPlt = ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(item, 2), 1, 0, 0, 1, work->heapId);
+    work->selIconChr = ClActSys_LoadChars(arc, GetItemGraphicsDatID(item, 1), FALSE, 1, work->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 132;
     setup.y = 80;
@@ -626,14 +629,14 @@ static void ItemMenuDisp_ShowSelIcon(ItemMenuWork *work, u32 item) {
     setup.priority = 0;
     setup.bgPriority = 0;
     work->selIcon =
-        func_0204c040(work->actorUnit, work->selIconChr, work->selIconPlt, work->selIconCel, &setup, 1, work->heapId);
+        ClActor_Create(work->actorUnit, work->selIconChr, work->selIconPlt, work->selIconCel, &setup, 1, work->heapId);
     func_0204c520(work->selIcon, TRUE);
-    func_0204c124(work->selIcon, TRUE);
+    ClActor_SetVisible(work->selIcon, TRUE);
     func_0204c5c8(work->selIcon, FALSE);
 }
 
 void ItemMenuDisp_Update(ItemMenuWork *work) {
-    func_0204b794();
+    ClActSys_Draw();
     if (work->taskMenu != NULL) {
         AppTaskMenu_Update(work->taskMenu);
     }
@@ -641,22 +644,22 @@ void ItemMenuDisp_Update(ItemMenuWork *work) {
 
 // Loads the list's OBJ
 void ItemMenuDisp_LoadListRes(ItemMenuWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     s32 i;
 
-    work->rowMarkPlt = func_0204bbb8(arc, 32, 0, 0x1c0, 0, 1, work->heapId);
-    work->rowMarkChr = func_0204b81c(arc, 31, FALSE, 0, work->heapId);
-    work->rowMarkCel = func_0204bde0(arc, 30, 29, work->heapId);
-    work->listCursorPlt = func_0204bbb8(arc, 28, 0, 0x60, 0, 1, work->heapId);
-    work->listCursorChr = func_0204b81c(arc, 27, FALSE, 0, work->heapId);
-    work->listCursorCel = func_0204bde0(arc, 26, 25, work->heapId);
+    work->rowMarkPlt = ClActSys_LoadPlttRange(arc, 32, 0, 0x1c0, 0, 1, work->heapId);
+    work->rowMarkChr = ClActSys_LoadChars(arc, 31, FALSE, 0, work->heapId);
+    work->rowMarkCel = ClActSys_LoadCellAnims(arc, 30, 29, work->heapId);
+    work->listCursorPlt = ClActSys_LoadPlttRange(arc, 28, 0, 0x60, 0, 1, work->heapId);
+    work->listCursorChr = ClActSys_LoadChars(arc, 27, FALSE, 0, work->heapId);
+    work->listCursorCel = ClActSys_LoadCellAnims(arc, 26, 25, work->heapId);
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
         work->rowNameBitmaps[i] = GFL_BitmapCreate(12, 2, 32, work->heapId);
-        work->rowNameChr[i] = func_0204b81c(arc, 20, FALSE, 0, work->heapId);
+        work->rowNameChr[i] = ClActSys_LoadChars(arc, 20, FALSE, 0, work->heapId);
     }
     getTrainerGender(work->playerInfo);
-    work->rowNamePlt = func_0204bbb8(arc, 21, 0, 0, 0, 3, work->heapId);
-    work->rowNameCel = func_0204bde0(arc, 19, 18, work->heapId);
+    work->rowNamePlt = ClActSys_LoadPlttRange(arc, 21, 0, 0, 0, 3, work->heapId);
+    work->rowNameCel = ClActSys_LoadCellAnims(arc, 19, 18, work->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -672,9 +675,9 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
     scrollSetup.priority = 1;
     scrollSetup.bgPriority = 2;
     scrollSetup.sequence = 0;
-    work->scrollBar = func_0204c040(work->actorUnit, work->listCursorChr, work->listCursorPlt, work->listCursorCel,
-                                    &scrollSetup, 0, work->heapId);
-    func_0204c124(work->scrollBar, TRUE);
+    work->scrollBar = ClActor_Create(work->actorUnit, work->listCursorChr, work->listCursorPlt, work->listCursorCel,
+                                     &scrollSetup, 0, work->heapId);
+    ClActor_SetVisible(work->scrollBar, TRUE);
     func_0204c520(work->scrollBar, TRUE);
     func_0204c5c8(work->scrollBar, FALSE);
     ItemMenuDisp_UpdateScrollBar(work);
@@ -684,10 +687,10 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
     cursorSetup.priority = 1;
     cursorSetup.bgPriority = 2;
     cursorSetup.sequence = 1;
-    work->listCursor = func_0204c040(work->actorUnit, work->listCursorChr, work->listCursorPlt, work->listCursorCel,
-                                     &cursorSetup, 0, work->heapId);
+    work->listCursor = ClActor_Create(work->actorUnit, work->listCursorChr, work->listCursorPlt, work->listCursorCel,
+                                      &cursorSetup, 0, work->heapId);
     func_0204c5c8(work->listCursor, FALSE);
-    func_0204c124(work->listCursor, TRUE);
+    ClActor_SetVisible(work->listCursor, TRUE);
     func_0204c520(work->listCursor, TRUE);
 
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
@@ -696,14 +699,14 @@ void ItemMenuDisp_CreateListActors(ItemMenuWork *work) {
         rowSetup.priority = 10;
         rowSetup.bgPriority = 3;
         rowSetup.sequence = 0;
-        work->rowNames[i] = func_0204c040(work->actorUnit, work->rowNameChr[i], work->rowNamePlt, work->rowNameCel,
-                                          &rowSetup, 0, work->heapId);
+        work->rowNames[i] = ClActor_Create(work->actorUnit, work->rowNameChr[i], work->rowNamePlt, work->rowNameCel,
+                                           &rowSetup, 0, work->heapId);
         rowSetup.x -= 24;
         rowSetup.sequence = 1;
-        work->rowMarks[i] = func_0204c040(work->actorUnit, work->rowMarkChr, work->rowMarkPlt, work->rowMarkCel,
-                                          &rowSetup, 0, work->heapId);
-        func_0204c124(work->rowNames[i], FALSE);
-        func_0204c124(work->rowMarks[i], FALSE);
+        work->rowMarks[i] = ClActor_Create(work->actorUnit, work->rowMarkChr, work->rowMarkPlt, work->rowMarkCel,
+                                           &rowSetup, 0, work->heapId);
+        ClActor_SetVisible(work->rowNames[i], FALSE);
+        ClActor_SetVisible(work->rowMarks[i], FALSE);
         func_0204c5c8(work->rowNames[i], FALSE);
         func_0204c5c8(work->rowMarks[i], FALSE);
     }
@@ -818,16 +821,16 @@ void ItemMenuDisp_UpdateListCursor(ItemMenuWork *work) {
     ClActorPos pos;
 
     ItemMenuDisp_SetListCursorPalette(work, 0);
-    func_0204c178(work->listCursor, &pos, 0xffff);
+    ClActor_GetSurfacePos(work->listCursor, &pos, 0xffff);
     pos.y = (work->cursorRow + 1) * 24;
-    func_0204c140(work->listCursor, &pos, 0xffff);
-    if (func_0203d554() == FALSE) {
+    ClActor_SetSurfacePos(work->listCursor, &pos, 0xffff);
+    if (GCTX_HIDIsUsingTouch() == FALSE) {
         ItemMenuDisp_SetListCursorPalette(work, 1);
     }
     BlinkPalAnm_InitAnime(work->paletteAnim);
-    func_0204c124(work->scrollBar, ItemMenu_GetItemCount(work) >= ITEMMENU_LIST_ROWS + 1);
-    func_0204c504(work->listCursor, 0);
-    func_0204c504(work->scrollBar, 0);
+    ClActor_SetVisible(work->scrollBar, ItemMenu_GetItemCount(work) >= ITEMMENU_LIST_ROWS + 1);
+    ClActor_SetAnimFrame(work->listCursor, 0);
+    ClActor_SetAnimFrame(work->scrollBar, 0);
 }
 
 // Copies the rows' names to their OBJ and shows their marks
@@ -837,7 +840,7 @@ void ItemMenuDisp_UpdateListRows(ItemMenuWork *work) {
     s32 i;
 
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
-        chars = func_0204bb80(work->rowNameChr[i], FALSE);
+        chars = ClActSys_GetCharVramAddr(work->rowNameChr[i], FALSE);
         pixels = GFL_BitmapGetPixelData(work->rowNameBitmaps[i]);
         DC_FlushRange(pixels, GFL_BitmapCalcPixelDataSize(work->rowNameBitmaps[i]));
         GX_LoadOBJ(pixels + 0x100, chars + 0x80, 0x80);
@@ -846,15 +849,15 @@ void ItemMenuDisp_UpdateListRows(ItemMenuWork *work) {
         GX_LoadOBJ(pixels + 0x180, chars + 0x400, 0x100);
         if (work->rowMarkTypes[i] != 9) {
             if (work->rowMarkTypes[i] != 8) {
-                func_0204c488(work->rowMarks[i], work->rowMarkTypes[i]);
-                func_0204c124(work->rowMarks[i], TRUE);
+                ClActor_SetSequence(work->rowMarks[i], work->rowMarkTypes[i]);
+                ClActor_SetVisible(work->rowMarks[i], TRUE);
             } else {
-                func_0204c124(work->rowMarks[i], FALSE);
+                ClActor_SetVisible(work->rowMarks[i], FALSE);
             }
-            func_0204c124(work->rowNames[i], TRUE);
+            ClActor_SetVisible(work->rowNames[i], TRUE);
         } else {
-            func_0204c124(work->rowMarks[i], FALSE);
-            func_0204c124(work->rowNames[i], FALSE);
+            ClActor_SetVisible(work->rowMarks[i], FALSE);
+            ClActor_SetVisible(work->rowNames[i], FALSE);
         }
     }
 }
@@ -865,15 +868,15 @@ void ItemMenuDisp_TouchScrollBar(ItemMenuWork *work) {
     u32 y;
     ClActorPos pos;
 
-    if (func_0203da84(&x, &y) == TRUE) {
+    if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
         if (y < 26) {
             y = 26;
         } else if (y > 142) {
             y = 142;
         }
-        func_0204c178(work->scrollBar, &pos, 0xffff);
+        ClActor_GetSurfacePos(work->scrollBar, &pos, 0xffff);
         pos.y = y;
-        func_0204c140(work->scrollBar, &pos, 0xffff);
+        ClActor_SetSurfacePos(work->scrollBar, &pos, 0xffff);
     }
 }
 
@@ -883,9 +886,9 @@ void ItemMenuDisp_UpdateScrollBar(ItemMenuWork *work) {
     ClActorPos pos;
 
     if (count >= ITEMMENU_LIST_ROWS + 1) {
-        func_0204c178(work->scrollBar, &pos, 0xffff);
+        ClActor_GetSurfacePos(work->scrollBar, &pos, 0xffff);
         pos.y = ScrollBar_GetPos(count - ITEMMENU_LIST_ROWS, work->scroll + 1, 26, 142, 0);
-        func_0204c140(work->scrollBar, &pos, 0xffff);
+        ClActor_SetSurfacePos(work->scrollBar, &pos, 0xffff);
     }
 }
 
@@ -907,25 +910,25 @@ static void ItemMenuDisp_CreateButtons(ItemMenuWork *work) {
             if (i == 2) {
                 setup.y += 4;
             }
-            work->buttons[i] = func_0204c040(work->actorUnit, work->buttonChr, work->buttonPlt, work->buttonCel, &setup,
-                                             0, work->heapId);
-            func_0204c124(work->buttons[i], TRUE);
+            work->buttons[i] = ClActor_Create(work->actorUnit, work->buttonChr, work->buttonPlt, work->buttonCel,
+                                              &setup, 0, work->heapId);
+            ClActor_SetVisible(work->buttons[i], TRUE);
             func_0204c5c8(work->buttons[i], FALSE);
         }
     }
     setup.x = 146;
     setup.y = 168;
     setup.sequence = 0;
-    work->filterButton = func_0204c040(work->actorUnit, work->filterButtonChr, work->buttonPlt, work->filterButtonCel,
-                                       &setup, 0, work->heapId);
-    func_0204c124(work->filterButton, FALSE);
+    work->filterButton = ClActor_Create(work->actorUnit, work->filterButtonChr, work->buttonPlt, work->filterButtonCel,
+                                        &setup, 0, work->heapId);
+    ClActor_SetVisible(work->filterButton, FALSE);
     func_0204c520(work->filterButton, TRUE);
     func_0204c5c8(work->filterButton, FALSE);
     if (ItemMenu_CanRegister(work) == FALSE) {
-        func_0204c124(work->buttons[2], FALSE);
+        ClActor_SetVisible(work->buttons[2], FALSE);
     }
     if (work->mode == 2) {
-        func_0204c124(work->buttons[3], FALSE);
+        ClActor_SetVisible(work->buttons[3], FALSE);
     }
     {
         u8 sequences[] = { 3, 2 };
@@ -938,10 +941,10 @@ static void ItemMenuDisp_CreateButtons(ItemMenuWork *work) {
             setup.sequence = sequences[i];
             setup.bgPriority = 0;
             button = i + 5;
-            work->buttons[button] = func_0204c040(work->actorUnit, work->buttonChr, work->buttonPlt, work->buttonCel,
-                                                  &setup, 0, work->heapId);
+            work->buttons[button] = ClActor_Create(work->actorUnit, work->buttonChr, work->buttonPlt, work->buttonCel,
+                                                   &setup, 0, work->heapId);
             func_0204c520(work->buttons[button], TRUE);
-            func_0204c124(work->buttons[button], FALSE);
+            ClActor_SetVisible(work->buttons[button], FALSE);
             func_0204c5c8(work->buttons[button], FALSE);
         }
     }
@@ -965,8 +968,8 @@ void ItemMenuDisp_CreatePocketTabs(ItemMenuWork *work) {
         setup.x = sPocketTabPos[i].x - 16;
         setup.y = sPocketTabPos[i].y;
         setup.sequence = sPocketTabSequences[i][1];
-        work->pocketTabs[i] = func_0204c040(work->actorUnit, work->pocketTabChr, work->pocketTabPlt, work->pocketTabCel,
-                                            &setup, 0, work->heapId);
+        work->pocketTabs[i] = ClActor_Create(work->actorUnit, work->pocketTabChr, work->pocketTabPlt,
+                                             work->pocketTabCel, &setup, 0, work->heapId);
         func_0204c520(work->pocketTabs[i], TRUE);
     }
 }
@@ -977,9 +980,9 @@ void ItemMenuDisp_SetPocketTab(ItemMenuWork *work, u32 pocket) {
 
     for (i = 0; i < NELEMS(work->pocketTabs); i++) {
         if (i == pocket) {
-            func_0204c488(work->pocketTabs[i], sPocketTabSequences[i][0]);
+            ClActor_SetSequence(work->pocketTabs[i], sPocketTabSequences[i][0]);
         } else {
-            func_0204c488(work->pocketTabs[i], sPocketTabSequences[i][1]);
+            ClActor_SetSequence(work->pocketTabs[i], sPocketTabSequences[i][1]);
         }
     }
 }
@@ -1086,7 +1089,7 @@ void ItemMenuDisp_OpenFilterMenu(ItemMenuWork *work, u8 count) {
 
 // Loads the lower screen's frame for a pocket
 void ItemMenuDisp_LoadPocketFrame(ItemMenuWork *work, u32 pocket) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
 
     if (pocket == BAG_POCKET_FREE_SPACE) {
         GFL_G2DIOLoadNSCRAsync(arc, 24, 5, 0, CHAR_POS(work->bg5Chars), 0, FALSE, work->heapId);
@@ -1103,8 +1106,8 @@ static void ItemMenuDisp_DrawTMInfo(ItemMenuWork *work, u32 move) {
     s32 power;
     s32 accuracy;
 
-    func_0204c124(work->categoryIcons[PML_MoveGetCategory(move)], TRUE);
-    func_0204c124(work->typeIcons[PML_MoveGetType(move)], TRUE);
+    ClActor_SetVisible(work->categoryIcons[PML_MoveGetCategory(move)], TRUE);
+    ClActor_SetVisible(work->typeIcons[PML_MoveGetType(move)], TRUE);
     pp = PML_MoveGetMaxPP(move, 0);
     power = PML_MoveGetParam(move, MOVE_PARAM_POWER);
     accuracy = PML_MoveGetParam(move, MOVE_PARAM_ACCURACY);
@@ -1145,8 +1148,8 @@ void ItemMenuDisp_ShowMessage(ItemMenuWork *work, BOOL stream) {
     GFL_BitmapFill(BmpWin_GetBitmap(window->window), 15);
     BmpWin_FlushChar(window->window);
     if (stream == TRUE) {
-        work->printStream = func_02022268(window->window, 0, 0, work->expandBuf, work->font, func_02017bcc(),
-                                          work->tcbManager, 2, work->heapId, 15);
+        work->printStream = PrintStream_Create(window->window, 0, 0, work->expandBuf, work->font,
+                                               TextSpeed_GetCurrentWait(), work->tcbManager, 2, work->heapId, 15);
     } else {
         ItemMenuDisp_Print(work, window, work->expandBuf, 0, 0, PRINT_COLOR(1, 2, 15));
     }
@@ -1168,26 +1171,26 @@ void ItemMenuDisp_SetItemMenuMessage(ItemMenuWork *work, u32 item) {
 // Whether the message is printed and read
 BOOL ItemMenuDisp_IsMessageDone(ItemMenuWork *work) {
     if (work->printStream != NULL) {
-        u32 state = func_020223b4(work->printStream);
+        u32 state = PrintStream_GetState(work->printStream);
 
         KeyCursor_Update(work->keyCursor, work->printStream, work->msgWindow.window);
         switch (state) {
         case PRINT_STREAM_DONE:
-            func_020223cc(work->printStream);
+            PrintStream_Delete(work->printStream);
             work->printStream = NULL;
             work->streamResumed = FALSE;
             break;
         case PRINT_STREAM_PAUSED:
             if (work->streamResumed == FALSE &&
-                ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+                ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(work->printStream);
+                PrintStream_Continue(work->printStream);
                 work->streamResumed = TRUE;
             }
             break;
         case PRINT_STREAM_RUNNING:
-            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-                func_020223e0(work->printStream, 0);
+            if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
+                PrintStream_SkipWait(work->printStream, 0);
             }
             work->streamResumed = FALSE;
             break;
@@ -1240,16 +1243,16 @@ void ItemMenuDisp_DrawMoney(ItemMenuWork *work) {
 
 // Shows the money in place of the pocket's name and arrows
 void ItemMenuDisp_ShowMoney(ItemMenuWork *work) {
-    func_0204c124(work->buttons[0], FALSE);
-    func_0204c124(work->buttons[1], FALSE);
+    ClActor_SetVisible(work->buttons[0], FALSE);
+    ClActor_SetVisible(work->buttons[1], FALSE);
     BmpWin_ClearScreen(work->pocketNameWindow.window);
     ItemMenuDisp_DrawMoney(work);
 }
 
 // Shows the pocket's name and arrows again
 void ItemMenuDisp_HideMoney(ItemMenuWork *work) {
-    func_0204c124(work->buttons[0], TRUE);
-    func_0204c124(work->buttons[1], TRUE);
+    ClActor_SetVisible(work->buttons[0], TRUE);
+    ClActor_SetVisible(work->buttons[1], TRUE);
     BmpWin_ClearScreen(work->moneyValueWindow.window);
     BmpWin_ClearScreen(work->moneyWindow.window);
     ItemMenuDisp_DrawPocketName(work, work->pocket);
@@ -1289,7 +1292,7 @@ void ItemMenuDisp_CloseMenu(ItemMenuWork *work) {
 
 // Draws the quantity picker's frame
 void ItemMenuDisp_DrawQuantityFrame(ItemMenuWork *work) {
-    ArcTool *arc = GFL_ArcSysCreateFileHandle(87, work->heapId);
+    ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMMENU, work->heapId);
     void *file = GFL_ArcToolReadHeapNewLZ(arc, 35, FALSE, work->heapId);
     NNSG2dScreenData *screen;
     s32 i = 0;
@@ -1352,14 +1355,14 @@ void ItemMenuDisp_SetListCursorPalette(ItemMenuWork *work, u32 palette) {
     ClActorPos rowPos;
     u32 i;
 
-    func_0204c178(work->listCursor, &cursorPos, 0);
+    ClActor_GetSurfacePos(work->listCursor, &cursorPos, 0);
     for (i = 0; i < ITEMMENU_ROW_OBJS; i++) {
-        func_0204c178(work->rowNames[i], &rowPos, 0);
+        ClActor_GetSurfacePos(work->rowNames[i], &rowPos, 0);
         if (rowPos.y == cursorPos.y) {
             break;
         }
     }
-    func_0204c378(work->rowNames[i], (u8)palette, 0);
+    ClActor_SetPalette(work->rowNames[i], (u8)palette, 0);
 }
 
 // Lights the lower screen up for the list, or dims it behind a menu
@@ -1376,33 +1379,33 @@ void ItemMenuDisp_SetButtonsActive(ItemMenuWork *work, BOOL active) {
         PaletteFade_StartFade(work->paletteFade, 1, 1, 0, 0, 0, 0, GFL_VBlankGetTCBMgr());
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 6, 0);
         ItemMenuDisp_UpdateSortButton(work);
-        func_0204c488(work->buttons[0], 4);
-        func_0204c488(work->buttons[1], 5);
-        func_0204c488(work->buttons[3], 0);
+        ClActor_SetSequence(work->buttons[0], 4);
+        ClActor_SetSequence(work->buttons[1], 5);
+        ClActor_SetSequence(work->buttons[3], 0);
         if (registered == TRUE) {
-            func_0204c488(work->buttons[2], 7);
+            ClActor_SetSequence(work->buttons[2], 7);
         } else {
-            func_0204c488(work->buttons[2], 6);
+            ClActor_SetSequence(work->buttons[2], 6);
         }
         ItemMenuDisp_SetBackButtonActive(work, TRUE);
     } else {
         PaletteFade_LoadFromVRAM(work->paletteFade, 2, 0, 0x200);
         PaletteFade_StartFade(work->paletteFade, 4, 0x47cf, 0, 8, 8, 0, GFL_VBlankGetTCBMgr());
         PaletteFade_StartFade(work->paletteFade, 1, 1, 0, 8, 8, 0, GFL_VBlankGetTCBMgr());
-        if (work->mode == 4 && func_0204c138(work->buttons[0]) == FALSE) {
+        if (work->mode == 4 && ClActor_IsVisible(work->buttons[0]) == FALSE) {
             G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 2, -8);
         } else {
             G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 6, -8);
         }
-        func_0204c488(work->sortButton, 4);
-        func_0204c488(work->filterButton, 2);
-        func_0204c488(work->buttons[0], 18);
-        func_0204c488(work->buttons[1], 19);
-        func_0204c488(work->buttons[3], 14);
+        ClActor_SetSequence(work->sortButton, 4);
+        ClActor_SetSequence(work->filterButton, 2);
+        ClActor_SetSequence(work->buttons[0], 18);
+        ClActor_SetSequence(work->buttons[1], 19);
+        ClActor_SetSequence(work->buttons[3], 14);
         if (registered == TRUE) {
-            func_0204c488(work->buttons[2], 22);
+            ClActor_SetSequence(work->buttons[2], 22);
         } else {
-            func_0204c488(work->buttons[2], 21);
+            ClActor_SetSequence(work->buttons[2], 21);
         }
     }
 }
@@ -1410,29 +1413,29 @@ void ItemMenuDisp_SetButtonsActive(ItemMenuWork *work, BOOL active) {
 // Lights the back button up, or dims it
 void ItemMenuDisp_SetBackButtonActive(ItemMenuWork *work, BOOL active) {
     if (active == TRUE) {
-        func_0204c488(work->buttons[4], 1);
+        ClActor_SetSequence(work->buttons[4], 1);
     } else {
-        func_0204c488(work->buttons[4], 15);
+        ClActor_SetSequence(work->buttons[4], 15);
     }
 }
 
 // Shows the sort button, or the Free Space's filter button
 void ItemMenuDisp_UpdateSortButton(ItemMenuWork *work) {
     if (work->pocket != BAG_POCKET_FREE_SPACE) {
-        func_0204c124(work->sortButton, TRUE);
-        func_0204c124(work->filterButton, FALSE);
+        ClActor_SetVisible(work->sortButton, TRUE);
+        ClActor_SetVisible(work->filterButton, FALSE);
         if (ItemMenu_GetItemCount(work) <= 1) {
-            func_0204c488(work->sortButton, 4);
+            ClActor_SetSequence(work->sortButton, 4);
         } else {
-            func_0204c488(work->sortButton, 0);
+            ClActor_SetSequence(work->sortButton, 0);
         }
     } else {
-        func_0204c124(work->filterButton, TRUE);
-        func_0204c124(work->sortButton, FALSE);
+        ClActor_SetVisible(work->filterButton, TRUE);
+        ClActor_SetVisible(work->sortButton, FALSE);
         if (ItemMenu_CountFilterActions(work) > 2) {
-            func_0204c488(work->filterButton, 0);
+            ClActor_SetSequence(work->filterButton, 0);
         } else {
-            func_0204c488(work->filterButton, 2);
+            ClActor_SetSequence(work->filterButton, 2);
         }
     }
 }
@@ -1443,24 +1446,24 @@ void ItemMenuDisp_SetMoveButtons(ItemMenuWork *work, BOOL active) {
 
     if (active == TRUE) {
         ItemMenuDisp_UpdateSortButton(work);
-        func_0204c488(work->buttons[0], 4);
-        func_0204c488(work->buttons[1], 5);
-        func_0204c488(work->buttons[3], 0);
+        ClActor_SetSequence(work->buttons[0], 4);
+        ClActor_SetSequence(work->buttons[1], 5);
+        ClActor_SetSequence(work->buttons[3], 0);
         if (registered == TRUE) {
-            func_0204c488(work->buttons[2], 7);
+            ClActor_SetSequence(work->buttons[2], 7);
         } else {
-            func_0204c488(work->buttons[2], 6);
+            ClActor_SetSequence(work->buttons[2], 6);
         }
     } else {
-        func_0204c488(work->sortButton, 4);
-        func_0204c488(work->filterButton, 2);
-        func_0204c488(work->buttons[0], 18);
-        func_0204c488(work->buttons[1], 19);
-        func_0204c488(work->buttons[3], 14);
+        ClActor_SetSequence(work->sortButton, 4);
+        ClActor_SetSequence(work->filterButton, 2);
+        ClActor_SetSequence(work->buttons[0], 18);
+        ClActor_SetSequence(work->buttons[1], 19);
+        ClActor_SetSequence(work->buttons[3], 14);
         if (registered == TRUE) {
-            func_0204c488(work->buttons[2], 22);
+            ClActor_SetSequence(work->buttons[2], 22);
         } else {
-            func_0204c488(work->buttons[2], 21);
+            ClActor_SetSequence(work->buttons[2], 21);
         }
     }
 }
@@ -1471,12 +1474,12 @@ BOOL ItemMenuDisp_SlidePocketTabs(ItemMenuWork *work) {
     u32 i;
 
     for (i = 0; i < NELEMS(work->pocketTabs); i++) {
-        func_0204c178(work->pocketTabs[i], &pos, 0xffff);
+        ClActor_GetSurfacePos(work->pocketTabs[i], &pos, 0xffff);
         if (pos.x == sPocketTabPos[i].x) {
             return FALSE;
         }
         pos.x += 4;
-        func_0204c140(work->pocketTabs[i], &pos, 0xffff);
+        ClActor_SetSurfacePos(work->pocketTabs[i], &pos, 0xffff);
     }
     return TRUE;
 }
@@ -1492,7 +1495,7 @@ static void ItemMenuDisp_TransferScreen(PrintWindow *window) {
 
 // Prints the queue's text and sends the windows that are done to VRAM
 void ItemMenuDisp_FlushWindows(ItemMenuWork *work) {
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     PrintWindow_Flush(&work->tmInfoWindow, work->printQueue);
     PrintWindow_Flush(&work->pocketLabelWindow, work->printQueue);
     PrintWindow_Flush(&work->itemNameWindow, work->printQueue);

@@ -8,7 +8,7 @@
 u32 numHandlersWithHandlerPri(u32 priority, u32 count);
 u32 devideNumHandersAndPri(u32 *packed);
 u16 calcAbilHandlerSubPriority(BattleMon *mon);
-BOOL func_ov167_021abdf8(BtlServerFlow *flow, u32 value);
+BOOL BtlServerFlow_CheckDebugFlag(BtlServerFlow *flow, u32 value);
 BOOL AbilityEvent_RollEffectChance(BtlServerFlow *flow, u32 chance);
 void AbilityEvent_ItemRotationSleep(BattleMon *mon);
 void AbilityEvent_ItemRotationWake(BattleMon *mon);
@@ -68,7 +68,7 @@ void HandlerGuts(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work
 const BattleEventHandlerEntry *EventAddGuts(u32 *priority);
 void HandlerPlusMinus(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 const BattleEventHandlerEntry *EventAddPlusMinus(u32 *priority);
-BOOL func_ov167_021be5c4(BtlServerFlow *flow, u8 monId, u8 *mons, u32 ability);
+BOOL CheckAllyHasAbility(BtlServerFlow *flow, u8 monId, u8 *mons, u32 ability);
 BOOL CheckFlowerGiftEnablePokemon(BtlServerFlow *flow, u8 monId);
 void HandlerFlowerGiftMemberOnField(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerFlowerGiftGotAbility(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -227,7 +227,8 @@ void HandlerTruantGet(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 
 void HandlerTruantFailed(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerTruantEndAction(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 const BattleEventHandlerEntry *EventAddTruant(u32 *priority);
-BOOL func_ov167_021c09d0(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId, u8 monId);
+BOOL HandlerMoldBreakerSkipCheck(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId,
+                                 u8 monId);
 void HandlerMoldBreakerStart(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerMoldBreakerEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerMoldBreakerConfirm(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -242,7 +243,7 @@ void HandlerForecastChangeAbility(BattleEventItem *item, BtlServerFlow *flow, u8
 void HandlerDampEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 BOOL HandlerDampSkipCheck(BattleEventItem *item, BtlServerFlow *flow, u32 factorType, u32 event, u16 subId, u8 monId);
 void HandlerDampStart(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-void func_ov167_021c06cc(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+void HandlerDampMoveEnd(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerDamp(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerDampEffective(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 const BattleEventHandlerEntry *EventAddDamp(u32 *priority);
@@ -266,7 +267,7 @@ void HandlerDrySkinWeather(BattleEventItem *item, BtlServerFlow *flow, u8 monId,
 void HandlerForecastAbilityOff(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 const BattleEventHandlerEntry *EventAddForecast(u32 *priority);
 BOOL CommonMoveTargetChangeToMe(BtlServerFlow *flow, u8 monId, s32 *work, u32 type);
-BOOL func_ov167_021abdd0(BtlServerFlow *flow, u8 attackerId, u8 defenderId, u16 move);
+BOOL BtlServerFlow_IsTargetOutOfRange(BtlServerFlow *flow, u8 attackerId, u8 defenderId, u16 move);
 BOOL func_ov167_021c0d78(u16 move);
 const BattleEventHandlerEntry *EventAddStormDrain(u32 *priority);
 void HandlerStormDrain(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
@@ -288,7 +289,7 @@ typedef struct AbilityEventAddEntry {
 void HandlerSlowStartCalcSpeed(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerSlowStartAttackPower(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerSlowStartMemberIn(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
-void func_ov167_021be18c(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
+void HandlerSlowStartAfterRotation(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerSlowStartTextSet(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerSlowStartTurnCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 const BattleEventHandlerEntry *EventAddSlowStart(u32 *priority);

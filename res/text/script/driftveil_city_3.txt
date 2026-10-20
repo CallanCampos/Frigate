@@ -1,0 +1,7 @@
+DriftveilCity3_Text_WelcomeGrandHotelDriftveil = Welcome to the Grand Hotel Driftveil.\nI'm sorry but we're completely full.{be01}\nBut please feel free to relax.
+DriftveilCity3_Text_HooHaHavePokedex = Hoo ha!\nYou have a Pokédex.{be01}\nHow many Pokémon have you found?{be01}\nIf you find 70 or more, I'll give you\nsomething sure to delight!
+DriftveilCity3_Text_HaHooHavePokedex = Ha hoo!\nYou have a Pokédex.{be01}\nHow many Pokémon have you found?{be01}\nHoo ha! You've found 70 or more!\nNow we're talking! This is for you!{be01}
+DriftveilCity3_Text_PokemonHoldingShellBell = A Pokémon holding a Shell Bell recovers\nits HP a little bit if it inflicts damage{be00}\nduring a battle.{be01}\nBut what's more important is this. Have\nyou shown the Pokédex to a professor?
+DriftveilCity3_Text_BattlingPokemonStrongerThan = Battling Pokémon stronger\nthan you gives you more Exp. Points!
+DriftveilCity3_Text_DidKnowItsFrom = Did you know this?\nIt's from an article in Pokémon Pal.{be01}\n“Press the L Button while selecting\na move during battle to display{be00}\ndetailed information about that move!"
+\pad{18}

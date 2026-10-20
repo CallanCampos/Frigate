@@ -1,7 +1,7 @@
 #include "types.h"
 #include "system/game_data.h"
 
-void func_ov012_0215cd58(CityState *state) {
+void CityState_ApplyVersionZones(CityState *state) {
     if (state->city == 1) {
         SetAllowVersionSpecificZone(0, 1);
         SetAllowVersionSpecificZone(1, 1);
@@ -12,7 +12,7 @@ void func_ov012_0215cd58(CityState *state) {
     }
 }
 
-void func_ov012_0215cd8c(CityState *state) {
+void CityState_Init(CityState *state) {
     state->initialized = 0;
     state->city = 2;
 }

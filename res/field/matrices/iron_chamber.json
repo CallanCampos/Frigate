@@ -1,0 +1,7 @@
+{
+    "$schema": "map_matrix.schema.json",
+    "maps": [
+        [ "MAP_MODEL_IRON_CHAMBER_M_DUN2909_00_00" ],
+        [ "MAP_MODEL_IRON_CHAMBER_M_DUN2909_00_01" ]
+    ]
+}

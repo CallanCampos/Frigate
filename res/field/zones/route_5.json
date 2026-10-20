@@ -1,0 +1,38 @@
+{
+    "$schema": "zone.schema.json",
+    "map_type": 0,
+    "npc_cache": 4,
+    "area": "AREA_DESERT_RESORT",
+    "matrix": "MAP_MATRIX_OVERWORLD",
+    "scripts": "SCRIPTS_ROUTE_5",
+    "text": "SCRIPT_TEXT_ROUTE_5",
+    "bgm": {
+        "spring": "SEQ_BGM_R_C_SP",
+        "summer": "SEQ_BGM_R_C_SU",
+        "autumn": "SEQ_BGM_R_C_AU",
+        "winter": "SEQ_BGM_R_C_WI"
+    },
+    "encounters": "ENCOUNTERS_ROUTE_5",
+    "enc_slot": 1,
+    "parent": "ZONE_ROUTE_5",
+    "place": "PLACE_ROUTE_5",
+    "place_display": 1,
+    "weather": 0,
+    "projection": 1,
+    "camera": 0,
+    "transition": 0,
+    "battle_bg": 0,
+    "cycling": true,
+    "escape_rope": false,
+    "fly_from": true,
+    "cycle_surf_bgm": true,
+    "entralink_warp": true,
+    "cam_bound": 431,
+    "name_icon": 39,
+    "easy_level": 2,
+    "fly": {
+        "x": 371,
+        "y": 0,
+        "z": 431
+    }
+}

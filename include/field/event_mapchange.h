@@ -26,7 +26,7 @@ GameEvent *EventMapChangeDiveOut_Create(GameSystem *gsys);
 GameEvent *EventMapChangeDiveIn_Create(GameSystem *gsys, u16 zoneId);
 GameEvent *EventMapChangeWarpPad_Create(GameSystem *gsys, Field *field, u16 zoneId, const VecFx32 *pos, u16 dir);
 GameEvent *EventUnionRoomWarp_Create(GameSystem *gsys, Field *field);
-GameEvent *EventMapChangeUnionRoomExit_Create(GameSystem *gsys);
+GameEvent *EventMapChangeUnionRoomExit_Create(GameSystem *gsys, Field *field);
 GameEvent *EventEntralinkWarpIn_Create(GameSystem *gsys, u16 zoneId, const VecFx32 *pos, u32 a3);
 GameEvent *EventEntralinkWarpIn_CreateCore(GameSystem *gsys, Field *field, ZoneSpawnInfo *spawn, u32 a3, u32 a4);
 GameEvent *EventEntralinkWarp_Create(GameSystem *gsys, Field *field, ZoneSpawnInfo *spawn);

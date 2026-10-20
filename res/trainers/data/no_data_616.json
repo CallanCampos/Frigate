@@ -1,0 +1,27 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "    ",
+    "class": "TRAINER_CLASS_NO_DATA_M_231",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 15,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_PATRAT",
+            "form": 0,
+            "level": 1,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_LOSE",
+            "text": "This Pokémon battle... It will forever\ncommemorate my visit to Castelia City!"
+        }
+    ]
+}

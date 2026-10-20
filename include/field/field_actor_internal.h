@@ -25,8 +25,15 @@ typedef struct {
     u32 (*getBlActIdx)(FieldActor *actor, u32 param);
 } FieldActorSceneNodeVTable;
 
-// Overlay 36's tables of the move codes' functions, by move code, and of the scene nodes' functions, by sceneNodeType
+// Overlay 36's tables of the move codes' functions, by move code (fldmmdl_movedata.c's), and of the scene nodes'
+// functions, by sceneNodeType
 extern const FieldActorMoveCode *const ACTOR_MOVE_CODE_FUNCTION_TABLES[];
+// Overlay 36's fldmmdl_movedata.c: the tables of the action commands' functions, by command, for the actors on the
+// grid and on the rails (the rail one, which points to fld_act_rail.c's tables, is not written yet), and the rows of
+// commands that differ only by direction, by direction
+extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES[];
+extern const ActorAcmdFunc *const ACTOR_ACTION_COMMAND_TABLES_RAIL[];
+extern const u32 *const ACMD_DIR_LUT[];
 extern const FieldActorSceneNodeVTable *const FIELD_ACTOR_MAIN_VTABLES[];
 
 // A position on the grid

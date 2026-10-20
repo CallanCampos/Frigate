@@ -257,7 +257,7 @@ static int BPlistMain_StateInit(BPlistWork *work) {
 }
 
 static int BPlistMain_StateStartWipe(BPlistWork *work) {
-    if (func_02021c0c(work->printQueue) == TRUE) {
+    if (PrintQueue_IsEmpty(work->printQueue) == TRUE) {
         GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, work->param->heapId);
         return 2;
     }
@@ -850,23 +850,23 @@ static int BPlistMain_StateCloseMessage(BPlistWork *work) {
 }
 
 static int BPlistMain_StatePrintMessage(BPlistWork *work) {
-    switch (func_020223b4(work->printStream)) {
+    switch (PrintStream_GetState(work->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if (func_0203da48() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
-            func_020223e0(work->printStream, 0);
+        if (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B))) {
+            PrintStream_SkipWait(work->printStream, 0);
         }
         work->streamAdvanced = FALSE;
         break;
     case PRINT_STREAM_PAUSED:
         if (work->streamAdvanced == FALSE &&
-            (func_0203da48() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
+            (GFL_HIDIsTouchPressed() == TRUE || (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)))) {
             BPlistMain_PlayMessageSE(work, SEQ_SE_MESSAGE);
-            func_020223bc(work->printStream);
+            PrintStream_Continue(work->printStream);
             work->streamAdvanced = TRUE;
         }
         break;
     case PRINT_STREAM_DONE:
-        func_020223cc(work->printStream);
+        PrintStream_Delete(work->printStream);
         work->printStream = NULL;
         work->streamAdvanced = FALSE;
         return 0x18;
@@ -878,7 +878,7 @@ static int BPlistMain_StateWaitMessageKey(BPlistWork *work) {
     if (BPlistMain_CheckQuit(work) == TRUE) {
         return 0x1f;
     }
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
         if (work->msgWinOpen == TRUE) {
             BmpWin_ClearFrame(work->msgWins[1].window, 0);
             work->msgWinOpen = FALSE;
@@ -912,9 +912,9 @@ static int BPlistMain_StateWaitFadeOut(BPlistWork *work) {
 
 static BOOL BPlistMain_Exit(TCB *tcb, BPlistWork *work) {
     if (work->initialized == TRUE) {
-        if (func_02021c0c(work->printQueue) == FALSE) {
+        if (PrintQueue_IsEmpty(work->printQueue) == FALSE) {
             if (work->param->unk34 == 1) {
-                func_02021c44(work->printQueue);
+                PrintQueue_Clear(work->printQueue);
             } else {
                 return FALSE;
             }
@@ -927,7 +927,7 @@ static BOOL BPlistMain_Exit(TCB *tcb, BPlistWork *work) {
             }
         }
         if (work->printStream != NULL) {
-            func_020223cc(work->printStream);
+            PrintStream_Delete(work->printStream);
         }
         if (work->plateFrames != NULL) {
             BGWinFrame_Delete(work->plateFrames);
@@ -1056,7 +1056,7 @@ static void BPlistMain_LoadGraphics(BPlistWork *work) {
     NNSG2dScreenData *scrn;
     void *buf;
 
-    arc = GFL_ArcSysCreateFileHandle(99, HEAPID_TAIL(work->param->heapId));
+    arc = GFL_ArcSysCreateFileHandle(ARCID_B_PLIST, HEAPID_TAIL(work->param->heapId));
     GFL_BGSysLoadArcNCGRStatic(arc, 18, 7, 0, 0, TRUE, work->param->heapId);
     buf = GFL_G2DIOReadNSCRArc(arc, 16, TRUE, &scrn, work->param->heapId);
     BPlistAnm_CutButtonScrn(work, scrn->rawData);
@@ -1081,7 +1081,7 @@ static void BPlistMain_InitText(BPlistWork *work) {
     work->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EGG_DEMO, work->param->heapId);
     work->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, work->param->heapId);
     work->wordSet = GFL_WordSetSystemCreateDefault(work->param->heapId);
-    work->printQueue = func_020219a8(0x800, work->param->heapId);
+    work->printQueue = PrintQueue_Create(0x800, work->param->heapId);
     work->strBuf = GFL_StrBufCreate(0x200, work->param->heapId);
 }
 
@@ -1089,7 +1089,7 @@ static void BPlistMain_ExitText(BPlistWork *work) {
     GFL_MsgDataFree(work->msgData);
     GFL_FontFree(work->smallFont);
     GFL_WordSetSystemFree(work->wordSet);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     GFL_StrBufFree(work->strBuf);
 }
 
@@ -1312,7 +1312,7 @@ static void BPlistMain_DrawExpBar(BPlistWork *work, u8 page) {
 static BOOL BPlistMain_ChangePage(BPlistWork *work, u8 page) {
     switch (work->pageChangeSeq) {
     case 0:
-        if (func_02021c0c(work->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             BPlistBmp_FreePageWindows(work);
             BPlistBmp_CreatePageWindows(work, page);
             BPlistBmp_DrawPage(work, page);
@@ -1320,7 +1320,7 @@ static BOOL BPlistMain_ChangePage(BPlistWork *work, u8 page) {
         }
         break;
     case 1:
-        if (func_02021c0c(work->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(work->printQueue) == TRUE) {
             BPlistMain_LoadPageScrn(work, page);
             GFL_BGSysFillScrAsync(4, 0);
             GFL_BGSysFillScrAsync(5, 0);
@@ -1345,7 +1345,7 @@ static void BPlistMain_LoadPageScrn(BPlistWork *work, u8 page) {
     u32 i;
 
     for (i = 0; i < 2; i++) {
-        buf = GFL_G2DIOReadNSCR(99, data_ov287_021fb50c[page][i], TRUE, &scrn, work->param->heapId);
+        buf = GFL_G2DIOReadNSCR(ARCID_B_PLIST, data_ov287_021fb50c[page][i], TRUE, &scrn, work->param->heapId);
         GFL_BGSysLoadScrAreaAll(i + 6, scrn->rawData, 0, 0, 32, 24);
         GFL_BGSysQueueScrLoad(i + 6);
         GFL_HeapFree(buf);

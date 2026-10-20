@@ -1,0 +1,184 @@
+{
+    "$schema": "../species.schema.json",
+    "name": "Skarmory",
+    "pokedex": {
+        "category": "Armor Bird Pokémon",
+        "entry": "Its heavy-looking iron body is\nactually thin and light, so it can\nfly at speeds over 180 mph.",
+        "height": "5'07\"",
+        "weight": "111.3 lbs.",
+        "languages": {
+            "en": {
+                "name": "Skarmory",
+                "category": "Armor Bird Pokémon",
+                "entry": "Despite being clad entirely in\niron-hard armor, it flies at\nspeeds over 180 mph.",
+                "height": "5'07\"",
+                "weight": "111.3 lbs."
+            },
+            "fr": {
+                "name": "Airmure",
+                "category": "Pokémon Armoiseau",
+                "entry": "Son corps est prisonnier d'une armure\ndure comme l'acier, mais il vole à plus\nde 300 km/h.",
+                "height": "1,7 m",
+                "weight": "50,5 kg"
+            },
+            "de": {
+                "name": "Panzaeron",
+                "category": "Flugstahl",
+                "entry": "Es wird komplett von einer eisenharten\nRüstung geschützt. Wenn es fliegt,\nerreicht es bis zu 300 km/h.",
+                "height": "1,7 m",
+                "weight": "50,5 kg"
+            },
+            "it": {
+                "name": "Skarmory",
+                "category": "Pokémon Armuccello",
+                "entry": "È interamente rivestito da un'armatura\ndura come l'acciaio. Vola alla velocità\ndi 300 km/h.",
+                "height": "1,7 m",
+                "weight": "50,5 kg"
+            },
+            "ko": {
+                "name": "무장조",
+                "category": "갑옷새포켓몬",
+                "entry": "철 같은 단단한 갑옷으로\n덮여 있다. 시속 300km의\n스피드로 넓은 하늘을 날아다닌다.",
+                "height": "1.7 m",
+                "weight": "50.5 kg"
+            },
+            "es": {
+                "name": "Skarmory",
+                "category": "Pokémon Coraza Ave",
+                "entry": "Una armadura de hierro cubre por\ncompleto su cuerpo. Vuela a más\nde 300 km/h.",
+                "height": "1,7 m",
+                "weight": "50,5 kg"
+            },
+            "ja": {
+                "name": "エアームド",
+                "category": "よろいどりポケモン",
+                "entry": "てつのような\\x{3000}かたい\\x{3000}よろいに\nおおわれている。じそく\\x{ff13}\\x{ff10}\\x{ff10}キロの\nスピードで\\x{3000}おおぞらを\\x{3000}とびまわる。",
+                "height": "\\x{ff11}\\x{ff0e}\\x{ff17}\\x{ff4d}",
+                "weight": "\\x{ff15}\\x{ff10}\\x{ff0e}\\x{ff15}\\x{ff4b}\\x{ff47}"
+            }
+        }
+    },
+    "base_stats": {
+        "hp": 65,
+        "attack": 80,
+        "defense": 140,
+        "speed": 70,
+        "special_attack": 40,
+        "special_defense": 70
+    },
+    "types": [ "TYPE_STEEL", "TYPE_FLYING" ],
+    "catch_rate": 25,
+    "evolution_stage": 2,
+    "ev_yields": {
+        "hp": 0,
+        "attack": 0,
+        "defense": 2,
+        "speed": 0,
+        "special_attack": 0,
+        "special_defense": 0
+    },
+    "underground": false,
+    "held_items": {
+        "common": "ITEM_NONE",
+        "rare": "ITEM_NONE",
+        "very_rare": "ITEM_NONE"
+    },
+    "gender_ratio": 127,
+    "hatch_cycles": 25,
+    "base_friendship": 70,
+    "growth_rate": "GROWTH_SLOW",
+    "egg_groups": [ "EGG_GROUP_FLYING", "EGG_GROUP_FLYING" ],
+    "abilities": [ "ABILITY_KEEN_EYE", "ABILITY_STURDY" ],
+    "hidden_ability": "ABILITY_WEAK_ARMOR",
+    "flee_rate": 0,
+    "forms": {
+        "count": 1,
+        "sprite_offset": 0
+    },
+    "color": "COLOR_GRAY",
+    "asymmetric": false,
+    "palette_forms": false,
+    "base_exp": 163,
+    "height": 17,
+    "weight": 505,
+    "learnset": {
+        "by_level": [
+            [ 1, "MOVE_LEER" ],
+            [ 1, "MOVE_PECK" ],
+            [ 6, "MOVE_SAND_ATTACK" ],
+            [ 9, "MOVE_SWIFT" ],
+            [ 12, "MOVE_AGILITY" ],
+            [ 17, "MOVE_FURY_ATTACK" ],
+            [ 20, "MOVE_FEINT" ],
+            [ 23, "MOVE_AIR_CUTTER" ],
+            [ 28, "MOVE_SPIKES" ],
+            [ 31, "MOVE_METAL_SOUND" ],
+            [ 34, "MOVE_STEEL_WING" ],
+            [ 39, "MOVE_AUTOTOMIZE" ],
+            [ 42, "MOVE_AIR_SLASH" ],
+            [ 45, "MOVE_SLASH" ],
+            [ 50, "MOVE_NIGHT_SLASH" ]
+        ],
+        "by_tm": [
+            "TM05",
+            "TM06",
+            "TM10",
+            "TM11",
+            "TM12",
+            "TM17",
+            "TM21",
+            "TM27",
+            "TM32",
+            "TM37",
+            "TM39",
+            "TM40",
+            "TM41",
+            "TM42",
+            "TM44",
+            "TM45",
+            "TM46",
+            "TM48",
+            "TM58",
+            "TM66",
+            "TM70",
+            "TM75",
+            "TM80",
+            "TM81",
+            "TM87",
+            "TM88",
+            "TM90",
+            "TM91",
+            "TM94",
+            "HM01",
+            "HM02"
+        ],
+        "by_tutor": [
+            "MOVE_IRON_HEAD",
+            "MOVE_IRON_DEFENSE",
+            "MOVE_ICY_WIND",
+            "MOVE_DARK_PULSE",
+            "MOVE_SNORE",
+            "MOVE_TAILWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_ROOST",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_SLEEP_TALK"
+        ],
+        "egg_moves": [
+            "MOVE_DRILL_PECK",
+            "MOVE_PURSUIT",
+            "MOVE_WHIRLWIND",
+            "MOVE_SKY_ATTACK",
+            "MOVE_CURSE",
+            "MOVE_BRAVE_BIRD",
+            "MOVE_ASSURANCE",
+            "MOVE_GUARD_SWAP",
+            "MOVE_STEALTH_ROCK",
+            "MOVE_ENDURE"
+        ]
+    },
+    "evolutions": [],
+    "regional_dex_number": 203,
+    "baby_species": "SPECIES_SKARMORY",
+    "cry_volume": 110
+}

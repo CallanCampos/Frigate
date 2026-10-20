@@ -1,0 +1,77 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "A trainer: res/trainers/data/<trainer>.json",
+    "description": "A trainer's record (archive a/0/9/1, 20 bytes) and its party (a/0/9/2). tools/data/trainer_data.py packs them in the order of generated/trainers.txt. A string value is the name of a constant from generated/ or include/constants/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [ "name", "class", "battle_style", "items", "ai_flags", "heals", "money", "reward", "party", "messages" ],
+    "properties": {
+        "$schema": { "type": "string", "description": "This schema, for editors" },
+        "name": { "type": "string", "description": "The trainer's name, which the text files take with \\from{trainers.name}" },
+        "compress_name": {
+            "type": "boolean",
+            "description": "Left out, the name is stored compressed, as the game stores almost every trainer's; false for the few it doesn't"
+        },
+        "class": { "type": "string", "x-constant": "TRAINER_CLASS_", "description": "A TRAINER_CLASS_* constant" },
+        "battle_style": {
+            "type": "string", "x-constant": "BTL_STYLE_",
+            "description": "Single, double, triple or rotation battle, a BTL_STYLE_* constant"
+        },
+        "items": {
+            "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/item" },
+            "description": "Up to four items the trainer can use in battle"
+        },
+        "ai_flags": {
+            "type": "array",
+            "items": { "type": [ "string", "integer" ], "x-constant": "AI_FLAG_", "minimum": 0 },
+            "description": "The trainer AI scripts to run, AI_FLAG_* constants (see docs/scripts.md)"
+        },
+        "heals": { "type": "boolean", "description": "Whether the trainer heals" },
+        "money": { "$ref": "#/$defs/u8", "description": "A multiplier of the prize money" },
+        "reward": { "$ref": "#/$defs/item", "description": "An item given after the battle" },
+        "messages": {
+            "type": "array",
+            "description": "What the trainer says, in order: lines of system message file 381, which the text files take with \\from{trainers.messages}, and the trainer message table pairs with the trainer and their type. res/trainers/data/message_order.json gives the order of the trainers in the table",
+            "items": {
+                "type": "object", "additionalProperties": false, "required": [ "type", "text" ],
+                "properties": {
+                    "type": {
+                        "type": [ "string", "integer" ], "x-constant": "TRMSG_", "minimum": 0, "maximum": 65535,
+                        "description": "When the trainer says it: TRMSG_START before the battle, TRMSG_LOSE when it loses, TRMSG_WIN when it wins, and other moments by number"
+                    },
+                    "text": { "type": "string", "description": "The message, with its line breaks" }
+                }
+            }
+        },
+        "party": {
+            "type": "array", "maxItems": 6,
+            "description": "The party. Every Pokémon has an item if any has, which makes it a party with items, and moves if any has, which makes it a party with moves; without moves, a Pokémon gets the moves of its level",
+            "items": {
+                "type": "object", "additionalProperties": false,
+                "required": [ "species", "form", "level", "difficulty", "gender", "ability" ],
+                "properties": {
+                    "species": { "type": "string", "x-constant": "SPECIES_" },
+                    "form": { "type": "integer", "minimum": 0, "maximum": 65535 },
+                    "level": { "$ref": "#/$defs/u8" },
+                    "difficulty": { "$ref": "#/$defs/u8", "description": "Sets the Pokémon's individual values" },
+                    "gender": {
+                        "type": "integer", "minimum": 0, "maximum": 15,
+                        "description": "Picks the gender when not 0"
+                    },
+                    "ability": {
+                        "type": "integer", "minimum": 0, "maximum": 15,
+                        "description": "Picks the ability when not 0"
+                    },
+                    "item": { "$ref": "#/$defs/item" },
+                    "moves": {
+                        "type": "array", "maxItems": 4, "items": { "type": "string", "x-constant": "MOVE_" }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "u8": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "item": { "type": "string", "x-constant": "ITEM_" }
+    }
+}

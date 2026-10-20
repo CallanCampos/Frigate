@@ -1,2 +1,0 @@
-NimbasaCity14_Text_BattleTestWomanMystery = The Battle Test...{be01}\nThis woman of mystery will show you\nthe ropes.{be01}\nBattle effectively, and keep your\nPokémon from fainting!
-\pad{0c}

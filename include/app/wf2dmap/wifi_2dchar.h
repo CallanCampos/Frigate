@@ -7,11 +7,6 @@
 #include "types.h"
 #include "gfl/clact.h"
 
-// Not from swan: the archives of the two player characters with the shadow, and of the Union Room characters. They
-// belong in constants/arc.h
-#define ARCID_WIFI_2DCHAR 30
-#define ARCID_WIFI_UNIONCHAR 31
-
 // The characters. The Union Room ones are 0 to 15; that the other two are the male and female player is a guess
 #define WF_2DC_UNIONCHARA_NUM 16
 #define WF_2DC_CHARA_HERO 16

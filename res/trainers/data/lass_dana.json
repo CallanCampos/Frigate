@@ -1,0 +1,55 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Dana",
+    "class": "TRAINER_CLASS_LASS",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [],
+    "heals": false,
+    "money": 4,
+    "reward": "ITEM_ULTRA_BALL",
+    "party": [
+        {
+            "species": "SPECIES_MISDREAVUS",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_PACHIRISU",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_DELCATTY",
+            "form": 0,
+            "level": 60,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I will be strong in Pokémon battles,\nand I will marry a professional athlete!{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "Ah.\nI still have a long way to go!"
+        },
+        {
+            "type": 15,
+            "text": "Your Pokémon are strong. I will give\nsomething good to a strong person!{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Strong people are always totally\nattractive. Don't you think?"
+        }
+    ]
+}

@@ -1,0 +1,175 @@
+{
+    "$schema": "encounters.schema.json",
+    "spring": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_FRILLISH", 25, 40 ],
+            [ "SPECIES_MANTYKE", 25, 40 ],
+            [ "SPECIES_REMORAID", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_JELLICENT", 25, 40 ],
+            [ "SPECIES_WAILMER", 25, 40 ],
+            [ "SPECIES_MANTINE", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ]
+        ],
+        "fishing": [
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_LANTURN", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ]
+        ]
+    },
+    "summer": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_FRILLISH", 25, 40 ],
+            [ "SPECIES_MANTYKE", 25, 40 ],
+            [ "SPECIES_REMORAID", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_JELLICENT", 25, 40 ],
+            [ "SPECIES_WAILMER", 25, 40 ],
+            [ "SPECIES_MANTINE", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ]
+        ],
+        "fishing": [
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_LANTURN", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ]
+        ]
+    },
+    "autumn": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_FRILLISH", 25, 40 ],
+            [ "SPECIES_MANTYKE", 25, 40 ],
+            [ "SPECIES_REMORAID", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_JELLICENT", 25, 40 ],
+            [ "SPECIES_WAILMER", 25, 40 ],
+            [ "SPECIES_MANTINE", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ]
+        ],
+        "fishing": [
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_LANTURN", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ]
+        ]
+    },
+    "winter": {
+        "rates": {
+            "grass": 0,
+            "dark_grass": 0,
+            "shaking_grass": 0,
+            "surf": 10,
+            "rippling_surf": 1,
+            "fishing": 50,
+            "rippling_fishing": 1,
+            "flags": 0
+        },
+        "grass": [],
+        "dark_grass": [],
+        "shaking_grass": [],
+        "surf": [
+            [ "SPECIES_FRILLISH", 25, 40 ],
+            [ "SPECIES_SPHEAL", 25, 40 ],
+            [ "SPECIES_REMORAID", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ],
+            [ "SPECIES_FRILLISH", 30, 40 ]
+        ],
+        "rippling_surf": [
+            [ "SPECIES_WAILMER", 25, 40 ],
+            [ "SPECIES_SEALEO", 25, 40 ],
+            [ "SPECIES_WALREIN", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ],
+            [ "SPECIES_WAILORD", 30, 40 ]
+        ],
+        "fishing": [
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ],
+            [ "SPECIES_CHINCHOU", 50, 70 ]
+        ],
+        "rippling_fishing": [
+            [ "SPECIES_REMORAID", 40, 60 ],
+            [ "SPECIES_CHINCHOU", 40, 60 ],
+            [ "SPECIES_LANTURN", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ],
+            [ "SPECIES_OCTILLERY", 50, 70 ]
+        ]
+    }
+}

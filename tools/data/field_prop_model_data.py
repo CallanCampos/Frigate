@@ -8,7 +8,7 @@ Usage: field_prop_model_data.py extract APICULA OUTPUT_DIR [BUNDLE [MODEL]]
 The bundle's resource information and animations stay in their original Nitro
 encoding. Each model's editable geometry and materials live in one GLB, next to
 its data.json (field_prop_model.schema.json). Bundles are directories named
-after their constants in data/constants/field_props_{exterior,interior}.txt.
+after their constants in generated/field_props_{exterior,interior}.txt.
 relink points every GLB's images at its bundle's texture directory again, after
 a bundle is renamed.
 """
@@ -125,7 +125,7 @@ def export_one(apicula, model_dir, texture_dir, entry, texture_blob):
             direct = patch_model(wrapped(nitro), positions, name) == wrapped(nitro)
         except ValueError:
             direct = False
-    data = {"$schema": "../../../field_prop_model.schema.json", "res_id": res_id}
+    data = {"$schema": "../../../../field_prop_model.schema.json", "res_id": res_id}
     if not direct:
         data["transformed"] = True
         if needs_baseline(model_dir, name, nitro):
@@ -134,9 +134,14 @@ def export_one(apicula, model_dir, texture_dir, entry, texture_blob):
     write(model_dir / "data.json", data)
 
 
+def prop_kind(directory):
+    """Returns whether a directory of prop models, <kind>/models/, is the exterior's or the interior's."""
+    return directory.parent.name if directory.name == "models" else directory.name
+
+
 def image_uri(texture_dir, filename):
-    """Returns a GLB's path to one of its bundle's textures, from data/field_prop_models/<kind>/<bundle>/<model>/."""
-    return f"../../../../field_prop_textures/{texture_dir.parent.name}/{texture_dir.name}/{filename}"
+    """Returns a GLB's path to one of its bundle's textures, from res/field/props/<kind>/models/<bundle>/<model>/."""
+    return f"../../../textures/{texture_dir.name}/{filename}"
 
 
 def model_dirs(folder, entries):
@@ -145,9 +150,9 @@ def model_dirs(folder, entries):
 
 
 def export(apicula, directory, selected_bundle=None, selected_model=None):
-    kind = directory.name
+    kind = prop_kind(directory)
     if kind not in ARCHIVES:
-        raise ValueError("output directory must end in exterior or interior")
+        raise ValueError("output directory must be exterior/models or interior/models")
     archive_name, texture_name = ARCHIVES[kind]
     archive = read_narc((ROOT / "extract/b2_us/files" / archive_name).read_bytes())
     textures = read_narc((ROOT / "extract/b2_us/files" / texture_name).read_bytes())
@@ -170,9 +175,9 @@ def export(apicula, directory, selected_bundle=None, selected_model=None):
 
 
 def relink(directory):
-    kind = directory.name
+    kind = prop_kind(directory)
     if kind not in ARCHIVES:
-        raise ValueError("source directory must end in exterior or interior")
+        raise ValueError("source directory must be exterior/models or interior/models")
     archive_name, texture_name = ARCHIVES[kind]
     archive = read_narc((ROOT / "extract/b2_us/files" / archive_name).read_bytes())
     for bundle, folder, texture_dir in zip(archive, directories(archive_name, directory),
@@ -221,9 +226,9 @@ def edit_model(model_dir, name, original, texture_blob, data, texture_directory=
 
 
 def pack(directory, game, output):
-    kind = directory.name
+    kind = prop_kind(directory)
     if kind not in ARCHIVES:
-        raise ValueError("source directory must end in exterior or interior")
+        raise ValueError("source directory must be exterior/models or interior/models")
     archive_name, texture_name = ARCHIVES[kind]
     if not Path(output).as_posix().endswith("/" + archive_name):
         raise ValueError(f"output {output} does not name {archive_name}")
@@ -234,7 +239,7 @@ def pack(directory, game, output):
     texture_dirs = directories(texture_name)
     if len(folders) != len(archive):
         raise ValueError(f"{archive_name} has {len(archive)} bundles and its list {len(folders)}")
-    schema = load_schema(directory.parent / "field_prop_model.schema.json")
+    schema = load_schema(directory.parents[1] / "field_prop_model.schema.json")
     result = []
     for bundle_id, (bundle, folder) in enumerate(zip(archive, folders)):
         entries = bundle_models(bundle)

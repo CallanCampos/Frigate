@@ -56,7 +56,7 @@ u32 func_ov036_021c89cc(ResortMapCreateWork *work, void *map, void *a2, void *a3
         rows = 7;
         rowChunk = row / 32;
         if (chunk == rowChunk || chunk == (row + 7) / 32) {
-            person = func_02038860(work->occupants, i);
+            person = JoinAvenueOccupants_GetPerson(work->occupants, i);
             if (!JoinAvenuePerson_IsEmpty(person)) {
                 shop = ResortShopData_GetPersonShop(shops, person);
                 x = column % 32;
@@ -99,12 +99,12 @@ void func_ov036_021c8b40(ResortMapCreateWork *work, EventData *eventData) {
     u16 position[2];
 
     for (i = 0; i < 8; i++) {
-        person = func_02038860(work->occupants, i);
+        person = JoinAvenueOccupants_GetPerson(work->occupants, i);
         entity = ResortBinary_Get(table, i, 3);
         if (JoinAvenuePerson_IsEmpty(person)) {
             SetBGEntityLocation(eventData, entity, 0, 0, 0);
         } else {
-            shopId = func_020363e0(func_02038470(person), 0);
+            shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
             shop = ResortShopData_GetShop(shops, shopId);
             func_02039560(ResortShopData_GetShopParam(shop, (i % 2 == 0 ? 1 : 0) + 6), &position[1], &position[0]);
             position[1] += ResortBinary_Get(table, i, 1);

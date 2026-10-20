@@ -8,6 +8,6 @@
 // Starts the zoom, which runs each VBlank
 void setBuildingEnterVBlankCallback(void);
 // Ends it and resets BG 2's matrix
-void func_ov012_02160e88(void);
+void resetBuildingEnterVBlankCallback(void);
 
 #endif // POKEBW2_FIELD_BUILDING_ENTER_EFFECT_H

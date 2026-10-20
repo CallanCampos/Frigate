@@ -94,9 +94,9 @@ BOOL FestSparkle_IsOnTile(FestSparkleGimmick *gimmick, u16 x, u16 z, fx32 height
         place = &work->places[work->placeIndex[i]];
         if (zone->found[i] == FALSE) {
             if (place->isRail == FALSE) {
-                func_ov012_0215d4d0(place, &pos);
+                GetBGEntityCenterPosGrid(place, &pos);
             } else {
-                func_ov012_0215d4ec(place, &railPos);
+                GetBGEntityPosRail(place, &railPos);
                 func_ov036_021b06ec(gimmick->rail, &railPos, &pos);
             }
             if (POS_TO_GRID(pos.x) == x && POS_TO_GRID(pos.z) == z && pos.y - SPARKLE_HEIGHT_RANGE <= height &&
@@ -138,13 +138,13 @@ static BOOL FestSparkle_ShowAll(FestSparkleGimmick *gimmick, FestSparkleWork *wo
             continue;
         }
         if (place->isRail == FALSE) {
-            func_ov012_0215d4d0(place, &pos);
+            GetBGEntityCenterPosGrid(place, &pos);
             if (FestSparkle_IsBlockedGrid(gimmick, work, &pos)) {
                 zone->found[i] = TRUE;
                 continue;
             }
         } else {
-            func_ov012_0215d4ec(place, &railPos);
+            GetBGEntityPosRail(place, &railPos);
             if (FestSparkle_IsBlockedRail(gimmick, work, &railPos)) {
                 zone->found[i] = TRUE;
                 continue;

@@ -12,14 +12,15 @@ static const u32 sEncryptedKeyMulti[6] = { 0x08a27510, 0xe47ab3c3, 0x5a289302, 0
 
 const u32 DSProt_DecryptCodeEntryMulti = (u32)(DSProt_DecryptCodeWithKeyMulti + 0x2200);
 
-// What the runner returns when a check failed or its code was changed: the result of the second function if it has
-// run already, else the result of running it
+// What the runner returns when a check failed or its code was changed: the result of the second function if a check
+// has run it already, else the result of running it now
 static inline void *DSProt_CheckFailed(DSProtCheckArgs *args, void *arg0, void *arg1) {
     if (args->result != NULL) {
         return args->result;
     }
     return args->tamper(arg0, arg1);
 }
+
 // Runs the two checks of the stubs `DSProt_CallCheckFlashcartA` and `DSProt_CallCheckFlashcartAStub`, each of which
 // gets the arguments and returns a code that is added up
 void *DSProt_RunChecks1(void *arg0, void *arg1) {
@@ -27,17 +28,20 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
-    args.failed = 0;
+    // The order of these stores sets the registers of the locals across the loop
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckFlashcartA + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckFlashcartAStub + 0x2200);
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -48,7 +52,7 @@ void *DSProt_RunChecks1(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -77,17 +81,20 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
-    args.failed = 0;
+    // The order of these stores sets the registers of the locals across the loop
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckFlashcartB + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckFlashcartBStub + 0x2200);
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -98,7 +105,7 @@ void *DSProt_RunChecks2(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -127,17 +134,20 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
-    args.failed = 0;
+    // The order of these stores sets the registers of the locals across the loop
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckEmulatorA + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckEmulatorAStub + 0x2200);
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -148,7 +158,7 @@ void *DSProt_RunChecks3(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -177,17 +187,20 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
     u32 checks[32];
     u32 *check;
     u32 total;
+    // DS Protect keeps the pair's address biased by 0x2200 in the literal and removes the bias at run time
+    DSProtCallback *callbacks = (DSProtCallback *)((u32)(data_ov337_02182444 + 0x880) - 0x2200);
     u32 index = data_ov337_02182440;
 
-    args.nop = data_ov337_02182444[index];
-    args.tamper = data_ov337_02182444[index ^ 1];
-    args.arg0 = arg0;
-    args.arg1 = arg1;
-    args.result = NULL;
-    args.failed = 0;
+    // The order of these stores sets the registers of the locals across the loop
+    args.nop = callbacks[index];
+    args.tamper = callbacks[index ^ 1];
     checks[0] = (u32)(DSProt_CallCheckEmulatorB + 0x2200);
+    args.arg0 = arg0;
     checks[1] = (u32)(DSProt_CallCheckEmulatorBStub + 0x2200);
+    args.arg1 = arg1;
     checks[2] = 0;
+    args.failed = 0;
+    args.result = NULL;
     check = checks;
     total = 0x30eb87;
     do {
@@ -198,7 +211,7 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
         u32 value;
 
         for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
+            checksum ^= (*code >> i) | (*code << (32 - i));
             code++;
         }
         if (checksum != DSPROT_CHECKSUM) {
@@ -220,8 +233,10 @@ void *DSProt_RunChecks4(void *arg0, void *arg1) {
     return args.tamper(arg0, arg1);
 }
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_RunChecks1, run it and encrypt it again
 // clang-format off
-asm void * DSProt_CallRunChecks1(void *arg0, void *arg1) {
+asm void *DSProt_CallRunChecks1(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
     moveq ip, #0
@@ -269,8 +284,10 @@ asm void * DSProt_CallRunChecks1(void *arg0, void *arg1) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_RunChecks3, run it and encrypt it again
 // clang-format off
-asm void * DSProt_CallRunChecks3(void *arg0, void *arg1) {
+asm void *DSProt_CallRunChecks3(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
     moveq ip, #0
@@ -318,8 +335,10 @@ asm void * DSProt_CallRunChecks3(void *arg0, void *arg1) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_RunChecks2, run it and encrypt it again
 // clang-format off
-asm void * DSProt_CallRunChecks2(void *arg0, void *arg1) {
+asm void *DSProt_CallRunChecks2(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
     moveq ip, #0
@@ -367,8 +386,10 @@ asm void * DSProt_CallRunChecks2(void *arg0, void *arg1) {
 }
 // clang-format on
 
+// Hand-written, as every DSProt_Call* is: checksums DSProt_DispatchMulti from the address and word count packed in its
+// last word, then has DSProt_DispatchMulti decrypt DSProt_RunChecks4, run it and encrypt it again
 // clang-format off
-asm void * DSProt_CallRunChecks4(void *arg0, void *arg1) {
+asm void *DSProt_CallRunChecks4(void *arg0, void *arg1) {
     orr ip, pc, pc
     ands ip, ip, ip
     moveq ip, #0
@@ -417,8 +438,8 @@ asm void * DSProt_CallRunChecks4(void *arg0, void *arg1) {
 // clang-format on
 
 // Hand-written, called by the game before the first of these: has the other objects' Decrypt* functions decrypt their
-// functions, then DSProt_DecryptMulti decrypt this file's, and writes `bx lr` over its own start so that a second call
-// does nothing
+// functions, then DSProt_DecryptMulti decrypt this file's, and writes `bx lr` and r2 to r10 over its first ten words so
+// that a second call does nothing
 // clang-format off
 asm void DSProt_Init(void) {
     stmdb sp!, {lr}

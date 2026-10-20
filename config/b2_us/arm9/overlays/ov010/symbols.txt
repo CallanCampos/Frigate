@@ -1,7 +1,7 @@
-func_ov010_0214ff00 kind:function(thumb,size=0x28) addr:0x0214ff00
-func_ov010_0214ff28 kind:function(thumb,size=0x2e) addr:0x0214ff28
-func_ov010_0214ff58 kind:function(thumb,size=0x3a8) addr:0x0214ff58
+BattleProc_Init kind:function(thumb,size=0x28) addr:0x0214ff00
+BattleProc_Exit kind:function(thumb,size=0x2e) addr:0x0214ff28
+BattleProc_Main kind:function(thumb,size=0x3a8) addr:0x0214ff58
 eventMakeFunc kind:function(thumb,size=0x10) addr:0x02150300
-func_ov010_02150310 kind:function(thumb,size=0x2c) addr:0x02150310
-func_ov010_0215033c kind:function(thumb,size=0x60) addr:0x0215033c
+EventMake_Create kind:function(thumb,size=0x2c) addr:0x02150310
+EventMake_Callback kind:function(thumb,size=0x60) addr:0x0215033c
 data_ov010_0215039c kind:data(any) addr:0x0215039c

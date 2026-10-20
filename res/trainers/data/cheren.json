@@ -1,0 +1,41 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Cheren",
+    "class": "TRAINER_CLASS_PKMN_TRAINER_CHEREN",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC", "AI_FLAG_EVAL_ATTACK", "AI_FLAG_EXPERT", "AI_FLAG_TAG_STRATEGY" ],
+    "heals": false,
+    "money": 30,
+    "reward": "ITEM_NONE",
+    "party": [
+        {
+            "species": "SPECIES_STOUTLAND",
+            "form": 0,
+            "level": 33,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 1,
+            "moves": [ "MOVE_STRENGTH", "MOVE_CRUNCH", "MOVE_THUNDER_FANG", "MOVE_ODOR_SLEUTH" ]
+        },
+        {
+            "species": "SPECIES_WATCHOG",
+            "form": 0,
+            "level": 31,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_HYPER_FANG", "MOVE_LOW_KICK", "MOVE_CRUNCH", "MOVE_HYPNOSIS" ]
+        },
+        {
+            "species": "SPECIES_CINCCINO",
+            "form": 0,
+            "level": 31,
+            "difficulty": 250,
+            "gender": 0,
+            "ability": 2,
+            "moves": [ "MOVE_TAIL_SLAP", "MOVE_ROCK_BLAST", "MOVE_BULLET_SEED", "MOVE_WAKE_UP_SLAP" ]
+        }
+    ],
+    "messages": []
+}

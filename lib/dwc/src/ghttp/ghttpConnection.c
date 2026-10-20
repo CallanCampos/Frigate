@@ -29,16 +29,16 @@ int ghiFindFreeSlot(void) {
 
     count = sConnections.count;
     newCount = count + GHI_CONNECTION_GROWTH;
-    connections = func_ov011_0216ddec(sConnections.connections, newCount * sizeof(GHIConnection *));
+    connections = gsirealloc(sConnections.connections, newCount * sizeof(GHIConnection *));
     if (connections == NULL) {
         return -1;
     }
     sConnections.connections = connections;
     for (i = count; i < newCount; i++) {
-        sConnections.connections[i] = func_ov011_0216dddc(sizeof(GHIConnection));
+        sConnections.connections[i] = gsimalloc(sizeof(GHIConnection));
         if (sConnections.connections[i] == NULL) {
             for (i--; i >= count; i--) {
-                func_ov011_0216ddfc(sConnections.connections[i]);
+                gsifree(sConnections.connections[i]);
             }
             return -1;
         }
@@ -135,13 +135,13 @@ BOOL ghiCloseSocket(GHIConnection *connection) {
 
     ghiLock();
     if (connection->hostLookup != NULL) {
-        func_ov011_0216cca8(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
-        func_ov011_0216e2b4(connection->hostLookup);
+        gsDebugFormat(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
+        gsiCancelResolvingHostname(connection->hostLookup);
         connection->hostLookup = NULL;
     }
     if (connection->socket != -1) {
-        func_ov011_0216de7c(connection->socket, 2);
-        if (!func_ov011_0216de40(connection->socket, &connection->encryptor.secure)) {
+        shutdown(connection->socket, 2);
+        if (!gsiCloseSocketSecure(connection->socket, &connection->encryptor.secure)) {
             ghiUnlock();
             return FALSE;
         }
@@ -167,21 +167,21 @@ BOOL ghiFreeConnectionData(GHIConnection *connection) {
     }
 
     ghiLock();
-    func_ov011_0216ddfc(connection->url);
+    gsifree(connection->url);
     connection->url = NULL;
-    func_ov011_0216ddfc(connection->unk_34);
+    gsifree(connection->unk_34);
     connection->unk_34 = NULL;
-    func_ov011_0216ddfc(connection->serverAddress);
+    gsifree(connection->serverAddress);
     connection->serverAddress = NULL;
-    func_ov011_0216ddfc(connection->requestPath);
+    gsifree(connection->requestPath);
     connection->requestPath = NULL;
-    func_ov011_0216ddfc(connection->headers);
+    gsifree(connection->headers);
     connection->headers = NULL;
-    func_ov011_0216ddfc(connection->redirectUrl);
+    gsifree(connection->redirectUrl);
     // The redirect URL is not cleared, the headers are cleared a second time instead. The slot's memory is cleared when
     // it is used again
     connection->headers = NULL;
-    func_ov011_0216ddfc(connection->proxyAddress);
+    gsifree(connection->proxyAddress);
     connection->proxyAddress = NULL;
     ghiFreeBuffer(&connection->sendBuffer);
     ghiFreeBuffer(&connection->encodeBuffer);
@@ -257,22 +257,22 @@ void ghiEnumConnections(GHIEnumFunc func) {
 
 // Starts a connection over at the address that it was redirected to
 void ghiRedirectConnection(GHIConnection *connection) {
-    func_ov011_0216cca8(8, 3, 0x10, "Redirecting Connection\n");
+    gsDebugFormat(8, 3, 0x10, "Redirecting Connection\n");
     if (connection->hostLookup != NULL) {
-        func_ov011_0216cca8(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
-        func_ov011_0216e2b4(connection->hostLookup);
+        gsDebugFormat(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
+        gsiCancelResolvingHostname(connection->hostLookup);
         connection->hostLookup = NULL;
     }
-    func_ov011_0216de7c(connection->socket, 2);
-    if (func_ov011_0216de40(connection->socket, &connection->encryptor.secure)) {
-        func_ov011_0216ddfc(connection->url);
+    shutdown(connection->socket, 2);
+    if (gsiCloseSocketSecure(connection->socket, &connection->encryptor.secure)) {
+        gsifree(connection->url);
         connection->url = connection->redirectUrl;
         connection->redirectUrl = NULL;
-        func_ov011_0216ddfc(connection->serverAddress);
+        gsifree(connection->serverAddress);
         connection->serverAddress = NULL;
         connection->serverIp = 0;
         connection->serverPort = 0;
-        func_ov011_0216ddfc(connection->requestPath);
+        gsifree(connection->requestPath);
         connection->socket = -1;
         connection->requestPath = NULL;
         connection->state = 0;
@@ -307,9 +307,9 @@ void ghiCleanupConnections(void) {
     if (sConnections.connections != NULL) {
         ghiEnumConnections(ghiFreeConnection);
         for (i = 0; i < sConnections.count; i++) {
-            func_ov011_0216ddfc(sConnections.connections[i]);
+            gsifree(sConnections.connections[i]);
         }
-        func_ov011_0216ddfc(sConnections.connections);
+        gsifree(sConnections.connections);
         sConnections.connections = NULL;
         sConnections.count = 0;
         sConnections.activeCount = 0;
@@ -334,7 +334,7 @@ char *ghiCopyHost(char *url) {
     length = strcspn(host, ":/");
     saved = host[length];
     host[length] = '\0';
-    copy = func_ov011_0216e2c8(host);
+    copy = goastrdup(host);
     host[length] = saved;
     return copy;
 }

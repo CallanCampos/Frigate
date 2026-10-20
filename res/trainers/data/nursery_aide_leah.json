@@ -1,0 +1,47 @@
+{
+    "$schema": "trainer.schema.json",
+    "name": "Leah",
+    "class": "TRAINER_CLASS_NURSERY_AIDE",
+    "battle_style": "BTL_STYLE_SINGLE",
+    "items": [],
+    "ai_flags": [ "AI_FLAG_BASIC" ],
+    "heals": false,
+    "money": 10,
+    "reward": "ITEM_RARE_CANDY",
+    "party": [
+        {
+            "species": "SPECIES_CLEFAIRY",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        },
+        {
+            "species": "SPECIES_CLEFABLE",
+            "form": 0,
+            "level": 61,
+            "difficulty": 0,
+            "gender": 0,
+            "ability": 0
+        }
+    ],
+    "messages": [
+        {
+            "type": "TRMSG_START",
+            "text": "I wonder if there are great children\nwho will become stars someday{be00}\nwho are now just kids at my preschool.{be01}"
+        },
+        {
+            "type": "TRMSG_LOSE",
+            "text": "You are also quite brilliant, but\nreal stars are cool."
+        },
+        {
+            "type": 15,
+            "text": "You seem to have potential as a star.\nSo, will you please be my friend?{be01}"
+        },
+        {
+            "type": 16,
+            "text": "Should I get autographs now\nfrom children who are likely to be stars?"
+        }
+    ]
+}
