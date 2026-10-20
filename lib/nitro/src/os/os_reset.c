@@ -8,6 +8,7 @@
 #include "nitro/pxi.h"
 #include "twl/mi.h"
 #include "twl/os.h"
+#include "twl/pm.h"
 
 // The high word of the DSi's title ID in the system area. Bit 2 of it is set for a program installed on the NAND
 #define HW_TWL_TITLE_ID_HI 0x02ffe234
@@ -34,7 +35,7 @@ void OS_ResetSystem(u32 parameter) {
         OS_Terminate();
     }
     if (OS_IsRunOnTwl()) {
-        func_02769578();
+        PMi_ExecutePostExitCallbackList();
     }
     CARD_LockRom(OS_GetLockID());
     OS_SetIrqMask(OS_IE_FIFO_RECV);

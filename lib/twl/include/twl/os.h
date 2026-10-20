@@ -32,8 +32,6 @@ typedef struct TWLSettings {
 // the shared memory
 BOOL OSi_IsAvailableWirelessTwl(void);
 BOOL OSi_IsForceDisableWirelessTwl(void);
-// The DSi's cleanup before OS_ResetSystem resets, which the card's pull-out does too
-void func_02769578(void);
 // TwlSDK's body of OSi_EnterNDmaCallback
 void OSi_EnterNDmaCallbackCore(u32 ndmaNo, OSIrqCallback callback, void *arg);
 // The DSi-only part of OS_InitArenaEx

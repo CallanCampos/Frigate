@@ -45,9 +45,6 @@
 #define PM_EXIT_TYPE_2 2
 #define PM_EXIT_TYPE_FORCED 3
 
-// A word of the shared memory that the exit notifications set and PM_Init clears
-#define HW_PM_EXIT_FLAG 0x02fff684
-
 // The requests, in the low byte of the first word of a PM_PXI_COMMAND_REQUEST: three that follow the screens' power,
 // six for the backlights, the power-off, and the settings and reads of the registers
 #define PM_REQ_LCD_POWER_1 1
@@ -95,9 +92,7 @@
 // A synchronous call starts with this in its result, which no answer has
 #define PM_SYNC_PENDING 0xffff0000
 
-// The cycles of the system clock that the retries wait for (about 10 ms), the wait before the screens are touched on
-// the way out (about 100 ms), and the one of their power
-#define PM_RETRY_CYCLES 0x51d23
+// The wait before the screens are touched on the way out (about 100 ms), and the one of their power
 #define PM_SCREENS_SETTLE_CYCLES 0x360000
 #define PM_SCREENS_RETRY_CYCLES 5
 
@@ -124,7 +119,7 @@ static BOOL PMi_WokeUp;
 static u32 PMi_ScreensOffCount;
 static u32 PMi_DisplayOffCount;
 // Why the system is exiting, for TwlSDK's exit sequence
-static u32 PMi_ExitType;
+u32 PMi_ExitType;
 // The DMA control registers before the sleep
 static u32 PMi_PreDmaCnt[4];
 // What the amplifier was set to, for when the screens come back on
@@ -244,7 +239,7 @@ static void PMi_CommonCallback(u32 tag, u32 data, BOOL err) {
     case PM_PXI_COMMAND_NOTIFY:
         switch (value) {
         case PM_PXI_NOTIFY_EXIT_1:
-            func_02769498(PM_EXIT_TYPE_1);
+            PMi_ProcessExitRequest(PM_EXIT_TYPE_1);
             *(vu32 *)HW_PM_EXIT_FLAG = 1;
             break;
         case 1:
@@ -257,7 +252,7 @@ static void PMi_CommonCallback(u32 tag, u32 data, BOOL err) {
             }
             break;
         case PM_PXI_NOTIFY_EXIT_2:
-            func_02769498(PM_EXIT_TYPE_2);
+            PMi_ProcessExitRequest(PM_EXIT_TYPE_2);
             *(vu32 *)HW_PM_EXIT_FLAG = 1;
             break;
         }
@@ -500,7 +495,7 @@ u32 PM_GetBattery(u32 *battery) {
 // PM_GetBatteryLevel
 u32 PM_GetBatteryLevel(u16 *level) {
     if (OS_IsRunOnTwl()) {
-        return func_027693dc(level);
+        return PMi_GetBatteryLevelCore(level);
     }
     return PM_RESULT_ERROR;
 }
@@ -564,7 +559,7 @@ static void PMi_StopDma(void) {
             break;
         }
         if (OS_IsRunOnTwl()) {
-            func_02769410(i);
+            PMi_StopNDma(i);
         }
     }
 }

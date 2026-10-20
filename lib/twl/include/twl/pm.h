@@ -24,24 +24,21 @@ void PM_ReadyToExit(void);
 // before the application exits, and PM_DeletePreExitCallback takes it out
 void PM_InsertPreExitCallback(PMExitCallbackInfo *info, int priority);
 void PM_DeletePreExitCallback(PMExitCallbackInfo *info);
-// Reads a word (at 0x14) of main's bss (PMi_IsInit)
-BOOL func_02769520(void);
+// Why the system is exiting (PMi_ExitType), which NWM checks
+u32 PMi_GetExitType(void);
 
-// The part of TwlSDK's pm.c that main's pm.c calls on a DSi. The exit request starts TwlSDK's exit sequence
-// (PMi_ExitRequest, by the type in the work and the callbacks it runs), the battery level is the DSi's, and the stop of
-// a new DMA channel is the DSi's part of PMi_StopDma
-void func_02769498(u32 exitType);
-u32 func_027693dc(u16 *level);
-void func_02769410(u32 ndmaNo);
+// The part of TwlSDK's pm.c that main's pm.c calls on a DSi: the exit request, which starts the exit sequence and runs
+// the pre-exit callbacks, the DSi's battery level, and the stop of a new DMA channel, the DSi's part of PMi_StopDma
+void PMi_ProcessExitRequest(u32 exitType);
+u32 PMi_GetBatteryLevelCore(u16 *level);
+void PMi_StopNDma(u32 ndmaNo);
+// Runs the callbacks of PM_InsertPreExitCallback's list, as the power-off does, and as OS_ResetSystem and the card's
+// pull-out do on a DSi
+void PMi_ExecutePostExitCallbackList(void);
 
 // The objects of the LTD autoload that main's pm.c reaches: the callbacks run when the system is forced to power off,
 // and the one for a low battery
-typedef struct {
-    PMGenCallback callback;
-    void *arg;
-} PMBatteryLowCallbackInfo;
-
 extern PMGenCallbackInfo *PMi_PostExitCallbackList;
-extern PMBatteryLowCallbackInfo PMi_BatteryLowCallbackInfo;
+extern PMGenCallbackInfo PMi_BatteryLowCallbackInfo;
 
 #endif // POKEBW2_TWL_PM_H

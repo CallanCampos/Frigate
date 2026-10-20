@@ -44,6 +44,14 @@ void PM_Init(void);
 // reads gives the ARM7's answer in *result. Swan calls it PMi_ReadRegister, after the register reads that it is
 // mostly used for
 u32 PMi_ReadRegister(u8 request, u16 data, u16 *result);
+// The cycles of the system clock that the retries of a request wait for (about 10 ms)
+#define PM_RETRY_CYCLES 0x51d23
+// A word of the shared memory that the exit notifications set and PM_Init clears
+#define HW_PM_EXIT_FLAG 0x02fff684
+// Why the system is exiting, and whether it exits once the exit callbacks have run, which pm.c keeps for TwlSDK's
+// exit sequence in the LTD autoload (twl/pm.h)
+extern u32 PMi_ExitType;
+extern BOOL PMi_AutoExitFlag;
 
 // PM_SetBackLight sends the request and waits for the answer, PM_SetBackLightAsync calls back
 u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *arg);

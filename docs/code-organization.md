@@ -27,9 +27,10 @@ every section.
   (microphone, power and touch panel), STD and wireless libraries, its fixed-point math and libmath, and libcrypto's
   RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
   (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
-  microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and the new DMA and
-  WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader, linked
-  into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
+  microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and
+  in `.ltdmain` the card's hashed ROM reads, the new DMA, the shared WRAM manager and the DSi parts of NitroSDK's card
+  ROM, OS and PM files; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader,
+  linked into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
   (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
   code; the rest in overlays 11, 29, 189 and 260, mostly Thumb), `lib/msl/` (Metrowerks' MSL C library for NITRO, the
   C library, fdlibm math and runtime that ARM9 main links after NitroSDK, ARM code built with `dsi/1.2`),

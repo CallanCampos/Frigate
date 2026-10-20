@@ -39,10 +39,11 @@ flags = [
 "camera/camera_api.c" = ["-nothumb", "-ipa function"]
 "camera/camera.c" = ["-nothumb"]
 "card/card_rom_twl.c" = ["-ipa function"]
-# The DSi part of os_application_jump.c is ARM code, as main's half is; the statics of mi_sharedWram_twl.c each have a
-# literal of their own, as under -ipa function
+# The DSi part of os_application_jump.c is ARM code, as main's half is; the statics of mi_sharedWram_twl.c and
+# pm_twl.c each have a literal of their own, as under -ipa function
 "mi/mi_sharedWram_twl.c" = ["-ipa function"]
 "os/os_application_jump_twl.c" = ["-nothumb"]
+"spi/pm_twl.c" = ["-ipa function"]
 "nwm/nwm.c" = ["-nothumb", "-ipa function"]
 "mic/mic_twl.c" = ["-nothumb"]
 "fatfs/fatfs_api.c" = ["-nothumb", "-O2,p", "-ipa function"]

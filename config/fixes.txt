@@ -788,6 +788,7 @@ ltd_autoload_0 0x027687e4 add_reloc load,ltd_autoload(0),0x02768620
 ltd_autoload_0 0x027692e0 reloc_addend 0x30
 ltd_autoload_0 0x027692e4 reloc_addend 0x38
 ltd_autoload_0 0x027692e8 reloc_addend 0x34
+ltd_autoload_0 0x0276b100 section_end lib/twl/src/spi/pm_twl.c:.bss
 ltd_autoload_0 0x0276b108 add_data data_0276b108
 ltd_autoload_0 0x0276b13c remove_symbol
 ltd_autoload_0 0x0276b14c remove_symbol
