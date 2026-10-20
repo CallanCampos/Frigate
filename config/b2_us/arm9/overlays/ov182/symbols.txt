@@ -1643,7 +1643,7 @@ sAddressEdit kind:bss addr:0x021c4104
 sErrorCode kind:bss addr:0x021c4108
 sAddressSettings kind:bss addr:0x021c410c
 data_ov182_021c4114 kind:bss addr:0x021c4114
-data_ov182_021c4118 kind:bss addr:0x021c4118
+sTestProgressPassed kind:bss addr:0x021c4118
 data_ov182_021c411c kind:bss addr:0x021c411c
 data_ov182_021c4120 kind:bss addr:0x021c4120
 data_ov182_021c4124 kind:bss addr:0x021c4124
