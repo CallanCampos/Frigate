@@ -72,9 +72,9 @@ typedef struct {
 
 u32 getSizeofTourneyBlock(void);
 // An entry's regulation, which is the entry itself, and a parameter of the regulation. The battle type is 0x15
-Regulation *func_0200b530(void *entry);
+Regulation *TournamentEntry_GetRegulation(void *entry);
 // The entry's data of 0x92 bytes
-void *func_0200b794(void *entry);
+void *TournamentEntry_GetCardData(void *entry);
 // An entry's field, and setting it. The Wi-Fi login reads field 2 and field 10 and sets field 10
 u32 TournamentEntry_GetField(void *entry, u32 field);
 void TournamentEntry_SetField(void *entry, u32 field, u32 value);

@@ -1033,7 +1033,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
             break;
         }
         invalidFlags = 0;
-        regulation = func_0200b530(link->entry);
+        regulation = TournamentEntry_GetRegulation(link->entry);
         invalid = PokeRegulation_CheckParty(regulation, (PokeParty *)player->partyData, &invalidFlags);
         otherInvalid = PokeRegulation_PartyHasEgg(regulation, (PokeParty *)player->partyData);
         if (invalid == 0 && otherInvalid == 0) {
@@ -1598,7 +1598,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 16:
         flags = 0;
-        regulation = func_0200b530(link->entry);
+        regulation = TournamentEntry_GetRegulation(link->entry);
         if (PokeRegulation_CheckParty(regulation, (PokeParty *)param->otherPlayer->partyData, &flags) == 0) {
             *seq = 17;
         } else {
@@ -2747,7 +2747,7 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     previous =
         TournamentBlock_GetTeam(getTournamentBlockAddress(GameData_GetSaveControl(link->param->param->gameData)), 0);
     MI_CpuFill8(&info, 0, sizeof(info));
-    MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
+    MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
     info.startDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),
                                                    TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH),
                                                    TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY));

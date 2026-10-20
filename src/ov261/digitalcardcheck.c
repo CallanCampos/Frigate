@@ -609,7 +609,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
     tournament = getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData));
     entry = TournamentBlock_GetEntry(tournament, check->param.mode);
     cardData = TournamentBlock_GetTeam(tournament, check->param.mode);
-    regulation = func_0200b530(entry);
+    regulation = TournamentEntry_GetRegulation(entry);
     record = getRecordBlkAddress(save);
     playerInfo = GetGameDataPlayerInfo(check->param.gameData);
     link = WifiBattleMatchGraphic_GetClActUnit(check->param.net);
@@ -619,7 +619,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         u32 first;
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
-        MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
+        MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
         results = RecordSave_GetRndMatch(record);
         info.unkA0 = RndMatchData_GetParam(results, 10, 0);
         first = RndMatchData_GetParam(results, 10, 1);
@@ -640,7 +640,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         void *results;
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
-        MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
+        MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
         results = RecordSave_GetLiveMatch(record);
         info.unkA0 = LiveMatchData_GetCount(results, 1);
         info.unkA2 = LiveMatchData_GetCount(results, 2);

@@ -497,7 +497,7 @@ static void LiveBattleMatchFlow_StepTeam(WifiBattleMatchTask *task, u32 *seq, vo
         }
         break;
     case 9: {
-        Regulation *regulation = func_0200b530(wk->entry);
+        Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
         u32 problem;
 
         LiveBattleMatchFlow_LoadTeam(wk, wk->party);
@@ -655,7 +655,7 @@ static void LiveBattleMatchFlow_StepMenu(WifiBattleMatchTask *task, u32 *seq, vo
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 39, TRUE, 25, 4);
         break;
     case 4: {
-        Regulation *regulation = func_0200b530(wk->entry);
+        Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
         u32 played = LiveMatchData_GetCount(wk->record, 0);
 
         if (played >= Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES)) {
@@ -1034,7 +1034,7 @@ static void LiveBattleMatchFlow_StepLink(WifiBattleMatchTask *task, u32 *seq, vo
         break;
     case 37:
         if (wk->frames++ > 60) {
-            Regulation *regulation = func_0200b530(wk->entry);
+            Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
 
             wk->frames = 0;
             Regulation_GetParam(regulation, REGULATION_PARAM_SHOW_PARTNERS);
@@ -1156,7 +1156,7 @@ static void LiveBattleMatchFlow_StepQuit(WifiBattleMatchTask *task, u32 *seq, vo
         }
         break;
     case 1: {
-        Regulation *regulation = func_0200b530(wk->entry);
+        Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
         u32 played = LiveMatchData_GetCount(wk->record, 0);
 
         if (played >= Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES)) {
@@ -1370,7 +1370,7 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
     if (wk->playerCard == NULL) {
         SaveControl *save = GameData_GetSaveControl(wk->param.gameData);
         BattleBoxSave *battleBox = getBattleBox(save);
-        Regulation *regulation = func_0200b530(wk->entry);
+        Regulation *regulation = TournamentEntry_GetRegulation(wk->entry);
         void *records = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 1);
         PlayerInfo *info = GetGameDataPlayerInfo(wk->param.gameData);
         ClActUnit *link = WifiBattleMatchGraphic_GetClActUnit(wk->param.net);
@@ -1382,7 +1382,7 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         card.unkA4 = LiveMatchData_GetCount(wk->record, 0);
         card.unkA6 = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES);
         card.look = PlayerInfo_GetUnionView(info);
-        MI_CpuCopy8(func_0200b794(wk->entry), card.data, sizeof(card.data));
+        MI_CpuCopy8(TournamentEntry_GetCardData(wk->entry), card.data, sizeof(card.data));
         card.startDate = LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_START_YEAR),
                                                       TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_START_MONTH),
                                                       TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_START_DAY));

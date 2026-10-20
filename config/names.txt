@@ -397,9 +397,11 @@
 . 0x0200b4f4 WorldTradeData_SetExchangeDate
 . 0x0200b50c Regulation_Create
 . 0x0200b524 Regulation_Copy
+. 0x0200b530 TournamentEntry_GetRegulation
 . 0x0200b574 Regulation_GetParam
 . 0x0200b608 Regulation_SetParam
 . 0x0200b6f4 Regulation_CheckParamBit
+. 0x0200b794 TournamentEntry_GetCardData
 . 0x0200b798 TournamentEntry_GetField
 . 0x0200b830 TournamentEntry_SetField
 . 0x0200b8c8 TournamentEntry_CheckCRC

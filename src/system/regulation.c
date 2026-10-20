@@ -34,7 +34,7 @@ void Regulation_Copy(const Regulation *src, Regulation *dest) {
     MI_CpuCopy8(src, dest, sizeof(Regulation));
 }
 
-Regulation *func_0200b530(void *entry) {
+Regulation *TournamentEntry_GetRegulation(void *entry) {
     return entry;
 }
 
@@ -249,7 +249,7 @@ void func_0200b760(Regulation *regulation, RegulationUnkAC *out) {
     MI_CpuCopy8(regulation->unkAC, out->unk0, sizeof(out->unk0));
 }
 
-void *func_0200b794(void *entry) {
+void *TournamentEntry_GetCardData(void *entry) {
     TournamentEntry *tournament = entry;
 
     return tournament->cardData;
