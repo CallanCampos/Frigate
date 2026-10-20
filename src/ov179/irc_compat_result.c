@@ -1112,9 +1112,9 @@ static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk) {
     }
     if (wk->param->profile != NULL) {
         u16 *name = GetPlayerName(info);
-        u8 unk10_17 = getTrainerGender(info) != 0 ? 0 : 1;
+        u8 isMale = getTrainerGender(info) != 0 ? 0 : 1;
 
-        func_0200b184(log, name, wk->param->result, unk10_17, other->birthMonth, other->birthDay, getIDAsUInt(info),
+        func_0200b184(log, name, wk->param->result, isMale, other->birthMonth, other->birthDay, getIDAsUInt(info),
                       other->species, other->form, other->sex, other->isEgg);
     }
     if (wk->param->gsys != NULL) {
