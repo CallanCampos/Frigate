@@ -28,6 +28,7 @@ src/ov036/fieldmap_ctrl_hybrid.c:
     .data       start:0x021d4f18 end:0x021d4f5c
 
 src/ov036/scrcmd_medal.c:
+    complete
     .text       start:0x021c7b38 end:0x021c7fd8
     .rodata     start:0x021d4684 end:0x021d4704
 
