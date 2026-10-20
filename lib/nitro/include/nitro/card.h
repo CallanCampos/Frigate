@@ -171,7 +171,7 @@ typedef struct CARDAccessControl {
 
 // The header of a DSi game: the load tables of the DS header in its first 0x60 bytes, then where the DSi loads its own
 // two images, and the keyed hashes of the ranges that the boot code verifies before it loads them. Only the fields that
-// the boot code reads are named, and each hash's name says which range it verifies
+// the boot code and TwlSDK's card_hash.c read are named, and each hash's name says which range it verifies
 typedef struct CARDTwlRomHeader {
     u8 unk_000[0x1c];
     // 0x1c: the card's security flag; bit 0 says the boot code checks the images against the hashes. The card library
@@ -193,9 +193,19 @@ typedef struct CARDTwlRomHeader {
     u32 arm7iRomOffset;
     u32 arm7iEntry;
     ROMHeaderLoad arm7i;
-    u8 unk_1e0[0x134];
+    // 0x1e0: the parts of the DS and the DSi images that TwlSDK's card library checks as it reads them, the tables of
+    // the sectors' hashes and of the blocks' hashes (a block hashes the hashes of a run of sectors), a sector's size,
+    // and the sectors of a block
+    ROMHeaderRegion digestNtr;
+    ROMHeaderRegion digestTwl;
+    ROMHeaderRegion digestSectorHashes;
+    ROMHeaderRegion digestBlockHashes;
+    u32 digestSectorSize;
+    u32 digestSectorsPerBlock;
+    u8 unk_208[0x10c];
     u8 arm7Hash[0x14];
-    u8 unk_328[0x28];
+    u8 digestBlockHashesHash[0x14];
+    u8 unk_33c[0x14];
     u8 arm9iHash[0x14];
     u8 arm7iHash[0x14];
     u8 unk_378[0x28];

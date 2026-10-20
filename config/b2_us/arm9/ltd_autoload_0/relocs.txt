@@ -1210,6 +1210,7 @@ from:0x02767b1e kind:thumb_call to:0x02767c00 module:ltd_autoload(0)
 from:0x02767b28 kind:thumb_call to:0x027677a8 module:ltd_autoload(0)
 from:0x02767b32 kind:thumb_call to:0x027677a8 module:ltd_autoload(0)
 from:0x02767b4c kind:thumb_call to:0x02767700 module:ltd_autoload(0)
+from:0x02767bec kind:load to:0x02767674 module:ltd_autoload(0)
 from:0x02767bf0 kind:load to:0x0276afd8 module:ltd_autoload(0)
 from:0x02767bf4 kind:load to:0x0276af74 module:ltd_autoload(0)
 from:0x02767bfc kind:load to:0x02078658 module:main

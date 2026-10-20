@@ -96,3 +96,7 @@ lib/twl/src/dsp/dsp_g711_image.c:
 lib/twl/src/dsp/dsp_graphics_image.c:
     complete
     .rodata     start:0x0272ecec end:0x02767480
+
+lib/twl/src/card/card_hash.c:
+    .ltdmain    start:0x02767674 end:0x02767f08
+    .bss        start:0x0276af74 end:0x0276b03c
