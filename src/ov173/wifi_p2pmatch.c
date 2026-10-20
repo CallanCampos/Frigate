@@ -1363,7 +1363,8 @@ static void WifiP2PMatch_CreateTrainerActor(WIFIP2PMATCH_WORK *wk, int friendInd
     if (wk->trainerActor != NULL) {
         WifiP2PMatch_FreeTrainerActor(wk);
     }
-    trainerClass = func_0202b5e8(WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_TRAINER_VIEW));
+    trainerClass =
+        UnionView_GetTrainerClass(WifiList_GetFriendParam(wk->wifiList, friendIndex, WIFI_LIST_FRIEND_TRAINER_VIEW));
     arc = MakeTrGraArcHandle(heapId);
     wk->trainerChars = TrGra_LoadClActChars(arc, trainerClass, 1, heapId);
     wk->trainerPalette = TrGra_LoadClActPalette(arc, trainerClass, 1, 0, heapId);

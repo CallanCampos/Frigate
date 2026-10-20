@@ -3238,7 +3238,7 @@ static void WifiNoteFriendInfo_Draw(WifiNoteFriendInfo *info, WifiNoteData *data
     }
     {
         ClActorSetup setup = { 56, 80, 0, 0, 0 };
-        u32 trainerClass = func_0202b5e8(
+        u32 trainerClass = UnionView_GetTrainerClass(
             WifiList_GetFriendParam(wifiList, data->friends.index[data->friendPos], WIFI_LIST_FRIEND_TRAINER_VIEW));
         ArcTool *arc = MakeTrGraArcHandle(heapId);
 

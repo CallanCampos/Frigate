@@ -1638,7 +1638,10 @@
 . 0x0202b590 Country_GetValidRegion
 . 0x0202b5a4 Country_GetRegionOrder
 . 0x0202b5d4 UnionView_GetTrainerType
+. 0x0202b5e8 UnionView_GetTrainerClass
+. 0x0202b5fc UnionView_GetClassNameId
 . 0x0202b610 UnionView_FindTrainerType
+. 0x0202b630 UnionView_FindTrainerClass
 . 0x0202b650 CursorMove_Create
 . 0x0202b694 CursorMove_Delete
 . 0x0202b69c CursorMove_SetHideOnTouch

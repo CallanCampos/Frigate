@@ -645,7 +645,7 @@ static void WifiBSubwayRoom_FixData(WifiBSubwayRoom *room) {
             Country_GetValidCountry(players[i].countryCode, players[i].localCode, players[i].langCode);
         players[i].localCode =
             Country_GetValidRegion(players[i].countryCode, players[i].localCode, players[i].langCode);
-        players[i].trainerType = func_0202b5e8(func_0202b630(players[i].trainerType));
+        players[i].trainerType = UnionView_GetTrainerClass(UnionView_FindTrainerClass(players[i].trainerType));
     }
     for (i = 0; i < ROOM_LEADER_COUNT; i++) {
         leaders[i].countryCode =
@@ -771,7 +771,7 @@ static void WifiBSubwayUpload_FillPlayer(Dpw_Bt_Player *player, GameData *gameDa
     player->localCode = UnityTowerVisitor_GetProvince(playerInfo);
     player->gender = getTrainerGender(playerInfo);
     player->trainerType = func_02008bf4(playerInfo);
-    player->trainerType = func_0202b5e8(player->trainerType);
+    player->trainerType = UnionView_GetTrainerClass(player->trainerType);
     for (i = 0; i < PLAYER_MESSAGE_COUNT; i++) {
         CGearPhrases_Get(cgear, i + 1, (PMSData *)player->messages[i]);
     }

@@ -152,7 +152,7 @@ void TrCardBmp_DrawUnionView(TrainerCardWork *wk, u32 view, BOOL flush) {
     u32 width;
 
     if (TimeSigSave_IsUnionViewChanged(getTimeSigSaveBlock(wk->param->gameData))) {
-        strbuf = GFL_MsgDataLoadStrbufNew(msgData, func_0202b5fc(view));
+        strbuf = GFL_MsgDataLoadStrbufNew(msgData, UnionView_GetClassNameId(view));
     } else {
         strbuf = GFL_MsgDataLoadStrbufNew(msgData, 0);
     }

@@ -498,8 +498,8 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     PMSDraw_Print(work->pmsDraw, panel->recordWindow, &record, page);
 
     panel->trainerView = GameBeacon_GetTrainerViewWithGender(beacon);
-    TrGra_ReplaceClActCharsAndPalette(work->trainerArc, func_0202b5e8(panel->trainerView), work->trainerRes[page].chars,
-                                      work->trainerRes[page].palette, work->tailHeapId);
+    TrGra_ReplaceClActCharsAndPalette(work->trainerArc, UnionView_GetTrainerClass(panel->trainerView),
+                                      work->trainerRes[page].chars, work->trainerRes[page].palette, work->tailHeapId);
 
     rank = GameBeacon_GetSurveyRank(beacon);
     if (rank == 0) {
