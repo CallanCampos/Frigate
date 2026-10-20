@@ -415,7 +415,7 @@ static void BeaconView_InitData(BeaconViewWork *work) {
     info = SaveControl_GetPlayerInfo(save);
     work->trainerId = (u16)getIDAsUInt(info);
     work->gender = getTrainerGender(info);
-    work->unk3D = func_02008bf4(info);
+    work->unk3D = PlayerInfo_GetUnionView(info);
     work->version = GAME_VERSION;
     work->newTable = GameBeaconInfoTable_Alloc(work->heapId);
     work->beacon = GameBeacon_Alloc(work->heapId);

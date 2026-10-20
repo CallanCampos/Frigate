@@ -373,7 +373,7 @@ BOOL TrainerCard_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     if (cardParam->canEdit) {
         info = GetGameDataPlayerInfo(wk->param->gameData);
         timeSig = getTimeSigSaveBlock(wk->param->gameData);
-        func_02008bf8(info, wk->data->unk06);
+        PlayerInfo_SetUnionView(info, wk->data->unk06);
         TimeSigSave_SetPersonality(timeSig, wk->data->unk48);
         TimeSigSave_SetSignBlinks(timeSig, wk->data->unk04_4);
     }

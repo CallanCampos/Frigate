@@ -259,7 +259,8 @@ void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, u8 netId, UnionA
     app->members[netId] = *member;
     app->hasProfile |= 1 << netId;
     if (netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
-        UnionGroup_AddMember(&self->mycomm, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
+        UnionGroup_AddMember(&self->mycomm, member->mac, PlayerInfo_GetUnionView(&member->info),
+                             getTrainerGender(&member->info));
     }
 }
 

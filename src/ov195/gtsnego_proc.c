@@ -514,7 +514,7 @@ static void GtsNego_StateShowPartner(GtsNegoWork *wk) {
         }
     }
     GtsNegoMessage_ShowPartner(wk->msg, partner, count);
-    GtsNegoDisp_ShowPartner(wk->disp, func_02008bf4(partner));
+    GtsNegoDisp_ShowPartner(wk->disp, PlayerInfo_GetUnionView(partner));
     wk->timer = 180;
     GtsNego_ChangeState(wk, GtsNego_StateWaitPartnerShown, 675);
 }

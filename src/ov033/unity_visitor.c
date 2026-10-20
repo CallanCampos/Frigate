@@ -45,7 +45,7 @@ void func_ov033_0217aa50(UnityTowerSurveySave *survey, UnityTowerFloor *output, 
         }
         country = UnityTowerVisitor_GetCountry(visitor);
         if (country == floor) {
-            visitorValue = func_02008bf4(visitor);
+            visitorValue = PlayerInfo_GetUnionView(visitor);
             if (visitorValue > 15) {
                 visitorValue = getTrainerGender(visitor) != 0 ? 15 : 11;
             }

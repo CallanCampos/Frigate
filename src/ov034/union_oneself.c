@@ -2152,7 +2152,7 @@ static BOOL UnionOneself_StepColosseumRun(UnionSystem *unisys, UnionSelf *situ, 
 static void UnionOneself_AddColosseumMember(void *work, const PlayerInfo *info, const u8 *mac) {
     UnionSystem *unisys = work;
 
-    UnionGroup_AddMember(&unisys->situ.mycomm, mac, func_02008bf4(info), getTrainerGender(info));
+    UnionGroup_AddMember(&unisys->situ.mycomm, mac, PlayerInfo_GetUnionView(info), getTrainerGender(info));
 }
 
 static void UnionOneself_RemoveColosseumMember(void *work, const PlayerInfo *info, const u8 *mac) {
@@ -2202,7 +2202,8 @@ static BOOL UnionOneself_StepColosseumSendRun(UnionSystem *unisys, UnionSelf *si
 
             for (i = 0; i < count; i++) {
                 if (clsys->members[i].unk26 == 1) {
-                    UnionGroup_AddMember(&situ->mycomm, clsys->members[i].mac, func_02008bf4(&clsys->members[i].info),
+                    UnionGroup_AddMember(&situ->mycomm, clsys->members[i].mac,
+                                         PlayerInfo_GetUnionView(&clsys->members[i].info),
                                          getTrainerGender(&clsys->members[i].info));
                 }
             }

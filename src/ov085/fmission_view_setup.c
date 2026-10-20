@@ -382,7 +382,7 @@ static void FMissionViewSetup_InitData(FMissionView *view) {
     info = SaveControl_GetPlayerInfo(save);
     view->trainerId = getTrainerID(info);
     view->gender = getTrainerGender(info);
-    view->unk3D = func_02008bf4(info);
+    view->unk3D = PlayerInfo_GetUnionView(info);
     view->version = GAME_VERSION;
     view->entry = FMissionLogFV_AllocEntry(view->heapId);
     view->unk54 = FMissionLogFV_AllocEntry(view->heapId);

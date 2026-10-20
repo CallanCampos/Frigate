@@ -3982,7 +3982,7 @@ static void WifiP2PMatch_InitMyStatus(WIFIP2PMATCH_WORK *wk, u32 status, u32 gam
     wk->myStatus->language = GAME_LANGUAGE;
     gender = getTrainerGender(info);
     wk->myStatus->gender = gender;
-    wk->myStatus->trainerView = func_02008bf4(info);
+    wk->myStatus->trainerView = PlayerInfo_GetUnionView(info);
     WifiP2PMatch_SetMyStatus(wk, status, gameMode);
     wk->myStatus->country = UnityTowerVisitor_GetCountry(info);
     wk->myStatus->province = UnityTowerVisitor_GetProvince(info);

@@ -2026,7 +2026,7 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
         info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
         info.unkC = info.unk10 + info.unk12;
     }
-    info.look = func_02008bf4(playerInfo);
+    info.look = PlayerInfo_GetUnionView(playerInfo);
     link->card =
         WifiBattleMatchRankCard_Create(&info, titleMsg, playerInfo, unit, link->res, link->font, link->printQueue,
                                        link->msgData, link->wordSet, HEAPID_WIFIBATTLEMATCH_LINK);

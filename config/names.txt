@@ -125,6 +125,8 @@
 . 0x02008b5c PlayerInfo_IsNameEmpty
 . 0x02008bdc PlayerInfo_GetProfileId
 . 0x02008be0 PlayerInfo_InitProfileId
+. 0x02008bf4 PlayerInfo_GetUnionView
+. 0x02008bf8 PlayerInfo_SetUnionView
 . 0x02008bfc PlayerInfo_GetVersion
 . 0x02008c00 PlayerInfo_SetVersion
 . 0x02008c08 PlayerInfo_SetRegion

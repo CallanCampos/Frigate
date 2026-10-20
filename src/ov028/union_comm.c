@@ -487,7 +487,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->unk07_5 = self->unk02;
     beacon->activity = self->activity;
     copyName(unisys->param->playerInfo->name, beacon->name, 8);
-    beacon->look = func_02008bf4(unisys->param->playerInfo);
+    beacon->look = PlayerInfo_GetUnionView(unisys->param->playerInfo);
     beacon->gender = getTrainerGender(unisys->param->playerInfo);
     beacon->trainerId = getIDAsUInt(unisys->param->playerInfo);
     beacon->state = self->state;
@@ -614,7 +614,7 @@ void UnionGroup_Init(UnionSystem *unisys, UnionGroup *group) {
     UnionGroup_ResetTargets(group);
     self = &group->members[0];
     OS_GetMacAddress(self->mac);
-    self->look = func_02008bf4(unisys->param->playerInfo);
+    self->look = PlayerInfo_GetUnionView(unisys->param->playerInfo);
     self->gender = getTrainerGender(unisys->param->playerInfo);
     self->used = TRUE;
     group->unk44 = 0xffff;

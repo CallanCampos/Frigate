@@ -953,7 +953,7 @@ void WorldTrade_PostPokemonBaseDataMake(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
     dtd->trainerID = getIDAsUInt(wk->param->mystatus);
     dtd->countryCode = UnityTowerVisitor_GetCountry(wk->param->mystatus);
     dtd->localCode = UnityTowerVisitor_GetProvince(wk->param->mystatus);
-    dtd->trainerType = func_02008bf4(wk->param->mystatus);
+    dtd->trainerType = PlayerInfo_GetUnionView(wk->param->mystatus);
     dtd->gender = getTrainerGender(wk->param->mystatus);
 #ifdef BLACK2
     dtd->versionCode = VERSION_BLACK2;

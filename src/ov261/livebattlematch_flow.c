@@ -1380,7 +1380,7 @@ static void LiveBattleMatchFlow_PlayerCardCreate(LiveBattleMatchFlow *wk) {
         card.unkA2 = LiveMatchData_GetCount(wk->record, 2);
         card.unkA4 = LiveMatchData_GetCount(wk->record, 0);
         card.unkA6 = Regulation_GetParam(regulation, 0x16);
-        card.look = func_02008bf4(info);
+        card.look = PlayerInfo_GetUnionView(info);
         MI_CpuCopy8(func_0200b794(wk->entry), card.data, sizeof(card.data));
         card.startDate =
             LiveBattleMatchFlow_PackCode(TournamentEntry_GetField(wk->entry, 4), TournamentEntry_GetField(wk->entry, 5),

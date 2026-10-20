@@ -116,7 +116,7 @@ static void setFriendInfo(WifiList *wifiList, PlayerInfo *info, u32 index, u32 h
     WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_GENDER, getTrainerGender(info));
     WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_ID, getIDAsUInt(info));
     WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_PROFILE_ID, PlayerInfo_GetProfileId(info));
-    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, func_02008bf4(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
 static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId, int mode) {
@@ -131,7 +131,7 @@ static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendDa
     } else if (mode == FRIEND_ADD_UPDATE) {
         setFriendInfo(wifiList, info, index, heapId, FALSE);
     }
-    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, func_02008bf4(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
 BOOL func_02011b30(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {

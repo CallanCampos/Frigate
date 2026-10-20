@@ -1736,7 +1736,7 @@ static void GSync_PersonToPlayerInfo(GSyncResultPerson *person, PlayerInfo *info
         offset = 8;
     }
     style = style + (u16)offset;
-    func_02008bf8(info, style);
+    PlayerInfo_SetUnionView(info, style);
 }
 
 static void GSync_AddJoinAvenuePeople(GameData *gameData, GSyncResultPerson *people, HeapID heapId) {

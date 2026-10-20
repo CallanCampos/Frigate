@@ -1241,7 +1241,7 @@ WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMa
         colorKind = stars == 5;
     }
     WifiBattleMatchView_PartnerWindows(card, data, font, printQueue, msgData, wordSet, colorKind, heapId);
-    WifiBattleMatchView_PartnerLoadBadge(card, func_02008bf4((PlayerInfo *)&data->info), unit, heapId);
+    WifiBattleMatchView_PartnerLoadBadge(card, PlayerInfo_GetUnionView((PlayerInfo *)&data->info), unit, heapId);
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 9, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     switch (kind) {
     case 2:

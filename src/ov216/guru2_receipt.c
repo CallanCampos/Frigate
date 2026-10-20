@@ -1394,7 +1394,7 @@ static void Guru2Receipt_UpdateActors(Guru2ReceiptWork *wk) {
         switch (wk->actorStates[i]) {
         case GURU2_RECEIPT_ACTOR_APPEAR: {
             int gender = getTrainerGender(&wk->members[i].member->info);
-            int look = func_02008bf4(&wk->members[i].member->info);
+            int look = PlayerInfo_GetUnionView(&wk->members[i].member->info);
 
             if (i == NetSystem_GetNetId()) {
                 ClActor_SetSequence(wk->actors[i], 4);
@@ -1434,7 +1434,7 @@ static void Guru2Receipt_FreeTrainerPalette(Guru2ReceiptWork *wk) {
     GFL_HeapFree(wk->trainerPaletteFile);
 }
 
-// The row of the trainer palette file for each appearance (func_02008bf4)
+// The row of the trainer palette file for each appearance (PlayerInfo_GetUnionView)
 static const u8 sLookPalettes[16] = { 2, 3, 6, 5, 4, 5, 2, 0, 1, 3, 6, 5, 4, 7, 7, 0 };
 
 // Gives a member's actor the palette and characters of the member's appearance

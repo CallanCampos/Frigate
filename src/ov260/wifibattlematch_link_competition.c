@@ -2751,7 +2751,7 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
         TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
     info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8),
                                                  TournamentEntry_GetField(entry, 9));
-    info.look = func_02008bf4(playerInfo);
+    info.look = PlayerInfo_GetUnionView(playerInfo);
     info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
     first = RndMatchData_GetParam(link->param->record, 10, 1);
     info.unkA4 = first + RndMatchData_GetParam(link->param->record, 10, 2);

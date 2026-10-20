@@ -770,7 +770,7 @@ static void WifiBSubwayUpload_FillPlayer(Dpw_Bt_Player *player, GameData *gameDa
     player->countryCode = UnityTowerVisitor_GetCountry(playerInfo);
     player->localCode = UnityTowerVisitor_GetProvince(playerInfo);
     player->gender = getTrainerGender(playerInfo);
-    player->trainerType = func_02008bf4(playerInfo);
+    player->trainerType = PlayerInfo_GetUnionView(playerInfo);
     player->trainerType = UnionView_GetTrainerClass(player->trainerType);
     for (i = 0; i < PLAYER_MESSAGE_COUNT; i++) {
         CGearPhrases_Get(cgear, i + 1, (PMSData *)player->messages[i]);

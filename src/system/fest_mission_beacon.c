@@ -123,7 +123,7 @@ void FestMissionLog_AddPlayer(FestMissionLog *log, GameData *gameData, u8 joined
     entry.own = TRUE;
     entry.trainerId = getTrainerID(info);
     entry.gender = getTrainerGender(info);
-    entry.look = func_02008bf4(info);
+    entry.look = PlayerInfo_GetUnionView(info);
     if (entry.gender == GENDER_FEMALE) {
         entry.look -= 8;
     }

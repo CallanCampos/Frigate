@@ -725,9 +725,9 @@ static void GameBeacon_Init(GameBeacon *beacon, GameData *gameData) {
     beacon->favoriteColor = owner.favoriteColor;
     beacon->gender = getTrainerGender(player);
     if (beacon->gender == GENDER_MALE) {
-        beacon->trainerView = func_02008bf4(player);
+        beacon->trainerView = PlayerInfo_GetUnionView(player);
     } else {
-        beacon->trainerView = func_02008bf4(player) - 8;
+        beacon->trainerView = PlayerInfo_GetUnionView(player) - 8;
     }
     beacon->version = GAME_VERSION;
     beacon->language = GAME_LANGUAGE;

@@ -234,7 +234,7 @@ PlayerInfo *WorldTrade_MakePartnerStatus(Dpw_Tr_Data *dtd) {
     PlayerInfo_SetVersion(info, dtd->versionCode);
     PlayerInfo_SetRegion(info, dtd->langCode);
     setTrainerGender(info, dtd->gender);
-    func_02008bf8(info, dtd->trainerType);
+    PlayerInfo_SetUnionView(info, dtd->trainerType);
     PlayerInfo_SetCountryAndProvince(info, dtd->countryCode, dtd->localCode);
     info->id = dtd->trainerID;
     info->profileId = dtd->id;

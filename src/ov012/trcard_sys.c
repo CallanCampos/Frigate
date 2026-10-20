@@ -201,7 +201,7 @@ static BOOL TrainerCardSys_Exit(GameProc *proc, u32 *state, void *param, void *w
     TrainerCardSysWork *wk = work;
 
     if (cardParam->canEdit) {
-        u32 value = func_02008bf4(GetGameDataPlayerInfo(cardParam->gameData));
+        u32 value = PlayerInfo_GetUnionView(GetGameDataPlayerInfo(cardParam->gameData));
 
         if (wk->unk34 != value) {
             GameBeaconSys_SetTrainerView(value);
@@ -457,13 +457,13 @@ void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnap
     if (isSnapshot == TRUE) {
         PlayTime *playTime = (PlayTime *)GameData_GetPlayTime(gameData);
 
-        data->unk06 = func_02008bf4(playerInfo);
+        data->unk06 = PlayerInfo_GetUnionView(playerInfo);
         data->isOwn = FALSE;
         data->playTime = NULL;
         data->playHours = PlayTime_GetHours(playTime);
         data->playMinutes = PlayTime_GetMinutes(playTime);
     } else {
-        data->unk06 = func_02008bf4(playerInfo);
+        data->unk06 = PlayerInfo_GetUnionView(playerInfo);
         data->isOwn = TRUE;
         data->playTime = (PlayTime *)GameData_GetPlayTime(gameData);
     }

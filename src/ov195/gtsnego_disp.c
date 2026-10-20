@@ -1051,7 +1051,7 @@ void GtsNegoDisp_ShowFriendIcon(GtsNegoDisp *disp, int row, int x, int y) {
 // The icon of a person in a row of the list, the second row being the first on the screen
 void GtsNegoDisp_SetFriendIcon(GtsNegoDisp *disp, PlayerInfo *friend, int row) {
     if (friend != NULL) {
-        GtsNegoDisp_CreateFriendIcon(disp, row, func_02008bf4(friend));
+        GtsNegoDisp_CreateFriendIcon(disp, row, PlayerInfo_GetUnionView(friend));
         GtsNegoDisp_ShowFriendIcon(disp, row, 16, -(GTSNEGO_LIST_ROW_HEIGHT * 8) * (1 - row));
     }
 }

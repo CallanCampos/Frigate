@@ -434,7 +434,7 @@ static void NewGame_SetUpPlayer(PlayerInfo *info, StrBuf *name, u32 gender) {
     copyTrainerNameFromStrbuf(info, name);
     setTrainerGender(info, gender);
     setIDAsUInt(info, GFL_RandomLCAlt(0xffffffff));
-    func_02008bf8(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
+    PlayerInfo_SetUnionView(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
 }
 
 static void NewGame_EraseOutsideKeys(SaveControl *save) {

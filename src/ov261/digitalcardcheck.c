@@ -624,7 +624,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         info.unkA0 = RndMatchData_GetParam(results, 10, 0);
         first = RndMatchData_GetParam(results, 10, 1);
         info.unkA4 = first + RndMatchData_GetParam(results, 10, 2);
-        info.look = func_02008bf4(playerInfo);
+        info.look = PlayerInfo_GetUnionView(playerInfo);
         info.startDate = DigitalCardCheck_PackBytes(
             TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
         info.endDate = DigitalCardCheck_PackBytes(
@@ -644,7 +644,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         info.unkA2 = LiveMatchData_GetCount(results, 2);
         info.unkA4 = LiveMatchData_GetCount(results, 0);
         info.unkA6 = Regulation_GetParam(regulation, 0x16);
-        info.look = func_02008bf4(playerInfo);
+        info.look = PlayerInfo_GetUnionView(playerInfo);
         info.startDate = DigitalCardCheck_PackBytes(
             TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
         info.endDate = DigitalCardCheck_PackBytes(
