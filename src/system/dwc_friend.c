@@ -62,7 +62,7 @@ static int findFriendData(DWCFriendData *friendData, int *index) {
     return FRIEND_CHECK_NEW;
 }
 
-int func_02011980(WifiList *wifiList, u64 friendKey, int *index) {
+int WifiList_FindFriendKey(WifiList *wifiList, u64 friendKey, int *index) {
     DWCUserData *userData = WifiList_GetMyUserData(wifiList);
     int i = 0;
     DWCFriendData *friends = WifiList_GetFriendData(wifiList, 0);
@@ -89,7 +89,7 @@ int func_02011980(WifiList *wifiList, u64 friendKey, int *index) {
     return FRIEND_CHECK_NEW;
 }
 
-BOOL func_02011a28(DWCFriendData *friendData) {
+BOOL DWCFriend_UpdateFriendData(DWCFriendData *friendData) {
     BOOL isNew = FALSE;
     DWCFriendData *friends = (DWCFriendData *)func_02042d64();
     int index;
@@ -134,7 +134,7 @@ static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendDa
     WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
-BOOL func_02011b30(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {
+BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {
     WifiList *wifiList = GameData_GetWifiList(gameData);
     int i;
 

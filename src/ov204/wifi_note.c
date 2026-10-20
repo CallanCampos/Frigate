@@ -1016,7 +1016,7 @@ static u32 WifiNoteData_AddFriend(WifiNoteData *data, StrBuf *code, StrBuf *name
                 if (!DWC_CheckFriendKey(WifiList_GetMyUserData(wifiList), key)) {
                     return 1;
                 }
-                if (!func_02011980(wifiList, key, &index)) {
+                if (!WifiList_FindFriendKey(wifiList, key, &index)) {
                     return 2;
                 }
                 DWC_CreateFriendKeyToken(WifiList_GetFriendData(wifiList, i), key);

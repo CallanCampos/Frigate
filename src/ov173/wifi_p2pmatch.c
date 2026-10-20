@@ -6099,7 +6099,7 @@ static int WifiP2PMatch_StateConnectEnd(WIFIP2PMATCH_WORK *wk, int seq) {
 
     if (!WifiP2PMatch_CheckDisconnect(wk) && NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 0x12, 10) &&
         WifiP2PMatch_IsMessageEndOrNone(wk) == TRUE) {
-        func_02011a28(WifiList_GetFriendData(GameData_GetWifiList(wk->gameData), 0));
+        DWCFriend_UpdateFriendData(WifiList_GetFriendData(GameData_GetWifiList(wk->gameData), 0));
         WifiP2PMatch_EndMessage(wk);
         status = WifiP2PMatch_GetFriendStatusData(DWCRap_GetFriendIndex());
         WifiP2PMatch_GetStatus(wk, status);

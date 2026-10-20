@@ -475,7 +475,7 @@ static void WH_StateOutStartScan(void *arg) {
     _pWmInfo->sScanWait = _pWmInfo->sScanTime;
     switch (state) {
     case WM_STATECODE_PARENT_NOT_FOUND:
-        func_02012edc();
+        WihDwc_OnParentNotFound();
         return;
     case WM_STATECODE_PARENT_FOUND:
         break;

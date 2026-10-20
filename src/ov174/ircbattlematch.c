@@ -520,7 +520,7 @@ static void IrcBattleMatch_RecvFriendData(int netId, int size, const void *data,
         if (netId != NetSystem_GetNetId()) {
             PlayerInfo *info = GameData_GetPlayerInfoByNetID(gameData, netId);
 
-            work->friendResult = func_02011b30(gameData, info, data, work->heapId);
+            work->friendResult = WifiList_AddFriend(gameData, info, data, work->heapId);
         }
     }
 }

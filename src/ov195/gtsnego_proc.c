@@ -1586,7 +1586,7 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
                 Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
                 break;
             case 3:
-                func_02011d20();
+                GFL_NetErrShowFatal();
                 break;
             }
         }

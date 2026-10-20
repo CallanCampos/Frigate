@@ -158,7 +158,7 @@ void GFLAppInit(void) {
 
 void GFLAppUpdate(void) {
     GCTX_HIDUpdate();
-    func_02011818();
+    NetDefine_Update();
     GCTX_ProcMgrUpdate();
     RTCCache_Update();
 }

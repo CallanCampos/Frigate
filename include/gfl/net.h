@@ -193,7 +193,7 @@ BOOL GFL_NetErrShow(u32 a0);
 // Shows the fatal error screen for a Wi-Fi error with the message given
 void GFL_NetErrShowWifi(u32 message);
 // GFL_NetErrShow(1)
-void func_02011d20(void);
+void GFL_NetErrShowFatal(void);
 // Records a Wi-Fi error with the message given, to show it
 void GFL_NetErrRecordWifi(u32 message);
 // The message for a server's result
@@ -221,7 +221,7 @@ void AssertFailErrorDisp(void);
 // clears
 u16 WihDwc_GetLinkLevel(void);
 void WihDwc_SetBestLinkLevel(u8 linkLevel);
-void func_02012edc(void);
+void WihDwc_OnParentNotFound(void);
 
 // The device table for a GFL_NET_TYPE_*, from outside the library
 const GFLNetDevTable *NetDefine_LoadDevice(int type);

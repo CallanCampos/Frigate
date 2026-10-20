@@ -195,14 +195,14 @@ typedef struct {
     u16 plttId;
 } ErrorWindowGraphics;
 
-static void func_02011dc8(void);
+static void GFL_NetErrWaitVBlank(void);
 static void GFL_NetErrAbortCore(void);
 static BOOL GFL_NetErrShowCore(u32 fatal);
 static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting);
 static void GFL_NetErrRestore(BOOL keepDark);
 static BOOL GFL_NetErrIsReady(void);
 static void loadErrorBackground(int window);
-static u32 func_020126fc(GFLNetErrorInfo *info, u32 message);
+static u32 GFL_NetErrGetWifiMessage(GFLNetErrorInfo *info, u32 message);
 static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting);
 static void GFL_NetErrGameUpdate(void);
 
@@ -288,7 +288,7 @@ void GFL_NetErrShowWifi(u32 message) {
     GFL_NetErrShow(TRUE);
 }
 
-void func_02011d20(void) {
+void GFL_NetErrShowFatal(void) {
     GFL_NetErrShow(TRUE);
 }
 
@@ -335,7 +335,7 @@ void GFL_NetErrApplyBrightness(void) {
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
 }
 
-static void func_02011dc8(void) {
+static void GFL_NetErrWaitVBlank(void) {
     if (GFL_NetIsInitialized() == TRUE) {
         GFL_NetMainWhileWaiting();
         OS_WaitIrq(TRUE, OS_IE_V_BLANK);
@@ -372,11 +372,11 @@ void GFL_NetErrShowScreen(void) {
     // Wait for the keys to be released, then pressed, with the lid open
     while (PAD_DetectFold() == TRUE || (ReadKeys() & CLOSE_KEYS)) {
         GFL_NetErrGameUpdate();
-        func_02011dc8();
+        GFL_NetErrWaitVBlank();
     }
     while (PAD_DetectFold() == TRUE || !(ReadKeys() & CLOSE_KEYS)) {
         GFL_NetErrGameUpdate();
-        func_02011dc8();
+        GFL_NetErrWaitVBlank();
     }
     GFL_NetErrRestore(g_GflNetErr.keepDark == TRUE ? TRUE : FALSE);
     WmIcon_Hide();
@@ -679,7 +679,7 @@ static void loadErrorBackground(int window) {
 }
 
 // The message of a Wi-Fi error. The second argument is unused
-static u32 func_020126fc(GFLNetErrorInfo *info, u32 message) {
+static u32 GFL_NetErrGetWifiMessage(GFLNetErrorInfo *info, u32 message) {
     switch (info->type) {
     case NET_ERR_INFO_TYPE_FIRST:
     case NET_ERR_INFO_TYPE_FIRST + 9:
@@ -747,7 +747,7 @@ static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting) {
             message = work->message;
             work->messageGiven = FALSE;
         } else {
-            message = func_020126fc(&work->info, work->message);
+            message = GFL_NetErrGetWifiMessage(&work->info, work->message);
         }
     } else {
         WordSetNumber(wordSet, 0, work->stateError, 5, 2, TRUE);
