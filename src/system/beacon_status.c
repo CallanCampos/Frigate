@@ -5,6 +5,7 @@
 #include "gfl/msg.h"
 #include "gfl/std.h"
 #include "gfl/str.h"
+#include "save/high_link.h"
 #include "system/beacon_status.h"
 
 // The game's beacon status, kept in GameData: among others, the greeting that the player's beacons send
@@ -17,12 +18,15 @@
 
 struct BeaconStatus {
     GameBeaconInfoTable table;
-    u8 unkB80[2];
-    u8 unkB82;
+    // Set by the phrase input when the player enters a new greeting, read as a u16
+    u8 greetingChanged[2];
+    // The top row of the beacon view's list
+    u8 logTop;
     u32 unkB84;
     u32 unkB88;
-    u32 unkB8C;
-    StrBuf *unkB90;
+    // The Pass Power that a beacon gave and its giver's name
+    u32 givenPassPower;
+    StrBuf *givenName;
     StrBuf *greeting;
 };
 
@@ -33,8 +37,8 @@ BeaconStatus *BeaconStatus_Create(HeapID heapId, HeapID msgHeapId) {
     u16 buf[BEACON_STATUS_GREETING_SIZE];
 
     status->greeting = GFL_StrBufCreate(BEACON_STATUS_GREETING_SIZE, heapId);
-    status->unkB90 = GFL_StrBufCreate(0x10, heapId);
-    status->unkB8C = 0x30;
+    status->givenName = GFL_StrBufCreate(0x10, heapId);
+    status->givenPassPower = PASS_POWER_NONE;
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, MSG_GAME_BEACON, msgHeapId);
     greeting = GFL_MsgDataLoadStrbufNew(msgData, MSG_GAME_BEACON_DEFAULT_GREETING);
     GFL_StrBufStoreString(greeting, buf, BEACON_STATUS_GREETING_SIZE);
@@ -45,7 +49,7 @@ BeaconStatus *BeaconStatus_Create(HeapID heapId, HeapID msgHeapId) {
 }
 
 void BeaconStatus_Free(BeaconStatus *status) {
-    GFL_StrBufFree(status->unkB90);
+    GFL_StrBufFree(status->givenName);
     GFL_StrBufFree(status->greeting);
     MI_CpuFill8(status, 0, sizeof(BeaconStatus));
     GFL_HeapFree(status);
@@ -56,11 +60,11 @@ GameBeaconInfoTable *BeaconStatus_GetInfoTable(BeaconStatus *status) {
 }
 
 u8 func_0202d7ac(BeaconStatus *status) {
-    return status->unkB82;
+    return status->logTop;
 }
 
 void func_0202d7b8(BeaconStatus *status, u8 value) {
-    status->unkB82 = value;
+    status->logTop = value;
 }
 
 StrBuf *BeaconStatus_GetGreeting(BeaconStatus *status) {
@@ -68,5 +72,5 @@ StrBuf *BeaconStatus_GetGreeting(BeaconStatus *status) {
 }
 
 u8 *func_0202d7d0(BeaconStatus *status) {
-    return status->unkB80;
+    return status->greetingChanged;
 }
