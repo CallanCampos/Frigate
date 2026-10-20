@@ -189,6 +189,8 @@
 . 0x02009890 CGearSettings_Init
 . 0x020098bc CGearSettings_SetOn
 . 0x020098c0 CGearSettings_IsOn
+. 0x020098c4 CGearSettings_SetSkin
+. 0x020098c8 CGearSettings_GetSkin
 . 0x020098cc CGearSettings_SetSkinValid
 . 0x020098d0 CGearSettings_GetSkinValid
 . 0x020098d4 CGearSettings_SetSkinCrc
@@ -197,6 +199,8 @@
 . 0x020098e8 CGearSettings_GetPanel
 . 0x020098f4 CGearSettings_SetColor
 . 0x02009900 CGearSettings_GetColor
+. 0x02009910 CGearSettings_SetWasOn
+. 0x02009914 CGearSettings_GetWasOn
 . 0x02009918 CGearSettings_GetFromSave
 . 0x02009924 CGearSettings_GetFromGameData
 . 0x02009930 DreamWorldSave_GetSize

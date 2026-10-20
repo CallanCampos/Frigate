@@ -361,10 +361,10 @@ static void FieldSubscreen_CGear_Init(FieldSubscreen *subscreen, u32 previousScr
     GFL_OvlLoad(OVERLAY_C_GEAR_SW);
     // The settings keep whether the C-Gear was on when it last showed, so that it plays its startup when it has been
     // turned on since
-    wasOn = func_02009914(settings);
+    wasOn = CGearSettings_GetWasOn(settings);
     isOn = GSYS_IsCGearOn(gsys);
     subscreen->work = CGearSw_Create(settings, subscreen, gsys, isOn == TRUE && wasOn == FALSE);
-    func_02009910(settings, isOn);
+    CGearSettings_SetWasOn(settings, isOn);
     if (GSYS_IsLowBatteryCGearOff(gsys)) {
         GSYS_ClearLowBatteryCGearOff(gsys);
     }
@@ -381,7 +381,7 @@ static void FieldSubscreen_CGear_InitPowerOn(FieldSubscreen *subscreen, u32 prev
     settings = CGearSettings_GetFromSave(save);
     subscreen->work = CGearSw_CreateWithCallback(settings, subscreen, Field_GetGameSystem(subscreen->field),
                                                  subscreen->callback, subscreen->callbackWork, isOn);
-    func_02009910(settings, isOn);
+    CGearSettings_SetWasOn(settings, isOn);
     if (GSYS_IsLowBatteryCGearOff(gsys)) {
         GSYS_ClearLowBatteryCGearOff(gsys);
     }
@@ -406,7 +406,7 @@ static void FieldSubscreen_CGear_Update(FieldSubscreen *subscreen, BOOL active) 
             if (GSYS_IsCGearOn(gsys) != 0) {
                 GSYS_ClearLowBatteryCGearOff(gsys);
             } else if (CGearSw_Reload(subscreen->work)) {
-                func_02009910(settings, FALSE);
+                CGearSettings_SetWasOn(settings, FALSE);
                 GSYS_ClearLowBatteryCGearOff(gsys);
             }
         }

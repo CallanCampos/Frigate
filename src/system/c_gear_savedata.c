@@ -48,11 +48,11 @@ u8 CGearSettings_IsOn(CGearSettings *settings) {
     return settings->on;
 }
 
-void func_020098c4(CGearSettings *settings, u8 value) {
+void CGearSettings_SetSkin(CGearSettings *settings, u8 value) {
     settings->skin = value;
 }
 
-u8 func_020098c8(CGearSettings *settings) {
+u8 CGearSettings_GetSkin(CGearSettings *settings) {
     return settings->skin;
 }
 
@@ -98,11 +98,11 @@ u8 CGearSettings_GetColor(CGearSettings *settings, s32 index) {
     return settings->colors[index];
 }
 
-void func_02009910(CGearSettings *settings, u32 value) {
+void CGearSettings_SetWasOn(CGearSettings *settings, u32 value) {
     settings->wasOn = value;
 }
 
-u8 func_02009914(CGearSettings *settings) {
+u8 CGearSettings_GetWasOn(CGearSettings *settings) {
     return settings->wasOn;
 }
 

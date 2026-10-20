@@ -1256,7 +1256,7 @@ static void CGearSw_UpdateTouch(CGearSw *work) {
         GFL_SndSEPlay(SEQ_SE_MSCL_07);
         work->skin++;
         work->skin %= SKIN_COUNT;
-        func_020098c4(work->settings, work->skin);
+        CGearSettings_SetSkin(work->settings, work->skin);
         CGearSw_LoadSkinChars(work);
         break;
     case TOUCH_COLOR:
@@ -1901,7 +1901,7 @@ static void CGearSw_InitGraphics(CGearSw *work, BOOL startup) {
     int i;
 
     work->gender = getTrainerGender(GetGameDataPlayerInfo(work->gameData)) & 1;
-    work->skin = func_020098c8(work->settings);
+    work->skin = CGearSettings_GetSkin(work->settings);
     for (i = 0; i < PANEL_COUNT + 1; i++) {
         work->panels[i] = CGearSettings_GetPanel(work->settings, (u8)i);
     }
