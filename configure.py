@@ -548,9 +548,12 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             compiled.append(obj)
         objects.append(f["object_to_link"])
 
+    # The LTD autoload's objects are linked as an overlay group, for their veneers, see tools/build/ltd_objects.py
+    link_objects = build_dir / "objects_link.txt"
+    n.build([link_objects], "ltd_objects", [objects_file, lcf_file], implicit=["tools/build/ltd_objects.py"])
     arm9_o = build_dir / "arm9.o"
-    n.build([arm9_o], "mwld", objects, implicit=[link_lcf, objects_file],
-            variables={"objects": objects_file, "lcf": link_lcf})
+    n.build([arm9_o], "mwld", objects, implicit=[link_lcf, link_objects],
+            variables={"objects": link_objects, "lcf": link_lcf})
 
     # The ROM's file system is the extracted one, with the archives built from source in place of the extracted ones.
     # The tree is made first, so that no archive is written through a link into extract/.
@@ -718,6 +721,7 @@ def main():
                "Compiling $in", depfile="$dep", deps="gcc")
     n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
+    n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Scripts go through the C preprocessor, so that they can include the constant headers
     n.rule("as", f"{shlex.quote(clang)} --target=armv5te-none-eabi -x assembler-with-cpp -c $as_includes $defines "
