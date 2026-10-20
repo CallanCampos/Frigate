@@ -1,6 +1,7 @@
 #include "dwc_util_address_edit.h"
 #include "dwc/bm.h"
 #include "dwc/ext.h"
+#include "dwc_util_address_settings.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_cell.h"
 #include "dwc_util_display.h"

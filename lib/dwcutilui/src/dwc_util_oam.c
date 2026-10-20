@@ -17,11 +17,6 @@ typedef struct DWCUtilOamScreen {
 
 static DWCUtilOamScreen *sScreens;
 
-static inline void DWCUtilOam_GetPosition(const GXOamAttr *oam, int *x, int *y) {
-    *x = (oam->attr01 & GX_OAM_ATTR01_X_MASK) >> GX_OAM_ATTR01_X_SHIFT;
-    *y = (u8)oam->attr01;
-}
-
 void func_ov182_021bb480(void) {
     int i;
 

@@ -20,11 +20,16 @@
 
 // Entry points in later, still unrecovered files of the DWC settings utility.
 
-// The copy of a connection of the console's Wi-Fi settings that the screens edit, and which connection it is
+// The copy of a connection of the console's Wi-Fi settings that the screens edit: the connection, its subnet mask as
+// four bytes (the connection keeps the number of its bits), which connection it is, and whether DHCP gives the address,
+// the mask and the gateway, and the DNS servers
 struct DWCUtilSettingsEdit {
     DWCBmConnection connection;
-    u8 unk_ef[5];
+    u8 unk_ef;
+    u8 netmask[4];
     u8 index;
+    u8 autoAddress;
+    u8 autoDns;
 };
 
 DWCUtilSettingsEdit *func_ov182_021b781c(void);
@@ -33,9 +38,13 @@ void func_ov182_021b7d80(const AossResult *result);
 // Takes the SSID and the WEP mode of the access point that the connection test connected to
 void func_ov182_021b7c60(const DWCUtilAcResult *result);
 
-// The rows of buttons of the two layouts
+// The rows of buttons of the two layouts; func_ov182_021b849c starts the task that moves them away,
+// func_ov182_021b854c is whether that task runs and func_ov182_021b87b0 whether they are idle
 void func_ov182_021b8154(int variant);
 void func_ov182_021b84c0(int variant);
+void func_ov182_021b849c(void);
+BOOL func_ov182_021b854c(void);
+BOOL func_ov182_021b87b0(void);
 
 // The utility's sound: its start and its end, around the main loop
 void func_ov182_021b8050(void);
@@ -50,6 +59,14 @@ void func_ov182_021b77dc(void);
 void func_ov182_021b780c(void);
 // Erases the connections of the console's Wi-Fi settings and makes a new Wi-Fi ID
 void func_ov182_021b7ea0(void);
+// The status of a connection of the console's Wi-Fi settings (DWCBmConnection.status), and erases one
+u8 func_ov182_021b7b0c(int index);
+void func_ov182_021b7e78(int index);
+// Saves the connection being edited into its connection of the console's Wi-Fi settings
+void func_ov182_021b7bb0(void);
+// Sets whether DHCP gives the address, the mask and the gateway, and the DNS servers, of the connection being edited
+void func_ov182_021b782c(BOOL autoAddress);
+void func_ov182_021b7840(BOOL autoDns);
 
 // Copies row src of the palette to BG palette row dest of the main screen at the next VBlank
 void func_ov182_021b7014(const void *palette, int src, int dest);
@@ -73,6 +90,10 @@ struct DWCUtilApEntry {
     u8 security;
 };
 
+// The scan for access points: allocates it, starts it (TRUE when it started), and stops it (TRUE once it has stopped)
+void func_ov182_021b74d4(void);
+BOOL func_ov182_021b751c(void);
+BOOL func_ov182_021b75d0(void);
 // Stops the scan for access points and frees it, and the access points it found and their count
 void func_ov182_021b74f4(void);
 int func_ov182_021b7630(DWCUtilApEntry **entries);
@@ -101,6 +122,10 @@ void func_ov182_021b7b20(int index);
 void func_ov182_021b6f38(const void *screen);
 void func_ov182_021b6f78(void);
 void func_ov182_021b6f98(void);
+// Copies rows of a screen of 32 entries a row into that copy, from an offset in the copy on, and loads a palette as the
+// main screen's BG palettes at the next VBlank
+void func_ov182_021b6fac(const u16 *src, int offset, int width, int rows);
+void func_ov182_021b7060(const void *palette);
 
 // The scroll bar of a list: its handle (kind 1 or 2, none for 0) travels range pixels down from x, y. Its event is 1
 // to 3 when the handle is grabbed, dragged and let go, 4 and 6 when an arrow is pressed and 5 and 7 when it is let go
@@ -113,17 +138,8 @@ void func_ov182_021b715c(int pos);
 void func_ov182_021b7164(void);
 void func_ov182_021b7174(void);
 
-// The first screen of the connection settings
-void func_ov182_021b536c(void);
-// The choice of the setup of a connection
-void func_ov182_021b5bb8(void);
-// The message before the connection test
-void func_ov182_021b6588(void);
-// The screen of the button above the list of access points
-void func_ov182_021b5000(void);
-// The settings of a connection, and the row it starts on
-void func_ov182_021b2d48(void);
-void func_ov182_021b43f8(int row);
+// The screen after the first screen of the connection settings' wide button
+void func_ov182_021b688c(void);
 
 // The whole touch screen, a rectangle as in dwc_util_display.c: .rodata between dwc_util_text.c's and
 // dwc_util_task.c's that no file claims yet

@@ -3606,6 +3606,7 @@ overlays/ov268 0x021c27b0 remove_reloc
 overlays/ov271 0x021effcc overlay_id 201
 overlays/ov271 0x021f0084 overlay_id 201
 overlays/ov271 0x021f628e reloc_module overlay(201)
+overlays/ov271 0x021f64c8 reloc_module overlay(201)
 overlays/ov271 0x021f6674 reloc_module overlay(201)
 overlays/ov271 0x021f670e reloc_module overlay(201)
 overlays/ov271 0x021f68ec reloc_module overlay(201)
@@ -4316,6 +4317,8 @@ overlays/ov326 0x021a175e reloc_module overlay(139)
 overlays/ov326 0x021a176e reloc_module overlay(139)
 overlays/ov326 0x021a3178 add_data data_ov326_021a3178
 overlays/ov327 0x021b6964 reloc_module overlay(196)
+overlays/ov327 0x021b6bb0 reloc_module overlay(196)
+overlays/ov327 0x021b6be8 reloc_module overlay(196)
 overlays/ov328 0x0219ec58 add_data sGPowerAppMessages
 overlays/ov328 0x0219ed40 remove_symbol
 overlays/ov328 0x0219ee40 remove_symbol

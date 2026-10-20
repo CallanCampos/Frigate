@@ -294,3 +294,77 @@ lib/dwcutilui/src/dwc_util_error.c:
     .rodata     start:0x021c0110 end:0x021c013c
     .data       start:0x021c1088 end:0x021c10a0
     .bss        start:0x021c4108 end:0x021c410c
+
+lib/dwcutilui/src/dwc_util_address_settings.c:
+    .text       start:0x021b2d48 end:0x021b4404
+    .rodata     start:0x021c013c end:0x021c0240
+    .data       start:0x021c10a0 end:0x021c1120
+    .bss        start:0x021c410c end:0x021c4118
+
+lib/dwcutilui/src/dwc_util_save_settings.c:
+    complete
+    .text       start:0x021b4404 end:0x021b4588
+    .data       start:0x021c1120 end:0x021c1164
+
+lib/dwcutilui/src/dwc_util_test_progress.c:
+    complete
+    .text       start:0x021b4588 end:0x021b4864
+    .data       start:0x021c1164 end:0x021c1178
+    .bss        start:0x021c4118 end:0x021c411c
+
+lib/dwcutilui/src/dwc_util_test_connect.c:
+    complete
+    .text       start:0x021b4864 end:0x021b4b68
+    .data       start:0x021c1178 end:0x021c118c
+    .bss        start:0x021c411c end:0x021c4120
+
+lib/dwcutilui/src/dwc_util_test_done.c:
+    complete
+    .text       start:0x021b4b68 end:0x021b4cc8
+    .data       start:0x021c118c end:0x021c11a0
+    .bss        start:0x021c4120 end:0x021c4124
+
+lib/dwcutilui/src/dwc_util_test_start.c:
+    complete
+    .text       start:0x021b4cc8 end:0x021b5000
+    .data       start:0x021c11a0 end:0x021c11e4
+    .bss        start:0x021c4124 end:0x021c4128
+
+lib/dwcutilui/src/dwc_util_ap_search.c:
+    complete
+    .text       start:0x021b5000 end:0x021b536c
+    .data       start:0x021c11e4 end:0x021c1228
+    .bss        start:0x021c4128 end:0x021c412c
+
+lib/dwcutilui/src/dwc_util_screen_ap.c:
+    complete
+    .text       start:0x021b536c end:0x021b5bb8
+    .rodata     start:0x021c0240 end:0x021c02f4
+    .data       start:0x021c1228 end:0x021c1298
+    .bss        start:0x021c412c end:0x021c4134
+
+lib/dwcutilui/src/dwc_util_screen_way.c:
+    complete
+    .text       start:0x021b5bb8 end:0x021b6104
+    .rodata     start:0x021c02f4 end:0x021c03b8
+    .data       start:0x021c1298 end:0x021c12dc
+    .bss        start:0x021c4134 end:0x021c413c
+
+lib/dwcutilui/src/dwc_util_auto_connect.c:
+    complete
+    .text       start:0x021b6104 end:0x021b63dc
+    .rodata     start:0x021c03b8 end:0x021c03cc
+    .data       start:0x021c12dc end:0x021c1320
+    .bss        start:0x021c413c end:0x021c4140
+
+lib/dwcutilui/src/dwc_util_auto_connect_ok.c:
+    complete
+    .text       start:0x021b63dc end:0x021b6588
+    .data       start:0x021c1320 end:0x021c1334
+    .bss        start:0x021c4140 end:0x021c4144
+
+lib/dwcutilui/src/dwc_util_auto_connect_intro.c:
+    complete
+    .text       start:0x021b6588 end:0x021b6728
+    .rodata     start:0x021c03cc end:0x021c03d8
+    .data       start:0x021c1334 end:0x021c1348

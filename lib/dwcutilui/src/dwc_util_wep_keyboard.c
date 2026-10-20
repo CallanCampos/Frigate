@@ -1,4 +1,6 @@
 #include "dwc_util_wep_keyboard.h"
+#include "dwc_util_address_settings.h"
+#include "dwc_util_auto_connect_intro.h"
 #include "dwc_util_bg_overlay.h"
 #include "dwc_util_cell.h"
 #include "dwc_util_display.h"

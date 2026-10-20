@@ -11,6 +11,7 @@
 #include "dwc_util_option_menu.h"
 #include "dwc_util_rom_resource.h"
 #include "dwc_util_screen.h"
+#include "dwc_util_screen_ap.h"
 #include "dwc_util_shared.h"
 #include "dwc_util_task.h"
 #include "dwc_util_touch.h"
