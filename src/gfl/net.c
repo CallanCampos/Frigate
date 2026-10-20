@@ -204,7 +204,7 @@ BOOL GFL_NetMainWhileWaiting(void) {
     WmIcon_Update();
     NetHandle_Update();
     NetSystem_Update();
-    return func_02040198();
+    return NetSystem_IsDataShareOk();
 }
 
 void GFL_NetUpdateDevice(void) {
@@ -285,7 +285,7 @@ void func_02042a10(int unused) {
 
 void func_02042a1c(int a0) {
     if (GFL_NetIsInitialized()) {
-        func_0203eea4(a0);
+        NetSystem_HoldScan(a0);
     }
 }
 
@@ -506,7 +506,7 @@ u8 func_02042d80(void) {
 }
 
 void func_02042d8c(BOOL a0) {
-    func_02040118(a0);
+    NetSystem_SetMPSendEnabled(a0);
 }
 
 void *GFL_NetGetWork(void) {

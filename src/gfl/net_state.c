@@ -195,14 +195,14 @@ static void NetState_OnParentBeacon(void) {
 }
 
 static void NetState_StartChildToMac(NetState *state) {
-    if (func_0203eec0(FALSE, state->aMacAddress, 0x200, NetState_OnParentBeacon)) {
+    if (NetSystem_StartChild(FALSE, state->aMacAddress, 0x200, NetState_OnParentBeacon)) {
         NetState_SetFuncLine(_pNetState, NetState_ChildConnecting, 10, 351);
     }
 }
 
 static void NetState_StartScanForMac(NetState *state) {
     GFL_NetGetInitData();
-    if (func_0203ede0(1, 0x200)) {
+    if (NetSystem_StartScan(1, 0x200)) {
         NetState_SetFuncLine(_pNetState, NetState_StartChildToMac, 0, 370);
     }
 }
@@ -225,7 +225,7 @@ static void NetState_Scanning(NetState *state) {
 }
 
 static void NetState_BeginScan(NetState *state) {
-    if (func_0203ede0(1, 0x200)) {
+    if (NetSystem_StartScan(1, 0x200)) {
         NetState_SetFuncLine(_pNetState, NetState_Scanning, 0, 420);
     }
 }
@@ -261,7 +261,7 @@ static BOOL func_02041448(void) {
 
 static void NetState_BeginParent(NetState *state) {
     GFL_NetGetInitData();
-    if (func_0203ed68(1, 0x200, 1, func_02041448)) {
+    if (NetSystem_StartParent(1, 0x200, 1, func_02041448)) {
         NetState_SetFuncLine(_pNetState, NetState_Parent, 0, 507);
     }
 }
@@ -287,10 +287,10 @@ static void NetState_ChangeoverStartChild(NetState *state) {
 
     if (sys->pDevTable->isIdle()) {
         if (state->useParentMac && state->mode != NET_STATE_MODE_PARENT) {
-            if (func_0203eec0(TRUE, state->parentMac, 0x200, NetState_OnParentBeacon)) {
+            if (NetSystem_StartChild(TRUE, state->parentMac, 0x200, NetState_OnParentBeacon)) {
                 NetState_SetFuncLine(_pNetState, NetState_ChangeoverChildWait, NetState_GetShortWait(state), 571);
             }
-        } else if (func_0203ede0(1, 0x200)) {
+        } else if (NetSystem_StartScan(1, 0x200)) {
             NetState_SetFuncLine(_pNetState, NetState_ChangeoverChildWait, NetState_GetLongWait(state), 576);
         }
     }
@@ -368,7 +368,7 @@ static BOOL func_02041774(void) {
 static void NetState_ChangeoverStartParent(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->isIdle() && func_0203ed68(0, 0x200, 0, func_02041774)) {
+    if (sys->pDevTable->isIdle() && NetSystem_StartParent(0, 0x200, 0, func_02041774)) {
         state->unk4C = FALSE;
         NetState_SetFuncLine(_pNetState, NetState_ChangeoverParentStarted, 30, 754);
     }
@@ -475,9 +475,9 @@ void NetState_StartChangeover(int a0, void (*callback)(void *work), int a2) {
         NetState_SetFuncLine(_pNetState, NetState_IrcConnect, MATH_Rand32(&_pNetState->rand, 30), 956);
     } else {
         if (_pNetState->useParentMac && _pNetState->mode != NET_STATE_MODE_PARENT) {
-            func_0203eec0(TRUE, _pNetState->parentMac, 0x200, NetState_OnParentBeacon);
+            NetSystem_StartChild(TRUE, _pNetState->parentMac, 0x200, NetState_OnParentBeacon);
         } else {
-            func_0203ede0(1, 0x200);
+            NetSystem_StartScan(1, 0x200);
         }
         _pNetState->connectCallback = callback;
         NetState_SetFuncLine(_pNetState, NetState_ChangeoverChildWait, 30, 968);
@@ -606,7 +606,7 @@ static void NetState_Idle(NetState *state) {
 }
 
 void NetState_StartSearch(void) {
-    func_0203ee50(0x200);
+    NetSystem_StartSearch(0x200);
     NetState_SetFuncLine(_pNetState, NetState_Idle, 0, 1232);
 }
 
@@ -634,7 +634,7 @@ static void func_02041e3c(NetState *state) {
 static void NetState_WifiConnected(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
 
-    func_02040104(1);
+    NetSystem_SetWifiConnected(1);
     sys->pDevTable->update(0);
 }
 
@@ -691,7 +691,7 @@ static void NetState_WifiConnect(NetState *state) {
 }
 
 BOOL NetState_ConnectWifiFriend(int a0) {
-    if (a0 != -1 && !func_0203ecac(a0)) {
+    if (a0 != -1 && !NetSystem_CanConnectFriend(a0)) {
         return FALSE;
     }
     _pNetState->friendIndex = a0;
@@ -756,7 +756,7 @@ static void NetState_WifiDisconnecting(NetState *state) {
     GFLNetSys *sys = GFL_NetGetSys();
     BOOL a0 = FALSE;
 
-    func_02040104(0);
+    NetSystem_SetWifiConnected(0);
     if (!state->unk4B) {
         a0 = TRUE;
     }
@@ -903,7 +903,7 @@ BOOL NetState_SetError(u8 a0) {
     if (_pNetState != NULL) {
         _pNetState->errorFlag = a0;
         NetSystem_SetError();
-        func_02040180();
+        NetSystem_Stop();
         return TRUE;
     }
     return FALSE;
