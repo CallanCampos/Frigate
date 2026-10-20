@@ -650,8 +650,8 @@ const FieldScriptCommand EVCMD_TABLE[] = {
     s021E_FishingChallengeGetRandomPkm,       // 0x21e
     func_ov012_02156104,                      // 0x21f
     func_ov012_02156128,                      // 0x220
-    func_ov036_021b018c,                      // 0x221
-    func_ov036_021b01e0,                      // 0x222
+    s0221_AnvilleTrainGetModelID,             // 0x221
+    s0222_AnvilleTrainGetDailyIndex,          // 0x222
     s0223_PokePartyGetHiddenPowerType,        // 0x223
     s0224_PokePartyGetIV,                     // 0x224
     s0225_ItemGetRandomOwnedTMMove,           // 0x225

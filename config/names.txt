@@ -9562,6 +9562,9 @@ overlays/ov036 0x021aeb64 Regulation_ListCaughtSpecies
 overlays/ov036 0x021aec28 TeamSelect_CheckTeams
 overlays/ov036 0x021aecf8 TeamSelectEvent_Create
 overlays/ov036 0x021aed8c TeamSelectEvent_Callback
+overlays/ov036 0x021b018c s0221_AnvilleTrainGetModelID
+overlays/ov036 0x021b01b8 AnvilleTrain_IsSpecialDate
+overlays/ov036 0x021b01e0 s0222_AnvilleTrainGetDailyIndex
 overlays/ov036 0x021b02c0 FieldRailSystem_Free
 overlays/ov036 0x021b02f8 FieldRailSystem_Reset
 overlays/ov036 0x021b05b8 FieldRailSystem_SetLineEnabled
@@ -10243,8 +10246,9 @@ overlays/ov036 0x021d09d8 sListRects
 overlays/ov036 0x021d09f8 sActorSetups
 overlays/ov036 0x021d0a20 sCameraTargetOffsets
 overlays/ov036 0x021d0f64 ITEM_COLLECTOR_FILES
-overlays/ov036 0x021d0f6c SPECIAL_DAYS
-overlays/ov036 0x021d0f76 DAY_DIGIT_VALUES
+overlays/ov036 0x021d0f6c ANVILLE_SPECIAL_TRAIN_DATES
+overlays/ov036 0x021d0f76 ANVILLE_TRAIN_INDICES_BY_DAY_DIGIT
+overlays/ov036 0x021d0f80 ANVILLE_TRAIN_MODEL_IDS
 overlays/ov036 0x021d0fa4 DEFAULT_RAIL_CAMERA
 overlays/ov036 0x021d0fc8 DEFAULT_RAIL_CURVE
 overlays/ov036 0x021d1078 NO_MAC
