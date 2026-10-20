@@ -75,7 +75,7 @@ struct BtlvMcss {
     u32 unk518Tasks;                          // 0x518  MCSS_SetScaleOffset's vector
     u32 unk51cTasks;                          // 0x51c  MCSS_SetRotation's vector
     u32 scaleTasks;                           // 0x520
-    u32 unk524Tasks;                          // 0x524  func_0201ac40's vector
+    u32 unk524Tasks;                          // 0x524  MCSS_SetShadowScaleOffset's vector
     u32 blinkTasks;                           // 0x528
     u32 alphaTasks;                           // 0x52c
     u32 levelTasks;                           // 0x530  MCSS_SetMosaic's level
@@ -603,9 +603,9 @@ void BtlvMcss_SetAnimPause(BtlvMcss *work, int pos, int mode) {
     if (mode == 1) {
         MCSS_PauseAnimation(work->entries[index].mcss);
     } else if (mode == 2) {
-        func_0201ad04(work->entries[index].mcss);
+        MCSS_FreezeAnimation(work->entries[index].mcss);
     } else if (mode == 3) {
-        func_0201ad4c(work->entries[index].mcss);
+        MCSS_UnfreezeAnimation(work->entries[index].mcss);
     } else {
         MCSS_ResumeAnimation(work->entries[index].mcss);
     }
@@ -794,9 +794,9 @@ void BtlvMcss_MoveVec524(BtlvMcss *work, int pos, int type, VecFx32 *dest, s32 f
     if (index == -1 || work->entries[index].mcss == NULL) {
         return;
     }
-    // BUG: the start is MCSS_GetScaleOffset's vector, where the task steps func_0201ac28's
+    // BUG: the start is MCSS_GetScaleOffset's vector, where the task steps MCSS_GetShadowScaleOffset's
 #ifdef BUGFIX
-    func_0201ac28(work->entries[index].mcss, &start);
+    MCSS_GetShadowScaleOffset(work->entries[index].mcss, &start);
 #else
     MCSS_GetScaleOffset(work->entries[index].mcss, &start);
 #endif
@@ -1298,7 +1298,7 @@ BOOL BtlvMcss_SetAnimation(BtlvMcss *work, int pos, int anim) {
     if (work->entries[index].mcss == NULL) {
         return set;
     }
-    if (anim < func_0201afa8(work->entries[index].mcss)) {
+    if (anim < MCSS_GetSequenceCount(work->entries[index].mcss)) {
         MCSS_SetAnimation(work->entries[index].mcss, anim);
         set = TRUE;
         work->entries[index].animSet = set;
@@ -1630,9 +1630,9 @@ static void BtlvMcss_MoveTask_Vec524(TCB *tcb, void *data) {
         BtlvEffect_EndTask(tcb);
         return;
     }
-    func_0201ac28(work->entries[index].mcss, &value);
+    MCSS_GetShadowScaleOffset(work->entries[index].mcss, &value);
     done = BtlvEffTool_Move(&task->move, &value);
-    func_0201ac40(work->entries[index].mcss, &value);
+    MCSS_SetShadowScaleOffset(work->entries[index].mcss, &value);
     if (done == TRUE) {
         BtlvEffect_EndTask(tcb);
     }
@@ -2070,7 +2070,7 @@ static void BtlvMcss_OnAnimationEnd(u32 index, fx32 frame) {
     if (work->rotating) {
         return;
     }
-    if (func_0201add0(work->entries[index].mcss) == 0xff) {
+    if (MCSS_GetIdleNodeCount(work->entries[index].mcss) == 0xff) {
         work->entries[index].animEnded = TRUE;
         return;
     }
@@ -2106,9 +2106,9 @@ static BOOL BtlvMcss_IdleNodeCallback(u32 param, const NNSG2dMultiCellHierarchyD
     }
     if (param & 0x80000000) {
         found = FALSE;
-        count = func_0201add0(work->entries[index].mcss);
+        count = MCSS_GetIdleNodeCount(work->entries[index].mcss);
         for (i = 0; i < count; i++) {
-            if (nodeIdx == func_0201add8(work->entries[index].mcss, i)) {
+            if (nodeIdx == MCSS_GetIdleNode(work->entries[index].mcss, i)) {
                 found = TRUE;
             }
         }

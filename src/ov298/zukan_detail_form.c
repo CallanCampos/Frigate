@@ -1504,7 +1504,7 @@ static void ZukanDetailForm_RemoveMCSS(MCSSSystem *system, MCSS *mcss) {
 }
 
 static void ZukanDetailForm_SetShadow(MCSS *mcss) {
-    f32 x = -(f32)func_0201adf0(mcss) * 0.25f;
+    f32 x = -(f32)MCSS_GetOffsetX(mcss) * 0.25f;
     VecFx32 offset;
 
     offset.x = FX32_CONST(x);

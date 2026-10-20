@@ -698,13 +698,13 @@ void MCSS_SetShadowScale(MCSS *mcss, VecFx32 *a1) {
     mcss->shadowScale.z = a1->z;
 }
 
-void func_0201ac28(MCSS *mcss, VecFx32 *out) {
+void MCSS_GetShadowScaleOffset(MCSS *mcss, VecFx32 *out) {
     out->x = mcss->shadowScaleOffset.x;
     out->y = mcss->shadowScaleOffset.y;
     out->z = mcss->shadowScaleOffset.z;
 }
 
-void func_0201ac40(MCSS *mcss, VecFx32 *in) {
+void MCSS_SetShadowScaleOffset(MCSS *mcss, VecFx32 *in) {
     mcss->shadowScaleOffset.x = in->x;
     mcss->shadowScaleOffset.y = in->y;
     mcss->shadowScaleOffset.z = in->z;
@@ -744,7 +744,7 @@ void MCSS_PauseAnimation(MCSS *mcss) {
     mcss->pause |= 1;
 }
 
-void func_0201ad04(MCSS *mcss) {
+void MCSS_FreezeAnimation(MCSS *mcss) {
     mcss->pause |= 2;
 }
 
@@ -752,7 +752,7 @@ void MCSS_ResumeAnimation(MCSS *mcss) {
     mcss->pause &= ~1;
 }
 
-void func_0201ad4c(MCSS *mcss) {
+void MCSS_UnfreezeAnimation(MCSS *mcss) {
     mcss->pause &= ~2;
 }
 
@@ -780,27 +780,27 @@ u16 MCSS_GetAnimationCount(MCSS *mcss) {
     return mcss->mcAnimBank->numSequences;
 }
 
-u8 func_0201add0(MCSS *mcss) {
+u8 MCSS_GetIdleNodeCount(MCSS *mcss) {
     return mcss->binTail->idleNodeCount;
 }
 
-u16 func_0201add8(MCSS *mcss, u8 index) {
+u16 MCSS_GetIdleNode(MCSS *mcss, u8 index) {
     return mcss->binTail->idleNodes[index];
 }
 
-u16 func_0201ade0(MCSS *mcss) {
+u16 MCSS_GetWidth(MCSS *mcss) {
     return mcss->bin->width;
 }
 
-u16 func_0201ade8(MCSS *mcss) {
+u16 MCSS_GetHeight(MCSS *mcss) {
     return mcss->bin->height;
 }
 
-s16 func_0201adf0(MCSS *mcss) {
+s16 MCSS_GetOffsetX(MCSS *mcss) {
     return mcss->bin->offsetX;
 }
 
-s16 func_0201adf8(MCSS *mcss) {
+s16 MCSS_GetOffsetY(MCSS *mcss) {
     return mcss->bin->offsetY;
 }
 
@@ -902,7 +902,7 @@ void MCSS_SetAnimSpeed(MCSS *mcss, fx32 speed) {
     mcss->animSpeed = speed;
 }
 
-u16 func_0201afa8(MCSS *mcss) {
+u16 MCSS_GetSequenceCount(MCSS *mcss) {
     return mcss->mcAnimBank->numSequences;
 }
 
