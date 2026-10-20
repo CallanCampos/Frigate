@@ -1183,7 +1183,7 @@ static void IrcCompatMenuHearts_Init(IrcCompatMenuHearts *hearts, IrcCompatMenuG
         if (log == NULL) {
             isSpecial = GFL_RandomLCAlt(2);
         } else {
-            isSpecial = func_0200b014(log, i) == 1 ? TRUE : FALSE;
+            isSpecial = TrainerLogSave_IsEntryMale(log, i) == 1 ? TRUE : FALSE;
         }
         IrcCompatMenuHeart_Init(&hearts->hearts[i], actor, isSpecial, heapId);
     }

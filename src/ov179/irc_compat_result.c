@@ -1114,8 +1114,8 @@ static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk) {
         u16 *name = GetPlayerName(info);
         u8 isMale = getTrainerGender(info) != 0 ? 0 : 1;
 
-        func_0200b184(log, name, wk->param->result, isMale, other->birthMonth, other->birthDay, getIDAsUInt(info),
-                      other->species, other->form, other->sex, other->isEgg);
+        TrainerLogSave_AddTrainer(log, name, wk->param->result, isMale, other->birthMonth, other->birthDay,
+                                  getIDAsUInt(info), other->species, other->form, other->sex, other->isEgg);
     }
     if (wk->param->gsys != NULL) {
         RecordAddOne(GameData_GetRecords(GSYS_GetGameData(wk->param->gsys)), RECORD_COMPAT_CHECKS);

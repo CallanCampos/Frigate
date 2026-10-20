@@ -40,11 +40,11 @@ u16 TrainerLogSave_GetEntryCount(TrainerLogSave *log, u32 index) {
     return log->entries[index].count;
 }
 
-BOOL func_0200b014(TrainerLogSave *log, u32 index) {
+BOOL TrainerLogSave_IsEntryMale(TrainerLogSave *log, u32 index) {
     return log->entries[index].isMale;
 }
 
-void func_0200b024(const TrainerLogSave *log, u32 index, u16 *species, u8 *form, u8 *sex, u8 *isEgg) {
+void TrainerLogSave_GetEntryPokemon(const TrainerLogSave *log, u32 index, u16 *species, u8 *form, u8 *sex, u8 *isEgg) {
     const TrainerLogEntry *entry = &log->entries[index];
 
     *species = entry->species;
@@ -57,7 +57,7 @@ u8 TrainerLogSave_GetLastSlot(TrainerLogSave *log) {
     return log->lastSlot;
 }
 
-u32 func_0200b05c(TrainerLogSave *log, u8 month, u8 day, RTCDate *date) {
+u32 TrainerLogSave_FindFortuneEntry(TrainerLogSave *log, u8 month, u8 day, RTCDate *date) {
     u32 count = TrainerLogSave_CountEntries(log);
     u32 fortune = TrainerLog_GetBirthdayValue(month, day, date);
     u32 result = 0;
@@ -119,8 +119,8 @@ u8 TrainerLog_GetBirthdayValue(u8 month, u8 day, const RTCDate *date) {
     return (FX_SinIdx((birthdayDay - today) % 30 * 0xffff / 30) + FX32_ONE) * 50 >> FX32_SHIFT;
 }
 
-u8 func_0200b184(TrainerLogSave *log, const u16 *name, u8 value, u8 isMale, u8 birthMonth, u8 birthDay, u32 id,
-                 u16 species, u8 form, u8 sex, u8 isEgg) {
+u8 TrainerLogSave_AddTrainer(TrainerLogSave *log, const u16 *name, u8 value, u8 isMale, u8 birthMonth, u8 birthDay,
+                             u32 id, u16 species, u8 form, u8 sex, u8 isEgg) {
     u16 count = 0;
     TrainerLogEntry entry;
     TrainerLogEntry *logged = TrainerLogSave_FindEntry(log, TRAINER_LOG_MAX, id);
@@ -128,7 +128,7 @@ u8 func_0200b184(TrainerLogSave *log, const u16 *name, u8 value, u8 isMale, u8 b
     if (logged != NULL) {
         count = logged->count;
     }
-    func_0200b330(&entry, name, value, count, isMale, birthMonth, birthDay, id, species, form, sex, isEgg);
+    TrainerLogEntry_Init(&entry, name, value, count, isMale, birthMonth, birthDay, id, species, form, sex, isEgg);
     log->lastSlot = TrainerLogSave_InsertEntry(log, TRAINER_LOG_MAX, &entry);
     if (TrainerLogSave_ContainsEntry(log, TRAINER_LOG_MAX, &entry)) {
         TrainerLogSave_IncrementMetCount(log, TRAINER_LOG_MAX, &entry);
@@ -186,8 +186,8 @@ BOOL TrainerLogSave_ContainsEntry(TrainerLogSave *log, s32 count, const TrainerL
     return FALSE;
 }
 
-void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 isMale, u8 birthMonth, u8 birthDay,
-                   u32 id, u16 species, u8 form, u8 sex, u8 isEgg) {
+void TrainerLogEntry_Init(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 isMale, u8 birthMonth,
+                          u8 birthDay, u32 id, u16 species, u8 form, u8 sex, u8 isEgg) {
     MI_CpuFill8(entry, 0, sizeof(TrainerLogEntry));
     wcharsncpy(name, entry->name, 8);
     entry->value = value;

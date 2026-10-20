@@ -50,19 +50,19 @@ u32 TrainerLogSave_CountEntries(TrainerLogSave *log);
 const u16 *TrainerLogSave_GetEntryName(TrainerLogSave *log, u32 index);
 u8 TrainerLogSave_GetEntryValue(TrainerLogSave *log, u32 index);
 u16 TrainerLogSave_GetEntryCount(TrainerLogSave *log, u32 index);
-BOOL func_0200b014(TrainerLogSave *log, u32 index);
-void func_0200b024(const TrainerLogSave *log, u32 index, u16 *species, u8 *form, u8 *sex, u8 *isEgg);
+BOOL TrainerLogSave_IsEntryMale(TrainerLogSave *log, u32 index);
+void TrainerLogSave_GetEntryPokemon(const TrainerLogSave *log, u32 index, u16 *species, u8 *form, u8 *sex, u8 *isEgg);
 u8 TrainerLogSave_GetLastSlot(TrainerLogSave *log);
 // The entry whose value is nearest the fortune of the birthday and date, at random between two as near
-u32 func_0200b05c(TrainerLogSave *log, u8 month, u8 day, RTCDate *date);
+u32 TrainerLogSave_FindFortuneEntry(TrainerLogSave *log, u8 month, u8 day, RTCDate *date);
 // Whether the trainer with the ID was met today, and whether they are in the log
 BOOL TrainerLogSave_WasMetToday(TrainerLogSave *log, u32 id);
 BOOL TrainerLogSave_HasId(TrainerLogSave *log, u32 id);
 // A fortune from 0 to 100, a cosine of how far the date is from the birthday within a month
 u8 TrainerLog_GetBirthdayValue(u8 month, u8 day, const RTCDate *date);
 // Logs a trainer met: in the slot their value earns, counting the meetings of one already logged. Returns the slot
-u8 func_0200b184(TrainerLogSave *log, const u16 *name, u8 value, u8 isMale, u8 birthMonth, u8 birthDay, u32 id,
-                 u16 species, u8 form, u8 sex, u8 isEgg);
+u8 TrainerLogSave_AddTrainer(TrainerLogSave *log, const u16 *name, u8 value, u8 isMale, u8 birthMonth, u8 birthDay,
+                             u32 id, u16 species, u8 form, u8 sex, u8 isEgg);
 // A day has passed
 void TrainerLogSave_ClearToday(TrainerLogSave *log);
 // The size of the block and its init
@@ -71,8 +71,8 @@ void TrainerLogSave_Init(TrainerLogSave *log);
 // Puts the entry in the first slot whose value is not above its own, moving the rest down. Returns the slot
 u8 TrainerLogSave_InsertEntry(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry);
 BOOL TrainerLogSave_ContainsEntry(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry);
-void func_0200b330(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 isMale, u8 birthMonth, u8 birthDay,
-                   u32 id, u16 species, u8 form, u8 sex, u8 isEgg);
+void TrainerLogEntry_Init(TrainerLogEntry *entry, const u16 *name, u8 value, u32 count, u8 isMale, u8 birthMonth,
+                          u8 birthDay, u32 id, u16 species, u8 form, u8 sex, u8 isEgg);
 TrainerLogEntry *TrainerLogSave_FindEntry(TrainerLogSave *log, s32 count, u32 id);
 // Counts one more meeting for every entry with the entry's ID
 void TrainerLogSave_IncrementMetCount(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry);
