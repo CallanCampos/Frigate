@@ -1279,6 +1279,9 @@ overlays/ov033 0x02179584 reloc_module overlay(12)
 overlays/ov033 0x021798f8 reloc_module overlay(256)
 overlays/ov033 0x02179e7c reloc_module overlay(319)
 overlays/ov033 0x0217a18e reloc_module overlay(131)
+overlays/ov033 0x0217c094 section_end src/ov033/bsubway_scr.c:.text
+overlays/ov033 0x0217c5b8 section_end src/ov033/bsubway_scr.c:.rodata
+overlays/ov033 0x0217c5b8 add_data sSuperTopTrainerRange
 overlays/ov035 0x0217c9e8 reloc_module overlay(12)
 overlays/ov035 0x0217ca5a reloc_module overlay(12)
 overlays/ov035 0x0217cb84 reloc_module overlay(279)

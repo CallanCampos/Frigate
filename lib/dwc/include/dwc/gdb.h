@@ -52,6 +52,8 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server);
 int Gdb_Cancel(void);
 // Ends the library, returning 0 or an error code
 int Gdb_Shutdown(void);
+// Releases the HTTPS root certificates installed for the storage and file servers
+void Gdb_ReleaseUrls(void);
 // Runs the library for a frame
 void Gdb_Update(void);
 // The state of the library, or 4 when the Wi-Fi library has an error
