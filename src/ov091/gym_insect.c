@@ -8,6 +8,7 @@
 #include "field/field_g3d_mapper.h"
 #include "field/field_map.h"
 #include "field/field_script.h"
+#include "field/fieldmap_tcb_camera_zoom.h"
 #include "field/gym_gimmick.h"
 #include "gfl/calctool.h"
 #include "gfl/g3d.h"
@@ -327,7 +328,7 @@ static GameEventReturnCode GymInsect_RideEvent(GameEvent *event, u32 *state, voi
         }
         break;
     case 1:
-        func_ov036_021c05d4(wk->field, 20, FX32_CONST(200));
+        FieldCameraZoomTCB_CreateLinear(wk->field, 20, FX32_CONST(200));
         GymInsect_StartRide(wk, ride);
         (*state)++;
         break;

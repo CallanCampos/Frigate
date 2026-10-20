@@ -473,54 +473,54 @@ void FieldG3DMapper_GenLocators2(FieldG3DMapper *mapper, const VecFx32 *playerPo
 // The player's layer of the matrix and the nearer of the layers above and below it
 void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPos, FieldChunkLocator *locators) {
     u32 layer;
-    u32 matrixSize;
+    u32 chunksPerLayer;
     fx32 layerHeight;
     fx32 halfSpan;
     u16 width;
     u32 span;
-    s32 otherLayer;
+    s32 adjacentLayerOffset;
     u32 chunkId;
-    u32 index;
-    s32 i;
-    fx32 y;
-    s32 x;
-    s32 z;
+    u32 locatorIndex;
+    s32 chunkIndex;
+    fx32 layerY;
+    s32 chunkX;
+    s32 chunkZ;
 
     width = mapper->matrixWidth;
-    matrixSize = mapper->matrixWidth * mapper->matrixHeight;
+    chunksPerLayer = mapper->matrixWidth * mapper->matrixHeight;
     span = mapper->chunkSpan;
     halfSpan = FX_Div(span, FX32_CONST(2));
     layerHeight = mapper->unk08;
     layer = FX_Div(playerPos->y, layerHeight) >> FX32_SHIFT;
     if (playerPos->y - layer * layerHeight > layerHeight / 2) {
-        otherLayer = 1;
+        adjacentLayerOffset = 1;
     } else {
-        otherLayer = -1;
+        adjacentLayerOffset = -1;
     }
-    index = 0;
-    for (i = 0; i < matrixSize; i++, index++) {
-        y = FX_Mul(layer << FX32_SHIFT, layerHeight);
-        x = i % mapper->matrixWidth;
-        z = i / mapper->matrixWidth;
-        chunkId = layer * matrixSize + z * width + x;
+    locatorIndex = 0;
+    for (chunkIndex = 0; chunkIndex < chunksPerLayer; chunkIndex++, locatorIndex++) {
+        layerY = FX_Mul(layer << FX32_SHIFT, layerHeight);
+        chunkX = chunkIndex % mapper->matrixWidth;
+        chunkZ = chunkIndex / mapper->matrixWidth;
+        chunkId = layer * chunksPerLayer + chunkZ * width + chunkX;
         if (chunkId >= mapper->chunkIdCount) {
             chunkId = 0xffffffff;
         }
-        FieldChunkLocator_SetChunkID(&locators[index], chunkId);
-        FieldChunkLocator_SetPos(&locators[index], halfSpan + FX_Mul(x << FX32_SHIFT, span), y,
-                                 halfSpan + FX_Mul(z << FX32_SHIFT, span));
+        FieldChunkLocator_SetChunkID(&locators[locatorIndex], chunkId);
+        FieldChunkLocator_SetPos(&locators[locatorIndex], halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), layerY,
+                                 halfSpan + FX_Mul(chunkZ << FX32_SHIFT, span));
     }
-    for (i = 0; i < matrixSize; i++, index++) {
-        y = FX_Mul((layer + otherLayer) << FX32_SHIFT, layerHeight);
-        x = i % mapper->matrixWidth;
-        z = i / mapper->matrixWidth;
-        chunkId = (layer + otherLayer) * matrixSize + z * width + x;
+    for (chunkIndex = 0; chunkIndex < chunksPerLayer; chunkIndex++, locatorIndex++) {
+        layerY = FX_Mul((layer + adjacentLayerOffset) << FX32_SHIFT, layerHeight);
+        chunkX = chunkIndex % mapper->matrixWidth;
+        chunkZ = chunkIndex / mapper->matrixWidth;
+        chunkId = (layer + adjacentLayerOffset) * chunksPerLayer + chunkZ * width + chunkX;
         if (chunkId >= mapper->chunkIdCount) {
             chunkId = 0xffffffff;
         }
-        FieldChunkLocator_SetChunkID(&locators[index], chunkId);
-        FieldChunkLocator_SetPos(&locators[index], halfSpan + FX_Mul(x << FX32_SHIFT, span), y,
-                                 halfSpan + FX_Mul(z << FX32_SHIFT, span));
+        FieldChunkLocator_SetChunkID(&locators[locatorIndex], chunkId);
+        FieldChunkLocator_SetPos(&locators[locatorIndex], halfSpan + FX_Mul(chunkX << FX32_SHIFT, span), layerY,
+                                 halfSpan + FX_Mul(chunkZ << FX32_SHIFT, span));
     }
 }
 

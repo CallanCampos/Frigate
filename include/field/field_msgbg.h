@@ -11,8 +11,9 @@
 
 // The field's message BG (field_msgbg.c, overlay 36): the two BGs the field prints its messages on, and the windows,
 // list menus, message balloons over actors and wait-for-input cursors on them. The talk windows of talkmsgwin.h draw
-// the balloons and the windows framed like them. The named functions are swan's
-// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// the balloons and the windows framed like them. Existing names are from swan
+// (https://github.com/ds-pokemon-hacking/swan, GPL-3.0); the CheckerMsgWin API names
+// are our descriptive guesses.
 
 // A list menu's layout. ListMenuRequest_Set completes it with the number of options, the position and the size, which
 // CalcListMenuWidth and CalcListMenuHeight give in tiles. The fields up to rowHeight are BmpMenuListHeader's
@@ -209,14 +210,17 @@ SignMsgWin *func_ov036_02188f34(FieldMsgBG *sys, u16 style, Font *font);
 void func_ov036_0218903c(SignMsgWin *win);
 BOOL func_ov036_02189110(SignMsgWin *win, StrBuf *text);
 
-// The checker window, with its frame drawn in its own bitmap: create, free, print, whether the player has pressed A or
-// B, and the width and height in tiles a message needs with a margin
-CheckerMsgWin *func_ov036_02189a98(FieldMsgBG *sys, u16 style, u16 x, u16 y, u16 width, u16 height);
-void func_ov036_02189b50(CheckerMsgWin *win);
-void func_ov036_02189bc4(CheckerMsgWin *win, u16 x, u16 y, StrBuf *text);
-BOOL func_ov036_02189c00(CheckerMsgWin *win);
-u32 func_ov036_02189c34(FieldMsgBG *sys, StrBuf *str, u32 margin);
-u32 func_ov036_02189c54(FieldMsgBG *sys, StrBuf *str, u32 margin);
+// The checker window draws its frame in its own bitmap. Position and dimensions are in tiles;
+// style is retained by the interface but does not change the frame.
+CheckerMsgWin *CheckerMsgWin_Create(FieldMsgBG *sys, u16 style, u16 x, u16 y, u16 width, u16 height);
+void CheckerMsgWin_Free(CheckerMsgWin *win);
+// Prints every line immediately at pixel coordinates.
+void CheckerMsgWin_PrintStrBuf(CheckerMsgWin *win, u16 x, u16 y, StrBuf *text);
+// Returns TRUE for newly pressed A/B; otherwise advances the wait-for-input cursor.
+BOOL CheckerMsgWin_Update(CheckerMsgWin *win);
+// Returns the required width or height in tiles; margin is in pixels on each side.
+u32 CheckerMsgWin_CalcWidth(FieldMsgBG *sys, StrBuf *str, u32 margin);
+u32 CheckerMsgWin_CalcHeight(FieldMsgBG *sys, StrBuf *str, u32 margin);
 
 // A wait-for-input cursor: create, free, and draw its next frame in a bitmap over the color
 MsgBGCursor *func_ov036_02189cb0(FieldMsgBG *sys);
