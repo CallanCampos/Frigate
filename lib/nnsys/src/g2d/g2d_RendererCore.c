@@ -66,8 +66,7 @@ static inline u16 GetFlippedOamPosY_(const GXOamAttr *oam, const GXOamShape *sha
     return GetOamPosY_(oam);
 }
 
-// The helpers below follow the shape of the public decompilation github.com/ntrtwl/NitroSystem: written as these
-// inlines, the two drawing functions below come closest to the original
+// OAM position and matrix helpers, following NitroSystem's g2di_OamUtil.h and g2di_Mtx32.h
 
 // An OAM's shape and size bits
 static inline GXOamShape GetOamShape_(const GXOamAttr *oam) {
@@ -115,8 +114,8 @@ static inline void AddRotatedCenterOffset_(const GXOamAttr *oam, const MtxFx22 *
     const int halfW = NNS_G2dGetOamSizeX(&shape) >> 1;
     const int halfH = NNS_G2dGetOamSizeY(&shape) >> 1;
 
-    pos->x += -(halfW << FX32_SHIFT) + (m->_00 * halfW + m->_10 * halfH);
-    pos->y += -(halfH << FX32_SHIFT) + (m->_01 * halfW + m->_11 * halfH);
+    pos->x += -(halfW << FX32_SHIFT) + m->_00 * halfW + m->_10 * halfH;
+    pos->y += -(halfH << FX32_SHIFT) + m->_01 * halfW + m->_11 * halfH;
     if (doubleSize) {
         pos->x -= halfW << FX32_SHIFT;
         pos->y -= halfH << FX32_SHIFT;
@@ -182,8 +181,25 @@ static inline void CallDrawOamCallBack_(NNSG2dRndCoreDrawOamCallBack callback, c
     }
 }
 
+// The four cached OAM orientations, from NitroSystem's private g2di_RendererMtxCache.h
+typedef enum OAM_FLIP { OAM_FLIP_NONE = 0, OAM_FLIP_H = 1, OAM_FLIP_V = 2, OAM_FLIP_HV = 3, OAM_FLIP_MAX = 4 } OAM_FLIP;
+#define TO_OAM_FLIP(bFlipH, bFlipV) (OAM_FLIP)((bFlipV << 1) | (bFlipH))
+
+static inline u16 GetMtxCacheAffineIndex_(const NNSG2dRndCore2DMtxCache *cache, NNSG2dSurfaceType type, OAM_FLIP flip) {
+    return cache->affineIndex[flip][type - NNS_G2D_SURFACETYPE_MAIN2D];
+}
+
+static inline void SetMtxCacheAffineIndex_(NNSG2dRndCore2DMtxCache *cache, NNSG2dSurfaceType type, OAM_FLIP flip,
+                                           u16 index) {
+    cache->affineIndex[flip][type - NNS_G2D_SURFACETYPE_MAIN2D] = index;
+}
+
+static inline BOOL IsMtxCacheRegisteredAsAffineParams_(const u16 index) {
+    return (index != NNS_G2D_OAM_AFFINE_IDX_NOT_CACHED) ? TRUE : FALSE;
+}
+
 // m flipped as flip says, NNS_G2D_RENDERERFLIP_H and NNS_G2D_RENDERERFLIP_V
-static inline void GetFlippedMtx22_(const MtxFx22 *m, MtxFx22 *out, u32 flip) {
+static inline void GetFlippedMtx22_(const MtxFx22 *m, MtxFx22 *out, OAM_FLIP flip) {
     *out = *m;
     if (flip & NNS_G2D_RENDERERFLIP_H) {
         out->_00 = -out->_00;
@@ -196,10 +212,10 @@ static inline void GetFlippedMtx22_(const MtxFx22 *m, MtxFx22 *out, u32 flip) {
 }
 
 // The affine parameter of the matrix cache with the flip on the surface, registered the first time
-static inline u16 GetAffineIndex_(NNSG2dRndCore2DMtxCache *cache, const NNSG2dRenderSurface *surface, u32 flip) {
-    u16 affineIdx = cache->affineIndex[flip][surface->type - NNS_G2D_SURFACETYPE_MAIN2D];
+static inline u16 GetAffineIndex_(NNSG2dRndCore2DMtxCache *cache, const NNSG2dRenderSurface *surface, OAM_FLIP flip) {
+    u16 affineIdx = GetMtxCacheAffineIndex_(cache, surface->type, flip);
 
-    if (affineIdx == NNS_G2D_OAM_AFFINE_IDX_NOT_CACHED) {
+    if (!IsMtxCacheRegisteredAsAffineParams_(affineIdx)) {
         if (flip == 0) {
             affineIdx = (*pCurrentInstance_->pFuncOamAffineRegister)(&cache->m22);
         } else {
@@ -208,7 +224,7 @@ static inline u16 GetAffineIndex_(NNSG2dRndCore2DMtxCache *cache, const NNSG2dRe
             GetFlippedMtx22_(&cache->m22, &flipped, flip);
             affineIdx = (*pCurrentInstance_->pFuncOamAffineRegister)(&flipped);
         }
-        cache->affineIndex[flip][surface->type - NNS_G2D_SURFACETYPE_MAIN2D] = affineIdx;
+        SetMtxCacheAffineIndex_(cache, surface->type, flip, affineIdx);
     }
     return affineIdx;
 }
@@ -276,7 +292,7 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
 
             if (affined) {
                 affineIdx = GetAffineIndex_((NNSG2dRndCore2DMtxCache *)pCurrentInstance_->pCurrentMxtCacheFor2D,
-                                            surface, (IsOamFlippedV_(oam) << 1) | IsOamFlippedH_(oam));
+                                            surface, TO_OAM_FLIP(IsOamFlippedH_(oam), IsOamFlippedV_(oam)));
                 m22._00 = mtx->_00;
                 m22._01 = mtx->_01;
                 m22._10 = mtx->_10;

@@ -11,6 +11,12 @@ source looks like, and the permuter only points at them.
 For direct work on an overlay function, complete the overlay issue claim in `decomp-file` step 0 before editing the
 source or starting a `function-matcher` agent. A matcher working under the caller's claim does not claim again.
 
+When maintainers announce an SDK type migration and ask contributors to use its contracts, continue writing and
+probing against those types in a topic branch. Keep a temporary shared-header base separate from the authored
+changes so it can be replaced by the maintainer's implementation. An unpublished dependency does not block coding;
+integration still requires both ROMs and the normal publication checks. Do not duplicate the maintainer's reserved
+migration work or add per-file type overrides to hide the dependency.
+
 ## 1. Triage: what kind of difference
 
 ```sh
