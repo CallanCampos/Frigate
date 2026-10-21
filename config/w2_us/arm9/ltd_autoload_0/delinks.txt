@@ -124,6 +124,7 @@ lib/twl/src/os/os_arena_twl.c:
     .ltdmain    start:0x027692ec end:0x02769318
 
 lib/twl/src/os/os_ownerInfoEx_twl.c:
+    complete
     .ltdmain    start:0x02769318 end:0x0276934c
 
 lib/twl/src/os/os_application_jump_twl.c:

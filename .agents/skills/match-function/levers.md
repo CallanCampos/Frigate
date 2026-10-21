@@ -672,6 +672,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `u16` narrowed twice in a row (`lsl; lsr` in place, then again into another register): an identity in the
   source, such as the DSP pipes' `count = count & ~(DSP_MEMORY_UNIT - 1);` (1 on the ARM9); `&=` folds it first.
   (matching.md: "narrowed to `u16` twice in a row")
+- A fixed address's bit flag read as `ldrb [r0, #4]` from the block's base where ours folds the offset into the
+  literal: read it through a pointer local of the block's struct. (matching.md: "read through a pointer local")
 
 ## Branches and block layout
 

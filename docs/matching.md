@@ -1843,6 +1843,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   DSP's unit, `count = count & ~(DSP_MEMORY_UNIT - 1);`, where `DSP_MEMORY_UNIT` is `3 - sizeof(u16)`, 1 on the ARM9
   (the shape of cybervisi0n/libntr's reconstruction). `DSP_ReadPipe` and `DSP_WritePipe` (`dsp_pipe.c`) match so;
   `count &= ...` folds before the narrowing and loses the second one.
+- A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
+  offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `TWLHwNormalInfo *info =
+  TWL_HW_NORMAL_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
+  `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
+  the offset.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
   DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
