@@ -50,7 +50,7 @@ every section.
   `gfd`, ...) are Thumb built with CodeWarrior 2.0. A file built with other flags than the rest of its library is
   listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
   (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`), and one built with another compiler
-  under `file_compilers` (TwlSDK's `syscall_twl_ltd.c` takes `2.0/sp2p2`). Library code uses the SDK's own names
+  under `file_compilers` (TwlSDK's `syscall_twl_ltd.c` takes `2.0/sp2`). Library code uses the SDK's own names
   (see [Names](#names)). The C library's headers are MSL's, in `include/` (`string.h`, `stdio.h`, `math.h` and the
   others, and `NMWException.h` for the runtime), and `lib/msl/src/` keeps MSL's private ones. A library whose ROM calls
   the string functions that MWCC builds in place from `<string.h>` declares them in its own header instead (`dwc/ext.h`,
