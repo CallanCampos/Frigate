@@ -30,7 +30,7 @@ static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnm
                                 const NNSG3dResJntAnm *jntAnm);
 static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
 static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
-static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, u32 rInfo);
+static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo);
 
 // For a rotation stored as its pivot (the one element that is 1 or -1, the others in its row and column being zero)
 // and two numbers, the pivot's index and where the numbers go in the matrix. sbc.c has the same table
@@ -911,17 +911,17 @@ blend:
 // to negate) or of five (the first two rows' elements but one, 13 bits each with the rest of the bits of the sixth
 // in the low three of them). Returns whether the third row still has to be made from the first two, which a rotation
 // of five values leaves to
-static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, u32 rInfo) {
+static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo) {
     fx32 *elem = (fx32 *)rot;
 
-    if (rInfo & NNS_G3D_JNTANM_RINFO_IS_ROT3) {
+    if (rInfo & NNS_G3D_JNTANM_RIDX_PIVOT) {
         const s16 *p;
         fx32 b;
         fx32 a;
         u32 pivot;
 
         elem[0] = elem[1] = elem[2] = elem[3] = elem[4] = elem[5] = elem[6] = elem[7] = elem[8] = 0;
-        p = (const s16 *)rot3Table + 3 * (rInfo & NNS_G3D_JNTANM_RINFO_IDX_MASK);
+        p = (const s16 *)rot3Table + 3 * (rInfo & NNS_G3D_JNTANM_RIDX_IDXDATA_MASK);
         a = p[1];
         b = p[2];
         pivot = p[0] & 0xf;
@@ -938,7 +938,7 @@ static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Tabl
         elem[NNS_COMPACT_ROT_LUT_CA[pivot][3]] = a;
         return FALSE;
     } else {
-        const s16 *p = (const s16 *)rot5Table + 5 * (rInfo & NNS_G3D_JNTANM_RINFO_IDX_MASK);
+        const s16 *p = (const s16 *)rot5Table + 5 * (rInfo & NNS_G3D_JNTANM_RIDX_IDXDATA_MASK);
         s16 bits;
 
         bits = p[4] & 7;

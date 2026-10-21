@@ -72,7 +72,7 @@ struct ScReport {
     int groupOffset;
     u16 groupCount;
     int unk_0c;
-    u32 keyNum;
+    unsigned int keyNum;
     int keys[0x40];
     int unk_114;
     int unk_118;

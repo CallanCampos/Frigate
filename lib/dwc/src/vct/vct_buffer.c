@@ -156,7 +156,7 @@ static inline void SearchSegment(int value, const int *table, int size, int *seg
 
 // Codes samples as 8-bit mu-law
 void VCT_EncodeMulaw(u8 *dst, s16 *src, u32 count) {
-    u32 i;
+    unsigned int i;
 
     for (i = 0; i < count; i++) {
         int segment;

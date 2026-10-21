@@ -803,7 +803,7 @@ static void ProcessCommand(StrmCommand *command) {
     u32 samples;
     u32 dataSize;
     // The read's result's type, which it is compared with: as a u32 it is a converted copy in a late slot
-    s32 readSize;
+    int readSize;
     int ch;
 
     if (player->flags.dataEnd && player->endWait > 0) {
@@ -887,7 +887,7 @@ static void ProcessCommand(StrmCommand *command) {
             dest = readDest = (u8 *)command->buffer[ch] + bufOffset;
 
             if (ch < player->header.head.numChannels) {
-                s32 result;
+                int result;
 
                 if (player->header.head.format == STRM_FORMAT_ADPCM) {
                     OS_LockMutex(&sDecodeMutex);

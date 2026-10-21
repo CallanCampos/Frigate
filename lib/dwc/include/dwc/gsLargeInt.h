@@ -10,7 +10,7 @@
 
 // A number of up to 64 words, the lowest first, and how many of them it uses (GameSpy's gsLargeInt_t)
 typedef struct BigNum {
-    u32 length;
+    unsigned int length;
     u32 data[0x40];
 } BigNum;
 

@@ -159,7 +159,7 @@ static u8 decWeatherTurns(BtlField *field) {
 }
 
 // Function name from swan.
-BOOL FieldStatusaddEffectCore(BtlField *field, u32 effect, BattleCondition value, BOOL addEvent) {
+BOOL FieldStatusaddEffectCore(BtlField *field, unsigned int effect, BattleCondition value, BOOL addEvent) {
     u32 i;
     u8 monId;
 

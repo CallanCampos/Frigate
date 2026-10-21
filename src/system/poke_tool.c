@@ -254,15 +254,15 @@ static BOOL PML_PkmDecryptCheck(BoxPkm *pkm);
 static void PokeParty_PkmEncrypt(PartyPkm *pkm);
 static void PML_PkmEncryptForce(BoxPkm *pkm);
 static u32 PokeParty_GetParamCore(PartyPkm *pkm, PkmField field, void *buffer);
-static u32 PML_PkmGetParamCore(BoxPkm *pkm, u32 field, void *buffer);
+static u32 PML_PkmGetParamCore(BoxPkm *pkm, PkmField field, void *buffer);
 static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, u32 value);
-static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value);
+static void PML_PkmSetParamCore(BoxPkm *pkm, PkmField field, u32 value);
 static void writePkmBattleData(PartyPkm *pkm, int param, int value);
 static void PML_PkmAddParam(BoxPkm *pkm, int param, int value);
 static void addClampedU8(u8 *field, int value, int max);
 static u16 PML_CryptoNextKey(u32 *key);
 static BOOL PML_PkmIsNicknamed(BoxPkm *pkm);
-static u16 adjustStatForNature(u32 nature, u16 value, u32 stat);
+static u16 adjustStatForNature(u32 nature, u16 value, unsigned int stat);
 static void setNameToNick(BoxPkm *pkm);
 static void PML_GrowTblRead(u32 growthRate, u32 *dest);
 static u32 PML_GrowTblGetLvExp(u32 growthRate, u32 level);
@@ -1517,7 +1517,7 @@ static u32 PokeParty_GetParamCore(PartyPkm *pkm, PkmField field, void *buffer) {
 }
 
 // Reads a field of a decrypted Pokémon
-static u32 PML_PkmGetParamCore(BoxPkm *pkm, u32 field, void *buffer) {
+static u32 PML_PkmGetParamCore(BoxPkm *pkm, PkmField field, void *buffer) {
     u32 result = 0;
     u64 bit = 1;
     PkmBlockA *blockA = PML_PkmGetParamBlockCore(pkm, pkm->pid, 0);
@@ -1940,7 +1940,7 @@ static void PokeParty_SetParamCore(PartyPkm *pkm, PkmField field, u32 value) {
 }
 
 // Writes a field of a decrypted Pokémon. An effort value is cut down to what the total and the stat allow
-static void PML_PkmSetParamCore(BoxPkm *pkm, u32 field, u32 value) {
+static void PML_PkmSetParamCore(BoxPkm *pkm, PkmField field, u32 value) {
     u64 bit;
     PkmBlockA *blockA = PML_PkmGetParamBlockCore(pkm, pkm->pid, 0);
     PkmBlockB *blockB = PML_PkmGetParamBlockCore(pkm, pkm->pid, 1);
@@ -2485,7 +2485,7 @@ static BOOL PML_PkmIsNicknamed(BoxPkm *pkm) {
 
 // A stat, in the order attack, defense, special attack, special defense and speed from 1, with the nature's 10% more
 // or less
-static u16 adjustStatForNature(u32 nature, u16 value, u32 stat) {
+static u16 adjustStatForNature(u32 nature, u16 value, unsigned int stat) {
     if (stat >= 6) {
         return value;
     }
@@ -2502,7 +2502,7 @@ static u16 adjustStatForNature(u32 nature, u16 value, u32 stat) {
     return value;
 }
 
-s8 statAffectedByNature(u8 nature, u32 stat) {
+s8 statAffectedByNature(u8 nature, unsigned int stat) {
     return natureStat[nature][stat - 1];
 }
 

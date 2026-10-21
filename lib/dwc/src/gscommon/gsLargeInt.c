@@ -27,7 +27,8 @@ static BOOL gsiLargeIntMult(const u32 *a, u32 aLength, const u32 *b, u32 bLength
                             u32 maxLength);
 static BOOL gsLargeIntDiv(const BigNum *a, const BigNum *b, BigNum *quotient, BigNum *remainder);
 static BOOL gsiLargeIntDiv(const u32 *a, u32 aLength, const BigNum *b, BigNum *quotient, BigNum *remainder);
-static BOOL gsiLargeIntSubDivide(u32 *a, u32 aLength, const u32 *b, u32 bLength, u32 shift, u32 *result);
+static BOOL gsiLargeIntSubDivide(u32 *a, unsigned int aLength, const u32 *b, unsigned int bLength, u32 shift,
+                                 u32 *result);
 static BOOL gsLargeIntSquareMod(const BigNum *value, const BigNum *modulus, BigNum *result);
 static BOOL gsiLargeIntMultM(const BigNum *a, const BigNum *b, const BigNum *modulus, u32 inverse, BigNum *result);
 static BOOL gsiLargeIntInverseMod(const BigNum *modulus, u32 *result);
@@ -336,7 +337,8 @@ static BOOL gsiLargeIntDiv(const u32 *a, u32 aLength, const BigNum *b, BigNum *q
 
 // Estimates the next word of a quotient: the top words of the dividend over the top word of the divisor, lowered until
 // the divisor times it is not more than the dividend, which it then takes away from
-static BOOL gsiLargeIntSubDivide(u32 *a, u32 aLength, const u32 *b, u32 bLength, u32 shift, u32 *result) {
+static BOOL gsiLargeIntSubDivide(u32 *a, unsigned int aLength, const u32 *b, unsigned int bLength, u32 shift,
+                                 u32 *result) {
     BigNum product;
     u64 estimate;
 

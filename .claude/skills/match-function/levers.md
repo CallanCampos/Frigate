@@ -106,9 +106,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Registers of a scheduled function swapped although every order of the computation was tried: write the `volatile`
   stores first, and read fields at each use. (matching.md: "registers still follow the source order")
 - A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
-  declare it `unsigned long`, the SDK's `u32`. (matching.md: "`WDS_OnScan`")
+  declare it `u32`, the SDK's `unsigned long`, not `unsigned int`. (matching.md: "`WDS_OnScan`")
 - An array entry's address recomputed after a call, where the original keeps it from before the call in a saved
-  register: declare the index `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
+  register: declare the index `u32`, the SDK's `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
+- A constant added or subtracted before an index where ours folds it into the base, or the reverse: the index, count
+  or field's type, `int`/`unsigned int` against `u32`/`s32`. (matching.md: "Game Freak's code mixes the SDK's types")
+- A caller's scheduling or stack slots differ only around a call: the callee's parameter type, `int` against `long`.
+  (matching.md: "A narrow argument passed to a parameter")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
   "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has

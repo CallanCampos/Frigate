@@ -373,7 +373,7 @@ static void BtlvEffvm_SideResetTask(TCB *tcb, void *data);
 static void BtlvEffvm_ParticleUploadTask(TCB *tcb, void *data);
 static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data);
 static void BtlvEffvm_PalAnimTaskRemove(TCB *tcb);
-static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, int count);
+static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, s32 count);
 static BOOL BtlvEffvm_IsGaugeKeptEffect(u32 move);
 
 // The camera's positions and targets (.data), the particles' camera vectors, the effects that keep the gauges, the
@@ -4448,7 +4448,7 @@ static void BtlvEffvm_PalAnimTaskRemove(TCB *tcb) {
     GFL_HeapFree(work);
 }
 
-static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, int count) {
+static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, s32 count) {
     BtlvMcssPos i;
     fx32 scale;
     VecFx32 dest;

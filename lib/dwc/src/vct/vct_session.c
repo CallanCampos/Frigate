@@ -235,7 +235,7 @@ int VCT_RemoveSession(u8 aid) {
 }
 
 BOOL VCT_InitSessions(VCTConfig *config) {
-    u32 i;
+    unsigned int i;
 
     if (config->sessions == NULL || config->sessionCount == 0 || config->sessionCount > 8) {
         return FALSE;

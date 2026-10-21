@@ -397,7 +397,7 @@ static void ConfigPanelOptions_Init(ConfigPanelOptions *options, Config *config)
 static void ConfigPanelOptions_Exit(ConfigPanelOptions *options);
 static void ConfigPanelOptions_Apply(const ConfigPanelOptions *options);
 static void ConfigPanelOptions_SetItem(ConfigPanelOptions *options, u32 item);
-static void ConfigPanelOptions_Step(ConfigPanelOptions *options, u32 option, int dir);
+static void ConfigPanelOptions_Step(ConfigPanelOptions *options, unsigned int option, int dir);
 static BOOL ConfigPanelOptions_IsSet(const ConfigPanelOptions *options, u32 item);
 static s32 ConfigPanelOptions_GetTextWait(const ConfigPanelOptions *options);
 static u32 ConfigPanelOptions_PopChanged(ConfigPanelOptions *options);
@@ -1698,7 +1698,7 @@ static void ConfigPanelOptions_SetItem(ConfigPanelOptions *options, u32 item) {
 }
 
 // Moves an option to the value before or after its own
-static void ConfigPanelOptions_Step(ConfigPanelOptions *options, u32 option, int dir) {
+static void ConfigPanelOptions_Step(ConfigPanelOptions *options, unsigned int option, int dir) {
     int i;
     int item = -1;
     s8 pos;

@@ -2365,18 +2365,23 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   register. Where the original loads the pointer after the call, the call's result was in a local first: the Pokédex
   search's `ZukanSearchEngine_Step` has `u8 color = PML_PersonalGetParam(...);` and `u8 shape = ...GetShape(...);`
   before their comparisons (8 bytes larger without them).
-- `u32` is `unsigned int` in our `types.h` and `unsigned long` in the SDK, and MWCC treats the two differently in an
-  index: for `&sActorData[15 + i]` with an `unsigned int i` it adds first and multiplies (`adds r1, #0xf; muls`), and
-  with an `unsigned long i` it keeps `i * 0x18` and adds the constant's offset, and folds the constant of
-  `actors[ret + 11]` into the load's offset. The PC box's `CreateFixedActors` and `BoxSearch_SeqMarkingList` match with
-  the counter and the result declared `unsigned long`. Rows that say "the original folds the constant into the
-  offset", or that match only with `(&a[i])[11]`, are candidates. `size_t` is `unsigned long` as well, and an SDK
-  prototype that takes one needs it: `STD_TVSNPrintf`'s `str.start[len - 1]` is `adds r0, p, len; subs r0, #1; strb
-  [r0]` with a `size_t len` and `subs; strb [p, r0]` with a `u32`.
-  The `int` types stay the default all the same: with `s32` and `u32` as `long` and `fx32` as `long` throughout, three
-  rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `ShopUI_PrintItemBuyMessage`) and 92
-  matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
-  the type of the code.
+- `u32` and `s32` are the SDK's `unsigned long` and `long` (`include/types.h`), and MWCC treats them differently from
+  `unsigned int` and `int` in an index: with a `long` index it keeps `i * size` and folds the constant of `a[i + k]` or
+  `a[i - k]` into the base address or the load's offset, and with an `int` one it adds or subtracts first
+  (`&sActorData[15 + i]`: `adds r1, #0xf; muls`). Game Freak's code mixes the SDK's types with plain C ones, so an
+  index, count or field that compiles the add-first way was an `int` or `unsigned int` in the original: switching the
+  project to the SDK's types (2026-10-21) broke 89 functions, and each matched again with one local, parameter,
+  struct field or prototype declared `int` or `unsigned int`. A row that says the original adds or subtracts before
+  indexing is a candidate for a plain C type, and one that says it folds the constant, for `u32`/`s32`. An enum is no
+  substitute for `unsigned int`: under `-enum int` an enum with no negative enumerators is a signed `int`
+  (`adjustStatForNature`'s `stat >= 6` compares unsigned only with `unsigned int stat`). `size_t` is `unsigned long`
+  as well, and an SDK prototype that takes one needs it: `STD_TVSNPrintf`'s `str.start[len - 1]` is `adds r0, p, len;
+  subs r0, #1; strb [r0]` with a `size_t len` and `subs; strb [p, r0]` with an `unsigned int`.
+- A narrow argument passed to a parameter that is a `long` gets a conversion that changes the caller's scheduling or
+  stack slots: when a caller differs only around a call, check the callee's parameter type. Five did so after the
+  switch to the SDK's types, each matching with an `int` or `unsigned int` parameter: `InfinityDungeon_GetTrainerSlot`'s
+  `room`, `MusPokeDraw_GetEquipPos`'s `pos`, `BtlvMcss_PlayCry`'s `speed`, `PutCmdArgs`'s `format` and
+  `StartMenu_SetItemPalette`'s `item`.
 - A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
   arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
   reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.
@@ -2801,13 +2806,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `if (WH_End(NULL)) { return; }` keeps a bare `cmp r0, #0` before the `pop` that a `break` drops, and initializing a
   `.bss` static (`static NetWhpipeWork *sWork = NULL;`) changed the order of two equal-size local initializers in
   `.rodata` while the static stays in `.bss`.
-- Switching `u32`/`s32` to the SDK's `unsigned long`/`long` for the whole project was tried with a full rebuild: 12
-  nonmatching functions then match and 75 matching ones break (27 restored by an `int` local, 30 only by an `int`
-  parameter, 18 not at all), so the typedefs stay `unsigned int`/`int` and a function that wants the SDK's type gets
-  it on one local, parameter or struct field (`RivalDataSave.metTrainerCount`: `arr[s->count - 1]` compiles to
-  `adds; subs #4; str` only with an `unsigned long` count). When a row says a constant is folded into an index or an
-  offset the wrong way, or two index registers are swapped, try each 32-bit index as `unsigned long` first, and as
-  `long` where the SDK types it `s32`. With `int first`, `fmission_app_draw.c`'s `FMissionAppDraw_SetTime` computes
+- `u32`/`s32` are the SDK's `unsigned long`/`long` since 2026-10-21, the maintainer's rule: a match under types the
+  original didn't have isn't faithful (an earlier full-rebuild trial had kept `int`, since 75 functions broke). Code
+  that wants the `long` shape now has it from the SDK's types (`RivalDataSave.metTrainerCount`: `arr[s->count - 1]`
+  compiles to `adds; subs #4; str` only with an `unsigned long` count). When a row says a constant is folded into an
+  index or an offset the wrong way, or two index registers are swapped, try each 32-bit index as `u32`, `s32`, `int`
+  and `unsigned int`. With `int first`, `fmission_app_draw.c`'s `FMissionAppDraw_SetTime` computes
   `(first + 2) * 4` for `work->upperActors[first + 2]` and shares `first * 4` with either the digit loops' hoisted
   address or that later use, never both, so `first` stays on the stack; with `long first` MWCC folds the 2 into the
   base (`(work + 0x38)[first * 4]`), shares one spilled `first * 4` among all the uses and drops `first`. It matches

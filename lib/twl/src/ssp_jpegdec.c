@@ -789,9 +789,9 @@ static int func_ov257_021abd3c(u8 *data, s32 *pos) {
 
 // Decodes a Huffman code with table tbl: through the lookahead tables for a code of up to 8 bits, otherwise bit by bit
 static int func_ov257_021abd84(u8 *data, s32 *pos, int tbl) {
-    s32 offset = sDerivedTblOffsets[tbl];
+    int offset = sDerivedTblOffsets[tbl];
     s32 idx;
-    s32 code;
+    int code;
     int nbits;
     int l;
 

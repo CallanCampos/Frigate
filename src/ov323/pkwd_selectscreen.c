@@ -219,7 +219,7 @@ typedef struct {
 typedef BOOL (*PkwdSelectScreenStateFunc)(PkwdSelectScreenWork *wk);
 
 static BOOL PkwdSelectScreen_Init(GameProc *proc, u32 *state, void *param, void *work);
-static s32 PkwdSelectScreen_GetScreen(PkwdSelectScreenWork *wk, s32 cursor);
+static int PkwdSelectScreen_GetScreen(PkwdSelectScreenWork *wk, s32 cursor);
 static void PkwdSelectScreen_CreateBlinks(PkwdSelectScreenWork *wk);
 static void PkwdSelectScreen_FreeBlinks(PkwdSelectScreenWork *wk);
 static BOOL PkwdSelectScreen_Exit(GameProc *proc, u32 *state, void *param, void *work);
@@ -260,7 +260,7 @@ static void PkwdSelectScreen_PrintMovie(PkwdSelectScreenWork *wk, s32 screen);
 static void PkwdSelectScreen_SetBlink(PkwdSelectScreenWork *wk, s32 cursor);
 static void PkwdSelectScreen_UpdateCursor(PkwdSelectScreenWork *wk);
 static void PkwdSelectScreen_PrintMessage(PkwdSelectScreenWork *wk, u32 messageId);
-static void PkwdSelectScreen_PrintDetails(PkwdSelectScreenWork *wk, s32 screen);
+static void PkwdSelectScreen_PrintDetails(PkwdSelectScreenWork *wk, int screen);
 static BOOL PkwdSelectScreen_RunState(PkwdSelectScreenWork *wk);
 static BOOL PkwdSelectScreen_FadeIn(PkwdSelectScreenWork *wk);
 static BOOL PkwdSelectScreen_WaitFadeIn(PkwdSelectScreenWork *wk);
@@ -475,7 +475,7 @@ static BOOL PkwdSelectScreen_Init(GameProc *proc, u32 *state, void *param, void 
 }
 
 // The screen of the theater at a row of the page
-static s32 PkwdSelectScreen_GetScreen(PkwdSelectScreenWork *wk, s32 cursor) {
+static int PkwdSelectScreen_GetScreen(PkwdSelectScreenWork *wk, s32 cursor) {
     return cursor + wk->page * PAGE_SIZE;
 }
 
@@ -823,7 +823,7 @@ static void PkwdSelectScreen_ShowWindow(PkwdSelectScreenWork *wk, u32 window) {
 
 // Reads the movie of each screen from the save, and sorts the screens with a movie first
 static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScreenParam *param) {
-    s32 i;
+    int i;
     s32 j;
     s32 loadedCount = 0;
     s32 emptyIdx = SCREEN_COUNT - 1;
@@ -1061,7 +1061,7 @@ static void PkwdSelectScreen_PrintMessage(PkwdSelectScreenWork *wk, u32 messageI
 }
 
 // Opens the details of a screen's movie: its cast, its box office gross and its summary
-static void PkwdSelectScreen_PrintDetails(PkwdSelectScreenWork *wk, s32 screen) {
+static void PkwdSelectScreen_PrintDetails(PkwdSelectScreenWork *wk, int screen) {
     const PkwdSelectScreenWindowSetup *setup = &sPkwdSelectScreenWindows[WINDOW_DETAILS];
     BmpWin *window =
         BmpWin_CreateDynamic(setup->bg, setup->x, setup->y, setup->width, setup->height, setup->palette, TRUE);

@@ -306,7 +306,7 @@ static BOOL WbtList_UpdateMessage(WbtList *work);
 static u32 WbtList_GetMessage(WbtList *work);
 static void WbtList_ClearMessage(WbtList *work);
 static s32 WbtList_GetPosition(WbtList *work, u32 index);
-static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side);
+static void WbtList_ShowLine(WbtList *work, int line, s32 drawn, s32 side);
 static BOOL WbtList_IsLineAnimating(WbtList *work, s32 line);
 static void WbtList_ShowLineJoint(WbtList *work);
 static void WbtList_ResetBracket(WbtList *work);
@@ -1282,7 +1282,7 @@ static s32 WbtList_GetPosition(WbtList *work, u32 index) {
 }
 
 // Shows one of the bracket's lines from the winner's end, drawing itself or drawn
-static void WbtList_ShowLine(WbtList *work, s32 line, s32 drawn, s32 side) {
+static void WbtList_ShowLine(WbtList *work, int line, s32 drawn, s32 side) {
     s32 index = line * 2 * LINE_VALUE_COUNT;
     s16 position;
     s16 flags;
@@ -1427,7 +1427,7 @@ static void WbtList_InitEntrants(WbtList *work) {
 // slide out; the first round's four matches and the player's next match at 3; and the second round's two matches and
 // the final at 8
 static void WbtList_InitMatches(WbtList *work) {
-    s32 i;
+    int i;
 
     for (i = 0; i < MATCH_COUNT; i++) {
         work->matches[i].loser = 0;

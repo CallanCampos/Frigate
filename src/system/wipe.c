@@ -87,7 +87,7 @@ static const WipeFunc WIPE_FUNCTIONS[] = {
 
 static WipeSys sWipe;
 
-void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, int division, int sync, u32 heapId) {
+void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, s32 division, s32 sync, u32 heapId) {
     WipeSys *sys;
 
     sync /= GFL_FadeGetUpdateFreq();

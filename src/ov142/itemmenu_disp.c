@@ -994,7 +994,7 @@ void ItemMenuDisp_ClearMsgWindow(ItemMenuWork *work) {
 // Opens the item menu with the messages of its entries
 void ItemMenuDisp_OpenItemMenu(ItemMenuWork *work, u32 *msgIds, s32 count) {
     AppTaskMenuInit init;
-    s32 i;
+    int i;
 
     init.heapId = work->heapId;
     init.itemCount = count;
@@ -1021,7 +1021,7 @@ void ItemMenuDisp_OpenItemMenu(ItemMenuWork *work, u32 *msgIds, s32 count) {
 // Opens the sort menu with the messages of its entries
 void ItemMenuDisp_OpenSortMenu(ItemMenuWork *work, u32 *msgIds, s32 count) {
     AppTaskMenuInit init;
-    s32 i;
+    int i;
 
     init.heapId = work->heapId;
     init.itemCount = count;

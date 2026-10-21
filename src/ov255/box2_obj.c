@@ -829,9 +829,9 @@ void Box2Obj_PickUpRangeIcons(Box2SysWork *syswk, u32 pos, int width, int height
     int i;
     int j;
     Box2AppWork *app;
-    u32 y;
+    unsigned int y;
     u32 x;
-    u32 rowWidth;
+    unsigned int rowWidth;
     s16 px;
     s16 py;
     u8 tmp;
@@ -858,7 +858,7 @@ void Box2Obj_PutDownRangeIcons(Box2AppWork *app, u32 pos, int width, int height)
     s16 px;
     s16 py;
     u32 x;
-    u32 y;
+    unsigned int y;
     int i;
     int j;
     u8 tmp;
@@ -1200,7 +1200,7 @@ static void CreateFixedActors(Box2SysWork *syswk) {
     Box2Obj_SetToolButtons(syswk, 9, TRUE);
 }
 
-void Box2Obj_SetToolButtons(Box2SysWork *syswk, u32 set, BOOL visible) {
+void Box2Obj_SetToolButtons(Box2SysWork *syswk, unsigned int set, BOOL visible) {
     int i;
 
     if (syswk->param->mode != 2 && syswk->param->mode != 4 && syswk->param->mode != 3) {

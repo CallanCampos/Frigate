@@ -156,7 +156,7 @@ static void BoxSearch_MainMenuCursorOn(void *work, int pos, int prevPos);
 static void BoxSearch_MainMenuCursorOff(void *work, int pos, int prevPos);
 static void BoxSearch_MainMenuCursorMove(void *work, int pos, int prevPos);
 static void BoxSearch_MainMenuCursorTouch(void *work, int pos, int prevPos);
-static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, u32 type);
+static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, unsigned int type);
 static void BoxSearch_ShowSwitch(BoxSearchWork *wk);
 static void BoxSearch_LoadStrings(BoxSearchWork *wk);
 static void BoxSearch_FreeStrings(BoxSearchWork *wk);
@@ -1822,7 +1822,7 @@ static void BoxSearch_MainMenuCursorMove(void *work, int pos, int prevPos) {
 static void BoxSearch_MainMenuCursorTouch(void *work, int pos, int prevPos) {
 }
 
-static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, u32 type) {
+static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, unsigned int type) {
     ClActor_SetSequence(wk->actors[9], data_ov255_021d8f00[type - 7][0]);
     ClActor_SetSequence(wk->actors[10], data_ov255_021d8f00[type - 7][1]);
 }

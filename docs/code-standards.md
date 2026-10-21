@@ -220,3 +220,18 @@ The skills in `.claude/skills/` have Codex copies in `.agents/skills/`; a change
 same commit.
 
 **Checked:** in CI, the two trees must be identical.
+
+## 14. The SDK's types, as the SDK has them
+
+`u32` and `s32` are NitroSDK's `unsigned long` and `long`, and its fixed-point constants and conversions are the SDK's
+(`FX32_ONE` is `((fx32)0x00001000L)`, `FX32_CONST` is `FX_F32_TO_FX32`), as ntrtwl's NitroSDK and pret's pokediamond
+have them. Game Freak's code mixes them with plain C types, so a declaration takes the type the original evidently
+had: `u32`/`s32` where it compiles as the SDK's, `int`/`unsigned int` where it compiles as those.
+
+**Don't:** change a typedef or an SDK constant because more functions match with it, or cast to emulate another type.
+A function that matches only under a type the original didn't have isn't faithful.
+
+**Do:** give the declaration that decides it (a local, a parameter, a struct field, a prototype) its original type.
+An enum isn't a stand-in for `unsigned int`: under `-enum int` it is a signed `int`.
+
+**Checked:** by review. `docs/matching.md` ("Game Freak's code mixes the SDK's types") has the lever.

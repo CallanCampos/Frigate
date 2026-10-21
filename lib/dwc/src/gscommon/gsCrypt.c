@@ -5,7 +5,7 @@
 // Wii build has the file (gsCrypt.s) and the later SDK the function
 
 int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const u8 *hash, u32 hashSize, const u8 *signature,
-                               u32 signatureSize) {
+                               unsigned int signatureSize) {
     BigNum value;
     // The signature as bytes, once it is decrypted: 00 01, FF up to a 00, the DER prefix of the hash, the hash
     u8 *bytes = (u8 *)value.data;

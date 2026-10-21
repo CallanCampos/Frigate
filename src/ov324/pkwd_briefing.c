@@ -350,7 +350,7 @@ static void PkwdBriefingText_CreateCreditsWindows(PkwdBriefingText *text, HeapID
 static void PkwdBriefingText_FreeCreditsWindows(PkwdBriefingText *text);
 static void PkwdBriefingSet_Init(PkwdBriefingSet *set, HeapID heapId, s32 movie);
 static void PkwdBriefingSet_StepCamera(PkwdBriefingSet *set, HeapID heapId);
-static void PkwdBriefingSet_Draw(PkwdBriefingSet *set, HeapID heapId, s32 movie);
+static void PkwdBriefingSet_Draw(PkwdBriefingSet *set, HeapID heapId, int movie);
 static void PkwdBriefingSet_Free(PkwdBriefingSet *set);
 static void PkwdBriefingClAct_Init(PkwdBriefingClAct *clact, HeapID heapId);
 static void PkwdBriefingClAct_Update(PkwdBriefingClAct *clact, HeapID heapId);
@@ -1541,7 +1541,7 @@ static void PkwdBriefingText_Print(PkwdBriefingText *text, s32 window, StrBuf *s
 static StrBuf *PkwdBriefingText_GetCredit(PkwdBriefingText *text, u32 line) {
     u32 source = sPkwdBriefingCreditSources[line];
     StrBuf *strbuf;
-    s32 slot;
+    int slot;
 
     switch (source) {
     case SOURCE_PLAYER_ROLE:
@@ -1603,7 +1603,7 @@ static void PkwdBriefingText_PrintCredit(PkwdBriefingText *text, s32 window, u32
 // Makes a window for each line of the credits that has text and prints it: the first 62 tiles on BG 1, the rest on
 // BG 2
 static void PkwdBriefingText_CreateCreditsWindows(PkwdBriefingText *text, HeapID heapId, u32 layout) {
-    s32 count = 0;
+    int count = 0;
     s32 y = 5;
     s32 i;
     const PkwdBriefingCreditsLine *lines = sPkwdBriefingCreditsBoth;
@@ -1671,7 +1671,7 @@ static void PkwdBriefingSet_StepCamera(PkwdBriefingSet *set, HeapID heapId) {
     GFL_G3DCurveFrameStep(set->curve, FX32_ONE);
 }
 
-static void PkwdBriefingSet_Draw(PkwdBriefingSet *set, HeapID heapId, s32 movie) {
+static void PkwdBriefingSet_Draw(PkwdBriefingSet *set, HeapID heapId, int movie) {
     s32 first = GFL_G3DMgrGetSceneFirstActorIdx(set->manager, set->scene);
     s32 i;
 

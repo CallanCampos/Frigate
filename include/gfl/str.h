@@ -27,7 +27,7 @@ void GFL_StrBufInsertTerminator(StrBuf *strbuf, u32 length);
 // Sets a buffer to a terminated string, or as much of it as fits
 void GFL_StrBufLoadString(StrBuf *strbuf, const u16 *src);
 // Sets a string buffer to a string of up to length characters
-void GFL_StrBufLoadFixedString(StrBuf *strbuf, const u16 *str, u32 length);
+void GFL_StrBufLoadFixedString(StrBuf *strbuf, const u16 *str, unsigned int length);
 // Sets a buffer to length characters, the terminator included
 void GFL_StrBufCopyString(StrBuf *strbuf, const u16 *src, u32 length);
 // Copies the string out, at most size characters

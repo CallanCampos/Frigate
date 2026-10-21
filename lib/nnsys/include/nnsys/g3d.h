@@ -543,10 +543,14 @@ typedef struct {
     u32 offset;
 } NNSG3dJntAnmTInfo;
 
-// A rotation index is that of a rotation of three values (ROT3, a pivot and two numbers) or of five, in the table
-// that ofsRot3 or ofsRot5 gives
-#define NNS_G3D_JNTANM_RINFO_IS_ROT3 0x00008000
-#define NNS_G3D_JNTANM_RINFO_IDX_MASK 0x00007fff
+// A rotation index is that of a rotation of three values (a pivot and two numbers) or of five, in the table that
+// ofsRot3 or ofsRot5 gives. The enum and its names are NitroSystem's, as Kingdom Hearts 358/2 Days' decompilation has
+// them
+typedef enum {
+    NNS_G3D_JNTANM_RIDX_PIVOT = 0x8000,
+    NNS_G3D_JNTANM_RIDX_IDXDATA_MASK = 0x7fff,
+    NNS_G3D_JNTANM_RIDX_IDXDATA_SHIFT = 0
+} NNSG3dJntAnmRIdx;
 
 // The second category of an animation resource's header, which tells the kind of animation within what it animates
 #define NNS_G3D_ANM_CATEGORY1_MA 'MA'

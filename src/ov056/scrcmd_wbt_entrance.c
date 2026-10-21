@@ -113,7 +113,7 @@ BOOL func_ov056_021e77b0(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     WbtSystem *sys = WbtCmd_GetSystem(env);
     u32 value = 48;
-    u32 i;
+    unsigned int i;
 
     if (WbtSystem_GetTournament(sys) == 3) {
         value = 60;

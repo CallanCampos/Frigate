@@ -69,7 +69,7 @@ typedef struct {
 } NetCommonDownloadNdState;
 
 static const void *NetCommonDownload_GetArgs(NetCommonDownload *download);
-static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, u32 command);
+static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, unsigned int command);
 static BOOL NetCommonDownload_Idle(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_DownloadFileList(NetCommonDownload *download, u32 *state);
 static BOOL NetCommonDownload_DownloadFile(NetCommonDownload *download, u32 *state);
@@ -569,7 +569,7 @@ static const void *NetCommonDownload_GetArgs(NetCommonDownload *download) {
     return &download->args;
 }
 
-static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, u32 command) {
+static BOOL NetCommonDownload_CanRequest(NetCommonDownload *download, unsigned int command) {
     u32 kind = NetCommonDownload_GetKind(download);
     BOOL allowed = FALSE;
 

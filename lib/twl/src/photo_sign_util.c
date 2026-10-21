@@ -43,7 +43,7 @@ static void PhotoSign_SendWord(u32 fifoTag, u32 data) {
 
 // Sends data 3 bytes to a word, the first in the high byte
 static void PhotoSign_SendData(u32 fifoTag, const u8 *data, u32 size) {
-    u32 i;
+    unsigned int i;
 
     for (i = 0; size - i >= 3; i += 3) {
         PhotoSign_SendWord(fifoTag, (data[i] << 16) | (data[i + 1] << 8) | data[i + 2]);

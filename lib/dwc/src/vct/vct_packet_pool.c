@@ -16,7 +16,7 @@ struct VCTPacketPool {
 static VCTPacketPool sPacketPool;
 
 BOOL VCT_InitPacketPool(void *buffer, u32 size) {
-    u32 i;
+    unsigned int i;
     u32 count = size / sizeof(VCTPacket);
 
     sPacketPool.base = buffer;

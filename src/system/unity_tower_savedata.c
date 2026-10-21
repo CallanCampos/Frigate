@@ -32,7 +32,7 @@ void UnityTower_SetOwnRegion(UnityTowerSurveySave *save, PlayerInfo *info, int c
 }
 
 u32 UnityTower_GetRegionState(UnityTowerSurveySave *save, int country, int region) {
-    s32 r = region;
+    int r = region;
     if (country == COUNTRY_NONE) {
         return UNITY_TOWER_REGION_NONE;
     }
