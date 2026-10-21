@@ -3,6 +3,7 @@
 // units and an odd-length terminator expose a mistaken 32-bit libc scan or copy.
 #include "nitrowifi/soc.h"
 #include <assert.h>
+#include <string.h>
 #include <wchar.h>
 
 // DWC utility's opaque SOC options include a host pointer in slot 5; its static relocation must retain every bit.

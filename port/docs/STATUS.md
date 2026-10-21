@@ -45,8 +45,8 @@ level that doesn't exist yet says "not yet"; no field is left out.
   The observed field-entry stop is `OS_Terminate` in `FieldmapProc_Init`, rather than a missing-field-C trap.
 - **64-bit warnings:** the normalized all-TU native syntax probe passes all 1,538 baseline and 1,655 current units.
   The four pointer/int cast families fall from 492 to 469 instances: game 245 to 234, libraries 247 to 235.
-  Separate optional `-Wshorten-64-to-32` diagnostics rise from 277 to 384; they are outside that four-family metric.
-  Evidence: `/tmp/frigate-native-warning-full/{summary,results}.json`; the preceding entry explains the baseline
+  Separate optional `-Wshorten-64-to-32` diagnostics rise from 277 to 388 after the native string declarations; they are outside that four-family metric.
+  Evidence: `/tmp/frigate-winfix-warning-full/{summary,results}.json`; the preceding entry explains the baseline
   and normalization.
 - **Work done:** renewed the contribution and portability work's proof against the latest upstream. Targeted MWCC
   token streams are identical for 20/24 file/version pairs (`/tmp/frigate-latest-neutral.log`). The four exceptions
@@ -56,7 +56,11 @@ level that doesn't exist yet says "not yet"; no field is left out.
   The portability rows in [game-changes.md](game-changes.md) identify their introduction commit `90ad973b12`.
   [The review](REVIEW-2026-10-21.md) now describes this sync and its validation limits. The publication check also
   replaced two stale function names in port-authored particle-work comments with their current names; executable C
-  is unchanged.
+  is unchanged. Windows CI also exposed a libc declaration collision for `strnicmp`: MSL comparison extensions
+  now use private host names after including the host string header, preserving their signed bounds. GameStats, ND and SSL
+  use the native string declarations on hosts while MWCC retains its original explicit declarations
+  ([game changes](game-changes.md)); all 16 including file/version pairs preprocess identically to upstream
+  (`/tmp/frigate-winfix-all-neutral.log`).
 - **Next:** size the external field heap for host allocations, then repeat extended entry, CONTINUE, real menus
   and differential checks before claiming a playable field; follow up numeric-width and deferred hardware paths.
 - **Blockers:** field C is present, but the fixed 64 KiB external field heap cannot hold weather and place-name
