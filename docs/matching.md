@@ -1079,6 +1079,11 @@ Same code, other `sp` offsets or frame size.
   function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
   use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
   variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
+  The merge also needs each call where the original has it: the DWC utility's `DWCUtilMenu_HandleTouchHold` and
+  `DWCUtilKeyboard_HandleTouchHold` move the held key into `r0` on each path to one shared call only with the held
+  key's `SetPressedKey(i); goto clear;` inside the button loop, where the key loop's `goto held` joins it, and the
+  release's own `SetPressedKey(-1)` after the loops; one call fed by `i`, or by a `key` set on each path, keeps the key
+  in the loop counter's register and copies it at the call.
 - A spilled value that sits below temporaries assigned after it has the narrow type of the field it is read from:
   Pokéstar Studios' `EventPokewood_CreateCastParty` matched once `s32 count` became `s16 count`, the type of
   `PokewoodCastFile.count[]`. MWCC still spills it as a word, but gives it the lowest slot. Try the field's own type
@@ -2681,6 +2686,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u32 corner = place * 4 + i; s16 index = sBScenarioCursorPositions[corner];` MWCC hoists only `place * 4` and loads
   the table's address on every pass, as `BScenarioGraphic_SetCursor` does in the ROM. With a `[5][4]` table or `int`
   operands the row's address is hoisted.
+  An unsigned factor does the same for a pointer: under MWCC 2.0, `out + i * sizeof(u64)` in `dwcutil_ac.c`'s AES key
+  wrap keeps `i` in a register and computes the address on each pass, as the ROM does, where `out + i * 8` steps an
+  offset of its own and spills `i`.
 - A loop's two increments are emitted in the order written: `PkwdCount_CreateActors` has `entries++, i++`, and
   `i++, entries++` was 2 bytes longer. There `int i;` declared first fixed the stack slots, and `count = group->count;`
   assigned last of the group's five fields fixed the register of the first load. In `PkwdCount_LoadGraphics` and
@@ -3378,6 +3386,18 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
   `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
   so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
+- MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
+  declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
+  file's initialized statics had them above the first function, and data that sits between two functions' literals
+  was defined between them. `dwcutil_ac.c`'s ten 1024-byte AES tables come out in the ROM's heapsort order (Td2 to Td4,
+  Te0 to Te4, Td0, Td1, after `rcon`) only defined among the setup's state statics, in the order that the forced
+  assignment ("invert the model", below) gives, and its host name and MD5 padding sit after
+  `UtilAc_FindSetupAp`'s literal and before `UtilAc_MakeIds'`, so they are defined between those functions, the name
+  forward-declared (`static char sAcHostName[12];`) for the SOC configuration that points to it.
+- Under MWCC 2.0 without `-ipa file`, a tentative static of struct type joins the shared `.bss` section after the
+  initialized statics, while a tentative byte array gets a section of its own, in the reverse of the definitions:
+  `dwcutil_ac.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the
+  file's other buffers, where the ROM has it among them by size, until it was a `u8[0x10]`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
@@ -3591,6 +3611,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
   the table. Its place among the packed tables is not definition order: defined between the room tables it came out
   one early, defined first it is where the ROM has it.
+  The DWC keypad's (`dwc_util_menu.c`) row text size, `{ 0x0c, 0x04 }` among its size tables, is such a table, read
+  by `DWCUtilText_CreateObj`'s arguments; as an unreferenced global it had a section of its own after them.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
 - Japanese text in a string is written as is: sources are UTF-8, and the build hands them to MWCC in Shift JIS, the
@@ -3797,6 +3819,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loops, and under no dsi compiler, while all but four of `lib/twl`'s other files break under it. Probe 2.0/sp2p2 before
   grinding such a function. A file gets a compiler of its own in its `library.toml`'s `file_compilers`, as
   `syscall_twl_ltd.c` does, and keeps the library's flags.
+
+- MWCC 2.0/sp2p2 places a Thumb literal pool island 0x1c bytes earlier than the compiler of the DWC utility
+  (`lib/dwcutil`): `dwcutil_ac.c`'s `UtilAc_MD5Transform` and `UtilAc_Run` have the original's code and pool words with
+  the island one step early, through every form of the source tried, so the utility was likely built with another 2.0.
+  A same-size difference that is only a pool placed early, in a 2.0 file, is that and not the C.
 
 - MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
   `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands

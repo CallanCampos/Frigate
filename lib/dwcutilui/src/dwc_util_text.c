@@ -26,12 +26,12 @@ typedef struct DWCUtilTextBgSize {
     u16 height;
 } DWCUtilTextBgSize;
 
-static const u16 sBgCharNames[2] = { 0, 0x180 };
-static const DWCUtilTextBgSize sBgSizes[2] = { { 32, 24 }, { 32, 12 } };
-
-// The fonts of the utility's language 6, and of the others
-static const char *sKcFontPaths[2] = { "msg/kc_m.NFTR.l", "msg/lc_s.NFTR.l" };
+// The fonts of the utility's languages but 6, and of language 6
 static const char *sFontPaths[2] = { "msg/lc_m.NFTR.l", "msg/lc_s.NFTR.l" };
+static const char *sKcFontPaths[2] = { "msg/kc_m.NFTR.l", "msg/lc_s.NFTR.l" };
+
+static const DWCUtilTextBgSize sBgSizes[2] = { { 32, 24 }, { 32, 12 } };
+static const u16 sBgCharNames[2] = { 0, 0x180 };
 
 static DWCUtilTextWork *sTextWork;
 
