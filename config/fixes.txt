@@ -9,6 +9,7 @@
 . 0x02005094 add_data CARDi_BackupSignature
 . 0x020050ac add_data CPSi_Signature
 . 0x020050c4 add_data SOCLi_Signature
+. 0x020050f0 add_data SSLi_Signature
 . 0x02005108 add_data VCTi_Signature
 . 0x0200587c reloc_addend 0x4
 . 0x02005880 reloc_addend 0xc
@@ -871,6 +872,7 @@ overlays/ov011 0x020050c4 remove_orphan_reloc .
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
+overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
 overlays/ov011 0x0215cd8c add_label ReshZekSave_UnresolvedInitTarget
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)

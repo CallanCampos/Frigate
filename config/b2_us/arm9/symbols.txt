@@ -9303,3 +9303,4 @@ atexit_funcs kind:bss addr:0x0214f1f8
 __global_destructor_chain kind:bss addr:0x0214f4f8
 LtdModuleParams kind:data(any) addr:0x02004f7c
 TaggedParams kind:data(any) addr:0x02005040
+SSLi_Signature kind:data(any) addr:0x020050f0
