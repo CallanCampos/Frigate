@@ -486,6 +486,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A zero text-origin component missing from measured bounds: `CalcMsgWindowDimensions` shares a paired origin's
+  field-by-field inline initializer with printer placement. (matching.md: "bounds include both components")
 - Cut-in text allocation heap IDs: pass `HEAPID_TAIL` at each call; saved `u32` and `HeapID` locals change
   narrowing and sharing. (matching.md: "`fld3d_ci.c`'s `EventFieldEffectCutinSub_DrawStrToTexture`")
 

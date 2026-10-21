@@ -1724,6 +1724,11 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- `field_msgbg.c`'s `CalcMsgWindowDimensions` keeps `adds r0, r0, #0` after the font-height call when its pixel
+  bounds include both components of a local text origin, assigned field by field by an inline initializer. The
+  numbered-window printer uses the same initializer's `{2, 0}` origin, so placement and measured bounds share one
+  setting. A direct zero constant folds away; an aggregate initializer emits additional read-only data. The
+  field assignments emit no data and leave the other 176 functions unchanged in both versions.
 - A constant that a local holds and changes in steps stays live in a register, and MWCC builds other constants that
   don't fit an immediate from it: DS Protect's card read (`dsprot_detect.c`'s `DSProt_ReadCardRaw`) builds its header
   address as `header = 5; header += twl & 1; header <<= 18; header -= 13; header <<= 5;`, and then makes the mask
