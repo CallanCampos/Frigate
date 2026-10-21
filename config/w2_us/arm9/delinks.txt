@@ -2572,3 +2572,8 @@ lib/nitrowifi/src/ssl/ssl_version.c:
 lib/dwc/src/vct/vct_version.c:
     complete
     .text       start:0x02005108 end:0x02005124
+
+lib/msl/src/exit.c:
+    complete
+    .text       start:0x020828d8 end:0x020828f4
+    .bss        start:0x0214ee08 end:0x0214ee0c
