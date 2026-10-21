@@ -380,6 +380,7 @@ lib/dwc/src/transport/dwc_transport.c:
     .bss        start:0x0218e918 end:0x0218e924
 
 lib/dwc/src/auth/dwc_nasfunc.c:
+    complete
     .text       start:0x021694d4 end:0x0216a408
     .data       start:0x02185ae8 end:0x02185d24
     .bss        start:0x0218e924 end:0x021905f8
@@ -400,47 +401,61 @@ lib/dwc/src/auth/dwc_profanity.c:
     .bss        start:0x02190690 end:0x02190694
 
 lib/dwc/src/auth/dwc_svcloc.c:
+    complete
     .text       start:0x0216c154 end:0x0216c520
     .data       start:0x02185fd4 end:0x0218604c
     .bss        start:0x02190694 end:0x02190698
 
 lib/dwc/src/auth/dwc_rootcert_baltimore_cybertrust.c:
+    complete
     .data       start:0x0218604c end:0x02186198
 
 lib/dwc/src/auth/dwc_rootcert_globalsign.c:
+    complete
     .data       start:0x02186198 end:0x021862e4
 
 lib/dwc/src/auth/dwc_rootcert_gte_cybertrust_global.c:
+    complete
     .data       start:0x021862e4 end:0x021863cc
 
 lib/dwc/src/auth/dwc_rootcert_gte_cybertrust.c:
+    complete
     .data       start:0x021863cc end:0x0218648c
 
 lib/dwc/src/auth/dwc_rootcert_globalsign_r2.c:
+    complete
     .data       start:0x0218648c end:0x021865d4
 
 lib/dwc/src/auth/dwc_rootcert_nintendo.c:
+    complete
     .data       start:0x021865d4 end:0x021866bc
 
 lib/dwc/src/auth/dwc_rootcert_nintendo_class2.c:
+    complete
     .data       start:0x021866bc end:0x021867ac
 
 lib/dwc/src/auth/dwc_rootcert_thawte_premium_server.c:
+    complete
     .data       start:0x021867ac end:0x021868cc
 
 lib/dwc/src/auth/dwc_rootcert_thawte_server.c:
+    complete
     .data       start:0x021868cc end:0x021869e4
 
 lib/dwc/src/auth/dwc_rootcert_verisign_class3_g2.c:
+    complete
     .data       start:0x021869e4 end:0x02186b10
 
 lib/dwc/src/auth/dwc_rootcert_verisign_class3_g3.c:
+    complete
     .data       start:0x02186b10 end:0x02186cc4
 
 lib/dwc/src/auth/dwc_rootcert_verisign_class3.c:
+    complete
     .data       start:0x02186cc4 end:0x02186da0
 
 lib/dwc/src/auth/dwc_rootcert_rsa_secure_server.c:
+    complete
     .data       start:0x02186da0 end:0x02186e7c
 
 lib/dwc/src/match/dwc_match.c:
