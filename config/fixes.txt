@@ -3141,6 +3141,7 @@ overlays/ov209 0x021c30ac remove_symbol
 overlays/ov209 0x021c315d remove_symbol
 overlays/ov209 0x021c3240 section_end src/ov209/script_command.c:.data
 overlays/ov210 0x021ef1c4 add_data data_ov210_021ef1c4
+overlays/ov210 0x021ef1e0 section_end src/ov210/mus_item_data.c:.data
 overlays/ov214 0x021d3490 overlay_id 189
 overlays/ov214 0x021d3494 overlay_id 139
 overlays/ov214 0x021d35c0 reloc_addend 4
