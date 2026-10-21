@@ -935,6 +935,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
 - On NitroSystem's `2.0/sp2p2`, initialized globals are ordered by size, smallest first, and objects of one size in the
   reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
+- Stores at offsets from a static's own address (`ldr r1, =obj; str r3, [r1]`) where ours goes through the section's
+  base: the function doesn't know the object, so `-ipa function` with the object defined after it (G3D's `sbc.c`).
+  (matching.md: "is one that the function doesn't know")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
   statics, which join at the end in reverse order; a global initialized to 0 joins where it is defined. Each kind
   (rodata, data, bss) gets its own shared section. Unreferenced statics are dropped, but a literal of a dropped table

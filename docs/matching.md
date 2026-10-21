@@ -2349,6 +2349,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `ShopUI_PrintItemBuyMessage`) and 92
   matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
   the type of the code.
+- A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
+  arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
+  reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.
+  As an `unsigned int` the index is a temporary, slotted below the named `isCached`; as `unsigned long` it is a named
+  local in its declared slot above, and the function matches. Declaration order and scope, `BOOL`, `u8` and `int`
+  types, and an inline for the bit test moved nothing. The same function also needs the joints' matrices as a field of
+  one object with the materials and the scales (`g_NNSG3DRenderCache`, grouped as the public decompilation of
+  NitroSystem groups them): as an array of their own MWCC folds the normal matrix's address into the clip matrix's
+  (`clip + 0x40`), 4 bytes short, where the original adds the index's offset to a second literal. And its weighted sums
+  add each product as a 64-bit value, `sum.invM.m[0][0] += (weight * clip->m[0][0]) >> FX32_SHIFT`: through an inline
+  that casts the product to `fx32` first, one load is scheduled after a store where the original has it before.
 - `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
   problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
   constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two
@@ -3337,8 +3348,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without `-ipa file` therefore ask for the flag before any respelling. Under `-ipa function` a file's initialized
   statics come first in its `.bss`, by size, and the tentative ones follow in the reverse of their declarations (every
   dsi compiler and 2.0/sp2p2), so two literals for a static that the ROM places after the file's others, read at offset
-  0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
-  file split at `0x0206f0f0`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
+  0, mean that it opens another file's `.bss`: `CARDi_NotifyEvent` matches, and the CARD range links, only with
+  `card_common.c` split at `0x0206f0f0`, the hooks' head `= { NULL }` opening `card_task.c`'s `.bss`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
   one defined with a zero initializer (next bullet), which is known and also stays first in the `.bss`: TwlSDK's
   `nwm_setup.c` matches `func_02702468` with `u8 NWMi_SetUpDone = FALSE;`.
 - A struct of statics whose functions need two addressings is several files. `nwm.c`'s system pointer, exit callback
@@ -3356,10 +3367,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
   match (33 bytes to 0x2c off otherwise).
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
-  down to a multiple of 0x80, with the rest in the load's offset: in `card_common.c` a static at 0x584 is read as
-  `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read with no
-  offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584 into the
-  file's one `.bss`, is another sign that it opens a section of another file.
+  down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
+  read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read
+  with no offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584
+  into the file's one `.bss`, is another sign that it opens a section of another file.
 - Under `-ipa file`, objects defined between `#pragma section NAME begin` and `#pragma section NAME end` get a section
   each and are reached through literals of their own, as under `-ipa function`, while the block's functions still reach
   the file's default `.bss` from its pooled base. `#pragma define_section NAME "init" "uninit" "const" abs32 RWX` names
@@ -3403,6 +3414,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
   `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
   so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
+- A static that a function stores to at offsets from its own address (`ldr r1, =obj; str r3, [r1]; str r2,
+  [r1, #0x14]`, then the same `r1` passed to a call) is one that the function doesn't know. Under `-ipa file` every
+  object of the file is known and reached from its section's base rounded down to 0x80 (`[r1, #0x30]` for an object at
+  0x30), and a pointer local is folded back into that. NitroSystem G3D's `sbc.c` has it in PRJMAP's texture matrix, at
+  0x30 of its `.data`: the file matches under `-ipa function` (`file_flags`), with the matrix defined after the last
+  function. That flag writes the data out in runs, one before each function that follows it, each sorted by size: the
+  ROM's `.data` (8, 8, 16, 16, then 64, 72, 72, 128 bytes) is the two texture commands and the material and shape tables
+  at the top, and the matrix, the two billboard commands and the command table defined after the last function, the
+  billboards and the matrix declared ahead of their users. Within a run, statics of one size come out in definition
+  order and globals of one size in the reverse, and the tentative `.bss` arrays in the reverse of their definitions.
 - MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
   declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
   file's initialized statics had them above the first function, and data that sits between two functions' literals

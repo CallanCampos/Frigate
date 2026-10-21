@@ -55,6 +55,7 @@ flags = [
 # pools show (without it each static gets a literal of its own). fs_command_default.c, os_deliverArg.c and
 # os_protectionRegion.c compile differently with it, so they don't take it
 "card/card_common.c" = ["-thumb"]
+"card/card_task.c" = ["-thumb"]
 "card/card_request.c" = ["-thumb"]
 "card/card_backup.c" = ["-thumb"]
 "card/card_rom.c" = ["-thumb", "-ipa file", "-inline on,noauto"]

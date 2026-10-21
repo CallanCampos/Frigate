@@ -293,7 +293,8 @@
 . 0x0206716c reloc_addend 0x30
 . 0x02067170 reloc_addend 0x3c
 . 0x02067178 reloc_addend 0x4
-. 0x02067480 reloc_addend 0x40
+. 0x02067478 reloc_addend 0x1400
+. 0x02067480 reloc_addend 0x1440
 . 0x020678dc reloc_addend 0x4
 . 0x020678e0 reloc_addend 0x80
 . 0x020678e4 reloc_addend 0x4c
@@ -310,14 +311,15 @@
 . 0x02069700 reloc_addend 1
 . 0x02069704 reloc_addend 2
 . 0x02069708 reloc_addend 3
-. 0x0206a124 reloc_addend 0xc
-. 0x0206a128 reloc_addend 0x10
-. 0x0206a12c reloc_addend 0x14
-. 0x0206aa48 reloc_addend 0x4
-. 0x0206aa4c reloc_addend 0x8
-. 0x0206aa50 reloc_addend 0xc
-. 0x0206aa54 reloc_addend 0x10
-. 0x0206aa58 reloc_addend 0x14
+. 0x0206a124 reloc_addend 0xe0c
+. 0x0206a128 reloc_addend 0xe10
+. 0x0206a12c reloc_addend 0xe14
+. 0x0206aa44 reloc_addend 0xe00
+. 0x0206aa48 reloc_addend 0xe04
+. 0x0206aa4c reloc_addend 0xe08
+. 0x0206aa50 reloc_addend 0xe0c
+. 0x0206aa54 reloc_addend 0xe10
+. 0x0206aa58 reloc_addend 0xe14
 . 0x0206e1dc reloc_addend 0x10c8
 . 0x0206e228 reloc_addend 0x10e0
 . 0x0206e3fc reloc_addend 0x10c8
@@ -656,11 +658,13 @@
 . 0x02143c58 remove_symbol
 . 0x02143c64 remove_symbol
 . 0x0214409a remove_symbol
+. 0x02144a74 remove_symbol
 . 0x02144a78 remove_symbol
 . 0x02144a7c remove_symbol
 . 0x02144a80 remove_symbol
 . 0x02144a84 remove_symbol
 . 0x02144a88 remove_symbol
+. 0x02145074 remove_symbol
 . 0x021450b4 remove_symbol
 . 0x0214697c add_data NNS_G3dFlagUseFastDma
 . 0x02149878 add_data sCaptureReserved
@@ -669,7 +673,7 @@
 . 0x0214b3d0 remove_symbol
 . 0x0214b8c0 remove_symbol
 . 0x0214b940 remove_symbol
-. 0x0214b980 section_end lib/nitro/src/card/card_common.c:.bss
+. 0x0214b960 section_end lib/nitro/src/card/card_common.c:.bss
 . 0x0214b980 add_section lib/nitro/src/card/card_backup.c:.bss:0x100
 . 0x0214ba84 add_data sRomReader
 . 0x0214ba88 add_data sInvalidateIC
