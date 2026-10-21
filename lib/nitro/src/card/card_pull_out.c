@@ -78,7 +78,7 @@ static void CARD_TerminateForPulledOut(void) {
     CARDi_SendtoPxi(CARD_PXI_COMMAND_TERMINATE, 1);
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        MI_StopAllNDma();
+        MI_StopNDmaChannels();
     }
     OS_Terminate();
 }

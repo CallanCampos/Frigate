@@ -168,7 +168,7 @@ static void PMi_ExecuteExit(BOOL reset) {
 
     OS_DisableInterrupts();
     MI_StopAllDma();
-    MI_StopAllNDma();
+    MI_StopNDmaChannels();
     PMi_SyncExitWithOtherProc();
     OSi_TerminateCore();
 }

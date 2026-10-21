@@ -40,6 +40,10 @@ other files then went through a veneer to address 0, which shifted the rest of t
 match. `--incomplete` removes that marker when a natural rewrite no longer matches, restoring the original assembly
 fallback. Both operations validate all requested owners before changing any version. Removing completion skips the
 external-static check because the C object is no longer linked.
+A static that the check reports as called from another module through an ambiguous relocation
+(`module:overlays(11,27)`) can be a call to the other overlay's function at the same address, which the delinker
+binds to the first overlay's symbol: ARM9 main's `WordSet_LoadFestivalMission` calls overlay 27's `FestMission_Load`,
+at overlay 11's `gsiXmlUtilWriteString`. Fix the relocation with `config_fixes.py reloc-module` (`docs/configs.md`).
 
 `tools/decomp/check_section_bounds.py` checks overlay 036's source-file boundaries against the configured symbol
 extents in both versions. Unknown sizes extend to the next symbol or the containing module section's end, so

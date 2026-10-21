@@ -1,6 +1,6 @@
 // TwlSDK's card_hash.c, in the LTD autoload: the reads of the ROM that check each sector against the HMAC-SHA-1
-// digests of the DSi's ROM header, with caches of the sectors and of the blocks of their hashes. The public functions
-// have TwlSDK's names as recalled, not shown by the code; the static ones are named for what they do
+// digests of the DSi's ROM header, with caches of the sectors and of the blocks of their hashes. The ROM names none of
+// it; the functions are named for what they do
 #include "nitro/math.h"
 #include "nitro/os.h"
 #include "twl/card.h"
@@ -13,11 +13,11 @@
 #define CARD_ROM_PAGE_SIZE 0x200
 
 static void CARDi_CompareHash(const void *hash, void *buffer, u32 length);
-static void CARDi_StartRomHashRead(CARDRomHashContext *context);
-static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u32 sector);
-static void *CARDi_TouchRomHashSector(CARDRomHashContext *context, u32 offset);
-static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buffer, u32 offset, u32 length);
-static void CARDi_ReadRomHashImageCaching(CARDRomHashContext *context, void *buffer, u32 offset, u32 length);
+static void CARDi_StartRomHashRead(CARDCheckedReadContext *context);
+static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDCheckedReadContext *context, u32 sector);
+static void *CARDi_TouchRomHashSector(CARDCheckedReadContext *context, u32 offset);
+static void CARDi_ReadRomHashImageDirect(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length);
+static void CARDi_ReadRomHashImageCaching(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length);
 
 // The SHA-1 states after the key's inner and outer pads, from which each HMAC starts
 static SVCSHA1Context sInnerContext;
@@ -36,7 +36,7 @@ static const u8 sDigestKey[64] ATTRIBUTE_ALIGN(4) = {
     0x32, 0x67, 0x8d, 0xfe, 0xca, 0x83, 0x64, 0x98, 0xac, 0xfd, 0x3e, 0x37, 0x87, 0x46, 0x58, 0x24,
 };
 
-u32 CARD_CalcRomHashBufferLength(const CARDTwlRomHeader *header) {
+u32 CARD_GetCheckedReadBufferSize(const CARDTwlRomHeader *header) {
     u32 length = 0;
     length += MATH_ROUNDUP32(header->digestBlockHashes.size);
     length += MATH_ROUNDUP32(header->digestSectorSize * CARD_ROM_HASH_SECTOR_MAX);
@@ -79,7 +79,7 @@ static void CARDi_CompareHash(const void *hash, void *buffer, u32 length) {
 
 // Starts the read of the next block, or else of the next sector, unless one is being read. A block's hashes are read
 // in whole pages
-static void CARDi_StartRomHashRead(CARDRomHashContext *context) {
+static void CARDi_StartRomHashRead(CARDCheckedReadContext *context) {
     void *buffer = NULL;
     u32 offset = 0;
     u32 length = 0;
@@ -107,12 +107,12 @@ static void CARDi_StartRomHashRead(CARDRomHashContext *context) {
 
     if (buffer != NULL && context->readAsync(context->userdata, buffer, offset, length) == 0) {
         context->readSync(context->userdata, buffer, offset, length);
-        CARD_NotifyRomHashReadAsync(context);
+        CARD_OnCheckedReadDone(context);
     }
 }
 
-void CARD_NotifyRomHashReadAsync(void *arg) {
-    CARDRomHashContext *context = arg;
+void CARD_OnCheckedReadDone(void *arg) {
+    CARDCheckedReadContext *context = arg;
     u32 enabled = OS_DisableInterrupts();
 
     if (context->loading == context->loadingSectors) {
@@ -134,7 +134,7 @@ void CARD_NotifyRomHashReadAsync(void *arg) {
 
 // The block of the hashes of a sector: the cached one, moved to the front, or the least recently used one, queued to
 // be read
-static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u32 sector) {
+static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDCheckedReadContext *context, u32 sector) {
     u32 index = sector / context->sectorsPerBlock;
     CARDRomHashBlock **link = &context->validBlocks;
     CARDRomHashBlock *found;
@@ -187,24 +187,26 @@ static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u3
     return found;
 }
 
-// The image of the sector at offset if it is cached and checked, moved to the front; otherwise NULL, and the least
-// recently used sector is queued to be read
-static void *CARDi_TouchRomHashSector(CARDRomHashContext *context, u32 offset) {
-    u32 position = offset;
-    void *image = NULL;
-    u32 index;
-    CARDRomHashSector **link;
-
-    position -= context->areaNtr.offset;
-    if (position >= context->areaNtr.size) {
-        position += context->areaNtr.offset - context->areaTwl.offset;
-        if (position < context->areaTwl.size) {
-            position += context->areaNtr.size;
+// The index of the sector of the hashed areas that holds the card's offset, counting the NITRO area's sectors first
+static inline u32 CARDi_RomOffsetToHashSector(const CARDCheckedReadContext *context, u32 offset) {
+    offset -= context->areaNtr.offset;
+    if (offset >= context->areaNtr.size) {
+        offset += context->areaNtr.offset - context->areaTwl.offset;
+        if (offset < context->areaTwl.size) {
+            offset += context->areaNtr.size;
         } else {
             OS_Terminate();
         }
     }
-    index = position / context->sectorSize;
+    return offset / context->sectorSize;
+}
+
+// The image of the sector at offset if it is cached and checked, moved to the front; otherwise NULL, and the least
+// recently used sector is queued to be read
+static void *CARDi_TouchRomHashSector(CARDCheckedReadContext *context, u32 offset) {
+    void *image = NULL;
+    u32 index = CARDi_RomOffsetToHashSector(context, offset);
+    CARDRomHashSector **link;
 
     for (link = &context->validSectors;;) {
         CARDRomHashSector *sector = *link;
@@ -235,112 +237,100 @@ static void *CARDi_TouchRomHashSector(CARDRomHashContext *context, u32 offset) {
     return image;
 }
 
-void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
-                             CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata) {
-    u32 sectorSize = header->digestSectorSize;
-    u32 sectorsPerBlock = header->digestSectorsPerBlock;
+void CARD_SetUpCheckedReads(CARDCheckedReadContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
+                            CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata) {
+    const u32 sectorSize = header->digestSectorSize;
+    const u32 sectorsPerBlock = header->digestSectorsPerBlock;
+    const u32 blockHashesSize = header->digestBlockHashes.size;
     u8 *lo = (u8 *)MATH_ROUNDUP32((u32)buffer);
-    u8 *hi = (u8 *)MATH_ROUNDDOWN32((u32)lo + length);
-    u8 *end;
-    u8 ipad[64];
-    u8 opad[64];
-    int i;
-    u32 blockLength;
+    u8 *hi = (u8 *)MATH_ROUNDDOWN32((u32)&lo[length]);
+    u8 *end = lo;
 
-    context->images = lo + MATH_ROUNDUP32(header->digestBlockHashes.size);
-    context->hashes = context->images + MATH_ROUNDUP32(sectorSize * CARD_ROM_HASH_SECTOR_MAX);
-    context->masterHash = lo;
-    context->sectors =
-        (CARDRomHashSector *)(context->hashes + MATH_ROUNDUP32(MATH_ROUNDUP(sectorsPerBlock * CARD_ROM_HASH_SIZE,
-                                                                            CARD_ROM_PAGE_SIZE * 3) *
-                                                               CARD_ROM_HASH_BLOCK_MAX));
-    context->blocks = (CARDRomHashBlock *)((u8 *)context->sectors +
-                                           MATH_ROUNDUP32(sizeof(CARDRomHashSector) * CARD_ROM_HASH_SECTOR_MAX));
-    end = (u8 *)context->blocks + MATH_ROUNDUP32(sizeof(CARDRomHashBlock) * CARD_ROM_HASH_BLOCK_MAX);
+    context->masterHash = end;
+    end += MATH_ROUNDUP32(blockHashesSize);
+    context->images = end;
+    end += MATH_ROUNDUP32(sectorSize * CARD_ROM_HASH_SECTOR_MAX);
+    context->hashes = end;
+    end += MATH_ROUNDUP32(MATH_ROUNDUP(CARD_ROM_HASH_SIZE * sectorsPerBlock, CARD_ROM_PAGE_SIZE * 3) *
+                          CARD_ROM_HASH_BLOCK_MAX);
+    context->sectors = (CARDRomHashSector *)end;
+    end += MATH_ROUNDUP32(sizeof(*context->sectors) * CARD_ROM_HASH_SECTOR_MAX);
+    context->blocks = (CARDRomHashBlock *)end;
+    end += MATH_ROUNDUP32(sizeof(*context->blocks) * CARD_ROM_HASH_BLOCK_MAX);
     if (end > hi) {
         OS_Terminate();
-        return;
-    }
-    MI_CpuClear32(lo, (u32)(end - lo));
-
-    context->areaNtr = header->digestNtr;
-    context->areaTwl = header->digestTwl;
-    context->sectorHashes = header->digestSectorHashes;
-    context->blockHashes = header->digestBlockHashes;
-    context->sectorSize = sectorSize;
-    context->sectorsPerBlock = sectorsPerBlock;
-    context->blockCount = CARD_ROM_HASH_BLOCK_MAX;
-    context->sectorCount = CARD_ROM_HASH_SECTOR_MAX;
-    context->readSync = readSync;
-    context->readAsync = readAsync;
-    context->userdata = userdata;
-
-    for (i = 0; i < 64; i++) {
-        ipad[i] = sDigestKey[i] ^ 0x36;
-        opad[i] = sDigestKey[i] ^ 0x5c;
-    }
-    SVC_SHA1Init(&sInnerContext);
-    SVC_SHA1Init(&sOuterContext);
-    SVC_SHA1Update(&sInnerContext, ipad, sizeof(ipad));
-    SVC_SHA1Update(&sOuterContext, opad, sizeof(opad));
-
-    context->readSync(context->userdata, context->masterHash, context->blockHashes.offset, context->blockHashes.size);
-    CARDi_CompareHash(header->digestBlockHashesHash, context->masterHash, context->blockHashes.size);
-
-    {
-        CARDRomHashSector *sectors = context->sectors;
-        u32 j;
-        for (j = 0; j < context->sectorCount; j++) {
-            sectors[j].next = &sectors[j - 1];
-            sectors[j].image = context->images + j * context->sectorSize;
-            sectors[j].index = (u32)-1;
+    } else {
+        MI_CpuClear32(lo, (u32)(end - lo));
+        context->areaNtr = header->digestNtr;
+        context->areaTwl = header->digestTwl;
+        context->sectorHashes = header->digestSectorHashes;
+        context->blockHashes = header->digestBlockHashes;
+        context->sectorSize = sectorSize;
+        context->sectorsPerBlock = sectorsPerBlock;
+        context->blockCount = CARD_ROM_HASH_BLOCK_MAX;
+        context->sectorCount = CARD_ROM_HASH_SECTOR_MAX;
+        context->readSync = readSync;
+        context->readAsync = readAsync;
+        context->userdata = userdata;
+        {
+            u8 ipad[64];
+            u8 opad[64];
+            int i;
+            for (i = 0; i < 64; ++i) {
+                ipad[i] = sDigestKey[i] ^ 0x36;
+                opad[i] = sDigestKey[i] ^ 0x5c;
+            }
+            SVC_SHA1Init(&sInnerContext);
+            SVC_SHA1Init(&sOuterContext);
+            SVC_SHA1Update(&sInnerContext, ipad, sizeof(ipad));
+            SVC_SHA1Update(&sOuterContext, opad, sizeof(opad));
+        }
+        context->readSync(context->userdata, context->masterHash, context->blockHashes.offset,
+                          context->blockHashes.size);
+        CARDi_CompareHash(header->digestBlockHashesHash, context->masterHash, context->blockHashes.size);
+        {
+            CARDRomHashSector *sectors = context->sectors;
+            int i;
+            for (i = 0; i < context->sectorCount; ++i) {
+                sectors[i].next = &sectors[i - 1];
+                sectors[i].image = &context->images[i * context->sectorSize];
+                sectors[i].index = 0xffffffff;
+            }
+            context->sectors[0].next = NULL;
+            context->validSectors = &context->sectors[context->sectorCount - 1];
+            context->loadingSectors = NULL;
+            context->loadedSectors = NULL;
+        }
+        {
+            CARDRomHashBlock *blocks = context->blocks;
+            const u32 blockLength = MATH_ROUNDUP(CARD_ROM_HASH_SIZE * sectorsPerBlock, CARD_ROM_PAGE_SIZE * 3);
+            int i;
+            for (i = 0; i < context->blockCount; ++i) {
+                blocks[i].next = &blocks[i + 1];
+                blocks[i].index = 0xffffffff;
+                blocks[i].image = &context->hashes[i * blockLength];
+            }
+            context->validBlocks = &context->blocks[0];
+            context->blocks[context->blockCount - 1].next = NULL;
+            context->loadingBlocks = NULL;
+            context->loadedBlocks = NULL;
         }
     }
-    context->sectors[0].next = NULL;
-    context->validSectors = &context->sectors[context->sectorCount - 1];
-
-    blockLength = MATH_ROUNDUP(sectorsPerBlock * CARD_ROM_HASH_SIZE, CARD_ROM_PAGE_SIZE * 3);
-    context->loadingSectors = NULL;
-    context->loadedSectors = NULL;
-    {
-        CARDRomHashBlock *blocks = context->blocks;
-        u32 j;
-        for (j = 0; j < context->blockCount; j++) {
-            blocks[j].next = &blocks[j + 1];
-            blocks[j].index = (u32)-1;
-            blocks[j].image = context->hashes + j * blockLength;
-        }
-    }
-    context->validBlocks = context->blocks;
-    context->blocks[context->blockCount - 1].next = NULL;
-    context->loadingBlocks = NULL;
-    context->loadedBlocks = NULL;
 }
 
 // Reads whole sectors straight into buffer, checking each against the hashes of its block as they arrive
-static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buffer, u32 offset, u32 length) {
-    u32 sectorsPerBlock = context->sectorsPerBlock;
-    u32 end = length + offset;
+static void CARDi_ReadRomHashImageDirect(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length) {
     u32 sectorSize = context->sectorSize;
+    u32 sectorsPerBlock = context->sectorsPerBlock;
     u32 position = offset;
-    u32 index;
+    u32 end = length + offset;
+    u32 index = CARDi_RomOffsetToHashSector(context, position);
 
-    position -= context->areaNtr.offset;
-    if (position >= context->areaNtr.size) {
-        position += context->areaNtr.offset - context->areaTwl.offset;
-        if (position < context->areaTwl.size) {
-            position += context->areaNtr.size;
-        } else {
-            OS_Terminate();
-        }
-    }
-    index = position / context->sectorSize;
-
-    while (offset < end) {
-        u32 read = context->readSync(context->userdata, buffer, offset, end - offset);
+    while (position < end) {
+        u32 read = context->readSync(context->userdata, buffer, position, end - position);
         CARDi_TouchRomHashBlock(context, index);
-        if (context->readAsync != NULL && offset + read < end) {
-            context->readAsync(context->userdata, NULL, offset + read, end - (offset + read));
+        if (context->readAsync != NULL && position + read < end) {
+            context->readAsync(context->userdata, NULL, position + read, end - (position + read));
         }
         while (read >= sectorSize) {
             CARDRomHashBlock *block = CARDi_TouchRomHashBlock(context, index);
@@ -361,7 +351,7 @@ static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buff
                     context->validBlocks = block;
                 }
                 CARDi_CompareHash(block->hash + i * CARD_ROM_HASH_SIZE, buffer, sectorSize);
-                offset += sectorSize;
+                position += sectorSize;
                 read -= sectorSize;
                 buffer = (u8 *)buffer + sectorSize;
                 i++;
@@ -372,7 +362,7 @@ static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buff
 }
 
 // Reads through the cache of sectors, checking the sectors and blocks as they arrive
-static void CARDi_ReadRomHashImageCaching(CARDRomHashContext *context, void *buffer, u32 offset, u32 length) {
+static void CARDi_ReadRomHashImageCaching(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length) {
     while (length > 0) {
         u8 *image = CARDi_TouchRomHashSector(context, offset);
         if (image != NULL) {
@@ -430,7 +420,7 @@ static void CARDi_ReadRomHashImageCaching(CARDRomHashContext *context, void *buf
     }
 }
 
-void CARD_ReadRomHashImage(CARDRomHashContext *context, void *buffer, u32 offset, u32 length) {
+void CARD_ReadRomChecked(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length) {
     context->thread = OS_GetCurrentThread();
     context->loading = NULL;
     if (length >= context->sectorSize * 16 && OS_GetBootType() != OS_BOOTTYPE_ROM) {

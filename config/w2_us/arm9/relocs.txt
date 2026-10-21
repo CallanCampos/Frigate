@@ -5403,7 +5403,7 @@ from:0x0202488e kind:thumb_call to:0x02024320 module:main
 from:0x020248a4 kind:thumb_call to:0x02024300 module:main
 from:0x020248c6 kind:thumb_call to:0x02014d1c module:main
 from:0x020248de kind:thumb_call to:0x02170b04 module:overlay(27)
-from:0x020248ec kind:thumb_call to:0x02170bd8 module:overlays(11,27)
+from:0x020248ec kind:thumb_call to:0x02170bd8 module:overlay(27)
 from:0x02024908 kind:thumb_call to:0x02170d3c module:overlay(27)
 from:0x02024914 kind:thumb_call to:0x02024320 module:main
 from:0x0202491a kind:thumb_call to:0x02170b40 module:overlay(27)

@@ -69,6 +69,11 @@ every section.
   under `rom/` of the generated headers with its module and symbol, and `tools/build/rom_blob.py` writes it from the
   extracted module, with the symbol's address and size from `symbols.txt`. The bytes are never committed. Without a
   ROM, `compile_all.py` writes zeros of the same size.
+- The digests of the ARM9 overlays at the end of ARM9 main's `.data`, which NitroSDK's tools write after the link, are
+  computed instead: `tools/build/overlay_digests.py` takes the HMAC-SHA1 of each overlay of the version's base ROM, as
+  stored, and the masked one of its overlay table, into `rom/<version>/` of the generated headers, which
+  `lib/nitro/src/fs/fs_overlay_digest.c` includes for its version. They are what FS_StartOverlay checks when the game
+  isn't booted from the ROM.
 - `struct_decls.h` declares every struct type once, as `typedef struct Name Name;`. The header of the module that
   owns a struct defines its layout when that is known (`struct Name { ... };`, without another typedef), and other
   code only uses pointers to it. A struct that only one file uses, such as an event's work, is defined in that file.
