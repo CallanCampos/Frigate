@@ -1367,7 +1367,7 @@ GameEvent *EventMapChangeBlackout_Create(GameSystem *gsys) {
     return event;
 }
 
-u16 ConvWarpDirToAngle(int warpDir) {
+u16 ConvWarpDirToAngle(s32 warpDir) {
     switch (warpDir) {
     default:
     case WARP_DIR_UP:
@@ -1588,7 +1588,7 @@ void Field_SetPlayerHidden(Field *field, BOOL hidden) {
     SetActorHidden(FieldPlayer_GetActor(Field_GetPlayer(field)), hidden);
 }
 
-void GameData_SetGimmickByZone(GameData *gameData, int zoneId) {
+void GameData_SetGimmickByZone(GameData *gameData, s32 zoneId) {
     GimmickState *gimmick = GameData_GetGimmickState(gameData);
     ArcTool *handle;
     u32 i;
