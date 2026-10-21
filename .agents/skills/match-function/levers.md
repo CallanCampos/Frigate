@@ -214,6 +214,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
+  inline read through a `const` pointer. (matching.md: "a progress snapshot")
 - Edge and corner sums unexpectedly shared, with fewer spills: signed edge arithmetic can coexist with unsigned
   corner arithmetic; cast the operands, not only the result. (matching.md: "Signed and unsigned sums")
 - Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.

@@ -696,6 +696,11 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- `RailMath_RailToWorldSlerpXZ` keeps raw signed position and length at the original stack slots when they form
+  a progress snapshot and an inline reads that snapshot through a `const` pointer to compute its fixed-point ratio.
+  Height interpolation reads the same raw fields, retaining its multiply-before-divide rounding. The ratio helper
+  also serves the straight and XYZ conversions without changing their code. Scalar fixed-point locals instead
+  spill the converted values and reuse their shifts, leaving the XZ conversion four bytes short.
 - A `static inline` accessor that returns a field cast to another type (`return (SOCLRecvPipe *)socket->recv_pipe;`)
   reverses the stack slots of the locals spilled around its result. NitroWiFi's `SOCLi_ReadCallBack` gets the
   original's slots only with the field typed as the SDK has it (`SOCLRecvPipe *recv_pipe`) and read directly (27 bytes

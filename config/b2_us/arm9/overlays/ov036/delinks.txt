@@ -792,5 +792,6 @@ src/ov036/rail_data_handle.c:
     .data       start:0x021d4d80 end:0x021d4de8
 
 src/ov036/field_rail_func.c:
+    complete
     .text       start:0x021b2404 end:0x021b3a3c
     .rodata     start:0x021d0fec end:0x021d1004

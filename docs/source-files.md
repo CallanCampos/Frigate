@@ -592,7 +592,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | complete | string at `0x021d5218` |
 | `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
 | `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | partial | string at `0x021d5238` |
-| `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | partial | descriptive |
+| `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
 | `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |
