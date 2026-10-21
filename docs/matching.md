@@ -8,6 +8,11 @@ tools that show the differences.
 
 ## Registers
 
+- A missing variadic log argument can change registers throughout a function without changing its size. Check the
+  ROM's format string before tuning allocation: `download_play_wih.c`'s parent and MP callbacks and finalizer require
+  a state argument for their strings' `%d`. Supplying the state
+  restores the finalizer's exact output and removes most callback differences; the callbacks also need the original
+  reload after the scan filter and the original switch exits.
 - A constant kept in a register for the whole function that is not ours (the original's `movs r7, #1` with every 0
   built where it is used, where ours keeps 0 in `r7`) can come from a store that the optimizer drops. `wcm_dsi.c`'s
   `func_02769e60`, which does at once what `wcm.c`'s reset request and its completion do, matches only with the

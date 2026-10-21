@@ -169,7 +169,7 @@ static void func_ov182_021b9d68(void *arg) {
             gWork.logPrint(0x08000000, data_ov182_021c18e0, aid);
         }
         if (gWork.work->sScanFilter != NULL && !gWork.work->sScanFilter(cb)) {
-            int result = WM_Disconnect(NULL, aid);
+            int result = WM_Disconnect(NULL, cb->aid);
 
             if (result != WM_ERRCODE_OPERATING) {
                 func_ov182_021b9c34(result);
@@ -194,7 +194,7 @@ static void func_ov182_021b9d68(void *arg) {
         return;
     }
     if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1938);
+        gWork.logPrint(0x08000000, data_ov182_021c1938, cb->state);
     }
 }
 
@@ -255,13 +255,14 @@ static void func_ov182_021b9eb0(void *arg) {
         func_ov182_021b9be4(WIH_STATE_CONNECTED);
         return;
     case WM_STATECODE_MPEND_IND:
-        return;
+        break;
     case WM_STATECODE_MP_IND:
     case WM_STATECODE_MPACK_IND:
+    default:
+        if (gWork.logPrint != NULL) {
+            gWork.logPrint(0x08000000, data_ov182_021c1938, cb->state);
+        }
         break;
-    }
-    if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1938);
     }
 }
 
@@ -731,7 +732,7 @@ void func_ov182_021ba67c(void) {
         return;
     }
     if (gWork.logPrint != NULL) {
-        gWork.logPrint(0x08000000, data_ov182_021c1ab4);
+        gWork.logPrint(0x08000000, data_ov182_021c1ab4, gWork.work->sysState);
     }
     if (gWork.work->sysState != WIH_STATE_KEYSHARING && gWork.work->sysState != WIH_STATE_DATASHARING &&
         gWork.work->sysState != WIH_STATE_CONNECTED) {
