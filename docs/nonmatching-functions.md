@@ -280,6 +280,13 @@ in both versions.
   Black 2 and 7 in White 2 start 2 bytes past one, and its assembler has `dcb` and `dcd` but no way to give a function
   a second entry point. The file stays incomplete.
 
+- `lib/nitro/src/init/crt0.c` (ARM9 main), NitroSDK's startup code, matches all its functions in both versions, but
+  its module parameters (`BuildInfo` and `LtdModuleParams`, in `.text`) hold the addresses of the static and LTD
+  modules' autoload lists, which the build writes after each module. dsd's linker script has no symbols for them
+  (its relocations from `BuildInfo` point into `.bss`, at `g_GFLSndHeap` + 0x948 and + 0x988), and the LTD module's
+  words have no relocations at all, with its compressed end differing between the versions (`0x02421c40` /
+  `0x02421c38`). The file stays incomplete until the linker script gives those symbols.
+
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file

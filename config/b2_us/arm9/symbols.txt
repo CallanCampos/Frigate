@@ -30,6 +30,7 @@ OSi_ReferSymbol kind:function(arm,size=0x4) addr:0x02004eb0
 asm_HWIsDSi kind:function(arm,size=0x20) addr:0x02004eb4
 asm_MemCpy32Fast kind:function(arm,size=0x4c) addr:0x02004ed4
 boot_MemSet32Fast kind:function(arm,size=0x5c) addr:0x02004f20
+WaitForHalfword kind:function(arm,size=0x1c) addr:0x02004f94
 BuildInfo kind:data(any) addr:0x02004fb0
 DWCi_Signature kind:data(any) addr:0x02005050
 CARDi_BackupSignature kind:data(any) addr:0x02005094
@@ -9300,3 +9301,5 @@ __msl_constraint_handler kind:bss addr:0x0214f1f0
 atexit_curr_func kind:bss addr:0x0214f1f4
 atexit_funcs kind:bss addr:0x0214f1f8
 __global_destructor_chain kind:bss addr:0x0214f4f8
+LtdModuleParams kind:data(any) addr:0x02004f7c
+TaggedParams kind:data(any) addr:0x02005040

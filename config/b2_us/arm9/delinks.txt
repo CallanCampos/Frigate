@@ -2545,3 +2545,6 @@ lib/msl/src/runtime/global_destructor_chain.c:
 
 lib/nitro/src/syscall/secure_area.c:
     .text       start:0x02004000 end:0x02004800
+
+lib/nitro/src/init/crt0.c:
+    .text       start:0x02004800 end:0x02005050

@@ -1,7 +1,10 @@
 # Fixes to dsd's analysis, applied by tools/decomp/config_fixes.py
 # module address(b2_us) action [argument]
+. 0x02004f7c add_data LtdModuleParams
+. 0x02004f94 add_function WaitForHalfword:arm:0x1c
 . 0x02004fb0 reloc_addend 0x948
 . 0x02004fb4 reloc_addend 0x988
+. 0x02005040 add_data TaggedParams
 . 0x02005050 add_data DWCi_Signature
 . 0x02005094 add_data CARDi_BackupSignature
 . 0x020050ac add_data CPSi_Signature
