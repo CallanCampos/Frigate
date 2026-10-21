@@ -1807,6 +1807,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
   literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
+- The reverse holds for addresses passed to calls: `text + i` given to several calls is computed once and kept in a
+  saved register, and `&text[i]` is recomputed at each call (`adds r0, r5, r4`), with `&text[i + 3]` keeping `i + 3`
+  (on the stack across calls) rather than the address. GameSpy's `gsiXmlUtilDecodeString` (`gsXML.c`) matches only
+  with `&text[...]` throughout, each entity branch's `started`, `value`, `mask` and `end` declared in its own block
+  (the `&#` branch's `value` then stays in a register, where one shared with the `&#x` branch's `&value` goes to
+  the stack), and the byte mask as a variable set to 0xff000000 at the branch's start and shifted by 8 at the end of
+  each pass (`lsrs r6, r6, #8`), not `0xff000000 >> (j * 8)`. Its file then linked only with its namespace table in
+  GameSpy's order (`SOAP-ENV`, `SOAP-ENC`, `xsi`, `xsd`): the strings come out by size either way, so only the
+  table's pointers showed the wrong order.
 - An inline's pointer parameter of the argument's own type takes the argument expression itself, so a field of an
   indexed element passed to it has the field's offset folded into each of the inline's loads (`[r, #4 + k]`). A
   `const void *` parameter, read as `((const u8 *)b)[k]`, keeps the argument one address: DWC's `DWCAc_AddCandidate`

@@ -2542,3 +2542,38 @@ lib/msl/src/runtime/global_destructor_chain.c:
     complete
     .text       start:0x0208ee34 end:0x0208ee54
     .bss        start:0x0214f538 end:0x0214f540
+
+lib/nitro/src/syscall/secure_area.c:
+    .text       start:0x02004000 end:0x02004800
+
+lib/nitro/src/init/crt0.c:
+    .text       start:0x02004800 end:0x02005050
+
+lib/dwc/src/base/dwc_init_version.c:
+    complete
+    .text       start:0x02005050 end:0x02005094
+
+lib/nitro/src/card/card_backup_version.c:
+    complete
+    .text       start:0x02005094 end:0x020050ac
+
+lib/nitrowifi/src/cps/cps_version.c:
+    complete
+    .text       start:0x020050ac end:0x020050c4
+
+lib/nitrowifi/src/soc/socl_startup_version.c:
+    complete
+    .text       start:0x020050c4 end:0x020050f0
+
+lib/nitrowifi/src/ssl/ssl_version.c:
+    complete
+    .text       start:0x020050f0 end:0x02005108
+
+lib/dwc/src/vct/vct_version.c:
+    complete
+    .text       start:0x02005108 end:0x02005124
+
+lib/msl/src/exit.c:
+    complete
+    .text       start:0x020828d8 end:0x020828f4
+    .bss        start:0x0214ee08 end:0x0214ee0c

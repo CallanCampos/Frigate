@@ -1776,6 +1776,7 @@ from:0x0215a594 kind:thumb_call to:0x021596f4 module:overlay(11)
 from:0x0215a5a2 kind:thumb_call to:0x02154e70 module:overlay(11)
 from:0x0215a5dc kind:load to:0x0218ba50 module:overlay(11)
 from:0x0215a5e6 kind:thumb_call_arm to:0x02004eb0 module:main
+from:0x0215a5fc kind:load to:0x020050f0 module:main
 from:0x0215a600 kind:load to:0x0214c22c module:main
 from:0x0215a608 kind:thumb_call_arm to:0x0207c0e4 module:main
 from:0x0215a63c kind:thumb_call_arm to:0x0207c0f8 module:main

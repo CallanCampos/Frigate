@@ -139,3 +139,6 @@ flags = [
 "wm/wm_common.c" = ["-thumb"]
 "ctrdg/ctrdg.c" = ["-thumb"]
 "ctrdg/ctrdg_proc.c" = ["-thumb"]
+
+# The system call library's BIOS stubs, Thumb asm functions
+"syscall/secure_area.c" = ["-thumb"]

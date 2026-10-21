@@ -1,8 +1,23 @@
 # Names that are not in swan, applied by tools/decomp/rename_symbol.py
 # module address(b2_us) name
+. 0x02004064 SVC_UnpackBits
+. 0x020040d0 SVC_UncompressLZ8
 . 0x0200413a SVC_GetCRC16
 . 0x02004190 SVC_CpuSet
+. 0x020041f0 SVC_UncompressRL8
+. 0x0200426e SVC_UncompressLZ16FromDevice
+. 0x020042e4 SVC_Div
+. 0x02004352 SVC_WaitVBlankIntr
+. 0x020043ca SVC_IsMmemExpanded
+. 0x02004424 SVC_UncompressHuffmanFromDevice
+. 0x0200448a SVC_SoftReset
 . 0x020044f6 SVC_WaitByLoop
+. 0x02004582 SVC_Sqrt
+. 0x020045f4 SVC_CpuSetFast
+. 0x02004666 SVC_Halt
+. 0x020046ba SVC_DivRem
+. 0x02004726 SVC_UncompressRL16FromDevice
+. 0x0200478e SVC_WaitIntr
 . 0x02004df4 MIi_UncompressBackward
 . 0x02004eb0 OSi_ReferSymbol
 . 0x020051d8 SetMainMemoryPriorityBlocked

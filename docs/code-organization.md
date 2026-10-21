@@ -23,9 +23,9 @@ every section.
   headers, `lib/<name>/src/` for the sources and private headers (`lib/spl/src/spl_internal.h`), and
   `lib/<name>/library.toml` for the library's compiler and flags, which `configure.py` and the probe read: `lib/spl/`
   (Nintendo's SPL particle library), `lib/dsprot/` (Nintendo's DS Protect, in overlays 165 and 337), `lib/nitro/`
-  (NitroSDK: in ARM9 main its card, cartridge, file system, graphics, memory, NVRAM, OS, PXI, RTC, sound, SPI
-  (microphone, power and touch panel), STD and wireless libraries, its fixed-point math and libmath, and libcrypto's
-  RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
+  (NitroSDK: in ARM9 main its startup code, its system call stubs, its card, cartridge, file system, graphics,
+  memory, NVRAM, OS, PXI, RTC, sound, SPI (microphone, power and touch panel), STD and wireless libraries, its
+  fixed-point math and libmath, and libcrypto's RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
   (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
   microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and
   in `.ltdmain` the card's hashed ROM reads, the new DMA, the shared WRAM manager and the DSi parts of NitroSDK's card

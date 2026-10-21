@@ -1,11 +1,15 @@
 # Fixes to dsd's analysis, applied by tools/decomp/config_fixes.py
 # module address(b2_us) action [argument]
+. 0x02004f7c add_data LtdModuleParams
+. 0x02004f94 add_function WaitForHalfword:arm:0x1c
 . 0x02004fb0 reloc_addend 0x948
 . 0x02004fb4 reloc_addend 0x988
+. 0x02005040 add_data TaggedParams
 . 0x02005050 add_data DWCi_Signature
 . 0x02005094 add_data CARDi_BackupSignature
 . 0x020050ac add_data CPSi_Signature
 . 0x020050c4 add_data SOCLi_Signature
+. 0x020050f0 add_data SSLi_Signature
 . 0x02005108 add_data VCTi_Signature
 . 0x0200587c reloc_addend 0x4
 . 0x02005880 reloc_addend 0xc
@@ -112,6 +116,7 @@
 . 0x0201a324 reloc_addend 0x258
 . 0x02020cec reloc_addend 9
 . 0x02020d24 reloc_addend 6
+. 0x020248c0 reloc_module overlay(27)
 . 0x02026708 reloc_addend 0x2
 . 0x02026710 reloc_addend 0x2
 . 0x0202678c reloc_addend 0x2
@@ -868,6 +873,7 @@ overlays/ov011 0x020050c4 remove_orphan_reloc .
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
+overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
 overlays/ov011 0x0215cd8c add_label ReshZekSave_UnresolvedInitTarget
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
