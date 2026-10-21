@@ -2568,3 +2568,7 @@ lib/nitrowifi/src/soc/socl_startup_version.c:
 lib/nitrowifi/src/ssl/ssl_version.c:
     complete
     .text       start:0x020050f0 end:0x02005108
+
+lib/dwc/src/vct/vct_version.c:
+    complete
+    .text       start:0x02005108 end:0x02005124
