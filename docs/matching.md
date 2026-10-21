@@ -3779,12 +3779,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 ## When nothing moves it
 
 - A Thumb `bx pc; nop` followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, right after a function that calls it,
-  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from
-  C and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
+  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from C
+  and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
   `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
-  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. The LTD autoload's
+  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. NitroWiFi's code in the LTD autoload's
   `.ltdmain` gives each call its own veneer instead, as an overlay does (`docs/configs.md`), which the build gets by
-  linking the module's objects as an overlay group.
+  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so
+  `os_interrupt_twl.c` reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use
+  another file's veneers can be complete only once that file is.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
