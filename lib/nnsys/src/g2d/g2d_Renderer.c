@@ -50,7 +50,9 @@ static MtxFx32 mtxTransOnly_ = { FX32_ONE, 0, 0, FX32_ONE, 0, 0 };
 static u16 mtxCacheGroupID_;
 static u16 mtxCacheCount_;
 static NNSG2dRendererInstance *pCurrentInstance_;
-static int mtxStackPos_;
+// The SDK's s32, a long, as the public decompilation of NitroSystem declares the stack position: as an int,
+// NNS_G2dPushMtx keeps the position it loaded first where the original loads it again after the bound check
+static long mtxStackPos_;
 static BOOL bNotSR_;
 static fx32 zStack_[MTX_STACK_SIZE];
 static MtxCacheState mtxCacheState_[MTX_STACK_SIZE];
