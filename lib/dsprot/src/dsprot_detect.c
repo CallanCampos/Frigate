@@ -136,9 +136,9 @@ u32 DSProt_CheckFlashcart(void) {
     lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw(page, address + (1 << (((const ROMHeader *)CARD_GetRomHeader())->deviceSize + 17)), 0);
         crcs[i] = DSProt_Crc32((u8 *)page, 0x200);
-        CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
+        CARD_ReadRom((u32)-1, (const void *)(address + offset), page, 0x200);
         crcs[i + 6] = DSProt_Crc32((u8 *)page, 0x200);
         if (i < 3) {
             address += 0x200;
@@ -153,7 +153,7 @@ u32 DSProt_CheckFlashcart(void) {
     for (; i < 8; i++) {
         DSProt_ReadCardRaw(page, address, 0);
         crcs[i + 6] = DSProt_Crc32((u8 *)page, 0x200);
-        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
+        CARD_ReadRom((u32)-1, (const void *)address, page, 0x200);
         crcs[i + 8] = DSProt_Crc32((u8 *)page, 0x200);
         address += 0x1000;
     }
@@ -161,7 +161,7 @@ u32 DSProt_CheckFlashcart(void) {
     for (; i < 10; i++) {
         DSProt_ReadCardRaw(page, address, 0x11);
         crcs[i + 8] = DSProt_Crc32((u8 *)page, 0x200);
-        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
+        CARD_ReadRom((u32)-1, (const void *)address, page, 0x200);
         crcs[i + 10] = DSProt_Crc32((u8 *)page, 0x200);
         address += 0x1000;
     }

@@ -146,7 +146,7 @@ static void CTRDGi_RestoreAccessCycle(const CTRDGRomCycle *cycle) {
 static void CTRDGi_LockByProcessor(u16 lockID, CTRDGLockInfo *info) {
     while (TRUE) {
         info->irq = OS_DisableInterrupts();
-        info->hadBus = OS_ReadOwnerOfLockWord((const OSLockWord *)HW_CTRDG_LOCK_BUF) & 0x40;
+        info->hadBus = OS_ReadOwnerOfLockWord((OSLockWord *)HW_CTRDG_LOCK_BUF) & 0x40;
         if (info->hadBus != 0) {
             return;
         }

@@ -53,7 +53,7 @@ void GX_Init(void) {
     reg_G2S_DB_BG3PD = 0x100;
 }
 
-void GX_SetVCountEqVal(int vcount) {
+void GX_SetVCountEqVal(s32 vcount) {
     reg_GX_DISPSTAT =
         (u16)((reg_GX_DISPSTAT & REG_GX_DISPSTAT_FLAGS_MASK) | ((vcount & 0xff) << 8) | ((vcount & 0x100) >> 1));
 }
@@ -99,7 +99,7 @@ void GX_DispOn(void) {
     }
 }
 
-void GX_SetGraphicsMode(int dispMode, int bgMode, int bg0As3D) {
+void GX_SetGraphicsMode(GXDispMode dispMode, GXBGMode bgMode, GXBG0As bg0As3D) {
     u32 dispcnt = reg_GX_DISPCNT;
     g_GfxEngineAMode = dispMode;
     if (!g_GfxEngineAEnabled) {
@@ -112,28 +112,28 @@ void GX_SetGraphicsMode(int dispMode, int bgMode, int bg0As3D) {
     }
 }
 
-void GXS_SetGraphicsMode(int bgMode) {
+void GXS_SetGraphicsMode(GXBGMode bgMode) {
     reg_GXS_DB_DISPCNT = (reg_GXS_DB_DISPCNT & ~REG_GXS_DB_DISPCNT_BGMODE_MASK) | bgMode;
 }
 
-void GXx_SetMasterBrightness_(u32 reg, s32 brightness) {
+void GXx_SetMasterBrightness_(vu16 *reg, int brightness) {
     if (brightness == 0) {
-        *(vu16 *)reg = 0;
+        *reg = 0;
     } else if (brightness > 0) {
-        *(vu16 *)reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_UP | brightness);
+        *reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_UP | brightness);
     } else {
-        *(vu16 *)reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_DOWN | -brightness);
+        *reg = (u16)(REG_GX_MASTER_BRIGHT_MODE_DOWN | -brightness);
     }
 }
 
-s32 GXx_GetMasterBrightness_(u32 reg) {
-    u16 mode = *(vu16 *)reg & REG_GX_MASTER_BRIGHT_MODE_MASK;
+int GXx_GetMasterBrightness_(vu16 *reg) {
+    u16 mode = *reg & REG_GX_MASTER_BRIGHT_MODE_MASK;
     if (mode == 0) {
         return 0;
     } else if (mode == REG_GX_MASTER_BRIGHT_MODE_UP) {
-        return *(vu16 *)reg & REG_GX_MASTER_BRIGHT_FACTOR_MASK;
+        return *reg & REG_GX_MASTER_BRIGHT_FACTOR_MASK;
     } else if (mode == REG_GX_MASTER_BRIGHT_MODE_DOWN) {
-        return -(*(vu16 *)reg & REG_GX_MASTER_BRIGHT_FACTOR_MASK);
+        return -(*reg & REG_GX_MASTER_BRIGHT_FACTOR_MASK);
     }
     return 0;
 }

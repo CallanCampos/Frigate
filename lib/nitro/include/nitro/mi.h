@@ -127,7 +127,7 @@ void MIi_CpuCopy32(const void *src, void *dest, u32 size); // swan's sys_memcpy3
 // which returns the difference of the first bytes that differ, or 0, MI_CpuCopy, which copies by words whatever the
 // alignment, MI_CpuMove, which also handles ranges that overlap, and MI_CpuFill, which fills by words
 void MI_CpuCopy8(const void *src, void *dest, u32 size); // swan's sys_memcpy
-void MI_CpuFill8(void *dest, u32 value, u32 size);       // swan's sys_memset
+void MI_CpuFill8(void *dest, u8 value, u32 size);        // swan's sys_memset
 int MI_CpuComp8(const void *a, const void *b, u32 size); // swan's sys_memcmp
 void MI_CpuCopy(const void *src, void *dest, u32 size);  // swan's sys_memcpy_fast
 void MI_CpuMove(const void *src, void *dest, u32 size);  // swan's sys_memcpy_ex
@@ -200,6 +200,31 @@ static inline void MI_SetMainMemoryPriority(MIProcessor proc) {
 
 // NitroSDK's MI_SwapWord, in assembly: stores the word at the address and returns the one that was there
 u32 MI_SwapWord(u32 data, vu32 *destp); // swan's memswap
+
+// NitroSDK's MIUnpackBitsParam: what SVC_UnpackBits widens, srcNum bytes of srcBitNum-bit units into destBitNum-bit
+// units, adding destOffset (to the zero units too when destOffset0_on is set)
+typedef struct {
+    u16 srcNum;
+    u16 srcBitNum : 8;
+    u16 destBitNum : 8;
+    u32 destOffset : 31;
+    u32 destOffset0_on : 1;
+} MIUnpackBitsParam;
+
+// NitroSDK's MIReadStreamCallbacks: how the BIOS's decompressors that read from a device open, read and close it
+typedef s32 (*MIi_InitReadStreamCallback)(const u8 *devicep, void *ramp, const void *paramp);
+typedef s32 (*MIi_TerminateReadStreamCallback)(const u8 *devicep);
+typedef u8 (*MIi_ReadByteStreamCallback)(const u8 *devicep);
+typedef u16 (*MIi_ReadShortStreamCallback)(const u8 *devicep);
+typedef u32 (*MIi_ReadWordStreamCallback)(const u8 *devicep);
+
+typedef struct {
+    MIi_InitReadStreamCallback initStream;
+    MIi_TerminateReadStreamCallback terminateStream;
+    MIi_ReadByteStreamCallback readByteStream;
+    MIi_ReadShortStreamCallback readShortStream;
+    MIi_ReadWordStreamCallback readWordStream;
+} MIReadStreamCallbacks;
 
 // Decompresses LZ77 data, which starts with a word holding its decompressed size in its upper 24 bits.
 void MI_UncompressLZ8(const void *src, void *dest); // swan's sys_uncomp_lz1x

@@ -71,7 +71,7 @@ void PhotoSign_InitLock(void) {
 }
 
 BOOL PhotoSign_TryLock(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSThread *current = OSi_ThreadInfo.current;
     BOOL result;
 
@@ -90,7 +90,7 @@ BOOL PhotoSign_TryLock(void) {
 }
 
 void PhotoSign_Lock(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSThread *current = OSi_ThreadInfo.current;
 
     while (TRUE) {
@@ -110,7 +110,7 @@ void PhotoSign_Lock(void) {
 }
 
 void PhotoSign_Unlock(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (sLock.owner != NULL && --sLock.count == 0) {
         sLock.owner = NULL;

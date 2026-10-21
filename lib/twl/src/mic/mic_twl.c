@@ -57,7 +57,7 @@ MICResult MICEX_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback
     MICWork *work = MICi_GetSysWork();
     u32 type;
     u8 mode;
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (param->size == 0) {
         return MIC_RESULT_ILLEGAL_PARAMETER;
@@ -146,7 +146,7 @@ MICResult MICEX_StopLimitedSampling(void) {
 // TwlSDK's MICEX_StopLimitedSamplingAsync: sends the stop, and the callback gets the answer
 static MICResult MICEX_StopLimitedSamplingAsync(MICCallback callback, void *arg) {
     MICWork *work = MICi_GetSysWork();
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (work->busy) {
         OS_RestoreInterrupts(enabled);

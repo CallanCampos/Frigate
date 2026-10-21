@@ -7,7 +7,7 @@
 #include "nitro/wm.h"
 
 // Starts the mode with the buffer that the frames are received into
-int WM_StartDCF(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize) {
+WMErrCode WM_StartDCF(WMCallbackFunc callback, WMDcfRecvBuf *recvBuf, u16 recvBufSize) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     int result = WMi_CheckStateEx(1, WM_STATE_CHILD);
 
@@ -35,7 +35,7 @@ int WM_StartDCF(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize) {
 
 // WM_SetDCFData: sends the frame in the buffer to the six-byte address. The mode must have been started and the frame
 // is 0x5e4 bytes at most
-int WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength) {
+WMErrCode WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const u16 *buffer, u16 byteLength) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     int result = WMi_CheckStateEx(1, WM_STATE_DCF_CHILD);
     u32 dstAddr[2];
@@ -60,7 +60,7 @@ int WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const void *buffer, u1
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_EndDCF(WMCallbackFunc callback) {
+WMErrCode WM_EndDCF(WMCallbackFunc callback) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     int result = WMi_CheckStateEx(1, WM_STATE_DCF_CHILD);
 

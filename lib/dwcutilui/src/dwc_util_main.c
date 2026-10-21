@@ -144,7 +144,7 @@ static void DWCUtilMain_InitGraphics(void) {
     GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     GX_SetVisiblePlane(0);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
     GX_SetOBJVRamModeChar(GX_OBJVRAMMODE_CHAR_1D_128K);
     G2_BG0Mosaic(FALSE);
     G2_BG1Mosaic(FALSE);
@@ -160,7 +160,7 @@ static void DWCUtilMain_InitGraphics(void) {
     GXS_SetGraphicsMode(GX_BGMODE_0);
     GXS_SetVisiblePlane(0);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GXS_SetMasterBrightness(0);
     GXS_SetOBJVRamModeChar(GX_OBJVRAMMODE_CHAR_1D_32K);
     G2S_BG0Mosaic(FALSE);
     G2S_BG1Mosaic(FALSE);

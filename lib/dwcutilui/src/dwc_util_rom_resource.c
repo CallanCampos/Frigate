@@ -89,7 +89,8 @@ static FSResult DWCUtilRomResource_ArchiveProc(FSFile *file, FSCommandType comma
 }
 
 static FSResult DWCUtilRomResource_ReadArchive(FSArchive *arc, void *buffer, u32 position, u32 length) {
-    CARDi_ReadRom((u32)-1, position + FS_GetArchiveBase(arc), buffer, length, DWCUtilRomResource_ReadDone, arc, TRUE);
+    CARD_ReadRomAsync((u32)-1, (const void *)(position + FS_GetArchiveBase(arc)), buffer, length,
+                      DWCUtilRomResource_ReadDone, arc);
     return FS_RESULT_PROC_ASYNC;
 }
 

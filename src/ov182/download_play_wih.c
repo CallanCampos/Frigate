@@ -107,8 +107,8 @@ static BOOL func_ov182_021b9cc0(void) {
     int result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
-    wepMode = gWork.work->unk_13ac(&gWork.work->wepKey);
-    result = WM_SetWEPKey(func_ov182_021b9d04, wepMode, &gWork.work->wepKey);
+    wepMode = gWork.work->unk_13ac(gWork.work->wepKey);
+    result = WM_SetWEPKey(func_ov182_021b9d04, wepMode, gWork.work->wepKey);
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
         func_ov182_021b9be4(WIH_STATE_ERROR);
@@ -207,8 +207,8 @@ static BOOL func_ov182_021b9e48(void) {
         return TRUE;
     }
     func_ov182_021b9be4(WIH_STATE_CONNECTED);
-    result = WM_StartMP(func_ov182_021b9eb0, gWork.work->recvBuf, gWork.work->recvBufSize, gWork.work->sendBuf,
-                        gWork.work->sendBufSize, 1);
+    result = WM_StartMP(func_ov182_021b9eb0, (u16 *)gWork.work->recvBuf, gWork.work->recvBufSize,
+                        (u16 *)gWork.work->sendBuf, gWork.work->sendBufSize, 1);
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
         return FALSE;
@@ -689,12 +689,12 @@ void func_ov182_021ba5d0(WHScanFilter filter) {
 
 // WH_GetSharedDataAdr: the data of the machine of the AID, from the last step of the data sharing
 u8 *func_ov182_021ba5dc(u16 netId) {
-    return WM_GetSharedDataAddress(&gWork.work->dataSharing, &gWork.work->dataSet, netId);
+    return (u8 *)WM_GetSharedDataAddress(&gWork.work->dataSharing, &gWork.work->dataSet, netId);
 }
 
 // WH_StepDS: shares the data given, for the machines to read the next step
 BOOL func_ov182_021ba5fc(u8 *data) {
-    int result = WM_StepDataSharing(&gWork.work->dataSharing, data, &gWork.work->dataSet);
+    int result = WM_StepDataSharing(&gWork.work->dataSharing, (const u16 *)data, &gWork.work->dataSet);
 
     if (result == 7) {
         if (gWork.logPrint != NULL) {

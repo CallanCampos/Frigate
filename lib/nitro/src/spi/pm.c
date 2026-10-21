@@ -134,7 +134,7 @@ static void PMi_WaitBusy(void);
 static void PMi_SyncCallback(u32 result, void *arg);
 static void PMi_CallCallbackAndUnlock(u32 result);
 static void func_0207eb9c(void);
-static void PMi_CommonCallback(u32 tag, u32 data, BOOL err);
+static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 static u32 PMi_SendPxiData(const u32 *words, int length, u16 *result, PMCallback callback, void *arg);
 static void PMi_SendPxiDataSync(const u32 *words, int length);
 static u32 PMi_SendSleepStart(u16 trigger, u16 keyPattern);
@@ -208,7 +208,7 @@ void PM_Init(void) {
 }
 
 // The ARM7's answers, and its notifications
-static void PMi_CommonCallback(u32 tag, u32 data, BOOL err) {
+static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     u16 command, value;
     BOOL finish = TRUE;
 
@@ -266,7 +266,7 @@ static void PMi_CommonCallback(u32 tag, u32 data, BOOL err) {
 
 // Sends the words of a request, if the ARM7 is not on another. PM_RESULT_BUSY if it is
 static u32 PMi_SendPxiData(const u32 *words, int length, u16 *result, PMCallback callback, void *arg) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
     if (PMi_Work.lock) {
@@ -376,7 +376,7 @@ static u32 func_0207ee94(u32 power) {
 }
 
 // PM_SetBackLightAsync
-u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *arg) {
+u32 PM_SetBackLightAsync(PMLCDTarget target, PMBackLightSwitch backlight, PMCallback callback, void *arg) {
     u32 request = 0;
 
     if (target == PM_LCD_TOP) {
@@ -408,7 +408,7 @@ u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *a
 }
 
 // NitroSDK's PM_SetBackLight
-u32 PM_SetBackLight(u32 target, u32 backlight) {
+u32 PM_SetBackLight(PMLCDTarget target, PMBackLightSwitch backlight) {
     u32 res;
     u32 sent = PM_SetBackLightAsync(target, backlight, PMi_SyncCallback, &res);
 
@@ -456,7 +456,7 @@ void PM_ForceToPowerOff(void) {
     }
 }
 
-u32 PM_SetAmp(int amp) {
+u32 PM_SetAmp(PMAmpSwitch amp) {
     PMi_Amp = amp;
     return PMi_SetAmp(amp);
 }
@@ -469,7 +469,7 @@ static u32 PMi_SetAmp(int amp) {
     return PM_RESULT_SUCCESS;
 }
 
-u32 PM_SetAmpGain(int gain) {
+u32 PM_SetAmpGain(PMAmpGain gain) {
     return PMi_ReadRegister(PM_REQ_SET_AMP_GAIN, gain, NULL);
 }
 
@@ -478,7 +478,7 @@ u32 PM_SetAmpGainLevel(u8 level) {
 }
 
 // PM_GetBattery
-u32 PM_GetBattery(u32 *battery) {
+u32 PM_GetBattery(PMBattery *battery) {
     u16 data;
     u32 state = PM_BATTERY_HIGH;
     u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BATTERY, &data);
@@ -501,7 +501,7 @@ u32 PM_GetBatteryLevel(u16 *level) {
 }
 
 // NitroSDK's PM_GetBackLight
-u32 PM_GetBackLight(u32 *top, u32 *bottom) {
+u32 PM_GetBackLight(PMBackLightSwitch *top, PMBackLightSwitch *bottom) {
     u16 data;
     u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_BACKLIGHT, &data);
 
@@ -516,7 +516,7 @@ u32 PM_GetBackLight(u32 *top, u32 *bottom) {
     return result;
 }
 
-u32 PM_GetAmp(int *amp) {
+u32 PM_GetAmp(PMAmpSwitch *amp) {
     u16 data;
     u32 result = PMi_ReadRegister(PM_REQ_READ_REGISTER, PM_REG_AMP, &data);
 
@@ -571,13 +571,13 @@ static void PMi_StopDma(void) {
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern) {
     BOOL cardPulledOut = FALSE;
     BOOL ime;
-    u32 irq;
+    OSIntrMode irq;
     u32 interrupts;
     u32 dispcnt;
     u32 dispcntSub;
     BOOL screensOn;
-    u32 top;
-    u32 bottom;
+    PMBackLightSwitch top;
+    PMBackLightSwitch bottom;
     u32 startTrigger;
 
     PMi_CallCallbackList(PMi_PreSleepList);
@@ -736,7 +736,7 @@ u32 func_0207f520(u32 *value) {
 void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType) {
     PMGenCallbackInfo *cur;
     PMGenCallbackInfo *prev;
-    u32 irq;
+    OSIntrMode irq;
 
     if (list == NULL) {
         return;
@@ -768,7 +768,7 @@ void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int prior
 void PMi_DeleteList(PMGenCallbackInfo **list, PMGenCallbackInfo *info) {
     PMGenCallbackInfo *cur;
     PMGenCallbackInfo *prev;
-    u32 irq;
+    OSIntrMode irq;
 
     if (list == NULL) {
         return;

@@ -174,7 +174,7 @@ static void PMi_ExecuteExit(BOOL reset) {
 }
 
 static BOOL PMi_TryLockExit(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (PMi_ExitLocked) {
         OS_RestoreInterrupts(enabled);

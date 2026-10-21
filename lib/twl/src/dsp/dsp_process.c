@@ -340,7 +340,7 @@ static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB,
 }
 
 void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callback, void *userData) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int i;
     int replies;
     u16 mask;
@@ -383,7 +383,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
     DSP_SetCallback(context, 0x48000, func_027070dc, NULL);
     OS_EnableIrqMask(OS_IE_DSP);
     if (func_02705acc(context, image, banksB, banksC)) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         DSPProcessContext **link = &sProcessList;
         while (*link != NULL && *link != context) {
             link = &(*link)->next;
@@ -424,7 +424,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
 }
 
 void DSP_QuitProcess(DSPProcessContext *context) {
-    u32 irq;
+    OSIntrMode irq;
     DSPProcessContext **link;
     DSPProcessContext *node;
     func_027052b4();
@@ -451,7 +451,7 @@ void DSP_QuitProcess(DSPProcessContext *context) {
 
 DSPProcessContext *DSP_FindProcess(const char *name) {
     DSPProcessContext *context;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     context = sProcessList;
     if (name != NULL) {
         while (context != NULL && STD_CompareString(context->name, name) != 0) {

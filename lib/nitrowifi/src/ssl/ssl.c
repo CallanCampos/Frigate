@@ -1929,7 +1929,7 @@ void CPS_SetSsl(BOOL enable) {
     OSThread *thread;
     CPSSoc *soc;
 
-    OSi_ReferSymbol(SSLi_Signature);
+    SDK_USING_MIDDLEWARE(SSLi_Signature);
     thread = OS_GetCurrentThread();
     soc = (CPSSoc *)thread->specific[0];
     if (soc != NULL) {

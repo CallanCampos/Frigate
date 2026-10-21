@@ -1219,8 +1219,8 @@ static BOOL PkwdBriefing_Exit(GameProc *proc, u32 *state, void *param, void *wor
 }
 
 static void PkwdBriefing_ResetDisplay(void) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();

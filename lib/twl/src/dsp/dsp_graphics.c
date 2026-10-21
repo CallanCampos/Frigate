@@ -45,7 +45,7 @@ BOOL DSP_OpenStaticComponentGraphicsCore(FSFile *file) {
         FS_Init(FS_DMA_NOT_USE);
     }
     FS_InitFile(file);
-    return FS_CreateFileFromMemory(file, DSP_GraphicsImage, DSP_COMPONENT_IMAGE_SIZE);
+    return FS_CreateFileFromMemory(file, (void *)DSP_GraphicsImage, DSP_COMPONENT_IMAGE_SIZE);
 }
 
 // The DSP's answer to an asynchronous scaling: whether it worked or not, the scaling is over, and only a success is

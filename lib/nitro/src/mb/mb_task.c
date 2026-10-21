@@ -17,7 +17,7 @@ static void MBTask_ThreadMain(void *arg) {
     MBTaskThread *thread = arg;
 
     while (TRUE) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         MBTask *task;
         void (*done)(MBTask *task);
         u32 priority;
@@ -62,7 +62,7 @@ static void MBTask_ThreadMain(void *arg) {
 
 // Starts the thread, with a block of memory for it and its stack
 void MBTask_StartThread(MBTaskThread *thread, u32 size) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sTaskThread == NULL) {
         u32 stackSize;
@@ -122,7 +122,7 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
         }
     }
     {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
 
         task->busy = 1;
         task->priority = priority;
@@ -162,7 +162,7 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
 
 // Ends the thread once its jobs are done, and then runs a function
 void MBTask_EndThread(void (*done)(MBTask *task)) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (MBTask_IsThreadStarted()) {
         MBTask_Add(&sTaskThread->exitTask, NULL, done, 0);

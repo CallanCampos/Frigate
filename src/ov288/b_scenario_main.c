@@ -381,7 +381,7 @@ static void BScenarioMain_Step(BScenarioWork *work) {
 
 static void BScenarioMain_Init(BScenarioWork *work) {
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXS_SetMasterBrightness(-16);
     work->tcbManager = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, work->param->heapId);
     work->printQueue = PrintQueue_Create(0x800, work->param->heapId);

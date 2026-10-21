@@ -41,7 +41,7 @@ void func_027026ec(void) {
 }
 
 // The PXI callback: takes the event that the ARM7 points to, runs the callbacks and gives the buffer back
-void func_02702740(u32 tag, u32 data, BOOL err) {
+void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
     NWMSys *sys = NWMi_SystemArea;
     NWMEvent *event = (NWMEvent *)data;
     NWMCallback callback;

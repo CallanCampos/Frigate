@@ -87,7 +87,7 @@ static void MIi_NDma(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data
                      const MINDmaSettings *config, u32 timing, u32 enable) {
     if (size > 0) {
         u32 control;
-        u32 enabled = OS_DisableInterrupts();
+        OSIntrMode enabled = OS_DisableInterrupts();
 
         MIi_WaitNDmaDone(ndmaNo);
         if (mode != 0) {
@@ -122,7 +122,7 @@ void MIi_NDmaAsync(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, 
         }
     } else {
         u32 control;
-        u32 enabled = OS_DisableInterrupts();
+        OSIntrMode enabled = OS_DisableInterrupts();
 
         MIi_WaitNDmaDone(ndmaNo);
         if (callback != NULL) {
@@ -180,14 +180,14 @@ BOOL MI_IsNDmaBusy(u32 ndmaNo) {
 }
 
 void MI_WaitNDma(u32 ndmaNo) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     while (MI_NDMA_REG(ndmaNo, MI_NDMA_CNT) & MI_NDMA_ENABLE) {
     }
     OS_RestoreInterrupts(enabled);
 }
 
 void MI_StopNDma(u32 ndmaNo) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     MI_NDMA_REG(ndmaNo, MI_NDMA_CNT) &= ~MI_NDMA_ENABLE;
     // The channel stops after two more reads of its control
     MI_NDMA_REG(ndmaNo, MI_NDMA_CNT);
@@ -233,7 +233,7 @@ void MI_CopyNDmaSettings(u32 ndmaNo, MINDmaSettings *config) {
 }
 
 void MIi_StartCardNDma(u32 ndmaNo, const void *src, void *dest) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     MINDmaSettings *config = &MIi_NDmaConfig[ndmaNo];
     MIi_WaitNDmaDone(ndmaNo);
     MI_NDMA_REG(ndmaNo, MI_NDMA_SAD) = (u32)src;

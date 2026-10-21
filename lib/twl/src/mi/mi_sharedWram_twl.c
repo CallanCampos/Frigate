@@ -49,7 +49,7 @@ static u8 MIi_ReadWramBankControl_C(int bank);
 static u32 MIi_WramBankToAddress_A(int bank);
 static u32 MIi_WramBankToAddress_B(int bank);
 static u32 MIi_WramBankToAddress_C(int bank);
-static void MIi_WramPxiCallback(u32 tag, u32 data, BOOL err);
+static void MIi_WramPxiCallback(PXIFifoTag tag, u32 data, BOOL err);
 static u32 MIi_AllocWramCore(MIWram wram, int count, MIWramProc proc);
 static u32 MIi_AllocWramSlotCore(MIWram wram, int slot, int count, MIWramProc proc);
 static int MIi_FreeWramCore(MIWram wram, MIWramProc proc);
@@ -259,7 +259,7 @@ void MIi_InitWramManagerCore(void) {
 }
 
 // A request of the ARM7's, which is answered with the result, or the reply to one of the ARM9's
-static void MIi_WramPxiCallback(u32 tag, u32 data, BOOL err) {
+static void MIi_WramPxiCallback(PXIFifoTag tag, u32 data, BOOL err) {
     u32 command;
     u32 param;
     MIWram wram;
@@ -680,7 +680,7 @@ static void MIi_UnlockWram(u16 lockId) {
 }
 
 static u32 MIi_EnterWramCritical(u16 *lockId) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     MIi_LockWram(lockId);
     return enabled;
 }

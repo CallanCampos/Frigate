@@ -208,7 +208,7 @@ static void BPlistMain_Task(TCB *tcb, void *data) {
 
 static int BPlistMain_StateInit(BPlistWork *work) {
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXS_SetMasterBrightness(-16);
     work->tcbExMgr = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     if (work->param->unk1F == 4) {
         work->page = 6;

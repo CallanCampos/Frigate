@@ -7,6 +7,8 @@
 
 // The page that the commands move a page of the backup through
 #define CARD_BACKUP_PAGE_SIZE 256
+// NitroSDK's: what every backup command starts with, to keep the signature in the link
+#define SDK_USING_BACKUP() SDK_USING_MIDDLEWARE(CARDi_BackupSignature)
 
 static void CARDi_RequestStreamCommandCore(CARDiCommon *p);
 static void CARDi_IdentifyBackupCore(CARDBackupType type);
@@ -22,7 +24,7 @@ static void CARDi_RequestStreamCommandCore(CARDiCommon *p) {
     CARDRequestMode reqMode = p->reqMode;
     int reqRetry = p->reqRetry;
     u32 size = CARD_BACKUP_PAGE_SIZE;
-    OSi_ReferSymbol(CARDi_BackupSignature);
+    SDK_USING_BACKUP();
     if (reqType == CARD_REQ_ERASE_SECTOR_BACKUP) {
         size = CARD_GetBackupSectorSize();
     } else if (reqType == CARD_REQ_ERASE_SUBSECTOR_BACKUP) {
@@ -229,7 +231,7 @@ static void CARDi_IdentifyBackupTask(CARDiCommon *p) {
 // Begins a backup command: checks that the game may use the card in this way, then waits until the last command is
 // done
 static BOOL CARDi_BeginBackupCommand(u32 permit, MIDmaCallback callback, void *arg) {
-    OSi_ReferSymbol(CARDi_BackupSignature);
+    SDK_USING_BACKUP();
     CARD_CheckEnabled();
     if ((CARDi_GetAccessLevel() & permit) != permit) {
         OS_Terminate();
@@ -273,7 +275,7 @@ BOOL CARD_TryWaitBackupAsync(void) {
 }
 
 void CARD_CancelBackupAsync(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     cardi_common.flag |= CARD_STAT_CANCEL;
     OS_RestoreInterrupts(irq);
 }

@@ -92,8 +92,8 @@ void ZukanHabitatGraphic_Init(ZukanHabitatGraphic *graphic, GameData *gameData) 
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetDisplayLayout(0);
     graphic->townmap = TownMapData_Load(HEAPID_ZUKAN_HABITAT);
     graphic->iconArc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_ZUKAN_HABITAT);
@@ -120,8 +120,8 @@ void ZukanHabitatGraphic_Exit(ZukanHabitatGraphic *graphic) {
     ZukanHabitatGraphic_FreeBG();
     ZukanHabitatGraphic_FreeBlink(graphic);
     ZukanHabitatGraphic_FreePaletteFade(graphic);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);

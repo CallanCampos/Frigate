@@ -112,7 +112,7 @@ static CAMERAWork sCameraWork;
 static u32 sUnused; // Nothing reads it; the library's other code that used it was stripped
 static BOOL sCameraInitialized;
 
-static void func_02701aa0(u32 tag, u32 data, BOOL err);
+static void func_02701aa0(PXIFifoTag tag, u32 data, BOOL err);
 static void func_02701fd8(CAMERAResult result, void *arg);
 static void func_02702028(void);
 static void func_02702070(void *arg);
@@ -592,7 +592,7 @@ CAMERAResult func_02700bd0(void) {
 // Starts the I2C of the cameras
 static CAMERAResult func_02700c18(CAMERASelect camera, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -626,7 +626,7 @@ CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera) {
 // Activates a camera, or none
 static CAMERAResult func_02700cec(CAMERASelect camera, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -670,7 +670,7 @@ CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera) {
 static CAMERAResult func_02700df0(CAMERASelect camera, CAMERAContext context, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -705,7 +705,7 @@ static CAMERAResult func_02700eb8(CAMERASelect camera, CAMERAContext context, CA
                                   void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -763,7 +763,7 @@ CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CA
 static CAMERAResult func_02701020(CAMERASelect camera, int rate, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -812,7 +812,7 @@ static CAMERAResult func_02701120(CAMERASelect camera, CAMERAContext context, CA
                                   CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -870,7 +870,7 @@ static CAMERAResult func_02701284(CAMERASelect camera, CAMERAContext context, CA
                                   void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(3)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -915,7 +915,7 @@ static CAMERAResult func_02701284(CAMERASelect camera, CAMERAContext context, CA
 static CAMERAResult func_027013a4(CAMERASelect camera, CAMERAPhotoMode mode, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -957,7 +957,7 @@ static CAMERAResult func_02701488(CAMERASelect camera, CAMERAWhiteBalance whiteB
                                   void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -999,7 +999,7 @@ static CAMERAResult func_02701488(CAMERASelect camera, CAMERAWhiteBalance whiteB
 static CAMERAResult func_02701570(CAMERASelect camera, int exposure, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -1033,7 +1033,7 @@ static CAMERAResult func_02701570(CAMERASelect camera, int exposure, CAMERACallb
 static CAMERAResult func_02701644(CAMERASelect camera, int sharpness, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -1067,7 +1067,7 @@ static CAMERAResult func_02701644(CAMERASelect camera, int sharpness, CAMERACall
 static CAMERAResult func_02701718(CAMERASelect camera, BOOL on, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -1108,7 +1108,7 @@ CAMERAResult CAMERA_I2CAutoExposureCore(CAMERASelect camera, BOOL on) {
 static CAMERAResult func_02701814(CAMERASelect camera, BOOL on, CAMERACallback callback, void *arg) {
     CAMERAResult state = func_027007c8();
     u8 data[CAMERA_COMMAND_BUFFER_SIZE(2)];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (state == CAMERA_RESULT_FATAL_ERROR) {
         return state;
@@ -1154,7 +1154,7 @@ CAMERAResult CAMERA_I2CAutoWhiteBalanceCore(CAMERASelect camera, BOOL on) {
 }
 
 static CAMERAResult func_02701940(int value, CAMERACallback callback, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (sCameraWork.busy) {
         OS_RestoreInterrupts(enabled);
@@ -1171,7 +1171,7 @@ static CAMERAResult func_02701940(int value, CAMERACallback callback, void *arg)
 // Sends the first word of a command, with its first byte of data, after turning the interface's clock on
 static BOOL func_027019b4(u32 command, u32 length, u8 data) {
     u32 word = ((command << 8) & 0x7f00) | CAMERA_PXI_START | ((length << 16) & 0xff0000) | (data & 0xff);
-    u32 enabled;
+    OSIntrMode enabled;
     u16 clk;
     int wasOn;
 
@@ -1214,7 +1214,7 @@ static void func_02701a60(const u8 *data) {
 
 // The camera interface's PXI callback: puts together an answer from its words and, with the whole answer, updates
 // what the settings are
-static void func_02701aa0(u32 tag, u32 data, BOOL err) {
+static void func_02701aa0(PXIFifoTag tag, u32 data, BOOL err) {
     CAMERAResult result;
 
     if (err) {
@@ -1245,7 +1245,7 @@ static void func_02701aa0(u32 tag, u32 data, BOOL err) {
         return;
     }
     if (sCameraWork.stopClock || (!sCameraWork.keepClock && !sCameraWork.clockWasOn)) {
-        u32 enabled = OS_DisableInterrupts();
+        OSIntrMode enabled = OS_DisableInterrupts();
 
         reg_SCFG_CLK = reg_SCFG_CLK & ~SCFG_CLK_CAMERA;
         OS_RestoreInterrupts(enabled);

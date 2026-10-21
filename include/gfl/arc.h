@@ -13,7 +13,7 @@ const char *GFL_ArcSysGetResourcePath(u32 arcId);
 // Sets the paths of the archives, by archive ID
 void GFL_ArcSysInit(const char **paths, u32 count);
 ArcTool *GFL_ArcSysCreateFileHandle(u32 arcId, HeapID heapId);
-ArcTool *GFL_ArcSysCreateMemoryHandle(const void *data, u32 size, HeapID heapId);
+ArcTool *GFL_ArcSysCreateMemoryHandle(void *data, u32 size, HeapID heapId);
 // Reads a file of the archive at path into a new allocation
 void *GFL_ArcSysReadHeapNewDirect(const char *path, u32 fileId, HeapID heapId);
 u32 GFL_ArcSysGetDataLength(u32 arcId, u32 fileId);

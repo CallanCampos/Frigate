@@ -27,7 +27,7 @@ u32 SOCLiDefaultLanBufferSize = 0x4000;
 int SOCL_Startup(SOCLConfig *config) {
     int result;
 
-    OSi_ReferSymbol(SOCLi_Signature);
+    SDK_USING_MIDDLEWARE(SOCLi_Signature);
     if (SOCLiConfigPtr != NULL) {
         return 0;
     }

@@ -22,7 +22,7 @@ static void DWCi_SetStarted(int started);
 
 int DWC_InitForProduction(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int),
                           void (*free)(u32, void *, u32)) {
-    OSi_ReferSymbol(DWCi_Signature);
+    SDK_USING_MIDDLEWARE(DWCi_Signature);
     return DWCi_Init(1, gameName, gameCode, alloc, free);
 }
 

@@ -17,7 +17,7 @@ typedef struct {
     u8 isAgbCartridge : 1; // The ROM has the header of a GBA cartridge, so its game code can be compared
     u8 pulledOut : 1;      // The library found that the cartridge was pulled out or exchanged
     u8 unk_05 : 6;
-    u8 unk_06[2];
+    u16 makerCode;
     u32 gameCode; // The cartridge's game code
 } CTRDGModuleInfo;
 

@@ -124,7 +124,7 @@ extern NWMSys *NWMi_SystemArea;
 extern PMExitCallbackInfo NWMi_UnloadOnExit;
 NWMSys *func_027026dc(void);
 void func_027026ec(void);
-void func_02702740(u32 tag, u32 data, BOOL err);
+void func_02702740(PXIFifoTag tag, u32 data, BOOL err);
 NWMRetCode func_027028e4(u32 count, ...);
 void func_02702a40(void);
 

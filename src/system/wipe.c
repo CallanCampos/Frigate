@@ -184,9 +184,9 @@ void Wipe_SetBackdropColor(u16 color) {
 
 void setBrightnessForEngine(int screen, int brightness) {
     if (screen == 0) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
+        GX_SetMasterBrightness(brightness);
     } else {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, brightness);
+        GXS_SetMasterBrightness(brightness);
     }
 }
 

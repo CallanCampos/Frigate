@@ -525,8 +525,8 @@ static void Oekaki_FreeWork(OekakiWork *wk) {
 }
 
 static void Oekaki_FreeBG(void) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysReleaseBG(5);
     GFL_BGSysReleaseBG(4);
     GFL_BGSysReleaseBG(2);

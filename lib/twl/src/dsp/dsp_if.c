@@ -85,7 +85,7 @@ u16 DSP_RecvDataCore(int index) {
 }
 
 void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u16 autoIncrement = (flags & DSP_WRITE_FIXED_ADDRESS) ? 0 : DSP_PCFG_AUTO_INCREMENT;
     reg_DSP_PADR = dspAddr;
     reg_DSP_PCFG = (reg_DSP_PCFG & ~(DSP_PCFG_MEMORY_MASK | DSP_PCFG_AUTO_INCREMENT)) | memory | autoIncrement;
@@ -106,7 +106,7 @@ void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags
 }
 
 void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u16 autoIncrement = (flags & DSP_READ_FIXED_ADDRESS) ? 0 : DSP_PCFG_AUTO_INCREMENT;
     u16 length;
 

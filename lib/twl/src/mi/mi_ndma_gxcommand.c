@@ -40,7 +40,7 @@ static MIiGXNDmaState sGXNDmaState;
 #pragma section LTDMAIN begin
 
 void MI_SendNDmaGXCommandAsync(u32 ndmaNo, const void *src, u32 length, MINDmaCallback callback, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (length == 0) {
         if (callback != NULL) {

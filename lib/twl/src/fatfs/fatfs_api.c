@@ -105,7 +105,7 @@ static inline FatfsRequest *TakeReservedRequest(void) {
     FatfsRequest *request = NULL;
     FatfsRequest *candidate;
     OSThread *current;
-    u32 irq;
+    OSIntrMode irq;
 
     irq = OS_DisableInterrupts();
     current = func_027040ec();
@@ -127,7 +127,7 @@ static FatfsRequest *func_0270410c(u32 command) {
     FatfsRequest *request;
     FatfsThread *thread;
     OSThread *current;
-    u32 irq;
+    OSIntrMode irq;
 
     request = TakeReservedRequest();
     if (request == NULL) {
@@ -187,7 +187,7 @@ static void func_02704264(FatfsRequest *request) {
     while (waiting) {
         // The PXI callback adds to the list of done requests from its interrupt
         FatfsRequest *volatile *link;
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
 
         for (link = &sFatfs.done; *link != NULL; link = &(*link)->next) {
             if (*link == request) {

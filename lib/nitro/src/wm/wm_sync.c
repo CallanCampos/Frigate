@@ -8,8 +8,8 @@
 #include "nitro/rtc.h"
 #include "nitro/wm.h"
 
-int WM_SetIndCallback(WMCallbackFunc callback) {
-    u32 irq = OS_DisableInterrupts();
+WMErrCode WM_SetIndCallback(WMCallbackFunc callback) {
+    OSIntrMode irq = OS_DisableInterrupts();
     int result = WMi_CheckInitialized();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -21,9 +21,9 @@ int WM_SetIndCallback(WMCallbackFunc callback) {
     return WM_ERRCODE_SUCCESS;
 }
 
-int WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg) {
+WMErrCode WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg) {
     WMPortRecvCallback cb;
-    u32 irq;
+    OSIntrMode irq;
     int result;
     WMArm9Buf *w9b;
 
@@ -61,7 +61,7 @@ int WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg) {
     return WM_ERRCODE_SUCCESS;
 }
 
-int WM_ReadStatus(WMStatus *statusBuf) {
+WMErrCode WM_ReadStatus(WMStatus *statusBuf) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     int result = WMi_CheckInitialized();
 
@@ -118,14 +118,14 @@ int WM_GetMPReceiveBufferSize(void) {
 }
 
 // The data that the child with the AID sent in a round of the multi-point mode, or NULL if it sent none
-const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid) {
+WMMpRecvData *WM_ReadMPData(const WMMpRecvHeader *header, u16 aid) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     // BUG: when the buffer has 15 entries and none is the child's, the loop writes datap[15], past the array and over a
     // saved register
 #ifdef BUGFIX
-    const WMMpRecvData *datap[16];
+    WMMpRecvData *datap[16];
 #else
-    const WMMpRecvData *datap[15];
+    WMMpRecvData *datap[15];
 #endif
     int i;
 
@@ -139,19 +139,19 @@ const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid) {
     if (!(w9b->status->childBitmap & (1 << aid))) {
         return NULL;
     }
-    if (recvBuf->count == 0 || recvBuf->count > 15) {
+    if (header->count == 0 || header->count > 15) {
         return NULL;
     }
 
-    datap[0] = (const WMMpRecvData *)recvBuf->entries;
+    datap[0] = (WMMpRecvData *)header->data;
     i = 0;
     do {
         if (aid == datap[i]->aid) {
             return datap[i];
         }
         i++;
-        datap[i] = (const WMMpRecvData *)((u32)datap[i - 1] + recvBuf->entrySize);
-    } while (i < recvBuf->count);
+        datap[i] = (WMMpRecvData *)((u32)datap[i - 1] + header->length);
+    } while (i < header->count);
     return NULL;
 }
 

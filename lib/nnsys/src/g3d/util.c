@@ -43,7 +43,7 @@ int NNS_G3dWorldPosToScrPos(const VecFx32 *world, int *x, int *y) {
     fx32 w;
     fx32 clipX;
     fx32 clipY;
-    fx64 invW;
+    fx64c invW;
     fx32 fracX;
     fx32 fracY;
     int result;
@@ -97,7 +97,7 @@ int NNS_G3dScrPosToWorldLine(int px, int py, VecFx32 *nearPos, VecFx32 *farPos) 
     const MtxFx44 *inv;
     fx32 wBase;
     fx32 wFar;
-    fx64 invW;
+    fx64c invW;
     fx32 x;
     fx32 y;
     fx32 z;

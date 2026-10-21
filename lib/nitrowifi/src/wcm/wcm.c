@@ -56,28 +56,6 @@ typedef struct WCMApListHeader {
     WCMApEntry entries[];
 } WCMApListHeader;
 
-// Recovered DCF receive-record prefix, named here for its WCM consumer rather than as an established SDK type.
-// The payload follows this prefix in the registered receive buffer; its length is supplied separately.
-typedef struct WCMReceiveRecord {
-    u8 unk_00[6];
-    u16 payloadLength; // 0x06
-    u8 unk_08[6];
-    u16 signalWord; // 0x0e, the high byte is the encoded input to WCM_AddRssiSample
-    u8 unk_10[8];
-    u8 destination[6]; // 0x18
-    u8 source[6];      // 0x1e
-    u8 unk_24[8];
-    u8 payload[]; // 0x2c
-} WCMReceiveRecord;
-
-// A private view of the callback bytes WCM reads; these names do not establish a complete SDK callback layout
-typedef struct WCMDcfCallbackView {
-    WMCallback base;
-    u16 state; // 0x04, start or receive event
-    u16 unk_06;
-    WCMReceiveRecord *record; // 0x08, borrowed WM buffer, dispatched synchronously
-} WCMDcfCallbackView;
-
 // The 802.3 header of a mode 2 frame. Only the length, big-endian, is filled in here
 typedef struct WCMEthernetHeader {
     u8 destination[6];
@@ -1426,11 +1404,11 @@ static s32 WCM_StartDisconnectStep(void) {
 
 static s32 WCM_RestoreIdleStep(void) {
     WCMWork *work = WCM_GetWork();
-    const u16 *status = WMi_GetStatusAddress();
+    const WMStatus *status = WMi_GetStatusAddress();
     s32 result;
 
-    DC_InvalidateRange(status, 2);
-    switch (*status) {
+    DC_InvalidateRange((void *)status, 2);
+    switch (status->state) {
     case 0:
         result = WM_Finish();
         if (result == 0) {
@@ -1759,7 +1737,7 @@ static void WCM_OnConnectStatus(void *ind) {
                 WCM_RequestReset();
             } else if (callback->aid >= 1 && callback->aid <= 0x7d7) {
                 work->associationId = callback->aid;
-                result = WM_StartDCF((WMCallbackFunc)WCM_OnDcfReceive, work->ioBuffer.receive,
+                result = WM_StartDCF((WMCallbackFunc)WCM_OnDcfReceive, (WMDcfRecvBuf *)work->ioBuffer.receive,
                                      sizeof(work->ioBuffer.receive));
                 switch (result) {
                 case 2:
@@ -1833,10 +1811,10 @@ static void WCM_OnDisconnectComplete(void *ind) {
 }
 
 static void WCM_OnDcfReceive(void *ind) {
-    const WCMDcfCallbackView *callback = ind;
+    const WMStartDCFCallback *callback = ind;
     WCMWork *work = WCM_GetWork();
 
-    switch (callback->base.errcode) {
+    switch (callback->errcode) {
     case 0:
         switch (callback->state) {
         case 0xe:
@@ -1849,10 +1827,10 @@ static void WCM_OnDcfReceive(void *ind) {
             }
             break;
         case 0xf:
-            WCM_AddRssiSample((u8)(callback->record->signalWord >> 8));
-            DC_InvalidateRange(callback->record, 0x620);
-            WCM_DispatchRecvCallback(callback->record->source, callback->record->destination, callback->record->payload,
-                                     callback->record->payloadLength);
+            WCM_AddRssiSample((u8)(callback->recvBuf->rate_rssi >> 8));
+            DC_InvalidateRange(callback->recvBuf, 0x620);
+            WCM_DispatchRecvCallback(callback->recvBuf->srcAdrs, callback->recvBuf->destAdrs,
+                                     (u8 *)callback->recvBuf->data, callback->recvBuf->length);
             break;
         default:
             WCM_SetState(0xb);

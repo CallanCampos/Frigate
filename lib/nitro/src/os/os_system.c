@@ -11,7 +11,7 @@ static u16 *sys_get_boot_indicator_ptr(void);
 // clang-format off
 // NitroSDK's OS_EnableInterrupts, assembly in the SDK like every function here that reads or changes the CPSR: clears
 // the IRQ bit and gives the one the CPSR had
-asm u32 OS_EnableInterrupts(void) {
+asm OSIntrMode OS_EnableInterrupts(void) {
     mrs r0, cpsr
     bic r1, r0, #0x80
     msr cpsr_c, r1
@@ -20,7 +20,7 @@ asm u32 OS_EnableInterrupts(void) {
 }
 
 // NitroSDK's OS_DisableInterrupts, assembly in the SDK: sets the IRQ bit and gives the one the CPSR had
-asm u32 OS_DisableInterrupts(void) {
+asm OSIntrMode OS_DisableInterrupts(void) {
     mrs r0, cpsr
     orr r1, r0, #0x80
     msr cpsr_c, r1
@@ -29,7 +29,7 @@ asm u32 OS_DisableInterrupts(void) {
 }
 
 // NitroSDK's OS_RestoreInterrupts, assembly in the SDK: sets the IRQ bit to mask and gives the one the CPSR had
-asm u32 OS_RestoreInterrupts(u32 mask) {
+asm OSIntrMode OS_RestoreInterrupts(OSIntrMode mask) {
     mrs r1, cpsr
     bic r2, r1, #0x80
     orr r2, r2, r0
@@ -39,7 +39,7 @@ asm u32 OS_RestoreInterrupts(u32 mask) {
 }
 
 // NitroSDK's OS_DisableInterrupts_IrqAndFiq, assembly in the SDK: OS_DisableInterrupts for both the IRQ and FIQ bits
-asm u32 OS_DisableInterrupts_IrqAndFiq(void) {
+asm OSIntrMode OS_DisableInterrupts_IrqAndFiq(void) {
     mrs r0, cpsr
     orr r1, r0, #0xc0
     msr cpsr_c, r1
@@ -48,7 +48,7 @@ asm u32 OS_DisableInterrupts_IrqAndFiq(void) {
 }
 
 // NitroSDK's OS_RestoreInterrupts_IrqAndFiq, assembly in the SDK: OS_RestoreInterrupts for both bits
-asm u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask) {
+asm OSIntrMode OS_RestoreInterrupts_IrqAndFiq(OSIntrMode mask) {
     mrs r1, cpsr
     bic r2, r1, #0xc0
     orr r2, r2, r0
@@ -58,14 +58,14 @@ asm u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask) {
 }
 
 // NitroSDK's OS_GetCpsrIrq, assembly in the SDK: the IRQ bit of the CPSR
-asm u32 OS_GetCpsrIrq(void) {
+asm OSIntrMode_Irq OS_GetCpsrIrq(void) {
     mrs r0, cpsr
     and r0, r0, #0x80
     bx lr
 }
 
 // NitroSDK's OS_GetProcMode, assembly in the SDK: the processor's mode, from the CPSR
-asm u32 OS_GetProcMode(void) {
+asm OSProcMode OS_GetProcMode(void) {
     mrs r0, cpsr
     and r0, r0, #0x1f
     bx lr
@@ -92,8 +92,8 @@ void OS_SpinWaitSysCycles(u32 cycles) {
 
 // NitroSDK's OS_WaitInterrupt: waits for one of the interrupts, after forgetting the ones that happened if clear is
 // set. It halts the CPU with IME on, and lets the IRQ through for a moment every time the CPU wakes
-void OS_WaitInterrupt(BOOL clear, u32 interrupts) {
-    u32 irq = OS_DisableInterrupts();
+void OS_WaitInterrupt(BOOL clear, OSIrqMask interrupts) {
+    OSIntrMode irq = OS_DisableInterrupts();
     BOOL ime = OS_EnableIrq();
 
     if (clear) {

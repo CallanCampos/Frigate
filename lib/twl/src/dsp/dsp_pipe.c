@@ -56,7 +56,7 @@ static DSPFileServer sFileServer;
 
 // The access to the DSP's memory, a half word of 16 bits at a time (its address is in half words)
 static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     if (OS_IsRunOnTwl() == TRUE) {
         func_02705150(0, dst, wordAddress, count, 0);
     }
@@ -65,7 +65,7 @@ static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
 }
 
 static inline void DSPi_WriteWords(u16 wordAddress, const u16 *src, u16 count) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     if (OS_IsRunOnTwl() == TRUE) {
         func_02705088(0, wordAddress, src, count, 0);
     }
@@ -162,7 +162,7 @@ static void func_027067b4(void *arg) {
     DSPFileServer *server = arg;
 
     for (;;) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         int port;
         OSMessage message;
         DSPPipe readPipe;
@@ -279,7 +279,7 @@ static void func_027067b4(void *arg) {
 // Asks the file server to look at the pipes of a port, and starts it if it is not running yet
 static void func_02706b60(int port) {
     DSPFileServer *server = &sFileServer;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (!server->started) {
         int i;
@@ -345,7 +345,7 @@ void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData) {
 }
 
 DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     while (sPipeBase == 0) {
         OS_SleepThread(&sPipeQueue);
     }
@@ -386,7 +386,7 @@ u16 DSP_GetPipeReadableSize(const DSPPipe *pipe) {
 }
 
 void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     BOOL moved = FALSE;
 
     func_02706dfc(pipe);
@@ -419,7 +419,7 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
 }
 
 void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     BOOL moved = FALSE;
 
     func_02706dfc(pipe);

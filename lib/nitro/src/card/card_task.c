@@ -17,7 +17,7 @@ static const CARDDmaInterface sCardDmaInterface = { MIi_CardDmaCopy32, MI_StopDm
 // CARDi_NotifyEvent: calls each hook with the event. The walk keeps the link before the current hook and moves it on
 // only if the hook is still there, so a hook may remove itself
 void CARDi_NotifyEvent(u32 command, u32 value) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     CARDHookContext *prev = &sCardHookRoot;
     CARDHookContext *hook = sCardHookRoot.next;
     for (; hook != NULL; hook = prev->next) {
@@ -53,7 +53,7 @@ BOOL CARDi_ExecuteOldTypeTask(CARDiTask task, BOOL async) {
 void CARDi_OldTypeTaskThread(void *arg) {
     CARDiCommon *p = &cardi_common;
     while (TRUE) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         for (;;) {
             if ((p->flag & CARD_STAT_TASK) != 0) {
                 break;
@@ -68,7 +68,7 @@ void CARDi_OldTypeTaskThread(void *arg) {
 // Waits until the last command is done. A command that starts takes over the thread, with the callback to call when
 // it ends. Returns whether the command block holds a success
 BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     while ((p->flag & CARD_STAT_BUSY) != 0) {
         OS_SleepThread(&p->busyQueue);
     }
@@ -85,7 +85,7 @@ BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void 
 void CARDi_EndTask(CARDiCommon *p) {
     MIDmaCallback callback = p->callback;
     void *arg = p->callbackArg;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     p->flag &= ~(CARD_STAT_BUSY | CARD_STAT_TASK | CARD_STAT_CANCEL);
     OS_WakeupThread(&p->busyQueue);
     OS_RestoreInterrupts(irq);

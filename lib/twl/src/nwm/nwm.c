@@ -53,7 +53,7 @@ static inline BOOL NWMi_IsPending(u32 cmd) {
 }
 
 NWMRetCode NWM_End(void) {
-    u32 irq;
+    OSIntrMode irq;
     NWMRetCode result;
 
     result = func_027028e4(1, NWM_STATE_INITIALIZED);
@@ -433,7 +433,7 @@ NWMRetCode func_027035f4(NWMCallback callback, u32 arg) {
 NWMRetCode NWM_SendFrame(NWMCallback callback, const u8 *destAddr, u8 *frame, u32 size) {
     NWMSys *sys = func_027026dc();
     NWMRetCode result;
-    u32 irq;
+    OSIntrMode irq;
 
     result = func_027028e4(1, NWM_STATE_CONNECTED);
     if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {

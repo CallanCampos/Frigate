@@ -83,7 +83,7 @@ static void CARDi_StartRomHashRead(CARDCheckedReadContext *context) {
     void *buffer = NULL;
     u32 offset = 0;
     u32 length = 0;
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (context->loading == NULL) {
         if (context->loadingBlocks != NULL) {
@@ -113,7 +113,7 @@ static void CARDi_StartRomHashRead(CARDCheckedReadContext *context) {
 
 void CARD_OnCheckedReadDone(void *arg) {
     CARDCheckedReadContext *context = arg;
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (context->loading == context->loadingSectors) {
         CARDRomHashSector *sector = context->loadingSectors;
@@ -149,7 +149,7 @@ static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDCheckedReadContext *context
             break;
         }
         if (block->next == NULL) {
-            u32 enabled = OS_DisableInterrupts();
+            OSIntrMode enabled = OS_DisableInterrupts();
             CARDRomHashBlock *other;
             for (other = context->loadedBlocks; other != NULL; other = other->next) {
                 if (other->index == index) {
@@ -218,7 +218,7 @@ static void *CARDi_TouchRomHashSector(CARDCheckedReadContext *context, u32 offse
             break;
         }
         if (sector->next == NULL) {
-            u32 enabled = OS_DisableInterrupts();
+            OSIntrMode enabled = OS_DisableInterrupts();
             CARDRomHashSector **tail;
             sector = *link;
             *link = NULL;
@@ -337,7 +337,7 @@ static void CARDi_ReadRomHashImageDirect(CARDCheckedReadContext *context, void *
             u32 i;
             for (i = index - block->index * sectorsPerBlock; i < sectorsPerBlock && read >= sectorSize;) {
                 if (block != context->validBlocks) {
-                    u32 enabled = OS_DisableInterrupts();
+                    OSIntrMode enabled = OS_DisableInterrupts();
                     while (context->loadingBlocks != NULL) {
                         OS_SleepThread(NULL);
                     }
@@ -383,7 +383,7 @@ static void CARDi_ReadRomHashImageCaching(CARDCheckedReadContext *context, void 
                 CARDi_TouchRomHashSector(context, position);
             }
             for (;;) {
-                u32 enabled = OS_DisableInterrupts();
+                OSIntrMode enabled = OS_DisableInterrupts();
                 CARDRomHashBlock *block;
                 CARDRomHashSector *sector = NULL;
                 while ((context->loadingSectors != NULL && context->loadedSectors == NULL) ||

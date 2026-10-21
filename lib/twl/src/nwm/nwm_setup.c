@@ -24,7 +24,7 @@ NWMRetCode NWM_Init(void *systemBuffer, u32 size, u32 dmaNo) {
 }
 
 static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
-    u32 irq;
+    OSIntrMode irq;
     int i;
 
     irq = OS_DisableInterrupts();

@@ -86,9 +86,9 @@ static BOOL Plugin14Cmd_ResetLCDToBlack(VM *vm, FieldScriptEnv *env) {
     GFL_BGSysSetEnabledBGsA(enabledA);
     GFL_BGSysSetEnabledBGsB(enabledB);
     FieldG2D_Prepare3DSurface(field);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
     G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x3d, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GXS_SetMasterBrightness(0);
     G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x3f, -16);
     return FALSE;
 }

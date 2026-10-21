@@ -22,7 +22,7 @@ static const u16 sDaysBeforeMonth[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243
 
 static RTCCache sRTCCache;
 
-static void RTCCache_ReadDone(int result, void *arg);
+static void RTCCache_ReadDone(RTCResult result, void *arg);
 static void RTCCache_Read(RTCCache *cache);
 
 void RTCCache_Init(void) {
@@ -44,7 +44,7 @@ void RTCCache_Update(void) {
     }
 }
 
-static void RTCCache_ReadDone(int result, void *arg) {
+static void RTCCache_ReadDone(RTCResult result, void *arg) {
     RTCCache *cache = arg;
 
     cache->result = result;

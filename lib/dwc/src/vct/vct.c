@@ -19,7 +19,7 @@ VCTSettings gVCTSettings;
 static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result);
 
 BOOL VCT_Init(VCTConfig *config) {
-    OSi_ReferSymbol(VCTi_Signature);
+    SDK_USING_MIDDLEWARE(VCTi_Signature);
     if (config == NULL) {
         return FALSE;
     }

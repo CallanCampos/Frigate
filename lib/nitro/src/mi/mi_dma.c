@@ -131,7 +131,7 @@ void MIi_DmaCopy32Async(u32 dmaNo, const void *src, void *dest, u32 size, MIDmaC
 }
 
 void MI_WaitDma(u32 dmaNo) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (MI_DMA_REGS[dmaNo].cnt & MI_DMA_ENABLE) {
     }
@@ -145,7 +145,7 @@ void MI_WaitDma(u32 dmaNo) {
 }
 
 void MI_StopDma(u32 dmaNo) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     vu32 *dmaCntp = &MI_DMA_REGS[dmaNo].cnt;
 
     *dmaCntp &= ~(MI_DMA_TIMING_MASK | MI_DMA_CONTINUOUS_ON);

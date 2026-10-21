@@ -78,8 +78,8 @@ static void playSavegameError(u32 message) {
 }
 
 static void displaySavegameError(u32 message) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GX_HBlankIntr(FALSE);
     GX_VBlankIntr(FALSE);
     GX_ResetBankForBG();
@@ -98,8 +98,8 @@ static void displaySavegameError(u32 message) {
     *(vu16 *)HW_DB_BG_PLTT = GX_RGB(10, 23, 31);
     displayLightBlueErrorWindow();
     loadDisplayPositionFont(message);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
+    GXS_SetMasterBrightness(0);
 }
 
 static void displayLightBlueErrorWindow(void) {

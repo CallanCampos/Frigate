@@ -815,7 +815,7 @@ void BtlvInput_StartFadeInWithGraphics(BtlvInput *work) {
     BtlvInputWorkTask *task;
 
     task = GFL_HeapAllocate(HEAPID_TAIL(work->heapId), sizeof(BtlvInputWorkTask), FALSE, "btlv_input.c", 0x5a2);
-    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) <= 0) {
+    if (GXS_GetMasterBrightness() <= 0) {
         GFL_FadeSet(FADE_ENGINE_B_BLACK, 16, 0, 0);
     } else {
         GFL_FadeSet(FADE_ENGINE_B_WHITE, 16, 0, 0);

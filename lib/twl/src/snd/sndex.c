@@ -98,7 +98,7 @@ static PMSleepCallbackInfo sSleepInfo;
 static SNDEXResult func_02704448(int volume, SNDEXCallback callback, void *arg, BOOL byLevel);
 static SNDEXResult func_027044c0(int volume, SNDEXCallback callback, void *arg);
 static SNDEXResult func_027044f8(int target, const u16 *coefficients, SNDEXCallback callback, void *arg);
-static void func_027049b0(u32 tag, u32 data, BOOL err);
+static void func_027049b0(PXIFifoTag tag, u32 data, BOOL err);
 static void func_02704b58(SNDEXResult result, void *arg);
 static BOOL func_02704b74(u32 command, u8 value);
 static BOOL func_02704be0(u32 command, u16 value);
@@ -112,7 +112,7 @@ static void func_02704e04(void);
 
 // TwlSDK's SNDEX_Init, by its code: sets the library up, once
 void SNDEX_Init(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sState != SNDEX_STATE_UNINITIALIZED) {
         OS_RestoreInterrupts(irq);
@@ -310,7 +310,7 @@ SNDEXResult func_02704940(SNDEXCallback callback, void *arg) {
 
 // The PXI callback, which gets the ARM7's words: the answers to the request in progress, and the notifications that it
 // sends of its own
-static void func_027049b0(u32 tag, u32 data, BOOL err) {
+static void func_027049b0(PXIFifoTag tag, u32 data, BOOL err) {
     u8 command = (u8)((data & 0xff0000) >> 16);
     u8 answer = (u8)((data & 0xff00) >> 8);
     u8 value = (u8)(data & 0xff);
@@ -395,7 +395,7 @@ static void func_02704b58(SNDEXResult result, void *arg) {
 
 // Sends a word with a command and a value of one byte. FALSE, and the state back to idle, when the FIFO refuses it
 static BOOL func_02704b74(u32 command, u8 value) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SNDEX, ((command << 16) & 0xff0000) | (value & 0xff), FALSE) < 0) {
         sState = SNDEX_STATE_IDLE;
@@ -408,7 +408,7 @@ static BOOL func_02704b74(u32 command, u8 value) {
 
 // Sends a word with a command and a value of two bytes
 static BOOL func_02704be0(u32 command, u16 value) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SNDEX, ((command << 16) & 0xff0000) | (value & 0xffff), FALSE) < 0) {
         sState = SNDEX_STATE_IDLE;
@@ -425,7 +425,7 @@ static BOOL func_02704be0(u32 command, u16 value) {
 // Starts a request if the library is idle, and puts it in the request state. It is not set up in the first two states,
 // and busy in the request and exclusive ones
 static SNDEXResult func_02704c5c(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     switch (sState) {
     case SNDEX_STATE_UNINITIALIZED:
@@ -447,7 +447,7 @@ static SNDEXResult func_02704c5c(void) {
 // Ends the request in progress: clears it, goes back to idle (or to the exclusive state, after the request 0xfb) and
 // calls its callback with the result
 static void func_02704cc4(SNDEXResult result) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u8 command = sRequest.command;
     SNDEXCallback callback = sRequest.callback;
     void *arg = sRequest.arg;

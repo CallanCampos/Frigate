@@ -99,8 +99,8 @@ CARDResult CARD_GetResultCode(void) {
     return cardi_common.cmd->result;
 }
 
-const ROMHeader *CARD_GetRomHeader(void) {
-    return (const ROMHeader *)HW_CARD_ROM_HEADER;
+const u8 *CARD_GetRomHeader(void) {
+    return (const u8 *)HW_CARD_ROM_HEADER;
 }
 
 const ROMHeader *CARD_GetOwnRomHeader(void) {
@@ -143,7 +143,7 @@ void CARD_UnlockBackup(u16 lockId) {
 // the same target. The loop's test is a 0/1 value, which keeps it from being rotated
 static void CARDi_LockResource(u16 lockId, int target) {
     CARDiCommon *p = &cardi_common;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     if (p->lockOwner == lockId) {
         if (p->lockTarget != target) {
             OS_Terminate();
@@ -161,7 +161,7 @@ static void CARDi_LockResource(u16 lockId, int target) {
 
 static void CARDi_UnlockResource(u16 lockId, int target) {
     CARDiCommon *p = &cardi_common;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     if (p->lockOwner != lockId || p->lockRef == 0) {
         OS_Terminate();
     } else {

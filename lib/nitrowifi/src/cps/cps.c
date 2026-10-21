@@ -78,7 +78,7 @@ static void CPSi_SendDelayedAcks(void);
 static void CPSi_AckThread(void *arg);
 static void CPSi_AckAlarm(void *arg);
 static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type);
-static u8 *CPSi_Pad(u32 value, u32 size, u8 *p, u32 used);
+static u8 *CPSi_Pad(u8 value, u32 size, u8 *p, u32 used);
 static u32 CPSi_DhcpSendDiscover(void);
 static u32 CPSi_DhcpSendRequest(int mode);
 static int CPSi_DhcpWait(u32 xid, int try);
@@ -255,7 +255,7 @@ static BOOL CPSi_LinkIsOn(void) {
 
 // CPS_Startup
 void CPS_Startup(CPSConfig *config) {
-    OSi_ReferSymbol(CPSi_Signature);
+    SDK_USING_MIDDLEWARE(CPSi_Signature);
     if (config->random_seed != 0) {
         MATH_InitRand32(&CPSiRand, config->random_seed);
     } else {
@@ -2588,7 +2588,7 @@ static u8 *CPSi_DhcpMakeMessage(u8 *buf, u8 type) {
 }
 
 // CPSi_Pad: fills the rest of the first size bytes, of which used are taken
-static u8 *CPSi_Pad(u32 value, u32 size, u8 *p, u32 used) {
+static u8 *CPSi_Pad(u8 value, u32 size, u8 *p, u32 used) {
     if (used < size) {
         u32 rest = size - used;
 

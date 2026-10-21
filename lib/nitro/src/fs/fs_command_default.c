@@ -824,7 +824,7 @@ static FSResult FSi_ROMFAT_GetPathInfo(FSArchive *arc, u32 baseDirId, const char
 
 // FS_COMMAND_GETARCHIVERESOURCE of the interface: the archive is the ROM, as big as the ROM header says
 static FSResult FSi_ROMFAT_GetArchiveResource(FSArchive *arc, FSArchiveResource *resource) {
-    const ROMHeader *header = CARD_GetRomHeader();
+    const ROMHeader *header = (const ROMHeader *)CARD_GetRomHeader();
 
     resource->unk_20[0] = 0;
     resource->unk_20[1] = 0;

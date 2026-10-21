@@ -82,9 +82,9 @@ typedef enum {
 static u16 rtcInitialized;
 static RTCWork rtcWork;
 
-static void RtcCommonCallback(u32 tag, u32 data, BOOL err);
+static void RtcCommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 static u32 RtcBCD2HEX(u32 bcd);
-static void RtcGetResultCallback(int result, void *arg);
+static void RtcGetResultCallback(RTCResult result, void *arg);
 static void RtcWaitBusy(void);
 
 void RTC_Init(void) {
@@ -103,8 +103,8 @@ void RTC_Init(void) {
     }
 }
 
-int RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+RTCResult RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg) {
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (rtcWork.lock) {
         OS_RestoreInterrupts(enabled);
@@ -125,7 +125,7 @@ int RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg) {
     return RTC_RESULT_SEND_ERROR;
 }
 
-int RTC_GetDate(RTCDate *date) {
+RTCResult RTC_GetDate(RTCDate *date) {
     rtcWork.commonResult = RTC_GetDateAsync(date, RtcGetResultCallback, NULL);
     if (rtcWork.commonResult == RTC_RESULT_SUCCESS) {
         RtcWaitBusy();
@@ -133,8 +133,8 @@ int RTC_GetDate(RTCDate *date) {
     return rtcWork.commonResult;
 }
 
-int RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+RTCResult RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg) {
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (rtcWork.lock) {
         OS_RestoreInterrupts(enabled);
@@ -155,7 +155,7 @@ int RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg) {
     return RTC_RESULT_SEND_ERROR;
 }
 
-int RTC_GetTime(RTCTime *time) {
+RTCResult RTC_GetTime(RTCTime *time) {
     rtcWork.commonResult = RTC_GetTimeAsync(time, RtcGetResultCallback, NULL);
     if (rtcWork.commonResult == RTC_RESULT_SUCCESS) {
         RtcWaitBusy();
@@ -163,8 +163,8 @@ int RTC_GetTime(RTCTime *time) {
     return rtcWork.commonResult;
 }
 
-int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+RTCResult RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg) {
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (rtcWork.lock) {
         OS_RestoreInterrupts(enabled);
@@ -186,7 +186,7 @@ int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, voi
     return RTC_RESULT_SEND_ERROR;
 }
 
-int RTC_GetDateTime(RTCDate *date, RTCTime *time) {
+RTCResult RTC_GetDateTime(RTCDate *date, RTCTime *time) {
     rtcWork.commonResult = RTC_GetDateTimeAsync(date, time, RtcGetResultCallback, NULL);
     if (rtcWork.commonResult == RTC_RESULT_SUCCESS) {
         RtcWaitBusy();
@@ -200,7 +200,7 @@ RTCWork *RTCi_GetSysWork(void) {
 
 // NitroSDK's RtcCommonCallback: the answer of the ARM7 to a command. The low byte has its result, and the bits 8 to 14
 // the command it answers. The alarm interrupt is not an answer
-static void RtcCommonCallback(u32 tag, u32 data, BOOL err) {
+static void RtcCommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     RTCResult result;
     u8 command;
     u8 pxiResult;
@@ -428,7 +428,7 @@ static u32 RtcBCD2HEX(u32 bcd) {
 }
 
 // NitroSDK's RtcGetResultCallback: the callback of the functions that wait for their answer
-static void RtcGetResultCallback(int result, void *arg) {
+static void RtcGetResultCallback(RTCResult result, void *arg) {
     rtcWork.commonResult = result;
 }
 

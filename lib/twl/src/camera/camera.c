@@ -49,19 +49,19 @@ BOOL CAMERA_IsBusyCore(void) {
 }
 
 void CAMERA_StartCaptureCore(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT |= CAMERA_CNT_CAPTURE;
     OS_RestoreInterrupts(enabled);
 }
 
 void CAMERA_StopCaptureCore(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT &= ~CAMERA_CNT_CAPTURE;
     OS_RestoreInterrupts(enabled);
 }
 
 void CAMERA_SetTrimmingCore(BOOL enabled) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     if (enabled) {
         cnt |= CAMERA_CNT_TRIMMING;
@@ -73,7 +73,7 @@ void CAMERA_SetTrimmingCore(BOOL enabled) {
 }
 
 void CAMERA_SetOutputFormatCore(CAMERAOutput output) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     switch (output) {
     case CAMERA_OUTPUT_YUV:
@@ -92,14 +92,14 @@ BOOL CAMERA_IsBufferErrorCore(void) {
 }
 
 void CAMERA_ClearBufferCore(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT |= CAMERA_CNT_CLEAR_BUFFER;
     OS_RestoreInterrupts(enabled);
 }
 
 // Sets or clears the interface's interrupt enable
 void CAMERA_SetInterruptEnableCore(BOOL on) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     if (on) {
         cnt |= CAMERA_CNT_INTR_ENABLE;
@@ -112,14 +112,14 @@ void CAMERA_SetInterruptEnableCore(BOOL on) {
 
 // Replaces the two-bit field of bits 8 and 9 of the control word
 void func_0270223c(u32 bits) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     reg_CAMERA_CNT = (reg_CAMERA_CNT & ~CAMERA_CNT_UNK_MASK) | bits;
     OS_RestoreInterrupts(enabled);
 }
 
 // Sets or clears bit 10 of the control word
 void func_02702268(BOOL on) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
     if (on) {
         cnt |= CAMERA_CNT_UNK_BIT10;
@@ -132,7 +132,7 @@ void func_02702268(BOOL on) {
 
 // CAMERA_SetTransferLinesCore, which takes 1 to 16 lines and ignores any other
 void CAMERA_SetTransferLinesCore(int lines) {
-    u32 enabled;
+    OSIntrMode enabled;
     if (lines < 1 || lines > 16) {
         return;
     }

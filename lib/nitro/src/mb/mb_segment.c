@@ -262,7 +262,7 @@ static void MBSegment_CopyRange(const MBSecureWindow *window, u32 start, u32 end
 
 BOOL MB_RegisterFile(const MBGameRegistry *gameReg, const void *buf) {
     u32 slot = 0xff;
-    u32 irq;
+    OSIntrMode irq;
     u8 i;
     MBCommFile *file;
 

@@ -23,7 +23,7 @@ BOOL DSP_OpenStaticComponentG711Core(FSFile *file) {
         FS_Init(FS_DMA_NOT_USE);
     }
     FS_InitFile(file);
-    return FS_CreateFileFromMemory(file, DSP_G711Image, DSP_COMPONENT_IMAGE_SIZE);
+    return FS_CreateFileFromMemory(file, (void *)DSP_G711Image, DSP_COMPONENT_IMAGE_SIZE);
 }
 
 // Starts the process from the image in file, into the banks of WRAM B and C that slotB and slotC allow

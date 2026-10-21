@@ -681,8 +681,8 @@ static UnSelectWork *UnSelect_Setup(GameProc *proc, UnSelectParam *param) {
         wk->visitorFloors[i] =
             param->visitorCountries[i] != 0 ? UnSelect_FindCountry(param->visitorCountries[i]) : UN_SELECT_NO_FLOOR;
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     wk->graphic = UnSelectGraphic_Create(0, wk->heapId);
     wk->scene = UIScene_Create(wk->heapId, sUnSelectSteps, UN_SELECT_STEP_COUNT, UN_SELECT_STEP_LIST, wk);
     UnSelect_LoadBG(wk, wk->heapId);
