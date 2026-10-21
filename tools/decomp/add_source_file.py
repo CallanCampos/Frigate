@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """Add a source file to a module's delinks.txt in every version.
 
-Section ranges are given for the primary version. The ranges in the other versions are derived from the version map:
-each end of a range is placed from the anchors of its section (its edges, the paired data, .bss and label symbols in it
-and, in .text, the paired functions' starts and ends), and an end between two anchors only when both agree on its place.
-So a range may start or end where no function or symbol does, among padding, filler or data in .text. An end that the
-map cannot place is given with --other-range, and every range is checked against the module's sections and the files
-already registered in each version before any version is written.
+Section ranges are given for the primary version. The ranges in the other versions are placed through the version map
+by version_addresses.py: each end from its section's edges and the paired functions' starts and ends, and an end
+between two of them only when both agree on its place. So a range may start or end where no function does, among
+padding, filler or data. An end that the map cannot place stops the tool with both candidates; give that range with
+--other-range. Every range is checked against the module's sections and the files already registered in each version
+before any version is written.
 """
 import argparse
-import csv
 import re
 import sys
 from pathlib import Path
@@ -17,109 +16,23 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.decomp.dsd_config import ROOT, config_lock, parse_sections  # noqa: E402
 from tools.decomp.mark_complete import externally_used_statics  # noqa: E402
-
-PRIMARY = "b2_us"
-OTHERS = ["w2_us"]
+from tools.decomp.version_addresses import OTHERS, PRIMARY, ModulePlacer, Unplaced, load_pairs  # noqa: E402
 
 
-def load_function_pairs(path: Path, module: str, other: str) -> dict[int, tuple[int, int]]:
-    """Returns primary function address -> (other address, primary function size) for a module."""
-    pairs = {}
-    with path.open() as f:
-        for row in csv.DictReader(f, delimiter="\t"):
-            if row["module"] == module:
-                pairs[int(row[f"{PRIMARY}_addr"], 16)] = int(row[f"{other}_addr"], 16)
-    return pairs
-
-
-def function_ends(config: Path) -> dict[int, int]:
-    """Returns the end address of every function in a module, by start address."""
-    ends = {}
-    for line in (config / "symbols.txt").read_text().splitlines():
-        match = re.match(r"^\S+ kind:function\(\w+,size=(0x[0-9a-f]+)[^ ]*\) addr:(0x[0-9a-f]+)", line)
-        if match:
-            start = int(match.group(2), 16)
-            ends[start] = start + int(match.group(1), 16)
-    return ends
-
-
-def load_symbol_pairs(path: Path, module: str, other: str) -> dict[int, int]:
-    """Returns primary address -> other address of a module's paired data, .bss and label symbols, which version_map.py
-    pairs through the relocations that read them."""
-    pairs = {}
-    if not path.exists():
-        return pairs
-    with path.open() as f:
-        for row in csv.DictReader(f, delimiter="\t"):
-            if row["module"] == module:
-                pairs[int(row[f"{PRIMARY}_addr"], 16)] = int(row[f"{other}_addr"], 16)
-    return pairs
-
-
-def section_anchors(name, primary_config, other_config, function_pairs, symbol_pairs) -> dict[int, int]:
-    """Returns the addresses of a section whose place in the other version is known, primary -> other: the section's
-    edges, the paired symbols in it and, in .text, the start and end of every paired function. Where a function ends at
-    the next one's start, the start wins, which keeps a file that ends there next to the one that begins there when the
-    padding between them differs."""
-    primary_start, primary_end = parse_sections(primary_config / "delinks.txt")[name]
-    other_start, other_end = parse_sections(other_config / "delinks.txt")[name]
-    anchors = {}
-    if name == ".text":
-        primary_ends = function_ends(primary_config)
-        other_ends = function_ends(other_config)
-        for primary, other in function_pairs.items():
-            if primary in primary_ends and other in other_ends:
-                anchors[primary_ends[primary]] = other_ends[other]
-    anchors.update((a, b) for a, b in symbol_pairs.items() if primary_start <= a <= primary_end)
-    if name == ".text":
-        anchors.update(function_pairs)
-    anchors[primary_start] = other_start
-    anchors[primary_end] = other_end
-    return anchors
-
-
-def map_address(name, address, anchors, functions, module) -> int:
-    """Maps an address of a section to the other version: an anchor maps directly, and an address between two anchors
-    only when both give it the same place, that is when the bytes from the one before it to the one after it (padding,
-    filler, or data in .text, as ARM9 main's secure area and version strings) have the same size in both versions."""
-    for start, end in functions:
-        if start < address < end:
-            sys.exit(f"{name} address {address:#010x} is inside the function at {start:#010x} in {module}")
-    if address in anchors:
-        return anchors[address]
-    before = max((a for a in anchors if a < address), default=None)
-    after = min((a for a in anchors if a > address), default=None)
-    if before is None or after is None:
-        sys.exit(f"{name} address {address:#010x} is outside {module}'s {name}")
-    from_before = anchors[before] + (address - before)
-    from_after = anchors[after] - (after - address)
-    if from_before != from_after:
-        raise Unplaced(
-            f"{name} address {address:#010x} of {module} is between two anchors that disagree on its place: "
-            f"{from_before:#010x} after {before:#010x}, {from_after:#010x} before {after:#010x}"
-        )
-    return from_before
-
-
-class Unplaced(Exception):
-    """An address that the version map cannot place in another version."""
-
-
-def map_range(name, start, end, module, other, primary_config, other_config, function_pairs, symbol_pairs=None):
-    """Maps a primary section range to the other version, or raises Unplaced."""
-    anchors = section_anchors(name, primary_config, other_config, function_pairs, symbol_pairs or {})
-    functions = list(function_ends(primary_config).items()) if name == ".text" else []
-    other_start = map_address(name, start, anchors, functions, module)
-    if name == ".text" and end not in anchors:
+def map_range(placer: ModulePlacer, name, start, end) -> tuple[int, int]:
+    """Places a primary section range in the other version, or raises Unplaced."""
+    for address in (start, end):
+        function = placer.function_at(address) if name == ".text" else None
+        if function is not None and function[0] != address:
+            sys.exit(f"{name} {address:#010x} is inside the function at {function[0]:#010x} in {placer.label}")
+    other_start = placer.place(start, name)
+    if name == ".text" and end not in placer.anchors and end != placer.sections[name][1]:
         # Padding after the range's last paired function, which has the same size in both versions
-        starts = [a for a in function_pairs if start <= a < end]
-        if starts:
-            last = max(starts)
-            last_end = function_ends(primary_config)[last]
-            if end < last_end:
-                sys.exit(f"{name} end {end:#010x} is inside the function at {last:#010x}")
-            return other_start, function_ends(other_config)[function_pairs[last]] + (end - last_end)
-    return other_start, map_address(name, end, anchors, functions, module)
+        starts = [a for a in placer.function_pairs if start <= a < end]
+        last_end = dict(placer.functions).get(max(starts)) if starts else None
+        if last_end in placer.anchors:
+            return other_start, placer.anchors[last_end] + (end - last_end)
+    return other_start, placer.place(end, name)
 
 
 def file_ranges(delinks: Path) -> list[tuple[str, str, int, int]]:
@@ -164,7 +77,6 @@ def main():
     parser.add_argument("sections", nargs="+", help="section ranges in the primary version, e.g. .text:0x021e8be0-0x021e8c74")
     parser.add_argument("--incomplete", action="store_true", help="do not mark the file as complete")
     parser.add_argument("--map", type=Path, default=ROOT / "build" / "version_map.tsv")
-    parser.add_argument("--symbols-map", type=Path, default=ROOT / "build" / "version_map_symbols.tsv")
     parser.add_argument(
         "--other-range",
         action="append",
@@ -189,16 +101,17 @@ def main():
     unplaced = []
     for other in OTHERS:
         other_config = ROOT / "config" / other / "arm9" / args.module
-        function_pairs = load_function_pairs(args.map, args.module, other)
-        symbol_pairs = load_symbol_pairs(args.symbols_map, args.module, other)
+        function_pairs = load_pairs(args.map, other).get(args.module, {})
+        placer = ModulePlacer.from_configs(args.module, primary_config, other_config, function_pairs)
         entries[other] = []
         for name, start, end in ranges:
             if (other, name) in given:
                 entries[other].append((name, *given[other, name]))
                 continue
+            if name not in placer.sections:
+                sys.exit(f"{args.module} has no {name} section")
             try:
-                mapped = map_range(name, start, end, args.module, other, primary_config, other_config,
-                                   function_pairs, symbol_pairs)
+                mapped = map_range(placer, name, start, end)
             except Unplaced as error:
                 unplaced.append(f"{other}: {error}; pass --other-range {other}:{name}:0x...-0x...")
                 continue

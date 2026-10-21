@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tools.decomp import add_source_file
+from tools.decomp.version_addresses import ModulePlacer, Unplaced
 
 
 class MapRangeTests(unittest.TestCase):
@@ -33,7 +34,7 @@ class MapRangeTests(unittest.TestCase):
         primary = self.config("b2_us", (0x02004000, 0x02006000), primary_functions)
         other = self.config("w2_us", other_text, other_functions)
         pairs = {p[0]: o[0] for p, o in zip(primary_functions, other_functions)}
-        return add_source_file.map_range(".text", start, end, ".", "w2_us", primary, other, pairs)
+        return add_source_file.map_range(ModulePlacer.from_configs(".", primary, other, pairs), ".text", start, end)
 
     def test_paired_functions(self):
         functions = [(0x02004100, 0x20), (0x02004120, 0x20)]
@@ -62,7 +63,7 @@ class MapRangeTests(unittest.TestCase):
     def test_disagreeing_functions_stop(self):
         functions = [(0x02004800, 0x50), (0x02004900, 0x10)]
         other = [(0x02004a00, 0x50), (0x02004b10, 0x10)]
-        with self.assertRaises(add_source_file.Unplaced) as raised:
+        with self.assertRaises(Unplaced) as raised:
             self.map(0x02004860, 0x02004900, functions, other)
         self.assertIn("disagree", str(raised.exception))
 
@@ -73,22 +74,23 @@ class MapRangeTests(unittest.TestCase):
             self.map(0x02004100, 0x02004120, functions, other)
         self.assertIn("inside the function", str(raised.exception))
 
-    def map_data(self, start, end, symbols, other_data):
+    def map_data(self, start, end, other_data):
         primary = self.config("b2_us", (0x02004000, 0x02006000), [])
         other = self.config("w2_us", (0x02004000, 0x02006000), [], data=other_data)
-        return add_source_file.map_range(".data", start, end, ".", "w2_us", primary, other, {}, symbols)
+        return add_source_file.map_range(ModulePlacer.from_configs(".", primary, other, {}), ".data", start, end)
 
     def test_data_of_the_same_size(self):
-        mapped = self.map_data(0x02007010, 0x02007020, {}, (0x02007200, 0x02007300))
+        mapped = self.map_data(0x02007010, 0x02007020, (0x02007200, 0x02007300))
         self.assertEqual(mapped, (0x02007210, 0x02007220))
 
-    def test_data_of_another_size_through_paired_symbols(self):
-        # White 2's .data is 0x10 longer, all before 0x02007080, so the symbols there place a file after them
-        symbols = {0x02007080: 0x02007290}
+    def test_data_of_another_size(self):
+        # White 2's .data is 0x10 longer: its edges place a file that fills it, and nothing places an end in between
         other_data = (0x02007200, 0x02007310)
-        self.assertEqual(self.map_data(0x02007080, 0x020070a0, symbols, other_data), (0x02007290, 0x020072b0))
-        with self.assertRaises(add_source_file.Unplaced):
-            self.map_data(0x02007010, 0x02007020, symbols, other_data)
+        self.assertEqual(self.map_data(0x02007000, 0x02007100, other_data), (0x02007200, 0x02007310))
+        with self.assertRaises(Unplaced):
+            self.map_data(0x02007000, 0x02007010, other_data)
+        with self.assertRaises(Unplaced):
+            self.map_data(0x020070f0, 0x02007100, other_data)
 
     def test_overlapping_ranges_stop(self):
         directory = self.config(

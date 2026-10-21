@@ -25,18 +25,19 @@ to update by hand. `objdiff_config.py` gives each unit progress categories, whic
 categories: ARM9 main or the overlays, and the game's code or each library of `lib/`.
 
 `tools/decomp/add_source_file.py` adds a source file to both versions' `delinks.txt`, with White 2's ranges taken
-from the version map. It places each end of a range from its section's anchors: the section's edges, the paired data,
-`.bss` and label symbols in it, and in `.text` the paired functions' starts and ends. An end between two anchors is
-placed only when both agree, so a range may start or end where no function does (filler and data in `.text`, as ARM9
-main's secure area and version strings), and a data section may differ in size between the versions. An end that the
-map can't place stops the tool, naming both candidates; give that range with `--other-range w2_us:.data:0x...-0x...`,
-from White 2's own symbols. Every range is checked against its module's sections and the files already registered,
-in both versions, before either is written, so a config is never edited by hand. `tools/decomp/compiler_probe.py src/... --compilers 1.1 --show-diff 1.1` compiles a file and
-diffs every function in it against the original. A library under `lib/` that has its own compiler, such as SPL
-with `1.2/base`, gets the compiler and flags of its `library.toml` by default. `--mismatches` leaves out the functions that
-match, and `--functions` limits the table and diffs to the functions named. `--align` shows only the hunks of the
-diff that differ, aligned so that an instruction more or less does not shift everything after it, which is what makes
-a long function's diff readable. A function the file defines but the object lacks shows as `not emitted`: MWCC drops a
+from the version map. `tools/decomp/version_addresses.py`, which `config_fixes.py` shares, places each end of a range
+from its section's anchors: the section's edges and the paired functions' starts and ends. An end between two anchors
+is placed only when both agree, so a range may start or end where no function does (filler and data in `.text`, as
+ARM9 main's secure area and version strings). The version map's symbol pairs are not anchors, since a relocation into
+the middle of an object pairs a bogus symbol with a real one. An end that the map can't place stops the tool, naming
+both candidates; give that range with `--other-range w2_us:.data:0x...-0x...`, from White 2's own symbols. Every
+range is checked against its module's sections and the files already registered, in both versions, before either is
+written, so a config is never edited by hand. `tools/decomp/compiler_probe.py src/... --compilers 1.1 --show-diff 1.1`
+compiles a file and diffs every function in it against the original. A library under `lib/` that has its own
+compiler, such as SPL with `1.2/base`, gets the compiler and flags of its `library.toml` by default. `--mismatches`
+leaves out the functions that match, and `--functions` limits the table and diffs to the functions named. `--align`
+shows only the hunks of the diff that differ, aligned so that an instruction more or less does not shift everything
+after it, which is what makes a long function's diff readable. A function the file defines but the object lacks shows as `not emitted`: MWCC drops a
 `static` function nothing references, such as a callback whose table isn't written yet, so it has not been checked.
 A function the C leaves out entirely doesn't show at all, so compare the count of functions with the original object's
 before marking a file complete: `mb_comm_sys.c` (overlay 181) linked without `MBComm_SendParentInfo`, whose callers in
