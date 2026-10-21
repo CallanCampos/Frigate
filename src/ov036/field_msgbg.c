@@ -75,9 +75,6 @@
 #define MSGBG_EVENT_KNOCK 3
 #define MSGBG_EVENT_WAIT_SOUND 6
 
-// The margin that a message window leaves beside its text, in pixels
-#define MSGBG_TEXT_MARGIN 2
-
 // The sign window's states: print the first page, scroll in, check for another page, wait for the A or B button and
 // print it, scroll to it, wait at the last page, scroll out, and closed
 enum {
@@ -154,6 +151,12 @@ typedef struct {
     TalkMsgWinSys *talk;
     u32 unk10[2];
 } NumberedMsgWin;
+
+// The numbered windows' text origin in pixels, also included in their measured bounds
+typedef struct {
+    u8 x;
+    u8 y;
+} NumberedMsgWinTextOrigin;
 
 struct FieldMsgBG {
     HeapID heapId;
@@ -1398,8 +1401,16 @@ u32 func_ov036_02188cbc(InfoMsgWin *win) {
     return win->state;
 }
 
+static inline void NumberedMsgWin_InitTextOrigin(NumberedMsgWinTextOrigin *origin) {
+    origin->x = 2;
+    origin->y = 0;
+}
+
 static void func_ov036_02188cc0(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *strbuf, u16 index, u8 x, u8 y, u8 width,
                                 u8 height, u32 userId, u32 frameType) {
+    NumberedMsgWinTextOrigin origin;
+
+    NumberedMsgWin_InitTextOrigin(&origin);
     sys->palette = MSGBG_PLTT_TALK;
     win->talk = sys->talk;
     win->index = index;
@@ -1407,14 +1418,19 @@ static void func_ov036_02188cc0(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *st
     loadPltt(sys->heapId);
     setAlphaBlend(FALSE);
     func_ov036_0218b370(win->talk, win->index, strbuf, x, y, width, height, 0xff, frameType,
-                        MsgBGInput_GetTextWait(&sys->input), 2, 0);
+                        MsgBGInput_GetTextWait(&sys->input), origin.x, origin.y);
     func_ov036_0218b4c8(win->talk, win->index);
 }
 
 void CalcMsgWindowDimensions(FieldMsgBG *sys, StrBuf *str, u8 *width, u8 *height) {
-    u32 w = GFL_FontGetBlockWidth(str, sys->font, 0) + MSGBG_TEXT_MARGIN;
-    u32 h = GFL_FontGetBlockHeight(str, sys->font);
+    NumberedMsgWinTextOrigin origin;
+    u32 w;
+    u32 h;
     u32 pixels;
+
+    NumberedMsgWin_InitTextOrigin(&origin);
+    w = GFL_FontGetBlockWidth(str, sys->font, 0) + origin.x;
+    h = GFL_FontGetBlockHeight(str, sys->font) + origin.y;
 
     // Each size becomes tiles in place, rounded up when its pixels don't fill the last tile
     pixels = w;

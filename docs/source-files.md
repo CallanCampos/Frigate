@@ -523,7 +523,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_wfbc.c` | `0x0218adac`–`0x0218ae38` | 7 | complete | string at `0x021d4bc0` |
 | `field_comm_actor.c` | `0x0218ae38`–`0x0218b12c` | 12 | complete | string at `0x021d4bd0` |
 | `field_menu_event.c` | `0x0218b12c`–`0x0218b1f8` | 2 | complete | descriptive |
-| `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | partial | string at `0x021d4c24` |
+| `talkmsgwin.c` | `0x0218b1f8`–`0x0218d0e8` | 54 | complete | string at `0x021d4c24` |
 | `ircbattlemenu.c` | `0x0218d0e8`–`0x0218ed18` | 65 | complete | string at `0x021d4d24` |
 | `fldmmdl_acmd.c` | `0x0218ed18`–`0x02191228` | 247 | complete | string at `0x021d4d40` |
 | `fldmmdl_movecode.c` | `0x02191228`–`0x021925a4` | 98 | complete | descriptive |
@@ -592,7 +592,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | complete | string at `0x021d5218` |
 | `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
 | `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | partial | string at `0x021d5238` |
-| `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | partial | descriptive |
+| `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
 | `fldeff_gyoe.c` | `0x021b3e50`–`0x021b427c` | 15 | complete | string at `0x021d5280` |

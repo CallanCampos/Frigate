@@ -696,6 +696,11 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- `RailMath_RailToWorldSlerpXZ` keeps raw signed position and length at the original stack slots when they form
+  a progress snapshot and an inline reads that snapshot through a `const` pointer to compute its fixed-point ratio.
+  Height interpolation reads the same raw fields, retaining its multiply-before-divide rounding. The ratio helper
+  also serves the straight and XYZ conversions without changing their code. Scalar fixed-point locals instead
+  spill the converted values and reuse their shifts, leaving the XZ conversion four bytes short.
 - A `static inline` accessor that returns a field cast to another type (`return (SOCLRecvPipe *)socket->recv_pipe;`)
   reverses the stack slots of the locals spilled around its result. NitroWiFi's `SOCLi_ReadCallBack` gets the
   original's slots only with the field typed as the SDK has it (`SOCLRecvPipe *recv_pipe`) and read directly (27 bytes
@@ -818,6 +823,12 @@ Same code, other `sp` offsets or frame size.
   values and three `remap->to` loads in assignment order only when its inline `SwapRemappedKeys` takes
   `const u32 *keys` and reads `*keys` at each use. With `u32 keys` by value, the keys took three slots apart from the
   others.
+- Signed and unsigned sums of the same values are kept apart. In `talkmsgwin.c`'s `TalkMsgWin_DrawSpikyFrame` and
+  `TalkMsgWin_DrawBumpyFrame`, the window getters return `u8`, held in unsigned coordinate and size locals. The signed
+  frame edges use `(int)x + (int)width` and `y + (int)height`, while the corner calculations keep their unsigned sums.
+  Assigning an unsigned sum to an `int` edge local does not make the addition signed: MWCC shares it with the corner
+  calculations, removes spills and shortens each function by 20 bytes. Casting the operands gives both original
+  frames and instruction streams without splitting the sums. The getter ranges keep the signed sums within 0–510.
 - A common subexpression's spilled temporary takes its slot by where its first use is written. A local holding it
   doesn't count, since MWCC propagates `end = offset + size;` into its uses whatever its type or declaration.
   `backup_system.c`'s `SaveData_LoadWithBackup` puts `offset + size` at the top of its spilled values (`sp+0x20`) only with
@@ -1718,6 +1729,11 @@ Same instructions, scheduled in another order.
 
 ## An instruction too many or too few
 
+- `field_msgbg.c`'s `CalcMsgWindowDimensions` keeps `adds r0, r0, #0` after the font-height call when its pixel
+  bounds include both components of a local text origin, assigned field by field by an inline initializer. The
+  numbered-window printer uses the same initializer's `{2, 0}` origin, so placement and measured bounds share one
+  setting. A direct zero constant folds away; an aggregate initializer emits additional read-only data. The
+  field assignments emit no data and leave the other 176 functions unchanged in both versions.
 - A constant that a local holds and changes in steps stays live in a register, and MWCC builds other constants that
   don't fit an immediate from it: DS Protect's card read (`dsprot_detect.c`'s `DSProt_ReadCardRaw`) builds its header
   address as `header = 5; header += twl & 1; header <<= 18; header -= 13; header <<= 5;`, and then makes the mask

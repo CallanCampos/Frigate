@@ -371,6 +371,7 @@ src/ov036/field_comm_actor.c:
     .data       start:0x021d4c10 end:0x021d4c24
 
 src/ov036/talkmsgwin.c:
+    complete
     .text       start:0x0218b238 end:0x0218d128
     .data       start:0x021d4c24 end:0x021d4c74
 
@@ -791,5 +792,6 @@ src/ov036/rail_data_handle.c:
     .data       start:0x021d4dc0 end:0x021d4e28
 
 src/ov036/field_rail_func.c:
+    complete
     .text       start:0x021b243c end:0x021b3a74
     .rodata     start:0x021d1020 end:0x021d1038
