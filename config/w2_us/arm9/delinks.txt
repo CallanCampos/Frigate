@@ -2525,6 +2525,7 @@ lib/msl/src/extras_string.c:
     .text       start:0x0208c1d8 end:0x0208c250
 
 lib/msl/src/fp/fp_fastI.c:
+    complete
     .text       start:0x0208c250 end:0x0208ed0c
 
 lib/msl/src/runtime/register_atexit.c:

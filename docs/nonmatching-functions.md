@@ -234,17 +234,6 @@ in both versions.
 
 ## Matching, but not linkable as is
 
-- `lib/msl/src/fp/fp_fastI.c` (ARM9 main), MSL's soft-float and integer runtime, has a `.text` byte for byte the ROM's
-  in both versions, but linked complete it leaves 17 names undefined (`_dadd`, `_ddiv`, `_deq`, `_dflt`, `_dfltu`,
-  `_dls`, `_dmul`, `_dneq`, `_dsub`, `_f2d`, `_fflt`, `_ll_mod`, `_ll_mul`, `_ll_shl`, `_ll_udiv`, `_ll_ufrom_d`,
-  `_u32_div_f`). Its asm functions carry swan's names (`__aeabi_dadd`, `doubleSub`, `mod64Signed`), the runtime's own
-  names are only labels in the configs, and the code MWCC compiles calls the runtime's. An MWCC asm function has one
-  name (its assembler doesn't take `entry`), so the file stays incomplete until the routines take the runtime's names,
-  with swan's kept where code calls them by those (`include/system/aeabi.h`'s `__aeabi_uidivmod`, which
-  `src/ov033/unity_visitor.c` calls), or until the linker gives them both.
-  `_drsb`, `_frsb`, `_frdiv` and `_drdiv` have no symbols, since dsd refuses a function that starts with the `eor` that
-  swaps their operands, so the probe lists them as unknown.
-
 - `lib/dwc/src/qr2/qr2regkeys.c` (overlay 11) matches both its functions in both versions, but its `.data` doesn't: MWCC
   lays out the key names with a heap sort by size of the reverse of their definitions, and among the strings of
   7 bytes the ROM's order (`score_`, `team_t`, `skill_`, `region`) is one that the sort gives only with one more
