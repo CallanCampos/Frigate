@@ -590,7 +590,7 @@ void FMissionAppDraw_SetNumber(FMissionApp *work, int type, int first, int numbe
 
 // `first` is a long, the SDK's s32: MWCC then shares one `first * 4` among the position, the digit loops and the
 // colon, as the original does
-void FMissionAppDraw_SetTime(FMissionApp *work, int type, long first, int minutes, int seconds) {
+void FMissionAppDraw_SetTime(FMissionApp *work, int type, s32 first, int minutes, int seconds) {
     int values[4];
     ClActorPos pos;
     int i;

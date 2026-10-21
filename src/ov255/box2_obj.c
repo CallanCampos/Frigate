@@ -1162,8 +1162,7 @@ void Box2Obj_MoveItemOutline(Box2AppWork *app) {
 
 static void CreateFixedActors(Box2SysWork *syswk) {
     Box2AppWork *app = syswk->app;
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long i;
+    u32 i;
 
     app->actors[0] = CreateActor(app, &sActorData[0]);
     app->actors[1] = CreateActor(app, &sActorData[1]);

@@ -3356,8 +3356,7 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
     u16 item;
     u8 clientId;
     u32 j;
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long index;
+    u32 index;
     u32 k;
     BattleParty *battleParty;
     u32 monCount;

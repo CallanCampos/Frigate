@@ -1155,8 +1155,7 @@ static void BPlistMain_SetPokemon(BPlistWork *work, PartyPkm *pkm, BPlistPokemon
 }
 
 static void BPlistMain_InitPokemon(BPlistWork *work) {
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long i;
+    u32 i;
 
     if (work->param->unk18 == FALSE) {
         for (i = 0; i < 6; i++) {

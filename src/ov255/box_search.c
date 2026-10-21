@@ -1614,8 +1614,7 @@ static int BoxSearch_SeqMarkingOpen(BoxSearchWork *wk, int seq) {
 
 // The list of markings, which turns each on and off
 static int BoxSearch_SeqMarkingList(BoxSearchWork *wk, int seq) {
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long ret;
+    u32 ret;
     u32 i;
     int pos;
     u32 on;

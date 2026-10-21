@@ -171,7 +171,7 @@ static void CtvtTalk_AskExit(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk);
 static BOOL CtvtTalk_CheckDisconnect(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_ResetWave(CommTvtWork *sys, CtvtTalk *talk);
-static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, long pos, u16 size);
+static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, s32 pos, u16 size);
 static BOOL CtvtTalk_IsTalkButtonTouched(CommTvtWork *sys, CtvtTalk *talk, BOOL held);
 static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk);
@@ -1140,10 +1140,9 @@ static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, 
     int dx = MATH_ABS(x0 - x1);
     int dy = MATH_ABS(y0 - y1);
     int steps;
-    // The SDK's fx32 and s32 are long, which copies y0 for the loop after the loop's guard
-    long stepX, stepY;
-    long offsetX, offsetY;
-    long i;
+    fx32 stepX, stepY;
+    fx32 offsetX, offsetY;
+    s32 i;
 
     steps = (dx > dy ? dx : dy) + 1;
     stepX = FX32_CONST(x1 - x0) / steps;
@@ -1337,7 +1336,7 @@ static void CtvtTalk_ResetWave(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 // `pos` is a long, the SDK's s32, which leaves `size` in its stack slot and `color` in a saved register
-static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, long pos, u16 size) {
+static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, s32 pos, u16 size) {
     u32 end;
     u8 *pixels;
     BOOL drawn;
