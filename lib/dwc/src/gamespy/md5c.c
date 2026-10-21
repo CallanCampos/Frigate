@@ -5,15 +5,15 @@
 // keeps its address, with its name in the comment: NitroWiFi's SSL has a function of that name in this overlay
 
 // RFC 1321's MD5Transform, and its helpers
-static void func_ov011_02171af0(u32 state[4], const u8 block[64]);
-static void Encode(u8 *output, u32 *input, u32 length);
-static void Decode(u32 *output, const u8 *input, u32 length);
-static void MD5_memcpy(void *output, const void *input, u32 length);
-static void MD5_memset(void *output, int value, u32 length);
+static void func_ov011_02171af0(gsi_u32 state[4], const gsi_u8 block[64]);
+static void Encode(gsi_u8 *output, gsi_u32 *input, gsi_u32 length);
+static void Decode(gsi_u32 *output, const gsi_u8 *input, gsi_u32 length);
+static void MD5_memcpy(void *output, const void *input, gsi_u32 length);
+static void MD5_memset(void *output, int value, gsi_u32 length);
 // Writes a digest as hex digits
-static void MD5Print(u8 digest[16], char *output);
+static void MD5Print(gsi_u8 digest[16], char *output);
 
-static u8 PADDING[64] = { 0x80 };
+static gsi_u8 PADDING[64] = { 0x80 };
 
 #define S11 7
 #define S12 12
@@ -41,25 +41,25 @@ static u8 PADDING[64] = { 0x80 };
 
 #define FF(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += F((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += F((b), (c), (d)) + (x) + (gsi_u32)(ac);                                                                 \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 #define GG(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += G((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += G((b), (c), (d)) + (x) + (gsi_u32)(ac);                                                                 \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 #define HH(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += H((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += H((b), (c), (d)) + (x) + (gsi_u32)(ac);                                                                 \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 #define II(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += I((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += I((b), (c), (d)) + (x) + (gsi_u32)(ac);                                                                 \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
@@ -68,11 +68,11 @@ void func_ov011_021719fc(HashContext *context) {
     func_ov011_021719fcInline(context);
 }
 
-void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
-    const u8 *input = data;
-    u32 i;
-    u32 index;
-    u32 partLen;
+void func_ov011_02171a24(HashContext *context, const void *data, gsi_u32 inputLen) {
+    const gsi_u8 *input = data;
+    gsi_u32 i;
+    gsi_u32 index;
+    gsi_u32 partLen;
 
     index = (context->count[0] >> 3) & 0x3F;
     if ((context->count[0] += (inputLen << 3)) < (inputLen << 3)) {
@@ -93,10 +93,10 @@ void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
     MD5_memcpy(&context->buffer[index], &input[i], inputLen - i);
 }
 
-void func_ov011_02171a9c(u8 digest[16], HashContext *context) {
-    u8 bits[8];
-    u32 index;
-    u32 padLen;
+void func_ov011_02171a9c(gsi_u8 digest[16], HashContext *context) {
+    gsi_u8 bits[8];
+    gsi_u32 index;
+    gsi_u32 padLen;
 
     Encode(bits, context->count, 8);
     index = (context->count[0] >> 3) & 0x3f;
@@ -107,12 +107,12 @@ void func_ov011_02171a9c(u8 digest[16], HashContext *context) {
     MD5_memset(context, 0, sizeof(*context));
 }
 
-static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
-    u32 a = state[0];
-    u32 b = state[1];
-    u32 c = state[2];
-    u32 d = state[3];
-    u32 x[16];
+static void func_ov011_02171af0(gsi_u32 state[4], const gsi_u8 block[64]) {
+    gsi_u32 a = state[0];
+    gsi_u32 b = state[1];
+    gsi_u32 c = state[2];
+    gsi_u32 d = state[3];
+    gsi_u32 x[16];
 
     Decode(x, block, 64);
 
@@ -192,40 +192,40 @@ static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
     MD5_memset(x, 0, sizeof(x));
 }
 
-static void Encode(u8 *output, u32 *input, u32 length) {
-    u32 i;
-    u32 j;
+static void Encode(gsi_u8 *output, gsi_u32 *input, gsi_u32 length) {
+    gsi_u32 i;
+    gsi_u32 j;
 
     for (i = 0, j = 0; j < length; i++, j += 4) {
-        output[j] = (u8)(input[i] & 0xff);
-        output[j + 1] = (u8)((input[i] >> 8) & 0xff);
-        output[j + 2] = (u8)((input[i] >> 16) & 0xff);
-        output[j + 3] = (u8)((input[i] >> 24) & 0xff);
+        output[j] = (gsi_u8)(input[i] & 0xff);
+        output[j + 1] = (gsi_u8)((input[i] >> 8) & 0xff);
+        output[j + 2] = (gsi_u8)((input[i] >> 16) & 0xff);
+        output[j + 3] = (gsi_u8)((input[i] >> 24) & 0xff);
     }
 }
 
-static void Decode(u32 *output, const u8 *input, u32 length) {
-    u32 i;
-    u32 j;
+static void Decode(gsi_u32 *output, const gsi_u8 *input, gsi_u32 length) {
+    gsi_u32 i;
+    gsi_u32 j;
 
     for (i = 0, j = 0; j < length; i++, j += 4) {
-        output[i] =
-            ((u32)input[j]) | (((u32)input[j + 1]) << 8) | (((u32)input[j + 2]) << 16) | (((u32)input[j + 3]) << 24);
+        output[i] = ((gsi_u32)input[j]) | (((gsi_u32)input[j + 1]) << 8) | (((gsi_u32)input[j + 2]) << 16) |
+                    (((gsi_u32)input[j + 3]) << 24);
     }
 }
 
-static void MD5_memcpy(void *output, const void *input, u32 length) {
+static void MD5_memcpy(void *output, const void *input, gsi_u32 length) {
     memcpy(output, input, length);
 }
 
-static void MD5_memset(void *output, int value, u32 length) {
+static void MD5_memset(void *output, int value, gsi_u32 length) {
     memset(output, value, length);
 }
 
 // Writes the digest as 32 hex digits and an end
-static void MD5Print(u8 digest[16], char *output) {
+static void MD5Print(gsi_u8 digest[16], char *output) {
     static const char hexDigits[] = "0123456789abcdef";
-    u32 i;
+    gsi_u32 i;
 
     for (i = 0; i < 16; i++) {
         output[i * 2] = hexDigits[digest[i] / 16];
@@ -234,9 +234,9 @@ static void MD5Print(u8 digest[16], char *output) {
     output[32] = '\0';
 }
 
-void MD5Digest(const u8 *input, u32 length, char *output) {
+void MD5Digest(const gsi_u8 *input, gsi_u32 length, char *output) {
     HashContext context;
-    u8 digest[16];
+    gsi_u8 digest[16];
 
     func_ov011_021719fc(&context);
     func_ov011_02171a24(&context, input, length);

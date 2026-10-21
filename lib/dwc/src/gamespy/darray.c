@@ -125,7 +125,7 @@ void ArraySort(DArray *array, DArrayCompareFunc compare) {
 }
 
 int func_ov011_021716ac(DArray *array, const void *key, DArrayCompareFunc compare, int start, int sorted) {
-    int found = TRUE;
+    int found = gsi_true;
     int count;
     char *position;
 
@@ -194,12 +194,12 @@ static void *mybsearch(const void *key, void *base, int count, int size, DArrayC
     int middle;
     int result;
 
-    *found = FALSE;
+    *found = gsi_false;
     while (low <= high) {
         middle = (low + high) >> 1;
         result = compare((char *)base + middle * size, key);
         if (result == 0) {
-            *found = TRUE;
+            *found = gsi_true;
         }
         if (result < 0) {
             low = middle + 1;

@@ -7,7 +7,7 @@
 int ghiThrottleInterval = 250;
 int ghiThrottleBytes = 125;
 char *ghiProxyAddress;
-u16 ghiProxyPort;
+gsi_u16 ghiProxyPort;
 
 // The locks do nothing in this build
 void ghiCreateLock(void) {
@@ -23,7 +23,7 @@ void ghiUnlock(void) {
 }
 
 // Decrypts what was received into the connection's decode buffer, to its receive buffer
-BOOL ghiDecryptReceivedData(GHIConnection *connection) {
+gsi_bool ghiDecryptReceivedData(GHIConnection *connection) {
     int inSize = 0;
     int outSize = 0;
     int result;
@@ -39,10 +39,10 @@ BOOL ghiDecryptReceivedData(GHIConnection *connection) {
             result = connection->encryptor.decrypt(connection, &connection->encryptor, in, &inSize, out, &outSize);
             if (result == 2) {
                 if (!ghiResizeBuffer(&connection->recvBuffer, connection->recvBuffer.sizeIncrement)) {
-                    return FALSE;
+                    return gsi_false;
                 }
             } else if (result == 3) {
-                return FALSE;
+                return gsi_false;
             }
         } while (result == 2 && outSize == 0);
 
@@ -50,7 +50,7 @@ BOOL ghiDecryptReceivedData(GHIConnection *connection) {
             gsDebugFormat(8, 4, 1,
                           "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
                           inSize, connection->decodeBuffer.length);
-            return FALSE;
+            return gsi_false;
         }
         connection->decodeBuffer.pos += inSize;
         connection->recvBuffer.length += outSize;
@@ -68,7 +68,7 @@ BOOL ghiDecryptReceivedData(GHIConnection *connection) {
             connection->decodeBuffer.length = remaining;
         }
     }
-    return TRUE;
+    return gsi_true;
 }
 
 // Reads what the socket has, up to size - 1 bytes, into buffer and sets size to the count. Returns 0 for data, 1 for
@@ -79,7 +79,7 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
     int error;
 
     if (connection->throttle != 0) {
-        u32 now = current_time();
+        gsi_u32 now = current_time();
 
         if (now < connection->lastThrottleTime + ghiThrottleInterval) {
             return 1;
@@ -100,10 +100,10 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
             }
             received = length;
         } else {
-            connection->completed = TRUE;
+            connection->completed = gsi_true;
             connection->result = 5;
             connection->socketError = 0;
-            connection->closing = TRUE;
+            connection->closing = gsi_true;
             return 3;
         }
     } else {
@@ -111,22 +111,22 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
         if (received == -1) {
             error = GOAGetLastError(connection->socket);
             if (error == -56) {
-                connection->closing = TRUE;
+                connection->closing = gsi_true;
                 return 2;
             }
             if (error == -6 || error == -26 || error == -76) {
                 return 1;
             }
-            connection->completed = TRUE;
+            connection->completed = gsi_true;
             connection->result = 5;
             connection->socketError = error;
-            connection->closing = TRUE;
+            connection->closing = gsi_true;
             return 3;
         }
     }
 
     if (received == 0) {
-        connection->closing = TRUE;
+        connection->closing = gsi_true;
         return 2;
     }
     buffer[received] = '\0';
@@ -154,7 +154,7 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
             }
             sent = count;
         } else {
-            connection->completed = TRUE;
+            connection->completed = gsi_true;
             connection->result = 5;
             connection->socketError = 0;
             return -1;
@@ -167,7 +167,7 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
             if (error == -6 || error == -26 || error == -76) {
                 return 0;
             }
-            connection->completed = TRUE;
+            connection->completed = gsi_true;
             connection->result = 5;
             connection->socketError = error;
             return -1;

@@ -4,13 +4,15 @@
 // ROM names neither the file nor its functions: the file, keyrand, GOACryptInit and GOADecrypt are GameSpy's, as
 // pret's pokerevo Wii build has them (sb_crypt.s), and GOAHashInit and GOADecryptByte after the later SDK
 
-static u8 keyrand(GOACryptState *state, int limit, const u8 *user_key, u8 keysize, u8 *rsum, u32 *keypos);
+static gsi_u8 keyrand(GOACryptState *state, int limit, const gsi_u8 *user_key, gsi_u8 keysize, gsi_u8 *rsum,
+                      gsi_u32 *keypos);
 
 // A number from 0 up to limit, from the permutation and the next bytes of the key
-static u8 keyrand(GOACryptState *state, int limit, const u8 *user_key, u8 keysize, u8 *rsum, u32 *keypos) {
-    u32 u;
-    u32 retry_limiter;
-    u32 mask;
+static gsi_u8 keyrand(GOACryptState *state, int limit, const gsi_u8 *user_key, gsi_u8 keysize, gsi_u8 *rsum,
+                      gsi_u32 *keypos) {
+    gsi_u32 u;
+    gsi_u32 retry_limiter;
+    gsi_u32 mask;
 
     if (limit == 0) {
         return 0;
@@ -48,12 +50,12 @@ void GOAHashInit(GOACryptState *state) {
     }
 }
 
-void GOACryptInit(GOACryptState *state, const u8 *key, u8 keysize) {
+void GOACryptInit(GOACryptState *state, const gsi_u8 *key, gsi_u8 keysize) {
     int i;
-    u8 toswap;
-    u8 swaptemp;
-    u8 rsum;
-    u32 keypos;
+    gsi_u8 toswap;
+    gsi_u8 swaptemp;
+    gsi_u8 rsum;
+    gsi_u32 keypos;
 
     if (keysize < 1) {
         GOAHashInit(state);
@@ -81,8 +83,8 @@ void GOACryptInit(GOACryptState *state, const u8 *key, u8 keysize) {
     keypos = 0;
 }
 
-u8 GOADecryptByte(GOACryptState *state, u8 b) {
-    u8 swaptemp;
+gsi_u8 GOADecryptByte(GOACryptState *state, gsi_u8 b) {
+    gsi_u8 swaptemp;
 
     state->ratchet += state->cards[state->rotor++];
     swaptemp = state->cards[state->last_cipher];
@@ -99,7 +101,7 @@ u8 GOADecryptByte(GOACryptState *state, u8 b) {
     return state->last_plain;
 }
 
-void GOADecrypt(GOACryptState *state, u8 *bp, int len) {
+void GOADecrypt(GOACryptState *state, gsi_u8 *bp, int len) {
     int i;
 
     for (i = 0; i < len; i++) {

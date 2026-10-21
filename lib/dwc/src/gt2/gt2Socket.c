@@ -31,7 +31,7 @@ static int gti2ConnectionCompare(const void *a, const void *b) {
     if (first->ip != second->ip) {
         return first->ip - second->ip;
     }
-    return (s16)(first->port - second->port);
+    return (gsi_i16)(first->port - second->port);
 }
 
 // The free function of the closed connections
@@ -39,7 +39,7 @@ static void gti2ConnectionFree(void *element) {
     gti2ConnectionCleanup(*(GTI2Connection **)element);
 }
 
-GTI2Connection *gti2SocketFindConnection(GTI2Socket *socket, u32 ip, u16 port) {
+GTI2Connection *gti2SocketFindConnection(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port) {
     GTI2Connection key;
     GTI2Connection *keyPointer;
     GTI2Connection **found;
@@ -56,10 +56,10 @@ GTI2Connection *gti2SocketFindConnection(GTI2Socket *socket, u32 ip, u16 port) {
 
 int gti2CreateSocket(GTI2Socket **socketOut, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
                      GTI2SocketErrorCallback onSocketError, int protocol) {
-    u16 port;
+    gsi_u16 port;
     SocAddrIn address;
     GTI2Socket *socket;
-    u32 ip;
+    gsi_u32 ip;
     int addressSize;
 
     SocketStartUp();
@@ -128,7 +128,7 @@ int gti2CreateSocket(GTI2Socket **socketOut, const char *localAddress, int outgo
 
 void gti2CloseSocket(GTI2Socket *socket) {
     if (socket->callbackLevel != 0) {
-        socket->close = TRUE;
+        socket->close = gsi_true;
         return;
     }
     closesocket(socket->handle);
@@ -147,7 +147,7 @@ static GTI2Connection *gti2CreateConnectionObject(void) {
     return gsimalloc(sizeof(GTI2Connection));
 }
 
-int gti2NewSocketConnection(GTI2Socket *socket, GTI2Connection **connectionOut, u32 ip, u16 port) {
+int gti2NewSocketConnection(GTI2Socket *socket, GTI2Connection **connectionOut, gsi_u32 ip, gsi_u16 port) {
     GTI2Connection *connection = NULL;
 
     if (gti2SocketFindConnection(socket, ip, port) != NULL) {
@@ -232,13 +232,13 @@ void gti2FreeSocketConnection(GTI2Connection *connection) {
     }
 }
 
-BOOL gti2SocketSend(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length) {
+gsi_bool gti2SocketSend(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message, int length) {
     int result;
     int error;
 
     gti2MessageCheck(&message, &length);
     if (socket->protocol != 3 && !CanSendOnSocket(socket->handle)) {
-        return TRUE;
+        return gsi_true;
     }
     SocAddrIn address = { 0 };
 
@@ -250,49 +250,49 @@ BOOL gti2SocketSend(GTI2Socket *socket, u32 ip, u16 port, const void *message, i
         error = GOAGetLastError(socket->handle);
         if (error == -15) {
             if (!gti2HandleConnectionReset(socket, ip, port)) {
-                return FALSE;
+                return gsi_false;
             }
         } else if (error == -23) {
-            if (!gti2HandleHostUnreachable(socket, ip, port, TRUE)) {
-                return FALSE;
+            if (!gti2HandleHostUnreachable(socket, ip, port, gsi_true)) {
+                return gsi_false;
             }
         } else if (error == -42 || error == -6) {
-            return TRUE;
+            return gsi_true;
         } else if (error != -35) {
             gti2SocketError(socket);
-            return FALSE;
+            return gsi_false;
         }
     } else if (socket->onSendDump != NULL) {
-        if (!gti2DumpCallback(socket, gti2SocketFindConnection(socket, ip, port), ip, port, FALSE, message, length,
-                              TRUE)) {
-            return FALSE;
+        if (!gti2DumpCallback(socket, gti2SocketFindConnection(socket, ip, port), ip, port, gsi_false, message, length,
+                              gsi_true)) {
+            return gsi_false;
         }
     }
-    return TRUE;
+    return gsi_true;
 }
 
-// Runs a connection's timers and frees it once it has closed; returns FALSE to stop
+// Runs a connection's timers and frees it once it has closed; returns gsi_false to stop
 // when a callback closed the socket
 static int gti2SocketConnectionsThinkMap(void *element, void *clientData) {
     GTI2Connection *connection = *(GTI2Connection **)element;
-    u32 now = *(u32 *)clientData;
+    gsi_u32 now = *(gsi_u32 *)clientData;
 
     if (connection->state != 7 && !gti2ConnectionThink(connection, now)) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->state == 7 && !connection->freeAtAcceptReject && connection->callbackLevel == 0) {
         gti2FreeSocketConnection(connection);
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gti2SocketConnectionsThink(GTI2Socket *socket) {
-    u32 now = current_time();
+gsi_bool gti2SocketConnectionsThink(GTI2Socket *socket) {
+    gsi_u32 now = current_time();
 
     if (TableMapSafe2(socket->connections, gti2SocketConnectionsThinkMap, &now)) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
 void gti2FreeClosedConnections(GTI2Socket *socket) {
@@ -305,7 +305,7 @@ void gti2FreeClosedConnections(GTI2Socket *socket) {
 
 void gti2SocketError(GTI2Socket *socket) {
     if (!socket->error) {
-        socket->error = TRUE;
+        socket->error = gsi_true;
         gt2CloseAllConnectionsHard(socket);
         if (gti2SocketErrorCallback(socket)) {
             gti2CloseSocket(socket);

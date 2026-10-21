@@ -28,16 +28,16 @@ typedef struct StatsServerRequest {
 
 // The callbacks of the four requests
 typedef void (*PersAuthCallbackFn)(int localid, int profileid, int authenticated, char *errmsg, void *instance);
-typedef void (*PersDataCallbackFn)(int localid, int profileid, int type, int index, int success, u32 modified,
+typedef void (*PersDataCallbackFn)(int localid, int profileid, int type, int index, int success, gsi_u32 modified,
                                    char *data, int len, void *instance);
-typedef void (*PersDataSaveCallbackFn)(int localid, int profileid, int type, int index, int success, u32 modified,
+typedef void (*PersDataSaveCallbackFn)(int localid, int profileid, int type, int index, int success, gsi_u32 modified,
                                        void *instance);
 typedef void (*ProfileCallbackFn)(int localid, int profileid, int success, void *instance);
 
 static void xcode_buf(char *buf, int len);
 static char *value_for_key(const char *s, const char *key);
 static char *value_for_key_safe(const char *s, const char *key);
-static BOOL SocketReadable(int s);
+static gsi_bool SocketReadable(int s);
 static char *FindFinal(char *buff, int len);
 static int FindRequest(StatsRequestType reqtype, int localid, int profileid);
 static void ProcessPlayerAuth(const char *buf, int len);
@@ -46,7 +46,7 @@ static void ProcessGetData(const char *buf, int len);
 static void ProcessSetData(const char *buf, int len);
 static void ProcessStatement(char *buff, int len);
 static int ProcessInBuffer(char *buff, int len);
-static void CallReqCallback(int reqindex, int success, u32 modified, char *data, int length);
+static void CallReqCallback(int reqindex, int success, gsi_u32 modified, char *data, int length);
 static void ClosePendingCallbacks(void);
 static int ServerOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index);
 static double ServerOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index);
@@ -81,7 +81,7 @@ static char sesskeystr[8] = { '\0', 'e', 's', 's', 'k', 'e', 'y', '\0' };
 static char finalstr[10] = { '\0', 'f', 'i', 'n', 'a', 'l', '\\', '\0' };
 static char *rcvbuffer = NULL;
 static char *enc = enc1;
-static u32 inittimeout = 20000;
+static gsi_u32 inittimeout = 20000;
 static int sUnused0 = 0;
 void *bopfuncs[3][3] = {
     { ServerOpInt, ServerOpFloat, ServerOpString },
@@ -89,7 +89,7 @@ void *bopfuncs[3][3] = {
     { PlayerOpInt, PlayerOpFloat, PlayerOpString },
 };
 static int rcvlen = 0;
-static u32 initstart = 0;
+static gsi_u32 initstart = 0;
 static int stats_initstate = 0;
 static int gameport = 0;
 // value_for_key's, which takes its two buffers in turn
@@ -115,19 +115,19 @@ void CloseStatsConnection(void) {
     }
 }
 
-BOOL IsStatsConnected(void) {
+gsi_bool IsStatsConnected(void) {
     return sock != -1;
 }
 
-BOOL PersistThink(void) {
+gsi_bool PersistThink(void) {
     int len;
     int processed;
 
     if (sock == -1) {
-        return FALSE;
+        return gsi_false;
     }
     if (stats_initstate != 5) {
-        return FALSE;
+        return gsi_false;
     }
     while (SocketReadable(sock)) {
         // Keeps at least 128 bytes free in the buffer
@@ -139,13 +139,13 @@ BOOL PersistThink(void) {
             }
             rcvbuffer = gsirealloc(rcvbuffer, rcvmax + 1);
             if (rcvbuffer == NULL) {
-                return FALSE;
+                return gsi_false;
             }
         }
         len = recv(sock, rcvbuffer + rcvlen, rcvmax - rcvlen, 0);
         if (len <= 0) {
             CloseStatsConnection();
-            return FALSE;
+            return gsi_false;
         }
         rcvlen += len;
         rcvbuffer[rcvlen] = '\0';
@@ -158,9 +158,9 @@ BOOL PersistThink(void) {
         }
     }
     if (sock == -1) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
 // Scrambles or unscrambles a buffer with the key that enc points to
@@ -208,7 +208,7 @@ static char *value_for_key_safe(const char *s, const char *key) {
     return temp;
 }
 
-static BOOL SocketReadable(int s) {
+static gsi_bool SocketReadable(int s) {
     return CanReceiveOnSocket(s);
 }
 
@@ -284,7 +284,7 @@ static void ProcessGetData(const char *buf, int len) {
     int lid;
     int success;
     int length;
-    u32 modified;
+    gsi_u32 modified;
     char *data;
 
     success = atol(value_for_key_safe(buf, "getpdr"));
@@ -360,7 +360,7 @@ static int ProcessInBuffer(char *buff, int len) {
 }
 
 // Calls a request's callback and removes the request
-static void CallReqCallback(int reqindex, int success, u32 modified, char *data, int length) {
+static void CallReqCallback(int reqindex, int success, gsi_u32 modified, char *data, int length) {
     StatsServerRequest *req;
 
     if (reqindex < 0 || reqindex >= func_ov011_02171588(serverreqs)) {

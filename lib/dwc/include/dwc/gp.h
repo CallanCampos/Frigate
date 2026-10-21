@@ -1,7 +1,7 @@
 #ifndef POKEBW2_DWC_GP_H
 #define POKEBW2_DWC_GP_H
 
-#include "types.h"
+#include "dwc/nonport.h"
 
 // GameSpy's GP (Presence), in overlay 11: the API (gp.c) that DWC's friends and login code calls, which logs in to the
 // connection manager (gpcm.gs.nintendowifi.net), keeps the buddy list and the statuses of the buddies, sends them
@@ -32,7 +32,7 @@ typedef struct GPErrorArg {
     int result;
     int errorCode;
     char *errorString;
-    BOOL fatal;
+    gsi_bool fatal;
 } GPErrorArg;
 
 // The answer to a connect, with the profile that logged in
@@ -101,7 +101,7 @@ typedef struct GPBuddyStatus {
     int status;
     char statusString[256];
     char locationString[256];
-    u32 ip;
+    gsi_u32 ip;
     int port;
     int quietModeFlags;
 } GPBuddyStatus;
@@ -110,35 +110,35 @@ typedef struct GPBuddyStatus {
 // changing (with its index in the buddy list) and a game invite, as the server or a peer sent them; date is in seconds
 typedef struct GPRecvBuddyMessageArg {
     int profile;
-    u32 date;
+    gsi_u32 date;
     char *message;
 } GPRecvBuddyMessageArg;
 
 typedef struct GPRecvBuddyUTMArg {
     int profile;
-    u32 date;
+    gsi_u32 date;
     char *message;
 } GPRecvBuddyUTMArg;
 
 typedef struct GPRecvBuddyRequestArg {
     int profile;
-    u32 date;
+    gsi_u32 date;
     char reason[1025];
 } GPRecvBuddyRequestArg;
 
 typedef struct GPRecvBuddyAuthArg {
     int profile;
-    u32 date;
+    gsi_u32 date;
 } GPRecvBuddyAuthArg;
 
 typedef struct GPRecvBuddyRevokeArg {
     int profile;
-    u32 date;
+    gsi_u32 date;
 } GPRecvBuddyRevokeArg;
 
 typedef struct GPRecvBuddyStatusArg {
     int profile;
-    u32 date;
+    gsi_u32 date;
     int index;
 } GPRecvBuddyStatusArg;
 
@@ -176,7 +176,7 @@ typedef struct GPTransferCallbackArg {
 typedef struct GPIsValidEmailResponseArg {
     int result;
     char email[51];
-    BOOL isValid;
+    gsi_bool isValid;
 } GPIsValidEmailResponseArg;
 
 typedef struct GPCheckResponseArg {
@@ -256,7 +256,7 @@ typedef struct GPSuggestUniqueNickResponseArg {
 typedef struct GPGetProfileListResponseArg {
     int result;
     int profile;
-    BOOL hidden;
+    gsi_bool hidden;
     int numProfiles;
     int *profiles;
 } GPGetProfileListResponseArg;
@@ -284,7 +284,7 @@ int gpDenyBuddyRequest(GPConnection *connection, int profile);
 int gpGetNumBuddies(GPConnection *connection, int *numBuddies);
 int gpGetBuddyStatus(GPConnection *connection, int index, GPBuddyStatus *status);
 int gpGetBuddyIndex(GPConnection *connection, int profile, int *index);
-BOOL gpIsBuddy(GPConnection *connection, int profile);
+gsi_bool gpIsBuddy(GPConnection *connection, int profile);
 int gpDeleteBuddy(GPConnection *connection, int profile);
 int gpSetStatus(GPConnection *connection, int status, const char *statusString, const char *locationString);
 int gpSendBuddyMessage(GPConnection *connection, int profile, const char *message);

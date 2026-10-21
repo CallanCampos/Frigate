@@ -13,13 +13,13 @@ typedef struct AvailableCheck {
     SocAddrIn address;
     char packet[0x40];
     int packetSize;
-    u32 sendTime;
+    gsi_u32 sendTime;
     int sendCount;
 } AvailableCheck;
 
-static BOOL get_sockaddrin(const char *host, int port, SocAddrIn *address);
+static gsi_bool get_sockaddrin(const char *host, int port, SocAddrIn *address);
 static void SendPacket(void);
-static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, u32 *flags);
+static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, gsi_u32 *flags);
 
 // MWCC lays out the .bss in the reverse order of the definitions, and the ROM has __GSIACResult first
 static AvailableCheck sAvailableCheck;
@@ -28,20 +28,20 @@ char __GSIACGamename[0x40];
 int __GSIACResult;
 
 // The address of a host (a text of four numbers or a name to look up) at a port
-static BOOL get_sockaddrin(const char *host, int port, SocAddrIn *address) {
+static gsi_bool get_sockaddrin(const char *host, int port, SocAddrIn *address) {
     address->family = 2;
     // The port in network order
-    address->port = (u8)((u16)port >> 8) | (((u16)port << 8) & 0xff00);
+    address->port = (gsi_u8)((gsi_u16)port >> 8) | (((gsi_u16)port << 8) & 0xff00);
     address->addr = inet_addr(host);
     if (address->addr == -1) {
         SocHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry == NULL) {
-            return FALSE;
+            return gsi_false;
         }
-        address->addr = *(u32 *)entry->addrList[0];
+        address->addr = *(gsi_u32 *)entry->addrList[0];
     }
-    return TRUE;
+    return gsi_true;
 }
 
 static void SendPacket(void) {
@@ -69,7 +69,7 @@ void GSIStartAvailableCheckA(const char *gamename) {
     if (get_sockaddrin(useHost, 27900, &sAvailableCheck.address)) {
         sAvailableCheck.sock = gsiSocket(2, 2, 0);
         if (sAvailableCheck.sock != -1) {
-            u32 length;
+            gsi_u32 length;
 
             sAvailableCheck.packet[0] = 9;
             length = strlen(gamename);
@@ -82,7 +82,7 @@ void GSIStartAvailableCheckA(const char *gamename) {
 }
 
 // Reads the server's answer: 0 with its flags for an answer from the server, 1 for anything else
-static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, u32 *flags) {
+static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, gsi_u32 *flags) {
     if (size < 7) {
         return 1;
     }
@@ -96,11 +96,11 @@ static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, u32
         return 1;
     }
     {
-        u32 value = (buffer[3] << 24) & 0xff000000;
+        gsi_u32 value = (buffer[3] << 24) & 0xff000000;
 
         value |= (buffer[4] << 16) & 0xff0000;
         value |= (buffer[5] << 8) & 0xff00;
-        value |= (u8)buffer[6];
+        value |= (gsi_u8)buffer[6];
         *flags = value;
     }
     return 0;
@@ -110,7 +110,7 @@ int GSIAvailableCheckThink(void) {
     char buffer[0x40];
     SocAddrIn from;
     int fromSize = sizeof(SocAddrIn);
-    u32 flags;
+    gsi_u32 flags;
 
     if (sAvailableCheck.sock == -1) {
         __GSIACResult = 1;

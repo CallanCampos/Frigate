@@ -31,9 +31,9 @@ static void ListCallback(SBServerList *serverlist, SBListCallbackReason reason, 
                     qtype = QTYPE_ICMP;
                 }
                 if (serverlist->backendgameflags & QR2_USE_QUERY_CHALLENGE) {
-                    SBQueryEngineUpdateServer(&sb->engine, server, FALSE, qtype, TRUE);
+                    SBQueryEngineUpdateServer(&sb->engine, server, gsi_false, qtype, gsi_true);
                 } else {
-                    SBQueryEngineUpdateServer(&sb->engine, server, FALSE, qtype, FALSE);
+                    SBQueryEngineUpdateServer(&sb->engine, server, gsi_false, qtype, gsi_false);
                 }
             }
         }
@@ -99,11 +99,11 @@ static void EngineCallback(SBQueryEngine *engine, SBQueryEngineCallbackReason re
 }
 
 ServerBrowser *ServerBrowserNewA(const char *queryForGamename, const char *queryFromGamename, const char *queryFromKey,
-                                 int queryFromVersion, int maxConcUpdates, int queryVersion, BOOL lanBrowse,
+                                 int queryFromVersion, int maxConcUpdates, int queryVersion, gsi_bool lanBrowse,
                                  ServerBrowserCallback callback, void *instance) {
     ServerBrowser *sb;
 
-    if (lanBrowse == FALSE && __GSIACResult != 1) {
+    if (lanBrowse == gsi_false && __GSIACResult != 1) {
         return NULL;
     }
     sb = gsimalloc(sizeof(ServerBrowser));
@@ -113,7 +113,7 @@ ServerBrowser *ServerBrowserNewA(const char *queryForGamename, const char *query
     sb->BrowserCallback = callback;
     sb->ConnectCallback = NULL;
     sb->instance = instance;
-    sb->dontUpdate = FALSE;
+    sb->dontUpdate = gsi_false;
     SBServerListInit(&sb->list, queryForGamename, queryFromGamename, queryFromKey, queryFromVersion, lanBrowse,
                      ListCallback, sb);
     SBQueryEngineInit(&sb->engine, maxConcUpdates, queryVersion, lanBrowse, EngineCallback, sb);
@@ -129,8 +129,9 @@ void ServerBrowserFree(ServerBrowser *sb) {
     gsifree(sb);
 }
 
-SBError ServerBrowserBeginUpdate2(ServerBrowser *sb, BOOL async, BOOL disconnectOnComplete, const u8 *basicFields,
-                                  int numBasicFields, const char *serverFilter, int updateOptions, int maxServers) {
+SBError ServerBrowserBeginUpdate2(ServerBrowser *sb, gsi_bool async, gsi_bool disconnectOnComplete,
+                                  const gsi_u8 *basicFields, int numBasicFields, const char *serverFilter,
+                                  int updateOptions, int maxServers) {
     char keyList[MAX_FIELD_LIST_LEN] = "";
     int listLen = 0;
     int i;
@@ -166,17 +167,18 @@ SBError ServerBrowserBeginUpdate2(ServerBrowser *sb, BOOL async, BOOL disconnect
     return err;
 }
 
-SBError ServerBrowserLimitUpdateA(ServerBrowser *sb, BOOL async, BOOL disconnectOnComplete, const u8 *basicFields,
-                                  int numBasicFields, const char *serverFilter, int maxServers) {
+SBError ServerBrowserLimitUpdateA(ServerBrowser *sb, gsi_bool async, gsi_bool disconnectOnComplete,
+                                  const gsi_u8 *basicFields, int numBasicFields, const char *serverFilter,
+                                  int maxServers) {
     return ServerBrowserBeginUpdate2(sb, async, disconnectOnComplete, basicFields, numBasicFields, serverFilter,
                                      LIMIT_RESULT_COUNT, maxServers);
 }
 
-SBError ServerBrowserSendMessageToServerA(ServerBrowser *sb, const char *ip, u16 port, const char *data, int len) {
+SBError ServerBrowserSendMessageToServerA(ServerBrowser *sb, const char *ip, gsi_u16 port, const char *data, int len) {
     return SBSendMessageToServer(&sb->list, inet_addr(ip), SB_SWAP16(port), data, len);
 }
 
-SBError ServerBrowserSendNatNegotiateCookieToServerA(ServerBrowser *sb, const char *ip, u16 port, int cookie) {
+SBError ServerBrowserSendNatNegotiateCookieToServerA(ServerBrowser *sb, const char *ip, gsi_u16 port, int cookie) {
     return SBSendNatNegotiateCookieToServer(&sb->list, inet_addr(ip), SB_SWAP16(port), cookie);
 }
 
@@ -225,7 +227,7 @@ int ServerBrowserCount(ServerBrowser *sb) {
     return SBServerListCount(&sb->list);
 }
 
-void ServerBrowserSortA(ServerBrowser *sb, BOOL ascending, const char *sortkey, SBCompareMode comparemode) {
+void ServerBrowserSortA(ServerBrowser *sb, gsi_bool ascending, const char *sortkey, SBCompareMode comparemode) {
     SortInfo info;
 
     info.comparemode = comparemode;
@@ -233,6 +235,6 @@ void ServerBrowserSortA(ServerBrowser *sb, BOOL ascending, const char *sortkey, 
     SBServerListSort(&sb->list, ascending, info);
 }
 
-u32 ServerBrowserGetMyPublicIPAddr(ServerBrowser *sb) {
+gsi_u32 ServerBrowserGetMyPublicIPAddr(ServerBrowser *sb) {
     return sb->list.mypublicip;
 }

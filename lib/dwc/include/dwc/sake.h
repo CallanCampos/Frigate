@@ -1,7 +1,7 @@
 #ifndef POKEBW2_DWC_SAKE_H
 #define POKEBW2_DWC_SAKE_H
 
-#include "types.h"
+#include "dwc/nonport.h"
 
 // GameSpy's Sake, the online record storage that Nintendo's Wi-Fi Connection games keep their ranking data in, in
 // overlay 260 (sake.c). It posts SOAP requests to a game's tables on the storage server and calls a function back with
@@ -33,19 +33,19 @@ typedef struct SakeField {
     const char *name;
     int type;
     union {
-        u8 byteValue;
-        s16 shortValue;
+        gsi_u8 byteValue;
+        gsi_i16 shortValue;
         int intValue;
         float floatValue;
         const char *asciiStringValue;
-        u16 *unicodeStringValue;
-        BOOL booleanValue;
+        gsi_u16 *unicodeStringValue;
+        gsi_bool booleanValue;
         int dateAndTimeValue;
         struct {
             void *data;
             int length;
         } binaryDataValue;
-        s64 int64Value;
+        gsi_i64 int64Value;
     } value;
 } SakeField;
 
@@ -156,10 +156,10 @@ SakeRequest *sakeGetMyRecords(Sake *sake, SakeGetMyRecordsInput *input, SakeCall
 SakeRequest *sakeGetSpecificRecords(Sake *sake, SakeGetSpecificRecordsInput *input, SakeCallback callback,
                                     void *userData);
 // Sets the URLs of the file server in place of the standard, and gets those of a file to download and to upload
-BOOL Sake_SetDownloadUrl(Sake *sake, const char *url);
-BOOL Sake_GetDownloadUrl(const Sake *sake, int fileId, char *url);
-BOOL Sake_SetUploadUrl(Sake *sake, const char *url);
-BOOL Sake_GetUploadUrl(const Sake *sake, char *url);
+gsi_bool Sake_SetDownloadUrl(Sake *sake, const char *url);
+gsi_bool Sake_GetDownloadUrl(const Sake *sake, int fileId, char *url);
+gsi_bool Sake_SetUploadUrl(Sake *sake, const char *url);
+gsi_bool Sake_GetUploadUrl(const Sake *sake, char *url);
 // Stops a request, returning 0 or an error code
 int Sake_CancelRequest(Sake *sake, SakeRequest *request);
 

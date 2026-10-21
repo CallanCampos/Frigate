@@ -6,8 +6,8 @@
 // (gsiStringToInt64, gsiInt64ToString, gsiSecondsToDate, gsiDateToSeconds, QuartToTrip, TripToQuart, B64Decode,
 // B64DecodeLen and the stream); RandomNext and RandomGenerate are ours
 
-static u32 RandomNext(u32 seed);
-static u32 RandomGenerate(void);
+static gsi_u32 RandomNext(gsi_u32 seed);
+static gsi_u32 RandomGenerate(void);
 static void QuartToTrip(const char *quart, char *trip, int count);
 static void TripToQuart(const char *trip, char *quart, int count);
 
@@ -20,24 +20,24 @@ static const char defaultEncoding[3] = { '+', '/', '=' };
 const char _dnames[] = "SunMonTueWedThuFriSat";
 const char _mnames[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
-static u32 sRandSeed = 1;
+static gsi_u32 sRandSeed = 1;
 // The days before each month, less one, in a leap year and in another year
 static int _lpdays[13] = { -1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 static int _days[13] = { -1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364 };
 static GSTime sDate;
 
-s64 gsiStringToInt64(const char *text) {
+gsi_i64 gsiStringToInt64(const char *text) {
     return atoll(text);
 }
 
-int gsiInt64ToString(char *text, s64 value) {
+int gsiInt64ToString(char *text, gsi_i64 value) {
     return OS_SPrintf(text, "%lld", value);
 }
 
 // The lookup of a host: what was left of GameSpy's thread, and the address
 typedef struct GSIResolveHostname {
-    u32 unused;
-    u32 ip;
+    gsi_u32 unused;
+    gsi_u32 ip;
 } GSIResolveHostname;
 
 int gsiStartResolvingHostname(const char *host, void **lookup) {
@@ -53,7 +53,7 @@ int gsiStartResolvingHostname(const char *host, void **lookup) {
     if (resolve == NULL) {
         return -1;
     }
-    resolve->ip = *(u32 *)entry->addrList[0];
+    resolve->ip = *(gsi_u32 *)entry->addrList[0];
     *lookup = resolve;
     return 0;
 }
@@ -100,15 +100,15 @@ void SocketStartUp(void) {
 void SocketShutDown(void) {
 }
 
-u32 current_time(void) {
+gsi_u32 current_time(void) {
     return OS_TicksToMilliSeconds(OS_GetTick());
 }
 
-u32 current_time_hires(void) {
+gsi_u32 current_time_hires(void) {
     return OS_TicksToMicroSeconds(OS_GetTick());
 }
 
-void msleep(u32 milliseconds) {
+void msleep(gsi_u32 milliseconds) {
     OS_Sleep(milliseconds);
 }
 
@@ -118,7 +118,7 @@ void msleep(u32 milliseconds) {
 
 GSTime *gsiSecondsToDate(const int *seconds) {
     int time = *seconds;
-    BOOL leap = FALSE;
+    gsi_bool leap = gsi_false;
     GSTime *date = &sDate;
     int year;
     int yday;
@@ -234,9 +234,9 @@ int gsiDateToSeconds(GSTime *date) {
 }
 
 // The next number of the Park-Miller generator (16807 times the seed, modulo 2^31 - 1), without a division
-static u32 RandomNext(u32 seed) {
-    u32 lo;
-    u32 hi;
+static gsi_u32 RandomNext(gsi_u32 seed) {
+    gsi_u32 lo;
+    gsi_u32 hi;
 
     lo = 16807 * (seed & 0xffff);
     hi = 16807 * (seed >> 16);
@@ -253,16 +253,16 @@ static u32 RandomNext(u32 seed) {
     return lo;
 }
 
-static u32 RandomGenerate(void) {
+static gsi_u32 RandomGenerate(void) {
     return sRandSeed = RandomNext(sRandSeed);
 }
 
-void Util_RandSeed(u32 seed) {
+void Util_RandSeed(gsi_u32 seed) {
     sRandSeed = seed != 0 ? seed & 0x7fffffff : 1;
 }
 
 int Util_RandInt(int low, int high) {
-    u32 range = high - low;
+    gsi_u32 range = high - low;
     int value;
 
     if (range == 0) {
@@ -287,7 +287,7 @@ static void QuartToTrip(const char *quart, char *trip, int count) {
 
 // Turns up to three bytes into four base 64 digits (values from 0 to 63)
 static void TripToQuart(const char *trip, char *quart, int count) {
-    u8 triple[3];
+    gsi_u8 triple[3];
     int i;
 
     for (i = 0; i < count; i++) {
@@ -462,12 +462,12 @@ void B64InitEncodeStream(B64StreamData *data, const char *input, int length, int
     data->encodingType = encodingType;
 }
 
-BOOL B64EncodeStream(B64StreamData *data, char output[4]) {
+gsi_bool B64EncodeStream(B64StreamData *data, char output[4]) {
     const char *encoding;
     int i;
 
     if (data->length <= 0) {
-        return FALSE;
+        return gsi_false;
     }
     switch (data->encodingType) {
     case 1:
@@ -502,5 +502,5 @@ BOOL B64EncodeStream(B64StreamData *data, char output[4]) {
             output[2] = encoding[2];
         }
     }
-    return TRUE;
+    return gsi_true;
 }

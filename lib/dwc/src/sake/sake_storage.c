@@ -123,7 +123,7 @@ static void Sake_WriteFields(SakeRequest *request, SakeField *fields, int fieldN
             gsXmlWriteCloseTag(request->writer, "ns1", "unicodeStringValue");
         } else if (fields[i].type == SAKE_FIELD_BOOLEAN) {
             gsXmlWriteOpenTag(request->writer, "ns1", "booleanValue");
-            gsXmlWriteIntElement(request->writer, "ns1", "value", fields[i].value.booleanValue != FALSE);
+            gsXmlWriteIntElement(request->writer, "ns1", "value", fields[i].value.booleanValue != gsi_false);
             gsXmlWriteCloseTag(request->writer, "ns1", "booleanValue");
         } else if (fields[i].type == SAKE_FIELD_DATE_AND_TIME) {
             gsXmlWriteOpenTag(request->writer, "ns1", "dateAndTimeValue");
@@ -165,7 +165,7 @@ static int Sake_BuildCreateRecord(SakeRequest *request) {
 }
 
 static int Sake_ParseCreateRecord(SakeRequest *request) {
-    if (gsXmlReadChildAsInt(request->response, "recordid", request->output) == FALSE) {
+    if (gsXmlReadChildAsInt(request->response, "recordid", request->output) == gsi_false) {
         return SAKE_RESULT_MALFORMED_RESPONSE;
     }
     return 0;

@@ -1,4 +1,5 @@
 #include "dwc/gs_screen_print.h"
+#include "dwc/nonport.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
@@ -11,7 +12,7 @@ static void ScreenPutChar(int c);
 
 // The text being printed, the screen's 24 lines of 32 characters, and where the next character goes in the last line
 static char sText[0x800];
-static u16 sScreen[24 * 32];
+static gsi_u16 sScreen[24 * 32];
 static int sCursor;
 
 // Whether the text is printed (bit 0), which it is not

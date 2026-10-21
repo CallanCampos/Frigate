@@ -14,7 +14,7 @@ void gpiCallErrorCallback(GPConnection *connection, int result, int fatal) {
     GPErrorArg *arg;
 
     if (fatal == 1) {
-        iconnection->fatalError = TRUE;
+        iconnection->fatalError = gsi_true;
     }
     callback = iconnection->callbacks[0];
     if (callback.callback != NULL) {
@@ -109,7 +109,7 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
         arg->suggestedNicks = NULL;
     } else if (type == GPI_ADD_BUDDYREVOKE) {
         // The buddy that revoked is deleted once the app knows, without telling the server
-        gpiDeleteBuddy(connection, ((GPRecvBuddyRevokeArg *)data->arg)->profile, FALSE);
+        gpiDeleteBuddy(connection, ((GPRecvBuddyRevokeArg *)data->arg)->profile, gsi_false);
     } else if (type == GPI_ADD_REVERSE_BUDDIES_LIST) {
         GPGetReverseBuddiesListResponseArg *arg = data->arg;
 

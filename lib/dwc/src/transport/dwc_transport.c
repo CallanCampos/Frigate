@@ -374,7 +374,7 @@ void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int leng
     }
 }
 
-void DWCi_PingCallback(GTI2Connection *connection, u32 latency) {
+void DWCi_PingCallback(GTI2Connection *connection, int latency) {
     if (sTransport->pingCallback != NULL) {
         u8 aid = DWCi_GetConnectionAID(connection);
 

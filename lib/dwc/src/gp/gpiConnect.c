@@ -20,7 +20,7 @@ static void randomString(char *buffer, int numChars);
 static int gpiStartConnect(GPConnection *connection, GPIOperation *operation);
 static int gpiSendLogin(GPConnection *connection, GPIConnectData *data);
 static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data);
-static BOOL gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data);
+static gsi_bool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data);
 
 // The host of the connection manager, and the characters of randomString's challenges, which are defined after
 // randomString, as their order in .data shows
@@ -40,7 +40,7 @@ static char sCharacters[63] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
 
 static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
     GPIConnection *iconnection = *connection;
-    u16 port;
+    gsi_u16 port;
     int result;
     int error;
 
@@ -98,7 +98,7 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
             gpiCallErrorCallback(connection, 3, 1);
             return 3;
         }
-        address.addr = *(u32 *)host->addrList[0];
+        address.addr = *(gsi_u32 *)host->addrList[0];
     } else {
         address.addr = inet_addr(sConnectionManagerHostname);
     }
@@ -118,7 +118,7 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
 
 int gpiConnect(GPConnection *connection, const char *nick, const char *uniquenick, const char *email,
                const char *password, const char *authtoken, const char *partnerchallenge, const char *cdkey,
-               BOOL firewall, BOOL newuser, int blocking, GPCallback callback, void *param) {
+               gsi_bool firewall, gsi_bool newuser, int blocking, GPCallback callback, void *param) {
     GPIConnection *iconnection = *connection;
     GPIConnectData *data;
     GPIOperation *operation;
@@ -134,7 +134,7 @@ int gpiConnect(GPConnection *connection, const char *nick, const char *uniquenic
         gpiSetErrorString(connection, "Invalid connection.");
         return 2;
     }
-    iconnection->firewall = TRUE;
+    iconnection->firewall = gsi_true;
     strzcpy(iconnection->nick, nick, 0x1f);
     strzcpy(iconnection->uniquenick, uniquenick, 0x15);
     strzcpy(iconnection->email, email, 0x33);
@@ -162,7 +162,7 @@ int gpiConnect(GPConnection *connection, const char *nick, const char *uniquenic
     if (result != 0) {
         operation->result = result;
         gpiFailedOpCallback(connection, operation);
-        gpiDisconnect(connection, FALSE);
+        gpiDisconnect(connection, gsi_false);
         return result;
     }
     if (operation->blocking) {
@@ -190,7 +190,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     } else {
         passphrase = iconnection->password;
     }
-    MD5Digest((const u8 *)passphrase, strlen(passphrase), data->passwordHash);
+    MD5Digest((const gsi_u8 *)passphrase, strlen(passphrase), data->passwordHash);
     if (iconnection->partnerID != 0) {
         OS_SPrintf(partnerBuffer, "%d@", iconnection->partnerID);
     } else {
@@ -207,7 +207,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     }
     OS_SPrintf(buffer, "%s%s%s%s%s%s", data->passwordHash, "                                                ", user,
                data->userChallenge, data->serverChallenge, data->passwordHash);
-    MD5Digest((const u8 *)buffer, strlen(buffer), response);
+    MD5Digest((const gsi_u8 *)buffer, strlen(buffer), response);
     if (iconnection->infoCaching) {
         gpiFindProfileByUser(connection, iconnection->nick, iconnection->email, &profile);
         if (profile != NULL) {
@@ -242,7 +242,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->partnerID);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\response\\");
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, response);
-    if (iconnection->firewall == TRUE) {
+    if (iconnection->firewall == gsi_true) {
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\firewall\\1");
     }
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\port\\");
@@ -267,8 +267,8 @@ static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data) {
     char cdkeyxor[0x41];
     char cdkeyenc[0x5a];
     char passwordenc[0x2d];
-    u32 cdkeylen;
-    u32 i;
+    gsi_u32 cdkeylen;
+    gsi_u32 i;
 
     gpiEncodeString(iconnection->password, passwordenc);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\newuser\\");
@@ -328,7 +328,7 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
     int result;
     int errorCode;
 
-    if (gpiCheckForError(connection, input, FALSE)) {
+    if (gpiCheckForError(connection, input, gsi_false)) {
         errorCode = iconnection->errorCode;
         if (errorCode == 0x106 && iconnection->profileid != 0) {
             gpiRemoveProfileByID(connection, iconnection->profileid);
@@ -423,7 +423,7 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
         // The server proves that it knows the password with the challenges the other way around
         OS_SPrintf(buffer, "%s%s%s%s%s%s", data->passwordHash, "                                                ", user,
                    data->serverChallenge, data->userChallenge, data->passwordHash);
-        MD5Digest((const u8 *)buffer, strlen(buffer), check);
+        MD5Digest((const gsi_u8 *)buffer, strlen(buffer), check);
         if (!gpiValueForKey(input, "\\proof\\", buffer, 0x200)) {
             GPI_UNEXPECTED_DATA(connection, "Unexepected data was received from the server.");
         }
@@ -481,11 +481,11 @@ int gpiCheckConnect(GPConnection *connection) {
     return 0;
 }
 
-static BOOL gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data) {
+static gsi_bool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data) {
     GPIConnection *iconnection = *connection;
 
     if (profile->buddyStatus != NULL) {
-        profile->buddyOrBlockCache = TRUE;
+        profile->buddyOrBlockCache = gsi_true;
         gsifree(profile->buddyStatus->statusString);
         profile->buddyStatus->statusString = NULL;
         gsifree(profile->buddyStatus->locationString);
@@ -494,7 +494,7 @@ static BOOL gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *pr
         profile->buddyStatus = NULL;
     }
     if (profile->buddyStatusInfo != NULL) {
-        profile->buddyOrBlockCache = TRUE;
+        profile->buddyOrBlockCache = gsi_true;
         gsifree(profile->buddyStatusInfo->richStatus);
         profile->buddyStatusInfo->richStatus = NULL;
         gsifree(profile->buddyStatusInfo->gameType);
@@ -511,23 +511,24 @@ static BOOL gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *pr
         profile->buddyStatusInfo = NULL;
     }
     if (profile->blocked) {
-        profile->buddyOrBlockCache = TRUE;
+        profile->buddyOrBlockCache = gsi_true;
     }
     gsifree(profile->authSig);
     profile->authSig = NULL;
     gsifree(profile->peerSig);
     profile->peerSig = NULL;
     profile->requestCount = 0;
-    if (profile->cache == NULL || (iconnection->infoCachingBuddyAndBlockOnly == TRUE && !profile->buddyOrBlockCache)) {
+    if (profile->cache == NULL ||
+        (iconnection->infoCachingBuddyAndBlockOnly == gsi_true && !profile->buddyOrBlockCache)) {
         gpiRemoveProfile(connection, profile);
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-void gpiDisconnect(GPConnection *connection, BOOL tellServer) {
+void gpiDisconnect(GPConnection *connection, gsi_bool tellServer) {
     GPIConnection *iconnection = *connection;
-    BOOL connClosed;
+    gsi_bool connClosed;
 
     if (iconnection->connectState == GPI_DISCONNECTED) {
         return;
@@ -538,7 +539,7 @@ void gpiDisconnect(GPConnection *connection, BOOL tellServer) {
             gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->sessKey);
             gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
         }
-        gpiSendFromBuffer(connection, iconnection->cmSocket, &iconnection->outputBuffer, &connClosed, TRUE, "CM");
+        gpiSendFromBuffer(connection, iconnection->cmSocket, &iconnection->outputBuffer, &connClosed, gsi_true, "CM");
         if (iconnection->cmSocket != -1) {
             shutdown(iconnection->cmSocket, 2);
             closesocket(iconnection->cmSocket);
@@ -589,7 +590,7 @@ int gpiProcessRemoteAuthReply(GPConnection *connection, const char *input) {
     GPIConnection *iconnection = *connection;
     char buffer[0x200];
 
-    if (gpiCheckForError(connection, input, TRUE)) {
+    if (gpiCheckForError(connection, input, gsi_true)) {
         return 4;
     }
     if (!gpiValueForKey(iconnection->inputBuffer, "\\namespaceid\\", buffer, 0x200)) {

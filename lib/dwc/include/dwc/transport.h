@@ -67,7 +67,7 @@ void DWCi_InitTransport(DWCTransportInfo *info);
 void DWCi_ShutdownTransport(void);
 // GT2's callbacks of a connection: a message received, and the latency of a ping
 void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable);
-void DWCi_PingCallback(GTI2Connection *connection, u32 latency);
+void DWCi_PingCallback(GTI2Connection *connection, int latency);
 // Runs the transport for a frame: drops the machines that sent nothing for too long, calls the receive timeouts and
 // sends the next piece of the data being sent
 void DWCi_TransportProcess(void);

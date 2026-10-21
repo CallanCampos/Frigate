@@ -1,8 +1,8 @@
 #ifndef POKEBW2_DWC_HASHTABLE_H
 #define POKEBW2_DWC_HASHTABLE_H
 
-#include "types.h"
 #include "dwc/darray.h"
+#include "dwc/nonport.h"
 
 // GameSpy's hash tables (hashtable.c), in overlay 11: an array of buckets, each a dynamic array (dwc/darray.h) of
 // elements. The ROM has no names for the file or its functions: the file is named after GameSpy's, as pret/pokerevo's
@@ -31,7 +31,7 @@ void TableFree(HashTable *table);
 int TableCount(HashTable *table);
 // TableEnter adds the element or replaces the one that compares equal
 void TableEnter(HashTable *table, const void *element);
-BOOL TableRemove(HashTable *table, const void *element);
+gsi_bool TableRemove(HashTable *table, const void *element);
 void *TableLookup(HashTable *table, const void *element);
 // TableMapSafe2 returns the first element the function returns 0 for, or NULL
 void TableMapSafe(HashTable *table, TableMapFunc func, void *clientData);

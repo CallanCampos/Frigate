@@ -13,26 +13,26 @@
 // connection, network and OS), 0x717 the AIM name, and 0x718 to 0x71e the picture, occupation, industry, income,
 // marriage, children and interests
 
-static BOOL gpiIsValidDate(int day, int month, int year);
+static gsi_bool gpiIsValidDate(int day, int month, int year);
 static int gpiIntToDate(GPConnection *connection, int date, int *day, int *month, int *year);
 static void gpiInfoCacheToArg(const GPIInfoCache *cache, GPGetInfoResponseArg *arg);
 static int gpiSendLocalInfo(GPConnection *connection, const char *info, const char *value);
 static int gpiSendUserInfo(GPConnection *connection, const char *info, const char *value);
 static int gpiSetInfoi(GPConnection *connection, int info, int value);
-static BOOL gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const GPIInfoCache *cache);
+static gsi_bool gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const GPIInfoCache *cache);
 
 // All zero is no date; the last date the server takes is 6 June 2079
-static BOOL gpiIsValidDate(int day, int month, int year) {
+static gsi_bool gpiIsValidDate(int day, int month, int year) {
     if (day == 0 && month == 0 && year == 0) {
-        return TRUE;
+        return gsi_true;
     }
     if (day < 0 || month < 0 || year < 0) {
-        return FALSE;
+        return gsi_false;
     }
     switch (month) {
     case 0:
         if (day != 0) {
-            return FALSE;
+            return gsi_false;
         }
         break;
     case 1:
@@ -43,7 +43,7 @@ static BOOL gpiIsValidDate(int day, int month, int year) {
     case 10:
     case 12:
         if (day > 31) {
-            return FALSE;
+            return gsi_false;
         }
         break;
     case 4:
@@ -51,43 +51,43 @@ static BOOL gpiIsValidDate(int day, int month, int year) {
     case 9:
     case 11:
         if (day > 30) {
-            return FALSE;
+            return gsi_false;
         }
         break;
     case 2:
         if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
             if (day > 29) {
-                return FALSE;
+                return gsi_false;
             }
         } else if (day > 28) {
-            return FALSE;
+            return gsi_false;
         }
         break;
     default:
-        return FALSE;
+        return gsi_false;
     }
     if (year < 1900) {
-        return FALSE;
+        return gsi_false;
     }
     if (year > 2079) {
-        return FALSE;
+        return gsi_false;
     }
     if (year == 2079) {
         if (month > 6) {
-            return FALSE;
+            return gsi_false;
         }
         if (month == 6 && day > 6) {
-            return FALSE;
+            return gsi_false;
         }
     }
-    return TRUE;
+    return gsi_true;
 }
 
 // A date is packed as the day, the month and the year in the bytes from the top
 static int gpiIntToDate(GPConnection *connection, int date, int *day, int *month, int *year) {
-    int d = (u8)(date >> 24);
-    int m = (u8)(date >> 16);
-    int y = (u16)date;
+    int d = (gsi_u8)(date >> 24);
+    int m = (gsi_u8)(date >> 16);
+    int y = (gsi_u16)date;
 
     if (!gpiIsValidDate(d, m, y)) {
         gpiSetErrorString(connection, "Invalid date.");
@@ -186,10 +186,10 @@ int gpiProcessGetInfo(GPConnection *connection, GPIOperation *operation, const c
     GPGetInfoResponseArg *arg;
     GPIPeer *peer;
     int pid;
-    BOOL saveSig;
+    gsi_bool saveSig;
     int result;
 
-    if (gpiCheckForError(connection, input, TRUE)) {
+    if (gpiCheckForError(connection, input, gsi_true)) {
         return 4;
     }
     if (strncmp(input, "\\pi\\", 4) != 0) {
@@ -339,7 +339,7 @@ int gpiProcessGetInfo(GPConnection *connection, GPIOperation *operation, const c
                 profile = gpiProfileListAdd(connection, pid);
             }
             peer->state = GPI_PEER_GOT_SIG;
-            saveSig = TRUE;
+            saveSig = gsi_true;
         }
     }
     if (profile == NULL && iconnection->infoCaching) {
@@ -854,13 +854,13 @@ int gpiGetInfo(GPConnection *connection, int profile, int checkCache, int blocki
     int id;
     int result;
 
-    BOOL useCache = FALSE;
+    gsi_bool useCache = gsi_false;
 
     if (checkCache == 1) {
-        useCache = TRUE;
+        useCache = gsi_true;
     }
     if (!iconnection->infoCaching) {
-        useCache = FALSE;
+        useCache = gsi_false;
     }
     if (callback != NULL && useCache && gpiGetProfile(connection, profile, &pProfile) && pProfile->cache != NULL) {
         arg = gsimalloc(sizeof(GPGetInfoResponseArg));
@@ -873,7 +873,7 @@ int gpiGetInfo(GPConnection *connection, int profile, int checkCache, int blocki
         arg->profile = profile;
         gpiCallback.callback = callback;
         gpiCallback.param = param;
-        result = gpiAddOperation(connection, GPI_GET_INFO, NULL, &operation, TRUE, callback, param);
+        result = gpiAddOperation(connection, GPI_GET_INFO, NULL, &operation, gsi_true, callback, param);
         if (result != 0) {
             return result;
         }
@@ -903,11 +903,11 @@ int gpiGetInfo(GPConnection *connection, int profile, int checkCache, int blocki
     return 0;
 }
 
-static BOOL gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const GPIInfoCache *cache) {
+static gsi_bool gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const GPIInfoCache *cache) {
     GPIConnection *iconnection = *connection;
 
     if (!iconnection->infoCaching) {
-        return TRUE;
+        return gsi_true;
     }
     gpiFreeInfoCache(profile);
     profile->cache = gsimalloc(sizeof(GPIInfoCache));
@@ -922,9 +922,9 @@ static BOOL gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const
         profile->cache->aimname = goastrdup(cache->aimname);
     }
     if (profile->cache != NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 void gpiFreeInfoCache(GPIProfile *profile) {

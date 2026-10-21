@@ -11,14 +11,14 @@
 
 // The last eight bytes of a GUID
 typedef struct ScGuidTail {
-    u8 data[8];
+    gsi_u8 data[8];
 } ScGuidTail;
 
-static inline u16 Sc_SwapU16(u16 value) {
+static inline gsi_u16 Sc_SwapU16(gsi_u16 value) {
     return ((value >> 8) & 0x00ff) | ((value << 8) & 0xff00);
 }
 
-static inline u32 Sc_SwapU32(u32 value) {
+static inline gsi_u32 Sc_SwapU32(gsi_u32 value) {
     return ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000) |
            ((value << 24) & 0xff000000);
 }
@@ -41,10 +41,10 @@ static int ScReport_Nothing(ScReport *report);
 static int ScReport_End(ScReport *report, int flag, int value);
 static int ScReport_PutInt(ScReport *report, int key, int value);
 static int ScReport_PutByte(ScReport *report, int key, int value);
-static u8 *Sc_PutByte(u8 *dest, int value);
-static u8 *Sc_PutU16(u8 *dest, s16 value);
-static u8 *Sc_PutU32(u8 *dest, u32 value);
-static u8 *Sc_PutGuid(u8 *dest, const char *text);
+static gsi_u8 *Sc_PutByte(gsi_u8 *dest, int value);
+static gsi_u8 *Sc_PutU16(gsi_u8 *dest, gsi_i16 value);
+static gsi_u8 *Sc_PutU32(gsi_u8 *dest, gsi_u32 value);
+static gsi_u8 *Sc_PutGuid(gsi_u8 *dest, const char *text);
 
 // The URL of the competition service, set by ScClient_SetServers or once it is asked for
 char gCompetitionUrl[128];
@@ -108,10 +108,10 @@ static void ScClient_Reset(ScClient *client) {
     memset(client->csid, 0, sizeof(client->csid));
     memset(client->ccid, 0, sizeof(client->ccid));
     // Invalid IDs carry the binary marker 0xDEAD.
-    ((u8 *)client->csid)[0] = 0xde;
-    ((u8 *)client->csid)[1] = 0xad;
-    ((u8 *)client->ccid)[0] = 0xde;
-    ((u8 *)client->ccid)[1] = 0xad;
+    ((gsi_u8 *)client->csid)[0] = 0xde;
+    ((gsi_u8 *)client->csid)[1] = 0xad;
+    ((gsi_u8 *)client->ccid)[0] = 0xde;
+    ((gsi_u8 *)client->ccid)[1] = 0xad;
     client->valid = 0;
 }
 
@@ -230,9 +230,9 @@ int ScClient_SetReportIntention(ScClient *client, const char *ccid, int authorit
 int ScClient_SubmitReport(ScClient *client, ScReport *report, int authoritative, AuthCertificate *certificate,
                           AuthKeys *keys, ScClientFunc func, int timeout, void *userData) {
     HashContext context;
-    u8 *digest;
-    u8 *clear;
-    u32 i;
+    gsi_u8 *digest;
+    gsi_u8 *clear;
+    gsi_u32 i;
 
     if (client == NULL) {
         return 2;
@@ -293,12 +293,12 @@ int ScReport_Finish(ScReport *report, int flag, int value) {
 int ScReport_SetPlayer(ScReport *report, int index, const char *id, int key, int result, int profileId,
                        const AuthCertificate *certificate, void *unused) {
     SCResult error = SCResult_NO_ERROR;
-    int add = TRUE;
-    u32 i;
+    int add = gsi_true;
+    gsi_u32 i;
 
     for (i = 0; i < report->keyNum; i++) {
         if (key == report->keys[i]) {
-            add = FALSE;
+            add = gsi_false;
             break;
         }
     }
@@ -343,8 +343,8 @@ char *ScClient_GetUrl(void) {
 static int ScReport_Create(const char *csid, int version, int playerNum, int teamNum, ScReport **report) {
     ScReport *created;
     ScReportHeader *header;
-    u32 playerSize;
-    u32 teamSize;
+    gsi_u32 playerSize;
+    gsi_u32 teamSize;
 
     teamSize = playerNum * 0x10;
     playerSize = teamSize + playerNum * 4;
@@ -371,7 +371,7 @@ static int ScReport_Create(const char *csid, int version, int playerNum, int tea
     header->playerNum = playerNum;
     header->teamNum = teamNum;
     created->phase = SC_REPORT_PHASE_NEW;
-    created->buffer = (u8 *)header;
+    created->buffer = (gsi_u8 *)header;
     created->groupOffset = -1;
     created->keyNum = 0;
     *report = created;
@@ -395,7 +395,7 @@ static int ScReport_Destroy(ScReport *report) {
 
 // Each player's record after the header is 0x14 bytes: the 0x10-byte GUID of its connection, then its key
 static int ScReport_SetPlayerId(ScReport *report, int index, const char *id) {
-    u32 offset = sizeof(ScReportHeader);
+    gsi_u32 offset = sizeof(ScReportHeader);
 
     offset += index * 0x14;
     Sc_PutGuid(report->buffer + offset, id);
@@ -403,7 +403,7 @@ static int ScReport_SetPlayerId(ScReport *report, int index, const char *id) {
 }
 
 static int ScReport_SetPlayerKey(ScReport *report, int index, int key) {
-    u32 offset = sizeof(ScReportHeader);
+    gsi_u32 offset = sizeof(ScReportHeader);
 
     offset += index * 0x14;
     offset += 0x10;
@@ -531,24 +531,24 @@ static int ScReport_PutByte(ScReport *report, int key, int value) {
     return 0;
 }
 
-static u8 *Sc_PutByte(u8 *dest, int value) {
+static gsi_u8 *Sc_PutByte(gsi_u8 *dest, int value) {
     *dest = value;
     return dest + 1;
 }
 
 // The report cursor can be unaligned; copy the swapped scalar as bytes.
-static u8 *Sc_PutU16(u8 *dest, s16 value) {
-    u16 swapped = Sc_SwapU16(value);
-    const u8 *bytes = (const u8 *)&swapped;
+static gsi_u8 *Sc_PutU16(gsi_u8 *dest, gsi_i16 value) {
+    gsi_u16 swapped = Sc_SwapU16(value);
+    const gsi_u8 *bytes = (const gsi_u8 *)&swapped;
 
     dest[0] = bytes[0];
     dest[1] = bytes[1];
     return dest + sizeof(swapped);
 }
 
-static u8 *Sc_PutU32(u8 *dest, u32 value) {
-    u32 swapped = Sc_SwapU32(value);
-    const u8 *bytes = (const u8 *)&swapped;
+static gsi_u8 *Sc_PutU32(gsi_u8 *dest, gsi_u32 value) {
+    gsi_u32 swapped = Sc_SwapU32(value);
+    const gsi_u8 *bytes = (const gsi_u8 *)&swapped;
 
     dest[0] = bytes[0];
     dest[1] = bytes[1];
@@ -557,8 +557,8 @@ static u8 *Sc_PutU32(u8 *dest, u32 value) {
     return dest + sizeof(swapped);
 }
 
-static u8 *Sc_PutGuid(u8 *dest, const char *text) {
-    u32 data1 = 0;
+static gsi_u8 *Sc_PutGuid(gsi_u8 *dest, const char *text) {
+    gsi_u32 data1 = 0;
     int data2 = 0;
     int data3 = 0;
     int data4[8];

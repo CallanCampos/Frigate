@@ -42,7 +42,7 @@ int ghiFindFreeSlot(void) {
             }
             return -1;
         }
-        sConnections.connections[i]->inUse = FALSE;
+        sConnections.connections[i]->inUse = gsi_false;
     }
     sConnections.count = newCount;
     return count;
@@ -61,7 +61,7 @@ GHIConnection *ghiNewConnection(void) {
     }
     connection = sConnections.connections[slot];
     memset(connection, 0, sizeof(GHIConnection));
-    connection->inUse = TRUE;
+    connection->inUse = gsi_true;
     connection->request = slot;
     connection->uniqueId = sConnections.nextUniqueId++;
     connection->type = 0;
@@ -73,21 +73,21 @@ GHIConnection *ghiNewConnection(void) {
     connection->requestPath = NULL;
     connection->headers = NULL;
     connection->unk_30 = 0;
-    connection->blocking = FALSE;
-    connection->keepAlive = FALSE;
+    connection->blocking = gsi_false;
+    connection->keepAlive = gsi_false;
     connection->result = 0;
     connection->progressCallback = NULL;
     connection->completedCallback = NULL;
     connection->callbackParam = NULL;
     connection->socket = -1;
     connection->socketError = 0;
-    connection->userBuffer = FALSE;
+    connection->userBuffer = gsi_false;
     connection->httpMajor = 0;
     connection->httpMinor = 0;
     connection->statusCode = 0;
     connection->statusTextPos = 0;
     connection->headersPos = 0;
-    connection->completed = FALSE;
+    connection->completed = gsi_false;
     connection->bytesReceived = 0;
     connection->totalSize = -1;
     connection->redirectUrl = NULL;
@@ -101,7 +101,7 @@ GHIConnection *ghiNewConnection(void) {
     connection->proxyPort = 80;
     connection->proxyAddress = NULL;
     connection->encryptor.state = NULL;
-    connection->encryptor.open = FALSE;
+    connection->encryptor.open = gsi_false;
     connection->hostLookup = NULL;
     connection->lastRecvTime = 0;
 
@@ -119,18 +119,18 @@ GHIConnection *ghiNewConnection(void) {
 }
 
 // Ends the connection's lookup of its host and its socket, and says if that went well
-BOOL ghiCloseSocket(GHIConnection *connection) {
+gsi_bool ghiCloseSocket(GHIConnection *connection) {
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (!connection->inUse) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request < 0) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request >= sConnections.count) {
-        return FALSE;
+        return gsi_false;
     }
 
     ghiLock();
@@ -143,27 +143,27 @@ BOOL ghiCloseSocket(GHIConnection *connection) {
         shutdown(connection->socket, 2);
         if (!gsiCloseSocketSecure(connection->socket, &connection->encryptor.secure)) {
             ghiUnlock();
-            return FALSE;
+            return gsi_false;
         }
         connection->socket = -1;
     }
     ghiUnlock();
-    return TRUE;
+    return gsi_true;
 }
 
 // Frees what a connection owns and gives its slot back
-BOOL ghiFreeConnectionData(GHIConnection *connection) {
+gsi_bool ghiFreeConnectionData(GHIConnection *connection) {
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (!connection->inUse) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request < 0) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request >= sConnections.count) {
-        return FALSE;
+        return gsi_false;
     }
 
     ghiLock();
@@ -195,30 +195,30 @@ BOOL ghiFreeConnectionData(GHIConnection *connection) {
         if (connection->encryptor.cleanup != NULL) {
             connection->encryptor.cleanup(connection, &connection->encryptor);
         }
-        connection->encryptor.open = FALSE;
+        connection->encryptor.open = gsi_false;
     }
     connection->lastRecvTime = 0;
-    connection->inUse = FALSE;
+    connection->inUse = gsi_false;
     sConnections.activeCount--;
     ghiUnlock();
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL ghiFreeConnection(GHIConnection *connection) {
+gsi_bool ghiFreeConnection(GHIConnection *connection) {
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (!connection->inUse) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request < 0) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request >= sConnections.count) {
-        return FALSE;
+        return gsi_false;
     }
-    if (ghiCloseSocket(connection) != TRUE) {
-        return FALSE;
+    if (ghiCloseSocket(connection) != gsi_true) {
+        return gsi_false;
     }
     return ghiFreeConnectionData(connection);
 }
@@ -285,12 +285,12 @@ void ghiRedirectConnection(GHIConnection *connection) {
         connection->statusCode = 0;
         connection->statusTextPos = 0;
         connection->headersPos = 0;
-        connection->closing = FALSE;
+        connection->closing = gsi_false;
         if (connection->encryptor.open) {
             if (connection->encryptor.cleanup != NULL) {
                 connection->encryptor.cleanup(connection, &connection->encryptor);
             }
-            connection->encryptor.open = FALSE;
+            connection->encryptor.open = gsi_false;
             if (strncmp("https://", connection->url, 8) != 0) {
                 connection->encryptor.engine = 0;
                 connection->encryptor.state = NULL;
@@ -320,7 +320,7 @@ void ghiCleanupConnections(void) {
 // if the URL has no scheme
 char *ghiCopyHost(char *url) {
     char *host;
-    u32 length;
+    gsi_u32 length;
     char saved;
     char *copy;
 

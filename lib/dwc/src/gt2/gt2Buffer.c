@@ -3,24 +3,24 @@
 
 // GameSpy GT2's byte buffers (gt2Buffer.c)
 
-BOOL gti2AllocateBuffer(GTI2Buffer *buffer, int capacity) {
+gsi_bool gti2AllocateBuffer(GTI2Buffer *buffer, int capacity) {
     buffer->data = gsimalloc(capacity);
     if (buffer->data == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     buffer->capacity = capacity;
-    return TRUE;
+    return gsi_true;
 }
 
 int gti2GetBufferFreeSpace(GTI2Buffer *buffer) {
     return buffer->capacity - buffer->length;
 }
 
-void gti2BufferWriteByte(GTI2Buffer *buffer, u8 value) {
+void gti2BufferWriteByte(GTI2Buffer *buffer, gsi_u8 value) {
     buffer->data[buffer->length++] = value;
 }
 
-void gti2BufferWriteUShort(GTI2Buffer *buffer, u16 value) {
+void gti2BufferWriteUShort(GTI2Buffer *buffer, gsi_u16 value) {
     buffer->data[buffer->length++] = value >> 8;
     buffer->data[buffer->length++] = value;
 }

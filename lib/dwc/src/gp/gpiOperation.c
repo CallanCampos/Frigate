@@ -138,7 +138,7 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
     return 0;
 }
 
-int gpiAddOperation(GPConnection *connection, int type, void *data, GPIOperation **op, BOOL blocking,
+int gpiAddOperation(GPConnection *connection, int type, void *data, GPIOperation **op, gsi_bool blocking,
                     GPCallback callback, void *param) {
     GPIConnection *iconnection = *connection;
     GPIOperation *operation = gsimalloc(sizeof(GPIOperation));
@@ -208,7 +208,7 @@ void gpiRemoveOperation(GPConnection *connection, GPIOperation *operation) {
     }
 }
 
-BOOL gpiFindOperationByID(const GPConnection *connection, GPIOperation **operation, int id) {
+gsi_bool gpiFindOperationByID(const GPConnection *connection, GPIOperation **operation, int id) {
     GPIConnection *iconnection = *connection;
     GPIOperation *op = iconnection->operationList;
 
@@ -217,28 +217,28 @@ BOOL gpiFindOperationByID(const GPConnection *connection, GPIOperation **operati
             if (operation != NULL) {
                 *operation = op;
             }
-            return TRUE;
+            return gsi_true;
         }
         op = op->pnext;
     }
     if (operation != NULL) {
         *operation = NULL;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 // Searches don't block the connection manager's loop: gpiProcessSearches waits on them
-BOOL gpiOperationsAreBlocking(const GPConnection *connection) {
+gsi_bool gpiOperationsAreBlocking(const GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     GPIOperation *operation = iconnection->operationList;
 
     while (operation != NULL) {
         if (operation->blocking && operation->type != GPI_PROFILE_SEARCH) {
-            return TRUE;
+            return gsi_true;
         }
         operation = operation->pnext;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 int gpiProcessOperation(GPConnection *connection, GPIOperation *operation, const char *input) {

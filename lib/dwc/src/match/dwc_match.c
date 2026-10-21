@@ -308,7 +308,7 @@ static void DWCi_GPRecvBuddyMessageCallback(GPConnection *connection, void *arg,
 static void DWCi_GT2ReceivedCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable);
 static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int isNetId, u8 netId);
 static void DWCi_GT2ClosedCallback(GTI2Connection *conn, int closeType);
-static void DWCi_GT2PingCallback(GTI2Connection *connection, u32 latency);
+static void DWCi_GT2PingCallback(GTI2Connection *connection, int latency);
 static void DWCi_GT2SocketErrorCallback(GTI2Socket *socket);
 static void DWCi_SetMatchType(u8 mode);
 static BOOL func_ov011_02160d88(void);
@@ -331,8 +331,9 @@ static void DWCi_ConnectToGameServerAsync(int type, s32 profileId, DWCMatchedFun
                                           int *attemptParam, void *param);
 static void DWCi_SendStateChanged(QR2Implementation *server);
 static void DWCi_MatchProcess(int a0);
-static BOOL DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length);
-static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port,
+static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message,
+                                                    int length);
+static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, gsi_u32 ip, gsi_u16 port,
                                            int latency, const void *message, int length);
 static void DWCi_FormatProfileID(char *dest, u32 size);
 static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, const void *message, int length);
@@ -420,7 +421,7 @@ static void DWCi_QR2TeamKeyCallback(int keyId, int index, QR2Buffer *outBuf, voi
 static void DWCi_QR2KeyListCallback(QR2KeyType keyType, QR2KeyBuffer *keyBuffer, void *userData);
 static int DWCi_QR2CountCallback(QR2KeyType keyType, void *userData);
 static void DWCi_QR2AddErrorCallback(int error, const char *errorMessage, void *userData);
-static void DWCi_QR2PublicAddrCallback(u32 ip, u16 port, void *userData);
+static void DWCi_QR2PublicAddrCallback(gsi_u32 ip, gsi_u16 port, void *userData);
 static void DWCi_QR2NatnegCallback(int cookie, void *userData);
 static void DWCi_QR2ClientMsgCallback(const char *data, int size, void *userData);
 static void DWCi_NNProgressCallback(int state, void *userData);
@@ -1373,7 +1374,7 @@ static void DWCi_GT2ClosedCallback(GTI2Connection *conn, int closeType) {
     DWCi_HandleClosedConnection(conn, closeType, 0, 0xff);
 }
 
-static void DWCi_GT2PingCallback(GTI2Connection *connection, u32 latency) {
+static void DWCi_GT2PingCallback(GTI2Connection *connection, int latency) {
     DWCi_PingCallback(connection, latency);
 }
 
@@ -2106,12 +2107,13 @@ static void DWCi_MatchProcess(int a0) {
     }
 }
 
-static BOOL DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length) {
+static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message,
+                                                    int length) {
     const u8 *data = message;
     SocAddrIn addr;
 
     if (length == 0 || data == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     MIi_CpuClear32(0, &addr, sizeof(addr));
     addr.family = 2;
@@ -2126,15 +2128,15 @@ static BOOL DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, u32 ip, u16 
     } else {
         switch (data[0]) {
         case 0xfe:
-            return FALSE;
+            return gsi_false;
         default:
-            return FALSE;
+            return gsi_false;
         }
     }
-    return TRUE;
+    return gsi_true;
 }
 
-static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port,
+static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, gsi_u32 ip, gsi_u16 port,
                                            int latency, const void *message, int length) {
     int slot;
     u32 gameId = 0;
@@ -5258,7 +5260,7 @@ static void DWCi_QR2AddErrorCallback(int error, const char *errorMessage, void *
     DWCi_HandleQR2Error(error);
 }
 
-static void DWCi_QR2PublicAddrCallback(u32 ip, u16 port, void *userData) {
+static void DWCi_QR2PublicAddrCallback(gsi_u32 ip, gsi_u16 port, void *userData) {
     DWCi_GetMatchCnt()->qr2Ip = ip;
     DWCi_GetMatchCnt()->qr2Port = port;
 }

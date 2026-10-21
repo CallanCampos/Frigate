@@ -39,13 +39,13 @@ void Sake_SetGame(Sake *sake, const char *gameName, int gameId, const char *secr
     strcpy(sake->gameName, gameName);
     strcpy(sake->secretKey, secretKey);
     sake->gameId = gameId;
-    sake->hasGame = TRUE;
+    sake->hasGame = gsi_true;
 }
 
 void Sake_SetLoginTicket(Sake *sake, int profileId, const SakeLoginTicket *loginTicket) {
     sake->profileId = profileId;
     sake->loginTicket = *loginTicket;
-    sake->hasTicket = TRUE;
+    sake->hasTicket = gsi_true;
 }
 
 int Sake_GetLastError(const Sake *sake) {
@@ -93,19 +93,19 @@ SakeRequest *sakeGetSpecificRecords(Sake *sake, SakeGetSpecificRecordsInput *inp
                              Sake_SubmitGetSpecificRecords);
 }
 
-BOOL Sake_SetDownloadUrl(Sake *sake, const char *url) {
+gsi_bool Sake_SetDownloadUrl(Sake *sake, const char *url) {
     if (sake == NULL || url == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     strcpy(sSakeDownloadUrl, url);
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL Sake_GetDownloadUrl(const Sake *sake, int fileId, char *url) {
+gsi_bool Sake_GetDownloadUrl(const Sake *sake, int fileId, char *url) {
     int length;
 
     if (sake == NULL || url == NULL || !sake->hasGame || !sake->hasTicket) {
-        return FALSE;
+        return gsi_false;
     }
     if (sSakeDownloadUrl[0] != '\0') {
         length = OS_SNPrintf(url, 128, "%s?fileid=%d&gameid=%d&pid=%d", sSakeDownloadUrl, fileId, sake->gameId,
@@ -116,24 +116,24 @@ BOOL Sake_GetDownloadUrl(const Sake *sake, int fileId, char *url) {
                         sake->gameName, fileId, sake->gameId, sake->profileId);
     }
     if (length < 0) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL Sake_SetUploadUrl(Sake *sake, const char *url) {
+gsi_bool Sake_SetUploadUrl(Sake *sake, const char *url) {
     if (sake == NULL || url == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     strcpy(sSakeUploadUrl, url);
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL Sake_GetUploadUrl(const Sake *sake, char *url) {
+gsi_bool Sake_GetUploadUrl(const Sake *sake, char *url) {
     int length;
 
     if (sake == NULL || url == NULL || !sake->hasGame || !sake->hasTicket) {
-        return FALSE;
+        return gsi_false;
     }
     if (sSakeUploadUrl[0] != '\0') {
         length = OS_SNPrintf(url, 128, "%s?gameid=%d&pid=%d", sSakeUploadUrl, sake->gameId, sake->profileId);
@@ -142,9 +142,9 @@ BOOL Sake_GetUploadUrl(const Sake *sake, char *url) {
                              sake->gameName, sake->gameId, sake->profileId);
     }
     if (length < 0) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
 int Sake_CancelRequest(Sake *sake, SakeRequest *request) {

@@ -8,23 +8,23 @@
 // The header of the report's buffer. The fields up to the sizes are set when it is made and finished; the digest is
 // made when the report is submitted
 typedef struct ScReportHeader {
-    u32 version;
-    u32 id;
-    u8 digest[0x10];
-    u32 value;
-    u32 flags;
-    u16 playerNum;
-    u16 teamNum;
-    u16 gameRecordNum;
-    u16 playerRecordNum;
-    u16 teamRecordNum;
-    u16 unk_2a;
-    u32 playerSize;
-    u32 teamSize;
-    u32 resultSize;
-    u32 gameSize;
-    u32 playerRecordSize;
-    u32 teamRecordSize;
+    gsi_u32 version;
+    gsi_u32 id;
+    gsi_u8 digest[0x10];
+    gsi_u32 value;
+    gsi_u32 flags;
+    gsi_u16 playerNum;
+    gsi_u16 teamNum;
+    gsi_u16 gameRecordNum;
+    gsi_u16 playerRecordNum;
+    gsi_u16 teamRecordNum;
+    gsi_u16 unk_2a;
+    gsi_u32 playerSize;
+    gsi_u32 teamSize;
+    gsi_u32 resultSize;
+    gsi_u32 gameSize;
+    gsi_u32 playerRecordSize;
+    gsi_u32 teamRecordSize;
 } ScReportHeader;
 
 // dwc_competition.c

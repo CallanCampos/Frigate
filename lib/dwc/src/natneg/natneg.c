@@ -25,36 +25,36 @@ typedef struct NATNegotiator {
     void *userData;
     int negotiateSock;
     int state;
-    BOOL initAckRecv[4];
+    gsi_bool initAckRecv[4];
     int retryCount;
     int maxRetryCount;
-    u32 retryTime;
-    u32 guessedIp;
-    u16 guessedPort;
-    u8 gotRemoteData;
-    u8 sendGotRemoteData; // whether the partner has this side's data, so that the negotiation can finish
+    gsi_u32 retryTime;
+    gsi_u32 guessedIp;
+    gsi_u16 guessedPort;
+    gsi_u8 gotRemoteData;
+    gsi_u8 sendGotRemoteData; // whether the partner has this side's data, so that the negotiation can finish
     int result;
     int connectedSocket;
     SocAddrIn remoteAddr;
 } NATNegotiator;
 
-u8 NNMagicData[NATNEG_MAGIC_LEN] = { 0xfd, 0xfc, 0x1e, 0x66, 0x6a, 0xb2 };
+gsi_u8 NNMagicData[NATNEG_MAGIC_LEN] = { 0xfd, 0xfc, 0x1e, 0x66, 0x6a, 0xb2 };
 
 // The NAT detection's state, which NNThink checks while a detection runs, and the servers' names (to use instead of
 // natneg1 to natneg3 of the game's domain) and addresses. With -ipa file, MWCC lays a file's .bss out in an order of
 // its own; this order of the definitions gives the ROM's, which starts with negotiateList
 static NatDetectionResultsFunc natifyCallback;
 static char *Matchup3Hostname;
-static u32 natifyStartTime;
+static gsi_u32 natifyStartTime;
 static char *Matchup2Hostname;
 static int natMappingScheme;
-static u32 matchup2ip;
-static u32 matchup1ip;
+static gsi_u32 matchup2ip;
+static gsi_u32 matchup1ip;
 static int clientId;
 static DArray *negotiateList;
 static char *Matchup1Hostname;
-static BOOL activeNatify;
-static u32 matchup3ip;
+static gsi_bool activeNatify;
+static gsi_u32 matchup3ip;
 static NAT nat;
 static int natType = 6;
 static int mappingSock = -1;
@@ -64,19 +64,19 @@ static int GetClientID(void);
 static NATNegotiator *FindNegotiatorForCookie(int cookie);
 static NATNegotiator *AddNegotiator(void);
 static void RemoveNegotiator(NATNegotiator *neg);
-static BOOL CheckMagic(const char *data);
-static int NNSendPacket(int sock, u32 toAddr, u16 toPort, const void *data, int length);
-static u32 NNGetLocalIP(void);
-static u16 NNGetLocalPort(int sock);
+static gsi_bool CheckMagic(const char *data);
+static int NNSendPacket(int sock, gsi_u32 toAddr, gsi_u16 toPort, const void *data, int length);
+static gsi_u32 NNGetLocalIP(void);
+static gsi_u16 NNGetLocalPort(int sock);
 static void SendReportPacket(NATNegotiator *neg);
 static void StartReport(NATNegotiator *neg, int result, int socket, SocAddrIn *remoteAddr);
 static void SendPreInitPacket(NATNegotiator *neg);
 static void SendInitPackets(NATNegotiator *neg);
 static void SendPingPacket(NATNegotiator *neg);
-static BOOL CheckNatifyStatus(int sock);
-static u32 NameToIp(const char *name);
-static u32 ResolveServer(const char *overrideHostname, const char *defaultHostname);
-static BOOL ResolveServers(void);
+static gsi_bool CheckNatifyStatus(int sock);
+static gsi_u32 NameToIp(const char *name);
+static gsi_u32 ResolveServer(const char *overrideHostname, const char *defaultHostname);
+static gsi_bool ResolveServers(void);
 static void FinishNegotiator(NATNegotiator *neg);
 static void NegotiateThink(NATNegotiator *neg);
 static void SendConnectAck(NATNegotiator *neg, SocAddrIn *toAddr);
@@ -142,11 +142,11 @@ void NNFreeNegotiateList(void) {
     }
 }
 
-static BOOL CheckMagic(const char *data) {
+static gsi_bool CheckMagic(const char *data) {
     return memcmp(data, NNMagicData, NATNEG_MAGIC_LEN) == 0;
 }
 
-static int NNSendPacket(int sock, u32 toAddr, u16 toPort, const void *data, int length) {
+static int NNSendPacket(int sock, gsi_u32 toAddr, gsi_u16 toPort, const void *data, int length) {
     SocAddrIn address;
 
     address.family = 2;
@@ -156,11 +156,11 @@ static int NNSendPacket(int sock, u32 toAddr, u16 toPort, const void *data, int 
 }
 
 // The first address of the console that isn't the loopback one and is a private one, else the last one
-static u32 NNGetLocalIP(void) {
+static gsi_u32 NNGetLocalIP(void) {
     int i;
     SocHostEnt *host;
-    u32 *addr;
-    u32 localIp = 0;
+    gsi_u32 *addr;
+    gsi_u32 localIp = 0;
 
     host = getlocalhost();
     if (host == NULL) {
@@ -170,8 +170,8 @@ static u32 NNGetLocalIP(void) {
         if (host->addrList[i] == NULL) {
             break;
         }
-        addr = (u32 *)host->addrList[i];
-        if (*(u32 *)host->addrList[i] == NN_SWAP32(0x7f000001)) {
+        addr = (gsi_u32 *)host->addrList[i];
+        if (*(gsi_u32 *)host->addrList[i] == NN_SWAP32(0x7f000001)) {
             continue;
         }
         localIp = *addr;
@@ -183,7 +183,7 @@ static u32 NNGetLocalIP(void) {
 }
 
 // The port (in network order) that a socket is bound to, or 0
-static u16 NNGetLocalPort(int sock) {
+static gsi_u16 NNGetLocalPort(int sock) {
     SocAddrIn address;
     int size = sizeof(SocAddrIn);
 
@@ -201,7 +201,7 @@ static void SendReportPacket(NATNegotiator *neg) {
     packet.packetType = 13;
     packet.cookie = NN_SWAP32(neg->cookie);
     packet.packet.report.clientIndex = neg->clientIndex;
-    packet.packet.report.negResult = neg->result == 0 ? TRUE : FALSE;
+    packet.packet.report.negResult = neg->result == 0 ? gsi_true : gsi_false;
     packet.packet.report.natType = natType;
     packet.packet.report.natMappingScheme = natMappingScheme;
     if (strlen(__GSIACGamename) > 0) {
@@ -258,8 +258,8 @@ static void SendPreInitPacket(NATNegotiator *neg) {
 static void SendInitPackets(NATNegotiator *neg) {
     char buffer[21 + sizeof(__GSIACGamename)];
     NatNegPacket *packet = (NatNegPacket *)buffer;
-    u32 localIp;
-    u16 localPort;
+    gsi_u32 localIp;
+    gsi_u16 localPort;
     int packetLength;
 
     memcpy(packet->magic, NNMagicData, NATNEG_MAGIC_LEN);
@@ -328,15 +328,15 @@ static void SendPingPacket(NATNegotiator *neg) {
     neg->maxRetryCount = 7;
 }
 
-static BOOL CheckNatifyStatus(int sock) {
-    BOOL active = TRUE;
-    BOOL success = FALSE;
+static gsi_bool CheckNatifyStatus(int sock) {
+    gsi_bool active = gsi_true;
+    gsi_bool success = gsi_false;
 
     if (sock != -1) {
         if (current_time() - natifyStartTime < 10000) {
             active = NatifyThink(sock, &nat);
         } else {
-            active = FALSE;
+            active = gsi_false;
         }
         if (!active) {
             success = DetermineNatType(&nat);
@@ -356,8 +356,8 @@ static BOOL CheckNatifyStatus(int sock) {
     return active;
 }
 
-static u32 NameToIp(const char *name) {
-    u32 ip;
+static gsi_u32 NameToIp(const char *name) {
+    gsi_u32 ip;
     SocHostEnt *host;
 
     ip = inet_addr(name);
@@ -366,12 +366,12 @@ static u32 NameToIp(const char *name) {
         if (host == NULL) {
             return 0;
         }
-        ip = *(u32 *)host->addrList[0];
+        ip = *(gsi_u32 *)host->addrList[0];
     }
     return ip;
 }
 
-static u32 ResolveServer(const char *overrideHostname, const char *defaultHostname) {
+static gsi_u32 ResolveServer(const char *overrideHostname, const char *defaultHostname) {
     const char *hostname;
     char hostnameBuffer[64];
 
@@ -384,7 +384,7 @@ static u32 ResolveServer(const char *overrideHostname, const char *defaultHostna
     return NameToIp(hostname);
 }
 
-static BOOL ResolveServers(void) {
+static gsi_bool ResolveServers(void) {
     if (matchup1ip == 0) {
         matchup1ip = ResolveServer(Matchup1Hostname, "natneg1.gs.nintendowifi.net");
     }
@@ -395,9 +395,9 @@ static BOOL ResolveServers(void) {
         matchup3ip = ResolveServer(Matchup3Hostname, "natneg3.gs.nintendowifi.net");
     }
     if (matchup1ip == 0 || matchup2ip == 0 || matchup3ip == 0) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
 int NNBeginNegotiationWithSocket(int gameSocket, int cookie, int clientIndex, NegotiateProgressFunc progress,
@@ -681,7 +681,7 @@ static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrI
             return;
         }
         gsDebugFormat(7, 0, 8, "Got init ack for port %d\n", packet->packet.init.portType);
-        neg->initAckRecv[packet->packet.init.portType] = TRUE;
+        neg->initAckRecv[packet->packet.init.portType] = gsi_true;
         if (neg->state == 2) {
             if (neg->initAckRecv[1] && neg->initAckRecv[2] && neg->initAckRecv[3] &&
                 (neg->gameSock == -1 || neg->initAckRecv[0])) {
@@ -706,7 +706,7 @@ static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrI
 void NNProcessData(char *data, int length, SocAddrIn *fromAddr) {
     NatNegPacket packet;
     NATNegotiator *neg;
-    u8 type;
+    gsi_u8 type;
 
     if (!CheckMagic(data)) {
         gsDebugFormat(7, 0, 4, "NNProcessData: Invalid packet header, ignoring\n");

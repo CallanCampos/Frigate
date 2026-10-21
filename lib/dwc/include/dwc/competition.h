@@ -1,8 +1,8 @@
 #ifndef POKEBW2_DWC_COMPETITION_H
 #define POKEBW2_DWC_COMPETITION_H
 
-#include "types.h"
 #include "dwc/auth.h"
+#include "dwc/nonport.h"
 
 // GameSpy's competition service in overlay 260 (dwc_competition.c and dwc_competition_soap.c), which keeps the results
 // of the Wi-Fi battle competitions. A client makes a session, tells that it will report on it, and submits a report,
@@ -70,15 +70,15 @@ struct ScClient {
 struct ScReport {
     int phase;
     int groupOffset;
-    u16 groupCount;
+    gsi_u16 groupCount;
     int unk_0c;
-    unsigned int keyNum;
+    gsi_u32 keyNum;
     int keys[0x40];
     int unk_114;
     int unk_118;
     int bufferSize;
     int used;
-    u8 *buffer;
+    gsi_u8 *buffer;
 };
 
 // The phases of a report, which are those of the records' sections

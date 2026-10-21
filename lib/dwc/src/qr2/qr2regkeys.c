@@ -13,11 +13,11 @@ const char *qr2_registered_key_list[MAX_REGISTERED_KEYS] = {
     "region",
 };
 
-BOOL qr2_internal_is_master_only_key(const char *key) {
+gsi_bool qr2_internal_is_master_only_key(const char *key) {
     if (strcmp(key, qr2_registered_key_list[31]) == 0 || strcmp(key, qr2_registered_key_list[32]) == 0) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 void qr2_register_keyA(int keyid, const char *key) {

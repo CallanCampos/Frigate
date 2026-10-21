@@ -2,9 +2,9 @@
 
 // GameSpy's threads (gsPlatformThread.c). The ROM names neither the file nor its functions; both are the later SDK's
 
-s32 gsiInterlockedIncrement(s32 *value) {
-    u32 mask;
-    s32 result;
+gsi_i32 gsiInterlockedIncrement(gsi_i32 *value) {
+    gsi_u32 mask;
+    gsi_i32 result;
 
     mask = OS_DisableInterrupts_IrqAndFiq();
     result = *value + 1;
@@ -13,9 +13,9 @@ s32 gsiInterlockedIncrement(s32 *value) {
     return result;
 }
 
-s32 gsiInterlockedDecrement(s32 *value) {
-    u32 mask;
-    s32 result;
+gsi_i32 gsiInterlockedDecrement(gsi_i32 *value) {
+    gsi_u32 mask;
+    gsi_i32 result;
 
     mask = OS_DisableInterrupts_IrqAndFiq();
     result = *value - 1;

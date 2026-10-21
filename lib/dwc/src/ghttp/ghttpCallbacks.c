@@ -3,7 +3,7 @@
 // ghttpCallbacks: the calls to the game's callbacks of a request
 
 // Tells the game that the request has ended, with its result and the data that it received. If the game doesn't want
-// the buffer (the callback returns FALSE), the buffer stays
+// the buffer (the callback returns gsi_false), the buffer stays
 void ghiCallCompletedCallback(GHIConnection *connection) {
     GHICompletedFunc completed;
     char *buffer;
@@ -13,7 +13,7 @@ void ghiCallCompletedCallback(GHIConnection *connection) {
     }
     completed = connection->completedCallback;
     if (completed != NULL) {
-        BOOL keep;
+        gsi_bool keep;
 
         if (connection->type == 0) {
             buffer = connection->fileBuffer.data;
@@ -23,7 +23,7 @@ void ghiCallCompletedCallback(GHIConnection *connection) {
         keep = completed(connection->request, connection->result, buffer, connection->bytesReceived,
                          connection->callbackParam);
         if (buffer != NULL && !keep) {
-            connection->fileBuffer.dontFree = TRUE;
+            connection->fileBuffer.dontFree = gsi_true;
         }
     }
 }

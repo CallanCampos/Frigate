@@ -25,11 +25,11 @@ typedef struct QRSplitQueryProgress {
 } QRSplitQueryProgress;
 
 static void enum_local_ips(void);
-static BOOL qr2_get_sockaddrin(const char *host, int port, SocAddrIn *saddr, SocHostEnt **savehent);
-static void swap_byte(u8 *a, u8 *b);
-static u8 encode_ct(u8 c);
-static void gs_encode(const u8 *ins, int size, char *result);
-static void gs_encrypt(const u8 *key, int keyLen, u8 *bufferPtr, int bufferLen);
+static gsi_bool qr2_get_sockaddrin(const char *host, int port, SocAddrIn *saddr, SocHostEnt **savehent);
+static void swap_byte(gsi_u8 *a, gsi_u8 *b);
+static gsi_u8 encode_ct(gsi_u8 c);
+static void gs_encode(const gsi_u8 *ins, int size, char *result);
+static void gs_encrypt(const gsi_u8 *key, int keyLen, gsi_u8 *bufferPtr, int bufferLen);
 static void NatNegProgressCallback(int state, void *userData);
 static void NatNegCompletedCallback(int result, int gameSocket, SocAddrIn *remoteAddr, void *userData);
 static void qr_add_packet_header(QR2Buffer *buf, char ptype, const char *reqkey);
@@ -37,15 +37,16 @@ static void compute_challenge_response(QR2Implementation *qrec, QR2Buffer *buf, 
                                        int challengeLen);
 static void handle_public_address(QR2Implementation *qrec, const char *buffer);
 static void qr_build_partial_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int keyType, int keyCount,
-                                         const u8 *keys);
-static void qr_build_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int serverKeyCount, const u8 *serverKeys,
-                                 int playerKeyCount, const u8 *playerKeys, int teamKeyCount, const u8 *teamKeys);
-static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, QRSplitQueryProgress *progress);
-static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const u8 *qdata, int len, SocAddrIn *sender);
+                                         const gsi_u8 *keys);
+static void qr_build_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int serverKeyCount, const gsi_u8 *serverKeys,
+                                 int playerKeyCount, const gsi_u8 *playerKeys, int teamKeyCount,
+                                 const gsi_u8 *teamKeys);
+static gsi_bool qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, QRSplitQueryProgress *progress);
+static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const gsi_u8 *qdata, int len, SocAddrIn *sender);
 static void qr_process_client_message(QR2Implementation *qrec, const char *buf, int len);
-static BOOL qr_got_recent_message(QR2Implementation *qrec, int msgKey);
-static BOOL qr2_process_ip_verify(QR2Implementation *qrec, QR2Buffer *buf, SocAddrIn *sender);
-static BOOL qr2_check_ip_verify(QR2Implementation *qrec, SocAddrIn *sender, u32 ipVerify);
+static gsi_bool qr_got_recent_message(QR2Implementation *qrec, int msgKey);
+static gsi_bool qr2_process_ip_verify(QR2Implementation *qrec, QR2Buffer *buf, SocAddrIn *sender);
+static gsi_bool qr2_check_ip_verify(QR2Implementation *qrec, SocAddrIn *sender, gsi_u32 ipVerify);
 static void qr2_expire_ip_verify(QR2Implementation *qrec);
 static void send_keepalive(QR2Implementation *qrec);
 static void send_heartbeat(QR2Implementation *qrec, int stateChanged);
@@ -60,7 +61,7 @@ static SocInAddr local_ip_list[5];
 static int num_local_ips;
 
 int qr2_init_socketA(QR2Implementation **qrec, int sock, int qport, const char *gamename, const char *secretKey,
-                     BOOL isPublic, BOOL natNegotiate, QR2ServerKeyCallback serverKeyCallback,
+                     gsi_bool isPublic, gsi_bool natNegotiate, QR2ServerKeyCallback serverKeyCallback,
                      QR2PlayerTeamKeyCallback playerKeyCallback, QR2PlayerTeamKeyCallback teamKeyCallback,
                      QR2KeyListCallback keyListCallback, QR2CountCallback playerTeamCountCallback,
                      QR2AddErrorCallback addErrorCallback, void *userData) {
@@ -95,14 +96,14 @@ int qr2_init_socketA(QR2Implementation **qrec, int sock, int qport, const char *
     cr->cmCallback = NULL;
     cr->cdkeyProcess = NULL;
     cr->isPublic = isPublic;
-    cr->readSocket = FALSE;
+    cr->readSocket = gsi_false;
     cr->natNegotiate = natNegotiate;
     cr->publicIp = 0;
     cr->publicPort = 0;
     cr->paCallback = NULL;
     cr->crCallback = NULL;
     cr->ccCallback = NULL;
-    cr->userStateChangeRequested = FALSE;
+    cr->userStateChangeRequested = gsi_false;
     cr->backendOptions = 0;
     for (i = 0; i < QR2_REQUEST_KEY_LEN; i++) {
         cr->instanceKey[i] = rand() % 0xff;
@@ -185,7 +186,7 @@ void qr2_check_queries(QR2Implementation *qrec) {
         if (error != -1) {
             qr2_indata[error] = '\0';
             gsDebugFormat(3, 0, 0x10, "Received %d bytes on query socket\r\n", error);
-            gsDebugBinary(3, 0, 0x20, (const u8 *)qr2_indata, error);
+            gsDebugBinary(3, 0, 0x20, (const gsi_u8 *)qr2_indata, error);
             qr2_parse_queryA(qrec, qr2_indata, error, &saddr);
         } else if (error == 0) {
             gsDebugFormat(3, 0, 0x10, "CanReceiveOnSocket() returned true, but recvfrom return 0, socket closed!\r\n",
@@ -198,7 +199,7 @@ void qr2_check_queries(QR2Implementation *qrec) {
 }
 
 void qr2_check_send_heartbeat(QR2Implementation *qrec) {
-    u32 tc = current_time();
+    gsi_u32 tc = current_time();
 
     if (qrec->hbSock == -1) {
         gsDebugFormat(3, 0, 2, "HBSock is invalid\r\n");
@@ -234,11 +235,11 @@ void qr2_send_statechanged(QR2Implementation *qrec) {
     }
     if (current_time() - qrec->lastHeartbeat < 10000) {
         gsDebugFormat(3, 4, 8, "Queing statechange for later send (too soon)\r\n");
-        qrec->userStateChangeRequested = TRUE;
+        qrec->userStateChangeRequested = gsi_true;
         return;
     }
     send_heartbeat(qrec, 1);
-    qrec->userStateChangeRequested = FALSE;
+    qrec->userStateChangeRequested = gsi_false;
 }
 
 void qr2_shutdown(QR2Implementation *qrec) {
@@ -265,37 +266,37 @@ void qr2_shutdown(QR2Implementation *qrec) {
     }
 }
 
-BOOL qr2_keybuffer_add(QR2KeyBuffer *keyBuffer, int keyId) {
+gsi_bool qr2_keybuffer_add(QR2KeyBuffer *keyBuffer, int keyId) {
     if (keyBuffer->numKeys >= MAX_REGISTERED_KEYS) {
-        return FALSE;
+        return gsi_false;
     }
     if (keyId < 1 || keyId > MAX_REGISTERED_KEYS) {
-        return FALSE;
+        return gsi_false;
     }
     keyBuffer->keys[keyBuffer->numKeys++] = keyId;
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL qr2_buffer_add_int(QR2Buffer *outBuf, int value) {
+gsi_bool qr2_buffer_add_int(QR2Buffer *outBuf, int value) {
     char temp[20];
 
     OS_SPrintf(temp, "%d", value);
     return qr2_buffer_addA(outBuf, temp);
 }
 
-BOOL qr2_buffer_addA(QR2Buffer *outBuf, const char *value) {
+gsi_bool qr2_buffer_addA(QR2Buffer *outBuf, const char *value) {
     int copylen = strlen(value) + 1;
 
     if (copylen > QR2_MAX_DATA_SIZE - outBuf->len) {
         copylen = QR2_MAX_DATA_SIZE - outBuf->len;
     }
     if (copylen <= 0) {
-        return FALSE;
+        return gsi_false;
     }
     memcpy(outBuf->buffer + outBuf->len, value, copylen);
     outBuf->len += copylen;
     outBuf->buffer[outBuf->len - 1] = '\0';
-    return TRUE;
+    return gsi_true;
 }
 
 static void enum_local_ips(void) {
@@ -313,12 +314,12 @@ static void enum_local_ips(void) {
 }
 
 // The address of a host (four numbers or a name to look up) at a port, and the host's entry in savehent
-static BOOL qr2_get_sockaddrin(const char *host, int port, SocAddrIn *saddr, SocHostEnt **savehent) {
+static gsi_bool qr2_get_sockaddrin(const char *host, int port, SocAddrIn *saddr, SocHostEnt **savehent) {
     SocHostEnt *hent = NULL;
 
     memset(saddr, 0, sizeof(SocAddrIn));
     saddr->family = 2;
-    saddr->port = QR2_SWAP16((u16)port);
+    saddr->port = QR2_SWAP16((gsi_u16)port);
     if (host == NULL) {
         saddr->addr = 0;
     } else {
@@ -327,25 +328,25 @@ static BOOL qr2_get_sockaddrin(const char *host, int port, SocAddrIn *saddr, Soc
     if (saddr->addr == -1 && strcmp(host, "255.255.255.255") != 0) {
         hent = SOC_GetHostByName(host);
         if (hent == NULL) {
-            return FALSE;
+            return gsi_false;
         }
-        saddr->addr = *(u32 *)hent->addrList[0];
+        saddr->addr = *(gsi_u32 *)hent->addrList[0];
     }
     if (savehent != NULL) {
         *savehent = hent;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-static void swap_byte(u8 *a, u8 *b) {
-    u8 swapByte = *a;
+static void swap_byte(gsi_u8 *a, gsi_u8 *b) {
+    gsi_u8 swapByte = *a;
 
     *a = *b;
     *b = swapByte;
 }
 
 // The character of a base 64 digit
-static u8 encode_ct(u8 c) {
+static gsi_u8 encode_ct(gsi_u8 c) {
     if (c < 26) {
         return 'A' + c;
     }
@@ -365,11 +366,11 @@ static u8 encode_ct(u8 c) {
 }
 
 // The bytes as base 64 digits
-static void gs_encode(const u8 *ins, int size, char *result) {
+static void gs_encode(const gsi_u8 *ins, int size, char *result) {
     int i;
     int pos;
-    u8 trip[3];
-    u8 kwart[4];
+    gsi_u8 trip[3];
+    gsi_u8 kwart[4];
 
     i = 0;
     while (i < size) {
@@ -392,12 +393,12 @@ static void gs_encode(const u8 *ins, int size, char *result) {
 }
 
 // The bytes encrypted in place with the key (RC4 with a twist)
-static void gs_encrypt(const u8 *key, int keyLen, u8 *bufferPtr, int bufferLen) {
+static void gs_encrypt(const gsi_u8 *key, int keyLen, gsi_u8 *bufferPtr, int bufferLen) {
     short counter;
-    u8 x;
-    u8 y;
-    u8 xorIndex;
-    u8 state[256];
+    gsi_u8 x;
+    gsi_u8 y;
+    gsi_u8 xorIndex;
+    gsi_u8 state[256];
 
     for (counter = 0; counter < 256; counter++) {
         state[counter] = counter;
@@ -451,16 +452,16 @@ static void compute_challenge_response(QR2Implementation *qrec, QR2Buffer *buf, 
         return;
     }
     gsiSafeStrcpyA(encryptedVal, challenge, sizeof(encryptedVal));
-    gs_encrypt((const u8 *)qrec->secretKey, strlen(qrec->secretKey), (u8 *)encryptedVal, challengeLen - 1);
-    gs_encode((const u8 *)encryptedVal, challengeLen - 1, buf->buffer + buf->len);
+    gs_encrypt((const gsi_u8 *)qrec->secretKey, strlen(qrec->secretKey), (gsi_u8 *)encryptedVal, challengeLen - 1);
+    gs_encode((const gsi_u8 *)encryptedVal, challengeLen - 1, buf->buffer + buf->len);
     buf->len += strlen(buf->buffer + buf->len) + 1;
 }
 
 // Takes the public address that the master server saw this side at, in 12 hexadecimal digits
 static void handle_public_address(QR2Implementation *qrec, const char *buffer) {
-    u32 ip;
-    u32 portTemp;
-    u16 port;
+    gsi_u32 ip;
+    gsi_u32 portTemp;
+    gsi_u16 port;
 
     STD_TSScanf(buffer, "%08X%04X", &ip, &portTemp);
     port = portTemp;
@@ -479,10 +480,10 @@ static void handle_public_address(QR2Implementation *qrec, const char *buffer) {
 }
 
 static void qr_build_partial_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int keyType, int keyCount,
-                                         const u8 *keys) {
+                                         const gsi_u8 *keys) {
     QR2KeyBuffer kb;
     int playerTeamCount;
-    u16 ctTemp;
+    gsi_u16 ctTemp;
     int i;
     int pindex;
     const char *k;
@@ -497,7 +498,7 @@ static void qr_build_partial_query_reply(QR2Implementation *qrec, QR2Buffer *buf
             return;
         }
         playerTeamCount = qrec->playerTeamCountCallback(keyType, qrec->userData);
-        ctTemp = QR2_SWAP16((u16)playerTeamCount);
+        ctTemp = QR2_SWAP16((gsi_u16)playerTeamCount);
         memcpy(buf->buffer + buf->len, &ctTemp, sizeof(ctTemp));
         buf->len += sizeof(ctTemp);
     } else {
@@ -546,25 +547,26 @@ static void qr_build_partial_query_reply(QR2Implementation *qrec, QR2Buffer *buf
     }
 }
 
-static void qr_build_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int serverKeyCount, const u8 *serverKeys,
-                                 int playerKeyCount, const u8 *playerKeys, int teamKeyCount, const u8 *teamKeys) {
+static void qr_build_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int serverKeyCount, const gsi_u8 *serverKeys,
+                                 int playerKeyCount, const gsi_u8 *playerKeys, int teamKeyCount,
+                                 const gsi_u8 *teamKeys) {
     qr_build_partial_query_reply(qrec, buf, 0, serverKeyCount, serverKeys);
     qr_build_partial_query_reply(qrec, buf, 1, playerKeyCount, playerKeys);
     qr_build_partial_query_reply(qrec, buf, 2, teamKeyCount, teamKeys);
 }
 
-// Adds the next part of a reply that takes several packets: TRUE when there is a packet to send
-static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, QRSplitQueryProgress *progress) {
-    u8 *packetNumPos = NULL;
+// Adds the next part of a reply that takes several packets: gsi_true when there is a packet to send
+static gsi_bool qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, QRSplitQueryProgress *progress) {
+    gsi_u8 *packetNumPos = NULL;
 
     if (progress->curKeyType >= key_type_count) {
-        return FALSE;
+        return gsi_false;
     }
     if (QR2_MAX_DATA_SIZE - buf->len < 32) {
-        return FALSE;
+        return gsi_false;
     }
     qr2_buffer_addA(buf, "splitnum");
-    packetNumPos = (u8 *)&buf->buffer[buf->len++];
+    packetNumPos = (gsi_u8 *)&buf->buffer[buf->len++];
     *packetNumPos = progress->curPacketNum++;
     while (progress->curKeyType < key_type_count) {
         if (progress->keyBuffer.numKeys == 0) {
@@ -574,7 +576,7 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
             progress->curSubCount = qrec->playerTeamCountCallback(progress->curKeyType, qrec->userData);
         }
         if (QR2_MAX_DATA_SIZE - buf->len < 100) {
-            return TRUE;
+            return gsi_true;
         }
         buf->buffer[buf->len++] = progress->curKeyType;
         while (progress->curKeyIndex < progress->keyBuffer.numKeys) {
@@ -582,16 +584,16 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
             const char *keyName = qr2_registered_key_list[registeredKeyIndex];
 
             if (!qr2_buffer_addA(buf, keyName)) {
-                return TRUE;
+                return gsi_true;
             }
             if (progress->curKeyType == key_server) {
                 qrec->serverKeyCallback(registeredKeyIndex, buf, qrec->userData);
                 if (QR2_MAX_DATA_SIZE - buf->len < 1) {
-                    return TRUE;
+                    return gsi_true;
                 }
             } else {
                 if (QR2_MAX_DATA_SIZE - buf->len < 1) {
-                    return TRUE;
+                    return gsi_true;
                 }
                 buf->buffer[buf->len++] = progress->curSubIndex;
                 while (progress->curSubIndex < progress->curSubCount) {
@@ -601,7 +603,7 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
                         qrec->teamKeyCallback(registeredKeyIndex, progress->curSubIndex, buf, qrec->userData);
                     }
                     if (QR2_MAX_DATA_SIZE - buf->len < 1) {
-                        return TRUE;
+                        return gsi_true;
                     }
                     progress->curSubIndex++;
                 }
@@ -622,17 +624,17 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
         progress->keyBuffer.numKeys = 0;
     }
     *packetNumPos |= 0x80;
-    return TRUE;
+    return gsi_true;
 }
 
-static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const u8 *qdata, int len, SocAddrIn *sender) {
-    u8 serverKeyCount;
-    u8 playerKeyCount;
-    u8 teamKeyCount;
-    u8 exFlags = 0;
-    const u8 *serverKeys = NULL;
-    const u8 *playerKeys = NULL;
-    const u8 *teamKeys = NULL;
+static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const gsi_u8 *qdata, int len, SocAddrIn *sender) {
+    gsi_u8 serverKeyCount;
+    gsi_u8 playerKeyCount;
+    gsi_u8 teamKeyCount;
+    gsi_u8 exFlags = 0;
+    const gsi_u8 *serverKeys = NULL;
+    const gsi_u8 *playerKeys = NULL;
+    const gsi_u8 *teamKeys = NULL;
 
     if (len < 3) {
         gsDebugFormat(3, 0, 2, "Discarding invalid query (too short#1: %d bytes total)\r\n", len);
@@ -688,7 +690,7 @@ static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const u8 *
         progress.curSubIndex = 0;
         progress.keyBuffer.numKeys = 0;
         gsDebugFormat(3, 0, 0x10, "Building query reply (split packet supported)\r\n");
-        while (qr_build_split_query_reply(qrec, buf, &progress) == TRUE) {
+        while (qr_build_split_query_reply(qrec, buf, &progress) == gsi_true) {
             sendto(qrec->hbSock, buf->buffer, buf->len, 0, sender, sizeof(SocAddrIn));
             buf->len = 5;
             if (progress.curPacketNum > 7) {
@@ -705,20 +707,20 @@ static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const u8 *
 
 // A message from a client through the master server: a NAT negotiation's cookie after the magic bytes, or the game's
 static void qr_process_client_message(QR2Implementation *qrec, const char *buf, int len) {
-    u8 natNegBytes[NATNEG_MAGIC_LEN] = { 0xfd, 0xfc, 0x1e, 0x66, 0x6a, 0xb2 };
+    gsi_u8 natNegBytes[NATNEG_MAGIC_LEN] = { 0xfd, 0xfc, 0x1e, 0x66, 0x6a, 0xb2 };
     int i;
-    BOOL isNatNeg = TRUE;
+    gsi_bool isNatNeg = gsi_true;
 
     gsDebugFormat(3, 4, 8, "Processing client message\r\n");
     if (len >= NATNEG_MAGIC_LEN + 4) {
         for (i = 0; i < NATNEG_MAGIC_LEN; i++) {
-            if ((u8)buf[i] != natNegBytes[i]) {
-                isNatNeg = FALSE;
+            if ((gsi_u8)buf[i] != natNegBytes[i]) {
+                isNatNeg = gsi_false;
                 break;
             }
         }
     } else {
-        isNatNeg = FALSE;
+        isNatNeg = gsi_false;
     }
     if (isNatNeg) {
         int cookie;
@@ -741,29 +743,29 @@ static void qr_process_client_message(QR2Implementation *qrec, const char *buf, 
 }
 
 // Whether a client message's key was seen lately; if not, keeps it
-static BOOL qr_got_recent_message(QR2Implementation *qrec, int msgKey) {
+static gsi_bool qr_got_recent_message(QR2Implementation *qrec, int msgKey) {
     int i;
 
     for (i = 0; i < QR2_RECENT_CLIENT_MESSAGES_TO_TRACK; i++) {
         if (qrec->clientMessageKeys[i] == msgKey) {
-            return TRUE;
+            return gsi_true;
         }
     }
     qrec->curMessageKey = (qrec->curMessageKey + 1) % QR2_RECENT_CLIENT_MESSAGES_TO_TRACK;
     qrec->clientMessageKeys[qrec->curMessageKey] = msgKey;
-    return FALSE;
+    return gsi_false;
 }
 
 // Adds a random challenge for a host to the reply, which its query has to give back
-static BOOL qr2_process_ip_verify(QR2Implementation *qrec, QR2Buffer *buf, SocAddrIn *sender) {
+static gsi_bool qr2_process_ip_verify(QR2Implementation *qrec, QR2Buffer *buf, SocAddrIn *sender) {
     int i = 0;
-    u32 now = current_time();
+    gsi_u32 now = current_time();
     int firstFreeIndex = -1;
     int numDuplicates = 0;
 
     if ((qrec->backendOptions & 0x80) == 0) {
         qr2_buffer_add_int(buf, 0);
-        return TRUE;
+        return gsi_true;
     }
     for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
         if (firstFreeIndex == -1 && qrec->ipVerify[i].addr.addr == 0) {
@@ -774,20 +776,20 @@ static BOOL qr2_process_ip_verify(QR2Implementation *qrec, QR2Buffer *buf, SocAd
         }
     }
     if (numDuplicates > 5) {
-        return FALSE;
+        return gsi_false;
     }
     if (firstFreeIndex == -1) {
-        return FALSE;
+        return gsi_false;
     }
     qrec->ipVerify[firstFreeIndex].addr = *sender;
     qrec->ipVerify[firstFreeIndex].challenge = QR2_SWAP32((rand() << 16) | rand());
     qrec->ipVerify[firstFreeIndex].createTime = now;
     qr2_buffer_add_int(buf, qrec->ipVerify[firstFreeIndex].challenge);
-    return TRUE;
+    return gsi_true;
 }
 
 // Whether a host gave back the challenge it was sent, which is then forgotten
-static BOOL qr2_check_ip_verify(QR2Implementation *qrec, SocAddrIn *sender, u32 ipVerify) {
+static gsi_bool qr2_check_ip_verify(QR2Implementation *qrec, SocAddrIn *sender, gsi_u32 ipVerify) {
     int i = 0;
 
     for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
@@ -795,17 +797,17 @@ static BOOL qr2_check_ip_verify(QR2Implementation *qrec, SocAddrIn *sender, u32 
             if (qrec->ipVerify[i].challenge == ipVerify) {
                 qrec->ipVerify[i].addr.addr = 0;
                 qrec->ipVerify[i].addr.port = 0;
-                return TRUE;
+                return gsi_true;
             }
         }
     }
-    return FALSE;
+    return gsi_false;
 }
 
 // Forgets the challenges that weren't given back within 4 seconds
 static void qr2_expire_ip_verify(QR2Implementation *qrec) {
     int i = 0;
-    u32 now = current_time();
+    gsi_u32 now = current_time();
 
     for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
         if (qrec->ipVerify[i].addr.addr != 0 && now - qrec->ipVerify[i].createTime > 4000) {
@@ -819,7 +821,7 @@ void qr2_parse_queryA(QR2Implementation *qrec, char *query, int len, SocAddrIn *
     char ptype;
     char *reqkey;
     char *pos;
-    u32 ipVerify = 0;
+    gsi_u32 ipVerify = 0;
     int i;
 
     buf.len = 0;
@@ -844,7 +846,7 @@ void qr2_parse_queryA(QR2Implementation *qrec, char *query, int len, SocAddrIn *
     if (len < 7) {
         return;
     }
-    if ((u8)query[0] != 0xfe || (u8)query[1] != 0xfd) {
+    if ((gsi_u8)query[0] != 0xfe || (gsi_u8)query[1] != 0xfd) {
         return;
     }
     if (qrec->listedState > 0) {
@@ -868,14 +870,14 @@ void qr2_parse_queryA(QR2Implementation *qrec, char *query, int len, SocAddrIn *
             if (len < 4) {
                 return;
             }
-            ipVerify = QR2_SWAP32(*(u32 *)pos);
+            ipVerify = QR2_SWAP32(*(gsi_u32 *)pos);
             pos += 4;
             len -= 4;
             if (!qr2_check_ip_verify(qrec, sender, ipVerify)) {
                 return;
             }
         }
-        qr_process_query(qrec, &buf, (const u8 *)pos, len, sender);
+        qr_process_query(qrec, &buf, (const gsi_u8 *)pos, len, sender);
         return;
     case 1:
         gsDebugFormat(3, 0, 8, "Processing challenge packet\r\n");
@@ -885,7 +887,7 @@ void qr2_parse_queryA(QR2Implementation *qrec, char *query, int len, SocAddrIn *
             }
         }
         if (len >= 15) {
-            u32 backendOptions;
+            gsi_u32 backendOptions;
 
             STD_TSScanf(pos + len - 15, "%02x", &backendOptions);
             qrec->backendOptions = backendOptions;
@@ -955,7 +957,7 @@ void qr2_parse_queryA(QR2Implementation *qrec, char *query, int len, SocAddrIn *
     }
     sendto(qrec->hbSock, buf.buffer, buf.len, 0, sender, sizeof(SocAddrIn));
     gsDebugFormat(3, 0, 0x10, "Sent %d bytes as QR2 query response\r\n", buf.len);
-    gsDebugBinary(3, 0, 0x20, (const u8 *)buf.buffer, buf.len);
+    gsDebugBinary(3, 0, 0x20, (const gsi_u8 *)buf.buffer, buf.len);
 }
 
 static void send_keepalive(QR2Implementation *qrec) {
@@ -1018,8 +1020,8 @@ static void send_heartbeat(QR2Implementation *qrec, int stateChanged) {
     sendto(qrec->hbSock, buf.buffer, buf.len, 0, &qrec->hbAddr, sizeof(SocAddrIn));
     qrec->lastKa = qrec->lastHeartbeat = current_time();
     if (stateChanged != 0) {
-        qrec->userStateChangeRequested = FALSE;
+        qrec->userStateChangeRequested = gsi_false;
     }
     gsDebugFormat(3, 0, 0x10, "Sent heartbeat to master (size %d)\r\n", buf.len);
-    gsDebugBinary(3, 0, 0x20, (const u8 *)buf.buffer, buf.len);
+    gsDebugBinary(3, 0, 0x20, (const gsi_u8 *)buf.buffer, buf.len);
 }

@@ -1,8 +1,8 @@
 #ifndef POKEBW2_DWC_GSSOAP_H
 #define POKEBW2_DWC_GSSOAP_H
 
-#include "types.h"
 #include "dwc/gsCore.h"
+#include "dwc/nonport.h"
 #include "dwc/soap.h"
 
 // GameSpy's SOAP requests (gsSoap.c), in overlay 11: a request posts a message of dwc/gsXML.h's writer to a URL with a
@@ -29,14 +29,14 @@ typedef struct GsHttpRequest {
     GSTask *handle;
     int requestId;
     int requestResult;
-    BOOL completed;
+    gsi_bool completed;
 } GsHttpRequest;
 
 // Starts a request, with a time limit or none; returns it, or NULL when it could not start
 GsHttpRequest *gsiExecuteSoap(const char *url, const char *service, SoapWriter *request, GsHttpResponseFunc func,
                               void *userData);
 GsHttpRequest *gsiExecuteSoapWithTimeout(const char *url, const char *service, SoapWriter *request,
-                                         GsHttpResponseFunc func, u32 timeout, void *userData);
+                                         GsHttpResponseFunc func, gsi_u32 timeout, void *userData);
 // The same with no time limit and a function that adds to the post before it is sent
 GsHttpRequest *gsiExecuteSoapCustom(const char *url, const char *service, SoapWriter *request, GsHttpResponseFunc func,
                                     GSSoapCustomFunc customFunc, void *userData);

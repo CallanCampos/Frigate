@@ -1,8 +1,8 @@
 #ifndef POKEBW2_DWC_GPIBUDDY_H
 #define POKEBW2_DWC_GPIBUDDY_H
 
-#include "types.h"
 #include "dwc/gpi.h"
+#include "dwc/nonport.h"
 
 // The buddy messages and the buddy list of GameSpy's GP (gpiBuddy.c), in overlay 11 (see dwc/gp.h for the names)
 
@@ -20,8 +20,8 @@ int gpiBuddyHandleKeyRequest(GPConnection *connection, GPIPeer *peer);
 int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer);
 // Authorize a buddy request, and delete a buddy, telling the server if asked to
 int gpiAuthBuddyRequest(GPConnection *connection, int profile);
-int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest);
+int gpiDeleteBuddy(GPConnection *connection, int profile, gsi_bool sendServerRequest);
 // Sets whether a profile's buddy was deleted (the name is ours)
-int gpiSetBuddyDeleted(GPConnection *connection, int profile, BOOL deleted);
+int gpiSetBuddyDeleted(GPConnection *connection, int profile, gsi_bool deleted);
 
 #endif // POKEBW2_DWC_GPIBUDDY_H

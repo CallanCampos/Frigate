@@ -52,7 +52,7 @@ static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operati
         SocAddrIn address = { 0 };
 
         address.family = 2;
-        address.addr = *(u32 *)host->addrList[0];
+        address.addr = *(gsi_u32 *)host->addrList[0];
         // Port 29901, in network order
         address.port = 0xcd74;
         if (connect(search->sock, &address, 8) == -1) {
@@ -208,7 +208,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
     int index;
     GPICallback callback;
     int bytesRead;
-    BOOL connClosed;
+    gsi_bool connClosed;
     GPICallback profileListCallback;
     GPICallback uniqueCallback;
     GPICallback othersListCallback;

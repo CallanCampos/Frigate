@@ -55,7 +55,7 @@ void TableEnter(HashTable *table, const void *element) {
 
     if (table != NULL) {
         hash = table->hashFunc(element, table->bucketCount);
-        index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, FALSE);
+        index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, gsi_false);
         if (index == -1) {
             func_ov011_021715a4(table->buckets[hash], element);
         } else {
@@ -64,20 +64,20 @@ void TableEnter(HashTable *table, const void *element) {
     }
 }
 
-BOOL TableRemove(HashTable *table, const void *element) {
+gsi_bool TableRemove(HashTable *table, const void *element) {
     int hash;
     int index;
 
     if (table == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     hash = table->hashFunc(element, table->bucketCount);
-    index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, FALSE);
+    index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, gsi_false);
     if (index == -1) {
-        return FALSE;
+        return gsi_false;
     }
     func_ov011_02171668(table->buckets[hash], index);
-    return TRUE;
+    return gsi_true;
 }
 
 void *TableLookup(HashTable *table, const void *element) {
@@ -90,7 +90,7 @@ void *TableLookup(HashTable *table, const void *element) {
     }
     hash = table->hashFunc(element, table->bucketCount);
     result = NULL;
-    index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, FALSE);
+    index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, gsi_false);
     if (index != -1) {
         result = func_ov011_0217158c(table->buckets[hash], index);
     }

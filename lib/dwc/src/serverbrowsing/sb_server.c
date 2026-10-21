@@ -98,7 +98,7 @@ int SBServerGetIntValueA(SBServer *server, const char *key, int idefault) {
         return idefault;
     }
     s2 = (*s != '-') ? s : s + 1;
-    if (!isdigit((u8)*s2)) {
+    if (!isdigit((gsi_u8)*s2)) {
         return idefault;
     }
     return atol(s);
@@ -113,30 +113,30 @@ double SBServerGetFloatValueA(SBServer *server, const char *key, double fdefault
     return atof(s);
 }
 
-u32 SBServerGetPublicInetAddress(SBServer *server) {
+gsi_u32 SBServerGetPublicInetAddress(SBServer *server) {
     return server->publicip;
 }
 
-u16 SBServerGetPublicQueryPort(SBServer *server) {
+gsi_u16 SBServerGetPublicQueryPort(SBServer *server) {
     return SB_SWAP16(server->publicport);
 }
 
-u16 SBServerGetPublicQueryPortNBO(SBServer *server) {
+gsi_u16 SBServerGetPublicQueryPortNBO(SBServer *server) {
     return server->publicport;
 }
 
-BOOL SBServerHasPrivateAddress(SBServer *server) {
+gsi_bool SBServerHasPrivateAddress(SBServer *server) {
     if ((server->flags & PRIVATE_IP_FLAG) == PRIVATE_IP_FLAG) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-u32 SBServerGetPrivateInetAddress(SBServer *server) {
+gsi_u32 SBServerGetPrivateInetAddress(SBServer *server) {
     return server->privateip;
 }
 
-u16 SBServerGetPrivateQueryPort(SBServer *server) {
+gsi_u16 SBServerGetPrivateQueryPort(SBServer *server) {
     return SB_SWAP16(server->privateport);
 }
 
@@ -151,7 +151,7 @@ SBServer *SBServerGetNext(SBServer *server) {
 // Whether a key of the old protocol's answer is one of the server's, not of the answer
 static int CheckValidKey(char *key) {
     const char *InvalidKeys[] = { "queryid", "final" };
-    u32 i;
+    gsi_u32 i;
 
     for (i = 0; i < NELEMS(InvalidKeys); i++) {
         if (strcmp(key, InvalidKeys[i]) == 0) {
@@ -207,7 +207,7 @@ void SBServerParseQR2FullKeysSingle(SBServer *server, char *data, int len) {
     char *v;
     char *keys;
     int nkeys;
-    u16 nunits;
+    gsi_u16 nunits;
     int pflag;
     int i;
     int j;
@@ -281,8 +281,8 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
     int dlen;
     char *k;
     char *v;
-    u32 packetNum = 0;
-    BOOL isFinal = FALSE;
+    gsi_u32 packetNum = 0;
+    gsi_bool isFinal = gsi_false;
 
     if (*data == '\0') {
         return;
@@ -300,17 +300,17 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
     if (len < 1) {
         return;
     }
-    packetNum = (u8)*data;
+    packetNum = (gsi_u8)*data;
     data++;
     len--;
     if ((packetNum & 0x80) == 0x80) {
-        isFinal = TRUE;
+        isFinal = gsi_true;
         packetNum ^= 0x80;
     }
     if (packetNum > 7) {
         return;
     }
-    if (isFinal == TRUE) {
+    if (isFinal == gsi_true) {
         // The parts after the last one never come
         server->splitResponseBitmap |= (char)(0xff << packetNum);
     } else {
@@ -388,7 +388,7 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
 }
 
 static int StringHash(const char *s, int numbuckets) {
-    u32 hashcode = 0;
+    gsi_u32 hashcode = 0;
 
     while (*s != '\0') {
         hashcode = hashcode * 0x9ccf9319 + tolower(*s);
@@ -420,7 +420,7 @@ int SBServerGetPing(SBServer *server) {
     return server->updatetime;
 }
 
-SBServer *SBAllocServer(SBServerList *slist, u32 publicip, u16 publicport) {
+SBServer *SBAllocServer(SBServerList *slist, gsi_u32 publicip, gsi_u16 publicport) {
     SBServer *server = gsimalloc(sizeof(SBServer));
 
     if (server == NULL) {
@@ -443,32 +443,32 @@ SBServer *SBAllocServer(SBServerList *slist, u32 publicip, u16 publicport) {
     return server;
 }
 
-void SBServerSetFlags(SBServer *server, u8 flags) {
+void SBServerSetFlags(SBServer *server, gsi_u8 flags) {
     server->flags = flags;
 }
 
-void SBServerSetPrivateAddr(SBServer *server, u32 ip, u16 port) {
+void SBServerSetPrivateAddr(SBServer *server, gsi_u32 ip, gsi_u16 port) {
     server->privateip = ip;
     server->privateport = port;
 }
 
-void SBServerSetICMPIP(SBServer *server, u32 icmpip) {
+void SBServerSetICMPIP(SBServer *server, gsi_u32 icmpip) {
     server->icmpip = icmpip;
 }
 
-void SBServerSetState(SBServer *server, u8 state) {
+void SBServerSetState(SBServer *server, gsi_u8 state) {
     server->state = state;
 }
 
-u8 SBServerGetState(SBServer *server) {
+gsi_u8 SBServerGetState(SBServer *server) {
     return server->state;
 }
 
-BOOL SBIsNullServer(SBServer *server) {
+gsi_bool SBIsNullServer(SBServer *server) {
     if (server == SBNullServer) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 SBServer *SBNullServer = NULL;

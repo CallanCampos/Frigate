@@ -13,8 +13,8 @@ static struct {
     char *aliases;
     int lastError;
     SocHostEnt hostEnt;
-    u32 ips[5];
-    u8 *ipPtrs[17];
+    gsi_u32 ips[5];
+    gsi_u8 *ipPtrs[17];
 } sSocketState;
 
 // Keeps the error of a call that failed and returns the error value, or returns the result
@@ -34,19 +34,19 @@ int closesocket(int sock) {
     return gsiSocketCheckResult(SOC_Close(sock), -1);
 }
 
-BOOL gsiCloseSocketSecure(int sock, BOOL *secure) {
+gsi_bool gsiCloseSocketSecure(int sock, gsi_bool *secure) {
     int result = SOC_Close(sock);
 
     if (result == 0) {
-        *secure = *secure == FALSE;
+        *secure = *secure == gsi_false;
         return *secure;
     }
     if (!SOCL_IsNotClosing(sock)) {
-        return FALSE;
+        return gsi_false;
     }
     gsiSocketCheckResult(result, -1);
-    *secure = TRUE;
-    return TRUE;
+    *secure = gsi_true;
+    return gsi_true;
 }
 
 int shutdown(int sock, int how) {
@@ -106,7 +106,7 @@ int getsockname(int sock, SocAddrIn *address, int *size) {
 }
 
 int inet_addr(const char *host) {
-    u32 address;
+    gsi_u32 address;
 
     if (SOC_InetAtoN(host, &address) == 0) {
         return -1;
@@ -118,7 +118,7 @@ int GOAGetLastError(int sock) {
     return sSocketState.lastError;
 }
 
-int GSISocketSelect(int sock, BOOL *readable, BOOL *writable, BOOL *failed) {
+int GSISocketSelect(int sock, gsi_bool *readable, gsi_bool *writable, gsi_bool *failed) {
     SocPollFd fd;
     int result;
 
@@ -137,29 +137,29 @@ int GSISocketSelect(int sock, BOOL *readable, BOOL *writable, BOOL *failed) {
     }
     if (readable != NULL) {
         if (result > 0 && (fd.revents & 0x41)) {
-            *readable = TRUE;
+            *readable = gsi_true;
         } else {
-            *readable = FALSE;
+            *readable = gsi_false;
         }
     }
     if (writable != NULL) {
         if (result > 0 && (fd.revents & 8)) {
-            *writable = TRUE;
+            *writable = gsi_true;
         } else {
-            *writable = FALSE;
+            *writable = gsi_false;
         }
     }
     if (failed != NULL) {
         if (result > 0 && (fd.revents & 0x20)) {
-            *failed = TRUE;
+            *failed = gsi_true;
         } else {
-            *failed = FALSE;
+            *failed = gsi_false;
         }
     }
     return result;
 }
 
-BOOL SetSockBlocking(int sock, BOOL blocking) {
+gsi_bool SetSockBlocking(int sock, gsi_bool blocking) {
     int flags = SOC_Fcntl(sock, 3, 0);
 
     if (blocking) {
@@ -170,23 +170,23 @@ BOOL SetSockBlocking(int sock, BOOL blocking) {
     if (SOC_Fcntl(sock, 4, flags) == 0) {
         gsDebugFormat(12, 0, 0x10, "SetSockBlocking: Set socket %d to %s\r\n", sock,
                       blocking ? "blocking" : "non-blocking");
-        return TRUE;
+        return gsi_true;
     }
     gsDebugFormat(12, 0, 0x10, "SetSockBlocking failed: tried to set socket %d to %s\r\n", sock,
                   blocking ? "blocking" : "non-blocking");
-    return FALSE;
+    return gsi_false;
 }
 
-BOOL SetReceiveBufferSize(int sock, int size) {
+gsi_bool SetReceiveBufferSize(int sock, int size) {
     if (setsockopt(sock, 0xffff, 0x1002, &size, sizeof(size)) != -1) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-BOOL CanReceiveOnSocket(int sock) {
-    BOOL result = FALSE;
-    BOOL readable = FALSE;
+gsi_bool CanReceiveOnSocket(int sock) {
+    gsi_bool result = gsi_false;
+    gsi_bool readable = gsi_false;
 
     if (GSISocketSelect(sock, &readable, NULL, NULL) == 1) {
         result = readable;
@@ -194,9 +194,9 @@ BOOL CanReceiveOnSocket(int sock) {
     return result;
 }
 
-BOOL CanSendOnSocket(int sock) {
-    BOOL result = FALSE;
-    BOOL writable = FALSE;
+gsi_bool CanSendOnSocket(int sock) {
+    gsi_bool result = gsi_false;
+    gsi_bool writable = gsi_false;
 
     if (GSISocketSelect(sock, NULL, &writable, NULL) == 1) {
         result = writable;
@@ -211,33 +211,33 @@ SocHostEnt *getlocalhost(void) {
     sSocketState.hostEnt.addrLength = 0;
     sSocketState.hostEnt.addrList = sSocketState.ipPtrs;
     sSocketState.ips[0] = 0;
-    SOC_U32to4U8(SOCL_GetHostID(), (u8 *)&sSocketState.ips[0]);
+    SOC_U32to4U8(SOCL_GetHostID(), (gsi_u8 *)&sSocketState.ips[0]);
     if (sSocketState.ips[0] == 0) {
         return NULL;
     }
-    sSocketState.ipPtrs[0] = (u8 *)&sSocketState.ips[0];
+    sSocketState.ipPtrs[0] = (gsi_u8 *)&sSocketState.ips[0];
     sSocketState.hostEnt.addrLength = 4;
     sSocketState.ipPtrs[1] = NULL;
     return &sSocketState.hostEnt;
 }
 
-BOOL IsPrivateIP(const u32 *address) {
-    u32 ip = *address;
+gsi_bool IsPrivateIP(const gsi_u32 *address) {
+    gsi_u32 ip = *address;
     int a;
     int b;
 
     // The address in host order
-    ip = ((ip << 24) & 0xff000000) | (((ip << 8) & 0x00ff0000) | ((u8)(ip >> 24) | ((ip >> 8) & 0x0000ff00)));
-    a = (u8)(ip >> 24);
-    b = (u8)(ip >> 16);
+    ip = ((ip << 24) & 0xff000000) | (((ip << 8) & 0x00ff0000) | ((gsi_u8)(ip >> 24) | ((ip >> 8) & 0x0000ff00)));
+    a = (gsi_u8)(ip >> 24);
+    b = (gsi_u8)(ip >> 16);
     if (a == 10) {
-        return TRUE;
+        return gsi_true;
     }
     if (a == 172 && b >= 16 && b <= 31) {
-        return TRUE;
+        return gsi_true;
     }
     if (a == 192 && b == 168) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }

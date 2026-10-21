@@ -8,13 +8,13 @@
 // type (13 categories of 5 types)
 typedef struct GSIDebugInstance {
     GSIDebugCallback callback;
-    BOOL initialized;
+    gsi_bool initialized;
     GSICriticalSection crit;
-    u8 levels[13][5];
+    gsi_u8 levels[13][5];
 } GSIDebugInstance;
 
 static void gsiDebugPrintToConsole(int category, int type, int level, const char *format, va_list args);
-static void HexEncode16(const u8 *data, char *line, int size);
+static void HexEncode16(const gsi_u8 *data, char *line, int size);
 
 static GSIDebugInstance gGSIDebugInstance;
 
@@ -24,7 +24,7 @@ static void gsiDebugPrintToConsole(int category, int type, int level, const char
 
 void gsDebugVaList(int category, int type, int level, const char *format, va_list args) {
     if (!gGSIDebugInstance.initialized) {
-        gGSIDebugInstance.initialized = TRUE;
+        gGSIDebugInstance.initialized = gsi_true;
         gsiInitializeCriticalSection(&gGSIDebugInstance.crit);
     }
     gsiEnterCriticalSection(&gGSIDebugInstance.crit);
@@ -47,13 +47,13 @@ void gsDebugFormat(int category, int type, int level, const char *format, ...) {
 }
 
 // Writes up to 16 bytes as a line: pairs of hexadecimal digits, then the bytes as characters from column 41
-static void HexEncode16(const u8 *data, char *line, int size) {
+static void HexEncode16(const gsi_u8 *data, char *line, int size) {
     char *chars = line + 41;
     int odd = size & 1;
 
     memset(line, ' ', 0x40);
     while (size--) {
-        u8 c = *data++;
+        gsi_u8 c = *data++;
 
         OS_SPrintf(line, "%02X", c);
         if (isgraph(c)) {
@@ -71,7 +71,7 @@ static void HexEncode16(const u8 *data, char *line, int size) {
     *chars = '\0';
 }
 
-void gsDebugBinary(int category, int type, int level, const u8 *data, int size) {
+void gsDebugBinary(int category, int type, int level, const gsi_u8 *data, int size) {
     int left = size;
     char line[0x50];
 

@@ -41,14 +41,14 @@ void ghiHandleStatus(GHIConnection *connection) {
     }
 }
 
-// Does what the state of the connection has to do. Returns TRUE once it has ended
-BOOL ghiProcessConnection(GHIConnection *connection) {
-    BOOL completed;
+// Does what the state of the connection has to do. Returns gsi_true once it has ended
+gsi_bool ghiProcessConnection(GHIConnection *connection) {
+    gsi_bool completed;
 
     if (connection->processing) {
-        return FALSE;
+        return gsi_false;
     }
-    connection->processing = TRUE;
+    connection->processing = gsi_true;
 
     if (connection->state == 0) {
         ghiDoSocketInit(connection);
@@ -94,37 +94,37 @@ BOOL ghiProcessConnection(GHIConnection *connection) {
     completed = connection->completed;
     if (connection->result == 0x12 && !completed) {
         if (!CanReceiveOnSocket(connection->socket)) {
-            connection->completed = TRUE;
+            connection->completed = gsi_true;
         }
     }
 
     if (connection->completed) {
-        if (connection->encryptor.secure == TRUE) {
+        if (connection->encryptor.secure == gsi_true) {
             ghiHandleStatus(connection);
             if (!ghiCloseSocket(connection)) {
-                connection->processing = FALSE;
+                connection->processing = gsi_false;
                 connection->state = 11;
-                return FALSE;
+                return gsi_false;
             }
             ghiCallCompletedCallback(connection);
             if (!ghiFreeConnectionData(connection)) {
-                connection->processing = FALSE;
-                return FALSE;
+                connection->processing = gsi_false;
+                return gsi_false;
             }
         } else {
             if (!ghiCloseSocket(connection)) {
-                connection->processing = FALSE;
+                connection->processing = gsi_false;
                 connection->state = 11;
-                return FALSE;
+                return gsi_false;
             }
             ghiCallCompletedCallback(connection);
             if (!ghiFreeConnectionData(connection)) {
-                connection->processing = FALSE;
-                return FALSE;
+                connection->processing = gsi_false;
+                return gsi_false;
             }
         }
     } else {
-        connection->processing = FALSE;
+        connection->processing = gsi_false;
     }
     return completed;
 }
@@ -159,10 +159,10 @@ void ghttpCleanup(void) {
 
 // Starts a request for a URL. With a buffer the result is received into it, without one into a buffer of the client's.
 // Returns the request, or -1 if it couldn't be made. If blocking it only returns when the request has ended, with 0
-int ghttpGetExA(const char *url, const char *headers, char *buffer, int bufferSize, GHIPost *post, BOOL throttle,
-                BOOL blocking, GHIProgressFunc progress, GHICompletedFunc completed, void *param) {
+int ghttpGetExA(const char *url, const char *headers, char *buffer, int bufferSize, GHIPost *post, gsi_bool throttle,
+                gsi_bool blocking, GHIProgressFunc progress, GHICompletedFunc completed, void *param) {
     GHIConnection *connection;
-    BOOL ready;
+    gsi_bool ready;
 
     if (url == NULL || url[0] == '\0') {
         return -1;
@@ -233,14 +233,14 @@ void ghttpThink(void) {
     ghiEnumConnections(ghiProcessConnection);
 }
 
-BOOL ghttpThinkRequest(int request) {
+gsi_bool ghttpThinkRequest(int request) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     ghiProcessConnection(connection);
-    return TRUE;
+    return gsi_true;
 }
 
 // Ends a request, as cancelled (0x12)
@@ -250,7 +250,7 @@ void ghttpCancelRequest(int request) {
     if (connection != NULL) {
         connection->result = 0x12;
         connection->state = 11;
-        connection->completed = TRUE;
+        connection->completed = gsi_true;
         ghiCloseSocket(connection);
     }
 }
@@ -276,7 +276,7 @@ GHIPost *ghttpNewPost(void) {
     return ghiNewPost();
 }
 
-void ghttpPostSetAutoFree(GHIPost *post, BOOL autoFree) {
+void ghttpPostSetAutoFree(GHIPost *post, gsi_bool autoFree) {
     if (post != NULL) {
         ghiPostSetAutoFree(post, autoFree);
     }
@@ -288,14 +288,14 @@ void ghttpFreePost(int request, GHIPost *post) {
     }
 }
 
-BOOL ghttpPostAddXml(GHIPost *post, SoapWriter *writer) {
+gsi_bool ghttpPostAddXml(GHIPost *post, SoapWriter *writer) {
     return ghiPostAddXml(post, writer);
 }
 
-BOOL ghttpSetRootCAList(const char *url, GHICertList *rootCA) {
+gsi_bool ghttpSetRootCAList(const char *url, GHICertList *rootCA) {
     return ghiEncyptorSetRootCAList(url, rootCA);
 }
 
-BOOL ghttpRemoveRootCAList(const char *url) {
+gsi_bool ghttpRemoveRootCAList(const char *url) {
     return ghiEncryptorRemoveRootCAList(url);
 }

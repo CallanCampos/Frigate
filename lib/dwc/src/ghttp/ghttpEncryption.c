@@ -11,23 +11,23 @@
 // How a certificate that the server sent is checked (the SSL library tells of what it found, and the callback says
 // which of the faults to ignore by clearing their bits)
 typedef struct GHISslCertInfo {
-    u8 unk_000[0x5b0];
+    gsi_u8 unk_000[0x5b0];
     char issuer[0x100];
     char subject[0x100];
     char commonName[0x100];
 } GHISslCertInfo;
 
-typedef int (*GHISslAuthFunc)(u32 result, GHISslCertInfo *info, int length);
+typedef int (*GHISslAuthFunc)(gsi_u32 result, GHISslCertInfo *info, int length);
 
 // What the SSL library's socket takes to make a connection secure
 typedef struct GHISslConnection {
-    u8 unk_000[0x800];
+    gsi_u8 unk_000[0x800];
     int unk_800;
-    u8 unk_804[0xc];
+    gsi_u8 unk_804[0xc];
     GHISslAuthFunc authCallback;
     void **certs;
     int certCount;
-    u8 unk_81C[0x14];
+    gsi_u8 unk_81C[0x14];
 } GHISslConnection;
 
 // The root certificates of a host that a request may be secured with, and how many have asked for them
@@ -38,33 +38,33 @@ typedef struct GHIRootCAEntry {
     int refCount;
 } GHIRootCAEntry;
 
-static u32 sSslEntropy[8];
+static gsi_u32 sSslEntropy[8];
 static void *sRootCAList;
 
 // What the connection has: 0 for no encryption, or the engine. 5 is taken as 4, the one that exists
-BOOL ghttpSetRequestEncryptionEngine(int request, int engine) {
+gsi_bool ghttpSetRequestEncryptionEngine(int request, int engine) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (engine == 5) {
         engine = 4;
     }
     if (connection->encryptor.engine == engine) {
-        return TRUE;
+        return gsi_true;
     }
     if (connection->encryptor.state != NULL && connection->encryptor.engine != engine) {
-        return FALSE;
+        return gsi_false;
     }
     if (engine == 0 && strncmp(connection->url, "https://", 8) == 0) {
-        return FALSE;
+        return gsi_false;
     }
 
     connection->encryptor.engine = engine;
     if (engine == 0) {
         connection->encryptor.state = NULL;
-        return TRUE;
+        return gsi_true;
     }
     connection->encryptor.state = NULL;
     connection->encryptor.init = ghiEncryptorSslInitFunc;
@@ -72,27 +72,27 @@ BOOL ghttpSetRequestEncryptionEngine(int request, int engine) {
     connection->encryptor.cleanup = ghiEncryptorSslCleanupFunc;
     connection->encryptor.encrypt = ghiEncryptorSslEncryptFunc;
     connection->encryptor.decrypt = ghiEncryptorSslDecryptFunc;
-    connection->encryptor.open = FALSE;
+    connection->encryptor.open = gsi_false;
     connection->encryptor.unk_0C = 0;
-    connection->encryptor.active = FALSE;
+    connection->encryptor.active = gsi_false;
     connection->encryptor.mode = 1;
-    connection->encryptor.established = FALSE;
+    connection->encryptor.established = gsi_false;
     connection->encryptor.unk_1C = 0;
     connection->encryptor.secure = 1;
-    return TRUE;
+    return gsi_true;
 }
 
 // Sets the root certificates that a host's secure connections are checked against
-BOOL ghiEncyptorSetRootCAList(const char *url, GHICertList *rootCA) {
+gsi_bool ghiEncyptorSetRootCAList(const char *url, GHICertList *rootCA) {
     if (rootCA == NULL || url == NULL || strcmp(url, "") == 0) {
         gsDebugFormat(8, 4, 1, "%s(@%s:%d):SSL - Null pointer or empty url string; url=0x%X, theRootCAList=0x%X\n",
                       GHI_FILE, __FUNCTION__, 116, url, rootCA);
-        return FALSE;
+        return gsi_false;
     }
     return ghiEncryptorSetTwlRootCA(url, rootCA);
 }
 
-BOOL ghiEncryptorRemoveRootCAList(const char *url) {
+gsi_bool ghiEncryptorRemoveRootCAList(const char *url) {
     return ghiEncryptorCleanupTwlRootCA(url);
 }
 
@@ -111,7 +111,7 @@ GHICertList *ghiEncryptorGetRootCAList(const char *url) {
         return NULL;
     }
     key.url = ghiCopyHost((char *)url);
-    index = func_ov011_021716ac(sRootCAList, &key, ghiCompareRootCAEntries, 0, TRUE);
+    index = func_ov011_021716ac(sRootCAList, &key, ghiCompareRootCAEntries, 0, gsi_true);
     gsifree(key.url);
     if (index == -1) {
         gsDebugFormat(8, 4, 1, "%s(@%s:%d):SSL - Could not find Url in the Cert List. url=%s\n", GHI_FILE, __FUNCTION__,
@@ -129,52 +129,52 @@ static void ghiFreeRootCAEntry(void *element) {
     entry->url = NULL;
 }
 
-BOOL ghiEncryptorSetTwlRootCA(const char *url, GHICertList *rootCA) {
+gsi_bool ghiEncryptorSetTwlRootCA(const char *url, GHICertList *rootCA) {
     GHIRootCAEntry entry;
     int index;
 
     if (url == NULL || rootCA == NULL || strcmp(url, "") == 0) {
         gsDebugFormat(8, 4, 1, "%s(@%s:%d):SSL - Null pointer or empty url string; url=0x%X, theRootCAList=0x%X\n",
                       GHI_FILE, __FUNCTION__, 837, url, rootCA);
-        return FALSE;
+        return gsi_false;
     }
     if (sRootCAList == NULL) {
         sRootCAList = func_ov011_02171514(sizeof(GHIRootCAEntry), 1, ghiFreeRootCAEntry);
         if (sRootCAList == NULL) {
             gsDebugFormat(8, 2, 1, "%s(@%s:%d):SSL - Out of memory. Cannot allocate memory for ghttpCertList\n",
                           GHI_FILE, __FUNCTION__, 852);
-            return FALSE;
+            return gsi_false;
         }
     }
     entry.url = ghiCopyHost((char *)url);
     entry.certList = rootCA;
     entry.refCount = 1;
-    index = func_ov011_021716ac(sRootCAList, &entry, ghiCompareRootCAEntries, 0, TRUE);
+    index = func_ov011_021716ac(sRootCAList, &entry, ghiCompareRootCAEntries, 0, gsi_true);
     if (index == -1) {
         ArrayInsertSorted(sRootCAList, &entry, ghiCompareRootCAEntries);
     } else {
         gsifree(entry.url);
         ((GHIRootCAEntry *)func_ov011_0217158c(sRootCAList, index))->refCount++;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL ghiEncryptorCleanupTwlRootCA(const char *url) {
-    BOOL result = TRUE;
+gsi_bool ghiEncryptorCleanupTwlRootCA(const char *url) {
+    gsi_bool result = gsi_true;
     GHIRootCAEntry key;
     int index;
 
     if (url == NULL || sRootCAList == NULL || strcmp(url, "") == 0) {
         gsDebugFormat(8, 4, 1, "%s(@%s:%d):SSL - Null pointer or empty url string; url=0x%X, ghttpCertList=0x%X\n",
                       GHI_FILE, __FUNCTION__, 891, url, sRootCAList);
-        return FALSE;
+        return gsi_false;
     }
     key.url = ghiCopyHost((char *)url);
-    index = func_ov011_021716ac(sRootCAList, &key, ghiCompareRootCAEntries, 0, TRUE);
+    index = func_ov011_021716ac(sRootCAList, &key, ghiCompareRootCAEntries, 0, gsi_true);
     if (index == -1) {
         gsDebugFormat(8, 4, result, "%s(@%s:%d):SSL - Could not find Url in the Cert List. url=%s\n", GHI_FILE,
                       __FUNCTION__, 906, url);
-        result = FALSE;
+        result = gsi_false;
     } else {
         GHIRootCAEntry *entry = func_ov011_0217158c(sRootCAList, index);
 
@@ -193,7 +193,7 @@ BOOL ghiEncryptorCleanupTwlRootCA(const char *url) {
 
 // Tells what the SSL library found in the server's certificate and which of the faults it may ignore. Returns the
 // faults that remain
-static int SslAuthCallback(u32 result, GHISslCertInfo *info, int length) {
+static int SslAuthCallback(gsi_u32 result, GHISslCertInfo *info, int length) {
     gsDebugFormat(8, 4, 8, "%s(@%s:%d):SSL - RECEIVED CERTFICATE\n", GHI_FILE, __FUNCTION__, 938);
     gsDebugFormat(8, 4, 8, "l:%d\n\ts:%s\n\tCN=%s\n\ti:%s\n", length, info->subject, info->commonName, info->issuer);
     if (result & 0x8000) {
@@ -205,7 +205,7 @@ static int SslAuthCallback(u32 result, GHISslCertInfo *info, int length) {
                       954);
         result &= ~0x4000;
     }
-    switch ((u8)result) {
+    switch ((gsi_u8)result) {
     case 1:
         gsDebugFormat(8, 4, 2, "%s(@%s:%d): SSL: No root CA installed.(DO NOT IGNORE)\r\n", GHI_FILE, __FUNCTION__,
                       963);
@@ -265,17 +265,17 @@ int ghiEncryptorSslInitFunc(GHIConnection *connection, GHIEncryptor *encryptor) 
     memset(encryptor->state, 0, sizeof(GHIEncryptorState));
     state = encryptor->state;
     state->ssl = ghiTwlSSLInit(connection->url);
-    state->started = FALSE;
+    state->started = gsi_false;
     if (state->ssl == NULL) {
         gsDebugFormat(8, 4, 15, "%s(@%s:%d):GameSpy SSL (TWL) certificate is uninitialized\r\n", GHI_FILE, __FUNCTION__,
                       1073);
         return 3;
     }
-    encryptor->open = TRUE;
+    encryptor->open = gsi_true;
     encryptor->unk_0C = 0;
-    encryptor->active = FALSE;
+    encryptor->active = gsi_false;
     encryptor->mode = 0;
-    encryptor->established = TRUE;
+    encryptor->established = gsi_true;
     encryptor->unk_1C = 1;
     gsDebugFormat(8, 4, 15, "%s(@%s:%d):GameSpy SSL (TWL engine) initialized\r\n", GHI_FILE, __FUNCTION__, 1085);
     return 1;
@@ -320,15 +320,15 @@ int ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncryptor *encryptor)
                               GHI_FILE, __FUNCTION__, 1135, error);
                 break;
             }
-            connection->completed = TRUE;
+            connection->completed = gsi_true;
             connection->result = 6;
             connection->socketError = error;
             return 3;
         }
-        state->started = TRUE;
+        state->started = gsi_true;
     }
     encryptor->unk_0C = 1;
-    encryptor->active = TRUE;
+    encryptor->active = gsi_true;
     gsDebugFormat(8, 4, 15, "%s(@%s:%d)return success\r\n", GHI_FILE, __FUNCTION__, 1154);
     return 1;
 }
@@ -353,7 +353,7 @@ int ghiEncryptorSslDecryptFunc(GHIConnection *connection, GHIEncryptor *encrypto
     return 3;
 }
 
-BOOL ghiEncryptorSslCleanupFunc(GHIConnection *connection, GHIEncryptor *encryptor) {
+gsi_bool ghiEncryptorSslCleanupFunc(GHIConnection *connection, GHIEncryptor *encryptor) {
     GHIEncryptorState *state;
 
     gsDebugFormat(8, 4, 15, "%s(@%s:%d):GameSpy SSL (Twl) engine cleanup called\r\n", GHI_FILE, __FUNCTION__, 1237);
@@ -366,9 +366,9 @@ BOOL ghiEncryptorSslCleanupFunc(GHIConnection *connection, GHIEncryptor *encrypt
             gsifree(state);
             encryptor->state = NULL;
         }
-        encryptor->open = FALSE;
+        encryptor->open = gsi_false;
         encryptor->unk_0C = 0;
-        encryptor->active = FALSE;
+        encryptor->active = gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }

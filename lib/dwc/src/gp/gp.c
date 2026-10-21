@@ -79,7 +79,7 @@ int gpConnectPreAuthenticated(GPConnection *connection, const char *authtoken, c
         callback(connection, &arg, param);
         return 0;
     }
-    return gpiConnect(connection, "", "", "", "", authtoken, partnerchallenge, NULL, firewall, FALSE, blocking,
+    return gpiConnect(connection, "", "", "", "", authtoken, partnerchallenge, NULL, firewall, gsi_false, blocking,
                       callback, param);
 }
 
@@ -89,7 +89,7 @@ void gpDisconnect(GPConnection *connection) {
 
     if (connection != NULL && (iconnection = *connection) != NULL && !iconnection->simulation) {
         state = iconnection->connectState;
-        gpiDisconnect(connection, TRUE);
+        gpiDisconnect(connection, gsi_true);
         gpiReset(connection);
         if (state == GPI_CONNECTED) {
             iconnection->connectState = GPI_DISCONNECTED;
@@ -185,7 +185,7 @@ int gpSendBuddyRequest(GPConnection *connection, int profile, const char *reason
             reasonFixed[i] = '/';
         }
     }
-    gpiSetBuddyDeleted(connection, profile, FALSE);
+    gpiSetBuddyDeleted(connection, profile, gsi_false);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\addbuddy\\");
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\sesskey\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->sessKey);
@@ -320,23 +320,23 @@ int gpGetBuddyIndex(GPConnection *connection, int profile, int *index) {
     return 0;
 }
 
-BOOL gpIsBuddy(GPConnection *connection, int profile) {
+gsi_bool gpIsBuddy(GPConnection *connection, int profile) {
     GPIConnection *iconnection;
     GPIProfile *pProfile;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (iconnection->simulation) {
-        return FALSE;
+        return gsi_false;
     }
     if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatus != NULL) {
-        return TRUE;
+        return gsi_true;
     }
     if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatusInfo != NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 int gpDeleteBuddy(GPConnection *connection, int profile) {
@@ -353,7 +353,7 @@ int gpDeleteBuddy(GPConnection *connection, int profile) {
         gpiSetErrorString(connection, "The connection has already been disconnected.");
         return 2;
     }
-    result = gpiDeleteBuddy(connection, profile, TRUE);
+    result = gpiDeleteBuddy(connection, profile, gsi_true);
     if (result != 0) {
         return result;
     }

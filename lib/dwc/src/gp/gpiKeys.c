@@ -116,9 +116,9 @@ int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
     for (i = 0; i < num; i++) {
         key = func_ov011_0217158c(iconnection->extendedInfoKeys, i);
         name = key->keyName;
-        nameLength = GPI_B64_LENGTH((u32)strlen(name));
+        nameLength = GPI_B64_LENGTH((gsi_u32)strlen(name));
         value = key->keyValue;
-        len += nameLength + 2 + GPI_B64_LENGTH((u32)strlen(value));
+        len += nameLength + 2 + GPI_B64_LENGTH((gsi_u32)strlen(value));
     }
     *buffer = gsimalloc(len + strlen(keysHeader) + 1);
     if (*buffer == NULL) {
@@ -134,13 +134,13 @@ int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
         name = key->keyName;
         B64Encode(name, pos, strlen(name), 2);
         name = key->keyName;
-        pos += GPI_B64_LENGTH((u32)strlen(name));
+        pos += GPI_B64_LENGTH((gsi_u32)strlen(name));
         strcat(pos, "\\");
         pos++;
         value = key->keyValue;
         B64Encode(value, pos, strlen(value), 2);
         value = key->keyValue;
-        pos += GPI_B64_LENGTH((u32)strlen(value));
+        pos += GPI_B64_LENGTH((gsi_u32)strlen(value));
     }
     return 0;
 }

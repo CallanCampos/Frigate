@@ -1,7 +1,7 @@
 #ifndef POKEBW2_DWC_SB_QUERYENGINE_H
 #define POKEBW2_DWC_SB_QUERYENGINE_H
 
-#include "types.h"
+#include "dwc/nonport.h"
 #include "dwc/sb_server.h"
 
 // The query engine of GameSpy's server browser (sb_queryengine.c), in overlay 11: it sends the queries to the game
@@ -42,24 +42,24 @@ struct SBQueryEngine {
     SBServerFIFO pendinglist; // the servers that wait their turn
     int querysock;
     int icmpsock;
-    u32 mypublicip;
-    u8 serverkeys[MAX_QUERY_KEYS]; // the keys of a basic query
+    gsi_u32 mypublicip;
+    gsi_u8 serverkeys[MAX_QUERY_KEYS]; // the keys of a basic query
     int numserverkeys;
     SBEngineCallbackFn ListCallback;
     void *instance;
 };
 
 // Starts the engine unless the game's services are down (a LAN browse starts it anyway)
-void SBQueryEngineInit(SBQueryEngine *engine, int maxupdates, int queryversion, BOOL lanBrowse,
+void SBQueryEngineInit(SBQueryEngine *engine, int maxupdates, int queryversion, gsi_bool lanBrowse,
                        SBEngineCallbackFn callback, void *instance);
-void SBQueryEngineSetPublicIP(SBQueryEngine *engine, u32 mypublicip);
+void SBQueryEngineSetPublicIP(SBQueryEngine *engine, gsi_u32 mypublicip);
 void SBEngineHaltUpdates(SBQueryEngine *engine);
 void SBEngineCleanup(SBQueryEngine *engine);
 // Queries a server, at once or once a query ends, at the front of the queue or at its end
-void SBQueryEngineUpdateServer(SBQueryEngine *engine, SBServer *server, BOOL addfront, int querytype,
-                               BOOL usequerychallenge);
+void SBQueryEngineUpdateServer(SBQueryEngine *engine, SBServer *server, gsi_bool addfront, int querytype,
+                               gsi_bool usequerychallenge);
 void SBQueryEngineThink(SBQueryEngine *engine);
-void SBQueryEngineAddQueryKey(SBQueryEngine *engine, u8 keyid);
+void SBQueryEngineAddQueryKey(SBQueryEngine *engine, gsi_u8 keyid);
 void SBQueryEngineRemoveServerFromFIFOs(SBQueryEngine *engine, SBServer *server);
 
 #endif // POKEBW2_DWC_SB_QUERYENGINE_H

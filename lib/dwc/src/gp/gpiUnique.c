@@ -13,7 +13,7 @@ int gpiProcessRegisterUniqueNick(GPConnection *connection, GPIOperation *operati
     GPRegisterUniqueNickResponseArg *arg;
     int result;
 
-    if (gpiCheckForError(connection, input, TRUE)) {
+    if (gpiCheckForError(connection, input, gsi_true)) {
         return 4;
     }
     if (strncmp(input, "\\rn\\", 4) != 0) {
@@ -44,7 +44,7 @@ int gpiProcessRegisterCdKey(GPConnection *connection, GPIOperation *operation, c
     GPRegisterCdKeyResponseArg *arg;
     int result;
 
-    if (gpiCheckForError(connection, input, TRUE)) {
+    if (gpiCheckForError(connection, input, gsi_true)) {
         return 4;
     }
     if (strncmp(input, "\\rc\\", 4) != 0) {

@@ -10,10 +10,10 @@
 
 // The one engine this build creates (sEngine); every function below reaches it through Gt2_GetEngine
 typedef struct GT2Engine {
-    GTI2Socket *socket; // the lower layer's socket
-    void *connections;  // GT2Connection array, the established connections, keyed by ip and port
-    void *pending;      // GT2PendingConnect array, keyed by its 16-byte header
-    BOOL initialized;   // whether Gt2_CreateSocket completed successfully
+    GTI2Socket *socket;   // the lower layer's socket
+    void *connections;    // GT2Connection array, the established connections, keyed by ip and port
+    void *pending;        // GT2PendingConnect array, keyed by its 16-byte header
+    gsi_bool initialized; // whether Gt2_CreateSocket completed successfully
     Gt2AttemptResultCallback onAttemptResult;
     Gt2ClosedCallback onClosed;
     Gt2PingCallback onPing;
@@ -23,21 +23,21 @@ typedef struct GT2Engine {
     Gt2UnknownMessageCallback onUnknownMessage;
     void *userData;
     int pendingCount;
-    u32 localIp;
-    u16 localPort;
+    gsi_u32 localIp;
+    gsi_u16 localPort;
 } GT2Engine;
 
 // An established connection, keyed by its peer's address
 typedef struct GT2Connection {
-    u32 ip;
-    u16 port;
+    gsi_u32 ip;
+    gsi_u16 port;
     GTI2Connection *handle; // the lower layer's connection
 } GT2Connection;
 
 // A pending connect with a fixed 16-byte init message and header
 typedef struct GT2PendingConnect {
-    u8 initMessage[0x10];
-    u8 header[0x10];
+    gsi_u8 initMessage[0x10];
+    gsi_u8 header[0x10];
     // The original uses four-byte entries, but appends a record word or a record pointer on different paths.
     // Completion searches use the connection-address comparator; the inconsistent representation is unresolved.
     void *attempts;
@@ -58,11 +58,11 @@ static int Gt2_CompareConnectionHandle(const void *a, const void *b);
 static void Gt2_OnSocketCreateError(GTI2Socket *unused);
 static void Gt2_OnClosed(GTI2Connection *addr, int reason);
 static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const void *message, int length);
-static void Gt2_OnPing(GTI2Connection *addr, u32 latencyMs);
-static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, BOOL reliable);
-static BOOL Gt2_OnUnknownMessage(GTI2Socket *unused, u32 ip, u16 port, const void *data, int len);
-static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u32 ip, u16 port, int elapsedMilliseconds,
-                                  const void *data, int len);
+static void Gt2_OnPing(GTI2Connection *addr, int latencyMs);
+static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, gsi_bool reliable);
+static gsi_bool Gt2_OnUnknownMessage(GTI2Socket *unused, gsi_u32 ip, gsi_u16 port, const void *data, int len);
+static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, gsi_u32 ip, gsi_u16 port,
+                                  int elapsedMilliseconds, const void *data, int len);
 
 // The one engine this build creates
 static GT2Engine sEngine;
@@ -168,7 +168,7 @@ static void Gt2_OnClosed(GTI2Connection *addr, int reason) {
     }
 
     key.handle = addr;
-    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionHandle, 0, FALSE);
+    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionHandle, 0, gsi_false);
     if (index != -1) {
         func_ov011_02171668(engine->connections, index);
     }
@@ -208,8 +208,8 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 
     if (reason == 2) {
         connKey.ip = func_ov011_0217d380(addr);
-        connKey.port = (u16)func_ov011_0217d384(addr);
-        index = func_ov011_021716ac(engine->connections, &connKey, Gt2_CompareConnectionAddr, 0, FALSE);
+        connKey.port = (gsi_u16)func_ov011_0217d384(addr);
+        index = func_ov011_021716ac(engine->connections, &connKey, Gt2_CompareConnectionAddr, 0, gsi_false);
         if (index != -1) {
             gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connect rejected by %s\n",
                           func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
@@ -222,8 +222,8 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
         GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
 
         attemptKey.ip = func_ov011_0217d380(addr);
-        attemptKey.port = (u16)func_ov011_0217d384(addr);
-        index = func_ov011_021716ac(pending->attempts, &attemptKey, Gt2_CompareConnectionAddr, 0, FALSE);
+        attemptKey.port = (gsi_u16)func_ov011_0217d384(addr);
+        index = func_ov011_021716ac(pending->attempts, &attemptKey, Gt2_CompareConnectionAddr, 0, gsi_false);
         if (index != -1) {
             if (pending->onAttemptResult != NULL) {
                 gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing connect result to message handler\n");
@@ -246,7 +246,7 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 }
 
 // Reports ping latency to the first pending connect with a ping callback, otherwise to the app
-static void Gt2_OnPing(GTI2Connection *addr, u32 latencyMs) {
+static void Gt2_OnPing(GTI2Connection *addr, int latencyMs) {
     GT2Engine *engine = Gt2_GetEngine();
     char buf[0x18];
     int i;
@@ -273,31 +273,31 @@ static void Gt2_OnPing(GTI2Connection *addr, u32 latencyMs) {
 
 // The callback for a received datagram; if its first 16 bytes match a pending connect's header, notifies
 // that connect's own handler, otherwise the app
-static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, BOOL reliable) {
+static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, gsi_bool reliable) {
     GT2Engine *engine = Gt2_GetEngine();
     char buf[0x18];
     GT2PendingConnect key;
     int index;
-    const u8 *src;
-    u8 *dest;
-    u32 n;
+    const gsi_u8 *src;
+    gsi_u8 *dest;
+    gsi_u32 n;
 
     gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Received data from %s\n",
                   func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     if (len >= 0x10) {
-        src = (const u8 *)data;
+        src = (const gsi_u8 *)data;
         dest = key.header;
         n = 0x10;
         do {
             *dest++ = *src++;
         } while (--n != 0);
-        index = func_ov011_021716ac(engine->pending, &key, Gt2_ComparePendingHeader, 0, FALSE);
+        index = func_ov011_021716ac(engine->pending, &key, Gt2_ComparePendingHeader, 0, gsi_false);
         if (index != -1) {
             GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, index);
             if (pending->onReceived != NULL) {
                 gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passed to message handler\n");
-                pending->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), (const u8 *)data + 0x10,
+                pending->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), (const gsi_u8 *)data + 0x10,
                                     len - 0x10, reliable, pending->userData);
                 return;
             }
@@ -311,44 +311,44 @@ static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, 
 }
 
 // Handles a datagram offered by the lower socket's unknown-message path; returns whether the app handled it
-static BOOL Gt2_OnUnknownMessage(GTI2Socket *unused, u32 ip, u16 port, const void *data, int len) {
+static gsi_bool Gt2_OnUnknownMessage(GTI2Socket *unused, gsi_u32 ip, gsi_u16 port, const void *data, int len) {
     GT2Engine *engine = Gt2_GetEngine();
     char buf[0x18];
-    BOOL handled;
+    gsi_bool handled;
 
     (void)unused;
     if (engine->onUnknownMessage == NULL) {
-        return FALSE;
+        return gsi_false;
     }
 
-    handled = FALSE;
+    handled = gsi_false;
     gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Unknown message from %s, passing to app\n",
                   func_ov011_0217ed14(ip, port, buf));
     if (engine->onUnknownMessage(ip, port, len, data, engine->userData) != 0) {
-        handled = TRUE;
+        handled = gsi_true;
     }
     return handled;
 }
 
 // The lower socket's incoming-attempt callback; auto-accepts when the first 16 data bytes match a pending
 // connect's init message, otherwise asks the app whether to accept it
-static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u32 ip, u16 port, int elapsedMilliseconds,
-                                  const void *data, int len) {
+static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, gsi_u32 ip, gsi_u16 port,
+                                  int elapsedMilliseconds, const void *data, int len) {
     GT2Engine *engine = Gt2_GetEngine();
     char buf[0x18];
     GT2Connection newConnection;
     GTI2ConnectionCallbacks table;
     int index;
     GT2PendingConnect key;
-    const u8 *src;
-    u8 *dest;
-    u32 n;
+    const gsi_u8 *src;
+    gsi_u8 *dest;
+    gsi_u32 n;
 
     (void)unused;
     gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s\n", func_ov011_0217ed14(ip, port, buf));
 
     if (len >= 0x10) {
-        src = (const u8 *)data;
+        src = (const gsi_u8 *)data;
         dest = key.initMessage;
         n = 0x10;
         do {
@@ -359,7 +359,7 @@ static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u3
         newConnection.port = port;
         newConnection.handle = handle;
         func_ov011_021715a4(engine->connections, &newConnection);
-        index = func_ov011_021716ac(engine->pending, &key, Gt2_CompareInitMessage, 0, FALSE);
+        index = func_ov011_021716ac(engine->pending, &key, Gt2_CompareInitMessage, 0, gsi_false);
         if (index != -1) {
             table.onClosed = Gt2_OnClosed;
             table.onReceived = Gt2_OnReceivedData;
@@ -384,12 +384,12 @@ static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u3
 }
 
 // Whether the engine was initialized
-BOOL Gt2_IsInitialized(void) {
+gsi_bool Gt2_IsInitialized(void) {
     return Gt2_GetEngine()->initialized;
 }
 
 // Creates the one engine, binding its socket to localPort
-int Gt2_CreateSocket(u16 localPort, int incomingBufferSize, int outgoingBufferSize, Gt2EventCallback onSocketError,
+int Gt2_CreateSocket(gsi_u16 localPort, int incomingBufferSize, int outgoingBufferSize, Gt2EventCallback onSocketError,
                      Gt2AttemptResultCallback onAttemptResult, Gt2ClosedCallback onClosed, Gt2PingCallback onPing,
                      Gt2ReceivedCallback onReceived, Gt2UnknownMessageCallback onUnknownMessage,
                      Gt2IncomingAttemptCallback onUnhandledAttempt, void *userData) {
@@ -435,9 +435,9 @@ int Gt2_CreateSocket(u16 localPort, int incomingBufferSize, int outgoingBufferSi
     func_ov011_0217d3a0(engine->socket, Gt2_OnUnknownMessage);
     func_ov011_0217d188(engine->socket, Gt2_OnIncomingAttempt);
     engine->localIp = func_ov011_0217d388(engine->socket);
-    engine->localPort = (u16)func_ov011_0217d38c(engine->socket);
+    engine->localPort = (gsi_u16)func_ov011_0217d38c(engine->socket);
     engine->pendingCount = 0;
-    engine->initialized = TRUE;
+    engine->initialized = gsi_true;
     if (userData != NULL) {
         engine->userData = userData;
     } else {
@@ -447,7 +447,7 @@ int Gt2_CreateSocket(u16 localPort, int incomingBufferSize, int outgoingBufferSi
 }
 
 // The lower-layer state of the connection to an address, written to *state
-int Gt2_GetConnectionState(u32 ip, u16 port, int *state) {
+int Gt2_GetConnectionState(gsi_u32 ip, gsi_u16 port, int *state) {
     GT2Engine *engine = Gt2_GetEngine();
     GT2Connection key;
     GT2Connection *conn;
@@ -461,7 +461,7 @@ int Gt2_GetConnectionState(u32 ip, u16 port, int *state) {
 
     key.ip = ip;
     key.port = port;
-    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, FALSE);
+    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, gsi_false);
     if (index == -1) {
         *state = 3;
         return 0;
@@ -472,16 +472,16 @@ int Gt2_GetConnectionState(u32 ip, u16 port, int *state) {
 }
 
 // Reuses a known connection or starts one through the lower layer, then associates it with a pending init message
-int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs) {
+int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u32 timeoutMs) {
     GT2Engine *engine = Gt2_GetEngine();
     char buf[0x18];
     GT2Connection key;
     GT2Connection *conn;
     GTI2ConnectionCallbacks table;
     GT2PendingConnect pendingKey;
-    const u8 *src;
-    u8 *dest;
-    u32 n;
+    const gsi_u8 *src;
+    gsi_u8 *dest;
+    gsi_u32 n;
     int index;
     int state;
 
@@ -496,7 +496,7 @@ int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs)
 
     key.ip = ip;
     key.port = port;
-    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, FALSE);
+    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, gsi_false);
     if (index != -1) {
         conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
         state = func_ov011_0217d364(conn->handle);
@@ -508,13 +508,13 @@ int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs)
             return 0;
         }
 
-        src = (const u8 *)initMessage;
+        src = (const gsi_u8 *)initMessage;
         dest = pendingKey.initMessage;
         n = 0x10;
         do {
             *dest++ = *src++;
         } while (--n != 0);
-        index = func_ov011_021716ac(engine->pending, &pendingKey, Gt2_CompareInitMessage, 0, FALSE);
+        index = func_ov011_021716ac(engine->pending, &pendingKey, Gt2_CompareInitMessage, 0, gsi_false);
         if (index == -1) {
             return 0;
         }
@@ -530,13 +530,13 @@ int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs)
     func_ov011_0217d1a0(engine->socket, &key.handle, buf, initMessage, 0x10, timeoutMs, &table, 0);
 
     func_ov011_021715a4(engine->connections, &key);
-    src = (const u8 *)initMessage;
+    src = (const gsi_u8 *)initMessage;
     dest = pendingKey.initMessage;
     n = 0x10;
     do {
         *dest++ = *src++;
     } while (--n != 0);
-    index = func_ov011_021716ac(engine->pending, &pendingKey, Gt2_CompareInitMessage, 0, FALSE);
+    index = func_ov011_021716ac(engine->pending, &pendingKey, Gt2_CompareInitMessage, 0, gsi_false);
     if (index != -1) {
         conn = (GT2Connection *)func_ov011_0217158c(engine->connections, func_ov011_02171588(engine->connections) - 1);
         func_ov011_021715a4(((GT2PendingConnect *)func_ov011_0217158c(engine->pending, index))->attempts, &conn);
@@ -547,7 +547,7 @@ int Gt2_OpenConnection(u32 ip, u16 port, const void *initMessage, u32 timeoutMs)
 }
 
 // Sends a message to the connection of an address, with a 16-byte header prepended
-int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size, BOOL reliable) {
+int Gt2_Send(gsi_u32 ip, gsi_u16 port, const void *header, const void *message, int size, gsi_bool reliable) {
     GT2Engine *engine = Gt2_GetEngine();
     GT2Connection key;
     char buf[0x18];
@@ -556,8 +556,8 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
     int index;
     int maxSize;
     int total;
-    const u8 *src;
-    u8 *dest;
+    const gsi_u8 *src;
+    gsi_u8 *dest;
     int n;
 
     if (engine->initialized == 0) {
@@ -569,7 +569,7 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
 
     key.ip = ip;
     key.port = port;
-    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, FALSE);
+    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, gsi_false);
     if (index == -1) {
         // BUG: The formatted address is computed but the format string has no %s to print it
 #ifdef BUGFIX
@@ -596,13 +596,13 @@ int Gt2_Send(u32 ip, u16 port, const void *header, const void *message, int size
 #else
     packet = gsimalloc(total);
 #endif
-    src = (const u8 *)header;
-    dest = (u8 *)packet;
+    src = (const gsi_u8 *)header;
+    dest = (gsi_u8 *)packet;
     n = 0x10;
     do {
         *dest++ = *src++;
     } while (--n != 0);
-    memcpy((u8 *)packet + 0x10, message, size);
+    memcpy((gsi_u8 *)packet + 0x10, message, size);
     index = func_ov011_0217d290(conn->handle, packet, total, reliable);
     gsifree(packet);
     return (index != 0) ? 8 : 0;
@@ -631,12 +631,12 @@ int Gt2_CloseSocket(void) {
     func_ov011_0217d158(engine->socket);
     func_ov011_02171558(engine->pending);
     func_ov011_02171558(engine->connections);
-    engine->initialized = FALSE;
+    engine->initialized = gsi_false;
     return 0;
 }
 
 // The engine's own bound local port
-u16 Gt2_GetLocalPort(void) {
+gsi_u16 Gt2_GetLocalPort(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
@@ -653,8 +653,8 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
     GT2Engine *engine = Gt2_GetEngine();
     GT2PendingConnect pending;
     void *attempts;
-    const u8 *src;
-    u8 *dest;
+    const gsi_u8 *src;
+    gsi_u8 *dest;
     int n;
 
     if (engine->initialized == 0) {
@@ -670,13 +670,13 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
         return 0xa;
     }
 
-    src = (const u8 *)initMessage;
+    src = (const gsi_u8 *)initMessage;
     dest = pending.initMessage;
     n = 0x10;
     do {
         *dest++ = *src++;
     } while (--n != 0);
-    src = (const u8 *)header;
+    src = (const gsi_u8 *)header;
     dest = pending.header;
     n = 0x10;
     do {
@@ -704,9 +704,9 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
 int Gt2_CancelConnect(const char *header) {
     GT2Engine *engine = Gt2_GetEngine();
     GT2PendingConnect key;
-    const u8 *src;
-    u8 *dest;
-    u32 n;
+    const gsi_u8 *src;
+    gsi_u8 *dest;
+    gsi_u32 n;
     int index;
 
     if (engine->initialized == 0) {
@@ -718,14 +718,14 @@ int Gt2_CancelConnect(const char *header) {
         return 0xa;
     }
 
-    src = (const u8 *)header;
+    src = (const gsi_u8 *)header;
     dest = key.header;
     n = 0x10;
     do {
         *dest++ = *src++;
     } while (--n != 0);
 
-    index = func_ov011_021716ac(engine->pending, &key, Gt2_ComparePendingHeader, 0, FALSE);
+    index = func_ov011_021716ac(engine->pending, &key, Gt2_ComparePendingHeader, 0, gsi_false);
     if (index != -1) {
         func_ov011_02171668(engine->pending, index);
     }
@@ -733,34 +733,34 @@ int Gt2_CancelConnect(const char *header) {
 }
 
 // Whether there are no pending connects left
-BOOL Gt2_IsIdle(void) {
+gsi_bool Gt2_IsIdle(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
         gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
-        return TRUE;
+        return gsi_true;
     }
     return func_ov011_02171588(engine->pending) == 0;
 }
 
 // Whether Gt2_CreateSocket was given none of its app-wide callbacks
-BOOL Gt2_HasNoAppCallbacks(void) {
+gsi_bool Gt2_HasNoAppCallbacks(void) {
     GT2Engine *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
         gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
-        return TRUE;
+        return gsi_true;
     }
     if (engine->onClosed != NULL || engine->onUnhandledAttempt != NULL || engine->onAttemptResult != NULL ||
         engine->onSocketError != NULL || engine->onPing != NULL || engine->onReceived != NULL ||
         engine->onUnknownMessage != NULL) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
 // Closes an established connection
-int Gt2_Close(u32 ip, u16 port) {
+int Gt2_Close(gsi_u32 ip, gsi_u16 port) {
     GT2Engine *engine = Gt2_GetEngine();
     GT2Connection key;
     GT2Connection *conn;
@@ -773,7 +773,7 @@ int Gt2_Close(u32 ip, u16 port) {
 
     key.ip = ip;
     key.port = port;
-    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, FALSE);
+    index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, gsi_false);
     if (index != -1) {
         conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
         return func_ov011_0217d394(conn->handle);
@@ -782,8 +782,8 @@ int Gt2_Close(u32 ip, u16 port) {
 }
 
 // A wide-character string's length
-int Gt2_WStrLen(const u16 *str) {
-    const u16 *p = str;
+int Gt2_WStrLen(const gsi_u16 *str) {
+    const gsi_u16 *p = str;
 
     while (*p++ != 0) {
     }

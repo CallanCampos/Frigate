@@ -15,13 +15,13 @@
 // GameSpy's later SDK, are in dwc/gp.h
 
 static int gpiSendAuthBuddyRequest(GPConnection *connection, GPIProfile *profile);
-static BOOL gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data);
+static gsi_bool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data);
 
 // Swaps the bytes of an address or a port from the server's order to the network's
-#define GPI_HTONL(x) (((x) << 24 & 0xff000000) | (((x) << 8 & 0xff0000) | ((u8)((x) >> 24) | ((x) >> 8 & 0xff00))))
+#define GPI_HTONL(x) (((x) << 24 & 0xff000000) | (((x) << 8 & 0xff0000) | ((gsi_u8)((x) >> 24) | ((x) >> 8 & 0xff00))))
 
-static inline u16 gpiHtons(u16 x) {
-    return (u16)((u8)(x >> 8) | (x << 8 & 0xff00));
+static inline gsi_u16 gpiHtons(gsi_u16 x) {
+    return (gsi_u16)((gsi_u8)(x >> 8) | (x << 8 & 0xff00));
 }
 
 // What a message that doesn't make sense gives
@@ -55,7 +55,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
     char strTemp[0x100];
     int type;
     int profileid;
-    u32 date;
+    gsi_u32 date;
     int result;
     char *str;
 
@@ -270,7 +270,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
             if (!gpiValueForKey(buffer, "|ip|", intValue, 0x10)) {
                 buddyStatus->ip = 0;
             } else {
-                buddyStatus->ip = GPI_HTONL((u32)atol(intValue));
+                buddyStatus->ip = GPI_HTONL((gsi_u32)atol(intValue));
             }
             if (!gpiValueForKey(buffer, "|p|", intValue, 0x10)) {
                 buddyStatus->port = 0;
@@ -356,7 +356,7 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
     GPRecvBuddyStatusArg *arg;
     char buffer[0x400];
     int profileid;
-    u32 date;
+    gsi_u32 date;
     GPIConnection *iconnection;
 
     iconnection = *connection;
@@ -400,7 +400,7 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
         if (!gpiValueForKey(input, "\\bip\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->buddyIp = GPI_HTONL((u32)atol(buffer));
+        buddyStatusInfo->buddyIp = GPI_HTONL((gsi_u32)atol(buffer));
         if (!gpiValueForKey(input, "\\bport\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
@@ -408,11 +408,11 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
         if (!gpiValueForKey(input, "\\hostip\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->hostIp = GPI_HTONL((u32)atol(buffer));
+        buddyStatusInfo->hostIp = GPI_HTONL((gsi_u32)atol(buffer));
         if (!gpiValueForKey(input, "\\hprivip\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
-        buddyStatusInfo->hostPrivateIp = GPI_HTONL((u32)atol(buffer));
+        buddyStatusInfo->hostPrivateIp = GPI_HTONL((gsi_u32)atol(buffer));
         if (!gpiValueForKey(input, "\\qport\\", buffer, 0x400)) {
             GPI_BAD_MESSAGE(connection);
         }
@@ -487,12 +487,12 @@ int gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
     char buffer[0x200];
     int index;
     int i;
-    u32 j;
+    gsi_u32 j;
     const char *list;
 
     index = 0;
     iconnection = *connection;
-    if (gpiCheckForError(connection, input, TRUE)) {
+    if (gpiCheckForError(connection, input, gsi_true)) {
         return 4;
     }
     if (!gpiValueForKeyWithIndex(input, "\\bdy\\", &index, buffer, 0x200)) {
@@ -528,7 +528,7 @@ int gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
         memset(profile->buddyStatus, 0, sizeof(GPIBuddyStatus));
         profile->buddyStatus->buddyIndex = iconnection->profileList.numBuddies++;
         profile->buddyStatus->status = 0;
-        gpiSetBuddyDeleted(connection, profileid, FALSE);
+        gpiSetBuddyDeleted(connection, profileid, gsi_false);
     }
     return 0;
 }
@@ -565,7 +565,7 @@ int gpiSendBuddyMessage(GPConnection *connection, int profileid, int type, const
             }
             return gpiSendServerBuddyMessage(connection, profileid, type, message);
         }
-        peer = gpiAddPeer(connection, profileid, TRUE);
+        peer = gpiAddPeer(connection, profileid, gsi_true);
         if (peer == NULL) {
             return 1;
         }
@@ -767,7 +767,7 @@ int gpiAuthBuddyRequest(GPConnection *connection, int profile) {
 }
 
 // Moves down the buddy indexes after the one of a deleted buddy (data)
-static BOOL gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data) {
+static gsi_bool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data) {
     int baseIndex = (int)data;
 
     if (profile->buddyStatus != NULL && profile->buddyStatus->buddyIndex > baseIndex) {
@@ -775,10 +775,10 @@ static BOOL gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, vo
     } else if (profile->buddyStatusInfo != NULL && profile->buddyStatusInfo->buddyIndex > baseIndex) {
         profile->buddyStatusInfo->buddyIndex--;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest) {
+int gpiDeleteBuddy(GPConnection *connection, int profile, gsi_bool sendServerRequest) {
     GPIConnection *iconnection = *connection;
     GPIProfile *pProfile;
     GPIBuddyStatus *buddyStatus;
@@ -789,7 +789,7 @@ int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest
         gpiSetErrorString(connection, "Invalid profile.");
         return 2;
     }
-    if (sendServerRequest == TRUE) {
+    if (sendServerRequest == gsi_true) {
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\delbuddy\\");
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\sesskey\\");
         gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->sessKey);
@@ -797,7 +797,7 @@ int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest
         gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, pProfile->profileId);
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
     }
-    gpiSetBuddyDeleted(connection, profile, TRUE);
+    gpiSetBuddyDeleted(connection, profile, gsi_true);
     buddyStatus = pProfile->buddyStatus;
     if (buddyStatus != NULL) {
         index = buddyStatus->buddyIndex;
@@ -844,7 +844,7 @@ int gpiDeleteBuddy(GPConnection *connection, int profile, BOOL sendServerRequest
     return 0;
 }
 
-int gpiSetBuddyDeleted(GPConnection *connection, int profile, BOOL deleted) {
+int gpiSetBuddyDeleted(GPConnection *connection, int profile, gsi_bool deleted) {
     GPIProfile *pProfile;
 
     if (profile <= 0) {

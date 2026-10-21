@@ -1,9 +1,9 @@
 #ifndef POKEBW2_DWC_GSTATS_H
 #define POKEBW2_DWC_GSTATS_H
 
-#include "types.h"
 #include "dwc/darray.h"
 #include "dwc/gbucket.h"
+#include "dwc/nonport.h"
 
 // GameSpy's stats and persistent data (gstats.c), in overlay 11: the connection to the stats server
 // ("gamestats.gs.nintendowifi.net"), whose messages are texts of "\key\value" pairs scrambled with a key and ended by
@@ -19,7 +19,7 @@ extern char StatsServerHostname[64];
 typedef struct StatsGame {
     int connid;
     int sesskey;
-    BOOL usebuckets;
+    gsi_bool usebuckets;
     GBucketSet *buckets;
     char challenge[9];
     DArray *playernums; // of int
@@ -37,9 +37,9 @@ extern BucketFunc bucketfuncs[7];
 extern void *bopfuncs[3][3];
 
 void CloseStatsConnection(void);
-BOOL IsStatsConnected(void);
-// Reads and handles what the server sent; returns FALSE once the connection is closed or not set up
-BOOL PersistThink(void);
+gsi_bool IsStatsConnected(void);
+// Reads and handles what the server sent; returns gsi_false once the connection is closed or not set up
+gsi_bool PersistThink(void);
 // The index of a team's or a player's buckets in the game
 int GetTeamIndex(StatsGame *game, int tnum);
 int GetPlayerIndex(StatsGame *game, int pnum);

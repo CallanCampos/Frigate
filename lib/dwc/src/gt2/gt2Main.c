@@ -30,7 +30,7 @@ void func_ov011_0217d188(GTI2Socket *socket, GTI2ConnectAttemptCallback callback
     gti2Listen(socket, callback);
 }
 
-BOOL func_ov011_0217d190(GTI2Connection *connection, const GTI2ConnectionCallbacks *callbacks) {
+gsi_bool func_ov011_0217d190(GTI2Connection *connection, const GTI2ConnectionCallbacks *callbacks) {
     return gti2AcceptConnection(connection, callbacks);
 }
 
@@ -39,12 +39,12 @@ void func_ov011_0217d198(GTI2Connection *connection, const void *message, int le
 }
 
 int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const char *remoteAddress, const void *message,
-                        int length, u32 timeout, const GTI2ConnectionCallbacks *callbacks, BOOL blocking) {
+                        int length, gsi_u32 timeout, const GTI2ConnectionCallbacks *callbacks, gsi_bool blocking) {
     GTI2Connection *created;
-    u32 ip;
-    u16 port;
+    gsi_u32 ip;
+    gsi_u16 port;
     int result;
-    BOOL done;
+    gsi_bool done;
 
     if (!gt2StringToAddress(remoteAddress, &ip, &port) || ip == 0 || port == 0) {
         return 4;
@@ -84,16 +84,16 @@ int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const c
     return created->result;
 }
 
-int func_ov011_0217d290(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+int func_ov011_0217d290(GTI2Connection *connection, const void *message, int length, gsi_bool reliable) {
     if (connection->state != 5) {
         return 8;
     }
     gti2MessageCheck(&message, &length);
     // A reliable message of protocol 2 starts with its own length, copied out as it may be unaligned
     if (reliable && connection->socket->protocol == 2) {
-        u16 size;
-        u8 *dest = (u8 *)&size;
-        const u8 *src = message;
+        gsi_u16 size;
+        gsi_u8 *dest = (gsi_u8 *)&size;
+        const gsi_u8 *src = message;
 
         dest[0] = src[0];
         dest[1] = src[1];
@@ -112,7 +112,7 @@ int func_ov011_0217d290(GTI2Connection *connection, const void *message, int len
 }
 
 void gt2CloseConnectionHard(GTI2Connection *connection) {
-    gti2CloseConnection(connection, TRUE);
+    gti2CloseConnection(connection, gsi_true);
 }
 
 static void gti2CloseAllConnectionsHardMap(void *element, void *clientData) {
@@ -136,19 +136,19 @@ int func_ov011_0217d364(GTI2Connection *connection) {
     return 3;
 }
 
-u32 func_ov011_0217d380(GTI2Connection *connection) {
+gsi_u32 func_ov011_0217d380(GTI2Connection *connection) {
     return connection->ip;
 }
 
-u16 func_ov011_0217d384(GTI2Connection *connection) {
+gsi_u16 func_ov011_0217d384(GTI2Connection *connection) {
     return connection->port;
 }
 
-u32 func_ov011_0217d388(GTI2Socket *socket) {
+gsi_u32 func_ov011_0217d388(GTI2Socket *socket) {
     return socket->ip;
 }
 
-u16 func_ov011_0217d38c(GTI2Socket *socket) {
+gsi_u16 func_ov011_0217d38c(GTI2Socket *socket) {
     return socket->port;
 }
 

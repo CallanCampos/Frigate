@@ -131,7 +131,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
     int count;
     int listSize;
 
-    if (gsXmlMoveToChild(request->response, "values") == FALSE) {
+    if (gsXmlMoveToChild(request->response, "values") == gsi_false) {
         return SAKE_RESULT_MALFORMED_RESPONSE;
     }
     count = gsXmlCountChildren(request->response, "ArrayOfRecordValue");
@@ -148,7 +148,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
     memset(list, 0, listSize);
     *records = list;
     for (i = 0; i < *recordNum; i++) {
-        if (gsXmlMoveToNext(request->response, "ArrayOfRecordValue") == FALSE) {
+        if (gsXmlMoveToNext(request->response, "ArrayOfRecordValue") == gsi_false) {
             return SAKE_RESULT_MALFORMED_RESPONSE;
         }
         record = gsimalloc(fieldNum * sizeof(SakeField));
@@ -164,13 +164,13 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
             SakeField *field = &record[j];
 
             field->name = fieldNames[j];
-            if (gsXmlMoveToNext(request->response, "RecordValue") == FALSE) {
+            if (gsXmlMoveToNext(request->response, "RecordValue") == gsi_false) {
                 return SAKE_RESULT_MALFORMED_RESPONSE;
             }
             if (gsXmlMoveToChild(request->response, "byteValue")) {
                 int value;
 
-                if (gsXmlReadChildAsInt(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt(request->response, "value", &value) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_BYTE;
@@ -178,7 +178,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
             } else if (gsXmlMoveToChild(request->response, "shortValue")) {
                 int value;
 
-                if (gsXmlReadChildAsInt(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt(request->response, "value", &value) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_SHORT;
@@ -186,15 +186,15 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
             } else if (gsXmlMoveToChild(request->response, "intValue")) {
                 int value;
 
-                if (gsXmlReadChildAsInt(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt(request->response, "value", &value) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_INT;
                 field->value.intValue = value;
             } else if (gsXmlMoveToChild(request->response, "int64Value")) {
-                s64 value;
+                gsi_i64 value;
 
-                if (gsXmlReadChildAsInt64(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsInt64(request->response, "value", &value) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_INT64;
@@ -202,7 +202,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
             } else if (gsXmlMoveToChild(request->response, "floatValue")) {
                 float value;
 
-                if (gsXmlReadChildAsFloat(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsFloat(request->response, "value", &value) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_FLOAT;
@@ -211,7 +211,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 char *text;
                 int length;
 
-                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == FALSE) {
+                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
@@ -224,9 +224,9 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
             } else if (gsXmlMoveToChild(request->response, "unicodeStringValue")) {
                 char *text;
                 int length;
-                u16 *wide;
+                gsi_u16 *wide;
 
-                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == FALSE) {
+                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
@@ -243,23 +243,23 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
             } else if (gsXmlMoveToChild(request->response, "booleanValue")) {
                 char *text;
                 int length;
-                BOOL value;
+                gsi_bool value;
 
-                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == FALSE) {
+                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
                     text[length] = '\0';
                     value = strcmp(text, "true") == 0;
                 } else {
-                    value = FALSE;
+                    value = gsi_false;
                 }
                 field->type = SAKE_FIELD_BOOLEAN;
                 field->value.booleanValue = value;
             } else if (gsXmlMoveToChild(request->response, "dateAndTimeValue")) {
                 int value;
 
-                if (gsXmlReadChildAsDateTimeElement(request->response, "value", &value) == FALSE) {
+                if (gsXmlReadChildAsDateTimeElement(request->response, "value", &value) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 field->type = SAKE_FIELD_DATE_AND_TIME;
@@ -268,7 +268,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 void *data;
                 int length;
 
-                if (gsXmlReadChildAsBase64Binary(request->response, "value", NULL, &length) == FALSE) {
+                if (gsXmlReadChildAsBase64Binary(request->response, "value", NULL, &length) == gsi_false) {
                     return SAKE_RESULT_MALFORMED_RESPONSE;
                 }
                 if (length > 0) {
@@ -276,7 +276,7 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                     if (data == NULL) {
                         return SAKE_RESULT_OUT_OF_MEMORY;
                     }
-                    if (gsXmlReadChildAsBase64Binary(request->response, "value", data, &length) == FALSE) {
+                    if (gsXmlReadChildAsBase64Binary(request->response, "value", data, &length) == gsi_false) {
                         gsifree(data);
                         return SAKE_RESULT_MALFORMED_RESPONSE;
                     }

@@ -4,12 +4,12 @@
 
 // GameSpy GP's helpers (gpiUtility.c). The functions' names, from pret/pokerevo's Wii build, are in dwc/gp.h
 
-void strzcpy(char *dest, const char *src, u32 len) {
+void strzcpy(char *dest, const char *src, gsi_u32 len) {
     strncpy(dest, src, len);
     *(dest + len - 1) = '\0';
 }
 
-BOOL gpiCheckForError(GPConnection *connection, const char *input, BOOL callErrorCallback) {
+gsi_bool gpiCheckForError(GPConnection *connection, const char *input, gsi_bool callErrorCallback) {
     char buffer[16];
     GPIConnection *iconnection = *connection;
 
@@ -24,12 +24,12 @@ BOOL gpiCheckForError(GPConnection *connection, const char *input, BOOL callErro
             int fatal = strstr(input, "\\fatal\\") != NULL ? 1 : 0;
             gpiCallErrorCallback(connection, 4, fatal ? 1 : 0);
         }
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-BOOL gpiValueForKeyWithIndex(const char *command, const char *key, int *index, char *value, int len) {
+gsi_bool gpiValueForKeyWithIndex(const char *command, const char *key, int *index, char *value, int len) {
     const char *start;
     const char *found;
     char delimiter = key[0];
@@ -39,7 +39,7 @@ BOOL gpiValueForKeyWithIndex(const char *command, const char *key, int *index, c
     start = command += *index;
     found = strstr(command, key);
     if (found == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     found += strlen(key);
     len--;
@@ -49,10 +49,10 @@ BOOL gpiValueForKeyWithIndex(const char *command, const char *key, int *index, c
     }
     value[i] = '\0';
     *index += (found - start) + strlen(value);
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) {
+gsi_bool gpiValueForKey(const char *command, const char *key, char *value, int len) {
     const char *found;
     char delimiter = key[0];
     int c;
@@ -60,7 +60,7 @@ BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) 
 
     found = strstr(command, key);
     if (found == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     found += strlen(key);
     len--;
@@ -69,7 +69,7 @@ BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) 
         i++;
     }
     value[i] = '\0';
-    return TRUE;
+    return gsi_true;
 }
 
 int gpiCheckSocketConnect(GPConnection *connection, int sock, int *state) {
@@ -155,8 +155,8 @@ void gpiSetErrorString(GPConnection *connection, const char *errorString) {
 
 void gpiEncodeString(const char *unencodedString, char *encodedString) {
     char scrambled[32];
-    u32 i;
-    u32 length;
+    gsi_u32 i;
+    gsi_u32 length;
     char key;
 
     length = strlen(unencodedString);
