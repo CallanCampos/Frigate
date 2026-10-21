@@ -273,6 +273,13 @@ in both versions.
   initialized object of up to 4 bytes defined after the names, which the ROM's `.data` and `.bss` don't have room for:
   most likely the later SDK's `qr2_internal_key_list`, whose code the linker stripped. The file stays incomplete.
 
+- `lib/nitro/src/syscall/secure_area.c` (ARM9 main), NitroSDK's system call library at `0x02004000` to `0x02004800`,
+  matches its 18 BIOS stubs in both versions, but it can't be linked: Nintendo builds the library for each game, with
+  the stubs at their own places among filler bytes (in another order in each version), and the filler is the base
+  ROM's, which the file doesn't write. MWCC also starts each function at a multiple of 4 bytes, where 11 of the stubs in
+  Black 2 and 7 in White 2 start 2 bytes past one, and its assembler has `dcb` and `dcd` but no way to give a function
+  a second entry point. The file stays incomplete.
+
 ## Keeping this list current
 
 After changing a source file, run `compiler_probe.py` on it for both versions, and add, update or remove its rows. A file

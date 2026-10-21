@@ -2542,3 +2542,6 @@ lib/msl/src/runtime/global_destructor_chain.c:
     complete
     .text       start:0x0208ee08 end:0x0208ee28
     .bss        start:0x0214f4f8 end:0x0214f500
+
+lib/nitro/src/syscall/secure_area.c:
+    .text       start:0x02004000 end:0x02004800
