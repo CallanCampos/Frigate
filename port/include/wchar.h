@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wctype.h>
+#ifdef _WIN32
+// SDL includes MinGW intrinsics after this header; read their wide declarations before enforcing the DS boundary.
+#include <intrin.h>
+#endif
 size_t port_msl_wcslen(const wchar_t *s);
 wchar_t *port_msl_wcscpy(wchar_t *dst, const wchar_t *src);
 // Fail explicitly for unsupported host wide APIs, including on Windows, to keep one DS ABI everywhere.

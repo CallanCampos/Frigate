@@ -60,7 +60,8 @@ level that doesn't exist yet says "not yet"; no field is left out.
   now use private host names after including the host string header, preserving their signed bounds. GameStats, ND and SSL
   use the native string declarations on hosts while MWCC retains its original explicit declarations
   ([game changes](game-changes.md)); all 16 including file/version pairs preprocess identically to upstream
-  (`/tmp/frigate-winfix-all-neutral.log`).
+  (`/tmp/frigate-winfix-all-neutral.log`). MinGW intrinsic declarations are also read before the unsupported-wide-API
+  poison, so later SDL headers can declare their intrinsics without exposing those APIs to game calls.
 - **Next:** size the external field heap for host allocations, then repeat extended entry, CONTINUE, real menus
   and differential checks before claiming a playable field; follow up numeric-width and deferred hardware paths.
 - **Blockers:** field C is present, but the fixed 64 KiB external field heap cannot hold weather and place-name
