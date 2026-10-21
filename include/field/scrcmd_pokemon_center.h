@@ -12,7 +12,7 @@ BOOL PokemonCenterCmd_FindEarnedMedal(VM *vm, FieldScriptEnv *env);
 BOOL PokemonCenterCmd_GetMatchState(VM *vm, FieldScriptEnv *env);
 BOOL PokemonCenterCmd_SetMatchInProgress(VM *vm, FieldScriptEnv *env);
 BOOL PokemonCenterCmd_ClearMatchInProgress(VM *vm, FieldScriptEnv *env);
-BOOL func_ov065_021e65dc(VM *vm, FieldScriptEnv *env);
+BOOL PokemonCenterCmd_SetMatchState(VM *vm, FieldScriptEnv *env);
 BOOL PokemonCenterCmd_AddBattlePoints(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_SCRCMD_POKEMON_CENTER_H

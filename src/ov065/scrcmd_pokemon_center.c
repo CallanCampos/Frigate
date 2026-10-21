@@ -662,12 +662,12 @@ static BOOL PokemonCenter_CheckStrengthRocks(MedalCheckContext *ctx, GameData *g
     return PokemonCenter_MeetsThreshold(CountMovedStrengthRocks(GameData_GetMMSys(gameData)), threshold);
 }
 
-static BOOL func_ov065_021e6280(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckPassersby(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     return PokemonCenter_MeetsThreshold(
         TrainerCard_GetPasserbyCount(getTrainerCardData_wrapper(GameData_GetSaveControl(gameData))), threshold);
 }
 
-static BOOL func_ov065_021e629c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckLinkBattles(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     u32 sum = 0;
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
 
@@ -677,7 +677,7 @@ static BOOL func_ov065_021e629c(MedalCheckContext *ctx, GameData *gameData, u32 
     return PokemonCenter_MeetsThreshold(sum, threshold);
 }
 
-static BOOL func_ov065_021e62d4(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckLinkTrades(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     u32 sum = 0;
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
 
@@ -688,7 +688,8 @@ static BOOL func_ov065_021e62d4(MedalCheckContext *ctx, GameData *gameData, u32 
 }
 
 // These checks count flags, and the ones that ignore the threshold need them all
-static BOOL func_ov065_021e630c(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_HasFoundAllHiddenGrottoes(MedalCheckContext *ctx, GameData *gameData, u32 threshold,
+                                                    HeapID heapId) {
     const u32 flags[] = {
         0xa50, 0xa51, 0xa52, 0xa53, 0xa54, 0xa55, 0xa56, 0xa57, 0xa58, 0xa59,
         0xa5a, 0xa5b, 0xa5c, 0xa5d, 0xa5e, 0xa5f, 0xa60, 0xa61, 0xa62, 0xa63,
@@ -698,7 +699,8 @@ static BOOL func_ov065_021e630c(MedalCheckContext *ctx, GameData *gameData, u32 
         PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
-static BOOL func_ov065_021e6340(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckTrainerTipsSigns(MedalCheckContext *ctx, GameData *gameData, u32 threshold,
+                                                HeapID heapId) {
     const u32 flags[] = {
         0xa64, 0xa65, 0xa66, 0xa67, 0xa68, 0xa69, 0xa6a, 0xa6b, 0xa6c,
         0xa6d, 0xa6e, 0xa6f, 0xa70, 0xa71, 0xa72, 0xa73, 0xa74, 0xa75,
@@ -708,14 +710,16 @@ static BOOL func_ov065_021e6340(MedalCheckContext *ctx, GameData *gameData, u32 
         PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), threshold);
 }
 
-static BOOL func_ov065_021e6374(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_HasHeardAllAnvilleTrains(MedalCheckContext *ctx, GameData *gameData, u32 threshold,
+                                                   HeapID heapId) {
     const u32 flags[] = { 0xa76, 0xa77, 0xa78, 0xa79, 0xa7a, 0xa7b, 0xa7c, 0xa7d, 0xa7e, 0xa7f };
 
     return PokemonCenter_MeetsThreshold(
         PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
-static BOOL func_ov065_021e63a8(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_HasVisitedAllBridges(MedalCheckContext *ctx, GameData *gameData, u32 threshold,
+                                               HeapID heapId) {
     const u32 flags[] = { 0x9bd, 0x9be, 0x9bf };
 
     return PokemonCenter_MeetsThreshold(
@@ -742,7 +746,8 @@ static BOOL PokemonCenter_HasVisitedAllTowns(MedalCheckContext *ctx, GameData *g
         PokemonCenter_CountSetFlags(flags, GameData_GetEventWork(gameData), NELEMS(flags)), NELEMS(flags));
 }
 
-static BOOL func_ov065_021e6410(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckMemoryLinkEvents(MedalCheckContext *ctx, GameData *gameData, u32 threshold,
+                                                HeapID heapId) {
     const u32 works[] = { 0x4045, 0x4046, 0x4047, 0x4048, 0x4049, 0x404a, 0x404b, 0x404c };
     u32 i;
     u32 count = 0;
@@ -756,7 +761,7 @@ static BOOL func_ov065_021e6410(MedalCheckContext *ctx, GameData *gameData, u32 
     return PokemonCenter_MeetsThreshold(count, threshold);
 }
 
-static BOOL func_ov065_021e6468(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckDailyExp(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
     u32 a = RecordGet(records, 0x1a);
     u32 b = RecordGet(records, 0x1b);
@@ -767,7 +772,7 @@ static BOOL func_ov065_021e6468(MedalCheckContext *ctx, GameData *gameData, u32 
     return PokemonCenter_MeetsThreshold(b, threshold);
 }
 
-static BOOL func_ov065_021e64a0(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
+static BOOL PokemonCenter_CheckDailyCatches(MedalCheckContext *ctx, GameData *gameData, u32 threshold, HeapID heapId) {
     GameRecords *records = getTrainerCardInfoBlkAddress(GameData_GetSaveControl(gameData));
     u32 a = RecordGet(records, 0x53);
     u32 b = RecordGet(records, 0x54);
@@ -836,7 +841,8 @@ BOOL PokemonCenterCmd_ClearMatchInProgress(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov065_021e65dc(VM *vm, FieldScriptEnv *env) {
+// Action 4 sets the value that PokemonCenterCmd_GetMatchState's info 4 returns, and action 5 counts record 0x35
+BOOL PokemonCenterCmd_SetMatchState(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     RecordSave *record = getRecordBlkAddress(save);
@@ -876,7 +882,7 @@ static MedalCheck sMedalChecks[] = {
     NULL,
     NULL,
     NULL,
-    func_ov065_021e6340,
+    PokemonCenter_CheckTrainerTipsSigns,
     NULL,
     PokemonCenter_IsType0Caught,
     PokemonCenter_IsType9Caught,
@@ -898,29 +904,29 @@ static MedalCheck sMedalChecks[] = {
     NULL,
     NULL,
     PokemonCenter_CheckBoxCount,
-    func_ov065_021e64a0,
+    PokemonCenter_CheckDailyCatches,
     NULL,
     PokemonCenter_CheckStrengthRocks,
-    func_ov065_021e6280,
-    func_ov065_021e630c,
+    PokemonCenter_CheckPassersby,
+    PokemonCenter_HasFoundAllHiddenGrottoes,
     PokemonCenter_HasNPokemon,
     PokemonCenter_HasRare,
     PokemonCenter_HasPokerus,
     NULL,
-    func_ov065_021e6374,
+    PokemonCenter_HasHeardAllAnvilleTrains,
     NULL,
     NULL,
     NULL,
     NULL,
     NULL,
-    func_ov065_021e63a8,
+    PokemonCenter_HasVisitedAllBridges,
     PokemonCenter_HasVisitedAllTowns,
     PokemonCenter_CheckCategory0,
-    func_ov065_021e629c,
+    PokemonCenter_CheckLinkBattles,
     PokemonCenter_CheckSingleStreak,
     PokemonCenter_CheckDoubleStreak,
     PokemonCenter_CheckMultiStreak,
-    func_ov065_021e6468,
+    PokemonCenter_CheckDailyExp,
     NULL,
     NULL,
     NULL,
@@ -940,7 +946,7 @@ static MedalCheck sMedalChecks[] = {
     NULL,
     NULL,
     PokemonCenter_CheckCategory1,
-    func_ov065_021e62d4,
+    PokemonCenter_CheckLinkTrades,
     NULL,
     PokemonCenter_HasAllMusicalProps,
     PokemonCenter_CheckFriendCount,
@@ -968,7 +974,7 @@ static MedalCheck sMedalChecks[] = {
     NULL,
     NULL,
     NULL,
-    func_ov065_021e6410,
+    PokemonCenter_CheckMemoryLinkEvents,
     PokemonCenter_CheckCategory2,
     NULL,
     NULL,
