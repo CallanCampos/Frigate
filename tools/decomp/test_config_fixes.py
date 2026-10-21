@@ -21,7 +21,7 @@ class FakeMapper:
                           (MODULE, 0x5010, "w2_us"): 0x6010}
         self.error = None
 
-    def map(self, module, addr, version):
+    def map(self, module, addr, version, section=None):
         self.calls.append((module, addr, version))
         if self.error:
             raise SystemExit(self.error)
@@ -216,7 +216,7 @@ class OrphanRelocationTests(ConfigFixFixture):
         self.assertEqual(self.mapper.calls, [(".", SOURCE, "w2_us")])
 
     def test_add_reloc_source_mapping_failure_after_destination_map_prevents_primary_mutation(self):
-        def mapping(module, addr, version):
+        def mapping(module, addr, version, section=None):
             if module == MODULE:
                 raise SystemExit("source mapping failed")
             return MAPPED

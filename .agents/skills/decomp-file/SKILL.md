@@ -123,6 +123,8 @@ file.
 .venv/bin/python tools/decomp/add_source_file.py src/ov033/x.c overlays/ov033 .text:0x...-0x... .rodata:... .data:... --incomplete
 ```
 
+If the tool can't place a range in White 2 (the anchors around one end disagree), it names both candidates: find the
+range in White 2's symbols and pass it with `--other-range w2_us:.text:0x...-0x...`. Never edit `delinks.txt` by hand.
 Leave out `--incomplete` only when everything matches; `mark_complete.py` is safer later (see finish-file). Run
 `python3 configure.py` after adding a file, since `build.ninja` lists the sources.
 

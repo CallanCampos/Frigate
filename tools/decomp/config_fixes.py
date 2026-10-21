@@ -2,9 +2,9 @@
 """Fix relocations and symbols that dsd's analysis gets wrong, in every version, and keep the fixes across config
 regeneration.
 
-Each fix is recorded in config/fixes.txt by module and address in the primary version. The address in the other
-versions is found through the function containing it, which must be paired in the version map, or else by its offset
-from the start of its section, which must have the same size in every version. regenerate_configs.py runs `apply`
+Each fix is recorded in config/fixes.txt by module and address in the primary version. version_addresses.py places the
+address in the other versions: through the function containing it, which must be paired in the version map, or else
+from the paired functions and section edges around it when they agree on its place. regenerate_configs.py runs `apply`
 after importing names from swan.
 
     config_fixes.py reloc-module overlays/ov035 'overlay(12)' 0x0217c9e8    # an ambiguous destination module
@@ -24,16 +24,15 @@ after importing names from swan.
     config_fixes.py apply
 """
 import argparse
-import csv
 import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.decomp.dsd_config import ROOT, config_lock, load_modules, parse_sections, reloc_module_names  # noqa: E402
+from tools.decomp.version_addresses import (  # noqa: E402
+    OTHERS, PRIMARY, ModulePlacer, Unplaced, function_ends, load_pairs)
 
-PRIMARY = "b2_us"
-OTHERS = ["w2_us"]
 FIXES = ROOT / "config" / "fixes.txt"
 MAP = ROOT / "build" / "version_map.tsv"
 HEADER = (
@@ -45,41 +44,31 @@ SYMBOL_ADDR_RE = re.compile(r" addr:(0x[0-9a-f]+)")
 
 
 class AddressMapper:
-    """Maps an address in the primary version to the other versions."""
+    """Maps an address in the primary version to the other versions, through version_addresses.py."""
 
     def __init__(self):
-        self.pairs: dict[str, dict[tuple[str, int], int]] = {other: {} for other in OTHERS}
-        with MAP.open() as f:
-            for row in csv.DictReader(f, delimiter="\t"):
-                for other in OTHERS:
-                    key = (row["module"], int(row[f"{PRIMARY}_addr"], 16))
-                    self.pairs[other][key] = int(row[f"{other}_addr"], 16)
+        self.pairs = {other: load_pairs(MAP, other) for other in OTHERS}
         self.functions = {name: module.functions() for name, module in load_modules(PRIMARY).items()}
+        self.other_functions: dict[tuple[str, str], dict[int, int]] = {}
 
-    def map(self, module: str, addr: int, other: str) -> int:
-        pairs = self.pairs[other]
-        function = next((f for f in self.functions[module] if f.addr <= addr < f.addr + (f.size or 0)), None)
-        if function is not None and (module, function.addr) in pairs:
-            return pairs[(module, function.addr)] + addr - function.addr
-        # Between functions, such as in padding, or in a function the version map doesn't pair, such as one a fix added:
-        # through the nearest paired functions on either side, if they are the same distance apart in both versions
-        paired = [f.addr for f in self.functions[module] if (module, f.addr) in pairs]
-        before = max((a for a in paired if a <= addr), default=None)
-        after = min((a for a in paired if a > addr), default=None)
-        if before is not None and after is not None:
-            if pairs[(module, after)] - pairs[(module, before)] == after - before:
-                return pairs[(module, before)] + addr - before
-        if function is not None:
-            sys.exit(f"{module} {addr:#010x}: function {function.name} is not paired with {other}")
-        primary_sections = parse_sections(config_dir(PRIMARY, module) / "delinks.txt")
-        other_sections = parse_sections(config_dir(other, module) / "delinks.txt")
-        for name, (start, end) in primary_sections.items():
-            if start <= addr < end:
-                other_start, other_end = other_sections[name]
-                if end - start != other_end - other_start:
-                    sys.exit(f"{module} {addr:#010x}: {name} has different sizes in {PRIMARY} and {other}")
-                return other_start + addr - start
-        sys.exit(f"{module} {addr:#010x} is in no section")
+    def map(self, module: str, addr: int, other: str, section: str | None = None) -> int:
+        """Exits with the reason when the version map cannot place the address. A boundary at a section's end names the
+        section, which tells it from the next section's start."""
+        if (module, other) not in self.other_functions:
+            self.other_functions[module, other] = function_ends(config_dir(other, module))
+        # The sections are read on each call, since a fix replayed before this one may have changed them
+        placer = ModulePlacer(
+            module,
+            parse_sections(config_dir(PRIMARY, module) / "delinks.txt"),
+            parse_sections(config_dir(other, module) / "delinks.txt"),
+            {f.addr: f.addr + (f.size or 0) for f in self.functions.get(module, [])},
+            self.other_functions[module, other],
+            self.pairs[other].get(module, {}),
+        )
+        try:
+            return placer.place(addr, section)
+        except Unplaced as error:
+            sys.exit(str(error))
 
 
 def config_dir(version: str, module: str) -> Path:
@@ -401,7 +390,9 @@ def apply_everywhere(mapper: AddressMapper, module: str, addr: int, action: str,
             target = int(target, 16)
             mapped = mapper.map(reloc_module_names(destination)[0], target & ~1, other) | (target & 1)
             other_argument = ",".join([kind, destination, f"{mapped:#010x}", *addend])
-        plan.append((other, mapper.map(module, addr, other), other_argument))
+        # A moved boundary names its section, so that one at the section's end is placed as that
+        section = argument.rsplit(":", 1)[1] if action in ("section_start", "section_end") else None
+        plan.append((other, mapper.map(module, addr, other, section=section), other_argument))
     changes = [plan_fix(version, module, mapped, action, mapped_argument)
                for version, mapped, mapped_argument in plan]
     for change in changes:

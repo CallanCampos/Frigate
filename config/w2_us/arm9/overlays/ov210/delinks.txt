@@ -11,4 +11,4 @@ src/ov210/musical_system.c:
 src/ov210/mus_item_data.c:
     complete
     .text       start:0x021eef78 end:0x021ef1c8
-    .data       start:0x021ef1f4 end:0x021ef204
+    .data       start:0x021ef1f4 end:0x021ef220
