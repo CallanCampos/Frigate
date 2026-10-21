@@ -26,11 +26,46 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-21: latest upstream sync and renewed validation
+
+- **Upstream:** `fc478a9ee5`, merged cleanly by `port/tools/sync_upstream.sh` in `c46687c006`.
+- **Port:** `PORT_SHA`.
+- **ROM:** T0 passes after the sync, both SHA1s match (`/tmp/frigate-latest-t0.log`).
+- **Host build:** T1 passes on macOS for Black 2 (`build/port`) and White 2 (`build/port-w2`), with
+  `/tmp/frigate-latest-build-{b2,w2}.log` recording the builds.
+- **Tests:** T2/T3/T6 non-timing suites pass: Black 2, 281 pass and 16 skip of 297 (173.83 s); White 2,
+  279 pass and 16 skip of 295 (166.14 s). Logs: `/tmp/frigate-latest-tests-{b2,w2}.log`. Each skips 15 optional
+  oracle checks and `app_universal_slices`; full optional T4 coverage was skipped. T5 and T7 were not run this pass.
+  The earlier 10,600-frame New Game replay and frame-10,759 field trace remain the gameplay evidence below.
+- **Tiers:** unchanged from the preceding entry: per version, a 37,150 functions, b 3,868 and c zero. Code bytes:
+  Black 2 a 3,369,134 and b 481,132; White 2 a 3,369,222 and b 481,132. Excluded veneers remain 2,384 and included
+  SDK assembly definitions 224. Evidence: `/tmp/frigate-progress-latest-20261021/{b2_us,w2_us}/functions.tsv`.
+  These source-coverage counts do not establish native readiness.
+- **Trap stubs:** generated sources still contain 31 function traps and 22 data placeholders per version.
+  The observed field-entry stop is `OS_Terminate` in `FieldmapProc_Init`, rather than a missing-field-C trap.
+- **64-bit warnings:** the normalized all-TU native syntax probe passes all 1,538 baseline and 1,655 current units.
+  The four pointer/int cast families fall from 492 to 469 instances: game 245 to 234, libraries 247 to 235.
+  Separate optional `-Wshorten-64-to-32` diagnostics rise from 277 to 384; they are outside that four-family metric.
+  Evidence: `/tmp/frigate-native-warning-full/{summary,results}.json`; the preceding entry explains the baseline
+  and normalization.
+- **Work done:** renewed the contribution and portability work's proof against the latest upstream. Targeted MWCC
+  token streams are identical for 20/24 file/version pairs (`/tmp/frigate-latest-neutral.log`). The four exceptions
+  are `friend.c` and `dwcutil_ac.c` in both versions. Exact object proof covers all ten DWC file/version pairs,
+  754 function instances, all allocated sections and exact relocation targets
+  (`/tmp/frigate-dwc-proof-fc478/{results,relocation-proof}.json`); DWC utility uses its configured `2.0/sp2` compiler.
+  The portability rows in [game-changes.md](game-changes.md) identify their introduction commit `90ad973b12`.
+  [The review](REVIEW-2026-10-21.md) now describes this sync and its validation limits.
+- **Next:** size the external field heap for host allocations, then repeat extended entry, CONTINUE, real menus
+  and differential checks before claiming a playable field; follow up numeric-width and deferred hardware paths.
+- **Blockers:** field C is present, but the fixed 64 KiB external field heap cannot hold weather and place-name
+  child allocations doubled to a combined `0x1b000` before other overhead. The earlier trace terminates at frame
+  10,759 in `FieldmapProc_Init`. Current full oracle, sanitizer and scripted visual coverage remains unverified.
+
 ## 2026-10-21: upstream sync, field entry diagnosis and contributor workflow
 
 - **Upstream:** `83515e20ce`, merged on `codex/port-sync-contributions`; 13 conflicts resolved with the port's
   portability changes reapplied.
-- **Port:** `PORT_SHA`.
+- **Port:** `90ad973b12`.
 - **ROM:** T0 passes, both SHA1s match (`/tmp/frigate-final-t0.log`).
 - **Host build:** T1 passes for Black 2 in `build/port` and White 2 in `build/port-w2` on macOS.
 - **Tests:** T2/T3/T6: fresh non-timing suites pass in both versions: Black 2, 281 pass and 16 skip of 297
