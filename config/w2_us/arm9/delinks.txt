@@ -1,5 +1,6 @@
     .text       start:0x02004000 end:0x0208ee54 kind:code align:32
-    .rodata     start:0x0208ee54 end:0x020990a8 kind:rodata align:4
+    .exceptix   start:0x0208ee54 end:0x0208ee84 kind:rodata align:4
+    .rodata     start:0x0208ee84 end:0x020990a8 kind:rodata align:4
     .ctor       start:0x020990a8 end:0x020990a8 kind:rodata align:4
     .data       start:0x020990c0 end:0x0209d780 kind:data align:32
     .bss        start:0x0209d780 end:0x0214f540 kind:bss align:32
@@ -2530,6 +2531,7 @@ lib/msl/src/runtime/register_atexit.c:
     complete
     .text       start:0x0208ed0c end:0x0208ed58
     .bss        start:0x0214f234 end:0x0214f538
+    .exceptix   start:0x0208ee54 end:0x0208ee60
 
 lib/msl/src/runtime/trk_stubs.c:
     complete
@@ -2538,10 +2540,12 @@ lib/msl/src/runtime/trk_stubs.c:
 lib/msl/src/runtime/console_io.c:
     complete
     .text       start:0x0208ed68 end:0x0208ee04
+    .exceptix   start:0x0208ee60 end:0x0208ee78
 
 lib/msl/src/runtime/call_static_initializers.c:
     complete
     .text       start:0x0208ee04 end:0x0208ee34
+    .exceptix   start:0x0208ee78 end:0x0208ee84
 
 lib/msl/src/runtime/global_destructor_chain.c:
     complete

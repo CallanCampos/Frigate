@@ -90,9 +90,9 @@ The game code was built with CodeWarrior for DSi, a version between `dsi/1.1p1` 
 
 The ROM was not necessarily built with one compiler. The Pokémon Black decomp by Goldoire found library code in Black
 built with other versions (`2.0/sp2p2` and `1.2`), so try them on library code that doesn't match. `configure.py`
-extracts only the `dsi` compilers; the others are in `build/mwccarm.zip`. Extracted to `tools/mwccarm`, they can be
-named by directory, as in `compiler_probe.py --compilers 2.0/sp2p2`, and `1.2` needs `--flags` without `-ipa file`.
-`configure.py` downloads a library's compiler when a `lib/*/library.toml` names it.
+extracts only the `dsi` compilers and those a `lib/*/library.toml` names, but its archive (`MWCCARM_URL`) holds every
+1.2, 2.0 and dsi build: extract the rest to `tools/mwccarm` before concluding that no build matches. They are named
+by directory, as in `compiler_probe.py --compilers 2.0/sp2p2`, and `1.2` needs `--flags` without `-ipa file`.
 Game code needs the `dsi` builds: the evolution demo's view matches 36 of its 56 functions with every `2.0` build and
 25 with `1.2`.
 

@@ -1,7 +1,9 @@
 # Nintendo's NitroSystem (FND, GFD, G2D, G3D and sound), built apart from the game as Thumb code with CodeWarrior for
-# NITRO 2.0: the dsi compilers that build the game miss its GFD pool loops, and every 2.0 build matches what has been
-# tested, so the exact service pack is a guess.
-compiler = "2.0/sp2p2"
+# NITRO 2.0: the dsi compilers that build the game miss its GFD pool loops. Every build from 2.0/sp1p6 to 2.0/sp2p4
+# matches the same functions (the earlier ones lose MAT32_Mul and NNS_G3DRenderFuncApplyJointMatrix), so the service
+# pack is a guess: 2.0/sp2 is the newest that also builds the DWC utility (lib/dwcutil), which leaves one 2.0 for the
+# whole ROM.
+compiler = "2.0/sp2"
 flags = [
     "-O4,p",               # Optimize for speed
     "-proc arm946e",       # ARM9 processor

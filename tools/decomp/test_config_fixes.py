@@ -28,7 +28,7 @@ class FakeMapper:
         return self.addresses[(module, addr, version)]
 
 
-class OrphanRelocationTests(unittest.TestCase):
+class ConfigFixFixture(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -85,6 +85,8 @@ class OrphanRelocationTests(unittest.TestCase):
             operation()
         self.assertEqual(self.snapshot(), before)
 
+
+class OrphanRelocationTests(ConfigFixFixture):
     def test_primary_present_other_absent_preserves_forward_relocations(self):
         absent_before = self.relocs("w2_us").read_bytes()
         self.apply()
@@ -326,6 +328,63 @@ class OrphanRelocationTests(unittest.TestCase):
         self.assert_rejected_without_changes(
             lambda: self.cli("remove-orphan-reloc", MODULE, "--source-module", ".", hex(SOURCE), "0x1100"),
             "outside source module")
+
+
+
+class SectionPrefixTests(ConfigFixFixture):
+    def prefix_fixture(self, crossing=False):
+        for version, start in (("b2_us", 0x5010), ("w2_us", 0x6010)):
+            path = fixes.config_dir(version, MODULE) / "delinks.txt"
+            end = start + (0x18 if crossing else 0x10)
+            path.write_text(f"    .rodata start:{start:#010x} end:{start + 0x100:#010x} kind:rodata align:4\n"
+                            f"\nsrc/example.c:\n    .rodata start:{start:#010x} end:{end:#010x}\n")
+
+    def test_split_prefix_maps_migrates_and_replays(self):
+        self.prefix_fixture()
+        self.cli("split-section-prefix", MODULE, ".rodata", ".exceptix", "0x10", "0x5010")
+        for version, start in (("b2_us", 0x5010), ("w2_us", 0x6010)):
+            text = (fixes.config_dir(version, MODULE) / "delinks.txt").read_text()
+            self.assertIn(f".exceptix   start:{start:#010x} end:{start + 0x10:#010x} kind:rodata align:4", text)
+            self.assertIn(f".rodata     start:{start + 0x10:#010x}", text)
+            self.assertIn(f"src/example.c:\n    .exceptix start:{start:#010x}", text)
+        after = self.snapshot()
+        self.cli("apply")
+        self.assertEqual(self.snapshot(), after)
+
+    def test_split_prefix_rejects_crossing_owner_in_either_version(self):
+        self.prefix_fixture()
+        path = fixes.config_dir("w2_us", MODULE) / "delinks.txt"
+        path.write_text(path.read_text().replace("end:0x00006020\n", "end:0x00006028\n"))
+        self.assert_rejected_without_changes(
+            lambda: self.cli("split-section-prefix", MODULE, ".rodata", ".exceptix", "0x10", "0x5010"),
+            "crosses")
+
+    def test_split_prefix_rejects_conflicting_target(self):
+        self.prefix_fixture()
+        path = fixes.config_dir("w2_us", MODULE) / "delinks.txt"
+        path.write_text("    .exceptix start:0x00006000 end:0x00006008 kind:rodata align:4\n" + path.read_text())
+        self.assert_rejected_without_changes(
+            lambda: self.cli("split-section-prefix", MODULE, ".rodata", ".exceptix", "0x10", "0x5010"),
+            "conflicting")
+
+    def test_split_prefix_replay_rejects_conflicting_attributes_atomically(self):
+        for attributes in ("kind:code align:4", "kind:rodata align:8", "kind:code align:8"):
+            with self.subTest(attributes=attributes):
+                self.prefix_fixture()
+                self.cli("split-section-prefix", MODULE, ".rodata", ".exceptix", "0x10", "0x5010")
+                path = fixes.config_dir("w2_us", MODULE) / "delinks.txt"
+                path.write_text(path.read_text().replace(
+                    "end:0x00006020 kind:rodata align:4", f"end:0x00006020 {attributes}"))
+                self.assert_rejected_without_changes(lambda: self.cli("apply"), "conflicting")
+
+    def test_split_prefix_rejects_invalid_size_name_and_nonprefix(self):
+        self.prefix_fixture()
+        for target, size in ((".exceptix", "0"), (".exceptix", "0x100"), (".exceptix", "0x3"), (".rodata", "0x10"),
+                             ("bad name", "0x10")):
+            self.assert_rejected_without_changes(
+                lambda: self.cli("split-section-prefix", MODULE, ".rodata", target, size, "0x5010"), "")
+        with self.assertRaisesRegex(SystemExit, "proper prefix"):
+            fixes.plan_fix("b2_us", MODULE, 0x5014, "split_section_prefix", ".rodata:.exceptix:0x10")
 
 
 class BoundaryRecordTests(unittest.TestCase):

@@ -240,7 +240,7 @@ Same instructions, registers swapped.
   other local, whatever its uses, and falls to the first callee-saved register left; `*++p` and `*--p` don't do it.
   Writing the step as a statement of its own puts the pointer back in the normal order. In MSL's compiler (`dsi/1.2`,
   ARM), `ansi_fp.c`'s `__timesdec` (`result->sig.text[n] = *p; p++;` and `xp++; yp--;`) and `__minus_dec` (`*rtext = *k;
-  rtext++; k++;`) match only so. NitroSystem's 2.0/sp2p2 Thumb build does the same: G3D's `getJntSRTAnmResult_`
+  rtext++; k++;`) match only so. NitroSystem's 2.0/sp2 Thumb build does the same: G3D's `getJntSRTAnmResult_`
   (`nsbca.c`) gets the original's `r4` and `r5` only with all three `result->trans.x = *p++;` written as `= *p; p++;`,
   since one left keeps the cursor last. In `dsi/1.1p1` Thumb a `*p++ = x` in a loop gives the pointer's spill a compiler
   temporary's slot below every named local, where `*p = x; p++;` keeps its declared slot (NitroSDK's `STD_TVSScanf`,
@@ -445,7 +445,7 @@ Same instructions, registers swapped.
   `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
   order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
   and declared first stores it right after the subtraction.
-- In NitroSystem's 2.0/sp2p2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
+- In NitroSystem's 2.0/sp2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
   the test and stores the earlier ones, and the `for` initializer's order sets the spill slots of the start values:
   `g2d_CharCanvas.c`'s `ClearArea1D` matches with `for (; cy < y1; charY++, cy += 8)` and `for (charX = charX0, cx =
   x0; cx < x1; charX++, cx += 8)`, and `DrawGlyph1D` with `cy++, y -= 8`. There too a load written before a group of
@@ -460,7 +460,7 @@ Same instructions, registers swapped.
   (`mi_dma_gxcommand.c`) restores the FIFO's interrupt condition in the original's order only through
   `G3X_SetFifoIntrCond`, whose parameter is the enum `GXFifoIntrCond`; the same body in place or in an inline taking a
   `u32` is 8 to 27 bytes off.
-- In NitroSystem's 2.0/sp2p2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
+- In NitroSystem's 2.0/sp2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
   written in place it loads `a` first (`g2d_Animation.c`'s `SequenceEdgeHandle_` clamps through
   `GetLastFrame_(seq)`). Spilled locals take slots from the top of the frame down: the function's locals, then an
   `if` block's, then its `else` block's, each in declaration order, then an inline's in reverse, so a slot order no
@@ -667,7 +667,10 @@ Same instructions, registers swapped.
   against a copy with the same include guard (`--extra-flags "-i DIR -prefix copy.h"`).
 - An array zeroed where it is declared in an inner block (`u8 list[N] = { 0 };` inside the block that fills it) is
   laid out and cleared differently from one declared at the top of the function and cleared by a call or a loop:
-  overlay 12's `MusicalEvent_RecordShow`, `s0249_GetRandomDistinctSix` and `MusicalProgram_Create` matched that way. A constant
+  overlay 12's `MusicalEvent_RecordShow`, `s0249_GetRandomDistinctSix` and `MusicalProgram_Create` matched that way.
+  Under 2.0/sp2 a clear in place by a down-counting byte loop (`movs r1, #0x22; movs r0, #0; strb r0, [r2];
+  adds r2, #1; subs r1, #1; bne`), where `memset` gives a call, is such an initializer, `char name[0x22] = { 0 };`, which
+  runs again on each pass when the array is declared in a loop's body (`dwcutil_ac.c`'s `UtilAc_FindSetupAp`). A constant
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode).
@@ -711,7 +714,7 @@ Same instructions, registers swapped.
   `int first` local sits above them.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
-  `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
+  `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2).
 - Local initializers declared in separate blocks are each copied to the stack just before their call, as the four BG
   setups of `b_plist_main.c`'s `BPlistMain_InitBG`; one block copies them all at the top.
 - Which of several locals of equal use MWCC spills follows where the group is declared among the function's other
@@ -1162,7 +1165,7 @@ Same code, other `sp` offsets or frame size.
   it out again means its comparison was another expression. `snd_arc_loader.c`'s `LoadWaveArcTable` reads
   `sizeof(SNDWaveArc) + tableSize` bytes and matches only comparing `result != (int)sizeof(SNDWaveArc) + tableSize`,
   signed where the argument is unsigned; without the cast it is 4 bytes longer.
-- On `2.0/sp2p2`, an add written through a small inline with parameters keeps their order where the same expression
+- On `2.0/sp2`, an add written through a small inline with parameters keeps their order where the same expression
   written out is swapped: `snd_stream.c`'s `StrmCallback` gets `adds r1, r1, r2` only with
   `AddU32ToPtr(buffer, offset)`, `(void *)((u32)ptr + val)`, while the cast-add written in place gives the right
   registers but `adds r1, r2, r1`, and `(u8 *)buffer + offset` other registers.
@@ -1212,7 +1215,7 @@ Same code, other `sp` offsets or frame size.
   `GFL_TextRendererDrawToBitmapEx` match, as a diagnostic, passing `TextRenderer *renderer = &g_TextRenderer;` with the
   global aligned, and `#pragma opt_propagation off` gives them the same code. Under `-ipa file` the pointer also reads a
   pooled static through a literal of its own instead of the section's base (`os_thread.c`'s `OS_IsThreadAvailable`, as a
-  diagnostic). Both rows say why neither is kept. In NitroSystem's 2.0/sp2p2 code a store to a member of a file static
+  diagnostic). Both rows say why neither is kept. In NitroSystem's 2.0/sp2 code a store to a member of a file static
   goes through the section's anchor (`ldr r0, =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address,
   stored at 0, 4 and 8, as G3D's billboard functions in `sbc.c` have, is a pointer local to the member,
   `VecFx32 *trans = &sBBCmd.trans;`; a pointer to the whole object is folded back into anchored stores, and
@@ -1771,7 +1774,7 @@ Same instructions, scheduled in another order.
   expression straight to the call drops the CSE entirely.
 - A trailing `mov r1, #0` after a 32-bit result is a function returning `u64`: DWC's `DivWords` (`crypt.c`) returns
   `(u32)(...)` from a `u64` function.
-- On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
+- On NitroSystem's `2.0/sp2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
   `ldr [r1, #0x3c]` and `ldr [r1, #0x40]` off one `waveArc + n * 4` only with
@@ -2462,11 +2465,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice.
 - An inline that returns a condition, `return a && b;`, builds the flag ahead of the tests (`movs r1, #0`, the
   tests, `movs r1, #1`) where the original's `movs r0, #1`, `b`, `movs r0, #0` after the tests is
-  `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2p2): `g2d_Animation.c`'s `IsFrameEnd_`, the test of
+  `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2): `g2d_Animation.c`'s `IsFrameEnd_`, the test of
   `NNS_G2dTickAnimCtrl`'s loop. It goes the other way too: `g2d_CellTransferManager.c`'s `IsTransferNeeded_` keeps
   its 0/1 only as `return a && b;`, which the if-form folds into the branches, so try both.
 - An inline's 0/1 result that the original materializes and then tests (`movs r0, #1`, `b`, `movs r0, #0`,
-  `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2p2): a
+  `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2): a
   `u32` return type with `if (c) { return TRUE; } return FALSE;` (`g2d_CellAnimation.c`'s
   `NNS_G2dCellDataBankHasVramTransferData`, which every `BOOL` spelling folds into the test), or a cast,
   `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
@@ -2870,7 +2873,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
-  `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2p2).
+  `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2).
 - A loop counted with `!=` tests with `beq` before the loop and `bne` at its end, where `<` gives `bls` and `blo`:
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
 - `dwc_competition.c`'s `ScClient_SubmitReport` needs a `u32` counter for its 16-byte digest clear,
@@ -3019,7 +3022,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BtlvInput_DrawMoveTiles` is the same: the 0/1 loop test it kept goes, and a plain `i < 4` matches with the attribute
   on its type-palette table, which only it reads, and whose address allows nothing above 4. The attribute on any other
   object it reads matches as well.
-  NitroSystem's 2.0/sp2p2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
+  NitroSystem's 2.0/sp2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
   test and indexes its arrays with a multiply on each pass only with `sDecodeBuffer`, which it reads, aligned (4 to
   16 give the same code and fit the buffer's address, 32 does not). There a `u8` array with `ATTRIBUTE_ALIGN(4)` gets
   a `.bss` section of its own, while the `u32` array with the same attribute stays in the file's one section.
@@ -3289,6 +3292,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Data and sections
 
+- `dsi/1.2` with `-Cpp_exceptions on` emits exception indices for C functions with stack frames even when their
+  instructions are unchanged. MSL's `register_atexit.c`, `console_io.c` and `call_static_initializers.c` emit the ROM's
+  48-byte `.exceptix` prefix, with four relocations to their functions; leaf console procedures emit no entries.
+  Keep this as the compiler's section rather than writing a C table of its encoding.
 - A local array with an initializer goes in a `.rodata` section of its own, ahead of the file's shared one; a struct
   of the same bytes copied from a static gives the same inline `ldrb`/`strb` pairs and keeps the static in declaration
   order in the shared section. NitroWiFi's `WCM_FindVendorIE` matches, with the file's `.rodata`, only with its OUI as
@@ -3427,7 +3434,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   objects: NitroSystem G3D's `gecom.c` defines `NNS_G3dFlagUseFastDma`, `sGeBuffer` and `sDmaBusy`, which the ROM has
   as `sGeBuffer`, `sDmaBusy`, `NNS_G3dFlagUseFastDma`, and three or four words compiled alone with the library's flags
   come out the same way.
-- MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
+- MWCC 2.0 (`2.0/sp2`) gives each initialized global of a file its own section and orders them by size, smallest
   first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
   count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of
   the ROM's order, then the count, then the table. `cgtool.c` declares its two 12-byte joint tables in reverse and
@@ -3885,15 +3892,22 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A library function whose loop stores through a stepped pointer (`strb rX, [r2], #1`) set up after the loop's entry
   test and restarted at `base + i` for a second loop, where dsi/1.1p1 indexes, or that recomputes a local's address
   (`add r0, sp, #0`) at each call, where dsi/1.1p1 keeps it in a saved register even at `optimization_level 1`, may have
-  been built with NitroSystem's 2.0/sp2p2. TwlSDK's `syscall_twl_ltd.c` matches whole under it, with plain indexed pad
-  loops, and under no dsi compiler, while all but four of `lib/twl`'s other files break under it. Probe 2.0/sp2p2 before
+  been built with NitroSystem's 2.0/sp2. TwlSDK's `syscall_twl_ltd.c` matches whole under it, with plain indexed pad
+  loops, and under no dsi compiler, while all but four of `lib/twl`'s other files break under it. Probe 2.0/sp2 before
   grinding such a function. A file gets a compiler of its own in its `library.toml`'s `file_compilers`, as
   `syscall_twl_ltd.c` does, and keeps the library's flags.
 
-- MWCC 2.0/sp2p2 places a Thumb literal pool island 0x1c bytes earlier than the compiler of the DWC utility
-  (`lib/dwcutil`): `dwcutil_ac.c`'s `UtilAc_MD5Transform` and `UtilAc_Run` have the original's code and pool words with
-  the island one step early, through every form of the source tried, so the utility was likely built with another 2.0.
-  A same-size difference that is only a pool placed early, in a 2.0 file, is that and not the C.
+- MWCC 2.0/sp2p2 places a Thumb literal pool island by a fixed rule (`ConstantPools.c`, at 0x514fd0 in its
+  `mwccarm.exe`): it sizes each instruction from its opcode table (a conditional branch as 6 bytes and a `b` as 4, before
+  they are shortened; everything else at its real size), and at the first instruction that lies 0x3a0 bytes or more past
+  the first pending pool load (`0x3fc - 0x60`, plus the 4 of the pc), it dumps the pool after the last unconditional
+  branch since the last pool load, or else after that load with a `b` around it. The 2.0 builds up to 2.0/sp2 use a
+  smaller margin, and the DWC utility needs it: `UtilAc_MD5Transform` has no branch at all, so its sizes are exact, and
+  the ROM's island after the load at +0x3d2 (first load at +0x2a) needs a margin of 0x40 to 0x54 where sp2p2's 0x60 puts
+  it one step (0x1c) early, after +0x3b6. It matches under 2.0/sp1p6, sp1p7 and sp2 and under no later build, and
+  NitroSystem matches the same functions under every build from sp1p6 on, so both libraries take 2.0/sp2. A pool placed
+  early or late in an otherwise same function of a 2.0 file is the build, not the C: probe the other 2.0 builds
+  (`compiler_probe.py --compilers 2.0/sp1p6,2.0/sp2,2.0/sp2p2`).
 
 - MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
   `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands

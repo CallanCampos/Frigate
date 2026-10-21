@@ -23,7 +23,7 @@ static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 fr
 static void RailUnit_SetLineInfo(RailUnit *unit, RailLine *line, u32 dir, s32 front, s32 side, s32 length, s32 width);
 static BOOL RailLine_IsPointA(RailDataHandle *data, RailLine *line, RailPoint *point);
 static BOOL RailLine_IsPointB(RailDataHandle *data, RailLine *line, RailPoint *point);
-static void SetupLineWidthForLineChange(RailDataHandle *data, RailLine *line, s32 *outNext, s32 *outCur,
+static void SetupLineWidthForLineChange(RailDataHandle *data, const RailLine *line, s32 *outNext, s32 *outCur,
                                         RailDisabledLines *disabled, fx32 tileWidth);
 static void RailDataHandle_Clear(RailDataHandle *data);
 static void RailDataHandle_Copy(RailDataHandle *data, RailDataHandle *src);
@@ -42,8 +42,8 @@ static BOOL func_ov036_021b1b60(RailUnit *unit);
 static RailCamera *GetRailCameraByHandlerImpl(RailUnit *unit);
 static void func_ov036_021b1bac(RailUnit *unit, VecFx32 *pos);
 static void func_ov036_021b1bec(const RailUnit *unit, RailPosition *pos);
-static s32 GetLineTileLengthWorldSpace(RailLine *line, fx32 tileWidth, const RailDataHandle *data);
-static s32 GetLerpedLineWidthByLineYPos(RailLine *line, s32 y, s32 length, const RailDataHandle *data);
+static s32 GetLineTileLengthWorldSpace(const RailLine *line, fx32 tileWidth, const RailDataHandle *data);
+static s32 GetLerpedLineWidthByLineYPos(const RailLine *line, s32 y, s32 length, const RailDataHandle *data);
 static u32 RailUnit_ClampSideToLineWidth(RailUnit *unit, RailLine *line, s32 length, u32 dir);
 static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 dir, s32 extra, VecFx32 *out);
 static u32 RailDirection_GetOpposite(u32 dir);
@@ -846,7 +846,7 @@ static BOOL RailLine_IsPointB(RailDataHandle *data, RailLine *line, RailPoint *p
     return FALSE;
 }
 
-static void SetupLineWidthForLineChange(RailDataHandle *data, RailLine *line, s32 *outNext, s32 *outCur,
+static void SetupLineWidthForLineChange(RailDataHandle *data, const RailLine *line, s32 *outNext, s32 *outCur,
                                         RailDisabledLines *disabled, fx32 tileWidth) {
     RailPoint *point;
     s32 nextWidth;
@@ -1412,11 +1412,11 @@ static void func_ov036_021b1bec(const RailUnit *unit, RailPosition *pos) {
     pos->railDirection = unit->dir;
 }
 
-static s32 GetLineTileLengthWorldSpace(RailLine *line, fx32 tileWidth, const RailDataHandle *data) {
+static s32 GetLineTileLengthWorldSpace(const RailLine *line, fx32 tileWidth, const RailDataHandle *data) {
     return line->length << 4;
 }
 
-static s32 GetLerpedLineWidthByLineYPos(RailLine *line, s32 y, s32 length, const RailDataHandle *data) {
+static s32 GetLerpedLineWidthByLineYPos(const RailLine *line, s32 y, s32 length, const RailDataHandle *data) {
     RailPoint *pointA = &data->points[line->pointA];
     RailPoint *pointB = &data->points[line->pointB];
     s32 widthA;
