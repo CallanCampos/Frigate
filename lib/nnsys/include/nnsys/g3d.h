@@ -799,7 +799,7 @@ extern NNSG3dFuncBlendJnt NNS_G3dFuncBlendJnt;
 extern NNSG3dFuncBlendVis NNS_G3dFuncBlendVis;
 
 // A scale and its inverse: a node's, as a scale function reads them, and each joint's of the model being drawn, which
-// the scaling rules (maya.c and si3d.c) keep for the joints below it in g_NNSG3DJointScales
+// the scaling rules (maya.c and si3d.c) keep for the joints below it in g_NNSG3DRenderCache
 typedef struct {
     VecFx32 scale;
     VecFx32 invScale;
@@ -1183,8 +1183,24 @@ extern NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4];
 // The state of the model being drawn, while there is one: a draw within a callback shares it
 extern NNSG3dRS *g_NNSG3DModelRenderer;
 
-// The scale and inverse scale of each joint of the model being drawn, relative to the root, for the joints below it
-extern NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
+// The matrices that NNS_G3DRenderFuncApplySmoSkMatrix makes for a joint of the envelope: the clip matrix and the normal
+// matrix, 100 bytes together
+typedef struct {
+    MtxFx44 clip;
+    MtxFx33 normal;
+} IbpMatrix;
+
+// What the model being drawn keeps for its nodes outside the render state, in one object: the result of each
+// material, which a node reuses once one has made it; the scale and inverse scale of each joint relative to the root,
+// which the scaling rules set and read for the joints below it; and the matrices that NODEMIX makes for each joint of
+// the envelope
+typedef struct {
+    NNSG3dMatAnmResult materials[NNS_G3D_SIZE_MAT_MAX];
+    NNSG3dJointScale jointScales[NNS_G3D_SIZE_JNT_MAX];
+    IbpMatrix ibpMatrices[NNS_G3D_SIZE_JNT_MAX];
+} NNSG3dRenderCache;
+
+extern NNSG3dRenderCache g_NNSG3DRenderCache;
 
 // The commands (NitroSystem's NNSi_G3dFuncSbcNop, Ret, Node, Mtx, Mat, MatDefault, Shp, ShpDefault, NodeDesc, BB, BBY,
 // NodeMix, CallDL, PosScale, EnvMap and PrjMap)

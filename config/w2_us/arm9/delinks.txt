@@ -1037,6 +1037,7 @@ lib/nnsys/src/g3d/cgtool.c:
     .data       start:0x0209b338 end:0x0209b360
 
 lib/nnsys/src/g3d/sbc.c:
+    complete
     .text       start:0x02066170 end:0x02067b8c
     .rodata     start:0x02094440 end:0x02094484
     .data       start:0x0209b360 end:0x0209b4e0

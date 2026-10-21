@@ -9144,9 +9144,7 @@ data_021439f8 kind:bss addr:0x021439f8
 pCurrentInstance_ kind:bss addr:0x02143a08
 NNS_G3dGlb kind:bss addr:0x02143a0c
 g_NNSG3DModelRenderer kind:bss addr:0x02143c70
-g_NNSMaterials kind:bss addr:0x02143c74
-g_NNSG3DJointScales kind:bss addr:0x02144a74
-g_NNSG3DIBPMatrices kind:bss addr:0x02145074
+g_NNSG3DRenderCache kind:bss addr:0x02143c74
 sGeBuffer kind:bss addr:0x02146974
 sDmaBusy kind:bss addr:0x02146978
 NNS_G3dFlagUseFastDma kind:bss addr:0x0214697c

@@ -2325,6 +2325,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `ShopUI_PrintItemBuyMessage`) and 92
   matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
   the type of the code.
+- A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
+  arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
+  reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.
+  As an `unsigned int` the index is a temporary, slotted below the named `isCached`; as `unsigned long` it is a named
+  local in its declared slot above, and the function matches. Declaration order and scope, `BOOL`, `u8` and `int`
+  types, and an inline for the bit test moved nothing. The same function also needs the joints' matrices as a field of
+  one object with the materials and the scales (`g_NNSG3DRenderCache`, grouped as the public decompilation of
+  NitroSystem groups them): as an array of their own MWCC folds the normal matrix's address into the clip matrix's
+  (`clip + 0x40`), 4 bytes short, where the original adds the index's offset to a second literal. And its weighted sums
+  add each product as a 64-bit value, `sum.invM.m[0][0] += (weight * clip->m[0][0]) >> FX32_SHIFT`: through an inline
+  that casts the product to `fx32` first, one load is scheduled after a store where the original has it before.
 - `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
   problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
   constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two

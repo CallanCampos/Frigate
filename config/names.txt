@@ -5385,6 +5385,7 @@
 . 0x021439ec s_pUVFlipCorrectFunc
 . 0x02143a08 pCurrentInstance_
 . 0x02143a0c NNS_G3dGlb
+. 0x02143c74 g_NNSG3DRenderCache
 . 0x02146974 sGeBuffer
 . 0x02146978 sDmaBusy
 . 0x02146980 sCurDriverInfo

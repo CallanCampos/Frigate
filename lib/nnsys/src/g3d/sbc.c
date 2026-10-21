@@ -33,19 +33,9 @@ static u32 sEnvMapCmd[2] = { G3OP_TEXIMAGE_PARAM, 0 };
 NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4] = { NNS_G3DRenderFuncDrawMeshDefault };
 NNSG3dFuncSbcMat NNS_G3D_MATERIAL_APPLY_FUNCS[4] = { NNS_G3DRenderFuncApplyMaterialDefault };
 
-// The matrices that NNS_G3DRenderFuncApplySmoSkMatrix makes for a joint of the envelope: the clip matrix and the normal
-// matrix, 100 bytes together
-typedef struct {
-    MtxFx44 clip;
-    MtxFx33 normal;
-} IbpMatrix;
-
-// The results of the materials that a model's nodes share, which a node reuses once one has made it. The scaling rules
-// set and read the scale of each joint. Under -ipa function the .bss is laid out in the reverse of the definitions
-// here, which gives the ROM's order: the renderer's pointer, the materials, the scales and the joints' matrices
-IbpMatrix g_NNSG3DIBPMatrices[NNS_G3D_SIZE_JNT_MAX];
-NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
-NNSG3dMatAnmResult g_NNSMaterials[NNS_G3D_SIZE_MAT_MAX];
+// What the model being drawn keeps for its nodes, and the renderer's pointer. Under -ipa function the .bss is laid out
+// in the reverse of the definitions here, which gives the ROM's order
+NNSG3dRenderCache g_NNSG3DRenderCache;
 NNSG3dRS *g_NNSG3DModelRenderer;
 
 // The timing of the command's callback, or zero when there is none
@@ -226,8 +216,8 @@ void NNS_G3DRenderFuncLoadMatrix(NNSG3dRS *rs, u32 opt) {
 }
 
 // MAT's default function: makes the result for the material, from its own values and the global state's, then the
-// animations'; and sends it to the geometry engine. With the option 010 a result that is made stays in g_NNSMaterials,
-// for the nodes that follow with the material, and with 001 one that stayed there is used
+// animations'; and sends it to the geometry engine. With the option 010 a result that is made stays in
+// g_NNSG3DRenderCache, for the nodes that follow with the material, and with 001 one that stayed there is used
 void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResMatData *mat, u32 matID) {
     u32 timing;
 
@@ -246,7 +236,7 @@ void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dRe
             if (rs->pRenderObj->recMatAnm != NULL) {
                 result = &rs->pRenderObj->recMatAnm[matID];
             } else {
-                result = &g_NNSMaterials[matID];
+                result = &g_NNSG3DRenderCache.materials[matID];
             }
         } else {
             if (rs->pRenderObj->recMatAnm != NULL) {
@@ -254,7 +244,7 @@ void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dRe
                 result = &rs->pRenderObj->recMatAnm[matID];
             } else if (opt == NNS_G3D_SBCFLG_010) {
                 rs->isMatCached[matID >> 5] |= 1 << (matID & 0x1f);
-                result = &g_NNSMaterials[matID];
+                result = &g_NNSG3DRenderCache.materials[matID];
             } else {
                 result = &rs->matAnmResult;
             }
@@ -753,21 +743,17 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
     rs->c += size;
 }
 
-// A fixed point product without the rounding that FX_Mul has
-static inline fx32 MulFx(fx64 a, fx32 b) {
-    return (fx32)((a * b) >> FX32_SHIFT);
-}
-
 // NODEMIX: makes a matrix from the matrices of several joints, each applied to the joint's inverse bind pose and
-// weighted, and stores it. The matrices that the joints make are kept in g_NNSG3DIBPMatrices for the nodes that
-// follow
+// weighted, and stores it. The matrices that the joints make are kept in g_NNSG3DRenderCache for the nodes that
+// follow. Each product is added to the sum as a 64-bit value, the shape that the public decompilation of NitroSystem
+// (github.com/ntrtwl/NitroSystem) gives this function
 void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     const NNSG3dResEvpMtx *evpMtx =
         (const NNSG3dResEvpMtx *)((u8 *)rs->pRenderObj->resMdl + rs->pRenderObj->resMdl->ofsEvpMtx);
     u32 numMtx = rs->c[2];
     const u8 *p = rs->c + 3;
     fx64 weight = 0;
-    const MtxFx33 *nrm;
+    MtxFx33 *nrm;
     // The weighted sums of the clip and the normal matrices, in the inverse bind pose's type only for its layout (one
     // object of 0x54 bytes, which one clear zeroes): invM and invN are sums here, not inverses
     NNSG3dResEvpMtx sum;
@@ -781,9 +767,10 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     reg_G3_MTX_MODE = GX_MTXMODE_POSITION_VECTOR;
 
     for (i = 0; i < numMtx; i++) {
-        u32 jointID = p[1];
+        // NitroSDK's u32, which is unsigned long
+        unsigned long jointID = p[1];
         u32 isCached = rs->isEnvMtxCached[jointID >> 5] & (1 << (jointID & 0x1f));
-        MtxFx44 *clip = &g_NNSG3DIBPMatrices[jointID].clip;
+        MtxFx44 *clip = &g_NNSG3DRenderCache.ibpMatrices[jointID].clip;
 
         if (!isCached) {
             rs->isEnvMtxCached[jointID >> 5] |= 1 << (jointID & 0x1f);
@@ -793,15 +780,15 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         }
 
         if (i != 0) {
-            sum.invN.m[0][0] += MulFx(weight, nrm->m[0][0]);
-            sum.invN.m[0][1] += MulFx(weight, nrm->m[0][1]);
-            sum.invN.m[0][2] += MulFx(weight, nrm->m[0][2]);
-            sum.invN.m[1][0] += MulFx(weight, nrm->m[1][0]);
-            sum.invN.m[1][1] += MulFx(weight, nrm->m[1][1]);
-            sum.invN.m[1][2] += MulFx(weight, nrm->m[1][2]);
-            sum.invN.m[2][0] += MulFx(weight, nrm->m[2][0]);
-            sum.invN.m[2][1] += MulFx(weight, nrm->m[2][1]);
-            sum.invN.m[2][2] += MulFx(weight, nrm->m[2][2]);
+            sum.invN.m[0][0] += (weight * nrm->m[0][0]) >> FX32_SHIFT;
+            sum.invN.m[0][1] += (weight * nrm->m[0][1]) >> FX32_SHIFT;
+            sum.invN.m[0][2] += (weight * nrm->m[0][2]) >> FX32_SHIFT;
+            sum.invN.m[1][0] += (weight * nrm->m[1][0]) >> FX32_SHIFT;
+            sum.invN.m[1][1] += (weight * nrm->m[1][1]) >> FX32_SHIFT;
+            sum.invN.m[1][2] += (weight * nrm->m[1][2]) >> FX32_SHIFT;
+            sum.invN.m[2][0] += (weight * nrm->m[2][0]) >> FX32_SHIFT;
+            sum.invN.m[2][1] += (weight * nrm->m[2][1]) >> FX32_SHIFT;
+            sum.invN.m[2][2] += (weight * nrm->m[2][2]) >> FX32_SHIFT;
         }
 
         if (!isCached) {
@@ -812,35 +799,35 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         }
 
         weight = p[2] << 4;
-        sum.invM.m[0][0] += MulFx(weight, clip->m[0][0]);
-        sum.invM.m[0][1] += MulFx(weight, clip->m[0][1]);
-        sum.invM.m[0][2] += MulFx(weight, clip->m[0][2]);
-        sum.invM.m[1][0] += MulFx(weight, clip->m[1][0]);
-        sum.invM.m[1][1] += MulFx(weight, clip->m[1][1]);
-        sum.invM.m[1][2] += MulFx(weight, clip->m[1][2]);
-        sum.invM.m[2][0] += MulFx(weight, clip->m[2][0]);
-        sum.invM.m[2][1] += MulFx(weight, clip->m[2][1]);
-        sum.invM.m[2][2] += MulFx(weight, clip->m[2][2]);
-        sum.invM.m[3][0] += MulFx(weight, clip->m[3][0]);
-        sum.invM.m[3][1] += MulFx(weight, clip->m[3][1]);
-        sum.invM.m[3][2] += MulFx(weight, clip->m[3][2]);
+        sum.invM.m[0][0] += (weight * clip->m[0][0]) >> FX32_SHIFT;
+        sum.invM.m[0][1] += (weight * clip->m[0][1]) >> FX32_SHIFT;
+        sum.invM.m[0][2] += (weight * clip->m[0][2]) >> FX32_SHIFT;
+        sum.invM.m[1][0] += (weight * clip->m[1][0]) >> FX32_SHIFT;
+        sum.invM.m[1][1] += (weight * clip->m[1][1]) >> FX32_SHIFT;
+        sum.invM.m[1][2] += (weight * clip->m[1][2]) >> FX32_SHIFT;
+        sum.invM.m[2][0] += (weight * clip->m[2][0]) >> FX32_SHIFT;
+        sum.invM.m[2][1] += (weight * clip->m[2][1]) >> FX32_SHIFT;
+        sum.invM.m[2][2] += (weight * clip->m[2][2]) >> FX32_SHIFT;
+        sum.invM.m[3][0] += (weight * clip->m[3][0]) >> FX32_SHIFT;
+        sum.invM.m[3][1] += (weight * clip->m[3][1]) >> FX32_SHIFT;
+        sum.invM.m[3][2] += (weight * clip->m[3][2]) >> FX32_SHIFT;
         p += 3;
-        nrm = &g_NNSG3DIBPMatrices[jointID].normal;
+        nrm = &g_NNSG3DRenderCache.ibpMatrices[jointID].normal;
         if (!isCached) {
-            while (G3X_GetVectorMtx(&g_NNSG3DIBPMatrices[jointID].normal) != 0) {
+            while (G3X_GetVectorMtx(nrm) != 0) {
             }
         }
     }
 
-    sum.invN.m[0][0] += MulFx(weight, nrm->m[0][0]);
-    sum.invN.m[0][1] += MulFx(weight, nrm->m[0][1]);
-    sum.invN.m[0][2] += MulFx(weight, nrm->m[0][2]);
-    sum.invN.m[1][0] += MulFx(weight, nrm->m[1][0]);
-    sum.invN.m[1][1] += MulFx(weight, nrm->m[1][1]);
-    sum.invN.m[1][2] += MulFx(weight, nrm->m[1][2]);
-    sum.invN.m[2][0] += MulFx(weight, nrm->m[2][0]);
-    sum.invN.m[2][1] += MulFx(weight, nrm->m[2][1]);
-    sum.invN.m[2][2] += MulFx(weight, nrm->m[2][2]);
+    sum.invN.m[0][0] += (weight * nrm->m[0][0]) >> FX32_SHIFT;
+    sum.invN.m[0][1] += (weight * nrm->m[0][1]) >> FX32_SHIFT;
+    sum.invN.m[0][2] += (weight * nrm->m[0][2]) >> FX32_SHIFT;
+    sum.invN.m[1][0] += (weight * nrm->m[1][0]) >> FX32_SHIFT;
+    sum.invN.m[1][1] += (weight * nrm->m[1][1]) >> FX32_SHIFT;
+    sum.invN.m[1][2] += (weight * nrm->m[1][2]) >> FX32_SHIFT;
+    sum.invN.m[2][0] += (weight * nrm->m[2][0]) >> FX32_SHIFT;
+    sum.invN.m[2][1] += (weight * nrm->m[2][1]) >> FX32_SHIFT;
+    sum.invN.m[2][2] += (weight * nrm->m[2][2]) >> FX32_SHIFT;
     // Loads the normal matrix as a 4x3 one, so the load reads three words past sum. Only the position matrix takes that
     // translation, and the next load replaces it
     G3_LoadMtx43((const MtxFx43 *)&sum.invN);
