@@ -4,10 +4,10 @@
 #include "field/fieldmap_tcb_camera_zoom.h"
 #include "types.h"
 #include "field/field.h"
+#include "field/field_animation_curve.h"
 #include "field/field_camera.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
-#include "math.h"
 #include "nitro/fx.h"
 
 typedef struct {
@@ -94,7 +94,7 @@ static void FieldCameraZoomTCB_Calc(FieldCameraZoomTCB *zoom) {
     u16 frameCount = zoom->frameCount;
 
     if (zoom->frame <= frameCount) {
-        f32 t = sqrt((f32)zoom->frame / (f32)frameCount);
+        f32 t = FieldAnimationCurve_Sqrt(1.0f, (f32)zoom->frame / (f32)frameCount);
         f32 start = zoom->startZoom / 4096.0f;
         f32 end = zoom->endZoom / 4096.0f;
         f32 value = (1.0f - t) * start + t * end;
