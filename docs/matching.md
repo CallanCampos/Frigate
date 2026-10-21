@@ -3312,7 +3312,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
   file split at `0x0206f0f0`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
   one defined with a zero initializer (next bullet), which is known and also stays first in the `.bss`: TwlSDK's
-  `nwm.c` matches `func_02702468` with `static u8 sNwmInitialized = FALSE;` and no split.
+  `nwm_setup.c` matches `func_02702468` with `u8 NWMi_SetUpDone = FALSE;`.
+- A struct of statics whose functions need two addressings is several files. `nwm.c`'s system pointer, exit callback
+  and sleep callback (0x24 bytes at `0x0276c2e8`) matched `func_02702a40` only as members of one struct, reached from
+  its base at `#0x14`, and `NWM_LoadDevice` only with the exit callback a plain object, loaded after the callback it
+  is given. They are a file of their own, `nwm_events.c` (cybervisi0n/libntr's reconstruction splits NWM there too),
+  built with `-ipa file` (every static from the section's base, its two 16-byte callbacks in the reverse of their
+  definitions) and starting its own `.bss`, while `NWM_LoadDevice`, in an `-ipa function` file after it, takes the exit
+  callback as an `extern`. Split as `nwm_setup.c`, `nwm_events.c` and `nwm.c`, all 41 functions match.
 - Under `-ipa function` the same holds for zero: a `.bss` global or static defined with an initializer, `= 0`,
   `= NULL` or `= { 0 }`, is known to the functions below it, which reach it from one base (`ldr rN, =.bss; [rN, #off]`),
   where a tentative definition is loaded through a literal of its own. NitroWiFi's `SOCLi_CleanupCommandPacketQueue`

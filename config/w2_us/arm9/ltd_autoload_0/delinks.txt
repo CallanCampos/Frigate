@@ -34,8 +34,9 @@ lib/twl/src/camera/camera.c:
     .text       start:0x02702080 end:0x02702434
 
 lib/twl/src/nwm/nwm.c:
-    .text       start:0x02702434 end:0x02703c60
-    .bss        start:0x0276c2e4 end:0x0276c520
+    complete
+    .text       start:0x02702a98 end:0x02703c60
+    .bss        start:0x0276c30c end:0x0276c520
 
 lib/twl/src/mic/mic_twl.c:
     complete
@@ -138,3 +139,13 @@ lib/nitrowifi/src/wcm/wcm_dsi.c:
     complete
     .ltdmain    start:0x02769930 end:0x0276ae98
     .bss        start:0x0276b100 end:0x0276b104
+
+lib/twl/src/nwm/nwm_setup.c:
+    complete
+    .text       start:0x02702434 end:0x027026dc
+    .bss        start:0x0276c2e4 end:0x0276c2e8
+
+lib/twl/src/nwm/nwm_events.c:
+    complete
+    .text       start:0x027026dc end:0x02702a98
+    .bss        start:0x0276c2e8 end:0x0276c30c

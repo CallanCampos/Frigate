@@ -1006,6 +1006,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - `.bss` runs that are each sorted by size, with the same layout unreachable in one file: the range is several
   files, each with `-ipa file`; and sweep the declaration orders of the statics. (matching.md: "With `-ipa file` the
   order of a file's same-size statics")
+- A struct of statics whose functions need two addressings (base plus offset in one, a plain object in another): the
+  statics of two files, each with its own `-ipa`. (matching.md: "A struct of statics whose functions need two")
 
 ## Function order and presence
 

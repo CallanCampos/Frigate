@@ -5747,8 +5747,10 @@ ltd_autoload_0 0x0276b100 sConnectIndex
 ltd_autoload_0 0x0276b104 sCameraInitialized
 ltd_autoload_0 0x0276b108 sUnused
 ltd_autoload_0 0x0276b10c sCameraWork
-ltd_autoload_0 0x0276c2e4 sNwmInitialized
-ltd_autoload_0 0x0276c2e8 sNwm
+ltd_autoload_0 0x0276c2e4 NWMi_SetUpDone
+ltd_autoload_0 0x0276c2e8 NWMi_SystemArea
+ltd_autoload_0 0x0276c2ec NWMi_UnloadOnExit
+ltd_autoload_0 0x0276c2fc sNwmSleepCallback
 ltd_autoload_0 0x0276c30c sUnloaded
 ltd_autoload_0 0x0276c310 sBlockBuf
 ltd_autoload_0 0x0276c520 sFatfs
