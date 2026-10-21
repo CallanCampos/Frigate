@@ -7,6 +7,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Registers differ around an indirect log call: read the ROM format string and check every variadic argument before
+  tuning allocation. (matching.md: "A missing variadic log argument")
 - A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)
   and cast it inside. (matching.md: "A handle parameter cast inside")
 - An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result

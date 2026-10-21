@@ -136,7 +136,7 @@ static void CARDi_RefreshRom(u32 mask) {
     if ((CARDi_ReadRomStatus() & mask) != 0) {
         CARDi_SendRomRefresh();
         while ((CARDi_ReadRomStatus() & CARD_ROM_STATUS_REFRESHED) == 0) {
-            if (OSi_ThreadInitialized != 0 && OS_IsAlarmAvailable()) {
+            if (OSi_IsThreadInitialized != 0 && OS_IsAlarmAvailable()) {
                 OS_Sleep(1);
             }
         }

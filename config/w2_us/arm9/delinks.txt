@@ -917,6 +917,7 @@ lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:
     .bss        start:0x02143a2c end:0x02143a38
 
 lib/nnsys/src/g2d/g2d_RendererCore.c:
+    complete
     .text       start:0x02063194 end:0x02063b5c
     .rodata     start:0x02094398 end:0x020943b0
     .bss        start:0x02143a48 end:0x02143a4c
@@ -2065,6 +2066,7 @@ lib/nitro/src/os/os_printf.c:
     .text       start:0x0207a2bc end:0x0207a310
 
 lib/nitro/src/os/os_thread.c:
+    complete
     .text       start:0x0207a310 end:0x0207ab30
     .bss        start:0x0214c250 end:0x0214c4c4
 

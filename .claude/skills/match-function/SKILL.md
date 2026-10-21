@@ -11,6 +11,11 @@ source looks like, and the permuter only points at them.
 For direct work on an overlay function, complete the overlay issue claim in `decomp-file` step 0 before editing the
 source or starting a `function-matcher` agent. A matcher working under the caller's claim does not claim again.
 
+The project uses NitroSDK's real types (`u32`/`s32` are `long`, the SDK's fixed-point constants) and GameSpy's
+`gsi_*` types in GameSpy's code (`docs/code-standards.md`, rule 14). Write and probe against them, and give a
+declaration the type the original evidently had (`int` or `unsigned int` where it compiles so); never override a
+typedef per file or cast to emulate another type.
+
 ## 1. Triage: what kind of difference
 
 ```sh

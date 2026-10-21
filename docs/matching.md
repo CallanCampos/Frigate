@@ -8,6 +8,11 @@ tools that show the differences.
 
 ## Registers
 
+- A missing variadic log argument can change registers throughout a function without changing its size. Check the
+  ROM's format string before tuning allocation: `download_play_wih.c`'s parent and MP callbacks and finalizer require
+  a state argument for their strings' `%d`. Supplying the state
+  restores the finalizer's exact output and removes most callback differences; the callbacks also need the original
+  reload after the scan filter and the original switch exits.
 - A constant kept in a register for the whole function that is not ours (the original's `movs r7, #1` with every 0
   built where it is used, where ours keeps 0 in `r7`) can come from a store that the optimizer drops. `wcm_dsi.c`'s
   `func_02769e60`, which does at once what `wcm.c`'s reset request and its completion do, matches only with the
@@ -1226,8 +1231,12 @@ Same code, other `sp` offsets or frame size.
   `GFL_TextRendererDrawToBitmapEx` match, as a diagnostic, passing `TextRenderer *renderer = &g_TextRenderer;` with the
   global aligned, and `#pragma opt_propagation off` gives them the same code. Under `-ipa file` the pointer also reads a
   pooled static through a literal of its own instead of the section's base (`os_thread.c`'s `OS_IsThreadAvailable`, as a
-  diagnostic). Both rows say why neither is kept. In NitroSystem's 2.0/sp2 code a store to a member of a file static
-  goes through the section's anchor (`ldr r0, =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address,
+  diagnostic). That spelling is not justified for the getter: both
+  [NitroSDK](https://github.com/ntrtwl/NitroSDK/blob/9eec6c92c9d7bba9350732b11296ed16aab3a8bc/libraries/os/src/os_thread.c#L373-L378)
+  and [pokediamond](https://github.com/pret/pokediamond/blob/b623abef1b4dfe204ca50aab42447ac00c134290/arm9/lib/NitroSDK/src/OS_thread.c#L316-L321)
+  define it as an assembly function, whose direct load matches without changing the C functions' pooling. The text
+  renderer's rows explain why its diagnostic is not kept. In NitroSystem's 2.0/sp2 code a store to a member of a file
+  static goes through the section's anchor (`ldr r0, =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address,
   stored at 0, 4 and 8, as G3D's billboard functions in `sbc.c` have, is a pointer local to the member,
   `VecFx32 *trans = &sBBCmd.trans;`; a pointer to the whole object is folded back into anchored stores, and
   `T *const p = &obj` keeps the pointer but loads it at the declaration.
