@@ -3835,7 +3835,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `MIi_NDma` and `MIi_NDmaAsync` set the registers through one-line `static inline` writers inside
   `if (size > 0) { ... }`, with the locals declared there; `mi_ndma_gxcommand.c`'s `MIi_NDmaFIFOCallback` calls the
   transfer through a `static inline`, `MIi_NDmaAsyncImmediate`, which adds the channel's config, so the arguments
-  are computed in the inline's order; `card_hash.c`'s `CARD_InitRomHashContext` lays its buffer out through a
+  are computed in the inline's order; `card_hash.c`'s `CARD_SetUpCheckedReads` lays its buffer out through a
   cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect` gets the sector
   index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops by
   `slot + banks`. Look the function up there before grinding registers.

@@ -24,24 +24,24 @@ typedef enum {
 // The setup of the shared WRAM's manager, which NitroSDK's MI_Init (mi_sharedWram.c's func_02078000) calls on a DSi
 void MIi_InitWramManagerCore(void);
 // The banks' registers: the processor that each bank is given to and whether it is enabled, by WRAM and for each
-void MI_SetWramBankMaster_A(int bank, MIWramProc proc);
-void MI_SetWramBankMaster_B(int bank, MIWramProc proc);
-void MI_SetWramBankMaster_C(int bank, MIWramProc proc);
-void MI_SetWramBankMaster(MIWram wram, int bank, MIWramProc proc);
-void MI_SetWramBankEnable_A(int bank, BOOL enable);
-void MI_SetWramBankEnable_B(int bank, BOOL enable);
-void MI_SetWramBankEnable_C(int bank, BOOL enable);
-void MI_SetWramBankEnable(MIWram wram, int bank, BOOL enable);
-MIWramProc MI_GetWramBankMaster_A(int bank);
-MIWramProc MI_GetWramBankMaster_B(int bank);
-MIWramProc MI_GetWramBankMaster_C(int bank);
+void MI_GiveWramBank_A(int bank, MIWramProc proc);
+void MI_GiveWramBank_B(int bank, MIWramProc proc);
+void MI_GiveWramBank_C(int bank, MIWramProc proc);
+void MI_GiveWramBank(MIWram wram, int bank, MIWramProc proc);
+void MI_EnableWramBank_A(int bank, BOOL enable);
+void MI_EnableWramBank_B(int bank, BOOL enable);
+void MI_EnableWramBank_C(int bank, BOOL enable);
+void MI_EnableWramBank(MIWram wram, int bank, BOOL enable);
+MIWramProc MI_GetWramBankOwner_A(int bank);
+MIWramProc MI_GetWramBankOwner_B(int bank);
+MIWramProc MI_GetWramBankOwner_C(int bank);
 // The processor that the hardware gives the bank to
-MIWramProc MI_GetWramBankMaster(MIWram wram, int bank);
+MIWramProc MI_GetWramBankOwner(MIWram wram, int bank);
 // Where each WRAM is in the ARM9's memory, and any of them
-void *MI_GetWramMapStart_A(void);
-void *MI_GetWramMapStart_B(void);
-void *MI_GetWramMapStart_C(void);
-void *MI_GetWramMapStart(MIWram wram);
+void *MI_GetWramBase_A(void);
+void *MI_GetWramBase_B(void);
+void *MI_GetWramBase_C(void);
+void *MI_GetWramBase(MIWram wram);
 // Frees every bank that proc has, and cancels proc's reservations; each returns how many banks it changed
 int MI_FreeWram(MIWram wram, MIWramProc proc);
 int MI_CancelWram(MIWram wram, MIWramProc proc);
@@ -52,12 +52,12 @@ typedef void (*MINDmaCallback)(void *arg);
 
 // The settings of a channel's transfers: the interval between blocks and its prescaler, the words of a block, and the
 // words that a start moves (-1: the whole transfer at once)
-typedef struct MINDmaConfig {
+typedef struct MINDmaSettings {
     u32 intervalTimer;
     u32 prescaler;
     u32 blockWord;
     u32 wordCount;
-} MINDmaConfig;
+} MINDmaSettings;
 
 #define MI_NDMA_MAX_NUM 3
 
@@ -86,14 +86,14 @@ typedef struct MINDmaConfig {
 #define MI_NDMA_CONTINUOUS (1 << 29)
 #define MI_NDMA_IF_ENABLE (1 << 30)
 #define MI_NDMA_ENABLE (1u << 31)
-#define MI_NDMA_ARBITRAMENT_ROUND (1u << 31)
+#define MI_NDMA_ROUND_ROBIN (1u << 31)
 
 // Each channel's settings
-extern MINDmaConfig MIi_NDmaConfig[MI_NDMA_MAX_NUM + 1];
+extern MINDmaSettings MIi_NDmaConfig[MI_NDMA_MAX_NUM + 1];
 
 // Sets the arbitration between the channels and the default settings of each, which NitroSDK's MI_Init (mi_init.c)
 // calls on a DSi
-void MI_InitNDma(void);
+void MI_SetUpNDma(void);
 // The NDMA fills and copies, each without a callback and then with one and its argument, and the wait for a channel to
 // be done, which GX's loaders use for the DSi's channels; the linker reaches them through veneers
 void MI_NDmaFill(u32 ndmaNo, void *dest, u32 data, u32 size);
@@ -104,14 +104,14 @@ BOOL MI_IsNDmaBusy(u32 ndmaNo);
 void MI_WaitNDma(u32 ndmaNo);
 void MI_StopNDma(u32 ndmaNo);
 // Stops the four channels, which OS_ResetSystem, the card's pull-out and PM_ForceToPowerOff do on a DSi
-void MI_StopAllNDma(void);
-void MI_SetNDmaArbitrament(u32 mode, u32 cycle);
-void MI_InitNDmaConfig(void);
-void MI_GetNDmaConfig(u32 ndmaNo, MINDmaConfig *config);
+void MI_StopNDmaChannels(void);
+void MI_SetNDmaGlobalControl(u32 mode, u32 cycle);
+void MI_ResetNDmaSettings(void);
+void MI_CopyNDmaSettings(u32 ndmaNo, MINDmaSettings *config);
 // The transfer under all of the asynchronous NDMA functions, which mi_ndma_gxcommand.c also calls: a fill of data or a
 // copy, by the address modes of mode, started at timing (-1: at once) with the channel's settings in config
 void MIi_NDmaAsync(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size, MINDmaCallback callback,
-                   void *arg, const MINDmaConfig *config, u32 timing, u32 enable);
+                   void *arg, const MINDmaSettings *config, u32 timing, u32 enable);
 
 // The transfer started at once with the channel's own settings
 static inline void MIi_NDmaAsyncImmediate(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size,

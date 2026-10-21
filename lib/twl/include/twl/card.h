@@ -33,7 +33,7 @@ typedef struct CARDRomHashBlock {
     u8 *image;
 } CARDRomHashBlock;
 
-typedef struct CARDRomHashContext {
+typedef struct CARDCheckedReadContext {
     ROMHeaderRegion areaNtr;
     ROMHeaderRegion areaTwl;
     ROMHeaderRegion sectorHashes;
@@ -64,18 +64,18 @@ typedef struct CARDRomHashContext {
     u8 *hashes;
     CARDRomHashSector *sectors;
     CARDRomHashBlock *blocks;
-} CARDRomHashContext;
+} CARDCheckedReadContext;
 
-// The size of the buffer that CARD_InitRomHashContext needs for a ROM's header
-u32 CARD_CalcRomHashBufferLength(const CARDTwlRomHeader *header);
+// The size of the buffer that CARD_SetUpCheckedReads needs for a ROM's header
+u32 CARD_GetCheckedReadBufferSize(const CARDTwlRomHeader *header);
 // Lays the context's caches out in the buffer and reads and checks the table of the blocks' hashes; ends the program
 // if the buffer is too small or the table doesn't match
-void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
-                             CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata);
+void CARD_SetUpCheckedReads(CARDCheckedReadContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
+                            CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata);
 // The callback of an asynchronous read of the context's: moves the sector or block read to the list of those to check
 // and starts the next read
-void CARD_NotifyRomHashReadAsync(void *arg);
+void CARD_OnCheckedReadDone(void *arg);
 // Reads length bytes of the ROM at offset into buffer, and checks them
-void CARD_ReadRomHashImage(CARDRomHashContext *context, void *buffer, u32 offset, u32 length);
+void CARD_ReadRomChecked(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length);
 
 #endif // POKEBW2_TWL_CARD_H

@@ -1,6 +1,7 @@
 // TwlSDK's mi_ndma.c, in the LTD autoload: the DSi's four new DMA channels. Each transfer is a fill or a copy whose
-// address modes its mode gives, with the channel's settings. The public functions have TwlSDK's names as recalled, not
-// shown by the code; the others are named for what they do
+// address modes its mode gives, with the channel's settings. The ROM names none of it: the fills, copies, waits and
+// stops of a channel keep the names they had here before the file was decompiled, and the other functions are named
+// for what they do
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "twl/mi.h"
@@ -12,11 +13,11 @@
 #define MI_CAMERA_DATA_ADDR 0x04004204
 
 static u32 MIi_GetNDmaModeBits(u32 mode);
-static void MIi_NDma(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size, const MINDmaConfig *config,
-                     u32 timing, u32 enable);
+static void MIi_NDma(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size,
+                     const MINDmaSettings *config, u32 timing, u32 enable);
 static void MIi_WaitNDmaDone(u32 ndmaNo);
 
-MINDmaConfig MIi_NDmaConfig[MI_NDMA_MAX_NUM + 1];
+MINDmaSettings MIi_NDmaConfig[MI_NDMA_MAX_NUM + 1];
 
 #pragma define_section LTDMAIN ".ltdmain"                                                                              \
                                ".ltdmain.bss"                                                                          \
@@ -82,8 +83,8 @@ static u32 MIi_GetNDmaModeBits(u32 mode) {
 }
 
 // A transfer that is waited for. Mode 0 fills with data, the others copy from src
-static void MIi_NDma(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size, const MINDmaConfig *config,
-                     u32 timing, u32 enable) {
+static void MIi_NDma(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size,
+                     const MINDmaSettings *config, u32 timing, u32 enable) {
     if (size > 0) {
         u32 control;
         u32 enabled = OS_DisableInterrupts();
@@ -114,7 +115,7 @@ static void MIi_NDma(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data
 }
 
 void MIi_NDmaAsync(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size, MINDmaCallback callback,
-                   void *arg, const MINDmaConfig *config, u32 timing, u32 enable) {
+                   void *arg, const MINDmaSettings *config, u32 timing, u32 enable) {
     if (size == 0) {
         if (callback != NULL) {
             callback(arg);
@@ -153,9 +154,9 @@ void MIi_NDmaAsync(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, 
     }
 }
 
-void MI_InitNDma(void) {
-    MI_SetNDmaArbitrament(MI_NDMA_ARBITRAMENT_ROUND, 6 << 16);
-    MI_InitNDmaConfig();
+void MI_SetUpNDma(void) {
+    MI_SetNDmaGlobalControl(MI_NDMA_ROUND_ROBIN, 6 << 16);
+    MI_ResetNDmaSettings();
 }
 
 void MI_NDmaFill(u32 ndmaNo, void *dest, u32 data, u32 size) {
@@ -194,7 +195,7 @@ void MI_StopNDma(u32 ndmaNo) {
     OS_RestoreInterrupts(enabled);
 }
 
-void MI_StopAllNDma(void) {
+void MI_StopNDmaChannels(void) {
     MI_StopNDma(0);
     MI_StopNDma(1);
     MI_StopNDma(2);
@@ -206,16 +207,16 @@ static void MIi_WaitNDmaDone(u32 ndmaNo) {
     }
 }
 
-void MI_SetNDmaArbitrament(u32 mode, u32 cycle) {
-    if (mode == MI_NDMA_ARBITRAMENT_ROUND) {
-        reg_MI_NDMAGCNT = cycle | MI_NDMA_ARBITRAMENT_ROUND;
+void MI_SetNDmaGlobalControl(u32 mode, u32 cycle) {
+    if (mode == MI_NDMA_ROUND_ROBIN) {
+        reg_MI_NDMAGCNT = cycle | MI_NDMA_ROUND_ROBIN;
     } else {
         reg_MI_NDMAGCNT = 0;
     }
 }
 
-void MI_InitNDmaConfig(void) {
-    MINDmaConfig *config = MIi_NDmaConfig;
+void MI_ResetNDmaSettings(void) {
+    MINDmaSettings *config = MIi_NDmaConfig;
     int i;
 
     for (i = 0; i <= MI_NDMA_MAX_NUM; i++) {
@@ -227,13 +228,13 @@ void MI_InitNDmaConfig(void) {
     }
 }
 
-void MI_GetNDmaConfig(u32 ndmaNo, MINDmaConfig *config) {
-    MI_CpuCopy32(&MIi_NDmaConfig[ndmaNo], config, sizeof(MINDmaConfig));
+void MI_CopyNDmaSettings(u32 ndmaNo, MINDmaSettings *config) {
+    MI_CpuCopy32(&MIi_NDmaConfig[ndmaNo], config, sizeof(MINDmaSettings));
 }
 
 void MIi_StartCardNDma(u32 ndmaNo, const void *src, void *dest) {
     u32 enabled = OS_DisableInterrupts();
-    MINDmaConfig *config = &MIi_NDmaConfig[ndmaNo];
+    MINDmaSettings *config = &MIi_NDmaConfig[ndmaNo];
     MIi_WaitNDmaDone(ndmaNo);
     MI_NDMA_REG(ndmaNo, MI_NDMA_SAD) = (u32)src;
     MI_NDMA_REG(ndmaNo, MI_NDMA_DAD) = (u32)dest;
@@ -250,13 +251,13 @@ void MIi_CardNDmaRecv(u32 ndmaNo, const void *src, void *dest, u32 size) {
 
 void MIi_CameraNDmaRecv(u32 ndmaNo, void *dest, u32 unitWords, u32 length, BOOL continuous, MINDmaCallback callback,
                         void *arg) {
-    MINDmaConfig config;
+    MINDmaSettings config;
     u32 mode = 10;
 
     if (!continuous) {
         mode = 3;
     }
-    MI_GetNDmaConfig(ndmaNo, &config);
+    MI_CopyNDmaSettings(ndmaNo, &config);
     config.intervalTimer = 2;
     config.prescaler = 0;
     config.blockWord = MI_NDMA_BWORD_16;

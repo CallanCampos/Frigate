@@ -1,6 +1,6 @@
 // TwlSDK's card_hash.c, in the LTD autoload: the reads of the ROM that check each sector against the HMAC-SHA-1
-// digests of the DSi's ROM header, with caches of the sectors and of the blocks of their hashes. The public functions
-// have TwlSDK's names as recalled, not shown by the code; the static ones are named for what they do
+// digests of the DSi's ROM header, with caches of the sectors and of the blocks of their hashes. The ROM names none of
+// it; the functions are named for what they do
 #include "nitro/math.h"
 #include "nitro/os.h"
 #include "twl/card.h"
@@ -13,11 +13,11 @@
 #define CARD_ROM_PAGE_SIZE 0x200
 
 static void CARDi_CompareHash(const void *hash, void *buffer, u32 length);
-static void CARDi_StartRomHashRead(CARDRomHashContext *context);
-static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u32 sector);
-static void *CARDi_TouchRomHashSector(CARDRomHashContext *context, u32 offset);
-static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buffer, u32 offset, u32 length);
-static void CARDi_ReadRomHashImageCaching(CARDRomHashContext *context, void *buffer, u32 offset, u32 length);
+static void CARDi_StartRomHashRead(CARDCheckedReadContext *context);
+static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDCheckedReadContext *context, u32 sector);
+static void *CARDi_TouchRomHashSector(CARDCheckedReadContext *context, u32 offset);
+static void CARDi_ReadRomHashImageDirect(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length);
+static void CARDi_ReadRomHashImageCaching(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length);
 
 // The SHA-1 states after the key's inner and outer pads, from which each HMAC starts
 static SVCSHA1Context sInnerContext;
@@ -36,7 +36,7 @@ static const u8 sDigestKey[64] ATTRIBUTE_ALIGN(4) = {
     0x32, 0x67, 0x8d, 0xfe, 0xca, 0x83, 0x64, 0x98, 0xac, 0xfd, 0x3e, 0x37, 0x87, 0x46, 0x58, 0x24,
 };
 
-u32 CARD_CalcRomHashBufferLength(const CARDTwlRomHeader *header) {
+u32 CARD_GetCheckedReadBufferSize(const CARDTwlRomHeader *header) {
     u32 length = 0;
     length += MATH_ROUNDUP32(header->digestBlockHashes.size);
     length += MATH_ROUNDUP32(header->digestSectorSize * CARD_ROM_HASH_SECTOR_MAX);
@@ -79,7 +79,7 @@ static void CARDi_CompareHash(const void *hash, void *buffer, u32 length) {
 
 // Starts the read of the next block, or else of the next sector, unless one is being read. A block's hashes are read
 // in whole pages
-static void CARDi_StartRomHashRead(CARDRomHashContext *context) {
+static void CARDi_StartRomHashRead(CARDCheckedReadContext *context) {
     void *buffer = NULL;
     u32 offset = 0;
     u32 length = 0;
@@ -107,12 +107,12 @@ static void CARDi_StartRomHashRead(CARDRomHashContext *context) {
 
     if (buffer != NULL && context->readAsync(context->userdata, buffer, offset, length) == 0) {
         context->readSync(context->userdata, buffer, offset, length);
-        CARD_NotifyRomHashReadAsync(context);
+        CARD_OnCheckedReadDone(context);
     }
 }
 
-void CARD_NotifyRomHashReadAsync(void *arg) {
-    CARDRomHashContext *context = arg;
+void CARD_OnCheckedReadDone(void *arg) {
+    CARDCheckedReadContext *context = arg;
     u32 enabled = OS_DisableInterrupts();
 
     if (context->loading == context->loadingSectors) {
@@ -134,7 +134,7 @@ void CARD_NotifyRomHashReadAsync(void *arg) {
 
 // The block of the hashes of a sector: the cached one, moved to the front, or the least recently used one, queued to
 // be read
-static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u32 sector) {
+static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDCheckedReadContext *context, u32 sector) {
     u32 index = sector / context->sectorsPerBlock;
     CARDRomHashBlock **link = &context->validBlocks;
     CARDRomHashBlock *found;
@@ -188,7 +188,7 @@ static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u3
 }
 
 // The index of the sector of the hashed areas that holds the card's offset, counting the NITRO area's sectors first
-static inline u32 CARDi_RomOffsetToHashSector(const CARDRomHashContext *context, u32 offset) {
+static inline u32 CARDi_RomOffsetToHashSector(const CARDCheckedReadContext *context, u32 offset) {
     offset -= context->areaNtr.offset;
     if (offset >= context->areaNtr.size) {
         offset += context->areaNtr.offset - context->areaTwl.offset;
@@ -203,7 +203,7 @@ static inline u32 CARDi_RomOffsetToHashSector(const CARDRomHashContext *context,
 
 // The image of the sector at offset if it is cached and checked, moved to the front; otherwise NULL, and the least
 // recently used sector is queued to be read
-static void *CARDi_TouchRomHashSector(CARDRomHashContext *context, u32 offset) {
+static void *CARDi_TouchRomHashSector(CARDCheckedReadContext *context, u32 offset) {
     void *image = NULL;
     u32 index = CARDi_RomOffsetToHashSector(context, offset);
     CARDRomHashSector **link;
@@ -237,8 +237,8 @@ static void *CARDi_TouchRomHashSector(CARDRomHashContext *context, u32 offset) {
     return image;
 }
 
-void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
-                             CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata) {
+void CARD_SetUpCheckedReads(CARDCheckedReadContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
+                            CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata) {
     const u32 sectorSize = header->digestSectorSize;
     const u32 sectorsPerBlock = header->digestSectorsPerBlock;
     const u32 blockHashesSize = header->digestBlockHashes.size;
@@ -319,7 +319,7 @@ void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader
 }
 
 // Reads whole sectors straight into buffer, checking each against the hashes of its block as they arrive
-static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buffer, u32 offset, u32 length) {
+static void CARDi_ReadRomHashImageDirect(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length) {
     u32 sectorSize = context->sectorSize;
     u32 sectorsPerBlock = context->sectorsPerBlock;
     u32 position = offset;
@@ -362,7 +362,7 @@ static void CARDi_ReadRomHashImageDirect(CARDRomHashContext *context, void *buff
 }
 
 // Reads through the cache of sectors, checking the sectors and blocks as they arrive
-static void CARDi_ReadRomHashImageCaching(CARDRomHashContext *context, void *buffer, u32 offset, u32 length) {
+static void CARDi_ReadRomHashImageCaching(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length) {
     while (length > 0) {
         u8 *image = CARDi_TouchRomHashSector(context, offset);
         if (image != NULL) {
@@ -420,7 +420,7 @@ static void CARDi_ReadRomHashImageCaching(CARDRomHashContext *context, void *buf
     }
 }
 
-void CARD_ReadRomHashImage(CARDRomHashContext *context, void *buffer, u32 offset, u32 length) {
+void CARD_ReadRomChecked(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length) {
     context->thread = OS_GetCurrentThread();
     context->loading = NULL;
     if (length >= context->sectorSize * 16 && OS_GetBootType() != OS_BOOTTYPE_ROM) {
