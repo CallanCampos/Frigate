@@ -813,14 +813,14 @@ BOOL func_ov036_021a95ec(FinishScriptSubEventsWork *work, u32 *state) {
 
 static void CheckerMsgWin_Close(FieldScriptEnv *env) {
     if (FieldScriptSubEvent_IsRegistered(6)) {
-        func_ov036_02189b50(getMapDisplayInfoPtr(env));
+        CheckerMsgWin_Free(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
         FieldScriptSubEvent_Unregister(6);
     }
 }
 
 static BOOL ScriptNative_CheckerMsgWinWait(VM *vm, void *env) {
-    if (func_ov036_02189c00(getMapDisplayInfoPtr(env)) == TRUE) {
+    if (CheckerMsgWin_Update(getMapDisplayInfoPtr(env)) == TRUE) {
         return TRUE;
     }
     return FALSE;
@@ -834,12 +834,12 @@ BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env) {
     u16 type = VM_Read16(vm);
     StrBuf *strbuf = LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
-    u16 width = func_ov036_02189c34(fieldWork->msgBGSys, strbuf, 4);
-    u16 height = func_ov036_02189c54(fieldWork->msgBGSys, strbuf, 4);
-    void *window = func_ov036_02189a98(fieldWork->msgBGSys, type, x, y, width, height);
+    u16 width = CheckerMsgWin_CalcWidth(fieldWork->msgBGSys, strbuf, 4);
+    u16 height = CheckerMsgWin_CalcHeight(fieldWork->msgBGSys, strbuf, 4);
+    void *window = CheckerMsgWin_Create(fieldWork->msgBGSys, type, x, y, width, height);
 
     setMapDisplayInfoPtr(env, window);
-    func_ov036_02189bc4(window, 4, 4, strbuf);
+    CheckerMsgWin_PrintStrBuf(window, 4, 4, strbuf);
     VM_SetNativeCallback(vm, ScriptNative_CheckerMsgWinWait);
     FieldScriptSubEvent_Register(6);
     return TRUE;

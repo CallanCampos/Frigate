@@ -5,6 +5,7 @@
 // RailLine_CheckEndpointDirections, RailPoint_GetLineDirection/CheckConnections, RailDataHandle_Clear/Copy,
 // RailDisabledLines_* and GetRailLineIfEnabled are our descriptive names.
 // RailUnit_GetMoveDirection/IsMovePending/GetLineDirection/RequestMove/UpdateMove are descriptive names too.
+// RailUnit_GetRailPos/IsRailPosInBounds/PredictNextPos/GetPreviousCalcPos describe the stored-position API.
 // The private inline directional handlers are our extraction and names for MoveOnLine's four paths;
 // their boundaries are not recovered original functions. Directions name the request relative to the entry line.
 #include "types.h"
@@ -33,7 +34,7 @@ static RailCurve *GetRailCurve(RailDataHandle *data, u32 id);
 static RailCameraFunc GetRailCameraCurveFunc(RailDataHandle *data, u32 id);
 static RailToWorldFunc GetHandler1CurveFunc(RailDataHandle *data, u32 id);
 static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id);
-static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step);
+static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step);
 static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail);
 static void RailUnit_SetData(RailUnit *unit, RailDataHandle *data);
 static u32 RailUnit_GetState(RailUnit *unit);
@@ -174,13 +175,13 @@ BOOL FieldRailSystem_UpdateCamera(FieldRailSystem *rail, BOOL force) {
         return FALSE;
     }
     switch (unit->onLine) {
-    case 0:
+    case RAIL_COMPONENT_POINT:
         cameraId = unit->component.point->cameraId;
         if (cameraId != 0xffff) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
         }
         break;
-    case 1:
+    case RAIL_COMPONENT_LINE:
         cameraId = unit->component.line->cameraId;
         if (cameraId != 0xffff) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
@@ -291,7 +292,7 @@ BOOL func_ov036_021b0644(FieldRailSystem *rail, const RailPosition *pos, u32 arg
     if (GFL_STD_MemCmp(pos, &rail->playerUnit->railPos, sizeof(RailPosition)) == 0) {
         return FALSE;
     }
-    return func_ov036_021b0794(rail->playerUnit, &rail->playerUnit->railPos);
+    return RailUnit_IsRailPosInBounds(rail->playerUnit, &rail->playerUnit->railPos);
 }
 
 BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32 railDir, RailPosition *next) {
@@ -300,11 +301,11 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
     RailUnit_SetRailPos(rail->playerUnit, railPos);
     RailUnit_RequestMove(rail->playerUnit, 4, railDir);
     RailUnit_UpdateMove(rail->playerUnit);
-    func_ov036_021b0774(rail->playerUnit, next);
+    RailUnit_GetRailPos(rail->playerUnit, next);
     if (GFL_STD_MemCmp(&start, next, sizeof(RailPosition)) == 0) {
         return FALSE;
     }
-    return func_ov036_021b0794(rail->playerUnit, next);
+    return RailUnit_IsRailPosInBounds(rail->playerUnit, next);
 }
 
 void func_ov036_021b06ec(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos) {
@@ -328,13 +329,13 @@ void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos
     unit = rail->playerUnit;
     rail->cameraParent = unit;
     switch (unit->onLine) {
-    case 0:
+    case RAIL_COMPONENT_POINT:
         cameraId = unit->component.point->cameraId;
         if (cameraId != 0xffff) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
         }
         break;
-    case 1:
+    case RAIL_COMPONENT_LINE:
         cameraId = unit->component.line->cameraId;
         if (cameraId != 0xffff) {
             func = GetRailCameraCurveFunc(unit->handle, GetRailCamera(unit->handle, cameraId)->funcId);
@@ -347,11 +348,11 @@ void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos
     rail->cameraParent = prevParent;
 }
 
-void func_ov036_021b0774(const RailUnit *unit, RailPosition *pos) {
+void RailUnit_GetRailPos(const RailUnit *unit, RailPosition *pos) {
     *pos = unit->railPos;
 }
 
-BOOL func_ov036_021b0794(RailUnit *unit, const RailPosition *pos) {
+BOOL RailUnit_IsRailPosInBounds(RailUnit *unit, const RailPosition *pos) {
     RailLine *line;
     RailLine *lines;
     s32 front;
@@ -383,7 +384,7 @@ BOOL func_ov036_021b0794(RailUnit *unit, const RailPosition *pos) {
     return TRUE;
 }
 
-u8 func_ov036_021b0814(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec) {
+u8 RailUnit_PredictNextPos(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec) {
     if (!unit->nextCached || dir != unit->nextDir) {
         unit->nextOk = func_ov036_021b068c(unit->rail, &unit->railPos, dir, &unit->nextPos);
         func_ov036_021b06ec(unit->rail, &unit->nextPos, &unit->nextVec);
@@ -399,7 +400,7 @@ u8 func_ov036_021b0814(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *o
     return unit->nextOk;
 }
 
-void func_ov036_021b0888(RailUnit *unit, VecFx32 *pos) {
+void RailUnit_GetPreviousCalcPos(RailUnit *unit, VecFx32 *pos) {
     *pos = unit->prevCalcPos;
 }
 
@@ -416,7 +417,7 @@ void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos) {
     if (pos->componentIsLine == 0) {
         RailPoint *point;
 
-        unit->onLine = 0;
+        unit->onLine = RAIL_COMPONENT_POINT;
         point = &unit->handle->points[pos->componentId];
         unit->component.point = point;
         unit->width = point->widths[0];
@@ -542,7 +543,7 @@ void RailUnit_UpdateMove(RailUnit *unit) {
     onLine = unit->onLine;
     step = sPendingSteps[unit->pendingSpeedIndex];
     unit->moveProgress += (s8)step;
-    if (onLine == 1) {
+    if (onLine == RAIL_COMPONENT_LINE) {
         resultDir = RailUnit_MoveOnLine(unit, dir, step);
     }
     if (resultDir != 0) {
@@ -746,7 +747,7 @@ void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3) {
 void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3) {
     RailPosition pos;
 
-    func_ov036_021b0774(unit, &pos);
+    RailUnit_GetRailPos(unit, &pos);
     pos.componentId = a1;
     pos.posSide = 0;
     pos.posFront = a2;
@@ -822,7 +823,7 @@ static u32 RailUnit_TryEnterLine(RailUnit *unit, RailLine *line, u32 dir, s32 fr
 }
 
 static void RailUnit_SetLineInfo(RailUnit *unit, RailLine *line, u32 dir, s32 front, s32 side, s32 length, s32 width) {
-    unit->onLine = 1;
+    unit->onLine = RAIL_COMPONENT_LINE;
     unit->component.line = line;
     unit->side = side;
     unit->length = length;
@@ -981,7 +982,7 @@ static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
 }
 
 // step uses sixteenths of a tile; the result is dir (1 up, 2 right, 3 down, 4 left) or 0.
-static inline s32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
+static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     s32 length = unit->length;
     RailPoint *point;
@@ -990,7 +991,7 @@ static inline s32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
     RailLine *next2;
     BOOL outsideWidth;
     s32 width;
-    s32 resultDir;
+    u32 resultDir;
     s32 absOffset;
 
     point = GetRailPoint(unit->handle, line->pointB);
@@ -1069,7 +1070,7 @@ static inline s32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
     return RailUnit_ClampSideToLineWidth(unit, line, length, dir);
 }
 
-static inline s32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
+static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     s32 length = unit->length;
     RailPoint *point;
@@ -1078,7 +1079,7 @@ static inline s32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
     RailLine *next2;
     BOOL outsideWidth;
     s32 width;
-    s32 resultDir;
+    u32 resultDir;
     s32 absOffset;
 
     point = GetRailPoint(unit->handle, line->pointA);
@@ -1163,13 +1164,13 @@ static inline s32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
     return 0;
 }
 
-static inline s32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
+static inline u32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     s32 width;
-    s32 resultDir;
+    u32 resultDir;
 
     RailUnit_ApplyLineStep(unit->disabled, unit, 0, step, dir);
     if (unit->side > 0 && unit->side % 16 == 0) {
@@ -1227,13 +1228,13 @@ static inline s32 RailUnit_MoveRight(RailUnit *unit, u32 dir, s32 step) {
     return dir;
 }
 
-static inline s32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
+static inline u32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     s32 length = unit->length;
     RailPoint *point;
     RailLine *next0;
     s32 width;
-    s32 resultDir;
+    u32 resultDir;
     s32 absOffset;
 
     RailUnit_ApplyLineStep(unit->disabled, unit, 0, -step, dir);
@@ -1324,7 +1325,7 @@ static inline s32 RailUnit_MoveLeft(RailUnit *unit, u32 dir, s32 step) {
     return dir;
 }
 
-static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
+static u32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     if (dir == line->dir) {
         return RailUnit_MoveForward(unit, dir, step);
@@ -1341,7 +1342,7 @@ static s32 RailUnit_MoveOnLine(RailUnit *unit, u32 dir, s32 step) {
 static void RailUnit_SetDataCore(RailUnit *unit, RailDataHandle *data, FieldRailSystem *rail) {
     unit->handle = data;
     unit->tileWidth = data->tileWidth;
-    unit->onLine = 2;
+    unit->onLine = RAIL_COMPONENT_NONE;
     unit->lastMoveSpeedIndex = 0;
     unit->direction = 0;
     unit->movePending = 0;
@@ -1364,7 +1365,7 @@ static u32 RailUnit_GetState(RailUnit *unit) {
 }
 
 static BOOL func_ov036_021b1b60(RailUnit *unit) {
-    if (unit->onLine < 2 && unit->component.point != NULL && unit->acquired != 0) {
+    if (unit->onLine < RAIL_COMPONENT_NONE && unit->component.point != NULL && unit->acquired != 0) {
         return TRUE;
     }
     return FALSE;
@@ -1372,18 +1373,18 @@ static BOOL func_ov036_021b1b60(RailUnit *unit) {
 
 static RailCamera *GetRailCameraByHandlerImpl(RailUnit *unit) {
     switch (unit->onLine) {
-    case 0:
+    case RAIL_COMPONENT_POINT:
         return GetRailCamera(unit->handle, unit->component.point->cameraId);
-    case 1:
+    case RAIL_COMPONENT_LINE:
         return GetRailCamera(unit->handle, unit->component.line->cameraId);
     }
     return (RailCamera *)&DEFAULT_RAIL_CAMERA;
 }
 
 static void func_ov036_021b1bac(RailUnit *unit, VecFx32 *pos) {
-    if (unit->onLine == 0) {
+    if (unit->onLine == RAIL_COMPONENT_POINT) {
         *pos = unit->component.point->pos;
-    } else if (unit->onLine == 1) {
+    } else if (unit->onLine == RAIL_COMPONENT_LINE) {
         RailCurve *curve = GetRailCurve(unit->handle, unit->component.line->curveId);
         RailToWorldFunc func = GetHandler1CurveFunc(unit->handle, curve->handlerId);
 
@@ -1398,7 +1399,7 @@ static void func_ov036_021b1bec(const RailUnit *unit, RailPosition *pos) {
     s32 id;
 
     pos->componentIsLine = onLine;
-    if (onLine == 0) {
+    if (onLine == RAIL_COMPONENT_POINT) {
         id = func_ov036_021b2184(unit->handle, unit->component.point);
     } else {
         id = func_ov036_021b21b0(unit->handle, unit->component.line);
@@ -1483,7 +1484,7 @@ static BOOL func_ov036_021b1d1c(FieldRailSystem *rail, RailPosition *pos, u32 di
     if (GFL_STD_MemCmp(pos, &rail->playerUnit->railPos, sizeof(RailPosition)) == 0) {
         return FALSE;
     }
-    return func_ov036_021b0794(rail->playerUnit, &rail->playerUnit->railPos);
+    return RailUnit_IsRailPosInBounds(rail->playerUnit, &rail->playerUnit->railPos);
 }
 
 static u32 RailDirection_GetOpposite(u32 dir) {
@@ -1722,9 +1723,9 @@ static void func_ov036_021b2120(const char *prefix, RailPoint *point, const char
 }
 
 static void func_ov036_021b2130(RailUnit *unit) {
-    if (unit->onLine == 0) {
+    if (unit->onLine == RAIL_COMPONENT_POINT) {
         func_ov036_021b2120(NULL, unit->component.point, "\n");
-    } else if (unit->onLine == 1) {
+    } else if (unit->onLine == RAIL_COMPONENT_LINE) {
         RailPoint *pointA = GetRailPoint(unit->handle, unit->component.line->pointA);
         RailPoint *pointB = GetRailPoint(unit->handle, unit->component.line->pointB);
 

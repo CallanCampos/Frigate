@@ -4,20 +4,21 @@
 // of RailMath_RailToWorldNoCurve and RailMath_RailToWorldSlerpXYZ in field_rail.c's sort, its first up vector can only
 // come before both defaults as a shared const, and with them here, as a local initializer like the others.
 // func_ov036_021b21dc, which only field_rail.c's CalculateRailCurves calls, could open this file as well
+// RailMath_SlerpDirections and RailMath_TryProjectWorldPointToSegment are our descriptive names.
 #include "types.h"
 #include "field/field_camera.h"
 #include "field/field_rail.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
 
-static void func_ov036_021b2404(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t);
+static void RailMath_SlerpDirections(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t);
 static void InterpolateRailPointsGlobal(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t);
 static void func_ov036_021b3194(FieldRailSystem *rail, u16 angle, s32 dist, VecFx32 *target);
-static BOOL func_ov036_021b3830(RailPoint *p0, RailPoint *p1, const VecFx32 *pos, VecFx32 *out, fx32 *along,
-                                VecFx32 *cross);
+static BOOL RailMath_TryProjectWorldPointToSegment(RailPoint *p0, RailPoint *p1, const VecFx32 *pos, VecFx32 *out,
+                                                   fx32 *along, VecFx32 *cross);
 static void func_ov036_021b39c8(FieldRailSystem *rail, RailUnit *unit, RailPoint *point);
 
-static void func_ov036_021b2404(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t) {
+static void RailMath_SlerpDirections(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t) {
     VecFx32 na;
     VecFx32 nb;
     s32 angle;
@@ -43,7 +44,7 @@ static void InterpolateRailPointsGlobal(VecFx32 *out, const VecFx32 *a, const Ve
     fx32 lenA;
     fx32 lenB;
 
-    func_ov036_021b2404(out, a, b, t);
+    RailMath_SlerpDirections(out, a, b, t);
     lenA = VEC_Mag(a);
     lenB = VEC_Mag(b);
     VEC_MultAdd(lenA + FX_Mul(lenB - lenA, t), out, &zero, out);
@@ -212,7 +213,7 @@ BOOL RailMath_WorldToRailNoCurve(u32 lineId, FieldRailSystem *rail, const VecFx3
     s32 base;
     s32 i;
 
-    if (!func_ov036_021b3830(p0, p1, pos, &hit, &along, &cross)) {
+    if (!RailMath_TryProjectWorldPointToSegment(p0, p1, pos, &hit, &along, &cross)) {
         return FALSE;
     }
     VEC_Set(&a, pos->x, 0, pos->z);
@@ -274,7 +275,7 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
     fx32 tileWidth;
     u32 step;
 
-    if (!func_ov036_021b3830(p0, p1, pos, &hit, &along, &cross)) {
+    if (!RailMath_TryProjectWorldPointToSegment(p0, p1, pos, &hit, &along, &cross)) {
         return FALSE;
     }
     step = 1;
@@ -532,7 +533,7 @@ void func_ov036_021b309c(FieldRailSystem *rail) {
     VecFx32 target;
 
     FieldRailSystem_GetFieldCamera(rail);
-    if (RailUnit_IsOnLine(unit) == 1) {
+    if (RailUnit_IsOnLine(unit) == RAIL_COMPONENT_LINE) {
         RailPoint *p0 = GetCurrentRailLinePoint1(unit);
         RailPoint *p1 = GetCurrentRailLinePoint2(unit);
 
@@ -699,7 +700,7 @@ void func_ov036_021b3568(FieldRailSystem *rail) {
     u16 onLine = RailUnit_IsOnLine(unit);
     RailPoint *point = GetCurrentRailLinePoint1(unit);
 
-    if (onLine == 1) {
+    if (onLine == RAIL_COMPONENT_LINE) {
         func_ov036_021b39c8(rail, unit, point);
     }
 }
@@ -709,7 +710,7 @@ void func_ov036_021b3590(FieldRailSystem *rail) {
     u16 onLine = RailUnit_IsOnLine(unit);
     RailPoint *point = GetCurrentRailLinePoint2(unit);
 
-    if (onLine == 1) {
+    if (onLine == RAIL_COMPONENT_LINE) {
         func_ov036_021b39c8(rail, unit, point);
     }
 }
@@ -805,8 +806,8 @@ void func_ov036_021b365c(FieldRailSystem *rail) {
     FieldCamera_CoordsSetTargetOffset(camera, &offset);
 }
 
-static BOOL func_ov036_021b3830(RailPoint *p0, RailPoint *p1, const VecFx32 *pos, VecFx32 *out, fx32 *along,
-                                VecFx32 *cross) {
+static BOOL RailMath_TryProjectWorldPointToSegment(RailPoint *p0, RailPoint *p1, const VecFx32 *pos, VecFx32 *out,
+                                                   fx32 *along, VecFx32 *cross) {
     VecFx32 lineDir;
     VecFx32 toPos;
     VecFx32 ndir;

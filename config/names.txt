@@ -9253,6 +9253,16 @@ overlays/ov036 0x02187b6c MsgBGPrinter_GetPrintWindow
 overlays/ov036 0x02187f58 FieldMsgBG_GetWidestOption
 overlays/ov036 0x0218823c MsgStream_Free
 overlays/ov036 0x02188250 MsgStream_Update
+overlays/ov036 0x0218976c CheckerMsgWin_LoadPalette
+overlays/ov036 0x0218978c CheckerMsgWin_LoadFrameTile
+overlays/ov036 0x021897cc CheckerMsgWin_DrawFrame
+overlays/ov036 0x02189a18 FieldMsgBG_DrawTextLines
+overlays/ov036 0x02189a98 CheckerMsgWin_Create
+overlays/ov036 0x02189b50 CheckerMsgWin_Free
+overlays/ov036 0x02189bc4 CheckerMsgWin_PrintStrBuf
+overlays/ov036 0x02189c00 CheckerMsgWin_Update
+overlays/ov036 0x02189c34 CheckerMsgWin_CalcWidth
+overlays/ov036 0x02189c54 CheckerMsgWin_CalcHeight
 overlays/ov036 0x02189ce8 MsgBGCursor_Init
 overlays/ov036 0x02189d10 MsgBGCursor_Free
 overlays/ov036 0x02189d20 MsgBGCursor_IsShown
@@ -9583,6 +9593,10 @@ overlays/ov036 0x021b01e0 s0222_AnvilleTrainGetDailyIndex
 overlays/ov036 0x021b02c0 FieldRailSystem_Free
 overlays/ov036 0x021b02f8 FieldRailSystem_Reset
 overlays/ov036 0x021b05b8 FieldRailSystem_SetLineEnabled
+overlays/ov036 0x021b0774 RailUnit_GetRailPos
+overlays/ov036 0x021b0794 RailUnit_IsRailPosInBounds
+overlays/ov036 0x021b0814 RailUnit_PredictNextPos
+overlays/ov036 0x021b0888 RailUnit_GetPreviousCalcPos
 overlays/ov036 0x021b09ec RailUnit_GetMoveDirection
 overlays/ov036 0x021b09f4 RailUnit_IsMovePending
 overlays/ov036 0x021b0a8c RailUnit_GetLineDirection
@@ -9609,6 +9623,8 @@ overlays/ov036 0x021b1f74 RailDisabledLines_AllowsPosition
 overlays/ov036 0x021b1fc0 RailPoint_GetLineDirection
 overlays/ov036 0x021b1ff0 RailLine_CheckEndpointDirections
 overlays/ov036 0x021b2060 RailPoint_CheckConnections
+overlays/ov036 0x021b2404 RailMath_SlerpDirections
+overlays/ov036 0x021b3830 RailMath_TryProjectWorldPointToSegment
 overlays/ov036 0x021b3da8 FieldNoGridMapper_SetLineEnabled
 overlays/ov036 0x021b445c UnionChat_AppendLine
 overlays/ov036 0x021b45cc UnionChat_AllocateLine
@@ -9752,6 +9768,9 @@ overlays/ov036 0x021bfa68 JoinAvenueNameEntry_Create
 overlays/ov036 0x021bfb88 JoinAvenueNameEntry_Callback
 overlays/ov036 0x021bfc9c RivalNameEntry_Create
 overlays/ov036 0x021bfcf4 RivalNameEntry_Callback
+overlays/ov036 0x021c05d4 FieldCameraZoomTCB_CreateLinear
+overlays/ov036 0x021c06bc FieldCameraZoomTCB_LinearCallback
+overlays/ov036 0x021c070c FieldCameraZoomTCB_CalcLinear
 overlays/ov036 0x021c08e8 FieldTask_SetStartedCore
 overlays/ov036 0x021c1444 FieldWaitTask_Callback
 overlays/ov036 0x021c1c68 FieldFlash_RequestState

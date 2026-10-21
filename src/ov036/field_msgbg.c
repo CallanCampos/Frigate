@@ -1,12 +1,12 @@
 // The field's message BG: its message windows, money and list windows, the message balloons over actors, and their
 // cursors and input. The ROM names the file in its heap allocations. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0). First written by mariano54 on their parallel-decomp branch
-// Additional helper and table names are our descriptive guesses.
+// Additional checker-window APIs, helpers and table names are our descriptive guesses.
+#include "field/field_msgbg.h"
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "constants/text_banks.h"
-#include "field/field_msgbg.h"
 #include "field/talkmsgwin.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -293,10 +293,10 @@ static void func_ov036_021894c8(u8 bg, u8 x, u8 y, u8 w, u8 h, u16 tile, u8 pal)
 static BOOL func_ov036_02189660(const StrBuf *src, StrBuf *dest, u32 line);
 static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line, u8 color);
 static BOOL func_ov036_021896f0(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color);
-static void func_ov036_0218976c(u32 bg, u32 slot, HeapID heapId);
-static void func_ov036_0218978c(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile);
-static void func_ov036_021897cc(GFLBitmap *bitmap, u32 style, HeapID heapId);
-static void func_ov036_02189a18(u16 x, u16 y, GFLBitmap *bitmap, Font *font, const StrBuf *text, HeapID heapId);
+static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId);
+static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile);
+static void CheckerMsgWin_DrawFrame(GFLBitmap *bitmap, u32 style, HeapID heapId);
+static void FieldMsgBG_DrawTextLines(u16 x, u16 y, GFLBitmap *bitmap, Font *font, const StrBuf *text, HeapID heapId);
 static void MsgBGCursor_Init(MsgBGCursor *cursor, FieldMsgBG *sys);
 static void MsgBGCursor_Free(MsgBGCursor *cursor);
 static BOOL MsgBGCursor_IsShown(MsgBGCursor *cursor);
@@ -1721,11 +1721,13 @@ static BOOL func_ov036_021896f0(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src
     return done;
 }
 
-static void func_ov036_0218976c(u32 bg, u32 slot, HeapID heapId) {
+// The palette always targets main BG memory; bg is retained by the caller interface.
+static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId) {
     GFL_G2DIOLoadNCLR(ARCID_WINFRAME, 2, PALTYPE_MAIN_BG, 0, slot * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE, heapId);
 }
 
-static void func_ov036_0218978c(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile) {
+// The checker frame uses fixed WINFRAME tiles; style does not select another tile set.
+static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile) {
     NNSG2dCharacterData *charData;
     u8 *pixels = GFL_BitmapGetPixelData(bitmap);
     void *file = GFL_ArcSysReadHeapNewLZ(ARCID_WINFRAME, 7, FALSE, heapId);
@@ -1735,57 +1737,57 @@ static void func_ov036_0218978c(GFLBitmap *bitmap, u32 style, HeapID heapId, u32
     GFL_HeapFree(file);
 }
 
-static void func_ov036_021897cc(GFLBitmap *bitmap, u32 style, HeapID heapId) {
+static void CheckerMsgWin_DrawFrame(GFLBitmap *bitmap, u32 style, HeapID heapId) {
     u16 x;
     u16 y;
     u16 tilesW = GFL_BitmapGetWidth(bitmap) >> 3;
     u16 tilesH = GFL_BitmapGetHeight(bitmap) >> 3;
     GFLBitmap *tile = GFL_BitmapCreate(1, 1, BGSYS_TILE_SIZE_16, heapId);
 
-    func_ov036_0218978c(tile, style, heapId, 9);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 9);
     for (y = 0; y < tilesH; y++) {
         for (x = 0; x < tilesW; x++) {
             GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
         }
     }
-    func_ov036_0218978c(tile, style, heapId, 1);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 1);
     for (x = 0; x < tilesW; x++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, 0, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
-    func_ov036_0218978c(tile, style, heapId, 0x11);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0x11);
     y = tilesH - 1;
     for (x = 0; x < tilesW; x++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
-    func_ov036_0218978c(tile, style, heapId, 8);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 8);
     for (y = 0; y < tilesH; y++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, 0, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
-    func_ov036_0218978c(tile, style, heapId, 0xa);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0xa);
     x = tilesW - 1;
     for (y = 0; y < tilesH; y++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
     x = 0;
     y = 0;
-    func_ov036_0218978c(tile, style, heapId, 0);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     x = tilesW - 1;
     y = 0;
-    func_ov036_0218978c(tile, style, heapId, 2);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 2);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     x = 0;
     y = tilesH - 1;
-    func_ov036_0218978c(tile, style, heapId, 0x10);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0x10);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     x = tilesW - 1;
     y = tilesH - 1;
-    func_ov036_0218978c(tile, style, heapId, 0x12);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0x12);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     GFL_BitmapFree(tile);
 }
 
-static void func_ov036_02189a18(u16 x, u16 y, GFLBitmap *bitmap, Font *font, const StrBuf *text, HeapID heapId) {
+static void FieldMsgBG_DrawTextLines(u16 x, u16 y, GFLBitmap *bitmap, Font *font, const StrBuf *text, HeapID heapId) {
     int lineHeight = GFL_FontGetCharHeight(font) + 2;
     StrBuf *line = GFL_StrBufCreate(GFL_StrBufGetCharCount(text) + 1, heapId);
     u32 i = 0;
@@ -1800,15 +1802,15 @@ static void func_ov036_02189a18(u16 x, u16 y, GFLBitmap *bitmap, Font *font, con
     GFL_StrBufFree(line);
 }
 
-CheckerMsgWin *func_ov036_02189a98(FieldMsgBG *sys, u16 style, u16 x, u16 y, u16 width, u16 height) {
+CheckerMsgWin *CheckerMsgWin_Create(FieldMsgBG *sys, u16 style, u16 x, u16 y, u16 width, u16 height) {
     CheckerMsgWin *win = GFL_HeapAllocate(sys->heapId, sizeof(CheckerMsgWin), TRUE, "field_msgbg.c", 4568);
 
     win->sys = sys;
     win->window = BmpWin_CreateDynamic(sys->bg, x, y, width, height, MSGBG_PLTT_SIGN, 1);
     win->cursorBack = GFL_BitmapCreate(1, 1, BGSYS_TILE_SIZE_16, sys->heapId);
-    func_ov036_0218978c(win->cursorBack, style, sys->heapId, 9);
-    func_ov036_021897cc(BmpWin_GetBitmap(win->window), style, sys->heapId);
-    func_ov036_0218976c(sys->bg, MSGBG_PLTT_SIGN, sys->heapId);
+    CheckerMsgWin_LoadFrameTile(win->cursorBack, style, sys->heapId, 9);
+    CheckerMsgWin_DrawFrame(BmpWin_GetBitmap(win->window), style, sys->heapId);
+    CheckerMsgWin_LoadPalette(sys->bg, MSGBG_PLTT_SIGN, sys->heapId);
     BmpWin_FlushMap(win->window);
     BmpWin_FlushChar(win->window);
     GFL_BGSysLoadScr(sys->bg);
@@ -1818,7 +1820,7 @@ CheckerMsgWin *func_ov036_02189a98(FieldMsgBG *sys, u16 style, u16 x, u16 y, u16
     return win;
 }
 
-void func_ov036_02189b50(CheckerMsgWin *win) {
+void CheckerMsgWin_Free(CheckerMsgWin *win) {
     BmpWin_ClearScreen(win->window);
     GFL_BGSysFillScrArea(win->sys->bg, 0, BmpWin_GetPosX(win->window), BmpWin_GetPosY(win->window),
                          BmpWin_GetSizeX(win->window), BmpWin_GetSizeY(win->window), BGSYS_FILL_TILE_PALETTE);
@@ -1830,15 +1832,15 @@ void func_ov036_02189b50(CheckerMsgWin *win) {
     GFL_HeapFree(win);
 }
 
-void func_ov036_02189bc4(CheckerMsgWin *win, u16 x, u16 y, StrBuf *text) {
+void CheckerMsgWin_PrintStrBuf(CheckerMsgWin *win, u16 x, u16 y, StrBuf *text) {
     FieldMsgBG *sys = win->sys;
 
-    func_ov036_02189a18(x, y, BmpWin_GetBitmap(win->window), sys->font, text, sys->heapId);
+    FieldMsgBG_DrawTextLines(x, y, BmpWin_GetBitmap(win->window), sys->font, text, sys->heapId);
     BmpWin_FlushChar(win->window);
     GFL_BGSysLoadScr(win->sys->bg);
 }
 
-BOOL func_ov036_02189c00(CheckerMsgWin *win) {
+BOOL CheckerMsgWin_Update(CheckerMsgWin *win) {
     u32 pressed = GCTX_HIDGetPressedKeys();
 
     GCTX_HIDGetHeldKeys();
@@ -1850,7 +1852,7 @@ BOOL func_ov036_02189c00(CheckerMsgWin *win) {
     return FALSE;
 }
 
-u32 func_ov036_02189c34(FieldMsgBG *sys, StrBuf *str, u32 margin) {
+u32 CheckerMsgWin_CalcWidth(FieldMsgBG *sys, StrBuf *str, u32 margin) {
     u32 w = GFL_FontGetBlockWidth(str, sys->font, 0) + margin * 2;
     u32 tiles = w / 8;
 
@@ -1860,7 +1862,7 @@ u32 func_ov036_02189c34(FieldMsgBG *sys, StrBuf *str, u32 margin) {
     return tiles;
 }
 
-u32 func_ov036_02189c54(FieldMsgBG *sys, StrBuf *str, u32 margin) {
+u32 CheckerMsgWin_CalcHeight(FieldMsgBG *sys, StrBuf *str, u32 margin) {
     u32 h = margin * 2 + GFL_FontGetBlockHeight(str, sys->font);
     StrBuf *clone = GFL_StrBufClone(str, sys->heapId);
     u32 i = 0;

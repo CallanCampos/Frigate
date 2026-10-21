@@ -130,14 +130,14 @@ void GetActorRailPos(FieldActor *actor, RailPosition *position) {
     ActorRailWork *rail = RAIL_WORK(actor);
 
     if (RailUnit_IsMovePending(rail->unit)) {
-        func_ov036_021b0814(rail->unit, RailUnit_GetMoveDirection(rail->unit), position, NULL);
+        RailUnit_PredictNextPos(rail->unit, RailUnit_GetMoveDirection(rail->unit), position, NULL);
     } else {
-        func_ov036_021b0774(rail->unit, position);
+        RailUnit_GetRailPos(rail->unit, position);
     }
 }
 
 void func_ov036_02195604(FieldActor *actor, RailPosition *position) {
-    func_ov036_021b0774(RAIL_WORK(actor)->unit, position);
+    RailUnit_GetRailPos(RAIL_WORK(actor)->unit, position);
 }
 
 RailUnit *FldAct_GetRailUnit(FieldActor *actor) {
@@ -163,10 +163,10 @@ static u32 RailActor_CheckCollision(FieldActor *actor, const RailPosition *from,
     ActorRailWork *rail = RAIL_WORK(actor);
     NoGridMapper *mapper = FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
 
-    if (!func_ov036_021b0794(rail->unit, from)) {
+    if (!RailUnit_IsRailPosInBounds(rail->unit, from)) {
         flags |= 1;
     }
-    if (!func_ov036_021b0794(rail->unit, to)) {
+    if (!RailUnit_IsRailPosInBounds(rail->unit, to)) {
         flags |= 1;
     }
     if (!FldAct_IsMapAttrDisabled(actor)) {
@@ -197,10 +197,10 @@ u32 func_ov036_021956f4(FieldActor *actor, u16 dir, u32 *tile) {
     RailPosition to;
     BOOL moved;
 
-    func_ov036_021b0774(rail->unit, &from);
+    RailUnit_GetRailPos(rail->unit, &from);
     moved = GetActorFaceDir(actor);
     if (moved == dir) {
-        moved = func_ov036_021b0814(rail->unit, RailActor_ConvertDirection(dir), &to, NULL);
+        moved = RailUnit_PredictNextPos(rail->unit, RailActor_ConvertDirection(dir), &to, NULL);
     } else {
         moved = func_ov036_021b068c(railSystem, &from, RailActor_ConvertDirection(dir), &to);
     }
@@ -234,12 +234,12 @@ static BOOL RailActor_CheckActorCollision(FieldActor *actor, const RailPosition 
         }
         unit = FldAct_GetRailUnit(other);
         if (RailUnit_IsMovePending(unit)) {
-            func_ov036_021b0814(unit, RailUnit_GetMoveDirection(unit), NULL, &otherPos);
+            RailUnit_PredictNextPos(unit, RailUnit_GetMoveDirection(unit), NULL, &otherPos);
             if (func_ov036_021b0d64(&target, &otherPos, radius)) {
                 return TRUE;
             }
         }
-        func_ov036_021b0888(unit, &otherPos);
+        RailUnit_GetPreviousCalcPos(unit, &otherPos);
         if (func_ov036_021b0d64(&target, &otherPos, radius)) {
             return TRUE;
         }
@@ -296,7 +296,7 @@ BOOL func_ov036_02195928(FieldActor *actor, RailPosition *position) {
 
     FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
     rail = RAIL_WORK(actor);
-    return func_ov036_021b0814(rail->unit, ConvDirToRailDir(GetActorFaceDir(actor)), position, NULL);
+    return RailUnit_PredictNextPos(rail->unit, ConvDirToRailDir(GetActorFaceDir(actor)), position, NULL);
 }
 
 BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position) {
@@ -309,7 +309,7 @@ BOOL GetActorRailPosForDir(FieldActor *actor, u16 dir, RailPosition *position) {
         GetActorRailPos(actor, position);
         return func_ov036_021b068c(railSystem, position, ConvDirToRailDir(dir), position);
     }
-    return func_ov036_021b0814(rail->unit, ConvDirToRailDir(dir), position, NULL);
+    return RailUnit_PredictNextPos(rail->unit, ConvDirToRailDir(dir), position, NULL);
 }
 
 void func_ov036_021959bc(FieldActor *actor, u16 dir) {
@@ -550,7 +550,7 @@ static void RailActor_AcquireUnit(ActorRailWork *rail, FieldActor *actor) {
 static void RailActor_SaveUnitPosition(ActorRailWork *rail, FieldActor *actor) {
     RailPosition pos;
 
-    func_ov036_021b0774(rail->unit, &pos);
+    RailUnit_GetRailPos(rail->unit, &pos);
     SetActorPositionRailCoordinates(rail, &pos);
 }
 
