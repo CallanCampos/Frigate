@@ -2548,3 +2548,7 @@ lib/nitro/src/syscall/secure_area.c:
 
 lib/nitro/src/init/crt0.c:
     .text       start:0x02004800 end:0x02005050
+
+lib/dwc/src/base/dwc_init_version.c:
+    complete
+    .text       start:0x02005050 end:0x02005094
