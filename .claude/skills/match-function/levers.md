@@ -214,6 +214,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- Edge and corner sums unexpectedly shared, with fewer spills: signed edge arithmetic can coexist with unsigned
+  corner arithmetic; cast the operands, not only the result. (matching.md: "Signed and unsigned sums")
 - Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
   (matching.md: "A `static inline` accessor that returns a field cast")
 - A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.

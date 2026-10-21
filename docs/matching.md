@@ -818,6 +818,12 @@ Same code, other `sp` offsets or frame size.
   values and three `remap->to` loads in assignment order only when its inline `SwapRemappedKeys` takes
   `const u32 *keys` and reads `*keys` at each use. With `u32 keys` by value, the keys took three slots apart from the
   others.
+- Signed and unsigned sums of the same values are kept apart. In `talkmsgwin.c`'s `TalkMsgWin_DrawSpikyFrame` and
+  `TalkMsgWin_DrawBumpyFrame`, the window getters return `u8`, held in unsigned coordinate and size locals. The signed
+  frame edges use `(int)x + (int)width` and `y + (int)height`, while the corner calculations keep their unsigned sums.
+  Assigning an unsigned sum to an `int` edge local does not make the addition signed: MWCC shares it with the corner
+  calculations, removes spills and shortens each function by 20 bytes. Casting the operands gives both original
+  frames and instruction streams without splitting the sums. The getter ranges keep the signed sums within 0–510.
 - A common subexpression's spilled temporary takes its slot by where its first use is written. A local holding it
   doesn't count, since MWCC propagates `end = offset + size;` into its uses whatever its type or declaration.
   `backup_system.c`'s `SaveData_LoadWithBackup` puts `offset + size` at the top of its spilled values (`sp+0x20`) only with

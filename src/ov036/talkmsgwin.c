@@ -1058,14 +1058,14 @@ static void TalkMsgWin_DrawSpikyFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 ta
     if (x == 0) {
         atLeft = 1;
     }
-    rightEdge = x + width;
+    rightEdge = (int)x + (int)width;
     if (rightEdge == TALKMSG_WIN_SCREEN_WIDTH) {
         atRight = 1;
     }
     if (y == 0) {
         atTop = 1;
     }
-    bottomEdge = y + height;
+    bottomEdge = y + (int)height;
     if (bottomEdge == TALKMSG_WIN_SCREEN_HEIGHT) {
         atBottom = 1;
     }
@@ -1228,14 +1228,14 @@ static void TalkMsgWin_DrawBumpyFrame(TalkMsgWinSys *sys, BmpWin *bmpWin, u32 ta
     if (x == 0) {
         atLeft = 1;
     }
-    rightEdge = x + width;
+    rightEdge = (int)x + (int)width;
     if (rightEdge == TALKMSG_WIN_SCREEN_WIDTH) {
         atRight = 1;
     }
     if (y == 0) {
         atTop = 1;
     }
-    bottomEdge = y + height;
+    bottomEdge = y + (int)height;
     if (bottomEdge == TALKMSG_WIN_SCREEN_HEIGHT) {
         atBottom = 1;
     }
