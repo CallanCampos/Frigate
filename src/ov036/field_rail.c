@@ -985,8 +985,8 @@ static WorldToRailFunc GetHandler2CurveFunc(RailDataHandle *data, u32 id) {
 static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
     RailLine *line = unit->component.line;
     s32 length = unit->length;
-    RailPoint *point;
     RailLine *next0;
+    RailPoint *point;
     RailLine *next1;
     RailLine *next2;
     BOOL outsideWidth;
@@ -1000,16 +1000,17 @@ static inline u32 RailUnit_MoveForward(RailUnit *unit, u32 dir, s32 step) {
     next1 = GetLineContinueInDirection(point, RailDirection_TurnLeft(dir), unit->handle, unit->disabled, 0);
     next2 = GetLineContinueInDirection(point, RailDirection_TurnRight(dir), unit->handle, unit->disabled, 0);
     RailUnit_ApplyLineStep(unit->disabled, unit, step, 0, dir);
-    if (length > unit->front) {
+    if (unit->front < length) {
         width = GetLerpedLineWidthByLineYPos(line, unit->front, length, unit->handle);
         absOffset = unit->side;
         if (absOffset < 0) {
             absOffset = -absOffset;
         }
-        if (absOffset <= width) {
+        if (width < absOffset) {
+            outsideWidth = TRUE;
+        } else {
             return dir;
         }
-        outsideWidth = TRUE;
     }
     if (next0 != NULL && !outsideWidth) {
         RailPoint_CheckConnections(point, unit->handle);
@@ -1094,10 +1095,11 @@ static inline u32 RailUnit_MoveBackward(RailUnit *unit, u32 dir, s32 step) {
         if (absOffset < 0) {
             absOffset = -absOffset;
         }
-        if (absOffset <= width) {
+        if (width < absOffset) {
+            outsideWidth = TRUE;
+        } else {
             return dir;
         }
-        outsideWidth = TRUE;
     }
     if (next2 != NULL && !outsideWidth) {
         RailPoint_CheckConnections(point, unit->handle);
