@@ -2382,6 +2382,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   switch to the SDK's types, each matching with an `int` or `unsigned int` parameter: `InfinityDungeon_GetTrainerSlot`'s
   `room`, `MusPokeDraw_GetEquipPos`'s `pos`, `BtlvMcss_PlayCry`'s `speed`, `PutCmdArgs`'s `format` and
   `StartMenu_SetItemPalette`'s `item`.
+- Whether a field read through a pointer parameter, `*(T *)&p->m`, is passed as `adds; ldr` or as one folded `ldr [p,
+  #off]` depends on how many references `p` has: a `(void)p;` statement counts as one and flips it. That makes it a
+  diagnostic, not a fix: when only that differs, the original uses the pointer once more than the C, so look for the
+  missing use. natneg.c's `ProcessPingPacket` matches with `(void)fromAddr;`, which nothing in GameSpy's code calls
+  for, so it keeps its row.
 - A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
   arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
   reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.

@@ -227,6 +227,8 @@ same commit.
 (`FX32_ONE` is `((fx32)0x00001000L)`, `FX32_CONST` is `FX_F32_TO_FX32`), as ntrtwl's NitroSDK and pret's pokediamond
 have them. Game Freak's code mixes them with plain C types, so a declaration takes the type the original evidently
 had: `u32`/`s32` where it compiles as the SDK's, `int`/`unsigned int` where it compiles as those.
+GameSpy's code, which is cross-platform, uses GameSpy's own types from its `nonport.h` (`lib/dwc/include/dwc/nonport.h`:
+`gsi_u32` is `unsigned int`, `gsi_i32` is `int`, `gsi_bool` is `int`), and DWC's own code the SDK's.
 
 **Don't:** change a typedef or an SDK constant because more functions match with it, or cast to emulate another type.
 A function that matches only under a type the original didn't have isn't faithful.

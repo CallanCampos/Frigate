@@ -115,11 +115,14 @@ static inline void AddRotatedCenterOffset_(const GXOamAttr *oam, const MtxFx22 *
     const int halfW = NNS_G2dGetOamSizeX(&shape) >> 1;
     const int halfH = NNS_G2dGetOamSizeY(&shape) >> 1;
 
-    pos->x += -(halfW << FX32_SHIFT) + (m->_00 * halfW + m->_10 * halfH);
-    pos->y += -(halfH << FX32_SHIFT) + (m->_01 * halfW + m->_11 * halfH);
+    const fx32 offX = halfW << FX32_SHIFT;
+    const fx32 offY = halfH << FX32_SHIFT;
+
+    pos->x += -offX + (m->_00 * halfW + m->_10 * halfH);
+    pos->y += -offY + (m->_01 * halfW + m->_11 * halfH);
     if (doubleSize) {
-        pos->x -= halfW << FX32_SHIFT;
-        pos->y -= halfH << FX32_SHIFT;
+        pos->x -= offX;
+        pos->y -= offY;
     }
 }
 

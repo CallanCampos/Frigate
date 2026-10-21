@@ -113,6 +113,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   or field's type, `int`/`unsigned int` against `u32`/`s32`. (matching.md: "Game Freak's code mixes the SDK's types")
 - A caller's scheduling or stack slots differ only around a call: the callee's parameter type, `int` against `long`.
   (matching.md: "A narrow argument passed to a parameter")
+- A loop's setup registers swapped in a function that calls an inline with `u16` bounds: declare the inline's index
+  parameters `int` (`g2d_OAM.c`'s `LoadAffinesByFunction_`, 14 bytes to 4).
+- A field read through a pointer parameter folded where the original builds the address, or the reverse: the original
+  uses the pointer once more or less. (matching.md: "depends on how many references")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
   "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has

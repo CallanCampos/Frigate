@@ -292,10 +292,6 @@ static s32 func_ov257_021aafdc(u8 *data, u32 size, u32 option) {
 
 // Decodes a JPEG into dest, and returns its height and width, or 0
 static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 maxHeight, u32 option) {
-    s32 width = 0;
-    s32 height = 0;
-    s32 restartInterval;
-    s32 restartCount;
     s32 p;
     u8 marker;
     int len;
@@ -321,6 +317,10 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
     u16 huffcode[257];
     s8 huffsize[257];
     s32 pos;
+    s32 width = 0;
+    s32 height = 0;
+    s32 restartInterval;
+    s32 restartCount;
 
     sStuffed = 0;
     sBitsLeft = 0;
@@ -393,9 +393,9 @@ static u32 func_ov257_021ab0a4(u8 *dest, u8 *data, u32 size, s32 maxWidth, s32 m
                     }
                     sDerivedTbl16 = (s16 *)&sHuffWork[tblOffset + HUFF_DERIVED];
                     sDerivedTbl32 = (s32 *)&sHuffWork[tblOffset + HUFF_DERIVED];
-                    count = 0;
                     bits = &sHuffWork[bitsOffset];
                     sHuffWork[bitsOffset] = 0;
+                    count = 0;
                     for (i = 1; i <= 16; i++) {
                         bits[i] = data[p];
                         count += bits[i];

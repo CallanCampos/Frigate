@@ -565,8 +565,8 @@ static inline void MysteryCardView_LoadIcon(MysteryCardView *view, MysteryCard *
 
 static void MysteryCardView_DrawCard(MysteryCardView *view, BOOL shown, BOOL left, u32 page, u16 index, HeapID heapId) {
     MysteryCard *card = &view->cards[index + page * 4];
-    MysteryCardPos pos = sCardPositions[index];
     u32 win = index;
+    MysteryCardPos pos = sCardPositions[index];
     GFLBitmap *date;
     ClActorSetup actorSetup;
     s16 dx;
