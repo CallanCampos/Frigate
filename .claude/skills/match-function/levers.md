@@ -1027,6 +1027,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.
+- TwlSDK code that resists respellings: rebuild it in the shape of cybervisi0n/libntr's reconstruction (its
+  `static inline` setters and wrappers, `if (n > 0) { ... }` blocks with their locals, cursor layouts), in our own
+  names. (matching.md: "in the shape of cybervisi0n/libntr's reconstruction")
 
 ## Diagnostic switches (not for committed code)
 

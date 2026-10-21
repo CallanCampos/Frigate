@@ -547,14 +547,10 @@ static u32 MIi_ReserveWramCore(MIWram wram, int count, MIWramProc proc) {
 
 // Reserves for proc the count banks from slot if they are free and not reserved, and returns their address
 static u32 MIi_ReserveWramSlotCore(MIWram wram, int slot, int count, MIWramProc proc) {
-    int end;
+    int banks = (wram == MI_WRAM_A) ? count / 2 : count;
     int i;
 
-    if (wram == MI_WRAM_A) {
-        count /= 2;
-    }
-    end = slot + count;
-    for (i = slot; i < end; i++) {
+    for (i = slot; i < slot + banks; i++) {
         // BUG: Each pass checks the first bank, not bank i
 #ifdef BUGFIX
         MIWramProc owner = sWramState[wram][i] & MI_WRAM_STATE_PROC_MASK;
@@ -568,7 +564,7 @@ static u32 MIi_ReserveWramSlotCore(MIWram wram, int slot, int count, MIWramProc 
         }
     }
 
-    for (i = slot; i < end; i++) {
+    for (i = slot; i < slot + banks; i++) {
         sWramState[wram][i] =
             (sWramState[wram][i] & ~MI_WRAM_STATE_RESERVE_MASK) | (proc << MI_WRAM_STATE_RESERVE_SHIFT);
     }
