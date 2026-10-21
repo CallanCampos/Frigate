@@ -9,7 +9,7 @@
 
 static u32 getSize(void);
 
-void func_02010ca0(void *data) {
+void ZukanHabitatSave_Init(void *data) {
     MI_CpuFill8(data, 0, getSize());
 }
 
@@ -17,11 +17,11 @@ static u32 getSize(void) {
     return sizeof(ZukanHabitatSave);
 }
 
-void *func_02010cb8(SaveControl *save) {
+void *SaveControl_GetZukanHabitatSave(SaveControl *save) {
     return MedalBox_GetHabitatList(SaveControl_GetMedalBox(save));
 }
 
-u8 func_02010cc4(void *data, u8 habitat, u32 type) {
+u8 ZukanHabitatSave_GetHabitatField(void *data, u8 habitat, u32 type) {
     ZukanHabitatSave *save = data;
 
     switch (type) {
@@ -35,15 +35,15 @@ u8 func_02010cc4(void *data, u8 habitat, u32 type) {
     return 0;
 }
 
-BOOL func_02010cfc(ZukanHabitatSave *save, u8 habitat) {
+BOOL ZukanHabitatSave_IsHabitatFlagSet(ZukanHabitatSave *save, u8 habitat) {
     return save->habitats[habitat].flag;
 }
 
-void func_02010d08(ZukanHabitatSave *save, u8 habitat) {
+void ZukanHabitatSave_SetHabitatFlag(ZukanHabitatSave *save, u8 habitat) {
     save->habitats[habitat].flag = TRUE;
 }
 
-void func_02010d14(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value) {
+void ZukanHabitatSave_SetHabitatField(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value) {
     switch (type) {
     case ZUKAN_HABITAT_TYPE_0:
         save->habitats[habitat].type0 = (u8)value;
@@ -57,54 +57,54 @@ void func_02010d14(ZukanHabitatSave *save, u8 habitat, u32 type, u32 value) {
     }
 }
 
-void func_02010d70(void *data, u16 zone) {
+void ZukanHabitatSave_SetZone(void *data, u16 zone) {
     ZukanHabitatSave *save = data;
 
     save->zone = zone;
 }
 
-u16 func_02010d78(void *data) {
+u16 ZukanHabitatSave_GetZone(void *data) {
     ZukanHabitatSave *save = data;
 
     return save->zone;
 }
 
-void func_02010d80(void *data, u32 season) {
+void ZukanHabitatSave_SetSeason(void *data, u32 season) {
     ZukanHabitatSave *save = data;
 
     save->season = season;
 }
 
-u8 func_02010d88(void *data) {
+u8 ZukanHabitatSave_GetSeason(void *data) {
     ZukanHabitatSave *save = data;
 
     return save->season;
 }
 
-void func_02010d90(void *data, u16 type) {
+void ZukanHabitatSave_SetType(void *data, u16 type) {
     ZukanHabitatSave *save = data;
 
     save->type = type;
 }
 
-u8 func_02010d98(void *data) {
+u8 ZukanHabitatSave_GetType(void *data) {
     ZukanHabitatSave *save = data;
 
     return save->type;
 }
 
-u8 func_02010da0(ZukanHabitatSave *save) {
-    return save->unk94;
+u8 ZukanHabitatSave_IsSeenMessageShown(ZukanHabitatSave *save) {
+    return save->seenMessageShown;
 }
 
-u8 func_02010da8(ZukanHabitatSave *save) {
-    return save->unk95;
+u8 ZukanHabitatSave_IsCaughtMessageShown(ZukanHabitatSave *save) {
+    return save->caughtMessageShown;
 }
 
-void func_02010db0(ZukanHabitatSave *save) {
-    save->unk94 = TRUE;
+void ZukanHabitatSave_SetSeenMessageShown(ZukanHabitatSave *save) {
+    save->seenMessageShown = TRUE;
 }
 
-void func_02010db8(ZukanHabitatSave *save) {
-    save->unk95 = TRUE;
+void ZukanHabitatSave_SetCaughtMessageShown(ZukanHabitatSave *save) {
+    save->caughtMessageShown = TRUE;
 }

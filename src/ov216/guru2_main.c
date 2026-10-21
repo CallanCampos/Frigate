@@ -898,7 +898,7 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     // Until the parent sends the positions, the members are in net ID order
     {
         int position = 0;
-        int netId = func_0203ffc4();
+        int netId = NetSystem_GetNetId();
         Guru2Disc *disc = &g2m->disc;
 
         for (; i < GURU2_MEMBER_MAX; i++) {
@@ -922,15 +922,15 @@ BOOL Guru2Main_Init(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2Main_InitButton(g2m);
     Guru2Main_InitBonus(g2m);
     GFL_WipeSet(0, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 8, 1, HEAPID_GURU2);
-    func_02042e9c(TRUE);
+    GFL_NetSetDisconnectError(TRUE);
     return TRUE;
 }
 
 BOOL Guru2Main_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2MainWork *g2m = work;
 
-    func_02021c44(g2m->msg.queue);
-    func_02021a18(g2m->msg.queue);
+    PrintQueue_Clear(g2m->msg.queue);
+    PrintQueue_Free(g2m->msg.queue);
     if (g2m->waitIcon != NULL) {
         WaitIcon_Free(g2m->waitIcon);
     }
@@ -940,7 +940,7 @@ BOOL Guru2Main_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     Guru2Main_FreeDiscBump(g2m);
     Guru2Main_FreeButton(g2m);
     Guru2Main_FreeBonus(g2m);
-    func_0203a610(g2m->tcbManager);
+    GFL_TCBMgrDelete(g2m->tcbManager);
     GFL_HeapFree(g2m->tcbBuffer);
     Guru2Main_FreeBG3D(g2m);
     Guru2Main_FreeDisc(g2m);
@@ -991,7 +991,7 @@ static int Guru2MainSeq_Init(Guru2MainWork *g2m) {
 
 static int Guru2MainSeq_FadeInWait(Guru2MainWork *g2m) {
     if (GFL_WipeIsFinished()) {
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             g2m->seq = SEQ_PARENT_WAIT_CHILDREN;
         } else {
             g2m->seq = SEQ_CHILD_SEND_JOIN;
@@ -1104,17 +1104,17 @@ static int Guru2MainSeq_ChildWaitStartSignal(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SyncStart(Guru2MainWork *g2m) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
 
     WaitIcon_Free(g2m->waitIcon);
     g2m->waitIcon = NULL;
-    func_02040624(handle, GURU2_SYNC_START, GURU2_SYNC_CLASS);
+    NetHandle_SendTimingPair(handle, GURU2_SYNC_START, GURU2_SYNC_CLASS);
     g2m->seq = SEQ_SYNC_START_WAIT;
     return SEQ_RESULT_WAIT;
 }
 
 static int Guru2MainSeq_SyncStartWait(Guru2MainWork *g2m) {
-    if (func_02040664(func_02040440(), GURU2_SYNC_START, GURU2_SYNC_CLASS)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), GURU2_SYNC_START, GURU2_SYNC_CLASS)) {
         g2m->seq = SEQ_SEND_PARTY_INDEX;
     }
     return SEQ_RESULT_WAIT;
@@ -1128,10 +1128,11 @@ static int Guru2MainSeq_SendPartyIndex(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SendParty(Guru2MainWork *g2m) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
     u32 joined = UnionApp_GetJoined(Guru2Main_GetUnionApp(g2m));
 
-    if (func_02042c9c(handle, (u8)joined, GURU2_NET_CMD_BLOCK, GURU2_COMM_BLOCK_SIZE, g2m->party, TRUE, TRUE, TRUE)) {
+    if (GFL_NetSendCommandToBits(handle, (u8)joined, GURU2_NET_CMD_BLOCK, GURU2_COMM_BLOCK_SIZE, g2m->party, TRUE, TRUE,
+                                 TRUE)) {
         g2m->seq = SEQ_WAIT_PARTIES;
     }
     return SEQ_RESULT_WAIT;
@@ -1233,7 +1234,7 @@ static int Guru2MainSeq_CountdownBefore(Guru2MainWork *g2m) {
     g2m->wait++;
     if (g2m->wait > 30) {
         g2m->wait = 0;
-        if (func_0203ffc4() == 0) {
+        if (NetSystem_GetNetId() == 0) {
             g2m->seq = SEQ_PARENT_SEND_COUNTDOWN_SIGNAL;
         } else {
             g2m->seq = SEQ_CHILD_WAIT_COUNTDOWN_SIGNAL;
@@ -1257,7 +1258,7 @@ static void Guru2Main_AddMetTrainers(Guru2MainWork *g2m) {
     int i;
 
     for (i = 0; i < GURU2_MEMBER_MAX; i++) {
-        if (g2m->members[i] != NULL && i != func_0203ffc4()) {
+        if (g2m->members[i] != NULL && i != NetSystem_GetNetId()) {
             Misc_AddMetTrainer(rivalData, getIDAsUInt(&g2m->members[i]->info));
         }
     }
@@ -1272,13 +1273,13 @@ static int Guru2MainSeq_ChildWaitCountdownSignal(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SyncCountdown(Guru2MainWork *g2m) {
-    func_02040624(func_02040440(), GURU2_SYNC_COUNTDOWN, GURU2_SYNC_CLASS);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), GURU2_SYNC_COUNTDOWN, GURU2_SYNC_CLASS);
     g2m->seq = SEQ_SYNC_COUNTDOWN_WAIT;
     return SEQ_RESULT_WAIT;
 }
 
 static int Guru2MainSeq_SyncCountdownWait(Guru2MainWork *g2m) {
-    if (func_02040664(func_02040440(), GURU2_SYNC_COUNTDOWN, GURU2_SYNC_CLASS)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), GURU2_SYNC_COUNTDOWN, GURU2_SYNC_CLASS)) {
         g2m->seq = SEQ_COUNTDOWN_START;
     }
     return SEQ_RESULT_WAIT;
@@ -1308,7 +1309,7 @@ static int Guru2MainSeq_CountdownWait(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_GameStart(Guru2MainWork *g2m) {
-    func_0203ffc4();
+    NetSystem_GetNetId();
     g2m->seq = SEQ_GAME;
     return SEQ_RESULT_WAIT;
 }
@@ -1347,7 +1348,7 @@ static int Guru2MainSeq_Game(Guru2MainWork *g2m) {
 
     // The parent speeds the disc up in the first half and slows it down in the second
     disc = &g2m->disc;
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         if (g2m->gameFrame < GAME_SLOW_FRAMES) {
             disc->speed += 0x5f;
             if (disc->speed >= FX32_CONST(7)) {
@@ -1360,7 +1361,7 @@ static int Guru2MainSeq_Game(Guru2MainWork *g2m) {
             }
         }
     }
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         data.discAngle = g2m->disc.angle;
         data.timeUp = g2m->timeUp;
         data.jumpY = g2m->objects.eggs[0].jumpY;
@@ -1369,7 +1370,7 @@ static int Guru2MainSeq_Game(Guru2MainWork *g2m) {
         }
         Guru2Comm_Send(g2m->g2c, GURU2_NET_CMD_8, &data, sizeof(data));
     }
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         fx32 speed = g2m->disc.speed;
 
         // While the Eggs are in the air, the disc turns under them at twice the speed
@@ -1385,8 +1386,8 @@ static int Guru2MainSeq_Game(Guru2MainWork *g2m) {
 static int Guru2MainSeq_GameEnd(Guru2MainWork *g2m) {
     Guru2Main_StartSubFade(g2m, FALSE);
     g2m->frontEgg = Guru2Main_FindFrontEgg(g2m);
-    if (func_0203ffc4() == 0) {
-        if (g2m->frontEgg->netId == func_0203ffc4()) {
+    if (NetSystem_GetNetId() == 0) {
+        if (g2m->frontEgg->netId == NetSystem_GetNetId()) {
             g2m->seq = SEQ_PARENT_ALIGN_OWN;
         } else {
             g2m->seq = SEQ_PARENT_ALIGN;
@@ -1402,7 +1403,7 @@ static int Guru2MainSeq_GameEnd(Guru2MainWork *g2m) {
 static int Guru2MainSeq_ParentAlignOwn(Guru2MainWork *g2m) {
     Guru2Main_ParentTurn(g2m, FX32_CONST(4));
     g2m->frontEgg = Guru2Main_FindFrontEgg(g2m);
-    if (g2m->frontEgg->netId != func_0203ffc4()) {
+    if (g2m->frontEgg->netId != NetSystem_GetNetId()) {
         g2m->seq = SEQ_PARENT_ALIGN;
     }
     return SEQ_RESULT_WAIT;
@@ -1439,14 +1440,14 @@ static int Guru2MainSeq_ParentAlign(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SyncResult(Guru2MainWork *g2m) {
-    func_02040624(func_02040440(), GURU2_SYNC_RESULT, GURU2_SYNC_CLASS);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), GURU2_SYNC_RESULT, GURU2_SYNC_CLASS);
     g2m->seq = SEQ_SYNC_RESULT_WAIT;
     return SEQ_RESULT_WAIT;
 }
 
 static int Guru2MainSeq_SyncResultWait(Guru2MainWork *g2m) {
-    if (func_02040664(func_02040440(), GURU2_SYNC_RESULT, GURU2_SYNC_CLASS)) {
-        if (func_0203ffc4() == 0) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), GURU2_SYNC_RESULT, GURU2_SYNC_CLASS)) {
+        if (NetSystem_GetNetId() == 0) {
             g2m->seq = SEQ_PARENT_SEND_RESULT;
         } else {
             g2m->seq = SEQ_CHILD_WAIT_RESULT;
@@ -1611,20 +1612,20 @@ static int Guru2MainSeq_BagFullWait(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SyncSave(Guru2MainWork *g2m) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
 
     RecordAddOne(g2m->g2p->param->records, 90);
     Guru2Main_PrintMsg(g2m, AbilityHandlers_Text_SavingDontTurnOff);
-    func_02040624(handle, GURU2_SYNC_SAVE, GURU2_SYNC_CLASS);
+    NetHandle_SendTimingPair(handle, GURU2_SYNC_SAVE, GURU2_SYNC_CLASS);
     g2m->seq = SEQ_SYNC_SAVE_WAIT;
     GCTX_HIDBlockSoftReset(8);
     return SEQ_RESULT_WAIT;
 }
 
 static int Guru2MainSeq_SyncSaveWait(Guru2MainWork *g2m) {
-    if (func_02040664(func_02040440(), GURU2_SYNC_SAVE, GURU2_SYNC_CLASS)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), GURU2_SYNC_SAVE, GURU2_SYNC_CLASS)) {
         Guru2Main_TradeEgg(g2m, g2m->frontEgg->netId);
-        g2m->netSave = func_02012ee4(HEAPID_GURU2, g2m->g2p->param->gameData);
+        g2m->netSave = NetSave_Create(HEAPID_GURU2, g2m->g2p->param->gameData);
         g2m->waitIcon = WaitIcon_Create(g2m->tcbManager, g2m->msg.msgWindow, 15, 16, HEAPID_GURU2);
         g2m->seq = SEQ_SAVE;
     }
@@ -1632,10 +1633,10 @@ static int Guru2MainSeq_SyncSaveWait(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_Save(Guru2MainWork *g2m) {
-    BOOL done = func_02012f5c(g2m->netSave);
+    BOOL done = NetSave_Update(g2m->netSave);
 
     if (GFL_NetErrCheck()) {
-        func_02012154();
+        GFL_NetErrShutdown();
         GFL_NetErrShow(1);
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
         Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
@@ -1644,7 +1645,7 @@ static int Guru2MainSeq_Save(Guru2MainWork *g2m) {
     if (done) {
         WaitIcon_Free(g2m->waitIcon);
         g2m->waitIcon = NULL;
-        func_02012f8c(g2m->netSave);
+        NetSave_Free(g2m->netSave);
         g2m->seq = SEQ_SYNC_END;
     }
     return SEQ_RESULT_WAIT;
@@ -1667,10 +1668,10 @@ static int Guru2MainSeq_BadEggWait(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SyncEnd(Guru2MainWork *g2m) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
 
     if (!g2m->error) {
-        func_02040624(handle, GURU2_SYNC_END, GURU2_SYNC_CLASS);
+        NetHandle_SendTimingPair(handle, GURU2_SYNC_END, GURU2_SYNC_CLASS);
     }
     Guru2Main_PrintMsg(g2m, AbilityHandlers_Text_CommunicatingPleaseStandBy_2);
     g2m->seq = SEQ_SYNC_END_WAIT;
@@ -1678,13 +1679,13 @@ static int Guru2MainSeq_SyncEnd(Guru2MainWork *g2m) {
 }
 
 static int Guru2MainSeq_SyncEndWait(Guru2MainWork *g2m) {
-    NetHandle *handle = func_02040440();
+    NetHandle *handle = NetHandle_GetOwn();
 
     if (!g2m->error) {
-        if (func_02040664(handle, GURU2_SYNC_END, GURU2_SYNC_CLASS)) {
+        if (NetHandle_IsTimingPairRecv(handle, GURU2_SYNC_END, GURU2_SYNC_CLASS)) {
             g2m->waitIcon = WaitIcon_Create(g2m->tcbManager, g2m->msg.msgWindow, 15, 16, HEAPID_GURU2);
-            func_02042e9c(FALSE);
-            func_02040c64(GURU2_NET_CMD_BASE);
+            GFL_NetSetDisconnectError(FALSE);
+            NetCommand_RemoveTable(GURU2_NET_CMD_BASE);
             UnionApp_RequestStart(Guru2Main_GetUnionApp(g2m));
             g2m->seq = SEQ_END_WAIT;
         }
@@ -1733,7 +1734,7 @@ static void Guru2Main_VBlank(TCB *tcb, void *data) {
     Guru2MainWork *g2m = data;
 
     PaletteFade_Transfer(g2m->fade);
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -1774,9 +1775,9 @@ static void Guru2Main_Draw(Guru2MainWork *g2m) {
     Guru2Main_DrawDisc(g2m);
     Guru2Main_DrawObjects(g2m);
     GFL_G3DSysReqSwapBuffers();
-    func_0204b794();
+    ClActSys_Draw();
 
-    func_02021a3c(g2m->msg.queue);
+    PrintQueue_Main(g2m->msg.queue);
     PrintWindow_Flush(&g2m->msg.msgPrint, g2m->msg.queue);
     for (i = 0; i < GURU2_MEMBER_MAX; i++) {
         PrintWindow_Flush(&g2m->msg.namePrints[i], g2m->msg.queue);
@@ -2061,25 +2062,25 @@ static void Guru2Main_SetSubFade(Guru2MainWork *g2m, int evy) {
 
 static void Guru2Main_InitClAct(Guru2MainWork *g2m) {
     ClActSys_Create(&data_02093f08, &sGuru2VRAMConfig, HEAPID_GURU2);
-    g2m->clactUnit = func_0204bf1c(30, 1, HEAPID_GURU2);
+    g2m->clactUnit = ClActUnit_Create(30, 1, HEAPID_GURU2);
 }
 
 static void Guru2Main_LoadClActResources(Guru2MainWork *g2m) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_GURU2_OBJ, HEAPID_GURU2);
 
-    g2m->chars = func_0204b81c(arc, 6, FALSE, 0, HEAPID_GURU2);
-    g2m->palette = func_0204bba0(arc, 0, 0, 0, HEAPID_GURU2);
-    g2m->cellAnims = func_0204bde0(arc, 10, 14, HEAPID_GURU2);
+    g2m->chars = ClActSys_LoadChars(arc, 6, FALSE, 0, HEAPID_GURU2);
+    g2m->palette = ClActSys_LoadPltt(arc, 0, 0, 0, HEAPID_GURU2);
+    g2m->cellAnims = ClActSys_LoadCellAnims(arc, 10, 14, HEAPID_GURU2);
     GFL_ArcToolFree(arc);
-    func_02042ba8(TRUE, HEAPID_GURU2);
+    GFL_NetSetIconScreen(TRUE, HEAPID_GURU2);
 }
 
 static void Guru2Main_FreeClAct(Guru2MainWork *g2m) {
-    func_0204b98c(g2m->chars);
-    func_0204bcd0(g2m->palette);
-    func_0204be64(g2m->cellAnims);
-    func_0204bf98(g2m->clactUnit);
-    func_0204b758();
+    ClActSys_FreeChars(g2m->chars);
+    ClActSys_FreePltt(g2m->palette);
+    ClActSys_FreeCellAnims(g2m->cellAnims);
+    ClActUnit_Delete(g2m->clactUnit);
+    ClActSys_Delete();
 }
 
 static void Guru2Main_InitMsg(Guru2MainWork *g2m) {
@@ -2098,7 +2099,7 @@ static void Guru2Main_InitMsg(Guru2MainWork *g2m) {
         g2m->names[i] = GFL_StrBufCreate(8, HEAPID_GURU2);
     }
     PrintWindow_Init(&msg->msgPrint, msg->msgWindow);
-    msg->queue = func_02021998(HEAPID_GURU2);
+    msg->queue = PrintQueue_CreateDefault(HEAPID_GURU2);
     Guru2Main_CreateNameWindows(g2m, g2m->g2p->memberCount);
 }
 
@@ -2138,7 +2139,7 @@ static void Guru2Main_PrintEggMsg(Guru2MainWork *g2m, u32 messageId, UnionAppMem
     UnionApp *app = Guru2Main_GetUnionApp(g2m);
     StrBuf *strbuf;
 
-    copyVarForText(msg->wordSet, 1, &UnionApp_GetMember(app, func_0203ffc4())->info);
+    copyVarForText(msg->wordSet, 1, &UnionApp_GetMember(app, NetSystem_GetNetId())->info);
     copyVarForText(msg->wordSet, 2, &member->info);
     strbuf = GFL_StrBufCreate(0x100, HEAPID_GURU2);
     GFL_MsgDataLoadStrbuf(msg->msgData, messageId, strbuf);
@@ -2211,7 +2212,7 @@ static void Guru2Main_PrintNameColor(Guru2MainWork *g2m, StrBuf *name, int index
 static void Guru2Main_PrintName(Guru2MainWork *g2m, StrBuf *name, int index, int netId) {
     u32 color = COLOR_NAME;
 
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         color = COLOR_NAME_MINE;
     }
     Guru2Main_PrintNameColor(g2m, name, index, color);
@@ -2230,7 +2231,7 @@ static void Guru2Main_FreeCamera(Guru2MainWork *g2m) {
 }
 
 static BOOL Guru2Main_IsButtonTouched(Guru2MainWork *g2m) {
-    if (func_0203da0c(sGuru2ButtonRects) != TOUCH_RECT_NONE) {
+    if (GFL_HIDGetTouchPressedRect(sGuru2ButtonRects) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;
@@ -2445,9 +2446,9 @@ static void Guru2Egg_Update(Guru2Egg *egg, const VecFx32 *offset, fx32 angle, fx
 
     Guru2Main_AddAngle(&angle, egg->angleOffset);
     degrees = angle / FX32_ONE;
-    egg->pos.x = egg->offset.x + offset->x + EGG_RADIUS * func_02044330(degrees);
+    egg->pos.x = egg->offset.x + offset->x + EGG_RADIUS * GFL_MathCosDeg(degrees);
     egg->pos.y = egg->offset.y - FX32_CONST(6) + offset->y + jumpY;
-    egg->pos.z = egg->offset.z + offset->z + EGG_RADIUS * func_02044304(degrees);
+    egg->pos.z = egg->offset.z + offset->z + EGG_RADIUS * GFL_MathSinDeg(degrees);
     egg->rotX = egg->rotation.x / FX32_ONE;
     egg->rotY = egg->rotation.y / FX32_ONE;
     egg->rotZ = egg->rotation.z / FX32_ONE;
@@ -2793,7 +2794,7 @@ static void Guru2EggShakeTask_Update(Guru2EggShakeTask *task) {
         task->speed = FX32_CONST(20);
         task->seq++;
     case 1:
-        rotation = task->amplitude / FX32_ONE * func_02044304(task->angle / FX32_ONE);
+        rotation = task->amplitude / FX32_ONE * GFL_MathSinDeg(task->angle / FX32_ONE);
         egg->rotation.z = 0;
         Guru2Main_AddAngle(&egg->rotation.z, rotation);
         angle = task->angle;
@@ -2950,13 +2951,13 @@ static void Guru2CountdownTask_Main(TCB *tcb, void *data) {
                 task->count++;
             }
         }
-        func_0204c4e0(task->actor, FX32_CONST(1.5));
-        if (!func_0204c560(task->actor)) {
+        ClActor_SetAnimSpeed(task->actor, FX32_CONST(1.5));
+        if (!ClActor_IsAnimActive(task->actor)) {
             task->seq++;
         }
         break;
     case 1:
-        func_0204c108(task->actor);
+        ClActor_Delete(task->actor);
         GFL_HeapFree(task);
         GFL_TCBRemove(tcb);
         break;
@@ -2974,8 +2975,8 @@ static void Guru2Main_StartCountdown(Guru2MainWork *g2m) {
     setup.sequence = 0;
     setup.bgPriority = 0;
     setup.priority = 0;
-    task->actor = func_0204c040(g2m->clactUnit, g2m->chars, g2m->palette, g2m->cellAnims, &setup, 0, HEAPID_GURU2);
-    func_0204c4e0(task->actor, FX32_ONE);
+    task->actor = ClActor_Create(g2m->clactUnit, g2m->chars, g2m->palette, g2m->cellAnims, &setup, 0, HEAPID_GURU2);
+    ClActor_SetAnimSpeed(task->actor, FX32_ONE);
     task->g2m = g2m;
     GFL_TCBMgrAddTask(g2m->tcbManager, Guru2CountdownTask_Main, task, 0);
 }
@@ -3236,7 +3237,7 @@ void Guru2Main_OnPosition(Guru2MainWork *g2m, const void *data) {
     const Guru2PositionData *position = data;
 
     g2m->positions[position->position] = *position;
-    if (position->netId == func_0203ffc4()) {
+    if (position->netId == NetSystem_GetNetId()) {
         g2m->position = position->position;
     }
 }
@@ -3262,7 +3263,7 @@ static void Guru2Main_TradeEgg(Guru2MainWork *g2m, int netId) {
     PartyPkm *otherPkm = PokeParty_GetPkm(otherParty, otherIndex);
     UnionApp *app = Guru2Main_GetUnionApp(g2m);
 
-    PokeParty_SetupMetData(otherPkm, 6, &UnionApp_GetMember(app, func_0203ffc4())->info, 30002, HEAPID_GURU2);
+    PokeParty_SetupMetData(otherPkm, 6, &UnionApp_GetMember(app, NetSystem_GetNetId())->info, 30002, HEAPID_GURU2);
     copyPartyPkm(otherPkm, pkm);
 }
 
@@ -3384,7 +3385,7 @@ static BOOL Guru2Main_IsMEPlaying(void) {
 
 // The parent turns the disc and the Eggs, and sends the others where they are
 static void Guru2Main_ParentTurn(Guru2MainWork *g2m, fx32 angle) {
-    if (func_0203ffc4() == 0) {
+    if (NetSystem_GetNetId() == 0) {
         Guru2GameData data;
         int i;
 

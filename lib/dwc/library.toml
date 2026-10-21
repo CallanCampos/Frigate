@@ -33,7 +33,14 @@ flags = [
 "vct/vct_audio.c" = ["-nothumb", "-ipa file"]
 "vct/vct_buffer.c" = ["-nothumb"]
 "vct/vct_session.c" = ["-nothumb", "-ipa file"]
-"vct/vct_dsp.c" = ["-nothumb"]
+# vct_dsp.c was one file once, but the ROM's range of it is four, each with its own `-ipa file` layout: the `.bss` runs
+# `sPacketPool`; `sNoiseFloor` with `sLoudnessHistory`; and `sEcho` with its arrays and buffers are each sorted by size
+# (the 2-byte `shift` first), which one file's statics could not be. The packet pool and the mixer compile alike with
+# or without it
+"vct/vct_packet_pool.c" = ["-nothumb"]
+"vct/vct_vad.c" = ["-nothumb", "-ipa file"]
+"vct/vct_dsp.c" = ["-nothumb", "-ipa file"]
+"vct/vct_mixer.c" = ["-nothumb"]
 "vct/vct.c" = ["-nothumb", "-ipa file"]
 # The signature check (overlay 189) is ARM code like NitroSDK's
 "crypt/crypt.c" = ["-nothumb"]
@@ -49,6 +56,33 @@ flags = [
 # The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
 # exponent, which only -ipa file gives
 "auth/dwc_auth.c" = ["-ipa file"]
+# The connection test (overlay 11) reaches its globals from one base
+"auth/dwc_conntest.c" = ["-ipa file"]
+# The profanity check (overlay 11) has DWCi_Prof_ParseResult's local table of field names, and its strings, at the head
+# of its .data, as -ipa file sorts local initializers ahead of the functions' strings
+"auth/dwc_profanity.c" = ["-ipa file"]
+# Each root certificate of the HTTPS connection (overlay 11) is a file of its own whose name and key, of 64 bytes or
+# more, are 4-aligned in sections of their own, which only -ipa file gives
+"auth/dwc_rootcert_baltimore_cybertrust.c" = ["-ipa file"]
+"auth/dwc_rootcert_globalsign.c" = ["-ipa file"]
+"auth/dwc_rootcert_gte_cybertrust_global.c" = ["-ipa file"]
+"auth/dwc_rootcert_gte_cybertrust.c" = ["-ipa file"]
+"auth/dwc_rootcert_globalsign_r2.c" = ["-ipa file"]
+"auth/dwc_rootcert_nintendo.c" = ["-ipa file"]
+"auth/dwc_rootcert_nintendo_class2.c" = ["-ipa file"]
+"auth/dwc_rootcert_thawte_premium_server.c" = ["-ipa file"]
+"auth/dwc_rootcert_thawte_server.c" = ["-ipa file"]
+"auth/dwc_rootcert_verisign_class3_g2.c" = ["-ipa file"]
+"auth/dwc_rootcert_verisign_class3_g3.c" = ["-ipa file"]
+"auth/dwc_rootcert_verisign_class3.c" = ["-ipa file"]
+"auth/dwc_rootcert_rsa_secure_server.c" = ["-ipa file"]
+# GameSpy's NAT detection and negotiation (overlay 11) reach their statics from one base too
+"natneg/NATify.c" = ["-ipa file"]
+"natneg/natneg.c" = ["-ipa file"]
+# And two files of GameSpy's server browser (overlay 11): a server's shared texts and null server, and the list's master
+# server and sorted list
+"serverbrowsing/sb_server.c" = ["-ipa file"]
+"serverbrowsing/sb_serverlist.c" = ["-ipa file"]
 
 # ARM9 main's DWC (account, auto-connect, backup and WDS) is ARM code; dwc_nvram.c reaches its three statics from one
 # base, as -ipa file does

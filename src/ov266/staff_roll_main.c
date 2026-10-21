@@ -359,7 +359,7 @@ static u32 StaffRollSeq_Init(StaffRollWork *work) {
     StaffRoll_InitWindows(work);
     StaffRoll_LoadLines(work);
     StaffRoll_InitVBlank(work);
-    func_020051d8(TRUE);
+    SetMainMemoryPriorityBlocked(TRUE);
     return SEQ_LOGO;
 }
 
@@ -371,7 +371,7 @@ static u32 StaffRollSeq_WaitWipe(StaffRollWork *work) {
 }
 
 static u32 StaffRollSeq_Exit(StaffRollWork *work) {
-    func_020051d8(FALSE);
+    SetMainMemoryPriorityBlocked(FALSE);
     StaffRoll_FreeVBlank(work);
     StaffRoll_FreeLines(work);
     if (work->arc != NULL) {
@@ -481,7 +481,7 @@ static u32 StaffRollSeq_Roll(StaffRollWork *work) {
     if (work->param->skippable != TRUE) {
         StaffRollPicture_Update(work, &work->picture);
     }
-    func_0204b794();
+    ClActSys_Draw();
     return SEQ_ROLL;
 }
 
@@ -684,29 +684,29 @@ static void StaffRoll_InitClAct(ArcTool *arc, StaffRollClAct *clact) {
     ClActorSetup setup;
 
     ClActSys_Create(&data_02093f08, &sStaffRollVRAMConfig, HEAPID_STAFF_ROLL);
-    clact->unit = func_0204bf1c(1, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
-    func_0204c028(clact->unit);
-    clact->chars = func_0204b81c(arc, ACTOR_CHAR_FILE, FALSE, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
-    clact->palette = func_0204bba0(arc, ACTOR_PALETTE_FILE, 0, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
-    clact->cellAnims = func_0204bde0(arc, ACTOR_CELL_FILE, ACTOR_ANIM_FILE, HEAPID_TAIL(HEAPID_STAFF_ROLL));
+    clact->unit = ClActUnit_Create(1, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
+    ClActUnit_UseSystemRenderer(clact->unit);
+    clact->chars = ClActSys_LoadChars(arc, ACTOR_CHAR_FILE, FALSE, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
+    clact->palette = ClActSys_LoadPltt(arc, ACTOR_PALETTE_FILE, 0, 0, HEAPID_TAIL(HEAPID_STAFF_ROLL));
+    clact->cellAnims = ClActSys_LoadCellAnims(arc, ACTOR_CELL_FILE, ACTOR_ANIM_FILE, HEAPID_TAIL(HEAPID_STAFF_ROLL));
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 0;
     setup.bgPriority = 1;
     setup.priority = 0;
-    clact->actor = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0,
-                                 HEAPID_TAIL(HEAPID_STAFF_ROLL));
-    func_0204c520(clact->actor, TRUE);
-    func_0204c124(clact->actor, FALSE);
+    clact->actor = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, 0,
+                                  HEAPID_TAIL(HEAPID_STAFF_ROLL));
+    ClActor_SetAutoAnim(clact->actor, TRUE);
+    ClActor_SetVisible(clact->actor, FALSE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void StaffRoll_FreeClAct(StaffRollClAct *clact) {
-    func_0204b98c(clact->chars);
-    func_0204bcd0(clact->palette);
-    func_0204be64(clact->cellAnims);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActSys_FreeChars(clact->chars);
+    ClActSys_FreePltt(clact->palette);
+    ClActSys_FreeCellAnims(clact->cellAnims);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
 }
 
 // Allocates the buffers of the pictures' characters and screens, as large as the largest of them
@@ -726,7 +726,7 @@ static void StaffRollPicture_Free(StaffRollPicture *picture) {
 static void StaffRoll_VBlank(TCB *tcb, void *data) {
     StaffRoll_Flush(data);
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
@@ -1184,8 +1184,8 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
         return;
     case PICTURE_LAST_START:
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_OBJ, FADE_BRIGHTNESS(16));
-        func_0204c124(work->clact.actor, TRUE);
-        func_0204c56c(work->clact.actor);
+        ClActor_SetVisible(work->clact.actor, TRUE);
+        ClActor_RestartAnim(work->clact.actor);
         picture->state = PICTURE_LOAD_CHAR;
         return;
     case PICTURE_LOAD_CHAR:
@@ -1243,9 +1243,9 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
         if (StaffRollPicture_Fade(picture, TRUE, work->fastForward) == TRUE) {
             picture->state = PICTURE_END;
             if (picture->isLast == TRUE) {
-                func_0204c520(work->clact.actor, FALSE);
-                func_0204c550(work->clact.actor);
-                func_0204c124(work->clact.actor, FALSE);
+                ClActor_SetAutoAnim(work->clact.actor, FALSE);
+                ClActor_StopAnim(work->clact.actor);
+                ClActor_SetVisible(work->clact.actor, FALSE);
             }
         }
         break;

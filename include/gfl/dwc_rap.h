@@ -40,7 +40,7 @@ BOOL DWCRap_SendPacket(const void *data, int size, int type);
 BOOL DWCRap_Send(const void *data, int size);
 // The machine's ID, or -1 when it is not in a match
 int DWCRap_GetNetId(void);
-void func_ov011_021515a4(void);
+void DWCRap_SetVoiceChatReady(void);
 // Starts and ends the voice chat
 void DWCRap_StartVoiceChat(void);
 void DWCRap_StopVoiceChat(void);
@@ -62,17 +62,17 @@ u8 DWCRap_GetFriendStatus(int index);
 int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2);
 // The friend index of the connection
 int DWCRap_GetFriendIndex(void);
-BOOL func_ov011_02151de4(void);
-s16 func_ov011_02151dec(void);
+BOOL DWCRap_GetVoiceChatSpeaking(void);
+s16 DWCRap_IsVoiceChatEnabled(void);
 int DWCRap_GetLastNetId(void);
-s16 func_ov011_02151e24(void);
-void func_ov011_02151e40(s16 a0);
+s16 DWCRap_GetLastIndex(void);
+void DWCRap_SetVoiceChatEnabled(s16 enabled);
 BOOL DWCRap_IsUserDataDirty(void);
 void DWCRap_ClearUserDataDirty(void);
 BOOL DWCRap_IsReady(void);
 BOOL DWCRap_IsConnected(void);
 int DWCRap_GetStatus(void);
-void func_ov011_02151fec(int a0);
+void DWCRap_SetAcceptConnect(int accept);
 BOOL DWCRap_IsEnding(void);
 void DWCRap_SetReportError(int a0);
 // Sets the function called when the connection is lost

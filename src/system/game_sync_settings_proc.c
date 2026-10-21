@@ -50,7 +50,7 @@ static BOOL GameSyncSettings_Init(GameProc *proc, u32 *state, void *param, void 
     MI_CpuFill8(wk, 0, sizeof(GameSyncSettingsWork));
     wk->heapId = HEAPID_GAMESYNC;
     wk->gameData = GameData_Create(HEAPID_GAMESYNC);
-    if (func_020099f4(getDreamWorldStuffAddress(GameData_GetSaveControl(wk->gameData)))) {
+    if (DreamWorldSave_GetIDShown(getDreamWorldStuffAddress(GameData_GetSaveControl(wk->gameData)))) {
         wk->state = GAME_SYNC_SETTINGS_ACCOUNT;
         wk->account.mode = PDWACC_MODE_SHOW_ID;
     } else {
@@ -94,7 +94,7 @@ static BOOL GameSyncSettings_Main(GameProc *proc, u32 *state, void *param, void 
         break;
     case GAME_SYNC_SETTINGS_LOGOUT:
         // Without a connection left, it logs in again
-        if (!func_02042788() || wk->account.disconnected == TRUE) {
+        if (!GFL_NetIsInitialized() || wk->account.disconnected == TRUE) {
             wk->login.unk14 = 1;
             wk->state = GAME_SYNC_SETTINGS_LOGIN;
         } else {

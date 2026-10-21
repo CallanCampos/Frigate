@@ -23,25 +23,25 @@ struct Config {
 
 // Points the key remaps at the game's table
 void initKeyBlk(void);
-Config *func_0200898c(u32 heapId);
+Config *Config_Create(u32 heapId);
 // Copies a config into the save's
 void initConfig(const Config *config, Config *dest);
-void func_020089c0(Config *config);
-u32 func_02008a14(const Config *config);
-void func_02008a1c(Config *config, u32 value);
+void Config_Init(Config *config);
+u32 Config_GetTextSpeed(const Config *config);
+void Config_SetTextSpeed(Config *config, u32 value);
 u32 getSoundFlags(const Config *config);
-void func_02008a38(Config *config, u32 value);
-BOOL func_02008a4c(const Config *config);
-void func_02008a54(Config *config, u32 value);
-BOOL func_02008a68(const Config *config);
-void func_02008a70(Config *config, u32 value);
+void Config_SetSoundFlags(Config *config, u32 value);
+BOOL Config_GetBattleScene(const Config *config);
+void Config_SetBattleScene(Config *config, u32 value);
+BOOL Config_GetBattleStyle(const Config *config);
+void Config_SetBattleStyle(Config *config, u32 value);
 // Also sets the message language
-void func_02008a8c(Config *config, u32 value);
-u32 func_02008a84(const Config *config);
-void func_02008ab4(const Config *config);
-u32 func_02008ac8(const Config *config);
-void func_02008ad0(Config *config, u32 value);
-u32 func_02008ae8(const Config *config);
-void func_02008af0(Config *config, u32 value);
+void Config_SetKanji(Config *config, u32 value);
+u32 Config_GetKanji(const Config *config);
+void Config_ApplyMsgLanguage(const Config *config);
+u32 Config_GetSaveBeforeIR(const Config *config);
+void Config_SetSaveBeforeIR(Config *config, u32 value);
+u32 Config_GetCGearOn(const Config *config);
+void Config_SetCGearOn(Config *config, u32 value);
 
 #endif // POKEBW2_SAVE_CONFIG_H

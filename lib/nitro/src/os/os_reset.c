@@ -1,13 +1,14 @@
 // NitroSDK OS: restarting the game (os_reset.c). OS_InitReset registers the callback for the OS tag of the PXI FIFO,
 // and OS_ResetSystem shuts down what the ARM9 started and has the ARM7 reset the console, through code in the ITCM
-// that is probably part of this file too (OSi_DoResetSystem, not yet registered). ARM code. The file is complete for
-// ARM9 main only: the ITCM part is still to be added.
+// that is this file's ITCM part too: OSi_DoResetSystem and the boot loader are in os_reset_itcm.c. ARM code. The file
+// is complete in both versions.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 #include "twl/mi.h"
 #include "twl/os.h"
+#include "twl/pm.h"
 
 // The high word of the DSi's title ID in the system area. Bit 2 of it is set for a program installed on the NAND
 #define HW_TWL_TITLE_ID_HI 0x02ffe234
@@ -34,14 +35,14 @@ void OS_ResetSystem(u32 parameter) {
         OS_Terminate();
     }
     if (OS_IsRunOnTwl()) {
-        func_02769578();
+        PMi_ExecutePostExitCallbackList();
     }
     CARD_LockRom(OS_GetLockID());
     OS_SetIrqMask(OS_IE_FIFO_RECV);
     OS_ResetRequestIrqMask(0xffffffff);
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        func_02768298();
+        MI_StopNDmaChannels();
     }
     *(u32 *)HW_RESET_PARAMETER_BUF = parameter;
     OSi_SendToPxi(OS_PXI_COMMAND_RESET);

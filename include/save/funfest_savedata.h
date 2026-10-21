@@ -15,7 +15,7 @@
 
 // A mission's record
 typedef struct {
-    // The two values that func_02010ebc and func_02010f14 give, which only grow
+    // The two values that FestRecords_GetMissionCount and FestRecords_GetMissionBest give, which only grow
     u32 count : 14;
     u32 best : 14;
     // The highest level cleared, up to FUNFEST_MISSION_LEVEL_MAX - 1
@@ -30,29 +30,31 @@ typedef struct FunfestSave {
     u16 hosted;
     u16 joined;
     u16 completed;
-    u16 unkF6;
-    u8 unkF8[2];
+    // How many missions with other players the player had the top score of, up to 9999
+    u16 topScores;
+    // The points left over toward the next White and Black pass power level
+    u8 levelPoints[2];
     // The most participants of a mission, up to 100
     u8 mostParticipants;
     u8 paddingFB;
 } FunfestSave; // size: 0xfc
 
 // The block's size and its initial state, with every mission new
-u32 func_02010dc0(void);
-void func_02010dc4(FunfestSave *save);
+u32 FestRecords_GetSize(void);
+void FestRecords_Init(FunfestSave *save);
 // Count one more mission completed, up to 9999
-void func_02010e58(FunfestSave *save);
+void FestRecords_AddCompleted(FunfestSave *save);
 // Keeps the most participants, up to 100
-void func_02010e80(FunfestSave *save, u32 count);
-// Adds one to the count that func_02010e94 gives, up to 9999
-void func_02010e9c(FunfestSave *save);
+void FestRecords_UpdateMostParticipants(FunfestSave *save, u32 count);
+// Counts one more top score in a mission with other players, up to 9999
+void FestRecords_AddTopScore(FunfestSave *save);
 // Keep a mission's count and best value, up to 9999, if they are more than the record's: TRUE when they were kept
-BOOL func_02010ed4(FunfestSave *save, u32 mission, u32 count);
-BOOL func_02010f2c(FunfestSave *save, u32 mission, u32 best);
+BOOL FestRecords_UpdateMissionCount(FunfestSave *save, u32 mission, u32 count);
+BOOL FestRecords_UpdateMissionBest(FunfestSave *save, u32 mission, u32 best);
 // Keeps the level cleared of a mission if it is higher than the record's
-void func_02010f80(FunfestSave *save, u32 mission, int level);
-// A byte for each of two slots, up to 99
-u8 func_02010fd4(FunfestSave *save, int index);
-void func_02010fe4(FunfestSave *save, int index, u32 value);
+void FestRecords_UpdateMissionLevel(FunfestSave *save, u32 mission, int level);
+// The points left over toward the next White (0) and Black (1) pass power level, up to 99
+u8 FestRecords_GetLevelPoints(FunfestSave *save, int index);
+void FestRecords_SetLevelPoints(FunfestSave *save, int index, u32 value);
 
 #endif // POKEBW2_SAVE_FUNFEST_SAVEDATA_H

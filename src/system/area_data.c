@@ -71,21 +71,21 @@ BOOL AreaData_HasSeasons(u16 areaId) {
     return FALSE;
 }
 
-BOOL func_02018f60(u16 areaId) {
+BOOL AreaData_IsInfinityDungeon(u16 areaId) {
     if (areaId >= 0x166 && areaId < 0x17a) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02018f78(u16 areaId) {
+BOOL AreaData_IsJoinAvenue(u16 areaId) {
     if (areaId >= 0x161 && areaId < 0x165) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02018f90(u16 areaId) {
+BOOL AreaData_IsWbt(u16 areaId) {
     if (areaId >= 0x17d && areaId < 0x183) {
         return TRUE;
     }

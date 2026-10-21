@@ -83,9 +83,9 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
     u32 rule;
 
     if (unk48) {
-        Regulation_SetParam(wk->club->regulation, 13, TRUE);
+        Regulation_SetParam(wk->club->regulation, REGULATION_PARAM_LAUNCHER, TRUE);
     } else {
-        Regulation_SetParam(wk->club->regulation, 13, FALSE);
+        Regulation_SetParam(wk->club->regulation, REGULATION_PARAM_LAUNCHER, FALSE);
     }
 
     switch (mode) {
@@ -144,19 +144,19 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
     switch (mode) {
     case 7:
     case 8:
-        BtlSetup_SetNet1v1Single(wk->btlSetup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNet1v1Single(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 9:
     case 10:
-        BtlSetup_SetNet1v1Double(wk->btlSetup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNet1v1Double(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 11:
     case 12:
-        BtlSetup_SetNetTriple(wk->btlSetup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNetTriple(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     case 13:
     case 14:
-        BtlSetup_SetNetRotation(wk->btlSetup, gameData, func_02040440(), 1, HEAPID_GAMEEVENT);
+        BtlSetup_SetNetRotation(wk->btlSetup, gameData, NetHandle_GetOwn(), 1, HEAPID_GAMEEVENT);
         break;
     }
 
@@ -168,9 +168,9 @@ void EventWifiClub_SetupBattle(EventWifiClub *wk, u32 mode) {
 }
 
 void EventWifiClub_SetupBattleSelect(EventWifiClub *wk, GameData *gameData, u32 unused) {
-    u32 netId = func_02042a6c(func_02040440());
+    u32 netId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u32 otherNetId = 1 - netId;
-    PlayerInfo *other = func_02017378(gameData, otherNetId);
+    PlayerInfo *other = GameData_GetPlayerInfoByNetID(gameData, otherNetId);
     BattleSelectParam *select = &wk->select;
 
     select->regulation = wk->club->regulation;
@@ -221,7 +221,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         *state = 8;
         break;
     case 4:
-        if (func_020427a4()) {
+        if (GFL_NetIsEnded()) {
             (*state)++;
             EventWifiClub_Free(wk);
             PokeVoice_ResetMasterVolume();
@@ -268,7 +268,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         if (wk->login.result == 1) {
             GFL_SndBGMFadeOut(6);
             *state = 25;
-        } else if (!func_0200a150(GameData_GetWifiList(wk->gameData))) {
+        } else if (!WifiList_CountFriends(GameData_GetWifiList(wk->gameData))) {
             *state = 30;
         } else if (wk->login.result == 0) {
             *state = 11;
@@ -329,7 +329,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         break;
     case 14:
         if (wk->select.result == 1) {
-            if (func_02042788()) {
+            if (GFL_NetIsInitialized()) {
                 wk->club->unk49 = 0;
                 *state = 11;
             } else {
@@ -339,18 +339,18 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         } else {
             EventWifiClub_SetBattleParty(wk, GSYS_GetGameData(gsys), seq);
             GFL_OvlLoad(OVERLAY_BATTLE_MAIN);
-            func_02040c20(0x100, data_ov167_021d7448, 9, 0);
-            func_02040624(func_02040440(), 100, 10);
+            NetCommand_AddTable(0x100, data_ov167_021d7448, 9, 0);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 100, 10);
             (*state)++;
         }
         break;
     case 15:
-        if (!func_02042788() || GFL_NetErrCheck()) {
-            func_02012154();
-            func_02011de0();
+        if (!GFL_NetIsInitialized() || GFL_NetErrCheck()) {
+            GFL_NetErrShutdown();
+            GFL_NetErrShowScreen();
             EventWifiClub_ResetForLogin(wk);
             *state = 9;
-        } else if (func_02040664(func_02040440(), 100, 10)) {
+        } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 100, 10)) {
             (*state)++;
         }
         break;
@@ -359,16 +359,16 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
 
         GFL_SndBGMPlay(SEQ_BGM_VS_TRAINER_WIFI, SND_CHANNEL_MASK_ALL);
         wk->players.unk44 = 1;
-        if (func_02042a6c(func_02040440()) == 0) {
+        if (GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0) {
             for (i = 0; i < 2; i++) {
-                wk->players.players[i].info = func_02017378(GSYS_GetGameData(gsys), i);
+                wk->players.players[i].info = GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
                 wk->players.players[i].party = wk->club->parties[i];
             }
         } else {
             u8 order[2] = { 1, 0 };
 
             for (i = 0; i < 2; i++) {
-                wk->players.players[order[i]].info = func_02017378(GSYS_GetGameData(gsys), i);
+                wk->players.players[order[i]].info = GameData_GetPlayerInfoByNetID(GSYS_GetGameData(gsys), i);
                 wk->players.players[order[i]].party = wk->club->parties[i];
             }
         }
@@ -383,16 +383,18 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         break;
     }
     case 17:
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
             *state = 9;
         } else {
             if (wk->players.result == 0) {
-                func_0200a2d4(GameData_GetWifiList(GSYS_GetGameData(wk->gsys)), wk->club->friendIndex - 1, 1, 0, 0);
+                WifiList_AddFriendRecord(GameData_GetWifiList(GSYS_GetGameData(wk->gsys)), wk->club->friendIndex - 1, 1,
+                                         0, 0);
             } else if (wk->players.result == 1) {
-                func_0200a2d4(GameData_GetWifiList(GSYS_GetGameData(wk->gsys)), wk->club->friendIndex - 1, 0, 1, 0);
+                WifiList_AddFriendRecord(GameData_GetWifiList(GSYS_GetGameData(wk->gsys)), wk->club->friendIndex - 1, 0,
+                                         1, 0);
             }
-            func_02040c64(0x100);
+            NetCommand_RemoveTable(0x100);
             *state = 11;
         }
         break;
@@ -419,7 +421,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
             *state = 11;
             break;
         }
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
             *state = 9;
         }
@@ -444,7 +446,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         GFL_HeapFree(wk->trade.evolution);
         wk->trade.next = 1;
         *state = 19;
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
             *state = 9;
         }
@@ -456,7 +458,7 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         (*state)++;
         break;
     case 24:
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             EventWifiClub_ResetForLogin(wk);
             *state = 9;
         } else {
@@ -464,11 +466,11 @@ GameEventReturnCode EventWifiClub_Callback(GameEvent *event, u32 *state, void *d
         }
         break;
     case 28:
-        func_02042860(0);
+        GFL_NetExit(0);
         *state = 29;
         break;
     case 29:
-        if (func_02042ab8()) {
+        if (GFL_NetIsNotInitialized()) {
             *state = 4;
         }
         break;

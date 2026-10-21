@@ -1,0 +1,28 @@
+# Reports failures in Frigate's host build or native game behavior; the decomp templates remain separate.
+name: Frigate bug
+description: Report a native port or host build problem.
+title: "[Port] "
+body:
+  - type: markdown
+    attributes:
+      value: "Include text logs only. Do not upload ROMs, extracted game assets, captured game frames or saves."
+  - type: input
+    id: environment
+    attributes:
+      label: OS, architecture and Frigate commit
+      placeholder: "macOS 26, arm64, commit hash"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps, expected result and actual result
+      description: Include the game version and exact build or launch command.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant text log and tests run
+      description: Include a short error excerpt and any skipped or unrun checks. Remove personal paths if needed.
+      render: text

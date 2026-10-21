@@ -151,7 +151,7 @@ void OS_InitArenaEx(void) {
         OS_SetProtectionRegion(1, 0x02000000, OS_PROTECTION_SIZE_4MB);
         OS_SetProtectionRegion(2, 0x027ff000, OS_PROTECTION_SIZE_4KB);
     } else {
-        func_027692ec();
+        OSi_InitArenaExTwl();
     }
 }
 

@@ -68,7 +68,7 @@ StaActPokeSys *StaActPoke_InitSystem(HeapID heapId, StaActing *stage, MusPokeDra
         sys->pokes[i].active = FALSE;
         sys->pokes[i].update = FALSE;
     }
-    sys->shadowMaterial = func_0204e614(sys->blact, ARCID_MUSICAL, 29, 3, 0x33, 64, 64);
+    sys->shadowMaterial = BlActScene_AddMaterialArcTex(sys->blact, ARCID_MUSICAL, 29, 3, 0x33, 64, 64);
     return sys;
 }
 

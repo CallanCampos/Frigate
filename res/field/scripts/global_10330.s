@@ -3498,7 +3498,7 @@ L_3528:
     VMStackPushConst 0
     VMStackCmp CMP_EQ
     VMJumpIf CMP_STACK, L_3563
-    Cmd_0222 EVENT_WORK_0x4162
+    AnvilleTrainGetDailyIndex EVENT_WORK_0x4162
     VMCall L_3571
     FadeOutBlackQ
     FadeWait

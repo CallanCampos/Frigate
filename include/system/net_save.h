@@ -8,11 +8,11 @@
 // Saving the game on two machines at once (net_save.c)
 
 // Starts the save
-NetSave *func_02012ee4(HeapID heapId, GameData *gameData);
+NetSave *NetSave_Create(HeapID heapId, GameData *gameData);
 // Starts the save, calling func with work each frame while the save is written
-NetSave *func_02012f1c(HeapID heapId, GameData *gameData, void (*func)(void *work), void *work);
+NetSave *NetSave_CreateWithCallback(HeapID heapId, GameData *gameData, void (*func)(void *work), void *work);
 // Whether the save has ended
-BOOL func_02012f5c(NetSave *save);
-void func_02012f8c(NetSave *save);
+BOOL NetSave_Update(NetSave *save);
+void NetSave_Free(NetSave *save);
 
 #endif // POKEBW2_SYSTEM_NET_SAVE_H

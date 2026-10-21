@@ -19,7 +19,7 @@ GameEventReturnCode EventBattleLose_Callback(GameEvent *event, u32 *state, void 
     case 0:
         BrightnessController_SetScreenBrightness(-16, 0x37, 1);
         BrightnessController_SetScreenBrightness(-16, 0x3f, 2);
-        func_ov012_02160618();
+        GameBeacon_BroadcastBattleLostMission();
         GSYS_QueueProcAsEvent(event, OVERLAY_ID(295), &BATTLE_LOSE_MESSAGE_PROC_FUNCTIONS, work);
         (*state)++;
         break;
@@ -50,6 +50,6 @@ GameEvent *EventBattleLose_Create(GameSystem *gsys) {
     data->returnNonLeague = IsReturnLocationNonLeaguePokeCen(gameData);
     data->playerInfo = GetGameDataPlayerInfo(gameData);
     PleasureBoat_Free(GameData_GetPleasureBoatPtr(gameData));
-    func_02016b24(gsys, 0);
+    GSYS_SetGameCommPaused(gsys, 0);
     return event;
 }

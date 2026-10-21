@@ -55,7 +55,8 @@ typedef struct {
     NetQueue mpQueue;
     NetRecvState recvStates[GFL_NET_MACHINE_MAX];
     NetRecvState serverRecvState;
-    BOOL unk1AC;
+    // Whether the parent sends its MP packets (Wi-Fi turns it off while it waits)
+    BOOL mpSendEnabled;
     int serverSends;
     // The packets sent to each machine that have not come back
     int sends[GFL_NET_MACHINE_MAX];
@@ -66,13 +67,17 @@ typedef struct {
     int recvSize;
     u16 connectBits;
     u8 unk1E6;
-    u8 unk1E7;
+    // Set while the Wi-Fi is connected
+    u8 wifiConnected;
     u8 unk1E8;
     u8 error;
-    u8 unk1EA;
-    u8 unk1EB;
+    // Set by an error, which stops the sending and receiving
+    u8 stopped;
+    // Whether the last step of the data sharing went through
+    u8 dataShareOk;
     u8 unk1EC;
-    u8 unk1ED;
+    // Set while a Wi-Fi packet is written and not yet sent
+    u8 wifiPacketReady;
 } NetSystem;
 
 typedef struct {
@@ -84,54 +89,54 @@ typedef struct {
 #define NET_ERROR(line)                                                                                                \
     do {                                                                                                               \
         GFLNetErrorInfo *err;                                                                                          \
-        func_02040158();                                                                                               \
-        err = func_02042540();                                                                                         \
+        NetSystem_SetError();                                                                                          \
+        err = NetState_GetErrorInfo();                                                                                 \
         if (!err->type) {                                                                                              \
-            func_020424ac(err->code, err->unk4, err->unk8, line);                                                      \
+            NetState_RecordError(err->code, err->errorType, err->error, line);                                         \
         }                                                                                                              \
     } while (0)
 
-static void func_0203e8c8(u8 state, int line);
-static void func_0203e8d4(NetRecvState *state);
-static int func_0203e8e8(void);
-static BOOL func_0203e910(int size, HeapID heapId, BOOL useSysSize);
-static void func_0203ea5c(void);
-static void func_0203ebe0(int netID);
-static BOOL func_0203ecc8(u16 netId, u8 *data, u16 size);
-static void func_0203ed18(int netId);
-static void func_0203ed40(int netId);
-static void func_0203efa0(void);
-static BOOL func_0203f10c(BOOL server);
-static void func_0203f19c(void);
-static void func_0203f234(void);
-static void func_0203f2cc(void);
-static BOOL func_0203f348(u16 netId, u8 *data, u16 size);
-static void func_0203f3f0(u8 *data, int size);
-static void func_0203f46c(void);
-static void func_0203f4f0(void);
-static void func_0203f520(void);
-static BOOL func_0203f63c(void);
-static void func_0203f670(void);
-static void func_0203f6a8(void);
-static BOOL func_0203f7f0(u16 netId, u8 *data, u16 size);
-static BOOL func_0203f8f8(u16 netId, u8 *data, u16 size);
-static BOOL func_0203f9c0(BOOL ok);
-static BOOL func_0203f9f0(BOOL ok);
-static BOOL func_0203fa28(u8 *packet, NetQueue *queue, int size, u8 seq);
-static void func_0203fbe0(int command, int size, void *data, NetRecvState *state);
-static void func_0203fc34(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *state, int size);
-static void func_0203fdbc(void);
-static void func_0203fe00(void);
+static void NetSystem_SetSendState(u8 state, int line);
+static void NetRecvState_Reset(NetRecvState *state);
+static int NetSystem_GetParentPacketSize(void);
+static BOOL NetSystem_Alloc(int size, HeapID heapId, BOOL useSysSize);
+static void NetSystem_ResetBuffers(void);
+static void NetSystem_ResetMachine(int netID);
+static BOOL NetSystem_RecvInfraredCallback(u16 netId, u8 *data, u16 size);
+static void NetSystem_OnConnectAsParent(int netId);
+static void NetSystem_OnConnectAsChild(int netId);
+static void NetSystem_FreeWhenDone(void);
+static BOOL NetSystem_BuildSendPacket(BOOL server);
+static void NetSystem_SendOwnPacket(void);
+static void NetSystem_UpdateDataSharing(void);
+static void NetSystem_UpdateInfrared(void);
+static BOOL NetSystem_RecvInfraredPacket(u16 netId, u8 *data, u16 size);
+static void NetSystem_SendInfraredPacket(u8 *data, int size);
+static void NetSystem_UpdateWifiSend(void);
+static void NetSystem_UpdateOwnSend(void);
+static void NetSystem_UpdateMPSendStep(void);
+static BOOL NetSystem_AllSendsReturned(void);
+static void NetSystem_CountSends(void);
+static void NetSystem_UpdateMPSend(void);
+static BOOL NetSystem_RecvPacket(u16 netId, u8 *data, u16 size);
+static BOOL NetSystem_RecvServerPacket(u16 netId, u8 *data, u16 size);
+static BOOL NetSystem_OnSendDone(BOOL ok);
+static BOOL NetSystem_OnMPSendDone(BOOL ok);
+static BOOL NetSystem_WritePacket(u8 *packet, NetQueue *queue, int size, u8 seq);
+static void NetSystem_DispatchCommand(int command, int size, void *data, NetRecvState *state);
+static void NetSystem_ReadCommands(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *state, int size);
+static void NetSystem_ReadServerRing(void);
+static void NetSystem_ReadRecvRings(void);
 
 static NetSystemState sState = { 4, 4 };
 
 static NetSystem *sNetSys;
 
-static void func_0203e8c8(u8 state, int line) {
+static void NetSystem_SetSendState(u8 state, int line) {
     sState.sendState = state;
 }
 
-static void func_0203e8d4(NetRecvState *state) {
+static void NetRecvState_Reset(NetRecvState *state) {
     state->command = 0;
     state->remaining = 0xffff;
     state->size = 0xffff;
@@ -140,19 +145,19 @@ static void func_0203e8d4(NetRecvState *state) {
 }
 
 // The size of the packet the parent sends
-static int func_0203e8e8(void) {
-    GFLNetSys *sys = func_02042e78();
+static int NetSystem_GetParentPacketSize(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->aNetInit.bMPMode && sys->aNetInit.unk6C) {
-        return sys->aNetInit.unk6C;
+    if (sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize) {
+        return sys->aNetInit.parentPacketSize;
     }
-    return func_02042de8() * func_02042dc0();
+    return GFL_NetGetMaxSendSize() * GFL_NetGetMaxConnectNum();
 }
 
-static BOOL func_0203e910(int size, HeapID heapId, BOOL useSysSize) {
+static BOOL NetSystem_Alloc(int size, HeapID heapId, BOOL useSysSize) {
     if (sNetSys == NULL) {
-        int machineMax = func_02042dc0();
-        int sendSize = func_0203e8e8();
+        int machineMax = GFL_NetGetMaxConnectNum();
+        int sendSize = NetSystem_GetParentPacketSize();
 
         sNetSys = GFL_HeapAllocate(heapId, sizeof(NetSystem), TRUE, "net_system.c", 221);
         if (useSysSize) {
@@ -163,198 +168,198 @@ static BOOL func_0203e910(int size, HeapID heapId, BOOL useSysSize) {
         sNetSys->serverRingData = GFL_HeapAllocate(heapId, sNetSys->recvSize * 3, TRUE, "net_system.c", 230);
         sNetSys->recvTemp = GFL_HeapAllocate(heapId, sNetSys->recvSize * 2, TRUE, "net_system.c", 232);
         sNetSys->recvData = GFL_HeapAllocate(heapId, machineMax * sNetSys->recvSize, TRUE, "net_system.c", 233);
-        sNetSys->sendData = GFL_HeapAllocate(heapId, func_02042de8(), TRUE, "net_system.c", 236);
-        sNetSys->sendRingData = GFL_HeapAllocate(heapId, 15 * func_02042de8(), TRUE, "net_system.c", 237);
+        sNetSys->sendData = GFL_HeapAllocate(heapId, GFL_NetGetMaxSendSize(), TRUE, "net_system.c", 236);
+        sNetSys->sendRingData = GFL_HeapAllocate(heapId, 15 * GFL_NetGetMaxSendSize(), TRUE, "net_system.c", 237);
         sNetSys->mpSendData = GFL_HeapAllocate(heapId, sendSize, TRUE, "net_system.c", 238);
         sNetSys->mpRingData = GFL_HeapAllocate(heapId, sendSize * 2, TRUE, "net_system.c", 239);
-        func_0203e418(&sNetSys->sendQueue, 100, &sNetSys->sendRing, heapId);
-        func_0203e418(&sNetSys->mpQueue, 180, &sNetSys->mpRing, heapId);
-        sNetSys->unk1AC = TRUE;
-        func_0203ea5c();
+        NetQueue_Init(&sNetSys->sendQueue, 100, &sNetSys->sendRing, heapId);
+        NetQueue_Init(&sNetSys->mpQueue, 180, &sNetSys->mpRing, heapId);
+        sNetSys->mpSendEnabled = TRUE;
+        NetSystem_ResetBuffers();
     }
     sNetSys->connectBits = 0;
-    sNetSys->unk1E7 = 0;
+    sNetSys->wifiConnected = 0;
     return TRUE;
 }
 
-static void func_0203ea5c(void) {
+static void NetSystem_ResetBuffers(void) {
     int i;
-    int machineMax = func_02042dc0();
-    int sendSize = func_0203e8e8();
-    int dataSize = func_02042de8();
+    int machineMax = GFL_NetGetMaxConnectNum();
+    int sendSize = NetSystem_GetParentPacketSize();
+    int dataSize = GFL_NetGetMaxSendSize();
 
     MI_CpuFill8(sNetSys->recvData, 0, sNetSys->recvSize * machineMax);
     for (i = 0; i < machineMax; i++) {
-        func_0203dfc0(&sNetSys->recvRings[i], sNetSys->recvData + i * sNetSys->recvSize, sNetSys->recvSize);
+        NetRingBuff_Init(&sNetSys->recvRings[i], sNetSys->recvData + i * sNetSys->recvSize, sNetSys->recvSize);
         sNetSys->recvSeq[i] = 0;
     }
     MI_CpuFill8(sNetSys->mpRingData, 0, (u32)sendSize * 2);
-    func_0203dfc0(&sNetSys->mpRing, sNetSys->mpRingData, sendSize * 2);
+    NetRingBuff_Init(&sNetSys->mpRing, sNetSys->mpRingData, sendSize * 2);
     for (i = 0; i < sendSize; i++) {
         sNetSys->mpSendData[i] = 0;
     }
     MI_CpuFill8(sNetSys->sendRingData, 0, (u32)dataSize * 15);
-    func_0203dfc0(&sNetSys->sendRing, sNetSys->sendRingData, dataSize * 15);
+    NetRingBuff_Init(&sNetSys->sendRing, sNetSys->sendRingData, dataSize * 15);
     sNetSys->sendData[0] = 0xff;
     for (i = 1; i < dataSize; i++) {
         sNetSys->sendData[i] = 0;
     }
     MI_CpuFill8(sNetSys->serverRingData, 0, sNetSys->recvSize * 3);
-    func_0203dfc0(&sNetSys->serverRing, sNetSys->serverRingData, sNetSys->recvSize * 3);
+    NetRingBuff_Init(&sNetSys->serverRing, sNetSys->serverRingData, sNetSys->recvSize * 3);
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        func_0203e8d4(&sNetSys->recvStates[i]);
+        NetRecvState_Reset(&sNetSys->recvStates[i]);
         sNetSys->sends[i] = 0;
     }
     sNetSys->serverSends = 0;
-    func_0203e8d4(&sNetSys->serverRecvState);
-    func_0203e8c8(4, 314);
+    NetRecvState_Reset(&sNetSys->serverRecvState);
+    NetSystem_SetSendState(4, 314);
     sState.recvState = 4;
-    func_0203e44c(&sNetSys->sendQueue);
-    func_0203e44c(&sNetSys->mpQueue);
+    NetQueue_Clear(&sNetSys->sendQueue);
+    NetQueue_Clear(&sNetSys->mpQueue);
     sNetSys->unk1E8 = 0;
-    sNetSys->unk1EB = 1;
-    sNetSys->unk1EA = 0;
-    sNetSys->unk1ED = 0;
+    sNetSys->dataShareOk = 1;
+    sNetSys->stopped = 0;
+    sNetSys->wifiPacketReady = 0;
 }
 
-static void func_0203ebe0(int netID) {
+static void NetSystem_ResetMachine(int netID) {
     GFL_ASSERT(netID < GFL_NET_MACHINE_MAX);
     sNetSys->sends[netID] = 0;
-    func_0203dfc0(&sNetSys->recvRings[netID], sNetSys->recvData + netID * sNetSys->recvSize, sNetSys->recvSize);
+    NetRingBuff_Init(&sNetSys->recvRings[netID], sNetSys->recvData + netID * sNetSys->recvSize, sNetSys->recvSize);
     sNetSys->recvSeq[netID] = 0;
-    func_0203e8d4(&sNetSys->recvStates[netID]);
+    NetRecvState_Reset(&sNetSys->recvStates[netID]);
 }
 
-BOOL func_0203ec44(int size, HeapID heapId) {
-    GFLNetInitData *ini = func_02042e84();
-    GFLNetSys *sys = func_02042e78();
+BOOL NetSystem_StartWireless(int size, HeapID heapId) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    func_0203e910(size, heapId, sys->aNetInit.bMPMode && sys->aNetInit.unk6C);
+    NetSystem_Alloc(size, heapId, sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize);
     sys->pDevTable->init(ini->heapId, sys, 0, sys->devWork);
-    sys->pDevTable->unk08(0);
-    sys->pDevTable->setRecvCallback(func_0203f7f0);
+    sys->pDevTable->start(0);
+    sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
     return TRUE;
 }
 
-int func_0203ecac(int a0) {
-    GFLNetSys *sys = func_02042e78();
+int NetSystem_CanConnectFriend(int a0) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    return sys->pDevTable->unk90(a0);
+    return sys->pDevTable->canConnectFriend(a0);
 }
 
-static BOOL func_0203ecc8(u16 netId, u8 *data, u16 size) {
-    return func_0203f348(netId, data, size);
+static BOOL NetSystem_RecvInfraredCallback(u16 netId, u8 *data, u16 size) {
+    return NetSystem_RecvInfraredPacket(netId, data, size);
 }
 
-BOOL func_0203ecd0(int a0) {
-    GFLNetInitData *ini = func_02042e84();
-    GFLNetSys *sys = func_02042e78();
+BOOL NetSystem_StartInfrared(int a0) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    ini->unk66 = a0;
-    sys->pDevTable->setRecvCallback(func_0203ecc8);
-    func_0203e910(0x80, ini->heapId, FALSE);
-    func_0203ebe0(0);
-    func_0203ebe0(1);
-    func_0203ebe0(2);
+    ini->changeTgid = a0;
+    sys->pDevTable->setRecvCallback(NetSystem_RecvInfraredCallback);
+    NetSystem_Alloc(0x80, ini->heapId, FALSE);
+    NetSystem_ResetMachine(0);
+    NetSystem_ResetMachine(1);
+    NetSystem_ResetMachine(2);
     return TRUE;
 }
 
-static void func_0203ed18(int netId) {
-    GFLNetInitData *ini = func_02042e84();
-    GFLNetSys *sys = func_02042e78();
+static void NetSystem_OnConnectAsParent(int netId) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    func_0203ebe0(netId);
+    NetSystem_ResetMachine(netId);
     if (ini->disconnectCallback != NULL) {
         ini->disconnectCallback(sys->devWork, netId);
     }
 }
 
-static void func_0203ed40(int netId) {
-    GFLNetInitData *ini = func_02042e84();
-    GFLNetSys *sys = func_02042e78();
+static void NetSystem_OnConnectAsChild(int netId) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    func_0203ebe0(netId);
+    NetSystem_ResetMachine(netId);
     if (ini->disconnectCallback != NULL) {
         ini->disconnectCallback(sys->devWork, netId);
     }
 }
 
-int func_0203ed68(int a0, int size, int a2, BOOL (*callback)(void)) {
-    GFLNetInitData *ini = func_02042e84();
-    GFLNetSys *sys = func_02042e78();
+int NetSystem_StartParent(int a0, int size, int a2, BOOL (*callback)(void)) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
+    GFLNetSys *sys = GFL_NetGetSys();
     BOOL useSysSize;
 
-    ini->unk66 = a0;
-    sys->pDevTable->setDisconnectCallback(func_0203ed18);
-    sys->pDevTable->setRecvCallback(func_0203f7f0);
-    useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
-    func_0203e910(size, func_02042e84()->heapId, useSysSize);
-    return sys->pDevTable->unk40(a2, callback);
+    ini->changeTgid = a0;
+    sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsParent);
+    sys->pDevTable->setRecvCallback(NetSystem_RecvPacket);
+    useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
+    NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
+    return sys->pDevTable->startParent(a2, callback);
 }
 
-BOOL func_0203ede0(int a0, int size) {
-    GFLNetSys *sys = func_02042e78();
+BOOL NetSystem_StartScan(int a0, int size) {
+    GFLNetSys *sys = GFL_NetGetSys();
     BOOL result;
 
-    sys->pDevTable->setDisconnectCallback(func_0203ed40);
-    result = sys->pDevTable->unk44(a0, 0);
+    sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsChild);
+    result = sys->pDevTable->startScan(a0, 0);
     if (result == TRUE) {
         BOOL useSysSize;
 
-        sys->pDevTable->setRecvCallback(func_0203f8f8);
-        useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
-        func_0203e910(size, func_02042e84()->heapId, useSysSize);
+        sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
+        useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
+        NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
         sState.recvState = 4;
     }
     return result;
 }
 
-BOOL func_0203ee50(int size) {
-    GFLNetSys *sys = func_02042e78();
+BOOL NetSystem_StartSearch(int size) {
+    GFLNetSys *sys = GFL_NetGetSys();
     BOOL result;
 
-    sys->pDevTable->setDisconnectCallback(func_0203ed40);
-    result = sys->pDevTable->unkBC();
+    sys->pDevTable->setDisconnectCallback(NetSystem_OnConnectAsChild);
+    result = sys->pDevTable->startSearch();
     if (result == TRUE) {
-        sys->pDevTable->setRecvCallback(func_0203f8f8);
-        func_0203e910(size, func_02042e84()->heapId, FALSE);
+        sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
+        NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, FALSE);
         sState.recvState = 4;
     }
     return result;
 }
 
-void func_0203eea4(int a0) {
-    GFLNetSys *sys = func_02042e78();
+void NetSystem_HoldScan(int a0) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
     if (sys->pDevTable != NULL) {
-        sys->pDevTable->unkC0(a0);
+        sys->pDevTable->holdScan(a0);
     }
 }
 
-int func_0203eec0(BOOL a0, const u8 *mac, int size, void (*callback)(void)) {
-    GFLNetSys *sys = func_02042e78();
-    GFLNetInitData *ini = func_02042e84();
+int NetSystem_StartChild(BOOL a0, const u8 *mac, int size, void (*callback)(void)) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
-    sys->pDevTable->setRecvCallback(func_0203f8f8);
+    sys->pDevTable->setRecvCallback(NetSystem_RecvServerPacket);
     if (a0) {
-        BOOL useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.unk6C;
+        BOOL useSysSize = sys->aNetInit.bMPMode && sys->aNetInit.parentPacketSize;
 
-        func_0203e910(size, func_02042e84()->heapId, useSysSize);
+        NetSystem_Alloc(size, GFL_NetGetInitData()->heapId, useSysSize);
         sState.recvState = 4;
     }
-    return sys->pDevTable->unk48(a0, mac, 0, 0, callback);
+    return sys->pDevTable->startChild(a0, mac, 0, 0, callback);
 }
 
-void func_0203ef38(void) {
-    GFLNetSys *sys = func_02042e78();
-    GFLNetInitData *ini = func_02042e84();
+void NetSystem_Free(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (sNetSys != NULL) {
         GFL_HeapFree(sNetSys->serverRingData);
         GFL_HeapFree(sNetSys->recvTemp);
         GFL_HeapFree(sNetSys->recvData);
-        func_0203e46c(&sNetSys->mpQueue);
-        func_0203e46c(&sNetSys->sendQueue);
+        NetQueue_Free(&sNetSys->mpQueue);
+        NetQueue_Free(&sNetSys->sendQueue);
         GFL_HeapFree(sNetSys->sendData);
         GFL_HeapFree(sNetSys->sendRingData);
         GFL_HeapFree(sNetSys->mpSendData);
@@ -364,28 +369,28 @@ void func_0203ef38(void) {
     }
 }
 
-static void func_0203efa0(void) {
+static void NetSystem_FreeWhenDone(void) {
     if (sNetSys->unk1EC) {
-        if (func_0203ffc4() == 0) {
-            if (func_0204001c() == 0) {
-                func_0203ef38();
+        if (NetSystem_GetNetId() == 0) {
+            if (NetSystem_GetChildBits() == 0) {
+                NetSystem_Free();
             }
         } else {
-            func_0203ef38();
+            NetSystem_Free();
         }
     }
 }
 
-void func_0203efd0(u32 netId) {
+void NetSystem_ForgetMachine(u32 netId) {
     if (sNetSys != NULL && netId < GFL_NET_MACHINE_MAX) {
-        func_0203ebe0(netId);
+        NetSystem_ResetMachine(netId);
     }
 }
 
 // Sends and receives, each frame
-BOOL func_0203efe8(void) {
-    GFLNetSys *sys = func_02042e78();
-    GFLNetInitData *ini = func_02042e84();
+BOOL NetSystem_Update(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (sNetSys == NULL) {
         if (sys != NULL) {
@@ -394,47 +399,47 @@ BOOL func_0203efe8(void) {
         return TRUE;
     }
     if (sys->pDevTable->getSignalLevel != NULL) {
-        func_0203e7f8(sys->pDevTable->getSignalLevel());
+        WmIcon_SetStrength(sys->pDevTable->getSignalLevel());
     }
-    if (!sNetSys->unk1EA && !func_0204003c()) {
+    if (!sNetSys->stopped && !NetSystem_HasError()) {
         if (!ini->bMPMode && (ini->bNetType == 0 || ini->bNetType == 5)) {
-            func_0203f234();
-            func_0203fe00();
+            NetSystem_UpdateDataSharing();
+            NetSystem_ReadRecvRings();
         } else if (ini->bNetType == 3 || ini->bNetType == 4) {
-            func_0203f2cc();
-            func_0203fe00();
+            NetSystem_UpdateInfrared();
+            NetSystem_ReadRecvRings();
         } else if (ini->bNetType == 1 || ini->bNetType == 2) {
-            func_0203f46c();
-            func_0203fe00();
+            NetSystem_UpdateWifiSend();
+            NetSystem_ReadRecvRings();
         } else {
-            func_0203f4f0();
-            func_0203fdbc();
-            if (!func_0203ffc4() && func_0203fe74(0) && ini->bMPMode) {
-                func_0203f6a8();
+            NetSystem_UpdateOwnSend();
+            NetSystem_ReadServerRing();
+            if (!NetSystem_GetNetId() && NetSystem_IsMachineConnected(0) && ini->bMPMode) {
+                NetSystem_UpdateMPSend();
             }
-            if (!func_0203ffc4()) {
-                func_0203fe00();
+            if (!NetSystem_GetNetId()) {
+                NetSystem_ReadRecvRings();
             }
         }
         if (ini->bNetType != 1 && ini->bNetType != 2) {
             sys->pDevTable->update(sNetSys->connectBits);
         }
-        func_020410dc();
-        func_0203efa0();
+        NetCommand_UpdateHugeSend();
+        NetSystem_FreeWhenDone();
     } else {
         sys->pDevTable->update(0);
     }
     return TRUE;
 }
 
-void func_0203f0f8(void) {
+void NetSystem_ResetBuffersIfAllocated(void) {
     if (sNetSys != NULL) {
-        func_0203ea5c();
+        NetSystem_ResetBuffers();
     }
 }
 
 // Writes the next packet to send
-static BOOL func_0203f10c(BOOL server) {
+static BOOL NetSystem_BuildSendPacket(BOOL server) {
     BOOL result = FALSE;
 
     if (sState.recvState != 4) {
@@ -446,7 +451,7 @@ static BOOL func_0203f10c(BOOL server) {
         if (net->serverSends > 0) {
             return result;
         }
-        if (func_0203fa28(net->sendData, &net->sendQueue, func_02042de8(), net->sendSeq)) {
+        if (NetSystem_WritePacket(net->sendData, &net->sendQueue, GFL_NetGetMaxSendSize(), net->sendSeq)) {
             sNetSys->sendSeq++;
         }
         sState.recvState = 0;
@@ -454,7 +459,7 @@ static BOOL func_0203f10c(BOOL server) {
     } else {
         NetSystem *net = sNetSys;
 
-        if (func_0203fa28(net->sendData, &net->sendQueue, func_02042de8(), net->sendSeq)) {
+        if (NetSystem_WritePacket(net->sendData, &net->sendQueue, GFL_NetGetMaxSendSize(), net->sendSeq)) {
             sNetSys->sendSeq++;
             sState.recvState = 0;
             result = TRUE;
@@ -463,75 +468,75 @@ static BOOL func_0203f10c(BOOL server) {
     return result;
 }
 
-static void func_0203f19c(void) {
-    GFLNetSys *sys = func_02042e78();
-    int dataSize = func_02042de8();
+static void NetSystem_SendOwnPacket(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    int dataSize = GFL_NetGetMaxSendSize();
 
-    if (sys->pDevTable->isConnected() && func_0203fe74(func_0203ffc4()) && sState.recvState == 0) {
-        if (func_0203ffc4() != 0) {
-            if (sys->pDevTable->send(sNetSys->sendData, dataSize, 0, func_0203f9c0)) {
+    if (sys->pDevTable->isConnected() && NetSystem_IsMachineConnected(NetSystem_GetNetId()) && sState.recvState == 0) {
+        if (NetSystem_GetNetId() != 0) {
+            if (sys->pDevTable->send(sNetSys->sendData, dataSize, 0, NetSystem_OnSendDone)) {
                 sState.recvState = 2;
                 sNetSys->serverSends++;
             }
         } else {
             sState.recvState = 2;
-            func_0203f9c0(TRUE);
-            func_0203f7f0(0, sNetSys->sendData, dataSize);
+            NetSystem_OnSendDone(TRUE);
+            NetSystem_RecvPacket(0, sNetSys->sendData, dataSize);
             sNetSys->serverSends++;
         }
     }
 }
 
-static void func_0203f234(void) {
+static void NetSystem_UpdateDataSharing(void) {
     int i;
-    GFLNetSys *sys = func_02042e78();
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    if (sys->pDevTable->unk58()) {
-        if (sNetSys->unk1EB) {
-            func_0203f10c(TRUE);
+    if (sys->pDevTable->isDataSharing()) {
+        if (sNetSys->dataShareOk) {
+            NetSystem_BuildSendPacket(TRUE);
         }
-        if (sys->pDevTable->unk5C(sNetSys->sendData) == TRUE) {
+        if (sys->pDevTable->stepDataSharing(sNetSys->sendData) == TRUE) {
             int dataSize;
             int machineMax;
 
             sState.recvState = 4;
-            sNetSys->unk1EB = TRUE;
-            dataSize = func_02042de8();
-            machineMax = func_02042dc0();
+            sNetSys->dataShareOk = TRUE;
+            dataSize = GFL_NetGetMaxSendSize();
+            machineMax = GFL_NetGetMaxConnectNum();
             for (i = 0; i < machineMax; i++) {
-                func_0203f7f0(i, sys->pDevTable->getRecvData(i), dataSize);
+                NetSystem_RecvPacket(i, sys->pDevTable->getRecvData(i), dataSize);
             }
         } else {
-            sNetSys->unk1EB = FALSE;
+            sNetSys->dataShareOk = FALSE;
         }
     }
 }
 
-static void func_0203f2cc(void) {
-    GFLNetSys *sys = func_02042e78();
+static void NetSystem_UpdateInfrared(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    if (func_0203e174(&sNetSys->sendQueue)) {
-        func_02042be8(func_02040440(), 0x10, 0, NULL);
+    if (NetQueue_IsEmpty(&sNetSys->sendQueue)) {
+        GFL_NetSendCommand(NetHandle_GetOwn(), 0x10, 0, NULL);
     }
-    if (sys->pDevTable->unk9C != NULL) {
-        sys->pDevTable->unk9C();
+    if (sys->pDevTable->poll != NULL) {
+        sys->pDevTable->poll();
     }
-    if (sys->pDevTable->unk6C() == TRUE) {
-        int dataSize = func_02042de8();
+    if (sys->pDevTable->isRunning() == TRUE) {
+        int dataSize = GFL_NetGetMaxSendSize();
 
-        if (sys->pDevTable->unkA0() == TRUE && func_0203f10c(FALSE)) {
-            func_0203f3f0(sNetSys->sendData, dataSize);
+        if (sys->pDevTable->canSend() == TRUE && NetSystem_BuildSendPacket(FALSE)) {
+            NetSystem_SendInfraredPacket(sNetSys->sendData, dataSize);
             sState.recvState = 4;
         }
     }
 }
 
-static BOOL func_0203f348(u16 netId, u8 *data, u16 size) {
+static BOOL NetSystem_RecvInfraredPacket(u16 netId, u8 *data, u16 size) {
     int crc;
     int len;
 
-    func_02042e84();
-    func_02042de8();
+    GFL_NetGetInitData();
+    GFL_NetGetMaxSendSize();
     if (data[PACKET_FLAGS] == PACKET_FLAGS_NONE) {
         return FALSE;
     }
@@ -550,159 +555,160 @@ static BOOL func_0203f348(u16 netId, u8 *data, u16 size) {
     if (data[PACKET_FLAGS] & PACKET_FLAG_LONG) {
         len += 0xff;
     }
-    func_0203dfd0(&sNetSys->recvRings[netId], data + PACKET_HEADER_SIZE, len);
+    NetRingBuff_Write(&sNetSys->recvRings[netId], data + PACKET_HEADER_SIZE, len);
     sNetSys->recvRings[netId].received = TRUE;
     return TRUE;
 }
 
-static void func_0203f3f0(u8 *data, int size) {
+static void NetSystem_SendInfraredPacket(u8 *data, int size) {
     GFLNetSys *sys;
 
-    func_02042e84();
-    sys = func_02042e78();
-    if (!sys->pDevTable->unkA4() || !sys->pDevTable->unkAC()) {
+    GFL_NetGetInitData();
+    sys = GFL_NetGetSys();
+    if (!sys->pDevTable->isSendTurn() || !sys->pDevTable->isLinked()) {
         GFL_ASSERT(0);
         return;
     }
     if (sState.recvState == 0) {
         sys->pDevTable->send(data, size, 0, NULL);
-        func_0203f348(sys->pDevTable->getNetId(), data, size);
-        func_0203e8c8(4, 1036);
+        NetSystem_RecvInfraredPacket(sys->pDevTable->getNetId(), data, size);
+        NetSystem_SetSendState(4, 1036);
     }
 }
 
-static void func_0203f46c(void) {
+static void NetSystem_UpdateWifiSend(void) {
     GFLNetSys *sys;
     int dataSize;
     NetSystem *net;
 
-    func_02042e84();
-    sys = func_02042e78();
-    dataSize = func_02042de8();
+    GFL_NetGetInitData();
+    sys = GFL_NetGetSys();
+    dataSize = GFL_NetGetMaxSendSize();
     net = sNetSys;
-    if (net->unk1E7) {
-        if (!net->unk1ED) {
-            if (func_0203fa28(net->sendData, &net->sendQueue, func_02042de8(), net->sendSeq)) {
-                sNetSys->unk1ED = TRUE;
+    if (net->wifiConnected) {
+        if (!net->wifiPacketReady) {
+            if (NetSystem_WritePacket(net->sendData, &net->sendQueue, GFL_NetGetMaxSendSize(), net->sendSeq)) {
+                sNetSys->wifiPacketReady = TRUE;
             }
         }
-        if (sNetSys->unk1ED == TRUE) {
+        if (sNetSys->wifiPacketReady == TRUE) {
             if (sys->pDevTable->send(sNetSys->sendData, dataSize, 0, NULL)) {
-                sNetSys->unk1ED = FALSE;
+                sNetSys->wifiPacketReady = FALSE;
             }
         }
     }
 }
 
-static void func_0203f4f0(void) {
+static void NetSystem_UpdateOwnSend(void) {
     GFLNetSys *sys;
 
-    func_02042e84();
-    sys = func_02042e78();
-    if (sys->pDevTable->isConnected() && func_0203fe74(func_0203ffc4())) {
-        func_0203f10c(TRUE);
-        func_0203f19c();
+    GFL_NetGetInitData();
+    sys = GFL_NetGetSys();
+    if (sys->pDevTable->isConnected() && NetSystem_IsMachineConnected(NetSystem_GetNetId())) {
+        NetSystem_BuildSendPacket(TRUE);
+        NetSystem_SendOwnPacket();
     }
 }
 
-static void func_0203f520(void) {
-    GFLNetSys *sys = func_02042e78();
+static void NetSystem_UpdateMPSendStep(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
-    func_02042dc0();
-    if (sState.sendState == 1 && func_0203ff6c() > 1) {
-        func_0203e8c8(2, 1130);
+    GFL_NetGetMaxConnectNum();
+    if (sState.sendState == 1 && NetSystem_CountConnected() > 1) {
+        NetSystem_SetSendState(2, 1130);
         if (sys->pDevTable->isConnected()) {
-            if (!sys->pDevTable->send(sNetSys->mpSendData, func_0203e8e8(), 0, func_0203f9f0)) {
-                func_0203e8c8(1, 1134);
+            if (!sys->pDevTable->send(sNetSys->mpSendData, NetSystem_GetParentPacketSize(), 0,
+                                      NetSystem_OnMPSendDone)) {
+                NetSystem_SetSendState(1, 1134);
             }
-        } else if (func_02042e84()->bNetType == 3 || func_02042e84()->bNetType == 4) {
-            if (!sys->pDevTable->unkA0()) {
-                func_0203e8c8(1, 1141);
+        } else if (GFL_NetGetInitData()->bNetType == 3 || GFL_NetGetInitData()->bNetType == 4) {
+            if (!sys->pDevTable->canSend()) {
+                NetSystem_SetSendState(1, 1141);
             } else {
                 if (sNetSys->mpSendData[PACKET_SIZE] == 0) {
                     return;
                 }
-                sys->pDevTable->send(sNetSys->mpSendData, func_02042de8(), 100, NULL);
+                sys->pDevTable->send(sNetSys->mpSendData, GFL_NetGetMaxSendSize(), 100, NULL);
             }
         }
     }
     if (sState.sendState == 2) {
-        func_0203f670();
-        func_0203f8f8(0, sNetSys->mpSendData, func_0203e8e8());
-        func_0203e8c8(3, 1165);
+        NetSystem_CountSends();
+        NetSystem_RecvServerPacket(0, sNetSys->mpSendData, NetSystem_GetParentPacketSize());
+        NetSystem_SetSendState(3, 1165);
     }
-    if (!sys->pDevTable->isConnected() || func_02042e84()->bNetType == 3 || func_02042e84()->bNetType == 4) {
-        func_0203e8c8(4, 1170);
+    if (!sys->pDevTable->isConnected() || GFL_NetGetInitData()->bNetType == 3 || GFL_NetGetInitData()->bNetType == 4) {
+        NetSystem_SetSendState(4, 1170);
     }
 }
 
 // Whether no machine has packets that have not come back
-static BOOL func_0203f63c(void) {
+static BOOL NetSystem_AllSendsReturned(void) {
     int i;
 
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        if (func_0203fe74(i) && sNetSys->sends[i] > 0) {
+        if (NetSystem_IsMachineConnected(i) && sNetSys->sends[i] > 0) {
             return FALSE;
         }
     }
     return TRUE;
 }
 
-static void func_0203f670(void) {
+static void NetSystem_CountSends(void) {
     int i;
-    int machineMax = func_02042dc0();
+    int machineMax = GFL_NetGetMaxConnectNum();
 
     for (i = 0; i < machineMax; i++) {
-        if (func_0203fe74(i)) {
+        if (NetSystem_IsMachineConnected(i)) {
             sNetSys->sends[i]++;
         }
     }
 }
 
-static void func_0203f6a8(void) {
-    GFLNetSys *sys = func_02042e78();
-    GFLNetInitData *pNetIni = func_02042e84();
+static void NetSystem_UpdateMPSend(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    GFLNetInitData *pNetIni = GFL_NetGetInitData();
 
     if (pNetIni->bNetType == 1 || pNetIni->bNetType == 2) {
-        if (!func_0203fe74(0)) {
+        if (!NetSystem_IsMachineConnected(0)) {
             return;
         }
         GFL_ASSERT(!pNetIni->bMPMode);
-        if (sState.sendState == 4 && sNetSys->unk1AC && func_0203f63c()) {
-            func_0203e8c8(1, 1242);
+        if (sState.sendState == 4 && sNetSys->mpSendEnabled && NetSystem_AllSendsReturned()) {
+            NetSystem_SetSendState(1, 1242);
         }
         if (sState.sendState == 1) {
-            if (sys->pDevTable->send(sNetSys->mpSendData, func_0203e8e8(), 0, NULL)) {
-                func_0203e8c8(4, 1249);
-                func_0203f670();
+            if (sys->pDevTable->send(sNetSys->mpSendData, NetSystem_GetParentPacketSize(), 0, NULL)) {
+                NetSystem_SetSendState(4, 1249);
+                NetSystem_CountSends();
             }
         }
     } else if (pNetIni->bNetType == 3 || pNetIni->bNetType == 4) {
         if (sState.sendState == 4) {
             NetSystem *net = sNetSys;
 
-            func_0203fa28(net->mpSendData, &net->mpQueue, func_0203e8e8(), net->mpSeq);
+            NetSystem_WritePacket(net->mpSendData, &net->mpQueue, NetSystem_GetParentPacketSize(), net->mpSeq);
             sNetSys->mpSeq++;
-            func_0203e8c8(1, 1268);
+            NetSystem_SetSendState(1, 1268);
         }
-        func_0203f520();
-    } else if (sys->pDevTable->isConnected() && func_0203f63c()) {
+        NetSystem_UpdateMPSendStep();
+    } else if (sys->pDevTable->isConnected() && NetSystem_AllSendsReturned()) {
         if (sState.sendState == 4) {
             NetSystem *net = sNetSys;
 
-            func_0203fa28(net->mpSendData, &net->mpQueue, func_0203e8e8(), net->mpSeq);
+            NetSystem_WritePacket(net->mpSendData, &net->mpQueue, NetSystem_GetParentPacketSize(), net->mpSeq);
             sNetSys->mpSeq++;
-            func_0203e8c8(1, 1281);
+            NetSystem_SetSendState(1, 1281);
         }
-        func_0203f520();
+        NetSystem_UpdateMPSendStep();
     }
 }
 
-static BOOL func_0203f7f0(u16 netId, u8 *data, u16 size) {
+static BOOL NetSystem_RecvPacket(u16 netId, u8 *data, u16 size) {
     int crc;
     int len;
 
-    func_02042de8();
+    GFL_NetGetMaxSendSize();
     if (data == NULL) {
         return FALSE;
     }
@@ -730,17 +736,17 @@ static BOOL func_0203f7f0(u16 netId, u8 *data, u16 size) {
     if (data[PACKET_FLAGS] & PACKET_FLAG_LONG) {
         len += 0xff;
     }
-    func_0203dfd0(&sNetSys->recvRings[netId], data + PACKET_HEADER_SIZE, len);
+    NetRingBuff_Write(&sNetSys->recvRings[netId], data + PACKET_HEADER_SIZE, len);
     sNetSys->recvRings[netId].received = TRUE;
     return TRUE;
 }
 
-static BOOL func_0203f8f8(u16 netId, u8 *data, u16 size) {
+static BOOL NetSystem_RecvServerPacket(u16 netId, u8 *data, u16 size) {
     int crc;
     int len;
 
-    func_02042e84();
-    func_02042de8();
+    GFL_NetGetInitData();
+    GFL_NetGetMaxSendSize();
     sNetSys->serverSends--;
     if (data == NULL) {
         return FALSE;
@@ -764,12 +770,12 @@ static BOOL func_0203f8f8(u16 netId, u8 *data, u16 size) {
     if (data[PACKET_FLAGS] & PACKET_FLAG_LONG) {
         len += 0xff;
     }
-    func_0203dfd0(&sNetSys->serverRing, data + PACKET_HEADER_SIZE, len);
+    NetRingBuff_Write(&sNetSys->serverRing, data + PACKET_HEADER_SIZE, len);
     sNetSys->serverRing.received = TRUE;
     return TRUE;
 }
 
-static BOOL func_0203f9c0(BOOL ok) {
+static BOOL NetSystem_OnSendDone(BOOL ok) {
     if (ok && sState.recvState == 2) {
         sState.recvState = 4;
     } else {
@@ -778,21 +784,21 @@ static BOOL func_0203f9c0(BOOL ok) {
     return TRUE;
 }
 
-static BOOL func_0203f9f0(BOOL ok) {
-    func_02042de8();
-    func_02042dc0();
-    func_02042e84();
+static BOOL NetSystem_OnMPSendDone(BOOL ok) {
+    GFL_NetGetMaxSendSize();
+    GFL_NetGetMaxConnectNum();
+    GFL_NetGetInitData();
     if (ok) {
-        func_0203e8c8(4, 1492);
+        NetSystem_SetSendState(4, 1492);
     } else {
         GFL_ASSERT(0);
     }
     return TRUE;
 }
 
-static BOOL func_0203fa28(u8 *packet, NetQueue *queue, int size, u8 seq) {
-    GFLNetInitData *ini = func_02042e84();
-    GFLNetSys *sys = func_02042e78();
+static BOOL NetSystem_WritePacket(u8 *packet, NetQueue *queue, int size, u8 seq) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
+    GFLNetSys *sys = GFL_NetGetSys();
     NetSendBuffer buffer;
     int len;
     int crc;
@@ -801,13 +807,13 @@ static BOOL func_0203fa28(u8 *packet, NetQueue *queue, int size, u8 seq) {
     packet[PACKET_FLAGS] = queue->pending == FALSE ? PACKET_FLAG_FIRST : PACKET_FLAG_CONTINUED;
     queue->pending = FALSE;
     packet[PACKET_CONNECT_BITS] = sys->pDevTable->getConnectBits();
-    if (func_0203e174(queue) || ((ini->bNetType == 3 || ini->bNetType == 4) && sys->pDevTable->unkB0() == TRUE)) {
+    if (NetQueue_IsEmpty(queue) || ((ini->bNetType == 3 || ini->bNetType == 4) && sys->pDevTable->unkB0() == TRUE)) {
         packet[PACKET_FLAGS] = PACKET_FLAGS_NONE;
         return FALSE;
     }
     buffer.size = size - PACKET_HEADER_SIZE;
     buffer.ptr = packet + PACKET_HEADER_SIZE;
-    if (!func_0203e3bc(queue, &buffer)) {
+    if (!NetQueue_FillBuffer(queue, &buffer)) {
         queue->pending = TRUE;
     }
     if (buffer.size != 0xffff) {
@@ -829,7 +835,7 @@ static BOOL func_0203fa28(u8 *packet, NetQueue *queue, int size, u8 seq) {
 }
 
 // Queues a command to send to a machine, or every machine for GFL_NET_NETID_SERVER
-BOOL func_0203fafc(int command, u8 *data, int size, u32 unused, int dest, int netId, BOOL noCopy) {
+BOOL NetSystem_QueueCommand(int command, u8 *data, int size, u32 unused, int dest, int netId, BOOL noCopy) {
     BOOL copy = TRUE;
     GFLNetInitData *ini;
     NetQueue *queue;
@@ -837,14 +843,14 @@ BOOL func_0203fafc(int command, u8 *data, int size, u32 unused, int dest, int ne
     if (noCopy) {
         copy = FALSE;
     }
-    ini = func_02042e84();
+    ini = GFL_NetGetInitData();
     if (sNetSys == NULL) {
         return FALSE;
     }
-    if (func_02040078() || func_02042494()) {
+    if (NetSystem_HasErrorChecked() || NetState_GetError()) {
         return FALSE;
     }
-    if (!func_02040198()) {
+    if (!NetSystem_IsDataShareOk()) {
         return FALSE;
     }
     if (size >= sNetSys->recvSize && copy == TRUE) {
@@ -855,39 +861,39 @@ BOOL func_0203fafc(int command, u8 *data, int size, u32 unused, int dest, int ne
     } else {
         queue = &sNetSys->sendQueue;
     }
-    if (func_0203e2c0(queue, command, data, size, unused, copy, netId)) {
+    if (NetQueue_Push(queue, command, data, size, unused, copy, netId)) {
         return TRUE;
     }
     NET_ERROR(1012);
     return FALSE;
 }
 
-int func_0203fbb8(void) {
-    return func_0203e0f4(&sNetSys->sendRing);
+int NetSystem_GetSendRingUsed(void) {
+    return NetRingBuff_GetUsedSize(&sNetSys->sendRing);
 }
 
-int func_0203fbcc(void) {
-    return func_0203e0f4(&sNetSys->mpRing);
+int NetSystem_GetMPRingUsed(void) {
+    return NetRingBuff_GetUsedSize(&sNetSys->mpRing);
 }
 
 // Hands a command that has arrived to its handler, and for the server to the server's handler too
-static void func_0203fbe0(int command, int size, void *data, NetRecvState *state) {
+static void NetSystem_DispatchCommand(int command, int size, void *data, NetRecvState *state) {
     NetHandle *handle;
 
-    func_02042e84();
-    handle = func_02040414(func_0203ffc4());
-    func_02040d78(state->netId, state->sender, command, size, data, handle);
-    if (func_0203ffc4() == 0) {
-        handle = func_02040414(GFL_NET_NETID_SERVER);
+    GFL_NetGetInitData();
+    handle = NetHandle_Get(NetSystem_GetNetId());
+    NetCommand_Dispatch(state->netId, state->sender, command, size, data, handle);
+    if (NetSystem_GetNetId() == 0) {
+        handle = NetHandle_Get(GFL_NET_NETID_SERVER);
         if (command < 0x11) {
-            func_02040d78(state->netId, state->sender, command, size, data, handle);
+            NetCommand_Dispatch(state->netId, state->sender, command, size, data, handle);
         }
     }
-    func_0203e8d4(state);
+    NetRecvState_Reset(state);
 }
 
 // Reads the commands that have arrived in a ring buffer
-static void func_0203fc34(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *state, int size) {
+static void NetSystem_ReadCommands(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *state, int size) {
     u8 *dest;
     int start;
     int read;
@@ -895,14 +901,14 @@ static void func_0203fc34(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *
     int command;
     int savedStart;
 
-    func_02042e84();
-    if (func_0203e0f4(ring) == 0) {
+    GFL_NetGetInitData();
+    if (NetRingBuff_GetUsedSize(ring) == 0) {
         return;
     }
     do {
         command = state->command;
         if (command == 0) {
-            command = func_0203e080(ring);
+            command = NetRingBuff_ReadU16(ring);
             if (command == 0) {
                 GFL_ASSERT(0);
                 continue;
@@ -911,34 +917,34 @@ static void func_0203fc34(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *
         savedStart = ring->startPos;
         state->command = command;
         if (state->size == 0xffff) {
-            if (func_0203e0f4(ring) < 3) {
+            if (NetRingBuff_GetUsedSize(ring) < 3) {
                 ring->startPos = savedStart;
                 return;
             }
-            u16 commandSize = func_0203e080(ring);
+            u16 commandSize = NetRingBuff_ReadU16(ring);
 
             state->remaining = commandSize;
             state->size = commandSize;
             state->netId = netId;
-            state->sender = func_0203e054(ring);
+            state->sender = NetRingBuff_ReadByte(ring);
         }
         start = ring->startPos;
-        if (func_02040dd4(command) && func_02040c94(state->sender)) {
+        if (NetCommand_HasBufferFunc(command) && NetCommand_IsForThisMachine(state->sender)) {
             if (state->buffer == NULL) {
-                state->buffer = func_02040de8(command, state->netId, state->size);
+                state->buffer = NetCommand_GetRecvBuffer(command, state->netId, state->size);
             }
             dest = state->buffer + state->pos;
         } else {
             state->buffer = temp;
             dest = temp;
         }
-        if (!func_02040c94(state->sender)) {
+        if (!NetCommand_IsForThisMachine(state->sender)) {
             dest = NULL;
         }
-        if (!func_02040dd4(command)) {
-            read = func_0203e038(ring, temp, state->remaining, state->remaining);
+        if (!NetCommand_HasBufferFunc(command)) {
+            read = NetRingBuff_Read(ring, temp, state->remaining, state->remaining);
         } else {
-            read = func_0203e038(ring, temp, state->remaining, size - PACKET_HEADER_SIZE);
+            read = NetRingBuff_Read(ring, temp, state->remaining, size - PACKET_HEADER_SIZE);
         }
         copied = read;
         state->remaining -= (u16)read;
@@ -953,66 +959,67 @@ static void func_0203fc34(NetRingBuff *ring, int netId, u8 *temp, NetRecvState *
         }
         state->pos += copied;
         if (state->remaining == 0) {
-            func_0203fbe0(command, state->size, state->buffer, state);
+            NetSystem_DispatchCommand(command, state->size, state->buffer, state);
             continue;
         }
-        if (func_02040dc0(command) && !func_02040dd4(command) && func_02040c94(state->sender)) {
+        if (NetCommand_HasCallback(command) && !NetCommand_HasBufferFunc(command) &&
+            NetCommand_IsForThisMachine(state->sender)) {
             state->remaining += (u16)read;
             ring->startPos = start;
         }
         return;
-    } while (func_0203e0f4(ring) != 0);
+    } while (NetRingBuff_GetUsedSize(ring) != 0);
 }
 
-static void func_0203fdbc(void) {
+static void NetSystem_ReadServerRing(void) {
     int i;
 
     if (sNetSys != NULL) {
-        func_0203e150(&sNetSys->serverRing);
+        NetRingBuff_Commit(&sNetSys->serverRing);
         for (i = 0; i < 4; i++) {
             NetSystem *net;
 
-            if (func_0203e0f4(&sNetSys->serverRing) <= 0) {
+            if (NetRingBuff_GetUsedSize(&sNetSys->serverRing) <= 0) {
                 break;
             }
             net = sNetSys;
-            func_0203fc34(&net->serverRing, GFL_NET_NETID_SERVER, net->recvTemp, &net->serverRecvState,
-                          func_0203e8e8());
+            NetSystem_ReadCommands(&net->serverRing, GFL_NET_NETID_SERVER, net->recvTemp, &net->serverRecvState,
+                                   NetSystem_GetParentPacketSize());
         }
     }
 }
 
-static void func_0203fe00(void) {
+static void NetSystem_ReadRecvRings(void) {
     int machineMax;
-    int dataSize = func_02042de8();
+    int dataSize = GFL_NetGetMaxSendSize();
     int i;
     int j;
 
     if (sNetSys != NULL) {
-        machineMax = func_02042dc0();
+        machineMax = GFL_NetGetMaxConnectNum();
 
         for (i = 0; i < machineMax; i++) {
-            func_0203e150(&sNetSys->recvRings[i]);
+            NetRingBuff_Commit(&sNetSys->recvRings[i]);
             for (j = 0; j < 4; j++) {
-                if (func_0203e0f4(&sNetSys->recvRings[i]) > 0) {
+                if (NetRingBuff_GetUsedSize(&sNetSys->recvRings[i]) > 0) {
                     NetSystem *net = sNetSys;
 
-                    func_0203fc34(&net->recvRings[i], i, net->recvTemp, &net->recvStates[i], dataSize);
+                    NetSystem_ReadCommands(&net->recvRings[i], i, net->recvTemp, &net->recvStates[i], dataSize);
                 }
             }
         }
     }
 }
 
-BOOL func_0203fe74(u16 netId) {
-    GFLNetSys *sys = func_02042e78();
-    GFLNetInitData *ini = func_02042e84();
+BOOL NetSystem_IsMachineConnected(u16 netId) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (sNetSys == NULL) {
         return FALSE;
     }
     if (ini->bNetType == 1 || ini->bNetType == 2) {
-        if (sNetSys->unk1E7 && sys->pDevTable->getNetId() != -1) {
+        if (sNetSys->wifiConnected && sys->pDevTable->getNetId() != -1) {
             if (netId == 0) {
                 return TRUE;
             }
@@ -1028,16 +1035,16 @@ BOOL func_0203fe74(u16 netId) {
         }
         return FALSE;
     }
-    if (!func_0203ff8c()) {
+    if (!NetSystem_IsDeviceReady()) {
         return FALSE;
     }
     if (!sys->pDevTable->isConnected()) {
         return FALSE;
     }
-    if (netId == func_0203ffc4()) {
+    if (netId == NetSystem_GetNetId()) {
         return TRUE;
     }
-    if (func_0203ffc4() == 0 || !ini->bMPMode) {
+    if (NetSystem_GetNetId() == 0 || !ini->bMPMode) {
         u16 bits = sys->pDevTable->getConnectBits();
 
         if ((1 << netId) & bits) {
@@ -1053,32 +1060,32 @@ BOOL func_0203fe74(u16 netId) {
     return FALSE;
 }
 
-int func_0203ff6c(void) {
+int NetSystem_CountConnected(void) {
     int count = 0;
     int i;
 
     for (i = 0; i < GFL_NET_MACHINE_MAX; i++) {
-        if (func_0203fe74(i)) {
+        if (NetSystem_IsMachineConnected(i)) {
             count++;
         }
     }
     return count;
 }
 
-BOOL func_0203ff8c(void) {
-    GFLNetSys *sys = func_02042e78();
-    GFLNetInitData *ini = func_02042e84();
+BOOL NetSystem_IsDeviceReady(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (sNetSys != NULL && (ini->bNetType == 1 || ini->bNetType == 2 || ini->bNetType == 3 || ini->bNetType == 4)) {
         return TRUE;
     }
-    return sys->pDevTable->unk6C();
+    return sys->pDevTable->isRunning();
 }
 
-u16 func_0203ffc4(void) {
+u16 NetSystem_GetNetId(void) {
     if (sNetSys != NULL) {
-        GFLNetSys *sys = func_02042e78();
-        GFLNetInitData *ini = func_02042e84();
+        GFLNetSys *sys = GFL_NetGetSys();
+        GFLNetInitData *ini = GFL_NetGetInitData();
 
         if (ini->bNetType == 1 || ini->bNetType == 2) {
             int netId = sys->pDevTable->getNetId();
@@ -1093,14 +1100,14 @@ u16 func_0203ffc4(void) {
     return 0;
 }
 
-u32 func_0204001c(void) {
-    GFLNetSys *sys = func_02042e78();
+u32 NetSystem_GetChildBits(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
     return (u16)sys->pDevTable->getConnectBits() & 0xfffe;
 }
 
-BOOL func_0204003c(void) {
-    GFLNetSys *sys = func_02042e78();
+BOOL NetSystem_HasError(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
 
     if (sNetSys != NULL && sNetSys->error) {
         return TRUE;
@@ -1111,8 +1118,8 @@ BOOL func_0204003c(void) {
     return FALSE;
 }
 
-BOOL func_02040078(void) {
-    GFLNetSys *sys = func_02042e78();
+BOOL NetSystem_HasErrorChecked(void) {
+    GFLNetSys *sys = GFL_NetGetSys();
     BOOL error = FALSE;
 
     if (sys != NULL && sys->pDevTable != NULL) {
@@ -1124,26 +1131,26 @@ BOOL func_02040078(void) {
     return error;
 }
 
-BOOL func_020400b8(u16 command, int dest) {
-    if (func_02042e84()->bMPMode && dest == GFL_NET_NETID_SERVER) {
-        return func_0203e478(&sNetSys->mpQueue, command);
+BOOL NetSystem_HasQueuedCommand(u16 command, int dest) {
+    if (GFL_NetGetInitData()->bMPMode && dest == GFL_NET_NETID_SERVER) {
+        return NetQueue_HasCommand(&sNetSys->mpQueue, command);
     }
-    return func_0203e478(&sNetSys->sendQueue, command);
+    return NetQueue_HasCommand(&sNetSys->sendQueue, command);
 }
 
-BOOL func_020400f0(void) {
-    return func_0203e174(&sNetSys->sendQueue);
+BOOL NetSystem_IsSendQueueEmpty(void) {
+    return NetQueue_IsEmpty(&sNetSys->sendQueue);
 }
 
-void func_02040104(u8 a0) {
-    sNetSys->unk1E7 = a0;
+void NetSystem_SetWifiConnected(u8 a0) {
+    sNetSys->wifiConnected = a0;
 }
 
-void func_02040118(BOOL a0) {
-    GFLNetInitData *ini = func_02042e84();
+void NetSystem_SetMPSendEnabled(BOOL a0) {
+    GFLNetInitData *ini = GFL_NetGetInitData();
 
     if (ini->bNetType == 1 || ini->bNetType == 2) {
-        sNetSys->unk1AC = a0;
+        sNetSys->mpSendEnabled = a0;
         if (a0) {
             sNetSys->serverSends = 0;
             sNetSys->sends[0] = 0;
@@ -1152,32 +1159,32 @@ void func_02040118(BOOL a0) {
     }
 }
 
-void func_02040158(void) {
+void NetSystem_SetError(void) {
     sNetSys->error = TRUE;
 }
 
-void func_0204016c(void) {
+void NetSystem_ClearError(void) {
     sNetSys->error = FALSE;
 }
 
-void func_02040180(void) {
+void NetSystem_Stop(void) {
     if (sNetSys != NULL) {
-        sNetSys->unk1EA = TRUE;
+        sNetSys->stopped = TRUE;
     }
 }
 
-BOOL func_02040198(void) {
+BOOL NetSystem_IsDataShareOk(void) {
     if (sNetSys != NULL) {
-        GFLNetInitData *ini = func_02042e84();
+        GFLNetInitData *ini = GFL_NetGetInitData();
 
         if (!ini->bMPMode && (ini->bNetType == 0 || ini->bNetType == 5)) {
-            return sNetSys->unk1EB;
+            return sNetSys->dataShareOk;
         }
     }
     return TRUE;
 }
 
-int func_020401d4(int netId) {
+int NetSystem_ClampNetId(int netId) {
     if (netId >= GFL_NET_MACHINE_MAX) {
         netId = GFL_NET_NETID_SERVER;
     }

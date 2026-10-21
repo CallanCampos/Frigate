@@ -14,13 +14,13 @@ struct DWCUtilMsg {
     void *file;
 };
 
-void func_ov182_021ae084(void);
-void func_ov182_021ae0a8(void);
-DWCUtilMsg *func_ov182_021ae0b8(const char *path);
-void func_ov182_021ae0ec(DWCUtilMsg *msg);
+void DWCUtilMsg_Init(void);
+void DWCUtilMsg_Exit(void);
+DWCUtilMsg *DWCUtilMsg_Open(const char *path);
+void DWCUtilMsg_Close(DWCUtilMsg *msg);
 // The message's 16-bit characters
-u16 *func_ov182_021ae108(DWCUtilMsg *msg, int index);
+u16 *DWCUtilMsg_Get(DWCUtilMsg *msg, int index);
 // The message, with the digit value written at its character slot if slot isn't negative
-u16 *func_ov182_021ae118(DWCUtilMsg *msg, int index, int slot, int value);
+u16 *DWCUtilMsg_GetWithDigit(DWCUtilMsg *msg, int index, int slot, int value);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_MSG_RESOURCE_H

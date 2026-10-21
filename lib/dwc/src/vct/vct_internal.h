@@ -45,8 +45,8 @@ extern VCTSettings gVCTSettings;
 
 // Send a packet to the machine with the given ID, from DWC in overlay 11 (neither has a header yet): the first for
 // voice, the second for control packets
-BOOL func_ov011_02168b18(u8 aid, const void *data, int size);
-BOOL func_ov011_02168a08(u8 aid, const void *data, int size);
+BOOL DWC_SendUnreliable(u8 aid, const void *data, int size);
+BOOL DWC_SendReliable(u8 aid, const void *data, int size);
 
 // The hardware's divider and square root unit
 #define REG_DIVCNT (*(vu16 *)0x04000280)

@@ -8,7 +8,8 @@ It writes:
     build/include/generated as compile_all.py does, since the sources include them;
   - include/: a mirror of the decomp's include/ made of symbolic links (copies, on a Windows account that may not make
     links), without the C library headers the decomp keeps there for MWCC (stdio.h, string.h and the rest), so that the
-    host's own C library headers are found instead; include_mirror.txt says which ("links" or "copies"), so that
+    host's own C library headers are found instead, except wchar.h, whose DS ABI shim exposes the original
+    MSL 16-bit scan/copy and poisons unsupported wide APIs; include_mirror.txt says which ("links" or "copies"), so that
     port/CMakeLists.txt configures again when a header changes while copies stand in for it;
   - hwinclude/: host variants of the headers that name DS hardware addresses, found ahead of the originals on the
     include path. Each DS address in them goes through PORT_HW_ADDR(), which port/include/port_host.h maps into the
@@ -217,6 +218,9 @@ def mirror_include(out: Path) -> bool:
     out.mkdir(parents=True, exist_ok=True)
     wanted = {entry.name for entry in source.iterdir() if entry.name not in LIBC_HEADERS}
     for link in out.iterdir():
+        # Preserve the generated DS wchar shim so an unchanged configure does not invalidate its users.
+        if link.name == "wchar.h" and link.is_file() and not link.is_symlink():
+            continue
         if link.name not in wanted:
             remove_entry(link)
     copying = not links_allowed(out, source / "types.h")
@@ -277,6 +281,8 @@ def main():
 
     generate_constants()
     copying = mirror_include(out / "include")
+    # Only MSL's implemented 16-bit operations may cross this boundary; never select the host wchar.h.
+    write_if_changed(out / "include" / "wchar.h", (ROOT / "port/include/wchar.h").read_text())
     write_if_changed(out / "include_mirror.txt", "copies\n" if copying else "links\n")
     write_if_changed(out / "hwinclude.txt", "".join(f"{line}\n" for line in translate_hw_headers(out / "hwinclude")))
     write_if_changed(out / "sources.txt", "".join(f"{source}\n" for source in list_sources()))

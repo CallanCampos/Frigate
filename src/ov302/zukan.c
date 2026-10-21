@@ -72,7 +72,7 @@ enum {
     AWARDS_RESULT_REGIONAL,
 };
 
-// Which Pokédex counts, with func_0200d1f8's values
+// Which Pokédex counts, with PokeDex_GetMode's values
 #define DEX_REGIONAL 0
 #define DEX_NATIONAL 1
 #define DEX_NATIONAL_OBTAINED 2
@@ -144,13 +144,13 @@ static BOOL Zukan_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->searched = FALSE;
     ZukanCommon_SelectSeen(wk->param->pokedex, wk->list, wk->count);
     ZukanCommon_InitCriteria(wk->param->pokedex, &wk->criteria);
-    habitat = func_02010cb8(GameData_GetSaveControl(wk->param->gameData));
-    func_02010d80(habitat, Season_GetRealTime());
-    func_02010d90(habitat, 0);
+    habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(wk->param->gameData));
+    ZukanHabitatSave_SetSeason(habitat, Season_GetRealTime());
+    ZukanHabitatSave_SetType(habitat, 0);
     if (wk->param->start == ZUKAN_START_OPEN) {
         wk->state = STATE_OPEN;
     } else if (wk->param->start == ZUKAN_START_LIST) {
-        if (func_0200d1f8(wk->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+        if (PokeDex_GetMode(wk->param->pokedex) == DEX_NATIONAL_OBTAINED) {
             wk->state = STATE_AWARDS;
         } else {
             wk->state = STATE_LIST;
@@ -249,7 +249,7 @@ static u32 Zukan_StateAfterOpen(ZukanWork *work) {
         next = STATE_EXIT;
         break;
     case ZUKAN_OPEN_RESULT_DONE:
-        if (func_0200d1f8(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+        if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
             next = STATE_AWARDS;
         } else {
             next = STATE_LIST;
@@ -266,8 +266,8 @@ static u32 Zukan_StateList(ZukanWork *work) {
     work->subParam = list;
     list->gameData = work->param->gameData;
     list->pokedex = work->param->pokedex;
-    if (func_0200d1f8(list->pokedex) == DEX_NATIONAL_OBTAINED) {
-        func_0200d1e4(work->param->pokedex, DEX_REGIONAL);
+    if (PokeDex_GetMode(list->pokedex) == DEX_NATIONAL_OBTAINED) {
+        PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
     }
     list->searched = work->searched;
     if (work->searched == 0 && ZukanCommon_IsFirstShown(work->param->pokedex) == 0) {
@@ -349,8 +349,8 @@ static u32 Zukan_StateAfterSearch(ZukanWork *work) {
     switch (search->result) {
     case SEARCH_RESULT_FOUND:
         Zukan_FreeList(work);
-        if (func_0200d1f8(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
-            func_0200d1e4(work->param->pokedex, DEX_REGIONAL);
+        if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+            PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
         }
         work->list = search->list;
         work->count = search->count;
@@ -358,8 +358,8 @@ static u32 Zukan_StateAfterSearch(ZukanWork *work) {
         next = STATE_LIST;
         break;
     case SEARCH_RESULT_CANCEL:
-        if (func_0200d1f8(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
-            func_0200d1e4(work->param->pokedex, DEX_REGIONAL);
+        if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+            PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
         }
         work->searched = 0;
         next = STATE_LIST;
@@ -375,7 +375,7 @@ static u32 Zukan_StateAfterSearch(ZukanWork *work) {
 }
 
 static u32 Zukan_StateDetail(ZukanWork *work) {
-    u16 current = func_0200d214(GameData_GetPokedex(work->param->gameData));
+    u16 current = PokeDex_GetLastSpecies(GameData_GetPokedex(work->param->gameData));
     ZukanDetailParam *detail = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanDetailParam), FALSE, "zukan.c", 622);
     u16 i;
 
@@ -409,7 +409,7 @@ static u32 Zukan_StateAfterDetail(ZukanWork *work) {
     if (work->fromHabitat == 0) {
         work->fromDetail = 0;
     }
-    func_0200d200(pokedex, detail->list[detail->index]);
+    PokeDex_SetLastSpecies(pokedex, detail->list[detail->index]);
     switch (detail->result) {
     case ZUKAN_DETAIL_RESULT_CLOSE:
         work->param->result = 1;
@@ -421,8 +421,8 @@ static u32 Zukan_StateAfterDetail(ZukanWork *work) {
         break;
     case ZUKAN_DETAIL_RESULT_RETURN:
         if (work->fromHabitat == 0) {
-            if (func_0200d1f8(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
-                func_0200d1e4(work->param->pokedex, DEX_REGIONAL);
+            if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+                PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
             }
             work->param->result = 0;
             next = STATE_LIST;
@@ -440,7 +440,7 @@ static u32 Zukan_StateAfterDetail(ZukanWork *work) {
 }
 
 static u32 Zukan_StateHabitat(ZukanWork *work) {
-    void *habitat = func_02010cb8(GameData_GetSaveControl(work->param->gameData));
+    void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
     ZukanHabitatListParam *habitatList;
 
     work->subParam = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanHabitatListParam), FALSE, "zukan.c", 751);
@@ -473,13 +473,13 @@ static u32 Zukan_StateAfterHabitat(ZukanWork *work) {
             work->page = ZUKAN_DETAIL_PAGE_MAP;
             next = STATE_DETAIL;
         } else {
-            func_0200d1e4(work->param->pokedex, DEX_NATIONAL_OBTAINED);
+            PokeDex_SetMode(work->param->pokedex, DEX_NATIONAL_OBTAINED);
             next = STATE_AWARDS;
         }
         work->fromHabitat = 0;
         break;
     case HABITAT_RESULT_AREA: {
-        void *habitat = func_02010cb8(GameData_GetSaveControl(work->param->gameData));
+        void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
 
         next = STATE_DETAIL;
         work->page = ZUKAN_DETAIL_PAGE_INFO;
@@ -499,7 +499,7 @@ static u32 Zukan_StateAfterHabitat(ZukanWork *work) {
 }
 
 static u32 Zukan_StateAwards(ZukanWork *work) {
-    void *habitat = func_02010cb8(GameData_GetSaveControl(work->param->gameData));
+    void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
     ZukanHabitatSummaryParam *summary;
 
     work->subParam = GFL_HeapAllocate(HEAPID_ZUKAN, sizeof(ZukanHabitatSummaryParam), FALSE, "zukan.c", 860);
@@ -527,24 +527,24 @@ static u32 Zukan_StateAfterAwards(ZukanWork *work) {
         work->param->result = 0;
         break;
     case AWARDS_RESULT_HABITATS: {
-        void *habitat = func_02010cb8(GameData_GetSaveControl(work->param->gameData));
+        void *habitat = SaveControl_GetZukanHabitatSave(GameData_GetSaveControl(work->param->gameData));
 
-        func_02010d80(habitat, Season_GetRealTime());
-        func_02010d90(habitat, 0);
-        func_0200d1e4(work->param->pokedex, DEX_NATIONAL_OBTAINED);
+        ZukanHabitatSave_SetSeason(habitat, Season_GetRealTime());
+        ZukanHabitatSave_SetType(habitat, 0);
+        PokeDex_SetMode(work->param->pokedex, DEX_NATIONAL_OBTAINED);
         next = STATE_HABITAT;
         break;
     }
     case AWARDS_RESULT_NATIONAL:
-        func_0200d1f8(work->param->pokedex);
-        func_0200d1e4(work->param->pokedex, DEX_NATIONAL);
+        PokeDex_GetMode(work->param->pokedex);
+        PokeDex_SetMode(work->param->pokedex, DEX_NATIONAL);
         Zukan_FreeList(work);
         work->count = ZukanCommon_CreateList(work->param->pokedex, &work->list, HEAPID_ZUKAN);
         next = STATE_LIST;
         break;
     case AWARDS_RESULT_REGIONAL:
-        func_0200d1f8(work->param->pokedex);
-        func_0200d1e4(work->param->pokedex, DEX_REGIONAL);
+        PokeDex_GetMode(work->param->pokedex);
+        PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
         Zukan_FreeList(work);
         work->count = ZukanCommon_CreateList(work->param->pokedex, &work->list, HEAPID_ZUKAN);
         next = STATE_LIST;

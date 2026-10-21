@@ -61,47 +61,47 @@ void WorldTrade_SubLcdActorAdd(WorldTradeWork *wk) {
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 0;
-    wk->subAct[0] = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR],
-                                  wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT],
-                                  wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-    func_0204c520(wk->subAct[0], TRUE);
-    func_0204c468(wk->subAct[0], 2);
-    func_0204c488(wk->subAct[0], 3);
-    func_0204c124(wk->subAct[0], TRUE);
+    wk->subAct[0] = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR],
+                                   wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT],
+                                   wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
+    ClActor_SetAutoAnim(wk->subAct[0], TRUE);
+    ClActor_SetBgPriority(wk->subAct[0], 2);
+    ClActor_SetSequence(wk->subAct[0], 3);
+    ClActor_SetVisible(wk->subAct[0], TRUE);
 
     for (i = 0; i < 7; i++) {
         wk->subAct[1 + i] =
-            func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
-                          wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
-                          wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-        func_0204c520(wk->subAct[1 + i], TRUE);
-        func_0204c488(wk->subAct[1 + i], i * 4 + 14);
-        func_0204c124(wk->subAct[1 + i], FALSE);
+            ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
+                           wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
+                           wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
+        ClActor_SetAutoAnim(wk->subAct[1 + i], TRUE);
+        ClActor_SetSequence(wk->subAct[1 + i], i * 4 + 14);
+        ClActor_SetVisible(wk->subAct[1 + i], FALSE);
         SubLcd_ActPos(wk->subAct[1 + i], sSubLcdObjPos[i].x, sSubLcdObjPos[i].y);
-        func_0204c468(wk->subAct[1 + i], 2);
-        func_0204c378(wk->subAct[1 + i], (u8)(i + 2), 1);
+        ClActor_SetBgPriority(wk->subAct[1 + i], 2);
+        ClActor_SetPalette(wk->subAct[1 + i], (u8)(i + 2), 1);
     }
 
     wk->partnerCursorAct =
-        func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
-                      wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
-                      wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-    func_0204c520(wk->partnerCursorAct, TRUE);
-    func_0204c488(wk->partnerCursorAct, 43);
-    func_0204c124(wk->partnerCursorAct, FALSE);
+        ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
+                       wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
+                       wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
+    ClActor_SetAutoAnim(wk->partnerCursorAct, TRUE);
+    ClActor_SetSequence(wk->partnerCursorAct, 43);
+    ClActor_SetVisible(wk->partnerCursorAct, FALSE);
     SubLcd_ActPos(wk->partnerCursorAct, 128, 82);
-    func_0204c468(wk->partnerCursorAct, 1);
+    ClActor_SetBgPriority(wk->partnerCursorAct, 1);
 
-    wk->promptDsAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
-                                    wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
-                                    wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
-    func_0204c520(wk->promptDsAct, TRUE);
-    func_0204c488(wk->promptDsAct, 42);
+    wk->promptDsAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR],
+                                     wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT],
+                                     wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL], &setup, 1, HEAPID_WORLDTRADE);
+    ClActor_SetAutoAnim(wk->promptDsAct, TRUE);
+    ClActor_SetSequence(wk->promptDsAct, 42);
     WorldTrade_ActPos(wk->promptDsAct, 55, wk->drawOffset + 168);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
 
     for (i = 0; i < 8; i++) {
-        func_0204c178(wk->subAct[i], &pos, 1);
+        ClActor_GetSurfacePos(wk->subAct[i], &pos, 1);
         wk->subActY[i][0] = pos.x;
         wk->subActY[i][1] = pos.y;
     }
@@ -123,7 +123,7 @@ void WorldTrade_HeroDemo(WorldTradeWork *wk) {
 }
 
 static void SubLcd_HeroAnimSet(SubLcdHeroDemo *demo, int seq) {
-    func_0204c488(demo->wk->subAct[0], seq);
+    ClActor_SetSequence(demo->wk->subAct[0], seq);
 }
 
 static void SubLcd_HeroDemoTask(TCB *tcb, void *data) {
@@ -141,7 +141,7 @@ static void SubLcd_HeroDemoTask(TCB *tcb, void *data) {
         SubLcd_ActPos(wk->subAct[0], 128, demo->y);
         break;
     case 1:
-        if (!func_0204c560(wk->subAct[0])) {
+        if (!ClActor_IsAnimActive(wk->subAct[0])) {
             SubLcd_HeroAnimSet(demo, 2);
             demo->seq = 2;
         }
@@ -193,7 +193,7 @@ static void SubLcd_ReturnHeroDemoTask(TCB *tcb, void *data) {
         SubLcd_ActPos(wk->subAct[0], 128, demo->y);
         break;
     case 1:
-        if (!func_0204c560(wk->subAct[0])) {
+        if (!ClActor_IsAnimActive(wk->subAct[0])) {
             SubLcd_HeroAnimSet(demo, 0);
             demo->seq = 2;
             GFL_SndSEPlay(SEQ_SE_SYS_87);
@@ -220,11 +220,11 @@ static void SubLcd_ActPos(ClActor *act, int x, int y) {
 
     pos.x = x;
     pos.y = y - 8;
-    func_0204c140(act, &pos, 1);
+    ClActor_SetSurfacePos(act, &pos, 1);
 }
 
 int WorldTrade_SubLcdObjHitCheck(int count) {
-    int ret = func_0203da0c(sSubLcdObjTouchRects);
+    int ret = GFL_HIDGetTouchPressedRect(sSubLcdObjTouchRects);
 
     if (ret == TOUCH_RECT_NONE || ret >= count) {
         ret = TOUCH_RECT_NONE;
@@ -243,13 +243,13 @@ void WorldTrade_SubLcdMatchObjAppear(WorldTradeWork *wk, int count, int appear) 
             SubLcd_FieldObjTrans(wk->fieldObjCharaData, wk->fieldObjPalData, i, wk->downloadPokemonData[i].trainerType,
                                  wk->downloadPokemonData[i].gender);
             if (appear) {
-                func_0204c488(wk->subAct[1 + i], i * 4 + 14);
+                ClActor_SetSequence(wk->subAct[1 + i], i * 4 + 14);
             } else {
-                func_0204c488(wk->subAct[1 + i], i * 4 + 17);
+                ClActor_SetSequence(wk->subAct[1 + i], i * 4 + 17);
             }
-            func_0204c124(wk->subAct[1 + i], TRUE);
+            ClActor_SetVisible(wk->subAct[1 + i], TRUE);
         } else {
-            func_0204c124(wk->subAct[1 + i], FALSE);
+            ClActor_SetVisible(wk->subAct[1 + i], FALSE);
         }
     }
 }
@@ -263,8 +263,9 @@ void WorldTrade_SubLcdMatchObjHide(WorldTradeWork *wk) {
 
     for (i = 0; i < 7; i++) {
         if (wk->subAct[1 + i] != NULL) {
-            if (func_0204c4a0(wk->subAct[1 + i]) != SubLcd_ObjAnimBase(i) + 1 && func_0204c138(wk->subAct[1 + i])) {
-                func_0204c488(wk->subAct[1 + i], SubLcd_ObjAnimBase(i) + 1);
+            if (ClActor_GetSequence(wk->subAct[1 + i]) != SubLcd_ObjAnimBase(i) + 1 &&
+                ClActor_IsVisible(wk->subAct[1 + i])) {
+                ClActor_SetSequence(wk->subAct[1 + i], SubLcd_ObjAnimBase(i) + 1);
             }
         }
     }

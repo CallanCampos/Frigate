@@ -29,10 +29,10 @@ u32 LocalTvtCallData_GetZoneObject(LocalTvtCallData *data, u16 zoneId);
 u16 LocalTvtCallData_GetCallCount(LocalTvtCallData *data, u16 person);
 BOOL LocalTvtCallData_IsPlayerMale(LocalTvtCallData *data);
 void LocalTvtCallData_AddCall(LocalTvtCallData *data, u16 person, u32 max);
-void LocalTvtCallData_Set0200ff68(LocalTvtCallData *data, u32 value);
-void LocalTvtCallData_Set0200ff78(LocalTvtCallData *data);
-BOOL LocalTvtCallData_Get0200ff8c(LocalTvtCallData *data);
-void LocalTvtCallData_Reset0200ffcc(LocalTvtCallData *data);
+void LocalTvtCallData_SetMeeting(LocalTvtCallData *data, u32 value);
+void LocalTvtCallData_SetMeetingToday(LocalTvtCallData *data);
+BOOL LocalTvtCallData_IsMeetingToday(LocalTvtCallData *data);
+void LocalTvtCallData_ClearMeetingIfMet(LocalTvtCallData *data);
 BOOL LocalTvtCallData_IsSecretUnknown(LocalTvtCallData *data);
 
 #endif // POKEBW2_APP_LOCAL_TVT_LOCAL_TVT_CALLDATA_H

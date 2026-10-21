@@ -32,9 +32,9 @@ static void NetDevIrc_SetTimeoutSlot(int frames);
 static void NetDevIrc_SetPeerFilterSlot(void *filter);
 
 static BOOL NetDevIrc_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL success), void *work) {
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
 
-    NetIrc_Init(func_02042e84()->unk68.word, init->gameCommandBase);
+    NetIrc_Init(GFL_NetGetInitData()->unk68.word, init->gameCommandBase);
     NetIrc_SetInitialized();
     return TRUE;
 }
@@ -146,28 +146,28 @@ static void NetDevIrc_SetPeerFilterSlot(void *filter) {
 
 static GFLNetDevTable NetDevIrcTable = {
     .init = NetDevIrc_Init,
-    .unk08 = NetDevIrc_Begin,
+    .start = NetDevIrc_Begin,
     .update = NetDevIrc_Update,
-    .unk10 = NetDevIrc_ReturnTrue10,
-    .unk14 = NetDevIrc_End,
+    .disconnect = NetDevIrc_ReturnTrue10,
+    .end = NetDevIrc_End,
     .send = NetDevIrc_Send,
     .setRecvCallback = NetDevIrc_SetRecvCallback,
-    .unk6C = NetDevIrc_IsRunning,
+    .isRunning = NetDevIrc_IsRunning,
     .isConnected = NetDevIrc_IsConnectedSlot,
-    .unk74 = NetDevIrc_IsIdle,
-    .unk78 = NetDevIrc_IsInitialized,
+    .isEnded = NetDevIrc_IsIdle,
+    .isIdle = NetDevIrc_IsInitialized,
     .getConnectBits = NetDevIrc_GetConnectBits,
     .getNetId = NetDevIrc_GetNetId,
     .isError = NetDevIrc_IsError,
-    .unk9C = NetDevIrc_Poll,
-    .unkA0 = NetDevIrc_CanSend,
-    .unkA4 = NetDevIrc_GetSendTurn,
-    .unkA8 = NetDevIrc_GetPeerSeen,
-    .unkAC = NetDevIrc_IsLinked,
+    .poll = NetDevIrc_Poll,
+    .canSend = NetDevIrc_CanSend,
+    .isSendTurn = NetDevIrc_GetSendTurn,
+    .isPeerSeen = NetDevIrc_GetPeerSeen,
+    .isLinked = NetDevIrc_IsLinked,
     .unkB0 = NetDevIrc_GetUnkCF0,
-    .unkB4 = NetDevIrc_StartLink,
-    .unkC4 = NetDevIrc_SetTimeoutSlot,
-    .unkC8 = NetDevIrc_SetPeerFilterSlot,
+    .startLink = NetDevIrc_StartLink,
+    .setTimeout = NetDevIrc_SetTimeoutSlot,
+    .setPeerFilter = NetDevIrc_SetPeerFilterSlot,
 };
 
 const GFLNetDevTable *NetDevIrc_GetTable(void) {

@@ -122,7 +122,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
             records = GameData_GetRecords(prm->gameData);
             RecordAddOne(records, 7);
             RecordAddOne(records, 0x54);
-            func_02038bc8(0x1f);
+            JoinAvenue_RecordActivity(0x1f);
             textCopy(playerInfo->name, wk->name);
             PokeParty_SetParam(prm->pkm, PKM_PARAM_OT_NAME, (uptr)wk->name);
             if (PokeParty_GetPkmCount(party) >= PokeParty_GetCapacity(party)) {
@@ -192,15 +192,15 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         if (procRunning != TRUE) {
             if (func_ov012_02165b0c(wk->nameEntry) == FALSE) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
-                func_ov012_02165afc(wk->nameEntry, wk->name);
+                NameEntryParam_GetName(wk->nameEntry, wk->name);
                 PokeParty_GetParam(prm->pkm, PKM_PARAM_NICKNAME, oldName);
                 PokeParty_SetParam(prm->pkm, PKM_PARAM_NICKNAME, (uptr)wk->name);
-                if (func_ov012_02165b10(wk->nameEntry, oldName) == FALSE) {
+                if (NameEntryParam_CompareName(wk->nameEntry, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(prm->gameData), 0x1e);
                 }
                 GFL_StrBufFree(oldName);
             }
-            func_ov012_02165ae8(wk->nameEntry);
+            NameEntryParam_Free(wk->nameEntry);
             wk->nameEntry = NULL;
             (*state)++;
         } else {
@@ -212,7 +212,7 @@ static BOOL EventPdcReturn_Main(GameProc *proc, u32 *state, void *param, void *w
         if (wk->boxMessage == NULL) {
             PokeParty_AddPkm(party, prm->pkm);
         } else {
-            BoxSaveAccessor_InsertPkm(GameData_GetBoxSaveAccessor(prm->gameData), func_0201d620(prm->pkm));
+            BoxSaveAccessor_InsertPkm(GameData_GetBoxSaveAccessor(prm->gameData), PokeParty_GetBoxPkm(prm->pkm));
         }
         (*state)++;
         break;

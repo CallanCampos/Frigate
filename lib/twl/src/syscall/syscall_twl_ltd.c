@@ -14,6 +14,12 @@ static void func_027697e0(SVCHMACSHA1Context *context, const void *input, u32 le
 static void func_027697fc(SVCHMACSHA1Context *context, void *digest);
 
 // clang-format off
+// TwlSDK's section for the DSi-only code that the LTD autoload's .ltdmain holds
+#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX
+// clang-format on
+#pragma section LTDMAIN begin
+
+// clang-format off
 // This BIOS entry point needs the SHA-1 init SVC instruction.
 asm void func_027696e8(SVCSHA1Context *context) {
     mov r3, #0x60
@@ -121,3 +127,5 @@ void func_027698b4(void *digest, const void *input, u32 len, const void *key, u3
     func_027697e0(&context, input, len);
     func_027697fc(&context, digest);
 }
+
+#pragma section LTDMAIN end

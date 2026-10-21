@@ -125,7 +125,7 @@ static BOOL BrBvSave_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
 
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
     p_wk->seq = BrSeq_Init(p_wk, BrBvSave_SeqDownload, p_wk->heapId);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
     }
@@ -144,7 +144,7 @@ static BOOL BrBvSave_ProcExit(GameProc *proc, u32 *state, void *param, void *wor
         BrText_Exit(p_wk->text, p_wk->p_param->res);
         p_wk->text = NULL;
     }
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     BrSeq_Exit(p_wk->seq);
     BmpOam_Exit(p_wk->bmpoam);
     BrProcSys_Pop(p_wk->p_param->procSys);
@@ -169,7 +169,7 @@ static BOOL BrBvSave_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }
@@ -245,10 +245,10 @@ static void BrBvSave_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
                 u64 number;
                 int i;
 
-                func_0200c0d0((GdsProfile *)video->profile, &video->header, &video->body,
-                              GameData_GetSaveControl(p_wk->p_param->gameData));
+                BattleRec_StoreDownloaded((GdsProfile *)video->profile, &video->header, &video->body,
+                                          GameData_GetSaveControl(p_wk->p_param->gameData));
                 isSaved = FALSE;
-                number = func_0200c124(func_0200c0c0(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
+                number = BattleRec_GetHeaderValue(BattleRec_GetHeader(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
                 for (i = BR_RECORD_MODE_OTHER1; i <= BR_RECORD_MODE_OTHER3; i++) {
                     if (p_wk->p_param->recordInfo->videoNumber[i] == number) {
                         isSaved = TRUE;
@@ -272,12 +272,12 @@ static void BrBvSave_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         break;
     }
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -352,7 +352,7 @@ static void BrBvSave_SeqSelect(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             int i;
 
             for (i = BTN_SLOT1; i <= BTN_SLOT3; i++) {
@@ -459,7 +459,7 @@ static void BrBvSave_SeqConfirm(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (BrBvSave_GetTrgYes(p_wk, x, y)) {
                 *p_seq = SEQ_YES_FADEOUT_START;
             }
@@ -556,7 +556,7 @@ static void BrBvSave_SeqSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         BrNetRequestParam req;
 
         MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
-        req.dataNumber = func_0200c124(func_0200c0c0(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
+        req.dataNumber = BattleRec_GetHeaderValue(BattleRec_GetHeader(), BATTLE_REC_HEADER_DATA_NUMBER, 0);
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_8, &req);
         BrText_Print(p_wk->text, p_wk->p_param->res, 0x13f);
         p_wk->netCnt = 0;
@@ -575,12 +575,12 @@ static void BrBvSave_SeqSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         }
         break;
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -647,8 +647,8 @@ static void BrBvSave_CreateConfirm(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_para
     wordSet = BrRes_GetWordSet(p_param->res);
     src = GFL_MsgDataLoadStrbufNew(BrRes_GetMsgData(p_param->res), 0x141);
     str = GFL_StrBufCreate(0x80, p_wk->heapId);
-    func_0202437c(wordSet, 0, p_param->recordInfo->name[p_wk->select + 1], p_param->recordInfo->sex[p_wk->select + 1],
-                  1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, p_param->recordInfo->name[p_wk->select + 1],
+                         p_param->recordInfo->sex[p_wk->select + 1], 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(str);
@@ -747,7 +747,7 @@ static void BrBvSave_CreateSelect(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_param
 
         if (p_param->recordInfo->isValid[slot]) {
             GFL_MsgDataLoadStrbuf(msg, 0x1a, src);
-            func_0202437c(wordSet, 0, p_param->recordInfo->name[slot], p_param->recordInfo->sex[slot], 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, p_param->recordInfo->name[slot], p_param->recordInfo->sex[slot], 1, 2);
             GFL_WordSetFormatStrbuf(wordSet, str, src);
         } else {
             GFL_MsgDataLoadStrbuf(msg, 9, str);
@@ -767,7 +767,7 @@ static void BrBvSave_CreateSelect(BrBvSaveWork *p_wk, BrBvSaveProcParam *p_param
         p_wk->text = BrText_Init(p_param->res, p_wk->que, p_wk->heapId);
     }
     GFL_MsgDataLoadStrbuf(msg, 0x5c, src);
-    func_0202437c(wordSet, 0, name, GdsProfile_GetSex(profile), 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, GdsProfile_GetSex(profile), 1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(name);

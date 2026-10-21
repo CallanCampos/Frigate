@@ -18,7 +18,8 @@ typedef enum {
     MI_WRAM_ARM7_ALL,
 } MIWramBank;
 
-// On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (func_02768818). OS_Init calls it
+// On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (MIi_InitWramManagerCore). OS_Init calls
+// it
 void func_02078000(void);
 void MI_SetWramBank(MIWramBank bank);
 // NitroSDK's MI_Init: gives the shared WRAM to the ARM7, sets up the new DMA on a DSi and stops DMA channel 0. OS_Init
@@ -136,6 +137,10 @@ void MI_CpuFill(void *dest, u32 value, u32 size);        // swan's sys_memset_fa
 // from the last, so the size is read before a destination that a call gives
 static inline void MI_CpuCopy16(const void *src, void *dest, u32 size) {
     MIi_CpuCopy16(src, dest, size);
+}
+
+static inline void MI_CpuCopy32(const void *src, void *dest, u32 size) {
+    MIi_CpuCopy32(src, dest, size);
 }
 
 static inline void MI_CpuFill16(void *dest, u16 data, u32 size) {

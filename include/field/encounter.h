@@ -84,7 +84,7 @@ EncountState *EncountState_Create(HeapID heapId);
 void EncountState_Free(EncountState *state);
 void EncountState_SetTerrain(EncountState *state, u32 terrain);
 void func_ov012_0215917c(GameData *gameData, Field *field);
-void func_ov012_021591b4(GameData *gameData);
+void GameData_ResetPhenomenonSteps(GameData *gameData);
 void func_ov012_021591f4(GameData *gameData);
 u16 EncountSave_GetRoamingPkmZone(EncountSave *save, u8 slot);
 u16 getSwarmLevelRangeFromData(GameData *gameData);

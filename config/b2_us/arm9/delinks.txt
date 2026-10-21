@@ -1,5 +1,6 @@
     .text       start:0x02004000 end:0x0208ee28 kind:code align:32
-    .rodata     start:0x0208ee28 end:0x0209907c kind:rodata align:4
+    .exceptix   start:0x0208ee28 end:0x0208ee58 kind:rodata align:4
+    .rodata     start:0x0208ee58 end:0x0209907c kind:rodata align:4
     .ctor       start:0x0209907c end:0x0209907c kind:rodata align:4
     .data       start:0x02099080 end:0x0209d740 kind:data align:32
     .bss        start:0x0209d740 end:0x0214f500 kind:bss align:32
@@ -909,6 +910,7 @@ lib/nnsys/src/g2d/g2d_CellTransferManager.c:
     .bss        start:0x021439e0 end:0x021439ec
 
 lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:
+    complete
     .text       start:0x02062e14 end:0x02063168
     .rodata     start:0x020942dc end:0x02094364
     .data       start:0x0209b280 end:0x0209b284
@@ -924,6 +926,7 @@ lib/nnsys/src/g2d/g2d_PaletteTable.c:
     .text       start:0x02060b28 end:0x02060b30
 
 lib/nnsys/src/g2d/g2d_Renderer.c:
+    complete
     .text       start:0x020619ac end:0x02062af8
     .data       start:0x0209b260 end:0x0209b280
     .bss        start:0x02142a48 end:0x021435d8
@@ -933,6 +936,7 @@ lib/nnsys/src/g2d/g2d_Font.c:
     .text       start:0x02063b30 end:0x02063d24
 
 lib/nnsys/src/g2d/g2d_CharCanvas.c:
+    complete
     .text       start:0x02063d24 end:0x02064ab0
     .rodata     start:0x02094390 end:0x02094414
 
@@ -957,6 +961,7 @@ src/system/area_data.c:
     .text       start:0x02018ee4 end:0x02018fbc
 
 lib/nnsys/src/snd/snd_arc_stream.c:
+    complete
     .text       start:0x0206db40 end:0x0206ed04
     .rodata     start:0x0209447c end:0x02094540
     .bss        start:0x02149950 end:0x0214b3dc
@@ -1036,6 +1041,7 @@ lib/nnsys/src/g3d/cgtool.c:
     .data       start:0x0209b2f8 end:0x0209b320
 
 lib/nnsys/src/g3d/sbc.c:
+    complete
     .text       start:0x02066144 end:0x02067b60
     .rodata     start:0x02094414 end:0x02094458
     .data       start:0x0209b320 end:0x0209b4a0
@@ -1757,6 +1763,7 @@ lib/nitro/src/math/math_md5.c:
     .data       start:0x0209b52c end:0x0209b6f0
 
 lib/nitro/src/math/math_sha1.c:
+    complete
     .text       start:0x02077454 end:0x02077884
     .rodata     start:0x02098830 end:0x02098858
     .data       start:0x0209b6f0 end:0x0209b6f4
@@ -1877,9 +1884,9 @@ lib/dwc/src/bm/dwc_bm_check.c:
     .text       start:0x0205e020 end:0x0205ea3c
 
 lib/nitro/src/card/card_common.c:
-    .text       start:0x0206ed94 end:0x0206f2e4
-    .rodata     start:0x02094540 end:0x02094548
-    .bss        start:0x0214b3dc end:0x0214b980
+    complete
+    .text       start:0x0206ed94 end:0x0206f0f0
+    .bss        start:0x0214b3dc end:0x0214b960
 
 lib/nitro/src/card/card_request.c:
     complete
@@ -2524,6 +2531,7 @@ lib/msl/src/runtime/register_atexit.c:
     complete
     .text       start:0x0208ece0 end:0x0208ed2c
     .bss        start:0x0214f1f4 end:0x0214f4f8
+    .exceptix   start:0x0208ee28 end:0x0208ee34
 
 lib/msl/src/runtime/trk_stubs.c:
     complete
@@ -2532,12 +2540,59 @@ lib/msl/src/runtime/trk_stubs.c:
 lib/msl/src/runtime/console_io.c:
     complete
     .text       start:0x0208ed3c end:0x0208edd8
+    .exceptix   start:0x0208ee34 end:0x0208ee4c
 
 lib/msl/src/runtime/call_static_initializers.c:
     complete
     .text       start:0x0208edd8 end:0x0208ee08
+    .exceptix   start:0x0208ee4c end:0x0208ee58
 
 lib/msl/src/runtime/global_destructor_chain.c:
     complete
     .text       start:0x0208ee08 end:0x0208ee28
     .bss        start:0x0214f4f8 end:0x0214f500
+
+lib/nitro/src/syscall/secure_area.c:
+    .text       start:0x02004000 end:0x02004800
+
+lib/nitro/src/init/crt0.c:
+    .text       start:0x02004800 end:0x02005050
+
+lib/dwc/src/base/dwc_init_version.c:
+    complete
+    .text       start:0x02005050 end:0x02005094
+
+lib/nitro/src/card/card_backup_version.c:
+    complete
+    .text       start:0x02005094 end:0x020050ac
+
+lib/nitrowifi/src/cps/cps_version.c:
+    complete
+    .text       start:0x020050ac end:0x020050c4
+
+lib/nitrowifi/src/soc/socl_startup_version.c:
+    complete
+    .text       start:0x020050c4 end:0x020050f0
+
+lib/nitrowifi/src/ssl/ssl_version.c:
+    complete
+    .text       start:0x020050f0 end:0x02005108
+
+lib/dwc/src/vct/vct_version.c:
+    complete
+    .text       start:0x02005108 end:0x02005124
+
+lib/msl/src/exit.c:
+    complete
+    .text       start:0x020828ac end:0x020828c8
+    .bss        start:0x0214edc8 end:0x0214edcc
+
+lib/nitro/src/card/card_task.c:
+    complete
+    .text       start:0x0206f0f0 end:0x0206f2e4
+    .rodata     start:0x02094540 end:0x02094548
+    .bss        start:0x0214b960 end:0x0214b980
+
+lib/nitro/src/fs/fs_overlay_digest.c:
+    complete
+    .data       start:0x0209bc20 end:0x0209d728

@@ -105,7 +105,7 @@ void GFL_SndInit(void) {
 
 static void GFL_SndInitCore(BOOL loadGroup) {
     NNS_SndArcPlayerSetup(sSndHeap);
-    func_02005838(&sSndHeap);
+    GFL_SndBGMStack_SetHeap(&sSndHeap);
     if (loadGroup) {
         // The group's info goes unused
         NNS_SndArcGetGroupInfo(0);
@@ -113,7 +113,7 @@ static void GFL_SndInitCore(BOOL loadGroup) {
         sUnused = 0;
     }
     GFL_SndResetPlayerStates();
-    func_020058e4(0);
+    GFL_SndBGMStack_Init(0);
     InitBGMChange();
     sTrackMask = 0;
     sFadeFrames = 0;
@@ -128,7 +128,7 @@ void GFL_SndUpdate(void) {
     UpdateBGMChange();
     NNS_SndMain();
     NNS_SndUpdateDriverInfo();
-    handle = func_02005c94();
+    handle = GFL_SndBGMGetHandle();
     sTrackMask = 0;
     for (i = 0; i < SND_TRACK_COUNT; i++) {
         if (NNS_SndPlayerReadDriverTrackInfo(handle, i, &sTrackInfo[i]) == TRUE) {
@@ -144,26 +144,26 @@ void GFL_SndDestroyHeap(void) {
     NNS_SndHeapDestroy(sSndHeap);
 }
 
-void func_02005c80(BOOL stereo) {
+void GFL_SndSetStereo(BOOL stereo) {
     NNS_SndSetMonoFlag(stereo == TRUE ? FALSE : TRUE);
 }
 
-NNSSndHandle *func_02005c94(void) {
-    return func_02005968();
+NNSSndHandle *GFL_SndBGMGetHandle(void) {
+    return GFL_SndBGMStack_GetHandle();
 }
 
 u32 GFL_SndBGMGetID(void) {
     return GFL_SndGetLastResID();
 }
 
-u32 func_02005ca4(void) {
+u32 GFL_SndBGMGetRequestedID(void) {
     if (sBGMChange.active == FALSE) {
         return GFL_SndGetLastResID();
     }
     return sBGMChange.seq;
 }
 
-BOOL func_02005cbc(void) {
+BOOL GFL_SndIsLoadThreadRunning(void) {
     if (sThread == NULL) {
         return FALSE;
     }
@@ -173,7 +173,7 @@ BOOL func_02005cbc(void) {
     return FALSE;
 }
 
-NNSSndHeapHandle func_02005ce4(void) {
+NNSSndHeapHandle GFL_SndGetHeap(void) {
     return sSndHeap;
 }
 
@@ -203,7 +203,7 @@ void GFL_SndPlayerSetVolumeEx(u32 volume, u32 playerMask) {
 }
 
 static BOOL GFL_SndSeqVerify(u32 seq) {
-    if (func_02005cbc() == FALSE) {
+    if (GFL_SndIsLoadThreadRunning() == FALSE) {
         return TRUE;
     }
     if (sSeqVerifyCallback == NULL) {
@@ -217,11 +217,11 @@ void GFL_SndSetSeqVerifyCallback(BOOL (*callback)(u32 seq)) {
 }
 
 static void StopBGM(void) {
-    NNS_SndPlayerStopSeq(func_02005968(), 0);
-    func_02005a24();
+    NNS_SndPlayerStopSeq(GFL_SndBGMStack_GetHandle(), 0);
+    GFL_SndBGMStack_FreeSeq();
 }
 
-void func_02005d8c(void) {
+void GFL_SndBGMStopImmediate(void) {
     ResetBGMChange();
     StopBGM();
 }
@@ -233,10 +233,10 @@ static BOOL GFL_SndBGMPlayCore(u32 seq, u32 channelMask) {
         return FALSE;
     }
     StopBGM();
-    if (func_02005980(seq) == FALSE) {
+    if (GFL_SndBGMStack_LoadSeq(seq) == FALSE) {
         return FALSE;
     }
-    result = NNS_SndArcPlayerStartSeqEx(func_02005968(), 0, -1, -1, seq);
+    result = NNS_SndArcPlayerStartSeqEx(GFL_SndBGMStack_GetHandle(), 0, -1, -1, seq);
     if (result == FALSE) {
         return FALSE;
     }
@@ -251,7 +251,7 @@ void GFL_SndBGMPlay(u32 bgm, u32 channelMask) {
     GFL_SndBGMPlayCore(bgm, channelMask);
 }
 
-void func_02005e08(u32 bgm, u16 channelMask, s32 fadeOutFrames, s32 fadeInFrames) {
+void GFL_SndBGMRequestChange(u32 bgm, u16 channelMask, s32 fadeOutFrames, s32 fadeInFrames) {
     RequestBGMChange(bgm, channelMask, fadeOutFrames, fadeInFrames);
 }
 
@@ -259,19 +259,19 @@ void GFL_SndBGMStop(u32 bgm) {
     ResetBGMChange();
     if (GFL_SndSeqVerify(bgm)) {
         StopBGM();
-        if (func_02005980(bgm)) {
-            NNS_SndArcPlayerStartSeqEx(func_02005968(), SND_PLAYER_BGM2, -1, -1, bgm);
+        if (GFL_SndBGMStack_LoadSeq(bgm)) {
+            NNS_SndArcPlayerStartSeqEx(GFL_SndBGMStack_GetHandle(), SND_PLAYER_BGM2, -1, -1, bgm);
         }
     }
 }
 
 u32 GFL_SndBGMGetTick(void) {
-    return NNS_SndPlayerGetTick(func_02005c94());
+    return NNS_SndPlayerGetTick(GFL_SndBGMGetHandle());
 }
 
 void GFL_SndBGMSetPaused(BOOL paused) {
     FinishBGMChange();
-    NNS_SndPlayerPause(func_02005968(), paused);
+    NNS_SndPlayerPause(GFL_SndBGMStack_GetHandle(), paused);
 }
 
 void GFL_SndBGMFadeIn(u16 frames) {
@@ -280,14 +280,14 @@ void GFL_SndBGMFadeIn(u16 frames) {
 
 static void GFL_SndBGMFadeInEx(u16 frames, s32 volume) {
     FinishBGMChange();
-    NNS_SndPlayerMoveVolume(func_02005968(), 0, 0);
-    NNS_SndPlayerMoveVolume(func_02005968(), volume, frames);
+    NNS_SndPlayerMoveVolume(GFL_SndBGMStack_GetHandle(), 0, 0);
+    NNS_SndPlayerMoveVolume(GFL_SndBGMStack_GetHandle(), volume, frames);
     sFadeFrames = frames;
 }
 
 void GFL_SndBGMFadeOut(u16 frames) {
     FinishBGMChange();
-    NNS_SndPlayerMoveVolume(func_02005968(), 0, frames);
+    NNS_SndPlayerMoveVolume(GFL_SndBGMStack_GetHandle(), 0, frames);
     sFadeFrames = frames;
 }
 
@@ -300,31 +300,31 @@ BOOL GFL_SndBGMIsFading(void) {
 
 void GFL_SndBGMPush(void) {
     FinishBGMChange();
-    NNS_SndPlayerSetTrackMute(func_02005968(), SND_CHANNEL_MASK_ALL, FALSE);
-    NNS_SndPlayerSetTrackModDepth(func_02005968(), SND_CHANNEL_MASK_ALL, 0);
-    NNS_SndPlayerSetTrackModSpeed(func_02005968(), SND_CHANNEL_MASK_ALL, 16);
-    func_02005a5c();
+    NNS_SndPlayerSetTrackMute(GFL_SndBGMStack_GetHandle(), SND_CHANNEL_MASK_ALL, FALSE);
+    NNS_SndPlayerSetTrackModDepth(GFL_SndBGMStack_GetHandle(), SND_CHANNEL_MASK_ALL, 0);
+    NNS_SndPlayerSetTrackModSpeed(GFL_SndBGMStack_GetHandle(), SND_CHANNEL_MASK_ALL, 16);
+    GFL_SndBGMStack_Push();
 }
 
 void GFL_SndBGMPop(void) {
     FinishBGMChange();
-    if (func_0200595c() != 0) {
+    if (GFL_SndBGMStack_GetDepth() != 0) {
         StopBGM();
-        func_02005aa8();
+        GFL_SndBGMStack_Pop();
     }
 }
 
 static void GFL_SndBGMSetChannelMask(u32 channelMask) {
     u16 muted = channelMask ^ SND_CHANNEL_MASK_ALL;
 
-    NNS_SndPlayerSetTrackMute(func_02005968(), SND_CHANNEL_MASK_ALL, FALSE);
+    NNS_SndPlayerSetTrackMute(GFL_SndBGMStack_GetHandle(), SND_CHANNEL_MASK_ALL, FALSE);
     if (muted != 0) {
-        NNS_SndPlayerSetTrackMuteEx(func_02005968(), muted, 1);
+        NNS_SndPlayerSetTrackMuteEx(GFL_SndBGMStack_GetHandle(), muted, 1);
     }
 }
 
 void GFL_SndBGMSetParams(u16 trackMask, s32 tempoRatio, s32 pitch, s32 pan) {
-    NNSSndHandle *handle = func_02005968();
+    NNSSndHandle *handle = GFL_SndBGMStack_GetHandle();
 
     if (tempoRatio != -1) {
         NNS_SndPlayerSetTempoRatio(handle, tempoRatio);
@@ -338,7 +338,7 @@ void GFL_SndBGMSetParams(u16 trackMask, s32 tempoRatio, s32 pitch, s32 pan) {
 }
 
 void GFL_SndBGMSetVolume(u16 trackMask, s32 volume) {
-    NNS_SndPlayerSetTrackVolume(func_02005968(), trackMask, volume);
+    NNS_SndPlayerSetTrackVolume(GFL_SndBGMStack_GetHandle(), trackMask, volume);
 }
 
 BOOL GFL_SndBGMIsPlaying(void) {
@@ -373,7 +373,7 @@ static void ResetBGMChange(void) {
     sBGMChange.channelMask = SND_CHANNEL_MASK_ALL;
     sBGMChange.seq = 0;
     sBGMChange.fadeCounter = 0;
-    NNS_SndPlayerSetVolume(func_02005968(), SND_VOLUME_MAX);
+    NNS_SndPlayerSetVolume(GFL_SndBGMStack_GetHandle(), SND_VOLUME_MAX);
     sBGMChange.loadState = BGM_LOAD_IDLE;
     StopLoadThread();
 }
@@ -394,7 +394,7 @@ static void FinishBGMChange(void) {
 }
 
 static void UpdateBGMChange(void) {
-    NNSSndHandle *handle = func_02005968();
+    NNSSndHandle *handle = GFL_SndBGMStack_GetHandle();
     u32 seq = GFL_SndGetLastResID();
 
     if (sBGMChange.active == FALSE) {
@@ -432,7 +432,7 @@ static void UpdateBGMChange(void) {
         break;
     case BGM_LOAD_SEQ:
         if (IsLoadThreadDone() == TRUE) {
-            func_020059d8();
+            GFL_SndBGMStack_SaveSeqLevel();
             StartLoadThread(sBGMChange.seq, SND_THREAD_LOAD_WAVE);
             sBGMChange.loadState = BGM_LOAD_WAVE;
         } else {
@@ -442,8 +442,8 @@ static void UpdateBGMChange(void) {
     case BGM_LOAD_WAVE:
         if (IsLoadThreadDone() == TRUE) {
             NNS_SndArcSetLoadBlockSize(0);
-            func_020059fc(sBGMChange.seq);
-            NNS_SndArcPlayerStartSeqEx(func_02005968(), 0, -1, -1, sBGMChange.seq);
+            GFL_SndBGMStack_SetLoadedSeq(sBGMChange.seq);
+            NNS_SndArcPlayerStartSeqEx(GFL_SndBGMStack_GetHandle(), 0, -1, -1, sBGMChange.seq);
             NNS_SndPlayerSetVolume(handle, 0);
             sBGMChange.loadState = BGM_LOAD_IDLE;
         } else {
@@ -462,7 +462,7 @@ static void GFL_SndResetPlayerStates(void) {
     }
 }
 
-NNSSndHandle *func_020061a8(s32 player) {
+NNSSndHandle *GFL_SndPlayerGetHandle(s32 player) {
     return &g_SndPlayerStates[player].handle;
 }
 
@@ -605,7 +605,7 @@ static BOOL IsLoadThreadDone(void) {
     return OS_IsThreadTerminated(&g_GFLSndThread);
 }
 
-BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
+BOOL GFL_SndBGMLoadStep(u32 seq, u32 *step, BOOL start) {
     if (start == TRUE) {
         StopBGM();
         StopLoadThread();
@@ -619,7 +619,7 @@ BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
             break;
         case 1:
             if (IsLoadThreadDone() == TRUE) {
-                func_020059d8();
+                GFL_SndBGMStack_SaveSeqLevel();
                 StartLoadThread(seq, SND_THREAD_LOAD_WAVE);
                 (*step)++;
             } else {
@@ -629,8 +629,8 @@ BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
         case 2:
             if (IsLoadThreadDone() == TRUE) {
                 NNS_SndArcSetLoadBlockSize(0);
-                func_020059fc(seq);
-                NNS_SndArcPlayerStartSeqEx(func_02005968(), 0, -1, -1, seq);
+                GFL_SndBGMStack_SetLoadedSeq(seq);
+                NNS_SndArcPlayerStartSeqEx(GFL_SndBGMStack_GetHandle(), 0, -1, -1, seq);
                 (*step)++;
                 return TRUE;
             }
@@ -641,14 +641,14 @@ BOOL func_02006424(u32 seq, u32 *step, BOOL start) {
     return FALSE;
 }
 
-BOOL func_020064b8(void *seqData, void *bankData, u32 seq) {
+BOOL GFL_SndBGMSetLoadedData(void *seqData, void *bankData, u32 seq) {
     const NNSSndArcSeqInfo *seqInfo = NNS_SndArcGetSeqInfo(seq);
     u32 seqFileId = seqInfo->fileId;
     const NNSSndArcBankInfo *bankInfo = NNS_SndArcGetBankInfo(seqInfo->param.bankNo);
     u32 bankFileId = bankInfo->fileId;
     int i;
 
-    func_020059d8();
+    GFL_SndBGMStack_SaveSeqLevel();
     for (i = 0; i < NNS_SND_ARC_BANK_TO_WAVEARC_NUM; i++) {
         if (bankInfo->waveArcNo[i] != NNS_SND_ARC_INVALID_WAVEARC_NO) {
             if (NNS_SndArcLoadWaveArc(bankInfo->waveArcNo[i], sSndHeap) == FALSE) {
@@ -658,11 +658,11 @@ BOOL func_020064b8(void *seqData, void *bankData, u32 seq) {
     }
     NNS_SndArcSetFileAddress(bankFileId, bankData);
     NNS_SndArcSetFileAddress(seqFileId, seqData);
-    func_020059fc(seq);
+    GFL_SndBGMStack_SetLoadedSeq(seq);
     return TRUE;
 }
 
-BOOL func_02006528(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex) {
+BOOL GFL_SndReplaceWave(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 srcIndex) {
     const NNSSndArcWaveArcInfo *info = NNS_SndArcGetWaveArcInfo(waveArc);
     SNDWaveArc *loaded;
 
@@ -677,20 +677,20 @@ BOOL func_02006528(u16 waveArc, u16 index, const SNDWaveArc *srcWaveArc, u16 src
     return TRUE;
 }
 
-void func_02006564(u16 seq) {
-    NNS_SndArcPlayerStartSeq(func_02005968(), seq);
+void GFL_SndBGMStartSeq(u16 seq) {
+    NNS_SndArcPlayerStartSeq(GFL_SndBGMStack_GetHandle(), seq);
 }
 
-void func_02006574(void) {
-    NNS_SndPlayerStopSeq(func_02005968(), 0);
-    func_02005a24();
+void GFL_SndBGMStopSeq(void) {
+    NNS_SndPlayerStopSeq(GFL_SndBGMStack_GetHandle(), 0);
+    GFL_SndBGMStack_FreeSeq();
 }
 
-// Clears the addresses of the files of bank and sequence 0x3f2 (SEQ_BGM_SHINKA), as func_020064b8 sets them to data
-// in memory
-void func_02006588(void) {
+// Clears the addresses of the files of bank 0x3f2 and sequence SEQ_BGM_SHINKA, as GFL_SndBGMSetLoadedData sets them
+// to data in memory
+void GFL_SndBGMClearLoadedData(void) {
     u32 bankFileId = NNS_SndArcGetBankInfo(0x3f2)->fileId;
-    u32 seqFileId = NNS_SndArcGetSeqInfo(0x3f2)->fileId;
+    u32 seqFileId = NNS_SndArcGetSeqInfo(SEQ_BGM_SHINKA)->fileId;
 
     NNS_SndArcSetFileAddress(bankFileId, NULL);
     NNS_SndArcSetFileAddress(seqFileId, NULL);

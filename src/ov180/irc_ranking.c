@@ -396,7 +396,7 @@ static BOOL IrcRanking_Init(GameProc *proc, u32 *state, void *param, void *work)
     } else {
         wk->gameData = GameData_Create(HEAPID_USER);
     }
-    wk->queue = func_02021998(HEAP_ID);
+    wk->queue = PrintQueue_CreateDefault(HEAP_ID);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAP_ID);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_5, HEAP_ID);
     wk->ranking = IrcRankingData_Create(wk->gameData, HEAP_ID);
@@ -410,7 +410,7 @@ static BOOL IrcRanking_Init(GameProc *proc, u32 *state, void *param, void *work)
     wk->button =
         IrcAppBar_Create(2, IrcRankingGraphic_GetUnit(&wk->graphic), 4, 13, 0, 2, wk->font, wk->queue, HEAP_ID);
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, HEAP_ID);
-    wk->palette = func_0204bc48(arc, 5, CLACT_VRAM_MAIN, 0x1c0, HEAP_ID);
+    wk->palette = ClActSys_LoadPlttEx(arc, 5, CLACT_VRAM_MAIN, 0x1c0, HEAP_ID);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 8;
@@ -437,7 +437,7 @@ static BOOL IrcRanking_Exit(GameProc *proc, u32 *state, void *param, void *work)
     for (i = 0; i < LABEL_COUNT; i++) {
         IrcRankingLabel_Free(wk->labels[i]);
     }
-    func_0204bcd0(wk->palette);
+    ClActSys_FreePltt(wk->palette);
     IrcAppBar_Free(wk->button);
     IrcRankingList_Free(&wk->list);
     IrcRankingFling_Free(&wk->fling);
@@ -448,7 +448,7 @@ static BOOL IrcRanking_Exit(GameProc *proc, u32 *state, void *param, void *work)
     IrcRankingData_Free(wk->ranking);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     if (rankingParam->gsys == NULL) {
         GameData_Free(wk->gameData);
     }
@@ -463,7 +463,7 @@ static BOOL IrcRanking_Main(GameProc *proc, u32 *state, void *param, void *work)
 
     IrcRankingStepMan_Run(&wk->stepMan);
     IrcRankingGraphic_Update(&wk->graphic);
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     for (i = 0; i < LABEL_COUNT; i++) {
         IrcRankingLabel_Update(wk->labels[i]);
     }
@@ -704,24 +704,24 @@ static u32 IrcRankingBG_GetChars(IrcRankingBG *bg, BOOL main) {
 static void IrcRankingClAct_Init(IrcRankingClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(IrcRankingClAct));
     ClActSys_Create(&sIrcRankingClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void IrcRankingClAct_Free(IrcRankingClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(IrcRankingClAct));
 }
 
 static void IrcRankingClAct_Update(IrcRankingClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void IrcRankingClAct_VBlank(IrcRankingClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *IrcRankingClAct_GetUnit(IrcRankingClAct *clact) {
@@ -739,7 +739,7 @@ static void IrcRankingGraphic_Create(IrcRankingGraphic *graphic, GameData *gameD
     GFL_BGSysSetDisplayLayout(1);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     IrcRankingBG_Init(&graphic->bg, gameData, heapId);
     IrcRankingClAct_Init(&graphic->clact, &sIrcRankingVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(IrcRankingGraphic_VBlank, graphic, 0);
@@ -789,8 +789,8 @@ static void IrcRankingList_Init(IrcRankingList *list, u8 bg1, u8 bg2, u8 bg5, u8
     list->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     IrcRankingScreens_Init(&list->screens, bg, heapId);
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    list->iconPalettes[0] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x20, heapId);
-    list->iconPalettes[1] = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x20, heapId);
+    list->iconPalettes[0] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 0x20, heapId);
+    list->iconPalettes[1] = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0x20, heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < IrcRankingData_GetCount(ranking); i++) {
         IrcRankingRow_Init(&list->rows[i], &ranking->entries[i], unit, list->iconPalettes[0], list->iconPalettes[1],
@@ -825,8 +825,8 @@ static void IrcRankingList_Free(IrcRankingList *list) {
     for (row = 0; row < IrcRankingData_GetCount(list->ranking); row++) {
         IrcRankingRow_Free(&list->rows[row]);
     }
-    func_0204bcd0(list->iconPalettes[0]);
-    func_0204bcd0(list->iconPalettes[1]);
+    ClActSys_FreePltt(list->iconPalettes[0]);
+    ClActSys_FreePltt(list->iconPalettes[1]);
     IrcRankingScreens_Free(&list->screens);
     GFL_WordSetSystemFree(list->wordSet);
     GFL_FontFree(list->font);
@@ -1047,8 +1047,8 @@ static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry,
     iconCells = PokeIcon_GetCellFile_Main();
     iconAnims = getOBJTileMapping_MainEng();
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    row->iconChars = func_0204b81c(arc, iconFile, FALSE, CLACT_VRAM_BOTH, heapId);
-    row->iconCellAnims = func_0204bde0(arc, iconCells, iconAnims, heapId);
+    row->iconChars = ClActSys_LoadChars(arc, iconFile, FALSE, CLACT_VRAM_BOTH, heapId);
+    row->iconCellAnims = ClActSys_LoadCellAnims(arc, iconCells, iconAnims, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.sequence = 1;
@@ -1063,12 +1063,13 @@ static void IrcRankingRow_Init(IrcRankingRow *row, const IrcRankingEntry *entry,
             palette = subPalette;
         }
         row->iconY[i] = setup.y;
-        row->icons[i] = func_0204c040(unit, row->iconChars, palette, row->iconCellAnims, &setup, i, heapId);
-        func_0204c378(row->icons[i], PokeIcon_GetPalette(entry->species, entry->form, entry->sex, entry->isEgg), FALSE);
+        row->icons[i] = ClActor_Create(unit, row->iconChars, palette, row->iconCellAnims, &setup, i, heapId);
+        ClActor_SetPalette(row->icons[i], PokeIcon_GetPalette(entry->species, entry->form, entry->sex, entry->isEgg),
+                           FALSE);
         if (setup.y > -16 && setup.y < 208) {
-            func_0204c124(row->icons[i], TRUE);
+            ClActor_SetVisible(row->icons[i], TRUE);
         } else {
-            func_0204c124(row->icons[i], FALSE);
+            ClActor_SetVisible(row->icons[i], FALSE);
         }
     }
 }
@@ -1077,10 +1078,10 @@ static void IrcRankingRow_Free(IrcRankingRow *row) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        func_0204c108(row->icons[i]);
+        ClActor_Delete(row->icons[i]);
     }
-    func_0204b98c(row->iconChars);
-    func_0204be64(row->iconCellAnims);
+    ClActSys_FreeChars(row->iconChars);
+    ClActSys_FreeCellAnims(row->iconCellAnims);
     GFL_BitmapFree(row->bitmap);
     MI_CpuFill8(row, 0, sizeof(IrcRankingRow));
 }
@@ -1098,13 +1099,13 @@ static void IrcRankingRow_SetScroll(IrcRankingRow *row, s16 scroll) {
     offset[0] = -scroll;
     offset[1] = -scroll;
     for (i = 0; i < 2; i++) {
-        func_0204c178(row->icons[i], &pos, i);
+        ClActor_GetSurfacePos(row->icons[i], &pos, i);
         pos.y = offset[i] + row->iconY[i];
-        func_0204c140(row->icons[i], &pos, i);
+        ClActor_SetSurfacePos(row->icons[i], &pos, i);
         if (pos.y > -16 && pos.y < 208) {
-            func_0204c124(row->icons[i], TRUE);
+            ClActor_SetVisible(row->icons[i], TRUE);
         } else {
-            func_0204c124(row->icons[i], FALSE);
+            ClActor_SetVisible(row->icons[i], FALSE);
         }
     }
 }
@@ -1148,8 +1149,8 @@ static void IrcRankingScreens_Load(const IrcRankingScreens *screens, u8 bg, u32 
 
 // Reads the trainer log, and ranks its trainers by value
 static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) {
-    TrainerLogSave *log = func_0200afbc(GameData_GetSaveControl(gameData));
-    u16 count = func_0200afc8(log);
+    TrainerLogSave *log = TrainerLogSave_Get(GameData_GetSaveControl(gameData));
+    u16 count = TrainerLogSave_CountEntries(log);
     IrcRankingData *ranking =
         GFL_HeapAllocate(heapId, sizeof(u32) + count * sizeof(IrcRankingEntry), FALSE, "irc_ranking.c", 2724);
     IrcRankingEntry *entry;
@@ -1163,21 +1164,21 @@ static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) 
     if (count != 0) {
         prevValue = 0x80;
         prevRank = 0;
-        self = func_0200b04c(log);
+        self = TrainerLogSave_GetLastSlot(log);
         for (i = 0; i < ranking->count; i++) {
             u8 met;
 
             entry = &ranking->entries[i];
             entry->name = GFL_StrBufCreate(8, heapId);
-            GFL_StrBufLoadString(entry->name, func_0200afe4(log, i));
-            entry->value = func_0200afec(log, i);
-            entry->count = func_0200b000(log, i);
+            GFL_StrBufLoadString(entry->name, TrainerLogSave_GetEntryName(log, i));
+            entry->value = TrainerLogSave_GetEntryValue(log, i);
+            entry->count = TrainerLogSave_GetEntryCount(log, i);
             if (entry->value < prevValue) {
                 entry->rank = i + 1;
             } else if (entry->value == prevValue) {
                 entry->rank = prevRank;
             }
-            met = func_0200b014(log, i);
+            met = TrainerLogSave_IsEntryMale(log, i);
             if (self == i) {
                 u32 base = 1;
 
@@ -1215,7 +1216,7 @@ static IrcRankingData *IrcRankingData_Create(GameData *gameData, HeapID heapId) 
                 }
                 entry->palette = base + 1;
             }
-            func_0200b024(log, i, &entry->species, &entry->form, &entry->sex, &entry->isEgg);
+            TrainerLogSave_GetEntryPokemon(log, i, &entry->species, &entry->form, &entry->sex, &entry->isEgg);
             prevValue = entry->value;
             prevRank = entry->rank;
         }
@@ -1252,7 +1253,7 @@ static void IrcRankingTouch_Update(IrcRankingTouch *touch) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         touch->start.x = x;
         touch->start.y = y;
         touch->end.x = x;
@@ -1262,7 +1263,7 @@ static void IrcRankingTouch_Update(IrcRankingTouch *touch) {
         touch->delta.x = 0;
         touch->delta.y = 0;
         touch->moveFrames = 0;
-    } else if (func_0203da84(&x, &y)) {
+    } else if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
         int diff = y - touch->start.y;
 
         if (MATH_ABS(diff) >= 1) {
@@ -1289,7 +1290,7 @@ static void IrcRankingTouch_Update(IrcRankingTouch *touch) {
 
 static BOOL IrcRankingTouch_GetMove(IrcRankingTouch *touch, IrcRankingPoint *start, IrcRankingPoint *end,
                                     IrcRankingPoint *delta) {
-    if (func_0203da2c()) {
+    if (GFL_HIDIsTouchHeld()) {
         if (start != NULL) {
             *start = touch->start;
         }
@@ -1471,7 +1472,7 @@ static void IrcRankingLabel_PrintMsg(IrcRankingLabel *label, MsgData *msgData, u
     GFL_BitmapFill(label->bitmap, label->color & 0x1f);
     GFL_MsgDataLoadStrbuf(msgData, msgId, label->strbuf);
     IrcRankingLabel_GetPosition(label, font, &pos);
-    func_02021c7c(label->queue, label->bitmap, pos.x, pos.y, label->strbuf, font, label->color);
+    PrintQueue_PrintColor(label->queue, label->bitmap, pos.x, pos.y, label->strbuf, font, label->color);
     label->busy = TRUE;
 }
 
@@ -1487,7 +1488,7 @@ static void IrcRankingLabel_SetPos(IrcRankingLabel *label, int x, int y, int ali
 
 static BOOL IrcRankingLabel_Update(IrcRankingLabel *label) {
     if (label->busy) {
-        if (!func_02021c1c(label->queue, label->bitmap)) {
+        if (!PrintQueue_IsBitmapPending(label->queue, label->bitmap)) {
             BmpOam_ActorBmpTrans(label->actor);
             label->busy = FALSE;
         }

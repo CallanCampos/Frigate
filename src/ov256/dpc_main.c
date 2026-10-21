@@ -45,7 +45,7 @@ static void DpcMain_VBlank(TCB *tcb, void *data) {
     DendouPCWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->palFade);
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
@@ -254,13 +254,13 @@ void DpcMain_InitMsg(DendouPCWork *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_DENDOU_PC);
     wk->smallFont = GFL_FontCreate(ARCID_FONT, 3, 0, FALSE, HEAPID_DENDOU_PC);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_DENDOU_PC);
-    wk->printQueue = func_02021998(HEAPID_DENDOU_PC);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_DENDOU_PC);
     wk->expandBuf = GFL_StrBufCreate(0x400, HEAPID_DENDOU_PC);
 }
 
 void DpcMain_ExitMsg(DendouPCWork *wk) {
     GFL_StrBufFree(wk->expandBuf);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->smallFont);
     GFL_FontFree(wk->font);
@@ -285,7 +285,7 @@ void DpcMain_LoadTeams(DendouPCWork *wk) {
     DpcMain_CreateTeamStrings(wk);
 
     if (wk->param->mode == DENDOU_PC_MODE_FIRST_CLEAR) {
-        HallOfFameTeam *team = func_020179c8(wk->param->gameData);
+        HallOfFameTeam *team = GameData_GetHallOfFameTeam(wk->param->gameData);
 
         wk->teams[0].count = HallOfFameTeam_GetPokemonCount(team);
         HallOfFameTeam_GetDate(team, &wk->teams[0].date);
@@ -296,7 +296,7 @@ void DpcMain_LoadTeams(DendouPCWork *wk) {
     } else {
         SaveControl *save = GameData_GetSaveControl(wk->param->gameData);
 
-        if (func_020074ec(save, SAVE_EXTRA_ID_HALL_OF_FAME, HEAPID_DENDOU_PC) == 1) {
+        if (SaveControl_OpenExtraBlock(save, SAVE_EXTRA_ID_HALL_OF_FAME, HEAPID_DENDOU_PC) == 1) {
             HallOfFameSave *hallOfFame = getAddressOfExtraSaveBlk(save, SAVE_EXTRA_ID_HALL_OF_FAME, 0);
 
             if (hallOfFame != NULL) {

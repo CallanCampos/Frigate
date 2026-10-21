@@ -1,14 +1,15 @@
-// The encounter effects: the table of every effect's event, which EncEff_StartEvent starts after loading the overlays
-// it needs, and the BGM and effect that a battle picks. The name is the ROM's own, from GFL_HeapAllocate's file
-// argument. Function and table names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The encounter effects: EncEff_StartEvent starts an effect's event from enceff_data.c's table after loading the
+// overlays it needs, and the BGM and effect that a battle picks. The name is the ROM's own, from GFL_HeapAllocate's
+// file argument. Function and table names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "battle/trainer_data.h"
 #include "constants/pokemon.h"
+#include "constants/sound.h"
+#include "constants/species.h"
+#include "constants/zones.h"
 #include "field/encounter.h"
 #include "field/encounter_effect.h"
-#include "field/encounter_effect_model.h"
-#include "field/encounter_effect_ripple.h"
-#include "field/event_encounter_cutin.h"
 #include "field/field.h"
 #include "field/field_map.h"
 #include "field/field_player.h"
@@ -26,7 +27,6 @@
 #include "system/game_system.h"
 
 #define ENCEFF_OVERLAYS 3
-#define ENCEFF_COUNT 38
 #define MAX_TRAINER_IDS 50
 #define BOXES 24
 
@@ -38,19 +38,6 @@ struct EncEff {
     s32 overlayCount;
     void *workArea;
 };
-
-typedef GameEvent *(*EncEffCreateFunc)(GameSystem *gsys, Field *field, u32 param);
-
-// What it takes to run an effect
-typedef struct {
-    EncEffCreateFunc create;
-    void (*render)(EncEff *effect);
-    // The overlay with the effect's code, or -1 for none
-    s32 overlay;
-    u32 param;
-    // The smallest part of the heap that is free for the effect to run
-    u32 heapSize;
-} EncEffInfo;
 
 // The trainer IDs of the Pokémon that did not come from the player, without repeats
 typedef struct {
@@ -68,60 +55,22 @@ typedef struct {
 static void EncEff_FreeWorkArea(EncEff *encEff);
 static void EncEff_LoadSubOvl(EncEff *encEff, u32 overlayId);
 static void EncEff_UnloadAllSubOverlays(EncEff *encEff);
-static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, void *data);
-static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *ids);
-static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
-static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
-static BOOL func_ov036_021c6448(u32 playerId, u32 id, TrainerIdList *ids);
-static BOOL func_ov036_021c6460(u32 id, TrainerIdList *ids);
+static GameEventReturnCode CountTrainersEvent_Callback(GameEvent *event, u32 *state, void *data);
+static int CountTrainersEvent_ScanParty(u32 playerId, GameData *gameData, TrainerIdList *ids);
+static int CountTrainersEvent_ScanBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
+static int CountTrainersEvent_ScanBattleBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids);
+static BOOL TrainerIdList_AddForeignId(u32 playerId, u32 id, TrainerIdList *ids);
+static BOOL TrainerIdList_AddUniqueId(u32 id, TrainerIdList *ids);
 
-static const u16 SPECIAL_TRAINER_BGM[14] = { 0x46c, 0x46f, 0x479, 0x4ee, 0x46a, 0x4ea, 0x471,
-                                             0x4e9, 0x4ec, 0x4eb, 0x4f3, 0x4ed, 0x4ea, 0x46d };
+static const u16 SPECIAL_TRAINER_BGM[14] = { SEQ_BGM_VS_GYMLEADER, SEQ_BGM_VS_SHITENNO,     SEQ_BGM_VS_SHIRONA,
+                                             SEQ_BGM_VS_HUE,       SEQ_BGM_VS_TRAINER,      SEQ_BGM_VS_ACHROMA,
+                                             SEQ_BGM_VS_SWAN_N,    SEQ_BGM_VS_NEO_PLASMA,   SEQ_BGM_VS_IRIS,
+                                             SEQ_BGM_VS_NEW_G_CIS, SEQ_BGM_VS_ELITE_PLASMA, SEQ_BGM_VS_BANJIROU,
+                                             SEQ_BGM_VS_ACHROMA,   SEQ_BGM_VS_RIVAL };
 
 static const u8 SPECIAL_TRAINER_ENCEFF[32] = { 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15,
                                                0x16, 0x05, 0x0a, 0x05, 0x18, 0x19, 0x1a, 0x1a, 0x1a, 0x1a, 0x17,
                                                0x1b, 0x1e, 0x1f, 0x05, 0x05, 0x09, 0x09, 0x00, 0x00, 0x00 };
-
-static const EncEffInfo ENC_EFFECT_CONTROLLERS[ENCEFF_COUNT] = {
-    /* 0 */ { (EncEffCreateFunc)func_ov146_021f59e0, EncEffModel_Render, 149, 1, 0x13010 },
-    /* 1 */ { (EncEffCreateFunc)func_ov149_021f59f0, EncEffModel_Render, 149, 1, 0x131a4 },
-    /* 2 */ { (EncEffCreateFunc)EncEffRipple_CreateWhite, EncEffRipple_ClearAndDraw, 151, 1, 0x0 },
-    /* 3 */ { func_ov146_021f5b0c, NULL, 146, 0, 0x1e04 },
-    /* 4 */ { func_ov146_021f5b18, NULL, 146, 1, 0x14bc8 },
-    /* 5 */ { (EncEffCreateFunc)func_ov149_021f5a00, EncEffModel_Render, 149, 1, 0x12fbc },
-    /* 6 */ { func_ov146_021f5a10, EncEffModel_Render, 149, 1, 0x13b20 },
-    /* 7 */ { (EncEffCreateFunc)func_ov152_021f6200, EncEffGrid_ClearAndDraw, 152, 0, 0x0 },
-    /* 8 */ { (EncEffCreateFunc)func_ov152_021f6200, EncEffGrid_ClearAndDraw, 154, 1, 0x0 },
-    /* 9 */ { (EncEffCreateFunc)func_ov152_021f6200, EncEffGrid_ClearAndDraw, 153, 1, 0x0 },
-    /* 10 */ { func_ov146_021f5a70, NULL, 146, 0, 0xe570 },
-    /* 11 */ { func_ov146_021f59e0, NULL, 146, 0, 0xe570 },
-    /* 12 */ { func_ov146_021f59ec, NULL, 146, 0, 0xe570 },
-    /* 13 */ { func_ov146_021f59f8, NULL, 146, 0, 0xe570 },
-    /* 14 */ { func_ov146_021f5a04, NULL, 146, 0, 0xe570 },
-    /* 15 */ { func_ov146_021f5a10, NULL, 146, 0, 0xe570 },
-    /* 16 */ { func_ov146_021f5a1c, NULL, 146, 0, 0xe570 },
-    /* 17 */ { func_ov146_021f5a28, NULL, 146, 0, 0xe570 },
-    /* 18 */ { func_ov146_021f5a34, NULL, 146, 0, 0xe570 },
-    /* 19 */ { func_ov146_021f5a40, NULL, 146, 0, 0x12a68 },
-    /* 20 */ { func_ov146_021f5a4c, NULL, 146, 0, 0x12a68 },
-    /* 21 */ { func_ov146_021f5a58, NULL, 146, 0, 0x12a68 },
-    /* 22 */ { func_ov146_021f5a64, NULL, 146, 0, 0x12a68 },
-    /* 23 */ { func_ov146_021f5aa0, NULL, 146, 0, 0x12a68 },
-    /* 24 */ { func_ov146_021f5a7c, NULL, 146, 0, 0xe570 },
-    /* 25 */ { func_ov146_021f5a88, NULL, 146, 0, 0xe570 },
-    /* 26 */ { func_ov146_021f5a94, NULL, 146, 0, 0xcf20 },
-    /* 27 */ { func_ov146_021f5aac, NULL, 146, 0, 0xd530 },
-    /* 28 */ { func_ov146_021f5ab8, NULL, 146, 0, 0xcf20 },
-    /* 29 */ { func_ov146_021f5ac4, NULL, 146, 0, 0xcf20 },
-    /* 30 */ { func_ov146_021f5ad0, NULL, 146, 0, 0xe570 },
-    /* 31 */ { func_ov146_021f5adc, NULL, 146, 0, 0xe570 },
-    /* 32 */ { (EncEffCreateFunc)func_ov149_021f5a20, EncEffModel_Render, 149, 1, 0x132e8 },
-    /* 33 */ { func_ov146_021f5ae8, NULL, 146, 1, 0x80e0 },
-    /* 34 */ { func_ov146_021f5af4, NULL, 146, 1, 0x619c },
-    /* 35 */ { func_ov146_021f5b00, NULL, 146, 1, 0xac88 },
-    /* 36 */ { (EncEffCreateFunc)EncEffModel_CreateZoroark, EncEffModel_Render, 149, 1, 0x12dc0 },
-    /* 37 */ { (EncEffCreateFunc)EncEffRipple_CreateBlack, EncEffRipple_ClearAndDraw, 151, 0, 0x0 },
-};
 
 EncEff *EncEff_Create(HeapID heapId, Field *field) {
     EncEff *encEff = GFL_HeapAllocate(heapId, sizeof(EncEff), TRUE, "enceff.c", 110);
@@ -223,85 +172,85 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
     u16 music;
 
     switch (species) {
-    case 0x23b:
-        *bgm = 0x469;
+    case SPECIES_ZOROARK:
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x24;
         return;
-    case 0x283:
-        *bgm = 0x474;
+    case SPECIES_RESHIRAM:
+        *bgm = SEQ_BGM_VS_SHIN;
         *encEffect = 0x21;
         return;
-    case 0x284:
-        *bgm = 0x475;
+    case SPECIES_ZEKROM:
+        *bgm = SEQ_BGM_VS_MU;
         *encEffect = 0x21;
         return;
-    case 0x286:
+    case SPECIES_KYUREM:
         if (form == 1) {
-            *bgm = 0x4e7;
+            *bgm = SEQ_BGM_VS_KYURAMU;
         } else if (form == 2) {
-            *bgm = 0x4e8;
+            *bgm = SEQ_BGM_VS_KYUROMU;
         } else {
-            *bgm = 0x476;
+            *bgm = SEQ_BGM_VS_RAI;
         }
         *encEffect = 0x21;
         return;
-    case 0x27d:
-        *bgm = 0x469;
+    case SPECIES_VOLCARONA:
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
-    case 0x1ee:
-        *bgm = 0x478;
+    case SPECIES_VICTINI:
+        *bgm = SEQ_BGM_VS_SETPOKE;
         *encEffect = 0x20;
         return;
-    case 0x27e:
-    case 0x27f:
-    case 0x280:
-    case 0x287:
-        *bgm = 0x478;
+    case SPECIES_COBALION:
+    case SPECIES_TERRAKION:
+    case SPECIES_VIRIZION:
+    case SPECIES_KELDEO:
+        *bgm = SEQ_BGM_VS_SETPOKE;
         *encEffect = 0x23;
         return;
-    case 0x281:
-    case 0x282:
-    case 0x285:
-        *bgm = 0x477;
+    case SPECIES_TORNADUS:
+    case SPECIES_THUNDURUS:
+    case SPECIES_LANDORUS:
+        *bgm = SEQ_BGM_VS_MOVEPOKE;
         *encEffect = 0x22;
         return;
-    case 0x17c:
-    case 0x17d:
-    case 0x1e8:
-    case 0x264:
-        *bgm = 0x469;
+    case SPECIES_LATIAS:
+    case SPECIES_LATIOS:
+    case SPECIES_CRESSELIA:
+    case SPECIES_HAXORUS:
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
-    case 0x179:
-    case 0x17a:
-    case 0x17b:
-    case 0x1e6:
-        *bgm = 0x473;
+    case SPECIES_REGIROCK:
+    case SPECIES_REGICE:
+    case SPECIES_REGISTEEL:
+    case SPECIES_REGIGIGAS:
+        *bgm = SEQ_BGM_VS_REGI;
         *encEffect = 0x20;
         return;
-    case 0x1e0:
-    case 0x1e1:
-    case 0x1e2:
-        *bgm = 0x472;
+    case SPECIES_UXIE:
+    case SPECIES_MESPRIT:
+    case SPECIES_AZELF:
+        *bgm = SEQ_BGM_VS_UMA;
         *encEffect = 0x20;
         return;
-    case 0x1e5:
-        *bgm = 0x46e;
+    case SPECIES_HEATRAN:
+        *bgm = SEQ_BGM_VS_DPLEGEND;
         *encEffect = 0x20;
         return;
     }
 
     if (a2 == 1) {
-        *bgm = 0x469;
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
         *encEffect = 0x20;
         return;
     }
     if (a2 == 4) {
-        if (parentZone == 0xd6) {
-            *bgm = 0x469;
+        if (parentZone == ZONE_VICTORY_ROAD_2) {
+            *bgm = SEQ_BGM_VS_TSUYOPOKE;
         } else {
-            *bgm = 0x468;
+            *bgm = SEQ_BGM_VS_NORAPOKE;
         }
         *encEffect = 2;
         return;
@@ -309,32 +258,32 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
     tileType = FieldPlayer_GetTileTypeUnder(Field_GetPlayer(field));
     tileClass = GetTileClass(tileType);
     if (GetTileFlags(tileType) & 2) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 2;
     } else if (MapTile_IsTallGrass(tileClass)) {
         if (a3) {
-            music = 0x469;
+            music = SEQ_BGM_VS_TSUYOPOKE;
             env = 1;
         } else {
-            music = 0x468;
+            music = SEQ_BGM_VS_NORAPOKE;
             env = 0;
         }
     } else if (MapTile_IsSwamp(tileClass)) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 0;
     } else if (IsTileSand(tileClass)) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 4;
     } else if (GetZoneIsHiddenGroto(zoneId)) {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 0;
     } else {
-        music = 0x468;
+        music = SEQ_BGM_VS_NORAPOKE;
         env = 3;
     }
     *encEffect = env;
-    if (parentZone == 0xd6) {
-        *bgm = 0x469;
+    if (parentZone == ZONE_VICTORY_ROAD_2) {
+        *bgm = SEQ_BGM_VS_TSUYOPOKE;
     } else {
         *bgm = music;
     }
@@ -369,7 +318,7 @@ void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffec
             env = 7;
         }
     }
-    *bgm = 0x46a;
+    *bgm = SEQ_BGM_VS_TRAINER;
     *encEffect = env;
 }
 
@@ -378,7 +327,7 @@ BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     u16 *result = ScriptReadVar(vm, env);
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021c6288, sizeof(CountTrainersEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, CountTrainersEvent_Callback, sizeof(CountTrainersEvent));
     PlayerInfo *player = GetGameDataPlayerInfo(gameData);
     CountTrainersEvent *data = GameEvent_GetData(event);
 
@@ -390,7 +339,7 @@ BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode CountTrainersEvent_Callback(GameEvent *event, u32 *state, void *data) {
     CountTrainersEvent *count = data;
     BOOL done = FALSE;
     GameData *gameData;
@@ -399,14 +348,14 @@ static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, voi
     gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
     switch (*state) {
     case 0:
-        func_ov036_021c6328(count->playerId, gameData, &count->ids);
+        CountTrainersEvent_ScanParty(count->playerId, gameData, &count->ids);
         (*state)++;
         break;
     case 1: {
         s32 box = count->box;
 
         for (i = 0; i < 2; i++) {
-            func_ov036_021c6384(count->playerId, gameData, box + i, &count->ids);
+            CountTrainersEvent_ScanBox(count->playerId, gameData, box + i, &count->ids);
             count->box++;
             if (count->box >= BOXES) {
                 (*state)++;
@@ -416,7 +365,7 @@ static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, voi
         break;
     }
     case 2:
-        func_ov036_021c63f0(count->playerId, gameData, 0, &count->ids);
+        CountTrainersEvent_ScanBattleBox(count->playerId, gameData, 0, &count->ids);
         done = TRUE;
         break;
     }
@@ -430,7 +379,7 @@ static GameEventReturnCode func_ov036_021c6288(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *ids) {
+static int CountTrainersEvent_ScanParty(u32 playerId, GameData *gameData, TrainerIdList *ids) {
     PokeParty *party = GameData_GetParty(gameData);
     int partyCount = PokeParty_GetPkmCount(party);
     int added = 0;
@@ -440,7 +389,7 @@ static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *
         PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
         if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 0) {
-            if (func_ov036_021c6448(playerId, PokeParty_GetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
+            if (TrainerIdList_AddForeignId(playerId, PokeParty_GetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
                 added++;
             }
         }
@@ -448,7 +397,7 @@ static int func_ov036_021c6328(u32 playerId, GameData *gameData, TrainerIdList *
     return added;
 }
 
-static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
+static int CountTrainersEvent_ScanBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
     BoxSaveAccessor *boxes = GameData_GetBoxSaveAccessor(gameData);
     int added = 0;
     int slot;
@@ -456,8 +405,8 @@ static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, Traine
     for (slot = 0; slot < 30; slot++) {
         if (BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
             if (BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_IS_EGG, NULL) == 0) {
-                if (func_ov036_021c6448(playerId, BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_ID, NULL),
-                                        ids)) {
+                if (TrainerIdList_AddForeignId(
+                        playerId, BoxSaveAccessor_GetPkmParam(boxes, box, slot, PKM_PARAM_ID, NULL), ids)) {
                     added++;
                 }
             }
@@ -466,7 +415,7 @@ static int func_ov036_021c6384(u32 playerId, GameData *gameData, u32 box, Traine
     return added;
 }
 
-static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
+static int CountTrainersEvent_ScanBattleBox(u32 playerId, GameData *gameData, u32 box, TrainerIdList *ids) {
     BattleBoxSave *battleBox;
     int slot;
     int added;
@@ -477,7 +426,7 @@ static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, Traine
         BoxPkm *pkm = getBoxSlotAddress(battleBox, box, slot);
 
         if (PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL) != 0) {
-            if (func_ov036_021c6448(playerId, PML_PkmGetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
+            if (TrainerIdList_AddForeignId(playerId, PML_PkmGetParam(pkm, PKM_PARAM_ID, NULL), ids)) {
                 added++;
             }
         }
@@ -485,16 +434,16 @@ static int func_ov036_021c63f0(u32 playerId, GameData *gameData, u32 box, Traine
     return added;
 }
 
-static BOOL func_ov036_021c6448(u32 playerId, u32 id, TrainerIdList *ids) {
+static BOOL TrainerIdList_AddForeignId(u32 playerId, u32 id, TrainerIdList *ids) {
     BOOL added = FALSE;
 
     if (playerId != id) {
-        added = func_ov036_021c6460(id, ids);
+        added = TrainerIdList_AddUniqueId(id, ids);
     }
     return added;
 }
 
-static BOOL func_ov036_021c6460(u32 id, TrainerIdList *ids) {
+static BOOL TrainerIdList_AddUniqueId(u32 id, TrainerIdList *ids) {
     int i;
 
     if (ids->count >= MAX_TRAINER_IDS) {

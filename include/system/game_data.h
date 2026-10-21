@@ -30,8 +30,8 @@ struct CityState {
 };
 
 void SetAllowVersionSpecificZone(u32 side, u32 allow);
-void func_ov012_0215cd58(CityState *state);
-void func_ov012_0215cd8c(CityState *state);
+void CityState_ApplyVersionZones(CityState *state);
+void CityState_Init(CityState *state);
 BOOL func_ov012_0215cd98(s32 value);
 
 GameData *GameData_Create(HeapID heapId);
@@ -39,7 +39,7 @@ void GameData_Free(GameData *gameData);
 BOOL GameData_CheckPairFlag(GameData *gameData);
 BagSave *GameData_GetBag(GameData *gameData);
 BGMInfo *GameData_GetBGMInfo(GameData *gameData);
-void *func_0201734c(GameData *gameData);
+void *GameData_GetBagCursor(GameData *gameData);
 BoxSaveAccessor *GameData_GetBoxSaveAccessor(GameData *gameData);
 ZoneSpawnInfo *GameData_GetEntralinkParentSpawnInfo(GameData *gameData);
 ZoneSpawnInfo *GameData_GetEscapeRopeZone(GameData *gameData);
@@ -56,34 +56,34 @@ MMSys *GameData_GetMMSys(GameData *gameData);
 CityState *GameData_GetMyCityState(GameData *gameData);
 // Adds seconds to the play time
 void GameData_UpdateTime(GameData *gameData, u32 seconds);
-// The levels that unlock the pass powers, which func_0200c5dc and func_0200c5e0 read
-void *func_02017208(GameData *gameData);
-u16 func_02017220(GameData *gameData);
+// The levels that unlock the pass powers, which PassPowerLevel_GetWhite and PassPowerLevel_GetBlack read
+void *GameData_GetMyPassPowerLevels(GameData *gameData);
+u16 GameData_GetMyCity(GameData *gameData);
 // The C-Gear power request, which GameData_SaveCGearPowerRequest puts aside
-u8 func_02017404(GameData *gameData);
-void func_0201740c(GameData *gameData, u8 value);
-// A byte of the game data, which func_020173f8 sets
-u8 func_020173ec(GameData *gameData);
+u8 GameData_GetCGearPowerRequest(GameData *gameData);
+void GameData_SetCGearPowerRequest(GameData *gameData, u8 value);
+// The field menu item selected last
+u8 GameData_GetFieldMenuItem(GameData *gameData);
 // Save block 0x39, the Battle Subway's scores
-BSubwayScoreData *func_0201795c(GameData *gameData);
-BSubwayScrWork *func_0201794c(GameData *gameData);
-u8 func_02017b8c(GameData *gameData);
+BSubwayScoreData *GameData_GetBSubwayScoreData(GameData *gameData);
+BSubwayScrWork *GameData_GetBSubwayScrWork(GameData *gameData);
+u8 GameData_GetCounter(GameData *gameData);
 // Adds one to a counter of the game data, to at most 99
-void func_02017b98(GameData *gameData);
-void func_02017bb4(GameData *gameData);
-void func_02017884(GameData *gameData);
+void GameData_IncCounter(GameData *gameData);
+void GameData_ResetCounter(GameData *gameData);
+void GameData_CancelSave(GameData *gameData);
 // Starts saving, and runs the save, returning 2 once it ends
-void func_0201782c(GameData *gameData);
-int func_02017850(GameData *gameData);
+void GameData_StartSave(GameData *gameData);
+int GameData_UpdateSave(GameData *gameData);
 void *getChatterDataAddress(GameData *gameData);
 MusicalSave *getMusicalInfoBlkAddress(GameData *gameData);
 ZoneSpawnInfo *GameData_GetNextZone(GameData *gameData);
 PokeParty *GameData_GetParty(GameData *gameData);
 PlayerState *GameData_GetPlayerState(GameData *gameData);
 void *getTimeSigSaveBlock(GameData *gameData);
-PlayerState *func_020171e8(GameData *gameData, s32 index);
+PlayerState *GameData_GetPlayerStateByNetID(GameData *gameData, s32 index);
 PokeDexSave *GameData_GetPokedex(GameData *gameData);
-PalPadFriendList *func_02017980(GameData *gameData);
+PalPadFriendList *GameData_GetPalPadFriendList(GameData *gameData);
 // Whether the key item is registered to Y, and registers it or not
 BOOL GameData_IsShortcutRegistered(GameData *gameData, u32 item);
 void GameData_SetKeyItemRegistration(GameData *gameData, u32 item, BOOL registered);
@@ -94,19 +94,19 @@ PartyPkm *GameData_MakeBoxPkm(GameData *gameData, BoxPkmCreateParams *params);
 // Whether a full day has passed since the last check
 BOOL checkForMidnight(GameData *gameData);
 SaveControl *GameData_GetSaveControl(GameData *gameData);
-void *func_02017670(GameData *gameData);
+void *GameData_GetShortcutMenuPos(GameData *gameData);
 // The support another player gave over communication (system/comm_player_support.h)
 CommPlayerSupport *GameData_GetCommPlayerSupport(GameData *gameData);
 // Save block 0x41, the Pokémon traded in game, which save/traded_pokemon.h reads
 void *GetTradedPokemonBlock(GameData *gameData);
 SaveControl *GameData_GetSaveControl_(GameData *gameData);
-BeaconStatus *func_020174d4(GameData *gameData);
-DreamWorldSave *func_020179e4(GameData *gameData);
+BeaconStatus *GameData_GetBeaconStatus(GameData *gameData);
+DreamWorldSave *GameData_GetDreamWorldSave(GameData *gameData);
 u8 GameData_GetSeason(GameData *gameData);
 void GameData_SetSeason(GameData *gameData, u8 season);
-u8 func_02017a24(GameData *gameData);
-// Sets the area of the Entree Forest the player is in, which func_02017a24 returns
-void func_02017a18(GameData *gameData, u8 area);
+u8 GameData_GetEntreeForestArea(GameData *gameData);
+// Sets the area of the Entree Forest the player is in, which GameData_GetEntreeForestArea returns
+void GameData_SetEntreeForestArea(GameData *gameData, u8 area);
 u16 GameData_GetDayPeriod(GameData *gameData);
 u32 GameData_GetMonth(GameData *gameData);
 u32 GameData_GetDay(GameData *gameData);
@@ -128,11 +128,11 @@ void GameData_SetLastBtlResult(GameData *gameData, u32 result);
 u32 GameData_GetLastBtlResult(GameData *gameData);
 void GameData_SetLensFlareRequested(GameData *gameData, BOOL requested);
 // Whether a Funfest mission is running, which plays its BGM everywhere (a guess from that use)
-BOOL func_02017b34(GameData *gameData);
+BOOL GameData_IsFunfestMission(GameData *gameData);
 // Sets whether a Funfest mission is running
-void func_02017b40(GameData *gameData, BOOL flag);
+void GameData_SetFunfestMission(GameData *gameData, BOOL flag);
 u32 GameData_GetLensFlareEntryIdx(GameData *gameData);
-void func_020173f8(GameData *gameData, u8 value);
+void GameData_SetFieldMenuItem(GameData *gameData, u8 value);
 void GameData_SetLensFlareEntryIdx(GameData *gameData, u32 index);
 void GameData_SetNextZone(GameData *gameData, ZoneSpawnInfo *spawn);
 ZoneSpawnInfo *GetGameDataNowSpawnZone(GameData *gameData);
@@ -143,33 +143,33 @@ void SetGameDataOutboundWarpRememberInfo(GameData *gameData, ZoneSpawnInfo *spaw
 u16 GetReturnLocationIdx(GameData *gameData);
 void SetCurrentTeleportOrDeathZone(GameData *gameData, u16 respawnLocation);
 void SetGameDataNowSpawnZone(GameData *gameData, ZoneSpawnInfo *spawn);
-PlayerInfo *func_02017378(GameData *gameData, u32 netId);
+PlayerInfo *GameData_GetPlayerInfoByNetID(GameData *gameData, u32 netId);
 // The player's net ID
-u8 func_020175cc(GameData *gameData);
+u8 GameData_GetNetID(GameData *gameData);
 // The number of players
-u8 func_020175bc(GameData *gameData);
+u8 GameData_GetPlayerCount(GameData *gameData);
 // The net ID of the player whose beacon is shown
-u8 func_020175fc(GameData *gameData);
-// The player's Entralink levels, as func_02017208 returns for the player's own
-void *func_020171fc(GameData *gameData, u32 netId);
-void func_020175c4(GameData *gameData, u32 a1);
-void func_020175d8(GameData *gameData, u32 a1);
-void func_02017608(GameData *gameData, u32 a1);
+u8 GameData_GetBeaconNetID(GameData *gameData);
+// The player's Entralink levels, as GameData_GetMyPassPowerLevels returns for the player's own
+void *GameData_GetPassPowerLevels(GameData *gameData, u32 netId);
+void GameData_SetPlayerCount(GameData *gameData, u32 a1);
+void GameData_SetNetID(GameData *gameData, u32 a1);
+void GameData_SetBeaconNetID(GameData *gameData, u32 a1);
 // Whether the game shows other players' beacons
-BOOL func_02017614(GameData *gameData);
-void func_020178c4(GameData *gameData, u32 block);
-u32 func_020178f4(GameData *gameData, u32 block);
-void func_02017954(GameData *gameData, BSubwayScrWork *bsw);
+BOOL GameData_IsCGearOn(GameData *gameData);
+void GameData_StartSaveBlock(GameData *gameData, u32 block);
+u32 GameData_UpdateSaveBlock(GameData *gameData, u32 block);
+void GameData_SetBSubwayScrWork(GameData *gameData, BSubwayScrWork *bsw);
 // Where Pokéstar Studios keeps its PokewoodSystem while the player makes a movie
-PokewoodSystem **func_02017a04(GameData *gameData);
+PokewoodSystem **GameData_GetPokewoodSystemPtr(GameData *gameData);
 // Where the Pokémon World Tournament keeps its WbtSystem while the player is at the tournament
-WbtSystem **func_020179f0(GameData *gameData);
+WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData);
 // The Pokémon World Tournament's save data
-void *func_020179f8(GameData *gameData);
+void *GameData_GetWbtSave(GameData *gameData);
 // The save's play time
-PlayTime *func_02017a40(GameData *gameData);
-void func_02017b64(GameData *gameData, u8 a1);
-ResortWork *func_02017b84(GameData *gameData);
+PlayTime *GameData_GetPlayTime(GameData *gameData);
+void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1);
+ResortWork *GameData_GetResortWork(GameData *gameData);
 u32 GetScrPluginNo(GameData *gameData);
 void SetScrPluginNo(GameData *gameData, u32 pluginNo);
 
@@ -178,7 +178,7 @@ void SetNowWeather(GameData *gameData, u8 weather);
 u32 GetNowWeather(GameData *gameData);
 BOOL GameData_CheckEventsPaused(GameData *gameData);
 // The Battle Subway's save data
-void *func_02017968(GameData *gameData);
+void *GameData_GetBSubwayWifiData(GameData *gameData);
 // Where the Trial House work is kept
 TrialHouseWork **GetTrialHouseWkPPtr(GameData *gameData);
 // The follower of field/pair_sys.h
@@ -189,20 +189,20 @@ u8 GameData_Is30FPSSkipFrame(GameData *gameData);
 BOOL GameData_Is30FPSMode(GameData *gameData);
 u32 getCurrentStepTotal(GameData *gameData);
 void setCurrentStepTotal(GameData *gameData, u32 stepTotal);
-// A byte of the game data, which overlay 169 uses
-void func_020174bc(GameData *gameData, u8 value);
-u8 func_020174c8(GameData *gameData);
-// Sets the option that func_02017614 returns
-void func_0201762c(GameData *gameData, BOOL flag);
-// Save block 0x40
-void *func_020179c8(GameData *gameData);
-// Draws three different values of fifteen at random, and whether a value is one of the three
-void func_02017a78(GameData *gameData);
-BOOL func_02017af0(GameData *gameData, u32 value);
-// A byte of the game data, 0xff at first, which overlay 145 uses
-void func_02017b4c(GameData *gameData, u8 value);
-u8 func_02017b58(GameData *gameData);
-u8 func_02017b70(GameData *gameData);
-CityState *func_0201722c(GameData *gameData, u32 index);
+// Set by the battle input when the player uses the keys, kept between battles
+void GameData_SetBattleKeyCursorFlag(GameData *gameData, u8 value);
+u8 GameData_GetBattleKeyCursorFlag(GameData *gameData);
+// Sets the option that GameData_IsCGearOn returns
+void GameData_SetCGearOn(GameData *gameData, BOOL flag);
+// Save block 0x40, the Hall of Fame team
+void *GameData_GetHallOfFameTeam(GameData *gameData);
+// Draws three different zones of fifteen that the secret calls can be made from, and whether a zone is one of them
+void GameData_DrawSecretCallZones(GameData *gameData);
+BOOL GameData_IsSecretCallZone(GameData *gameData, u32 value);
+// The medal under the Medal Box cursor, 0xff at first, and the season of the Join Avenue areas
+void GameData_SetMedalBoxCursorMedal(GameData *gameData, u8 value);
+u8 GameData_GetMedalBoxCursorMedal(GameData *gameData);
+u8 GameData_GetJoinAvenueSeason(GameData *gameData);
+CityState *GameData_GetCityState(GameData *gameData, u32 index);
 
 #endif // POKEBW2_SYSTEM_GAME_DATA_H

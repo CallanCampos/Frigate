@@ -24,7 +24,7 @@ typedef struct {
     BOOL useCGear;
 } PhraseSelectEvent;
 
-static GameEventReturnCode func_ov012_02161114(GameEvent *event, u32 *state, void *data);
+static GameEventReturnCode EventPhraseSelect_Callback(GameEvent *event, u32 *state, void *data);
 
 BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
@@ -35,7 +35,7 @@ BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     u16 *result2 = ScriptReadVar(vm, env);
     u16 *decided = ScriptReadVar(vm, env);
     u32 kind = 0;
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov012_02161114, sizeof(PhraseSelectEvent));
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventPhraseSelect_Callback, sizeof(PhraseSelectEvent));
     PhraseSelectEvent *data = GameEvent_GetData(event);
     PMSData sentence;
 
@@ -88,7 +88,7 @@ BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static GameEventReturnCode func_ov012_02161114(GameEvent *event, u32 *state, void *data_) {
+static GameEventReturnCode EventPhraseSelect_Callback(GameEvent *event, u32 *state, void *data_) {
     PhraseSelectEvent *data = GameEvent_GetData(event);
     void *pms = data->pms;
     u16 words[2];

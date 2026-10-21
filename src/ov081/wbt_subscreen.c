@@ -165,10 +165,10 @@ void WbtSubscreen_Update(WbtSubscreen *work) {
     if (work->func != NULL) {
         work->func(work);
     }
-    func_02012be4(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
+    WihDwc_GetStatus(GameData_GetWifiList(GSYS_GetGameData(work->gsys)));
 }
 
-void func_ov081_021ea934(WbtSubscreen *work) {
+void WbtSubscreen_Draw(WbtSubscreen *work) {
 }
 
 void WbtSubscreen_Free(WbtSubscreen *work) {
@@ -263,24 +263,24 @@ static void WbtSubscreen_FreeWindows(WbtSubscreen *work) {
 
 static void WbtSubscreen_PrintTournament(WbtSubscreen *work) {
     StrBuf *strbuf;
-    WbtSystem **sys = func_020179f0(GSYS_GetGameData(work->gsys));
+    WbtSystem **sys = GameData_GetWbtSystemPtr(GSYS_GetGameData(work->gsys));
 
     if (sys == NULL || *sys == NULL) {
         return;
     }
 
     strbuf = GFL_StrBufCreate(128, work->heapId);
-    func_ov055_021e5d44(*sys, func_ov055_021e5ca4(*sys), strbuf);
+    WbtSystem_LoadTournamentName(*sys, WbtSystem_GetTournament(*sys), strbuf);
     WbtSubscreen_PrintCentered(work, WINDOW_TOURNAMENT, 112, 0, strbuf);
     GFL_StrBufFree(strbuf);
 
     strbuf = GFL_StrBufCreate(128, work->heapId);
-    func_ov055_021e6488(func_ov055_021e5cac(*sys), strbuf);
+    WbtStyle_LoadName(WbtSystem_GetStyle(*sys), strbuf);
     WbtSubscreen_PrintCentered(work, WINDOW_STYLE, 112, 0, strbuf);
     GFL_StrBufFree(strbuf);
 }
 
 static void WbtSubscreen_InitWirelessIcons(WbtSubscreen *work) {
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }

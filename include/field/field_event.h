@@ -73,7 +73,7 @@ GameEvent *EventFieldSubprocessTransition_Create(GameSystem *gsys, Field *field,
                                                  const GameProcFunctions *functions, void *param);
 GameEvent *EventPlayerSpinDown_Create(GameEvent *event, GameSystem *gsys, Field *field);
 GameEvent *EventQuicksandArrive_Create(GameEvent *event, GameSystem *gsys, Field *field);
-GameEvent *EventQuicksandDrawIn_Create(GameEvent *event, GameSystem *gsys, Field *field, VecFx32 *pos);
+GameEvent *EventQuicksandDrawIn_Create(GameEvent *event, GameSystem *gsys, Field *field, const VecFx32 *pos);
 GameEvent *EventTeleportEffect_Create(GameEvent *event, GameSystem *gsys, Field *field, BOOL a3);
 void func_ov036_021b50c8(PlaceName *placeName, s32 zoneId);
 void func_ov036_021b5168(PlaceName *placeName);
@@ -98,5 +98,7 @@ GameEvent *FieldEventProvider_Grid(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_UnionRoom(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_NoGrid(GameSystem *gsys, void *data);
 GameEvent *FieldEventProvider_Hybrid(GameSystem *gsys, void *data);
+// How many Pokémon in the party can battle: not Eggs, and not fainted
+u32 func_ov036_02182f90(GameSystem *gsys);
 
 #endif // POKEBW2_FIELD_FIELD_EVENT_H

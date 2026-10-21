@@ -354,7 +354,7 @@ static BOOL BadgeView_Init(GameProc *proc, u32 *state, void *param, void *work) 
     BadgeView_InitBmp(wk);
     BadgeView_InitPrint(wk);
     BadgeView_SetPage(wk, wk->page);
-    func_02042ba8(TRUE, HEAPID_TRAINER_CARD_SCREEN);
+    GFL_NetSetIconScreen(TRUE, HEAPID_TRAINER_CARD_SCREEN);
     GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_TRAINER_CARD_SCREEN);
     return TRUE;
 }
@@ -367,7 +367,7 @@ static BOOL BadgeView_Main(GameProc *proc, u32 *state, void *param, void *work) 
     }
     BadgeView_Draw3D(wk);
     BadgeView_UpdatePrint(wk);
-    func_0204b794();
+    ClActSys_Draw();
     wk->frame++;
     if (wk->frame >= 0x100) {
         wk->frame = 0;
@@ -408,7 +408,7 @@ static void BadgeView_VBlank(TCB *tcb, void *data) {
             wk->flags &= ~BADGE_FLAG_MOVE_END;
         }
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
 }
 
@@ -541,9 +541,10 @@ static void BadgeView_LoadBG(BadgeViewWork *wk) {
     GFL_G2DIOLoadArcNCLR(arc, 0, 4, 0x100, 0x100, 0x20, HEAPID_TRAINER_CARD_SCREEN);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, 4, 0, 0x100, HEAPID_TRAINER_CARD_SCREEN);
     barArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TRAINER_CARD_SCREEN);
-    GFL_BGSysLoadArcNCGRStatic(barArc, func_0202d824(), 5, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
-    loadBGScrToVramByFileNoReserveNegAlign(barArc, func_0202d828(), 5, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
-    GFL_G2DIOLoadArcNCLR(barArc, func_0202d820(), 4, 0, 0x180, 0x20, HEAPID_TRAINER_CARD_SCREEN);
+    GFL_BGSysLoadArcNCGRStatic(barArc, AppMenuCommon_GetBarBgCharFile(), 5, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
+    loadBGScrToVramByFileNoReserveNegAlign(barArc, AppMenuCommon_GetBarScreenFile(), 5, 0, 0, FALSE,
+                                           HEAPID_TRAINER_CARD_SCREEN);
+    GFL_G2DIOLoadArcNCLR(barArc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0, 0x180, 0x20, HEAPID_TRAINER_CARD_SCREEN);
     GFL_BGSysSetScrPaletteNo(5, 0, 21, 32, 3, 12);
     GFL_BGSysLoadScr(5);
     GFL_ArcToolFree(barArc);
@@ -570,18 +571,18 @@ static void BadgeView_InitObj(BadgeViewWork *wk) {
     ArcTool *barArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TRAINER_CARD_SCREEN);
 
     ClActSys_Create(&data_02093f08, &sBadgeViewVRAMConfig, HEAPID_TRAINER_CARD_SCREEN);
-    wk->unit = func_0204bf1c(BADGE_ACTOR_COUNT, 1, HEAPID_TRAINER_CARD_SCREEN);
+    wk->unit = ClActUnit_Create(BADGE_ACTOR_COUNT, 1, HEAPID_TRAINER_CARD_SCREEN);
     GFL_BGSysSetBGEnabledA(0x10, TRUE);
     GFL_BGSysSetBGEnabledB(0x10, TRUE);
-    wk->res[BADGE_RES_CHARS] = func_0204b81c(wk->arc, 31, FALSE, CLACT_VRAM_SUB, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_PALETTE] = func_0204bba0(wk->arc, 4, CLACT_VRAM_SUB, 0, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_CELLS] = func_0204bde0(wk->arc, 52, 54, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_BAR_CHARS] =
-        func_0204b81c(barArc, func_0202d814(), FALSE, CLACT_VRAM_SUB, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_BAR_PALETTE] =
-        func_0204bbb8(barArc, func_0202d810(), CLACT_VRAM_SUB, 0x160, 0, 3, HEAPID_TRAINER_CARD_SCREEN);
-    wk->res[BADGE_RES_BAR_CELLS] =
-        func_0204bde0(barArc, func_0202d818(0), func_0202d81c(0), HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_CHARS] = ClActSys_LoadChars(wk->arc, 31, FALSE, CLACT_VRAM_SUB, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_PALETTE] = ClActSys_LoadPltt(wk->arc, 4, CLACT_VRAM_SUB, 0, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_CELLS] = ClActSys_LoadCellAnims(wk->arc, 52, 54, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_BAR_CHARS] = ClActSys_LoadChars(barArc, AppMenuCommon_GetTouchBarCharFile(), FALSE,
+                                                      CLACT_VRAM_SUB, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_BAR_PALETTE] = ClActSys_LoadPlttRange(barArc, AppMenuCommon_GetTouchBarPaletteFile(),
+                                                            CLACT_VRAM_SUB, 0x160, 0, 3, HEAPID_TRAINER_CARD_SCREEN);
+    wk->res[BADGE_RES_BAR_CELLS] = ClActSys_LoadCellAnims(
+        barArc, AppMenuCommon_GetTouchBarCellFile(0), AppMenuCommon_GetTouchBarAnimFile(0), HEAPID_TRAINER_CARD_SCREEN);
     GFL_ArcToolFree(barArc);
     BadgeView_LoadLeaders(wk, CLACT_VRAM_MAIN);
 }
@@ -598,22 +599,22 @@ static void BadgeView_AddActors(BadgeViewWork *wk) {
         setup.sequence = def->sequence;
         setup.bgPriority = def->bgPriority;
         setup.priority = BADGE_ACTOR_COUNT - i;
-        wk->actors[i] = func_0204c040(wk->unit, wk->res[def->charRes], wk->res[def->paletteRes], wk->res[def->cellRes],
-                                      &setup, def->surface, HEAPID_TRAINER_CARD_SCREEN);
-        func_0204c520(wk->actors[i], TRUE);
+        wk->actors[i] = ClActor_Create(wk->unit, wk->res[def->charRes], wk->res[def->paletteRes], wk->res[def->cellRes],
+                                       &setup, def->surface, HEAPID_TRAINER_CARD_SCREEN);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
 }
 
 static void BadgeView_ExitObj(BadgeViewWork *wk) {
-    func_0204b98c(wk->res[BADGE_RES_BAR_CHARS]);
-    func_0204bcd0(wk->res[BADGE_RES_BAR_PALETTE]);
-    func_0204be64(wk->res[BADGE_RES_BAR_CELLS]);
-    func_0204b98c(wk->res[BADGE_RES_CHARS]);
-    func_0204bcd0(wk->res[BADGE_RES_PALETTE]);
-    func_0204be64(wk->res[BADGE_RES_CELLS]);
+    ClActSys_FreeChars(wk->res[BADGE_RES_BAR_CHARS]);
+    ClActSys_FreePltt(wk->res[BADGE_RES_BAR_PALETTE]);
+    ClActSys_FreeCellAnims(wk->res[BADGE_RES_BAR_CELLS]);
+    ClActSys_FreeChars(wk->res[BADGE_RES_CHARS]);
+    ClActSys_FreePltt(wk->res[BADGE_RES_PALETTE]);
+    ClActSys_FreeCellAnims(wk->res[BADGE_RES_CELLS]);
     BadgeView_FreeLeaders(wk);
-    func_0204bf98(wk->unit);
-    func_0204b758();
+    ClActUnit_Delete(wk->unit);
+    ClActSys_Delete();
 }
 
 static const LightSetup sBadgeViewLights[] = {
@@ -832,17 +833,17 @@ static void BadgeView_FlushWin(BadgeViewWork *wk) {
 
 static void BadgeView_InitPrint(BadgeViewWork *wk) {
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_TRAINER_CARD_SCREEN);
-    wk->queue = func_02021998(HEAPID_TRAINER_CARD_SCREEN);
+    wk->queue = PrintQueue_CreateDefault(HEAPID_TRAINER_CARD_SCREEN);
     PrintWindow_Init(&wk->printWin, wk->win);
 }
 
 static void BadgeView_ExitPrint(BadgeViewWork *wk) {
-    func_02021a18(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_FontFree(wk->font);
 }
 
 static void BadgeView_UpdatePrint(BadgeViewWork *wk) {
-    func_02021a3c(wk->queue);
+    PrintQueue_Main(wk->queue);
     PrintWindow_Flush(&wk->printWin, wk->queue);
 }
 
@@ -858,7 +859,7 @@ static BOOL BadgeView_SeqFadeIn(BadgeViewWork *wk) {
 }
 
 static BOOL BadgeView_SeqMain(BadgeViewWork *wk) {
-    if (!func_02021c0c(wk->queue)) {
+    if (!PrintQueue_IsEmpty(wk->queue)) {
         return TRUE;
     }
     BadgeView_Input(wk);
@@ -869,15 +870,15 @@ static BOOL BadgeView_SeqMain(BadgeViewWork *wk) {
 static BOOL BadgeView_SeqButton(BadgeViewWork *wk) {
     switch (wk->result) {
     case BADGE_HIT_EXIT:
-        if (!func_0204c560(wk->actors[BADGE_ACTOR_EXIT])) {
+        if (!ClActor_IsAnimActive(wk->actors[BADGE_ACTOR_EXIT])) {
             wk->seq = BADGE_SEQ_FADE_OUT_START;
         }
     case BADGE_HIT_RETURN:
-        if (!func_0204c560(wk->actors[BADGE_ACTOR_RETURN])) {
+        if (!ClActor_IsAnimActive(wk->actors[BADGE_ACTOR_RETURN])) {
             wk->seq = BADGE_SEQ_FADE_OUT_START;
         }
     case BADGE_HIT_CARD:
-        if (!func_0204c560(wk->actors[BADGE_ACTOR_CARD])) {
+        if (!ClActor_IsAnimActive(wk->actors[BADGE_ACTOR_CARD])) {
             wk->seq = BADGE_SEQ_FADE_OUT_START;
         }
         break;
@@ -924,7 +925,7 @@ static void BadgeView_DrawMessage(BadgeViewWork *wk, int kind, int badge, int pa
     GFL_BitmapFill(BmpWin_GetBitmap(wk->win), 0);
     switch (kind) {
     case 0: {
-        TimeSigBadgeDate date = func_02009230(wk->timeSig, badge);
+        TimeSigBadgeDate date = TimeSigSave_GetBadgeDate(wk->timeSig, badge);
 
         WordSetNumber(wk->wordSet, 0, date.year + 2000, 4, 0, TRUE);
         WordSetNumber(wk->wordSet, 1, date.month, 2, 0, TRUE);
@@ -953,11 +954,11 @@ static int BadgeView_Input(BadgeViewWork *wk) {
     BOOL moving;
     int hit;
 
-    hit = func_0203da0c(sBadgeViewRects);
-    func_0203d9c8(sBadgeViewRects);
-    func_0203da0c(sBadgeViewMessageRect);
-    func_0203d9c8(sBadgeViewMessageRect);
-    func_0203da84(&x, &y);
+    hit = GFL_HIDGetTouchPressedRect(sBadgeViewRects);
+    GFL_HIDGetTouchHeldRect(sBadgeViewRects);
+    GFL_HIDGetTouchPressedRect(sBadgeViewMessageRect);
+    GFL_HIDGetTouchHeldRect(sBadgeViewMessageRect);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
     BadgeView_Update(wk);
     moving = FALSE;
     if (BadgeView_IsMoving(wk) == TRUE) {
@@ -1008,7 +1009,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
     case BADGE_HIT_BADGE + 5:
     case BADGE_HIT_BADGE + 6:
     case BADGE_HIT_BADGE + 7:
-        if (func_02021c0c(wk->queue) && wk->hasBadge[hit] && wk->mode <= BADGE_MODE_BADGE) {
+        if (PrintQueue_IsEmpty(wk->queue) && wk->hasBadge[hit] && wk->mode <= BADGE_MODE_BADGE) {
             slide = FALSE;
             if (wk->mode != BADGE_MODE_BADGE) {
                 slide = TRUE;
@@ -1038,7 +1039,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
     case BADGE_HIT_LEADER + 5:
     case BADGE_HIT_LEADER + 6:
     case BADGE_HIT_LEADER + 7:
-        if (func_02021c0c(wk->queue) && (wk->mode == BADGE_MODE_NONE || wk->mode == BADGE_MODE_LEADER)) {
+        if (PrintQueue_IsEmpty(wk->queue) && (wk->mode == BADGE_MODE_NONE || wk->mode == BADGE_MODE_LEADER)) {
             slide = FALSE;
             if (wk->mode != BADGE_MODE_LEADER) {
                 slide = TRUE;
@@ -1080,7 +1081,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
             wk->seq = BADGE_SEQ_BUTTON;
             wk->result = hit;
             GFL_SndSEPlay(SEQ_SE_SW_CARD_01);
-            func_0204c488(wk->actors[BADGE_ACTOR_CARD], 12);
+            ClActor_SetSequence(wk->actors[BADGE_ACTOR_CARD], 12);
         }
         break;
     case BADGE_HIT_SHORTCUT:
@@ -1093,7 +1094,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_05);
             wk->seq = BADGE_SEQ_BUTTON;
             wk->result = hit;
-            func_0204c488(wk->actors[BADGE_ACTOR_EXIT], 8);
+            ClActor_SetSequence(wk->actors[BADGE_ACTOR_EXIT], 8);
         }
         break;
     case BADGE_HIT_RETURN:
@@ -1101,15 +1102,15 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
             GFL_SndSEPlay(SEQ_SE_SW_CARD_04);
             wk->seq = BADGE_SEQ_BUTTON;
             wk->result = hit;
-            func_0204c488(wk->actors[BADGE_ACTOR_RETURN], 9);
+            ClActor_SetSequence(wk->actors[BADGE_ACTOR_RETURN], 9);
             if (key) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         } else if (!(wk->flags & (1 << (BADGE_FLAG_BUTTON_OFF_SHIFT + 1)))) {
             // With a message open, the button closes it
-            func_0204c488(wk->actors[BADGE_ACTOR_RETURN], 9);
+            ClActor_SetSequence(wk->actors[BADGE_ACTOR_RETURN], 9);
             move = 2;
             if (wk->mode == BADGE_MODE_LEADER) {
                 move = 3;
@@ -1124,7 +1125,7 @@ static void BadgeView_HandleHit(BadgeViewWork *wk, int hit, BOOL key) {
 static void BadgeView_ToggleShortcut(BadgeViewWork *wk) {
     BOOL registered = GameData_IsShortcutRegistered(wk->param->gameData, SHORTCUT_TRAINER_CARD_BADGES) ^ 1;
 
-    func_0204c488(wk->actors[BADGE_ACTOR_SHORTCUT], registered + 6);
+    ClActor_SetSequence(wk->actors[BADGE_ACTOR_SHORTCUT], registered + 6);
     GameData_SetKeyItemRegistration(wk->param->gameData, SHORTCUT_TRAINER_CARD_BADGES, registered);
     GFL_SndSEPlay(SEQ_SE_SW_CARD_03);
 }
@@ -1141,7 +1142,7 @@ static void BadgeView_SetSparklesVisible(BadgeViewWork *wk, int badge, BOOL visi
     int i;
 
     for (i = 0; i < 3; i++) {
-        func_0204c124(wk->actors[BADGE_ACTOR_SPARKLE + badge * 3 + i], visible);
+        ClActor_SetVisible(wk->actors[BADGE_ACTOR_SPARKLE + badge * 3 + i], visible);
     }
 }
 
@@ -1151,16 +1152,16 @@ static void BadgeView_InitBadges(BadgeViewWork *wk, int page, int pageMax) {
 
     for (i = 0; i < BADGE_COUNT; i++) {
         if (isBadgeObtained(trainerCard, i)) {
-            func_0204c124(wk->actors[BADGE_ACTOR_BADGE + i], TRUE);
+            ClActor_SetVisible(wk->actors[BADGE_ACTOR_BADGE + i], TRUE);
             wk->hasBadge[i] = TRUE;
         } else {
-            func_0204c124(wk->actors[BADGE_ACTOR_BADGE + i], FALSE);
+            ClActor_SetVisible(wk->actors[BADGE_ACTOR_BADGE + i], FALSE);
             wk->hasBadge[i] = FALSE;
         }
         BadgeView_SetSparklesVisible(wk, i, FALSE);
     }
-    func_0204c488(wk->actors[BADGE_ACTOR_SHORTCUT],
-                  GameData_IsShortcutRegistered(wk->param->gameData, SHORTCUT_TRAINER_CARD_BADGES) + 6);
+    ClActor_SetSequence(wk->actors[BADGE_ACTOR_SHORTCUT],
+                        GameData_IsShortcutRegistered(wk->param->gameData, SHORTCUT_TRAINER_CARD_BADGES) + 6);
 }
 
 static void BadgeView_SetPage(BadgeViewWork *wk, int page) {
@@ -1184,7 +1185,7 @@ static void BadgeView_SavePolish(BadgeViewWork *wk) {
     seconds = RTC_ConvertDateTimeToSecond(&date, &time);
     saveSecondsTime(wk->timeSig, seconds, seconds >> 32);
     for (i = 0; i < BADGE_COUNT; i++) {
-        func_020092b8(wk->timeSig, i, wk->polish[i]);
+        TimeSigSave_SetBadgePolish(wk->timeSig, i, wk->polish[i]);
     }
 }
 
@@ -1207,7 +1208,7 @@ static void BadgeView_LoadPolish(BadgeViewWork *wk) {
     }
     decay = hours * 2;
     for (i = 0; i < BADGE_COUNT; i++) {
-        wk->polish[i] = func_020092a8(wk->timeSig, i);
+        wk->polish[i] = TimeSigSave_GetBadgePolish(wk->timeSig, i);
         wk->polish[i] -= decay;
         if (wk->polish[i] < 0) {
             wk->polish[i] = 0;
@@ -1381,7 +1382,7 @@ static BOOL BadgeView_IsMoving(BadgeViewWork *wk) {
 }
 
 static void BadgeView_SetActorVisible(BadgeViewWork *wk, int actor, BOOL visible) {
-    func_0204c124(wk->actors[actor], visible);
+    ClActor_SetVisible(wk->actors[actor], visible);
 }
 
 // Shows or hides a button, and keeps whether it can be used
@@ -1419,7 +1420,7 @@ static void BadgeView_UpdateLeader(BadgeViewWork *wk) {
         hasBadge = TRUE;
     }
     if (hasBadge == FALSE) {
-        if (func_0203da0c(sBadgeViewLeaderArea) == 0) {
+        if (GFL_HIDGetTouchPressedRect(sBadgeViewLeaderArea) == 0) {
             BadgeView_StartMove(wk, 3);
             wk->mode = BADGE_MODE_NONE;
         }
@@ -1431,7 +1432,7 @@ static void BadgeView_UpdateLeader(BadgeViewWork *wk) {
             BadgeView_DrawMessage(wk, wk->kind, wk->selected, wk->msgPage);
             BadgeView_FlushWin(wk);
         }
-        if (!changed && func_0203da0c(sBadgeViewLeaderArea) == 0) {
+        if (!changed && GFL_HIDGetTouchPressedRect(sBadgeViewLeaderArea) == 0) {
             if (wk->msgPage == 0) {
                 wk->msgPage = 1;
                 BadgeView_SetTimer(wk, 0, sBadgeViewMessageFrames[wk->msgPage]);
@@ -1448,7 +1449,7 @@ static void BadgeView_UpdateLeader(BadgeViewWork *wk) {
 
 // A touch outside the badges closes a badge's message
 static void BadgeView_UpdateBadge(BadgeViewWork *wk) {
-    if (wk->mode == BADGE_MODE_BADGE && func_0203da0c(sBadgeViewBadgeArea) == 0) {
+    if (wk->mode == BADGE_MODE_BADGE && GFL_HIDGetTouchPressedRect(sBadgeViewBadgeArea) == 0) {
         BadgeView_StartMove(wk, 2);
         wk->mode = BADGE_MODE_NONE;
     }
@@ -1575,18 +1576,18 @@ static void BadgeView_FreeLeaders(BadgeViewWork *wk) {
     int i;
 
     for (i = 0; i < BADGE_COUNT; i++) {
-        func_0204b98c(wk->leaderRes[i].chars);
-        func_0204bcd0(wk->leaderRes[i].palette);
-        func_0204be64(wk->leaderRes[i].cellAnims);
+        ClActSys_FreeChars(wk->leaderRes[i].chars);
+        ClActSys_FreePltt(wk->leaderRes[i].palette);
+        ClActSys_FreeCellAnims(wk->leaderRes[i].cellAnims);
     }
 }
 
 static void BadgeView_SetActorX(BadgeViewWork *wk, int actor, int x) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[actor], &pos, CLACT_SURFACE_MAIN);
+    ClActor_GetSurfacePos(wk->actors[actor], &pos, CLACT_SURFACE_MAIN);
     pos.x = x;
-    func_0204c140(wk->actors[actor], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->actors[actor], &pos, CLACT_SURFACE_MAIN);
 }
 
 static void BadgeView_SetLeadersX(BadgeViewWork *wk, int x) {

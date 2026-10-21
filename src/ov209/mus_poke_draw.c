@@ -236,7 +236,7 @@ static void MusPokeDraw_GetLoadInfo(MusicalPoke *musPoke, MCSSLoadInfo *info, BO
     u8 rare;
     u32 dir;
 
-    func_0201d624(musPoke->pkm);
+    PokeParty_ToBoxPkm(musPoke->pkm);
     species = musPoke->species;
     form = PML_PkmSanitizeForme(species, musPoke->form);
     sex = musPoke->sex;

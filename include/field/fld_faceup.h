@@ -9,12 +9,12 @@
 
 // Fades in the face of type 0 to 2 and returns the event that does it, or NULL if a face is already up. With
 // endBlack, the end leaves the screen black
-GameEvent *func_ov155_021f59e0(u8 type, u8 unused, u16 endBlack, GameSystem *gsys, FieldScriptEnv *env);
+GameEvent *EventFaceUpStart_Create(u8 type, u8 unused, u16 endBlack, GameSystem *gsys, FieldScriptEnv *env);
 // The event that fades the face out and frees it, or NULL if there is none
-GameEvent *func_ov155_021f5cd0(GameSystem *gsys);
+GameEvent *EventFaceUpEnd_Create(GameSystem *gsys);
 // Frees the face at once
-void func_ov155_021f5cf8(Field *field);
+void FaceUp_FreeNow(Field *field);
 // Lets the mouth move with the next message
-void func_ov155_021f5d0c(Field *field);
+void FaceUp_StartTalk(Field *field);
 
 #endif // POKEBW2_FIELD_FLD_FACEUP_H

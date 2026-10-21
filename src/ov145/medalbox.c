@@ -421,7 +421,7 @@ static BOOL MedalBoxApp_ProcInit(GameProc *proc, u32 *state, void *param, void *
     arc = GFL_ArcSysCreateFileHandle(ARCID_MEDALBOX, work->heapId);
     BlinkPalAnm_SetPalBufferArcTool(work->blinkAnm, arc, 2, 0, 0x10);
     GFL_ArcToolFree(arc);
-    func_02042ba8(TRUE, work->heapId);
+    GFL_NetSetIconScreen(TRUE, work->heapId);
     MedalBoxApp_DrawInfo(work, NULL, FALSE);
     return TRUE;
 }
@@ -476,14 +476,14 @@ static BOOL MedalBoxApp_ProcMain(GameProc *proc, u32 *state, void *param, void *
     MedalBoxApp_UpdateBGScroll(work);
     MedalBoxApp_UpdatePrint(work);
     work->printing = FALSE;
-    func_02021a3c(work->printQueue);
+    PrintQueue_Main(work->printQueue);
     for (i = 0; i < WINDOW_COUNT; i++) {
         PrintWindow_Flush(&work->printWindows[i], work->printQueue);
         if (PrintWindow_IsPrinted(&work->printWindows[i]) == FALSE) {
             work->printing = TRUE;
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
     return result;
 }
 
@@ -551,7 +551,7 @@ static void MedalBoxApp_InitGraphics(MedalBoxApp *work) {
     GFL_BGSysSetDisplayLayout(0);
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     MedalBoxApp_InitBG(work);
     MedalBoxApp_InitObj(work);
     AppPrintsysCommon_Init(&work->printCommon, 6);
@@ -647,29 +647,29 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
     int j;
 
     ClActSys_Create(&setup, &sMedalBoxVRAMConfig, heapId);
-    work->unit = func_0204bf1c(0x80, 1, heapId);
-    func_0204c028(work->unit);
+    work->unit = ClActUnit_Create(0x80, 1, heapId);
+    ClActUnit_UseSystemRenderer(work->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     resources = work->resources;
     arcs[0] = GFL_ArcSysCreateFileHandle(ARCID_MEDALBOX, heapId);
     arcs[1] = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
     arcs[2] = GFL_ArcSysCreateFileHandle(ARCID_MEDAL, heapId);
-    work->resources[RES_MEDAL_CELLS] = func_0204bde0(arcs[2], 2, 3, heapId);
-    resources[RES_MEDAL_PALETTE] = func_0204bbb8(arcs[2], 0, 2, 0, 0, 6, heapId);
-    resources[RES_MEDAL_CHARS] = func_0204b81c(arcs[2], 1, FALSE, 2, heapId);
-    resources[RES_CELLS] = func_0204bde0(arcs[0], 12, 13, heapId);
+    work->resources[RES_MEDAL_CELLS] = ClActSys_LoadCellAnims(arcs[2], 2, 3, heapId);
+    resources[RES_MEDAL_PALETTE] = ClActSys_LoadPlttRange(arcs[2], 0, 2, 0, 0, 6, heapId);
+    resources[RES_MEDAL_CHARS] = ClActSys_LoadChars(arcs[2], 1, FALSE, 2, heapId);
+    resources[RES_CELLS] = ClActSys_LoadCellAnims(arcs[0], 12, 13, heapId);
     paletteOffset = 0xc0;
-    resources[RES_PALETTE] = func_0204bbb8(arcs[0], 2, 0, paletteOffset, 0, 4, heapId);
+    resources[RES_PALETTE] = ClActSys_LoadPlttRange(arcs[0], 2, 0, paletteOffset, 0, 4, heapId);
     // The rank's palette for the top screen's medal case
     paletteOffset += 0x60;
-    func_0204bbb8(arcs[0], 2, 0, paletteOffset, MedalBoxApp_GetRankPalette(work->medalBox) + 3, 1, heapId);
-    resources[RES_CHARS] = func_0204b81c(arcs[0], 5, FALSE, 0, heapId);
-    resources[RES_COMMON_CELLS] = func_0204bde0(arcs[1], 23, 26, heapId);
-    resources[RES_COMMON_PALETTE] = func_0204bbb8(arcs[1], 19, 0, 0x140, 0, 4, heapId);
-    resources[RES_COMMON_CHARS] = func_0204b81c(arcs[1], 20, FALSE, 0, heapId);
-    resources[RES_BAR_CHARS] = func_0204b81c(arcs[1], 175, FALSE, 0, heapId);
-    resources[RES_BAR_CELLS] = func_0204bde0(arcs[1], 174, 173, heapId);
+    ClActSys_LoadPlttRange(arcs[0], 2, 0, paletteOffset, MedalBoxApp_GetRankPalette(work->medalBox) + 3, 1, heapId);
+    resources[RES_CHARS] = ClActSys_LoadChars(arcs[0], 5, FALSE, 0, heapId);
+    resources[RES_COMMON_CELLS] = ClActSys_LoadCellAnims(arcs[1], 23, 26, heapId);
+    resources[RES_COMMON_PALETTE] = ClActSys_LoadPlttRange(arcs[1], 19, 0, 0x140, 0, 4, heapId);
+    resources[RES_COMMON_CHARS] = ClActSys_LoadChars(arcs[1], 20, FALSE, 0, heapId);
+    resources[RES_BAR_CHARS] = ClActSys_LoadChars(arcs[1], 175, FALSE, 0, heapId);
+    resources[RES_BAR_CELLS] = ClActSys_LoadCellAnims(arcs[1], 174, 173, heapId);
     for (i = 0; i < 3; i++) {
         GFL_ArcToolFree(arcs[i]);
     }
@@ -682,38 +682,38 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         actorSetup.bgPriority = 3;
         actorSetup.priority = 3;
         work->actors[i] =
-            func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
-                          work->resources[RES_MEDAL_CELLS], &actorSetup, 0, heapId);
-        func_0204c488(work->actors[i], 0);
-        func_0204c124(work->actors[i], FALSE);
+            ClActor_Create(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
+                           work->resources[RES_MEDAL_CELLS], &actorSetup, 0, heapId);
+        ClActor_SetSequence(work->actors[i], 0);
+        ClActor_SetVisible(work->actors[i], FALSE);
     }
     for (i = ACTOR_SLIDER; i < ACTOR_RETURN; i++) {
         MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 2;
         actorSetup.priority = 2;
-        work->actors[i] = func_0204c040(work->unit, work->resources[RES_CHARS], work->resources[RES_PALETTE],
-                                        work->resources[RES_CELLS], &actorSetup, 0, heapId);
-        func_0204c488(work->actors[i], 0);
-        func_0204c124(work->actors[i], TRUE);
+        work->actors[i] = ClActor_Create(work->unit, work->resources[RES_CHARS], work->resources[RES_PALETTE],
+                                         work->resources[RES_CELLS], &actorSetup, 0, heapId);
+        ClActor_SetSequence(work->actors[i], 0);
+        ClActor_SetVisible(work->actors[i], TRUE);
     }
     for (i = ACTOR_RETURN; i < ACTOR_MENU; i++) {
         MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
         actorSetup.bgPriority = 2;
         actorSetup.priority = 2;
         work->actors[i] =
-            func_0204c040(work->unit, work->resources[RES_COMMON_CHARS], work->resources[RES_COMMON_PALETTE],
-                          work->resources[RES_COMMON_CELLS], &actorSetup, 0, heapId);
-        func_0204c488(work->actors[i], 0);
-        func_0204c124(work->actors[i], TRUE);
+            ClActor_Create(work->unit, work->resources[RES_COMMON_CHARS], work->resources[RES_COMMON_PALETTE],
+                           work->resources[RES_COMMON_CELLS], &actorSetup, 0, heapId);
+        ClActor_SetSequence(work->actors[i], 0);
+        ClActor_SetVisible(work->actors[i], TRUE);
     }
     MI_CpuFill8(&actorSetup, 0, sizeof(ClActorSetup));
     actorSetup.bgPriority = 2;
     actorSetup.priority = 2;
     work->actors[ACTOR_MENU] =
-        func_0204c040(work->unit, work->resources[RES_BAR_CHARS], work->resources[RES_COMMON_PALETTE],
-                      work->resources[RES_BAR_CELLS], &actorSetup, 0, heapId);
-    func_0204c488(work->actors[ACTOR_MENU], 0);
-    func_0204c124(work->actors[ACTOR_MENU], TRUE);
+        ClActor_Create(work->unit, work->resources[RES_BAR_CHARS], work->resources[RES_COMMON_PALETTE],
+                       work->resources[RES_BAR_CELLS], &actorSetup, 0, heapId);
+    ClActor_SetSequence(work->actors[ACTOR_MENU], 0);
+    ClActor_SetVisible(work->actors[ACTOR_MENU], TRUE);
 
     MI_CpuFill8(&windowSetup, 0, sizeof(ClActorSetup));
     for (j = ACTOR_MEDAL_WINDOW; j <= ACTOR_MEDAL_WINDOW + MEDAL_ACTOR_COUNT - 1; j++) {
@@ -723,21 +723,21 @@ static void MedalBoxApp_InitObj(MedalBoxApp *work) {
         windowSetup.bgPriority = 3;
         windowSetup.priority = 3;
         work->actors[j] =
-            func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
-                          work->resources[RES_MEDAL_CELLS], &windowSetup, 0, heapId);
-        func_0204c488(work->actors[j], 0);
-        func_0204c124(work->actors[j], TRUE);
-        func_0204c318(work->actors[j], GX_OAM_MODE_OBJWND);
+            ClActor_Create(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
+                           work->resources[RES_MEDAL_CELLS], &windowSetup, 0, heapId);
+        ClActor_SetSequence(work->actors[j], 0);
+        ClActor_SetVisible(work->actors[j], TRUE);
+        ClActor_SetObjMode(work->actors[j], GX_OAM_MODE_OBJWND);
     }
 
     actorSetup.x = 0x2c;
     actorSetup.y = 0x46;
     actorSetup.bgPriority = 1;
     work->actors[ACTOR_INFO_MEDAL] =
-        func_0204c040(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
-                      work->resources[RES_MEDAL_CELLS], &actorSetup, 1, heapId);
-    func_0204c488(work->actors[ACTOR_INFO_MEDAL], 0);
-    func_0204c124(work->actors[ACTOR_INFO_MEDAL], FALSE);
+        ClActor_Create(work->unit, work->resources[RES_MEDAL_CHARS], work->resources[RES_MEDAL_PALETTE],
+                       work->resources[RES_MEDAL_CELLS], &actorSetup, 1, heapId);
+    ClActor_SetSequence(work->actors[ACTOR_INFO_MEDAL], 0);
+    ClActor_SetVisible(work->actors[ACTOR_INFO_MEDAL], FALSE);
 }
 
 static void MedalBoxApp_FreeObj(MedalBoxApp *work) {
@@ -745,24 +745,24 @@ static void MedalBoxApp_FreeObj(MedalBoxApp *work) {
 
     for (i = 0; i < ACTOR_COUNT; i++) {
         if (work->actors[i] != NULL) {
-            func_0204c108(work->actors[i]);
+            ClActor_Delete(work->actors[i]);
         }
     }
-    func_0204be64(work->resources[RES_MEDAL_CELLS]);
-    func_0204b98c(work->resources[RES_MEDAL_CHARS]);
-    func_0204bcd0(work->resources[RES_MEDAL_PALETTE]);
-    func_0204be64(work->resources[RES_CELLS]);
-    func_0204b98c(work->resources[RES_CHARS]);
-    func_0204bcd0(work->resources[RES_PALETTE]);
-    func_0204be64(work->resources[RES_COMMON_CELLS]);
-    func_0204b98c(work->resources[RES_COMMON_CHARS]);
-    func_0204bcd0(work->resources[RES_COMMON_PALETTE]);
-    func_0204b98c(work->resources[RES_BAR_CHARS]);
-    func_0204be64(work->resources[RES_BAR_CELLS]);
+    ClActSys_FreeCellAnims(work->resources[RES_MEDAL_CELLS]);
+    ClActSys_FreeChars(work->resources[RES_MEDAL_CHARS]);
+    ClActSys_FreePltt(work->resources[RES_MEDAL_PALETTE]);
+    ClActSys_FreeCellAnims(work->resources[RES_CELLS]);
+    ClActSys_FreeChars(work->resources[RES_CHARS]);
+    ClActSys_FreePltt(work->resources[RES_PALETTE]);
+    ClActSys_FreeCellAnims(work->resources[RES_COMMON_CELLS]);
+    ClActSys_FreeChars(work->resources[RES_COMMON_CHARS]);
+    ClActSys_FreePltt(work->resources[RES_COMMON_PALETTE]);
+    ClActSys_FreeChars(work->resources[RES_BAR_CHARS]);
+    ClActSys_FreeCellAnims(work->resources[RES_BAR_CELLS]);
     if (work->unit != NULL) {
-        func_0204bf98(work->unit);
+        ClActUnit_Delete(work->unit);
     }
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void MedalBoxApp_InitActors(MedalBoxApp *work) {
@@ -772,53 +772,53 @@ static void MedalBoxApp_InitActors(MedalBoxApp *work) {
 
     pos.x = SLIDER_X;
     pos.y = SLIDER_Y;
-    func_0204c140(actors[ACTOR_SLIDER], &pos, 0);
-    func_0204c488(actors[ACTOR_SLIDER], 0);
+    ClActor_SetSurfacePos(actors[ACTOR_SLIDER], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_SLIDER], 0);
     pos.x = 0x74;
     pos.y = SLIDER_Y;
-    func_0204c140(actors[ACTOR_SLIDER_BAR], &pos, 0);
-    func_0204c488(actors[ACTOR_SLIDER_BAR], 1);
-    func_0204c140(actors[ACTOR_CURSOR], &pos, 0);
-    func_0204c488(actors[ACTOR_CURSOR], 2);
-    func_0204c468(actors[ACTOR_CURSOR], 3);
+    ClActor_SetSurfacePos(actors[ACTOR_SLIDER_BAR], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_SLIDER_BAR], 1);
+    ClActor_SetSurfacePos(actors[ACTOR_CURSOR], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_CURSOR], 2);
+    ClActor_SetBgPriority(actors[ACTOR_CURSOR], 3);
     MedalBoxApp_GetFavoritePos(0, &pos);
-    func_0204c140(actors[ACTOR_FAVORITE], &pos, 0);
-    func_0204c488(actors[ACTOR_FAVORITE], 3);
+    ClActor_SetSurfacePos(actors[ACTOR_FAVORITE], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_FAVORITE], 3);
     pos.x = 0;
     pos.y = 0;
     for (i = 0; i < SPARKLE_COUNT; i++) {
-        func_0204c140(actors[ACTOR_SPARKLE + i], &pos, 0);
-        func_0204c488(actors[ACTOR_SPARKLE + i], 4);
-        func_0204c124(work->actors[ACTOR_SPARKLE + i], FALSE);
-        func_0204c468(actors[ACTOR_SPARKLE + i], 3);
-        func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
-        func_0204c438(actors[ACTOR_SPARKLE + i], 1);
+        ClActor_SetSurfacePos(actors[ACTOR_SPARKLE + i], &pos, 0);
+        ClActor_SetSequence(actors[ACTOR_SPARKLE + i], 4);
+        ClActor_SetVisible(work->actors[ACTOR_SPARKLE + i], FALSE);
+        ClActor_SetBgPriority(actors[ACTOR_SPARKLE + i], 3);
+        ClActor_SetAutoAnim(actors[ACTOR_SPARKLE + i], TRUE);
+        ClActor_SetPriority(actors[ACTOR_SPARKLE + i], 1);
     }
     pos.x = 0x80;
     pos.y = 0x60;
-    func_0204c438(actors[ACTOR_COVER], 0);
-    func_0204c140(actors[ACTOR_COVER], &pos, 0);
-    func_0204c488(actors[ACTOR_COVER], 5);
+    ClActor_SetPriority(actors[ACTOR_COVER], 0);
+    ClActor_SetSurfacePos(actors[ACTOR_COVER], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_COVER], 5);
     pos.x = 0;
     pos.y = 0xa8;
-    func_0204c140(actors[ACTOR_MENU], &pos, 0);
-    func_0204c488(actors[ACTOR_MENU], 0);
+    ClActor_SetSurfacePos(actors[ACTOR_MENU], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_MENU], 0);
     pos.x = 0xd0;
     pos.y = 0xa8;
-    func_0204c140(actors[ACTOR_EXIT], &pos, 0);
-    func_0204c488(actors[ACTOR_EXIT], 0);
+    ClActor_SetSurfacePos(actors[ACTOR_EXIT], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_EXIT], 0);
     pos.x = 0xe8;
     pos.y = 0xa8;
-    func_0204c140(actors[ACTOR_RETURN], &pos, 0);
-    func_0204c488(actors[ACTOR_RETURN], 1);
+    ClActor_SetSurfacePos(actors[ACTOR_RETURN], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_RETURN], 1);
     pos.x = 0xb0;
     pos.y = 0xa8;
-    func_0204c140(actors[ACTOR_RIGHT], &pos, 0);
-    func_0204c488(actors[ACTOR_RIGHT], 5);
+    ClActor_SetSurfacePos(actors[ACTOR_RIGHT], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_RIGHT], 5);
     pos.x = 0x20;
     pos.y = 0xa8;
-    func_0204c140(actors[ACTOR_LEFT], &pos, 0);
-    func_0204c488(actors[ACTOR_LEFT], 4);
+    ClActor_SetSurfacePos(actors[ACTOR_LEFT], &pos, 0);
+    ClActor_SetSequence(actors[ACTOR_LEFT], 4);
 }
 
 static void MedalBoxApp_InitWindows(MedalBoxApp *work) {
@@ -839,12 +839,12 @@ static void MedalBoxApp_FreeWindows(MedalBoxApp *work) {
 }
 
 static void MedalBoxApp_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 // Starts at the column of the medal the cursor was on the last time
 static void MedalBoxApp_InitColumn(MedalBoxApp *work) {
-    u8 medal = func_02017b58(work->param->gameData);
+    u8 medal = GameData_GetMedalBoxCursorMedal(work->param->gameData);
     int index = MedalBoxDataSys_FindMedal(&work->data, medal);
 
     if (medal != 0xff) {
@@ -874,11 +874,12 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
 
             switch (medals->medals[i]->status) {
             case MEDAL_STATUS_OBTAINED:
-                func_0204c488(work->actors[ACTOR_MEDAL + actor], medals->medals[i]->sequence);
+                ClActor_SetSequence(work->actors[ACTOR_MEDAL + actor], medals->medals[i]->sequence);
                 break;
             case MEDAL_STATUS_DISCOVERED:
                 // A hint medal is the cell's last sequence
-                func_0204c488(work->actors[ACTOR_MEDAL + actor], func_0204c4a8(work->actors[ACTOR_MEDAL + actor]) - 1);
+                ClActor_SetSequence(work->actors[ACTOR_MEDAL + actor],
+                                    ClActor_GetSequenceCount(work->actors[ACTOR_MEDAL + actor]) - 1);
                 break;
             }
             if (shown == 1 && work->view == VIEW_NAMES) {
@@ -895,8 +896,8 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
                     ClActorPos pos;
 
                     MedalBoxApp_GetFavoritePos(actor % MEDALBOX_COLUMN_SIZE, &pos);
-                    func_0204c140(work->actors[ACTOR_FAVORITE], &pos, 0);
-                    func_0204c124(work->actors[ACTOR_FAVORITE], TRUE);
+                    ClActor_SetSurfacePos(work->actors[ACTOR_FAVORITE], &pos, 0);
+                    ClActor_SetVisible(work->actors[ACTOR_FAVORITE], TRUE);
                     favorite = TRUE;
                 }
             }
@@ -921,14 +922,14 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
                 divisor /= 10;
             }
             window = MedalBoxApp_GetWindowActor(actor);
-            func_0204c124(work->actors[ACTOR_MEDAL + actor], TRUE);
-            func_0204c124(work->actors[window], TRUE);
+            ClActor_SetVisible(work->actors[ACTOR_MEDAL + actor], TRUE);
+            ClActor_SetVisible(work->actors[window], TRUE);
         } else {
             int window = MedalBoxApp_GetWindowActor(actor);
             int j;
 
-            func_0204c124(work->actors[ACTOR_MEDAL + actor], FALSE);
-            func_0204c124(work->actors[window], FALSE);
+            ClActor_SetVisible(work->actors[ACTOR_MEDAL + actor], FALSE);
+            ClActor_SetVisible(work->actors[window], FALSE);
             for (j = 0; j < 3; j++) {
                 GFL_BGSysFillScrArea(MedalBoxApp_GetBG(BG_MAIN_NUMBER), 10,
                                      sMedalBoxNumberPos[i].x + shown * 10 - (2 - j), sMedalBoxNumberPos[i].y, 1, 1, 0);
@@ -936,7 +937,7 @@ static void MedalBoxApp_DrawColumn(MedalBoxApp *work, u8 column, u8 shown, BOOL 
         }
     }
     if (!favorite && work->view == VIEW_NAMES && shown == 1) {
-        func_0204c124(work->actors[ACTOR_FAVORITE], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
     }
     GFL_BGSysQueueScrLoad(MedalBoxApp_GetBG(BG_MAIN_NUMBER));
 }
@@ -994,7 +995,7 @@ static void MedalBoxApp_SetSeq(MedalBoxApp *work, int seq) {
 static void MedalBoxApp_InitPrint(MedalBoxApp *work) {
     work->stream = NULL;
     work->tcbManager = GFL_TCBExMgrCreate(work->heapId, work->heapId, 1, 0);
-    work->printQueue = func_02021998(work->heapId);
+    work->printQueue = PrintQueue_CreateDefault(work->heapId);
     work->keyCursor = KeyCursor_Create(15, TRUE, TRUE, work->heapId);
 }
 
@@ -1004,9 +1005,9 @@ static void MedalBoxApp_UpdatePrint(MedalBoxApp *work) {
     if (work->stream != NULL) {
         KeyCursor_Update(work->keyCursor, work->stream, work->messageWindow);
         if (AppPrintsysCommon_Update(&work->printCommon, work->stream) == TRUE) {
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48() == TRUE) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed() == TRUE) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223cc(work->stream);
+                PrintStream_Delete(work->stream);
                 work->stream = NULL;
             } else {
                 KeyCursor_Draw(work->keyCursor, BmpWin_GetBitmap(work->messageWindow), 15);
@@ -1018,8 +1019,8 @@ static void MedalBoxApp_UpdatePrint(MedalBoxApp *work) {
 
 static void MedalBoxApp_FreePrint(MedalBoxApp *work) {
     KeyCursor_Free(work->keyCursor);
-    func_02021c44(work->printQueue);
-    func_02021a18(work->printQueue);
+    PrintQueue_Clear(work->printQueue);
+    PrintQueue_Free(work->printQueue);
     work->printQueue = NULL;
     GFL_TCBExMgrFree(work->tcbManager);
 }
@@ -1040,7 +1041,7 @@ static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_CASE), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_CASE_BACK), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_TEXT), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
-        func_0204c140(work->actors[ACTOR_INFO_MEDAL], &pos, 1);
+        ClActor_SetSurfacePos(work->actors[ACTOR_INFO_MEDAL], &pos, 1);
         work->subSeq++;
         break;
     }
@@ -1070,16 +1071,16 @@ static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
             work->caseY = 0;
             caseDone = TRUE;
         }
-        func_0204c140(work->actors[ACTOR_COVER], &coverPos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_COVER], &coverPos, 0);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_CASE), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_CASE_BACK), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_SUB_TEXT), BG_MOVE_SET_Y, work->caseY >> FX32_SHIFT);
         pos.x = 0x2c;
         pos.y = 0x46 - (work->caseY >> FX32_SHIFT);
-        func_0204c140(work->actors[ACTOR_INFO_MEDAL], &pos, 1);
+        ClActor_SetSurfacePos(work->actors[ACTOR_INFO_MEDAL], &pos, 1);
         if (coverDone && caseDone) {
             // The first time, a manual falls out of the case
-            if (func_0200fb28(work->medalBox) == TRUE) {
+            if (MedalBox_IsManualShown(work->medalBox) == TRUE) {
                 MedalBoxApp_RestoreCursor(work);
                 MedalBoxApp_SetSeq(work, SEQ_MAIN);
             } else {
@@ -1094,8 +1095,8 @@ static BOOL MedalBoxApp_SeqStart(MedalBoxApp *work) {
 
 // Puts the cursor on the medal it was on the last time, if the keys are in use
 static void MedalBoxApp_RestoreCursor(MedalBoxApp *work) {
-    if (!func_0203d554()) {
-        u8 medal = func_02017b58(work->param->gameData);
+    if (!GCTX_HIDIsUsingTouch()) {
+        u8 medal = GameData_GetMedalBoxCursorMedal(work->param->gameData);
         int index = MedalBoxDataSys_FindMedal(&work->data, medal);
 
         if (medal != 0xff) {
@@ -1129,7 +1130,7 @@ static void MedalBoxApp_HandleInput(MedalBoxApp *work) {
         MedalBoxApp_SetScrollDir(work, -1);
         MedalBoxApp_SetSeq(work, SEQ_SCROLL);
         work->drag = 0;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     }
     if (work->drag > 20) {
@@ -1138,7 +1139,7 @@ static void MedalBoxApp_HandleInput(MedalBoxApp *work) {
         MedalBoxApp_SetScrollDir(work, 1);
         MedalBoxApp_SetSeq(work, SEQ_SCROLL);
         work->drag = 0;
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     }
     if (work->view == VIEW_NAMES) {
@@ -1146,7 +1147,7 @@ static void MedalBoxApp_HandleInput(MedalBoxApp *work) {
         int hit;
 
         MedalBoxApp_GetFavoriteRects(work, rects);
-        hit = func_0203da0c(rects);
+        hit = GFL_HIDGetTouchPressedRect(rects);
         if (hit != -1) {
             u8 column = MedalBoxApp_GetCursorColumn(work);
 
@@ -1161,62 +1162,62 @@ static void MedalBoxApp_HandleInput(MedalBoxApp *work) {
                     }
                     MedalBoxApp_SetCursor(work, hit, FALSE);
                     MedalBoxApp_SetSeq(work, SEQ_FAVORITE);
-                    func_0203d564(TRUE);
+                    GCTX_HIDSetUsingTouch(TRUE);
                     return;
                 }
                 MedalBoxApp_SetCursor(work, hit, FALSE);
                 MedalBoxApp_SetFavorite(work, 0, FAVORITE_HINT);
                 MedalBoxApp_SetSeq(work, SEQ_FAVORITE);
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 return;
             }
         }
     }
     if (pressed & PAD_BUTTON_X) {
         MedalBoxApp_SetSeq(work, SEQ_EXIT);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return;
     }
     if (pressed & PAD_BUTTON_B) {
         MedalBoxApp_SetSeq(work, SEQ_RETURN);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return;
     }
-    switch (func_0203da0c(sMedalBoxButtonRects)) {
+    switch (GFL_HIDGetTouchPressedRect(sMedalBoxButtonRects)) {
     case BUTTON_MENU:
         MedalBoxApp_SetSeq(work, SEQ_MENU);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     case BUTTON_LEFT:
         MedalBoxApp_SetScrollSpeed(work, FX32_CONST(7));
         MedalBoxApp_SetScrollCount(work, 1);
         MedalBoxApp_SetScrollDir(work, -1);
         MedalBoxApp_SetSeq(work, SEQ_SCROLL);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     case BUTTON_RIGHT:
         MedalBoxApp_SetScrollSpeed(work, FX32_CONST(7));
         MedalBoxApp_SetScrollCount(work, 1);
         MedalBoxApp_SetScrollDir(work, 1);
         MedalBoxApp_SetSeq(work, SEQ_SCROLL);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     case BUTTON_RETURN:
         MedalBoxApp_SetSeq(work, SEQ_RETURN);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     case BUTTON_EXIT:
         MedalBoxApp_SetSeq(work, SEQ_EXIT);
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
         return;
     default: {
         TouchRect sliderRects[] = { { 0xa8, 0xc9, 0x3c, 0xac }, { TOUCH_RECT_END, 0, 0, 0 } };
 
-        if (func_0203d9c8(sliderRects) == 0) {
+        if (GFL_HIDGetTouchHeldRect(sliderRects) == 0) {
             u32 x;
             u32 y;
 
-            if (func_0203da84(&x, &y)) {
+            if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
                 if (x < SLIDER_X) {
                     work->sliderX = 0;
                 } else if (x - SLIDER_X > SLIDER_WIDTH) {
@@ -1225,13 +1226,13 @@ static void MedalBoxApp_HandleInput(MedalBoxApp *work) {
                     work->sliderX = x - SLIDER_X;
                 }
                 MedalBoxApp_SetSeq(work, SEQ_SLIDER);
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 return;
             }
         } else {
             if (pressed & PAD_BUTTON_START) {
                 MedalBoxApp_SetSeq(work, SEQ_MENU);
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 return;
             }
             if (MedalBoxApp_HandleKeys(work)) {
@@ -1248,7 +1249,7 @@ static void MedalBoxApp_StartDrag(MedalBoxApp *work) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y) && !work->dragging) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && !work->dragging) {
         if (work->view == VIEW_NAMES) {
             if (x < COLUMN_WIDTH) {
                 work->dragging = TRUE;
@@ -1259,7 +1260,7 @@ static void MedalBoxApp_StartDrag(MedalBoxApp *work) {
             work->touchX = x;
         }
     }
-    if (!func_0203da2c()) {
+    if (!GFL_HIDIsTouchHeld()) {
         work->dragging = FALSE;
     }
 }
@@ -1268,7 +1269,7 @@ static BOOL MedalBoxApp_UpdateDrag(MedalBoxApp *work) {
     u32 x;
     u32 y;
 
-    if (work->dragging && func_0203da84(&x, &y)) {
+    if (work->dragging && GFL_HIDGetTouchHeldPoint(&x, &y)) {
         work->drag += work->touchX - x;
         work->touchX = x;
         if (work->view == VIEW_NAMES && x > COLUMN_WIDTH) {
@@ -1285,11 +1286,11 @@ static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
         MedalBoxApp_ClearNames(work);
         MedalBoxApp_SetCursorMode(work, CURSOR_HIDDEN, 0xff);
         if (work->scrollDir == 1) {
-            func_0204c488(work->actors[ACTOR_RIGHT], 13);
-            func_0204c520(work->actors[ACTOR_RIGHT], TRUE);
+            ClActor_SetSequence(work->actors[ACTOR_RIGHT], 13);
+            ClActor_SetAutoAnim(work->actors[ACTOR_RIGHT], TRUE);
         } else {
-            func_0204c488(work->actors[ACTOR_LEFT], 12);
-            func_0204c520(work->actors[ACTOR_LEFT], TRUE);
+            ClActor_SetSequence(work->actors[ACTOR_LEFT], 12);
+            ClActor_SetAutoAnim(work->actors[ACTOR_LEFT], TRUE);
         }
         GFL_SndSEPlay(SEQ_SE_MD_02);
         work->subSeq++;
@@ -1308,7 +1309,7 @@ static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
         u8 top = work->cursor / MEDALBOX_COLUMN_SIZE * MEDALBOX_COLUMN_SIZE;
         ClActorPos pos;
 
-        if (!func_0203d554()) {
+        if (!GCTX_HIDIsUsingTouch()) {
             switch (work->cursorEdge) {
             case CURSOR_EDGE_NONE:
                 MedalBoxApp_SetCursor(work, work->cursor, TRUE);
@@ -1331,7 +1332,7 @@ static BOOL MedalBoxApp_SeqScroll(MedalBoxApp *work) {
                         FX32_SHIFT;
         pos.x = work->sliderX + SLIDER_X;
         pos.y = SLIDER_Y;
-        func_0204c140(work->actors[ACTOR_SLIDER], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_SLIDER], &pos, 0);
         MedalBoxApp_FlushNames(work);
         MedalBoxApp_SetSeq(work, SEQ_MAIN);
         break;
@@ -1378,8 +1379,8 @@ static void MedalBoxApp_MoveMedals(MedalBoxApp *work) {
         MedalBoxApp_GetMedalPos(i, &pos);
         pos.x -= actorX;
         GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_NUMBER), BG_MOVE_SET_X, bgX);
-        func_0204c140(work->actors[ACTOR_MEDAL + i], &pos, 0);
-        func_0204c140(work->actors[MedalBoxApp_GetWindowActor(i)], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_MEDAL + i], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[MedalBoxApp_GetWindowActor(i)], &pos, 0);
     }
 }
 
@@ -1387,12 +1388,12 @@ static void MedalBoxApp_MoveSparkles(MedalBoxApp *work, s16 x) {
     int i;
 
     for (i = 0; i < SPARKLE_COUNT; i++) {
-        if (func_0204c560(work->actors[ACTOR_SPARKLE + i]) == TRUE) {
+        if (ClActor_IsAnimActive(work->actors[ACTOR_SPARKLE + i]) == TRUE) {
             ClActorPos pos;
 
-            func_0204c178(work->actors[ACTOR_SPARKLE + i], &pos, 0);
+            ClActor_GetSurfacePos(work->actors[ACTOR_SPARKLE + i], &pos, 0);
             pos.x -= x;
-            func_0204c140(work->actors[ACTOR_SPARKLE + i], &pos, 0);
+            ClActor_SetSurfacePos(work->actors[ACTOR_SPARKLE + i], &pos, 0);
         }
     }
 }
@@ -1410,7 +1411,7 @@ static void MedalBoxApp_DrawColumns(MedalBoxApp *work, BOOL names, BOOL slider) 
     if (names) {
         MedalBoxApp_ClearNames(work);
     }
-    func_0204c124(work->actors[ACTOR_FAVORITE], FALSE);
+    ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
     for (i = 0; i < count; i++) {
         int column = work->column + i - 1;
 
@@ -1433,7 +1434,7 @@ static void MedalBoxApp_DrawColumns(MedalBoxApp *work, BOOL names, BOOL slider) 
                         FX32_SHIFT;
         pos.x = work->sliderX + SLIDER_X;
         pos.y = SLIDER_Y;
-        func_0204c140(work->actors[ACTOR_SLIDER], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_SLIDER], &pos, 0);
     }
 }
 
@@ -1472,13 +1473,13 @@ static void MedalBoxApp_DrawInfo(MedalBoxApp *work, MedalBoxEntry *medal, BOOL s
     actor = work->actors[ACTOR_INFO_MEDAL];
     if (show == TRUE) {
         if (medal->status == MEDAL_STATUS_OBTAINED) {
-            func_0204c488(actor, medal->sequence);
+            ClActor_SetSequence(actor, medal->sequence);
         } else {
-            func_0204c488(actor, func_0204c4a8(actor) - 1);
+            ClActor_SetSequence(actor, ClActor_GetSequenceCount(actor) - 1);
         }
-        func_0204c124(actor, TRUE);
+        ClActor_SetVisible(actor, TRUE);
     } else {
-        func_0204c124(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
     }
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_INFO]), color & 0x1f);
     if (show == FALSE && rank != MEDAL_RANK_MAX) {
@@ -1664,9 +1665,9 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
         TouchRect rects[MEDALBOX_COLUMN_SIZE + 1];
 
         MedalBoxApp_GetNameRects(work, rects);
-        hit = func_0203da0c(rects);
+        hit = GFL_HIDGetTouchPressedRect(rects);
         if (hit != -1) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             MedalBoxApp_SetCursor(work, hit, TRUE);
             return TRUE;
         }
@@ -1675,9 +1676,9 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
         TouchRect rects[3 * MEDALBOX_COLUMN_SIZE + 1];
 
         MedalBoxApp_GetMedalRects(work, rects);
-        hit = func_0203da0c(rects);
+        hit = GFL_HIDGetTouchPressedRect(rects);
         if (hit != -1) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             MedalBoxApp_SetCursor(work, hit, TRUE);
             return TRUE;
         }
@@ -1688,7 +1689,7 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
         if ((pressed & PAD_KEY_UP) || (pressed & PAD_KEY_DOWN) || (pressed & PAD_KEY_LEFT) ||
             (pressed & PAD_KEY_RIGHT) || (pressed & PAD_BUTTON_L) || (pressed & PAD_BUTTON_R) ||
             (pressed & PAD_BUTTON_A)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             MedalBoxApp_SetCursor(work, work->prevCursor, TRUE);
             work->prevCursor = 0;
             return TRUE;
@@ -1699,7 +1700,7 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
             MedalBoxApp_ScrollLeft(work);
             return TRUE;
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         MedalBoxApp_SetCursor(work, cursor - 1, TRUE);
         return TRUE;
     } else if (typed & PAD_KEY_DOWN) {
@@ -1713,7 +1714,7 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
             MedalBoxApp_ScrollRight(work);
             return TRUE;
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         MedalBoxApp_SetCursor(work, cursor + 1, TRUE);
         return TRUE;
     } else if (typed & PAD_KEY_RIGHT) {
@@ -1736,14 +1737,14 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
         MedalBoxApp_SetScrollCount(work, 3);
         MedalBoxApp_SetScrollDir(work, 1);
         MedalBoxApp_SetSeq(work, SEQ_SCROLL);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return TRUE;
     } else if (typed & PAD_BUTTON_L) {
         MedalBoxApp_SetScrollSpeed(work, FX32_CONST(20));
         MedalBoxApp_SetScrollCount(work, 3);
         MedalBoxApp_SetScrollDir(work, -1);
         MedalBoxApp_SetSeq(work, SEQ_SCROLL);
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         return TRUE;
     } else if (pressed & PAD_BUTTON_A) {
         column = MedalBoxApp_GetCursorColumn(work);
@@ -1758,12 +1759,12 @@ static BOOL MedalBoxApp_HandleKeys(MedalBoxApp *work) {
                     MedalBoxApp_SetFavorite(work, medal->id, FAVORITE_REMOVED);
                 }
                 MedalBoxApp_SetSeq(work, SEQ_FAVORITE);
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 return TRUE;
             }
             MedalBoxApp_SetFavorite(work, 0, FAVORITE_HINT);
             MedalBoxApp_SetSeq(work, SEQ_FAVORITE);
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return TRUE;
         }
     }
@@ -1775,7 +1776,7 @@ static void MedalBoxApp_ScrollRight(MedalBoxApp *work) {
     MedalBoxApp_SetScrollCount(work, 1);
     MedalBoxApp_SetScrollDir(work, 1);
     MedalBoxApp_SetSeq(work, SEQ_SCROLL);
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
 }
 
 static void MedalBoxApp_ScrollLeft(MedalBoxApp *work) {
@@ -1783,7 +1784,7 @@ static void MedalBoxApp_ScrollLeft(MedalBoxApp *work) {
     MedalBoxApp_SetScrollCount(work, 1);
     MedalBoxApp_SetScrollDir(work, -1);
     MedalBoxApp_SetSeq(work, SEQ_SCROLL);
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
 }
 
 // Puts the cursor on a medal and shows it on the top screen. With the names shown it stays in the middle column
@@ -1807,12 +1808,12 @@ static void MedalBoxApp_SetCursor(MedalBoxApp *work, u8 cursor, BOOL keys) {
     medal = work->shown[column].medals[slot];
     if (medal != NULL) {
         MedalBoxApp_GetCursorPos(work, cursor, &pos);
-        func_0204c140(work->actors[ACTOR_CURSOR], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_CURSOR], &pos, 0);
         MedalBoxApp_DrawInfo(work, medal, TRUE);
         MedalBoxApp_SetCursorMode(work, CURSOR_SHOWN, medal->id);
     } else {
         MedalBoxApp_GetCursorPos(work, cursor, &pos);
-        func_0204c140(work->actors[ACTOR_CURSOR], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_CURSOR], &pos, 0);
         MedalBoxApp_SetCursorMode(work, CURSOR_SHOWN, 0xff);
         MedalBoxApp_DrawInfo(work, medal, FALSE);
     }
@@ -1821,18 +1822,18 @@ static void MedalBoxApp_SetCursor(MedalBoxApp *work, u8 cursor, BOOL keys) {
 // Shows or hides the cursor, and remembers its medal for the next time
 static void MedalBoxApp_SetCursorMode(MedalBoxApp *work, int mode, u8 medal) {
     work->cursorMode = mode;
-    func_02017b4c(work->param->gameData, medal);
+    GameData_SetMedalBoxCursorMedal(work->param->gameData, medal);
     switch (work->cursorMode) {
     case CURSOR_TOUCH:
         MedalBoxApp_DrawInfo(work, NULL, FALSE);
-        func_0204c124(work->actors[ACTOR_CURSOR], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_CURSOR], FALSE);
         break;
     case CURSOR_HIDDEN:
-        func_0204c124(work->actors[ACTOR_CURSOR], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_CURSOR], FALSE);
         break;
     case CURSOR_SHOWN:
         GFL_SndSEPlay(SEQ_SE_MD_03);
-        func_0204c124(work->actors[ACTOR_CURSOR], TRUE);
+        ClActor_SetVisible(work->actors[ACTOR_CURSOR], TRUE);
         break;
     }
 }
@@ -1844,7 +1845,7 @@ static void MedalBoxApp_UpdateSparkles(MedalBoxApp *work) {
     int i;
 
     for (i = 0; i < SPARKLE_COUNT; i++) {
-        if (GFL_RandomMTRange(10) == 0 && !func_0204c560(actors[ACTOR_SPARKLE + i])) {
+        if (GFL_RandomMTRange(10) == 0 && !ClActor_IsAnimActive(actors[ACTOR_SPARKLE + i])) {
             u8 shown = GFL_RandomMTRange(4) + 1;
             MedalBoxColumn *medals = &work->shown[shown];
             u8 slot = GFL_RandomMTRange(MEDALBOX_COLUMN_SIZE);
@@ -1856,15 +1857,15 @@ static void MedalBoxApp_UpdateSparkles(MedalBoxApp *work) {
                 MedalBoxApp_GetMedalPos(slot + shown * MEDALBOX_COLUMN_SIZE, &pos);
                 pos.x -= (s16)(work->scrollX + (GFL_RandomMTRange(26) - 13));
                 pos.y -= (s16)(work->scrollX + (GFL_RandomMTRange(26) - 13));
-                func_0204c488(actors[ACTOR_SPARKLE + i], 4);
-                func_0204c140(actors[ACTOR_SPARKLE + i], &pos, 0);
-                func_0204c124(work->actors[ACTOR_SPARKLE + i], TRUE);
-                func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
+                ClActor_SetSequence(actors[ACTOR_SPARKLE + i], 4);
+                ClActor_SetSurfacePos(actors[ACTOR_SPARKLE + i], &pos, 0);
+                ClActor_SetVisible(work->actors[ACTOR_SPARKLE + i], TRUE);
+                ClActor_SetAutoAnim(actors[ACTOR_SPARKLE + i], TRUE);
             } else {
-                func_0204c488(actors[ACTOR_SPARKLE + i], 4);
-                func_0204c140(actors[ACTOR_SPARKLE + i], &pos, 0);
-                func_0204c124(work->actors[ACTOR_SPARKLE + i], FALSE);
-                func_0204c520(actors[ACTOR_SPARKLE + i], TRUE);
+                ClActor_SetSequence(actors[ACTOR_SPARKLE + i], 4);
+                ClActor_SetSurfacePos(actors[ACTOR_SPARKLE + i], &pos, 0);
+                ClActor_SetVisible(work->actors[ACTOR_SPARKLE + i], FALSE);
+                ClActor_SetAutoAnim(actors[ACTOR_SPARKLE + i], TRUE);
             }
         }
     }
@@ -1896,13 +1897,13 @@ static BOOL MedalBoxApp_SeqExit(MedalBoxApp *work) {
 
     switch (work->subSeq) {
     case 0:
-        func_0204c488(button, 8);
-        func_0204c520(button, TRUE);
+        ClActor_SetSequence(button, 8);
+        ClActor_SetAutoAnim(button, TRUE);
         GFL_SndSEPlay(SEQ_SE_CLOSE1);
         work->subSeq++;
         break;
     case 1:
-        if (!func_0204c560(button)) {
+        if (!ClActor_IsAnimActive(button)) {
             work->subSeq++;
         }
         break;
@@ -1925,13 +1926,13 @@ static BOOL MedalBoxApp_SeqReturn(MedalBoxApp *work) {
 
     switch (work->subSeq) {
     case 0:
-        func_0204c488(button, 9);
-        func_0204c520(button, TRUE);
+        ClActor_SetSequence(button, 9);
+        ClActor_SetAutoAnim(button, TRUE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         work->subSeq++;
         break;
     case 1:
-        if (!func_0204c560(button)) {
+        if (!ClActor_IsAnimActive(button)) {
             work->subSeq++;
         }
         break;
@@ -1962,7 +1963,7 @@ static BOOL MedalBoxApp_SeqSlider(MedalBoxApp *work) {
         work->subSeq++;
         // fallthrough
     case 1:
-        if (func_0203da84(&x, &y)) {
+        if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
             if (x < SLIDER_X) {
                 work->sliderX = 0;
             } else if (x - SLIDER_X > SLIDER_WIDTH) {
@@ -2001,7 +2002,7 @@ static BOOL MedalBoxApp_UpdateSlider(MedalBoxApp *work) {
                     FX_Div(work->sliderX << FX32_SHIFT, FX32_CONST(SLIDER_WIDTH)));
     pos.x = work->sliderX + SLIDER_X;
     pos.y = SLIDER_Y;
-    func_0204c140(work->actors[ACTOR_SLIDER], &pos, 0);
+    ClActor_SetSurfacePos(work->actors[ACTOR_SLIDER], &pos, 0);
     if ((target >> FX32_SHIFT) < work->column) {
         MedalBoxApp_SetScrollDir(work, -1);
     } else if ((target >> FX32_SHIFT) > work->column) {
@@ -2051,8 +2052,8 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
 
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), FALSE);
-        func_0204c488(work->actors[ACTOR_MENU], 1);
-        func_0204c520(work->actors[ACTOR_MENU], TRUE);
+        ClActor_SetSequence(work->actors[ACTOR_MENU], 1);
+        ClActor_SetAutoAnim(work->actors[ACTOR_MENU], TRUE);
         // A change of the view keeps the cursor's column
         if (work->shown[column].count != 0 && work->cursorMode == CURSOR_SHOWN) {
             work->nextColumn = work->shown[column].column;
@@ -2065,7 +2066,7 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
         break;
     }
     case 1:
-        if (!func_0204c560(work->actors[ACTOR_MENU])) {
+        if (!ClActor_IsAnimActive(work->actors[ACTOR_MENU])) {
             work->subSeq++;
         }
         break;
@@ -2128,7 +2129,7 @@ static BOOL MedalBoxApp_SeqMenu(MedalBoxApp *work) {
             break;
         case Title10_Text_Back:
         default:
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 MedalBoxApp_SetCursor(work, work->cursor, TRUE);
             } else {
                 work->prevCursor = work->cursor;
@@ -2204,7 +2205,7 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
     case 0:
         GFL_SndSEPlay(SEQ_SE_MD_04);
         MedalBoxApp_ClearNames(work);
-        func_0204c124(work->actors[ACTOR_FAVORITE], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
         work->subSeq++;
         // fallthrough
     case 1: {
@@ -2221,7 +2222,7 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
             pos.y = 0x60;
             coverDone = TRUE;
         }
-        func_0204c140(work->actors[ACTOR_COVER], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_COVER], &pos, 0);
         if (work->view == VIEW_COLUMNS) {
             backDone = FALSE;
             work->backX += 0x8ccc;
@@ -2246,7 +2247,7 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
         work->column = work->nextColumn;
         MedalBoxApp_DrawColumns(work, FALSE, TRUE);
         MedalBoxApp_ClearNames(work);
-        func_0204c124(work->actors[ACTOR_FAVORITE], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
         work->wait = 0;
         work->subSeq++;
         break;
@@ -2270,7 +2271,7 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
             pos.x = (work->coverX >> FX32_SHIFT) + 0x80;
             pos.y = 0x60;
         }
-        func_0204c140(work->actors[ACTOR_COVER], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_COVER], &pos, 0);
         if (work->view == VIEW_COLUMNS) {
             backDone = FALSE;
             work->backX -= 0x8ccc;
@@ -2286,7 +2287,7 @@ static BOOL MedalBoxApp_SeqChangeView(MedalBoxApp *work) {
         }
         if (coverDone && backDone) {
             MedalBoxApp_DrawColumns(work, TRUE, TRUE);
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 MedalBoxApp_SetCursor(work, work->cursor, TRUE);
             } else {
                 work->prevCursor = work->cursor;
@@ -2364,10 +2365,10 @@ static void MedalBoxApp_SetFavorite(MedalBoxApp *work, u16 medal, int result) {
     work->favoriteResult = result;
     if (result == FAVORITE_SET) {
         work->data.favoriteMedal = medal;
-        func_0202d194(medal);
+        GameBeaconSys_SetFavoriteMedal(medal);
     } else if (result == FAVORITE_REMOVED) {
         work->data.favoriteMedal = 0xff;
-        func_0202d194(0xff);
+        GameBeaconSys_SetFavoriteMedal(0xff);
     }
 }
 
@@ -2377,7 +2378,7 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
     case 0:
         GFL_SndSEPlay(SEQ_SE_MD_04);
         MedalBoxApp_ClearNames(work);
-        func_0204c124(work->actors[ACTOR_FAVORITE], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
         work->subSeq++;
         // fallthrough
     case 1: {
@@ -2394,7 +2395,7 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
             pos.y = 0x60;
             coverDone = TRUE;
         }
-        func_0204c140(work->actors[ACTOR_COVER], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_COVER], &pos, 0);
         if (work->view == VIEW_COLUMNS) {
             backDone = FALSE;
             work->backX += 0x8ccc;
@@ -2414,7 +2415,7 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
         work->column = 0;
         MedalBoxApp_DrawColumns(work, FALSE, TRUE);
         MedalBoxApp_ClearNames(work);
-        func_0204c124(work->actors[ACTOR_FAVORITE], FALSE);
+        ClActor_SetVisible(work->actors[ACTOR_FAVORITE], FALSE);
         work->wait = 0;
         work->subSeq++;
         break;
@@ -2438,7 +2439,7 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
             pos.x = (work->coverX >> FX32_SHIFT) + 0x80;
             pos.y = 0x60;
         }
-        func_0204c140(work->actors[ACTOR_COVER], &pos, 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_COVER], &pos, 0);
         if (work->view == VIEW_COLUMNS) {
             backDone = FALSE;
             work->backX -= 0x8ccc;
@@ -2450,7 +2451,7 @@ static BOOL MedalBoxApp_SeqSort(MedalBoxApp *work) {
             GFL_BGSysMoveBGReq(MedalBoxApp_GetBG(BG_MAIN_TEXT), BG_MOVE_SET_X, work->backX >> FX32_SHIFT);
         }
         if (coverDone && backDone) {
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 MedalBoxApp_SetCursor(work, 0, TRUE);
             } else {
                 work->prevCursor = 0;
@@ -2497,7 +2498,7 @@ static BOOL MedalBoxApp_SeqManual(MedalBoxApp *work) {
         GX_SetVisibleWnd(GX_WNDMASK_OW);
         GFL_BGSysSetBGPriority(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), 2);
         GFL_BGSysSetBGEnabled(MedalBoxApp_GetBG(BG_MAIN_MESSAGE), TRUE);
-        func_0200fb34(work->medalBox);
+        MedalBox_SetManualShown(work->medalBox);
         MedalBoxApp_RestoreCursor(work);
         MedalBoxApp_SetSeq(work, SEQ_MAIN);
         work->subSeq++;
@@ -2513,8 +2514,8 @@ static void MedalBoxApp_ShowMessage(MedalBoxApp *work, StrBuf *str) {
     BmpWin_DrawFrame(work->messageWindow, 1, 1, 12);
     GFL_BitmapFill(BmpWin_GetBitmap(work->messageWindow), 15);
     BmpWin_FlushChar(work->messageWindow);
-    work->stream = func_02022268(work->messageWindow, 0, 0, str, work->font, func_02017bcc(), work->tcbManager, 0,
-                                 work->heapId, 15);
+    work->stream = PrintStream_Create(work->messageWindow, 0, 0, str, work->font, TextSpeed_GetCurrentWait(),
+                                      work->tcbManager, 0, work->heapId, 15);
     BmpWin_FlushChar(work->messageWindow);
     GFL_BGSysQueueScrLoad(MedalBoxApp_GetBG(BG_MAIN_MESSAGE));
 }

@@ -121,7 +121,7 @@ void updateFollowerModel(GameData *gameData) {
         ShutdownFollowWork(gameData);
         return;
     }
-    if (func_ov012_02167520(actor)) {
+    if (IsActorHidden(actor)) {
         FieldActor *player = FindPlayerFieldActor(mmSys);
         GridPos pos;
 

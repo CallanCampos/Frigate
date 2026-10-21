@@ -121,12 +121,12 @@ extern const char data_ov012_0216e208[];
 extern const char data_ov012_0216e1b4[];
 
 ScriptSubwork *InitScriptSubwork(ScriptWork *work, HeapID heapId);
-void func_ov012_021550e4(void *subwork);
+void FreeScriptSubwork(void *subwork);
 FieldScriptEnv *CreateFieldScriptEnv(const FieldScriptEnvArgs *args, HeapID heapId);
 void FreeFieldScriptEnv(FieldScriptEnv *env);
 u32 FieldScriptEnv_IsReducedFeatureLevel(FieldScriptEnv *env);
 u32 FieldScriptEnv_GetFeatureLevel(FieldScriptEnv *env);
-void func_ov012_021552c8(FieldScriptEnv *env);
+void FieldScriptEnv_RemoveAcmdTasks(FieldScriptEnv *env);
 void InitListMenu(FieldScriptEnv *env, u16 x, u16 y, u16 cursor, u16 flags, u32 align, u16 *result, WordSet *wordSet,
                   MsgData *msgData);
 void AddItemToListMenu(FieldScriptEnv *env, u32 messageId, u32 descriptionId, u32 value, StrBuf *expanded,
@@ -135,14 +135,14 @@ void FieldScriptEnv_ShowListMenu(FieldScriptEnv *env);
 void FreeListMenuWork(ScriptListMenu *menu);
 BOOL FieldScriptEnv_UpdateListMenu(FieldScriptEnv *env);
 BOOL FieldScriptEnv_UpdateListMenuEx(FieldScriptEnv *env);
-void func_ov012_02155568(BmpMenuList *list, s32 value, u8 a2);
-void *func_ov012_0215518c(FieldScriptEnv *env);
+void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2);
+void *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
 void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info);
 void *getMapDisplayInfoPtr(FieldScriptEnv *env);
 void SetSpecialMessageIconPtr(FieldScriptEnv *env, void *icon);
-void *func_ov012_021551c0(FieldScriptEnv *env);
+void *GetSpecialMessageIconPtr(FieldScriptEnv *env);
 void *GetFieldScriptActorWk(FieldScriptEnv *env);
 u8 ActorMsgWin_GetPosActual(FieldScriptEnv *env);
 void ActorMsgWin_SetPosActual(FieldScriptEnv *env, u8 pos);
@@ -211,10 +211,10 @@ BOOL s000D_VMStackSub(VM *vm, FieldScriptEnv *env);
 BOOL s000E_VMStackMul(VM *vm, FieldScriptEnv *env);
 BOOL s000F_VMStackDiv(VM *vm, FieldScriptEnv *env);
 BOOL s0010_VMStackPushFlag(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159c80(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159c90(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159cd8(VM *vm, FieldScriptEnv *env);
-BOOL func_ov012_02159d10(VM *vm, FieldScriptEnv *env);
+BOOL s013C_GameCommTryBoot(VM *vm, FieldScriptEnv *env);
+BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env);
+BOOL s013E_GameCommResume(VM *vm, FieldScriptEnv *env);
+BOOL s024A_FieldSubscreenIsEnabled(VM *vm, FieldScriptEnv *env);
 // scrcmd_phrase_select.c and scrcmd_weather.c
 BOOL s01DA_CallPhraseSelect(VM *vm, FieldScriptEnv *env);
 BOOL s0136_FieldSetWeather(VM *vm, FieldScriptEnv *env);
@@ -302,7 +302,7 @@ typedef BOOL (*FieldScriptSubEventFinishFunc)(FinishScriptSubEventsWork *work, u
 
 extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15];
 // scrcmd_network.c: tries to boot the game's communication again
-BOOL func_ov012_02159cf8(FinishScriptSubEventsWork *work, u32 *state);
+BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state);
 // scrcmd_ndemo.c
 BOOL FieldScriptSubEventFinish_NDemo(FinishScriptSubEventsWork *work, u32 *state);
 
@@ -376,8 +376,8 @@ BOOL FieldScriptEnv_CheckAcmdQueueRunning(FieldScriptEnv *env);
 GameSystem *ScriptWork_GetGameSystem(ScriptWork *work);
 StrBuf *ScriptWork_GetMainStrBuf(ScriptWork *work);
 StrBuf *ScriptWork_GetAltStrBuf(ScriptWork *work);
-void func_ov012_02153ed0(ScriptWork *work, void *value);
-void *func_ov012_02153ed4(ScriptWork *work);
+void ScriptWork_SetSignFont(ScriptWork *work, void *value);
+void *ScriptWork_GetSignFont(ScriptWork *work);
 FieldActor *ScriptWork_GetParentActor(ScriptWork *work);
 void ScriptWork_SetParentActor(ScriptWork *work, FieldActor *actor);
 // A pointer that a command can keep its own work in while the script waits
@@ -395,13 +395,5 @@ void AddItemToListMenu(FieldScriptEnv *env, u32 a1, u32 message, u32 value, StrB
 // Overlay 36: show a message, and have the script wait for it
 BOOL func_ov036_021a8eb4(VM *vm, FieldScriptEnv *env, StrBuf *message, u16 actorId, u16 pos, u32 a5);
 BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 a3, u8 a4);
-
-// Script commands of overlay 36's fldeff_iaigiri.c, enceff.c and fldeff_ochiba.c, which are not written yet
-BOOL s01B1_CallLeagueLiftWarp(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c3018(VM *vm, FieldScriptEnv *env);
-BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c315c(VM *vm, FieldScriptEnv *env);
-BOOL func_ov036_021c6220(VM *vm, FieldScriptEnv *env);
-BOOL s02AC_CallLeafPileStuck(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_FIELD_SCRIPT_H

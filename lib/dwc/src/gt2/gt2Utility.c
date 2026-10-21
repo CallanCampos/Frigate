@@ -1,8 +1,7 @@
 #include "dwc/gt2Utility.h"
 #include "dwc/ext.h"
 
-// GameSpy GT2's addresses as text (gt2Utility.c). The functions' names, from pret/pokerevo's Wii build, are in
-// dwc/gt2Utility.h
+// GameSpy GT2's addresses as text (gt2Utility.c)
 
 // gt2AddressToString's two buffers, which it uses in turn; MWCC lays .bss out in the reverse order of the
 // declarations
@@ -31,7 +30,7 @@ const char *func_ov011_0217ed14(u32 ip, u16 port, char *string) {
     return string;
 }
 
-BOOL func_ov011_0217ed7c(const char *string, u32 *ipOut, u16 *portOut) {
+BOOL gt2StringToAddress(const char *string, u32 *ipOut, u16 *portOut) {
     u32 ip = 0;
     u16 port;
     char host[0x104];
@@ -88,7 +87,7 @@ BOOL func_ov011_0217ed7c(const char *string, u32 *ipOut, u16 *portOut) {
     return TRUE;
 }
 
-void func_ov011_0217ee60(const void **message, int *length) {
+void gti2MessageCheck(const void **message, int *length) {
     if (*message == NULL) {
         *message = "";
         *length = 0;

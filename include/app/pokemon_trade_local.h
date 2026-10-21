@@ -43,7 +43,7 @@
 // The trade's own declarations, shared by the files of overlay 194 and the trade demo overlays 192 and 193. The work
 // is one struct that every file uses
 
-// The network commands, from TRADE_NET_CMD_BASE. The library takes a command as a u16, which func_02042be8's
+// The network commands, from TRADE_NET_CMD_BASE. The library takes a command as a u16, which GFL_NetSendCommand's
 // prototype doesn't say, so a computed command is cast
 #define TRADE_NET_CMD_BASE 0xc00
 #define TRADE_NET_CMD_SELECT (TRADE_NET_CMD_BASE + 0)
@@ -392,19 +392,19 @@ struct PokemonTradeWork {
 
 // The machine's own network ID
 static inline int PokemonTrade_GetMyNetId(void) {
-    return func_02042a6c(func_02040440());
+    return GFL_NetGetHandleNetId(NetHandle_GetOwn());
 }
 
 // Sends a command of one byte to the other machine
 static inline BOOL PokemonTrade_SendSelect(u8 command) {
-    return func_02042be8(func_02040440(), TRADE_NET_CMD_SELECT, 1, &command);
+    return GFL_NetSendCommand(NetHandle_GetOwn(), TRADE_NET_CMD_SELECT, 1, &command);
 }
 
 // Whether the screen was touched, switching the controls to the touch screen if so
 static inline BOOL PokemonTrade_GetTouched(void) {
-    BOOL touched = func_0203da48();
+    BOOL touched = GFL_HIDIsTouchPressed();
     if (touched) {
-        func_0203d564(TRUE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     return touched;
 }
@@ -413,7 +413,7 @@ static inline BOOL PokemonTrade_GetTouched(void) {
 static inline u32 PokemonTrade_GetPressedKeys(void) {
     u32 keys = GCTX_HIDGetPressedKeys();
     if (keys) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
     }
     return keys;
 }

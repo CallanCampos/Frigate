@@ -149,12 +149,12 @@ static BOOL MonolithRecord_Main(GameProc *proc, u32 *state, void *param, void *w
     switch (*state) {
     case MONOLITH_RECORD_SEQ_INPUT:
         pressed = GCTX_HIDGetPressedKeys();
-        if (func_0203da0c(sMonolithRecordTouchRects) != TOUCH_RECT_NONE || (pressed & PAD_BUTTON_B)) {
+        if (GFL_HIDGetTouchPressedRect(sMonolithRecordTouchRects) != TOUCH_RECT_NONE || (pressed & PAD_BUTTON_B)) {
             MonolithTool_PressReturnButton(&rw->returnButton);
             if (pressed & PAD_BUTTON_B) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             (*state)++;
@@ -175,7 +175,7 @@ static BOOL MonolithRecord_Exit(GameProc *proc, u32 *state, void *param, void *w
     MonolithScreenParam *screen = param;
     MonolithRecordWork *rw = work;
 
-    if (func_02021c0c(screen->work->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(screen->work->printQueue) == FALSE) {
         return FALSE;
     }
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_BG3);
@@ -249,7 +249,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
     u16 width;
 
     MonolithTool_GetPlayerInfo(screen);
-    records = func_02010dec(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
+    records = FestRecords_GetFromSave(GameData_GetSaveControl(GSYS_GetGameData(screen->param->gsys)));
     MonolithTool_GetLevels(screen);
     str = GFL_StrBufCreate(256, HEAPID_MONOLITH);
     expanded = GFL_StrBufCreate(256, HEAPID_MONOLITH);
@@ -257,7 +257,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
     PrintWindow_PrintNoColor(&rw->prints[0], wk->printQueue, 0, 4, str, wk->font);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 12, str);
     PrintWindow_PrintNoColor(&rw->prints[1], wk->printQueue, 0, 0, str, wk->font);
-    value = func_02010df8(records);
+    value = FestRecords_GetHosted(records);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 17, str);
     WordSetNumber(wk->wordSet, 0, value, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, expanded, str);
@@ -266,7 +266,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
                              wk->font);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 13, str);
     PrintWindow_PrintNoColor(&rw->prints[2], wk->printQueue, 0, 0, str, wk->font);
-    value = func_02010e24(records);
+    value = FestRecords_GetJoined(records);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 18, str);
     WordSetNumber(wk->wordSet, 0, value, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, expanded, str);
@@ -275,7 +275,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
                              wk->font);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 11, str);
     PrintWindow_PrintNoColor(&rw->prints[3], wk->printQueue, 0, 0, str, wk->font);
-    value = func_02010e50(records);
+    value = FestRecords_GetCompleted(records);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 16, str);
     WordSetNumber(wk->wordSet, 0, value, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, expanded, str);
@@ -284,7 +284,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
                              wk->font);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 14, str);
     PrintWindow_PrintNoColor(&rw->prints[4], wk->printQueue, 0, 0, str, wk->font);
-    value = func_02010e78(records);
+    value = FestRecords_GetMostParticipants(records);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 19, str);
     WordSetNumber(wk->wordSet, 0, value, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, expanded, str);
@@ -293,7 +293,7 @@ static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, M
                              wk->font);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 15, str);
     PrintWindow_PrintNoColor(&rw->prints[5], wk->printQueue, 0, 0, str, wk->font);
-    value = func_02010e94(records);
+    value = FestRecords_GetTopScores(records);
     GFL_MsgDataLoadStrbuf(wk->msgMonolith, 20, str);
     WordSetNumber(wk->wordSet, 0, value, 4, 0, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, expanded, str);

@@ -285,7 +285,7 @@ static inline u16 CAMERA_SizeToHeight(CAMERASize size) {
 
 static inline void CAMERA_DmaRecvAsync(u32 ndmaNo, void *dest, u32 unit, u32 length, MINDmaCallback callback,
                                        void *arg) {
-    func_02768378(ndmaNo, dest, unit / 4, length, 0, callback, arg);
+    MIi_CameraNDmaRecv(ndmaNo, dest, unit / 4, length, 0, callback, arg);
 }
 
 #endif // POKEBW2_TWL_CAMERA_H

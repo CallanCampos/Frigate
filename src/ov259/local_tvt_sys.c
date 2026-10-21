@@ -83,7 +83,7 @@ static BOOL LocalTvt_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     sys->chara = LocalTvtChara_Create(&charaSetup, sys->heapId);
     sys->bg = LocalTvtBG_Create(tvtParam->gameData, sys->heapId, sys->param->unk04);
     sys->initMode(sys);
-    func_02042ba8(FALSE, sys->heapId);
+    GFL_NetSetIconScreen(FALSE, sys->heapId);
     return TRUE;
 }
 

@@ -19,13 +19,12 @@ that upstream turns into C reaches Frigate at the next sync.
 
 ## Status
 
-Frigate boots natively through the game's logos, the title screen and the start menu, with sound, and its tests hold it
-frame by frame against melonDS; its sound too: the sound driver run by run, the title's stream and the cry to the bit,
-the music by its envelope and levels. New Game's intro runs to the field's first script, and CONTINUE loads a save,
-which stays interchangeable with melonDS's, up to the field. The field engine (overlay 36) is still being decompiled
-upstream; code that isn't C yet stops the game with its name. Meanwhile a test launcher opens the field menu's apps in
-the field's place, where the bag, the trainer card, the party list and the Pokédex match melonDS pass for pass in both
-versions. The log, newest entry first, is [port/docs/STATUS.md](../port/docs/STATUS.md).
+Frigate boots natively through the logos, opening, title screen and start menu, with sound. Earlier tests compared
+these paths frame by frame with melonDS and checked the sound driver, music and cries. The latest sync includes the
+field engine's C, but field initialization is still blocked by a host memory allocation issue. The overworld is not
+yet playable. The former test launcher now steps aside, so its earlier app comparisons do not establish current
+field or app coverage.
+The log is [port/docs/STATUS.md](../port/docs/STATUS.md).
 
 The decomp's progress, from upstream's CI:
 
@@ -75,6 +74,11 @@ the distribution build, as one universal app for Apple Silicon and Intel Macs, b
 tested on macOS 15 and 26 ([port/README.md](../port/README.md#the-macos-app)). On Windows it builds in MSYS2's CLANG64
 environment ([Building on Windows](../port/README.md#building-on-windows)).
 
+## Contributing to Frigate
+
+Port contributions are welcome: follow [port/CONTRIBUTING.md](../port/CONTRIBUTING.md) to fork, build, test and open a
+pull request to this repository's `main`. Maintainers handle upstream sync and final verification of both ROMs.
+
 ## For decomp contributors
 
 Decompilation and matching happen upstream: decomp claims and contributions go to
@@ -82,8 +86,8 @@ Decompilation and matching happen upstream: decomp claims and contributions go t
 What merges there reaches this repository at the next sync.
 
 Problems with this repository, including building it, go in
-[this repository's issues](https://github.com/CallanCampos/Frigate/issues). Its issue and pull request
-templates are upstream's, written for decomp work; a port issue or pull request ignores their decomp checklists.
+[this repository's issues](https://github.com/CallanCampos/Frigate/issues). Its port issue and pull request
+templates are linked from the contribution guide. The inherited templates remain for decomp context.
 
 ## Legal
 

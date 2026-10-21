@@ -8,6 +8,14 @@ tools that show the differences.
 
 ## Registers
 
+- A constant kept in a register for the whole function that is not ours (the original's `movs r7, #1` with every 0
+  built where it is used, where ours keeps 0 in `r7`) can come from a store that the optimizer drops. `wcm_dsi.c`'s
+  `func_02769e60`, which does at once what `wcm.c`'s reset request and its completion do, matches only with the
+  request's `work->resetPending = 1;` before the completion's `work->resetPending = 0;`: the dead store is removed,
+  but the 1 it used is the constant kept.
+- A static assigned in both arms of an `if`/`else` is stored and then read through a second load of its address
+  (`ldr r0, =s; strb r1, [r0]; ldr r1, =s; ldrb r1, [r1]`), where a ternary assigned to it keeps the address for the
+  read: `wcm_dsi.c`'s `func_0276a9e4` sets `sConnectIndex` from the access point's capability bit so.
 - A handle parameter cast inside, `SOCL_Connect(int s, ...) { SOCLSocket *socket = (SOCLSocket *)s;`, and a `void *`
   parameter cast to a block-scoped typed pointer where it is used (`SOC_RecvFrom`'s `SocAddrIn *addr = from;`) are
   allocated differently from typed parameters: NitroWiFi's `SOCL_Connect` (8 bytes) and `SOC_RecvFrom` (20 bytes)
@@ -56,11 +64,11 @@ tools that show the differences.
   as `btlv_clact.c`'s move and scale task ends do, and `btlv_stage.c`'s vanish flags use `(1 << side) ^ 3`.
   That expression builds the -1 from the shift's 1 (`sub rY, rX, #2`), one register more. Where the original builds
   the -1 on its own (`mov r4, #0; mvn r4, r4` among `mov r3, #1; lsl r3, r2`), the mask was a local set to all ones
-  first: `key_data_savedata.c`'s `func_02010304` and `func_02010354` clear with
+  first: `key_data_savedata.c`'s `KeyDataSave_SetTrainerDefeated` and `KeyDataSave_SetFlag` clear with
   `mask = 0xffffffff; mask ^= 1 << bit; keyData->flags &= mask;`, and set with
   `mask = 1; mask <<= bit; keyData->flags |= mask;`, where `|= 1 << bit` adds a register copy.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
-  `clact.c`'s `func_0204ca1c`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
+  `clact.c`'s `ClAct_IsCellInViewTransformed`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which
   also passes a call's result to a setter through a `u8 pp` local rather than a `(u8)` cast.
 - A blend's clamps written into their own narrow locals, `u8 r = MATH_CLAMP(glowR + dr, 0, 31);`, and through one
@@ -134,9 +142,9 @@ tools that show the differences.
   `report_event.c`'s `EventSave_Update` writes `FieldSubscreen *subscreen = Field_GetSubscreen(work->field);` before
   passing `work->screenId`.
 - Saved registers swapped around an indirect call, with `r0` still holding a value just stored, mean the call passes
-  an argument: `net_state.c`'s `func_020411fc` calls the network's end callback as `callback(NULL)`, so the callback
+  an argument: `net_state.c`'s `NetState_FinishEnd` calls the network's end callback as `callback(NULL)`, so the callback
   type takes a `void *`. Parameters spilled at entry in the wrong order can be narrower than written:
-  `net_command.c`'s `func_02040f84` takes a `u8` and a `u16`, which its caller in overlay 70 narrows.
+  `net_command.c`'s `NetCommand_SendHuge` takes a `u8` and a `u16`, which its caller in overlay 70 narrows.
 - A pointer that follows another (`cr = cb + n`) adds its operands the other way round when written from the base,
   `cr = y + n + n`, which reuses `y + n` and adds the scaled count first: `ssp_jpegenc.c`'s
   `JpegEnc_ConvertYUV422`. A product the original computes by doubling one factor in place (`lsls rW, rW, #1`
@@ -147,7 +155,7 @@ tools that show the differences.
   `int i = 0; u32 params[] = { ... }; for (; i < 5; i++)`.
 - The operands of an add or compare come in another order when one of them is an unnamed temporary: MWCC puts a
   register local first, whatever the source order. Give the other operand an `int` variable of its own.
-  `btl_string.c`'s `func_ov167_021d5440` adds the variant second only as `base = message + stat * 3;` then
+  `btl_string.c`'s `FormatItemStatRise` adds the variant second only as `base = message + stat * 3;` then
   `base + variant` (a `u16` `base` or a cast doesn't do it), and `btl_handler_work.c`'s `PopWork` compares
   `cmp end, pos` only with `start = work - base;` and `end = start + size;` in variables.
 - A leaf function that builds a constant in `r0` and an address in `r1`, where ours swaps them, returns that
@@ -162,10 +170,10 @@ Same instructions, registers swapped.
   swapped.
 - An array index kept scaled (`i * 4` in a callee-saved register) across a call, where ours recomputes it, can come from
   an accessor whose index parameter has another type than the caller's counter. `btl_pokeparam.c`'s
-  `CopyBatonPassParams` and `func_ov167_021bb864` match only with their condition accesses through a static inline
+  `CopyBatonPassParams` and `BattleMon_TickCondition` match only with their condition accesses through a static inline
   `GetConditionPtr(mon, BattleConditionID id)`; the same accessor with a `u32 id`, casts and an enum counter don't.
 - How a store is written can move the parameters' registers too: `*result = *partyResult != 0 ? 3 : 0;` swapped two
-  pointer parameters' registers in `scrcmd_fld_battle.c`'s `func_ov036_021aec28`, where the same store as an
+  pointer parameters' registers in `scrcmd_fld_battle.c`'s `TeamSelect_CheckTeams`, where the same store as an
   `if`/`else` matched.
 - The registers follow the declarations, but the order the constants are set follows the statements: when the
   declaration order that gives the right registers sets them in the wrong order, or derives one constant from the
@@ -214,17 +222,17 @@ Same instructions, registers swapped.
   `PStaInfo_PrintMemo` sets its highest IV with `ldr r7, [sp, #0x14]`, `best`'s slot, which matches only as
   `best = 0;` between two calls well before the loop and `u8 maxIV = best;`; `maxIV = 0` makes it 18 bytes longer.
   The same goes for a zeroed struct a loop passes by value, which MWCC builds once in the loop's preheader by copying
-  a variable in scope that holds 0: `btl_server_flow.c`'s `func_ov167_021a49c4` copies
+  a variable in scope that holds 0: `btl_server_flow.c`'s `ServerControl_DamageMultiHit` copies
   `BtlFlowDamageFlags flags = { 0 };` from the loop counter, as the original does, only with `flags` declared in a
   block around the loop; at function scope it copies `damage`. Stores of 0 just before a loop use the zero of the
-  variable the loop's initializer sets first: `btl_net.c`'s `func_ov167_021b9950` clears `serverCmdReceived` and
+  variable the loop's initializer sets first: `btl_net.c`'s `BtlNet_Init` clears `serverCmdReceived` and
   `unkE` with `i`'s zero, and keeps its own for `count` in `r5`, only as `for (i = 0, count = 0; i < 4; i++)`; with
-  `count = 0;` before `for (i = 0; ...)` the stores take `count`'s. `btl_server_flow.c`'s `func_ov167_021a00a4`
+  `count = 0;` before `for (i = 0; ...)` the stores take `count`'s. `btl_server_flow.c`'s `ActionOrder_Build`
   likewise stores `clientId`'s zero before building `count`'s in `r7` only as
   `for (clientId = 0, count = 0; clientId < 4; clientId++)`.
 - Moving code into a `static inline` helper can swap two registers when the instructions stay the same. In the same
   function, a loop counter and a copy of 0 traded `r1` and `r2` in its two closing loops until the loops and the
-  stores after them became `ClearRecvBuffers()`, the setup counterpart of `func_ov167_021ba26c`, which frees those
+  stores after them became `ClearRecvBuffers()`, the setup counterpart of `FreeRecvBuffers`, which frees those
   buffers in the same order.
 - `arr[count++] = x` and `arr[count] = x; count++;` allocate registers differently, as do `count = 1; arr[0] = x;` and
   the reverse order.
@@ -232,7 +240,7 @@ Same instructions, registers swapped.
   other local, whatever its uses, and falls to the first callee-saved register left; `*++p` and `*--p` don't do it.
   Writing the step as a statement of its own puts the pointer back in the normal order. In MSL's compiler (`dsi/1.2`,
   ARM), `ansi_fp.c`'s `__timesdec` (`result->sig.text[n] = *p; p++;` and `xp++; yp--;`) and `__minus_dec` (`*rtext = *k;
-  rtext++; k++;`) match only so. NitroSystem's 2.0/sp2p2 Thumb build does the same: G3D's `getJntSRTAnmResult_`
+  rtext++; k++;`) match only so. NitroSystem's 2.0/sp2 Thumb build does the same: G3D's `getJntSRTAnmResult_`
   (`nsbca.c`) gets the original's `r4` and `r5` only with all three `result->trans.x = *p++;` written as `= *p; p++;`,
   since one left keeps the cursor last. In `dsi/1.1p1` Thumb a `*p++ = x` in a loop gives the pointer's spill a compiler
   temporary's slot below every named local, where `*p = x; p++;` keeps its declared slot (NitroSDK's `STD_TVSScanf`,
@@ -275,7 +283,7 @@ Same instructions, registers swapped.
   stores the elements from the last to the first, the original's descending order.
 - A pointer local to an element of a struct, like `dst = &shot->pokes[i]`, takes a callee-saved register of its own
   and can push the struct's pointer to the stack along with a constant MWCC keeps for it. The musical's photo
-  (`musical_event.c`'s `func_ov012_02151384`) only matches with `shot->pokes[pos].field` written at each use.
+  (`musical_event.c`'s `MusicalEvent_TakeShot`) only matches with `shot->pokes[pos].field` written at each use.
   The base register tells the two apart: `&call->rows[i]` is `call + 0x40 + i * 0x1c`, used with the field's own
   offset (`[r5, #0x14]`), while `call->rows[i].window` written out is `call + i * 0x1c` with the array's offset
   folded in (`[r5, #0x54]`), as in `ctvt_call.c`'s `CtvtCall_Leave` and `CtvtCall_Main`.
@@ -294,14 +302,18 @@ Same instructions, registers swapped.
   `poke_regulation.c`'s `checkPicked` swaps its last loop's counter and `requiredForm` between `r2` and `r3` with
   either earlier loop's counter, and matches once that loop counts with a `k` of its own, wherever `k` is declared.
 - A pair of values computed twice and spilled to two different slots is two pairs of variables, and the second pair
-  repeats the first's declaration order. `gimmick_passing_vehicles.c`'s `func_ov128_021eeec8` takes the sine and
+  repeats the first's declaration order. `gimmick_passing_vehicles.c`'s `PassingVehicles_PlaceVehicle` takes the sine and
   cosine of 90 and then of 270 degrees: one reused `cos, sin` pair gave the second cosine `r7` and spilled the sine,
   `fx32 cos; fx32 sin; fx32 cos2; fx32 sin2;` matches, and `sin, cos, sin2, cos2` is further off.
 - Variables declared in an inner block are allocated apart from the function's variables of the same name: in
   `ShinkaDemoPieces_Move`, the branch that moves a piece home declares its own `dx` and `dz`, which live on the stack
   while the other branches keep theirs in registers.
+- `s02A1_MedalGetMostCompleteCategory` declares its ranking-loop counter `s32 j;` first in the function, before
+  `fx32 best = 0;`. With `j` in that position, `best` takes `r5` and both loop counters take `r4`; with `j` declared
+  inside the ranking block, those registers exchange. The unsigned medal counter and signed ranking counter remain
+  separate variables.
 - Two values that the original keeps in one register, one dead before the other is set, were one variable: the PC
-  box's `func_ov255_021cdcc8` keeps the party position and then its result in the same variable, where two
+  box's `GetDepositBlock` keeps the party position and then its result in the same variable, where two
   variables get two registers.
 - A value tested before a branch and the value a loop in that branch works out can be one variable even when the
   two end up in two registers, and that split frees a register for a pointer that both branches share. Overlay 30's
@@ -312,7 +324,7 @@ Same instructions, registers swapped.
   declaration order, width and inline helper tried. An explicit `WIH *info = _pWmInfo;` is a plain copy that MWCC
   removes (it is absent from the `-g` DWARF), so it moves nothing.
 - A loop condition written with a local for its row start, `start = pos + j * 6; if (x >= start && x < w + start)`,
-  allocates registers differently from the same sums written in both comparisons: the PC box's `func_ov255_021d229c`
+  allocates registers differently from the same sums written in both comparisons: the PC box's `IsInPickedRange`
   only matched with the sums written out.
 - A parameter that the callers narrow with shifts before the call is a `u16` or `u8`, and the type also decides how it
   is spilled: `BagItemList_GetItem` spills `pocket` first and compares the reloaded copy only once `pocket` and `index`
@@ -330,10 +342,10 @@ Same instructions, registers swapped.
   `list->entries[i].x` in the body, keep the array's base in a register and the element's address in another, as
   `bag_item.c`'s `BagItemList_Remove` and `BagItemList_GetItem` do; indexing in the test too folds the field offsets.
 - A pointer to an array slot can give a loop's variables back the original's registers. `btlv_scu.c`'s
-  `func_ov167_021d2820` stores a call's result to `work->mons[i]`, tests it for `NULL` and passes it on twice; written
+  `BtlvScu_StepPlayerSendOutDoubleAlone` stores a call's result to `work->mons[i]`, tests it for `NULL` and passes it on twice; written
   through `BattleMon **slot = &work->mons[i];`, assigned just before the store, the work, `&balls` and `i` go to `r4`,
   `r5` and `r6` and `i * 4` is reloaded from its slot, as in the original. Indexing at each use swaps `r4` and `r6`,
-  and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `func_ov167_021d2b88`, the same
+  and assigning `slot` at the top of the loop body leaves 16 bytes off. Its sibling `BtlvScu_StepPlayerSendOutTriple`, the same
   loop without the `NULL` test, matches with plain indexing.
 - `ctvt_game_cam.c`'s `CtvtGameCamExchange_Update` matches when each received picture is accessed as
   `exchange->received[slot]`, keeping `exchange` in `r6` and forming its member offset after adding `slot`. An element
@@ -372,7 +384,7 @@ Same instructions, registers swapped.
   written `sample <<= 4; return sample;` does not match.
 - A pointer an inline advances in two statements and returns from its `if`, `const u16 *end = cmd + 3; end +=
   cmd[2]; return end;` with `return cmd;` after the `if`, compiles to the instructions of `return cmd + 3 + cmd[2];`
-  but colors its caller's registers in another order. `printsys.c`'s `func_02022900` copies a command with
+  but colors its caller's registers in another order. `printsys.c`'s `GFL_FontCopyLine` copies a command with
   `end = StrCmd_Skip(str)` and needs that body: with it the string stays in `r5` and `end` takes `r4`, and the
   caller's `end = str` copy lands in the `else` arm, where the inline's test reuses the outer test's flags; with the
   one expression, `str` takes `r4`, and without the return in the `if`, the copy is made before the test. The
@@ -433,7 +445,7 @@ Same instructions, registers swapped.
   `r7` and pushes `floor = 131 - pos` to the stack. There a spilled local's store also follows the declaration
   order: `floor` declared after `u32 y = 12` stores its spill after `y`'s constant is built, as in the original,
   and declared first stores it right after the subtraction.
-- In NitroSystem's 2.0/sp2p2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
+- In NitroSystem's 2.0/sp2 code, a `for` loop's comma-separated increment keeps its last variable in a register for
   the test and stores the earlier ones, and the `for` initializer's order sets the spill slots of the start values:
   `g2d_CharCanvas.c`'s `ClearArea1D` matches with `for (; cy < y1; charY++, cy += 8)` and `for (charX = charX0, cx =
   x0; cx < x1; charX++, cx += 8)`, and `DrawGlyph1D` with `cy++, y -= 8`. There too a load written before a group of
@@ -448,13 +460,22 @@ Same instructions, registers swapped.
   (`mi_dma_gxcommand.c`) restores the FIFO's interrupt condition in the original's order only through
   `G3X_SetFifoIntrCond`, whose parameter is the enum `GXFifoIntrCond`; the same body in place or in an inline taking a
   `u32` is 8 to 27 bytes off.
-- In NitroSystem's 2.0/sp2p2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
+- In NitroSystem's 2.0/sp2 code a pointer sum `a + n - 1` returned from a `static inline` loads `n` first, where
   written in place it loads `a` first (`g2d_Animation.c`'s `SequenceEdgeHandle_` clamps through
   `GetLastFrame_(seq)`). Spilled locals take slots from the top of the frame down: the function's locals, then an
   `if` block's, then its `else` block's, each in declaration order, then an inline's in reverse, so a slot order no
   block layout gives needs the locals at function scope (`NNS_G2dInitMCAnimationInstance`). A second loop that
   reuses the first loop's counter swaps registers with its block's temporary, where a counter of its own declared
   after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
+- For a NitroSystem function that is close, the inlines of the public decompilation github.com/ntrtwl/NitroSystem
+  are worth following whole, in our own names: MWCC shares an expression between two inlines only when both spell it
+  the same. `g2d_OamSoftwareSpriteDraw.c`'s `SetTexParamsAndGetTexCoord_` matched once its 1D texture inline
+  (`SetCharTexture1D_`) computed `(u16)((shape & GX_OAM_ATTR0_SHAPE_MASK) >> 14)` as `NNS_G2dGetOamSizeX` does, so
+  the shape and size indices are computed once and spilled raw, and the `u16` conversions come late in the branch;
+  the flips had to be read through `BOOL` getters (`IsOamFlippedH_`), which as locals or direct reads swap
+  registers. How an inline assigns its locals counts too: `snd_arc_stream.c`'s `DecodeAdpcm`, with its locals
+  declared and then assigned (sample before index) as that decompilation writes it, took `ProcessCommand` from 208
+  differing bytes to 72, before the types below matched it.
 - A loop offset that starts at 0, grows by a step and is zeroed after the loop's hoisted invariants is a counter
   times the step: MWCC strength-reduces `x + step * line` into a running offset that it zeroes in the loop's
   preheader, where an offset kept by hand is zeroed before the hoisted code. NitroSystem's `g2d_TextCanvas.c`
@@ -503,7 +524,7 @@ Same instructions, registers swapped.
   `GFLNetInitData *init = &sNetInit;` local swaps `r4` and `r5`.
 - Constants hoisted into saved registers across a run of `f(g(x, N), FALSE)` calls (`movs r1, #0; movs r4, #0` at the
   first call, `adds r1, r4, #0` at the last ones) come from the inner call's result passing through one local that
-  every statement reassigns: `actor = GetActor(...); func_0204c124(actor, FALSE);`, as the habitat list's
+  every statement reassigns: `actor = GetActor(...); ClActor_SetVisible(actor, FALSE);`, as the habitat list's
   `ZukanHabitat_HideListButtons` has it. Written nested, every constant stays a literal (4 bytes short there);
   constant locals, inline helpers and loops did not reproduce it.
 - A register argument or a loop counter that takes its 0 from another variable's stack slot
@@ -516,7 +537,7 @@ Same instructions, registers swapped.
   `count` is declared or set, its type, and the shape of the inline changed nothing.
 - A store written in each branch of an `if` is the extra use that wins a register for a member-pointer local. The
   battle party list's `BPlistObj_LoadPokeIconRes` has `u32 *res = wk->charRes;` before its loop and writes
-  `res[i] = func_0204b81c(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
+  `res[i] = ClActSys_LoadChars(...)` in both branches, with `wk->pokemon[i]` indexed at each use. With one store after
   the branches the code has the right size but the file handle and `res` are swapped in `r6`/`r7`, through every
   declaration order.
 - A bit field argument extracted completely before the first argument is set up (`ldrh r0; lsls r0, #0x11; lsrs r1,
@@ -557,7 +578,7 @@ Same instructions, registers swapped.
   made non-`const` although it sits in `.rodata`.
 - A copy's size computed by a call and held in a local before the `MI_CpuCopy8` or `MI_CpuFill8` is scheduled
   differently from the call written as the size argument: the musical's `MusComm_SendAllPokes`,
-  `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `func_ov211_021ef3e4` all matched with
+  `MusComm_RecvAllPokes`, `MusComm_RecvAllPlayerData` and `MusComm_SetUp` all matched with
   `u32 size = ...GetSize();` first. In `MusComm_Main`, `requesters[count] = i; count++;` in place of
   `requesters[count++] = i;` and `requests += chosen << 16;` as its own statement before the call were each needed.
 - A struct field that is a pointer to `const` explains several users at once: loop bounds read through it are loaded
@@ -588,12 +609,12 @@ Same instructions, registers swapped.
   the local's own type: the Dream World postman's `func_ov033_02177d78` matched once its callee
   `func_ov033_021780a4` took `u8 kind` in place of `u32`.
 - Whether an argument is loaded with `ldrh` or `ldrsh` follows the callee's parameter type, not the field's: the
-  Funfest's `FesMissionPeople_PlaceActors` matched once `func_ov012_021682d4` took `u16 sidePos`. Consecutive
+  Funfest's `FesMissionPeople_PlaceActors` matched once `ZoneNPC_SetRailPos` took `u16 sidePos`. Consecutive
   halfword fields loaded as `adds r3, r4, #0; adds r3, #8; ldrh [r3, #2]; ldrh [r3, #4]` are read through a pointer
   to the first of them (`const u16 *values = &place->pos.rail.componentId;` then `values[0]`, `values[1]`,
   `values[2]`).
 - Whether a constant shared by two uses is kept in a register or rebuilt can depend on how many temporaries the
-  function has, not on the constant: the resort's `func_ov059_021e6630` keeps its zero in `r5` once three of its
+  function has, not on the constant: the resort's `ResortCmd_PayAndSetShopFlag` keeps its zero in `r5` once three of its
   nested call results are held in locals (`field`, `people`, `person`), and no spelling of the zero itself does it.
   A pool word that differs between the versions by a table row is a table indexed by the version:
   `sUnk7db4[VERSION_BLACK2 - GAME_VERSION][value]` in the same file folds to the table's address in Black 2 and
@@ -613,13 +634,13 @@ Same instructions, registers swapped.
   as an immediate at each use up to that edge, and as a copy of the register (`mov r3, r7`) at every use past it.
   The edge is counted in IR nodes, not instructions, so a respelling that compiles to the same bytes moves it: a
   one-argument call is about 3 nodes, a call without arguments 1, a parameter as an argument 1, a field load 1, a
-  `u16` narrowing 1; casts of constants and dead code are free. The badge gate's `func_ov103_021ef630` (16 bytes
+  `u16` narrowing 1; casts of constants and dead code are free. The badge gate's `BadgeGate_AddLastGateScene` (16 bytes
   off, immediates where the ROM copies) matched when a call's result went through a local
   (`matrix = FieldExpObj_GetActorMatrixPtr(...); matrix->translation = ...;`), which is the same code for that
   statement and three nodes more before the edge. So when the only difference is which uses of a constant are
   immediates and which are register copies, look for a statement before the first copy that the original wrote with
   one more (or one fewer) named step, and measure by padding rather than counting. This also explains "holding three
-  nested call results in locals keeps the zero in a register" (`func_ov059_021e6630`). The Battle Recorder's
+  nested call results in locals keeps the zero in a register" (`ResortCmd_PayAndSetShopFlag`). The Battle Recorder's
   `BrProfile_Init` (4 bytes off: a `1` copied from `r7` where the original has `movs r1, #1` at both uses) showed
   three more things. There the budget counted from the start of the `if (species != 0)` block, not of the function:
   removing statements before the `if` never moved the edge. Pointer and `u8`-to-`u32` conversions were free. And the
@@ -630,7 +651,7 @@ Same instructions, registers swapped.
   show from the starting source flips the immediates there.
   A function with calls and joins after the constant's first use doesn't follow a node count. `ctvt_talk.c`'s
   `CtvtTalk_Enter` sets its `1` in `r7` after the zoom button's `if`/`else`, and the original copies it from the
-  talk button's `func_0204c124` on. There padding before that join never moved the edge, 40 field stores after it
+  talk button's `ClActor_SetVisible` on. There padding before that join never moved the edge, 40 field stores after it
   (about 200 nodes) never produced a copy, and added calls moved the first copy in jumps: a seventh actor creation
   put it one use late, 19 to 23 calls put it at later uses, and 24 to 39 removed every copy. The badge gate's edge,
   in a function without such joins, moves by one padding call as described. Matched code switches in the middle of
@@ -646,7 +667,10 @@ Same instructions, registers swapped.
   against a copy with the same include guard (`--extra-flags "-i DIR -prefix copy.h"`).
 - An array zeroed where it is declared in an inner block (`u8 list[N] = { 0 };` inside the block that fills it) is
   laid out and cleared differently from one declared at the top of the function and cleared by a call or a loop:
-  overlay 12's `func_ov012_0215168c`, `func_ov012_02159f90` and `func_ov012_021522d8` matched that way. A constant
+  overlay 12's `MusicalEvent_RecordShow`, `s0249_GetRandomDistinctSix` and `MusicalProgram_Create` matched that way.
+  Under 2.0/sp2 a clear in place by a down-counting byte loop (`movs r1, #0x22; movs r0, #0; strb r0, [r2];
+  adds r2, #1; subs r1, #1; bne`), where `memset` gives a call, is such an initializer, `char name[0x22] = { 0 };`, which
+  runs again on each pass when the array is declared in a loop's body (`dwcutil_ac.c`'s `UtilAc_FindSetupAp`). A constant
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode).
@@ -660,6 +684,15 @@ Same instructions, registers swapped.
   spellings with one variable leave 26 bytes of registers. The decryption's bytes go through a `static inline` that
   returns the xor and stores the encrypted byte into the state, which splits their live ranges so that the first
   lands in `r7` and the next two in `fp`.
+- Under MWCC 2.0 a loop over an allocation that is freed after it walks the pointer itself when the source does: in
+  `AossAp_Scan` (`dwc_aoss_ap.c`) `Wifi_ConvertBss(descs, &scanList->ap[i]); descs++;`, with the start kept in a
+  second local (`buffer = descs;` before the search) for the free, steps `descs` in its saved register
+  (`adds r4, #0xc0`) and spills `buffer`; indexing `&descs[i]` makes a new induction pointer and keeps `descs` on the
+  stack, 4 bytes over.
+- A parameter reused as a loop counter is allocated apart from a local counter, even when the parameter is otherwise
+  dead: `dwc_aoss.c`'s `Crc32_MakeTable(int i, u32 *table)` with `for (i = 0; ...)` swaps its two counters' registers
+  (`r2`/`r0`) under MWCC 2.0, and matches with the caller's argument as a parameter it doesn't read (`int ready`) and
+  `u32 value; int i; int bit;` declared in that order.
 
 ## Stack slots
 
@@ -681,7 +714,7 @@ Same instructions, registers swapped.
   `int first` local sits above them.
 - Taking a parameter's address makes MWCC push all four argument registers to give it a home; an original that pushes
   fewer copied the parameter to a local first and passed that local's address: `g2d_Font.c`'s
-  `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2p2).
+  `NNSi_G2dFontGetStringWidth` writes `const void *pos = str;` and hands `&pos` to the character splitter (2.0/sp2).
 - Local initializers declared in separate blocks are each copied to the stack just before their call, as the four BG
   setups of `b_plist_main.c`'s `BPlistMain_InitBG`; one block copies them all at the top.
 - Which of several locals of equal use MWCC spills follows where the group is declared among the function's other
@@ -692,13 +725,13 @@ Same code, other `sp` offsets or frame size.
 
 - A pointer to an array element written to a local, `font = &app->fontOam[i]; font->bitmap = ...; font->oam = ...`,
   keeps the array's address in a register and spills the element's offset, where `app->fontOam[i].bitmap` folds the
-  offsets into each access: the PC box's `func_ov255_021d1c30` matched only with the pointer.
+  offsets into each access: the PC box's `CreateFontOams` matched only with the pointer.
 - A padding slot stored twice before a call (`str r4, [sp]; adds r4, #0x80; str r4, [sp]`), with one field then read
   through the pointer's register and another through the reloaded slot, is a pointer local to a field of a field, used
   in two statements: NitroSDK's `OS_GetLowEntropyData` (`os_entropy.c`) declares `const u8 *macAddress = ((const
   NVRAMConfig *)work->nvramUserInfo)->macAddress;`, and MWCC keeps both the pointer and its base. It matched only
   together with the SDK's order of the `^` operands, which alone failed as well.
-- Declaration order does move spill slots in longer functions: `func_ov255_021d0374` matched with its loop counters
+- Declaration order does move spill slots in longer functions: `Box2Obj_PickUpRangeIcons` matched with its loop counters
   declared first and `y` before the row width.
 - Stack locals are laid out in reverse declaration order.
   When values must be read in one order (a script's arguments, say) but the original's slots follow another, declare
@@ -721,7 +754,7 @@ Same code, other `sp` offsets or frame size.
   `(u32)include` into such a slot; `u32 include` keeps the declared slot, and so does a `BOOL`-returning bit-test
   inline. Its `radix`, compared as a `u32` and multiplied into a `u64`, has the same temporary, and no spelling tried
   moved it. `#pragma opt_loop_invariants off` shows the effect, as a diagnostic only. The converted copy takes its
-  register after every declared local too: `pokewood_cutin.c`'s `func_ov167_021d5fe8` compares the `s16`
+  register after every declared local too: `pokewood_cutin.c`'s `PokewoodCutin_HasCutin` compares the `s16`
   `rules->movie` with the table's `u32 movie : 12` bit field, unsigned, and keeps it in `r6`, between the counter in
   `r5` and `play`, only as `u32 movie = rules->movie;` declared between them (`unsigned long` too). Read in the loop,
   or into an `s16`, `int` or `s32` local anywhere, it is the converted copy in `r7`, after `play`, 10 bytes off.
@@ -733,10 +766,15 @@ Same code, other `sp` offsets or frame size.
   of the frame in declaration order, and the function matches with every local at function scope and `trainerId`
   declared after `count`. Give each local the type the loop uses it at, and run `tools/decomp/locals.py` again after
   each type change to see which pair is still swapped. The wider type can be the callee's prototype:
-  `ctvt_game_cam.c`'s `CtvtGameCamExchange_Start` passes its `u8 netId` counter to `func_02042a80` on every pass and
+  `ctvt_game_cam.c`'s `CtvtGameCamExchange_Start` passes its `u8 netId` counter to `GFL_NetIsNegotiated` on every pass and
   keeps it in `r4`, ahead of `slot`, only with that function taking `u8 netId`; with the old `int netId` the counter
   was the converted copy in `r5`, after `slot`. A `u16` or `u32` parameter matched too, but the function's other
   callers pass their `int` counters as `(u8)i`, which a `u8` parameter explains.
+  A narrowing to the callee's type is hoisted out of the loop, and an explicit cast at the call is not the same:
+  `field_msgbg.c`'s `FieldMsgBG_GetWidestOption` passes its `u32 spacing` to `GFL_FontGetBlockWidth` in a loop and
+  matches only with that function taking `u16 spacing`, which narrows the spacing once before the loop into the
+  slot after the widest option's index. With a `u32` parameter and `(u16)spacing` at the call the two slots
+  were swapped (5 bytes), and every order of the declarations kept them so.
 - In NitroSDK's Thumb files built without `-ipa file`, the frame runs from the top down through the back end's
   temporaries, the function-scope locals in declaration order, the block locals in parse order (nested blocks after
   their parent), the loop-invariant temporaries, and the spilled parameters at the bottom, so a block local sits below
@@ -750,7 +788,7 @@ Same code, other `sp` offsets or frame size.
   spilled takes the lowest slot whatever the declarations say. When the original has a case's spilled value among the
   declared variables' slots, that case had a variable of its own, as case 9 of the records command does.
 - A loop counter stored to the slot of a local whose address is passed elsewhere is that local reused: in the PC box's
-  range pick, `func_ov255_021c445c`, the row loop counts with `y`, the touch position's `&y`, so the counter lives in
+  range pick, `Box2Seq_RangeMain`, the row loop counts with `y`, the touch position's `&y`, so the counter lives in
   `y`'s slot and the frame has no slot of its own for it. Pairs such as `width, height` that the original keeps in two
   sets of slots are block locals in two blocks; declaring them once at the top shares the slots and shrinks the frame.
   In `PokeIconMoveDataMake` the slots only matched once each reused variable was made block local and the loops used the
@@ -782,7 +820,7 @@ Same code, other `sp` offsets or frame size.
   others.
 - A common subexpression's spilled temporary takes its slot by where its first use is written. A local holding it
   doesn't count, since MWCC propagates `end = offset + size;` into its uses whatever its type or declaration.
-  `backup_system.c`'s `func_0203b170` puts `offset + size` at the top of its spilled values (`sp+0x20`) only with
+  `backup_system.c`'s `SaveData_LoadWithBackup` puts `offset + size` at the top of its spilled values (`sp+0x20`) only with
   `dataFooter = (BlockFooter *)(data + end);` written first of its three footer pointers, before a call and a `break`
   test; written after them, the value took the lowest slot (`sp+4`). Every named slot then moved down by 4, and `data`
   declared after the loop counter took the freed lowest one.
@@ -832,10 +870,17 @@ Same code, other `sp` offsets or frame size.
   `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
   is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
   argument's common subexpressions after the call, where the nested call computes them before it.
+- `RailUnit_MoveOnLine` allocates its cached line and length differently when its four directional inlines read
+  them from `unit` at entry instead of receiving caller snapshots as parameters. Both versions then consume the
+  original's total 0x80 stack bytes: six pushed words plus 0x68, against five plus 0x6c in the ROM. The forward
+  path keeps length in `r7`; the other three still spill it. The call-labelled aligned difference falls from
+  608 to 348 rows, but the function grows from 0x890 to 0x894 against 0x888, so it remains partial. This is evidence
+  for allocation changing with snapshot ownership, not proof of original inline boundaries. Moving the reads
+  crosses only scalar direction helpers; every snapshot still precedes calls that can change the unit.
 - A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
   saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
   a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay
-  123's `func_ov123_021eed54` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
+  123's `GrimsleyRoom_Init` matches with its group loop in `GrimsleyRoom_InitGroupModels(work, 0)`, which counts
   with its own `u8 index` parameter (`for (; index < GROUP_MODEL_COUNT; index++)`): the earlier loop then loads its
   zeros from that slot and keeps the 1 for `SetPaused` in `r7`, as the original does. A local counter set from a
   parameter (`i = first`) doesn't.
@@ -877,31 +922,31 @@ Same code, other `sp` offsets or frame size.
 - A narrow local passed to several calls becomes a compiler temporary, slotted by its first use after the named
   locals, only when every parameter that receives it has the same type; otherwise it keeps its declared slot.
   Overlay 102's `RollerCoaster_Task` passes `u8 anm = path + 1` to two calls, and its slot matches only with
-  `func_ov036_021b8520` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
+  `FieldExpObj_GetAnmFrame` taking `u16 anm`, like the other callee, where its old prototype took a `u32`; a `(u16)`
   cast at the call does not do it. When such a local's slot is off, check the callees' prototypes first.
 - A spilled local's width for the rule below can come from its callee's return: `wbt_list.c`'s
   `WbtList_PrintMessage` stores its first name call's last stack argument before the name's address, as the
   original does, only with `s16 first` set from `WbtList_GetMatchValue` returning `s16` (and its `value` local
   `s16`). An `s16` local from an `s32` return, or any other pairing, swaps the two. The callee's other callers
   bound the width: `WbtList_UpdateMessage`'s `u16 message = WbtList_GetMatchValue(...)` keeps its narrowing
-  only with a signed or wider return. `btl_main.c`'s `func_ov167_0219b610` reloads its spilled bag mode, from
+  only with a signed or wider return. `btl_main.c`'s `BtlMain_CommCreateDouble` reloads its spilled bag mode, from
   `func_ov167_0219a004` and passed on to four calls, after the calls' stack argument stores and after the store of
   the new client to `mainModule->clients[clientId]`, only with the callee returning `u8` into a `u8` local, the type
   of the `bagMode` field it ends in. A `u8` local from a `BOOL` return adds a narrowing after the call, and a `u8`
   return into a `u32` local changes nothing. The same goes for a returned flag: `btl_server_flow.c`'s
-  `func_ov167_0219f588` sets `result = FALSE;` between the command queue's two zero stores, and as a `u8` MWCC
+  `BtlServerFlow_StartBattle` sets `result = FALSE;` between the command queue's two zero stores, and as a `u8` MWCC
   loads that zero back from the flag's slot for the second store, where the original stores one register three
-  times. It matches as a `BOOL` local returned as `BOOL`, and its caller `func_ov167_0219e608` then matches only
-  with `func_ov167_0219f000`, which it passes the result to, taking a `BOOL` too, since a `u8` parameter there
+  times. It matches as a `BOOL` local returned as `BOOL`, and its caller `BattleServer_ProcStart` then matches only
+  with `BattleServer_SendRecStartChunk`, which it passes the result to, taking a `BOOL` too, since a `u8` parameter there
   narrows the argument. The local whose width matters need not be the one whose store moves: `ctvt_call.c`'s
   `CtvtCall_Scan` stores its spilled `found = TRUE` after the `stale = FALSE` field store, where the original does,
-  only with `u8 service = func_ov030_02173b78(i);`, the callee's return type and that of the `gameServiceId` field it
+  only with `u8 service = NetWhpipe_GetBeaconService(i);`, the callee's return type and that of the `gameServiceId` field it
   is compared with. As a `u32`, the flag's store follows its `movs r0, #1` at once, and no width of `found` itself
   moves it. When a flag's store is misplaced, sweep the block's other spilled locals against their callees' returns.
 - The types of locals and of the values they hold change how spilled values are scheduled. The trainer AI's speed
   comparison only matches with the speed function returning `u16` into `u16` locals: a spilled `u16` is reloaded after
   the call's stack argument is stored, while a spilled `u32` is reloaded before it.
-  Spilled parameters follow the same rule at both ends of the call: `wm_icon.c`'s `func_0203e76c` reloads its
+  Spilled parameters follow the same rule at both ends of the call: `wm_icon.c`'s `WmIcon_Create` reloads its
   `u32 x` and `y`, passed on as `u32`, ahead of the stack argument stores, and its `HeapID heapId`, passed to a
   `u32 heapId`, after them. Widening the callee alone, or narrowing `heapId` alone, did not match: sweep the caller's
   and the callee's widths together.
@@ -910,18 +955,18 @@ Same code, other `sp` offsets or frame size.
   year, only with `u32 year = (poke->date >> 16) & 0xffff`, written like its month and day; a `u16 year` stores
   it first.
   A spilled loop bound is the same: `AddExpAndEVs` in `btl_server_flow_sub.c` stores the spilled counter before
-  loading its bound, the number of mons, only with the bound a `u16`. And `func_ov167_021afd90` matched only with
+  loading its bound, the number of mons, only with the bound a `u16`. And `BagItemRestoreAllPP` matched only with
   `numMoves` a `u32` and its locals in one order of 720; no order matched with it a `u8` or `u16`, so sweep the orders
   again after widening a local.
   The spills stay word-sized `str` and `ldr` whatever the type, so the asm doesn't show it. A reload placed above
   another spill's store, where the original stores first, can mean narrow locals: in `scrcmd_musical.c`'s
-  `func_ov012_02158280`, `secondValue = most; second = topIndex;` stores before it reloads only with `topIndex` and
+  `s0165_MusicalGetInfo`, `secondValue = most; second = topIndex;` stores before it reloads only with `topIndex` and
   `secondValue` both `u8` (or `u16`), so sweep the widths of several locals together: narrowing one at a time, or
   all the candidates at once, misses it. A local read from a field can need the field's type even with the same
   instructions and slots: `u8 gender = poke->gender;` in `Mystery_CreateGiftPokemon` moves the species reload and
   the `poke->form` load among `PML_GenPID`'s stack argument stores, which matched `mystery_gift_pokemon.c`'s
-  `func_ov012_02153160`. A spilled flag's constant store moves the same way: `btl_server_flow.c`'s
-  `func_ov167_021a1940` fills the delay slot after its `action->bits.target` load with the copy
+  `CreateMysteryGiftPokemon`. A spilled flag's constant store moves the same way: `btl_server_flow.c`'s
+  `ServerControl_Fight` fills the delay slot after its `action->bits.target` load with the copy
   `actualMove = move` (`adds r7, r6, #0`), as the original does, only with `u8 usedMove`, like its other flags;
   with `BOOL usedMove` the flag's `FALSE` store (`str r1, [sp, #0x28]`) takes the slot and the copy sinks to just
   before the next call.
@@ -962,7 +1007,7 @@ Same code, other `sp` offsets or frame size.
 - A frame slot that no instruction touches, in a small function with no struct local, can be a struct an inline
   returned by value: MWCC reserves the return value's slot for each inlined call even when the value lives in a
   register. The DWC utility's menu and keyboard (overlay 182) have 8-byte frames that are never written in their key
-  position updates, `func_ov182_021acff0` and its neighbours; they match only when `attr01` is read through
+  position updates, `DWCUtilMenu_SlideInRow0Task` and its neighbours; they match only when `attr01` is read through
   `static inline DWCUtilOamAttr01 ReadAttr01(const GXOamAttr *oam)`,
   which returns a one-word struct, as in `(u8)ReadAttr01(sMenu->keyOams[0]).attr01 - 12`. Reading `oam->attr01`
   directly leaves no slot.
@@ -1046,6 +1091,11 @@ Same code, other `sp` offsets or frame size.
   function has the right instructions with the wrong slots or a hoisted constant. Related: a product shifted at each
   use (`target >> FX32_SHIFT` five times in `MedalBoxApp_UpdateSlider`) is computed once by CSE as a temporary the
   variable cannot absorb, where `target >>= FX32_SHIFT` once changes the registers.
+  The merge also needs each call where the original has it: the DWC utility's `DWCUtilMenu_HandleTouchHold` and
+  `DWCUtilKeyboard_HandleTouchHold` move the held key into `r0` on each path to one shared call only with the held
+  key's `SetPressedKey(i); goto clear;` inside the button loop, where the key loop's `goto held` joins it, and the
+  release's own `SetPressedKey(-1)` after the loops; one call fed by `i`, or by a `key` set on each path, keeps the key
+  in the loop counter's register and copies it at the call.
 - A spilled value that sits below temporaries assigned after it has the narrow type of the field it is read from:
   Pokéstar Studios' `EventPokewood_CreateCastParty` matched once `s32 count` became `s16 count`, the type of
   `PokewoodCastFile.count[]`. MWCC still spills it as a word, but gives it the lowest slot. Try the field's own type
@@ -1059,6 +1109,12 @@ Same code, other `sp` offsets or frame size.
   [sp, #0xc]` for a `-1` and the counter started from a reload of it), was a `u8` local in DS Protect's
   `DSProt_DecryptCodeMulti`: its `u8 sum` gives the original's `push {r3}` frame of 0x10 and its 4 missing bytes,
   where a `u32 sum` lived in a register.
+- Using `u8` for `effect_encount.c`'s `positionShakingSpot` source-availability mask in the parameter and
+  `UpdatePhenomenon`'s local gives its original frame anchor. Its only flags are 1 and 2, and it intersects the mask
+  with a byte table. With `u32`, MWCC holds the position's zero y in `r6` across the candidate clear and rebuilds
+  the frame address for three bounds reads. The byte mask gives
+  the original's shared `r6 = sp + 0x10` anchor and 360-byte function; the caller stays unchanged. The spilled mask
+  is still stored and reloaded as a word, so those instructions alone do not establish its source width.
 
 ## Instruction order
 
@@ -1091,7 +1147,7 @@ Same code, other `sp` offsets or frame size.
 - An `|` chain is combined in the order written, so the order of the original's `orr`s gives the order of the
   terms: `btl_server_flow.c`'s `ActionOrder_MakeKey` packs the action order's key from its highest field down,
   `((unk22 & 7) << 22) | ((unk16 & 0x3f) << 16) | ((unk13 & 7) << 13) | (speed & 0x1fff)`, which both its callers,
-  `func_ov167_0219fb3c` and `func_ov167_021a00a4`, need; written from the speed up, they combine the low fields
+  `ActionOrder_RecalcAndSort` and `ActionOrder_Build`, need; written from the speed up, they combine the low fields
   first.
 - Stores through a walking pointer written `*p-- = a; *p-- = b;` compile at the same size as `p[0] = a; p[-1] = b;
   p -= 2;` but allocate and schedule differently: DWC's `EncodeWindows` (`crypt.c`) only gets the original's
@@ -1109,7 +1165,7 @@ Same code, other `sp` offsets or frame size.
   it out again means its comparison was another expression. `snd_arc_loader.c`'s `LoadWaveArcTable` reads
   `sizeof(SNDWaveArc) + tableSize` bytes and matches only comparing `result != (int)sizeof(SNDWaveArc) + tableSize`,
   signed where the argument is unsigned; without the cast it is 4 bytes longer.
-- On `2.0/sp2p2`, an add written through a small inline with parameters keeps their order where the same expression
+- On `2.0/sp2`, an add written through a small inline with parameters keeps their order where the same expression
   written out is swapped: `snd_stream.c`'s `StrmCallback` gets `adds r1, r1, r2` only with
   `AddU32ToPtr(buffer, offset)`, `(void *)((u32)ptr + val)`, while the cast-add written in place gives the right
   registers but `adds r1, r2, r1`, and `(u8 *)buffer + offset` other registers.
@@ -1127,7 +1183,7 @@ Same code, other `sp` offsets or frame size.
 - The stores of a struct-filling function can come out in the reverse of the source's order: `tcb.c`'s
   `GFL_TCBMgrCreate` stores its computed pointers last only when the source sets them first. Sweep the orders.
 - A pointer field read twice through a struct is reloaded after a store between; a block-local copy is read once
-  before the first field read: `btl_main.c`'s `func_ov167_0219ada0` writes
+  before the first field read: `btl_main.c`'s `BtlMain_CommExchangeSyncData` writes
   `BtlSetup *setup = mainModule->setup;` before its two stores.
 - The order of unrelated statements in a branch decides when a value is loaded: `br_sidebar.c`'s
   `BrSidebarWork_Move_Close` loads the scale step before storing the count only with `cnt++` after
@@ -1141,7 +1197,7 @@ Same code, other `sp` offsets or frame size.
   the result in a local and the stores in field order: `key_system_util.c`'s `KeySystemAccelMove_Init` stores
   `speed` and then `accel = FX_Div(...)`.
 - A counter zeroed at its declaration before a local array with an initializer is zeroed before the array's address
-  is set up; `for (i = 0; ...)` after the array zeroes it after: `event_ircbattle.c`'s `func_ov012_02150588`.
+  is set up; `for (i = 0; ...)` after the array zeroes it after: `event_ircbattle.c`'s `EventIRC_SetBattlePlayers`.
 - A constant stored to a field that the original builds one store earlier is stored first in the source: MWCC
   keeps the stores in their order but builds the constant sooner. `ctvt_draw.c`'s `CtvtDraw_Main` writes
   `draw->exit = TRUE; draw->state = DRAW_STATE_FADE_OUT;`.
@@ -1159,14 +1215,14 @@ Same code, other `sp` offsets or frame size.
   `GFL_TextRendererDrawToBitmapEx` match, as a diagnostic, passing `TextRenderer *renderer = &g_TextRenderer;` with the
   global aligned, and `#pragma opt_propagation off` gives them the same code. Under `-ipa file` the pointer also reads a
   pooled static through a literal of its own instead of the section's base (`os_thread.c`'s `OS_IsThreadAvailable`, as a
-  diagnostic). Both rows say why neither is kept. In NitroSystem's 2.0/sp2p2 code a store to a member of a file static
+  diagnostic). Both rows say why neither is kept. In NitroSystem's 2.0/sp2 code a store to a member of a file static
   goes through the section's anchor (`ldr r0, =.data+0x80; str r1, [r0, #0x20]`). A literal of the member's own address,
   stored at 0, 4 and 8, as G3D's billboard functions in `sbc.c` have, is a pointer local to the member,
   `VecFx32 *trans = &sBBCmd.trans;`; a pointer to the whole object is folded back into anchored stores, and
   `T *const p = &obj` keeps the pointer but loads it at the declaration.
 - MWCC keeps a load and a store through pointers that may alias in source order. A field the original loads before
   a store is read into a local in a statement before it: `g3d_system.c`'s `GFL_G3DAnmCreate` reads
-  `resource->data` before storing `resource` in the animation, and `event_field_proclink.c`'s `func_ov012_0215bb70`
+  `resource->data` before storing `resource` in the animation, and `event_field_proclink.c`'s `FieldAppCall_CreatePStatusParam`
   loads the party and the trainer data into locals before storing either, where reading a stored field back for a
   call gives load, store, load, store. libfx's `MTX_Concat33`, `MTX_Concat43` and `MTX_Concat44` load a column of `b`
   once for two neighbouring products of the result only with the column in locals: every store into the result
@@ -1188,11 +1244,19 @@ Same code, other `sp` offsets or frame size.
   original's `BtlvMcss_MoveTaskEnd_Circle` and `_Shake` load `work` first while eight siblings of the same C load
   `pos` first; each of these spellings matches them but is only a second path to the field. What matches them is
   an alignment on their task structs' `work` member (Loops: "Where a member's alignment is written").
+- A bit tested in an `if`'s condition and set in its body, `if (ready & 1 << i) { mask |= 1 << i; }`, is a common
+  subexpression built ahead of the condition's load (`movs r0, #1` first, the load's address in `r1`). The original
+  loads first (`ldr r0, [sp]; ldrb r1, [r4, r0]; movs r0, #1; lsls r0, r5`) when the two shifts differ in
+  signedness, and still reuses the test's register for the body: `comm_entry_menu.c`'s `CommEntryMenu_UpdateLeader`
+  sets `mask |= 1U << i`. A test of another mask before a call in the same loop keeps its own `1 << i` when it is a
+  `static inline` with a `u32` parameter (`CommEntryMenu_IsChecked`); written in the loop, MWCC keeps one shift across
+  the call for both tests and spills the mask instead.
 - A loaded field is reused into an `if`'s body but not past the join after it: a field loaded before an `if`, even
   one whose arms store nothing to memory, is loaded again after it, with the static's literal, where a straight run
   of stores to the struct's other members keeps the first load. A value the original never reloads after a branchy
-  statement was a variable: libVCT's `SuppressEcho` (`vct_dsp.c`) spills its one load of `sEcho.readIndex` and
-  reloads the copy after its index clamp, where the field read at both uses is loaded again.
+  statement was a variable or an inline: libVCT's `SuppressEcho` (`vct_dsp.c`) spills its one load of the read index
+  and reloads the copy after its index clamp. Written as a per-sample `static inline` that steps two scalar statics
+  (`sCounterIn`, `sCounterOut`), it does the same, where the field of a struct read at both uses is loaded again.
 - A constant assigned to a spilled local is stored where MWCC likes, but the register that builds it follows where
   the source assigns it: `ctvt_game.c`'s `CtvtGamePlayer_Create` builds `isSelf`'s `TRUE` in `r2`, as the original
   does, only assigned right after the allocation, not at its declaration.
@@ -1236,7 +1300,7 @@ Same instructions, scheduled in another order.
   16)`, as the DSP's `dsp_audio.c` and `dsp_pipe.c` swap the halves of a word.
 - Loads through a pointer are not moved above stores unless the pointee is `const`. A load that the original
   schedules early, such as an argument loaded before the stack arguments are stored, points to a `const` parameter.
-  A narrow parameter's spill to its stack slot at entry counts as a store: `btl_main.c`'s `func_ov167_0219d188`
+  A narrow parameter's spill to its stack slot at entry counts as a store: `btl_main.c`'s `PokeCon_GetPosMonInner`
   loads `pokeCon->mainModule` first and stores its `u8 pos` to `[sp]` just before its first call only with `const
   BtlPokeCon *pokeCon`, like the file's `GetPokeParamConst`. Ours stored `pos` at entry, and its width and the
   callee's did not move it.
@@ -1246,13 +1310,13 @@ Same instructions, scheduled in another order.
   It has to be the parameter: `fld_scenearea_loader.c`'s camera-area callbacks scheduled their area's loads only
   once the callback typedefs took `const CameraArea *`, and a `const` local pointer to the member did nothing. The
   same change fixed the register allocation of the loop in `fld_scenearea.c` that calls them. A `void *` parameter
-  copied to a typed local needs the `const` on the `void *` itself: `event_field_proclink.c`'s `func_ov012_0215c160`
+  copied to a typed local needs the `const` on the `void *` itself: `event_field_proclink.c`'s `FieldAppCall_CreateMailParam`
   and `script_evo` matched once `FieldProcLink`'s `createParam` and every callback in its table took
   `const void *prevParam`, while `const PokeListParam *partyParam = prevParam;` alone did nothing. Through a wrapper
-  whose whole body is a `static inline`, only the wrapper's own parameter counts: `func_ov012_02153160` matched with
+  whose whole body is a `static inline`, only the wrapper's own parameter counts: `CreateMysteryGiftPokemon` matched with
   `const MysteryGift *gift`, though `Mystery_CreateGiftPokemon`, which it returns, already took one. Since `const`
   shows in the code, check it along a caller's chain before deciding that a caller and its callee disagree:
-  `btl_server_flow.c`'s `func_ov167_021a6c34` and `func_ov167_021a6914`, which it passes its param to, both match
+  `btl_server_flow.c`'s `ServerControl_StatChangeAndCondition` and `ServerControl_ApplyMoveStatChanges`, which it passes its param to, both match
   only with a `const` param, and `battle_rec_tool.c`'s party loaders took a non-`const` record with no change. A
   NitroSDK function that takes a pointer to a parameter struct may have lost the SDK's `const` in our header:
   `WM_StartScanEx` (`wm_standard.c`) loads `param->channelList` above its command's first store only with
@@ -1395,6 +1459,11 @@ Same instructions, scheduled in another order.
   list's count again in every iteration because its filter is `const`, where a plain pointer's count is loaded once
   before the loop. Overlay 169's `BtlMonSet_GetTotalDamage` and `BtlMonSet_GetHpDamage` match the same way with
   `const BtlMonSet *set`, and `PokeSelect_Init` loads `cmd->count` above its store of 0 only with `cmd` `const`.
+  The pointer can be a parameter or a local: `field_rail.c`'s line searches `func_ov036_021b21b0` and
+  `RailDisabledLines_ContainsLine` match with `const RailDataHandle *data`, and `fldmmdl_blact.c`'s
+  `FieldBlAct_IsAsyncLoadPending` with `const AsyncLoader *loader = blact->loader;` (its own field read through a
+  plain pointer). In `SetWkToActorRailPos` neither a `const` local nor a `const` parameter of a `static inline`
+  helper stops the hoist, so the count there is held some other way.
 - A field load scheduled ahead of a store it doesn't depend on, where MWCC keeps the written order, can come from an
   inline helper's argument: arguments are evaluated before the body's stores. The PC box's sequences set the picked
   position with `u8 pos = func_0202ba60(...); Box2Seq_SetGetPos(syswk, pos, syswk->tray);`, which loads `tray` before
@@ -1471,7 +1540,7 @@ Same instructions, scheduled in another order.
   of `->` or `*` weighs 2 and a plain use, an argument or a copy, weighs 1; a dereference through a cast weighs 1,
   and so does passing it to a `static inline` that takes a `const T *`. A lighter pointer is reloaded from its stack
   slot at each use, with nearby uses sharing a load. `fld_btl_inst_tool.c`'s
-  `func_ov012_02162068` reloads its `trainer` (`ldr r2, [sp, #0x3c]`) as the original does once its dereferences go
+  `SetupInfinityDungeonBattle` reloads its `trainer` (`ldr r2, [sp, #0x3c]`) as the original does once its dereferences go
   through `SetTrialHouseTrainer`, an inline taking `const BSubwayTrainer *trainer`; with a non-`const` parameter the
   inline is transparent and `trainer` keeps its register.
 - A `u16` stack parameter reloaded with `ldrh` at some uses, with one `ldrh` into a register that feeds others, has
@@ -1493,6 +1562,10 @@ Same instructions, scheduled in another order.
   inline's entry and spills it, was a local of the caller: `mystery.c`'s `MysteryEffect_Init` sets
   `tailHeapId = HEAPID_TAIL(heapId);` before calling the inlined gift-Pokémon routine, which reaches the original's size,
   where `HEAPID_TAIL(heapId)` written as the argument is 4 bytes short.
+- In `fld3d_ci.c`'s `EventFieldEffectCutinSub_DrawStrToTexture`, `HEAPID_TAIL(heapId)` passed directly to each
+  allocation matches both ROMs. Saving the macro's result in a `u32` adds narrowings (0x194 against 0x190); a
+  `HeapID` local instead shares the narrowed value and is four bytes short. The macro at each call preserves the
+  allocation's heap semantics without a temporary.
 - Reads of a `const` table are not moved across stores to I/O registers, so a table read the original does before the
   stores of a NitroSDK register inline was written before it: `mystery_album.c`'s `MysteryCardView_SeqThrowAway`
   reads a card position's x and y into `int` locals before `G2_SetWnd0InsidePlane`.
@@ -1551,7 +1624,7 @@ Same instructions, scheduled in another order.
   so the shape survives only where the address keeps a second use. That is a read-modify-write (`f[i].b += v`, or
   `list->table[i].f--` through a loaded base, as in `bgwinfrm.c`'s `BGWinFrame_MoveStep` and `heapsys.c`'s
   `GFL_HeapAllocateCore`), two stores to one element, a read and a copy into the element (`pokewood_savedata.c`'s
-  `func_02011130` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
+  `PokewoodSave_UpdateRecord` reads `save->records[movie].score` and then copies a record into `save->records[movie]`, both from
   one `save + 0x28`, and tests `hasRecord` and sets it from one `save + 0x38`, while `isNewRecord`, set once, indexes
   first), or a store in the other arm of the `if` whose condition reads
   it: overlay 143's `MonolithPower_Equip` reads the array member `screen->state->equipped[slot]` in its condition and
@@ -1579,6 +1652,9 @@ Same instructions, scheduled in another order.
   into a new register. The union room's `UnionMsg_UpdateRuleMenu` reads
   `sMenuInfo[ruleSel[3]].rows[UnionMsg_GetMenuInfo(ruleSel[3])->count - 1]`, with `UnionMsg_GetMenuInfo(int kind)`
   returning `&sMenuInfo[kind]`; the getter with a `u8` index is 14 bytes off and with `s8` folds again.
+  DWC's `Gdb_Cancel` (`gdb.c`) is the same with a global index: its ghttp case reads `u.delete.table` at offset 4 of
+  the current request, which folds into `sGdbRequests+4` written plainly, and matches only through
+  `Gdb_GetCurrentRequest()` returning `&sGdbRequests[sGdb.requestIndex]`.
 - A constant stored ahead of a call that passes the same constant can be an assignment written after the call: MWCC
   shares the constant and stores it where it is first made. `BScenarioMain_PrintCast` sets `sexMsg = CAST_MSG_MALE`
   after the species' print, and declares `u32 color` before `int sex`, which decides which of the block's locals gets
@@ -1635,9 +1711,19 @@ Same instructions, scheduled in another order.
   `GX_PACK_DIFFAMB_PARAM(getColorData_(...), getColorData_(...), result->prmMatColor0 & 0x8000)` in one expression
   MWCC tests the kept bit before the calls and spills it (12 bytes larger). It matches with two calls into locals, the
   store of the first word, and then the other two calls.
+- An SDK inline written from memory can match every user that doesn't care about its order of terms and still be
+  wrong. `nitro/gx.h`'s `G2_SetOBJPosition` ORed x before y, and only `DWCUtilKeyboard_MoveRow` (`dwc_util_keyboard.c`)
+  showed it; NitroSDK's `g2_oam.h` masks both fields at once and ORs y first, which matches every user. Check such an
+  inline against the SDK's own definition before writing a local copy with its terms swapped.
 
 ## An instruction too many or too few
 
+- A constant that a local holds and changes in steps stays live in a register, and MWCC builds other constants that
+  don't fit an immediate from it: DS Protect's card read (`dsprot_detect.c`'s `DSProt_ReadCardRaw`) builds its header
+  address as `header = 5; header += twl & 1; header <<= 18; header -= 13; header <<= 5;`, and then makes the mask
+  0x1ff as `mov r0, #5; rsb r0, r0, #0x204`, as the original does. Written as one expression it leaves no 5 behind,
+  and the mask is `rsb` from a 1. DS Protect builds its constants at run time on purpose, as pret's pokeheartgold has
+  an older version's card read do.
 - A difference with a 64-bit constant, `wait > CPS_ACK_DELAY - waited` where `CPS_ACK_DELAY` is a `u64` tick count,
   compares in 64 bits, and `wait = (u32)CPS_ACK_DELAY - waited` then computes the difference again in 32 bits rather
   than reusing it, as NitroWiFi's `CPSi_SendDelayedAcks` does (13 bytes otherwise).
@@ -1683,12 +1769,12 @@ Same instructions, scheduled in another order.
   (`mb_wm.c`) needed.
 - A member's address kept in a callee-saved register from an early store to a later call's argument, where ours
   recomputes it: `btlv_mcss.c`'s `BtlvMcss_Transform` needed a pointer local declared at the top but assigned just
-  before the call, `MCSSLoadInfo *dst; ... dst = &work->entries[index].info; func_02019bd8(..., dst);`. Initializing
+  before the call, `MCSSLoadInfo *dst; ... dst = &work->entries[index].info; MCSS_Reload(..., dst);`. Initializing
   `dst` at its declaration gives the base in the right register but adds a `mov ip, r0` spill, and passing the
   expression straight to the call drops the CSE entirely.
 - A trailing `mov r1, #0` after a 32-bit result is a function returning `u64`: DWC's `DivWords` (`crypt.c`) returns
   `(u32)(...)` from a `u64` function.
-- On NitroSystem's `2.0/sp2p2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
+- On NitroSystem's `2.0/sp2`, an address passed straight to a static inline that reads `p[k]` folds `k` into the
   load's offset from the shared base, where the same address in a named local, or the element written `a[n + k]`,
   is computed again. `snd_arc_loader.c`'s `LoadSingleWave` reads a wave's file offset and the next one's as
   `ldr [r1, #0x3c]` and `ldr [r1, #0x40]` off one `waveArc + n * 4` only with
@@ -1703,7 +1789,7 @@ Same instructions, scheduled in another order.
   for each code, and `EncodeAdpcm2` and `EncodeAdpcm4` reach the original's size with the same change. A `u8 code`
   returned as `u8` has nothing to narrow, and each function comes out short by those `and`s.
 - `&p[i].field` computes `p + i * size + offset`, and `&p->array[i].field` computes `(p + offset) + i * size` with
-  an extra `mov`, so the order shows where an array starts: `event_bsubway.c`'s `func_ov012_0216657c` reads a
+  an extra `mov`, so the order shows where an array starts: `event_bsubway.c`'s `EventBSubwayLeaderMsg_Create` reads a
   leader's message at 0x18 of each 0x22-byte entry of an array at offset 0, not in entries of an array at 0x18.
 - A small fixed-size copy the original wrote as a hand `ldrb`/`strb` loop, rather than calling `memcpy`, only keeps
   that shape when the loop runs over its own `const u8 *`/`u8 *` locals; written directly over the function's raw
@@ -1738,6 +1824,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
   literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
+- The reverse holds for addresses passed to calls: `text + i` given to several calls is computed once and kept in a
+  saved register, and `&text[i]` is recomputed at each call (`adds r0, r5, r4`), with `&text[i + 3]` keeping `i + 3`
+  (on the stack across calls) rather than the address. GameSpy's `gsiXmlUtilDecodeString` (`gsXML.c`) matches only
+  with `&text[...]` throughout, each entity branch's `started`, `value`, `mask` and `end` declared in its own block
+  (the `&#` branch's `value` then stays in a register, where one shared with the `&#x` branch's `&value` goes to
+  the stack), and the byte mask as a variable set to 0xff000000 at the branch's start and shifted by 8 at the end of
+  each pass (`lsrs r6, r6, #8`), not `0xff000000 >> (j * 8)`. Its file then linked only with its namespace table in
+  GameSpy's order (`SOAP-ENV`, `SOAP-ENC`, `xsi`, `xsd`): the strings come out by size either way, so only the
+  table's pointers showed the wrong order.
 - An inline's pointer parameter of the argument's own type takes the argument expression itself, so a field of an
   indexed element passed to it has the field's offset folded into each of the inline's loads (`[r, #4 + k]`). A
   `const void *` parameter, read as `((const u8 *)b)[k]`, keeps the argument one address: DWC's `DWCAc_AddCandidate`
@@ -1753,8 +1848,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   such adds, where `field = field + value` adds the `int` as it is. The phrase input's `PMSIVEdit_ScrollWait` adds its
   step to two scroll fields the second way.
 - An argument narrowed by a `u16` parameter is narrowed again at each call, and only hoisted out of a loop, while a
-  `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `func_0204c1a8` and
-  `func_0204c1dc` took their surface as `u16`.
+  `(u16)` cast is computed once and reused: `PMSIVEdit_ScrollWait` matched only once `ClActor_SetSurfacePosAxis` and
+  `ClActor_GetSurfacePosAxis` took their surface as `u16`.
 - A signed halving kept apart from its narrowing ahead of a loop (`asrs r0, r0, #1; lsls r0, r0, #0x10; asrs r2, r0,
   #0x10`), where MWCC gives `lsls r0, r0, #0xf; asrs r4, r0, #0x10`, is a value the loop body computes through a narrow
   local and the loop-invariant pass hoists. The fold is a tree rewrite before code generation, and it carries a
@@ -1769,6 +1864,36 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `field--` and `field++` load the field again before the subtraction, even right after comparing it, where
   `field = field - 1` reuses the register: the phrase input's `PMSInput_SentenceKey` moves its edit position the
   second way.
+- A word loaded from a stack slot and stored straight back (`ldr r0, [sp]; str r0, [sp]`) right after a copy into a
+  local is a field assigned to itself through a cast: MWCC drops `x = x;` and every identity on it (`x += 0`, `x | 0`,
+  an identity static inline), but keeps `x = (u32)x;`, even with the field's own type. DWC's `DWCs_RecvDataHeader`
+  (`dwc_transport.c`) and `DWCi_ProcessGT2MatchCommand` and `DWCi_QR2ClientMsgCallback` (`dwc_match.c`) match only
+  so after `MI_CpuCopy8` of a received header, which reads as a byte order conversion that is the identity on the DS;
+  with no such conversion known in DWC, the three stay rows.
+- A value narrowed to `u16` twice in a row (`lsl r0, #16; lsr r0, #16`, then `lsl r4, r0, #16; lsr r7, r4, #16`) is a
+  `u16` put through an identity that MWCC folds only after it narrows: TwlSDK's pipes round each chunk down to the
+  DSP's unit, `count = count & ~(DSP_MEMORY_UNIT - 1);`, where `DSP_MEMORY_UNIT` is `3 - sizeof(u16)`, 1 on the ARM9
+  (the shape of cybervisi0n/libntr's reconstruction). `DSP_ReadPipe` and `DSP_WritePipe` (`dsp_pipe.c`) match so;
+  `count &= ...` folds before the narrowing and loses the second one.
+- A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
+  offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `TWLHwNormalInfo *info =
+  TWL_HW_NORMAL_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
+  `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
+  the offset.
+- A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
+  frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
+  DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
+  `OS_SNPrintf(buffer, 0x200, "%s%dv%s", "GPCM", 0x5a, "MAT")`, whose format takes three, and matches without it.
+- A load through a pointer parameter that the original keeps after unrelated stores (to stack locals or a struct)
+  moves above them when the pointee is `const`: DWC's `DWCi_MatchGPRecvBuddyMsgCallback` and `func_ov011_02162958`
+  (`dwc_match.c`) match with `u8 *str` and `u32 *msg`, where `const` hoisted the first byte's load over a stack
+  argument's store and the reads of the message over the copies of fields.
+- `x ? x : 0x2000` and `if (x == 0) { x = 0x2000; }` build the constant differently (`movs r0, #4; lsls r4, r0,
+  #0xb` against `movs r4, #2; lsls r4, r4, #0xc`): DWC's `DWC_InitFriendsMatch` matches with
+  `fm->sendBufSize = sendBufSize ? sendBufSize : 0x2000;`.
+- A 0 loaded once from the literal pool, stored to one local's slot and copied from there to the others, is a local
+  zeroed by a statement after the early returns, not at its declaration: DWC's `DWCi_Prof_StartRequest`
+  (`dwc_profanity.c`) matches with `total = 0;` just before its loop.
 - A compound assignment to a narrow field narrows its right side first: `work->checkFlag &= 0xff ^ (1 << waza);` on a
   `u8` shifts the mask down to a byte before the `and`, while `work->checkFlag = work->checkFlag & (0xff ^ (1 << waza));`
   ands the full mask, as the PC box's `Box2Main_PokeFreeWazaCheck` does.
@@ -1778,7 +1903,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   constant gets a register of its own and the difference goes straight to the argument (`subs r2, r0, r1`), as in
   `fieldmap.c`'s `FieldmapProc_Init`. The result in a local and the subtraction in the argument don't do it.
 - `res -= 34;` lets MWCC fold a later `res + 36` into `res + 2`; a variable of its own, `u32 slot = res - 34;`, keeps the
-  difference in its register and adds 36 to it, as the PC box's `func_ov255_021c445c` does.
+  difference in its register and adds 36 to it, as the PC box's `Box2Seq_RangeMain` does.
 - Two constants applied to a field in one expression are folded into one (`x = x - 0x100 + 1` becomes `subs #0xff`);
   as two statements, `work->winV -= 0x100; work->winV++;`, both operations stay, as `btlv_effvm.c`'s
   `BtlvEffvm_WindowTask` needs (an unsigned `1u` mixed in also keeps them apart, but less naturally).
@@ -1817,7 +1942,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u8` itself: `GetBattleMon` hands its ID straight to `GetPokeParam`, so both take a `u8`, and so do the ability
   helpers that pass their mon's ID to `GetBattleMon`.
 - A wider parameter stored into a narrow bit field is narrowed to the field's type and then shifted into place, while
-  a `u8` parameter is trusted and shifted at once. The PC box's `func_ov255_021cc460` takes its button's actor and
+  a `u8` parameter is trusted and shifted at once. The PC box's `Box2Seq_AnimActorButton` takes its button's actor and
   palette as `u32` and narrows them in the stores to its 7- and 4-bit fields.
 - A sum that the original truncates to `s16` before comparing it was stored in an `s16` local, as the edges of the
   Join Avenue's balloons are; casting it in the comparison gives the same code but is not needed.
@@ -1860,12 +1985,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A loop that still checks its bound before the
   first pass, as `for (p = 80; p <= 83; p++)` does in the Join Avenue's commands, or a sum that still adds a counter
   known to be 0, as the Battle Subway's loop over its music switches does, has an enum counter. Nor does it move an
-  enum local's value into its one use: `btl_rec.c`'s `func_ov167_021d4674` computes a chunk's type from its header
+  enum local's value into its one use: `btl_rec.c`'s `BtlRecReader_SkipTurnChunk` computes a chunk's type from its header
   byte before the chapter bit, as written, only with `BtlRecChunkType type`; an `int type` used once is computed in
-  the `if` that tests it, after the chapter bit. `btl_server_flow.c`'s `func_ov167_021a6914` tests its stat
-  against 0 and 10 with one load and loads it again into `r3` for `func_ov167_021a6ab8`, as the original does,
+  the `if` that tests it, after the chapter bit. `btl_server_flow.c`'s `ServerControl_ApplyMoveStatChanges` tests its stat
+  against 0 and 10 with one load and loads it again into `r3` for `ServerControl_StatChangeCore`, as the original does,
   only with the stat an enum, `MoveStatChangeStat`, in the local, in `ServerEvent_GetMoveStatChangeValue`'s
-  out-parameter and in `func_ov167_021a6ab8`'s parameter; a `u32` local, or the enum local passed to a `u32`
+  out-parameter and in `ServerControl_StatChangeCore`'s parameter; a `u32` local, or the enum local passed to a `u32`
   parameter, reuses the tests' register for the call, and casts change nothing. A constant loaded once into a
   callee-saved register (`movs r5, #6`) and copied to each use (`adds r0, r5, #0`) is such a local too, where an integer
   local gives a `movs #6` at each use: `move_handlers.c`'s `HandlerChatter` holds its confusion status in a
@@ -1929,21 +2054,21 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   so, `u8 kinds[3] = { FALSE, FALSE, FALSE };`, also makes MWCC load memory again after each store to the array, where
   with assignments it keeps the first load: the Pokédex habitat map reads `wk->habitat` again for each of its three
   tests of a place's habitats.
-- Thumb has no `sp`-relative `ldrh` or `ldrb`, so a field of a struct local is loaded through a fresh
+- Thumb has no `sp`-relative `ldrh` or `ldrb`, so a field of a struct local can be loaded through a fresh
   `add rN, sp, #off`, even when a saved register already holds the local's address for calls; a pointer
-  `p = &header` is propagated and folded back the same way. A load through the saved register (`ldrh r1, [r6]`) means
-  a raw buffer read through a typed pointer: `msgdata.c`'s `GFL_MsgDataLoadHeader` declares
+  `p = &header` is propagated and folded back the same way. In `msgdata.c`'s `GFL_MsgDataLoadHeader`, a raw buffer
+  read through a typed pointer gives the saved-register load (`ldrh r1, [r6]`): it declares
   `u8 buf[sizeof(MsgFileHeader)]` and `MsgFileHeader *header`, and assigns `header = (MsgFileHeader *)buf;` just before
   the call that first takes it. Assigned at its declaration, the `add` is hoisted above an earlier call.
+  A saved base shared by several stack locals does not establish a raw source buffer: `effect_encount.c`'s matched
+  `IsPositionOccupiedByActorAny` keeps `sp + 0xc`, its `index` slot, in `r7` and reads its ordinary `GridPos pos` at
+  `sp + 0x14` through `r7 + 8`, `r7 + 0xa` and `r7 + 0xc`.
 - The initializer's stores happen at the declaration, so an array cleared by an initializer after some calls is
   declared in an inner block opened there: the forms page's `BOOL hasSex[3] = { FALSE, FALSE, FALSE };` follows the
   Pokédex reads in a block around the rest of the gathering, and `BOOL seenRare[2] = { FALSE, FALSE };` sits in the
   loop over the forms.
 - A switch of three cases can compile to a compare chain that tests them in value order. When the original tests 1,
   then 2, then 0, the source is an `if`/`else if` chain in that order: `scrcmd_msg.c`'s `SystemMsgWin_Open`.
-- A result flag declared after a call, `CalcAttachmentPos(env, FALSE); BOOL done = FALSE;`, takes the register of a
-  parameter that died in the call, and MWCC still sets it just before the `bl`: `scrcmd_msg.c`'s
-  `ScriptNative_ActorMsgWinWait`.
 - A struct member set from a C99 compound literal, `request.pos = (VecFx32){ 0, 0, 0 };`, builds the literal in a
   stack temporary through a base register just before the copy (`str r6, [r3]; str r6, [r3, #4]; str r6, [r3, #8];
   ldm r3!, {r0, r1}`), in source order among the other member stores. An initialized local makes the same stores at
@@ -1970,8 +2095,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `.z`) written out; a `values` local or a separate index keeps one of the two copies.
   An array element passed whole to a `static inline` taking a `const` pointer is formed again at that use from the
   scaled index: `btl_server_flow.c`'s `ActionOrder_GetMove(&order[i])` adds `order` again to `i * 16`, kept in a
-  saved register, just before it loads the entry's action at `#4`, as `func_ov167_0219fb3c`,
-  `func_ov167_021a00a4`, `func_ov167_0219fffc` and `ServerEvent_InterruptSwitch` do. Written as
+  saved register, just before it loads the entry's action at `#4`, as `ActionOrder_RecalcAndSort`,
+  `ActionOrder_Build`, `ServerControl_BeforeFirstFight` and `ServerEvent_InterruptSwitch` do. Written as
   `BattleAction_GetMove(&order[i].action)`, through the header's own `const BattleAction *`, the read shares the
   entry's address with the body's other uses of `order[i]`, and none of the four match.
 - Reads of a `const` table at a constant index are folded into immediates, but reads in a loop over the table are not,
@@ -1991,7 +2116,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A float local initialized with a constant at its declaration has that constant built in a saved register at the
   function's entry, even when the initializer is dead, and a later float literal of the same value is copied from it
   (`adds r1, r6, #0`) instead of built at its use (`movs r1, #0`). `building_enter_effect.c`'s
-  `func_ov012_02160dc8` declares `f32 zoom = 0.0f;` and assigns `zoom` again before reading it, and
+  `buildingEnterVBlankCallback` declares `f32 zoom = 0.0f;` and assigns `zoom` again before reading it, and
   `FX32_CONST(1.0f / zoom)`'s rounding test takes its 0.0 from r6, pushed at entry (79 bytes off without the
   initializer; `= 1.0f` instead shares the `1.0f` of the division). In a minimal loop, `f32 t = 2.0f;` builds 2.0
   before the loop's guard for a `t * 2.0f` in the body, where without it the constant is built after the guard. An
@@ -2032,7 +2157,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `pos = x + 0xc` and reading through `pos` keeps the `add` (`ssp_exifdec.c`'s IFD loop).
 - A ternary argument `f(c ? 1 : 0)` compiles to the select form (`movs r0, #1; cmp; beq; movs r0, #0`). A branchy
   original (`bne`; `movs #1`; `b`; `movs #0`) is an `if`/`else` with a call in each branch, as `CtvtTalk_UpdateMain`
-  calls `func_0203d564(TRUE)` or `func_0203d564(FALSE)`.
+  calls `GCTX_HIDSetUsingTouch(TRUE)` or `GCTX_HIDSetUsingTouch(FALSE)`.
 - MWCC doesn't push a constant multiply into the arms of a select: `&frames[c ? 0 : 2]` with 0x460-byte elements gives
   `movne r2, #0; moveq r2, #2; mov r0, #0x460; mla`. A select of 0 and an element's size added to a base (`movne r0, #0;
   moveq r0, #0x460; add r8, r6, r0`) is therefore a ternary of byte offsets in the source, which no index spelling, type
@@ -2047,10 +2172,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag set with `b = TRUE; if (*p != 0) { b = FALSE; }` is live before `*p` is loaded, so `b` and `p` need two
   registers, and a spilled flag is stored twice. `b = (*p == 0) ? TRUE : FALSE;` reads `*p` first, takes `p`'s
   register (`ldrh r0, [r7]; movs r7, #1; ...; movs r7, #0`) and stores a spilled flag once at the join. A function
-  can mix the two: `gym_virbank.c`'s `func_ov100_021eee4c` has the first of its four flags as `TRUE` plus `if` (its
+  can mix the two: `gym_virbank.c`'s `GymVirbank_InitMusic` has the first of its four flags as `TRUE` plus `if` (its
   `movs r5, #1` is in the prologue) and the other three as ternaries; one spelling for all four leaves a pointer
   spilled and the frame larger. Where both spellings give the same instructions, the ternary still allocates the
-  rest of the function differently: `scrcmd_musical.c`'s `func_ov012_021580c4` swaps its `vm` and `env` between
+  rest of the function differently: `scrcmd_musical.c`'s `s0163_MusicalCall` swaps its `vm` and `env` between
   `r4` and `r5`, and everything that shares them, with `online = TRUE; if (kind == 0) { online = FALSE; }`, and
   matches with `online = kind != 0 ? TRUE : FALSE;`, after over 400 declaration orders had not. `wipe_sub.c`'s
   `WipeLineRange_Apply` likewise needs `covered = range->covered ? FALSE : TRUE;`, with `covered` a `BOOL` and not a
@@ -2080,8 +2205,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `table[item / (sizeof(u32) * 8)] & (1 << (item % 32))`; `item >> 5` gives `asr` (pml_item.c).
 - A `u8` parameter divided with `asr`/`ror` (signed `/ 4` and `% 4`) while its callers pass a `u8` with no
   conversion is a `u8` parameter copied to an `s32` local first: `s32 r = region;` in unity_tower_savedata.c's
-  `func_02009ba4` and `func_02009be0`. Declaring the parameter `int` or `s8` matches the function but moves the
-  callers' argument loads (`Upload_WifiHistoryDataSet`) or masks a `u8` passed on (`func_02009b84`); a plain `u8`
+  `UnityTower_GetRegionState` and `UnityTower_SetRegionState`. Declaring the parameter `int` or `s8` matches the function but moves the
+  callers' argument loads (`Upload_WifiHistoryDataSet`) or masks a `u8` passed on (`UnityTower_SetOwnRegion`); a plain `u8`
   used directly divides with `lsr`.
 - A result computed into the parameter's own callee-saved register comes from a compound assignment to the parameter
   (`item -= ITEM_TM93 - TM_INDEX_TM93;` in `PML_ItemGetTMWazaID`); `item = item - X` or a new local computes into r0.
@@ -2118,6 +2243,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - An `int` assigned to a `u8` bitfield is narrowed (`lsl`/`lsr #0x18`) before the bit insert; a `u8` value isn't
   (game_comm.c, a `BOOL flag` stored in a 1-bit field).
+- A mask written before the store to a bit-field at bit 0 stays as an `and` of its own (`movs r2, #0xf; ands r3, r2`)
+  ahead of the insert's own `and`: `d->a = s[0] & 0xf;` keeps it, 2 bytes, where `d->a = s[0];` doesn't. For a field
+  higher up, whose value is shifted into place (`lsl #0x1c; lsr #0x18`), the mask folds into the shifts. A doubled
+  `and` with the field's width before an insert is a mask in the source.
 - Loads still move above stores to other known offsets of the same pointer: in `GameCommSys_Main`,
   `comm->work = NULL; comm->commNo = 0; cb = comm->exitCallback;` reads the callback first, and only that source order
   gives the original's registers.
@@ -2130,7 +2259,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `u16` parameter is spilled at entry before the other parameters are moved, a `u32` one after them. A caller's
   `u16` narrowing can come from its own `u16` local rather than the parameter type (`GameCommSys_LogPlayers`).
   The width of a spilled index parameter also schedules its multiply, with no narrowing anywhere to show it:
-  `event_bsubway.c`'s `func_ov012_02166118` builds the size of `bsw->trainers[index]`
+  `event_bsubway.c`'s `EventBSubwayTrainerMsg_Create` builds the size of `bsw->trainers[index]`
   (`movs r1, #0xe8; adds r1, #0x38`) after its event data's field stores with `u16 index`, under every order of the
   stores, and ahead of them with `int index` (or `u32`), which matches once the stores are in the original's order.
 
@@ -2138,6 +2267,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `const` keeps the source order (app_taskmenu.c's `AppTaskMenu_Create`).
 - A range test `subs; subs; cmp; bhi` is an unsigned difference in the source, `x - left <= right - left` on `u32`
   values; MWCC doesn't fold `x >= left && x <= right` into it (`AppTaskMenuWin_IsTouched`).
+- Two range tests joined by a bitwise `&` each build a 0/1 (`cmp; bhs; movs rN, #1; b; movs rN, #0`) and combine them
+  with `ands`, and the second test runs even when the first fails. `&&` instead zeroes one result register up front
+  and branches past the second test. Game Freak's touch hit tests are written this way: `namein.c`'s
+  `NameEntry_PointInRect` returns `(touch->x - rect->left <= rect->right - rect->left) & (touch->y - rect->top <=
+  rect->bottom - rect->top)`.
 - A test of `x == 1 || x == 2` repeated after a call subtracts again at each test on a `u32`, and on an `int` is
   worked out once into a saved register and compared again (`sub r4, r6, #0x1; cmp r4, #0x1` ... `cmp r4, #0x1`):
   `gf_overlay.c`'s `GFL_OvlLoad` matches with `int region`. Its loop also stores through
@@ -2148,7 +2282,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `mystery.c`'s effects match with `static inline void Mystery_SetBlendAlpha(s16 ev1, s16 ev2)` storing
   `ev1 | (ev2 << 8)`, called as `Mystery_SetBlendAlpha(alpha, 16 - alpha)` with a `u32` alpha; `s16` locals or casts
   narrow in the other order. Called twice on one bit field, such an inline narrows it at the second call only, so the
-  original sign-extends the field twice, once plain and once after `lsl`/`asr #16`: `clact.c`'s `func_0204cb8c` wraps
+  original sign-extends the field twice, once plain and once after `lsl`/`asr #16`: `clact.c`'s `ClAct_CullOam` wraps
   `oam->x` with `ClAct_WrapOamX(oam->x)` for both its left and its right edge (and `oam->y` likewise), where one local
   wrapped once was 56 bytes short.
 - `FX32_ONE` is an `int` constant in `nitro/fx.h` but a `long` in the SDK. Where a product of it is passed on,
@@ -2218,11 +2352,35 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `u32` is `unsigned int` in our `types.h` and `unsigned long` in the SDK, and MWCC treats the two differently in an
   index: for `&sActorData[15 + i]` with an `unsigned int i` it adds first and multiplies (`adds r1, #0xf; muls`), and
   with an `unsigned long i` it keeps `i * 0x18` and adds the constant's offset, and folds the constant of
-  `actors[ret + 11]` into the load's offset. The PC box's `func_ov255_021d0d70` and `func_ov255_021d57a0` match with
+  `actors[ret + 11]` into the load's offset. The PC box's `CreateFixedActors` and `BoxSearch_SeqMarkingList` match with
   the counter and the result declared `unsigned long`. Rows that say "the original folds the constant into the
   offset", or that match only with `(&a[i])[11]`, are candidates. `size_t` is `unsigned long` as well, and an SDK
   prototype that takes one needs it: `STD_TVSNPrintf`'s `str.start[len - 1]` is `adds r0, p, len; subs r0, #1; strb
   [r0]` with a `size_t len` and `subs; strb [p, r0]` with a `u32`.
+  The `int` types stay the default all the same: with `s32` and `u32` as `long` and `fx32` as `long` throughout, three
+  rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `ShopUI_PrintItemBuyMessage`) and 92
+  matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
+  the type of the code.
+- A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
+  arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
+  reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.
+  As an `unsigned int` the index is a temporary, slotted below the named `isCached`; as `unsigned long` it is a named
+  local in its declared slot above, and the function matches. Declaration order and scope, `BOOL`, `u8` and `int`
+  types, and an inline for the bit test moved nothing. The same function also needs the joints' matrices as a field of
+  one object with the materials and the scales (`g_NNSG3DRenderCache`, grouped as the public decompilation of
+  NitroSystem groups them): as an array of their own MWCC folds the normal matrix's address into the clip matrix's
+  (`clip + 0x40`), 4 bytes short, where the original adds the index's offset to a second literal. And its weighted sums
+  add each product as a 64-bit value, `sum.invM.m[0][0] += (weight * clip->m[0][0]) >> FX32_SHIFT`: through an inline
+  that casts the product to `fx32` first, one load is scheduled after a store where the original has it before.
+- The same goes for NitroSystem's `s32` (a `long`) and for a spilled `u32` in a big function: two NitroSystem
+  functions matched only with one variable of the SDK's type. `g2d_Renderer.c`'s `NNS_G2dPushMtx` loads the stack
+  position once to check `next < 32` and again in each branch for the source index; with `static long mtxStackPos_`
+  (an `s32` in the decompilation of NitroSystem) it does, where an `int` keeps the first load (the decompilation of
+  HGSS's NitroSystem in ctrl-cheeb-del/pokeheartgold reaches the same code only through a `volatile` view of the
+  state). `snd_arc_stream.c`'s `ProcessCommand` homes `bufOffset` and `readSize` in their declared slots only with
+  `unsigned long bufOffset` (a `u32` in the decompilation of NitroSystem; Kingdom Hearts Re:coded's decompilation
+  writes `long`) and `s32 readSize`, the type of the read's result it is compared with; as `unsigned int`s they took
+  late spill slots. Rows that are left with a reload the original has, or with locals in late slots, are candidates.
 - `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
   problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
   constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two
@@ -2302,16 +2460,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   comparison, and `if (isLeague) { return FALSE; } return TRUE;`.
 - A range check that adds the 16-bit negated constant (`adds r0, #0xc004`, narrowing, `cmp r0, #3`, `bhi`) is an
   `||` chain of `==` tests of consecutive constants; a written `(u16)(x - C) <= n` subtracts instead.
-  `billboard_act.c`'s `func_0204f768` tests the last animation command this way, and `pml_item.c`'s
+  `billboard_act.c`'s `BlActSys_GetActorLastCmd` tests the last animation command this way, and `pml_item.c`'s
   `PML_ItemIsNotSpecialMonsball` its nine balls, with `0xfe14` from the literal pool and `cmp #8; bls`, where
   `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice.
 - An inline that returns a condition, `return a && b;`, builds the flag ahead of the tests (`movs r1, #0`, the
   tests, `movs r1, #1`) where the original's `movs r0, #1`, `b`, `movs r0, #0` after the tests is
-  `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2p2): `g2d_Animation.c`'s `IsFrameEnd_`, the test of
+  `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2): `g2d_Animation.c`'s `IsFrameEnd_`, the test of
   `NNS_G2dTickAnimCtrl`'s loop. It goes the other way too: `g2d_CellTransferManager.c`'s `IsTransferNeeded_` keeps
   its 0/1 only as `return a && b;`, which the if-form folds into the branches, so try both.
 - An inline's 0/1 result that the original materializes and then tests (`movs r0, #1`, `b`, `movs r0, #0`,
-  `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2p2): a
+  `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2): a
   `u32` return type with `if (c) { return TRUE; } return FALSE;` (`g2d_CellAnimation.c`'s
   `NNS_G2dCellDataBankHasVramTransferData`, which every `BOOL` spelling folds into the test), or a cast,
   `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
@@ -2324,7 +2482,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   condition must stay `which == 0`, since `which ? B : A` still builds 1 first.
 - A flag set to 0 and then to 1 under a branch (`movs #0`, `cmp`, `beq`, `movs #1`) is
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
-  also needs the call before it in the argument list read into a local first.
+  also needs the call before it in the argument list read into a local first. For a `u16` parameter the local also
+  saves the narrowing that a comparison or a ternary as the argument gets (`lsls`, `lsrs`): `wcm_dsi.c`'s
+  `func_02769b80` passes `NWM_Connect` its `u16 authMode = 0;`, set to 1 under the shared-key option.
 - A 0/1 comparison flag is built set-then-clear (`movs r5, #1; beq; movs r5, #0`) when its register is free at
   the `cmp`, and with branches (`bne; movs r1, #1; b; movs r1, #0`) when its register is an operand of the
   `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
@@ -2334,7 +2494,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   throughout (`bne; adds r4, r5`, where `int` arms give `beq; adds r5, r4`) also has enum constants for both arms:
   `btlv_effvm.c`'s `BtlvEffvm_GetDefenderPositions` stores
   `(wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY` into its `int` array. One enum arm,
-  a cast of the whole ternary, or the condition inverted stays 5 bytes off.
+  a cast of the whole ternary, or the condition inverted stays 5 bytes off. A 0/1 argument laid out 0 first after a
+  `bne` is the same: `wcm_dsi.c`'s `func_0276a0ac` passes `x == WCM_OPTION_POWER_ACTIVE ? NWM_POWER_MODE_ACTIVE :
+  NWM_POWER_MODE_SAVE`, where `? 0 : 1`, `? FALSE : TRUE`, `!=` and casts all give `beq` and the 1 first.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
   on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just
@@ -2342,14 +2504,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   matches with the body wrapped as `if (packet != NULL) { ... } else { receiver->queuedCount = count; return FALSE; }`.
 - Every `return` gets its own epilogue. Failures that all branch to one block that sets a saved register and jumps
   to a shared `mov r0, rN` exit can be a `static inline`'s early returns, which inlining turns into stores to one
-  result and jumps to its end. `mystery_gift_pokemon.c`'s `func_ov012_02153160` is
+  result and jumps to its end. `mystery_gift_pokemon.c`'s `CreateMysteryGiftPokemon` is
   `return Mystery_CreateGiftPokemon(gift, heapId, gameData);`, the maker overlay 197 also inlines: written out with
   a result variable and `goto`, the result got a stack slot of its own and the frame grew.
 - A conditional branch to the epilogue beyond Thumb's `b<cond>` range goes through a `b` within range that jumps to
   the same label. `return;` statements share the return label, while the end of an `if` body and a `break` out of a
   `switch` jump to the label after that statement, even when both labels end at the same epilogue. An early
   return that takes the wrong one of two `b` trampolines shows which nearby exits were `return` and which were
-  `break` or the end of an `if`. `printsys.c`'s `func_02022464` matches with `if (stream->paused) { return; }`
+  `break` or the end of an `if`. `printsys.c`'s `PrintStream_Task` matches with `if (stream->paused) { return; }`
   before its switch, whose `b` the callback's early `return` above it then shares, and `break;` ending its cases;
   with the switch inside `if (!stream->paused) { ... }` and the running case ending in `return;`, that `bne` took
   a later `b` the case's `return` had put on the return label.
@@ -2414,11 +2576,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   scheduler then moved below the load: `bmp.c`'s `GFL_BitmapCopyArea_IDX8_VRAM` writes `destPixel--;` before
   `pixels = (srcPixel[0] << 8) | srcPixel[-1];` in its odd arm, which keeps `ldrb r1, [r2]` at the top of both arms.
   A `color = srcPixel[0];` set before the `if` pinned the load above the branch as well.
-- MWCC evaluates the operands of `|` in the order they are grouped, so a color built from three computed parts shows
-  its grouping: `field_menu.c`'s cursor fade (`func_ov036_021a040c`) computes red, then blue, then green, and only
-  matches as `r | ((b << 10) | (g << 5))`, not as `GX_RGB(r, g, b)`.
 - A block that many cases of a switch branch to, such as the step advance of `event_entrance_effect.c`'s
-  `func_ov036_0219f380` (`*state = next(work); advance(work);`), is each case's own copy merged by cross-jumping. A flag
+  `EntranceEffect_ArrivalCallback` (`*state = next(work); advance(work);`), is each case's own copy merged by cross-jumping. A flag
   set in the cases and tested after the switch keeps a register for it and doesn't match.
 - An early `return` at the top of a long function jumps to the nearest `b` to the epilogue. When the original skips the
   body with `bne` over a `b` to the very end, the body was wrapped in `if (cond) { ... }`, as in the PC box's
@@ -2438,7 +2597,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   A ternary is the same: `fieldmap.c`'s `FldActSys_VRAMUploadFunc` branches with `bne` and puts the `a` value first
   only as `!type ? a : b`; `type == 0 ? a : b` branches with `beq` and puts `b` first.
 - The operands of `==` between two fields are compared in source order: `syswk->tray == syswk->getTray` gives
-  `cmp tray, getTray`, as the PC box's `func_ov255_021cc8dc` needs.
+  `cmp tray, getTray`, as the PC box's `Box2Seq_ArrangeSummaryReturn` needs.
 - `Aoss_Decrypt` needs the `u8` returned by `Aoss_Checksum` stored in a local before it is compared with the
   `checksum` parameter; comparing the call directly swaps the `cmp` operands, even when the expression is reversed.
 - The left operand of a comparison is loaded first, even before a store just above it: `sw->nowFrame++; if
@@ -2446,7 +2605,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ISSSwitch_AdvanceFade` does, where `sw->nowFrame > sw->endFrame` is 2 bytes off.
 - A store picked by a test, `if (pos < 30) syswk->pos = pos; else syswk->pos = 0;`, branches past the second value with
   `bhs` and `b`, while clamping a local first, `if (pos >= 30) pos = 0; syswk->pos = pos;`, uses one `blo`. The PC box's
-  `func_ov255_021c8b38` is the first.
+  `Box2Seq_ItemMain` is the first.
 - `x = x == 0 ? 3 : x - 1;` reads `x` once, and `if (x == 0) { x = 3; } else { x--; }` reads it again in the `else`
   branch before the shared store, as the Pokédex habitat map's season changes do.
 - The last test of a condition branches to the code written second. `if (a == x || a == y) { return TRUE; } return
@@ -2545,8 +2704,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `ServerPort`, all three fields of `gPOKE_NET_Control`. libVCT's `VCT_CheckTimeout` (`vct_session.c`) stores the
   low word of its `u64` `sRequestTime = 0;` before loading `sSessionPool`'s address: the high word's store follows
   it in the same object and, at 4 of the 8 bytes, stays above the `sSessionPool` stores. `VCT_ResetCapture`
-  (`vct_dsp.c`), whose stores alternate between `sNoiseFloor` and `sCapture`, loads the address first in every
-  natural spelling (its row).
+  (`vct_dsp.c`), whose stores alternate between `sNoiseFloor` and `sCapture`, loads the address first
+  while its four fields are members of two structs; as scalar statics in a file of their own built with `-ipa file`
+  (`vct_vad.c`), it matches.
 - `movs r1, #1; cmp; bne; movs r1, #0` reached by a `b` from the other arm, with the literal pool dumped after that
   `b`, is a constant arm written first and a select in the `else`:
   `if (p == NULL) { saved = FALSE; } else { saved = f(x) ? TRUE : FALSE; }`, as state 15 of `event_make.c`'s battle
@@ -2568,6 +2728,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `u32 corner = place * 4 + i; s16 index = sBScenarioCursorPositions[corner];` MWCC hoists only `place * 4` and loads
   the table's address on every pass, as `BScenarioGraphic_SetCursor` does in the ROM. With a `[5][4]` table or `int`
   operands the row's address is hoisted.
+  An unsigned factor does the same for a pointer: under MWCC 2.0, `out + i * sizeof(u64)` in `dwcutil_ac.c`'s AES key
+  wrap keeps `i` in a register and computes the address on each pass, as the ROM does, where `out + i * 8` steps an
+  offset of its own and spills `i`.
 - A loop's two increments are emitted in the order written: `PkwdCount_CreateActors` has `entries++, i++`, and
   `i++, entries++` was 2 bytes longer. There `int i;` declared first fixed the stack slots, and `count = group->count;`
   assigned last of the group's five fields fixed the register of the first load. In `PkwdCount_LoadGraphics` and
@@ -2576,7 +2739,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A flag built as `bne; movs #0; b; movs #1; str [sp]` is an enum-typed local set with a ternary; every plain 0/1
   spelling folds to the mirrored `beq` layout. Which of a function's two flags is the enum can differ between
   siblings: in the Pokédex entry's `ZukanInfo_InitTypeIcons` the enum (`ClActDrawType`, our name) feeds the resource
-  loaders and a `u32` zero-plus-`if` flag feeds `func_0204c040`, and in `ZukanInfo_ShowTypesInGameLanguage`,
+  loaders and a `u32` zero-plus-`if` flag feeds `ClActor_Create`, and in `ZukanInfo_ShowTypesInGameLanguage`,
   `ZukanInfo_ShowTypesInLanguage` and `ZukanInfo_LoadFootprint` it is the other way round. All four were 4 bytes
   long or 29 bytes off before.
 - A dead second conditional branch on the same flags is a redundant test in the source: the live competition's
@@ -2642,9 +2805,20 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `long`, its `u16` stack parameter `span` is loaded again from its slot for the clamp (`add r0, sp, #0x10; ldrh r0,
   [r0]; cmp r5, r0`), while `span - width` and `span - 1` share one load; with `s32 index` the comparison uses that
   load's register too (`cmp r5, r2`) and the function is 4 bytes short.
+- An element offset worked out again after a branch joins (`subs #0x64; muls` once more before a call), with the
+  parameter and the offset in swapped saved registers, where the original keeps one offset to the end, is an index
+  local set once the parameter is final: DWC's `DWC_AddMatchKeyInt` and `DWC_AddMatchKeyString` (`dwc_match.c`)
+  match with `index = keyId - 100;` after the key ID is picked and `sKeys[index]` for every field from there on.
+  `sKeys[keyId - 100]` written at each use was 8 and 12 bytes long; it also matched with `qr2_register_keyA` taking
+  its key ID as a `u8`, which GameSpy's prototype doesn't.
 
 ## Loops
 
+- A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
+  enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose
+  parameter has that enum type. GameSpy's `qr_build_split_query_reply` (`qr2.c`, overlay 11) matched only with its
+  progress's key type as `QR2KeyType`, the SDK's `qr2_key_type`, and the key list callback taking `QR2KeyType`; the
+  field alone, or the parameters alone, kept the register.
 - A table read in an unrolled loop through a pointer that each read steps (`*sines++`, `x[*index++]`) and the same
   table indexed (`sines[0]` to `sines[3]`, then `sines += 4`) give different registers and spills. libmath's
   `md5_transform` matches only stepped, with the message walked by its own pointer in the first round and through
@@ -2654,11 +2828,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   field: an original that loads a field once and stores it back on each pass copied it to a local. Multiboot's `MB_Init`
   (`mb_wm.c`) came closer with `src = sWmConfig.name;` before its name loop and `sWmConfig.name = src;` inside it.
 - MWCC hoists a static's field load out of a loop into its preheader, below the entry test, unless the loop stores
-  through a pointer: then the field is loaded again on each pass, whatever its type and even when the static's
-  address is never taken. An original that loads it once in such a loop read it into a local, which MWCC loads above
-  the entry test (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`). libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the samples
-  it stores through `s16 *mic` by an `sEcho.attenuation` loaded once only with `shift = sEcho.attenuation;` before
-  the loop; the original's load is below the test, which no spelling found gives.
+  through a pointer: then a file-scope static is loaded again on each pass, whatever its type and even when its
+  address is never taken. A function-local `static` is hoisted: libVCT's `SuppressEcho` (`vct_dsp.c`) shifts the
+  samples it stores through `s16 *mic` by `static s16 shift` declared in the function, and loads it once, below the
+  entry test (`cmp r2, #0; addls sp, sp, #0x10; popls; ldrsh r4, [r1]`), as the original does. The same variable at
+  file scope is loaded in the loop, and a local copy of it (`int amount = shift;`) is loaded above the entry test
+  (`cmp r1, #0; ldrsh lr, [r2, #4]; pople`), which is what an original that reads it into a local looks like.
 - The order of independent stores before a loop can decide whether a local struct's address, passed to a call on
   every pass, keeps a register across the loop. DS Protect's `DSProt_RunChecks1`-`4` (`dsprot_run_multi.c`) keep
   `&args` in a register as the original does with the stores to `args` and `checks[]` interleaved (`args.nop`,
@@ -2698,7 +2873,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
-  `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2p2).
+  `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2).
 - A loop counted with `!=` tests with `beq` before the loop and `bne` at its end, where `<` gives `bls` and `blo`:
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
 - `dwc_competition.c`'s `ScClient_SubmitReport` needs a `u32` counter for its 16-byte digest clear,
@@ -2769,7 +2944,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   only moves to the column loop, and read in the row loop, the `charData` load is not hoisted.
 - An address that a returning branch inside a loop uses twice, written out at both uses, is merged within the branch
   and computed again in the branch's own registers; read into a local once there, the branch reuses the parts the
-  loop hoisted. `btl_rec.c`'s `func_ov167_021d46a4` passes and returns the client's actions in its timeout branch
+  loop hoisted. `btl_rec.c`'s `BtlRecReader_ReadActions` passes and returns the client's actions in its timeout branch
   through `actions = reader->actions[clientId];`, which loads `clientId << 6` and `reader + 0x18` from the
   preheader's spill slots as the original does, and also puts those two slots in the original's order; with
   `reader->actions[clientId]` at both uses it computed them again in `r7` and `r4`, 104 bytes off. A local set at the
@@ -2847,7 +3022,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BtlvInput_DrawMoveTiles` is the same: the 0/1 loop test it kept goes, and a plain `i < 4` matches with the attribute
   on its type-palette table, which only it reads, and whose address allows nothing above 4. The attribute on any other
   object it reads matches as well.
-  NitroSystem's 2.0/sp2p2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
+  NitroSystem's 2.0/sp2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
   test and indexes its arrays with a multiply on each pass only with `sDecodeBuffer`, which it reads, aligned (4 to
   16 give the same code and fit the buffer's address, 32 does not). There a `u8` array with `ATTRIBUTE_ALIGN(4)` gets
   a `.bss` section of its own, while the `u32` array with the same attribute stays in the file's one section.
@@ -2938,7 +3113,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   is merged into it, leaving a `b` to the next case. The original's code is that `b`, so write each case out in full
   with its own `done = TRUE; break;`, as wipe_sub.c's `WipeBright_Main` does, rather than a fall-through.
 - The comparison tree depends only on the set of case values, and evenly spaced cases are grouped from the low end:
-  the PC box search's `func_ov255_021d40e8` cases {0, 3, 9, 15, 21, 24, 27, 30} split at 27, and no order, type or
+  the PC box search's `BoxSearch_PrintInfo` cases {0, 3, 9, 15, 21, 24, 27, 30} split at 27, and no order, type or
   `default:` changes that.
 - A switch whose comparisons start with a value outside its jump table, `cmp r0, #5; beq other; cmp r0, #3; bls table`,
   with that value's code after the cases, is `if (x != 5) { switch (x) { ... } } else { ... }`; the same test before
@@ -3016,13 +3191,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   another tree than the ROM's compiler did, and no source changes that. With mwccarm run at 0x27f these match
   unchanged: `ItemMenuDisp_IsFieldMoveTM` and `PokeList_GetHidenResult` (cases 15 and 19), overlay 36's `SetupEncountFlagsByPartyPokeAbil`
   (42 and 46), `Demo3DCapture_End` and `Demo3DCapture_VBlank` (2 and 6; `Demo3DCapture_Begin` goes from 93 to 24
-  bytes), and `box_search.c`'s `func_ov255_021d40e8` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
+  bytes), and `box_search.c`'s `BoxSearch_PrintInfo` (cases 0, 3, 9, 15, 21, 24, 27, 30). A full build of every file
   for both versions at 0x27f still gives both ROMs, so nothing that matches today depends on 64-bit. The pinned wibo
   release configures the guest at 0x27f; if an older binary is used, check that before trying a "gap of 4" or a tree
   rooted one case off. What the tree builder does otherwise: ranges are built left to right, a case joining while the density
   holds; a range of four or more is a jump table; the tree is balanced over the items with its pivot at index
   (n - 1) / 2; a range after the first loses its first k cases to single compares, k being the number of extra cases
-  in the ranges before it.
+  in the ranges before it. Empty cases count as cases, so the number of them sets the ranges, not which ones:
+  `DWCUtilMove_UpdateTask` (`dwc_util_move.c`) has a table from 0 to 20 and compares for 23, 26, 29 and 34 only with
+  four empty labels between 1 and 20 beside its four handled cases there (8 in a span of 20); with every unhandled
+  state listed the table took in 34, and with none there was no table.
 - A three-case `switch` is not range-folded where the `||` chain over the same values is, which frees a register:
   the tournament download's `TDownload_SelectTouch` and `TDownload_SavedTouch` test their touched button with
   `switch (touched) { case 3: case 4: case 5: }`. A constant stored to a spilled local as the last statement of a
@@ -3034,6 +3212,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A random pick in a variable range with no zero check is `u64 value = GFL_RandomMT(); value *= n; value >>= 32;`, as
   `btlv_mcss.c`'s idle task does.
+- An angle index one below a round value, 0x3fff for 90 degrees or 0x1fff for 45, is GFL's conversion
+  `degrees * 0xffff / 360`, as `math_util.c`'s sine and cosine by degrees compute it. `DEG_TO_IDX` and
+  `FX_DEG_TO_IDX(FX32_CONST(...))` give the round 0x4000 and 0x2000.
 - Float arithmetic calls MWCC's runtime helpers, such as `_fadd` and `_ffix`, which swan names `__aeabi_*`. When a
   complete file fails to link on one of them, rename it to the MWCC name with `rename_symbol.py`, or, when the AEABI
   name is in use, give it the MWCC name as a second one with `config_fixes.py add-label`, as `_ddiv` and `_dsub` for
@@ -3052,7 +3233,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - MWCC doesn't fold float arithmetic on a local variable that holds a constant, so `size / 2.0f` stays a call when
   `size` is a variable, while an expression of literals is folded.
 - `compiler_probe.py` skips relocated words, so a wrong addend, such as a table index that the compiler folds into a
-  literal pool address, or a call to the wrong runtime helper, only shows when the module check fails. Division and
+  literal pool address, or a call to the wrong runtime helper needs a separate relocation check. A module check
+  catches it only when the file's C is linked; incomplete files still link their original assembly. Division and
   modulo call `_s32_div_f` for a signed operand and `_u32_div_f` (swan's `__aeabi_uidivmod`) for an unsigned one; a
   `u8` or `u16` promotes to a signed `int`, so `(u8)id % 5u` is the unsigned one, and so is a `u16` divided by a
   `u32`. `wipe_sub.c`'s `WipeLineRange_Apply` divides `(range->end - range->start) * step` signed, its fields being
@@ -3067,7 +3249,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `build/<version>/build` with the original to find it.
 - A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned, and `_ll_sdiv`
   (0x0208d414) when both are signed: `pass_power.c`'s `PassPower_ApplyCapture` divides an `s64 value` by 100. The
-  probe masks the call's relocation, so only linking the file shows the wrong helper. A call to `_ll_udiv` with
+  probe masks the call's relocation, so check the helper in the object or the linked file. A call to `_ll_udiv` with
   operands sign-extended by `asr #0x1f` is an `int` cast to `u64`: the trade's box cubes turn by
   `((u64)((x + 48) % width) << 16) / width` in `func_ov194_021c2844`. A file that calls it needs `_ll_udiv` added as a
   label on `__aeabi_uldivmod` with `config_fixes.py add-label` before it can go complete.
@@ -3103,9 +3285,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.
+- A divide by the hardware divider that stores the operands as a `str` pair and reads the result through plain
+  pointers is NitroSDK's `CP_SetDiv64_32` and `CP_GetDivResult32`, not raw `REG_DIV_*` writes. libVCT's `SuppressEcho`
+  (`vct_dsp.c`) with `CP_SetDiv64_32(sum, bytes); gain = CP_GetDivResult32();` is 8 bytes smaller than with the
+  registers written one by one, and matches in the same register allocation as `VCT_FilterFrame`.
 
 ## Data and sections
 
+- `dsi/1.2` with `-Cpp_exceptions on` emits exception indices for C functions with stack frames even when their
+  instructions are unchanged. MSL's `register_atexit.c`, `console_io.c` and `call_static_initializers.c` emit the ROM's
+  48-byte `.exceptix` prefix, with four relocations to their functions; leaf console procedures emit no entries.
+  Keep this as the compiler's section rather than writing a C table of its encoding.
 - A local array with an initializer goes in a `.rodata` section of its own, ahead of the file's shared one; a struct
   of the same bytes copied from a static gives the same inline `ldrb`/`strb` pairs and keeps the static in declaration
   order in the shared section. NitroWiFi's `WCM_FindVendorIE` matches, with the file's `.rodata`, only with its OUI as
@@ -3115,6 +3305,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they
   sort into the shared `.rodata` by size, the digit first, which moved the file's start back 4 bytes from the
   previous file's range.
+- A string that the ROM has twice in one file's range, a few hundred bytes apart, is two files: MWCC pools a file's
+  equal literals. DWC's `"httpresult"`, `"returncd"` and `"Date"` in overlay 11 split its login range into the login,
+  the HTTP client, the connection test, the profanity check and the service locator (`dwc_nasfunc.c`,
+  `dwc_http_client.c`, `dwc_conntest.c`, `dwc_profanity.c`, `dwc_svcloc.c`), and only the split laid each one's `.data`
+  out as the ROM's. The 13 root certificates after them are each a data-only file under `-ipa file`, whose name and key
+  of 64 bytes or more and unreferenced global struct get 4-aligned sections of their own, which one file of all 13
+  can't give.
 - An object of 64 bytes or more gets a section of its own only under `-ipa file`; without it every size stays in the
   shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
@@ -3143,10 +3340,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `sUnusedColors`, then 2-byte tables, which no `-ipa file` layout gives, and matches whole with `-ipa function` and its
   tables defined just above `CtvtDraw_UpdateDraw`, their first user (`config/compiler_flags.toml` records the flag).
   With every table above the first function the colors sort after the 2-byte tables again. `.data` is written out
-  the same way: libVCT's `vct_dsp.c` has its 16-byte
-  `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration order gives while both are defined
-  above the first function, and `VCT_InitCapture` matches once the coefficients are defined just above
-  `VCT_InitEcho`, their only user. The reverse rules the flag out: under `-ipa function` the tables of 64 bytes or
+  the same way: the ROM has the 16-byte `sCapture` ahead of the 12-byte `sInitialCoefficients`, which no declaration
+  order gives in one file while both are defined above the first function. They belong to two files (`vct_vad.c` and
+  `vct_dsp.c`), each laid out on its own, which is why the order looked unreachable.
+  The reverse rules the flag out: under `-ipa function` the tables of 64 bytes or
   more stay in the one shared section, even one defined just above a late function, and each local initializer gets
   a section of its own in function order, so local initializers sorted by size across functions, between the shared
   section and the large tables, come only from `-ipa file`, as overlay 257's `ctvt_game.c` has them in both versions.
@@ -3188,10 +3385,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without `-ipa file` therefore ask for the flag before any respelling. Under `-ipa function` a file's initialized
   statics come first in its `.bss`, by size, and the tentative ones follow in the reverse of their declarations (every
   dsi compiler and 2.0/sp2p2), so two literals for a static that the ROM places after the file's others, read at offset
-  0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
-  file split at `0x0206f0f0`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
+  0, mean that it opens another file's `.bss`: `CARDi_NotifyEvent` matches, and the CARD range links, only with
+  `card_common.c` split at `0x0206f0f0`, the hooks' head `= { NULL }` opening `card_task.c`'s `.bss`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
   one defined with a zero initializer (next bullet), which is known and also stays first in the `.bss`: TwlSDK's
-  `nwm.c` matches `func_02702468` with `static u8 sNwmInitialized = FALSE;` and no split.
+  `nwm_setup.c` matches `func_02702468` with `u8 NWMi_SetUpDone = FALSE;`.
+- A struct of statics whose functions need two addressings is several files. `nwm.c`'s system pointer, exit callback
+  and sleep callback (0x24 bytes at `0x0276c2e8`) matched `func_02702a40` only as members of one struct, reached from
+  its base at `#0x14`, and `NWM_LoadDevice` only with the exit callback a plain object, loaded after the callback it
+  is given. They are a file of their own, `nwm_events.c` (cybervisi0n/libntr's reconstruction splits NWM there too),
+  built with `-ipa file` (every static from the section's base, its two 16-byte callbacks in the reverse of their
+  definitions) and starting its own `.bss`, while `NWM_LoadDevice`, in an `-ipa function` file after it, takes the exit
+  callback as an `extern`. Split as `nwm_setup.c`, `nwm_events.c` and `nwm.c`, all 41 functions match.
 - Under `-ipa function` the same holds for zero: a `.bss` global or static defined with an initializer, `= 0`,
   `= NULL` or `= { 0 }`, is known to the functions below it, which reach it from one base (`ldr rN, =.bss; [rN, #off]`),
   where a tentative definition is loaded through a literal of its own. NitroWiFi's `SOCLi_CleanupCommandPacketQueue`
@@ -3200,10 +3404,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
   match (33 bytes to 0x2c off otherwise).
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
-  down to a multiple of 0x80, with the rest in the load's offset: in `card_common.c` a static at 0x584 is read as
-  `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read with no
-  offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584 into the
-  file's one `.bss`, is another sign that it opens a section of another file.
+  down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
+  read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read
+  with no offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584
+  into the file's one `.bss`, is another sign that it opens a section of another file.
 - Under `-ipa file`, objects defined between `#pragma section NAME begin` and `#pragma section NAME end` get a section
   each and are reached through literals of their own, as under `-ipa function`, while the block's functions still reach
   the file's default `.bss` from its pooled base. `#pragma define_section NAME "init" "uninit" "const" abs32 RWX` names
@@ -3230,16 +3434,45 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   objects: NitroSystem G3D's `gecom.c` defines `NNS_G3dFlagUseFastDma`, `sGeBuffer` and `sDmaBusy`, which the ROM has
   as `sGeBuffer`, `sDmaBusy`, `NNS_G3dFlagUseFastDma`, and three or four words compiled alone with the library's flags
   come out the same way.
-- MWCC 2.0 (`2.0/sp2p2`) gives each initialized global of a file its own section and orders them by size, smallest
+- MWCC 2.0 (`2.0/sp2`) gives each initialized global of a file its own section and orders them by size, smallest
   first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a
   count and eight function pointers, 4 bytes each, before an 80-byte table: it declares the pointers in the reverse of
   the ROM's order, then the count, then the table. `cgtool.c` declares its two 12-byte joint tables in reverse and
   its 16-byte texture-matrix table after them, which the size puts last. The compiled object's symbol table shows the
   order.
-- MWCC 2.0 reaches a file's own statics of one section through a shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`),
-  and another file's global by its own address. In overlay 182 that set the seam between `dwc_aoss.c`, which loads
-  the free callback at `0x021c294c` directly, and `dwc_aoss_ap.c`, which loads it as `0x021c2940` + 0xc. It emits a
-  jump table only when every value of the range has a case label, so `dwc_aoss.c`'s switches list the empty cases too.
+- MWCC 2.0 without `-ipa file` reaches a file's statics and globals defined with an initializer (`= NULL`, `= 0`,
+  `= { 0 }`) from one shared anchor (`ldr r0, =base; ldr r1, [r0, #0xc]`), and a tentative definition or another
+  file's global by its own address. It lays the initialized ones out first in `.bss`, in the size heapsort of every
+  initialized object defined above the first function (`.data` and `.rodata` ones included), which
+  `rodata_order.py`'s `heapsort` of the reversed list predicts. A "struct" of words reached from that anchor, laid out
+  in size order in the ROM, is separate statics: `dwc_aoss_ap.c`'s `gAossApAlloc`, `gAossApOnModeChange`,
+  `gAossApBlock` and `gAossApFree`, four `= NULL` globals, give `DWC_Aoss_Init` its one literal for `0x021c2940` and
+  the free callback at + 0xc, while `dwc_aoss.c` loads the callback by its own address; `dwcutil_ac.c`'s work area is
+  32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
+  `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
+  so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
+- A static that a function stores to at offsets from its own address (`ldr r1, =obj; str r3, [r1]; str r2,
+  [r1, #0x14]`, then the same `r1` passed to a call) is one that the function doesn't know. Under `-ipa file` every
+  object of the file is known and reached from its section's base rounded down to 0x80 (`[r1, #0x30]` for an object at
+  0x30), and a pointer local is folded back into that. NitroSystem G3D's `sbc.c` has it in PRJMAP's texture matrix, at
+  0x30 of its `.data`: the file matches under `-ipa function` (`file_flags`), with the matrix defined after the last
+  function. That flag writes the data out in runs, one before each function that follows it, each sorted by size: the
+  ROM's `.data` (8, 8, 16, 16, then 64, 72, 72, 128 bytes) is the two texture commands and the material and shape tables
+  at the top, and the matrix, the two billboard commands and the command table defined after the last function, the
+  billboards and the matrix declared ahead of their users. Within a run, statics of one size come out in definition
+  order and globals of one size in the reverse, and the tentative `.bss` arrays in the reverse of their definitions.
+- MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
+  declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
+  file's initialized statics had them above the first function, and data that sits between two functions' literals
+  was defined between them. `dwcutil_ac.c`'s ten 1024-byte AES tables come out in the ROM's heapsort order (Td2 to Td4,
+  Te0 to Te4, Td0, Td1, after `rcon`) only defined among the setup's state statics, in the order that the forced
+  assignment ("invert the model", below) gives, and its host name and MD5 padding sit after
+  `UtilAc_FindSetupAp`'s literal and before `UtilAc_MakeIds'`, so they are defined between those functions, the name
+  forward-declared (`static char sAcHostName[12];`) for the SOC configuration that points to it.
+- Under MWCC 2.0 without `-ipa file`, a tentative static of struct type joins the shared `.bss` section after the
+  initialized statics, while a tentative byte array gets a section of its own, in the reverse of the definitions:
+  `dwcutil_ac.c`'s key of the first exchange, a 16-byte struct of two MAC addresses and a tag, came out ahead of the
+  file's other buffers, where the ROM has it among them by size, until it was a `u8[0x10]`.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM
@@ -3269,6 +3502,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   relocations, and two with the same contents only by the code that loads them: `btlv_scu.c`'s four 12-byte
   encounter step tables, two of them identical, needed their own declaration order, found by trying the orders of
   the four.
+- An object at an address that isn't a multiple of 4 shares its section with the one before it, since the linker
+  starts each section on a 4-byte boundary. So a run out of size order inside packed data means the objects'
+  boundaries are wrong, not that they have sections of their own: `dwc_util_address_settings.c`'s 24 bytes of "row
+  rectangles" at 0xa, after a 3- and a 7-byte table, are three 8-byte rectangles, which make its one shared section
+  ascend (3, 7, 8, 8, 8, 9, 9, 11, 15, 18, 24, 48); split, they give the ROM's `.rodata` and
+  `DWCUtilAddressSettings_GetTouchedItem` its offsets from the section's base.
 - When structured reorderings don't reach the shared section's tie order, invert the model: the heapsort permutation
   depends only on the sequence of sizes by declaration slot, so for a given sequence the ROM's layout forces which
   object every slot must hold, exactly. Search the size sequences instead of the orders — anneal with the forced
@@ -3357,8 +3596,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but
   the overlay links only with the original's form: twelve of overlay 182's DWC utility screens, such as
-  `dwc_util_error.c`'s `func_ov182_021ab67c("char/jb4Error.nsc.l", ...)`, link only with the literal, and
+  `dwc_util_error.c`'s `DWCUtilGfxResource_Load("char/jb4Error.nsc.l", ...)`, link only with the literal, and
   `dwc_util_main_menu.c`'s message paths, each padded to 4 bytes, are literals too.
+- MWCC shares a file's equal string literals, so one string in two places of the ROM's `.data` of one file, each
+  4-aligned, is not two uses of one literal. `dwc_util_info_menu.c` loads `char/yb5Multi.nsc.l` in two functions and
+  the ROM has a copy for each: the file links only with `-str noreuse` in its `file_flags`, which gives every use a
+  literal of its own, as `dwc_util_main_menu.c` needs for its two paths of the menu's graphics. `dwc_util_text.c`'s
+  two font tables share one string, so the flag is the file's, not its library's.
 - A global that no code refers to can be declared anywhere in the file, after functions too, and where it sits in
   the heapsort's list moves the local initializers around it: `mus_shot_photo.c` declares `MUS_SHOT_PHOTO_UNUSED`
   just before its last function, which gives the original's `.rodata` with no code change.
@@ -3397,6 +3641,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   a file's shared `.rodata` are such locals: `win_record.c` has its two columns' x (`{ 0, 144 }`) in
   `WinRecord_PrintItemAt` and its BG scroll's speed and wrap (`{ 0x40, 0x2000 }`) in `WinRecord_ScrollBG`, read as
   `add r2, #0x40`, and a 12-byte table that nothing reads, 4-aligned, so it is declared as `u32`s.
+  `field_menu.c`'s four BG setups likewise belong to its background-loading function: placing all four there keeps
+  the unused 32-byte setup among the three live templates and reproduces the full data layout in both ROMs.
 - Such a static can sit anywhere in the shared section, sorted by its size, and its function shows what it is.
   Overlay 165's `plist_sys.c` has 16 zero bytes that nothing reads after its 16-byte `BGSysLCDConfig`. They are read
   as `static const GXRgb sEdgeColors[8]` in `PokeList_Init3D`, which turns edge marking on but never loads a table.
@@ -3440,12 +3686,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
   the table. Its place among the packed tables is not definition order: defined between the room tables it came out
   one early, defined first it is where the ROM has it.
+  The DWC keypad's (`dwc_util_menu.c`) row text size, `{ 0x0c, 0x04 }` among its size tables, is such a table, read
+  by `DWCUtilText_CreateObj`'s arguments; as an unreferenced global it had a section of its own after them.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
 - Japanese text in a string is written as is: sources are UTF-8, and the build hands them to MWCC in Shift JIS, the
   encoding of the game's strings, through sjiswrap, with `-enc SJIS` so that a second byte of 0x5c (`表`, `ソ`) isn't
   read as a backslash. An escape such as `\x94` can't stand in for it in an assert, whose expression is stringized as
-  written: `wm_icon.c`'s `func_0203e5ec` has `GFL_ASSERT(0 && "非対応のOBJマッピングモード")`. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
+  written: `wm_icon.c`'s `WmIcon_GetCharNo` has `GFL_ASSERT(0 && "非対応のOBJマッピングモード")`. A character that Shift JIS can't encode is fine in a comment; anywhere else sjiswrap names it, and its
   bytes would be wrong.
 - Overlay IDs are linker symbols, written `OVERLAY_ID(279)` from `gfl/overlay.h`, which gives the literal pool entry
   a relocation. Mark the literal in the config with `tools/decomp/config_fixes.py overlay-id`.
@@ -3612,14 +3860,28 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `[-0x880]` indexing). The one that keeps it there stores the biased value into `checks[]` and reads it back
   (`checks[0] = biased; check = checks; index = *(u32 *)(*check++ - 0x2200);`), a store written only to stop MWCC
   folding the constant, which `docs/code-standards.md` §2 rejects.
+- With `-ipa file` the order of a file's same-size statics in `.bss` is set by their declaration order, but not as that
+  order: the four `int`s and two arrays of the echo filter in `vct_dsp.c` came out in 150 of 2,880 declaration orders
+  with the ROM's layout (`PrevIn`, read index, write index, `PrevOut`, coefficients, taps), and the other orders give
+  other layouts. A layout that the first few orders miss is worth a sweep: write each order to a file and read the
+  object's symbol table (about 8 compiles a second). Observed on `vct_dsp.c` and `vct_vad.c` only; `vct_vad.c`'s
+  libVCT order (`sNoiseThreshold`, `sQuietFrames`, `sNoiseIndex`, `sLoudnessHistory`) was the one that matched. When no
+  order gives a layout, the range may be several files: each file's statics are sorted by size on their own, so a
+  small static (the 2-byte `shift`) starts every run. The ROM's `vct_dsp.c` range is `vct_packet_pool.c`, `vct_vad.c`,
+  `vct_dsp.c` and `vct_mixer.c`; split, `VCT_UpdateVad`, `VCT_ResetCapture` and `SuppressEcho` match, where together no
+  spelling did.
 
 ## When nothing moves it
 
 - A Thumb `bx pc; nop` followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, right after a function that calls it,
-  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from
-  C and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
+  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from C
+  and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
   `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
-  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does.
+  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. NitroWiFi's code in the LTD autoload's
+  `.ltdmain` gives each call its own veneer instead, as an overlay does (`docs/configs.md`), which the build gets by
+  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so
+  `os_interrupt_twl.c` reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use
+  another file's veneers can be complete only once that file is.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
@@ -3630,9 +3892,22 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A library function whose loop stores through a stepped pointer (`strb rX, [r2], #1`) set up after the loop's entry
   test and restarted at `base + i` for a second loop, where dsi/1.1p1 indexes, or that recomputes a local's address
   (`add r0, sp, #0`) at each call, where dsi/1.1p1 keeps it in a saved register even at `optimization_level 1`, may have
-  been built with NitroSystem's 2.0/sp2p2. TwlSDK's `syscall_twl_ltd.c` matches whole under it, with plain indexed pad
-  loops, and under no dsi compiler, while all but four of `lib/twl`'s other files break under it. Probe 2.0/sp2p2 before
-  grinding such a function; configure.py has no per-file compiler yet.
+  been built with NitroSystem's 2.0/sp2. TwlSDK's `syscall_twl_ltd.c` matches whole under it, with plain indexed pad
+  loops, and under no dsi compiler, while all but four of `lib/twl`'s other files break under it. Probe 2.0/sp2 before
+  grinding such a function. A file gets a compiler of its own in its `library.toml`'s `file_compilers`, as
+  `syscall_twl_ltd.c` does, and keeps the library's flags.
+
+- MWCC 2.0/sp2p2 places a Thumb literal pool island by a fixed rule (`ConstantPools.c`, at 0x514fd0 in its
+  `mwccarm.exe`): it sizes each instruction from its opcode table (a conditional branch as 6 bytes and a `b` as 4, before
+  they are shortened; everything else at its real size), and at the first instruction that lies 0x3a0 bytes or more past
+  the first pending pool load (`0x3fc - 0x60`, plus the 4 of the pc), it dumps the pool after the last unconditional
+  branch since the last pool load, or else after that load with a `b` around it. The 2.0 builds up to 2.0/sp2 use a
+  smaller margin, and the DWC utility needs it: `UtilAc_MD5Transform` has no branch at all, so its sizes are exact, and
+  the ROM's island after the load at +0x3d2 (first load at +0x2a) needs a margin of 0x40 to 0x54 where sp2p2's 0x60 puts
+  it one step (0x1c) early, after +0x3b6. It matches under 2.0/sp1p6, sp1p7 and sp2 and under no later build, and
+  NitroSystem matches the same functions under every build from sp1p6 on, so both libraries take 2.0/sp2. A pool placed
+  early or late in an otherwise same function of a 2.0 file is the build, not the C: probe the other 2.0 builds
+  (`compiler_probe.py --compilers 2.0/sp1p6,2.0/sp2,2.0/sp2p2`).
 
 - MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
   `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands
@@ -3661,3 +3936,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the order of instructions differs and no source change moves it, try `tools/decomp/permuter_setup.py`, which
   prepares a function for [decomp-permuter](https://github.com/simonlindholm/decomp-permuter). Its result can point to
   a plain change: `GFL_BGSysAllocChar`'s registers only matched with its tile size, a `u8` from a call, in an `int`.
+
+- A TwlSDK function that resists respellings can be in the shape of cybervisi0n/libntr's reconstruction, which keeps
+  the SDK's inlines and blocks: six of the LTD autoload's matched once rebuilt so, in our own names. `mi_ndma.c`'s
+  `MIi_NDma` and `MIi_NDmaAsync` set the registers through one-line `static inline` writers inside
+  `if (size > 0) { ... }`, with the locals declared there; `mi_ndma_gxcommand.c`'s `MIi_NDmaFIFOCallback` calls the
+  transfer through a `static inline`, `MIi_NDmaAsyncImmediate`, which adds the channel's config, so the arguments
+  are computed in the inline's order; `card_hash.c`'s `CARD_SetUpCheckedReads` lays its buffer out through a
+  cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect` gets the sector
+  index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops by
+  `slot + banks`. Look the function up there before grinding registers.

@@ -113,7 +113,7 @@ enum {
     DWC_SVL_STATE_ERROR,
     DWC_SVL_STATE_CANCELED,
 };
-BOOL func_ov011_0215de44(const char *svc, void *result);
-int func_ov011_0215dea8(void);
+BOOL DWC_SVLGetTokenAsync(const char *svc, void *result);
+int DWC_SVLProcess(void);
 
 #endif // POKEBW2_POKE_NET_INTERNAL_H

@@ -13,6 +13,11 @@
 #include "nnsys/gfd.h"
 #include "system/aeabi.h"
 
+// The texture pattern animations a map can have
+#define FIELD_TERRAIN_TEXPAT_ANIMATION_MAX 16
+// The size of each chunk's SRT animation object, fixed whatever the animation
+#define FIELD_TERRAIN_SRT_ANMOBJ_SIZE 0x80
+
 // A texture pattern animation's value at a frame
 typedef struct {
     u8 textureIndex;
@@ -68,7 +73,7 @@ typedef struct {
 } FieldTerrainTexPatAnimationPack;
 
 typedef struct {
-    FieldTerrainTexPatAnimation animations[16];
+    FieldTerrainTexPatAnimation animations[FIELD_TERRAIN_TEXPAT_ANIMATION_MAX];
     FieldTerrainTexPatAnimationPack *animationPack;
 } FieldTerrainTexPatAnimator;
 
@@ -216,7 +221,7 @@ static FieldTerrainSRTAnimatorChunkState *FieldTerrainSRTAnimator_GetChunkState(
 
 static void FieldTerrainSRTAnimatorChunkState_Init(FieldTerrainSRTAnimatorChunkState *state, void *resAnm,
                                                    HeapID heapId) {
-    state->anmObj = GFL_HeapAllocate(heapId, 0x80, TRUE, "field_ground_anime.c", 518);
+    state->anmObj = GFL_HeapAllocate(heapId, FIELD_TERRAIN_SRT_ANMOBJ_SIZE, TRUE, "field_ground_anime.c", 518);
     state->resAnm = resAnm;
 }
 
@@ -225,23 +230,31 @@ static void FieldTerrainSRTAnimatorChunkState_Free(FieldTerrainSRTAnimatorChunkS
     state->anmObj = NULL;
 }
 
-static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, void *model,
-                                                       void *textures, NNSG3dRenderObj *renderObj) {
-    NNSG3dResMdlSet *mdlSet = NNS_G3dGetMdlSet(GFL_G3DResGetResData(model));
-    NNSG3dResMdl *mdl;
-    NNSG3dResTex *tex;
+// The first model of a model set that may be missing. The missing set and the missing entry share one NULL, so this
+// isn't a NULL check around NNS_G3dGetMdlByIdx
+static inline NNSG3dResMdl *FieldTerrainSRTAnimatorChunkState_GetFirstMdl(const NNSG3dResMdlSet *mdlSet) {
+    const u32 *ofs;
 
     if (mdlSet != NULL) {
-        mdl = NNS_G3dGetMdlByIdx(mdlSet, 0);
-    } else {
-        mdl = NULL;
+        ofs = NNS_G3dGetResDataByIdx(&mdlSet->dict, 0);
+        if (ofs != NULL) {
+            return (NNSG3dResMdl *)((u8 *)mdlSet + *ofs);
+        }
     }
+    return NULL;
+}
+
+static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, void *model,
+                                                       void *textures, NNSG3dRenderObj *renderObj) {
+    NNSG3dResMdl *mdl = FieldTerrainSRTAnimatorChunkState_GetFirstMdl(NNS_G3dGetMdlSet(GFL_G3DResGetResData(model)));
+    NNSG3dResTex *tex;
+
     if (textures != NULL) {
         tex = GFL_G3DResGetTexData(textures);
     } else {
         tex = NULL;
     }
-    MI_CpuFill8(state->anmObj, 0, 0x80);
+    MI_CpuFill8(state->anmObj, 0, FIELD_TERRAIN_SRT_ANMOBJ_SIZE);
     NNS_G3DAnimationCreate(state->anmObj, state->resAnm, mdl, tex);
     NNS_G3DAnimationBind(renderObj, state->anmObj);
     state->used = TRUE;
@@ -274,7 +287,7 @@ static void FieldTerrainAnimator_LoadTexPat(FieldTerrainTexPatAnimator *animator
 static void FieldTerrainTexPatAnimator_Free(FieldTerrainTexPatAnimator *animator) {
     int i;
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < FIELD_TERRAIN_TEXPAT_ANIMATION_MAX; i++) {
         if (FieldTerrainTexPatAnimation_HasData(&animator->animations[i])) {
             FieldTerrainTexPatAnimation_Free(&animator->animations[i]);
         }
@@ -288,7 +301,7 @@ static void FieldTerrainTexPatAnimator_Free(FieldTerrainTexPatAnimator *animator
 static void FieldTerrainTexPatAnimator_Update(FieldTerrainTexPatAnimator *animator, fx32 step) {
     int i;
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < FIELD_TERRAIN_TEXPAT_ANIMATION_MAX; i++) {
         if (FieldTerrainTexPatAnimation_HasData(&animator->animations[i])) {
             FieldTerrainTexPatAnimation_Update(&animator->animations[i], step);
         }
@@ -405,8 +418,13 @@ static int FieldTerrainTexPatAnimation_GetTextureSize(void *textures, u32 textur
     const NNSG3dResDictTexData *data = tex != NULL ? NNS_G3dGetResDataByIdx(&tex->dict, textureIndex) : NULL;
     u32 param = data->texImageParam;
 
-    return TEXIMAGE_DIM_TO_PIXELS[(param & (7 << 20)) >> 20] * TEXIMAGE_DIM_TO_PIXELS[(param & (7 << 23)) >> 23] /
-           TEX_FMT_PIXELS_PER_BYTE[(param & (7 << 26)) >> 26];
+    u32 pixelCount = TEXIMAGE_DIM_TO_PIXELS[(param & (7 << REG_G3_TEXIMAGE_PARAM_V_SIZE_SHIFT)) >>
+                                            REG_G3_TEXIMAGE_PARAM_V_SIZE_SHIFT] *
+                     TEXIMAGE_DIM_TO_PIXELS[(param & (7 << REG_G3_TEXIMAGE_PARAM_T_SIZE_SHIFT)) >>
+                                            REG_G3_TEXIMAGE_PARAM_T_SIZE_SHIFT];
+
+    return pixelCount / TEX_FMT_PIXELS_PER_BYTE[(param & (7 << REG_G3_TEXIMAGE_PARAM_TEXFMT_SHIFT)) >>
+                                                REG_G3_TEXIMAGE_PARAM_TEXFMT_SHIFT];
 }
 
 static void *FieldTerrainTexPatAnimation_GetTextureAddress(void *textures, u32 textureIndex) {

@@ -1,3 +1,5 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/sound.h"
 #include "field/event_data.h"
@@ -212,7 +214,7 @@ static void FieldPlayerGrid_ClearConstMoveFlag(FieldPlayerGrid *grid);
 static BOOL FieldPlayerGrid_CheckConstMoveFlag(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_SetConstMoveEndSpotFlag(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_ClearConstMoveEndSpotFlag(FieldPlayerGrid *grid);
-static void func_ov036_0219c994(FieldPlayerGrid *grid);
+static void FieldPlayerGrid_ClearFlag4(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_SetCatwalkBalancingFlag(FieldPlayerGrid *grid, BOOL set);
 static BOOL FieldPlayerGrid_CheckCatwalkBalancingFlag(FieldPlayerGrid *grid);
 static void FieldPlayerGrid_SetCatwalkExitingFlag(FieldPlayerGrid *grid, BOOL set);
@@ -316,7 +318,7 @@ void FieldPlayerGrid_UpdateMovement(FieldPlayerGrid *grid, u32 pressedKeys, u32 
 static void FieldPlayerGrid_SetCommonStatus(FieldPlayerGrid *grid, u32 command, const GridMoveInput *input) {
     grid->command = command;
     FieldPlayerCore_CalcSeparateKeyDirs(grid->core, input->heldKeys);
-    func_ov036_0219c994(grid);
+    FieldPlayerGrid_ClearFlag4(grid);
     FieldPlayerGrid_ClearFlag(grid, GRID_FLAG_RUNNING);
     if (command == GRID_COMMAND_MOVE) {
         FieldPlayerGrid_ClearConstMoveEndSpotFlag(grid);
@@ -473,7 +475,7 @@ u32 FieldPlayerGrid_GetMoveDirContType(FieldPlayerGrid *grid, u16 dir) {
     return MOVE_DIR_CONT_MOVE;
 }
 
-BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid) {
+BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid, u16 dir) {
     return FieldPlayerCore_IsAcmdFinished(grid->core);
 }
 
@@ -587,7 +589,7 @@ static u32 FieldPlayerGrid_DecideCommandNormalBraking(FieldPlayerGrid *grid, Fie
     u16 faceDir = GetActorFaceDir(actor);
 
     if (input->dir != PLAYER_DIR_NONE && input->dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return FieldPlayerGrid_DecideCommandNormalMoving(grid, actor, input);
     }
     if (IsAllActorAcmdFinished(actor) == FALSE) {
@@ -818,7 +820,7 @@ static u32 FieldPlayerGrid_DecideCommandBikeBraking(FieldPlayerGrid *grid, Field
     u16 faceDir = GetActorFaceDir(actor);
 
     if (input->dir != PLAYER_DIR_NONE && input->dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return FieldPlayerGrid_DecideCommandBikeMoving(grid, actor, input);
     }
     if (IsAllActorAcmdFinished(actor) == FALSE) {
@@ -870,7 +872,6 @@ static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldA
     u32 tileType;
     u32 tileFlags;
     u32 hit;
-    u16 tileClass;
 
     if (IsAllActorAcmdFinished(actor) == FALSE) {
         return GRID_COMMAND_NONE;
@@ -883,7 +884,7 @@ static u32 FieldPlayerGrid_DecideCommandSurfMoving(FieldPlayerGrid *grid, FieldA
         hit = 0;
     }
     if (tileType != 0xffffffff) {
-        tileClass = GetTileClass(tileType);
+        GetTileClass(tileType);
         tileFlags = GetTileFlags(tileType);
         if (hit == 0) {
             if (tileFlags & 2) {
@@ -913,7 +914,7 @@ static u32 FieldPlayerGrid_DecideCommandSurfBraking(FieldPlayerGrid *grid, Field
     u16 faceDir = GetActorFaceDir(actor);
 
     if (input->dir != PLAYER_DIR_NONE && input->dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return FieldPlayerGrid_DecideCommandSurfMoving(grid, actor, input);
     }
     if (IsAllActorAcmdFinished(actor) == FALSE) {
@@ -993,7 +994,7 @@ static void FieldPlayerGrid_UpdateNormalIdle(FieldPlayerGrid *grid, FieldActor *
 
 // A step, slower when the tile ahead is higher
 static void FieldPlayerGrid_UpdateNormalMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    u32 acmd;
+    u16 acmd;
     BOOL checkHeight = TRUE;
 
     if (input->force == TRUE) {
@@ -1060,8 +1061,8 @@ static void FieldPlayerGrid_UpdateNormalCatwalkExit(FieldPlayerGrid *grid, Field
         dir = FieldPlayerGrid_CalcCatwalkFallDir(grid);
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, ACMD_JUMP_1));
-    func_ov012_0216763c(actor, TRUE);
-    func_ov012_021677d8(actor, TRUE);
+    FldAct_SetHeightCalcDisabled(actor, TRUE);
+    FldAct_SetLandingDustDisabled(actor, TRUE);
     SetActorMovementFlag(actor, 0x8000);
     grid->state = GRID_STATE_CATWALK_EXIT;
 }
@@ -1133,7 +1134,7 @@ static void FieldPlayerGrid_UpdateBikeIdle(FieldPlayerGrid *grid, FieldActor *ac
 // A step, slower in deep sand and when the tile ahead is higher
 static void FieldPlayerGrid_UpdateBikeMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
     u32 tileType;
-    u32 acmd;
+    u16 acmd;
     BOOL checkHeight = TRUE;
 
     if (input->force == TRUE) {
@@ -1218,7 +1219,7 @@ static void FieldPlayerGrid_UpdateSurfIdle(FieldPlayerGrid *grid, FieldActor *ac
 }
 
 static void FieldPlayerGrid_UpdateSurfMove(FieldPlayerGrid *grid, FieldActor *actor, const GridMoveInput *input) {
-    u32 acmd;
+    u16 acmd;
 
     if (input->force == TRUE) {
         acmd = ACMD_WALK_2F;
@@ -1263,7 +1264,7 @@ static u32 PlayerMoveCollCheck(FieldPlayerGrid *grid, FieldActor *actor, u16 dir
         *tileType = 0xffffffff;
     }
     if ((hit & 2) && MapTile_IsStrengthHole(GetTileClass(*tileType)) == TRUE &&
-        func_ov012_0216820c(GetActorMModelSystem(actor), &pos) == TRUE) {
+        IsSavedStrengthRockAtPos(GetActorMModelSystem(actor), &pos) == TRUE) {
         hit &= ~2;
     }
     return hit;
@@ -1309,7 +1310,7 @@ static void FieldPlayerGrid_ClearConstMoveEndSpotFlag(FieldPlayerGrid *grid) {
     FieldPlayerGrid_ClearFlag(grid, GRID_FLAG_CONST_MOVE_END_SPOT);
 }
 
-static void func_ov036_0219c994(FieldPlayerGrid *grid) {
+static void FieldPlayerGrid_ClearFlag4(FieldPlayerGrid *grid) {
     FieldPlayerGrid_ClearFlag(grid, GRID_FLAG_4);
 }
 
@@ -1348,9 +1349,9 @@ void FieldPlayerGrid_ForceBrake(FieldPlayerGrid *grid) {
         FieldActor *actor = FieldPlayerCore_GetActor(grid->core);
         u16 dir = GetActorFaceDir(actor);
 
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        func_ov012_021670f4(actor, 0);
+        FldAct_SetDrawStatus(actor, 0);
         FieldPlayerCore_SetMoveStatus(grid->core, 0);
     }
 }
@@ -1366,9 +1367,9 @@ BOOL func_ov036_0219ca30(FieldPlayerGrid *grid) {
         FieldActor *actor = FieldPlayerGrid_GetPlayerActor(grid);
         u16 dir = GetActorFaceDir(actor);
 
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        func_ov012_021670f4(actor, 0);
+        FldAct_SetDrawStatus(actor, 0);
         FieldPlayerCore_SetMoveStatus(grid->core, 0);
         break;
     }
@@ -1406,8 +1407,8 @@ void FieldPlayerGrid_SanitizeHeightMismatch(FieldPlayerGrid *grid) {
     VecFx32 pos;
     FieldActor *actor = FieldPlayerCore_GetActor(grid->core);
 
-    func_ov012_0216763c(actor, FALSE);
-    func_ov012_021677d8(actor, FALSE);
+    FldAct_SetHeightCalcDisabled(actor, FALSE);
+    FldAct_SetLandingDustDisabled(actor, FALSE);
     SetActorMovementFlag(actor, 0x140);
     CheckRecalcActorY(actor);
     CopyActorWPos(actor, &pos);

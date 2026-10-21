@@ -231,7 +231,7 @@ DrawSystem *DrawSystem_Create(const DrawSystemParam *param) {
 }
 
 void DrawSystem_Delete(DrawSystem *sys) {
-    func_02042ed0(sys->commands);
+    GFL_NetFreeAligned32(sys->commands);
     GFL_HeapFree(sys);
 }
 

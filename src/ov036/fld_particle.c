@@ -1,4 +1,7 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field_3dci.h"
 #include "gfl/g3d.h"
 #include "gfl/heap.h"
@@ -61,54 +64,88 @@ const Fld3DCiFadeKey data_ov036_021d18ac[1] = { { -1 } };
 const Fld3DCiFadeKey data_ov036_021d18a0[1] = { { -1 } };
 const Fld3DCiFadeKey data_ov036_021d17ec[1] = { { -1 } };
 const Fld3DCiFadeKey data_ov036_021d1888[1] = { { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1960[2] = { { 0x84f, 1 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1970[2] = { { 0x8fe, 1 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1980[2] = { { 0x672, 24 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1990[2] = { { 0x7eb, 1 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d19a0[2] = { { 0x672, 24 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d19b0[2] = { { 0x672, 24 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d19c0[2] = { { 0x7eb, 1 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d19d0[2] = { { 0x7c5, 1 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1a10[3] = { { 0x8d2, 1 }, { 0x8d3, 30 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1a28[3] = { { 0x8df, 1 }, { 0x8e0, 31 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1a40[3] = { { 0x7d5, 1 }, { 0x794, 38 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1960[2] = { { SEQ_SE_SW_FES_13, 1 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1970[2] = { { SEQ_SE_SW_GIANTHOLE_10, 1 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1980[2] = { { SEQ_SE_FLD_01, 24 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1990[2] = { { SEQ_SE_FLD_172, 1 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d19a0[2] = { { SEQ_SE_FLD_01, 24 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d19b0[2] = { { SEQ_SE_FLD_01, 24 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d19c0[2] = { { SEQ_SE_FLD_172, 1 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d19d0[2] = { { SEQ_SE_FLD_157, 1 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1a10[3] = { { SEQ_SE_SW_MEDALGET, 1 }, { SEQ_SE_SW_MEDALGET_02, 30 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1a28[3] = { { SEQ_SE_SW_KERTIO_FORM_04, 1 },
+                                                 { SEQ_SE_SW_KERTIO_FORM_05, 31 },
+                                                 { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1a40[3] = { { SEQ_SE_FLD_166, 1 }, { SEQ_SE_SYS_89, 38 }, { -1 } };
 const Fld3DCiFadeKey data_ov036_021d19e0[2] = { { 50, 12, 0, 16, 5 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d19f8[3] = { { 0x7b6, 16 }, { 0x7b7, 32 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1a58[4] = { { 0x7cd, 2 }, { 0x796, 12 }, { 0x7b7, 21 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1a78[4] = { { 0x8ec, 6 }, { 0x8ed, 27 }, { 0x8ee, 28 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1a98[4] = { { 0x57a, 10 }, { 0x7de, 38 }, { 0x786, 91 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d19f8[3] = { { SEQ_SE_FLD_152, 16 }, { SEQ_SE_SDEMO_03, 32 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1a58[4] = {
+    { SEQ_SE_FLD_164, 2 }, { SEQ_SE_NDEMO_01, 12 }, { SEQ_SE_SDEMO_03, 21 }, { -1 }
+};
+const Fld3DCiSoundKey data_ov036_021d1a78[4] = {
+    { SEQ_SE_SW_CI_PKWOOD_01, 6 }, { SEQ_SE_SW_CI_PKWOOD_02, 27 }, { SEQ_SE_SW_CI_PKWOOD_03, 28 }, { -1 }
+};
+const Fld3DCiSoundKey data_ov036_021d1a98[4] = {
+    { SEQ_SE_ROTATION_B, 10 }, { SEQ_SE_SHDEMO_04, 38 }, { SEQ_SE_TDEMO_003, 91 }, { -1 }
+};
 const Fld3DCiFadeKey data_ov036_021d1ab8[3] = { { 1, 3, 0, 16, 10 }, { 10, 3, 16, 0, 20 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1b54[5] = { { 0x5f2, 1 }, { 0x7cd, 22 }, { 0x7de, 46 }, { 0x766, 117 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1b7c[5] = { { 0x7cd, 9 }, { 0x7cd, 15 }, { 0x789, 30 }, { 0x5f2, 49 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1adc[5] = { { 0x8e8, 1 }, { 0x8e9, 10 }, { 0x8ea, 25 }, { 0x8eb, 26 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1b04[5] = { { 0x8f5, 1 }, { 0x8f6, 2 }, { 0x8f7, 70 }, { 0x8f8, 71 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1b2c[5] = { { 0x8f9, 1 }, { 0x8fa, 2 }, { 0x8fb, 70 }, { 0x8fc, 71 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1ba4[6] = { { 0x58f, 10 }, { 0x58f, 27 }, { 0x58f, 41 },
-                                                 { 0x5a9, 52 }, { 0x794, 75 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1bd4[7] = { { 0x789, 1 },   { 0x7d9, 3 },   { 0x5e5, 159 }, { 0x7da, 208 },
-                                                 { 0x794, 272 }, { 0x57a, 316 }, { -1 } };
-const Fld3DCiSoundKey data_ov036_021d1c0c[7] = { { 0x789, 1 },   { 0x7d9, 3 },   { 0x5e5, 159 }, { 0x7da, 208 },
-                                                 { 0x794, 272 }, { 0x57a, 316 }, { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1b54[5] = {
+    { SEQ_SE_W009_01, 1 }, { SEQ_SE_FLD_164, 22 }, { SEQ_SE_SHDEMO_04, 46 }, { SEQ_SE_FLD_127, 117 }, { -1 }
+};
+const Fld3DCiSoundKey data_ov036_021d1b7c[5] = {
+    { SEQ_SE_FLD_164, 9 }, { SEQ_SE_FLD_164, 15 }, { SEQ_SE_TDEMO_006, 30 }, { SEQ_SE_W009_01, 49 }, { -1 }
+};
+const Fld3DCiSoundKey data_ov036_021d1adc[5] = { { SEQ_SE_SW_CI_WBT_01, 1 },
+                                                 { SEQ_SE_SW_CI_WBT_02, 10 },
+                                                 { SEQ_SE_SW_CI_WBT_03, 25 },
+                                                 { SEQ_SE_SW_CI_WBT_04, 26 },
+                                                 { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1b04[5] = { { SEQ_SE_SW_GIANTHOLE_07_1, 1 },
+                                                 { SEQ_SE_SW_GIANTHOLE_07_2, 2 },
+                                                 { SEQ_SE_SW_GIANTHOLE_07_3, 70 },
+                                                 { SEQ_SE_SW_GIANTHOLE_07_4, 71 },
+                                                 { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1b2c[5] = { { SEQ_SE_SW_GIANTHOLE_08_1, 1 },
+                                                 { SEQ_SE_SW_GIANTHOLE_08_2, 2 },
+                                                 { SEQ_SE_SW_GIANTHOLE_08_3, 70 },
+                                                 { SEQ_SE_SW_GIANTHOLE_08_4, 71 },
+                                                 { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1ba4[6] = { { SEQ_SE_W010_01, 10 }, { SEQ_SE_W010_01, 27 }, { SEQ_SE_W010_01, 41 },
+                                                 { SEQ_SE_W043_01, 52 }, { SEQ_SE_SYS_89, 75 },  { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1bd4[7] = { { SEQ_SE_TDEMO_006, 1 },
+                                                 { SEQ_SE_BGDEMO_01, 3 },
+                                                 { SEQ_SE_W319_01, 159 },
+                                                 { SEQ_SE_BGDEMO_02, 208 },
+                                                 { SEQ_SE_SYS_89, 272 },
+                                                 { SEQ_SE_ROTATION_B, 316 },
+                                                 { -1 } };
+const Fld3DCiSoundKey data_ov036_021d1c0c[7] = { { SEQ_SE_TDEMO_006, 1 },
+                                                 { SEQ_SE_BGDEMO_01, 3 },
+                                                 { SEQ_SE_W319_01, 159 },
+                                                 { SEQ_SE_BGDEMO_02, 208 },
+                                                 { SEQ_SE_SYS_89, 272 },
+                                                 { SEQ_SE_ROTATION_B, 316 },
+                                                 { -1 } };
 const Fld3DCiFadeKey data_ov036_021d1c44[5] = {
     { 90, 4, 0, 16, 1 }, { 93, 4, 16, 0, 5 }, { 165, 4, 0, 16, 5 }, { 170, 4, 16, 0, 5 }, { -1 }
 };
 
-FieldParticle *func_ov036_021bb590(HeapID heapId) {
+FieldParticle *FieldParticle_Create(HeapID heapId) {
     FieldParticle *particle = GFL_HeapAllocate(heapId, sizeof(FieldParticle), TRUE, "fld_particle.c", 46);
 
     particle->heapId = heapId;
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     particle->work = GFL_HeapAllocate(heapId, 0x4800, TRUE, "fld_particle.c", 52);
     return particle;
 }
 
-ParticleSystem *func_ov036_021bb5d0(FieldParticle *particle) {
+ParticleSystem *FieldParticle_CreateSystem(FieldParticle *particle) {
     G3DCamera *camera;
     fx32 zNear;
     fx32 zFar;
 
-    particle->system = func_0204f968(particle->work, 0x4800, TRUE, particle->heapId);
-    camera = func_02050194(particle->system);
+    particle->system = Particle_CreateSystem(particle->work, 0x4800, TRUE, particle->heapId);
+    camera = Particle_GetCamera(particle->system);
     zNear = FX32_ONE;
     zFar = FX32_CONST(900);
     GFL_G3DCameraSetProjectionZNear(camera, &zNear);
@@ -116,38 +153,38 @@ ParticleSystem *func_ov036_021bb5d0(FieldParticle *particle) {
     return particle->system;
 }
 
-void func_ov036_021bb60c(FieldParticle *particle) {
+void FieldParticle_DeleteSystem(FieldParticle *particle) {
     if (particle->system != NULL) {
-        func_0204fa84(particle->system);
+        Particle_DeleteSystem(particle->system);
         particle->system = NULL;
     }
 }
 
 void *FieldParticle_LoadResource(FieldParticle *particle, u32 arcId, u32 fileId) {
-    return func_0204fdf8(arcId, fileId, particle->heapId);
+    return Particle_ReadResource(arcId, fileId, particle->heapId);
 }
 
-void func_ov036_021bb630(FieldParticle *particle, void *resource, BOOL immediate, TCBManager *tcbMgr) {
-    func_0204fe04(particle->system, resource, immediate, tcbMgr);
+void FieldParticle_SetResource(FieldParticle *particle, void *resource, BOOL immediate, TCBManager *tcbMgr) {
+    Particle_SetResource(particle->system, resource, immediate, tcbMgr);
 }
 
-BOOL func_ov036_021bb63c(FieldParticle *particle) {
+BOOL FieldParticle_IsFinished(FieldParticle *particle) {
     if (particle->system == NULL) {
         return TRUE;
     }
-    if (func_020500a8(particle->system) == FALSE) {
+    if (Particle_GetEmitterCount(particle->system) == FALSE) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov036_021bb658(FieldParticle *particle) {
-    func_ov036_021bb60c(particle);
-    func_0204fb4c();
+void FieldParticle_Free(FieldParticle *particle) {
+    FieldParticle_DeleteSystem(particle);
+    Particle_Free();
     GFL_HeapFree(particle->work);
     GFL_HeapFree(particle);
 }
 
-void func_ov036_021bb674(void) {
-    func_0204f954();
+void FieldParticle_DrawAndUpdateAll(void) {
+    Particle_DrawAndUpdateAll();
 }

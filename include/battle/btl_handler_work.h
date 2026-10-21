@@ -26,7 +26,7 @@ struct BtlActionState {
     u8 work[500];
 };
 
-void func_ov167_021b083c(BtlActionState *state);
+void InitState(BtlActionState *state);
 u32 PushState(BtlActionState *state, u32 command);
 u32 PushStateUseItem(BtlActionState *state, u16 item, u32 command);
 void PopState(BtlActionState *state, u32 value, u32 command);
@@ -34,8 +34,8 @@ u16 GetUseItemNo(BtlActionState *state);
 BOOL IsUsed(BtlActionState *state);
 void SetResult(BtlActionState *state, BOOL result);
 BOOL GetPrevResult(BtlActionState *state);
-BOOL func_ov167_021b0918(BtlActionState *state);
-void *func_ov167_021b0920(BtlActionState *state, u32 command, u32 monId);
+BOOL GetResult(BtlActionState *state);
+void *PushWork(BtlActionState *state, u32 command, u32 monId);
 void PopWork(BtlActionState *state, void *work);
 
 #endif // POKEBW2_BATTLE_BTL_HANDLER_WORK_H

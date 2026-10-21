@@ -125,6 +125,8 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
         libraries[src] = (library["compiler"], [*library["flags"], ENCODING_FLAG])
         for path, flags in library.get("file_flags", {}).items():
             FILE_FLAGS[src + path] = flags
+        for path, compiler in library.get("file_compilers", {}).items():
+            FILE_COMPILERS[src + path] = compiler
     return libraries
 
 
@@ -132,6 +134,8 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
 # replaces the default flag of the same option ("-ipa function" replaces "-ipa file", "-thumb" replaces "-nothumb",
 # "-O2,p" replaces "-O4,p")
 FILE_FLAGS: dict[str, list[str]] = {}
+# Library sources built with another compiler than the rest of their library, from library.toml's file_compilers
+FILE_COMPILERS: dict[str, str] = {}
 
 
 def flag_option(flag: str) -> str:
@@ -184,6 +188,8 @@ def load_source_flags(path: Path) -> dict[str, list[str]]:
 
 
 LIBRARIES = load_libraries()
+# Every compiler that a library source is built with, each with a rule of its own
+LIBRARY_COMPILERS = list(dict.fromkeys([*(compiler for compiler, _ in LIBRARIES.values()), *FILE_COMPILERS.values()]))
 FILE_FLAGS.update(load_source_flags(ROOT / "config/compiler_flags.toml"))
 # Header search path of every source file, the game's and the libraries': the game's headers, each library's public
 # headers, and the headers the build generates from the constant lists in generated/ (see
@@ -202,6 +208,12 @@ ROM_BLOBS = {
 }
 
 
+def overlay_digest_includes(version: str) -> list[str]:
+    """Returns the include files, under the generated headers, of a version's overlay table digest and overlay digests,
+    which lib/nitro/src/fs/fs_overlay_digest.c includes and tools/build/overlay_digests.py writes in that order."""
+    return [f"rom/{version}/overlay_table_digest.inc", f"rom/{version}/overlay_digests.inc"]
+
+
 def library_of(source: Path) -> tuple[str, list[str]] | None:
     """Returns the compiler and flags of the library a source file belongs to, or None for the game's own code."""
     try:
@@ -209,7 +221,7 @@ def library_of(source: Path) -> tuple[str, list[str]] | None:
     except ValueError:
         return None
     library = next((library for prefix, library in LIBRARIES.items() if relative.startswith(prefix)), None)
-    return (library[0], file_flags(source, library[1])) if library else None
+    return (FILE_COMPILERS.get(relative, library[0]), file_flags(source, library[1])) if library else None
 
 
 @dataclass(frozen=True)
@@ -440,7 +452,7 @@ def download_tools(tools_dir: Path):
         objdiff.chmod(objdiff.stat().st_mode | stat.S_IEXEC)
 
     mwccarm = tools_dir / "mwccarm"
-    compilers = ["dsi", *(compiler for compiler, _ in LIBRARIES.values())]
+    compilers = ["dsi", *LIBRARY_COMPILERS]
     if not all((mwccarm / compiler).exists() for compiler in compilers):
         print("Downloading mwccarm")
         with urllib.request.urlopen(MWCCARM_URL) as response:
@@ -541,16 +553,20 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
         source = Path(f["name"])
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
-            rule = next((f"mwcc_{i}" for i, lib in enumerate(LIBRARIES) if str(source).startswith(lib)), "mwcc")
+            settings = source_compiler(source)
+            rule = f"mwcc_{LIBRARY_COMPILERS.index(settings.compiler)}" if settings.is_library else "mwcc"
             variables = {"defines": defines, "dep": obj.with_suffix(".d")}
-            variables["flags"] = " ".join(source_compiler(source).flags)
+            variables["flags"] = " ".join(settings.flags)
             n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
             compiled.append(obj)
         objects.append(f["object_to_link"])
 
+    # The LTD autoload's objects are linked as an overlay group, for their veneers, see tools/build/ltd_objects.py
+    link_objects = build_dir / "objects_link.txt"
+    n.build([link_objects], "ltd_objects", [objects_file, lcf_file], implicit=["tools/build/ltd_objects.py"])
     arm9_o = build_dir / "arm9.o"
-    n.build([arm9_o], "mwld", objects, implicit=[link_lcf, objects_file],
-            variables={"objects": objects_file, "lcf": link_lcf})
+    n.build([arm9_o], "mwld", objects, implicit=[link_lcf, link_objects],
+            variables={"objects": link_objects, "lcf": link_lcf})
 
     # The ROM's file system is the extracted one, with the archives built from source in place of the extracted ones.
     # The tree is made first, so that no archive is written through a link into extract/.
@@ -711,13 +727,14 @@ def main():
            depfile="$dep", deps="gcc")
     # The older compilers (SPL's 1.2/base) warn when MWCIncludes, their system include path, isn't set. The code finds its
     # headers through -i, so any value does
-    for i, (compiler, _) in enumerate(LIBRARIES.values()):
+    for i, compiler in enumerate(LIBRARY_COMPILERS):
         lib_mwcc = tools_dir / "mwccarm" / compiler / "mwccarm.exe"
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
     n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
+    n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
     # Scripts go through the C preprocessor, so that they can include the constant headers
     n.rule("as", f"{shlex.quote(clang)} --target=armv5te-none-eabi -x assembler-with-cpp -c $as_includes $defines "
@@ -789,6 +806,15 @@ def main():
                 implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
                 variables={"module": str(Path("extract") / versions[0] / module), "name": name})
         constant_headers.append(output)
+    # Each version's digests of its overlays, computed from its base ROM (tools/build/overlay_digests.py)
+    n.rule("overlay_digests", "$python tools/build/overlay_digests.py $in $key $out", "Generating $out", restat="1")
+    for version in versions:
+        outputs = [Path(GENERATED_INCLUDE_DIR) / include for include in overlay_digest_includes(version)]
+        extract_dir = Path("extract") / version
+        n.build(outputs, "overlay_digests", [Path("orig") / f"baserom_{version}.nds"],
+                implicit=["tools/build/overlay_digests.py", extract_dir / "config.yaml"],
+                variables={"key": str(extract_dir / "arm9" / "hmac_sha1_key.bin")})
+        constant_headers += outputs
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []

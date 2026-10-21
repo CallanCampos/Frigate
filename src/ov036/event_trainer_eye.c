@@ -8,6 +8,7 @@
 #include "field/field_actor.h"
 #include "field/field_comm_actor.h"
 #include "field/field_effect.h"
+#include "field/field_event.h"
 #include "field/field_script_event.h"
 #include "field/pair_sys.h"
 #include "field/trainer_script.h"
@@ -92,12 +93,12 @@ static BOOL EventTrainerEyeSub_SetIdleMoveCode(EventTrainerEyeWork *work);
 static BOOL EventTrainerEyeSub_Finish(EventTrainerEyeWork *work);
 static BOOL EventTrainerEye_Update(EventTrainerEyeWork *work);
 static GameEventReturnCode EventTrainerEye_Callback(GameEvent *event, u32 *state, void *data);
-static u16 func_ov036_021a643c(FieldActor *actor);
+static u16 EventTrainerEye_GetSightType(FieldActor *actor);
 static BOOL EventTrainerEye_CheckPathObstacle(FieldActor *actor, u16 dir, int range, EncountSystem *encounter);
-static u16 func_ov036_021a6544(FieldActor *actor);
+static u16 EventTrainerEye_UsesSpecialScript(FieldActor *actor);
 static BOOL CheckTrainerAlreadyDefeated(Field *field, FieldActor *actor);
 static void InitFieldScriptTrainerSetup(TrainerClashData *data, FieldActor *actor, int range, u16 dir);
-static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId);
+static FieldActor *EventTrainerEye_FindPairedTrainer(FieldActor *trainer, u16 trainerId);
 static GameEvent *CreateTrainerClashEvent(Field *field, FieldActor *actor);
 
 static const TrainerLineOfSightFunc TRAINER_LOS_DIST_FUNCTIONS[4] = {
@@ -141,7 +142,7 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
 
     if (EventTrainerEye_FindClashActor(field, NULL, &data) == TRUE) {
         battleCount = func_ov036_02182f90(Field_GetGameSystem(field));
-        if (func_ov036_021a6544(data.actor) == TRUE) {
+        if (EventTrainerEye_UsesSpecialScript(data.actor) == TRUE) {
             battleType = 0;
         } else {
             battleType = getBattleType(data.trainerId);
@@ -167,8 +168,8 @@ GameEvent *EventTrainerEye_CheckAll(Field *field) {
             }
         } else if (battleType == 1) {
             if (battleCount >= 2) {
-                InitFieldScriptTrainerSetup(&partner, func_ov036_021a65d4(data.actor, data.trainerId), data.range,
-                                            data.dir);
+                InitFieldScriptTrainerSetup(&partner, EventTrainerEye_FindPairedTrainer(data.actor, data.trainerId),
+                                            data.range, data.dir);
                 event = CreateTrainerClashEvent(field, data.actor);
                 data.kind = 1;
                 SetupTrainerClashSlot(event, 0, &data);
@@ -238,7 +239,7 @@ static int EventTrainerEye_CheckActorClash(EncountSystem *encounter, FieldActor 
     int dist;
     s16 range;
     u16 dir;
-    u16 eyeType = func_ov036_021a643c(actor);
+    u16 eyeType = EventTrainerEye_GetSightType(actor);
 
     if (eyeType == 1 || eyeType == 2) {
         dir = 0;
@@ -345,7 +346,7 @@ static BOOL EventTrainerEyeSub_ForceTrainerDir(EventTrainerEyeWork *work) {
 static BOOL EventTrainerEyeSub_DecideJumpOut(EventTrainerEyeWork *work) {
     u32 moveCode;
 
-    if (!func_ov012_02166ecc(FieldPlayer_GetActor(work->player))) {
+    if (!FldAct_CheckAcmdEnd(FieldPlayer_GetActor(work->player))) {
         return FALSE;
     }
     work->seq = TRAINER_EYE_SEQ_TURN_TRAINER;
@@ -371,7 +372,7 @@ static BOOL EventTrainerEyeSub_TurnTrainer(EventTrainerEyeWork *work) {
 }
 
 static BOOL EventTrainerEyeSub_WaitTurnTrainer(EventTrainerEyeWork *work) {
-    if (!func_ov012_02166ecc(work->data.actor)) {
+    if (!FldAct_CheckAcmdEnd(work->data.actor)) {
         return FALSE;
     }
     work->seq = TRAINER_EYE_SEQ_START_TERRAIN_EFFECT;
@@ -400,7 +401,7 @@ static BOOL EventTrainerEyeSub_JumpOut(EventTrainerEyeWork *work) {
 }
 
 static BOOL EventTrainerEyeSub_WaitJumpOut(EventTrainerEyeWork *work) {
-    if (func_ov012_02166ecc(work->data.actor) == TRUE) {
+    if (FldAct_CheckAcmdEnd(work->data.actor) == TRUE) {
         work->seq = TRAINER_EYE_SEQ_WAIT_30F;
     }
     return FALSE;
@@ -432,7 +433,7 @@ static BOOL EventTrainerEyeSub_WalkOneStepToPlayer(EventTrainerEyeWork *work) {
 }
 
 static BOOL EventTrainerEyeSub_DecrementClashDist(EventTrainerEyeWork *work) {
-    if (!func_ov012_02166ecc(work->data.actor)) {
+    if (!FldAct_CheckAcmdEnd(work->data.actor)) {
         return FALSE;
     }
     work->data.range--;
@@ -469,16 +470,16 @@ static BOOL EventTrainerEyeSub_TurnPlayer(EventTrainerEyeWork *work) {
 static BOOL EventTrainerEyeSub_WaitTurnPlayer(EventTrainerEyeWork *work) {
     FieldActor *player = FieldPlayer_GetActor(work->player);
 
-    if (!func_ov012_02166ecc(player)) {
+    if (!FldAct_CheckAcmdEnd(player)) {
         return FALSE;
     }
-    func_ov012_02166ef8(player);
+    FldAct_EndAcmd(player);
     work->seq = TRAINER_EYE_SEQ_SET_IDLE_MOVE_CODE;
     return TRUE;
 }
 
 static BOOL EventTrainerEyeSub_SetIdleMoveCode(EventTrainerEyeWork *work) {
-    func_ov012_02166ef8(work->data.actor);
+    FldAct_EndAcmd(work->data.actor);
     ChangeActorMoveCodeSeq(work->data.actor, 0);
     work->seq = TRAINER_EYE_SEQ_FINISH;
     return TRUE;
@@ -517,8 +518,8 @@ static GameEventReturnCode EventTrainerEye_Callback(GameEvent *event, u32 *state
 }
 
 // How the actor looks for the player: 1 the way it faces, 2 every way
-static u16 func_ov036_021a643c(FieldActor *actor) {
-    return func_ov012_02168024(GetActorEvType(actor));
+static u16 EventTrainerEye_GetSightType(FieldActor *actor) {
+    return EvType_GetSightType(GetActorEvType(actor));
 }
 
 // Whether anything stands between the Trainer and the tile range tiles away in dir
@@ -556,14 +557,14 @@ static BOOL EventTrainerEye_CheckPathObstacle(FieldActor *actor, u16 dir, int ra
 }
 
 u16 GetNPCTrainerID(FieldActor *actor) {
-    if (func_ov036_021a6544(actor) != TRUE) {
+    if (EventTrainerEye_UsesSpecialScript(actor) != TRUE) {
         return GetNPCTrainerIDFromSCRID(FldAct_GetSCRID(actor));
     }
     return GetActorUID(actor);
 }
 
 // Whether the actor uses the special Trainer script, whose Trainer ID is its UID
-static u16 func_ov036_021a6544(FieldActor *actor) {
+static u16 EventTrainerEye_UsesSpecialScript(FieldActor *actor) {
     return FldAct_GetSCRID(actor) == SCRID_SPECIAL_TRAINER;
 }
 
@@ -573,12 +574,12 @@ static BOOL CheckTrainerAlreadyDefeated(Field *field, FieldActor *actor) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     EventWork *eventWork = GameData_GetEventWork(gameData);
 
-    if (func_ov036_021a6544(actor) != TRUE) {
+    if (EventTrainerEye_UsesSpecialScript(actor) != TRUE) {
         return TrainerFlagGet(eventWork, GetNPCTrainerID(actor));
     }
     index = GetNPCTrainerID(actor) - 0xb0;
     keyData = getKeyDataBlkAddress(GameData_GetSaveControl(gameData));
-    return func_02010288(keyData, func_020102d4(keyData), index);
+    return KeyDataSave_IsTrainerDefeated(keyData, KeyDataSave_GetFloorInArea(keyData), index);
 }
 
 static void InitFieldScriptTrainerSetup(TrainerClashData *data, FieldActor *actor, int range, u16 dir) {
@@ -590,7 +591,7 @@ static void InitFieldScriptTrainerSetup(TrainerClashData *data, FieldActor *acto
 }
 
 // The other Trainer of a double battle pair
-static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId) {
+static FieldActor *EventTrainerEye_FindPairedTrainer(FieldActor *trainer, u16 trainerId) {
     FieldActor *actor;
     u32 index = 0;
     MMSys *actorSys = GetActorMModelSystem(trainer);
@@ -598,7 +599,7 @@ static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId) {
 
     while (NextActor(actorSys, &actor, &index) == TRUE) {
         if (actor != trainer) {
-            eyeType = func_ov036_021a643c(actor);
+            eyeType = EventTrainerEye_GetSightType(actor);
             if ((eyeType == 1 || eyeType == 2) && trainerId == GetNPCTrainerID(actor)) {
                 return actor;
             }
@@ -610,7 +611,7 @@ static FieldActor *func_ov036_021a65d4(FieldActor *trainer, u16 trainerId) {
 static GameEvent *CreateTrainerClashEvent(Field *field, FieldActor *actor) {
     GameSystem *gsys = Field_GetGameSystem(field);
 
-    if (func_ov036_021a6544(actor) != TRUE) {
+    if (EventTrainerEye_UsesSpecialScript(actor) != TRUE) {
         return EventScriptCall_Create(gsys, SCRID_TRAINER_CLASH, actor, 1);
     }
     return EventScriptCall_Create(gsys, SCRID_SPECIAL_TRAINER_CLASH, actor, 1);

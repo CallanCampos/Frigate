@@ -87,28 +87,28 @@ static const GFLNetInitData data_ov028_02172c94 = {
 // clang-format on
 
 static const NetCommand data_ov028_02172d04[22] = {
-    { func_ov028_02171138, NULL },
-    { func_ov028_02171170, NULL },
-    { func_ov028_021711b4, NULL },
-    { func_ov028_021711f8, NULL },
-    { func_ov028_02171254, NULL },
-    { func_ov028_021712ac, NULL },
-    { func_ov028_02171308, UnionNet_GetRecvBuffer },
-    { func_ov028_021713e0, UnionNet_GetRecvBuffer },
-    { func_ov028_0217144c, UnionNet_GetRecvBuffer },
-    { func_ov028_02171478, NULL },
-    { func_ov028_021714bc, NULL },
-    { func_ov028_02171570, NULL },
-    { func_ov028_021715a4, NULL },
-    { func_ov028_021715d8, NULL },
-    { func_ov028_02171638, NULL },
-    { func_ov028_0217168c, NULL },
-    { func_ov028_021716ec, NULL },
-    { func_ov028_02171758, NULL },
-    { func_ov028_021717e8, NULL },
-    { func_ov028_02171848, NULL },
-    { func_ov028_021718e4, NULL },
-    { func_ov028_02171920, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvGroupDone, NULL },
+    { UnionNet_RecvUnk19, NULL },
+    { UnionNet_RecvUnk1A, NULL },
+    { UnionNet_RecvMac, NULL },
+    { UnionNet_RecvUnk46_2, NULL },
+    { UnionNet_RecvPlayerInfo, NULL },
+    { UnionNet_RecvCard, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvColosseumMember, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvColosseumUnkDE, UnionNet_GetRecvBuffer },
+    { UnionNet_RecvColosseumUnkCA, NULL },
+    { UnionNet_RecvEntryRequest, NULL },
+    { UnionNet_RecvEntryReply2, NULL },
+    { UnionNet_RecvEntryReply1, NULL },
+    { UnionNet_RecvEnqueue, NULL },
+    { UnionNet_RecvUnkE, NULL },
+    { UnionNet_RecvRequestStatus, NULL },
+    { UnionNet_RecvStatus, NULL },
+    { UnionNet_RecvAppProfile, NULL },
+    { UnionNet_RecvProfile, NULL },
+    { UnionNet_RecvConfirmProfile, NULL },
+    { UnionNet_RecvLeave, NULL },
+    { UnionNet_RecvJoinAvenue, UnionNet_GetRecvBuffer },
 };
 
 UnionSystem *UnionComm_Create(UnionBootParam *param) {
@@ -139,7 +139,7 @@ void *UnionComm_Init(u32 *seq, void *param) {
     UnionSystem *unisys = UnionComm_Create(param);
 
     unisys->commState = 1;
-    func_020425ec(&data_ov028_02172c94, UnionComm_OnNetReady, unisys);
+    GFL_NetInit(&data_ov028_02172c94, UnionComm_OnNetReady, unisys);
     return unisys;
 }
 
@@ -148,7 +148,7 @@ BOOL UnionComm_InitWait(u32 *seq, void *param, void *work) {
 
     if (unisys->commState >= 2) {
         unisys->commState = 3;
-        func_02042a10(0);
+        GFL_NetStartSearch(0);
         return TRUE;
     }
     return FALSE;
@@ -158,7 +158,7 @@ void UnionComm_OnNetReady(void *work) {
     UnionSystem *unisys = work;
 
     unisys->commState = 2;
-    func_02042f50(FALSE);
+    GFL_NetSetRejectNegotiated(FALSE);
 }
 
 BOOL UnionComm_Exit(u32 *seq, void *param, void *work) {
@@ -169,7 +169,7 @@ BOOL UnionComm_Exit(u32 *seq, void *param, void *work) {
         return FALSE;
     }
     unisys->commState = 4;
-    if (!func_02042860(UnionComm_SetEnded)) {
+    if (!GFL_NetExit(UnionComm_SetEnded)) {
         UnionComm_SetEnded(unisys);
     }
     return TRUE;
@@ -181,7 +181,7 @@ BOOL UnionComm_ExitWait(u32 *seq, void *param, void *work) {
     if (unisys->commState == 5) {
         UnionComm_Free(param, unisys);
         if (GFL_NetErrCheck()) {
-            func_02012144();
+            GFL_NetErrClear();
         }
         return TRUE;
     }
@@ -245,7 +245,7 @@ static BOOL UnionComm_UpdateLink(UnionSystem *unisys) {
         break;
     case 2:
         unisys->commState = 4;
-        if (!func_02042860(UnionComm_SetEnded)) {
+        if (!GFL_NetExit(UnionComm_SetEnded)) {
             UnionComm_SetEnded(unisys);
         }
         unisys->linkState++;
@@ -261,13 +261,13 @@ static BOOL UnionComm_UpdateLink(UnionSystem *unisys) {
         break;
     case 4:
         unisys->commState = 1;
-        func_020425ec(&data_ov028_02172c94, UnionComm_OnNetReady, unisys);
+        GFL_NetInit(&data_ov028_02172c94, UnionComm_OnNetReady, unisys);
         unisys->linkState++;
         break;
     case 5:
         if (unisys->commState >= 2) {
             unisys->commState = 3;
-            func_02042a10(0);
+            GFL_NetStartSearch(0);
             unisys->linkState = 0;
         }
         break;
@@ -281,16 +281,16 @@ void UnionComm_Main(u32 *seq, void *param, void *work) {
     if (UnionComm_UpdateLink(unisys) == TRUE) {
         return;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (unisys->beaconReady == 1) {
-            func_ov030_02173780();
+            NetWhpipe_UpdateGameBeacon();
             unisys->beaconReady = 0;
         }
         UnionComm_ReceiveBeacons(unisys);
         UnionComm_UpdateColosseum(unisys);
         UnionComm_UpdateEntries(unisys);
         UnionComm_UpdateGroup(unisys);
-        if (GFL_NetErrCheck() && func_02042bc4() == TRUE) {
+        if (GFL_NetErrCheck() && GFL_NetIsParent() == TRUE) {
             UnionColosseum *colosseum = unisys->colosseum_sys;
 
             if (colosseum != NULL && colosseum->unkC8_0 == 1 && unisys->situ.step == 0x2a && !colosseum->unkC8_1) {
@@ -316,19 +316,19 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
     }
     switch (self->mycomm.step) {
     case 0:
-        if (func_ov028_0217115c() == TRUE) {
+        if (UnionMain_SendGroupDone() == TRUE) {
             self->mycomm.step++;
         }
         break;
     case 1:
-        if (MATH_CountPopulation(self->mycomm.doneMask) >= func_02042a78()) {
-            func_02042e9c(FALSE);
+        if (MATH_CountPopulation(self->mycomm.doneMask) >= GFL_NetGetNegotiatedCount()) {
+            GFL_NetSetDisconnectError(FALSE);
             self->mycomm.step++;
         }
         break;
     case 2:
-        if (func_02042bc4() == TRUE) {
-            if (func_02042a78() > 1) {
+        if (GFL_NetIsParent() == TRUE) {
+            if (GFL_NetGetNegotiatedCount() > 1) {
                 break;
             }
             UnionComm_RequestLink1(unisys);
@@ -342,14 +342,14 @@ static void UnionComm_UpdateGroup(UnionSystem *unisys) {
 }
 
 static void UnionComm_UpdateEntries(UnionSystem *unisys) {
-    if (func_02042a78() > 1) {
+    if (GFL_NetGetNegotiatedCount() > 1) {
         if (unisys->entryRepliedTo != 0) {
-            if (func_ov028_0217157c(unisys->entryRepliedTo) == 1) {
+            if (UnionMain_SendEntryReply2(unisys->entryRepliedTo) == 1) {
                 unisys->entryRepliedTo = 0;
             }
         }
         if (unisys->entryAcceptedTo != 0) {
-            if (func_ov028_021715b0(unisys->entryAcceptedTo) == 1) {
+            if (UnionMain_SendEntryReply1(unisys->entryAcceptedTo) == 1) {
                 unisys->entryAcceptedTo = 0;
             }
         }
@@ -365,10 +365,10 @@ static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
     }
     if (UnionMain_IsFieldReady(unisys) == TRUE) {
         if (!UnionCommand_IsActive(unisys)) {
-            func_ov012_0216144c(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
+            CommPlayer_Update(unisys->param->gsys, unisys->colosseum_sys->commPlayer);
             if (unisys->colosseum_sys->unk17F == 0) {
-                if (func_ov012_021616b0(unisys->colosseum_sys->commPlayer,
-                                        (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
+                if (CommPlayer_GetMyStatus(unisys->colosseum_sys->commPlayer,
+                                           (CommPlayerStatus *)unisys->colosseum_sys->unk04) == TRUE) {
                     unisys->colosseum_sys->unk17F = 1;
                 }
             }
@@ -380,23 +380,23 @@ static void UnionComm_UpdateColosseum(UnionSystem *unisys) {
         }
         UnionEff_UpdateColosseumCommPlayers(unisys->colosseum_sys);
     }
-    func_ov028_02172a1c(unisys->colosseum_sys);
-    func_ov028_02172a50(unisys->colosseum_sys);
+    Colosseum_SendVoteReplies(unisys->colosseum_sys);
+    Colosseum_UpdateReadySync(unisys->colosseum_sys);
 }
 
 static void UnionComm_ReceiveBeacons(UnionSystem *unisys) {
     int i;
 
     for (i = 0; i < 10; i++) {
-        UnionBeacon *beacon = func_020428a8(i);
+        UnionBeacon *beacon = GFL_NetGetBeaconData(i);
 
         if (beacon != NULL) {
-            u8 *mac = func_020428c8(i);
+            u8 *mac = GFL_NetGetBeaconMac(i);
 
             if (mac != NULL) {
                 UnionComm_AddBeacon(unisys, beacon, mac);
             }
-            func_ov030_02173bec(i);
+            NetWhpipe_ConsumeBeacon(i);
         }
     }
 }
@@ -472,7 +472,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
 
     MI_CpuFill8(beacon, 0, sizeof(UnionBeacon));
     if (self->mycomm.parent != NULL) {
-        if (func_02042bc4() == TRUE) {
+        if (GFL_NetIsParent() == TRUE) {
             OS_GetMacAddress(beacon->mac);
         } else {
             MI_CpuCopy8(self->mycomm.parent->mac, beacon->mac, 6);
@@ -480,14 +480,14 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     } else if (self->mycomm.unk4 != NULL) {
         MI_CpuCopy8(self->mycomm.unk4->mac, beacon->mac, 6);
     }
-    beacon->memberCount = func_02042a78();
+    beacon->memberCount = GFL_NetGetNegotiatedCount();
     beacon->version = GAME_VERSION;
     beacon->language = GAME_LANGUAGE;
     beacon->unk0A = self->step;
     beacon->unk07_5 = self->unk02;
     beacon->activity = self->activity;
     copyName(unisys->param->playerInfo->name, beacon->name, 8);
-    beacon->look = func_02008bf4(unisys->param->playerInfo);
+    beacon->look = PlayerInfo_GetUnionView(unisys->param->playerInfo);
     beacon->gender = getTrainerGender(unisys->param->playerInfo);
     beacon->trainerId = getIDAsUInt(unisys->param->playerInfo);
     beacon->state = self->state;
@@ -499,7 +499,7 @@ static void UnionComm_BuildBeacon(UnionSystem *unisys, UnionBeacon *beacon) {
     beacon->country = UnityTowerVisitor_GetCountry(unisys->param->playerInfo);
     beacon->province = UnityTowerVisitor_GetProvince(unisys->param->playerInfo);
     beacon->memberList = self->mycomm.memberList;
-    func_0200a3cc(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->unk50);
+    WifiList_CreateExchangeToken(GameData_GetWifiList(GSYS_GetGameData(unisys->param->gsys)), &beacon->unk50);
     if (unisys->alloc.uniapp != NULL) {
         beacon->entryClosed = UnionApp_IsEntryClosed(unisys->alloc.uniapp);
     } else {
@@ -614,7 +614,7 @@ void UnionGroup_Init(UnionSystem *unisys, UnionGroup *group) {
     UnionGroup_ResetTargets(group);
     self = &group->members[0];
     OS_GetMacAddress(self->mac);
-    self->look = func_02008bf4(unisys->param->playerInfo);
+    self->look = PlayerInfo_GetUnionView(unisys->param->playerInfo);
     self->gender = getTrainerGender(unisys->param->playerInfo);
     self->used = TRUE;
     group->unk44 = 0xffff;
@@ -701,22 +701,22 @@ void UnionComm_SetState(UnionSystem *unisys, u8 state) {
 void UnionComm_SetCommandBase(u32 activity) {
     switch (activity) {
     case 0x14:
-        func_02042d14(0x17, 5);
+        GFL_NetSetGameCommandBase(0x17, 5);
         break;
     case 0x15:
-        func_02042d14(0x18, 5);
+        GFL_NetSetGameCommandBase(0x18, 5);
         break;
     case 0x16:
-        func_02042d14(0x19, 5);
+        GFL_NetSetGameCommandBase(0x19, 5);
         break;
     case 0x17:
-        func_02042d14(0x1a, 5);
+        GFL_NetSetGameCommandBase(0x1a, 5);
         break;
     case 3:
-        func_02042d14(0x16, 5);
+        GFL_NetSetGameCommandBase(0x16, 5);
         break;
     case 0x19:
-        func_02042d14(0x1b, 5);
+        GFL_NetSetGameCommandBase(0x1b, 5);
         break;
     }
 }

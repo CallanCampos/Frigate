@@ -226,11 +226,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
+- Rail movement's cached line/length allocation differs between caller snapshots passed as parameters and snapshots
+  owned by directional inlines; the latter improves the still-partial function. (matching.md: "snapshot ownership")
 - A local slotted above the temporaries where the original's value sits among them: the expression written at each
   use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
-- A NitroSystem (2.0/sp2p2) function's spill slots in another order: locals are slotted function scope first, then
+- A NitroSystem (2.0/sp2) function's spill slots in another order: locals are slotted function scope first, then
   the `if` block's, then the `else` block's, then inlines' in reverse; move them to function scope.
-  (matching.md: "In NitroSystem's 2.0/sp2p2 code a pointer sum")
+  (matching.md: "In NitroSystem's 2.0/sp2 code a pointer sum")
 - Spill slots grouped by kind across branches where ours are in declaration order: a local set from an inline's
   return is slotted as a temporary; compute it in place to make it named, or the reverse. (matching.md: "A local
   assigned straight from a `static inline`'s return")
@@ -293,6 +295,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
 - A byte-sized running value kept on the stack and reloaded across calls where ours holds it in a register: declare
   it `u8`. (matching.md: "A running sum that only ever holds a byte")
+- `positionShakingSpot`'s missing shared frame anchor: a `u8` two-flag mask in the caller and callee recovers it,
+  despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
 
@@ -378,7 +382,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "another processor holds")
 - A constant return value built between a load and its store: `result = CONST;` before that store, `break`, and one
   `return result;`. (matching.md: "A constant return value built between")
-- A member of a file static stored through a literal of its own address (2.0/sp2p2): a pointer local to the member.
+- A member of a file static stored through a literal of its own address (2.0/sp2): a pointer local to the member.
   (matching.md: "goes through the section's anchor")
 - An inline's argument evaluated in the original's order only through the SDK's own inline, enum parameter and all
   (`G3X_SetFifoIntrCond`). (matching.md: "It goes the other way as well")
@@ -470,6 +474,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   loads in tree order and reuses the register: global CSE merged the reads; only a second pointer path to the field
   (a cast, not `(*p).f`) or `opt_common_subs off` keeps them apart. (matching.md: "is a global common
   subexpression, loaded into a")
+- A bit test's `movs rX, #1` ahead of the tested field's load, where the original loads first and builds the bit
+  after it: the body sets the same bit; write the body's shift with the other signedness (`mask |= 1U << i`).
+  (matching.md: "A bit tested in an `if`'s condition")
 - A three-register `adds` done late, at the copy for a later `adds rd, #imm8`, with both operands spilled across
   calls, where the original adds where the sum is written: MWCC moved the add down by itself; a second use of the
   sum that isn't a copy (`f(x + 4)`, not `f(x)`) or another immediate keeps it in place, no pragma does, and each
@@ -477,6 +484,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- Cut-in text allocation heap IDs: pass `HEAPID_TAIL` at each call; saved `u32` and `HeapID` locals change
+  narrowing and sharing. (matching.md: "`fld3d_ci.c`'s `EventFieldEffectCutinSub_DrawStrToTexture`")
+
+- A constant built by `rsb`/`sub` from a small value already in a register (`mov r0, #5; rsb r0, r0, #0x204`): that
+  value is a local built in steps. (matching.md: "A constant that a local holds and changes in steps")
+- An `and` with a bit-0 bit-field's width mask before an insert that masks again: the source masks the value before the
+  store, `d->a = s[0] & 0xf;`. (matching.md: "A mask written before a bit-field store")
 - A constant narrowed at a call after `movs` (`movs r3, #0x11; lsls; asrs`): an enum-typed local set at the top of
   the function, before the calls. (matching.md: "A constant narrowed at a call")
 - A table field's offset folded into a second literal (`ldr r1, =table+4`) where the original adds the element
@@ -587,8 +601,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A constant built once for `r3` and the first stack slot is one `u64` argument. (matching.md: "is a `u64` argument")
 - A caller that leaves an argument register untouched across a call is passing that argument.
   (matching.md: "keeps an argument register untouched")
-- A NULL that the original tests (`movs r7, #0` then `beq`) and MWCC folds away is open; see the `event_save.c` and
-  `script_sys.c` rows of `docs/nonmatching-functions.md`.
+- A constant that the original tests (`movs r7, #0` then `beq`) and MWCC folds away is held in a variable of an enum
+  type, which MWCC doesn't propagate constants into. (matching.md: "doesn't propagate constants into a variable of an
+  enum type")
 - Memory loaded again after stores to a local `u8` array, or stores through `add rN, sp, #off` for a local: the
   local is initialized in its declaration (matching.md: "initialized in its declaration is stored through a base
   register")
@@ -602,7 +617,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A -1 built from a shift's 1 (`sub rY, rX, #2`) where the original builds it alone (`mov; mvn`): a mask local set to
   `0xffffffff`, then `mask ^= 1 << bit;`. (matching.md: "the mask was a local set to all ones")
 - A struct local's field loaded through a fresh `add rN, sp, #off` where the original loads through a saved
-  register: a raw buffer read through a typed pointer. (matching.md: "a raw buffer read through a typed pointer")
+  register: a raw buffer read through a typed pointer in `GFL_MsgDataLoadHeader`; first distinguish a shared frame
+  base used for several locals. (matching.md: "a raw buffer")
 - A range test's subtraction repeated after a call, where the original keeps it in a saved register: the variable
   is an `int`, not a `u32`. (matching.md: "subtracts again at each test")
 - An object's address loaded from two literals in one function, where ours keeps one in a register: the object is a
@@ -655,6 +671,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   multiply into a select's arms, so the source selected byte offsets. When nothing else indexes the elements, that
   is a raw `u8` buffer of slots, the slot cast to the element, `(T *)&buf[c ? 0 : SLOT]`, as a stride rounded up to
   32 bytes also says. `moveq #1; movne #0` is `c ? 0 : 1`. (matching.md: "into the arms of a select")
+- A `u16` narrowed twice in a row (`lsl; lsr` in place, then again into another register): an identity in the
+  source, such as the DSP pipes' `count = count & ~(DSP_MEMORY_UNIT - 1);` (1 on the ARM9); `&=` folds it first.
+  (matching.md: "narrowed to `u16` twice in a row")
+- A fixed address's bit flag read as `ldrb [r0, #4]` from the block's base where ours folds the offset into the
+  literal: read it through a pointer local of the block's struct. (matching.md: "read through a pointer local")
 
 ## Branches and block layout
 
@@ -682,6 +703,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   constants for both arms as well. (matching.md: "also has enum constants for both arms")
 - A negated range test whose branch targets differ: write the positive test of the complement, an `||` chain.
   (matching.md: "A negated test and its expansion")
+- Two 0/1 values built by `movs #1; b; movs #0` and combined with `ands`, no branch between the tests: a bitwise `&` of
+  two comparisons, as in a touch hit test. (matching.md: "joined by a bitwise `&`")
 - Blocks are laid out in source order. A switch whose `default` code comes first had `default:` written first, and
   `if (!f()) return FALSE; n++;` puts the return before the code that goes on. (matching.md: "Blocks are laid out in source order")
 - A loop's early exit placed after the whole body, just before the bottom test: wrap the body in `if (p != NULL) {
@@ -749,10 +772,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "`ScClient_SubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
   it as a counter times the step. (matching.md: "A loop offset that starts at 0")
-- A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2p2): put it last
+- A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2): put it last
   in the `for` increment's comma list. (matching.md: "a `for` loop's comma-separated increment")
 - In library code, a store pointer stepped with `strb rX, [r2], #1`, set up after the loop's entry test and restarted
-  at `base + i`, where dsi/1.1p1 indexes: probe 2.0/sp2p2, which TwlSDK's `syscall_twl_ltd.c` matches under.
+  at `base + i`, where dsi/1.1p1 indexes: probe 2.0/sp2, which TwlSDK's `syscall_twl_ltd.c` matches under.
   (matching.md: "`syscall_twl_ltd.c` matches whole under it")
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
@@ -812,13 +835,15 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "has a test whose value is 0/1"), (matching.md: "What keeps the `b`")
 - The same `b` in every function that reads one object, where the file's other loops are rotated: the object has an
   explicit alignment, as a 32-aligned address in the ROM shows; another file's object takes it on its `extern`
-  declaration. NitroSystem's 2.0/sp2p2 too (`NNS_SndArcStrmInit`). (matching.md: "An explicit alignment")
+  declaration. NitroSystem's 2.0/sp2 too (`NNS_SndArcStrmInit`). (matching.md: "An explicit alignment")
 - The same in an outer loop around an inner one: begin its body with the inner loop,
   `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
 - An empty loop that the original keeps and `-O4,p` drops: the function reads an aligned object (`lib/irc`'s
   `IrcLink_IsRecvIgnored`). (matching.md: "An explicit alignment")
 - `mov rN, #bound` on a search loop's normal exit, before `cmp rN, #bound`: an inline search that returns its `size`
   argument after the loop. (matching.md: "A search loop whose normal exit")
+- A static loaded in the loop on each pass where the ROM loads it once below the entry test, with a store through
+  a pointer in the loop: declare the static inside the function. (matching.md: "A function-local `static` is hoisted")
 
 ## Switches
 
@@ -844,6 +869,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Floats and runtime helpers
 
+- An angle constant one below a round index (0x3fff, 0x1fff): `degrees * 0xffff / 360`, not `DEG_TO_IDX`.
+  (matching.md: "An angle index one below a round value")
 - Float arithmetic calls `_fadd`, `_ffix` and others (swan's `__aeabi_*`). Rename to MWCC's name when a complete file
   fails to link. (matching.md: "MWCC's runtime helpers")
 - An arithmetic operation on a literal passes the literal first; a constant in a local keeps its source position, and
@@ -879,9 +906,13 @@ text to `grep -n` there. Entries without a key come from later work and still be
   declaration. (matching.md: "goes by the first declaration")
 - Two-bytes-a-pass copy loops (`ldrb [r3, #1]; ldrb [r3], #2`) where ours calls `strcpy` with a literal: take
   `strcpy` from `<string.h>`. (matching.md: "`strcpy` of a string literal")
+- A hardware divide whose operand stores are a `str` pair, 8 bytes smaller than raw `REG_DIV_*` writes: NitroSDK's
+  `CP_SetDiv64_32` and `CP_GetDivResult32`. (matching.md: "A divide by the hardware divider")
 
 ## Data and sections
 
+- MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
+  (matching.md: "`dsi/1.2` with `-Cpp_exceptions on` emits exception indices")
 - A local array initializer's bytes in a `.rodata` section of their own: copy a struct from a static instead.
   (matching.md: "A local array with an initializer goes in a `.rodata` section of its own")
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
@@ -904,8 +935,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
   compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
-- On NitroSystem's `2.0/sp2p2`, initialized globals are ordered by size, smallest first, and objects of one size in the
+- On NitroSystem's `2.0/sp2`, initialized globals are ordered by size, smallest first, and objects of one size in the
   reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
+- Stores at offsets from a static's own address (`ldr r1, =obj; str r3, [r1]`) where ours goes through the section's
+  base: the function doesn't know the object, so `-ipa function` with the object defined after it (G3D's `sbc.c`).
+  (matching.md: "is one that the function doesn't know")
 - The full model, checked by fuzzing MWCC: there is one list per file in declaration order, except tentative `.bss`
   statics, which join at the end in reverse order; a global initialized to 0 joins where it is defined. Each kind
   (rodata, data, bss) gets its own shared section. Unreferenced statics are dropped, but a literal of a dropped table
@@ -978,6 +1012,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A literal of `SYM + bias` with the bias subtracted at run time: element-pointer arithmetic (`arr + 0x880`) puts
   the bias in the addend, byte arithmetic adds it at run time, and the subtraction stays when the result is the base
   of a variable index. (matching.md: "A bias on a data symbol lands in the literal's addend")
+- `.bss` runs that are each sorted by size, with the same layout unreachable in one file: the range is several
+  files, each with `-ipa file`; and sweep the declaration orders of the statics. (matching.md: "With `-ipa file` the
+  order of a file's same-size statics")
+- A struct of statics whose functions need two addressings (base plus offset in one, a plain object in another): the
+  statics of two files, each with its own `-ipa`. (matching.md: "A struct of statics whose functions need two")
 
 ## Function order and presence
 
@@ -995,6 +1034,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.
+- TwlSDK code that resists respellings: rebuild it in the shape of cybervisi0n/libntr's reconstruction (its
+  `static inline` setters and wrappers, `if (n > 0) { ... }` blocks with their locals, cursor layouts), in our own
+  names. (matching.md: "in the shape of cybervisi0n/libntr's reconstruction")
 
 ## Diagnostic switches (not for committed code)
 

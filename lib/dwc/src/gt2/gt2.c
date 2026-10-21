@@ -61,7 +61,7 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 static void Gt2_OnPing(GTI2Connection *addr, u32 latencyMs);
 static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, BOOL reliable);
 static BOOL Gt2_OnUnknownMessage(GTI2Socket *unused, u32 ip, u16 port, const void *data, int len);
-static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u32 ip, u16 port, u32 elapsedMilliseconds,
+static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u32 ip, u16 port, int elapsedMilliseconds,
                                   const void *data, int len);
 
 // The one engine this build creates
@@ -332,7 +332,7 @@ static BOOL Gt2_OnUnknownMessage(GTI2Socket *unused, u32 ip, u16 port, const voi
 
 // The lower socket's incoming-attempt callback; auto-accepts when the first 16 data bytes match a pending
 // connect's init message, otherwise asks the app whether to accept it
-static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u32 ip, u16 port, u32 elapsedMilliseconds,
+static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, u32 ip, u16 port, int elapsedMilliseconds,
                                   const void *data, int len) {
     GT2Engine *engine = Gt2_GetEngine();
     char buf[0x18];

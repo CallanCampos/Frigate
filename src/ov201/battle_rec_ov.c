@@ -16,7 +16,7 @@ u32 BattleRecOv_SaveVideo(GameData *gameData, u32 slot, BOOL secure, u16 *seq, u
     switch (*seq) {
     case 0:
         if (secure == TRUE) {
-            data_02140f64->header.unk2A = secure;
+            data_02140f64->header.secure = secure;
             data_02140f64->header.magic = BATTLE_REC_MAGIC;
             data_02140f64->header.crc = getCRC16(&data_02140f64->header, BATTLE_REC_HEADER_CRC_SIZE);
         }
@@ -24,7 +24,7 @@ u32 BattleRecOv_SaveVideo(GameData *gameData, u32 slot, BOOL secure, u16 *seq, u
         (*seq)++;
         break;
     case 1:
-        return func_0200bdd4(gameData, data_02140f64, slot, saveSeq, heapId);
+        return BattleRec_SaveSlot(gameData, data_02140f64, slot, saveSeq, heapId);
     }
     return 0;
 }
@@ -40,7 +40,7 @@ u32 BattleRecOv_SaveDataNumber(GameData *gameData, u64 dataNumber, u16 *seq, u16
         (*seq)++;
         break;
     case 1:
-        return func_0200bdd4(gameData, data_02140f64, 0, saveSeq, heapId);
+        return BattleRec_SaveSlot(gameData, data_02140f64, 0, saveSeq, heapId);
     }
     return 0;
 }
@@ -48,14 +48,14 @@ u32 BattleRecOv_SaveDataNumber(GameData *gameData, u64 dataNumber, u16 *seq, u16
 u32 BattleRecOv_SaveSecureVideo(GameData *gameData, u32 slot, u16 *seq, u16 *saveSeq, HeapID heapId) {
     switch (*seq) {
     case 0:
-        data_02140f64->header.unk2A = TRUE;
+        data_02140f64->header.secure = TRUE;
         data_02140f64->header.magic = BATTLE_REC_MAGIC;
         data_02140f64->header.crc = getCRC16(&data_02140f64->header, BATTLE_REC_HEADER_CRC_SIZE);
         decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
         (*seq)++;
         break;
     case 1:
-        return func_0200bdd4(gameData, data_02140f64, slot, saveSeq, heapId);
+        return BattleRec_SaveSlot(gameData, data_02140f64, slot, saveSeq, heapId);
     }
     return 0;
 }
@@ -63,14 +63,14 @@ u32 BattleRecOv_SaveSecureVideo(GameData *gameData, u32 slot, u16 *seq, u16 *sav
 void BattleRecOv_StartDeleteVideo(GameData *gameData, HeapID heapId, u32 block) {
     SaveControl *save = GameData_GetSaveControl(gameData);
 
-    func_020074ec(save, block, heapId);
+    SaveControl_OpenExtraBlock(save, block, heapId);
     clearVSPlayerBlk(getAddressOfExtraSaveBlk(save, block, 0));
-    func_020178c4(gameData, block);
+    GameData_StartSaveBlock(gameData, block);
 }
 
 u32 BattleRecOv_DeleteVideoMain(GameData *gameData, u32 block) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    u32 result = func_020178f4(gameData, block);
+    u32 result = GameData_UpdateSaveBlock(gameData, block);
 
     if (result == 2 || result == 3) {
         freeIntermediateSaveExtraBlksAfterLoad(save, block);

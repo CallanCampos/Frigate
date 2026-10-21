@@ -7,13 +7,13 @@
 #include "battle/btl_main.h"
 #include "struct_decls.h"
 
-PokewoodCutin *func_ov167_021d5e1c(HeapID heapId);
-void func_ov167_021d5e68(PokewoodCutin *cutin);
-void func_ov167_021d5e90(PokewoodCutin *cutin);
-BOOL func_ov167_021d5fc0(PokewoodCutin *cutin);
-void func_ov167_021d5fc4(PokewoodCutin *cutin, const BtlScriptedRules *rules, s8 scene, u16 choice, u32 gender);
-void func_ov167_021d5fe4(PokewoodCutin *cutin, BtlvCore *viewCore);
+PokewoodCutin *PokewoodCutin_Create(HeapID heapId);
+void PokewoodCutin_Delete(PokewoodCutin *cutin);
+void PokewoodCutin_Main(PokewoodCutin *cutin);
+BOOL PokewoodCutin_IsDone(PokewoodCutin *cutin);
+void PokewoodCutin_Start(PokewoodCutin *cutin, const BtlScriptedRules *rules, s8 scene, u16 choice, u32 gender);
+void PokewoodCutin_SetViewCore(PokewoodCutin *cutin, BtlvCore *viewCore);
 // unused is a debug flag the client passes, which the function ignores
-BOOL func_ov167_021d5fe8(const BtlScriptedRules *rules, s8 scene, u8 result, u32 unused);
+BOOL PokewoodCutin_HasCutin(const BtlScriptedRules *rules, s8 scene, u8 result, u32 unused);
 
 #endif // POKEBW2_BATTLE_POKEWOOD_CUTIN_H

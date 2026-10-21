@@ -51,17 +51,17 @@ void SaveControlIntr_Start(SaveControlIntr *intr) {
     if (intr->disabled == TRUE) {
         return;
     }
-    func_020073ac(intr->save);
+    SaveControl_StartSave(intr->save);
     if (intr->disabled == FALSE) {
-        func_02008e04(intr->save);
-        intr->flag4 = func_0200748c(intr->save);
-        intr->flag5 = func_02007494(intr->save);
-        intr->flag6 = func_020074dc(intr->save);
-        intr->flag7 = func_020074e4(intr->save);
-        func_02007490(intr->save, 0);
-        func_02007498(intr->save, 0);
-        func_020074e0(intr->save, 0);
-        func_020074e8(intr->save, 0);
+        TrainerDataSave_SetIntroSave(intr->save);
+        intr->flag4 = SaveControl_GetGiftsLoaded(intr->save);
+        intr->flag5 = SaveControl_GetGiftsBroken(intr->save);
+        intr->flag6 = SaveControl_GetKeysLoaded(intr->save);
+        intr->flag7 = SaveControl_GetKeysBroken(intr->save);
+        SaveControl_SetGiftsLoaded(intr->save, 0);
+        SaveControl_SetGiftsBroken(intr->save, 0);
+        SaveControl_SetKeysLoaded(intr->save, 0);
+        SaveControl_SetKeysBroken(intr->save, 0);
     }
     intr->state = STATE_SAVING;
 }
@@ -79,13 +79,13 @@ u32 SaveControlIntr_Update(SaveControlIntr *intr) {
             intr->state = STATE_PAUSED;
             return 0;
         }
-        result = func_020073c4(intr->save);
+        result = SaveControl_ContinueSave(intr->save);
         if (result - 2 <= 1) {
             intr->state = STATE_DONE;
-            func_02007490(intr->save, intr->flag4);
-            func_02007498(intr->save, intr->flag5);
-            func_020074e0(intr->save, intr->flag6);
-            func_020074e8(intr->save, intr->flag7);
+            SaveControl_SetGiftsLoaded(intr->save, intr->flag4);
+            SaveControl_SetGiftsBroken(intr->save, intr->flag5);
+            SaveControl_SetKeysLoaded(intr->save, intr->flag6);
+            SaveControl_SetKeysBroken(intr->save, intr->flag7);
         }
         return result;
     case STATE_PAUSED:
@@ -138,7 +138,7 @@ static void SaveControlIntr_OnSoftReset(void *work) {
     SaveControlIntr *intr = work;
 
     if (intr->disabled == FALSE && intr->state != STATE_DONE) {
-        func_02007424(intr->save);
+        SaveControl_CancelSave(intr->save);
         intr->disabled = TRUE;
     }
 }

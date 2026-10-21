@@ -86,7 +86,7 @@ static void Demo3DCmdSys_Init(Demo3DCmdSys *sys) {
     sys->tcbMgr = GFL_TCBExMgrCreate(sys->heapId, sys->heapId, 16, 0x80);
     sys->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, sys->heapId);
     sys->arc = GFL_ArcSysCreateFileHandle(ARCID_DEMO3D_2D, sys->heapId);
-    sys->textSpeed = func_02017bcc();
+    sys->textSpeed = TextSpeed_GetCurrentWait();
 }
 
 static void Demo3DCmdSys_Exit(Demo3DCmdSys *sys) {

@@ -169,10 +169,47 @@ typedef struct CARDAccessControl {
     u32 : 15;
 } CARDAccessControl;
 
-// The header of a DSi game, of which only the access control is known
+// The header of a DSi game: the load tables of the DS header in its first 0x60 bytes, then where the DSi loads its own
+// two images, and the keyed hashes of the ranges that the boot code verifies before it loads them. Only the fields that
+// the boot code and TwlSDK's card_hash.c read are named, and each hash's name says which range it verifies
 typedef struct CARDTwlRomHeader {
-    u8 unk_000[0x1b4];
+    u8 unk_000[0x1c];
+    // 0x1c: the card's security flag; bit 0 says the boot code checks the images against the hashes. The card library
+    // reads the same byte as its CARD_TWL_BOOT_FLAGS
+    u8 bootFlags;
+    u8 unk_01d[0x3];
+    u32 arm9RomOffset;
+    u32 arm9Entry;
+    ROMHeaderLoad arm9;
+    u32 arm7RomOffset;
+    u32 arm7Entry;
+    ROMHeaderLoad arm7;
+    u8 unk_040[0x174];
     CARDAccessControl accessControl;
+    u8 unk_1b8[0x8];
+    u32 arm9iRomOffset;
+    u32 arm9iEntry;
+    ROMHeaderLoad arm9i;
+    u32 arm7iRomOffset;
+    u32 arm7iEntry;
+    ROMHeaderLoad arm7i;
+    // 0x1e0: the parts of the DS and the DSi images that TwlSDK's card library checks as it reads them, the tables of
+    // the sectors' hashes and of the blocks' hashes (a block hashes the hashes of a run of sectors), a sector's size,
+    // and the sectors of a block
+    ROMHeaderRegion digestNtr;
+    ROMHeaderRegion digestTwl;
+    ROMHeaderRegion digestSectorHashes;
+    ROMHeaderRegion digestBlockHashes;
+    u32 digestSectorSize;
+    u32 digestSectorsPerBlock;
+    u8 unk_208[0x10c];
+    u8 arm7Hash[0x14];
+    u8 digestBlockHashesHash[0x14];
+    u8 unk_33c[0x14];
+    u8 arm9iHash[0x14];
+    u8 arm7iHash[0x14];
+    u8 unk_378[0x28];
+    u8 arm9Hash[0x14];
 } CARDTwlRomHeader;
 
 // A function that the library calls with each event, such as the card being pulled out. Linked through next
@@ -233,7 +270,7 @@ BOOL CARD_WaitBackupAsync(void);
 BOOL CARD_TryWaitBackupAsync(void);
 void CARD_CancelBackupAsync(void);
 
-// What card_common.c gives the other files of the library
+// What card_common.c and card_task.c give the other files of the library
 void CARD_Init(void); // swan's cart_read_thread_init
 void CARD_CheckEnabled(void);
 const ROMHeader *CARD_GetRomHeader(void);
@@ -243,6 +280,7 @@ u32 CARDi_GetAccessLevel(void);
 BOOL CARDi_WaitAsync(void);
 BOOL CARDi_TryWaitAsync(void);
 BOOL CARDi_ExecuteOldTypeTask(CARDiTask task, BOOL async);
+void CARDi_OldTypeTaskThread(void *arg); // swan's cart_read_thread_proc
 BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg);
 void CARDi_EndTask(CARDiCommon *p);
 const CARDDmaInterface *CARDi_GetDmaInterface(u32 dma);

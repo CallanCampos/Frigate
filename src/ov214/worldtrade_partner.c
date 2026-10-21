@@ -105,7 +105,7 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     Partner_SetCellActor(wk);
 
     WorldTrade_MyPokeInfoPrint(wk->msgManager, wk->monsNameManager, wk->wordSet, &wk->infoWin[0],
-                               func_0201d624((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData),
+                               PokeParty_ToBoxPkm((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData),
                                &wk->downloadPokemonData[wk->touchTrainerPos].postSimple, &wk->print);
     WorldTrade_PokeInfoPrint2(wk->msgManager, &wk->infoWin[7], wk->downloadPokemonData[wk->touchTrainerPos].name,
                               (PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData, &wk->infoWin[12],
@@ -121,7 +121,7 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     WorldTrade_SetPartnerCursorPos(wk, wk->touchTrainerPos, -wk->drawOffset);
     wk->vfunc2 = Partner_SlideScreenVFunc;
     GX_SetDispSelect(GX_DISP_SELECT_MAIN_SUB);
-    func_02042ba8(TRUE, HEAPID_WORLDTRADE);
+    GFL_NetSetIconScreen(TRUE, HEAPID_WORLDTRADE);
 
     if (wk->subProcessMode == PARTNER_MODE_FROM_PARTNER) {
         if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) == -16 &&
@@ -160,10 +160,10 @@ int WorldTrade_Partner_End(WorldTradeWork *wk, int seq) {
     Partner_BmpWinDelete(wk);
     Partner_BgExit();
     WorldTrade_SubLcdBgExit(wk);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     WorldTrade_SubProcessUpdate(wk);
     if (wk->partnerChange == 0) {
-        func_02042ba8(FALSE, HEAPID_WORLDTRADE);
+        GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);
     }
     return WT_SEQ_INIT;
 }
@@ -248,17 +248,17 @@ static void Partner_SetCellActor(WorldTradeWork *wk) {
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 208;
     setup.y = 58;
-    wk->pokemonAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->pokemonAct, TRUE);
-    func_0204c488(wk->pokemonAct, 36);
-    func_0204c124(wk->pokemonAct, TRUE);
-    func_02042ba8(FALSE, HEAPID_WORLDTRADE);
+    wk->pokemonAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                                    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetAutoAnim(wk->pokemonAct, TRUE);
+    ClActor_SetSequence(wk->pokemonAct, 36);
+    ClActor_SetVisible(wk->pokemonAct, TRUE);
+    GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);
 }
 
 static void Partner_DelCellActor(WorldTradeWork *wk) {
-    func_0204c108(wk->pokemonAct);
+    ClActor_Delete(wk->pokemonAct);
 }
 
 // The windows of the Pokémon's and its trainer's information
@@ -338,20 +338,20 @@ static void Partner_FreeWork(WorldTradeWork *wk) {
 }
 
 static int Partner_SubSeqStart(WorldTradeWork *wk) {
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     if (wk->subProcessMode == PARTNER_MODE_FROM_SEARCH) {
         GFL_WipeSet(0, 1, 1, 0, 16, 1, HEAPID_WORLDTRADE);
         wk->subprocessSeq = PARTNER_SEQ_RETURN_SCREEN1;
     } else {
         wk->subprocessSeq = PARTNER_SEQ_MAIN;
-        func_0204c124(wk->partnerCursorAct, TRUE);
+        ClActor_SetVisible(wk->partnerCursorAct, TRUE);
     }
     return WT_SEQ_MAIN;
 }
 
 static void Partner_DecidePartner(WorldTradeWork *wk, int result) {
     if (result != wk->touchTrainerPos && result >= 0) {
-        func_0204c488(wk->subAct[result + 1], result * 4 + 16);
+        ClActor_SetSequence(wk->subAct[result + 1], result * 4 + 16);
         wk->subprocessSeq = PARTNER_SEQ_END;
         WorldTrade_SubProcessChange(wk, WORLDTRADE_PARTNER, PARTNER_MODE_FROM_PARTNER);
         wk->touchTrainerPos = result;
@@ -401,7 +401,7 @@ static int Partner_SubSeqMain(WorldTradeWork *wk) {
         if (ret != -1) {
             Partner_DecidePartner(wk, ret);
         }
-        ret = func_0203da0c(sPartnerTouchRects);
+        ret = GFL_HIDGetTouchPressedRect(sPartnerTouchRects);
         if (ret == 0) {
             Partner_SubSeqMessagePrint(wk, 0x10, 1, 0, 0xf0f);
             WorldTrade_SetNextSeq(wk, PARTNER_SEQ_MESSAGE_WAIT, PARTNER_SEQ_YESNO);
@@ -416,7 +416,7 @@ static int Partner_SubSeqMain(WorldTradeWork *wk) {
 }
 
 static int Partner_SubSeqEnd(WorldTradeWork *wk) {
-    func_0204c124(wk->partnerCursorAct, FALSE);
+    ClActor_SetVisible(wk->partnerCursorAct, FALSE);
     if (wk->subProcessMode != SEARCH_MODE_PARTNER_RETURN) {
         if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
@@ -473,7 +473,7 @@ static int Partner_SubSeqReturnScreen1(WorldTradeWork *wk) {
     if (GFL_WipeIsFinished()) {
         wk->drawOffset = 0;
         wk->subprocessSeq = PARTNER_SEQ_MAIN;
-        func_0204c124(wk->partnerCursorAct, TRUE);
+        ClActor_SetVisible(wk->partnerCursorAct, TRUE);
     }
     return WT_SEQ_MAIN;
 }

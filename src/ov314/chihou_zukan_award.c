@@ -143,7 +143,7 @@ static BOOL ChihouZukanAward_Init(GameProc *proc, u32 *state, void *param, void 
     wk->param = param;
     wk->graphic = ChihouZukanAwardGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     GFL_BGSysSetBGPriority(1, 1);
     GFL_BGSysSetBGPriority(2, 0);
     wk->vblankTask = GFL_VBlankTCBAdd(ChihouZukanAward_VBlank, wk, 1);
@@ -178,7 +178,7 @@ static BOOL ChihouZukanAward_Init(GameProc *proc, u32 *state, void *param, void 
     GFL_BGSysLoadScr(BG_SUB_C_GEAR);
     ChihouZukanAward_StartSlide(wk);
     GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 16, 0);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     if (wk->param->unk04 == 0) {
         GFL_SndBGMFadeOut(6);
     }
@@ -198,8 +198,8 @@ static BOOL ChihouZukanAward_Exit(GameProc *proc, u32 *state, void *param, void 
     ChihouZukanAward_FreeText(wk);
     ChihouZukanAward_Unused(wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ChihouZukanAwardGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -258,11 +258,11 @@ static BOOL ChihouZukanAward_Main(GameProc *proc, u32 *state, void *param, void 
     case STEP_WAIT_INPUT:
         done = FALSE;
         if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             done = TRUE;
-        } else if (func_0203dac8(&x, &y)) {
+        } else if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             done = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
         if (done) {
             *state = STEP_WAIT_FADE_OUT;
@@ -277,7 +277,7 @@ static BOOL ChihouZukanAward_Main(GameProc *proc, u32 *state, void *param, void 
     case STEP_END:
         return TRUE;
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     ChihouZukanAward_TransferPrinted(wk);
     if ((s32)*state >= STEP_WAIT_FADE_IN && (s32)*state <= STEP_WAIT_FADE_OUT) {
         ChihouZukanAward_UpdateSlide(wk);
@@ -332,20 +332,20 @@ static void ChihouZukanAward_InitText(ChihouZukanAwardWork *wk) {
     strbuf = GFL_StrBufCreate(32, wk->heapId);
     copyVarForText(wordSet, 0, playerInfo);
     GFL_WordSetFormatStrbuf(wordSet, strbuf, format);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_PLAYER_NAME]), 0, 0, strbuf, wk->font,
-                  PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_PLAYER_NAME]), 0, 0, strbuf, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(strbuf);
     GFL_StrBufFree(format);
     GFL_WordSetSystemFree(wordSet);
 
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_DocumentCertifiesHaveMade);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]), 0, 0, strbuf, wk->font,
-                  PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_CERTIFIES]), 0, 0, strbuf, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(strbuf);
 
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, ScriptTitle_Text_GameFreakAllStaff);
-    func_02021c7c(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]), 0, 0, strbuf, wk->font,
-                  PRINT_COLOR(1, 2, 0));
+    PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(wk->windows[WINDOW_STAFF]), 0, 0, strbuf, wk->font,
+                          PRINT_COLOR(1, 2, 0));
     GFL_StrBufFree(strbuf);
 
     for (i = 1; i < WINDOW_COUNT; i++) {
@@ -372,7 +372,7 @@ static void ChihouZukanAward_TransferPrinted(ChihouZukanAwardWork *wk) {
     u8 i;
 
     for (i = 0; i < WINDOW_COUNT; i++) {
-        if (!wk->printed[i] && !func_02021c1c(wk->printQueue, BmpWin_GetBitmap(wk->windows[i]))) {
+        if (!wk->printed[i] && !PrintQueue_IsBitmapPending(wk->printQueue, BmpWin_GetBitmap(wk->windows[i]))) {
             BmpWin_Transfer(wk->windows[i]);
             wk->printed[i] = TRUE;
         }
@@ -424,21 +424,21 @@ static void ChihouZukanAward_InitBackdrop(ChihouZukanAwardWork *wk) {
 static void ChihouZukanAward_InitRibbon(ChihouZukanAwardWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_AWARD, wk->heapId);
 
-    wk->palette = func_0204bbb8(arc, 0, 0, 0, 0, 2, wk->heapId);
-    wk->chars = func_0204b81c(arc, 3, FALSE, 0, wk->heapId);
-    wk->cellAnims = func_0204bde0(arc, 8, 9, wk->heapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 0, 0, 0, 0, 2, wk->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 3, FALSE, 0, wk->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 8, 9, wk->heapId);
     GFL_ArcToolFree(arc);
-    wk->ribbon = func_0204c040(ChihouZukanAwardGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette, wk->cellAnims,
-                               sChihouZukanAwardRibbonSetup, 0, wk->heapId);
-    func_0204c124(wk->ribbon, TRUE);
-    func_0204c520(wk->ribbon, TRUE);
+    wk->ribbon = ClActor_Create(ChihouZukanAwardGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette,
+                                wk->cellAnims, sChihouZukanAwardRibbonSetup, 0, wk->heapId);
+    ClActor_SetVisible(wk->ribbon, TRUE);
+    ClActor_SetAutoAnim(wk->ribbon, TRUE);
 }
 
 static void ChihouZukanAward_FreeRibbon(ChihouZukanAwardWork *wk) {
-    func_0204c108(wk->ribbon);
-    func_0204be64(wk->cellAnims);
-    func_0204b98c(wk->chars);
-    func_0204bcd0(wk->palette);
+    ClActor_Delete(wk->ribbon);
+    ClActSys_FreeCellAnims(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreePltt(wk->palette);
 }
 
 // Puts the diploma's BGs and the ribbon below the screen, to slide up
@@ -452,7 +452,7 @@ static void ChihouZukanAward_StartSlide(ChihouZukanAwardWork *wk) {
         for (i = 0; i < NELEMS(sChihouZukanAwardRibbonSetup); i++) {
             pos.x = sChihouZukanAwardRibbonSetup[i].x;
             pos.y = sChihouZukanAwardRibbonSetup[i].y - 64;
-            func_0204c140(wk->ribbon, &pos, 0);
+            ClActor_SetSurfacePos(wk->ribbon, &pos, 0);
         }
         wk->slideWait = 0;
     }
@@ -471,9 +471,9 @@ static void ChihouZukanAward_UpdateSlide(ChihouZukanAwardWork *wk) {
                 }
                 GFL_BGSysMoveBGReq(BG_MAIN_DIPLOMA, BG_MOVE_UP, y);
                 GFL_BGSysMoveBGReq(BG_MAIN_BACKDROP, BG_MOVE_UP, y);
-                func_0204c178(wk->ribbon, &pos, 0);
+                ClActor_GetSurfacePos(wk->ribbon, &pos, 0);
                 pos.y += y;
-                func_0204c140(wk->ribbon, &pos, 0);
+                ClActor_SetSurfacePos(wk->ribbon, &pos, 0);
                 wk->slideWait = 0;
             } else {
                 wk->slideWait--;

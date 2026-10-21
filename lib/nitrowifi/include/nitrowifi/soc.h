@@ -129,7 +129,7 @@ typedef struct SocConfig {
     u32 unk_28;         // 0x28
     u32 mtu;            // 0x2c: SOCLConfig's mtu
     u32 rwin;           // 0x30: SOCLConfig's rwin
-    u32 unk_34[9];      // 0x34
+    uptr unk_34[9];     // 0x34: native-word options; DWC utility stores its hostname pointer in slot 5
 } SocConfig;
 
 // Only type selects the transport: 1 creates TCP, every other value UDP. domain/protocol are ignored.

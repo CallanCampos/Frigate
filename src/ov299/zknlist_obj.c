@@ -97,7 +97,7 @@ void ZknListObj_Exit(ZknListWork *wk) {
     ZknListObj_ExitBlinkAnm(wk);
     ZknListObj_DeleteActors(wk);
     ZknListObj_FreeResources(wk);
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 void ZknListObj_Update(ZknListWork *wk) {
@@ -107,51 +107,51 @@ void ZknListObj_Update(ZknListWork *wk) {
         BlinkPalAnm_Main(wk->blinkAnm);
     }
     for (i = 0; i < ZKNLIST_OBJ_COUNT; i++) {
-        if (wk->actors[i] != NULL && func_0204c534(wk->actors[i]) != TRUE) {
-            func_0204c4e0(wk->actors[i], FX32_ONE);
+        if (wk->actors[i] != NULL && ClActor_IsAutoAnim(wk->actors[i]) != TRUE) {
+            ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 void ZknListObj_SetAnmSeq(ZknListWork *wk, u32 id, u32 anm) {
-    func_0204c4d4(wk->actors[id], 0);
-    func_0204c488(wk->actors[id], anm);
-    func_0204c540(wk->actors[id]);
+    ClActor_SetAnimTime(wk->actors[id], 0);
+    ClActor_SetSequence(wk->actors[id], anm);
+    ClActor_StartAnim(wk->actors[id]);
 }
 
 void ZknListObj_EndAnm(ZknListWork *wk, u32 id) {
-    func_0204c550(wk->actors[id]);
+    ClActor_StopAnim(wk->actors[id]);
 }
 
 void ZknListObj_SetAnm(ZknListWork *wk, u32 id, u32 anm) {
     ZknListObj_SetAnmSeq(wk, id, anm);
-    func_0204c520(wk->actors[id], TRUE);
+    ClActor_SetAutoAnim(wk->actors[id], TRUE);
 }
 
 u32 ZknListObj_GetAnm(ZknListWork *wk, u32 id) {
-    return func_0204c4a0(wk->actors[id]);
+    return ClActor_GetSequence(wk->actors[id]);
 }
 
 BOOL ZknListObj_IsAnmPlaying(ZknListWork *wk, u32 id) {
-    return func_0204c560(wk->actors[id]);
+    return ClActor_IsAnimActive(wk->actors[id]);
 }
 
 void ZknListObj_SetVisible(ZknListWork *wk, u32 id, BOOL visible) {
     if (wk->actors[id] != NULL) {
-        func_0204c124(wk->actors[id], visible);
+        ClActor_SetVisible(wk->actors[id], visible);
     }
 }
 
 BOOL ZknListObj_IsVisible(ZknListWork *wk, u32 id) {
-    return func_0204c138(wk->actors[id]);
+    return ClActor_IsVisible(wk->actors[id]);
 }
 
 void ZknListObj_SetBlend(ZknListWork *wk, u32 id, BOOL blend) {
     if (blend == TRUE) {
-        func_0204c318(wk->actors[id], GX_OAM_MODE_XLU);
+        ClActor_SetObjMode(wk->actors[id], GX_OAM_MODE_XLU);
     } else {
-        func_0204c318(wk->actors[id], GX_OAM_MODE_NORMAL);
+        ClActor_SetObjMode(wk->actors[id], GX_OAM_MODE_NORMAL);
     }
 }
 
@@ -160,13 +160,13 @@ void ZknListObj_SetPos(ZknListWork *wk, u32 id, s16 x, s16 y, u16 surface) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(wk->actors[id], &pos, surface);
+    ClActor_SetSurfacePos(wk->actors[id], &pos, surface);
 }
 
 void ZknListObj_GetPos(ZknListWork *wk, u32 id, s16 *x, s16 *y, u16 surface) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[id], &pos, surface);
+    ClActor_GetSurfacePos(wk->actors[id], &pos, surface);
     *x = pos.x;
     *y = pos.y;
 }
@@ -196,9 +196,9 @@ static void ZknListObj_LoadResources(ZknListWork *wk) {
     }
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    wk->charRes[CHAR_RES_LIST] = func_0204b81c(arc, 57, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
-    wk->paletteRes[RES_LIST] = func_0204bba0(arc, 53, CLACT_VRAM_MAIN, 0 * 0x20, HEAPID_ZUKAN_LIST);
-    wk->cellRes[RES_LIST] = func_0204bde0(arc, 63, 73, HEAPID_ZUKAN_LIST);
+    wk->charRes[CHAR_RES_LIST] = ClActSys_LoadChars(arc, 57, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
+    wk->paletteRes[RES_LIST] = ClActSys_LoadPltt(arc, 53, CLACT_VRAM_MAIN, 0 * 0x20, HEAPID_ZUKAN_LIST);
+    wk->cellRes[RES_LIST] = ClActSys_LoadCellAnims(arc, 63, 73, HEAPID_ZUKAN_LIST);
     GFL_ArcToolFree(arc);
 
     // The icons of each screen; their characters are loaded over when a row is drawn
@@ -208,24 +208,28 @@ static void ZknListObj_LoadResources(ZknListWork *wk) {
     cells = &wk->cellRes[RES_ICON];
     for (i = 0; i < ZKNLIST_ICON_COUNT; i++) {
         chars[i] =
-            func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
+            ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
     }
-    *palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 4 * 0x20, HEAPID_ZUKAN_LIST);
-    *cells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_ZUKAN_LIST);
+    *palette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 4 * 0x20, HEAPID_ZUKAN_LIST);
+    *cells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_ZUKAN_LIST);
     chars = &wk->charRes[CHAR_RES_ICON_SUB];
     palette = &wk->paletteRes[RES_ICON_SUB];
     cells = &wk->cellRes[RES_ICON_SUB];
     for (i = 0; i < ZKNLIST_ICON_COUNT; i++) {
-        chars[i] = func_0204b81c(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB, HEAPID_ZUKAN_LIST);
+        chars[i] =
+            ClActSys_LoadChars(arc, PokeParty_GetIconIndex(0, 0, 0, FALSE), FALSE, CLACT_VRAM_SUB, HEAPID_ZUKAN_LIST);
     }
-    *palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0 * 0x20, HEAPID_ZUKAN_LIST);
-    *cells = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), HEAPID_ZUKAN_LIST);
+    *palette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_SUB, 0 * 0x20, HEAPID_ZUKAN_LIST);
+    *cells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), HEAPID_ZUKAN_LIST);
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    wk->charRes[CHAR_RES_TOUCHBAR] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
-    wk->paletteRes[RES_TOUCHBAR] = func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, 7 * 0x20, HEAPID_ZUKAN_LIST);
-    wk->cellRes[RES_TOUCHBAR] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), HEAPID_ZUKAN_LIST);
+    wk->charRes[CHAR_RES_TOUCHBAR] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
+    wk->paletteRes[RES_TOUCHBAR] =
+        ClActSys_LoadPltt(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 7 * 0x20, HEAPID_ZUKAN_LIST);
+    wk->cellRes[RES_TOUCHBAR] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                       AppMenuCommon_GetTouchBarAnimFile(2), HEAPID_ZUKAN_LIST);
     GFL_ArcToolFree(arc);
 }
 
@@ -251,17 +255,17 @@ static void ZknListObj_FreeResources(ZknListWork *wk) {
 
     for (i = 0; i < ZKNLIST_CHAR_RES_COUNT; i++) {
         if (wk->charRes[i] != -1) {
-            func_0204b98c(wk->charRes[i]);
+            ClActSys_FreeChars(wk->charRes[i]);
         }
     }
     for (i = 0; i < ZKNLIST_PALETTE_RES_COUNT; i++) {
         if (wk->paletteRes[i] != -1) {
-            func_0204bcd0(wk->paletteRes[i]);
+            ClActSys_FreePltt(wk->paletteRes[i]);
         }
     }
     for (i = 0; i < ZKNLIST_CELL_RES_COUNT; i++) {
         if (wk->cellRes[i] != -1) {
-            func_0204be64(wk->cellRes[i]);
+            ClActSys_FreeCellAnims(wk->cellRes[i]);
         }
     }
 }
@@ -272,7 +276,7 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
     u32 i;
     s16 x, y;
 
-    wk->actorUnit = func_0204bf1c(ZKNLIST_OBJ_COUNT, 0, HEAPID_ZUKAN_LIST);
+    wk->actorUnit = ClActUnit_Create(ZKNLIST_OBJ_COUNT, 0, HEAPID_ZUKAN_LIST);
     for (i = 0; i < ZKNLIST_OBJ_COUNT; i++) {
         wk->actors[i] = NULL;
     }
@@ -283,13 +287,13 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
         template.palette = wk->paletteRes[template.palette];
         template.cells = wk->cellRes[template.cells];
         wk->actors[i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[i], FALSE);
     }
     if (wk->param->count <= ZKNLIST_ROW_COUNT) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_SCROLL_BAR, FALSE);
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_SCROLL_RAIL, FALSE);
     }
-    if (func_0200d1dc(wk->param->pokedex) == 0) {
+    if (PokeDex_IsGiven(wk->param->pokedex) == 0) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_START, FALSE);
     }
     if (habitat == FALSE) {
@@ -307,7 +311,7 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
         ZknListObj_SetAnmSeq(wk, ZKNLIST_OBJ_NATIONAL, 14);
         ZknListObj_EndAnm(wk, ZKNLIST_OBJ_NATIONAL);
     } else if (national == TRUE && habitat == TRUE) {
-        if (func_0200d1f8(wk->param->pokedex) != 1) {
+        if (PokeDex_GetMode(wk->param->pokedex) != 1) {
             ZknListObj_SetAnmSeq(wk, ZKNLIST_OBJ_UNOVA, 14);
             ZknListObj_EndAnm(wk, ZKNLIST_OBJ_UNOVA);
         } else {
@@ -328,7 +332,7 @@ static void ZknListObj_CreateActors(ZknListWork *wk) {
 
 static void ZknListObj_DeleteActor(ZknListWork *wk, u32 id) {
     if (wk->actors[id] != NULL) {
-        func_0204c108(wk->actors[id]);
+        ClActor_Delete(wk->actors[id]);
         wk->actors[id] = NULL;
     }
 }
@@ -339,7 +343,7 @@ static void ZknListObj_DeleteActors(ZknListWork *wk) {
     for (i = 0; i < ZKNLIST_OBJ_COUNT; i++) {
         ZknListObj_DeleteActor(wk, i);
     }
-    func_0204bf98(wk->actorUnit);
+    ClActUnit_Delete(wk->actorUnit);
 }
 
 // Loads the picture into the actor that isn't shown, then hides the other
@@ -366,30 +370,31 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
     if (wk->actors[id] != NULL) {
         ZknListObj_DeleteActor(wk, id);
         if (wk->charRes[template.chars] != -1) {
-            func_0204b98c(wk->charRes[template.chars]);
+            ClActSys_FreeChars(wk->charRes[template.chars]);
         }
         if (wk->paletteRes[template.palette] != -1) {
-            func_0204bcd0(wk->paletteRes[template.palette]);
+            ClActSys_FreePltt(wk->paletteRes[template.palette]);
         }
         if (wk->cellRes[template.cells] != -1) {
-            func_0204be64(wk->cellRes[template.cells]);
+            ClActSys_FreeCellAnims(wk->cellRes[template.cells]);
         }
     }
     if (species == SPECIES_NONE) {
         arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-        wk->charRes[template.chars] = func_0204b81c(arc, 56, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
+        wk->charRes[template.chars] = ClActSys_LoadChars(arc, 56, FALSE, CLACT_VRAM_MAIN, HEAPID_ZUKAN_LIST);
         wk->paletteRes[template.palette] =
-            func_0204bbb8(arc, 52, CLACT_VRAM_MAIN, paletteOffset, 0, 1, HEAPID_ZUKAN_LIST);
-        wk->cellRes[template.cells] = func_0204bde0(arc, 62, 72, HEAPID_ZUKAN_LIST);
+            ClActSys_LoadPlttRange(arc, 52, CLACT_VRAM_MAIN, paletteOffset, 0, 1, HEAPID_ZUKAN_LIST);
+        wk->cellRes[template.cells] = ClActSys_LoadCellAnims(arc, 62, 72, HEAPID_ZUKAN_LIST);
         GFL_ArcToolFree(arc);
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_MON_BASE, FALSE);
     } else {
         u32 personality;
 
-        func_0200d3c8(wk->param->pokedex, species, &sex, &rare, &form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
+        PokeDex_GetShownSexRareForm(wk->param->pokedex, species, &sex, &rare, &form,
+                                    HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         arc = MakePokeGraArcHandle(HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
         if (species == SPECIES_SPINDA) {
-            personality = func_0200da18(wk->param->pokedex, 0);
+            personality = PokeDex_GetSpindaPersonality(wk->param->pokedex, 0);
         } else {
             personality = 0;
         }
@@ -406,12 +411,12 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
     template.palette = wk->paletteRes[template.palette];
     template.cells = wk->cellRes[template.cells];
     wk->actors[id] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-    func_0204c5c8(wk->actors[id], FALSE);
+    ClActor_SetDrawAnim(wk->actors[id], FALSE);
 
     // BUG: for the unknown picture the form is whatever the stack holds, since nothing read it from the Pokédex
     personal = PML_PersonalLoad(species, form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
     if (species != SPECIES_NONE && PML_PersonalGetParam(personal, PERSONAL_SPRITE_FLIP) == 0) {
-        func_0204c2b0(wk->actors[id], 1, TRUE);
+        ClActor_SetFlip(wk->actors[id], 1, TRUE);
     }
     PML_PersonalFree(personal);
     ZknListObj_SetVisible(wk, prevId, FALSE);
@@ -431,7 +436,7 @@ static void ZknListObj_CreateIcons(ZknListWork *wk) {
         template.setup.y = i * ROW_HEIGHT + 8;
         template.chars = wk->charRes[CHAR_RES_ICON + i];
         wk->actors[ZKNLIST_OBJ_ICON + i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[ZKNLIST_OBJ_ICON + i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[ZKNLIST_OBJ_ICON + i], FALSE);
     }
 
     template = icon;
@@ -442,12 +447,12 @@ static void ZknListObj_CreateIcons(ZknListWork *wk) {
         template.chars = wk->charRes[CHAR_RES_ICON_SUB + i];
         template.surface = CLACT_SURFACE_SUB;
         wk->actors[ZKNLIST_OBJ_ICON_SUB + i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[ZKNLIST_OBJ_ICON_SUB + i], FALSE);
+        ClActor_SetDrawAnim(wk->actors[ZKNLIST_OBJ_ICON_SUB + i], FALSE);
         ZknListObj_SetBlend(wk, ZKNLIST_OBJ_ICON_SUB + i, TRUE);
 
         wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i] = ZukanCommon_CreateActor(wk->actorUnit, &template, HEAPID_ZUKAN_LIST);
-        func_0204c5c8(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], FALSE);
-        func_0204c318(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], OAM_MODE_OBJWND);
+        ClActor_SetDrawAnim(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], FALSE);
+        ClActor_SetObjMode(wk->actors[ZKNLIST_OBJ_ICON_WINDOW + i], OAM_MODE_OBJWND);
     }
     for (i = 0; i < ZKNLIST_ICON_COUNT; i++) {
         ZknListObj_SetVisible(wk, ZKNLIST_OBJ_ICON + i, FALSE);
@@ -466,13 +471,13 @@ static void ZknListObj_LoadIcon(ZknListWork *wk, u32 id, u16 species, u16 form, 
                                          HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
 
     if (touchScreen == TRUE) {
-        func_0204bab8(func_0204c428(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_MAIN);
+        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_MAIN);
     } else {
-        func_0204bab8(func_0204c428(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_SUB);
+        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_SUB);
     }
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
-    func_0204c378(wk->actors[id], PokeIcon_GetPalette(species, form, sex, FALSE), 1);
+    ClActor_SetPalette(wk->actors[id], PokeIcon_GetPalette(species, form, sex, FALSE), 1);
 }
 
 // An icon actor of a screen that isn't shown
@@ -499,7 +504,7 @@ void ZknListObj_PutIcon(ZknListWork *wk, u16 species, s16 y, BOOL touchScreen) {
     u32 sex, form, rare;
     u32 id;
 
-    func_0200d3c8(wk->param->pokedex, species, &sex, &rare, &form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
+    PokeDex_GetShownSexRareForm(wk->param->pokedex, species, &sex, &rare, &form, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
     id = ZknListObj_FindFreeIcon(wk, touchScreen);
     ZknListObj_LoadIcon(wk, id, species, form, sex, touchScreen);
     ZknListObj_SetVisible(wk, id, TRUE);

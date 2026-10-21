@@ -2,6 +2,7 @@
 // name is the ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field.h"
 #include "field/field_camera.h"
 #include "field/field_scene_area.h"
@@ -36,7 +37,7 @@ static void FieldCameraAreaCalc_RECT_LookatTargetOffs(FieldSceneArea *area, cons
 static void FieldCameraAreaCalc_RECT_FOV(FieldSceneArea *area, const CameraArea *cameraArea, const VecFx32 *pos);
 
 // The camera areas of the field maps, and of the other maps
-static const u32 FIELD_CAMERA_ARCIDS[2] = { 79, 156 };
+static const u32 FIELD_CAMERA_ARCIDS[2] = { 79, ARCID_FIELD_CAMERA_MAP_PARAM };
 
 static CameraAreaCollCheck CAM_COLL_CHECK_FUNCS[2] = {
     FieldCameraArea_CIRCLE_CheckColl,
@@ -147,10 +148,13 @@ static void FieldCameraAreaCalc_CIRCLE_AimPlayerCentre(FieldSceneArea *area, con
     FieldCamera *camera = GetFieldSceneAreaCamera(area);
 
     FieldCamera_SetTransformType(camera, 2);
-    centerY = cameraArea->circle.y;
-    VEC_Set(&target, cameraArea->circle.x, centerY, cameraArea->circle.z);
-    dir = *pos;
+    target.x = cameraArea->circle.x;
+    target.y = cameraArea->circle.y;
+    target.z = cameraArea->circle.z;
+    // The direction from the centre to the player on the ground, then the centre at its height again
+    centerY = target.y;
     target.y = 0;
+    dir = *pos;
     dir.y = 0;
     VEC_Subtract(&dir, &target, &dir);
     VEC_Normalize(&dir, &normal);

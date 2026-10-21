@@ -36,7 +36,8 @@ struct MedalBox {
     // The medal obtained last, or 0xff
     u8 lastMedal;
     u8 rank;
-    u8 unk3FE;
+    // Set once the Medal Box has shown its manual, which it shows the first time it opens
+    u8 manualShown;
     u8 padding3FF;
     // The Pokédex's habitat list
     u8 habitatList[0x96];
@@ -65,23 +66,23 @@ void MedalBox_GetMedalDate(MedalBox *box, u16 medal, u8 *year, u8 *month, u8 *da
 u32 MedalBox_GetNextRankRequirement(MedalBox *box);
 // The medals obtained, and with countEarned also those hinted at and those earned on a date
 u32 MedalBox_GetObtainedCount(MedalBox *box, BOOL countEarned);
-u8 func_0200fb28(MedalBox *box);
-void func_0200fb34(MedalBox *box);
+u8 MedalBox_IsManualShown(MedalBox *box);
+void MedalBox_SetManualShown(MedalBox *box);
 MedalBox *SaveControl_GetMedalBox(SaveControl *save);
 // The Pokédex's habitat list in the block
 void *MedalBox_GetHabitatList(MedalBox *box);
 
 // The Pokédex's habitat list, kept in the medal box's block: the zone it shows, its season and its kind of habitat.
 // These functions come from a later file than the medal box's, which has no header yet
-void func_02010ca0(void *data);
-void *func_02010cb8(SaveControl *save);
-void func_02010d70(void *data, u16 zone);
-u16 func_02010d78(void *data);
-void func_02010d80(void *data, u32 season);
-u8 func_02010d88(void *data);
-void func_02010d90(void *data, u16 type);
-u8 func_02010d98(void *data);
+void ZukanHabitatSave_Init(void *data);
+void *SaveControl_GetZukanHabitatSave(SaveControl *save);
+void ZukanHabitatSave_SetZone(void *data, u16 zone);
+u16 ZukanHabitatSave_GetZone(void *data);
+void ZukanHabitatSave_SetSeason(void *data, u32 season);
+u8 ZukanHabitatSave_GetSeason(void *data);
+void ZukanHabitatSave_SetType(void *data, u16 type);
+u8 ZukanHabitatSave_GetType(void *data);
 // What the player has done of a habitat's kind of habitat
-u8 func_02010cc4(void *data, u8 habitat, u32 type);
+u8 ZukanHabitatSave_GetHabitatField(void *data, u8 habitat, u32 type);
 
 #endif // POKEBW2_SAVE_MEDAL_BOX_H

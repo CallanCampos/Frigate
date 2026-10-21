@@ -16,7 +16,7 @@
 #include "struct_decls.h"
 #include "system/game_event.h"
 
-// The musical's communication work, which func_020179d4 keeps in the game data
+// The musical's communication work, which GameData_SetMusicalCommWork keeps in the game data
 struct MusicalCommWork {
     MusicalEventWork *event;
     // Overlay 211's communication work
@@ -28,32 +28,32 @@ struct MusicalCommWork {
     u16 value;
 };
 
-MusicalCommWork *func_020179dc(GameData *gameData);
-void func_020179d4(GameData *gameData, MusicalCommWork *work);
+MusicalCommWork *GameData_GetMusicalCommWork(GameData *gameData);
+void GameData_SetMusicalCommWork(GameData *gameData, MusicalCommWork *work);
 
 // Overlay 12's musical_event.c
-GameEvent *func_ov012_02150cf8(GameSystem *gsys, GameData *gameData, u8 slot, BOOL online, MusicalCommWork *comm);
+GameEvent *MusicalEvent_Create(GameSystem *gsys, GameData *gameData, u8 slot, BOOL online, MusicalCommWork *comm);
 // The position of the player's Pokémon on the stage
-u8 func_ov012_02151b80(MusicalEventWork *work);
+u8 MusicalEvent_GetPlayerPos(MusicalEventWork *work);
 // The entry order of the Pokémon at a stage position
-u8 func_ov012_02151b88(MusicalEventWork *work, u8 pos);
-u8 func_ov012_02151ba8(MusicalEventWork *work);
+u8 MusicalEvent_GetEntryIndex(MusicalEventWork *work, u8 pos);
+u8 MusicalEvent_GetTopPropKind(MusicalEventWork *work);
 // The program's title
-StrBuf *func_ov012_02151bb4(MusicalEventWork *work, HeapID heapId);
+StrBuf *MusicalEvent_GetProgramTitle(MusicalEventWork *work, HeapID heapId);
 // The points of the Pokémon at a stage position, at most 255
-u8 func_ov012_02151bd4(MusicalEventWork *work, u8 pos);
-u16 func_ov012_02151bf4(MusicalEventWork *work);
-u16 func_ov012_02151c18(MusicalEventWork *work);
+u8 MusicalEvent_GetPoints(MusicalEventWork *work, u8 pos);
+u16 MusicalEvent_GetMaxPoints(MusicalEventWork *work);
+u16 MusicalEvent_GetMinPoints(MusicalEventWork *work);
 // The stage position that finished at a rank
-u8 func_ov012_02151c3c(MusicalEventWork *work, u8 rank);
-u8 func_ov012_02151c44(MusicalEventWork *work, u8 pos);
+u8 MusicalEvent_GetPosAtRank(MusicalEventWork *work, u8 rank);
+u8 MusicalEvent_GetBestPropKind(MusicalEventWork *work, u8 pos);
 // The trainer class shown for the owner of the Pokémon at a stage position
-u8 func_ov012_02151c8c(MusicalEventWork *work, u8 pos);
+u8 MusicalEvent_GetOwnerTrainerClass(MusicalEventWork *work, u8 pos);
 // Sets a word to the owner's name, or to the Pokémon's
-void func_ov012_02151cd4(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 wordIndex);
-void func_ov012_02151d6c(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 wordIndex);
-void func_ov012_02151e44(MusicalEventWork *work);
+void MusicalEvent_WordSetOwnerName(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 wordIndex);
+void MusicalEvent_WordSetPokeName(MusicalEventWork *work, u8 pos, WordSet *wordSet, u32 wordIndex);
+void MusicalEvent_CheckNetError(MusicalEventWork *work);
 // Whether the connection was lost
-BOOL func_ov012_02151e64(MusicalEventWork *work);
+BOOL MusicalEvent_IsNetError(MusicalEventWork *work);
 
 #endif // POKEBW2_FIELD_MUSICAL_H

@@ -1,7 +1,9 @@
 # Nintendo's NitroSystem (FND, GFD, G2D, G3D and sound), built apart from the game as Thumb code with CodeWarrior for
-# NITRO 2.0: the dsi compilers that build the game miss its GFD pool loops, and every 2.0 build matches what has been
-# tested, so the exact service pack is a guess.
-compiler = "2.0/sp2p2"
+# NITRO 2.0: the dsi compilers that build the game miss its GFD pool loops. Every build from 2.0/sp1p6 to 2.0/sp2p4
+# matches the same functions (the earlier ones lose MAT32_Mul and NNS_G3DRenderFuncApplyJointMatrix), so the service
+# pack is a guess: 2.0/sp2 is the newest that also builds the DWC utility (lib/dwcutil), which leaves one 2.0 for the
+# whole ROM.
+compiler = "2.0/sp2"
 flags = [
     "-O4,p",               # Optimize for speed
     "-proc arm946e",       # ARM9 processor
@@ -25,6 +27,9 @@ flags = [
 # Files built with other flags, each replacing the library's flag of the same option. The capture is built without
 # -ipa file: its code reaches each object through its own symbol (the struct as well as the flag and the queue), and
 # its .bss keeps a word and a message buffer that no surviving code uses, both of which only function-level analysis
-# gives. With -ipa file every object is reached from the .bss base and the unused ones are dropped
+# gives. With -ipa file every object is reached from the .bss base and the unused ones are dropped. G3D's sbc.c is
+# built without it too: PRJMAP stores to its texture matrix through the matrix's own address, which -ipa file never
+# gives a known object, and its .bss is the reverse of its definitions, as without -ipa file
 [file_flags]
 "snd/snd_capture.c" = ["-ipa function"]
+"g3d/sbc.c" = ["-ipa function"]

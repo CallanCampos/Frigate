@@ -383,7 +383,7 @@ static BOOL TownMap_ProcInit(GameProc *proc, u32 *state, void *paramPtr, void *w
                            work->msgData, 0, 21, 24, 3, HEAPID_TOWNMAP);
         GFL_TextRndUpdateColorIndexLUT(15, 1, 0);
         TownMapMsgWin_Print(&work->msgWin, TownMap_Text_FlyWhere, 16, 0);
-        func_020232d8();
+        GFL_TextRndResetColorIndexLUT();
     }
     TownMapAppBar_Init(&work->appBar, work->param->mode, TownMapGraphic_GetUnit(work->graphic, TOWNMAP_UNIT_MAIN),
                        TownMapGraphic_GetBG(work->graphic, TOWNMAP_BG_BAR), 15, 8, gameData, HEAPID_TOWNMAP);
@@ -424,8 +424,8 @@ static BOOL TownMap_ProcInit(GameProc *proc, u32 *state, void *paramPtr, void *w
         TownMapPlaces_GetScroll(&work->places, &scroll);
         TownMapCursor_SetPlace(&work->cursor, place, &scroll);
     }
-    if (func_02042788()) {
-        func_02042ba8(TRUE, HEAPID_TOWNMAP);
+    if (GFL_NetIsInitialized()) {
+        GFL_NetSetIconScreen(TRUE, HEAPID_TOWNMAP);
     }
     work->vblankTask = GFL_VBlankTCBAdd(TownMap_VBlank, work, 0);
     return TRUE;
@@ -606,7 +606,7 @@ static void TownMap_SeqMain(TownMapSeq *seq, u32 *state, void *data) {
                 }
             }
             // With the keys, the place under the cursor is selected at once; a touch has to decide it
-            if (func_0203d554() == FALSE) {
+            if (GCTX_HIDIsUsingTouch() == FALSE) {
                 decided = TRUE;
             } else {
                 decided = TownMapCursor_IsDecided(&work->cursor);
@@ -701,9 +701,9 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
     MI_CpuFill8(appBar, 0, sizeof(TownMapAppBar));
     appBar->gameData = gameData;
     arc = GFL_ArcSysCreateFileHandle(ARCID_TOWNMAP_GRA, heapId);
-    appBar->pltt = func_0204bbb8(arc, 2, CLACT_VRAM_MAIN, 0, 0, 4, heapId);
-    appBar->chars = func_0204b81c(arc, 8, FALSE, CLACT_VRAM_MAIN, heapId);
-    appBar->cellAnims = func_0204bde0(arc, 12, 19, heapId);
+    appBar->pltt = ClActSys_LoadPlttRange(arc, 2, CLACT_VRAM_MAIN, 0, 0, 4, heapId);
+    appBar->chars = ClActSys_LoadChars(arc, 8, FALSE, CLACT_VRAM_MAIN, heapId);
+    appBar->cellAnims = ClActSys_LoadCellAnims(arc, 12, 19, heapId);
     GFL_ArcToolFree(arc);
     {
         ClActorSetup setup;
@@ -713,9 +713,9 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
         setup.y = 168;
         setup.sequence = TOWNMAP_ANIM_ZOOM_IN;
         appBar->zoomButton =
-            func_0204c040(unit, appBar->chars, appBar->pltt, appBar->cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c520(appBar->zoomButton, TRUE);
-        func_0204c550(appBar->zoomButton);
+            ClActor_Create(unit, appBar->chars, appBar->pltt, appBar->cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetAutoAnim(appBar->zoomButton, TRUE);
+        ClActor_StopAnim(appBar->zoomButton);
     }
     {
         TouchBarSetup setup;
@@ -739,10 +739,10 @@ static void TownMapAppBar_Init(TownMapAppBar *appBar, u32 mode, ClActUnit *unit,
 
 static void TownMapAppBar_Free(TownMapAppBar *appBar) {
     TouchBar_Free(appBar->bar);
-    func_0204c108(appBar->zoomButton);
-    func_0204be64(appBar->cellAnims);
-    func_0204b98c(appBar->chars);
-    func_0204bcd0(appBar->pltt);
+    ClActor_Delete(appBar->zoomButton);
+    ClActSys_FreeCellAnims(appBar->cellAnims);
+    ClActSys_FreeChars(appBar->chars);
+    ClActSys_FreePltt(appBar->pltt);
     MI_CpuFill8(appBar, 0, sizeof(TownMapAppBar));
 }
 
@@ -756,34 +756,34 @@ static void TownMapAppBar_Main(TownMapAppBar *appBar, TownMapMap *map) {
         u32 y;
         ClActorPos pos;
 
-        func_0204c178(appBar->zoomButton, &pos, CLACT_SURFACE_MAIN);
-        if (func_0203dac8(&x, &y)) {
+        ClActor_GetSurfacePos(appBar->zoomButton, &pos, CLACT_SURFACE_MAIN);
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (x - pos.x <= 24 && y - pos.y <= 24) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 pressed = TRUE;
             }
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_SELECT) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             pressed = TRUE;
         }
-        if (pressed && !func_0204c560(appBar->zoomButton) && !TownMapMap_IsMoving(map)) {
-            if (func_0204c4a0(appBar->zoomButton) == TOWNMAP_ANIM_ZOOM_IN) {
-                func_0204c488(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_IN_PRESSED);
+        if (pressed && !ClActor_IsAnimActive(appBar->zoomButton) && !TownMapMap_IsMoving(map)) {
+            if (ClActor_GetSequence(appBar->zoomButton) == TOWNMAP_ANIM_ZOOM_IN) {
+                ClActor_SetSequence(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_IN_PRESSED);
             } else {
-                func_0204c488(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_OUT_PRESSED);
+                ClActor_SetSequence(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_OUT_PRESSED);
             }
-            func_0204c540(appBar->zoomButton);
+            ClActor_StartAnim(appBar->zoomButton);
             appBar->decided = TOWNMAP_ICON_ZOOM;
             appBar->state = 1;
         }
         break;
     }
     case 1:
-        if (!func_0204c560(appBar->zoomButton)) {
-            if (func_0204c4a0(appBar->zoomButton) == TOWNMAP_ANIM_ZOOM_IN_PRESSED) {
-                func_0204c488(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_OUT);
+        if (!ClActor_IsAnimActive(appBar->zoomButton)) {
+            if (ClActor_GetSequence(appBar->zoomButton) == TOWNMAP_ANIM_ZOOM_IN_PRESSED) {
+                ClActor_SetSequence(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_OUT);
             } else {
-                func_0204c488(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_IN);
+                ClActor_SetSequence(appBar->zoomButton, TOWNMAP_ANIM_ZOOM_IN);
             }
             appBar->state = 0;
         }
@@ -811,20 +811,20 @@ static void TownMapCursor_Init(TownMapCursor *cursor, ClActor *actor, ClActor *r
     cursor->pos.y = TOWNMAP_CURSOR_Y;
     cursor->cursor = actor;
     cursor->ring = ring;
-    func_0204c140(cursor->cursor, &cursor->pos, CLACT_SURFACE_MAIN);
-    func_0204c140(cursor->ring, &cursor->pos, CLACT_SURFACE_MAIN);
-    func_0204c124(cursor->cursor, TRUE);
-    func_0204c124(cursor->ring, FALSE);
-    func_0204c468(cursor->cursor, 0);
-    func_0204c438(cursor->cursor, 0);
-    func_0204c468(cursor->ring, 2);
-    func_0204c438(cursor->ring, 3);
-    func_0204c520(cursor->ring, TRUE);
+    ClActor_SetSurfacePos(cursor->cursor, &cursor->pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(cursor->ring, &cursor->pos, CLACT_SURFACE_MAIN);
+    ClActor_SetVisible(cursor->cursor, TRUE);
+    ClActor_SetVisible(cursor->ring, FALSE);
+    ClActor_SetBgPriority(cursor->cursor, 0);
+    ClActor_SetPriority(cursor->cursor, 0);
+    ClActor_SetBgPriority(cursor->ring, 2);
+    ClActor_SetPriority(cursor->ring, 3);
+    ClActor_SetAutoAnim(cursor->ring, TRUE);
     // The cursor shows only while the keys are used
-    if (!func_0203d554()) {
-        func_0204c124(cursor->cursor, TRUE);
+    if (!GCTX_HIDIsUsingTouch()) {
+        ClActor_SetVisible(cursor->cursor, TRUE);
     } else {
-        func_0204c124(cursor->cursor, FALSE);
+        ClActor_SetVisible(cursor->cursor, FALSE);
     }
 }
 
@@ -839,27 +839,27 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
 
     cursor->decided = FALSE;
     if (GCTX_HIDGetHeldKeys() & PAD_KEY_UP) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         move.y -= FX32_ONE;
         moved = TRUE;
     }
     if (GCTX_HIDGetHeldKeys() & PAD_KEY_DOWN) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         move.y += FX32_ONE;
         moved = TRUE;
     }
     if (GCTX_HIDGetHeldKeys() & PAD_KEY_LEFT) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         move.x -= FX32_ONE;
         moved = TRUE;
     }
     if (GCTX_HIDGetHeldKeys() & PAD_KEY_RIGHT) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         move.x += FX32_ONE;
         moved = TRUE;
     }
     // A place near the cursor pulls it in
-    if (cursor->pull && !func_0203d554()) {
+    if (cursor->pull && !GCTX_HIDIsUsingTouch()) {
         TownMapPlace *place = TownMapPlaces_GetNearest(places, cursor);
 
         if (place != NULL) {
@@ -904,18 +904,18 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
         cursor->pos.y += y >> FX32_SHIFT;
         cursor->pos.x = MATH_CLAMP(cursor->pos.x, TOWNMAP_CURSOR_LEFT, TOWNMAP_CURSOR_RIGHT);
         cursor->pos.y = MATH_CLAMP(cursor->pos.y, TOWNMAP_CURSOR_TOP, TOWNMAP_CURSOR_BOTTOM);
-        func_0204c140(cursor->cursor, &cursor->pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(cursor->cursor, &cursor->pos, CLACT_SURFACE_MAIN);
     }
     if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         cursor->decided = TRUE;
     }
     {
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
-            func_0203d564(TRUE);
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
+            GCTX_HIDSetUsingTouch(TRUE);
             if (x <= TOWNMAP_CURSOR_RIGHT && y - TOWNMAP_CURSOR_TOP <= TOWNMAP_CURSOR_BOTTOM - TOWNMAP_CURSOR_TOP) {
                 cursor->decided = TRUE;
                 cursor->pos.x = x;
@@ -923,10 +923,10 @@ static void TownMapCursor_Main(TownMapCursor *cursor, TownMapPlaces *places) {
             }
         }
     }
-    if (!func_0203d554()) {
-        func_0204c124(cursor->cursor, TRUE);
+    if (!GCTX_HIDIsUsingTouch()) {
+        ClActor_SetVisible(cursor->cursor, TRUE);
     } else {
-        func_0204c124(cursor->cursor, FALSE);
+        ClActor_SetVisible(cursor->cursor, FALSE);
     }
 }
 
@@ -938,7 +938,7 @@ static void TownMapCursor_GetPos(const TownMapCursor *cursor, TownMapPoint *pos)
 static void TownMapCursor_SetPos(TownMapCursor *cursor, const TownMapPoint *pos) {
     cursor->pos.x = pos->x;
     cursor->pos.y = pos->y;
-    func_0204c140(cursor->cursor, &cursor->pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(cursor->cursor, &cursor->pos, CLACT_SURFACE_MAIN);
 }
 
 static BOOL TownMapCursor_IsDecided(const TownMapCursor *cursor) {
@@ -952,16 +952,16 @@ static u32 TownMapCursor_GetHeldKeys(const TownMapCursor *cursor) {
 // Puts the ring around a place, whose position is relative to the places' scroll, or hides it
 static void TownMapCursor_SetPlace(TownMapCursor *cursor, TownMapPlace *place, const TownMapPoint *scroll) {
     if (place == NULL) {
-        func_0204c124(cursor->ring, FALSE);
+        ClActor_SetVisible(cursor->ring, FALSE);
         cursor->place = NULL;
     } else if (cursor->place != place) {
         ClActorPos pos;
 
         pos.x = scroll->x + TownMapPlace_GetParam(place, TOWNMAP_PARAM_CURSOR_X);
         pos.y = scroll->y + TownMapPlace_GetParam(place, TOWNMAP_PARAM_CURSOR_Y);
-        func_0204c140(cursor->ring, &pos, CLACT_SURFACE_MAIN);
-        func_0204c124(cursor->ring, TRUE);
-        func_0204c56c(cursor->ring);
+        ClActor_SetSurfacePos(cursor->ring, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetVisible(cursor->ring, TRUE);
+        ClActor_RestartAnim(cursor->ring);
         cursor->place = place;
     }
 }
@@ -972,7 +972,7 @@ static void TownMapCursor_UpdateRing(TownMapCursor *cursor, const TownMapPoint *
 
         pos.x = scroll->x + TownMapPlace_GetParam(cursor->place, TOWNMAP_PARAM_CURSOR_X);
         pos.y = scroll->y + TownMapPlace_GetParam(cursor->place, TOWNMAP_PARAM_CURSOR_Y);
-        func_0204c140(cursor->ring, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(cursor->ring, &pos, CLACT_SURFACE_MAIN);
     }
 }
 
@@ -1007,7 +1007,7 @@ static void TownMapPlaces_Init(TownMapPlaces *places, u16 zoneId, u16 escapeZone
 
         // Black City's place is followed by White Forest's, which is shown in its stead
         if (zone == ZONE_BLACK_CITY) {
-            switch (func_02017220(gameData)) {
+            switch (GameData_GetMyCity(gameData)) {
             case CITY_BLACK_CITY:
                 break;
             case CITY_WHITE_FOREST:
@@ -1172,7 +1172,7 @@ static void TownMapPlaces_Deselect(TownMapPlaces *places) {
 // The place the town map shows for a zone, or NULL
 static TownMapPlace *TownMapPlaces_GetByZone(const TownMapPlaces *places, u16 zoneId, u16 escapeZoneId) {
     u32 i;
-    u16 zone = func_ov012_02160eb4(places->gameData, zoneId);
+    u16 zone = TownMap_GetMapZone(places->gameData, zoneId);
 
     for (i = 0; i < places->count; i++) {
         TownMapPlace *place = &places->places[i];
@@ -1205,7 +1205,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
     place->index = index;
     flag = TownMapData_GetParam(data, index, TOWNMAP_PARAM_ARRIVAL_FLAG);
     if (flag != TOWNMAP_NO_FLAG) {
-        place->arrived = func_ov012_02160f74(gameData, flag);
+        place->arrived = TownMap_CheckFlag(gameData, flag);
     } else {
         place->arrived = FALSE;
     }
@@ -1222,7 +1222,7 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
     }
     flag = TownMapData_GetParam(place->data, place->index, TOWNMAP_PARAM_FLAG);
     if (flag != TOWNMAP_NO_FLAG) {
-        place->hidden = func_ov012_02160f74(gameData, flag) == FALSE ? TRUE : FALSE;
+        place->hidden = TownMap_CheckFlag(gameData, flag) == FALSE ? TRUE : FALSE;
     } else {
         place->hidden = FALSE;
     }
@@ -1267,17 +1267,17 @@ static void TownMapPlace_Init(TownMapPlace *place, void *data, u32 index, ClActU
         MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
         setup.x = TownMapPlace_GetParam(place, TOWNMAP_PARAM_X);
         setup.y = TownMapPlace_GetParam(place, TOWNMAP_PARAM_Y);
-        place->actor = func_0204c040(unit, chars, pltt, cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c244(place->actor, 2);
-        func_0204c468(place->actor, 2);
-        func_0204c438(place->actor, 4);
+        place->actor = ClActor_Create(unit, chars, pltt, cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetAffineMode(place->actor, 2);
+        ClActor_SetBgPriority(place->actor, 2);
+        ClActor_SetPriority(place->actor, 4);
     }
     TownMapPlace_Deselect(place);
 }
 
 static void TownMapPlace_Free(TownMapPlace *place) {
     if (place->actor != NULL) {
-        func_0204c108(place->actor);
+        ClActor_Delete(place->actor);
     }
     MI_CpuFill8(place, 0, sizeof(TownMapPlace));
 }
@@ -1285,13 +1285,13 @@ static void TownMapPlace_Free(TownMapPlace *place) {
 static void TownMapPlace_SetVisible(TownMapPlace *place, BOOL visible) {
     if (place->actor != NULL && place->animNow != TOWNMAP_ANIM_NONE) {
         if (place->hidden) {
-            func_0204c124(place->actor, FALSE);
+            ClActor_SetVisible(place->actor, FALSE);
         } else if (TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == TOWNMAP_PLACE_TYPE_TOWN ||
                    TownMapPlace_GetParam(place, TOWNMAP_PARAM_TYPE) == 5) {
             TownMapPlace_SetAnim(place, place->anim);
-            func_0204c124(place->actor, TRUE);
+            ClActor_SetVisible(place->actor, TRUE);
         } else {
-            func_0204c124(place->actor, visible);
+            ClActor_SetVisible(place->actor, visible);
         }
     }
 }
@@ -1366,7 +1366,7 @@ static void TownMapPlace_SetScale(TownMapPlace *place, fx32 scale, const TownMap
 
         actorScale.x = scale;
         actorScale.y = scale;
-        func_0204c270(place->actor, &actorScale);
+        ClActor_SetScale(place->actor, &actorScale);
     }
 }
 
@@ -1376,7 +1376,7 @@ static void TownMapPlace_UpdatePos(TownMapPlace *place, const TownMapPoint *scro
     pos.x = scroll->x + TownMapPlace_GetParam(place, TOWNMAP_PARAM_X);
     pos.y = scroll->y + TownMapPlace_GetParam(place, TOWNMAP_PARAM_Y);
     if (place->actor != NULL) {
-        func_0204c140(place->actor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetSurfacePos(place->actor, &pos, CLACT_SURFACE_MAIN);
     }
 }
 
@@ -1384,12 +1384,12 @@ static void TownMapPlace_SetAnim(TownMapPlace *place, u8 anim) {
     place->animNow = anim;
     if (place->animNow != TOWNMAP_ANIM_NONE) {
         if (place->actor != NULL) {
-            func_0204c124(place->actor, TRUE);
-            func_0204c488(place->actor, place->animNow);
+            ClActor_SetVisible(place->actor, TRUE);
+            ClActor_SetSequence(place->actor, place->animNow);
         }
     } else {
         if (place->actor != NULL) {
-            func_0204c124(place->actor, FALSE);
+            ClActor_SetVisible(place->actor, FALSE);
         }
     }
 }
@@ -1444,18 +1444,18 @@ static void TownMapPlayer_Init(TownMapPlayer *player, TownMapPlace *place, ClAct
         setup.x = TownMapPlace_GetParam(place, TOWNMAP_PARAM_X);
         setup.y = TownMapPlace_GetParam(place, TOWNMAP_PARAM_Y);
     }
-    player->actor = func_0204c040(unit, chars, pltt, cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
-    func_0204c468(player->actor, 2);
-    func_0204c438(player->actor, 2);
-    func_0204c488(player->actor, TOWNMAP_ANIM_PLAYER);
-    func_0204c520(player->actor, TRUE);
+    player->actor = ClActor_Create(unit, chars, pltt, cellAnims, &setup, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetBgPriority(player->actor, 2);
+    ClActor_SetPriority(player->actor, 2);
+    ClActor_SetSequence(player->actor, TOWNMAP_ANIM_PLAYER);
+    ClActor_SetAutoAnim(player->actor, TRUE);
     if (place == NULL) {
-        func_0204c124(player->actor, FALSE);
+        ClActor_SetVisible(player->actor, FALSE);
     }
 }
 
 static void TownMapPlayer_Free(TownMapPlayer *player) {
-    func_0204c108(player->actor);
+    ClActor_Delete(player->actor);
     MI_CpuFill8(player, 0, sizeof(TownMapPlayer));
 }
 
@@ -1466,7 +1466,7 @@ static void TownMapPlayer_UpdatePos(TownMapPlayer *player, const TownMapPoint *s
         pos.x = scroll->x + TownMapPlace_GetParam(player->place, TOWNMAP_PARAM_X);
         pos.y = scroll->y + TownMapPlace_GetParam(player->place, TOWNMAP_PARAM_Y);
     }
-    func_0204c140(player->actor, &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(player->actor, &pos, CLACT_SURFACE_MAIN);
 }
 
 static void TownMapMap_Init(TownMapMap *map, u8 bgBack, u8 bgFront, HeapID heapId) {
@@ -1617,7 +1617,7 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
 
     getAddressOfBeginningOfOccupants(joinAvenue);
     persons = JoinAvenue_GetPersonList(joinAvenue);
-    entries = func_02010054(joinAvenue);
+    entries = JoinAvenue_GetEntryList(joinAvenue);
     visitors = GameData_GetJoinAvenuePersonListPtr(info->gameData);
     GFL_BitmapFill(bitmap, 0);
     if (place != NULL) {
@@ -1669,11 +1669,11 @@ static void TownMapInfo_Draw(TownMapInfo *info, TownMapPlace *place) {
                 rank = JoinAvenue_GetParam(avenueInfo, 2, NULL);
                 record7F = RecordGet(records, 0x7f);
                 record80 = RecordGet(records, 0x80);
-                people = func_02038030(persons) + func_02037ed8(entries);
+                people = JoinAvenuePersonList_CountUsed(persons) + JoinAvenueEntryList_CountUsed(entries);
                 format = GFL_StrBufCreate(128, HEAPID_TOWNMAP);
 
                 if (*visitors != NULL) {
-                    people += func_02038030(*visitors);
+                    people += JoinAvenuePersonList_CountUsed(*visitors);
                 }
                 messageId = TownMapPlace_GetParam(place, TOWNMAP_PARAM_LANDMARK_FIRST + 3);
                 if (messageId != 0xffff) {
@@ -1782,13 +1782,13 @@ static void TownMapPlaceName_Init(TownMapPlaceName *placeName, u8 bg, Font *font
     TownMapMsgWin_Init(&placeName->msgWin, bg, font, placeNames, 0, 0, 24, 3, heapId);
     pos.x = TOWNMAP_CENTER_X;
     pos.y = TOWNMAP_CENTER_Y;
-    func_0204c140(placeName->plate, &pos, CLACT_SURFACE_MAIN);
-    func_0204c468(placeName->plate, 1);
-    func_0204c438(placeName->plate, 1);
-    func_0204c124(placeName->plate, TRUE);
-    func_0204c488(placeName->plate, TOWNMAP_ANIM_NAME_PLATE);
-    func_0204c520(placeName->plate, TRUE);
-    func_0204c550(placeName->plate);
+    ClActor_SetSurfacePos(placeName->plate, &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetBgPriority(placeName->plate, 1);
+    ClActor_SetPriority(placeName->plate, 1);
+    ClActor_SetVisible(placeName->plate, TRUE);
+    ClActor_SetSequence(placeName->plate, TOWNMAP_ANIM_NAME_PLATE);
+    ClActor_SetAutoAnim(placeName->plate, TRUE);
+    ClActor_StopAnim(placeName->plate);
 }
 
 static void TownMapPlaceName_Free(TownMapPlaceName *placeName) {
@@ -1799,13 +1799,13 @@ static void TownMapPlaceName_Free(TownMapPlaceName *placeName) {
 static void TownMapPlaceName_Main(TownMapPlaceName *placeName) {
     if (placeName->requested) {
         placeName->requested = FALSE;
-        func_0204c488(placeName->plate, TOWNMAP_ANIM_NAME_PLATE);
-        func_0204c540(placeName->plate);
-        func_0204c124(placeName->plate, TRUE);
+        ClActor_SetSequence(placeName->plate, TOWNMAP_ANIM_NAME_PLATE);
+        ClActor_StartAnim(placeName->plate);
+        ClActor_SetVisible(placeName->plate, TRUE);
         TownMapMsgWin_Clear(&placeName->msgWin);
         placeName->opening = TRUE;
     }
-    if (placeName->opening && !func_0204c560(placeName->plate)) {
+    if (placeName->opening && !ClActor_IsAnimActive(placeName->plate)) {
         u16 zoneId = TownMapPlace_GetParam(placeName->place, TOWNMAP_PARAM_ZONE);
 
         if (IsZoneJoinAvenue(zoneId)) {
@@ -1819,7 +1819,7 @@ static void TownMapPlaceName_Main(TownMapPlaceName *placeName) {
         } else {
             TownMapMsgWin_Print(&placeName->msgWin, ZoneData_GetPlaceNameID(zoneId), 16, 2);
         }
-        func_0204c550(placeName->plate);
+        ClActor_StopAnim(placeName->plate);
         placeName->opening = FALSE;
     }
 }
@@ -1830,7 +1830,7 @@ static void TownMapPlaceName_SetPlace(TownMapPlaceName *placeName, TownMapPlace 
 }
 
 static void TownMapPlaceName_SetVisible(TownMapPlaceName *placeName, BOOL visible) {
-    func_0204c124(placeName->plate, visible);
+    ClActor_SetVisible(placeName->plate, visible);
     if (!visible) {
         placeName->requested = FALSE;
         placeName->opening = FALSE;
@@ -1852,7 +1852,7 @@ static void TownMapTouch_Main(TownMapTouch *touch) {
     u32 y;
 
     touch->dragging = FALSE;
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (y <= TOWNMAP_CURSOR_BOTTOM) {
             touch->start.x = x << FX32_SHIFT;
             touch->start.y = y << FX32_SHIFT;
@@ -1861,7 +1861,7 @@ static void TownMapTouch_Main(TownMapTouch *touch) {
             touch->now.y = y << FX32_SHIFT;
             touch->now.z = 0;
         }
-    } else if (func_0203da84(&x, &y)) {
+    } else if (GFL_HIDGetTouchHeldPoint(&x, &y)) {
         if (y <= TOWNMAP_CURSOR_BOTTOM) {
             if (touch->restart) {
                 touch->start = touch->now;

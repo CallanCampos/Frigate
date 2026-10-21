@@ -42,55 +42,55 @@ struct DreamWorldSave {
 }; // size: 0x1ac
 
 // The size of the Dream World save and its init
-u32 func_02009930(void);
-void func_02009938(DreamWorldSave *dreamWorld);
+u32 DreamWorldSave_GetSize(void);
+void DreamWorldSave_Init(DreamWorldSave *dreamWorld);
 // The Pokémon sent to the Dream World, and whether it is there
-PartyPkm *func_02009998(DreamWorldSave *dreamWorld);
-void func_0200999c(DreamWorldSave *dreamWorld, PartyPkm *pkm);
+PartyPkm *DreamWorldSave_GetPkm(DreamWorldSave *dreamWorld);
+void DreamWorldSave_SetPkm(DreamWorldSave *dreamWorld, PartyPkm *pkm);
 // Whether a species' bit is set in a list of species flags
-BOOL func_020099b4(const u8 *flags, int species);
+BOOL DreamWorldSave_TestSpeciesFlag(const u8 *flags, int species);
 void func_020099d8(DreamWorldSave *dreamWorld, u8 value);
 u8 func_020099e0(DreamWorldSave *dreamWorld);
-void func_020099e8(DreamWorldSave *dreamWorld, u8 value);
-u8 func_020099f4(DreamWorldSave *dreamWorld);
-void func_02009a00(DreamWorldSave *dreamWorld, u8 asleep);
+void DreamWorldSave_SetIDShown(DreamWorldSave *dreamWorld, u8 value);
+u8 DreamWorldSave_GetIDShown(DreamWorldSave *dreamWorld);
+void DreamWorldSave_SetPokemonAsleep(DreamWorldSave *dreamWorld, u8 asleep);
 BOOL DreamWorldSave_IsPokemonAsleep(DreamWorldSave *dreamWorld);
 // The items sent from the Dream World and their counts, 0 when out of range
-u16 func_02009a18(DreamWorldSave *dreamWorld, int index);
-u8 func_02009a38(DreamWorldSave *dreamWorld, int index);
-void func_02009a50(DreamWorldSave *dreamWorld, int index, u16 item, u8 count);
-void func_02009a6c(DreamWorldSave *dreamWorld, int index);
+u16 DreamWorldSave_GetItem(DreamWorldSave *dreamWorld, int index);
+u8 DreamWorldSave_GetItemCount(DreamWorldSave *dreamWorld, int index);
+void DreamWorldSave_SetItem(DreamWorldSave *dreamWorld, int index, u16 item, u8 count);
+void DreamWorldSave_ClearItem(DreamWorldSave *dreamWorld, int index);
 // How many items the Dream World sent
-s32 func_02009a78(DreamWorldSave *dreamWorld);
+s32 DreamWorldSave_CountItems(DreamWorldSave *dreamWorld);
 // The entries of the Dream World's result, NULL when the index is out of range
-u16 *func_02009a98(DreamWorldSave *dreamWorld, int index);
-void func_02009ab0(DreamWorldSave *dreamWorld, int index, const void *entry);
-u32 func_02009ad0(DreamWorldSave *dreamWorld);
-void func_02009ad4(DreamWorldSave *dreamWorld, u32 date);
-u32 func_02009ad8(DreamWorldSave *dreamWorld);
-void func_02009adc(DreamWorldSave *dreamWorld, u32 id);
+u16 *DreamWorldSave_GetResult(DreamWorldSave *dreamWorld, int index);
+void DreamWorldSave_SetResult(DreamWorldSave *dreamWorld, int index, const void *entry);
+u32 DreamWorldSave_GetSyncDate(DreamWorldSave *dreamWorld);
+void DreamWorldSave_SetSyncDate(DreamWorldSave *dreamWorld, u32 date);
+u32 DreamWorldSave_GetLastResultID(DreamWorldSave *dreamWorld);
+void DreamWorldSave_SetLastResultID(DreamWorldSave *dreamWorld, u32 id);
 // The chosen result entry, DREAM_WORLD_RESULT_INDEX_NONE when it is out of range, and the flag above it
-u32 func_02009ae0(DreamWorldSave *dreamWorld);
-void func_02009af8(DreamWorldSave *dreamWorld, int value);
+u32 DreamWorldSave_GetResultIndex(DreamWorldSave *dreamWorld);
+void DreamWorldSave_SetResultIndex(DreamWorldSave *dreamWorld, int value);
 u32 func_02009b20(DreamWorldSave *dreamWorld);
 void func_02009b30(DreamWorldSave *dreamWorld, u32 value);
 // The Dream Radar's values in the save: 0 whether it was read, 1 the seed of the data, 2 the Pokémon received
 u32 GetDreamRadarFlag(DreamRadarSave *save, u32 flag);
 void SetDreamRadarFlag(DreamRadarSave *save, u32 flag, u32 value);
-// The data that Pokémon Dream Radar writes to the card, read into a buffer of func_02011510's
-void *func_02011510(HeapID heapId);
-void func_02011528(void *buffer);
+// The data that Pokémon Dream Radar writes to the card, read into a buffer of DreamRadar_AllocBuffer's
+void *DreamRadar_AllocBuffer(HeapID heapId);
+void DreamRadar_FreeBuffer(void *buffer);
 void ReadDreamRadarSaveData(void *buffer);
-void *func_02011588(void *buffer);
+void *DreamRadar_GetSaveData(void *buffer);
 // Writes the data back to the card
-void func_02011544(void);
+void DreamRadar_WriteSaveData(void);
 // Checks the data and decodes its 32 words with the seed. Returns 2 when the data is valid
-u32 func_02011400(void *data, u32 seed, u32 *words);
+u32 CygnusSaveData_Load(void *data, u32 seed, u32 *words);
 // Marks the data read with a new seed and the Pokémon received
-void func_020113c4(void *data, u32 seed, u32 received);
+void CygnusSaveData_Store(void *data, u32 seed, u32 received);
 // The Pokémon that a word of the data names, if any: its bit in the Pokémon received, its species, form and sex
-BOOL func_020115fc(u32 word);
-u32 func_0201167c(u32 word);
-void func_02011624(u32 word, u16 *species, u8 *form, u8 *sex);
+BOOL DreamRadar_IsPokemonWord(u32 word);
+u32 DreamRadar_GetPokemonBit(u32 word);
+void DreamRadar_GetPokemonByWord(u32 word, u16 *species, u8 *form, u8 *sex);
 
 #endif // POKEBW2_SAVE_DREAM_WORLD_H

@@ -214,7 +214,7 @@ static void Rc4_Crypt(RC4Context *context, u8 *out, const u8 *in, u32 length);
 static u32 Rc4_Next(RC4Context *context);
 static u8 Aoss_Checksum(const u8 *data, int length);
 static u32 Crc32_Update(u32 crc, const u8 *data, int length, int ready, u32 *table);
-static void Crc32_MakeTable(int i, u32 *table);
+static void Crc32_MakeTable(int ready, u32 *table);
 static int Aoss_Scramble(u8 *block, int length, const char *key, int keyLength);
 static void Aoss_ScrambleKey(int round, char *out, int length, const char *key, int keyLength);
 static void Aoss_ScrambleXor(const char *mask, u8 *block, int length);
@@ -257,7 +257,7 @@ static AossSession sSession;
 static AossWork sAoss;
 
 static void *Aoss_Alloc(u32 size) {
-    return gAossAp.alloc(size);
+    return gAossApAlloc(size);
 }
 
 static void Aoss_Free(void *ptr) {
@@ -274,7 +274,7 @@ int DWC_Aoss_Start(AossParam *param) {
     } else {
         result = 0;
     }
-    if (gAossAp.alloc == NULL || gAossApFree == NULL) {
+    if (gAossApAlloc == NULL || gAossApFree == NULL) {
         result = -1;
     }
     if (result == -1) {
@@ -798,11 +798,11 @@ static int Aoss_GetError(void) {
 
 // Copies the keys that the access point sent to the answer, if they are fit
 static int Aoss_StoreResult(AossParam *param) {
-    AossPskInfo *aes = &sApInfo[0].aes;
+    AossResult *result = &param->result;
     AossPskInfo *tkip = &sApInfo[0].tkip;
     AossWepInfo *wep104 = &sApInfo[0].wep104;
     AossWepInfo *wep40 = &sApInfo[0].wep40;
-    AossResult *result = &param->result;
+    AossPskInfo *aes = &sApInfo[0].aes;
 
     if (result == NULL) {
         return -1;
@@ -880,14 +880,12 @@ static int Aoss_CheckScan(const WifiScanList *list) {
     if (count == 0) {
         return 5;
     }
-    if (count > 0x40) {
+    if (list->count > 0x40) {
         count = 0x40;
     }
     for (i = 0; i < count; i++) {
-        const WifiApInfo *ap = &list->ap[i];
-
-        if ((ap->type & 1) && ap->ssidLength == Str_Length(AOSS_SSID) &&
-            Mem_Compare(ap->ssid, (u8 *)AOSS_SSID, Str_Length(AOSS_SSID)) == 0) {
+        if ((list->ap[i].type & 1) && list->ap[i].ssidLength == Str_Length(AOSS_SSID) &&
+            Mem_Compare(list->ap[i].ssid, (u8 *)AOSS_SSID, Str_Length(AOSS_SSID)) == 0) {
             found++;
         }
     }
@@ -952,7 +950,7 @@ static int Aoss_ProcessPacket(int state, AossPacket *packet, int *errors, const 
         (*errors)++;
         return state;
     }
-    if (Aoss_DecodePacket(header) > 0) {
+    if (Aoss_DecodePacket(&packet->header) > 0) {
         (*errors)++;
         return state;
     }
@@ -1065,8 +1063,8 @@ static int Aoss_OnStage2(int state, AossPacket *packet, int *errors, const u8 *i
         (*errors)++;
         return state;
     }
-    record = (AossRecord *)packet->body;
     header = &packet->header;
+    record = (AossRecord *)(header + 1);
     if (Aoss_CheckIds(ids + 16, header->id) < 0) {
         (*errors)++;
         return state;
@@ -1551,9 +1549,9 @@ static int Aoss_SendStage2(const AossEndpoints *endpoints, const u8 *ids, int so
 // The body of the hello: the request's data and the item 0x60 with 14; returns its length
 static s16 Aoss_BuildHello(u8 *buffer) {
     AossItem *first = (AossItem *)buffer;
-    AossItem *second;
     s16 length;
     s16 total = 0;
+    AossItem *second;
     s16 offset;
     u32 value;
 
@@ -1660,22 +1658,24 @@ static int Aoss_Decrypt(const u8 *in, u8 *out, u32 length, u8 checksum, const u8
 static void Rc4_Init(RC4Context *context, const u8 *key, u32 keyLength, u32 n) {
     u8 *s = context->s;
     u32 i;
-    u32 j = 0;
+    u32 j;
     u32 k;
 
-    context->i = 0;
-    context->j = 0;
+    context->i = context->j = 0;
     context->n = n;
     for (i = 0; i < n; i++) {
         s[i] = i;
     }
+    j = 0;
     k = 0;
     for (i = 0; i < n; i++) {
         u8 value = s[i];
+        u8 other;
 
-        j = (j + value + key[k]) % context->n;
-        s[i] = s[j];
+        j = (j + key[k] + value) % context->n;
+        other = s[j];
         s[j] = value;
+        s[i] = other;
         k++;
         if (k >= keyLength) {
             k = 0;
@@ -1726,10 +1726,14 @@ static u32 Crc32_Update(u32 crc, const u8 *data, int length, int ready, u32 *tab
     return crc;
 }
 
-static void Crc32_MakeTable(int i, u32 *table) {
+// Fills the table of the CRC-32; the caller passes its flag of a ready table, which isn't read
+static void Crc32_MakeTable(int ready, u32 *table) {
+    u32 value;
+    int i;
+    int bit;
+
     for (i = 0; i < 256; i++) {
-        u32 value = i;
-        int bit;
+        value = i;
         for (bit = 0; bit < 8; bit++) {
             if (value & 1) {
                 value = (value >> 1) ^ 0xedb88320;
@@ -1800,7 +1804,7 @@ static void Aoss_ScrambleSwap(u8 *block, int length, u8 *work) {
 
 static void *Soc_Alloc(u32 name, s32 size) {
     if (size > 0) {
-        return gAossAp.alloc(size);
+        return gAossApAlloc(size);
     }
     return NULL;
 }
@@ -1819,7 +1823,7 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
     }
     if (CPSMyIp == 0) {
         do {
-            AossAp_Sleep(100);
+            OS_Sleep(100);
         } while (CPSMyIp == 0);
     }
     return 0;

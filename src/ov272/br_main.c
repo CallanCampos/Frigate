@@ -89,7 +89,7 @@ static BOOL BrMain_ProcInit(GameProc *proc, u32 *state, void *param, void *work)
     wk = GFL_ProcInitSubsystem(proc, sizeof(BrMainWork), HEAPID_BATTLE_RECORDER_SYS);
     MI_CpuFill8(wk, 0, sizeof(BrMainWork));
     wk->param = param;
-    func_0200bb24(HEAPID_BATTLE_RECORDER_SYS);
+    BattleRec_Init(HEAPID_BATTLE_RECORDER_SYS);
     BrMainProcSys_Init(&wk->procSys, sBrMainProcTable, wk, HEAPID_BATTLE_RECORDER_SYS);
     BrMainProcSys_SetNext(&wk->procSys, BR_MAIN_PROCID_CORE);
     return TRUE;
@@ -221,9 +221,9 @@ static void *BrMain_BattleCreateParam(HeapID heapId, void *work, u32 preID) {
     BtlSetup *setup = BtlSetup_Create(heapId);
 
     BtlSetup_InitForRecord(setup, wk->param->gameData, heapId);
-    func_0200c1f0();
+    BattleRec_LoadToolOverlay();
     BattleRecTool_LoadSetup(setup, 0, heapId);
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
     GFL_SndBGMSetPaused(TRUE);
     GFL_SndBGMPush();
     BrMain_CheckBgm(&setup->fieldSituation.bgm, &setup->fieldSituation.unk12);

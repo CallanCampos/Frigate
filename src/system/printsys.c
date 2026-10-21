@@ -116,7 +116,7 @@ enum {
 GFLBitmap *g_TextRendererTempBitmap;
 TextRenderer g_TextRenderer;
 
-static void func_02021cb0(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf);
+static void PrintQueue_PrintOrDraw(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf);
 static void GFL_TextRndBind(TextRenderer *renderer, Font *font, GFLBitmap *bitmap, s16 x, s16 y);
 static void GFL_TextRndSetDefaultColor(TextRenderer *renderer, u16 color);
 static void GFL_TextRndDrawStrBuf(TextRenderer *renderer, const StrBuf *strbuf);
@@ -125,15 +125,15 @@ static void GFL_TextRndDrawCharProc_IDX4(GFLBitmap *bitmap, int x, int y, Font *
 static void GFL_TextRndDrawCharProc_IDX8(GFLBitmap *bitmap, int x, int y, Font *font, u16 c, GlyphInfo *info);
 static const u16 *GFL_TextRndExecLayoutCmd(TextRenderer *renderer, const u16 *cmd);
 static const u16 *GFL_TextRndExecColorCmd(TextRenderer *renderer, const u16 *cmd);
-static void func_02022378(s32 wait, u8 *steps);
-static void func_02022464(TCBEx *task, void *data);
-static void func_02022694(PrintStream *stream);
-static u32 func_02022c08(const StrBuf *strbuf);
-static u32 func_02022c24(const StrBuf *strbuf);
-static u32 func_02022c30(PrintQueue *queue);
-static void func_02022c44(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf);
-static void *func_02022cd4(PrintQueue *queue, const void *src, u16 size, u16 chunk);
-static TextRenderer *func_02022d30(PrintQueue *queue, TextRenderer *job);
+static void PrintStream_GetWaitSteps(s32 wait, u8 *steps);
+static void PrintStream_Task(TCBEx *task, void *data);
+static void PrintStream_ExecStreamCmd(PrintStream *stream);
+static u32 PrintQueue_GetStringSize(const StrBuf *strbuf);
+static u32 PrintQueue_GetJobSize(const StrBuf *strbuf);
+static u32 PrintQueue_GetFreeSize(PrintQueue *queue);
+static void PrintQueue_Enqueue(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf);
+static void *PrintQueue_Write(PrintQueue *queue, const void *src, u16 size, u16 chunk);
+static TextRenderer *PrintQueue_GetNextJob(PrintQueue *queue, TextRenderer *job);
 
 static inline u32 StrCmd_Category(const u16 *cmd) {
     return *cmd == STRCMD_CHAR ? (u8)(cmd[1] >> 8) : 0xff;
@@ -173,11 +173,11 @@ void GFL_TextRndInit(HeapID heapId) {
     g_TextRendererTempBitmap = GFL_BitmapCreate(2, 2, 0x20, heapId);
 }
 
-PrintQueue *func_02021998(HeapID heapId) {
-    return func_020219a8(0x400, heapId);
+PrintQueue *PrintQueue_CreateDefault(HeapID heapId) {
+    return PrintQueue_Create(0x400, heapId);
 }
 
-PrintQueue *func_020219a8(u16 size, HeapID heapId) {
+PrintQueue *PrintQueue_Create(u16 size, HeapID heapId) {
     u16 bufferSize = size + sizeof(TextRenderer);
     PrintQueue *queue;
 
@@ -197,20 +197,20 @@ PrintQueue *func_020219a8(u16 size, HeapID heapId) {
     return queue;
 }
 
-void func_02021a18(PrintQueue *queue) {
+void PrintQueue_Free(PrintQueue *queue) {
     GFL_HeapFree(queue);
 }
 
-void func_02021a20(PrintQueue *queue, u32 queueAlways) {
+void PrintQueue_SetQueueAlways(PrintQueue *queue, u32 queueAlways) {
     queue->queueAlways = (u8)queueAlways;
 }
 
-void func_02021a34(PrintQueue *queue, u64 timeLimit) {
+void PrintQueue_SetTimeLimit(PrintQueue *queue, u64 timeLimit) {
     queue->timeLimit = timeLimit;
 }
 
 // Prints what the queue holds until the frame's time runs out. Returns whether it is empty
-BOOL func_02021a3c(PrintQueue *queue) {
+BOOL PrintQueue_Main(PrintQueue *queue) {
     BOOL timeout = FALSE;
     BOOL setColor;
     u16 savedColor;
@@ -258,7 +258,7 @@ BOOL func_02021a3c(PrintQueue *queue) {
         if (*queue->cursor == CHAR_EOM) {
             u16 offset = (u32)queue->job - (u32)queue->buffer;
 
-            queue->job = func_02022d30(queue, queue->job);
+            queue->job = PrintQueue_GetNextJob(queue, queue->job);
             if (queue->job != NULL) {
                 // The next string follows this renderer and its link
                 offset = PrintQueue_Advance(queue, offset, sizeof(TextRenderer));
@@ -283,18 +283,18 @@ BOOL func_02021a3c(PrintQueue *queue) {
     return TRUE;
 }
 
-BOOL func_02021c0c(PrintQueue *queue) {
+BOOL PrintQueue_IsEmpty(PrintQueue *queue) {
     if (queue->job == NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02021c1c(PrintQueue *queue, GFLBitmap *bitmap) {
+BOOL PrintQueue_IsBitmapPending(PrintQueue *queue, GFLBitmap *bitmap) {
     TextRenderer *job;
 
     if (queue->job != NULL) {
-        for (job = queue->job; job != NULL; job = func_02022d30(queue, job)) {
+        for (job = queue->job; job != NULL; job = PrintQueue_GetNextJob(queue, job)) {
             if (job->bitmap == bitmap) {
                 return TRUE;
             }
@@ -303,39 +303,40 @@ BOOL func_02021c1c(PrintQueue *queue, GFLBitmap *bitmap) {
     return FALSE;
 }
 
-void func_02021c44(PrintQueue *queue) {
+void PrintQueue_Clear(PrintQueue *queue) {
     queue->writePos = 0;
     queue->readPos = queue->size;
     queue->cursor = NULL;
     queue->job = NULL;
 }
 
-void func_02021c54(PrintQueue *queue, GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font) {
+void PrintQueue_Print(PrintQueue *queue, GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font) {
     GFL_TextRndBind(&g_TextRenderer, font, bitmap, x, y);
-    func_02021cb0(queue, &g_TextRenderer, strbuf);
+    PrintQueue_PrintOrDraw(queue, &g_TextRenderer, strbuf);
 }
 
-void func_02021c7c(PrintQueue *queue, GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font, u16 color) {
+void PrintQueue_PrintColor(PrintQueue *queue, GFLBitmap *bitmap, s16 x, s16 y, const StrBuf *strbuf, Font *font,
+                           u16 color) {
     GFL_TextRndBind(&g_TextRenderer, font, bitmap, x, y);
     GFL_TextRndSetDefaultColor(&g_TextRenderer, color);
-    func_02021cb0(queue, &g_TextRenderer, strbuf);
+    PrintQueue_PrintOrDraw(queue, &g_TextRenderer, strbuf);
 }
 
 static inline BOOL PrintQueue_IsConnected(void) {
-    if (func_02042a78()) {
+    if (GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
 }
 
 // Prints at once, unless connected, when the string goes in the queue if it fits
-static void func_02021cb0(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf) {
+static void PrintQueue_PrintOrDraw(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf) {
     if (!PrintQueue_IsConnected() && queue->queueAlways == 0) {
         GFL_TextRndDrawStrBuf(renderer, strbuf);
         return;
     }
-    if (func_02022c24(strbuf) <= func_02022c30(queue)) {
-        func_02022c44(queue, renderer, strbuf);
+    if (PrintQueue_GetJobSize(strbuf) <= PrintQueue_GetFreeSize(queue)) {
+        PrintQueue_Enqueue(queue, renderer, strbuf);
     }
 }
 
@@ -524,21 +525,22 @@ static const u16 *GFL_TextRndExecColorCmd(TextRenderer *renderer, const u16 *cmd
     return StrCmd_Skip(cmd);
 }
 
-PrintStream *func_02022268(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
-                           TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9) {
-    return func_02022294(window, x, y, strbuf, font, wait, tcbManager, a7, heapId, a9, NULL);
+PrintStream *PrintStream_Create(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
+                                TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9) {
+    return PrintStream_CreateWithCallback(window, x, y, strbuf, font, wait, tcbManager, a7, heapId, a9, NULL);
 }
 
-PrintStream *func_02022294(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
-                           TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9, PrintStreamCallback callback) {
+PrintStream *PrintStream_CreateWithCallback(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
+                                            TCBExManager *tcbManager, u32 a7, HeapID heapId, u16 a9,
+                                            PrintStreamCallback callback) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(window);
-    TCBEx *task = GFL_TCBExMgrAddTask(tcbManager, func_02022464, sizeof(PrintStream), a7);
+    TCBEx *task = GFL_TCBExMgrAddTask(tcbManager, PrintStream_Task, sizeof(PrintStream), a7);
     PrintStream *stream = GFL_TCBExGetData(task);
     u8 steps[2];
 
     stream->task = task;
     GFL_TextRndBind(&stream->renderer, font, bitmap, x, y);
-    func_02022378(wait, steps);
+    PrintStream_GetWaitSteps(wait, steps);
     stream->baseCharsPerStep = steps[1];
     stream->wait = stream->fastWait = stream->baseWait = steps[0];
     stream->charsPerStep = stream->fastCharsPerStep = stream->baseCharsPerStep;
@@ -564,7 +566,7 @@ PrintStream *func_02022294(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, F
 }
 
 // A wait of 0 or more frames between single characters, or a negative count of characters a frame
-static void func_02022378(s32 wait, u8 *steps) {
+static void PrintStream_GetWaitSteps(s32 wait, u8 *steps) {
     if (wait >= 0) {
         steps[1] = 1;
         steps[0] = wait;
@@ -574,27 +576,27 @@ static void func_02022378(s32 wait, u8 *steps) {
     }
 }
 
-void func_02022390(PrintStream *stream) {
+void PrintStream_Pause(PrintStream *stream) {
     stream->paused = TRUE;
 }
 
-void func_020223a4(PrintStream *stream) {
+void PrintStream_Resume(PrintStream *stream) {
     stream->paused = FALSE;
 }
 
-u32 func_020223b4(PrintStream *stream) {
+u32 PrintStream_GetState(PrintStream *stream) {
     return stream->state;
 }
 
-u32 func_020223b8(PrintStream *stream) {
+u32 PrintStream_GetPageMode(PrintStream *stream) {
     return stream->pageMode;
 }
 
-void func_020223bc(PrintStream *stream) {
+void PrintStream_Continue(PrintStream *stream) {
     stream->continueRequested = TRUE;
 }
 
-void func_020223cc(PrintStream *stream) {
+void PrintStream_Delete(PrintStream *stream) {
     if (stream->task != NULL) {
 #ifdef PLATFORM_PC
         // The stream is its task's data, which ending the task frees when the task manager allocated it
@@ -612,36 +614,36 @@ void func_020223cc(PrintStream *stream) {
 }
 
 // Cuts the wait short, and prints at the fast speed from then on
-void func_020223e0(PrintStream *stream, s32 waitTimer) {
+void PrintStream_SkipWait(PrintStream *stream, s32 waitTimer) {
     if (waitTimer < stream->waitTimer) {
         stream->waitTimer = waitTimer;
         if (waitTimer == 0) {
-            func_02022410(stream, func_02017c50(2));
+            PrintStream_SetFastWait(stream, TextSpeed_GetWait(2));
             stream->fastPending = TRUE;
         }
     }
 }
 
-void func_02022410(PrintStream *stream, s32 wait) {
+void PrintStream_SetFastWait(PrintStream *stream, s32 wait) {
     u8 steps[2];
 
-    func_02022378(wait, steps);
+    PrintStream_GetWaitSteps(wait, steps);
     stream->fastCharsPerStep = steps[1];
     stream->fastWait = steps[0];
     stream->fast = TRUE;
 }
 
-void func_0202243c(PrintStream *stream) {
+void PrintStream_ClearFast(PrintStream *stream) {
     stream->fast = FALSE;
     stream->fastCharsPerStep = stream->baseCharsPerStep;
     stream->fastWait = stream->baseWait;
 }
 
-BOOL func_02022458(PrintStream *stream) {
+BOOL PrintStream_IsFast(PrintStream *stream) {
     return stream->fast;
 }
 
-static void func_02022464(TCBEx *task, void *data) {
+static void PrintStream_Task(TCBEx *task, void *data) {
     PrintStream *stream = data;
 
     if (stream->callback != NULL && stream->callbackWait) {
@@ -684,7 +686,7 @@ static void func_02022464(TCBEx *task, void *data) {
             int i;
 
             if (stream->fastPending) {
-                func_0202243c(stream);
+                PrintStream_ClearFast(stream);
                 stream->fastPending = FALSE;
             }
             for (i = 0; i < chars; i++) {
@@ -696,7 +698,7 @@ static void func_02022464(TCBEx *task, void *data) {
                     break;
                 case STRCMD_CHAR:
                     if (StrCmd_Category(str) == STRCMD_CATEGORY_STREAM) {
-                        func_02022694(stream);
+                        PrintStream_ExecStreamCmd(stream);
                         if (stream->callback != NULL) {
                             stream->callbackWait = stream->callback(stream->event);
                             if (stream->callbackWait) {
@@ -753,7 +755,7 @@ static void func_02022464(TCBEx *task, void *data) {
 }
 
 // Carries out a stream command: page breaks, waits, speeds and the callback's events
-static void func_02022694(PrintStream *stream) {
+static void PrintStream_ExecStreamCmd(PrintStream *stream) {
     BOOL pageBreak = FALSE;
 
     switch (StrCmd_Index(stream->cursor)) {
@@ -794,10 +796,10 @@ static void func_02022694(PrintStream *stream) {
             steps[1] = stream->baseCharsPerStep;
             break;
         case 1:
-            func_02022378(func_02017bf0(), steps);
+            PrintStream_GetWaitSteps(TextSpeed_GetFasterWait(), steps);
             break;
         case 2:
-            func_02022378(func_02017c20(), steps);
+            PrintStream_GetWaitSteps(TextSpeed_GetSlowerWait(), steps);
             break;
         }
         stream->wait = steps[0];
@@ -846,7 +848,7 @@ u32 GFL_FontGetLineWidth(const u16 *str, Font *font, u32 spacing, const u16 **en
     return width;
 }
 
-u32 func_0202284c(const StrBuf *strbuf) {
+u32 GFL_FontGetLineCount(const StrBuf *strbuf) {
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
     u32 lines = 1;
 
@@ -863,7 +865,7 @@ u32 func_0202284c(const StrBuf *strbuf) {
     return lines;
 }
 
-u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u32 spacing) {
+u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u16 spacing) {
     u32 width = 0;
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
 
@@ -878,7 +880,7 @@ u32 GFL_FontGetBlockWidth(const StrBuf *strbuf, Font *font, u32 spacing) {
 }
 
 // The width of each line, up to maxLines. Returns the count of lines
-u32 func_020228c0(const StrBuf *strbuf, Font *font, u32 spacing, u32 *widths, u32 maxLines) {
+u32 GFL_FontGetLineWidths(const StrBuf *strbuf, Font *font, u32 spacing, u32 *widths, u32 maxLines) {
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
     u32 i;
 
@@ -892,7 +894,7 @@ u32 func_020228c0(const StrBuf *strbuf, Font *font, u32 spacing, u32 *widths, u3
 }
 
 // Copies a line of the string, with its commands. Returns whether it has the line
-BOOL func_02022900(const StrBuf *strbuf, StrBuf *dest, u32 line) {
+BOOL GFL_FontCopyLine(const StrBuf *strbuf, StrBuf *dest, u32 line) {
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
 
     GFL_StrBufClear(dest);
@@ -1060,7 +1062,7 @@ const u16 *GFL_StrCmdSkipCommand(const u16 *cmd) {
 }
 
 // The size a string takes in the queue, in 4-byte steps, and with its renderer and link
-static u32 func_02022c08(const StrBuf *strbuf) {
+static u32 PrintQueue_GetStringSize(const StrBuf *strbuf) {
     u32 size = (GFL_StrBufGetCharCount(strbuf) + 1) * 2;
 
     while (size & 3) {
@@ -1069,12 +1071,12 @@ static u32 func_02022c08(const StrBuf *strbuf) {
     return size;
 }
 
-static u32 func_02022c24(const StrBuf *strbuf) {
-    return func_02022c08(strbuf) + sizeof(TextRenderer) + sizeof(TextRenderer *);
+static u32 PrintQueue_GetJobSize(const StrBuf *strbuf) {
+    return PrintQueue_GetStringSize(strbuf) + sizeof(TextRenderer) + sizeof(TextRenderer *);
 }
 
 // The free space of the queue
-static u32 func_02022c30(PrintQueue *queue) {
+static u32 PrintQueue_GetFreeSize(PrintQueue *queue) {
     if (queue->writePos < queue->readPos) {
         return queue->readPos - queue->writePos;
     }
@@ -1082,20 +1084,20 @@ static u32 func_02022c30(PrintQueue *queue) {
 }
 
 // Adds the string and a copy of the renderer, and links them after the last one
-static void func_02022c44(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf) {
+static void PrintQueue_Enqueue(PrintQueue *queue, TextRenderer *renderer, const StrBuf *strbuf) {
     const u16 *str = GFL_StrBufGetStringPtr(strbuf);
-    const u16 *queued = func_02022cd4(queue, str, func_02022c08(strbuf), sizeof(u16));
-    TextRenderer *job = func_02022cd4(queue, renderer, sizeof(TextRenderer), sizeof(TextRenderer));
+    const u16 *queued = PrintQueue_Write(queue, str, PrintQueue_GetStringSize(strbuf), sizeof(u16));
+    TextRenderer *job = PrintQueue_Write(queue, renderer, sizeof(TextRenderer), sizeof(TextRenderer));
     TextRenderer *next = NULL;
 
-    func_02022cd4(queue, &next, sizeof(next), sizeof(next));
+    PrintQueue_Write(queue, &next, sizeof(next), sizeof(next));
     if (queue->job != NULL) {
         TextRenderer *last = queue->job;
         TextRenderer *following;
         u16 offset;
 
         for (;;) {
-            following = func_02022d30(queue, last);
+            following = PrintQueue_GetNextJob(queue, last);
             if (following == NULL) {
                 break;
             }
@@ -1114,7 +1116,7 @@ static void func_02022c44(PrintQueue *queue, TextRenderer *renderer, const StrBu
 }
 
 // Writes to the ring in pieces of chunk bytes, which do not wrap. Returns where it started
-static void *func_02022cd4(PrintQueue *queue, const void *src, u16 size, u16 chunk) {
+static void *PrintQueue_Write(PrintQueue *queue, const void *src, u16 size, u16 chunk) {
     u16 start;
     u8 *buffer;
     u16 written;
@@ -1137,7 +1139,7 @@ static void *func_02022cd4(PrintQueue *queue, const void *src, u16 size, u16 chu
     return buffer + start;
 }
 
-static TextRenderer *func_02022d30(PrintQueue *queue, TextRenderer *job) {
+static TextRenderer *PrintQueue_GetNextJob(PrintQueue *queue, TextRenderer *job) {
     u32 offset = (u16)((u8 *)job - queue->buffer);
 
     offset = PrintQueue_Advance(queue, offset, sizeof(TextRenderer));

@@ -8,10 +8,10 @@
 #include "nitro/math.h"
 #include "pml/poke_party.h"
 
-static void func_ov055_021e5d88(WbtEntrant *entrant, HeapID heapId);
-static void func_ov055_021e5dfc(WbtEntrant *entrant);
-static void func_ov055_021e614c(WbtMatch *match, MATHRandContext32 *rand, WbtEntrant *first, WbtEntrant *second);
-static u8 func_ov055_021e6338(u32 attackType, u32 defenseType);
+static void WbtEntrant_Init(WbtEntrant *entrant, HeapID heapId);
+static void WbtEntrant_Free(WbtEntrant *entrant);
+static void WbtMatch_Play(WbtMatch *match, MATHRandContext32 *rand, WbtEntrant *first, WbtEntrant *second);
+static u8 WbtMatch_GetTypeEffectiveness(u32 attackType, u32 defenseType);
 
 WbtSystem *WbtSystem_Create(HeapID heapId, BOOL a1) {
     int i;
@@ -26,20 +26,20 @@ WbtSystem *WbtSystem_Create(HeapID heapId, BOOL a1) {
     MATH_InitRand32(&sys->rand, sys->seed);
     sys->unk1E = GFL_RandomLC(4);
     for (i = 0; i < 8; i++) {
-        func_ov055_021e5d88(&sys->entrants[i], heapId);
+        WbtEntrant_Init(&sys->entrants[i], heapId);
     }
     sys->partyBC = PokeParty_Create(sys->heapId);
     sys->partyC0 = PokeParty_Create(sys->heapId);
     sys->partyC4 = PokeParty_Create(sys->heapId);
     sys->unk13AC = NULL;
-    sys->trainers = func_ov055_021e63e0(sys->heapId);
+    sys->trainers = WbtTrainers_Load(sys->heapId);
     return sys;
 }
 
 void WbtSystem_Free(WbtSystem *sys) {
     int i;
 
-    func_ov055_021e6438(sys->trainers);
+    WbtTrainers_Free(sys->trainers);
     GFL_HeapFree(sys->partyC4);
     GFL_HeapFree(sys->partyBC);
     GFL_HeapFree(sys->partyC0);
@@ -47,93 +47,93 @@ void WbtSystem_Free(WbtSystem *sys) {
         GFL_HeapFree(sys->unk13AC);
     }
     for (i = 0; i < 8; i++) {
-        func_ov055_021e5dfc(&sys->entrants[i]);
+        WbtEntrant_Free(&sys->entrants[i]);
     }
     GFL_HeapFree(sys);
 }
 
-void func_ov055_021e5ca0(WbtSystem *sys, u32 tournament) {
+void WbtSystem_SetTournament(WbtSystem *sys, u32 tournament) {
     sys->tournament = tournament;
 }
 
-u32 func_ov055_021e5ca4(WbtSystem *sys) {
+u32 WbtSystem_GetTournament(WbtSystem *sys) {
     return sys->tournament;
 }
 
-void func_ov055_021e5ca8(WbtSystem *sys, u32 style) {
+void WbtSystem_SetStyle(WbtSystem *sys, u32 style) {
     sys->style = style;
 }
 
-u32 func_ov055_021e5cac(WbtSystem *sys) {
+u32 WbtSystem_GetStyle(WbtSystem *sys) {
     return sys->style;
 }
 
-void func_ov055_021e5cb0(WbtSystem *sys, u8 type) {
+void WbtSystem_SetType(WbtSystem *sys, u8 type) {
     sys->type = type;
 }
 
-u8 func_ov055_021e5cb4(WbtSystem *sys) {
+u8 WbtSystem_GetType(WbtSystem *sys) {
     return sys->type;
 }
 
-void func_ov055_021e5cb8(WbtSystem *sys, u32 value) {
+void WbtSystem_SetCategory(WbtSystem *sys, u32 value) {
     sys->unk14 = value;
 }
 
-u32 func_ov055_021e5cbc(WbtSystem *sys) {
+u32 WbtSystem_GetCategory(WbtSystem *sys) {
     return sys->unk14;
 }
 
-void func_ov055_021e5cc0(WbtSystem *sys, u32 round) {
+void WbtSystem_SetRound(WbtSystem *sys, u32 round) {
     sys->round = round;
 }
 
-u32 func_ov055_021e5cc4(WbtSystem *sys) {
+u32 WbtSystem_GetRound(WbtSystem *sys) {
     return sys->round;
 }
 
-u64 func_ov055_021e5cc8(WbtSystem *sys) {
+u64 WbtSystem_GetSeed(WbtSystem *sys) {
     return sys->seed;
 }
 
-void func_ov055_021e5cd0(WbtSystem *sys, u8 value) {
+void WbtSystem_SetDownloadSlot(WbtSystem *sys, u8 value) {
     sys->unk1D = value;
 }
 
-u8 func_ov055_021e5cd4(WbtSystem *sys) {
+u8 WbtSystem_GetDownloadSlot(WbtSystem *sys) {
     return sys->unk1D;
 }
 
-void func_ov055_021e5cd8(WbtSystem *sys, u16 *var) {
+void WbtSystem_SetResultVar(WbtSystem *sys, u16 *var) {
     sys->unk13E0 = var;
 }
 
-u16 *func_ov055_021e5ce4(WbtSystem *sys) {
+u16 *WbtSystem_GetResultVar(WbtSystem *sys) {
     return sys->unk13E0;
 }
 
-void func_ov055_021e5cf0(WbtSystem *sys, u8 value) {
+void WbtSystem_SetUseBattleBox(WbtSystem *sys, u8 value) {
     sys->unk13A8 = value;
 }
 
-void func_ov055_021e5cfc(WbtSystem *sys, void *value) {
+void WbtSystem_SetPartyList(WbtSystem *sys, void *value) {
     sys->unk13CC = value;
 }
 
-void *func_ov055_021e5d08(WbtSystem *sys) {
+void *WbtSystem_GetPartyList(WbtSystem *sys) {
     return sys->unk13CC;
 }
 
-void func_ov055_021e5d14(WbtSystem *sys, u32 value) {
+void WbtSystem_SetRentalMode(WbtSystem *sys, u32 value) {
     sys->unk13E4 = value;
 }
 
-WbtEntrant *func_ov055_021e5d20(WbtSystem *sys, u32 index) {
+WbtEntrant *WbtSystem_GetEntrant(WbtSystem *sys, u32 index) {
     return &sys->entrants[index];
 }
 
 // The player's entrant
-WbtEntrant *func_ov055_021e5d28(WbtSystem *sys) {
+WbtEntrant *WbtSystem_GetPlayerEntrant(WbtSystem *sys) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -144,7 +144,7 @@ WbtEntrant *func_ov055_021e5d28(WbtSystem *sys) {
     return sys->entrants;
 }
 
-void func_ov055_021e5d44(WbtSystem *sys, u32 tournament, StrBuf *strbuf) {
+void WbtSystem_LoadTournamentName(WbtSystem *sys, u32 tournament, StrBuf *strbuf) {
     if (tournament == 3) {
         GFL_StrBufLoadFixedString(strbuf, sys->download.name, NELEMS(sys->download.name));
     } else {
@@ -152,19 +152,19 @@ void func_ov055_021e5d44(WbtSystem *sys, u32 tournament, StrBuf *strbuf) {
     }
 }
 
-PokeParty *func_ov055_021e5d68(WbtSystem *sys) {
+PokeParty *WbtSystem_GetPlayerParty(WbtSystem *sys) {
     return sys->partyBC;
 }
 
-PokeParty *func_ov055_021e5d74(WbtSystem *sys) {
+PokeParty *WbtSystem_GetOpponentParty(WbtSystem *sys) {
     return sys->partyC0;
 }
 
-u32 func_ov055_021e5d7c(WbtSystem *sys) {
-    return func_ov055_021e64c0(sys->style);
+u32 WbtSystem_GetEntryCount(WbtSystem *sys) {
+    return WbtStyle_GetPokemonCount(sys->style);
 }
 
-static void func_ov055_021e5d88(WbtEntrant *entrant, HeapID heapId) {
+static void WbtEntrant_Init(WbtEntrant *entrant, HeapID heapId) {
     entrant->unk0_0 = 0;
     entrant->unk0_3 = 0;
     entrant->unk0_4 = 1;
@@ -180,45 +180,45 @@ static void func_ov055_021e5d88(WbtEntrant *entrant, HeapID heapId) {
     entrant->unkC = GFL_StrBufCreate(0x16, heapId);
 }
 
-static void func_ov055_021e5dfc(WbtEntrant *entrant) {
+static void WbtEntrant_Free(WbtEntrant *entrant) {
     GFL_StrBufFree(entrant->name);
     GFL_StrBufFree(entrant->unkC);
 }
 
-u32 func_ov055_021e5e10(WbtEntrant *entrant) {
+u32 WbtEntrant_GetRank(WbtEntrant *entrant) {
     return entrant->unk0_4;
 }
 
-u8 func_ov055_021e5e18(WbtEntrant *entrant) {
+u8 WbtEntrant_GetIv(WbtEntrant *entrant) {
     return entrant->unk3_0;
 }
 
-u32 func_ov055_021e5e20(WbtEntrant *entrant) {
+u32 WbtEntrant_GetDownloadedRound(WbtEntrant *entrant) {
     return entrant->unk3_6;
 }
 
-u8 func_ov055_021e5e28(WbtEntrant *entrant) {
+u8 WbtEntrant_GetTrainerId(WbtEntrant *entrant) {
     return entrant->unk2;
 }
 
-u16 func_ov055_021e5e2c(WbtEntrant *entrant) {
+u16 WbtEntrant_GetTrainerClass(WbtEntrant *entrant) {
     return entrant->unk6_0;
 }
 
-u32 func_ov055_021e5e34(WbtEntrant *entrant) {
+u32 WbtEntrant_GetKind(WbtEntrant *entrant) {
     return entrant->unk0_0;
 }
 
-void func_ov055_021e5e3c(const WbtEntrant *entrant, StrBuf *dest) {
+void WbtEntrant_GetName(const WbtEntrant *entrant, StrBuf *dest) {
     GFL_StrBufCopy(dest, entrant->name);
 }
 
-u32 func_ov055_021e5e4c(WbtEntrant *entrant) {
+u32 WbtEntrant_HasSpecialPokemon(WbtEntrant *entrant) {
     return entrant->unk0_7;
 }
 
 // Copies the Pokémon picked for the tournament into its parties
-void func_ov055_021e5e54(WbtSystem *sys, GameData *gameData) {
+void WbtSystem_SetPickedParty(WbtSystem *sys, GameData *gameData) {
     PokeParty *party = PokeParty_Create(HEAPID_TAIL(sys->heapId));
     PokeParty *src;
     PartyPkm *copy;
@@ -234,8 +234,8 @@ void func_ov055_021e5e54(WbtSystem *sys, GameData *gameData) {
     copy = GFL_HeapAllocate(heapId, PokeParty_GetPkmRawSize(), FALSE, "wbt_system.c", 468);
     n = 0;
     PokeParty_ClearPkm(copy);
-    count = func_ov055_021e5d7c(sys);
-    if (func_ov055_021e6794(sys->tournament) == 4) {
+    count = WbtSystem_GetEntryCount(sys);
+    if (WbtTournament_GetKind(sys->tournament) == 4) {
         for (i = 0; i < NELEMS(sys->castSlots); i++) {
             if (sys->castSlots[i] != 0) {
                 n++;
@@ -261,13 +261,13 @@ static const u8 sRegulations[] = { 29, 30, 31, 32 };
 static const u8 sDoubleRegulations[] = { 33, 34, 35, 36 };
 
 // The tournament's regulation, in arc 106
-u8 func_ov055_021e5f38(WbtSystem *sys) {
+u8 WbtSystem_GetRegulationId(WbtSystem *sys) {
     const u8 *regulations;
 
     if (sys->tournament == 11) {
         return 37;
     }
-    switch (func_ov055_021e6794(sys->tournament)) {
+    switch (WbtTournament_GetKind(sys->tournament)) {
     case 0:
     case 3:
     case 4:
@@ -282,30 +282,30 @@ u8 func_ov055_021e5f38(WbtSystem *sys) {
     return regulations[sys->style];
 }
 
-Regulation *func_ov055_021e5f78(WbtSystem *sys) {
+Regulation *WbtSystem_GetRegulation(WbtSystem *sys) {
     if (sys->tournament == 3) {
         WbtDownloadedTournament *downloaded = &sys->download.tournament;
         int i;
 
         MI_CpuFill8(&sys->regulation, 0, sizeof(sys->regulation));
-        sys->regulation.unk2 = downloaded->unk0;
-        sys->regulation.unk3 = downloaded->unk1;
-        sys->regulation.unk4 = downloaded->unk2;
-        sys->regulation.unk5 = downloaded->unk3;
-        sys->regulation.unk6 = downloaded->unk4;
-        sys->regulation.unk8 = downloaded->unk6;
-        sys->regulation.unk9 = downloaded->unk7;
+        sys->regulation.minCount = downloaded->unk0;
+        sys->regulation.maxCount = downloaded->unk1;
+        sys->regulation.level = downloaded->unk2;
+        sys->regulation.levelMode = downloaded->unk3;
+        sys->regulation.maxLevelTotal = downloaded->unk4;
+        sys->regulation.allowSameSpecies = downloaded->unk6;
+        sys->regulation.allowSameItem = downloaded->unk7;
         for (i = 0; i < 0x52; i++) {
-            sys->regulation.unkA[i] = downloaded->unk8[i];
+            sys->regulation.bannedSpecies[i] = downloaded->unk8[i];
         }
         for (i = 0; i < 0x4c; i++) {
-            sys->regulation.unk5C[i] = downloaded->unk5A[i];
+            sys->regulation.bannedItems[i] = downloaded->unk5A[i];
         }
-        sys->regulation.unkBA = downloaded->unkA7;
+        sys->regulation.battleType = downloaded->unkA7;
     } else {
-        PokeRegulation_Load(func_ov055_021e5f38(sys), &sys->regulation);
+        PokeRegulation_Load(WbtSystem_GetRegulationId(sys), &sys->regulation);
         if (sys->tournament == 11 || sys->tournament == 4) {
-            sys->regulation.unk4 = 25;
+            sys->regulation.level = 25;
         }
     }
     return &sys->regulation;
@@ -315,7 +315,7 @@ WbtUnk18A *func_ov055_021e6024(WbtSystem *sys) {
     u8 type = 17;
     u16 value = 0;
 
-    switch (func_ov055_021e6794(sys->tournament)) {
+    switch (WbtTournament_GetKind(sys->tournament)) {
     case 0:
         break;
     case 1:
@@ -349,7 +349,7 @@ static const u32 sSecondMatches[] = { 1, 1, 0, 0, 3, 3, 2, 2 };
 static const u32 sThirdMatches[] = { 1, 1, 1, 1, 0, 0, 0, 0 };
 
 // The seat of the player's opponent in the current round
-u32 func_ov055_021e607c(WbtSystem *sys) {
+u32 WbtSystem_GetOpponentSeat(WbtSystem *sys) {
     u8 firstWinners[4];
     u8 secondWinners[2];
     WbtMatch *matches;
@@ -375,7 +375,7 @@ u32 func_ov055_021e607c(WbtSystem *sys) {
             break;
         }
     }
-    switch (func_ov055_021e5cc4(sys)) {
+    switch (WbtSystem_GetRound(sys)) {
     case 1:
     case 2:
         opponent = sFirstOpponents[player];
@@ -392,11 +392,11 @@ u32 func_ov055_021e607c(WbtSystem *sys) {
     return opponent;
 }
 
-static void func_ov055_021e614c(WbtMatch *match, MATHRandContext32 *rand, WbtEntrant *first, WbtEntrant *second) {
+static void WbtMatch_Play(WbtMatch *match, MATHRandContext32 *rand, WbtEntrant *first, WbtEntrant *second) {
     int firstRank = first->unk0_4;
     int secondRank = second->unk0_4;
-    u8 firstEffect = func_ov055_021e6338(first->type, second->type);
-    u8 secondEffect = func_ov055_021e6338(second->type, first->type);
+    u8 firstEffect = WbtMatch_GetTypeEffectiveness(first->type, second->type);
+    u8 secondEffect = WbtMatch_GetTypeEffectiveness(second->type, first->type);
     int kind;
     int sign;
 
@@ -442,14 +442,14 @@ static void func_ov055_021e614c(WbtMatch *match, MATHRandContext32 *rand, WbtEnt
 }
 
 // Plays the first two rounds of the bracket
-void func_ov055_021e62b0(WbtSystem *sys, MATHRandContext32 *rand) {
+void WbtSystem_PlayFirstRounds(WbtSystem *sys, MATHRandContext32 *rand) {
     WbtEntrant *entrants[2];
     WbtMatch *match;
     int i;
     int j;
 
     for (i = 0; i < 4; i++) {
-        func_ov055_021e614c(&sys->matches[i], rand, &sys->entrants[i * 2], &sys->entrants[i * 2 + 1]);
+        WbtMatch_Play(&sys->matches[i], rand, &sys->entrants[i * 2], &sys->entrants[i * 2 + 1]);
     }
     for (i = 0; i < 2; i++) {
         match = &sys->matches[i + 4];
@@ -460,7 +460,7 @@ void func_ov055_021e62b0(WbtSystem *sys, MATHRandContext32 *rand) {
                 entrants[j] = &sys->entrants[i * 4 + j * 2 + 1];
             }
         }
-        func_ov055_021e614c(match, rand, entrants[0], entrants[1]);
+        WbtMatch_Play(match, rand, entrants[0], entrants[1]);
     }
 }
 
@@ -490,7 +490,7 @@ static const u8 sTypeChart[17][17] = {
 
 // How well one type attacks another: 0 not at all, 1 not very well, 2 normally and 3 super effectively. Type 17 is
 // no type
-static u8 func_ov055_021e6338(u32 attackType, u32 defenseType) {
+static u8 WbtMatch_GetTypeEffectiveness(u32 attackType, u32 defenseType) {
     if (attackType == 17 || defenseType == 17) {
         return 2;
     }

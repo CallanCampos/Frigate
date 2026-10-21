@@ -23,8 +23,8 @@ typedef struct {
     BattleParam param;
 } EventMakeWork;
 
-GameEvent *func_ov010_02150310(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3);
-GameEventReturnCode func_ov010_0215033c(GameEvent *event, u32 *state, void *data);
+GameEvent *EventMake_Create(GameSystem *gsys, BtlSetup *setup, BattlePlayers *players, u32 a3);
+GameEventReturnCode EventMake_Callback(GameEvent *event, u32 *state, void *data);
 // A GameEventProvider, for GameEvent_CreateOverlayDelegate
 GameEvent *eventMakeFunc(GameSystem *gsys, void *data);
 

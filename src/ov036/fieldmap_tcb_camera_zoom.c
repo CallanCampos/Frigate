@@ -1,3 +1,7 @@
+// Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// The linear task's names are our descriptive guesses.
+
+#include "field/fieldmap_tcb_camera_zoom.h"
 #include "types.h"
 #include "field/field.h"
 #include "field/field_camera.h"
@@ -14,12 +18,12 @@ typedef struct {
     fx32 endZoom;
 } FieldCameraZoomTCB;
 
-static void func_ov036_021c06bc(TCB *tcb, void *data);
+static void FieldCameraZoomTCB_LinearCallback(TCB *tcb, void *data);
 static void FieldCameraZoomTCB_Callback(TCB *tcb, void *data);
-static void func_ov036_021c070c(FieldCameraZoomTCB *zoom);
+static void FieldCameraZoomTCB_CalcLinear(FieldCameraZoomTCB *zoom);
 static void FieldCameraZoomTCB_Calc(FieldCameraZoomTCB *zoom);
 
-void func_ov036_021c05d4(Field *field, u32 frameCount, fx32 zoomDelta) {
+void FieldCameraZoomTCB_CreateLinear(Field *field, u32 frameCount, fx32 zoomDelta) {
     HeapID heapId = Field_GetHeapID(field);
     FieldCamera *camera = Field_GetCameraSystem(field);
     TCBManager *tcbMgr = Field_GetTCBMgr(field);
@@ -31,7 +35,7 @@ void func_ov036_021c05d4(Field *field, u32 frameCount, fx32 zoomDelta) {
     zoom->startZoom = FieldCamera_CoordsGetZoom(camera);
     zoom->endZoom = zoomDelta + FieldCamera_CoordsGetZoom(camera);
     zoom->field = field;
-    GFL_TCBMgrAddTask(tcbMgr, func_ov036_021c06bc, zoom, 0);
+    GFL_TCBMgrAddTask(tcbMgr, FieldCameraZoomTCB_LinearCallback, zoom, 0);
 }
 
 void FieldCameraZoomTCB_Create(Field *field, u32 frameCount, fx32 zoomDelta) {
@@ -49,10 +53,10 @@ void FieldCameraZoomTCB_Create(Field *field, u32 frameCount, fx32 zoomDelta) {
     GFL_TCBMgrAddTask(tcbMgr, FieldCameraZoomTCB_Callback, zoom, 0);
 }
 
-static void func_ov036_021c06bc(TCB *tcb, void *data) {
+static void FieldCameraZoomTCB_LinearCallback(TCB *tcb, void *data) {
     FieldCameraZoomTCB *zoom = data;
 
-    func_ov036_021c070c(zoom);
+    FieldCameraZoomTCB_CalcLinear(zoom);
     zoom->frame++;
     if (zoom->frameCount < zoom->frame) {
         GFL_HeapFree(zoom);
@@ -71,7 +75,7 @@ static void FieldCameraZoomTCB_Callback(TCB *tcb, void *data) {
     }
 }
 
-static void func_ov036_021c070c(FieldCameraZoomTCB *zoom) {
+static void FieldCameraZoomTCB_CalcLinear(FieldCameraZoomTCB *zoom) {
     FieldCamera *camera = Field_GetCameraSystem(zoom->field);
     u16 frameCount = zoom->frameCount;
 

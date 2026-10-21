@@ -175,7 +175,7 @@ typedef struct {
     u32 subEnabledBGs;
     int subVisibleWnd;
     u16 subBackdrop;
-    // Whether the screens stay dark after the error screen, for func_02011de0
+    // Whether the screens stay dark after the error screen, for GFL_NetErrShowScreen
     BOOL keepDark;
     GFLNetErrorInfo info;
     u8 stateError;
@@ -197,14 +197,14 @@ typedef struct {
     u16 plttId;
 } ErrorWindowGraphics;
 
-static void func_02011dc8(void);
+static void GFL_NetErrWaitVBlank(void);
 static void GFL_NetErrAbortCore(void);
 static BOOL GFL_NetErrShowCore(u32 fatal);
 static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting);
 static void GFL_NetErrRestore(BOOL keepDark);
 static BOOL GFL_NetErrIsReady(void);
 static void loadErrorBackground(int window);
-static u32 func_020126fc(GFLNetErrorInfo *info, u32 message);
+static u32 GFL_NetErrGetWifiMessage(GFLNetErrorInfo *info, u32 message);
 static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting);
 static void GFL_NetErrGameUpdate(void);
 
@@ -253,17 +253,17 @@ void GFL_NetErrInit(u32 heapId) {
 }
 
 // Finds the network's error, each frame
-void func_02011c78(void) {
+void GFL_NetErrUpdate(void) {
     u8 netType;
 
-    if (g_GflNetErr.state == NET_ERR_STATE_NONE && func_02042788() == TRUE) {
-        if (func_02042f24() || func_0204003c() || func_02042494()) {
-            func_02042f10();
-            func_02012050();
-            netType = func_02042e84()->bNetType;
+    if (g_GflNetErr.state == NET_ERR_STATE_NONE && GFL_NetIsInitialized() == TRUE) {
+        if (GFL_NetHasError() || NetSystem_HasError() || NetState_GetError()) {
+            GFL_NetClearCallbacks();
+            GFL_NetErrRecord();
+            netType = GFL_NetGetInitData()->bNetType;
             if (netType == GFL_NET_TYPE_WIFI || netType == GFL_NET_TYPE_WIFI_LOBBY ||
                 netType == GFL_NET_TYPE_WIFI_GTS) {
-                GFLNetErrorInfo *info = func_02042540();
+                GFLNetErrorInfo *info = NetState_GetErrorInfo();
 
                 if (info->type == NET_ERR_INFO_TYPE_FIRST + 2 || info->type == NET_ERR_INFO_TYPE_FIRST + 3) {
                     g_GflNetErr.message = WifiError_Text_ConnectionOtherPersonHas;
@@ -272,7 +272,7 @@ void func_02011c78(void) {
                            info->type == NET_ERR_INFO_TYPE_FIRST + 8) {
                     g_GflNetErr.message = WifiError_Text_CommunicationError;
                 } else {
-                    g_GflNetErr.message = DWCRap_GetErrorKind(info->code, info->unk4);
+                    g_GflNetErr.message = DWCRap_GetErrorKind(info->code, info->errorType);
                 }
             }
         }
@@ -283,18 +283,18 @@ BOOL GFL_NetErrShow(u32 a0) {
     return GFL_NetErrShowCore(a0);
 }
 
-void func_02011d04(u32 message) {
+void GFL_NetErrShowWifi(u32 message) {
     g_GflNetErr.message = message;
     g_GflNetErr.messageGiven = TRUE;
     g_GflNetErr.netType = GFL_NET_TYPE_WIFI;
     GFL_NetErrShow(TRUE);
 }
 
-void func_02011d20(void) {
+void GFL_NetErrShowFatal(void) {
     GFL_NetErrShow(TRUE);
 }
 
-u32 func_02011d2c(int result) {
+u32 GFL_NetErrGetServerMessage(int result) {
     switch (result) {
     case 0:
         GFL_ASSERT(0);
@@ -321,32 +321,32 @@ u32 func_02011d2c(int result) {
     }
 }
 
-void func_02011d8c(BOOL keepDark) {
+void GFL_NetErrSetKeepDark(BOOL keepDark) {
     g_GflNetErr.keepDark = keepDark;
 }
 
-void func_02011d98(void) {
-    func_02011d8c(FALSE);
+void GFL_NetErrClearKeepDark(void) {
+    GFL_NetErrSetKeepDark(FALSE);
 }
 
 // Sets the brightness the screens had before the error screen
-void func_02011da4(void) {
+void GFL_NetErrApplyBrightness(void) {
     GFLNetErrWork *work = &g_GflNetErr;
 
     GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
     GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
 }
 
-static void func_02011dc8(void) {
-    if (func_02042788() == TRUE) {
-        func_020428e0();
+static void GFL_NetErrWaitVBlank(void) {
+    if (GFL_NetIsInitialized() == TRUE) {
+        GFL_NetMainWhileWaiting();
         OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     }
 }
 
 // Shows the error screen while the network goes on, on the screen that has the wireless icon, with a window that
 // leaves the icon's OBJ visible
-void func_02011de0(void) {
+void GFL_NetErrShowScreen(void) {
     GXDispCnt subDispCnt = GXS_GetDispCnt();
     GXWndPlane outside = G2_GetWndOutsidePlane();
     GXWndPlane subOutside = G2S_GetWndOutsidePlane();
@@ -359,8 +359,8 @@ void func_02011de0(void) {
     GFL_SndStop();
     GFL_NetErrDispInit(FALSE, FALSE);
     GX_VBlankIntr(TRUE);
-    func_0203e84c();
-    if (func_0203e8b0() == 1) {
+    WmIcon_Show();
+    if (WmIcon_GetEngine() == 1) {
         G2_SetWndOutsidePlane(GX_WND_PLANEMASK_BG1, FALSE);
         G2_SetWndOBJInsidePlane(GX_WND_PLANEMASK_OBJ, FALSE);
         GX_SetVisibleWnd(GX_WNDMASK_OW);
@@ -374,15 +374,15 @@ void func_02011de0(void) {
     // Wait for the keys to be released, then pressed, with the lid open
     while (PAD_DetectFold() == TRUE || (ReadKeys() & CLOSE_KEYS)) {
         GFL_NetErrGameUpdate();
-        func_02011dc8();
+        GFL_NetErrWaitVBlank();
     }
     while (PAD_DetectFold() == TRUE || !(ReadKeys() & CLOSE_KEYS)) {
         GFL_NetErrGameUpdate();
-        func_02011dc8();
+        GFL_NetErrWaitVBlank();
     }
     GFL_NetErrRestore(g_GflNetErr.keepDark == TRUE ? TRUE : FALSE);
-    func_0203e860();
-    if (func_0203e8b0() == 2) {
+    WmIcon_Hide();
+    if (WmIcon_GetEngine() == 2) {
         GXS_SetGraphicsMode(subDispCnt.bgMode);
         GXS_SetVisiblePlane(subDispCnt.visiblePlane);
         GXS_SetVisibleWnd(subDispCnt.visibleWnd);
@@ -405,23 +405,23 @@ static void GFL_NetErrAbortCore(void) {
     GFL_NetErrDispInit(TRUE, FALSE);
     GCTX_HIDUnblockSoftReset(2);
     while (TRUE) {
-        func_02005430();
+        Machine_ProcessExitRequest();
     }
 }
 
 // Records the network's error, and what the game is to do about it
-void func_02012050(void) {
+void GFL_NetErrRecord(void) {
     GFLNetErrWork *work = &g_GflNetErr;
 
     if (GFL_NetErrIsReady() && work->state == NET_ERR_STATE_NONE) {
         work->state = NET_ERR_STATE_FOUND;
-        if (!func_020427a4()) {
-            work->netType = func_02042e84()->bNetType;
-            work->info = *func_02042540();
-            work->stateError = func_02042494();
+        if (!GFL_NetIsEnded()) {
+            work->netType = GFL_NetGetInitData()->bNetType;
+            work->info = *NetState_GetErrorInfo();
+            work->stateError = NetState_GetError();
             if (work->netType == GFL_NET_TYPE_WIFI || work->netType == GFL_NET_TYPE_WIFI_LOBBY ||
                 work->netType == GFL_NET_TYPE_WIFI_GTS) {
-                if (work->info.unk4 == 1 || work->info.unk4 == 2) {
+                if (work->info.errorType == 1 || work->info.errorType == 2) {
                     work->check = NET_ERR_CHECK_END;
                 } else {
                     work->check = NET_ERR_CHECK_RETRY;
@@ -448,7 +448,7 @@ void GFL_NetErrMarkShown(void) {
     }
 }
 
-void func_020120f0(u32 message) {
+void GFL_NetErrRecordWifi(u32 message) {
     if (g_GflNetErr.state != NET_ERR_STATE_SHOW) {
         g_GflNetErr.message = message;
         g_GflNetErr.messageGiven = TRUE;
@@ -468,28 +468,28 @@ void AssertFailErrorDisp(void) {
     GFL_NetErrShow(TRUE);
 }
 
-void func_02012144(void) {
+void GFL_NetErrClear(void) {
     g_GflNetErr.state = NET_ERR_STATE_NONE;
     g_GflNetErr.check = NET_ERR_CHECK_NONE;
 }
 
-BOOL func_02012154(void) {
-    if (func_02042788()) {
-        GFLNetInitData *init = func_02042e84();
+BOOL GFL_NetErrShutdown(void) {
+    if (GFL_NetIsInitialized()) {
+        GFLNetInitData *init = GFL_NetGetInitData();
 
-        func_020428a0();
-        func_02042860(NULL);
-        func_020429f0();
+        GFL_NetCancelEnd();
+        GFL_NetExit(NULL);
+        GFL_NetIwFree();
         do {
             if (init != NULL && (init->bNetType == 0 || init->bNetType == 5)) {
                 if (WH_GetSystemState() == 10) {
                     return FALSE;
                 }
             }
-            func_02042918();
+            GFL_NetUpdateDevice();
             GFL_NetErrGameUpdate();
             OS_WaitIrq(TRUE, OS_IE_V_BLANK);
-        } while (!func_020427a4());
+        } while (!GFL_NetIsEnded());
     }
     return TRUE;
 }
@@ -515,7 +515,7 @@ static BOOL GFL_NetErrShowCore(u32 fatal) {
         if (wifi == TRUE) {
             GFL_NetErrDispInit(fatal, TRUE);
         }
-        if (!func_02012154()) {
+        if (!GFL_NetErrShutdown()) {
             GFL_NetErrAbortCore();
         }
         if (wifi == TRUE) {
@@ -533,7 +533,7 @@ static BOOL GFL_NetErrShowCore(u32 fatal) {
             GFL_NetErrGameUpdate();
         }
         GFL_NetErrRestore(FALSE);
-        func_02012144();
+        GFL_NetErrClear();
         work->unk30 = 0;
         return TRUE;
     }
@@ -619,7 +619,7 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     G2_SetBG1Control(work->bg1Control.screenSize, work->bg1Control.colorMode, work->bg1Control.screenBase,
                      work->bg1Control.charBase, work->bg1Control.bgExtPltt);
     G2_BG1Mosaic(work->bg1Control.mosaic);
-    func_02042eec(&x, &y);
+    GFL_NetGetBG1Offset(&x, &y);
     G2_SetBG1Offset(x, y);
     GX_SetGraphicsMode(work->dispCnt.dispMode, work->dispCnt.bgMode, work->dispCnt.bg0_2d3d);
     GX_SetVisiblePlane(work->dispCnt.visiblePlane);
@@ -681,7 +681,7 @@ static void loadErrorBackground(int window) {
 }
 
 // The message of a Wi-Fi error. The second argument is unused
-static u32 func_020126fc(GFLNetErrorInfo *info, u32 message) {
+static u32 GFL_NetErrGetWifiMessage(GFLNetErrorInfo *info, u32 message) {
     switch (info->type) {
     case NET_ERR_INFO_TYPE_FIRST:
     case NET_ERR_INFO_TYPE_FIRST + 9:
@@ -749,7 +749,7 @@ static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting) {
             message = work->message;
             work->messageGiven = FALSE;
         } else {
-            message = func_020126fc(&work->info, work->message);
+            message = GFL_NetErrGetWifiMessage(&work->info, work->message);
         }
     } else {
         WordSetNumber(wordSet, 0, work->stateError, 5, 2, TRUE);
@@ -775,7 +775,7 @@ static void GFL_NetErrDispMessage(u32 fatal, BOOL disconnecting) {
 
 // Keeps the game's systems running while the error screen waits
 static void GFL_NetErrGameUpdate(void) {
-    func_02005430();
+    Machine_ProcessExitRequest();
     GCTX_HIDUpdate();
     GFL_SndUpdate();
     PokeVoice_Update();

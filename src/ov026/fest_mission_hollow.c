@@ -12,8 +12,8 @@ typedef struct {
     u8 unk2;
 } FesMissionHollowPerson;
 
-static u16 func_ov026_0216f9a4(RivalSelectContext *context);
-static u8 func_ov026_0216f9c0(RivalSelectContext *context);
+static u16 FesMissionHollow_GetPersonObjCode(RivalSelectContext *context);
+static u8 FesMissionHollow_GetPersonUnk2(RivalSelectContext *context);
 static void FesMissionHollow_Shuffle(u8 *list, int count, MATHRandContext32 *rand);
 
 // clang-format off
@@ -28,13 +28,13 @@ static const FesMissionHollowPerson data_ov026_0216fa50[] = {
 
 void FesMissionHollow_Setup(RivalSelectContext *context) {
     FestMission *mission = GetFestMissionCfg(context->entryOwner);
-    RivalEntry *entries = func_02014864(context->entryOwner);
+    RivalEntry *entries = LinkFestival_GetEntries(context->entryOwner);
     MATHRandContext32 rand;
     u8 hollows[20];
     int i;
 
     MI_CpuFill8(entries, 0, sizeof(RivalEntry) * 10);
-    func_ov012_02168348(mission->unk1C, 0, &rand);
+    FestMission_InitRand(mission->seed, 0, &rand);
     for (i = 0; i < 20; i++) {
         hollows[i] = i;
     }
@@ -46,8 +46,8 @@ void FesMissionHollow_Setup(RivalSelectContext *context) {
         entry->unk1 = 0;
         entry->selected = 1;
         entry->active = 0;
-        entry->unk4 = func_ov026_0216f9a4(context);
-        entry->unk6 = func_ov026_0216f9c0(context);
+        entry->unk4 = FesMissionHollow_GetPersonObjCode(context);
+        entry->unk6 = FesMissionHollow_GetPersonUnk2(context);
     }
     FesMissionHollow_Shuffle(hollows, 20, &rand);
     for (i = 0; i < 10; i++) {
@@ -59,12 +59,12 @@ void FesMissionHollow_Setup(RivalSelectContext *context) {
     }
 }
 
-static u16 func_ov026_0216f9a4(RivalSelectContext *context) {
+static u16 FesMissionHollow_GetPersonObjCode(RivalSelectContext *context) {
     FestMission *mission = GetFestMissionCfg(context->entryOwner);
     return data_ov026_0216fa50[mission->unk0_20].unk0;
 }
 
-static u8 func_ov026_0216f9c0(RivalSelectContext *context) {
+static u8 FesMissionHollow_GetPersonUnk2(RivalSelectContext *context) {
     FestMission *mission = GetFestMissionCfg(context->entryOwner);
     return data_ov026_0216fa50[mission->unk0_20].unk2;
 }

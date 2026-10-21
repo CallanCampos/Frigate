@@ -72,31 +72,31 @@ typedef struct {
     u8 unk228;
 } NetCommandWork;
 
-static NetCommandTable *func_02040ccc(int command);
-static void *func_02040d2c(int command);
-static void *func_02040d48(int command);
-static void *func_02040d5c(int command);
-static int func_02041048(void);
+static NetCommandTable *NetCommand_FindTable(int command);
+static void *NetCommand_GetCallback(int command);
+static void *NetCommand_GetWork(int command);
+static void *NetCommand_GetBufferFunc(int command);
+static int NetCommand_SendHugeHeader(void);
 
 // clang-format off
 static const NetCommand sBaseCommands[GFL_NET_CMD_BASE_COUNT] = {
-    { (void *)func_02040e0c, NULL },
-    { func_02041cd8, NULL },
-    { func_02041d0c, NULL },
-    { (void *)func_02040880, NULL },
-    { (void *)func_0204095c, NULL },
-    { (void *)func_02040a20, NULL },
-    { func_02041e20, NULL },
-    { func_02040574, NULL },
-    { func_020405ec, NULL },
-    { func_02043764, NULL },
-    { func_02040ad0, NULL },
-    { func_020421f8, NULL },
-    { func_02040e10, NULL },
-    { func_02040ebc, NULL },
-    { func_02043ca0, func_02043c64 },
-    { func_02043d6c, NULL },
-    { (void *)func_02040e0c, NULL },
+    { (void *)NetCommand_RecvDummy, NULL },
+    { NetState_RecvExit, NULL },
+    { NetState_RecvExitReply, NULL },
+    { (void *)NetHandle_RecvNegotiation, NULL },
+    { (void *)NetHandle_RecvNegotiationReply, NULL },
+    { (void *)NetHandle_RecvForget, NULL },
+    { NetState_RecvMPMode, NULL },
+    { NetHandle_RecvTimingFromMachine, NULL },
+    { NetHandle_RecvTimingFromServer, NULL },
+    { NetIw_RecvCollectedMacs, NULL },
+    { NetHandle_RecvData, NULL },
+    { NetState_RecvWifiDisconnect, NULL },
+    { NetCommand_RecvHugeChunk, NULL },
+    { NetCommand_RecvHugeHeader, NULL },
+    { NetLdata_RecvData, NetLdata_GetRecvPtr },
+    { NetLdata_RecvHeader, NULL },
+    { (void *)NetCommand_RecvDummy, NULL },
 };
 
 // clang-format on
@@ -105,13 +105,13 @@ static NetCommandTable _BaseTable = { sBaseCommands, GFL_NET_CMD_BASE_COUNT };
 
 static NetCommandWork *_pCommandWork;
 
-void func_02040b94(int base, const void *list, int listNum, void *work, HeapID unused) {
+void NetCommand_Init(int base, const void *list, int listNum, void *work, HeapID unused) {
     int i;
 
     if (_pCommandWork == NULL) {
         _pCommandWork = GFL_HeapAllocate(HEAPID_SYSTEM, sizeof(NetCommandWork), TRUE, "net_command.c", 150);
     }
-    func_02040c20(base, list, listNum, work);
+    NetCommand_AddTable(base, list, listNum, work);
     _BaseTable.work = work;
     for (i = 0; i < 8; i++) {
         _pCommandWork->unk220[i] = 0;
@@ -119,7 +119,7 @@ void func_02040b94(int base, const void *list, int listNum, void *work, HeapID u
     _pCommandWork->unk228 = 0;
 }
 
-void func_02040bfc(void) {
+void NetCommand_Exit(void) {
     if (_pCommandWork != NULL) {
         MI_CpuFill8(_pCommandWork, 0, sizeof(NetCommandWork));
         GFL_HeapFree(_pCommandWork);
@@ -127,7 +127,7 @@ void func_02040bfc(void) {
     }
 }
 
-void func_02040c20(int base, const void *list, int listNum, void *work) {
+void NetCommand_AddTable(int base, const void *list, int listNum, void *work) {
     NetCommandWork *commandWork = _pCommandWork;
 
     if (commandWork != NULL) {
@@ -145,7 +145,7 @@ void func_02040c20(int base, const void *list, int listNum, void *work) {
     }
 }
 
-void func_02040c64(int base) {
+void NetCommand_RemoveTable(int base) {
     NetCommandWork *commandWork = _pCommandWork;
 
     if (commandWork != NULL) {
@@ -160,20 +160,20 @@ void func_02040c64(int base) {
     }
 }
 
-BOOL func_02040c94(int netIds) {
+BOOL NetCommand_IsForThisMachine(int netIds) {
     if (netIds == GFL_NET_NETID_SERVER) {
         return TRUE;
     }
-    if (netIds & (1 << func_0203ffc4())) {
+    if (netIds & (1 << NetSystem_GetNetId())) {
         return TRUE;
     }
-    if (func_0203ffc4() == 0 && (netIds & 0x80)) {
+    if (NetSystem_GetNetId() == 0 && (netIds & 0x80)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static NetCommandTable *func_02040ccc(int command) {
+static NetCommandTable *NetCommand_FindTable(int command) {
     int i;
     NetCommandWork *commandWork;
     int base = command & 0xff00;
@@ -197,8 +197,8 @@ static NetCommandTable *func_02040ccc(int command) {
     return NULL;
 }
 
-static void *func_02040d2c(int command) {
-    NetCommandTable *table = func_02040ccc(command);
+static void *NetCommand_GetCallback(int command) {
+    NetCommandTable *table = NetCommand_FindTable(command);
 
     if (table != NULL) {
         return table->list[(u8)command].callback;
@@ -206,8 +206,8 @@ static void *func_02040d2c(int command) {
     return NULL;
 }
 
-static void *func_02040d48(int command) {
-    NetCommandTable *table = func_02040ccc(command);
+static void *NetCommand_GetWork(int command) {
+    NetCommandTable *table = NetCommand_FindTable(command);
 
     if (table != NULL) {
         return table->work;
@@ -215,8 +215,8 @@ static void *func_02040d48(int command) {
     return NULL;
 }
 
-static void *func_02040d5c(int command) {
-    NetCommandTable *table = func_02040ccc(command);
+static void *NetCommand_GetBufferFunc(int command) {
+    NetCommandTable *table = NetCommand_FindTable(command);
 
     if (table != NULL) {
         return table->list[(u8)command].getBuffer;
@@ -224,56 +224,56 @@ static void *func_02040d5c(int command) {
     return NULL;
 }
 
-void func_02040d78(int netId, int netIds, int command, int size, void *data, NetHandle *handle) {
-    if (func_02040c94(netIds)) {
+void NetCommand_Dispatch(int netId, int netIds, int command, int size, void *data, NetHandle *handle) {
+    if (NetCommand_IsForThisMachine(netIds)) {
         BOOL ok = TRUE;
         void (*callback)(int netId, int size, const void *data, void *work, NetHandle *handle);
 
-        if (!func_0204044c(handle) && command >= GFL_NET_CMD_BASE_COUNT) {
+        if (!NetHandle_IsNegotiated(handle) && command >= GFL_NET_CMD_BASE_COUNT) {
             ok = FALSE;
         }
         if (ok) {
-            callback = func_02040d2c(command);
+            callback = NetCommand_GetCallback(command);
             if (callback != NULL) {
-                callback(netId, size, data, func_02040d48(command), handle);
+                callback(netId, size, data, NetCommand_GetWork(command), handle);
             }
         }
     }
 }
 
-BOOL func_02040dc0(int command) {
-    if (func_02040d2c(command) != NULL) {
+BOOL NetCommand_HasCallback(int command) {
+    if (NetCommand_GetCallback(command) != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_02040dd4(int command) {
-    if (func_02040d5c(command) != NULL) {
+BOOL NetCommand_HasBufferFunc(int command) {
+    if (NetCommand_GetBufferFunc(command) != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-void *func_02040de8(int command, int netId, int size) {
-    void *(*getBuffer)(int netId, void *work, int size) = func_02040d5c(command);
+void *NetCommand_GetRecvBuffer(int command, int netId, int size) {
+    void *(*getBuffer)(int netId, void *work, int size) = NetCommand_GetBufferFunc(command);
 
     if (getBuffer != NULL) {
-        return getBuffer(netId, func_02040d48(command), size);
+        return getBuffer(netId, NetCommand_GetWork(command), size);
     }
     return NULL;
 }
 
-void func_02040e0c(void) {
+void NetCommand_RecvDummy(void) {
 }
 
-void func_02040e10(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetCommand_RecvHugeChunk(int netId, int size, const void *data, void *work, NetHandle *handle) {
     int index = netId;
 
     if (netId == GFL_NET_NETID_SERVER) {
         index = GFL_NET_HANDLE_MAX - 1;
     }
-    if (handle == func_02040440() && _pCommandWork->aNetHugeRecv[index].used) {
+    if (handle == NetHandle_GetOwn() && _pCommandWork->aNetHugeRecv[index].used) {
         if (_pCommandWork->aNetHugeRecv[index].data != NULL) {
             MI_CpuCopy8(data,
                         _pCommandWork->aNetHugeRecv[index].data + _pCommandWork->aNetHugeRecv[index].chunksReceived *
@@ -283,29 +283,29 @@ void func_02040e10(int netId, int size, const void *data, void *work, NetHandle 
         _pCommandWork->aNetHugeRecv[index].chunksReceived++;
         if (_pCommandWork->aNetHugeRecv[index].chunksReceived == _pCommandWork->aNetHugeRecv[index].chunkCount) {
             if (_pCommandWork->aNetHugeRecv[index].data != NULL) {
-                func_02040d78(netId, _pCommandWork->aNetHugeRecv[index].netIds,
-                              _pCommandWork->aNetHugeRecv[index].command, _pCommandWork->aNetHugeRecv[index].size,
-                              _pCommandWork->aNetHugeRecv[index].data, handle);
+                NetCommand_Dispatch(netId, _pCommandWork->aNetHugeRecv[index].netIds,
+                                    _pCommandWork->aNetHugeRecv[index].command, _pCommandWork->aNetHugeRecv[index].size,
+                                    _pCommandWork->aNetHugeRecv[index].data, handle);
             }
             _pCommandWork->aNetHugeRecv[index].used = FALSE;
         }
     }
 }
 
-void func_02040ebc(int netId, int size, const void *data, void *work, NetHandle *handle) {
+void NetCommand_RecvHugeHeader(int netId, int size, const void *data, void *work, NetHandle *handle) {
     const NetHugeHeader *header = data;
     int index = netId;
 
     if (netId == GFL_NET_NETID_SERVER) {
         index = GFL_NET_HANDLE_MAX - 1;
     }
-    if (handle == func_02040440() && func_02040de8(header->command, netId, header->size)) {
+    if (handle == NetHandle_GetOwn() && NetCommand_GetRecvBuffer(header->command, netId, header->size)) {
         // clang-format off
         GFL_ASSERT(_pCommandWork->aNetHugeRecv[index].used==FALSE);
         // clang-format on
         _pCommandWork->aNetHugeRecv[index].used = TRUE;
         _pCommandWork->aNetHugeRecv[index].size = header->size;
-        _pCommandWork->aNetHugeRecv[index].data = func_02040de8(header->command, netId, header->size);
+        _pCommandWork->aNetHugeRecv[index].data = NetCommand_GetRecvBuffer(header->command, netId, header->size);
         GFL_ASSERT(_pCommandWork->aNetHugeRecv[index].data);
         _pCommandWork->aNetHugeRecv[index].command = header->command;
         _pCommandWork->aNetHugeRecv[index].chunkSize = header->chunkSize;
@@ -315,8 +315,8 @@ void func_02040ebc(int netId, int size, const void *data, void *work, NetHandle 
     }
 }
 
-int func_02040f84(NetHandle *handle, u8 netIds, u16 command, u32 size, void *data) {
-    GFLNetInitData *pNetIni = func_02042e84();
+int NetCommand_SendHuge(NetHandle *handle, u8 netIds, u16 command, u32 size, void *data) {
+    GFLNetInitData *pNetIni = GFL_NetGetInitData();
     NetHugeSend *send;
     int i;
 
@@ -343,12 +343,12 @@ int func_02040f84(NetHandle *handle, u8 netIds, u16 command, u32 size, void *dat
     send->command = command;
     send->netIds = netIds;
     send->data = data;
-    send->netId = func_020401dc(handle);
+    send->netId = NetHandle_GetNetId(handle);
     send->headerPending = TRUE;
     return send->headerPending;
 }
 
-static int func_02041048(void) {
+static int NetCommand_SendHugeHeader(void) {
     int i;
 
     for (i = 0; i < HUGE_SEND_MAX; i++) {
@@ -362,8 +362,8 @@ static int func_02041048(void) {
             header.command = send->command;
             header.chunkSize = send->chunkSize;
             header.netIds = send->netIds;
-            send->sending =
-                func_0203fafc(NET_CMD_HUGE_HEADER, (u8 *)&header, sizeof(header), 1, send->netId, send->netIds, FALSE);
+            send->sending = NetSystem_QueueCommand(NET_CMD_HUGE_HEADER, (u8 *)&header, sizeof(header), 1, send->netId,
+                                                   send->netIds, FALSE);
             send->headerPending = 1 - send->sending;
             return send->sending;
         }
@@ -371,7 +371,7 @@ static int func_02041048(void) {
     return 0;
 }
 
-void func_020410dc(void) {
+void NetCommand_UpdateHugeSend(void) {
     int i;
 
     for (i = 0; i < HUGE_SEND_MAX; i++) {
@@ -391,7 +391,7 @@ void func_020410dc(void) {
 #endif
                 len = send->lastSize;
             }
-            if (func_0203fafc(NET_CMD_HUGE_DATA, sendData + offset, len, 1, send->netId, send->netIds, TRUE)) {
+            if (NetSystem_QueueCommand(NET_CMD_HUGE_DATA, sendData + offset, len, 1, send->netId, send->netIds, TRUE)) {
                 send->chunksSent++;
             }
             if (send->chunksSent == send->chunkCount) {
@@ -400,5 +400,5 @@ void func_020410dc(void) {
             return;
         }
     }
-    func_02041048();
+    NetCommand_SendHugeHeader();
 }

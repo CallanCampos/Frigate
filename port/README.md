@@ -14,13 +14,17 @@ This directory, `port/`, is Frigate's code. The rest of the repository is the de
 `fuddlesworth/pokebw2`: Frigate compiles the decomp's C with the host's compiler, gives it the parts of the DS a host
 doesn't have, and runs it as a program, with no emulator. The ROM is only where the game's files come from.
 
-**Where it stands:** the game boots natively through its logos, the opening, the title screen and the start menu, frame
-for frame against melonDS, with its sound held to melonDS's too: the sound driver run by run, the title's stream and the
-cry to the bit, the music by its envelope and levels; New Game's intro runs to the field's first script, and CONTINUE
-loads a save up to the field, which waits for the decomp's overlay 36 (a trap stub stops the game there). Meanwhile
-Frigate's test launcher opens the field menu's apps in the field's place for the tests: the bag, the trainer card, the
-party list and the Pokédex match melonDS pass for pass in both versions.
-[docs/STATUS.md](docs/STATUS.md) has the current state.
+**Where it stands:** Frigate boots natively through the logos, opening, title screen and start menu, with sound.
+Earlier tests compared these paths frame by frame with melonDS and checked the sound driver, music and cries. The
+latest sync includes the field engine's C, but field initialization is still blocked by a host memory allocation
+issue. The overworld is not yet playable. The former test launcher now steps aside, so its earlier app comparisons do
+not establish current field or app coverage.
+[docs/STATUS.md](docs/STATUS.md) records the checks and remaining work.
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) explains personal forks, topic branches, port pull requests to `main` and the
+checks to report. Host builds and tests work without ROMs; maintainers verify both ROM SHA1s before merging.
 
 ## Quick start
 
@@ -28,9 +32,9 @@ Frigate is developed on macOS on Apple Silicon, and CI builds and tests it on Li
 ([Building on Windows](#building-on-windows)), and the macOS app for other Macs on macOS 15 and 26, Apple Silicon and
 Intel ([The macOS app](#the-macos-app)). It needs CMake 3.28 or later, Ninja, clang, Python 3.11 or later and SDL3 3.4
 (Homebrew's `sdl3`; without one, CMake downloads the pinned SDL3 release and builds it).
-Running the game needs your own dump of the ROM. A clone needs the decomp's untracked inputs first:
-[Preparing a checkout](#preparing-a-checkout) has the steps, and places your dumps as `orig/baserom_b2_us.nds` and
-`orig/baserom_w2_us.nds`.
+Running the game needs your own dump of the ROM; the host build itself needs no ROM or decomp bootstrap.
+For full ROM verification, [Preparing a checkout](#preparing-a-checkout) sets up the decomp's untracked inputs
+and places your dumps as `orig/baserom_b2_us.nds` and `orig/baserom_w2_us.nds`.
 
 ```sh
 cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo   # configure (Black 2)
@@ -67,8 +71,8 @@ ctest --test-dir build/port -j4 --output-on-failure                      # test
   own heaps included, and stops at the first report; `ctest -L route` runs its routes. How to read a report, and the
   few checks it leaves out and why, are in [docs/sanitizers.md](docs/sanitizers.md).
 - **The ROM build stays as upstream's:** `python3 configure.py && ninja` rebuilds both ROMs from your dumps and checks
-  both SHA1s. Every change to this repository ends with it, since Frigate's changes must leave the ROMs byte for byte
-  ([CLAUDE.md](CLAUDE.md#how-the-root-rules-apply-here)).
+  both SHA1s. Maintainers run it before publishing and before merging a PR, since Frigate's changes must leave the
+  ROMs byte for byte. Contributors report unavailable checks ([CONTRIBUTING.md](CONTRIBUTING.md)).
 
 The host build compiles every C file of `src/` and `lib/` with the host's clang into one program, except the files
 [hal/replaced.txt](hal/replaced.txt) lists, which the platform layer replaces. Functions and data with no C yet are trap
@@ -114,9 +118,9 @@ build/port/frigate-black2 --rom /c/Games/black2.nds                      # your 
 
 ### The test launcher
 
-A continued game stops when it asks for the field, whose code (overlay 36) has no C yet. For tests, Frigate's test
-launcher opens the field menu's apps there instead, in order, each when GFL's frame count reaches its COUNT (at once
-without one), then stops:
+The launcher was built to open apps while the field had no C. It now detects the imported
+`FIELDMAP_PROC_FUNCS` and steps aside; these commands document the earlier test path and cannot bypass the current
+field-heap blocker. On revisions with the placeholder, it opens apps in order at COUNT (at once without one):
 
 ```sh
 build/port/frigate-black2 --save-dir SAVES --launch bag,card        # the bag, then the trainer card, after CONTINUE
@@ -162,6 +166,7 @@ asm oracle, each spike, the artwork) lists its files there.
 | `docs/` | The plan, the architecture, modding, the status log, the decisions, the research | [docs/README.md](docs/README.md) |
 | [CMakeLists.txt](CMakeLists.txt) | The host build: the decomp's C and `port/` linked into one program | |
 | [CLAUDE.md](CLAUDE.md) | The rules for working on Frigate | |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | External contributions, fork and PR workflow, validation and scope | |
 
 [PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
@@ -356,6 +361,9 @@ opens normally. Do this only for an app whose source you trust.
 
 ## Preparing a checkout
 
+External contributors should start with [CONTRIBUTING.md](CONTRIBUTING.md); the host build needs no maintainer
+bootstrap or upstream sync. The steps below prepare a maintainer checkout for full ROM verification and sync.
+
 Port work uses its own clone, not the decomp checkout. A clone or worktree needs the decomp's untracked inputs (the
 base ROMs in `orig/`, `.venv` and the downloaded tools), which `port/tools/bootstrap_checkout.sh` links in from a
 decomp checkout. The same script sets the checkout up for Claude Code and disables pushes to upstream (below). Its
@@ -389,7 +397,8 @@ your own and are never committed.
 
 ### For Claude Code sessions
 
-Port work is done by Claude Code sessions under [CLAUDE.md](CLAUDE.md). Claude Code would load that file only once a
+Claude Code sessions follow [CLAUDE.md](CLAUDE.md); human contributors and authorized Codex sessions can also work on
+the port under those rules and the contribution guide. Claude Code would load that file only once a
 session reads something under `port/`, and the root `CLAUDE.md` alone sends a session to decomp work, whose skills
 post claims and progress on upstream's issues. `bootstrap_checkout.sh` sets each checkout up so that the port's rules
 load at startup and a session can't write upstream:

@@ -10,13 +10,13 @@
 #include "struct_decls.h"
 #include "system/pms.h"
 
-// What the trainer card shows. func_ov012_02169770 fills the front and the back, and func_ov012_02169508 the medals,
-// the Pokémon World Tournament and Join Avenue
+// What the trainer card shows. TrainerCardData_Fill fills the front and the back, and TrainerCardData_FillExtras the
+// medals, the Pokémon World Tournament and Join Avenue
 typedef struct {
     u8 version;
     u8 unk01;
     u8 unk02;
-    // Up to five, from func_ov012_02169b78
+    // Up to five, from TrainerCard_CountStars
     u8 stars;
     // Set when the card is the player's own, whose play time keeps running
     u8 isOwn : 1;
@@ -50,8 +50,8 @@ typedef struct {
     u8 clearDay;
     u8 clearMinute;
     u8 unk36[2];
-    // unk38 to unk44, unk4C to unk54, unk5C and unk60 are sums of records, from the rows of func_ov012_02169738's
-    // table
+    // unk38 to unk44, unk4C to unk54, unk5C and unk60 are sums of records, from the rows of
+    // TrainerCardData_SumRecords's table
     u32 unk38;
     u32 unk3C;
     u32 unk40;
@@ -115,12 +115,12 @@ typedef struct {
     s32 appParam;
 } TrainerCardParam;
 
-void func_ov012_02169508(TrainerCardData *data, GameData *gameData, HeapID heapId);
+void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapID heapId);
 // isSnapshot is TRUE for a card that is sent away, with the play time copied
-void func_ov012_02169770(TrainerCardData *data, GameData *gameData, BOOL isSnapshot, BOOL canEdit, HeapID heapId);
-TrainerCardParam *func_ov012_02169b3c(GameData *gameData, TrainerCardData *data, HeapID heapId);
-u16 func_ov012_02169c04(TrainerCardData *data);
-u8 func_ov012_02169c10(TrainerCardData *data);
+void TrainerCardData_Fill(TrainerCardData *data, GameData *gameData, BOOL isSnapshot, BOOL canEdit, HeapID heapId);
+TrainerCardParam *TrainerCardParam_CreateView(GameData *gameData, TrainerCardData *data, HeapID heapId);
+u16 TrainerCardData_GetMedalCount(TrainerCardData *data);
+u8 TrainerCardData_GetMedalRank(TrainerCardData *data);
 
 // The proc that shows a card it is given, which it frees
 extern const GameProcFunctions data_ov012_0216dd6c;

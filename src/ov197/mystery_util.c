@@ -166,7 +166,7 @@ static const MysteryPos sListCursorPositions[4] = {
 
 static inline void MysteryMsgWin_PrintQueue(PrintWindow *printWindow, PrintQueue *queue, const StrBuf *str,
                                             Font *font) {
-    func_02021c54(queue, BmpWin_GetBitmap(printWindow->window), 0, 0, str, font);
+    PrintQueue_Print(queue, BmpWin_GetBitmap(printWindow->window), 0, 0, str, font);
     printWindow->flushPending = TRUE;
 }
 
@@ -237,7 +237,8 @@ BOOL MysteryTextLine_Update(MysteryTextLine *line) {
         }
         return FALSE;
     } else {
-        if (line->printWindow.flushPending && !func_02021c1c(line->queue, BmpWin_GetBitmap(line->printWindow.window))) {
+        if (line->printWindow.flushPending &&
+            !PrintQueue_IsBitmapPending(line->queue, BmpWin_GetBitmap(line->printWindow.window))) {
             line->printWindow.flushPending = FALSE;
         }
         if (!line->printWindow.flushPending) {
@@ -345,7 +346,7 @@ MysteryMsgWin *MysteryMsgWin_CreateSmall(u16 bg, u8 palette, PrintQueue *queue, 
 
 void MysteryMsgWin_Delete(MysteryMsgWin *win) {
     if (win->stream != NULL) {
-        func_020223cc(win->stream);
+        PrintStream_Delete(win->stream);
         win->stream = NULL;
     }
     if (win->waitIcon != NULL) {
@@ -395,7 +396,7 @@ void MysteryMsgWin_Print(MysteryMsgWin *win, MsgData *msgData, u32 msgId, u32 mo
 static void MysteryMsgWin_PrintStr(MysteryMsgWin *win, u32 mode) {
     GFL_BitmapFill(BmpWin_GetBitmap(win->window), win->bgColor);
     if (win->stream != NULL) {
-        func_020223cc(win->stream);
+        PrintStream_Delete(win->stream);
         win->stream = NULL;
     }
     if (win->keyCursor != NULL) {
@@ -416,8 +417,8 @@ static void MysteryMsgWin_PrintStr(MysteryMsgWin *win, u32 mode) {
     case MYSTERY_PRINT_STREAM:
         AppPrintsysCommon_Init(&win->printCommon, 2);
         win->keyCursor = KeyCursor_Create(win->bgColor, TRUE, TRUE, win->heapId);
-        win->stream = func_02022268(win->window, 0, 0, win->str, win->font, func_02017bcc(), win->tcbManager, 0,
-                                    win->heapId, win->bgColor);
+        win->stream = PrintStream_Create(win->window, 0, 0, win->str, win->font, TextSpeed_GetCurrentWait(),
+                                         win->tcbManager, 0, win->heapId, win->bgColor);
         win->mode = MYSTERY_PRINT_STREAM;
         break;
     default:
@@ -615,7 +616,7 @@ void MysteryTextWinCopy_Print(MysteryTextWinCopy *copy, const MysteryTextWinUpda
             } else {
                 GFL_MsgDataLoadStrbuf(copy->textWin->msgData, update->msgId, str);
             }
-            func_02021c7c(queue, copy->bitmaps[i], pos.x, pos.y, str, copy->textWin->font, update->color);
+            PrintQueue_PrintColor(queue, copy->bitmaps[i], pos.x, pos.y, str, copy->textWin->font, update->color);
         }
     }
     GFL_HeapFree(str);
@@ -685,10 +686,10 @@ MysteryList *MysteryList_Create(const MysteryListSetup *setup, HeapID heapId) {
     }
     pos.x = sListCursorPositions[list->pos].x;
     pos.y = sListCursorPositions[list->pos].y + setup->offsetY * 8;
-    func_0204c140(list->cursor, &pos, 0);
-    func_0204c124(list->cursor, TRUE);
-    func_0204c488(list->cursor, list->cursorSequence);
-    func_0204c520(list->cursor, TRUE);
+    ClActor_SetSurfacePos(list->cursor, &pos, 0);
+    ClActor_SetVisible(list->cursor, TRUE);
+    ClActor_SetSequence(list->cursor, list->cursorSequence);
+    ClActor_SetAutoAnim(list->cursor, TRUE);
     return list;
 }
 
@@ -696,7 +697,7 @@ void MysteryList_Delete(MysteryList *list) {
     if (list->cursorPos != NULL && list->pos != 3) {
         *list->cursorPos = list->pos;
     }
-    func_0204c124(list->cursor, FALSE);
+    ClActor_SetVisible(list->cursor, FALSE);
     MysteryTextWin_Clear(list->textWin);
     MysteryTextWin_Delete(list->textWin);
     GFL_BGSysLoadScr(list->bg);
@@ -744,11 +745,11 @@ u32 MysteryList_Update(MysteryList *list) {
     if (moved) {
         pos.x = sListCursorPositions[list->pos].x;
         pos.y = sListCursorPositions[list->pos].y + list->offsetY * 8;
-        func_0204c140(list->cursor, &pos, 0);
+        ClActor_SetSurfacePos(list->cursor, &pos, 0);
         if (list->pos == 3) {
-            func_0204c488(list->cursor, 2);
+            ClActor_SetSequence(list->cursor, 2);
         } else {
-            func_0204c488(list->cursor, list->cursorSequence);
+            ClActor_SetSequence(list->cursor, list->cursorSequence);
         }
         if (list->onMove != NULL) {
             list->onMove(list->work);
@@ -860,7 +861,7 @@ void MysteryOamText_Print(MysteryOamText *oamText, MsgData *msgData, u32 msgId, 
     GFL_BitmapFill(oamText->bitmap, oamText->color & 0x1f);
     GFL_MsgDataLoadStrbuf(msgData, msgId, oamText->str);
     MysteryOamText_GetPos(oamText, font, &pos);
-    func_02021c7c(oamText->queue, oamText->bitmap, pos.x, pos.y, oamText->str, font, oamText->color);
+    PrintQueue_PrintColor(oamText->queue, oamText->bitmap, pos.x, pos.y, oamText->str, font, oamText->color);
     oamText->printing = TRUE;
 }
 
@@ -875,7 +876,7 @@ void MysteryOamText_SetAlign(MysteryOamText *oamText, s32 x, s32 y, u32 align) {
 }
 
 BOOL MysteryOamText_Update(MysteryOamText *oamText) {
-    if (oamText->printing && !func_02021c1c(oamText->queue, oamText->bitmap)) {
+    if (oamText->printing && !PrintQueue_IsBitmapPending(oamText->queue, oamText->bitmap)) {
         BmpOam_ActorBmpTrans(oamText->actor);
         oamText->printing = FALSE;
     }

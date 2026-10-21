@@ -95,7 +95,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         break;
     case 7:
         if (!GSYS_GetProcMgrState(gsys)) {
-            if (!func_02042788()) {
+            if (!GFL_NetIsInitialized()) {
                 wk->login.unk14 = 1;
                 *state = 2;
             } else if (wk->trade.next == TRADE_NEXT_NEGOTIATE) {
@@ -103,9 +103,9 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
             } else if (wk->trade.next == TRADE_NEXT_EVOLVE) {
                 *state = 10;
             } else {
-                func_02040624(func_02040440(), 1, 12);
+                NetHandle_SendTimingPair(NetHandle_GetOwn(), 1, 12);
                 func_02042e94(FALSE);
-                func_02042e9c(FALSE);
+                GFL_NetSetDisconnectError(FALSE);
                 wk->timeout = 100;
                 *state = 8;
             }
@@ -113,7 +113,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         break;
     case 8:
         wk->timeout--;
-        if (func_02040664(func_02040440(), 1, 12)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 1, 12)) {
             *state = 9;
         }
         if (wk->timeout < 0) {
@@ -121,7 +121,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
         }
         break;
     case 9:
-        func_020421ac(1);
+        NetState_WifiDisconnect(1);
         *state = 4;
         break;
     case 10: {
@@ -143,7 +143,7 @@ GameEventReturnCode EventGtsNego_Callback(GameEvent *event, u32 *state, void *da
     case 11:
         if (!GSYS_GetProcMgrState(gsys)) {
             GFL_HeapFree(wk->trade.evolution);
-            if (!func_02042788()) {
+            if (!GFL_NetIsInitialized()) {
                 wk->login.unk14 = 1;
                 *state = 2;
             } else {

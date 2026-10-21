@@ -26,11 +26,22 @@ relocations. Changes regenerate both the Ninja configuration and objdiff metadat
 NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the addresses of symbols that the SDK's linker
 script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's linker
 script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values, the same
-in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the entry point's gap code
-(`Entry` and the functions at `0x02004d50` and `0x02004da0`) read, and the start of the DSi's extended main memory
-arena, which `os_arena.c` reads. `tools/build/lcf_symbols.py` adds them after `__OVERLAY_COUNT` as absolute symbols, in
+in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
+(`Entry`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
+`os_arena.c` reads. `tools/build/lcf_symbols.py` adds them after `__OVERLAY_COUNT` as absolute symbols, in
 `build/<version>/arm9_symbols.lcf`, the linker script that the link (or `--shift`'s padding) takes. Another one goes in
 the config when a file that reads it is written, with its value read from the pool word in both versions.
+
+## Compiler exception indices
+
+MSL's runtime/register_atexit.c, runtime/console_io.c and runtime/call_static_initializers.c use
+`-Cpp_exceptions on` and emit 48 bytes of exception indices in `.exceptix`. These are compiler output with relocations
+to their functions, placed before ARM9's ordinary `.rodata`. Analysis originally folded this prefix into `.rodata`;
+registering it there makes the runtime precede the game's data owners while code order puts the game first, creating
+a link-order cycle. `config_fixes.py split-section-prefix . .rodata .exceptix 0x30 0x0208ee28` restores the distinct
+module section in both versions and migrates any wholly contained registered ranges. The operation rejects a split
+through an owner's range and preserves the module section's kind and alignment. Each runtime file owns its emitted
+`.exceptix` range directly, so the linker keeps the compiler's relocations without a C reconstruction of the indices.
 
 ## Fixing the configs
 
@@ -75,11 +86,16 @@ consider every name at the destination, including labels, and use the first over
 An alias therefore cannot hide a reference to a static function.
 
 `section-start` and `section-end` move one end of a registered source file's section, as an object at a boundary
-that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files:
+that turns out to belong to the neighbouring file needs; `add_source_file.py` only adds files. Recording a boundary
+again replaces its earlier record, since fixes replay in address order:
 
 ```sh
 .venv/bin/python tools/decomp/config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028
 ```
+
+`remove-section MODULE FILE SECTION EXPECTED_START` removes a section wrongly attributed to a source file, such as
+a label inside another file's heap. It verifies the owner and start in both versions before writing; repeating an
+already-applied removal is harmless. The fix is recorded for config regeneration.
 
 A relocation that dsd could not pin to one overlay only links while its symbol is global. When a function becomes
 `static` in a decompiled file, check `relocs.txt` of both versions for relocations to its address with several
@@ -125,8 +141,10 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
     taken for pointers.
   - `.ctor`: the empty static initializer table, a zero, that the autoload list points to.
   - `.ltdmain`, from the next 32-byte boundary: Thumb code that calls main's SDK through linker veneers, such as the
-    NDMA functions (`MI_IsNDmaBusy` at `0x02768234`). It seems to be the DSi-only code of main's library files. The
-    section's name is a guess, after the SDK's LTDMAIN.
+    NDMA functions (`MI_IsNDmaBusy` at `0x02768234`). It seems to be the DSi-only code of main's library files, and
+    ends with NitroWiFi WCM's DSi backend (`wcm_dsi.c`), which overlay 11 calls. The section's name is a guess, after
+    the SDK's LTDMAIN; C code goes there between `#pragma section LTDMAIN begin` and `end`, after
+    `#pragma define_section LTDMAIN ".ltdmain" ".ltdmain.bss" ".ltdmain" abs32 RWX`.
   - `.data` and `.bss`.
 - Overlay 169 runs from VRAM, at `0x06898020`. Its code is analyzed like any other overlay's since dsd v0.12.1-dsi.3;
   before, dsd took a branch outside main memory for data and had all of it as `.rodata`.
@@ -136,11 +154,17 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
 A call out of `bl` range, such as from an overlay to overlay 169 or the LTD module, goes through a veneer the linker
 adds after the calling function. The original shares main's veneers among their callers, but gives every call in an
 overlay its own: `HandlerRapidSpin` (`src/ov167/move_handlers.c`) calls `func_ov169_06898cf4` three times and is
-followed by three identical veneers. `mwldarm` does this only for a file listed after its `-overlaygroup` and
-`-overlay` options, which must be how the SDK's response file places each overlay's objects; any other file shares one
-veneer per target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes
-`objects.txt` this way, while the LCF still places the objects. Before, a file that called the same far target twice,
-such as `camera_system.c`, couldn't be completed.
+followed by three identical veneers. `mwldarm` does this only for a file listed after its `-overlaygroup` and `-overlay`
+options, which must be how the SDK's response file places each overlay's objects; any other file shares one veneer per
+target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes `objects.txt`
+this way, while the LCF still places the objects. Before, a file that called the same far target twice, such as
+`camera_system.c`, couldn't be completed. NitroWiFi's Thumb code in the LTD autoload (`.ltdmain`) gives every call its
+own veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
+moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and `-overlay LTD_AUTOLOAD_0`,
+which gives `wcm_dsi.c`'s 56 calls of `WCM_SetState` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
+target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
+`mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
+`lib/twl/` with main's.
 
 ## Shifting
 

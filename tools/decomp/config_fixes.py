@@ -20,6 +20,7 @@ after importing names from swan.
     config_fixes.py section-end overlays/ov310 src/ov310/research_list.c .rodata 0x021a7028  # move a file's boundary
     config_fixes.py section-start overlays/ov310 src/ov310/research_common.c .rodata 0x021a773c
     config_fixes.py add-section . lib/nnsys/src/g2d/g2di_Mtx32.c .bss 0x408 0x021435d8  # give a file a section
+    config_fixes.py split-section-prefix . .rodata .exceptix 0x30 0x0208ee28  # recover a compiler section
     config_fixes.py apply
 """
 import argparse
@@ -178,6 +179,56 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
             lines.insert(at[-1] + 1, f"{argument} kind:label({mode}) addr:{addr:#010x}")
         return path, "\n".join(lines) + "\n"
 
+    if action == "split_section_prefix":
+        # The compiler may emit a distinct section that analysis folded into the next ROM section.
+        # Split only a nonempty prefix, preserving kind/alignment and rejecting an owner crossing the boundary.
+        source, target, size_text = argument.split(":")
+        size = int(size_text, 0)
+        if not re.fullmatch(r"\.[A-Za-z0-9_.]+", target) or target == source or size <= 0:
+            sys.exit("invalid section prefix name or size")
+        path = config_dir(version, module) / "delinks.txt"
+        lines = path.read_text().splitlines()
+        header_end = next((i for i, line in enumerate(lines) if not line.startswith(" ")), len(lines))
+        headers = {}
+        pattern = re.compile(r"^(\s*)(\S+)\s+start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)(.*)$")
+        for i, line in enumerate(lines[:header_end]):
+            match = pattern.fullmatch(line)
+            if match:
+                headers[match[2]] = (i, match)
+        if source not in headers:
+            sys.exit(f"{version} {module}: missing module section {source}")
+        index, match = headers[source]
+        start, end = int(match[3], 16), int(match[4], 16)
+        boundary = addr + size
+        alignment = re.search(r" align:(\d+)", match[5])
+        if alignment and boundary % int(alignment[1]):
+            sys.exit(f"{version} {module}: split boundary violates section alignment")
+        if target in headers:
+            _, previous = headers[target]
+            attributes = dict(re.findall(r"\b(kind|align):(\S+)", match[5]))
+            previous_attributes = dict(re.findall(r"\b(kind|align):(\S+)", previous[5]))
+            if ((int(previous[3], 16), int(previous[4], 16), start) != (addr, boundary, boundary)
+                    or previous_attributes != attributes):
+                sys.exit(f"{version} {module}: conflicting module section {target}")
+        elif start != addr or not start < boundary < end:
+            sys.exit(f"{version} {module}: split must be a proper prefix of {source}")
+        changes = []
+        for i in range(header_end, len(lines)):
+            owned = pattern.fullmatch(lines[i])
+            if not owned or owned[2] != source:
+                continue
+            owned_start, owned_end = int(owned[3], 16), int(owned[4], 16)
+            if owned_start < boundary and owned_end > addr:
+                if not addr <= owned_start < owned_end <= boundary:
+                    sys.exit(f"{version} {module}: an owned range crosses the section prefix")
+                changes.append((i, lines[i].replace(source, target, 1)))
+        for i, line in changes:
+            lines[i] = line
+        if target not in headers:
+            lines[index] = f"{match[1]}{source:<11} start:{boundary:#010x} end:{end:#010x}{match[5]}"
+            lines.insert(index, f"{match[1]}{target:<11} start:{addr:#010x} end:{boundary:#010x}{match[5]}")
+        return path, "\n".join(lines) + "\n"
+
     if action in ("section_start", "section_end"):
         # A registered source file's section range, moved after add_source_file.py, such as when an object at a boundary
         # turns out to belong to the neighbouring file. The argument is source:section
@@ -198,6 +249,25 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
         else:
             sys.exit(f"{version} {module}: {source} has no {section}")
         return path, "\n".join(lines) + "\n"
+
+    if action == "remove_section":
+        path = config_dir(version, module) / "delinks.txt"
+        lines = path.read_text().splitlines()
+        source, section = argument.rsplit(":", 1)
+        try:
+            start = lines.index(f"{source}:")
+        except ValueError:
+            sys.exit(f"{version} {module}: {source} is not registered")
+        for i in range(start + 1, len(lines)):
+            if not lines[i].startswith(" "):
+                break
+            if lines[i].split()[0] == section:
+                match = re.search(r"start:(0x[0-9a-f]+)", lines[i])
+                if match is None or int(match.group(1), 16) != addr:
+                    sys.exit(f"{version} {module}: {source} {section} does not start at {addr:#010x}")
+                del lines[i]
+                return path, "\n".join(lines) + "\n"
+        return
 
     if action == "add_section":
         # A section that a registered source file turns out to have, such as an object it defines that its neighbour
@@ -398,6 +468,17 @@ def main():
     command.add_argument("section", help="e.g. .bss")
     command.add_argument("size", help="the section's size, e.g. 0x408")
     command.add_argument("addresses", nargs="+", help="the section's start")
+    command = commands.add_parser("remove-section", help="remove a section assigned to the wrong source file")
+    command.add_argument("module")
+    command.add_argument("source", help="the source file as delinks.txt names it")
+    command.add_argument("section", help="e.g. .bss")
+    command.add_argument("addresses", nargs="+", help="the section's original start")
+    command = commands.add_parser("split-section-prefix", help="split a compiler section from a module section prefix")
+    command.add_argument("module")
+    command.add_argument("section", help="the existing module section")
+    command.add_argument("target_section", help="the compiler's original section name")
+    command.add_argument("size", help="the prefix size")
+    command.add_argument("addresses", nargs="+", help="the prefix start")
     commands.add_parser("apply", help="apply every fix in config/fixes.txt")
     args = parser.parse_args()
 
@@ -419,7 +500,9 @@ def main():
                                                                       else [])]),
                 "section_start": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "section_end": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
+                "remove_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}",
                 "add_section": f"{getattr(args, 'source', '')}:{getattr(args, 'section', '')}:{getattr(args, 'size', '')}"}
+    argument["split_section_prefix"] = f"{getattr(args, 'section', '')}:{getattr(args, 'target_section', '')}:{getattr(args, 'size', '')}"
     argument = argument.get(action, "")
     if action == "remove_orphan_reloc":
         # A command may name several sources. Validate all of them before changing any relocation file or fix record.
@@ -428,9 +511,12 @@ def main():
     for address in args.addresses:
         addr = int(address, 16)
         apply_everywhere(mapper, args.module, addr, action, argument)
-        # One fix of each kind per address: a word can need its symbol removed and a relocation added
-        fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)] + [
-            (args.module, addr, action, argument)]
+        # One fix of each kind per address: a word can need its symbol removed and a relocation added. Recording a
+        # file's section boundary again replaces its earlier record: fixes replay in address order, so an older
+        # record of the same boundary at a higher address would undo a move down.
+        fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)
+                 and not (action in ("section_start", "section_end") and (f[0], f[2], f[3]) == (args.module, action, argument))
+                 ] + [(args.module, addr, action, argument)]
         print(f"{action} {args.module} {addr:#010x} {argument}".rstrip())
     save_fixes(fixes)
 

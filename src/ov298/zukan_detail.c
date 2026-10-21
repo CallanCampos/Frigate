@@ -53,10 +53,10 @@ static BOOL ZukanDetail_Init(GameProc *proc, u32 *state, void *param_, void *wor
     ZukanDetailGraphic_Free(wk->graphic);
     wk->graphic = ZukanDetailGraphic_Create(0, wk->heapId, FALSE);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->vblankTcb = GFL_VBlankTCBAdd(ZukanDetail_VBlank, wk, 1);
     wk->touchbar =
-        ZukanDetailTouchbar_Create(wk->heapId, func_0200d1dc(GameData_GetPokedex(param->gameData)), param->mode);
+        ZukanDetailTouchbar_Create(wk->heapId, PokeDex_IsGiven(GameData_GetPokedex(param->gameData)), param->mode);
     wk->headbar = ZukanDetailHeadbar_Create(wk->heapId, wk->font);
     wk->common = ZukanDetailCommon_Create(wk->heapId, param->gameData, wk->graphic, wk->font, wk->printQueue,
                                           wk->touchbar, wk->headbar, param->list, param->count, &param->index);
@@ -66,7 +66,7 @@ static BOOL ZukanDetail_Init(GameProc *proc, u32 *state, void *param_, void *wor
     wk->nextPage = ZUKAN_DETAIL_PAGE_NONE;
 
     GFL_FadeSet(3, 0, 0, 0);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return TRUE;
 }
 
@@ -84,8 +84,8 @@ static BOOL ZukanDetail_Exit(GameProc *proc, u32 *state, void *param, void *work
     ZukanDetailHeadbar_Free(wk->headbar);
     ZukanDetailTouchbar_Free(wk->touchbar);
     GFL_TCBRemove(wk->vblankTcb);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     ZukanDetailGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -149,7 +149,7 @@ static BOOL ZukanDetail_Main(GameProc *proc, u32 *state, void *param_, void *wor
 
     ZukanDetailTouchbar_Update(wk->touchbar);
     ZukanDetailHeadbar_Update(wk->headbar);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     ZukanDetailGraphic_Update(wk->graphic);
     ZukanDetailGraphic_Begin3D(wk->graphic);
     if (!pageChanged) {

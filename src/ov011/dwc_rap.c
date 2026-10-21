@@ -95,8 +95,9 @@ typedef struct {
     s16 vctEnabled;
     int idleFrames[DWCRAP_NETID_MAX];
     int retryCount;
-    int unk790;
-    u16 unk794;
+    // Whether the peer's voice chat is on, from the bit 8 of its packets' headers, and this side's, sent there
+    int peerVctReady;
+    u16 vctReady;
     u16 unk796;
     u32 connectBits;
     u8 sendSeq;
@@ -108,7 +109,8 @@ typedef struct {
     u8 userDataDirty;
     u8 reportError;
     u8 unk7A4;
-    u8 unk7A5;
+    // What the match's connection attempts are answered (FALSE refuses them)
+    u8 acceptConnect;
     u8 sendReady;
     u8 ackPending;
     u8 connected;
@@ -129,7 +131,7 @@ static void DWCRap_MatchFailed(void);
 static BOOL DWCRap_SendAck(const void *data, int size);
 static void DWCRap_FlushAck(void);
 static void DWCRap_LoginCallback(int error);
-static void DWCRap_TimeoutCallback(u8 aid);
+static void DWCRap_TimeoutCallback(u8 aid, void *param);
 static void DWCRap_UpdateServersCallback(int error);
 static void DWCRap_FriendStatusCallback(int index, u8 status, const char *location, void *param);
 static void DWCRap_DeleteFriendCallback(int deleteIndex, int srcIndex, void *param);
@@ -139,9 +141,9 @@ static void DWCRap_SetRecvTimeouts(void);
 static void DWCRap_OnMatched(int index);
 static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static int DWCRap_EvalCallback(int index, void *param);
-static void DWCRap_SendCallback(int size, u8 aid);
-static void DWCRap_SetUnk790(u32 header);
-static void DWCRap_RecvCallback(u8 aid, u8 *data, int size);
+static void DWCRap_SendCallback(int size, u8 aid, void *param);
+static void DWCRap_SetPeerVctReady(u32 header);
+static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param);
 static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
 static u32 DWCRap_HandleError(void);
 static BOOL DWCRap_CanPing(void);
@@ -170,7 +172,7 @@ BOOL DWCRap_IsInitialized(void) {
 }
 
 int DWCRap_Init(void *userData, DWCFriendData *friendList) {
-    GFLNetInitData *netInit = func_02042e84();
+    GFLNetInitData *netInit = GFL_NetGetInitData();
     int i;
 
     GFL_ASSERT(_dWork == NULL);
@@ -185,8 +187,8 @@ int DWCRap_Init(void *userData, DWCFriendData *friendList) {
     _dWork->lastNetId = -1;
     _dWork->vctEnabled = 0;
     _dWork->unk79E = 0;
-    _dWork->unk794 = 1;
-    _dWork->unk790 = 1;
+    _dWork->vctReady = 1;
+    _dWork->peerVctReady = 1;
     _dWork->unk796 = 1;
     _dWork->userData = userData;
     _dWork->friendList = friendList;
@@ -205,9 +207,9 @@ int DWCRap_Init(void *userData, DWCFriendData *friendList) {
 
 static void DWCRap_Delete(void) {
     if (_dWork != NULL) {
-        func_02042e84();
+        GFL_NetGetInitData();
         DWCRap_FreeRecvBuffers();
-        func_02042ed0(_dWork);
+        GFL_NetFreeAligned32(_dWork);
         _dWork = NULL;
     }
     DWC_ClearError();
@@ -223,7 +225,7 @@ static u32 DWCRap_UpdateLogin(void) {
 
     switch (_dWork->state) {
     case DWCRAP_STATE_INIT:
-        func_02042e84();
+        GFL_NetGetInitData();
         DWC_InitInetEx(&_dWork->inetControl, 2, 1, 20);
         DWC_ConnectInetAsync();
         DWCRap_SetState(DWCRAP_STATE_INET);
@@ -251,37 +253,37 @@ static u32 DWCRap_UpdateLogin(void) {
         if (friendList != NULL) {
             friendListLen = 32;
         }
-        func_ov011_0215fa0c(_dWork->userData, 0x2fc6, "tXH2sN", 0, 0, friendList, friendListLen);
+        DWC_InitFriendsMatch(_dWork->userData, 0x2fc6, "tXH2sN", 0, 0, friendList, friendListLen);
         _dWork->friendsMatchActive = 1;
         name[0] = 0;
         name[1] = 0;
         OS_GetOwnerInfo(&owner);
-        func_ov011_0215fdf0(name, NULL, DWCRap_LoginCallback, NULL);
+        DWC_LoginAsync(name, NULL, DWCRap_LoginCallback, NULL);
         DWCRap_SetState(DWCRAP_STATE_LOGIN);
         // fall through
     case DWCRAP_STATE_LOGIN:
-        func_ov011_0215fc50();
+        DWC_ProcessFriendsMatch();
         break;
     case DWCRAP_STATE_SERVERS:
         if (_dWork->friendList != NULL) {
-            if (!func_ov011_0215fe94(NULL, DWCRap_UpdateServersCallback, _dWork->userData, DWCRap_FriendStatusCallback,
-                                     &_dWork, DWCRap_DeleteFriendCallback, &_dWork)) {
-                func_020424ac(0, 0, 0, 0x3ee);
+            if (!DWC_UpdateServersAsync(NULL, DWCRap_UpdateServersCallback, _dWork->userData,
+                                        DWCRap_FriendStatusCallback, &_dWork, DWCRap_DeleteFriendCallback, &_dWork)) {
+                NetState_RecordError(0, 0, 0, 0x3ee);
             } else {
-                func_ov011_0215e4d4(DWCRap_BuddyCallback, NULL);
-                func_ov011_0215fc50();
+                DWC_SetBuddyFriendCallback(DWCRap_BuddyCallback, NULL);
+                DWC_ProcessFriendsMatch();
             }
         }
         DWCRap_SetState(DWCRAP_STATE_FRIENDS);
         break;
     case DWCRAP_STATE_FRIENDS:
-        func_ov011_0215fc50();
+        DWC_ProcessFriendsMatch();
         if (_dWork->friendList == NULL) {
             DWCRap_SetState(DWCRAP_STATE_READY);
         }
         break;
     case DWCRAP_STATE_READY:
-        func_ov011_0215fc50();
+        DWC_ProcessFriendsMatch();
         _dWork->errorCode = 0x3ef;
         return 0x3ef;
     }
@@ -301,7 +303,7 @@ static void DWCRap_NewClientCallback(int index, void *param) {
 }
 
 static BOOL DWCRap_AttemptCallback(void *param) {
-    return _dWork->unk7A5;
+    return _dWork->acceptConnect;
 }
 
 // clang-format off
@@ -314,29 +316,29 @@ BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3) {
         return FALSE;
     }
     DWCRap_FreeRecvBuffers();
-    ret = func_ov011_02160ed4(0, "a", key);
+    ret = DWC_AddMatchKeyString(0, "a", key);
     GFL_ASSERT(ret!=0);
     MI_CpuFill8(_dWork->randommatch_query, 0, _MATCHSTRINGNUM);
     sprintf(_dWork->randommatch_query, sQueryFormat, "a", key);
     GFL_ASSERT(GFL_STD_StrLen((const char*)_dWork->randommatch_query) < _MATCHSTRINGNUM);
     if (a2) {
-        func_ov011_02160ed4(1, _dWork->randommatch_query, _dWork->randommatch_query);
+        DWC_AddMatchKeyString(1, _dWork->randommatch_query, _dWork->randommatch_query);
     }
     for (i = 0; i < numEntry; i++) {
         DWCRap_AllocRecvBuffer(i);
     }
     DWCRap_SetState(DWCRAP_STATE_MATCHING);
     _dWork->maxPlayers = numEntry;
-    if (!func_ov011_0215fef8(2, numEntry, _dWork->randommatch_query, DWCRap_MatchedCallback, func_02042d94(),
-                             DWCRap_NewClientCallback, func_02042d94(), DWCRap_EvalCallback, func_02042d94(),
-                             DWCRap_AttemptCallback, &_dWork->connectResult, func_02042d94())) {
+    if (!DWC_ConnectToAnybodyAsync(2, numEntry, _dWork->randommatch_query, DWCRap_MatchedCallback, GFL_NetGetWork(),
+                             DWCRap_NewClientCallback, GFL_NetGetWork(), DWCRap_EvalCallback, GFL_NetGetWork(),
+                             DWCRap_AttemptCallback, &_dWork->connectResult, GFL_NetGetWork())) {
         return FALSE;
     }
     _dWork->matchType = 0;
-    func_ov011_02168bb0(DWCRap_SendCallback, 0);
-    func_ov011_02168bd8(DWCRap_RecvCallback, 0);
-    func_ov011_02160150(DWCRap_ClosedCallback, 0);
-    func_ov011_02168c00(DWCRap_TimeoutCallback, 0);
+    DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
+    DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
+    DWC_SetConnectionClosedCallback(DWCRap_ClosedCallback, 0);
+    DWC_SetUserRecvTimeoutCallback(DWCRap_TimeoutCallback, 0);
     _dWork->sending = 0;
     _dWork->unk7A1 = 1;
     return TRUE;
@@ -355,15 +357,15 @@ BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFun
     }
     DWCRap_SetState(DWCRAP_STATE_MATCHING);
     _dWork->maxPlayers = numEntry;
-    if (!func_ov011_0215fef8(1, numEntry, query, DWCRap_MatchedCallback, NULL, DWCRap_NewClientCallback, NULL,
+    if (!DWC_ConnectToAnybodyAsync(1, numEntry, query, DWCRap_MatchedCallback, NULL, DWCRap_NewClientCallback, NULL,
                              evalFunc, evalWork, NULL, NULL, NULL)) {
         return FALSE;
     }
     _dWork->matchType = 0;
-    func_ov011_02168bb0(DWCRap_SendCallback, 0);
-    func_ov011_02168bd8(DWCRap_RecvCallback, 0);
-    func_ov011_02160150(DWCRap_ClosedCallback, 0);
-    func_ov011_02168c00(DWCRap_TimeoutCallback, 0);
+    DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
+    DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
+    DWC_SetConnectionClosedCallback(DWCRap_ClosedCallback, 0);
+    DWC_SetUserRecvTimeoutCallback(DWCRap_TimeoutCallback, 0);
     _dWork->sending = 0;
     _dWork->unk7A1 = 1;
     _dWork->errorCode = 0x3ef;
@@ -401,16 +403,16 @@ int DWCRap_Process(int a0) {
         break;
     case DWCRAP_STATE_MATCH_CANCEL:
     case DWCRAP_STATE_MATCH_FAILED:
-        func_ov011_02160170();
+        DWC_CloseAllConnectionsHard();
         DWCRap_MatchFailed();
         break;
     case DWCRAP_STATE_CONNECTED: {
-        GFLNetInitData *netInit = func_02042e84();
+        GFLNetInitData *netInit = GFL_NetGetInitData();
 
         if (_dWork->vctEnabled != 0) {
             DWCRap_StartVct(netInit->heapId);
         }
-        _dWork->unk794 = 0;
+        _dWork->vctReady = 0;
         DWCRap_SetState(DWCRAP_STATE_CONNECTED_IDLE);
         _dWork->errorCode = 1000;
         return 1000;
@@ -431,7 +433,7 @@ int DWCRap_Process(int a0) {
         return DWCRap_HandleError();
     case DWCRAP_STATE_CLOSED:
         if (_dWork->vctActive == 0) {
-            func_ov011_02160170();
+            DWC_CloseAllConnectionsHard();
             DWCRap_SetState(DWCRAP_STATE_ENDING);
             break;
         }
@@ -456,13 +458,13 @@ BOOL DWCRap_SendPacket(const void *data, int size, int type) {
     if (_dWork->sending != 0) {
         return FALSE;
     }
-    _dWork->header.word = type | (_dWork->unk794 << 8);
+    _dWork->header.word = type | (_dWork->vctReady << 8);
     _dWork->sendSeq++;
     _dWork->header.bytes[2] = _dWork->sendSeq;
     MI_CpuCopy8(data, _dWork->data, size);
     _dWork->sending = 1;
-    netIds = func_ov011_02160344();
-    if (netIds != func_ov011_02168ad4(netIds, &_dWork->header, size + 4)) {
+    netIds = DWC_GetAIDBitmap();
+    if (netIds != DWC_SendReliableBitmap(netIds, &_dWork->header, size + 4)) {
         _dWork->sending = 0;
         return FALSE;
     }
@@ -485,7 +487,7 @@ BOOL DWCRap_Send(const void *data, int size) {
     }
     _dWork->sendReady = 0;
     if (_dWork->childRecvFunc != NULL) {
-        _dWork->childRecvFunc(func_ov011_021602c0(), (u8 *)data, size);
+        _dWork->childRecvFunc(DWC_GetMyAID(), (u8 *)data, size);
     }
     return TRUE;
 }
@@ -512,10 +514,10 @@ static void DWCRap_LoginCallback(int error) {
     }
 }
 
-static void DWCRap_TimeoutCallback(u8 aid) {
+static void DWCRap_TimeoutCallback(u8 aid, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         if (_dWork->connected != 0) {
-            func_ov011_02160170();
+            DWC_CloseAllConnectionsHard();
             _dWork->lastNetId = -1;
             DWCRap_SetState(DWCRAP_STATE_ENDED);
         }
@@ -536,7 +538,7 @@ static void DWCRap_FriendStatusCallback(int index, u8 status, const char *locati
 static void DWCRap_DeleteFriendCallback(int deleteIndex, int srcIndex, void *param) {
     int i;
 
-    func_02042e84();
+    GFL_NetGetInitData();
     for (i = 0; i < DWCRAP_FRIEND_MAX; i++) {
         if (_dWork->pendingCode[i] == -1) {
             _dWork->pendingCode[i] = deleteIndex;
@@ -557,16 +559,16 @@ static void DWCRap_SetRecvTimeouts(void) {
     int i;
 
     for (i = 0; i < DWCRAP_NETID_MAX; i++) {
-        func_ov011_02168ca4(i, 0);
+        DWC_SetRecvTimeoutTime(i, 0);
     }
-    if (func_ov011_021602c0() == 0) {
+    if (DWC_GetMyAID() == 0) {
         for (i = 0; i < _dWork->maxPlayers; i++) {
-            if (i != func_ov011_021602c0() && (func_ov011_02160344() & (1 << i))) {
-                GFL_ASSERT_MSG(func_ov011_02168ca4(i, 10000), "DWC_SetRecvTimeoutTime\n");
+            if (i != DWC_GetMyAID() && (DWC_GetAIDBitmap() & (1 << i))) {
+                GFL_ASSERT_MSG(DWC_SetRecvTimeoutTime(i, 10000), "DWC_SetRecvTimeoutTime\n");
             }
         }
     } else {
-        GFL_ASSERT_MSG(func_ov011_02168ca4(0, 10000), "DWC_SetRecvTimeoutTime\n");
+        GFL_ASSERT_MSG(DWC_SetRecvTimeoutTime(0, 10000), "DWC_SetRecvTimeoutTime\n");
     }
     _dWork->connected = 1;
     DWCRap_ResetIdleFrames();
@@ -589,7 +591,7 @@ static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int
         DWCRap_SetState(DWCRAP_STATE_ERROR);
     }
     if (_dWork->connectFunc != NULL) {
-        _dWork->connectFunc(func_ov011_021602c0(), _dWork->connectWork);
+        _dWork->connectFunc(DWC_GetMyAID(), _dWork->connectWork);
     }
 }
 
@@ -597,30 +599,30 @@ static int DWCRap_EvalCallback(int index, void *param) {
     return 1;
 }
 
-static void DWCRap_SendCallback(int size, u8 aid) {
+static void DWCRap_SendCallback(int size, u8 aid, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->sending = 0;
         _dWork->idleFrames[aid] = 0;
     }
 }
 
-static void DWCRap_SetUnk790(u32 header) {
+static void DWCRap_SetPeerVctReady(u32 header) {
     if (header & 0x100) {
-        _dWork->unk790 = 1;
+        _dWork->peerVctReady = 1;
     } else {
-        _dWork->unk790 = 0;
+        _dWork->peerVctReady = 0;
     }
 }
 
 // clang-format off
-static void DWCRap_RecvCallback(u8 aid, u8 *data, int size) {
+static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
     u32 header = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 
     GFL_ASSERT(aid < 2);
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->connected = 1;
         if ((u8)header == 1) {
-            DWCRap_SetUnk790(header);
+            DWCRap_SetPeerVctReady(header);
             _dWork->recvSeq = data[2];
             _dWork->ackPending = 1;
         } else if ((u8)header == 3) {
@@ -632,7 +634,7 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size) {
             }
             return;
         }
-        if (func_ov011_021602c0() == 0) {
+        if (DWC_GetMyAID() == 0) {
             if (_dWork->parentRecvFunc != NULL) {
                 _dWork->parentRecvFunc(aid, data + 4, size - 4);
             }
@@ -651,7 +653,7 @@ static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index
         _dWork->retryCount = 0;
         _dWork->matchingBusy = 0;
         if (error == 0) {
-            if (_dWork->unk7A1 == 1 && func_ov011_021602a0() == 1) {
+            if (_dWork->unk7A1 == 1 && DWC_GetNumConnectionHost() == 1) {
                 if (_dWork->state != DWCRAP_STATE_MATCH_CANCEL) {
                     DWCRap_SetState(DWCRAP_STATE_CLOSED);
                 }
@@ -664,13 +666,13 @@ static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index
             }
         }
         if (_dWork->reportError != 0) {
-            GFLNetErrorInfo *info = func_02042540();
+            GFLNetErrorInfo *info = NetState_GetErrorInfo();
 
             if (info->type == 0) {
-                func_020424ac(info->code, info->unk4, info->unk8, 0x3f1);
+                NetState_RecordError(info->code, info->errorType, info->error, 0x3f1);
             }
         }
-        func_02040a9c(aid);
+        NetHandle_Forget(aid);
         if (_dWork->disconnectFunc != NULL) {
             _dWork->disconnectFunc(aid, _dWork->disconnectWork);
         }
@@ -735,7 +737,7 @@ static u32 DWCRap_HandleError(void) {
                 case DWCRAP_STATE_ENDING:
                 case DWCRAP_STATE_ENDED:
                     if (_dWork->friendsMatchActive == 1) {
-                        func_ov011_0215fb78();
+                        DWC_ShutdownFriendsMatch();
                         _dWork->friendsMatchActive = 0;
                     }
                     // fall through
@@ -764,12 +766,12 @@ static u32 DWCRap_HandleError(void) {
     }
     if (_dWork->unk79E != 0) {
         result = 0x3ee;
-        func_020424ac(code, type, error, result);
+        NetState_RecordError(code, type, error, result);
     } else if (_dWork->state == DWCRAP_STATE_ENDED) {
         result = 0x3f0;
-        func_020424ac(code, type, error, result);
+        NetState_RecordError(code, type, error, result);
     } else if (error != 0) {
-        func_020424ac(code, type, error, 0);
+        NetState_RecordError(code, type, error, 0);
     }
     return result;
 }
@@ -779,9 +781,9 @@ static BOOL DWCRap_CanPing(void) {
     BOOL found = FALSE;
 
     for (i = 0; i < _dWork->maxPlayers; i++) {
-        if (i != func_ov011_021602c0() && func_ov011_02160370(i)) {
+        if (i != DWC_GetMyAID() && DWC_IsValidAID(i)) {
             found = TRUE;
-            if (!func_ov011_02168998(i)) {
+            if (!DWC_IsSendableReliable(i)) {
                 return FALSE;
             }
         }
@@ -790,10 +792,10 @@ static BOOL DWCRap_CanPing(void) {
 }
 
 static BOOL DWCRap_SendIdlePing(int index) {
-    if (_dWork->sending == 0 && DWCRap_CanPing() && (func_ov011_02160344() & 0xfffe)) {
+    if (_dWork->sending == 0 && DWCRap_CanPing() && (DWC_GetAIDBitmap() & 0xfffe)) {
         _dWork->sending = 1;
-        _dWork->header.word = 2 | (_dWork->unk794 << 8);
-        func_ov011_02168ad4(func_ov011_02160344(), &_dWork->header, 4);
+        _dWork->header.word = 2 | (_dWork->vctReady << 8);
+        DWC_SendReliableBitmap(DWC_GetAIDBitmap(), &_dWork->header, 4);
         _dWork->idleFrames[index] = 0;
         return TRUE;
     }
@@ -804,17 +806,17 @@ static u32 DWCRap_Update(void) {
     int i;
 
     DWCRap_FlushPendingErrors();
-    func_ov011_0215fc50();
+    DWC_ProcessFriendsMatch();
     DWCRap_UpdateFriendStatus();
     if (_dWork->vctActive != 0) {
-        if (_dWork->unk794 == 1 && _dWork->unk790 == 1 && _dWork->unk796 == 1) {
+        if (_dWork->vctReady == 1 && _dWork->peerVctReady == 1 && _dWork->unk796 == 1) {
             DWCRapVChat_Update(FALSE);
         } else {
             DWCRapVChat_Update(TRUE);
         }
-        if (_dWork->lastConnectBits != func_ov011_02160344() && _dWork->micOn == 0 && _dWork->vctEnabled != 0) {
-            if (DWCRapVChat_AddHeard(func_ov011_02160344(), func_ov011_021602c0())) {
-                _dWork->lastConnectBits = func_ov011_02160344();
+        if (_dWork->lastConnectBits != DWC_GetAIDBitmap() && _dWork->micOn == 0 && _dWork->vctEnabled != 0) {
+            if (DWCRapVChat_AddHeard(DWC_GetAIDBitmap(), DWC_GetMyAID())) {
+                _dWork->lastConnectBits = DWC_GetAIDBitmap();
             }
         }
     }
@@ -842,7 +844,7 @@ int DWCRap_GetNetId(void) {
     if (_dWork != NULL) {
         if (_dWork->state == DWCRAP_STATE_CONNECTED || _dWork->state == DWCRAP_STATE_CONNECTED_IDLE ||
             _dWork->state == DWCRAP_STATE_CLOSED) {
-            return func_ov011_021602c0();
+            return DWC_GetMyAID();
         }
     }
     return -1;
@@ -852,15 +854,15 @@ static void DWCRap_VctEndCallback(void) {
     _dWork->vctActive = 0;
 }
 
-void func_ov011_021515a4(void) {
-    _dWork->unk794 = 1;
+void DWCRap_SetVoiceChatReady(void) {
+    _dWork->vctReady = 1;
 }
 
 static void DWCRap_StartVct(HeapID heapId) {
     int mode;
 
-    _dWork->unk794 = 1;
-    _dWork->unk790 = 1;
+    _dWork->vctReady = 1;
+    _dWork->peerVctReady = 1;
     _dWork->unk796 = 1;
     if (_dWork->vctActive == 0) {
         switch (_dWork->vctMode) {
@@ -887,7 +889,7 @@ static void DWCRap_StartVct(HeapID heapId) {
 }
 
 void DWCRap_StartVoiceChat(void) {
-    DWCRap_StartVct(func_02042e84()->heapId);
+    DWCRap_StartVct(GFL_NetGetInitData()->heapId);
 }
 
 void DWCRap_StopVoiceChat(void) {
@@ -905,13 +907,13 @@ void DWCRap_ResetVoiceChat(void) {
     if (_dWork != NULL) {
         _dWork->vctActive = 0;
         _dWork->lastConnectBits = 0;
-        _dWork->unk794 = 0;
+        _dWork->vctReady = 0;
     }
 }
 
 void DWCRap_SetMic(BOOL on) {
     if (on) {
-        DWCRapVChat_RemoveHeard(func_ov011_021602c0());
+        DWCRapVChat_RemoveHeard(DWC_GetMyAID());
         _dWork->micOn = TRUE;
     } else {
         _dWork->micOn = FALSE;
@@ -1092,7 +1094,7 @@ void DWCRap_Shutdown(void) {
     if (_dWork != NULL) {
         DWC_ClearError();
         if (_dWork->friendsMatchActive != 0) {
-            func_ov011_0215fb78();
+            DWC_ShutdownFriendsMatch();
         }
         _dWork->friendsMatchActive = 0;
         DWC_CleanupInet();
@@ -1107,7 +1109,7 @@ static void DWCRap_UpdateFriendStatus(void) {
 
         if (DWC_IsBuddyFriendData(&_dWork->friendList[index])) {
             int size;
-            u8 status = func_ov011_0215e410(&_dWork->friendList[index], _dWork->friendStatusData[index], &size);
+            u8 status = DWC_GetFriendStatusData(&_dWork->friendList[index], _dWork->friendStatusData[index], &size);
 
             if (size < 1) {
                 _dWork->friendStatus[index] = 0;
@@ -1123,7 +1125,7 @@ static void DWCRap_UpdateFriendStatus(void) {
 // clang-format off
 void DWCRap_SetOwnStatusData(const char *data, int size) {
     GFL_ASSERT(size <= MYDWC_STATUS_DATA_SIZE_MAX);
-    func_ov011_0215e47c(data, size);
+    DWC_SetOwnStatusData(data, size);
 }
 // clang-format on
 
@@ -1162,19 +1164,20 @@ int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
     }
     _dWork->matchingBusy = 1;
     if (friendIndex < 0) {
-        ok = func_ov011_0215ff7c(2, entries, DWCRap_AnybodyMatchedCallback, func_02042d94(), DWCRap_ConnectedCallback,
-                                 func_02042d94(), DWCRap_AttemptCallback, &_dWork->connectResult, func_02042d94());
+        ok = DWC_SetupGameServer(2, entries, DWCRap_AnybodyMatchedCallback, GFL_NetGetWork(), DWCRap_ConnectedCallback,
+                                 GFL_NetGetWork(), DWCRap_AttemptCallback, &_dWork->connectResult, GFL_NetGetWork());
         matchType = 1;
     } else {
-        ok = func_ov011_0215fff4(2, friendIndex, DWCRap_FriendMatchedCallback, NULL, DWCRap_ConnectedCallback,
-                                 func_02042d94(), DWCRap_AttemptCallback, &_dWork->connectResult, func_02042d94());
+        ok = DWC_ConnectToGameServerAsync(2, friendIndex, DWCRap_FriendMatchedCallback, NULL, DWCRap_ConnectedCallback,
+                                          GFL_NetGetWork(), DWCRap_AttemptCallback, &_dWork->connectResult,
+                                          GFL_NetGetWork());
         matchType = 2;
     }
     _dWork->matchType = matchType;
     if (!ok) {
         _dWork->retryCount++;
         if (_dWork->retryCount > 120) {
-            func_020424ac(0, 0, 0, 0x3f1);
+            NetState_RecordError(0, 0, 0, 0x3f1);
         }
         return -2;
     }
@@ -1183,10 +1186,10 @@ int DWCRap_Connect(int friendIndex, int numEntry, BOOL a2) {
         DWCRap_AllocRecvBuffer(i);
     }
     DWCRap_SetState(DWCRAP_STATE_MATCHING);
-    func_ov011_02168bb0(DWCRap_SendCallback, 0);
-    func_ov011_02168bd8(DWCRap_RecvCallback, 0);
-    func_ov011_02160150(DWCRap_ClosedCallback, 0);
-    func_ov011_02168c00(DWCRap_TimeoutCallback, 0);
+    DWC_SetUserSendCallback(DWCRap_SendCallback, 0);
+    DWC_SetUserRecvCallback(DWCRap_RecvCallback, 0);
+    DWC_SetConnectionClosedCallback(DWCRap_ClosedCallback, 0);
+    DWC_SetUserRecvTimeoutCallback(DWCRap_TimeoutCallback, 0);
     _dWork->sending = 0;
     return 0;
 }
@@ -1208,17 +1211,17 @@ static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL 
                 failed = TRUE;
             }
             if (_dWork->requestFunc != NULL) {
-                if (!_dWork->requestFunc(index, func_02042d94())) {
+                if (!_dWork->requestFunc(index, GFL_NetGetWork())) {
                     failed = TRUE;
                 }
             }
             if (_dWork->unk7A0 != 0 || failed) {
                 if (index != -1) {
-                    func_ov011_02160284(index);
+                    DWC_CloseConnectionHard(index);
                 }
             }
             _dWork->friendIndex = index;
-            _dWork->connectBits = func_ov011_02160344();
+            _dWork->connectBits = DWC_GetAIDBitmap();
             if (_dWork->connectBits == 1) {
                 DWCRap_SetState(DWCRAP_STATE_MATCH_CANCEL);
             } else {
@@ -1245,11 +1248,11 @@ static void DWCRap_ConnectedCallback(int index, void *param) {
     }
 }
 
-BOOL func_ov011_02151de4(void) {
+BOOL DWCRap_GetVoiceChatSpeaking(void) {
     return DWCRapVChat_GetSpeaking();
 }
 
-s16 func_ov011_02151dec(void) {
+s16 DWCRap_IsVoiceChatEnabled(void) {
     if (_dWork != NULL) {
         return _dWork->vctEnabled;
     }
@@ -1263,31 +1266,31 @@ int DWCRap_GetLastNetId(void) {
     return 0;
 }
 
-s16 func_ov011_02151e24(void) {
+s16 DWCRap_GetLastIndex(void) {
     if (_dWork != NULL) {
         return _dWork->lastIndex;
     }
     return -1;
 }
 
-void func_ov011_02151e40(s16 a0) {
-    _dWork->vctEnabled = a0;
+void DWCRap_SetVoiceChatEnabled(s16 enabled) {
+    _dWork->vctEnabled = enabled;
 }
 
 static void DWCRap_FreeRecvBuffer(int aid) {
     if (_dWork->recvBuf[aid] != NULL) {
-        func_02042ed0(_dWork->recvBuf[aid]);
+        GFL_NetFreeAligned32(_dWork->recvBuf[aid]);
         _dWork->recvBuf[aid] = NULL;
     }
 }
 
 static void DWCRap_AllocRecvBuffer(int aid) {
-    GFLNetInitData *netInit = func_02042e84();
+    GFLNetInitData *netInit = GFL_NetGetInitData();
 
     DWCRap_FreeRecvBuffer(aid);
     if (_dWork->recvBuf[aid] == NULL) {
         _dWork->recvBuf[aid] = allocConfigDSSoftwareFeature(netInit->heapId, 0x1000, "dwc_rap.c", 2929);
-        func_ov011_02168b84(aid, _dWork->recvBuf[aid], 0x1000);
+        DWC_SetRecvBuffer(aid, _dWork->recvBuf[aid], 0x1000);
     }
 }
 
@@ -1330,10 +1333,10 @@ static void DWCRap_FlushPendingErrors(void) {
 
     for (i = 0; i < DWCRAP_FRIEND_MAX; i++) {
         if (_dWork->pendingCode[i] != -1) {
-            GFLNetInitData *netInit = func_02042e84();
+            GFLNetInitData *netInit = GFL_NetGetInitData();
 
             if (netInit->unk34.wifiError.callback != NULL) {
-                netInit->unk34.wifiError.callback(_dWork->pendingCode[i], _dWork->pendingParam[i], func_02042d94());
+                netInit->unk34.wifiError.callback(_dWork->pendingCode[i], _dWork->pendingParam[i], GFL_NetGetWork());
             }
             _dWork->pendingCode[i] = -1;
         }
@@ -1344,8 +1347,8 @@ int DWCRap_GetStatus(void) {
     return _dWork->errorCode;
 }
 
-void func_ov011_02151fec(int a0) {
-    _dWork->unk7A5 = a0;
+void DWCRap_SetAcceptConnect(int accept) {
+    _dWork->acceptConnect = accept;
 }
 
 BOOL DWCRap_IsEnding(void) {

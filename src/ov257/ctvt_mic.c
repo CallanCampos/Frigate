@@ -69,7 +69,7 @@ void CtvtMic_Delete(CtvtMic *work) {
     CtvtMic_StopRecording(work);
     CtvtMic_FreeChannel(work);
     PM_SetAmp(PM_AMP_OFF);
-    func_02042ed0(work->buffer);
+    GFL_NetFreeAligned32(work->buffer);
     GFL_HeapFree(work);
 }
 

@@ -2,6 +2,8 @@
 // whether the player walks, cycles or surfs, and the command sets the actor's next animation command. Function names
 // from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
+#include "constants/obj_codes.h"
+#include "constants/sound.h"
 #include "field/event_data.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -39,7 +41,7 @@
 #define NOGRID_FLAG_SLIDE_C 0x20
 #define NOGRID_FLAG_SLIDE_PENDING 0x40
 
-#define DIR_NONE 9
+#define NOGRID_MOVE_CODE 0x45 // Guessed name: the player rail movement callback set.
 
 #define ACMD_FACE 0x0
 #define ACMD_WALK_8F 0x8
@@ -153,8 +155,8 @@ static u32 func_ov036_0219dc8c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
                                BOOL a5);
 static u32 func_ov036_0219dcdc(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                BOOL a5);
-void func_ov036_0219dd54(FieldPlayerNoGrid *nogrid, u32 flag);
-void func_ov036_0219dd5c(FieldPlayerNoGrid *nogrid, u32 flag);
+static void func_ov036_0219dd54(FieldPlayerNoGrid *nogrid, u32 flag);
+static void func_ov036_0219dd5c(FieldPlayerNoGrid *nogrid, u32 flag);
 static BOOL func_ov036_0219dd68(FieldPlayerNoGrid *nogrid, u32 flag);
 static void func_ov036_0219dd78(FieldPlayerNoGrid *nogrid);
 static void func_ov036_0219dd84(FieldPlayerNoGrid *nogrid);
@@ -210,7 +212,7 @@ static const SlideFunc SLIDE_FUNCS[8] = {
 };
 
 // The player's actor on a rail, whose object code is filled in
-static ZoneNPC sPlayerTemplate = { 0xff, 0xe7, 0x45, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, TRUE };
+static ZoneNPC sPlayerTemplate = { 0xff, OBJ_CODE_HERO, NOGRID_MOVE_CODE, 0, 0, 0, 0, 0, 0, 0, 0xffff, 0xffff, TRUE };
 
 FieldPlayerNoGrid *func_ov036_0219cea0(FieldPlayerCore *core, HeapID heapId) {
     FieldPlayerNoGrid *nogrid = GFL_HeapAllocate(heapId, sizeof(FieldPlayerNoGrid), TRUE, "field_player_nogrid.c", 416);
@@ -218,7 +220,7 @@ FieldPlayerNoGrid *func_ov036_0219cea0(FieldPlayerCore *core, HeapID heapId) {
     nogrid->core = core;
     nogrid->field = FieldPlayerCore_GetField(core);
     nogrid->actor = FieldPlayerCore_GetActor(nogrid->core);
-    if (GetActorMoveCode(nogrid->actor) != 0x45) {
+    if (GetActorMoveCode(nogrid->actor) != NOGRID_MOVE_CODE) {
         sPlayerTemplate.modelId = FldAct_GetObjCode(nogrid->actor);
         FldAct_Transplant(nogrid->actor, &sPlayerTemplate);
     }
@@ -248,7 +250,7 @@ void func_ov036_0219cf40(FieldPlayerNoGrid *nogrid) {
 }
 
 void func_ov036_0219cf48(FieldPlayerNoGrid *nogrid, const RailPosition *pos) {
-    if (GetActorMoveCode(nogrid->actor) != 0x45) {
+    if (GetActorMoveCode(nogrid->actor) != NOGRID_MOVE_CODE) {
         sPlayerTemplate.modelId = FldAct_GetObjCode(nogrid->actor);
         FldAct_Transplant(nogrid->actor, &sPlayerTemplate);
     }
@@ -296,7 +298,7 @@ void FieldPlayerCore_GetRailPos(FieldPlayerNoGrid *nogrid, RailPosition *pos) {
     GetActorRailPos(nogrid->actor, pos);
 }
 
-void func_ov036_0219d044(FieldPlayerNoGrid *nogrid, u32 dir, RailPosition *pos) {
+void func_ov036_0219d044(FieldPlayerNoGrid *nogrid, u16 dir, RailPosition *pos) {
     GetActorRailPosForDir(nogrid->actor, dir, pos);
 }
 
@@ -313,9 +315,9 @@ void func_ov036_0219d060(FieldPlayerNoGrid *nogrid) {
         FieldActor *actor = nogrid->actor;
         u16 dir = GetActorFaceDir(actor);
 
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         CheckSetActorFaceDir(actor, dir);
-        func_ov012_021670f4(actor, 0);
+        FldAct_SetDrawStatus(actor, 0);
         FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
     }
 }
@@ -397,22 +399,22 @@ static void func_ov036_0219d230(FieldPlayerNoGrid *nogrid, u32 command, u32 pres
     FieldActor *actor = nogrid->actor;
 
     switch (command) {
-    case 0:
+    case NOGRID_COMMAND_NONE:
         func_ov036_0219d510(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 1:
+    case NOGRID_COMMAND_IDLE:
         func_ov036_0219d514(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 2:
+    case NOGRID_COMMAND_MOVE:
         func_ov036_0219d54c(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 3:
+    case NOGRID_COMMAND_TURN:
         func_ov036_0219d584(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 4:
+    case NOGRID_COMMAND_BRAKE:
         func_ov036_0219d5a8(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 5:
+    case NOGRID_COMMAND_JUMP:
         func_ov036_0219d5e4(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
     }
@@ -423,16 +425,16 @@ static u32 func_ov036_0219d2ac(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 h
     FieldActor *actor = nogrid->actor;
 
     switch (nogrid->state) {
-    case 0:
+    case NOGRID_STATE_IDLE:
         command = func_ov036_0219d314(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 1:
+    case NOGRID_STATE_MOVE:
         command = func_ov036_0219d374(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 2:
+    case NOGRID_STATE_TURN:
         command = func_ov036_0219d448(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 3:
+    case NOGRID_STATE_BRAKE:
         command = func_ov036_0219d498(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
     }
@@ -514,7 +516,7 @@ static u32 func_ov036_0219d498(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return func_ov036_0219d374(nogrid, actor, pressedKeys, heldKeys, dir, a5);
     }
     if (!IsAllActorAcmdFinished(actor)) {
@@ -542,7 +544,7 @@ static void func_ov036_0219d514(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
 
 static void func_ov036_0219d54c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
-    u32 acmd;
+    u16 acmd;
 
     if (a5 == TRUE) {
         acmd = ACMD_WALK_2F;
@@ -569,7 +571,7 @@ static void func_ov036_0219d5a8(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     nogrid->state = NOGRID_STATE_BRAKE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
     if (!func_ov036_0219e2dc(nogrid, dir)) {
-        GFL_SndSEPlay(0x55a);
+        GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
 }
 
@@ -585,22 +587,22 @@ static void func_ov036_0219d608(FieldPlayerNoGrid *nogrid, u32 command, u32 pres
     FieldActor *actor = nogrid->actor;
 
     switch (command) {
-    case 0:
+    case NOGRID_COMMAND_NONE:
         func_ov036_0219d8e8(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 1:
+    case NOGRID_COMMAND_IDLE:
         func_ov036_0219d8ec(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 2:
+    case NOGRID_COMMAND_MOVE:
         func_ov036_0219d924(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 3:
+    case NOGRID_COMMAND_TURN:
         func_ov036_0219d948(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 4:
+    case NOGRID_COMMAND_BRAKE:
         func_ov036_0219d96c(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 5:
+    case NOGRID_COMMAND_JUMP:
         func_ov036_0219d9a8(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
     }
@@ -611,16 +613,16 @@ static u32 func_ov036_0219d684(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 h
     FieldActor *actor = nogrid->actor;
 
     switch (nogrid->state) {
-    case 0:
+    case NOGRID_STATE_IDLE:
         command = func_ov036_0219d6ec(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 1:
+    case NOGRID_STATE_MOVE:
         command = func_ov036_0219d74c(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 2:
+    case NOGRID_STATE_TURN:
         command = func_ov036_0219d820(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 3:
+    case NOGRID_STATE_BRAKE:
         command = func_ov036_0219d870(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
     }
@@ -702,7 +704,7 @@ static u32 func_ov036_0219d870(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return func_ov036_0219d74c(nogrid, actor, pressedKeys, heldKeys, dir, a5);
     }
     if (!IsAllActorAcmdFinished(actor)) {
@@ -748,7 +750,7 @@ static void func_ov036_0219d96c(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     nogrid->state = NOGRID_STATE_BRAKE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
     if (!func_ov036_0219e2dc(nogrid, dir)) {
-        GFL_SndSEPlay(0x55a);
+        GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
 }
 
@@ -764,19 +766,19 @@ static void func_ov036_0219d9cc(FieldPlayerNoGrid *nogrid, u32 command, u32 pres
     FieldActor *actor = FieldPlayerCore_GetActor(nogrid->core);
 
     switch (command) {
-    case 0:
+    case NOGRID_COMMAND_NONE:
         func_ov036_0219da5c(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 1:
+    case NOGRID_COMMAND_IDLE:
         func_ov036_0219da60(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 2:
+    case NOGRID_COMMAND_MOVE:
         func_ov036_0219da98(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 3:
+    case NOGRID_COMMAND_TURN:
         func_ov036_0219dac4(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
-    case 4:
+    case NOGRID_COMMAND_BRAKE:
         func_ov036_0219dae8(nogrid, actor, pressedKeys, heldKeys, dir, a5);
         break;
     }
@@ -798,9 +800,11 @@ static void func_ov036_0219da60(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
 
 static void func_ov036_0219da98(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32 pressedKeys, u32 heldKeys, u16 dir,
                                 BOOL a5) {
-    u32 acmd = ACMD_WALK_2F;
+    u16 acmd;
 
-    if (a5 != TRUE) {
+    if (a5 == TRUE) {
+        acmd = ACMD_WALK_2F;
+    } else {
         acmd = ACMD_WALK_4F;
     }
     FldAct_SetAcmd(actor, GetAcmdForDir(dir, acmd));
@@ -821,7 +825,7 @@ static void func_ov036_0219dae8(FieldPlayerNoGrid *nogrid, FieldActor *actor, u3
     nogrid->state = NOGRID_STATE_BRAKE;
     FieldPlayerCore_SetMoveStatus(nogrid->core, 0);
     if (!func_ov036_0219e2dc(nogrid, dir)) {
-        GFL_SndSEPlay(0x55a);
+        GFL_SndSEPlay(SEQ_SE_WALL_HIT);
     }
 }
 
@@ -830,16 +834,16 @@ static u32 func_ov036_0219db24(FieldPlayerNoGrid *nogrid, u32 pressedKeys, u32 h
     u32 command = NOGRID_COMMAND_NONE;
 
     switch (nogrid->state) {
-    case 0:
+    case NOGRID_STATE_IDLE:
         command = func_ov036_0219db9c(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 1:
+    case NOGRID_STATE_MOVE:
         command = func_ov036_0219dbfc(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 2:
+    case NOGRID_STATE_TURN:
         command = func_ov036_0219dc8c(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
-    case 3:
+    case NOGRID_STATE_BRAKE:
         command = func_ov036_0219dcdc(nogrid, actor, pressedKeys, heldKeys, dir, a4);
         break;
     }
@@ -909,7 +913,7 @@ static u32 func_ov036_0219dcdc(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     u16 faceDir = GetActorFaceDir(actor);
 
     if (dir != DIR_NONE && dir != faceDir) {
-        func_ov012_02166f2c(actor);
+        FldAct_FreeAcmd(actor);
         return func_ov036_0219dbfc(nogrid, actor, pressedKeys, heldKeys, dir, a5);
     }
     if (!IsAllActorAcmdFinished(actor)) {
@@ -921,11 +925,11 @@ static u32 func_ov036_0219dcdc(FieldPlayerNoGrid *nogrid, FieldActor *actor, u32
     return func_ov036_0219dbfc(nogrid, actor, pressedKeys, heldKeys, dir, a5);
 }
 
-void func_ov036_0219dd54(FieldPlayerNoGrid *nogrid, u32 flag) {
+static void func_ov036_0219dd54(FieldPlayerNoGrid *nogrid, u32 flag) {
     nogrid->flags |= flag;
 }
 
-void func_ov036_0219dd5c(FieldPlayerNoGrid *nogrid, u32 flag) {
+static void func_ov036_0219dd5c(FieldPlayerNoGrid *nogrid, u32 flag) {
     nogrid->flags &= ~flag;
 }
 
@@ -1035,7 +1039,8 @@ static u16 func_ov036_0219de9c(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
 static void func_ov036_0219dee0(FieldPlayerNoGrid *nogrid) {
     FieldActor *actor = nogrid->actor;
 
-    if (func_ov036_0219dd68(nogrid, 0x59)) {
+    if (func_ov036_0219dd68(nogrid, NOGRID_FLAG_SLIDING | NOGRID_FLAG_SLIDE_A | NOGRID_FLAG_SLIDE_B |
+                                        NOGRID_FLAG_SLIDE_PENDING)) {
         ClearActorFlag(actor, 0x18);
     }
     if (func_ov036_0219dd68(nogrid, NOGRID_FLAG_SLIDING)) {
@@ -1115,14 +1120,14 @@ static u16 func_ov036_0219e048(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
 
 static u16 func_ov036_0219e0ac(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     if (GetActorMotionDir(nogrid->actor) == DIR_LEFT) {
-        GFL_SndSEPlay(0x55e);
+        GFL_SndSEPlay(SEQ_SE_DANSA);
     }
     return func_ov036_0219df78(nogrid, dir, a2);
 }
 
 static u16 func_ov036_0219e0d4(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
     if (GetActorMotionDir(nogrid->actor) == DIR_RIGHT) {
-        GFL_SndSEPlay(0x55e);
+        GFL_SndSEPlay(SEQ_SE_DANSA);
     }
     return func_ov036_0219df78(nogrid, dir, a2);
 }
@@ -1155,7 +1160,7 @@ static u16 func_ov036_0219e110(FieldPlayerNoGrid *nogrid, u16 dir, u32 a2) {
 
 static void func_ov036_0219e178(StepSound *sound, u32 kind) {
     if (sound->active != 1 || kind != sound->kind) {
-        GFL_SndSEPlay(0x6d1);
+        GFL_SndSEPlay(SEQ_SE_FLD_66);
         sound->active = 1;
         sound->kind = kind;
         sound->step = 0;
@@ -1166,7 +1171,7 @@ static void func_ov036_0219e1a0(StepSound *sound) {
     if (sound->active != 0) {
         sound->active = 0;
         sound->step = 0;
-        GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(0x6d1));
+        GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_66));
     }
 }
 
@@ -1251,7 +1256,7 @@ static BOOL func_ov036_0219e2dc(FieldPlayerNoGrid *nogrid, u16 dir) {
     RailPosition pos;
 
     GetActorRailPosForDir(actor, dir, &pos);
-    if (GetWarpIDByPlayerPosRail(eventData, &pos) != 0xffff) {
+    if (GetWarpIDByPlayerPosRail(eventData, &pos) != WARP_ID_NONE) {
         return TRUE;
     }
     return FALSE;

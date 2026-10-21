@@ -197,7 +197,7 @@ static BOOL WifiBattleMatchLink_CompetitionInit(GameProc *proc, u32 *state, void
         WifiBattleMatchRes_Create(WifiBattleMatchGraphic_GetClActUnit(link->graphic), 0, HEAPID_WIFIBATTLEMATCH_LINK);
     link->font = GFL_FontCreate(0x17, 0, 0, 0, HEAPID_WIFIBATTLEMATCH_LINK);
     link->smallFont = GFL_FontCreate(0x17, 3, 0, 0, HEAPID_WIFIBATTLEMATCH_LINK);
-    link->printQueue = func_02021998(HEAPID_WIFIBATTLEMATCH_LINK);
+    link->printQueue = PrintQueue_CreateDefault(HEAPID_WIFIBATTLEMATCH_LINK);
     link->msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_EVENT_FISHING, HEAPID_WIFIBATTLEMATCH_LINK);
     link->wordSet = GFL_WordSetSystemCreate(8, 0x40, HEAPID_WIFIBATTLEMATCH_LINK);
@@ -234,7 +234,7 @@ static BOOL WifiBattleMatchLink_CompetitionExit(GameProc *proc, u32 *state, void
     WifiBattleMatchLink_CompetitionDeleteMenu(link);
     GFL_WordSetSystemFree(link->wordSet);
     GFL_MsgDataFree(link->msgData);
-    func_02021a18(link->printQueue);
+    PrintQueue_Free(link->printQueue);
     GFL_FontFree(link->smallFont);
     GFL_FontFree(link->font);
     WifiBattleMatchRes_Free(link->res);
@@ -276,7 +276,7 @@ static BOOL WifiBattleMatchLink_CompetitionMain(GameProc *proc, u32 *state, void
         break;
     }
     WifiBattleMatchGraphic_Update(link->graphic);
-    func_02021a3c(link->printQueue);
+    PrintQueue_Main(link->printQueue);
     WifiBattleMatchMsgBox_Update(link->msgBox);
     WifiBattleMatchLinkIcon_Update(link->linkIcon);
     WifiBattleMatchRes_Update(link->res);
@@ -321,7 +321,7 @@ static void WifiBattleMatchLink_CompetitionTaskAccount(WifiBattleMatchTask *task
 
     switch (*seq) {
     case 0:
-        if (func_020099f4(getDreamWorldStuffAddress(GameData_GetSaveControl(param->param->gameData)))) {
+        if (DreamWorldSave_GetIDShown(getDreamWorldStuffAddress(GameData_GetSaveControl(param->param->gameData)))) {
             *seq = 1;
         } else {
             *seq = 5;
@@ -450,9 +450,10 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 3:
-        if (link->param->account->unk5 == TournamentEntry_GetField(entry, 10)) {
+        if (link->param->account->unk5 == TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B)) {
             *seq = 4;
-        } else if (TournamentEntry_GetField(entry, 10) == 4 || TournamentEntry_GetField(entry, 10) == 5) {
+        } else if (TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B) == 4 ||
+                   TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B) == 5) {
             *seq = 7;
         } else {
             *seq = 4;
@@ -484,9 +485,9 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         WifiBattleMatchLinkRequest request;
 
         MI_CpuFill8(&request, 0, sizeof(request));
-        request.unk1 = TournamentEntry_GetField(entry, 10);
+        request.unk1 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
         request.unk4 = WifiBattleMatchNet_GetGSID(link->net);
-        link->param->account->unk5 = TournamentEntry_GetField(entry, 10);
+        link->param->account->unk5 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
         WifiBattleMatchNet_StartPostRequest(link->net, &request, HEAPID_WIFIBATTLEMATCH_LINK);
         *seq = 8;
         break;
@@ -560,7 +561,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 15:
-        if (TournamentEntry_GetField(entry, 2) == 0) {
+        if (TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID) == 0) {
             *seq = 18;
         } else {
             *seq = 16;
@@ -611,7 +612,7 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 19:
-        if (TournamentEntry_GetField(entry, 2) == 0) {
+        if (TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID) == 0) {
             *seq = 42;
         } else {
             *seq = 20;
@@ -818,17 +819,17 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
 
         MI_CpuCopy8(&link->serverEntry, link->entry, sizeof(link->serverEntry));
         BattleBoxSave_ClearFlags(battleBox, 1);
-        TournamentEntry_SetField(link->entry, 10, 1);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 1);
         RndMatchData_SetParam(param->record, 10, 0, 0);
         RndMatchData_SetParam(param->record, 10, 1, 0);
         RndMatchData_SetParam(param->record, 10, 2, 0);
         TournamentTeam_Clear(previous);
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 44;
         break;
     }
     case 44:
-        state = func_02017850(param->param->gameData);
+        state = GameData_UpdateSave(param->param->gameData);
         if (state == 2) {
             *seq = 37;
         } else if (state == 3) {
@@ -884,11 +885,11 @@ static void WifiBattleMatchLink_CompetitionTaskEntry(WifiBattleMatchTask *task, 
         break;
     case 51:
         WifiBattleMatchLink_CompetitionUpdateRecord(link, param->unk34);
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 52;
         break;
     case 52:
-        if (func_02017850(param->param->gameData) == 2) {
+        if (GameData_UpdateSave(param->param->gameData) == 2) {
             *seq = 55;
         }
         break;
@@ -1032,7 +1033,7 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
             break;
         }
         invalidFlags = 0;
-        regulation = func_0200b530(link->entry);
+        regulation = TournamentEntry_GetRegulation(link->entry);
         invalid = PokeRegulation_CheckParty(regulation, (PokeParty *)player->partyData, &invalidFlags);
         otherInvalid = PokeRegulation_PartyHasEgg(regulation, (PokeParty *)player->partyData);
         if (invalid == 0 && otherInvalid == 0) {
@@ -1133,17 +1134,17 @@ static void WifiBattleMatchLink_CompetitionTaskRegister(WifiBattleMatchTask *tas
         previous = TournamentBlock_GetTeam(getTournamentBlockAddress(save), 0);
         party = convertBoxedPokeSetToParty(battleBox, HEAPID_TAIL(HEAPID_WIFIBATTLEMATCH));
         BattleBoxSave_SetFlags(battleBox, 1);
-        TournamentEntry_SetField(link->entry, 10, 2);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 2);
         TournamentTeam_SetFromParty(previous, party);
         GFL_HeapFree(party);
         *seq = 23;
         break;
     case 23:
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 24;
         break;
     case 24:
-        ret = func_02017850(param->param->gameData);
+        ret = GameData_UpdateSave(param->param->gameData);
         if (ret == 2) {
             *seq = 25;
         } else if (ret == 3) {
@@ -1477,7 +1478,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         MI_CpuFill8(&condition, 0, sizeof(condition));
         condition.rating = link->param->unk34->unk10;
         condition.disconnects = link->param->unk34->unk4;
-        condition.cup = TournamentEntry_GetField(entry, 2);
+        condition.cup = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
         condition.matches = link->param->unk34->unk8 + link->param->unk34->unkC;
         WifiBattleMatchNet_StartMatch(link->net, 0, 0, param->param->unk4, &condition);
         link->unkE4 = 0;
@@ -1554,8 +1555,8 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
                 otherPlayer->info.gender = GENDER_MALE;
                 fixCount++;
             }
-            if (otherPlayer->info.unk1C >= 16) {
-                otherPlayer->info.unk1C = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
+            if (otherPlayer->info.unionView >= 16) {
+                otherPlayer->info.unionView = otherPlayer->info.gender == GENDER_MALE ? 0 : 8;
                 fixCount++;
             }
             if (!Country_IsValidPlace(otherPlayer->info.country, otherPlayer->info.province,
@@ -1597,7 +1598,7 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         break;
     case 16:
         flags = 0;
-        regulation = func_0200b530(link->entry);
+        regulation = TournamentEntry_GetRegulation(link->entry);
         if (PokeRegulation_CheckParty(regulation, (PokeParty *)param->otherPlayer->partyData, &flags) == 0) {
             *seq = 17;
         } else {
@@ -1965,8 +1966,8 @@ static void WifiBattleMatchLink_CompetitionTaskMatch(WifiBattleMatchTask *task, 
         }
         if (timedOut) {
             WifiBattleMatchNet_CancelMatch(link->net);
-            if (!GFL_NetErrCheck() && func_02042788()) {
-                func_ov011_02160170();
+            if (!GFL_NetErrCheck() && GFL_NetIsInitialized()) {
+                DWC_CloseAllConnectionsHard();
             }
             *seq = 10;
         }
@@ -2021,7 +2022,7 @@ static void WifiBattleMatchLink_CompetitionTaskResult(WifiBattleMatchTask *task,
         if (link->exchangeDone == 0) {
             link->exchangeDone = WifiBattleMatchNet_ReportMain(link->net, &link->exchangeResult);
             if (link->exchangeDone != 0 && link->exchangeResult != 0) {
-                func_ov262_021c5c94(param->param->gameData, param->battleResult->result);
+                WifiBattleMatch_RecordResult(param->param->gameData, param->battleResult->result);
             }
         }
         if (link->exchangeDone == 1) {
@@ -2130,14 +2131,14 @@ static void WifiBattleMatchLink_CompetitionTaskAfterBattle(WifiBattleMatchTask *
         break;
     case 1:
         if (param->result != 2) {
-            func_ov262_021c5cd4(param->param->gameData, param->battleResult->result);
+            WifiBattleMatch_RecordBattleTime(param->param->gameData, param->battleResult->result);
         }
         WifiBattleMatchLink_CompetitionUpdateRecord(link, link->param->unk34);
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 2;
         break;
     case 2:
-        ret = func_02017850(param->param->gameData);
+        ret = GameData_UpdateSave(param->param->gameData);
         if (ret == 2) {
             *seq = 3;
         } else if (ret == 3) {
@@ -2310,11 +2311,11 @@ static void WifiBattleMatchLink_CompetitionTaskLogout(WifiBattleMatchTask *task,
         *seq = 7;
         break;
     case 1:
-        func_0201782c(param->param->gameData);
+        GameData_StartSave(param->param->gameData);
         *seq = 2;
         break;
     case 2:
-        if (func_02017850(param->param->gameData) == 2) {
+        if (GameData_UpdateSave(param->param->gameData) == 2) {
             *seq = 3;
         }
         break;
@@ -2403,7 +2404,7 @@ static void WifiBattleMatchLink_CompetitionTaskRelogin(WifiBattleMatchTask *task
         WifiBattleMatchNet_Delete(link->net);
         link->net = NULL;
     }
-    func_02012154();
+    GFL_NetErrShutdown();
     WifiBattleMatchTask_End(task);
 }
 
@@ -2429,20 +2430,20 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
         break;
     case 1:
         entry = link->entry;
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             GFL_NetErrAbort();
         }
-        valid = func_ov011_0215dda8(&date, &time);
+        valid = DWC_GetDateTime(&date, &time);
         if (valid) {
             RTC_ConvertSecondToDateTime(&date, &time, RTC_ConvertDateTimeToSecond(&date, &time));
         }
-        startDate.year = TournamentEntry_GetField(entry, 4);
-        startDate.month = TournamentEntry_GetField(entry, 5);
-        startDate.day = TournamentEntry_GetField(entry, 6);
+        startDate.year = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR);
+        startDate.month = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH);
+        startDate.day = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY);
         startDate.week = RTC_WEEK_SUNDAY;
-        endDate.year = TournamentEntry_GetField(entry, 7);
-        endDate.month = TournamentEntry_GetField(entry, 8);
-        endDate.day = TournamentEntry_GetField(entry, 9);
+        endDate.year = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_YEAR);
+        endDate.month = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH);
+        endDate.day = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY);
         endDate.week = RTC_WEEK_SUNDAY;
         startDay = RTC_ConvertDateToDay(&startDate);
         endDay = RTC_ConvertDateToDay(&endDate);
@@ -2491,13 +2492,13 @@ static void WifiBattleMatchLink_CompetitionTaskCheckPeriod(WifiBattleMatchTask *
 
         link->hadBattleBox = BattleBoxSave_CheckFlags(battleBox, 1);
         BattleBoxSave_ClearFlags(battleBox, 1);
-        TournamentEntry_SetField(link->entry, 10, 3);
-        func_0201782c(param->param->gameData);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 3);
+        GameData_StartSave(param->param->gameData);
         *seq = 7;
         break;
     }
     case 7:
-        if (func_02017850(param->param->gameData) == 2) {
+        if (GameData_UpdateSave(param->param->gameData) == 2) {
             *seq = 8;
         }
         break;
@@ -2633,12 +2634,12 @@ static void WifiBattleMatchLink_CompetitionTaskUnregister(WifiBattleMatchTask *t
         break;
     case 9:
         BattleBoxSave_ClearFlags(getBattleBox(GameData_GetSaveControl(param->param->gameData)), 1);
-        TournamentEntry_SetField(link->entry, 10, 4);
-        func_0201782c(param->param->gameData);
+        TournamentEntry_SetField(link->entry, TOURNAMENT_FIELD_UNK15B, 4);
+        GameData_StartSave(param->param->gameData);
         *seq = 10;
         break;
     case 10:
-        ret = func_02017850(param->param->gameData);
+        ret = GameData_UpdateSave(param->param->gameData);
         if (ret == 2) {
             link->subTaskResult = 0;
             *seq = 11;
@@ -2746,16 +2747,18 @@ static void WifiBattleMatchLink_CompetitionCreateCard(WifiBattleMatchLinkCompeti
     previous =
         TournamentBlock_GetTeam(getTournamentBlockAddress(GameData_GetSaveControl(link->param->param->gameData)), 0);
     MI_CpuFill8(&info, 0, sizeof(info));
-    MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
-    info.startDate = WifiBattleMatchLink_PackBytes(
-        TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-    info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8),
-                                                 TournamentEntry_GetField(entry, 9));
-    info.look = func_02008bf4(playerInfo);
+    MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
+    info.startDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),
+                                                   TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH),
+                                                   TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY));
+    info.endDate = WifiBattleMatchLink_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_YEAR),
+                                                 TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH),
+                                                 TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY));
+    info.look = PlayerInfo_GetUnionView(playerInfo);
     info.unkA0 = RndMatchData_GetParam(link->param->record, 10, 0);
     first = RndMatchData_GetParam(link->param->record, 10, 1);
     info.unkA4 = first + RndMatchData_GetParam(link->param->record, 10, 2);
-    info.variant = TournamentEntry_GetField(entry, 11);
+    info.variant = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
     if (info.unkA4 == 0 && info.unkA0 == 0) {
         info.unkA0 = 1500;
     }
@@ -2800,7 +2803,8 @@ static void WifiBattleMatchLink_CompetitionCreatePartnerCard(WifiBattleMatchLink
         unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
         link->partnerCard = WifiBattleMatchPartnerCard_Create(
             (const LiveBattleMatchPlayerData *)partner, unit, link->res, link->font, link->printQueue, link->msgData,
-            link->wordSet, 0, 1, TournamentEntry_GetField(link->entry, 11), HEAPID_WIFIBATTLEMATCH_LINK);
+            link->wordSet, 0, 1, TournamentEntry_GetField(link->entry, TOURNAMENT_FIELD_VARIANT),
+            HEAPID_WIFIBATTLEMATCH_LINK);
     }
 }
 
@@ -2952,7 +2956,7 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer 
     WifiBattleMatchLinkParam *param;
     void *entry;
 
-    func_02008b34(GetGameDataPlayerInfo(link->param->param->gameData), &player->info);
+    PlayerInfo_Copy(GetGameDataPlayerInfo(link->param->param->gameData), &player->info);
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     param = link->param;
     player->record1 = param->unk34->unk8;
@@ -2961,7 +2965,7 @@ static void WifiBattleMatchLink_CompetitionFillPlayer(WifiBattleMatchLinkPlayer 
     player->unk4C = WifiBattleMatchNet_GetRecordId(link->net);
     player->gsid = WifiList_GetMyGSID(GameData_GetWifiList(link->param->param->gameData));
     entry = link->entry;
-    player->entryField2 = TournamentEntry_GetField(entry, 2);
+    player->entryField2 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
     player->checksum = CRC16_350bytes(entry);
 }
 
@@ -2997,7 +3001,7 @@ static BOOL WifiBattleMatchLink_CompetitionCompareParties(PokeParty *party, Poke
             PartyPkm *pkm = PokeParty_GetPkm(party, i);
             PartyPkm *otherPkm = PokeParty_GetPkm(otherParty, i);
 
-            if (GFL_STD_MemCmp(func_0201d620(pkm), func_0201d620(otherPkm), PML_GetPkmRawSize()) != 0) {
+            if (GFL_STD_MemCmp(PokeParty_GetBoxPkm(pkm), PokeParty_GetBoxPkm(otherPkm), PML_GetPkmRawSize()) != 0) {
                 return FALSE;
             }
         }
@@ -3060,8 +3064,8 @@ static u32 WifiBattleMatchLink_CompetitionUpdateCancel(WifiBattleMatchLinkCompet
             link->cancelSeq++;
             WifiBattleMatchLinkIcon_SetShown(link->linkIcon, FALSE);
             WifiBattleMatchNet_CancelMatch(link->net);
-            if (!GFL_NetErrCheck() && func_02042788()) {
-                func_ov011_02160170();
+            if (!GFL_NetErrCheck() && GFL_NetIsInitialized()) {
+                DWC_CloseAllConnectionsHard();
             }
         }
         break;

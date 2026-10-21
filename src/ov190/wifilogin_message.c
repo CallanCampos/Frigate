@@ -36,9 +36,9 @@ WifiLoginMessage *WifiLoginMessage_Create(HeapID heapId, u32 bank, u32 style) {
     msg->heapId = heapId;
     msg->style = style;
     BmpWin_InitAllocator(msg->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     msg->tcbManager = GFL_TCBExMgrCreate(msg->heapId, msg->heapId, 1, 0);
-    msg->printQueue = func_02021998(msg->heapId);
+    msg->printQueue = PrintQueue_CreateDefault(msg->heapId);
     msg->strbuf = GFL_StrBufCreate(400, msg->heapId);
     msg->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, msg->heapId);
     msg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, bank, msg->heapId);
@@ -57,7 +57,7 @@ WifiLoginMessage *WifiLoginMessage_Create(HeapID heapId, u32 bank, u32 style) {
 
 void WifiLoginMessage_Update(WifiLoginMessage *msg) {
     GFL_TCBExMgrUpdate(msg->tcbManager);
-    func_02021a3c(msg->printQueue);
+    PrintQueue_Main(msg->printQueue);
 }
 
 void WifiLoginMessage_Free(WifiLoginMessage *msg) {
@@ -66,7 +66,7 @@ void WifiLoginMessage_Free(WifiLoginMessage *msg) {
         msg->waitIcon = NULL;
     }
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
         msg->stream = NULL;
     }
     WifiLoginMessage_ClearTitle(msg);
@@ -74,15 +74,15 @@ void WifiLoginMessage_Free(WifiLoginMessage *msg) {
                             CHAR_SIZE(msg->frameChars));
     GFL_BGSysFreeCharMemory(WifiLoginMessage_GetNoticeBG(msg->style), CHAR_POS(msg->frameCharsOther),
                             CHAR_SIZE(msg->frameCharsOther));
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GFL_WordSetSystemFree(msg->wordSet);
     GFL_MsgDataFree(msg->msgData);
     GFL_FontFree(msg->font);
     GFL_StrBufFree(msg->strbuf);
     AppTaskMenuRes_Free(msg->menu.res);
     GFL_TCBExMgrFree(msg->tcbManager);
-    func_02021c44(msg->printQueue);
-    func_02021a18(msg->printQueue);
+    PrintQueue_Clear(msg->printQueue);
+    PrintQueue_Free(msg->printQueue);
     if (msg->messageWin != NULL) {
         BmpWin_Free(msg->messageWin);
         msg->messageWin = NULL;
@@ -127,10 +127,10 @@ void WifiLoginMessage_PrintFrom(WifiLoginMessage *msg, MsgData *msgData, u32 msg
     }
     AppPrintsysCommon_Init(&msg->printsys, flags);
     if (msg->stream != NULL) {
-        func_020223cc(msg->stream);
+        PrintStream_Delete(msg->stream);
     }
-    msg->stream =
-        func_02022268(window, 0, 0, msg->strbuf, msg->font, func_02017bcc(), msg->tcbManager, 2, msg->heapId, 15);
+    msg->stream = PrintStream_Create(window, 0, 0, msg->strbuf, msg->font, TextSpeed_GetCurrentWait(), msg->tcbManager,
+                                     2, msg->heapId, 15);
     BmpWin_DrawFrame(window, WINFRAME_TRANSFER_VBLANK, msg->frameChars, 12);
     BmpWin_FlushChar(window);
     BmpWin_FlushMap(window);
@@ -158,7 +158,7 @@ BOOL WifiLoginMessage_IsDone(WifiLoginMessage *msg) {
     if (msg->stream != NULL) {
         done = AppPrintsysCommon_Update(&msg->printsys, msg->stream);
         if (done) {
-            func_020223cc(msg->stream);
+            PrintStream_Delete(msg->stream);
             msg->stream = NULL;
         }
     }

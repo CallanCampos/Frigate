@@ -288,7 +288,7 @@ static void CommTvt_Init(CommTvtWork *sys) {
     if (canPlayerExchangePhotos() == TRUE) {
         sys->canExchangePhotos = TRUE;
     }
-    func_02042ba8(FALSE, sys->heapId);
+    GFL_NetSetIconScreen(FALSE, sys->heapId);
 
     switch (sys->param->unk4) {
     case COMM_TVT_START_WAIT:
@@ -335,14 +335,14 @@ static void CommTvt_Resume(CommTvtWork *sys) {
     CommTvt_CreateNameWindows(sys);
     GFL_BGSysLoadNCLRDefault(23, 5, 0, 0x140, 0x20, sys->heapId);
     GFL_BGSysLoadNCLRDefault(23, 5, 4, 0x140, 0x20, sys->heapId);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     LoadSysMsgBox(4, 0x140, 9, 0, sys->heapId);
     LoadSysMsgBox(0, 0x200, 9, 0, sys->heapId);
     sys->taskMenuRes = AppTaskMenuRes_Create(4, 7, sys->font, sys->printQueue, sys->heapId);
     CtvtCamera_Restart(sys, sys->camera);
-    func_02043868(heapId, FALSE);
+    NetLdata_Init(heapId, FALSE);
     CtvtComm_ResetSession(sys, sys->comm);
-    func_02042ba8(FALSE, sys->heapId);
+    GFL_NetSetIconScreen(FALSE, sys->heapId);
     GFL_SndBGMPlay(SEQ_BGM_SILENCE_FIELD, 0xffff);
 }
 
@@ -358,7 +358,7 @@ static void CommTvt_Free(CommTvtWork *sys) {
     CtvtDraw_Delete(sys, sys->draw);
     CtvtTalk_Delete(sys, sys->talk);
     CtvtGame_Delete(sys, sys->game);
-    func_020438dc();
+    NetLdata_Exit();
     CtvtComm_Delete(sys, sys->comm);
     CtvtCamera_Delete(sys, sys->camera);
     AppTaskMenuRes_Free(sys->taskMenuRes);
@@ -444,8 +444,8 @@ static BOOL CommTvt_Main(CommTvtWork *sys) {
 
     CtvtCamera_Update(sys, sys->camera);
     DrawSystem_Update(sys->drawSystem);
-    func_0204b794();
-    func_02021a3c(sys->printQueue);
+    ClActSys_Draw();
+    PrintQueue_Main(sys->printQueue);
     CommTvt_UpdateNames(sys);
     {
         u8 frame;
@@ -472,7 +472,7 @@ static void CommTvt_VBlank(TCB *tcb, void *data) {
 
     if (sys->mode != COMM_TVT_MODE_GAME) {
         CtvtCamera_Draw(sys, sys->camera);
-        func_0204b7c8();
+        ClActSys_VBlank();
         DrawSystem_Draw(sys->drawSystem);
         CtvtTalk_Draw(sys, sys->talk);
     }
@@ -515,8 +515,8 @@ static void CommTvt_InitGraphics(CommTvtWork *sys) {
     ClActSys_Create(&clactSetup, &sCommTvtVRAMConfig, sys->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    sys->clactUnit = func_0204bf1c(64, 0, sys->heapId);
-    func_0204c028(sys->clactUnit);
+    sys->clactUnit = ClActUnit_Create(64, 0, sys->heapId);
+    ClActUnit_UseSystemRenderer(sys->clactUnit);
     // The video's windows: window 0 covers the screen, window 1 its right half
     GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
     G2_SetWnd0InsidePlane(0x1f, TRUE);
@@ -528,8 +528,8 @@ static void CommTvt_InitGraphics(CommTvtWork *sys) {
 
 static void CommTvt_FreeGraphics(CommTvtWork *sys) {
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
-    func_0204bf98(sys->clactUnit);
-    func_0204b758();
+    ClActUnit_Delete(sys->clactUnit);
+    ClActSys_Delete();
     GFL_BGSysReleaseBG(7);
     GFL_BGSysReleaseBG(6);
     GFL_BGSysReleaseBG(5);
@@ -567,26 +567,29 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
     GFL_BGSysLoadArcNCGRStatic(sys->arc, 8, 1, 0, 0, FALSE, sys->heapId);
     loadBGScrToVramByFileNoReserveNegAlign(sys->arc, 13, 1, 0, 0, FALSE, sys->heapId);
     GFL_BGSysLoadScr(1);
-    sys->objResources[0] = func_0204bc48(sys->arc, 3, 0, 0, sys->heapId);
-    sys->objResources[4] = func_0204b81c(sys->arc, 27, FALSE, 0, sys->heapId);
-    sys->objResources[8] = func_0204bde0(sys->arc, 21, 24, sys->heapId);
-    sys->objResources[1] = func_0204bc48(sys->arc, 3, 1, 0, sys->heapId);
-    sys->objResources[5] = func_0204b81c(sys->arc, 26, FALSE, 1, sys->heapId);
-    sys->objResources[9] = func_0204bde0(sys->arc, 20, 23, sys->heapId);
+    sys->objResources[0] = ClActSys_LoadPlttEx(sys->arc, 3, 0, 0, sys->heapId);
+    sys->objResources[4] = ClActSys_LoadChars(sys->arc, 27, FALSE, 0, sys->heapId);
+    sys->objResources[8] = ClActSys_LoadCellAnims(sys->arc, 21, 24, sys->heapId);
+    sys->objResources[1] = ClActSys_LoadPlttEx(sys->arc, 3, 1, 0, sys->heapId);
+    sys->objResources[5] = ClActSys_LoadChars(sys->arc, 26, FALSE, 1, sys->heapId);
+    sys->objResources[9] = ClActSys_LoadCellAnims(sys->arc, 20, 23, sys->heapId);
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), sys->heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 0, 0, 0x20, sys->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), 0, 0, 0, FALSE, sys->heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 4, 0xc0, 0x20, sys->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), 5, 0, 0, FALSE, sys->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 5, 0, 0, FALSE, sys->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 0, 0, 0x20, sys->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), 0, 0, 0, FALSE, sys->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0xc0, 0x20, sys->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), 5, 0, 0, FALSE, sys->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 5, 0, 0, FALSE, sys->heapId);
     GFL_BGSysSetScrPaletteNo(5, 0, 21, 32, 3, 6);
     GFL_BGSysLoadScr(5);
-    sys->objResources[3] = func_0204bbb8(arc, func_0202d810(), 0, 0xe0, 0, 3, sys->heapId);
-    sys->objResources[7] = func_0204b81c(arc, func_0202d814(), FALSE, 0, sys->heapId);
-    sys->objResources[2] = func_0204bbb8(arc, func_0202d810(), 1, 0xe0, 0, 3, sys->heapId);
-    sys->objResources[6] = func_0204b81c(arc, func_0202d814(), FALSE, 1, sys->heapId);
-    sys->objResources[10] = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), sys->heapId);
+    sys->objResources[3] =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), 0, 0xe0, 0, 3, sys->heapId);
+    sys->objResources[7] = ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 0, sys->heapId);
+    sys->objResources[2] =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), 1, 0xe0, 0, 3, sys->heapId);
+    sys->objResources[6] = ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 1, sys->heapId);
+    sys->objResources[10] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2),
+                                                   AppMenuCommon_GetTouchBarAnimFile(2), sys->heapId);
     GFL_ArcToolFree(arc);
 
     setup.x = 0;
@@ -595,10 +598,10 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
     setup.priority = 0;
     setup.bgPriority = 0;
     sys->talkerCursor =
-        func_0204c040(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, 4), CommTvt_GetObjResource(sys, 0),
-                      CommTvt_GetObjResource(sys, 8), &setup, 0, sys->heapId);
-    func_0204c124(sys->talkerCursor, FALSE);
-    func_0204c520(sys->talkerCursor, TRUE);
+        ClActor_Create(CommTvt_GetClActUnit(sys), CommTvt_GetObjResource(sys, 4), CommTvt_GetObjResource(sys, 0),
+                       CommTvt_GetObjResource(sys, 8), &setup, 0, sys->heapId);
+    ClActor_SetVisible(sys->talkerCursor, FALSE);
+    ClActor_SetAutoAnim(sys->talkerCursor, TRUE);
 
     if (getTrainerGender(player) == GENDER_MALE) {
         file = GFL_G2DIOReadNCLRArc(sys->arc, 7, &palette, sys->heapId);
@@ -612,15 +615,15 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
 static void CommTvt_FreeResources(CommTvtWork *sys) {
     u8 i;
 
-    func_0204c108(sys->talkerCursor);
+    ClActor_Delete(sys->talkerCursor);
     for (i = 0; i < 4; i++) {
-        func_0204bcd0(sys->objResources[i]);
+        ClActSys_FreePltt(sys->objResources[i]);
     }
     for (i = 4; i < 8; i++) {
-        func_0204b98c(sys->objResources[i]);
+        ClActSys_FreeChars(sys->objResources[i]);
     }
     for (i = 8; i < COMM_TVT_OBJ_RESOURCES; i++) {
-        func_0204be64(sys->objResources[i]);
+        ClActSys_FreeCellAnims(sys->objResources[i]);
     }
     GFL_ArcToolFree(sys->arc);
 }
@@ -628,10 +631,10 @@ static void CommTvt_FreeResources(CommTvtWork *sys) {
 static void CommTvt_InitMessages(CommTvtWork *sys) {
     sys->font = GFL_FontCreate(23, 0, 0, FALSE, sys->heapId);
     sys->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_SERVER_FLOW, sys->heapId);
-    sys->printQueue = func_020219a8(0x800, sys->heapId);
+    sys->printQueue = PrintQueue_Create(0x800, sys->heapId);
     GFL_BGSysLoadNCLRDefault(23, 5, 0, 0x140, 0x20, sys->heapId);
     GFL_BGSysLoadNCLRDefault(23, 5, 4, 0x140, 0x20, sys->heapId);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     LoadSysMsgBox(4, 0x140, 9, 0, sys->heapId);
     LoadSysMsgBox(0, 0x200, 9, 0, sys->heapId);
     sys->tcbEx = GFL_TCBExMgrCreate(sys->heapId, sys->heapId, 1, 0);
@@ -645,8 +648,8 @@ static void CommTvt_FreeMessages(CommTvtWork *sys) {
     }
     GFL_TCBExMgrFreeTasks(sys->tcbEx);
     GFL_TCBExMgrFree(sys->tcbEx);
-    func_02021c44(sys->printQueue);
-    func_02021a18(sys->printQueue);
+    PrintQueue_Clear(sys->printQueue);
+    PrintQueue_Free(sys->printQueue);
     GFL_MsgDataFree(sys->msgData);
     GFL_FontFree(sys->font);
 }
@@ -743,7 +746,8 @@ static void CommTvt_UpdateNames(CommTvtWork *sys) {
     for (i = 0; i < COMM_TVT_MEMBERS; i++) {
         int bit = 1 << i;
 
-        if ((sys->namesPending & bit) && !func_02021c1c(sys->printQueue, BmpWin_GetBitmap(sys->nameWindows[i]))) {
+        if ((sys->namesPending & bit) &&
+            !PrintQueue_IsBitmapPending(sys->printQueue, BmpWin_GetBitmap(sys->nameWindows[i]))) {
             BmpWin_Transfer(sys->nameWindows[i]);
             sys->namesPending -= (u8)bit;
             copied = TRUE;
@@ -763,11 +767,11 @@ static void CommTvt_PrintName(CommTvtWork *sys, const CtvtCommMemberInfo *info, 
     StrBuf *name = copyTrainerNameToNewStrbuf((const u16 *)info->playerInfo, sys->heapId);
     int x = (96 - (u8)GFL_FontGetBlockWidth(name, sys->font, 0)) / 2;
 
-    func_02021c7c(sys->printQueue, BmpWin_GetBitmap(window), x + 1, 1, name, sys->font, 0x400);
-    func_02021c7c(sys->printQueue, BmpWin_GetBitmap(window), x - 1, 1, name, sys->font, 0x400);
-    func_02021c7c(sys->printQueue, BmpWin_GetBitmap(window), x, 2, name, sys->font, 0x400);
-    func_02021c7c(sys->printQueue, BmpWin_GetBitmap(window), x, 0, name, sys->font, 0x400);
-    func_02021c7c(sys->printQueue, BmpWin_GetBitmap(window), x, 1, name, sys->font, 0x3c00);
+    PrintQueue_PrintColor(sys->printQueue, BmpWin_GetBitmap(window), x + 1, 1, name, sys->font, 0x400);
+    PrintQueue_PrintColor(sys->printQueue, BmpWin_GetBitmap(window), x - 1, 1, name, sys->font, 0x400);
+    PrintQueue_PrintColor(sys->printQueue, BmpWin_GetBitmap(window), x, 2, name, sys->font, 0x400);
+    PrintQueue_PrintColor(sys->printQueue, BmpWin_GetBitmap(window), x, 0, name, sys->font, 0x400);
+    PrintQueue_PrintColor(sys->printQueue, BmpWin_GetBitmap(window), x, 1, name, sys->font, 0x3c00);
     GFL_StrBufFree(name);
 }
 
@@ -1085,14 +1089,14 @@ void func_ov257_021aad74(CommTvtWork *sys, u8 talker) {
         GFL_StrBufFree(name);
         pos.x = cursorX[window] + width / 2;
         pos.y = cursorY[window];
-        func_0204c140(sys->talkerCursor, &pos, 0);
-        func_0204c124(sys->talkerCursor, TRUE);
-        func_0204c56c(sys->talkerCursor);
+        ClActor_SetSurfacePos(sys->talkerCursor, &pos, 0);
+        ClActor_SetVisible(sys->talkerCursor, TRUE);
+        ClActor_RestartAnim(sys->talkerCursor);
     }
 }
 
 void func_ov257_021aae44(CommTvtWork *sys) {
-    func_0204c124(sys->talkerCursor, FALSE);
+    ClActor_SetVisible(sys->talkerCursor, FALSE);
 }
 
 void func_ov257_021aae54(CommTvtWork *sys, const CtvtCommMemberInfo *info) {

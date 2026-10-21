@@ -110,14 +110,14 @@ void func_ov036_02199cf0(WeatherObj *obj, const ClActorPos *pos);
 
 // Overlay 74
 extern WeatherData SUNNY_WEATHER;
-BOOL func_ov074_021e90c0(WeatherTask *task, u32 arg, HeapID heapId);
-BOOL func_ov074_021e9108(WeatherTask *task, u32 arg, HeapID heapId);
-BOOL func_ov074_021e9170(WeatherTask *task, u32 arg, HeapID heapId);
-BOOL func_ov074_021e91b8(WeatherTask *task, u32 arg, HeapID heapId);
-BOOL func_ov074_021e91bc(WeatherTask *task, u32 arg, HeapID heapId);
-BOOL func_ov074_021e91e0(WeatherTask *task, u32 arg, HeapID heapId);
-BOOL func_ov074_021e91f4(WeatherTask *task, u32 arg, HeapID heapId);
-void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u32 season,
+BOOL Sunny_Init(WeatherTask *task, u32 arg, HeapID heapId);
+BOOL Sunny_FadeIn(WeatherTask *task, u32 arg, HeapID heapId);
+BOOL Sunny_InitNoFade(WeatherTask *task, u32 arg, HeapID heapId);
+BOOL Sunny_Main(WeatherTask *task, u32 arg, HeapID heapId);
+BOOL Sunny_InitFadeOut(WeatherTask *task, u32 arg, HeapID heapId);
+BOOL Sunny_FadeOut(WeatherTask *task, u32 arg, HeapID heapId);
+BOOL Sunny_Exit(WeatherTask *task, u32 arg, HeapID heapId);
+void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u16 season,
                           HeapID heapId);
 void func_ov036_021990d8(void *weather);
 void FieldWeather_Update(void *weather, HeapID heapId);

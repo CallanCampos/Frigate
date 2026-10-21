@@ -67,7 +67,7 @@ Script_4:
     VMJump L_0100
 
 L_00F0:
-    Cmd_0221 EVENT_WORK_0x4162, 0x8010
+    AnvilleTrainGetModelID EVENT_WORK_0x4162, 0x8010
     BMChangeMdlID 8, 24, 25, 0x8010
 
 L_0100:
@@ -82,7 +82,7 @@ Script_5:
     VMJump L_0135
 
 L_0125:
-    Cmd_0221 EVENT_WORK_0x4162, 0x8010
+    AnvilleTrainGetModelID EVENT_WORK_0x4162, 0x8010
     BMChangeMdlID 8, 24, 25, 0x8010
 
 L_0135:

@@ -13,7 +13,7 @@
 #include "system/printsys.h"
 #include "system/version.h"
 
-typedef void (*LetterInitFn)(PlaceNameLetter *letter, void *work, void *arg);
+typedef void (*LetterInitFn)(PlaceNameLetter *letter, void *work, const void *arg);
 typedef void (*LetterExitFn)(PlaceNameLetter *letter, void *work);
 typedef u32 (*LetterUpdateFn)(PlaceNameLetter *letter, void *work);
 
@@ -41,10 +41,13 @@ struct PlaceNameLetter {
 };
 
 typedef struct {
-    s32 x0;
-    s32 y0;
-    s32 x1;
-    s32 y1;
+    s32 x;
+    s32 y;
+} MovePoint;
+
+typedef struct {
+    MovePoint start;
+    MovePoint end;
 } MovePath;
 
 typedef struct {
@@ -127,23 +130,32 @@ typedef struct {
 static const ClActorPos PLACE_NAME_LETTER_POSITIONS[5] = {
     { 0x10, 8 }, { 0x80, 0x60 }, { 0x1e, 3 }, { 0xe2, 0xbc }, { 0x80, 0x60 }
 };
-// Two moves that no code uses
-const MoveSpec PLACE_NAME_LETTER_UNUSED_MOVE_A = { { 0, 0x20, 0, 0 }, 0, 0 };
-const MoveSpec PLACE_NAME_LETTER_UNUSED_MOVE_B = { { 0, -0x20, 0, 0 }, 0, 0 };
 
-static void func_ov036_021b6950(PlaceNameLetter *letter, void *work, void *arg);
+static void func_ov036_021b6950(PlaceNameLetter *letter, void *work, const void *arg);
 static void func_ov036_021b6a3c(PlaceNameLetter *letter, void *work);
-static void func_ov036_021b6a94(PlaceNameLetter *letter, void *work, void *arg);
+static void func_ov036_021b6a94(PlaceNameLetter *letter, void *work, const void *arg);
 static u32 func_ov036_021b6aac(PlaceNameLetter *letter, void *work);
-static void func_ov036_021b6dec(PlaceNameLetter *letter, void *work, void *arg);
+static void func_ov036_021b6dec(PlaceNameLetter *letter, void *work, const void *arg);
 static void func_ov036_021b6e44(PlaceNameLetter *letter, void *work);
-static void func_ov036_021b6e60(PlaceNameLetter *letter, void *work, void *arg);
+static void func_ov036_021b6e60(PlaceNameLetter *letter, void *work, const void *arg);
 static u32 func_ov036_021b6e70(PlaceNameLetter *letter, void *work);
 static void func_ov036_021b692c(PlaceNameLetter *letter, s32 state);
 
 static const PlaceNameLetterOps PLACE_NAME_LETTER_OPS[2] = {
     { sizeof(LetterA), func_ov036_021b6950, func_ov036_021b6a3c, func_ov036_021b6a94, func_ov036_021b6aac },
     { sizeof(LetterB), func_ov036_021b6dec, func_ov036_021b6e44, func_ov036_021b6e60, func_ov036_021b6e70 },
+};
+
+// How each part slides out, and how it slides in and swings; the code fills in the start and the timing. They are
+// copied rather than written as initializers of the locals, which would give each a .rodata section of its own, and
+// declared in the order that gives the original's .rodata
+static const MoveSpec PLACE_NAME_LETTER_TEXT_MOVE_OUT = { { { 0, 0 }, { 0, -0x40 } }, 0, 0 };
+static const MoveSpec PLACE_NAME_LETTER_FRAME_MOVE_OUT = { { { 0, 0 }, { 0, 0x20 } }, 0, 0 };
+static const AnimSpec PLACE_NAME_LETTER_TEXT_ANIM_IN = {
+    { { 0, -0x20 }, { 0, 0 } }, 0, 0x7fff, 0, -3, 1, 0, 0, 0, 0, 0
+};
+static const AnimSpec PLACE_NAME_LETTER_FRAME_ANIM_IN = {
+    { { 0, 0x20 }, { 0, 0 } }, 0, 0x7fff, 0, 3, 1, 0, 0, 0, 0, 0
 };
 
 PlaceNameLetter *func_ov036_021b6824(HeapID heapId, u32 type, void *arg, ClActUnit *unit, ArcTool *arc, u16 bgPriority,
@@ -161,17 +173,17 @@ PlaceNameLetter *func_ov036_021b6824(HeapID heapId, u32 type, void *arg, ClActUn
     letter->work = letter + 1;
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
-        letter->actor = func_0204c040(unit, chars, palette, cellAnims, &setup, 0, heapId);
+        letter->actor = ClActor_Create(unit, chars, palette, cellAnims, &setup, 0, heapId);
     }
-    func_0204c318(letter->actor, 2);
-    func_0204c124(letter->actor, FALSE);
+    ClActor_SetObjMode(letter->actor, 2);
+    ClActor_SetVisible(letter->actor, FALSE);
     letter->ops->init(letter, letter->work, arg);
     return letter;
 }
 
 void func_ov036_021b68bc(PlaceNameLetter *letter) {
     letter->ops->exit(letter, letter->work);
-    func_0204c108(letter->actor);
+    ClActor_Delete(letter->actor);
     GFL_HeapFree(letter);
 }
 
@@ -216,47 +228,47 @@ BOOL func_ov036_021b6940(PlaceNameLetter *letter) {
     return FALSE;
 }
 
-static void func_ov036_021b6950(PlaceNameLetter *letter, void *work, void *arg) {
+static void func_ov036_021b6950(PlaceNameLetter *letter, void *work, const void *arg) {
     LetterA *wk = work;
-    PlaceNameTextSetup *setup = arg;
+    const PlaceNameTextSetup *setup = arg;
     BmpOamActorSetup oamSetup;
 
     wk->queue = setup->printQueue;
-    func_0204c488(letter->actor, 0);
+    ClActor_SetSequence(letter->actor, 0);
     wk->bitmap = GFL_BitmapCreate(25, 2, 32, letter->heapId);
     oamSetup.bitmap = wk->bitmap;
     oamSetup.x = 0;
     oamSetup.y = 0;
-    oamSetup.paletteOffset = 0;
     oamSetup.palette = setup->palette;
+    oamSetup.paletteOffset = 0;
     oamSetup.priority = 3;
     oamSetup.bgPriority = 1;
     oamSetup.surface = letter->bgPriority;
     oamSetup.vramType = 0;
     wk->oamActor = BmpOam_ActorAdd(setup->bmpOam, &oamSetup);
     BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
-    wk->palette = func_0204bbb8(letter->arc, 26, 0, 96, 0, 1, letter->heapId);
-    wk->chars = func_0204b81c(letter->arc, 25, 0, 0, letter->heapId);
-    wk->cellAnims = func_0204bde0(letter->arc, 24, 23, letter->heapId);
+    wk->palette = ClActSys_LoadPlttRange(letter->arc, 26, 0, 96, 0, 1, letter->heapId);
+    wk->chars = ClActSys_LoadChars(letter->arc, 25, 0, 0, letter->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(letter->arc, 24, 23, letter->heapId);
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
-        wk->actor = func_0204c040(letter->unit, wk->chars, wk->palette, wk->cellAnims, &setup, 0, letter->heapId);
+        wk->actor = ClActor_Create(letter->unit, wk->chars, wk->palette, wk->cellAnims, &setup, 0, letter->heapId);
     }
-    func_0204c124(wk->actor, FALSE);
-    func_0204c468(wk->actor, 1);
-    func_0204c438(wk->actor, 3);
+    ClActor_SetVisible(wk->actor, FALSE);
+    ClActor_SetBgPriority(wk->actor, 1);
+    ClActor_SetPriority(wk->actor, 3);
 }
 
 static void func_ov036_021b6a3c(PlaceNameLetter *letter, void *work) {
     LetterA *wk = work;
 
     if (wk->actor != NULL) {
-        func_0204c108(wk->actor);
+        ClActor_Delete(wk->actor);
         wk->actor = NULL;
     }
-    func_0204bcd0(wk->palette);
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActSys_FreePltt(wk->palette);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
     if (wk->oamActor != NULL) {
         BmpOam_ActorDel(wk->oamActor);
         wk->oamActor = NULL;
@@ -267,9 +279,9 @@ static void func_ov036_021b6a3c(PlaceNameLetter *letter, void *work) {
     }
 }
 
-static void func_ov036_021b6a94(PlaceNameLetter *letter, void *work, void *arg) {
+static void func_ov036_021b6a94(PlaceNameLetter *letter, void *work, const void *arg) {
     LetterA *wk = work;
-    PlaceNameTextParam *text = arg;
+    const PlaceNameTextParam *text = arg;
 
     wk->text = *text;
     func_ov036_021b692c(letter, 4);
@@ -300,12 +312,12 @@ static u32 func_ov036_021b6adc(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
         if (getGameVersion() == 0x16) {
             color = 0x3c40;
         }
-        func_02021c7c(wk->queue, wk->bitmap, 0, 0, wk->text.name, wk->text.font, color);
+        PrintQueue_PrintColor(wk->queue, wk->bitmap, 0, 0, wk->text.name, wk->text.font, color);
         (*step)++;
         break;
     }
     case 2:
-        if (!func_02021c1c(wk->queue, wk->bitmap)) {
+        if (!PrintQueue_IsBitmapPending(wk->queue, wk->bitmap)) {
             BmpOam_ActorBmpTrans(wk->oamActor);
             (*step)++;
         }
@@ -316,7 +328,7 @@ static u32 func_ov036_021b6adc(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
     case 4: {
         NNSG2dCharacterData *character;
         void *file = GFL_G2DIOReadOBJNCGRArc(letter->arc, wk->iconId + 2, FALSE, &character, letter->heapId);
-        func_0204ba40(wk->chars, character);
+        ClActSys_ReplaceCharData(wk->chars, character);
         GFL_HeapFree(file);
         (*step)++;
         break;
@@ -335,13 +347,17 @@ static void func_ov036_021b70bc(Mover *mover, const MoveSpec *spec);
 static void func_ov036_021b70e8(Mover *mover);
 static BOOL func_ov036_021b712c(Mover *mover);
 static void func_ov036_021b7140(Mover *mover, ClActorPos *pos);
-static void func_ov036_021b6d50(PlaceNameLetter *letter, LetterA *wk, ClActorPos *pos);
-static void func_ov036_021b704c(PlaceNameLetter *letter, LetterB *wk, ClActorPos *pos);
+static void func_ov036_021b6d50(PlaceNameLetter *letter, LetterA *wk, const ClActorPos *pos);
+static void func_ov036_021b704c(PlaceNameLetter *letter, LetterB *wk, const ClActorPos *pos);
 
 static u32 func_ov036_021b6b9c(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
+    // The slide in as a plain move, on the path of PLACE_NAME_LETTER_TEXT_ANIM_IN's. Nothing reads it, so which
+    // function held it is a guess, one that gives the original's .rodata
+    static const MoveSpec sMoveIn = { { { 0, -0x20 }, { 0, 0 } }, 0, 0 };
+
     switch (*step) {
     case 0: {
-        AnimSpec spec = { { 0, -0x20, 0, 0 }, 0, 0x7fff, 0, -3, 1, 0, 0, 0, 0, 0 };
+        AnimSpec spec = PLACE_NAME_LETTER_TEXT_ANIM_IN;
 
         spec.moveStart = letter->param0;
         spec.moveFrames = (s16)(letter->param1 * 0.6f);
@@ -349,8 +365,8 @@ static u32 func_ov036_021b6b9c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
         spec.swingFrames = (s16)(letter->param1 * 0.4f);
         func_ov036_021b7224(&wk->anim, &spec);
         BmpOam_ActorSetDrawEnable(wk->oamActor, TRUE);
-        func_0204c124(letter->actor, TRUE);
-        func_0204c124(wk->actor, TRUE);
+        ClActor_SetVisible(letter->actor, TRUE);
+        ClActor_SetVisible(wk->actor, TRUE);
         (*step)++;
         break;
     }
@@ -371,10 +387,10 @@ static u32 func_ov036_021b6b9c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
 static u32 func_ov036_021b6c7c(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
     switch (*step) {
     case 0: {
-        MoveSpec spec = { { 0, 0, 0, -0x40 }, 0, 0 };
+        MoveSpec spec = PLACE_NAME_LETTER_TEXT_MOVE_OUT;
 
-        spec.path.x0 = wk->pos.x;
-        spec.path.y0 = wk->pos.y;
+        spec.path.start.x = wk->pos.x;
+        spec.path.start.y = wk->pos.y;
         spec.startFrame = letter->param0;
         spec.frames = letter->param1;
         func_ov036_021b70bc(&wk->mover, &spec);
@@ -384,8 +400,8 @@ static u32 func_ov036_021b6c7c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
     case 1:
         func_ov036_021b70e8(&wk->mover);
         if (func_ov036_021b712c(&wk->mover)) {
-            func_0204c124(letter->actor, FALSE);
-            func_0204c124(wk->actor, FALSE);
+            ClActor_SetVisible(letter->actor, FALSE);
+            ClActor_SetVisible(wk->actor, FALSE);
             BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
             (*step)++;
         }
@@ -399,13 +415,13 @@ static u32 func_ov036_021b6c7c(PlaceNameLetter *letter, LetterA *wk, s32 *step) 
 }
 
 static u32 func_ov036_021b6d2c(PlaceNameLetter *letter, LetterA *wk, s32 *step) {
-    func_0204c124(letter->actor, FALSE);
-    func_0204c124(wk->actor, FALSE);
+    ClActor_SetVisible(letter->actor, FALSE);
+    ClActor_SetVisible(wk->actor, FALSE);
     BmpOam_ActorSetDrawEnable(wk->oamActor, FALSE);
     return FALSE;
 }
 
-static void func_ov036_021b6d50(PlaceNameLetter *letter, LetterA *wk, ClActorPos *pos) {
+static void func_ov036_021b6d50(PlaceNameLetter *letter, LetterA *wk, const ClActorPos *pos) {
     ClActorPos letterPos;
     ClActorPos oamPos;
     ClActorPos actorPos;
@@ -414,42 +430,42 @@ static void func_ov036_021b6d50(PlaceNameLetter *letter, LetterA *wk, ClActorPos
     actorPos = PLACE_NAME_LETTER_POSITIONS[0];
     letterPos.x += pos->x;
     letterPos.y += pos->y;
-    func_0204c140(letter->actor, &letterPos, letter->bgPriority);
+    ClActor_SetSurfacePos(letter->actor, &letterPos, letter->bgPriority);
     actorPos.x += pos->x;
     actorPos.y += pos->y;
-    func_0204c140(wk->actor, &actorPos, letter->bgPriority);
+    ClActor_SetSurfacePos(wk->actor, &actorPos, letter->bgPriority);
     oamPos.x += pos->x;
     oamPos.y += pos->y;
     BmpOam_ActorSetPos(wk->oamActor, oamPos.x, oamPos.y);
 }
 
-static void func_ov036_021b6dec(PlaceNameLetter *letter, void *work, void *arg) {
+static void func_ov036_021b6dec(PlaceNameLetter *letter, void *work, const void *arg) {
     LetterB *wk = work;
-    PlaceNameFrameSetup *frame = arg;
+    const PlaceNameFrameSetup *frame = arg;
 
-    func_0204c488(letter->actor, 1);
+    ClActor_SetSequence(letter->actor, 1);
     {
         ClActorSetup setup = { 0, 0, 0, 0, 0 };
         wk->actor =
-            func_0204c040(letter->unit, frame->chars, frame->palette, frame->cellAnims, &setup, 0, letter->heapId);
+            ClActor_Create(letter->unit, frame->chars, frame->palette, frame->cellAnims, &setup, 0, letter->heapId);
     }
-    func_0204c124(wk->actor, FALSE);
-    func_0204c468(wk->actor, 1);
-    func_0204c438(wk->actor, 3);
+    ClActor_SetVisible(wk->actor, FALSE);
+    ClActor_SetBgPriority(wk->actor, 1);
+    ClActor_SetPriority(wk->actor, 3);
 }
 
 static void func_ov036_021b6e44(PlaceNameLetter *letter, void *work) {
     LetterB *wk = work;
 
     if (wk->actor != NULL) {
-        func_0204c108(wk->actor);
+        ClActor_Delete(wk->actor);
         wk->actor = NULL;
     }
 }
 
-static void func_ov036_021b6e60(PlaceNameLetter *letter, void *work, void *arg) {
+static void func_ov036_021b6e60(PlaceNameLetter *letter, void *work, const void *arg) {
     LetterB *wk = work;
-    u32 *season = arg;
+    const u32 *season = arg;
 
     wk->iconId = *season;
     func_ov036_021b692c(letter, 4);
@@ -469,22 +485,25 @@ static u32 func_ov036_021b6e70(PlaceNameLetter *letter, void *work) {
 }
 
 static u32 func_ov036_021b6ea0(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
-    func_0204c488(wk->actor, (u16)(wk->iconId + 2));
+    ClActor_SetSequence(wk->actor, (u16)(wk->iconId + 2));
     return FALSE;
 }
 
 static u32 func_ov036_021b6eb8(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
+    // The slide in as a plain move, on the path of PLACE_NAME_LETTER_FRAME_ANIM_IN's. Nothing reads it either
+    static const MoveSpec sMoveIn = { { { 0, 0x20 }, { 0, 0 } }, 0, 0 };
+
     switch (*step) {
     case 0: {
-        AnimSpec spec = { { 0, 0x20, 0, 0 }, 0, 0x7fff, 0, 3, 1, 0, 0, 0, 0, 0 };
+        AnimSpec spec = PLACE_NAME_LETTER_FRAME_ANIM_IN;
 
         spec.moveStart = letter->param0;
         spec.moveFrames = (s16)(letter->param1 * 0.6f);
         spec.swingStart = letter->param0 >= spec.moveFrames ? letter->param0 - spec.moveFrames : letter->param0;
         spec.swingFrames = (s16)(letter->param1 * 0.4f);
         func_ov036_021b7224(&wk->anim, &spec);
-        func_0204c124(letter->actor, TRUE);
-        func_0204c124(wk->actor, TRUE);
+        ClActor_SetVisible(letter->actor, TRUE);
+        ClActor_SetVisible(wk->actor, TRUE);
         (*step)++;
         break;
     }
@@ -505,10 +524,10 @@ static u32 func_ov036_021b6eb8(PlaceNameLetter *letter, LetterB *wk, s32 *step) 
 static u32 func_ov036_021b6f88(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
     switch (*step) {
     case 0: {
-        MoveSpec spec = { { 0, 0, 0, 0x20 }, 0, 0 };
+        MoveSpec spec = PLACE_NAME_LETTER_FRAME_MOVE_OUT;
 
-        spec.path.x0 = wk->pos.x;
-        spec.path.y0 = wk->pos.y;
+        spec.path.start.x = wk->pos.x;
+        spec.path.start.y = wk->pos.y;
         spec.startFrame = letter->param0;
         spec.frames = letter->param1;
         func_ov036_021b70bc(&wk->mover, &spec);
@@ -518,8 +537,8 @@ static u32 func_ov036_021b6f88(PlaceNameLetter *letter, LetterB *wk, s32 *step) 
     case 1:
         func_ov036_021b70e8(&wk->mover);
         if (func_ov036_021b712c(&wk->mover)) {
-            func_0204c124(letter->actor, FALSE);
-            func_0204c124(wk->actor, FALSE);
+            ClActor_SetVisible(letter->actor, FALSE);
+            ClActor_SetVisible(wk->actor, FALSE);
             (*step)++;
         }
         break;
@@ -532,12 +551,12 @@ static u32 func_ov036_021b6f88(PlaceNameLetter *letter, LetterB *wk, s32 *step) 
 }
 
 static u32 func_ov036_021b7030(PlaceNameLetter *letter, LetterB *wk, s32 *step) {
-    func_0204c124(letter->actor, FALSE);
-    func_0204c124(wk->actor, FALSE);
+    ClActor_SetVisible(letter->actor, FALSE);
+    ClActor_SetVisible(wk->actor, FALSE);
     return FALSE;
 }
 
-static void func_ov036_021b704c(PlaceNameLetter *letter, LetterB *wk, ClActorPos *pos) {
+static void func_ov036_021b704c(PlaceNameLetter *letter, LetterB *wk, const ClActorPos *pos) {
     ClActorPos letterPos;
     ClActorPos actorPos;
 
@@ -545,17 +564,17 @@ static void func_ov036_021b704c(PlaceNameLetter *letter, LetterB *wk, ClActorPos
     actorPos = PLACE_NAME_LETTER_POSITIONS[3];
     letterPos.x += pos->x;
     letterPos.y += pos->y;
-    func_0204c140(letter->actor, &letterPos, letter->bgPriority);
+    ClActor_SetSurfacePos(letter->actor, &letterPos, letter->bgPriority);
     actorPos.x += pos->x;
     actorPos.y += pos->y;
-    func_0204c140(wk->actor, &actorPos, letter->bgPriority);
+    ClActor_SetSurfacePos(wk->actor, &actorPos, letter->bgPriority);
 }
 
 static void func_ov036_021b70bc(Mover *mover, const MoveSpec *spec) {
     MI_CpuFill8(mover, 0, sizeof(Mover));
     mover->frame = spec->startFrame;
-    mover->x = spec->path.x0;
-    mover->y = spec->path.y0;
+    mover->x = spec->path.start.x;
+    mover->y = spec->path.start.y;
     mover->spec = *spec;
 }
 
@@ -563,16 +582,16 @@ static void func_ov036_021b70e8(Mover *mover) {
     s32 frame = mover->frame++;
 
     if (frame < mover->spec.frames) {
-        s32 x0 = mover->spec.path.x0;
+        s32 x0 = mover->spec.path.start.x;
         s32 y0;
 
-        mover->x = x0 + (mover->spec.path.x1 - x0) * mover->frame / mover->spec.frames;
-        y0 = mover->spec.path.y0;
-        mover->y = y0 + (mover->spec.path.y1 - y0) * mover->frame / mover->spec.frames;
+        mover->x = x0 + (mover->spec.path.end.x - x0) * mover->frame / mover->spec.frames;
+        y0 = mover->spec.path.start.y;
+        mover->y = y0 + (mover->spec.path.end.y - y0) * mover->frame / mover->spec.frames;
         return;
     }
-    mover->x = mover->spec.path.x1;
-    mover->y = mover->spec.path.y1;
+    mover->x = mover->spec.path.end.x;
+    mover->y = mover->spec.path.end.y;
 }
 
 static BOOL func_ov036_021b712c(Mover *mover) {
@@ -624,11 +643,9 @@ static BOOL func_ov036_021b71e8(Swing *swing) {
     return FALSE;
 }
 
-static void func_ov036_021b71f8(Swing *swing, ClActorPos *pos) {
-    s32 sin = swing->sin;
-
-    pos->x = swing->spec.baseX + (swing->spec.ampX * sin >> 12);
-    pos->y = swing->spec.baseY + (swing->spec.ampY * sin >> 12);
+static void func_ov036_021b71f8(const Swing *swing, ClActorPos *pos) {
+    pos->x = swing->spec.baseX + (swing->spec.ampX * swing->sin >> 12);
+    pos->y = swing->spec.baseY + (swing->spec.ampY * swing->sin >> 12);
 }
 
 static void func_ov036_021b7224(Anim *anim, const AnimSpec *spec) {
@@ -638,10 +655,8 @@ static void func_ov036_021b7224(Anim *anim, const AnimSpec *spec) {
     anim->done = 0;
     anim->spec = *spec;
     MI_CpuFill8(&move, 0, sizeof(MoveSpec));
-    move.path.x0 = anim->spec.path.x0;
-    move.path.y0 = anim->spec.path.y0;
-    move.path.x1 = anim->spec.path.x1;
-    move.path.y1 = anim->spec.path.y1;
+    move.path.start = anim->spec.path.start;
+    move.path.end = anim->spec.path.end;
     move.startFrame = anim->spec.moveStart;
     move.frames = anim->spec.moveFrames;
     func_ov036_021b70bc(&anim->mover, &move);
@@ -659,8 +674,8 @@ static void func_ov036_021b7280(Anim *anim) {
             swing.endAngle = anim->spec.endAngle;
             swing.startFrame = anim->spec.swingStart;
             swing.frames = anim->spec.swingFrames;
-            swing.baseX = anim->spec.path.x1;
-            swing.baseY = anim->spec.path.y1;
+            swing.baseX = anim->spec.path.end.x;
+            swing.baseY = anim->spec.path.end.y;
             swing.ampX = anim->spec.ampX;
             swing.ampY = anim->spec.ampY;
             swing.direction = anim->spec.direction;

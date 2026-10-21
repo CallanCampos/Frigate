@@ -294,11 +294,11 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         }
         break;
     case 3:
-        func_02040624(func_02040440(), 9, 0x14);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 9, 0x14);
         (*step)++;
         break;
     case 4:
-        if (func_02040664(func_02040440(), 9, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 9, 0x14) == TRUE) {
             *step = 7;
         }
         break;
@@ -308,7 +308,7 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         }
         break;
     case 6:
-        if (func_ov069_0217cd64(unisys->alloc.uniapp) == TRUE) {
+        if (UnionApp_IsTurnReceived(unisys->alloc.uniapp) == TRUE) {
             *step = 7;
         }
         break;
@@ -342,18 +342,18 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
             }
         } else {
             UnionComm_SetCommandBase(self->activity);
-            func_02040624(func_02040440(), 10, 0x14);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 10, 0x14);
             *step = 12;
         }
         break;
     case 12:
-        if (func_02040664(func_02040440(), 10, 0x14) == TRUE) {
-            func_02042a9c(func_02040440(), TRUE);
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 10, 0x14) == TRUE) {
+            GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
             *step = 13;
         }
         break;
     case 13:
-        func_02042e9c(FALSE);
+        GFL_NetSetDisconnectError(FALSE);
         if (self->activity == 3) {
             param = subproc->arg;
             param->app = unisys->alloc.uniapp;
@@ -372,9 +372,9 @@ static BOOL UnionCommand_App(GameSystem *gsys, UnionSystem *unisys, Field *field
         if (self->activity == 0x19) {
             param = subproc->arg;
             if (param->unk14 == 1) {
-                func_02005e08((u16)GetMapBGMIDByPlayerState2(unisys->param->gameData, ZONE_UNION_ROOM,
-                                                             GameData_GetSeason(unisys->param->gameData)),
-                              0xffff, 6, 0x3c);
+                GFL_SndBGMRequestChange((u16)GetMapBGMIDByPlayerState2(unisys->param->gameData, ZONE_UNION_ROOM,
+                                                                       GameData_GetSeason(unisys->param->gameData)),
+                                        0xffff, 6, 0x3c);
                 *step = 15;
             } else {
                 *step = 16;
@@ -419,7 +419,7 @@ static BOOL UnionCommand_WarpA(GameSystem *gsys, UnionSystem *unisys, Field *fie
     VecFx32 pos;
 
     if (*step == 0) {
-        pos.x = (func_02042a6c(func_02040440()) * 16 + 88) << FX32_SHIFT;
+        pos.x = (GFL_NetGetHandleNetId(NetHandle_GetOwn()) * 16 + 88) << FX32_SHIFT;
         pos.y = 0;
         pos.z = FX32_CONST(152);
         *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_UNION_ROOM_COLOSSEUM, &pos, 0, FALSE);
@@ -435,7 +435,7 @@ static BOOL UnionCommand_WarpB(GameSystem *gsys, UnionSystem *unisys, Field *fie
     VecFx32 pos;
 
     if (*step == 0) {
-        pos.x = (func_02042a6c(func_02040440()) * 16 + 88) << FX32_SHIFT;
+        pos.x = (GFL_NetGetHandleNetId(NetHandle_GetOwn()) * 16 + 88) << FX32_SHIFT;
         pos.y = 0;
         pos.z = FX32_CONST(152);
         *next = EventMapChangeWarp_CreateGrid(gsys, field, ZONE_UNION_ROOM_COLOSSEUM_2, &pos, 0, FALSE);
@@ -469,7 +469,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     UnionSelf *self = &unisys->situ;
     PStatusParam *status = &param->status;
     ColosseumBattleParam *battle = param->battle;
-    u32 selfId = func_02042a6c(func_02040440());
+    u32 selfId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     PokeParty *tmpParty;
     PokeParty *party;
     GameEvent *chain;
@@ -480,7 +480,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
     int i;
 
     if (*step > 2 && *step < 7) {
-        func_ov164_021998d4((NetSyncWork *)param);
+        NetSync_Update((NetSyncWork *)param);
     }
     switch (*step) {
     case 0:
@@ -495,7 +495,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         break;
     case 2:
         GFL_OvlLoad(OVERLAY_ID(164));
-        func_ov164_021998c0((NetSyncWork *)param);
+        NetSync_Init((NetSyncWork *)param);
         (*step)++;
         break;
     case 3:
@@ -533,7 +533,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
         *step = 3;
         break;
     case 7:
-        func_ov164_021998c8((NetSyncWork *)param);
+        NetSync_Exit((NetSyncWork *)param);
         GFL_OvlUnload(OVERLAY_ID(164));
         *step = 8;
         break;
@@ -555,8 +555,8 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             PokeParty_AddPkm(party, PokeParty_GetPkm(tmpParty, param->list.picked[i] - 1));
         }
         GFL_HeapFree(tmpParty);
-        func_ov028_02172b4c(colosseum, TRUE);
-        func_02040624(func_02040440(), 22, 0x14);
+        Colosseum_ClearParties(colosseum, TRUE);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 22, 0x14);
         (*step)++;
         break;
     case 9:
@@ -564,7 +564,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             *step = 17;
             break;
         }
-        if (func_02040664(func_02040440(), 22, 0x14) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 22, 0x14) == TRUE) {
             (*step)++;
         }
         break;
@@ -582,7 +582,7 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             *step = 17;
             break;
         }
-        if (func_ov028_02172b20(colosseum) == TRUE) {
+        if (Colosseum_AreAllPartiesReceived(colosseum) == TRUE) {
             (*step)++;
         }
         break;
@@ -596,39 +596,39 @@ static BOOL UnionCommand_Colosseum(GameSystem *gsys, UnionSystem *unisys, Field 
             battle->bgm = 0x48a;
         }
         Colosseum_BuildBattlePlayers(colosseum, gsys, &battle->players, 0x41);
-        *next = func_ov012_02152704(gsys, field, self->activity, battle);
+        *next = EventColosseumBattle_Create(gsys, field, self->activity, battle);
         (*step)++;
         break;
     case 13:
         if (!GFL_NetErrCheck()) {
             wifiList = GameData_GetWifiList(GSYS_GetGameData(gsys));
-            count = func_02042a78();
+            count = GFL_NetGetNegotiatedCount();
             isRedTeam = colosseum->unk16C[selfId] & 1;
             for (i = 0; i < count; i++) {
                 if (i == selfId) {
                     continue;
                 }
-                if (func_0200a438(wifiList, &colosseum->members[i].info, &friendIndex) != TRUE) {
+                if (WifiList_FindFriendByPlayerInfo(wifiList, &colosseum->members[i].info, &friendIndex) != TRUE) {
                     continue;
                 }
                 if (isRedTeam == (colosseum->unk16C[i] & 1)) {
-                    func_0200a29c(wifiList, friendIndex);
+                    WifiList_SetFriendLastDateToNow(wifiList, friendIndex);
                 } else {
                     switch (battle->players.battle.result) {
                     case 0:
-                        func_0200a2d4(wifiList, friendIndex, 1, 0, 0);
+                        WifiList_AddFriendRecord(wifiList, friendIndex, 1, 0, 0);
                         break;
                     case 1:
-                        func_0200a2d4(wifiList, friendIndex, 0, 1, 0);
+                        WifiList_AddFriendRecord(wifiList, friendIndex, 0, 1, 0);
                         break;
                     case 2:
-                        func_0200a29c(wifiList, friendIndex);
+                        WifiList_SetFriendLastDateToNow(wifiList, friendIndex);
                         break;
                     }
                 }
             }
         }
-        func_ov028_02172c60(&battle->players);
+        Colosseum_ClearPlayers(&battle->players);
         *step = 16;
         break;
     case 14:
@@ -655,7 +655,7 @@ static BOOL Colosseum_CommandBattle(GameSystem *gsys, UnionSystem *unisys, Field
     UnionSelf *self = &unisys->situ;
 
     if (*step == 0) {
-        *next = func_ov012_02152704(gsys, field, self->activity, param);
+        *next = EventColosseumBattle_Create(gsys, field, self->activity, param);
     } else {
         return TRUE;
     }

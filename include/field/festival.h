@@ -58,14 +58,16 @@ struct LinkFestival {
     u8 recordCount;
     // Where the next seen mission goes in records
     u8 recordIndex;
-    // The frames between two calls of func_0202d5cc, and those left until the next
+    // The frames between two calls of GameBeaconSys_SendMission, and those left until the next
     u16 beaconInterval;
     u16 beaconTimer;
-    u16 unk10;
-    u16 unk12;
-    u16 unk14;
+    // The total and the player's score that the field's mission panel shows, and the seconds gained that it has not
+    // shown yet
+    u16 shownTotal;
+    u16 shownScore;
+    u16 secondsGained;
     u16 zoneId;
-    // The total that unk14 was last raised for
+    // The total that secondsGained was last raised for
     u16 lastTotal;
     ArcTool *archive;
     // File 0 of the archive: every mission's FestMissionHeader (field/fest_mission_data.h)
@@ -73,21 +75,22 @@ struct LinkFestival {
     FestMissionConfig config;
     // The two parts of config
     FestMissionInfo *info;
-    void *unk54;
+    // The FestMissionHeader at the start of config
+    void *missionHeader;
     FestMissionRecord records[LINK_FESTIVAL_RECORD_COUNT];
     // The current mission
     FestMissionRecord current;
     LinkFestivalBest *best;
-    // A second log, which func_02014708 gives
-    FestMissionLog unk37C;
+    // The log that the mission viewer lists, which it moves the entries of log into
+    FestMissionLog viewLog;
     FestMissionLog log;
     FestMissionPassPowers passPowers;
     FestMissionOffers offers;
-    // What func_02014864 (field/rival_select.h) gives
+    // What LinkFestival_GetEntries (field/rival_select.h) gives
     RivalEntry entries[224];
 };
 
-// A mission taken from a beacon (func_02014c78, FestMissionConfig_FromBeacon, func_02014c94)
+// A mission taken from a beacon (FestMissionEntry_Clear, FestMissionConfig_FromBeacon, LinkFestival_UpdateMember)
 struct FestMissionEntry {
     FestMissionConfig config;
     // The sender, as a member
@@ -114,59 +117,59 @@ u32 LinkFestival_GetNormalChangeBGMID(LinkFestival *festival);
 void *GetFestMissionCfg(LinkFestival *festival);
 // Overlay 12's fest_mission_field.c: the zone a mission uses in place of a zone, a random state seeded for the
 // mission, a random number below max that the list doesn't have, and the mission's work on entering a zone
-u16 func_ov012_02168320(u16 zoneId);
-void func_ov012_02168348(u32 seed, int skip, MATHRandContext32 *rand);
-u32 func_ov012_021683a8(MATHRandContext32 *rand, u32 max, const u32 *list, int count);
+u16 FestMission_GetMissionZone(u16 zoneId);
+void FestMission_InitRand(u32 seed, int skip, MATHRandContext32 *rand);
+u32 FestMission_RandExcluding(MATHRandContext32 *rand, u32 max, const u32 *list, int count);
 LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys);
 void FreeLinkFestival(LinkFestival *festival);
 void LinkFestival_Update(LinkFestival *festival);
 // Copies the current mission's beacon data to mission, with value
-void func_02014594(LinkFestival *festival, void *mission, u16 value);
+void LinkFestival_FillMissionInfo(LinkFestival *festival, void *mission, u16 value);
 // The player's score in the mission
-u16 func_020145d8(LinkFestival *festival);
+u16 LinkFestival_GetScore(LinkFestival *festival);
 // The mission's seconds left
-u16 func_020145dc(LinkFestival *festival);
+u16 LinkFestival_GetSecondsLeft(LinkFestival *festival);
 void LinkFestival_GetRanking(LinkFestival *festival, LinkFestivalRanking *ranking);
-void *func_020146fc(LinkFestival *festival);
-void *func_02014708(LinkFestival *festival);
-void *func_02014710(LinkFestival *festival);
+void *LinkFestival_GetLog(LinkFestival *festival);
+void *LinkFestival_GetViewLog(LinkFestival *festival);
+void *LinkFestival_GetPassPowers(LinkFestival *festival);
 // Copies a mission's FestMissionHeader to dest
 void FetchFestMissionCfgGimmickID(LinkFestival *festival, u8 index, FestMissionHeader *dest);
-void func_0201472c(LinkFestival *festival, void *mission, u8 joined);
+void LinkFestival_StartMission(LinkFestival *festival, void *mission, u8 joined);
 void LinkFestival_SetState(LinkFestival *festival, u32 state);
 int LinkFestival_GetState(LinkFestival *festival);
-u16 func_02014828(LinkFestival *festival);
-u16 func_0201482c(LinkFestival *festival);
-void func_02014830(LinkFestival *festival, u16 value);
-u16 func_02014838(LinkFestival *festival);
-void func_0201483c(LinkFestival *festival);
-BOOL func_02014844(LinkFestival *festival, u16 zoneId);
+u16 LinkFestival_GetShownTotal(LinkFestival *festival);
+u16 LinkFestival_GetShownScore(LinkFestival *festival);
+void LinkFestival_SetShownTotal(LinkFestival *festival, u16 value);
+u16 LinkFestival_GetSecondsGained(LinkFestival *festival);
+void LinkFestival_ClearSecondsGained(LinkFestival *festival);
+BOOL LinkFestival_IsNewZoneFromOutside(LinkFestival *festival, u16 zoneId);
 // Whether the festival's total has reached what the mission wants; total gets it
-BOOL func_020148a8(LinkFestival *festival, u32 *total);
+BOOL LinkFestival_IsTargetReached(LinkFestival *festival, u32 *total);
 // Ends the mission when it is cleared or out of time, and says whether it did
-BOOL func_020148cc(LinkFestival *festival);
-u32 func_02014920(GameSystem *gsys, u32 a1, u32 a2);
+BOOL LinkFestival_IsMissionOver(LinkFestival *festival);
+u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 a1, u32 a2);
 // The players in the mission, or 0 without one
-int func_0201494c(LinkFestival *festival);
+int LinkFestival_GetMemberCount(LinkFestival *festival);
 // Remembers a mission seen while none is on
-void func_02014964(LinkFestival *festival, void *mission);
+void LinkFestival_AddRecord(LinkFestival *festival, void *mission);
 // Whether a mission of a beacon is not to be offered
-BOOL func_020149b0(LinkFestival *festival, FestMissionConfig *config);
+BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config);
 // A score for best: the player's own when name is NULL
-void func_02014a00(LinkFestival *festival, u16 trainerId, u16 value, StrBuf *name);
-BOOL func_02014a4c(LinkFestival *festival);
-BOOL func_02014a54(LinkFestival *festival);
-void func_02014a78(LinkFestival *festival, LinkFestivalBest *dest);
+void LinkFestival_UpdateBest(LinkFestival *festival, u16 trainerId, u16 value, StrBuf *name);
+BOOL LinkFestival_IsBestChanged(LinkFestival *festival);
+BOOL LinkFestival_IsBestMine(LinkFestival *festival);
+void LinkFestival_GetBest(LinkFestival *festival, LinkFestivalBest *dest);
 LinkFestivalBest *LinkFestivalBest_Create(HeapID heapId);
 void LinkFestivalBest_Free(LinkFestivalBest *best);
-void func_02014c78(FestMissionEntry *entry);
-int func_02014c94(LinkFestival *festival, FestMissionEntry *entry, u32 *out);
-void func_02014774(LinkFestival *festival, u32 arg1);
+void FestMissionEntry_Clear(FestMissionEntry *entry);
+int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u32 *out);
+void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1);
 u32 GetTrainerCardTextMSGID(u32 type);
-void *func_ov036_021b5b7c(GameSystem *gsys, HeapID heapId);
-void func_ov036_021b5bfc(void *work);
-void func_ov036_021b5c28(void *work);
-void func_ov036_021b5c78(void *work);
+void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
+void FieldFMissionInfo_Free(void *work);
+void FieldFMissionInfo_Update(void *work);
+void FieldFMissionInfo_UpdateDisplay(void *work);
 void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId);
 void FesGimmick_Free(void *gimmick);
 void FesGimmick_BindActorSystem(void *gimmick, MMSys *actorSystem);

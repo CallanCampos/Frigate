@@ -352,7 +352,7 @@ void ResearchTop_Main(ResearchTop *wk) {
         ResearchTop_CheckNewResult(wk);
         ResearchTop_UpdatePaletteAnimes(wk);
         ResearchCommon_UpdatePaletteAnime(wk->common);
-        func_0204b794();
+        ClActSys_Draw();
     }
     ResearchTop_CountFrame(wk);
     ResearchTop_UpdateSeq(wk);
@@ -409,8 +409,8 @@ static void ResearchTop_SeqSetup(ResearchTop *wk) {
 
 static void ResearchTop_SeqTouch(ResearchTop *wk) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 button = func_0203da0c(wk->buttonRects);
-    s32 commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    s32 button = GFL_HIDGetTouchPressedRect(wk->buttonRects);
+    s32 commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
 
     if (ResearchTop_IsForceExit(wk) || commonButton == RESEARCH_COMMON_BUTTON_RETURN) {
         ResearchTop_SetTouchMode(wk, TRUE);
@@ -477,8 +477,8 @@ static void ResearchTop_SeqTouch(ResearchTop *wk) {
 
 static void ResearchTop_SeqCursor(ResearchTop *wk) {
     u32 keys = GCTX_HIDGetPressedKeys();
-    s32 button = func_0203da0c(wk->buttonRects);
-    s32 commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    s32 button = GFL_HIDGetTouchPressedRect(wk->buttonRects);
+    s32 commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
 
     if (ResearchTop_IsForceExit(wk) || commonButton == RESEARCH_COMMON_BUTTON_RETURN) {
         ResearchTop_SetTouchMode(wk, TRUE);
@@ -755,10 +755,10 @@ static void ResearchTop_StartReturnAnime(ResearchTop *wk) {
 static void ResearchTop_ShowNewIcon(ResearchTop *wk) {
     ClActor *actor = ResearchTop_GetActor(wk, 0);
 
-    func_0204c124(actor, TRUE);
-    func_0204c520(actor, TRUE);
-    func_0204c53c(actor, FX32_ONE);
-    func_0204c4d4(actor, 0);
+    ClActor_SetVisible(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
+    ClActor_SetAutoAnimSpeed(actor, FX32_ONE);
+    ClActor_SetAnimTime(actor, 0);
 }
 
 static void ResearchTop_FadeIn(void) {
@@ -1126,9 +1126,9 @@ static void ResearchTop_ClearObjRes(ResearchTop *wk) {
 static void ResearchTop_LoadSubObjRes(ResearchTop *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, heapId);
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
-    u32 palette = func_0204bba0(handle, 16, CLACT_VRAM_SUB, 0, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
+    u32 palette = ClActSys_LoadPltt(handle, 16, CLACT_VRAM_SUB, 0, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
 
     wk->objRes[OBJ_RES_SUB_CHARS] = chars;
     wk->objRes[OBJ_RES_SUB_PALETTE] = palette;
@@ -1137,17 +1137,17 @@ static void ResearchTop_LoadSubObjRes(ResearchTop *wk) {
 }
 
 static void ResearchTop_FreeSubObjRes(ResearchTop *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_SUB_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_SUB_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_SUB_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_SUB_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
 }
 
 static void ResearchTop_LoadMainObjRes(ResearchTop *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, heapId);
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
-    u32 palette = func_0204bbb8(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 4, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
+    u32 palette = ClActSys_LoadPlttRange(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 4, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
 
     wk->objRes[OBJ_RES_MAIN_CHARS] = chars;
     wk->objRes[OBJ_RES_MAIN_PALETTE] = palette;
@@ -1156,9 +1156,9 @@ static void ResearchTop_LoadMainObjRes(ResearchTop *wk) {
 }
 
 static void ResearchTop_FreeMainObjRes(ResearchTop *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_MAIN_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_MAIN_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_MAIN_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_MAIN_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
 }
 
 static void ResearchTop_ClearUnits(ResearchTop *wk) {
@@ -1173,7 +1173,7 @@ static void ResearchTop_CreateUnits(ResearchTop *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        wk->units[i] = func_0204bf1c(sTopUnitCounts[i], sTopUnitPriorities[i], wk->heapId);
+        wk->units[i] = ClActUnit_Create(sTopUnitCounts[i], sTopUnitPriorities[i], wk->heapId);
     }
 }
 
@@ -1181,7 +1181,7 @@ static void ResearchTop_DeleteUnits(ResearchTop *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        func_0204bf98(wk->units[i]);
+        ClActUnit_Delete(wk->units[i]);
     }
 }
 
@@ -1209,13 +1209,13 @@ static void ResearchTop_CreateActors(ResearchTop *wk) {
         chars = ResearchTop_GetObjRes(wk, entry->chars);
         palette = ResearchTop_GetObjRes(wk, entry->palette);
         cellAnims = ResearchTop_GetObjRes(wk, entry->cellAnims);
-        wk->actors[i] = func_0204c040(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
-        func_0204c124(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
 }
 
 static void ResearchTop_DeleteActors(ResearchTop *wk) {
-    func_0204c108(wk->actors[0]);
+    ClActor_Delete(wk->actors[0]);
 }
 
 static void ResearchTop_ClearPaletteAnimes(ResearchTop *wk) {
@@ -1260,7 +1260,7 @@ static void ResearchTop_RestorePalettes(ResearchTop *wk) {
 }
 
 static void ResearchTop_VBlank(void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void ResearchTop_SetVBlank(ResearchTop *wk) {
@@ -1272,5 +1272,5 @@ static void ResearchTop_ResetVBlank(ResearchTop *wk) {
 }
 
 static void ResearchTop_ShowCommIcon(ResearchTop *wk) {
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }

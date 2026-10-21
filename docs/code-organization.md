@@ -23,18 +23,20 @@ every section.
   headers, `lib/<name>/src/` for the sources and private headers (`lib/spl/src/spl_internal.h`), and
   `lib/<name>/library.toml` for the library's compiler and flags, which `configure.py` and the probe read: `lib/spl/`
   (Nintendo's SPL particle library), `lib/dsprot/` (Nintendo's DS Protect, in overlays 165 and 337), `lib/nitro/`
-  (NitroSDK: in ARM9 main its card, cartridge, file system, graphics, memory, NVRAM, OS, PXI, RTC, sound, SPI
-  (microphone, power and touch panel), STD and wireless libraries, its fixed-point math and libmath, and libcrypto's
-  RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
+  (NitroSDK: in ARM9 main its startup code, its system call stubs, its card, cartridge, file system, graphics,
+  memory, NVRAM, OS, PXI, RTC, sound, SPI (microphone, power and touch panel), STD and wireless libraries, its
+  fixed-point math and libmath, and libcrypto's RC4; in overlay 181 the multiboot library), `lib/nnsys/` (NitroSystem: FND, G2D, G3D, GFD and sound), `lib/twl/`
   (TwlSDK's DSi libraries: SCFG and the DSi system calls in ARM9 main; in the LTD autoload the camera, the DSP, the
-  microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and the new DMA and
-  WRAM functions; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader, linked
-  into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
+  microphone, NWM, FATFS and the sound and RTC extensions, beside the DSi's photo signature code (names guessed), and
+  in `.ltdmain` the card's hashed ROM reads, the new DMA, the shared WRAM manager and the DSi parts of NitroSDK's card
+  ROM, OS and PM files; and in `lib/twl/src/`, the SSP JPEG encoder and decoder with their EXIF writer and reader,
+  linked into overlay 257 and built as Thumb with the game's compiler, `-ipa file` and `-inline on,noauto`), `lib/dwc/`
   (Nintendo's Wi-Fi Connection library, TWL-DWC: its account, auto-connect, backup and WDS code in ARM9 main, ARM
   code; the rest in overlays 11, 29, 189 and 260, mostly Thumb), `lib/msl/` (Metrowerks' MSL C library for NITRO, the
   C library, fdlibm math and runtime that ARM9 main links after NitroSDK, ARM code built with `dsi/1.2`),
-  `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under DWC in overlay 11, Thumb with the game's
-  compiler), `lib/dpw/` (the Global Trade Station's and the Battle Subway's Wi-Fi library in overlay 189, ARM),
+  `lib/nitrowifi/` (NitroWiFi, the TCP/IP stack CPS and the socket layer under DWC in overlay 11, and WCM's DSi
+  backend in the LTD autoload's `.ltdmain`, Thumb with the game's compiler), `lib/dpw/` (the Global Trade Station's
+  and the Battle Subway's Wi-Fi library in overlay 189, ARM),
   `lib/poke_net/` (the Global Data Server client at the end of overlay 201, ARM), `lib/dwcutil/` (the DWC utility, the
   Wi-Fi Connection settings in overlay 182, built with MWCC 2.0), `lib/dwcutilui/` (that utility's main loop, screens,
   keyboards and selectable objects, and the helpers under them: resources, messages, heap, OAM, cells, fades, text,
@@ -47,7 +49,8 @@ every section.
   autoload's TwlSDK, ARM9 main's DWC and libVCT) in `file_flags`. NitroSystem's sources (`lib/nnsys/src/fnd`,
   `gfd`, ...) are Thumb built with CodeWarrior 2.0. A file built with other flags than the rest of its library is
   listed under `file_flags` in the `library.toml`, each flag replacing the library's flag of the same option
-  (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`). Library code uses the SDK's own names
+  (NitroSystem's sound capture takes `-ipa function`; see `docs/matching.md`), and one built with another compiler
+  under `file_compilers` (TwlSDK's `syscall_twl_ltd.c` takes `2.0/sp2`). Library code uses the SDK's own names
   (see [Names](#names)). The C library's headers are MSL's, in `include/` (`string.h`, `stdio.h`, `math.h` and the
   others, and `NMWException.h` for the runtime), and `lib/msl/src/` keeps MSL's private ones. A library whose ROM calls
   the string functions that MWCC builds in place from `<string.h>` declares them in its own header instead (`dwc/ext.h`,
@@ -66,6 +69,11 @@ every section.
   under `rom/` of the generated headers with its module and symbol, and `tools/build/rom_blob.py` writes it from the
   extracted module, with the symbol's address and size from `symbols.txt`. The bytes are never committed. Without a
   ROM, `compile_all.py` writes zeros of the same size.
+- The digests of the ARM9 overlays at the end of ARM9 main's `.data`, which NitroSDK's tools write after the link, are
+  computed instead: `tools/build/overlay_digests.py` takes the HMAC-SHA1 of each overlay of the version's base ROM, as
+  stored, and the masked one of its overlay table, into `rom/<version>/` of the generated headers, which
+  `lib/nitro/src/fs/fs_overlay_digest.c` includes for its version. They are what FS_StartOverlay checks when the game
+  isn't booted from the ROM.
 - `struct_decls.h` declares every struct type once, as `typedef struct Name Name;`. The header of the module that
   owns a struct defines its layout when that is known (`struct Name { ... };`, without another typedef), and other
   code only uses pointers to it. A struct that only one file uses, such as an event's work, is defined in that file.
@@ -86,6 +94,14 @@ every section.
   external data with `extern` there, and include the header at each use. Do not add `extern` declarations or
   prototypes of other files' functions in a `.c` file. A file includes its own header, so its definitions are checked
   against the declarations.
+- A function the build compiled into more than one file (`tools/decomp/find_duplicates.py` lists them) is written
+  once. Its body goes in the owner's header as a `static inline` named after the owner's function with an `Inline`
+  suffix, and the owner and each copy keep their own names and linkage (a `static` copy stays `static`) and are each
+  one call to it. The header gains the includes the body needs; `ninja` compiles every file that includes it. The
+  file's compiler has to inline the call: the game's `-inline on,noauto` and the 2.0 library default do, while
+  `-inline off` leaves a call. A copy that doesn't match this way is written out in its own file, with a comment
+  naming the function it copies. Only `identical` groups are shared: in a `same via duplicates` group each copy calls
+  its own duplicate, which one inline cannot, and a `same shape` group is not proven to be the same code.
 - Each proc that an event starts has a header in `app/` with its parameter struct, proc table and overlay ID, such as
   `app/worldtrade.h`. Each event has a header in `field/` with its create functions, such as
   `field/event_worldtrade.h`. A proc built from many files keeps their headers in a directory of `app/` named after

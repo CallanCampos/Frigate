@@ -11,8 +11,8 @@
 
 // Where the shortcut menu's list was left, which GameData_Create clears
 typedef struct {
-    u16 unk0;
-    u16 unk2;
+    u16 listTop;
+    u16 cursorRow;
 } ShortcutMenuPos;
 
 void ShortcutMenuPos_Init(ShortcutMenuPos *pos);

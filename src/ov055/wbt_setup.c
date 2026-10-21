@@ -1,6 +1,7 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "field/field_actor.h"
+#include "field/fldmmdl_drawdata.h"
 #include "field/wbt.h"
 #include "gfl/arc.h"
 #include "gfl/heap.h"
@@ -13,12 +14,12 @@
 
 static const u16 sScoreUnk[] = { 8, 13, 18, 23, 28 };
 
-static void func_ov055_021e695c(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant);
-static void func_ov055_021e69b0(WbtSystem *sys, WbtSetup *setup);
+static void WbtSetup_SetEntrant(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant);
+static void WbtSetup_SetMatches(WbtSystem *sys, WbtSetup *setup);
 static u8 func_ov055_021e6a14(u32 index);
-static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4);
+static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4);
 
-WbtSetup *func_ov055_021e67f4(HeapID heapId, GameSystem *gsys) {
+WbtSetup *WbtSetup_Create(HeapID heapId, GameSystem *gsys) {
     WbtSetup *setup = GFL_HeapAllocate(heapId, sizeof(WbtSetup), TRUE, "wbt_setup.c", 57);
     int i;
 
@@ -40,7 +41,7 @@ WbtSetup *func_ov055_021e67f4(HeapID heapId, GameSystem *gsys) {
     return setup;
 }
 
-void func_ov055_021e6870(WbtSetup *setup) {
+void WbtSetup_Free(WbtSetup *setup) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -51,19 +52,19 @@ void func_ov055_021e6870(WbtSetup *setup) {
     GFL_HeapFree(setup);
 }
 
-void func_ov055_021e68a8(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup) {
+void WbtSetup_Load(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup) {
     GameData *gameData = GSYS_GetGameData(gsys);
     MATHRandContext32 rand;
     int i;
     u32 round;
 
     for (i = 0; i < 8; i++) {
-        func_ov055_021e695c(HEAPID_FIELDMAP, gameData, &setup->entrants[i], func_ov055_021e5d20(sys, i));
+        WbtSetup_SetEntrant(HEAPID_FIELDMAP, gameData, &setup->entrants[i], WbtSystem_GetEntrant(sys, i));
     }
-    MATH_InitRand32(&rand, func_ov055_021e5cc8(sys));
-    func_ov055_021e62b0(sys, &rand);
-    func_ov055_021e69b0(sys, setup);
-    switch (func_ov055_021e5cc4(sys)) {
+    MATH_InitRand32(&rand, WbtSystem_GetSeed(sys));
+    WbtSystem_PlayFirstRounds(sys, &rand);
+    WbtSetup_SetMatches(sys, setup);
+    switch (WbtSystem_GetRound(sys)) {
     default:
     case 1:
         round = 0;
@@ -76,11 +77,11 @@ void func_ov055_021e68a8(GameSystem *gsys, WbtSystem *sys, WbtSetup *setup) {
         break;
     }
     setup->unk4 = round;
-    func_ov055_021e5d44(sys, func_ov055_021e5ca4(sys), setup->tournamentName);
-    func_ov055_021e6488(func_ov055_021e5cac(sys), setup->unk9C);
+    WbtSystem_LoadTournamentName(sys, WbtSystem_GetTournament(sys), setup->tournamentName);
+    WbtStyle_LoadName(WbtSystem_GetStyle(sys), setup->unk9C);
 }
 
-static void func_ov055_021e695c(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant) {
+static void WbtSetup_SetEntrant(HeapID heapId, GameData *gameData, WbtSetupEntrant *dest, const WbtEntrant *entrant) {
     ArcTool *handle;
     u16 objCode;
 
@@ -88,14 +89,14 @@ static void func_ov055_021e695c(HeapID heapId, GameData *gameData, WbtSetupEntra
     dest->rank = entrant->unk0_4;
     dest->type = entrant->type;
     dest->unk7 = entrant->unk0_3;
-    func_ov055_021e5e3c(entrant, dest->name);
+    WbtEntrant_GetName(entrant, dest->name);
     objCode = entrant->objCode;
     handle = GFL_ArcSysCreateFileHandle(ARCID_MMODEL_TBL, heapId);
-    func_ov055_021e6a2c(handle, objCode, &dest->unk6, &dest->unk4);
+    WbtSetup_LoadActorConfig(handle, objCode, &dest->unk6, &dest->unk4);
     GFL_ArcToolFree(handle);
 }
 
-static void func_ov055_021e69b0(WbtSystem *sys, WbtSetup *setup) {
+static void WbtSetup_SetMatches(WbtSystem *sys, WbtSetup *setup) {
     WbtMatch *match;
     WbtSetupMatch *dest;
     int i;
@@ -115,10 +116,10 @@ static void func_ov055_021e69b0(WbtSystem *sys, WbtSetup *setup) {
 }
 
 static u8 func_ov055_021e6a14(u32 index) {
-    return data_ov036_021cf1c8[index].unk0[1]->face;
+    return FIELD_BILLBOARD_ANIM_SETS[index].animations[1]->face;
 }
 
-static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4) {
+static void WbtSetup_LoadActorConfig(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk4) {
     FieldActorConfig record;
     u32 offset = GetIndexOfObjID(objCode) * sizeof(FieldActorConfig) + 4;
 
@@ -127,26 +128,26 @@ static void func_ov055_021e6a2c(ArcTool *handle, u16 objCode, u8 *unk6, s16 *unk
     *unk4 = record.rscIndices.res1;
 }
 
-WbtOv326Param *func_ov055_021e6a64(HeapID heapId, GameSystem *gsys, u16 *var) {
+WbtOv326Param *WbtSetup_CreateWinRecordParam(HeapID heapId, GameSystem *gsys, u16 *var) {
     GameData *gameData = GSYS_GetGameData(gsys);
     WbtOv326Param *param = GFL_HeapAllocate(heapId, sizeof(WbtOv326Param), TRUE, "wbt_setup.c", 318);
     int i;
 
     param->unk0 = 0;
-    param->save = func_020179f8(gameData);
+    param->save = GameData_GetWbtSave(gameData);
     param->playerInfo = GetGameDataPlayerInfo(gameData);
     for (i = 0; i < 29; i++) {
-        param->open[i] = func_ov055_021e66dc(gameData, func_ov055_021e6760(i));
+        param->open[i] = WbtTournament_IsOpen(gameData, WbtTournament_FromRecord(i));
     }
     param->unk4 = var;
     return param;
 }
 
-void func_ov055_021e6ac0(WbtOv326Param *param) {
+void WbtSetup_FreeWinRecordParam(WbtOv326Param *param) {
     GFL_HeapFree(param);
 }
 
-WbtOv326Param2 *func_ov055_021e6ac8(HeapID heapId, GameSystem *gsys, u32 a2, u16 *var1, u16 *var2) {
+WbtOv326Param2 *WbtSetup_CreateDownloadParam(HeapID heapId, GameSystem *gsys, u32 a2, u16 *var1, u16 *var2) {
     GameData *gameData = GSYS_GetGameData(gsys);
     WbtOv326Param2 *param = GFL_HeapAllocate(heapId, sizeof(WbtOv326Param2), TRUE, "wbt_setup.c", 390);
 
@@ -157,6 +158,6 @@ WbtOv326Param2 *func_ov055_021e6ac8(HeapID heapId, GameSystem *gsys, u32 a2, u16
     return param;
 }
 
-void func_ov055_021e6afc(WbtOv326Param2 *param) {
+void WbtSetup_FreeDownloadParam(WbtOv326Param2 *param) {
     GFL_HeapFree(param);
 }

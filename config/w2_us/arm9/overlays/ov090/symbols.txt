@@ -1,3 +1,3 @@
-func_ov090_021eec80 kind:function(thumb,size=0x16) addr:0x021eecc0
-func_ov090_021eec98 kind:function(thumb,size=0x28) addr:0x021eecd8
-func_ov090_021eecc0 kind:function(thumb,size=0x26) addr:0x021eed00
+GimmickState_SetNimbasaGym kind:function(thumb,size=0x16) addr:0x021eecc0
+GimmickState_ResetOpelucid kind:function(thumb,size=0x28) addr:0x021eecd8
+GimmickState_SetNimbasaFlags kind:function(thumb,size=0x26) addr:0x021eed00

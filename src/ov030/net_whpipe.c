@@ -107,12 +107,12 @@ void NetWhpipe_SetState(NetWhpipeState *work, NetWhpipeStateFunc state) {
     work->state = state;
 }
 
-BOOL func_ov030_02173340(HeapID heapId, WHCallback callback, void *gameWork, BOOL unused) {
+BOOL NetWhpipe_Init(HeapID heapId, WHCallback callback, void *gameWork, BOOL unused) {
     NetWhpipeWork *work;
     GFLNetInitData *init;
 
-    func_02042e84();
-    init = func_02042e84();
+    GFL_NetGetInitData();
+    init = GFL_NetGetInitData();
     if (sWork != NULL) {
         return FALSE;
     }
@@ -130,7 +130,7 @@ BOOL func_ov030_02173340(HeapID heapId, WHCallback callback, void *gameWork, BOO
     return TRUE;
 }
 
-void func_ov030_021733d0(GFLNetRecvFunc callback) {
+void NetWhpipe_SetRecvCallback(GFLNetRecvFunc callback) {
     sWork->recvCallback = callback;
 }
 
@@ -142,7 +142,7 @@ static BOOL CheckBeacon(const NetWhpipeBeacon *beacon) {
     u16 gameId;
 
     work = sWork;
-    init = func_02042e84();
+    init = GFL_NetGetInitData();
     gameCommandBase = init->gameCommandBase;
     gameId = init->unk4C.id.gameId;
     info = &beacon->info;
@@ -180,7 +180,7 @@ static BOOL OnBeaconFound(const void *found) {
     int i;
     NetWhpipeWork *work = sWork;
 
-    func_02042e84();
+    GFL_NetGetInitData();
     if (!CheckBeacon(beacon)) {
         return FALSE;
     }
@@ -205,7 +205,7 @@ static BOOL OnBeaconFound(const void *found) {
     return TRUE;
 }
 
-void func_ov030_02173554(void) {
+void NetWhpipe_ClearBeacons(void) {
     NetWhpipeWork *work = sWork;
     int i;
 
@@ -228,7 +228,7 @@ static BOOL RecvCallback(u16 netId, u8 *data, u16 size) {
     return sWork->recvCallback(netId, data, size);
 }
 
-BOOL func_ov030_021735b0(BOOL clearBeacons) {
+BOOL NetWhpipe_StartScan(BOOL clearBeacons) {
     NetWhpipeWork *work = sWork;
 
     if (work == NULL) {
@@ -236,7 +236,7 @@ BOOL func_ov030_021735b0(BOOL clearBeacons) {
     }
     ResetFlags(work);
     if (clearBeacons) {
-        func_ov030_02173554();
+        NetWhpipe_ClearBeacons();
     }
     WH_SetReceiver(RecvCallback);
     work->running = TRUE;
@@ -278,7 +278,7 @@ static void StateWaitEnd(void *arg) {
     }
 }
 
-BOOL func_ov030_021736b8(void) {
+BOOL NetWhpipe_Finalize(void) {
     NetWhpipeWork *work = sWork;
 
     if (work == NULL) {
@@ -328,17 +328,17 @@ static void TickBeaconTimers(void) {
     }
 }
 
-void func_ov030_02173780(void) {
-    if (func_02042788()) {
+void NetWhpipe_UpdateGameBeacon(void) {
+    if (GFL_NetIsInitialized()) {
         NetWhpipeBeaconInfo *info;
         NetWhpipeWork *work = sWork;
-        GFLNetInitData *init = func_02042e84();
+        GFLNetInitData *init = GFL_NetGetInitData();
         int size;
 
-        if (init->unk1C == NULL) {
+        if (init->getBeaconSize == NULL) {
             return;
         }
-        size = init->unk1C(work->gameWork);
+        size = init->getBeaconSize(work->gameWork);
         if (size > _BEACON_USER_SIZE_MAX) {
             OS_Terminate();
             return;
@@ -348,7 +348,7 @@ void func_ov030_02173780(void) {
         info->gameId = init->unk4C.id.gameId;
         info->unk5 = 0;
         info->closed = work->entryClosed;
-        MI_CpuCopy8(init->unk18(work->gameWork), info->data, size);
+        MI_CpuCopy8(init->getBeaconData(work->gameWork), info->data, size);
         SetBeaconInfo(&work->info, sizeof(NetWhpipeBeaconInfo));
     }
 }
@@ -356,13 +356,13 @@ void func_ov030_02173780(void) {
 static void UpdateBeacon(void) {
     NetWhpipeWork *work = sWork;
     NetWhpipeBeaconInfo *info = &work->info;
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
 
-    if (init->unk1C != NULL) {
-        int size = init->unk1C(work->gameWork);
+    if (init->getBeaconSize != NULL) {
+        int size = init->getBeaconSize(work->gameWork);
 
         GFL_ASSERT(size <= _BEACON_USER_SIZE_MAX);
-        MI_CpuCopy8(init->unk18(work->gameWork), info->data, size);
+        MI_CpuCopy8(init->getBeaconData(work->gameWork), info->data, size);
     }
     if (info->childCount != CountChildren()) {
         work->beaconCounter = 0;
@@ -379,7 +379,7 @@ static void Update(u16 count) {
     int state = WH_GetSystemState();
     NetWhpipeWork *work = sWork;
 
-    if (!func_ov030_02173ae4()) {
+    if (!NetWhpipe_IsStopped()) {
         UpdateBeacon();
     }
     if (work->startCount == 0xffff) {
@@ -418,7 +418,7 @@ static void Update(u16 count) {
     case WH_SYSSTATE_ERROR:
         if (work != NULL) {
             if (!work->stopped) {
-                func_02042e54(WH_GetLastError());
+                GFL_NetNotifyError(WH_GetLastError());
             }
             work->stopped = TRUE;
         }
@@ -426,14 +426,14 @@ static void Update(u16 count) {
     }
 }
 
-void func_ov030_02173964(u16 count) {
+void NetWhpipe_Update(u16 count) {
     if (sWork != NULL && sWork->base.state != NULL) {
         sWork->base.state(sWork);
     }
     if (sWork != NULL) {
         Update(count);
     }
-    if (sWork != NULL && func_ov030_02173c08()) {
+    if (sWork != NULL && NetWhpipe_IsScanning()) {
         TickBeaconTimers();
     }
     if (sWork != NULL) {
@@ -451,7 +451,7 @@ void func_ov030_02173964(u16 count) {
     WH_UpdateScan();
 }
 
-BOOL func_ov030_021739ec(void) {
+BOOL NetWhpipe_IsConnected(void) {
     if (sWork == NULL) {
         return FALSE;
     }
@@ -489,14 +489,14 @@ static int CountChildren(void) {
     return count;
 }
 
-BOOL func_ov030_02173a8c(void) {
+BOOL NetWhpipe_IsInitialized(void) {
     if (sWork != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov030_02173aa0(void) {
+BOOL NetWhpipe_IsIdle(void) {
     if (sWork != NULL) {
         if (WH_GetSystemState() == WH_SYSSTATE_IDLE) {
             return TRUE;
@@ -513,14 +513,14 @@ static int GetChildrenBitmap(void) {
     return 0;
 }
 
-BOOL func_ov030_02173ae4(void) {
+BOOL NetWhpipe_IsStopped(void) {
     if (sWork != NULL && sWork->stopped) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov030_02173b04(int lock) {
+void NetWhpipe_SetLockEnabled(int lock) {
     NetWhpipeWork *work = sWork;
 
     if (work != NULL) {
@@ -529,7 +529,7 @@ void func_ov030_02173b04(int lock) {
     }
 }
 
-void *func_ov030_02173b24(int index) {
+void *NetWhpipe_GetBeaconData(int index) {
     NetWhpipeWork *work = sWork;
 
     if (work != NULL && work->beaconTimer[index] != 0) {
@@ -540,7 +540,7 @@ void *func_ov030_02173b24(int index) {
     return NULL;
 }
 
-u8 *func_ov030_02173b50(int index) {
+u8 *NetWhpipe_GetBeaconMac(int index) {
     NetWhpipeWork *work = sWork;
 
     if (work != NULL && work->beaconTimer[index] != 0) {
@@ -549,7 +549,7 @@ u8 *func_ov030_02173b50(int index) {
     return NULL;
 }
 
-u8 func_ov030_02173b78(int index) {
+u8 NetWhpipe_GetBeaconService(int index) {
     NetWhpipeWork *work = sWork;
 
     if (work != NULL && work->beaconTimer[index] != 0) {
@@ -558,7 +558,7 @@ u8 func_ov030_02173b78(int index) {
     return 0;
 }
 
-void func_ov030_02173ba4(int index) {
+void NetWhpipe_RemoveBeacon(int index) {
     NetWhpipeWork *work = sWork;
 
     if (work != NULL && work->beaconTimer[index] != 0) {
@@ -566,7 +566,7 @@ void func_ov030_02173ba4(int index) {
     }
 }
 
-void func_ov030_02173bc4(void) {
+void NetWhpipe_RemoveAllBeacons(void) {
     NetWhpipeWork *work = sWork;
     int i;
 
@@ -577,33 +577,33 @@ void func_ov030_02173bc4(void) {
     }
 }
 
-void func_ov030_02173bec(int index) {
-    func_ov030_02173ba4(index);
+void NetWhpipe_ConsumeBeacon(int index) {
+    NetWhpipe_RemoveBeacon(index);
 }
 
-BOOL func_ov030_02173bf4(void) {
+BOOL NetWhpipe_HasBeacons(void) {
     if (WH_GetBeaconCount()) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov030_02173c08(void) {
+BOOL NetWhpipe_IsScanning(void) {
     if (WH_GetSystemState() == WH_SYSSTATE_SCANNING) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov030_02173c1c(u8 *data, int size, BOOL (*callback)(BOOL ok)) {
+BOOL NetWhpipe_SendData(u8 *data, int size, BOOL (*callback)(BOOL ok)) {
     return WH_SendData(data, size, callback);
 }
 
-int func_ov030_02173c28(void) {
+int NetWhpipe_GetBitmap(void) {
     return WH_GetBitmap();
 }
 
-int func_ov030_02173c30(void) {
+int NetWhpipe_GetAid(void) {
     return WH_GetAid();
 }
 
@@ -613,7 +613,7 @@ static void StateStartParent(void *arg) {
     u16 modes[2] = { 4, 0 };
 
     if (state == WH_SYSSTATE_MEASURECHANNEL) {
-        GFLNetInitData *init = func_02042e84();
+        GFLNetInitData *init = GFL_NetGetInitData();
         u16 channel;
 
         work->entryClosed = FALSE;
@@ -626,10 +626,10 @@ static void StateStartParent(void *arg) {
         } else {
             channel = work->channel;
         }
-        if (init->unk66 != 0) {
+        if (init->changeTgid != 0) {
             work->tgid = WM_GetNextTgid();
         }
-        func_ov030_02173780();
+        NetWhpipe_UpdateGameBeacon();
         WH_ParentConnect(modes[init->bMPMode], work->tgid, channel, init->maxConnectNum - 1);
         NetWhpipe_SetState(&sWork->base, NULL);
     }
@@ -641,7 +641,7 @@ static void StateMeasureChannel(void *arg) {
     }
 }
 
-BOOL func_ov030_02173cf8(BOOL anyChannel) {
+BOOL NetWhpipe_StartParent(BOOL anyChannel) {
     NetWhpipeWork *work = sWork;
 
     if (work->base.state != NULL) {
@@ -658,7 +658,7 @@ BOOL func_ov030_02173cf8(BOOL anyChannel) {
 
 static void SetBeaconInfo(NetWhpipeBeaconInfo *info, int size) {
     NetWhpipeWork *work = sWork;
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
 
     if (work != NULL && init != NULL) {
         info->crc = getCRC16(&info->gameId, size - 2);
@@ -672,7 +672,7 @@ static void SetBeaconInfo(NetWhpipeBeaconInfo *info, int size) {
 }
 
 static void StateStartChild(void *arg) {
-    GFLNetInitData *init = func_02042e84();
+    GFLNetInitData *init = GFL_NetGetInitData();
     u16 modes[2] = { 5, 1 };
 
     if (WH_GetSystemState() == WH_SYSSTATE_IDLE || WH_GetSystemState() == WH_SYSSTATE_SCANNING) {
@@ -684,8 +684,8 @@ static void StateStartChild(void *arg) {
     }
 }
 
-BOOL func_ov030_02173e0c(BOOL unused, const u8 *mac, int index, void (*callback)(void)) {
-    func_02042e84();
+BOOL NetWhpipe_StartChild(BOOL unused, const u8 *mac, int index, void (*callback)(void)) {
+    GFL_NetGetInitData();
     if (sWork->base.state != NULL) {
         return FALSE;
     }
@@ -710,7 +710,7 @@ static void StateFinish(void *arg) {
     }
 }
 
-BOOL func_ov030_02173e9c(WHCallback callback) {
+BOOL NetWhpipe_End(WHCallback callback) {
     if (WH_End(callback)) {
         NetWhpipe_SetState(&sWork->base, StateFinish);
         return TRUE;
@@ -726,7 +726,7 @@ static BOOL AcceptNone(const void *info, void *work) {
     return FALSE;
 }
 
-void func_ov030_02173ec8(BOOL acceptAll) {
+void NetWhpipe_SetScanAcceptAll(BOOL acceptAll) {
     if (acceptAll) {
         WH_SetScanFilter(AcceptAll);
     } else {
@@ -750,14 +750,14 @@ static void StateParentWait(void *arg) {
 static void StateParentRetry(void *arg) {
     NetWhpipeWork *work = arg;
 
-    if (func_ov030_02173aa0()) {
+    if (NetWhpipe_IsIdle()) {
         u8 channels[3] = { 1, 7, 13 };
 
         work->channelIndex = GFL_RandomLC(3);
         if (work->channelIndex >= 3) {
             work->channelIndex = 0;
         }
-        func_ov030_02173780();
+        NetWhpipe_UpdateGameBeacon();
         GameBeaconSys_ToggleB2W2Only();
         if (WH_ParentConnect(0, work->tgid, channels[work->channelIndex], 1)) {
             work->waitTimer = GFL_RandomLC(0x98) + 0x3c;
@@ -789,28 +789,28 @@ static void StateSearch(void *arg) {
     }
 }
 
-BOOL func_ov030_02174040(void) {
+BOOL NetWhpipe_StartSearch(void) {
     NetWhpipeWork *work = sWork;
 
     if (work == NULL) {
         return FALSE;
     }
-    func_ov030_021740f0(0);
+    NetWhpipe_HoldScan(0);
     ResetFlags(work);
-    func_ov030_02173554();
+    NetWhpipe_ClearBeacons();
     WH_SetReceiver(RecvCallback);
     work->running = TRUE;
     NetWhpipe_SetState(&sWork->base, StateSearch);
     return TRUE;
 }
 
-void func_ov030_02174088(void) {
+void NetWhpipe_StopIfLocked(void) {
     if (sWork->lockEnabled) {
         sWork->stopped = TRUE;
     }
 }
 
-u8 func_ov030_021740a4(u8 index) {
+u8 NetWhpipe_GetBeaconCommandBase(u8 index) {
     NetWhpipeWork *work = sWork;
 
     if (work != NULL && work->beaconTimer[index] != 0) {
@@ -819,24 +819,24 @@ u8 func_ov030_021740a4(u8 index) {
     return 0;
 }
 
-void func_ov030_021740d0(int index) {
+void NetWhpipe_SetScanTarget(int index) {
     WH_SetScanTarget(sWork->beacons[index].channel, sWork->beacons[index].mac);
 }
 
-void func_ov030_021740f0(int unused) {
+void NetWhpipe_HoldScan(int unused) {
     if (sWork != NULL) {
         sWork->holdFrames = 20;
     }
 }
 
-void func_ov030_02174108(u32 enabled) {
+void NetWhpipe_SetSearchPaused(u32 enabled) {
     if (sWork != NULL) {
         sWork->pauseSearch = enabled;
     }
 }
 
-void func_ov030_02174120(void (*callback)(void *arg, const void *beacon, u8 gameCommandBase, u8 childCount),
-                         void *arg) {
+void NetWhpipe_SetScanCallback(void (*callback)(void *arg, const void *beacon, u8 gameCommandBase, u8 childCount),
+                               void *arg) {
     if (sWork != NULL) {
         sWork->scanCallback = callback;
         sWork->scanArg = arg;

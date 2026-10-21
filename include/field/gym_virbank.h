@@ -9,13 +9,13 @@
 // overlay has no string
 
 // Overlay 36's gimmick table calls these
-void func_ov100_021eec80(Field *field);
-void func_ov100_021eecd0(Field *field);
-void func_ov100_021eecf8(Field *field);
+void GymVirbank_Init(Field *field);
+void GymVirbank_End(Field *field);
+void GymVirbank_Update(Field *field);
 
 // Overlay 36's gym script commands. Stops the animations of the model, paused
-void func_ov100_021eed10(GameSystem *gsys, int model);
+void GymVirbank_StopModelAnimations(GameSystem *gsys, int model);
 // Sets a flag of the actor
-void func_ov100_021eed64(GameSystem *gsys, int actorId);
+void GymVirbank_SetActorFlag(GameSystem *gsys, int actorId);
 
 #endif // POKEBW2_FIELD_GYM_VIRBANK_H

@@ -120,11 +120,11 @@ MusShotPhoto *MusShotPhoto_Create(MusicalShot *shot, HeapID heapId) {
         photo->pokes[i] = MusicalSystem_InitPoke(shot->pokes[i].species, shot->pokes[i].sex, shot->pokes[i].form,
                                                  shot->pokes[i].rare, shot->pokes[i].personality, heapId);
         for (j = 0; j < 8; j++) {
-            u8 equip = shot->pokes[i].equips[j].unk4;
+            u8 equip = shot->pokes[i].equips[j].pos;
 
             if (equip != 10) {
                 photo->pokes[i]->equips[equip].itemId = shot->pokes[i].equips[j].itemId;
-                photo->pokes[i]->equips[equip].unk2 = shot->pokes[i].equips[j].unk2;
+                photo->pokes[i]->equips[equip].unk2 = shot->pokes[i].equips[j].rotation;
                 photo->pokes[i]->equips[equip].slot = j;
             }
         }
@@ -227,7 +227,7 @@ static void MusShotPhoto_ExitGraphics(MusShotPhoto *photo) {
     GFL_BGSysReleaseBG(3);
     GFL_BGSysReleaseBG(1);
     GFL_BGSysReleaseBG(2);
-    func_0204e450(photo->blact);
+    BlActScene_Delete(photo->blact);
     GFL_G3DCameraFree(photo->camera);
     GFL_G3DSysFree();
     GFL_BGSysReleaseBG(0);

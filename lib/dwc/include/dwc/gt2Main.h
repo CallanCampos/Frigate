@@ -12,8 +12,9 @@
 // challenge, the server's challenge, the client's response, accept, reject, close and keep-alive), and 100 to 104
 // unreliable acks, nacks, pings, pongs and the note that a connection is closed. The ROM has no names for the files or
 // their functions: the files are named after GameSpy's, as pret/pokerevo's Wii build has them
-// (asm/SDK/DWC/gamespy/gt2Main.s and the other gt2*.s), and so are the functions in the comments beside them, while
-// the symbols keep their addresses. The types take the gti2 prefix of the functions inside GT2.
+// (asm/SDK/DWC/gamespy/gt2Main.s and the other gt2*.s), and so are the functions, after GameSpy's source. The ones
+// that gt2.c calls keep their addresses for now, with their names in the comments beside them. The types take the gti2
+// prefix of the functions inside GT2.
 //
 // A connection's state goes 0 (waiting for the server's challenge) and 1 (waiting to be accepted) on the side that
 // connects, 2 (waiting for the client's challenge), 3 (waiting for the client's response) and 4 (waiting for the app to
@@ -35,7 +36,7 @@ typedef struct GTI2Connection GTI2Connection;
 // and a datagram that isn't GT2's, which returns whether the app handled it
 typedef void (*GTI2SocketErrorCallback)(GTI2Socket *socket);
 typedef void (*GTI2ConnectAttemptCallback)(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port,
-                                           u32 latency, const void *message, int length);
+                                           int latency, const void *message, int length);
 typedef void (*GTI2DumpCallback)(GTI2Socket *socket, GTI2Connection *connection, u32 ip, u16 port, BOOL reset,
                                  const void *message, int length);
 typedef BOOL (*GTI2UnrecognizedMessageCallback)(GTI2Socket *socket, u32 ip, u16 port, const void *message, int length);
@@ -138,9 +139,9 @@ int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const c
                         int length, u32 timeout, const GTI2ConnectionCallbacks *callbacks, BOOL blocking);
 // gt2Send; a length of -1 sends a text with its end
 int func_ov011_0217d290(GTI2Connection *connection, const void *message, int length, BOOL reliable);
-// gt2CloseConnectionHard and gt2CloseAllConnectionsHard, which close at once without waiting for the peer
-void func_ov011_0217d338(GTI2Connection *connection);
-void func_ov011_0217d350(GTI2Socket *socket);
+// Close at once without waiting for the peer
+void gt2CloseConnectionHard(GTI2Connection *connection);
+void gt2CloseAllConnectionsHard(GTI2Socket *socket);
 // The connection's state as the app sees it: 0 connecting, 1 connected, 2 closing, 3 closed
 int func_ov011_0217d364(GTI2Connection *connection);
 // The peer's ip and port, the socket's own ip and port (gt2GetLocalPort), and the size and free space of the
@@ -151,10 +152,10 @@ u32 func_ov011_0217d388(GTI2Socket *socket);
 u16 func_ov011_0217d38c(GTI2Socket *socket);
 int func_ov011_0217d390(GTI2Connection *connection);
 int func_ov011_0217d394(GTI2Connection *connection);
-// gt2GetSocketSOCKET, gt2SetUnrecognizedMessageCallback, gt2SetConnectionData and gt2GetConnectionData
-int func_ov011_0217d39c(GTI2Socket *socket);
+int gt2GetSocketSOCKET(GTI2Socket *socket);
+// gt2SetUnrecognizedMessageCallback
 void func_ov011_0217d3a0(GTI2Socket *socket, GTI2UnrecognizedMessageCallback callback);
-void func_ov011_0217d3a4(GTI2Connection *connection, void *userData);
-void *func_ov011_0217d3a8(GTI2Connection *connection);
+void gt2SetConnectionData(GTI2Connection *connection, void *userData);
+void *gt2GetConnectionData(GTI2Connection *connection);
 
 #endif // POKEBW2_DWC_GT2MAIN_H

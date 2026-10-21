@@ -76,18 +76,18 @@ void MonolithTool_CreateText(MonolithWork *wk, MonolithTextActor *text, int sub,
     vramType = sub == 0 ? CLACT_VRAM_MAIN : CLACT_VRAM_SUB;
     textSetup.vramType = vramType;
     textSetup.surface = vramType;
-    text->frame = func_0204c040(wk->clactUnit, wk->actorRes[sub].chars, wk->actorRes[sub].palette,
-                                wk->actorRes[sub].cellAnims, &frameSetup, vramType, HEAPID_MONOLITH);
+    text->frame = ClActor_Create(wk->clactUnit, wk->actorRes[sub].chars, wk->actorRes[sub].palette,
+                                 wk->actorRes[sub].cellAnims, &frameSetup, vramType, HEAPID_MONOLITH);
     text->text = BmpOam_ActorAdd(wk->bmpOam, &textSetup);
     str = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, msgId);
     if (wordSet != NULL) {
         StrBuf *expanded = GFL_StrBufCreate(128, HEAPID_MONOLITH);
 
         GFL_WordSetFormatStrbuf(wordSet, expanded, str);
-        func_02021c54(wk->printQueue, text->bitmap, 0, 0, expanded, wk->font);
+        PrintQueue_Print(wk->printQueue, text->bitmap, 0, 0, expanded, wk->font);
         GFL_StrBufFree(expanded);
     } else {
-        func_02021c54(wk->printQueue, text->bitmap, 0, 0, str, wk->font);
+        PrintQueue_Print(wk->printQueue, text->bitmap, 0, 0, str, wk->font);
     }
     GFL_StrBufFree(str);
     text->printing = TRUE;
@@ -130,8 +130,8 @@ void MonolithTool_CreateTextCentered(MonolithWork *wk, MonolithTextActor *text, 
     vramType = sub == 0 ? CLACT_VRAM_MAIN : CLACT_VRAM_SUB;
     textSetup.vramType = vramType;
     textSetup.surface = vramType;
-    text->frame = func_0204c040(wk->clactUnit, wk->actorRes[sub].chars, wk->actorRes[sub].palette,
-                                wk->actorRes[sub].cellAnims, &frameSetup, vramType, HEAPID_MONOLITH);
+    text->frame = ClActor_Create(wk->clactUnit, wk->actorRes[sub].chars, wk->actorRes[sub].palette,
+                                 wk->actorRes[sub].cellAnims, &frameSetup, vramType, HEAPID_MONOLITH);
     text->text = BmpOam_ActorAdd(wk->bmpOam, &textSetup);
     str = GFL_MsgDataLoadStrbufNew(wk->msgMonolith, msgId);
     halfWidth = GFL_FontGetBlockWidth(str, wk->font, 0) / 2;
@@ -140,17 +140,17 @@ void MonolithTool_CreateTextCentered(MonolithWork *wk, MonolithTextActor *text, 
         StrBuf *expanded = GFL_StrBufCreate(128, HEAPID_MONOLITH);
 
         GFL_WordSetFormatStrbuf(wordSet, expanded, str);
-        func_02021c7c(wk->printQueue, text->bitmap, textX, 0, expanded, wk->font, color);
+        PrintQueue_PrintColor(wk->printQueue, text->bitmap, textX, 0, expanded, wk->font, color);
         GFL_StrBufFree(expanded);
     } else {
-        func_02021c7c(wk->printQueue, text->bitmap, textX, 0, str, wk->font, color);
+        PrintQueue_PrintColor(wk->printQueue, text->bitmap, textX, 0, str, wk->font, color);
     }
     GFL_StrBufFree(str);
     text->printing = TRUE;
 }
 
 void MonolithTool_DeleteText(MonolithTextActor *text) {
-    func_0204c108(text->frame);
+    ClActor_Delete(text->frame);
     BmpOam_ActorDel(text->text);
     GFL_BitmapFree(text->bitmap);
     text->frame = NULL;
@@ -159,12 +159,12 @@ void MonolithTool_DeleteText(MonolithTextActor *text) {
 }
 
 void MonolithTool_SetTextVisible(MonolithTextActor *text, BOOL visible) {
-    func_0204c124(text->frame, visible);
+    ClActor_SetVisible(text->frame, visible);
     BmpOam_ActorSetDrawEnable(text->text, visible);
 }
 
 BOOL MonolithTool_UpdateText(MonolithWork *wk, MonolithTextActor *text) {
-    if (text->printing == TRUE && func_02021c1c(wk->printQueue, text->bitmap) == FALSE) {
+    if (text->printing == TRUE && PrintQueue_IsBitmapPending(wk->printQueue, text->bitmap) == FALSE) {
         BmpOam_ActorBmpTrans(text->text);
         text->printing = FALSE;
         return TRUE;
@@ -178,10 +178,10 @@ void MonolithTool_SetTextCursor(MonolithScreenParam *param, MonolithTextActor *t
 
     for (i = 0; i < count; i++) {
         if (i == cursor) {
-            func_0204c378(texts[i].frame, 1, TRUE);
+            ClActor_SetPalette(texts[i].frame, 1, TRUE);
             MonolithTool_SetPanelMode(param, PANEL_MODE_PULSE, panel);
         } else {
-            func_0204c378(texts[i].frame, 0, TRUE);
+            ClActor_SetPalette(texts[i].frame, 0, TRUE);
         }
     }
     if (cursor == 0xff) {
@@ -195,10 +195,10 @@ void MonolithTool_SetTextPicked(MonolithScreenParam *param, MonolithTextActor *t
 
     for (i = 0; i < count; i++) {
         if (i == cursor) {
-            func_0204c378(texts[i].frame, 1, TRUE);
+            ClActor_SetPalette(texts[i].frame, 1, TRUE);
             MonolithTool_SetPanelMode(param, PANEL_MODE_FLASH, panel);
         } else {
-            func_0204c378(texts[i].frame, 0, TRUE);
+            ClActor_SetPalette(texts[i].frame, 0, TRUE);
         }
     }
 }
@@ -318,26 +318,26 @@ PlayerInfo *MonolithTool_GetPlayerInfo(MonolithScreenParam *param) {
 }
 
 PassPowerLevel *MonolithTool_GetLevels(MonolithScreenParam *param) {
-    return func_02017208(GSYS_GetGameData(param->param->gsys));
+    return GameData_GetMyPassPowerLevels(GSYS_GetGameData(param->param->gsys));
 }
 
 void MonolithTool_CreateReturnButton(MonolithWork *wk, MonolithReturnButton *button) {
     ClActorSetup setup = { 240, 180, 6, 0, 2 };
-    ClActor *actor = func_0204c040(wk->clactUnit, wk->actorRes[1].chars, wk->actorRes[1].palette,
-                                   wk->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
+    ClActor *actor = ClActor_Create(wk->clactUnit, wk->actorRes[1].chars, wk->actorRes[1].palette,
+                                    wk->actorRes[1].cellAnims, &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
 
-    func_0204c520(actor, TRUE);
+    ClActor_SetAutoAnim(actor, TRUE);
     button->actor = actor;
 }
 
 void MonolithTool_DeleteReturnButton(MonolithReturnButton *button) {
-    func_0204c108(button->actor);
+    ClActor_Delete(button->actor);
 }
 
 void MonolithTool_UpdateReturnButton(MonolithReturnButton *button) {
     if (button->blinking == TRUE) {
         if (button->timer % 5 == 0) {
-            func_0204c378(button->actor, button->lit, TRUE);
+            ClActor_SetPalette(button->actor, button->lit, TRUE);
             button->lit ^= 1;
             if (button->timer / 5 == 3) {
                 button->blinking = FALSE;
@@ -361,14 +361,14 @@ ClActor *MonolithTool_CreateActor(MonolithWork *wk, s16 x, s16 y, u16 sequence) 
     ClActorSetup setup = { x, y, sequence, 0, 1 };
     ClActor *actor;
 
-    actor = func_0204c040(wk->clactUnit, wk->actorRes[1].chars, wk->actorRes[1].palette, wk->actorRes[1].cellAnims,
-                          &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
-    func_0204c520(actor, TRUE);
+    actor = ClActor_Create(wk->clactUnit, wk->actorRes[1].chars, wk->actorRes[1].palette, wk->actorRes[1].cellAnims,
+                           &setup, CLACT_VRAM_SUB, HEAPID_MONOLITH);
+    ClActor_SetAutoAnim(actor, TRUE);
     return actor;
 }
 
 void MonolithTool_DeleteActor(ClActor *actor) {
-    func_0204c108(actor);
+    ClActor_Delete(actor);
 }
 
 void MonolithTool_UpdateActor(ClActor *actor) {

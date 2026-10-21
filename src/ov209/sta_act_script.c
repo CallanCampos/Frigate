@@ -51,7 +51,7 @@ void StaActScript_TermSystem(StaActScriptSys *sys) {
         StaActScript_DelTask(sys, task);
         task = next;
     }
-    func_0203a610(sys->tcbMgr);
+    GFL_TCBMgrDelete(sys->tcbMgr);
     GFL_HeapFree(sys->tcbWork);
     GFL_HeapFree(sys);
 }

@@ -764,7 +764,7 @@ void ResearchGraph_Main(ResearchGraph *wk) {
     ResearchGraph_CheckNewResults(wk);
     ResearchGraph_CountUpdateFrames(wk);
     if (wk->active) {
-        func_0204b794();
+        ClActSys_Draw();
         ResearchGraph_UpdateGraphs(wk);
         Arrow_Update(wk->arrow);
         ResearchGraph_UpdateCommonPaletteAnime(wk);
@@ -867,8 +867,8 @@ static void ResearchGraph_SeqTouch(ResearchGraph *wk) {
 
     GCTX_HIDGetHeldKeys();
     keys = GCTX_HIDGetPressedKeys();
-    rect = func_0203da0c(wk->touchRects);
-    commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    rect = GFL_HIDGetTouchPressedRect(wk->touchRects);
+    commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
 
     if (wk->resultsShown && wk->newResults && wk->updateReady) {
         ResearchGraph_EndSeq(wk);
@@ -997,8 +997,8 @@ static void ResearchGraph_SeqCursor(ResearchGraph *wk) {
 
     GCTX_HIDGetHeldKeys();
     keys = GCTX_HIDGetPressedKeys();
-    rect = func_0203da0c(wk->touchRects);
-    commonButton = func_0203da0c(ResearchCommon_GetTouchRects(wk->common));
+    rect = GFL_HIDGetTouchPressedRect(wk->touchRects);
+    commonButton = GFL_HIDGetTouchPressedRect(ResearchCommon_GetTouchRects(wk->common));
 
     if (wk->resultsShown && wk->newResults && wk->updateReady) {
         ResearchGraph_EndSeq(wk);
@@ -2036,7 +2036,7 @@ static void ResearchGraph_PrintAnswer(ResearchGraph *wk) {
     name = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_DATA_ANSWERS], answerId);
     str = GFL_StrBufCreate(0x80, wk->heapId);
     WordSetNumber(wk->wordSet, 0, index + 1, 2, 1, 1);
-    func_0202437c(wk->wordSet, 1, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 1, name, 0, 1, 2);
     WordSetNumber(wk->wordSet, 2, total, 5, 1, 1);
     WordSetNumber(wk->wordSet, 3, percent, 3, 1, 1);
     GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
@@ -2062,7 +2062,7 @@ static void ResearchGraph_PrintPlayerAnswer(ResearchGraph *wk) {
     format = GFL_MsgDataLoadStrbufNew(wk->msgData[0], 14);
     name = GFL_MsgDataLoadStrbufNew(wk->msgData[MSG_DATA_ANSWERS], answerId);
     str = GFL_StrBufCreate(0x80, wk->heapId);
-    func_0202437c(wk->wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 0, 1, 2);
     GFL_WordSetFormatStrbuf(wk->wordSet, str, format);
     BGFont_SetVisible(wk->bgFonts[BG_FONT_PLAYER_ANSWER], TRUE);
     BGFont_PrintStr(wk->bgFonts[BG_FONT_PLAYER_ANSWER], str);
@@ -2134,37 +2134,37 @@ static void ResearchGraph_UpdateArrows(ResearchGraph *wk) {
     ClActorPos pos;
 
     if (wk->updating == TRUE || wk->cursor == CURSOR_PLAYER_ANSWER || wk->cursor == CURSOR_BUTTON) {
-        func_0204c124(left, FALSE);
-        func_0204c124(right, FALSE);
+        ClActor_SetVisible(left, FALSE);
+        ClActor_SetVisible(right, FALSE);
         return;
     }
 
     pos.x = entry->x + entry->leftX;
     pos.y = entry->y + entry->leftY;
-    func_0204c140(left, &pos, 0);
+    ClActor_SetSurfacePos(left, &pos, 0);
     pos.x = entry->x + entry->rightX;
     pos.y = entry->y + entry->rightY;
-    func_0204c140(right, &pos, 0);
-    func_0204c124(left, TRUE);
-    func_0204c124(right, TRUE);
-    func_0204c520(left, TRUE);
-    func_0204c520(right, TRUE);
+    ClActor_SetSurfacePos(right, &pos, 0);
+    ClActor_SetVisible(left, TRUE);
+    ClActor_SetVisible(right, TRUE);
+    ClActor_SetAutoAnim(left, TRUE);
+    ClActor_SetAutoAnim(right, TRUE);
 }
 
 static void ResearchGraph_SetArrowsVisible(ResearchGraph *wk, BOOL visible) {
     ClActor *left = ResearchGraph_GetActor(wk, ACTOR_LEFT);
     ClActor *right = ResearchGraph_GetActor(wk, ACTOR_RIGHT);
 
-    func_0204c124(left, visible);
-    func_0204c124(right, visible);
+    ClActor_SetVisible(left, visible);
+    ClActor_SetVisible(right, visible);
 }
 
 static void ResearchGraph_UpdateLegend(ResearchGraph *wk) {
     if (!wk->resultsShown || !ResearchGraph_GetQuestionTotal(wk)) {
-        func_0204c124(wk->actors[ACTOR_LEGEND], FALSE);
+        ClActor_SetVisible(wk->actors[ACTOR_LEGEND], FALSE);
         return;
     }
-    func_0204c124(wk->actors[ACTOR_LEGEND], TRUE);
+    ClActor_SetVisible(wk->actors[ACTOR_LEGEND], TRUE);
 }
 
 // Marks the player's answer in the graph while the cursor is on it
@@ -2176,31 +2176,31 @@ static void ResearchGraph_UpdateMarker(ResearchGraph *wk) {
     ClActorPos pos;
 
     if (!wk->resultsShown) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
     if (wk->cursor != CURSOR_PLAYER_ANSWER) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
 
     answerId = ResearchGraph_GetPlayerAnswer(wk);
     if (!CircleGraph_GetPercentById(ResearchGraph_GetGraph(wk), answerId)) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
     if (answerId == 0) {
-        func_0204c124(marker, FALSE);
+        ClActor_SetVisible(marker, FALSE);
         return;
     }
 
     CircleGraph_GetLabelScreenPosById(ResearchGraph_GetGraph(wk), answerId, &x, &y);
     pos.x = x;
     pos.y = y;
-    func_0204c140(marker, &pos, entry->surface);
-    func_0204c124(marker, TRUE);
-    func_0204c520(marker, TRUE);
-    func_0204c584(marker, 2);
+    ClActor_SetSurfacePos(marker, &pos, entry->surface);
+    ClActor_SetVisible(marker, TRUE);
+    ClActor_SetAutoAnim(marker, TRUE);
+    ClActor_SetPlayMode(marker, 2);
 }
 
 static void ResearchGraph_ShowButton(ResearchGraph *wk) {
@@ -2264,7 +2264,7 @@ static void ResearchGraph_VBlank(TCB *tcb, void *data) {
     ResearchGraph *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
 }
 
@@ -2400,10 +2400,10 @@ static u8 ResearchGraph_GetSurveyID(ResearchGraph *wk) {
     int i;
     u8 questions[RESEARCH_QUESTION_COUNT];
     u8 id;
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
 
     for (i = 0; i < RESEARCH_QUESTION_COUNT; i++) {
-        questions[i] = func_0200ece4(survey, i);
+        questions[i] = SurveySave_GetQuestion(survey, i);
     }
     for (id = 0; id < SURVEY_COUNT; id++) {
         if (questions[0] == sGraphSurveyQuestions1[id] && questions[1] == sGraphSurveyQuestions2[id] &&
@@ -2416,7 +2416,7 @@ static u8 ResearchGraph_GetSurveyID(ResearchGraph *wk) {
 
 // The ID of the player's answer to the question, or 0 if the player hasn't answered it
 static u8 ResearchGraph_GetPlayerAnswer(ResearchGraph *wk) {
-    void *answers = func_0200ec38(func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk))));
+    void *answers = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk))));
     u8 questionId = ResearchGraph_GetQuestionID(wk);
     u16 answer;
 
@@ -2424,7 +2424,7 @@ static u8 ResearchGraph_GetPlayerAnswer(ResearchGraph *wk) {
         return ResearchGraph_GetPlayTimeAnswer(wk);
     }
 
-    answer = func_0200ec3c(answers, questionId);
+    answer = SurveySave_ReadAnswer(answers, questionId);
     if (answer == 0) {
         return 0;
     }
@@ -2433,7 +2433,7 @@ static u8 ResearchGraph_GetPlayerAnswer(ResearchGraph *wk) {
 }
 
 static u8 ResearchGraph_GetPlayTimeAnswer(ResearchGraph *wk) {
-    u16 hours = func_02008cec(func_02017a40(ResearchGraph_GetGameData(wk)));
+    u16 hours = PlayTime_GetHours(GameData_GetPlayTime(ResearchGraph_GetGameData(wk)));
 
     if (hours < 10) {
         return ANSWER_PLAY_TIME_FIRST;
@@ -2460,9 +2460,9 @@ static u8 ResearchGraph_GetPlayTimeAnswer(ResearchGraph *wk) {
 }
 
 static u32 ResearchGraph_GetSavedTodayTotal(ResearchGraph *wk) {
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
 
-    return func_0200ecf0(survey, ResearchGraph_GetQuestionID(wk));
+    return SurveySave_GetTodayCount(survey, ResearchGraph_GetQuestionID(wk));
 }
 
 static u32 ResearchGraph_GetObjRes(ResearchGraph *wk, u32 index) {
@@ -2621,7 +2621,7 @@ static void ResearchGraph_ClearData(ResearchGraph *wk) {
 
 // Reads the survey's questions and the counts of their answers from the save, adding today's to those of before
 static void ResearchGraph_LoadData(ResearchGraph *wk) {
-    void *survey = func_0200ec2c(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
+    void *survey = SurveySave_Get(GameData_GetSaveControl(ResearchGraph_GetGameData(wk)));
     int count;
     int q, i;
     u8 surveyId = ResearchGraph_GetSurveyID(wk);
@@ -2633,18 +2633,18 @@ static void ResearchGraph_LoadData(ResearchGraph *wk) {
     u8 questions[RESEARCH_QUESTION_COUNT];
     u8 answerCounts[RESEARCH_QUESTION_COUNT];
 
-    questions[0] = func_0200ece4(survey, 0);
-    questions[1] = func_0200ece4(survey, 1);
-    questions[2] = func_0200ece4(survey, 2);
+    questions[0] = SurveySave_GetQuestion(survey, 0);
+    questions[1] = SurveySave_GetQuestion(survey, 1);
+    questions[2] = SurveySave_GetQuestion(survey, 2);
     answerCounts[0] = GetSurveyAnswerMsgIDCount(questions[0]);
     answerCounts[1] = GetSurveyAnswerMsgIDCount(questions[1]);
     answerCounts[2] = GetSurveyAnswerMsgIDCount(questions[2]);
-    todayTotals[0] = func_0200ecf0(survey, questions[0]);
-    todayTotals[1] = func_0200ecf0(survey, questions[1]);
-    todayTotals[2] = func_0200ecf0(survey, questions[2]);
-    pastTotals[0] = func_0200ed14(survey, questions[0]);
-    pastTotals[1] = func_0200ed14(survey, questions[1]);
-    pastTotals[2] = func_0200ed14(survey, questions[2]);
+    todayTotals[0] = SurveySave_GetTodayCount(survey, questions[0]);
+    todayTotals[1] = SurveySave_GetTodayCount(survey, questions[1]);
+    todayTotals[2] = SurveySave_GetTodayCount(survey, questions[2]);
+    pastTotals[0] = SurveySave_GetTotalCount(survey, questions[0]);
+    pastTotals[1] = SurveySave_GetTotalCount(survey, questions[1]);
+    pastTotals[2] = SurveySave_GetTotalCount(survey, questions[2]);
 
     for (q = 0; q < RESEARCH_QUESTION_COUNT; q++) {
         u8 question = questions[q];
@@ -2652,8 +2652,8 @@ static void ResearchGraph_LoadData(ResearchGraph *wk) {
         count = answerCounts[q];
         for (i = 0; i < count; i++) {
             answerIds[q][i] = GetSurveyAnswerMsgID(question, i);
-            todayCounts[q][i] = func_0200ed48(survey, question, i + 1);
-            pastCounts[q][i] = func_0200ed90(survey, question, i + 1);
+            todayCounts[q][i] = SurveySave_GetTodayAnswerCount(survey, question, i + 1);
+            pastCounts[q][i] = SurveySave_GetTotalAnswerCount(survey, question, i + 1);
         }
     }
 
@@ -2882,9 +2882,9 @@ static void ResearchGraph_DeleteBGFonts(ResearchGraph *wk) {
 static void ResearchGraph_LoadSubObjRes(ResearchGraph *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, heapId);
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
-    u32 palette = func_0204bba0(handle, 16, CLACT_VRAM_SUB, 0, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_SUB, heapId);
+    u32 palette = ClActSys_LoadPltt(handle, 16, CLACT_VRAM_SUB, 0, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
 
     wk->objRes[OBJ_RES_SUB_CHARS] = chars;
     wk->objRes[OBJ_RES_SUB_PALETTE] = palette;
@@ -2893,24 +2893,24 @@ static void ResearchGraph_LoadSubObjRes(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_FreeSubObjRes(ResearchGraph *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_SUB_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_SUB_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_SUB_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_SUB_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_SUB_CELL_ANIMS]);
 }
 
 static void ResearchGraph_LoadMainObjRes(ResearchGraph *wk) {
     HeapID heapId = wk->heapId;
     ArcTool *handle = GFL_ArcSysCreateFileHandle(ARCID_RESEARCH_RADAR, heapId);
-    u32 chars = func_0204b81c(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
-    u32 palette = func_0204bbb8(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 3, heapId);
-    u32 cellAnims = func_0204bde0(handle, 14, 17, heapId);
+    u32 chars = ClActSys_LoadChars(handle, 15, FALSE, CLACT_VRAM_MAIN, heapId);
+    u32 palette = ClActSys_LoadPlttRange(handle, 16, CLACT_VRAM_MAIN, 0xc0, 0, 3, heapId);
+    u32 cellAnims = ClActSys_LoadCellAnims(handle, 14, 17, heapId);
     ArcTool *commonHandle;
     u32 buttonPalette;
 
     GFL_ArcToolFree(handle);
 
     commonHandle = GFL_ArcSysCreateFileHandle(ARCID_APP_MENU_COMMON, heapId);
-    buttonPalette = func_0204bbb8(commonHandle, 31, CLACT_VRAM_MAIN, 0x80, 0, 2, heapId);
+    buttonPalette = ClActSys_LoadPlttRange(commonHandle, 31, CLACT_VRAM_MAIN, 0x80, 0, 2, heapId);
     GFL_ArcToolFree(commonHandle);
 
     wk->objRes[OBJ_RES_MAIN_CHARS] = chars;
@@ -2920,10 +2920,10 @@ static void ResearchGraph_LoadMainObjRes(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_FreeMainObjRes(ResearchGraph *wk) {
-    func_0204b98c(wk->objRes[OBJ_RES_MAIN_CHARS]);
-    func_0204bcd0(wk->objRes[OBJ_RES_MAIN_PALETTE]);
-    func_0204bcd0(wk->objRes[OBJ_RES_BUTTON_PALETTE]);
-    func_0204be64(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
+    ClActSys_FreeChars(wk->objRes[OBJ_RES_MAIN_CHARS]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_MAIN_PALETTE]);
+    ClActSys_FreePltt(wk->objRes[OBJ_RES_BUTTON_PALETTE]);
+    ClActSys_FreeCellAnims(wk->objRes[OBJ_RES_MAIN_CELL_ANIMS]);
 }
 
 static void ResearchGraph_ClearUnits(ResearchGraph *wk) {
@@ -2938,7 +2938,7 @@ static void ResearchGraph_CreateUnits(ResearchGraph *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        wk->units[i] = func_0204bf1c(sGraphUnitCounts[i], sGraphUnitPriorities[i], wk->heapId);
+        wk->units[i] = ClActUnit_Create(sGraphUnitCounts[i], sGraphUnitPriorities[i], wk->heapId);
     }
 }
 
@@ -2946,7 +2946,7 @@ static void ResearchGraph_DeleteUnits(ResearchGraph *wk) {
     int i;
 
     for (i = 0; i < UNIT_COUNT; i++) {
-        func_0204bf98(wk->units[i]);
+        ClActUnit_Delete(wk->units[i]);
     }
 }
 
@@ -2978,8 +2978,8 @@ static void ResearchGraph_CreateActors(ResearchGraph *wk) {
         chars = ResearchGraph_GetObjRes(wk, entry->chars);
         palette = ResearchGraph_GetObjRes(wk, entry->palette);
         cellAnims = ResearchGraph_GetObjRes(wk, entry->cellAnims);
-        wk->actors[i] = func_0204c040(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
-        func_0204c124(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, entry->surface, wk->heapId);
+        ClActor_SetVisible(wk->actors[i], FALSE);
     }
 }
 
@@ -2987,7 +2987,7 @@ static void ResearchGraph_DeleteActors(ResearchGraph *wk) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
 }
 
@@ -3162,7 +3162,7 @@ static void ResearchGraph_RestorePalettes(ResearchGraph *wk) {
 }
 
 static void ResearchGraph_ShowCommIcon(ResearchGraph *wk) {
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }
 
 static void ResearchGraph_SetVBlank(ResearchGraph *wk) {
@@ -3187,8 +3187,8 @@ static u8 ResearchGraph_ClampU8(int value) {
 static void ResearchGraph_RequestCommRestart(ResearchGraph *wk) {
     GameCommSys *comm = GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk));
 
-    func_0202be14(comm, TRUE);
-    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNK2) {
+    GameCommSys_SetInResearchGraph(comm, TRUE);
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_INTRUDE) {
         GameCommSys_ExitReq(comm);
     }
 }
@@ -3203,11 +3203,11 @@ static BOOL ResearchGraph_RestartComm(ResearchGraph *wk) {
         return TRUE;
     default:
         return TRUE;
-    case GAME_COMM_NO_UNK2:
+    case GAME_COMM_NO_INTRUDE:
         return FALSE;
     }
 }
 
 static void ResearchGraph_EndComm(ResearchGraph *wk) {
-    func_0202be14(GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk)), FALSE);
+    GameCommSys_SetInResearchGraph(GSYS_GetGameCommSystem(ResearchGraph_GetGameSystem(wk)), FALSE);
 }

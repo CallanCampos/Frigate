@@ -97,8 +97,8 @@ u8 DWCAc_StepSockets(void) {
             state = DWCAc_StopSoc();
             break;
         case 14:
-            func_ov011_0216b24c();
-            func_ov011_0216b1d4();
+            DWC_Netcheck_Abort();
+            DWC_Netcheck_Destroy();
             // fall through to the loss of the candidate
         default:
             work->infos[work->selected].result = DWC_AC_RESULT_LOST;
@@ -153,7 +153,7 @@ static u8 DWCAc_WaitHostId(DWCAcSearchWork *work) {
 // State 13, starts the connection test of overlay 11 with the memory functions. 14 to wait
 // for it, or 0x11, the teardown, if it will not start
 static u8 DWCAc_StartConnectionTest(void) {
-    if (func_ov011_0216b14c(DWCAc_GetBlock(DWC_AC_WORK_MEMFUNCS)) == 0) {
+    if (DWC_Netcheck_Create(DWCAc_GetBlock(DWC_AC_WORK_MEMFUNCS)) == 0) {
         return 14;
     }
     DWCAc_SetError(3);
@@ -165,13 +165,13 @@ static u8 DWCAc_StartConnectionTest(void) {
 // candidate is given up, with a note if CPS found its address already in use, and SOC goes down (11)
 static u8 DWCAc_WaitConnectionTest(DWCAcSearchWork *work) {
     DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
-    u32 status = func_ov011_0216b2a4();
+    u32 status = DWC_Netcheck_GetError();
 
     if (status != 0) {
         if (main->candidateType == DWCAc_GetApTypeOfId(work->kind)) {
-            main->testResult = func_ov011_0216b2cc();
+            main->testResult = DWC_Netcheck_GetReturnCode();
         }
-        func_ov011_0216b1d4();
+        DWC_Netcheck_Destroy();
         if (status != 11) {
             work->infos[work->selected].result = DWC_AC_RESULT_GAVE_UP;
             if (CPSNoIpReason == CPS_NOIP_REASON_COLLISION) {

@@ -195,7 +195,7 @@ int WorldTrade_Box_End(WorldTradeWork *wk, int seq) {
     Box_BmpWinDelete(wk);
     Box_BgExit();
     WorldTrade_SubLcdBgExit(wk);
-    func_0204c124(wk->promptDsAct, FALSE);
+    ClActor_SetVisible(wk->promptDsAct, FALSE);
     WorldTrade_SubProcessUpdate(wk);
     return WT_SEQ_INIT;
 }
@@ -327,20 +327,20 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = sCursorPos[wk->boxCursorPos].x;
     setup.y = sCursorPos[wk->boxCursorPos].y;
-    wk->cursorAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                                  wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                  wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c520(wk->cursorAct, TRUE);
-    func_0204c488(wk->cursorAct, 4);
-    if (func_0203d554() == TRUE) {
-        func_0204c124(wk->cursorAct, FALSE);
+    wk->cursorAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetAutoAnim(wk->cursorAct, TRUE);
+    ClActor_SetSequence(wk->cursorAct, 4);
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
+        ClActor_SetVisible(wk->cursorAct, FALSE);
     } else {
-        func_0204c124(wk->cursorAct, TRUE);
+        ClActor_SetVisible(wk->cursorAct, TRUE);
     }
     if (wk->boxCursorPos == BOX_CURSOR_TRAY_POS || (wk->boxCursorPos >= 0 && wk->boxCursorPos <= 5)) {
-        func_0204c468(wk->cursorAct, 0);
+        ClActor_SetBgPriority(wk->cursorAct, 0);
     } else {
-        func_0204c468(wk->cursorAct, 1);
+        ClActor_SetBgPriority(wk->cursorAct, 1);
     }
 
     for (i = 0; i < BOX_POKE_NUM; i++) {
@@ -348,75 +348,75 @@ static void Box_SetCellActor(WorldTradeWork *wk) {
         setup.y = sCursorPos[i].y;
         setup.priority = 30 - i % 6;
         wk->pokeIconAct[i] =
-            func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-        func_0204c488(wk->pokeIconAct[i], i + 6);
-        func_0204c468(wk->pokeIconAct[i], 1);
+            ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+        ClActor_SetSequence(wk->pokeIconAct[i], i + 6);
+        ClActor_SetBgPriority(wk->pokeIconAct[i], 1);
     }
     for (i = 0; i < BOX_POKE_NUM; i++) {
         setup.x = sCursorPos[i].x;
         setup.y = sCursorPos[i].y + 6;
         setup.priority = 10;
         wk->itemIconAct[i] =
-            func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-        func_0204c488(wk->itemIconAct[i], 40);
-        func_0204c468(wk->itemIconAct[i], 1);
+            ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+        ClActor_SetSequence(wk->itemIconAct[i], 40);
+        ClActor_SetBgPriority(wk->itemIconAct[i], 1);
     }
     for (i = 0; i < 6; i++) {
         setup.x = sCursorPos[i].x + 8;
         setup.y = sCursorPos[i].y + 6;
         setup.priority = 10;
         wk->cballAct[i] =
-            func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-        func_0204c488(wk->cballAct[i], 42);
-        func_0204c468(wk->cballAct[i], 1);
+            ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+        ClActor_SetSequence(wk->cballAct[i], 42);
+        ClActor_SetBgPriority(wk->cballAct[i], 1);
     }
     for (i = 0; i < 2; i++) {
         setup.x = sBoxArrowPos[i].x;
         setup.y = sBoxArrowPos[i].y;
         wk->boxArrowAct[i] =
-            func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                          wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-        func_0204c488(wk->boxArrowAct[i], i + 38);
-        func_0204c468(wk->boxArrowAct[i], 1);
+            ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                           wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+        ClActor_SetSequence(wk->boxArrowAct[i], i + 38);
+        ClActor_SetBgPriority(wk->boxArrowAct[i], 1);
     }
 
     setup.x = 239;
     setup.y = 136;
     setup.priority = 100;
     setup.bgPriority = 1;
-    wk->fingerAct = func_0204c040(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
-                                  wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
-                                  wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
-    func_0204c488(wk->fingerAct, 12);
-    func_0204c520(wk->fingerAct, TRUE);
-    func_0204c550(wk->fingerAct);
-    func_0204c124(wk->fingerAct, FALSE);
+    wk->fingerAct = ClActor_Create(wk->clactUnit, wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR],
+                                   wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT],
+                                   wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL], &setup, 0, HEAPID_WORLDTRADE);
+    ClActor_SetSequence(wk->fingerAct, 12);
+    ClActor_SetAutoAnim(wk->fingerAct, TRUE);
+    ClActor_StopAnim(wk->fingerAct);
+    ClActor_SetVisible(wk->fingerAct, FALSE);
 
-    func_0204c124(wk->promptDsAct, TRUE);
+    ClActor_SetVisible(wk->promptDsAct, TRUE);
     WorldTrade_ActPos(wk->promptDsAct, 55, 168);
 }
 
 static void Box_DelCellActor(WorldTradeWork *wk) {
     int i;
 
-    func_0204c108(wk->fingerAct);
+    ClActor_Delete(wk->fingerAct);
     for (i = 0; i < 2; i++) {
-        func_0204c108(wk->boxArrowAct[i]);
+        ClActor_Delete(wk->boxArrowAct[i]);
     }
-    func_0204c108(wk->cursorAct);
+    ClActor_Delete(wk->cursorAct);
     for (i = 0; i < BOX_POKE_NUM; i++) {
-        func_0204c108(wk->pokeIconAct[i]);
-        func_0204c108(wk->itemIconAct[i]);
+        ClActor_Delete(wk->pokeIconAct[i]);
+        ClActor_Delete(wk->itemIconAct[i]);
     }
     for (i = 0; i < 6; i++) {
-        func_0204c108(wk->cballAct[i]);
+        ClActor_Delete(wk->cballAct[i]);
     }
 }
 
@@ -503,10 +503,10 @@ static int Box_SubSeqStart(WorldTradeWork *wk) {
         }
         Box_SubSeqMessagePrint(wk, msgNo, 1, 0, 0xf0f, 0);
         WorldTrade_SetNextSeq(wk, BOX_SEQ_MESSAGE_WAIT, BOX_SEQ_MAIN);
-        if (func_0203d554() == TRUE) {
-            func_0204c124(wk->cursorAct, FALSE);
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
+            ClActor_SetVisible(wk->cursorAct, FALSE);
         } else {
-            func_0204c124(wk->cursorAct, TRUE);
+            ClActor_SetVisible(wk->cursorAct, TRUE);
         }
     }
     return WT_SEQ_MAIN;
@@ -514,8 +514,8 @@ static int Box_SubSeqStart(WorldTradeWork *wk) {
 
 static void Box_DepositDecideFunc(WorldTradeWork *wk) {
     if (wk->boxCursorPos == BOX_CURSOR_END_POS) {
-        func_0204c124(wk->fingerAct, TRUE);
-        func_0204c56c(wk->fingerAct);
+        ClActor_SetVisible(wk->fingerAct, TRUE);
+        ClActor_RestartAnim(wk->fingerAct);
         wk->subprocessSeq = BOX_SEQ_CANCEL_WAIT;
         GFL_SndSEPlay(0x551);
     } else if (wk->boxCursorPos != BOX_CURSOR_TRAY_POS) {
@@ -546,8 +546,8 @@ static void Box_ExchangeDecideFunc(WorldTradeWork *wk) {
     BoxPkm *pkm;
 
     if (wk->boxCursorPos == BOX_CURSOR_END_POS) {
-        func_0204c124(wk->fingerAct, TRUE);
-        func_0204c56c(wk->fingerAct);
+        ClActor_SetVisible(wk->fingerAct, TRUE);
+        ClActor_RestartAnim(wk->fingerAct);
         wk->subprocessSeq = BOX_SEQ_CANCEL_WAIT;
         GFL_SndSEPlay(0x551);
     } else if (wk->boxCursorPos != BOX_CURSOR_TRAY_POS) {
@@ -588,11 +588,11 @@ static const TouchRect sBoxTouchRects[] = {
 };
 
 static int Box_TouchFunc(WorldTradeWork *wk) {
-    int ret = func_0203da0c(sBoxTouchRects);
+    int ret = GFL_HIDGetTouchPressedRect(sBoxTouchRects);
 
     if (ret != -1) {
-        func_0204c124(wk->cursorAct, FALSE);
-        func_0203d564(TRUE);
+        ClActor_SetVisible(wk->cursorAct, FALSE);
+        GCTX_HIDSetUsingTouch(TRUE);
     }
     return ret;
 }
@@ -613,22 +613,22 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
     if (touch != -1) {
         switch (touch) {
         case 31:
-            func_0204c520(wk->boxArrowAct[0], TRUE);
-            func_0204c488(wk->boxArrowAct[0], 38);
+            ClActor_SetAutoAnim(wk->boxArrowAct[0], TRUE);
+            ClActor_SetSequence(wk->boxArrowAct[0], 38);
             wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, 1);
             Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
             GFL_SndSEPlay(0x548);
             break;
         case 32:
-            func_0204c520(wk->boxArrowAct[1], TRUE);
-            func_0204c488(wk->boxArrowAct[1], 39);
+            ClActor_SetAutoAnim(wk->boxArrowAct[1], TRUE);
+            ClActor_SetSequence(wk->boxArrowAct[1], 39);
             wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, -1);
             Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
             GFL_SndSEPlay(0x548);
             break;
         case BOX_CURSOR_END_POS:
-            func_0204c124(wk->fingerAct, TRUE);
-            func_0204c56c(wk->fingerAct);
+            ClActor_SetVisible(wk->fingerAct, TRUE);
+            ClActor_RestartAnim(wk->fingerAct);
             wk->subprocessSeq = BOX_SEQ_CANCEL_WAIT;
             wk->boxCursorPos = touch;
             GFL_SndSEPlay(0x551);
@@ -648,8 +648,8 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
         Box_CursorControl(wk);
         if (wk->subProcessMode == BOX_MODE_DEPOSIT_SELECT) {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-                func_0204c124(wk->fingerAct, TRUE);
-                func_0204c56c(wk->fingerAct);
+                ClActor_SetVisible(wk->fingerAct, TRUE);
+                ClActor_RestartAnim(wk->fingerAct);
                 wk->subprocessSeq = BOX_SEQ_CANCEL_WAIT;
                 GFL_SndSEPlay(0x551);
             } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
@@ -657,8 +657,8 @@ static int Box_SubSeqMain(WorldTradeWork *wk) {
             }
         } else if (wk->subProcessMode == BOX_MODE_EXCHANGE_SELECT) {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-                func_0204c124(wk->fingerAct, TRUE);
-                func_0204c56c(wk->fingerAct);
+                ClActor_SetVisible(wk->fingerAct, TRUE);
+                ClActor_RestartAnim(wk->fingerAct);
                 wk->subprocessSeq = BOX_SEQ_CANCEL_WAIT;
                 GFL_SndSEPlay(0x551);
             } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) {
@@ -684,9 +684,9 @@ static void Box_CursorControl(WorldTradeWork *wk) {
     BOOL moved = FALSE;
     int move = 0;
 
-    if (GCTX_HIDGetPressedKeys() != 0 && func_0203d554() == TRUE) {
-        func_0204c124(wk->cursorAct, TRUE);
-        func_0203d564(FALSE);
+    if (GCTX_HIDGetPressedKeys() != 0 && GCTX_HIDIsUsingTouch() == TRUE) {
+        ClActor_SetVisible(wk->cursorAct, TRUE);
+        GCTX_HIDSetUsingTouch(FALSE);
         GFL_SndSEPlay(0x548);
         return;
     }
@@ -708,8 +708,8 @@ static void Box_CursorControl(WorldTradeWork *wk) {
             if (next == 99 || next == 101) {
                 u8 arrow = next == 101 ? 0 : 1;
 
-                func_0204c520(wk->boxArrowAct[arrow], TRUE);
-                func_0204c488(wk->boxArrowAct[arrow], arrow + 38);
+                ClActor_SetAutoAnim(wk->boxArrowAct[arrow], TRUE);
+                ClActor_SetSequence(wk->boxArrowAct[arrow], arrow + 38);
                 wk->boxTrayNo = Box_RoundWork(wk->boxTrayNo, wk->boxCount, next - 100);
                 Box_NowBoxPageInfoGet(wk, wk->boxTrayNo);
                 GFL_SndSEPlay(0x548);
@@ -728,9 +728,9 @@ static void Box_CursorControl(WorldTradeWork *wk) {
 static void Box_CursorPosPrioritySet(ClActor *cursor, int pos) {
     WorldTrade_CLACT_PosChange(cursor, sCursorPos[pos].x, sCursorPos[pos].y);
     if (pos == BOX_CURSOR_TRAY_POS || (pos >= 0 && pos <= 5)) {
-        func_0204c468(cursor, 0);
+        ClActor_SetBgPriority(cursor, 0);
     } else {
-        func_0204c468(cursor, 1);
+        ClActor_SetBgPriority(cursor, 1);
     }
 }
 
@@ -971,7 +971,7 @@ static int Box_SubSeqCBallDepositYesNoSelect(WorldTradeWork *wk) {
 }
 
 static int Box_SubSeqCancelWait(WorldTradeWork *wk) {
-    if (!func_0204c560(wk->fingerAct)) {
+    if (!ClActor_IsAnimActive(wk->fingerAct)) {
         Box_CancelFunc(wk, wk->subProcessMode);
     }
     return WT_SEQ_MAIN;
@@ -986,7 +986,7 @@ static int Box_SubSeqMessageWait(WorldTradeWork *wk) {
 
 static int Box_SubSeqMessageClearWait(WorldTradeWork *wk) {
     if (!WorldTrade_PrintIsBusy(&wk->print)) {
-        if (GCTX_HIDGetPressedKeys() || func_0203da48()) {
+        if (GCTX_HIDGetPressedKeys() || GFL_HIDIsTouchPressed()) {
             BmpWin_ClearFrame(wk->talkWin, 0);
             wk->subprocessSeq = wk->subprocessNextSeq;
         }
@@ -1050,7 +1050,7 @@ static void Box_PokemonIconDraw(WorldTradeWork *wk) {
         if (pbuf->icon != NULL) {
             DC_FlushRange(pbuf->chars, 0x200);
             GX_LoadOBJ(pbuf->chars, pbuf->charOffset, 0x200);
-            func_0204c378(pbuf->icon, (u8)pbuf->palette, 1);
+            ClActor_SetPalette(pbuf->icon, (u8)pbuf->palette, 1);
         }
     }
     GFL_HeapFree(wk->boxIcon);
@@ -1078,20 +1078,20 @@ static void Box_PokemonIconSet(BoxPkm *pkm, ClActor *icon, ClActor *itemAct, u16
 
     if (exists) {
         Box_TransPokeIconCharaPal(*no, form, dat->gender - 1, egg, pos, icon, handle, pbuf);
-        func_0204c124(icon, TRUE);
+        ClActor_SetVisible(icon, TRUE);
         if (item) {
-            func_0204c124(itemAct, TRUE);
+            ClActor_SetVisible(itemAct, TRUE);
             if (PML_ItemIsMail(item)) {
-                func_0204c488(itemAct, 41);
+                ClActor_SetSequence(itemAct, 41);
             } else {
-                func_0204c488(itemAct, 40);
+                ClActor_SetSequence(itemAct, 40);
             }
         } else {
-            func_0204c124(itemAct, FALSE);
+            ClActor_SetVisible(itemAct, FALSE);
         }
     } else {
-        func_0204c124(icon, FALSE);
-        func_0204c124(itemAct, FALSE);
+        ClActor_SetVisible(icon, FALSE);
+        ClActor_SetVisible(itemAct, FALSE);
         pbuf->icon = NULL;
     }
 }
@@ -1119,26 +1119,26 @@ static void Box_NowBoxPageInfoGet(WorldTradeWork *wk, int now) {
             Box_PokemonIconSet(BoxSaveAccessor_GetPkm(box, now, i), wk->pokeIconAct[i], wk->itemIconAct[i], &no[i], i,
                                handle, &wk->boxWork[i], &pbuf[i]);
             if (i < 6) {
-                func_0204c124(wk->cballAct[i], FALSE);
+                ClActor_SetVisible(wk->cballAct[i], FALSE);
             }
         }
         loadBoxNameToStrbuf(box, now, wk->boxTrayNameString);
     } else if (now == BOX_TRAY_PARTY) {
         num = PokeParty_GetPkmCount(wk->param->myparty);
         for (i = 0; i < num; i++) {
-            pkm = func_0201d624(PokeParty_GetPkm(wk->param->myparty, i));
+            pkm = PokeParty_ToBoxPkm(PokeParty_GetPkm(wk->param->myparty, i));
             Box_PokemonLevelSet(pkm, &wk->boxWork[i]);
             Box_PokemonIconSet(pkm, wk->pokeIconAct[i], wk->itemIconAct[i], &no[i], i, handle, &wk->boxWork[i],
                                &pbuf[i]);
-            func_0204c124(wk->cballAct[i], FALSE);
+            ClActor_SetVisible(wk->cballAct[i], FALSE);
         }
         for (; i < BOX_POKE_NUM; i++) {
             wk->boxWork[i].characterNo = 0;
-            func_0204c124(wk->pokeIconAct[i], FALSE);
-            func_0204c124(wk->itemIconAct[i], FALSE);
+            ClActor_SetVisible(wk->pokeIconAct[i], FALSE);
+            ClActor_SetVisible(wk->itemIconAct[i], FALSE);
             pbuf[i].icon = NULL;
             if (i < 6) {
-                func_0204c124(wk->cballAct[i], FALSE);
+                ClActor_SetVisible(wk->cballAct[i], FALSE);
             }
         }
         GFL_MsgDataLoadStrbuf(wk->msgManager, 0x62, wk->boxTrayNameString);
@@ -1169,7 +1169,7 @@ BoxPkm *WorldTrade_GetPokePtr(PokeParty *party, BoxSaveAccessor *box, int tray, 
         if (pos > PokeParty_GetPkmCount(party) - 1) {
             return NULL;
         }
-        return func_0201d624(PokeParty_GetPkm(party, pos));
+        return PokeParty_ToBoxPkm(PokeParty_GetPkm(party, pos));
     }
     return BoxSaveAccessor_GetPkm(box, tray, pos);
 }
@@ -1272,7 +1272,7 @@ static void Box_MakeExchangePokemonData(Dpw_Tr_Data *dtd, WorldTradeWork *wk) {
     dtd->postSimple = post;
     WorldTrade_PostPokemonBaseDataMake(dtd, wk);
 
-    pkm = func_0201d624((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData);
+    pkm = PokeParty_ToBoxPkm((PartyPkm *)wk->downloadPokemonData[wk->touchTrainerPos].postData);
     want.characterNo = PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL);
     want.gender = PML_PkmGetParam(pkm, PKM_PARAM_SEX, NULL) + 1;
     want.level_min = 0;

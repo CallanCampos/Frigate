@@ -58,6 +58,8 @@ struct WeatherObj {
     WeatherObj *next;
 };
 
+#define WEATHER_OBJ_COUNT 32
+
 struct WeatherTask {
     ClActUnit *unit;
     FieldFog *fog;
@@ -78,7 +80,7 @@ struct WeatherTask {
     WeatherSound sound;
     WeatherTimer timer;
     VecFx32 lookAt;
-    WeatherObj objs[32];
+    WeatherObj objs[WEATHER_OBJ_COUNT];
     WeatherObj *objHead;
     int objCount;
     u8 fogPending;
@@ -86,8 +88,6 @@ struct WeatherTask {
     u8 fogDuration;
     u32 fogColor;
 };
-
-#define WEATHER_OBJ_COUNT 32
 
 static const ClActorSetup WEATHER_OBJ_SETUP = { 0, 0, 0, 0x40, 3 };
 static const u8 WEATHER_STATE_KINDS[13] = { 0, 1, 1, 1, 1, 2, 2, 1, 3, 4, 4, 5, 5 };
@@ -129,7 +129,8 @@ static void func_ov036_0219a020(WeatherRes *res);
 static void func_ov036_02199fc0(WeatherRes *res);
 static void func_ov036_0219a044(WeatherRes *res, int index, Field3DBg *bg, const void *config, HeapID heapId);
 static void func_ov036_0219a094(WeatherRes *res, int index, Field3DBg *bg);
-static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, WeatherRes *res, ClActUnit *unit, HeapID heapId);
+static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, const WeatherRes *res, ClActUnit *unit,
+                                HeapID heapId);
 static void func_ov036_0219a23c(WeatherObj *obj);
 static void func_ov036_0219a1e4(WeatherObj *obj);
 static void *func_ov036_0219a250(WeatherObj *obj);
@@ -557,10 +558,10 @@ void func_ov036_02199b90(WeatherTask *task, int x, int y) {
         do {
             ClActor *actor = func_ov036_0219a254(obj);
             ClActorPos pos;
-            func_0204c21c(actor, &pos);
+            ClActor_GetPos(actor, &pos);
             pos.x -= (s16)x;
             pos.y -= (s16)y;
-            func_0204c210(actor, &pos);
+            ClActor_SetPos(actor, &pos);
             obj = obj->next;
         } while (obj != task->objHead);
     }
@@ -575,7 +576,7 @@ void func_ov036_02199bf8(WeatherTask *task) {
 }
 
 void func_ov036_02199c08(WeatherTask *task, u32 sound) {
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         if (task->sound.ambience != 0) {
             FieldSnd_PlayAmbience(task->fieldSound, sound);
         } else {
@@ -585,7 +586,7 @@ void func_ov036_02199c08(WeatherTask *task, u32 sound) {
 }
 
 void func_ov036_02199c30(WeatherTask *task, u32 sound, u32 a2) {
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         if (task->sound.ambience != 0) {
             FieldSnd_PlayAmbienceEx(task->fieldSound, sound, a2);
         } else {
@@ -603,26 +604,26 @@ ClActor *func_ov036_02199c64(WeatherObj *obj) {
 }
 
 void func_ov036_02199c6c(WeatherObj *obj, ClActorPos *pos) {
-    func_0204c178(func_ov036_0219a254(obj), pos, 0);
+    ClActor_GetSurfacePos(func_ov036_0219a254(obj), pos, 0);
 }
 
 void func_ov036_02199c80(WeatherObj *obj, const ClActorPos *pos) {
     ClActorPos wrapped = *pos;
     if (wrapped.x > 0x140) {
-        wrapped.x = wrapped.x % 0x140;
+        wrapped.x %= 0x140;
     } else if (wrapped.x < -0x40) {
         wrapped.x += 0x140;
     }
     if (wrapped.y > 0x100) {
-        wrapped.y = wrapped.y % 0x100;
+        wrapped.y %= 0x100;
     } else if (wrapped.y < -0x40) {
         wrapped.y += 0x100;
     }
-    func_0204c140(func_ov036_0219a254(obj), &wrapped, 0);
+    ClActor_SetSurfacePos(func_ov036_0219a254(obj), &wrapped, 0);
 }
 
 void func_ov036_02199cf0(WeatherObj *obj, const ClActorPos *pos) {
-    func_0204c140(func_ov036_0219a254(obj), pos, 0);
+    ClActor_SetSurfacePos(func_ov036_0219a254(obj), pos, 0);
 }
 
 static void func_ov036_02199d04(WeatherTask *task) {
@@ -683,23 +684,23 @@ static void func_ov036_02199da8(WeatherTask *task, WeatherObj *obj) {
     obj->next = last->next;
     last->next->prev = obj;
     last->next = obj;
-    func_0204c124(obj->actor, TRUE);
+    ClActor_SetVisible(obj->actor, TRUE);
 }
 
 static void func_ov036_02199de4(WeatherTask *task, WeatherObj *obj) {
     task->objCount--;
     if (task->objHead == obj) {
-        WeatherObj *next = obj->next;
-        if (next == obj) {
-            next = NULL;
+        if (obj->next == obj) {
+            task->objHead = NULL;
+        } else {
+            task->objHead = obj->next;
         }
-        task->objHead = next;
     }
     obj->next->prev = obj->prev;
     obj->prev->next = obj->next;
     obj->next = NULL;
     obj->prev = NULL;
-    func_0204c124(obj->actor, FALSE);
+    ClActor_SetVisible(obj->actor, FALSE);
 }
 
 static void func_ov036_02199e24(WeatherTask *task) {
@@ -789,18 +790,18 @@ static void func_ov036_02199fc0(WeatherRes *res) {
 
 static void func_ov036_02199fd4(WeatherRes *res, const WeatherData *data, HeapID heapId) {
     if (data->graphics.hasObjs != 0) {
-        res->chars = func_0204b81c(res->arc, data->graphics.charsFileId, FALSE, 0, heapId);
-        res->palette = func_0204bbb8(res->arc, data->graphics.paletteFileId, 0, 0, 0, 1, heapId);
-        res->cells = func_0204bde0(res->arc, data->graphics.cellFileId, data->graphics.cellAnimFileId, heapId);
+        res->chars = ClActSys_LoadChars(res->arc, data->graphics.charsFileId, FALSE, 0, heapId);
+        res->palette = ClActSys_LoadPlttRange(res->arc, data->graphics.paletteFileId, 0, 0, 0, 1, heapId);
+        res->cells = ClActSys_LoadCellAnims(res->arc, data->graphics.cellFileId, data->graphics.cellAnimFileId, heapId);
         res->loaded = 1;
     }
 }
 
 static void func_ov036_0219a020(WeatherRes *res) {
     if (res->loaded != 0) {
-        func_0204b98c(res->chars);
-        func_0204bcd0(res->palette);
-        func_0204be64(res->cells);
+        ClActSys_FreeChars(res->chars);
+        ClActSys_FreePltt(res->palette);
+        ClActSys_FreeCellAnims(res->cells);
         res->loaded = 0;
     }
 }
@@ -914,16 +915,17 @@ static BOOL func_ov036_0219a1f0(WeatherObj *obj) {
     return FALSE;
 }
 
-static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, WeatherRes *res, ClActUnit *unit, HeapID heapId) {
+static void func_ov036_0219a200(WeatherObj *obj, WeatherTask *task, const WeatherRes *res, ClActUnit *unit,
+                                HeapID heapId) {
     obj->task = task;
-    obj->actor = func_0204c040(unit, res->chars, res->palette, res->cells, &WEATHER_OBJ_SETUP, 0, heapId);
-    func_0204c124(obj->actor, FALSE);
-    func_0204c5c8(obj->actor, FALSE);
+    obj->actor = ClActor_Create(unit, res->chars, res->palette, res->cells, &WEATHER_OBJ_SETUP, 0, heapId);
+    ClActor_SetVisible(obj->actor, FALSE);
+    ClActor_SetDrawAnim(obj->actor, FALSE);
 }
 
 static void func_ov036_0219a23c(WeatherObj *obj) {
     if (obj->actor != NULL) {
-        func_0204c108(obj->actor);
+        ClActor_Delete(obj->actor);
         obj->actor = NULL;
     }
 }
@@ -942,7 +944,7 @@ static void func_ov036_0219a258(WeatherSound *sound, u32 ambience) {
 
 static void func_ov036_0219a25c(WeatherSound *sound, FieldSound *fieldSound, u32 se) {
     func_ov036_0219a298(sound, fieldSound);
-    if (!func_02005cbc()) {
+    if (!GFL_SndIsLoadThreadRunning()) {
         sound->state = 1;
         sound->se = se;
         if (sound->ambience != 0) {
@@ -968,7 +970,7 @@ static void func_ov036_0219a298(WeatherSound *sound, FieldSound *fieldSound) {
 }
 
 static void func_ov036_0219a2c4(WeatherSound *sound, FieldSound *fieldSound) {
-    if (sound->state == 2 && !func_02005cbc()) {
+    if (sound->state == 2 && !GFL_SndIsLoadThreadRunning()) {
         sound->state = 1;
         if (sound->ambience != 0) {
             FieldSnd_PlayAmbience(fieldSound, sound->se);

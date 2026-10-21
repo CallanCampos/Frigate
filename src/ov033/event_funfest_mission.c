@@ -49,14 +49,14 @@ GameEventReturnCode func_ov033_02176d9c(GameEvent *event, u32 *state, void *data
         break;
     case 1:
         GimmickFunfestLevels_PlayStartEffect(gsys);
-        if (GameCommSys_BootCheck(commSys) != 2) {
+        if (GameCommSys_BootCheck(commSys) != GAME_COMM_NO_INTRUDE) {
             gameData = GSYS_GetGameData(gsys);
             positionPtr = (s32 *)&position;
             positionPtr[0] = 0;
             positionPtr[1] = 0;
             positionPtr[2] = 0;
             for (i = 0; i < 3; i++) {
-                playerState = func_020171e8(gameData, i);
+                playerState = GameData_GetPlayerStateByNetID(gameData, i);
                 PlayerState_SetWPos(playerState, (VecFx32 *)positionPtr);
             }
         }
@@ -82,7 +82,7 @@ GameEventReturnCode func_ov033_02176d9c(GameEvent *event, u32 *state, void *data
         }
         break;
     case 5:
-        func_02014774(festival, 0);
+        LinkFestival_StartTimer(festival, 0);
         EnableAllActorsMovement(Field_GetActorSystem(field));
         return GAMEEVENT_DONE;
     }

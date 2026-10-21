@@ -45,31 +45,31 @@ static BOOL NetDevWifi_UnkAC(void);
 static void NetDevWifi_UnkB8(int a0);
 
 static GFLNetDevTable sNetDevWifiTable = {
-    .unk00 = NetDevWifi_Prepare,
+    .prepare = NetDevWifi_Prepare,
     .init = NetDevWifi_Init,
-    .unk08 = NetDevWifi_Start,
+    .start = NetDevWifi_Start,
     .update = NetDevWifi_Update,
-    .unk10 = NetDevWifi_Unk10,
-    .unk14 = NetDevWifi_Exit,
-    .unk4C = NetDevWifi_Unk4C,
-    .unk50 = NetDevWifi_Unk50,
-    .unk54 = NetDevWifi_Unk54,
+    .disconnect = NetDevWifi_Unk10,
+    .end = NetDevWifi_Exit,
+    .startMatch = NetDevWifi_Unk4C,
+    .connectFriend = NetDevWifi_Unk50,
+    .close = NetDevWifi_Unk54,
     .send = NetDevWifi_Send,
     .setRecvCallback = NetDevWifi_SetRecvCallback,
-    .unk6C = NetDevWifi_Unk6C,
+    .isRunning = NetDevWifi_Unk6C,
     .isConnected = NetDevWifi_IsConnected,
-    .unk74 = NetDevWifi_Unk74,
-    .unk78 = NetDevWifi_Unk78,
+    .isEnded = NetDevWifi_Unk74,
+    .isIdle = NetDevWifi_Unk78,
     .getConnectBits = NetDevWifi_GetConnectBits,
     .getNetId = NetDevWifi_GetNetId,
     .getSignalLevel = NetDevWifi_GetSignalLevel,
     .isError = NetDevWifi_IsError,
-    .unk8C = NetDevWifi_Unk8C,
-    .unk90 = NetDevWifi_Unk90,
+    .setDisconnectError = NetDevWifi_Unk8C,
+    .canConnectFriend = NetDevWifi_Unk90,
     .unk94 = NetDevWifi_Unk94,
     .unk98 = NetDevWifi_Unk98,
-    .unkAC = NetDevWifi_UnkAC,
-    .unkB8 = NetDevWifi_UnkB8,
+    .isLinked = NetDevWifi_UnkAC,
+    .setAcceptConnect = NetDevWifi_UnkB8,
 };
 
 static void NetDevWifi_Prepare(int a0, int a1) {
@@ -82,7 +82,7 @@ static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL succ
     if (sNetDevWifiWork != NULL) {
         return FALSE;
     }
-    pNetInit = func_02042e84();
+    pNetInit = GFL_NetGetInitData();
     DWCRapCommon_Create(pNetInit->wifiHeapId, pNetInit->wifiHeapSize);
     sNetDevWifiWork = GFL_HeapAllocate(heapId, sizeof(NetDevWifiWork), TRUE, "net_devwifi.c", 186);
     sNetDevWifiWork->pNetInit = sys;
@@ -90,7 +90,7 @@ static BOOL NetDevWifi_Init(HeapID heapId, void *sys, BOOL (*callback)(BOOL succ
 }
 
 static BOOL NetDevWifi_Start(void (*callback)(BOOL ok)) {
-    BOOL result = DWCRap_Init((void *)func_02042d48(), (DWCFriendData *)func_02042d64());
+    BOOL result = DWCRap_Init((void *)GFL_NetGetUserData(), (DWCFriendData *)GFL_NetGetFriendData());
 
     if (callback != NULL) {
         callback(TRUE);
@@ -180,7 +180,7 @@ static BOOL NetDevWifi_Unk78(void) {
 }
 
 static int NetDevWifi_GetConnectBits(void) {
-    return func_ov011_02160344();
+    return DWC_GetAIDBitmap();
 }
 
 static int NetDevWifi_GetNetId(void) {
@@ -198,7 +198,7 @@ static BOOL NetDevWifi_IsError(void) {
     int result = DWC_GetLastErrorEx(&code, &type);
 
     if (result != 0) {
-        func_020424ac(code, type, result, 0);
+        NetState_RecordError(code, type, result, 0);
     }
     if (result == 0) {
         return 0;
@@ -206,7 +206,7 @@ static BOOL NetDevWifi_IsError(void) {
     if (code == 0) {
         return -10000;
     }
-    info = func_02042540();
+    info = NetState_GetErrorInfo();
     return info->type != 0 ? info->type : code;
 }
 
@@ -222,7 +222,7 @@ static int NetDevWifi_Unk90(int a0) {
 }
 
 static int NetDevWifi_Unk94(void) {
-    return func_ov011_02151dec();
+    return DWCRap_IsVoiceChatEnabled();
 }
 
 static int NetDevWifi_Unk98(void) {
@@ -230,7 +230,7 @@ static int NetDevWifi_Unk98(void) {
 }
 
 static void NetDevWifi_UnkB8(int a0) {
-    func_ov011_02151fec(a0);
+    DWCRap_SetAcceptConnect(a0);
 }
 
 static BOOL NetDevWifi_UnkAC(void) {

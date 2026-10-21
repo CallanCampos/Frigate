@@ -54,9 +54,11 @@ void *GetZoneInitScrPointer(EventData *data);
 u32 IsEncountDataLoaded(EventData *data);
 EncData *GetEncountData(EventData *data);
 void *GetZoneProxiesAndCount(EventData *data, u32 *count);
-s32 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction);
-s32 CheckProxyEntityEventGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u16 direction);
-s32 CheckProxyEntityEventRail(EventData *data, EventWork *eventWork, const RailPosition *position, u16 direction);
+u16 CheckProxyEntityEvent(EventData *data, EventWork *eventWork, const void *position, u16 direction);
+u16 CheckProxyEntityEventGrid(EventData *data, EventWork *eventWork, const VecFx32 *position, u16 direction);
+u16 CheckProxyEntityEventRail(EventData *data, EventWork *eventWork, const RailPosition *position, u16 direction);
+// What the warp lookups return where there is no warp (our name)
+#define WARP_ID_NONE 0xffff
 s32 GetWarpAtPosition(EventData *data, const VecFx32 *position);
 s32 GetWarpIDByPlayerPos(EventData *data, const VecFx32 *position, u8 direction);
 s32 GetWarpIDByPlayerPosRail(EventData *data, const RailPosition *position);

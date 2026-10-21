@@ -115,7 +115,7 @@ struct GSyncMenuWork {
     // The button touched
     u32 selected;
     u32 unk274;
-    // The wireless status, from func_02012be4, and the last frame's
+    // The wireless status, from WihDwc_GetStatus, and the last frame's
     u32 wifiStatus;
     u32 prevWifiStatus;
     // The sub screen's palettes kept while they are dimmed
@@ -346,7 +346,7 @@ static void GSyncMenu_StateFadeOut(GSyncMenuWork *wk) {
     switch (wk->result) {
     case GSYNC_RESULT_CONNECT:
     case GSYNC_RESULT_WIFI_SETTINGS:
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             GameCommSys_ExitReq(GSYS_GetGameCommSystem(wk->gsys));
         }
         break;
@@ -380,8 +380,8 @@ static void GSyncMenu_StateWifiSettingsYesNo(GSyncMenuWork *wk) {
 static void GSyncMenu_OnButtonAnimEnd(uptr param, fx32 frame) {
     GSyncMenuWork *wk = (GSyncMenuWork *)param;
 
-    func_0204c5bc(wk->actors[wk->selected]);
-    func_0204c520(wk->actors[wk->selected], FALSE);
+    ClActor_ClearAnimCallback(wk->actors[wk->selected]);
+    ClActor_SetAutoAnim(wk->actors[wk->selected], FALSE);
     if (wk->result == GSYNC_RESULT_WIFI_SETTINGS) {
         if (wk->msgWin != NULL) {
             BmpWin_Free(wk->msgWin);
@@ -415,7 +415,7 @@ static void GSyncMenu_CreateButtons(int count, const u32 *msgIds, GSyncMenuWork 
     int i;
 
     wk->buttonCount = count;
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     for (i = 0; i < GSYNC_MENU_BUTTON_WIN_MAX; i++) {
         if (wk->buttonWins[i] != NULL) {
             BmpWin_ClearScreen(wk->buttonWins[i]);
@@ -501,10 +501,10 @@ static void GSyncMenu_CreateActors(GSyncMenuWork *wk) {
         setup.priority = 0;
         setup.bgPriority = 2;
         wk->actors[i] =
-            func_0204c040(wk->clUnit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
-        func_0204c124(wk->actors[i], TRUE);
-        func_0204c318(wk->actors[i], 1);
+            ClActor_Create(wk->clUnit, wk->chars, wk->palette, wk->cellAnims, &setup, CLACT_SURFACE_SUB, wk->heapId);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
+        ClActor_SetVisible(wk->actors[i], TRUE);
+        ClActor_SetObjMode(wk->actors[i], 1);
     }
 }
 
@@ -535,9 +535,9 @@ static void GSyncMenu_LoadGraphics(GSyncMenuWork *wk) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 13 * 0x20, 0x20, wk->heapId);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC_MENU, wk->heapId);
-    wk->chars = func_0204b81c(arc, 5, FALSE, CLACT_VRAM_SUB, wk->heapId);
-    wk->palette = func_0204bbb8(arc, 3, CLACT_VRAM_SUB, 0, 0, 10, wk->heapId);
-    wk->cellAnims = func_0204bde0(arc, 7, 16, wk->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 5, FALSE, CLACT_VRAM_SUB, wk->heapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_SUB, 0, 0, 10, wk->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 7, 16, wk->heapId);
     GFL_ArcToolFree(arc);
     GSyncMenu_CreateActors(wk);
 }
@@ -563,7 +563,7 @@ static void GSyncMenu_StateShowButtons(GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_FreeGraphics(GSyncMenuWork *wk) {
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     GSyncMenu_FreeButtons(wk);
     GFL_BGSysFreeFilledChar(5, 1, 0);
     GFL_BGSysFreeCharMemory(5, CHAR_POS(wk->frameChars), CHAR_SIZE(wk->frameChars));
@@ -592,7 +592,7 @@ static void GSyncMenu_StateWaitFadeOut(GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_StateWaitMessageTouch(GSyncMenuWork *wk) {
-    if (GSyncMenu_IsMessageFinished(wk) && func_0203da48()) {
+    if (GSyncMenu_IsMessageFinished(wk) && GFL_HIDIsTouchPressed()) {
         GSyncMenu_FreeMessage(wk);
         wk->prevWifiStatus = 0;
         GFL_SndSEPlay(SEQ_SE_SYS_69);
@@ -607,9 +607,9 @@ static void GSyncMenu_StatePressButton(GSyncMenuWork *wk) {
     callback.type = CLACT_CALLBACK_LAST_FRAME;
     callback.param = (uptr)wk;
     callback.func = GSyncMenu_OnButtonAnimEnd;
-    func_0204c520(wk->actors[wk->selected], TRUE);
-    func_0204c5b0(wk->actors[wk->selected], &callback);
-    func_0204c56c(wk->actors[wk->selected]);
+    ClActor_SetAutoAnim(wk->actors[wk->selected], TRUE);
+    ClActor_SetAnimCallback(wk->actors[wk->selected], &callback);
+    ClActor_RestartAnim(wk->actors[wk->selected]);
     GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitButtonAnim, 886);
 }
 
@@ -618,7 +618,7 @@ static BOOL GSyncMenu_OnTouch(u32 button, GSyncMenuWork *wk) {
     switch (button) {
     case GSYNC_MENU_BUTTON_GSYNC:
         GFL_SndSEPlay(SEQ_SE_SYS_69);
-        func_0204c488(wk->actors[GSYNC_MENU_BUTTON_GSYNC], GSYNC_MENU_SEQ_GSYNC);
+        ClActor_SetSequence(wk->actors[GSYNC_MENU_BUTTON_GSYNC], GSYNC_MENU_SEQ_GSYNC);
         GSyncMenu_ChangeState(wk, GSyncMenu_StatePressButton, 905);
         wk->result = GSYNC_RESULT_CONNECT;
         break;
@@ -637,13 +637,13 @@ static BOOL GSyncMenu_OnTouch(u32 button, GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_SetSignalSequence(GSyncMenuWork *wk, int sequence) {
-    if (sequence != func_0204c4a0(wk->actors[GSYNC_MENU_BUTTON_GSYNC])) {
-        func_0204c520(wk->actors[GSYNC_MENU_BUTTON_GSYNC], TRUE);
-        func_0204c488(wk->actors[GSYNC_MENU_BUTTON_GSYNC], sequence);
+    if (sequence != ClActor_GetSequence(wk->actors[GSYNC_MENU_BUTTON_GSYNC])) {
+        ClActor_SetAutoAnim(wk->actors[GSYNC_MENU_BUTTON_GSYNC], TRUE);
+        ClActor_SetSequence(wk->actors[GSYNC_MENU_BUTTON_GSYNC], sequence);
     }
 }
 
-// Shows the wireless signal's strength on the Game Sync button, from the bits of func_02012be4's status that
+// Shows the wireless signal's strength on the Game Sync button, from the bits of WihDwc_GetStatus's status that
 // are set, strongest first
 static void GSyncMenu_UpdateSignal(GSyncMenuWork *wk) {
     if (wk->wifiStatus != wk->prevWifiStatus) {
@@ -748,20 +748,20 @@ static BOOL GSyncMenu_IsMessageFinished(GSyncMenuWork *wk) {
         if (wk->msgWin != NULL) {
             KeyCursor_Update(wk->keyCursor, wk->printStream, wk->msgWin);
         }
-        switch (func_020223b4(wk->printStream)) {
+        switch (PrintStream_GetState(wk->printStream)) {
         case PRINT_STREAM_DONE:
-            func_020223cc(wk->printStream);
+            PrintStream_Delete(wk->printStream);
             wk->printStream = NULL;
             break;
         case PRINT_STREAM_PAUSED:
-            if (func_0203da48()) {
+            if (GFL_HIDIsTouchPressed()) {
                 GFL_SndSEPlay(SEQ_SE_MESSAGE);
-                func_020223bc(wk->printStream);
+                PrintStream_Continue(wk->printStream);
             }
             break;
         case PRINT_STREAM_RUNNING:
-            if (func_0203da2c()) {
-                func_020223e0(wk->printStream, 0);
+            if (GFL_HIDIsTouchHeld()) {
+                PrintStream_SkipWait(wk->printStream, 0);
             }
             break;
         }
@@ -781,8 +781,8 @@ static void GSyncMenu_PrintMessage(GSyncMenuWork *wk, int height, BOOL stream) {
     GFL_BitmapFill(BmpWin_GetBitmap(win), 15);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 15);
     if (stream) {
-        wk->printStream =
-            func_02022268(win, 0, 0, wk->strBuf, wk->font, func_02017bcc(), wk->tcbMgr, 2, wk->heapId, 15);
+        wk->printStream = PrintStream_Create(win, 0, 0, wk->strBuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbMgr, 2,
+                                             wk->heapId, 15);
     } else {
         GFL_TextRendererDrawToBitmap(BmpWin_GetBitmap(win), 0, 0, wk->strBuf, wk->font);
     }
@@ -805,7 +805,7 @@ static void GSyncMenu_StateSaveAsk(GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_StateWaitSave(GSyncMenuWork *wk) {
-    if (func_02017850(wk->gameData) == 2) {
+    if (GameData_UpdateSave(wk->gameData) == 2) {
         GSyncMenu_FreeMessage(wk);
         GSyncMenu_DimSubScreen(wk, FALSE);
         GSyncMenu_ChangeState(wk, GSyncMenu_StateFadeOut, 1258);
@@ -814,7 +814,7 @@ static void GSyncMenu_StateWaitSave(GSyncMenuWork *wk) {
 
 static void GSyncMenu_StateStartSave(GSyncMenuWork *wk) {
     if (GSyncMenu_IsMessageFinished(wk)) {
-        func_0201782c(wk->gameData);
+        GameData_StartSave(wk->gameData);
         GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitSave, 1274);
     }
 }
@@ -822,7 +822,7 @@ static void GSyncMenu_StateStartSave(GSyncMenuWork *wk) {
 static void GSyncMenu_StateSaveAnswer(GSyncMenuWork *wk) {
     if (AppTaskMenu_IsFlashFinished(wk->yesNoMenu)) {
         if (AppTaskMenu_GetCursorPos(wk->yesNoMenu) == 0) {
-            if (func_0200746c(GameData_GetSaveControl(wk->gameData))) {
+            if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(wk->gameData))) {
                 GFL_MsgDataLoadStrbuf(wk->msgData, GsyncMenu_Text_ThereAlreadySavedGame, wk->strBuf);
                 GSyncMenu_PrintMessageStream(wk);
                 GSyncMenu_ChangeState(wk, GSyncMenu_StateWaitMessageTouch, 1293);
@@ -851,7 +851,7 @@ static void GSyncMenu_StateSaveYesNo(GSyncMenuWork *wk) {
 }
 
 static void GSyncMenu_VBlank(TCB *task, void *work) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
@@ -878,7 +878,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     GX_DispOn();
     GFL_BGSysCreate(wk->heapId);
     BmpWin_InitAllocator(wk->heapId);
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     GFL_BGSysSetVRAMBanks(&sGSyncMenuVRAMConfig);
     {
         BGSysLCDConfig lcd = { GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BGMODE_0, GX_BG0_AS_2D };
@@ -887,7 +887,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     ClActSys_Create(&sGSyncMenuClActSetup, &sGSyncMenuVRAMConfig, wk->heapId);
-    wk->clUnit = func_0204bf1c(40, 0, wk->heapId);
+    wk->clUnit = ClActUnit_Create(40, 0, wk->heapId);
     wk->vblankTask = GFL_VBlankTCBAdd(GSyncMenu_VBlank, wk, 0);
     GSyncMenu_CreateBGs(wk);
     GSyncMenu_LoadGraphics(wk);
@@ -895,7 +895,7 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     wk->bgPalettes = GFL_HeapAllocate(wk->heapId, 0x200, FALSE, "gsync_menu.c", 1447);
     wk->tcbMgr = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 3, 0);
     wk->keyCursor = KeyCursor_Create(15, FALSE, TRUE, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(5, 9, wk->font, wk->printQueue, wk->heapId);
     G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, 15, 4);
     color = WIPE_COLOR_BLACK;
@@ -907,8 +907,8 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     GFL_BGSysSetEnabledBGsB(GX_PLANEMASK_ALL);
     GSyncMenu_ChangeState(wk, GSyncMenu_StateShowButtons, 1471);
     wk->param = event;
-    func_02042ba8(FALSE, wk->heapId);
-    func_0203d564(TRUE);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
+    GCTX_HIDSetUsingTouch(TRUE);
     return TRUE;
 }
 
@@ -924,19 +924,19 @@ static BOOL GSyncMenu_ProcMain(GameProc *proc, u32 *state, void *param, void *wo
     if (wk->yesNoMenu != NULL) {
         AppTaskMenu_Update(wk->yesNoMenu);
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         wk->prevWifiStatus = wk->wifiStatus;
-        wk->wifiStatus = func_02012be4(NULL);
+        wk->wifiStatus = WihDwc_GetStatus(NULL);
     }
     GFL_TCBExMgrUpdate(wk->tcbMgr);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     GFL_BGSysMoveBG(4, BG_MOVE_SET_Y, wk->bgScroll);
     wk->bgScroll--;
-    func_0204b794();
+    ClActSys_Draw();
     if (!wk->ending) {
         GSYS_TryBootGameComm(wk->gsys);
     }
-    if (GFL_WipeIsFinished() && func_02016bec(wk->gsys)) {
+    if (GFL_WipeIsFinished() && GSYS_IsLowBatteryCGearOff(wk->gsys)) {
         wk->result = GSYNC_RESULT_NONE;
         done = TRUE;
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
@@ -954,20 +954,20 @@ static BOOL GSyncMenu_ProcExit(GameProc *proc, u32 *state, void *param, void *wo
         return FALSE;
     }
     for (i = 0; i < GSYNC_MENU_ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204bcd0(wk->palette);
-    func_0204b98c(wk->chars);
-    func_0204be64(wk->cellAnims);
+    ClActSys_FreePltt(wk->palette);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreeCellAnims(wk->cellAnims);
     GFL_TCBRemove(wk->vblankTask);
-    func_0204bf98(wk->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(wk->clUnit);
+    ClActSys_Delete();
     if (wk->waitIcon != NULL) {
         WaitIcon_Free(wk->waitIcon);
         wk->waitIcon = NULL;
     }
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     if (wk->yesNoMenu != NULL) {
         AppTaskMenu_Free(wk->yesNoMenu);
@@ -979,8 +979,8 @@ static BOOL GSyncMenu_ProcExit(GameProc *proc, u32 *state, void *param, void *wo
     GFL_HeapFree(wk->bgPalettes);
     KeyCursor_Free(wk->keyCursor);
     GFL_BGSysReleaseBG(5);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     if (wk->msgWin != NULL) {
         BmpWin_Free(wk->msgWin);
     }

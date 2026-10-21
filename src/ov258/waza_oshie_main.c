@@ -445,7 +445,7 @@ static BOOL WazaOshieProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     WazaOshie_InitScreen(wk);
     WazaOshie_SetCursorActor(wk, wk->param->cursorPos, 3);
     wk->nextSeq = SEQ_SELECT;
-    func_02042ba8(TRUE, HEAPID_WAZA_OSHIE);
+    GFL_NetSetIconScreen(TRUE, HEAPID_WAZA_OSHIE);
     return TRUE;
 }
 
@@ -502,9 +502,9 @@ static BOOL WazaOshieProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         break;
     }
     WazaOshie_UpdateButtons(wk);
-    func_0204b794();
+    ClActSys_Draw();
     GFL_TCBExMgrUpdate(wk->tcbManager);
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     return FALSE;
 }
 
@@ -522,7 +522,7 @@ static BOOL WazaOshieProc_Exit(GameProc *proc, u32 *state, void *param, void *wo
 static void WazaOshie_InitMenu(WazaOshieWork *work) {
     int i;
 
-    work->printQueue = func_02021998(HEAPID_WAZA_OSHIE);
+    work->printQueue = PrintQueue_CreateDefault(HEAPID_WAZA_OSHIE);
     work->menuRes = AppTaskMenuRes_Create(4, 10, work->font, work->printQueue, HEAPID_WAZA_OSHIE);
     for (i = 0; i < 2; i++) {
         work->buttonItems[i].str = GFL_MsgDataLoadStrbufNew(work->msgData, sWazaOshieButtonItems[i].msg);
@@ -545,7 +545,7 @@ static void WazaOshie_FreeMenu(WazaOshieWork *work) {
     GFL_StrBufFree(work->yesNoItems[0].str);
     GFL_StrBufFree(work->yesNoItems[1].str);
     AppTaskMenuRes_Free(work->menuRes);
-    func_02021a18(work->printQueue);
+    PrintQueue_Free(work->printQueue);
 }
 
 static void WazaOshie_UpdateButtons(WazaOshieWork *work) {
@@ -596,7 +596,7 @@ static void WazaOshie_FreeScreen(WazaOshieWork *work) {
 static void WazaOshie_VBlank(TCB *tcb, void *data) {
     WazaOshie_LoadTypeIcons(data);
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }
 
@@ -821,7 +821,7 @@ static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
     case 1:
     case 2:
     case 3:
-        if (!func_0203da48()) {
+        if (!GFL_HIDIsTouchPressed()) {
             if (work->param->scroll + pos < work->moveCount) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 return WazaOshie_SeqMoveChosen(work);
@@ -868,19 +868,19 @@ static u32 WazaOshie_SeqSelect(WazaOshieWork *work) {
 }
 
 static u32 WazaOshie_SeqMessage(WazaOshieWork *work) {
-    u32 state = func_020223b4(work->stream);
+    u32 state = PrintStream_GetState(work->stream);
 
     KeyCursor_Update(work->keyCursor, work->stream, work->windows[WINDOW_MESSAGE]);
     if (state == PRINT_STREAM_RUNNING) {
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_A) {
-            func_020223e0(work->stream, 0);
+            PrintStream_SkipWait(work->stream, 0);
         }
     } else if (state == PRINT_STREAM_DONE) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
         return work->nextSeq;
     } else if (state == PRINT_STREAM_PAUSED) {
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-            func_020223bc(work->stream);
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
+            PrintStream_Continue(work->stream);
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
         }
     }
@@ -1023,13 +1023,13 @@ static void WazaOshie_DrawText(WazaOshieWork *work) {
     BmpWin_Transfer(work->windows[WINDOW_TITLE]);
 
     moveNames = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_MOVE_NAMES, HEAPID_WAZA_OSHIE);
-    boxPkm = func_0201d624(work->param->pkm);
+    boxPkm = PokeParty_ToBoxPkm(work->param->pkm);
     for (i = 0; i < 4; i++) {
         move = PML_PkmGetParam(boxPkm, PKM_PARAM_MOVE1 + i, NULL);
         if (move == 0) {
-            func_0204c124(work->actors[ACTOR_KNOWN_TYPE + i], FALSE);
+            ClActor_SetVisible(work->actors[ACTOR_KNOWN_TYPE + i], FALSE);
         } else {
-            func_0204c124(work->actors[ACTOR_KNOWN_TYPE + i], TRUE);
+            ClActor_SetVisible(work->actors[ACTOR_KNOWN_TYPE + i], TRUE);
             WazaOshie_SetKnownMoveType(work, move, i);
             GFL_MsgDataLoadStrbuf(moveNames, move, work->strbuf);
             WazaOshie_PrintText(work, WINDOW_KNOWN_MOVES, work->font, PRINT_COLOR(15, 2, 0), ALIGN_LEFT, i * 32);
@@ -1144,7 +1144,7 @@ static void WazaOshie_DrawMoveInfo(WazaOshieWork *work, u32 move) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_DESCRIPTION]), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_POWER]), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_ACCURACY]), 0);
-    func_0204c124(work->actors[ACTOR_CATEGORY], FALSE);
+    ClActor_SetVisible(work->actors[ACTOR_CATEGORY], FALSE);
     if (move != NO_MOVE) {
         power = PML_MoveGetParam(move, MOVE_PARAM_POWER);
         if (power <= 1) {
@@ -1165,7 +1165,7 @@ static void WazaOshie_DrawMoveInfo(WazaOshieWork *work, u32 move) {
         WazaOshie_PrintText(work, WINDOW_DESCRIPTION, work->font, PRINT_COLOR(1, 2, 0), ALIGN_LEFT, 0);
         GFL_MsgDataFree(descriptions);
         WazaOshie_SetCategory(work, move);
-        func_0204c124(work->actors[ACTOR_CATEGORY], TRUE);
+        ClActor_SetVisible(work->actors[ACTOR_CATEGORY], TRUE);
         BmpWin_Transfer(work->windows[WINDOW_POWER_LABEL]);
         BmpWin_Transfer(work->windows[WINDOW_ACCURACY_LABEL]);
     } else {
@@ -1238,8 +1238,9 @@ static void WazaOshie_PrintMessage(WazaOshieWork *work, u32 msg) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[WINDOW_MESSAGE]), 15);
     BmpWin_DrawFrame(work->windows[WINDOW_MESSAGE], 0, 1, 13);
     WazaOshie_FormatMessage(work, msg);
-    work->stream = func_02022294(work->windows[WINDOW_MESSAGE], 0, 0, work->strbuf, work->font, func_02017bcc(),
-                                 work->tcbManager, 0, HEAPID_WAZA_OSHIE, 0xffff, WazaOshie_StreamCallback);
+    work->stream = PrintStream_CreateWithCallback(work->windows[WINDOW_MESSAGE], 0, 0, work->strbuf, work->font,
+                                                  TextSpeed_GetCurrentWait(), work->tcbManager, 0, HEAPID_WAZA_OSHIE,
+                                                  0xffff, WazaOshie_StreamCallback);
     BmpWin_TransferNow(work->windows[WINDOW_MESSAGE]);
 }
 
@@ -1346,8 +1347,8 @@ static u32 WazaOshie_ForgetNo(WazaOshieWork *work) {
 
 static void WazaOshie_InitActorSys(WazaOshieWork *work) {
     ClActSys_Create(&sWazaOshieActorSysSetup, &sWazaOshieVRAMConfig, HEAPID_WAZA_OSHIE);
-    work->unit = func_0204bf1c(ACTOR_COUNT, 0, HEAPID_WAZA_OSHIE);
-    func_0204c028(work->unit);
+    work->unit = ClActUnit_Create(ACTOR_COUNT, 0, HEAPID_WAZA_OSHIE);
+    ClActUnit_UseSystemRenderer(work->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
@@ -1356,10 +1357,10 @@ static void WazaOshie_FreeActors(WazaOshieWork *work) {
     u32 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(work->actors[i]);
+        ClActor_Delete(work->actors[i]);
     }
-    func_0204bf98(work->unit);
-    func_0204b758();
+    ClActUnit_Delete(work->unit);
+    ClActSys_Delete();
     GFL_ArcToolFree(work->commonArc);
 }
 
@@ -1371,26 +1372,33 @@ static void WazaOshie_LoadActorResources(WazaOshieWork *work, ArcTool *arc) {
     u32 i;
 
     commonArc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_WAZA_OSHIE);
-    work->chars[0] = func_0204b81c(commonArc, func_0202d814(), FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
-    work->chars[1] = func_0204b81c(arc, 17, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
-    work->chars[2] = func_0204b81c(arc, 26, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+    work->chars[0] =
+        ClActSys_LoadChars(commonArc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+    work->chars[1] = ClActSys_LoadChars(arc, 17, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+    work->chars[2] = ClActSys_LoadChars(arc, 26, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
     for (i = 4; i < 8; i++) {
-        work->chars[i] = func_0204b81c(commonArc, func_0202d7f4(0), FALSE, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
+        work->chars[i] = ClActSys_LoadChars(commonArc, AppMenuCommon_GetTypeIconCharFile(0), FALSE, CLACT_VRAM_MAIN,
+                                            HEAPID_WAZA_OSHIE);
     }
-    work->chars[3] = func_0204b81c(arc, 23, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
-    work->palettes[0] = func_0204bbb8(commonArc, func_0202d810(), CLACT_VRAM_SUB, 0, 0, 4, HEAPID_WAZA_OSHIE);
-    work->palettes[1] = func_0204bbb8(arc, 5, CLACT_VRAM_SUB, 4 * 0x20, 0, 1, HEAPID_WAZA_OSHIE);
-    work->palettes[2] = func_0204bbb8(commonArc, func_0202d7e4(), CLACT_VRAM_SUB, 6 * 0x20, 0, 3, HEAPID_WAZA_OSHIE);
-    work->palettes[3] = func_0204bba0(commonArc, func_0202d7e4(), CLACT_VRAM_MAIN, 0, HEAPID_WAZA_OSHIE);
-    work->cellAnims[0] = func_0204bde0(commonArc, func_0202d818(1), func_0202d81c(1), HEAPID_WAZA_OSHIE);
-    work->cellAnims[1] = func_0204bde0(arc, 7, 8, HEAPID_WAZA_OSHIE);
-    work->cellAnims[2] = func_0204bde0(commonArc, func_0202d7f8(1), func_0202d7fc(1), HEAPID_WAZA_OSHIE);
-    work->cellAnims[3] = func_0204bde0(arc, 24, 25, HEAPID_WAZA_OSHIE);
-    work->cellAnims[4] = func_0204bde0(arc, 27, 28, HEAPID_WAZA_OSHIE);
+    work->chars[3] = ClActSys_LoadChars(arc, 23, FALSE, CLACT_VRAM_SUB, HEAPID_WAZA_OSHIE);
+    work->palettes[0] = ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0,
+                                               4, HEAPID_WAZA_OSHIE);
+    work->palettes[1] = ClActSys_LoadPlttRange(arc, 5, CLACT_VRAM_SUB, 4 * 0x20, 0, 1, HEAPID_WAZA_OSHIE);
+    work->palettes[2] = ClActSys_LoadPlttRange(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_SUB,
+                                               6 * 0x20, 0, 3, HEAPID_WAZA_OSHIE);
+    work->palettes[3] =
+        ClActSys_LoadPltt(commonArc, AppMenuCommon_GetTypeIconPaletteFile(), CLACT_VRAM_MAIN, 0, HEAPID_WAZA_OSHIE);
+    work->cellAnims[0] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTouchBarCellFile(1),
+                                                AppMenuCommon_GetTouchBarAnimFile(1), HEAPID_WAZA_OSHIE);
+    work->cellAnims[1] = ClActSys_LoadCellAnims(arc, 7, 8, HEAPID_WAZA_OSHIE);
+    work->cellAnims[2] = ClActSys_LoadCellAnims(commonArc, AppMenuCommon_GetTypeIconCellFile(1),
+                                                AppMenuCommon_GetTypeIconAnimFile(1), HEAPID_WAZA_OSHIE);
+    work->cellAnims[3] = ClActSys_LoadCellAnims(arc, 24, 25, HEAPID_WAZA_OSHIE);
+    work->cellAnims[4] = ClActSys_LoadCellAnims(arc, 27, 28, HEAPID_WAZA_OSHIE);
     GFL_ArcToolFree(commonArc);
 
     pokeArc = MakePokeGraArcHandle(HEAPID_WAZA_OSHIE);
-    boxPkm = func_0201d620(work->param->pkm);
+    boxPkm = PokeParty_GetBoxPkm(work->param->pkm);
     wasEncrypted = PML_PkmDecrypt(boxPkm);
     work->chars[8] = PokeGra_LoadClActCharsByBoxData(pokeArc, boxPkm, 0, CLACT_VRAM_MAIN, HEAPID_WAZA_OSHIE);
     work->palettes[4] =
@@ -1404,7 +1412,7 @@ static void WazaOshie_ReplaceChars(ArcTool *arc, u32 chars, u32 fileId, BOOL com
     NNSG2dCharacterData *character;
     void *buffer = GFL_G2DIOReadOBJNCGRArc(arc, fileId, compressed, &character, heapId);
 
-    func_0204ba40(chars, character);
+    ClActSys_ReplaceCharData(chars, character);
     GFL_HeapFree(buffer);
 }
 
@@ -1414,7 +1422,7 @@ static void WazaOshie_SetKnownMoveType(WazaOshieWork *work, u16 move, u16 index)
 
     work->typeIcons[index].type = type;
     work->typeIcons[index].dirty = TRUE;
-    func_0204c378(work->actors[ACTOR_KNOWN_TYPE + index], func_0202d7e8(type), 1);
+    ClActor_SetPalette(work->actors[ACTOR_KNOWN_TYPE + index], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
 }
 
 static void WazaOshie_LoadTypeIcons(WazaOshieWork *work) {
@@ -1422,7 +1430,8 @@ static void WazaOshie_LoadTypeIcons(WazaOshieWork *work) {
 
     for (i = 0; i < TYPE_ICON_COUNT; i++) {
         if (work->typeIcons[i].dirty) {
-            WazaOshie_ReplaceChars(work->commonArc, work->chars[4 + i], func_0202d7f4(work->typeIcons[i].type), FALSE,
+            WazaOshie_ReplaceChars(work->commonArc, work->chars[4 + i],
+                                   AppMenuCommon_GetTypeIconCharFile(work->typeIcons[i].type), FALSE,
                                    HEAPID_WAZA_OSHIE);
             work->typeIcons[i].dirty = FALSE;
         }
@@ -1438,19 +1447,19 @@ static void WazaOshie_UpdateListTypes(WazaOshieWork *work) {
     for (i = 0; i < LIST_ROWS; i++) {
         pos.x = 47;
         pos.y = i * 24 + 80;
-        func_0204c140(work->actors[ACTOR_LIST_TYPE + i], &pos, CLACT_SURFACE_SUB);
+        ClActor_SetSurfacePos(work->actors[ACTOR_LIST_TYPE + i], &pos, CLACT_SURFACE_SUB);
         if (work->param->scroll + i >= work->moveCount) {
-            func_0204c124(work->actors[ACTOR_LIST_TYPE + i], FALSE);
+            ClActor_SetVisible(work->actors[ACTOR_LIST_TYPE + i], FALSE);
         } else {
             type = PML_MoveGetParam(work->param->moves[work->param->scroll + i], MOVE_PARAM_TYPE);
-            func_0204c124(work->actors[ACTOR_LIST_TYPE + i], TRUE);
-            func_0204c488(work->actors[ACTOR_LIST_TYPE + i], type);
+            ClActor_SetVisible(work->actors[ACTOR_LIST_TYPE + i], TRUE);
+            ClActor_SetSequence(work->actors[ACTOR_LIST_TYPE + i], type);
         }
     }
 }
 
 static void WazaOshie_SetCategory(WazaOshieWork *work, u16 move) {
-    func_0204c488(work->actors[ACTOR_CATEGORY], PML_MoveGetParam(move, MOVE_PARAM_CATEGORY));
+    ClActor_SetSequence(work->actors[ACTOR_CATEGORY], PML_MoveGetParam(move, MOVE_PARAM_CATEGORY));
 }
 
 static const WazaOshieActorData sWazaOshieActors[ACTOR_COUNT] = {
@@ -1483,15 +1492,15 @@ static void WazaOshie_InitActors(WazaOshieWork *work, ArcTool *arc) {
         setup.sequence = sWazaOshieActors[i].sequence;
         setup.priority = sWazaOshieActors[i].priority;
         setup.bgPriority = sWazaOshieActors[i].bgPriority;
-        work->actors[i] = func_0204c040(
+        work->actors[i] = ClActor_Create(
             work->unit, work->chars[sWazaOshieActors[i].chars], work->palettes[sWazaOshieActors[i].palette],
             work->cellAnims[sWazaOshieActors[i].cellAnims], &setup, sWazaOshieActors[i].surface, HEAPID_WAZA_OSHIE);
-        func_0204c520(work->actors[i], FALSE);
+        ClActor_SetAutoAnim(work->actors[i], FALSE);
     }
-    func_0204c520(work->actors[ACTOR_RETURN], TRUE);
-    func_0204c520(work->actors[ACTOR_CURSOR], TRUE);
-    func_0204c520(work->actors[ACTOR_ARROW_UP], TRUE);
-    func_0204c520(work->actors[ACTOR_ARROW_DOWN], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_RETURN], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_CURSOR], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_ARROW_UP], TRUE);
+    ClActor_SetAutoAnim(work->actors[ACTOR_ARROW_DOWN], TRUE);
 }
 
 // Moves the cursor's actor to a row of the list, an arrow or the buttons, with the frame for each
@@ -1501,18 +1510,18 @@ static void WazaOshie_SetCursorActor(WazaOshieWork *work, u8 pos, u32 unused) {
     if (pos < LIST_ROWS) {
         actorPos.x = 130;
         actorPos.y = pos * 24 + 84;
-        func_0204c140(work->actors[ACTOR_CURSOR], &actorPos, CLACT_SURFACE_SUB);
-        func_0204c4d4(work->actors[ACTOR_CURSOR], 0);
+        ClActor_SetSurfacePos(work->actors[ACTOR_CURSOR], &actorPos, CLACT_SURFACE_SUB);
+        ClActor_SetAnimTime(work->actors[ACTOR_CURSOR], 0);
     } else if (pos < POS_RETURN) {
         actorPos.x = (pos - POS_ARROW_DOWN) * 40;
         actorPos.y = 168;
-        func_0204c140(work->actors[ACTOR_CURSOR], &actorPos, CLACT_SURFACE_SUB);
-        func_0204c4d4(work->actors[ACTOR_CURSOR], 1);
+        ClActor_SetSurfacePos(work->actors[ACTOR_CURSOR], &actorPos, CLACT_SURFACE_SUB);
+        ClActor_SetAnimTime(work->actors[ACTOR_CURSOR], 1);
     } else {
         actorPos.x = 192;
         actorPos.y = 160;
-        func_0204c140(work->actors[ACTOR_CURSOR], &actorPos, CLACT_SURFACE_SUB);
-        func_0204c4d4(work->actors[ACTOR_CURSOR], 2);
+        ClActor_SetSurfacePos(work->actors[ACTOR_CURSOR], &actorPos, CLACT_SURFACE_SUB);
+        ClActor_SetAnimTime(work->actors[ACTOR_CURSOR], 2);
     }
 }
 
@@ -1542,7 +1551,7 @@ static u32 WazaOshie_SeqStatusCall(WazaOshieWork *work) {
 static u32 WazaOshie_SeqStatusReturn(WazaOshieWork *work) {
     WazaOshie_InitScreen(work);
     WazaOshie_SetCursorActor(work, work->param->cursorPos, 3);
-    func_02042ba8(TRUE, HEAPID_WAZA_OSHIE);
+    GFL_NetSetIconScreen(TRUE, HEAPID_WAZA_OSHIE);
     if (work->status.result == PSTATUS_RESULT_FORGET) {
         work->param->slot = work->status.slot;
     } else {
@@ -1736,35 +1745,35 @@ static void WazaOshie_UpdateArrowPositions(WazaOshieWork *work) {
 
 // Plays the arrows' animations after the list scrolled down (direction above 0) or up
 static void WazaOshie_AnimateArrows(WazaOshieWork *work, int direction) {
-    func_0204c4d4(work->actors[ACTOR_ARROW_UP], 0);
-    func_0204c4d4(work->actors[ACTOR_ARROW_DOWN], 0);
+    ClActor_SetAnimTime(work->actors[ACTOR_ARROW_UP], 0);
+    ClActor_SetAnimTime(work->actors[ACTOR_ARROW_DOWN], 0);
     if (direction > 0) {
         if (work->param->scroll + LIST_ROWS < work->moveCount) {
-            func_0204c488(work->actors[ACTOR_ARROW_DOWN], 10);
+            ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 10);
         } else {
-            func_0204c488(work->actors[ACTOR_ARROW_DOWN], 23);
+            ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 23);
         }
-        func_0204c488(work->actors[ACTOR_ARROW_UP], 3);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 3);
     } else {
         if (work->param->scroll == 0) {
-            func_0204c488(work->actors[ACTOR_ARROW_UP], 24);
+            ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 24);
         } else {
-            func_0204c488(work->actors[ACTOR_ARROW_UP], 11);
+            ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 11);
         }
-        func_0204c488(work->actors[ACTOR_ARROW_DOWN], 2);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 2);
     }
 }
 
 static void WazaOshie_InitArrows(WazaOshieWork *work) {
     if (work->moveCount <= LIST_ROWS) {
-        func_0204c488(work->actors[ACTOR_ARROW_UP], 17);
-        func_0204c488(work->actors[ACTOR_ARROW_DOWN], 16);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 17);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 16);
     } else if (work->param->scroll + LIST_ROWS < work->moveCount) {
-        func_0204c488(work->actors[ACTOR_ARROW_UP], 17);
-        func_0204c488(work->actors[ACTOR_ARROW_DOWN], 2);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 17);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 2);
     } else if (work->param->scroll == 0) {
-        func_0204c488(work->actors[ACTOR_ARROW_UP], 3);
-        func_0204c488(work->actors[ACTOR_ARROW_DOWN], 16);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_UP], 3);
+        ClActor_SetSequence(work->actors[ACTOR_ARROW_DOWN], 16);
     }
 }
 
@@ -1775,7 +1784,7 @@ static u32 WazaOshie_DecideActor(WazaOshieWork *work, u16 seq) {
     decide->type = DECIDE_ACTOR;
     decide->index = ACTOR_RETURN;
     decide->seq = seq;
-    func_0204c488(work->actors[ACTOR_RETURN], 9);
+    ClActor_SetSequence(work->actors[ACTOR_RETURN], 9);
     return SEQ_DECIDE_WAIT;
 }
 
@@ -1803,7 +1812,7 @@ static u32 WazaOshie_SeqDecideWait(WazaOshieWork *work) {
     WazaOshieDecide *decide = &work->decide;
 
     if (decide->type == DECIDE_ACTOR) {
-        if (!func_0204c560(work->actors[decide->index])) {
+        if (!ClActor_IsAnimActive(work->actors[decide->index])) {
             return decide->seq;
         }
     } else if (decide->type == DECIDE_BUTTON) {

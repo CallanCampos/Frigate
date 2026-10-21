@@ -9,7 +9,7 @@
 
 typedef struct {
     u32 netId;
-    u16 unk4;
+    u16 actorDeleted;
     u16 unk6;
     FieldActor *actor;
 } FldCommActEntry;
@@ -36,7 +36,7 @@ static void func_ov036_0218b110(FieldActor *actor, const u16 *dir, const VecFx32
                                 FldCommActEntry *entry);
 static u16 func_ov036_0218b128(u16 dir);
 
-FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, u8 a3) {
+FldCommActSys *FldCommActSys_Create(u8 count, MMSys *actorSystem, HeapID heapId, BOOL a3) {
     FldCommActSys *sys = GFL_HeapAllocate(heapId, sizeof(FldCommActSys), TRUE, "field_comm_actor.c", 93);
 
     sys->count = count;
@@ -98,6 +98,11 @@ BOOL FldCommActSys_FindActor(FldCommActSys *sys, s16 x, s16 y, s16 z, u32 *netId
 
             (*index)++;
             if (entry->actor == NULL) {
+                // BUG: only the index moves past an empty entry, so the search stays on it to the end and misses the
+                // actors of the entries after it
+#ifdef BUGFIX
+                entry++;
+#endif
                 continue;
             }
             dy = FldAct_GetGPosY(entry->actor) - y;
@@ -115,7 +120,7 @@ BOOL FldCommActSys_FindActor(FldCommActSys *sys, s16 x, s16 y, s16 z, u32 *netId
 }
 
 static void FieldCommActor_Reset(FldCommActEntry *entry) {
-    if (entry->unk4 == 0) {
+    if (entry->actorDeleted == 0) {
         DeleteActor(entry->actor);
     }
     MI_CpuFill8(entry, 0, sizeof(FldCommActEntry));
@@ -136,11 +141,11 @@ static FieldActor *FieldCommActor_Add(FldCommActSys *sys, u16 modelId, const u16
     actor = CreateNewActorByEntityNoWKOBJCODE(actorSystem, &npc, 0);
     func_ov036_0218b110(actor, dir, pos, hidden, entry);
     SetActorWPosAll(actor, pos, func_ov036_0218b128(*dir));
-    func_ov012_0216763c(actor, TRUE);
-    func_ov012_02167788(actor, TRUE);
+    FldAct_SetHeightCalcDisabled(actor, TRUE);
+    FldAct_SetMapAttrDisabled(actor, TRUE);
     SetActorFlag32(actor, TRUE);
-    func_ov012_02167580(actor, FALSE);
-    func_ov012_02167754(actor, TRUE);
+    SetActorCollisionEnabled(actor, FALSE);
+    FldAct_SetIgnoreDisableAll(actor, TRUE);
     func_ov012_021677bc(actor, TRUE);
     return actor;
 }
@@ -150,13 +155,13 @@ void func_ov036_0218b044(FieldActor *actor) {
 }
 
 void func_ov036_0218b050(FieldActor *actor) {
-    FldCommActLink *link = (FldCommActLink *)GetNPCRailPosPtrAddr(actor);
+    FldCommActLink *link = GetNPCRailPosPtrAddr(actor);
 
-    link->entry->unk4 = 1;
+    link->entry->actorDeleted = 1;
 }
 
 void func_ov036_0218b060(FieldActor *actor) {
-    FldCommActLink *link = (FldCommActLink *)GetNPCRailPosPtrAddr(actor);
+    FldCommActLink *link = GetNPCRailPosPtrAddr(actor);
     VecFx32 pos;
     u32 state;
 
@@ -183,13 +188,13 @@ void func_ov036_0218b060(FieldActor *actor) {
                 if (dz < 0) {
                     dz = -dz;
                 }
-                if (dist + dz >= 0x4000) {
+                if (dist + dz >= FX32_CONST(4)) {
                     state = 10;
                 }
             }
         }
     }
-    func_ov012_021670f4(actor, state);
+    FldAct_SetDrawStatus(actor, state);
     if (link->hidden != NULL) {
         BOOL hide = FALSE;
 
@@ -202,7 +207,7 @@ void func_ov036_0218b060(FieldActor *actor) {
 
 static void func_ov036_0218b110(FieldActor *actor, const u16 *dir, const VecFx32 *pos, const u32 *hidden,
                                 FldCommActEntry *entry) {
-    FldCommActLink *link = (FldCommActLink *)GetNPCRailPosPtrAddr(actor);
+    FldCommActLink *link = GetNPCRailPosPtrAddr(actor);
 
     link->dir = dir;
     link->pos = pos;

@@ -8,6 +8,7 @@
 #include "nitro/svc.h"
 #include "twl/mi.h"
 #include "twl/os.h"
+#include "twl/pm.h"
 
 // The commands of the card's PXI tag: the ARM7 sends PULLED_OUT and RESET_SLOT, and the ARM9 sends TERMINATE
 #define CARD_PXI_COMMAND_MASK 0x3f
@@ -72,12 +73,12 @@ static void CARD_TerminateForPulledOut(void) {
     }
     // The calls into the LTD autoload go through veneers, which the linker adds after this function
     if (OS_IsRunOnTwl()) {
-        func_02769578();
+        PMi_ExecutePostExitCallbackList();
     }
     CARDi_SendtoPxi(CARD_PXI_COMMAND_TERMINATE, 1);
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        func_02768298();
+        MI_StopNDmaChannels();
     }
     OS_Terminate();
 }

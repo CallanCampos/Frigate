@@ -10,7 +10,8 @@
 // with a WEP key, and the disconnection, over DWC_Wcm_*. A message queue turns the WCM's events into waits. The ROM
 // names none of it; the names are ours.
 //
-// MWCC 2.0 lays the statics out in the reverse of their definition order
+// MWCC 2.0 lays the statics out in the reverse of their definition order. The four globals are defined with an
+// initializer, which lets the functions below reach them from one base.
 
 // The messages of the alarm
 #define WIFI_ALARM_SCAN 0x13
@@ -33,8 +34,10 @@ static WifiWepDesc sWep;
 static WMBssDesc sBss;
 static OSMessageQueue sAossApQueue;
 static OSMessage sAossApMessages[4];
-DWCAossFreeFunc gAossApFree;
-AossApWork gAossAp;
+DWCAossFreeFunc gAossApFree = NULL;
+void *gAossApBlock = NULL;
+void (*gAossApOnModeChange)(int mode) = NULL;
+DWCAossAllocFunc gAossApAlloc = NULL;
 
 // The WM's description of an access point to ours
 static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
@@ -102,14 +105,14 @@ int DWC_Aoss_Init(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
         return -1;
     }
     mask = OS_DisableInterrupts();
-    gAossAp.alloc = alloc;
+    gAossApAlloc = alloc;
     gAossApFree = free;
     OS_RestoreInterrupts(mask);
-    gAossAp.block = gAossAp.alloc(0x5890);
-    if (gAossAp.block == NULL) {
+    gAossApBlock = gAossApAlloc(0x5890);
+    if (gAossApBlock == NULL) {
         return -1;
     }
-    if (DWC_Wcm_Start(Wifi_OnEvent, gAossAp.block, 0x5890) == 0) {
+    if (DWC_Wcm_Start(Wifi_OnEvent, gAossApBlock, 0x5890) == 0) {
         ok = FALSE;
     }
     if (ok) {
@@ -139,7 +142,7 @@ int DWC_Aoss_Init(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
             }
         } while (ok);
     }
-    gAossApFree(gAossAp.block);
+    gAossApFree(gAossApBlock);
     return -1;
 }
 
@@ -161,7 +164,7 @@ int DWC_Aoss_Shutdown(void) {
         case DWC_WCM_EVENT_CLEANED_UP:
             ok = FALSE;
             result = 0;
-            gAossApFree(gAossAp.block);
+            gAossApFree(gAossApBlock);
             break;
         case 0:
         case 1:
@@ -189,7 +192,7 @@ int DWC_Aoss_Shutdown(void) {
         }
     } while (ok);
     mask = OS_DisableInterrupts();
-    gAossAp.alloc = NULL;
+    gAossApAlloc = NULL;
     gAossApFree = NULL;
     OS_RestoreInterrupts(mask);
     return result;
@@ -224,14 +227,17 @@ static int AossAp_Scan(WifiScanList **list) {
     OSMessage message;
     OSAlarm alarm;
     WMBssDesc *descs;
+    // The start of the descriptions, for the free, while descs walks them
+    WMBssDesc *buffer;
 
-    if (gAossAp.alloc == NULL || gAossApFree == NULL) {
+    if (gAossApAlloc == NULL || gAossApFree == NULL) {
         return -1;
     }
-    descs = gAossAp.alloc(0x3000);
+    descs = gAossApAlloc(0x3000);
     if (descs == NULL) {
         return -1;
     }
+    buffer = descs;
     if (DWC_Wcm_Search(NULL, NULL, 0, 0x30bffe)) {
         OS_CreateAlarm(&alarm);
         OS_SetAlarm(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_SCAN);
@@ -295,12 +301,12 @@ static int AossAp_Scan(WifiScanList **list) {
             int i;
 
             if (count != 0) {
-                scanList = gAossAp.alloc(sizeof(WifiScanList) + (count - 1) * sizeof(WifiApInfo));
+                scanList = gAossApAlloc(sizeof(WifiScanList) + (count - 1) * sizeof(WifiApInfo));
                 if (scanList == NULL) {
                     goto cancel;
                 }
             } else {
-                scanList = gAossAp.alloc(sizeof(WifiScanList));
+                scanList = gAossApAlloc(sizeof(WifiScanList));
                 if (scanList == NULL) {
                     goto cancel;
                 }
@@ -308,7 +314,8 @@ static int AossAp_Scan(WifiScanList **list) {
             *list = scanList;
             scanList->count = count;
             for (i = 0; i < count; i++) {
-                Wifi_ConvertBss(&descs[i], &scanList->ap[i]);
+                Wifi_ConvertBss(descs, &scanList->ap[i]);
+                descs++;
             }
         }
     cancel:
@@ -316,7 +323,7 @@ static int AossAp_Scan(WifiScanList **list) {
         while (OS_ReceiveMessage(&sAossApQueue, &message, 0) == 1) {
         }
     }
-    gAossApFree(descs);
+    gAossApFree(buffer);
     return result;
 }
 
@@ -325,7 +332,7 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
     BOOL running = TRUE;
     int status = -1;
     int connected = 0;
-    int tries = 0;
+    int tries;
     u32 option;
     OSMessage message;
     OSAlarm alarm;
@@ -338,23 +345,20 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
     }
     option |= 3 << 16;
     MI_CpuFill8(&sWep, 0, sizeof(sWep));
-    switch (param->keyLength) {
-    case 5:
+    if (param->keyLength == 5) {
         sWep.mode = 1;
-        break;
-    case 13:
+    } else if (param->keyLength == 13) {
         sWep.mode = 2;
-        break;
-    case 16:
+    } else if (param->keyLength == 16) {
         sWep.mode = 3;
-        break;
-    default:
+    } else {
         return -1;
     }
     sWep.keyId = connected;
     MI_CpuCopy8(param->key, sWep.key[connected], param->keyLength);
     WCM_ClearApListBuffer();
     if (DWC_Wcm_Search(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
+        tries = 0;
         OS_CreateAlarm(&alarm);
         OS_SetAlarm(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_CONNECT);
         while (running) {
@@ -439,8 +443,8 @@ void AossAp_Sleep(u32 milliseconds) {
 }
 
 int AossAp_NotifyModeChange(int mode) {
-    if (gAossAp.onModeChange != NULL) {
-        gAossAp.onModeChange(mode);
+    if (gAossApOnModeChange != NULL) {
+        gAossApOnModeChange(mode);
     }
     return 0;
 }

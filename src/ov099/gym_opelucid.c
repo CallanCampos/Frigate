@@ -677,10 +677,10 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
     mover->done = FALSE;
     if (mover->entry->start < mover->entry->end) {
         mover->reverse = FALSE;
-        func_ov036_021b82ac(mover->obj->expObj, 0, FX32_ONE);
+        FieldExpObj_SetSceneFrameStep(mover->obj->expObj, 0, FX32_ONE);
     } else {
         mover->reverse = TRUE;
-        func_ov036_021b82ac(mover->obj->expObj, 0, -FX32_ONE);
+        FieldExpObj_SetSceneFrameStep(mover->obj->expObj, 0, -FX32_ONE);
     }
     for (j = 0; j < sGymOpelucidActors[mover->object].animationCount; j++) {
         if (j != ANM_STATE) {
@@ -706,10 +706,10 @@ static void GymOpelucid_StartMove(OpelucidGymMoveEvent *ev) {
         mover->done = FALSE;
         if (mover->entry->start < mover->entry->end) {
             mover->reverse = FALSE;
-            func_ov036_021b82ac(mover->obj->expObj, 0, FX32_ONE);
+            FieldExpObj_SetSceneFrameStep(mover->obj->expObj, 0, FX32_ONE);
         } else {
             mover->reverse = TRUE;
-            func_ov036_021b82ac(mover->obj->expObj, 0, -FX32_ONE);
+            FieldExpObj_SetSceneFrameStep(mover->obj->expObj, 0, -FX32_ONE);
         }
         for (j = 0; j < sGymOpelucidActors[mover->object].animationCount; j++) {
             OpelucidGymObject *obj = mover->obj;
@@ -748,7 +748,7 @@ static void GymOpelucid_EndMove(OpelucidGymMoveEvent *ev) {
 
     for (i = 0; i < OBJECT_COUNT; i++) {
         OpelucidGymObject *obj = &ev->work->objects[i];
-        ev->state->frames[obj->actor] = func_ov036_021b8520(obj->expObj, 0, 0, 0);
+        ev->state->frames[obj->actor] = FieldExpObj_GetAnmFrame(obj->expObj, 0, 0, 0);
     }
     for (i = 0; i < MOVER_COUNT; i++) {
         if (ev->movers[i].curve != NULL) {
@@ -762,7 +762,7 @@ static void GymOpelucid_UpdatePlayerMover(OpelucidGymMoveEvent *ev) {
     OpelucidGymMover *mover = &ev->movers[0];
     int step;
 
-    func_ov036_021b8520(mover->obj->expObj, 0, 0, 0);
+    FieldExpObj_GetAnmFrame(mover->obj->expObj, 0, 0, 0);
     if (mover->done == 1) {
         for (j = 0; j < sGymOpelucidActors[mover->object].animationCount; j++) {
             FieldExpObjAnm *anm = FieldExpObj_GetAnmInfo(mover->obj->expObj, 0, mover->obj->actor, j);

@@ -23,18 +23,17 @@ void *FieldTask_GetData(FieldTask *task);
 BOOL FieldTask_CheckStateReqEnd(FieldTask *task);
 u32 FieldTask_GetState(FieldTask *task);
 FieldTaskCallback FieldTask_GetCallback(FieldTask *task);
-void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, u32 a2);
+void FieldTaskManager_AddTask(FieldTaskManager *mgr, FieldTask *task, FieldTask *parent);
 // Whether a task with the callback is running
 BOOL FieldTaskManager_CheckCallbackRegistered(FieldTaskManager *mgr, FieldTaskCallback callback);
 FieldTask *FieldActorSpinTask_CreatePlayerAccel(Field *field, u32 duration, u32 direction);
 FieldTask *FieldActorSpinTask_CreatePlayer(Field *field, u32 duration, u32 direction);
-// Overlay 36's field_task_manager.c, not written yet: the player's spin slowing down to face dir, a wait of
-// duration frames, and the effect task of an actor
+// The player's spin slowing down to face dir, a wait of duration frames, and the effect task of an actor
 FieldTask *FieldActorSpinTask_CreatePlayerDeaccel(Field *field, u32 duration, u32 direction, u32 dir);
 FieldTask *FieldWaitTask_Create(Field *field, u16 duration);
 FieldTask *FieldActorEffectTask_Create(Field *field, FieldActor *actor, u16 duration, u16 interval);
-// Moves the player to pos over duration frames
-FieldTask *FieldPlayerMoveTask_Create(Field *field, u32 duration, const VecFx32 *pos);
+// Moves the player to pos over duration frames. pos isn't const: the original loads it only after storing duration
+FieldTask *FieldPlayerMoveTask_Create(Field *field, u32 duration, VecFx32 *pos);
 FieldTask *FieldActorMoveTask_CreatePlayer(Field *field, u32 duration, const VecFx32 *offset);
 FieldTask *FieldActorSpinTask_Create(Field *field, u32 duration, u32 direction, FieldActor *actor);
 // Moves the actor by offset, or to pos, over duration frames

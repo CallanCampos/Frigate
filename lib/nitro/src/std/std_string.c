@@ -39,11 +39,11 @@ char *STD_CopyString(char *dst, const char *src) {
 }
 
 int STD_CopyLString(char *dst, const char *src, int size) {
-    u32 offset = (u32)dst & 3;
+    u32 offset = (uptr)dst & 3;
     const char *s = src;
     int i = 0;
 
-    if (!(offset ^ ((u32)src & 3))) {
+    if (!(offset ^ ((uptr)src & 3))) {
         if (offset != 0) {
             while (i + offset < 4 && i < size - 1) {
                 dst[i] = *s;
@@ -105,7 +105,7 @@ int STD_GetStringLength(const char *str) {
     int len = 0;
     const u32 *p;
 
-    while ((u32)(str + len) & 3) {
+    while ((uptr)(str + len) & 3) {
         if (str[len] == '\0') {
             return len;
         }
@@ -131,7 +131,7 @@ int STD_GetStringNLength(const char *str, int maxlen) {
     int len = 0;
     const u32 *p;
 
-    while (((u32)(str + len) & 3) && len < maxlen) {
+    while (((uptr)(str + len) & 3) && len < maxlen) {
         if (str[len] == '\0') {
             return len;
         }
@@ -155,10 +155,10 @@ int STD_GetStringNLength(const char *str, int maxlen) {
 
 // STD_CompareString
 int STD_CompareString(const char *a, const char *b) {
-    u32 offset = (u32)a & 3;
+    u32 offset = (uptr)a & 3;
     int i = 0;
 
-    if (!(offset ^ ((u32)b & 3))) {
+    if (!(offset ^ ((uptr)b & 3))) {
         if (offset != 0) {
             while (i + offset < 4) {
                 u8 ca = a[i];
@@ -196,9 +196,9 @@ int STD_CompareNString(const char *a, const char *b, int len) {
     int i;
 
     if (len != 0) {
-        offset = (u32)a & 3;
+        offset = (uptr)a & 3;
         i = 0;
-        if (!(offset ^ ((u32)b & 3))) {
+        if (!(offset ^ ((uptr)b & 3))) {
             if (offset != 0) {
                 while (i + offset < 4 && i < len) {
                     u8 ca = a[i];

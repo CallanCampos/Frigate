@@ -23,7 +23,7 @@ BOOL MusicalSystem_CanJoin(PartyPkm *pkm) {
     if (PokeParty_GetParam(pkm, 0xaa, NULL) == TRUE) {
         return result;
     }
-    if (hasPokemonChangedForm(func_0201d620(pkm)) != TRUE) {
+    if (hasPokemonChangedForm(PokeParty_GetBoxPkm(pkm)) != TRUE) {
         result = TRUE;
     }
     return result;
@@ -112,8 +112,9 @@ void MusicalSystem_LoadProgramData(Ov210Work *work, SaveControl *save, GameData 
 
     work->program = program;
     if (program >= MUSICAL_PROGRAM_DOWNLOAD) {
-        download = func_0200cca0(gameData, heapId);
-        arc = GFL_ArcSysCreateMemoryHandle(func_0200ce44(download), func_0200ce48(download), HEAPID_TAIL(heapId));
+        download = MusicalDist_Load(gameData, heapId);
+        arc = GFL_ArcSysCreateMemoryHandle(MusicalDist_GetData(download), MusicalDist_GetDataSize(download),
+                                           HEAPID_TAIL(heapId));
     } else {
         arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL_PROGRAM + program, HEAPID_TAIL(heapId));
     }
@@ -140,6 +141,6 @@ void MusicalSystem_LoadProgramData(Ov210Work *work, SaveControl *save, GameData 
     GFL_ArcToolFree(arc);
 
     if (program >= MUSICAL_PROGRAM_DOWNLOAD) {
-        func_0200cd10(download);
+        MusicalDist_Free(download);
     }
 }

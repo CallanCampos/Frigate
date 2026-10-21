@@ -124,7 +124,7 @@ BOOL ManualData_IsOpen(ManualData *data, u16 condition, GameData *gameData) {
         open = TRUE;
         break;
     case MANUAL_CONDITION_C_GEAR:
-        if (func_020098c0(func_02009918(GameData_GetSaveControl(gameData)))) {
+        if (CGearSettings_IsOn(CGearSettings_GetFromSave(GameData_GetSaveControl(gameData)))) {
             open = TRUE;
         }
         break;

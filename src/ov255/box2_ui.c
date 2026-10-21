@@ -19,42 +19,42 @@ typedef struct {
     const CursorMoveCallbacks *callbacks;
 } Box2CursorMoveTable;
 
-static void func_ov255_021d251c(Box2SysWork *syswk, u32 pos);
-static void func_ov255_021d252c(void *work, int pos, int prevPos);
-static void func_ov255_021d2540(void *work, int pos, int prevPos);
-static void func_ov255_021d2550(void *work, int pos, int prevPos);
-static void func_ov255_021d2568(void *work, int pos, int prevPos);
-static void func_ov255_021d2584(void *work, int pos, int prevPos);
-static void func_ov255_021d2624(void *work, int pos, int prevPos);
-static void func_ov255_021d2760(void *work, int pos, int prevPos);
-static void func_ov255_021d2848(void *work, int pos, int prevPos);
-static void func_ov255_021d286c(void *work, int pos, int prevPos);
-static void func_ov255_021d2954(void *work, int pos, int prevPos);
-static void func_ov255_021d2984(void *work, int pos, int prevPos);
-static void func_ov255_021d2b0c(void *work, int pos, int prevPos);
-static void func_ov255_021d2b30(void *work, int pos, int prevPos);
-static void func_ov255_021d2bf0(void *work, int pos, int prevPos);
-static void func_ov255_021d2c20(void *work, int pos, int prevPos);
-static void func_ov255_021d2d4c(void *work, int pos, int prevPos);
-static void func_ov255_021d2d70(void *work, int pos, int prevPos);
-static void func_ov255_021d2e48(void *work, int pos, int prevPos);
-static void func_ov255_021d2e6c(void *work, int pos, int prevPos);
-static void func_ov255_021d2ea8(void *work, int pos, int prevPos);
-static void func_ov255_021d2ec0(void *work, int pos, int prevPos);
-static void func_ov255_021d2edc(void *work, int pos, int prevPos);
-static void func_ov255_021d2ef4(void *work, int pos, int prevPos);
-static void func_ov255_021d2f10(void *work, int pos, int prevPos);
-static void func_ov255_021d2f54(void *work, int pos, int prevPos);
-static void func_ov255_021d3064(void *work, int pos, int prevPos);
-static void func_ov255_021d3088(void *work, int pos, int prevPos);
-static void func_ov255_021d3188(void *work, int pos, int prevPos);
-static void func_ov255_021d31ac(void *work, int pos, int prevPos);
-static void func_ov255_021d32b0(void *work, int pos, int prevPos);
-static void func_ov255_021d32c8(void *work, int pos, int prevPos);
-static void func_ov255_021d3304(Box2AppWork *app, u8 fromX, u8 fromY, u8 toX, u8 toY);
-static u32 func_ov255_021d33a8(const CursorMoveData *data, u32 count);
-static u32 func_ov255_021d3408(const CursorMoveData *data, u32 count);
-static u32 func_ov255_021d3468(const CursorMoveData *data, u32 count, u32 x, u32 y);
+static void MoveCursorTo(Box2SysWork *syswk, u32 pos);
+static void CursorOn(void *work, int pos, int prevPos);
+static void CursorOff(void *work, int pos, int prevPos);
+static void CursorMoveAnim(void *work, int pos, int prevPos);
+static void Cursor9_Touch(void *work, int pos, int prevPos);
+static void CursorNone(void *work, int pos, int prevPos);
+static void Cursor0_Touch(void *work, int pos, int prevPos);
+static void Cursor2_Touch(void *work, int pos, int prevPos);
+static void Cursor3_Move(void *work, int pos, int prevPos);
+static void Cursor3_Touch(void *work, int pos, int prevPos);
+static void Cursor4_Move(void *work, int pos, int prevPos);
+static void Cursor4_Touch(void *work, int pos, int prevPos);
+static void Cursor5_Move(void *work, int pos, int prevPos);
+static void Cursor5_Touch(void *work, int pos, int prevPos);
+static void Cursor6_Move(void *work, int pos, int prevPos);
+static void Cursor6_Touch(void *work, int pos, int prevPos);
+static void Cursor7_Move(void *work, int pos, int prevPos);
+static void Cursor7_Touch(void *work, int pos, int prevPos);
+static void Cursor8_Move(void *work, int pos, int prevPos);
+static void Cursor8_Touch(void *work, int pos, int prevPos);
+static void Cursor10_Move(void *work, int pos, int prevPos);
+static void Cursor10_Touch(void *work, int pos, int prevPos);
+static void Cursor11_Move(void *work, int pos, int prevPos);
+static void Cursor11_Touch(void *work, int pos, int prevPos);
+static void Cursor12_Move(void *work, int pos, int prevPos);
+static void Cursor12_Touch(void *work, int pos, int prevPos);
+static void Cursor13_Move(void *work, int pos, int prevPos);
+static void Cursor13_Touch(void *work, int pos, int prevPos);
+static void Cursor14_Move(void *work, int pos, int prevPos);
+static void Cursor14_Touch(void *work, int pos, int prevPos);
+static void Cursor15_Move(void *work, int pos, int prevPos);
+static void Cursor15_Touch(void *work, int pos, int prevPos);
+static void StartCursorMoveWork(Box2AppWork *app, u8 fromX, u8 fromY, u8 toX, u8 toY);
+static u32 FindTriggeredRect(const CursorMoveData *data, u32 count);
+static u32 FindHeldRect(const CursorMoveData *data, u32 count);
+static u32 FindRectAt(const CursorMoveData *data, u32 count, u32 x, u32 y);
 
 // MWCC sorts a file's data by size, in an order that depends on where each object is declared; the objects of the same
 // size are declared in the order that lays them out as in the ROM (tools/decomp/rodata_order.py)
@@ -95,115 +95,115 @@ static const TouchRect sTouchRects_78e4[3] = {
 };
 
 static const CursorMoveCallbacks sCursorCallbacks10 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2ea8,
-    func_ov255_021d2ec0,
+    CursorOn,
+    CursorOff,
+    Cursor10_Move,
+    Cursor10_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks12 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2f10,
-    func_ov255_021d2f54,
+    CursorOn,
+    CursorOff,
+    Cursor12_Move,
+    Cursor12_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks13 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d3064,
-    func_ov255_021d3088,
+    CursorOn,
+    CursorOff,
+    Cursor13_Move,
+    Cursor13_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks5 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2b0c,
-    func_ov255_021d2b30,
+    CursorOn,
+    CursorOff,
+    Cursor5_Move,
+    Cursor5_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks3 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2848,
-    func_ov255_021d286c,
+    CursorOn,
+    CursorOff,
+    Cursor3_Move,
+    Cursor3_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks2 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2550,
-    func_ov255_021d2760,
+    CursorOn,
+    CursorOff,
+    CursorMoveAnim,
+    Cursor2_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks4 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2954,
-    func_ov255_021d2984,
+    CursorOn,
+    CursorOff,
+    Cursor4_Move,
+    Cursor4_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks6 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2bf0,
-    func_ov255_021d2c20,
+    CursorOn,
+    CursorOff,
+    Cursor6_Move,
+    Cursor6_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks14 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d3188,
-    func_ov255_021d31ac,
+    CursorOn,
+    CursorOff,
+    Cursor14_Move,
+    Cursor14_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks7 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2d4c,
-    func_ov255_021d2d70,
+    CursorOn,
+    CursorOff,
+    Cursor7_Move,
+    Cursor7_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks11 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2edc,
-    func_ov255_021d2ef4,
+    CursorOn,
+    CursorOff,
+    Cursor11_Move,
+    Cursor11_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks15 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d32b0,
-    func_ov255_021d32c8,
+    CursorOn,
+    CursorOff,
+    Cursor15_Move,
+    Cursor15_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks8 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2e48,
-    func_ov255_021d2e6c,
+    CursorOn,
+    CursorOff,
+    Cursor8_Move,
+    Cursor8_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks1 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2584,
-    func_ov255_021d2584,
+    CursorOn,
+    CursorOff,
+    CursorNone,
+    CursorNone,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks9 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2550,
-    func_ov255_021d2568,
+    CursorOn,
+    CursorOff,
+    CursorMoveAnim,
+    Cursor9_Touch,
 };
 
 static const CursorMoveCallbacks sCursorCallbacks0 = {
-    func_ov255_021d252c,
-    func_ov255_021d2540,
-    func_ov255_021d2550,
-    func_ov255_021d2624,
+    CursorOn,
+    CursorOff,
+    CursorMoveAnim,
+    Cursor0_Touch,
 };
 
 static const TouchRect sTouchRects_79fc[5] = {
@@ -707,11 +707,11 @@ static const Box2CursorMoveTable sCursorMoveTables[16] = {
 
 // clang-format on
 
-void func_ov255_021d23d8(Box2SysWork *syswk) {
+void Box2Ui_CreateCursor(Box2SysWork *syswk) {
     BOOL visible;
     u32 id;
 
-    visible = func_0203d554() == TRUE ? FALSE : TRUE;
+    visible = GCTX_HIDIsUsingTouch() == TRUE ? FALSE : TRUE;
     switch (syswk->param->mode) {
     case 0:
         id = 0;
@@ -732,91 +732,91 @@ void func_ov255_021d23d8(Box2SysWork *syswk) {
         id = 15;
         break;
     }
-    func_ov255_021d24e0(syswk);
+    Box2Ui_DeleteCursor(syswk);
     syswk->app->cursorMove = CursorMove_Create(sCursorMoveTables[id].data, sCursorMoveTables[id].callbacks, syswk,
                                                visible, syswk->curRcvPos, HEAPID_BOX2_APP);
     CursorMove_SetHideOnTouch(syswk->app->cursorMove);
-    func_ov255_021d251c(syswk, syswk->curRcvPos);
-    func_ov255_021d101c(syswk, visible);
+    MoveCursorTo(syswk, syswk->curRcvPos);
+    Box2Obj_ShowCursor(syswk, visible);
     syswk->app->oldCurPos = syswk->curRcvPos;
 }
 
-void func_ov255_021d2478(Box2SysWork *syswk, u32 id, u32 pos) {
+void Box2Ui_ChangeCursor(Box2SysWork *syswk, u32 id, u32 pos) {
     BOOL visible = CursorMove_IsCursorVisible(syswk->app->cursorMove);
 
-    func_ov255_021d24e0(syswk);
+    Box2Ui_DeleteCursor(syswk);
     syswk->app->cursorMove = CursorMove_Create(sCursorMoveTables[id].data, sCursorMoveTables[id].callbacks, syswk,
                                                visible, pos, HEAPID_BOX2_APP);
     CursorMove_SetHideOnTouch(syswk->app->cursorMove);
-    func_ov255_021d251c(syswk, pos);
-    func_ov255_021d101c(syswk, visible);
+    MoveCursorTo(syswk, pos);
+    Box2Obj_ShowCursor(syswk, visible);
     syswk->app->oldCurPos = pos;
 }
 
-void func_ov255_021d24e0(Box2SysWork *syswk) {
+void Box2Ui_DeleteCursor(Box2SysWork *syswk) {
     if (syswk->app->cursorMove != NULL) {
         CursorMove_Delete(syswk->app->cursorMove);
         syswk->app->cursorMove = NULL;
     }
 }
 
-void func_ov255_021d24f8(Box2SysWork *syswk, u32 pos) {
+void Box2Ui_PlaceCursorActor(Box2SysWork *syswk, u32 pos) {
     const CursorMoveData *data = CursorMove_GetData(syswk->app->cursorMove, pos);
 
-    func_ov255_021cf6c8(syswk->app, BOX2_ACTOR_CURSOR, data->x, data->y, 0);
+    Box2Obj_SetPos(syswk->app, BOX2_ACTOR_CURSOR, data->x, data->y, 0);
 }
 
-static void func_ov255_021d251c(Box2SysWork *syswk, u32 pos) {
-    func_ov255_021d24f8(syswk, pos);
-    func_ov255_021d052c(syswk);
+static void MoveCursorTo(Box2SysWork *syswk, u32 pos) {
+    Box2Ui_PlaceCursorActor(syswk, pos);
+    Box2Obj_MoveHeldIcons(syswk);
 }
 
-static void func_ov255_021d252c(void *work, int pos, int prevPos) {
+static void CursorOn(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d251c(syswk, pos);
-    func_ov255_021cf63c(syswk->app, BOX2_ACTOR_CURSOR, TRUE);
+    MoveCursorTo(syswk, pos);
+    Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, TRUE);
 }
 
-static void func_ov255_021d2540(void *work, int pos, int prevPos) {
+static void CursorOff(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021cf63c(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
+    Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, FALSE);
 }
 
-static void func_ov255_021d2550(void *work, int pos, int prevPos) {
+static void CursorMoveAnim(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
 }
 
-static void func_ov255_021d2568(void *work, int pos, int prevPos) {
+static void Cursor9_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     CursorMove_SetPos(syswk->app->cursorMove, pos);
-    func_ov255_021d251c(syswk, pos);
+    MoveCursorTo(syswk, pos);
 }
 
-static void func_ov255_021d2584(void *work, int pos, int prevPos) {
+static void CursorNone(void *work, int pos, int prevPos) {
 }
 
-u32 func_ov255_021d2588(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor0(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 8 && res <= 12) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 6;
         }
         if (res == 6) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 6;
         }
         if (res == 7) {
@@ -825,25 +825,25 @@ u32 func_ov255_021d2588(Box2SysWork *syswk) {
         }
     } else if (res == 6 || res == 7) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     return res;
 }
 
-static void func_ov255_021d2624(void *work, int pos, int prevPos) {
+static void Cursor0_Touch(void *work, int pos, int prevPos) {
     if (pos != 6 && pos != 7) {
-        func_ov255_021d251c(work, pos);
+        MoveCursorTo(work, pos);
     }
 }
 
-void func_ov255_021d2634(Box2SysWork *syswk, u32 pos) {
+void Box2Ui_StartMoveToPartyPos(Box2SysWork *syswk, u32 pos) {
     const CursorMoveData *data = CursorMove_GetData(syswk->app->cursorMove, pos);
 
-    func_ov255_021d3304(syswk->app, 84, 16, data->x, data->y);
+    StartCursorMoveWork(syswk->app, 84, 16, data->x, data->y);
 }
 
-void func_ov255_021d2658(Box2SysWork *syswk, u32 pos) {
+void Box2Ui_StartMoveToCursor1(Box2SysWork *syswk, u32 pos) {
     const CursorMoveData *to = sCursorData1;
     const CursorMoveData *data;
 
@@ -852,25 +852,25 @@ void func_ov255_021d2658(Box2SysWork *syswk, u32 pos) {
     } else {
         data = &sCursorData0[pos - BOX2_TRAY_POKE_MAX];
     }
-    func_ov255_021d3304(syswk->app, data->x, data->y, to->x, to->y);
+    StartCursorMoveWork(syswk->app, data->x, data->y, to->x, to->y);
 }
 
-u32 func_ov255_021d2690(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor2(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 35 && res <= 39) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 33;
         }
         if (res == 33) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 33;
         }
         if (res == 34) {
@@ -879,7 +879,7 @@ u32 func_ov255_021d2690(Box2SysWork *syswk) {
         }
     } else if (res == 33 || res == 34) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     if (res == CURSORMOVE_NONE) {
@@ -895,28 +895,28 @@ u32 func_ov255_021d2690(Box2SysWork *syswk) {
     return res;
 }
 
-static void func_ov255_021d2760(void *work, int pos, int prevPos) {
+static void Cursor2_Touch(void *work, int pos, int prevPos) {
     if (pos != 33 && pos != 34) {
-        func_ov255_021d251c(work, pos);
+        MoveCursorTo(work, pos);
     }
 }
 
-u32 func_ov255_021d2770(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor3(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 36 && res <= 41) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 34;
         }
         if (res == 34) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 34;
         }
         if (res == 35) {
@@ -925,7 +925,7 @@ u32 func_ov255_021d2770(Box2SysWork *syswk) {
         }
     } else if (res == 33 || res == 34 || res == 35 || res == 45) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     if (res == CURSORMOVE_NONE) {
@@ -941,30 +941,30 @@ u32 func_ov255_021d2770(Box2SysWork *syswk) {
     return res;
 }
 
-static void func_ov255_021d2848(void *work, int pos, int prevPos) {
+static void Cursor3_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d286c(void *work, int pos, int prevPos) {
+static void Cursor3_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 34 || pos == 35 || pos == 42 || pos == 43 || pos == 44 || pos == 45) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
-    } else if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE && pos >= 36 && pos <= 41) {
+    } else if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE && pos >= 36 && pos <= 41) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-void func_ov255_021d28c4(Box2SysWork *syswk, u32 pos) {
+void Box2Ui_SetButtonStates(Box2SysWork *syswk, u32 pos) {
     u8 button1 = 0;
     u8 button3 = 0;
     u8 button4 = 0;
@@ -982,26 +982,26 @@ void func_ov255_021d28c4(Box2SysWork *syswk, u32 pos) {
         button3 = 1;
         button4 = 1;
     } else if (pos >= BOX2_PARTY_POS) {
-        if (func_ov255_021d3834(syswk->app->bgWinFrame) == FALSE ||
+        if (Box2Frame_IsPartyAtRight(syswk->app->bgWinFrame) == FALSE ||
             Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
             button3 = 2;
         }
     } else if (Box2Main_GetPokeParam(syswk, pos, syswk->tray, PKM_PARAM_SPECIES_VALID, NULL) == 0) {
         button3 = 2;
     }
-    func_ov255_021d1af8(syswk, button1, 1, button3, button4);
+    Box2Obj_SetButtons(syswk, button1, 1, button3, button4);
 }
 
-static void func_ov255_021d2954(void *work, int pos, int prevPos) {
+static void Cursor4_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d28c4(syswk, pos);
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_SetButtonStates(syswk, pos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2984(void *work, int pos, int prevPos) {
+static void Cursor4_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 31 || pos == 32) {
@@ -1011,19 +1011,19 @@ static void func_ov255_021d2984(void *work, int pos, int prevPos) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
-    func_ov255_021c2854(syswk, pos);
-    func_ov255_021d28c4(syswk, pos);
+    Box2Main_UpdateRangeIconsPos(syswk, pos);
+    Box2Ui_SetButtonStates(syswk, pos);
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d29e8(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor4(Box2SysWork *syswk) {
     u32 x;
     u32 y;
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    func_0203da84(&x, &y);
+    GFL_HIDGetTouchHeldPoint(&x, &y);
     if (res == CURSORMOVE_NONE) {
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_Y) {
             Box2Main_ShowCursor(syswk);
@@ -1031,34 +1031,34 @@ u32 func_ov255_021d29e8(Box2SysWork *syswk) {
         }
         if (GCTX_HIDGetTypedKeys() & PAD_BUTTON_L) {
             Box2Main_ShowCursor(syswk);
-            func_ov255_021c2854(syswk, BOX2_PARTY_POS);
+            Box2Main_UpdateRangeIconsPos(syswk, BOX2_PARTY_POS);
             return 31;
         }
         if (GCTX_HIDGetTypedKeys() & PAD_BUTTON_R) {
             Box2Main_ShowCursor(syswk);
-            func_ov255_021c2854(syswk, BOX2_PARTY_POS);
+            Box2Main_UpdateRangeIconsPos(syswk, BOX2_PARTY_POS);
             return 32;
         }
     }
     return res;
 }
 
-u32 func_ov255_021d2a64(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor5(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 9 && res <= 14) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 7;
         }
         if (res == 7) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 7;
         }
         if (res == 8) {
@@ -1067,36 +1067,36 @@ u32 func_ov255_021d2a64(Box2SysWork *syswk) {
         }
     } else if (res == 6 || res == 7 || res == 8 || res == 18) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     return res;
 }
 
-static void func_ov255_021d2b0c(void *work, int pos, int prevPos) {
+static void Cursor5_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2b30(void *work, int pos, int prevPos) {
+static void Cursor5_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 7 || pos == 8 || pos == 15 || pos == 16 || pos == 17 || pos == 18) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
-    } else if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE && pos >= 9 && pos <= 14) {
+    } else if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE && pos >= 9 && pos <= 14) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d2b88(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor6(Box2SysWork *syswk) {
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
     if (res == CURSORMOVE_NONE) {
@@ -1106,28 +1106,28 @@ u32 func_ov255_021d2b88(Box2SysWork *syswk) {
         }
         if (GCTX_HIDGetTypedKeys() & PAD_BUTTON_L) {
             Box2Main_ShowCursor(syswk);
-            func_ov255_021c2854(syswk, BOX2_BOXLIST_POS);
+            Box2Main_UpdateRangeIconsPos(syswk, BOX2_BOXLIST_POS);
             return 37;
         }
         if (GCTX_HIDGetTypedKeys() & PAD_BUTTON_R) {
             Box2Main_ShowCursor(syswk);
-            func_ov255_021c2854(syswk, BOX2_BOXLIST_POS);
+            Box2Main_UpdateRangeIconsPos(syswk, BOX2_BOXLIST_POS);
             return 38;
         }
     }
     return res;
 }
 
-static void func_ov255_021d2bf0(void *work, int pos, int prevPos) {
+static void Cursor6_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d28c4(syswk, pos);
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_SetButtonStates(syswk, pos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2c20(void *work, int pos, int prevPos) {
+static void Cursor6_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 37 || pos == 38) {
@@ -1137,29 +1137,29 @@ static void func_ov255_021d2c20(void *work, int pos, int prevPos) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
-    func_ov255_021c2854(syswk, pos);
-    func_ov255_021d28c4(syswk, pos);
+    Box2Main_UpdateRangeIconsPos(syswk, pos);
+    Box2Ui_SetButtonStates(syswk, pos);
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d2c7c(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor7(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res == 36 || res == 37 || res == 38) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 34;
         }
         if (res == 34) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 34;
         }
         if (res == 35) {
@@ -1168,7 +1168,7 @@ u32 func_ov255_021d2c7c(Box2SysWork *syswk) {
         }
     } else if (res == 33 || res == 34 || res == 35) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     if (res == CURSORMOVE_NONE) {
@@ -1184,42 +1184,42 @@ u32 func_ov255_021d2c7c(Box2SysWork *syswk) {
     return res;
 }
 
-static void func_ov255_021d2d4c(void *work, int pos, int prevPos) {
+static void Cursor7_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2d70(void *work, int pos, int prevPos) {
+static void Cursor7_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 34 || pos == 35 || pos == 39 || pos == 40) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d2dac(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor8(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res == 9 || res == 10 || res == 11) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 7;
         }
         if (res == 7) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 7;
         }
         if (res == 8) {
@@ -1228,101 +1228,101 @@ u32 func_ov255_021d2dac(Box2SysWork *syswk) {
         }
     } else if (res == 6 || res == 7 || res == 8) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     return res;
 }
 
-static void func_ov255_021d2e48(void *work, int pos, int prevPos) {
+static void Cursor8_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2e6c(void *work, int pos, int prevPos) {
+static void Cursor8_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 7 || pos == 8 || pos == 12 || pos == 13) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2ea8(void *work, int pos, int prevPos) {
+static void Cursor10_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
 }
 
-static void func_ov255_021d2ec0(void *work, int pos, int prevPos) {
+static void Cursor10_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     CursorMove_SetPos(syswk->app->cursorMove, pos);
-    func_ov255_021d251c(syswk, pos);
+    MoveCursorTo(syswk, pos);
 }
 
-static void func_ov255_021d2edc(void *work, int pos, int prevPos) {
+static void Cursor11_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
 }
 
-static void func_ov255_021d2ef4(void *work, int pos, int prevPos) {
+static void Cursor11_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     CursorMove_SetPos(syswk->app->cursorMove, pos);
-    func_ov255_021d251c(syswk, pos);
+    MoveCursorTo(syswk, pos);
 }
 
-static void func_ov255_021d2f10(void *work, int pos, int prevPos) {
+static void Cursor12_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos >= 1 && pos <= 4) {
-        func_ov255_021d1ac8(syswk, pos - 1, TRUE);
+        Box2Obj_ShowBoxNameFrame(syswk, pos - 1, TRUE);
     } else {
-        func_ov255_021d1ac8(syswk, 0, FALSE);
+        Box2Obj_ShowBoxNameFrame(syswk, 0, FALSE);
     }
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d2f54(void *work, int pos, int prevPos) {
+static void Cursor12_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 0 || pos == 5 || pos == 6) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d2f88(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor13(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 36 && res <= 39) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 34;
         }
         if (res == 34) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 34;
         }
         if (res == 35) {
@@ -1331,7 +1331,7 @@ u32 func_ov255_021d2f88(Box2SysWork *syswk) {
         }
     } else if (res == 30 || res == 33 || res == 34 || res == 35 || res == 43) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     if (res == CURSORMOVE_NONE) {
@@ -1347,45 +1347,45 @@ u32 func_ov255_021d2f88(Box2SysWork *syswk) {
     return res;
 }
 
-static void func_ov255_021d3064(void *work, int pos, int prevPos) {
+static void Cursor13_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d3088(void *work, int pos, int prevPos) {
+static void Cursor13_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 34 || pos == 35 || pos == 40 || pos == 41 || pos == 42 || pos == 43) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
-    } else if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE && pos >= 36 && pos <= 39) {
+    } else if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE && pos >= 36 && pos <= 39) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d30e0(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor14(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 9 && res <= 12) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_X) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return 7;
         }
         if (res == 7) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             return 7;
         }
         if (res == 8) {
@@ -1394,43 +1394,43 @@ u32 func_ov255_021d30e0(Box2SysWork *syswk) {
         }
     } else if (res == 6 || res == 7 || res == 8 || res == 16) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     return res;
 }
 
-static void func_ov255_021d3188(void *work, int pos, int prevPos) {
+static void Cursor14_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
     syswk->app->oldCurPos = pos;
 }
 
-static void func_ov255_021d31ac(void *work, int pos, int prevPos) {
+static void Cursor14_Touch(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
     if (pos == 7 || pos == 8 || pos == 13 || pos == 14 || pos == 15 || pos == 16) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
-    } else if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE && pos >= 9 && pos <= 12) {
+    } else if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE && pos >= 9 && pos <= 12) {
         CursorMove_SetPos(syswk->app->cursorMove, syswk->app->oldCurPos);
         pos = syswk->app->oldCurPos;
     } else {
-        func_ov255_021d251c(syswk, pos);
+        MoveCursorTo(syswk, pos);
     }
     syswk->app->oldCurPos = pos;
 }
 
-u32 func_ov255_021d3204(Box2SysWork *syswk) {
+u32 Box2Ui_UpdateCursor15(Box2SysWork *syswk) {
     u8 prev = CursorMove_GetPos(syswk->app->cursorMove);
     u32 res = CursorMove_Update(syswk->app->cursorMove);
 
-    if (func_ov255_021d39c0(syswk->app->bgWinFrame) == FALSE) {
+    if (Box2Frame_IsMenuOnScreen(syswk->app->bgWinFrame) == FALSE) {
         if (res >= 34 && res <= 35) {
             CursorMove_SetPos(syswk->app->cursorMove, prev);
-            func_ov255_021d251c(syswk, prev);
+            MoveCursorTo(syswk, prev);
             return CURSORMOVE_NONE;
         }
         if (res == 33) {
@@ -1439,7 +1439,7 @@ u32 func_ov255_021d3204(Box2SysWork *syswk) {
         }
     } else if (res == 30 || res == 33) {
         CursorMove_SetPos(syswk->app->cursorMove, prev);
-        func_ov255_021d251c(syswk, prev);
+        MoveCursorTo(syswk, prev);
         return CURSORMOVE_NONE;
     }
     if (res == CURSORMOVE_NONE) {
@@ -1455,27 +1455,27 @@ u32 func_ov255_021d3204(Box2SysWork *syswk) {
     return res;
 }
 
-static void func_ov255_021d32b0(void *work, int pos, int prevPos) {
+static void Cursor15_Move(void *work, int pos, int prevPos) {
     Box2SysWork *syswk = work;
 
-    func_ov255_021d32d4(syswk->app, pos, prevPos);
+    Box2Ui_StartCursorMove(syswk->app, pos, prevPos);
     Box2Main_VFuncReq(syswk->app, Box2Main_VFuncCursorMove);
 }
 
-static void func_ov255_021d32c8(void *work, int pos, int prevPos) {
+static void Cursor15_Touch(void *work, int pos, int prevPos) {
     if (pos != 33) {
-        func_ov255_021d251c(work, pos);
+        MoveCursorTo(work, pos);
     }
 }
 
-void func_ov255_021d32d4(Box2AppWork *app, u32 pos, u32 curPos) {
+void Box2Ui_StartCursorMove(Box2AppWork *app, u32 pos, u32 curPos) {
     const CursorMoveData *from = CursorMove_GetData(app->cursorMove, pos);
     const CursorMoveData *to = CursorMove_GetData(app->cursorMove, curPos);
 
-    func_ov255_021d3304(app, from->x, from->y, to->x, to->y);
+    StartCursorMoveWork(app, from->x, from->y, to->x, to->y);
 }
 
-static void func_ov255_021d3304(Box2AppWork *app, u8 fromX, u8 fromY, u8 toX, u8 toY) {
+static void StartCursorMoveWork(Box2AppWork *app, u8 fromX, u8 fromY, u8 toX, u8 toY) {
     Box2CursorMoveWork *mv = GFL_HeapAllocate(HEAPID_BOX2_APP, sizeof(Box2CursorMoveWork), FALSE, "box2_ui.c", 2600);
 
     mv->cnt = 4;
@@ -1500,98 +1500,98 @@ static void func_ov255_021d3304(Box2AppWork *app, u8 fromX, u8 fromY, u8 toX, u8
     app->vfunk.work = mv;
 }
 
-static u32 func_ov255_021d33a8(const CursorMoveData *data, u32 count) {
+static u32 FindTriggeredRect(const CursorMoveData *data, u32 count) {
     TouchRect rects[2];
     u32 i;
 
     rects[1] = sTouchRectEnd;
     for (i = 0; i < count; i++) {
         rects[0] = data[i].rect;
-        if (func_0203da0c(rects) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchPressedRect(rects) != TOUCH_RECT_NONE) {
             return i;
         }
     }
     return CURSORMOVE_NONE;
 }
 
-static u32 func_ov255_021d3408(const CursorMoveData *data, u32 count) {
+static u32 FindHeldRect(const CursorMoveData *data, u32 count) {
     TouchRect rects[2];
     u32 i;
 
     rects[1] = sTouchRectEnd;
     for (i = 0; i < count; i++) {
         rects[0] = data[i].rect;
-        if (func_0203d9c8(rects) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchHeldRect(rects) != TOUCH_RECT_NONE) {
             return i;
         }
     }
     return CURSORMOVE_NONE;
 }
 
-static u32 func_ov255_021d3468(const CursorMoveData *data, u32 count, u32 x, u32 y) {
+static u32 FindRectAt(const CursorMoveData *data, u32 count, u32 x, u32 y) {
     TouchRect rects[2];
     u32 i;
 
     rects[1] = sTouchRectEnd;
     for (i = 0; i < count; i++) {
         rects[0] = data[i].rect;
-        if (func_0203dadc(rects, x, y) != TOUCH_RECT_NONE) {
+        if (GFL_HIDGetTouchRectAt(rects, x, y) != TOUCH_RECT_NONE) {
             return i;
         }
     }
     return CURSORMOVE_NONE;
 }
 
-u32 func_ov255_021d34d0(void) {
-    return func_ov255_021d33a8(sTrayCursorData[0], BOX2_TRAY_POKE_MAX);
+u32 Box2Ui_GetTrayPokeTrigger(void) {
+    return FindTriggeredRect(sTrayCursorData[0], BOX2_TRAY_POKE_MAX);
 }
 
-u32 func_ov255_021d34e0(void) {
-    return func_ov255_021d3408(sTrayCursorData[0], BOX2_TRAY_POKE_MAX);
+u32 Box2Ui_GetTrayPokeHeld(void) {
+    return FindHeldRect(sTrayCursorData[0], BOX2_TRAY_POKE_MAX);
 }
 
-u32 func_ov255_021d34f0(u32 x, u32 y) {
-    return func_ov255_021d3468(sTrayCursorData[0], BOX2_TRAY_POKE_MAX, x, y);
+u32 Box2Ui_GetTrayPokeAt(u32 x, u32 y) {
+    return FindRectAt(sTrayCursorData[0], BOX2_TRAY_POKE_MAX, x, y);
 }
 
-u32 func_ov255_021d3504(void) {
-    return func_ov255_021d33a8(sCursorData5, 6);
+u32 Box2Ui_GetMenuButtonTrigger(void) {
+    return FindTriggeredRect(sCursorData5, 6);
 }
 
-u32 func_ov255_021d3514(void) {
-    return func_ov255_021d33a8(&sTrayCursorData[2][30], 6);
+u32 Box2Ui_GetPartyPokeTrigger(void) {
+    return FindTriggeredRect(&sTrayCursorData[2][30], 6);
 }
 
-u32 func_ov255_021d3524(void) {
-    return func_ov255_021d3408(&sTrayCursorData[2][30], 6);
+u32 Box2Ui_GetPartyPokeHeld(void) {
+    return FindHeldRect(&sTrayCursorData[2][30], 6);
 }
 
-u32 func_ov255_021d3534(void) {
-    return func_ov255_021d3408(&sTrayCursorData[0][31], 2);
+u32 Box2Ui_GetTrayArrowHeld(void) {
+    return FindHeldRect(&sTrayCursorData[0][31], 2);
 }
 
-u32 func_ov255_021d3544(void) {
-    return func_0203d9c8(sTouchRects_78e4);
+u32 Box2Ui_GetBoxListArrowHeld(void) {
+    return GFL_HIDGetTouchHeldRect(sTouchRects_78e4);
 }
 
-BOOL func_ov255_021d3554(u32 *x, u32 *y) {
-    if (func_0203d9c8(sTouchRects_78f0) != TOUCH_RECT_NONE) {
-        func_0203da84(x, y);
+BOOL Box2Ui_GetBoxListScrollTouch(u32 *x, u32 *y) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78f0) != TOUCH_RECT_NONE) {
+        GFL_HIDGetTouchHeldPoint(x, y);
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov255_021d357c(u32 *x, u32 *y) {
-    if (func_0203d9c8(sTouchRects_78cc) != TOUCH_RECT_NONE) {
-        func_0203da84(x, y);
+BOOL Box2Ui_GetBoxListTouch(u32 *x, u32 *y) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78cc) != TOUCH_RECT_NONE) {
+        GFL_HIDGetTouchHeldPoint(x, y);
         return TRUE;
     }
     return FALSE;
 }
 
-int func_ov255_021d35a4(u32 x, u32 y) {
-    int res = func_0203dadc(sTouchRects_79fc, x, y);
+int Box2Ui_GetBoxListRowAt(u32 x, u32 y) {
+    int res = GFL_HIDGetTouchRectAt(sTouchRects_79fc, x, y);
 
     if (res == TOUCH_RECT_NONE) {
         return TOUCH_RECT_NONE;
@@ -1599,8 +1599,8 @@ int func_ov255_021d35a4(u32 x, u32 y) {
     return res;
 }
 
-u32 func_ov255_021d35c4(u32 x, u32 y) {
-    u32 res = func_ov255_021d3468(&sTrayCursorData[1][34], 4, x, y);
+u32 Box2Ui_GetBoxListPosAt(u32 x, u32 y) {
+    u32 res = FindRectAt(&sTrayCursorData[1][34], 4, x, y);
 
     if (res != CURSORMOVE_NONE) {
         return res + BOX2_BOXLIST_POS;
@@ -1608,26 +1608,26 @@ u32 func_ov255_021d35c4(u32 x, u32 y) {
     return BOX2_GET_NONE;
 }
 
-BOOL func_ov255_021d35e8(void) {
-    if (func_0203d9c8(sTouchRects_78d4) != TOUCH_RECT_NONE) {
+BOOL Box2Ui_IsPartyLeftHeld(void) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78d4) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL func_ov255_021d3604(void) {
-    if (func_0203d9c8(sTouchRects_78dc) != TOUCH_RECT_NONE) {
+BOOL Box2Ui_IsPartyRightHeld(void) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78dc) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov255_021d3620(void) {
-    return func_ov255_021d3408(&sTrayCursorData[0][33], 1);
+u32 Box2Ui_GetSwitchButtonHeld(void) {
+    return FindHeldRect(&sTrayCursorData[0][33], 1);
 }
 
-BOOL func_ov255_021d3630(void) {
-    if (func_0203d9c8(sTouchRects_78c4) != TOUCH_RECT_NONE) {
+BOOL Box2Ui_IsTrayHeld(void) {
+    if (GFL_HIDGetTouchHeldRect(sTouchRects_78c4) != TOUCH_RECT_NONE) {
         return TRUE;
     }
     return FALSE;

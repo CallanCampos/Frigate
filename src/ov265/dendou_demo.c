@@ -22,7 +22,7 @@ static BOOL DendouDemo_Init(GameProc *proc, u32 *state, void *param, void *work)
     wk = GFL_ProcInitSubsystem(proc, sizeof(DDemoWork), HEAPID_DENDOU_DEMO);
     MI_CpuFill8(wk, 0, sizeof(DDemoWork));
     wk->param = param;
-    func_02038bc8(1);
+    JoinAvenue_RecordActivity(1);
     return TRUE;
 }
 

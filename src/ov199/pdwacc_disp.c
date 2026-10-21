@@ -84,7 +84,7 @@ PdwAccDisp *PdwAccDisp_Create(HeapID heapId) {
     GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     ClActSys_Create(&data_02093f24, &sPdwAccVRAMConfig, disp->heapId);
-    disp->clUnit = func_0204bf1c(40, 0, disp->heapId);
+    disp->clUnit = ClActUnit_Create(40, 0, disp->heapId);
     GFL_BGSysSetVRAMBanks(&sPdwAccVRAMConfig);
     GFL_BGSysSetLCDConfig(&sPdwAccLCDConfig);
     PdwAccDisp_CreateBGs(disp);
@@ -96,7 +96,7 @@ PdwAccDisp *PdwAccDisp_Create(HeapID heapId) {
 }
 
 void PdwAccDisp_Main(PdwAccDisp *disp) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 void PdwAccDisp_Free(PdwAccDisp *disp) {
@@ -110,25 +110,25 @@ void PdwAccDisp_Free(PdwAccDisp *disp) {
     }
     for (i = 0; i < 3; i++) {
         if (disp->res[i] != 0) {
-            func_0204bcd0(disp->res[i]);
+            ClActSys_FreePltt(disp->res[i]);
         }
     }
     for (; i < 6; i++) {
         if (disp->res[i] != 0) {
-            func_0204b98c(disp->res[i]);
+            ClActSys_FreeChars(disp->res[i]);
         }
     }
     for (; i < PDWACC_DISP_RES_COUNT; i++) {
         if (disp->res[i] != 0) {
-            func_0204be64(disp->res[i]);
+            ClActSys_FreeCellAnims(disp->res[i]);
         }
     }
     if (disp->hblankTask != NULL) {
         GFL_TCBRemove(disp->hblankTask);
     }
     GFL_TCBRemove(disp->vblankTask);
-    func_0204bf98(disp->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(disp->clUnit);
+    ClActSys_Delete();
     GFL_BGSysFreeFilledChar(1, 1, 0);
     GFL_BGSysFreeFilledChar(6, 1, 0);
     GFL_BGSysReleaseBG(5);
@@ -320,7 +320,7 @@ static inline void PdwAccDisp_CreateBG6(void) {
 }
 
 static void PdwAccDisp_VBlank(TCB *task, void *work) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 // Loads the palettes the cycle blends between, makes the blends and starts the cycle
@@ -409,7 +409,7 @@ static void PdwAccDisp_DeleteActors(PdwAccDisp *disp) {
 
     for (i = 0; i < PDWACC_DISP_ACTOR_COUNT; i++) {
         if (disp->actors[i] != NULL) {
-            func_0204c108(disp->actors[i]);
+            ClActor_Delete(disp->actors[i]);
             disp->actors[i] = NULL;
         }
     }

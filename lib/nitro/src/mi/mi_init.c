@@ -7,7 +7,7 @@
 void MI_Init(void) {
     MI_SetWramBank(MI_WRAM_ARM7_ALL);
     if (OS_IsRunOnTwl()) {
-        func_02768138();
+        MI_SetUpNDma();
     }
     MI_StopDma(0);
 }

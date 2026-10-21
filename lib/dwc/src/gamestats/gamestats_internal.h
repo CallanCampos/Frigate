@@ -15,10 +15,15 @@
 // The main module's Wi-Fi library (its allocator and its error), NitroSDK's formatted texts and the C library are in
 // the headers above, but for the C library's string functions: MWCC builds them in place (memcpy of a size it knows,
 // strlen) when <string.h> declares them, where the ROM calls them
+#ifdef PLATFORM_PC
+// Host libc uses native size_t for string lengths and memory extents. Keep MWCC's original built-in suppression below.
+#include <string.h>
+#else
 u32 strlen(const char *s);
 char *strncpy(char *dest, const char *src, u32 size);
 int strncmp(const char *a, const char *b, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
+#endif
 
 // The front half of overlay 189: the HTTP client of the game statistics
 // Starts and ends the client, and runs it once; the first starts one more user of it

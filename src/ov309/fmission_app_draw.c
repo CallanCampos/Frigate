@@ -261,7 +261,7 @@ void FMissionAppDraw_Free(FMissionApp *work) {
         work->message = NULL;
     }
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
         work->stream = NULL;
     }
     FMissionAppDraw_FreeObj(work);
@@ -309,9 +309,10 @@ static void FMissionAppDraw_LoadTouchBar(FMissionApp *work, u32 bg, u32 palette)
     int x;
     int y;
 
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, palette * 32, 32, work->heapId);
-    GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), bg, 0, 0, FALSE, work->heapId);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), bg, 0, 0, FALSE, work->heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, palette * 32, 32,
+                                work->heapId);
+    GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), bg, 0, 0, FALSE, work->heapId);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), bg, 0, 0, FALSE, work->heapId);
     screen = GFL_BGSysIsScrHeapExists(bg);
     for (y = 0; y < 24; y++) {
         for (x = 0; x < 32; x++) {
@@ -402,23 +403,23 @@ static void FMissionAppDraw_AddActors(FMissionApp *work, u32 vramType, const FMi
         setup.sequence = setups->sequence;
         setup.priority = setups->priority;
         setup.bgPriority = setups->bgPriority;
-        actors[i] = func_0204c040(unit, work->resources[chars], work->resources[palette], work->resources[cells],
-                                  &setup, vramType, work->heapId);
+        actors[i] = ClActor_Create(unit, work->resources[chars], work->resources[palette], work->resources[cells],
+                                   &setup, vramType, work->heapId);
         visible = FALSE;
         if (setups->visible == TRUE) {
             visible = TRUE;
         }
-        func_0204c124(actors[i], visible);
+        ClActor_SetVisible(actors[i], visible);
         autoAnim = FALSE;
         if (setups->flags & ACTOR_AUTO_ANIM) {
             autoAnim = TRUE;
         }
-        func_0204c520(actors[i], autoAnim);
+        ClActor_SetAutoAnim(actors[i], autoAnim);
         if (setups->flags & ACTOR_FLIP_Y) {
-            func_0204c2b0(actors[i], 1, TRUE);
+            ClActor_SetFlip(actors[i], 1, TRUE);
         }
         if (setups->flags & ACTOR_FLIP_X) {
-            func_0204c2b0(actors[i], 0, TRUE);
+            ClActor_SetFlip(actors[i], 0, TRUE);
         }
         setups++;
     }
@@ -430,9 +431,9 @@ static void FMissionAppDraw_LoadObjResources(FMissionApp *work, u32 vramType, co
 
     FMissionAppGra_GetClActUnit(work->graphic);
     work->resources[files[0].resource] =
-        func_0204bbb8(arc, files[0].file, vramType, files[0].offset, 0, files[0].count, work->heapId);
-    work->resources[files[1].resource] = func_0204b81c(arc, files[1].file, TRUE, vramType, work->heapId);
-    work->resources[files[2].resource] = func_0204bde0(arc, files[2].file, files[3].file, work->heapId);
+        ClActSys_LoadPlttRange(arc, files[0].file, vramType, files[0].offset, 0, files[0].count, work->heapId);
+    work->resources[files[1].resource] = ClActSys_LoadChars(arc, files[1].file, TRUE, vramType, work->heapId);
+    work->resources[files[2].resource] = ClActSys_LoadCellAnims(arc, files[2].file, files[3].file, work->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -445,13 +446,13 @@ static void FMissionAppDraw_LoadCommonObjResources(FMissionApp *work, u32 vramTy
     u32 anims;
 
     FMissionAppGra_GetClActUnit(work->graphic);
-    palette = func_0202d810();
-    chars = func_0202d814();
-    cells = func_0202d818(2);
-    anims = func_0202d81c(2);
-    work->resources[3] = func_0204bbb8(arc, palette, vramType, 0, 0, 4, work->heapId);
-    work->resources[4] = func_0204b81c(arc, chars, FALSE, vramType, work->heapId);
-    work->resources[5] = func_0204bde0(arc, cells, anims, work->heapId);
+    palette = AppMenuCommon_GetTouchBarPaletteFile();
+    chars = AppMenuCommon_GetTouchBarCharFile();
+    cells = AppMenuCommon_GetTouchBarCellFile(2);
+    anims = AppMenuCommon_GetTouchBarAnimFile(2);
+    work->resources[3] = ClActSys_LoadPlttRange(arc, palette, vramType, 0, 0, 4, work->heapId);
+    work->resources[4] = ClActSys_LoadChars(arc, chars, FALSE, vramType, work->heapId);
+    work->resources[5] = ClActSys_LoadCellAnims(arc, cells, anims, work->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -469,7 +470,7 @@ static void FMissionAppDraw_InitObj(FMissionApp *work) {
         FMissionAppDraw_AddActors(work, CLACT_VRAM_MAIN, sFMissionAppDrawActorSetups[2],
                                   &sFMissionAppDrawRecordActorGroup);
     }
-    func_02042ba8(FALSE, work->heapId);
+    GFL_NetSetIconScreen(FALSE, work->heapId);
 }
 
 static void FMissionAppDraw_FreeObj(FMissionApp *work) {
@@ -477,53 +478,53 @@ static void FMissionAppDraw_FreeObj(FMissionApp *work) {
 
     for (i = 0; i < FMISSION_APP_UPPER_ACTOR_COUNT; i++) {
         if (work->upperActors[i] != NULL) {
-            func_0204c108(work->upperActors[i]);
+            ClActor_Delete(work->upperActors[i]);
             work->upperActors[i] = NULL;
         }
     }
     for (i = 0; i < FMISSION_APP_LOWER_ACTOR_COUNT; i++) {
         if (work->lowerActors[i] != NULL) {
-            func_0204c108(work->lowerActors[i]);
+            ClActor_Delete(work->lowerActors[i]);
             work->lowerActors[i] = NULL;
         }
     }
     if (work->recordActors[0] != NULL) {
-        func_0204c108(work->recordActors[0]);
+        ClActor_Delete(work->recordActors[0]);
         work->recordActors[0] = NULL;
     }
-    func_0204bcd0(work->resources[0]);
-    func_0204b98c(work->resources[1]);
-    func_0204be64(work->resources[2]);
-    func_0204bcd0(work->resources[3]);
-    func_0204b98c(work->resources[4]);
-    func_0204be64(work->resources[5]);
+    ClActSys_FreePltt(work->resources[0]);
+    ClActSys_FreeChars(work->resources[1]);
+    ClActSys_FreeCellAnims(work->resources[2]);
+    ClActSys_FreePltt(work->resources[3]);
+    ClActSys_FreeChars(work->resources[4]);
+    ClActSys_FreeCellAnims(work->resources[5]);
     if (work->mode == FMISSION_APP_MODE_RESULT) {
-        func_0204bcd0(work->resources[6]);
-        func_0204b98c(work->resources[7]);
-        func_0204be64(work->resources[8]);
+        ClActSys_FreePltt(work->resources[6]);
+        ClActSys_FreeChars(work->resources[7]);
+        ClActSys_FreeCellAnims(work->resources[8]);
     }
 }
 
 void FMissionAppDraw_SetActorAnim(FMissionApp *work, int type, int index, u32 sequence) {
     if (type == FMISSION_APP_ACTOR_UPPER) {
-        func_0204c488(work->upperActors[index], (u16)sequence);
-        func_0204c520(work->upperActors[index], TRUE);
+        ClActor_SetSequence(work->upperActors[index], (u16)sequence);
+        ClActor_SetAutoAnim(work->upperActors[index], TRUE);
     } else if (type == FMISSION_APP_ACTOR_LOWER) {
-        func_0204c488(work->lowerActors[index], (u16)sequence);
-        func_0204c520(work->lowerActors[index], TRUE);
+        ClActor_SetSequence(work->lowerActors[index], (u16)sequence);
+        ClActor_SetAutoAnim(work->lowerActors[index], TRUE);
     } else if (type == FMISSION_APP_ACTOR_RECORD) {
-        func_0204c488(work->recordActors[index], (u16)sequence);
-        func_0204c520(work->recordActors[index], TRUE);
+        ClActor_SetSequence(work->recordActors[index], (u16)sequence);
+        ClActor_SetAutoAnim(work->recordActors[index], TRUE);
     }
 }
 
 void FMissionAppDraw_SetActorVisible(FMissionApp *work, int type, int index, BOOL visible) {
     if (type == FMISSION_APP_ACTOR_UPPER) {
-        func_0204c124(work->upperActors[index], visible);
+        ClActor_SetVisible(work->upperActors[index], visible);
     } else if (type == FMISSION_APP_ACTOR_LOWER) {
-        func_0204c124(work->lowerActors[index], visible);
+        ClActor_SetVisible(work->lowerActors[index], visible);
     } else if (type == FMISSION_APP_ACTOR_RECORD) {
-        func_0204c124(work->recordActors[index], visible);
+        ClActor_SetVisible(work->recordActors[index], visible);
     }
 }
 
@@ -531,15 +532,15 @@ BOOL FMissionAppDraw_IsActorAnimActive(FMissionApp *work, int type, int index) {
     BOOL active = TRUE;
 
     if (type == FMISSION_APP_ACTOR_UPPER) {
-        if (!func_0204c560(work->upperActors[index])) {
+        if (!ClActor_IsAnimActive(work->upperActors[index])) {
             active = FALSE;
         }
     } else if (type == FMISSION_APP_ACTOR_LOWER) {
-        if (!func_0204c560(work->lowerActors[index])) {
+        if (!ClActor_IsAnimActive(work->lowerActors[index])) {
             active = FALSE;
         }
     } else if (type == FMISSION_APP_ACTOR_RECORD) {
-        if (!func_0204c560(work->recordActors[index])) {
+        if (!ClActor_IsAnimActive(work->recordActors[index])) {
             active = FALSE;
         }
     }
@@ -548,11 +549,11 @@ BOOL FMissionAppDraw_IsActorAnimActive(FMissionApp *work, int type, int index) {
 
 void FMissionAppDraw_SetActorPalette(FMissionApp *work, int type, int index, u32 palette) {
     if (type == FMISSION_APP_ACTOR_UPPER) {
-        func_0204c378(work->upperActors[index], (u8)palette, 1);
+        ClActor_SetPalette(work->upperActors[index], (u8)palette, 1);
     } else if (type == FMISSION_APP_ACTOR_LOWER) {
-        func_0204c378(work->lowerActors[index], (u8)palette, 1);
+        ClActor_SetPalette(work->lowerActors[index], (u8)palette, 1);
     } else if (type == FMISSION_APP_ACTOR_RECORD) {
-        func_0204c378(work->recordActors[index], (u8)palette, 1);
+        ClActor_SetPalette(work->recordActors[index], (u8)palette, 1);
     }
 }
 
@@ -580,10 +581,10 @@ void FMissionAppDraw_SetNumber(FMissionApp *work, int type, int first, int numbe
             visible = FALSE;
             values[i] = 0;
         }
-        func_0204c124(work->upperActors[first + DIGIT_COUNT - 1 - i], visible);
-        func_0204c504(work->upperActors[first + DIGIT_COUNT - 1 - i], values[i]);
+        ClActor_SetVisible(work->upperActors[first + DIGIT_COUNT - 1 - i], visible);
+        ClActor_SetAnimFrame(work->upperActors[first + DIGIT_COUNT - 1 - i], values[i]);
         pos.x = x + (DIGIT_COUNT - 1 - i) * 8;
-        func_0204c140(work->upperActors[first + DIGIT_COUNT - 1 - i], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(work->upperActors[first + DIGIT_COUNT - 1 - i], &pos, CLACT_VRAM_SUB);
     }
 }
 
@@ -599,7 +600,7 @@ void FMissionAppDraw_SetTime(FMissionApp *work, int type, long first, int minute
     for (i = 0; i < 4; i++) {
         values[i] = 0;
     }
-    func_0204c178(work->upperActors[first], &pos, CLACT_VRAM_SUB);
+    ClActor_GetSurfacePos(work->upperActors[first], &pos, CLACT_VRAM_SUB);
     x = pos.x;
     number = minutes;
     for (i = 0; i < 2; i++) {
@@ -618,31 +619,31 @@ void FMissionAppDraw_SetTime(FMissionApp *work, int type, long first, int minute
         }
     }
     for (i = 0; i < 2; i++) {
-        func_0204c124(work->upperActors[first + i], TRUE);
-        func_0204c504(work->upperActors[first + i], values[i]);
+        ClActor_SetVisible(work->upperActors[first + i], TRUE);
+        ClActor_SetAnimFrame(work->upperActors[first + i], values[i]);
         pos.x = x + i * 8;
-        func_0204c140(work->upperActors[first + i], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(work->upperActors[first + i], &pos, CLACT_VRAM_SUB);
     }
-    func_0204c124(work->upperActors[first + 2], TRUE);
+    ClActor_SetVisible(work->upperActors[first + 2], TRUE);
     pos.x = x + 16;
-    func_0204c140(work->upperActors[first + 2], &pos, CLACT_VRAM_SUB);
+    ClActor_SetSurfacePos(work->upperActors[first + 2], &pos, CLACT_VRAM_SUB);
     for (i = 0; i < 2; i++) {
-        func_0204c124(work->upperActors[first + 3 + i], TRUE);
-        func_0204c504(work->upperActors[first + 3 + i], values[2 + i]);
+        ClActor_SetVisible(work->upperActors[first + 3 + i], TRUE);
+        ClActor_SetAnimFrame(work->upperActors[first + 3 + i], values[2 + i]);
         pos.x = x + (i + 3) * 8;
-        func_0204c140(work->upperActors[first + 3 + i], &pos, CLACT_VRAM_SUB);
+        ClActor_SetSurfacePos(work->upperActors[first + 3 + i], &pos, CLACT_VRAM_SUB);
     }
 }
 
 void FMissionAppDraw_SetLevelIcon(FMissionApp *work, int index) {
     u32 level = work->param->missionConfig->info.level;
 
-    func_0204c124(work->upperActors[index], TRUE);
+    ClActor_SetVisible(work->upperActors[index], TRUE);
     FMissionAppDraw_SetActorAnim(work, FMISSION_APP_ACTOR_UPPER, index, sFMissionAppDrawLevelSequences[level]);
 }
 
 int FMissionAppDraw_CheckTouch(FMissionApp *work) {
-    return func_0203da0c(sFMissionAppDrawTouchRects);
+    return GFL_HIDGetTouchPressedRect(sFMissionAppDrawTouchRects);
 }
 
 // Makes one of the result's messages, gives the player what it says, and starts printing it
@@ -659,7 +660,7 @@ static inline BOOL FMissionAppDraw_SetCountWord(FMissionApp *work, int count) {
 
 static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int message) {
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
         work->stream = NULL;
     }
     if (work->message != NULL) {
@@ -674,7 +675,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         room = FMissionAppDraw_GetItemRoom(work, work->result.item);
         count = work->result.itemCount + work->result.bonusCount;
         if (count > room) {
@@ -703,7 +704,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         room = FMissionAppDraw_GetItemRoom(work, work->result.item2);
         count = work->result.item2Count;
         if (count > room) {
@@ -731,11 +732,11 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
         StrBuf *format;
 
         textCopy(playerInfo->name, name);
-        func_0202437c(work->wordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, name, 0, 1, 2);
         GFL_StrBufFree(name);
         side = GFL_MsgDataLoadStrbufNew(work->msgData[0],
                                         sFMissionAppDrawMessages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
-        func_0202437c(work->wordSet, 1, side, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 1, side, 0, 1, 2);
         WordSetNumber(work->wordSet, 2, work->result.levels, 3, 0, TRUE);
         work->message = GFL_StrBufCreate(256, work->heapId);
         format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
@@ -747,7 +748,7 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
             work->msgData[0], sFMissionAppDrawMessages[work->result.isBlack + FMISSION_APP_MESSAGE_WHITE]);
         StrBuf *format;
 
-        func_0202437c(work->wordSet, 0, side, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, side, 0, 1, 2);
         WordSetNumber(work->wordSet, 1, work->result.levels, 3, 0, TRUE);
         work->message = GFL_StrBufCreate(256, work->heapId);
         format = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
@@ -757,8 +758,8 @@ static void FMissionAppDraw_StartMessage(FMissionApp *work, int window, int mess
     } else {
         work->message = GFL_MsgDataLoadStrbufNew(work->msgData[0], sFMissionAppDrawMessages[message]);
     }
-    work->stream = func_02022268(work->windows[window].window, 0, 0, work->message, work->font, func_02017bcc(),
-                                 work->tcbManager, 4, work->heapId, 15);
+    work->stream = PrintStream_Create(work->windows[window].window, 0, 0, work->message, work->font,
+                                      TextSpeed_GetCurrentWait(), work->tcbManager, 4, work->heapId, 15);
 }
 
 BOOL FMissionAppDraw_UpdateMessage(FMissionApp *work) {

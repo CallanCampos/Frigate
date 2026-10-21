@@ -158,7 +158,7 @@ KeySystemGraphic *KeySystemGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     KeySystemGraphicBG_Init(&graphic->bg, heapId);
     KeySystemGraphicClAct_Init(&graphic->clact, &sVRAMConfig, heapId);
     graphic->vblankTask = GFL_VBlankTCBAdd(KeySystemGraphic_VBlank, graphic, 0);
@@ -169,7 +169,7 @@ void KeySystemGraphic_Free(KeySystemGraphic *graphic) {
     GFL_TCBRemove(graphic->vblankTask);
     KeySystemGraphicClAct_Free(&graphic->clact);
     KeySystemGraphicBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -254,27 +254,27 @@ static void KeySystemGraphicBG_VBlank(KeySystemGraphicBG *bg) {
 static void KeySystemGraphicClAct_Init(KeySystemGraphicClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(KeySystemGraphicClAct));
     ClActSys_Create(&sClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(32, 0, heapId);
-    clact->renderer = func_0204be9c(sSurfaceSetups, NELEMS(sSurfaceSetups), heapId);
-    func_0204c018(clact->unit, clact->renderer);
-    func_0204bf14(clact->renderer, TRUE);
+    clact->unit = ClActUnit_Create(32, 0, heapId);
+    clact->renderer = ClActRenderer_Create(sSurfaceSetups, NELEMS(sSurfaceSetups), heapId);
+    ClActUnit_SetRenderer(clact->unit, clact->renderer);
+    ClActRenderer_SetCulling(clact->renderer, TRUE);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void KeySystemGraphicClAct_Free(KeySystemGraphicClAct *clact) {
-    func_0204becc(clact->renderer);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActRenderer_Delete(clact->renderer);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(KeySystemGraphicClAct));
 }
 
 static void KeySystemGraphicClAct_Update(KeySystemGraphicClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void KeySystemGraphicClAct_VBlank(KeySystemGraphicClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActUnit *KeySystemGraphicClAct_GetUnit(KeySystemGraphicClAct *clact) {
@@ -287,12 +287,12 @@ static void KeySystemG3dSys_Init(KeySystemG3dSys *g3d, HeapID heapId) {
     g3d->camera =
         GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, FX32_CONST(24), -FX32_CONST(24), -FX32_CONST(32), FX32_CONST(32),
                             FX32_ONE, FX32_CONST(1024), 0, &sCameraPosition, &sCameraUpVector, &sCameraTarget, heapId);
-    func_0204f918(heapId);
+    Particle_Init(heapId);
     g3d->active = TRUE;
 }
 
 static void KeySystemG3dSys_Free(KeySystemG3dSys *g3d) {
-    func_0204fb4c();
+    Particle_Free();
     GFL_G3DCameraFree(g3d->camera);
     GFL_G3DSysFree();
     MI_CpuFill8(g3d, 0, sizeof(KeySystemG3dSys));
@@ -303,7 +303,7 @@ static void KeySystemG3dSys_Begin(KeySystemG3dSys *g3d) {
         GFL_G3DSysReset();
         GFL_G3DCameraFlush(g3d->camera);
         GFL_G3DSysMtxViewFlush();
-        func_0204f954();
+        Particle_DrawAndUpdateAll();
     }
 }
 

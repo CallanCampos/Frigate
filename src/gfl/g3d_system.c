@@ -289,11 +289,11 @@ void GFL_G3DSysSetSwapBufferParams(u32 sortMode, u32 bufferMode) {
     g_G3DSystem.sys->bufferMode = bufferMode;
 }
 
-BOOL func_02049228(void) {
+BOOL GFL_G3DSysUsesFrmTexVramMgr(void) {
     return g_G3DSystem.sys->frmTexVramMgr;
 }
 
-BOOL func_02049238(void) {
+BOOL GFL_G3DSysUsesFrmPlttVramMgr(void) {
     return g_G3DSystem.sys->frmPltVramMgr;
 }
 

@@ -10,11 +10,11 @@
 
 #define SAVE_BLOCK_TIMESIG 0x21
 
-u32 func_02009184(void) {
+u32 TimeSigSave_GetSize(void) {
     return sizeof(TimeSigSave);
 }
 
-void func_0200918c(TimeSigSave *timeSig) {
+void TimeSigSave_Init(TimeSigSave *timeSig) {
     MI_CpuFill8(timeSig, 0, sizeof(TimeSigSave));
 }
 
@@ -22,11 +22,11 @@ void *getTimeSigBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TIMESIG);
 }
 
-void *func_020091a8(void *timeSig) {
+void *TimeSigSave_GetSignature(void *timeSig) {
     return timeSig;
 }
 
-BOOL func_020091ac(TimeSigSave *timeSig) {
+BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig) {
     u32 sum = 0;
     int i;
 
@@ -39,28 +39,28 @@ BOOL func_020091ac(TimeSigSave *timeSig) {
     return TRUE;
 }
 
-u8 func_020091d0(TimeSigSave *timeSig) {
-    return timeSig->unk602;
+u8 TimeSigSave_IsUnionViewChanged(TimeSigSave *timeSig) {
+    return timeSig->unionViewChanged;
 }
 
-void func_020091dc(TimeSigSave *timeSig) {
-    timeSig->unk602 = 1;
+void TimeSigSave_SetUnionViewChanged(TimeSigSave *timeSig) {
+    timeSig->unionViewChanged = 1;
 }
 
-u16 func_020091e8(TimeSigSave *timeSig) {
-    return timeSig->unk600;
+u16 TimeSigSave_GetPersonality(TimeSigSave *timeSig) {
+    return timeSig->personality;
 }
 
-void func_020091f0(TimeSigSave *timeSig, u32 value) {
-    timeSig->unk600 = value;
+void TimeSigSave_SetPersonality(TimeSigSave *timeSig, u32 value) {
+    timeSig->personality = value;
 }
 
-void func_020091f8(TimeSigSave *timeSig, u8 value) {
-    timeSig->unk603 = value;
+void TimeSigSave_SetSignBlinks(TimeSigSave *timeSig, u8 value) {
+    timeSig->signBlinks = value;
 }
 
-BOOL func_02009204(TimeSigSave *timeSig) {
-    return timeSig->unk603;
+BOOL TimeSigSave_GetSignBlinks(TimeSigSave *timeSig) {
+    return timeSig->signBlinks;
 }
 
 void saveSecondsTime(TimeSigSave *timeSig, u32 low, u32 high) {
@@ -72,7 +72,7 @@ s64 loadSecondsTime(TimeSigSave *timeSig) {
     return timeSig->seconds;
 }
 
-TimeSigBadgeDate func_02009230(TimeSigSave *timeSig, u32 badgeId) {
+TimeSigBadgeDate TimeSigSave_GetBadgeDate(TimeSigSave *timeSig, u32 badgeId) {
     return timeSig->badgeDates[badgeId];
 }
 
@@ -90,10 +90,10 @@ void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 mon
     saveSecondsTime(timeSig, seconds, seconds >> 32);
 }
 
-u16 func_020092a8(TimeSigSave *timeSig, u32 badgeId) {
+u16 TimeSigSave_GetBadgePolish(TimeSigSave *timeSig, u32 badgeId) {
     return timeSig->badgePolish[badgeId];
 }
 
-void func_020092b8(TimeSigSave *timeSig, u32 badgeId, u32 polish) {
+void TimeSigSave_SetBadgePolish(TimeSigSave *timeSig, u32 badgeId, u32 polish) {
     timeSig->badgePolish[badgeId] = polish;
 }

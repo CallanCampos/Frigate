@@ -9,8 +9,8 @@
 #define SURVEY_ANSWER_MAX 17
 
 typedef struct {
-    // Whether the question has no rank of its own in the trainer's game info
-    u8 unk00_0 : 1;
+    // Whether the question is new in Black 2 and White 2, so that Black and White's beacons have no answer to it
+    u8 newInB2W2 : 1;
     u8 unk00_1 : 7;
     // How many bits the answer takes
     u8 bits;
@@ -104,30 +104,30 @@ int GetSurveyAnswerMsgIDCount(int question) {
     return sAnswerMsgIdCounts[question];
 }
 
-u8 func_02011450(u8 question) {
+u8 SurveyQuestion_GetBitCount(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return 0;
     }
     return sQuestions[question].bits;
 }
 
-u8 func_02011464(u8 question) {
+u8 SurveyQuestion_GetFirstAnswer(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return 0;
     }
     return sQuestions[question].firstAnswer;
 }
 
-u8 func_02011478(u8 question) {
+u8 SurveyQuestion_GetFirstBit(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return 0;
     }
     return sQuestions[question].firstBit;
 }
 
-BOOL func_0201148c(u8 question) {
+BOOL SurveyQuestion_IsNewInB2W2(u8 question) {
     if (question > SURVEY_QUESTION_COUNT - 1) {
         return TRUE;
     }
-    return sQuestions[question].unk00_0;
+    return sQuestions[question].newInB2W2;
 }

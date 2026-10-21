@@ -13,12 +13,12 @@ u32 getSizeofTrainerData(void) {
     return sizeof(TrainerDataSave);
 }
 
-void func_02008da4(TrainerDataSave *data) {
+void TrainerDataSave_Init(TrainerDataSave *data) {
     MIi_CpuClear32(0, data, sizeof(TrainerDataSave));
-    func_020089c0(&data->config);
-    func_02008b40(&data->playerInfo);
-    func_02008c40(&data->playTime);
-    data->unk2C = 0;
+    Config_Init(&data->config);
+    PlayerInfo_Init(&data->playerInfo);
+    PlayTime_Init(&data->playTime);
+    data->isIntroSave = 0;
 }
 
 PlayerInfo *SaveControl_GetPlayerInfo(SaveControl *save) {
@@ -30,52 +30,52 @@ TrainerDataSave *getTrainerDataBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
 }
 
-PlayTime *func_02008de8(SaveControl *save) {
+PlayTime *SaveControl_GetPlayTime(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     return &data->playTime;
 }
 
-u8 func_02008df4(SaveControl *save) {
+u8 TrainerDataSave_IsIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    return data->unk2C;
+    return data->isIntroSave;
 }
 
-void func_02008e04(SaveControl *save) {
+void TrainerDataSave_SetIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    data->unk2C = 1;
+    data->isIntroSave = 1;
 }
 
-void func_02008e14(SaveControl *save) {
+void TrainerDataSave_ClearIntroSave(SaveControl *save) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    data->unk2C = 0;
+    data->isIntroSave = 0;
 }
 
-BOOL func_02008e24(SaveControl *save, u32 index) {
+BOOL TrainerDataSave_IsMarkerSet(SaveControl *save, u32 index) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     return data->markers[index] == TRAINER_DATA_MARKER_SET;
 }
 
-void func_02008e48(SaveControl *save, u32 index) {
+void TrainerDataSave_SetMarker(SaveControl *save, u32 index) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     data->markers[index] = TRAINER_DATA_MARKER_SET;
 }
 
-void func_02008e60(SaveControl *save, u32 index) {
+void TrainerDataSave_ClearMarker(SaveControl *save, u32 index) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     data->markers[index] = 0;
 }
 
-u32 *func_02008e74(SaveControl *save, u32 index) {
+u32 *TrainerDataSave_GetExtraSaveCount(SaveControl *save, u32 index) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
-    return &data->unk5C[index];
+    return &data->extraSaveCounts[index];
 }
 
-void func_02008e88(SaveControl *save, PlayerState *state) {
+void TrainerDataSave_StorePlayerInfo(SaveControl *save, PlayerState *state) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     data->playerInfo = state->playerInfo;
 }
 
-void func_02008ea8(SaveControl *save, PlayerState *state) {
+void TrainerDataSave_LoadPlayerInfo(SaveControl *save, PlayerState *state) {
     TrainerDataSave *data = SaveControl_GetBlockPtr(save, SAVE_BLOCK_TRAINER_DATA);
     state->playerInfo = data->playerInfo;
 }

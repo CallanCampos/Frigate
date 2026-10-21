@@ -24,7 +24,7 @@ UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const P
     UnionAppMember member;
     UnionApp *app = GFL_HeapAllocate(heapId, sizeof(UnionApp), TRUE, "union_app.c", 77);
 
-    if (func_02042bc4() == TRUE) {
+    if (GFL_NetIsParent() == TRUE) {
         app->status.joined = 3;
     }
     app->status.memberMax = memberMax;
@@ -34,7 +34,7 @@ UnionApp *UnionApp_Create(UnionSystem *sys, HeapID heapId, u8 memberMax, const P
     MI_CpuFill8(&member, 0, sizeof(UnionAppMember));
     member.info = *info;
     OS_GetMacAddress(member.mac);
-    UnionApp_SetMemberProfile(app, sys, func_02042a6c(func_02040440()), &member);
+    UnionApp_SetMemberProfile(app, sys, GFL_NetGetHandleNetId(NetHandle_GetOwn()), &member);
     UnionApp_CloseEntry(app);
     func_ov069_0217cf4c(app);
     return app;
@@ -84,7 +84,7 @@ void UnionApp_Update(UnionApp *app, UnionSystem *sys) {
         }
         return;
     }
-    if (func_02042bc4() == TRUE) {
+    if (GFL_NetIsParent() == TRUE) {
         UnionApp_CheckEnteringLeft(app, sys);
         UnionApp_SendStatus(app);
         UnionApp_CheckJoinedLeft(app);
@@ -106,7 +106,7 @@ static void UnionApp_CheckJoinedLeft(UnionApp *app) {
     }
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
         bit = 1 << i;
-        if ((app->status.joined & bit) && !func_02042a80((u8)i)) {
+        if ((app->status.joined & bit) && !GFL_NetIsNegotiated((u8)i)) {
             connected ^= bit;
         }
     }
@@ -115,7 +115,7 @@ static void UnionApp_CheckJoinedLeft(UnionApp *app) {
     }
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
         bit = 1 << i;
-        if ((app->status.joined & bit) && !(connected & bit) && func_ov028_0217196c(connected, i) == TRUE) {
+        if ((app->status.joined & bit) && !(connected & bit) && UnionMain_SendLeave(connected, i) == TRUE) {
             UnionApp_OnLeave(app, i);
             app->status.joined ^= bit;
         }
@@ -123,7 +123,7 @@ static void UnionApp_CheckJoinedLeft(UnionApp *app) {
 }
 
 static void UnionApp_SendStatus(UnionApp *app) {
-    if (app->statusSendTo != 0 && func_ov028_02171724(&app->status, app->statusSendTo) == TRUE) {
+    if (app->statusSendTo != 0 && UnionMain_SendStatus(&app->status, app->statusSendTo) == TRUE) {
         app->statusSendTo = 0;
     }
 }
@@ -134,7 +134,7 @@ static void UnionApp_UpdateQueue(UnionApp *app) {
     u8 queued;
 
     if (app->current != 0xff) {
-        if (func_02042a80(app->current)) {
+        if (GFL_NetIsNegotiated(app->current)) {
             return;
         }
         app->current = 0xff;
@@ -156,14 +156,14 @@ static void UnionApp_UpdateQueue(UnionApp *app) {
 }
 
 static void UnionApp_SendCurrent(UnionApp *app) {
-    if (app->currentPending != 0xff && func_ov028_02171664(app->currentPending) == TRUE) {
+    if (app->currentPending != 0xff && UnionMain_SendUnkE(app->currentPending) == TRUE) {
         app->currentPending = 0xff;
     }
 }
 
 static void UnionApp_SendProfile(UnionApp *app) {
     if (app->profileSendTo != 0 &&
-        func_ov028_0217181c(app->profileSendTo, &app->members[func_02042a6c(func_02040440())]) == TRUE) {
+        UnionMain_SendProfile(app->profileSendTo, &app->members[GFL_NetGetHandleNetId(NetHandle_GetOwn())]) == TRUE) {
         app->profileSendTo = 0;
     }
 }
@@ -197,8 +197,8 @@ static void UnionApp_CheckProfileLeft(UnionApp *app, UnionSystem *sys) {
 
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
         bit = 1 << i;
-        if ((app->hasProfile & bit) && !func_02042a80((u8)i)) {
-            if (func_02042bc4() == TRUE || (app->status.joined & bit)) {
+        if ((app->hasProfile & bit) && !GFL_NetIsNegotiated((u8)i)) {
+            if (GFL_NetIsParent() == TRUE || (app->status.joined & bit)) {
                 if (app->onLeave != NULL) {
                     app->onLeave(i, &app->members[i], app->callbackWork);
                 }
@@ -216,7 +216,7 @@ static void UnionApp_CheckEnteringLeft(UnionApp *app, UnionSystem *sys) {
 
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
         bit = 1 << i;
-        if ((app->entering & bit) && !func_02042a80(i)) {
+        if ((app->entering & bit) && !GFL_NetIsNegotiated(i)) {
             app->entering ^= bit;
             if (app->hasProfile & bit) {
                 app->hasProfile &= 0xff ^ bit;
@@ -233,11 +233,11 @@ void UnionApp_Enqueue(UnionApp *app, u8 netId) {
     app->queued |= 1 << netId;
 }
 
-void func_ov069_0217cd5c(UnionApp *app) {
+void UnionApp_SetTurnReceived(UnionApp *app) {
     app->unk12 = TRUE;
 }
 
-u8 func_ov069_0217cd64(UnionApp *app) {
+u8 UnionApp_IsTurnReceived(UnionApp *app) {
     return app->unk12;
 }
 
@@ -258,8 +258,9 @@ void UnionApp_SetMemberProfile(UnionApp *app, UnionSystem *sys, u8 netId, UnionA
 
     app->members[netId] = *member;
     app->hasProfile |= 1 << netId;
-    if (netId != func_02042a6c(func_02040440())) {
-        UnionGroup_AddMember(&self->mycomm, member->mac, func_02008bf4(&member->info), getTrainerGender(&member->info));
+    if (netId != GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
+        UnionGroup_AddMember(&self->mycomm, member->mac, PlayerInfo_GetUnionView(&member->info),
+                             getTrainerGender(&member->info));
     }
 }
 
@@ -276,7 +277,7 @@ BOOL UnionApp_AllProfilesReceived(UnionApp *app) {
 
     for (i = 0; i < UNION_APP_MEMBER_MAX; i++) {
         bit = 1 << i;
-        if ((app->status.joined & bit) && func_02042a80((u8)i) == TRUE && !(app->hasProfile & bit)) {
+        if ((app->status.joined & bit) && GFL_NetIsNegotiated((u8)i) == TRUE && !(app->hasProfile & bit)) {
             return FALSE;
         }
     }
@@ -284,7 +285,7 @@ BOOL UnionApp_AllProfilesReceived(UnionApp *app) {
 }
 
 void UnionApp_ConfirmEntry(UnionApp *app, u8 netId) {
-    if (func_02042bc4() == TRUE) {
+    if (GFL_NetIsParent() == TRUE) {
         int bit = 1 << netId;
 
         if ((app->hasProfile & bit) && (app->entering & bit)) {
@@ -304,7 +305,7 @@ u32 UnionApp_GetStatusSize(void) {
 }
 
 void UnionApp_JoinSelf(UnionApp *app) {
-    app->status.joined |= 1 << func_02042a6c(func_02040440());
+    app->status.joined |= 1 << GFL_NetGetHandleNetId(NetHandle_GetOwn());
 }
 
 BOOL UnionApp_IsEntryClosed(UnionApp *app) {
@@ -333,7 +334,7 @@ void UnionApp_SetCallbacks(UnionApp *app, UnionAppMemberCallback onJoin, UnionAp
 
 BOOL UnionApp_CloseEntry(UnionApp *app) {
     if (app->entering == 0) {
-        func_02042a9c(func_02040440(), FALSE);
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), FALSE);
         app->entryMode = UNION_APP_ENTRY_CLOSED;
         return TRUE;
     }
@@ -341,13 +342,13 @@ BOOL UnionApp_CloseEntry(UnionApp *app) {
 }
 
 void UnionApp_OpenEntry(UnionApp *app) {
-    func_02042a9c(func_02040440(), TRUE);
+    GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
     app->entryMode = UNION_APP_ENTRY_OPEN;
 }
 
 void UnionApp_LimitEntry(UnionApp *app, u8 limit) {
-    if (func_02042788()) {
-        func_02042a9c(func_02040440(), TRUE);
+    if (GFL_NetIsInitialized()) {
+        GFL_NetSetAcceptConnect(NetHandle_GetOwn(), TRUE);
         app->entryMode = UNION_APP_ENTRY_LIMITED;
         app->entryLimit = limit;
         app->entryCount = 0;

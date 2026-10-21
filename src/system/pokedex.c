@@ -34,18 +34,18 @@ typedef struct {
 } PokeDexEvaluation;
 
 static BOOL PML_PkmIsBadMonsNo(u16 species);
-static void func_0200cea4(PokeDexSave *pokedex, u32 species, u32 language);
+static void PokeDex_SetLanguageSeen(PokeDexSave *pokedex, u32 species, u32 language);
 static BOOL PML_PkmIsNationalDexExclude(u16 species);
 static BOOL PML_PkmIsRegionalDexExclude(u16 species);
 static int getIndexPokemonWithForms(u16 species);
 static int getIndexNumOfPkmForm(u16 species);
-static void func_0200cf88(PokeDexSave *pokedex, u32 species, u32 sex, BOOL rare);
+static void PokeDex_SetSeenSex(PokeDexSave *pokedex, u32 species, u32 sex, BOOL rare);
 static void getForm(PokeDexSave *pokedex, u32 species, u32 sex, BOOL rare, u32 form);
 static u16 PokeDex_GetCaughtNo(PokeDexSave *pokedex, HeapID heapId);
 static u16 PokeDex_GetCaughtNoPermissive(PokeDexSave *pokedex);
 static u16 PokeDex_GetCaughtNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapId);
 static u16 PokeDex_GetSeenNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapId);
-static u16 func_0200dbb4(const PokeDexEvaluation *table, int count);
+static u16 PokeDex_LookupEvaluation(const PokeDexEvaluation *table, int count);
 
 static const u16 UNOVA_DEX_COMPLETION_EXCLUSIONS[] = {
     SPECIES_KELDEO,
@@ -150,7 +150,7 @@ static BOOL PML_PkmIsBadMonsNo(u16 species) {
 }
 
 // Adds a language to the ones a species was caught in
-static void func_0200cea4(PokeDexSave *pokedex, u32 species, u32 language) {
+static void PokeDex_SetLanguageSeen(PokeDexSave *pokedex, u32 species, u32 language) {
     if (language > LANGUAGE_KOREAN || language == 6 || language == 0) {
         return;
     }
@@ -215,7 +215,7 @@ static int getIndexNumOfPkmForm(u16 species) {
 }
 
 // Sets a species as seen in a sex and shininess
-static void func_0200cf88(PokeDexSave *pokedex, u32 species, u32 sex, BOOL rare) {
+static void PokeDex_SetSeenSex(PokeDexSave *pokedex, u32 species, u32 sex, BOOL rare) {
     if (sex == 0) {
         if (rare == TRUE) {
             SetSeen(pokedex, POKEDEX_KIND_RARE_MALE, species);
@@ -310,26 +310,26 @@ BOOL PokeDex_IsHabitatListEnabled(PokeDexSave *pokedex) {
 }
 
 void givePlayerPokedex(PokeDexSave *pokedex) {
-    pokedex->unk4_2 = 1;
+    pokedex->given = 1;
 }
 
-u32 func_0200d1dc(PokeDexSave *pokedex) {
-    return pokedex->unk4_2;
+u32 PokeDex_IsGiven(PokeDexSave *pokedex) {
+    return pokedex->given;
 }
 
-void func_0200d1e4(PokeDexSave *pokedex, u32 mode) {
+void PokeDex_SetMode(PokeDexSave *pokedex, u32 mode) {
     pokedex->mode = mode;
 }
 
-u32 func_0200d1f8(PokeDexSave *pokedex) {
+u32 PokeDex_GetMode(PokeDexSave *pokedex) {
     return pokedex->mode;
 }
 
-void func_0200d200(PokeDexSave *pokedex, u16 species) {
+void PokeDex_SetLastSpecies(PokeDexSave *pokedex, u16 species) {
     pokedex->lastSpecies = species;
 }
 
-u16 func_0200d214(PokeDexSave *pokedex) {
+u16 PokeDex_GetLastSpecies(PokeDexSave *pokedex) {
     return pokedex->lastSpecies;
 }
 
@@ -408,7 +408,7 @@ u16 getNumberOfForms(u16 species) {
     return 1;
 }
 
-void func_0200d3c8(PokeDexSave *pokedex, u16 species, u32 *sex, u32 *rare, u32 *form, HeapID heapId) {
+void PokeDex_GetShownSexRareForm(PokeDexSave *pokedex, u16 species, u32 *sex, u32 *rare, u32 *form, HeapID heapId) {
     int entry = getIndexNumOfPkmForm(species);
     void *personal;
 
@@ -490,9 +490,9 @@ void addPkmToDex(PokeDexSave *pokedex, PartyPkm *pkm) {
     if (species == SPECIES_SPINDA && pokedex->spindaPersonality == 0) {
         pokedex->spindaPersonality = personality;
     }
-    func_0200cf88(pokedex, species, sex, rare);
+    PokeDex_SetSeenSex(pokedex, species, sex, rare);
     getForm(pokedex, species, sex, rare, form);
-    func_0200cea4(pokedex, species, language);
+    PokeDex_SetLanguageSeen(pokedex, species, language);
     SetSpeciesBit(pokedex->caught, species);
 }
 
@@ -563,7 +563,7 @@ void PokeDex_RegistPkm(PokeDexSave *pokedex, PartyPkm *pkm) {
     if (species == SPECIES_SPINDA && pokedex->spindaPersonality == 0) {
         pokedex->spindaPersonality = personality;
     }
-    func_0200cf88(pokedex, species, sex, rare);
+    PokeDex_SetSeenSex(pokedex, species, sex, rare);
     getForm(pokedex, species, sex, rare, form);
 }
 
@@ -614,7 +614,7 @@ u16 PokeDex_GetSeenNoUnova(PokeDexSave *pokedex, HeapID heapId) {
     return count;
 }
 
-BOOL func_0200d8d4(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
+BOOL PokeDex_HasSeenVariant(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
     int index;
 
     if (PML_PkmIsBadMonsNo(species)) {
@@ -651,7 +651,7 @@ BOOL func_0200d8d4(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 fo
     return FALSE;
 }
 
-u32 func_0200da18(PokeDexSave *pokedex, u32 index) {
+u32 PokeDex_GetSpindaPersonality(PokeDexSave *pokedex, u32 index) {
     if (index == 0) {
         return pokedex->spindaPersonality;
     }
@@ -722,7 +722,7 @@ static u16 PokeDex_GetSeenNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapId)
     return count;
 }
 
-BOOL func_0200db5c(PokeDexSave *pokedex, u16 species, u32 language) {
+BOOL PokeDex_HasLanguage(PokeDexSave *pokedex, u16 species, u32 language) {
     if (language > LANGUAGE_KOREAN || language == 6 || language == 0) {
         return FALSE;
     }
@@ -735,7 +735,7 @@ BOOL func_0200db5c(PokeDexSave *pokedex, u16 species, u32 language) {
     return CheckBit(pokedex->languages, (species - 1) * POKEDEX_LANGUAGE_COUNT + (language - 1));
 }
 
-static u16 func_0200dbb4(const PokeDexEvaluation *table, int count) {
+static u16 PokeDex_LookupEvaluation(const PokeDexEvaluation *table, int count) {
     int i;
 
     for (i = 0;; i++) {
@@ -761,8 +761,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = func_0200dbb4(data_0208f89a, *count);
-        *unk = func_0200dbb4(data_0208f814, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
+        *message = PokeDex_LookupEvaluation(data_0208f89a, *count);
+        *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
         break;
     case 2:
         *count = PokeDex_GetSeenNoUnova(pokedex, heapId);
@@ -771,8 +771,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = func_0200dbb4(data_0208f85e, *count);
-        *unk = func_0200dbb4(data_0208f814, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
+        *message = PokeDex_LookupEvaluation(data_0208f85e, *count);
+        *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
         break;
     case 1:
         *count = PokeDex_GetCaughtNo(pokedex, heapId);
@@ -781,8 +781,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = func_0200dbb4(data_0208f8d8, *count);
-        *unk = func_0200dbb4(data_0208f82c, PokeDex_GetCaughtNoPermissive(pokedex));
+        *message = PokeDex_LookupEvaluation(data_0208f8d8, *count);
+        *unk = PokeDex_LookupEvaluation(data_0208f82c, PokeDex_GetCaughtNoPermissive(pokedex));
         break;
     }
 }

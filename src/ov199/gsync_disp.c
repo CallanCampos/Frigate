@@ -167,7 +167,7 @@ GSyncDisp *GSyncDisp_Create(HeapID heapId) {
     GX_DispOn();
     GFL_BGSysCreate(disp->heapId);
     ClActSys_Create(&data_02093f24, &sGSyncDispVRAMConfig, disp->heapId);
-    disp->clUnit = func_0204bf1c(40, 0, disp->heapId);
+    disp->clUnit = ClActUnit_Create(40, 0, disp->heapId);
     GFL_BGSysSetVRAMBanks(&sGSyncDispVRAMConfig);
     GFL_BGSysSetLCDConfig(&sGSyncDispLCDConfig);
     GSyncDisp_CreateBGs(disp);
@@ -186,7 +186,7 @@ void GSyncDisp_Main(GSyncDisp *disp) {
     if (disp->waveLine >= 192) {
         disp->waveLine = 0;
     }
-    func_0204b794();
+    ClActSys_Draw();
     GSyncDisp_UpdateFade(disp);
     GSyncDisp_UpdateFloats(disp);
 }
@@ -196,29 +196,29 @@ void GSyncDisp_Free(GSyncDisp *disp) {
 
     GSyncDisp_DeleteActors(disp);
     GFL_HeapFree(disp->bgPaletteFile);
-    func_0204c108(disp->floatPokemonActor);
-    func_0204c108(disp->floatItemActor);
+    ClActor_Delete(disp->floatPokemonActor);
+    ClActor_Delete(disp->floatItemActor);
     for (i = 0; i < GSYNC_DISP_RES_CHAR_ACTORS; i++) {
         if (disp->res[i] != 0) {
-            func_0204bcd0(disp->res[i]);
+            ClActSys_FreePltt(disp->res[i]);
         }
     }
     for (; i < GSYNC_DISP_RES_CELL_ACTORS; i++) {
         if (disp->res[i] != 0) {
-            func_0204b98c(disp->res[i]);
+            ClActSys_FreeChars(disp->res[i]);
         }
     }
     for (; i < GSYNC_DISP_RES_COUNT; i++) {
         if (disp->res[i] != 0) {
-            func_0204be64(disp->res[i]);
+            ClActSys_FreeCellAnims(disp->res[i]);
         }
     }
     if (disp->hblankTask != NULL) {
         GFL_TCBRemove(disp->hblankTask);
     }
     GFL_TCBRemove(disp->vblankTask);
-    func_0204bf98(disp->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(disp->clUnit);
+    ClActSys_Delete();
     // BUG: BG 5's filled character is freed from BG 1, which has none, so BG 5's stays allocated until
     // GFL_BGSysFree
 #ifdef BUGFIX
@@ -387,7 +387,7 @@ static void GSyncDisp_VBlank(TCB *task, void *work) {
     GSyncDisp *disp = work;
     int timer;
 
-    func_0204b7c8();
+    ClActSys_VBlank();
     timer = ++disp->paletteTimer;
     if (timer % 10 == 1) {
         u8 *palette = disp->bgPalette->rawData;
@@ -418,12 +418,13 @@ static void GSyncDisp_LoadGraphics(GSyncDisp *disp) {
     disp->mainBgChars = GFL_BGSysLoadArcNCGRDynamic(arc, 8, 0, 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 23, 0, 0, CHAR_POS(disp->mainBgChars), 0, FALSE, disp->heapId);
     GFL_G2DIOLoadNSCRSync(arc, 24, 1, 0, CHAR_POS(disp->mainBgChars), 0, FALSE, disp->heapId);
-    disp->res[GSYNC_DISP_RES_CHAR_ACTORS] = func_0204b81c(arc, 9, FALSE, CLACT_VRAM_BOTH, disp->heapId);
-    disp->res[GSYNC_DISP_RES_PLTT_ACTORS] = func_0204bbb8(arc, 3, CLACT_VRAM_BOTH, 3 * 0x20, 0, 4, disp->heapId);
-    disp->res[GSYNC_DISP_RES_CELL_ACTORS] = func_0204bde0(arc, 12, 25, disp->heapId);
-    disp->res[GSYNC_DISP_RES_CHAR_SUB] = func_0204b81c(arc, 10, FALSE, CLACT_VRAM_BOTH, disp->heapId);
-    disp->res[GSYNC_DISP_RES_PLTT_SUB] = func_0204bbb8(arc, 4, CLACT_VRAM_BOTH, 7 * 0x20, 0, 0, disp->heapId);
-    disp->res[GSYNC_DISP_RES_CELL_SUB] = func_0204bde0(arc, 13, 26, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CHAR_ACTORS] = ClActSys_LoadChars(arc, 9, FALSE, CLACT_VRAM_BOTH, disp->heapId);
+    disp->res[GSYNC_DISP_RES_PLTT_ACTORS] =
+        ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_BOTH, 3 * 0x20, 0, 4, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CELL_ACTORS] = ClActSys_LoadCellAnims(arc, 12, 25, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CHAR_SUB] = ClActSys_LoadChars(arc, 10, FALSE, CLACT_VRAM_BOTH, disp->heapId);
+    disp->res[GSYNC_DISP_RES_PLTT_SUB] = ClActSys_LoadPlttRange(arc, 4, CLACT_VRAM_BOTH, 7 * 0x20, 0, 0, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CELL_SUB] = ClActSys_LoadCellAnims(arc, 13, 26, disp->heapId);
     GSyncDisp_LoadPokeIconRes(disp);
     GFL_ArcToolFree(arc);
 }
@@ -437,16 +438,16 @@ void GSyncDisp_CreateActor(GSyncDisp *disp, int index) {
 }
 
 void GSyncDisp_SetActorSequence(GSyncDisp *disp, int index, int sequence) {
-    func_0204c488(disp->actors[index], sequence);
+    ClActor_SetSequence(disp->actors[index], sequence);
 }
 
 void GSyncDisp_SetActorCallback(GSyncDisp *disp, int index, const ClActorCallback *callback) {
-    func_0204c5b0(disp->actors[index], callback);
+    ClActor_SetAnimCallback(disp->actors[index], callback);
 }
 
 void GSyncDisp_DeleteActor(GSyncDisp *disp, int index) {
     if (disp->actors[index] != NULL) {
-        func_0204c108(disp->actors[index]);
+        ClActor_Delete(disp->actors[index]);
         disp->actors[index] = NULL;
     }
 }
@@ -461,10 +462,10 @@ static void GSyncDisp_CreateSubActorAt(GSyncDisp *disp, s16 x, s16 y) {
         setup.priority = 0;
         setup.bgPriority = 1;
         disp->actors[GSYNC_DISP_ACTOR_SUB] =
-            func_0204c040(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_SUB], disp->res[GSYNC_DISP_RES_PLTT_SUB],
-                          disp->res[GSYNC_DISP_RES_CELL_SUB], &setup, CLACT_SURFACE_SUB, disp->heapId);
-        func_0204c520(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
-        func_0204c124(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
+            ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_SUB], disp->res[GSYNC_DISP_RES_PLTT_SUB],
+                           disp->res[GSYNC_DISP_RES_CELL_SUB], &setup, CLACT_SURFACE_SUB, disp->heapId);
+        ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
+        ClActor_SetVisible(disp->actors[GSYNC_DISP_ACTOR_SUB], TRUE);
     }
 }
 
@@ -472,7 +473,7 @@ static void GSyncDisp_InitActor(GSyncDisp *disp, int index) {
     ClActorSetup setup;
 
     if (disp->actors[index] != NULL) {
-        func_0204c108(disp->actors[index]);
+        ClActor_Delete(disp->actors[index]);
     }
     setup.x = sActorPositions[index].x;
     setup.y = sActorPositions[index].y;
@@ -480,16 +481,16 @@ static void GSyncDisp_InitActor(GSyncDisp *disp, int index) {
     setup.priority = sActorPositions[index].priority;
     setup.bgPriority = 1;
     disp->actors[index] =
-        func_0204c040(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_ACTORS], disp->res[GSYNC_DISP_RES_PLTT_ACTORS],
-                      disp->res[GSYNC_DISP_RES_CELL_ACTORS], &setup, CLACT_SURFACE_MAIN, disp->heapId);
-    func_0204c4d4(disp->actors[index], 0);
-    func_0204c520(disp->actors[index], TRUE);
-    func_0204c124(disp->actors[index], TRUE);
-    func_0204c244(disp->actors[index], 2);
+        ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_ACTORS], disp->res[GSYNC_DISP_RES_PLTT_ACTORS],
+                       disp->res[GSYNC_DISP_RES_CELL_ACTORS], &setup, CLACT_SURFACE_MAIN, disp->heapId);
+    ClActor_SetAnimTime(disp->actors[index], 0);
+    ClActor_SetAutoAnim(disp->actors[index], TRUE);
+    ClActor_SetVisible(disp->actors[index], TRUE);
+    ClActor_SetAffineMode(disp->actors[index], 2);
 }
 
 void GSyncDisp_PokeIconSequence2(GSyncDisp *disp) {
-    func_0204c488(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], 2);
+    ClActor_SetSequence(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], 2);
 }
 
 static void GSyncDisp_DeleteActors(GSyncDisp *disp) {
@@ -497,7 +498,7 @@ static void GSyncDisp_DeleteActors(GSyncDisp *disp) {
 
     for (i = 0; i < GSYNC_DISP_ACTOR_COUNT; i++) {
         if (disp->actors[i] != NULL) {
-            func_0204c108(disp->actors[i]);
+            ClActor_Delete(disp->actors[i]);
             disp->actors[i] = NULL;
         }
     }
@@ -507,10 +508,10 @@ static void GSyncDisp_LoadPokeIconRes(GSyncDisp *disp) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, disp->heapId);
 
     disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON] =
-        func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_BOTH, 0, disp->heapId);
+        ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_BOTH, 0, disp->heapId);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC, disp->heapId);
-    disp->res[GSYNC_DISP_RES_CELL_POKE_ICON] = func_0204bde0(arc, 14, 27, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CELL_POKE_ICON] = ClActSys_LoadCellAnims(arc, 14, 27, disp->heapId);
     GFL_ArcToolFree(arc);
 }
 
@@ -521,7 +522,7 @@ void GSyncDisp_CreatePokeIcon(GSyncDisp *disp, BoxPkm *pkm, u32 surface) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, disp->heapId);
 
     disp->res[GSYNC_DISP_RES_CHAR_POKE_ICON] =
-        func_0204b81c(arc, PokeIcon_GetFileOfPkm(pkm), FALSE, CLACT_VRAM_BOTH, disp->heapId);
+        ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(pkm), FALSE, CLACT_VRAM_BOTH, disp->heapId);
     if (surface == CLACT_SURFACE_MAIN) {
         setup.x = x[1];
         setup.y = y[1];
@@ -533,21 +534,21 @@ void GSyncDisp_CreatePokeIcon(GSyncDisp *disp, BoxPkm *pkm, u32 surface) {
     setup.priority = 3;
     setup.bgPriority = 1;
     disp->actors[GSYNC_DISP_ACTOR_POKE_ICON] =
-        func_0204c040(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_POKE_ICON], disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON],
-                      disp->res[GSYNC_DISP_RES_CELL_POKE_ICON], &setup, surface, disp->heapId);
-    func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], FALSE);
-    func_0204c124(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
-    func_0204c378(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], PokeIcon_GetPaletteOfPkm(pkm), 1);
+        ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_POKE_ICON], disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON],
+                       disp->res[GSYNC_DISP_RES_CELL_POKE_ICON], &setup, surface, disp->heapId);
+    ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], FALSE);
+    ClActor_SetVisible(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
+    ClActor_SetPalette(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], PokeIcon_GetPaletteOfPkm(pkm), 1);
     GFL_ArcToolFree(arc);
 }
 
 void GSyncDisp_StartPokeIcon(GSyncDisp *disp) {
-    func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
+    ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
 }
 
 void GSyncDisp_PokeIconSequence1(GSyncDisp *disp) {
-    func_0204c488(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], 1);
-    func_0204c520(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
+    ClActor_SetSequence(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], 1);
+    ClActor_SetAutoAnim(disp->actors[GSYNC_DISP_ACTOR_POKE_ICON], TRUE);
 }
 
 // The progress gauge's colors, the line where it is filled and the lines below it, then white
@@ -653,19 +654,19 @@ static void GSyncDisp_StartPokemonFloat(GSyncDisp *disp, int index) {
         ClActorPos pos = { 128, 0 };
         ClActorScale scale = { FX32_ONE, FX32_ONE };
 
-        func_0204c140(actor, &pos, CLACT_SURFACE_MAIN);
-        func_0204c270(actor, &scale);
-        func_0204c520(actor, FALSE);
-        func_0204c124(actor, FALSE);
-        func_0204c318(actor, 1);
-        func_0204c244(actor, 2);
+        ClActor_SetSurfacePos(actor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetScale(actor, &scale);
+        ClActor_SetAutoAnim(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
+        ClActor_SetObjMode(actor, 1);
+        ClActor_SetAffineMode(actor, 2);
         disp->floats[index].actor = actor;
     }
 }
 
 static void GSyncDisp_HideFloat(GSyncDispFloat *fl) {
     if (fl->actor != NULL) {
-        func_0204c124(fl->actor, FALSE);
+        ClActor_SetVisible(fl->actor, FALSE);
     }
     fl->actor = NULL;
 }
@@ -677,12 +678,12 @@ static void GSyncDisp_StartItemFloat(GSyncDisp *disp, int index) {
         ClActorPos pos = { 156, 28 };
         ClActorScale scale = { FX32_ONE, FX32_ONE };
 
-        func_0204c140(actor, &pos, CLACT_SURFACE_MAIN);
-        func_0204c270(actor, &scale);
-        func_0204c520(actor, FALSE);
-        func_0204c124(actor, FALSE);
-        func_0204c318(actor, 1);
-        func_0204c244(actor, 2);
+        ClActor_SetSurfacePos(actor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetScale(actor, &scale);
+        ClActor_SetAutoAnim(actor, FALSE);
+        ClActor_SetVisible(actor, FALSE);
+        ClActor_SetObjMode(actor, 1);
+        ClActor_SetAffineMode(actor, 2);
         disp->floats[index].actor = actor;
     }
 }
@@ -700,7 +701,7 @@ static void GSyncDisp_UpdateFloat(GSyncDispFloat *fl) {
     swayX = (s16)(FX_SinIdx(fl->angleX) * 4) >> FX32_SHIFT;
     swayY = (s16)(FX_SinIdx(fl->angleY) * 3) >> FX32_SHIFT;
     if (fl->actor != NULL) {
-        func_0204c178(fl->actor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_GetSurfacePos(fl->actor, &pos, CLACT_SURFACE_MAIN);
         u16 x = fl->x;
 
         pos.x = x + swayX + swayY;
@@ -712,17 +713,17 @@ static void GSyncDisp_UpdateFloat(GSyncDispFloat *fl) {
                 fl->x = x + 1;
             }
         }
-        func_0204c140(fl->actor, &pos, CLACT_SURFACE_MAIN);
-        func_0204c124(fl->actor, TRUE);
+        ClActor_SetSurfacePos(fl->actor, &pos, CLACT_SURFACE_MAIN);
+        ClActor_SetVisible(fl->actor, TRUE);
         fl->timer++;
         if (pos.y > 25) {
-            func_0204c27c(fl->actor, &scale);
+            ClActor_GetScale(fl->actor, &scale);
             scale.x -= 16;
             scale.y -= 16;
             if (scale.x < 0 || scale.y < 0) {
                 GSyncDisp_HideFloat(fl);
             } else {
-                func_0204c270(fl->actor, &scale);
+                ClActor_SetScale(fl->actor, &scale);
             }
         }
         if (pos.y > 50) {
@@ -855,17 +856,17 @@ void GSyncDisp_LoadFloatGraphics(GSyncDisp *disp) {
 static void GSyncDisp_UploadPokemonFloat(GSyncDisp *disp, int index, ClActor *actor) {
     NNSG2dImageProxy proxy;
 
-    func_0204c40c(actor, &proxy);
+    ClActor_GetImageProxy(actor, &proxy);
     MI_CpuCopy8(disp->floatGraphics[index].chars,
                 (void *)(HW_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
                 sizeof(disp->floatGraphics[index].chars));
-    func_0204c378(actor, (u8)disp->floatGraphics[index].paletteNum, 1);
+    ClActor_SetPalette(actor, (u8)disp->floatGraphics[index].paletteNum, 1);
 }
 
 static void GSyncDisp_UploadItemFloat(GSyncDisp *disp, int index, ClActor *actor) {
     NNSG2dImageProxy proxy;
 
-    func_0204c40c(actor, &proxy);
+    ClActor_GetImageProxy(actor, &proxy);
     MI_CpuCopy8(disp->floatGraphics[index].chars,
                 (void *)(HW_OBJ_VRAM + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DMAIN]),
                 sizeof(disp->floatGraphics[index].chars));
@@ -879,17 +880,17 @@ static void GSyncDisp_CreatePokemonFloatActor(GSyncDisp *disp) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, disp->heapId);
     u16 icon = PokeParty_GetIconIndex(SPECIES_BULBASAUR, 0, 0, FALSE);
 
-    disp->res[GSYNC_DISP_RES_CHAR_FLOAT_POKEMON] = func_0204b81c(arc, icon, FALSE, CLACT_VRAM_MAIN, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CHAR_FLOAT_POKEMON] = ClActSys_LoadChars(arc, icon, FALSE, CLACT_VRAM_MAIN, disp->heapId);
     setup.x = 133;
     setup.y = 128;
     setup.sequence = 0;
     setup.priority = 3;
     setup.bgPriority = 2;
-    disp->floatPokemonActor = func_0204c040(
+    disp->floatPokemonActor = ClActor_Create(
         disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_FLOAT_POKEMON], disp->res[GSYNC_DISP_RES_PLTT_POKE_ICON],
         disp->res[GSYNC_DISP_RES_CELL_POKE_ICON], &setup, CLACT_SURFACE_MAIN, disp->heapId);
-    func_0204c520(disp->floatPokemonActor, FALSE);
-    func_0204c124(disp->floatPokemonActor, FALSE);
+    ClActor_SetAutoAnim(disp->floatPokemonActor, FALSE);
+    ClActor_SetVisible(disp->floatPokemonActor, FALSE);
     GFL_ArcToolFree(arc);
 }
 
@@ -899,11 +900,11 @@ static void GSyncDisp_CreateItemFloatActor(GSyncDisp *disp) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, disp->heapId);
 
     disp->res[GSYNC_DISP_RES_PLTT_ITEM] =
-        func_0204bbb8(arc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_PLTT), CLACT_VRAM_MAIN, 8 * 0x20, 0, 1,
-                      disp->heapId);
-    disp->res[GSYNC_DISP_RES_CHAR_ITEM] = func_0204b81c(
+        ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_PLTT), CLACT_VRAM_MAIN,
+                               8 * 0x20, 0, 1, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CHAR_ITEM] = ClActSys_LoadChars(
         arc, GetItemGraphicsDatID(ITEM_MASTER_BALL, ITEM_FILE_ICON_CHAR), FALSE, CLACT_VRAM_MAIN, disp->heapId);
-    disp->res[GSYNC_DISP_RES_CELL_ITEM] = func_0204bde0(arc, 1, 0, disp->heapId);
+    disp->res[GSYNC_DISP_RES_CELL_ITEM] = ClActSys_LoadCellAnims(arc, 1, 0, disp->heapId);
     GFL_ArcToolFree(arc);
     setup.x = 156;
     setup.y = 28;
@@ -911,8 +912,8 @@ static void GSyncDisp_CreateItemFloatActor(GSyncDisp *disp) {
     setup.priority = 0;
     setup.bgPriority = 2;
     disp->floatItemActor =
-        func_0204c040(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_ITEM], disp->res[GSYNC_DISP_RES_PLTT_ITEM],
-                      disp->res[GSYNC_DISP_RES_CELL_ITEM], &setup, CLACT_SURFACE_MAIN, disp->heapId);
-    func_0204c520(disp->floatItemActor, FALSE);
-    func_0204c124(disp->floatItemActor, FALSE);
+        ClActor_Create(disp->clUnit, disp->res[GSYNC_DISP_RES_CHAR_ITEM], disp->res[GSYNC_DISP_RES_PLTT_ITEM],
+                       disp->res[GSYNC_DISP_RES_CELL_ITEM], &setup, CLACT_SURFACE_MAIN, disp->heapId);
+    ClActor_SetAutoAnim(disp->floatItemActor, FALSE);
+    ClActor_SetVisible(disp->floatItemActor, FALSE);
 }

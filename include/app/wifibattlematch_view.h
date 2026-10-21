@@ -28,7 +28,7 @@ typedef struct {
     // Dates, as the year since 2000, the month and the day in the bytes from the top
     u32 startDate;
     u32 endDate;
-    // The player's appearance (func_02008bf4)
+    // The player's appearance (PlayerInfo_GetUnionView)
     u32 look;
     u16 unkA0;
     u8 unkA2[2];

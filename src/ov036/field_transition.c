@@ -6,6 +6,7 @@
 #include "field/field.h"
 #include "field/field_event.h"
 #include "field/field_lens_flare.h"
+#include "field/field_msgbg.h"
 #include "field/fld_exp_obj.h"
 #include "field/zone.h"
 #include "gfl/bg_sys.h"
@@ -435,7 +436,7 @@ GameEventReturnCode setupScreenForEnterBuilding(GameEvent *event, u32 *state, vo
         reg_GX_DISPCAPCNT = 0x80330010;
         OS_WaitVBlankIntr();
         OS_WaitVBlankIntr();
-        config = data_ov036_021d1624;
+        config = gEnterBuildingLCDConfig;
         GFL_BGSysSetLCDConfig(&config);
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x4084;
         GX_SetBankForBG(8);
@@ -456,7 +457,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         GFL_BGSysSetBGPriority(2, 0);
         GFL_BGSysSetBGPriority(0, 1);
         GFL_BGSysSetBGEnabled(0, TRUE);
-        G2x_SetBlendAlpha_(0x4000050, 4, 1, work->alpha, 0);
+        G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG2, GX_BLEND_PLANEMASK_BG0, work->alpha, 0);
         GFL_FadeSet(work->fadeMode, 16, 0, -1);
         FieldLensFlare_Cancel(Field_GetLensFlare(work->field));
         (*state)++;
@@ -464,7 +465,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
     case 1:
         if (work->alpha != 0) {
             u32 alpha = --work->alpha;
-            reg_G2_BLDALPHA = alpha | ((16 - alpha) << 8);
+            G2_ChangeBlendAlpha(alpha, 16 - alpha);
             break;
         }
         GFL_BGSysSetBGEnabled(2, FALSE);
@@ -472,7 +473,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         MIi_CpuClearFast(0, (void *)0x6800000, 0x20000);
         GX_DisableBankForLCDC();
         GX_SetBankForBG(8);
-        func_ov012_02160e88();
+        resetBuildingEnterVBlankCallback();
         (*state)++;
         break;
     case 2:
@@ -552,7 +553,7 @@ GameEventReturnCode func_ov036_021b8fc0(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 8, 8, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 8, 8, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -576,7 +577,7 @@ GameEventReturnCode func_ov036_021b9038(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 2, 2, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 2, 2, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -600,7 +601,7 @@ GameEventReturnCode func_ov036_021b90b0(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 4, 4, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 4, 4, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -624,7 +625,7 @@ GameEventReturnCode func_ov036_021b9128(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 10, 10, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 10, 10, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -648,7 +649,7 @@ GameEventReturnCode func_ov036_021b91a0(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 6, 6, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 6, 6, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -674,7 +675,7 @@ GameEventReturnCode func_ov036_021b9214(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 3, 3, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 3, 3, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -700,7 +701,7 @@ GameEventReturnCode func_ov036_021b9294(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 5, 5, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 5, 5, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -726,7 +727,7 @@ GameEventReturnCode func_ov036_021b9314(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 7, 7, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 7, 7, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:
@@ -752,7 +753,7 @@ GameEventReturnCode func_ov036_021b9394(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 1:
-        GFL_WipeSet(3, 11, 11, 0, 6, 1, Field_GetHeapID(field));
+        GFL_WipeSet(WIPE_MODE_MAIN, 11, 11, WIPE_COLOR_BLACK, 6, 1, Field_GetHeapID(field));
         (*state)++;
         break;
     case 2:

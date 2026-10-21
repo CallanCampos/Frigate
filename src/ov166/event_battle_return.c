@@ -271,15 +271,15 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         if (procRunning != TRUE) {
             if (func_ov012_02165b0c(wk->nameEntry) == FALSE) {
                 oldName = GFL_StrBufCreate(32, wk->heapId);
-                func_ov012_02165afc(wk->nameEntry, wk->name);
+                NameEntryParam_GetName(wk->nameEntry, wk->name);
                 PokeParty_GetParam(wk->pkm, PKM_PARAM_NICKNAME, oldName);
                 PokeParty_SetParam(wk->pkm, PKM_PARAM_NICKNAME, (uptr)wk->name);
-                if (func_ov012_02165b10(wk->nameEntry, oldName) == FALSE) {
+                if (NameEntryParam_CompareName(wk->nameEntry, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(prm->gameData), 0x1e);
                 }
                 GFL_StrBufFree(oldName);
             }
-            func_ov012_02165ae8(wk->nameEntry);
+            NameEntryParam_Free(wk->nameEntry);
             wk->nameEntry = NULL;
             (*state)++;
         } else {
@@ -292,7 +292,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         if (wk->boxMessage == NULL) {
             PokeParty_AddPkm(party, wk->pkm);
         } else {
-            BoxSaveAccessor_InsertPkm(GameData_GetBoxSaveAccessor(prm->gameData), func_0201d620(wk->pkm));
+            BoxSaveAccessor_InsertPkm(GameData_GetBoxSaveAccessor(prm->gameData), PokeParty_GetBoxPkm(wk->pkm));
         }
         (*state)++;
         break;
@@ -303,7 +303,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
                     GFL_SndBGMFadeOut(30);
                     wk->musicFading = TRUE;
                 } else if (!GFL_SndBGMIsFading()) {
-                    func_02005d8c();
+                    GFL_SndBGMStopImmediate();
                     wk->musicDone = TRUE;
                 }
             } else {

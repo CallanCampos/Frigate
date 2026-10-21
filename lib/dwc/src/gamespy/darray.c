@@ -1,24 +1,23 @@
 #include "dwc/darray.h"
 #include "dwc/ext.h"
 
-// GameSpy's dynamic arrays (darray.c). The functions' names, from pret/pokerevo's Wii build, are in dwc/darray.h
+// GameSpy's dynamic arrays (darray.c). The names of the functions that keep their addresses are in dwc/darray.h
 
-static void func_ov011_021714cc(DArray *array, int index);
-static void func_ov011_021714e0(DArray *array);
-static void func_ov011_021714fc(DArray *array, const void *element, int index);
-static void *func_ov011_0217178c(const void *key, void *base, int count, int size, DArrayCompareFunc compare);
-static void *func_ov011_021717c8(const void *key, void *base, int count, int size, DArrayCompareFunc compare,
-                                 int *found);
+static void FreeElement(DArray *array, int index);
+static void ArrayGrow(DArray *array);
+static void SetElement(DArray *array, const void *element, int index);
+static void *mylsearch(const void *key, void *base, int count, int size, DArrayCompareFunc compare);
+static void *mybsearch(const void *key, void *base, int count, int size, DArrayCompareFunc compare, int *found);
 
 // Frees the element at the index with the array's free function, if it has one
-static void func_ov011_021714cc(DArray *array, int index) {
+static void FreeElement(DArray *array, int index) {
     if (array->freeFunc != NULL) {
         array->freeFunc(func_ov011_0217158c(array, index));
     }
 }
 
 // Makes room for growBy more elements
-static void func_ov011_021714e0(DArray *array) {
+static void ArrayGrow(DArray *array) {
     int capacity = array->capacity + array->growBy;
 
     array->capacity = capacity;
@@ -26,7 +25,7 @@ static void func_ov011_021714e0(DArray *array) {
 }
 
 // Copies the element to the index
-static void func_ov011_021714fc(DArray *array, const void *element, int index) {
+static void SetElement(DArray *array, const void *element, int index) {
     memcpy(func_ov011_0217158c(array, index), element, array->elementSize);
 }
 
@@ -54,7 +53,7 @@ void func_ov011_02171558(DArray *array) {
     int i;
 
     for (i = 0; i < array->count; i++) {
-        func_ov011_021714cc(array, i);
+        FreeElement(array, i);
     }
     if (array->list != NULL) {
         gsifree(array->list);
@@ -75,15 +74,15 @@ void *func_ov011_0217158c(DArray *array, int index) {
 
 void func_ov011_021715a4(DArray *array, const void *element) {
     if (array != NULL) {
-        func_ov011_021715b4(array, element, array->count);
+        ArrayInsertAt(array, element, array->count);
     }
 }
 
-void func_ov011_021715b4(DArray *array, const void *element, int index) {
+void ArrayInsertAt(DArray *array, const void *element, int index) {
     int count;
 
     if (array->count == array->capacity) {
-        func_ov011_021714e0(array);
+        ArrayGrow(array);
     }
     array->count++;
     count = array->count - 1;
@@ -91,14 +90,14 @@ void func_ov011_021715b4(DArray *array, const void *element, int index) {
         memmove(func_ov011_0217158c(array, index + 1), func_ov011_0217158c(array, index),
                 (count - index) * array->elementSize);
     }
-    func_ov011_021714fc(array, element, index);
+    SetElement(array, element, index);
 }
 
-void func_ov011_02171600(DArray *array, const void *element, DArrayCompareFunc compare) {
+void ArrayInsertSorted(DArray *array, const void *element, DArrayCompareFunc compare) {
     int found;
-    char *position = func_ov011_021717c8(element, array->list, array->count, array->elementSize, compare, &found);
+    char *position = mybsearch(element, array->list, array->count, array->elementSize, compare, &found);
 
-    func_ov011_021715b4(array, element, (position - array->list) / array->elementSize);
+    ArrayInsertAt(array, element, (position - array->list) / array->elementSize);
 }
 
 void func_ov011_02171634(DArray *array, int index) {
@@ -112,16 +111,16 @@ void func_ov011_02171634(DArray *array, int index) {
 }
 
 void func_ov011_02171668(DArray *array, int index) {
-    func_ov011_021714cc(array, index);
+    FreeElement(array, index);
     func_ov011_02171634(array, index);
 }
 
-void func_ov011_0217167c(DArray *array, const void *element, int index) {
-    func_ov011_021714cc(array, index);
-    func_ov011_021714fc(array, element, index);
+void ArrayReplaceAt(DArray *array, const void *element, int index) {
+    FreeElement(array, index);
+    SetElement(array, element, index);
 }
 
-void func_ov011_02171698(DArray *array, DArrayCompareFunc compare) {
+void ArraySort(DArray *array, DArrayCompareFunc compare) {
     qsort(array->list, array->count, array->elementSize, compare);
 }
 
@@ -134,11 +133,10 @@ int func_ov011_021716ac(DArray *array, const void *key, DArrayCompareFunc compar
         return -1;
     }
     if (sorted) {
-        position = func_ov011_021717c8(key, func_ov011_0217158c(array, start), count - start, array->elementSize,
-                                       compare, &found);
-    } else {
         position =
-            func_ov011_0217178c(key, func_ov011_0217158c(array, start), count - start, array->elementSize, compare);
+            mybsearch(key, func_ov011_0217158c(array, start), count - start, array->elementSize, compare, &found);
+    } else {
+        position = mylsearch(key, func_ov011_0217158c(array, start), count - start, array->elementSize, compare);
     }
     if (position != NULL && found) {
         return (position - array->list) / array->elementSize;
@@ -146,7 +144,7 @@ int func_ov011_021716ac(DArray *array, const void *key, DArrayCompareFunc compar
     return -1;
 }
 
-void func_ov011_02171724(DArray *array, DArrayMapFunc func, void *clientData) {
+void ArrayMapBackwards(DArray *array, DArrayMapFunc func, void *clientData) {
     int i;
 
     for (i = array->count - 1; i >= 0; i--) {
@@ -154,7 +152,7 @@ void func_ov011_02171724(DArray *array, DArrayMapFunc func, void *clientData) {
     }
 }
 
-void *func_ov011_02171744(DArray *array, DArrayMapFunc2 func, void *clientData) {
+void *ArrayMapBackwards2(DArray *array, DArrayMapFunc2 func, void *clientData) {
     int i;
     void *element;
 
@@ -167,7 +165,7 @@ void *func_ov011_02171744(DArray *array, DArrayMapFunc2 func, void *clientData) 
     return NULL;
 }
 
-void func_ov011_02171770(DArray *array) {
+void ArrayClear(DArray *array) {
     int i;
 
     for (i = func_ov011_02171588(array) - 1; i >= 0; i--) {
@@ -176,7 +174,7 @@ void func_ov011_02171770(DArray *array) {
 }
 
 // A linear search, for an unsorted array
-static void *func_ov011_0217178c(const void *key, void *base, int count, int size, DArrayCompareFunc compare) {
+static void *mylsearch(const void *key, void *base, int count, int size, DArrayCompareFunc compare) {
     int i;
     int offset;
 
@@ -190,8 +188,7 @@ static void *func_ov011_0217178c(const void *key, void *base, int count, int siz
 }
 
 // A binary search: the place where the key is or goes, and whether it is there
-static void *func_ov011_021717c8(const void *key, void *base, int count, int size, DArrayCompareFunc compare,
-                                 int *found) {
+static void *mybsearch(const void *key, void *base, int count, int size, DArrayCompareFunc compare, int *found) {
     int low = 0;
     int high = count - 1;
     int middle;

@@ -104,7 +104,7 @@ FrameList *FrameList_Create(const FrameListSetup *setup, HeapID heapId) {
     list->heapId = heapId;
     list->touchY = -1;
     list->prevTouchY = -1;
-    list->printQueue = func_020219a8(0x800, heapId);
+    list->printQueue = PrintQueue_Create(0x800, heapId);
     list->blinkAnm = BlinkPalAnm_Create(list->setup.layout.palette << 4, 16, list->setup.layout.bg, list->heapId);
     list->items = GFL_HeapAllocate(list->heapId, list->setup.count * sizeof(FrameListItem), TRUE, "frame_list.c", 265);
     if (list->setup.screenCount != 0) {
@@ -181,7 +181,7 @@ void FrameList_Free(FrameList *list) {
     }
     GFL_HeapFree(list->items);
     BlinkPalAnm_Free(list->blinkAnm);
-    func_02021a18(list->printQueue);
+    PrintQueue_Free(list->printQueue);
     GFL_HeapFree(list);
 }
 
@@ -223,7 +223,7 @@ BOOL FrameList_Draw(FrameList *list) {
         list->state++;
         break;
     case 1:
-        if (func_02021c0c(list->printQueue) == TRUE) {
+        if (PrintQueue_IsEmpty(list->printQueue) == TRUE) {
             list->state = 0;
             return FALSE;
         }
@@ -237,7 +237,7 @@ u32 FrameList_Main(FrameList *list) {
     u32 x;
     s32 result = FRAMELIST_NONE;
 
-    if (!func_0203da84(&x, (u32 *)&list->touchY)) {
+    if (!GFL_HIDGetTouchHeldPoint(&x, (u32 *)&list->touchY)) {
         list->touchY = -1;
         list->flags.scrolledByDrag = 0;
     }
@@ -261,7 +261,7 @@ u32 FrameList_Main(FrameList *list) {
         }
         break;
     case LIST_STATE_CURSOR_WAIT:
-        if (!func_0203d554() && (GetKeyTrigger(list) & PAD_BUTTON_A)) {
+        if (!GCTX_HIDIsUsingTouch() && (GetKeyTrigger(list) & PAD_BUTTON_A)) {
             result = list->cursor;
         }
         if (list->cursorDelay == 0) {
@@ -358,12 +358,12 @@ static int TouchEvent(FrameList *list) {
     if (list->touchRects == NULL) {
         return LIST_EVENT_NONE;
     }
-    touched = func_0203da0c(list->touchRects);
+    touched = GFL_HIDGetTouchPressedRect(list->touchRects);
     if (touched == TOUCH_RECT_NONE) {
         return LIST_EVENT_NONE;
     }
-    touchMode = func_0203d554();
-    func_0203d564(TRUE);
+    touchMode = GCTX_HIDIsUsingTouch();
+    GCTX_HIDSetUsingTouch(TRUE);
     switch (list->setup.touch[touched].action) {
     case FRAMELIST_TOUCH_ITEM_DECIDE:
         if (touched >= list->rows) {
@@ -385,7 +385,7 @@ static int TouchEvent(FrameList *list) {
             list->prevCursor = list->cursor;
             return LIST_EVENT_BAR;
         }
-        func_0203d564(touchMode);
+        GCTX_HIDSetUsingTouch(touchMode);
         break;
     case FRAMELIST_TOUCH_UP:
         if (list->scroll != 0) {
@@ -435,8 +435,8 @@ static int TouchEvent(FrameList *list) {
 
 // What the keys ask for
 static int KeyEvent(FrameList *list) {
-    if ((GetKeyTrigger(list) & 0x3f1) && func_0203d554() == TRUE) {
-        func_0203d564(FALSE);
+    if ((GetKeyTrigger(list) & 0x3f1) && GCTX_HIDIsUsingTouch() == TRUE) {
+        GCTX_HIDSetUsingTouch(FALSE);
         list->prevCursor = 0xff;
         list->cursorDelay = 8;
         return LIST_EVENT_CURSOR_SHOWN;
@@ -446,7 +446,7 @@ static int KeyEvent(FrameList *list) {
         list->repeatStage = 6;
     }
     if (GetKeyRepeat(list) & PAD_KEY_UP) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         if (list->cursor != 0) {
             list->prevCursor = list->cursor;
             list->cursor--;
@@ -461,7 +461,7 @@ static int KeyEvent(FrameList *list) {
         return LIST_EVENT_NONE;
     }
     if (GetKeyRepeat(list) & PAD_KEY_DOWN) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         if (list->cursor < list->rows - 1) {
             list->prevCursor = list->cursor;
             list->cursor++;
@@ -476,7 +476,7 @@ static int KeyEvent(FrameList *list) {
         return LIST_EVENT_NONE;
     }
     if (GetKeyRepeat(list) & PAD_KEY_LEFT) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         if (list->scroll != 0) {
             list->cursorDelay = 4;
             return LIST_EVENT_PAGE_UP;
@@ -490,7 +490,7 @@ static int KeyEvent(FrameList *list) {
         return LIST_EVENT_NONE;
     }
     if (GetKeyRepeat(list) & PAD_KEY_RIGHT) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         if (list->scroll < list->maxScroll) {
             list->cursorDelay = 4;
             return LIST_EVENT_PAGE_DOWN;
@@ -507,14 +507,14 @@ static int KeyEvent(FrameList *list) {
         return LIST_EVENT_DECIDE;
     }
     if (GetKeyTrigger(list) & PAD_BUTTON_L) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         if (list->cursor != 0 || list->scroll != 0) {
             return LIST_EVENT_JUMP_TOP;
         }
         return LIST_EVENT_NONE;
     }
     if (GetKeyTrigger(list) & PAD_BUTTON_R) {
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         if (list->cursor != list->rows - 1 || list->scroll != list->maxScroll) {
             return LIST_EVENT_JUMP_BOTTOM;
         }
@@ -527,7 +527,7 @@ static int KeyEvent(FrameList *list) {
 static int HandleEvent(FrameList *list) {
     s16 rows;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return FRAMELIST_NONE;
     }
     {
@@ -613,7 +613,7 @@ static int HandleEvent(FrameList *list) {
             GFL_SndSEPlay(SEQ_SE_SYS_06);
             return -8;
         case LIST_EVENT_DECIDE:
-            if (func_0203d554() == TRUE) {
+            if (GCTX_HIDIsUsingTouch() == TRUE) {
                 SetCursorRow(list, list->cursor, list->prevCursor);
                 list->setup.callbacks->select(list->setup.work, list->cursor + list->scroll, TRUE);
             }
@@ -675,11 +675,11 @@ static void StartScroll(FrameList *list, s8 step, u8 count, u16 nextState, BOOL 
 static BOOL UpdateScroll(FrameList *list) {
     s32 touched;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return TRUE;
     }
     if (list->nextState == LIST_STATE_DRAG && list->flicking == TRUE) {
-        touched = func_0203d9c8(list->touchRects);
+        touched = GFL_HIDGetTouchHeldRect(list->touchRects);
         if (list->flags.touching == TRUE) {
             if (!list->flags.dragging) {
                 if (touched == TOUCH_RECT_NONE) {
@@ -710,7 +710,7 @@ static BOOL UpdateScroll(FrameList *list) {
     }
     if (list->scrollFrames == 0) {
         if (list->scrollStep == 0) {
-            touched = func_0203d9c8(list->touchRects);
+            touched = GFL_HIDGetTouchHeldRect(list->touchRects);
             if (touched != TOUCH_RECT_NONE && list->setup.touch[touched].action == FRAMELIST_TOUCH_ITEM &&
                 list->flags.scrolledByDrag == 1 && list->setup.touch[touched].action == FRAMELIST_TOUCH_ITEM &&
                 ((list->dragDelta < 0 && list->dragItem < touched) ||
@@ -764,7 +764,7 @@ static BOOL UpdateScroll(FrameList *list) {
                     list->flags.dragging = 0;
                 }
                 if (list->flags.touching == 1 && list->flags.touchFrames == 3) {
-                    touched = func_0203d9c8(list->touchRects);
+                    touched = GFL_HIDGetTouchHeldRect(list->touchRects);
                     if (touched != TOUCH_RECT_NONE && list->setup.touch[touched].action == FRAMELIST_TOUCH_ITEM) {
                         list->cursor = touched;
                     }
@@ -866,7 +866,7 @@ static void StartBar(FrameList *list, u32 index) {
         list->barTouch[0].right = 255;
     }
     list->barTouch[1].top = TOUCH_RECT_END;
-    if (!func_0203da84(&x, (u32 *)&list->barTouchY)) {
+    if (!GFL_HIDGetTouchHeldPoint(&x, (u32 *)&list->barTouchY)) {
         list->barTouchY = -1;
     }
     list->barDragging = TRUE;
@@ -878,7 +878,7 @@ static u32 GetBarTouchValue(FrameList *list) {
     u32 x;
     u32 y;
 
-    if (!func_0203da84(&x, &y)) {
+    if (!GFL_HIDGetTouchHeldPoint(&x, &y)) {
         y = list->barTouchY;
     }
     list->barTouchY = -1;
@@ -922,8 +922,8 @@ int FrameList_ClampBarPos(FrameList *list, int y) {
     u32 end;
 
     if (list->barDragging == TRUE) {
-        if (func_0203d9c8(&list->barTouch[0]) != TOUCH_RECT_NONE) {
-            func_0203da84(&x, &touchY);
+        if (GFL_HIDGetTouchHeldRect(&list->barTouch[0]) != TOUCH_RECT_NONE) {
+            GFL_HIDGetTouchHeldPoint(&x, &touchY);
             return touchY;
         }
         return y;
@@ -946,10 +946,10 @@ static BOOL UpdateBar(FrameList *list) {
     u32 target;
     u32 diff;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return TRUE;
     }
-    if (func_0203d9c8(&list->barTouch[0]) == TOUCH_RECT_NONE && list->barTouchY == -1) {
+    if (GFL_HIDGetTouchHeldRect(&list->barTouch[0]) == TOUCH_RECT_NONE && list->barTouchY == -1) {
         list->barDragging = FALSE;
         list->state = LIST_STATE_INPUT;
         return FALSE;
@@ -987,10 +987,10 @@ static void StartDrag(FrameList *list, u32 item) {
 static BOOL UpdateDrag(FrameList *list) {
     s32 touched;
 
-    if (func_02021c0c(list->printQueue) == FALSE) {
+    if (PrintQueue_IsEmpty(list->printQueue) == FALSE) {
         return TRUE;
     }
-    touched = func_0203d9c8(list->touchRects);
+    touched = GFL_HIDGetTouchHeldRect(list->touchRects);
     switch (list->dragState) {
     case 0:
         if (touched == TOUCH_RECT_NONE) {
@@ -1184,7 +1184,7 @@ static void DrawItemFrame(FrameList *list, int item, int row) {
     u8 i;
     u8 j;
 
-    tiles = func_020503f4(GetBgNo(BGWinFrame_GetBG(list->frames, row)));
+    tiles = Particle_GetBGCharPtr(GetBgNo(BGWinFrame_GetBG(list->frames, row)));
     BGWinFrame_SetScreen(list->frames, row, screen);
     BGWinFrame_WriteBmpWin(list->frames, row, window);
     screenWidth = list->setup.layout.width;
@@ -1317,7 +1317,7 @@ static void SetCursorRow(FrameList *list, u16 newCursor, u16 oldCursor) {
 
         FrameList_SetRowPalette(list, oldCursor, palette);
     }
-    if (newCursor < list->rows && !func_0203d554()) {
+    if (newCursor < list->rows && !GCTX_HIDIsUsingTouch()) {
         BlinkPalAnm_InitAnime(list->blinkAnm);
         FrameList_SetRowPalette(list, newCursor, list->setup.layout.palette);
     }
@@ -1326,7 +1326,7 @@ static void SetCursorRow(FrameList *list, u16 newCursor, u16 oldCursor) {
 static void FlushWindows(FrameList *list) {
     u32 i;
 
-    func_02021a3c(list->printQueue);
+    PrintQueue_Main(list->printQueue);
     for (i = 0; i < list->rowCount; i++) {
         PrintWindow_Flush(&list->printWindows[i], list->printQueue);
     }

@@ -214,7 +214,7 @@ void EventFieldFirst_SetupCity(GameSystem *gsys) {
     PlayerInfo *player = GetGameDataPlayerInfo(gameData);
 
     CityState_InitFromSave(city, player, GameData_GetSaveControl(gameData), 1);
-    func_ov012_0215cd58(GameData_GetMyCityState(gameData));
+    CityState_ApplyVersionZones(GameData_GetMyCityState(gameData));
 }
 
 GameEventReturnCode EventFieldFirst_Callback(GameEvent *event, u32 *state, void *data) {
@@ -292,7 +292,7 @@ void EventFieldContinue_SetupCity(GameSystem *gsys) {
     PlayerInfo *player = GetGameDataPlayerInfo(gameData);
 
     CityState_InitFromSave(city, player, GameData_GetSaveControl(gameData), 1);
-    func_ov012_0215cd58(GameData_GetMyCityState(gameData));
+    CityState_ApplyVersionZones(GameData_GetMyCityState(gameData));
 }
 
 GameEventReturnCode EventFieldContinue_Callback(GameEvent *event, u32 *state, void *data) {
@@ -319,8 +319,8 @@ GameEventReturnCode EventFieldContinue_Callback(GameEvent *event, u32 *state, vo
 
             FieldMapControl_LoadZone(gsys, wk->zoneId);
             GameData_UpdatePartyForTimeOfDay(gameData);
-            func_ov012_02162f44(gameData);
-            func_ov012_0215ef24(gameData, wk->zoneId);
+            EvTime_Update(gameData);
+            ZoneChange_OnGameStart(gameData, wk->zoneId);
             UpdateWeatherToDefault(gameData, wk->zoneId);
             cacheIdx = GetZoneNPCInfoCacheIdx(wk->zoneId);
             mmSys = GameData_GetMMSys(gameData);
@@ -393,7 +393,7 @@ GameEvent *EventFieldContinue_Create(GameSystem *gsys, GameSystemProcData *procD
     trainerCard = getTrainerCardDataBlkAddress(wk->gameData);
     if (!hasClockNotBeenTampered(adventure)) {
         setNewDayForCountdown(getSaveAdventureTimeBlock(save));
-        func_ov012_02164428(wk->gameData, party);
+        ShayminForm_RevertPartyAndRegister(wk->gameData, party);
         setSecondsCurrentTimeInTrainerCard(trainerCard, RTC_ConvertSecondsCached());
     }
     setAdvTimeBlkRtcOffsetOwnerMacBdayMonthDay(adventure);
@@ -522,7 +522,7 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
             season = GameData_GetSeason(gameData);
             party = GameData_GetParty(gameData);
             TransformVsPokePartyBySeason(gameData, party, season);
-            func_ov012_021643f0(gameData, party, &adventureTime->time, season);
+            ShayminForm_CheckNight(gameData, party, &adventureTime->time, season);
         }
         DSPROT_CHECKED_CALL(DSProt_CallRunChecks4, EventMapChange_DSProtNop, EventMapChange_DSProtTamper2, wk, gsys);
         FieldMapControl_LoadZone(gsys, wk->spawn.zoneId);
@@ -533,13 +533,13 @@ GameEventReturnCode EventMapChangeCore_Callback(GameEvent *event, u32 *state, vo
         }
         switch (wk->mode) {
         case 1:
-            func_ov012_0215ee94(gameData, wk->spawn.zoneId);
+            ZoneChange_OnFly(gameData, wk->spawn.zoneId);
             break;
         case 2:
-            func_ov012_0215eedc(gameData, wk->spawn.zoneId);
+            ZoneChange_OnEscape(gameData, wk->spawn.zoneId);
             break;
         case 3:
-            func_ov012_0215eeb8(gameData, wk->spawn.zoneId);
+            ZoneChange_OnTeleport(gameData, wk->spawn.zoneId);
             break;
         }
         if (wk->mode != 0) {
@@ -1174,7 +1174,7 @@ GameEvent *EventUnionRoomWarp_Create(GameSystem *gsys, Field *field) {
     return event;
 }
 
-GameEvent *EventMapChangeUnionRoomExit_Create(GameSystem *gsys) {
+GameEvent *EventMapChangeUnionRoomExit_Create(GameSystem *gsys, Field *field) {
     ZoneSpawnInfo *next = GameData_GetNextZone(GSYS_GetGameData(gsys));
     GameEvent *event = GameEvent_Create(gsys, NULL, EventMapChangeUnionRoomExit_Callback, sizeof(EventMapChange));
     EventMapChange *wk = GameEvent_GetData(event);
@@ -1193,8 +1193,8 @@ GameEvent *EventEntralinkWarpIn_Create(GameSystem *gsys, u16 zoneId, const VecFx
 
     EventEntralinkWarp_CreateReturnLocation(&returnSpawn, field);
     GameData_SetEntralinkParentSpawnInfo(gameData, &returnSpawn);
-    HighLinkSave_CountPlaySeconds(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)), func_02017a40(gameData),
-                                  0);
+    HighLinkSave_CountPlaySeconds(getHighLinkBlockAddress(GameData_GetSaveControl(gameData)),
+                                  GameData_GetPlayTime(gameData), 0);
     CreateZoneChangeData(&spawn, zoneId, ConvDirToWarpDir(0), spawnPos.x, spawnPos.y, spawnPos.z);
     return EventEntralinkWarpIn_CreateCore(gsys, field, &spawn, a3, 0);
 }
@@ -1210,9 +1210,9 @@ GameEvent *EventEntralinkWarp_CreateOut(GameSystem *gsys) {
         func_0202be00(comm);
     }
     GameData_SetForceSeasonSync(gameData, FALSE);
-    func_020175d8(gameData, 0);
-    func_02017608(gameData, 0);
-    func_020175c4(gameData, 1);
+    GameData_SetNetID(gameData, 0);
+    GameData_SetBeaconNetID(gameData, 0);
+    GameData_SetPlayerCount(gameData, 1);
     return event;
 }
 
@@ -1331,8 +1331,8 @@ void FieldMapControl_LoadBlackoutZone(GameSystem *gsys) {
     FieldMapControl_LoadZone(gsys, spawn.zoneId);
     FieldMapControl_InitSpawn(gsys, &spawn);
     GameBeacon_SetZone(spawn.zoneId, gameData);
-    func_ov012_02162f44(gameData);
-    func_ov012_0215ef00(gameData, spawn.zoneId);
+    EvTime_Update(gameData);
+    ZoneChange_OnBlackout(gameData, spawn.zoneId);
     ShutdownFollowWork(gameData);
 }
 
@@ -1428,13 +1428,13 @@ void FieldMapControl_InitSpawn(GameSystem *gsys, ZoneSpawnInfo *next) {
         SetCurrentTeleportOrDeathZone(gameData, respawnLocation);
     }
     GameData_SetGimmickByZone(gameData, spawn.zoneId);
-    func_ov012_02162f44(gameData);
-    func_ov012_0215ee40(gameData, spawn.zoneId);
+    EvTime_Update(gameData);
+    ZoneChange_OnMapChange(gameData, spawn.zoneId);
     SetTeleportZoneDiscover(gameData, spawn.zoneId);
     FieldScript_CallOnZoneInit(gsys, 4);
     resetRebattleTrainers(GameData_GetEventWork(gameData));
     CallSpawnAllZoneNPCs(gameData, next);
-    func_ov012_021683f4(gsys, spawn.zoneId);
+    FestMission_OnZoneEnter(gsys, spawn.zoneId);
     GameData_UpdateFlashStatus(gameData, spawn.zoneId);
     ResetWeather(gsys, spawn.zoneId);
 
@@ -1465,7 +1465,7 @@ void GameData_DeleteAllActors(GameData *gameData) {
 
 // Allocates a list of people while in Join Avenue and frees it elsewhere, then resets the people in it and in the save
 void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
-    ResortWork *unk = func_02017b84(gameData);
+    ResortWork *unk = GameData_GetResortWork(gameData);
     JoinAvenuePersonList **personList;
 
     if (IsZoneJoinAvenue(zoneId) || IsZoneJoinAvenueSubZone(zoneId)) {
@@ -1484,8 +1484,8 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
     if (IsZoneJoinAvenue(zoneId)) {
         u16 param =
             JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), 5, 0);
-        func_02017b64(gameData, param);
-        func_02038bc8(0x18);
+        GameData_SetJoinAvenueSeason(gameData, param);
+        JoinAvenue_RecordActivity(0x18);
     }
 
     ResortWork_Set(unk, 8, 0);
@@ -1517,7 +1517,7 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
 
 // Sets flag 8 when the zone changed, which GameData_UpdateJoinAvenueForZone clears
 void GameData_UpdateZoneChangeFlag(GameData *gameData, u16 zoneId, u16 prevZoneId) {
-    ResortWork *unk = func_02017b84(gameData);
+    ResortWork *unk = GameData_GetResortWork(gameData);
 
     if (zoneId != prevZoneId) {
         ResortWork_Set(unk, 8, 1);
@@ -1711,7 +1711,7 @@ GameEventReturnCode EventEntralinkWarpIn_Callback(GameEvent *event, u32 *state, 
         if (!GameCommSys_BootCheck(comm)) {
             func_0202be00(comm);
             GameData_SetForceSeasonSync(wk->gameData, TRUE);
-            func_020175d8(wk->gameData, func_0203ffc4());
+            GameData_SetNetID(wk->gameData, NetSystem_GetNetId());
             GameEvent_ChainNext(event, EventEntralinkWarp_Create(wk->gsys, wk->field, &wk->spawn));
             *state = 2;
         }
@@ -1768,7 +1768,7 @@ void GameData_UpdatePartyForTimeOfDay(GameData *gameData) {
     PokeParty *party = SaveControl_GetPokePartySave(save);
     u8 season = GameData_GetSeason(gameData);
 
-    func_ov012_021643f0(gameData, party, &getSaveAdventureTimeBlock(save)->time, season);
+    ShayminForm_CheckNight(gameData, party, &getSaveAdventureTimeBlock(save)->time, season);
 }
 
 // DS Protect tamper responses, which leak memory

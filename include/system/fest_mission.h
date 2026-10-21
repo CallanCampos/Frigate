@@ -31,7 +31,8 @@ typedef struct {
     u32 count : 14;
     u32 unk4_31 : 1;
     u32 unk8_0 : 18;
-    u32 unk8_18 : 12;
+    // An event flag that must be set to join the mission, or 0
+    u32 requiredFlag : 12;
     u32 unk8_30 : 2;
     // What a log entry of the mission's beacon is about: an item, a move, a Pass Power or a species
     u32 unkC_0 : 10;
@@ -42,7 +43,7 @@ typedef struct {
     u16 unk10_0 : 6;
     u16 unk10_6 : 3;
     // Which of FestMission_ExtraSeconds a gain of time counts
-    u16 unk10_9 : 2;
+    u16 extraSecondsIndex : 2;
     u16 unk10_11 : 5;
     u8 messageId;
     u8 resultMessageId;
@@ -50,7 +51,7 @@ typedef struct {
 
 // A Funfest mission's config, as GetFestMissionCfg returns it. A mission's beacons send its first 0x14 bytes
 struct FestMissionConfig {
-    // unk00[0] and unk1C together tell one mission from another
+    // unk00[0] and seed together tell one mission from another
     union {
         FestMissionInfo info;
         u32 unk00[5];
@@ -66,10 +67,11 @@ struct FestMissionConfig {
     // The player's score in the mission, at most FEST_MISSION_SCORE_MAX
     u16 missionId;
     u8 unk1A;
-    u32 unk1C;
+    // The seed of the mission's random choices, drawn when it starts, which its beacons send
+    u32 seed;
     u32 unk20;
-    // When the mission's time started, in the RTC's seconds, or -1 until it starts (func_02014dac)
-    s64 unk24;
+    // When the mission's time started, in the RTC's seconds, or -1 until it starts (FestMissionConfig_StartTimer)
+    s64 startSeconds;
 };
 
 FestMissionConfig *allocateForFestMission(HeapID heapId);
@@ -77,8 +79,8 @@ void ClearFesMissionCfg(FestMissionConfig *config);
 // Copies a mission to start it, or to join it when joined is set
 void FestMissionConfig_Start(FestMissionConfig *config, const FestMissionConfig *src, u8 joined);
 // Starts the mission's time
-void func_02014dac(FestMissionConfig *config);
-void func_02014db4(FestMissionConfig *config);
+void FestMissionConfig_StartTimer(FestMissionConfig *config);
+void FestMissionConfig_Clear(FestMissionConfig *config);
 void UpdateFesMissionConfigSecondsTime(FestMissionConfig *config);
 // The mission's seconds left
 u32 FestMissionConfig_GetSecondsLeft(FestMissionConfig *config);

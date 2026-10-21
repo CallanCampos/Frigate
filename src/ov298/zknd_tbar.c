@@ -256,7 +256,7 @@ void ZkndTbar_SetPos(ZkndTbar *tbar, int icon, const ClActorPos *pos) {
         surface = CLACT_VRAM_MAIN;
     }
     // The original truncates the surface to 16 bits
-    func_0204c140(item->actor, pos, surface);
+    ClActor_SetSurfacePos(item->actor, pos, surface);
 }
 
 void ZkndTbar_Push(ZkndTbar *tbar, int icon) {
@@ -290,21 +290,25 @@ static void ZkndTbarResource_Load(ZkndTbarResource *resource, u8 bg, u32 engine,
     resource->bg = bg;
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     if (!noBG) {
-        GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), palType, bgPalette * 32, 32, heapId);
-        resource->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), resource->bg, 32 * 64, FALSE, heapId);
-        ZkndTbar_LoadScreen(arc, func_0202d828(), resource->bg, CHAR_POS(resource->bgChars), 0, 21, 32, 24, 0, 21, 32,
-                            3, bgPalette, FALSE, heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), palType, bgPalette * 32, 32, heapId);
+        resource->bgChars =
+            GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), resource->bg, 32 * 64, FALSE, heapId);
+        ZkndTbar_LoadScreen(arc, AppMenuCommon_GetBarScreenFile(), resource->bg, CHAR_POS(resource->bgChars), 0, 21, 32,
+                            24, 0, 21, 32, 3, bgPalette, FALSE, heapId);
     }
-    resource->objRes[OBJRES_PALETTE] = func_0204bbb8(arc, func_0202d810(), engine, objPalette * 32, 0, 3, heapId);
-    resource->objRes[OBJRES_CHARS] = func_0204b81c(arc, func_0202d814(), FALSE, engine, heapId);
-    resource->objRes[OBJRES_CELLANIMS] = func_0204bde0(arc, func_0202d818(mapping), func_0202d81c(mapping), heapId);
+    resource->objRes[OBJRES_PALETTE] =
+        ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), engine, objPalette * 32, 0, 3, heapId);
+    resource->objRes[OBJRES_CHARS] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, engine, heapId);
+    resource->objRes[OBJRES_CELLANIMS] = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(mapping),
+                                                                AppMenuCommon_GetTouchBarAnimFile(mapping), heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void ZkndTbarResource_Free(ZkndTbarResource *resource) {
-    func_0204be64(resource->objRes[OBJRES_CELLANIMS]);
-    func_0204b98c(resource->objRes[OBJRES_CHARS]);
-    func_0204bcd0(resource->objRes[OBJRES_PALETTE]);
+    ClActSys_FreeCellAnims(resource->objRes[OBJRES_CELLANIMS]);
+    ClActSys_FreeChars(resource->objRes[OBJRES_CHARS]);
+    ClActSys_FreePltt(resource->objRes[OBJRES_PALETTE]);
     GFL_BGSysFreeCharMemory(resource->bg, CHAR_POS(resource->bgChars), CHAR_SIZE(resource->bgChars));
     MI_CpuFill8(resource, 0, sizeof(ZkndTbarResource));
 }
@@ -370,8 +374,8 @@ static void ZkndTbarItem_Init(ZkndTbarItem *item, ClActUnit *unit, const ZkndTba
     }
     item->anim = item->icon.activeAnim;
     setup.sequence = item->icon.activeAnim;
-    item->actor = func_0204c040(unit, chars, palette, cellAnims, &setup, engine, heapId);
-    func_0204c520(item->actor, TRUE);
+    item->actor = ClActor_Create(unit, chars, palette, cellAnims, &setup, engine, heapId);
+    ClActor_SetAutoAnim(item->actor, TRUE);
     switch (item->type) {
     case ZKND_TBAR_TYPE_PUSH:
         item->callback = ZkndTbarItem_PushCallback;
@@ -383,30 +387,30 @@ static void ZkndTbarItem_Init(ZkndTbarItem *item, ClActUnit *unit, const ZkndTba
 }
 
 static void ZkndTbarItem_Free(ZkndTbarItem *item) {
-    func_0204c108(item->actor);
+    ClActor_Delete(item->actor);
     MI_CpuFill8(item, 0, sizeof(ZkndTbarItem));
 }
 
 static BOOL ZkndTbarItem_CheckTouch(ZkndTbarItem *item) {
     BOOL touched = FALSE;
-    BOOL enabled = func_0204c138(item->actor) & item->active;
+    BOOL enabled = ClActor_IsVisible(item->actor) & item->active;
     u32 x;
     u32 y;
 
     item->triggered = FALSE;
     if (enabled) {
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (x - item->icon.pos.x <= item->icon.width && y - item->icon.pos.y <= 24) {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
                 touched = TRUE;
             }
         }
         if (item->icon.key != 0 && (GCTX_HIDGetPressedKeys() & item->icon.key)) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             touched = TRUE;
         }
         if (item->pushed) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             touched = TRUE;
         }
         if (touched) {
@@ -419,7 +423,7 @@ static BOOL ZkndTbarItem_CheckTouch(ZkndTbarItem *item) {
 }
 
 static BOOL ZkndTbarItem_IsAnimEnd(const ZkndTbarItem *item) {
-    if (!func_0204c560(item->actor)) {
+    if (!ClActor_IsAnimActive(item->actor)) {
         return TRUE;
     }
     return FALSE;
@@ -430,11 +434,11 @@ static int ZkndTbarItem_GetIcon(const ZkndTbarItem *item) {
 }
 
 static void ZkndTbarItem_SetVisible(ZkndTbarItem *item, BOOL visible) {
-    func_0204c124(item->actor, visible);
+    ClActor_SetVisible(item->actor, visible);
 }
 
 static BOOL ZkndTbarItem_GetVisible(const ZkndTbarItem *item) {
-    return func_0204c138(item->actor);
+    return ClActor_IsVisible(item->actor);
 }
 
 static void ZkndTbarItem_SetActive(ZkndTbarItem *item, BOOL active) {
@@ -443,9 +447,9 @@ static void ZkndTbarItem_SetActive(ZkndTbarItem *item, BOOL active) {
         if (item->anim == item->icon.pushedAnim) {
             item->anim = item->icon.activeAnim;
         }
-        func_0204c488(item->actor, item->anim);
+        ClActor_SetSequence(item->actor, item->anim);
     } else {
-        func_0204c488(item->actor, item->icon.inactiveAnim);
+        ClActor_SetSequence(item->actor, item->icon.inactiveAnim);
     }
 }
 
@@ -459,7 +463,7 @@ static void ZkndTbarItem_SetFlip(ZkndTbarItem *item, BOOL flip) {
     } else {
         item->anim = item->icon.activeAnim;
     }
-    func_0204c488(item->actor, item->anim);
+    ClActor_SetSequence(item->actor, item->anim);
 }
 
 static BOOL ZkndTbarItem_GetFlip(const ZkndTbarItem *item) {
@@ -475,7 +479,7 @@ static void ZkndTbarItem_ClearPush(ZkndTbarItem *item) {
 
 static void ZkndTbarItem_PushCallback(ZkndTbarItem *item) {
     item->anim = item->icon.pushedAnim;
-    func_0204c488(item->actor, item->icon.pushedAnim);
+    ClActor_SetSequence(item->actor, item->icon.pushedAnim);
     if (item->icon.se != 0) {
         GFL_SndSEPlay(item->icon.se);
     }

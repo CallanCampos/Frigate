@@ -743,8 +743,8 @@ void BattleHandler_PushRun(BtlServerFlow *flow, u32 command, u32 monId);
 void BattleHandler_PopWork(BtlServerFlow *flow, void *work);
 u32 BattleHandler_Result(BtlServerFlow *handler);
 void BattleHandler_Execute(BtlServerFlow *flow, void *work);
-u32 func_ov167_021ac450(BtlServerFlow *flow);
-u8 func_ov167_021ac7ac(BtlServerFlow *handler, BattleHandlerHeader *param);
+u32 BtlServerFlow_GetHandlerResult(BtlServerFlow *flow);
+u8 BattleHandler_UseItemAnim(BtlServerFlow *handler, BattleHandlerHeader *param);
 u8 BattleHandler_AbilityPopupAdd(BtlServerFlow *handler, BattleHandlerHeader *param);
 u8 BattleHandler_RecoverHP(BtlServerFlow *handler, const BattleHandlerRecoverHPParam *param, u16 itemId);
 u8 BattleHandler_RecoverPP(BtlServerFlow *handler, const BattleHandlerPPParam *param, u16 itemId);
@@ -756,7 +756,7 @@ u8 BattleHandler_SetStatStage(BtlServerFlow *handler, const BattleHandlerSetStat
 u8 BattleHandler_SetStatus(BtlServerFlow *handler, const BattleHandlerSetStatusParam *param);
 u8 BattleHandler_AddSideEffect(BtlServerFlow *handler, const BattleHandlerAddSideEffectParam *param);
 u8 BattleHandler_RemoveSideEffectCore(BtlServerFlow *handler, const BattleHandlerRemoveSideEffectParam *param);
-u8 func_ov167_021ad564(BtlServerFlow *handler, const BattleHandlerPosEffectParam *param);
+u8 BattleHandler_AddPosEffect(BtlServerFlow *handler, const BattleHandlerPosEffectParam *param);
 u8 BattleHandler_UpdateMove(BtlServerFlow *handler, const BattleHandlerUpdateMoveParam *param);
 u8 BattleHandler_DelayMoveDamage(BtlServerFlow *handler, const BattleHandlerDelayMoveDamageParam *param);
 u8 BattleHandler_ForceSwitch(BtlServerFlow *handler, const BattleHandlerForceSwitchParam *param);
@@ -806,8 +806,8 @@ u8 BattleHandler_ChangeType(BtlServerFlow *handler, BattleHandlerChangeTypeParam
 u8 BattleHandler_AbilityChange(BtlServerFlow *handler, BattleHandlerAbilityChangeParam *param);
 BOOL func_ov167_021ad204(u16 species);
 u8 HandlerGetAlivePartyCount(BtlServerFlow *handler, u16 code, u8 *monIds);
-u8 func_ov167_021ab840(BtlServerFlow *flow, u8 monId);
-u8 *func_ov167_021abc60(BtlServerFlow *flow, u32 size);
+u8 BtlServerFlow_GetMonBattlePos(BtlServerFlow *flow, u8 monId);
+u8 *BtlServerFlow_GetHandlerWork(BtlServerFlow *flow, u32 size);
 
 u8 BattleHandler_SetMoveEffectIndex(BtlServerFlow *handler, BattleHandlerMoveEffectParam *param);
 u8 BattleHandler_SetMoveEffectEnable(BtlServerFlow *handler, BattleHandlerHeader *header);

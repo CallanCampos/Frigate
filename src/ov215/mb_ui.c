@@ -51,7 +51,7 @@ static const CursorMoveData sCursorData[] = {
 };
 
 s32 MailBox_GetTouch(MailBoxWork *work) {
-    return func_0203da0c(sButtonRects);
+    return GFL_HIDGetTouchPressedRect(sButtonRects);
 }
 
 void MailBox_CreateCursor(MailBoxWork *work) {
@@ -97,7 +97,7 @@ void MailBox_UpdateCursor(MailBoxWork *work, u32 pos) {
 }
 
 BOOL MailBox_IsReturnPressed(void) {
-    if (func_0203da0c(sReturnRects) != -1) {
+    if (GFL_HIDGetTouchPressedRect(sReturnRects) != -1) {
         return TRUE;
     }
     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {

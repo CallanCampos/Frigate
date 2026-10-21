@@ -149,12 +149,12 @@ static int Enter_Start(WorldTradeWork *wk) {
 }
 
 static int Enter_InternetConnect(WorldTradeWork *wk) {
-    func_ov011_0215dec0();
+    DWC_NASLoginAsync();
     return TRUE;
 }
 
 static int Enter_InternetConnectWait(WorldTradeWork *wk) {
-    switch (func_ov011_0215df40()) {
+    switch (DWC_NASLoginProcess()) {
     case 3:
         return 1;
     case 0:
@@ -166,11 +166,11 @@ static int Enter_InternetConnectWait(WorldTradeWork *wk) {
 }
 
 static int Enter_DpwTrInit(WorldTradeWork *wk) {
-    void *userData = func_02009f7c(wk->param->wifilist);
+    void *userData = WifiList_GetMyUserData(wk->param->wifilist);
     s32 pid;
 
-    func_02008be0(wk->param->mystatus, WifiList_GetMyGSID(wk->param->wifilist));
-    pid = func_02008bdc(wk->param->mystatus);
+    PlayerInfo_InitProfileId(wk->param->mystatus, WifiList_GetMyGSID(wk->param->wifilist));
+    pid = PlayerInfo_GetProfileId(wk->param->mystatus);
     DpwTr_Init(pid, DWC_CreateFriendKey(userData), 0);
     return TRUE;
 }
@@ -551,7 +551,7 @@ static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
         break;
     case 3:
         DpwTr_End();
-        func_ov011_0215fb78();
+        DWC_ShutdownFriendsMatch();
         DWC_CleanupInet();
         wk->localSeq++;
         break;
@@ -626,5 +626,5 @@ void WorldTrade_ExplainPrint(BmpWin *win, MsgData *msgManager, int no, WorldTrad
 }
 
 void WorldTrade_WifiIconAdd(WorldTradeWork *wk) {
-    func_02042ba8(FALSE, HEAPID_WORLDTRADE);
+    GFL_NetSetIconScreen(FALSE, HEAPID_WORLDTRADE);
 }

@@ -5,14 +5,23 @@
 
 // SSL's state and helpers, shared by its files
 
+// SSL's signature, "[SDK+UBIQUITOUS:SSL]", in the main module (ssl_version.c), which CPS_SetSsl refers to so that the
+// link keeps it
+extern const char SSLi_Signature[];
+
 // The C library's string functions the main module links, under their own names (ssl.c's certificate and session
 // matching and biginteger.c need them; MI_CpuCopy8, with the source first, and MI_CpuFill8 cover the rest). They are
 // not taken from <string.h>, whose declarations make MWCC treat strcmp and strlen as the library's own, which changes
 // the registers around their calls (docs/matching.md, "a header named `string.h`")
+#ifdef PLATFORM_PC
+// Host libc uses native size_t; the original declarations below preserve MWCC's call generation.
+#include <string.h>
+#else
 void *memmove(void *dest, const void *src, u32 size);
 int memcmp(const void *a, const void *b, u32 size);
 int strcmp(const char *a, const char *b);
 u32 strlen(const char *s);
+#endif
 
 // rc4.c: RC4's state, with pokediamond's field layout (CPSi_rc4_init writes s right after i and j, with no padding)
 typedef struct CPSRc4Context {

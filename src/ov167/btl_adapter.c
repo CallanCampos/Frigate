@@ -27,15 +27,15 @@ struct BtlAdapter {
     BtlAdapterCmd sendCmd;
 };
 
-static BOOL func_ov167_021d4b70(BtlAdapter *adapter);
-static BOOL func_ov167_021d4b90(BtlAdapter *adapter);
+static BOOL SendCmd(BtlAdapter *adapter);
+static BOOL IsReplyReceived(BtlAdapter *adapter);
 
 // The battle's communication mode (BtlFieldSituation.unk18): while it is 0, the server and the client share one adapter
 // per client ID; otherwise each caller gets its own
 static u32 sCommMode;
 static BtlAdapter *sAdapters[4];
 
-void func_ov167_021d4a1c(u8 commMode) {
+void BtlAdapter_InitSystem(u8 commMode) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -44,10 +44,10 @@ void func_ov167_021d4a1c(u8 commMode) {
     sCommMode = commMode;
 }
 
-void func_ov167_021d4a40(void) {
+void BtlAdapter_QuitSystem(void) {
 }
 
-BtlAdapter *func_ov167_021d4a44(void *netHandle, u8 clientId, BOOL flag, HeapID heapId) {
+BtlAdapter *BtlAdapter_Create(void *netHandle, u8 clientId, BOOL flag, HeapID heapId) {
     BtlAdapter *adapter = NULL;
 
     if (sAdapters[clientId] == NULL) {
@@ -69,26 +69,26 @@ BtlAdapter *func_ov167_021d4a44(void *netHandle, u8 clientId, BOOL flag, HeapID 
     return adapter;
 }
 
-void func_ov167_021d4abc(BtlAdapter *adapter) {
+void BtlAdapter_ResetState(BtlAdapter *adapter) {
     adapter->state = 0;
     adapter->cmd = 0;
     adapter->returned = 0;
 }
 
-void func_ov167_021d4acc(BtlAdapter *adapter) {
+void BtlAdapter_Delete(BtlAdapter *adapter) {
     GFL_HeapFree(adapter);
 }
 
-void func_ov167_021d4ad4(void) {
+void BtlAdapter_ClearNetReplies(void) {
     if (sCommMode != 0) {
-        func_ov167_021ba458();
+        BtlNet_ResetReplies();
     }
 }
 
 void func_ov167_021d4ae8(void) {
 }
 
-void func_ov167_021d4aec(BtlAdapter *adapter, u32 cmd, const void *data, u32 size) {
+void BtlAdapter_SetCmd(BtlAdapter *adapter, u32 cmd, const void *data, u32 size) {
     adapter->state = 1;
     adapter->cmd = cmd;
     adapter->sendCmd.cmd = cmd;
@@ -99,16 +99,16 @@ void func_ov167_021d4aec(BtlAdapter *adapter, u32 cmd, const void *data, u32 siz
     adapter->returned = 0;
 }
 
-BOOL func_ov167_021d4b18(BtlAdapter *adapter) {
+BOOL BtlAdapter_WaitCmd(BtlAdapter *adapter) {
     switch (adapter->state) {
     case 1:
-        if (!func_ov167_021d4b70(adapter)) {
+        if (!SendCmd(adapter)) {
             break;
         }
         adapter->state = 3;
         // fallthrough
     case 3:
-        if (!func_ov167_021d4b90(adapter)) {
+        if (!IsReplyReceived(adapter)) {
             break;
         }
         adapter->state = 4;
@@ -119,32 +119,32 @@ BOOL func_ov167_021d4b18(BtlAdapter *adapter) {
     return FALSE;
 }
 
-void *func_ov167_021d4b50(BtlAdapter *adapter, u32 *size) {
+void *BtlAdapter_GetReturnData(BtlAdapter *adapter, u32 *size) {
     if (size != NULL) {
         *size = adapter->returnSize;
     }
     return adapter->returnData;
 }
 
-void func_ov167_021d4b5c(BtlAdapter *adapter) {
+void BtlAdapter_SetIdle(BtlAdapter *adapter) {
     adapter->state = 0;
     if (adapter->isNet) {
-        func_ov167_021ba458();
+        BtlNet_ResetReplies();
     }
 }
 
-static BOOL func_ov167_021d4b70(BtlAdapter *adapter) {
+static BOOL SendCmd(BtlAdapter *adapter) {
     if (adapter->isNet) {
         BtlAdapterCmd *cmd = &adapter->sendCmd;
-        return func_ov167_021ba358(adapter->clientId, cmd, cmd->size + 4);
+        return BtlNet_SendServerCmd(adapter->clientId, cmd, cmd->size + 4);
     }
     return TRUE;
 }
 
-static BOOL func_ov167_021d4b90(BtlAdapter *adapter) {
+static BOOL IsReplyReceived(BtlAdapter *adapter) {
     if (adapter->isNet) {
-        if (func_ov167_021ba398()) {
-            adapter->returnSize = func_ov167_021ba3d4(adapter->clientId, &adapter->returnData);
+        if (BtlNet_AreRepliesReceived()) {
+            adapter->returnSize = BtlNet_GetReply(adapter->clientId, &adapter->returnData);
             adapter->returned = 1;
             return TRUE;
         }
@@ -153,17 +153,17 @@ static BOOL func_ov167_021d4b90(BtlAdapter *adapter) {
     return adapter->returned;
 }
 
-void func_ov167_021d4bc8(BtlAdapter *adapter) {
+void BtlAdapter_ClearSendCmd(BtlAdapter *adapter) {
     adapter->sendCmd.cmd = 0;
     adapter->sendCmd.size = 4;
 }
 
-u8 func_ov167_021d4bd4(BtlAdapter *adapter) {
+u8 BtlAdapter_GetRecvCmd(BtlAdapter *adapter) {
     if (adapter->isNet) {
-        if (func_ov167_021ba460()) {
+        if (BtlNet_IsServerCmdReceived()) {
             void *buf;
             BtlAdapterCmd *recv;
-            func_ov167_021ba46c(&buf);
+            BtlNet_GetServerCmd(&buf);
             recv = buf;
             return recv->cmd;
         }
@@ -175,11 +175,11 @@ u8 func_ov167_021d4bd4(BtlAdapter *adapter) {
     return 0;
 }
 
-u16 func_ov167_021d4c0c(BtlAdapter *adapter, const void **data) {
+u16 BtlAdapter_GetRecvData(BtlAdapter *adapter, const void **data) {
     if (adapter->isNet) {
         void *buf;
         BtlAdapterCmd *recv;
-        func_ov167_021ba46c(&buf);
+        BtlNet_GetServerCmd(&buf);
         recv = buf;
         *data = recv->data;
         return recv->size;
@@ -188,9 +188,9 @@ u16 func_ov167_021d4c0c(BtlAdapter *adapter, const void **data) {
     return adapter->sendCmd.size;
 }
 
-BOOL func_ov167_021d4c38(BtlAdapter *adapter, const void *data, u32 size) {
+BOOL BtlAdapter_SetReturnData(BtlAdapter *adapter, const void *data, u32 size) {
     if (adapter->isNet) {
-        return func_ov167_021ba484(data, size);
+        return BtlNet_SendReply(data, size);
     }
     if (!adapter->returned) {
         adapter->returnData = data;

@@ -1,6 +1,7 @@
 #include "dwc_util_aoss_session.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_shared.h"
+#include "dwc_util_wifi_settings.h"
 #include "dwcutil/dwc_aoss.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -11,16 +12,16 @@ typedef struct DWCUtilAoss {
     AossParam *param;
 } DWCUtilAoss;
 
-static void *func_ov182_021adbac(u32 size);
-static void func_ov182_021adbb8(void *ptr);
+static void *DWCUtilAossSession_Alloc(u32 size);
+static void DWCUtilAossSession_Free(void *ptr);
 
 static const char sClientName[] = "NINTENDO-DS";
 static DWCUtilAoss sAoss;
 
-void func_ov182_021ada94(void) {
+void DWCUtilAossSession_Init(void) {
     AossClientInfo client;
 
-    sAoss.param = func_ov182_021bc4d8(sizeof(AossParam), 4);
+    sAoss.param = DWCUtilHeap_AllocClear(sizeof(AossParam), 4);
     sAoss.done = FALSE;
     MI_CpuClear16(&client, sizeof(client));
     client.version = 0x50;
@@ -34,20 +35,20 @@ void func_ov182_021ada94(void) {
     sAoss.param->sendDelay = -1;
     sAoss.param->timeout = -1;
     OS_GetMacAddress(sAoss.param->mac);
-    if (DWC_Aoss_Init(func_ov182_021adbac, func_ov182_021adbb8) != 0) {
+    if (DWC_Aoss_Init(DWCUtilAossSession_Alloc, DWCUtilAossSession_Free) != 0) {
         OS_Terminate();
     }
 }
 
-void func_ov182_021adb38(BOOL saveKeys) {
+void DWCUtilAossSession_Exit(BOOL saveKeys) {
     DWC_Aoss_Shutdown();
     if (saveKeys && sAoss.param->error == 0 && sAoss.done == TRUE) {
-        func_ov182_021b7d80(&sAoss.param->result);
+        DWCUtilWifiSettings_SaveAossResult(&sAoss.param->result);
     }
-    func_ov182_021bc4f0(&sAoss.param);
+    DWCUtilHeap_FreeAndNull(&sAoss.param);
 }
 
-int func_ov182_021adb74(void) {
+int DWCUtilAossSession_Run(void) {
     u8 error;
 
     if (DWC_Aoss_Start(sAoss.param) == 0) {
@@ -61,10 +62,10 @@ int func_ov182_021adb74(void) {
     return 2;
 }
 
-static void *func_ov182_021adbac(u32 size) {
-    return func_ov182_021bc4d8(size, 32);
+static void *DWCUtilAossSession_Alloc(u32 size) {
+    return DWCUtilHeap_AllocClear(size, 32);
 }
 
-static void func_ov182_021adbb8(void *ptr) {
-    func_ov182_021bc51c(ptr);
+static void DWCUtilAossSession_Free(void *ptr) {
+    DWCUtilHeap_Free(ptr);
 }

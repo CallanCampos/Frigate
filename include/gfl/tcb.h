@@ -27,6 +27,6 @@ void GFL_VBlankResetCallback(void);
 u32 GFL_TCBMgrCalcAllocSize(u32 count);
 TCBManager *GFL_TCBMgrCreate(u32 count, void *buffer);
 void GFL_TCBMgrUpdate(TCBManager *manager);
-void func_0203a610(TCBManager *manager);
+void GFL_TCBMgrDelete(TCBManager *manager);
 
 #endif // POKEBW2_GFL_TCB_H

@@ -36,6 +36,21 @@ A function the C leaves out entirely doesn't show at all, so compare the count o
 before marking a file complete: `mb_comm_sys.c` (overlay 181) linked without `MBComm_SendParentInfo`, whose callers in
 other files then went through a veneer to address 0, which shifted the rest of the overlay.
 
+`tools/decomp/mark_complete.py src/...` enables the C object in every registered version after all functions and data
+match. `--incomplete` removes that marker when a natural rewrite no longer matches, restoring the original assembly
+fallback. Both operations validate all requested owners before changing any version. Removing completion skips the
+external-static check because the C object is no longer linked.
+A static that the check reports as called from another module through an ambiguous relocation
+(`module:overlays(11,27)`) can be a call to the other overlay's function at the same address, which the delinker
+binds to the first overlay's symbol: ARM9 main's `WordSet_LoadFestivalMission` calls overlay 27's `FestMission_Load`,
+at overlay 11's `gsiXmlUtilWriteString`. Fix the relocation with `config_fixes.py reloc-module` (`docs/configs.md`).
+
+`tools/decomp/check_section_bounds.py` checks overlay 036's source-file boundaries against the configured symbol
+extents in both versions. Unknown sizes extend to the next symbol or the containing module section's end, so
+alignment padding between sections is excluded. Known sizes are checked as recorded. This catches file boundaries
+inside objects; it does not establish original source ownership, uncovered ranges, or matching C data. Its isolated
+regressions run with `python3 -m unittest tools.decomp.test_check_section_bounds` without ROMs or generated files.
+
 `tools/decomp/try_variants.py src/... FUNC variants.c` puts each variant of a function, separated by lines of
 `=====`, in place of its definition and probes it with the file's compiler, keeping the first that matches. `--score`
 adds each variant's count of differing aligned lines, to tell apart variants of the same size.
@@ -53,8 +68,10 @@ matches first - a group with one matched copy, whose C proves the others - then 
 each unmatched copy it says whether the function is `global` (referenced from outside its file, so it is emitted as
 soon as it is written), `static` (it needs the in-file callers the row lists, up to a global function), `static?`
 (every reference is inside a range the delinks have not covered yet, so its boundary has to be found first, as in the
-`decomp-file` skill) or `unreferenced`. Near-duplicates are not reported, and a pointer dsd did not record is not
-seen.
+`decomp-file` skill), `global?` (every reference from outside its file names more than one overlay that could hold the
+target, so which one is meant is not recorded; check by hand) or `unreferenced`. Near-duplicates are not reported,
+and a pointer dsd did not record is not seen. How a shared group is written is in
+[Code organization](code-organization.md).
 
 `tools/decomp/rodata_order.py` predicts how MWCC lays out a file's static data and searches small reorderings; when
 no structured order reaches the ROM's layout, `tools/decomp/rodata_solver.py` anneals the sequence of sizes by
@@ -73,9 +90,9 @@ The game code was built with CodeWarrior for DSi, a version between `dsi/1.1p1` 
 
 The ROM was not necessarily built with one compiler. The Pokémon Black decomp by Goldoire found library code in Black
 built with other versions (`2.0/sp2p2` and `1.2`), so try them on library code that doesn't match. `configure.py`
-extracts only the `dsi` compilers; the others are in `build/mwccarm.zip`. Extracted to `tools/mwccarm`, they can be
-named by directory, as in `compiler_probe.py --compilers 2.0/sp2p2`, and `1.2` needs `--flags` without `-ipa file`.
-`configure.py` downloads a library's compiler when a `lib/*/library.toml` names it.
+extracts only the `dsi` compilers and those a `lib/*/library.toml` names, but its archive (`MWCCARM_URL`) holds every
+1.2, 2.0 and dsi build: extract the rest to `tools/mwccarm` before concluding that no build matches. They are named
+by directory, as in `compiler_probe.py --compilers 2.0/sp2p2`, and `1.2` needs `--flags` without `-ipa file`.
 Game code needs the `dsi` builds: the evolution demo's view matches 36 of its 56 functions with every `2.0` build and
 25 with `1.2`.
 

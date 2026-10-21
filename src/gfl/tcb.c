@@ -124,7 +124,7 @@ void GFL_TCBMgrUpdate(TCBManager *manager) {
     manager->current->func = NULL;
 }
 
-void func_0203a610(TCBManager *manager) {
+void GFL_TCBMgrDelete(TCBManager *manager) {
 }
 
 TCB *GFL_TCBMgrAddTask(TCBManager *manager, TCBFunc func, void *data, u32 priority) {

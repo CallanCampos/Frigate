@@ -106,7 +106,7 @@ CtvtGameCamGraphic *CtvtGameCamGraphic_Create(u32 layout, HeapID heapId) {
     GFL_BGSysEnableEngines();
     GFL_BGSysDisableAllA();
     GFL_BGSysDisableAllB();
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     CtvtGameCamBG_Init(&graphic->bg, heapId);
     CtvtGameCamClAct_Init(&graphic->clact, &sCtvtGameCamVRAMConfig, heapId);
     return graphic;
@@ -115,7 +115,7 @@ CtvtGameCamGraphic *CtvtGameCamGraphic_Create(u32 layout, HeapID heapId) {
 void CtvtGameCamGraphic_Free(CtvtGameCamGraphic *graphic) {
     CtvtGameCamClAct_Free(&graphic->clact);
     CtvtGameCamBG_Free(&graphic->bg);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     G2_BlendNone();
     G2S_BlendNone();
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
@@ -156,15 +156,15 @@ static void CtvtGameCamBG_Free(CtvtGameCamBG *bg) {
 static void CtvtGameCamClAct_Init(CtvtGameCamClAct *clact, const BGSysVRAMConfig *vramConfig, HeapID heapId) {
     MI_CpuFill8(clact, 0, sizeof(CtvtGameCamClAct));
     ClActSys_Create(&sCtvtGameCamClActSetup, vramConfig, heapId);
-    clact->unit = func_0204bf1c(16, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(16, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void CtvtGameCamClAct_Free(CtvtGameCamClAct *clact) {
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(CtvtGameCamClAct));
 }
 

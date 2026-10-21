@@ -1,15 +1,15 @@
 #include "dwc/hashtable.h"
 #include "dwc/ext.h"
 
-// GameSpy's hash tables (hashtable.c). The functions' names, from pret/pokerevo's Wii build, are in dwc/hashtable.h
+// GameSpy's hash tables (hashtable.c)
 
-HashTable *func_ov011_02171818(int elementSize, int bucketCount, TableHashFunc hashFunc, TableCompareFunc compareFunc,
-                               TableFreeFunc freeFunc) {
-    return func_ov011_02171830(elementSize, bucketCount, 4, hashFunc, compareFunc, freeFunc);
+HashTable *TableNew(int elementSize, int bucketCount, TableHashFunc hashFunc, TableCompareFunc compareFunc,
+                    TableFreeFunc freeFunc) {
+    return TableNew2(elementSize, bucketCount, 4, hashFunc, compareFunc, freeFunc);
 }
 
-HashTable *func_ov011_02171830(int elementSize, int bucketCount, int bucketGrowBy, TableHashFunc hashFunc,
-                               TableCompareFunc compareFunc, TableFreeFunc freeFunc) {
+HashTable *TableNew2(int elementSize, int bucketCount, int bucketGrowBy, TableHashFunc hashFunc,
+                     TableCompareFunc compareFunc, TableFreeFunc freeFunc) {
     HashTable *table = gsimalloc(sizeof(HashTable));
     int i;
 
@@ -24,7 +24,7 @@ HashTable *func_ov011_02171830(int elementSize, int bucketCount, int bucketGrowB
     return table;
 }
 
-void func_ov011_0217187c(HashTable *table) {
+void TableFree(HashTable *table) {
     int i;
 
     if (table != NULL) {
@@ -36,7 +36,7 @@ void func_ov011_0217187c(HashTable *table) {
     }
 }
 
-int func_ov011_021718ac(HashTable *table) {
+int TableCount(HashTable *table) {
     int count = 0;
     int i;
 
@@ -49,7 +49,7 @@ int func_ov011_021718ac(HashTable *table) {
     return count;
 }
 
-void func_ov011_021718dc(HashTable *table, const void *element) {
+void TableEnter(HashTable *table, const void *element) {
     int hash;
     int index;
 
@@ -59,12 +59,12 @@ void func_ov011_021718dc(HashTable *table, const void *element) {
         if (index == -1) {
             func_ov011_021715a4(table->buckets[hash], element);
         } else {
-            func_ov011_0217167c(table->buckets[hash], element, index);
+            ArrayReplaceAt(table->buckets[hash], element, index);
         }
     }
 }
 
-BOOL func_ov011_02171920(HashTable *table, const void *element) {
+BOOL TableRemove(HashTable *table, const void *element) {
     int hash;
     int index;
 
@@ -80,7 +80,7 @@ BOOL func_ov011_02171920(HashTable *table, const void *element) {
     return TRUE;
 }
 
-void *func_ov011_02171964(HashTable *table, const void *element) {
+void *TableLookup(HashTable *table, const void *element) {
     int hash;
     int index;
     void *result;
@@ -97,20 +97,20 @@ void *func_ov011_02171964(HashTable *table, const void *element) {
     return result;
 }
 
-void func_ov011_021719a4(HashTable *table, TableMapFunc func, void *clientData) {
+void TableMapSafe(HashTable *table, TableMapFunc func, void *clientData) {
     int i;
 
     for (i = 0; i < table->bucketCount; i++) {
-        func_ov011_02171724(table->buckets[i], func, clientData);
+        ArrayMapBackwards(table->buckets[i], func, clientData);
     }
 }
 
-void *func_ov011_021719cc(HashTable *table, TableMapFunc2 func, void *clientData) {
+void *TableMapSafe2(HashTable *table, TableMapFunc2 func, void *clientData) {
     int i;
     void *element;
 
     for (i = 0; i < table->bucketCount; i++) {
-        element = func_ov011_02171744(table->buckets[i], func, clientData);
+        element = ArrayMapBackwards2(table->buckets[i], func, clientData);
         if (element != NULL) {
             return element;
         }

@@ -134,7 +134,8 @@ if(NOT gen_result EQUAL 0)
     message(FATAL_ERROR "port/tools/gen_host_tree.py failed")
 endif()
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${REPO_ROOT}/port/hal/replaced.txt" "${REPO_ROOT}/port/tools/gen_host_tree.py")
+    "${REPO_ROOT}/port/hal/replaced.txt" "${REPO_ROOT}/port/tools/gen_host_tree.py"
+    "${REPO_ROOT}/port/include/wchar.h")
 file(GLOB_RECURSE port_watched CONFIGURE_DEPENDS
     "${REPO_ROOT}/src/*.c" "${REPO_ROOT}/lib/*.c" "${REPO_ROOT}/lib/*.h" "${REPO_ROOT}/include/*")
 # Where the include/ mirror is copies (Windows without the right to make links), a header's change reaches the build
@@ -239,7 +240,8 @@ add_library(port_decomp_env INTERFACE)
 target_compile_definitions(port_decomp_env INTERFACE PLATFORM_PC ${PORT_VERSION_DEFINE})
 file(GLOB library_includes LIST_DIRECTORIES true "${REPO_ROOT}/lib/*/include")
 target_include_directories(port_decomp_env SYSTEM INTERFACE
-    "${PORT_GEN}/hwinclude" "${PORT_GEN}/include" ${library_includes} "${REPO_ROOT}/build/include/generated")
+    "${PORT_GEN}/hwinclude" "${PORT_GEN}/include" "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    ${library_includes} "${REPO_ROOT}/build/include/generated")
 target_compile_options(port_decomp_env INTERFACE
     -fsigned-char -fshort-wchar -fno-builtin-wcslen -fwrapv -fno-strict-aliasing -ffp-contract=off
     -ftrivial-auto-var-init=zero -fno-common
@@ -263,6 +265,16 @@ target_compile_options(pokebw2_game PRIVATE
     # The 64-bit warnings are counted by port/tools/compile-probe; here they only make noise
     -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-void-pointer-to-int-cast
     -Wno-int-to-void-pointer-cast -Wno-unknown-pragmas)
+# MWCC places middleware signature strings in a custom ROM section; host code refers to the same constants
+# normally. These files contain only the signatures, so discard only their MWCC section spelling.
+set_source_files_properties(
+    "${REPO_ROOT}/lib/dwc/src/base/dwc_init_version.c"
+    "${REPO_ROOT}/lib/dwc/src/vct/vct_version.c"
+    "${REPO_ROOT}/lib/nitrowifi/src/cps/cps_version.c"
+    "${REPO_ROOT}/lib/nitrowifi/src/ssl/ssl_version.c"
+    "${REPO_ROOT}/lib/nitro/src/card/card_backup_version.c"
+    "${REPO_ROOT}/lib/nitrowifi/src/soc/socl_startup_version.c"
+    PROPERTIES COMPILE_OPTIONS "-D__declspec(x)=")
 # The game's main() becomes NitroMain(), which the platform layer calls on the game's thread
 set_source_files_properties("${REPO_ROOT}/src/system/main.c" PROPERTIES COMPILE_DEFINITIONS "main=NitroMain")
 

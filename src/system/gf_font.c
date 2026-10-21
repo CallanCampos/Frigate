@@ -95,13 +95,13 @@ typedef struct {
 } BitReader;
 
 static void GFL_FontLoad(Font *font, u32 fileId, BOOL fixedWidth, HeapID heapId);
-static void func_02022f38(Font *font);
+static void GFL_FontFreeBuffers(Font *font);
 static void GFL_FontInit(Font *font, u32 loadType, HeapID heapId);
 static void GFL_FontInitCached(Font *font, u32 tilesWide, u32 tilesHigh, HeapID heapId);
 static void GFL_FontInitStreamed(Font *font, u32 tilesWide, u32 tilesHigh, HeapID heapId);
-static void func_0202304c(Font *font);
-static void func_02023060(Font *font);
-static void func_02023070(Font *font);
+static void GFL_FontFreeGlyphs(Font *font);
+static void GFL_FontFreeLoadedGlyphs(Font *font);
+static void GFL_FontFreeGlyphsNone(Font *font);
 static u32 GFL_FontGetCharIndex(const Font *font, u16 c);
 static void GFL_FontGetGlyphCached(const Font *font, u32 index, void *dest, GlyphInfo *info);
 static void GFL_FontGetGlyphStreamed(const Font *font, u32 index, void *dest, GlyphInfo *info);
@@ -122,8 +122,8 @@ static const FontInitProc v_GFLFontInitSub[] = {
 };
 
 static const FontFreeProc v_GFLFontFreeSub[] = {
-    func_02023070,
-    func_02023060,
+    GFL_FontFreeGlyphsNone,
+    GFL_FontFreeLoadedGlyphs,
 };
 
 // The top n bits of a byte
@@ -147,8 +147,8 @@ Font *GFL_FontCreate(u32 arcId, u32 fileId, u32 loadType, BOOL fixedWidth, HeapI
 }
 
 void GFL_FontFree(Font *font) {
-    func_0202304c(font);
-    func_02022f38(font);
+    GFL_FontFreeGlyphs(font);
+    GFL_FontFreeBuffers(font);
     GFL_HeapFree(font);
 }
 
@@ -201,7 +201,7 @@ static void GFL_FontLoad(Font *font, u32 fileId, BOOL fixedWidth, HeapID heapId)
     font->unknownIndex = GFL_FontGetCharIndex(font, '?');
 }
 
-static void func_02022f38(Font *font) {
+static void GFL_FontFreeBuffers(Font *font) {
     if (font->cell != NULL) {
         GFL_HeapFree(font->cell);
     }
@@ -244,16 +244,16 @@ static void GFL_FontInitStreamed(Font *font, u32 tilesWide, u32 tilesHigh, HeapI
     }
 }
 
-static void func_0202304c(Font *font) {
+static void GFL_FontFreeGlyphs(Font *font) {
     v_GFLFontFreeSub[font->loadType](font);
 }
 
-static void func_02023060(Font *font) {
+static void GFL_FontFreeLoadedGlyphs(Font *font) {
     GFL_HeapFree(font->glyphs);
     font->glyphs = NULL;
 }
 
-static void func_02023070(Font *font) {
+static void GFL_FontFreeGlyphsNone(Font *font) {
 }
 
 void GFL_FontGetGlyph(Font *font, u16 c, void *dest, GlyphInfo *info) {
@@ -373,11 +373,11 @@ static u8 GFL_FontGetCharWidthFixed(Font *font, u32 index) {
     return font->info.defaultCharWidth;
 }
 
-void func_020232d0(void) {
-    func_020232d8();
+void GFL_TextRndInitColorIndexLUT(void) {
+    GFL_TextRndResetColorIndexLUT();
 }
 
-void func_020232d8(void) {
+void GFL_TextRndResetColorIndexLUT(void) {
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
 }
 

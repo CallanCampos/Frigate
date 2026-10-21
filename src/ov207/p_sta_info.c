@@ -159,31 +159,31 @@ void PStaInfo_Draw(PStatusWork *wk, PStaInfoWork *info) {
     if (wk->isEgg == FALSE) {
         type1 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE1, NULL);
         type2 = PML_PkmGetParam(pkm, PKM_PARAM_TYPE2, NULL);
-        func_0204bb58(wk->typeIconChars[type1], &proxy1);
-        func_0204c3e4(wk->typeIcons[0], &proxy1);
-        func_0204c378(wk->typeIcons[0], func_0202d7e8(type1), 1);
+        ClActSys_GetCharProxy(wk->typeIconChars[type1], &proxy1);
+        ClActor_SetImageProxy(wk->typeIcons[0], &proxy1);
+        ClActor_SetPalette(wk->typeIcons[0], AppMenuCommon_GetTypeIconPaletteIndex(type1), 1);
         pos.x = 96;
         pos.y = 48;
-        func_0204c140(wk->typeIcons[0], &pos, 0);
-        func_0204c124(wk->typeIcons[0], TRUE);
-        func_0204c468(wk->typeIcons[0], 1);
+        ClActor_SetSurfacePos(wk->typeIcons[0], &pos, 0);
+        ClActor_SetVisible(wk->typeIcons[0], TRUE);
+        ClActor_SetBgPriority(wk->typeIcons[0], 1);
         if (type1 != type2) {
-            func_0204bb58(wk->typeIconChars[type2], &proxy2);
-            func_0204c3e4(wk->typeIcons[1], &proxy2);
-            func_0204c378(wk->typeIcons[1], func_0202d7e8(type2), 1);
+            ClActSys_GetCharProxy(wk->typeIconChars[type2], &proxy2);
+            ClActor_SetImageProxy(wk->typeIcons[1], &proxy2);
+            ClActor_SetPalette(wk->typeIcons[1], AppMenuCommon_GetTypeIconPaletteIndex(type2), 1);
             pos.x = 130;
             pos.y = 48;
-            func_0204c140(wk->typeIcons[1], &pos, 0);
-            func_0204c124(wk->typeIcons[1], TRUE);
-            func_0204c468(wk->typeIcons[1], 1);
+            ClActor_SetSurfacePos(wk->typeIcons[1], &pos, 0);
+            ClActor_SetVisible(wk->typeIcons[1], TRUE);
+            ClActor_SetBgPriority(wk->typeIcons[1], 1);
         } else {
-            func_0204c124(wk->typeIcons[1], FALSE);
+            ClActor_SetVisible(wk->typeIcons[1], FALSE);
         }
     } else {
-        func_0204c124(wk->typeIcons[0], FALSE);
-        func_0204c124(wk->typeIcons[1], FALSE);
+        ClActor_SetVisible(wk->typeIcons[0], FALSE);
+        ClActor_SetVisible(wk->typeIcons[1], FALSE);
     }
-    func_0204c488(wk->buttons[PSTA_BUTTON_INFO], 3);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_INFO], 3);
 }
 
 void PStaInfo_Unload(PStatusWork *wk, PStaInfoWork *info) {
@@ -201,9 +201,9 @@ void PStaInfo_Clear(PStatusWork *wk, PStaInfoWork *info) {
     GFL_BGSysQueueScrLoad(1);
     GFL_BGSysFillScrAsync(4, 0);
     GFL_BGSysQueueScrLoad(4);
-    func_0204c124(wk->typeIcons[0], FALSE);
-    func_0204c124(wk->typeIcons[1], FALSE);
-    func_0204c488(wk->buttons[PSTA_BUTTON_INFO], 0);
+    ClActor_SetVisible(wk->typeIcons[0], FALSE);
+    ClActor_SetVisible(wk->typeIcons[1], FALSE);
+    ClActor_SetSequence(wk->buttons[PSTA_BUTTON_INFO], 0);
 }
 
 // A new string of a species' name
@@ -253,7 +253,8 @@ static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
         } else {
             str = PStaInfo_LoadSpeciesName(SPECIES_EGG);
         }
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->windows[1]), 65, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->windows[1]), 65, 1, str, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(str);
 
         PStatus_PrintToWindow(wk, info->windows[2], 12, 1, 1, PRINT_COLOR(15, 2, 0));
@@ -268,7 +269,7 @@ static void PStaInfo_PrintInfo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
             color = PRINT_COLOR(3, 4, 0);
         }
         PML_PkmGetParam(pkm, PKM_PARAM_OT_NAME, name);
-        func_0202437c(nameWordSet, 0, name, 0, 1, 2);
+        GFL_WordSetSetStrbuf(nameWordSet, 0, name, 0, 1, 2);
         PStatus_PrintFormattedToWindow(wk, info->windows[3], nameWordSet, 14, 65, 1, color);
         GFL_WordSetSystemFree(nameWordSet);
         GFL_StrBufFree(name);
@@ -352,7 +353,8 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
     foreignOT = PML_UtilCheckForeignOT(pkm, playerInfo);
     if (isEgg == FALSE) {
         str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], nature);
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, 1, str, wk->font, PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, 1, str, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_StrBufFree(str);
         y = 16;
     }
@@ -461,17 +463,17 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
         WordSetNumber(wordSet, 1, metMonth, 2, 0, 1);
         WordSetNumber(wordSet, 2, metDay, 2, 0, 1);
         WordSetNumber(wordSet, 3, metLevel, 3, 0, 1);
-        func_0202437c(wordSet, 4, metPlace, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 4, metPlace, 0, 1, 2);
         WordSetNumber(wordSet, 5, eggYear, 2, 2, 1);
         WordSetNumber(wordSet, 6, eggMonth, 2, 0, 1);
         WordSetNumber(wordSet, 7, eggDay, 2, 0, 1);
-        func_0202437c(wordSet, 8, eggPlace, 0, 1, 2);
+        GFL_WordSetSetStrbuf(wordSet, 8, eggPlace, 0, 1, 2);
         str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], msg);
         GFL_WordSetFormatStrbuf(wordSet, buf, str);
-        func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, buf, wk->font,
-                      PRINT_COLOR(1, 2, 0));
+        PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, buf, wk->font,
+                              PRINT_COLOR(1, 2, 0));
         GFL_WordSetSystemFree(wordSet);
-        y += func_0202284c(buf) * 16;
+        y += GFL_FontGetLineCount(buf) * 16;
         GFL_StrBufFree(eggPlace);
         GFL_StrBufFree(metPlace);
         GFL_StrBufFree(str);
@@ -499,8 +501,8 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
                 }
             }
             str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], maxIV % 5 + (0x36 + best * 5));
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
-                          PRINT_COLOR(1, 2, 0));
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
+                                  PRINT_COLOR(1, 2, 0));
             GFL_StrBufFree(str);
         } else {
             u32 hatchMsg;
@@ -515,8 +517,8 @@ static void PStaInfo_PrintMemo(PStatusWork *wk, PStaInfoWork *info, BoxPkm *pkm)
                 hatchMsg = 0x5b;
             }
             str = GFL_MsgDataLoadStrbufNew(info->msgData[INFO_MSG_MEMO], hatchMsg);
-            func_02021c7c(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
-                          PRINT_COLOR(1, 2, 0));
+            PrintQueue_PrintColor(wk->printQueue, BmpWin_GetBitmap(info->memoWindow), 1, y + 1, str, wk->font,
+                                  PRINT_COLOR(1, 2, 0));
             GFL_StrBufFree(str);
         }
     }

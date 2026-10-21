@@ -51,7 +51,7 @@ Full detail in [RESEARCH.md §1–4](RESEARCH.md#1-state-of-the-decomp).
 | D7 | **Saves stay byte-compatible with the DS** (raw 512 KiB image, works with melonDS `.sav` and cartridge dumps); port and mod data go in a sidecar file | Recommended |
 | D8 | **Sound:** keep the ARM9 sound libraries as C; replace the ARM7 driver with host C written from the ARM7's own asm (sequencer and channel logic) plus our own mixer | Recommended |
 | D9 | **Mods first-class:** layered file system, data registries, hook macros that compile away in the ROM build, settings registry, Lua; built-in features use the same API | Recommended |
-| D10 | **A solo project:** nothing about the port is posted on `fuddlesworth/pokebw2` (no issues, comments, pull requests or proposals); port changes stay in this repository | **Decided** 2026-10-17 (§9, [ADR 0002](adr/0002-solo-project-no-upstream-posts.md)) |
+| D10 | **An independent port:** external contributions use forks and pull requests here; nothing about the port is posted on `fuddlesworth/pokebw2` (no issues, comments, pull requests or proposals) | **Decided** 2026-10-17; contribution policy amended 2026-10-21 (§9, [ADR 0002](adr/0002-solo-project-no-upstream-posts.md), [ADR 0017](adr/0017-external-contributions.md)) |
 | D11 | **No Apple Developer account:** macOS builds are ad-hoc signed and never notarized | **Decided** 2026-10-17 (§7 phase 5, §10, [ADR 0003](adr/0003-ad-hoc-signing-no-apple-developer-account.md)) |
 
 ### Why not libntr
@@ -103,8 +103,8 @@ name, and the decision is otherwise unchanged.
   new source files, config changes, overlay claims) never happens in this repository (§9).
 - **Why not a branch of the existing fork:** `CallanCampos/pokebw2` carries the decomp PR branches, GitHub allows an
   account only one fork of a repository, and a port needs its own issues and releases.
-- **Why not in upstream:** the port is a solo project (D10). Upstream isn't told about it, and nothing from it is
-  proposed there.
+- **Why not in upstream:** Frigate accepts contributions in its own repository (D10, [ADR 0017](adr/0017-external-contributions.md)).
+  Port changes and discussion stay here; nothing from it is proposed upstream.
 - **Visibility:** public, so GitHub Actions minutes are free, macOS runners included
   ([tech-stack.md](research/tech-stack.md)). The tree holds no ROM data beyond what upstream already publishes in
   `data/`. Going private would end the free minutes and needs its own ADR

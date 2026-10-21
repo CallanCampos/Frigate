@@ -7,12 +7,7 @@ has is the game's whole source, compiled into the program, so a change to the ga
 
 Two limits shape everything below:
 
-- **Frigate plays as far as the decomp's C goes.** It runs from power-on through the logos, the opening, the title
-  screen, the start menu and New Game's intro, and loads a save up to the field. The field engine (overlay 36) is still
-  being decompiled upstream, and the game stops there on the first thing it reaches that has no C, the field's process
-  table `FIELDMAP_PROC_FUNCS`, which the message names ([STATUS.md](STATUS.md) has the current state). The overworld,
-  battles and menus past it can't be reached yet, but for the field menu's apps, which Frigate's test launcher opens in
-  the field's place ([below](#reaching-the-field-menus-apps)).
+- **Field entry is still blocked.** The latest sync imports the field engine's C, including `FIELDMAP_PROC_FUNCS`. New Game's 10,600-frame replay passes; an extended trace reaches `FieldmapProc_Init` and stops at frame 10,759 because the external field heap is too small for the host's allocations. The test launcher now steps aside automatically, so its earlier app comparisons do not establish current field or app coverage. See [STATUS.md](STATUS.md).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of
@@ -60,15 +55,15 @@ main and exit functions); what it draws, its backgrounds, windows, sprites and t
 in battle is another overlay's: `src/ov286/b_bag_main.c` and the other `b_bag_*.c` files there. To change what the bag
 shows, change those files' C: which items a pocket lists, in what order, which message each line uses. The words
 themselves are the ROM's message data, which a C change can pick between but not rewrite until the layered file system
-exists. The bag opens from the field, which stops at overlay 36, so to see a change run it through the test launcher:
-`--launch bag` ([below](#reaching-the-field-menus-apps)).
+exists. The bag opens from the field. Current field entry is blocked by heap capacity; `--launch bag` steps aside
+because the field process table now has C ([below](#reaching-the-field-menus-apps)).
 
 ## Reaching the field menu's apps
 
-The field menu's apps (the party list, a Pokémon's summary, the Pokédex, the bag and the trainer card) open from the
-field, which stops at overlay 36 until upstream writes it. Frigate's test launcher reaches them anyway: with `--launch`,
-a continued game opens the apps you name in the field's place, when CONTINUE asks for the field, through the game's own
-app call ([../app/launcher.c](../app/launcher.c), [ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)):
+The launcher is retained as a test tool from before the field engine's C arrived. It automatically steps aside
+when `FIELDMAP_PROC_FUNCS` exists, as it does now, so the following historical commands do not reach apps on the
+current build. Earlier comparisons against melonDS remain evidence for their recorded revisions, not current
+field or app coverage ([ADR 0012](adr/0012-test-launcher-for-the-field-menus-apps.md)).
 
 ```sh
 build/port/frigate-black2 --save-dir SAVES --launch bag                # the bag after CONTINUE, then stop
@@ -104,7 +99,7 @@ build/port/frigate-black2 --save-dir SAVES --launch bag@4044 --input FILE --head
   when GFL's frame count reaches COUNT, which lines it up with an input file's presses; without one it opens at once.
 - **What it can't do:** an app that wants the field (a field move, an item used in the field) ends the launch with
   status 1. What the field leaves behind before an app opens (VRAM, palettes, the random numbers) isn't there.
-- **It is a test tool**, off without the option, and it goes once overlay 36 lands. The tests use it to hold each app
+- **It is a test tool**, off without the option, and now steps aside because overlay 36 has landed. Earlier tests used it to hold each app
   to melonDS's route through the real field menu, pass by pass (`oracle.py launch`,
   [../tools/oracle/README.md](../tools/oracle/README.md#the-launch-checks)).
 

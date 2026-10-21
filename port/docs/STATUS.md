@@ -26,10 +26,100 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-21: latest upstream sync and renewed validation
+
+- **Upstream:** `fc478a9ee5`, merged cleanly by `port/tools/sync_upstream.sh` in `c46687c006`.
+- **Port:** `b418e7d15d`.
+- **ROM:** T0 passes after the sync, both SHA1s match (`/tmp/frigate-latest-t0.log`).
+- **Host build:** T1 passes on macOS for Black 2 (`build/port`) and White 2 (`build/port-w2`), with
+  `/tmp/frigate-latest-build-{b2,w2}.log` recording the builds.
+- **Tests:** T2/T3/T6 non-timing suites pass: Black 2, 281 pass and 16 skip of 297 (173.83 s); White 2,
+  279 pass and 16 skip of 295 (166.14 s). Logs: `/tmp/frigate-latest-tests-{b2,w2}.log`. Each skips 15 optional
+  oracle checks and `app_universal_slices`; full optional T4 coverage was skipped. T5 and T7 were not run this pass.
+  The earlier 10,600-frame New Game replay and frame-10,759 field trace remain the gameplay evidence below.
+- **Tiers:** unchanged from the preceding entry: per version, a 37,150 functions, b 3,868 and c zero. Code bytes:
+  Black 2 a 3,369,134 and b 481,132; White 2 a 3,369,222 and b 481,132. Excluded veneers remain 2,384 and included
+  SDK assembly definitions 224. Evidence: `/tmp/frigate-progress-latest-20261021/{b2_us,w2_us}/functions.tsv`.
+  These source-coverage counts do not establish native readiness.
+- **Trap stubs:** generated sources still contain 31 function traps and 22 data placeholders per version.
+  The observed field-entry stop is `OS_Terminate` in `FieldmapProc_Init`, rather than a missing-field-C trap.
+- **64-bit warnings:** the normalized all-TU native syntax probe passes all 1,538 baseline and 1,655 current units.
+  The four pointer/int cast families fall from 492 to 469 instances: game 245 to 234, libraries 247 to 235.
+  Separate optional `-Wshorten-64-to-32` diagnostics rise from 277 to 388 after the native string declarations; they are outside that four-family metric.
+  Evidence: `/tmp/frigate-winfix-warning-full/{summary,results}.json`; the preceding entry explains the baseline
+  and normalization.
+- **Work done:** renewed the contribution and portability work's proof against the latest upstream. Targeted MWCC
+  token streams are identical for 20/24 file/version pairs (`/tmp/frigate-latest-neutral.log`). The four exceptions
+  are `friend.c` and `dwcutil_ac.c` in both versions. Exact object proof covers all ten DWC file/version pairs,
+  754 function instances, all allocated sections and exact relocation targets
+  (`/tmp/frigate-dwc-proof-fc478/{results,relocation-proof}.json`); DWC utility uses its configured `2.0/sp2` compiler.
+  The portability rows in [game-changes.md](game-changes.md) identify their introduction commit `90ad973b12`.
+  [The review](REVIEW-2026-10-21.md) now describes this sync and its validation limits. The publication check also
+  replaced two stale function names in port-authored particle-work comments with their current names; executable C
+  is unchanged. Windows CI also exposed a libc declaration collision for `strnicmp`: MSL comparison extensions
+  now use private host names after including the host string header, preserving their signed bounds. GameStats, ND and SSL
+  use the native string declarations on hosts while MWCC retains its original explicit declarations
+  ([game changes](game-changes.md)); all 16 including file/version pairs preprocess identically to upstream
+  (`/tmp/frigate-winfix-all-neutral.log`). MinGW intrinsic declarations are also read before the unsupported-wide-API
+  poison, so later SDL headers can declare their intrinsics without exposing those APIs to game calls.
+- **Next:** size the external field heap for host allocations, then repeat extended entry, CONTINUE, real menus
+  and differential checks before claiming a playable field; follow up numeric-width and deferred hardware paths.
+- **Blockers:** field C is present, but the fixed 64 KiB external field heap cannot hold weather and place-name
+  child allocations doubled to a combined `0x1b000` before other overhead. The earlier trace terminates at frame
+  10,759 in `FieldmapProc_Init`. Current full oracle, sanitizer and scripted visual coverage remains unverified.
+
+## 2026-10-21: upstream sync, field entry diagnosis and contributor workflow
+
+- **Upstream:** `83515e20ce`, merged on `codex/port-sync-contributions`; 13 conflicts resolved with the port's
+  portability changes reapplied.
+- **Port:** `90ad973b12`.
+- **ROM:** T0 passes, both SHA1s match (`/tmp/frigate-final-t0.log`).
+- **Host build:** T1 passes for Black 2 in `build/port` and White 2 in `build/port-w2` on macOS.
+- **Tests:** T2/T3/T6: fresh non-timing suites pass in both versions: Black 2, 281 pass and 16 skip of 297
+  (178.73 s); White 2, 279 pass and 16 skip of 295 (167.08 s). The registered assembly oracle uses the actual
+  `SVC_UnpackBits` symbol and each build's version. The WCM workspace/configuration test covers native alignment,
+  undersized and negative lengths, complete addresses and buffer canaries; restoring the DS-sized minimum fails the
+  regression. Both suites skip 15 optional oracle tests without their binary and `app_universal_slices`. T4 full
+  optional comparisons skipped; T5 and T7 not run this pass. The 10,600-frame New Game replay passes; an extended trace
+  stops at frame 10,759 during field initialization. Logs: `/tmp/frigate-final-tests-{b2,w2}.log` and
+  `/tmp/frigate-wcm-{red,green}-test.log`.
+- **Tiers:** config/C scanner: 37,150 functions in complete files (tier a), 3,868 in partial files (b), zero without
+  a detected C/assembly definition (c), per version. Code bytes: Black 2, a 3,369,134 and b 481,132; White 2,
+  a 3,369,222 and b 481,132. Against `a14364b6ba`, a grows by 3,449 functions, b falls by 1,055 and c by 2,394.
+  Counts exclude 2,384 linker veneers and include 224 SDK assembly definitions; they do not prove native readiness or
+  partial-C semantics. Evidence: `/tmp/frigate-progress-20261021/` and its baseline counterpart.
+- **Trap stubs:** 31 function traps and 22 data placeholders per version, down from 457 and 46 in the previous record.
+  The field table has C; the observed field-entry stop is `OS_Terminate`, not its old placeholder.
+- **64-bit warnings:** the four pointer/int cast families, explicitly enabled in configured native commands, fall
+  from 245 to 234 game instances and from 247 to 235 library instances against `a14364b6ba` (492 to 469 total).
+  All 1,538 baseline and 1,655 current translation units pass syntax checks with their own generated headers,
+  `PLATFORM_PC`, Apple clang 21 and normalized `-O2 -DNDEBUG`. This establishes the comparable pointer-warning gate;
+  it is not a zero-warning claim. The separate `-Wshorten-64-to-32` probe rises from 277 to 384 instances and remains
+  numeric-width follow-up work. Earlier ordinary-build and non-native shim counts use different metrics.
+  Evidence: `/tmp/frigate-native-warning-full/{summary,results}.json`.
+- **Work done:** imported the field engine's C and removed obsolete `ov011_pending.c` (all four SDK definitions now
+  have real C). Preserved SocConfig's hostname pointer with `uptr` ([game changes](game-changes.md)): targeted MWCC
+  token streams 6/6 identical. The initial merge's global MWCC comparison has 3,550/3,554 identical pairs; its four
+  exceptions are `event_field_proclink.c` (TrainerCardParam) and `vm.c` in both versions. Both files are complete in
+  both delinks, so T0 proves those exceptions. ROM hashes do not prove the behavior of other incomplete C linked only
+  on the host. Later SDK changes have 14/14 targeted identical token streams plus ten exact DWC object pairs
+  (754 function instances, allocated data and relocation identities). They preserve native addresses, match callback
+  contexts and the public callback ABI. WCM and both wrappers share a native DS workspace extent; signed lengths and
+  AP-list alignment are checked before writing. Added external fork/topic-PR guidance under
+  [ADR 0017](adr/0017-external-contributions.md), preserving
+  earlier uncommitted contributor documentation. [Review](REVIEW-2026-10-21.md) records the architecture and remaining
+  gaps.
+- **Next:** size the external field heap for host allocations, then repeat extended field entry, current field/app
+  replays and oracle comparisons. Investigate remaining numeric-width and deferred hardware boundaries.
+- **Blockers:** `g_FieldHeapMemory` is an external 64 KiB buffer; host doubling of weather's `0x6400` and place-name's
+  `0x7400` requires `0x1b000` combined before other overhead. The trace terminates in `FieldmapProc_Init` after
+  `HEAPID_FIELD_PLACE_NAME` (`/tmp/frigate-host-field-entry.log`). This is a host allocation blocker, not missing
+  field C. Sanitized and scripted visual coverage remains unverified this pass.
+
 ## 2026-10-19: the performance and hygiene merge, reviewed: ADR 0016's acceptance as it was, a timing failure's way out
 
 - **Upstream:** `2825ea75f` (merge of PR #393), as merged into the port's `main` by `607ccd1a6`; no sync in this task.
-- **Port:** `PORT_SHA`, on the branch `port-integrate` after the merge's last entry (`e653f3deb`); pushed to
+- **Port:** `658f00e7e3`, on the branch `port-integrate` after the merge's last entry (`e653f3deb`); pushed to
   `port-perf` on origin for CI, not to `main`.
 - **ROM:** both SHA1s match (b2_us `e51e6dfb8`, w2_us `b5d7490be`; `python3 configure.py && ninja`, with nothing to
   rebuild). No file outside `port/` changed.

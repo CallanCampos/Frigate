@@ -13,7 +13,7 @@ void FieldFlash_Update(FieldFlash *flash);
 void FieldFlash_Draw(FieldFlash *flash);
 // Changes the darkness at the next update: 0 dark, 1 widening as Flash is used, 2 lit, 3 off. The state is 3 once the
 // widening has ended
-void func_ov036_021c1c68(FieldFlash *flash, u32 nextState);
-u16 func_ov036_021c1c6c(FieldFlash *flash);
+void FieldFlash_RequestState(FieldFlash *flash, u32 nextState);
+u16 FieldFlash_GetState(FieldFlash *flash);
 
 #endif // POKEBW2_FIELD_FIELD_FLASH_H

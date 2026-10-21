@@ -59,7 +59,7 @@ void main(void) {
     while (TRUE) {
         BOOL priority;
 
-        func_02005430();
+        Machine_ProcessExitRequest();
         GFLAppUpdate();
         GameUpdate();
         func_02005668();
@@ -84,19 +84,19 @@ void main(void) {
     }
 }
 
-void func_020051d8(BOOL blocked) {
+void SetMainMemoryPriorityBlocked(BOOL blocked) {
     g_MainMemoryPriorityBlocked = blocked;
 }
 
-// FALSE while the network, a sound stream or func_020051d8 needs the ARM7 to keep its priority
+// FALSE while the network, a sound stream or SetMainMemoryPriorityBlocked needs the ARM7 to keep its priority
 static BOOL IsMainMemoryPriorityFree(void) {
-    if (func_0203ff6c() > 1) {
+    if (NetSystem_CountConnected() > 1) {
         return FALSE;
     }
-    if (func_02042b00()) {
+    if (GFL_NetIsInfrared()) {
         return FALSE;
     }
-    if (func_02042b20()) {
+    if (GFL_NetIsWifi()) {
         return FALSE;
     }
     if (GFL_SndStreamCheckInit()) {
@@ -128,13 +128,13 @@ static void GameInit(void) {
     GFL_OvlLoad(OVERLAY_ID(27));
     GFL_TextRndInit(0);
     g_MainMemoryPriorityBlocked = FALSE;
-    func_020425a0(1, 0, 1, 12);
+    GFL_NetBoot(1, 0, 1, 12);
     setupDownloadPlayConfig(12);
     downloadPlayConfigForWifi();
     GCTX_ProcMgrQueueProc(OVERLAY_NONE, &EVENT_TITLE_FUNCS, NULL);
 
     SaveControl_Create(7);
-    func_02008ab4(&getTrainerDataBlkAddress(SaveControl_GetInstance())->config);
+    Config_ApplyMsgLanguage(&getTrainerDataBlkAddress(SaveControl_GetInstance())->config);
     saveMainSaveAreaAddress(SaveControl_GetInstance());
     setImportantJABlockAddresses(SaveControl_GetInstance());
 
@@ -154,7 +154,7 @@ static void GameInit(void) {
 static void GameUpdate(void) {
     BrightnessController_Update();
     GFL_WipeMain();
-    func_02011c78();
+    GFL_NetErrUpdate();
     GFL_SndUpdate();
     PokeVoice_Update();
     GameBeaconSys_Update();
@@ -164,8 +164,8 @@ static void GameUpdate(void) {
 // Sets the sound's output from the options
 static void setMonoSnd(const Config *config) {
     if (getSoundFlags(config) == 0) {
-        func_02005c80(TRUE);
+        GFL_SndSetStereo(TRUE);
     } else {
-        func_02005c80(FALSE);
+        GFL_SndSetStereo(FALSE);
     }
 }

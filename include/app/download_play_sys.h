@@ -147,6 +147,6 @@ const MBUserInfo *func_ov182_021bac14(void);
 
 // Not written yet: the function that fills the parent's copy of the game registry, which the overlay's unassigned
 // screens range owns
-u8 *func_ov182_021b7e6c(void);
+u8 *DWCUtilWifiSettings_GetPages(void);
 
 #endif // POKEBW2_APP_DOWNLOAD_PLAY_SYS_H
