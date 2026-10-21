@@ -591,10 +591,10 @@ static inline OSThread *OS_GetCurrentThread(void) {
 }
 
 // NitroSDK's OS_InitThread, which makes the thread that runs the launcher thread and creates the idle thread, and
-// OS_IsThreadAvailable, which says whether it has run (a flag that other code reads, OSi_ThreadInitialized)
+// OS_IsThreadAvailable, which says whether it has run (a flag that other code reads, OSi_IsThreadInitialized)
 void OS_InitThread(void); // swan's scheduler_init
 BOOL OS_IsThreadAvailable(void);
-extern BOOL OSi_ThreadInitialized;
+extern BOOL OSi_IsThreadInitialized;
 // swan's scheduler_init_thread
 void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *stack, u32 stackSize, u32 prio);
 void OS_SleepThread(OSThreadQueue *queue); // swan's scheduler_yield

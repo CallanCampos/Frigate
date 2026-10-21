@@ -2064,6 +2064,7 @@ lib/nitro/src/os/os_printf.c:
     .text       start:0x0207a2bc end:0x0207a310
 
 lib/nitro/src/os/os_thread.c:
+    complete
     .text       start:0x0207a310 end:0x0207ab30
     .bss        start:0x0214c250 end:0x0214c4c4
 
