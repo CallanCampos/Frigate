@@ -40,7 +40,7 @@ static DWCGHTTPEntry *DWCi_FindGHTTPEntry(int request);
 static void DWCi_FreeAllGHTTPEntries(void);
 
 // The root certificate that DWC's hosts are checked against
-static void *sRootCerts[1] = { data_ov011_021866c0 };
+static void *sRootCerts[1] = { &DWCi_RootCertNintendoClass2 };
 static GHICertList sDWCRootCAList = { sRootCerts, 1 };
 
 static DWCGHTTPEntry *sGHTTPEntries;

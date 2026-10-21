@@ -17,8 +17,9 @@ typedef void (*NHttpFreeFunc)(void *ptr);
 // being sent (1), the buffer being full (2), the body being received (3) and the connection ending (4)
 typedef int (*NHttpCallback)(int connection, int event, void *arg);
 
-// The root certificate that the answers' TLS is checked against, in overlay 11
-extern u8 data_ov011_021866c0[];
+// The root certificate that the answers' TLS is checked against, in overlay 11 (dwc_rootcert_nintendo_class2.c, with
+// its type in dwc/nasfunc.h)
+extern struct NasRootCert DWCi_RootCertNintendoClass2;
 
 // Starts the library with an allocator and the priority of the thread that runs the requests; 0 once it started
 int NHTTPStartup(NHttpAllocFunc alloc, NHttpFreeFunc free, u32 priority);

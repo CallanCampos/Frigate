@@ -5,12 +5,15 @@
 #include "nitro/os.h"
 #include "nitrowifi/cps.h"
 
-// DWC's login to the Nintendo authentication server (dwc_nasfunc.c, overlay 11): the login's thread, the HTTP client
-// that it and the other requests to the server use, the connection test, the profanity check and the service locator.
-// The ROM names none of it. The type names follow the SDK's (DWCHttp, DWCAuthParam and the others, recalled from it),
-// and so do the functions that NitroDWC's headers (auth/dwc_auth.h, dwc_http.h, dwc_netcheck.h, dwc_prof.h and
-// dwc_svl.h) and the Wii DWC's dwc_auth_interface.c declare; the others' names are ours, in their style. The functions
-// that the game calls are in dwc/dwc.h, and the connection test's in dwc/ac.h.
+// DWC's login to the Nintendo authentication server (overlay 11): the login's thread (dwc_nasfunc.c), the HTTP client
+// that it and the other requests to the server use (dwc_http_client.c), the connection test (dwc_conntest.c), the
+// profanity check (dwc_profanity.c), the service locator (dwc_svcloc.c) and the root certificates (dwc_rootcert_*.c).
+// The ROM names none of it: the file names are ours, from what each file does and the strings it sends, and so are the
+// names of the globals that the files share (DWCi_ and what they hold). The type names follow the SDK's (DWCHttp,
+// DWCAuthParam and the others, recalled from it), and so do the functions that NitroDWC's headers (auth/dwc_auth.h,
+// dwc_http.h, dwc_netcheck.h, dwc_prof.h and dwc_svl.h) and the Wii DWC's dwc_auth_interface.c declare; the others'
+// names are ours, in their style. The functions that the game calls are in dwc/dwc.h, and the connection test's in
+// dwc/ac.h.
 
 // The allocator and the deallocator of a request, with a name (0 here) first, as DWC_Alloc and DWC_Free take them
 typedef void *(*DWCHttpAlloc)(u32 name, u32 size);
@@ -154,5 +157,87 @@ BOOL DWC_Svl_Init(DWCHttpAlloc alloc, DWCHttpFree free);
 void DWC_Svl_Cleanup(void);
 BOOL DWC_Svl_GetTokenAsync(const char *service, DWCSvlResult *result);
 int DWC_Svl_Process(void);
+
+// The login's HTTP client and helpers that the connection test (dwc_conntest.c), the profanity check
+// (dwc_profanity.c) and the service locator (dwc_svcloc.c) share with dwc_nasfunc.c
+// What the requests to the server tell about the player and the console, as the form fields are made from them
+typedef struct NasAuthInfo {
+    char userId[0xe];
+    char password[7];
+    char gameCode[5];
+    char makerCode[3];
+    char unitCode[2];
+    char macAddress[0xd];
+    char language[3];
+    char birthday[5];
+    char deviceTime[0xd];
+    char bssid[0xd];
+    char ssid[0x20];
+    char unk_6e;
+    char apInfo[0xe];
+    char unk_7d;
+    u16 deviceName[10];
+    u8 unk_92[2];
+} NasAuthInfo;
+
+// The login's request: the server's URL and the rest of what it is made with (the URL that DWC_Auth_SetCustomNas sets)
+extern DWCHttpParam DWCi_AuthConfig;
+
+// Cancels the login and waits for its thread
+void DWC_Auth_Abort(void);
+// Waits for the login's thread
+void DWC_Auth_Join(void);
+// The player's and the console's details for a request, from the current Wi-Fi ID, and the form fields made from them
+BOOL DWCi_Auth_GetCurrentInfo(NasAuthInfo *info);
+BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, const NasAuthInfo *info, BOOL sendSsid);
+
+// Makes a request, ends its headers, runs it in a thread at a priority, and cancels it
+int DWC_Http_Create(DWCHttp *http, const DWCHttpParam *param);
+BOOL DWC_Http_FinishHeader(DWCHttp *http);
+void DWC_Http_StartThread(DWCHttp *http, u32 priority);
+void DWC_Http_Abort(DWCHttp *http);
+// Lets go of a request's memory
+void DWC_Http_Destroy(DWCHttp *http);
+// Adds a header, a form field whose value is encoded in Base64, or text, to the request
+int DWC_Http_Add_HeaderItem(DWCHttp *http, const char *name, const char *value);
+int DWC_Http_Add_PostBase64Item(DWCHttp *http, const char *name, const void *value, int size);
+int DWC_Http_Add_Body(DWCHttp *http, const char *text);
+// Parses the answer (its headers only, or its form fields too), and reads a header, a field's Base64-decoded value
+// or a field's raw value
+int DWC_Http_ParseResult(DWCHttp *http, BOOL headersOnly);
+const char *DWC_Http_GetResult(DWCHttp *http, const char *label);
+int DWC_Http_GetBase64DecodedResult(DWCHttp *http, const char *label, char *dest, int size);
+int DWC_Http_GetRawResult(DWCHttp *http, const char *label, char *dest, int size);
+
+// dwc_conntest.c: whether the requests to the server send the access point's SSID, which the connection test sets
+// once it has been redirected
+extern BOOL DWCi_SendSsid;
+
+// A root certificate that the HTTPS connection accepts: its name, its public key and the exponent of the key. Each is a
+// file of its own (dwc_rootcert_*.c) that holds only the certificate: built with -ipa file, its name and key of 64
+// bytes or more and its global get 4-aligned sections of their own, as the ROM has them, which one file of all 13
+// can't give. The files and globals are named after each certificate's own name. DWCi_Http_Thread accepts all but
+// DWCi_RootCertNintendoClass2, which DWC's GameSpy HTTP and the RAP's NHTTP requests use
+typedef struct NasRootCert {
+    char *name;
+    int keyLength;
+    u8 *key;
+    int exponentLength;
+    u8 *exponent;
+} NasRootCert;
+
+extern NasRootCert DWCi_RootCertBaltimoreCyberTrust;
+extern NasRootCert DWCi_RootCertGlobalSign;
+extern NasRootCert DWCi_RootCertGteCyberTrustGlobal;
+extern NasRootCert DWCi_RootCertGteCyberTrust;
+extern NasRootCert DWCi_RootCertGlobalSignR2;
+extern NasRootCert DWCi_RootCertNintendo;
+extern NasRootCert DWCi_RootCertNintendoClass2;
+extern NasRootCert DWCi_RootCertThawtePremiumServer;
+extern NasRootCert DWCi_RootCertThawteServer;
+extern NasRootCert DWCi_RootCertVeriSignClass3G2;
+extern NasRootCert DWCi_RootCertVeriSignClass3G3;
+extern NasRootCert DWCi_RootCertVeriSignClass3;
+extern NasRootCert DWCi_RootCertRsaSecureServer;
 
 #endif // POKEBW2_DWC_NASFUNC_H
