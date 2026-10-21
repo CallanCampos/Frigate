@@ -2257,6 +2257,12 @@ overlays/ov145 0x021a0d6c remove_symbol
 overlays/ov145 0x021a0e15 remove_symbol
 overlays/ov145 0x021a0e81 remove_symbol
 overlays/ov148 0x021f5ad4 reloc_addend 0x380
+overlays/ov148 0x021f5bda reloc_module overlay(36)
+overlays/ov148 0x021f5c12 reloc_module overlay(36)
+overlays/ov148 0x021f5d32 reloc_module overlay(36)
+overlays/ov148 0x021f5d6a reloc_module overlay(36)
+overlays/ov149 0x021f5bc0 reloc_module overlay(36)
+overlays/ov149 0x021f5c66 reloc_module overlay(36)
 overlays/ov152 0x021f6228 reloc_module overlay(148)
 overlays/ov152 0x021f6254 reloc_module overlay(150)
 overlays/ov153 0x021f6228 reloc_module overlay(148)

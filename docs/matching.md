@@ -2766,6 +2766,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
+  enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose
+  parameter has that enum type. GameSpy's `qr_build_split_query_reply` (`qr2.c`, overlay 11) matched only with its
+  progress's key type as `QR2KeyType`, the SDK's `qr2_key_type`, and the key list callback taking `QR2KeyType`; the
+  field alone, or the parameters alone, kept the register.
 - A table read in an unrolled loop through a pointer that each read steps (`*sines++`, `x[*index++]`) and the same
   table indexed (`sines[0]` to `sines[3]`, then `sines += 4`) give different registers and spills. libmath's
   `md5_transform` matches only stepped, with the message walked by its own pointer in the first round and through

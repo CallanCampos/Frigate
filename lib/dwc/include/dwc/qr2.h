@@ -35,11 +35,18 @@ typedef struct QR2KeyBuffer {
     int numKeys;
 } QR2KeyBuffer;
 
-// The key types are 0 (the server's), 1 (the players') and 2 (the teams')
+// The types of keys, the later SDK's qr2_key_type
+typedef enum QR2KeyType {
+    key_server,
+    key_player,
+    key_team,
+    key_type_count,
+} QR2KeyType;
+
 typedef void (*QR2ServerKeyCallback)(int keyId, QR2Buffer *outBuf, void *userData);
 typedef void (*QR2PlayerTeamKeyCallback)(int keyId, int index, QR2Buffer *outBuf, void *userData);
-typedef void (*QR2KeyListCallback)(int keyType, QR2KeyBuffer *keyBuffer, void *userData);
-typedef int (*QR2CountCallback)(int keyType, void *userData);
+typedef void (*QR2KeyListCallback)(QR2KeyType keyType, QR2KeyBuffer *keyBuffer, void *userData);
+typedef int (*QR2CountCallback)(QR2KeyType keyType, void *userData);
 typedef void (*QR2AddErrorCallback)(int error, const char *errorMessage, void *userData);
 typedef void (*QR2NatNegCallback)(int cookie, void *userData);
 typedef void (*QR2ClientMessageCallback)(const char *data, int len, void *userData);
