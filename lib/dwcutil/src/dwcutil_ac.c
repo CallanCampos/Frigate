@@ -96,7 +96,7 @@ typedef struct UtilAcSettings {
 // An access point that a scan found, and the scan
 typedef struct UtilAcScanEntry {
     u32 ssidLength;
-    char ssid[0x24];
+    u8 ssid[0x24];
     u8 bssid[6];
     u16 secure;
 } UtilAcScanEntry;
@@ -1173,28 +1173,24 @@ static void UtilAc_Disconnect(void) {
 // Looks for the access point that opened its setup: one that was secured in the scan before and is open now, or else
 // one named "******" in this scan and not in the one before. Gives its place in the scan
 static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous, int *index) {
-    char name[0x22];
     int found = 0;
     int result = 0;
-    int i = 0;
+    int i;
     int j;
-    int foundNew = 0;
-    int foundOld = 0;
 
     for (i = 0; i < scan->count; i++) {
+        char name[0x22] = { 0 };
         const UtilAcScanEntry *entry = &scan->entries[i];
-        u32 length = entry->ssidLength;
 
-        memset(name, 0, 0x22);
         memcpy(name, entry->ssid, 0x20);
         name[entry->ssidLength] = 0;
         for (j = 0; j < previous->count; j++) {
             const UtilAcScanEntry *old = &previous->entries[j];
 
-            if (length == 0 || length > 0x20) {
+            if (entry->ssidLength == 0 || entry->ssidLength > 0x20) {
                 break;
             }
-            if (length == 1 && (entry->ssid[0] == 0 || entry->ssid[0] == ' ')) {
+            if (entry->ssidLength == 1 && (entry->ssid[0] == 0 || entry->ssid[0] == ' ')) {
                 break;
             }
             if (memcmp(name, old->ssid, strlen(name)) == 0 && memcmp(entry->bssid, old->bssid, 6) == 0 &&
@@ -1208,22 +1204,25 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
         }
     }
     if (!found) {
-        char oldName[0x22];
+        char name[0x22] = { 0 };
+        int foundOld = 0;
+        int foundNew = 0;
 
-        memset(oldName, 0, 0x22);
         for (j = 0; j < previous->count; j++) {
-            memcpy(oldName, previous->entries[j].ssid, 0x20);
-            oldName[previous->entries[j].ssidLength] = 0;
-            if (memcmp(oldName, "******", strlen("******")) == 0 && previous->entries[j].secure == 0) {
+            memcpy(name, previous->entries[j].ssid, 0x20);
+            name[previous->entries[j].ssidLength] = 0;
+            if (memcmp(name, "******", strlen("******")) == 0 && previous->entries[j].secure == 0) {
                 foundOld = 1;
                 break;
             }
         }
         for (i = 0; i < scan->count; i++) {
-            memcpy(name, scan->entries[i].ssid, 0x20);
-            name[scan->entries[i].ssidLength] = 0;
+            const UtilAcScanEntry *entry = &scan->entries[i];
+
+            memcpy(name, entry->ssid, 0x20);
+            name[entry->ssidLength] = 0;
             if (strlen(name) == strlen("******") && memcmp(name, "******", strlen("******")) == 0 &&
-                scan->entries[i].secure == 0) {
+                entry->secure == 0) {
                 foundNew = 1;
                 break;
             }
@@ -1754,6 +1753,42 @@ static int UtilAc_ParseHex(u8 *out, const char *text, int length) {
 }
 
 // Turns the settings into the result; 1, or RESULT_BAD_KEY when the keys make no sense
+// Sets a WEP key and the result's mode from the key's text: 5, 13 or 16 characters, or twice as many hex digits.
+// FALSE when the length is none of those
+static inline BOOL UtilAc_SetKey(u8 *key, const char *text, u32 length) {
+    switch (length) {
+    case 0:
+        break;
+    case 5:
+        sAcResult.wepMode = 1;
+        memcpy(key, text, 5);
+        break;
+    case 10:
+        sAcResult.wepMode = 1;
+        UtilAc_ParseHex(key, text, 10);
+        break;
+    case 13:
+        sAcResult.wepMode = 2;
+        memcpy(key, text, 13);
+        break;
+    case 26:
+        sAcResult.wepMode = 2;
+        UtilAc_ParseHex(key, text, 26);
+        break;
+    case 16:
+        sAcResult.wepMode = 3;
+        memcpy(key, text, 16);
+        break;
+    case 32:
+        sAcResult.wepMode = 3;
+        UtilAc_ParseHex(key, text, 32);
+        break;
+    default:
+        return FALSE;
+    }
+    return TRUE;
+}
+
 static int UtilAc_MakeResult(void) {
     int result = RESULT_OK;
     char text[0x21];
@@ -1775,36 +1810,8 @@ static int UtilAc_MakeResult(void) {
                 memcpy(text, sAcSettings.keys[i].key, 0x20);
                 text[0x20] = 0;
                 length = strlen(text);
-                switch (length) {
-                case 0:
-                    break;
-                case 5:
-                    sAcResult.wepMode = 1;
-                    memcpy(sAcResult.keys[i], text, 5);
-                    break;
-                case 10:
-                    sAcResult.wepMode = 1;
-                    UtilAc_ParseHex(sAcResult.keys[i], text, 10);
-                    break;
-                case 13:
-                    sAcResult.wepMode = 2;
-                    memcpy(sAcResult.keys[i], text, 13);
-                    break;
-                case 26:
-                    sAcResult.wepMode = 2;
-                    UtilAc_ParseHex(sAcResult.keys[i], text, 26);
-                    break;
-                case 16:
-                    sAcResult.wepMode = 3;
-                    memcpy(sAcResult.keys[i], text, 16);
-                    break;
-                case 32:
-                    sAcResult.wepMode = 3;
-                    UtilAc_ParseHex(sAcResult.keys[i], text, 32);
-                    break;
-                default:
+                if (!UtilAc_SetKey(sAcResult.keys[i], text, length)) {
                     result = RESULT_BAD_KEY;
-                    break;
                 }
             }
         }
