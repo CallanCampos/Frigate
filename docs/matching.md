@@ -1686,8 +1686,8 @@ Same instructions, scheduled in another order.
   to its own type (`(fx32)-(a + b) + FX32_ONE`, where `-(fx32)(a + b)` folds), or an implicit one, a negated `int` sum
   added to a `long` constant. NitroSDK's `FX32_ONE` is `((fx32)0x00001000L)` with `fx32` a `long`, so G3D's `maya.c`,
   which has the two instructions in `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, wrote `-(sinR + cosR) + FX32_ONE`, and
-  matches so under scratch copies of the SDK's typedefs; with this checkout's `int` `fx32` both functions stay 4 bytes
-  short. The negation in a statement of its own (`sum = a + b; sum = -sum;`) keeps the two as well.
+  matches so under the SDK's types (an `int` `fx32` folds both to one `rsb`). The negation in a statement of its own
+  (`sum = a + b; sum = -sum;`) keeps the two as well.
 - A difference taken back from its own first operand folds too: `d + ((d - last - d) >> 4)`, or the same with
   `d - last` in a `u32` local, compiles to `rsb r0, r0, #0`. The two `sub`s stay when the local has the other
   signedness, `int change = d - last;`, or when a store to `last` comes between the local and its use. libVCT's

@@ -1098,6 +1098,7 @@ lib/nnsys/src/g3d/basic.c:
     .text       start:0x02069f40 end:0x02069fbc
 
 lib/nnsys/src/g3d/maya.c:
+    complete
     .text       start:0x02069fbc end:0x0206a714
     .data       start:0x0209b4a0 end:0x0209b4c0
 
