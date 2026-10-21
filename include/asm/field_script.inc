@@ -5271,7 +5271,7 @@
     FieldCommand 1007
     .endm
 
-    // func_ov065_021e65dc
+    // PokemonCenterCmd_SetMatchState
     .macro Plugin13_Cmd1008 a0, a1
     FieldCommand 1008
     .2byte \a0
