@@ -62,7 +62,7 @@ MBDataConv *MBDataConv_Create(HeapID heapId) {
 
 void MBDataConv_Delete(MBDataConv *conv) {
     GCTX_HIDUnblockSleep(0x10);
-    func_0203e7dc();
+    WmIcon_Delete();
     if (conv->registry != NULL) {
         MBDataConv_FreeRegistry(conv->registry);
         conv->registry = NULL;
@@ -140,8 +140,8 @@ static BOOL MBDataConv_Distribute(MBDataConv *conv, u32 *seq) {
         GFL_OvlLoad(OVERLAY_ID(30));
         sMBDataConvWirelessDone = FALSE;
         WH_Initialize(conv->heapId, MBDataConv_OnWirelessDone, 0);
-        func_0203e76c(240, 0, 0, conv->heapId);
-        func_0203e810(TRUE, conv->heapId);
+        WmIcon_Create(240, 0, 0, conv->heapId);
+        WmIcon_SetScreen(TRUE, conv->heapId);
         GCTX_HIDSetSoftResetCallback(MBDataConv_SoftResetCallback, conv);
         (*seq)++;
         break;
@@ -189,8 +189,8 @@ static BOOL MBDataConv_Distribute(MBDataConv *conv, u32 *seq) {
         conv->wirelessStarted = FALSE;
         return TRUE;
     }
-    func_0203e7f8(WM_LINK_LEVEL_3 - WM_GetLinkLevel());
-    func_0203e838();
+    WmIcon_SetStrength(WM_LINK_LEVEL_3 - WM_GetLinkLevel());
+    WmIcon_Update();
     return FALSE;
 }
 
@@ -198,7 +198,7 @@ static BOOL MBDataConv_Connect(MBDataConv *conv, u32 *seq) {
     switch (*seq) {
     case 0:
         MBComm_StartNet(conv->comm);
-        func_02042ba8(TRUE, conv->heapId);
+        GFL_NetSetIconScreen(TRUE, conv->heapId);
         (*seq)++;
         break;
     case 1:
@@ -220,7 +220,7 @@ static BOOL MBDataConv_Connect(MBDataConv *conv, u32 *seq) {
         }
         break;
     case 4:
-        conv->parentInfo.textSpeed = func_02017bcc();
+        conv->parentInfo.textSpeed = TextSpeed_GetCurrentWait();
         conv->parentInfo.language = GFL_MsgDataGetDefaultLangID();
         if (MBComm_SendParentInfo(conv->comm, &conv->parentInfo)) {
             (*seq)++;

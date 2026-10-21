@@ -160,7 +160,7 @@ MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSa
     MusShotInfo_InitGraphics(info);
     MusShotInfo_InitMessage(info);
     info->menuRes = AppTaskMenuRes_Create(4, 12, info->font, info->printQueue, info->heapId);
-    func_02042ba8(FALSE, heapId);
+    GFL_NetSetIconScreen(FALSE, heapId);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     return info;
 }
@@ -168,12 +168,12 @@ MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSa
 void MusShotInfo_Delete(MusShotInfo *info) {
     AppTaskMenuRes_Free(info->menuRes);
     if (info->askSave == FALSE) {
-        func_0204bcd0(info->returnPalette);
-        func_0204b98c(info->returnChars);
-        func_0204be64(info->returnCellAnims);
-        func_0204c108(info->returnButton);
+        ClActSys_FreePltt(info->returnPalette);
+        ClActSys_FreeChars(info->returnChars);
+        ClActSys_FreeCellAnims(info->returnCellAnims);
+        ClActor_Delete(info->returnButton);
     }
-    func_0204bf98(info->clactUnit);
+    ClActUnit_Delete(info->clactUnit);
     MusShotInfo_ExitMessage(info);
     GFL_BGSysReleaseBG(4);
     GFL_BGSysReleaseBG(6);
@@ -211,11 +211,11 @@ void MusShotInfo_Main(MusShotInfo *info) {
             pos = AppTaskMenu_GetCursorPos(info->menu);
             AppTaskMenu_Free(info->menu);
             if (pos == 0) {
-                MI_CpuCopy8(info->shot, func_0200ad5c(info->save), sizeof(MusicalShot));
+                MI_CpuCopy8(info->shot, MusicalSave_GetShot(info->save), sizeof(MusicalShot));
             }
             if (info->comm != NULL) {
                 info->state = MUS_SHOT_INFO_STATE_SYNC;
-                func_ov211_021ef988(info->comm, MUS_SHOT_INFO_SYNC_ID);
+                MusComm_SendTiming(info->comm, MUS_SHOT_INFO_SYNC_ID);
                 MusShotInfo_PrintMessageNow(info, 6);
             } else {
                 info->state = MUS_SHOT_INFO_STATE_END;
@@ -226,22 +226,22 @@ void MusShotInfo_Main(MusShotInfo *info) {
         }
         break;
     case MUS_SHOT_INFO_STATE_SYNC:
-        if (func_ov211_021ef99c(info->comm, MUS_SHOT_INFO_SYNC_ID) == TRUE) {
+        if (MusComm_IsTimingReached(info->comm, MUS_SHOT_INFO_SYNC_ID) == TRUE) {
             info->state = MUS_SHOT_INFO_STATE_END;
         } else if (GFL_NetErrCheck()) {
             info->state = MUS_SHOT_INFO_STATE_END;
         }
         break;
     case MUS_SHOT_INFO_STATE_WAIT_RETURN:
-        if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || func_0203da0c(MUS_SHOT_INFO_RETURN_RECT) == 0) {
+        if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) || GFL_HIDGetTouchPressedRect(MUS_SHOT_INFO_RETURN_RECT) == 0) {
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             info->state = MUS_SHOT_INFO_STATE_RETURN;
-            func_0204c488(info->returnButton, 9);
-            func_0204c520(info->returnButton, TRUE);
+            ClActor_SetSequence(info->returnButton, 9);
+            ClActor_SetAutoAnim(info->returnButton, TRUE);
         }
         break;
     case MUS_SHOT_INFO_STATE_RETURN:
-        if (func_0204c560(info->returnButton) == FALSE) {
+        if (ClActor_IsAnimActive(info->returnButton) == FALSE) {
             info->state = MUS_SHOT_INFO_STATE_END;
         }
         break;
@@ -249,12 +249,12 @@ void MusShotInfo_Main(MusShotInfo *info) {
         break;
     }
 
-    if (info->stream != NULL && func_020223b4(info->stream) == PRINT_STREAM_DONE) {
-        func_020223cc(info->stream);
+    if (info->stream != NULL && PrintStream_GetState(info->stream) == PRINT_STREAM_DONE) {
+        PrintStream_Delete(info->stream);
         info->stream = NULL;
     }
-    func_02021a3c(info->printQueue);
-    if (info->printing == TRUE && func_02021c0c(info->printQueue) == TRUE) {
+    PrintQueue_Main(info->printQueue);
+    if (info->printing == TRUE && PrintQueue_IsEmpty(info->printQueue) == TRUE) {
         info->printing = FALSE;
         info->waitIcon = WaitIcon_CreateTCBEx(info->tcbManager, info->msgWin, 15, 16, info->heapId);
         BmpWin_FlushChar(info->msgWin);
@@ -281,8 +281,8 @@ static void MusShotInfo_InitGraphics(MusShotInfo *info) {
     MusShotInfo_InitBG(&MUS_SHOT_INFO_BG4_SETUP, 4, 0);
     MusShotInfo_InitBG(&MUS_SHOT_INFO_BG6_SETUP, 6, 0);
     MusShotInfo_InitBG(&MUS_SHOT_INFO_BG7_SETUP, 7, 0);
-    info->clactUnit = func_0204bf1c(8, 0, info->heapId);
-    func_0204c028(info->clactUnit);
+    info->clactUnit = ClActUnit_Create(8, 0, info->heapId);
+    ClActUnit_UseSystemRenderer(info->clactUnit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL_SHOT, info->heapId);
@@ -295,14 +295,17 @@ static void MusShotInfo_InitGraphics(MusShotInfo *info) {
         ClActorSetup setup;
 
         arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), info->heapId);
-        GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), 4, 0x120, 0x20, info->heapId);
-        GFL_BGSysLoadArcNCGRStatic(arc, func_0202d824(), 6, 0, 0, FALSE, info->heapId);
-        loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 6, 0, 0, FALSE, info->heapId);
+        GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), 4, 0x120, 0x20, info->heapId);
+        GFL_BGSysLoadArcNCGRStatic(arc, AppMenuCommon_GetBarBgCharFile(), 6, 0, 0, FALSE, info->heapId);
+        loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 6, 0, 0, FALSE, info->heapId);
         GFL_BGSysSetScrPaletteNo(6, 0, 21, 32, 3, 9);
         GFL_BGSysLoadScr(6);
-        info->returnPalette = func_0204bbb8(arc, func_0202d810(), CLACT_VRAM_SUB, 0, 0, 3, info->heapId);
-        info->returnChars = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_SUB, info->heapId);
-        info->returnCellAnims = func_0204bde0(arc, func_0202d818(0), func_0202d81c(0), info->heapId);
+        info->returnPalette =
+            ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_SUB, 0, 0, 3, info->heapId);
+        info->returnChars =
+            ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_SUB, info->heapId);
+        info->returnCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(0),
+                                                       AppMenuCommon_GetTouchBarAnimFile(0), info->heapId);
         GFL_ArcToolFree(arc);
 
         setup.x = 232;
@@ -310,8 +313,8 @@ static void MusShotInfo_InitGraphics(MusShotInfo *info) {
         setup.sequence = 1;
         setup.bgPriority = 0;
         setup.priority = 0;
-        info->returnButton = func_0204c040(info->clactUnit, info->returnChars, info->returnPalette,
-                                           info->returnCellAnims, &setup, CLACT_SURFACE_SUB, info->heapId);
+        info->returnButton = ClActor_Create(info->clactUnit, info->returnChars, info->returnPalette,
+                                            info->returnCellAnims, &setup, CLACT_SURFACE_SUB, info->heapId);
     }
 }
 
@@ -331,24 +334,24 @@ static void MusShotInfo_InitMessage(MusShotInfo *info) {
     info->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_POKEPARAM_2, info->heapId);
     LoadSysMsgBox(4, 1, 11, 0, info->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 0x140, 0x20, info->heapId);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
     info->tcbManager = GFL_TCBExMgrCreate(info->heapId, info->heapId, 3, 0x100);
     info->stream = NULL;
     info->msgStr = NULL;
     info->printing = FALSE;
     info->waitIcon = NULL;
-    info->printQueue = func_02021998(info->heapId);
+    info->printQueue = PrintQueue_CreateDefault(info->heapId);
 }
 
 static void MusShotInfo_ExitMessage(MusShotInfo *info) {
-    func_02021c44(info->printQueue);
-    func_02021a18(info->printQueue);
+    PrintQueue_Clear(info->printQueue);
+    PrintQueue_Free(info->printQueue);
     if (info->waitIcon != NULL) {
         WaitIcon_Free(info->waitIcon);
         info->waitIcon = NULL;
     }
     if (info->stream != NULL) {
-        func_020223cc(info->stream);
+        PrintStream_Delete(info->stream);
     }
     if (info->msgStr != NULL) {
         GFL_StrBufFree(info->msgStr);
@@ -361,7 +364,7 @@ static void MusShotInfo_ExitMessage(MusShotInfo *info) {
 
 static void MusShotInfo_PrintMessage(MusShotInfo *info, u32 msgId) {
     if (info->stream != NULL) {
-        func_020223cc(info->stream);
+        PrintStream_Delete(info->stream);
         info->stream = NULL;
     }
     if (info->msgStr != NULL) {
@@ -370,8 +373,8 @@ static void MusShotInfo_PrintMessage(MusShotInfo *info, u32 msgId) {
     }
     GFL_BitmapFill(BmpWin_GetBitmap(info->msgWin), 15);
     info->msgStr = GFL_MsgDataLoadStrbufNew(info->msgData, msgId);
-    info->stream = func_02022268(info->msgWin, 0, 0, info->msgStr, info->font, func_02017bcc(), info->tcbManager, 2,
-                                 info->heapId, 0);
+    info->stream = PrintStream_Create(info->msgWin, 0, 0, info->msgStr, info->font, TextSpeed_GetCurrentWait(),
+                                      info->tcbManager, 2, info->heapId, 0);
     BmpWin_DrawFrame(info->msgWin, TRUE, 1, 11);
 }
 
@@ -382,7 +385,7 @@ static void MusShotInfo_PrintMessageNow(MusShotInfo *info, u32 msgId) {
     }
     GFL_BitmapFill(BmpWin_GetBitmap(info->msgWin), 15);
     info->msgStr = GFL_MsgDataLoadStrbufNew(info->msgData, msgId);
-    func_02021c54(info->printQueue, BmpWin_GetBitmap(info->msgWin), 0, 0, info->msgStr, info->font);
+    PrintQueue_Print(info->printQueue, BmpWin_GetBitmap(info->msgWin), 0, 0, info->msgStr, info->font);
     info->printing = TRUE;
     BmpWin_DrawFrame(info->msgWin, TRUE, 1, 11);
 }

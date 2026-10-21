@@ -80,27 +80,27 @@ typedef struct {
 } EventWildBattleCallWork;
 
 static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state, void *work);
-static void func_ov012_02168edc(u16 trainerId, u32 kind);
-static void func_ov012_02168efc(BtlSetup *setup, u32 kind);
-static void func_ov012_02168f38(EventBattleCallWork *work);
-static void func_ov012_0216907c(EventBattleCallWork *work);
+static void EventBattleCall_BroadcastTrainerBattle(u16 trainerId, u32 kind);
+static void EventBattleCall_BroadcastWildBattle(BtlSetup *setup, u32 kind);
+static void EventBattleCall_BroadcastBattleResult(EventBattleCallWork *work);
+static void EventBattleCall_RecordEnemyFled(EventBattleCallWork *work);
 static BOOL EventBattleCall_IsResultDefeat(EventBattleCallWork *work);
 static void EventBattleCall_SyncGameDataOnReturn(EventBattleCallWork *work, GameData *gameData);
 static void EventBattleCall_Setup(EventBattleCallWork *work, GameSystem *gsys, BtlSetup *setup);
 static void EventBattleCall_ReleaseBtlSetup(EventBattleCallWork *work);
-static void *func_ov012_02169154(u32 *seed, void *work);
-static void *func_ov012_02169170(u32 *seed, void *work);
-static void *func_ov012_02169180(u32 *seed, void *work);
-static void *func_ov012_02169198(u32 *seed, void *work);
+static void *EventBattleCall_DSProtTamper1(u32 *seed, void *work);
+static void *EventBattleCall_DSProtNop1(u32 *seed, void *work);
+static void *EventBattleCall_DSProtTamper3(u32 *seed, void *work);
+static void *EventBattleCall_DSProtNop3(u32 *seed, void *work);
 
 // The result of a wild battle for each battle result
 static const u8 WILD_BATTLE_RESULT[7] = { 0xff, 2, 0xff, 1, 1, 0, 0 };
 
 // The beacons a trainer battle sends, for its kind of trainer and whether it starts or ends
 static void (*const data_ov012_0216dd24[3][2])(u16 trainerId) = {
-    { func_ov012_0215fa90, func_ov012_0215faf0 },
-    { func_ov012_0215fb50, func_ov012_0215fbb0 },
-    { func_ov012_0215fc10, func_ov012_0215fc70 },
+    { GameBeacon_BroadcastTrainerBattleStart, GameBeacon_BroadcastTrainerBattleWin },
+    { GameBeacon_BroadcastLeaderBattleStart, GameBeacon_BroadcastLeaderBattleWin },
+    { GameBeacon_BroadcastSpecialTrainerBattleStart, GameBeacon_BroadcastSpecialTrainerBattleWin },
 };
 
 // Whether each battle result is not a defeat, for each battle type
@@ -201,7 +201,7 @@ GameEvent *EventWildBattleCall_CreateCore(GameSystem *gsys, Field *field, BtlSet
     if (a4 == 1) {
         BtlSetup_SetFlag(setup, 1 << 14);
     }
-    func_ov012_02168efc(setup, 0);
+    EventBattleCall_BroadcastWildBattle(setup, 0);
     RecordAddOne(GameData_GetRecords(GSYS_GetGameData(gsys)), 5);
     func_ov036_021a2364(Field_GetEncountSystem(field));
     return event;
@@ -227,7 +227,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
     setup = BtlSetup_Create(4);
     BtlSetup_SetTrainerLocal(encountSystem, setup, a2, a3, trainerId, a5, 4);
     adjustPkmLvForChallengeKeys(setup, gameData, Field_GetPlayerStateZoneID(field));
-    func_ov012_02168edc(trainerId, 0);
+    EventBattleCall_BroadcastTrainerBattle(trainerId, 0);
     RecordAddOne(records, 6);
     RecordAddOne(records, 0x56);
     EventBattleCall_Setup(work, gsys, setup);
@@ -242,11 +242,11 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
         func_ov036_021b67d8(Field_GetFesGimmick(field), party);
     }
     if (flags & 2) {
-        if (func_02018f60(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {
-            u8 level = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+        if (AreaData_IsInfinityDungeon(ZoneData_GetAreaID(Field_GetPlayerStateZoneID(field)))) {
+            u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
 
             setup->fieldSituation.env.terrain =
-                func_ov127_021f0dd8(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
+                InfinityDungeon_GetVersion(InfinityDungeonGimmick_GetDungeon(field)) == 0x17 ? 0x12 : 0x13;
             setup->fieldSituation.env.bgType = level;
             setup->unkDD_5 = TRUE;
             setup->unkDE_0 = TRUE;
@@ -257,7 +257,7 @@ GameEvent *EventTrainerBattleCall_Create(GameSystem *gsys, Field *field, u32 a2,
     return event;
 }
 
-GameEvent *func_ov012_0216881c(GameSystem *gsys, Field *field, BtlSetup *setup) {
+GameEvent *EventBSubwayBattleCall_Create(GameSystem *gsys, Field *field, BtlSetup *setup) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventBattleCall_Callback, sizeof(EventBattleCallWork));
     EventBattleCallWork *work = GameEvent_GetData(event);
 
@@ -284,7 +284,7 @@ GameEvent *CreateTrialHouseBattleEvent(GameSystem *gsys, Field *field, BtlSetup 
     return event;
 }
 
-GameEvent *func_ov012_021688ac(GameSystem *gsys, Field *field, BtlSetup *setup) {
+GameEvent *EventInfinityDungeonBattleCall_Create(GameSystem *gsys, Field *field, BtlSetup *setup) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventBattleCall_Callback, sizeof(EventBattleCallWork));
     EventBattleCallWork *work;
 
@@ -302,7 +302,7 @@ GameEvent *func_ov012_021688ac(GameSystem *gsys, Field *field, BtlSetup *setup) 
     return event;
 }
 
-GameEvent *func_ov012_02168924(GameSystem *gsys, Field *field, BtlSetup *setup) {
+GameEvent *EventWbtBattleCall_Create(GameSystem *gsys, Field *field, BtlSetup *setup) {
     GameEvent *event = GameEvent_Create(gsys, NULL, EventBattleCall_Callback, sizeof(EventBattleCallWork));
     EventBattleCallWork *work = GameEvent_GetData(event);
 
@@ -422,8 +422,8 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         CommPlayerSupport_EndBattle(GameData_GetCommPlayerSupport(gameData));
         index = OS_GetVBlankCount() & 1;
         data_ov337_02182440 = index;
-        data_ov337_02182444[index] = func_ov012_02169170;
-        data_ov337_02182444[index ^ 1] = func_ov012_02169154;
+        data_ov337_02182444[index] = EventBattleCall_DSProtNop1;
+        data_ov337_02182444[index ^ 1] = EventBattleCall_DSProtTamper1;
         (*state)++;
         break;
     }
@@ -455,8 +455,8 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         (*state)++;
         index = OS_GetVBlankCount() & 1;
         data_ov337_02182440 = index;
-        data_ov337_02182444[index] = func_ov012_02169198;
-        data_ov337_02182444[index ^ 1] = func_ov012_02169180;
+        data_ov337_02182444[index] = EventBattleCall_DSProtNop3;
+        data_ov337_02182444[index ^ 1] = EventBattleCall_DSProtTamper3;
         break;
     }
     case 7: {
@@ -526,7 +526,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
 }
 
 // The kind of beacon for the trainer: 0 for some classes, 1 for others and 2 for the rest
-static u32 func_ov012_02168e98(u16 trainerId) {
+static u32 EventBattleCall_GetTrainerBeaconKind(u16 trainerId) {
     u16 trainerClass = TrainerData_GetParam(trainerId, 1);
     u32 group = GetTrainerClassBGMGroupId(trainerClass);
     u32 i;
@@ -545,27 +545,27 @@ static u32 func_ov012_02168e98(u16 trainerId) {
     return 2;
 }
 
-static void func_ov012_02168edc(u16 trainerId, u32 kind) {
-    data_ov012_0216dd24[func_ov012_02168e98(trainerId)][kind](trainerId);
+static void EventBattleCall_BroadcastTrainerBattle(u16 trainerId, u32 kind) {
+    data_ov012_0216dd24[EventBattleCall_GetTrainerBeaconKind(trainerId)][kind](trainerId);
 }
 
-static void func_ov012_02168efc(BtlSetup *setup, u32 kind) {
+static void EventBattleCall_BroadcastWildBattle(BtlSetup *setup, u32 kind) {
     u16 species = PokeParty_GetParam(PokeParty_GetPkm(BtlSetup_GetParty(setup, 1), 0), PKM_PARAM_SPECIES, NULL);
 
     switch (kind) {
     case 0:
-        func_ov012_0215f958(species);
+        GameBeacon_BroadcastWildBattleStart(species);
         break;
     case 1:
-        func_ov012_0215f994(species);
+        GameBeacon_BroadcastWildBattleWin(species);
         break;
     case 2:
-        func_ov012_0215fe6c(species);
+        GameBeacon_BroadcastBattleEscape(species);
         break;
     }
 }
 
-static void func_ov012_02168f38(EventBattleCallWork *work) {
+static void EventBattleCall_BroadcastBattleResult(EventBattleCallWork *work) {
     BtlSetup *setup = work->setup;
     PokeParty *party = GameData_GetParty(work->gameData);
     PartyPkm *pkm = PokeParty_GetPkm(party, isEggInParty(party));
@@ -580,41 +580,41 @@ static void func_ov012_02168f38(EventBattleCallWork *work) {
         hp = PokeParty_GetParam(pkm, PKM_PARAM_HP, NULL);
         maxHp = PokeParty_GetParam(pkm, PKM_PARAM_MAX_HP, NULL);
         if (hp == 0) {
-            func_ov012_0215ff84(species, name);
+            GameBeacon_BroadcastFainted(species, name);
         } else if (hp * 2 <= maxHp) {
-            func_ov012_0215febc(species, name);
+            GameBeacon_BroadcastLowHP(species, name);
         }
         for (i = 0; i < 4; i++) {
             if (PokeParty_GetParam(pkm, PKM_PARAM_MOVE1 + i, NULL) != 0 &&
                 PokeParty_GetParam(pkm, PKM_PARAM_MOVE1_PP + i, NULL) == 0) {
-                func_ov012_0215ff20(species, name);
+                GameBeacon_BroadcastLowPP(species, name);
                 break;
             }
         }
         if (PokeParty_GetParam(pkm, PKM_PARAM_STATUS, NULL)) {
-            func_ov012_0215ffe8(name);
+            GameBeacon_BroadcastStatusCondition(name);
         }
         GFL_StrBufFree(name);
     }
     switch (setup->battleType) {
     case 0:
         if (setup->unkA8 == 3) {
-            func_ov012_02168efc(setup, 2);
+            EventBattleCall_BroadcastWildBattle(setup, 2);
         } else if (setup->unkA8 == 4) {
-            func_ov012_02168efc(setup, 3);
+            EventBattleCall_BroadcastWildBattle(setup, 3);
         } else if (setup->unkA8 == 1) {
-            func_ov012_02168efc(setup, 1);
+            EventBattleCall_BroadcastWildBattle(setup, 1);
         }
         break;
     case 1:
         if (setup->unkA8 == 1 && !(work->flags & 4)) {
-            func_ov012_02168edc(setup->trainers[1]->trainerId, 1);
+            EventBattleCall_BroadcastTrainerBattle(setup->trainers[1]->trainerId, 1);
         }
         break;
     }
 }
 
-static void func_ov012_0216907c(EventBattleCallWork *work) {
+static void EventBattleCall_RecordEnemyFled(EventBattleCallWork *work) {
     BtlSetup *setup = work->setup;
     GameRecords *records = GameData_GetRecords(GSYS_GetGameData(work->gsys));
 
@@ -648,8 +648,8 @@ static BOOL EventBattleCall_IsResultDefeat(EventBattleCallWork *work) {
 
 static void EventBattleCall_SyncGameDataOnReturn(EventBattleCallWork *work, GameData *gameData) {
     GameData_SetLastBtlResult(gameData, work->setup->unkA8);
-    func_ov012_02168f38(work);
-    func_ov012_0216907c(work);
+    EventBattleCall_BroadcastBattleResult(work);
+    EventBattleCall_RecordEnemyFled(work);
     ResetWeather(work->gsys, PlayerState_GetZoneID(GameData_GetPlayerState(gameData)));
 }
 
@@ -670,26 +670,26 @@ static void EventBattleCall_ReleaseBtlSetup(EventBattleCallWork *work) {
 }
 
 // The fallbacks of the anti-piracy checks
-static void *func_ov012_02169154(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtTamper1(u32 *seed, void *work) {
     GFL_RandomMT();
     GFL_RandomMT();
     *seed += 0x3d1;
     return seed;
 }
 
-static void *func_ov012_02169170(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtNop1(u32 *seed, void *work) {
     GFL_RandomMT();
     GFL_RandomMT();
     return work;
 }
 
-static void *func_ov012_02169180(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtTamper3(u32 *seed, void *work) {
     GFL_RandomMT();
     GFL_RandomMT();
     *seed += 0x9d;
     return seed;
 }
 
-static void *func_ov012_02169198(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtNop3(u32 *seed, void *work) {
     return work;
 }

@@ -356,7 +356,7 @@ enum {
     ZUKAN_DETAIL_TOUCHBAR_DISAPPEARING,
 };
 
-// showFormTab is a setting of the Pokédex's save (func_0200d1dc), and mode the screen's ZukanDetailParam mode, which
+// showFormTab is a setting of the Pokédex's save (PokeDex_IsGiven), and mode the screen's ZukanDetailParam mode, which
 // hides the map's tab and the check box
 ZukanDetailTouchbar *ZukanDetailTouchbar_Create(HeapID heapId, BOOL showFormTab, u32 mode);
 void ZukanDetailTouchbar_Free(ZukanDetailTouchbar *touchbar);

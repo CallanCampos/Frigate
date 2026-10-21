@@ -30,7 +30,7 @@ static void BtlPosPoke_SetupPos(BtlPosPoke *posPoke, BtlMainModule *mainModule, 
     u8 index;
     BattleMon *mon;
 
-    func_ov167_0219c694(mainModule, pos, &clientId, &index);
+    GetPosClientAndIndex(mainModule, pos, &clientId, &index);
     mon = GetClientMonData(pokeCon, clientId, index);
     if (mon != NULL && !IsFainted(mon)) {
         u8 monId = GetMonID(mon);
@@ -76,8 +76,8 @@ void BtlPosPoke_Rotate(BtlPosPoke *posPoke, u8 slot, u8 clientId, BattleMon *mon
                 positions[count++] = i;
             }
         }
-        from = func_ov167_0219d38c(slot);
-        to = func_ov167_0219d3a4(slot);
+        from = GetRotationInSlot(slot);
+        to = GetRotationOutSlot(slot);
         first = posPoke->entries[positions[0]];
         posPoke->entries[positions[from]] = posPoke->entries[positions[to]];
         posPoke->entries[positions[to]] = first;
@@ -106,8 +106,8 @@ static void BtlPosPoke_RecordOpponents(BtlPosPoke *posPoke, u8 pos, BtlPokeCon *
             BtlPosPokeEntry *other = &posPoke->entries[i];
 
             if (other->monId != BTL_POSPOKE_NO_MON && monId != other->monId && !IsAllyMonID(other->monId, monId)) {
-                func_ov167_021bc5cc(GetPokeParam(pokeCon, other->monId), monId);
-                func_ov167_021bc5cc(GetPokeParam(pokeCon, monId), other->monId);
+                BattleMon_AddConfrontedMon(GetPokeParam(pokeCon, other->monId), monId);
+                BattleMon_AddConfrontedMon(GetPokeParam(pokeCon, monId), other->monId);
             }
         }
     }
@@ -154,7 +154,7 @@ BOOL BtlPosPoke_IsMonAtActivePos(BtlPosPoke *posPoke, BtlMainModule *mainModule,
     u8 pos = GetBattlePos(posPoke, monId);
 
     if (pos != BTL_POS_NONE) {
-        return func_ov167_0219bebc(mainModule, pos);
+        return IsActivePos(mainModule, pos);
     }
     return FALSE;
 }

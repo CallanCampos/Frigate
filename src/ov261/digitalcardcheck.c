@@ -108,8 +108,8 @@ static void DigitalCardCheck_TaskStart(WifiBattleMatchTask *task, u32 *seq, void
     DigitalCardCheck *check = work;
     void *entry = TournamentBlock_GetEntry(getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData)),
                                            check->param.mode);
-    u32 field2 = TournamentEntry_GetField(entry, 2);
-    u32 cardType = TournamentEntry_GetField(entry, 10);
+    u32 field2 = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_CUP_ID);
+    u32 cardType = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_UNK15B);
 
     if (field2 != 0 && cardType == CARD_TYPE_1) {
         WifiBattleMatchTask_SetFunc(task, DigitalCardCheck_TaskCardType1);
@@ -226,15 +226,15 @@ static void DigitalCardCheck_TaskCardType1(WifiBattleMatchTask *task, u32 *seq, 
         entry = TournamentBlock_GetEntry(getTournamentBlockAddress(save), check->param.mode);
         box = getBattleBox(save);
         BattleBoxSave_ClearFlags(box, check->param.mode == 0 ? 1 : 2);
-        TournamentEntry_SetField(entry, 10, 4);
+        TournamentEntry_SetField(entry, TOURNAMENT_FIELD_UNK15B, 4);
         *seq = 14;
         break;
     case 14:
-        func_0201782c(check->param.gameData);
+        GameData_StartSave(check->param.gameData);
         *seq = 15;
         break;
     case 15:
-        result = func_02017850(check->param.gameData);
+        result = GameData_UpdateSave(check->param.gameData);
         if (result == 2) {
             *seq = 16;
         } else if (result == 3) {
@@ -362,15 +362,15 @@ static void DigitalCardCheck_TaskCardType2(WifiBattleMatchTask *task, u32 *seq, 
         entry = TournamentBlock_GetEntry(getTournamentBlockAddress(save), check->param.mode);
         box = getBattleBox(save);
         BattleBoxSave_ClearFlags(box, check->param.mode == 0 ? 1 : 2);
-        TournamentEntry_SetField(entry, 10, 4);
+        TournamentEntry_SetField(entry, TOURNAMENT_FIELD_UNK15B, 4);
         *seq = 14;
         break;
     case 14:
-        func_0201782c(check->param.gameData);
+        GameData_StartSave(check->param.gameData);
         *seq = 15;
         break;
     case 15:
-        result = func_02017850(check->param.gameData);
+        result = GameData_UpdateSave(check->param.gameData);
         if (result == 2) {
             *seq = 16;
         } else if (result == 3) {
@@ -609,7 +609,7 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
     tournament = getTournamentBlockAddress(GameData_GetSaveControl(check->param.gameData));
     entry = TournamentBlock_GetEntry(tournament, check->param.mode);
     cardData = TournamentBlock_GetTeam(tournament, check->param.mode);
-    regulation = func_0200b530(entry);
+    regulation = TournamentEntry_GetRegulation(entry);
     record = getRecordBlkAddress(save);
     playerInfo = GetGameDataPlayerInfo(check->param.gameData);
     link = WifiBattleMatchGraphic_GetClActUnit(check->param.net);
@@ -619,17 +619,19 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         u32 first;
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchWifiCardInfo));
-        MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
-        results = func_0200f2d0(record);
+        MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
+        results = RecordSave_GetRndMatch(record);
         info.unkA0 = RndMatchData_GetParam(results, 10, 0);
         first = RndMatchData_GetParam(results, 10, 1);
         info.unkA4 = first + RndMatchData_GetParam(results, 10, 2);
-        info.look = func_02008bf4(playerInfo);
-        info.startDate = DigitalCardCheck_PackBytes(
-            TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-        info.endDate = DigitalCardCheck_PackBytes(
-            TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
-        info.variant = TournamentEntry_GetField(entry, 11);
+        info.look = PlayerInfo_GetUnionView(playerInfo);
+        info.startDate = DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),
+                                                    TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH),
+                                                    TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY));
+        info.endDate = DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_YEAR),
+                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH),
+                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY));
+        info.variant = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
         check->card = WifiBattleMatchWifiCard_Create(&info, 0, playerInfo, link, check->param.seq, check->param.font,
                                                      check->param.printQueue, check->msgData, check->wordSet, cardData,
                                                      1, check->heapId);
@@ -638,18 +640,20 @@ static void DigitalCardCheck_CreateCard(DigitalCardCheck *check) {
         void *results;
 
         MI_CpuFill8(&info, 0, sizeof(WifiBattleMatchLiveCardInfo));
-        MI_CpuCopy8(func_0200b794(entry), &info, 0x92);
-        results = func_0200f2d8(record);
-        info.unkA0 = func_0200f1d8(results, 1);
-        info.unkA2 = func_0200f1d8(results, 2);
-        info.unkA4 = func_0200f1d8(results, 0);
-        info.unkA6 = Regulation_GetParam(regulation, 0x16);
-        info.look = func_02008bf4(playerInfo);
-        info.startDate = DigitalCardCheck_PackBytes(
-            TournamentEntry_GetField(entry, 4), TournamentEntry_GetField(entry, 5), TournamentEntry_GetField(entry, 6));
-        info.endDate = DigitalCardCheck_PackBytes(
-            TournamentEntry_GetField(entry, 7), TournamentEntry_GetField(entry, 8), TournamentEntry_GetField(entry, 9));
-        info.variant = TournamentEntry_GetField(entry, 11);
+        MI_CpuCopy8(TournamentEntry_GetCardData(entry), &info, 0x92);
+        results = RecordSave_GetLiveMatch(record);
+        info.unkA0 = LiveMatchData_GetCount(results, 1);
+        info.unkA2 = LiveMatchData_GetCount(results, 2);
+        info.unkA4 = LiveMatchData_GetCount(results, 0);
+        info.unkA6 = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_BATTLES);
+        info.look = PlayerInfo_GetUnionView(playerInfo);
+        info.startDate = DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_YEAR),
+                                                    TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_MONTH),
+                                                    TournamentEntry_GetField(entry, TOURNAMENT_FIELD_START_DAY));
+        info.endDate = DigitalCardCheck_PackBytes(TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_YEAR),
+                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_MONTH),
+                                                  TournamentEntry_GetField(entry, TOURNAMENT_FIELD_END_DAY));
+        info.variant = TournamentEntry_GetField(entry, TOURNAMENT_FIELD_VARIANT);
         check->card = WifiBattleMatchLiveCard_Create(&info, playerInfo, link, check->param.seq, check->param.font,
                                                      check->param.printQueue, check->msgData, check->wordSet, cardData,
                                                      1, check->heapId);

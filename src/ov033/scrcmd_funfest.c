@@ -43,7 +43,7 @@ BOOL s0276_FunfestMissionBroadcast(VM *vm, FieldScriptEnv *env) {
     FieldScriptEnv_GetGameSystem(env);
     type = ScriptReadAny(vm, env);
     value = ScriptReadAny(vm, env);
-    func_ov012_0216063c(type, value);
+    GameBeacon_BroadcastMission(type, value);
     return TRUE;
 }
 
@@ -90,7 +90,7 @@ BOOL s027B_FunfestGetItemExchangeInfo(VM *vm, FieldScriptEnv *env) {
         *out0 = *out1 = 0x11;
         return TRUE;
     }
-    func_ov072_021e8d08(gimmick, ScriptWork_GetParentActor(scriptWork), arg0, arg1, out0, out1);
+    FesMissionGimmick_GetItemExchangeInfo(gimmick, ScriptWork_GetParentActor(scriptWork), arg0, arg1, out0, out1);
     return TRUE;
 }
 
@@ -106,7 +106,7 @@ BOOL s027C_FunfestGetItemSaleInfo(VM *vm, FieldScriptEnv *env) {
         *out1 = 0x270f;
         return TRUE;
     }
-    func_ov072_021e8d70(gimmick, ScriptWork_GetParentActor(scriptWork), out0, out1);
+    FesMissionGimmick_GetItemSaleInfo(gimmick, ScriptWork_GetParentActor(scriptWork), out0, out1);
     return TRUE;
 }
 
@@ -129,7 +129,7 @@ BOOL s027D_FunfestGetPokemonQuizInfo(VM *vm, FieldScriptEnv *env) {
         *out1 = *out2 = 0;
         return TRUE;
     }
-    func_ov072_021e8ddc(gimmick, out0, out1, out2);
+    FesMissionGimmick_MakePokemonQuiz(gimmick, out0, out1, out2);
     return TRUE;
 }
 
@@ -149,7 +149,7 @@ BOOL s027E_FunfestGetPokemonQuizSpecies(VM *vm, FieldScriptEnv *env) {
         *result = 0x1f8 + index;
         return TRUE;
     }
-    *result = func_ov072_021e8ee8(gimmick, (u8)index);
+    *result = FesMissionGimmick_GetQuizSpecies(gimmick, (u8)index);
     return TRUE;
 }
 
@@ -169,7 +169,7 @@ BOOL s027F_FunfestGetPokemonQuizBogusSpecies(VM *vm, FieldScriptEnv *env) {
         *result = 0x1f8 + index;
         return TRUE;
     }
-    *result = func_ov072_021e8ef4(gimmick, (u8)index);
+    *result = FesMissionGimmick_GetQuizChoice(gimmick, (u8)index);
     return TRUE;
 }
 

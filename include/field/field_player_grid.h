@@ -18,7 +18,7 @@ void FieldPlayerGrid_Free(FieldPlayerGrid *grid);
 // One frame of the player's movement. Bit 0 of the flags allows running
 void FieldPlayerGrid_UpdateMovement(FieldPlayerGrid *grid, u32 pressedKeys, u32 heldKeys, u32 flags);
 u32 FieldPlayerGrid_GetMoveDirContType(FieldPlayerGrid *grid, u16 dir);
-BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid);
+BOOL FieldPlayerGrid_IsAcmdFinished(FieldPlayerGrid *grid, u16 dir);
 // Ends the animation of walking into a wall
 void FieldPlayerGrid_ForceBrake(FieldPlayerGrid *grid);
 // The same, for a turn too. FALSE while the player is moving

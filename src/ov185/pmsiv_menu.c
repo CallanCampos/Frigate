@@ -140,10 +140,10 @@ void PMSIVMenu_Delete(PMSIVMenu *wk) {
     int i;
 
     PMSIVMenu_Clear(wk);
-    func_0204c108(wk->returnButton);
-    func_0204bcd0(wk->returnPalette);
-    func_0204b98c(wk->returnChars);
-    func_0204be64(wk->returnCellAnims);
+    ClActor_Delete(wk->returnButton);
+    ClActSys_FreePltt(wk->returnPalette);
+    ClActSys_FreeChars(wk->returnChars);
+    ClActSys_FreeCellAnims(wk->returnCellAnims);
     for (i = 0; i < 3; i++) {
         AppTaskMenuRes_Free(wk->taskMenuRes[i]);
     }
@@ -169,7 +169,7 @@ void PMSIVMenu_Main(PMSIVMenu *wk) {
         wk->returnSeq = RETURN_SEQ_WAIT;
         // fallthrough
     case RETURN_SEQ_WAIT:
-        if (!func_0204c560(wk->returnButton)) {
+        if (!ClActor_IsAnimActive(wk->returnButton)) {
             wk->returnSeq = RETURN_SEQ_END;
         }
         break;
@@ -194,13 +194,13 @@ static void PMSIVMenu_Clear(PMSIVMenu *wk) {
         }
     }
     for (i = 0; i < PMSIV_MENU_TYPE_BUTTON_COUNT; i++) {
-        func_0204c124(wk->typeButtons[i], FALSE);
+        ClActor_SetVisible(wk->typeButtons[i], FALSE);
     }
     for (i = 0; i < 2; i++) {
-        func_0204c124(wk->arrows[i], FALSE);
+        ClActor_SetVisible(wk->arrows[i], FALSE);
     }
     GFL_BGSysLoadScr(0);
-    func_0204c124(wk->returnButton, FALSE);
+    ClActor_SetVisible(wk->returnButton, FALSE);
 }
 
 void PMSIVMenu_SetupEditButtons(PMSIVMenu *wk) {
@@ -220,15 +220,15 @@ void PMSIVMenu_SetupEditButtons(PMSIVMenu *wk) {
     PMSIVMenu_UpdateEditButtons(wk);
     GFL_BGSysLoadScr(0);
     if (!PMSInput_HasStartSentence(wk->mwk) && PMSInput_GetInputMode(wk->mwk) == PMSI_MODE_SENTENCE) {
-        func_0204c124(wk->typeButtons[0], TRUE);
-        func_0204c124(wk->typeButtons[1], TRUE);
-        func_0204c124(wk->typeButtons[2], TRUE);
-        func_0204c124(wk->typeButtons[3], TRUE);
-        func_0204c124(wk->typeButtons[4], TRUE);
-        func_0204c124(wk->typeButtons[5], TRUE);
-        func_0204c124(wk->typeButtons[6], TRUE);
+        ClActor_SetVisible(wk->typeButtons[0], TRUE);
+        ClActor_SetVisible(wk->typeButtons[1], TRUE);
+        ClActor_SetVisible(wk->typeButtons[2], TRUE);
+        ClActor_SetVisible(wk->typeButtons[3], TRUE);
+        ClActor_SetVisible(wk->typeButtons[4], TRUE);
+        ClActor_SetVisible(wk->typeButtons[5], TRUE);
+        ClActor_SetVisible(wk->typeButtons[6], TRUE);
         for (i = 0; i < 2; i++) {
-            func_0204c124(wk->arrows[i], TRUE);
+            ClActor_SetVisible(wk->arrows[i], TRUE);
         }
     }
     PMSIVMenu_UpdateSentenceType(wk);
@@ -236,7 +236,7 @@ void PMSIVMenu_SetupEditButtons(PMSIVMenu *wk) {
 
 void PMSIVMenu_SetupCategoryButtons(PMSIVMenu *wk) {
     PMSIVMenu_Clear(wk);
-    func_0204c124(wk->typeButtons[PMSIV_MENU_TYPE_BUTTON_BACK], TRUE);
+    ClActor_SetVisible(wk->typeButtons[PMSIV_MENU_TYPE_BUTTON_BACK], TRUE);
     if (PMSInput_GetCategoryMode(wk->mwk) == 0) {
         PMSIVMenu_ShowReturnButton(wk);
     } else {
@@ -246,8 +246,8 @@ void PMSIVMenu_SetupCategoryButtons(PMSIVMenu *wk) {
 
 void PMSIVMenu_SetupWordWinButtons(PMSIVMenu *wk) {
     PMSIVMenu_Clear(wk);
-    func_0204c124(wk->returnButton, TRUE);
-    func_0204c488(wk->returnButton, 1);
+    ClActor_SetVisible(wk->returnButton, TRUE);
+    ClActor_SetSequence(wk->returnButton, 1);
     wk->returnSeq = RETURN_SEQ_NONE;
 }
 
@@ -259,7 +259,7 @@ void PMSIVMenu_UpdateSentenceType(PMSIVMenu *wk) {
     u16 anim;
 
     for (i = 1; i <= PMSIV_MENU_SENTENCE_TYPE_COUNT; i++) {
-        anim = func_0204c4a0(wk->typeButtons[i]);
+        anim = ClActor_GetSequence(wk->typeButtons[i]);
         if (anim == sPMSIVMenuTypeButtonAnims[i][1]) {
             prev = i;
             break;
@@ -330,7 +330,7 @@ static void PMSIVMenu_StartBackButton(PMSIVMenu *wk) {
 }
 
 static BOOL PMSIVMenu_WaitBackButton(PMSIVMenu *wk) {
-    if (!func_0204c560(wk->typeButtons[PMSIV_MENU_TYPE_BUTTON_BACK])) {
+    if (!ClActor_IsAnimActive(wk->typeButtons[PMSIV_MENU_TYPE_BUTTON_BACK])) {
         return TRUE;
     }
     return FALSE;
@@ -450,8 +450,8 @@ BOOL PMSIVMenu_IsFlashFinished(PMSIVMenu *wk, u8 pos) {
 }
 
 BOOL PMSIVMenu_StartReturn(PMSIVMenu *wk) {
-    if (func_0204c138(wk->returnButton) && wk->returnSeq == RETURN_SEQ_NONE) {
-        func_0204c488(wk->returnButton, 9);
+    if (ClActor_IsVisible(wk->returnButton) && wk->returnSeq == RETURN_SEQ_NONE) {
+        ClActor_SetSequence(wk->returnButton, 9);
         wk->returnSeq = RETURN_SEQ_START;
         return TRUE;
     }
@@ -459,7 +459,7 @@ BOOL PMSIVMenu_StartReturn(PMSIVMenu *wk) {
 }
 
 BOOL PMSIVMenu_WaitReturn(PMSIVMenu *wk) {
-    if (func_0204c138(wk->returnButton) && wk->returnSeq != RETURN_SEQ_END) {
+    if (ClActor_IsVisible(wk->returnButton) && wk->returnSeq != RETURN_SEQ_END) {
         return FALSE;
     }
     return TRUE;
@@ -470,8 +470,8 @@ static void PMSIVMenu_SetupTypeButtons(PMSIVMenu *wk) {
     int i;
 
     PMSIView_GetObjRes(wk->vwk, &wk->typeButtonRes, 0, 0);
-    wk->typeButtonRes.chars = func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
-    wk->typeButtonRes.cellAnims = func_0204bde0(arc, 35, 41, HEAPID_PMS_INPUT);
+    wk->typeButtonRes.chars = ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
+    wk->typeButtonRes.cellAnims = ClActSys_LoadCellAnims(arc, 35, 41, HEAPID_PMS_INPUT);
     GFL_ArcToolFree(arc);
     for (i = 0; i < PMSIV_MENU_TYPE_BUTTON_COUNT; i++) {
         s16 x = i * 24;
@@ -481,7 +481,7 @@ static void PMSIVMenu_SetupTypeButtons(PMSIVMenu *wk) {
         }
         wk->typeButtons[i] = PMSIView_AddActor(wk->vwk, &wk->typeButtonRes, x, 168, 0, NNS_G2D_VRAM_TYPE_2DMAIN);
         PMSIVMenu_SetTypeButtonAnim(wk, i, FALSE);
-        func_0204c124(wk->typeButtons[i], FALSE);
+        ClActor_SetVisible(wk->typeButtons[i], FALSE);
     }
 }
 
@@ -489,14 +489,14 @@ static void PMSIVMenu_FreeTypeButtons(PMSIVMenu *wk) {
     int i;
 
     for (i = 0; i < PMSIV_MENU_TYPE_BUTTON_COUNT; i++) {
-        func_0204c108(wk->typeButtons[i]);
+        ClActor_Delete(wk->typeButtons[i]);
     }
-    func_0204b98c(wk->typeButtonRes.chars);
-    func_0204be64(wk->typeButtonRes.cellAnims);
+    ClActSys_FreeChars(wk->typeButtonRes.chars);
+    ClActSys_FreeCellAnims(wk->typeButtonRes.cellAnims);
 }
 
 static void PMSIVMenu_SetTypeButtonAnim(PMSIVMenu *wk, u32 button, BOOL on) {
-    func_0204c488(wk->typeButtons[button], sPMSIVMenuTypeButtonAnims[button][on]);
+    ClActor_SetSequence(wk->typeButtons[button], sPMSIVMenuTypeButtonAnims[button][on]);
 }
 
 static void PMSIVMenu_SetupArrows(PMSIVMenu *wk) {
@@ -507,8 +507,8 @@ static void PMSIVMenu_SetupArrows(PMSIVMenu *wk) {
 
         wk->arrows[i] = PMSIView_AddActor(wk->vwk, &wk->typeButtonRes, sPMSIVMenuArrows[i].x, arrow->y, 0,
                                           NNS_G2D_VRAM_TYPE_2DMAIN);
-        func_0204c488(wk->arrows[i], arrow->anim);
-        func_0204c124(wk->arrows[i], FALSE);
+        ClActor_SetSequence(wk->arrows[i], arrow->anim);
+        ClActor_SetVisible(wk->arrows[i], FALSE);
     }
 }
 
@@ -516,7 +516,7 @@ static void PMSIVMenu_FreeArrows(PMSIVMenu *wk) {
     u8 i;
 
     for (i = 0; i < 2; i++) {
-        func_0204c108(wk->arrows[i]);
+        ClActor_Delete(wk->arrows[i]);
     }
 }
 
@@ -524,9 +524,12 @@ static void PMSIVMenu_SetupReturnButton(PMSIVMenu *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_PMS_INPUT);
     ClActorSetup setup;
 
-    wk->returnPalette = func_0204bbb8(arc, func_0202d810(), CLACT_VRAM_MAIN, 0x180, 0, 3, HEAPID_PMS_INPUT);
-    wk->returnChars = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
-    wk->returnCellAnims = func_0204bde0(arc, func_0202d818(1), func_0202d81c(1), HEAPID_PMS_INPUT);
+    wk->returnPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN, 0x180, 0,
+                                               3, HEAPID_PMS_INPUT);
+    wk->returnChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_PMS_INPUT);
+    wk->returnCellAnims = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(1),
+                                                 AppMenuCommon_GetTouchBarAnimFile(1), HEAPID_PMS_INPUT);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 232;
@@ -534,16 +537,16 @@ static void PMSIVMenu_SetupReturnButton(PMSIVMenu *wk) {
     setup.sequence = 1;
     setup.priority = 0;
     setup.bgPriority = 3;
-    wk->returnButton = func_0204c040(PMSIView_GetActUnit(wk->vwk), wk->returnChars, wk->returnPalette,
-                                     wk->returnCellAnims, &setup, CLACT_SURFACE_MAIN, HEAPID_PMS_INPUT);
-    func_0204c520(wk->returnButton, TRUE);
-    func_0204c124(wk->returnButton, FALSE);
+    wk->returnButton = ClActor_Create(PMSIView_GetActUnit(wk->vwk), wk->returnChars, wk->returnPalette,
+                                      wk->returnCellAnims, &setup, CLACT_SURFACE_MAIN, HEAPID_PMS_INPUT);
+    ClActor_SetAutoAnim(wk->returnButton, TRUE);
+    ClActor_SetVisible(wk->returnButton, FALSE);
     wk->returnSeq = RETURN_SEQ_NONE;
 }
 
 static void PMSIVMenu_ShowReturnButton(PMSIVMenu *wk) {
-    func_0204c124(wk->returnButton, TRUE);
-    func_0204c488(wk->returnButton, 1);
+    ClActor_SetVisible(wk->returnButton, TRUE);
+    ClActor_SetSequence(wk->returnButton, 1);
     wk->returnSeq = RETURN_SEQ_NONE;
 }
 
@@ -606,11 +609,11 @@ static void PMSIVMenu_UpdateColors(PMSIVMenu *wk) {
 }
 
 static void PMSIVMenu_StartTypeButtonPulse(PMSIVMenu *wk, u32 button) {
-    func_0204c378(wk->typeButtons[button], 2, 1);
+    ClActor_SetPalette(wk->typeButtons[button], 2, 1);
     MI_CpuCopy8(wk->pulseFrom, wk->pulse, sizeof(wk->pulse));
     wk->pulseAngle = 0;
 }
 
 static void PMSIVMenu_EndTypeButtonPulse(PMSIVMenu *wk, u32 button) {
-    func_0204c378(wk->typeButtons[button], 6, 1);
+    ClActor_SetPalette(wk->typeButtons[button], 6, 1);
 }

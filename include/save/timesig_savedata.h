@@ -18,9 +18,11 @@ typedef struct {
 // obtained, saved badge polish and the time it was last saved at
 struct TimeSigSave {
     u32 signature[0x180];
-    u16 unk600;
-    u8 unk602;
-    u8 unk603;
+    // The personality the card shows, 0 to 24 (the natures' names), whether the player changed the union view on
+    // the card, and whether the signature blinks between its two frames
+    u16 personality;
+    u8 unionViewChanged;
+    u8 signBlinks;
     TimeSigBadgeDate badgeDates[TIMESIG_BADGE_COUNT];
     union {
         s64 seconds;
@@ -34,23 +36,23 @@ struct TimeSigSave {
     u8 unk648[0x10];
 };
 
-u32 func_02009184(void);
-void func_0200918c(TimeSigSave *timeSig);
+u32 TimeSigSave_GetSize(void);
+void TimeSigSave_Init(TimeSigSave *timeSig);
 void *getTimeSigBlkAddress(SaveControl *save);
 // The block's first 0x600 bytes, which the trainer card copies
-void *func_020091a8(void *timeSig);
-BOOL func_020091ac(TimeSigSave *timeSig);
-u8 func_020091d0(TimeSigSave *timeSig);
-void func_020091dc(TimeSigSave *timeSig);
-u16 func_020091e8(TimeSigSave *timeSig);
-void func_020091f0(TimeSigSave *timeSig, u32 value);
-void func_020091f8(TimeSigSave *timeSig, u8 value);
-BOOL func_02009204(TimeSigSave *timeSig);
+void *TimeSigSave_GetSignature(void *timeSig);
+BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig);
+u8 TimeSigSave_IsUnionViewChanged(TimeSigSave *timeSig);
+void TimeSigSave_SetUnionViewChanged(TimeSigSave *timeSig);
+u16 TimeSigSave_GetPersonality(TimeSigSave *timeSig);
+void TimeSigSave_SetPersonality(TimeSigSave *timeSig, u32 value);
+void TimeSigSave_SetSignBlinks(TimeSigSave *timeSig, u8 value);
+BOOL TimeSigSave_GetSignBlinks(TimeSigSave *timeSig);
 void saveSecondsTime(TimeSigSave *timeSig, u32 low, u32 high);
 s64 loadSecondsTime(TimeSigSave *timeSig);
-TimeSigBadgeDate func_02009230(TimeSigSave *timeSig, u32 badgeId);
+TimeSigBadgeDate TimeSigSave_GetBadgeDate(TimeSigSave *timeSig, u32 badgeId);
 void setBadgeGetSecondsTime(TimeSigSave *timeSig, u32 badgeId, u32 year, u32 month, u32 day);
-u16 func_020092a8(TimeSigSave *timeSig, u32 badgeId);
-void func_020092b8(TimeSigSave *timeSig, u32 badgeId, u32 polish);
+u16 TimeSigSave_GetBadgePolish(TimeSigSave *timeSig, u32 badgeId);
+void TimeSigSave_SetBadgePolish(TimeSigSave *timeSig, u32 badgeId, u32 polish);
 
 #endif // POKEBW2_SAVE_TIMESIG_SAVEDATA_H

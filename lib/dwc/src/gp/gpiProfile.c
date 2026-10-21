@@ -85,8 +85,8 @@ BOOL gpiInitProfiles(GPConnection *connection) {
     iconnection->profileList.numBuddies = 0;
     iconnection->profileList.numBlocked = 0;
     iconnection->profileList.num = 0;
-    iconnection->profileList.profileTable = func_ov011_02171818(sizeof(GPIProfile), 32, gpiProfilesTableHash,
-                                                                gpiProfilesTableCompare, gpiProfilesTableFree);
+    iconnection->profileList.profileTable =
+        TableNew(sizeof(GPIProfile), 32, gpiProfilesTableHash, gpiProfilesTableCompare, gpiProfilesTableFree);
     return iconnection->profileList.profileTable != NULL;
 }
 
@@ -152,7 +152,7 @@ GPIProfile *gpiProfileListAdd(GPConnection *connection, int id) {
     newProfile.peerSig = NULL;
     newProfile.requestCount = 0;
     newProfile.deleted = FALSE;
-    func_ov011_021718dc(profileList->profileTable, &newProfile);
+    TableEnter(profileList->profileTable, &newProfile);
     profileList->num++;
     if (gpiGetProfile(connection, id, &profile)) {
         result = profile;
@@ -166,7 +166,7 @@ BOOL gpiGetProfile(GPConnection *connection, int profileid, GPIProfile **profile
     GPIProfile *pProfile;
 
     profileTemp.profileId = profileid;
-    pProfile = func_ov011_02171964(iconnection->profileList.profileTable, &profileTemp);
+    pProfile = TableLookup(iconnection->profileList.profileTable, &profileTemp);
     if (profile != NULL) {
         *profile = pProfile;
     }
@@ -214,14 +214,14 @@ void gpiRemoveProfileByID(GPConnection *connection, int profileid) {
     GPIProfile *profile;
 
     if (gpiGetProfile(connection, profileid, &profile)) {
-        func_ov011_02171920(iconnection->profileList.profileTable, profile);
+        TableRemove(iconnection->profileList.profileTable, profile);
     }
 }
 
 void gpiRemoveProfile(GPConnection *connection, GPIProfile *profile) {
     GPIConnection *iconnection = *connection;
 
-    func_ov011_02171920(iconnection->profileList.profileTable, profile);
+    TableRemove(iconnection->profileList.profileTable, profile);
 }
 
 static BOOL gpiCheckProfileForUser(GPConnection *connection, GPIProfile *profile, void *data) {
@@ -263,7 +263,7 @@ BOOL gpiProfileMap(GPConnection *connection, GPIProfileMapFunc func, void *data)
     mapData.connection = connection;
     mapData.func = func;
     mapData.data = data;
-    if (func_ov011_021719cc(iconnection->profileList.profileTable, gpiProfileMapCallback, &mapData) == NULL) {
+    if (TableMapSafe2(iconnection->profileList.profileTable, gpiProfileMapCallback, &mapData) == NULL) {
         return TRUE;
     }
     return FALSE;

@@ -51,6 +51,16 @@ void OSi_TerminateCore(void);
 #define OS_PXI_COMMAND_TERMINATE 0x20
 // NitroSDK's OSi_DoResetSystem, in ITCM: the function that OS_ResetSystem ends in
 void OSi_DoResetSystem(void);
+// The rest of the boot code in ITCM, which OSi_DoResetSystem calls and ends by jumping to OSi_StartProgram with: the
+// check of the images that the card loaded against the hashes of the DSi header, the load of the program's images, the
+// card read, the word fill and the jump to the program's entry. All but OSi_DoResetSystem are named as guesses from
+// what their code does
+BOOL OSi_VerifyHmac(const void *data, u32 size, const void *hash);
+void OSi_VerifyRomBlocks(void);
+void OSi_LoadProgram(BOOL twl);
+void OSi_ReadRom(u32 address, void *dest, u32 size);
+void OSi_Clear32(u32 value, void *dest, u32 size);
+void OSi_StartProgram(void);
 // NitroSDK's OS_Halt (swan's cp15_halt): stops the CPU until an interrupt
 void OS_Halt(void);
 // Writes a range of the data cache back to memory, before DMA reads it. NitroSDK's DC_FlushRange
@@ -77,6 +87,7 @@ u32 OS_GetDTCMAddress(void);
 // to 5, n for 2^(n + 1) bytes): 4 KB is n = 11 and 4 MB is n = 21
 #define OS_PROTECTION_SIZE_4KB (11 << 1)
 #define OS_PROTECTION_SIZE_4MB (21 << 1)
+#define OS_PROTECTION_SIZE_64MB (25 << 1)
 void OS_SetProtectionRegion(int regionNo, u32 address, u32 size); // swan's SetMemoryProtectionRegion
 
 // The start of DTCM, where the linker places the DTCM module
@@ -91,6 +102,17 @@ extern u32 SDK_AUTOLOAD_DTCM_START[];
 // over after that many bytes at the start of it)
 extern u8 SDK_IRQ_STACKSIZE[];
 extern u8 SDK_SYS_STACKSIZE[];
+// The module parameters' addresses in crt0.c: the static module's .bss and where its autoload blocks start (the end
+// of its .data), which are symbols of dsd's linker script, and NitroSDK's and TwlSDK's symbols for the two modules'
+// autoload lists and where the LTD module's blocks start, which the build writes and dsd's linker script lacks
+extern u8 ARM9_DATA_END[];
+extern u8 ARM9_BSS_START[];
+extern u8 ARM9_BSS_END[];
+extern u8 SDK_AUTOLOAD_LIST[];
+extern u8 SDK_AUTOLOAD_LIST_END[];
+extern u8 SDK_LTDAUTOLOAD_LIST[];
+extern u8 SDK_LTDAUTOLOAD_LIST_END[];
+extern u8 SDK_LTDAUTOLOAD_START[];
 #define HW_IRQ_STACK_SIZE ((u32)SDK_IRQ_STACKSIZE)
 #define HW_IRQ_STACK_END (HW_IRQ_STACK - HW_IRQ_STACK_SIZE)
 #define HW_SYS_STACK_SIZE ((int)SDK_SYS_STACKSIZE)
@@ -277,6 +299,9 @@ u32 OS_RestoreInterrupts_IrqAndFiq(u32 mask); // swan's CPU_SetIRQFIQMask
 // NitroSDK's OS_IrqHandler (swan's CPU_IRQInvoke), in ITCM: the IRQ dispatcher. WCM also uses its address as a special
 // mutex-owner marker
 void OS_IrqHandler(void);
+// NitroSDK's OS_IrqHandler_ThreadSwitch, in ITCM: the dispatcher's second half, which an interrupt handler returns
+// into, and which switches to the highest-priority ready thread
+void OS_IrqHandler_ThreadSwitch(void);
 // NitroSDK's OS_GetCpsrIrq: the CPSR's IRQ-disable bit, 0x80 while IRQs are off
 u32 OS_GetCpsrIrq(void); // swan's CPU_GetIRQMask
 // NitroSDK's OS_GetProcMode: the processor mode, 0x12 in an IRQ handler

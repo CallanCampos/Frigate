@@ -273,10 +273,10 @@ static void GtsNego_OnRecvRequest(int netId, int size, const void *data, void *w
     GtsNegoWork *wk = work;
     GtsNegoParam *param = wk->param;
 
-    if (handle != func_02040440()) {
+    if (handle != NetHandle_GetOwn()) {
         return;
     }
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         return;
     }
     MI_CpuCopy8(data, &param->unk4[1], sizeof(GtsNegoUnk4));
@@ -286,10 +286,10 @@ static void GtsNego_OnRecvPlayerInfo(int netId, int size, const void *data, void
     GtsNegoWork *wk = work;
     GtsNegoParam *param = wk->param;
 
-    if (handle != func_02040440()) {
+    if (handle != NetHandle_GetOwn()) {
         return;
     }
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         return;
     }
     MI_CpuCopy8(data, param->playerInfo2, PlayerInfo_GetSize());
@@ -298,10 +298,10 @@ static void GtsNego_OnRecvPlayerInfo(int netId, int size, const void *data, void
 static void GtsNego_OnRecvPhrase(int netId, int size, const void *data, void *work, NetHandle *handle) {
     GtsNegoWork *wk = work;
 
-    if (handle != func_02040440()) {
+    if (handle != NetHandle_GetOwn()) {
         return;
     }
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         return;
     }
     MI_CpuCopy8(data, &wk->recv, sizeof(GtsNegoGreeting));
@@ -314,21 +314,21 @@ static void GtsNego_OnRecvPerson(int netId, int size, const void *data, void *wo
     JoinAvenuePerson *person = (JoinAvenuePerson *)data;
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(param->gameData));
 
-    if (handle != func_02040440()) {
+    if (handle != NetHandle_GetOwn()) {
         return;
     }
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         return;
     }
     JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_UNK_26, 2);
     JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_NAME, (u32)GetPlayerName(param->playerInfo2));
-    func_02010078(joinAvenue, param->gameData, person, 1);
+    JoinAvenue_Add(joinAvenue, param->gameData, person, 1);
 }
 
 static void *GtsNego_GetPersonBuffer(int netId, void *work, int size) {
     GtsNegoWork *wk = work;
 
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         GFL_DebugAssertFail("", 0, "0");
         return NULL;
     }
@@ -338,7 +338,7 @@ static void *GtsNego_GetPersonBuffer(int netId, void *work, int size) {
 // A button of the main menu was touched
 static BOOL GtsNego_OnMainButton(int button, GtsNegoWork *wk) {
     wk->mode = button;
-    func_0203d564(TRUE);
+    GCTX_HIDSetUsingTouch(TRUE);
     if (wk->notEnoughPokemon == TRUE) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         return TRUE;
@@ -475,7 +475,7 @@ static void GtsNego_StateShowPhrase(GtsNegoWork *wk) {
     PMSData empty = { 1, 1, { 1, 1 } };
     PMSData *phrase = &empty;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         phrase = &wk->recv.phrase;
     }
     wk->timer = 180;
@@ -502,7 +502,7 @@ static void GtsNego_StateShowPartner(GtsNegoWork *wk) {
     int count = 2;
     PlayerInfo *partner;
 
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         partner = GetGameDataPlayerInfo(param->gameData);
     } else {
         partner = param->playerInfo2;
@@ -514,13 +514,13 @@ static void GtsNego_StateShowPartner(GtsNegoWork *wk) {
         }
     }
     GtsNegoMessage_ShowPartner(wk->msg, partner, count);
-    GtsNegoDisp_ShowPartner(wk->disp, func_02008bf4(partner));
+    GtsNegoDisp_ShowPartner(wk->disp, PlayerInfo_GetUnionView(partner));
     wk->timer = 180;
     GtsNego_ChangeState(wk, GtsNego_StateWaitPartnerShown, 675);
 }
 
 static void GtsNego_StateWaitPersonSync(GtsNegoWork *wk) {
-    if (func_02040664(func_02040440(), 4, GTSNEGO_TIMING_NO)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 4, GTSNEGO_TIMING_NO)) {
         GtsNego_ChangeState(wk, GtsNego_StateShowPartner, 690);
     }
 }
@@ -529,12 +529,12 @@ static void GtsNego_StateWaitPersonSync(GtsNegoWork *wk) {
 static void GtsNego_StateSendPerson(GtsNegoWork *wk) {
     GtsNegoParam *param = wk->param;
     // The other machine of the two
-    int target = func_02042a6c(func_02040440()) == 0;
+    int target = GFL_NetGetHandleNetId(NetHandle_GetOwn()) == 0;
 
-    func_02036dc0(&wk->myPerson, param->gameData);
-    if (func_02042c18(func_02040440(), target, GTSNEGO_NET_CMD_PERSON, sizeof(JoinAvenuePerson), &wk->myPerson, TRUE,
-                      FALSE, TRUE)) {
-        func_02040624(func_02040440(), 4, GTSNEGO_TIMING_NO);
+    JoinAvenuePerson_InitPlayer(&wk->myPerson, param->gameData);
+    if (GFL_NetSendCommandToMachine(NetHandle_GetOwn(), target, GTSNEGO_NET_CMD_PERSON, sizeof(JoinAvenuePerson),
+                                    &wk->myPerson, TRUE, FALSE, TRUE)) {
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 4, GTSNEGO_TIMING_NO);
         GtsNego_ChangeState(wk, GtsNego_StateWaitPersonSync, 705);
     }
 }
@@ -543,7 +543,7 @@ static void GtsNego_StateSendPerson(GtsNegoWork *wk) {
 static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
     PlayerInfo *partner = wk->param->playerInfo2;
     BOOL bad = FALSE;
-    BOOL done = func_ov011_0216bed4() == 2;
+    BOOL done = DWC_CheckProfanityProcess() == 2;
     u32 id;
 
     if (done) {
@@ -559,10 +559,10 @@ static void GtsNego_StateWaitNameCheck(GtsNegoWork *wk) {
             copyTrainerNameFromStrbuf(partner, name);
             GFL_StrBufFree(name);
         }
-        func_02008b34(partner, func_02017378(wk->gameData, 1 - func_0203ffc4()));
+        PlayerInfo_Copy(partner, GameData_GetPlayerInfoByNetID(wk->gameData, 1 - NetSystem_GetNetId()));
         id = getIDAsUInt(partner);
         Misc_AddMetTrainer(getHollow_RivalData(wk->save), id);
-        if (func_02008bfc(partner) == 22 || func_02008bfc(partner) == 23) {
+        if (PlayerInfo_GetVersion(partner) == 22 || PlayerInfo_GetVersion(partner) == 23) {
             GtsNego_ChangeState(wk, GtsNego_StateSendPerson, 740);
         } else {
             GtsNego_ChangeState(wk, GtsNego_StateShowPartner, 745);
@@ -590,41 +590,42 @@ static void GtsNego_StateStartNameCheck(GtsNegoWork *wk) {
     }
     wk->nameCheck.words = wk->nameCheck.name;
     wk->nameCheck.badCount = 0;
-    func_ov011_0216bea4(&wk->nameCheck.words, 1, NULL, 0, &wk->nameCheck.result, &wk->nameCheck.badCount, 0x80);
+    DWC_CheckProfanityExAsync(&wk->nameCheck.words, 1, NULL, 0, &wk->nameCheck.result, &wk->nameCheck.badCount, 0x80);
     GFL_StrBufFree(name);
     GtsNego_ChangeState(wk, GtsNego_StateWaitNameCheck, 768);
 }
 
 static void GtsNego_StateWaitInfoSync(GtsNegoWork *wk) {
-    if (func_02040664(func_02040440(), 3, GTSNEGO_TIMING_NO)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 3, GTSNEGO_TIMING_NO)) {
         GtsNego_ChangeState(wk, GtsNego_StateStartNameCheck, 778);
     }
 }
 
 static void GtsNego_StateStartInfoSync(GtsNegoWork *wk) {
-    func_02040624(func_02040440(), 3, GTSNEGO_TIMING_NO);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), 3, GTSNEGO_TIMING_NO);
     GtsNego_ChangeState(wk, GtsNego_StateWaitInfoSync, 794);
 }
 
 static void GtsNego_StateSendPlayerInfo(GtsNegoWork *wk) {
-    if (func_02042be8(func_02040440(), GTSNEGO_NET_CMD_PLAYER_INFO, PlayerInfo_GetSize(), wk->param->playerInfo)) {
+    if (GFL_NetSendCommand(NetHandle_GetOwn(), GTSNEGO_NET_CMD_PLAYER_INFO, PlayerInfo_GetSize(),
+                           wk->param->playerInfo)) {
         GtsNego_ChangeState(wk, GtsNego_StateStartInfoSync, 811);
     }
 }
 
 static void GtsNego_StateSendPhrase(GtsNegoWork *wk) {
-    if (func_02042be8(func_02040440(), GTSNEGO_NET_CMD_PHRASE, sizeof(GtsNegoGreeting), &wk->send)) {
+    if (GFL_NetSendCommand(NetHandle_GetOwn(), GTSNEGO_NET_CMD_PHRASE, sizeof(GtsNegoGreeting), &wk->send)) {
         GtsNego_ChangeState(wk, GtsNego_StateSendPlayerInfo, 829);
     }
 }
 
 static void GtsNego_StateSendRequest(GtsNegoWork *wk) {
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         GtsNego_ChangeState(wk, GtsNego_StateShowPartner, 845);
         return;
     }
-    if (func_02040664(func_02040440(), 2, GTSNEGO_TIMING_NO)) {
-        if (func_02042be8(func_02040440(), GTSNEGO_NET_CMD_REQUEST, sizeof(GtsNegoUnk4), &wk->param->unk4[0])) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 2, GTSNEGO_TIMING_NO)) {
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), GTSNEGO_NET_CMD_REQUEST, sizeof(GtsNegoUnk4), &wk->param->unk4[0])) {
             GtsNego_ChangeState(wk, GtsNego_StateSendPhrase, 853);
         }
     }
@@ -633,7 +634,7 @@ static void GtsNego_StateSendRequest(GtsNegoWork *wk) {
 // With both machines connected, starts exchanging what they show of each other
 static void GtsNego_StateStartExchange(GtsNegoWork *wk) {
     if (GtsNegoMessage_IsDone(wk->msg)) {
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             GtsNego_ChangeState(wk, GtsNego_StateSendRequest, 876);
             return;
         }
@@ -641,27 +642,27 @@ static void GtsNego_StateStartExchange(GtsNegoWork *wk) {
             wk->timer--;
             return;
         }
-        if (func_02040474() == 2) {
+        if (NetHandle_CountNegotiated() == 2) {
             GtsNegoParam *param = wk->param;
             void *phrases = CGearPhrases_GetBlock(wk->save);
 
             param->unk4[0].unk0 = wk->level;
             param->unk4[0].unk4 = wk->myKind;
             CGearPhrases_Get(phrases, 0, &wk->send.phrase);
-            wk->send.tradeCount = func_0200a5c4(func_02017980(wk->gameData));
-            func_02040624(func_02040440(), 2, GTSNEGO_TIMING_NO);
+            wk->send.tradeCount = PalPadFriendList_GetTradeCount(GameData_GetPalPadFriendList(wk->gameData));
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 2, GTSNEGO_TIMING_NO);
             GtsNego_ChangeState(wk, GtsNego_StateSendRequest, 898);
         }
     }
 }
 
 static void GtsNego_StateWaitConnect(GtsNegoWork *wk) {
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         GtsNego_ChangeState(wk, GtsNego_StateStartExchange, 907);
         return;
     }
-    if (func_02040474() != 0) {
-        if (func_02040504()) {
+    if (NetHandle_CountNegotiated() != 0) {
+        if (NetHandle_SendNegotiation()) {
             GtsNego_ChangeState(wk, GtsNego_StateStartExchange, 912);
         }
     }
@@ -673,8 +674,8 @@ static void GtsNego_StateWaitMatched(GtsNegoWork *wk) {
             wk->timer--;
             return;
         }
-        if (func_0203ffc4() != 0) {
-            if (func_02040504()) {
+        if (NetSystem_GetNetId() != 0) {
+            if (NetHandle_SendNegotiation()) {
                 wk->timer = 180;
                 GtsNego_ChangeState(wk, GtsNego_StateStartExchange, 941);
             }
@@ -690,23 +691,23 @@ static void GtsNego_StateSearching(GtsNegoWork *wk) {
     GtsNegoMessage_UpdateButtons(wk->msg);
     if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B) {
         GtsNegoMessage_PressCancelButton(wk->msg);
-        if (func_02042788()) {
-            func_020421ac(TRUE);
+        if (GFL_NetIsInitialized()) {
+            NetState_WifiDisconnect(TRUE);
         }
-        func_0203d564(FALSE);
+        GCTX_HIDSetUsingTouch(FALSE);
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         GtsNego_ChangeState(wk, GtsNego_StateWaitCancelPressed, 974);
     }
-    if (!func_02042788()) {
+    if (!GFL_NetIsInitialized()) {
         if (GCTX_HIDGetPressedKeys() != PAD_BUTTON_A) {
             return;
         }
     } else {
-        if (func_020420b4() != 1) {
+        if (NetState_GetWifiStatus() != 1) {
             return;
         }
         func_02042e94(1);
-        func_02042e9c(TRUE);
+        GFL_NetSetDisconnectError(TRUE);
     }
     GtsNegoMessage_ClearWindow(wk->msg);
     GtsNegoMessage_PrintShort(wk->msg, GtsnegoProc_Text_GettingInformationFromOther);
@@ -721,17 +722,17 @@ static int GtsNego_EvalMatch(int index, void *work) {
     GtsNegoWork *wk = work;
     GtsNegoParam *param = wk->param;
     int score = -1;
-    int level = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_LEVEL].key, -1);
-    int wantKind = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_WANT_KIND].key, -1);
-    int myKind = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_MY_KIND].key, -1);
-    u32 id = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_MY_ID].key, 0);
-    u32 friendId = func_ov011_02160f98(index, wk->keys[GTSNEGO_KEY_FRIEND_ID].key, 0);
+    int level = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_LEVEL].key, -1);
+    int wantKind = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_WANT_KIND].key, -1);
+    int myKind = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_MY_KIND].key, -1);
+    u32 id = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_MY_ID].key, 0);
+    u32 friendId = DWC_GetMatchIntValue(index, wk->keys[GTSNEGO_KEY_FRIEND_ID].key, 0);
     int i;
 
     if (wk->mode == GTSNEGO_MODE_RENDEZVOUS) {
         if (level == GTSNEGO_LEVEL_RENDEZVOUS) {
             if (wk->friendIndex == -1) {
-                if (func_0200a590(getPalPadFriendListAddress(wk->save), id)) {
+                if (PalPadFriendList_HasPlayer(getPalPadFriendListAddress(wk->save), id)) {
                     score = 100;
                 }
             } else if (wk->friendId == id) {
@@ -739,7 +740,7 @@ static int GtsNego_EvalMatch(int index, void *work) {
             }
         } else if (friendId == getIDAsUInt(GetGameDataPlayerInfo(param->gameData))) {
             if (wk->friendIndex == -1) {
-                if (func_0200a590(getPalPadFriendListAddress(wk->save), id)) {
+                if (PalPadFriendList_HasPlayer(getPalPadFriendListAddress(wk->save), id)) {
                     score = 100;
                 }
             } else if (wk->friendId == id) {
@@ -778,15 +779,15 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
         PlayerInfo *friend;
         int i;
 
-        if (!func_02042788()) {
+        if (!GFL_NetIsInitialized()) {
             GtsNegoMessage_CreateCancelButton(wk->msg, GtsNego_OnCancelButton, wk);
             GtsNego_ChangeState(wk, GtsNego_StateSearching, 1112);
             return;
         }
         friend = NULL;
-        func_02042d8c(FALSE);
+        GFL_NetSetMPSendEnabled(FALSE);
         // The token is made in the values' buffer, which they then overwrite
-        func_0200a3c4(&wk->wifiList->myUserData, (DWCFriendData *)values);
+        WifiList_CreateExchangeTokenFromUserData(&wk->wifiList->myUserData, (DWCFriendData *)values);
         values[GTSNEGO_KEY_MY_ID] = wk->myId;
         values[GTSNEGO_KEY_MODE] = wk->mode;
         values[GTSNEGO_KEY_LEVEL] = wk->level;
@@ -809,16 +810,16 @@ static void GtsNego_StateStartSearch(GtsNegoWork *wk) {
 
             MI_CpuCopy8(sGtsNegoKeyNames[i], key->key, 2);
             key->value = values[i];
-            key->keyId = func_ov011_02160e10(key->keyId, key->key, &key->value);
+            key->keyId = DWC_AddMatchKeyInt(key->keyId, key->key, &key->value);
         }
         STD_TSPrintf(wk->query, "ty=%d And db=%d", wk->mode, 1);
         if (DWCRap_StartMatchQuery(wk->query, 2, GtsNego_EvalMatch, wk)) {
-            func_0204204c();
-            func_ov011_02151e40(0);
+            NetState_WaitGtsMatch();
+            DWCRap_SetVoiceChatEnabled(0);
             GtsNegoMessage_CreateCancelButton(wk->msg, GtsNego_OnCancelButton, wk);
             GtsNego_ChangeState(wk, GtsNego_StateSearching, 1163);
         } else {
-            func_020424ac(0, 0, 0, 1009);
+            NetState_RecordError(0, 0, 0, 1009);
         }
     }
 }
@@ -830,7 +831,7 @@ static void GtsNego_OnButton(u32 button, u32 event, void *work) {
     if (event == 0) {
         if (wk->buttonCallback != NULL) {
             GtsNegoDisp_SetCursor(wk->disp, wk->button, GTSNEGO_CURSOR_NONE);
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             if (wk->buttonCallback(button, wk)) {
                 return;
             }
@@ -865,9 +866,9 @@ static void GtsNego_StateSearchMenu(GtsNegoWork *wk) {
     }
     if (!TouchBar_IsTouching(bar)) {
         GtsNegoMessage_UpdateButtons(wk->msg);
-        if (GCTX_HIDGetPressedKeys() != 0 && func_0203d554() == TRUE) {
+        if (GCTX_HIDGetPressedKeys() != 0 && GCTX_HIDIsUsingTouch() == TRUE) {
             GtsNegoDisp_SetCursor(wk->disp, wk->button, wk->searchCursor);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return;
         }
         if (GCTX_HIDGetPressedKeys() == PAD_KEY_LEFT) {
@@ -900,8 +901,8 @@ static void GtsNego_StateSearchMenu(GtsNegoWork *wk) {
         if (moved) {
             GtsNegoDisp_SetCursor(wk->disp, wk->button, wk->searchCursor);
         }
-        if (func_0203da0c(sGtsNegoSearchRect) == 0) {
-            func_0203d564(TRUE);
+        if (GFL_HIDGetTouchPressedRect(sGtsNegoSearchRect) == 0) {
+            GCTX_HIDSetUsingTouch(TRUE);
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
             AppTaskMenuWin_SetFlashing(wk->button, TRUE);
             GtsNego_ChangeState(wk, GtsNego_StateWaitSearchPressed, 1376);
@@ -933,7 +934,7 @@ static void GtsNego_StateOpenSearchMenu(GtsNegoWork *wk) {
     GtsNegoMessage_ShowSearchMenu(wk->msg, GtsNego_OnButton, wk, wk->level, wk->myKind, wk->wantKind);
     GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleasePressSearchWhen);
     wk->button = GtsNegoMessage_CreateButton(wk->msg, GtsnegoProc_Text_Search);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         GtsNegoDisp_SetCursor(wk->disp, NULL, wk->searchCursor);
         if (wk->searchCursor == GTSNEGO_CURSOR_SEARCH) {
             AppTaskMenuWin_SetActive(wk->button, TRUE);
@@ -946,17 +947,17 @@ static void GtsNego_StateOpenSearchMenu(GtsNegoWork *wk) {
 }
 
 PlayerInfo *GtsNego_GetFriend(GameData *gameData, int index) {
-    int count = func_0200a5a8(func_02017980(gameData));
+    int count = PalPadFriendList_CountPlayers(GameData_GetPalPadFriendList(gameData));
 
     if (index >= count || index < 0) {
         return NULL;
     }
-    return func_0200a570(func_02017980(gameData), index);
+    return PalPadFriendList_GetPlayer(GameData_GetPalPadFriendList(gameData), index);
 }
 
 // The person at index, or the first or last when it is past the list's ends
 static PlayerInfo *GtsNego_GetFriendClamped(GameData *gameData, int index) {
-    int count = func_0200a5a8(func_02017980(gameData));
+    int count = PalPadFriendList_CountPlayers(GameData_GetPalPadFriendList(gameData));
 
     if (index < 0) {
         index = 0;
@@ -964,7 +965,7 @@ static PlayerInfo *GtsNego_GetFriendClamped(GameData *gameData, int index) {
     if (index >= count) {
         index = count - 1;
     }
-    return func_0200a570(func_02017980(gameData), index);
+    return PalPadFriendList_GetPlayer(GameData_GetPalPadFriendList(gameData), index);
 }
 
 static void GtsNego_StateReturnToMainMenu(GtsNegoWork *wk) {
@@ -1002,8 +1003,8 @@ static void GtsNego_OnCancelButton(u32 button, u32 event, void *work) {
     if (event == 0) {
         if (wk->state == GtsNego_StateSearching) {
             GtsNegoMessage_PressCancelButton(wk->msg);
-            func_020421ac(TRUE);
-            func_0203d564(TRUE);
+            NetState_WifiDisconnect(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             GtsNego_ChangeState(wk, GtsNego_StateWaitCancelPressed, 1635);
         }
@@ -1037,7 +1038,7 @@ static void GtsNego_StateWaitFriendConfirm(GtsNegoWork *wk) {
         case 1:
             GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
             GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectWhoWish);
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
             } else {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
@@ -1164,9 +1165,9 @@ static void GtsNego_StateFriendList(GtsNegoWork *wk) {
         if (scrolling != GTSNEGO_LIST_STILL) {
             return;
         }
-        if (func_0203d554() == TRUE && GCTX_HIDGetPressedKeys() != 0) {
+        if (GCTX_HIDIsUsingTouch() == TRUE && GCTX_HIDGetPressedKeys() != 0) {
             GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return;
         }
         if (GCTX_HIDGetTypedKeys() == PAD_BUTTON_R) {
@@ -1240,7 +1241,7 @@ static void GtsNego_StateFriendList(GtsNegoWork *wk) {
             GtsNego_ChangeState(wk, GtsNego_StateWaitAnyFriendPressed, 2004);
             return;
         }
-        touched = func_0203da0c(sGtsNegoFriendRects);
+        touched = GFL_HIDGetTouchPressedRect(sGtsNegoFriendRects);
         switch (touched) {
         case 3:
             GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -1258,7 +1259,7 @@ static void GtsNego_StateFriendList(GtsNegoWork *wk) {
             }
             // fallthrough
         case 0:
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             wk->friendCursor = touched + GTSNEGO_CURSOR_FRIEND_1;
             GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
             GtsNegoDisp_PressCursor(wk->disp, wk->friendCursor);
@@ -1271,8 +1272,8 @@ static void GtsNego_StateFriendList(GtsNegoWork *wk) {
             GtsNego_ChangeState(wk, GtsNego_StatePrintFriendChosen, 2041);
             return;
         }
-        if (func_0203d9c8(sGtsNegoScrollBarRect) == 0) {
-            if (func_0203da84(&x, &y) == TRUE) {
+        if (GFL_HIDGetTouchHeldRect(sGtsNegoScrollBarRect) == 0) {
+            if (GFL_HIDGetTouchHeldPoint(&x, &y) == TRUE) {
                 int top = GtsNegoDisp_DragKnob(wk->disp, y, wk->scroll.count);
 
                 if (wk->scroll.top != top) {
@@ -1306,7 +1307,7 @@ static void GtsNego_StateWaitNoFriends(GtsNegoWork *wk) {
             GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectHowTrade);
             TouchBar_SetVisible(GtsNegoDisp_GetTouchBar(wk->disp), TRUE);
             GtsNego_ChangeState(wk, GtsNego_StateMainMenu, 2101);
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, wk->mainCursor);
             }
         }
@@ -1315,7 +1316,7 @@ static void GtsNego_StateWaitNoFriends(GtsNegoWork *wk) {
 
 static void GtsNego_StateOpenFriendList(GtsNegoWork *wk) {
     BOOL scrollable = TRUE;
-    int count = func_0200a5a8(func_02017980(wk->gameData));
+    int count = PalPadFriendList_CountPlayers(GameData_GetPalPadFriendList(wk->gameData));
 
     wk->mode = GTSNEGO_MODE_RENDEZVOUS;
     if (count == 0) {
@@ -1326,7 +1327,7 @@ static void GtsNego_StateOpenFriendList(GtsNegoWork *wk) {
     }
     wk->scroll.count = count;
     GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_PleaseSelectWhoWish);
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         GtsNegoDisp_SetCursor(wk->disp, NULL, wk->friendCursor);
     } else {
         GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
@@ -1352,10 +1353,10 @@ static void GtsNego_StateOpenMainMenu(GtsNegoWork *wk) {
         if (wk->errorFrames++ < 3) {
             return;
         }
-        func_02011da4();
+        GFL_NetErrApplyBrightness();
         wk->errorShown = FALSE;
     }
-    if (!func_0203d554()) {
+    if (!GCTX_HIDIsUsingTouch()) {
         GtsNegoDisp_SetCursor(wk->disp, NULL, wk->mainCursor);
     } else {
         GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
@@ -1426,7 +1427,7 @@ static void GtsNego_StateWaitExitConfirm(GtsNegoWork *wk) {
             } else {
                 GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_NeedLeastTwoPokemon);
             }
-            if (!func_0203d554()) {
+            if (!GCTX_HIDIsUsingTouch()) {
                 GtsNegoDisp_SetCursor(wk->disp, NULL, wk->mainCursor);
             }
             TouchBar_SetIconVisible(GtsNegoDisp_GetTouchBar(wk->disp), GTSNEGO_TOUCHBAR_RETURN, TRUE);
@@ -1456,9 +1457,9 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
         return;
     }
     if (!TouchBar_IsTouching(bar)) {
-        if (GCTX_HIDGetPressedKeys() != 0 && func_0203d554() == TRUE) {
+        if (GCTX_HIDGetPressedKeys() != 0 && GCTX_HIDIsUsingTouch() == TRUE) {
             GtsNegoDisp_SetCursor(wk->disp, NULL, wk->mainCursor);
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             return;
         }
         if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_A) {
@@ -1488,7 +1489,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
     if (TouchBar_GetDecided(GtsNegoDisp_GetTouchBar(wk->disp)) == GTSNEGO_TOUCHBAR_RETURN) {
         wk->timer = 1;
         GtsNegoMessage_Print(wk->msg, GtsnegoProc_Text_OkDisconnectFromNintendo);
-        if (func_0203d554() == TRUE) {
+        if (GCTX_HIDIsUsingTouch() == TRUE) {
             GtsNegoDisp_SetCursor(wk->disp, NULL, GTSNEGO_CURSOR_NONE);
         }
         GtsNego_ChangeState(wk, GtsNego_StateOpenExitConfirm, 2436);
@@ -1499,7 +1500,7 @@ static void GtsNego_StateMainMenu(GtsNegoWork *wk) {
 static void GtsNego_HandleDisconnect(GtsNegoWork *wk) {
     if (wk->param->result != GTSNEGO_RESULT_EXIT) {
         func_02042e94(0);
-        func_02042e9c(FALSE);
+        GFL_NetSetDisconnectError(FALSE);
         GtsNegoMessage_FreePMSDraw(wk->msg);
         GtsNegoDisp_SetDim(wk->disp, FALSE, GTSNEGO_DIM_ALL);
         GFL_BGSysSetBGEnabled(4, FALSE);
@@ -1537,13 +1538,13 @@ static BOOL GtsNegoProc_Init(GameProc *proc, u32 *state, void *param, void *work
     wk->searchCursor = GTSNEGO_CURSOR_LEVEL;
     wk->friendCursor = GTSNEGO_CURSOR_FRIEND_1;
     wk->myId = getIDAsUInt(GetGameDataPlayerInfo(negoParam->gameData));
-    if (func_02042788()) {
-        func_02040c20(GTSNEGO_NET_CMD_BASE, sGtsNegoCommands, NELEMS(sGtsNegoCommands), wk);
+    if (GFL_NetIsInitialized()) {
+        NetCommand_AddTable(GTSNEGO_NET_CMD_BASE, sGtsNegoCommands, NELEMS(sGtsNegoCommands), wk);
     }
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
     GFL_SndBGMPlay(SEQ_BGM_GTS, 0xffff);
-    func_02042ba8(TRUE, wk->heapId);
-    func_02011d8c(TRUE);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
+    GFL_NetErrSetKeepDark(TRUE);
     GtsNego_ChangeState(wk, GtsNego_StateOpenMainMenu, 2520);
     return TRUE;
 }
@@ -1571,7 +1572,7 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
     }
     GtsNegoDisp_Main(wk->disp);
     GtsNegoMessage_Update(wk->msg);
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (GFL_NetErrCheck()) {
             switch (DWCRapCommon_CheckError(TRUE, TRUE)) {
             case 1:
@@ -1585,7 +1586,7 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
                 Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
                 break;
             case 3:
-                func_02011d20();
+                GFL_NetErrShowFatal();
                 break;
             }
         }
@@ -1598,12 +1599,12 @@ static BOOL GtsNegoProc_Main(GameProc *proc, u32 *state, void *param, void *work
 static BOOL GtsNegoProc_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GtsNegoWork *wk = work;
 
-    func_02011d98();
+    GFL_NetErrClearKeepDark();
     if (!GFL_WipeIsFinished()) {
         return FALSE;
     }
-    if (func_02042788()) {
-        func_02040c64(GTSNEGO_NET_CMD_BASE);
+    if (GFL_NetIsInitialized()) {
+        NetCommand_RemoveTable(GTSNEGO_NET_CMD_BASE);
     }
     if (wk->button != NULL) {
         AppTaskMenuWin_Free(wk->button);

@@ -105,16 +105,16 @@ static BOOL WorldTradeProc_Init(GameProc *proc, u32 *state, void *param, void *w
     GFL_BGSysInitVRAM(0);
     WorldTrade_InitGraphics(wk);
     GFL_SndBGMSetPaused(FALSE);
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     return TRUE;
 }
 
 static BOOL WorldTradeProc_Main(GameProc *proc, u32 *state, void *param, void *work) {
     WorldTradeWork *wk = work;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         DWC_UpdateConnection();
-        func_0203e7f8(WorldTrade_WifiLinkLevel());
+        WmIcon_SetStrength(WorldTrade_WifiLinkLevel());
     }
     DpwTr_Process();
     wk->procResult = GFL_ProcMgrUpdate(wk->procManager);
@@ -153,7 +153,7 @@ static BOOL WorldTradeProc_Main(GameProc *proc, u32 *state, void *param, void *w
 
     WorldTrade_ServerWaitTimeFunc(wk);
     if (wk->clactUnit != NULL) {
-        func_0204b794();
+        ClActSys_Draw();
     }
     if (wk->unk12E8 > 0) {
         wk->unk12E8--;
@@ -164,7 +164,7 @@ static BOOL WorldTradeProc_Main(GameProc *proc, u32 *state, void *param, void *w
 static BOOL WorldTradeProc_End(GameProc *proc, u32 *state, void *param, void *work) {
     WorldTradeWork *wk = work;
 
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     WorldTrade_ExitGraphics(wk);
     WorldTrade_FreeWork(wk);
 
@@ -175,7 +175,7 @@ static BOOL WorldTradeProc_End(GameProc *proc, u32 *state, void *param, void *wo
     GFL_MsgDataFree(wk->countryNameManager);
     GFL_WordSetSystemFree(wk->wordSet);
 
-    func_0203a610(wk->tcbManager);
+    GFL_TCBMgrDelete(wk->tcbManager);
     GFL_HeapFree(wk->tcbBuffer);
     FreeGameProcManager(wk->procManager);
     GFL_HeapFree(wk->demoPokemon);
@@ -192,7 +192,7 @@ static void WorldTrade_VBlankFunc(TCB *tcb, void *data) {
     WorldTradeWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     if (wk->vfunc != NULL) {
         wk->vfunc(wk);
         wk->vfunc = NULL;
@@ -269,19 +269,20 @@ static void WorldTrade_InitCellActor(WorldTradeWork *wk, const BGSysVRAMConfig *
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_WORLDTRADE, HEAPID_WORLDTRADE);
     ClActSys_Create(&sClActSysSetup, vramConfig, HEAPID_WORLDTRADE);
-    wk->clactUnit = func_0204bf1c(96, 0, HEAPID_WORLDTRADE);
+    wk->clactUnit = ClActUnit_Create(96, 0, HEAPID_WORLDTRADE);
 
     wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR] =
-        func_0204b81c(arc, 0x11, TRUE, CLACT_VRAM_MAIN, HEAPID_WORLDTRADE);
-    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT] = func_0204bba0(arc, 8, CLACT_VRAM_MAIN, 0, HEAPID_WORLDTRADE);
-    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL] = func_0204bde0(arc, 0x12, 0x13, HEAPID_WORLDTRADE);
+        ClActSys_LoadChars(arc, 0x11, TRUE, CLACT_VRAM_MAIN, HEAPID_WORLDTRADE);
+    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT] =
+        ClActSys_LoadPltt(arc, 8, CLACT_VRAM_MAIN, 0, HEAPID_WORLDTRADE);
+    wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL] = ClActSys_LoadCellAnims(arc, 0x12, 0x13, HEAPID_WORLDTRADE);
     wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR] =
-        func_0204b81c(arc, 0x27, TRUE, CLACT_VRAM_MAIN, HEAPID_WORLDTRADE);
-    wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL] = func_0204bde0(arc, 0x28, 0x29, HEAPID_WORLDTRADE);
+        ClActSys_LoadChars(arc, 0x27, TRUE, CLACT_VRAM_MAIN, HEAPID_WORLDTRADE);
+    wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL] = ClActSys_LoadCellAnims(arc, 0x28, 0x29, HEAPID_WORLDTRADE);
     wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR] =
-        func_0204b81c(arc, 0x24, TRUE, CLACT_VRAM_SUB, HEAPID_WORLDTRADE);
-    wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT] = func_0204bba0(arc, 7, CLACT_VRAM_SUB, 0, HEAPID_WORLDTRADE);
-    wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL] = func_0204bde0(arc, 0x25, 0x26, HEAPID_WORLDTRADE);
+        ClActSys_LoadChars(arc, 0x24, TRUE, CLACT_VRAM_SUB, HEAPID_WORLDTRADE);
+    wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT] = ClActSys_LoadPltt(arc, 7, CLACT_VRAM_SUB, 0, HEAPID_WORLDTRADE);
+    wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL] = ClActSys_LoadCellAnims(arc, 0x25, 0x26, HEAPID_WORLDTRADE);
     GFL_ArcToolFree(arc);
 
     // The Pokémon icons' palettes, and a copy at half brightness for icons that can't be chosen
@@ -310,10 +311,11 @@ static void WorldTrade_InitCellActor(WorldTradeWork *wk, const BGSysVRAMConfig *
     }
     arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_2DCHAR, HEAPID_WORLDTRADE);
     wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR] =
-        func_0204b81c(arc, charFile, FALSE, CLACT_VRAM_SUB, HEAPID_WORLDTRADE);
+        ClActSys_LoadChars(arc, charFile, FALSE, CLACT_VRAM_SUB, HEAPID_WORLDTRADE);
     wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT] =
-        func_0204bbb8(arc, plttFile, CLACT_VRAM_SUB, 0, 0, 1, HEAPID_WORLDTRADE);
-    wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL] = func_0204bde0(arc, cellFile, animFile, HEAPID_WORLDTRADE);
+        ClActSys_LoadPlttRange(arc, plttFile, CLACT_VRAM_SUB, 0, 0, 1, HEAPID_WORLDTRADE);
+    wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL] =
+        ClActSys_LoadCellAnims(arc, cellFile, animFile, HEAPID_WORLDTRADE);
     GFL_ArcToolFree(arc);
 }
 
@@ -465,7 +467,7 @@ void WorldTrade_ActPos(ClActor *act, int x, int y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(act, &pos, 1);
+    ClActor_SetSurfacePos(act, &pos, 1);
 }
 
 static int WorldTrade_WifiLinkLevel(void) {
@@ -483,7 +485,7 @@ void WorldTrade_SubProcessUpdate(WorldTradeWork *wk) {
 }
 
 int WorldTrade_GetTalkSpeed(WorldTradeWork *wk) {
-    return func_02017bcc();
+    return TextSpeed_GetCurrentWait();
 }
 
 static const BGSysVRAMConfig sWorldTradeVRAMConfig = {
@@ -500,20 +502,20 @@ static void WorldTrade_InitCLACT(WorldTradeWork *wk) {
 
 static void WorldTrade_FreeCLACT(WorldTradeWork *wk) {
     WorldTrade_FreeFieldObjData(wk);
-    func_0204bcd0(wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT]);
-    func_0204b98c(wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR]);
-    func_0204be64(wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL]);
-    func_0204bcd0(wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT]);
-    func_0204b98c(wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR]);
-    func_0204be64(wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL]);
-    func_0204bcd0(wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT]);
-    func_0204b98c(wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR]);
-    func_0204be64(wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL]);
-    func_0204b98c(wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR]);
-    func_0204be64(wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL]);
-    func_0204bf98(wk->clactUnit);
+    ClActSys_FreePltt(wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_PLTT]);
+    ClActSys_FreeChars(wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CHAR]);
+    ClActSys_FreeCellAnims(wk->clactRes[WT_CLACT_RES_HERO][WT_CLACT_RES_CELL]);
+    ClActSys_FreePltt(wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_PLTT]);
+    ClActSys_FreeChars(wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CHAR]);
+    ClActSys_FreeCellAnims(wk->clactRes[WT_CLACT_RES_SUB][WT_CLACT_RES_CELL]);
+    ClActSys_FreePltt(wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_PLTT]);
+    ClActSys_FreeChars(wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CHAR]);
+    ClActSys_FreeCellAnims(wk->clactRes[WT_CLACT_RES_MAIN][WT_CLACT_RES_CELL]);
+    ClActSys_FreeChars(wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CHAR]);
+    ClActSys_FreeCellAnims(wk->clactRes[WT_CLACT_RES_MAIN2][WT_CLACT_RES_CELL]);
+    ClActUnit_Delete(wk->clactUnit);
     wk->clactUnit = NULL;
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 static void WorldTrade_ServerWaitTimeFunc(WorldTradeWork *wk) {
@@ -545,7 +547,7 @@ void WorldTrade_CLACT_PosChange(ClActor *act, int x, int y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(act, &pos, 0);
+    ClActor_SetSurfacePos(act, &pos, 0);
 }
 
 // Darkens a screen behind a menu
@@ -613,6 +615,6 @@ void WorldTrade_ExitGraphics(WorldTradeWork *wk) {
 }
 
 void WorldTrade_ShowFatalError(WorldTradeWork *wk) {
-    func_02017884(GSYS_GetGameData(wk->param->gsys));
-    func_02011d04(0x29);
+    GameData_CancelSave(GSYS_GetGameData(wk->param->gsys));
+    GFL_NetErrShowWifi(0x29);
 }

@@ -1,8 +1,11 @@
-// TwlSDK's NWM, the DSi's wireless manager, ARM9 side: it keeps a system area for the commands that it sends the ARM7
-// over the PXI tag 0x16 and for the events that come back, checks that the commands suit the state that the ARM7
-// reports, and runs the callbacks. ARM code in the DSi-only LTD autoload. The ROM names none of it; the file's name and
-// those of the types and data are descriptive guesses, and the functions have the names of the SDK functions they
-// implement where those are known, from what they do, and keep their default names otherwise.
+// TwlSDK's NWM, the DSi's wireless manager, ARM9 side, from NWM_End on: the commands that the ARM9 sends the ARM7
+// over the PXI tag 0x16, each checked against the state that the ARM7 reports, the callback that unloads the device
+// before the application exits, and the sending of the commands' buffers. ARM code in the DSi-only LTD autoload. The
+// ROM names none of it; the file's name and those of the types and data are descriptive guesses, and the functions have
+// the names of the SDK functions they implement where those are known, from what they do, and keep their default
+// names otherwise. NWM_Init and its flag are nwm_setup.c's, and the system area and the events nwm_events.c's, whose
+// statics are each laid out on their own. The SDK has more files here (cybervisi0n/libntr's reconstruction splits
+// this part further), whose boundaries the ROM does not show
 
 #include "types.h"
 #include "nitro/mi.h"
@@ -10,128 +13,10 @@
 #include "nitro/pm.h"
 #include "nitro/pxi.h"
 #include "nitro/svc.h"
-#include "nitro/wm.h"
+#include "nwm_private.h"
 #include "twl/nwm.h"
 #include <stdarg.h>
 
-// The commands, by their numbers: the first halfword of the buffer that goes to the ARM7 and of the event that comes
-// back. They also index the callbacks and the ARM7's flags of the commands it is running. The names are guessed from
-// the states that take a command and from its parameters; a number is left in the name of those with nothing to
-// show what they do
-enum {
-    NWM_CMD_1 = 1,
-    NWM_CMD_LOAD_DEVICE = 3,
-    NWM_CMD_UNLOAD_DEVICE = 4,
-    NWM_CMD_OPEN = 5,
-    NWM_CMD_CLOSE = 6,
-    NWM_CMD_SCAN = 7,
-    NWM_CMD_8 = 8,
-    NWM_CMD_DISCONNECT = 9,
-    NWM_CMD_SET_RECEIVE_BUFFER = 10,
-    NWM_CMD_SEND_FRAME = 11,
-    NWM_CMD_12 = 12,
-    NWM_CMD_CONNECT = 13,
-    NWM_CMD_14 = 14,
-    NWM_CMD_SET_PMK = 18,
-    NWM_CMD_19 = 19,
-    NWM_CMD_COUNT = 20
-};
-
-// The results of an event that the library tells apart: a sent frame that the ARM7 gave up, and a receive buffer
-// that is full (the callback of the command that sets it gives it back)
-#define NWM_RESULT_12 12
-#define NWM_RESULT_BUFFER_FULL 11
-
-// What the ARM7 reports as the library's state, which the commands check. The numbers 0 to 4 are in the order that
-// the commands take them in; 5 is only known from the command that unloads the device in any state
-enum { NWM_STATE_NONE, NWM_STATE_INITIALIZED, NWM_STATE_LOADED, NWM_STATE_READY, NWM_STATE_CONNECTED, NWM_STATE_5 };
-
-// The first halfword of a command buffer while the ARM7 is done with the buffer, and the number of buffers
-#define NWM_CMD_BUF_FREE 0x8000
-#define NWM_CMD_BUF_COUNT 32
-#define NWM_INDICATE_COUNT 3
-
-// The priority of the library's callbacks in the lists of those that run when the console sleeps and exits
-#define NWM_PM_PRIORITY 0xffff
-
-// What the exit callback waits for the ARM7: a first spin of 400000 cycles, spins of 10000 until the commands it
-// runs are done, and at most about a second (the ARM9's clock, in cycles) for the device to unload
-#define NWM_EXIT_SPIN_FIRST 400000
-#define NWM_EXIT_SPIN_STEP 10000
-#define NWM_EXIT_TIMEOUT 67028000
-
-// A command buffer: the command and its words
-typedef struct NWMCmdBuf {
-    u16 cmd;
-    u16 unk_02;
-    u32 args[63];
-} NWMCmdBuf;
-
-// The flags that the ARM7 sets in the shared memory, of which the library clears the first
-typedef struct NWMInfo {
-    u8 flags;
-    u8 unk_01[0x1f];
-} NWMInfo;
-
-#define NWM_INFO_PENDING 0x01
-
-// The ARM7's status block, which it writes in the shared memory
-typedef struct NWMStatus {
-    u8 pending[0x24]; // By command: 1 while the ARM7 runs it
-    u16 state;
-    u8 unk_26[0x1a];
-    u8 macAddr[6];
-    u8 unk_46[0x58];
-    u16 unk_9e;
-    u8 unk_a0[0x20];
-} NWMStatus;
-
-// What the ARM7 sends: the number of the command it answers, its result, and the command's data
-typedef struct NWMEvent {
-    u16 cmd;
-    u16 result;
-    union {
-        NWMCallback sendCallback; // The event of a frame sent: the callback that the frame was given
-        u16 index;                // The event of frames received: the index of the callback
-    } u04;
-    u32 unk_08;
-    union {
-        u32 size;     // The event of a scan: the size of the data
-        void *buffer; // The event of frames received: the buffer that is full
-    } u0c;
-    void *data;
-    u8 unk_14[0xec];
-} NWMEvent;
-
-// The system area that the game gives the library, its first part: the buffers of the commands, the queue of those the
-// ARM7 is done with, the callbacks and pointers to the three blocks that follow it (the flags, the status and an event)
-typedef struct NWMSys {
-    NWMCmdBuf cmdBuf[NWM_CMD_BUF_COUNT];      // 0x0000
-    OSMessageQueue freeQueue;                 // 0x2000
-    OSMessage freeMsgs[NWM_CMD_BUF_COUNT];    // 0x2020
-    u8 unk_20a0[0x80];                        // 0x20a0
-    u8 unk_2120[0x154];                       // 0x2120: cleared when the library starts
-    NWMInfo *info;                            // 0x2274
-    NWMStatus *status;                        // 0x2278
-    NWMEvent *event;                          // 0x227c
-    u16 dmaNo;                                // 0x2280
-    NWMCallback callbacks[NWM_CMD_COUNT];     // 0x2284: of the commands
-    NWMCallback indicate[NWM_INDICATE_COUNT]; // 0x22d4: of the frames received, by index
-} NWMSys;
-
-// A pointer in the DSi's shared memory to a block of its settings. The library checks the 16 bytes at 0x1e0 of it:
-// a word whose upper half is the CRC-16 of the 12 bytes that follow it
-#define NWM_SETTINGS_PTR 0x02fffdfc
-
-static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo);
-static BOOL func_027026b4(void);
-static NWMSys *func_027026dc(void);
-static void func_027026ec(void);
-static void func_02702740(u32 tag, u32 data, BOOL err);
-static NWMRetCode func_027028e4(u32 count, ...);
-static void func_02702a40(void);
-static void func_02702a78(void);
-static void func_02702a8c(void *arg);
 static NWMRetCode func_02702ca0(NWMCallback callback);
 static void func_02702d68(void *event);
 static void func_02702d7c(void *arg);
@@ -144,19 +29,14 @@ static NWMRetCode func_02703b24(const void *cmd, u32 size);
 static NWMCmdBuf *func_02703b98(void);
 static BOOL func_02703c28(void);
 
-// The data, in memory: sNwmInitialized, sNwm (the system area and the two PM callbacks), sUnloaded (set when the exit
-// callback's unload is done) and sBlockBuf (the block that the command 8 copies for the ARM7). -ipa function lays out
-// the statics defined with an initializer first and the tentative ones after them, in the reverse of their
-// declarations. The flag's zero initializer gives it a literal of its own for its address, as the original has:
-// func_02702468 reads and stores it through one literal and passes DC_StoreRange its address through another
-static u8 sNwmInitialized = FALSE;
+// A pointer in the DSi's shared memory to a block of its settings. The library checks the 16 bytes at 0x1e0 of it:
+// a word whose upper half is the CRC-16 of the 12 bytes that follow it
+#define NWM_SETTINGS_PTR 0x02fffdfc
+
+// The data, in memory: sUnloaded (set when the exit callback's unload is done) and sBlockBuf (the block that the
+// command 8 copies for the ARM7). -ipa function lays out the tentative statics in the reverse of their declarations
 static u32 sBlockBuf[0x210 / 4];
 static u8 sUnloaded;
-static struct {
-    NWMSys *sys;
-    PMExitCallbackInfo exitCallback;
-    PMSleepCallbackInfo sleepCallback;
-} sNwm;
 
 // Whether the ARM7 is running the command: it sets the command's byte in its status block while it does
 static inline BOOL NWMi_IsPending(u32 cmd) {
@@ -172,232 +52,6 @@ static inline BOOL NWMi_IsPending(u32 cmd) {
     return pending;
 }
 
-NWMRetCode NWM_Init(void *systemBuffer, u32 size, u32 dmaNo) {
-    if (!func_027026b4()) {
-        return NWM_RETCODE_UNAVAILABLE;
-    }
-    return func_02702468(systemBuffer, size, dmaNo);
-}
-
-static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
-    u32 irq;
-    int i;
-
-    irq = OS_DisableInterrupts();
-    if (WM_CheckInitialized() == 0) {
-        OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_ILLEGAL_STATE;
-    }
-    if (sNwmInitialized) {
-        OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_ILLEGAL_STATE;
-    }
-    if (sys == NULL) {
-        OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_INVALID_PARAM;
-    }
-    if (dmaNo > 3) {
-        OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_INVALID_PARAM;
-    }
-    if (((u32)sys & 0x1f) != 0) {
-        OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_INVALID_PARAM;
-    }
-    PXI_Init();
-    if (!PXI_IsCallbackReady(PXI_FIFO_TAG_NWM, PXI_PROC_ARM7)) {
-        OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_UNAVAILABLE;
-    }
-    DC_InvalidateRange(sys, size);
-    MIi_DmaFill32(dmaNo, sys, 0, size, TRUE);
-    sNwm.sys = sys;
-    DC_StoreRange(&sNwm.sys, 4);
-    sNwm.sys->info = (NWMInfo *)(sNwm.sys + 1);
-    sNwm.sys->status = (NWMStatus *)(sNwm.sys->info + 1);
-    sNwm.sys->event = (NWMEvent *)(sNwm.sys->status + 1);
-    func_027026ec();
-    sNwm.sys->dmaNo = dmaNo;
-    OS_InitMessageQueue(&sNwm.sys->freeQueue, sNwm.sys->freeMsgs, NWM_CMD_BUF_COUNT);
-    for (i = 0; i < NWM_CMD_BUF_COUNT; i++) {
-        sNwm.sys->cmdBuf[i].cmd = NWM_CMD_BUF_FREE;
-        DC_StoreRange(&sNwm.sys->cmdBuf[i], 2);
-        OS_SendMessage(&sNwm.sys->freeQueue, &sNwm.sys->cmdBuf[i], OS_MESSAGE_BLOCK);
-    }
-    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, func_02702740);
-    MI_CpuFill8(sNwm.sys->unk_2120, 0, sizeof(sNwm.sys->unk_2120));
-    sNwmInitialized = TRUE;
-    sNwm.sys->status->state = NWM_STATE_INITIALIZED;
-    DC_StoreRange(sNwm.sys, sizeof(NWMSys));
-    DC_StoreRange(&sNwmInitialized, 1);
-    OS_RestoreInterrupts(irq);
-    return NWM_RETCODE_SUCCESS;
-}
-
-NWMRetCode func_02702698(void) {
-    return sNwmInitialized ? NWM_RETCODE_SUCCESS : NWM_RETCODE_ILLEGAL_STATE;
-}
-
-// Whether the wireless is available and not turned off
-static BOOL func_027026b4(void) {
-    if (OS_IsAvailableWireless() == TRUE && !OS_IsForceDisableWireless()) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-// The library's system area. The commands' bare calls of it, whose result they drop, are left from the SDK's fetches of
-// the work for assertions that its release build compiles out
-static NWMSys *func_027026dc(void) {
-    return sNwm.sys;
-}
-
-// Clears the flag by which the ARM7 says it has something for the ARM9
-static void func_027026ec(void) {
-    NWMInfo *info;
-
-    if (sNwm.sys == NULL) {
-        return;
-    }
-    info = sNwm.sys->info;
-    DC_InvalidateRange(info, 1);
-    if (info->flags & NWM_INFO_PENDING) {
-        info->flags &= ~NWM_INFO_PENDING;
-        DC_StoreRange(info, 1);
-    }
-}
-
-// The PXI callback: takes the event that the ARM7 points to, runs the callbacks and gives the buffer back
-static void func_02702740(u32 tag, u32 data, BOOL err) {
-    NWMSys *sys = sNwm.sys;
-    NWMEvent *event = (NWMEvent *)data;
-    NWMCallback callback;
-
-    if (sys == NULL) {
-        return;
-    }
-    if (err) {
-        return;
-    }
-    if (event == NULL) {
-        return;
-    }
-    // BUG: the event is read before its cache lines are invalidated, so the check can see the event that was there
-#ifdef BUGFIX
-    DC_InvalidateRange(event, sizeof(NWMEvent));
-#endif
-    if (event->cmd >= NWM_CMD_COUNT) {
-        return;
-    }
-    DC_InvalidateRange(sys->event, sizeof(NWMEvent));
-    DC_InvalidateRange(sys->status, sizeof(NWMStatus));
-    if (event != sys->event) {
-        DC_InvalidateRange(event, sizeof(NWMEvent));
-    }
-    if ((event->cmd == NWM_CMD_LOAD_DEVICE && event->result != 0) ||
-        (event->cmd == NWM_CMD_UNLOAD_DEVICE && event->result == 0) || event->cmd == NWM_CMD_19) {
-        func_02702a78();
-    }
-    if (event->cmd == NWM_CMD_SEND_FRAME && event->result != NWM_RESULT_12 && event->u04.sendCallback != NULL) {
-        event->u04.sendCallback(event);
-    }
-    if (event->cmd != NWM_CMD_SEND_FRAME) {
-        if (event->cmd == NWM_CMD_UNLOAD_DEVICE || event->cmd == NWM_CMD_19 ||
-            (event->cmd == NWM_CMD_LOAD_DEVICE && event->result != 0)) {
-            PM_DeletePreExitCallback(&sNwm.exitCallback);
-        }
-        callback = sys->callbacks[event->cmd];
-        if (event->cmd == NWM_CMD_SCAN) {
-            DC_InvalidateRange(event->data, event->u0c.size);
-        }
-        if (callback != NULL) {
-            callback(event);
-        }
-    }
-    MI_CpuFill8(event, 0, sizeof(NWMEvent));
-    DC_StoreRange(event, sizeof(NWMEvent));
-    if (sys != NULL) {
-        func_027026ec();
-    }
-}
-
-u16 func_027028b0(void) {
-    NWMSys *sys = func_027026dc();
-    NWMStatus *status;
-    u16 state = 0;
-
-    if (sys != NULL) {
-        status = sys->status;
-        // BUG: the state is 0x24 bytes into the block, in another cache line than the one that is invalidated
-#ifdef BUGFIX
-        DC_InvalidateRange(&status->state, 2);
-#else
-        DC_InvalidateRange(status, 2);
-#endif
-        state = status->state;
-    }
-    return state;
-}
-
-// Whether the state is one of the count states that follow
-static NWMRetCode func_027028e4(u32 count, ...) {
-    NWMRetCode result;
-    u16 state;
-    va_list args;
-    NWMSys *sys = func_027026dc();
-
-    result = func_02702698();
-    if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {
-        return result;
-    }
-    DC_InvalidateRange(&sys->status->state, 2);
-    state = sys->status->state;
-    va_start(args, count);
-    result = NWM_RETCODE_ILLEGAL_STATE;
-    for (; count != 0; count--) {
-        if (va_arg(args, u32) == state) {
-            result = NWM_RETCODE_SUCCESS;
-        }
-    }
-    return result;
-}
-
-u16 func_02702980(void) {
-    return func_027026dc()->status->unk_9e;
-}
-
-u16 func_02702998(int type) {
-    u8 mac[6];
-    u16 sum;
-    int i;
-    int value;
-
-    OS_GetMacAddress(mac);
-    for (i = 0, sum = 0; i < 6; i++) {
-        sum += mac[i];
-    }
-    sum += OS_GetVBlankCount();
-    value = sum * 13;
-    if (type == 1) {
-        return value % 10 + 30;
-    }
-    return value % 10 + 105;
-}
-
-// Puts the callback that exits the application before the console sleeps (the wireless would be on)
-static void func_02702a40(void) {
-    PM_SetSleepCallbackInfo(&sNwm.sleepCallback, func_02702a8c, NULL);
-    PM_InsertPreSleepCallback(&sNwm.sleepCallback, NWM_PM_PRIORITY);
-}
-
-static void func_02702a78(void) {
-    PM_DeletePreSleepCallback(&sNwm.sleepCallback);
-}
-
-static void func_02702a8c(void *arg) {
-    OS_Terminate();
-}
-
 NWMRetCode NWM_End(void) {
     u32 irq;
     NWMRetCode result;
@@ -407,11 +61,11 @@ NWMRetCode NWM_End(void) {
         return result;
     }
     irq = OS_DisableInterrupts();
-    sNwm.sys->status->state = NWM_STATE_NONE;
+    NWMi_SystemArea->status->state = NWM_STATE_NONE;
     func_027026ec();
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_NWM, NULL);
-    sNwm.sys = NULL;
-    sNwmInitialized = FALSE;
+    NWMi_SystemArea = NULL;
+    NWMi_SetUpDone = FALSE;
     OS_RestoreInterrupts(irq);
     return NWM_RETCODE_SUCCESS;
 }
@@ -431,7 +85,7 @@ NWMRetCode NWM_LoadDevice(NWMCallback callback) {
     func_02703c28();
     func_02703a34(NWM_CMD_LOAD_DEVICE, callback);
     func_02702a40();
-    info = &sNwm.exitCallback;
+    info = &NWMi_UnloadOnExit;
     PM_SetExitCallbackInfo(info, func_02702d7c, NULL);
     PM_InsertPreExitCallback(info, NWM_PM_PRIORITY);
     result = func_02703a74(NWM_CMD_LOAD_DEVICE, 4, sys->info, sys->status, sys->event, 0);
@@ -490,7 +144,7 @@ static void func_02702d7c(void *arg) {
     s32 timeout;
     NWMSys *sys;
 
-    if (!func_02769520()) {
+    if (!PMi_GetExitType()) {
         return;
     }
     sys = func_027026dc();

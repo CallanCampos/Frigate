@@ -315,7 +315,7 @@ def test_harness_reports():
     checks = [
         (UnalignedAccess, lambda: emu.call("VEC_DotProduct", a + 2, a)),
         (Fault, lambda: emu.call("VEC_DotProduct", 0x10, a)),
-        (Fault, lambda: emu.call("BitUnPack", a, out, a)),
+        (Fault, lambda: emu.call("SVC_UnpackBits", a, out, a)),
         (InstructionLimit, lambda: emu.call(emu.stub(struct.pack("<I", 0xEAFFFFFE)), max_instructions=1000)),
     ]
     for expected, call in checks:

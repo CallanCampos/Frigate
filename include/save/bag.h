@@ -67,22 +67,22 @@ void BagSave_Init(BagSave *bag);
 // Replaces the DNA Splicers that fuse (0) with those that separate, or those that separate (1) with those that fuse
 void BagSave_SwitchOwnedDNASplicers(BagSave *bag, u32 from);
 // The bag's cursor in each pocket, the pocket the bag opens on and the Free Space's filter, in the cursor that
-// func_0201734c returns
-void func_0200887c(BagCursor *cursor, u16 pocket, s16 *row, s16 *scroll);
-u16 func_02008890(BagCursor *cursor);
-void func_02008894(BagCursor *cursor, u16 pocket, s16 row, s16 scroll);
-void func_020088a4(BagCursor *cursor, u16 pocket);
+// GameData_GetBagCursor returns
+void BagCursor_GetPocketPosition(BagCursor *cursor, u16 pocket, s16 *row, s16 *scroll);
+u16 BagCursor_GetPocket(BagCursor *cursor);
+void BagCursor_SetPocketPosition(BagCursor *cursor, u16 pocket, s16 row, s16 scroll);
+void BagCursor_SetPocket(BagCursor *cursor, u16 pocket);
 // The battle bag's cursor memory, in the same cursor (allocated here): the row and page of a pocket, and the last used
 // item and its pocket
 BagCursor *BagCursor_Create(HeapID heapId);
-void func_020088a8(BagCursor *cursor, u16 pocket, s16 *row, s16 *page);
-u16 func_020088bc(BagCursor *cursor);
-u16 func_020088c0(BagCursor *cursor);
-void func_020088c4(BagCursor *cursor, s16 *rows, s16 *pages);
-void func_020088e0(BagCursor *cursor, u16 item, u8 pocket);
+void BagCursor_GetBattlePocketPosition(BagCursor *cursor, u16 pocket, s16 *row, s16 *page);
+u16 BagCursor_GetBattleLastItem(BagCursor *cursor);
+u16 BagCursor_GetBattleLastPocket(BagCursor *cursor);
+void BagCursor_SetBattlePositions(BagCursor *cursor, s16 *rows, s16 *pages);
+void BagCursor_SetBattleLastItem(BagCursor *cursor, u16 item, u8 pocket);
 // The Free Space's filter
-u8 func_020088e8(BagCursor *cursor);
-void func_020088ec(BagCursor *cursor, u32 filter);
+u8 BagCursor_GetFreeSpaceFilter(BagCursor *cursor);
+void BagCursor_SetFreeSpaceFilter(BagCursor *cursor, u32 filter);
 // The bag's Free Space and item slots. Function names from swan, except BagSave_GetOwnedItemFlags and
 // BagSave_GetPocketItems Whether an item's Free Space bit is set
 BOOL BagSave_IsItemFreeSpaceBit(BagSave *bag, u16 item);

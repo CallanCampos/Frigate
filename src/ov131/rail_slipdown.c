@@ -72,9 +72,9 @@ void *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOO
     } else {
         work->player = NULL;
     }
-    func_ov012_0216763c(work->actor, TRUE);
-    func_ov012_02167788(work->actor, TRUE);
-    func_ov012_02167580(work->actor, FALSE);
+    FldAct_SetHeightCalcDisabled(work->actor, TRUE);
+    FldAct_SetMapAttrDisabled(work->actor, TRUE);
+    SetActorCollisionEnabled(work->actor, FALSE);
     DisableActorMovement(work->actor);
     work->task = GFL_TCBMgrAddTask(Field_GetTCBMgr(field), RailSlipdown_Task, work, 0);
     return work;
@@ -260,9 +260,9 @@ static void RailSlipdown_Task(TCB *tcb, void *data) {
             SetActorInitedPositionRail(work->actor, &work->railPos);
         }
         ClearActorMovementFlag(work->actor, 0x8000);
-        func_ov012_0216763c(work->actor, FALSE);
-        func_ov012_02167788(work->actor, FALSE);
-        func_ov012_02167580(work->actor, TRUE);
+        FldAct_SetHeightCalcDisabled(work->actor, FALSE);
+        FldAct_SetMapAttrDisabled(work->actor, FALSE);
+        SetActorCollisionEnabled(work->actor, TRUE);
         EnableActorMovement(work->actor);
         work->state = SLIPDOWN_STATE_DONE;
         break;

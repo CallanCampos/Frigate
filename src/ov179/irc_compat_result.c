@@ -477,34 +477,34 @@ static void IrcCompatClAct_Init(IrcCompatClAct *clact, const BGSysVRAMConfig *vr
 
     MI_CpuFill8(clact, 0, sizeof(IrcCompatClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     arc = GFL_ArcSysCreateFileHandle(ARCID_IRC_COMPAT, heapId);
-    clact->palette = func_0204bba0(arc, 12, CLACT_VRAM_MAIN, 0, heapId);
-    clact->chars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_MAIN, heapId);
-    clact->cellAnims = func_0204bde0(arc, 10, 9, heapId);
+    clact->palette = ClActSys_LoadPltt(arc, 12, CLACT_VRAM_MAIN, 0, heapId);
+    clact->chars = ClActSys_LoadChars(arc, 11, FALSE, CLACT_VRAM_MAIN, heapId);
+    clact->cellAnims = ClActSys_LoadCellAnims(arc, 10, 9, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < 3; i++) {
-        clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
-                                         CLACT_SURFACE_MAIN, heapId);
+        clact->actors[i] = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
+                                          CLACT_SURFACE_MAIN, heapId);
     }
     MI_CpuFill8(&background, 0, sizeof(ClActorSetup));
     background.x = 128;
     background.y = 96;
-    clact->actors[ACTOR_BACKGROUND] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims,
-                                                    &background, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(clact->actors[ACTOR_BACKGROUND], FALSE);
-    func_0204c468(clact->actors[ACTOR_BACKGROUND], 0);
-    func_0204c438(clact->actors[ACTOR_BACKGROUND], 0);
-    func_0204c520(clact->actors[ACTOR_BACKGROUND], TRUE);
-    func_0204c488(clact->actors[ACTOR_BACKGROUND], 11);
+    clact->actors[ACTOR_BACKGROUND] = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims,
+                                                     &background, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(clact->actors[ACTOR_BACKGROUND], FALSE);
+    ClActor_SetBgPriority(clact->actors[ACTOR_BACKGROUND], 0);
+    ClActor_SetPriority(clact->actors[ACTOR_BACKGROUND], 0);
+    ClActor_SetAutoAnim(clact->actors[ACTOR_BACKGROUND], TRUE);
+    ClActor_SetSequence(clact->actors[ACTOR_BACKGROUND], 11);
     for (i = 0; i < 3; i++) {
-        func_0204c124(clact->actors[i], FALSE);
-        func_0204c468(clact->actors[i], 0);
-        func_0204c438(clact->actors[i], 0);
+        ClActor_SetVisible(clact->actors[i], FALSE);
+        ClActor_SetBgPriority(clact->actors[i], 0);
+        ClActor_SetPriority(clact->actors[i], 0);
     }
 }
 
@@ -513,23 +513,23 @@ static void IrcCompatClAct_Free(IrcCompatClAct *clact) {
 
     for (i = 0; i < CLACT_COUNT; i++) {
         if (clact->actors[i] != NULL) {
-            func_0204c108(clact->actors[i]);
+            ClActor_Delete(clact->actors[i]);
         }
     }
-    func_0204bcd0(clact->palette);
-    func_0204b98c(clact->chars);
-    func_0204be64(clact->cellAnims);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActSys_FreePltt(clact->palette);
+    ClActSys_FreeChars(clact->chars);
+    ClActSys_FreeCellAnims(clact->cellAnims);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(IrcCompatClAct));
 }
 
 static void IrcCompatClAct_Update(IrcCompatClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void IrcCompatClAct_VBlank(IrcCompatClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActor *IrcCompatClAct_GetActor(IrcCompatClAct *clact, int index) {
@@ -542,11 +542,11 @@ static ClActUnit *IrcCompatClAct_GetUnit(IrcCompatClAct *clact) {
 
 static void IrcCompatText_Init(IrcCompatText *text, BOOL keepFont, HeapID heapId) {
     MI_CpuFill8(text, 0, sizeof(IrcCompatText));
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     if (!keepFont) {
         text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
     }
-    text->queue = func_02021998(heapId);
+    text->queue = PrintQueue_CreateDefault(heapId);
     text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_6, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
 }
@@ -554,13 +554,13 @@ static void IrcCompatText_Init(IrcCompatText *text, BOOL keepFont, HeapID heapId
 static void IrcCompatText_Free(IrcCompatText *text) {
     GFL_WordSetSystemFree(text->wordSet);
     GFL_MsgDataFree(text->msgData);
-    func_02021a18(text->queue);
+    PrintQueue_Free(text->queue);
     GFL_FontFree(text->font);
     MI_CpuFill8(text, 0, sizeof(IrcCompatText));
 }
 
 static BOOL IrcCompatText_Update(IrcCompatText *text) {
-    return func_02021a3c(text->queue);
+    return PrintQueue_Main(text->queue);
 }
 
 static Font *IrcCompatText_GetFont(IrcCompatText *text) {
@@ -805,7 +805,7 @@ static void IrcCompatResult_ShowStep(IrcCompatResultWork *wk, u16 *state) {
         }
         break;
     case STEP_REWARD:
-        if (!func_0203da48()) {
+        if (!GFL_HIDIsTouchPressed()) {
             break;
         }
         if (wk->param->gsys != NULL) {
@@ -838,7 +838,7 @@ static void IrcCompatResult_ShowStep(IrcCompatResultWork *wk, u16 *state) {
         *state = STEP_WAIT_SAVE;
         break;
     case STEP_WAIT_SAVE:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             IrcCompatResult_SetStep(wk, IrcCompatResult_FinishStep);
         }
         break;
@@ -869,8 +869,8 @@ static void IrcCompatDigits_Init(IrcCompatDigits *digits, IrcCompatGraphic *grap
             pos.x = 36 * i + 92;
         }
         pos.y = 84;
-        func_0204c140(digits->actors[i], &pos, 0);
-        func_0204c124(digits->actors[i], FALSE);
+        ClActor_SetSurfacePos(digits->actors[i], &pos, 0);
+        ClActor_SetVisible(digits->actors[i], FALSE);
         digits->unkC[i] = 0;
         digits->unk12[i] = 60;
         digits->unk18[i] = 0xfef / digits->unk12[i];
@@ -889,7 +889,7 @@ static void IrcCompatDigits_Show(IrcCompatDigits *digits, int index) {
             return;
         }
         digits->shown[index] = TRUE;
-        func_0204c124(digits->actors[index], TRUE);
+        ClActor_SetVisible(digits->actors[index], TRUE);
     }
 }
 
@@ -915,11 +915,11 @@ static void IrcCompatDigits_SetValue(IrcCompatDigits *digits, u32 value) {
         }
     }
     for (i = 0; i < DIGIT_COUNT; i++) {
-        func_0204c488(digits->actors[i], 0);
+        ClActor_SetSequence(digits->actors[i], 0);
     }
     for (i = 0; i < DIGIT_COUNT; i++) {
         digits->digits[i] = value % sIrcCompatDigitDivisors[i + 1] / sIrcCompatDigitDivisors[i];
-        func_0204c488(digits->actors[2 - i], digits->digits[i] + 1);
+        ClActor_SetSequence(digits->actors[2 - i], digits->digits[i] + 1);
     }
 }
 
@@ -1087,11 +1087,11 @@ static u32 IrcCompat_GetRewardCount(u32 score, BOOL bothLogs) {
 
 static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk) {
     u32 result = REWARD_NONE;
-    TrainerLogSave *log = func_0200afbc(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
+    TrainerLogSave *log = TrainerLogSave_Get(GameData_GetSaveControl(GSYS_GetGameData(wk->param->gsys)));
     CompatibleIrcProfile *other = wk->param->profile;
     PlayerInfo *info = &other->trainer;
 
-    if (!func_0200b0c0(log, getIDAsUInt(info)) && wk->param->gsys != NULL) {
+    if (!TrainerLogSave_WasMetToday(log, getIDAsUInt(info)) && wk->param->gsys != NULL) {
         BagSave *bag = GameData_GetBag(GSYS_GetGameData(wk->param->gsys));
         u32 owned = BagSave_GetItemCountByID(bag, ITEM_SWEET_HEART, HEAPID_IRC_COMPAT);
 
@@ -1112,10 +1112,10 @@ static u32 IrcCompatResult_GiveReward(IrcCompatResultWork *wk) {
     }
     if (wk->param->profile != NULL) {
         u16 *name = GetPlayerName(info);
-        u8 unk10_17 = getTrainerGender(info) != 0 ? 0 : 1;
+        u8 isMale = getTrainerGender(info) != 0 ? 0 : 1;
 
-        func_0200b184(log, name, wk->param->result, unk10_17, other->birthMonth, other->birthDay, getIDAsUInt(info),
-                      other->species, other->form, other->sex, other->isEgg);
+        TrainerLogSave_AddTrainer(log, name, wk->param->result, isMale, other->birthMonth, other->birthDay,
+                                  getIDAsUInt(info), other->species, other->form, other->sex, other->isEgg);
     }
     if (wk->param->gsys != NULL) {
         RecordAddOne(GameData_GetRecords(GSYS_GetGameData(wk->param->gsys)), RECORD_COMPAT_CHECKS);

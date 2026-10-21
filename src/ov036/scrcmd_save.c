@@ -1,6 +1,7 @@
 // The script command that saves the game, with the saving icon, through the Pokéwood system when it runs. The ROM has
 // no name for the file; scrcmd_save.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/field.h"
 #include "field/field_effect.h"
@@ -25,7 +26,7 @@ typedef struct {
     BOOL pokewood;
 } SaveEvent;
 
-static GameEventReturnCode func_ov036_021a6b80(GameEvent *event, u32 *state, void *data) {
+static GameEventReturnCode EventSaveData_Callback(GameEvent *event, u32 *state, void *data) {
     SaveEvent *save = data;
     GameData *gameData = GSYS_GetGameData(save->gsys);
     Field *field = GSYS_GetField(save->gsys);
@@ -42,15 +43,15 @@ static GameEventReturnCode func_ov036_021a6b80(GameEvent *event, u32 *state, voi
         }
         RecordAddOne(GameData_GetRecords(gameData), 1);
         if (!save->pokewood) {
-            func_0201782c(gameData);
+            GameData_StartSave(gameData);
             *state = 1;
         } else {
-            GameEvent_ChainNext(event, func_ov062_021e682c(save->gsys, save->result));
+            GameEvent_ChainNext(event, EventPokewoodSave_Create(save->gsys, save->result));
             *state = 2;
         }
         break;
     case 1:
-        switch (func_02017850(gameData)) {
+        switch (GameData_UpdateSave(gameData)) {
         case 0:
         case 1:
             // Still saving
@@ -87,8 +88,8 @@ static GameEventReturnCode func_ov036_021a6b80(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-static GameEvent *func_ov036_021a6c94(GameSystem *gsys, u16 *result) {
-    GameEvent *event = GameEvent_Create(gsys, NULL, func_ov036_021a6b80, sizeof(SaveEvent));
+static GameEvent *EventSaveData_Create(GameSystem *gsys, u16 *result) {
+    GameEvent *event = GameEvent_Create(gsys, NULL, EventSaveData_Callback, sizeof(SaveEvent));
     SaveEvent *save = GameEvent_GetData(event);
     PokewoodSystem **pokewood;
 
@@ -96,7 +97,7 @@ static GameEvent *func_ov036_021a6c94(GameSystem *gsys, u16 *result) {
     save->saveIcon = NULL;
     save->result = result;
     save->pokewood = FALSE;
-    pokewood = func_02017a04(GSYS_GetGameData(gsys));
+    pokewood = GameData_GetPokewoodSystemPtr(GSYS_GetGameData(gsys));
     if (pokewood != NULL && *pokewood != NULL) {
         save->pokewood = TRUE;
     }
@@ -105,11 +106,11 @@ static GameEvent *func_ov036_021a6c94(GameSystem *gsys, u16 *result) {
 
 BOOL s0137_SaveDataWrite(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    GameData *gameData = FieldScriptEnv_GetGameData(env);
+    FieldScriptEnv_GetGameData(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
-    Field *field = GSYS_GetField(gsys);
+    GSYS_GetField(gsys);
     u16 *result = ScriptReadVar(vm, env);
 
-    ScriptWork_CallEvent(work, func_ov036_021a6c94(gsys, result));
+    ScriptWork_CallEvent(work, EventSaveData_Create(gsys, result));
     return TRUE;
 }

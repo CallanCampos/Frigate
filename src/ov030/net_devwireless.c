@@ -55,42 +55,42 @@ static NetDevWireless *sDevWireless;
 
 static GFLNetDevTable sNetDevWirelessTable = {
     .init = NetDevWireless_Init,
-    .unk08 = NetDevWireless_Begin,
+    .start = NetDevWireless_Begin,
     .update = NetDevWireless_Update,
-    .unk10 = NetDevWireless_Unk10,
-    .unk14 = NetDevWireless_End,
+    .disconnect = NetDevWireless_Unk10,
+    .end = NetDevWireless_End,
     .unk18 = NetDevWireless_ResetPipe,
     .unk1C = NetDevWireless_ReturnTrue1C,
     .unk20 = NetDevWireless_ReturnTrue20,
     .unk24 = NetDevWireless_ReturnTrue24,
-    .unk28 = NetDevWireless_GetBeaconData,
-    .unk2C = NetDevWireless_GetBeaconMac,
+    .getBeaconData = NetDevWireless_GetBeaconData,
+    .getBeaconMac = NetDevWireless_GetBeaconMac,
     .unk30 = NetDevWireless_ReturnTrue30,
     .unk34 = NetDevWireless_ReturnTrue34,
-    .unk38 = NetDevWireless_Unk38,
+    .hasBeacons = NetDevWireless_Unk38,
     .setDisconnectCallback = NetDevWireless_SetDisconnectCallback,
-    .unk40 = NetDevWireless_Unk40,
-    .unk44 = NetDevWireless_Unk44,
-    .unk48 = NetDevWireless_Unk48,
-    .unk4C = NetDevWireless_Unk4C,
-    .unk54 = NetDevWireless_Unk54,
-    .unk58 = NetDevWireless_IsDataSharing,
-    .unk5C = NetDevWireless_Unk5C,
+    .startParent = NetDevWireless_Unk40,
+    .startScan = NetDevWireless_Unk44,
+    .startChild = NetDevWireless_Unk48,
+    .startMatch = NetDevWireless_Unk4C,
+    .close = NetDevWireless_Unk54,
+    .isDataSharing = NetDevWireless_IsDataSharing,
+    .stepDataSharing = NetDevWireless_Unk5C,
     .getRecvData = NetDevWireless_GetRecvData,
     .send = NetDevWireless_Send,
     .setRecvCallback = NetDevWireless_SetRecvCallback,
-    .unk6C = NetDevWireless_IsRunning,
+    .isRunning = NetDevWireless_IsRunning,
     .isConnected = NetDevWireless_IsConnected,
-    .unk74 = NetDevWireless_Unk74,
-    .unk78 = NetDevWireless_IsIdle,
+    .isEnded = NetDevWireless_Unk74,
+    .isIdle = NetDevWireless_IsIdle,
     .getConnectBits = NetDevWireless_GetConnectBits,
     .getNetId = NetDevWireless_GetNetId,
     .getSignalLevel = NetDevWireless_GetSignalLevel,
     .isError = NetDevWireless_GetError,
-    .unk8C = NetDevWireless_Unk8C,
-    .unkB8 = NetDevWireless_UnkB8,
-    .unkBC = NetDevWireless_UnkBC,
-    .unkC0 = NetDevWireless_UnkC0,
+    .setDisconnectError = NetDevWireless_Unk8C,
+    .setAcceptConnect = NetDevWireless_UnkB8,
+    .startSearch = NetDevWireless_UnkBC,
+    .holdScan = NetDevWireless_UnkC0,
 };
 
 const GFLNetDevTable *NetDevWireless_GetTable(void) {
@@ -106,26 +106,26 @@ static BOOL NetDevWireless_Init(HeapID heapId, void *sys, WHCallback callback, v
     sDevWireless = GFL_HeapAllocate(heapId, sizeof(NetDevWireless), TRUE, "net_devwireless.c", 180);
     sDevWireless->sys = sys;
     flag = TRUE;
-    if (func_02042e84()->bNetType != 5) {
+    if (GFL_NetGetInitData()->bNetType != 5) {
         flag = FALSE;
     }
-    return func_ov030_02173340(heapId, callback, work, flag);
+    return NetWhpipe_Init(heapId, callback, work, flag);
 }
 
 static BOOL NetDevWireless_Begin(void (*callback)(BOOL ok)) {
     if (callback != NULL) {
-        callback(func_ov030_02173aa0());
+        callback(NetWhpipe_IsIdle());
     }
-    return func_ov030_02173aa0();
+    return NetWhpipe_IsIdle();
 }
 
 static int NetDevWireless_Update(u16 connectBits) {
-    func_ov030_02173964(connectBits);
+    NetWhpipe_Update(connectBits);
     return TRUE;
 }
 
 static BOOL NetDevWireless_Unk10(int a0, int a1) {
-    return func_ov030_021736b8();
+    return NetWhpipe_Finalize();
 }
 
 static BOOL NetDevWireless_Finish(BOOL success) {
@@ -140,13 +140,13 @@ static BOOL NetDevWireless_Finish(BOOL success) {
 static BOOL NetDevWireless_End(void (*endCallback)(BOOL ok)) {
     if (sDevWireless != NULL) {
         sDevWireless->endCallback = endCallback;
-        return func_ov030_02173e9c(NetDevWireless_Finish);
+        return NetWhpipe_End(NetDevWireless_Finish);
     }
     return TRUE;
 }
 
 static BOOL NetDevWireless_ResetPipe(void) {
-    func_ov030_02173554();
+    NetWhpipe_ClearBeacons();
     return TRUE;
 }
 
@@ -166,14 +166,14 @@ static void *NetDevWireless_GetBeaconData(int index) {
     if (index >= 16) {
         return NULL;
     }
-    return func_ov030_02173b24(index);
+    return NetWhpipe_GetBeaconData(index);
 }
 
 static u8 *NetDevWireless_GetBeaconMac(int index) {
     if (index >= 16) {
         return NULL;
     }
-    return func_ov030_02173b50(index);
+    return NetWhpipe_GetBeaconMac(index);
 }
 
 static BOOL NetDevWireless_ReturnTrue30(void) {
@@ -185,7 +185,7 @@ static BOOL NetDevWireless_ReturnTrue34(void) {
 }
 
 static BOOL NetDevWireless_Unk38(int a0) {
-    return func_ov030_02173bf4();
+    return NetWhpipe_HasBeacons();
 }
 
 static BOOL NetDevWireless_SetDisconnectCallback(void (*callback)(int netId)) {
@@ -194,15 +194,15 @@ static BOOL NetDevWireless_SetDisconnectCallback(void (*callback)(int netId)) {
 }
 
 static int NetDevWireless_Unk40(int a0, BOOL (*callback)(void)) {
-    return func_ov030_02173cf8(a0);
+    return NetWhpipe_StartParent(a0);
 }
 
 static BOOL NetDevWireless_Unk44(int a0, int a1) {
-    return func_ov030_021735b0(a0);
+    return NetWhpipe_StartScan(a0);
 }
 
 static int NetDevWireless_Unk48(BOOL a0, const u8 *mac, int index, int a3, void (*callback)(void)) {
-    return func_ov030_02173e0c(a0, mac, index, callback);
+    return NetWhpipe_StartChild(a0, mac, index, callback);
 }
 
 static BOOL NetDevWireless_Unk4C(int a0, int a1, int a2, int a3) {
@@ -210,7 +210,7 @@ static BOOL NetDevWireless_Unk4C(int a0, int a1, int a2, int a3) {
 }
 
 static BOOL NetDevWireless_Unk54(BOOL a0, int a1) {
-    return func_ov030_021736b8();
+    return NetWhpipe_Finalize();
 }
 
 static BOOL NetDevWireless_IsDataSharing(void) {
@@ -226,11 +226,11 @@ static u8 *NetDevWireless_GetRecvData(int netId) {
 }
 
 static BOOL NetDevWireless_Send(u8 *data, int size, int a2, GFLNetSendDoneFunc callback) {
-    return func_ov030_02173c1c(data, size, callback);
+    return NetWhpipe_SendData(data, size, callback);
 }
 
 static BOOL NetDevWireless_SetRecvCallback(GFLNetRecvFunc callback) {
-    func_ov030_021733d0(callback);
+    NetWhpipe_SetRecvCallback(callback);
     return TRUE;
 }
 
@@ -252,11 +252,11 @@ static BOOL NetDevWireless_IsRunning(void) {
 }
 
 static BOOL NetDevWireless_IsConnected(void) {
-    return func_ov030_021739ec();
+    return NetWhpipe_IsConnected();
 }
 
 static BOOL NetDevWireless_Unk74(void) {
-    return !func_ov030_02173a8c();
+    return !NetWhpipe_IsInitialized();
 }
 
 static BOOL NetDevWireless_IsIdle(void) {
@@ -264,16 +264,16 @@ static BOOL NetDevWireless_IsIdle(void) {
 }
 
 static int NetDevWireless_GetConnectBits(void) {
-    return func_ov030_02173c28();
+    return NetWhpipe_GetBitmap();
 }
 
 static int NetDevWireless_GetNetId(void) {
-    return func_ov030_02173c30();
+    return NetWhpipe_GetAid();
 }
 
 static int NetDevWireless_GetSignalLevel(void) {
-    if (func_02042d34() == 3) {
-        return 3 - func_02012ea0();
+    if (GFL_NetGetGameCommandBase() == 3) {
+        return 3 - WihDwc_GetLinkLevel();
     }
     return 3 - WM_GetLinkLevel();
 }
@@ -284,24 +284,24 @@ static int NetDevWireless_GetError(void) {
     if (error == 5) {
         error = 0;
     }
-    if (func_ov030_02173ae4() && error == 0) {
+    if (NetWhpipe_IsStopped() && error == 0) {
         error = 20;
     }
     return error;
 }
 
 static void NetDevWireless_Unk8C(int a0) {
-    func_ov030_02173b04(a0);
+    NetWhpipe_SetLockEnabled(a0);
 }
 
 static void NetDevWireless_UnkB8(int a0) {
-    func_ov030_02173ec8(a0);
+    NetWhpipe_SetScanAcceptAll(a0);
 }
 
 static BOOL NetDevWireless_UnkBC(void) {
-    return func_ov030_02174040();
+    return NetWhpipe_StartSearch();
 }
 
 static void NetDevWireless_UnkC0(int a0) {
-    func_ov030_021740f0(a0);
+    NetWhpipe_HoldScan(a0);
 }

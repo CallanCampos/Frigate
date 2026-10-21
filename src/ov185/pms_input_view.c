@@ -135,7 +135,7 @@ PMSInputView *PMSIView_Create(const PMSInputWork *mwk, const PMSInputData *dwk) 
         vwk->dwk = dwk;
         vwk->keyMode = PMSInput_GetKeyModePtr(mwk);
         ClActSys_Create(&data_02093f08, &sPMSIViewVRAMConfig, HEAPID_PMS_INPUT);
-        vwk->actUnit = func_0204bf1c(128, 0, HEAPID_PMS_INPUT);
+        vwk->actUnit = ClActUnit_Create(128, 0, HEAPID_PMS_INPUT);
         GFL_BGSysCreate(HEAPID_PMS_INPUT);
         BmpWin_InitAllocator(HEAPID_PMS_INPUT);
         GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
@@ -167,16 +167,16 @@ void PMSIView_Delete(PMSInputView *vwk) {
         GFL_TCBRemove(vwk->mainTask);
         GFL_TCBRemove(vwk->vintrTask);
         PMSIVMenu_Delete(vwk->menu);
-        func_0204bf98(vwk->actUnit);
+        ClActUnit_Delete(vwk->actUnit);
         for (i = 0; i < 2; i++) {
-            func_0204bcd0(vwk->objRes[i].palette);
-            func_0204b98c(vwk->objRes[i].chars);
-            func_0204be64(vwk->objRes[i].cellAnims);
-            func_0204bcd0(vwk->objRes2[i].palette);
-            func_0204b98c(vwk->objRes2[i].chars);
-            func_0204be64(vwk->objRes2[i].cellAnims);
+            ClActSys_FreePltt(vwk->objRes[i].palette);
+            ClActSys_FreeChars(vwk->objRes[i].chars);
+            ClActSys_FreeCellAnims(vwk->objRes[i].cellAnims);
+            ClActSys_FreePltt(vwk->objRes2[i].palette);
+            ClActSys_FreeChars(vwk->objRes2[i].chars);
+            ClActSys_FreeCellAnims(vwk->objRes2[i].cellAnims);
         }
-        func_0204b758();
+        ClActSys_Delete();
         BmpWin_FreeAllocator();
         GFL_BGSysFree();
         GFL_HeapFree(vwk);
@@ -190,12 +190,12 @@ TCB *PMSIView_AddVTask(TCBFunc func, void *wk, u32 priority) {
 static void PMSIView_MainTask(TCB *tcb, void *data) {
     PMSInputView *vwk = data;
 
-    func_0204b794();
+    ClActSys_Draw();
     if (vwk->menu != NULL) {
         PMSIVMenu_Main(vwk->menu);
     }
     if (vwk->printQueue != NULL) {
-        func_02021a3c(vwk->printQueue);
+        PrintQueue_Main(vwk->printQueue);
         PMSIView_FlushMessage(vwk);
     }
 }
@@ -207,7 +207,7 @@ static void PMSIView_VintrTask(TCB *tcb, void *data) {
         vwk->lowerScreenChanged = FALSE;
     }
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 void PMSIView_SetCommand(PMSInputView *vwk, int cmd) {
@@ -370,12 +370,12 @@ static void PMSIView_SetupObjGraphic(PMSIVCommandWork *cwk, ArcTool *arc) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        vwk->objRes[i].palette = func_0204bba0(arc, 7, i, 0, HEAPID_PMS_INPUT);
-        vwk->objRes[i].chars = func_0204b81c(arc, 19, FALSE, i, HEAPID_PMS_INPUT);
-        vwk->objRes[i].cellAnims = func_0204bde0(arc, 36, 42, HEAPID_PMS_INPUT);
-        vwk->objRes2[i].palette = func_0204bba0(arc, 1, i, 0xe0, HEAPID_PMS_INPUT);
-        vwk->objRes2[i].chars = func_0204b81c(arc, 46, FALSE, i, HEAPID_PMS_INPUT);
-        vwk->objRes2[i].cellAnims = func_0204bde0(arc, 34, 40, HEAPID_PMS_INPUT);
+        vwk->objRes[i].palette = ClActSys_LoadPltt(arc, 7, i, 0, HEAPID_PMS_INPUT);
+        vwk->objRes[i].chars = ClActSys_LoadChars(arc, 19, FALSE, i, HEAPID_PMS_INPUT);
+        vwk->objRes[i].cellAnims = ClActSys_LoadCellAnims(arc, 36, 42, HEAPID_PMS_INPUT);
+        vwk->objRes2[i].palette = ClActSys_LoadPltt(arc, 1, i, 0xe0, HEAPID_PMS_INPUT);
+        vwk->objRes2[i].chars = ClActSys_LoadChars(arc, 46, FALSE, i, HEAPID_PMS_INPUT);
+        vwk->objRes2[i].cellAnims = ClActSys_LoadCellAnims(arc, 34, 40, HEAPID_PMS_INPUT);
     }
 }
 
@@ -395,8 +395,8 @@ static void PMSIView_CmdQuit(TCB *tcb, void *data) {
             PMSIVCategory_Delete(cwk->vwk->category);
             PMSIVWordWin_Delete(cwk->vwk->wordWin);
             GFL_FontFree(vwk->font);
-            func_02021c44(vwk->printQueue);
-            func_02021a18(vwk->printQueue);
+            PrintQueue_Clear(vwk->printQueue);
+            PrintQueue_Free(vwk->printQueue);
             vwk->printQueue = NULL;
             GFL_BGSysReleaseBG(0);
             GFL_BGSysReleaseBG(1);
@@ -555,7 +555,7 @@ static void PMSIView_SetupBG(PMSIVCommandWork *cwk) {
         GFL_BGSysSetBGEnabled(i, TRUE);
     }
     vwk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_PMS_INPUT);
-    vwk->printQueue = func_020219a8(0x500, HEAPID_PMS_INPUT);
+    vwk->printQueue = PrintQueue_Create(0x500, HEAPID_PMS_INPUT);
 }
 
 static void PMSIView_CmdFadeIn(TCB *tcb, void *data) {
@@ -1245,11 +1245,11 @@ ClActor *PMSIView_AddActor(PMSInputView *vwk, const PMSIVObjRes *res, u32 x, u32
         surface = CLACT_SURFACE_MAIN;
     }
     irq = OS_DisableInterrupts();
-    actor = func_0204c040(vwk->actUnit, res->chars, res->palette, res->cellAnims, &setup, surface, HEAPID_PMS_INPUT);
+    actor = ClActor_Create(vwk->actUnit, res->chars, res->palette, res->cellAnims, &setup, surface, HEAPID_PMS_INPUT);
     OS_RestoreInterrupts(irq);
     if (actor) {
-        func_0204c520(actor, TRUE);
-        func_0204c53c(actor, FX32_ONE);
+        ClActor_SetAutoAnim(actor, TRUE);
+        ClActor_SetAutoAnimSpeed(actor, FX32_ONE);
     }
     return actor;
 }
@@ -1303,8 +1303,8 @@ static void PMSIView_PrintMessage(PMSIVCommandWork *cwk, u32 msg) {
     GFL_BitmapFill(BmpWin_GetBitmap(cwk->vwk->msgWin), 7);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, PMSIV_MSG_FILE, HEAPID_PMS_INPUT);
     str = GFL_MsgDataLoadStrbufNew(msgData, msgIds[msg]);
-    func_02021c7c(cwk->vwk->printQueue, BmpWin_GetBitmap(cwk->vwk->msgWin), 2, 4, str, cwk->vwk->font,
-                  PRINT_COLOR(14, 15, 7));
+    PrintQueue_PrintColor(cwk->vwk->printQueue, BmpWin_GetBitmap(cwk->vwk->msgWin), 2, 4, str, cwk->vwk->font,
+                          PRINT_COLOR(14, 15, 7));
     cwk->vwk->msgPrinting = TRUE;
     GFL_StrBufFree(str);
     GFL_MsgDataFree(msgData);
@@ -1312,7 +1312,7 @@ static void PMSIView_PrintMessage(PMSIVCommandWork *cwk, u32 msg) {
 
 static void PMSIView_FlushMessage(PMSInputView *vwk) {
     if (vwk->msgPrinting) {
-        if (!func_02021c1c(vwk->printQueue, BmpWin_GetBitmap(vwk->msgWin))) {
+        if (!PrintQueue_IsBitmapPending(vwk->printQueue, BmpWin_GetBitmap(vwk->msgWin))) {
             BmpWin_Transfer(vwk->msgWin);
             vwk->msgPrinting = FALSE;
         }

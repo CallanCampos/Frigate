@@ -191,7 +191,7 @@ static BOOL BrBvSearch_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     MI_CpuFill8(p_wk, 0, sizeof(BrBvSearchWork));
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
     p_wk->text = BrText_Init(p_param->res, p_wk->que, p_wk->heapId);
     BrText_Print(p_wk->text, p_param->res, 0x6b);
@@ -221,7 +221,7 @@ static BOOL BrBvSearch_ProcExit(GameProc *proc, u32 *state, void *param, void *w
     }
     BrText_Exit(p_wk->text, p_param->res);
     BmpOam_Exit(p_wk->bmpoam);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }
@@ -328,7 +328,7 @@ static BOOL BrBvSearch_ProcMain(GameProc *proc, u32 *state, void *param, void *w
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
@@ -399,7 +399,7 @@ static BOOL BrBvSearch_MenuMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -416,7 +416,7 @@ static BOOL BrBvSearch_MenuMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -441,7 +441,7 @@ static BOOL BrBvSearch_MenuMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
                 u32 y;
                 BrPoint pos;
 
-                func_0203dac8(&x, &y);
+                GFL_HIDGetTouchPressedPoint(&x, &y);
                 pos.x = x;
                 pos.y = y;
                 BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -466,7 +466,7 @@ static BOOL BrBvSearch_MenuMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y)) {
                 BrPoint pos;
 
@@ -561,7 +561,7 @@ static BOOL BrBvSearch_ModeMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
 
     BrList_Main(p_wk->p_list);
     select = BrList_GetSelect(p_wk->p_list);
-    isReturn = func_0203dac8(&x, &y);
+    isReturn = GFL_HIDGetTouchPressedPoint(&x, &y);
     isReturn &= BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y);
 
     if (select != BR_LIST_SELECT_NONE) {
@@ -569,7 +569,7 @@ static BOOL BrBvSearch_ModeMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
         u32 y;
         BrPoint pos;
 
-        func_0203dac8(&x, &y);
+        GFL_HIDGetTouchPressedPoint(&x, &y);
         pos.x = x;
         pos.y = y;
         BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -582,7 +582,7 @@ static BOOL BrBvSearch_ModeMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
         u32 y;
         BrPoint pos;
 
-        func_0203dac8(&x, &y);
+        GFL_HIDGetTouchPressedPoint(&x, &y);
         pos.x = x;
         pos.y = y;
         BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -706,7 +706,7 @@ static BOOL BrBvSearch_AreaMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
 
     BrList_Main(p_wk->p_list);
     select = BrList_GetSelect(p_wk->p_list);
-    isReturn = func_0203dac8(&x, &y);
+    isReturn = GFL_HIDGetTouchPressedPoint(&x, &y);
     isReturn &= BrBtn_GetTrg(p_wk->btn[BR_BVSEARCH_BTN_RETURN], x, y);
 
     if (select != BR_LIST_SELECT_NONE) {
@@ -716,7 +716,7 @@ static BOOL BrBvSearch_AreaMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
         PlayerInfo *player;
         u32 country;
 
-        func_0203dac8(&x, &y);
+        GFL_HIDGetTouchPressedPoint(&x, &y);
         pos.x = x;
         pos.y = y;
         BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -732,7 +732,7 @@ static BOOL BrBvSearch_AreaMain(BrBvSearchWork *p_wk, BrBvSearchProcParam *p_par
         u32 y;
         BrPoint pos;
 
-        func_0203dac8(&x, &y);
+        GFL_HIDGetTouchPressedPoint(&x, &y);
         pos.x = x;
         pos.y = y;
         BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -827,7 +827,7 @@ static u32 BrBvSearch_GetTrgMenu(void) {
     u32 y;
     int i;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         for (i = 0; i < BR_BVSEARCH_MENU_MAX; i++) {
             const BrBvSearchRect *rect = &sBrBvSearchMenuRects[i];
 

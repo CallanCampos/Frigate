@@ -221,12 +221,12 @@ WifiBattleMatchRes *WifiBattleMatchRes_Create(ClActUnit *unit, u32 kind, HeapID 
     GFL_BGSysLoadArcNCGRStatic(arc, 2, 3, 0, 0, FALSE, HEAPID_TAIL(heapId));
     GFL_BGSysLoadArcNCGRStatic(arc, 2, 7, 0, 0, FALSE, HEAPID_TAIL(heapId));
     WifiBattleMatchRes_LoadBG(res, kind, heapId);
-    res->res[RES_PALETTE + CLACT_VRAM_MAIN] = func_0204bba0(arc, 1, CLACT_VRAM_MAIN, 0, HEAPID_TAIL(heapId));
-    res->res[RES_CHARS + CLACT_VRAM_MAIN] = func_0204b81c(arc, 3, FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
-    res->res[RES_CELLS + CLACT_VRAM_MAIN] = func_0204bde0(arc, 4, 11, HEAPID_TAIL(heapId));
-    res->res[RES_PALETTE + CLACT_VRAM_SUB] = func_0204bba0(arc, 1, CLACT_VRAM_SUB, 0, HEAPID_TAIL(heapId));
-    res->res[RES_CHARS + CLACT_VRAM_SUB] = func_0204b81c(arc, 3, FALSE, CLACT_VRAM_SUB, HEAPID_TAIL(heapId));
-    res->res[RES_CELLS + CLACT_VRAM_SUB] = func_0204bde0(arc, 4, 11, HEAPID_TAIL(heapId));
+    res->res[RES_PALETTE + CLACT_VRAM_MAIN] = ClActSys_LoadPltt(arc, 1, CLACT_VRAM_MAIN, 0, HEAPID_TAIL(heapId));
+    res->res[RES_CHARS + CLACT_VRAM_MAIN] = ClActSys_LoadChars(arc, 3, FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
+    res->res[RES_CELLS + CLACT_VRAM_MAIN] = ClActSys_LoadCellAnims(arc, 4, 11, HEAPID_TAIL(heapId));
+    res->res[RES_PALETTE + CLACT_VRAM_SUB] = ClActSys_LoadPltt(arc, 1, CLACT_VRAM_SUB, 0, HEAPID_TAIL(heapId));
+    res->res[RES_CHARS + CLACT_VRAM_SUB] = ClActSys_LoadChars(arc, 3, FALSE, CLACT_VRAM_SUB, HEAPID_TAIL(heapId));
+    res->res[RES_CELLS + CLACT_VRAM_SUB] = ClActSys_LoadCellAnims(arc, 4, 11, HEAPID_TAIL(heapId));
     file = GFL_G2DIOReadNCLRArc(arc, 0, &palette, heapId);
     rawData = palette->rawData;
     MI_CpuCopy8(rawData, res->colorsA, sizeof(res->colorsA));
@@ -246,12 +246,12 @@ WifiBattleMatchRes *WifiBattleMatchRes_Create(ClActUnit *unit, u32 kind, HeapID 
 }
 
 void WifiBattleMatchRes_Free(WifiBattleMatchRes *res) {
-    func_0204bcd0(res->res[RES_PALETTE + CLACT_VRAM_MAIN]);
-    func_0204b98c(res->res[RES_CHARS + CLACT_VRAM_MAIN]);
-    func_0204be64(res->res[RES_CELLS + CLACT_VRAM_MAIN]);
-    func_0204bcd0(res->res[RES_PALETTE + CLACT_VRAM_SUB]);
-    func_0204b98c(res->res[RES_CHARS + CLACT_VRAM_SUB]);
-    func_0204be64(res->res[RES_CELLS + CLACT_VRAM_SUB]);
+    ClActSys_FreePltt(res->res[RES_PALETTE + CLACT_VRAM_MAIN]);
+    ClActSys_FreeChars(res->res[RES_CHARS + CLACT_VRAM_MAIN]);
+    ClActSys_FreeCellAnims(res->res[RES_CELLS + CLACT_VRAM_MAIN]);
+    ClActSys_FreePltt(res->res[RES_PALETTE + CLACT_VRAM_SUB]);
+    ClActSys_FreeChars(res->res[RES_CHARS + CLACT_VRAM_SUB]);
+    ClActSys_FreeCellAnims(res->res[RES_CELLS + CLACT_VRAM_SUB]);
     GFL_BGSysFreeFilledChar(0, 1, 0);
     GFL_HeapFree(res);
 }
@@ -387,7 +387,7 @@ WifiBattleMatchCard *WifiBattleMatchRankCard_Create(const WifiBattleMatchRankInf
     WifiBattleMatchView_CardLoadBadge(card, info->look, unit, heapId);
     pos.x = 0x120;
     pos.y = 0x44;
-    func_0204c140(card->actors[CARD_ACTOR_BADGE], &pos, CLACT_VRAM_SUB);
+    ClActor_SetSurfacePos(card->actors[CARD_ACTOR_BADGE], &pos, CLACT_VRAM_SUB);
     WifiBattleMatchView_CardLoadStars(card, info, unit, res, heapId);
     GFL_BGSysSetScrPaletteNo(6, 0, 0, 32, 6, 1);
     GFL_BGSysSetScrPaletteNo(6, 0, 6, 32, 18, stars + 3);
@@ -451,7 +451,7 @@ WifiBattleMatchCard *WifiBattleMatchWifiCard_Create(const WifiBattleMatchWifiCar
     WifiBattleMatchView_CardLoadBadge(card, info->look, unit, heapId);
     pos.x = 0x120;
     pos.y = 0x6e;
-    func_0204c140(card->actors[CARD_ACTOR_BADGE], &pos, card->surface);
+    ClActor_SetSurfacePos(card->actors[CARD_ACTOR_BADGE], &pos, card->surface);
     WifiBattleMatchView_CardLoadMark(card, unit, res, heapId);
     return card;
 }
@@ -484,51 +484,51 @@ void WifiBattleMatchWifiCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgDa
         pos.y = 168;
         pos.x = x + i * 32;
         if (card->actors[i] != NULL) {
-            func_0204c140(card->actors[i], &pos, card->surface);
+            ClActor_SetSurfacePos(card->actors[i], &pos, card->surface);
         }
         if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
             pos.x += 12;
             pos.y += 8;
-            func_0204c140(card->actors[CARD_ACTOR_ITEM + i], &pos, card->surface);
+            ClActor_SetSurfacePos(card->actors[CARD_ACTOR_ITEM + i], &pos, card->surface);
         }
     }
     switch (page) {
     case 0:
         for (i = 0; i < CARD_PARTY_COUNT; i++) {
             if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-                func_0204c124(card->actors[CARD_ACTOR_ITEM + i], TRUE);
+                ClActor_SetVisible(card->actors[CARD_ACTOR_ITEM + i], TRUE);
             }
             if (card->actors[i] != NULL) {
-                func_0204c124(card->actors[i], TRUE);
+                ClActor_SetVisible(card->actors[i], TRUE);
             }
         }
-        func_0204c124(card->actors[CARD_ACTOR_MARK], TRUE);
+        ClActor_SetVisible(card->actors[CARD_ACTOR_MARK], TRUE);
         text = GFL_MsgDataLoadStrbufNew(msgData, 17);
         PrintWindow_Print(&card->printWindows[7], printQueue, 0, 0, text, font, PRINT_COLOR(15, 2, 0));
         break;
     case 1:
         for (i = 0; i < CARD_PARTY_COUNT; i++) {
             if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-                func_0204c124(card->actors[CARD_ACTOR_ITEM + i], TRUE);
+                ClActor_SetVisible(card->actors[CARD_ACTOR_ITEM + i], TRUE);
             }
             if (card->actors[i] != NULL) {
-                func_0204c124(card->actors[i], TRUE);
+                ClActor_SetVisible(card->actors[i], TRUE);
             }
         }
-        func_0204c124(card->actors[CARD_ACTOR_MARK], FALSE);
+        ClActor_SetVisible(card->actors[CARD_ACTOR_MARK], FALSE);
         text = GFL_MsgDataLoadStrbufNew(msgData, 18);
         PrintWindow_Print(&card->printWindows[7], printQueue, 0, 0, text, font, PRINT_COLOR(15, 2, 0));
         break;
     case 2:
         for (i = 0; i < CARD_PARTY_COUNT; i++) {
             if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-                func_0204c124(card->actors[CARD_ACTOR_ITEM + i], FALSE);
+                ClActor_SetVisible(card->actors[CARD_ACTOR_ITEM + i], FALSE);
             }
             if (card->actors[i] != NULL) {
-                func_0204c124(card->actors[i], FALSE);
+                ClActor_SetVisible(card->actors[i], FALSE);
             }
         }
-        func_0204c124(card->actors[CARD_ACTOR_MARK], FALSE);
+        ClActor_SetVisible(card->actors[CARD_ACTOR_MARK], FALSE);
         text = GFL_MsgDataLoadStrbufNew(msgData, 19);
         PrintWindow_Print(&card->printWindows[7], printQueue, 0, 0, text, font, PRINT_COLOR(15, 2, 0));
         break;
@@ -590,7 +590,7 @@ WifiBattleMatchCard *WifiBattleMatchLiveCard_Create(const WifiBattleMatchLiveCar
     WifiBattleMatchView_CardLoadBadge(card, info->look, unit, heapId);
     pos.x = 0x120;
     pos.y = 0x6e;
-    func_0204c140(card->actors[CARD_ACTOR_BADGE], &pos, card->surface);
+    ClActor_SetSurfacePos(card->actors[CARD_ACTOR_BADGE], &pos, card->surface);
     WifiBattleMatchView_CardLoadMark(card, unit, res, heapId);
     return card;
 }
@@ -623,51 +623,51 @@ void WifiBattleMatchLiveCard_ShowPage(WifiBattleMatchCard *card, u32 page, MsgDa
         pos.y = 168;
         pos.x = x + i * 32;
         if (card->actors[i] != NULL) {
-            func_0204c140(card->actors[i], &pos, card->surface);
+            ClActor_SetSurfacePos(card->actors[i], &pos, card->surface);
         }
         if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
             pos.x += 12;
             pos.y += 8;
-            func_0204c140(card->actors[CARD_ACTOR_ITEM + i], &pos, card->surface);
+            ClActor_SetSurfacePos(card->actors[CARD_ACTOR_ITEM + i], &pos, card->surface);
         }
     }
     switch (page) {
     case 0:
         for (i = 0; i < CARD_PARTY_COUNT; i++) {
             if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-                func_0204c124(card->actors[CARD_ACTOR_ITEM + i], TRUE);
+                ClActor_SetVisible(card->actors[CARD_ACTOR_ITEM + i], TRUE);
             }
             if (card->actors[i] != NULL) {
-                func_0204c124(card->actors[i], TRUE);
+                ClActor_SetVisible(card->actors[i], TRUE);
             }
         }
-        func_0204c124(card->actors[CARD_ACTOR_MARK], TRUE);
+        ClActor_SetVisible(card->actors[CARD_ACTOR_MARK], TRUE);
         text = GFL_MsgDataLoadStrbufNew(msgData, 17);
         PrintWindow_Print(&card->printWindows[9], printQueue, 0, 0, text, font, PRINT_COLOR(15, 2, 0));
         break;
     case 1:
         for (i = 0; i < CARD_PARTY_COUNT; i++) {
             if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-                func_0204c124(card->actors[CARD_ACTOR_ITEM + i], TRUE);
+                ClActor_SetVisible(card->actors[CARD_ACTOR_ITEM + i], TRUE);
             }
             if (card->actors[i] != NULL) {
-                func_0204c124(card->actors[i], TRUE);
+                ClActor_SetVisible(card->actors[i], TRUE);
             }
         }
-        func_0204c124(card->actors[CARD_ACTOR_MARK], FALSE);
+        ClActor_SetVisible(card->actors[CARD_ACTOR_MARK], FALSE);
         text = GFL_MsgDataLoadStrbufNew(msgData, 18);
         PrintWindow_Print(&card->printWindows[9], printQueue, 0, 0, text, font, PRINT_COLOR(15, 2, 0));
         break;
     case 2:
         for (i = 0; i < CARD_PARTY_COUNT; i++) {
             if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-                func_0204c124(card->actors[CARD_ACTOR_ITEM + i], FALSE);
+                ClActor_SetVisible(card->actors[CARD_ACTOR_ITEM + i], FALSE);
             }
             if (card->actors[i] != NULL) {
-                func_0204c124(card->actors[i], FALSE);
+                ClActor_SetVisible(card->actors[i], FALSE);
             }
         }
-        func_0204c124(card->actors[CARD_ACTOR_MARK], FALSE);
+        ClActor_SetVisible(card->actors[CARD_ACTOR_MARK], FALSE);
         text = GFL_MsgDataLoadStrbufNew(msgData, 19);
         PrintWindow_Print(&card->printWindows[9], printQueue, 0, 0, text, font, PRINT_COLOR(15, 2, 0));
         break;
@@ -700,7 +700,7 @@ BOOL WifiBattleMatchCard_SlideIn(WifiBattleMatchCard *card) {
     if (card->slideCount == 0) {
         for (i = 0; i < CARD_ACTOR_COUNT; i++) {
             if (card->actors[i] != NULL) {
-                func_0204c178(card->actors[i], &start, card->surface);
+                ClActor_GetSurfacePos(card->actors[i], &start, card->surface);
                 card->slideX[i] = start.x;
             }
         }
@@ -709,9 +709,9 @@ BOOL WifiBattleMatchCard_SlideIn(WifiBattleMatchCard *card) {
     offset = (card->slideCount << 8) / SLIDE_FRAMES - 256;
     for (i = 0; i < CARD_ACTOR_COUNT; i++) {
         if (card->actors[i] != NULL) {
-            func_0204c178(card->actors[i], &pos, card->surface);
+            ClActor_GetSurfacePos(card->actors[i], &pos, card->surface);
             pos.x = card->slideX[i] - (card->slideCount << 8) / SLIDE_FRAMES;
-            func_0204c140(card->actors[i], &pos, card->surface);
+            ClActor_SetSurfacePos(card->actors[i], &pos, card->surface);
         }
     }
     if (card->slideCount++ >= SLIDE_FRAMES) {
@@ -734,7 +734,7 @@ BOOL WifiBattleMatchCard_SlideOut(WifiBattleMatchCard *card) {
     if (card->slideCount == 0) {
         for (i = 0; i < CARD_ACTOR_COUNT; i++) {
             if (card->actors[i] != NULL) {
-                func_0204c178(card->actors[i], &start, card->surface);
+                ClActor_GetSurfacePos(card->actors[i], &start, card->surface);
                 card->slideX[i] = start.x;
             }
         }
@@ -743,9 +743,9 @@ BOOL WifiBattleMatchCard_SlideOut(WifiBattleMatchCard *card) {
     offset = (card->slideCount << 8) / SLIDE_FRAMES;
     for (i = 0; i < CARD_ACTOR_COUNT; i++) {
         if (card->actors[i] != NULL) {
-            func_0204c178(card->actors[i], &pos, card->surface);
+            ClActor_GetSurfacePos(card->actors[i], &pos, card->surface);
             pos.x = card->slideX[i] - (card->slideCount << 8) / SLIDE_FRAMES;
-            func_0204c140(card->actors[i], &pos, card->surface);
+            ClActor_SetSurfacePos(card->actors[i], &pos, card->surface);
         }
     }
     if (card->slideCount++ >= SLIDE_FRAMES) {
@@ -1068,24 +1068,26 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
     int i;
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    card->iconPalette =
-        func_0204bc48(arc, PokeIcon_GetPaletteFile(), card->surface, card->iconPaletteSlot << 5, HEAPID_TAIL(heapId));
-    card->iconCells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
+    card->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), card->surface, card->iconPaletteSlot << 5,
+                                            HEAPID_TAIL(heapId));
+    card->iconCells = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
         species = TournamentTeam_GetField(records, 0, i);
         form = TournamentTeam_GetField(records, 1, i);
         gender = TournamentTeam_GetField(records, 3, i);
 
         species = species == 0 ? 1 : species;
-        card->iconChars[i] = func_0204b81c(arc, PokeParty_GetIconIndex(species, form, gender, FALSE), FALSE,
-                                           card->surface, HEAPID_TAIL(heapId));
+        card->iconChars[i] = ClActSys_LoadChars(arc, PokeParty_GetIconIndex(species, form, gender, FALSE), FALSE,
+                                                card->surface, HEAPID_TAIL(heapId));
     }
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    card->itemPalette =
-        func_0204bbb8(arc, func_0202d890(), card->surface, (card->iconPaletteSlot + 3) << 5, 0, 1, HEAPID_TAIL(heapId));
-    card->itemChars = func_0204b81c(arc, func_0202d894(), FALSE, card->surface, HEAPID_TAIL(heapId));
-    card->itemCells = func_0204bde0(arc, func_0202d898(2), func_0202d89c(2), heapId);
+    card->itemPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), card->surface,
+                                               (card->iconPaletteSlot + 3) << 5, 0, 1, HEAPID_TAIL(heapId));
+    card->itemChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, card->surface, HEAPID_TAIL(heapId));
+    card->itemCells =
+        ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2), AppMenuCommon_GetItemIconAnimFile(2), heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.y = 168;
@@ -1100,17 +1102,17 @@ static void WifiBattleMatchView_CardLoadIcons(WifiBattleMatchCard *card, ClActUn
 
         if (species != 0) {
             setup.x = i * 32 + 288;
-            card->actors[i] = func_0204c040(unit, card->iconChars[i], card->iconPalette, card->iconCells, &setup,
-                                            card->surface, heapId);
-            func_0204c378(card->actors[i], PokeIcon_GetPalette(species, form, gender, FALSE), 0);
+            card->actors[i] = ClActor_Create(unit, card->iconChars[i], card->iconPalette, card->iconCells, &setup,
+                                             card->surface, heapId);
+            ClActor_SetPalette(card->actors[i], PokeIcon_GetPalette(species, form, gender, FALSE), 0);
             if (hasItem) {
                 itemSetup = setup;
                 itemSetup.x += 12;
                 itemSetup.y += 8;
                 itemSetup.priority = 0;
                 itemSetup.sequence = 0;
-                card->actors[CARD_ACTOR_ITEM + i] = func_0204c040(unit, card->itemChars, card->itemPalette,
-                                                                  card->itemCells, &itemSetup, card->surface, heapId);
+                card->actors[CARD_ACTOR_ITEM + i] = ClActor_Create(unit, card->itemChars, card->itemPalette,
+                                                                   card->itemCells, &itemSetup, card->surface, heapId);
             } else {
                 card->actors[CARD_ACTOR_ITEM + i] = NULL;
             }
@@ -1126,22 +1128,22 @@ static void WifiBattleMatchView_CardFreeIcons(WifiBattleMatchCard *card) {
 
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
         if (card->actors[i] != NULL) {
-            func_0204c108(card->actors[i]);
+            ClActor_Delete(card->actors[i]);
             card->actors[i] = NULL;
         }
         if (card->actors[CARD_ACTOR_ITEM + i] != NULL) {
-            func_0204c108(card->actors[CARD_ACTOR_ITEM + i]);
+            ClActor_Delete(card->actors[CARD_ACTOR_ITEM + i]);
             card->actors[CARD_ACTOR_ITEM + i] = NULL;
         }
     }
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
-        func_0204b98c(card->iconChars[i]);
+        ClActSys_FreeChars(card->iconChars[i]);
     }
-    func_0204be64(card->iconCells);
-    func_0204bcd0(card->iconPalette);
-    func_0204b98c(card->itemChars);
-    func_0204bcd0(card->itemPalette);
-    func_0204be64(card->itemCells);
+    ClActSys_FreeCellAnims(card->iconCells);
+    ClActSys_FreePltt(card->iconPalette);
+    ClActSys_FreeChars(card->itemChars);
+    ClActSys_FreePltt(card->itemPalette);
+    ClActSys_FreeCellAnims(card->itemCells);
 }
 
 static void WifiBattleMatchView_CardLoadBadge(WifiBattleMatchCard *card, u32 look, ClActUnit *unit, HeapID heapId) {
@@ -1149,24 +1151,24 @@ static void WifiBattleMatchView_CardLoadBadge(WifiBattleMatchCard *card, u32 loo
     ClActorSetup setup;
 
     card->badgePalette =
-        func_0204bbb8(arc, 0, card->surface, card->itemPaletteSlot << 5, sBadgePaletteStarts[look], 1, heapId);
-    card->badgeChars = func_0204b81c(arc, look + 49, FALSE, card->surface, heapId);
-    card->badgeCells = func_0204bde0(arc, 65, 66, heapId);
+        ClActSys_LoadPlttRange(arc, 0, card->surface, card->itemPaletteSlot << 5, sBadgePaletteStarts[look], 1, heapId);
+    card->badgeChars = ClActSys_LoadChars(arc, look + 49, FALSE, card->surface, heapId);
+    card->badgeCells = ClActSys_LoadCellAnims(arc, 65, 66, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.y = 0;
     setup.x = 0;
     setup.bgPriority = 1;
     card->actors[CARD_ACTOR_BADGE] =
-        func_0204c040(unit, card->badgeChars, card->badgePalette, card->badgeCells, &setup, card->surface, heapId);
-    func_0204c378(card->actors[CARD_ACTOR_BADGE], 0, 1);
+        ClActor_Create(unit, card->badgeChars, card->badgePalette, card->badgeCells, &setup, card->surface, heapId);
+    ClActor_SetPalette(card->actors[CARD_ACTOR_BADGE], 0, 1);
 }
 
 static void WifiBattleMatchView_CardFreeBadge(WifiBattleMatchCard *card) {
-    func_0204c108(card->actors[CARD_ACTOR_BADGE]);
-    func_0204b98c(card->badgeChars);
-    func_0204be64(card->badgeCells);
-    func_0204bcd0(card->badgePalette);
+    ClActor_Delete(card->actors[CARD_ACTOR_BADGE]);
+    ClActSys_FreeChars(card->badgeChars);
+    ClActSys_FreeCellAnims(card->badgeCells);
+    ClActSys_FreePltt(card->badgePalette);
 }
 
 static void WifiBattleMatchView_CardLoadMark(WifiBattleMatchCard *card, ClActUnit *unit, WifiBattleMatchRes *res,
@@ -1179,13 +1181,13 @@ static void WifiBattleMatchView_CardLoadMark(WifiBattleMatchCard *card, ClActUni
     setup.sequence = 7;
     setup.bgPriority = 1;
     card->actors[CARD_ACTOR_MARK] =
-        func_0204c040(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + card->surface),
-                      WifiBattleMatchView_GetRes(res, RES_PALETTE + card->surface),
-                      WifiBattleMatchView_GetRes(res, RES_CELLS + card->surface), &setup, card->surface, heapId);
+        ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + card->surface),
+                       WifiBattleMatchView_GetRes(res, RES_PALETTE + card->surface),
+                       WifiBattleMatchView_GetRes(res, RES_CELLS + card->surface), &setup, card->surface, heapId);
 }
 
 static void WifiBattleMatchView_CardFreeMark(WifiBattleMatchCard *card) {
-    func_0204c108(card->actors[CARD_ACTOR_MARK]);
+    ClActor_Delete(card->actors[CARD_ACTOR_MARK]);
 }
 
 static void WifiBattleMatchView_CardLoadStars(WifiBattleMatchCard *card, const WifiBattleMatchRankInfo *info,
@@ -1201,9 +1203,9 @@ static void WifiBattleMatchView_CardLoadStars(WifiBattleMatchCard *card, const W
         setup.x += 16;
         setup.sequence = i + 2;
         card->actors[CARD_ACTOR_STAR + i] =
-            func_0204c040(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_SUB),
-                          WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_SUB),
-                          WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_SUB), &setup, CLACT_VRAM_SUB, heapId);
+            ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_SUB),
+                           WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_SUB),
+                           WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_SUB), &setup, CLACT_VRAM_SUB, heapId);
     }
 }
 
@@ -1212,7 +1214,7 @@ static void WifiBattleMatchView_CardFreeStars(WifiBattleMatchCard *card) {
 
     for (i = CARD_ACTOR_STAR; i < CARD_ACTOR_STAR + CARD_STAR_MAX; i++) {
         if (card->actors[i] != NULL) {
-            func_0204c108(card->actors[i]);
+            ClActor_Delete(card->actors[i]);
             card->actors[i] = NULL;
         }
     }
@@ -1239,7 +1241,7 @@ WifiBattleMatchPartnerCard *WifiBattleMatchPartnerCard_Create(const LiveBattleMa
         colorKind = stars == 5;
     }
     WifiBattleMatchView_PartnerWindows(card, data, font, printQueue, msgData, wordSet, colorKind, heapId);
-    WifiBattleMatchView_PartnerLoadBadge(card, func_02008bf4((PlayerInfo *)&data->info), unit, heapId);
+    WifiBattleMatchView_PartnerLoadBadge(card, PlayerInfo_GetUnionView((PlayerInfo *)&data->info), unit, heapId);
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 9, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     switch (kind) {
     case 2:
@@ -1308,12 +1310,12 @@ BOOL WifiBattleMatchPartnerCard_SlideIn(WifiBattleMatchPartnerCard *card) {
 
     if (card->slideCount == 0) {
         if (card->badge != NULL) {
-            func_0204c178(card->badge, &start, CLACT_VRAM_MAIN);
+            ClActor_GetSurfacePos(card->badge, &start, CLACT_VRAM_MAIN);
             card->badgeX = start.x;
         }
         for (i = 0; i < CARD_STAR_MAX; i++) {
             if (card->stars[i] != NULL) {
-                func_0204c178(card->stars[i], &start, CLACT_VRAM_MAIN);
+                ClActor_GetSurfacePos(card->stars[i], &start, CLACT_VRAM_MAIN);
                 card->starX[i] = start.x;
             }
         }
@@ -1321,15 +1323,15 @@ BOOL WifiBattleMatchPartnerCard_SlideIn(WifiBattleMatchPartnerCard *card) {
     }
     offset = (card->slideCount << 8) / SLIDE_FRAMES - 256;
     if (card->badge != NULL) {
-        func_0204c178(card->badge, &pos, CLACT_VRAM_MAIN);
+        ClActor_GetSurfacePos(card->badge, &pos, CLACT_VRAM_MAIN);
         pos.x = card->badgeX - (card->slideCount << 8) / SLIDE_FRAMES;
-        func_0204c140(card->badge, &pos, CLACT_VRAM_MAIN);
+        ClActor_SetSurfacePos(card->badge, &pos, CLACT_VRAM_MAIN);
     }
     for (i = 0; i < CARD_STAR_MAX; i++) {
         if (card->stars[i] != NULL) {
-            func_0204c178(card->stars[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_GetSurfacePos(card->stars[i], &pos, CLACT_VRAM_MAIN);
             pos.x = card->starX[i] - (card->slideCount << 8) / SLIDE_FRAMES;
-            func_0204c140(card->stars[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_SetSurfacePos(card->stars[i], &pos, CLACT_VRAM_MAIN);
         }
     }
     if (card->slideCount++ >= SLIDE_FRAMES) {
@@ -1470,23 +1472,23 @@ static void WifiBattleMatchView_PartnerLoadBadge(WifiBattleMatchPartnerCard *car
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_UNIONCHAR, heapId);
     ClActorSetup setup;
 
-    card->badgePalette = func_0204bbb8(arc, 0, CLACT_VRAM_MAIN, 320, sBadgePaletteStarts[look], 1, heapId);
-    card->badgeChars = func_0204b81c(arc, look + 49, FALSE, CLACT_VRAM_MAIN, heapId);
-    card->badgeCells = func_0204bde0(arc, 65, 66, heapId);
+    card->badgePalette = ClActSys_LoadPlttRange(arc, 0, CLACT_VRAM_MAIN, 320, sBadgePaletteStarts[look], 1, heapId);
+    card->badgeChars = ClActSys_LoadChars(arc, look + 49, FALSE, CLACT_VRAM_MAIN, heapId);
+    card->badgeCells = ClActSys_LoadCellAnims(arc, 65, 66, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 288;
     setup.y = 44;
     card->badge =
-        func_0204c040(unit, card->badgeChars, card->badgePalette, card->badgeCells, &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c378(card->badge, 0, 1);
+        ClActor_Create(unit, card->badgeChars, card->badgePalette, card->badgeCells, &setup, CLACT_VRAM_MAIN, heapId);
+    ClActor_SetPalette(card->badge, 0, 1);
 }
 
 static void WifiBattleMatchView_PartnerFreeBadge(WifiBattleMatchPartnerCard *card) {
-    func_0204c108(card->badge);
-    func_0204b98c(card->badgeChars);
-    func_0204be64(card->badgeCells);
-    func_0204bcd0(card->badgePalette);
+    ClActor_Delete(card->badge);
+    ClActSys_FreeChars(card->badgeChars);
+    ClActSys_FreeCellAnims(card->badgeCells);
+    ClActSys_FreePltt(card->badgePalette);
 }
 
 static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *card,
@@ -1502,10 +1504,10 @@ static void WifiBattleMatchView_PartnerLoadStars(WifiBattleMatchPartnerCard *car
     for (i = 0; i < count; i++) {
         setup.x += 16;
         setup.sequence = i + 2;
-        card->stars[i] = func_0204c040(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
-                                       WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
-                                       WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup,
-                                       CLACT_VRAM_MAIN, heapId);
+        card->stars[i] = ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
+                                        WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
+                                        WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup,
+                                        CLACT_VRAM_MAIN, heapId);
     }
 }
 
@@ -1514,7 +1516,7 @@ static void WifiBattleMatchView_PartnerFreeStars(WifiBattleMatchPartnerCard *car
 
     for (i = 0; i < CARD_STAR_MAX; i++) {
         if (card->stars[i] != NULL) {
-            func_0204c108(card->stars[i]);
+            ClActor_Delete(card->stars[i]);
             card->stars[i] = NULL;
         }
     }
@@ -1553,24 +1555,24 @@ WifiBattleMatchLinkIcon *WifiBattleMatchLinkIcon_Create(ClActUnit *unit, WifiBat
     setup.priority = 1;
     setup.bgPriority = 1;
     icon->actors[0] =
-        func_0204c040(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
-                      WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
-                      WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c520(icon->actors[0], TRUE);
+        ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
+                       WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
+                       WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
+    ClActor_SetAutoAnim(icon->actors[0], TRUE);
     setup.sequence = 0;
     setup.priority = 0;
     setup.bgPriority = 1;
     icon->actors[1] =
-        func_0204c040(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
-                      WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
-                      WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
-    func_0204c520(icon->actors[1], TRUE);
+        ClActor_Create(unit, WifiBattleMatchView_GetRes(res, RES_CHARS + CLACT_VRAM_MAIN),
+                       WifiBattleMatchView_GetRes(res, RES_PALETTE + CLACT_VRAM_MAIN),
+                       WifiBattleMatchView_GetRes(res, RES_CELLS + CLACT_VRAM_MAIN), &setup, CLACT_VRAM_MAIN, heapId);
+    ClActor_SetAutoAnim(icon->actors[1], TRUE);
     return icon;
 }
 
 void WifiBattleMatchLinkIcon_Free(WifiBattleMatchLinkIcon *icon) {
-    func_0204c108(icon->actors[1]);
-    func_0204c108(icon->actors[0]);
+    ClActor_Delete(icon->actors[1]);
+    ClActor_Delete(icon->actors[0]);
     GFL_HeapFree(icon);
 }
 
@@ -1583,8 +1585,8 @@ void WifiBattleMatchLinkIcon_SetShown(WifiBattleMatchLinkIcon *icon, BOOL shown)
     } else {
         GFL_SndPlayerStop(2);
     }
-    func_0204c124(icon->actors[0], shown);
-    func_0204c124(icon->actors[1], shown);
+    ClActor_SetVisible(icon->actors[0], shown);
+    ClActor_SetVisible(icon->actors[1], shown);
 }
 
 WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox, ClActUnit *unit,
@@ -1611,21 +1613,25 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     party = convertBoxedPokeSetToParty(battleBox, HEAPID_TAIL(heapId));
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_WIFIBATTLEMATCH, 7, 2, 0, 0, FALSE, HEAPID_TAIL(heapId));
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    list->palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 160, HEAPID_TAIL(heapId));
-    list->cells = func_0204bde0(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
+    list->palette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), CLACT_VRAM_MAIN, 160, HEAPID_TAIL(heapId));
+    list->cells =
+        ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), HEAPID_TAIL(heapId));
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
         pkm = PokeParty_GetPkm(party, i);
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
-            list->chars[i] = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d624(pkm)), FALSE, CLACT_VRAM_MAIN,
-                                           HEAPID_TAIL(heapId));
+            list->chars[i] = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(pkm)), FALSE,
+                                                CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
         }
     }
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
     i = 0;
-    list->itemPalette = func_0204bbb8(arc, func_0202d890(), CLACT_VRAM_MAIN, 256, i, 1, HEAPID_TAIL(heapId));
-    list->itemCells = func_0204bde0(arc, func_0202d898(2), func_0202d89c(2), HEAPID_TAIL(heapId));
-    list->itemChars = func_0204b81c(arc, func_0202d894(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
+    list->itemPalette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetItemIconPaletteFile(), CLACT_VRAM_MAIN, 256, i, 1,
+                                               HEAPID_TAIL(heapId));
+    list->itemCells = ClActSys_LoadCellAnims(arc, AppMenuCommon_GetItemIconCellFile(2),
+                                             AppMenuCommon_GetItemIconAnimFile(2), HEAPID_TAIL(heapId));
+    list->itemChars =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetItemIconCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_TAIL(heapId));
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     setup.x = 24;
@@ -1637,16 +1643,16 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
         if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
             setup.x = i * 40 + 24;
             list->actors[i] =
-                func_0204c040(unit, list->chars[i], list->palette, list->cells, &setup, CLACT_VRAM_MAIN, heapId);
-            func_0204c378(list->actors[i], PokeIcon_GetPaletteOfPkm(func_0201d624(pkm)), 0);
+                ClActor_Create(unit, list->chars[i], list->palette, list->cells, &setup, CLACT_VRAM_MAIN, heapId);
+            ClActor_SetPalette(list->actors[i], PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm)), 0);
             if (PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL)) {
                 itemSetup = setup;
                 itemSetup.x += 12;
                 itemSetup.y += 8;
                 itemSetup.priority = 0;
                 itemSetup.sequence = 0;
-                list->actors[TEAM_ACTOR_ITEM + i] = func_0204c040(unit, list->itemChars, list->itemPalette,
-                                                                  list->itemCells, &itemSetup, CLACT_VRAM_MAIN, heapId);
+                list->actors[TEAM_ACTOR_ITEM + i] = ClActor_Create(
+                    unit, list->itemChars, list->itemPalette, list->itemCells, &itemSetup, CLACT_VRAM_MAIN, heapId);
             }
         }
     }
@@ -1685,9 +1691,9 @@ WifiBattleMatchTeamList *WifiBattleMatchTeamList_Create(BattleBoxSave *battleBox
     GFL_WordSetSystemFree(wordSet);
     for (i = 0; i < TEAM_ACTOR_COUNT; i++) {
         if (list->actors[i] != NULL) {
-            func_0204c178(list->actors[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_GetSurfacePos(list->actors[i], &pos, CLACT_VRAM_MAIN);
             pos.x += 256;
-            func_0204c140(list->actors[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_SetSurfacePos(list->actors[i], &pos, CLACT_VRAM_MAIN);
         }
     }
     GFL_BGSysMoveBG(2, BG_MOVE_SET_X, -256);
@@ -1709,19 +1715,19 @@ void WifiBattleMatchTeamList_Free(WifiBattleMatchTeamList *list) {
     }
     for (i = 0; i < TEAM_ACTOR_COUNT; i++) {
         if (list->actors[i] != NULL) {
-            func_0204c108(list->actors[i]);
+            ClActor_Delete(list->actors[i]);
         }
     }
-    func_0204b98c(list->itemChars);
-    func_0204be64(list->itemCells);
-    func_0204bcd0(list->itemPalette);
+    ClActSys_FreeChars(list->itemChars);
+    ClActSys_FreeCellAnims(list->itemCells);
+    ClActSys_FreePltt(list->itemPalette);
     for (i = 0; i < CARD_PARTY_COUNT; i++) {
         if (list->actors[i] != NULL) {
-            func_0204b98c(list->chars[i]);
+            ClActSys_FreeChars(list->chars[i]);
         }
     }
-    func_0204be64(list->cells);
-    func_0204bcd0(list->palette);
+    ClActSys_FreeCellAnims(list->cells);
+    ClActSys_FreePltt(list->palette);
     GFL_HeapFree(list);
 }
 
@@ -1739,7 +1745,7 @@ BOOL WifiBattleMatchTeamList_SlideIn(WifiBattleMatchTeamList *list) {
     if (list->slideCount == 0) {
         for (i = 0; i < TEAM_ACTOR_COUNT; i++) {
             if (list->actors[i] != NULL) {
-                func_0204c178(list->actors[i], &start, CLACT_VRAM_MAIN);
+                ClActor_GetSurfacePos(list->actors[i], &start, CLACT_VRAM_MAIN);
                 list->slideX[i] = start.x;
             }
         }
@@ -1747,9 +1753,9 @@ BOOL WifiBattleMatchTeamList_SlideIn(WifiBattleMatchTeamList *list) {
     offset = (list->slideCount << 8) / SLIDE_FRAMES - 256;
     for (i = 0; i < TEAM_ACTOR_COUNT; i++) {
         if (list->actors[i] != NULL) {
-            func_0204c178(list->actors[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_GetSurfacePos(list->actors[i], &pos, CLACT_VRAM_MAIN);
             pos.x = list->slideX[i] - (list->slideCount << 8) / SLIDE_FRAMES;
-            func_0204c140(list->actors[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_SetSurfacePos(list->actors[i], &pos, CLACT_VRAM_MAIN);
         }
     }
     if (list->slideCount++ >= SLIDE_FRAMES) {
@@ -1772,7 +1778,7 @@ BOOL WifiBattleMatchTeamList_SlideOut(WifiBattleMatchTeamList *list) {
     if (list->slideCount == 0) {
         for (i = 0; i < TEAM_ACTOR_COUNT; i++) {
             if (list->actors[i] != NULL) {
-                func_0204c178(list->actors[i], &start, CLACT_VRAM_MAIN);
+                ClActor_GetSurfacePos(list->actors[i], &start, CLACT_VRAM_MAIN);
                 list->slideX[i] = start.x;
             }
         }
@@ -1780,9 +1786,9 @@ BOOL WifiBattleMatchTeamList_SlideOut(WifiBattleMatchTeamList *list) {
     offset = (list->slideCount << 8) / SLIDE_FRAMES;
     for (i = 0; i < TEAM_ACTOR_COUNT; i++) {
         if (list->actors[i] != NULL) {
-            func_0204c178(list->actors[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_GetSurfacePos(list->actors[i], &pos, CLACT_VRAM_MAIN);
             pos.x = list->slideX[i] - (list->slideCount << 8) / SLIDE_FRAMES;
-            func_0204c140(list->actors[i], &pos, CLACT_VRAM_MAIN);
+            ClActor_SetSurfacePos(list->actors[i], &pos, CLACT_VRAM_MAIN);
         }
     }
     if (list->slideCount++ >= SLIDE_FRAMES) {

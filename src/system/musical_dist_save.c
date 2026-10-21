@@ -15,20 +15,21 @@
 
 #define SAVE_EXTRA_BLOCK_MUSICAL_DIST 6
 
-u32 func_0200cc94(void) {
+u32 MusicalDist_GetSaveSize(void) {
     return MUSICAL_DIST_SAVE_SIZE;
 }
 
-void func_0200cc9c(void *block) {
+void MusicalDist_InitBlock(void *block) {
 }
 
-void *func_0200cca0(GameData *gameData, HeapID heapId) {
+void *MusicalDist_Load(GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     MusicalDistWork *wk = GFL_HeapAllocate(heapId, sizeof(MusicalDistWork), TRUE, "musical_dist_save.c", 82);
     u32 result;
 
     wk->block = GFL_HeapAllocate(heapId, MUSICAL_DIST_BUFFER_SIZE, TRUE, "musical_dist_save.c", 84);
-    result = func_02007560(save, SAVE_EXTRA_BLOCK_MUSICAL_DIST, heapId, wk->block, MUSICAL_DIST_BUFFER_SIZE);
+    result =
+        SaveControl_LoadExtraBlock(save, SAVE_EXTRA_BLOCK_MUSICAL_DIST, heapId, wk->block, MUSICAL_DIST_BUFFER_SIZE);
     wk->heapId = heapId;
     wk->gameData = gameData;
     wk->seq = 0;
@@ -46,7 +47,7 @@ void *func_0200cca0(GameData *gameData, HeapID heapId) {
     return wk;
 }
 
-void func_0200cd10(void *work) {
+void MusicalDist_Free(void *work) {
     MusicalDistWork *wk = work;
 
     freeIntermediateSaveExtraBlksAfterLoad(GameData_GetSaveControl(wk->gameData), SAVE_EXTRA_BLOCK_MUSICAL_DIST);
@@ -56,8 +57,8 @@ void func_0200cd10(void *work) {
     GFL_HeapFree(wk);
 }
 
-void *func_0200cd34(GameData *gameData, void *data, u32 size, HeapID heapId) {
-    MusicalDistWork *wk = func_0200cca0(gameData, heapId);
+void *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId) {
+    MusicalDistWork *wk = MusicalDist_Load(gameData, heapId);
 
     if (wk->block != NULL) {
         wk->header.size = size;
@@ -67,13 +68,13 @@ void *func_0200cd34(GameData *gameData, void *data, u32 size, HeapID heapId) {
     return wk;
 }
 
-BOOL func_0200cd64(void *work) {
+BOOL MusicalDist_WriteStep(void *work) {
     MusicalDistWork *wk = work;
 
     switch (wk->seq) {
     case 0:
         if (wk->block == NULL) {
-            func_0200cd10(wk);
+            MusicalDist_Free(wk);
             return TRUE;
         }
         {
@@ -84,23 +85,23 @@ BOOL func_0200cd64(void *work) {
             StrBuf *title;
             u32 size;
 
-            func_0200af08(musical, 1);
+            MusicalSave_SetHasDistProgram(musical, 1);
             arc = GFL_ArcSysCreateMemoryHandle(wk->data, wk->header.size, HEAPID_TAIL(wk->heapId));
             file = GFL_ArcToolReadHeapNewLZGetLen(arc, 1, FALSE, HEAPID_TAIL(wk->heapId), &size);
             msgData = GFL_MsgDataCreateFromHandle(file, HEAPID_TAIL(wk->heapId));
             title = GFL_MsgDataLoadStrbufNew(msgData, 0);
-            GFL_StrBufStoreString(title, (u16 *)func_0200af14(musical), 0x25);
+            GFL_StrBufStoreString(title, (u16 *)MusicalSave_GetName(musical), 0x25);
             GFL_StrBufFree(title);
             GFL_MsgDataFree(msgData);
             GFL_HeapFree(file);
             GFL_ArcToolFree(arc);
-            func_020178c4(wk->gameData, SAVE_EXTRA_BLOCK_MUSICAL_DIST);
+            GameData_StartSaveBlock(wk->gameData, SAVE_EXTRA_BLOCK_MUSICAL_DIST);
             wk->seq++;
         }
         break;
     case 1:
-        if (func_020178f4(wk->gameData, SAVE_EXTRA_BLOCK_MUSICAL_DIST) == 2) {
-            func_0200cd10(wk);
+        if (GameData_UpdateSaveBlock(wk->gameData, SAVE_EXTRA_BLOCK_MUSICAL_DIST) == 2) {
+            MusicalDist_Free(wk);
             return TRUE;
         }
         break;
@@ -108,13 +109,13 @@ BOOL func_0200cd64(void *work) {
     return FALSE;
 }
 
-void *func_0200ce44(void *work) {
+void *MusicalDist_GetData(void *work) {
     MusicalDistWork *wk = work;
 
     return wk->data;
 }
 
-u32 func_0200ce48(void *work) {
+u32 MusicalDist_GetDataSize(void *work) {
     MusicalDistWork *wk = work;
 
     return wk->blockHeader->size;

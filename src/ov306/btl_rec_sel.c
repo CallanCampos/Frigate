@@ -357,10 +357,10 @@ static BOOL BtlRecSelProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     }
     wk->graphic = BtlRecSelGraphic_Create(GX_DISP_SELECT_MAIN_SUB, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
-    wk->messageQueue = func_02021998(wk->heapId);
-    wk->titleQueue = func_02021998(wk->heapId);
-    wk->timeLabelQueue = func_02021998(wk->heapId);
-    wk->timeQueue = func_02021998(wk->heapId);
+    wk->messageQueue = PrintQueue_CreateDefault(wk->heapId);
+    wk->titleQueue = PrintQueue_CreateDefault(wk->heapId);
+    wk->timeLabelQueue = PrintQueue_CreateDefault(wk->heapId);
+    wk->timeQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->hasVsRecorder = BagSave_CheckAmount(GameData_GetBag(prm->gameData), ITEM_VS_RECORDER, 1, wk->heapId);
     wk->skip = FALSE;
     wk->vblankTask = GFL_VBlankTCBAdd(BtlRecSel_VBlank, wk, 1);
@@ -407,7 +407,7 @@ static BOOL BtlRecSelProc_Init(GameProc *proc, u32 *state, void *param, void *wo
     BtlRecSel_CreateDummyIcon(prm, wk);
     BtlRecSel_InitPaletteFade(prm, wk);
     BtlRecSel_FreeDummyIcon(prm, wk);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
     return TRUE;
 }
 
@@ -423,14 +423,14 @@ static BOOL BtlRecSelProc_Exit(GameProc *proc, u32 *state, void *param, void *wo
     BtlRecSel_FreeBG(prm, wk);
     GFL_MsgDataFree(wk->msgData);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->timeQueue);
-    func_02021a18(wk->timeQueue);
-    func_02021c44(wk->timeLabelQueue);
-    func_02021a18(wk->timeLabelQueue);
-    func_02021c44(wk->titleQueue);
-    func_02021a18(wk->titleQueue);
-    func_02021c44(wk->messageQueue);
-    func_02021a18(wk->messageQueue);
+    PrintQueue_Clear(wk->timeQueue);
+    PrintQueue_Free(wk->timeQueue);
+    PrintQueue_Clear(wk->timeLabelQueue);
+    PrintQueue_Free(wk->timeLabelQueue);
+    PrintQueue_Clear(wk->titleQueue);
+    PrintQueue_Free(wk->titleQueue);
+    PrintQueue_Clear(wk->messageQueue);
+    PrintQueue_Free(wk->messageQueue);
     GFL_FontFree(wk->font);
     BtlRecSelGraphic_Free(wk->graphic);
     GFL_ProcReleaseSubsystem(proc);
@@ -498,10 +498,10 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         u32 choice = ConfirmDialog_Update(wk->yesNo);
 
         if (choice != BMPMENU_NULL) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (choice == 0) {
                 // With a video saved already, show it and ask whether to overwrite it
-                if (func_0200bcf8(save, wk->heapId, &saved, 0)) {
+                if (BattleRec_IsSlotValid(save, wk->heapId, &saved, 0)) {
                     wk->timerStopped = TRUE;
                     BtlRecSel_SetFade(state, prm, wk, SEQ_SHOW_PREVIOUS, 1, 0, 16, -2, TRUE);
                 } else {
@@ -521,7 +521,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         u32 choice = ConfirmDialog_Update(wk->yesNo);
 
         if (choice != BMPMENU_NULL) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (choice == 0) {
                 BtlRecSel_StopTimer(prm, wk);
                 *state = SEQ_END_MESSAGE;
@@ -538,7 +538,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         u32 choice = ConfirmDialog_Update(wk->yesNo);
 
         if (choice != BMPMENU_NULL) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             if (choice == 0) {
                 wk->hideNextSeq = SEQ_SAVE_MESSAGE;
             } else {
@@ -556,23 +556,23 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
     case SEQ_SHOW_PREVIOUS: {
         s32 i = 0;
 
-        wk->video = func_0200bcd0(save, wk->heapId, &result, 0);
+        wk->video = BattleRec_LoadVideo(save, wk->heapId, &result, 0);
         BtlRecSel_ClearBG(prm, wk);
         BtlRecSel_ClearMessageWindow(prm, wk);
         if (result == 1) {
-            BattleRecHeader *header = func_0200c0cc(wk->video);
+            BattleRecHeader *header = BattleRec_GetVideoHeader(wk->video);
 
-            wk->mode = func_0200c124(header, BATTLE_REC_HEADER_MODE, 0);
+            wk->mode = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_MODE, 0);
             BtlRecSel_SetMode(prm, wk);
             for (i = 0; i < SIDE_COUNT * PARTY_SIZE; i++) {
                 u32 species;
                 u32 form = 0;
                 u32 sex = 0;
 
-                species = func_0200c124(header, BATTLE_REC_HEADER_SPECIES, i);
+                species = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_SPECIES, i);
                 if (species != 0) {
-                    form = func_0200c124(header, BATTLE_REC_HEADER_FORM, i);
-                    sex = func_0200c124(header, BATTLE_REC_HEADER_GENDER, i);
+                    form = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_FORM, i);
+                    sex = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_GENDER, i);
                 }
                 if (wk->oneTrainerPerSide) {
                     if (i < PARTY_SIZE) {
@@ -619,7 +619,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         } else {
             BtlRecSel_SetFade(state, prm, wk, SEQ_SAVE_MESSAGE, 1, 16, 0, -2, TRUE);
         }
-        func_0200bb5c(wk->video);
+        BattleRec_FreeVideo(wk->video);
         break;
     }
     case SEQ_HIDE_PREVIOUS:
@@ -650,11 +650,11 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         break;
     case SEQ_SAVE:
         if (wk->saveResult != 2 && wk->saveResult != 3) {
-            wk->saveResult =
-                func_0200be50(prm->gameData, wk->heapId, prm->mode, prm->counter, 0, &wk->saveSeq, &wk->saveSubSeq);
+            wk->saveResult = BattleRec_FinishAndSaveSlot(prm->gameData, wk->heapId, prm->mode, prm->counter, 0,
+                                                         &wk->saveSeq, &wk->saveSubSeq);
         }
         if (wk->saveResult == 2 || wk->saveResult == 3) {
-            func_0200bbb4();
+            BattleRec_DecryptBody();
             WaitIcon_Free(wk->waitIcon);
             if (wk->saveResult == 2) {
                 GFL_SndSEPlay(SEQ_SE_SAVE);
@@ -722,7 +722,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         }
         if (done) {
             if (prm->comm) {
-                func_02040624(func_02040440(), 150, 43);
+                NetHandle_SendTimingPair(NetHandle_GetOwn(), 150, 43);
                 wk->waitIcon = WaitIcon_Create(GFL_VBlankGetTCBMgr(), wk->messageWindow, 15, 16, wk->heapId);
             }
             *state = SEQ_END_SYNC;
@@ -733,7 +733,7 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
         done = TRUE;
         if (prm->comm) {
             if (!GFL_NetErrCheck()) {
-                done = func_02040664(func_02040440(), 150, 43);
+                done = NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 150, 43);
             }
             if (done) {
                 WaitIcon_Free(wk->waitIcon);
@@ -750,10 +750,10 @@ static BOOL BtlRecSelProc_Main(GameProc *proc, u32 *state, void *param, void *wo
     BtlRecSel_UpdateTimer(prm, wk);
     BtlRecSel_FlushTextWindows(prm, wk);
     BtlRecSel_UpdatePaletteFade(prm, wk);
-    func_02021a3c(wk->messageQueue);
-    func_02021a3c(wk->titleQueue);
-    func_02021a3c(wk->timeLabelQueue);
-    func_02021a3c(wk->timeQueue);
+    PrintQueue_Main(wk->messageQueue);
+    PrintQueue_Main(wk->titleQueue);
+    PrintQueue_Main(wk->timeLabelQueue);
+    PrintQueue_Main(wk->timeQueue);
     BtlRecSelGraphic_Update(wk->graphic);
     BtlRecSelGraphic_Begin3D(wk->graphic);
     BtlRecSelGraphic_End3D(wk->graphic);
@@ -827,7 +827,7 @@ static void BtlRecSel_InitMessage(BtlRecSelParam *param, BtlRecSelWork *work) {
 
 static void BtlRecSel_FreeMessage(BtlRecSelParam *param, BtlRecSelWork *work) {
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     if (work->messageStr != NULL) {
         GFL_StrBufFree(work->messageStr);
@@ -868,14 +868,14 @@ static void BtlRecSel_EraseMessageWindow(BtlRecSelParam *param, BtlRecSelWork *w
 static void BtlRecSel_StartStream(BtlRecSelParam *param, BtlRecSelWork *work, u32 message, BOOL waitKey) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->messageWindow), 15);
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     if (work->messageStr != NULL) {
         GFL_StrBufFree(work->messageStr);
     }
     work->messageStr = GFL_MsgDataLoadStrbufNew(work->msgData, message);
-    work->stream = func_02022268(work->messageWindow, 0, 0, work->messageStr, work->font, func_02017bcc(),
-                                 work->tcbExManager, 2, work->heapId, 15);
+    work->stream = PrintStream_Create(work->messageWindow, 0, 0, work->messageStr, work->font,
+                                      TextSpeed_GetCurrentWait(), work->tcbExManager, 2, work->heapId, 15);
     work->waitKey = waitKey;
 }
 
@@ -892,25 +892,25 @@ static BOOL BtlRecSel_WaitStream(BtlRecSelParam *param, BtlRecSelWork *work) {
 static BOOL BtlRecSel_UpdateStream(BtlRecSelParam *param, BtlRecSelWork *work) {
     BOOL done = FALSE;
 
-    switch (func_020223b4(work->stream)) {
+    switch (PrintStream_GetState(work->stream)) {
     case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(work->stream, 0);
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
+            PrintStream_SkipWait(work->stream, 0);
             if (GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
             GFL_SndSEPlay(SEQ_SE_MESSAGE);
-            func_020223bc(work->stream);
+            PrintStream_Continue(work->stream);
             if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
             } else {
-                func_0203d564(TRUE);
+                GCTX_HIDSetUsingTouch(TRUE);
             }
         }
         break;
@@ -919,11 +919,11 @@ static BOOL BtlRecSel_UpdateStream(BtlRecSelParam *param, BtlRecSelWork *work) {
             work->waitTimer--;
         } else {
             if (work->waitKey) {
-                if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+                if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                     if (GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) {
-                        func_0203d564(FALSE);
+                        GCTX_HIDSetUsingTouch(FALSE);
                     } else {
-                        func_0203d564(TRUE);
+                        GCTX_HIDSetUsingTouch(TRUE);
                     }
                     work->waitKey = FALSE;
                     done = TRUE;
@@ -941,7 +941,7 @@ static BOOL BtlRecSel_UpdateStream(BtlRecSelParam *param, BtlRecSelWork *work) {
 static void BtlRecSel_PrintMessage(BtlRecSelParam *param, BtlRecSelWork *work, u32 message) {
     GFL_BitmapFill(BmpWin_GetBitmap(work->messageWindow), 15);
     if (work->stream != NULL) {
-        func_020223cc(work->stream);
+        PrintStream_Delete(work->stream);
     }
     work->stream = NULL;
     if (work->messageStr != NULL) {
@@ -949,12 +949,13 @@ static void BtlRecSel_PrintMessage(BtlRecSelParam *param, BtlRecSelWork *work, u
     }
     work->messageStr = GFL_MsgDataLoadStrbufNew(work->msgData, message);
     work->messagePrinted = FALSE;
-    func_02021c54(work->messageQueue, BmpWin_GetBitmap(work->messageWindow), 0, 0, work->messageStr, work->font);
+    PrintQueue_Print(work->messageQueue, BmpWin_GetBitmap(work->messageWindow), 0, 0, work->messageStr, work->font);
     BtlRecSel_IsMessagePrinted(param, work);
 }
 
 static BOOL BtlRecSel_IsMessagePrinted(BtlRecSelParam *param, BtlRecSelWork *work) {
-    if (!work->messagePrinted && !func_02021c1c(work->messageQueue, BmpWin_GetBitmap(work->messageWindow))) {
+    if (!work->messagePrinted &&
+        !PrintQueue_IsBitmapPending(work->messageQueue, BmpWin_GetBitmap(work->messageWindow))) {
         BmpWin_Transfer(work->messageWindow);
         work->messagePrinted = TRUE;
     }
@@ -1049,18 +1050,20 @@ static void BtlRecSel_FlushTextWindows(BtlRecSelParam *param, BtlRecSelWork *wor
     u8 i;
 
     for (i = TEXT_WINDOW_TITLE; i <= TEXT_WINDOW_MODE; i++) {
-        if (!work->textPrinted[i] && !func_02021c1c(work->titleQueue, BmpWin_GetBitmap(work->textWindows[i]))) {
+        if (!work->textPrinted[i] &&
+            !PrintQueue_IsBitmapPending(work->titleQueue, BmpWin_GetBitmap(work->textWindows[i]))) {
             BmpWin_Transfer(work->textWindows[i]);
             work->textPrinted[i] = TRUE;
         }
     }
     if (!work->textPrinted[TEXT_WINDOW_TIME_LABEL] &&
-        !func_02021c1c(work->timeLabelQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME_LABEL]))) {
+        !PrintQueue_IsBitmapPending(work->timeLabelQueue,
+                                    BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME_LABEL]))) {
         BmpWin_Transfer(work->textWindows[TEXT_WINDOW_TIME_LABEL]);
         work->textPrinted[TEXT_WINDOW_TIME_LABEL] = TRUE;
     }
     if (!work->textPrinted[TEXT_WINDOW_TIME] &&
-        !func_02021c1c(work->timeQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME]))) {
+        !PrintQueue_IsBitmapPending(work->timeQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME]))) {
         BmpWin_Transfer(work->textWindows[TEXT_WINDOW_TIME]);
         work->textPrinted[TEXT_WINDOW_TIME] = TRUE;
     }
@@ -1070,13 +1073,13 @@ static void BtlRecSel_FlushTextWindows(BtlRecSelParam *param, BtlRecSelWork *wor
 static void BtlRecSel_PrintPrevious(BtlRecSelParam *param, BtlRecSelWork *work) {
     StrBuf *str = GFL_MsgDataLoadStrbufNew(work->msgData, Title_Text_PreviousRecord);
 
-    func_02021c7c(work->titleQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TITLE]), 4, 1, str, work->font,
-                  COLOR_TEXT);
+    PrintQueue_PrintColor(work->titleQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TITLE]), 4, 1, str,
+                          work->font, COLOR_TEXT);
     GFL_StrBufFree(str);
     work->textPrinted[TEXT_WINDOW_TITLE] = FALSE;
     str = GFL_MsgDataLoadStrbufNew(work->msgData, work->modeMessage);
-    func_02021c7c(work->titleQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_MODE]), 4, 1, str, work->font,
-                  COLOR_TEXT);
+    PrintQueue_PrintColor(work->titleQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_MODE]), 4, 1, str,
+                          work->font, COLOR_TEXT);
     GFL_StrBufFree(str);
     work->textPrinted[TEXT_WINDOW_MODE] = FALSE;
     BtlRecSel_FlushTextWindows(param, work);
@@ -1086,7 +1089,7 @@ static void BtlRecSel_ClearPrevious(BtlRecSelParam *param, BtlRecSelWork *work) 
     u8 i;
 
     for (i = TEXT_WINDOW_TITLE; i <= TEXT_WINDOW_MODE; i++) {
-        func_02021c44(work->titleQueue);
+        PrintQueue_Clear(work->titleQueue);
         GFL_BitmapFill(BmpWin_GetBitmap(work->textWindows[i]), 0);
         BmpWin_Transfer(work->textWindows[i]);
         work->textPrinted[i] = TRUE;
@@ -1113,11 +1116,11 @@ static void BtlRecSel_StartTimer(BtlRecSelParam *param, BtlRecSelWork *work, u16
 static void BtlRecSel_StopTimer(BtlRecSelParam *param, BtlRecSelWork *work) {
     work->timer = 0;
     work->timerEnd = 0;
-    func_02021c44(work->timeLabelQueue);
+    PrintQueue_Clear(work->timeLabelQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME_LABEL]), 0);
     BmpWin_Transfer(work->textWindows[TEXT_WINDOW_TIME_LABEL]);
     work->textPrinted[TEXT_WINDOW_TIME_LABEL] = TRUE;
-    func_02021c44(work->timeQueue);
+    PrintQueue_Clear(work->timeQueue);
     GFL_BitmapFill(BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME]), 0);
     BmpWin_Transfer(work->textWindows[TEXT_WINDOW_TIME]);
     work->textPrinted[TEXT_WINDOW_TIME] = TRUE;
@@ -1152,10 +1155,10 @@ static void BtlRecSel_PrintTimer(BtlRecSelParam *param, BtlRecSelWork *work, u16
     if (colorType != work->timeColor) {
         StrBuf *str;
 
-        func_02021c44(work->timeLabelQueue);
+        PrintQueue_Clear(work->timeLabelQueue);
         str = GFL_MsgDataLoadStrbufNew(work->msgData, Title_Text_TimeLimit);
-        func_02021c7c(work->timeLabelQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME_LABEL]), 4, 1, str,
-                      work->font, color);
+        PrintQueue_PrintColor(work->timeLabelQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME_LABEL]), 4, 1,
+                              str, work->font, color);
         work->textPrinted[TEXT_WINDOW_TIME_LABEL] = FALSE;
         GFL_StrBufFree(str);
     }
@@ -1164,11 +1167,11 @@ static void BtlRecSel_PrintTimer(BtlRecSelParam *param, BtlRecSelWork *work, u16
         StrBuf *format = GFL_MsgDataLoadStrbufNew(work->msgData, Title_Text_Empty_8);
         StrBuf *str = GFL_StrBufCreate(8, work->heapId);
 
-        func_02021c44(work->timeQueue);
+        PrintQueue_Clear(work->timeQueue);
         WordSetNumber(wordSet, 1, seconds, 2, 2, TRUE);
         GFL_WordSetFormatStrbuf(wordSet, str, format);
-        func_02021c7c(work->timeQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME]), 2, 2, str, work->font,
-                      color);
+        PrintQueue_PrintColor(work->timeQueue, BmpWin_GetBitmap(work->textWindows[TEXT_WINDOW_TIME]), 2, 2, str,
+                              work->font, color);
         work->textPrinted[TEXT_WINDOW_TIME] = FALSE;
         GFL_StrBufFree(str);
         GFL_StrBufFree(format);
@@ -1273,15 +1276,15 @@ static ClActor *BtlRecSel_CreateIcon(ClActUnit *unit, HeapID heapId, u32 vramTyp
     setup.paletteCount = 3;
     UIObjRes_Load(res, &setup, unit, heapId);
     actor = UIObjRes_CreateActor(res, unit, x, y, anim, heapId);
-    func_0204c468(actor, bgPriority);
-    func_0204c438(actor, priority);
-    func_0204c520(actor, TRUE);
-    func_0204c378(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
+    ClActor_SetBgPriority(actor, bgPriority);
+    ClActor_SetPriority(actor, priority);
+    ClActor_SetAutoAnim(actor, TRUE);
+    ClActor_SetPalette(actor, PokeIcon_GetPalette(species, form, sex, egg), 0);
     return actor;
 }
 
 static void BtlRecSel_FreeIcon(UIObjRes *res, ClActor *actor) {
-    func_0204c108(actor);
+    ClActor_Delete(actor);
     UIObjRes_Free(res);
 }
 
@@ -1408,7 +1411,7 @@ static void BtlRecSel_FreePaletteFade(BtlRecSelParam *param, BtlRecSelWork *work
     PaletteFade_FreeBuffer(work->fade, 0);
     PaletteFade_FreeBuffer(work->fade, 2);
     PaletteFade_Free(work->fade);
-    func_0203a610(work->tcbManager);
+    GFL_TCBMgrDelete(work->tcbManager);
     GFL_HeapFree(work->tcbManagerWork);
 }
 

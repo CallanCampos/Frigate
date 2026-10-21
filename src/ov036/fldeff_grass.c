@@ -1,6 +1,7 @@
 // The grass that shakes where a field actor steps: a billboard per step that plays the shaking and stays until the
 // actor leaves the tile. The name is the ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/field.h"
 #include "field/field_actor.h"
@@ -38,33 +39,33 @@ typedef struct {
     u16 actorIndex;
 } GrassTask;
 
-static void func_ov036_021a4020(FieldEffectGrass *grass);
-static void func_ov036_021a408c(FieldEffectGrass *grass);
-static void func_ov036_021a415c(FieldEffectTask *task, void *work);
-static void func_ov036_021a4230(FieldEffectTask *task, void *work);
-static void func_ov036_021a424c(FieldEffectTask *task, void *work);
+static void Grass_LoadTextures(FieldEffectGrass *grass);
+static void Grass_FreeTextures(FieldEffectGrass *grass);
+static void GrassTask_Init(FieldEffectTask *task, void *work);
+static void GrassTask_Delete(FieldEffectTask *task, void *work);
+static void GrassTask_Update(FieldEffectTask *task, void *work);
 static void func_ov036_021a4320(FieldEffectTask *task, void *work);
-static BOOL func_ov036_021a4324(GrassTask *grassTask);
+static BOOL GrassTask_IsActorOnTile(GrassTask *grassTask);
 
 // Whether each kind of grass ends as soon as the actor walks on, and the step of its animation it settles on
 static const u8 GRASS_ENDS_ON_LEAVE[GRASS_KIND_COUNT] = { FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE };
 
 static const u16 GRASS_REST_STEPS[GRASS_KIND_COUNT] = { 3, 3, 5, 5, 3, 3, 3, 3 };
 
-static const BlActAnimStep GRASS_ANIM_SHAKE[] = {
-    { 0, 0, 0, 3 }, { 1, 0, 0, 3 }, { 2, 0, 0, 3 }, { 3, 0, 0, 4 }, { BLACT_ANIM_CMD_END, 0, 0, 0 },
-};
-
 // clang-format off
 static const FieldEffectTaskVTable GRASS_TASK_VTABLE = {
     sizeof(GrassTask),
-    func_ov036_021a415c,
-    func_ov036_021a4230,
-    func_ov036_021a424c,
+    GrassTask_Init,
+    GrassTask_Delete,
+    GrassTask_Update,
     func_ov036_021a4320,
 };
 
 // clang-format on
+
+static const BlActAnimStep GRASS_ANIM_SHAKE[] = {
+    { 0, 0, 0, 3 }, { 1, 0, 0, 3 }, { 2, 0, 0, 3 }, { 3, 0, 0, 4 }, { BLACT_ANIM_CMD_END, 0, 0, 0 },
+};
 
 static const BlActAnimStep GRASS_ANIM_SHAKE_LONG[] = {
     { 0, 0, 0, 2 },
@@ -91,9 +92,9 @@ static const u16 GRASS_TEXTURES[GRASS_KIND_COUNT][4] = {
 
 // clang-format on
 
-static const BlActAnimStep *GRASS_ANIMS_LONG[] = { GRASS_ANIM_SHAKE_LONG };
-
 static const BlActAnimStep *GRASS_ANIMS[] = { GRASS_ANIM_SHAKE };
+
+static const BlActAnimStep *GRASS_ANIMS_LONG[] = { GRASS_ANIM_SHAKE_LONG };
 
 static const BlActAnimStep **GRASS_KIND_ANIMS[GRASS_KIND_COUNT] = {
     GRASS_ANIMS, GRASS_ANIMS, GRASS_ANIMS_LONG, GRASS_ANIMS_LONG, GRASS_ANIMS, GRASS_ANIMS, GRASS_ANIMS, GRASS_ANIMS,
@@ -104,20 +105,20 @@ void *loadGrassEffects(FieldEffects *effects, HeapID heapId) {
 
     grass->effects = effects;
     grass->blact = Field_GetWildEffectBlAct(FieldEffects_GetField(effects));
-    func_ov036_021a4020(grass);
+    Grass_LoadTextures(grass);
     return grass;
 }
 
 void freeGrassEffects(FieldEffects *effects, void *data) {
-    func_ov036_021a408c(data);
+    Grass_FreeTextures(data);
     GFL_HeapFree(data);
 }
 
-static void func_ov036_021a4020(FieldEffectGrass *grass) {
+static void Grass_LoadTextures(FieldEffectGrass *grass) {
     int i;
     BlActMatRequest request;
     ArcTool *arc = FieldEffects_GetArc(grass->effects);
-    GameSystem *gameSystem = Field_GetGameSystem(FieldEffects_GetField(grass->effects));
+    Field_GetGameSystem(FieldEffects_GetField(grass->effects));
     u32 season = FieldEffects_GetSeason(grass->effects);
 
     request.format = 0;
@@ -132,7 +133,7 @@ static void func_ov036_021a4020(FieldEffectGrass *grass) {
     }
 }
 
-static void func_ov036_021a408c(FieldEffectGrass *grass) {
+static void Grass_FreeTextures(FieldEffectGrass *grass) {
     int i;
 
     for (i = 0; i < GRASS_KIND_COUNT; i++) {
@@ -156,19 +157,21 @@ void func_ov036_021a40ac(FieldEffects *effects, FieldActor *actor, BOOL animate,
         params.gz = GetGPosZ(actor);
         ConvGXZToVector(params.gx, params.gz, &pos);
         pos.y = GetActorPosY(actor);
+        // The step back in z is written in both branches, which sets the registers
         if (CheckActorFlag(actor, 0x2000)) {
             pos.y += FX32_CONST(7);
+            pos.z -= FX32_CONST(2);
         } else {
             GetHeightFromMap(actor, &pos, &height);
             pos.y = height + FX32_CONST(9);
+            pos.z -= FX32_CONST(2);
         }
-        pos.z -= FX32_CONST(2);
         params.pos = pos;
         FieldEffects_TCBCreate(effects, &GRASS_TASK_VTABLE, NULL, animate, &params, 0);
     }
 }
 
-static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
+static void GrassTask_Init(FieldEffectTask *task, void *work) {
     GrassTask *grassTask = work;
     GrassTaskParams *params = func_ov036_021a3ac8(task);
     BlActActorRequest request;
@@ -177,7 +180,7 @@ static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
     u16 actorIndex;
 
     grassTask->params = *params;
-    func_ov012_02167d88(params->actor, &grassTask->identity);
+    FldAct_GetIdentity(params->actor, &grassTask->identity);
     func_ov036_021a3ae8(task, &params->pos);
     kind = grassTask->params.kind;
     request.texMat = grassTask->params.grass->matIndices[kind];
@@ -195,17 +198,17 @@ static void func_ov036_021a415c(FieldEffectTask *task, void *work) {
         func_ov036_021a3a70(task);
         return;
     }
-    func_0204f6d4(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
+    BlActSys_SetActorAnims(blact, grassTask->actorIndex, GRASS_KIND_ANIMS[kind], 1);
     actorIndex = grassTask->actorIndex;
-    func_0204f6ec(blact, actorIndex, 0);
-    func_0204f6c8(blact, actorIndex, TRUE);
+    BlActSys_SetActorAnim(blact, actorIndex, 0);
+    BlActSys_SetActorAnimating(blact, actorIndex, TRUE);
     if (func_ov036_021a3abc(task) == FALSE) {
         grassTask->state = 1;
     }
     func_ov036_021a3a94(task);
 }
 
-static void func_ov036_021a4230(FieldEffectTask *task, void *work) {
+static void GrassTask_Delete(FieldEffectTask *task, void *work) {
     GrassTask *grassTask = work;
     BlActSys *blact = grassTask->params.grass->blact;
 
@@ -214,7 +217,7 @@ static void func_ov036_021a4230(FieldEffectTask *task, void *work) {
     }
 }
 
-static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
+static void GrassTask_Update(FieldEffectTask *task, void *work) {
     u16 cmd;
     GrassTask *grassTask = work;
     BlActSys *blact = grassTask->params.grass->blact;
@@ -225,34 +228,34 @@ static void func_ov036_021a424c(FieldEffectTask *task, void *work) {
         if (GRASS_ENDS_ON_LEAVE[grassTask->params.kind] == TRUE) {
             FieldActor *actor = grassTask->params.actor;
 
-            if (func_ov012_02167da8(actor, &grassTask->identity) == TRUE && !func_ov036_021a4324(grassTask) &&
+            if (FldAct_CheckIdentity(actor, &grassTask->identity) == TRUE && !GrassTask_IsActorOnTile(grassTask) &&
                 GetActorMotionDir(actor) == 1) {
                 func_ov036_021a3a70(task);
                 return;
             }
         }
-        if (func_0204f768(blact, grassTask->actorIndex, &cmd)) {
+        if (BlActSys_GetActorLastCmd(blact, grassTask->actorIndex, &cmd)) {
             grassTask->state++;
         }
         break;
     case 1:
         // Settle
-        if (!func_ov012_02167da8(grassTask->params.actor, &grassTask->identity)) {
+        if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             func_ov036_021a3a70(task);
             return;
         }
-        func_0204f70c(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
+        BlActSys_SetActorStep(blact, grassTask->actorIndex, GRASS_REST_STEPS[grassTask->params.kind]);
         grassTask->state++;
         break;
     case 2:
         grassTask->state++;
     case 3:
         // Stay until the actor leaves the tile
-        if (!func_ov012_02167da8(grassTask->params.actor, &grassTask->identity)) {
+        if (!FldAct_CheckIdentity(grassTask->params.actor, &grassTask->identity)) {
             func_ov036_021a3a70(task);
             return;
         }
-        if (!func_ov036_021a4324(grassTask)) {
+        if (!GrassTask_IsActorOnTile(grassTask)) {
             func_ov036_021a3a70(task);
         }
         break;
@@ -263,7 +266,7 @@ static void func_ov036_021a4320(FieldEffectTask *task, void *work) {
 }
 
 // Whether the actor is still on the grass's tile, or standing still on its first tile
-static BOOL func_ov036_021a4324(GrassTask *grassTask) {
+static BOOL GrassTask_IsActorOnTile(GrassTask *grassTask) {
     FieldActor *actor = grassTask->params.actor;
     s16 gx = GetGPosX(actor);
     s16 gz = GetGPosZ(actor);

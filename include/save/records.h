@@ -51,7 +51,7 @@ struct RecordSave {
 }; // size: 0xac
 
 // The size of the records
-u32 func_020093d0(void);
+u32 GameRecords_GetSize(void);
 void initTrainerCardInfoBlk(GameRecords *records);
 void EncryptRecordStorage(GameRecords *records, u32 id);
 void DecryptRecordStorage(GameRecords *records, u32 id);
@@ -59,47 +59,47 @@ u32 GetRecordCounter(GameRecords *records, int id);
 u32 SetRecordCounter(GameRecords *records, int id, u32 value);
 u32 GetRecordCounterMax(u32 id);
 // Sets a record to value, or to its maximum
-u32 func_020094cc(GameRecords *records, u32 id, u32 value);
+u32 RecordSet(GameRecords *records, u32 id, u32 value);
 
 // Clears the flag that is set, with the console's MAC address and the time, while a match is in progress
 void RecordSave_ClearMatchInProgress(RecordSave *record);
 // Sets that flag again, with the console's MAC address and the time
-void func_0200f368(RecordSave *record);
+void RecordSave_UpdateMatchSeconds(RecordSave *record);
 
 u32 RecordAddOne(GameRecords *records, u32 id);
 u32 RecordGet(GameRecords *records, u32 id);
 u32 RecordAdd(GameRecords *records, u32 id, u32 value);
 // Sets a record to value if that is higher, up to the record's maximum
-u32 func_02009508(GameRecords *records, u32 id, u32 value);
+u32 RecordSetIfHigher(GameRecords *records, u32 id, u32 value);
 // The Trial House's best rank and best points
-void func_02009618(GameRecords *records, u8 rank);
+void RecordSetTrialHouseRank(GameRecords *records, u8 rank);
 // The Battle Test rank
-u8 func_02009628(GameRecords *records);
+u8 RecordGetTrialHouseRank(GameRecords *records);
 // Record 0x7c
-u32 func_02009650(GameRecords *records);
-void func_020095e0(GameRecords *records);
-void func_02009638(GameRecords *records, u32 points);
+u32 RecordGetTrialHousePoints(GameRecords *records);
+void RecordFinishDay(GameRecords *records);
+void RecordSetTrialHousePoints(GameRecords *records, u32 points);
 // The block's size and its initial state
-u32 func_0200f29c(void);
-void func_0200f2a0(RecordSave *record);
+u32 RecordSave_GetSize(void);
+void RecordSave_Init(RecordSave *record);
 // The same as getRecordBlkAddress, which save/save_control.h declares
-RecordSave *func_0200f2bc(SaveControl *save);
+RecordSave *SaveControl_GetRecordSave(SaveControl *save);
 // The results of the random matches
-void *func_0200f2d4(RecordSave *record);
-void func_0200f2dc(RecordSave *record);
-u8 func_0200f300(RecordSave *record);
-u32 func_0200f308(RecordSave *record);
-u32 func_0200f334(RecordSave *record);
+void *RecordSave_GetRndMatchData(RecordSave *record);
+void RecordSave_SetMatchInProgress(RecordSave *record);
+u8 RecordSave_IsMatchInProgress(RecordSave *record);
+u32 RecordSave_IsMacAddressSame(RecordSave *record);
+u32 RecordSave_IsMatchTimedOut(RecordSave *record);
 void func_0200f37c(RecordSave *record, u32 value);
 u8 func_0200f384(RecordSave *record);
 // The parts of the record that the Wi-Fi competition's card reads (6-byte results with halfword fields), and the
 // live competition's (the record itself, with a byte after each result's 6 bytes)
-void *func_0200f2d0(RecordSave *record);
-void *func_0200f2d8(RecordSave *record);
+void *RecordSave_GetRndMatch(RecordSave *record);
+void *RecordSave_GetLiveMatch(RecordSave *record);
 
 // livematch_savedata.c, whose other functions app/livebattlematch_flow.h declares. A count of the live competition's
 // results
-u32 func_0200f1d8(void *results, u32 index);
+u32 LiveMatchData_GetCount(void *results, u32 index);
 
 // rndmatch_savedata.c
 void RndMatchData_Init(void *results);

@@ -109,44 +109,44 @@ void mgEncryptData(void *data, u32 kind);
 void mgDecryptData(void *data, u32 kind);
 
 // The size of the save's block and its init
-u32 func_0200a5f0(void);
-void func_0200a5f8(MysteryGiftSaveData *data);
+u32 MysteryGiftSaveData_GetSize(void);
+void MysteryGiftSaveData_Init(MysteryGiftSaveData *data);
 // Whether a card's kind is one of the gifts
-BOOL func_0200a628(u32 kind);
+BOOL MysteryGift_IsValidKind(u32 kind);
 // Loads the mystery gift save into a new buffer, and frees it. Function name from swan. Mode 1 takes the gifts
 // outside the save when there is no save yet; any other mode takes the save's block
 MysteryGiftSave *mysteryGiftBlock(SaveControl *save, u32 mode, HeapID heapId);
-void func_0200aa54(MysteryGiftSave *save);
+void MysteryGiftSave_Free(MysteryGiftSave *save);
 // The same, in a MysteryGiftSave of the caller's
-void func_0200aa74(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapID heapId);
-void func_0200aaec(MysteryGiftSave *save);
+void MysteryGiftSave_Load(MysteryGiftSave *giftSave, SaveControl *save, u32 mode, HeapID heapId);
+void MysteryGiftSave_Unload(MysteryGiftSave *save);
 // Copies the card in the slot into gift
-BOOL func_0200a71c(MysteryGiftSave *save, u32 slot, MysteryGift *gift);
+BOOL MysteryGiftSave_GetCard(MysteryGiftSave *save, u32 slot, MysteryGift *gift);
 // Whether the slot has a card
-BOOL func_0200a800(MysteryGiftSave *save, u32 slot);
-// Whether the gift of the slot was picked up from the delivery man, which func_0200a858 marks
-BOOL func_0200a820(MysteryGiftSave *save, u32 slot);
-void func_0200a858(MysteryGiftSave *save, u32 slot);
+BOOL MysteryGiftSave_IsSlotUsed(MysteryGiftSave *save, u32 slot);
+// Whether the gift of the slot was picked up from the delivery man, which MysteryGiftSave_SetCardDelivered marks
+BOOL MysteryGiftSave_IsCardDelivered(MysteryGiftSave *save, u32 slot);
+void MysteryGiftSave_SetCardDelivered(MysteryGiftSave *save, u32 slot);
 // Saves the gift in the first free slot, and returns FALSE when there is none
-BOOL func_0200a750(MysteryGiftSave *save, const MysteryGift *gift);
+BOOL MysteryGiftSave_AddCard(MysteryGiftSave *save, const MysteryGift *gift);
 // Throws away the card in the slot
-void func_0200a7b0(MysteryGiftSave *save, u32 slot);
+void MysteryGiftSave_RemoveCard(MysteryGiftSave *save, u32 slot);
 // Whether the album has a free slot
-BOOL func_0200a7e4(MysteryGiftSave *save);
+BOOL MysteryGiftSave_HasFreeSlot(MysteryGiftSave *save);
 // Whether the album has any card
-BOOL func_0200a88c(MysteryGiftSave *save);
+BOOL MysteryGiftSave_HasAnyCard(MysteryGiftSave *save);
 // Swaps the cards of two slots
-void func_0200a970(MysteryGiftSave *save, u32 slot1, u32 slot2);
+void MysteryGiftSave_SwapCards(MysteryGiftSave *save, u32 slot1, u32 slot2);
 // Whether the gift with the ID was received, and the marking of it
-BOOL func_0200a8c4(MysteryGiftSave *save, u32 id);
-void func_0200a900(MysteryGiftSave *save, u32 id);
+BOOL MysteryGiftSave_IsIdReceived(MysteryGiftSave *save, u32 id);
+void MysteryGiftSave_SetIdReceived(MysteryGiftSave *save, u32 id);
 // Whether the received data's CRC is right
-BOOL func_0200a938(const MysteryGiftRecvData *data);
+BOOL MysteryGiftRecvData_CheckCRC(const MysteryGiftRecvData *data);
 // Starts and checks the save of the album
-void func_0200a9d4(MysteryGiftSave *save, GameData *gameData);
-u32 func_0200a9f4(MysteryGiftSave *save, GameData *gameData);
+void MysteryGiftSave_StartSave(MysteryGiftSave *save, GameData *gameData);
+u32 MysteryGiftSave_SaveStep(MysteryGiftSave *save, GameData *gameData);
 // The number of card slots, and the MG_DATA_* kind
-u32 func_0200aa64(MysteryGiftSave *save);
-u32 func_0200aa6c(MysteryGiftSave *save);
+u32 MysteryGiftSave_GetCardMax(MysteryGiftSave *save);
+u32 MysteryGiftSave_GetKind(MysteryGiftSave *save);
 
 #endif // POKEBW2_SAVE_MYSTERY_GIFT_H

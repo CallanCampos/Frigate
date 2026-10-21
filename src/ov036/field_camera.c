@@ -1,4 +1,7 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/arc.h"
 #include "field/field_camera.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
@@ -45,8 +48,8 @@ static void FieldCameraApply_MakeTargetByEye(FieldCamera *camera);
 static void FieldCameraBoundary_ApplyTarget(FieldCameraBoundary *bound, VecFx32 *vec);
 static void FieldCameraBoundary_ApplyEye(FieldCameraBoundary *bound, VecFx32 *vec);
 static void FieldCameraBoundary_LoadFile(FieldCamera *camera, const u32 *file);
-static void func_ov036_02185dec(FieldCamera *camera, const VecFx32 *target, const VecFx32 *eye);
-static void func_ov036_02185e64(const VecFx32 *dir, u16 yaw, u16 pitch, u16 *outYaw, u16 *outPitch);
+static void FieldCamera_UpdateViewAngles(FieldCamera *camera, const VecFx32 *target, const VecFx32 *eye);
+static void FieldCamera_RefineDerivedAngles(const VecFx32 *dir, u16 yaw, u16 pitch, u16 *outYaw, u16 *outPitch);
 static void FieldCamera_CoordsDerive_(const VecFx32 *vec, u16 *pitch, u16 *yaw, fx32 *zoom);
 static void FieldCamera_CoordsSetFromDir(FieldCamera *camera, const VecFx32 *vec);
 static BOOL FieldCameraBoundary_RestrictRect(const FieldCameraBoundary *bound, const VecFx32 *in, VecFx32 *out);
@@ -116,8 +119,8 @@ FieldCamera *FieldCamera_Create(u32 cameraIndex, u32 a1, G3DCamera *g3dCamera, c
         GFL_G3DCameraPerspectiveGetFOVCos(g3dCamera, &fovCos);
         camera->fov = FX_AcosIdx(fovCos);
     }
-    camera->defaultsArc = GFL_ArcSysCreateFileHandle(0x3b, camera->heapId);
-    camera->boundaryArc = GFL_ArcSysCreateFileHandle(0x6d, camera->heapId);
+    camera->defaultsArc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_CAMERA_DEFAULT, camera->heapId);
+    camera->boundaryArc = GFL_ArcSysCreateFileHandle(ARCID_FIELD_CAMERA_MAP_BOUNDARY, camera->heapId);
     camera->boundaryId = 0xffff;
     FieldCamera_CoordsLoadDefaults(camera, target);
     FieldCameraDelay_Create(7, 6, 2, heapId, camera);
@@ -304,7 +307,7 @@ static void FieldCameraApply_FinishLookAtMatrix(FieldCamera *camera) {
     GFL_G3DCameraSetLookatTarget(camera->g3dCamera, &target);
     GFL_G3DCameraSetLookatPos(camera->g3dCamera, &eye);
     FieldCamera_ApplyDelay(camera);
-    func_ov036_02185dec(camera, &target, &camera->eyeActual);
+    FieldCamera_UpdateViewAngles(camera, &target, &camera->eyeActual);
 }
 
 static void FieldCamera_CallTransformCalcFunc(FieldCamera *camera, u16 heldKeys) {
@@ -355,7 +358,7 @@ static void FieldCamera_CoordsDerive_(const VecFx32 *vec, u16 *pitch, u16 *yaw, 
     flat.z = norm.z;
     angles[1] = FX_Atan2Idx(norm.y, VEC_Mag(&flat));
     angles[0] = FX_Atan2Idx(norm.x, norm.z);
-    func_ov036_02185e64(&norm, angles[0], angles[1], &angles[0], &angles[1]);
+    FieldCamera_RefineDerivedAngles(&norm, angles[0], angles[1], &angles[0], &angles[1]);
     *pitch = angles[1];
     *yaw = angles[0];
     *zoom = mag;
@@ -402,7 +405,7 @@ static void FieldCameraTransform_FIXED_ALL_ConvertTo(FieldCamera *camera) {
     }
 }
 
-static void func_ov036_02185dec(FieldCamera *camera, const VecFx32 *target, const VecFx32 *eye) {
+static void FieldCamera_UpdateViewAngles(FieldCamera *camera, const VecFx32 *target, const VecFx32 *eye) {
     VecFx32 dir;
     VEC_Subtract(eye, target, &dir);
     VEC_Normalize(&dir, &dir);
@@ -426,93 +429,99 @@ static void func_ov036_02185dec(FieldCamera *camera, const VecFx32 *target, cons
     }
 }
 
-static void func_ov036_02185e64(const VecFx32 *dir, u16 yaw, u16 pitch, u16 *outYaw, u16 *outPitch) {
+// Moves a yaw and pitch closer to dir by a fraction of a degree: how far dir lies from the direction they give,
+// against how far one degree moves that direction, in the quadrant of each angle
+static void FieldCamera_RefineDerivedAngles(const VecFx32 *dir, u16 yaw, u16 pitch, u16 *outYaw, u16 *outPitch) {
     VecFx16 base = { 0, 0, 0 };
     VecFx16 minus = { 0, 0, 0 };
     VecFx16 plus = { 0, 0, 0 };
-    fx32 cosPitch;
+    fx16 sinYaw;
+    fx16 cosYaw;
+    fx16 cosPitch;
     fx16 sinPitchMinus;
     fx16 sinPitchPlus;
     *outYaw = yaw;
     *outPitch = pitch;
+    sinYaw = FX_SinIdx(yaw);
+    cosYaw = FX_CosIdx(yaw);
     cosPitch = FX_CosIdx(pitch);
-    base.x = FX_Mul(FX_SinIdx(yaw), cosPitch);
+    base.x = FX_Mul(sinYaw, cosPitch);
     base.y = FX_SinIdx(pitch);
-    base.z = FX_Mul(FX_CosIdx(yaw), cosPitch);
-    minus.x = FX_Mul(FX_SinIdx(yaw - 0xb6), cosPitch);
-    minus.z = FX_Mul(FX_CosIdx(yaw - 0xb6), cosPitch);
-    sinPitchMinus = FX_SinIdx(pitch - 0xb6);
-    plus.x = FX_Mul(FX_SinIdx(yaw + 0xb6), cosPitch);
-    plus.z = FX_Mul(FX_CosIdx(yaw + 0xb6), cosPitch);
-    sinPitchPlus = FX_SinIdx(pitch + 0xb6);
+    base.z = FX_Mul(cosYaw, cosPitch);
+    minus.x = FX_Mul(FX_SinIdx(yaw - DEG_TO_IDX(1)), cosPitch);
+    minus.z = FX_Mul(FX_CosIdx(yaw - DEG_TO_IDX(1)), cosPitch);
+    sinPitchMinus = FX_SinIdx(pitch - DEG_TO_IDX(1));
+    plus.x = FX_Mul(FX_SinIdx(yaw + DEG_TO_IDX(1)), cosPitch);
+    plus.z = FX_Mul(FX_CosIdx(yaw + DEG_TO_IDX(1)), cosPitch);
+    sinPitchPlus = FX_SinIdx(pitch + DEG_TO_IDX(1));
     if (yaw < 0x4000) {
         if (base.x < dir->x && base.z > dir->z) {
-            if (MATH_ABS(base.x - dir->x) < MATH_ABS(base.z - dir->z)) {
-                yaw = yaw - (u16)((base.z - dir->z) * 0xb6 / (base.z - minus.z));
+            if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
+                yaw = yaw - (u16)((dir->x - base.x) * DEG_TO_IDX(1) / (minus.x - base.x));
             } else {
-                yaw = yaw - (u16)((dir->x - base.x) * 0xb6 / (minus.x - base.x));
+                yaw = yaw - (u16)((base.z - dir->z) * DEG_TO_IDX(1) / (base.z - minus.z));
             }
         } else if (base.x > dir->x && base.z < dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw + (u16)((base.x - dir->x) * 0xb6 / (base.x - plus.x));
+                yaw = yaw + (u16)((base.x - dir->x) * DEG_TO_IDX(1) / (base.x - plus.x));
             } else {
-                yaw = yaw + (u16)((dir->z - base.z) * 0xb6 / (plus.z - base.z));
+                yaw = yaw + (u16)((dir->z - base.z) * DEG_TO_IDX(1) / (plus.z - base.z));
             }
         }
     } else if (yaw < 0x8000) {
         if (base.x > dir->x && base.z > dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw - (u16)((base.x - dir->x) * 0xb6 / (base.x - minus.x));
+                yaw = yaw - (u16)((base.x - dir->x) * DEG_TO_IDX(1) / (base.x - minus.x));
             } else {
-                yaw = yaw - (u16)((base.z - dir->z) * 0xb6 / (base.z - minus.z));
+                yaw = yaw - (u16)((base.z - dir->z) * DEG_TO_IDX(1) / (base.z - minus.z));
             }
         } else if (base.x < dir->x && base.z < dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw + (u16)((dir->x - base.x) * 0xb6 / (plus.x - base.x));
+                yaw = yaw + (u16)((dir->x - base.x) * DEG_TO_IDX(1) / (plus.x - base.x));
             } else {
-                yaw = yaw + (u16)((dir->z - base.z) * 0xb6 / (plus.z - base.z));
+                yaw = yaw + (u16)((dir->z - base.z) * DEG_TO_IDX(1) / (plus.z - base.z));
             }
         }
     } else if (yaw < 0xc000) {
         if (base.x > dir->x && base.z < dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw - (u16)((base.x - dir->x) * 0xb6 / (base.x - minus.x));
+                yaw = yaw - (u16)((base.x - dir->x) * DEG_TO_IDX(1) / (base.x - minus.x));
             } else {
-                yaw = yaw - (u16)((dir->z - base.z) * 0xb6 / (minus.z - base.z));
+                yaw = yaw - (u16)((dir->z - base.z) * DEG_TO_IDX(1) / (minus.z - base.z));
             }
         } else if (base.x < dir->x && base.z > dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw + (u16)((dir->x - base.x) * 0xb6 / (plus.x - base.x));
+                yaw = yaw + (u16)((dir->x - base.x) * DEG_TO_IDX(1) / (plus.x - base.x));
             } else {
-                yaw = yaw + (u16)((base.z - dir->z) * 0xb6 / (base.z - plus.z));
+                yaw = yaw + (u16)((base.z - dir->z) * DEG_TO_IDX(1) / (base.z - plus.z));
             }
         }
     } else {
         if (base.x < dir->x && base.z < dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw - (u16)((dir->x - base.x) * 0xb6 / (minus.x - base.x));
+                yaw = yaw - (u16)((dir->x - base.x) * DEG_TO_IDX(1) / (minus.x - base.x));
             } else {
-                yaw = yaw - (u16)((dir->z - base.z) * 0xb6 / (minus.z - base.z));
+                yaw = yaw - (u16)((dir->z - base.z) * DEG_TO_IDX(1) / (minus.z - base.z));
             }
         } else if (base.x > dir->x && base.z > dir->z) {
             if (MATH_ABS(base.x - dir->x) >= MATH_ABS(base.z - dir->z)) {
-                yaw = yaw + (u16)((base.x - dir->x) * 0xb6 / (base.x - plus.x));
+                yaw = yaw + (u16)((base.x - dir->x) * DEG_TO_IDX(1) / (base.x - plus.x));
             } else {
-                yaw = yaw + (u16)((base.z - dir->z) * 0xb6 / (base.z - plus.z));
+                yaw = yaw + (u16)((base.z - dir->z) * DEG_TO_IDX(1) / (base.z - plus.z));
             }
         }
     }
     if (pitch < 0x4000) {
         if (base.y > dir->y) {
-            pitch = pitch - (u16)((base.y - dir->y) * 0xb6 / (base.y - sinPitchMinus));
+            pitch = pitch - (u16)((base.y - dir->y) * DEG_TO_IDX(1) / (base.y - sinPitchMinus));
         } else if (base.y < dir->y) {
-            pitch = pitch + (u16)((dir->y - base.y) * 0xb6 / (sinPitchPlus - base.y));
+            pitch = pitch + (u16)((dir->y - base.y) * DEG_TO_IDX(1) / (sinPitchPlus - base.y));
         }
     } else if (pitch >= 0xc000) {
         if (base.y > dir->y) {
-            pitch = pitch - (u16)((base.y - dir->y) * 0xb6 / (base.y - sinPitchMinus));
+            pitch = pitch - (u16)((base.y - dir->y) * DEG_TO_IDX(1) / (base.y - sinPitchMinus));
         } else if (base.y < dir->y) {
-            pitch = pitch + (u16)((dir->y - base.y) * 0xb6 / (sinPitchPlus - base.y));
+            pitch = pitch + (u16)((dir->y - base.y) * DEG_TO_IDX(1) / (sinPitchPlus - base.y));
         }
     }
     *outYaw = yaw;
@@ -523,11 +532,10 @@ G3DCamera *FieldCamera_GetG3DCamera(FieldCamera *camera) {
     return camera->g3dCamera;
 }
 
-void FieldCamera_SetBind(FieldCamera *camera, void *bind) {
-    VecFx32 *pos = bind;
-    camera->bind = pos;
-    camera->targetBase = *pos;
-    camera->target = *pos;
+void FieldCamera_SetBind(FieldCamera *camera, const VecFx32 *bind) {
+    camera->bind = bind;
+    camera->targetBase = *bind;
+    camera->target = *bind;
 }
 
 void FieldCamera_ClearBind(FieldCamera *camera) {
@@ -542,7 +550,7 @@ void FieldCamera_ResetBind(FieldCamera *camera) {
     camera->bind = camera->refBind;
 }
 
-void FieldCamera_SetRefBind(FieldCamera *camera, void *bind) {
+void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind) {
     camera->refBind = bind;
 }
 
@@ -935,10 +943,11 @@ static BOOL FieldCameraBoundary_RestrictCircle(const FieldCameraBoundary *bound,
             if (circle->angleB < angle && circle->angleA >= angle) {
                 if (MATH_ABS(circle->angleB - angle) > MATH_ABS(circle->angleA - angle)) {
                     angle = circle->angleA;
+                    moved = TRUE;
                 } else {
                     angle = circle->angleB;
+                    moved = TRUE;
                 }
-                moved = TRUE;
             }
         } else if (circle->angleA > angle) {
             angle = circle->angleA;

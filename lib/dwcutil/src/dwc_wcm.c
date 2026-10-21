@@ -3,6 +3,15 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
+#ifdef PLATFORM_PC
+#include "port_wcm.h"
+
+// The DS backend's active work grows with host pointers; the larger DSi union tail is not used here.
+#define DWC_WCM_WORK_SIZE PORT_WCM_DS_WORK_SIZE
+#else
+#define DWC_WCM_WORK_SIZE WCM_WORK_SIZE
+#endif
+
 // The wrapper that DWC's settings put around the wireless connection manager (WCM, see wcm.h): one operation runs at a
 // time, a state says which, and a callback is told how each ends. The ROM names none of it; the names are ours.
 
@@ -375,16 +384,29 @@ BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size) {
     u8 *buf = work;
 
     sWcm.wepDesc = buf;
+#ifdef PLATFORM_PC
+    // WCMConfig contains a pointer, so its address needs the host's pointer alignment.
+    sWcm.config = (WCMConfig *)(((uptr)buf + 0x50 + sizeof(uptr) - 1) & ~(sizeof(uptr) - 1));
+#else
     sWcm.config = (WCMConfig *)(((u32)buf + 0x53) & ~3);
-    sWcm.wcmWork = (void *)(((u32)sWcm.config + sizeof(WCMConfig) + 0x1f) & ~0x1f);
-    sWcm.bssDesc = (void *)(((u32)sWcm.wcmWork + WCM_WORK_SIZE + 0x1f) & ~0x1f);
-    sWcm.config->pbdbuffer = (void *)(((u32)sWcm.bssDesc + 0xc0 + 0x1f) & ~0x1f);
-    sWcm.config->nbdbuffer = (s32)(buf + size) - (s32)sWcm.config->pbdbuffer;
+#endif
+    sWcm.wcmWork = (void *)(((uptr)sWcm.config + sizeof(WCMConfig) + 0x1f) & ~0x1f);
+    sWcm.bssDesc = (void *)(((uptr)sWcm.wcmWork + DWC_WCM_WORK_SIZE + 0x1f) & ~0x1f);
+#ifdef PLATFORM_PC
+    // The caller owns this buffer; reject a layout that would extend beyond it or a signed SDK byte count.
+    if (work == NULL || (uptr)sWcm.bssDesc + 0xc0 + 0x1f < (uptr)buf ||
+        (((uptr)sWcm.bssDesc + 0xc0 + 0x1f) & ~(uptr)0x1f) - (uptr)buf > size || size > 0x7fffffff) {
+        OS_RestoreInterrupts(irq);
+        return FALSE;
+    }
+#endif
+    sWcm.config->pbdbuffer = (void *)(((uptr)sWcm.bssDesc + 0xc0 + 0x1f) & ~0x1f);
+    sWcm.config->nbdbuffer = (sptr)(buf + size) - (sptr)sWcm.config->pbdbuffer;
     sWcm.config->nbdmode = 0;
     sWcm.config->dmano = 3;
     sWcm.callback = callback;
     if (sWcm.state == STATE_OFF) {
-        if (WCM_Init(sWcm.wcmWork, WCM_WORK_SIZE) != 0) {
+        if (WCM_Init(sWcm.wcmWork, DWC_WCM_WORK_SIZE) != 0) {
             OS_RestoreInterrupts(irq);
             return FALSE;
         }

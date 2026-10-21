@@ -26,7 +26,7 @@ static const u32 sRibbonParams[15] = {
     0x69, 0x6a, 0x6b, 0x6c, 0x33, 0x34, 0x2c, 0x2f, 0x30, 0x31, 0x32, 0x66, 0x67, 0x68, 0x2e,
 };
 
-// The Pokémon of a Pokémon gift, as overlay 12's func_ov012_02153160 makes it. NULL when the gift's Pokémon is not
+// The Pokémon of a Pokémon gift, as overlay 12's CreateMysteryGiftPokemon makes it. NULL when the gift's Pokémon is not
 // valid
 static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapID heapId, GameData *gameData) {
     const MysteryGiftPokemon *poke = (const MysteryGiftPokemon *)gift;
@@ -215,7 +215,7 @@ static inline PartyPkm *Mystery_CreateGiftPokemon(const MysteryGift *gift, HeapI
     } else {
         location = poke->metLocation;
     }
-    setFatefulEncounterPkmData(func_0201d620(pkm), location, year - 2000, month, day);
+    setFatefulEncounterPkmData(PokeParty_GetBoxPkm(pkm), location, year - 2000, month, day);
     PokeParty_RecalcStats(pkm);
     if (PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL)) {
         GFL_HeapFree(pkm);

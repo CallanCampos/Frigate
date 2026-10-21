@@ -202,7 +202,7 @@ void SortBySpeed(BtlMonSet *set, BtlServerFlow *flow) {
 
     if (set->count > 1) {
         for (i = 0; i < set->count; i++) {
-            set->speed[i] = func_ov167_021abd08(flow, set->mons[i], TRUE);
+            set->speed[i] = BtlServerFlow_CalcSpeed(flow, set->mons[i], TRUE);
         }
         for (i = 0; i < set->count; i++) {
             for (j = i + 1; j < set->count; j++) {

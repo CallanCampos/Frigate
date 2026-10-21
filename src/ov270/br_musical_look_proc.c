@@ -107,7 +107,7 @@ static BOOL BrMusicalLook_ProcInit(GameProc *proc, u32 *state, void *param, void
     wk->param = p;
     wk->heapId = BrProcSys_GetHeapID(p->procSys);
 
-    wk->que = func_02021998(wk->heapId);
+    wk->que = PrintQueue_CreateDefault(wk->heapId);
     unit = BrGraphic_GetClunit(p->graphic);
     wk->bmpoam = BmpOam_Init(wk->heapId, unit);
     for (i = 0; i < 2; i++) {
@@ -139,7 +139,7 @@ static BOOL BrMusicalLook_ProcExit(GameProc *proc, u32 *state, void *param, void
         BrBallEff_Exit(wk->ballEff[i]);
     }
     BmpOam_Exit(wk->bmpoam);
-    func_02021a18(wk->que);
+    PrintQueue_Free(wk->que);
 
     GFL_ProcReleaseSubsystem(proc);
     GFL_OvlUnload(OVERLAY_ID(209));
@@ -164,7 +164,7 @@ static BOOL BrMusicalLook_ProcMain(GameProc *proc, u32 *state, void *param, void
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(wk->ballEff[i]);
     }
-    func_02021a3c(wk->que);
+    PrintQueue_Main(wk->que);
     if (wk->msgWin != NULL) {
         BrMsgWin_Main(wk->msgWin);
     }
@@ -260,7 +260,7 @@ static void BrMusicalLook_SeqTouch(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (BrBtn_GetTrg(wk->btn, x, y)) {
             BrPoint pos;
 
@@ -336,12 +336,12 @@ static void BrMusicalLook_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adr
         break;
     }
     case SEQ_TOUCH_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);

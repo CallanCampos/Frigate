@@ -31,15 +31,15 @@ typedef struct {
 
 static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env);
 
-static BOOL func_ov061_021e5800(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_CreateWalls(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
 
-    func_ov127_021efd60(gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)));
+    InfinityDungeon_CreateCurrentWalls(gsys, InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys)));
     return FALSE;
 }
 
-static BOOL func_ov061_021e5828(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_ChangeRoom(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a = ScriptReadAny(vm, env);
     u16 b = ScriptReadAny(vm, env);
@@ -50,7 +50,7 @@ static BOOL func_ov061_021e5828(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov061_021e5888(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_ChangeFloor(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     u16 a = ScriptReadAny(vm, env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
@@ -59,55 +59,55 @@ static BOOL func_ov061_021e5888(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov061_021e58c4(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_SetProgress(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     SaveControl *save = GameData_GetSaveControl(gameData);
     u8 value = ScriptReadAny(vm, env);
-    u16 unk = func_02017220(gameData);
+    u16 unk = GameData_GetMyCity(gameData);
 
-    func_020102f0(getKeyDataBlkAddress(save), value, unk);
+    KeyDataSave_SetProgress(getKeyDataBlkAddress(save), value, unk);
     return FALSE;
 }
 
-static BOOL func_ov061_021e5904(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_StartRun(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u32 random = GFL_RandomMT();
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(save);
 
-    func_0201024c(keyData);
-    func_020103ec(keyData, getCash(gameInfo));
-    func_02010300(keyData, random);
+    KeyDataSave_ClearRun(keyData);
+    KeyDataSave_SetMoney(keyData, getCash(gameInfo));
+    KeyDataSave_SetSeed(keyData, random);
     return FALSE;
 }
 
-static BOOL func_ov061_021e594c(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetFloorInArea(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_020102d4(getKeyDataBlkAddress(save));
+    *var = KeyDataSave_GetFloorInArea(getKeyDataBlkAddress(save));
     return FALSE;
 }
 
-static BOOL func_ov061_021e597c(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetArea(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_02010378(getKeyDataBlkAddress(save));
+    *var = KeyDataSave_GetArea(getKeyDataBlkAddress(save));
     return FALSE;
 }
 
-static BOOL func_ov061_021e59ac(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_CallBattleEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u8 actor = GetActorUID(ScriptWork_GetParentActor(work)) - 0xb0;
 
-    ScriptWork_CallEvent(work, func_ov127_021efeec(gsys, field, actor));
+    ScriptWork_CallEvent(work, InfinityDungeon_CreateBattleEvent(gsys, field, actor));
     return TRUE;
 }
 
-static BOOL func_ov061_021e59ec(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_CallDoorEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
@@ -118,7 +118,7 @@ static BOOL func_ov061_021e59ec(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov061_021e5a38(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_CallMachineEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -126,7 +126,7 @@ static BOOL func_ov061_021e5a38(VM *vm, FieldScriptEnv *env) {
     return TRUE;
 }
 
-static BOOL func_ov061_021e5a64(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_CallLiftEvent(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
 
@@ -141,27 +141,27 @@ static BOOL func_ov061_021e5a90(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov061_021e5aa8(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_SetTrainerDefeated(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 set = ScriptReadAny(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    func_02010304(keyData, func_020102d4(keyData), actor, set);
+    KeyDataSave_SetTrainerDefeated(keyData, KeyDataSave_GetFloorInArea(keyData), actor, set);
     return FALSE;
 }
 
-static BOOL func_ov061_021e5af4(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_IsTrainerDefeated(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     u16 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    *var = func_02010288(keyData, func_020102d4(keyData), actor);
+    *var = KeyDataSave_IsTrainerDefeated(keyData, KeyDataSave_GetFloorInArea(keyData), actor);
     return FALSE;
 }
 
-static BOOL func_ov061_021e5b40(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetNpcScript(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     u16 *var = ScriptReadVar(vm, env);
@@ -198,7 +198,7 @@ static BOOL func_ov061_021e5bc4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov061_021e5c04(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_SetSpecialTrainerFlag(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     Field *field = GSYS_GetField(gsys);
@@ -206,11 +206,11 @@ static BOOL func_ov061_021e5c04(VM *vm, FieldScriptEnv *env) {
     u16 set = ScriptReadAny(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    func_02010354(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a), set);
+    KeyDataSave_SetFlag(keyData, InfinityDungeon_FindSpecialTrainer(InfinityDungeonGimmick_GetDungeon(field), a), set);
     return FALSE;
 }
 
-static BOOL func_ov061_021e5c5c(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetSpecialTrainerFlag(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
@@ -219,23 +219,24 @@ static BOOL func_ov061_021e5c5c(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
 
-    *var = func_02010340(keyData, func_ov127_021f08b4(InfinityDungeonGimmick_GetDungeon(field), a));
+    *var =
+        KeyDataSave_IsFlagSet(keyData, InfinityDungeon_FindSpecialTrainer(InfinityDungeonGimmick_GetDungeon(field), a));
     return FALSE;
 }
 
-static BOOL func_ov061_021e5cb8(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetGoalFloor(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
-    u8 level = func_02010378(getKeyDataBlkAddress(save));
-    u32 unk = func_ov127_021f02e0(dungeon);
+    u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(save));
+    u32 unk = InfinityDungeon_GetGoalFloor(dungeon);
 
-    *var = unk + func_020103a0(level) + 1;
+    *var = unk + KeyDataSave_GetAreaFirstFloor(level) + 1;
     return FALSE;
 }
 
-static BOOL func_ov061_021e5d0c(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetRoomNpcCount(VM *vm, FieldScriptEnv *env) {
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));
     u16 *var = ScriptReadVar(vm, env);
 
@@ -243,14 +244,14 @@ static BOOL func_ov061_021e5d0c(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov061_021e5d58(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetTrainerClass(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     HeapID heapId = Field_GetHeapID(GSYS_GetField(gsys));
     u16 a = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov012_02162b28(0x106, a, heapId);
+    *var = BtlInst_GetRomTrainerClass(0x106, a, heapId);
     return FALSE;
 }
 
@@ -270,28 +271,28 @@ static BOOL func_ov061_021e5dd4(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov061_021e5e08(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetTrainerId(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u8 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = InfinityDungeon_GetTrainerId(dungeon, func_020102d4(getKeyDataBlkAddress(save)), actor);
+    *var = InfinityDungeon_GetTrainerId(dungeon, KeyDataSave_GetFloorInArea(getKeyDataBlkAddress(save)), actor);
     return FALSE;
 }
 
-static BOOL func_ov061_021e5e60(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetVersion(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0dd8(dungeon);
+    *var = InfinityDungeon_GetVersion(dungeon);
     return FALSE;
 }
 
-static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetInfo(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
@@ -305,26 +306,26 @@ static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
 
     switch (info) {
     case 0:
-        *var = func_020103a0((u8)arg);
+        *var = KeyDataSave_GetAreaFirstFloor((u8)arg);
         break;
     case 1:
-        *var = func_020103c4(arg);
+        *var = KeyDataSave_GetAreaFloorCount(arg);
         break;
     case 2:
-        *var = func_020102ec(keyData);
+        *var = KeyDataSave_GetRoom(keyData);
         break;
     case 6:
-        *var = func_020102d4(keyData);
+        *var = KeyDataSave_GetFloorInArea(keyData);
         break;
     case 3:
-        *var = func_ov127_021f08e8(dungeon);
+        *var = InfinityDungeon_CountTrainers(dungeon);
         break;
     case 4:
-        *var = func_020102a4(keyData);
+        *var = KeyDataSave_CountDefeatedTrainers(keyData);
         break;
     case 5:
-        unk = func_020102ec(keyData);
-        *var = func_ov127_021f093c(dungeon, func_020102d4(keyData), unk);
+        unk = KeyDataSave_GetRoom(keyData);
+        *var = InfinityDungeon_IsBelowGoal(dungeon, KeyDataSave_GetFloorInArea(keyData), unk);
         break;
     case 9:
         *var = dungeon->rewardItem;
@@ -333,8 +334,8 @@ static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
         *var = dungeon->rewardCount;
         break;
     case 11:
-        unk = func_02010274(keyData, 0);
-        unk2 = func_02010274(keyData, 1);
+        unk = KeyDataSave_GetProgress(keyData, 0);
+        unk2 = KeyDataSave_GetProgress(keyData, 1);
         if (unk == 0 && unk2 == 0) {
             *var = TRUE;
         } else {
@@ -345,7 +346,7 @@ static BOOL func_ov061_021e5e98(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// Used in the area where func_ov127_021f0dd8 returns 0x17
+// Used in the area where InfinityDungeon_GetVersion returns 0x17
 static const BlackTowerUnkPair sUnkPairs17[] = {
     { 0xb8, 0x22 }, { 0xba, 0x23 }, { 0xbc, 0x24 }, { 0xbe, 0x25 },  { 0xc0, 0x20 },  { 0xc2, 0x1f },
     { 0xc4, 0x1e }, { 0xc6, 0x21 }, { 0xc8, 0x20 }, { 0xca, 0x130 }, { 0x1f9, 0x21 },
@@ -359,8 +360,8 @@ static const BlackTowerUnkPair sUnkPairs[] = {
 static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
-    u8 level = func_02010378(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
-    u32 area = func_ov127_021f0dd8(dungeon);
+    u8 level = KeyDataSave_GetArea(getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys))));
+    u32 area = InfinityDungeon_GetVersion(dungeon);
     const BlackTowerUnkPair *pairs = area == 0x17 ? sUnkPairs17 : sUnkPairs;
 
     if (level == 9 && area != AREA_VERSION_UNK) {
@@ -369,18 +370,18 @@ static const BlackTowerUnkPair *func_ov061_021e5f94(FieldScriptEnv *env) {
     return &pairs[level];
 }
 
-static BOOL func_ov061_021e5fe4(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_IsTargetSlot(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
     KeyDataSave *keyData = getKeyDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     u16 actor = ScriptReadAny(vm, env) - 0xb0;
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov127_021f0db4(dungeon, func_020102d4(keyData), actor);
+    *var = InfinityDungeon_IsTargetSlot(dungeon, KeyDataSave_GetFloorInArea(keyData), actor);
     return FALSE;
 }
 
-static BOOL func_ov061_021e603c(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_GetNpcScriptByResult(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     GameData *gameData = GSYS_GetGameData(gsys);
     u16 a = ScriptReadAny(vm, env);
@@ -390,18 +391,18 @@ static BOOL func_ov061_021e603c(VM *vm, FieldScriptEnv *env) {
     u16 objCode = FldAct_GetObjCode(actor);
     InfinityDungeon *dungeon = InfinityDungeonGimmick_GetDungeon(GSYS_GetField(gsys));
 
-    *var = func_ov127_021f03dc(getKeyDataBlkAddress(save), dungeon, objCode, a);
+    *var = InfinityDungeon_GetNpcScriptByResult(getKeyDataBlkAddress(save), dungeon, objCode, a);
     return FALSE;
 }
 
-static BOOL func_ov061_021e60a8(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_HasEarnedMoney(VM *vm, FieldScriptEnv *env) {
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     KeyDataSave *keyData = getKeyDataBlkAddress(save);
     TrainerGameInfoSave *gameInfo = getTrainerGameInfoAddress(save);
     u16 *var = ScriptReadVar(vm, env);
     u32 cash = getCash(gameInfo);
 
-    if (cash > func_020103e8(keyData)) {
+    if (cash > KeyDataSave_GetMoney(keyData)) {
         *var = TRUE;
     } else {
         *var = FALSE;
@@ -409,7 +410,7 @@ static BOOL func_ov061_021e60a8(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov061_021e60f4(VM *vm, FieldScriptEnv *env) {
+static BOOL BlackTowerCmd_TakeEarnedMoney(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
@@ -418,7 +419,7 @@ static BOOL func_ov061_021e60f4(VM *vm, FieldScriptEnv *env) {
     u16 wordIndex = ScriptReadAny(vm, env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u32 cash = getCash(gameInfo);
-    u32 start = func_020103e8(keyData);
+    u32 start = KeyDataSave_GetMoney(keyData);
     u32 amount;
 
     if (cash > start) {
@@ -436,15 +437,37 @@ static BOOL func_ov061_021e60f4(VM *vm, FieldScriptEnv *env) {
 }
 
 const FieldScriptCommand BLACK_TOWER_SCRIPT_COMMANDS[] = {
-    func_ov061_021e5800, func_ov061_021e5828, NULL,
-    func_ov061_021e5904, func_ov061_021e594c, func_ov061_021e5888,
-    func_ov061_021e597c, func_ov061_021e59ac, func_ov061_021e5a90,
-    func_ov061_021e5aa8, func_ov061_021e5bac, func_ov061_021e5af4,
-    func_ov061_021e5b40, func_ov061_021e5bc4, func_ov061_021e5c5c,
-    func_ov061_021e5c04, func_ov061_021e59ec, func_ov061_021e5cb8,
-    func_ov061_021e5d58, func_ov061_021e58c4, func_ov061_021e5da4,
-    func_ov061_021e5dd4, func_ov061_021e5e08, func_ov061_021e5e60,
-    func_ov061_021e5e98, func_ov061_021e5a38, func_ov061_021e5fe4,
-    func_ov061_021e603c, func_ov061_021e5d0c, func_ov061_021e60a8,
-    func_ov061_021e5a64, func_ov061_021e60f4, (FieldScriptCommand)0xFFFFFFFF,
+    BlackTowerCmd_CreateWalls,
+    BlackTowerCmd_ChangeRoom,
+    NULL,
+    BlackTowerCmd_StartRun,
+    BlackTowerCmd_GetFloorInArea,
+    BlackTowerCmd_ChangeFloor,
+    BlackTowerCmd_GetArea,
+    BlackTowerCmd_CallBattleEvent,
+    func_ov061_021e5a90,
+    BlackTowerCmd_SetTrainerDefeated,
+    func_ov061_021e5bac,
+    BlackTowerCmd_IsTrainerDefeated,
+    BlackTowerCmd_GetNpcScript,
+    func_ov061_021e5bc4,
+    BlackTowerCmd_GetSpecialTrainerFlag,
+    BlackTowerCmd_SetSpecialTrainerFlag,
+    BlackTowerCmd_CallDoorEvent,
+    BlackTowerCmd_GetGoalFloor,
+    BlackTowerCmd_GetTrainerClass,
+    BlackTowerCmd_SetProgress,
+    func_ov061_021e5da4,
+    func_ov061_021e5dd4,
+    BlackTowerCmd_GetTrainerId,
+    BlackTowerCmd_GetVersion,
+    BlackTowerCmd_GetInfo,
+    BlackTowerCmd_CallMachineEvent,
+    BlackTowerCmd_IsTargetSlot,
+    BlackTowerCmd_GetNpcScriptByResult,
+    BlackTowerCmd_GetRoomNpcCount,
+    BlackTowerCmd_HasEarnedMoney,
+    BlackTowerCmd_CallLiftEvent,
+    BlackTowerCmd_TakeEarnedMoney,
+    (FieldScriptCommand)0xFFFFFFFF,
 };

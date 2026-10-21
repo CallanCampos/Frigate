@@ -52,36 +52,36 @@ struct PokewoodSystem {
 // pokewood_system.c
 PokewoodSystem *PokewoodSystem_Create(HeapID heapId);
 void PokewoodSystem_Free(PokewoodSystem *sys);
-void func_ov062_021e61a0(PokewoodSystem *sys, const PokeListParam *param);
-void func_ov062_021e61e8(PokewoodSystem *sys, GameData *gameData, PokeListParam *param);
-void func_ov062_021e6254(PokewoodSystem *sys, GameData *gameData, PStatusParam *param);
+void PokewoodSystem_SetCastFromPokeList(PokewoodSystem *sys, const PokeListParam *param);
+void PokewoodSystem_SetupPokeList(PokewoodSystem *sys, GameData *gameData, PokeListParam *param);
+void PokewoodSystem_SetupPStatus(PokewoodSystem *sys, GameData *gameData, PStatusParam *param);
 void PokewoodSystem_SetResultVar(PokewoodSystem *sys, u16 *var);
 u16 *PokewoodSystem_GetResultVar(PokewoodSystem *sys);
-void func_ov062_021e62a0(PokewoodSystem *sys, u16 value);
-u16 func_ov062_021e62a8(PokewoodSystem *sys);
+void PokewoodSystem_SetUsePlayerCast(PokewoodSystem *sys, u16 value);
+u16 PokewoodSystem_GetUsePlayerCast(PokewoodSystem *sys);
 void PokewoodSystem_SetMovie(PokewoodSystem *sys, int movie);
 u16 PokewoodSystem_GetMovie(PokewoodSystem *sys);
-void func_ov062_021e62c0(PokewoodSystem *sys, u16 value);
-u16 func_ov062_021e62c8(PokewoodSystem *sys);
+void PokewoodSystem_SetSaveSlot(PokewoodSystem *sys, u16 value);
+u16 PokewoodSystem_GetSaveSlot(PokewoodSystem *sys);
 void *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys);
 void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty *party);
-void func_ov062_021e636c(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result);
+void PokewoodSystem_SetResultFlag(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result);
 void Pokewood_CheckMedals(GameData *gameData);
 void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32 movie);
 void PokewoodSystem_KeepBestRecord(GameData *gameData, PokewoodSystem *sys);
-void func_ov062_021e6584(GameData *gameData, PokewoodSystem *sys);
-void func_ov062_021e65b4(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot);
+void PokewoodSystem_RecordScore(GameData *gameData, PokewoodSystem *sys);
+void PokewoodSystem_AddGradePoints(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot);
 void PokewoodSystem_UpdateCastFame(GameData *gameData, PokewoodSystem *sys);
-void func_ov062_021e663c(GameData *gameData, PokewoodSystem *sys, u32 slot);
-void func_ov062_021e6668(PokewoodSystem *sys, const u8 *src);
+void PokewoodSystem_PushLastSeries(GameData *gameData, PokewoodSystem *sys, u32 slot);
+void PokewoodSystem_SetSlotInfo(PokewoodSystem *sys, const u8 *src);
 
 // pokewood_setup.c: the parameters of overlay 23's events, which the caller frees once the event has them
-void *func_ov062_021e6680(HeapID heapId, GameSystem *gsys, u16 *var);
-void func_ov062_021e66b8(void *param);
-void *func_ov062_021e66c0(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var);
-void func_ov062_021e670c(void *param);
-void *func_ov062_021e6714(HeapID heapId, GameSystem *gsys);
-void func_ov062_021e674c(void *param);
-GameEvent *func_ov062_021e682c(GameSystem *gsys, u16 *var);
+void *PokewoodSetup_CreateBookParam(HeapID heapId, GameSystem *gsys, u16 *var);
+void PokewoodSetup_FreeBookParam(void *param);
+void *PokewoodSetup_CreateMenuParam(HeapID heapId, GameSystem *gsys, u16 a2, u16 *var);
+void PokewoodSetup_FreeMenuParam(void *param);
+void *PokewoodSetup_CreateRecordMonitorParam(HeapID heapId, GameSystem *gsys);
+void PokewoodSetup_FreeRecordMonitorParam(void *param);
+GameEvent *EventPokewoodSave_Create(GameSystem *gsys, u16 *var);
 
 #endif // POKEBW2_FIELD_POKEWOOD_SYSTEM_H

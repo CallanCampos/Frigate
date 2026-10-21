@@ -27,7 +27,7 @@ struct UnionBootParam {
 // A player met, in a group's list and in the beacon
 typedef struct {
     u8 mac[6];
-    u8 look; // func_02008bf4's appearance
+    u8 look; // PlayerInfo_GetUnionView's appearance
     u8 gender : 1;
     u8 used : 1;
 } UnionMember;
@@ -185,7 +185,7 @@ typedef struct {
 } UnionVisitorList;
 
 // The line of the ring that the index calls for, or NULL if it is empty
-UnionVisitor *func_ov036_021b4620(UnionVisitorList *list, u32 index);
+UnionVisitor *UnionChat_GetLine(UnionVisitorList *list, u32 index);
 
 // The command the system is running: a row of union_main.c's sUnionCommands, or UNION_SUBPROC_ID_NULL
 typedef struct {

@@ -8,8 +8,8 @@
 // functions are in gfl/net.h and app/comm_tvt_field.h
 
 // Stop and start the beacon timers' countdown, as the save does while it writes
-void func_020129e0(void);
-void func_020129f8(void);
+void WihDwc_Pause(void);
+void WihDwc_Resume(void);
 // Allocates the copy of the console's Wi-Fi connection settings, and reads them
 void setupDownloadPlayConfig(HeapID heapId);
 void downloadPlayConfigForWifi(void);

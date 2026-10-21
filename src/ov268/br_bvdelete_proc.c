@@ -88,7 +88,7 @@ static BOOL BrBvDelete_ProcInit(GameProc *proc, u32 *state, void *param, void *w
     p_wk->heapId = BrProcSys_GetHeapID(p_param->procSys);
 
     p_wk->seq = BrSeq_Init(p_wk, BrBvDelete_SeqFadeIn, p_wk->heapId);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     BrBvDelete_CreateConfirm(p_wk, p_param);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
@@ -110,7 +110,7 @@ static BOOL BrBvDelete_ProcExit(GameProc *proc, u32 *state, void *param, void *w
         BrBvDelete_DeleteText(p_wk, p_param);
         BrBvDelete_DeleteConfirm(p_wk, p_param);
     }
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     BrSeq_Exit(p_wk->seq);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -128,7 +128,7 @@ static BOOL BrBvDelete_ProcMain(GameProc *proc, u32 *state, void *param, void *w
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     if (p_wk->text != NULL) {
         BrText_Main(p_wk->text);
     }
@@ -211,7 +211,7 @@ static void BrBvDelete_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (BrBvDelete_GetTrgYes(p_wk, x, y)) {
                 BrText_Print(p_wk->text, p_wk->p_param->res, 0x142);
                 *p_seq = SEQ_INPUT_AGAIN;
@@ -225,7 +225,7 @@ static void BrBvDelete_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (BrBvDelete_GetTrgYes(p_wk, x, y)) {
                 *p_seq = SEQ_FADEOUT_START;
             } else if (BrBvDelete_GetTrgNo(p_wk, x, y)) {
@@ -284,12 +284,12 @@ static void BrBvDelete_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
         }
         break;
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -318,7 +318,8 @@ static void BrBvDelete_CreateConfirm(BrBvDeleteWork *p_wk, BrBvDeleteProcParam *
     wordSet = BrRes_GetWordSet(p_param->res);
     src = GFL_MsgDataLoadStrbufNew(BrRes_GetMsgData(p_param->res), 0x141);
     str = GFL_StrBufCreate(0x80, p_wk->heapId);
-    func_0202437c(wordSet, 0, p_param->recordInfo->name[p_param->mode], p_param->recordInfo->sex[p_param->mode], 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, p_param->recordInfo->name[p_param->mode], p_param->recordInfo->sex[p_param->mode],
+                         1, 2);
     GFL_WordSetFormatStrbuf(wordSet, str, src);
     BrText_PrintBuf(p_wk->text, p_param->res, str);
     GFL_StrBufFree(str);

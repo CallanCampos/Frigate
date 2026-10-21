@@ -24,9 +24,9 @@
 static BOOL calcPokerusDecay(AdventureTime *adventureTime, const RTCDate *date, const RTCTime *time, s32 *days,
                              s32 *minutes);
 static void midnight(GameData *gameData, s32 days);
-static void func_ov012_021630e8(GameData *gameData, s32 minutes, const RTCTime *time);
+static void minutesPassed(GameData *gameData, s32 minutes, const RTCTime *time);
 
-void func_ov012_02162f44(GameData *gameData) {
+void EvTime_Update(GameData *gameData) {
     AdventureTime *adventureTime = getSaveAdventureTimeBlock(GameData_GetSaveControl(gameData));
     RTCDate date;
     RTCTime time;
@@ -46,7 +46,7 @@ void func_ov012_02162f44(GameData *gameData) {
     }
     if (minutes != 0) {
         dayCountdownTest(adventureTime, minutes);
-        func_ov012_021630e8(gameData, minutes, &time);
+        minutesPassed(gameData, minutes, &time);
     }
     if (days != 0) {
         midnight(gameData, days);
@@ -91,23 +91,23 @@ static void midnight(GameData *gameData, s32 days) {
     EventWork_ResetDailyFlags(GameData_GetEventWork(gameData));
     EncountSave_RerollSwarmLocation(save);
     pokerusDecay(GameData_GetParty(gameData), days);
-    func_020095e0(GameData_GetRecords(gameData));
-    func_02009c48(getUnityTower_SurveySaveBlkAddrress(save));
-    func_0200edb0(func_0200ec2c(save));
-    func_0200b220(func_0200afbc(save));
-    func_0200ff78(getHollow_RivalBlk(save), 0);
+    RecordFinishDay(GameData_GetRecords(gameData));
+    UnityTower_AgeTodayRegions(getUnityTower_SurveySaveBlkAddrress(save));
+    SurveySave_FinishDay(SurveySave_Get(save));
+    TrainerLogSave_ClearToday(TrainerLogSave_Get(save));
+    HollowRivalSave_SetMeetingToday(getHollow_RivalBlk(save), 0);
     joinAvenue = SaveControl_GetJoinAvenue(save);
     info = JoinAvenue_GetInfo(joinAvenue);
     occupants = getAddressOfBeginningOfOccupants(joinAvenue);
-    func_020392d4(info, fullDay);
-    func_020389a0(occupants, fullDay);
+    JoinAvenueInfo_ResetDaily(info, fullDay);
+    JoinAvenueOccupants_ResetDaily(occupants, fullDay);
 }
 
-static void func_ov012_021630e8(GameData *gameData, s32 minutes, const RTCTime *time) {
+static void minutesPassed(GameData *gameData, s32 minutes, const RTCTime *time) {
     PokeParty *party = SaveControl_GetPokePartySave(GameData_GetSaveControl(gameData));
 
-    func_ov012_02164384(gameData, party, minutes, time, GameData_GetSeason(gameData));
-    func_0200cb10(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
+    ShayminForm_CheckNightPassed(gameData, party, minutes, time, GameData_GetSeason(gameData));
+    TrainerGameInfo_SubHallOfFameMinutes(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData)), minutes);
 }
 
 RTCDate *getAddressAdventureTimeBlk(GameData *gameData) {

@@ -295,12 +295,12 @@ static void func_ov194_021c1a40(PokemonTradeWork *wk, SRTMatrix *mtx) {
         if (wk->work3D->emitters[0] != NULL) {
             VecFx32 pos;
             GFL_G3DCurveGetNowTranslation(wk->work3D->emitterPaths[0], &pos);
-            func_02050208(wk->work3D->emitters[0], &pos);
+            ParticleEmitter_SetPosition(wk->work3D->emitters[0], &pos);
         }
         if (wk->work3D->emitters[1] != NULL) {
             VecFx32 pos;
             GFL_G3DCurveGetNowTranslation(wk->work3D->emitterPaths[1], &pos);
-            func_02050208(wk->work3D->emitters[1], &pos);
+            ParticleEmitter_SetPosition(wk->work3D->emitters[1], &pos);
         }
     }
 }
@@ -363,7 +363,7 @@ void func_ov194_021c1d38(PokemonTrade3DWork *work) {
     int i;
     BOOL camera;
 
-    func_0204f918(work->heapId);
+    Particle_Init(work->heapId);
     work->resource = NULL;
     for (i = 0; i < 9; i++) {
         work->systemWork[i] = GFL_HeapAllocate(work->heapId, PARTICLE_WORK_SIZE, TRUE, "pokemontrade_3d.c", 513);
@@ -380,17 +380,17 @@ void func_ov194_021c1d38(PokemonTrade3DWork *work) {
             camera = TRUE;
             break;
         }
-        work->systems[i] = func_0204f968(work->systemWork[i], PARTICLE_WORK_SIZE, camera, work->heapId);
+        work->systems[i] = Particle_CreateSystem(work->systemWork[i], PARTICLE_WORK_SIZE, camera, work->heapId);
     }
 }
 
 void func_ov194_021c1db4(PokemonTrade3DWork *work) {
     int i;
 
-    work->resource = func_0204fdf8(0x68, 0x35, HEAPID_TAIL(work->heapId));
+    work->resource = Particle_ReadResource(0x68, 0x35, HEAPID_TAIL(work->heapId));
     for (i = 0; i < 4; i++) {
         OS_WaitInterrupt(TRUE, OS_IE_V_BLANK);
-        func_0204fee0(work->systems[i], work->resource, TRUE, GFL_VBlankGetTCBMgr());
+        Particle_SetExternalResource(work->systems[i], work->resource, TRUE, GFL_VBlankGetTCBMgr());
     }
 }
 
@@ -399,14 +399,14 @@ void func_ov194_021c1e08(PokemonTrade3DWork *work) {
 
     for (i = 4; i < 9; i++) {
         OS_WaitInterrupt(TRUE, OS_IE_V_BLANK);
-        func_0204fee0(work->systems[i], work->resource, TRUE, GFL_VBlankGetTCBMgr());
+        Particle_SetExternalResource(work->systems[i], work->resource, TRUE, GFL_VBlankGetTCBMgr());
     }
 }
 
 void func_ov194_021c1e38(PokemonTrade3DWork *work, int count) {
     int i;
 
-    func_0204fb4c();
+    Particle_Free();
     if (work->resource != NULL) {
         GFL_HeapFree(work->resource);
         work->resource = NULL;
@@ -423,14 +423,14 @@ void func_ov194_021c1e74(PokemonTrade3DWork *work) {
     int i;
     void *resource;
 
-    func_0204f918(work->heapId);
+    Particle_Init(work->heapId);
     for (i = 0; i < 6; i++) {
         work->systemWork[i] = GFL_HeapAllocate(work->heapId, PARTICLE_WORK_SIZE, TRUE, "pokemontrade_3d.c", 627);
-        work->systems[i] = func_0204f968(work->systemWork[i], PARTICLE_WORK_SIZE, FALSE, work->heapId);
+        work->systems[i] = Particle_CreateSystem(work->systemWork[i], PARTICLE_WORK_SIZE, FALSE, work->heapId);
     }
-    resource = func_0204fdf8(0x69, 0xa, work->heapId);
+    resource = Particle_ReadResource(0x69, 0xa, work->heapId);
     for (i = 0; i < 6; i++) {
-        func_0204fe04(work->systems[i], resource, TRUE, NULL);
+        Particle_SetResource(work->systems[i], resource, TRUE, NULL);
     }
 }
 
@@ -535,8 +535,8 @@ static void func_ov194_021c20f0(PokemonTradeWork *wk) {
         GFL_G3DCameraFlush(wk->sceneCamera);
         GFL_G3DSysMtxViewFlush();
         if (wk->work3D != NULL) {
-            func_0205001c();
-            func_02050044();
+            Particle_DrawAll();
+            Particle_UpdateAll();
         }
         if (wk->scene != SCENE_NONE) {
             GFL_G3DSysDrawObj(GFL_G3DMgrGetActor(wk->sceneMgr, wk->scene), &mtx);
@@ -594,8 +594,8 @@ static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, Pa
         f32 x;
 
         // The result is left unused
-        func_0201ade0(mcss);
-        width = func_0201adf0(mcss);
+        MCSS_GetWidth(mcss);
+        width = MCSS_GetOffsetX(mcss);
         if (scale->x < 0) {
             x = width * 0.33f;
         } else {
@@ -605,7 +605,7 @@ static void func_ov194_021c2200(MCSS *mcss, const VecFx32 *scale, BOOL front, Pa
         offset.y = 0;
         offset.z = 0;
     }
-    func_0201ab54(mcss, &offset);
+    MCSS_SetPositionOffset(mcss, &offset);
 }
 
 void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *pkm, BOOL mirror) {
@@ -628,16 +628,16 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
         DWCRap_SetMic(TRUE);
     }
     if (front) {
-        wk->mcss[side] = func_0201c14c(wk->mcssSys, pkm, 0, x[side], FX32_CONST(-28), 0);
+        wk->mcss[side] = MCSSSys_AddPartyPkm(wk->mcssSys, pkm, 0, x[side], FX32_CONST(-28), 0);
     } else {
-        wk->mcss[side] = func_0201c14c(wk->mcssSys, pkm, 1, x[side], FX32_CONST(-28), 0);
+        wk->mcss[side] = MCSSSys_AddPartyPkm(wk->mcssSys, pkm, 1, x[side], FX32_CONST(-28), 0);
     }
     if (wk->type == 2) {
         DWCRap_SetMic(FALSE);
     }
-    func_0201c290(wk->mcss[side]);
+    MCSS_SetLoopAnimation(wk->mcss[side]);
     MCSS_SetScale(wk->mcss[side], &scale);
-    func_0201aecc(wk->mcss[side], 1);
+    MCSS_SetNoShadow(wk->mcss[side], 1);
     func_ov194_021c2200(wk->mcss[side], &scale, front, pkm);
 }
 

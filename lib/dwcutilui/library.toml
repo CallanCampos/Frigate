@@ -5,7 +5,7 @@
 # files were built with the game's compiler and flags, not with the 2.0 that the rest of the utility (lib/dwcutil:
 # dwc_wcm.c and the AOSS files) needs: dwc_util_ui_object.c matches 15 of 15 functions with them against 10 of 15 under
 # 2.0/sp2p2, and -ipa file is what gives DWCUtilUiObject_Destroy its second literal of the object's address. The one
-# difference is that char is unsigned, the compiler's default: func_ov182_021ab63c loads a path's sixth character with
+# difference is that char is unsigned, the compiler's default: DWCUtilGfxResource_LocalizePath loads a path's sixth character with
 # ldrb and no sign extension.
 compiler = "dsi/1.1p1"
 flags = [
@@ -27,3 +27,10 @@ flags = [
     "-nolink",
     "-msgstyle gcc",
 ]
+
+# dwc_util_main_menu.c loads char/jbBgStep1.ncg.l and char/jbBgStep1.ncl.l in two functions, and dwc_util_info_menu.c
+# char/yb5Multi.nsc.l, and the ROM has a copy of each for each function, where MWCC shares a file's equal string
+# literals: these files are built with -str noreuse. dwc_util_text.c's two font tables share one string.
+[file_flags]
+"dwc_util_main_menu.c" = ["-str noreuse"]
+"dwc_util_info_menu.c" = ["-str noreuse"]

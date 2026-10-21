@@ -262,6 +262,7 @@ FIELD_ACTOR_ANM_ASYNC_PROC_TEMPLATE kind:data(any) addr:0x0217c54c
 data_ov033_0217c564 kind:data(any) addr:0x0217c564
 data_ov033_0217c570 kind:data(any) addr:0x0217c570
 data_ov033_0217c5ac kind:data(any) addr:0x0217c5ac
+sSuperTopTrainerRange kind:data(any) addr:0x0217c5b8
 data_ov033_0217c5bc kind:data(any) addr:0x0217c5bc
 data_ov033_0217c5c4 kind:data(any) addr:0x0217c5c4
 data_ov033_0217c5d0 kind:data(any) addr:0x0217c5d0

@@ -64,7 +64,7 @@ void func_ov012_0215917c(GameData *gameData, Field *field) {
     EncountState_SetTerrain(state, terrain);
 }
 
-void func_ov012_021591b4(GameData *gameData) {
+void GameData_ResetPhenomenonSteps(GameData *gameData) {
     EncountState *state = GameData_GetEncountState(gameData);
     state->phenomenonSteps = 0;
 }

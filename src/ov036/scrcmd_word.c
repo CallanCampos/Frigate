@@ -1,6 +1,7 @@
 // The script commands that set the words of messages: names of the player, rival, items, moves, Pokémon, places and
 // the rest, and numbers. The ROM has no name for the file; scrcmd_word.c is descriptive. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "field/field.h"
 #include "field/field_daycare.h"
@@ -25,11 +26,11 @@ typedef void (*WordSetLoadByteFunc)(WordSet *wordSet, u32 index, u8 value);
 
 static BOOL loadAllItemText(VM *vm, FieldScriptEnv *env, WordSetLoadFunc load);
 static BOOL loadAllPkmNameText(VM *vm, FieldScriptEnv *env, WordSetLoadFunc load);
-static BOOL func_ov036_021a7c18(VM *vm, FieldScriptEnv *env, WordSetLoadByteFunc load);
+static BOOL WordSet_LoadTrainerClassFromScript(VM *vm, FieldScriptEnv *env, WordSetLoadByteFunc load);
 
 BOOL s004C_WordSetPlayerName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptWork_GetFieldWork(work);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(FieldScriptEnv_GetGameData(env));
 
     WordSet *wordSet = ScriptWork_GetWordSet(work);
@@ -40,7 +41,7 @@ BOOL s004C_WordSetPlayerName(VM *vm, FieldScriptEnv *env) {
 
 BOOL s0290_WordSetLoadRivalName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work);
+    ScriptWork_GetFieldWork(work);
     RivalDataSave *rival = getHollow_RivalData(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env)));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u8 index = VM_Read8(vm);
@@ -127,7 +128,7 @@ BOOL s0052_WordSetItemPocketName(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(FieldScriptEnv_GetScriptWork(env));
     u8 index = VM_Read8(vm);
     u16 item = ScriptReadAny(vm, env);
-    HeapID heapId = FieldScriptEnv_GetHeapID(env);
+    FieldScriptEnv_GetHeapID(env);
 
     loadBagPocketNameToStrbuf(wordSet, index,
                               BagSave_GetActualItemPocket(GameData_GetBag(FieldScriptEnv_GetGameData(env)), item));
@@ -235,7 +236,7 @@ BOOL s0060_WordSetPassPowerName(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-static BOOL func_ov036_021a7c18(VM *vm, FieldScriptEnv *env, WordSetLoadByteFunc load) {
+static BOOL WordSet_LoadTrainerClassFromScript(VM *vm, FieldScriptEnv *env, WordSetLoadByteFunc load) {
     u8 index = VM_Read8(vm);
     u16 value = ScriptReadAny(vm, env);
 
@@ -244,11 +245,11 @@ static BOOL func_ov036_021a7c18(VM *vm, FieldScriptEnv *env, WordSetLoadByteFunc
 }
 
 BOOL s0061_WordSetTrainerClassName(VM *vm, FieldScriptEnv *env) {
-    return func_ov036_021a7c18(vm, env, loadTrainerTypeText);
+    return WordSet_LoadTrainerClassFromScript(vm, env, loadTrainerTypeText);
 }
 
 BOOL s0062_WordSetTrainerClassNameWithArticle(VM *vm, FieldScriptEnv *env) {
-    return func_ov036_021a7c18(vm, env, loadTrainerTypeWithArticleToStrbuf);
+    return WordSet_LoadTrainerClassFromScript(vm, env, loadTrainerTypeWithArticleToStrbuf);
 }
 
 BOOL func_ov036_021a7c64(VM *vm, FieldScriptEnv *env) {
@@ -257,7 +258,7 @@ BOOL func_ov036_021a7c64(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u8 index = VM_Read8(vm);
 
-    WordSetNumber(wordSet, index, func_0200c924(info), 9, 1, TRUE);
+    WordSetNumber(wordSet, index, TrainerCard_GetPasserbyCount(info), 9, 1, TRUE);
     return FALSE;
 }
 
@@ -267,7 +268,7 @@ BOOL func_ov036_021a7cb4(VM *vm, FieldScriptEnv *env) {
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     u8 index = VM_Read8(vm);
 
-    WordSetNumber(wordSet, index, func_0200c90c(info), 9, 1, TRUE);
+    WordSetNumber(wordSet, index, TrainerCard_GetThankedCount(info), 9, 1, TRUE);
     return FALSE;
 }
 
@@ -323,7 +324,7 @@ BOOL func_ov036_021a7e04(VM *vm, FieldScriptEnv *env) {
     u16 value = ScriptReadAny(vm, env);
     u16 arg = ScriptReadAny(vm, env);
 
-    func_02024868(wordSet, index, value, arg);
+    WordSet_LoadFestivalMission(wordSet, index, value, arg);
     return FALSE;
 }
 
@@ -339,7 +340,7 @@ BOOL s029B_WordSetLoadJoinAvenueName(VM *vm, FieldScriptEnv *env) {
     JoinAvenue_GetParam(info, 0, name);
     strBuf = GFL_StrBufCreate(21, heapId);
     GFL_StrBufLoadString(strBuf, name);
-    func_0202437c(wordSet, index, strBuf, 2, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, index, strBuf, 2, 1, 2);
     GFL_StrBufFree(strBuf);
     return FALSE;
 }

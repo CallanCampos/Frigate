@@ -1893,9 +1893,6 @@ u32 CPS_SslWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
     return sent;
 }
 
-// This file's signature, which CPS_SetSsl refers to purely to keep it linked in
-static const char sSslSignature[] = "[SDK+UBIQUITOUS:SSL]";
-
 // Sends close_notify for an established SSL session, then resets the handshake state.
 void CPS_SslShutdown(CPSSoc *soc) {
     SSLContext *ctx = (SSLContext *)soc->con;
@@ -1932,7 +1929,7 @@ void CPS_SetSsl(BOOL enable) {
     OSThread *thread;
     CPSSoc *soc;
 
-    OSi_ReferSymbol(sSslSignature);
+    OSi_ReferSymbol(SSLi_Signature);
     thread = OS_GetCurrentThread();
     soc = (CPSSoc *)thread->specific[0];
     if (soc != NULL) {

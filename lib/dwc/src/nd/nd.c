@@ -207,7 +207,7 @@ static void ThreadMain(void *arg) {
     char token[0x190];
 
     for (;;) {
-        switch (func_ov011_0215dea8()) {
+        switch (DWC_SVLProcess()) {
         case 3: {
             NdWork *work = sDwcNdState.work;
 
@@ -290,7 +290,7 @@ BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *p
     sDwcNdState.work->started = FALSE;
     strncpy(sDwcNdState.work->gameCode, gameCode, 0x1f);
     strncpy(sDwcNdState.work->password, password, 0x1f);
-    if (!func_ov011_0215de44("9000", sDwcNdState.work->unk44)) {
+    if (!DWC_SVLGetTokenAsync("9000", sDwcNdState.work->unk44)) {
         NdFree(sDwcNdState.work);
         sDwcNdState.work = NULL;
         return FALSE;

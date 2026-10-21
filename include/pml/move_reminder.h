@@ -40,8 +40,8 @@ struct MoveReminderProcessData {
     u8 slot;
 };
 
-MoveReminderProcessData *func_ov012_02169c7c(HeapID heapId);
-void func_ov012_02169ca4(MoveReminderProcessData *data);
+MoveReminderProcessData *MoveReminderProcessData_Create(HeapID heapId);
+void MoveReminderProcessData_Free(MoveReminderProcessData *data);
 
 // The screen's process (waza_oshie_main.c)
 extern const GameProcFunctions WazaOshieProcFunctions;

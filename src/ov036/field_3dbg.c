@@ -50,10 +50,10 @@ static void func_ov036_02198d08(Field3DBgTex *tex, ArcTool *arc, const Field3DBg
 static void func_ov036_02198d6c(Field3DBgTex *tex);
 static void func_ov036_02198d84(Field3DBgTex *tex);
 static u8 func_ov036_02198d9c(Field3DBgTex *tex);
-static void func_ov036_02198da0(Field3DBgQuad *quad, Field3DBg *bg, Field3DBgTex *tex, const MtxFx44 *proj);
-static void func_ov036_02198e64(Field3DBgQuad *quad);
+static void func_ov036_02198da0(Field3DBgQuad *quad, const Field3DBg *bg, Field3DBgTex *tex, const MtxFx44 *proj);
+static void func_ov036_02198e64(const Field3DBgQuad *quad);
 static void func_ov036_02198f50(Field3DBg *bg);
-static void func_ov036_02198f78(Field3DBg *bg);
+static void func_ov036_02198f78(const Field3DBg *bg);
 
 Field3DBg *func_ov036_02198bc0(const Field3DBgInit *init, u32 heapId) {
     Field3DBg *bg = GFL_HeapAllocate(heapId, sizeof(Field3DBg), TRUE, "field_3dbg.c", 149);
@@ -110,8 +110,8 @@ void func_ov036_02198cb4(Field3DBg *bg, ArcTool *arc, const Field3DBgRes *res, u
     }
     func_ov036_02198d08(&bg->tex, arc, res, heapId);
     bg->alpha = res->alpha;
-    bg->scaleX = 0x1000;
-    bg->scaleY = 0x1000;
+    bg->scaleX = FX32_ONE;
+    bg->scaleY = FX32_ONE;
     bg->angle = 0;
 }
 
@@ -171,71 +171,55 @@ static u8 func_ov036_02198d9c(Field3DBgTex *tex) {
     return tex->loaded;
 }
 
-static void func_ov036_02198da0(Field3DBgQuad *quad, Field3DBg *bg, Field3DBgTex *tex, const MtxFx44 *proj) {
-    MtxFx33 scale;
-    fx32 max;
-    fx32 x;
-    fx32 y;
+static void func_ov036_02198da0(Field3DBgQuad *quad, const Field3DBg *bg, Field3DBgTex *tex, const MtxFx44 *proj) {
+    MtxFx33 scaling;
+    fx32 u;
+    fx32 v;
 
     quad->halfHeight = FX_Div(bg->distance, proj->m[1][1]);
     quad->halfWidth = FX_Div(bg->distance, proj->m[0][0]);
     quad->depth = bg->distance;
-    max = quad->halfWidth;
     if (quad->halfHeight > quad->halfWidth) {
         if (quad->halfHeight > quad->depth) {
-            max = quad->halfHeight;
+            quad->scale = FX_Div(quad->halfHeight, FX32_CONST(4));
         } else {
-            max = quad->depth;
+            quad->scale = FX_Div(quad->depth, FX32_CONST(4));
         }
-    } else if (quad->halfWidth <= quad->depth) {
-        max = quad->depth;
+    } else if (quad->halfWidth > quad->depth) {
+        quad->scale = FX_Div(quad->halfWidth, FX32_CONST(4));
+    } else {
+        quad->scale = FX_Div(quad->depth, FX32_CONST(4));
     }
-    quad->scale = FX_Div(max, 0x4000);
     quad->halfWidth = FX_Div(quad->halfWidth, quad->scale);
     quad->halfHeight = FX_Div(quad->halfHeight, quad->scale);
     quad->depth = FX_Div(quad->depth, quad->scale);
-    x = bg->texX << 12;
-    quad->texU1 = x + (bg->width << 12);
-    quad->texU0 = x;
-    y = bg->texY << 12;
-    quad->texV0 = y;
-    quad->texV1 = y + (bg->height << 12);
+    u = bg->texX << FX32_SHIFT;
+    v = bg->texY << FX32_SHIFT;
+    quad->texU0 = u;
+    quad->texU1 = u + (bg->width << FX32_SHIFT);
+    quad->texV0 = v;
+    quad->texV1 = v + (bg->height << FX32_SHIFT);
     MTX_Identity33_(&quad->mtx);
     MTX_RotZ33_(&quad->mtx, FX_SinIdx(bg->angle), FX_CosIdx(bg->angle));
-    MAT3_Scaling(&scale, bg->scaleX, bg->scaleY, 0x1000);
-    MTX_Concat33(&quad->mtx, &scale, &quad->mtx);
+    MAT3_Scaling(&scaling, bg->scaleX, bg->scaleY, FX32_ONE);
+    MTX_Concat33(&quad->mtx, &scaling, &quad->mtx);
 }
 
-static void func_ov036_02198e64(Field3DBgQuad *quad) {
+static void func_ov036_02198e64(const Field3DBgQuad *quad) {
     G3_MtxMode(GX_MTXMODE_TEXTURE);
     G3_Identity();
     G3_MultMtx33(&quad->mtx);
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     G3_Scale(quad->scale, quad->scale, quad->scale);
     G3_Begin(GX_BEGIN_QUADS);
-    {
-        fx32 u0 = quad->texU0;
-        fx32 v0 = quad->texV0;
-        fx32 x;
-        fx32 y;
-        fx32 z;
-        fx32 v1;
-        fx32 u1;
-
-        G3_TexCoord(u0, v0);
-        x = quad->halfWidth;
-        y = quad->halfHeight;
-        z = quad->depth;
-        G3_Vtx(-x, y, -z);
-        v1 = quad->texV1;
-        G3_TexCoord(u0, v1);
-        G3_Vtx(-x, -y, -z);
-        u1 = quad->texU1;
-        G3_TexCoord(u1, v1);
-        G3_Vtx(x, -y, -z);
-        G3_TexCoord(u1, v0);
-        G3_Vtx(x, y, -z);
-    }
+    G3_TexCoord(quad->texU0, quad->texV0);
+    G3_Vtx(-quad->halfWidth, quad->halfHeight, -quad->depth);
+    G3_TexCoord(quad->texU0, quad->texV1);
+    G3_Vtx(-quad->halfWidth, -quad->halfHeight, -quad->depth);
+    G3_TexCoord(quad->texU1, quad->texV1);
+    G3_Vtx(quad->halfWidth, -quad->halfHeight, -quad->depth);
+    G3_TexCoord(quad->texU1, quad->texV0);
+    G3_Vtx(quad->halfWidth, quad->halfHeight, -quad->depth);
     G3_End();
 }
 
@@ -245,7 +229,7 @@ static void func_ov036_02198f50(Field3DBg *bg) {
                    GX_POLYGON_ATTR_MISC_FOG);
 }
 
-static void func_ov036_02198f78(Field3DBg *bg) {
+static void func_ov036_02198f78(const Field3DBg *bg) {
     G3_TexImageParam(bg->tex.texParams[4], GX_TEXGEN_TEXCOORD, bg->tex.texParams[0], bg->tex.texParams[1],
                      bg->tex.texParams[2], bg->tex.texParams[3], bg->tex.texParams[5],
                      NNS_GfdGetTexKeyAddr(GFL_G3DResGetTexVRAMHandle(bg->tex.resource)));

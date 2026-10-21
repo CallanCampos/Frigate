@@ -24,7 +24,7 @@ BOOL CtvtBeacon_IsFriendInvite(CtvtCommBeacon *beacon, WifiList *wifiList, const
             }
         }
         if (match == TRUE) {
-            return func_0200a438(wifiList, &beacon->player, NULL);
+            return WifiList_FindFriendByPlayerInfo(wifiList, &beacon->player, NULL);
         }
     }
     return FALSE;

@@ -83,30 +83,30 @@ typedef struct {
 
 static BtlNetWork *sWork;
 
-static void func_ov167_021b9abc(int netId, int size, const void *data, void *work, NetHandle *handle);
-static BOOL func_ov167_021b9b30(int netId);
-static u8 func_ov167_021b9b94(u8 clientId);
-static void func_ov167_021b9be0(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void *func_ov167_021b9c6c(int netId, void *work, int size);
-static void func_ov167_021b9cb4(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov167_021ba4ec(void);
-static void func_ov167_021ba26c(void);
-static void *func_ov167_021b9d58(int netId, void *work, int size);
-static void func_ov167_021b9db8(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void *func_ov167_021b9eb0(int netId, void *work, int size);
-static void func_ov167_021b9efc(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void *func_ov167_021ba038(int netId, void *work, int size);
-static void func_ov167_021ba080(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void *func_ov167_021ba154(int netId, void *work, int size);
-static void func_ov167_021ba19c(int netId, int size, const void *data, void *work, NetHandle *handle);
-static BtlCommTrainerData *func_ov167_021ba20c(const BtlSetupTrainer *trainer, HeapID heapId);
-static void func_ov167_021ba264(void *data);
-static void *func_ov167_021ba3fc(int netId, void *work, int size);
-static void func_ov167_021ba414(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov167_021ba4b8(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void *func_ov167_021ba4e0(int netId, void *work, int size);
+static void RecvVersion(int netId, int size, const void *data, void *work, NetHandle *handle);
+static BOOL HasMachineVersion(int netId);
+static u8 GetClientNetId(u8 clientId);
+static void RecvSyncData(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *GetPartyRecvBuffer(int netId, void *work, int size);
+static void RecvParty(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void ClearReplies(void);
+static void FreeRecvBuffers(void);
+static void *GetChatterRecvBuffer(int netId, void *work, int size);
+static void RecvChatter(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *GetPartyPacketRecvBuffer(int netId, void *work, int size);
+static void RecvPartyPacket(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *GetPlayerInfoRecvBuffer(int netId, void *work, int size);
+static void RecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *GetTrainerRecvBuffer(int netId, void *work, int size);
+static void RecvTrainer(int netId, int size, const void *data, void *work, NetHandle *handle);
+static BtlCommTrainerData *CreateCommTrainerData(const BtlSetupTrainer *trainer, HeapID heapId);
+static void FreeCommTrainerData(void *data);
+static void *GetReplyRecvBuffer(int netId, void *work, int size);
+static void RecvReply(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void RecvServerCmd(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *GetServerCmdRecvBuffer(int netId, void *work, int size);
 
-// Empties the receive buffers that func_ov167_021ba26c frees, and forgets their clients
+// Empties the receive buffers that FreeRecvBuffers frees, and forgets their clients
 static inline void ClearRecvBuffers(void) {
     u32 i;
 
@@ -122,7 +122,7 @@ static inline void ClearRecvBuffers(void) {
     sWork->tempSize = 0;
 }
 
-void func_ov167_021b9950(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
+void BtlNet_Init(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
     u32 count;
     u32 max;
     u32 i;
@@ -132,7 +132,7 @@ void func_ov167_021b9950(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
         sWork->netHandle = netHandle;
         sWork->clientMask = clientMask;
         sWork->heapId = heapId;
-        sWork->myNetId = func_02042a6c(netHandle);
+        sWork->myNetId = GFL_NetGetHandleNetId(netHandle);
         sWork->serverNetId = 40;
         sWork->serverCmdReceived = FALSE;
         sWork->unkE = 0;
@@ -141,7 +141,7 @@ void func_ov167_021b9950(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
                 count++;
             }
         }
-        max = func_02042a78();
+        max = GFL_NetGetNegotiatedCount();
         if (count > max) {
             count = max;
         }
@@ -150,27 +150,27 @@ void func_ov167_021b9950(NetHandle *netHandle, u16 clientMask, HeapID heapId) {
         sWork->timingPending = FALSE;
         sWork->syncDataReceived = FALSE;
         ClearRecvBuffers();
-        func_ov167_021ba2f4(1);
+        BtlNet_StartTiming(1);
     } else {
         sWork = NULL;
     }
 }
 
-BOOL func_ov167_021b9a30(void) {
+BOOL BtlNet_IsInitSynced(void) {
     if (sWork != NULL) {
-        return func_ov167_021ba318(1) ? TRUE : FALSE;
+        return BtlNet_CheckTiming(1) ? TRUE : FALSE;
     }
     return TRUE;
 }
 
-void func_ov167_021b9a54(void) {
+void BtlNet_Exit(void) {
     if (sWork != NULL) {
-        func_ov167_021ba26c();
+        FreeRecvBuffers();
         GFL_HeapFree(sWork);
     }
 }
 
-BOOL func_ov167_021b9a70(void) {
+BOOL BtlNet_CheckError(void) {
     if (sWork != NULL) {
         if (GFL_NetErrCheck()) {
             return TRUE;
@@ -181,16 +181,16 @@ BOOL func_ov167_021b9a70(void) {
 }
 
 // Sends this machine's version and client
-BOOL func_ov167_021b9a94(u8 clientId) {
+BOOL BtlNet_SendVersion(u8 clientId) {
     BtlNetVersionPacket *packet = &sWork->sendBuf.version;
 
     packet->version = 100;
     packet->clientId = clientId;
-    return func_02042be8(sWork->netHandle, 0x100, sizeof(BtlNetVersionPacket), packet);
+    return GFL_NetSendCommand(sWork->netHandle, 0x100, sizeof(BtlNetVersionPacket), packet);
 }
 
 // Command 0x100: records a machine's version, and once every machine's is in, makes the highest the server
-static void func_ov167_021b9abc(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvVersion(int netId, int size, const void *data, void *work, NetHandle *handle) {
     const BtlNetVersionPacket *packet = data;
     BtlNetVersions *versions = &sWork->versions;
     int i;
@@ -217,12 +217,12 @@ static void func_ov167_021b9abc(int netId, int size, const void *data, void *wor
     }
 }
 
-static BOOL func_ov167_021b9b30(int netId) {
+static BOOL HasMachineVersion(int netId) {
     return sWork->versions.clients[netId].received;
 }
 
 // Whether the server is decided
-BOOL func_ov167_021b9b48(void) {
+BOOL BtlNet_IsServerDecided(void) {
     if (sWork->serverNetId != 40) {
         return TRUE;
     }
@@ -230,7 +230,7 @@ BOOL func_ov167_021b9b48(void) {
 }
 
 // Whether this machine is the server
-BOOL func_ov167_021b9b60(void) {
+BOOL BtlNet_IsServer(void) {
     if (sWork->serverNetId == sWork->myNetId) {
         return TRUE;
     }
@@ -238,7 +238,7 @@ BOOL func_ov167_021b9b60(void) {
 }
 
 // The highest version, which every machine plays by
-u8 func_ov167_021b9b78(void) {
+u8 BtlNet_GetCommonVersion(void) {
     if (sWork != NULL) {
         return sWork->versions.max;
     }
@@ -246,7 +246,7 @@ u8 func_ov167_021b9b78(void) {
 }
 
 // The net id of a client, or 40
-static u8 func_ov167_021b9b94(u8 clientId) {
+static u8 GetClientNetId(u8 clientId) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -258,12 +258,12 @@ static u8 func_ov167_021b9b94(u8 clientId) {
 }
 
 // Sends the server's sync data to everyone
-BOOL func_ov167_021b9bb8(BtlMainSyncData *data) {
-    return func_02042c18(sWork->netHandle, 0xff, 0x101, sizeof(BtlMainSyncData), data, 0, 0, 0);
+BOOL BtlNet_SendSyncData(BtlMainSyncData *data) {
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x101, sizeof(BtlMainSyncData), data, 0, 0, 0);
 }
 
 // Command 0x101: keeps the first sync data that arrives
-static void func_ov167_021b9be0(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvSyncData(int netId, int size, const void *data, void *work, NetHandle *handle) {
     if (!sWork->syncDataReceived) {
         sWork->syncData = *(const BtlMainSyncData *)data;
         sWork->syncDataReceived = TRUE;
@@ -271,7 +271,7 @@ static void func_ov167_021b9be0(int netId, int size, const void *data, void *wor
 }
 
 // Copies the sync data once it has arrived
-BOOL func_ov167_021b9c0c(BtlMainSyncData *data) {
+BOOL BtlNet_GetSyncData(BtlMainSyncData *data) {
     if (sWork->syncDataReceived) {
         *data = sWork->syncData;
         return TRUE;
@@ -280,40 +280,40 @@ BOOL func_ov167_021b9c0c(BtlMainSyncData *data) {
 }
 
 // Sends this machine's party to everyone
-u8 func_ov167_021b9c38(PokeParty *party) {
-    return func_02042c18(sWork->netHandle, 0xff, 0x102, PokeParty_GetSaveDataSize(), party, 0, 1, 1);
+u8 BtlNet_SendParty(PokeParty *party) {
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x102, PokeParty_GetSaveDataSize(), party, 0, 1, 1);
 }
 
 // Command 0x102's buffer
-static void *func_ov167_021b9c6c(int netId, void *work, int size) {
+static void *GetPartyRecvBuffer(int netId, void *work, int size) {
     sWork->recvBuffers[netId] = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 462);
     return sWork->recvBuffers[netId];
 }
 
 // Command 0x102: a party has arrived
-static void func_ov167_021b9cb4(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvParty(int netId, int size, const void *data, void *work, NetHandle *handle) {
     sWork->recvSizes[netId] = size;
 }
 
 // Whether every machine's data has arrived
-BOOL func_ov167_021b9ccc(void) {
+BOOL BtlNet_ArePartiesReceived(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (func_ov167_021b9b30(i) && sWork->recvSizes[i] == 0) {
+        if (HasMachineVersion(i) && sWork->recvSizes[i] == 0) {
             return FALSE;
         }
     }
     return TRUE;
 }
 
-void func_ov167_021b9d00(void) {
-    func_ov167_021ba4ec();
-    func_ov167_021ba26c();
+void BtlNet_BeginChatterExchange(void) {
+    ClearReplies();
+    FreeRecvBuffers();
 }
 
 // Sends this machine's Chatot cry to everyone, or a word of zero without one
-BOOL func_ov167_021b9d0c(void *chatter) {
+BOOL BtlNet_SendChatter(void *chatter) {
     u32 size;
 
     if (doesChatotExist(chatter)) {
@@ -323,11 +323,11 @@ BOOL func_ov167_021b9d0c(void *chatter) {
         chatter = &sWork->sendBuf.noChatter;
         sWork->sendBuf.noChatter = 0;
     }
-    return func_02042c18(sWork->netHandle, 0xff, 0x103, size, chatter, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x103, size, chatter, 0, 1, 1);
 }
 
 // Command 0x103's buffer: a word for no cry, which goes in the machine's reply buffer
-static void *func_ov167_021b9d58(int netId, void *work, int size) {
+static void *GetChatterRecvBuffer(int netId, void *work, int size) {
     if (size == sizeof(u32)) {
         return &sWork->clientReplies[netId];
     }
@@ -336,7 +336,7 @@ static void *func_ov167_021b9d58(int netId, void *work, int size) {
 }
 
 // Command 0x103: a Chatot cry has arrived
-static void func_ov167_021b9db8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvChatter(int netId, int size, const void *data, void *work, NetHandle *handle) {
     if (size == sizeof(u32)) {
         BtlNetRecvBuffer *buffer = &sWork->clientReplies[netId];
 
@@ -348,11 +348,11 @@ static void func_ov167_021b9db8(int netId, int size, const void *data, void *wor
 }
 
 // Whether every machine's Chatot cry has arrived
-BOOL func_ov167_021b9dfc(void) {
+BOOL BtlNet_AreChattersReceived(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (func_ov167_021b9b30(i) && sWork->clientReplies[i].empty && sWork->recvSizes[i] == 0) {
+        if (HasMachineVersion(i) && sWork->clientReplies[i].empty && sWork->recvSizes[i] == 0) {
             return FALSE;
         }
     }
@@ -360,8 +360,8 @@ BOOL func_ov167_021b9dfc(void) {
 }
 
 // A client's Chatot cry, or NULL
-void *func_ov167_021b9e48(u8 clientId) {
-    u8 netId = func_ov167_021b9b94(clientId);
+void *BtlNet_GetChatter(u8 clientId) {
+    u8 netId = GetClientNetId(clientId);
 
     if (netId != 40 && sWork->recvSizes[netId] != 0) {
         return sWork->recvBuffers[netId];
@@ -369,20 +369,21 @@ void *func_ov167_021b9e48(u8 clientId) {
     return NULL;
 }
 
-void func_ov167_021b9e74(void) {
-    func_ov167_021ba4ec();
-    func_ov167_021ba26c();
+void BtlNet_EndChatterExchange(void) {
+    ClearReplies();
+    FreeRecvBuffers();
 }
 
 // Sends a party for one client to everyone
-BOOL func_ov167_021b9e80(void *data) {
+BOOL BtlNet_SendPartyPacket(void *data) {
     BtlNetPartyPacket *packet = data;
 
-    return func_02042c18(sWork->netHandle, 0xff, 0x104, packet->size + sizeof(BtlNetPartyPacket), packet, 0, 1, 1);
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x104, packet->size + sizeof(BtlNetPartyPacket), packet,
+                                       0, 1, 1);
 }
 
 // Command 0x104's buffer
-static void *func_ov167_021b9eb0(int netId, void *work, int size) {
+static void *GetPartyPacketRecvBuffer(int netId, void *work, int size) {
     if (sWork->tempBuffer == NULL) {
         sWork->tempBuffer = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 633);
     }
@@ -390,7 +391,7 @@ static void *func_ov167_021b9eb0(int netId, void *work, int size) {
 }
 
 // Command 0x104: keeps the party for its client
-static void func_ov167_021b9efc(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvPartyPacket(int netId, int size, const void *data, void *work, NetHandle *handle) {
     const BtlNetPartyPacket *packet = data;
 
     if (sWork->parties[packet->clientId] == NULL) {
@@ -403,7 +404,7 @@ static void func_ov167_021b9efc(int netId, int size, const void *data, void *wor
 }
 
 // Whether a client's party has arrived
-BOOL func_ov167_021b9f84(u8 clientId) {
+BOOL BtlNet_IsClientPartyReceived(u8 clientId) {
     if (sWork->parties[clientId] != NULL) {
         return TRUE;
     }
@@ -411,8 +412,8 @@ BOOL func_ov167_021b9f84(u8 clientId) {
 }
 
 // A client's party, from its machine or sent for it
-PokeParty *func_ov167_021b9fa4(u8 clientId) {
-    u8 netId = func_ov167_021b9b94(clientId);
+PokeParty *BtlNet_GetParty(u8 clientId) {
+    u8 netId = GetClientNetId(clientId);
     PokeParty *party;
     u32 count;
     u32 i;
@@ -431,32 +432,32 @@ PokeParty *func_ov167_021b9fa4(u8 clientId) {
     return NULL;
 }
 
-void func_ov167_021ba000(void) {
-    func_ov167_021ba26c();
+void BtlNet_EndPartyExchange(void) {
+    FreeRecvBuffers();
 }
 
 // Sends this machine's player info to everyone
-BOOL func_ov167_021ba008(PlayerInfo *info) {
-    return func_02042c18(sWork->netHandle, 0xff, 0x105, PlayerInfo_GetSize(), info, 0, 1, 1);
+BOOL BtlNet_SendPlayerInfo(PlayerInfo *info) {
+    return GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x105, PlayerInfo_GetSize(), info, 0, 1, 1);
 }
 
 // Command 0x105's buffer
-static void *func_ov167_021ba038(int netId, void *work, int size) {
+static void *GetPlayerInfoRecvBuffer(int netId, void *work, int size) {
     sWork->recvBuffers[netId] = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 724);
     return sWork->recvBuffers[netId];
 }
 
 // Command 0x105: a machine's player info has arrived
-static void func_ov167_021ba080(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvPlayerInfo(int netId, int size, const void *data, void *work, NetHandle *handle) {
     sWork->recvSizes[netId] = size;
 }
 
 // Whether every machine's player info has arrived
-BOOL func_ov167_021ba098(void) {
+BOOL BtlNet_ArePlayerInfosReceived(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (func_ov167_021b9b30(i) && sWork->recvSizes[i] == 0) {
+        if (HasMachineVersion(i) && sWork->recvSizes[i] == 0) {
             return FALSE;
         }
     }
@@ -464,8 +465,8 @@ BOOL func_ov167_021ba098(void) {
 }
 
 // A client's player info, from its machine or sent for it
-PlayerInfo *func_ov167_021ba0cc(u8 clientId) {
-    u8 netId = func_ov167_021b9b94(clientId);
+PlayerInfo *BtlNet_GetPlayerInfo(u8 clientId) {
+    u8 netId = GetClientNetId(clientId);
 
     if (netId != 40) {
         return sWork->recvBuffers[netId];
@@ -477,49 +478,49 @@ PlayerInfo *func_ov167_021ba0cc(u8 clientId) {
 }
 
 // Sends this machine's trainer to everyone
-BOOL func_ov167_021ba108(BtlSetupTrainer *trainer) {
-    BtlCommTrainerData *data = func_ov167_021ba20c(trainer, HEAPID_TAIL(sWork->heapId));
-    BOOL result = func_02042c18(sWork->netHandle, 0xff, 0x106, sizeof(BtlCommTrainerData), data, 0, 1, 0);
+BOOL BtlNet_SendTrainer(BtlSetupTrainer *trainer) {
+    BtlCommTrainerData *data = CreateCommTrainerData(trainer, HEAPID_TAIL(sWork->heapId));
+    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, 0xff, 0x106, sizeof(BtlCommTrainerData), data, 0, 1, 0);
 
-    func_ov167_021ba264(data);
+    FreeCommTrainerData(data);
     return result;
 }
 
 // Command 0x106's buffer
-static void *func_ov167_021ba154(int netId, void *work, int size) {
+static void *GetTrainerRecvBuffer(int netId, void *work, int size) {
     sWork->tempBuffer = GFL_HeapAllocate(HEAPID_TAIL(sWork->heapId), size, TRUE, "btl_net.c", 798);
     return sWork->tempBuffer;
 }
 
 // Command 0x106: a trainer has arrived
-static void func_ov167_021ba19c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvTrainer(int netId, int size, const void *data, void *work, NetHandle *handle) {
     sWork->tempSize = size;
 }
 
 // Whether the trainer has arrived
-BOOL func_ov167_021ba1b0(void) {
+BOOL BtlNet_IsTrainerReceived(void) {
     if (sWork->tempSize != 0) {
         return TRUE;
     }
     return FALSE;
 }
 
-void *func_ov167_021ba1cc(void) {
+void *BtlNet_GetTrainer(void) {
     return sWork->tempBuffer;
 }
 
-void func_ov167_021ba1e0(void) {
+void BtlNet_FreeTrainer(void) {
     GFL_HeapFree(sWork->tempBuffer);
     sWork->tempBuffer = NULL;
     sWork->tempSize = 0;
 }
 
-void func_ov167_021ba204(void) {
-    func_ov167_021ba26c();
+void BtlNet_EndTrainerExchange(void) {
+    FreeRecvBuffers();
 }
 
 // A trainer as a link battle sends it, with its name copied out of the string buffer
-static BtlCommTrainerData *func_ov167_021ba20c(const BtlSetupTrainer *trainer, HeapID heapId) {
+static BtlCommTrainerData *CreateCommTrainerData(const BtlSetupTrainer *trainer, HeapID heapId) {
     BtlCommTrainerData *data = GFL_HeapAllocate(heapId, sizeof(BtlCommTrainerData), TRUE, "btl_net.c", 841);
 
     MI_CpuCopy8(trainer, data, sizeof(BtlSetupTrainer));
@@ -531,11 +532,11 @@ static BtlCommTrainerData *func_ov167_021ba20c(const BtlSetupTrainer *trainer, H
     return data;
 }
 
-static void func_ov167_021ba264(void *data) {
+static void FreeCommTrainerData(void *data) {
     GFL_HeapFree(data);
 }
 
-static void func_ov167_021ba26c(void) {
+static void FreeRecvBuffers(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -559,20 +560,20 @@ static void func_ov167_021ba26c(void) {
 }
 
 // Starts synchronizing every machine on a timing number
-void func_ov167_021ba2f4(u8 id) {
+void BtlNet_StartTiming(u8 id) {
     if (sWork != NULL) {
         sWork->timingNo = id;
         sWork->timingPending = TRUE;
-        func_02040b38(sWork->netHandle, id, 1, sWork->clientMask);
+        NetHandle_SendTimingPairToMachines(sWork->netHandle, id, 1, sWork->clientMask);
     }
 }
 
 // Whether every machine has reached the timing number, starting the wait if it isn't waiting
 // Whether every machine has reached the timing number, starting the wait if it isn't waiting
-BOOL func_ov167_021ba318(u8 id) {
+BOOL BtlNet_CheckTiming(u8 id) {
     if (sWork != NULL) {
         if (sWork->timingPending) {
-            BOOL done = func_02040664(sWork->netHandle, sWork->timingNo, 1);
+            BOOL done = NetHandle_IsTimingPairRecv(sWork->netHandle, sWork->timingNo, 1);
 
             if (done) {
                 sWork->timingNo = 0;
@@ -580,7 +581,7 @@ BOOL func_ov167_021ba318(u8 id) {
                 return done;
             }
         } else {
-            func_02040b38(sWork->netHandle, id, 1, sWork->clientMask);
+            NetHandle_SendTimingPairToMachines(sWork->netHandle, id, 1, sWork->clientMask);
         }
         return FALSE;
     }
@@ -588,21 +589,21 @@ BOOL func_ov167_021ba318(u8 id) {
 }
 
 // Sends a server command to a client's machine
-BOOL func_ov167_021ba358(u8 clientId, void *data, u32 size) {
-    u8 netId = func_ov167_021b9b94(clientId);
+BOOL BtlNet_SendServerCmd(u8 clientId, void *data, u32 size) {
+    u8 netId = GetClientNetId(clientId);
 
     if (netId != 40) {
-        return func_02042c18(sWork->netHandle, netId, 0x107, size, data, 0, 0, 1);
+        return GFL_NetSendCommandToMachine(sWork->netHandle, netId, 0x107, size, data, 0, 0, 1);
     }
     return TRUE;
 }
 
 // Whether every machine's reply has arrived
-BOOL func_ov167_021ba398(void) {
+BOOL BtlNet_AreRepliesReceived(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (func_ov167_021b9b30(i) && sWork->clientReplies[i].empty) {
+        if (HasMachineVersion(i) && sWork->clientReplies[i].empty) {
             return FALSE;
         }
     }
@@ -610,8 +611,8 @@ BOOL func_ov167_021ba398(void) {
 }
 
 // A client's reply and its size
-u16 func_ov167_021ba3d4(u8 clientId, void **data) {
-    u8 netId = func_ov167_021b9b94(clientId);
+u16 BtlNet_GetReply(u8 clientId, void **data) {
+    u8 netId = GetClientNetId(clientId);
     BtlNetRecvBuffer *buffer = &sWork->clientReplies[netId];
 
     *data = buffer;
@@ -619,12 +620,12 @@ u16 func_ov167_021ba3d4(u8 clientId, void **data) {
 }
 
 // Command 0x108's buffer
-static void *func_ov167_021ba3fc(int netId, void *work, int size) {
+static void *GetReplyRecvBuffer(int netId, void *work, int size) {
     return &sWork->clientReplies[netId];
 }
 
 // Command 0x108: a client's reply has arrived
-static void func_ov167_021ba414(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvReply(int netId, int size, const void *data, void *work, NetHandle *handle) {
     BtlNetRecvBuffer *buffer = &sWork->clientReplies[netId];
 
     buffer->size = size;
@@ -633,17 +634,17 @@ static void func_ov167_021ba414(int netId, int size, const void *data, void *wor
     sWork->clientReplies[netId].empty = FALSE;
 }
 
-void func_ov167_021ba458(void) {
-    func_ov167_021ba4ec();
+void BtlNet_ResetReplies(void) {
+    ClearReplies();
 }
 
 // Whether the server's command has arrived
-BOOL func_ov167_021ba460(void) {
+BOOL BtlNet_IsServerCmdReceived(void) {
     return sWork->serverCmdReceived;
 }
 
 // The server's command and its size
-u16 func_ov167_021ba46c(void **data) {
+u16 BtlNet_GetServerCmd(void **data) {
     BtlNetRecvBuffer *buffer = &sWork->serverCmd;
 
     *data = buffer;
@@ -651,8 +652,8 @@ u16 func_ov167_021ba46c(void **data) {
 }
 
 // Sends this machine's reply to the server
-BOOL func_ov167_021ba484(void *data, u32 size) {
-    BOOL result = func_02042c18(sWork->netHandle, sWork->serverNetId, 0x108, size, data, 0, 1, 1);
+BOOL BtlNet_SendReply(void *data, u32 size) {
+    BOOL result = GFL_NetSendCommandToMachine(sWork->netHandle, sWork->serverNetId, 0x108, size, data, 0, 1, 1);
 
     if (result) {
         sWork->serverCmdReceived = FALSE;
@@ -661,7 +662,7 @@ BOOL func_ov167_021ba484(void *data, u32 size) {
 }
 
 // Command 0x107: the server's command has arrived
-static void func_ov167_021ba4b8(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void RecvServerCmd(int netId, int size, const void *data, void *work, NetHandle *handle) {
     if (!sWork->serverCmdReceived) {
         BtlNetRecvBuffer *buffer = &sWork->serverCmd;
 
@@ -672,11 +673,11 @@ static void func_ov167_021ba4b8(int netId, int size, const void *data, void *wor
 }
 
 // Command 0x107's buffer
-static void *func_ov167_021ba4e0(int netId, void *work, int size) {
+static void *GetServerCmdRecvBuffer(int netId, void *work, int size) {
     return &sWork->serverCmd;
 }
 
-static void func_ov167_021ba4ec(void) {
+static void ClearReplies(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -688,7 +689,7 @@ static void func_ov167_021ba4ec(void) {
 }
 
 // A party packet of a size, for no client yet
-void *func_ov167_021ba524(u32 size, HeapID heapId) {
+void *BtlNet_CreatePartyPacket(u32 size, HeapID heapId) {
     BtlNetPartyPacket *packet = GFL_HeapAllocate(heapId, size + sizeof(BtlNetPartyPacket), TRUE, "btl_net.c", 1143);
 
     packet->size = size;
@@ -696,12 +697,12 @@ void *func_ov167_021ba524(u32 size, HeapID heapId) {
     return packet;
 }
 
-void func_ov167_021ba55c(void *data) {
+void BtlNet_FreePartyPacket(void *data) {
     GFL_HeapFree(data);
 }
 
 // Puts a client's party in a party packet
-void func_ov167_021ba564(void *data, PokeParty *party, u8 clientId) {
+void BtlNet_SetPartyPacket(void *data, PokeParty *party, u8 clientId) {
     BtlNetPartyPacket *packet = data;
 
     packet->clientId = clientId;
@@ -710,13 +711,13 @@ void func_ov167_021ba564(void *data, PokeParty *party, u8 clientId) {
 
 // The link battle's commands, from 0x100
 const NetCommand data_ov167_021d7448[9] = {
-    { func_ov167_021b9abc, NULL },
-    { func_ov167_021b9be0, NULL },
-    { func_ov167_021b9cb4, func_ov167_021b9c6c },
-    { func_ov167_021b9db8, func_ov167_021b9d58 },
-    { func_ov167_021b9efc, func_ov167_021b9eb0 },
-    { func_ov167_021ba080, func_ov167_021ba038 },
-    { func_ov167_021ba19c, func_ov167_021ba154 },
-    { func_ov167_021ba4b8, func_ov167_021ba4e0 },
-    { func_ov167_021ba414, func_ov167_021ba3fc },
+    { RecvVersion, NULL },
+    { RecvSyncData, NULL },
+    { RecvParty, GetPartyRecvBuffer },
+    { RecvChatter, GetChatterRecvBuffer },
+    { RecvPartyPacket, GetPartyPacketRecvBuffer },
+    { RecvPlayerInfo, GetPlayerInfoRecvBuffer },
+    { RecvTrainer, GetTrainerRecvBuffer },
+    { RecvServerCmd, GetServerCmdRecvBuffer },
+    { RecvReply, GetReplyRecvBuffer },
 };

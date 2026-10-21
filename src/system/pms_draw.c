@@ -174,7 +174,7 @@ void PMSDraw_SetObjMode(PMSDraw *draw, u8 slot, u32 mode) {
     int i;
 
     for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
-        func_0204c318(draw->slots[slot].icons[i], mode);
+        ClActor_SetObjMode(draw->slots[slot].icons[i], mode);
     }
 }
 
@@ -191,12 +191,12 @@ void PMSDraw_Copy(PMSDraw *draw, u8 src, u8 dest) {
     for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
         u32 surface = PMSDraw_GetSurface(BmpWin_GetBGIndex(srcSlot->window));
 
-        func_0204c178(srcSlot->icons[i], &pos, surface);
+        ClActor_GetSurfacePos(srcSlot->icons[i], &pos, surface);
         pos.x += moveX * 8;
         pos.y += moveY * 8;
-        func_0204c140(destSlot->icons[i], &pos, surface);
-        func_0204c488(destSlot->icons[i], func_0204c4a0(srcSlot->icons[i]));
-        func_0204c124(destSlot->icons[i], srcSlot->isIcon[i]);
+        ClActor_SetSurfacePos(destSlot->icons[i], &pos, surface);
+        ClActor_SetSequence(destSlot->icons[i], ClActor_GetSequence(srcSlot->icons[i]));
+        ClActor_SetVisible(destSlot->icons[i], srcSlot->isIcon[i]);
     }
     destSlot->printing = srcSlot->printing;
     destSlot->drawn = srcSlot->drawn;
@@ -296,27 +296,27 @@ static void PMSDrawRes_Load(PMSDrawRes *res, u8 palette, HeapID heapId) {
     u32 charFile = PMSDraw_GetIconCharFile(res->vramType);
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PMSI, heapId);
 
-    res->palette =
-        func_0204bbb8(arc, PMSI_PALETTE_FILE, res->vramType, palette * 0x20, 0, PMSI_ICON_PALETTE_COUNT, heapId);
-    res->chars = func_0204b81c(arc, charFile, FALSE, res->vramType, heapId);
-    res->cellAnims = func_0204bde0(arc, cellFile, animFile, heapId);
+    res->palette = ClActSys_LoadPlttRange(arc, PMSI_PALETTE_FILE, res->vramType, palette * 0x20, 0,
+                                          PMSI_ICON_PALETTE_COUNT, heapId);
+    res->chars = ClActSys_LoadChars(arc, charFile, FALSE, res->vramType, heapId);
+    res->cellAnims = ClActSys_LoadCellAnims(arc, cellFile, animFile, heapId);
     GFL_ArcToolFree(arc);
 }
 
 static void PMSDrawRes_Free(PMSDrawRes *res) {
-    func_0204bcd0(res->palette);
-    func_0204b98c(res->chars);
-    func_0204be64(res->cellAnims);
+    ClActSys_FreePltt(res->palette);
+    ClActSys_FreeChars(res->chars);
+    ClActSys_FreeCellAnims(res->cellAnims);
 }
 
 static ClActor *PMSDrawRes_CreateIcon(PMSDrawRes *res, HeapID heapId) {
     ClActorSetup setup = { 0 };
-    ClActor *icon = func_0204c040(res->unit, res->chars, res->palette, res->cellAnims, &setup, res->vramType, heapId);
+    ClActor *icon = ClActor_Create(res->unit, res->chars, res->palette, res->cellAnims, &setup, res->vramType, heapId);
 
-    func_0204c124(icon, FALSE);
-    func_0204c520(icon, TRUE);
+    ClActor_SetVisible(icon, FALSE);
+    ClActor_SetAutoAnim(icon, TRUE);
     if (GCTX_HIDGetUpdateRate() == 30) {
-        func_0204c53c(icon, FX32_CONST(2));
+        ClActor_SetAutoAnimSpeed(icon, FX32_CONST(2));
     }
     return icon;
 }
@@ -330,9 +330,9 @@ static void PMSDraw_SetIcon(ClActor *icon, BmpWin *window, u32 width, u32 lines,
     actorPos.x = pos.x;
     actorPos.y = pos.y;
     bg = BmpWin_GetBGIndex(window);
-    func_0204c140(icon, &actorPos, PMSDraw_GetSurface(bg));
-    func_0204c468(icon, GFL_BGSysGetBGPriority(bg));
-    func_0204c488(icon, word - 1);
+    ClActor_SetSurfacePos(icon, &actorPos, PMSDraw_GetSurface(bg));
+    ClActor_SetBgPriority(icon, GFL_BGSysGetBGPriority(bg));
+    ClActor_SetSequence(icon, word - 1);
 }
 
 static void PMSDrawSlot_Init(PMSDrawSlot *slot, PMSDrawRes *res, HeapID heapId) {
@@ -349,7 +349,7 @@ static void PMSDrawSlot_Delete(PMSDrawSlot *slot) {
     int i;
 
     for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
-        func_0204c108(slot->icons[i]);
+        ClActor_Delete(slot->icons[i]);
     }
 }
 
@@ -358,7 +358,7 @@ static BOOL PMSDrawSlot_Main(PMSDrawSlot *slot, PrintQueue *queue, BOOL followSc
     int i;
     BOOL printing;
 
-    if (slot->printing && !func_02021c1c(queue, BmpWin_GetBitmap(slot->window))) {
+    if (slot->printing && !PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(slot->window))) {
         BmpWin_FlushChar(slot->window);
         slot->printing = FALSE;
     }
@@ -366,9 +366,9 @@ static BOOL PMSDrawSlot_Main(PMSDrawSlot *slot, PrintQueue *queue, BOOL followSc
     if (!printing && slot->visible) {
         for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
             if (slot->isIcon[i] && slot->showIcons) {
-                func_0204c124(slot->icons[i], TRUE);
+                ClActor_SetVisible(slot->icons[i], TRUE);
             } else {
-                func_0204c124(slot->icons[i], FALSE);
+                ClActor_SetVisible(slot->icons[i], FALSE);
             }
         }
     }
@@ -389,10 +389,10 @@ static BOOL PMSDrawSlot_Main(PMSDrawSlot *slot, PrintQueue *queue, BOOL followSc
         }
         if (move.x != 0 || move.y != 0) {
             for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
-                func_0204c21c(slot->icons[i], &pos);
+                ClActor_GetPos(slot->icons[i], &pos);
                 pos.x += move.x;
                 pos.y += move.y;
-                func_0204c210(slot->icons[i], &pos);
+                ClActor_SetPos(slot->icons[i], &pos);
             }
         }
     }
@@ -417,15 +417,15 @@ static void PMSDrawSlot_Print(PMSDrawSlot *slot, PrintQueue *queue, Font *font, 
     format = PMSData_GetSentenceString(sentence, heapId);
     wordCount = (u8)GFL_StrCmdGetWordSetCommandCount(format);
     for (i = 0; i < wordCount; i++) {
-        if (func_02029e1c(sentence, i)) {
+        if (PMSData_IsWordNumber(sentence, i)) {
             slot->isIcon[i] = TRUE;
-        } else if (func_02029df8(sentence, i) == PMS_WORD_NULL) {
+        } else if (PMSData_GetWordIndex(sentence, i) == PMS_WORD_NULL) {
             isEmpty[i] = TRUE;
         }
     }
     str = PMSData_ToStringWithWords(sentence, heapId, wordCount);
     GFL_BitmapFill(BmpWin_GetBitmap(slot->window), backColor);
-    func_02021c7c(queue, BmpWin_GetBitmap(slot->window), offset->x, offset->y, str, font, color);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(slot->window), offset->x, offset->y, str, font, color);
     slot->printing = TRUE;
     GFL_StrBufFree(str);
     for (i = 0; i < wordCount; i++) {
@@ -433,7 +433,7 @@ static void PMSDrawSlot_Print(PMSDrawSlot *slot, PrintQueue *queue, Font *font, 
             u8 width = GFL_StrCmdGetStrWidthUntilWordSetIndex(format, i, font, 0);
             u8 lines = GFL_StrCmdCountLinesUntilWordSetIndex(format, i);
 
-            PMSDraw_SetIcon(slot->icons[i], window, width, lines, func_02029df8(sentence, i), offset);
+            PMSDraw_SetIcon(slot->icons[i], window, width, lines, PMSData_GetWordIndex(sentence, i), offset);
         } else if (isEmpty[i] == TRUE) {
             u8 width = GFL_StrCmdGetStrWidthUntilWordSetIndex(format, i, font, 0);
             u8 lines = GFL_StrCmdCountLinesUntilWordSetIndex(format, i);
@@ -458,7 +458,7 @@ static void PMSDrawSlot_Clear(PMSDrawSlot *slot, BOOL clearScreen) {
         BmpWin_ClearScreenNow(slot->window);
     }
     for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
-        func_0204c124(slot->icons[i], FALSE);
+        ClActor_SetVisible(slot->icons[i], FALSE);
         slot->isIcon[i] = FALSE;
     }
     slot->drawn = FALSE;
@@ -479,7 +479,7 @@ static void PMSDrawSlot_SetVisible(PMSDrawSlot *slot, BOOL visible) {
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(slot->window));
     for (i = 0; i < PMS_SENTENCE_WORD_MAX; i++) {
         if (slot->isIcon[i]) {
-            func_0204c124(slot->icons[i], visible);
+            ClActor_SetVisible(slot->icons[i], visible);
         }
     }
 }

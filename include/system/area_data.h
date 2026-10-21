@@ -39,9 +39,9 @@ u8 AreaData_GetEdgeColorTableID(AreaData *areaData);
 u8 AreaData_GetActorMatColorID(AreaData *areaData);
 BOOL AreaData_HasSeasons(u16 areaId);
 // Areas whose record is picked by something other than the season
-BOOL func_02018f60(u16 areaId);
-BOOL func_02018f78(u16 areaId);
-BOOL func_02018f90(u16 areaId);
+BOOL AreaData_IsInfinityDungeon(u16 areaId);
+BOOL AreaData_IsJoinAvenue(u16 areaId);
+BOOL AreaData_IsWbt(u16 areaId);
 BOOL func_02018fa8(u16 areaId);
 
 #endif // POKEBW2_SYSTEM_AREA_DATA_H

@@ -95,34 +95,34 @@ void DpcObj_Exit(DendouPCWork *wk) {
     DpcObj_ExitPageOam(wk);
     DpcObj_DeleteActors(wk);
     DpcObj_FreeResources(wk);
-    func_0204b758();
+    ClActSys_Delete();
 }
 
 void DpcObj_Animate(DendouPCWork *wk) {
     u32 i;
 
     for (i = 0; i < DPCOBJ_MAX; i++) {
-        if (wk->actors[i] != NULL && func_0204c534(wk->actors[i]) != TRUE) {
-            func_0204c4e0(wk->actors[i], FX32_ONE);
+        if (wk->actors[i] != NULL && ClActor_IsAutoAnim(wk->actors[i]) != TRUE) {
+            ClActor_SetAnimSpeed(wk->actors[i], FX32_ONE);
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 void DpcObj_SetVisible(DendouPCWork *wk, u32 id, BOOL visible) {
     if (wk->actors[id] != NULL) {
-        func_0204c124(wk->actors[id], visible);
+        ClActor_SetVisible(wk->actors[id], visible);
     }
 }
 
 void DpcObj_SetAnime(DendouPCWork *wk, u32 id, u32 sequence) {
-    func_0204c4d4(wk->actors[id], 0);
-    func_0204c488(wk->actors[id], sequence);
-    func_0204c520(wk->actors[id], TRUE);
+    ClActor_SetAnimTime(wk->actors[id], 0);
+    ClActor_SetSequence(wk->actors[id], sequence);
+    ClActor_SetAutoAnim(wk->actors[id], TRUE);
 }
 
 BOOL DpcObj_IsAnimating(DendouPCWork *wk, u32 id) {
-    return func_0204c560(wk->actors[id]);
+    return ClActor_IsAnimActive(wk->actors[id]);
 }
 
 void DpcObj_SetPos(DendouPCWork *wk, u32 id, s16 x, s16 y) {
@@ -130,13 +130,13 @@ void DpcObj_SetPos(DendouPCWork *wk, u32 id, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(wk->actors[id], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->actors[id], &pos, CLACT_SURFACE_MAIN);
 }
 
 void DpcObj_GetPos(DendouPCWork *wk, u32 id, s16 *x, s16 *y) {
     ClActorPos pos;
 
-    func_0204c178(wk->actors[id], &pos, CLACT_SURFACE_MAIN);
+    ClActor_GetSurfacePos(wk->actors[id], &pos, CLACT_SURFACE_MAIN);
     *x = pos.x;
     *y = pos.y;
 }
@@ -162,31 +162,33 @@ static void DpcObj_InitResources(DendouPCWork *wk) {
     }
 
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_TAIL(HEAPID_DENDOU_PC));
-    wk->chars[DPCOBJ_RES_BUTTON] = func_0204b81c(arc, func_0202d814(), FALSE, CLACT_VRAM_MAIN, HEAPID_DENDOU_PC);
-    wk->palettes[DPCOBJ_RES_BUTTON] =
-        func_0204bba0(arc, func_0202d810(), CLACT_VRAM_MAIN, DPCOBJ_RES_BUTTON * 0x20, HEAPID_DENDOU_PC);
+    wk->chars[DPCOBJ_RES_BUTTON] =
+        ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, CLACT_VRAM_MAIN, HEAPID_DENDOU_PC);
+    wk->palettes[DPCOBJ_RES_BUTTON] = ClActSys_LoadPltt(arc, AppMenuCommon_GetTouchBarPaletteFile(), CLACT_VRAM_MAIN,
+                                                        DPCOBJ_RES_BUTTON * 0x20, HEAPID_DENDOU_PC);
     wk->cellAnims[DPCOBJ_RES_BUTTON] =
-        func_0204bde0(arc, func_0202d818(DPCOBJ_MAPPING_128K), func_0202d81c(DPCOBJ_MAPPING_128K), HEAPID_DENDOU_PC);
+        ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(DPCOBJ_MAPPING_128K),
+                               AppMenuCommon_GetTouchBarAnimFile(DPCOBJ_MAPPING_128K), HEAPID_DENDOU_PC);
     GFL_ArcToolFree(arc);
 }
 
 static void DpcObj_FreeChars(DendouPCWork *wk, u32 id) {
     if (wk->chars[id] != DPCOBJ_RES_NONE) {
-        func_0204b98c(wk->chars[id]);
+        ClActSys_FreeChars(wk->chars[id]);
         wk->chars[id] = DPCOBJ_RES_NONE;
     }
 }
 
 static void DpcObj_FreePalette(DendouPCWork *wk, u32 id) {
     if (wk->palettes[id] != DPCOBJ_RES_NONE) {
-        func_0204bcd0(wk->palettes[id]);
+        ClActSys_FreePltt(wk->palettes[id]);
         wk->palettes[id] = DPCOBJ_RES_NONE;
     }
 }
 
 static void DpcObj_FreeCellAnims(DendouPCWork *wk, u32 id) {
     if (wk->cellAnims[id] != DPCOBJ_RES_NONE) {
-        func_0204be64(wk->cellAnims[id]);
+        ClActSys_FreeCellAnims(wk->cellAnims[id]);
         wk->cellAnims[id] = DPCOBJ_RES_NONE;
     }
 }
@@ -206,15 +208,15 @@ static void DpcObj_FreeResources(DendouPCWork *wk) {
 }
 
 static ClActor *DpcObj_AddActor(DendouPCWork *wk, const DpcObjSetup *setup) {
-    return func_0204c040(wk->unit, wk->chars[setup->chars], wk->palettes[setup->palette],
-                         wk->cellAnims[setup->cellAnims], &setup->setup, setup->surface, HEAPID_DENDOU_PC);
+    return ClActor_Create(wk->unit, wk->chars[setup->chars], wk->palettes[setup->palette],
+                          wk->cellAnims[setup->cellAnims], &setup->setup, setup->surface, HEAPID_DENDOU_PC);
 }
 
 static void DpcObj_AddButtons(DendouPCWork *wk) {
     // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
     unsigned long i;
 
-    wk->unit = func_0204bf1c(31, 0, HEAPID_DENDOU_PC);
+    wk->unit = ClActUnit_Create(31, 0, HEAPID_DENDOU_PC);
     for (i = 0; i < DPCOBJ_MAX; i++) {
         wk->actors[i] = NULL;
     }
@@ -231,7 +233,7 @@ static void DpcObj_AddButtons(DendouPCWork *wk) {
 
 static void DpcObj_DeleteActor(DendouPCWork *wk, u32 id) {
     if (wk->actors[id] != NULL) {
-        func_0204c108(wk->actors[id]);
+        ClActor_Delete(wk->actors[id]);
         wk->actors[id] = NULL;
     }
 }
@@ -242,7 +244,7 @@ static void DpcObj_DeleteActors(DendouPCWork *wk) {
     for (i = 0; i < DPCOBJ_MAX; i++) {
         DpcObj_DeleteActor(wk, i);
     }
-    func_0204bf98(wk->unit);
+    ClActUnit_Delete(wk->unit);
 }
 
 void DpcObj_LoadPokemon(DendouPCWork *wk) {
@@ -335,8 +337,8 @@ u32 DpcObj_GetPokeBase(DendouPCWork *wk) {
 }
 
 void DpcObj_SetPokePos(DendouPCWork *wk, u32 id, s32 angle) {
-    fx32 x = FX_MUL(func_02044388(angle), DPCOBJ_RING_RADIUS_X * FX32_ONE);
-    fx32 y = FX_MUL(func_02044360(angle), DPCOBJ_RING_RADIUS_Y * FX32_ONE);
+    fx32 x = FX_MUL(GFL_MathCosDegWrap(angle), DPCOBJ_RING_RADIUS_X * FX32_ONE);
+    fx32 y = FX_MUL(GFL_MathSinDegWrap(angle), DPCOBJ_RING_RADIUS_Y * FX32_ONE);
 
     DpcObj_SetPos(wk, id, FX_Whole((x + DPCOBJ_RING_X * FX32_ONE) & 0x7ffff000),
                   FX_Whole((y + DPCOBJ_RING_Y * FX32_ONE) & 0x7ffff000));
@@ -371,7 +373,7 @@ void DpcObj_SortPriority(DendouPCWork *wk) {
 
     for (i = 0; i < wk->teams[wk->page].count; i++) {
         if (wk->actors[ids[i]] != NULL) {
-            func_0204c438(wk->actors[ids[i]], i);
+            ClActor_SetPriority(wk->actors[ids[i]], i);
         }
     }
 }

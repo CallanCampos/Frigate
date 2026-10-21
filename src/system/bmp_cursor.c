@@ -44,7 +44,7 @@ void BmpCursor_Free(BmpCursor *cursor) {
 
 void BmpCursor_Print(BmpCursor *cursor, u16 x, u16 y, PrintWindow *printWindow, PrintQueue *queue, Font *font) {
     if (cursor->type == BMPCURSOR_STRING) {
-        func_02021c54(queue, BmpWin_GetBitmap(printWindow->window), x, y, cursor->string, font);
+        PrintQueue_Print(queue, BmpWin_GetBitmap(printWindow->window), x, y, cursor->string, font);
         printWindow->flushPending = TRUE;
     } else if (cursor->bitmap != NULL) {
         GFL_BitmapCopyArea(cursor->bitmap, BmpWin_GetBitmap(printWindow->window), 0, 0, x + 2, y + 2, 8, 8, 0xf);

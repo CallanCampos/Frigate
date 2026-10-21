@@ -8,6 +8,10 @@
 #include "twl/nwm.h"
 #include <stddef.h>
 
+#ifdef PLATFORM_PC
+#include "port_wcm.h"
+#endif
+
 // NitroWiFi's WCM (overlay 11), over NitroSDK's WM. dsd splits this range into 93 pieces; eight Thumb/ARM pairs among
 // them are the linker's long-branch veneers to the DSi WCM backend physically placed in LTD. This file calls
 // their real targets directly instead of writing the veneers out. The ROM names none of this; established WCM
@@ -85,44 +89,6 @@ typedef struct WCMEthernetHeader {
     u16 length;
 } WCMEthernetHeader;
 
-// WCM's mapped work prefix follows the DS allocation (WCM_WORK_SIZE bytes). Mode 2 allocates 0x4800 bytes;
-// its additional tail and most of the connect/search scratch area remain unmapped.
-struct WCMWork {
-    u8 unk_0000[0x600];
-    union {
-        u8 scan[0x400];
-        u8 receive[0x620];
-    } ioBuffer; // 0x600, the scan and DCF receive operations reuse this storage
-    u8 unk_0c20[0x1240 - 0xc20];
-    // Descriptive private storage recovered from WCM's copies and WM command arguments.
-    struct {
-        u8 data[0x50];
-        u8 mode;     // Secondary descriptor mode.
-        u8 argument; // Legacy key index or variable-copy byte count; mode zero retains the previous byte.
-        u8 padding[2];
-    } connectionStorage;         // 0x1240..0x1293; no original SDK type identity established
-    OSAlarm alarm;               // 0x1294
-    s32 dmaNo;                   // 0x12c0, from WCMConfig.dmano
-    void *apBuffer;              // 0x12c4, from WCMConfig.pbdbuffer: a WCMApListHeader followed by its entries
-    u32 apBufferBytes;           // 0x12c8, from WCMConfig.nbdbuffer
-    u32 scanMode;                // 0x12cc, from WCMConfig.nbdmode
-    WCMNotify notify;            // 0x12d0
-    u32 searchOption;            // 0x12d4
-    u16 scanChannelTime;         // 0x12d8, zero selects the WM default
-    s16 pendingNotify;           // 0x12da, notification ID consumed by WCM_NotifyResult
-    u8 apListLocked;             // 0x12dc
-    u8 resetPending;             // 0x12dd, set before reset submission; successful reset completion clears it
-    u8 state;                    // 0x12de
-    u8 wirelessMode;             // 0x12df, selected by WCM_InitCore: 1 for DS, 2 for DSi
-    WMBssDesc connectBss;        // 0x12e0, the access point's description, copied from WCM_ConnectAsync's argument
-    u8 startupBuffer[0xf00];     // 0x13a0, passed to WM initialization
-    WMScanExParam scanRequest;   // 0x22a0, including the 16-byte SSID match mask
-    u32 scanCount;               // 0x22e4
-    u16 associationId;           // 0x22e8, from the successful connection callback; cleared on disconnect or reset
-    u16 connectionFailureReason; // 0x22ea, retained across reset for retry and notification
-    u8 unk_22ec[WCM_WORK_SIZE - 0x22ec];
-};
-
 // WCM's own small globals, zeroed with the rest of .bss
 // sWcmAnchor: the anchor WCM_Init and WCM_Finish set and clear
 typedef struct WCMAnchor {
@@ -130,20 +96,6 @@ typedef struct WCMAnchor {
     u8 unk_01[3];
     WCMWork *work; // 0x04
 } WCMAnchor;
-
-// sWcmGlobal, right after WCMAnchor: the globals WCM_InitOnce sets up once
-struct WCMGlobal {
-    u8 initialized; // 0x00, set once WCM_InitOnce has initialized the send state
-    u8 unk_01[3];
-    OSThreadQueue sendQueue; // 0x04
-    OSMutex mutex;           // 0x0c
-    u16 sendStatus;          // 0x24
-    u8 padding_26[2];
-    void (*recvCallback)(u8 *src, u8 *dst, u8 *data, u32 len); // 0x28
-    void (*sendCompletion)(s32);                               // 0x2c
-    u8 ownMac[6];                                              // 0x30
-    u8 unk_36[2];
-};
 
 static WCMAnchor sWcmAnchor;
 static WCMGlobal sWcmGlobal;
@@ -210,10 +162,17 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
-    if (((u32)work & 0x1f) != 0) {
+    if (((uptr)work & 0x1f) != 0) {
         OS_RestoreInterrupts(irq);
         return 1;
     }
+#ifdef PLATFORM_PC
+    // A negative SDK byte count must not become a large unsigned clear on the host.
+    if (size < 0) {
+        OS_RestoreInterrupts(irq);
+        return 6;
+    }
+#endif
     MI_CpuFill8(work, 0, size);
     if (requestedMode == 0) {
         requestedMode = sWcmAnchor.preferredMode;
@@ -271,7 +230,12 @@ static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
     }
     switch (mode) {
     case 1:
+#ifdef PLATFORM_PC
+        // Native pointer fields enlarge the DS backend without requiring the union's DSi storage.
+        *size = PORT_WCM_DS_WORK_SIZE;
+#else
         *size = WCM_WORK_SIZE;
+#endif
         break;
     case 2:
         if (!OS_IsRunOnTwl()) {
@@ -703,6 +667,19 @@ static void WCM_SetConfig(WCMConfig *config, WCMNotify notify) {
         sWcmAnchor.work->scanMode = 0;
     } else {
         sWcmAnchor.work->dmaNo = config->dmano & 3;
+#ifdef PLATFORM_PC
+        // The native AP-list header holds pointers; align it for those fields and bound its clear length.
+        u32 padding = (u32)(-(uptr)config->pbdbuffer & (_Alignof(WCMApListHeader) - 1));
+
+        if (config->nbdbuffer < 0 || padding + sizeof(WCMApListHeader) > config->nbdbuffer) {
+            sWcmAnchor.work->apBuffer = NULL;
+            sWcmAnchor.work->apBufferBytes = 0;
+        } else {
+            sWcmAnchor.work->apBuffer = (u8 *)config->pbdbuffer + padding;
+            sWcmAnchor.work->apBufferBytes = (u32)config->nbdbuffer - padding;
+            MI_CpuFill8(sWcmAnchor.work->apBuffer, 0, sWcmAnchor.work->apBufferBytes);
+        }
+#else
         if (((4 - ((u32)config->pbdbuffer & 3)) % 4) + sizeof(WCMApListHeader) > config->nbdbuffer) {
             sWcmAnchor.work->apBuffer = NULL;
             sWcmAnchor.work->apBufferBytes = 0;
@@ -711,6 +688,7 @@ static void WCM_SetConfig(WCMConfig *config, WCMNotify notify) {
             sWcmAnchor.work->apBufferBytes = config->nbdbuffer - (4 - ((u32)config->pbdbuffer & 3)) % 4;
             MI_CpuFill8(sWcmAnchor.work->apBuffer, 0, sWcmAnchor.work->apBufferBytes);
         }
+#endif
         sWcmAnchor.work->scanMode = config->nbdmode;
     }
     sWcmAnchor.work->notify = notify;

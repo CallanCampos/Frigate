@@ -118,8 +118,8 @@ static BOOL Continue_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Continue_Main(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static void NewGame_SetUpPlayer(PlayerInfo *info, StrBuf *name, u32 gender);
-static void func_ov162_021a04a8(SaveControl *save);
-static void func_ov162_021a04e8(SaveControl *save);
+static void NewGame_EraseOutsideKeys(SaveControl *save);
+static void NewGame_ImportOutsideData(SaveControl *save);
 static BOOL DebugGameStart_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL DebugGameStart_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *work);
@@ -221,11 +221,11 @@ static BOOL NewGame_Init(GameProc *proc, u32 *state, void *param, void *work) {
     u32 pokeVoice;
 
     wk->saveTask = SaveControlIntr_Create(HEAPID_USER, save);
-    func_ov162_021a04a8(save);
-    func_0200749c(save);
+    NewGame_EraseOutsideKeys(save);
+    SaveControl_InitNewGame(save);
     wk->save = save;
-    wk->newPlayerInfo = func_02008b0c(HEAPID_USER);
-    wk->newConfig = func_0200898c(HEAPID_USER);
+    wk->newPlayerInfo = PlayerInfo_Create(HEAPID_USER);
+    wk->newConfig = Config_Create(HEAPID_USER);
     MI_CpuFill8(wk->rivalName, 0, sizeof(wk->rivalName));
     wk->onlyCGearQuestion = FALSE;
     wk->config = wk->newConfig;
@@ -247,7 +247,7 @@ static BOOL NewGame_Init(GameProc *proc, u32 *state, void *param, void *work) {
         seqs[nameEntryCount + i] = INTRO_SOUNDS[i];
     }
     GFL_OvlUnload(OVERLAY_ID(294));
-    wk->preloadedSeqs = func_02005af4(seqs, nameEntryCount + introCount);
+    wk->preloadedSeqs = GFL_SndBGMStack_Preload(seqs, nameEntryCount + introCount);
 
     // The intro's Pokémon
     pokeVoice = PokeVoice_Load(SPECIES_CINCCINO, 0, 64, 0, 0, 0, 0, 0);
@@ -360,17 +360,17 @@ static BOOL NewGame_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     VecFx32 spawnPos = { 0, 0, 0 };
     GameSystemProcData *procData;
 
-    func_02005b60(wk->preloadedSeqs);
+    GFL_SndBGMStack_Unload(wk->preloadedSeqs);
     SaveControlIntr_Free(wk->saveTask);
-    func_02008b34(wk->newPlayerInfo, SaveControl_GetPlayerInfo(save));
+    PlayerInfo_Copy(wk->newPlayerInfo, SaveControl_GetPlayerInfo(save));
     initConfig(wk->newConfig, (Config *)getTrainerDataBlkAddress(save));
     copyRivalNameIntoHollowBlock(getHollow_RivalData(save), wk->rivalName);
     GFL_HeapFree(wk->newPlayerInfo);
     GFL_HeapFree(wk->newConfig);
     FreeGameProcManager(wk->procManager);
-    func_ov162_021a04e8(save);
+    NewGame_ImportOutsideData(save);
     procData = GameSystem_CreateProcData(GAME_ENTRYPOINT_OPENING, 0, &spawnPos, 0);
-    func_ov012_02165ae8(wk->nameEntryParam);
+    NameEntryParam_Free(wk->nameEntryParam);
     GFL_ProcReleaseSubsystem(proc);
     GCTX_ProcMgrReplaceProc(OVERLAY_NONE, &GAMESYSTEM_PROC_FUNCTIONS, procData);
     return TRUE;
@@ -394,9 +394,9 @@ static BOOL Continue_Main(GameProc *proc, u32 *state, void *param, void *work) {
         if ((u32)param == CONTINUE_DEBUG) {
             GCTX_ProcMgrQueueProc(OVERLAY_NONE, &DEBUG_GAME_START_PROC_FUNCTIONS, wk);
         } else if ((u32)param == CONTINUE_CGEAR_OFF) {
-            func_02008af0(wk->config, FALSE);
+            Config_SetCGearOn(wk->config, FALSE);
         } else if ((u32)param == CONTINUE_CGEAR_ON) {
-            func_02008af0(wk->config, TRUE);
+            Config_SetCGearOn(wk->config, TRUE);
         }
         (*state)++;
         break;
@@ -411,21 +411,21 @@ static BOOL Continue_Main(GameProc *proc, u32 *state, void *param, void *work) {
 static BOOL Continue_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     GameStartWork *wk = work;
     SaveControl *save = SaveControl_GetInstance();
-    u32 cgearOn = func_02008ae8(wk->config);
+    u32 cgearOn = Config_GetCGearOn(wk->config);
     u32 gameInfoValues[2];
     SaveLocation location;
 
-    gameInfoValues[0] = func_0200ca64(wk->gameInfo);
-    gameInfoValues[1] = func_0200ca74(wk->gameInfo);
-    func_02007324(save);
-    func_02008ab4((Config *)getTrainerDataBlkAddress(save));
-    func_02008fb8(save, &location);
+    gameInfoValues[0] = TrainerGameInfo_GetStartMenuFlags(wk->gameInfo);
+    gameInfoValues[1] = TrainerGameInfo_GetKeyNotice(wk->gameInfo);
+    SaveControl_Reload(save);
+    Config_ApplyMsgLanguage((Config *)getTrainerDataBlkAddress(save));
+    SaveControl_GetPlayerLocation(save, &location);
     GCTX_ProcMgrReplaceProc(
         OVERLAY_NONE, &GAMESYSTEM_PROC_FUNCTIONS,
         GameSystem_CreateProcData(GAME_ENTRYPOINT_FIELD_CONTINUE, location.zoneId, &location.pos, location.unk18));
-    func_02008af0(wk->config, cgearOn);
-    func_0200ca6c(wk->gameInfo, gameInfoValues[0]);
-    func_0200ca78(wk->gameInfo, gameInfoValues[1]);
+    Config_SetCGearOn(wk->config, cgearOn);
+    TrainerGameInfo_SetStartMenuFlags(wk->gameInfo, gameInfoValues[0]);
+    TrainerGameInfo_SetKeyNotice(wk->gameInfo, gameInfoValues[1]);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
 }
@@ -434,13 +434,13 @@ static void NewGame_SetUpPlayer(PlayerInfo *info, StrBuf *name, u32 gender) {
     copyTrainerNameFromStrbuf(info, name);
     setTrainerGender(info, gender);
     setIDAsUInt(info, GFL_RandomLCAlt(0xffffffff));
-    func_02008bf8(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
+    PlayerInfo_SetUnionView(info, GFL_RandomMTRange(8) + getTrainerGender(info) * 8);
 }
 
-static void func_ov162_021a04a8(SaveControl *save) {
+static void NewGame_EraseOutsideKeys(SaveControl *save) {
     void *work;
 
-    if (func_02007464(save) & 2) {
+    if (SaveControl_GetErrors(save) & 2) {
         GFL_OvlLoad(OVERLAY_ID(331));
         work = SaveOutside_Load(HEAPID_USER);
         if (SaveOutside_IsKeysLoaded(work)) {
@@ -451,7 +451,7 @@ static void func_ov162_021a04a8(SaveControl *save) {
     }
 }
 
-static void func_ov162_021a04e8(SaveControl *save) {
+static void NewGame_ImportOutsideData(SaveControl *save) {
     void *work;
 
     if (SaveControl_GetStatus(save) == 1 && !SaveControl_IsDataAlreadyPresent(save)) {
@@ -513,9 +513,9 @@ static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *w
             break;
         }
         if (answer == 1) {
-            func_02008a8c(gameStart->config, 0);
+            Config_SetKanji(gameStart->config, 0);
         } else {
-            func_02008a8c(gameStart->config, 1);
+            Config_SetKanji(gameStart->config, 1);
         }
         DebugGameStart_FreeWindows(wk);
         wk->question = DEBUG_QUESTION_GENDER;
@@ -541,9 +541,9 @@ static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *w
             break;
         }
         if (answer == 1) {
-            func_02008af0(gameStart->config, TRUE);
+            Config_SetCGearOn(gameStart->config, TRUE);
         } else {
-            func_02008af0(gameStart->config, FALSE);
+            Config_SetCGearOn(gameStart->config, FALSE);
         }
         GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, WIPE_COLOR_BLACK, 12, 1,
                     HEAPID_DEBUG_GENDER_SELECT);
@@ -663,7 +663,7 @@ static u32 DebugGameStart_UpdateMenu(DebugGameStartWork *wk) {
     {
         TouchRectTable table = sDebugTouchRects;
 
-        touched = func_0203da0c(table.rects);
+        touched = GFL_HIDGetTouchPressedRect(table.rects);
     }
     if (touched != TOUCH_RECT_NONE) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);

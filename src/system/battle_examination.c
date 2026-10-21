@@ -60,11 +60,11 @@ void BattleExamination_Load(GameData *gameData, void *saveBuffer, HeapID heapId)
     SaveControl *save = GameData_GetSaveControl(gameData);
     void *buffer = GFL_HeapAllocate(heapId, BATTLE_EXAMINATION_LOAD_SIZE, FALSE, "battle_examination.c", 153);
 
-    func_02007560(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, heapId, buffer, BATTLE_EXAMINATION_LOAD_SIZE);
+    SaveControl_LoadExtraBlock(save, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION, heapId, buffer, BATTLE_EXAMINATION_LOAD_SIZE);
     MI_CpuCopy8(saveBuffer, buffer, sizeof(BattleExaminationSave));
-    func_020178c4(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
+    GameData_StartSaveBlock(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION);
     for (;;) {
-        if (func_020178f4(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION) == 2) {
+        if (GameData_UpdateSaveBlock(gameData, SAVE_EXTRA_BLOCK_BATTLE_EXAMINATION) == 2) {
             break;
         }
         OS_WaitIrq(TRUE, 1);

@@ -34,8 +34,8 @@ void GCTX_HIDGetRepeat(u32 *repeatWait, u32 *repeatStart);
 // Sets a table of key remappings, which make keys report as others
 void setKeyBlkStarted(const void *remaps);
 // Set the keys of a frame
-void func_0203df90(SystemUI *ui, u32 pressed, u32 pressed30);
-void func_0203dfa0(SystemUI *ui, u32 held, u32 held30);
-void func_0203dfb0(SystemUI *ui, u32 typed, u32 typed30);
+void GFL_HIDSetPressedKeys(SystemUI *ui, u32 pressed, u32 pressed30);
+void GFL_HIDSetHeldKeys(SystemUI *ui, u32 held, u32 held30);
+void GFL_HIDSetTypedKeys(SystemUI *ui, u32 typed, u32 typed30);
 
 #endif // POKEBW2_GFL_KEY_H

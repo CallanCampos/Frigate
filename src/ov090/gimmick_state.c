@@ -18,12 +18,12 @@ typedef struct {
     u16 second;
 } GimmickState48;
 
-void func_ov090_021eec80(GameSystem *gsys, u16 value) {
+void GimmickState_SetNimbasaGym(GameSystem *gsys, u16 value) {
     u16 *state = GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(gsys)), 2);
     *state = value;
 }
 
-void func_ov090_021eec98(GameSystem *gsys) {
+void GimmickState_ResetOpelucid(GameSystem *gsys) {
     GimmickState10 *state = GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(gsys)), 10);
     int i;
 
@@ -34,7 +34,7 @@ void func_ov090_021eec98(GameSystem *gsys) {
     }
 }
 
-void func_ov090_021eecc0(GameSystem *gsys, BOOL first, BOOL second) {
+void GimmickState_SetNimbasaFlags(GameSystem *gsys, BOOL first, BOOL second) {
     GimmickState48 *state = GimmickState_GetUserData(GameData_GetGimmickState(GSYS_GetGameData(gsys)), 0x30);
 
     if (first) {

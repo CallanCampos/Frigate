@@ -22,7 +22,8 @@
 // it:
 // - the menu's offer: it opens only the apps the save's field menu offers (FieldMenu_GetMenuType's kind of menu, from
 //   the player's zone and two event flags, launcher_spec.c), else nothing, with status 2;
-// - the menu's choice by a key, before each app: the UI's touch flag FALSE (func_0203d564, src/ov036/field_menu.c:709),
+// - the menu's choice by a key, before each app: the UI's touch flag FALSE (GCTX_HIDSetUsingTouch,
+//   src/ov036/field_menu.c:709),
 //   whatever the last app left it at (an app closed by a touch sets it TRUE);
 // - the field's close, before each app: the menu's subscreen recorded as the last one (GameData_SetLastSubscreen with
 //   1, a constant: the game records what FieldSubscreen_Free returns, src/ov036/fieldmap.c:632, the subscreen the
@@ -182,14 +183,14 @@ static void StartEntry(LauncherWork *launch, GameEvent *event, size_t entry) {
     work->appId = appId;
     work->prevAppId = appId;
     work->nextAppId = appId;
-    func_ov012_0215b76c(&work->params, input, NULL, NULL, NULL, NULL);
+    FieldAppCallParam_Init(&work->params, input, NULL, NULL, NULL, NULL);
     for (int i = 0; i < PLAYER_ACTION_COUNT; i++) {
         PlayerActionPerms_SetActionBlocked(&work->perms, (u32)i, ACTION_BLOCKED);
     }
     // The menu's choice of the app by a key (src/ov036/field_menu.c:709, after EventFieldMenu_Create's TRUE in
     // src/ov012/event_field_menu.c), whatever the last app left the flag at, and the field's close, which records the
     // subscreen it frees, the menu's (src/ov036/fieldmap.c:632)
-    func_0203d564(FALSE);
+    GCTX_HIDSetUsingTouch(FALSE);
     GameData_SetLastSubscreen(GSYS_GetGameData(input->gameSystem), SUBSCREEN_FIELD_MENU);
 
     launch->entry = entry;
@@ -304,7 +305,7 @@ static GameEventReturnCode Launcher_Callback(GameEvent *event, u32 *state, void 
             *state = LAUNCHER_OPEN;
             break;
         }
-        func_ov012_0215b754(work);
+        FieldAppCall_ClearBagFreeSpaceFilter(work);
         if (work->appParam != NULL) {
             GFL_HeapFree(work->appParam);
             work->appParam = NULL;

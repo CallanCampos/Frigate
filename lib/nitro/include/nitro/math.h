@@ -7,6 +7,11 @@
 #define MATH_CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 #define MATH_MAX(a, b) (((a) >= (b)) ? (a) : (b))
 #define MATH_MIN(a, b) (((a) <= (b)) ? (a) : (b))
+// NitroSDK's rounding up and down to a multiple of base, and to a multiple of 32
+#define MATH_ROUNDUP(x, base) (((x) + ((base) - 1)) & ~((base) - 1))
+#define MATH_ROUNDDOWN(x, base) ((x) & ~((base) - 1))
+#define MATH_ROUNDUP32(x) MATH_ROUNDUP(x, 32)
+#define MATH_ROUNDDOWN32(x) MATH_ROUNDDOWN(x, 32)
 
 // NitroSDK's linear congruential random numbers, which are inline in the SDK
 

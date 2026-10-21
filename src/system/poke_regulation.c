@@ -81,8 +81,8 @@ static u32 checkPokemon(Regulation *regulation, PartyPkm *pkm) {
     if (regulation == NULL) {
         return REGULATION_FAIL_COUNT;
     }
-    levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_4);
-    levelRange = Regulation_GetParam(regulation, REGULATION_PARAM_5);
+    levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL);
+    levelRange = Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL_MODE);
     level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
     switch (levelRange) {
     case 1:
@@ -100,10 +100,10 @@ static u32 checkPokemon(Regulation *regulation, PartyPkm *pkm) {
     if (PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL)) {
         return REGULATION_FAIL_EGG;
     }
-    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BITS_A, species)) {
+    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BANNED_SPECIES, species)) {
         return REGULATION_FAIL_SPECIES;
     }
-    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BITS_5C, item)) {
+    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BANNED_ITEMS, item)) {
         result = REGULATION_FAIL_ITEM;
     }
     return result;
@@ -199,7 +199,7 @@ u32 PokeRegulation_CheckPartyCanEnter(Regulation *regulation, PokeParty *party) 
             valid--;
         }
     }
-    if (Regulation_GetParam(regulation, REGULATION_PARAM_7) == 0 && count > 1) {
+    if (Regulation_GetParam(regulation, REGULATION_PARAM_ALLOW_SAME_SPECIES) == 0 && count > 1) {
         // Of two of a species, only the one of the lower level counts
         for (i = 0; i < count - 1; i++) {
             for (j = i + 1; j < count; j++) {
@@ -214,7 +214,7 @@ u32 PokeRegulation_CheckPartyCanEnter(Regulation *regulation, PokeParty *party) 
             }
         }
     }
-    if (valid < (int)Regulation_GetParam(regulation, REGULATION_PARAM_2)) {
+    if (valid < (int)Regulation_GetParam(regulation, REGULATION_PARAM_MIN_COUNT)) {
         return REGULATION_RESULT_COUNT;
     }
     result = REGULATION_RESULT_OK;
@@ -234,8 +234,8 @@ static BOOL checkPokemonFlags(Regulation *regulation, PartyPkm *pkm, u32 *flags)
     if (regulation == NULL) {
         return ok;
     }
-    levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_4);
-    levelRange = Regulation_GetParam(regulation, REGULATION_PARAM_5);
+    levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL);
+    levelRange = Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL_MODE);
     level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
     switch (levelRange) {
     case 1:
@@ -251,13 +251,13 @@ static BOOL checkPokemonFlags(Regulation *regulation, PartyPkm *pkm, u32 *flags)
         }
         break;
     }
-    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BITS_A, species)) {
+    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BANNED_SPECIES, species)) {
         if (!PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL)) {
             ok = FALSE;
             *flags |= REGULATION_FAIL_SPECIES;
         }
     }
-    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BITS_5C, item)) {
+    if (Regulation_CheckParamBit(regulation, REGULATION_PARAM_BANNED_ITEMS, item)) {
         ok = FALSE;
         *flags |= REGULATION_FAIL_ITEM;
     }
@@ -283,7 +283,7 @@ u32 PokeRegulation_CheckParty(Regulation *regulation, PokeParty *party, u32 *fla
         items[i] = 0;
     }
     count = howManyPokesAreAbleToFight(party);
-    if (count < (int)Regulation_GetParam(regulation, REGULATION_PARAM_2)) {
+    if (count < (int)Regulation_GetParam(regulation, REGULATION_PARAM_MIN_COUNT)) {
         *flags |= REGULATION_FAIL_COUNT;
         result = REGULATION_RESULT_COUNT;
     }
@@ -300,7 +300,7 @@ u32 PokeRegulation_CheckParty(Regulation *regulation, PokeParty *party, u32 *fla
             levelTotal += PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
         }
     }
-    if (Regulation_GetParam(regulation, REGULATION_PARAM_7) == 0 && count > 1) {
+    if (Regulation_GetParam(regulation, REGULATION_PARAM_ALLOW_SAME_SPECIES) == 0 && count > 1) {
         for (i = 0; i < PARTY_SIZE - 1; i++) {
             for (j = i + 1; j < PARTY_SIZE; j++) {
                 if (species[i] == species[j] && species[i] != SPECIES_NONE) {
@@ -310,7 +310,7 @@ u32 PokeRegulation_CheckParty(Regulation *regulation, PokeParty *party, u32 *fla
             }
         }
     }
-    if (Regulation_GetParam(regulation, REGULATION_PARAM_8) == 0 && count > 1) {
+    if (Regulation_GetParam(regulation, REGULATION_PARAM_ALLOW_SAME_ITEM) == 0 && count > 1) {
         for (i = 0; i < PARTY_SIZE - 1; i++) {
             for (j = i + 1; j < PARTY_SIZE; j++) {
                 if (items[i] == items[j] && species[i] != SPECIES_NONE && items[i] != 0) {
@@ -320,8 +320,8 @@ u32 PokeRegulation_CheckParty(Regulation *regulation, PokeParty *party, u32 *fla
             }
         }
     }
-    required = Regulation_GetParam(regulation, REGULATION_PARAM_11);
-    requiredForm = Regulation_GetParam(regulation, REGULATION_PARAM_12);
+    required = Regulation_GetParam(regulation, REGULATION_PARAM_REQUIRED_SPECIES);
+    requiredForm = Regulation_GetParam(regulation, REGULATION_PARAM_REQUIRED_FORM);
     i = 0;
     if (required != SPECIES_NONE && count >= 1) {
         for (i = 0; i < PARTY_SIZE; i++) {
@@ -344,9 +344,9 @@ u32 PokeRegulation_CheckParty(Regulation *regulation, PokeParty *party, u32 *fla
 
 // The level the regulation gives a Pokémon of a level
 static u32 getLevel(Regulation *regulation, u32 level) {
-    u32 levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_4);
+    u32 levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL);
 
-    switch (Regulation_GetParam(regulation, REGULATION_PARAM_5)) {
+    switch (Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL_MODE)) {
     case 3:
         if (level > levelRule) {
             return levelRule;
@@ -364,7 +364,7 @@ static u32 getLevel(Regulation *regulation, u32 level) {
 }
 
 void PokeRegulation_ApplyLevelToParty(Regulation *regulation, PokeParty *party) {
-    u32 levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_4);
+    u32 levelRule = Regulation_GetParam(regulation, REGULATION_PARAM_LEVEL);
     int i;
 
     for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
@@ -383,7 +383,7 @@ void PokeRegulation_ApplyLevelToParty(Regulation *regulation, PokeParty *party) 
 void PokeRegulation_ApplyNicknamesToParty(Regulation *regulation, PokeParty *party, HeapID heapId) {
     int i;
 
-    if (Regulation_GetParam(regulation, REGULATION_PARAM_17) == 0) {
+    if (Regulation_GetParam(regulation, REGULATION_PARAM_ALLOW_NICKNAMES) == 0) {
         for (i = 0; i < PokeParty_GetPkmCount(party); i++) {
             PartyPkm *pkm = PokeParty_GetPkm(party, i);
 
@@ -421,17 +421,17 @@ static StrBuf *makeCountText(const Regulation *regulation, WordSet *wordset, Reg
     StrBuf *strbuf;
     u32 messageId;
 
-    if (regulation->unk2 == 1 && regulation->unk3 == PARTY_SIZE) {
+    if (regulation->minCount == 1 && regulation->maxCount == PARTY_SIZE) {
         messageId = PokeRegulation_Text_NoRestrictions;
-    } else if (regulation->unk2 == regulation->unk3) {
+    } else if (regulation->minCount == regulation->maxCount) {
         messageId = PokeRegulation_Text_Empty;
-    } else if (regulation->unk2 > 1 && regulation->unk3 == PARTY_SIZE) {
+    } else if (regulation->minCount > 1 && regulation->maxCount == PARTY_SIZE) {
         messageId = PokeRegulation_Text_More;
     } else {
         messageId = PokeRegulation_Text_To;
     }
-    WordSetNumber(wordset, 0, regulation->unk2, 1, 0, TRUE);
-    WordSetNumber(wordset, 1, regulation->unk3, 1, 0, TRUE);
+    WordSetNumber(wordset, 0, regulation->minCount, 1, 0, TRUE);
+    WordSetNumber(wordset, 1, regulation->maxCount, 1, 0, TRUE);
     strbuf = GFL_StrBufCreate(PRINT_MSG_STRBUF_SIZE, heapId);
     GFL_MsgDataLoadStrbuf(printMsg->msgData, messageId, temp);
     GFL_WordSetFormatStrbuf(wordset, strbuf, temp);
@@ -443,22 +443,22 @@ static StrBuf *makeLevelText(const Regulation *regulation, WordSet *wordset, Reg
     StrBuf *strbuf;
     u32 messageId;
 
-    if (regulation->unk5 == 0) {
+    if (regulation->levelMode == 0) {
         messageId = PokeRegulation_Text_NoRestrictions;
-    } else if (regulation->unk5 == 4) {
+    } else if (regulation->levelMode == 4) {
         messageId = PokeRegulation_Text_Becomes;
-    } else if (regulation->unk5 == 1) {
+    } else if (regulation->levelMode == 1) {
         messageId = PokeRegulation_Text_Up_2;
-    } else if (regulation->unk5 == 2) {
+    } else if (regulation->levelMode == 2) {
         messageId = PokeRegulation_Text_Up;
-    } else if (regulation->unk5 == 3) {
+    } else if (regulation->levelMode == 3) {
         messageId = PokeRegulation_Text_Becomes_2;
-    } else if (regulation->unk5 == 5) {
+    } else if (regulation->levelMode == 5) {
         messageId = PokeRegulation_Text_Becomes_3;
     } else {
         messageId = PokeRegulation_Text_NoRestrictions;
     }
-    WordSetNumber(wordset, 0, regulation->unk4, 3, 0, TRUE);
+    WordSetNumber(wordset, 0, regulation->level, 3, 0, TRUE);
     strbuf = GFL_StrBufCreate(PRINT_MSG_STRBUF_SIZE, heapId);
     GFL_MsgDataLoadStrbuf(printMsg->msgData, messageId, temp);
     GFL_WordSetFormatStrbuf(wordset, strbuf, temp);
@@ -470,12 +470,12 @@ static StrBuf *makeSpecialPokemonText(const Regulation *regulation, WordSet *wor
     int i;
     u32 messageId;
 
-    for (i = 0; i < (int)sizeof(regulation->unkA); i++) {
-        if (regulation->unkA[i] != 0) {
+    for (i = 0; i < (int)sizeof(regulation->bannedSpecies); i++) {
+        if (regulation->bannedSpecies[i] != 0) {
             break;
         }
     }
-    if (i == sizeof(regulation->unkA)) {
+    if (i == sizeof(regulation->bannedSpecies)) {
         messageId = PokeRegulation_Text_Permitted;
     } else {
         messageId = PokeRegulation_Text_Banned;
@@ -487,7 +487,7 @@ static StrBuf *makeSamePokemonText(const Regulation *regulation, WordSet *wordse
                                    StrBuf *temp, HeapID heapId) {
     u32 messageId;
 
-    if (regulation->unk8 == 1) {
+    if (regulation->allowSameSpecies == 1) {
         messageId = PokeRegulation_Text_Permitted_2;
     } else {
         messageId = PokeRegulation_Text_Banned_2;
@@ -499,7 +499,7 @@ static StrBuf *makeSameItemsText(const Regulation *regulation, WordSet *wordset,
                                  StrBuf *temp, HeapID heapId) {
     u32 messageId;
 
-    if (regulation->unk9 == 1) {
+    if (regulation->allowSameItem == 1) {
         messageId = PokeRegulation_Text_Permitted_3;
     } else {
         messageId = PokeRegulation_Text_Banned_3;
@@ -529,10 +529,10 @@ void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, He
     printMsg->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_POKE_REGULATION, heapId);
     temp = GFL_StrBufCreate(PRINT_MSG_STRBUF_SIZE, heapId);
     // A regulation with 2 leaves the Wonder Launcher to the players
-    if (regulation->unkAB == 2) {
+    if (regulation->launcher == 2) {
         printMsg->launcher = launcher;
     } else {
-        printMsg->launcher = regulation->unkAB;
+        printMsg->launcher = regulation->launcher;
     }
     for (i = 0; i < PRINT_MSG_RULE_COUNT; i++) {
         printMsg->rule[i] = GFL_MsgDataLoadStrbufNew(printMsg->msgData, PokeRegulation_Text_NoPokemon + i);
@@ -579,7 +579,7 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
     u16 levelTotal = 0;
     PartyPkm *pkm;
     u32 pkmSpecies, pkmItem, level;
-    u32 levelLimit = Regulation_GetParam(regulation, REGULATION_PARAM_6);
+    u32 levelLimit = Regulation_GetParam(regulation, REGULATION_PARAM_MAX_LEVEL_TOTAL);
 
     if (out != NULL) {
         out[0] = 0;
@@ -611,14 +611,15 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
         }
         ok = TRUE;
         for (j = 0; j < count; j++) {
-            if (Regulation_GetParam(regulation, REGULATION_PARAM_7) == 0 && pkmSpecies == species[j]) {
+            if (Regulation_GetParam(regulation, REGULATION_PARAM_ALLOW_SAME_SPECIES) == 0 && pkmSpecies == species[j]) {
                 ok = FALSE;
                 if (flags != NULL) {
                     *flags |= REGULATION_FAIL_SAME_SPECIES;
                 }
                 break;
             }
-            if (Regulation_GetParam(regulation, REGULATION_PARAM_8) == 0 && pkmItem != 0 && pkmItem == items[j]) {
+            if (Regulation_GetParam(regulation, REGULATION_PARAM_ALLOW_SAME_ITEM) == 0 && pkmItem != 0 &&
+                pkmItem == items[j]) {
                 ok = FALSE;
                 if (flags != NULL) {
                     *flags |= REGULATION_FAIL_SAME_ITEM;
@@ -643,7 +644,7 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
         items[count] = pkmItem;
         levelTotal += (u16)level;
         count++;
-        if (count >= (int)Regulation_GetParam(regulation, REGULATION_PARAM_3)) {
+        if (count >= (int)Regulation_GetParam(regulation, REGULATION_PARAM_MAX_COUNT)) {
             // A Pokémon picked beyond a full team
             if (flags != NULL && count < PARTY_SIZE && picked[count] != 0) {
                 *flags |= REGULATION_FAIL_COUNT;
@@ -651,12 +652,12 @@ static BOOL checkPicked(Regulation *regulation, PokeParty *party, const u8 *pick
             break;
         }
     }
-    if (count >= (int)Regulation_GetParam(regulation, REGULATION_PARAM_2)) {
-        u32 required = Regulation_GetParam(regulation, REGULATION_PARAM_11);
+    if (count >= (int)Regulation_GetParam(regulation, REGULATION_PARAM_MIN_COUNT)) {
+        u32 required = Regulation_GetParam(regulation, REGULATION_PARAM_REQUIRED_SPECIES);
         BOOL found = TRUE;
 
         if (required != SPECIES_NONE) {
-            u32 requiredForm = Regulation_GetParam(regulation, REGULATION_PARAM_12);
+            u32 requiredForm = Regulation_GetParam(regulation, REGULATION_PARAM_REQUIRED_FORM);
 
             found = FALSE;
             for (k = 0; k < count; k++) {

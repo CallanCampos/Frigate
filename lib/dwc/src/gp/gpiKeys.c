@@ -53,7 +53,7 @@ int gpiStatusInfoAddKey(GPConnection *connection, DArray *keys, const char *keyN
     }
     key.keyName = goastrdup(keyName);
     key.keyValue = goastrdup(keyValue);
-    func_ov011_02171600(keys, &key, gpiStatusInfoKeyCompFunc);
+    ArrayInsertSorted(keys, &key, gpiStatusInfoKeyCompFunc);
     return 0;
 }
 

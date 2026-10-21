@@ -11,7 +11,7 @@
 
 #define SAVE_BLOCK_JOIN_AVENUE 0x43
 
-// What func_020100e0 and func_02010194 return
+// What JoinAvenue_MergeExisting and JoinAvenue_MergeOrAdd return
 enum {
     JOIN_AVE_ADD_FAILED = 0,
     JOIN_AVE_ADD_MERGED = 1,
@@ -30,46 +30,46 @@ typedef struct {
     u32 (*addEntry)(JoinAvenueEntryList *list, void *source);
 } JoinAvenueSourceFuncs;
 
-static u32 func_020100e0(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind);
-static u32 func_02010194(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind);
+static u32 JoinAvenue_MergeExisting(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind);
+static u32 JoinAvenue_MergeOrAdd(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind);
 
 static const JoinAvenueSourceFuncs sSourceFuncs[] = {
     {
-        (BOOL (*)(void *))func_020379f8,
-        (u32 (*)(JoinAvenuePersonList *, const void *))func_0203806c,
-        (u32 (*)(JoinAvenueEntryList *, const void *))func_02037f10,
-        (u32 (*)(JoinAvenuePersonList *, const void *))func_020380d8,
+        (BOOL (*)(void *))JoinAvenueVisitor_IsValid,
+        (u32 (*)(JoinAvenuePersonList *, const void *))JoinAvenuePersonList_MergeVisitor,
+        (u32 (*)(JoinAvenueEntryList *, const void *))JoinAvenueEntryList_HasVisitor,
+        (u32 (*)(JoinAvenuePersonList *, const void *))JoinAvenuePersonList_AddVisitor,
         NULL,
     },
     {
-        (BOOL (*)(void *))func_020370a4,
-        (u32 (*)(JoinAvenuePersonList *, const void *))func_02038090,
-        (u32 (*)(JoinAvenueEntryList *, const void *))func_02037f24,
-        (u32 (*)(JoinAvenuePersonList *, const void *))func_0203815c,
+        (BOOL (*)(void *))JoinAvenuePerson_IsValid,
+        (u32 (*)(JoinAvenuePersonList *, const void *))JoinAvenuePersonList_MergePerson,
+        (u32 (*)(JoinAvenueEntryList *, const void *))JoinAvenueEntryList_HasPerson,
+        (u32 (*)(JoinAvenuePersonList *, const void *))JoinAvenuePersonList_AddPerson,
         NULL,
     },
     {
-        (BOOL (*)(void *))func_02037a98,
-        (u32 (*)(JoinAvenuePersonList *, const void *))func_020380b4,
-        (u32 (*)(JoinAvenueEntryList *, const void *))func_02037f38,
+        (BOOL (*)(void *))JoinAvenueEntry_IsValid,
+        (u32 (*)(JoinAvenuePersonList *, const void *))JoinAvenuePersonList_MergeEntry,
+        (u32 (*)(JoinAvenueEntryList *, const void *))JoinAvenueEntryList_MergeEntry,
         NULL,
-        (u32 (*)(JoinAvenueEntryList *, void *))func_02037e7c,
+        (u32 (*)(JoinAvenueEntryList *, void *))JoinAvenueEntryList_Add,
     },
 };
 
-// The step of func_020100a4
+// The step of JoinAvenue_AddStepwise
 static u32 sAddStep;
 
-u32 func_0200fffc(void) {
+u32 JoinAvenueSave_GetSize(void) {
     return sizeof(JoinAvenueSave);
 }
 
-void func_02010004(JoinAvenueSave *joinAvenue) {
+void JoinAvenueSave_Init(JoinAvenueSave *joinAvenue) {
     MI_CpuFill8(joinAvenue, 0, offsetof(JoinAvenueSave, unk13E0));
-    func_02037ffc(JoinAvenue_GetPersonList(joinAvenue), JOIN_AVE_PERSON_COUNT);
-    func_02037e4c(func_02010054(joinAvenue), JOIN_AVE_ENTRY_COUNT);
-    func_0203880c(getAddressOfBeginningOfOccupants(joinAvenue));
-    func_02038e54(JoinAvenue_GetInfo(joinAvenue));
+    JoinAvenuePersonList_Init(JoinAvenue_GetPersonList(joinAvenue), JOIN_AVE_PERSON_COUNT);
+    JoinAvenueEntryList_Init(JoinAvenue_GetEntryList(joinAvenue), JOIN_AVE_ENTRY_COUNT);
+    JoinAvenueOccupants_Init(getAddressOfBeginningOfOccupants(joinAvenue));
+    JoinAvenueInfo_Init(JoinAvenue_GetInfo(joinAvenue));
 }
 
 JoinAvenueSave *SaveControl_GetJoinAvenue(SaveControl *save) {
@@ -80,7 +80,7 @@ JoinAvenuePersonList *JoinAvenue_GetPersonList(JoinAvenueSave *joinAvenue) {
     return (JoinAvenuePersonList *)joinAvenue->personList;
 }
 
-JoinAvenueEntryList *func_02010054(JoinAvenueSave *joinAvenue) {
+JoinAvenueEntryList *JoinAvenue_GetEntryList(JoinAvenueSave *joinAvenue) {
     return (JoinAvenueEntryList *)joinAvenue->entryList;
 }
 
@@ -92,26 +92,26 @@ JoinAvenueInfo *JoinAvenue_GetInfo(JoinAvenueSave *joinAvenue) {
     return &joinAvenue->info;
 }
 
-u32 func_02010078(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3) {
-    u32 result = func_020100e0(joinAvenue, gameData, entry, a3);
+u32 JoinAvenue_Add(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3) {
+    u32 result = JoinAvenue_MergeExisting(joinAvenue, gameData, entry, a3);
 
     if (result == JOIN_AVE_ADD_NOT_FOUND) {
-        result = func_02010194(joinAvenue, gameData, entry, a3);
+        result = JoinAvenue_MergeOrAdd(joinAvenue, gameData, entry, a3);
     }
     return result;
 }
 
-void func_02010098(JoinAvenueSave *joinAvenue) {
+void JoinAvenue_ResetAddStep(JoinAvenueSave *joinAvenue) {
     sAddStep = 0;
 }
 
-// The same as func_02010078 over two calls, FALSE until the result is out
-BOOL func_020100a4(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out) {
+// The same as JoinAvenue_Add over two calls, FALSE until the result is out
+BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out) {
     u32 result;
 
     switch (sAddStep) {
     case 0:
-        result = func_020100e0(joinAvenue, gameData, work, a3);
+        result = JoinAvenue_MergeExisting(joinAvenue, gameData, work, a3);
         if (result == JOIN_AVE_ADD_NOT_FOUND) {
             sAddStep++;
             break;
@@ -119,17 +119,17 @@ BOOL func_020100a4(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u
         *out = result;
         return TRUE;
     case 1:
-        *out = func_02010194(joinAvenue, gameData, work, a3);
+        *out = JoinAvenue_MergeOrAdd(joinAvenue, gameData, work, a3);
         return TRUE;
     }
     return FALSE;
 }
 
 // Merges the source into the person met or the entry who matches
-static u32 func_020100e0(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind) {
+static u32 JoinAvenue_MergeExisting(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind) {
     JoinAvenuePersonList *personList = JoinAvenue_GetPersonList(joinAvenue);
     JoinAvenuePersonList *extraList = *GameData_GetJoinAvenuePersonListPtr(gameData);
-    JoinAvenueEntryList *entryList = func_02010054(joinAvenue);
+    JoinAvenueEntryList *entryList = JoinAvenue_GetEntryList(joinAvenue);
     JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     JoinAvenueInfo *info = JoinAvenue_GetInfo(joinAvenue);
     u32 result;
@@ -164,16 +164,16 @@ static u32 func_020100e0(JoinAvenueSave *joinAvenue, GameData *gameData, void *s
 }
 
 // Merges the source into the occupant who matches, or else adds it to the people met or the entries
-static u32 func_02010194(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind) {
+static u32 JoinAvenue_MergeOrAdd(JoinAvenueSave *joinAvenue, GameData *gameData, void *source, u32 kind) {
     JoinAvenuePersonList *personList = JoinAvenue_GetPersonList(joinAvenue);
     JoinAvenuePersonList *extraList = *GameData_GetJoinAvenuePersonListPtr(gameData);
-    JoinAvenueEntryList *entryList = func_02010054(joinAvenue);
+    JoinAvenueEntryList *entryList = JoinAvenue_GetEntryList(joinAvenue);
     JoinAvenueOccupants *occupants = getAddressOfBeginningOfOccupants(joinAvenue);
     JoinAvenueInfo *info = JoinAvenue_GetInfo(joinAvenue);
     u32 (*add)(JoinAvenuePersonList *list, const void *source);
     u32 result;
 
-    result = func_020388e8(occupants, source, kind);
+    result = JoinAvenueOccupants_Merge(occupants, source, kind);
     if (result == 1) {
         return JOIN_AVE_ADD_MERGED;
     }

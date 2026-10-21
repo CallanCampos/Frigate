@@ -20,8 +20,8 @@ void saveMainSaveAreaAddress(SaveControl *save) {
     sSaveControl = save;
 }
 
-s32 func_02017bcc(void) {
-    u32 speed = func_02008a14(&getTrainerDataBlkAddress(sSaveControl)->config);
+s32 TextSpeed_GetCurrentWait(void) {
+    u32 speed = Config_GetTextSpeed(&getTrainerDataBlkAddress(sSaveControl)->config);
 
     if (speed >= TEXT_SPEED_MAX) {
         speed = TEXT_SPEED_MAX - 1;
@@ -29,8 +29,8 @@ s32 func_02017bcc(void) {
     return sTextSpeedWaits[speed];
 }
 
-s32 func_02017bf0(void) {
-    u32 speed = func_02008a14(&getTrainerDataBlkAddress(sSaveControl)->config);
+s32 TextSpeed_GetFasterWait(void) {
+    u32 speed = Config_GetTextSpeed(&getTrainerDataBlkAddress(sSaveControl)->config);
 
     switch (speed) {
     case 0:
@@ -43,11 +43,11 @@ s32 func_02017bf0(void) {
         speed = 3;
         break;
     }
-    return func_02017c50(speed);
+    return TextSpeed_GetWait(speed);
 }
 
-s32 func_02017c20(void) {
-    u32 speed = func_02008a14(&getTrainerDataBlkAddress(sSaveControl)->config);
+s32 TextSpeed_GetSlowerWait(void) {
+    u32 speed = Config_GetTextSpeed(&getTrainerDataBlkAddress(sSaveControl)->config);
 
     switch (speed) {
     case 0:
@@ -60,10 +60,10 @@ s32 func_02017c20(void) {
         speed = 1;
         break;
     }
-    return func_02017c50(speed);
+    return TextSpeed_GetWait(speed);
 }
 
-s32 func_02017c50(u32 speed) {
+s32 TextSpeed_GetWait(u32 speed) {
     if (speed >= TEXT_SPEED_MAX) {
         speed = TEXT_SPEED_MAX - 1;
     }

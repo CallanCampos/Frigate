@@ -12,7 +12,7 @@ struct Event3DDemoWork {
     GameSystem *gameSystem;
     GameCommSys *gameCommSys;
     Demo3DParam param;
-    // What func_02016b2c returned before the demo
+    // What GSYS_IsGameCommPaused returned before the demo
     u32 savedState;
     u16 demoId;
     u16 unk26;

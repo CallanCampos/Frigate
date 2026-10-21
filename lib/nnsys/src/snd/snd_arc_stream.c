@@ -9,7 +9,9 @@
 // players, its file read and, for IMA-ADPCM, decoded by a thread of its own as the stream asks for each block. The
 // file's name is a guess, NitroSystem's sndarc_stream.c from memory with the snd_ prefix the other sound files take.
 // swan names NNS_SndArcStrmInit NNS_SndArcStrmInit and CreateThread and ThreadProc CreateThread and
-// ThreadProc; the rest swan doesn't name
+// ThreadProc; the rest swan doesn't name. The block filling follows the public decompilations of NitroSystem that
+// pret's pokeplatinum and pokeheartgold build (github.com/ntrtwl/NitroSystem) and of Kingdom Hearts Re:coded
+// (github.com/kh-recoded-decomp/kh-recoded-decomp)
 
 #define STRM_PLAYER_NUM 4
 #define STRM_COMMAND_NUM 8
@@ -733,12 +735,21 @@ static void StartNextStrm(NNSSndArcStrmPlayer *player) {
     player->flags.dataEnd = FALSE;
 }
 
+// Decodes one IMA-ADPCM sample. Written as the public decompilation github.com/ntrtwl/NitroSystem has it, with the
+// locals assigned after their declarations, the sample before the index: initialized in their declarations, they give
+// ProcessCommand other registers and a shorter frame
 static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
-    int index = state->index;
-    int pcm = state->pcm;
-    int step = sAdpcmStepTable[index];
-    int diff = step >> 3;
+    int step;
+    int pcm;
+    int index;
+    int diff;
 
+    pcm = state->pcm;
+    index = state->index;
+
+    step = sAdpcmStepTable[index];
+
+    diff = step >> 3;
     if (nibble & 4) {
         diff += step;
     }
@@ -748,6 +759,7 @@ static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
     if (nibble & 1) {
         diff += step >> 2;
     }
+
     if (nibble & 8) {
         pcm -= diff;
         if (pcm < -0x8000) {
@@ -761,6 +773,7 @@ static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
     }
 
     index += sAdpcmIndexTable[nibble];
+
     if (index < 0) {
         index = 0;
     } else if (index > STRM_ADPCM_INDEX_MAX) {
@@ -769,6 +782,7 @@ static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
 
     state->pcm = pcm;
     state->index = index;
+
     return pcm;
 }
 
@@ -776,18 +790,20 @@ static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
 static void ProcessCommand(StrmCommand *command) {
     NNSSndArcStrmPlayer *player = command->player;
     BOOL loop;
-    u32 bufOffset;
+    // NitroSDK's u32, an unsigned long, as in sbc.c: as an unsigned int it takes a late spill slot instead of its
+    // declared one (Kingdom Hearts Re:coded's decompilation has a long)
+    unsigned long bufOffset;
     u32 len;
+    u32 block;
     u32 blockSize;
+    u32 blockSamples;
     u32 blockOffset;
+    u32 readOffset;
     u32 fileOffset;
     u32 samples;
     u32 dataSize;
-    u32 readSize;
-    u8 *dest;
-    u32 block;
-    u32 blockSamples;
-    u32 readOffset;
+    // The read's result's type, which it is compared with: as a u32 it is a converted copy in a late slot
+    s32 readSize;
     int ch;
 
     if (player->flags.dataEnd && player->endWait > 0) {
@@ -865,16 +881,20 @@ static void ProcessCommand(StrmCommand *command) {
         fileOffset += player->header.head.dataOffset;
 
         for (ch = 0; ch < command->numChannels; ch++) {
-            dest = (u8 *)command->buffer[ch] + bufOffset;
+            void *dest;
+            void *readDest;
+
+            dest = readDest = (u8 *)command->buffer[ch] + bufOffset;
 
             if (ch < player->header.head.numChannels) {
-                void *readBuffer = dest;
+                s32 result;
 
                 if (player->header.head.format == STRM_FORMAT_ADPCM) {
                     OS_LockMutex(&sDecodeMutex);
-                    readBuffer = sArcStrm.decodeBuffer;
+                    readDest = sArcStrm.decodeBuffer;
                 }
-                if (player->read(player, readBuffer, readSize, fileOffset + ch * blockSize) != readSize) {
+                result = player->read(player, readDest, readSize, fileOffset + ch * blockSize);
+                if (result != readSize) {
                     dataSize = 0;
                     samples = 0;
                     loop = FALSE;
@@ -888,28 +908,35 @@ static void ProcessCommand(StrmCommand *command) {
                 if (player->header.head.format == STRM_FORMAT_ADPCM) {
                     AdpcmState *state = &player->adpcm[ch];
                     const u8 *src = sArcStrm.decodeBuffer;
+                    s16 *out = dest;
                     u32 pos;
+                    u32 end;
 
                     if (blockOffset == 0) {
-                        *state = *(const AdpcmState *)src;
+                        // NitroSystem copies the header through a postincrement of the cast pointer, which
+                        // this does in standard C: src steps past it before the copy
+                        const AdpcmState *header = (const AdpcmState *)src;
+
                         src += STRM_ADPCM_HEADER_SIZE;
+                        *state = *header;
                     }
+                    end = blockOffset + samples;
                     pos = blockOffset;
-                    if (blockOffset & 1) {
-                        *(s16 *)dest = DecodeAdpcm(state, (*src >> 4) & 0xf);
-                        dest += sizeof(s16);
+                    if (pos & 1) {
+                        *out++ = DecodeAdpcm(state, (*src >> 4) & 0xf);
                         pos++;
                         src++;
                     }
-                    while (pos < ((blockOffset + samples) & ~1)) {
-                        *(s16 *)dest = DecodeAdpcm(state, *src & 0xf);
-                        *(s16 *)(dest + sizeof(s16)) = DecodeAdpcm(state, (*src >> 4) & 0xf);
-                        pos += 2;
-                        dest += 2 * sizeof(s16);
+                    while (pos < (end & ~1)) {
+                        *out++ = DecodeAdpcm(state, *src & 0xf);
+                        pos++;
+                        *out++ = DecodeAdpcm(state, (*src >> 4) & 0xf);
+                        pos++;
                         src++;
                     }
-                    if (pos < blockOffset + samples) {
-                        *(s16 *)dest = DecodeAdpcm(state, *src & 0xf);
+                    if (pos < end) {
+                        *out++ = DecodeAdpcm(state, *src & 0xf);
+                        pos++;
                     }
                     OS_UnlockMutex(&sDecodeMutex);
                 }

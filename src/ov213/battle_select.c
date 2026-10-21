@@ -58,10 +58,10 @@ static void *BattleSelect_GetPartyBuffer(int netId, void *work, int size) {
 }
 
 static void BattleSelect_RecvParty(int netId, int size, const void *data, void *work, NetHandle *handle) {
-    if (handle != func_02040440()) {
+    if (handle != NetHandle_GetOwn()) {
         return;
     }
-    if (netId == func_02042a6c(func_02040440())) {
+    if (netId == GFL_NetGetHandleNetId(NetHandle_GetOwn())) {
         return;
     }
 }
@@ -72,7 +72,7 @@ static BOOL BattleSelect_Init(GameProc *proc, u32 *state, void *param, void *wor
     wk->param = *(BattleSelectParam *)param;
     wk->heapId = HEAPID_GAMEEVENT;
     wk->procManager = CreateGameProcManager(wk->heapId);
-    func_02040c20(BATTLE_SELECT_NET_CMD_BASE, sBattleSelectNetCommands, NELEMS(sBattleSelectNetCommands), wk);
+    NetCommand_AddTable(BATTLE_SELECT_NET_CMD_BASE, sBattleSelectNetCommands, NELEMS(sBattleSelectNetCommands), wk);
     BattleSelect_SetupPokeList(param, wk, &wk->pokeList);
     BattleSelect_SetupStatus(param, wk, &wk->status);
     wk->frames = 0;
@@ -83,7 +83,7 @@ static BOOL BattleSelect_Init(GameProc *proc, u32 *state, void *param, void *wor
 
 static BOOL BattleSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) {
     BattleSelectWork *wk = work;
-    func_ov164_021998c8((NetSyncWork *)&wk->pokeList);
+    NetSync_Exit((NetSyncWork *)&wk->pokeList);
     GFL_OvlUnload(OVERLAY_ID(164));
     FreeGameProcManager(wk->procManager);
     GFL_ProcReleaseSubsystem(proc);
@@ -104,7 +104,7 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
             wk->frames -= 60;
         }
     }
-    func_ov164_021998d4((NetSyncWork *)&wk->pokeList);
+    NetSync_Update((NetSyncWork *)&wk->pokeList);
 
     switch (wk->state) {
     case 0:
@@ -136,14 +136,14 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
         wk->state = 7;
         break;
     case 7:
-        if (func_02042c18(func_02040440(), 0xff, BATTLE_SELECT_NET_CMD_BASE, PokeParty_GetSaveDataSize(), select->unk1C,
-                          0, FALSE, TRUE)) {
-            func_02040624(func_02040440(), 20, 0x2f);
+        if (GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, BATTLE_SELECT_NET_CMD_BASE,
+                                        PokeParty_GetSaveDataSize(), select->unk1C, 0, FALSE, TRUE)) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 20, 0x2f);
             wk->state = 8;
         }
         break;
     case 8:
-        if (func_02040664(func_02040440(), 20, 0x2f)) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 20, 0x2f)) {
             return TRUE;
         }
         break;
@@ -171,7 +171,7 @@ static BOOL BattleSelect_Main(GameProc *proc, u32 *state, void *param, void *wor
     }
 
     // Outside the screens, a lost connection ends the selection
-    if (func_02042788() && wk->state != 1 && wk->state != 2 && wk->state != 4 && wk->state != 5) {
+    if (GFL_NetIsInitialized() && wk->state != 1 && wk->state != 2 && wk->state != 4 && wk->state != 5) {
         if (DWCRapCommon_CheckError(1, 1)) {
             select->result = 1;
             return TRUE;
@@ -188,7 +188,7 @@ static void BattleSelect_SetupPokeList(BattleSelectParam *param, BattleSelectWor
     PokeListParam_Setup(pokeList, param->gameData, 0x1a, param->party);
     PokeRegulation_ApplyLevelToParty(regulation, pokeList->party);
     pokeList->regulation = regulation;
-    switch (regulation->unkBA) {
+    switch (regulation->battleType) {
     case 0:
         pokeList->unk48 = 0;
         pokeList->partnerCount = 1;
@@ -234,7 +234,7 @@ static void BattleSelect_SetupPokeList(BattleSelectParam *param, BattleSelectWor
     }
     pokeList->battleMsg = 0;
     GFL_OvlLoad(OVERLAY_ID(164));
-    func_ov164_021998c0((NetSyncWork *)pokeList);
+    NetSync_Init((NetSyncWork *)pokeList);
 }
 
 static void BattleSelect_SetupStatus(BattleSelectParam *param, BattleSelectWork *wk, PStatusParam *status) {

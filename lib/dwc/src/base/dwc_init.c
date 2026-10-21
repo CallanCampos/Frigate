@@ -62,16 +62,16 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
         }
     }
 
-    func_ov011_02169df8(server);
+    DWCi_Auth_InitInterface(server);
     sGameCode = gameCode;
     gsiMemoryCallbacksSet(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
     if (gameName != NULL) {
-        strcpy(data_ov011_021917bc, gameName);
+        strcpy(gcd_gamename, gameName);
     }
     if (server == 0) {
-        strcpy(data_ov011_02188fe4, "sdkdev.gamespy.com");
+        strcpy(StatsServerHostname, "sdkdev.gamespy.com");
     } else {
-        strcpy(data_ov011_02188fe4, "gamestats.gs.nintendowifi.net");
+        strcpy(StatsServerHostname, "gamestats.gs.nintendowifi.net");
     }
     DWCi_SetStarted(1);
     return result;

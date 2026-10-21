@@ -84,25 +84,33 @@ the game each piece touches, for the modders who come later.
   share). Every gh command that writes still names its repository, `-R CallanCampos/Frigate`.
   `-R fuddlesworth/pokebw2` is only for reads, never for writes (D10,
   [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
-- **Port work is for Claude Code.** Upstream's `AGENTS.md`, `.agents/` and `.codex/` give Codex the decomp's rules
-  and never mention the port, so Codex sessions don't do port work.
+- **Port work is open to contributors.** Human contributors, Claude Code and explicitly authorized Codex sessions
+  follow this file and [CONTRIBUTING.md](CONTRIBUTING.md). Root agent instructions describe the decomp; for port work,
+  these rules take precedence. External contributors use personal forks and topic PRs to Frigate's `main`, not the
+  maintainer direct-publishing loop ([ADR 0017](docs/adr/0017-external-contributions.md)).
 - **Port files live in `port/`**, plus files upstream doesn't have: `.github/workflows/port-*.yml` and
-  `.github/README.md`. Never edit an upstream file for the port's own setup (root `CLAUDE.md`, `AGENTS.md`,
+  `.github/README.md`, `.github/CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE/port.md` and
+  `.github/ISSUE_TEMPLATE/port_*.yml`. Never edit an upstream file for the port's own setup (root `CLAUDE.md`, `AGENTS.md`,
   `README.md`, `CONTRIBUTING.md`, `.gitignore`, `.claude/`, `.agents/`, `.codex/`, upstream's `.github/` templates and
   workflows, `docs/`, `tools/`, `config/`, `configure.py`): every sync would conflict.
 - **Only upstream's `build.yml` is off here**, because it needs the ROM deploy key
   (`gh workflow disable build.yml -R CallanCampos/Frigate`). Disabling or enabling any other workflow needs the
   user's OK. Never disable `compile.yml` or `standards.yml` to make CI pass: fix the change instead.
-- **Upstream's issue and pull request templates** show here unchanged. A port pull request ignores the template's
-  decomp checklist and says which test levels ran instead.
+- **Upstream's issue and pull request templates** stay unchanged. Port contributors use Frigate's added templates
+  linked from [CONTRIBUTING.md](CONTRIBUTING.md) and report commands, results and unrun checks.
+
+External contributors update from Frigate's `main` and push topic branches to their own forks. They do not run
+`sync_upstream.sh`, whose canonical-origin check and publishing are for maintainers. Contributors without ROMs may
+submit draft PRs with unrun checks stated; maintainers verify both ROM SHA1s and applicable host tests before merge.
+The no-upstream-posts and reference rules below still apply to every contributor.
 
 ## How the root rules apply here
 
-- **Both ROMs stay byte for byte.** Every commit ends with `python3 configure.py && ninja` and both SHA1s, even one
+- **Both ROMs stay byte for byte.** Every maintainer commit ends with `python3 configure.py && ninja` and both SHA1s, even one
   that touches only `port/`: it proves the last sync and every change outside `port/` left the DS build alone (T0).
 - **The code rules apply to any edit in `src/`, `lib/` or `include/`**: natural C, names, `docs/code-standards.md`,
   clang-format 23.1.1. `post_edit.py` and CI's Standards workflow check those paths; they don't look at `port/`.
-- **Publish every commit** means: `git fetch origin && git merge origin/main` (the port's own `main`, which other port
+- **For maintainer sessions, publish every commit** means: `git fetch origin && git merge origin/main` (the port's own `main`, which other port
   sessions and the hourly sync push to), the ROM build with both SHA1s, the host build and the pre-push tests that
   exist, then `git push origin HEAD:main`. A rejected push is fetched, merged, rebuilt and pushed again.
 - **Never here:** overlay claims, matching, new decomp source files, config changes (`add_source_file.py`,
@@ -122,7 +130,7 @@ the game each piece touches, for the modders who come later.
   compile failure, a change to upstream's workflows, a rewrite of its history or, while this repository is public,
   commits whose messages reference issues (the `references` outcome) leaves `main` alone and opens an `upstream-sync`
   issue.
-- **Each session starts with `port/tools/sync_upstream.sh`.** It merges upstream on top of what the Action merged,
+- **Each maintainer session starts with `port/tools/sync_upstream.sh`.** It merges upstream on top of what the Action merged,
   builds both ROMs and checks both SHA1s, builds and tests the host side once `port/CMakeLists.txt` exists, and pushes
   only when all of that passes. Upstream lands 150–250 commits a day, so sync before each task and at least daily.
 - **When the script stops**, SYNC.md says what to do. Exit 3 is a merge conflict: resolve it (a file with a row in
@@ -139,7 +147,8 @@ the game each piece touches, for the modders who come later.
 
 ## The iteration loop (PLAN.md §8)
 
-1. **Sync** with `port/tools/sync_upstream.sh`, as above, then regenerate source lists and stubs.
+1. **Sync** maintainer checkouts with `port/tools/sync_upstream.sh`, as above, then regenerate source lists and stubs.
+   External contributors update from Frigate's `main` instead.
 2. **Pick** the earliest unmet exit criterion of the current phase (STATUS.md names it) that the decomp allows.
 3. **Build it in small commits**, each passing the pre-push tests. Large subsystems (renderer, sound driver,
    scheduler) go to subagents in their own worktrees, one writer per set of files.
@@ -193,9 +202,11 @@ wire or in the save stay pointer-free and get host `_Static_assert`s.
   this clone, on a topic branch from upstream `main`, under the root rules and skills there (claim an overlay's issue
   first, C from the asm, both SHA1s, `finish-file`, a fork PR), as ordinary decomp work: nothing it commits, comments
   or posts mentions the port. Work under someone else's active claim stays theirs; the port waits or uses a documented
-  stand-in for a deferred subsystem (`port/hal/dwc/ov011_pending.c`). Frigate's test launcher (`port/app/launcher.c`,
+  stand-in for a deferred subsystem where the plan documents one. The obsolete
+  `ov011_pending.c` stand-in was removed once all four SDK definitions had C. Frigate's test launcher (`port/app/launcher.c`,
   [ADR 0012](docs/adr/0012-test-launcher-for-the-field-menus-apps.md)) is the other documented stand-in, test-only and
-  off by default, opening the field menu's apps while overlay 36 is claimed. The C reaches the port by sync once
+  off by default; it opened the field menu's apps while overlay 36 was missing and now automatically steps aside
+  because `FIELDMAP_PROC_FUNCS` has C. The C reaches the port by sync once
   upstream merges it.
 
 ## What native means (PLAN.md §1)
@@ -211,7 +222,7 @@ wire or in the save stay pointer-free and get host `_Static_assert`s.
 
 | Level | What | When |
 | --- | --- | --- |
-| T0 | ROM build, both SHA1s | before every push |
+| T0 | ROM build, both SHA1s | before every maintainer push and PR merge |
 | T1 | Host build; the 64-bit warning count not above STATUS.md's last entry | before every push |
 | T2, T6 | Unit tests; save round trips and ROM dump verification | before every push |
 | T3 | Replay tests: frame hashes and state checkpoints | short ones before every push, long ones nightly |
@@ -240,7 +251,8 @@ only when its exit criteria pass on macOS.
 
 ## Upstream doesn't know about the port
 
-The port is a solo project (PLAN.md D10, [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)).
+The port accepts external contributions ([ADR 0017](docs/adr/0017-external-contributions.md)).
+The independent-upstream boundary of PLAN.md D10 and [ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md) remains.
 
 - **Never post anything about the port on `fuddlesworth/pokebw2`**: no issues, comments, reactions, pull requests,
   discussions or proposals, and no mention of the port in decomp PRs or claims made from the decomp checkout. Read-only

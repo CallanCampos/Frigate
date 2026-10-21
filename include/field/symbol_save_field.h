@@ -10,8 +10,8 @@
 #include "struct_decls.h"
 
 u32 func_ov012_02161260(AreaNPCSave *npcData);
-u32 func_ov012_0216127c(AreaNPCSave *npcData);
+u32 SymbolSaveField_GetDeepestArea(AreaNPCSave *npcData);
 // The Pokémon of an area, and how many there are
-u32 func_ov012_02161354(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count);
+u32 SymbolSaveField_GetAreaPokemon(AreaNPCSave *npcData, EntreeForestPokemon *dest, int max, int area, u8 *count);
 
 #endif // POKEBW2_FIELD_SYMBOL_SAVE_FIELD_H

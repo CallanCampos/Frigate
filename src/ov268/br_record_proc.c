@@ -203,7 +203,7 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     p_wk->p_param = p_param;
 
     p_wk->bmpoam = BmpOam_Init(p_wk->heapId, p_param->unit);
-    p_wk->que = func_02021998(p_wk->heapId);
+    p_wk->que = PrintQueue_CreateDefault(p_wk->heapId);
     p_wk->seq = BrSeq_Init(p_wk, NULL, p_wk->heapId);
     for (i = 0; i < 2; i++) {
         p_wk->ballEff[i] = BrBallEff_Init(p_param->unit, p_param->res, i, p_wk->heapId);
@@ -223,7 +223,7 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
         break;
     }
     case BR_RECORD_MODE_MINE:
-        p_wk->header = func_0200c0c0();
+        p_wk->header = BattleRec_GetHeader();
         p_wk->profile = getVSPlayerAllocation();
         p_wk->isSecure = TRUE;
         p_wk->canSave = FALSE;
@@ -231,9 +231,9 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
     case BR_RECORD_MODE_OTHER1:
     case BR_RECORD_MODE_OTHER2:
     case BR_RECORD_MODE_OTHER3:
-        p_wk->header = func_0200c0c0();
+        p_wk->header = BattleRec_GetHeader();
         p_wk->profile = getVSPlayerAllocation();
-        p_wk->isSecure = func_0200c124(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
+        p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_SECURE, 0);
         p_wk->canSave = FALSE;
         break;
     case BR_RECORD_MODE_CODEIN:
@@ -242,7 +242,7 @@ static BOOL BrRecord_ProcInit(GameProc *proc, u32 *state, void *param, void *wor
             p_wk->header = NULL;
             p_wk->profile = NULL;
         } else {
-            p_wk->header = func_0200c0c0();
+            p_wk->header = BattleRec_GetHeader();
             p_wk->profile = getVSPlayerAllocation();
             p_wk->isSecure = *p_wk->p_param->unk3C;
         }
@@ -289,7 +289,7 @@ static BOOL BrRecord_ProcExit(GameProc *proc, u32 *state, void *param, void *wor
         BrBallEff_Exit(p_wk->ballEff[i]);
     }
     BrSeq_Exit(p_wk->seq);
-    func_02021a18(p_wk->que);
+    PrintQueue_Free(p_wk->que);
     BmpOam_Exit(p_wk->bmpoam);
     GFL_ProcReleaseSubsystem(proc);
     return TRUE;
@@ -312,7 +312,7 @@ static BOOL BrRecord_ProcMain(GameProc *proc, u32 *state, void *param, void *wor
     for (i = 0; i < 2; i++) {
         BrBallEff_Main(p_wk->ballEff[i]);
     }
-    func_02021a3c(p_wk->que);
+    PrintQueue_Main(p_wk->que);
     for (i = 0; i < BR_RECORD_TITLE_MAX; i++) {
         if (p_wk->title[i] != NULL) {
             BrMsgWin_Main(p_wk->title[i]);
@@ -411,7 +411,7 @@ static void BrRecord_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (BrRecord_GetTrgChange(p_wk, x, y)) {
             p_wk->isProfile ^= 1;
             BrSeq_SetNext(p_seqwk, BrRecord_SeqChangePage);
@@ -433,7 +433,7 @@ static void BrRecord_SeqMain(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
             BrProcSys_Push(p_wk->p_param->procSys, BR_PROCID_BV_SAVE);
-            p_wk->p_param->videoNumber = func_0200c124(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
+            p_wk->p_param->videoNumber = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
             BrSeq_SetNext(p_seqwk, BrRecord_SeqFadeOut);
         }
         if (BrRecord_GetTrgPlay(p_wk, x, y)) {
@@ -571,12 +571,12 @@ static void BrRecord_SeqDownloadOutline(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_a
         break;
     }
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -680,7 +680,7 @@ static void BrRecord_SeqDownloadPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs
         BrNetRequestParam req;
 
         MI_CpuFill8(&req, 0, sizeof(BrNetRequestParam));
-        req.dataNumber = func_0200c124(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
+        req.dataNumber = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
         BrNet_StartRequest(p_wk->p_param->net, BR_NET_REQUEST_3, &req);
         p_wk->cnt = 0;
         *p_seq = SEQ_DOWNLOAD_WAIT;
@@ -701,8 +701,8 @@ static void BrRecord_SeqDownloadPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs
             BattleRecVideo *video;
 
             if (BrNet_GetDownloadVideo(p_wk->p_param->net, (void **)&video, &value)) {
-                func_0200c0d0((GdsProfile *)video->profile, &video->header, &video->body,
-                              GameData_GetSaveControl(p_wk->p_param->gameData));
+                BattleRec_StoreDownloaded((GdsProfile *)video->profile, &video->header, &video->body,
+                                          GameData_GetSaveControl(p_wk->p_param->gameData));
                 *p_wk->p_param->unk2C = (s32)value;
                 p_wk->p_param->result = 1;
                 BrProcSys_Interrupt(p_wk->p_param->procSys);
@@ -718,12 +718,12 @@ static void BrRecord_SeqDownloadPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs
         break;
     }
     case SEQ_MSG_WAIT:
-        if (func_0203da48()) {
+        if (GFL_HIDIsTouchPressed()) {
             u32 x;
             u32 y;
             BrPoint pos;
 
-            func_0203dac8(&x, &y);
+            GFL_HIDGetTouchPressedPoint(&x, &y);
             pos.x = x;
             pos.y = y;
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_SUB], BR_BALL_EFFECT_SPREAD, &pos);
@@ -800,8 +800,8 @@ static void BrRecord_SeqSecureSave(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) 
         GFL_ASSERT(p_wk->p_param->mode <= BR_RECODE_PROC_OTHER_02);
         if (BattleRecOv_SaveSecureVideo(p_wk->p_param->gameData, p_wk->p_param->mode, &p_wk->saveSeq, &p_wk->saveSeq2,
                                         p_wk->heapId) == 2) {
-            func_0200bbb4();
-            p_wk->isSecure = func_0200c124(p_wk->header, BATTLE_REC_HEADER_UNK2A, 0);
+            BattleRec_DecryptBody();
+            p_wk->isSecure = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_SECURE, 0);
             *p_seq = SEQ_FADEOUT_START;
         }
         break;
@@ -885,7 +885,7 @@ static void BrRecord_SeqConfirmPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs)
         u32 x;
         u32 y;
 
-        if (func_0203dac8(&x, &y)) {
+        if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
             if (BrRecord_GetTrgYes(p_wk, x, y)) {
                 *p_seq = SEQ_YES_FADEOUT_START;
             } else if (BrRecord_GetTrgNo(p_wk, x, y)) {
@@ -938,11 +938,11 @@ static void BrRecord_SeqConfirmPlay(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs)
         *p_seq = SEQ_SAVE_START;
         break;
     case SEQ_SAVE_START:
-        func_0201782c(p_wk->p_param->gameData);
+        GameData_StartSave(p_wk->p_param->gameData);
         *p_seq = SEQ_SAVE_MAIN;
         break;
     case SEQ_SAVE_MAIN:
-        if (func_02017850(p_wk->p_param->gameData) == 2) {
+        if (GameData_UpdateSave(p_wk->p_param->gameData) == 2) {
             BrBallEff_Start(p_wk->ballEff[CLACT_SURFACE_MAIN], BR_BALL_EFFECT_NONE, NULL);
             *p_seq = SEQ_PLAY_FADEOUT_START;
         }
@@ -1002,7 +1002,7 @@ static void BrRecord_CreateInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
             str = GFL_StrBufCreate(0x80, p_wk->heapId);
             name = GdsProfile_CreateNameStrBuf(p_wk->profile, p_wk->heapId);
             src = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
-            func_0202437c(wordSet, 0, name, GdsProfile_GetSex(p_wk->profile), 1, 2);
+            GFL_WordSetSetStrbuf(wordSet, 0, name, GdsProfile_GetSex(p_wk->profile), 1, 2);
             GFL_WordSetFormatStrbuf(wordSet, str, src);
             GFL_StrBufFree(name);
             GFL_StrBufFree(src);
@@ -1011,7 +1011,7 @@ static void BrRecord_CreateInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
             break;
         }
         case MSGWIN_MODE: {
-            u32 mode = func_0200c124(p_wk->header, BATTLE_REC_HEADER_MODE, 0);
+            u32 mode = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_MODE, 0);
 
             str = GFL_MsgDataLoadStrbufNew(msg, mode + data->msgID);
             BrMsgWin_SetPos(p_wk->msgWin[i], 0, 1, BR_MSGWIN_POS_ABSOLUTE);
@@ -1020,7 +1020,7 @@ static void BrRecord_CreateInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
         }
         case MSGWIN_NUMBER: {
             // The video's number is shown as 12-34567-89012
-            u64 number = func_0200c124(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
+            u64 number = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_DATA_NUMBER, 0);
             u32 low;
             u32 middle;
             u32 high;
@@ -1053,7 +1053,7 @@ static void BrRecord_CreateInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
         }
         case MSGWIN_COUNTER:
             if (BrRecord_IsCounterMode(p_wk->header)) {
-                u32 counter = func_0200c124(p_wk->header, BATTLE_REC_HEADER_COUNTER, 0);
+                u32 counter = BattleRec_GetHeaderValue(p_wk->header, BATTLE_REC_HEADER_COUNTER, 0);
                 StrBuf *src;
 
                 str = GFL_StrBufCreate(0x80, p_wk->heapId);
@@ -1101,8 +1101,8 @@ static void BrRecord_CreateIcons(BrRecordWork *p_wk, ClActUnit *unit, BattleRecH
     int idx;
 
     handle = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, HEAPID_TAIL(heapId));
-    p_wk->iconPlt = func_0204bc48(handle, PokeIcon_GetPaletteFile(), CLACT_SURFACE_MAIN, 0x80, heapId);
-    p_wk->iconCell = func_0204bde0(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
+    p_wk->iconPlt = ClActSys_LoadPlttEx(handle, PokeIcon_GetPaletteFile(), CLACT_SURFACE_MAIN, 0x80, heapId);
+    p_wk->iconCell = ClActSys_LoadCellAnims(handle, PokeIcon_GetCellFile_Main(), getOBJTileMapping_MainEng(), heapId);
 
     idx = 0;
     step = 6;
@@ -1121,9 +1121,9 @@ static void BrRecord_CreateIcons(BrRecordWork *p_wk, ClActUnit *unit, BattleRecH
             u32 sex;
 
             species[idx] = 0xff;
-            monsno = func_0200c124(header, BATTLE_REC_HEADER_SPECIES, i);
-            formno = func_0200c124(header, BATTLE_REC_HEADER_FORM, i);
-            sex = func_0200c124(header, BATTLE_REC_HEADER_GENDER, i);
+            monsno = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_SPECIES, i);
+            formno = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_FORM, i);
+            sex = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_GENDER, i);
             if (monsno != 0) {
                 species[idx] = monsno;
                 form[idx] = formno;
@@ -1147,16 +1147,16 @@ static void BrRecord_CreateIcons(BrRecordWork *p_wk, ClActUnit *unit, BattleRecH
         if (species[i] != 0) {
             ClActorSetup setup;
 
-            p_wk->iconChr[i] = func_0204b81c(handle, PokeParty_GetIconIndex(species[i], form[i], gender[i], FALSE),
-                                             FALSE, CLACT_SURFACE_MAIN, heapId);
+            p_wk->iconChr[i] = ClActSys_LoadChars(handle, PokeParty_GetIconIndex(species[i], form[i], gender[i], FALSE),
+                                                  FALSE, CLACT_SURFACE_MAIN, heapId);
             MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
             setup.x = sBrRecordIconPos[layout][i].x + 8;
             setup.y = sBrRecordIconPos[layout][i].y - 12;
             setup.sequence = 1;
             setup.priority = BATTLE_REC_HEADER_PKM_MAX - cnt;
-            p_wk->icon[cnt] = func_0204c040(unit, p_wk->iconChr[i], p_wk->iconPlt, p_wk->iconCell, &setup, 0, heapId);
-            func_0204c318(p_wk->icon[cnt], 1);
-            func_0204c378(p_wk->icon[cnt], PokeIcon_GetPalette(species[i], form[i], gender[i], FALSE), 0);
+            p_wk->icon[cnt] = ClActor_Create(unit, p_wk->iconChr[i], p_wk->iconPlt, p_wk->iconCell, &setup, 0, heapId);
+            ClActor_SetObjMode(p_wk->icon[cnt], 1);
+            ClActor_SetPalette(p_wk->icon[cnt], PokeIcon_GetPalette(species[i], form[i], gender[i], FALSE), 0);
             cnt++;
         }
     }
@@ -1192,21 +1192,21 @@ static void BrRecord_DeleteInfo(BrRecordWork *p_wk, BrRecordProcParam *p_param) 
     if (p_wk->isInfoCreated) {
         for (i = 0; i < BATTLE_REC_HEADER_PKM_MAX; i++) {
             if (p_wk->icon[i] != NULL) {
-                func_0204c124(p_wk->icon[i], FALSE);
-                func_0204c108(p_wk->icon[i]);
+                ClActor_SetVisible(p_wk->icon[i], FALSE);
+                ClActor_Delete(p_wk->icon[i]);
                 p_wk->icon[i] = NULL;
             }
             if (p_wk->iconChr[i] != -1) {
-                func_0204b98c(p_wk->iconChr[i]);
+                ClActSys_FreeChars(p_wk->iconChr[i]);
                 p_wk->iconChr[i] = -1;
             }
         }
         if (p_wk->iconPlt != -1) {
-            func_0204bcd0(p_wk->iconPlt);
+            ClActSys_FreePltt(p_wk->iconPlt);
             p_wk->iconPlt = -1;
         }
         if (p_wk->iconCell != -1) {
-            func_0204be64(p_wk->iconCell);
+            ClActSys_FreeCellAnims(p_wk->iconCell);
             p_wk->iconCell = -1;
         }
         for (i = 0; i < MSGWIN_MAX; i++) {
@@ -1367,7 +1367,7 @@ static void BrRecord_DeleteConfirm(BrRecordWork *p_wk, BrRecordProcParam *p_para
 
 // Whether the video's battle mode has teams of three Pokémon, whose icons are laid out in groups of three
 static BOOL BrRecord_IsSmallTeamMode(BattleRecHeader *header) {
-    u32 mode = func_0200c124(header, BATTLE_REC_HEADER_MODE, 0);
+    u32 mode = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_MODE, 0);
 
     switch (mode) {
     case 0x10:
@@ -1384,7 +1384,7 @@ static BOOL BrRecord_IsSmallTeamMode(BattleRecHeader *header) {
 // Whether the video's battle mode has a counter to show, such as a Battle Subway streak
 static BOOL BrRecord_IsCounterMode(BattleRecHeader *header) {
     BOOL ret = FALSE;
-    u32 mode = func_0200c124(header, BATTLE_REC_HEADER_MODE, 0);
+    u32 mode = BattleRec_GetHeaderValue(header, BATTLE_REC_HEADER_MODE, 0);
 
     switch (mode) {
     case 0x14:

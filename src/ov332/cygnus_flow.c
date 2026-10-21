@@ -97,7 +97,7 @@ struct CygnusData {
     GameData *gameData;
     void *radarData;
     DreamRadarSave *save;
-    // What func_02011400 says of the data
+    // What CygnusSaveData_Load says of the data
     u32 status;
     u32 saveState;
     CygnusEntry entries[CYGNUS_ENTRY_MAX];
@@ -759,7 +759,7 @@ static void CygnusFlow_MsgSceneExit(void *work) {
 static void CygnusFlow_ReceiveSceneInit(void *work, HeapID heapId) {
     KeySystemWork *wk = work;
 
-    func_0204c124(KeySystemClAct_Create(&wk->clact, 24, heapId), TRUE);
+    ClActor_SetVisible(KeySystemClAct_Create(&wk->clact, 24, heapId), TRUE);
     KeySystemMsgWin_PrintMsg(wk->msgWin, wk->msgData, 0, KEY_SYSTEM_MSG_PRINT);
 }
 
@@ -819,11 +819,11 @@ static void CygnusAppear_Load(CygnusAppear *appear, PartyPkm *pkm) {
     ClActorSetup setup;
 
     appear->palette =
-        PokeGra_LoadClActPaletteByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, 0x80, appear->heapId);
+        PokeGra_LoadClActPaletteByBoxData(arc, PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 0, 0x80, appear->heapId);
     appear->cellAnims =
-        PokeGra_LoadClActCellAnimsByBoxData(func_0201d624(pkm), POKEGRA_DIR_FRONT, 2, 0, appear->heapId);
-    appear->chars = PokeGra_LoadClActCharsByBoxData(arc, func_0201d624(pkm), POKEGRA_DIR_FRONT, 0, appear->heapId);
-    appear->offset = CygnusAppear_GetSpriteBottom(func_0201d624(pkm), appear->heapId) - 48;
+        PokeGra_LoadClActCellAnimsByBoxData(PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 2, 0, appear->heapId);
+    appear->chars = PokeGra_LoadClActCharsByBoxData(arc, PokeParty_ToBoxPkm(pkm), POKEGRA_DIR_FRONT, 0, appear->heapId);
+    appear->offset = CygnusAppear_GetSpriteBottom(PokeParty_ToBoxPkm(pkm), appear->heapId) - 48;
     appear->offset = MATH_CLAMP(appear->offset, 0, 48);
     GFL_ArcToolFree(arc);
     MI_CpuCopy8((void *)(HW_OBJ_PLTT + CYGNUS_APPEAR_PALETTE * 0x20), appear->spritePalette,
@@ -833,18 +833,18 @@ static void CygnusAppear_Load(CygnusAppear *appear, PartyPkm *pkm) {
     setup.y = 0;
     setup.bgPriority = 0;
     appear->actor =
-        func_0204c040(appear->unit, appear->chars, appear->palette, appear->cellAnims, &setup, 0, appear->heapId);
-    func_0204c124(appear->actor, FALSE);
-    func_0204c318(appear->actor, GX_OAM_MODE_XLU);
+        ClActor_Create(appear->unit, appear->chars, appear->palette, appear->cellAnims, &setup, 0, appear->heapId);
+    ClActor_SetVisible(appear->actor, FALSE);
+    ClActor_SetObjMode(appear->actor, GX_OAM_MODE_XLU);
 }
 
 static void CygnusAppear_Unload(CygnusAppear *appear) {
     if (appear->actor != NULL) {
-        func_0204c108(appear->actor);
+        ClActor_Delete(appear->actor);
     }
-    func_0204bcd0(appear->palette);
-    func_0204b98c(appear->chars);
-    func_0204be64(appear->cellAnims);
+    ClActSys_FreePltt(appear->palette);
+    ClActSys_FreeChars(appear->chars);
+    ClActSys_FreeCellAnims(appear->cellAnims);
 }
 
 static void CygnusAppear_Run(CygnusAppear *appear) {
@@ -878,8 +878,8 @@ static void CygnusAppear_Run(CygnusAppear *appear) {
     case 2:
         pos.x = 128;
         pos.y = 118 - appear->offset;
-        func_0204c140(appear->actor, &pos, 0);
-        func_0204c124(appear->actor, TRUE);
+        ClActor_SetSurfacePos(appear->actor, &pos, 0);
+        ClActor_SetVisible(appear->actor, TRUE);
         appear->fade = 0;
         appear->state = 3;
         break;
@@ -931,12 +931,12 @@ static CygnusData *CygnusData_Create(GameData *gameData, HeapID heapId) {
     CygnusData *data = GFL_HeapAllocate(heapId, sizeof(CygnusData), TRUE, "cygnus_flow.c", 1768);
 
     data->gameData = gameData;
-    data->buffer = func_02011510(heapId);
+    data->buffer = DreamRadar_AllocBuffer(heapId);
     return data;
 }
 
 static void CygnusData_Free(CygnusData *data) {
-    func_02011528(data->buffer);
+    DreamRadar_FreeBuffer(data->buffer);
     GFL_HeapFree(data);
 }
 
@@ -944,10 +944,10 @@ static void CygnusData_Load(CygnusData *data, HeapID heapId) {
     u32 words[CYGNUS_WORD_COUNT];
 
     ReadDreamRadarSaveData(data->buffer);
-    data->radarData = func_02011588(data->buffer);
+    data->radarData = DreamRadar_GetSaveData(data->buffer);
     data->save = GetDreamRadarSaveBlock(GameData_GetSaveControl(data->gameData));
     data->received = GetDreamRadarFlag(data->save, 2);
-    data->status = func_02011400(data->radarData, GetDreamRadarFlag(data->save, 1), words);
+    data->status = CygnusSaveData_Load(data->radarData, GetDreamRadarFlag(data->save, 1), words);
     if (data->status == 2 && words[CYGNUS_WORD_COUNT - 1] == 0) {
         CygnusData_ReadEntries(data, words, heapId);
     }
@@ -1005,7 +1005,7 @@ static void CygnusData_Commit(CygnusData *data) {
     seed = GFL_RandomLC(0);
     SetDreamRadarFlag(data->save, 1, seed);
     SetDreamRadarFlag(data->save, 0, TRUE);
-    func_020113c4(data->radarData, seed, data->received);
+    CygnusSaveData_Store(data->radarData, seed, data->received);
     SetDreamRadarFlag(data->save, 2, data->received);
     GCTX_HIDBlockSoftReset(8);
     data->saveState = 0;
@@ -1014,14 +1014,14 @@ static void CygnusData_Commit(CygnusData *data) {
 static BOOL CygnusData_Save(CygnusData *data) {
     switch (data->saveState) {
     case 0:
-        func_0201782c(data->gameData);
+        GameData_StartSave(data->gameData);
         data->saveState++;
         // fallthrough
     case 1:
-        if (func_02017850(data->gameData) != 2) {
+        if (GameData_UpdateSave(data->gameData) != 2) {
             break;
         }
-        func_02011544();
+        DreamRadar_WriteSaveData();
         data->saveState++;
         // fallthrough
     case 2:
@@ -1065,7 +1065,7 @@ static PartyPkm *CygnusData_CreatePokemon(const CygnusData *data, u32 index, Hea
         PokeParty_SetParam(pkm, PKM_PARAM_POKEBALL, 25);
         PokeParty_SetParam(pkm, PKM_PARAM_ORIGIN_GAME, game_version);
         PokeParty_SetParam(pkm, PKM_PARAM_REGION, region);
-        setDreamRadarPokeMetInfo(func_0201d620(pkm));
+        setDreamRadarPokeMetInfo(PokeParty_GetBoxPkm(pkm));
         PokeParty_RecalcStats(pkm);
         if (PokeParty_GetParam(pkm, PKM_PARAM_BAD_EGG, NULL)) {
             GFL_HeapFree(pkm);
@@ -1147,7 +1147,7 @@ static void CygnusData_Receive(CygnusData *data, HeapID heapId) {
                 setOneShotDRObtained(getTrainerCardDataBlkAddress(data->gameData), 7, player);
             }
             addPkmToDex(pokedex, pkm);
-            BoxSaveAccessor_InsertPkm(boxes, func_0201d620(pkm));
+            BoxSaveAccessor_InsertPkm(boxes, PokeParty_GetBoxPkm(pkm));
             GFL_HeapFree(pkm);
         }
     }
@@ -1176,15 +1176,15 @@ static void CygnusData_ReadEntries(CygnusData *data, const u32 *words, HeapID he
     MI_CpuFill8(data->entries, 0, sizeof(data->entries));
     data->count = 0;
     for (i = 0; i <= CYGNUS_WORD_POKEMON_END - 1; i++) {
-        if (func_020115fc(words[i])) {
-            u32 bit = func_0201167c(words[i]);
+        if (DreamRadar_IsPokemonWord(words[i])) {
+            u32 bit = DreamRadar_GetPokemonBit(words[i]);
 
             if (!(data->received & bit)) {
                 u8 radarForm;
                 u8 radarSex;
                 u16 radarSpecies;
 
-                func_02011624(words[i], &radarSpecies, &radarForm, &radarSex);
+                DreamRadar_GetPokemonByWord(words[i], &radarSpecies, &radarForm, &radarSex);
                 data->entries[data->count].type = CYGNUS_ENTRY_POKEMON;
                 data->entries[data->count].id = radarSpecies;
                 data->entries[data->count].form = radarForm;
@@ -1388,11 +1388,11 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
         ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
         u32 cells;
 
-        icon->palette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 0, 0x80, heapId);
+        icon->palette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 0, 0x80, heapId);
         cells = PokeIcon_GetCellFile_Main();
-        icon->cellAnims = func_0204bde0(arc, cells, getOBJTileMapping_MainEng(), heapId);
-        icon->chars = func_0204b81c(arc, PokeIcon_GetFileOfPkm(func_0201d620(pkm)), FALSE, 0, heapId);
-        iconPalette = PokeIcon_GetPaletteOfPkm(func_0201d620(pkm));
+        icon->cellAnims = ClActSys_LoadCellAnims(arc, cells, getOBJTileMapping_MainEng(), heapId);
+        icon->chars = ClActSys_LoadChars(arc, PokeIcon_GetFileOfPkm(PokeParty_GetBoxPkm(pkm)), FALSE, 0, heapId);
+        iconPalette = PokeIcon_GetPaletteOfPkm(PokeParty_GetBoxPkm(pkm));
         GFL_ArcToolFree(arc);
         GFL_HeapFree(pkm);
         break;
@@ -1401,9 +1401,9 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
         ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ITEMGRA, heapId);
         u32 number = CygnusData_GetItemNumber(data, index - CygnusData_CountPokemon(data));
 
-        icon->palette = func_0204bbb8(arc, GetItemGraphicsDatID(id, 2), x, (number + 7) * 0x20, 0, 1, heapId);
-        icon->cellAnims = func_0204bde0(arc, 1, x, heapId);
-        icon->chars = func_0204b81c(arc, GetItemGraphicsDatID(id, 1), x, x, heapId);
+        icon->palette = ClActSys_LoadPlttRange(arc, GetItemGraphicsDatID(id, 2), x, (number + 7) * 0x20, 0, 1, heapId);
+        icon->cellAnims = ClActSys_LoadCellAnims(arc, 1, x, heapId);
+        icon->chars = ClActSys_LoadChars(arc, GetItemGraphicsDatID(id, 1), x, x, heapId);
         GFL_ArcToolFree(arc);
         x = 4;
         y = 8;
@@ -1422,23 +1422,23 @@ static void CygnusIcon_Load(CygnusIcon *icon, ClActUnit *unit, CygnusData *data,
     setup.x = icon->pos.x;
     setup.y = icon->pos.y - 16;
     setup.bgPriority = 0;
-    icon->actor = func_0204c040(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 0, heapId);
-    func_0204c378(icon->actor, (u8)iconPalette, 0);
-    func_0204c124(icon->actor, FALSE);
-    func_0204c318(icon->actor, GX_OAM_MODE_XLU);
+    icon->actor = ClActor_Create(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 0, heapId);
+    ClActor_SetPalette(icon->actor, (u8)iconPalette, 0);
+    ClActor_SetVisible(icon->actor, FALSE);
+    ClActor_SetObjMode(icon->actor, GX_OAM_MODE_XLU);
 }
 
 static void CygnusIcon_Unload(CygnusIcon *icon) {
-    func_0204c108(icon->actor);
-    func_0204bcd0(icon->palette);
-    func_0204b98c(icon->chars);
-    func_0204be64(icon->cellAnims);
+    ClActor_Delete(icon->actor);
+    ClActSys_FreePltt(icon->palette);
+    ClActSys_FreeChars(icon->chars);
+    ClActSys_FreeCellAnims(icon->cellAnims);
     MI_CpuFill8(icon, 0, sizeof(CygnusIcon));
 }
 
 static void CygnusIcon_Start(CygnusIcon *icon) {
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0xf, 0, 16);
-    func_0204c124(icon->actor, TRUE);
+    ClActor_SetVisible(icon->actor, TRUE);
     icon->falling = TRUE;
     icon->startTime = OS_TicksToMilliSeconds(OS_GetTick());
 }
@@ -1451,15 +1451,15 @@ static BOOL CygnusIcon_Update(CygnusIcon *icon) {
     if (icon->falling) {
         elapsed = OS_TicksToMilliSeconds(OS_GetTick()) - icon->startTime;
         if (elapsed > CYGNUS_ICON_TIME) {
-            func_0204c140(icon->actor, &icon->pos, 0);
-            func_0204c318(icon->actor, GX_OAM_MODE_NORMAL);
+            ClActor_SetSurfacePos(icon->actor, &icon->pos, 0);
+            ClActor_SetObjMode(icon->actor, GX_OAM_MODE_NORMAL);
             reg_G2_BLDCNT = 0;
             return TRUE;
         }
         pos.x = icon->pos.x;
         alpha = (elapsed * 16) / CYGNUS_ICON_TIME;
         pos.y = icon->pos.y - 16 + alpha;
-        func_0204c140(icon->actor, &pos, 0);
+        ClActor_SetSurfacePos(icon->actor, &pos, 0);
         CygnusFlow_SetBlendAlpha(alpha, 16 - alpha);
     }
     return FALSE;

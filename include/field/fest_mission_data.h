@@ -82,8 +82,8 @@ typedef struct {
     u8 resultMessageId;
     FestMissionHeader header;
     u32 unk18;
-    // The seed of the mission's random choices (overlay 26)
-    u32 unk1C;
+    // The seed of the mission's random choices (FestMissionConfig's seed)
+    u32 seed;
     u8 unk20[0xc];
 } FestMission;
 
@@ -93,17 +93,17 @@ extern const u8 data_ov027_021711c0[8];
 #define FEST_MISSION_COUNT 55
 
 FestivalText *getTextFileForFestMissions(HeapID heapId);
-void func_ov027_02170b00(FestivalText *text);
-void *func_ov027_02170b18(ArcTool *arc, HeapID heapId);
-void func_ov027_02170b24(ArcTool *arc, u8 index, FestMissionData *dest);
+void FestivalText_Free(FestivalText *text);
+void *FestMissionData_LoadHeaders(ArcTool *arc, HeapID heapId);
+void FestMissionData_Load(ArcTool *arc, u8 index, FestMissionData *dest);
 // All the missions
-FestMissionData *func_ov027_02170b50(ArcTool *arc, HeapID heapId);
-FestMissionData *func_ov027_02170b8c(FestivalText *text, HeapID heapId);
-void func_ov027_02170b98(ArcTool *arc, u8 index, u32 level, FestMission *mission);
-void func_ov027_02170cf8(FestivalText *text, u8 index, u32 level, FestMission *mission);
+FestMissionData *FestMissionData_LoadAll(ArcTool *arc, HeapID heapId);
+FestMissionData *FestivalText_LoadAllMissions(FestivalText *text, HeapID heapId);
+void FestMission_Load(ArcTool *arc, u8 index, u32 level, FestMission *mission);
+void FestivalText_LoadMission(FestivalText *text, u8 index, u32 level, FestMission *mission);
 // The mission's message and result message, with its target and count
-void func_ov027_02170d04(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId);
-void func_ov027_02170d90(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId);
-void func_ov027_02170e1c(WordSet *wordSet, StrBuf *unused, u32 index, u32 kind, u32 target);
+void FestMission_GetMessage(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId);
+void FestMission_GetResultMessage(FestivalText *text, StrBuf *dest, const FestMission *mission, HeapID heapId);
+void FestMission_SetTargetWord(WordSet *wordSet, StrBuf *unused, u32 index, u32 kind, u32 target);
 
 #endif // POKEBW2_FIELD_FEST_MISSION_DATA_H

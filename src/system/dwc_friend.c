@@ -37,8 +37,8 @@ static int compareFriendData(DWCFriendData *friendData, DWCUserData *userData, D
 
 static int findFriendData(DWCFriendData *friendData, int *index) {
     int i;
-    DWCUserData *userData = (DWCUserData *)func_02042d48();
-    DWCFriendData *friends = (DWCFriendData *)func_02042d64();
+    DWCUserData *userData = (DWCUserData *)GFL_NetGetUserData();
+    DWCFriendData *friends = (DWCFriendData *)GFL_NetGetFriendData();
     int count = func_02042d80();
 
     *index = -1;
@@ -62,11 +62,11 @@ static int findFriendData(DWCFriendData *friendData, int *index) {
     return FRIEND_CHECK_NEW;
 }
 
-int func_02011980(WifiList *wifiList, u64 friendKey, int *index) {
-    DWCUserData *userData = func_02009f7c(wifiList);
+int WifiList_FindFriendKey(WifiList *wifiList, u64 friendKey, int *index) {
+    DWCUserData *userData = WifiList_GetMyUserData(wifiList);
     int i = 0;
-    DWCFriendData *friends = func_0200a0e4(wifiList, 0);
-    int count = func_0200a150(wifiList);
+    DWCFriendData *friends = WifiList_GetFriendData(wifiList, 0);
+    int count = WifiList_CountFriends(wifiList);
     DWCFriendData token;
 
     if (!DWC_CheckFriendKey(userData, friendKey)) {
@@ -89,9 +89,9 @@ int func_02011980(WifiList *wifiList, u64 friendKey, int *index) {
     return FRIEND_CHECK_NEW;
 }
 
-BOOL func_02011a28(DWCFriendData *friendData) {
+BOOL DWCFriend_UpdateFriendData(DWCFriendData *friendData) {
     BOOL isNew = FALSE;
-    DWCFriendData *friends = (DWCFriendData *)func_02042d64();
+    DWCFriendData *friends = (DWCFriendData *)GFL_NetGetFriendData();
     int index;
     int result;
 
@@ -110,18 +110,18 @@ static void setFriendInfo(WifiList *wifiList, PlayerInfo *info, u32 index, u32 h
     if (setName) {
         StrBuf *name = copyTrainerNameToNewStrbuf(info->name, heapId);
 
-        func_0200a11c(wifiList, index, name);
+        WifiList_StoreFriendName(wifiList, index, name);
         GFL_StrBufFree(name);
     }
-    func_0200a034(wifiList, index, WIFI_LIST_FRIEND_GENDER, getTrainerGender(info));
-    func_0200a034(wifiList, index, WIFI_LIST_FRIEND_ID, getIDAsUInt(info));
-    func_0200a034(wifiList, index, WIFI_LIST_FRIEND_PROFILE_ID, func_02008bdc(info));
-    func_0200a034(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, func_02008bf4(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_GENDER, getTrainerGender(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_ID, getIDAsUInt(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_PROFILE_ID, PlayerInfo_GetProfileId(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
 static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendData, u32 index, u32 heapId, int mode) {
     WifiList *wifiList = GameData_GetWifiList(gameData);
-    DWCFriendData *dest = func_0200a0e4(wifiList, index);
+    DWCFriendData *dest = WifiList_GetFriendData(wifiList, index);
 
     if (mode != FRIEND_ADD_VIEW) {
         MI_CpuCopy8(friendData, dest, sizeof(DWCFriendData));
@@ -131,10 +131,10 @@ static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendDa
     } else if (mode == FRIEND_ADD_UPDATE) {
         setFriendInfo(wifiList, info, index, heapId, FALSE);
     }
-    func_0200a034(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, func_02008bf4(info));
+    WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
-BOOL func_02011b30(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {
+BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {
     WifiList *wifiList = GameData_GetWifiList(gameData);
     int i;
 
@@ -142,14 +142,14 @@ BOOL func_02011b30(GameData *gameData, PlayerInfo *info, const void *friendData,
         return FALSE;
     }
     for (i = 0; i < WIFI_LIST_FRIEND_MAX; i++) {
-        DWCFriendData *other = func_0200a0e4(wifiList, i);
+        DWCFriendData *other = WifiList_GetFriendData(wifiList, i);
         int result;
 
-        if (!func_0200a138(wifiList, i)) {
+        if (!WifiList_IsFriendValid(wifiList, i)) {
             addFriend(gameData, info, friendData, i, heapId, FRIEND_ADD_NEW);
             return TRUE;
         }
-        result = compareFriendData((DWCFriendData *)friendData, func_02009f7c(wifiList), other);
+        result = compareFriendData((DWCFriendData *)friendData, WifiList_GetMyUserData(wifiList), other);
         if (result == FRIEND_CHECK_SAME) {
             addFriend(gameData, info, friendData, i, heapId, FRIEND_ADD_VIEW);
             return FALSE;

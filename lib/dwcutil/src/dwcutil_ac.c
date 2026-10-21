@@ -1,11 +1,793 @@
+#include <string.h>
+// Before dwc/ext.h: MWCC copies and clears the blocks of a size it knows in place, as the ROM does, only when
+// <string.h> declares memcpy and memset first
+#include "dwc/ext.h"
+#include "dwc/md5.h"
+#include "dwc_wcm.h"
 #include "dwcutil/dwcutil_ac.h"
-#include "dwc/wcm.h"
+#ifdef PLATFORM_PC
+#include "port_wcm.h"
+// Native pointers enlarge the active DS backend; reserve its aligned extent before placing the BSS and AP buffers.
+#define UTIL_AC_WCM_WORK_SIZE ((u32)PORT_WCM_DS_WORK_SIZE)
+_Static_assert(PORT_WCM_DS_WORK_SIZE <= 0x7fffffff, "WCM workspace fits the SDK size argument");
+#define UTIL_AC_WCM_BUFFER_SIZE (0x2490 + UTIL_AC_WCM_WORK_SIZE - WCM_WORK_SIZE)
+#define UTIL_AC_WCM_ALLOC_OVERHEAD (0x24d0 + UTIL_AC_WCM_WORK_SIZE - WCM_WORK_SIZE)
+_Static_assert(sizeof(WCMConfig) <= 0x20, "WCM configuration must fit its aligned slot");
+_Static_assert(sizeof(WMBssDesc) == 0xc0, "WCM BSS descriptor keeps its DS layout");
+#else
+#define UTIL_AC_WCM_WORK_SIZE WCM_WORK_SIZE
+#define UTIL_AC_WCM_BUFFER_SIZE 0x2490
+#define UTIL_AC_WCM_ALLOC_OVERHEAD 0x24d0
+#endif
 #include "nitro/mi.h"
+#include "nitro/os.h"
+#include "nitro/wm.h"
+#include "nitrowifi/soc.h"
+#include "nitrowifi/wcm.h"
 
-// The access-point connection of DWC's settings (see dwcutil_ac.h): the second copy of the WCM wrapper, and the code
-// that drives it. The name says the utility's copy, because ARM9 main has a dwc_ac.c of its own (lib/dwc/src/ac)
+// The access point setup of DWC's settings (see dwcutil_ac.h). A thread scans until an access point opens its setup,
+// joins it, and over UDP broadcasts on port 486 trades a hello and a session key for the settings of the network,
+// each message encrypted with AES key wrap. Under it are a second copy of the wrapper around the WCM (dwc_wcm.c), with
+// its events in a ring of four, and in the middle Rijndael's reference AES (rijndael-alg-fst.c) and RFC 1321's MD5.
+// The original has all of it in one object: the AES's tables sort among the setup's state and the MD5's padding sits
+// among the other code's data. The ROM names none of it: the names are ours, those of the AES and MD5 code after their
+// references
 
-int func_ov182_021a7bcc(void *dest, int max) {
+// Where the wrapper is (the same numbers as in dwc_wcm.c)
+enum {
+    STATE_OFF,
+    STATE_INITIALIZED,
+    STATE_CLEANING_UP,
+    STATE_IDLE,
+    STATE_STOPPING,
+    STATE_SEARCHING,
+    STATE_SEARCH_STARTING,
+    STATE_CONNECTED,
+    STATE_CONNECTING,
+};
+
+// The messages that the alarms put in the ring of events
+#define EVENT_CONNECT_TIMEOUT 0x12
+#define EVENT_SCAN_TIMEOUT 0x13
+
+// The setup's own errors, as the result says them
+#define RESULT_OK 1
+#define RESULT_NO_MEMORY (-1)
+#define RESULT_WIRELESS (-2)
+#define RESULT_SCAN_TIMEOUT (-3)
+#define RESULT_HELLO_TIMEOUT (-4)
+#define RESULT_FAILED (-5)
+#define RESULT_TOO_MANY_APS (-6)
+#define RESULT_BAD_KEY (-7)
+#define RESULT_CANCELLED (-8)
+#define RESULT_NO_THREADS (-9)
+#define RESULT_BUSY (-10)
+
+// The state that the setup reports (DWCUtilAcStatus's)
+enum {
+    AC_STATE_IDLE,
+    AC_STATE_SCANNING,
+    AC_STATE_SCANNED,
+    AC_STATE_FOUND,
+    AC_STATE_HELLO,
+    AC_STATE_KEY,
+    AC_STATE_DONE,
+    AC_STATE_FAILED,
+};
+
+typedef struct {
+    u8 *items;     // 0x00: where a message's items go, after its header
+    BOOL debug;    // 0x04: formats the MAC addresses (for a print that is left out)
+    u32 stackSize; // 0x08
+    u32 deadline;  // 0x0c: in milliseconds, 0xffffffff for none
+    int apCount;   // 0x10: DWCUtilAc_Start's, which nothing reads
+} UtilAcConfig;
+
+typedef struct MacAddress {
+    u8 bytes[6];
+} MacAddress;
+
+// A key of the settings
+typedef struct UtilAcWepKey {
+    u32 format; // 0x00: 1 for a key in hex
+    u32 type;   // 0x04
+    char key[0x20];
+} UtilAcWepKey;
+
+// The settings that the access point sends
+typedef struct UtilAcSettings {
+    u8 unk_000[0x100];
+    char ssid[0x20]; // 0x100
+    u8 unk_120[0xc];
+    u32 security; // 0x12c: 0 none, 1 WEP, 2 and 3 a passphrase
+    u32 keyCount; // 0x130
+    u8 unk_134[0x28];
+    UtilAcWepKey keys[4]; // 0x15c
+    u8 passphrase[0x48];  // 0x1fc
+    u8 unk_244[0x10];
+} UtilAcSettings;
+
+// An access point that a scan found, and the scan
+typedef struct UtilAcScanEntry {
+    u32 ssidLength;
+    char ssid[0x24];
+    u8 bssid[6];
+    u16 secure;
+} UtilAcScanEntry;
+
+typedef struct UtilAcScan {
+    u32 count;
+    UtilAcScanEntry entries[1];
+} UtilAcScan;
+
+typedef struct HelloId {
+    u8 bytes[7];
+} HelloId;
+
+static void UtilAcWcm_Notify(WCMNotice *notice);
+static BOOL UtilAcWcm_Abort(void);
+static int UtilAcWcm_GetApList(void *dest, int max);
+static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 option);
+static BOOL UtilAcWcm_Disconnect(void);
+static BOOL UtilAcWcm_Cleanup(void);
+static BOOL UtilAcWcm_Connect(const void *bssDesc, const void *wepDesc, u32 option);
+static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size);
+static int UtilAcWcm_GetState(void);
+static void *UtilAc_SocAlloc(u32 name, s32 size);
+static void UtilAc_SocFree(u32 name, void *ptr, s32 size);
+static void UtilAc_ClearEvents(void);
+static int UtilAc_PopEvent(void);
+static void UtilAc_OnEvent(int event, int param);
+static void UtilAc_OnAlarm(void *arg);
+static int UtilAc_StartWcm(int apCount);
+static int UtilAc_EndWcm(void);
+static int UtilAc_Connect(void);
+static void UtilAc_Disconnect(void);
+static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous, int *index);
+static int UtilAc_Scan(void);
+static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, const void *data, int length);
+static int UtilAc_Broadcast(int sock, const void *data, int length);
+static int UtilAc_Send(int sock, const SocAddrIn *from, const void *data, int length);
+static const u8 *UtilAc_ParsePacket(const u8 *packet, u32 *type, u32 *length);
+static const u8 *UtilAc_NextItem(const u8 **cursor, const u8 *end, u32 *type, u32 *length);
+static const u8 *UtilAc_FirstItem(const u8 *message, u32 *type, u32 *length);
+static int UtilAc_BuildPacket(u8 *out, int type, u8 *message, int length, const u8 *key);
+static u8 *UtilAc_AppendItem(u8 *out, int type, const void *data, int length);
+static int UtilAc_BuildMessage(u8 *out, int type, const void *data, int length);
+static int UtilAc_ParseHello(const u8 *packet, int *secure);
+static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key);
+static int UtilAc_BuildHello(u8 *out);
+static int UtilAc_GetMacAddress(u8 *mac);
+static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from);
+static int UtilAc_ParseSettings(const u8 *message);
+static int UtilAc_ParseHex(u8 *out, const char *text, int length);
+static int UtilAc_MakeResult(void);
+static int UtilAc_Run(void);
+static void UtilAc_Thread(void *arg);
+static int UtilAc_AesWrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength);
+static int UtilAc_AesUnwrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength);
+static void UtilAc_Xor8(const u8 *a, const u8 *b, u8 *out);
+static int rijndaelKeySetupEnc(u32 *rk, const u8 *cipherKey, int keyBits);
+static int rijndaelKeySetupDec(u32 *rk, const u8 *cipherKey, int keyBits);
+static void rijndaelEncrypt(const u32 *rk, int Nr, const u8 *pt, u8 *ct);
+static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt);
+static void UtilAc_MD5Init(HashContext *context);
+static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen);
+static void UtilAc_MD5Final(u8 *digest, HashContext *context);
+static void UtilAc_MD5Transform(u32 *state, const u8 *block);
+static void UtilAc_MD5Encode(u8 *output, const u32 *input, u32 length);
+static void UtilAc_MD5Decode(u32 *output, const u8 *input, u32 length);
+static void UtilAc_MD5Memcpy(u8 *output, const u8 *input, u32 length);
+static void UtilAc_MD5Memset(char *output, int value, u32 length);
+static void UtilAc_Md5(u8 *digest, const u8 *data, u32 length);
+static u32 UtilAc_GetMilliseconds(void);
+static void *UtilAc_Calloc(int count, int size);
+static void UtilAc_Free(void *ptr);
+static int UtilAc_FormatHexByte(char *out, s8 value);
+static int UtilAc_FormatMacAddress(char *out, const s8 *mac);
+static int UtilAc_GetStatus(DWCUtilAcStatus *status);
+static void UtilAc_NotifyStatus(void);
+
+// MWCC 2.0 gives each of these a section of its own and lays them out in the reverse of their definitions
+static u8 sAcPacket[0x800];
+static u8 sAcMessage[0x800];
+static char sAcApSsid[0x21];
+static u8 sAcEssid[0x20];
+static u8 sAcSessionKey[0x20];
+// The key of the first exchange: the two MAC addresses, the greater first, and "WARP"
+static u8 sAcKey[0x10];
+static u8 sAcBssid[6];
+static u8 sAcApMac[6];
+static u8 sAcOwnMac[6];
+static const HelloId sAcHelloId = { { 6, 0, 1, 2, 3, 4, 5 } };
+static UtilAcConfig sAcConfig = { sAcMessage + 8, TRUE, 0x800, 0xffffffff, 0x40 };
+static char sAcHostName[12]; // Defined before the socket functions, where the ROM's .data has it
+// Fixed addresses on the access point's network, in network order: 192.168.0.176/24, with 192.168.0.200 as the
+// gateway and 192.168.0.32 as the DNS server
+static SocConfig sAcSocConfig = {
+    0x01000000,
+    UtilAc_SocAlloc,
+    UtilAc_SocFree,
+    FALSE,
+    0xb000a8c0,
+    0x00ffffff,
+    0xc800a8c0,
+    0x2000a8c0,
+    0,
+    0x1000,
+    0x1000,
+    0,
+    0,
+    { 0, 0, 0, 0, 0, (uptr)sAcHostName, 4, 0, 0 },
+};
+// The setup's state, defined with initializers so that the functions reach it from one base. MWCC 2.0 lays out the
+// initialized objects defined above a file's first function by size with one heapsort, each in its own section (.bss,
+// .data or .rodata), and this order of definitions gives the ROM's layout. Rijndael's tables take part: defined among
+// the state, the ten tables of 1024 bytes come out in the ROM's order (Td2 to Td4, Te0 to Te4, Td0, Td1)
+static UtilAcSettings sAcSettings = { 0 };
+static DWCUtilAcResult sAcResult = { 0 };
+static OSThread sAcThread = { 0 };
+static OSMutex sAcSocMutex = { 0 };
+static int sAcEvents[4] = { 0 };
+static u8 sAcHasSsid = 0; // Whether the settings named the network, which the last message tells
+static void *sAcWepDesc = NULL;
+static int sAcWcmState = 0;
+static BOOL sAcSocStarted = FALSE;
+static int sAcPacketSize = 0;
+static BOOL sAcCancel = FALSE;
+// Rijndael (AES) as in rijndael-alg-fst.c
+static const u32 Te0[256] = {
+    0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d, 0xfff2f20d, 0xd66b6bbd, 0xde6f6fb1, 0x91c5c554, 0x60303050,
+    0x02010103, 0xce6767a9, 0x562b2b7d, 0xe7fefe19, 0xb5d7d762, 0x4dababe6, 0xec76769a, 0x8fcaca45, 0x1f82829d,
+    0x89c9c940, 0xfa7d7d87, 0xeffafa15, 0xb25959eb, 0x8e4747c9, 0xfbf0f00b, 0x41adadec, 0xb3d4d467, 0x5fa2a2fd,
+    0x45afafea, 0x239c9cbf, 0x53a4a4f7, 0xe4727296, 0x9bc0c05b, 0x75b7b7c2, 0xe1fdfd1c, 0x3d9393ae, 0x4c26266a,
+    0x6c36365a, 0x7e3f3f41, 0xf5f7f702, 0x83cccc4f, 0x6834345c, 0x51a5a5f4, 0xd1e5e534, 0xf9f1f108, 0xe2717193,
+    0xabd8d873, 0x62313153, 0x2a15153f, 0x0804040c, 0x95c7c752, 0x46232365, 0x9dc3c35e, 0x30181828, 0x379696a1,
+    0x0a05050f, 0x2f9a9ab5, 0x0e070709, 0x24121236, 0x1b80809b, 0xdfe2e23d, 0xcdebeb26, 0x4e272769, 0x7fb2b2cd,
+    0xea75759f, 0x1209091b, 0x1d83839e, 0x582c2c74, 0x341a1a2e, 0x361b1b2d, 0xdc6e6eb2, 0xb45a5aee, 0x5ba0a0fb,
+    0xa45252f6, 0x763b3b4d, 0xb7d6d661, 0x7db3b3ce, 0x5229297b, 0xdde3e33e, 0x5e2f2f71, 0x13848497, 0xa65353f5,
+    0xb9d1d168, 0x00000000, 0xc1eded2c, 0x40202060, 0xe3fcfc1f, 0x79b1b1c8, 0xb65b5bed, 0xd46a6abe, 0x8dcbcb46,
+    0x67bebed9, 0x7239394b, 0x944a4ade, 0x984c4cd4, 0xb05858e8, 0x85cfcf4a, 0xbbd0d06b, 0xc5efef2a, 0x4faaaae5,
+    0xedfbfb16, 0x864343c5, 0x9a4d4dd7, 0x66333355, 0x11858594, 0x8a4545cf, 0xe9f9f910, 0x04020206, 0xfe7f7f81,
+    0xa05050f0, 0x783c3c44, 0x259f9fba, 0x4ba8a8e3, 0xa25151f3, 0x5da3a3fe, 0x804040c0, 0x058f8f8a, 0x3f9292ad,
+    0x219d9dbc, 0x70383848, 0xf1f5f504, 0x63bcbcdf, 0x77b6b6c1, 0xafdada75, 0x42212163, 0x20101030, 0xe5ffff1a,
+    0xfdf3f30e, 0xbfd2d26d, 0x81cdcd4c, 0x180c0c14, 0x26131335, 0xc3ecec2f, 0xbe5f5fe1, 0x359797a2, 0x884444cc,
+    0x2e171739, 0x93c4c457, 0x55a7a7f2, 0xfc7e7e82, 0x7a3d3d47, 0xc86464ac, 0xba5d5de7, 0x3219192b, 0xe6737395,
+    0xc06060a0, 0x19818198, 0x9e4f4fd1, 0xa3dcdc7f, 0x44222266, 0x542a2a7e, 0x3b9090ab, 0x0b888883, 0x8c4646ca,
+    0xc7eeee29, 0x6bb8b8d3, 0x2814143c, 0xa7dede79, 0xbc5e5ee2, 0x160b0b1d, 0xaddbdb76, 0xdbe0e03b, 0x64323256,
+    0x743a3a4e, 0x140a0a1e, 0x924949db, 0x0c06060a, 0x4824246c, 0xb85c5ce4, 0x9fc2c25d, 0xbdd3d36e, 0x43acacef,
+    0xc46262a6, 0x399191a8, 0x319595a4, 0xd3e4e437, 0xf279798b, 0xd5e7e732, 0x8bc8c843, 0x6e373759, 0xda6d6db7,
+    0x018d8d8c, 0xb1d5d564, 0x9c4e4ed2, 0x49a9a9e0, 0xd86c6cb4, 0xac5656fa, 0xf3f4f407, 0xcfeaea25, 0xca6565af,
+    0xf47a7a8e, 0x47aeaee9, 0x10080818, 0x6fbabad5, 0xf0787888, 0x4a25256f, 0x5c2e2e72, 0x381c1c24, 0x57a6a6f1,
+    0x73b4b4c7, 0x97c6c651, 0xcbe8e823, 0xa1dddd7c, 0xe874749c, 0x3e1f1f21, 0x964b4bdd, 0x61bdbddc, 0x0d8b8b86,
+    0x0f8a8a85, 0xe0707090, 0x7c3e3e42, 0x71b5b5c4, 0xcc6666aa, 0x904848d8, 0x06030305, 0xf7f6f601, 0x1c0e0e12,
+    0xc26161a3, 0x6a35355f, 0xae5757f9, 0x69b9b9d0, 0x17868691, 0x99c1c158, 0x3a1d1d27, 0x279e9eb9, 0xd9e1e138,
+    0xebf8f813, 0x2b9898b3, 0x22111133, 0xd26969bb, 0xa9d9d970, 0x078e8e89, 0x339494a7, 0x2d9b9bb6, 0x3c1e1e22,
+    0x15878792, 0xc9e9e920, 0x87cece49, 0xaa5555ff, 0x50282878, 0xa5dfdf7a, 0x038c8c8f, 0x59a1a1f8, 0x09898980,
+    0x1a0d0d17, 0x65bfbfda, 0xd7e6e631, 0x844242c6, 0xd06868b8, 0x824141c3, 0x299999b0, 0x5a2d2d77, 0x1e0f0f11,
+    0x7bb0b0cb, 0xa85454fc, 0x6dbbbbd6, 0x2c16163a,
+};
+static const u32 Te1[256] = {
+    0xa5c66363, 0x84f87c7c, 0x99ee7777, 0x8df67b7b, 0x0dfff2f2, 0xbdd66b6b, 0xb1de6f6f, 0x5491c5c5, 0x50603030,
+    0x03020101, 0xa9ce6767, 0x7d562b2b, 0x19e7fefe, 0x62b5d7d7, 0xe64dabab, 0x9aec7676, 0x458fcaca, 0x9d1f8282,
+    0x4089c9c9, 0x87fa7d7d, 0x15effafa, 0xebb25959, 0xc98e4747, 0x0bfbf0f0, 0xec41adad, 0x67b3d4d4, 0xfd5fa2a2,
+    0xea45afaf, 0xbf239c9c, 0xf753a4a4, 0x96e47272, 0x5b9bc0c0, 0xc275b7b7, 0x1ce1fdfd, 0xae3d9393, 0x6a4c2626,
+    0x5a6c3636, 0x417e3f3f, 0x02f5f7f7, 0x4f83cccc, 0x5c683434, 0xf451a5a5, 0x34d1e5e5, 0x08f9f1f1, 0x93e27171,
+    0x73abd8d8, 0x53623131, 0x3f2a1515, 0x0c080404, 0x5295c7c7, 0x65462323, 0x5e9dc3c3, 0x28301818, 0xa1379696,
+    0x0f0a0505, 0xb52f9a9a, 0x090e0707, 0x36241212, 0x9b1b8080, 0x3ddfe2e2, 0x26cdebeb, 0x694e2727, 0xcd7fb2b2,
+    0x9fea7575, 0x1b120909, 0x9e1d8383, 0x74582c2c, 0x2e341a1a, 0x2d361b1b, 0xb2dc6e6e, 0xeeb45a5a, 0xfb5ba0a0,
+    0xf6a45252, 0x4d763b3b, 0x61b7d6d6, 0xce7db3b3, 0x7b522929, 0x3edde3e3, 0x715e2f2f, 0x97138484, 0xf5a65353,
+    0x68b9d1d1, 0x00000000, 0x2cc1eded, 0x60402020, 0x1fe3fcfc, 0xc879b1b1, 0xedb65b5b, 0xbed46a6a, 0x468dcbcb,
+    0xd967bebe, 0x4b723939, 0xde944a4a, 0xd4984c4c, 0xe8b05858, 0x4a85cfcf, 0x6bbbd0d0, 0x2ac5efef, 0xe54faaaa,
+    0x16edfbfb, 0xc5864343, 0xd79a4d4d, 0x55663333, 0x94118585, 0xcf8a4545, 0x10e9f9f9, 0x06040202, 0x81fe7f7f,
+    0xf0a05050, 0x44783c3c, 0xba259f9f, 0xe34ba8a8, 0xf3a25151, 0xfe5da3a3, 0xc0804040, 0x8a058f8f, 0xad3f9292,
+    0xbc219d9d, 0x48703838, 0x04f1f5f5, 0xdf63bcbc, 0xc177b6b6, 0x75afdada, 0x63422121, 0x30201010, 0x1ae5ffff,
+    0x0efdf3f3, 0x6dbfd2d2, 0x4c81cdcd, 0x14180c0c, 0x35261313, 0x2fc3ecec, 0xe1be5f5f, 0xa2359797, 0xcc884444,
+    0x392e1717, 0x5793c4c4, 0xf255a7a7, 0x82fc7e7e, 0x477a3d3d, 0xacc86464, 0xe7ba5d5d, 0x2b321919, 0x95e67373,
+    0xa0c06060, 0x98198181, 0xd19e4f4f, 0x7fa3dcdc, 0x66442222, 0x7e542a2a, 0xab3b9090, 0x830b8888, 0xca8c4646,
+    0x29c7eeee, 0xd36bb8b8, 0x3c281414, 0x79a7dede, 0xe2bc5e5e, 0x1d160b0b, 0x76addbdb, 0x3bdbe0e0, 0x56643232,
+    0x4e743a3a, 0x1e140a0a, 0xdb924949, 0x0a0c0606, 0x6c482424, 0xe4b85c5c, 0x5d9fc2c2, 0x6ebdd3d3, 0xef43acac,
+    0xa6c46262, 0xa8399191, 0xa4319595, 0x37d3e4e4, 0x8bf27979, 0x32d5e7e7, 0x438bc8c8, 0x596e3737, 0xb7da6d6d,
+    0x8c018d8d, 0x64b1d5d5, 0xd29c4e4e, 0xe049a9a9, 0xb4d86c6c, 0xfaac5656, 0x07f3f4f4, 0x25cfeaea, 0xafca6565,
+    0x8ef47a7a, 0xe947aeae, 0x18100808, 0xd56fbaba, 0x88f07878, 0x6f4a2525, 0x725c2e2e, 0x24381c1c, 0xf157a6a6,
+    0xc773b4b4, 0x5197c6c6, 0x23cbe8e8, 0x7ca1dddd, 0x9ce87474, 0x213e1f1f, 0xdd964b4b, 0xdc61bdbd, 0x860d8b8b,
+    0x850f8a8a, 0x90e07070, 0x427c3e3e, 0xc471b5b5, 0xaacc6666, 0xd8904848, 0x05060303, 0x01f7f6f6, 0x121c0e0e,
+    0xa3c26161, 0x5f6a3535, 0xf9ae5757, 0xd069b9b9, 0x91178686, 0x5899c1c1, 0x273a1d1d, 0xb9279e9e, 0x38d9e1e1,
+    0x13ebf8f8, 0xb32b9898, 0x33221111, 0xbbd26969, 0x70a9d9d9, 0x89078e8e, 0xa7339494, 0xb62d9b9b, 0x223c1e1e,
+    0x92158787, 0x20c9e9e9, 0x4987cece, 0xffaa5555, 0x78502828, 0x7aa5dfdf, 0x8f038c8c, 0xf859a1a1, 0x80098989,
+    0x171a0d0d, 0xda65bfbf, 0x31d7e6e6, 0xc6844242, 0xb8d06868, 0xc3824141, 0xb0299999, 0x775a2d2d, 0x111e0f0f,
+    0xcb7bb0b0, 0xfca85454, 0xd66dbbbb, 0x3a2c1616,
+};
+static const u32 Te2[256] = {
+    0x63a5c663, 0x7c84f87c, 0x7799ee77, 0x7b8df67b, 0xf20dfff2, 0x6bbdd66b, 0x6fb1de6f, 0xc55491c5, 0x30506030,
+    0x01030201, 0x67a9ce67, 0x2b7d562b, 0xfe19e7fe, 0xd762b5d7, 0xabe64dab, 0x769aec76, 0xca458fca, 0x829d1f82,
+    0xc94089c9, 0x7d87fa7d, 0xfa15effa, 0x59ebb259, 0x47c98e47, 0xf00bfbf0, 0xadec41ad, 0xd467b3d4, 0xa2fd5fa2,
+    0xafea45af, 0x9cbf239c, 0xa4f753a4, 0x7296e472, 0xc05b9bc0, 0xb7c275b7, 0xfd1ce1fd, 0x93ae3d93, 0x266a4c26,
+    0x365a6c36, 0x3f417e3f, 0xf702f5f7, 0xcc4f83cc, 0x345c6834, 0xa5f451a5, 0xe534d1e5, 0xf108f9f1, 0x7193e271,
+    0xd873abd8, 0x31536231, 0x153f2a15, 0x040c0804, 0xc75295c7, 0x23654623, 0xc35e9dc3, 0x18283018, 0x96a13796,
+    0x050f0a05, 0x9ab52f9a, 0x07090e07, 0x12362412, 0x809b1b80, 0xe23ddfe2, 0xeb26cdeb, 0x27694e27, 0xb2cd7fb2,
+    0x759fea75, 0x091b1209, 0x839e1d83, 0x2c74582c, 0x1a2e341a, 0x1b2d361b, 0x6eb2dc6e, 0x5aeeb45a, 0xa0fb5ba0,
+    0x52f6a452, 0x3b4d763b, 0xd661b7d6, 0xb3ce7db3, 0x297b5229, 0xe33edde3, 0x2f715e2f, 0x84971384, 0x53f5a653,
+    0xd168b9d1, 0x00000000, 0xed2cc1ed, 0x20604020, 0xfc1fe3fc, 0xb1c879b1, 0x5bedb65b, 0x6abed46a, 0xcb468dcb,
+    0xbed967be, 0x394b7239, 0x4ade944a, 0x4cd4984c, 0x58e8b058, 0xcf4a85cf, 0xd06bbbd0, 0xef2ac5ef, 0xaae54faa,
+    0xfb16edfb, 0x43c58643, 0x4dd79a4d, 0x33556633, 0x85941185, 0x45cf8a45, 0xf910e9f9, 0x02060402, 0x7f81fe7f,
+    0x50f0a050, 0x3c44783c, 0x9fba259f, 0xa8e34ba8, 0x51f3a251, 0xa3fe5da3, 0x40c08040, 0x8f8a058f, 0x92ad3f92,
+    0x9dbc219d, 0x38487038, 0xf504f1f5, 0xbcdf63bc, 0xb6c177b6, 0xda75afda, 0x21634221, 0x10302010, 0xff1ae5ff,
+    0xf30efdf3, 0xd26dbfd2, 0xcd4c81cd, 0x0c14180c, 0x13352613, 0xec2fc3ec, 0x5fe1be5f, 0x97a23597, 0x44cc8844,
+    0x17392e17, 0xc45793c4, 0xa7f255a7, 0x7e82fc7e, 0x3d477a3d, 0x64acc864, 0x5de7ba5d, 0x192b3219, 0x7395e673,
+    0x60a0c060, 0x81981981, 0x4fd19e4f, 0xdc7fa3dc, 0x22664422, 0x2a7e542a, 0x90ab3b90, 0x88830b88, 0x46ca8c46,
+    0xee29c7ee, 0xb8d36bb8, 0x143c2814, 0xde79a7de, 0x5ee2bc5e, 0x0b1d160b, 0xdb76addb, 0xe03bdbe0, 0x32566432,
+    0x3a4e743a, 0x0a1e140a, 0x49db9249, 0x060a0c06, 0x246c4824, 0x5ce4b85c, 0xc25d9fc2, 0xd36ebdd3, 0xacef43ac,
+    0x62a6c462, 0x91a83991, 0x95a43195, 0xe437d3e4, 0x798bf279, 0xe732d5e7, 0xc8438bc8, 0x37596e37, 0x6db7da6d,
+    0x8d8c018d, 0xd564b1d5, 0x4ed29c4e, 0xa9e049a9, 0x6cb4d86c, 0x56faac56, 0xf407f3f4, 0xea25cfea, 0x65afca65,
+    0x7a8ef47a, 0xaee947ae, 0x08181008, 0xbad56fba, 0x7888f078, 0x256f4a25, 0x2e725c2e, 0x1c24381c, 0xa6f157a6,
+    0xb4c773b4, 0xc65197c6, 0xe823cbe8, 0xdd7ca1dd, 0x749ce874, 0x1f213e1f, 0x4bdd964b, 0xbddc61bd, 0x8b860d8b,
+    0x8a850f8a, 0x7090e070, 0x3e427c3e, 0xb5c471b5, 0x66aacc66, 0x48d89048, 0x03050603, 0xf601f7f6, 0x0e121c0e,
+    0x61a3c261, 0x355f6a35, 0x57f9ae57, 0xb9d069b9, 0x86911786, 0xc15899c1, 0x1d273a1d, 0x9eb9279e, 0xe138d9e1,
+    0xf813ebf8, 0x98b32b98, 0x11332211, 0x69bbd269, 0xd970a9d9, 0x8e89078e, 0x94a73394, 0x9bb62d9b, 0x1e223c1e,
+    0x87921587, 0xe920c9e9, 0xce4987ce, 0x55ffaa55, 0x28785028, 0xdf7aa5df, 0x8c8f038c, 0xa1f859a1, 0x89800989,
+    0x0d171a0d, 0xbfda65bf, 0xe631d7e6, 0x42c68442, 0x68b8d068, 0x41c38241, 0x99b02999, 0x2d775a2d, 0x0f111e0f,
+    0xb0cb7bb0, 0x54fca854, 0xbbd66dbb, 0x163a2c16,
+};
+static const u32 Te3[256] = {
+    0x6363a5c6, 0x7c7c84f8, 0x777799ee, 0x7b7b8df6, 0xf2f20dff, 0x6b6bbdd6, 0x6f6fb1de, 0xc5c55491, 0x30305060,
+    0x01010302, 0x6767a9ce, 0x2b2b7d56, 0xfefe19e7, 0xd7d762b5, 0xababe64d, 0x76769aec, 0xcaca458f, 0x82829d1f,
+    0xc9c94089, 0x7d7d87fa, 0xfafa15ef, 0x5959ebb2, 0x4747c98e, 0xf0f00bfb, 0xadadec41, 0xd4d467b3, 0xa2a2fd5f,
+    0xafafea45, 0x9c9cbf23, 0xa4a4f753, 0x727296e4, 0xc0c05b9b, 0xb7b7c275, 0xfdfd1ce1, 0x9393ae3d, 0x26266a4c,
+    0x36365a6c, 0x3f3f417e, 0xf7f702f5, 0xcccc4f83, 0x34345c68, 0xa5a5f451, 0xe5e534d1, 0xf1f108f9, 0x717193e2,
+    0xd8d873ab, 0x31315362, 0x15153f2a, 0x04040c08, 0xc7c75295, 0x23236546, 0xc3c35e9d, 0x18182830, 0x9696a137,
+    0x05050f0a, 0x9a9ab52f, 0x0707090e, 0x12123624, 0x80809b1b, 0xe2e23ddf, 0xebeb26cd, 0x2727694e, 0xb2b2cd7f,
+    0x75759fea, 0x09091b12, 0x83839e1d, 0x2c2c7458, 0x1a1a2e34, 0x1b1b2d36, 0x6e6eb2dc, 0x5a5aeeb4, 0xa0a0fb5b,
+    0x5252f6a4, 0x3b3b4d76, 0xd6d661b7, 0xb3b3ce7d, 0x29297b52, 0xe3e33edd, 0x2f2f715e, 0x84849713, 0x5353f5a6,
+    0xd1d168b9, 0x00000000, 0xeded2cc1, 0x20206040, 0xfcfc1fe3, 0xb1b1c879, 0x5b5bedb6, 0x6a6abed4, 0xcbcb468d,
+    0xbebed967, 0x39394b72, 0x4a4ade94, 0x4c4cd498, 0x5858e8b0, 0xcfcf4a85, 0xd0d06bbb, 0xefef2ac5, 0xaaaae54f,
+    0xfbfb16ed, 0x4343c586, 0x4d4dd79a, 0x33335566, 0x85859411, 0x4545cf8a, 0xf9f910e9, 0x02020604, 0x7f7f81fe,
+    0x5050f0a0, 0x3c3c4478, 0x9f9fba25, 0xa8a8e34b, 0x5151f3a2, 0xa3a3fe5d, 0x4040c080, 0x8f8f8a05, 0x9292ad3f,
+    0x9d9dbc21, 0x38384870, 0xf5f504f1, 0xbcbcdf63, 0xb6b6c177, 0xdada75af, 0x21216342, 0x10103020, 0xffff1ae5,
+    0xf3f30efd, 0xd2d26dbf, 0xcdcd4c81, 0x0c0c1418, 0x13133526, 0xecec2fc3, 0x5f5fe1be, 0x9797a235, 0x4444cc88,
+    0x1717392e, 0xc4c45793, 0xa7a7f255, 0x7e7e82fc, 0x3d3d477a, 0x6464acc8, 0x5d5de7ba, 0x19192b32, 0x737395e6,
+    0x6060a0c0, 0x81819819, 0x4f4fd19e, 0xdcdc7fa3, 0x22226644, 0x2a2a7e54, 0x9090ab3b, 0x8888830b, 0x4646ca8c,
+    0xeeee29c7, 0xb8b8d36b, 0x14143c28, 0xdede79a7, 0x5e5ee2bc, 0x0b0b1d16, 0xdbdb76ad, 0xe0e03bdb, 0x32325664,
+    0x3a3a4e74, 0x0a0a1e14, 0x4949db92, 0x06060a0c, 0x24246c48, 0x5c5ce4b8, 0xc2c25d9f, 0xd3d36ebd, 0xacacef43,
+    0x6262a6c4, 0x9191a839, 0x9595a431, 0xe4e437d3, 0x79798bf2, 0xe7e732d5, 0xc8c8438b, 0x3737596e, 0x6d6db7da,
+    0x8d8d8c01, 0xd5d564b1, 0x4e4ed29c, 0xa9a9e049, 0x6c6cb4d8, 0x5656faac, 0xf4f407f3, 0xeaea25cf, 0x6565afca,
+    0x7a7a8ef4, 0xaeaee947, 0x08081810, 0xbabad56f, 0x787888f0, 0x25256f4a, 0x2e2e725c, 0x1c1c2438, 0xa6a6f157,
+    0xb4b4c773, 0xc6c65197, 0xe8e823cb, 0xdddd7ca1, 0x74749ce8, 0x1f1f213e, 0x4b4bdd96, 0xbdbddc61, 0x8b8b860d,
+    0x8a8a850f, 0x707090e0, 0x3e3e427c, 0xb5b5c471, 0x6666aacc, 0x4848d890, 0x03030506, 0xf6f601f7, 0x0e0e121c,
+    0x6161a3c2, 0x35355f6a, 0x5757f9ae, 0xb9b9d069, 0x86869117, 0xc1c15899, 0x1d1d273a, 0x9e9eb927, 0xe1e138d9,
+    0xf8f813eb, 0x9898b32b, 0x11113322, 0x6969bbd2, 0xd9d970a9, 0x8e8e8907, 0x9494a733, 0x9b9bb62d, 0x1e1e223c,
+    0x87879215, 0xe9e920c9, 0xcece4987, 0x5555ffaa, 0x28287850, 0xdfdf7aa5, 0x8c8c8f03, 0xa1a1f859, 0x89898009,
+    0x0d0d171a, 0xbfbfda65, 0xe6e631d7, 0x4242c684, 0x6868b8d0, 0x4141c382, 0x9999b029, 0x2d2d775a, 0x0f0f111e,
+    0xb0b0cb7b, 0x5454fca8, 0xbbbbd66d, 0x16163a2c,
+};
+static const u32 Te4[256] = {
+    0x63636363, 0x7c7c7c7c, 0x77777777, 0x7b7b7b7b, 0xf2f2f2f2, 0x6b6b6b6b, 0x6f6f6f6f, 0xc5c5c5c5, 0x30303030,
+    0x01010101, 0x67676767, 0x2b2b2b2b, 0xfefefefe, 0xd7d7d7d7, 0xabababab, 0x76767676, 0xcacacaca, 0x82828282,
+    0xc9c9c9c9, 0x7d7d7d7d, 0xfafafafa, 0x59595959, 0x47474747, 0xf0f0f0f0, 0xadadadad, 0xd4d4d4d4, 0xa2a2a2a2,
+    0xafafafaf, 0x9c9c9c9c, 0xa4a4a4a4, 0x72727272, 0xc0c0c0c0, 0xb7b7b7b7, 0xfdfdfdfd, 0x93939393, 0x26262626,
+    0x36363636, 0x3f3f3f3f, 0xf7f7f7f7, 0xcccccccc, 0x34343434, 0xa5a5a5a5, 0xe5e5e5e5, 0xf1f1f1f1, 0x71717171,
+    0xd8d8d8d8, 0x31313131, 0x15151515, 0x04040404, 0xc7c7c7c7, 0x23232323, 0xc3c3c3c3, 0x18181818, 0x96969696,
+    0x05050505, 0x9a9a9a9a, 0x07070707, 0x12121212, 0x80808080, 0xe2e2e2e2, 0xebebebeb, 0x27272727, 0xb2b2b2b2,
+    0x75757575, 0x09090909, 0x83838383, 0x2c2c2c2c, 0x1a1a1a1a, 0x1b1b1b1b, 0x6e6e6e6e, 0x5a5a5a5a, 0xa0a0a0a0,
+    0x52525252, 0x3b3b3b3b, 0xd6d6d6d6, 0xb3b3b3b3, 0x29292929, 0xe3e3e3e3, 0x2f2f2f2f, 0x84848484, 0x53535353,
+    0xd1d1d1d1, 0x00000000, 0xedededed, 0x20202020, 0xfcfcfcfc, 0xb1b1b1b1, 0x5b5b5b5b, 0x6a6a6a6a, 0xcbcbcbcb,
+    0xbebebebe, 0x39393939, 0x4a4a4a4a, 0x4c4c4c4c, 0x58585858, 0xcfcfcfcf, 0xd0d0d0d0, 0xefefefef, 0xaaaaaaaa,
+    0xfbfbfbfb, 0x43434343, 0x4d4d4d4d, 0x33333333, 0x85858585, 0x45454545, 0xf9f9f9f9, 0x02020202, 0x7f7f7f7f,
+    0x50505050, 0x3c3c3c3c, 0x9f9f9f9f, 0xa8a8a8a8, 0x51515151, 0xa3a3a3a3, 0x40404040, 0x8f8f8f8f, 0x92929292,
+    0x9d9d9d9d, 0x38383838, 0xf5f5f5f5, 0xbcbcbcbc, 0xb6b6b6b6, 0xdadadada, 0x21212121, 0x10101010, 0xffffffff,
+    0xf3f3f3f3, 0xd2d2d2d2, 0xcdcdcdcd, 0x0c0c0c0c, 0x13131313, 0xecececec, 0x5f5f5f5f, 0x97979797, 0x44444444,
+    0x17171717, 0xc4c4c4c4, 0xa7a7a7a7, 0x7e7e7e7e, 0x3d3d3d3d, 0x64646464, 0x5d5d5d5d, 0x19191919, 0x73737373,
+    0x60606060, 0x81818181, 0x4f4f4f4f, 0xdcdcdcdc, 0x22222222, 0x2a2a2a2a, 0x90909090, 0x88888888, 0x46464646,
+    0xeeeeeeee, 0xb8b8b8b8, 0x14141414, 0xdededede, 0x5e5e5e5e, 0x0b0b0b0b, 0xdbdbdbdb, 0xe0e0e0e0, 0x32323232,
+    0x3a3a3a3a, 0x0a0a0a0a, 0x49494949, 0x06060606, 0x24242424, 0x5c5c5c5c, 0xc2c2c2c2, 0xd3d3d3d3, 0xacacacac,
+    0x62626262, 0x91919191, 0x95959595, 0xe4e4e4e4, 0x79797979, 0xe7e7e7e7, 0xc8c8c8c8, 0x37373737, 0x6d6d6d6d,
+    0x8d8d8d8d, 0xd5d5d5d5, 0x4e4e4e4e, 0xa9a9a9a9, 0x6c6c6c6c, 0x56565656, 0xf4f4f4f4, 0xeaeaeaea, 0x65656565,
+    0x7a7a7a7a, 0xaeaeaeae, 0x08080808, 0xbabababa, 0x78787878, 0x25252525, 0x2e2e2e2e, 0x1c1c1c1c, 0xa6a6a6a6,
+    0xb4b4b4b4, 0xc6c6c6c6, 0xe8e8e8e8, 0xdddddddd, 0x74747474, 0x1f1f1f1f, 0x4b4b4b4b, 0xbdbdbdbd, 0x8b8b8b8b,
+    0x8a8a8a8a, 0x70707070, 0x3e3e3e3e, 0xb5b5b5b5, 0x66666666, 0x48484848, 0x03030303, 0xf6f6f6f6, 0x0e0e0e0e,
+    0x61616161, 0x35353535, 0x57575757, 0xb9b9b9b9, 0x86868686, 0xc1c1c1c1, 0x1d1d1d1d, 0x9e9e9e9e, 0xe1e1e1e1,
+    0xf8f8f8f8, 0x98989898, 0x11111111, 0x69696969, 0xd9d9d9d9, 0x8e8e8e8e, 0x94949494, 0x9b9b9b9b, 0x1e1e1e1e,
+    0x87878787, 0xe9e9e9e9, 0xcececece, 0x55555555, 0x28282828, 0xdfdfdfdf, 0x8c8c8c8c, 0xa1a1a1a1, 0x89898989,
+    0x0d0d0d0d, 0xbfbfbfbf, 0xe6e6e6e6, 0x42424242, 0x68686868, 0x41414141, 0x99999999, 0x2d2d2d2d, 0x0f0f0f0f,
+    0xb0b0b0b0, 0x54545454, 0xbbbbbbbb, 0x16161616,
+};
+static const u32 Td0[256] = {
+    0x51f4a750, 0x7e416553, 0x1a17a4c3, 0x3a275e96, 0x3bab6bcb, 0x1f9d45f1, 0xacfa58ab, 0x4be30393, 0x2030fa55,
+    0xad766df6, 0x88cc7691, 0xf5024c25, 0x4fe5d7fc, 0xc52acbd7, 0x26354480, 0xb562a38f, 0xdeb15a49, 0x25ba1b67,
+    0x45ea0e98, 0x5dfec0e1, 0xc32f7502, 0x814cf012, 0x8d4697a3, 0x6bd3f9c6, 0x038f5fe7, 0x15929c95, 0xbf6d7aeb,
+    0x955259da, 0xd4be832d, 0x587421d3, 0x49e06929, 0x8ec9c844, 0x75c2896a, 0xf48e7978, 0x99583e6b, 0x27b971dd,
+    0xbee14fb6, 0xf088ad17, 0xc920ac66, 0x7dce3ab4, 0x63df4a18, 0xe51a3182, 0x97513360, 0x62537f45, 0xb16477e0,
+    0xbb6bae84, 0xfe81a01c, 0xf9082b94, 0x70486858, 0x8f45fd19, 0x94de6c87, 0x527bf8b7, 0xab73d323, 0x724b02e2,
+    0xe31f8f57, 0x6655ab2a, 0xb2eb2807, 0x2fb5c203, 0x86c57b9a, 0xd33708a5, 0x302887f2, 0x23bfa5b2, 0x02036aba,
+    0xed16825c, 0x8acf1c2b, 0xa779b492, 0xf307f2f0, 0x4e69e2a1, 0x65daf4cd, 0x0605bed5, 0xd134621f, 0xc4a6fe8a,
+    0x342e539d, 0xa2f355a0, 0x058ae132, 0xa4f6eb75, 0x0b83ec39, 0x4060efaa, 0x5e719f06, 0xbd6e1051, 0x3e218af9,
+    0x96dd063d, 0xdd3e05ae, 0x4de6bd46, 0x91548db5, 0x71c45d05, 0x0406d46f, 0x605015ff, 0x1998fb24, 0xd6bde997,
+    0x894043cc, 0x67d99e77, 0xb0e842bd, 0x07898b88, 0xe7195b38, 0x79c8eedb, 0xa17c0a47, 0x7c420fe9, 0xf8841ec9,
+    0x00000000, 0x09808683, 0x322bed48, 0x1e1170ac, 0x6c5a724e, 0xfd0efffb, 0x0f853856, 0x3daed51e, 0x362d3927,
+    0x0a0fd964, 0x685ca621, 0x9b5b54d1, 0x24362e3a, 0x0c0a67b1, 0x9357e70f, 0xb4ee96d2, 0x1b9b919e, 0x80c0c54f,
+    0x61dc20a2, 0x5a774b69, 0x1c121a16, 0xe293ba0a, 0xc0a02ae5, 0x3c22e043, 0x121b171d, 0x0e090d0b, 0xf28bc7ad,
+    0x2db6a8b9, 0x141ea9c8, 0x57f11985, 0xaf75074c, 0xee99ddbb, 0xa37f60fd, 0xf701269f, 0x5c72f5bc, 0x44663bc5,
+    0x5bfb7e34, 0x8b432976, 0xcb23c6dc, 0xb6edfc68, 0xb8e4f163, 0xd731dcca, 0x42638510, 0x13972240, 0x84c61120,
+    0x854a247d, 0xd2bb3df8, 0xaef93211, 0xc729a16d, 0x1d9e2f4b, 0xdcb230f3, 0x0d8652ec, 0x77c1e3d0, 0x2bb3166c,
+    0xa970b999, 0x119448fa, 0x47e96422, 0xa8fc8cc4, 0xa0f03f1a, 0x567d2cd8, 0x223390ef, 0x87494ec7, 0xd938d1c1,
+    0x8ccaa2fe, 0x98d40b36, 0xa6f581cf, 0xa57ade28, 0xdab78e26, 0x3fadbfa4, 0x2c3a9de4, 0x5078920d, 0x6a5fcc9b,
+    0x547e4662, 0xf68d13c2, 0x90d8b8e8, 0x2e39f75e, 0x82c3aff5, 0x9f5d80be, 0x69d0937c, 0x6fd52da9, 0xcf2512b3,
+    0xc8ac993b, 0x10187da7, 0xe89c636e, 0xdb3bbb7b, 0xcd267809, 0x6e5918f4, 0xec9ab701, 0x834f9aa8, 0xe6956e65,
+    0xaaffe67e, 0x21bccf08, 0xef15e8e6, 0xbae79bd9, 0x4a6f36ce, 0xea9f09d4, 0x29b07cd6, 0x31a4b2af, 0x2a3f2331,
+    0xc6a59430, 0x35a266c0, 0x744ebc37, 0xfc82caa6, 0xe090d0b0, 0x33a7d815, 0xf104984a, 0x41ecdaf7, 0x7fcd500e,
+    0x1791f62f, 0x764dd68d, 0x43efb04d, 0xccaa4d54, 0xe49604df, 0x9ed1b5e3, 0x4c6a881b, 0xc12c1fb8, 0x4665517f,
+    0x9d5eea04, 0x018c355d, 0xfa877473, 0xfb0b412e, 0xb3671d5a, 0x92dbd252, 0xe9105633, 0x6dd64713, 0x9ad7618c,
+    0x37a10c7a, 0x59f8148e, 0xeb133c89, 0xcea927ee, 0xb761c935, 0xe11ce5ed, 0x7a47b13c, 0x9cd2df59, 0x55f2733f,
+    0x1814ce79, 0x73c737bf, 0x53f7cdea, 0x5ffdaa5b, 0xdf3d6f14, 0x7844db86, 0xcaaff381, 0xb968c43e, 0x3824342c,
+    0xc2a3405f, 0x161dc372, 0xbce2250c, 0x283c498b, 0xff0d9541, 0x39a80171, 0x080cb3de, 0xd8b4e49c, 0x6456c190,
+    0x7bcb8461, 0xd532b670, 0x486c5c74, 0xd0b85742,
+};
+static const u32 Td1[256] = {
+    0x5051f4a7, 0x537e4165, 0xc31a17a4, 0x963a275e, 0xcb3bab6b, 0xf11f9d45, 0xabacfa58, 0x934be303, 0x552030fa,
+    0xf6ad766d, 0x9188cc76, 0x25f5024c, 0xfc4fe5d7, 0xd7c52acb, 0x80263544, 0x8fb562a3, 0x49deb15a, 0x6725ba1b,
+    0x9845ea0e, 0xe15dfec0, 0x02c32f75, 0x12814cf0, 0xa38d4697, 0xc66bd3f9, 0xe7038f5f, 0x9515929c, 0xebbf6d7a,
+    0xda955259, 0x2dd4be83, 0xd3587421, 0x2949e069, 0x448ec9c8, 0x6a75c289, 0x78f48e79, 0x6b99583e, 0xdd27b971,
+    0xb6bee14f, 0x17f088ad, 0x66c920ac, 0xb47dce3a, 0x1863df4a, 0x82e51a31, 0x60975133, 0x4562537f, 0xe0b16477,
+    0x84bb6bae, 0x1cfe81a0, 0x94f9082b, 0x58704868, 0x198f45fd, 0x8794de6c, 0xb7527bf8, 0x23ab73d3, 0xe2724b02,
+    0x57e31f8f, 0x2a6655ab, 0x07b2eb28, 0x032fb5c2, 0x9a86c57b, 0xa5d33708, 0xf2302887, 0xb223bfa5, 0xba02036a,
+    0x5ced1682, 0x2b8acf1c, 0x92a779b4, 0xf0f307f2, 0xa14e69e2, 0xcd65daf4, 0xd50605be, 0x1fd13462, 0x8ac4a6fe,
+    0x9d342e53, 0xa0a2f355, 0x32058ae1, 0x75a4f6eb, 0x390b83ec, 0xaa4060ef, 0x065e719f, 0x51bd6e10, 0xf93e218a,
+    0x3d96dd06, 0xaedd3e05, 0x464de6bd, 0xb591548d, 0x0571c45d, 0x6f0406d4, 0xff605015, 0x241998fb, 0x97d6bde9,
+    0xcc894043, 0x7767d99e, 0xbdb0e842, 0x8807898b, 0x38e7195b, 0xdb79c8ee, 0x47a17c0a, 0xe97c420f, 0xc9f8841e,
+    0x00000000, 0x83098086, 0x48322bed, 0xac1e1170, 0x4e6c5a72, 0xfbfd0eff, 0x560f8538, 0x1e3daed5, 0x27362d39,
+    0x640a0fd9, 0x21685ca6, 0xd19b5b54, 0x3a24362e, 0xb10c0a67, 0x0f9357e7, 0xd2b4ee96, 0x9e1b9b91, 0x4f80c0c5,
+    0xa261dc20, 0x695a774b, 0x161c121a, 0x0ae293ba, 0xe5c0a02a, 0x433c22e0, 0x1d121b17, 0x0b0e090d, 0xadf28bc7,
+    0xb92db6a8, 0xc8141ea9, 0x8557f119, 0x4caf7507, 0xbbee99dd, 0xfda37f60, 0x9ff70126, 0xbc5c72f5, 0xc544663b,
+    0x345bfb7e, 0x768b4329, 0xdccb23c6, 0x68b6edfc, 0x63b8e4f1, 0xcad731dc, 0x10426385, 0x40139722, 0x2084c611,
+    0x7d854a24, 0xf8d2bb3d, 0x11aef932, 0x6dc729a1, 0x4b1d9e2f, 0xf3dcb230, 0xec0d8652, 0xd077c1e3, 0x6c2bb316,
+    0x99a970b9, 0xfa119448, 0x2247e964, 0xc4a8fc8c, 0x1aa0f03f, 0xd8567d2c, 0xef223390, 0xc787494e, 0xc1d938d1,
+    0xfe8ccaa2, 0x3698d40b, 0xcfa6f581, 0x28a57ade, 0x26dab78e, 0xa43fadbf, 0xe42c3a9d, 0x0d507892, 0x9b6a5fcc,
+    0x62547e46, 0xc2f68d13, 0xe890d8b8, 0x5e2e39f7, 0xf582c3af, 0xbe9f5d80, 0x7c69d093, 0xa96fd52d, 0xb3cf2512,
+    0x3bc8ac99, 0xa710187d, 0x6ee89c63, 0x7bdb3bbb, 0x09cd2678, 0xf46e5918, 0x01ec9ab7, 0xa8834f9a, 0x65e6956e,
+    0x7eaaffe6, 0x0821bccf, 0xe6ef15e8, 0xd9bae79b, 0xce4a6f36, 0xd4ea9f09, 0xd629b07c, 0xaf31a4b2, 0x312a3f23,
+    0x30c6a594, 0xc035a266, 0x37744ebc, 0xa6fc82ca, 0xb0e090d0, 0x1533a7d8, 0x4af10498, 0xf741ecda, 0x0e7fcd50,
+    0x2f1791f6, 0x8d764dd6, 0x4d43efb0, 0x54ccaa4d, 0xdfe49604, 0xe39ed1b5, 0x1b4c6a88, 0xb8c12c1f, 0x7f466551,
+    0x049d5eea, 0x5d018c35, 0x73fa8774, 0x2efb0b41, 0x5ab3671d, 0x5292dbd2, 0x33e91056, 0x136dd647, 0x8c9ad761,
+    0x7a37a10c, 0x8e59f814, 0x89eb133c, 0xeecea927, 0x35b761c9, 0xede11ce5, 0x3c7a47b1, 0x599cd2df, 0x3f55f273,
+    0x791814ce, 0xbf73c737, 0xea53f7cd, 0x5b5ffdaa, 0x14df3d6f, 0x867844db, 0x81caaff3, 0x3eb968c4, 0x2c382434,
+    0x5fc2a340, 0x72161dc3, 0x0cbce225, 0x8b283c49, 0x41ff0d95, 0x7139a801, 0xde080cb3, 0x9cd8b4e4, 0x906456c1,
+    0x617bcb84, 0x70d532b6, 0x74486c5c, 0x42d0b857,
+};
+static const u32 Td2[256] = {
+    0xa75051f4, 0x65537e41, 0xa4c31a17, 0x5e963a27, 0x6bcb3bab, 0x45f11f9d, 0x58abacfa, 0x03934be3, 0xfa552030,
+    0x6df6ad76, 0x769188cc, 0x4c25f502, 0xd7fc4fe5, 0xcbd7c52a, 0x44802635, 0xa38fb562, 0x5a49deb1, 0x1b6725ba,
+    0x0e9845ea, 0xc0e15dfe, 0x7502c32f, 0xf012814c, 0x97a38d46, 0xf9c66bd3, 0x5fe7038f, 0x9c951592, 0x7aebbf6d,
+    0x59da9552, 0x832dd4be, 0x21d35874, 0x692949e0, 0xc8448ec9, 0x896a75c2, 0x7978f48e, 0x3e6b9958, 0x71dd27b9,
+    0x4fb6bee1, 0xad17f088, 0xac66c920, 0x3ab47dce, 0x4a1863df, 0x3182e51a, 0x33609751, 0x7f456253, 0x77e0b164,
+    0xae84bb6b, 0xa01cfe81, 0x2b94f908, 0x68587048, 0xfd198f45, 0x6c8794de, 0xf8b7527b, 0xd323ab73, 0x02e2724b,
+    0x8f57e31f, 0xab2a6655, 0x2807b2eb, 0xc2032fb5, 0x7b9a86c5, 0x08a5d337, 0x87f23028, 0xa5b223bf, 0x6aba0203,
+    0x825ced16, 0x1c2b8acf, 0xb492a779, 0xf2f0f307, 0xe2a14e69, 0xf4cd65da, 0xbed50605, 0x621fd134, 0xfe8ac4a6,
+    0x539d342e, 0x55a0a2f3, 0xe132058a, 0xeb75a4f6, 0xec390b83, 0xefaa4060, 0x9f065e71, 0x1051bd6e, 0x8af93e21,
+    0x063d96dd, 0x05aedd3e, 0xbd464de6, 0x8db59154, 0x5d0571c4, 0xd46f0406, 0x15ff6050, 0xfb241998, 0xe997d6bd,
+    0x43cc8940, 0x9e7767d9, 0x42bdb0e8, 0x8b880789, 0x5b38e719, 0xeedb79c8, 0x0a47a17c, 0x0fe97c42, 0x1ec9f884,
+    0x00000000, 0x86830980, 0xed48322b, 0x70ac1e11, 0x724e6c5a, 0xfffbfd0e, 0x38560f85, 0xd51e3dae, 0x3927362d,
+    0xd9640a0f, 0xa621685c, 0x54d19b5b, 0x2e3a2436, 0x67b10c0a, 0xe70f9357, 0x96d2b4ee, 0x919e1b9b, 0xc54f80c0,
+    0x20a261dc, 0x4b695a77, 0x1a161c12, 0xba0ae293, 0x2ae5c0a0, 0xe0433c22, 0x171d121b, 0x0d0b0e09, 0xc7adf28b,
+    0xa8b92db6, 0xa9c8141e, 0x198557f1, 0x074caf75, 0xddbbee99, 0x60fda37f, 0x269ff701, 0xf5bc5c72, 0x3bc54466,
+    0x7e345bfb, 0x29768b43, 0xc6dccb23, 0xfc68b6ed, 0xf163b8e4, 0xdccad731, 0x85104263, 0x22401397, 0x112084c6,
+    0x247d854a, 0x3df8d2bb, 0x3211aef9, 0xa16dc729, 0x2f4b1d9e, 0x30f3dcb2, 0x52ec0d86, 0xe3d077c1, 0x166c2bb3,
+    0xb999a970, 0x48fa1194, 0x642247e9, 0x8cc4a8fc, 0x3f1aa0f0, 0x2cd8567d, 0x90ef2233, 0x4ec78749, 0xd1c1d938,
+    0xa2fe8cca, 0x0b3698d4, 0x81cfa6f5, 0xde28a57a, 0x8e26dab7, 0xbfa43fad, 0x9de42c3a, 0x920d5078, 0xcc9b6a5f,
+    0x4662547e, 0x13c2f68d, 0xb8e890d8, 0xf75e2e39, 0xaff582c3, 0x80be9f5d, 0x937c69d0, 0x2da96fd5, 0x12b3cf25,
+    0x993bc8ac, 0x7da71018, 0x636ee89c, 0xbb7bdb3b, 0x7809cd26, 0x18f46e59, 0xb701ec9a, 0x9aa8834f, 0x6e65e695,
+    0xe67eaaff, 0xcf0821bc, 0xe8e6ef15, 0x9bd9bae7, 0x36ce4a6f, 0x09d4ea9f, 0x7cd629b0, 0xb2af31a4, 0x23312a3f,
+    0x9430c6a5, 0x66c035a2, 0xbc37744e, 0xcaa6fc82, 0xd0b0e090, 0xd81533a7, 0x984af104, 0xdaf741ec, 0x500e7fcd,
+    0xf62f1791, 0xd68d764d, 0xb04d43ef, 0x4d54ccaa, 0x04dfe496, 0xb5e39ed1, 0x881b4c6a, 0x1fb8c12c, 0x517f4665,
+    0xea049d5e, 0x355d018c, 0x7473fa87, 0x412efb0b, 0x1d5ab367, 0xd25292db, 0x5633e910, 0x47136dd6, 0x618c9ad7,
+    0x0c7a37a1, 0x148e59f8, 0x3c89eb13, 0x27eecea9, 0xc935b761, 0xe5ede11c, 0xb13c7a47, 0xdf599cd2, 0x733f55f2,
+    0xce791814, 0x37bf73c7, 0xcdea53f7, 0xaa5b5ffd, 0x6f14df3d, 0xdb867844, 0xf381caaf, 0xc43eb968, 0x342c3824,
+    0x405fc2a3, 0xc372161d, 0x250cbce2, 0x498b283c, 0x9541ff0d, 0x017139a8, 0xb3de080c, 0xe49cd8b4, 0xc1906456,
+    0x84617bcb, 0xb670d532, 0x5c74486c, 0x5742d0b8,
+};
+static const u32 Td3[256] = {
+    0xf4a75051, 0x4165537e, 0x17a4c31a, 0x275e963a, 0xab6bcb3b, 0x9d45f11f, 0xfa58abac, 0xe303934b, 0x30fa5520,
+    0x766df6ad, 0xcc769188, 0x024c25f5, 0xe5d7fc4f, 0x2acbd7c5, 0x35448026, 0x62a38fb5, 0xb15a49de, 0xba1b6725,
+    0xea0e9845, 0xfec0e15d, 0x2f7502c3, 0x4cf01281, 0x4697a38d, 0xd3f9c66b, 0x8f5fe703, 0x929c9515, 0x6d7aebbf,
+    0x5259da95, 0xbe832dd4, 0x7421d358, 0xe0692949, 0xc9c8448e, 0xc2896a75, 0x8e7978f4, 0x583e6b99, 0xb971dd27,
+    0xe14fb6be, 0x88ad17f0, 0x20ac66c9, 0xce3ab47d, 0xdf4a1863, 0x1a3182e5, 0x51336097, 0x537f4562, 0x6477e0b1,
+    0x6bae84bb, 0x81a01cfe, 0x082b94f9, 0x48685870, 0x45fd198f, 0xde6c8794, 0x7bf8b752, 0x73d323ab, 0x4b02e272,
+    0x1f8f57e3, 0x55ab2a66, 0xeb2807b2, 0xb5c2032f, 0xc57b9a86, 0x3708a5d3, 0x2887f230, 0xbfa5b223, 0x036aba02,
+    0x16825ced, 0xcf1c2b8a, 0x79b492a7, 0x07f2f0f3, 0x69e2a14e, 0xdaf4cd65, 0x05bed506, 0x34621fd1, 0xa6fe8ac4,
+    0x2e539d34, 0xf355a0a2, 0x8ae13205, 0xf6eb75a4, 0x83ec390b, 0x60efaa40, 0x719f065e, 0x6e1051bd, 0x218af93e,
+    0xdd063d96, 0x3e05aedd, 0xe6bd464d, 0x548db591, 0xc45d0571, 0x06d46f04, 0x5015ff60, 0x98fb2419, 0xbde997d6,
+    0x4043cc89, 0xd99e7767, 0xe842bdb0, 0x898b8807, 0x195b38e7, 0xc8eedb79, 0x7c0a47a1, 0x420fe97c, 0x841ec9f8,
+    0x00000000, 0x80868309, 0x2bed4832, 0x1170ac1e, 0x5a724e6c, 0x0efffbfd, 0x8538560f, 0xaed51e3d, 0x2d392736,
+    0x0fd9640a, 0x5ca62168, 0x5b54d19b, 0x362e3a24, 0x0a67b10c, 0x57e70f93, 0xee96d2b4, 0x9b919e1b, 0xc0c54f80,
+    0xdc20a261, 0x774b695a, 0x121a161c, 0x93ba0ae2, 0xa02ae5c0, 0x22e0433c, 0x1b171d12, 0x090d0b0e, 0x8bc7adf2,
+    0xb6a8b92d, 0x1ea9c814, 0xf1198557, 0x75074caf, 0x99ddbbee, 0x7f60fda3, 0x01269ff7, 0x72f5bc5c, 0x663bc544,
+    0xfb7e345b, 0x4329768b, 0x23c6dccb, 0xedfc68b6, 0xe4f163b8, 0x31dccad7, 0x63851042, 0x97224013, 0xc6112084,
+    0x4a247d85, 0xbb3df8d2, 0xf93211ae, 0x29a16dc7, 0x9e2f4b1d, 0xb230f3dc, 0x8652ec0d, 0xc1e3d077, 0xb3166c2b,
+    0x70b999a9, 0x9448fa11, 0xe9642247, 0xfc8cc4a8, 0xf03f1aa0, 0x7d2cd856, 0x3390ef22, 0x494ec787, 0x38d1c1d9,
+    0xcaa2fe8c, 0xd40b3698, 0xf581cfa6, 0x7ade28a5, 0xb78e26da, 0xadbfa43f, 0x3a9de42c, 0x78920d50, 0x5fcc9b6a,
+    0x7e466254, 0x8d13c2f6, 0xd8b8e890, 0x39f75e2e, 0xc3aff582, 0x5d80be9f, 0xd0937c69, 0xd52da96f, 0x2512b3cf,
+    0xac993bc8, 0x187da710, 0x9c636ee8, 0x3bbb7bdb, 0x267809cd, 0x5918f46e, 0x9ab701ec, 0x4f9aa883, 0x956e65e6,
+    0xffe67eaa, 0xbccf0821, 0x15e8e6ef, 0xe79bd9ba, 0x6f36ce4a, 0x9f09d4ea, 0xb07cd629, 0xa4b2af31, 0x3f23312a,
+    0xa59430c6, 0xa266c035, 0x4ebc3774, 0x82caa6fc, 0x90d0b0e0, 0xa7d81533, 0x04984af1, 0xecdaf741, 0xcd500e7f,
+    0x91f62f17, 0x4dd68d76, 0xefb04d43, 0xaa4d54cc, 0x9604dfe4, 0xd1b5e39e, 0x6a881b4c, 0x2c1fb8c1, 0x65517f46,
+    0x5eea049d, 0x8c355d01, 0x877473fa, 0x0b412efb, 0x671d5ab3, 0xdbd25292, 0x105633e9, 0xd647136d, 0xd7618c9a,
+    0xa10c7a37, 0xf8148e59, 0x133c89eb, 0xa927eece, 0x61c935b7, 0x1ce5ede1, 0x47b13c7a, 0xd2df599c, 0xf2733f55,
+    0x14ce7918, 0xc737bf73, 0xf7cdea53, 0xfdaa5b5f, 0x3d6f14df, 0x44db8678, 0xaff381ca, 0x68c43eb9, 0x24342c38,
+    0xa3405fc2, 0x1dc37216, 0xe2250cbc, 0x3c498b28, 0x0d9541ff, 0xa8017139, 0x0cb3de08, 0xb4e49cd8, 0x56c19064,
+    0xcb84617b, 0x32b670d5, 0x6c5c7448, 0xb85742d0,
+};
+static const u32 Td4[256] = {
+    0x52525252, 0x09090909, 0x6a6a6a6a, 0xd5d5d5d5, 0x30303030, 0x36363636, 0xa5a5a5a5, 0x38383838, 0xbfbfbfbf,
+    0x40404040, 0xa3a3a3a3, 0x9e9e9e9e, 0x81818181, 0xf3f3f3f3, 0xd7d7d7d7, 0xfbfbfbfb, 0x7c7c7c7c, 0xe3e3e3e3,
+    0x39393939, 0x82828282, 0x9b9b9b9b, 0x2f2f2f2f, 0xffffffff, 0x87878787, 0x34343434, 0x8e8e8e8e, 0x43434343,
+    0x44444444, 0xc4c4c4c4, 0xdededede, 0xe9e9e9e9, 0xcbcbcbcb, 0x54545454, 0x7b7b7b7b, 0x94949494, 0x32323232,
+    0xa6a6a6a6, 0xc2c2c2c2, 0x23232323, 0x3d3d3d3d, 0xeeeeeeee, 0x4c4c4c4c, 0x95959595, 0x0b0b0b0b, 0x42424242,
+    0xfafafafa, 0xc3c3c3c3, 0x4e4e4e4e, 0x08080808, 0x2e2e2e2e, 0xa1a1a1a1, 0x66666666, 0x28282828, 0xd9d9d9d9,
+    0x24242424, 0xb2b2b2b2, 0x76767676, 0x5b5b5b5b, 0xa2a2a2a2, 0x49494949, 0x6d6d6d6d, 0x8b8b8b8b, 0xd1d1d1d1,
+    0x25252525, 0x72727272, 0xf8f8f8f8, 0xf6f6f6f6, 0x64646464, 0x86868686, 0x68686868, 0x98989898, 0x16161616,
+    0xd4d4d4d4, 0xa4a4a4a4, 0x5c5c5c5c, 0xcccccccc, 0x5d5d5d5d, 0x65656565, 0xb6b6b6b6, 0x92929292, 0x6c6c6c6c,
+    0x70707070, 0x48484848, 0x50505050, 0xfdfdfdfd, 0xedededed, 0xb9b9b9b9, 0xdadadada, 0x5e5e5e5e, 0x15151515,
+    0x46464646, 0x57575757, 0xa7a7a7a7, 0x8d8d8d8d, 0x9d9d9d9d, 0x84848484, 0x90909090, 0xd8d8d8d8, 0xabababab,
+    0x00000000, 0x8c8c8c8c, 0xbcbcbcbc, 0xd3d3d3d3, 0x0a0a0a0a, 0xf7f7f7f7, 0xe4e4e4e4, 0x58585858, 0x05050505,
+    0xb8b8b8b8, 0xb3b3b3b3, 0x45454545, 0x06060606, 0xd0d0d0d0, 0x2c2c2c2c, 0x1e1e1e1e, 0x8f8f8f8f, 0xcacacaca,
+    0x3f3f3f3f, 0x0f0f0f0f, 0x02020202, 0xc1c1c1c1, 0xafafafaf, 0xbdbdbdbd, 0x03030303, 0x01010101, 0x13131313,
+    0x8a8a8a8a, 0x6b6b6b6b, 0x3a3a3a3a, 0x91919191, 0x11111111, 0x41414141, 0x4f4f4f4f, 0x67676767, 0xdcdcdcdc,
+    0xeaeaeaea, 0x97979797, 0xf2f2f2f2, 0xcfcfcfcf, 0xcececece, 0xf0f0f0f0, 0xb4b4b4b4, 0xe6e6e6e6, 0x73737373,
+    0x96969696, 0xacacacac, 0x74747474, 0x22222222, 0xe7e7e7e7, 0xadadadad, 0x35353535, 0x85858585, 0xe2e2e2e2,
+    0xf9f9f9f9, 0x37373737, 0xe8e8e8e8, 0x1c1c1c1c, 0x75757575, 0xdfdfdfdf, 0x6e6e6e6e, 0x47474747, 0xf1f1f1f1,
+    0x1a1a1a1a, 0x71717171, 0x1d1d1d1d, 0x29292929, 0xc5c5c5c5, 0x89898989, 0x6f6f6f6f, 0xb7b7b7b7, 0x62626262,
+    0x0e0e0e0e, 0xaaaaaaaa, 0x18181818, 0xbebebebe, 0x1b1b1b1b, 0xfcfcfcfc, 0x56565656, 0x3e3e3e3e, 0x4b4b4b4b,
+    0xc6c6c6c6, 0xd2d2d2d2, 0x79797979, 0x20202020, 0x9a9a9a9a, 0xdbdbdbdb, 0xc0c0c0c0, 0xfefefefe, 0x78787878,
+    0xcdcdcdcd, 0x5a5a5a5a, 0xf4f4f4f4, 0x1f1f1f1f, 0xdddddddd, 0xa8a8a8a8, 0x33333333, 0x88888888, 0x07070707,
+    0xc7c7c7c7, 0x31313131, 0xb1b1b1b1, 0x12121212, 0x10101010, 0x59595959, 0x27272727, 0x80808080, 0xecececec,
+    0x5f5f5f5f, 0x60606060, 0x51515151, 0x7f7f7f7f, 0xa9a9a9a9, 0x19191919, 0xb5b5b5b5, 0x4a4a4a4a, 0x0d0d0d0d,
+    0x2d2d2d2d, 0xe5e5e5e5, 0x7a7a7a7a, 0x9f9f9f9f, 0x93939393, 0xc9c9c9c9, 0x9c9c9c9c, 0xefefefef, 0xa0a0a0a0,
+    0xe0e0e0e0, 0x3b3b3b3b, 0x4d4d4d4d, 0xaeaeaeae, 0x2a2a2a2a, 0xf5f5f5f5, 0xb0b0b0b0, 0xc8c8c8c8, 0xebebebeb,
+    0xbbbbbbbb, 0x3c3c3c3c, 0x83838383, 0x53535353, 0x99999999, 0x61616161, 0x17171717, 0x2b2b2b2b, 0x04040404,
+    0x7e7e7e7e, 0xbabababa, 0x77777777, 0xd6d6d6d6, 0x26262626, 0xe1e1e1e1, 0x69696969, 0x14141414, 0x63636363,
+    0x55555555, 0x21212121, 0x0c0c0c0c, 0x7d7d7d7d,
+};
+static const u32 rcon[10] = { 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
+                              0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000 };
+static BOOL sAcRunning = FALSE; // Whether the thread runs
+static int sAcApIndex = 0;      // The setup's access point in the list
+static u8 *sAcSearchBssid = NULL;
+static void *sAcWcmBuffer = NULL;
+static int sAcSecure = 0; // From the hello, whether the access point asks for the MAC address
+static void *sAcStack = NULL;
+static void *sAcBssDesc = NULL;
+static u8 *sAcSearchEssid = NULL;
+static int sAcState = 0; // AC_STATE_*
+static u8 *sAcApList = NULL;
+static DWCWcmCallback sAcWcmCallback = NULL;
+static int sAcStatusResult = 0; // 1, or the negative error that ended the setup, as the status says
+static int sAcApCount = 0;
+static int sAcEventRead = 0;
+static u32 sAcSearchOption = 0;
+static int sAcStep = 0; // The step of UtilAc_Run
+static int sAcMessageSize = 0;
+static BOOL sAcConnected = FALSE; // Whether it joined the access point
+static void (*sAcFree)(void *ptr) = NULL;
+static DWCUtilAcCallback sAcCallback = NULL;
+static int sAcEventWrite = 0;
+static u32 sAcConnectOption = 0;
+static void *sAcBlock = NULL;
+static WCMConfig *sAcWcmConfig = NULL;
+static BOOL sAcWcmStarted = FALSE; // Whether the WCM is started
+static void *(*sAcAlloc)(u32 size) = NULL;
+static void *sAcWcmWork = NULL;
+
+static void UtilAcWcm_Notify(WCMNotice *notice) {
+    if (notice == NULL) {
+        return;
+    }
+    switch (notice->notify) {
+    case WCM_NOTIFY_STARTUP:
+        if (notice->result == 0) {
+            if (sAcWcmState == STATE_STOPPING) {
+                sAcWcmState = STATE_IDLE;
+                if (sAcWcmCallback != NULL) {
+                    sAcWcmCallback(DWC_WCM_EVENT_STARTED, 0);
+                }
+            } else if (sAcWcmState == STATE_SEARCH_STARTING) {
+                if (WCM_SearchAsync(sAcSearchBssid, sAcSearchEssid, sAcSearchOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            } else if (sAcWcmState == STATE_CONNECTING) {
+                if (WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            }
+        } else {
+            sAcWcmState = STATE_INITIALIZED;
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_BEGIN_SEARCH:
+        if (notice->result == 0) {
+            if (sAcWcmState == STATE_SEARCH_STARTING) {
+                sAcWcmState = STATE_SEARCHING;
+                if (sAcWcmCallback != NULL) {
+                    sAcWcmCallback(DWC_WCM_EVENT_SEARCHING, 0);
+                }
+            }
+        } else {
+            sAcWcmState = STATE_IDLE;
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_SEARCH_FAILED, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_CONNECT:
+        if (notice->result == 0) {
+            if (sAcWcmState == STATE_CONNECTING) {
+                sAcWcmState = STATE_CONNECTED;
+                if (sAcWcmCallback != NULL) {
+                    sAcWcmCallback(DWC_WCM_EVENT_CONNECTED, 0);
+                }
+            }
+        } else {
+            sAcWcmState = STATE_IDLE;
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_CONNECT_FAILED, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_END_SEARCH:
+        if (notice->result == 0) {
+            if (sAcWcmState == STATE_STOPPING) {
+                sAcWcmState = STATE_IDLE;
+                if (sAcWcmCallback != NULL) {
+                    sAcWcmCallback(DWC_WCM_EVENT_SEARCH_ENDED, 0);
+                }
+            } else if (sAcWcmState == STATE_SEARCH_STARTING) {
+                if (WCM_SearchAsync(sAcSearchBssid, sAcSearchEssid, sAcSearchOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            } else if (sAcWcmState == STATE_CLEANING_UP) {
+                if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            } else if (sAcWcmState == STATE_CONNECTING) {
+                if (WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            }
+        } else {
+            sAcWcmState = STATE_IDLE;
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_END_SEARCH_FAILED, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_DISCONNECT:
+        if (notice->result == 0) {
+            if (sAcWcmState == STATE_STOPPING) {
+                sAcWcmState = STATE_IDLE;
+                if (sAcWcmCallback != NULL) {
+                    sAcWcmCallback(DWC_WCM_EVENT_DISCONNECTED, 0);
+                }
+            } else if (sAcWcmState == STATE_SEARCH_STARTING) {
+                if (WCM_SearchAsync(sAcSearchBssid, sAcSearchEssid, sAcSearchOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            } else if (sAcWcmState == STATE_CLEANING_UP) {
+                if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            } else if (sAcWcmState == STATE_CONNECTING) {
+                if (WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) != WCM_RESULT_ACCEPT) {
+                    sAcWcmState = STATE_IDLE;
+                    if (sAcWcmCallback != NULL) {
+                        sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+                    }
+                }
+            } else if (sAcWcmState == STATE_CONNECTED) {
+                sAcWcmState = STATE_IDLE;
+            }
+        } else {
+            sAcWcmState = STATE_IDLE;
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_DISCONNECT_FAILED, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_CLEANUP:
+        if (notice->result == 0) {
+            if (sAcWcmState == STATE_CLEANING_UP) {
+                WCM_Finish();
+                sAcWcmState = STATE_OFF;
+                if (sAcWcmCallback != NULL) {
+                    sAcWcmCallback(DWC_WCM_EVENT_CLEANED_UP, 0);
+                }
+            }
+        } else {
+            sAcWcmState = STATE_IDLE;
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_FAILED, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_FOUND_AP:
+        if (sAcWcmState == STATE_SEARCHING) {
+            if (sAcWcmCallback != NULL) {
+                sAcWcmCallback(DWC_WCM_EVENT_FOUND_AP, 0);
+            }
+        }
+        break;
+    case WCM_NOTIFY_SEARCH_AROUND:
+        if (sAcWcmCallback != NULL) {
+            sAcWcmCallback(DWC_WCM_EVENT_SEARCH_AROUND, 0);
+        }
+        break;
+    case WCM_NOTIFY_TERMINATE:
+        sAcWcmState = STATE_OFF;
+        if (sAcWcmCallback != NULL) {
+            sAcWcmCallback(DWC_WCM_EVENT_TERMINATED, 0);
+        }
+        break;
+    default:
+        if (sAcWcmCallback != NULL) {
+            sAcWcmCallback(DWC_WCM_EVENT_UNKNOWN, 0);
+        }
+        break;
+    }
+}
+
+// Stops what the state says is under way, and reports whether the WCM took it
+static BOOL UtilAcWcm_Abort(void) {
+    switch (sAcWcmState) {
+    case STATE_SEARCHING:
+        if (WCM_SearchAsync(NULL, NULL, 0) != WCM_RESULT_ACCEPT) {
+            return FALSE;
+        }
+        break;
+    case STATE_CONNECTED:
+        if (WCM_DisconnectAsync() != WCM_RESULT_ACCEPT) {
+            return FALSE;
+        }
+        break;
+    case STATE_INITIALIZED:
+        if (WCM_StartupAsync(sAcWcmConfig, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
+            return FALSE;
+        }
+        break;
+    case STATE_OFF:
+    case STATE_CLEANING_UP:
+    case STATE_IDLE:
+    case STATE_STOPPING:
+    case STATE_SEARCH_STARTING:
+    case STATE_CONNECTING:
+    default:
+        return FALSE;
+    }
+    return TRUE;
+}
+
+// Copies up to max descriptions of the access points found to dest and counts all of them
+static int UtilAcWcm_GetApList(void *dest, int max) {
     u8 *out = dest;
     int count;
     int i;
@@ -17,10 +799,1907 @@ int func_ov182_021a7bcc(void *dest, int max) {
             if (i >= max) {
                 break;
             }
-            MIi_CpuCopy32(WCM_PointApList(i), out, 0xc0);
-            out += 0xc0;
+            MIi_CpuCopy32(WCM_PointApList(i), out, WCM_APLIST_SIZE);
+            out += WCM_APLIST_SIZE;
         }
     }
     WCM_LockApList(FALSE);
     return count;
+}
+
+static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 option) {
+    u32 irq = OS_DisableInterrupts();
+    int i;
+
+    sAcSearchOption = option;
+    sAcSearchBssid = sAcBssid;
+    if (bssid != NULL) {
+        for (i = 0; i < 6; i++) {
+            sAcBssid[i] = *bssid++;
+        }
+    } else {
+        MI_CpuFill8(sAcBssid, 0xff, 6);
+        sAcSearchBssid = (u8 *)WCMiAnyBssid;
+    }
+    sAcSearchEssid = sAcEssid;
+    if (essid != NULL && essidLength > 0 && essidLength < 0x20) {
+        for (i = 0; i < essidLength; i++) {
+            sAcEssid[i] = *essid++;
+        }
+        for (; i < 0x20; i++) {
+            sAcEssid[i] = 0;
+        }
+    } else {
+        MI_CpuFill8(sAcEssid, 0xff, 0x20);
+        sAcSearchEssid = (u8 *)WCMiAnyEssid;
+    }
+    if (sAcWcmState == STATE_IDLE) {
+        if (WCM_SearchAsync(sAcBssid, sAcSearchEssid, sAcSearchOption) == WCM_RESULT_ACCEPT) {
+            sAcWcmState = STATE_SEARCH_STARTING;
+            OS_RestoreInterrupts(irq);
+            return TRUE;
+        }
+    } else if (UtilAcWcm_Abort() == TRUE) {
+        sAcWcmState = STATE_SEARCH_STARTING;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    OS_RestoreInterrupts(irq);
+    return FALSE;
+}
+
+static BOOL UtilAcWcm_Disconnect(void) {
+    u32 irq = OS_DisableInterrupts();
+
+    if (sAcWcmState == STATE_CONNECTED && WCM_DisconnectAsync() == WCM_RESULT_ACCEPT) {
+        sAcWcmState = STATE_STOPPING;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    OS_RestoreInterrupts(irq);
+    return FALSE;
+}
+
+static BOOL UtilAcWcm_Cleanup(void) {
+    u32 irq = OS_DisableInterrupts();
+
+    if (sAcWcmState == STATE_IDLE) {
+        if (WCM_CleanupAsync() != WCM_RESULT_ACCEPT) {
+            OS_RestoreInterrupts(irq);
+            return FALSE;
+        }
+        sAcWcmState = STATE_CLEANING_UP;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    if (UtilAcWcm_Abort() == TRUE) {
+        sAcWcmState = STATE_CLEANING_UP;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    OS_RestoreInterrupts(irq);
+    return FALSE;
+}
+
+static BOOL UtilAcWcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
+    u32 irq = OS_DisableInterrupts();
+
+    sAcConnectOption = option;
+    if (wepDesc != NULL) {
+        MI_CpuCopy8(wepDesc, sAcWepDesc, 0x60);
+    } else {
+        MI_CpuFill8(sAcWepDesc, 0, 0x60);
+    }
+    MIi_CpuCopy32(bssDesc, sAcBssDesc, WCM_APLIST_SIZE);
+    if (UtilAcWcm_Abort() == TRUE) {
+        sAcWcmState = STATE_CONNECTING;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    if (sAcWcmState == STATE_IDLE && WCM_ConnectAsync(sAcBssDesc, sAcWepDesc, sAcConnectOption) == WCM_RESULT_ACCEPT) {
+        sAcWcmState = STATE_CONNECTING;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    OS_RestoreInterrupts(irq);
+    return FALSE;
+}
+
+// Starts the WCM in the work: the WEP key's description, the WCM's configuration and work, the description of the
+// access point to connect to and the buffer of the access point list, each aligned
+static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size) {
+    u32 irq = OS_DisableInterrupts();
+    u8 *buf = work;
+
+#ifdef PLATFORM_PC
+    // The only caller gives a 32-byte-aligned block: WEP, a 32-byte configuration slot, work, then a BSS descriptor.
+    if (work == NULL || ((uptr)work & 0x1f) != 0 || size < 0x80 + UTIL_AC_WCM_WORK_SIZE + 0xc0 || size > 0x7fffffff) {
+        OS_RestoreInterrupts(irq);
+        return FALSE;
+    }
+#endif
+
+    sAcWepDesc = buf;
+    sAcWcmConfig = (WCMConfig *)(((uptr)buf + 0x63) & ~3);
+    sAcWcmWork = (void *)(((uptr)sAcWcmConfig + 0x2f) & ~0x1f);
+    sAcBssDesc = (void *)(((uptr)sAcWcmWork + UTIL_AC_WCM_WORK_SIZE + 0x1f) & ~0x1f);
+    sAcWcmConfig->pbdbuffer = (void *)(((uptr)sAcBssDesc + 0xdf) & ~0x1f);
+    // Only the bounded buffer length is 32-bit; its addresses remain native-width.
+    sAcWcmConfig->nbdbuffer = (s32)((sptr)(buf + size) - (sptr)sAcWcmConfig->pbdbuffer);
+    sAcWcmConfig->nbdmode = 0;
+    sAcWcmConfig->dmano = 3;
+    sAcWcmCallback = callback;
+    if (sAcWcmState == STATE_OFF) {
+        if (WCM_Init(sAcWcmWork, UTIL_AC_WCM_WORK_SIZE) != 0) {
+            OS_RestoreInterrupts(irq);
+            return FALSE;
+        }
+        sAcWcmState = STATE_INITIALIZED;
+    }
+    if (sAcWcmState == STATE_INITIALIZED) {
+        if (WCM_StartupAsync(sAcWcmConfig, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
+            OS_RestoreInterrupts(irq);
+            return FALSE;
+        }
+        sAcWcmState = STATE_STOPPING;
+        OS_RestoreInterrupts(irq);
+        return TRUE;
+    }
+    OS_RestoreInterrupts(irq);
+    return FALSE;
+}
+
+static int UtilAcWcm_GetState(void) {
+    return sAcWcmState;
+}
+
+// The allocator of the sockets, which can be called from the setup's thread and the socket layer's
+static void *UtilAc_SocAlloc(u32 name, s32 size) {
+    void *ptr;
+
+    if (size > 0) {
+        OS_LockMutex(&sAcSocMutex);
+        ptr = sAcAlloc(size);
+        OS_UnlockMutex(&sAcSocMutex);
+        return ptr;
+    }
+    return NULL;
+}
+
+static void UtilAc_SocFree(u32 name, void *ptr, s32 size) {
+    if (ptr != NULL && size > 0) {
+        OS_LockMutex(&sAcSocMutex);
+        sAcFree(ptr);
+        OS_UnlockMutex(&sAcSocMutex);
+    }
+}
+
+static void UtilAc_ClearEvents(void) {
+    u32 irq = OS_DisableInterrupts();
+    int i;
+
+    sAcEventWrite = 0;
+    sAcEventRead = 0;
+    for (i = 0; i < 4; i++) {
+        sAcEvents[i] = 0;
+    }
+    OS_RestoreInterrupts(irq);
+}
+
+// The oldest event of the ring, or 0 for none
+static int UtilAc_PopEvent(void) {
+    u32 irq = OS_DisableInterrupts();
+    int read = sAcEventRead;
+    int event;
+
+    if (sAcEventWrite == read) {
+        event = 0;
+    } else {
+        event = sAcEvents[read];
+        sAcEventRead = read + 1;
+        if (sAcEventRead >= 4) {
+            sAcEventRead = 0;
+        }
+    }
+    OS_RestoreInterrupts(irq);
+    return event;
+}
+
+// The WCM wrapper's callback, which puts the event in the ring unless it is full
+static void UtilAc_OnEvent(int event, int param) {
+    int write = sAcEventWrite;
+    int read = sAcEventRead;
+
+    if (write + 1 == read || write == read + 3) {
+        return;
+    }
+    sAcEvents[write] = event;
+    sAcEventWrite = write + 1;
+    if (sAcEventWrite >= 4) {
+        sAcEventWrite = 0;
+    }
+}
+
+static void UtilAc_OnAlarm(void *arg) {
+    // Every alarm argument is an EVENT_* integer, not an address.
+    UtilAc_OnEvent((int)(sptr)arg, 0);
+}
+
+// Starts the WCM with room for the access points, and waits until it has; 1, or a negative number
+static int UtilAc_StartWcm(int apCount) {
+    BOOL waiting = TRUE;
+    int result;
+    int wcmSize;
+
+    sAcApCount = apCount;
+    UtilAc_ClearEvents();
+    wcmSize = apCount * 0xd0;
+    sAcBlock = sAcAlloc(wcmSize + UTIL_AC_WCM_ALLOC_OVERHEAD + apCount * WCM_APLIST_SIZE);
+    if (sAcBlock == NULL) {
+        return RESULT_NO_MEMORY;
+    }
+    sAcWcmBuffer = (void *)(((sptr)sAcBlock + 0x1f) & ~0x1f);
+    sAcApList = (u8 *)(((sptr)sAcWcmBuffer + wcmSize + UTIL_AC_WCM_BUFFER_SIZE + 0x1f) & ~0x1f);
+    if (!UtilAcWcm_Start(UtilAc_OnEvent, sAcWcmBuffer, wcmSize + UTIL_AC_WCM_BUFFER_SIZE)) {
+        return RESULT_WIRELESS;
+    }
+    do {
+        int event;
+
+        OS_Sleep(10);
+        while ((event = UtilAc_PopEvent()) != 0) {
+            switch (event) {
+            case DWC_WCM_EVENT_SEARCH_AROUND:
+            case DWC_WCM_EVENT_FOUND_AP:
+                break;
+            case DWC_WCM_EVENT_STARTED:
+                waiting = FALSE;
+                result = RESULT_OK;
+                break;
+            default:
+                waiting = FALSE;
+                result = RESULT_WIRELESS;
+                break;
+            }
+        }
+    } while (waiting);
+    return result;
+}
+
+static int UtilAc_EndWcm(void) {
+    BOOL waiting = TRUE;
+
+    if (UtilAcWcm_Cleanup()) {
+        do {
+            int event;
+
+            OS_Sleep(10);
+            while ((event = UtilAc_PopEvent()) != 0) {
+                switch (event) {
+                case DWC_WCM_EVENT_SEARCH_AROUND:
+                case DWC_WCM_EVENT_FOUND_AP:
+                    break;
+                case DWC_WCM_EVENT_CLEANED_UP:
+                    waiting = FALSE;
+                    break;
+                default:
+                    waiting = FALSE;
+                    break;
+                }
+            }
+        } while (waiting);
+    }
+    if (sAcBlock != NULL) {
+        sAcFree(sAcBlock);
+        sAcBlock = NULL;
+    }
+    return RESULT_OK;
+}
+
+// Connects to the setup's access point, without a key, and starts the sockets
+static int UtilAc_Connect(void) {
+    BOOL waiting = TRUE;
+    int result = RESULT_WIRELESS;
+    OSAlarm alarm;
+    WMBssDesc *bss = (WMBssDesc *)(sAcApList + sAcApIndex * WCM_APLIST_SIZE);
+
+    if (bss == NULL) {
+        return 0;
+    }
+    if (!UtilAcWcm_Connect(bss, NULL, WCM_OPTION_POWER_ACTIVE)) {
+        return RESULT_WIRELESS;
+    }
+    OS_CreateAlarm(&alarm);
+    OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(8000), UtilAc_OnAlarm, (void *)EVENT_CONNECT_TIMEOUT);
+    do {
+        int event;
+
+        if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+            result = RESULT_SCAN_TIMEOUT;
+            break;
+        }
+        if (sAcCancel) {
+            result = RESULT_CANCELLED;
+            break;
+        }
+        OS_Sleep(10);
+        while ((event = UtilAc_PopEvent()) != 0) {
+            switch (event) {
+            case DWC_WCM_EVENT_SEARCH_AROUND:
+            case DWC_WCM_EVENT_FOUND_AP:
+            case EVENT_CONNECT_TIMEOUT:
+            case EVENT_SCAN_TIMEOUT:
+                break;
+            case DWC_WCM_EVENT_CONNECTED:
+                waiting = FALSE;
+                result = RESULT_OK;
+                break;
+            case DWC_WCM_EVENT_CONNECT_FAILED:
+                if (sAcCancel) {
+                    waiting = FALSE;
+                    result = RESULT_CANCELLED;
+                } else if (!UtilAcWcm_Connect(bss, NULL, WCM_OPTION_POWER_ACTIVE)) {
+                    return result;
+                }
+                break;
+            default:
+                waiting = FALSE;
+                break;
+            }
+        }
+    } while (waiting);
+    OS_CancelAlarm(&alarm);
+    while (UtilAc_PopEvent() != 0) {
+    }
+    if (result > 0) {
+        sAcConnected = TRUE;
+        if (SOC_Startup(&sAcSocConfig) < 0) {
+            result = RESULT_WIRELESS;
+        } else {
+            sAcSocStarted = TRUE;
+        }
+    }
+    return result;
+}
+
+static void UtilAc_Disconnect(void) {
+    BOOL waiting = TRUE;
+
+    if (sAcConnected) {
+        if (UtilAcWcm_Disconnect()) {
+            do {
+                int event;
+
+                OS_Sleep(10);
+                while ((event = UtilAc_PopEvent()) != 0) {
+                    switch (event) {
+                    case DWC_WCM_EVENT_SEARCH_AROUND:
+                    case DWC_WCM_EVENT_FOUND_AP:
+                        break;
+                    case DWC_WCM_EVENT_DISCONNECTED:
+                        waiting = FALSE;
+                        break;
+                    default:
+                        waiting = FALSE;
+                        break;
+                    }
+                }
+            } while (waiting);
+        }
+        sAcConnected = FALSE;
+    }
+    if (sAcSocStarted) {
+        sAcSocStarted = FALSE;
+        SOC_Cleanup();
+    }
+}
+
+// Looks for the access point that opened its setup: one that was secured in the scan before and is open now, or else
+// one named "******" in this scan and not in the one before. Gives its place in the scan
+static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous, int *index) {
+    char name[0x22];
+    int found = 0;
+    int result = 0;
+    int i = 0;
+    int j;
+    int foundNew = 0;
+    int foundOld = 0;
+
+    for (i = 0; i < scan->count; i++) {
+        const UtilAcScanEntry *entry = &scan->entries[i];
+        u32 length = entry->ssidLength;
+
+        memset(name, 0, 0x22);
+        memcpy(name, entry->ssid, 0x20);
+        name[entry->ssidLength] = 0;
+        for (j = 0; j < previous->count; j++) {
+            const UtilAcScanEntry *old = &previous->entries[j];
+
+            if (length == 0 || length > 0x20) {
+                break;
+            }
+            if (length == 1 && (entry->ssid[0] == 0 || entry->ssid[0] == ' ')) {
+                break;
+            }
+            if (memcmp(name, old->ssid, strlen(name)) == 0 && memcmp(entry->bssid, old->bssid, 6) == 0 &&
+                entry->secure != old->secure && entry->secure == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    if (!found) {
+        char oldName[0x22];
+
+        memset(oldName, 0, 0x22);
+        for (j = 0; j < previous->count; j++) {
+            memcpy(oldName, previous->entries[j].ssid, 0x20);
+            oldName[previous->entries[j].ssidLength] = 0;
+            if (memcmp(oldName, "******", strlen("******")) == 0 && previous->entries[j].secure == 0) {
+                foundOld = 1;
+                break;
+            }
+        }
+        for (i = 0; i < scan->count; i++) {
+            memcpy(name, scan->entries[i].ssid, 0x20);
+            name[scan->entries[i].ssidLength] = 0;
+            if (strlen(name) == strlen("******") && memcmp(name, "******", strlen("******")) == 0 &&
+                scan->entries[i].secure == 0) {
+                foundNew = 1;
+                break;
+            }
+        }
+        if (foundNew && !foundOld) {
+            found = 1;
+        }
+    }
+    if (found) {
+        *index = i;
+        result = 1;
+    }
+    return result;
+}
+
+// Scans for the access points until one opens its setup; 1 when one did, or a negative number
+static int UtilAc_Scan(void) {
+    UtilAcScan *scan = NULL;
+    UtilAcScan *previous = NULL;
+    int result = RESULT_NO_MEMORY;
+    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
+    int round;
+    int foundIndex = 0;
+    char text[0x20];
+
+    scan = UtilAc_Calloc(1, size);
+    if (scan != NULL) {
+        previous = UtilAc_Calloc(1, size);
+        if (previous != NULL) {
+            for (round = 0; round < 30 && !sAcCancel; round++) {
+                OSAlarm alarm;
+                BOOL waiting = TRUE;
+                int count = 0;
+                int i;
+
+                if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+                    break;
+                }
+                if (!UtilAcWcm_Search(NULL, NULL, 0, 0x30bffe)) {
+                    result = RESULT_WIRELESS;
+                    goto done;
+                }
+                OS_CreateAlarm(&alarm);
+                OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm, (void *)EVENT_SCAN_TIMEOUT);
+                do {
+                    int event;
+
+                    OS_Sleep(10);
+                    if (UtilAc_GetMilliseconds() >= sAcConfig.deadline || sAcCancel) {
+                        break;
+                    }
+                    while ((event = UtilAc_PopEvent()) != 0) {
+                        switch (event) {
+                        case DWC_WCM_EVENT_SEARCH_AROUND:
+                        case DWC_WCM_EVENT_SEARCHING:
+                        case EVENT_CONNECT_TIMEOUT:
+                            break;
+                        case EVENT_SCAN_TIMEOUT:
+                            waiting = FALSE;
+                            break;
+                        case DWC_WCM_EVENT_FOUND_AP: {
+                            int found = UtilAcWcm_GetApList(sAcApList, sAcApCount);
+
+                            if (found > count) {
+                                count = found;
+                                OS_CancelAlarm(&alarm);
+                                OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm,
+                                            (void *)EVENT_SCAN_TIMEOUT);
+                            }
+                            break;
+                        }
+                        case DWC_WCM_EVENT_SEARCH_ENDED:
+                            waiting = FALSE;
+                            break;
+                        case 0:
+                        case DWC_WCM_EVENT_UNKNOWN:
+                        case DWC_WCM_EVENT_FAILED:
+                        case DWC_WCM_EVENT_TERMINATED:
+                        case DWC_WCM_EVENT_STARTED:
+                        case 7:
+                        case DWC_WCM_EVENT_SEARCH_FAILED:
+                        case DWC_WCM_EVENT_END_SEARCH_FAILED:
+                        case DWC_WCM_EVENT_CONNECTED:
+                        case DWC_WCM_EVENT_CONNECT_FAILED:
+                        case DWC_WCM_EVENT_DISCONNECTED:
+                        case DWC_WCM_EVENT_DISCONNECT_FAILED:
+                        case 16:
+                        case 17:
+                        default:
+                            waiting = FALSE;
+                            break;
+                        }
+                    }
+                } while (waiting);
+                OS_CancelAlarm(&alarm);
+                while (UtilAc_PopEvent() != 0) {
+                }
+                if (sAcCancel) {
+                    break;
+                }
+                if (count >= sAcApCount) {
+                    result = RESULT_TOO_MANY_APS;
+                    goto done;
+                }
+                for (i = 0; i < count; i++) {
+                    WMBssDesc *bss = (WMBssDesc *)sAcApList + i;
+
+                    memcpy(scan->entries[i].ssid, bss->ssid, 0x20);
+                    scan->entries[i].ssidLength = bss->ssidLength;
+                    scan->entries[i].ssid[bss->ssidLength] = 0;
+                    if (bss->capaInfo & 0x10) {
+                        scan->entries[i].secure = 1;
+                    } else {
+                        scan->entries[i].secure = 0;
+                    }
+                    memcpy(scan->entries[i].bssid, bss->bssid, 6);
+                }
+                scan->count = count;
+                if (sAcState != AC_STATE_SCANNING && UtilAc_FindSetupAp(scan, previous, &foundIndex)) {
+                    UtilAcScanEntry *entry = &scan->entries[foundIndex];
+
+                    sAcApIndex = foundIndex;
+                    strcpy(sAcApSsid, entry->ssid);
+                    memcpy(sAcApMac, entry->bssid, 6);
+                    UtilAc_FormatMacAddress(text, (s8 *)sAcApMac);
+                    result = RESULT_OK;
+                    goto done;
+                }
+                memcpy(previous, scan, size);
+                sAcState = AC_STATE_SCANNED;
+                UtilAc_NotifyStatus();
+            }
+            if (round >= 30 || UtilAc_GetMilliseconds() > sAcConfig.deadline) {
+                result = RESULT_SCAN_TIMEOUT;
+            } else if (sAcCancel) {
+                result = RESULT_CANCELLED;
+            } else {
+                result = RESULT_OK;
+            }
+        }
+    }
+done:
+    if (scan != NULL) {
+        UtilAc_Free(scan);
+    }
+    if (previous != NULL) {
+        UtilAc_Free(previous);
+    }
+    return result;
+}
+
+// The name that the console gives (the word before the 4 points to it, as in dwc_ac_soc.c's configuration), and the
+// MD5's padding (md5c.c's PADDING). MWCC 2.0 writes data defined between functions out with the next function, and the
+// ROM's .data has these two after UtilAc_FindSetupAp's literal and before UtilAc_MakeIds', so they are defined here
+static char sAcHostName[] = "NINTENDO-DS";
+static u8 PADDING[64] = { 0x80 };
+
+// A 16-bit number in network order
+#define SWAP16(value) ((u16)((((value) >> 8) & 0xff) | (((value) << 8) & 0xff00)))
+
+// Sends to the address, on the port the address has; ownAddress is not used
+static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, const void *data, int length) {
+    int result = SOC_SendTo(sock, data, length, 0, to);
+
+    if (result < 0) {
+        return RESULT_HELLO_TIMEOUT;
+    }
+    return result;
+}
+
+// Sends to everyone on port 486
+static int UtilAc_Broadcast(int sock, const void *data, int length) {
+    SocAddrIn to;
+    u8 ownAddress[4];
+
+    to.len = sizeof(SocAddrIn);
+    to.family = POKE_NET_SOC_AF_INET;
+    to.addr = 0xffffffff;
+    to.port = 486;
+    SOC_U32to4U8(SOCL_GetHostID(), ownAddress);
+    return UtilAc_SendTo(sock, &to, ownAddress, data, length);
+}
+
+// Answers whoever sent to us, by a broadcast; from is not used
+static int UtilAc_Send(int sock, const SocAddrIn *from, const void *data, int length) {
+    return UtilAc_Broadcast(sock, data, length);
+}
+
+// A packet is a type, the length of its message, the message, and the sum of all the bytes before it, all numbers in
+// network order. A message is a header of 8 bytes, whose first number is the length of the items after it, and the
+// items, each a type, a length and the data, padded so that the next one starts at a multiple of 8
+static const u8 *UtilAc_ParsePacket(const u8 *packet, u32 *type, u32 *length) {
+    const u8 *end;
+    const u8 *p;
+    u32 sum = 0;
+
+    *type = SWAP16(*(u16 *)packet);
+    *length = SWAP16(*(u16 *)(packet + 2));
+    end = packet + 6 + *length;
+    for (p = packet; p < end; p++) {
+        sum += *p;
+    }
+    if ((sum & 0xffff) != SWAP16(*(u16 *)end)) {
+        return NULL;
+    }
+    return packet + 6;
+}
+
+static const u8 *UtilAc_NextItem(const u8 **cursor, const u8 *end, u32 *type, u32 *length) {
+    const u8 *item = *cursor;
+
+    if (item >= end) {
+        return NULL;
+    }
+    *type = SWAP16(*(u16 *)item);
+    *length = SWAP16(*(u16 *)(item + 2));
+    *cursor = item + 4 + (((*length + 11) & ~7) - 4);
+    return item + 4;
+}
+
+static const u8 *UtilAc_FirstItem(const u8 *message, u32 *type, u32 *length) {
+    const u8 *cursor = message + 8;
+
+    return UtilAc_NextItem(&cursor, cursor + SWAP16(*(u16 *)message), type, length);
+}
+
+// Makes a packet of the type from the message, whose header is ours to fill in, encrypted with the key if there is one
+static int UtilAc_BuildPacket(u8 *out, int type, u8 *message, int length, const u8 *key) {
+    u8 *p = out;
+    u32 sum = 0;
+    u8 *q;
+
+    message[0] = 0;
+    message[1] = 0;
+    message[2] = 0;
+    message[3] = 0;
+    message[4] = 0;
+    message[5] = 0;
+    message[6] = 0;
+    message[7] = 0;
+    *(u16 *)message = SWAP16((u16)(length - 8));
+    if (key != NULL) {
+        UtilAc_AesWrap(out + 6, message, length, key, 0x10);
+        length += 8;
+    } else {
+        memcpy(out + 6, message, length);
+    }
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = 0;
+    *(u16 *)out = SWAP16((u16)type);
+    *(u16 *)(out + 2) = SWAP16((u16)length);
+    p += 6;
+    p += length;
+    for (q = out; q < p; q++) {
+        sum += *q;
+    }
+    *(u16 *)p = SWAP16((u16)sum);
+    return p + 2 - out;
+}
+
+// Writes an item and returns where the next one goes
+static u8 *UtilAc_AppendItem(u8 *out, int type, const void *data, int length) {
+    int padding;
+
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    *(u16 *)out = SWAP16((u16)type);
+    padding = ((length + 11) & ~7) - 4;
+    *(u16 *)(out + 2) = SWAP16((u16)length);
+    out = out + 4;
+    memset(out, 0, padding);
+    memcpy(out, data, length);
+    out += padding;
+    return out;
+}
+
+// A message of one item
+static int UtilAc_BuildMessage(u8 *out, int type, const void *data, int length) {
+    u8 *end;
+
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = 0;
+    out[6] = 0;
+    out[7] = 0;
+    end = UtilAc_AppendItem(out + 8, type, data, length);
+    *(u16 *)out = end - out - 8;
+    return end - out;
+}
+
+// Reads the hello of the access point: its version and mode, which must be 1, and whether it asks for more
+static int UtilAc_ParseHello(const u8 *packet, int *secure) {
+    u32 type;
+    u32 length;
+    u32 itemType;
+    u32 itemLength;
+    const u8 *end;
+    const u8 *message = UtilAc_ParsePacket(packet, &type, &length);
+    const u8 *cursor = message;
+    const u8 *data;
+    u32 version = 0;
+    u32 mode = 0;
+    int count = 0;
+
+    if (message == NULL) {
+        return 0;
+    }
+    if (type != 1) {
+        return 0;
+    }
+    end = message + length;
+    cursor = message + 8;
+    while ((data = UtilAc_NextItem(&cursor, end, &itemType, &itemLength)) != NULL) {
+        switch (itemType) {
+        case 1:
+            version = SWAP16(*(u16 *)data);
+            break;
+        case 2:
+            mode = SWAP16(*(u16 *)data);
+            break;
+        case 5:
+            count = SWAP16(*(u16 *)data);
+            break;
+        }
+    }
+    if (version != 1 || mode != 1) {
+        return 0;
+    }
+    if (count >= 1) {
+        *secure = 1;
+    } else {
+        *secure = 0;
+    }
+    return 1;
+}
+
+// The message of a packet of the type, decrypted with the key if there is one; its length, or 0
+static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key) {
+    u32 packetType;
+    u32 length;
+    const u8 *message = UtilAc_ParsePacket(packet, &packetType, &length);
+
+    if (message == NULL) {
+        return 0;
+    }
+    if (packetType != type) {
+        return 0;
+    }
+    if (key != NULL) {
+        UtilAc_AesUnwrap(out, message, length, key, 0x10);
+        length -= 8;
+    } else {
+        memcpy(out, message, length);
+    }
+    return length;
+}
+
+// The hello of this side
+static int UtilAc_BuildHello(u8 *out) {
+    struct {
+        u16 version;
+        HelloId id;
+    } data;
+    u8 *end;
+
+    data.version = 0x100;
+    data.id = sAcHelloId;
+    end = UtilAc_AppendItem(sAcConfig.items, 1, &data.version, sizeof(data.version));
+    end = UtilAc_AppendItem(end, 2, &data.version, sizeof(data.version));
+    if (sAcSecure) {
+        end = UtilAc_AppendItem(end, 5, &data.version, sizeof(data.version));
+    }
+    end = UtilAc_AppendItem(end, 3, &data.id, sizeof(data.id));
+    if (sAcSecure) {
+        end = UtilAc_AppendItem(end, 4, sAcOwnMac, 6);
+    }
+    return UtilAc_BuildPacket(out, 2, sAcMessage, end - sAcConfig.items + 8, NULL);
+}
+
+static int UtilAc_GetMacAddress(u8 *mac) {
+    OS_GetMacAddress(mac);
+    return 1;
+}
+
+// Makes the key of the first exchange; from is not used
+static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
+    char ownText[0x20];
+    char apText[0x20];
+    MacAddress ap;
+    MacAddress own;
+
+    memcpy(key + 12, "WARP", 4);
+    memcpy(&ap, sAcApMac, 6);
+    ap.bytes[0] &= 0xfd;
+    UtilAc_GetMacAddress(own.bytes);
+    memcpy(sAcOwnMac, &own, 6);
+    if (memcmp(&ap, &own, 6) <= 0) {
+        memcpy(key, &own, 6);
+        memcpy(key + 6, &ap, 6);
+    } else {
+        memcpy(key, &ap, 6);
+        memcpy(key + 6, &own, 6);
+    }
+    if (sAcConfig.debug) {
+        UtilAc_FormatMacAddress(ownText, (s8 *)own.bytes);
+        UtilAc_FormatMacAddress(apText, (s8 *)ap.bytes);
+    }
+    return 1;
+}
+
+// Takes the items of the message with the settings; whether it named the network
+static int UtilAc_ParseSettings(const u8 *message) {
+    const u8 *cursor = message + 8;
+    const u8 *end = cursor + SWAP16(*(u16 *)message);
+    const u8 *data;
+    u32 type;
+    u32 length;
+    int found = 0;
+    int i;
+    u16 value;
+
+    while ((data = UtilAc_NextItem(&cursor, end, &type, &length)) != NULL) {
+        switch (type) {
+        case 0x201:
+            memset(sAcSettings.ssid, 0, 0x20);
+            memcpy(sAcSettings.ssid, data, length);
+            found = 1;
+            break;
+        case 0x202:
+            sAcSettings.security = SWAP16(*(u16 *)data);
+            break;
+        case 0x203:
+            value = SWAP16(*(u16 *)data);
+            for (i = 0; i < 4; i++) {
+                sAcSettings.keys[i].format = value;
+            }
+            break;
+        case 0x204:
+            value = SWAP16(*(u16 *)data);
+            for (i = 0; i < 4; i++) {
+                sAcSettings.keys[i].type = value;
+            }
+            break;
+        case 0x205:
+            sAcSettings.keyCount = SWAP16(*(u16 *)data);
+            break;
+        case 0x206:
+        case 0x207:
+        case 0x208:
+        case 0x209:
+            memset(sAcSettings.keys[type - 0x206].key, 0, 0x20);
+            if (sAcSettings.keys[0].format == 1) {
+                char *p = sAcSettings.keys[type - 0x206].key;
+
+                for (i = 0; i < length; i++) {
+                    p += UtilAc_FormatHexByte(p, data[i]);
+                }
+            } else {
+                memcpy(sAcSettings.keys[type - 0x206].key, data, length);
+            }
+            break;
+        case 0x20a:
+            memset(sAcSettings.passphrase, 0, 0x48);
+            memcpy(sAcSettings.passphrase, data, length);
+            break;
+        }
+    }
+    return found;
+}
+
+// Turns a key in hex digits into its bytes; 0 at a character that is no digit
+static int UtilAc_ParseHex(u8 *out, const char *text, int length) {
+    int i;
+    int value = 0;
+
+    for (i = 0; i < length; i++) {
+        char c = text[i];
+
+        switch (c) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            value += c - '0';
+            break;
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+            value += c - 'a' + 10;
+            break;
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
+            value += c - 'A' + 10;
+            break;
+        default:
+            return 0;
+        }
+        if (i % 2 == 0) {
+            value <<= 4;
+        } else {
+            out[i / 2] = value;
+            value = 0;
+        }
+    }
+    return 1;
+}
+
+// Turns the settings into the result; 1, or RESULT_BAD_KEY when the keys make no sense
+static int UtilAc_MakeResult(void) {
+    int result = RESULT_OK;
+    char text[0x21];
+    int i;
+
+    strcpy(sAcResult.ssid, sAcSettings.ssid);
+    switch (sAcSettings.security) {
+    case 0:
+        sAcResult.wepMode = 0;
+        break;
+    case 1:
+        if (sAcSettings.keyCount == 0) {
+            result = RESULT_BAD_KEY;
+        } else {
+            sAcResult.keyCount = sAcSettings.keyCount;
+            for (i = 0; i < 4; i++) {
+                u32 length;
+
+                memcpy(text, sAcSettings.keys[i].key, 0x20);
+                text[0x20] = 0;
+                length = strlen(text);
+                switch (length) {
+                case 0:
+                    break;
+                case 5:
+                    sAcResult.wepMode = 1;
+                    memcpy(sAcResult.keys[i], text, 5);
+                    break;
+                case 10:
+                    sAcResult.wepMode = 1;
+                    UtilAc_ParseHex(sAcResult.keys[i], text, 10);
+                    break;
+                case 13:
+                    sAcResult.wepMode = 2;
+                    memcpy(sAcResult.keys[i], text, 13);
+                    break;
+                case 26:
+                    sAcResult.wepMode = 2;
+                    UtilAc_ParseHex(sAcResult.keys[i], text, 26);
+                    break;
+                case 16:
+                    sAcResult.wepMode = 3;
+                    memcpy(sAcResult.keys[i], text, 16);
+                    break;
+                case 32:
+                    sAcResult.wepMode = 3;
+                    UtilAc_ParseHex(sAcResult.keys[i], text, 32);
+                    break;
+                default:
+                    result = RESULT_BAD_KEY;
+                    break;
+                }
+            }
+        }
+        break;
+    case 2:
+        sAcResult.wepMode = 4;
+        memcpy(sAcResult.passphrase, sAcSettings.passphrase, 0x40);
+        break;
+    case 3:
+        sAcResult.wepMode = 5;
+        memcpy(sAcResult.passphrase, sAcSettings.passphrase, 0x40);
+        break;
+    default:
+        result = RESULT_BAD_KEY;
+        break;
+    }
+    return result;
+}
+
+// The setup, step by step: scan until an access point opens its setup, join it, wait for its hello and answer it,
+// take the session key, ask for the settings with it, take them, and say so. Returns 1, or a negative number
+static int UtilAc_Run(void) {
+    int sock = 0;
+    int result = RESULT_FAILED;
+    u32 sentAt = 0;
+    int retries = 0;
+    BOOL done = FALSE;
+    SocAddrIn address;
+    SocAddrIn from;
+    u32 type;
+    u32 length;
+    u32 now;
+    const u8 *data;
+
+    sAcStep = 1;
+    while (!done && !sAcCancel) {
+        OS_Sleep(500);
+        switch (sAcStep) {
+        case 1:
+            result = UtilAc_Scan();
+            if (result != RESULT_OK) {
+                done = TRUE;
+            } else {
+                sAcState = AC_STATE_FOUND;
+                UtilAc_NotifyStatus();
+                sAcStep = 2;
+            }
+            break;
+        case 2:
+            result = UtilAc_Connect();
+            if (result != RESULT_OK) {
+                done = TRUE;
+            } else {
+                sAcStep = 3;
+            }
+            break;
+        case 3:
+            sock = SOC_Socket(POKE_NET_SOC_AF_INET, 2, 0);
+            if (sock < 0) {
+                result = RESULT_WIRELESS;
+                done = TRUE;
+            } else {
+                memset(&address, 0, sizeof(address));
+                address.len = sizeof(SocAddrIn);
+                address.family = POKE_NET_SOC_AF_INET;
+                address.port = 486;
+                address.addr = 0;
+                result = SOC_Bind(sock, &address);
+                if (result < 0) {
+                    result = RESULT_WIRELESS;
+                    done = TRUE;
+                } else {
+                    sAcStep = 4;
+                }
+            }
+            break;
+        case 4:
+            if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+                SOC_Close(sock);
+                result = RESULT_SCAN_TIMEOUT;
+                done = TRUE;
+            } else {
+                from.len = sizeof(SocAddrIn);
+                UtilAc_MakeIds(sAcKey, &from);
+                if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
+                    UtilAc_ParseHello(sAcPacket, &sAcSecure)) {
+                    sAcConfig.deadline = UtilAc_GetMilliseconds() + 30000;
+                    sAcStep = 5;
+                    sAcState = AC_STATE_HELLO;
+                    UtilAc_NotifyStatus();
+                }
+            }
+            break;
+        case 5:
+            sAcPacketSize = UtilAc_BuildHello(sAcPacket);
+            UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
+            sentAt = UtilAc_GetMilliseconds();
+            sAcStep = 6;
+            break;
+        case 6:
+            if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+                SOC_Close(sock);
+                result = RESULT_HELLO_TIMEOUT;
+                done = TRUE;
+            } else if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
+                       UtilAc_ParseBody(sAcPacket, 3, sAcMessage, sAcKey)) {
+                data = UtilAc_FirstItem(sAcMessage, &type, &length);
+                if (type == 0x101) {
+                    now = UtilAc_GetMilliseconds();
+                    memcpy(sAcSessionKey, data, 8);
+                    UtilAc_Md5(sAcSessionKey + 8, (u8 *)&now, sizeof(now));
+                    retries = 0;
+                    sAcStep = 7;
+                    sAcState = AC_STATE_KEY;
+                    sAcConfig.deadline = 0xffffffff;
+                    UtilAc_NotifyStatus();
+                }
+            } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
+                sAcStep = 5;
+            }
+            break;
+        case 7:
+            sAcMessageSize = UtilAc_BuildMessage(sAcMessage, 0x102, sAcSessionKey + 8, 8);
+            sAcPacketSize = UtilAc_BuildPacket(sAcPacket, 4, sAcMessage, sAcMessageSize, sAcKey);
+            UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
+            sentAt = UtilAc_GetMilliseconds();
+            memset(&sAcSettings, 0, sizeof(sAcSettings));
+            sAcStep = 8;
+            break;
+        case 8:
+            if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
+                (sAcMessageSize = UtilAc_ParseBody(sAcPacket, 5, sAcMessage, sAcSessionKey)) != 0 &&
+                UtilAc_ParseSettings(sAcMessage)) {
+                if (sAcSettings.ssid[0] != 0) {
+                    sAcHasSsid = TRUE;
+                } else {
+                    sAcHasSsid = FALSE;
+                }
+                retries = 0;
+                sAcStep = 9;
+            } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
+                if (++retries >= 10) {
+                    SOC_Close(sock);
+                    result = RESULT_WIRELESS;
+                    done = TRUE;
+                } else {
+                    sAcStep = 7;
+                }
+            }
+            break;
+        case 9:
+            sAcMessageSize = UtilAc_BuildMessage(sAcMessage, 0x301, &sAcHasSsid, 1);
+            sAcPacketSize = UtilAc_BuildPacket(sAcPacket, 6, sAcMessage, sAcMessageSize, sAcSessionKey);
+            if (UtilAcWcm_GetState() != STATE_CONNECTED) {
+                // The connection is gone: wait a second and give up on the answer
+                sentAt = UtilAc_GetMilliseconds() + 1000;
+                retries = 10;
+                sAcStep = 10;
+            } else {
+                UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
+                sentAt = UtilAc_GetMilliseconds();
+                sAcStep = 10;
+            }
+            break;
+        case 10:
+            if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
+                if (++retries >= 10) {
+                    done = TRUE;
+                    result = UtilAc_MakeResult();
+                } else {
+                    sAcStep = 9;
+                }
+            }
+            break;
+        }
+    }
+    if (sock != 0) {
+        SOC_Close(sock);
+    }
+    if (sAcCancel) {
+        result = RESULT_CANCELLED;
+    }
+    return result;
+}
+
+// The thread of the setup
+static void UtilAc_Thread(void *arg) {
+    int result = UtilAc_Run();
+
+    sAcStatusResult = result;
+    UtilAc_Disconnect();
+    if (result == RESULT_OK) {
+        sAcState = AC_STATE_DONE;
+    } else {
+        sAcState = AC_STATE_FAILED;
+    }
+    sAcConfig.deadline = 0xffffffff;
+    UtilAc_NotifyStatus();
+}
+
+#define BSWAP64(value)                                                                                                 \
+    ((((value) & 0x00000000000000ffULL) << 56) | (((value) & 0x000000000000ff00ULL) << 40) |                           \
+     (((value) & 0x0000000000ff0000ULL) << 24) | (((value) & 0x00000000ff000000ULL) << 8) |                            \
+     (((value) & 0x000000ff00000000ULL) >> 8) | (((value) & 0x0000ff0000000000ULL) >> 24) |                            \
+     (((value) & 0x00ff000000000000ULL) >> 40) | (((value) & 0xff00000000000000ULL) >> 56))
+
+// AES key wrap (RFC 3394): the output is 8 bytes longer than the input
+static int UtilAc_AesWrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength) {
+    u64 t;
+    u32 iv[2];
+    u8 block[16];
+    u32 rk[80];
+    int n;
+    int j;
+    int i;
+    int Nr;
+
+    iv[0] = 0xa6a6a6a6;
+    iv[1] = 0xa6a6a6a6;
+    if ((length & 7) != 0 || (keyLength & 7) != 0) {
+        return 0;
+    }
+    n = length >> 3;
+    if (n < 2) {
+        return 0;
+    }
+    Nr = rijndaelKeySetupEnc(rk, key, keyLength * 8);
+    memcpy(out + 8, in, length);
+    memcpy(block, iv, 8);
+    for (j = 0; j < 6; j++) {
+        for (i = 1; i <= n; i++) {
+            memcpy(block + 8, out + i * sizeof(u64), 8);
+            rijndaelEncrypt(rk, Nr, block, block);
+            t = BSWAP64((u64)n * j + i);
+            UtilAc_Xor8(block, (u8 *)&t, block);
+            memcpy(out + i * sizeof(u64), block + 8, 8);
+        }
+    }
+    memcpy(out, block, 8);
+    return 1;
+}
+
+static int UtilAc_AesUnwrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength) {
+    u64 t;
+    u32 iv[2];
+    u8 block[16];
+    u32 rk[80];
+    int n;
+    int j;
+    int i;
+    int Nr;
+    int result = 1;
+
+    iv[0] = 0xa6a6a6a6;
+    iv[1] = 0xa6a6a6a6;
+    if ((length & 7) != 0 || (keyLength & 7) != 0) {
+        return 0;
+    }
+    n = (length - 1) >> 3;
+    if (n < 2) {
+        return 0;
+    }
+    Nr = rijndaelKeySetupDec(rk, key, keyLength * 8);
+    memcpy(block, in, 8);
+    // BUG: the input has length - 8 bytes after its first block, and this copies 7 bytes more, from past its end
+#ifdef BUGFIX
+    memcpy(out, in + 8, length - 8);
+#else
+    memcpy(out, in + 8, length - 1);
+#endif
+    for (j = 5; j >= 0; j--) {
+        for (i = n; i > 0; i--) {
+            t = BSWAP64((u64)n * j + i);
+            UtilAc_Xor8(block, (u8 *)&t, block);
+            memcpy(block + 8, out + (i - 1) * sizeof(u64), 8);
+            rijndaelDecrypt(rk, Nr, block, block);
+            memcpy(out + (i - 1) * sizeof(u64), block + 8, 8);
+        }
+    }
+    if (memcmp(iv, block, 8) != 0) {
+        result = 0;
+    }
+    return result;
+}
+
+static void UtilAc_Xor8(const u8 *a, const u8 *b, u8 *out) {
+    out[0] = a[0] ^ b[0];
+    out[1] = a[1] ^ b[1];
+    out[2] = a[2] ^ b[2];
+    out[3] = a[3] ^ b[3];
+    out[4] = a[4] ^ b[4];
+    out[5] = a[5] ^ b[5];
+    out[6] = a[6] ^ b[6];
+    out[7] = a[7] ^ b[7];
+}
+
+// Rijndael (AES) as in rijndael-alg-fst.c, whose tables are defined with the setup's state
+#define GETU32(p) (((u32)(p)[0] << 24) ^ ((u32)(p)[1] << 16) ^ ((u32)(p)[2] << 8) ^ ((u32)(p)[3]))
+#define PUTU32(c, v)                                                                                                   \
+    {                                                                                                                  \
+        (c)[0] = (u8)((v) >> 24);                                                                                      \
+        (c)[1] = (u8)((v) >> 16);                                                                                      \
+        (c)[2] = (u8)((v) >> 8);                                                                                       \
+        (c)[3] = (u8)(v);                                                                                              \
+    }
+
+// Rijndael's key schedule for encryption; returns the number of rounds
+static int rijndaelKeySetupEnc(u32 *rk, const u8 *cipherKey, int keyBits) {
+    int i = 0;
+    u32 temp;
+
+    rk[0] = GETU32(cipherKey);
+    rk[1] = GETU32(cipherKey + 4);
+    rk[2] = GETU32(cipherKey + 8);
+    rk[3] = GETU32(cipherKey + 12);
+    if (keyBits == 128) {
+        for (;;) {
+            temp = rk[3];
+            rk[4] = rk[0] ^ (Te4[(temp >> 16) & 0xff] & 0xff000000) ^ (Te4[(temp >> 8) & 0xff] & 0x00ff0000) ^
+                    (Te4[temp & 0xff] & 0x0000ff00) ^ (Te4[temp >> 24] & 0x000000ff) ^ rcon[i];
+            rk[5] = rk[1] ^ rk[4];
+            rk[6] = rk[2] ^ rk[5];
+            rk[7] = rk[3] ^ rk[6];
+            if (++i >= 10) {
+                return 10;
+            }
+            rk += 4;
+        }
+    }
+    rk[4] = GETU32(cipherKey + 16);
+    rk[5] = GETU32(cipherKey + 20);
+    if (keyBits == 192) {
+        for (;;) {
+            temp = rk[5];
+            rk[6] = rk[0] ^ (Te4[(temp >> 16) & 0xff] & 0xff000000) ^ (Te4[(temp >> 8) & 0xff] & 0x00ff0000) ^
+                    (Te4[temp & 0xff] & 0x0000ff00) ^ (Te4[temp >> 24] & 0x000000ff) ^ rcon[i];
+            rk[7] = rk[1] ^ rk[6];
+            rk[8] = rk[2] ^ rk[7];
+            rk[9] = rk[3] ^ rk[8];
+            if (++i >= 8) {
+                return 12;
+            }
+            rk[10] = rk[4] ^ rk[9];
+            rk[11] = rk[5] ^ rk[10];
+            rk += 6;
+        }
+    }
+    rk[6] = GETU32(cipherKey + 24);
+    rk[7] = GETU32(cipherKey + 28);
+    if (keyBits == 256) {
+        for (;;) {
+            temp = rk[7];
+            rk[8] = rk[0] ^ (Te4[(temp >> 16) & 0xff] & 0xff000000) ^ (Te4[(temp >> 8) & 0xff] & 0x00ff0000) ^
+                    (Te4[temp & 0xff] & 0x0000ff00) ^ (Te4[temp >> 24] & 0x000000ff) ^ rcon[i];
+            rk[9] = rk[1] ^ rk[8];
+            rk[10] = rk[2] ^ rk[9];
+            rk[11] = rk[3] ^ rk[10];
+            if (++i >= 7) {
+                return 14;
+            }
+            temp = rk[11];
+            rk[12] = rk[4] ^ (Te4[temp >> 24] & 0xff000000) ^ (Te4[(temp >> 16) & 0xff] & 0x00ff0000) ^
+                     (Te4[(temp >> 8) & 0xff] & 0x0000ff00) ^ (Te4[temp & 0xff] & 0x000000ff);
+            rk[13] = rk[5] ^ rk[12];
+            rk[14] = rk[6] ^ rk[13];
+            rk[15] = rk[7] ^ rk[14];
+            rk += 8;
+        }
+    }
+    return 0;
+}
+
+// The same for decryption
+static int rijndaelKeySetupDec(u32 *rk, const u8 *cipherKey, int keyBits) {
+    int Nr;
+    int i;
+    int j;
+    u32 temp;
+
+    Nr = rijndaelKeySetupEnc(rk, cipherKey, keyBits);
+    for (i = 0, j = 4 * Nr; i < j; i += 4, j -= 4) {
+        temp = rk[i];
+        rk[i] = rk[j];
+        rk[j] = temp;
+        temp = rk[i + 1];
+        rk[i + 1] = rk[j + 1];
+        rk[j + 1] = temp;
+        temp = rk[i + 2];
+        rk[i + 2] = rk[j + 2];
+        rk[j + 2] = temp;
+        temp = rk[i + 3];
+        rk[i + 3] = rk[j + 3];
+        rk[j + 3] = temp;
+    }
+    for (i = 1; i < Nr; i++) {
+        rk += 4;
+        rk[0] = Td0[Te4[rk[0] >> 24] & 0xff] ^ Td1[Te4[(rk[0] >> 16) & 0xff] & 0xff] ^
+                Td2[Te4[(rk[0] >> 8) & 0xff] & 0xff] ^ Td3[Te4[rk[0] & 0xff] & 0xff];
+        rk[1] = Td0[Te4[rk[1] >> 24] & 0xff] ^ Td1[Te4[(rk[1] >> 16) & 0xff] & 0xff] ^
+                Td2[Te4[(rk[1] >> 8) & 0xff] & 0xff] ^ Td3[Te4[rk[1] & 0xff] & 0xff];
+        rk[2] = Td0[Te4[rk[2] >> 24] & 0xff] ^ Td1[Te4[(rk[2] >> 16) & 0xff] & 0xff] ^
+                Td2[Te4[(rk[2] >> 8) & 0xff] & 0xff] ^ Td3[Te4[rk[2] & 0xff] & 0xff];
+        rk[3] = Td0[Te4[rk[3] >> 24] & 0xff] ^ Td1[Te4[(rk[3] >> 16) & 0xff] & 0xff] ^
+                Td2[Te4[(rk[3] >> 8) & 0xff] & 0xff] ^ Td3[Te4[rk[3] & 0xff] & 0xff];
+    }
+    return Nr;
+}
+
+static void rijndaelEncrypt(const u32 *rk, int Nr, const u8 *pt, u8 *ct) {
+    u32 s0;
+    u32 s1;
+    u32 s2;
+    u32 s3;
+    u32 t0;
+    u32 t1;
+    u32 t2;
+    u32 t3;
+    int r;
+
+    s0 = GETU32(pt) ^ rk[0];
+    s1 = GETU32(pt + 4) ^ rk[1];
+    s2 = GETU32(pt + 8) ^ rk[2];
+    s3 = GETU32(pt + 12) ^ rk[3];
+    r = Nr >> 1;
+    for (;;) {
+        t0 = Te0[s0 >> 24] ^ Te1[(s1 >> 16) & 0xff] ^ Te2[(s2 >> 8) & 0xff] ^ Te3[s3 & 0xff] ^ rk[4];
+        t1 = Te0[s1 >> 24] ^ Te1[(s2 >> 16) & 0xff] ^ Te2[(s3 >> 8) & 0xff] ^ Te3[s0 & 0xff] ^ rk[5];
+        t2 = Te0[s2 >> 24] ^ Te1[(s3 >> 16) & 0xff] ^ Te2[(s0 >> 8) & 0xff] ^ Te3[s1 & 0xff] ^ rk[6];
+        t3 = Te0[s3 >> 24] ^ Te1[(s0 >> 16) & 0xff] ^ Te2[(s1 >> 8) & 0xff] ^ Te3[s2 & 0xff] ^ rk[7];
+        rk += 8;
+        if (--r == 0) {
+            break;
+        }
+        s0 = Te0[t0 >> 24] ^ Te1[(t1 >> 16) & 0xff] ^ Te2[(t2 >> 8) & 0xff] ^ Te3[t3 & 0xff] ^ rk[0];
+        s1 = Te0[t1 >> 24] ^ Te1[(t2 >> 16) & 0xff] ^ Te2[(t3 >> 8) & 0xff] ^ Te3[t0 & 0xff] ^ rk[1];
+        s2 = Te0[t2 >> 24] ^ Te1[(t3 >> 16) & 0xff] ^ Te2[(t0 >> 8) & 0xff] ^ Te3[t1 & 0xff] ^ rk[2];
+        s3 = Te0[t3 >> 24] ^ Te1[(t0 >> 16) & 0xff] ^ Te2[(t1 >> 8) & 0xff] ^ Te3[t2 & 0xff] ^ rk[3];
+    }
+    s0 = (Te4[t0 >> 24] & 0xff000000) ^ (Te4[(t1 >> 16) & 0xff] & 0x00ff0000) ^ (Te4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
+         (Te4[t3 & 0xff] & 0x000000ff) ^ rk[0];
+    PUTU32(ct, s0);
+    s1 = (Te4[t1 >> 24] & 0xff000000) ^ (Te4[(t2 >> 16) & 0xff] & 0x00ff0000) ^ (Te4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
+         (Te4[t0 & 0xff] & 0x000000ff) ^ rk[1];
+    PUTU32(ct + 4, s1);
+    s2 = (Te4[t2 >> 24] & 0xff000000) ^ (Te4[(t3 >> 16) & 0xff] & 0x00ff0000) ^ (Te4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
+         (Te4[t1 & 0xff] & 0x000000ff) ^ rk[2];
+    PUTU32(ct + 8, s2);
+    s3 = (Te4[t3 >> 24] & 0xff000000) ^ (Te4[(t0 >> 16) & 0xff] & 0x00ff0000) ^ (Te4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
+         (Te4[t2 & 0xff] & 0x000000ff) ^ rk[3];
+    PUTU32(ct + 12, s3);
+}
+
+static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt) {
+    u32 s0;
+    u32 s1;
+    u32 s2;
+    u32 s3;
+    u32 t0;
+    u32 t1;
+    u32 t2;
+    u32 t3;
+    int r;
+
+    s0 = GETU32(ct) ^ rk[0];
+    s1 = GETU32(ct + 4) ^ rk[1];
+    s2 = GETU32(ct + 8) ^ rk[2];
+    s3 = GETU32(ct + 12) ^ rk[3];
+    r = Nr >> 1;
+    for (;;) {
+        t0 = Td0[s0 >> 24] ^ Td1[(s3 >> 16) & 0xff] ^ Td2[(s2 >> 8) & 0xff] ^ Td3[s1 & 0xff] ^ rk[4];
+        t1 = Td0[s1 >> 24] ^ Td1[(s0 >> 16) & 0xff] ^ Td2[(s3 >> 8) & 0xff] ^ Td3[s2 & 0xff] ^ rk[5];
+        t2 = Td0[s2 >> 24] ^ Td1[(s1 >> 16) & 0xff] ^ Td2[(s0 >> 8) & 0xff] ^ Td3[s3 & 0xff] ^ rk[6];
+        t3 = Td0[s3 >> 24] ^ Td1[(s2 >> 16) & 0xff] ^ Td2[(s1 >> 8) & 0xff] ^ Td3[s0 & 0xff] ^ rk[7];
+        rk += 8;
+        if (--r == 0) {
+            break;
+        }
+        s0 = Td0[t0 >> 24] ^ Td1[(t3 >> 16) & 0xff] ^ Td2[(t2 >> 8) & 0xff] ^ Td3[t1 & 0xff] ^ rk[0];
+        s1 = Td0[t1 >> 24] ^ Td1[(t0 >> 16) & 0xff] ^ Td2[(t3 >> 8) & 0xff] ^ Td3[t2 & 0xff] ^ rk[1];
+        s2 = Td0[t2 >> 24] ^ Td1[(t1 >> 16) & 0xff] ^ Td2[(t0 >> 8) & 0xff] ^ Td3[t3 & 0xff] ^ rk[2];
+        s3 = Td0[t3 >> 24] ^ Td1[(t2 >> 16) & 0xff] ^ Td2[(t1 >> 8) & 0xff] ^ Td3[t0 & 0xff] ^ rk[3];
+    }
+    s0 = (Td4[t0 >> 24] & 0xff000000) ^ (Td4[(t3 >> 16) & 0xff] & 0x00ff0000) ^ (Td4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
+         (Td4[t1 & 0xff] & 0x000000ff) ^ rk[0];
+    PUTU32(pt, s0);
+    s1 = (Td4[t1 >> 24] & 0xff000000) ^ (Td4[(t0 >> 16) & 0xff] & 0x00ff0000) ^ (Td4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
+         (Td4[t2 & 0xff] & 0x000000ff) ^ rk[1];
+    PUTU32(pt + 4, s1);
+    s2 = (Td4[t2 >> 24] & 0xff000000) ^ (Td4[(t1 >> 16) & 0xff] & 0x00ff0000) ^ (Td4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
+         (Td4[t3 & 0xff] & 0x000000ff) ^ rk[2];
+    PUTU32(pt + 8, s2);
+    s3 = (Td4[t3 >> 24] & 0xff000000) ^ (Td4[(t2 >> 16) & 0xff] & 0x00ff0000) ^ (Td4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
+         (Td4[t0 & 0xff] & 0x000000ff) ^ rk[3];
+    PUTU32(pt + 12, s3);
+}
+
+// RFC 1321's MD5 (md5c.c), as in GameSpy's copy in overlay 11 (lib/dwc/src/gamespy/md5c.c), with the functions named
+// after the reference's: UtilAc_MD5Init is its MD5Init, UtilAc_MD5Memcpy its MD5_memcpy, and so on
+
+#define S11 7
+#define S12 12
+#define S13 17
+#define S14 22
+#define S21 5
+#define S22 9
+#define S23 14
+#define S24 20
+#define S31 4
+#define S32 11
+#define S33 16
+#define S34 23
+#define S41 6
+#define S42 10
+#define S43 15
+#define S44 21
+
+#define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
+#define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
+#define H(x, y, z) ((x) ^ (y) ^ (z))
+#define I(x, y, z) ((y) ^ ((x) | (~z)))
+
+#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
+
+#define FF(a, b, c, d, x, s, ac)                                                                                       \
+    {                                                                                                                  \
+        (a) += F((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) = ROTATE_LEFT((a), (s));                                                                                   \
+        (a) += (b);                                                                                                    \
+    }
+#define GG(a, b, c, d, x, s, ac)                                                                                       \
+    {                                                                                                                  \
+        (a) += G((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) = ROTATE_LEFT((a), (s));                                                                                   \
+        (a) += (b);                                                                                                    \
+    }
+#define HH(a, b, c, d, x, s, ac)                                                                                       \
+    {                                                                                                                  \
+        (a) += H((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) = ROTATE_LEFT((a), (s));                                                                                   \
+        (a) += (b);                                                                                                    \
+    }
+#define II(a, b, c, d, x, s, ac)                                                                                       \
+    {                                                                                                                  \
+        (a) += I((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) = ROTATE_LEFT((a), (s));                                                                                   \
+        (a) += (b);                                                                                                    \
+    }
+
+static void UtilAc_MD5Init(HashContext *context) {
+    func_ov011_021719fcInline(context);
+}
+
+static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen) {
+    u32 i;
+    u32 index;
+    u32 partLen;
+
+    index = (context->count[0] >> 3) & 0x3F;
+    if ((context->count[0] += (inputLen << 3)) < (inputLen << 3)) {
+        context->count[1]++;
+    }
+    context->count[1] += (inputLen >> 29);
+    partLen = 64 - index;
+    if (inputLen >= partLen) {
+        UtilAc_MD5Memcpy(&context->buffer[index], input, partLen);
+        UtilAc_MD5Transform(context->state, context->buffer);
+        for (i = partLen; i + 63 < inputLen; i += 64) {
+            UtilAc_MD5Transform(context->state, &input[i]);
+        }
+        index = 0;
+    } else {
+        i = 0;
+    }
+    UtilAc_MD5Memcpy(&context->buffer[index], &input[i], inputLen - i);
+}
+
+static void UtilAc_MD5Final(u8 *digest, HashContext *context) {
+    u8 bits[8];
+    u32 index;
+    u32 padLen;
+
+    UtilAc_MD5Encode(bits, context->count, 8);
+    index = (context->count[0] >> 3) & 0x3f;
+    padLen = (index < 56) ? (56 - index) : (120 - index);
+    UtilAc_MD5Update(context, PADDING, padLen);
+    UtilAc_MD5Update(context, bits, 8);
+    UtilAc_MD5Encode(digest, context->state, 16);
+    UtilAc_MD5Memset((char *)context, 0, sizeof(*context));
+}
+
+static void UtilAc_MD5Transform(u32 *state, const u8 *block) {
+    u32 a = state[0];
+    u32 b = state[1];
+    u32 c = state[2];
+    u32 d = state[3];
+    u32 x[16];
+
+    UtilAc_MD5Decode(x, block, 64);
+
+    FF(a, b, c, d, x[0], S11, 0xd76aa478);
+    FF(d, a, b, c, x[1], S12, 0xe8c7b756);
+    FF(c, d, a, b, x[2], S13, 0x242070db);
+    FF(b, c, d, a, x[3], S14, 0xc1bdceee);
+    FF(a, b, c, d, x[4], S11, 0xf57c0faf);
+    FF(d, a, b, c, x[5], S12, 0x4787c62a);
+    FF(c, d, a, b, x[6], S13, 0xa8304613);
+    FF(b, c, d, a, x[7], S14, 0xfd469501);
+    FF(a, b, c, d, x[8], S11, 0x698098d8);
+    FF(d, a, b, c, x[9], S12, 0x8b44f7af);
+    FF(c, d, a, b, x[10], S13, 0xffff5bb1);
+    FF(b, c, d, a, x[11], S14, 0x895cd7be);
+    FF(a, b, c, d, x[12], S11, 0x6b901122);
+    FF(d, a, b, c, x[13], S12, 0xfd987193);
+    FF(c, d, a, b, x[14], S13, 0xa679438e);
+    FF(b, c, d, a, x[15], S14, 0x49b40821);
+
+    GG(a, b, c, d, x[1], S21, 0xf61e2562);
+    GG(d, a, b, c, x[6], S22, 0xc040b340);
+    GG(c, d, a, b, x[11], S23, 0x265e5a51);
+    GG(b, c, d, a, x[0], S24, 0xe9b6c7aa);
+    GG(a, b, c, d, x[5], S21, 0xd62f105d);
+    GG(d, a, b, c, x[10], S22, 0x2441453);
+    GG(c, d, a, b, x[15], S23, 0xd8a1e681);
+    GG(b, c, d, a, x[4], S24, 0xe7d3fbc8);
+    GG(a, b, c, d, x[9], S21, 0x21e1cde6);
+    GG(d, a, b, c, x[14], S22, 0xc33707d6);
+    GG(c, d, a, b, x[3], S23, 0xf4d50d87);
+    GG(b, c, d, a, x[8], S24, 0x455a14ed);
+    GG(a, b, c, d, x[13], S21, 0xa9e3e905);
+    GG(d, a, b, c, x[2], S22, 0xfcefa3f8);
+    GG(c, d, a, b, x[7], S23, 0x676f02d9);
+    GG(b, c, d, a, x[12], S24, 0x8d2a4c8a);
+
+    HH(a, b, c, d, x[5], S31, 0xfffa3942);
+    HH(d, a, b, c, x[8], S32, 0x8771f681);
+    HH(c, d, a, b, x[11], S33, 0x6d9d6122);
+    HH(b, c, d, a, x[14], S34, 0xfde5380c);
+    HH(a, b, c, d, x[1], S31, 0xa4beea44);
+    HH(d, a, b, c, x[4], S32, 0x4bdecfa9);
+    HH(c, d, a, b, x[7], S33, 0xf6bb4b60);
+    HH(b, c, d, a, x[10], S34, 0xbebfbc70);
+    HH(a, b, c, d, x[13], S31, 0x289b7ec6);
+    HH(d, a, b, c, x[0], S32, 0xeaa127fa);
+    HH(c, d, a, b, x[3], S33, 0xd4ef3085);
+    HH(b, c, d, a, x[6], S34, 0x4881d05);
+    HH(a, b, c, d, x[9], S31, 0xd9d4d039);
+    HH(d, a, b, c, x[12], S32, 0xe6db99e5);
+    HH(c, d, a, b, x[15], S33, 0x1fa27cf8);
+    HH(b, c, d, a, x[2], S34, 0xc4ac5665);
+
+    II(a, b, c, d, x[0], S41, 0xf4292244);
+    II(d, a, b, c, x[7], S42, 0x432aff97);
+    II(c, d, a, b, x[14], S43, 0xab9423a7);
+    II(b, c, d, a, x[5], S44, 0xfc93a039);
+    II(a, b, c, d, x[12], S41, 0x655b59c3);
+    II(d, a, b, c, x[3], S42, 0x8f0ccc92);
+    II(c, d, a, b, x[10], S43, 0xffeff47d);
+    II(b, c, d, a, x[1], S44, 0x85845dd1);
+    II(a, b, c, d, x[8], S41, 0x6fa87e4f);
+    II(d, a, b, c, x[15], S42, 0xfe2ce6e0);
+    II(c, d, a, b, x[6], S43, 0xa3014314);
+    II(b, c, d, a, x[13], S44, 0x4e0811a1);
+    II(a, b, c, d, x[4], S41, 0xf7537e82);
+    II(d, a, b, c, x[11], S42, 0xbd3af235);
+    II(c, d, a, b, x[2], S43, 0x2ad7d2bb);
+    II(b, c, d, a, x[9], S44, 0xeb86d391);
+
+    state[0] += a;
+    state[1] += b;
+    state[2] += c;
+    state[3] += d;
+
+    UtilAc_MD5Memset((char *)x, 0, sizeof(x));
+}
+
+static void UtilAc_MD5Encode(u8 *output, const u32 *input, u32 length) {
+    u32 i;
+    u32 j;
+
+    for (i = 0, j = 0; j < length; i++, j += 4) {
+        output[j] = (u8)(input[i] & 0xff);
+        output[j + 1] = (u8)((input[i] >> 8) & 0xff);
+        output[j + 2] = (u8)((input[i] >> 16) & 0xff);
+        output[j + 3] = (u8)((input[i] >> 24) & 0xff);
+    }
+}
+
+static void UtilAc_MD5Decode(u32 *output, const u8 *input, u32 length) {
+    u32 i;
+    u32 j;
+
+    for (i = 0, j = 0; j < length; i++, j += 4) {
+        output[i] =
+            ((u32)input[j]) | (((u32)input[j + 1]) << 8) | (((u32)input[j + 2]) << 16) | (((u32)input[j + 3]) << 24);
+    }
+}
+
+static void UtilAc_MD5Memcpy(u8 *output, const u8 *input, u32 length) {
+    u32 i;
+
+    for (i = 0; i < length; i++) {
+        output[i] = input[i];
+    }
+}
+
+static void UtilAc_MD5Memset(char *output, int value, u32 length) {
+    u32 i;
+
+    for (i = 0; i < length; i++) {
+        *output++ = value;
+    }
+}
+
+// The 16 bytes of the MD5 of the data
+static void UtilAc_Md5(u8 *digest, const u8 *data, u32 length) {
+    HashContext context;
+
+    UtilAc_MD5Init(&context);
+    UtilAc_MD5Update(&context, data, length);
+    UtilAc_MD5Final(digest, &context);
+}
+
+static u32 UtilAc_GetMilliseconds(void) {
+    return OS_TicksToMilliSeconds(OS_GetTick());
+}
+
+static void *UtilAc_Calloc(int count, int size) {
+    int total = count * size;
+    void *ptr = sAcAlloc(total);
+
+    if (ptr != NULL) {
+        memset(ptr, 0, total);
+    }
+    return ptr;
+}
+
+static void UtilAc_Free(void *ptr) {
+    sAcFree(ptr);
+}
+
+// Writes the two hex digits of a byte, in capitals; their count
+static int UtilAc_FormatHexByte(char *out, s8 value) {
+    char *p = out;
+    u8 byte = value;
+    int i;
+    int next;
+    int digit;
+
+    digit = (byte & 0xf0) >> 4;
+    i = 0;
+    next = byte & 0xf;
+    for (; i < 2; i++) {
+        if (digit <= 9) {
+            digit += '0';
+        } else {
+            digit += 'A' - 10;
+        }
+        *p++ = digit;
+        digit = next;
+    }
+    *p = 0;
+    return p - out;
+}
+
+// Writes a MAC address as hex digits with colons; the count of the characters
+static int UtilAc_FormatMacAddress(char *out, const s8 *mac) {
+    char *p = out;
+    int i;
+
+    for (i = 0; i < 6; i++) {
+        p += UtilAc_FormatHexByte(p, *mac++);
+        if (i < 5) {
+            *p++ = ':';
+        }
+    }
+    *p = 0;
+    return p - out;
+}
+
+int DWCUtilAc_Start(u32 priority, int apCount, DWCUtilAcCallback callback, void *(*alloc)(u32 size),
+                    void (*free)(void *ptr), u32 stackSize) {
+    int result;
+
+    if (sAcState >= AC_STATE_SCANNING && sAcState <= AC_STATE_KEY) {
+        return RESULT_BUSY;
+    }
+    sAcConfig.apCount = apCount;
+    sAcState = AC_STATE_FAILED;
+    sAcCallback = callback;
+    sAcAlloc = alloc;
+    sAcFree = free;
+    sAcConfig.stackSize = stackSize;
+    result = UtilAc_StartWcm(apCount);
+    sAcWcmStarted = TRUE;
+    if (result < 0) {
+        sAcStatusResult = result;
+        return result;
+    }
+    sAcStack = sAcAlloc(sAcConfig.stackSize);
+    if (sAcStack == NULL) {
+        sAcStatusResult = RESULT_NO_MEMORY;
+        return RESULT_NO_MEMORY;
+    }
+    if (OS_IsThreadAvailable() != TRUE) {
+        sAcStatusResult = RESULT_NO_THREADS;
+        return RESULT_NO_THREADS;
+    }
+    OS_CreateThread(&sAcThread, UtilAc_Thread, NULL, (u8 *)sAcStack + (sAcConfig.stackSize & ~7), sAcConfig.stackSize,
+                    priority);
+    sAcState = AC_STATE_SCANNING;
+    sAcConfig.deadline = UtilAc_GetMilliseconds() + 60000;
+    sAcCancel = FALSE;
+    memset(&sAcResult, 0, sizeof(sAcResult));
+    UtilAc_NotifyStatus();
+    OS_WakeupThreadDirect(&sAcThread);
+    sAcRunning = TRUE;
+    return RESULT_OK;
+}
+
+int DWCUtilAc_Cancel(void) {
+    if (sAcRunning) {
+        int state = sAcState;
+
+        sAcCancel = TRUE;
+        while (sAcState >= AC_STATE_SCANNING && sAcState <= AC_STATE_KEY) {
+            OS_Sleep(100);
+        }
+        OS_Sleep(500);
+        if (!OS_IsThreadTerminated(&sAcThread)) {
+            do {
+                OS_WakeupThreadDirect(&sAcThread);
+                OS_JoinThread(&sAcThread);
+            } while (!OS_IsThreadTerminated(&sAcThread));
+        }
+        if (sAcStack != NULL) {
+            sAcFree(sAcStack);
+            sAcStack = NULL;
+        }
+        sAcRunning = FALSE;
+        if (state != sAcState) {
+            UtilAc_NotifyStatus();
+        }
+    }
+    if (sAcWcmStarted > 0) {
+        int result = UtilAc_EndWcm();
+
+        sAcWcmStarted = FALSE;
+        return result;
+    }
+    return RESULT_BUSY;
+}
+
+static int UtilAc_GetStatus(DWCUtilAcStatus *status) {
+    status->state = sAcState;
+    if (sAcConfig.deadline == 0xffffffff) {
+        status->timeLeft = 0xffffffff;
+    } else {
+        status->timeLeft = sAcConfig.deadline - UtilAc_GetMilliseconds();
+    }
+    status->result = sAcStatusResult;
+    return 1;
+}
+
+BOOL DWCUtilAc_GetResult(DWCUtilAcResult *result) {
+    memcpy(result, &sAcResult, sizeof(sAcResult));
+    return TRUE;
+}
+
+static void UtilAc_NotifyStatus(void) {
+    DWCUtilAcStatus status;
+
+    UtilAc_GetStatus(&status);
+    sAcCallback(&status);
 }

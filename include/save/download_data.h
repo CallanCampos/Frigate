@@ -8,6 +8,6 @@
 #include "save/memory_link_savedata.h"
 #include "struct_decls.h"
 
-void *func_020074d8(SaveControl *save);
+void *SaveControl_GetMemoryLink(SaveControl *save);
 
 #endif // POKEBW2_SAVE_DOWNLOAD_DATA_H

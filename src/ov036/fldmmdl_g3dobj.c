@@ -1,5 +1,8 @@
+// Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
 #include "constants/directions.h"
+#include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_effect.h"
@@ -33,26 +36,20 @@ typedef struct {
     s16 wait;
 } ActorWaitWork;
 
-// An action command that is done in its first frame: what to do then, and at the end
-typedef struct {
-    ActorAcmdFunc start;
-    ActorAcmdFunc end;
-} ActorAcmdTurnFuncs;
-
 #define RES_NONE 0xffff
 
-static void func_ov036_02194718(ActorG3DSystem *sys, HeapID heapId);
-static void func_ov036_02194758(ActorG3DSystem *sys);
+static void FieldActorG3DSystem_InitEntries(ActorG3DSystem *sys, HeapID heapId);
+static void FieldActorG3DSystem_FreeEntries(ActorG3DSystem *sys);
 static u16 FieldActorG3DSystem_RegistObj(ActorG3DSystem *sys, u16 objCode, u16 resGroup);
-static u16 func_ov036_021947c4(ActorG3DSystem *sys, u16 objCode);
+static u16 FieldActorG3DSystem_FindResGroup(ActorG3DSystem *sys, u16 objCode);
 static u16 FldActSys_SetupG3DObj(MMSys *system, ActorG3DSystem *sys, u16 objCode, const FieldActorResGroup *group);
-static void func_ov036_02194870(ActorG3DSystem *sys, u16 objCode);
+static void FieldActorG3DSystem_UnloadObjCode(ActorG3DSystem *sys, u16 objCode);
 static BOOL func_ov036_021949ec(FieldActor *actor);
 static void func_ov036_02194a18(FieldActor *actor);
 static void func_ov036_02194a3c(FieldActor *actor);
 static void func_ov036_02194a5c(FieldActor *actor);
 static void func_ov036_02194a90(FieldActor *actor);
-static BOOL func_ov036_02194ac8(FieldActor *actor);
+static BOOL RailActor_CacheTerrain(FieldActor *actor);
 static void func_ov036_02194b48(FieldActor *actor);
 static void func_ov036_02194ba8(FieldActor *actor);
 static void func_ov036_02194c14(FieldActor *actor);
@@ -62,35 +59,22 @@ static void func_ov036_02194d28(FieldActor *actor, u32 tile, u32 origYTile, cons
 static void func_ov036_02194d4c(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194d78(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194db4(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_EnsureShadow(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194dec(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static void func_ov036_02194df0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194e70(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
-static void func_ov036_02194eb0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
+static void RailActor_ClearReflectionIfOffTile(FieldActor *actor, u32 tile, u32 origYTile,
+                                               const FieldActorConfig *info);
+static void RailActor_UpdateShadowGroup(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info);
 static FieldEffects *FldAct_GetFieldEffects(FieldActor *actor);
-static BOOL func_ov036_02194ef8(FieldActor *actor);
-static void func_ov036_02194f04(FieldActor *actor, u32 dir);
-static BOOL func_ov036_02194f28(FieldActor *actor);
-static BOOL func_ov036_02194f34(FieldActor *actor);
-static BOOL func_ov036_02194f40(FieldActor *actor);
-static BOOL func_ov036_02194f4c(FieldActor *actor);
-static void func_ov036_02194f58(FieldActor *actor, u32 dir, u32 speed, u32 frames);
-static void func_ov036_02195134(FieldActor *actor, u32 dir, u32 speed, u32 frames);
-static BOOL func_ov036_021952bc(FieldActor *actor);
-static void func_ov036_021952dc(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
-                                u32 se);
+static void RailActorAcmd_InitTurn(FieldActor *actor, u32 dir);
+static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 frames);
+static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 speed, u32 frames);
+static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
+                                   u32 se);
 
 // The direction an actor on the rails faces, by the sixteenth of a turn from the camera angle to its way along the rail
 static const u8 FACE_DIRS_BY_ANGLE[16] = { 1, 3, 3, 3, 3, 3, 3, 0, 0, 2, 2, 2, 2, 2, 2, 1 };
-
-// The rail actors' action commands of these functions, which fldmmdl_acmd.c's table of action commands lists
-const ActorAcmdTurnFuncs data_ov036_021cf374 = { func_ov036_02194f4c, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf37c = { func_ov036_02194f40, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf384 = { func_ov036_02194f28, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf38c = { func_ov036_02194f34, func_ov036_02194ee8 };
-const ActorAcmdTurnFuncs data_ov036_021cf394 = { func_ov036_02194ef8, func_ov036_02194ee8 };
-const ActorAcmdFuncs data_ov036_021cf39c = { func_ov036_021952bc, func_ov036_02195168, func_ov036_02194ee8 };
 
 void FieldActorG3DSystem_Create(MMSys *system, void *g3dObjSystem) {
     HeapID heapId = FldActSys_GetFieldHeapID(system);
@@ -99,14 +83,14 @@ void FieldActorG3DSystem_Create(MMSys *system, void *g3dObjSystem) {
     sys->system = system;
     sys->objSystem = g3dObjSystem;
     sys->count = GetActorLimit(system);
-    func_ov036_02194718(sys, heapId);
+    FieldActorG3DSystem_InitEntries(sys, heapId);
     FldActSys_BindActorG3DSystem(system, sys);
 }
 
 void func_ov036_021946f4(MMSys *system) {
     ActorG3DSystem *sys = FldActSys_GetActorG3DSystem(system);
 
-    func_ov036_02194758(sys);
+    FieldActorG3DSystem_FreeEntries(sys);
     GFL_HeapFree(sys);
 }
 
@@ -116,7 +100,7 @@ FieldG3DObjSystem *FldAct_GetG3DObjSystem(FieldActor *actor) {
     return sys->objSystem;
 }
 
-static void func_ov036_02194718(ActorG3DSystem *sys, HeapID heapId) {
+static void FieldActorG3DSystem_InitEntries(ActorG3DSystem *sys, HeapID heapId) {
     int i;
 
     sys->entries = GFL_HeapAllocate(heapId, sys->count * sizeof(ActorG3DEntry), TRUE, "fldmmdl_g3dobj.c", 127);
@@ -125,7 +109,7 @@ static void func_ov036_02194718(ActorG3DSystem *sys, HeapID heapId) {
     }
 }
 
-static void func_ov036_02194758(ActorG3DSystem *sys) {
+static void FieldActorG3DSystem_FreeEntries(ActorG3DSystem *sys) {
     int i;
     ActorG3DEntry *entry = sys->entries;
 
@@ -151,7 +135,7 @@ static u16 FieldActorG3DSystem_RegistObj(ActorG3DSystem *sys, u16 objCode, u16 r
     return 0;
 }
 
-static u16 func_ov036_021947c4(ActorG3DSystem *sys, u16 objCode) {
+static u16 FieldActorG3DSystem_FindResGroup(ActorG3DSystem *sys, u16 objCode) {
     int i;
     ActorG3DEntry *entry = sys->entries;
 
@@ -187,7 +171,7 @@ static u16 FldActSys_SetupG3DObj(MMSys *system, ActorG3DSystem *sys, u16 objCode
     return resGroup;
 }
 
-static void func_ov036_02194870(ActorG3DSystem *sys, u16 objCode) {
+static void FieldActorG3DSystem_UnloadObjCode(ActorG3DSystem *sys, u16 objCode) {
     int i;
     ActorG3DEntry *entry = sys->entries;
 
@@ -204,7 +188,7 @@ u16 func_ov036_021948a0(FieldActor *actor) {
     const FieldActorConfig *info = GetActorMdlInfo(actor);
     MMSys *system = GetActorMModelSystem(actor);
     ActorG3DSystem *sys = FldActSys_GetActorG3DSystem(system);
-    u16 resGroup = func_ov036_021947c4(sys, info->uid);
+    u16 resGroup = FieldActorG3DSystem_FindResGroup(sys, info->uid);
 
     if (resGroup == RES_NONE) {
         resGroup = FldActSys_SetupG3DObj(system, sys, info->uid, GetNPCMdlInfoG3DRscGroup(info));
@@ -218,24 +202,24 @@ void func_ov036_021948ec(FieldActor *actor, u16 objIdx) {
 
     FieldG3DObjSystem_FreeObj(sys->objSystem, objIdx);
     if (!FldAct_CheckObjCodeShared(actor, objCode)) {
-        func_ov036_02194870(sys, objCode);
+        FieldActorG3DSystem_UnloadObjCode(sys, objCode);
     }
 }
 
 void func_ov036_02194924(FieldActor *actor) {
-    func_ov012_02167174(actor);
+    FldAct_CallMoveInitProc(actor);
     SetActorFlag(actor, 2);
 }
 
 void func_ov036_02194938(FieldActor *actor) {
-    if (func_ov012_0216748c(actor, 2) == 0) {
+    if (CheckActorMMSysFlag(actor, 2) == 0) {
         func_ov036_02194a18(actor);
         func_ov036_02194a3c(actor);
         if (CheckActorMovementFlag(actor, 0x200)) {
             func_ov036_0218eff4(actor);
-        } else if (func_ov012_02167600(actor) == FALSE) {
+        } else if (IsActorMovementDisabled(actor) == FALSE) {
             if (func_ov036_021949ec(actor) == TRUE) {
-                func_ov012_02167188(actor);
+                FldAct_CallMoveProc(actor);
             }
         }
         func_ov036_02194a5c(actor);
@@ -274,8 +258,8 @@ static BOOL func_ov036_021949ec(FieldActor *actor) {
 
 static void func_ov036_02194a18(FieldActor *actor) {
     if (CheckActorMovementFlag(actor, 0x800)) {
-        if (func_ov036_02194ac8(actor) == TRUE) {
-            func_ov012_021674dc(actor);
+        if (RailActor_CacheTerrain(actor) == TRUE) {
+            FldAct_SetMoveStart(actor);
         }
     }
 }
@@ -305,11 +289,11 @@ static void func_ov036_02194a90(FieldActor *actor) {
     ClearActorMovementFlag(actor, 0x140);
 }
 
-static BOOL func_ov036_02194ac8(FieldActor *actor) {
+static BOOL RailActor_CacheTerrain(FieldActor *actor) {
     u32 origYTile = -1;
     u32 tile = -1;
 
-    if (!func_ov012_021677a4(actor)) {
+    if (!FldAct_IsMapAttrDisabled(actor)) {
         NoGridMapper *mapper = FldActSys_GetNoGridMapper(GetActorMModelSystem(actor));
         RailPosition origYPos;
         RailPosition pos;
@@ -330,67 +314,67 @@ static BOOL func_ov036_02194ac8(FieldActor *actor) {
 }
 
 static void func_ov036_02194b48(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
         func_ov036_02194d28(actor, tile, origYTile, info);
         func_ov036_02194dac(actor, tile, origYTile, info);
-        func_ov036_02194e04(actor, tile, origYTile, info);
-        func_ov036_02194eb0(actor, tile, origYTile, info);
+        RailActor_StartReflection(actor, tile, origYTile, info);
+        RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
 static void func_ov036_02194ba8(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
         func_ov036_02194d4c(actor, tile, origYTile, info);
         func_ov036_02194d78(actor, tile, origYTile, info);
-        func_ov036_02194db4(actor, tile, origYTile, info);
-        func_ov036_02194e04(actor, tile, origYTile, info);
-        func_ov036_02194eb0(actor, tile, origYTile, info);
+        RailActor_EnsureShadow(actor, tile, origYTile, info);
+        RailActor_StartReflection(actor, tile, origYTile, info);
+        RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
 static void func_ov036_02194c14(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
-        func_ov036_02194db4(actor, tile, origYTile, info);
-        func_ov036_02194e04(actor, tile, origYTile, info);
-        func_ov036_02194eb0(actor, tile, origYTile, info);
+        RailActor_EnsureShadow(actor, tile, origYTile, info);
+        RailActor_StartReflection(actor, tile, origYTile, info);
+        RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
 static void func_ov036_02194c68(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
-        func_ov036_02194e70(actor, tile, origYTile, info);
+        RailActor_ClearReflectionIfOffTile(actor, tile, origYTile, info);
         func_ov036_02194dec(actor, tile, origYTile, info);
-        func_ov036_02194eb0(actor, tile, origYTile, info);
+        RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
 static void func_ov036_02194cbc(FieldActor *actor) {
-    if (func_ov036_02194ac8(actor) && func_ov012_02167614(actor) == TRUE) {
+    if (RailActor_CacheTerrain(actor) && FldAct_IsDrawReady(actor) == TRUE) {
         u32 tile = GetCachedTileUnderActor(actor);
         u32 origYTile = GetCachedOrigYTileUnderActor(actor);
         const FieldActorConfig *info = GetActorMdlInfo(actor);
 
-        func_ov036_02194e70(actor, tile, origYTile, info);
+        RailActor_ClearReflectionIfOffTile(actor, tile, origYTile, info);
         func_ov036_02194dec(actor, tile, origYTile, info);
         func_ov036_02194d4c(actor, tile, origYTile, info);
         func_ov036_02194df0(actor, tile, origYTile, info);
-        func_ov036_02194eb0(actor, tile, origYTile, info);
+        RailActor_UpdateShadowGroup(actor, tile, origYTile, info);
     }
 }
 
@@ -419,11 +403,11 @@ static void func_ov036_02194d78(FieldActor *actor, u32 tile, u32 origYTile, cons
 }
 
 static void func_ov036_02194dac(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    func_ov036_02194db4(actor, tile, origYTile, info);
+    RailActor_EnsureShadow(actor, tile, origYTile, info);
 }
 
-static void func_ov036_02194db4(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
-    if (func_ov012_021673f8(GetActorMModelSystem(actor))) {
+static void RailActor_EnsureShadow(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+    if (FldActSys_AreShadowsEnabled(GetActorMModelSystem(actor))) {
         if (!CheckActorMovementFlag(actor, 0x4000)) {
             func_ov036_021a3bf0(actor, FldAct_GetFieldEffects(actor));
             SetActorMovementFlag(actor, 0x4000);
@@ -438,7 +422,7 @@ static void func_ov036_02194df0(FieldActor *actor, u32 tile, u32 origYTile, cons
     func_ov036_021a3ec4(actor, FldAct_GetFieldEffects(actor));
 }
 
-static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_StartReflection(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (info->enableReflections != 0 && !FldAct_CheckReflectingFlag(actor)) {
         u32 reflectTile = -1;
 
@@ -446,7 +430,7 @@ static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, cons
             if (GetTileFlags(tile) & 0x40) {
                 reflectTile = tile;
             } else {
-                tile = func_ov012_0215e9b0(actor, 1);
+                tile = FldAct_GetTileTypeInDir(actor, 1);
                 if (GetTileFlags(tile) & 0x40) {
                     reflectTile = tile;
                 }
@@ -462,9 +446,10 @@ static void func_ov036_02194e04(FieldActor *actor, u32 tile, u32 origYTile, cons
     }
 }
 
-static void func_ov036_02194e70(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_ClearReflectionIfOffTile(FieldActor *actor, u32 tile, u32 origYTile,
+                                               const FieldActorConfig *info) {
     if (info->enableReflections != 0 && FldAct_CheckReflectingFlag(actor)) {
-        u32 reflectTile = func_ov012_0215e9b0(actor, 1);
+        u32 reflectTile = FldAct_GetTileTypeInDir(actor, 1);
 
         if (reflectTile == -1) {
             FldAct_SetReflectingFlag(actor, FALSE);
@@ -476,7 +461,7 @@ static void func_ov036_02194e70(FieldActor *actor, u32 tile, u32 origYTile, cons
     }
 }
 
-static void func_ov036_02194eb0(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
+static void RailActor_UpdateShadowGroup(FieldActor *actor, u32 tile, u32 origYTile, const FieldActorConfig *info) {
     if (GetTileFlags(tile) & 0x100) {
         FldAct_SetShadowGroup(actor, 1);
     } else {
@@ -493,43 +478,43 @@ BOOL func_ov036_02194ee8(FieldActor *actor) {
     return FALSE;
 }
 
-static BOOL func_ov036_02194ef8(FieldActor *actor) {
+BOOL func_ov036_02194ef8(FieldActor *actor) {
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 
-static void func_ov036_02194f04(FieldActor *actor, u32 dir) {
+static void RailActorAcmd_InitTurn(FieldActor *actor, u32 dir) {
     CheckSetActorFaceDir(actor, dir);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
 
-static BOOL func_ov036_02194f28(FieldActor *actor) {
-    func_ov036_02194f04(actor, DIR_UP);
+BOOL func_ov036_02194f28(FieldActor *actor) {
+    RailActorAcmd_InitTurn(actor, DIR_UP);
     return TRUE;
 }
 
-static BOOL func_ov036_02194f34(FieldActor *actor) {
-    func_ov036_02194f04(actor, DIR_DOWN);
+BOOL func_ov036_02194f34(FieldActor *actor) {
+    RailActorAcmd_InitTurn(actor, DIR_DOWN);
     return TRUE;
 }
 
-static BOOL func_ov036_02194f40(FieldActor *actor) {
-    func_ov036_02194f04(actor, DIR_LEFT);
+BOOL func_ov036_02194f40(FieldActor *actor) {
+    RailActorAcmd_InitTurn(actor, DIR_LEFT);
     return TRUE;
 }
 
-static BOOL func_ov036_02194f4c(FieldActor *actor) {
-    func_ov036_02194f04(actor, DIR_RIGHT);
+BOOL func_ov036_02194f4c(FieldActor *actor) {
+    RailActorAcmd_InitTurn(actor, DIR_RIGHT);
     return TRUE;
 }
 
-static void func_ov036_02194f58(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
+static void RailActorAcmd_InitMove(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
     func_ov036_02195640(actor, dir, speed);
     func_ov036_021959bc(actor, dir);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, frames);
+    FldAct_SetDrawStatus(actor, frames);
     SetActorMovementFlag(actor, 0x20);
     FieldActor_NextAcmdState(actor);
 }
@@ -541,107 +526,107 @@ BOOL func_ov036_02194f94(FieldActor *actor) {
     func_ov036_02195624(actor);
     RailUnit_GetCalcPos(unit, &pos);
     SetActorWPosValue(actor, &pos);
-    if (func_ov036_021b09f4(unit)) {
+    if (RailUnit_IsMovePending(unit)) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x440);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return FALSE;
 }
 
 BOOL func_ov036_02194fe8(FieldActor *actor) {
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     return FALSE;
 }
 
 BOOL func_ov036_02194ff4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 0, 16, 2);
+    RailActorAcmd_InitMove(actor, 0, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_02195004(FieldActor *actor) {
-    func_ov036_02194f58(actor, 1, 16, 2);
+    RailActorAcmd_InitMove(actor, 1, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_02195014(FieldActor *actor) {
-    func_ov036_02194f58(actor, 2, 16, 2);
+    RailActorAcmd_InitMove(actor, 2, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_02195024(FieldActor *actor) {
-    func_ov036_02194f58(actor, 3, 16, 2);
+    RailActorAcmd_InitMove(actor, 3, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_02195034(FieldActor *actor) {
-    func_ov036_02194f58(actor, 0, 8, 3);
+    RailActorAcmd_InitMove(actor, 0, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_02195044(FieldActor *actor) {
-    func_ov036_02194f58(actor, 1, 8, 3);
+    RailActorAcmd_InitMove(actor, 1, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_02195054(FieldActor *actor) {
-    func_ov036_02194f58(actor, 2, 8, 3);
+    RailActorAcmd_InitMove(actor, 2, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_02195064(FieldActor *actor) {
-    func_ov036_02194f58(actor, 3, 8, 3);
+    RailActorAcmd_InitMove(actor, 3, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_02195074(FieldActor *actor) {
-    func_ov036_02194f58(actor, 0, 4, 4);
+    RailActorAcmd_InitMove(actor, 0, 4, 4);
     return TRUE;
 }
 BOOL func_ov036_02195084(FieldActor *actor) {
-    func_ov036_02194f58(actor, 1, 4, 4);
+    RailActorAcmd_InitMove(actor, 1, 4, 4);
     return TRUE;
 }
 BOOL func_ov036_02195094(FieldActor *actor) {
-    func_ov036_02194f58(actor, 2, 4, 4);
+    RailActorAcmd_InitMove(actor, 2, 4, 4);
     return TRUE;
 }
 BOOL func_ov036_021950a4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 3, 4, 4);
+    RailActorAcmd_InitMove(actor, 3, 4, 4);
     return TRUE;
 }
 BOOL func_ov036_021950b4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 0, 2, 5);
+    RailActorAcmd_InitMove(actor, 0, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_021950c4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 1, 2, 5);
+    RailActorAcmd_InitMove(actor, 1, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_021950d4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 2, 2, 5);
+    RailActorAcmd_InitMove(actor, 2, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_021950e4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 3, 2, 5);
+    RailActorAcmd_InitMove(actor, 3, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_021950f4(FieldActor *actor) {
-    func_ov036_02194f58(actor, 0, 4, 10);
+    RailActorAcmd_InitMove(actor, 0, 4, 10);
     return TRUE;
 }
 BOOL func_ov036_02195104(FieldActor *actor) {
-    func_ov036_02194f58(actor, 1, 4, 10);
+    RailActorAcmd_InitMove(actor, 1, 4, 10);
     return TRUE;
 }
 BOOL func_ov036_02195114(FieldActor *actor) {
-    func_ov036_02194f58(actor, 2, 4, 10);
+    RailActorAcmd_InitMove(actor, 2, 4, 10);
     return TRUE;
 }
 BOOL func_ov036_02195124(FieldActor *actor) {
-    func_ov036_02194f58(actor, 3, 4, 10);
+    RailActorAcmd_InitMove(actor, 3, 4, 10);
     return TRUE;
 }
-static void func_ov036_02195134(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
+static void RailActorAcmd_InitWait(FieldActor *actor, u32 dir, u32 speed, u32 frames) {
     ActorWaitWork *work = func_ov012_0216713c(actor, sizeof(ActorWaitWork));
 
     work->unk0 = frames;
     work->wait = speed;
     CheckSetActorFaceDir(actor, dir);
-    func_ov012_021670f4(actor, frames);
+    FldAct_SetDrawStatus(actor, frames);
     SetActorInitialGPosToNowGPos(actor);
     FieldActor_NextAcmdState(actor);
 }
@@ -653,92 +638,92 @@ BOOL func_ov036_02195168(FieldActor *actor) {
         return FALSE;
     }
     SetActorMovementFlag(actor, 0x400);
-    func_ov012_021670f4(actor, 0);
+    FldAct_SetDrawStatus(actor, 0);
     FieldActor_NextAcmdState(actor);
     return TRUE;
 }
 BOOL func_ov036_0219519c(FieldActor *actor) {
-    func_ov036_02195134(actor, 0, 32, 1);
+    RailActorAcmd_InitWait(actor, 0, 32, 1);
     return TRUE;
 }
 BOOL func_ov036_021951ac(FieldActor *actor) {
-    func_ov036_02195134(actor, 1, 32, 1);
+    RailActorAcmd_InitWait(actor, 1, 32, 1);
     return TRUE;
 }
 BOOL func_ov036_021951bc(FieldActor *actor) {
-    func_ov036_02195134(actor, 2, 32, 1);
+    RailActorAcmd_InitWait(actor, 2, 32, 1);
     return TRUE;
 }
 BOOL func_ov036_021951cc(FieldActor *actor) {
-    func_ov036_02195134(actor, 3, 32, 1);
+    RailActorAcmd_InitWait(actor, 3, 32, 1);
     return TRUE;
 }
 BOOL func_ov036_021951dc(FieldActor *actor) {
-    func_ov036_02195134(actor, 0, 16, 2);
+    RailActorAcmd_InitWait(actor, 0, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_021951ec(FieldActor *actor) {
-    func_ov036_02195134(actor, 1, 16, 2);
+    RailActorAcmd_InitWait(actor, 1, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_021951fc(FieldActor *actor) {
-    func_ov036_02195134(actor, 2, 16, 2);
+    RailActorAcmd_InitWait(actor, 2, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_0219520c(FieldActor *actor) {
-    func_ov036_02195134(actor, 3, 16, 2);
+    RailActorAcmd_InitWait(actor, 3, 16, 2);
     return TRUE;
 }
 BOOL func_ov036_0219521c(FieldActor *actor) {
-    func_ov036_02195134(actor, 0, 8, 3);
+    RailActorAcmd_InitWait(actor, 0, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_0219522c(FieldActor *actor) {
-    func_ov036_02195134(actor, 1, 8, 3);
+    RailActorAcmd_InitWait(actor, 1, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_0219523c(FieldActor *actor) {
-    func_ov036_02195134(actor, 2, 8, 3);
+    RailActorAcmd_InitWait(actor, 2, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_0219524c(FieldActor *actor) {
-    func_ov036_02195134(actor, 3, 8, 3);
+    RailActorAcmd_InitWait(actor, 3, 8, 3);
     return TRUE;
 }
 BOOL func_ov036_0219525c(FieldActor *actor) {
-    func_ov036_02195134(actor, 0, 2, 5);
+    RailActorAcmd_InitWait(actor, 0, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_0219526c(FieldActor *actor) {
-    func_ov036_02195134(actor, 1, 2, 5);
+    RailActorAcmd_InitWait(actor, 1, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_0219527c(FieldActor *actor) {
-    func_ov036_02195134(actor, 2, 2, 5);
+    RailActorAcmd_InitWait(actor, 2, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_0219528c(FieldActor *actor) {
-    func_ov036_02195134(actor, 3, 2, 5);
+    RailActorAcmd_InitWait(actor, 3, 2, 5);
     return TRUE;
 }
 BOOL func_ov036_0219529c(FieldActor *actor) {
-    func_ov036_02195134(actor, 0, 4, 4);
+    RailActorAcmd_InitWait(actor, 0, 4, 4);
     return TRUE;
 }
 BOOL func_ov036_021952ac(FieldActor *actor) {
-    func_ov036_02195134(actor, 1, 4, 4);
+    RailActorAcmd_InitWait(actor, 1, 4, 4);
     return TRUE;
 }
-static BOOL func_ov036_021952bc(FieldActor *actor) {
-    func_ov036_02195134(actor, 2, 4, 4);
+BOOL func_ov036_021952bc(FieldActor *actor) {
+    RailActorAcmd_InitWait(actor, 2, 4, 4);
     return TRUE;
 }
 BOOL func_ov036_021952cc(FieldActor *actor) {
-    func_ov036_02195134(actor, 3, 4, 4);
+    RailActorAcmd_InitWait(actor, 3, 4, 4);
     return TRUE;
 }
-static void func_ov036_021952dc(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
-                                u32 se) {
+static void RailActorAcmd_InitJump(FieldActor *actor, u32 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step,
+                                   u32 se) {
     ActorRailJumpWork *work = func_ov012_0216713c(actor, sizeof(ActorRailJumpWork));
 
     work->dir = dir;
@@ -755,7 +740,7 @@ static void func_ov036_021952dc(FieldActor *actor, u32 dir, u32 speed, u32 timer
     }
     SetActorMovementFlag(actor, 0xa0);
     ChangeActorDirection(actor, dir);
-    func_ov012_021670f4(actor, frame);
+    FldAct_SetDrawStatus(actor, frame);
     FieldActor_NextAcmdState(actor);
     if (se != 0) {
         GFL_SndSEPlay(se);
@@ -763,5 +748,5 @@ static void func_ov036_021952dc(FieldActor *actor, u32 dir, u32 speed, u32 timer
 }
 
 void func_ov036_02195354(FieldActor *actor, u16 dir, u32 speed, u32 timer, u16 frame, s16 height, u16 step) {
-    func_ov036_021952dc(actor, dir, speed, timer, frame, height, step, 0x55e);
+    RailActorAcmd_InitJump(actor, dir, speed, timer, frame, height, step, SEQ_SE_DANSA);
 }

@@ -10,85 +10,85 @@
 #define SAVE_BLOCK_MISC 0x42
 
 void *getHollow_RivalBlk(SaveControl *save) {
-    return func_0200f7d8(SaveControl_GetBlockPtr(save, SAVE_BLOCK_MISC));
+    return Misc_GetHollowRival(SaveControl_GetBlockPtr(save, SAVE_BLOCK_MISC));
 }
 
-void func_0200ff50(void *block, u32 index, u16 value) {
+void HollowRivalSave_SetValue(void *block, u32 index, u16 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->values[index] = value;
 }
 
-u16 func_0200ff54(void *block, u16 index) {
+u16 HollowRivalSave_GetValue(void *block, u16 index) {
     HollowRivalSave *hollowRival = block;
 
     return hollowRival->values[index];
 }
 
-void func_0200ff58(void *block, u16 index, u32 value) {
+void HollowRivalSave_SetFlag(void *block, u16 index, u32 value) {
     HollowRivalSave *hollowRival = block;
 
     hollowRival->flags[index] = value;
 }
 
-u8 func_0200ff60(HollowRivalSave *hollowRival, u16 index) {
+u8 HollowRivalSave_GetFlag(HollowRivalSave *hollowRival, u16 index) {
     return hollowRival->flags[index];
 }
 
-void func_0200ff68(HollowRivalSave *hollowRival, u32 value) {
-    hollowRival->unk10 = value;
+void HollowRivalSave_SetMeeting(HollowRivalSave *hollowRival, u32 value) {
+    hollowRival->meeting = value;
 }
 
-void func_0200ff6c(void *block) {
+void HollowRivalSave_ClearMeeting(void *block) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk10 = 0;
+    hollowRival->meeting = 0;
 }
 
-u16 func_0200ff74(void *block) {
+u16 HollowRivalSave_GetMeeting(void *block) {
     HollowRivalSave *hollowRival = block;
 
-    return hollowRival->unk10;
+    return hollowRival->meeting;
 }
 
-void func_0200ff78(void *rival, u32 value) {
+void HollowRivalSave_SetMeetingToday(void *rival, u32 value) {
     HollowRivalSave *hollowRival = rival;
 
-    hollowRival->unk11_0 = value;
+    hollowRival->meetingToday = value;
 }
 
-BOOL func_0200ff8c(HollowRivalSave *hollowRival) {
-    return hollowRival->unk11_0;
+BOOL HollowRivalSave_IsMeetingToday(HollowRivalSave *hollowRival) {
+    return hollowRival->meetingToday;
 }
 
-void func_0200ff94(void *block, u32 value) {
+void HollowRivalSave_SetHasSpecies(void *block, u32 value) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk11_1 = value;
+    hollowRival->hasSpecies = value;
 }
 
-BOOL func_0200ffa8(HollowRivalSave *hollowRival) {
-    return hollowRival->unk11_1;
+BOOL HollowRivalSave_HasSpecies(HollowRivalSave *hollowRival) {
+    return hollowRival->hasSpecies;
 }
 
-void func_0200ffb0(void *block, u16 value) {
+void HollowRivalSave_SetSpecies(void *block, u16 value) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk12 = value;
+    hollowRival->species = value;
 }
 
-u16 func_0200ffb4(HollowRivalSave *hollowRival) {
-    return hollowRival->unk12;
+u16 HollowRivalSave_GetSpecies(HollowRivalSave *hollowRival) {
+    return hollowRival->species;
 }
 
-void func_0200ffb8(void *block, u32 value) {
+void HollowRivalSave_SetMet(void *block, u32 value) {
     HollowRivalSave *hollowRival = block;
 
-    hollowRival->unk11_2 = value;
+    hollowRival->met = value;
 }
 
-BOOL func_0200ffcc(HollowRivalSave *hollowRival) {
-    return hollowRival->unk11_2;
+BOOL HollowRivalSave_IsMet(HollowRivalSave *hollowRival) {
+    return hollowRival->met;
 }
 
 BOOL func_0200ffd4(void *block, int index) {

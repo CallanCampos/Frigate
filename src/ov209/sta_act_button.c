@@ -49,22 +49,22 @@ StaActButton *StaActButton_InitSystem(HeapID heapId, StaActing *stage, MusicalPo
 void StaActButton_TermSystem(StaActButton *sys) {
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
     if (sys->itemIds[0] != 0xff) {
-        func_0204c108(sys->buttons[0]);
+        ClActor_Delete(sys->buttons[0]);
     }
     if (sys->itemIds[1] != 0xff) {
-        func_0204c108(sys->buttons[1]);
+        ClActor_Delete(sys->buttons[1]);
     }
-    func_0204c108(sys->effect);
-    func_0204bcd0(sys->palettes[0]);
-    func_0204b98c(sys->chars[0]);
-    func_0204be64(sys->cellAnims[0]);
-    func_0204bcd0(sys->palettes[1]);
-    func_0204b98c(sys->chars[1]);
-    func_0204be64(sys->cellAnims[1]);
-    func_0204bcd0(sys->palettes[2]);
-    func_0204b98c(sys->chars[2]);
-    func_0204be64(sys->cellAnims[2]);
-    func_0204bf98(sys->clactUnit);
+    ClActor_Delete(sys->effect);
+    ClActSys_FreePltt(sys->palettes[0]);
+    ClActSys_FreeChars(sys->chars[0]);
+    ClActSys_FreeCellAnims(sys->cellAnims[0]);
+    ClActSys_FreePltt(sys->palettes[1]);
+    ClActSys_FreeChars(sys->chars[1]);
+    ClActSys_FreeCellAnims(sys->cellAnims[1]);
+    ClActSys_FreePltt(sys->palettes[2]);
+    ClActSys_FreeChars(sys->chars[2]);
+    ClActSys_FreeCellAnims(sys->cellAnims[2]);
+    ClActUnit_Delete(sys->clactUnit);
     GFL_HeapFree(sys);
 }
 
@@ -75,7 +75,7 @@ void StaActButton_UpdateSystem(StaActButton *sys) {
             { 144, 176, 208, 240 },
             { TOUCH_RECT_END, 0, 0, 0 },
         };
-        s32 hit = func_0203da0c(rects);
+        s32 hit = GFL_HIDGetTouchPressedRect(rects);
 
         G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, 0x10, 0);
         if (hit != TOUCH_RECT_NONE && sys->itemIds[hit] != 0xff && sys->used[hit] == FALSE) {
@@ -93,26 +93,26 @@ void StaActButton_UpdateSystem(StaActButton *sys) {
             sys->selected = hit;
             pos.x = hit == 0 ? 32 : 224;
             pos.y = 128;
-            func_0204c56c(sys->effect);
-            func_0204c124(sys->effect, TRUE);
-            func_0204c140(sys->effect, &pos, CLACT_SURFACE_SUB);
-            func_0203d564(TRUE);
+            ClActor_RestartAnim(sys->effect);
+            ClActor_SetVisible(sys->effect, TRUE);
+            ClActor_SetSurfacePos(sys->effect, &pos, CLACT_SURFACE_SUB);
+            GCTX_HIDSetUsingTouch(TRUE);
         }
     }
     if (sys->selected != STA_ACT_BUTTON_NONE) {
         if (StaActing_IsUsingItem(sys->stage) == FALSE) {
             if (sys->pressed == FALSE) {
                 sys->active = TRUE;
-                func_0204c124(sys->buttons[sys->selected], FALSE);
-                func_0204c124(sys->items[sys->selected], FALSE);
+                ClActor_SetVisible(sys->buttons[sys->selected], FALSE);
+                ClActor_SetVisible(sys->items[sys->selected], FALSE);
                 sys->selected = STA_ACT_BUTTON_NONE;
             }
         } else if (sys->pressed == TRUE) {
             sys->pressed = FALSE;
         }
     }
-    if (func_0204c138(sys->effect) == TRUE && func_0204c560(sys->effect) == FALSE) {
-        func_0204c124(sys->effect, FALSE);
+    if (ClActor_IsVisible(sys->effect) == TRUE && ClActor_IsAnimActive(sys->effect) == FALSE) {
+        ClActor_SetVisible(sys->effect, FALSE);
     }
 }
 
@@ -123,20 +123,20 @@ static void StaActButton_InitGraphic(StaActButton *sys) {
     ClActorSetup setup;
     ClActorSetup effectSetup;
 
-    sys->clactUnit = func_0204bf1c(5, 0, sys->heapId);
-    func_0204c028(sys->clactUnit);
+    sys->clactUnit = ClActUnit_Create(5, 0, sys->heapId);
+    ClActUnit_UseSystemRenderer(sys->clactUnit);
     arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL, sys->heapId);
-    sys->palettes[0] = func_0204bbb8(arc, 0, CLACT_VRAM_SUB, 0, 0, 2, sys->heapId);
-    sys->chars[0] = func_0204b81c(arc, 6, FALSE, CLACT_VRAM_SUB, sys->heapId);
-    sys->cellAnims[0] = func_0204bde0(arc, 18, 21, sys->heapId);
-    sys->palettes[1] = func_0204bbb8(arc, 1, CLACT_VRAM_SUB, 0x40, 0, 1, sys->heapId);
-    sys->chars[1] = func_0204b81c(arc, 7, FALSE, CLACT_VRAM_SUB, sys->heapId);
-    sys->cellAnims[1] = func_0204bde0(arc, 19, 22, sys->heapId);
+    sys->palettes[0] = ClActSys_LoadPlttRange(arc, 0, CLACT_VRAM_SUB, 0, 0, 2, sys->heapId);
+    sys->chars[0] = ClActSys_LoadChars(arc, 6, FALSE, CLACT_VRAM_SUB, sys->heapId);
+    sys->cellAnims[0] = ClActSys_LoadCellAnims(arc, 18, 21, sys->heapId);
+    sys->palettes[1] = ClActSys_LoadPlttRange(arc, 1, CLACT_VRAM_SUB, 0x40, 0, 1, sys->heapId);
+    sys->chars[1] = ClActSys_LoadChars(arc, 7, FALSE, CLACT_VRAM_SUB, sys->heapId);
+    sys->cellAnims[1] = ClActSys_LoadCellAnims(arc, 19, 22, sys->heapId);
     GFL_ArcToolFree(arc);
     arc = GFL_ArcSysCreateFileHandle(ARCID_MUSICAL_SHOT, sys->heapId);
-    sys->palettes[2] = func_0204bba0(arc, 0, CLACT_VRAM_SUB, 0x60, sys->heapId);
-    sys->chars[2] = func_0204b81c(arc, 26, FALSE, CLACT_VRAM_SUB, sys->heapId);
-    sys->cellAnims[2] = func_0204bde0(arc, 18, 22, sys->heapId);
+    sys->palettes[2] = ClActSys_LoadPltt(arc, 0, CLACT_VRAM_SUB, 0x60, sys->heapId);
+    sys->chars[2] = ClActSys_LoadChars(arc, 26, FALSE, CLACT_VRAM_SUB, sys->heapId);
+    sys->cellAnims[2] = ClActSys_LoadCellAnims(arc, 18, 22, sys->heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < 2; i++) {
         if (sys->itemIds[i] != 0xff) {
@@ -151,13 +151,13 @@ static void StaActButton_InitGraphic(StaActButton *sys) {
             setup.sequence = i;
             setup.priority = 10;
             setup.bgPriority = 0;
-            sys->buttons[i] = func_0204c040(sys->clactUnit, sys->chars[0], sys->palettes[0], sys->cellAnims[0], &setup,
-                                            CLACT_SURFACE_SUB, sys->heapId);
+            sys->buttons[i] = ClActor_Create(sys->clactUnit, sys->chars[0], sys->palettes[0], sys->cellAnims[0], &setup,
+                                             CLACT_SURFACE_SUB, sys->heapId);
             setup.sequence = 0;
-            sys->items[i] = func_0204c040(sys->clactUnit, sys->chars[1], sys->palettes[1], sys->cellAnims[1], &setup,
-                                          CLACT_SURFACE_SUB, sys->heapId);
-            func_0204c124(sys->buttons[i], FALSE);
-            func_0204c124(sys->items[i], FALSE);
+            sys->items[i] = ClActor_Create(sys->clactUnit, sys->chars[1], sys->palettes[1], sys->cellAnims[1], &setup,
+                                           CLACT_SURFACE_SUB, sys->heapId);
+            ClActor_SetVisible(sys->buttons[i], FALSE);
+            ClActor_SetVisible(sys->items[i], FALSE);
             StaActButton_LoadItemTexture(sys, i, sys->itemIds[i], size);
         }
     }
@@ -166,10 +166,10 @@ static void StaActButton_InitGraphic(StaActButton *sys) {
     effectSetup.sequence = 0;
     effectSetup.priority = 0;
     effectSetup.bgPriority = 0;
-    sys->effect = func_0204c040(sys->clactUnit, sys->chars[2], sys->palettes[2], sys->cellAnims[2], &effectSetup,
-                                CLACT_SURFACE_SUB, sys->heapId);
-    func_0204c124(sys->effect, FALSE);
-    func_0204c520(sys->effect, TRUE);
+    sys->effect = ClActor_Create(sys->clactUnit, sys->chars[2], sys->palettes[2], sys->cellAnims[2], &effectSetup,
+                                 CLACT_SURFACE_SUB, sys->heapId);
+    ClActor_SetVisible(sys->effect, FALSE);
+    ClActor_SetAutoAnim(sys->effect, TRUE);
 }
 
 // Copies the prop's texture, of the BlAct size `size`, into the characters of the prop's cell
@@ -195,7 +195,7 @@ static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId
     plttOfs = tex->plttInfo.ofsPlttData;
     texSize = tex->texInfo.sizeTex << 3;
     plttSize = tex->plttInfo.sizePltt << 3;
-    charAddr = func_0204bb80(sys->chars[0], TRUE);
+    charAddr = ClActSys_GetCharVramAddr(sys->chars[0], TRUE);
     charAddr += index << 11;
 
     DC_FlushRange((u8 *)tex + plttOfs, plttSize);
@@ -243,12 +243,12 @@ static void StaActButton_LoadItemTexture(StaActButton *sys, u8 index, u16 itemId
 
 void StaActButton_SetShowFlg(StaActButton *sys, BOOL show) {
     if (sys->itemIds[0] != 0xff) {
-        func_0204c124(sys->buttons[0], show);
-        func_0204c124(sys->items[0], show);
+        ClActor_SetVisible(sys->buttons[0], show);
+        ClActor_SetVisible(sys->items[0], show);
     }
     if (sys->itemIds[1] != 0xff) {
-        func_0204c124(sys->buttons[1], show);
-        func_0204c124(sys->items[1], show);
+        ClActor_SetVisible(sys->buttons[1], show);
+        ClActor_SetVisible(sys->items[1], show);
     }
     sys->active = show;
 }

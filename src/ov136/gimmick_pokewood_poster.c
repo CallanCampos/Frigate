@@ -25,16 +25,17 @@ typedef struct {
     Field *field;
 } GimmickWork;
 
-static void func_ov136_021eece0(GimmickWork *work);
-static void func_ov136_021eed38(GimmickWork *work);
-static void func_ov136_021eed44(GimmickWork *work);
-static void func_ov136_021eed50(GimmickWork *work, u32 poster);
-static void func_ov136_021eedc0(void *texResource, const char *texName, const char *plttName, u32 image, HeapID heapId);
-static u32 func_ov136_021eee94(const NNSG3dResTex *tex, const NNSG3dResDictTexData *texData);
-static u32 func_ov136_021eeea4(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *plttData);
-static void func_ov136_021eeeb4(NNSG3dResName *resName, const char *name);
-static u32 func_ov136_021eeee8(const NNSG3dResTex *tex, const char *name);
-static u32 func_ov136_021eef20(const NNSG3dResTex *tex, const char *name);
+static void PokewoodPoster_Init(GimmickWork *work);
+static void PokewoodPoster_Free(GimmickWork *work);
+static void PokewoodPoster_StepAnimations(GimmickWork *work);
+static void PokewoodPoster_LoadPoster(GimmickWork *work, u32 poster);
+static void PokewoodPoster_WriteImage(void *texResource, const char *texName, const char *plttName, u32 image,
+                                      HeapID heapId);
+static u32 PokewoodPoster_GetTexAddr(const NNSG3dResTex *tex, const NNSG3dResDictTexData *texData);
+static u32 PokewoodPoster_GetPlttAddr(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *plttData);
+static void PokewoodPoster_MakeResName(NNSG3dResName *resName, const char *name);
+static u32 PokewoodPoster_FindTexAddr(const NNSG3dResTex *tex, const char *name);
+static u32 PokewoodPoster_FindPlttAddr(const NNSG3dResTex *tex, const char *name);
 
 // The poster model, from archive 0x125
 static const G3DSceneResourceSetup sResources[] = { { 0x125, 0, 0 } };
@@ -48,28 +49,28 @@ static const char *sPosterTexNames[POSTER_COUNT] = { "c15_poster1", "c15_poster2
 static const char *sPosterPlttNames[POSTER_COUNT] = { "c15_poster1_pl", "c15_poster2_pl", "c15_poster3_pl",
                                                       "c15_poster4_pl" };
 
-void func_ov136_021eec80(Field *field) {
+void GimmickPokewoodPoster_Setup(Field *field) {
     int i;
     GimmickWork *work = Field_AllocGimmickWorkBlock(field, 1, Field_GetHeapID(field), sizeof(GimmickWork));
 
     work->expObj = Field_GetExpObjSystem(field);
     work->field = field;
-    func_ov136_021eece0(work);
+    PokewoodPoster_Init(work);
     for (i = 0; i < POSTER_COUNT; i++) {
-        func_ov136_021eed50(work, i);
+        PokewoodPoster_LoadPoster(work, i);
     }
 }
 
-void func_ov136_021eecb8(Field *field) {
-    func_ov136_021eed38(Field_GetGimmickWorkBlock(field, 1));
+void GimmickPokewoodPoster_End(Field *field) {
+    PokewoodPoster_Free(Field_GetGimmickWorkBlock(field, 1));
     Field_DeleteGimmickWorkBlock(field, 1);
 }
 
-void func_ov136_021eecd0(Field *field) {
-    func_ov136_021eed44(Field_GetGimmickWorkBlock(field, 1));
+void GimmickPokewoodPoster_Update(Field *field) {
+    PokewoodPoster_StepAnimations(Field_GetGimmickWorkBlock(field, 1));
 }
 
-static void func_ov136_021eece0(GimmickWork *work) {
+static void PokewoodPoster_Init(GimmickWork *work) {
     LoadFieldExpandObjData(work->expObj, &sSceneSetup, 0);
     {
         VecFx32 position = { FX32_CONST(728), FX32_CONST(16), FX32_CONST(288) };
@@ -79,31 +80,31 @@ static void func_ov136_021eece0(GimmickWork *work) {
         matrix->translation.y = position.y;
         matrix->translation.z = position.z;
     }
-    func_ov036_021b8248(work->expObj, 0, 0, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, 0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, 0, FALSE);
 }
 
-static void func_ov136_021eed38(GimmickWork *work) {
+static void PokewoodPoster_Free(GimmickWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov136_021eed44(GimmickWork *work) {
+static void PokewoodPoster_StepAnimations(GimmickWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
-static void func_ov136_021eed50(GimmickWork *work, u32 poster) {
+static void PokewoodPoster_LoadPoster(GimmickWork *work, u32 poster) {
     HeapID heapId = HEAPID_TAIL(Field_GetHeapID(work->field));
-    PokewoodSave *save = func_02011040(GSYS_GetGameData(Field_GetGameSystem(work->field)));
+    PokewoodSave *save = PokewoodSave_Get(GSYS_GetGameData(Field_GetGameSystem(work->field)));
     void *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
-    int series = func_02011270(save, poster);
+    int series = PokewoodSave_GetLastSeries(save, poster);
 
     if (series > 0) {
-        func_ov136_021eedc0(texResource, sPosterTexNames[poster], sPosterPlttNames[poster], series - 1, heapId);
+        PokewoodPoster_WriteImage(texResource, sPosterTexNames[poster], sPosterPlttNames[poster], series - 1, heapId);
     }
 }
 
-static void func_ov136_021eedc0(void *texResource, const char *texName, const char *plttName, u32 image,
-                                HeapID heapId) {
+static void PokewoodPoster_WriteImage(void *texResource, const char *texName, const char *plttName, u32 image,
+                                      HeapID heapId) {
     // A poster's size in tiles and a tile's in pixels. The reads are folded, but a function's constants stay in
     // .rodata, as three bytes of 8; which 8 is which is a guess
     static const u8 sTileWidth = 8;
@@ -112,8 +113,8 @@ static void func_ov136_021eedc0(void *texResource, const char *texName, const ch
     NNSGfdTexKey texKey = GFL_G3DResGetTexVRAMHandle(texResource);
     NNSGfdPlttKey plttKey = GFL_G3DResGetPltVRAMHandle(texResource);
     NNSG3dResTex *tex = NNS_G3dGetTex(GFL_G3DResGetResData(texResource));
-    u32 texAddr = func_ov136_021eeee8(tex, texName);
-    u32 plttAddr = func_ov136_021eef20(tex, plttName);
+    u32 texAddr = PokewoodPoster_FindTexAddr(tex, texName);
+    u32 plttAddr = PokewoodPoster_FindPlttAddr(tex, plttName);
     NNSG2dCharacterData *character = NULL;
     NNSG2dPaletteData *palette = NULL;
     void *characterFile = GFL_G2DIOReadBGNCGR(ARCID_GIMMICK_POKEWOOD_POSTER, image * 2 + 1, TRUE, &character, heapId);
@@ -138,15 +139,15 @@ static void func_ov136_021eedc0(void *texResource, const char *texName, const ch
     GFL_BitmapFree(bitmap);
 }
 
-static u32 func_ov136_021eee94(const NNSG3dResTex *tex, const NNSG3dResDictTexData *texData) {
+static u32 PokewoodPoster_GetTexAddr(const NNSG3dResTex *tex, const NNSG3dResDictTexData *texData) {
     return ((texData->texImageParam & 0xffff) << 3) + NNS_GfdGetTexKeyAddr(tex->texInfo.vramKey);
 }
 
-static u32 func_ov136_021eeea4(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *plttData) {
+static u32 PokewoodPoster_GetPlttAddr(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *plttData) {
     return (plttData->offset << 3) + NNS_GfdGetPlttKeyAddr(tex->plttInfo.vramKey);
 }
 
-static void func_ov136_021eeeb4(NNSG3dResName *resName, const char *name) {
+static void PokewoodPoster_MakeResName(NNSG3dResName *resName, const char *name) {
     int len = STD_GetStringLength(name);
     u8 i;
 
@@ -158,11 +159,11 @@ static void func_ov136_021eeeb4(NNSG3dResName *resName, const char *name) {
     }
 }
 
-static u32 func_ov136_021eeee8(const NNSG3dResTex *tex, const char *name) {
+static u32 PokewoodPoster_FindTexAddr(const NNSG3dResTex *tex, const char *name) {
     NNSG3dResName resName;
     const NNSG3dResDictTexData *texData;
 
-    func_ov136_021eeeb4(&resName, name);
+    PokewoodPoster_MakeResName(&resName, name);
     if (tex != NULL) {
         texData = NNS_G3dGetResDataByName(&tex->dict, &resName);
     } else {
@@ -171,14 +172,14 @@ static u32 func_ov136_021eeee8(const NNSG3dResTex *tex, const char *name) {
     if (texData == NULL) {
         return 0;
     }
-    return func_ov136_021eee94(tex, texData);
+    return PokewoodPoster_GetTexAddr(tex, texData);
 }
 
-static u32 func_ov136_021eef20(const NNSG3dResTex *tex, const char *name) {
+static u32 PokewoodPoster_FindPlttAddr(const NNSG3dResTex *tex, const char *name) {
     NNSG3dResName resName;
     const NNSG3dResDictPlttData *plttData;
 
-    func_ov136_021eeeb4(&resName, name);
+    PokewoodPoster_MakeResName(&resName, name);
     if (tex != NULL && tex->plttInfo.ofsDict != 0) {
         plttData = NNS_G3dGetResDataByName((const NNSG3dResDict *)((u8 *)tex + tex->plttInfo.ofsDict), &resName);
     } else {
@@ -187,5 +188,5 @@ static u32 func_ov136_021eef20(const NNSG3dResTex *tex, const char *name) {
     if (plttData == NULL) {
         return 0;
     }
-    return func_ov136_021eeea4(tex, plttData);
+    return PokewoodPoster_GetPlttAddr(tex, plttData);
 }

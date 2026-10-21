@@ -188,7 +188,7 @@ static void GimmickFunfestLevels_InitModels(FunfestLevelsWork *work) {
         matrix->translation.x = TRIGGER_X;
         matrix->translation.y = FX32_CONST(32);
         matrix->translation.z = TRIGGER_X;
-        func_ov036_021b8248(work->expObj, 0, model, TRUE);
+        FieldExpObj_SetActorCulling(work->expObj, 0, model, TRUE);
         FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
     }
     for (model = MODEL_EFFECT_0; model <= MODEL_LEAVE_EFFECT; model++) {
@@ -197,7 +197,7 @@ static void GimmickFunfestLevels_InitModels(FunfestLevelsWork *work) {
         matrix->translation.x = FX32_CONST(512);
         matrix->translation.y = 0;
         matrix->translation.z = FX32_CONST(512);
-        func_ov036_021b8248(work->expObj, 0, model, TRUE);
+        FieldExpObj_SetActorCulling(work->expObj, 0, model, TRUE);
         FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
         for (i = 0; i < count; i++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, i);
@@ -257,7 +257,7 @@ static int GetLevelSteps(u16 level) {
 // Lights the models of the Entralink levels of the player whose beacon is shown, in the tile of the player's
 // position relative to the player's own. Returns the player's net ID
 static u8 GimmickFunfestLevels_ShowLevels(GameData *gameData, FieldExpObjSystem *expObj, EntralinkCommWork *commWork) {
-    u32 netId = func_020175fc(gameData);
+    u32 netId = GameData_GetBeaconNetID(gameData);
     int offset;
     void *levels;
     int whiteSteps;
@@ -265,17 +265,17 @@ static u8 GimmickFunfestLevels_ShowLevels(GameData *gameData, FieldExpObjSystem 
     SRTMatrix *matrix;
     fx32 x;
 
-    offset = netId - func_020175cc(gameData);
+    offset = netId - GameData_GetNetID(gameData);
     if (offset < 0) {
-        offset += func_020175bc(gameData);
+        offset += GameData_GetPlayerCount(gameData);
     }
-    if (netId == func_020175cc(gameData)) {
-        levels = func_02017208(gameData);
+    if (netId == GameData_GetNetID(gameData)) {
+        levels = GameData_GetMyPassPowerLevels(gameData);
     } else {
-        levels = func_020171fc(gameData, netId);
+        levels = GameData_GetPassPowerLevels(gameData, netId);
     }
-    whiteSteps = GetLevelSteps(func_0200c5dc(levels));
-    blackSteps = GetLevelSteps(func_0200c5e0(levels));
+    whiteSteps = GetLevelSteps(PassPowerLevel_GetWhite(levels));
+    blackSteps = GetLevelSteps(PassPowerLevel_GetBlack(levels));
     matrix = FieldExpObj_GetActorMatrixPtr(expObj, 0, MODEL_WHITE_LEVEL + whiteSteps);
     x = FX32_CONST(1024) * offset + TRIGGER_X;
     matrix->translation.x = x;
@@ -291,7 +291,7 @@ static u8 GimmickFunfestLevels_ShowLevels(GameData *gameData, FieldExpObjSystem 
 }
 
 static EntralinkCommWork *GetCommWork(GameCommSys *comm) {
-    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_UNK2) {
+    if (GameCommSys_BootCheck(comm) == GAME_COMM_NO_INTRUDE) {
         return GameCommSys_GetWork(comm);
     }
     return NULL;

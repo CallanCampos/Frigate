@@ -9,6 +9,20 @@
 // MWCC's memcpy built-in, which the DPW, DWC and POKE_NET libraries call by this name
 #define __memcpy __builtin_memcpy
 
+#include <stddef.h>
+
+// MSL strings contain 16-bit DS code units. Keep their operations away from the host libc (32-bit wchar_t on
+// macOS/Linux); port/hal/stubs/wstring_host.c compiles the original MSL implementation with these private names.
+#define wcslen port_msl_wcslen
+#define wcscpy port_msl_wcscpy
+size_t port_msl_wcslen(const wchar_t *s);
+wchar_t *port_msl_wcscpy(wchar_t *dst, const wchar_t *src);
+
+// MSL's C-locale comparison extensions, used by GameSpy's server browser; host libc has no portable equivalent.
+int stricmp(const char *a, const char *b);
+int strcmpi(const char *a, const char *b);
+int strnicmp(const char *a, const char *b, int n);
+
 // The DS's fixed addresses (ADR 0004). The host variants of the SDK headers (port/tools/gen_host_tree.py) write each
 // hardware or memory-map address as PORT_HW_ADDR(address), which finds it in host memory: a 16 MiB window for each
 // region of the memory map, by the address's top byte, each a static array of port/hal/hw so that an address stays a

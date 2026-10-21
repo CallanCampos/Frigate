@@ -13,8 +13,8 @@ enum GameCommNo {
     GAME_COMM_NO_NULL,
     // The field's beacon search (overlay 12's game_beacon_search.c)
     GAME_COMM_NO_BEACON_SEARCH,
-    // Has no callbacks
-    GAME_COMM_NO_UNK2,
+    // Entralink (Intrude_GetCommWork), which has no callbacks of its own here
+    GAME_COMM_NO_INTRUDE,
     // The Union Room (overlay 28)
     GAME_COMM_NO_UNION,
     // The musical (overlay 211)
@@ -51,13 +51,13 @@ GameData *getBasePlayerBlk(GameCommSys *comm);
 u8 GameCommSys_GetLastCommNo(GameCommSys *comm);
 void func_0202be00(GameCommSys *comm);
 u32 func_0202be08(GameCommSys *comm);
-void func_0202be14(GameCommSys *comm, BOOL flag);
-void func_0202be28(GameCommSys *comm, BOOL flag);
-// Whether either of the flags of func_0202be14 and func_0202be28 is set
-BOOL func_0202be3c(GameCommSys *comm);
+void GameCommSys_SetInResearchGraph(GameCommSys *comm, BOOL flag);
+void GameCommSys_SetInFunfestMission(GameCommSys *comm, BOOL flag);
+// Whether either of the flags of GameCommSys_SetInResearchGraph and GameCommSys_SetInFunfestMission is set
+BOOL GameCommSys_IsInResearchGraphOrMission(GameCommSys *comm);
 // Logs two players met over a communication, by net ID: as beacon type 0x27 if they are the same, else 0x26
-void func_0202bf68(GameCommSys *comm, u32 netId1, u32 netId2);
+void GameCommSys_LogPassPowerReceived(GameCommSys *comm, u32 netId1, u32 netId2);
 // Logs the player, as beacon type 0x37
-void func_0202bf7c(GameCommSys *comm);
+void GameCommSys_LogMissionJoined(GameCommSys *comm);
 
 #endif // POKEBW2_SYSTEM_GAME_COMM_H

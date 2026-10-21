@@ -9,7 +9,7 @@
 // The mail screens' params (overlay 215's mailtool.c): what the field app call allocates, and reads the result of
 
 MailParam *MailTool_CreateWriteParam(GameData *gameData, u32 a1, u8 partySlot, u32 mailId, u32 heapId) {
-    void *mailBox = func_02009790(gameData);
+    void *mailBox = MailBox_GetFromGameData(gameData);
     MailParam *param = GFL_HeapAllocate(HEAPID_TAIL((HeapID)heapId), sizeof(MailParam), FALSE, "mailtool.c", 67);
 
     MIi_CpuClearFast(0, param, sizeof(MailParam));
@@ -22,7 +22,7 @@ MailParam *MailTool_CreateWriteParam(GameData *gameData, u32 a1, u8 partySlot, u
     param->save = GameData_GetSaveControl(gameData);
     param->mail = CreateMailData(heapId);
     ResetMailData(param->mail);
-    func_020096f8(param->mail, 0xff, partySlot, gameData);
+    MailData_InitForPlayer(param->mail, 0xff, partySlot, gameData);
     return param;
 }
 
@@ -44,7 +44,7 @@ MailParam *MailTool_CreateItemViewParam(GameData *gameData, u32 mailId, u32 heap
     param->mode = MAIL_PARAM_MODE_VIEW;
     param->save = GameData_GetSaveControl(gameData);
     param->mail = CreateMailData(heapId);
-    func_02009754(param->mail, mailId);
+    MailData_SetDesign(param->mail, mailId);
     return param;
 }
 

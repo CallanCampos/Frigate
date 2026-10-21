@@ -103,25 +103,25 @@ void PokeListDemo_Update(PokeListWork *wk) {
     if (done) {
         wk->state = 16;
     }
-    func_02050044();
+    Particle_UpdateAll();
     GFL_G3DSysReset();
     GFL_G3DSysMtxViewFlush();
-    func_0205001c();
+    Particle_DrawAll();
     GFL_G3DSysReqSwapBuffers();
 }
 
 // Starts particle effect type in particle slot 0 or 1, over the plate's Pokémon
 static void PokeListDemo_CreateParticles(PokeListWork *wk, int slot, int type, int plate) {
     const u8 *res = sParticleResources[type];
-    void *resource = func_0204fdf8(0x4b, res[0], wk->heapId);
+    void *resource = Particle_ReadResource(0x4b, res[0], wk->heapId);
     ClActorPos pos;
     VecFx32 vec;
     u8 i;
     u8 count;
 
     wk->particleHeaps[slot] = allocConfigDSSoftwareFeature(wk->heapId, 0x5000, "plist_demo.c", 196);
-    wk->particles[slot] = func_0204f968(wk->particleHeaps[slot], 0x5000, FALSE, wk->heapId);
-    func_0204fe04(wk->particles[slot], resource, FALSE, GFL_VBlankGetTCBMgr());
+    wk->particles[slot] = Particle_CreateSystem(wk->particleHeaps[slot], 0x5000, FALSE, wk->heapId);
+    Particle_SetResource(wk->particles[slot], resource, FALSE, GFL_VBlankGetTCBMgr());
     PokeListPlate_GetCursorPos(wk, wk->plates[plate], &pos);
     pos.x -= 40;
     pos.y += 4;
@@ -130,7 +130,7 @@ static void PokeListDemo_CreateParticles(PokeListWork *wk, int slot, int type, i
     vec.z = 64 * FX32_ONE;
     count = res[1];
     for (i = 0; i < count; i++) {
-        func_0205006c(wk->particles[slot], i, &vec);
+        Particle_CreateEmitter(wk->particles[slot], i, &vec);
     }
 }
 
@@ -169,7 +169,7 @@ static void PokeListDemo_Setup(PokeListWork *wk) {
     case 5: {
         int zekrom = FALSE;
 
-        if (PokeParty_GetParam(func_0200afa8(wk->param->reshZek), PKM_PARAM_SPECIES, NULL) == SPECIES_ZEKROM) {
+        if (PokeParty_GetParam(ReshZekSave_GetPkm(wk->param->reshZek), PKM_PARAM_SPECIES, NULL) == SPECIES_ZEKROM) {
             zekrom = TRUE;
         }
         PokeListDemo_CreateParticles(wk, 0, zekrom + 5, wk->cursorPos);
@@ -190,8 +190,8 @@ static void PokeListDemo_FreeParticles(PokeListWork *wk) {
 
     for (i = 0; i < 2; i++) {
         if (wk->particles[i] != NULL) {
-            func_0204fa84(wk->particles[i]);
-            func_02042ed0(wk->particleHeaps[i]);
+            Particle_DeleteSystem(wk->particles[i]);
+            GFL_NetFreeAligned32(wk->particleHeaps[i]);
             wk->particleHeaps[i] = NULL;
             wk->particles[i] = NULL;
         }
@@ -213,7 +213,7 @@ static BOOL PokeListDemo_UpdateForm(PokeListWork *wk) {
         }
         break;
     case 2:
-        if (func_020500a8(wk->particles[0]) <= 0 && GFL_SndPlayerIsActiveAny() == FALSE) {
+        if (Particle_GetEmitterCount(wk->particles[0]) <= 0 && GFL_SndPlayerIsActiveAny() == FALSE) {
             wk->voice = PokeVoice_Play(PokeParty_GetParam(wk->pkm, PKM_PARAM_SPECIES, NULL),
                                        PokeParty_GetParam(wk->pkm, PKM_PARAM_FORM, NULL), 64, 0, 0, 0, 0, NULL);
             wk->demoStep++;
@@ -256,7 +256,7 @@ static BOOL PokeListDemo_UpdateFusion(PokeListWork *wk) {
             break;
         }
         for (i = 0; i < 2; i++) {
-            if (wk->particles[i] != NULL && func_020500a8(wk->particles[i]) > 0) {
+            if (wk->particles[i] != NULL && Particle_GetEmitterCount(wk->particles[i]) > 0) {
                 // BUG: Meant to wait for the particles, but this leaves only the loop
 #ifdef BUGFIX
                 return FALSE;
@@ -289,8 +289,8 @@ static BOOL PokeListDemo_UpdateFusion(PokeListWork *wk) {
                 wk->enteredCount++;
             }
         }
-        func_0204c124(wk->cursor, FALSE);
-        func_0204c124(wk->subCursor, FALSE);
+        ClActor_SetVisible(wk->cursor, FALSE);
+        ClActor_SetVisible(wk->subCursor, FALSE);
         wk->demoStep++;
         break;
     }
@@ -451,22 +451,22 @@ u32 PokeListDemo_CheckSeparate(PokeListWork *wk, PartyPkm *pkm) {
 static void PokeListDemo_Fuse(PokeListWork *wk, int form, int kyuremPos, int partnerPos) {
     PartyPkm *kyurem = PokeParty_GetPkm(wk->param->party, kyuremPos);
 
-    func_0200afac(wk->param->reshZek, PokeParty_GetPkm(wk->param->party, partnerPos));
+    ReshZekSave_SetPkm(wk->param->reshZek, PokeParty_GetPkm(wk->param->party, partnerPos));
     PokeListDemo_ChangeKyuremMoves(kyurem, 0, form + 1);
     // PokeParty_ChangeForme takes a u16
     PokeParty_ChangeForme(kyurem, form + 1);
     addPkmToDex(wk->param->pokedex, kyurem);
     PokeParty_RemovePkm(wk->param->party, partnerPos);
     BagSave_SwitchOwnedDNASplicers(wk->param->bag, 0);
-    func_0200cc34(wk->param->shortcut, 7);
+    ShortcutSave_SwitchDNASplicers(wk->param->shortcut, 7);
 }
 
 static void PokeListDemo_Separate(PokeListWork *wk, PartyPkm *kyurem) {
     PokeListDemo_ChangeKyuremMoves(kyurem, PokeParty_GetParam(kyurem, PKM_PARAM_FORM, NULL), 0);
     PokeParty_ChangeForme(kyurem, 0);
-    PokeParty_AddPkm(wk->param->party, func_0200afa8(wk->param->reshZek));
+    PokeParty_AddPkm(wk->param->party, ReshZekSave_GetPkm(wk->param->reshZek));
     BagSave_SwitchOwnedDNASplicers(wk->param->bag, 1);
-    func_0200cc34(wk->param->shortcut, 8);
+    ShortcutSave_SwitchDNASplicers(wk->param->shortcut, 8);
 }
 
 // Replaces the moves of Kyurem's old form with those of its new one, keeping the PP within the new maximum

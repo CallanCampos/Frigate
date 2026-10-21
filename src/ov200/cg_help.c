@@ -206,7 +206,7 @@ static void CGHelp_Setup(CGHelp *help) {
     help->page = 0;
     help->redraw = TRUE;
     CGHelp_DrawPage(help, help->page);
-    func_02042ba8(FALSE, help->heapId);
+    GFL_NetSetIconScreen(FALSE, help->heapId);
 }
 
 static void CGHelp_Cleanup(CGHelp *help) {
@@ -244,8 +244,8 @@ static BOOL CGHelp_Update(CGHelp *help) {
         }
         break;
     }
-    func_02021a3c(help->printQueue);
-    func_0204b794();
+    PrintQueue_Main(help->printQueue);
+    ClActSys_Draw();
     if (help->nextButton != NULL) {
         AppTaskMenuWin_Update(help->nextButton);
     }
@@ -253,7 +253,7 @@ static BOOL CGHelp_Update(CGHelp *help) {
         AppTaskMenuWin_Update(help->previousButton);
     }
     AppTaskMenuWin_Update(help->quitButton);
-    if (help->printing == TRUE && func_02021c0c(help->printQueue) == TRUE) {
+    if (help->printing == TRUE && PrintQueue_IsEmpty(help->printQueue) == TRUE) {
         if (AppTaskMenuWin_IsFlashFinished(help->nextButton) == TRUE ||
             AppTaskMenuWin_IsFlashFinished(help->previousButton) == TRUE || help->redraw == TRUE) {
             BmpWin_FlushChar(help->textWindow);
@@ -282,7 +282,7 @@ static BOOL CGHelp_Update(CGHelp *help) {
 }
 
 static void CGHelp_VBlank(TCB *tcb, void *data) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void CGHelp_InitBGs(CGHelp *help) {
@@ -310,14 +310,14 @@ static void CGHelp_InitBGs(CGHelp *help) {
     clActSetup = data_02093f08;
     clActSetup.charCount = 0x40;
     ClActSys_Create(&clActSetup, &sVRAMConfig, help->heapId);
-    help->clActUnit = func_0204bf1c(0x30, 0, help->heapId);
-    func_0204c028(help->clActUnit);
+    help->clActUnit = ClActUnit_Create(0x30, 0, help->heapId);
+    ClActUnit_UseSystemRenderer(help->clActUnit);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
 
 static void CGHelp_FreeBGs(CGHelp *help) {
-    func_0204bf98(help->clActUnit);
-    func_0204b758();
+    ClActUnit_Delete(help->clActUnit);
+    ClActSys_Delete();
     GFL_BGSysReleaseBG(BG_TEXT);
     GFL_BGSysReleaseBG(BG_MESSAGE);
     GFL_BGSysReleaseBG(BG_FRAME);
@@ -347,11 +347,11 @@ static void CGHelp_LoadGraphics(CGHelp *help) {
     GFL_ArcToolFree(arc);
     gender = getTrainerGender(help->param->playerInfo) & 1;
     arc = GFL_ArcSysCreateFileHandle(ARCID_C_GEAR, help->heapId);
-    help->palette = func_0204bbb8(arc, 14 + gender, CLACT_VRAM_SUB, 0, 0, 15, help->heapId);
-    help->chars[0] = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_SUB, help->heapId);
-    help->cellAnims[0] = func_0204bde0(arc, 17, 18, help->heapId);
-    help->chars[1] = func_0204b81c(arc, 19, FALSE, CLACT_VRAM_SUB, help->heapId);
-    help->cellAnims[1] = func_0204bde0(arc, 29, 30, help->heapId);
+    help->palette = ClActSys_LoadPlttRange(arc, 14 + gender, CLACT_VRAM_SUB, 0, 0, 15, help->heapId);
+    help->chars[0] = ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_SUB, help->heapId);
+    help->cellAnims[0] = ClActSys_LoadCellAnims(arc, 17, 18, help->heapId);
+    help->chars[1] = ClActSys_LoadChars(arc, 19, FALSE, CLACT_VRAM_SUB, help->heapId);
+    help->cellAnims[1] = ClActSys_LoadCellAnims(arc, 29, 30, help->heapId);
     GFL_ArcToolFree(arc);
     actorSetup.x = 32;
     actorSetup.y = 48;
@@ -359,10 +359,10 @@ static void CGHelp_LoadGraphics(CGHelp *help) {
     actorSetup.bgPriority = 0;
     for (i = 0; i < ACTOR_COUNT; i++) {
         actorSetup.priority = i;
-        help->actors[i] = func_0204c040(help->clActUnit, help->chars[i], help->palette, help->cellAnims[i], &actorSetup,
-                                        CLACT_SURFACE_SUB, help->heapId);
-        func_0204c124(help->actors[i], FALSE);
-        func_0204c520(help->actors[i], FALSE);
+        help->actors[i] = ClActor_Create(help->clActUnit, help->chars[i], help->palette, help->cellAnims[i],
+                                         &actorSetup, CLACT_SURFACE_SUB, help->heapId);
+        ClActor_SetVisible(help->actors[i], FALSE);
+        ClActor_SetAutoAnim(help->actors[i], FALSE);
     }
 }
 
@@ -370,13 +370,13 @@ static void CGHelp_FreeGraphics(CGHelp *help) {
     int i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(help->actors[i]);
+        ClActor_Delete(help->actors[i]);
     }
-    func_0204be64(help->cellAnims[1]);
-    func_0204b98c(help->chars[1]);
-    func_0204be64(help->cellAnims[0]);
-    func_0204b98c(help->chars[0]);
-    func_0204bcd0(help->palette);
+    ClActSys_FreeCellAnims(help->cellAnims[1]);
+    ClActSys_FreeChars(help->chars[1]);
+    ClActSys_FreeCellAnims(help->cellAnims[0]);
+    ClActSys_FreeChars(help->chars[0]);
+    ClActSys_FreePltt(help->palette);
 }
 
 static void CGHelp_InitText(CGHelp *help) {
@@ -388,8 +388,8 @@ static void CGHelp_InitText(CGHelp *help) {
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, 4, 15 * 32, 0x20, help->heapId);
     LoadSysMsgBox(BG_MESSAGE, 1, 13, 0, help->heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_WINFRAME, GetSysMsgBoxPaletteDatID(0), 4, 13 * 32, 0x40, help->heapId);
-    func_020232d8();
-    help->printQueue = func_02021998(help->heapId);
+    GFL_TextRndResetColorIndexLUT();
+    help->printQueue = PrintQueue_CreateDefault(help->heapId);
     help->taskMenuRes = AppTaskMenuRes_Create(BG_TEXT, 11, help->font, help->printQueue, help->heapId);
     help->titleWindow = BmpWin_CreateDynamic(BG_MESSAGE, 2, 4, 28, 4, 15, 1);
     help->textWindow = BmpWin_CreateDynamic(BG_MESSAGE, 2, 9, 28, 12, 15, 1);
@@ -428,12 +428,12 @@ static void CGHelp_FreeText(CGHelp *help) {
     }
     AppTaskMenuWin_Free(help->quitButton);
     AppTaskMenuRes_Free(help->taskMenuRes);
-    func_02021a18(help->printQueue);
+    PrintQueue_Free(help->printQueue);
     BmpWin_Free(help->textWindow);
     BmpWin_Free(help->titleWindow);
     GFL_MsgDataFree(help->msgData);
     GFL_FontFree(help->font);
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
 }
 
 static void CGHelp_HandleInput(CGHelp *help) {
@@ -444,7 +444,7 @@ static void CGHelp_HandleInput(CGHelp *help) {
         { TOUCH_RECT_END, 0, 0, 0 },
     };
 
-    switch (func_0203da0c(rects)) {
+    switch (GFL_HIDGetTouchPressedRect(rects)) {
     case BUTTON_PREVIOUS:
         if (help->page != 0) {
             help->page--;
@@ -467,7 +467,7 @@ static void CGHelp_HandleInput(CGHelp *help) {
         GFL_SndSEPlay(SEQ_SE_CANCEL1);
         break;
     }
-    if (func_02016bec(help->param->gsys) == TRUE) {
+    if (GSYS_IsLowBatteryCGearOff(help->param->gsys) == TRUE) {
         AppTaskMenuWin_SetFlashing(help->quitButton, TRUE);
         help->state = STATE_CLOSE;
     }
@@ -480,11 +480,12 @@ static void CGHelp_DrawPage(CGHelp *help, u8 page) {
     GFL_BitmapFill(BmpWin_GetBitmap(help->titleWindow), 1);
     GFL_BitmapFill(BmpWin_GetBitmap(help->textWindow), 0);
     title = GFL_MsgDataLoadStrbufNew(help->msgData, TITLE_MESSAGE(page));
-    func_02021c7c(help->printQueue, BmpWin_GetBitmap(help->titleWindow), 40, 8, title, help->font,
-                  PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(help->printQueue, BmpWin_GetBitmap(help->titleWindow), 40, 8, title, help->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(title);
     text = GFL_MsgDataLoadStrbufNew(help->msgData, TEXT_MESSAGE(page));
-    func_02021c7c(help->printQueue, BmpWin_GetBitmap(help->textWindow), 0, 0, text, help->font, PRINT_COLOR(15, 2, 0));
+    PrintQueue_PrintColor(help->printQueue, BmpWin_GetBitmap(help->textWindow), 0, 0, text, help->font,
+                          PRINT_COLOR(15, 2, 0));
     GFL_StrBufFree(text);
     help->printing = TRUE;
 }
@@ -492,9 +493,9 @@ static void CGHelp_DrawPage(CGHelp *help, u8 page) {
 static void CGHelp_ShowAnimation(CGHelp *help, u8 page) {
     const PageAnimation *animation = &sPageAnimations[sPageAnimationIndex[page]];
 
-    func_0204c488(help->actors[animation->actor], animation->sequence);
-    func_0204c124(help->actors[animation->actor], TRUE);
-    func_0204c124(help->actors[animation->actor ^ 1], FALSE);
+    ClActor_SetSequence(help->actors[animation->actor], animation->sequence);
+    ClActor_SetVisible(help->actors[animation->actor], TRUE);
+    ClActor_SetVisible(help->actors[animation->actor ^ 1], FALSE);
 }
 
 static BOOL CGHelp_Init(GameProc *proc, u32 *state, void *param, void *work) {
@@ -505,7 +506,7 @@ static BOOL CGHelp_Init(GameProc *proc, u32 *state, void *param, void *work) {
     help = GFL_ProcInitSubsystem(proc, sizeof(CGHelp), HEAPID_CG_HELP);
     if (helpParam == NULL) {
         helpParam = GFL_HeapAllocate(HEAPID_CG_HELP, 8, TRUE, "cg_help.c", 801);
-        helpParam->playerInfo = func_02008b0c(HEAPID_CG_HELP);
+        helpParam->playerInfo = PlayerInfo_Create(HEAPID_CG_HELP);
         if (GCTX_HIDGetHeldKeys() & PAD_BUTTON_R) {
             setTrainerGender(helpParam->playerInfo, 1);
         } else {

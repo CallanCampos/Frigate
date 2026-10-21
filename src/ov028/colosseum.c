@@ -22,13 +22,13 @@ static void Colosseum_SetPlayer(UnionColosseum *colosseum, BattlePlayer *player,
 
 UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const PlayerInfo *info, u32 flag) {
     UnionColosseum *colosseum;
-    int self = func_02042a6c(func_02040440());
+    int self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     int i;
     u8 value;
     ColosseumMember *member;
 
     colosseum = GFL_HeapAllocate(HEAPID_UNION, sizeof(UnionColosseum), TRUE, "colosseum.c", 53);
-    colosseum->commPlayer = func_ov012_021613d0(4, gsys, HEAPID_UNION, 0);
+    colosseum->commPlayer = CommPlayer_Init(4, gsys, HEAPID_UNION, 0);
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
         colosseum->card[i] = GFL_HeapAllocate(HEAPID_UNION, sizeof(TrainerCardData), TRUE, "colosseum.c", 56);
         colosseum->cardCheck[i] = colosseum->card[i];
@@ -42,7 +42,7 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     colosseum->unkDD = 0xff;
     PokeParty_Copy(GameData_GetParty(gameData), colosseum->party[self]);
     member = &colosseum->members[self];
-    func_02008b34(info, &member->info);
+    PlayerInfo_Copy(info, &member->info);
     OS_GetMacAddress(member->mac);
     member->unk26 = 1;
     value = 1;
@@ -51,8 +51,8 @@ UnionColosseum *Colosseum_Create(GameData *gameData, GameSystem *gsys, const Pla
     }
     member->unk27 = value;
     member->unk28 = 100;
-    func_ov012_02169770(colosseum->cardCheck[self], gameData, TRUE, FALSE, HEAPID_UNION);
-    func_ov012_02169508(colosseum->card[self], gameData, HEAPID_UNION);
+    TrainerCardData_Fill(colosseum->cardCheck[self], gameData, TRUE, FALSE, HEAPID_UNION);
+    TrainerCardData_FillExtras(colosseum->card[self], gameData, HEAPID_UNION);
     colosseum->cardReady[self] = TRUE;
     return colosseum;
 }
@@ -64,15 +64,15 @@ void Colosseum_Free(UnionColosseum *colosseum, GameSystem *gsys) {
         GFL_HeapFree(colosseum->card[i]);
         GFL_HeapFree(colosseum->party[i]);
     }
-    func_ov012_02161404(gsys, colosseum->commPlayer);
+    CommPlayer_Exit(gsys, colosseum->commPlayer);
     GFL_HeapFree(colosseum);
 }
 
-void func_ov028_021729a0(UnionColosseum *colosseum, BOOL value) {
+void Colosseum_SetUnkC8_0(UnionColosseum *colosseum, BOOL value) {
     colosseum->unkC8_0 = value;
 }
 
-void func_ov028_021729bc(UnionColosseum *colosseum, u32 value) {
+void Colosseum_SetUnkDC(UnionColosseum *colosseum, u32 value) {
     colosseum->unkDC = value;
     colosseum->unkDD = 0xff;
 }
@@ -85,7 +85,7 @@ void Colosseum_SetUnkDD(UnionColosseum *colosseum, u32 value) {
     colosseum->unkDD = value;
 }
 
-u8 func_ov028_021729dc(const UnionColosseum *colosseum) {
+u8 Colosseum_GetUnkDD(const UnionColosseum *colosseum) {
     return colosseum->unkDD;
 }
 
@@ -112,10 +112,10 @@ BOOL Colosseum_Vote(UnionColosseum *colosseum, u32 netId, u8 value) {
     return accepted;
 }
 
-void func_ov028_02172a1c(UnionColosseum *colosseum) {
+void Colosseum_SendVoteReplies(UnionColosseum *colosseum) {
     int i;
 
-    if (func_02042bc4()) {
+    if (GFL_NetIsParent()) {
         for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
             u8 value = colosseum->unkD0[i];
 
@@ -126,18 +126,18 @@ void func_ov028_02172a1c(UnionColosseum *colosseum) {
     }
 }
 
-void func_ov028_02172a50(UnionColosseum *colosseum) {
+void Colosseum_UpdateReadySync(UnionColosseum *colosseum) {
     int count;
     int i;
 
-    if (func_02042bc4()) {
+    if (GFL_NetIsParent()) {
         count = 0;
         for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
             if (colosseum->unkD4[i] == 1) {
                 count++;
             }
         }
-        if (count == func_02042a78()) {
+        if (count == GFL_NetGetNegotiatedCount()) {
             if (Colosseum_SendUnkB() == TRUE) {
                 for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
                     colosseum->unkD4[i] = 0;
@@ -159,7 +159,7 @@ void Colosseum_StoreChoice(UnionColosseum *colosseum, u32 netId, const Colosseum
     colosseum->choiceReady[netId] = TRUE;
 }
 
-u8 func_ov028_02172ae8(UnionColosseum *colosseum, u32 netId, ColosseumChoice *choice) {
+u8 Colosseum_TakeChoice(UnionColosseum *colosseum, u32 netId, ColosseumChoice *choice) {
     u8 ready;
 
     *choice = colosseum->choice[netId];
@@ -168,11 +168,11 @@ u8 func_ov028_02172ae8(UnionColosseum *colosseum, u32 netId, ColosseumChoice *ch
     return ready;
 }
 
-void func_ov028_02172b14(UnionColosseum *colosseum) {
+void Colosseum_ResetUnk171(UnionColosseum *colosseum) {
     colosseum->unk171 = 0;
 }
 
-BOOL func_ov028_02172b20(const UnionColosseum *colosseum) {
+BOOL Colosseum_AreAllPartiesReceived(const UnionColosseum *colosseum) {
     int count = 0;
     int i;
 
@@ -181,14 +181,14 @@ BOOL func_ov028_02172b20(const UnionColosseum *colosseum) {
             count++;
         }
     }
-    if (count >= func_02042a78()) {
+    if (count >= GFL_NetGetNegotiatedCount()) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov028_02172b4c(UnionColosseum *colosseum, BOOL keepOwn) {
-    int self = func_02042a6c(func_02040440());
+void Colosseum_ClearParties(UnionColosseum *colosseum, BOOL keepOwn) {
+    int self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     int i;
 
     for (i = 0; i < COLOSSEUM_MEMBER_MAX; i++) {
@@ -217,7 +217,7 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
         member_max++;
     }
     GFL_ASSERT(member_max == 2 || member_max == 4);
-    self = func_02042a6c(func_02040440());
+    self = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     selfTeam = colosseum->unk16C[self];
     for (i = 0; i < member_max; i++) {
         u8 team = colosseum->unk16C[i];
@@ -236,7 +236,7 @@ void Colosseum_BuildBattlePlayers(UnionColosseum *colosseum, GameSystem *gsys, C
     players->records = GameData_GetRecords(GSYS_GetGameData(gsys));
 }
 
-void func_ov028_02172c60(ColosseumPlayers *players) {
+void Colosseum_ClearPlayers(ColosseumPlayers *players) {
     MI_CpuFill8(players, 0, sizeof(ColosseumPlayers));
 }
 

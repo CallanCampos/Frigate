@@ -29,7 +29,7 @@ typedef struct {
     NNSSndHeapHandle *heap;
 } BGMStack;
 
-// What func_02005af4 preloads: the count of sequences, and the level to go back to
+// What GFL_SndBGMStack_Preload preloads: the count of sequences, and the level to go back to
 typedef struct {
     u32 count;
     s32 level;
@@ -42,7 +42,7 @@ static void BGMStack_FreeEntry(void);
 static BGMStack sBGMStack;
 static BGMStackEntry sBGMStackEntries[BGM_STACK_SIZE];
 
-void func_02005838(NNSSndHeapHandle *heap) {
+void GFL_SndBGMStack_SetHeap(NNSSndHeapHandle *heap) {
     sBGMStack.heap = heap;
 }
 
@@ -74,7 +74,7 @@ static void BGMStack_FreeEntry(void) {
     BGMStack_ResetEntry(sBGMStack.depth);
 }
 
-void func_020058e4(u16 player) {
+void GFL_SndBGMStack_Init(u16 player) {
     s32 i;
 
     sBGMStack.player = player;
@@ -99,15 +99,15 @@ u32 GFL_SndGetLastResID(void) {
     return entry->seq;
 }
 
-s32 func_0200595c(void) {
+s32 GFL_SndBGMStack_GetDepth(void) {
     return sBGMStack.depth;
 }
 
-NNSSndHandle *func_02005968(void) {
+NNSSndHandle *GFL_SndBGMStack_GetHandle(void) {
     return &sBGMStackEntries[sBGMStack.depth].handle;
 }
 
-BOOL func_02005980(u32 seq) {
+BOOL GFL_SndBGMStack_LoadSeq(u32 seq) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
     BOOL result;
 
@@ -124,13 +124,13 @@ BOOL func_02005980(u32 seq) {
     return result;
 }
 
-void func_020059d8(void) {
+void GFL_SndBGMStack_SaveSeqLevel(void) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
 
     entry->seqLevel = NNS_SndHeapSaveState(*sBGMStack.heap);
 }
 
-BOOL func_020059fc(u32 seq) {
+BOOL GFL_SndBGMStack_SetLoadedSeq(u32 seq) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
 
     entry->waveLevel = NNS_SndHeapSaveState(*sBGMStack.heap);
@@ -138,7 +138,7 @@ BOOL func_020059fc(u32 seq) {
     return TRUE;
 }
 
-void func_02005a24(void) {
+void GFL_SndBGMStack_FreeSeq(void) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
 
     if (sBGMStackEntries[sBGMStack.depth].active) {
@@ -149,7 +149,7 @@ void func_02005a24(void) {
     }
 }
 
-BOOL func_02005a5c(void) {
+BOOL GFL_SndBGMStack_Push(void) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
     s32 level;
 
@@ -168,7 +168,7 @@ BOOL func_02005a5c(void) {
     return TRUE;
 }
 
-BOOL func_02005aa8(void) {
+BOOL GFL_SndBGMStack_Pop(void) {
     BGMStackEntry *entry;
 
     if (sBGMStack.depth <= 0) {
@@ -184,7 +184,7 @@ BOOL func_02005aa8(void) {
     return TRUE;
 }
 
-uptr func_02005af4(const u32 *seqs, u32 count) {
+uptr GFL_SndBGMStack_Preload(const u32 *seqs, u32 count) {
     BGMStackEntry *entry = &sBGMStackEntries[sBGMStack.depth];
     BGMStackPreload *preload;
     s32 level = entry->baseLevel;
@@ -201,7 +201,7 @@ uptr func_02005af4(const u32 *seqs, u32 count) {
     return (uptr)preload;
 }
 
-void func_02005b60(uptr handle) {
+void GFL_SndBGMStack_Unload(uptr handle) {
     s32 level = ((BGMStackPreload *)handle)->level;
 
     BGMStack_FreeEntry();

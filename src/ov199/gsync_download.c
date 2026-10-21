@@ -50,7 +50,7 @@ static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
         _pDLWork->cancelled = TRUE;
         break;
     case ND_ERROR_FATAL:
-        func_02011d20();
+        GFL_NetErrShowFatal();
         break;
     }
     _pDLWork->done = TRUE;

@@ -13,28 +13,34 @@
 
 #define DWC_BM_PACKED_SIZE 14
 
-// What the settings keep of one connection (a slot of the console's Wi-Fi settings): the network name, the address
-// settings, and a byte that says whether the connection is in use. The first 0xEF bytes of a page
+// What the settings keep of one connection (a slot of the console's Wi-Fi settings): the network name, the WEP keys,
+// the address settings, the WEP mode, a byte that says whether the connection is in use, its MTU, and in the first two
+// pages the mask of the connections in use (bit n is set while connection n is). The first 0xF0 bytes of a page
 #define DWC_BM_CONNECTION_UNUSED 0xFF
 typedef struct DWCBmConnection {
     u8 unk0[0x40];
     u8 ssid[0x20];
-    u8 unk60[0x60];
+    u8 aossSsid[0x20]; // the SSID of the 40-bit WEP key of an AOSS setup, which has an SSID for each kind of key
+    u8 wepKey[4][0x10];
     u8 ip[4]; // all 0 when the address comes from DHCP
     u8 gateway[4];
-    u8 dns[2][4];   // the first is all 0 when the DNS servers come from DHCP
-    u8 netmaskBits; // how many of the mask's high bits are set, 0x20 at most
-    u8 unkD1[0x16];
-    u8 status; // DWC_BM_CONNECTION_UNUSED; 0 to 2 are the kinds that an NTR console has, more are the TWL's
-    u8 unkE8[7];
+    u8 dns[2][4];     // the first is all 0 when the DNS servers come from DHCP
+    u8 netmaskBits;   // how many of the mask's high bits are set, 0x20 at most
+    u8 aossKey[4][5]; // the 40-bit WEP keys of an AOSS setup
+    u8 unkE5;
+    u8 wepMode : 2;    // 0 for no WEP, 1 for a key of 5 bytes, 2 of 13 and 3 of 16
+    u8 wepKeyText : 6; // 1 when the key was entered as characters, 0 when as hex digits
+    u8 status;         // DWC_BM_CONNECTION_UNUSED; 0 to 2 are the kinds that an NTR console has, more are the TWL's
+    u8 unkE8[2];
+    u16 mtu; // 0 for the default
+    u8 unkEC[3];
+    u8 usedMask;
 } DWCBmConnection;
 
-// A page of the NTR console's Wi-Fi settings, 0x100 bytes: a connection, the mask of the connections in use (bit n is
-// set while connection n is, kept in the first two pages), the packed Wi-Fi ID, and the CRC16 of all that comes before
-// it
+// A page of the NTR console's Wi-Fi settings, 0x100 bytes: a connection, the packed Wi-Fi ID, and the CRC16 of all that
+// comes before it
 typedef struct DWCBmNtrPage {
     DWCBmConnection connection;
-    u8 usedMask;
     u8 wifiId[DWC_BM_PACKED_SIZE];
     u16 crc16;
 } DWCBmNtrPage;

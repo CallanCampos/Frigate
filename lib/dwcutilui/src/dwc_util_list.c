@@ -2,8 +2,8 @@
 #include "dwc_util_heap.h"
 #include "nitro/os.h"
 
-DWCUtilList *func_ov182_021bcb3c(void) {
-    DWCUtilList *list = func_ov182_021bc4d8(sizeof(DWCUtilList), 4);
+DWCUtilList *DWCUtilList_Create(void) {
+    DWCUtilList *list = DWCUtilHeap_AllocClear(sizeof(DWCUtilList), 4);
 
     list->head.prev = NULL;
     list->head.next = &list->tail;
@@ -12,11 +12,11 @@ DWCUtilList *func_ov182_021bcb3c(void) {
     return list;
 }
 
-void func_ov182_021bcb58(DWCUtilList *list) {
-    func_ov182_021bc4f0(&list);
+void DWCUtilList_Destroy(DWCUtilList *list) {
+    DWCUtilHeap_FreeAndNull(&list);
 }
 
-void func_ov182_021bcb6c(void *node) {
+void DWCUtilList_Remove(void *node) {
     DWCUtilNode *links = node;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
 
@@ -27,7 +27,7 @@ void func_ov182_021bcb6c(void *node) {
     OS_EnableIrqMask(irq);
 }
 
-void func_ov182_021bcb90(void *position, void *node) {
+void DWCUtilList_InsertBefore(void *position, void *node) {
     DWCUtilNode *at = position;
     DWCUtilNode *links = node;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
@@ -39,10 +39,10 @@ void func_ov182_021bcb90(void *position, void *node) {
     OS_EnableIrqMask(irq);
 }
 
-void func_ov182_021bcbb0(DWCUtilList *list, void *node) {
-    func_ov182_021bcb90(&list->tail, node);
+void DWCUtilList_Append(DWCUtilList *list, void *node) {
+    DWCUtilList_InsertBefore(&list->tail, node);
 }
 
-void func_ov182_021bcbbc(DWCUtilList *list, void *node) {
-    func_ov182_021bcb90(list->head.next, node);
+void DWCUtilList_Prepend(DWCUtilList *list, void *node) {
+    DWCUtilList_InsertBefore(list->head.next, node);
 }

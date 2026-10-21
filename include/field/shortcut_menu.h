@@ -5,6 +5,7 @@
 #include "field/app_call.h"
 #include "struct_decls.h"
 #include "system/game_event.h"
+#include "system/shortcut_util.h"
 
 struct ShortcutMenuWork {
     GameEvent *event;
@@ -24,17 +25,15 @@ BOOL IsExistAnyYShortcut(GameSystem *gsys);
 BOOL CheckAnyRibbon(ShortcutMenuWork *work);
 u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item);
 BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid);
-void func_ov012_0215b284(u32 arg0, ShortcutMenuWork *work);
-BOOL func_ov012_0215b2d0(ShortcutMenuWork *work);
-BOOL func_ov012_0215b32c(FieldAppCallInput *input, void *arg);
-BOOL func_ov012_0215b39c(FieldAppCallInput *input, void *arg);
+void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work);
+BOOL ShortcutMenu_Close(ShortcutMenuWork *work);
+BOOL ShortcutMenu_CanRetry(FieldAppCallInput *input, void *arg);
+BOOL ShortcutMenu_CanLeaveField(FieldAppCallInput *input, void *arg);
 GameEvent *CallYButtonShortcutMenu(GameSystem *gsys, Field *field, u16 code);
 GameEventReturnCode EventShortcutChoicePopup_Callback(GameEvent *event, u32 *state, void *data);
 GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *state, void *data);
 
-void func_ov036_02187834(void);
-void func_ov036_02187888(void);
-void *func_ov036_021bedd8(GameData *gameData, u32 mode, u16 *listPos, HeapID heapId, u32 unused);
+void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos, HeapID menuHeapId, HeapID heapId);
 void func_ov036_021bf004(void *app);
 u32 func_ov036_021bf198(void *app);
 void func_ov036_021bf088(void *app);

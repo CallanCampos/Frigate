@@ -5,14 +5,14 @@
 
 // The downloaded C-Gear skin, extra save block 4. The ROM has no string for the file, so the name is a guess
 
-u32 func_0200ce50(void) {
+u32 CGearPictureSave_GetSize(void) {
     return sizeof(CGearPictureSave);
 }
 
-void func_0200ce58(CGearPictureSave *picture) {
+void CGearPictureSave_Init(CGearPictureSave *picture) {
 }
 
-BOOL func_0200ce5c(CGearPictureSave *picture) {
+BOOL CGearPictureSave_IsValid(CGearPictureSave *picture) {
     u8 empty[0x20];
     BOOL valid = FALSE;
 

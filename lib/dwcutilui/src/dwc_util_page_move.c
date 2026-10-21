@@ -1,0 +1,156 @@
+#include "dwc_util_page_move.h"
+#include "dwc_util_dialog.h"
+#include "dwc_util_display.h"
+#include "dwc_util_fade.h"
+#include "dwc_util_gfx_resource.h"
+#include "dwc_util_main.h"
+#include "dwc_util_move.h"
+#include "dwc_util_notice_screen.h"
+#include "dwc_util_option_menu.h"
+#include "dwc_util_screen.h"
+#include "dwc_util_shared.h"
+#include "dwc_util_sound.h"
+#include "dwc_util_text.h"
+#include "dwc_util_top_menu.h"
+#include "nitro/gx.h"
+#include "nitro/mi.h"
+
+// Whether the move reported an event during the question, and the player's answer
+typedef struct DWCUtilPageMove {
+    u8 interrupted;
+    u8 yes;
+} DWCUtilPageMove;
+
+static void DWCUtilPageMove_LoadGraphics(void);
+static void DWCUtilPageMove_FadeIn(void);
+static void DWCUtilPageMove_WaitFadeIn(void);
+static void DWCUtilPageMove_WaitDialog(void);
+static void DWCUtilPageMove_Main(void);
+static void func_ov182_021b030c(void);
+static void func_ov182_021b0310(void);
+static void DWCUtilPageMove_FadeOut(void);
+static void DWCUtilPageMove_WaitFadeOut(void);
+static void DWCUtilPageMove_WaitMoveEnd(void);
+static void DWCUtilPageMove_OnMoveEvent(int event);
+
+static DWCUtilPageMove sPageMove;
+
+void DWCUtilPageMove_Init(void) {
+    const MBUserInfo *user = DWCUtilMove_GetChildUser();
+    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
+    u16 name[MB_USER_NAME_LENGTH + 1];
+
+    sPageMove.yes = FALSE;
+    sPageMove.interrupted = FALSE;
+    DWCUtilPageMove_LoadGraphics();
+    MI_CpuClear16(name, sizeof(name));
+    MI_CpuCopy16(user->name, name, user->nameLength * 2);
+    DWCUtilText_DrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
+    DWCUtilText_MarkDirty(text);
+    DWCUtilMove_SetCallback(DWCUtilPageMove_OnMoveEvent);
+    DWCUtilDialog_Open(0x1d, 4, 0, -1, 0);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeIn);
+}
+
+static void DWCUtilPageMove_LoadGraphics(void) {
+    DWCUtilGfxResource_Load("char/jb5Move.nsc.l", GX_LoadBG2Scr);
+    G2S_SetBG0Priority(3);
+    G2S_SetBG1Priority(3);
+    G2_SetBG0Priority(3);
+    G2_SetBG1Priority(3);
+    G2_SetBG2Priority(3);
+}
+
+static void DWCUtilPageMove_FadeIn(void) {
+    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeIn);
+}
+
+static void DWCUtilPageMove_WaitFadeIn(void) {
+    if (DWCUtilFade_IsActive(0) == 0) {
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitDialog);
+    }
+}
+
+static void DWCUtilPageMove_WaitDialog(void) {
+    if (DWCUtilDialog_GetChoice() != -2) {
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_Main);
+    }
+}
+
+static void DWCUtilPageMove_Main(void) {
+    func_ov182_021b030c();
+    func_ov182_021b0310();
+    switch (DWCUtilDialog_GetChoice()) {
+    case 0:
+        sPageMove.yes = FALSE;
+        DWCUtilSound_PlaySe(7);
+        break;
+    case 1:
+        sPageMove.yes = TRUE;
+        DWCUtilSound_PlaySe(0xe);
+        break;
+    default:
+        return;
+    }
+    DWCUtilMove_SetCallback(NULL);
+    DWCUtilDialog_Close();
+    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeOut);
+}
+
+static void func_ov182_021b030c(void) {
+}
+
+static void func_ov182_021b0310(void) {
+}
+
+static void DWCUtilPageMove_FadeOut(void) {
+    if (!DWCUtilDialog_IsOpen()) {
+        if (!sPageMove.yes) {
+            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        }
+        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
+                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeOut);
+    }
+}
+
+// Sends the settings, or ends the move
+static void DWCUtilPageMove_WaitFadeOut(void) {
+    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+        if (!sPageMove.interrupted && sPageMove.yes == TRUE) {
+            DWCUtilMove_StartSending();
+        } else {
+            DWCUtilMove_End();
+        }
+        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitMoveEnd);
+    }
+}
+
+// Waits for the end of the move, unless it goes on
+static void DWCUtilPageMove_WaitMoveEnd(void) {
+    if ((sPageMove.interrupted || !sPageMove.yes) && !DWCUtilMove_HasEnded()) {
+        return;
+    }
+    DWCUtilText_DestroyScreenBg(0);
+    DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    if (!sPageMove.yes) {
+        DWCUtilScreen_Stop();
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+    }
+    DWCUtilMain_SetLayout(0, 1);
+    if (sPageMove.interrupted) {
+        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
+    } else if (!sPageMove.yes) {
+        DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
+        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
+    } else {
+        DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitMove);
+    }
+}
+
+static void DWCUtilPageMove_OnMoveEvent(int event) {
+    sPageMove.interrupted = TRUE;
+}

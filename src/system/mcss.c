@@ -37,21 +37,23 @@ typedef struct {
 
 typedef struct {
     u32 count;
-    u16 unk4;
-    u16 unk6;
-    s16 unk8;
-    s16 unkA;
+    // The size of the sprite's image, and its offset from the origin
+    u16 width;
+    u16 height;
+    s16 offsetX;
+    s16 offsetY;
     MCSSCell cells[];
 } MCSSBin;
 
 typedef struct {
-    u8 unk0;
+    // How many cells keep animating while the idle animation stops the others, listed in idleNodes (0xff: no idle)
+    u8 idleNodeCount;
     u8 unk1;
-    u8 unk2[];
+    u8 idleNodes[];
 } MCSSBinTail;
 
 struct MCSSSystem {
-    // The archive that func_02019b98 opened, which the sprites of that archive are read from
+    // The archive that MCSSSys_OpenArc opened, which the sprites of that archive are read from
     ArcTool *arc;
     u32 arcId;
     // Runs the sprites' loads when set, and the V-blank's tasks otherwise
@@ -95,7 +97,7 @@ struct MCSS {
     void *mcWork;
     NNSG2dImageProxy imageProxy;
     NNSG2dImagePaletteProxy plttProxy;
-    // The sprite's colors, and the colors that func_0201afb0 blended them into
+    // The sprite's colors, and the colors that MCSS_BlendPalette blended them into
     u16 *pltt;
     u16 *blendedPltt;
     int plttSize;
@@ -104,7 +106,7 @@ struct MCSS {
     // Only z is used, as the sprite's rotation
     VecFx32 rotation;
     VecFx32 shadowScale;
-    VecFx32 unk110;
+    VecFx32 shadowScaleOffset;
     // Added to the position, and multiplied into the scale
     VecFx32 posOffset;
     VecFx32 scaleOffset;
@@ -169,8 +171,8 @@ static void MCSS_InitMCAnime(MCSS *mcss, u32 mcType);
 static void MCSS_SetMaterial(void);
 static void MCSS_UpdatePaletteFade(MCSSSystem *system, MCSS *mcss);
 static void MCSS_FreeFiles(MCSS *mcss);
-static void func_0201bae8(TCB *tcb);
-static void func_0201bb14(TCB *tcb);
+static void MCSS_RemoveLoadTask(TCB *tcb);
+static void MCSS_RemovePaletteTask(TCB *tcb);
 static void MCSS_MakeMosaic(MCSS *mcss, MCSSLoad *load);
 static void MCSS_MulVecMtx44(const VecFx32 *vec, const MtxFx44 *mtx, VecFx32 *dest, fx32 *w);
 
@@ -198,7 +200,7 @@ MCSSSystem *MCSSSys_Create(u32 capacity, HeapID heapId) {
 void MCSSSys_Free(MCSSSystem *system) {
     int i;
 
-    func_02019bb4(system);
+    MCSSSys_CloseArc(system);
     if (system->shadowTcb != NULL) {
         MCSSLoad *load = GFL_TCBGetData(system->shadowTcb);
 
@@ -237,14 +239,14 @@ void MCSSSys_Update(MCSSSystem *system) {
     }
 }
 
-void func_02019b98(MCSSSystem *system, u32 arcId) {
+void MCSSSys_OpenArc(MCSSSystem *system, u32 arcId) {
     if (system->arc == NULL) {
         system->arcId = arcId;
         system->arc = GFL_ArcSysCreateFileHandle(arcId, system->heapId);
     }
 }
 
-void func_02019bb4(MCSSSystem *system) {
+void MCSSSys_CloseArc(MCSSSystem *system) {
     if (system->arc != NULL) {
         GFL_ArcToolFree(system->arc);
         system->arcId = 0;
@@ -252,7 +254,7 @@ void func_02019bb4(MCSSSystem *system) {
     }
 }
 
-void func_02019bcc(MCSSSystem *system, TCBManager *tcbMgr) {
+void MCSSSys_SetTCBManager(MCSSSystem *system, TCBManager *tcbMgr) {
     system->tcbMgr = tcbMgr;
 }
 
@@ -261,7 +263,7 @@ void MCSSSys_SetLoadCallback(MCSSSystem *system, MCSSLoadCallback callback, u32 
     system->loadCallbackWork = work;
 }
 
-void func_02019bd8(MCSSSystem *system, MCSS *mcss, const MCSSLoadInfo *info) {
+void MCSS_Reload(MCSSSystem *system, MCSS *mcss, const MCSSLoadInfo *info) {
     MCSS_FreeFiles(mcss);
     mcss->info = *info;
     LoadMCSSGraphicsData(system, mcss->index, info);
@@ -396,8 +398,9 @@ void MCSSSys_Draw(MCSSSystem *system) {
                      FX_Mul(FX_Mul(-mcSrt.py << 8, system->offsetScale), mcss->shadowScale.y), 0);
         G3_RotZ(-FX_SinIdx(mcss->shadowRotZ), FX_CosIdx(mcss->shadowRotZ));
         G3_RotZ(-FX_SinIdx(rot), FX_CosIdx(rot));
-        G3_Scale(FX_Mul(FX_Mul(FX_Mul(mcSrt.sx, mcss->shadowScale.x), mcss->unk110.x), mcss->scaleOffset.x),
-                 FX_Mul(FX_Mul(FX_Mul(mcSrt.sy, mcss->shadowScale.y), mcss->unk110.y), mcss->scaleOffset.y), FX32_ONE);
+        G3_Scale(FX_Mul(FX_Mul(FX_Mul(mcSrt.sx, mcss->shadowScale.x), mcss->shadowScaleOffset.x), mcss->scaleOffset.x),
+                 FX_Mul(FX_Mul(FX_Mul(mcSrt.sy, mcss->shadowScale.y), mcss->shadowScaleOffset.y), mcss->scaleOffset.y),
+                 FX32_ONE);
         G3_StoreMtx(30);
 
         MCSS_SetMaterial();
@@ -582,9 +585,9 @@ MCSS *MCSSSys_Add(MCSSSystem *system, fx32 x, fx32 y, fx32 z, const MCSSLoadInfo
             system->mcss[i]->shadowOffset.x = 0;
             system->mcss[i]->shadowOffset.y = 0;
             system->mcss[i]->shadowOffset.z = -FX32_ONE;
-            system->mcss[i]->unk110.x = FX32_ONE;
-            system->mcss[i]->unk110.y = FX32_ONE;
-            system->mcss[i]->unk110.z = FX32_ONE;
+            system->mcss[i]->shadowScaleOffset.x = FX32_ONE;
+            system->mcss[i]->shadowScaleOffset.y = FX32_ONE;
+            system->mcss[i]->shadowScaleOffset.z = FX32_ONE;
             system->mcss[i]->info = *info;
             system->mcss[i]->animSpeed = FX32_ONE;
             system->mcss[i]->ortho = TRUE;
@@ -598,34 +601,34 @@ MCSS *MCSSSys_Add(MCSSSystem *system, fx32 x, fx32 y, fx32 z, const MCSSLoadInfo
 void MCSSSys_Remove(MCSSSystem *system, MCSS *mcss) {
     MCSS_FreeFiles(mcss);
     if (mcss->loadTcb != NULL) {
-        func_0201bae8(mcss->loadTcb);
+        MCSS_RemoveLoadTask(mcss->loadTcb);
         mcss->loadTcb = NULL;
     }
     if (mcss->fadeTcb != NULL) {
-        func_0201bb14(mcss->fadeTcb);
+        MCSS_RemovePaletteTask(mcss->fadeTcb);
         mcss->fadeTcb = NULL;
     }
     if (mcss->blendTcb != NULL) {
-        func_0201bb14(mcss->blendTcb);
+        MCSS_RemovePaletteTask(mcss->blendTcb);
         mcss->blendTcb = NULL;
     }
     system->mcss[mcss->index] = NULL;
     GFL_HeapFree(mcss);
 }
 
-void func_0201aacc(MCSSSystem *system) {
+void MCSSSys_EnableOrtho(MCSSSystem *system) {
     system->ortho = TRUE;
 }
 
-void func_0201aadc(MCSSSystem *system) {
+void MCSSSys_DisableOrtho(MCSSSystem *system) {
     system->ortho = FALSE;
 }
 
-void func_0201aae8(MCSS *mcss) {
+void MCSS_EnableOrtho(MCSS *mcss) {
     mcss->ortho = TRUE;
 }
 
-void func_0201aaf8(MCSS *mcss) {
+void MCSS_DisableOrtho(MCSS *mcss) {
     mcss->ortho = FALSE;
 }
 
@@ -641,19 +644,19 @@ void MCSS_SetPosition(MCSS *mcss, VecFx32 *position) {
     mcss->pos.z = position->z;
 }
 
-void func_0201ab3c(MCSS *mcss, VecFx32 *out) {
+void MCSS_GetPositionOffset(MCSS *mcss, VecFx32 *out) {
     out->x = mcss->posOffset.x;
     out->y = mcss->posOffset.y;
     out->z = mcss->posOffset.z;
 }
 
-void func_0201ab54(MCSS *mcss, VecFx32 *a1) {
+void MCSS_SetPositionOffset(MCSS *mcss, VecFx32 *a1) {
     mcss->posOffset.x = a1->x;
     mcss->posOffset.y = a1->y;
     mcss->posOffset.z = a1->z;
 }
 
-void func_0201ab70(MCSS *mcss, VecFx32 *out) {
+void MCSS_GetScale(MCSS *mcss, VecFx32 *out) {
     out->x = mcss->scale.x;
     out->y = mcss->scale.y;
     out->z = mcss->scale.z;
@@ -665,75 +668,75 @@ void MCSS_SetScale(MCSS *mcss, VecFx32 *scale) {
     mcss->scale.z = scale->z;
 }
 
-void func_0201aba0(MCSS *mcss, VecFx32 *out) {
+void MCSS_GetScaleOffset(MCSS *mcss, VecFx32 *out) {
     out->x = mcss->scaleOffset.x;
     out->y = mcss->scaleOffset.y;
     out->z = mcss->scaleOffset.z;
 }
 
-void func_0201abb8(MCSS *mcss, VecFx32 *a1) {
+void MCSS_SetScaleOffset(MCSS *mcss, VecFx32 *a1) {
     mcss->scaleOffset.x = a1->x;
     mcss->scaleOffset.y = a1->y;
     mcss->scaleOffset.z = a1->z;
 }
 
-void func_0201abd4(MCSS *mcss, VecFx32 *out) {
+void MCSS_GetRotation(MCSS *mcss, VecFx32 *out) {
     out->x = mcss->rotation.x;
     out->y = mcss->rotation.y;
     out->z = mcss->rotation.z;
 }
 
-void func_0201abf0(MCSS *mcss, const VecFx32 *in) {
+void MCSS_SetRotation(MCSS *mcss, const VecFx32 *in) {
     mcss->rotation.x = in->x;
     mcss->rotation.y = in->y;
     mcss->rotation.z = in->z;
 }
 
-void func_0201ac0c(MCSS *mcss, VecFx32 *a1) {
+void MCSS_SetShadowScale(MCSS *mcss, VecFx32 *a1) {
     mcss->shadowScale.x = a1->x;
     mcss->shadowScale.y = a1->y;
     mcss->shadowScale.z = a1->z;
 }
 
-void func_0201ac28(MCSS *mcss, VecFx32 *out) {
-    out->x = mcss->unk110.x;
-    out->y = mcss->unk110.y;
-    out->z = mcss->unk110.z;
+void MCSS_GetShadowScaleOffset(MCSS *mcss, VecFx32 *out) {
+    out->x = mcss->shadowScaleOffset.x;
+    out->y = mcss->shadowScaleOffset.y;
+    out->z = mcss->shadowScaleOffset.z;
 }
 
-void func_0201ac40(MCSS *mcss, VecFx32 *in) {
-    mcss->unk110.x = in->x;
-    mcss->unk110.y = in->y;
-    mcss->unk110.z = in->z;
+void MCSS_SetShadowScaleOffset(MCSS *mcss, VecFx32 *in) {
+    mcss->shadowScaleOffset.x = in->x;
+    mcss->shadowScaleOffset.y = in->y;
+    mcss->shadowScaleOffset.z = in->z;
 }
 
-void func_0201ac5c(MCSS *mcss, u16 a1) {
+void MCSS_SetShadowRotX(MCSS *mcss, u16 a1) {
     mcss->shadowRotX = a1;
 }
 
-void func_0201ac64(MCSS *mcss, u16 value) {
+void MCSS_SetShadowRotZ(MCSS *mcss, u16 value) {
     mcss->shadowRotZ = value;
 }
 
-void func_0201ac70(MCSS *mcss, VecFx32 *a1) {
+void MCSS_SetShadowOffset(MCSS *mcss, VecFx32 *a1) {
     mcss->shadowOffset.x = a1->x;
     mcss->shadowOffset.y = a1->y;
     mcss->shadowOffset.z = a1->z;
 }
 
-void func_0201ac8c(MCSS *mcss) {
+void MCSS_EnableFlipV(MCSS *mcss) {
     mcss->flipV = TRUE;
 }
 
-void func_0201ac9c(MCSS *mcss) {
+void MCSS_DisableFlipV(MCSS *mcss) {
     mcss->flipV = FALSE;
 }
 
-void func_0201acb0(MCSS *mcss) {
+void MCSS_ToggleFlipV(MCSS *mcss) {
     mcss->flipV ^= 1;
 }
 
-BOOL func_0201acd4(MCSS *mcss) {
+BOOL MCSS_IsPaused(MCSS *mcss) {
     return mcss->pause;
 }
 
@@ -741,7 +744,7 @@ void MCSS_PauseAnimation(MCSS *mcss) {
     mcss->pause |= 1;
 }
 
-void func_0201ad04(MCSS *mcss) {
+void MCSS_FreezeAnimation(MCSS *mcss) {
     mcss->pause |= 2;
 }
 
@@ -749,11 +752,11 @@ void MCSS_ResumeAnimation(MCSS *mcss) {
     mcss->pause &= ~1;
 }
 
-void func_0201ad4c(MCSS *mcss) {
+void MCSS_UnfreezeAnimation(MCSS *mcss) {
     mcss->pause &= ~2;
 }
 
-BOOL func_0201ad70(MCSS *mcss) {
+BOOL MCSS_IsHidden(MCSS *mcss) {
     return mcss->hidden;
 }
 
@@ -765,40 +768,40 @@ void MCSS_Show(MCSS *mcss) {
     mcss->hidden = FALSE;
 }
 
-void func_0201ada0(MCSS *mcss) {
+void MCSS_ToggleHidden(MCSS *mcss) {
     mcss->hidden ^= 1;
 }
 
-NNSG2dMultiCellAnimation *func_0201adc4(MCSS *mcss) {
+NNSG2dMultiCellAnimation *MCSS_GetMultiCellAnimation(MCSS *mcss) {
     return &mcss->mcAnim;
 }
 
-u16 func_0201adc8(MCSS *mcss) {
+u16 MCSS_GetAnimationCount(MCSS *mcss) {
     return mcss->mcAnimBank->numSequences;
 }
 
-u8 func_0201add0(MCSS *mcss) {
-    return mcss->binTail->unk0;
+u8 MCSS_GetIdleNodeCount(MCSS *mcss) {
+    return mcss->binTail->idleNodeCount;
 }
 
-u16 func_0201add8(MCSS *mcss, u8 index) {
-    return mcss->binTail->unk2[index];
+u16 MCSS_GetIdleNode(MCSS *mcss, u8 index) {
+    return mcss->binTail->idleNodes[index];
 }
 
-u16 func_0201ade0(MCSS *mcss) {
-    return mcss->bin->unk4;
+u16 MCSS_GetWidth(MCSS *mcss) {
+    return mcss->bin->width;
 }
 
-u16 func_0201ade8(MCSS *mcss) {
-    return mcss->bin->unk6;
+u16 MCSS_GetHeight(MCSS *mcss) {
+    return mcss->bin->height;
 }
 
-s16 func_0201adf0(MCSS *mcss) {
-    return mcss->bin->unk8;
+s16 MCSS_GetOffsetX(MCSS *mcss) {
+    return mcss->bin->offsetX;
 }
 
-s16 func_0201adf8(MCSS *mcss) {
-    return mcss->bin->unkA;
+s16 MCSS_GetOffsetY(MCSS *mcss) {
+    return mcss->bin->offsetY;
 }
 
 u8 func_0201ae00(MCSS *mcss) {
@@ -809,13 +812,13 @@ void MCSS_SetAnimationEndCallback(MCSS *mcss, uptr param, MCSSAnimationCallback 
     NNS_G2dSetAnimCtrlCallBackFunctor(&mcss->mcAnim.animCtrl, 1, param, callback);
 }
 
-void func_0201ae1c(MCSS *mcss, u32 param,
-                   BOOL (*func)(u32 param, const NNSG2dMultiCellHierarchyData *node, NNSG2dCellAnimation *cellAnim,
-                                u16 nodeIdx)) {
+void MCSS_TraverseNodes(MCSS *mcss, u32 param,
+                        BOOL (*func)(u32 param, const NNSG2dMultiCellHierarchyData *node, NNSG2dCellAnimation *cellAnim,
+                                     u16 nodeIdx)) {
     NNS_G2dTraverseMCNodes(&mcss->mcAnim.multiCellInstance, func, param);
 }
 
-void func_0201ae2c(MCSS *mcss, u8 startLevel, u8 endLevel, s32 wait, u32 color) {
+void MCSS_StartFade(MCSS *mcss, u8 startLevel, u8 endLevel, s32 wait, u32 color) {
     mcss->fading = TRUE;
     mcss->fadeLevel = startLevel;
     mcss->fadeEnd = endLevel;
@@ -833,7 +836,7 @@ void func_0201ae2c(MCSS *mcss, u8 startLevel, u8 endLevel, s32 wait, u32 color) 
     }
 }
 
-u8 func_0201ae88(MCSS *mcss) {
+u8 MCSS_GetAlpha(MCSS *mcss) {
     return mcss->alpha;
 }
 
@@ -841,26 +844,26 @@ void MCSS_SetAlpha(MCSS *mcss, u8 alpha) {
     mcss->alpha = alpha;
 }
 
-void func_0201aeb0(MCSS *mcss, u32 a1) {
+void MCSS_SetShadowAlpha(MCSS *mcss, u32 a1) {
     mcss->shadowAlpha = a1;
 }
 
-void func_0201aecc(MCSS *mcss, u32 a1) {
+void MCSS_SetNoShadow(MCSS *mcss, u32 a1) {
     mcss->noShadow = a1;
 }
 
-BOOL func_0201aee8(MCSS *mcss) {
+BOOL MCSS_IsFading(MCSS *mcss) {
     if (mcss->fading) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_0201aefc(MCSSSystem *system, u32 characterOffset) {
+void MCSSSys_SetTexBase(MCSSSystem *system, u32 characterOffset) {
     system->texBase = characterOffset;
 }
 
-void func_0201af00(MCSSSystem *system, u32 paletteOffset) {
+void MCSSSys_SetPlttBase(MCSSSystem *system, u32 paletteOffset) {
     system->plttBase = paletteOffset;
 }
 
@@ -875,12 +878,12 @@ void MCSS_SetAnimation(MCSS *mcss, u32 animation) {
     mcss->restart = FALSE;
 }
 
-u8 func_0201af44(MCSS *mcss) {
+u8 MCSS_GetMosaic(MCSS *mcss) {
     return mcss->mosaic;
 }
 
 // Sets the size of the sprite's mosaic and loads its graphics again
-void func_0201af54(MCSSSystem *system, MCSS *mcss, int level) {
+void MCSS_SetMosaic(MCSSSystem *system, MCSS *mcss, int level) {
     if (mcss->mosaic != level) {
         if (level > MCSS_MOSAIC_MAX) {
             level = MCSS_MOSAIC_MAX;
@@ -891,20 +894,20 @@ void func_0201af54(MCSSSystem *system, MCSS *mcss, int level) {
     }
 }
 
-void func_0201af9c(MCSSSystem *system, u32 offset) {
+void MCSSSys_SetOffsetScale(MCSSSystem *system, u32 offset) {
     system->offsetScale = offset;
 }
 
-void func_0201afa0(MCSS *mcss, fx32 speed) {
+void MCSS_SetAnimSpeed(MCSS *mcss, fx32 speed) {
     mcss->animSpeed = speed;
 }
 
-u16 func_0201afa8(MCSS *mcss) {
+u16 MCSS_GetSequenceCount(MCSS *mcss) {
     return mcss->mcAnimBank->numSequences;
 }
 
 // Blends the sprite's colors with a color, for the fade to start from
-void func_0201afb0(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color) {
+void MCSS_BlendPalette(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color) {
     MCSSLoad *load = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), sizeof(MCSSLoad), TRUE, "mcss.c", 1891);
 
     load->system = system;
@@ -920,7 +923,7 @@ void func_0201afb0(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color) {
     BlendColors(mcss->pltt, load->pltt->rawData, mcss->plttSize / 2, evy, color);
     MI_CpuCopy16(load->pltt->rawData, mcss->blendedPltt, mcss->plttSize);
     if (mcss->blendTcb != NULL) {
-        func_0201bb14(mcss->blendTcb);
+        MCSS_RemovePaletteTask(mcss->blendTcb);
         mcss->blendTcb = NULL;
     }
     if (mcss->fading == FALSE) {
@@ -938,7 +941,7 @@ void func_0201afb0(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color) {
 }
 
 // Puts the sprite's own colors back
-void func_0201b128(MCSSSystem *system, MCSS *mcss) {
+void MCSS_ResetPalette(MCSSSystem *system, MCSS *mcss) {
     MCSSLoad *load = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), sizeof(MCSSLoad), TRUE, "mcss.c", 1944);
 
     load->system = system;
@@ -953,7 +956,7 @@ void func_0201b128(MCSSSystem *system, MCSS *mcss) {
     load->pltt->rawData = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), mcss->plttSize, FALSE, "mcss.c", 1957);
     MI_CpuCopy16(mcss->pltt, load->pltt->rawData, mcss->plttSize);
     if (mcss->blendTcb != NULL) {
-        func_0201bb14(mcss->blendTcb);
+        MCSS_RemovePaletteTask(mcss->blendTcb);
         mcss->blendTcb = NULL;
     }
     if (system->tcbMgr != NULL) {
@@ -968,19 +971,19 @@ void MCSS_RestartAnimation(MCSS *mcss) {
     NNS_G2dRestartMCAnimation(&mcss->mcAnim);
 }
 
-void func_0201b25c(MCSS *mcss) {
+void MCSS_RequestRestart(MCSS *mcss) {
     mcss->restart = TRUE;
 }
 
-void func_0201b270(MCSS *mcss, BOOL flag) {
+void MCSS_SetReverse(MCSS *mcss, BOOL flag) {
     mcss->reverse = flag;
 }
 
-void func_0201b28c(MCSSSystem *system, u32 value) {
+void MCSSSys_SetCellDepth(MCSSSystem *system, u32 value) {
     system->cellDepth = value;
 }
 
-void func_0201b290(MCSSSystem *system, BOOL flag) {
+void MCSSSys_SetOrthoNear(MCSSSystem *system, BOOL flag) {
     system->orthoNear = flag;
 }
 
@@ -1183,7 +1186,7 @@ static void MCSS_UpdatePaletteFade(MCSSSystem *system, MCSS *mcss) {
             BlendColors(mcss->pltt, load->pltt->rawData, mcss->plttSize / 2, mcss->fadeLevel, mcss->fadeColor);
         }
         if (mcss->fadeTcb != NULL) {
-            func_0201bb14(mcss->fadeTcb);
+            MCSS_RemovePaletteTask(mcss->fadeTcb);
             mcss->fadeTcb = NULL;
         }
         if (system->tcbMgr != NULL) {
@@ -1225,13 +1228,13 @@ static void MCSS_FreeFiles(MCSS *mcss) {
     mcss->pltt = NULL;
     mcss->blendedPltt = NULL;
     if (mcss->loadTcb != NULL) {
-        func_0201bae8(mcss->loadTcb);
+        MCSS_RemoveLoadTask(mcss->loadTcb);
         mcss->loadTcb = NULL;
     }
 }
 
 // Removes a task of MCSS_LoadTask
-static void func_0201bae8(TCB *tcb) {
+static void MCSS_RemoveLoadTask(TCB *tcb) {
     MCSSLoad *load = GFL_TCBGetData(tcb);
 
     if (load->charFile != NULL) {
@@ -1245,7 +1248,7 @@ static void func_0201bae8(TCB *tcb) {
 }
 
 // Removes a task of MCSS_PaletteTask
-static void func_0201bb14(TCB *tcb) {
+static void MCSS_RemovePaletteTask(TCB *tcb) {
     MCSSLoad *load = GFL_TCBGetData(tcb);
 
     GFL_HeapFree(load->pltt->rawData);

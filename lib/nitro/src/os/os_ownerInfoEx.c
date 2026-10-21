@@ -5,25 +5,8 @@
 #include "nitro/os.h"
 #include "twl/os.h"
 
-// The pointer to the DSi's system settings, which the system puts in the shared memory
-#define HW_TWL_SETTINGS_BUF_PTR 0x02fffdfc
 // A byte of the TWL ROM header that the system puts in main memory
 #define HW_TWL_ROM_HEADER_BYTE_20E 0x02ffe20e
-
-// The DSi's system settings, of which only what this file reads is named
-typedef struct TWLSettings {
-    u32 unk0_0 : 24;
-    u32 eulaFlags : 8; // bit 0: the EULA was agreed to
-    u8 unk_04;
-    u8 country;
-    u8 language;
-    u8 unk_07[9];
-    u8 agreedEULAVersion;
-    u8 unk_11[0x83];
-    TWLParentalControl parentalControl;
-} TWLSettings;
-
-#define TWL_SETTINGS (*(TWLSettings **)HW_TWL_SETTINGS_BUF_PTR)
 
 // TwlSDK's OS_GetOwnerInfoEx: the owner's settings, with the language and the country from the DSi's settings on a DSi
 void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
@@ -52,7 +35,7 @@ void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
 // TwlSDK's OS_IsAvailableWireless: TRUE on a DS
 BOOL OS_IsAvailableWireless(void) {
     if (OS_IsRunOnTwl()) {
-        return func_02769318();
+        return OSi_IsAvailableWirelessTwl();
     }
     return TRUE;
 }
@@ -92,7 +75,7 @@ TWLParentalControl *OS_GetParentalControlInfoPtr(void) {
 // TwlSDK's OS_IsForceDisableWireless (the name is recalled, not shown): FALSE on a DS
 BOOL OS_IsForceDisableWireless(void) {
     if (OS_IsRunOnTwl()) {
-        return func_02769334();
+        return OSi_IsForceDisableWirelessTwl();
     }
     return FALSE;
 }

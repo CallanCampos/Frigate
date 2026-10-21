@@ -550,9 +550,9 @@ void CtvtGame_Delete(CommTvtWork *sys, CtvtGame *game) {
 
 void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
     HeapID heapId = game->heapId;
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     CtvtComm *comm = CommTvt_GetComm(sys);
-    u8 memberCount = func_02042a78();
+    u8 memberCount = GFL_NetGetNegotiatedCount();
     u8 slot = 0;
     u8 netId;
     u8 i;
@@ -594,19 +594,19 @@ void CtvtGame_Enter(CommTvtWork *sys, CtvtGame *game) {
     game->state = CTVT_GAME_STATE_START_CAMERA;
     game->replay = FALSE;
     func_ov257_021aae44(sys);
-    func_02042ba8(TRUE, heapId);
+    GFL_NetSetIconScreen(TRUE, heapId);
 }
 
 void CtvtGame_Leave(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
     u8 j;
 
-    func_02021c44(CommTvt_GetPrintQueue(sys));
+    PrintQueue_Clear(CommTvt_GetPrintQueue(sys));
     CtvtGameCam_Delete(game->cam);
     for (i = 0; i < 3; i++) {
         if (game->members[i].hasCamera == TRUE && !canPlayerExchangePhotos()) {
             for (j = 0; j < 3; j++) {
-                func_02042ed0(game->members[i].pictures[j]);
+                GFL_NetFreeAligned32(game->members[i].pictures[j]);
             }
         } else {
             for (j = 0; j < 3; j++) {
@@ -689,7 +689,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     if (game->messagePending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(game->messageWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(game->messageWindow))) {
             BmpWin_FlushChar(game->messageWindow);
             BmpWin_FlushMap(game->messageWindow);
             GFL_BGSysLoadScr(2);
@@ -699,7 +699,7 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     if (game->titlePending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(game->titleWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(game->titleWindow))) {
             BmpWin_FlushChar(game->titleWindow);
             BmpWin_FlushMap(game->titleWindow);
             GFL_BGSysLoadScr(3);
@@ -709,15 +709,15 @@ int CtvtGame_Main(CommTvtWork *sys, CtvtGame *game) {
     if (game->infoPending == TRUE) {
         PrintQueue *queue = CommTvt_GetPrintQueue(sys);
 
-        if (!func_02021c1c(queue, BmpWin_GetBitmap(game->infoWindow))) {
+        if (!PrintQueue_IsBitmapPending(queue, BmpWin_GetBitmap(game->infoWindow))) {
             BmpWin_FlushChar(game->infoWindow);
             BmpWin_FlushMap(game->infoWindow);
             GFL_BGSysLoadScr(3);
             game->infoPending = FALSE;
         }
     }
-    func_0204b794();
-    func_02021a3c(CommTvt_GetPrintQueue(sys));
+    ClActSys_Draw();
+    PrintQueue_Main(CommTvt_GetPrintQueue(sys));
     return COMM_TVT_MODE_GAME;
 }
 
@@ -794,7 +794,7 @@ static BOOL CtvtGame_AreAllReady(CommTvtWork *sys, CtvtGame *game) {
 }
 
 void CtvtGame_LoadBalloonPictures(CtvtGame *game, u8 netId, u8 color) {
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 slot = 0;
     u8 i;
     void *src;
@@ -893,7 +893,7 @@ void CtvtGame_CheckTouch(CtvtComm *comm, CtvtGame *game, const CtvtGamePacket *p
 }
 
 void CtvtGame_ApplyHits(CtvtGame *game, const CtvtGamePacket *packet, u8 mask) {
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 i;
     u8 index;
 
@@ -989,7 +989,7 @@ void CtvtGame_CountPump(CtvtComm *comm, CtvtGame *game, BOOL big, int netId) {
 }
 
 void CtvtGame_PumpBalloons(CtvtGame *game, u8 mask) {
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 i;
 
     for (i = 0; i < 4; i++) {
@@ -1066,7 +1066,7 @@ static void CtvtGame_InitPlay(CommTvtWork *sys, CtvtGame *game) {
     game->rankSign = NULL;
     game->tryAgainSign = NULL;
     GFL_BGSysSetBGPriority(0, 2);
-    func_02042ba8(TRUE, heapId);
+    GFL_NetSetIconScreen(TRUE, heapId);
 }
 
 static void CtvtGame_FreePlay(CommTvtWork *sys, CtvtGame *game) {
@@ -1118,7 +1118,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
 
     CommTvt_GetCamera(sys);
     comm = CommTvt_GetComm(sys);
-    selfNetId = func_02042a6c(func_02040440());
+    selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     switch (game->playState) {
     case CTVT_GAME_PLAY_SEND_SEED:
         if (selfNetId == 0) {
@@ -1134,11 +1134,11 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         game->playState = CTVT_GAME_PLAY_SYNC_SEED;
         break;
     case CTVT_GAME_PLAY_SYNC_SEED:
-        func_02040624(func_02040440(), 22, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 22, 32);
         game->playState = CTVT_GAME_PLAY_WAIT_SEED;
         break;
     case CTVT_GAME_PLAY_WAIT_SEED:
-        if (func_02040664(func_02040440(), 22, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 22, 32) == TRUE) {
             game->playState = CTVT_GAME_PLAY_INIT;
         }
         break;
@@ -1166,13 +1166,13 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
     case CTVT_GAME_PLAY_INTRO:
         if (CtvtGame_UpdateIntro(sys, game)) {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, game->heapId);
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             game->playState = CTVT_GAME_PLAY_WAIT_INTRO_FADE_OUT;
         }
         break;
     case CTVT_GAME_PLAY_WAIT_INTRO_FADE_OUT:
         if (GFL_WipeIsFinished() == TRUE) {
-            func_0204c124(game->scoreFrame, TRUE);
+            ClActor_SetVisible(game->scoreFrame, TRUE);
             for (i = 0; i < 4; i++) {
                 CtvtGamePlayer_Show(sys, game->players[i]);
             }
@@ -1192,12 +1192,12 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
                 CtvtGame_StartBalloons(sys, game);
                 break;
             }
-            func_02040624(func_02040440(), 23, 32);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 23, 32);
             game->playState = CTVT_GAME_PLAY_WAIT_SYNC_START;
         }
         break;
     case CTVT_GAME_PLAY_WAIT_SYNC_START:
-        if (func_02040664(func_02040440(), 23, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 23, 32) == TRUE) {
             game->playState = CTVT_GAME_PLAY_WAIT_FADE_IN;
             GFL_SndBGMPlay(SEQ_BGM_LCG_01, SND_CHANNEL_MASK_ALL);
             GFL_BGSysMoveBG(4, 3, 0);
@@ -1215,20 +1215,20 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
                 break;
             case CTVT_GAME_TYPE_BALLOONS:
                 game->playState = CTVT_GAME_PLAY_BALLOON_START;
-                func_0204c124(game->startSign, TRUE);
-                func_0204c520(game->startSign, TRUE);
-                func_0204c56c(game->startSign);
+                ClActor_SetVisible(game->startSign, TRUE);
+                ClActor_SetAutoAnim(game->startSign, TRUE);
+                ClActor_RestartAnim(game->startSign);
                 break;
             }
             RecordAddOne(game->records, 0x81);
-            func_02038bc8(25);
+            JoinAvenue_RecordActivity(25);
         }
         break;
     case CTVT_GAME_PLAY_TARGETS:
         if (CtvtGame_UpdateTargets(sys, game)) {
             game->playing = FALSE;
             game->playState = CTVT_GAME_PLAY_TARGETS_END;
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
         }
         break;
     case CTVT_GAME_PLAY_TARGETS_END:
@@ -1256,16 +1256,16 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         if (CtvtGame_UpdateBalloons(sys, game)) {
             game->playing = FALSE;
             game->playState = CTVT_GAME_PLAY_SYNC_END;
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
         }
         break;
     case CTVT_GAME_PLAY_SYNC_END:
-        func_02040624(func_02040440(), 24, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, 32);
         game->hostFrame = 0;
         game->playState = CTVT_GAME_PLAY_WAIT_SYNC_END;
         break;
     case CTVT_GAME_PLAY_WAIT_SYNC_END:
-        if (func_02040664(func_02040440(), 24, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 24, 32) == TRUE) {
             game->playState = CTVT_GAME_PLAY_FADE_OUT;
         }
         break;
@@ -1294,7 +1294,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         break;
     case CTVT_GAME_PLAY_RESULTS:
         if (CtvtGame_UpdateResults(sys, game) == TRUE) {
-            RecordAdd(game->records, 0x32, game->players[func_02042a6c(func_02040440())]->score);
+            RecordAdd(game->records, 0x32, game->players[GFL_NetGetHandleNetId(NetHandle_GetOwn())]->score);
             game->playState = CTVT_GAME_PLAY_ASK_REPLAY;
         }
         break;
@@ -1472,11 +1472,11 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
         }
         break;
     case CTVT_GAME_PLAY_SYNC_FREE:
-        func_02040624(func_02040440(), 25, 32);
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 25, 32);
         game->playState = CTVT_GAME_PLAY_WAIT_SYNC_FREE;
         break;
     case CTVT_GAME_PLAY_WAIT_SYNC_FREE:
-        if (func_02040664(func_02040440(), 25, 32) == TRUE) {
+        if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 25, 32) == TRUE) {
             game->playState = CTVT_GAME_PLAY_FREE;
         }
         break;
@@ -1502,7 +1502,7 @@ static BOOL CtvtGame_UpdatePlay(CommTvtWork *sys, CtvtGame *game) {
 
 static void CtvtGame_InitCommon(CommTvtWork *sys, CtvtGame *game) {
     HeapID heapId = game->heapId;
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 memberCount = CommTvt_GetMemberCount(sys);
     u8 pos = 0;
     u8 i;
@@ -1513,20 +1513,20 @@ static void CtvtGame_InitCommon(CommTvtWork *sys, CtvtGame *game) {
     setup.y = 168;
     setup.sequence = 0;
     setup.bgPriority = 1;
-    game->scoreFrame = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
-                                     CLACT_SURFACE_SUB, heapId);
-    func_0204c124(game->scoreFrame, FALSE);
+    game->scoreFrame = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
+                                      CLACT_SURFACE_SUB, heapId);
+    ClActor_SetVisible(game->scoreFrame, FALSE);
     setup.x = 128;
     setup.y = 96;
     setup.sequence = 2;
     setup.bgPriority = 1;
-    game->hurrySign = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
-                                    CLACT_SURFACE_SUB, heapId);
-    func_0204c124(game->hurrySign, FALSE);
+    game->hurrySign = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
+                                     CLACT_SURFACE_SUB, heapId);
+    ClActor_SetVisible(game->hurrySign, FALSE);
     game->playerTcbBuffer = GFL_HeapAllocate(game->heapId, GFL_TCBMgrCalcAllocSize(4), FALSE, "ctvt_game.c", 2733);
     game->playerTcbManager = GFL_TCBMgrCreate(4, game->playerTcbBuffer);
     for (i = 0; i < 4; i++) {
-        if (func_02042a80(i) == TRUE) {
+        if (GFL_NetIsNegotiated(i) == TRUE) {
             game->players[i] = CtvtGamePlayer_Create(sys, game, i, pos);
             pos++;
         } else {
@@ -1565,7 +1565,7 @@ static void CtvtGame_InitCommon(CommTvtWork *sys, CtvtGame *game) {
 
 static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     HeapID heapId = game->heapId;
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 memberCount = CommTvt_GetMemberCount(sys);
     u8 i;
     Font *font;
@@ -1601,10 +1601,10 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 3; i++) {
         setup.sequence = i + 4;
         setup.priority = i;
-        game->introActors[i] = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4],
-                                             &setup, CLACT_SURFACE_SUB, heapId);
-        func_0204c124(game->introActors[i], TRUE);
-        func_0204c520(game->introActors[i], TRUE);
+        game->introActors[i] = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4],
+                                              &setup, CLACT_SURFACE_SUB, heapId);
+        ClActor_SetVisible(game->introActors[i], TRUE);
+        ClActor_SetAutoAnim(game->introActors[i], TRUE);
     }
     MI_CpuFill8(&setupEx, 0, sizeof(ClActorSetupEx));
     setupEx.base.x = 60;
@@ -1618,18 +1618,18 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     setupEx.scaleY = FX32_ONE;
     setupEx.rotation = 0;
     setupEx.affineMode = 2;
-    game->targetSigns[0] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                         &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->targetSigns[0], FALSE);
-    func_0204c520(game->targetSigns[0], TRUE);
+    game->targetSigns[0] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                            &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->targetSigns[0], FALSE);
+    ClActor_SetAutoAnim(game->targetSigns[0], TRUE);
     setupEx.base.x = 200;
     setupEx.base.y = 90;
     setupEx.base.sequence = 14;
     setupEx.base.bgPriority = 3;
-    game->targetSigns[1] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                         &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->targetSigns[1], FALSE);
-    func_0204c520(game->targetSigns[1], TRUE);
+    game->targetSigns[1] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                            &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->targetSigns[1], FALSE);
+    ClActor_SetAutoAnim(game->targetSigns[1], TRUE);
     game->tcbBuffer = GFL_HeapAllocate(game->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "ctvt_game.c", 2945);
     game->tcbManager = GFL_TCBMgrCreate(8, game->tcbBuffer);
     for (i = 0; i < 8; i++) {
@@ -1640,7 +1640,7 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     queue = CommTvt_GetPrintQueue(sys);
     str = GFL_MsgDataLoadStrbufNew(msgData, 64);
     width = GFL_FontGetBlockWidth(str, font, 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(game->titleWindow);
     BmpWin_FlushMap(game->titleWindow);
@@ -1650,18 +1650,18 @@ static void CtvtGame_InitTargets(CommTvtWork *sys, CtvtGame *game) {
     GFL_BitmapFill(BmpWin_GetBitmap(game->infoWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, 59);
     name = GFL_MsgDataLoadStrbufNew(msgData, 67 + selfNetId);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(game->infoWindow);
     BmpWin_FlushMap(game->infoWindow);
     BmpWin_DrawFrame(game->infoWindow, 1, 1, 14);
     game->infoPending = TRUE;
-    sndHeap = func_02005ce4();
+    sndHeap = GFL_SndGetHeap();
     NNS_SndHeapSaveState(sndHeap);
     NNS_SndArcLoadGroup(1, sndHeap);
 }
@@ -1671,7 +1671,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     HeapID heapId = game->heapId;
     u8 memberCount;
 
-    selfNetId = func_02042a6c(func_02040440());
+    selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     memberCount = CommTvt_GetMemberCount(sys);
     u8 i;
     u8 pos;
@@ -1707,63 +1707,63 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 3; i++) {
         setup.sequence = i + 7;
         setup.priority = i;
-        game->introActors[i] = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4],
-                                             &setup, CLACT_SURFACE_SUB, heapId);
-        func_0204c124(game->introActors[i], TRUE);
-        func_0204c520(game->introActors[i], TRUE);
+        game->introActors[i] = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4],
+                                              &setup, CLACT_SURFACE_SUB, heapId);
+        ClActor_SetVisible(game->introActors[i], TRUE);
+        ClActor_SetAutoAnim(game->introActors[i], TRUE);
     }
     setup.x = 128;
     setup.y = 96;
     setup.priority = 4;
     setup.bgPriority = 1;
     setup.sequence = 41;
-    game->pump = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                               CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->pump, FALSE);
+    game->pump = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->pump, FALSE);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 5;
     setup.bgPriority = 1;
     setup.sequence = 38;
-    game->pumpBase = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                   CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->pumpBase, FALSE);
+    game->pumpBase = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                    CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->pumpBase, FALSE);
     setup.x = 128;
     setup.y = 96;
     setup.priority = 6;
     setup.bgPriority = 1;
     setup.sequence = 39;
-    game->pumpAir = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                  CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->pumpAir, FALSE);
-    func_0204c520(game->pumpAir, TRUE);
+    game->pumpAir = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                   CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->pumpAir, FALSE);
+    ClActor_SetAutoAnim(game->pumpAir, TRUE);
     setup.x = 65;
     setup.y = 122;
     setup.priority = 3;
     setup.bgPriority = 1;
     setup.sequence = 47;
-    game->startSign = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                    CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->startSign, FALSE);
+    game->startSign = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                     CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->startSign, FALSE);
     setup.x = 234;
     setup.y = 170;
     setup.priority = 0;
     setup.bgPriority = 1;
     setup.sequence = 50;
     for (i = 0; i < 3; i++) {
-        game->rightPuffs[i] = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                            &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c124(game->rightPuffs[i], FALSE);
-        func_0204c520(game->rightPuffs[i], TRUE);
+        game->rightPuffs[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                             &setup, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetVisible(game->rightPuffs[i], FALSE);
+        ClActor_SetAutoAnim(game->rightPuffs[i], TRUE);
     }
     setup.x = 20;
     setup.y = 170;
     setup.sequence = 49;
     for (i = 0; i < 3; i++) {
-        game->leftPuffs[i] = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c124(game->leftPuffs[i], FALSE);
-        func_0204c520(game->leftPuffs[i], TRUE);
+        game->leftPuffs[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                            &setup, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetVisible(game->leftPuffs[i], FALSE);
+        ClActor_SetAutoAnim(game->leftPuffs[i], TRUE);
     }
     game->tcbBuffer = GFL_HeapAllocate(game->heapId, GFL_TCBMgrCalcAllocSize(8), FALSE, "ctvt_game.c", 3214);
     game->tcbManager = GFL_TCBMgrCreate(8, game->tcbBuffer);
@@ -1771,7 +1771,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     for (i = 0; i < 4; i++) {
         if (selfNetId == i) {
             game->balloons[i] = CtvtGameBalloon_Create(game, i, pos, TRUE, game->heapId);
-        } else if (!func_02042a80(i)) {
+        } else if (!GFL_NetIsNegotiated(i)) {
             game->balloons[i] = CtvtGameBalloon_Create(game, i, pos, FALSE, game->heapId);
         } else {
             game->balloons[i] = CtvtGameBalloon_Create(game, i, pos, TRUE, game->heapId);
@@ -1784,14 +1784,14 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     queue = CommTvt_GetPrintQueue(sys);
     str = GFL_MsgDataLoadStrbufNew(msgData, 64);
     width = GFL_FontGetBlockWidth(str, font, 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->titleWindow), 64 - width / 2, 12, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(game->titleWindow);
     BmpWin_FlushMap(game->titleWindow);
     game->titlePending = TRUE;
     GFL_BitmapFill(BmpWin_GetBitmap(game->infoWindow), 15);
     str = GFL_MsgDataLoadStrbufNew(msgData, 60);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->infoWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     BmpWin_FlushChar(game->infoWindow);
     BmpWin_FlushMap(game->infoWindow);
@@ -1803,7 +1803,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     game->leftPuff = 0;
     game->rightPuff = 0;
     game->pumpSeq = 41;
-    sndHeap = func_02005ce4();
+    sndHeap = GFL_SndGetHeap();
     NNS_SndHeapSaveState(sndHeap);
     NNS_SndArcLoadGroup(2, sndHeap);
 }
@@ -1839,11 +1839,11 @@ static void CtvtGame_StartTargets(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
 
     for (i = 0; i < 3; i++) {
-        func_0204c124(game->introActors[i], FALSE);
+        ClActor_SetVisible(game->introActors[i], FALSE);
     }
     for (i = 0; i < 2; i++) {
-        func_0204c124(game->targetSigns[i], TRUE);
-        func_0204c56c(game->targetSigns[i]);
+        ClActor_SetVisible(game->targetSigns[i], TRUE);
+        ClActor_RestartAnim(game->targetSigns[i]);
     }
     GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 5, 0, 0, 0x20, game->heapId);
     GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 14, 1, 0, 0, FALSE, game->heapId);
@@ -1854,12 +1854,12 @@ static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
     u8 i;
 
     for (i = 0; i < 3; i++) {
-        func_0204c124(game->introActors[i], FALSE);
+        ClActor_SetVisible(game->introActors[i], FALSE);
     }
-    func_0204c124(game->pump, TRUE);
-    func_0204c520(game->pump, TRUE);
-    func_0204c124(game->pumpBase, TRUE);
-    func_0204c124(game->pumpAir, TRUE);
+    ClActor_SetVisible(game->pump, TRUE);
+    ClActor_SetAutoAnim(game->pump, TRUE);
+    ClActor_SetVisible(game->pumpBase, TRUE);
+    ClActor_SetVisible(game->pumpAir, TRUE);
     GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 6, 0, 0, 0xe0, game->heapId);
     GFL_BGSysLoadNCGRStatic(ARCID_CTVT_GAME, 15, 1, 0, 0, FALSE, game->heapId);
     loadBGScrToVramByNarcNoReserveNegAlign(ARCID_CTVT_GAME, 22, 1, 0, 0, FALSE, game->heapId);
@@ -1867,12 +1867,12 @@ static void CtvtGame_StartBalloons(CommTvtWork *sys, CtvtGame *game) {
 
 static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
     CtvtComm *comm = CommTvt_GetComm(sys);
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u32 x;
     u32 y;
     u8 index;
 
-    if (func_0203dac8(&x, &y) == TRUE) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) == TRUE) {
         CtvtGamePacket packet = { 0 };
 
         packet.unk5[0] = x;
@@ -1925,7 +1925,7 @@ static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
         CtvtGame_StartSort(game, TRUE);
     }
     if (game->timeLeft < 20 && !game->sorting) {
-        func_0204c124(game->hurrySign, TRUE);
+        ClActor_SetVisible(game->hurrySign, TRUE);
     }
     if (game->timeLeft == 20) {
         GFL_SndBGMSetParams(SND_CHANNEL_MASK_ALL, 285, 85, -1);
@@ -1938,18 +1938,18 @@ static BOOL CtvtGame_UpdateTargets(CommTvtWork *sys, CtvtGame *game) {
 static BOOL CtvtGame_UpdateBalloonStart(CommTvtWork *sys, CtvtGame *game) {
     ClActorPos pos;
 
-    if (func_0204c4a0(game->startSign) == 47) {
-        if (!func_0204c560(game->startSign)) {
-            func_0204c178(game->startSign, &pos, CLACT_SURFACE_SUB);
+    if (ClActor_GetSequence(game->startSign) == 47) {
+        if (!ClActor_IsAnimActive(game->startSign)) {
+            ClActor_GetSurfacePos(game->startSign, &pos, CLACT_SURFACE_SUB);
             pos.x += 128;
-            func_0204c488(game->startSign, 48);
-            func_0204c140(game->startSign, &pos, CLACT_SURFACE_SUB);
-            func_0204c520(game->startSign, TRUE);
-            func_0204c56c(game->startSign);
-            func_0204c488(game->pump, 40);
+            ClActor_SetSequence(game->startSign, 48);
+            ClActor_SetSurfacePos(game->startSign, &pos, CLACT_SURFACE_SUB);
+            ClActor_SetAutoAnim(game->startSign, TRUE);
+            ClActor_RestartAnim(game->startSign);
+            ClActor_SetSequence(game->pump, 40);
         }
-    } else if (func_0204c4a0(game->startSign) == 48 && !func_0204c560(game->startSign)) {
-        func_0204c124(game->startSign, FALSE);
+    } else if (ClActor_GetSequence(game->startSign) == 48 && !ClActor_IsAnimActive(game->startSign)) {
+        ClActor_SetVisible(game->startSign, FALSE);
         return TRUE;
     }
     CtvtGame_UpdatePlayers(game);
@@ -1965,7 +1965,7 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
         { 155, 192, 192, 207 }, { 129, 144, 217, 255 }, { TOUCH_RECT_END, 0, 0, 0 },
     };
     CtvtComm *comm = CommTvt_GetComm(sys);
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u16 pullSeq;
     u16 pushSeq;
     u16 idleSeq;
@@ -1986,10 +1986,10 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
         pullSeq = 44;
         pushSeq = 43;
         idleSeq = 45;
-        if (func_0204c4a0(game->pump) == 40) {
+        if (ClActor_GetSequence(game->pump) == 40) {
             game->pumpSeq = 43;
         }
-        if (func_0204c4a0(game->pump) == 41) {
+        if (ClActor_GetSequence(game->pump) == 41) {
             game->pumpSeq = 44;
         }
     } else {
@@ -1999,11 +1999,11 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
     }
     if (CtvtGameBalloon_IsIdle(game->balloons[selfNetId]) == TRUE && game->timeLeft != 0) {
         pumped = FALSE;
-        hit = func_0203da0c(sPumpRects);
-        if (pullSeq == func_0204c4a0(game->pump) && hit >= 0 && hit <= 3) {
+        hit = GFL_HIDGetTouchPressedRect(sPumpRects);
+        if (pullSeq == ClActor_GetSequence(game->pump) && hit >= 0 && hit <= 3) {
             pumped = TRUE;
         }
-        if (pushSeq == func_0204c4a0(game->pump) && hit >= 4 && hit <= 7) {
+        if (pushSeq == ClActor_GetSequence(game->pump) && hit >= 4 && hit <= 7) {
             pumped = TRUE;
         }
         if (pumped == TRUE) {
@@ -2020,20 +2020,20 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
                 game->wobbleCooldown = 80;
                 CtvtGameBalloon_Wobble(game->balloons[selfNetId]);
             }
-            if (!func_0204c560(game->pumpAir)) {
-                func_0204c56c(game->pumpAir);
+            if (!ClActor_IsAnimActive(game->pumpAir)) {
+                ClActor_RestartAnim(game->pumpAir);
                 if (!GFL_SndPlayerIsActive(GFL_SndSeqGetPlayerIndex(SEQ_SE_LCG_06))) {
                     GFL_SndSEPlay(SEQ_SE_LCG_06);
                 }
             }
-            if (pushSeq == func_0204c4a0(game->pump)) {
+            if (pushSeq == ClActor_GetSequence(game->pump)) {
                 game->pumpSeq = pullSeq;
                 if (hit == 4) {
-                    func_0204c124(game->rightPuffs[game->rightPuff], TRUE);
-                    func_0204c56c(game->rightPuffs[game->rightPuff]);
-                    func_0204c438(game->rightPuffs[game->rightPuff], 0);
-                    func_0204c438(game->rightPuffs[(game->rightPuff + 1) % 3], 1);
-                    func_0204c438(game->rightPuffs[(game->rightPuff + 2) % 3], 2);
+                    ClActor_SetVisible(game->rightPuffs[game->rightPuff], TRUE);
+                    ClActor_RestartAnim(game->rightPuffs[game->rightPuff]);
+                    ClActor_SetPriority(game->rightPuffs[game->rightPuff], 0);
+                    ClActor_SetPriority(game->rightPuffs[(game->rightPuff + 1) % 3], 1);
+                    ClActor_SetPriority(game->rightPuffs[(game->rightPuff + 2) % 3], 2);
                     game->rightPuff++;
                     if (game->rightPuff >= 3) {
                         game->rightPuff = 0;
@@ -2042,26 +2042,26 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
             } else {
                 game->pumpSeq = pushSeq;
                 if (hit == 0) {
-                    func_0204c124(game->leftPuffs[game->leftPuff], TRUE);
-                    func_0204c56c(game->leftPuffs[game->leftPuff]);
-                    func_0204c438(game->leftPuffs[game->leftPuff], 0);
-                    func_0204c438(game->leftPuffs[(game->leftPuff + 1) % 3], 1);
-                    func_0204c438(game->leftPuffs[(game->leftPuff + 2) % 3], 2);
+                    ClActor_SetVisible(game->leftPuffs[game->leftPuff], TRUE);
+                    ClActor_RestartAnim(game->leftPuffs[game->leftPuff]);
+                    ClActor_SetPriority(game->leftPuffs[game->leftPuff], 0);
+                    ClActor_SetPriority(game->leftPuffs[(game->leftPuff + 1) % 3], 1);
+                    ClActor_SetPriority(game->leftPuffs[(game->leftPuff + 2) % 3], 2);
                     game->leftPuff++;
                     if (game->leftPuff >= 3) {
                         game->leftPuff = 0;
                     }
                 }
             }
-            func_0204c520(game->pump, TRUE);
-            func_0204c56c(game->pump);
+            ClActor_SetAutoAnim(game->pump, TRUE);
+            ClActor_RestartAnim(game->pump);
         }
-        if (!func_0204c560(game->pump)) {
-            func_0204c488(game->pump, game->pumpSeq);
-            func_0204c550(game->pump);
+        if (!ClActor_IsAnimActive(game->pump)) {
+            ClActor_SetSequence(game->pump, game->pumpSeq);
+            ClActor_StopAnim(game->pump);
         }
     } else {
-        func_0204c488(game->pump, idleSeq);
+        ClActor_SetSequence(game->pump, idleSeq);
     }
     if (game->wobbleCooldown != 0) {
         game->wobbleCooldown--;
@@ -2095,7 +2095,7 @@ static BOOL CtvtGame_UpdateBalloons(CommTvtWork *sys, CtvtGame *game) {
         CtvtGame_StartSort(game, TRUE);
     }
     if (game->timeLeft < 20 && !game->sorting) {
-        func_0204c124(game->hurrySign, TRUE);
+        ClActor_SetVisible(game->hurrySign, TRUE);
     }
     if (game->timeLeft == 20) {
         GFL_SndBGMSetParams(SND_CHANNEL_MASK_ALL, 285, 85, -1);
@@ -2121,24 +2121,24 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     ClActorSetup setup;
     ClActorSetupEx setupEx;
 
-    sndHeap = func_02005ce4();
+    sndHeap = GFL_SndGetHeap();
     NNS_SndHeapLoadState(sndHeap, NNS_SndHeapGetCurrentLevel(sndHeap));
-    func_0204c124(game->scoreFrame, FALSE);
-    func_0204c124(game->hurrySign, FALSE);
+    ClActor_SetVisible(game->scoreFrame, FALSE);
+    ClActor_SetVisible(game->hurrySign, FALSE);
     window = game->timeWindow;
     BmpWin_ClearScreen(window);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(window));
     if (type == CTVT_GAME_TYPE_TARGETS) {
         for (i = 0; i < 2; i++) {
-            func_0204c124(game->targetSigns[i], FALSE);
+            ClActor_SetVisible(game->targetSigns[i], FALSE);
         }
     } else if (type == CTVT_GAME_TYPE_BALLOONS) {
-        func_0204c124(game->pump, FALSE);
-        func_0204c124(game->pumpBase, FALSE);
-        func_0204c124(game->pumpAir, FALSE);
+        ClActor_SetVisible(game->pump, FALSE);
+        ClActor_SetVisible(game->pumpBase, FALSE);
+        ClActor_SetVisible(game->pumpAir, FALSE);
         for (i = 0; i < 3; i++) {
-            func_0204c124(game->rightPuffs[i], FALSE);
-            func_0204c124(game->leftPuffs[i], FALSE);
+            ClActor_SetVisible(game->rightPuffs[i], FALSE);
+            ClActor_SetVisible(game->leftPuffs[i], FALSE);
         }
     }
     for (i = 0; i < 4; i++) {
@@ -2163,9 +2163,9 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     setup.priority = 0;
     setup.bgPriority = 1;
     setup.sequence = 3;
-    game->resultFrame = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
-                                      CLACT_SURFACE_SUB, heapId);
-    func_0204c124(game->resultFrame, TRUE);
+    game->resultFrame = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
+                                       CLACT_SURFACE_SUB, heapId);
+    ClActor_SetVisible(game->resultFrame, TRUE);
     setup.priority = 1;
     setup.bgPriority = 3;
     for (i = 0; i < 2; i++) {
@@ -2174,34 +2174,34 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
         } else if (type == CTVT_GAME_TYPE_BALLOONS) {
             setup.sequence = 32;
         }
-        game->winFlashes[i] = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                            &setup, CLACT_SURFACE_MAIN, heapId);
-        func_0204c124(game->winFlashes[i], FALSE);
+        game->winFlashes[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                             &setup, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetVisible(game->winFlashes[i], FALSE);
     }
     setup.priority = 2;
     setup.bgPriority = 3;
     setup.sequence = type + 26;
-    game->winBanner = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                    CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->winBanner, FALSE);
+    game->winBanner = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                     CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->winBanner, FALSE);
     setup.priority = 0;
     setup.bgPriority = 3;
     setup.sequence = type + 28;
-    game->winGlow = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                  CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->winGlow, FALSE);
+    game->winGlow = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                   CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->winGlow, FALSE);
     setup.priority = 1;
     setup.bgPriority = 1;
     setup.sequence = 33;
-    game->rankSign = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                   CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->rankSign, FALSE);
+    game->rankSign = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                    CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->rankSign, FALSE);
     setup.priority = 1;
     setup.bgPriority = 1;
     setup.sequence = 37;
-    game->tryAgainSign = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                       CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->tryAgainSign, FALSE);
+    game->tryAgainSign = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                        &setup, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->tryAgainSign, FALSE);
     MI_CpuFill8(&setupEx, 0, sizeof(ClActorSetupEx));
     setupEx.base.x = 128;
     setupEx.base.y = 96;
@@ -2214,57 +2214,57 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     setupEx.scaleY = FX32_ONE;
     setupEx.rotation = 0;
     setupEx.affineMode = 2;
-    game->crown = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setupEx,
-                                CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crown, FALSE);
+    game->crown = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setupEx,
+                                   CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crown, FALSE);
     setupEx.base.x = 59;
     setupEx.base.y = 80;
     setupEx.base.sequence = 16;
     setupEx.base.priority = 2;
     setupEx.base.bgPriority = 1;
-    game->crownSparkles[0] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crownSparkles[0], FALSE);
+    game->crownSparkles[0] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crownSparkles[0], FALSE);
     setupEx.base.x = 90;
     setupEx.base.y = 80;
     setupEx.base.sequence = 17;
     setupEx.base.priority = 3;
     setupEx.base.bgPriority = 1;
-    game->crownSparkles[1] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crownSparkles[1], FALSE);
+    game->crownSparkles[1] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crownSparkles[1], FALSE);
     setupEx.base.x = 120;
     setupEx.base.y = 80;
     setupEx.base.sequence = 18;
     setupEx.base.priority = 4;
     setupEx.base.bgPriority = 1;
-    game->crownSparkles[2] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crownSparkles[2], FALSE);
+    game->crownSparkles[2] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crownSparkles[2], FALSE);
     setupEx.base.x = 150;
     setupEx.base.y = 80;
     setupEx.base.sequence = 19;
     setupEx.base.priority = 5;
     setupEx.base.bgPriority = 1;
-    game->crownSparkles[3] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crownSparkles[3], FALSE);
+    game->crownSparkles[3] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crownSparkles[3], FALSE);
     setupEx.base.x = 177;
     setupEx.base.y = 80;
     setupEx.base.sequence = 20;
     setupEx.base.priority = 6;
     setupEx.base.bgPriority = 1;
-    game->crownSparkles[4] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crownSparkles[4], FALSE);
+    game->crownSparkles[4] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crownSparkles[4], FALSE);
     setupEx.base.x = 200;
     setupEx.base.y = 80;
     setupEx.base.sequence = 21;
     setupEx.base.priority = 6;
     setupEx.base.bgPriority = 1;
-    game->crownSparkles[5] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-    func_0204c124(game->crownSparkles[5], FALSE);
+    game->crownSparkles[5] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+    ClActor_SetVisible(game->crownSparkles[5], FALSE);
     setupEx.base.x = 128;
     setupEx.base.y = 96;
     setupEx.base.priority = 3;
@@ -2274,9 +2274,9 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
         } else if (type == CTVT_GAME_TYPE_BALLOONS) {
             setupEx.base.sequence = i + 30;
         }
-        game->winBursts[i] = func_0204c0a4(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                           &setupEx, CLACT_SURFACE_MAIN, heapId);
-        func_0204c124(game->winBursts[i], FALSE);
+        game->winBursts[i] = ClActor_CreateEx(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                              &setupEx, CLACT_SURFACE_MAIN, heapId);
+        ClActor_SetVisible(game->winBursts[i], FALSE);
     }
     {
         u8 ranks[4] = { 1, 1, 1, 1 };
@@ -2303,7 +2303,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
             game->shots[i]->tcb = GFL_TCBMgrAddTask(game->tcbManager, CtvtGame_ShotTask, game->shots[i], 2);
         }
     }
-    selfNetId = func_02042a6c(func_02040440());
+    selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     for (i = 0; i < 5; i++) {
         GFL_G3DMgrDeleteScene(game->g3d, game->scenes[i]);
     }
@@ -2339,7 +2339,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
 }
 
 static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 memberCount = CommTvt_GetMemberCount(sys);
     u8 i;
 
@@ -2368,69 +2368,69 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
         break;
     case 2:
         if (game->players[selfNetId]->rank == 1) {
-            func_0204c124(game->winBanner, TRUE);
-            func_0204c124(game->winBursts[0], TRUE);
-            func_0204c124(game->winBursts[1], TRUE);
-            func_0204c520(game->winBursts[0], TRUE);
-            func_0204c520(game->winBursts[1], TRUE);
-            func_0204c56c(game->winBursts[0]);
-            func_0204c56c(game->winBursts[1]);
-            func_0204c124(game->winFlashes[0], TRUE);
-            func_0204c124(game->winFlashes[1], TRUE);
-            func_0204c520(game->winFlashes[0], TRUE);
-            func_0204c520(game->winFlashes[1], TRUE);
-            func_0204c56c(game->winFlashes[0]);
-            func_0204c56c(game->winFlashes[1]);
-            func_0204c124(game->winGlow, TRUE);
-            func_0204c520(game->winGlow, TRUE);
-            func_0204c56c(game->winGlow);
+            ClActor_SetVisible(game->winBanner, TRUE);
+            ClActor_SetVisible(game->winBursts[0], TRUE);
+            ClActor_SetVisible(game->winBursts[1], TRUE);
+            ClActor_SetAutoAnim(game->winBursts[0], TRUE);
+            ClActor_SetAutoAnim(game->winBursts[1], TRUE);
+            ClActor_RestartAnim(game->winBursts[0]);
+            ClActor_RestartAnim(game->winBursts[1]);
+            ClActor_SetVisible(game->winFlashes[0], TRUE);
+            ClActor_SetVisible(game->winFlashes[1], TRUE);
+            ClActor_SetAutoAnim(game->winFlashes[0], TRUE);
+            ClActor_SetAutoAnim(game->winFlashes[1], TRUE);
+            ClActor_RestartAnim(game->winFlashes[0]);
+            ClActor_RestartAnim(game->winFlashes[1]);
+            ClActor_SetVisible(game->winGlow, TRUE);
+            ClActor_SetAutoAnim(game->winGlow, TRUE);
+            ClActor_RestartAnim(game->winGlow);
             game->resultState = 3;
         } else if (game->players[selfNetId]->rank == 2) {
             game->resultState = 4;
         } else {
             game->resultState = 5;
         }
-        func_0204c488(game->rankSign, game->players[selfNetId]->rank + 32);
-        func_0204c124(game->rankSign, FALSE);
+        ClActor_SetSequence(game->rankSign, game->players[selfNetId]->rank + 32);
+        ClActor_SetVisible(game->rankSign, FALSE);
         break;
     case 3:
-        if (!func_0204c560(game->winFlashes[0])) {
-            func_0204c124(game->winFlashes[0], FALSE);
-            func_0204c124(game->winFlashes[1], FALSE);
-            func_0204c124(game->crown, TRUE);
-            func_0204c520(game->crown, TRUE);
-            func_0204c56c(game->crown);
+        if (!ClActor_IsAnimActive(game->winFlashes[0])) {
+            ClActor_SetVisible(game->winFlashes[0], FALSE);
+            ClActor_SetVisible(game->winFlashes[1], FALSE);
+            ClActor_SetVisible(game->crown, TRUE);
+            ClActor_SetAutoAnim(game->crown, TRUE);
+            ClActor_RestartAnim(game->crown);
             game->resultState = 6;
         }
         break;
     case 4:
-        func_0204c124(game->rankSign, TRUE);
-        func_0204c520(game->rankSign, TRUE);
-        func_0204c56c(game->rankSign);
+        ClActor_SetVisible(game->rankSign, TRUE);
+        ClActor_SetAutoAnim(game->rankSign, TRUE);
+        ClActor_RestartAnim(game->rankSign);
         game->resultTimer = 0;
         game->resultState = 7;
         break;
     case 5:
-        func_0204c124(game->rankSign, TRUE);
-        func_0204c520(game->rankSign, TRUE);
-        func_0204c56c(game->rankSign);
-        func_0204c124(game->tryAgainSign, TRUE);
-        func_0204c520(game->tryAgainSign, TRUE);
-        func_0204c56c(game->tryAgainSign);
+        ClActor_SetVisible(game->rankSign, TRUE);
+        ClActor_SetAutoAnim(game->rankSign, TRUE);
+        ClActor_RestartAnim(game->rankSign);
+        ClActor_SetVisible(game->tryAgainSign, TRUE);
+        ClActor_SetAutoAnim(game->tryAgainSign, TRUE);
+        ClActor_RestartAnim(game->tryAgainSign);
         game->resultTimer = 0;
         game->resultState = 7;
         break;
     case 6:
-        if (!func_0204c560(game->crown)) {
-            func_0204c124(game->crown, FALSE);
+        if (!ClActor_IsAnimActive(game->crown)) {
+            ClActor_SetVisible(game->crown, FALSE);
             for (i = 0; i < 6; i++) {
-                func_0204c124(game->crownSparkles[i], TRUE);
-                func_0204c520(game->crownSparkles[i], TRUE);
-                func_0204c56c(game->crownSparkles[i]);
+                ClActor_SetVisible(game->crownSparkles[i], TRUE);
+                ClActor_SetAutoAnim(game->crownSparkles[i], TRUE);
+                ClActor_RestartAnim(game->crownSparkles[i]);
             }
-            func_0204c124(game->rankSign, TRUE);
-            func_0204c520(game->rankSign, TRUE);
-            func_0204c56c(game->rankSign);
+            ClActor_SetVisible(game->rankSign, TRUE);
+            ClActor_SetAutoAnim(game->rankSign, TRUE);
+            ClActor_RestartAnim(game->rankSign);
             game->resultTimer = 0;
             game->resultState = 7;
         }
@@ -2449,8 +2449,8 @@ static BOOL CtvtGame_UpdateResults(CommTvtWork *sys, CtvtGame *game) {
 }
 
 static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
-    u8 selfNetId = func_02042a6c(func_02040440());
-    NNSSndHeapHandle sndHeap = func_02005ce4();
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
+    NNSSndHeapHandle sndHeap = GFL_SndGetHeap();
     int level = NNS_SndHeapGetCurrentLevel(sndHeap);
     u8 i;
 
@@ -2469,7 +2469,7 @@ static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
             game->players[i] = NULL;
         }
     }
-    func_0203a610(game->playerTcbManager);
+    GFL_TCBMgrDelete(game->playerTcbManager);
     if (game->playerTcbManager != NULL) {
         GFL_HeapFree(game->playerTcbManager);
         game->playerTcbManager = NULL;
@@ -2478,7 +2478,7 @@ static void CtvtGame_FreeCommon(CommTvtWork *sys, CtvtGame *game) {
         GFL_HeapFree(game->playerTcbBuffer);
         game->playerTcbBuffer = NULL;
     }
-    func_0203a610(game->tcbManager);
+    GFL_TCBMgrDelete(game->tcbManager);
     if (game->tcbManager != NULL) {
         GFL_HeapFree(game->tcbManager);
         game->tcbManager = NULL;
@@ -2587,11 +2587,11 @@ static void CtvtGame_FreeBalloons(CommTvtWork *sys, CtvtGame *game) {
 static BOOL CtvtGame_CheckError(CommTvtWork *sys, CtvtGame *game) {
     CommTvt_GetComm(sys);
     if (CommTvt_IsErrorShown(sys) == TRUE) {
-        func_020120f0(14);
+        GFL_NetErrRecordWifi(14);
         return TRUE;
     }
     if (CommTvt_GetMemberCount(sys) <= 1) {
-        func_020120f0(14);
+        GFL_NetErrRecordWifi(14);
         return TRUE;
     }
     return FALSE;
@@ -2624,16 +2624,16 @@ static void CtvtGame_InitGraphics(CtvtGame *game, HeapID heapId) {
     }
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    game->clactUnit = func_0204bf1c(64, 0, heapId);
-    func_0204c028(game->clactUnit);
+    game->clactUnit = ClActUnit_Create(64, 0, heapId);
+    ClActUnit_UseSystemRenderer(game->clactUnit);
     game->vblankTcb = GFL_VBlankTCBAdd(CtvtGame_VBlank, game, 1);
     game->g3dActive = TRUE;
 }
 
 static void CtvtGame_FreeGraphics(CtvtGame *game) {
     GFL_TCBRemove(game->vblankTcb);
-    func_0204bf98(game->clactUnit);
-    func_0204b758();
+    ClActUnit_Delete(game->clactUnit);
+    ClActSys_Delete();
     CtvtGame_Free3D(game);
     CtvtGame_FreeBGs(game);
     game->g3dActive = FALSE;
@@ -2684,12 +2684,12 @@ static void CtvtGame_Draw3D(CtvtGame *game) {
 
 static void CtvtGame_VBlank(TCB *tcb, void *data) {
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static void CtvtGame_DeleteActor(ClActor *actor) {
     if (actor != NULL) {
-        func_0204c108(actor);
+        ClActor_Delete(actor);
     }
 }
 
@@ -2779,12 +2779,12 @@ static void CtvtGame_LoadTargetResources(CtvtGame *game, HeapID heapId, ArcTool 
     u16 first;
     G3DActor *actor;
 
-    game->clactRes[0] = func_0204bc48(arc, 1, CLACT_VRAM_SUB, 0, heapId);
-    game->clactRes[2] = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
-    game->clactRes[4] = func_0204bde0(arc, 27, 29, heapId);
-    game->clactRes[1] = func_0204bc48(arc, 0, CLACT_VRAM_MAIN, 0, heapId);
-    game->clactRes[3] = func_0204b81c(arc, 10, FALSE, CLACT_VRAM_MAIN, heapId);
-    game->clactRes[5] = func_0204bde0(arc, 26, 28, heapId);
+    game->clactRes[0] = ClActSys_LoadPlttEx(arc, 1, CLACT_VRAM_SUB, 0, heapId);
+    game->clactRes[2] = ClActSys_LoadChars(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
+    game->clactRes[4] = ClActSys_LoadCellAnims(arc, 27, 29, heapId);
+    game->clactRes[1] = ClActSys_LoadPlttEx(arc, 0, CLACT_VRAM_MAIN, 0, heapId);
+    game->clactRes[3] = ClActSys_LoadChars(arc, 10, FALSE, CLACT_VRAM_MAIN, heapId);
+    game->clactRes[5] = ClActSys_LoadCellAnims(arc, 26, 28, heapId);
     game->g3d = GFL_G3DMgrCreate(36, 16, heapId);
     for (i = 0; i < 5; i++) {
         game->scenes[i] = GFL_G3DMgrNewScene(game->g3d, &sTargetScenes[i]);
@@ -2810,13 +2810,13 @@ static void CtvtGame_FreeTargetResources(CtvtGame *game) {
     u8 i;
 
     for (i = 0; i < 2; i++) {
-        func_0204bcd0(game->clactRes[i]);
+        ClActSys_FreePltt(game->clactRes[i]);
     }
     for (i = 2; i < 4; i++) {
-        func_0204b98c(game->clactRes[i]);
+        ClActSys_FreeChars(game->clactRes[i]);
     }
     for (i = 4; i < 6; i++) {
-        func_0204be64(game->clactRes[i]);
+        ClActSys_FreeCellAnims(game->clactRes[i]);
     }
     for (i = 0; i < 5; i++) {
         GFL_G3DMgrDeleteScene(game->g3d, game->scenes[i]);
@@ -2828,12 +2828,12 @@ static void CtvtGame_LoadBalloonResources(CtvtGame *game, HeapID heapId, ArcTool
     u8 i;
     G3DActor *actor;
 
-    game->clactRes[0] = func_0204bc48(arc, 1, CLACT_VRAM_SUB, 0, heapId);
-    game->clactRes[2] = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
-    game->clactRes[4] = func_0204bde0(arc, 27, 29, heapId);
-    game->clactRes[1] = func_0204bc48(arc, 0, CLACT_VRAM_MAIN, 0, heapId);
-    game->clactRes[3] = func_0204b81c(arc, 10, FALSE, CLACT_VRAM_MAIN, heapId);
-    game->clactRes[5] = func_0204bde0(arc, 26, 28, heapId);
+    game->clactRes[0] = ClActSys_LoadPlttEx(arc, 1, CLACT_VRAM_SUB, 0, heapId);
+    game->clactRes[2] = ClActSys_LoadChars(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
+    game->clactRes[4] = ClActSys_LoadCellAnims(arc, 27, 29, heapId);
+    game->clactRes[1] = ClActSys_LoadPlttEx(arc, 0, CLACT_VRAM_MAIN, 0, heapId);
+    game->clactRes[3] = ClActSys_LoadChars(arc, 10, FALSE, CLACT_VRAM_MAIN, heapId);
+    game->clactRes[5] = ClActSys_LoadCellAnims(arc, 26, 28, heapId);
     game->g3d = GFL_G3DMgrCreate(36, 16, heapId);
     for (i = 0; i < 5; i++) {
         game->scenes[i] = GFL_G3DMgrNewScene(game->g3d, &sBalloonScenes[i]);
@@ -2847,13 +2847,13 @@ static void CtvtGame_FreeBalloonResources(CtvtGame *game) {
     u8 i;
 
     for (i = 0; i < 2; i++) {
-        func_0204bcd0(game->clactRes[i]);
+        ClActSys_FreePltt(game->clactRes[i]);
     }
     for (i = 2; i < 4; i++) {
-        func_0204b98c(game->clactRes[i]);
+        ClActSys_FreeChars(game->clactRes[i]);
     }
     for (i = 4; i < 6; i++) {
-        func_0204be64(game->clactRes[i]);
+        ClActSys_FreeCellAnims(game->clactRes[i]);
     }
     for (i = 0; i < 5; i++) {
         GFL_G3DMgrDeleteScene(game->g3d, game->scenes[i]);
@@ -2887,15 +2887,15 @@ static void CtvtGame_PrintMessage(CommTvtWork *sys, CtvtGame *game, u32 msgId) {
     StrBuf *format;
     StrBuf *name;
 
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     GFL_BitmapFill(BmpWin_GetBitmap(game->messageWindow), 15);
     format = GFL_MsgDataLoadStrbufNew(msgData, msgId);
     name = GFL_MsgDataLoadStrbufNew(msgData, CtvtGame_GetType(game) + 62);
-    func_0202437c(wordSet, 0, name, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, name, 0, 1, 2);
     GFL_StrBufFree(name);
     GFL_WordSetFormatStrbuf(wordSet, str, format);
     GFL_StrBufFree(format);
-    func_02021c7c(queue, BmpWin_GetBitmap(game->messageWindow), 0, 0, str, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(game->messageWindow), 0, 0, str, font, 0x440);
     GFL_StrBufFree(str);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(game->messageWindow);
@@ -3218,7 +3218,7 @@ static void CtvtGame_DrawResults3D(CtvtGame *game) {
 
 static CtvtGamePlayer *CtvtGamePlayer_Create(CommTvtWork *sys, CtvtGame *game, u8 netId, u8 pos) {
     ClActorSetup setup;
-    u8 selfNetId = func_02042a6c(func_02040440());
+    u8 selfNetId = GFL_NetGetHandleNetId(NetHandle_GetOwn());
     u8 x;
     int tileX;
     BOOL isSelf;
@@ -3248,18 +3248,18 @@ static CtvtGamePlayer *CtvtGamePlayer_Create(CommTvtWork *sys, CtvtGame *game, u
     setup.sequence = 1;
     setup.priority = 3;
     setup.bgPriority = 1;
-    player->icon = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
-                                 CLACT_SURFACE_SUB, game->heapId);
-    func_0204c124(player->icon, FALSE);
-    func_0204c378(player->icon, netId, 1);
+    player->icon = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
+                                  CLACT_SURFACE_SUB, game->heapId);
+    ClActor_SetVisible(player->icon, FALSE);
+    ClActor_SetPalette(player->icon, netId, 1);
     setup.x = x + 56;
     setup.y = y;
     setup.sequence = 10;
     setup.priority = 1;
     setup.bgPriority = 1;
-    player->frame = func_0204c040(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
-                                  CLACT_SURFACE_SUB, game->heapId);
-    func_0204c124(player->frame, FALSE);
+    player->frame = ClActor_Create(game->clactUnit, game->clactRes[0], game->clactRes[2], game->clactRes[4], &setup,
+                                   CLACT_SURFACE_SUB, game->heapId);
+    ClActor_SetVisible(player->frame, FALSE);
     tileX = x / 8;
     tileY = y / 8 - 2;
     player->nameWindow = BmpWin_CreateDynamic(5, tileX - 8, tileY, 14, 4, 15, TRUE);
@@ -3353,14 +3353,14 @@ static void CtvtGamePlayer_Show(CommTvtWork *sys, CtvtGamePlayer *player) {
     if (player->absent) {
         return;
     }
-    func_0204c124(player->icon, TRUE);
-    func_0204c124(player->frame, TRUE);
+    ClActor_SetVisible(player->icon, TRUE);
+    ClActor_SetVisible(player->frame, TRUE);
     msgData = player->msgData;
     font = player->font;
     queue = player->queue;
     y = (player->pos + 1) * 2 + 8;
     textCopy((const u16 *)CtvtComm_GetMemberInfo(sys, CommTvt_GetComm(sys), player->netId)->playerInfo, player->name);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
     BmpWin_FlushChar(player->nameWindow);
     BmpWin_FlushMap(player->nameWindow);
     player->namePending = TRUE;
@@ -3368,7 +3368,7 @@ static void CtvtGamePlayer_Show(CommTvtWork *sys, CtvtGamePlayer *player) {
     GFL_MsgDataLoadStrbuf(msgData, 66, player->scoreFormat);
     WordSetNumber(wordSet, 0, player->score, 3, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, player->scoreStr, player->scoreFormat);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(player->scoreWindow);
     BmpWin_FlushMap(player->scoreWindow);
@@ -3410,7 +3410,7 @@ static void CtvtGame_SetScore(CtvtGame *game, u8 netId, u8 score) {
     GFL_MsgDataLoadStrbuf(msgData, 66, player->scoreFormat);
     WordSetNumber(wordSet, 0, score, 3, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, player->scoreStr, player->scoreFormat);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     player->scorePending = TRUE;
 }
@@ -3483,12 +3483,12 @@ static BOOL CtvtGamePlayer_Slide(CtvtGamePlayer *player, int dx) {
     ClActorPos pos;
     s16 x;
 
-    func_0204c178(player->icon, &pos, CLACT_SURFACE_SUB);
+    ClActor_GetSurfacePos(player->icon, &pos, CLACT_SURFACE_SUB);
     pos.x += (s16)(dx * 8);
-    func_0204c140(player->icon, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(player->icon, &pos, CLACT_SURFACE_SUB);
     x = pos.x;
     pos.x = x + 56;
-    func_0204c140(player->frame, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(player->frame, &pos, CLACT_SURFACE_SUB);
     BmpWin_ClearScreen(player->nameWindow);
     BmpWin_SetPosX(player->nameWindow, x / 8 - 8);
     BmpWin_FlushMap(player->nameWindow);
@@ -3519,10 +3519,10 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
 
     pos.x = 384;
     pos.y = sPlayerPositions[player->rank - 1][1];
-    func_0204c140(player->icon, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(player->icon, &pos, CLACT_SURFACE_SUB);
     x = pos.x;
     pos.x = x + 56;
-    func_0204c140(player->frame, &pos, CLACT_SURFACE_SUB);
+    ClActor_SetSurfacePos(player->frame, &pos, CLACT_SURFACE_SUB);
     BmpWin_SetPosX(player->nameWindow, x / 8 - 8);
     BmpWin_SetPosY(player->nameWindow, pos.y / 8 - 2);
     BmpWin_SetPosX(player->scoreWindow, x / 8 + 4);
@@ -3532,7 +3532,7 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
     queue = player->queue;
     y = player->rank * 2 + 8;
     GFL_BitmapFill(BmpWin_GetBitmap(player->nameWindow), 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->nameWindow), 0, y, player->name, font, 0x440);
     BmpWin_FlushChar(player->nameWindow);
     BmpWin_FlushMap(player->nameWindow);
     player->namePending = TRUE;
@@ -3541,7 +3541,7 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
     WordSetNumber(wordSet, 0, player->score, 3, 2, TRUE);
     GFL_WordSetFormatStrbuf(wordSet, player->scoreStr, player->scoreFormat);
     GFL_BitmapFill(BmpWin_GetBitmap(player->scoreWindow), 0);
-    func_02021c7c(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->scoreWindow), 0, y, player->scoreStr, font, 0x440);
     GFL_WordSetSystemFree(wordSet);
     BmpWin_FlushChar(player->scoreWindow);
     BmpWin_FlushMap(player->scoreWindow);
@@ -3552,11 +3552,13 @@ static void CtvtGamePlayer_PlaceAtRank(CtvtGamePlayer *player) {
 static void CtvtGamePlayer_Task(TCB *tcb, void *data) {
     CtvtGamePlayer *player = data;
 
-    if (player->namePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
+    if (player->namePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
         player->namePending = FALSE;
         BmpWin_Transfer(player->nameWindow);
     }
-    if (player->scorePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
+    if (player->scorePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
         player->scorePending = FALSE;
         BmpWin_TransferNow(player->scoreWindow);
     }
@@ -3643,28 +3645,28 @@ static void CtvtGamePlayer_InitResult(CommTvtWork *sys, CtvtGamePlayer *player) 
         setup.sequence = 12;
         setup.priority = 3;
         setup.bgPriority = 1;
-        player->icon = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                     CLACT_SURFACE_MAIN, game->heapId);
-        func_0204c124(player->icon, TRUE);
-        func_0204c378(player->icon, player->netId, 1);
+        player->icon = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                      CLACT_SURFACE_MAIN, game->heapId);
+        ClActor_SetVisible(player->icon, TRUE);
+        ClActor_SetPalette(player->icon, player->netId, 1);
         setup.x = x + 12;
         setup.y = y + 8;
         setup.sequence = 10;
         setup.priority = 1;
         setup.bgPriority = 1;
-        player->frame = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
-                                      CLACT_SURFACE_MAIN, game->heapId);
-        func_0204c124(player->frame, TRUE);
+        player->frame = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5], &setup,
+                                       CLACT_SURFACE_MAIN, game->heapId);
+        ClActor_SetVisible(player->frame, TRUE);
         for (i = 0; i < 3; i++) {
             digitSetup.x = x + i * 9 - 16;
             digitSetup.y = y + 8;
             digitSetup.sequence = 11;
             digitSetup.priority = 0;
             digitSetup.bgPriority = 1;
-            player->digits[i] = func_0204c040(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
-                                              &digitSetup, CLACT_SURFACE_MAIN, game->heapId);
-            func_0204c520(player->digits[i], TRUE);
-            func_0204c504(player->digits[i], i * 3);
+            player->digits[i] = ClActor_Create(game->clactUnit, game->clactRes[1], game->clactRes[3], game->clactRes[5],
+                                               &digitSetup, CLACT_SURFACE_MAIN, game->heapId);
+            ClActor_SetAutoAnim(player->digits[i], TRUE);
+            ClActor_SetAnimFrame(player->digits[i], i * 3);
         }
     }
     if (!player->absent) {
@@ -3679,7 +3681,7 @@ static void CtvtGamePlayer_InitResult(CommTvtWork *sys, CtvtGamePlayer *player) 
         GFL_BGSysSetBGEnabled(5, FALSE);
         player->nameWindow = BmpWin_CreateDynamic(3, player->pos * 8, 20, 14, 4, 15, TRUE);
         GFL_BitmapFill(BmpWin_GetBitmap(player->nameWindow), 0);
-        func_02021c7c(queue, BmpWin_GetBitmap(player->nameWindow), 32 - width / 2, 0, name, font, 0x440);
+        PrintQueue_PrintColor(queue, BmpWin_GetBitmap(player->nameWindow), 32 - width / 2, 0, name, font, 0x440);
         GFL_StrBufFree(name);
         BmpWin_FlushChar(player->nameWindow);
         BmpWin_FlushMap(player->nameWindow);
@@ -3693,11 +3695,13 @@ static void CtvtGamePlayer_ResultTask(TCB *tcb, void *data) {
     if (player->absent == TRUE) {
         return;
     }
-    if (player->namePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
+    if (player->namePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->nameWindow))) {
         player->namePending = FALSE;
         BmpWin_Transfer(player->nameWindow);
     }
-    if (player->scorePending == TRUE && !func_02021c1c(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
+    if (player->scorePending == TRUE &&
+        !PrintQueue_IsBitmapPending(player->queue, BmpWin_GetBitmap(player->scoreWindow))) {
         player->scorePending = FALSE;
         BmpWin_TransferNow(player->scoreWindow);
     }
@@ -3705,9 +3709,9 @@ static void CtvtGamePlayer_ResultTask(TCB *tcb, void *data) {
     case 0:
         break;
     case 1:
-        func_0204c488(player->digits[0], player->score / 100);
-        func_0204c488(player->digits[1], player->score % 100 / 10);
-        func_0204c488(player->digits[2], player->score % 10);
+        ClActor_SetSequence(player->digits[0], player->score / 100);
+        ClActor_SetSequence(player->digits[1], player->score % 100 / 10);
+        ClActor_SetSequence(player->digits[2], player->score % 10);
         player->state = 2;
         break;
     case 2:

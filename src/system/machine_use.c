@@ -23,7 +23,7 @@
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0).
 //
 // The calls to the DSi's power management go to the LTD autoload, out of reach of a branch, so the linker adds a
-// veneer after each calling function: the `bx pc` stubs and ARM jumps after SystemInit, func_02005430 and
+// veneer after each calling function: the `bx pc` stubs and ARM jumps after SystemInit, Machine_ProcessExitRequest and
 // OnExitRequest (swan's dsi276952D, dsi2769595, dsi27694DD and dsi2769589) are those, not functions of this file
 
 // The DSi's system configuration: the extensions it enables for the game, and the copy that the boot code keeps
@@ -77,7 +77,7 @@ void SystemInit(void) {
     }
 }
 
-void func_02005430(void) {
+void Machine_ProcessExitRequest(void) {
     if (sExitRequested && !GCTX_HIDIsSoftResetBlocked(2) && !PM_GetAutoExit()) {
         MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
         PM_ReadyToExit();
@@ -92,7 +92,7 @@ void CTRDG_Init(void) {
     CTRDG_DummyInit();
 }
 
-// Called when the DSi is about to exit the game: keeps it from exiting until func_02005430 lets it
+// Called when the DSi is about to exit the game: keeps it from exiting until Machine_ProcessExitRequest lets it
 static void OnExitRequest(void *arg) {
     PM_SetAutoExit(FALSE);
     sExitRequested = TRUE;

@@ -86,8 +86,8 @@ WifiBattleMatchTask_SetFunc kind:function(thumb,size=0x8) addr:0x021c5c74
 WifiBattleMatchTask_End kind:function(thumb,size=0xc) addr:0x021c5c7c
 WifiBattleMatchTask_SetReturnSeq kind:function(thumb,size=0x4) addr:0x021c5c88
 WifiBattleMatchTask_ReturnToSeq kind:function(thumb,size=0x6) addr:0x021c5c8c
-func_ov262_021c5c94 kind:function(thumb,size=0x40) addr:0x021c5c94
-func_ov262_021c5cd4 kind:function(thumb,size=0x22) addr:0x021c5cd4
+WifiBattleMatch_RecordResult kind:function(thumb,size=0x40) addr:0x021c5c94
+WifiBattleMatch_RecordBattleTime kind:function(thumb,size=0x22) addr:0x021c5cd4
 data_ov262_021c5cf8 kind:data(any) addr:0x021c5cf8
 data_ov262_021c5d08 kind:data(any) addr:0x021c5d08
 data_ov262_021c5d24 kind:data(any) addr:0x021c5d24

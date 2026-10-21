@@ -38,7 +38,7 @@ enum {
     SEQ_END,
 };
 
-// Which Pokédex counts, func_0200d1f8's values
+// Which Pokédex counts, PokeDex_GetMode's values
 #define DEX_REGIONAL 0
 #define DEX_NATIONAL 1
 #define DEX_HABITAT 2
@@ -103,7 +103,7 @@ static int ZknListSeq_Init(ZknListWork *wk) {
     } else {
         ZknListBmp_PutSearchCount(wk);
     }
-    func_02042ba8(TRUE, HEAPID_ZUKAN_LIST);
+    GFL_NetSetIconScreen(TRUE, HEAPID_ZUKAN_LIST);
     ZknListMain_SetBlend();
     ZknListMain_InitWindow();
     ZknListMain_InitFramePos(wk);
@@ -211,7 +211,7 @@ static int ZknListSeq_List(ZknListWork *wk) {
         seq = SEQ_LIST_SCROLL;
         break;
     case FRAMELIST_NONE: {
-        BOOL touch = func_0203d554();
+        BOOL touch = GCTX_HIDIsUsingTouch();
         int ui = ZknListUI_Main(wk);
 
         switch (ui) {
@@ -222,7 +222,7 @@ static int ZknListSeq_List(ZknListWork *wk) {
                 GFL_SndSEPlay(SEQ_SE_DECIDE1);
                 return ZknListSeq_SetDecide(wk, index);
             }
-            func_0203d564(touch);
+            GCTX_HIDSetUsingTouch(touch);
             break;
         }
         case ZKNLIST_UI_ROW:
@@ -252,9 +252,9 @@ static int ZknListSeq_List(ZknListWork *wk) {
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_UNOVA, 13, SEQ_FINISH);
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_NATIONAL, 13, SEQ_FINISH);
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 13, SEQ_FINISH);
-            if (func_0200d1f8(wk->param->pokedex) != DEX_NATIONAL) {
+            if (PokeDex_GetMode(wk->param->pokedex) != DEX_NATIONAL) {
                 if (PokeDex_IsNationalObtained(wk->param->pokedex) == TRUE) {
-                    func_0200d1e4(wk->param->pokedex, DEX_NATIONAL);
+                    PokeDex_SetMode(wk->param->pokedex, DEX_NATIONAL);
                     wk->param->result = ZUKAN_LIST_RESULT_RELOAD;
                     ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
                     ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_NATIONAL, 14, SEQ_FINISH);
@@ -262,13 +262,13 @@ static int ZknListSeq_List(ZknListWork *wk) {
                     wk->param->result = ZUKAN_LIST_RESULT_HABITAT;
                     ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
                     ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 14, SEQ_FINISH);
-                    func_0200d1e4(wk->param->pokedex, DEX_HABITAT);
+                    PokeDex_SetMode(wk->param->pokedex, DEX_HABITAT);
                 }
             } else {
                 wk->param->result = ZUKAN_LIST_RESULT_HABITAT;
                 ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
                 ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 14, SEQ_FINISH);
-                func_0200d1e4(wk->param->pokedex, DEX_HABITAT);
+                PokeDex_SetMode(wk->param->pokedex, DEX_HABITAT);
             }
             return ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_SELECT, 5, SEQ_FINISH);
         case ZKNLIST_UI_UNOVA:
@@ -276,7 +276,7 @@ static int ZknListSeq_List(ZknListWork *wk) {
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_UNOVA, 13, SEQ_FINISH);
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_NATIONAL, 13, SEQ_FINISH);
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 13, SEQ_FINISH);
-            func_0200d1e4(wk->param->pokedex, DEX_REGIONAL);
+            PokeDex_SetMode(wk->param->pokedex, DEX_REGIONAL);
             wk->param->result = ZUKAN_LIST_RESULT_RELOAD;
             ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
             return ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_UNOVA, 42, SEQ_FINISH);
@@ -287,13 +287,13 @@ static int ZknListSeq_List(ZknListWork *wk) {
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_NATIONAL, 13, SEQ_FINISH);
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 13, SEQ_FINISH);
             if (PokeDex_IsNationalObtained(wk->param->pokedex) == TRUE) {
-                func_0200d1e4(wk->param->pokedex, DEX_NATIONAL);
+                PokeDex_SetMode(wk->param->pokedex, DEX_NATIONAL);
                 wk->param->result = ZUKAN_LIST_RESULT_RELOAD;
                 ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
             } else {
                 wk->param->result = ZUKAN_LIST_RESULT_HABITAT;
                 ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
-                func_0200d1e4(wk->param->pokedex, DEX_HABITAT);
+                PokeDex_SetMode(wk->param->pokedex, DEX_HABITAT);
             }
             return ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_NATIONAL, 42, SEQ_FINISH);
         case ZKNLIST_UI_HABITAT:
@@ -303,7 +303,7 @@ static int ZknListSeq_List(ZknListWork *wk) {
             ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 13, SEQ_FINISH);
             wk->param->result = ZUKAN_LIST_RESULT_HABITAT;
             ZknListSeq_SaveLastSpecies(wk, FrameList_GetSelected(wk->frameList));
-            func_0200d1e4(wk->param->pokedex, DEX_HABITAT);
+            PokeDex_SetMode(wk->param->pokedex, DEX_HABITAT);
             return ZknListSeq_SetButtonAnm(wk, ZKNLIST_OBJ_HABITAT, 42, SEQ_FINISH);
         case ZKNLIST_UI_SHORTCUT:
             GFL_SndSEPlay(SEQ_SE_SYS_07);
@@ -440,7 +440,7 @@ static BOOL ZknListSeq_IsItemKnown(ZknListWork *wk, u32 index) {
 // The species that the list is on when the Pokédex opens again
 static void ZknListSeq_SaveLastSpecies(ZknListWork *wk, u32 index) {
     if (ZknListSeq_IsItemKnown(wk, index) == TRUE) {
-        func_0200d200(wk->param->pokedex, FrameList_GetValue(wk->frameList, index));
+        PokeDex_SetLastSpecies(wk->param->pokedex, FrameList_GetValue(wk->frameList, index));
     }
 }
 

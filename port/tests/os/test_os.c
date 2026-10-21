@@ -5,6 +5,7 @@
 // they cover, every part of the game runs on: the game's main loop and its threads (the card's, the sound loader),
 // VBlank and HBlank (the HBlank interrupt with DISPSTAT's flag set, which the screen wipes' HBlank function checks),
 // the timers and alarms, and the timed work that the ARM7 sound driver's alarms use.
+// WCM's workspace check also exercises the native SDK layout above those OS services.
 //
 //   port_os_tests NAME | all
 //
@@ -13,9 +14,11 @@
 #include "hal/os/fiber.h"
 #include "hal/os/os_internal.h"
 #include "hal/os/port_os.h"
+#include "lib/dwcutil/src/dwc_wcm.h"
 #include "nitro/gx.h"
 #include "nitro/os.h"
 #include "nitro/svc.h"
+#include "port_wcm.h"
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -733,9 +736,9 @@ static void TestIrqOnSwitchIn(void) {
     EXPECT_LOG("main wakes H (pending 1)", "vblank 1 (irq mode 1, line 0)", "H runs", "main back", "main restored");
 }
 
-// backup_card.c's write (func_0203bfd4): an async call whose completion callback sets a plain flag, then a loop that
-// makes no call at all until the flag is set. On the DS the card thread (priority 4) and the ARM7's PXI interrupt set
-// it while the loop spins. On the host nothing runs inside such a loop, so the HAL's async services must finish
+// backup_card.c's write (writeFlashWaitSuccess): an async call whose completion callback sets a plain flag, then a loop
+// that makes no call at all until the flag is set. On the DS the card thread (priority 4) and the ARM7's PXI interrupt
+// set it while the loop spins. On the host nothing runs inside such a loop, so the HAL's async services must finish
 // before they return. The three ways a completion can come:
 //   - at once, inside the call: the loop never turns;
 //   - from a higher thread that the call wakes (the shape of CARD's own task thread), with the ARM7's reply given
@@ -1343,6 +1346,57 @@ static void VAlarmSecondRun(void) {
     Log("a frame later");
 }
 
+// WCM's DS backend contains host pointers. Its minimum size and DWC's workspace partition must protect the next
+// object, even when a caller supplies the original DS size or an invalid signed byte count.
+static void TestWcmWorkspace(void) {
+    _Alignas(32) u8 workspace[PORT_WCM_DS_WORK_SIZE + 32];
+    _Alignas(32) u8 accessPoints[128];
+    int result;
+
+    Boot(VBlankHandler);
+    memset(workspace, 0x5a, sizeof(workspace));
+    Check(DWC_Wcm_Start(NULL, NULL, 0) == FALSE, "DWC rejects a missing workspace");
+    Check(DWC_Wcm_Start(NULL, workspace, 32) == FALSE, "DWC rejects a workspace smaller than its partition");
+    for (size_t i = 0; i < sizeof(workspace); i++) {
+        Check(workspace[i] == 0x5a, "DWC does not write outside an invalid workspace");
+    }
+    Check(WCM_Init(workspace, -1) == 6, "WCM rejects a negative count before clearing memory");
+    Check(workspace[0] == 0x5a, "the negative count leaves the buffer alone");
+    Check(WCM_Init(workspace, PORT_WCM_DS_WORK_SIZE - 32) == 6, "WCM enforces the native DS backend extent");
+    Check(WCM_GetWork() == NULL, "a short workspace is not installed");
+    result = WCM_Init(workspace, PORT_WCM_DS_WORK_SIZE);
+    Check(result == 0, "the native workspace initializes");
+    if (result == 0) {
+        WCMWork *work = WCM_GetWork();
+
+        Check(work == (WCMWork *)workspace, "WCM retains the complete workspace address");
+        work->scanCount = 0x12345678;
+        work->connectionFailureReason = 0xabcd;
+        // An unsupported backend exercises configuration without starting the deferred wireless transport.
+        work->wirelessMode = 3;
+        memset(accessPoints, 0x5a, sizeof(accessPoints));
+        WCMConfig config = { 3, accessPoints + 1, -1, 0 };
+
+        Check(WCM_StartupAsync(&config, NULL) == 7, "the unsupported backend returns its error");
+        Check(work->apBuffer == NULL && work->apBufferBytes == 0, "a negative AP-list count is rejected");
+        for (size_t i = 0; i < sizeof(accessPoints); i++) {
+            Check(accessPoints[i] == 0x5a, "the rejected AP list is not cleared");
+        }
+        config.nbdbuffer = 95;
+        Check(WCM_StartupAsync(&config, NULL) == 7, "configuration precedes the backend error");
+        Check(work->apBuffer == accessPoints + _Alignof(void *) && work->apBufferBytes == 96 - _Alignof(void *),
+              "the aligned AP list retains its full address and bounded length");
+        for (size_t i = 0; i < sizeof(accessPoints); i++) {
+            Check(accessPoints[i] == ((i >= _Alignof(void *) && i < 96) ? 0 : 0x5a),
+                  "only the usable AP-list bytes are cleared");
+        }
+        Check(WCM_Finish() == 0, "the initialized workspace can be released");
+    }
+    for (size_t i = PORT_WCM_DS_WORK_SIZE; i < sizeof(workspace); i++) {
+        Check(workspace[i] == 0x5a, "WCM leaves the following object intact");
+    }
+}
+
 typedef struct Test {
     const char *name;
     void (*run)(void);
@@ -1382,6 +1436,7 @@ static const Test sTests[] = {
     { "boot_cpsr", TestBootCpsr },
     { "destroy_many", TestDestroyMany },
     { "wait_vcount0", TestWaitVCount0 },
+    { "wcm_workspace", TestWcmWorkspace },
 };
 
 static void PrintLog(void) {

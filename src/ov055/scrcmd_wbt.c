@@ -16,25 +16,25 @@
 
 // The commands of the Pokémon World Tournament's script plugins (plugins 6 and 7), from 1000, that both plugins use
 
-WbtSystem *func_ov055_021e5800(FieldScriptEnv *env) {
-    return *func_020179f0(FieldScriptEnv_GetGameData(env));
+WbtSystem *WbtCmd_GetSystem(FieldScriptEnv *env) {
+    return *GameData_GetWbtSystemPtr(FieldScriptEnv_GetGameData(env));
 }
 
 // Counts a win of the tournament in the save
-static void func_ov055_021e5810(WbtSystem *sys, FieldScriptEnv *env) {
-    void *save = func_020179f8(FieldScriptEnv_GetGameData(env));
-    int record = func_ov055_021e6750(func_ov055_021e5ca4(sys), func_ov055_021e5cb4(sys));
+static void WbtCmd_IncrementWinCount(WbtSystem *sys, FieldScriptEnv *env) {
+    void *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
+    int record = WbtTournament_GetRecord(WbtSystem_GetTournament(sys), WbtSystem_GetType(sys));
 
     if (record < 29) {
-        func_0200feb4(save, record);
+        WbtSave_IncrementCount(save, record);
     }
 }
 
 // The save's count of wins of the tournament, of all tournaments for 0, or of every type for the Type Expert
 // Tournament with type 17. It stops at 9999
-static u16 func_ov055_021e5844(FieldScriptEnv *env, int tournament, u8 type) {
+static u16 WbtCmd_CountWins(FieldScriptEnv *env, int tournament, u8 type) {
     u32 total = 0;
-    void *save = func_020179f8(FieldScriptEnv_GetGameData(env));
+    void *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u32 start;
     u32 end;
     u32 i;
@@ -51,11 +51,11 @@ static u16 func_ov055_021e5844(FieldScriptEnv *env, int tournament, u8 type) {
             end = start + 1;
         }
     } else {
-        start = func_ov055_021e6750(tournament, total);
+        start = WbtTournament_GetRecord(tournament, total);
         end = start + 1;
     }
     for (i = start; i < end; i++) {
-        total += func_0200feac(save, i);
+        total += WbtSave_GetCount(save, i);
         if (total >= 9999) {
             total = 9999;
             break;
@@ -67,7 +67,7 @@ static u16 func_ov055_021e5844(FieldScriptEnv *env, int tournament, u8 type) {
 static BOOL WbtCmd_Create(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     BOOL flag = EventWork_FlagGet(GameData_GetEventWork(gameData), 2441);
-    WbtSystem **sys = func_020179f0(gameData);
+    WbtSystem **sys = GameData_GetWbtSystemPtr(gameData);
 
     *sys = WbtSystem_Create(HEAPID_GAMEEVENT, flag);
     WbtMakeMatch_LoadBattleBoxParty(*sys, gameData);
@@ -75,7 +75,7 @@ static BOOL WbtCmd_Create(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL WbtCmd_Free(VM *vm, FieldScriptEnv *env) {
-    WbtSystem **sys = func_020179f0(FieldScriptEnv_GetGameData(env));
+    WbtSystem **sys = GameData_GetWbtSystemPtr(FieldScriptEnv_GetGameData(env));
 
     WbtSystem_Free(*sys);
     *sys = NULL;
@@ -83,7 +83,7 @@ static BOOL WbtCmd_Free(VM *vm, FieldScriptEnv *env) {
 }
 
 static BOOL WbtCmd_IsCreated(VM *vm, FieldScriptEnv *env) {
-    WbtSystem **sys = func_020179f0(FieldScriptEnv_GetGameData(env));
+    WbtSystem **sys = GameData_GetWbtSystemPtr(FieldScriptEnv_GetGameData(env));
     u16 *var = ScriptReadVar(vm, env);
 
     *var = *sys != NULL ? TRUE : FALSE;
@@ -93,22 +93,22 @@ static BOOL WbtCmd_IsCreated(VM *vm, FieldScriptEnv *env) {
 static BOOL WbtCmd_SetRound(VM *vm, FieldScriptEnv *env) {
     u16 round = ScriptReadAny(vm, env);
 
-    func_ov055_021e5cc0(func_ov055_021e5800(env), round);
+    WbtSystem_SetRound(WbtCmd_GetSystem(env), round);
     return FALSE;
 }
 
 static BOOL WbtCmd_GetRound(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5cc4(func_ov055_021e5800(env));
+    *var = WbtSystem_GetRound(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
-static BOOL func_ov055_021e5960(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+static BOOL WbtCmd_MakeMatch(VM *vm, FieldScriptEnv *env) {
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
 
-    func_ov055_021e5e54(sys, gameData);
+    WbtSystem_SetPickedParty(sys, gameData);
     WbtMakeMatch_Make(sys, gameData);
     return FALSE;
 }
@@ -116,64 +116,64 @@ static BOOL func_ov055_021e5960(VM *vm, FieldScriptEnv *env) {
 static BOOL WbtCmd_SetStyle(VM *vm, FieldScriptEnv *env) {
     u16 style = ScriptReadAny(vm, env);
 
-    func_ov055_021e5ca8(func_ov055_021e5800(env), style);
+    WbtSystem_SetStyle(WbtCmd_GetSystem(env), style);
     return FALSE;
 }
 
 static BOOL WbtCmd_GetStyle(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5cac(func_ov055_021e5800(env));
+    *var = WbtSystem_GetStyle(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
 static BOOL WbtCmd_SetTournament(VM *vm, FieldScriptEnv *env) {
     u16 tournament = ScriptReadAny(vm, env);
 
-    func_ov055_021e5ca0(func_ov055_021e5800(env), tournament);
+    WbtSystem_SetTournament(WbtCmd_GetSystem(env), tournament);
     return FALSE;
 }
 
 static BOOL WbtCmd_GetTournament(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5ca4(func_ov055_021e5800(env));
+    *var = WbtSystem_GetTournament(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
 static BOOL WbtCmd_SetType(VM *vm, FieldScriptEnv *env) {
     u16 value = ScriptReadAny(vm, env);
 
-    func_ov055_021e5cb0(func_ov055_021e5800(env), value);
+    WbtSystem_SetType(WbtCmd_GetSystem(env), value);
     return FALSE;
 }
 
 static BOOL WbtCmd_GetType(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5cb4(func_ov055_021e5800(env));
+    *var = WbtSystem_GetType(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
-static BOOL func_ov055_021e5a30(VM *vm, FieldScriptEnv *env) {
+static BOOL WbtCmd_SetCategory(VM *vm, FieldScriptEnv *env) {
     u16 value = ScriptReadAny(vm, env);
 
-    func_ov055_021e5cb8(func_ov055_021e5800(env), value);
+    WbtSystem_SetCategory(WbtCmd_GetSystem(env), value);
     return FALSE;
 }
 
-static BOOL func_ov055_021e5a4c(VM *vm, FieldScriptEnv *env) {
+static BOOL WbtCmd_GetCategory(VM *vm, FieldScriptEnv *env) {
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5cbc(func_ov055_021e5800(env));
+    *var = WbtSystem_GetCategory(WbtCmd_GetSystem(env));
     return FALSE;
 }
 
 static BOOL WbtCmd_RecordWin(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
 
-    func_ov055_021e5cc4(sys);
-    func_ov055_021e5810(sys, env);
+    WbtSystem_GetRound(sys);
+    WbtCmd_IncrementWinCount(sys, env);
     return FALSE;
 }
 
@@ -182,34 +182,34 @@ static BOOL WbtCmd_GetWinCount(VM *vm, FieldScriptEnv *env) {
     u16 type = ScriptReadAny(vm, env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5844(env, tournament, type);
+    *var = WbtCmd_CountWins(env, tournament, type);
     return FALSE;
 }
 
-static BOOL func_ov055_021e5ab8(VM *vm, FieldScriptEnv *env) {
-    WbtSystem *sys = func_ov055_021e5800(env);
+static BOOL WbtCmd_GetEntryCount(VM *vm, FieldScriptEnv *env) {
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u16 *var = ScriptReadVar(vm, env);
 
-    *var = func_ov055_021e5d7c(sys);
+    *var = WbtSystem_GetEntryCount(sys);
     return FALSE;
 }
 
 // Puts the tournament's name in a word of the script's WordSet
-static BOOL func_ov055_021e5adc(VM *vm, FieldScriptEnv *env) {
+static BOOL WbtCmd_SetTournamentNameWord(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
-    WbtSystem *sys = func_ov055_021e5800(env);
+    WbtSystem *sys = WbtCmd_GetSystem(env);
     u8 index = VM_Read8(vm);
     u16 tournament = ScriptReadAny(vm, env);
     StrBuf *strbuf = ScriptWork_GetAltStrBuf(work);
 
-    func_ov055_021e5d44(sys, tournament, strbuf);
-    func_0202437c(wordSet, index, strbuf, 2, 1, 2);
+    WbtSystem_LoadTournamentName(sys, tournament, strbuf);
+    GFL_WordSetSetStrbuf(wordSet, index, strbuf, 2, 1, 2);
     return FALSE;
 }
 
 // Shows the tournament's Trainers
-static BOOL func_ov055_021e5b38(VM *vm, FieldScriptEnv *env) {
+static BOOL WbtCmd_ShowTrainerList(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work;
     GameSystem *gsys;
     HeapID heapId;
@@ -221,9 +221,9 @@ static BOOL func_ov055_021e5b38(VM *vm, FieldScriptEnv *env) {
     gsys = ScriptWork_GetGameSystem(work);
     GSYS_GetField(gsys);
     heapId = FieldScriptEnv_GetHeapID(env);
-    sys = func_ov055_021e5800(env);
-    setup = func_ov055_021e67f4(heapId, gsys);
-    func_ov055_021e68a8(gsys, sys, setup);
+    sys = WbtCmd_GetSystem(env);
+    setup = WbtSetup_Create(heapId, gsys);
+    WbtSetup_Load(gsys, sys, setup);
     ScriptWork_CallEvent(work, GameEvent_CreateOverlayDelegate(gsys, OVERLAY_ID(22), EventWbtList_Create, setup));
     return TRUE;
 }
@@ -234,9 +234,9 @@ const FieldScriptCommand WBT_SCRIPT_COMMANDS[] = {
     WbtCmd_IsCreated,
     WbtCmd_SetRound,
     WbtCmd_GetRound,
-    func_ov055_021e5960,
-    func_ov056_021e7620,
-    func_ov056_021e7674,
+    WbtCmd_MakeMatch,
+    WbtCmd_IsTournamentAvailable,
+    WbtCmd_WouldOpenTournament,
     WbtCmd_CheckRegulation,
     WbtCmd_SetStyle,
     WbtCmd_GetStyle,
@@ -244,51 +244,51 @@ const FieldScriptCommand WBT_SCRIPT_COMMANDS[] = {
     WbtCmd_GetTournament,
     WbtCmd_SetType,
     WbtCmd_GetType,
-    func_ov055_021e5a30,
-    func_ov055_021e5a4c,
+    WbtCmd_SetCategory,
+    WbtCmd_GetCategory,
     WbtCmd_RecordWin,
     WbtCmd_GetWinCount,
-    func_ov057_021e7814,
+    WbtCmd_GetRoundRemaining,
     WbtCmd_AwardBattlePoints,
     NULL,
-    func_ov056_021e7988,
-    func_ov056_021e7894,
-    func_ov055_021e5ab8,
-    func_ov056_021e79c0,
-    func_ov056_021e79f0,
-    func_ov056_021e7a30,
-    func_ov056_021e7808,
-    func_ov057_021e7850,
-    func_ov057_021e7878,
-    func_ov057_021e7894,
-    func_ov057_021e78a4,
-    func_ov057_021e78c8,
-    func_ov057_021e78fc,
-    func_ov057_021e7948,
-    func_ov057_021e79e8,
-    func_ov057_021e79ec,
+    WbtCmd_GetSlot,
+    WbtCmd_GetSlotTrainerObjCodes,
+    WbtCmd_GetEntryCount,
+    WbtCmd_CountDownloads,
+    WbtCmd_SetDownloadSlot,
+    WbtCmd_GetDownloadSlot,
+    WbtCmd_SetUseBattleBox,
+    WbtCmd_ShowPartyList,
+    WbtCmd_ClosePartyList,
+    WbtCmd_ResetPicks,
+    WbtCmd_RandomPick,
+    WbtCmd_SetPick,
+    WbtCmd_WordSetPickSpecies,
+    WbtCmd_ListPartyPokemon,
+    WbtCmd_Dummy,
+    WbtCmd_SwapPickedPokemon,
     WbtCmd_MakeRentalParty,
     WbtCmd_MakeOpponentParty,
-    func_ov057_021e760c,
-    func_ov057_021e7630,
-    func_ov057_021e76a8,
-    func_ov057_021e770c,
-    func_ov055_021e5adc,
-    func_ov057_021e777c,
-    func_ov056_021e7750,
-    func_ov055_021e5b38,
-    func_ov056_021e7a4c,
-    func_ov056_021e7a9c,
-    func_ov056_021e7b00,
+    WbtCmd_GetOpponentObjCode,
+    WbtCmd_ShowOpponentLine,
+    WbtCmd_CallBattle,
+    WbtCmd_ShowOpponentLine7,
+    WbtCmd_SetTournamentNameWord,
+    WbtCmd_WordSetOpponentName,
+    WbtCmd_CallEntryPartySelect,
+    WbtCmd_ShowTrainerList,
+    WbtCmd_CallPokeSelect,
+    WbtCmd_ShowDownloads,
+    WbtCmd_ShowWinRecord,
     WbtCmd_Download,
-    func_ov057_021e7b20,
-    func_ov057_021e7b60,
-    func_ov057_021e7ba0,
-    func_ov057_021e7bb4,
-    func_ov057_021e7bec,
-    func_ov056_021e76f4,
+    WbtCmd_ShowPortraits,
+    WbtCmd_LoadPortraitScene,
+    WbtCmd_PlayStadiumIntro,
+    WbtCmd_SwitchLights,
+    WbtCmd_PlayCrowd,
+    WbtCmd_GetRegulationId,
     func_ov056_021e77b0,
-    func_ov056_021e7710,
-    func_ov057_021e79fc,
+    WbtCmd_CheckEntryParties,
+    WbtCmd_SetNamePlates,
     (FieldScriptCommand)0xFFFFFFFF,
 };

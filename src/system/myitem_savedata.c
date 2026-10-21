@@ -1219,38 +1219,38 @@ BagCursor *BagCursor_Create(HeapID heapId) {
     return GFL_HeapAllocate(heapId, sizeof(BagCursor), TRUE, __FILE__, 1371);
 }
 
-void func_0200887c(BagCursor *cursor, u16 pocket, s16 *row, s16 *scroll) {
+void BagCursor_GetPocketPosition(BagCursor *cursor, u16 pocket, s16 *row, s16 *scroll) {
     *row = cursor->rows[pocket];
     *scroll = cursor->scrolls[pocket];
 }
 
-u16 func_02008890(BagCursor *cursor) {
+u16 BagCursor_GetPocket(BagCursor *cursor) {
     return cursor->pocket;
 }
 
-void func_02008894(BagCursor *cursor, u16 pocket, s16 row, s16 scroll) {
+void BagCursor_SetPocketPosition(BagCursor *cursor, u16 pocket, s16 row, s16 scroll) {
     cursor->rows[pocket] = row;
     cursor->scrolls[pocket] = scroll;
 }
 
-void func_020088a4(BagCursor *cursor, u16 pocket) {
+void BagCursor_SetPocket(BagCursor *cursor, u16 pocket) {
     cursor->pocket = pocket;
 }
 
-void func_020088a8(BagCursor *cursor, u16 pocket, s16 *row, s16 *page) {
+void BagCursor_GetBattlePocketPosition(BagCursor *cursor, u16 pocket, s16 *row, s16 *page) {
     *row = cursor->battleRows[pocket];
     *page = cursor->battlePages[pocket];
 }
 
-u16 func_020088bc(BagCursor *cursor) {
+u16 BagCursor_GetBattleLastItem(BagCursor *cursor) {
     return cursor->battleLastItem;
 }
 
-u16 func_020088c0(BagCursor *cursor) {
+u16 BagCursor_GetBattleLastPocket(BagCursor *cursor) {
     return cursor->battleLastPocket;
 }
 
-void func_020088c4(BagCursor *cursor, s16 *rows, s16 *pages) {
+void BagCursor_SetBattlePositions(BagCursor *cursor, s16 *rows, s16 *pages) {
     u32 i;
 
     for (i = 0; i < BATTLE_BAG_POCKET_COUNT; i++) {
@@ -1259,16 +1259,16 @@ void func_020088c4(BagCursor *cursor, s16 *rows, s16 *pages) {
     }
 }
 
-void func_020088e0(BagCursor *cursor, u16 item, u8 pocket) {
+void BagCursor_SetBattleLastItem(BagCursor *cursor, u16 item, u8 pocket) {
     cursor->battleLastItem = item;
     cursor->battleLastPocket = pocket;
 }
 
-u8 func_020088e8(BagCursor *cursor) {
+u8 BagCursor_GetFreeSpaceFilter(BagCursor *cursor) {
     return cursor->freeSpaceFilter;
 }
 
-void func_020088ec(BagCursor *cursor, u32 filter) {
+void BagCursor_SetFreeSpaceFilter(BagCursor *cursor, u32 filter) {
     cursor->freeSpaceFilter = filter;
 }
 

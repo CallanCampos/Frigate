@@ -9,6 +9,7 @@
 #include "gfl/clact.h"
 #include "gfl/heap.h"
 #include "gfl/msg.h"
+#include "gfl/overlay.h"
 #include "gfl/str.h"
 #include "gfl/tcb.h"
 #include "gfl/tcbl.h"
@@ -28,6 +29,7 @@
 // which the ROM names, and beacon_view.c, beacon_view_sub.c and beacon_view_accessor.c, whose names are guesses.
 // Overlay 83's beacon_view_common.c is what it shares with overlay 85. swan has no names for this overlay; the names
 // are ours
+#define OVERLAY_BEACON_VIEW OVERLAY_ID(84)
 
 #define BEACON_VIEW_PANEL_MAX 5
 // The log's lines on the screen

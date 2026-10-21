@@ -266,9 +266,10 @@ LocalTvtReturnBar *LocalTvtReturnBar_Create(ClActUnit *unit, HeapID heapId) {
 
     LocalTvtReturnIcon_Init(&bar->icon, unit, heapId);
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_SUB_BG, PALETTE_BAR * 0x20, 0x20, heapId);
-    bar->chars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), BG_SUB_PANEL, 0, FALSE, heapId);
-    file = GFL_G2DIOReadNSCRArc(arc, func_0202d828(), FALSE, &screen, heapId);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_SUB_BG, PALETTE_BAR * 0x20, 0x20,
+                                heapId);
+    bar->chars = GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), BG_SUB_PANEL, 0, FALSE, heapId);
+    file = GFL_G2DIOReadNSCRArc(arc, AppMenuCommon_GetBarScreenFile(), FALSE, &screen, heapId);
     for (i = 0; i < 32 * 24; i++) {
         ((u16 *)screen->rawData)[i] += (u16)bar->chars;
     }
@@ -291,18 +292,18 @@ void LocalTvtReturnBar_Free(LocalTvtReturnBar *bar) {
 
 void LocalTvtReturnBar_Main(LocalTvtReturnBar *bar) {
     if (bar->active) {
-        int touched = func_0203da0c(sLocalTvtReturnBarRects);
+        int touched = GFL_HIDGetTouchPressedRect(sLocalTvtReturnBarRects);
         BOOL pressed = FALSE;
 
         if (touched == 0) {
             pressed = TRUE;
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            func_0203d564(FALSE);
+            GCTX_HIDSetUsingTouch(FALSE);
             pressed = TRUE;
         }
         if (pressed) {
-            func_0204c488(LocalTvtReturnIcon_GetActor(&bar->icon), RETURN_SEQUENCE_PRESSED);
+            ClActor_SetSequence(LocalTvtReturnIcon_GetActor(&bar->icon), RETURN_SEQUENCE_PRESSED);
             GFL_SndSEPlay(SEQ_SE_CANCEL1);
             bar->pressed = TRUE;
         }
@@ -310,7 +311,7 @@ void LocalTvtReturnBar_Main(LocalTvtReturnBar *bar) {
 }
 
 static void LocalTvtReturnBar_SetVisible(LocalTvtReturnBar *bar, BOOL visible) {
-    func_0204c124(LocalTvtReturnIcon_GetActor(&bar->icon), visible);
+    ClActor_SetVisible(LocalTvtReturnIcon_GetActor(&bar->icon), visible);
     GFL_BGSysSetBGEnabled(BG_SUB_PANEL, visible);
 }
 
@@ -319,15 +320,15 @@ BOOL LocalTvtReturnBar_IsPressed(LocalTvtReturnBar *bar) {
 }
 
 BOOL LocalTvtReturnBar_IsAnimEnd(LocalTvtReturnBar *bar) {
-    return !func_0204c560(LocalTvtReturnIcon_GetActor(&bar->icon));
+    return !ClActor_IsAnimActive(LocalTvtReturnIcon_GetActor(&bar->icon));
 }
 
 static void LocalTvtReturnBar_SetActive(LocalTvtReturnBar *bar, BOOL active) {
     bar->active = active;
     if (active) {
-        func_0204c488(LocalTvtReturnIcon_GetActor(&bar->icon), RETURN_SEQUENCE_ACTIVE);
+        ClActor_SetSequence(LocalTvtReturnIcon_GetActor(&bar->icon), RETURN_SEQUENCE_ACTIVE);
     } else {
-        func_0204c488(LocalTvtReturnIcon_GetActor(&bar->icon), RETURN_SEQUENCE_INACTIVE);
+        ClActor_SetSequence(LocalTvtReturnIcon_GetActor(&bar->icon), RETURN_SEQUENCE_INACTIVE);
     }
 }
 
@@ -391,8 +392,8 @@ LocalTvtMenu *LocalTvtMenu_Create(const LocalTvtMenuSetup *setup, HeapID heapId)
     LocalTvtReturnIcon_Init(&menu->icon, menu->setup.unit, heapId);
     pos.x = 184;
     pos.y = (menu->setup.count - 1) * 40 + 20;
-    func_0204c140(LocalTvtReturnIcon_GetActor(&menu->icon), &pos, 1);
-    func_0204c488(LocalTvtReturnIcon_GetActor(&menu->icon), RETURN_SEQUENCE_ACTIVE);
+    ClActor_SetSurfacePos(LocalTvtReturnIcon_GetActor(&menu->icon), &pos, 1);
+    ClActor_SetSequence(LocalTvtReturnIcon_GetActor(&menu->icon), RETURN_SEQUENCE_ACTIVE);
     for (i = 0; i < menu->setup.count; i++) {
         menu->windows[i] = BmpWin_CreateDynamic(BG_SUB_WINDOW, 5, i * 5 + 3, 21, 2, PALETTE_NORMAL, TRUE);
         LocalTvtMessage_SetColor(menu->setup.message, MENU_COLOR);
@@ -490,7 +491,7 @@ u32 LocalTvtMenu_GetSelected(LocalTvtMenu *menu) {
 
 static int LocalTvtMenu_Touch(void *work) {
     LocalTvtMenu *menu = work;
-    int index = func_0203da0c(sLocalTvtMenuRects);
+    int index = GFL_HIDGetTouchPressedRect(sLocalTvtMenuRects);
 
     if (index != TOUCH_RECT_NONE && index < menu->setup.count) {
         GFL_SndSEPlay(SEQ_SE_DECIDE1);
@@ -630,23 +631,23 @@ LocalTvtPokeSelect *LocalTvtPokeSelect_Create(const LocalTvtPokeSelectSetup *set
     inputSetup.draw = LocalTvtPokeSelect_Draw;
     select->input = LocalTvtKeyTouch_Create(&inputSetup, heapId);
     arc = GFL_ArcSysCreateFileHandle(ARCID_POKEICON, heapId);
-    select->iconPalette = func_0204bc48(arc, PokeIcon_GetPaletteFile(), 1, 8 * 0x20, heapId);
-    select->iconCellAnims = func_0204bde0(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), heapId);
+    select->iconPalette = ClActSys_LoadPlttEx(arc, PokeIcon_GetPaletteFile(), 1, 8 * 0x20, heapId);
+    select->iconCellAnims = ClActSys_LoadCellAnims(arc, PokeIcon_GetCellFile_Sub(), getOBJTileMapping_SubEng(), heapId);
     for (i = 0; i < PokeParty_GetPkmCount(select->setup.party); i++) {
         PartyPkm *pkm = PokeParty_GetPkm(select->setup.party, i);
-        u32 iconFile = PokeIcon_GetFileOfPkm(func_0201d624(pkm));
-        u32 iconPalette = PokeIcon_GetPaletteOfPkm(func_0201d624(pkm));
+        u32 iconFile = PokeIcon_GetFileOfPkm(PokeParty_ToBoxPkm(pkm));
+        u32 iconPalette = PokeIcon_GetPaletteOfPkm(PokeParty_ToBoxPkm(pkm));
         ClActorSetup actorSetup;
 
         MI_CpuFill8(&actorSetup, 0, sizeof(actorSetup));
         actorSetup.sequence = 1;
         actorSetup.x = sLocalTvtPokeSelectRects[i].left + 24;
         actorSetup.y = sLocalTvtPokeSelectRects[i].top + 16;
-        select->iconChars[i] = func_0204b81c(arc, iconFile, FALSE, 1, heapId);
-        select->icons[i] = func_0204c040(select->setup.unit, select->iconChars[i], select->iconPalette,
-                                         select->iconCellAnims, &actorSetup, 1, heapId);
-        func_0204c378(select->icons[i], iconPalette, 1);
-        func_0204c124(select->icons[i], FALSE);
+        select->iconChars[i] = ClActSys_LoadChars(arc, iconFile, FALSE, 1, heapId);
+        select->icons[i] = ClActor_Create(select->setup.unit, select->iconChars[i], select->iconPalette,
+                                          select->iconCellAnims, &actorSetup, 1, heapId);
+        ClActor_SetPalette(select->icons[i], iconPalette, 1);
+        ClActor_SetVisible(select->icons[i], FALSE);
     }
     GFL_ArcToolFree(arc);
     for (i = 0; i < PokeParty_GetPkmCount(select->setup.party); i++) {
@@ -679,12 +680,12 @@ void LocalTvtPokeSelect_Free(LocalTvtPokeSelect *select) {
     }
     for (i = 0; i < PARTY_MAX; i++) {
         if (select->icons[i] != NULL) {
-            func_0204c108(select->icons[i]);
-            func_0204b98c(select->iconChars[i]);
+            ClActor_Delete(select->icons[i]);
+            ClActSys_FreeChars(select->iconChars[i]);
         }
     }
-    func_0204bcd0(select->iconPalette);
-    func_0204be64(select->iconCellAnims);
+    ClActSys_FreePltt(select->iconPalette);
+    ClActSys_FreeCellAnims(select->iconCellAnims);
     LocalTvtKeyTouch_Free(select->input);
     LocalTvtReturnBar_Free(select->returnBar);
     GFL_BGSysFreeCharMemory(BG_SUB_PANEL, (u16)select->chars, (u16)(select->chars >> 16));
@@ -781,7 +782,7 @@ void LocalTvtPokeSelect_SetActive(LocalTvtPokeSelect *select, BOOL active) {
         G2S_SetWnd1Position(1, BAR_Y * 8, 256, 192);
         G2x_SetBlendAlpha_(REG_DB_BLDCNT_ADDR, GX_BLEND_PLANEMASK_BG1, GX_BLEND_PLANEMASK_BG2, 13, 3);
     } else {
-        if (func_02042788()) {
+        if (GFL_NetIsInitialized()) {
             G2S_SetWnd0Position(240, 0, 256, 16);
             G2S_SetWnd1Position(240, 0, 256, 16);
         } else {
@@ -870,7 +871,7 @@ static void LocalTvtPokeSelect_GetGridSize(int index, u32 count, s16 *rows, s16 
 // An egg cannot be picked: the touch only shows the cursor on it
 static int LocalTvtPokeSelect_Touch(void *work) {
     LocalTvtPokeSelect *select = work;
-    int index = func_0203da0c(sLocalTvtPokeSelectRects);
+    int index = GFL_HIDGetTouchPressedRect(sLocalTvtPokeSelectRects);
 
     if (index != TOUCH_RECT_NONE && index < PokeParty_GetPkmCount(select->setup.party)) {
         PartyPkm *pkm = PokeParty_GetPkm(select->setup.party, index);
@@ -980,7 +981,7 @@ static void LocalTvtPokeSelect_VBlank(TCB *tcb, void *data) {
     if (select->show) {
         for (i = 0; i < PARTY_MAX; i++) {
             if (select->icons[i] != NULL) {
-                func_0204c124(select->icons[i], TRUE);
+                ClActor_SetVisible(select->icons[i], TRUE);
             }
         }
         select->show = FALSE;
@@ -1029,23 +1030,24 @@ static void LocalTvtReturnIcon_Init(LocalTvtReturnIcon *icon, ClActUnit *unit, H
 
     MI_CpuFill8(icon, 0, sizeof(LocalTvtReturnIcon));
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), heapId);
-    icon->palette = func_0204bbb8(arc, func_0202d810(), 1, 11 * 0x20, 0, 3, heapId);
-    icon->chars = func_0204b81c(arc, func_0202d814(), FALSE, 1, heapId);
-    icon->cellAnims = func_0204bde0(arc, func_0202d818(2), func_0202d81c(2), heapId);
+    icon->palette = ClActSys_LoadPlttRange(arc, AppMenuCommon_GetTouchBarPaletteFile(), 1, 11 * 0x20, 0, 3, heapId);
+    icon->chars = ClActSys_LoadChars(arc, AppMenuCommon_GetTouchBarCharFile(), FALSE, 1, heapId);
+    icon->cellAnims =
+        ClActSys_LoadCellAnims(arc, AppMenuCommon_GetTouchBarCellFile(2), AppMenuCommon_GetTouchBarAnimFile(2), heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(setup));
     setup.x = 224;
     setup.y = BAR_Y * 8;
-    icon->actor = func_0204c040(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 1, heapId);
-    func_0204c124(icon->actor, TRUE);
-    func_0204c520(icon->actor, TRUE);
+    icon->actor = ClActor_Create(unit, icon->chars, icon->palette, icon->cellAnims, &setup, 1, heapId);
+    ClActor_SetVisible(icon->actor, TRUE);
+    ClActor_SetAutoAnim(icon->actor, TRUE);
 }
 
 static void LocalTvtReturnIcon_Exit(LocalTvtReturnIcon *icon) {
-    func_0204c108(icon->actor);
-    func_0204bcd0(icon->palette);
-    func_0204b98c(icon->chars);
-    func_0204be64(icon->cellAnims);
+    ClActor_Delete(icon->actor);
+    ClActSys_FreePltt(icon->palette);
+    ClActSys_FreeChars(icon->chars);
+    ClActSys_FreeCellAnims(icon->cellAnims);
     MI_CpuFill8(icon, 0, sizeof(LocalTvtReturnIcon));
 }
 
@@ -1057,7 +1059,7 @@ LocalTvtKeyTouch *LocalTvtKeyTouch_Create(const LocalTvtKeyTouchSetup *setup, He
     LocalTvtKeyTouch *input = GFL_HeapAllocate(heapId, sizeof(LocalTvtKeyTouch), TRUE, "local_tvt_util.c", 1991);
 
     input->setup = *setup;
-    input->touchMode = func_0203d554();
+    input->touchMode = GCTX_HIDIsUsingTouch();
     LocalTvtKeyTouch_CallDraw(input);
     return input;
 }
@@ -1074,13 +1076,13 @@ void LocalTvtKeyTouch_Main(LocalTvtKeyTouch *input) {
             input->touchMode = FALSE;
             LocalTvtKeyTouch_CallDraw(input);
         } else if (LocalTvtKeyTouch_CallTouch(input) == LOCAL_TVT_INPUT_DECIDE) {
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             input->decided = TRUE;
         }
     } else {
         switch (LocalTvtKeyTouch_CallTouch(input)) {
         case LOCAL_TVT_INPUT_DECIDE:
-            func_0203d564(TRUE);
+            GCTX_HIDSetUsingTouch(TRUE);
             input->decided = TRUE;
             break;
         case LOCAL_TVT_INPUT_MOVE:
@@ -1089,7 +1091,7 @@ void LocalTvtKeyTouch_Main(LocalTvtKeyTouch *input) {
             break;
         case LOCAL_TVT_INPUT_NONE:
             if (LocalTvtKeyTouch_CallKey(input) == LOCAL_TVT_INPUT_DECIDE) {
-                func_0203d564(FALSE);
+                GCTX_HIDSetUsingTouch(FALSE);
                 input->decided = TRUE;
             }
             break;
@@ -1103,7 +1105,7 @@ BOOL LocalTvtKeyTouch_IsDecided(LocalTvtKeyTouch *input) {
 
 static void LocalTvtKeyTouch_Reset(LocalTvtKeyTouch *input) {
     input->decided = FALSE;
-    input->touchMode = func_0203d554();
+    input->touchMode = GCTX_HIDIsUsingTouch();
     LocalTvtKeyTouch_CallDraw(input);
 }
 

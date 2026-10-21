@@ -83,8 +83,8 @@ static void Demo3DExpCCruiser_Init(Demo3DExp *exp) {
     UIObjRes_Load(&work->objRes, &setup, unit, exp->heapId);
     work->marker = UIObjRes_CreateActor(&work->objRes, unit, sDemo3DExpCCruiserPositions[work->position].x,
                                         sDemo3DExpCCruiserPositions[work->position].y, 0, exp->heapId);
-    func_0204c124(work->marker, TRUE);
-    func_0204c520(work->marker, TRUE);
+    ClActor_SetVisible(work->marker, TRUE);
+    ClActor_SetAutoAnim(work->marker, TRUE);
     GFL_BGSysSetBGEnabled(6, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
 }
@@ -94,10 +94,10 @@ static void Demo3DExpCCruiser_Main(Demo3DExp *exp) {
     int frame = Demo3DEngine_GetNowFrame(exp->engine) >> FX32_SHIFT;
 
     if (work->position < POSITION_COUNT && work->position * POSITION_FRAMES <= frame) {
-        func_0204c140(work->marker, &sDemo3DExpCCruiserPositions[work->position], 1);
+        ClActor_SetSurfacePos(work->marker, &sDemo3DExpCCruiserPositions[work->position], 1);
         work->position++;
         if (work->position == POSITION_COUNT) {
-            func_0204c124(work->marker, FALSE);
+            ClActor_SetVisible(work->marker, FALSE);
         }
     }
 }

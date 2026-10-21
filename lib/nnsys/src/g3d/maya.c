@@ -55,7 +55,7 @@ void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result) {
 
 // Sets the scale of a joint's pose from the scale of its node: the node's scale, or a scale of one if the node's flag
 // says so. A joint whose children cancel its scale (the NODEDESC command's flag) keeps its inverse scale in
-// g_NNSG3DJointScales and whether its scale is one in the render state. A joint that cancels its parent's scale takes
+// g_NNSG3DRenderCache and whether its scale is one in the render state. A joint that cancels its parent's scale takes
 // the parent's inverse scale as its scaleEx0, or flags it as one if the parent's scale is
 void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag) {
     u32 flags = cmd[3];
@@ -75,9 +75,9 @@ void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScal
             u32 node = cmd[1];
 
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
-            g_NNSG3DJointScales[node].invScale.x = scale->invScale.x;
-            g_NNSG3DJointScales[node].invScale.y = scale->invScale.y;
-            g_NNSG3DJointScales[node].invScale.z = scale->invScale.z;
+            g_NNSG3DRenderCache.jointScales[node].invScale.x = scale->invScale.x;
+            g_NNSG3DRenderCache.jointScales[node].invScale.y = scale->invScale.y;
+            g_NNSG3DRenderCache.jointScales[node].invScale.z = scale->invScale.z;
         }
     }
     if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_APPLY) {
@@ -87,7 +87,7 @@ void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScal
         if (g_NNSG3DModelRenderer->isScaleOne[parent >> 5] & (1 << (parent & 0x1f))) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE;
         } else {
-            result->scaleEx0 = g_NNSG3DJointScales[parent].invScale;
+            result->scaleEx0 = g_NNSG3DRenderCache.jointScales[parent].invScale;
         }
     }
     result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE;

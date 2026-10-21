@@ -211,7 +211,7 @@ static BOOL PMSSelect_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->param = selectParam;
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, wk->heapId);
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PMS_INPUT, wk->heapId);
-    wk->queue = func_02021998(wk->heapId);
+    wk->queue = PrintQueue_CreateDefault(wk->heapId);
     wk->procMgr = CreateGameProcManager(wk->heapId);
     wk->prevPos = POS_NONE;
     wk->pos = POS_NONE;
@@ -224,8 +224,8 @@ static BOOL PMSSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) 
 
     PMSSelect_ReleaseScreen(wk);
     FreeGameProcManager(wk->procMgr);
-    func_02021c44(wk->queue);
-    func_02021a18(wk->queue);
+    PrintQueue_Clear(wk->queue);
+    PrintQueue_Free(wk->queue);
     GFL_MsgDataFree(wk->msgData);
     GFL_FontFree(wk->font);
     GFL_ProcReleaseSubsystem(proc);
@@ -235,7 +235,7 @@ static BOOL PMSSelect_Exit(GameProc *proc, u32 *state, void *param, void *work) 
 }
 
 static BOOL PMSSelect_IsPrintEnd(PMSSelectWork *wk) {
-    if (func_02021c0c(wk->queue) && PMSDraw_IsPrintEnd(wk->pmsDraw)) {
+    if (PrintQueue_IsEmpty(wk->queue) && PMSDraw_IsPrintEnd(wk->pmsDraw)) {
         return TRUE;
     }
     return FALSE;
@@ -343,8 +343,8 @@ static BOOL PMSSelect_Main(GameProc *proc, u32 *state, void *param, void *work) 
         return TRUE;
     }
 
-    func_02021a3c(wk->queue);
-    if (wk->bg.titleFlushPending && !func_02021c1c(wk->queue, BmpWin_GetBitmap(wk->bg.titleWindow))) {
+    PrintQueue_Main(wk->queue);
+    if (wk->bg.titleFlushPending && !PrintQueue_IsBitmapPending(wk->queue, BmpWin_GetBitmap(wk->bg.titleWindow))) {
         BmpWin_Transfer(wk->bg.titleWindow);
         wk->bg.titleFlushPending = FALSE;
     }
@@ -360,7 +360,7 @@ static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
 
     wk->scrollTouch = FALSE;
     wk->listActive = TRUE;
-    wk->touchMode = func_0203d554() == TRUE;
+    wk->touchMode = GCTX_HIDIsUsingTouch() == TRUE;
     wk->prevPos = wk->pos;
     if (wk->pos == POS_NONE) {
         if (wk->touchMode) {
@@ -387,8 +387,8 @@ static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
     setup.paletteCount = 5;
     UIObjRes_Load(&wk->objRes, &setup, unit, wk->heapId);
     wk->scrollBar = UIObjRes_CreateActor(&wk->objRes, unit, 240, SCROLL_BAR_TOP, 16, wk->heapId);
-    func_0204c468(wk->scrollBar, 1);
-    func_0204c520(wk->scrollBar, TRUE);
+    ClActor_SetBgPriority(wk->scrollBar, 1);
+    ClActor_SetAutoAnim(wk->scrollBar, TRUE);
     PMSSelect_BGLoad(&wk->bg, wk->heapId, wk->font, wk->queue, wk->msgData);
     PMSSelect_BGResetPlateFade(&wk->bg);
     wk->bg.blinkCount = 0;
@@ -396,13 +396,13 @@ static void PMSSelect_SetupScreen(PMSSelectWork *wk) {
     wk->touchBar = PMSSelect_CreateTouchBar(wk, PMSSelectGraphic_GetClActUnit(wk->graphic), wk->heapId);
     wk->menuRes = AppTaskMenuRes_Create(0, 12, wk->font, wk->queue, wk->heapId);
     PMSSelect_SetupList(wk);
-    func_02042ba8(TRUE, wk->heapId);
+    GFL_NetSetIconScreen(TRUE, wk->heapId);
 }
 
 static void PMSSelect_ReleaseScreen(PMSSelectWork *wk) {
     u8 i;
 
-    func_02021c44(wk->queue);
+    PrintQueue_Clear(wk->queue);
     for (i = 0; i < PLATE_COUNT; i++) {
         wk->flushPending[i] = FALSE;
     }
@@ -413,7 +413,7 @@ static void PMSSelect_ReleaseScreen(PMSSelectWork *wk) {
     PMSSelect_DeleteList(wk);
     PMSSelect_BGUnload(&wk->bg);
     PMSSelectGraphic_Delete(wk->graphic);
-    func_0203d564(wk->touchMode ? TRUE : FALSE);
+    GCTX_HIDSetUsingTouch(wk->touchMode ? TRUE : FALSE);
 }
 
 static void PMSSelect_BGLoad(PMSSelectBG *bg, HeapID heapId, Font *font, PrintQueue *queue, MsgData *msgData) {
@@ -448,7 +448,7 @@ static void PMSSelect_BGLoad(PMSSelectBG *bg, HeapID heapId, Font *font, PrintQu
     bg->titleWindow = BmpWin_CreateDynamic(5, 3, 5, 26, 7, 8, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(bg->titleWindow), 7);
     strbuf = GFL_MsgDataLoadStrbufNew(msgData, 21);
-    func_02021c7c(queue, BmpWin_GetBitmap(bg->titleWindow), 2, 4, strbuf, font, PRINT_COLOR(14, 15, 7));
+    PrintQueue_PrintColor(queue, BmpWin_GetBitmap(bg->titleWindow), 2, 4, strbuf, font, PRINT_COLOR(14, 15, 7));
     bg->titleFlushPending = TRUE;
     GFL_StrBufFree(strbuf);
     GFL_ArcToolFree(arc);
@@ -617,7 +617,7 @@ static void PMSSelect_SetupList(PMSSelectWork *wk) {
     if (wk->sentenceCount < SENTENCE_MAX) {
         wk->lineCount++;
     }
-    func_0204c124(wk->scrollBar, wk->lineCount > 3);
+    ClActor_SetVisible(wk->scrollBar, wk->lineCount > 3);
     for (i = 0; i < PLATE_COUNT; i++) {
         wk->windows[i] = BmpWin_CreateDynamic(2, 2, i * 6 + 2, 25, 4, 9, TRUE);
     }
@@ -678,13 +678,13 @@ static void PMSSelect_UpdateScrollBar(PMSSelectWork *wk, BOOL force) {
     int top;
     s16 y;
 
-    if (!func_0204c138(wk->scrollBar)) {
+    if (!ClActor_IsVisible(wk->scrollBar)) {
         return;
     }
     max = wk->lineCount - 2;
     top = wk->top;
     if (!force) {
-        int barY = func_0204c234(wk->scrollBar, 1);
+        int barY = ClActor_GetPosAxis(wk->scrollBar, 1);
         int start = top * SCROLL_BAR_RANGE / max + SCROLL_BAR_TOP;
         int end = (top + 1) * SCROLL_BAR_RANGE / max + SCROLL_BAR_TOP;
 
@@ -710,16 +710,16 @@ static void PMSSelect_UpdateScrollBar(PMSSelectWork *wk, BOOL force) {
             y = SCROLL_BAR_BOTTOM;
         }
     }
-    func_0204c228(wk->scrollBar, y, 1);
+    ClActor_SetPosAxis(wk->scrollBar, y, 1);
 }
 
 static BOOL PMSSelect_CheckScrollBarTouch(PMSSelectWork *wk) {
     u32 x, y;
 
-    if (!func_0204c138(wk->scrollBar)) {
+    if (!ClActor_IsVisible(wk->scrollBar)) {
         return FALSE;
     }
-    if (!func_0203dac8(&x, &y)) {
+    if (!GFL_HIDGetTouchPressedPoint(&x, &y)) {
         return FALSE;
     }
     if (x >= 240 && x <= 247 && y <= 159 && y >= 8) {
@@ -765,12 +765,12 @@ static BOOL PMSSelect_ScrollByTouch(PMSSelectWork *wk) {
     u16 top;
     s16 barY;
 
-    if (!func_0203da84(&x, &y)) {
+    if (!GFL_HIDGetTouchHeldPoint(&x, &y)) {
         wk->scrollTouch = FALSE;
         return FALSE;
     }
     PMSSelect_GetScrollPos(y, wk->lineCount, &top, &barY);
-    func_0204c228(wk->scrollBar, barY, 1);
+    ClActor_SetPosAxis(wk->scrollBar, barY, 1);
     if (top != wk->top) {
         wk->top = top;
         return TRUE;
@@ -887,7 +887,7 @@ static void PMSSelect_FlushWindows(PMSSelectWork *wk) {
 static BOOL PMSSelect_FlushWindow(PrintQueue *queue, BmpWin *window, BOOL *flushPending) {
     GFLBitmap *bitmap = BmpWin_GetBitmap(window);
 
-    if (*flushPending == TRUE && !func_02021c1c(queue, bitmap)) {
+    if (*flushPending == TRUE && !PrintQueue_IsBitmapPending(queue, bitmap)) {
         BmpWin_Transfer(window);
         *flushPending = FALSE;
         return TRUE;
@@ -907,7 +907,7 @@ static void PMSSelect_DrawNewPlate(PMSSelectWork *wk, u8 line, u8 index, BOOL ac
         GFL_BitmapFill(BmpWin_GetBitmap(wk->windows[line]), 13);
         color = PRINT_COLOR(1, 2, 13);
     }
-    func_02021c7c(wk->queue, BmpWin_GetBitmap(wk->windows[line]), 0, 0, strbuf, wk->font, color);
+    PrintQueue_PrintColor(wk->queue, BmpWin_GetBitmap(wk->windows[line]), 0, 0, strbuf, wk->font, color);
     GFL_StrBufFree(strbuf);
     BmpWin_FlushMap(wk->windows[line]);
     GFL_BGSysQueueScrLoad(BmpWin_GetBGIndex(wk->windows[line]));
@@ -936,7 +936,7 @@ static void PMSSelect_DrawSentencePlate(PMSSelectWork *wk, u8 line, u8 index, BO
 static int PMSSelect_GetTouchedPlate(void) {
     u32 x, y;
 
-    if (func_0203dac8(&x, &y) && x < 232 && y >= 8) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && x < 232 && y >= 8) {
         u32 plate = (y / 8 - 1) / 6;
 
         if (plate < 3) {
@@ -962,7 +962,7 @@ static BOOL PMSSelect_SeqSelect(u32 *seq, PMSSelectWork *wk) {
         BOOL decided = FALSE;
 
         if (!wk->scrollTouch) {
-            func_0203d564(wk->touchMode ? TRUE : FALSE);
+            GCTX_HIDSetUsingTouch(wk->touchMode ? TRUE : FALSE);
             PMSSelect_UpdateTouchBar(wk->touchBar);
             if (TouchBar_GetTouched(wk->touchBar) != -1) {
                 wk->listActive = FALSE;
@@ -971,7 +971,7 @@ static BOOL PMSSelect_SeqSelect(u32 *seq, PMSSelectWork *wk) {
             if (touch != -1) {
                 wk->listActive = TRUE;
             }
-            wk->touchMode = func_0203d554() == TRUE;
+            wk->touchMode = GCTX_HIDIsUsingTouch() == TRUE;
         }
         if (touch != -1) {
             switch (touch) {
@@ -1011,7 +1011,7 @@ static BOOL PMSSelect_SeqTouchBarOff(u32 *seq, PMSSelectWork *wk) {
 }
 
 static BOOL PMSSelect_SeqMenuOpen(u32 *seq, PMSSelectWork *wk) {
-    func_0203d564(wk->touchMode ? TRUE : FALSE);
+    GCTX_HIDSetUsingTouch(wk->touchMode ? TRUE : FALSE);
     wk->menu = PMSSelect_CreateMenu(wk->menuRes, wk->msgData, wk->heapId);
     BrightnessController_SetScreenBrightness(-8, 30, 1);
     return TRUE;
@@ -1040,7 +1040,7 @@ static BOOL PMSSelect_SeqMenu(u32 *seq, PMSSelectWork *wk) {
 
 static BOOL PMSSelect_SeqMenuClose(u32 *seq, PMSSelectWork *wk) {
     PMSSelect_DeleteMenu(wk->menu);
-    wk->touchMode = func_0203d554() == TRUE;
+    wk->touchMode = GCTX_HIDIsUsingTouch() == TRUE;
     if (wk->nextSeq == SEQ_SELECT) {
         BrightnessController_SetScreenBrightness(0, 30, 1);
         PMSSelect_BGResetPlateFade(&wk->bg);

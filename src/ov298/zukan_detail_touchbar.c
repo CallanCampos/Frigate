@@ -186,8 +186,8 @@ ZukanDetailTouchbar *ZukanDetailTouchbar_Create(HeapID heapId, BOOL showFormTab,
     GFL_BGSysSetBGPriority(1, 0);
     touchbar->bgPriority = 0;
     touchbar->bgPriorityChanged = FALSE;
-    touchbar->unit = func_0204bf1c(16, 0, touchbar->heapId);
-    func_0204c028(touchbar->unit);
+    touchbar->unit = ClActUnit_Create(16, 0, touchbar->heapId);
+    ClActUnit_UseSystemRenderer(touchbar->unit);
     touchbar->tbar = NULL;
     ZukanDetailTouchbar_CreateType(touchbar);
     ZkndTbar_SetActiveAll(touchbar->tbar, FALSE);
@@ -200,7 +200,7 @@ ZukanDetailTouchbar *ZukanDetailTouchbar_Create(HeapID heapId, BOOL showFormTab,
 void ZukanDetailTouchbar_Free(ZukanDetailTouchbar *touchbar) {
     GFL_TCBRemove(touchbar->vblankTcb);
     ZukanDetailTouchbar_FreeType(touchbar);
-    func_0204bf98(touchbar->unit);
+    ClActUnit_Delete(touchbar->unit);
     GFL_HeapFree(touchbar);
 }
 
@@ -415,7 +415,7 @@ void ZukanDetailTouchbar_SetBGPriority(ZukanDetailTouchbar *touchbar, u8 priorit
     touchbar->bgPriority = priority;
     touchbar->bgPriorityChanged = TRUE;
     for (i = 0; i < touchbar->itemCount; i++) {
-        func_0204c468(touchbar->items[i].actor, priority);
+        ClActor_SetBgPriority(touchbar->items[i].actor, priority);
     }
 }
 
@@ -463,10 +463,10 @@ static void ZukanDetailTouchbar_SetItemsY(ZukanDetailTouchbar *touchbar, s16 off
     ClActorPos pos;
 
     for (i = 0; i < touchbar->itemCount; i++) {
-        func_0204c21c(touchbar->items[i].actor, &pos);
+        ClActor_GetPos(touchbar->items[i].actor, &pos);
         pos.y = touchbar->items[i].icon->pos.y;
         pos.y += offset;
-        func_0204c210(touchbar->items[i].actor, &pos);
+        ClActor_SetPos(touchbar->items[i].actor, &pos);
     }
 }
 
@@ -478,10 +478,10 @@ static void ZukanDetailTouchbar_CreateGeneral(ZukanDetailTouchbar *touchbar) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, touchbar->heapId);
     touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].palette =
-        func_0204bbb8(arc, 3, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
+        ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
     touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].chars =
-        func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, touchbar->heapId);
-    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].cellAnims = func_0204bde0(arc, 28, 45, touchbar->heapId);
+        ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, touchbar->heapId);
+    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].cellAnims = ClActSys_LoadCellAnims(arc, 28, 45, touchbar->heapId);
     GFL_ArcToolFree(arc);
 
     touchbar->itemCount = NELEMS(sZukanDetailTouchbarGeneralIcons);
@@ -571,9 +571,9 @@ static void ZukanDetailTouchbar_FreeGeneral(ZukanDetailTouchbar *touchbar) {
         ZukanDetailTouchbar_StopGlow(touchbar);
         ZukanDetailTouchbar_FreeGlow(touchbar);
         ZkndTbar_Free(touchbar->tbar);
-        func_0204bcd0(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].palette);
-        func_0204b98c(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].chars);
-        func_0204be64(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].cellAnims);
+        ClActSys_FreePltt(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].palette);
+        ClActSys_FreeChars(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].chars);
+        ClActSys_FreeCellAnims(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_GENERAL].cellAnims);
     }
     touchbar->tbar = NULL;
 }
@@ -705,7 +705,7 @@ static void ZukanDetailTouchbar_StartGlow(ZukanDetailTouchbar *touchbar) {
         break;
     }
     if (item != ITEM_NONE) {
-        func_0204c378(ZkndTbar_GetActor(touchbar->tbar, touchbar->items[item].icon->icon), 2, 0);
+        ClActor_SetPalette(ZkndTbar_GetActor(touchbar->tbar, touchbar->items[item].icon->icon), 2, 0);
     }
 }
 
@@ -727,7 +727,7 @@ static void ZukanDetailTouchbar_StopGlow(ZukanDetailTouchbar *touchbar) {
         break;
     }
     if (item != ITEM_NONE) {
-        func_0204c378(ZkndTbar_GetActor(touchbar->tbar, touchbar->items[item].icon->icon), 0, 0);
+        ClActor_SetPalette(ZkndTbar_GetActor(touchbar->tbar, touchbar->items[item].icon->icon), 0, 0);
         touchbar->selectedPage = ZUKAN_DETAIL_PAGE_FORM;
     }
 }
@@ -821,9 +821,10 @@ static void ZukanDetailTouchbar_CreateMap(ZukanDetailTouchbar *touchbar) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, touchbar->heapId);
     touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].palette =
-        func_0204bbb8(arc, 6, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
-    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].chars = func_0204b81c(arc, 16, FALSE, CLACT_VRAM_MAIN, touchbar->heapId);
-    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].cellAnims = func_0204bde0(arc, 30, 47, touchbar->heapId);
+        ClActSys_LoadPlttRange(arc, 6, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
+    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].chars =
+        ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_MAIN, touchbar->heapId);
+    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].cellAnims = ClActSys_LoadCellAnims(arc, 30, 47, touchbar->heapId);
     GFL_ArcToolFree(arc);
 
     touchbar->itemCount = NELEMS(sZukanDetailTouchbarMapIcons);
@@ -863,9 +864,9 @@ static void ZukanDetailTouchbar_CreateMap(ZukanDetailTouchbar *touchbar) {
 static void ZukanDetailTouchbar_FreeMap(ZukanDetailTouchbar *touchbar) {
     if (touchbar->tbar != NULL) {
         ZkndTbar_Free(touchbar->tbar);
-        func_0204bcd0(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].palette);
-        func_0204b98c(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].chars);
-        func_0204be64(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].cellAnims);
+        ClActSys_FreePltt(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].palette);
+        ClActSys_FreeChars(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].chars);
+        ClActSys_FreeCellAnims(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_MAP].cellAnims);
     }
     touchbar->tbar = NULL;
 }
@@ -879,9 +880,10 @@ static void ZukanDetailTouchbar_CreateForm(ZukanDetailTouchbar *touchbar) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, touchbar->heapId);
     touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].palette =
-        func_0204bbb8(arc, 3, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
-    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].chars = func_0204b81c(arc, 13, FALSE, CLACT_VRAM_MAIN, touchbar->heapId);
-    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].cellAnims = func_0204bde0(arc, 28, 45, touchbar->heapId);
+        ClActSys_LoadPlttRange(arc, 3, CLACT_VRAM_MAIN, 11 * 32, 0, 3, touchbar->heapId);
+    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].chars =
+        ClActSys_LoadChars(arc, 13, FALSE, CLACT_VRAM_MAIN, touchbar->heapId);
+    touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].cellAnims = ClActSys_LoadCellAnims(arc, 28, 45, touchbar->heapId);
     GFL_ArcToolFree(arc);
 
     touchbar->itemCount = NELEMS(sZukanDetailTouchbarFormIcons);
@@ -926,9 +928,9 @@ static void ZukanDetailTouchbar_CreateForm(ZukanDetailTouchbar *touchbar) {
 static void ZukanDetailTouchbar_FreeForm(ZukanDetailTouchbar *touchbar) {
     if (touchbar->tbar != NULL) {
         ZkndTbar_Free(touchbar->tbar);
-        func_0204bcd0(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].palette);
-        func_0204b98c(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].chars);
-        func_0204be64(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].cellAnims);
+        ClActSys_FreePltt(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].palette);
+        ClActSys_FreeChars(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].chars);
+        ClActSys_FreeCellAnims(touchbar->res[ZUKAN_DETAIL_TOUCHBAR_FORM].cellAnims);
     }
     touchbar->tbar = NULL;
 }

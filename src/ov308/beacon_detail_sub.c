@@ -201,14 +201,14 @@ void BeaconDetailSub_Start(BeaconDetailWork *work) {
     BeaconDetailSub_SetPanelVisible(work, work->page ^ 1, FALSE);
     BeaconDetailSub_DrawMap(work);
     BeaconDetailSub_UpdateTouchBar(work);
-    func_02042ba8(FALSE, work->tailHeapId);
+    GFL_NetSetIconScreen(FALSE, work->tailHeapId);
 }
 
 u32 BeaconDetailSub_Input(BeaconDetailWork *work) {
     u32 touched = TouchBar_GetTouched(work->touchBar);
     u32 keys = GCTX_HIDGetPressedKeys();
 
-    if (func_02016bec(work->param->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->param->gsys)) {
         work->param->unk0A = TRUE;
         return BEACON_DETAIL_SEQ_FADE_OUT;
     }
@@ -244,7 +244,7 @@ static BOOL BeaconDetailSub_IsMarkerTouched(BeaconDetailWork *work) {
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y)) {
         if (x - (work->markerX - 12) <= 24 && y - (work->markerY - 16) <= 32) {
             return TRUE;
         }
@@ -345,8 +345,8 @@ static void BeaconDetailSub_SetRecentWords(const GameBeacon *beacon, WordSet *wo
 }
 
 static void BeaconDetailSub_SetActorAnim(ClActor *actor, u8 anim) {
-    func_0204c488(actor, anim);
-    func_0204c56c(actor);
+    ClActor_SetSequence(actor, anim);
+    ClActor_RestartAnim(actor);
 }
 
 static void BeaconDetailSub_SetActorPos(ClActor *actor, s16 x, s16 y, u16 surface) {
@@ -354,7 +354,7 @@ static void BeaconDetailSub_SetActorPos(ClActor *actor, s16 x, s16 y, u16 surfac
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(actor, &pos, surface);
+    ClActor_SetSurfacePos(actor, &pos, surface);
 }
 
 // Loads a message into the text buffer, with the words set
@@ -367,7 +367,7 @@ static void BeaconDetailSub_FormatMessage(BeaconDetailWork *work, u8 messageId) 
 static void BeaconDetailSub_SetMapTrainer(BeaconDetailWork *work, u8 view) {
     u8 color;
 
-    func_0204ba40(work->unionRes.chars, work->unionChars[view].data);
+    ClActSys_ReplaceCharData(work->unionRes.chars, work->unionChars[view].data);
     color = sBeaconDetailUnionPalettes[view] * 16;
     BeaconDetailSub_LoadPalette(&work->unionPalette.raw[color], PALETTE_OBJ_MAIN, 10 * 16, 16);
 }
@@ -417,9 +417,9 @@ static void BeaconDetailSub_DrawRow(BeaconDetailWork *work, BeaconDetailWindow *
 static void BeaconDetailSub_SetPanelVisible(BeaconDetailWork *work, u8 page, BOOL visible) {
     BeaconDetailPanel *panel = &work->panels[page];
 
-    func_0204c124(panel->trainerActor, visible);
+    ClActor_SetVisible(panel->trainerActor, visible);
     if (panel->rankShown) {
-        func_0204c124(panel->rankActor, visible);
+        ClActor_SetVisible(panel->rankActor, visible);
     }
     if (PMSDraw_IsDrawn(work->pmsDraw, page)) {
         PMSDraw_SetVisible(work->pmsDraw, page, visible);
@@ -446,7 +446,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     u8 rank;
 
     // The sender's favorite color and a darker shade of it
-    func_02013d38(&colors[0], beacon);
+    GameBeacon_GetFavoriteColorRGB(&colors[0], beacon);
     BlendColors(&colors[0], &colors[1], 1, 3, 0);
     palette = page * 16;
     BeaconDetailSub_LoadPalette(colors, PALETTE_BG_SUB, palette + 1, 2);
@@ -456,7 +456,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     GameBeacon_GetName(beacon, work->formatBuf);
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_NAME], work->formatBuf, 6, 48, 13, 2, 0);
 
-    answer = func_02013cd8(beacon);
+    answer = GameBeacon_GetJob(beacon);
     if (answer == 0xff) {
         GFL_StrBufClear(work->textBuf);
     } else {
@@ -465,7 +465,7 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     }
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_JOB], work->textBuf, 6, 48, 13, 2, 1);
 
-    answer = func_02013cf0(beacon);
+    answer = GameBeacon_GetHobby(beacon);
     if (answer == 0xff) {
         GFL_StrBufClear(work->textBuf);
     } else {
@@ -486,8 +486,8 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     BeaconDetailSub_FormatMessage(work, Startmenu_Text_Empty_4);
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_HOME], work->textBuf, 0, 0, 28, 4, 0);
 
-    WordSetNumber(work->wordSet, 0, func_02013db8(beacon), 5, 1, TRUE);
-    WordSetNumber(work->wordSet, 1, func_02013dc0(beacon), 5, 1, TRUE);
+    WordSetNumber(work->wordSet, 0, GameBeacon_GetThankedCount(beacon), 5, 1, TRUE);
+    WordSetNumber(work->wordSet, 1, GameBeacon_GetPasserbyCount(beacon), 5, 1, TRUE);
     BeaconDetailSub_FormatMessage(work, Startmenu_Text_Empty_5);
     BeaconDetailSub_DrawRow(work, &panel->windows[BEACON_DETAIL_WINDOW_COUNTS], work->textBuf, 21, 0, 6, 4, 0);
 
@@ -498,15 +498,15 @@ static void BeaconDetailSub_DrawPanel(BeaconDetailWork *work, GameBeacon *beacon
     PMSDraw_Print(work->pmsDraw, panel->recordWindow, &record, page);
 
     panel->trainerView = GameBeacon_GetTrainerViewWithGender(beacon);
-    TrGra_ReplaceClActCharsAndPalette(work->trainerArc, func_0202b5e8(panel->trainerView), work->trainerRes[page].chars,
-                                      work->trainerRes[page].palette, work->tailHeapId);
+    TrGra_ReplaceClActCharsAndPalette(work->trainerArc, UnionView_GetTrainerClass(panel->trainerView),
+                                      work->trainerRes[page].chars, work->trainerRes[page].palette, work->tailHeapId);
 
     rank = GameBeacon_GetSurveyRank(beacon);
     if (rank == 0) {
-        func_0204c124(panel->rankActor, FALSE);
+        ClActor_SetVisible(panel->rankActor, FALSE);
     } else {
         BeaconDetailSub_SetActorAnim(panel->rankActor, rank + 1);
-        func_0204c124(panel->rankActor, TRUE);
+        ClActor_SetVisible(panel->rankActor, TRUE);
     }
 }
 
@@ -530,8 +530,8 @@ static void BeaconDetailSub_DrawMap(BeaconDetailWork *work) {
         work->hasPlace = FALSE;
         work->markerY = 0;
         work->markerX = work->markerY;
-        func_0204c124(work->actors[BEACON_DETAIL_ACTOR_TRAINER], FALSE);
-        func_0204c124(work->actors[BEACON_DETAIL_ACTOR_RECENT], FALSE);
+        ClActor_SetVisible(work->actors[BEACON_DETAIL_ACTOR_TRAINER], FALSE);
+        ClActor_SetVisible(work->actors[BEACON_DETAIL_ACTOR_RECENT], FALSE);
     } else {
         work->hasPlace = TRUE;
         work->markerX = TownMapData_GetParam(work->townMapData, place, TOWNMAP_PARAM_X);
@@ -548,7 +548,7 @@ static void BeaconDetailSub_DrawMap(BeaconDetailWork *work) {
         }
         BeaconDetailSub_SetActorPos(work->actors[BEACON_DETAIL_ACTOR_TRAINER], work->markerX, work->markerY,
                                     CLACT_SURFACE_MAIN);
-        func_0204c124(work->actors[BEACON_DETAIL_ACTOR_TRAINER], TRUE);
+        ClActor_SetVisible(work->actors[BEACON_DETAIL_ACTOR_TRAINER], TRUE);
         if (recent->icon) {
             // To the trainer's left, or to the right at the map's left edge
             int x = work->markerX - 24;
@@ -559,7 +559,7 @@ static void BeaconDetailSub_DrawMap(BeaconDetailWork *work) {
             BeaconDetailSub_SetActorPos(work->actors[BEACON_DETAIL_ACTOR_RECENT], x, work->markerY, CLACT_SURFACE_MAIN);
             BeaconDetailSub_SetActorAnim(work->actors[BEACON_DETAIL_ACTOR_RECENT], recent->icon - 1);
         }
-        func_0204c124(work->actors[BEACON_DETAIL_ACTOR_RECENT], recent->icon != 0);
+        ClActor_SetVisible(work->actors[BEACON_DETAIL_ACTOR_RECENT], recent->icon != 0);
     }
 
     GFL_BitmapFill(work->infoWindow.bitmap, 15);
@@ -625,7 +625,7 @@ static void BeaconDetailSub_StartPopupTask(BeaconDetailWork *work, int *taskCoun
 
 // Whether the pop-up stays: until its time is up, a touch or the A Button
 static BOOL BeaconDetailSub_WaitPopup(BeaconDetailPopupTask *popup) {
-    if (func_0203da48() || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A)) {
+    if (GFL_HIDIsTouchPressed() || (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A)) {
         popup->timer = 0;
         return FALSE;
     }
@@ -738,7 +738,7 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
     if (!page->decided && TouchBar_GetDecided(page->work->touchBar) != -1) {
         page->decided = TRUE;
     }
-    if (!func_02021c0c(page->work->printQueue)) {
+    if (!PrintQueue_IsEmpty(page->work->printQueue)) {
         return;
     }
     switch (page->seq) {
@@ -754,8 +754,8 @@ static void BeaconDetailSub_PageTask(TCBEx *task, void *data) {
                                         &page->taskCount);
         BeaconDetailSub_StartPanelSlide(page->work, page->work->page ^ 1, sBeaconDetailSlideFrom[page->direction],
                                         page->direction, &page->taskCount);
-        func_0204c124(page->work->actors[BEACON_DETAIL_ACTOR_TRAINER], FALSE);
-        func_0204c124(page->work->actors[BEACON_DETAIL_ACTOR_RECENT], FALSE);
+        ClActor_SetVisible(page->work->actors[BEACON_DETAIL_ACTOR_TRAINER], FALSE);
+        ClActor_SetVisible(page->work->actors[BEACON_DETAIL_ACTOR_RECENT], FALSE);
         page->seq++;
         break;
     case 2:

@@ -90,8 +90,8 @@ static FieldActor *UnionOneself_CreateActor(UnionSystem *unisys, GameData *gameD
     if (member != 0) {
         npc.moveCode = 0xf;
     }
-    func_ov012_021682c0(&npc, sUnionEntryPositions[entryIndex].x + sUnionMemberOffsets[member].x,
-                        sUnionEntryPositions[entryIndex].z + sUnionMemberOffsets[member].z, 0);
+    ZoneNPC_SetGridPos(&npc, sUnionEntryPositions[entryIndex].x + sUnionMemberOffsets[member].x,
+                       sUnionEntryPositions[entryIndex].z + sUnionMemberOffsets[member].z, 0);
     return CreateNewActorByEntityNoWKOBJCODE(mmsys, &npc, ZONE_UNION_ROOM);
 }
 
@@ -451,8 +451,8 @@ BOOL UnionActor_StepAppear(UnionSystem *unisys, UnionActorSlot *slot, Field *fie
         }
         break;
     case 1:
-        if (func_ov012_02166ecc(actor) == TRUE) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == TRUE) {
+            FldAct_EndAcmd(actor);
             return TRUE;
         }
         break;
@@ -471,8 +471,8 @@ static BOOL UnionOneself_ActorLeave(UnionSystem *unisys, UnionActorSlot *slot, F
         }
         break;
     case 1:
-        if (func_ov012_02166ecc(actor) == TRUE) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == TRUE) {
+            FldAct_EndAcmd(actor);
             return TRUE;
         }
         break;
@@ -509,7 +509,7 @@ static BOOL UnionOneself_ActorTalk(UnionSystem *unisys, UnionActorSlot *slot, Fi
         }
         break;
     case 1:
-        if (func_ov012_02166ef8(actor) == TRUE) {
+        if (FldAct_EndAcmd(actor) == TRUE) {
             SetActorFlag(actor, 8);
             (*seq)++;
         }

@@ -24,7 +24,7 @@ typedef struct {
     BOOL comm;
     // Whether the battle was recorded at all; "The last battle cannot be recorded" if not
     BOOL recorded;
-    // The battle mode's index and the header's counter, for func_0200be50
+    // The battle mode's index and the header's counter, for BattleRec_FinishAndSaveSlot
     u32 mode;
     s32 counter;
 } BtlRecSelParam;

@@ -2,7 +2,9 @@
 // the world: sinking into quicksand, falling down a hole, a spin, an Escape Rope, Dig and Teleport. The name is the
 // ROM's own, from GFL_HeapAllocate's file argument. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/field.h"
 #include "field/field_actor.h"
 #include "field/field_camera.h"
@@ -34,7 +36,7 @@ void FieldFadeTCB_Start(GameSystem *gsys, Field *field, u32 type, u32 slow, u32 
     FieldFadeWork *wk;
     TCBManager *mgr = Field_GetTCBMgr(field);
 
-    wk = GFL_HeapAllocate(4, sizeof(FieldFadeWork), TRUE, "field_fade.c", 56);
+    wk = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(FieldFadeWork), TRUE, "field_fade.c", 56);
     GFL_TCBMgrAddTask(mgr, FieldFadeTCB_Callback, wk, 0);
     Field_SetFadeFlag(field, TRUE);
     wk->stage = 0;
@@ -63,7 +65,7 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
         if (wk->type == 0 || wk->type == 2) {
             u32 enabled;
 
-            start = 0x10;
+            start = 16;
             end = 0;
             enabled = GFL_BGSysGetEnabledBGsA();
             FieldG2D_SetLCDConfig();
@@ -71,12 +73,12 @@ static void FieldFadeTCB_Callback(TCB *tcb, void *data) {
             FieldG2D_Prepare3DSurface(wk->field);
         } else {
             start = 0;
-            end = 0x10;
+            end = 16;
         }
         if (wk->slow == 0) {
-            mode = 3;
+            mode = FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK;
         } else {
-            mode = 0xc;
+            mode = FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE;
         }
         GFL_FadeSet(mode, start, end, speed);
         wk->stage++;
@@ -196,7 +198,7 @@ static GameEventReturnCode EventQuicksandArrive_Callback(GameEvent *event, u32 *
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
         {
-            VecFx32 offset = { 0, 0xfa000, 0 };
+            VecFx32 offset = { 0, FX32_CONST(250), 0 };
             FieldActor *actor;
             FieldTask *task;
 
@@ -281,7 +283,7 @@ static void func_ov036_021b97f0(SpinEventWork *wk) {
     FieldCameraAnimationController_PrepareCamera(wk->controller);
     FieldCamera_GetAnimationCoords(camera, &wk->anim.dst);
     wk->anim.src = wk->anim.dst;
-    wk->anim.src.distance -= 0x64000;
+    wk->anim.src.distance -= FX32_CONST(100);
     FieldCameraAnimationController_CommitSrcCoords(wk->controller);
     FieldCameraAnimationController_StartAnimation(wk->controller);
 }
@@ -373,7 +375,7 @@ static void func_ov036_021b9970(SpinEventWork *wk) {
     FieldCameraAnimationController_PrepareCamera(wk->controller);
     FieldCamera_GetAnimationCoords(camera, &wk->anim.dst);
     wk->anim.src = wk->anim.dst;
-    wk->anim.src.distance -= 0x64000;
+    wk->anim.src.distance -= FX32_CONST(100);
     FieldCameraAnimationController_CommitSrcCoords(wk->controller);
     FieldCameraAnimationController_StartAnimation(wk->controller);
 }
@@ -439,7 +441,7 @@ static GameEventReturnCode func_ov036_021b9a64(GameEvent *event, u32 *state, voi
         FieldCameraAnimationController_PrepareCamera(wk->controller);
         FieldCamera_GetAnimationCoords(camera, &wk->anim.dst);
         wk->anim.src = wk->anim.dst;
-        wk->anim.src.distance -= 0x64000;
+        wk->anim.src.distance -= FX32_CONST(100);
         FieldCameraAnimationController_CommitSrcCoords(wk->controller);
         FieldCameraAnimationController_StartAnimation(wk->controller);
         (*state)++;
@@ -476,7 +478,7 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
             VecFx32 offset;
             FieldActor *actor = FieldPlayer_GetActor(Field_GetPlayer(field));
 
-            offset.y = 0xa000;
+            offset.y = FX32_CONST(10);
             offset.x = 0;
             offset.z = 0;
             SetActorWPosOffset(actor, &offset);
@@ -488,7 +490,7 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
             FieldTask *moveTask;
             FieldTaskManager *taskManager;
 
-            move.y = 0x96000;
+            move.y = FX32_CONST(150);
             move.x = 0;
             move.z = 0;
             spin = FieldActorSpinTask_CreatePlayer(field, 0x18, 3);
@@ -506,7 +508,7 @@ static GameEventReturnCode EventPlayerSpinDown_Callback(GameEvent *event, u32 *s
         break;
     case 2:
         func_ov036_021a3e74(FieldPlayer_GetActor(Field_GetPlayer(field)), Field_GetFieldEffects(wk->field));
-        GFL_SndSEPlay(0x67b);
+        GFL_SndSEPlay(SEQ_SE_FLD_10);
         (*state)++;
         break;
     case 3:
@@ -533,8 +535,8 @@ static GameEventReturnCode func_ov036_021b9c90(GameEvent *event, u32 *state, voi
         (*state)++;
         break;
     case 1:
-        if (func_ov012_02166ecc(actor) == 1) {
-            func_ov012_02166ef8(actor);
+        if (FldAct_CheckAcmdEnd(actor) == 1) {
+            FldAct_EndAcmd(actor);
             (*state)++;
         }
         break;
@@ -552,7 +554,7 @@ typedef struct {
     GameSystem *gsys;
     Field *field;
     u32 transformType;
-    u32 frame;
+    s32 frame;
     BOOL teleportFlag;
     VecFx32 pos;
     FieldPropHandle *propHandle;
@@ -568,7 +570,7 @@ static GameEventReturnCode EventDig_Callback(GameEvent *event, u32 *state, void 
 static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, void *data);
 
-GameEvent *EventQuicksandDrawIn_Create(GameEvent *parent, GameSystem *gsys, Field *field, VecFx32 *pos) {
+GameEvent *EventQuicksandDrawIn_Create(GameEvent *parent, GameSystem *gsys, Field *field, const VecFx32 *pos) {
     GameEvent *event = GameEvent_Create(gsys, parent, EventQuicksandDrawIn_Callback, 0x7c);
     EffectEventWork *wk = GameEvent_GetData(event);
 
@@ -576,9 +578,7 @@ GameEvent *EventQuicksandDrawIn_Create(GameEvent *parent, GameSystem *gsys, Fiel
     wk->field = field;
     wk->frame = 0;
     wk->propHandle = NULL;
-    wk->pos.x = pos->x;
-    wk->pos.y = pos->y;
-    wk->pos.z = pos->z;
+    VEC_Set(&wk->pos, pos->x, pos->y, pos->z);
     return event;
 }
 
@@ -646,12 +646,12 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
         FieldChunkPropHolder **props;
         u32 count;
 
-        GFL_SEPlayKeepVol(0x680, GFL_SndSeqGetPlayerIndex(0x680));
+        GFL_SEPlayKeepVol(SEQ_SE_FLD_15, GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_15));
         propSystem = FieldG3DMapper_GetBMSystem(Field_GetG3DMapper(wk->field));
-        bounds.minX = wk->pos.x - 0x20000;
-        bounds.maxX = wk->pos.x + 0x20000;
-        bounds.minZ = wk->pos.z - 0x20000;
-        bounds.maxZ = wk->pos.z + 0x20000;
+        bounds.minX = wk->pos.x - FX32_CONST(32);
+        bounds.maxX = wk->pos.x + FX32_CONST(32);
+        bounds.minZ = wk->pos.z - FX32_CONST(32);
+        bounds.maxZ = wk->pos.z + FX32_CONST(32);
         props = FieldPropSystem_FindPropsInArea(propSystem, &bounds, 2, &count);
         if (*props != NULL) {
             wk->propHandle = FieldPropSystem_CreateHandleFromExisting(propSystem, *props);
@@ -703,16 +703,16 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
             FieldPropHandle_CallAnmCmd(wk->propHandle, 0, 0);
         }
         keys = GCTX_HIDGetHeldKeys();
-        if (keys & 0x40) {
+        if (keys & PAD_KEY_UP) {
             FldAct_SetAcmd(actor, 0x24);
         }
-        if (keys & 0x80) {
+        if (keys & PAD_KEY_DOWN) {
             FldAct_SetAcmd(actor, 0x25);
         }
-        if (keys & 0x20) {
+        if (keys & PAD_KEY_LEFT) {
             FldAct_SetAcmd(actor, 0x26);
         }
-        if (keys & 0x10) {
+        if (keys & PAD_KEY_RIGHT) {
             FldAct_SetAcmd(actor, 0x27);
         }
         if (wk->frame++ % 10 == 0) {
@@ -731,20 +731,20 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
         FieldTask *fade;
         FieldTaskManager *taskManager;
 
-        GFL_SndSEPlay(0x79f);
+        GFL_SndSEPlay(SEQ_SE_FLD_147);
         SetActorMovementFlag(actor, 0x8000);
         move.x = 0;
+        move.y = FX32_CONST(-30);
         move.z = 0;
-        move.y = -0x1de000;
         moveTask = FieldActorMoveTask_CreatePlayer(wk->field, 0x22, &move);
         spin = FieldActorSpinTask_CreatePlayer(wk->field, 0x22, 5);
-        zoom = FieldCameraMoveTaskZoom_Create(wk->field, 0x1e, 0xb4000);
-        fade = FieldFadeTask_Create(wk->field, 3, 0, 0x10, 0);
+        zoom = FieldCameraMoveTaskZoom_Create(wk->field, 0x1e, FX32_CONST(180));
+        fade = FieldFadeTask_Create(wk->field, FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 0);
         taskManager = Field_GetTaskManager(wk->field);
         FieldTaskManager_AddTask(taskManager, moveTask, 0);
         FieldTaskManager_AddTask(taskManager, spin, 0);
         FieldTaskManager_AddTask(taskManager, zoom, 0);
-        FieldTaskManager_AddTask(taskManager, fade, (u32)zoom);
+        FieldTaskManager_AddTask(taskManager, fade, zoom);
         wk->frame = 0;
         *state = 5;
         break;
@@ -755,7 +755,7 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
         }
         break;
     case 6:
-        GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(0x680));
+        GFL_SndPlayerStop(GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_15));
         FieldCamera_ChangeTransformType(camera, wk->transformType);
         if (wk->propHandle != NULL) {
             FieldPropHandle_Free(wk->propHandle);
@@ -765,14 +765,14 @@ static GameEventReturnCode EventQuicksandDrawIn_Callback(GameEvent *event, u32 *
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021ba13c(EffectEventWork *wk);
-static void func_ov036_021ba178(EffectEventWork *wk);
-static void func_ov036_021ba1e0(EffectEventWork *wk);
-static GameEvent *func_ov036_021ba1f4(EffectEventWork *wk);
-static void func_ov036_021ba298(EffectEventWork *wk);
-static void func_ov036_021ba2f4(EffectEventWork *wk);
-static void func_ov036_021ba35c(EffectEventWork *wk);
-static GameEvent *func_ov036_021ba370(EffectEventWork *wk);
+static void EventEscapeRope_StartSpinTasks(EffectEventWork *wk);
+static void EventEscapeRope_StartCameraAnimation(EffectEventWork *wk);
+static void EventEscapeRope_FreeCameraAnimation(EffectEventWork *wk);
+static GameEvent *EventEscapeRope_CreateExitTransition(EffectEventWork *wk);
+static void EventDig_StartEffectTasks(EffectEventWork *wk);
+static void EventDig_StartCameraAnimation(EffectEventWork *wk);
+static void EventDig_FreeCameraAnimation(EffectEventWork *wk);
+static GameEvent *EventDig_CreateExitTransition(EffectEventWork *wk);
 
 static GameEventReturnCode EventEscapeRope_Callback(GameEvent *event, u32 *state, void *data) {
     EffectEventWork *wk = data;
@@ -780,40 +780,40 @@ static GameEventReturnCode EventEscapeRope_Callback(GameEvent *event, u32 *state
 
     switch (*state) {
     case 0:
-        func_ov036_021ba13c(wk);
-        func_ov036_021ba178(wk);
+        EventEscapeRope_StartSpinTasks(wk);
+        EventEscapeRope_StartCameraAnimation(wk);
         (*state)++;
         break;
     case 1:
         if (wk->timer++ > 0x23) {
-            GameEvent_ChainNext(event, func_ov036_021ba1f4(wk));
+            GameEvent_ChainNext(event, EventEscapeRope_CreateExitTransition(wk));
             (*state)++;
             break;
         }
     case 2:
         if (FieldTaskManager_IsIdle(taskManager)) {
-            GFL_SndSEPlay(0x559);
+            GFL_SndSEPlay(SEQ_SE_KAIDAN);
             (*state)++;
         }
         break;
     case 3:
-        func_ov036_021ba1e0(wk);
+        EventEscapeRope_FreeCameraAnimation(wk);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021ba13c(EffectEventWork *wk) {
+static void EventEscapeRope_StartSpinTasks(EffectEventWork *wk) {
     Field *field = wk->field;
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
     FieldTask *accel = FieldActorSpinTask_CreatePlayerAccel(field, 0x14, 3);
     FieldTask *spin = FieldActorSpinTask_CreatePlayer(field, 0x14, 5);
 
     FieldTaskManager_AddTask(taskManager, accel, 0);
-    FieldTaskManager_AddTask(taskManager, spin, (u32)accel);
+    FieldTaskManager_AddTask(taskManager, spin, accel);
 }
 
-static void func_ov036_021ba178(EffectEventWork *wk) {
+static void EventEscapeRope_StartCameraAnimation(EffectEventWork *wk) {
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
@@ -825,17 +825,17 @@ static void func_ov036_021ba178(EffectEventWork *wk) {
     FieldCameraAnimationController_PrepareCamera(wk->controller);
     FieldCamera_GetAnimationCoords(camera, &wk->anim.src);
     wk->anim.dst = wk->anim.src;
-    wk->anim.dst.distance -= 0x64000;
+    wk->anim.dst.distance -= FX32_CONST(100);
     FieldCameraAnimationController_CommitSrcCoords(wk->controller);
     FieldCameraAnimationController_StartAnimation(wk->controller);
 }
 
-static void func_ov036_021ba1e0(EffectEventWork *wk) {
+static void EventEscapeRope_FreeCameraAnimation(EffectEventWork *wk) {
     FieldCameraAnimationController_FinishCamera(wk->controller);
     FieldCameraAnimationController_FreeAnimation(wk->controller);
 }
 
-static GameEvent *func_ov036_021ba1f4(EffectEventWork *wk) {
+static GameEvent *EventEscapeRope_CreateExitTransition(EffectEventWork *wk) {
     GameSystem *gsys = wk->gsys;
     Field *field = wk->field;
 
@@ -851,31 +851,31 @@ static GameEventReturnCode EventDig_Callback(GameEvent *event, u32 *state, void 
 
     switch (*state) {
     case 0:
-        func_ov036_021ba298(wk);
-        func_ov036_021ba2f4(wk);
-        GFL_SndSEPlay(0x6df);
+        EventDig_StartEffectTasks(wk);
+        EventDig_StartCameraAnimation(wk);
+        GFL_SndSEPlay(SEQ_SE_FLD_80);
         (*state)++;
         break;
     case 1:
         if (wk->timer++ > 0x23) {
-            GameEvent_ChainNext(event, func_ov036_021ba370(wk));
+            GameEvent_ChainNext(event, EventDig_CreateExitTransition(wk));
             (*state)++;
             break;
         }
     case 2:
         if (FieldTaskManager_IsIdle(taskManager)) {
-            GFL_SndSEPlay(0x559);
+            GFL_SndSEPlay(SEQ_SE_KAIDAN);
             (*state)++;
         }
         break;
     case 3:
-        func_ov036_021ba35c(wk);
+        EventDig_FreeCameraAnimation(wk);
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
 }
 
-static void func_ov036_021ba298(EffectEventWork *wk) {
+static void EventDig_StartEffectTasks(EffectEventWork *wk) {
     Field *field = wk->field;
     FieldTaskManager *taskManager = Field_GetTaskManager(field);
     FieldTask *effect = FieldActorEffectTask_Create(field, FieldPlayer_GetActor(Field_GetPlayer(field)), 0x28, 6);
@@ -884,10 +884,10 @@ static void func_ov036_021ba298(EffectEventWork *wk) {
 
     FieldTaskManager_AddTask(taskManager, effect, 0);
     FieldTaskManager_AddTask(taskManager, accel, 0);
-    FieldTaskManager_AddTask(taskManager, spin, (u32)accel);
+    FieldTaskManager_AddTask(taskManager, spin, accel);
 }
 
-static void func_ov036_021ba2f4(EffectEventWork *wk) {
+static void EventDig_StartCameraAnimation(EffectEventWork *wk) {
     FieldCamera *camera = Field_GetCameraSystem(wk->field);
     FieldCameraAnimationController *controller = Field_CreateCameraAnimationController(wk->field);
 
@@ -899,17 +899,17 @@ static void func_ov036_021ba2f4(EffectEventWork *wk) {
     FieldCameraAnimationController_PrepareCamera(wk->controller);
     FieldCamera_GetAnimationCoords(camera, &wk->anim.src);
     wk->anim.dst = wk->anim.src;
-    wk->anim.dst.distance -= 0x64000;
+    wk->anim.dst.distance -= FX32_CONST(100);
     FieldCameraAnimationController_CommitSrcCoords(wk->controller);
     FieldCameraAnimationController_StartAnimation(wk->controller);
 }
 
-static void func_ov036_021ba35c(EffectEventWork *wk) {
+static void EventDig_FreeCameraAnimation(EffectEventWork *wk) {
     FieldCameraAnimationController_FinishCamera(wk->controller);
     FieldCameraAnimationController_FreeAnimation(wk->controller);
 }
 
-static GameEvent *func_ov036_021ba370(EffectEventWork *wk) {
+static GameEvent *EventDig_CreateExitTransition(EffectEventWork *wk) {
     GameSystem *gsys = wk->gsys;
     Field *field = wk->field;
 
@@ -933,17 +933,17 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
         FieldTask *accel = FieldActorSpinTask_CreatePlayerAccel(field, 0x14, 3);
         FieldTask *spin = FieldActorSpinTask_CreatePlayer(field, 0x14, 5);
         FieldTask *wait = FieldWaitTask_Create(field, 0x1e);
-        FieldTask *fade = FieldFadeTask_Create(field, 3, 0, 0x10, 1);
+        FieldTask *fade = FieldFadeTask_Create(field, FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 1);
         FieldCameraAnimationController *controller;
 
         FieldTaskManager_AddTask(taskManager, accel, 0);
-        FieldTaskManager_AddTask(taskManager, spin, (u32)accel);
+        FieldTaskManager_AddTask(taskManager, spin, accel);
         FieldTaskManager_AddTask(taskManager, wait, 0);
-        FieldTaskManager_AddTask(taskManager, fade, (u32)wait);
+        FieldTaskManager_AddTask(taskManager, fade, wait);
         if (wk->teleportFlag) {
-            GFL_SndSEPlay(0x6e7);
+            GFL_SndSEPlay(SEQ_SE_FLD_86);
         } else {
-            GFL_SndSEPlay(0x676);
+            GFL_SndSEPlay(SEQ_SE_FLD_05);
         }
         controller = Field_CreateCameraAnimationController(field);
         wk->anim.frames = 0x3c;
@@ -954,7 +954,7 @@ static GameEventReturnCode EventTeleportEffect_Callback(GameEvent *event, u32 *s
         FieldCameraAnimationController_PrepareCamera(wk->controller);
         FieldCamera_GetAnimationCoords(camera, &wk->anim.src);
         wk->anim.dst = wk->anim.src;
-        wk->anim.dst.distance -= 0x64000;
+        wk->anim.dst.distance -= FX32_CONST(100);
         FieldCameraAnimationController_CommitSrcCoords(wk->controller);
         FieldCameraAnimationController_StartAnimation(wk->controller);
         (*state)++;
@@ -990,17 +990,17 @@ static GameEventReturnCode func_ov036_021ba4bc(GameEvent *event, u32 *state, voi
 
         wk->transformType = FieldCamera_GetTransformType(camera);
         FieldCamera_ChangeTransformType(camera, 0);
-        move.y = 0x96000;
+        move.y = FX32_CONST(150);
         move.x = 0;
         move.z = 0;
         spin = FieldActorSpinTask_CreatePlayer(field, 0x18, 3);
-        fade = FieldFadeTask_Create(field, 3, 0, 0x10, 1);
+        fade = FieldFadeTask_Create(field, FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 0, 16, 1);
         moveTask = FieldActorMoveTask_CreatePlayer(field, 0x18, &move);
         taskManager = Field_GetTaskManager(field);
         FieldTaskManager_AddTask(taskManager, spin, 0);
         FieldTaskManager_AddTask(taskManager, moveTask, 0);
-        FieldTaskManager_AddTask(taskManager, fade, (u32)moveTask);
-        GFL_SndSEPlay(0x676);
+        FieldTaskManager_AddTask(taskManager, fade, moveTask);
+        GFL_SndSEPlay(SEQ_SE_FLD_05);
         (*state)++;
         break;
     }

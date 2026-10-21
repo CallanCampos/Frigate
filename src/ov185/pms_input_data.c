@@ -1401,7 +1401,7 @@ static u32 CountupPokemon(PMSInputData *data, const u16 *src, u32 count, u16 *ds
 static u32 CountupMoves(PMSInputData *data, const u16 *src, u32 count, u16 *dst) {
     u32 i;
 
-    if (func_02029a74(data->param)) {
+    if (PMSIParam_AreMovesEnabled(data->param)) {
         for (i = 0; i < count; i++) {
             SetWordEnableFlag(data, *src);
             *dst++ = *src++;

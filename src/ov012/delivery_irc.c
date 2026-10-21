@@ -43,35 +43,35 @@ struct DeliveryIrcWork {
     DeliveryIrcWanted wanted;
 };
 
-static void func_ov012_02152c0c(void *work, int netId);
-static void func_ov012_02152c18(DeliveryIrcWork *pWork, DeliveryIrcSeq seq);
-static void func_ov012_02152c24(DeliveryIrcWork *pWork, DeliveryIrcSeq seq, u32 line);
-static void func_ov012_02152c2c(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02152c30(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02152c44(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void func_ov012_02152c5c(int netId, int size, const void *data, void *work, NetHandle *handle);
-static void *func_ov012_02152c68(int netId, void *work, int size);
-static void func_ov012_02152c70(void *work);
-static void func_ov012_02152c74(void *work);
-static void func_ov012_02152cf4(void *work);
-static void func_ov012_02152d1c(void *work);
-static void func_ov012_02152d3c(void *work);
-static void func_ov012_02152d8c(void *work);
-static void func_ov012_02152db4(void *work);
-static void func_ov012_02152e4c(void *work);
-static void func_ov012_02152f0c(void *work);
-static void func_ov012_02152fd0(void *work);
-static void func_ov012_0215302c(void *work);
-static void func_ov012_0215305c(void *work);
-static void func_ov012_0215307c(void *work);
-static BOOL func_ov012_021530cc(DeliveryIrcWork *pWork);
+static void DeliveryIrc_OnNegotiation(void *work, int netId);
+static void DeliveryIrc_SetSeq(DeliveryIrcWork *pWork, DeliveryIrcSeq seq);
+static void DeliveryIrc_SetSeqWithLine(DeliveryIrcWork *pWork, DeliveryIrcSeq seq, u32 line);
+static void DeliveryIrc_RecvData(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void DeliveryIrc_RecvHeader(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void DeliveryIrc_RecvWanted(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void DeliveryIrc_RecvNoData(int netId, int size, const void *data, void *work, NetHandle *handle);
+static void *DeliveryIrc_GetRecvBuffer(int netId, void *work, int size);
+static void DeliveryIrc_SeqIdle(void *work);
+static void DeliveryIrc_SeqCheckResult(void *work);
+static void DeliveryIrc_SeqExitParent(void *work);
+static void DeliveryIrc_SeqExitChild(void *work);
+static void DeliveryIrc_SeqWaitDoneTiming(void *work);
+static void DeliveryIrc_SeqSendDoneTiming(void *work);
+static void DeliveryIrc_SeqSendData(void *work);
+static void DeliveryIrc_SeqSendHeader(void *work);
+static void DeliveryIrc_SeqFindData(void *work);
+static void DeliveryIrc_SeqSendWanted(void *work);
+static void DeliveryIrc_SeqWaitConnect(void *work);
+static void DeliveryIrc_SeqConnect(void *work);
+static void DeliveryIrc_SeqWaitNetInit(void *work);
+static BOOL DeliveryIrc_InitNet(DeliveryIrcWork *pWork);
 
 // clang-format off
 static const NetCommand data_ov012_0216af3c[] = {
-    {func_ov012_02152c2c, func_ov012_02152c68},
-    {func_ov012_02152c30, NULL},
-    {func_ov012_02152c44, NULL},
-    {func_ov012_02152c5c, NULL},
+    {DeliveryIrc_RecvData, DeliveryIrc_GetRecvBuffer},
+    {DeliveryIrc_RecvHeader, NULL},
+    {DeliveryIrc_RecvWanted, NULL},
+    {DeliveryIrc_RecvNoData, NULL},
 };
 
 // clang-format on
@@ -81,7 +81,7 @@ static GFLNetInitData data_ov012_0216e110 = {
     data_ov012_0216af3c,
     NELEMS(data_ov012_0216af3c),
     NULL,
-    func_ov012_02152c0c,
+    DeliveryIrc_OnNegotiation,
     NULL,
     NULL,
     NULL,
@@ -117,24 +117,24 @@ static GFLNetInitData data_ov012_0216e110 = {
 
 // clang-format on
 
-static void func_ov012_02152c0c(void *work, int netId) {
+static void DeliveryIrc_OnNegotiation(void *work, int netId) {
     DeliveryIrcWork *pWork = work;
 
     pWork->negotiated = TRUE;
 }
 
-static void func_ov012_02152c18(DeliveryIrcWork *pWork, DeliveryIrcSeq seq) {
+static void DeliveryIrc_SetSeq(DeliveryIrcWork *pWork, DeliveryIrcSeq seq) {
     pWork->seq = seq;
 }
 
-static void func_ov012_02152c24(DeliveryIrcWork *pWork, DeliveryIrcSeq seq, u32 line) {
-    func_ov012_02152c18(pWork, seq);
+static void DeliveryIrc_SetSeqWithLine(DeliveryIrcWork *pWork, DeliveryIrcSeq seq, u32 line) {
+    DeliveryIrc_SetSeq(pWork, seq);
 }
 
-static void func_ov012_02152c2c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void DeliveryIrc_RecvData(int netId, int size, const void *data, void *work, NetHandle *handle) {
 }
 
-static void func_ov012_02152c30(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void DeliveryIrc_RecvHeader(int netId, int size, const void *data, void *work, NetHandle *handle) {
     DeliveryIrcWork *pWork = work;
     const DeliveryIrcHeader *header = data;
 
@@ -142,34 +142,34 @@ static void func_ov012_02152c30(int netId, int size, const void *data, void *wor
     pWork->seed = header->seed;
 }
 
-static void func_ov012_02152c44(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void DeliveryIrc_RecvWanted(int netId, int size, const void *data, void *work, NetHandle *handle) {
     DeliveryIrcWork *pWork = work;
     const DeliveryIrcWanted *wanted = data;
 
     pWork->wanted = *wanted;
 }
 
-static void func_ov012_02152c5c(int netId, int size, const void *data, void *work, NetHandle *handle) {
+static void DeliveryIrc_RecvNoData(int netId, int size, const void *data, void *work, NetHandle *handle) {
     DeliveryIrcWork *pWork = work;
     const u32 *noData = data;
 
     pWork->noData = *noData;
 }
 
-static void *func_ov012_02152c68(int netId, void *work, int size) {
+static void *DeliveryIrc_GetRecvBuffer(int netId, void *work, int size) {
     DeliveryIrcWork *pWork = work;
 
     return pWork->buffer;
 }
 
-static void func_ov012_02152c70(void *work) {
+static void DeliveryIrc_SeqIdle(void *work) {
 }
 
 // The receiver checks the data that came
-static void func_ov012_02152c74(void *work) {
+static void DeliveryIrc_SeqCheckResult(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         return;
     }
     if (pWork->isSender == FALSE) {
@@ -188,94 +188,95 @@ static void func_ov012_02152c74(void *work) {
     } else {
         pWork->result = 3;
     }
-    func_ov012_02152c24(pWork, func_ov012_02152c70, 248);
+    DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqIdle, 248);
 }
 
-static void func_ov012_02152cf4(void *work) {
+static void DeliveryIrc_SeqExitParent(void *work) {
     if (NetDevIrc_IsConnected()) {
-        func_02042860(NULL);
+        GFL_NetExit(NULL);
     }
-    func_ov012_02152c24(work, func_ov012_02152c74, 258);
+    DeliveryIrc_SetSeqWithLine(work, DeliveryIrc_SeqCheckResult, 258);
 }
 
-static void func_ov012_02152d1c(void *work) {
-    func_02042860(NULL);
-    func_ov012_02152c24(work, func_ov012_02152c74, 266);
+static void DeliveryIrc_SeqExitChild(void *work) {
+    GFL_NetExit(NULL);
+    DeliveryIrc_SetSeqWithLine(work, DeliveryIrc_SeqCheckResult, 266);
 }
 
-static void func_ov012_02152d3c(void *work) {
+static void DeliveryIrc_SeqWaitDoneTiming(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    if (func_02040664(func_02040440(), 35, (u8)pWork->aInit.code)) {
-        if (func_02042bc4()) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 35, (u8)pWork->aInit.code)) {
+        if (GFL_NetIsParent()) {
             NetDevIrc_SetTimeout(300);
-            func_ov012_02152c24(pWork, func_ov012_02152cf4, 275);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqExitParent, 275);
         } else {
-            func_ov012_02152c24(pWork, func_ov012_02152d1c, 278);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqExitChild, 278);
         }
     }
 }
 
-static void func_ov012_02152d8c(void *work) {
+static void DeliveryIrc_SeqSendDoneTiming(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    func_02040624(func_02040440(), 35, (u8)pWork->aInit.code);
-    func_ov012_02152c24(pWork, func_ov012_02152d3c, 287);
+    NetHandle_SendTimingPair(NetHandle_GetOwn(), 35, (u8)pWork->aInit.code);
+    DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqWaitDoneTiming, 287);
 }
 
 // The sender sends the data
-static void func_ov012_02152db4(void *work) {
+static void DeliveryIrc_SeqSendData(void *work) {
     DeliveryIrcWork *pWork = work;
     DeliveryData *data;
 
-    if (func_02040664(func_02040440(), 24, (u8)pWork->aInit.code)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code)) {
         if (pWork->isSender) {
             if (pWork->found == TRUE) {
                 data = &pWork->aInit.data[pWork->index];
-                if (func_02042c18(func_02040440(), 0xff, pWork->aInit.code << 8, data->datasize, data->pData, 0, FALSE,
-                                  TRUE)) {
-                    func_ov012_02152c24(pWork, func_ov012_02152d8c, 302);
+                if (GFL_NetSendCommandToMachine(NetHandle_GetOwn(), 0xff, pWork->aInit.code << 8, data->datasize,
+                                                data->pData, 0, FALSE, TRUE)) {
+                    DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendDoneTiming, 302);
                 }
             } else {
-                func_ov012_02152c24(pWork, func_ov012_02152d8c, 307);
+                DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendDoneTiming, 307);
             }
         } else {
-            func_ov012_02152c24(pWork, func_ov012_02152d8c, 311);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendDoneTiming, 311);
         }
     }
 }
 
 // The sender sends the header, or that it has no data
-static void func_ov012_02152e4c(void *work) {
+static void DeliveryIrc_SeqSendHeader(void *work) {
     DeliveryIrcWork *pWork = work;
     DeliveryIrcHeader header;
 
     if (pWork->found == TRUE) {
         header.crc = getCRC16(pWork->sendData->pData, pWork->sendData->datasize);
         header.seed = pWork->seed;
-        if (func_02042be8(func_02040440(), (u16)((pWork->aInit.code << 8) + 1), sizeof(DeliveryIrcHeader), &header)) {
-            func_02040624(func_02040440(), 24, (u8)pWork->aInit.code);
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), (u16)((pWork->aInit.code << 8) + 1), sizeof(DeliveryIrcHeader),
+                               &header)) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code);
             pWork->negotiated = FALSE;
-            func_ov012_02152c24(pWork, func_ov012_02152db4, 338);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendData, 338);
         }
     } else {
         pWork->noData = TRUE;
-        if (func_02042be8(func_02040440(), (u16)((pWork->aInit.code << 8) + 3), sizeof(pWork->noData),
-                          &pWork->noData)) {
-            func_02040624(func_02040440(), 24, (u8)pWork->aInit.code);
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), (u16)((pWork->aInit.code << 8) + 3), sizeof(pWork->noData),
+                               &pWork->noData)) {
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code);
             pWork->negotiated = FALSE;
-            func_ov012_02152c24(pWork, func_ov012_02152db4, 354);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendData, 354);
         }
     }
 }
 
 // The sender looks for data the receiver wants
-static void func_ov012_02152f0c(void *work) {
+static void DeliveryIrc_SeqFindData(void *work) {
     DeliveryIrcWork *pWork = work;
     DeliveryData *data;
     u32 i;
 
-    if (func_02040664(func_02040440(), 23, (u8)pWork->aInit.code)) {
+    if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), 23, (u8)pWork->aInit.code)) {
         if (pWork->isSender) {
             data = NULL;
             pWork->found = FALSE;
@@ -287,90 +288,90 @@ static void func_ov012_02152f0c(void *work) {
                     break;
                 }
             }
-            func_ov012_02152c24(pWork, func_ov012_02152e4c, 392);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendHeader, 392);
             if (pWork->found == TRUE) {
                 pWork->seed = GFL_RandomLC(0);
                 decryptData(data->pData, data->datasize, pWork->seed);
                 pWork->sendData = data;
             }
         } else {
-            func_02040624(func_02040440(), 24, (u8)pWork->aInit.code);
-            func_ov012_02152c24(pWork, func_ov012_02152db4, 403);
+            NetHandle_SendTimingPair(NetHandle_GetOwn(), 24, (u8)pWork->aInit.code);
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendData, 403);
         }
     }
 }
 
 // The receiver says what it wants
-static void func_ov012_02152fd0(void *work) {
+static void DeliveryIrc_SeqSendWanted(void *work) {
     DeliveryIrcWork *pWork = work;
 
     if (pWork->isSender == FALSE) {
         pWork->wanted.region = pWork->aInit.data[0].region;
         pWork->wanted.mask = pWork->aInit.data[0].mask;
-        if (func_02042be8(func_02040440(), (u16)((pWork->aInit.code << 8) + 2), sizeof(DeliveryIrcWanted),
-                          &pWork->wanted)) {
-            func_ov012_02152c24(pWork, func_ov012_02152f0c, 418);
+        if (GFL_NetSendCommand(NetHandle_GetOwn(), (u16)((pWork->aInit.code << 8) + 2), sizeof(DeliveryIrcWanted),
+                               &pWork->wanted)) {
+            DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqFindData, 418);
         }
     } else {
-        func_ov012_02152c24(pWork, func_ov012_02152f0c, 422);
+        DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqFindData, 422);
     }
 }
 
-static void func_ov012_0215302c(void *work) {
+static void DeliveryIrc_SeqWaitConnect(void *work) {
     DeliveryIrcWork *pWork = work;
 
-    if (func_02042a78() > 1) {
-        func_02040624(func_02040440(), 23, (u8)pWork->aInit.code);
-        func_ov012_02152c24(pWork, func_ov012_02152fd0, 431);
+    if (GFL_NetGetNegotiatedCount() > 1) {
+        NetHandle_SendTimingPair(NetHandle_GetOwn(), 23, (u8)pWork->aInit.code);
+        DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqSendWanted, 431);
     }
 }
 
-static void func_ov012_0215305c(void *work) {
-    func_020429f8(NULL);
-    func_ov012_02152c24(work, func_ov012_0215302c, 439);
+static void DeliveryIrc_SeqConnect(void *work) {
+    GFL_NetChangeoverConnect(NULL);
+    DeliveryIrc_SetSeqWithLine(work, DeliveryIrc_SeqWaitConnect, 439);
 }
 
-static void func_ov012_0215307c(void *work) {
-    if (func_02042788() == TRUE) {
-        func_ov012_02152c24(work, func_ov012_0215305c, 446);
+static void DeliveryIrc_SeqWaitNetInit(void *work) {
+    if (GFL_NetIsInitialized() == TRUE) {
+        DeliveryIrc_SetSeqWithLine(work, DeliveryIrc_SeqConnect, 446);
     }
 }
 
-void *func_ov012_0215309c(const DeliveryIrcInit *init) {
+void *DeliveryIrc_Init(const DeliveryIrcInit *init) {
     DeliveryIrcWork *pWork = GFL_HeapAllocate(init->heapId, sizeof(DeliveryIrcWork), TRUE, "delivery_irc.c", 461);
 
     MI_CpuCopy8(init, &pWork->aInit, sizeof(DeliveryIrcInit));
     return pWork;
 }
 
-static BOOL func_ov012_021530cc(DeliveryIrcWork *pWork) {
-    if (func_02042788()) {
+static BOOL DeliveryIrc_InitNet(DeliveryIrcWork *pWork) {
+    if (GFL_NetIsInitialized()) {
         return FALSE;
     }
     data_ov012_0216e110.gameCommandBase = pWork->aInit.code;
-    func_020425ec(&data_ov012_0216e110, NULL, pWork);
+    GFL_NetInit(&data_ov012_0216e110, NULL, pWork);
     return TRUE;
 }
 
-BOOL func_ov012_021530f8(void *work) {
+BOOL DeliveryIrc_RecvStart(void *work) {
     DeliveryIrcWork *pWork = work;
-    BOOL started = func_ov012_021530cc(pWork);
+    BOOL started = DeliveryIrc_InitNet(pWork);
 
     pWork->isSender = FALSE;
     pWork->found = FALSE;
     pWork->index = 0;
     pWork->noData = 0;
-    func_ov012_02152c24(pWork, func_ov012_0215307c, 561);
+    DeliveryIrc_SetSeqWithLine(pWork, DeliveryIrc_SeqWaitNetInit, 561);
     return started;
 }
 
-u8 func_ov012_02153130(void *work) {
+u8 DeliveryIrc_GetResult(void *work) {
     DeliveryIrcWork *pWork = work;
 
     return pWork->result;
 }
 
-void func_ov012_0215313c(void *work) {
+void DeliveryIrc_Main(void *work) {
     DeliveryIrcWork *pWork = work;
 
     if (pWork->seq != NULL) {
@@ -378,7 +379,7 @@ void func_ov012_0215313c(void *work) {
     }
 }
 
-void func_ov012_02153150(void *work) {
+void DeliveryIrc_End(void *work) {
     GFL_HeapFree(work);
-    func_02042860(NULL);
+    GFL_NetExit(NULL);
 }

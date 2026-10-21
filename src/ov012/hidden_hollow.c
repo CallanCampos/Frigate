@@ -66,7 +66,7 @@ u32 GetHiddenHollowEntranceParam(u8 hollow, u32 param) {
     return 0;
 }
 
-BOOL func_ov012_0216ac74(VM *vm, FieldScriptEnv *env) {
+BOOL s02C4_HiddenHollowSetPeriod(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env));
     HiddenHollowGimmick *gimmick = GimmickState_GetUserData(GameData_GetGimmickState(gameData), GIMMICK_HIDDEN_HOLLOW);
     int hour = getCurrentHour(gameData);

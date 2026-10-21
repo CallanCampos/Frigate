@@ -126,7 +126,7 @@ typedef struct {
 // A screen of the theater and its movie: the fields of the downloaded movie in its slot
 typedef struct {
     u32 screen;
-    // func_02010644's result, 1 when the slot has a movie
+    // Pokewood_LoadDownloadedMovie's result, 1 when the slot has a movie
     u32 loaded;
     s32 movie;
     // In tenths of a billion
@@ -459,7 +459,7 @@ static BOOL PkwdSelectScreen_Init(GameProc *proc, u32 *state, void *param, void 
     PkwdSelectScreen_PrintScreens(wk);
     PkwdSelectScreen_CreateBlinks(wk);
     wk->cursor = 0;
-    if (func_0203d554() == TRUE) {
+    if (GCTX_HIDIsUsingTouch() == TRUE) {
         wk->cursor = CURSOR_NONE;
         wk->touched = TRUE;
         PkwdSelectScreen_SetMarkVisible(wk, 0, FALSE);
@@ -470,7 +470,7 @@ static BOOL PkwdSelectScreen_Init(GameProc *proc, u32 *state, void *param, void 
     wk->state = STATE_FADE_IN;
     wk->vblankTask = GFL_VBlankTCBAdd(PkwdSelectScreen_VBlank, wk, 1);
     GFL_BGSysMoveBG(6, BG_MOVE_SET_Y, 16);
-    func_02042ba8(FALSE, HEAPID_PKWD_SELECTSCREEN);
+    GFL_NetSetIconScreen(FALSE, HEAPID_PKWD_SELECTSCREEN);
     return TRUE;
 }
 
@@ -543,7 +543,7 @@ static BOOL PkwdSelectScreen_Main(GameProc *proc, u32 *state, void *param, void 
     if (wk->tcbManager != NULL) {
         GFL_TCBExMgrUpdate(wk->tcbManager);
     }
-    func_02021a3c(wk->printQueue);
+    PrintQueue_Main(wk->printQueue);
     PkwdSelectScreen_FlushWindows(wk);
     if (wk->cursor >= 0) {
         BlinkPalAnm_Main(wk->blinks[wk->cursor]);
@@ -610,9 +610,9 @@ static void PkwdSelectScreenBG_LoadPoster(PkwdSelectScreenBG *bg, s32 movie, s32
 static TouchBar *PkwdSelectScreen_CreateTouchBar(PkwdSelectScreenWork *wk, ClActUnit *unit, HeapID heapId) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TOWNMAP_GRA, heapId);
 
-    wk->touchBarRes.chars = func_0204b81c(arc, 8, FALSE, 0, heapId);
-    wk->touchBarRes.palette = func_0204bbb8(arc, 0, 0, 14 * 0x20, 2, 2, heapId);
-    wk->touchBarRes.cellAnims = func_0204bde0(arc, 12, 19, heapId);
+    wk->touchBarRes.chars = ClActSys_LoadChars(arc, 8, FALSE, 0, heapId);
+    wk->touchBarRes.palette = ClActSys_LoadPlttRange(arc, 0, 0, 14 * 0x20, 2, 2, heapId);
+    wk->touchBarRes.cellAnims = ClActSys_LoadCellAnims(arc, 12, 19, heapId);
     GFL_ArcToolFree(arc);
     {
         TouchBarItem items[3] = {
@@ -636,9 +636,9 @@ static TouchBar *PkwdSelectScreen_CreateTouchBar(PkwdSelectScreenWork *wk, ClAct
 
 static void PkwdSelectScreen_FreeTouchBar(PkwdSelectScreenWork *wk) {
     TouchBar_Free(wk->touchBar);
-    func_0204bcd0(wk->touchBarRes.palette);
-    func_0204b98c(wk->touchBarRes.chars);
-    func_0204be64(wk->touchBarRes.cellAnims);
+    ClActSys_FreePltt(wk->touchBarRes.palette);
+    ClActSys_FreeChars(wk->touchBarRes.chars);
+    ClActSys_FreeCellAnims(wk->touchBarRes.cellAnims);
 }
 
 static void PkwdSelectScreen_UpdateTouchBar(TouchBar *touchBar) {
@@ -684,16 +684,16 @@ static void PkwdSelectScreen_UpdateMenu(AppTaskMenu *menu) {
 static void PkwdSelectScreen_LoadNewMarkRes(PkwdSelectScreenWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, HEAPID_PKWD_SELECTSCREEN);
 
-    wk->newRes.chars = func_0204b81c(arc, 21, FALSE, 0, HEAPID_PKWD_SELECTSCREEN);
-    wk->newRes.palette = func_0204bbb8(arc, 2, 0, 5 * 0x20, 0, 1, HEAPID_PKWD_SELECTSCREEN);
-    wk->newRes.cellAnims = func_0204bde0(arc, 27, 39, HEAPID_PKWD_SELECTSCREEN);
+    wk->newRes.chars = ClActSys_LoadChars(arc, 21, FALSE, 0, HEAPID_PKWD_SELECTSCREEN);
+    wk->newRes.palette = ClActSys_LoadPlttRange(arc, 2, 0, 5 * 0x20, 0, 1, HEAPID_PKWD_SELECTSCREEN);
+    wk->newRes.cellAnims = ClActSys_LoadCellAnims(arc, 27, 39, HEAPID_PKWD_SELECTSCREEN);
     GFL_ArcToolFree(arc);
 }
 
 static void PkwdSelectScreen_FreeNewMarkRes(PkwdSelectScreenWork *wk) {
-    func_0204bcd0(wk->newRes.palette);
-    func_0204b98c(wk->newRes.chars);
-    func_0204be64(wk->newRes.cellAnims);
+    ClActSys_FreePltt(wk->newRes.palette);
+    ClActSys_FreeChars(wk->newRes.chars);
+    ClActSys_FreeCellAnims(wk->newRes.cellAnims);
 }
 
 static void PkwdSelectScreen_CreateNewMarks(PkwdSelectScreenWork *wk) {
@@ -706,9 +706,9 @@ static void PkwdSelectScreen_CreateNewMarks(PkwdSelectScreenWork *wk) {
         setup.y = sPkwdSelectScreenNewMarkPos[i].y;
         setup.sequence = 1;
         setup.bgPriority = 2;
-        wk->newMarks[i] = func_0204c040(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->newRes.chars,
-                                        wk->newRes.palette, wk->newRes.cellAnims, &setup, 0, HEAPID_PKWD_SELECTSCREEN);
-        func_0204c520(wk->newMarks[i], TRUE);
+        wk->newMarks[i] = ClActor_Create(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->newRes.chars,
+                                         wk->newRes.palette, wk->newRes.cellAnims, &setup, 0, HEAPID_PKWD_SELECTSCREEN);
+        ClActor_SetAutoAnim(wk->newMarks[i], TRUE);
     }
 }
 
@@ -720,9 +720,9 @@ static void PkwdSelectScreen_ShowNewMarks(PkwdSelectScreenWork *wk, u32 page) {
         s32 screen = i + page * PAGE_SIZE;
 
         if (!func_020111a0(wk->param->save, screen)) {
-            func_0204c124(wk->newMarks[i], wk->sorted[screen]->loaded);
+            ClActor_SetVisible(wk->newMarks[i], wk->sorted[screen]->loaded);
         } else {
-            func_0204c124(wk->newMarks[i], FALSE);
+            ClActor_SetVisible(wk->newMarks[i], FALSE);
         }
     }
 }
@@ -731,23 +731,23 @@ static void PkwdSelectScreen_FreeNewMarks(PkwdSelectScreenWork *wk) {
     s32 i;
 
     for (i = 0; i < PAGE_SIZE; i++) {
-        func_0204c108(wk->newMarks[i]);
+        ClActor_Delete(wk->newMarks[i]);
     }
 }
 
 static void PkwdSelectScreen_LoadMarkRes(PkwdSelectScreenWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_PKWD, HEAPID_PKWD_SELECTSCREEN);
 
-    wk->markRes.chars = func_0204b81c(arc, 21, FALSE, 1, HEAPID_PKWD_SELECTSCREEN);
-    wk->markRes.palette = func_0204bbb8(arc, 2, 1, 0, 0, 3, HEAPID_PKWD_SELECTSCREEN);
-    wk->markRes.cellAnims = func_0204bde0(arc, 27, 39, HEAPID_PKWD_SELECTSCREEN);
+    wk->markRes.chars = ClActSys_LoadChars(arc, 21, FALSE, 1, HEAPID_PKWD_SELECTSCREEN);
+    wk->markRes.palette = ClActSys_LoadPlttRange(arc, 2, 1, 0, 0, 3, HEAPID_PKWD_SELECTSCREEN);
+    wk->markRes.cellAnims = ClActSys_LoadCellAnims(arc, 27, 39, HEAPID_PKWD_SELECTSCREEN);
     GFL_ArcToolFree(arc);
 }
 
 static void PkwdSelectScreen_FreeMarkRes(PkwdSelectScreenWork *wk) {
-    func_0204bcd0(wk->markRes.palette);
-    func_0204b98c(wk->markRes.chars);
-    func_0204be64(wk->markRes.cellAnims);
+    ClActSys_FreePltt(wk->markRes.palette);
+    ClActSys_FreeChars(wk->markRes.chars);
+    ClActSys_FreeCellAnims(wk->markRes.cellAnims);
 }
 
 static void PkwdSelectScreen_CreateMarks(PkwdSelectScreenWork *wk) {
@@ -760,9 +760,9 @@ static void PkwdSelectScreen_CreateMarks(PkwdSelectScreenWork *wk) {
         setup.y = sPkwdSelectScreenMarkPos[i].y;
         setup.sequence = 10;
         setup.bgPriority = 1;
-        wk->marks[i] = func_0204c040(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->markRes.chars,
-                                     wk->markRes.palette, wk->markRes.cellAnims, &setup, 1, HEAPID_PKWD_SELECTSCREEN);
-        func_0204c520(wk->marks[i], TRUE);
+        wk->marks[i] = ClActor_Create(PkwdSelectScreenGraphic_GetClActUnit(wk->graphic), wk->markRes.chars,
+                                      wk->markRes.palette, wk->markRes.cellAnims, &setup, 1, HEAPID_PKWD_SELECTSCREEN);
+        ClActor_SetAutoAnim(wk->marks[i], TRUE);
     }
 }
 
@@ -770,17 +770,17 @@ static void PkwdSelectScreen_FreeMarks(PkwdSelectScreenWork *wk) {
     s32 i;
 
     for (i = 0; i < MARK_COUNT; i++) {
-        func_0204c108(wk->marks[i]);
+        ClActor_Delete(wk->marks[i]);
     }
 }
 
 static void PkwdSelectScreen_SetMarkVisible(PkwdSelectScreenWork *wk, u32 mark, BOOL visible) {
-    func_0204c124(wk->marks[mark], visible);
+    ClActor_SetVisible(wk->marks[mark], visible);
 }
 
 static void PkwdSelectScreen_SetMarkSequence(PkwdSelectScreenWork *wk, u32 mark, s32 sequence) {
-    func_0204c488(wk->marks[mark], sequence);
-    func_0204c520(wk->marks[mark], TRUE);
+    ClActor_SetSequence(wk->marks[mark], sequence);
+    ClActor_SetAutoAnim(wk->marks[mark], TRUE);
 }
 
 // Sends the windows whose text is printed to VRAM
@@ -828,26 +828,26 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
     s32 loadedCount = 0;
     s32 emptyIdx = SCREEN_COUNT - 1;
 
-    func_0200c1f0();
+    BattleRec_LoadToolOverlay();
     allocatePokewoodBlk(HEAPID_PKWD_SELECTSCREEN);
     for (i = 0; i < SCREEN_COUNT; i++) {
         wk->movies[i].screen = i;
-        wk->movies[i].loaded = func_02010644(param->saveControl, HEAPID_PKWD_SELECTSCREEN, i);
+        wk->movies[i].loaded = Pokewood_LoadDownloadedMovie(param->saveControl, HEAPID_PKWD_SELECTSCREEN, i);
         if (wk->movies[i].loaded == 1) {
             PartyPkm *pkm = GFL_HeapAllocate(HEAPID_PKWD_SELECTSCREEN, PokeParty_GetPkmRawSize(), FALSE,
                                              "pkwd_selectscreen.c", 1570);
 
-            wk->movies[i].movie = func_020107f0(0, 0);
-            wk->movies[i].gross = func_020107f0(12, 0);
-            wk->movies[i].rank = func_020107f0(1, 0);
-            wk->movies[i].date = func_020107f0(10, 0);
-            wk->movies[i].time = func_020107f0(11, 0);
+            wk->movies[i].movie = Pokewood_GetLoadedMovieField(0, 0);
+            wk->movies[i].gross = Pokewood_GetLoadedMovieField(12, 0);
+            wk->movies[i].rank = Pokewood_GetLoadedMovieField(1, 0);
+            wk->movies[i].date = Pokewood_GetLoadedMovieField(10, 0);
+            wk->movies[i].time = Pokewood_GetLoadedMovieField(11, 0);
             wk->movies[i].watched = func_020111a0(param->save, i);
             for (j = 0; j < CAST_COUNT; j++) {
-                func_020107f0(2 + j, (u32)pkm);
+                Pokewood_GetLoadedMovieField(2 + j, (u32)pkm);
                 wk->movies[i].cast[j] = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
             }
-            func_020107f0(2, (u32)pkm);
+            Pokewood_GetLoadedMovieField(2, (u32)pkm);
             setPartyPokemonSpeciesNameToStrbuf(wk->movies[i].wordSet, 0, pkm);
             GFL_HeapFree(pkm);
         } else {
@@ -864,12 +864,12 @@ static void PkwdSelectScreen_LoadMovies(PkwdSelectScreenWork *wk, PkwdSelectScre
         }
     }
     freeAndClearPokewoodBlk();
-    func_0200c200();
+    BattleRec_UnloadToolOverlay();
 }
 
 // The row with a movie that was touched this frame, which takes the cursor, or CURSOR_NONE
 static s32 PkwdSelectScreen_ReadTouch(PkwdSelectScreenWork *wk) {
-    s32 row = func_0203da0c(sPkwdSelectScreenTouchRects);
+    s32 row = GFL_HIDGetTouchPressedRect(sPkwdSelectScreenTouchRects);
 
     if (row != TOUCH_RECT_NONE) {
         if (wk->sorted[PkwdSelectScreen_GetScreen(wk, row)]->loaded) {
@@ -915,7 +915,7 @@ static void PkwdSelectScreen_InitText(PkwdSelectScreenWork *wk) {
         wk->movies[i].wordSet = GFL_WordSetSystemCreateDefault(HEAPID_PKWD_SELECTSCREEN);
     }
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_PKWD_SELECTSCREEN);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->tcbManager = GFL_TCBExMgrCreate(wk->heapId, wk->heapId, 32, 32);
 }
 
@@ -924,7 +924,7 @@ static void PkwdSelectScreen_FreeText(PkwdSelectScreenWork *wk) {
 
     GFL_TCBExMgrFree(wk->tcbManager);
     GFL_MsgDataFree(wk->msgData);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     for (i = 0; i < SCREEN_COUNT; i++) {
         GFL_WordSetSystemFree(wk->sorted[i]->wordSet);
@@ -1055,8 +1055,8 @@ static void PkwdSelectScreen_PrintMessage(PkwdSelectScreenWork *wk, u32 messageI
     BmpWin_DrawFrame(window, 2, 0x20, 14);
     GFL_BitmapFill(BmpWin_GetBitmap(window), 0xff);
     GFL_MsgDataLoadStrbuf(wk->msgData, messageId, wk->strbuf);
-    wk->stream = func_02022268(window, 0, 0, wk->strbuf, wk->font, func_02017bcc(), wk->tcbManager, 4,
-                               HEAPID_PKWD_SELECTSCREEN, 15);
+    wk->stream = PrintStream_Create(window, 0, 0, wk->strbuf, wk->font, TextSpeed_GetCurrentWait(), wk->tcbManager, 4,
+                                    HEAPID_PKWD_SELECTSCREEN, 15);
     BmpWin_TransferNow(window);
 }
 
@@ -1161,7 +1161,7 @@ static s32 PkwdSelectScreen_GetLastCursor(PkwdSelectScreenWork *wk) {
 static BOOL PkwdSelectScreen_Input(PkwdSelectScreenWork *wk) {
     s32 picked = CURSOR_NONE;
 
-    if (!func_02021c0c(wk->printQueue)) {
+    if (!PrintQueue_IsEmpty(wk->printQueue)) {
         return FALSE;
     }
     if (!TouchBar_IsTouching(wk->touchBar)) {
@@ -1210,14 +1210,14 @@ static BOOL PkwdSelectScreen_WaitBlink(PkwdSelectScreenWork *wk) {
 }
 
 static BOOL PkwdSelectScreen_WaitMessage(PkwdSelectScreenWork *wk) {
-    switch (func_020223b4(wk->stream)) {
+    switch (PrintStream_GetState(wk->stream)) {
     case PRINT_STREAM_DONE:
-        func_020223cc(wk->stream);
+        PrintStream_Delete(wk->stream);
         wk->state = wk->nextState;
         break;
     case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(wk->stream, 0);
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
+            PrintStream_SkipWait(wk->stream, 0);
         }
         break;
     }

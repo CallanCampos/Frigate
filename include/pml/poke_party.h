@@ -194,7 +194,7 @@ BOOL doesPokeHavePokerus(BoxPkm *pkm);
 // The same two for a Pokémon of the party
 BOOL pokerusDuration(PartyPkm *pkm);
 BOOL pokeHasPkrs(PartyPkm *pkm);
-BoxPkm *func_0201d620(PartyPkm *pkm);
+BoxPkm *PokeParty_GetBoxPkm(PartyPkm *pkm);
 // Puts a move in a slot with its full PP and no PP Ups
 void PML_PkmSetMove(BoxPkm *pkm, u16 move, u8 slot);
 // How a nature changes a stat, in the order attack, defense, special attack, special defense and speed from 1:
@@ -270,7 +270,7 @@ PartyPkm *PokeParty_GetPkm(PokeParty *party, u32 index);
 // A flag of each slot, kept in the party
 BOOL PokeParty_GetSlotExists(PokeParty *party, u32 slot);
 void PokeParty_SetSlotExists(PokeParty *party, u32 slot, BOOL exists);
-BoxPkm *func_0201d624(PartyPkm *pkm);
+BoxPkm *PokeParty_ToBoxPkm(PartyPkm *pkm);
 // A new party Pokémon made from a box Pokémon, with its stats calculated
 PartyPkm *boxPkmRegenToPartyPkm(BoxPkm *pkm, HeapID heapId);
 int PokeParty_GetPkmCount(PokeParty *party);
@@ -286,7 +286,7 @@ BOOL PokeParty_AddPkm(PokeParty *party, PartyPkm *pkm);
 BOOL PokeParty_RemovePkm(PokeParty *party, u32 index);
 BOOL PokeParty_SwapPkms(PokeParty *party, u32 indexA, u32 indexB, HeapID heapId);
 // Reorders the party: order[i] is the index of the Pokémon that goes to position i
-void func_0201fff8(PokeParty *party, u32 *order, HeapID heapId);
+void PokeParty_Reorder(PokeParty *party, u32 *order, HeapID heapId);
 void PokeParty_RecoverAll(PokeParty *party);
 // A Pokémon's icon in archive 7: its file, and the palette of the file PokeIcon_GetPaletteFile returns that it uses.
 // The cells and animations depend on the sub engine's OBJ VRAM mapping: PokeIcon_GetCellFile_Sub and

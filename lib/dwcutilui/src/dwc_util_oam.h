@@ -17,20 +17,20 @@ struct DWCUtilOamNode {
     u8 count;
 };
 
-void func_ov182_021bb480(void);
-void func_ov182_021bb54c(void);
+void DWCUtilOam_Init(void);
+void DWCUtilOam_Exit(void);
 // A run of count entries, the first free one from the front if fromFront, else from the back
-DWCUtilOamNode *func_ov182_021bb594(int screen, int count, BOOL fromFront);
+DWCUtilOamNode *DWCUtilOam_Alloc(int screen, int count, BOOL fromFront);
 // Hides the run's entries and frees it
-void func_ov182_021bb690(DWCUtilOamNode *node);
-GXOamAttr *func_ov182_021bb6ec(DWCUtilOamNode *node, int index);
-int func_ov182_021bb6f4(DWCUtilOamNode *node);
+void DWCUtilOam_Free(DWCUtilOamNode *node);
+GXOamAttr *DWCUtilOam_GetEntry(DWCUtilOamNode *node, int index);
+int DWCUtilOam_GetCount(DWCUtilOamNode *node);
 // The functions that change the run's entries change the one at index, or every entry if index is negative
-void func_ov182_021bb6f8(DWCUtilOamNode *node, int index, int effect, int rsParam);
-void func_ov182_021bb778(DWCUtilOamNode *node, int index, int mode, int cParam);
+void DWCUtilOam_SetEffect(DWCUtilOamNode *node, int index, int effect, int rsParam);
+void DWCUtilOam_SetMode(DWCUtilOamNode *node, int index, int mode, int cParam);
 // Moves the entry, or the whole run with its first entry at (x, y)
-void func_ov182_021bb7e0(DWCUtilOamNode *node, int index, int x, int y);
-void func_ov182_021bb878(DWCUtilOamNode *node, int index, int priority);
-void func_ov182_021bb8bc(DWCUtilOamNode *node, int index, int *x, int *y);
+void DWCUtilOam_SetNodePosition(DWCUtilOamNode *node, int index, int x, int y);
+void DWCUtilOam_SetPriority(DWCUtilOamNode *node, int index, int priority);
+void DWCUtilOam_GetNodePosition(DWCUtilOamNode *node, int index, int *x, int *y);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_OAM_H

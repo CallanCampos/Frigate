@@ -12,11 +12,11 @@ typedef struct MailData {
     u8 trainerGender;
     u8 region;
     u8 gameVersion;
-    u8 unk07;
+    u8 design;
     u16 trainerName[8];
     u16 unk18[3];
-    // 0xffff when there is none
-    u16 unk1E;
+    // The word of the mail's stamp, 0xffff when there is none
+    u16 stampWord;
     PMSData message[3];
 } MailData;
 
@@ -25,39 +25,39 @@ typedef struct MailData {
 #define MAIL_DESIGN_MAX 11
 
 // Whether the mail is filled in, which is when its design is one of the MAIL_DESIGN_COUNT
-BOOL func_020096a8(const MailData *mail);
+BOOL MailData_IsValid(const MailData *mail);
 // Allocates a blank mail
 MailData *CreateMailData(HeapID heapId);
 // Empties the mail
 void ResetMailData(MailData *mail);
 void copyMailMsg(const MailData *src, MailData *dest);
 // Empties the mail, then sets its design and the author's info from the game data
-void func_020096f8(MailData *mail, u32 design, u32 unused, GameData *gameData);
-u32 func_02009730(const MailData *mail);
-u16 *func_02009734(MailData *mail);
+void MailData_InitForPlayer(MailData *mail, u32 design, u32 unused, GameData *gameData);
+u32 MailData_GetTrainerID(const MailData *mail);
+u16 *MailData_GetTrainerName(MailData *mail);
 // Sets the mail's author's name
-void func_02009738(MailData *mail, const u16 *name);
-u8 func_0200974c(const MailData *mail);
-u8 func_02009750(const MailData *mail);
-void func_02009754(MailData *mail, u32 design);
-u8 func_0200975c(const MailData *mail);
-u8 func_02009760(const MailData *mail);
-u16 func_02009764(const MailData *mail);
-void func_02009768(MailData *mail, u16 value);
-PMSData *func_0200976c(MailData *mail, u8 index);
-void func_0200977c(MailData *mail, const PMSData *src, u8 index);
+void MailData_SetTrainerName(MailData *mail, const u16 *name);
+u8 MailData_GetTrainerGender(const MailData *mail);
+u8 MailData_GetDesign(const MailData *mail);
+void MailData_SetDesign(MailData *mail, u32 design);
+u8 MailData_GetRegion(const MailData *mail);
+u8 MailData_GetGameVersion(const MailData *mail);
+u16 MailData_GetStampWord(const MailData *mail);
+void MailData_SetStampWord(MailData *mail, u16 value);
+PMSData *MailData_GetMessage(MailData *mail, u8 index);
+void MailData_SetMessage(MailData *mail, const PMSData *src, u8 index);
 // The save block of mail, and its size
-void *func_02009790(GameData *gameData);
-u32 func_020097a0(void);
+void *MailBox_GetFromGameData(GameData *gameData);
+u32 MailBox_GetSize(void);
 // Empties all of the mails of a mailbox
-void func_020097a8(MailData *mails);
+void MailBox_Clear(MailData *mails);
 // The mail of the save's mailbox (box 0) or of a Pokémon: the free slot, and clearing, copying and reading a slot's
 // mail
-s32 func_020097c4(MailData *mails, u32 box);
-void func_020097d0(MailData *mails, u32 box, u32 index);
-void func_020097e0(MailData *mails, u32 box, u32 index, const MailData *mail);
-MailData *func_020097f4(MailData *mails, u32 box, u32 index, HeapID heapId);
-s32 func_02009818(MailData *mails, s32 count);
-MailData *func_02009844(MailData *mails, u32 box, s32 index);
+s32 MailBox_GetFreeSlot(MailData *mails, u32 box);
+void MailBox_ResetMail(MailData *mails, u32 box, u32 index);
+void MailBox_SetMail(MailData *mails, u32 box, u32 index, const MailData *mail);
+MailData *MailBox_CopyMail(MailData *mails, u32 box, u32 index, HeapID heapId);
+s32 MailBox_FindFree(MailData *mails, s32 count);
+MailData *MailBox_GetMail(MailData *mails, u32 box, s32 index);
 
 #endif // POKEBW2_PML_MAIL_H

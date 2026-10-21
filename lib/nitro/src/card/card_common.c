@@ -1,6 +1,6 @@
 // NitroSDK's CARD library, the part that ROM and backup commands share: initialization, the lock of the card's
-// resources, the thread that runs the commands' tasks, and the cache handling around the ARM7's DMA. The file name is
-// a guess, descriptive from the SDK's structure (card_common.c); the library has no file name string.
+// resources and the command block; card_task.c, which follows it, has the thread that runs the commands' tasks. The
+// file name is a guess, descriptive from the SDK's structure (card_common.c); the library has no file name string.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -26,16 +26,11 @@ static void CARDi_LockResource(u16 lockId, int target);
 static void CARDi_UnlockResource(u16 lockId, int target);
 static int CARDi_InitResourceLock(void);
 static void CARDi_InitCommand(void);
-static void CARDi_OldTypeTaskThread(void *arg); // swan's cart_read_thread_proc
 
-// The first node of the list of hooks has only its link in use. The statics lie in memory in reverse of the order here
-static CARDHookContext sCardHookRoot;
+// The statics lie in memory in reverse of the order here
 CARDiCommon cardi_common;
 static CARDiCommandArg cardi_arg;
 static BOOL sCardEnabled;
-
-// The interface for the DS's DMA channels
-static const CARDDmaInterface sCardDmaInterface = { MIi_CardDmaCopy32, MI_StopDma };
 
 // Calls the condition each frame, at the first line of the vertical blank, until it holds
 static void CARDi_PollRomLock(void *arg) {
@@ -234,129 +229,4 @@ static void CARDi_InitCommand(void) {
     MI_CpuClearFast(&cardi_arg, sizeof(CARDiCommandArg));
     DC_FlushRange(&cardi_arg, sizeof(CARDiCommandArg));
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_FS, CARDi_OnFifoRecv);
-}
-
-// CARDi_NotifyEvent: calls each hook with the event. The walk keeps the link before the current hook and moves it on
-// only if the hook is still there, so a hook may remove itself
-void CARDi_NotifyEvent(u32 command, u32 value) {
-    u32 irq = OS_DisableInterrupts();
-    CARDHookContext *prev = &sCardHookRoot;
-    CARDHookContext *hook = sCardHookRoot.next;
-    for (; hook != NULL; hook = prev->next) {
-        if (hook->callback != NULL) {
-            hook->callback(hook->userdata, command, value);
-        }
-        if (prev->next == hook) {
-            prev = prev->next;
-        }
-    }
-    OS_RestoreInterrupts(irq);
-}
-
-// Runs a task: on the thread if async, otherwise here and now. An async task is done when its callback is called
-BOOL CARDi_ExecuteOldTypeTask(CARDiTask task, BOOL async) {
-    CARDiCommon *p = &cardi_common;
-    if (async) {
-        OS_SetThreadPriority(&p->thread, p->priority);
-        p->task = task;
-        p->flag |= CARD_STAT_TASK;
-        OS_WakeupThreadDirect(&p->thread);
-    } else {
-        task(p);
-        CARDi_EndTask(p);
-    }
-    if (async) {
-        return TRUE;
-    }
-    return p->cmd->result == CARD_RESULT_SUCCESS;
-}
-
-// Sleeps until a task is set, then runs it
-static void CARDi_OldTypeTaskThread(void *arg) {
-    CARDiCommon *p = &cardi_common;
-    while (TRUE) {
-        u32 irq = OS_DisableInterrupts();
-        for (;;) {
-            if ((p->flag & CARD_STAT_TASK) != 0) {
-                break;
-            }
-            OS_SleepThread(NULL);
-        }
-        OS_RestoreInterrupts(irq);
-        CARDi_ExecuteOldTypeTask(p->task, FALSE);
-    }
-}
-
-// Waits until the last command is done. A command that starts takes over the thread, with the callback to call when
-// it ends. Returns whether the command block holds a success
-BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg) {
-    u32 irq = OS_DisableInterrupts();
-    while ((p->flag & CARD_STAT_BUSY) != 0) {
-        OS_SleepThread(&p->busyQueue);
-    }
-    if (start) {
-        p->flag |= CARD_STAT_BUSY;
-        p->callback = callback;
-        p->callbackArg = arg;
-    }
-    OS_RestoreInterrupts(irq);
-    return p->cmd->result == CARD_RESULT_SUCCESS;
-}
-
-// Ends a command: lets the next one start, then calls the callback of the one that ended
-void CARDi_EndTask(CARDiCommon *p) {
-    MIDmaCallback callback = p->callback;
-    void *arg = p->callbackArg;
-    u32 irq = OS_DisableInterrupts();
-    p->flag &= ~(CARD_STAT_BUSY | CARD_STAT_TASK | CARD_STAT_CANCEL);
-    OS_WakeupThread(&p->busyQueue);
-    OS_RestoreInterrupts(irq);
-    if (callback != NULL) {
-        callback(arg);
-    }
-}
-
-// The interface of a DMA channel for ROM reads: bit 4 of the number picks the DSi's new DMA, which only a DSi has.
-// NULL for a channel that doesn't exist
-const CARDDmaInterface *CARDi_GetDmaInterface(u32 dma) {
-    const CARDDmaInterface *interface = NULL;
-    BOOL twl = (dma & 0x10) != 0;
-    dma &= ~0x10;
-    if (dma <= 3) {
-        if (!twl) {
-            interface = &sCardDmaInterface;
-        } else if (!OS_IsRunOnTwl()) {
-            OS_Terminate();
-        } else {
-            interface = &CARDi_NdmaInterface;
-        }
-    }
-    return interface;
-}
-
-// Discards the instruction cache of a range, or all of it from the threshold on
-void CARDi_ICInvalidateSmart(void *addr, u32 len, u32 threshold) {
-    if (len >= threshold) {
-        IC_InvalidateAll();
-    } else {
-        IC_InvalidateRange(addr, len);
-    }
-}
-
-// Discards the data cache of a range, or all of it from the threshold on. The lines at the ends of a range that they
-// share with other data are written back first
-void CARDi_DCInvalidateSmart(void *addr, u32 len, u32 threshold) {
-    if (len >= threshold) {
-        DC_FlushAll();
-    } else {
-        u32 offset = (u32)addr & 0x1f;
-        if (offset != 0) {
-            addr = (u8 *)addr - offset;
-            DC_StoreRange(addr, 0x20);
-            DC_StoreRange((u8 *)addr + len, 0x20);
-            len += 0x20;
-        }
-        DC_InvalidateRange(addr, len);
-        DC_WaitWriteBufferEmpty();
-    }
 }

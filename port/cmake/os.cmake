@@ -63,7 +63,7 @@ set(port_os_scenarios
     switch_callback hblank_lines hblank_main_loop hblank_flag_in_handler dispstat_gates_blanks
     frame_hooks_on_host_stack timed_work irq_on_switch_in async_completion waits request_irq scanline_hook
     display_registers timers_and_tick stop_from_frame_hook arenas locks console deadlock determinism boot_cpsr
-    destroy_many wait_vcount0 valarm_each_run)
+    destroy_many wait_vcount0 valarm_each_run wcm_workspace)
 foreach(scenario IN LISTS port_os_scenarios)
     add_test(NAME os_${scenario} COMMAND port_os_tests ${scenario})
     set_tests_properties(os_${scenario} PROPERTIES TIMEOUT 60)

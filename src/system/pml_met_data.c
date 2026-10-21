@@ -35,8 +35,8 @@ static void PML_PkmSyncMetLevel(BoxPkm *pkm);
 static void PML_PkmSyncOriginGame(BoxPkm *pkm);
 static void PML_PkmSetSpecialTransferUsed(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo);
 
-void PokeParty_SetupMetData(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo, u16 placeName, HeapID heapId) {
-    PML_UtilSetupMetData(func_0201d620(pkm), kind, playerInfo, placeName, heapId);
+void PokeParty_SetupMetData(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo, u32 placeName, HeapID heapId) {
+    PML_UtilSetupMetData(PokeParty_GetBoxPkm(pkm), kind, playerInfo, placeName, heapId);
 }
 
 void PML_UtilSetupMetData(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo, u32 placeName, HeapID heapId) {
@@ -186,7 +186,7 @@ static void PML_PkmSyncOriginGame(BoxPkm *pkm) {
 }
 
 BOOL PokeParty_IsSpecialTransfer(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo) {
-    return special_transfers(func_0201d620(pkm), kind, playerInfo);
+    return special_transfers(PokeParty_GetBoxPkm(pkm), kind, playerInfo);
 }
 
 BOOL special_transfers(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo) {
@@ -268,7 +268,7 @@ BOOL special_transfers(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo) {
 }
 
 void PokeParty_SetSpecialTransferUsed(PartyPkm *pkm, u32 kind, PlayerInfo *playerInfo) {
-    PML_PkmSetSpecialTransferUsed(func_0201d620(pkm), kind, playerInfo);
+    PML_PkmSetSpecialTransferUsed(PokeParty_GetBoxPkm(pkm), kind, playerInfo);
 }
 
 static void PML_PkmSetSpecialTransferUsed(BoxPkm *pkm, u32 kind, PlayerInfo *playerInfo) {

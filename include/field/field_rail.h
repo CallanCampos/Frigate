@@ -3,8 +3,11 @@
 
 // The rail system of the no-grid maps, where the player moves along rails. Function names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except FieldRailSystem_Free, FieldRailSystem_Reset and
-// FieldRailSystem_SetLineEnabled. Layouts from swan's RailPoint, RailLine, RailCurve, RailCamera, RailDataHandle,
-// RailUnit and FieldRailSystem
+// FieldRailSystem_SetLineEnabled, RailUnit_GetMoveDirection, RailUnit_IsMovePending, RailUnit_GetLineDirection,
+// RailUnit_RequestMove, RailUnit_UpdateMove, RailUnit_GetRailPos, RailUnit_IsRailPosInBounds,
+// RailUnit_PredictNextPos and RailUnit_GetPreviousCalcPos, which are our descriptive names. Layouts from swan's
+// RailPoint, RailLine, RailCurve, RailCamera, RailDataHandle, RailUnit and FieldRailSystem. Additional movement state
+// field names describe recovered behavior; direction follows swan's Direction field.
 
 #include "types.h"
 #include "field/zone.h"
@@ -84,16 +87,23 @@ struct RailDisabledLines {
     u16 lineIds[18];
 };
 
+// RailUnit's component tag; a unit has no component before placement
+enum {
+    RAIL_COMPONENT_POINT = 0,
+    RAIL_COMPONENT_LINE = 1,
+    RAIL_COMPONENT_NONE = 2,
+};
+
 // Something that moves along the rails: the point it is at, or the line, with its position along the line (front)
 // and across it (side), in sixteenths of a tile
 struct RailUnit {
-    u16 onLine;
+    u16 onLine; // RAIL_COMPONENT_*, the tag of component
     u16 acquired;
     union {
         RailPoint *point;
         RailLine *line;
     } component;
-    u16 active;
+    u16 positionInitialized; // Set after a rail position is initialized
     s32 front;
     s32 length;
     s32 side;
@@ -102,12 +112,12 @@ struct RailUnit {
     u32 dir;
     RailDataHandle *handle;
     RailDisabledLines *disabled;
-    u8 pending;
-    s8 counter;
-    u16 pendingArgB;
-    u16 pendingArgA;
-    u8 unk32;
-    u8 unk33;
+    u8 movePending;
+    s8 moveProgress; // Attempted sixteenths toward the current 16-sixteenth request
+    u16 pendingDir;
+    u16 pendingSpeedIndex;
+    u8 direction;          // Placement/accepted move direction, distinct from dir in the stored rail position
+    u8 lastMoveSpeedIndex; // Accepted request speed index; placement initializes it to 1
     u8 unk34;
     VecFx32 calcPos;
     VecFx32 prevCalcPos;
@@ -164,6 +174,7 @@ RailUnit *FieldRailSystem_AcquireUnit(FieldRailSystem *rail);
 void FieldRailSystem_ReleaseUnit(FieldRailSystem *rail, RailUnit *unit);
 void FieldRailSystem_SetCameraParent(FieldRailSystem *rail, RailUnit *unit);
 void FieldRailSystem_ClearCameraParent(FieldRailSystem *rail);
+void FieldRailSystem_GetCameraParentPos(FieldRailSystem *rail, VecFx32 *pos);
 // Does nothing: what is left of a check whether the rails are loaded and active
 void func_ov036_021b0398(FieldRailSystem *rail);
 // Updates the camera from its parent unit when the unit asks for it, the camera is dirty or force is set
@@ -186,30 +197,57 @@ BOOL func_ov036_021b068c(FieldRailSystem *rail, const RailPosition *railPos, u32
 void func_ov036_021b06ec(FieldRailSystem *rail, const RailPosition *railPos, VecFx32 *pos);
 s32 func_ov036_021b0704(FieldRailSystem *rail, const RailPosition *pos);
 void FieldRailSystem_SetPlayerPos(FieldRailSystem *rail, const RailPosition *pos);
-void func_ov036_021b0774(RailUnit *unit, RailPosition *pos);
-// Whether the rail position is on the rail data
-BOOL func_ov036_021b0794(RailUnit *unit, const RailPosition *pos);
-// The rail and world position a step from the unit in a direction, kept until the unit moves, and whether there is one
-u8 func_ov036_021b0814(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec);
-void func_ov036_021b0888(RailUnit *unit, VecFx32 *pos);
+void RailUnit_GetRailPos(const RailUnit *unit, RailPosition *pos);
+// Checks the component ID and, for lines, the front and side bounds
+BOOL RailUnit_IsRailPosInBounds(RailUnit *unit, const RailPosition *pos);
+// Caches a one-tile attempt in dir until the unit moves. Either output may be NULL; requested outputs are filled
+// even when the attempt fails.
+u8 RailUnit_PredictNextPos(RailUnit *unit, u32 dir, RailPosition *outPos, VecFx32 *outVec);
+void RailUnit_GetPreviousCalcPos(RailUnit *unit, VecFx32 *pos);
 void RailUnit_SetRailPos(RailUnit *unit, const RailPosition *pos);
 void RailUnit_GetCalcPos(RailUnit *unit, VecFx32 *pos);
-u8 func_ov036_021b09ec(RailUnit *unit);
-// Whether the unit has a step to take
-u8 func_ov036_021b09f4(RailUnit *unit);
+// The placement direction or most recent accepted movement result
+u8 RailUnit_GetMoveDirection(RailUnit *unit);
+// Whether a move is queued or in progress
+u8 RailUnit_IsMovePending(RailUnit *unit);
 // The unit vector along the unit's line
 void func_ov036_021b0a04(RailUnit *unit, VecFx16 *dir);
-u32 func_ov036_021b0a8c(RailUnit *unit);
-// Starts a step of speed index speed in a direction, FALSE if the unit is already taking one
-BOOL func_ov036_021b0a94(RailUnit *unit, u32 speed, u32 dir);
-// Moves the unit on with its step
-void func_ov036_021b0ac0(RailUnit *unit);
+// The current line's direction; requires a unit placed on a line
+u32 RailUnit_GetLineDirection(RailUnit *unit);
+// Queues a move when idle. speedIndex must be 0..4 and dir a rail direction.
+BOOL RailUnit_RequestMove(RailUnit *unit, u32 speedIndex, u32 dir);
+// Attempts the indexed step, ending the request on completion or failure
+void RailUnit_UpdateMove(RailUnit *unit);
+FieldCamera *FieldRailSystem_GetFieldCamera(FieldRailSystem *rail);
+RailUnit *FieldRailSystem_GetCameraParentUnit(FieldRailSystem *rail);
+RailPoint *FieldRailSystem_GetPoint(FieldRailSystem *rail, u32 id);
+RailLine *FieldRailSystem_GetLine(FieldRailSystem *rail, u32 id);
+RailCurve *GetRailHnd2Curve(FieldRailSystem *rail, u32 id);
+fx32 FieldRailSystem_GetTileWidth(FieldRailSystem *rail);
+RailUnit *func_ov036_021b0c00(FieldRailSystem *rail);
+void func_ov036_021b0c04(const FieldRailSystem *rail, const RailPosition *in, RailPosition *out);
+// Returns the RAIL_COMPONENT_* tag
+u16 RailUnit_IsOnLine(RailUnit *unit);
+RailLine *GetCurrentLine(RailUnit *unit);
+s32 GetCurrentLinePosV(RailUnit *unit);
+s32 GetCurrentLineLength(RailUnit *unit);
+s32 GetCurrentLinePosH(RailUnit *unit);
+s32 func_ov036_021b0cb8(RailUnit *unit);
+fx32 RailUnit_GetTileWidth(RailUnit *unit);
+RailCamera *GetRailCameraByCamHandler(RailUnit *unit);
+void func_ov036_021b0cc8(RailUnit *unit, VecFx32 *pos);
+void func_ov036_021b0cdc(RailUnit *unit, s32 front, VecFx32 *pos);
+RailPoint *GetCurrentRailLinePoint1(RailUnit *unit);
+RailPoint *GetCurrentRailLinePoint2(RailUnit *unit);
+RailCurve *RailUnit_GetCurve(RailUnit *unit);
+RailCamera *GetRailCameraByPoint(RailUnit *unit, RailPoint *point);
+s32 func_ov036_021b0d2c(s32 value);
 // Whether two positions are within dist of each other across and half a tile up or down
 BOOL func_ov036_021b0d64(const VecFx32 *a, const VecFx32 *b, fx32 dist);
 // Writes the unit's rail position to three script variables, or sets it from three values
-void SetWkToActorRailPos(RailUnit *unit, u16 *a1, u16 *a2, u16 *a3);
+void SetWkToActorRailPos(const RailUnit *unit, u16 *a1, u16 *a2, u16 *a3);
 void func_ov036_021b0e38(RailUnit *unit, u16 a1, u16 a2, u16 a3);
-// The curves' conversions between rail and world positions
+// field_rail_func.c: the curves' conversions between rail and world positions
 void RailMath_RailToWorldNoCurve(RailUnit *unit, VecFx32 *out);
 void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out);
 void RailMath_RailToWorldSlerpXYZ(RailUnit *unit, VecFx32 *out);

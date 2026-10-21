@@ -1,0 +1,18 @@
+# Collects user benefits and scope for Frigate's native platform features; implementation lives in port/.
+name: Frigate feature
+description: Propose an improvement to the native port.
+title: "[Port] "
+body:
+  - type: textarea
+    id: benefit
+    attributes:
+      label: Who benefits and what problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed behavior and scope
+      description: Describe a concrete example and any alternatives you considered.
+    validations:
+      required: true

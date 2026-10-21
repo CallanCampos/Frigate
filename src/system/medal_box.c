@@ -35,7 +35,7 @@ static void MedalInfo_SetDate(MedalInfo *info, u8 year, u8 month, u8 day) {
 void MedalBox_Init(MedalBox *box) {
     MI_CpuFill8(box, 0, sizeof(MedalBox));
     box->lastMedal = 0xff;
-    func_02010ca0(MedalBox_GetHabitatList(box));
+    ZukanHabitatSave_Init(MedalBox_GetHabitatList(box));
 }
 
 u32 MedalBox_GetBlockSize(void) {
@@ -146,12 +146,12 @@ u32 MedalBox_GetObtainedCount(MedalBox *box, BOOL countEarned) {
     return count;
 }
 
-u8 func_0200fb28(MedalBox *box) {
-    return box->unk3FE;
+u8 MedalBox_IsManualShown(MedalBox *box) {
+    return box->manualShown;
 }
 
-void func_0200fb34(MedalBox *box) {
-    box->unk3FE = TRUE;
+void MedalBox_SetManualShown(MedalBox *box) {
+    box->manualShown = TRUE;
 }
 
 MedalBox *SaveControl_GetMedalBox(SaveControl *save) {

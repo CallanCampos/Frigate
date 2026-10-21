@@ -238,9 +238,9 @@ static void LocalTvtCallSelect_LoadResources(LocalTvtCallSelect *select, HeapID 
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_TVT, heapId);
 
     LoadSysMsgBox(4, 0x140, 9, 0, heapId);
-    select->palette = func_0204bc48(arc, 3, 1, 0, heapId);
-    select->chars = func_0204b81c(arc, 25, FALSE, 1, heapId);
-    select->cellAnims = func_0204bde0(arc, 19, 22, heapId);
+    select->palette = ClActSys_LoadPlttEx(arc, 3, 1, 0, heapId);
+    select->chars = ClActSys_LoadChars(arc, 25, FALSE, 1, heapId);
+    select->cellAnims = ClActSys_LoadCellAnims(arc, 19, 22, heapId);
     GFL_BGSysLoadArcNCGRStatic(arc, 12, 4, 0, 0x2800, FALSE, heapId);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 18, 4, 0, 0, FALSE, heapId);
     GFL_BGSysLoadScr(4);
@@ -250,9 +250,9 @@ static void LocalTvtCallSelect_LoadResources(LocalTvtCallSelect *select, HeapID 
 static void LocalTvtCallSelect_FreeResources(LocalTvtCallSelect *select) {
     GFL_BGSysClearScr(4);
     GFL_BGSysLoadScr(4);
-    func_0204be64(select->cellAnims);
-    func_0204b98c(select->chars);
-    func_0204bcd0(select->palette);
+    ClActSys_FreeCellAnims(select->cellAnims);
+    ClActSys_FreeChars(select->chars);
+    ClActSys_FreePltt(select->palette);
 }
 
 static int LocalTvtCallSelect_Touch(void *work) {
@@ -374,7 +374,7 @@ static BOOL LocalTvtCallList_Touch(LocalTvtCallList *list) {
     int i;
     BOOL wasSelected;
 
-    if (func_0203dac8(&x, &y) && LocalTvtCallList_GetTouchedItem(list, &list->cursor)) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && LocalTvtCallList_GetTouchedItem(list, &list->cursor)) {
         wasSelected = LocalTvtCallItem_IsSelected(&list->items[list->cursor]);
         if (LocalTvtCallItem_SetSelected(&list->items[list->cursor], wasSelected ? FALSE : TRUE)) {
             for (i = 0; i < list->count; i++) {
@@ -485,7 +485,7 @@ static BOOL LocalTvtCallList_GetTouchedItem(LocalTvtCallList *list, int *index) 
     u32 x;
     u32 y;
 
-    if (func_0203dac8(&x, &y) && x > 8 && x < 224 && y < 168) {
+    if (GFL_HIDGetTouchPressedPoint(&x, &y) && x > 8 && x < 224 && y < 168) {
         int item = (y + list->scroll) / ITEM_HEIGHT;
 
         if (item >= 0 && item < list->count) {
@@ -573,14 +573,14 @@ static void LocalTvtCallItem_Init(LocalTvtCallItem *item, const LocalTvtCallSele
     setup.y = index * ITEM_HEIGHT + 16;
     setup.sequence = LIST_ANIM_PLATE;
     setup.priority = 32;
-    item->plate = func_0204c040(unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
-    func_0204c124(item->plate, TRUE);
-    func_0204c520(item->plate, TRUE);
+    item->plate = ClActor_Create(unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
+    ClActor_SetVisible(item->plate, TRUE);
+    ClActor_SetAutoAnim(item->plate, TRUE);
     setup.x = 18;
     setup.sequence = LIST_ANIM_ICON;
     setup.priority = 16;
-    item->icon = func_0204c040(unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
-    func_0204c124(item->icon, TRUE);
+    item->icon = ClActor_Create(unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
+    ClActor_SetVisible(item->icon, TRUE);
     item->window = BmpWin_CreateDynamic(6, 3, index * 4 + 1, 25, 2, 15, 1);
     LocalTvtMessage_SetColor(message, 0x3c40);
     LocalTvtMessage_SetPosition(message, 6, 0, LOCAL_TVT_ALIGN_LEFT);
@@ -591,8 +591,8 @@ static void LocalTvtCallItem_Init(LocalTvtCallItem *item, const LocalTvtCallSele
 
 static void LocalTvtCallItem_Exit(LocalTvtCallItem *item) {
     BmpWin_Free(item->window);
-    func_0204c108(item->icon);
-    func_0204c108(item->plate);
+    ClActor_Delete(item->icon);
+    ClActor_Delete(item->plate);
     MI_CpuFill8(item, 0, sizeof(LocalTvtCallItem));
 }
 
@@ -602,25 +602,25 @@ static void LocalTvtCallItem_Update(LocalTvtCallItem *item, u16 scroll) {
     ClActorPos pos;
     s16 y;
 
-    if (!func_0204c560(item->plate)) {
-        func_0204c488(item->plate, sLocalTvtCallItemPlateSequences[item->cursor]);
+    if (!ClActor_IsAnimActive(item->plate)) {
+        ClActor_SetSequence(item->plate, sLocalTvtCallItemPlateSequences[item->cursor]);
     }
     y = item->index * ITEM_HEIGHT - scroll;
     if (y >= -ITEM_HEIGHT && y <= 160) {
         pos.x = 128;
         pos.y = y + 16;
-        func_0204c140(item->plate, &pos, 1);
-        func_0204c124(item->plate, TRUE);
+        ClActor_SetSurfacePos(item->plate, &pos, 1);
+        ClActor_SetVisible(item->plate, TRUE);
         pos.x = 18;
-        func_0204c140(item->icon, &pos, 1);
-        func_0204c124(item->icon, TRUE);
+        ClActor_SetSurfacePos(item->icon, &pos, 1);
+        ClActor_SetVisible(item->icon, TRUE);
         // The position of something the plate has no more
         pos.x = 200;
     }
 }
 
 static void LocalTvtCallItem_StartDecideAnim(LocalTvtCallItem *item) {
-    func_0204c488(item->plate, LIST_ANIM_PLATE_DECIDE);
+    ClActor_SetSequence(item->plate, LIST_ANIM_PLATE_DECIDE);
 }
 
 // Returns whether it changed, which a person who cannot be called never does
@@ -641,12 +641,12 @@ static void LocalTvtCallItem_SetBright(LocalTvtCallItem *item, BOOL bright) {
     item->bright = bright;
     if (bright && !item->disabled) {
         if (item->selected) {
-            func_0204c488(item->icon, LIST_ANIM_ICON_SELECTED);
+            ClActor_SetSequence(item->icon, LIST_ANIM_ICON_SELECTED);
         } else {
-            func_0204c488(item->icon, LIST_ANIM_ICON);
+            ClActor_SetSequence(item->icon, LIST_ANIM_ICON);
         }
     } else {
-        func_0204c488(item->icon, LIST_ANIM_ICON_DARK);
+        ClActor_SetSequence(item->icon, LIST_ANIM_ICON_DARK);
     }
 }
 
@@ -658,8 +658,8 @@ static void LocalTvtCallItem_SetCursor(LocalTvtCallItem *item, BOOL cursor) {
     static const u8 sLocalTvtCallItemCursorSequences[] = { LIST_ANIM_PLATE, LIST_ANIM_PLATE_CURSOR };
 
     item->cursor = cursor;
-    if (func_0204c4a0(item->plate) != LIST_ANIM_PLATE_DECIDE) {
-        func_0204c488(item->plate, sLocalTvtCallItemCursorSequences[item->cursor]);
+    if (ClActor_GetSequence(item->plate) != LIST_ANIM_PLATE_DECIDE) {
+        ClActor_SetSequence(item->plate, sLocalTvtCallItemCursorSequences[item->cursor]);
     }
 }
 
@@ -676,16 +676,16 @@ static void LocalTvtCallScrollBar_Init(LocalTvtCallScrollBar *bar, const LocalTv
     setup.y = 24;
     setup.sequence = LIST_ANIM_SCROLL_BAR;
     bar->actor =
-        func_0204c040(select->setup.unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
+        ClActor_Create(select->setup.unit, select->chars, select->palette, select->cellAnims, &setup, 1, heapId);
     if (bar->enabled) {
-        func_0204c124(bar->actor, TRUE);
+        ClActor_SetVisible(bar->actor, TRUE);
     } else {
-        func_0204c124(bar->actor, FALSE);
+        ClActor_SetVisible(bar->actor, FALSE);
     }
 }
 
 static void LocalTvtCallScrollBar_Exit(LocalTvtCallScrollBar *bar) {
-    func_0204c108(bar->actor);
+    ClActor_Delete(bar->actor);
     MI_CpuFill8(bar, 0, sizeof(LocalTvtCallScrollBar));
 }
 
@@ -699,7 +699,7 @@ static void LocalTvtCallScrollBar_Main(LocalTvtCallScrollBar *bar) {
         bar->moved = FALSE;
         pos.x = 248;
         pos.y = bar->pos + 24;
-        func_0204c140(bar->actor, &pos, 1);
+        ClActor_SetSurfacePos(bar->actor, &pos, 1);
     }
     if (bar->scrolling) {
         if (bar->pos > bar->target) {
@@ -734,11 +734,11 @@ static BOOL LocalTvtCallScrollBar_Touch(LocalTvtCallScrollBar *bar) {
     if (!bar->enabled) {
         return FALSE;
     }
-    touched = func_0203dac8(&x, &y);
-    held = func_0203da84(&heldX, &heldY);
+    touched = GFL_HIDGetTouchPressedPoint(&x, &y);
+    held = GFL_HIDGetTouchHeldPoint(&heldX, &heldY);
     if (touched && x >= 236 && x <= 260 && y >= bar->pos + 12 && y <= bar->pos + 36) {
         bar->held = TRUE;
-        func_0204c488(bar->actor, LIST_ANIM_SCROLL_BAR_HELD);
+        ClActor_SetSequence(bar->actor, LIST_ANIM_SCROLL_BAR_HELD);
         GFL_SndSEPlay(SEQ_SE_SYS_45);
         return TRUE;
     }
@@ -757,7 +757,7 @@ static BOOL LocalTvtCallScrollBar_Touch(LocalTvtCallScrollBar *bar) {
         }
     } else {
         bar->held = FALSE;
-        func_0204c488(bar->actor, LIST_ANIM_SCROLL_BAR);
+        ClActor_SetSequence(bar->actor, LIST_ANIM_SCROLL_BAR);
     }
     return FALSE;
 }

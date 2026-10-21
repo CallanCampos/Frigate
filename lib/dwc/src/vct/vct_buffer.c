@@ -143,15 +143,15 @@ int VCT_RemoveActive(VCTPacket *packet) {
 
 // Finds the segment of a mu-law magnitude, as search() does in the public-domain G.711 code whose table and constants
 // these are
-static inline int SearchSegment(int value, const int *table, int size) {
-    int i;
-
-    for (i = 0; i < size; i++) {
+static inline void SearchSegment(int value, const int *table, int size, int *segment) {
+    *segment = 0;
+    while (*segment < size) {
         if (value <= *table++) {
-            return i;
+            return;
         }
+        (*segment)++;
     }
-    return size;
+    *segment = size;
 }
 
 // Codes samples as 8-bit mu-law
@@ -173,11 +173,14 @@ void VCT_EncodeMulaw(u8 *dst, s16 *src, u32 count) {
             sample = 0x1fdf;
         }
         sample += 0x21;
-        segment = SearchSegment(sample, sSegmentEnds, 8);
+        SearchSegment(sample, sSegmentEnds, 8, &segment);
         if (segment >= 8) {
             dst[i] = sign ^ 0x7f;
         } else {
-            dst[i] = ((segment << 4) | ((sample >> (segment + 1)) & 0xf)) ^ sign;
+            int code = (segment << 4) | ((sample >> (segment + 1)) & 0xf);
+
+            code ^= sign;
+            dst[i] = code;
         }
     }
 }

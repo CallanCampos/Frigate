@@ -22,6 +22,7 @@ class SourceCompilerTests(unittest.TestCase):
             ("src/unlisted.c", configure.MWCC_VERSION, False, "-ipa file"),
             ("lib/nnsys/src/snd/snd_capture.c", None, True, "-ipa function"),
             ("lib/nitro/src/card/card_pull_out.c", None, True, "-thumb"),
+            ("lib/twl/src/syscall/syscall_twl_ltd.c", "2.0/sp2p2", True, "-ipa file"),
         ]
         for source, compiler, library, flag in cases:
             with self.subTest(source=source):

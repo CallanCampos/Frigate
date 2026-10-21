@@ -26,14 +26,14 @@ BOOL s013A_GameCommGetStatus(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021adc94(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_0200a400(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
+    *result = WifiList_HasValidProfile(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
     return FALSE;
 }
 
 BOOL func_ov036_021adcb4(VM *vm, FieldScriptEnv *env) {
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = func_0200a150(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
+    *result = WifiList_CountFriends(GameData_GetWifiList(FieldScriptEnv_GetGameData(env)));
     return FALSE;
 }
 

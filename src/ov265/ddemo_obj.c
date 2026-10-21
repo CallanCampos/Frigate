@@ -113,7 +113,7 @@ void DDemoObj_Init(DDemoWork *wk, u32 scene) {
 
         ClActSys_Create(&setup, DDemoMain_GetVramConfig(scene), HEAPID_DENDOU_DEMO);
     }
-    wk->clUnit = func_0204bf1c(DDEMOOBJ_COUNT + 216, 0, HEAPID_DENDOU_DEMO);
+    wk->clUnit = ClActUnit_Create(DDEMOOBJ_COUNT + 216, 0, HEAPID_DENDOU_DEMO);
     wk->bmpOam = BmpOam_Init(HEAPID_DENDOU_DEMO, wk->clUnit);
     DDemoObj_InitResources(wk);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
@@ -122,8 +122,8 @@ void DDemoObj_Init(DDemoWork *wk, u32 scene) {
 
 void DDemoObj_Exit(DDemoWork *wk) {
     BmpOam_Exit(wk->bmpOam);
-    func_0204bf98(wk->clUnit);
-    func_0204b758();
+    ClActUnit_Delete(wk->clUnit);
+    ClActSys_Delete();
 }
 
 static void DDemoObj_Animate(DDemoWork *wk) {
@@ -131,12 +131,12 @@ static void DDemoObj_Animate(DDemoWork *wk) {
 
     for (i = 0; i < DDEMOOBJ_COUNT; i++) {
         if (wk->clact[i] != NULL) {
-            if (func_0204c534(wk->clact[i]) != TRUE) {
-                func_0204c4e0(wk->clact[i], FX32_ONE);
+            if (ClActor_IsAutoAnim(wk->clact[i]) != TRUE) {
+                ClActor_SetAnimSpeed(wk->clact[i], FX32_ONE);
             }
         }
     }
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 void DDemoObj_SetPos(DDemoWork *wk, u32 id, s16 x, s16 y) {
@@ -144,13 +144,13 @@ void DDemoObj_SetPos(DDemoWork *wk, u32 id, s16 x, s16 y) {
 
     pos.x = x;
     pos.y = y;
-    func_0204c140(wk->clact[id], &pos, CLACT_SURFACE_MAIN);
+    ClActor_SetSurfacePos(wk->clact[id], &pos, CLACT_SURFACE_MAIN);
 }
 
 void DDemoObj_GetPos(DDemoWork *wk, u32 id, s16 *x, s16 *y) {
     ClActorPos pos;
 
-    func_0204c178(wk->clact[id], &pos, CLACT_SURFACE_MAIN);
+    ClActor_GetSurfacePos(wk->clact[id], &pos, CLACT_SURFACE_MAIN);
     *x = pos.x;
     *y = pos.y;
 }
@@ -166,18 +166,18 @@ void DDemoObj_Move(DDemoWork *wk, u32 id, s16 x, s16 y) {
 
 void DDemoObj_SetVisible(DDemoWork *wk, u32 id, BOOL visible) {
     if (wk->clact[id] != NULL) {
-        func_0204c124(wk->clact[id], visible);
+        ClActor_SetVisible(wk->clact[id], visible);
     }
 }
 
 void DDemoObj_SetAnime(DDemoWork *wk, u32 id, u32 sequence) {
-    func_0204c4d4(wk->clact[id], 0);
-    func_0204c488(wk->clact[id], sequence);
-    func_0204c520(wk->clact[id], TRUE);
+    ClActor_SetAnimTime(wk->clact[id], 0);
+    ClActor_SetSequence(wk->clact[id], sequence);
+    ClActor_SetAutoAnim(wk->clact[id], TRUE);
 }
 
 BOOL DDemoObj_IsAnimating(DDemoWork *wk, u32 id) {
-    return func_0204c560(wk->clact[id]);
+    return ClActor_IsAnimActive(wk->clact[id]);
 }
 
 static void DDemoObj_InitResources(DDemoWork *wk) {
@@ -196,21 +196,21 @@ static void DDemoObj_InitResources(DDemoWork *wk) {
 
 static void DDemoObj_FreeChars(DDemoWork *wk, u32 id) {
     if (wk->chrRes[id] != RES_NONE) {
-        func_0204b98c(wk->chrRes[id]);
+        ClActSys_FreeChars(wk->chrRes[id]);
         wk->chrRes[id] = RES_NONE;
     }
 }
 
 static void DDemoObj_FreePalette(DDemoWork *wk, u32 id) {
     if (wk->palRes[id] != RES_NONE) {
-        func_0204bcd0(wk->palRes[id]);
+        ClActSys_FreePltt(wk->palRes[id]);
         wk->palRes[id] = RES_NONE;
     }
 }
 
 static void DDemoObj_FreeCellAnims(DDemoWork *wk, u32 id) {
     if (wk->celRes[id] != RES_NONE) {
-        func_0204be64(wk->celRes[id]);
+        ClActSys_FreeCellAnims(wk->celRes[id]);
         wk->celRes[id] = RES_NONE;
     }
 }
@@ -230,13 +230,13 @@ static void DDemoObj_FreeResources(DDemoWork *wk) {
 }
 
 static ClActor *DDemoObj_Add(DDemoWork *wk, const DDemoObjSetup *setup) {
-    return func_0204c040(wk->clUnit, wk->chrRes[setup->chr], wk->palRes[setup->pal], wk->celRes[setup->cel],
-                         &setup->setup, setup->surface, HEAPID_DENDOU_DEMO);
+    return ClActor_Create(wk->clUnit, wk->chrRes[setup->chr], wk->palRes[setup->pal], wk->celRes[setup->cel],
+                          &setup->setup, setup->surface, HEAPID_DENDOU_DEMO);
 }
 
 static void DDemoObj_Delete(DDemoWork *wk, u32 id) {
     if (wk->clact[id] != NULL) {
-        func_0204c108(wk->clact[id]);
+        ClActor_Delete(wk->clact[id]);
         wk->clact[id] = NULL;
     }
 }
@@ -267,7 +267,7 @@ void DDemoObj_AddPoke(DDemoWork *wk) {
         DDemoObj_FreeCellAnims(wk, DDEMO_CEL_POKE_BACK);
     }
     arc = MakePokeGraArcHandle(HEAPID_DENDOU_DEMO);
-    pkm = func_0201d620(wk->mons[wk->monIndex]);
+    pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     wasEncrypted = PML_PkmDecrypt(pkm);
     wk->chrRes[DDEMO_CHR_POKE_FRONT] =
         PokeGra_LoadClActCharsByBoxData(arc, pkm, 0, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
@@ -291,7 +291,7 @@ void DDemoObj_LoadTypePalette(DDemoWork *wk) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLRArc(arc, sDDemoTypePalettes[wk->type], &palette, HEAPID_DENDOU_DEMO);
 
-    func_0204bd10(wk->palRes[DDEMO_PAL_OBJ], palette, 1);
+    ClActSys_ReplacePlttData(wk->palRes[DDEMO_PAL_OBJ], palette, 1);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
 }
@@ -351,7 +351,7 @@ static void DDemoObj_InitFontOam1st(DDemoWork *wk) {
 
 // Draws the name and level of the Pokémon being shown
 void DDemoObj_PrintPokeInfo(DDemoWork *wk) {
-    BoxPkm *pkm = func_0201d620(wk->mons[wk->monIndex]);
+    BoxPkm *pkm = PokeParty_GetBoxPkm(wk->mons[wk->monIndex]);
     BOOL wasEncrypted = PML_PkmDecrypt(pkm);
     StrBuf *str;
     u32 width;
@@ -428,8 +428,8 @@ static void DDemoObj_InitFontOam2nd(DDemoWork *wk) {
     GFL_StrBufFree(str);
 
     str = GFL_MsgDataLoadStrbufNew(wk->msgData, BtlMain2_Text_Empty_4);
-    WordSetNumber(wk->wordSet, 0, func_02008cec(wk->param->playTime), 3, 0, TRUE);
-    WordSetNumber(wk->wordSet, 1, func_02008cf0(wk->param->playTime), 2, 2, TRUE);
+    WordSetNumber(wk->wordSet, 0, PlayTime_GetHours(wk->param->playTime), 3, 0, TRUE);
+    WordSetNumber(wk->wordSet, 1, PlayTime_GetMinutes(wk->param->playTime), 2, 2, TRUE);
     GFL_WordSetFormatStrbuf(wk->wordSet, wk->strbuf, str);
     DDemoObj_PrintFontOam(wk, DDEMO_FOAM_PLAYER, wk->font, wk->strbuf, 200, 0);
     GFL_StrBufFree(str);
@@ -452,14 +452,15 @@ void DDemoObj_SetFontOamVisible(DDemoWork *wk, u32 id, BOOL visible) {
 static void DDemoObj_LoadResources(DDemoWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_DEMO, HEAPID_TAIL(HEAPID_DENDOU_DEMO));
 
-    wk->chrRes[DDEMO_CHR_OBJ] = func_0204b81c(arc, NARC_DDEMO_OBJ_1ST_NCGR, FALSE, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
-    wk->palRes[DDEMO_PAL_OBJ] = func_0204bba0(arc, NARC_DDEMO_OBJ_NCLR, CLACT_VRAM_MAIN, 0, HEAPID_DENDOU_DEMO);
+    wk->chrRes[DDEMO_CHR_OBJ] =
+        ClActSys_LoadChars(arc, NARC_DDEMO_OBJ_1ST_NCGR, FALSE, CLACT_VRAM_MAIN, HEAPID_DENDOU_DEMO);
+    wk->palRes[DDEMO_PAL_OBJ] = ClActSys_LoadPltt(arc, NARC_DDEMO_OBJ_NCLR, CLACT_VRAM_MAIN, 0, HEAPID_DENDOU_DEMO);
     wk->celRes[DDEMO_CEL_OBJ] =
-        func_0204bde0(arc, NARC_DDEMO_OBJ_1ST_NCER, NARC_DDEMO_OBJ_1ST_NANR, HEAPID_DENDOU_DEMO);
+        ClActSys_LoadCellAnims(arc, NARC_DDEMO_OBJ_1ST_NCER, NARC_DDEMO_OBJ_1ST_NANR, HEAPID_DENDOU_DEMO);
     GFL_ArcToolFree(arc);
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_FONT, HEAPID_TAIL(HEAPID_DENDOU_DEMO));
-    wk->palRes[DDEMO_PAL_FONT] = func_0204bc48(arc, 5, CLACT_VRAM_MAIN, 0xa0, HEAPID_DENDOU_DEMO);
+    wk->palRes[DDEMO_PAL_FONT] = ClActSys_LoadPlttEx(arc, 5, CLACT_VRAM_MAIN, 0xa0, HEAPID_DENDOU_DEMO);
     GFL_ArcToolFree(arc);
 }
 
@@ -501,10 +502,10 @@ void DDemoObj_Init2nd(DDemoWork *wk) {
             { 0, 512, 256, 192, CLACT_VRAM_SUB, TRUE },
         };
 
-        wk->renderer = func_0204be9c(surfaces, NELEMS(surfaces), HEAPID_DENDOU_DEMO);
+        wk->renderer = ClActRenderer_Create(surfaces, NELEMS(surfaces), HEAPID_DENDOU_DEMO);
     }
-    func_0204bf14(wk->renderer, TRUE);
-    func_0204c018(wk->clUnit, wk->renderer);
+    ClActRenderer_SetCulling(wk->renderer, TRUE);
+    ClActUnit_SetRenderer(wk->clUnit, wk->renderer);
     wk->clact[DDEMOOBJ_PLATE_UPPER] = DDemoObj_Add(wk, &sDDemoObjPlateUpper);
     wk->clact[DDEMOOBJ_PLATE_LOWER] = DDemoObj_Add(wk, &sDDemoObjPlateLower);
     DDemoObj_SetVisible(wk, DDEMOOBJ_PLATE_UPPER, FALSE);
@@ -512,10 +513,10 @@ void DDemoObj_Init2nd(DDemoWork *wk) {
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_DENDOU_DEMO, HEAPID_TAIL(HEAPID_DENDOU_DEMO));
     wk->chrRes[DDEMO_CHR_OBJ_SUB] =
-        func_0204b81c(arc, NARC_DDEMO_OBJ_2ND_NCGR, FALSE, CLACT_VRAM_SUB, HEAPID_DENDOU_DEMO);
-    wk->palRes[DDEMO_PAL_OBJ_SUB] = func_0204bba0(arc, NARC_DDEMO_OBJ_NCLR, CLACT_VRAM_SUB, 0, HEAPID_DENDOU_DEMO);
+        ClActSys_LoadChars(arc, NARC_DDEMO_OBJ_2ND_NCGR, FALSE, CLACT_VRAM_SUB, HEAPID_DENDOU_DEMO);
+    wk->palRes[DDEMO_PAL_OBJ_SUB] = ClActSys_LoadPltt(arc, NARC_DDEMO_OBJ_NCLR, CLACT_VRAM_SUB, 0, HEAPID_DENDOU_DEMO);
     wk->celRes[DDEMO_CEL_OBJ_SUB] =
-        func_0204bde0(arc, NARC_DDEMO_OBJ_2ND_NCER, NARC_DDEMO_OBJ_2ND_NANR, HEAPID_DENDOU_DEMO);
+        ClActSys_LoadCellAnims(arc, NARC_DDEMO_OBJ_2ND_NCER, NARC_DDEMO_OBJ_2ND_NANR, HEAPID_DENDOU_DEMO);
     GFL_ArcToolFree(arc);
 
     trainerClass = TRAINER_CLASS_PKMN_TRAINER_ROSA;
@@ -540,7 +541,7 @@ void DDemoObj_Init2nd(DDemoWork *wk) {
 void DDemoObj_Exit2nd(DDemoWork *wk) {
     DDemoObj_DeleteFontOamAll(wk);
     DDemoObj_DeleteAll(wk);
-    func_0204becc(wk->renderer);
+    ClActRenderer_Delete(wk->renderer);
     DDemoObj_FreeResources(wk);
 }
 

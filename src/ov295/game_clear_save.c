@@ -119,7 +119,7 @@ static BOOL GameClearSave_Init(GameProc *proc, u32 *state, void *param, void *wo
     save->msgBank = TEXT_BANK_GAME_CLEAR_SAVE;
     save->gameData = GSYS_GetGameData(gsys);
     save->playerInfo = GetGameDataPlayerInfo(save->gameData);
-    if (func_0200746c(GameData_GetSaveControl(save->gameData))) {
+    if (SaveControl_IsNewGameOverSave(GameData_GetSaveControl(save->gameData))) {
         save->cannotSave = TRUE;
     }
     return TRUE;
@@ -170,7 +170,7 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
         GFL_BGSysLoadScr(BmpWin_GetBGIndex(window));
         save->nextState = STATE_REGISTER;
         *state = STATE_WAIT_MESSAGE;
-        func_0201782c(save->gameData);
+        GameData_StartSave(save->gameData);
         break;
     case STATE_REGISTER:
         if (!save->cannotSave) {
@@ -197,7 +197,7 @@ static BOOL GameClearSave_Main(GameProc *proc, u32 *state, void *param, void *wo
         break;
     case STATE_WAIT_SAVE:
         if (!save->cannotSave) {
-            switch (func_02017850(save->gameData)) {
+            switch (GameData_UpdateSave(save->gameData)) {
             case 0:
             case 1:
                 break;
@@ -360,8 +360,8 @@ static void GameClearSave_PrintMessage(GameClearSave *save, u32 messageId, s16 x
     GFL_MsgDataLoadStrbuf(save->msgData, messageId, message);
     copyVarForText(save->wordSet, 0, save->playerInfo);
     GFL_WordSetFormatStrbuf(save->wordSet, save->strBuf, message);
-    save->stream = func_02022268(save->window, x, y, save->strBuf, save->font, func_02017bcc(), save->tcbManager, 0,
-                                 save->heapId, 0xf0f);
+    save->stream = PrintStream_Create(save->window, x, y, save->strBuf, save->font, TextSpeed_GetCurrentWait(),
+                                      save->tcbManager, 0, save->heapId, 0xf0f);
     GFL_StrBufFree(message);
     BmpWin_DrawFrame(save->window, WINFRAME_TRANSFER_NONE, 1, 12);
 }
@@ -369,19 +369,19 @@ static void GameClearSave_PrintMessage(GameClearSave *save, u32 messageId, s16 x
 // Sets the record of the play time of the first clear to hours, minutes and seconds in decimal
 static void GameClearSave_SetClearPlayTime(GameClearSave *save) {
     GameRecords *records = GameData_GetRecords(save->gameData);
-    PlayTime *playTime = func_02017a40(save->gameData);
-    u16 hours = func_02008cec(playTime);
-    u8 minutes = func_02008cf0(playTime);
-    u8 seconds = func_02008cf4(playTime);
+    PlayTime *playTime = GameData_GetPlayTime(save->gameData);
+    u16 hours = PlayTime_GetHours(playTime);
+    u8 minutes = PlayTime_GetMinutes(playTime);
+    u8 seconds = PlayTime_GetSeconds(playTime);
 
-    func_020094cc(records, RECORD_CLEAR_PLAY_TIME, hours * 10000 + minutes * 100 + seconds);
+    RecordSet(records, RECORD_CLEAR_PLAY_TIME, hours * 10000 + minutes * 100 + seconds);
 }
 
 static void GameClearSave_CountClear(GameClearSave *save) {
     SaveControl *saveControl = GameData_GetSaveControl(save->gameData);
     GameRecords *records = GameData_GetRecords(save->gameData);
 
-    if (!func_0200746c(saveControl)) {
+    if (!SaveControl_IsNewGameOverSave(saveControl)) {
         RecordAdd(records, RECORD_HALL_OF_FAME_ENTRIES, 1);
     }
 }
@@ -403,11 +403,11 @@ static void GameClearSave_RegisterTeam(GameClearSave *save) {
     RTC_GetDate(&date);
     party = GameData_GetParty(save->gameData);
     saveControl = GameData_GetSaveControl(save->gameData);
-    func_020074ec(saveControl, HALL_OF_FAME_BLOCK, HEAPID_GAMEEVENT);
+    SaveControl_OpenExtraBlock(saveControl, HALL_OF_FAME_BLOCK, HEAPID_GAMEEVENT);
     hallOfFame = getAddressOfExtraSaveBlk(saveControl, HALL_OF_FAME_BLOCK, 0);
-    if (!func_0200746c(saveControl)) {
+    if (!SaveControl_IsNewGameOverSave(saveControl)) {
         HallOfFameSave_AddTeam(hallOfFame, party, &date, HEAPID_GAMEEVENT);
-        func_020178c4(save->gameData, HALL_OF_FAME_BLOCK);
+        GameData_StartSaveBlock(save->gameData, HALL_OF_FAME_BLOCK);
         save->registered = TRUE;
     }
 }
@@ -415,8 +415,8 @@ static void GameClearSave_RegisterTeam(GameClearSave *save) {
 static void GameClearSave_FreeBlocks(GameClearSave *save) {
     SaveControl *saveControl = GameData_GetSaveControl(save->gameData);
 
-    if (!func_0200746c(saveControl)) {
-        u32 state = func_020178f4(save->gameData, HALL_OF_FAME_BLOCK);
+    if (!SaveControl_IsNewGameOverSave(saveControl)) {
+        u32 state = GameData_UpdateSaveBlock(save->gameData, HALL_OF_FAME_BLOCK);
 
         if (state == 2 || state == 3) {
             freeIntermediateSaveExtraBlksAfterLoad(saveControl, HALL_OF_FAME_BLOCK);

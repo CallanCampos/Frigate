@@ -4150,7 +4150,7 @@
    ]
   },
   "545": {
-   "handler": "func_ov036_021b018c",
+   "handler": "s0221_AnvilleTrainGetModelID",
    "overlay": 36,
    "args": [
     "any",
@@ -4158,7 +4158,7 @@
    ]
   },
   "546": {
-   "handler": "func_ov036_021b01e0",
+   "handler": "s0222_AnvilleTrainGetDailyIndex",
    "overlay": 36,
    "args": [
     "var"

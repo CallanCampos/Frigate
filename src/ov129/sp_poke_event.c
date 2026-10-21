@@ -144,7 +144,7 @@ static GameEventReturnCode SpPokeEvent_WaitFrame(GameEvent *event, u32 *state, v
     } else {
         frame = FX32_CONST(34);
     }
-    if ((fx32)func_ov036_021b8520(system, 0, actor, 0) >= frame) {
+    if (FieldExpObj_GetAnmFrame(system, 0, actor, 0) >= frame) {
         return GAMEEVENT_DONE;
     }
     return GAMEEVENT_CONTINUE;
@@ -192,7 +192,7 @@ static GameEventReturnCode SpPokeEvent_AppearMain(GameEvent *event, u32 *state, 
     FieldExpObjSystem *system = Field_GetExpObjSystem(field);
     SpPokeGimmickWork *work = Field_GetGimmickWorkBlock(field, WORK_ID);
 
-    if (func_ov036_021b8520(system, 0, 2, 0) == FX32_CONST(15)) {
+    if (FieldExpObj_GetAnmFrame(system, 0, 2, 0) == FX32_CONST(15)) {
         u16 actorId = work->data.npc->actorId;
         u16 uid = work->data.npc->uid;
         MMSys *actorSystem = Field_GetActorSystem(field);
@@ -209,7 +209,7 @@ static GameEventReturnCode SpPokeEvent_AppearMain(GameEvent *event, u32 *state, 
         if (npcCount != 0) {
             EventWork *eventWork = GameData_GetEventWork(gameData);
             FieldActor *actor =
-                func_ov012_021668f8(actorSystem, GetZoneNPCs(eventData), zoneId, npcCount, eventWork, uid);
+                SpawnZoneNPCByUID(actorSystem, GetZoneNPCs(eventData), zoneId, npcCount, eventWork, uid);
 
             if (actor != NULL) {
                 DisableActorMovement(actor);

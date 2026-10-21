@@ -30,11 +30,11 @@ static const WbtBattleStyle sBattleStyles[] = {
     { 3, 4, 3 },
 };
 
-static int func_ov055_021e647c(int style);
-static void func_ov055_021e65c8(GameData *gameData, u16 *counts);
-static BOOL func_ov055_021e65e8(GameData *gameData, u32 tournament, u16 *counts);
+static int WbtStyle_GetIndex(int style);
+static void WbtTournament_LoadWinCounts(GameData *gameData, u16 *counts);
+static BOOL WbtTournament_IsOpenByCounts(GameData *gameData, u32 tournament, u16 *counts);
 
-void func_ov055_021e6388(HeapID heapId, u32 message, StrBuf *strbuf) {
+void WbtTool_LoadTrainerName(HeapID heapId, u32 message, StrBuf *strbuf) {
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY, heapId);
 
     if (msgData != NULL) {
@@ -43,7 +43,7 @@ void func_ov055_021e6388(HeapID heapId, u32 message, StrBuf *strbuf) {
     }
 }
 
-void func_ov055_021e63b4(HeapID heapId, u32 message, StrBuf *strbuf) {
+void WbtTool_LoadTrainerClassName(HeapID heapId, u32 message, StrBuf *strbuf) {
     MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_2, heapId);
 
     if (msgData != NULL) {
@@ -52,7 +52,7 @@ void func_ov055_021e63b4(HeapID heapId, u32 message, StrBuf *strbuf) {
     }
 }
 
-WbtTrainers *func_ov055_021e63e0(HeapID heapId) {
+WbtTrainers *WbtTrainers_Load(HeapID heapId) {
     ArcTool *handle = GFL_ArcSysCreateFileHandle(247, HEAPID_TAIL(heapId));
     u32 size = GFL_ArcToolGetDataLength(handle, 0);
     WbtTrainers *trainers = GFL_HeapAllocate(heapId, size + 4, TRUE, "wbt_tool.c", 126);
@@ -63,39 +63,39 @@ WbtTrainers *func_ov055_021e63e0(HeapID heapId) {
     return trainers;
 }
 
-void func_ov055_021e6438(WbtTrainers *trainers) {
+void WbtTrainers_Free(WbtTrainers *trainers) {
     GFL_HeapFree(trainers);
 }
 
-void func_ov055_021e6440(WbtTrainers *trainers, u32 index, WbtTrainer *dest) {
+void WbtTrainers_Get(WbtTrainers *trainers, u32 index, WbtTrainer *dest) {
     *dest = trainers->trainers[index];
 }
 
-BOOL func_ov055_021e6458(WbtTrainers *trainers, u8 index) {
+BOOL WbtTrainers_IsValid(WbtTrainers *trainers, u8 index) {
     if (index < trainers->count) {
         return TRUE;
     }
     return FALSE;
 }
 
-u16 func_ov055_021e6468(WbtTrainers *trainers, u8 index) {
+u16 WbtTrainers_GetObjCode(WbtTrainers *trainers, u8 index) {
     return trainers->trainers[index].unk2;
 }
 
-int func_ov055_021e6470(WbtTrainers *trainers, u8 index) {
+int WbtTrainers_GetRank(WbtTrainers *trainers, u8 index) {
     return trainers->trainers[index].unk8_0;
 }
 
 // Meant to keep the style in range, but it can never change it
-static int func_ov055_021e647c(int style) {
+static int WbtStyle_GetIndex(int style) {
     if (style < 0 && style > 3) {
         style = 0;
     }
     return style;
 }
 
-void func_ov055_021e6488(int style, StrBuf *strbuf) {
-    u16 message = sBattleStyles[func_ov055_021e647c(style)].name;
+void WbtStyle_LoadName(int style, StrBuf *strbuf) {
+    u16 message = sBattleStyles[WbtStyle_GetIndex(style)].name;
     MsgData *msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SCRCMD_BSUBWAY_WBT_PARTY, HEAPID_FIELDMAP);
 
@@ -105,19 +105,19 @@ void func_ov055_021e6488(int style, StrBuf *strbuf) {
     }
 }
 
-u8 func_ov055_021e64c0(int style) {
-    return sBattleStyles[func_ov055_021e647c(style)].count;
+u8 WbtStyle_GetPokemonCount(int style) {
+    return sBattleStyles[WbtStyle_GetIndex(style)].count;
 }
 
-u32 func_ov055_021e64d4(int style) {
-    return sBattleStyles[func_ov055_021e647c(style)].unk4;
+u32 WbtStyle_GetBattleMode(int style) {
+    return sBattleStyles[WbtStyle_GetIndex(style)].unk4;
 }
 
-int func_ov055_021e64e8(int style) {
-    return func_ov055_021e647c(style);
+int WbtStyle_Clamp(int style) {
+    return WbtStyle_GetIndex(style);
 }
 
-u8 func_ov055_021e64f0(PokeParty *party, u64 seed) {
+u8 WbtTool_GetPartyMainType(PokeParty *party, u64 seed) {
     u8 counts[17];
     u8 types[17];
     MATHRandContext32 rand;
@@ -160,18 +160,18 @@ u8 func_ov055_021e64f0(PokeParty *party, u64 seed) {
     return types[MATH_Rand32(&rand, n)];
 }
 
-static void func_ov055_021e65c8(GameData *gameData, u16 *counts) {
-    void *save = func_020179f8(gameData);
+static void WbtTournament_LoadWinCounts(GameData *gameData, u16 *counts) {
+    void *save = GameData_GetWbtSave(gameData);
     int i;
 
     for (i = 0; i < 29; i++) {
-        counts[i] = func_0200feac(save, i);
+        counts[i] = WbtSave_GetCount(save, i);
     }
 }
 
 // Whether the tournament is open, by the save's counts of wins. The leaders' tournaments of the other regions open one
 // after another
-static BOOL func_ov055_021e65e8(GameData *gameData, u32 tournament, u16 *counts) {
+static BOOL WbtTournament_IsOpenByCounts(GameData *gameData, u32 tournament, u16 *counts) {
     EventWork *eventWork = GameData_GetEventWork(gameData);
     BOOL allLeaders = FALSE;
     BOOL throughHoenn = FALSE;
@@ -222,59 +222,59 @@ static BOOL func_ov055_021e65e8(GameData *gameData, u32 tournament, u16 *counts)
     return FALSE;
 }
 
-BOOL func_ov055_021e66dc(GameData *gameData, u32 tournament) {
+BOOL WbtTournament_IsOpen(GameData *gameData, u32 tournament) {
     u16 counts[30];
 
-    func_ov055_021e65c8(gameData, counts);
-    return func_ov055_021e65e8(gameData, tournament, counts);
+    WbtTournament_LoadWinCounts(gameData, counts);
+    return WbtTournament_IsOpenByCounts(gameData, tournament, counts);
 }
 
-BOOL func_ov055_021e66fc(GameData *gameData, u32 won, u32 tournament) {
+BOOL WbtTournament_WouldOpen(GameData *gameData, u32 won, u32 tournament) {
     u16 counts[30];
     BOOL before;
     BOOL after;
     u32 record;
 
-    func_ov055_021e65c8(gameData, counts);
-    before = func_ov055_021e65e8(gameData, tournament, counts);
-    record = func_ov055_021e6750(won, 0);
+    WbtTournament_LoadWinCounts(gameData, counts);
+    before = WbtTournament_IsOpenByCounts(gameData, tournament, counts);
+    record = WbtTournament_GetRecord(won, 0);
     if (record != 29) {
         counts[record]++;
     }
-    after = func_ov055_021e65e8(gameData, tournament, counts);
+    after = WbtTournament_IsOpenByCounts(gameData, tournament, counts);
     if (before == FALSE && after != before) {
         return TRUE;
     }
     return FALSE;
 }
 
-u32 func_ov055_021e6750(u32 tournament, u32 type) {
+u32 WbtTournament_GetRecord(u32 tournament, u32 type) {
     if (tournament != 2) {
-        type = func_ov036_021c98a4(tournament)->record;
+        type = GetPWTTournamentInfo(tournament)->record;
     }
     return type;
 }
 
-u32 func_ov055_021e6760(int record) {
+u32 WbtTournament_FromRecord(int record) {
     u32 i;
 
     if (record <= 16) {
         return 2;
     }
-    for (i = 0; i < NELEMS(data_ov036_021d4920); i++) {
-        if (record == data_ov036_021d4920[i].record) {
+    for (i = 0; i < NELEMS(PWT_TOURNAMENT_INFO); i++) {
+        if (record == PWT_TOURNAMENT_INFO[i].record) {
             return i + 1;
         }
     }
     return 4;
 }
 
-u32 func_ov055_021e6794(u32 tournament) {
-    return func_ov036_021c98a4(tournament)->kind;
+u32 WbtTournament_GetKind(u32 tournament) {
+    return GetPWTTournamentInfo(tournament)->kind;
 }
 
-BOOL func_ov055_021e67a0(u32 tournament, u32 value) {
-    const WbtTournamentInfo *info = func_ov036_021c98a4(tournament);
+BOOL WbtTournament_IsInCategory(u32 tournament, u32 value) {
+    const WbtTournamentInfo *info = GetPWTTournamentInfo(tournament);
 
     if (info->unk3 == value) {
         return TRUE;
@@ -282,17 +282,17 @@ BOOL func_ov055_021e67a0(u32 tournament, u32 value) {
     return FALSE;
 }
 
-u16 func_ov055_021e67b8(u32 tournament) {
-    return sUnk5Messages[func_ov036_021c98a4(tournament)->unk5];
+u16 WbtTournament_GetTrainerArc(u32 tournament) {
+    return sUnk5Messages[GetPWTTournamentInfo(tournament)->unk5];
 }
 
-u32 func_ov055_021e67cc(u32 tournament, int style) {
-    int index = func_ov055_021e647c(style);
+u32 WbtTournament_GetBattlePoints(u32 tournament, int style) {
+    int index = WbtStyle_GetIndex(style);
 
-    return func_ov036_021c98a4(tournament)->battlePoints[index];
+    return GetPWTTournamentInfo(tournament)->battlePoints[index];
 }
 
-u8 func_ov055_021e67e4(u32 index) {
+u8 WbtTool_GetDownloadedTrainerClass(u32 index) {
     if (index >= NELEMS(sUnk74fe)) {
         index = 0;
     }

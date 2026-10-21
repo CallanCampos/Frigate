@@ -5,6 +5,10 @@
 
 // SSL's state and helpers, shared by its files
 
+// SSL's signature, "[SDK+UBIQUITOUS:SSL]", in the main module (ssl_version.c), which CPS_SetSsl refers to so that the
+// link keeps it
+extern const char SSLi_Signature[];
+
 // The C library's string functions the main module links, under their own names (ssl.c's certificate and session
 // matching and biginteger.c need them; MI_CpuCopy8, with the source first, and MI_CpuFill8 cover the rest). They are
 // not taken from <string.h>, whose declarations make MWCC treat strcmp and strlen as the library's own, which changes

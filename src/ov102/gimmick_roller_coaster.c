@@ -255,7 +255,7 @@ static inline void RollerCoaster_ShowSwitchState(FieldExpObjSystem *expObj, u8 a
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 0), FALSE);
     FieldExpObjAnm_SetLooped(FieldExpObj_GetAnmInfo(expObj, 0, actor, 1), FALSE);
     FieldExpObj_SetAnmFrame(expObj, 0, actor, state,
-                            func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
+                            FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, actor, state)));
 }
 
 static u8 RollerCoaster_FindSpot(int x, int z) {
@@ -394,14 +394,14 @@ static void RollerCoaster_Task(TCB *task, void *data) {
                     GFL_SndSEPlay(SEQ_SE_FLD_76);
                     player = GFL_SndSeqGetPlayerIndex(SEQ_SE_FLD_76);
                     FieldSnd_SetAmbienceVolume(fieldSound, SEQ_SE_FLD_25, 127);
-                    NNS_SndPlayerSetVolume(func_020061a8(player), 0);
+                    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), 0);
                 }
                 work->stations[i] = NO_SPOT;
             }
         } else {
             u8 index;
 
-            if (RollerCoaster_IsAtStation(path, func_ov036_021b8520(expObj, 0, actor, anm), &index)) {
+            if (RollerCoaster_IsAtStation(path, FieldExpObj_GetAnmFrame(expObj, 0, actor, anm), &index)) {
                 FieldExpObjAnm_SetPaused(anmInfo, TRUE);
                 if (work->ridePath != NO_PATH && i == work->ridePath / 2) {
                     FieldSnd_StopAmbience(fieldSound, SEQ_SE_FLD_25);
@@ -417,7 +417,7 @@ static void RollerCoaster_Task(TCB *task, void *data) {
         VecFx32 pos = { 0, FX32_CONST(32), 0 };
         u8 car = work->ridePath / 2;
         u8 anm = work->ridePath + 1;
-        fx32 frame = func_ov036_021b8520(expObj, 0, car, anm);
+        fx32 frame = FieldExpObj_GetAnmFrame(expObj, 0, car, anm);
 
         if (GFL_G3DCurveGetNowTranslationLoop(work->curve, &pos, frame / FX32_ONE)) {
             pos.x += sCarOrigins[car].x;
@@ -687,7 +687,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
             work->waitCar = NO_CAR;
             FieldSnd_PlayAmbience(fieldSound, SEQ_SE_FLD_25);
             GFL_SndSEPlay(SEQ_SE_FLD_76);
-            NNS_SndPlayerSetVolume(func_020061a8(player), 0);
+            NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), 0);
             FieldSnd_SetAmbienceVolume(fieldSound, SEQ_SE_FLD_25, 127);
             work->riding = TRUE;
             (*state)++;
@@ -813,7 +813,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
         VecFx32 move;
 
         anm = work->ridePath + 1;
-        lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, actor, anm));
+        lastFrame = FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, actor, anm));
         frame = RollerCoaster_GetAnmFrame(expObj, actor, anm);
         nextFrame = frame + FX32_ONE;
         if (nextFrame >= lastFrame) {
@@ -835,7 +835,7 @@ static GameEventReturnCode RollerCoaster_RideEvent(GameEvent *event, u32 *state,
     } else if (speed >= SPEED_SLOW) {
         volume = 30;
     }
-    NNS_SndPlayerSetVolume(func_020061a8(player), volume);
+    NNS_SndPlayerSetVolume(GFL_SndPlayerGetHandle(player), volume);
     return GAMEEVENT_CONTINUE;
 }
 
@@ -931,7 +931,7 @@ static void RollerCoaster_SwitchPath(FieldExpObjSystem *expObj, u8 oldSwitch, u8
     FieldExpObj_SetAnm(expObj, 0, actor, oldAnm, FALSE);
     FieldExpObj_SetAnm(expObj, 0, actor, newAnm, TRUE);
     RollerCoaster_SetAnmFrame(expObj, actor, newAnm, frame);
-    paused = func_ov036_021b84ec(FieldExpObj_GetAnmInfo(expObj, 0, actor, oldAnm));
+    paused = FieldExpObjAnm_IsPaused(FieldExpObj_GetAnmInfo(expObj, 0, actor, oldAnm));
     FieldExpObjAnm_SetPaused(FieldExpObj_GetAnmInfo(expObj, 0, actor, newAnm), paused);
 }
 
@@ -1126,7 +1126,7 @@ static void RollerCoaster_UpdateAmbience(Field *field, RollerCoasterWork *work) 
         fx32 nextFrame;
         NNSG3dAnmObj *anmObj;
 
-        lastFrame = func_ov036_021b8580(FieldExpObj_GetAnmInfo(expObj, 0, nearestCar, nearestAnm));
+        lastFrame = FieldExpObjAnm_GetLastFrame(FieldExpObj_GetAnmInfo(expObj, 0, nearestCar, nearestAnm));
         frame = RollerCoaster_GetAnmFrame(expObj, nearestCar, nearestAnm);
         nextFrame = frame + FX32_ONE;
         if (nextFrame >= lastFrame) {

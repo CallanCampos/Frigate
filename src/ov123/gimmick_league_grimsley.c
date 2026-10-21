@@ -38,19 +38,19 @@ typedef struct {
     GroupPlayback playback;
 } GrimsleyRoomWork;
 
-static void func_ov123_021eed54(GrimsleyRoomWork *work);
-static void func_ov123_021eee70(GrimsleyRoomWork *work);
-static void func_ov123_021eee7c(GrimsleyRoomWork *work);
-static void func_ov123_021eee88(GrimsleyRoomWork *work);
-static void func_ov123_021eeefc(GrimsleyRoomWork *work, GroupPlayback *playback, u16 group);
-static void func_ov123_021eef18(GroupPlayback *playback);
-static BOOL func_ov123_021eef3c(GroupPlayback *playback);
-static void func_ov123_021eefa4(GroupPlayback *playback, int group, u8 mode);
-static void func_ov123_021ef0d8(GrimsleyRoomWork *work, u16 animation);
-static void func_ov123_021ef144(GrimsleyRoomState *state, BOOL played);
-static BOOL func_ov123_021ef148(GrimsleyRoomState *state);
-static void func_ov123_021ef14c(GrimsleyRoomState *state, BOOL played);
-static BOOL func_ov123_021ef150(GrimsleyRoomState *state);
+static void GrimsleyRoom_Init(GrimsleyRoomWork *work);
+static void GrimsleyRoom_Free(GrimsleyRoomWork *work);
+static void GrimsleyRoom_StepAnimations(GrimsleyRoomWork *work);
+static void GrimsleyRoom_ShowSavedState(GrimsleyRoomWork *work);
+static void GrimsleyRoom_StartGroup(GrimsleyRoomWork *work, GroupPlayback *playback, u16 group);
+static void GrimsleyRoom_UpdatePlayback(GroupPlayback *playback);
+static BOOL GrimsleyRoom_IsGroupFinished(GroupPlayback *playback);
+static void GrimsleyRoom_ShowGroup(GroupPlayback *playback, int group, u8 mode);
+static void GrimsleyRoom_PlayModel0Animation(GrimsleyRoomWork *work, u16 animation);
+static void GrimsleyRoom_SetGroup0Played(GrimsleyRoomState *state, BOOL played);
+static BOOL GrimsleyRoom_GetGroup0Played(GrimsleyRoomState *state);
+static void GrimsleyRoom_SetGroup1Played(GrimsleyRoomState *state, BOOL played);
+static BOOL GrimsleyRoom_GetGroup1Played(GrimsleyRoomState *state);
 
 static const G3DSceneResourceSetup sResources[8] = {
     { GIMMICK_ARCID, 0, 0 }, { GIMMICK_ARCID, 1, 0 }, { GIMMICK_ARCID, 2, 0 }, { GIMMICK_ARCID, 3, 0 },
@@ -73,7 +73,7 @@ static const G3DSceneActorSetup sActors[7] = {
 
 static const G3DSceneSetup sSceneSetup = { sResources, NELEMS(sResources), sActors, NELEMS(sActors) };
 
-void func_ov123_021eec80(Field *field) {
+void GimmickGrimsley_Setup(Field *field) {
     GameData *gameData = GSYS_GetGameData(Field_GetGameSystem(field));
     GrimsleyRoomWork *work =
         Field_AllocGimmickWorkBlock(field, GIMMICK_WORK_ID, Field_GetHeapID(field), sizeof(GrimsleyRoomWork));
@@ -84,36 +84,36 @@ void func_ov123_021eec80(Field *field) {
     work->playback.expObj = Field_GetExpObjSystem(field);
     work->playback.playing = FALSE;
     work->playback.group = 0;
-    func_ov123_021eed54(work);
-    func_ov123_021eee88(work);
+    GrimsleyRoom_Init(work);
+    GrimsleyRoom_ShowSavedState(work);
 }
 
-void func_ov123_021eecd8(Field *field) {
-    func_ov123_021eee70(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
+void GimmickGrimsley_End(Field *field) {
+    GrimsleyRoom_Free(Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID));
     Field_DeleteGimmickWorkBlock(field, GIMMICK_WORK_ID);
 }
 
-void func_ov123_021eecf0(Field *field) {
+void GimmickGrimsley_Update(Field *field) {
     GrimsleyRoomWork *work = Field_GetGimmickWorkBlock(field, GIMMICK_WORK_ID);
 
-    func_ov123_021eee7c(work);
-    func_ov123_021eef18(&work->playback);
+    GrimsleyRoom_StepAnimations(work);
+    GrimsleyRoom_UpdatePlayback(&work->playback);
 }
 
-void func_ov123_021eed08(GameSystem *gsys, int group) {
+void GimmickGrimsley_PlayGroup(GameSystem *gsys, int group) {
     GrimsleyRoomWork *work = Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID);
     BOOL played = TRUE;
 
-    func_ov123_021eeefc(work, &work->playback, group);
+    GrimsleyRoom_StartGroup(work, &work->playback, group);
     if (group == 0) {
-        func_ov123_021ef144(work->state, played);
+        GrimsleyRoom_SetGroup0Played(work->state, played);
     } else {
-        func_ov123_021ef14c(work->state, played);
+        GrimsleyRoom_SetGroup1Played(work->state, played);
     }
 }
 
-void func_ov123_021eed3c(GameSystem *gsys, int animation) {
-    func_ov123_021ef0d8(Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID), animation);
+void GimmickGrimsley_PlayModel0Animation(GameSystem *gsys, int animation) {
+    GrimsleyRoom_PlayModel0Animation(Field_GetGimmickWorkBlock(GSYS_GetField(gsys), GIMMICK_WORK_ID), animation);
 }
 
 // Places the models, hidden
@@ -135,7 +135,7 @@ static inline void GrimsleyRoom_InitGroupModels(GrimsleyRoomWork *work, u8 index
         matrix->translation.x = positions[index].x;
         matrix->translation.y = positions[index].y;
         matrix->translation.z = positions[index].z;
-        func_ov036_021b8248(work->expObj, 0, model, 1);
+        FieldExpObj_SetActorCulling(work->expObj, 0, model, 1);
         FieldExpObj_SetActorHidden(work->expObj, 0, model, TRUE);
         for (anim = 0; anim < NELEMS(sGroupModelAnimations); anim++) {
             anm = FieldExpObj_GetAnmInfo(work->expObj, 0, model, anim);
@@ -147,7 +147,7 @@ static inline void GrimsleyRoom_InitGroupModels(GrimsleyRoomWork *work, u8 index
 }
 
 // Places the models, hidden
-static void func_ov123_021eed54(GrimsleyRoomWork *work) {
+static void GrimsleyRoom_Init(GrimsleyRoomWork *work) {
     u8 i;
     SRTMatrix *matrix;
     FieldExpObjAnm *anm;
@@ -157,7 +157,7 @@ static void func_ov123_021eed54(GrimsleyRoomWork *work) {
     matrix->translation.x = FX32_CONST(256);
     matrix->translation.y = 0;
     matrix->translation.z = FX32_CONST(256);
-    func_ov036_021b8248(work->expObj, 0, MODEL_0, 1);
+    FieldExpObj_SetActorCulling(work->expObj, 0, MODEL_0, 1);
     FieldExpObj_SetActorHidden(work->expObj, 0, MODEL_0, FALSE);
     for (i = 0; i < NELEMS(sModel0Animations); i++) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, i);
@@ -168,48 +168,48 @@ static void func_ov123_021eed54(GrimsleyRoomWork *work) {
     GrimsleyRoom_InitGroupModels(work, 0);
 }
 
-static void func_ov123_021eee70(GrimsleyRoomWork *work) {
+static void GrimsleyRoom_Free(GrimsleyRoomWork *work) {
     FieldExpObj_FreeScene(work->expObj, 0);
 }
 
-static void func_ov123_021eee7c(GrimsleyRoomWork *work) {
+static void GrimsleyRoom_StepAnimations(GrimsleyRoomWork *work) {
     FieldExpObj_StepAllAnimations(work->expObj);
 }
 
 // Shows the groups that the save says have played, as they were left
-static void func_ov123_021eee88(GrimsleyRoomWork *work) {
-    BOOL group0Played = func_ov123_021ef148(work->state);
-    BOOL group1Played = func_ov123_021ef150(work->state);
+static void GrimsleyRoom_ShowSavedState(GrimsleyRoomWork *work) {
+    BOOL group0Played = GrimsleyRoom_GetGroup0Played(work->state);
+    BOOL group1Played = GrimsleyRoom_GetGroup1Played(work->state);
     FieldExpObjAnm *anm;
 
     if (group0Played == TRUE) {
-        func_ov123_021eefa4(&work->playback, 0, 1);
+        GrimsleyRoom_ShowGroup(&work->playback, 0, 1);
     }
     if (group1Played == TRUE) {
-        func_ov123_021eefa4(&work->playback, 1, 1);
+        GrimsleyRoom_ShowGroup(&work->playback, 1, 1);
     }
     if (group0Played == TRUE && group1Played == FALSE) {
         anm = FieldExpObj_GetAnmInfo(work->expObj, 0, MODEL_0, 0);
         FieldExpObj_SetAnm(work->expObj, 0, MODEL_0, 0, TRUE);
-        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, 0, func_ov036_021b8580(anm));
+        FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, 0, FieldExpObjAnm_GetLastFrame(anm));
     }
 }
 
 // Shows the group and has it play
-static void func_ov123_021eeefc(GrimsleyRoomWork *work, GroupPlayback *playback, u16 group) {
+static void GrimsleyRoom_StartGroup(GrimsleyRoomWork *work, GroupPlayback *playback, u16 group) {
     FieldExpObjSystem *expObj = work->expObj;
 
-    func_ov123_021eefa4(playback, group, 0);
+    GrimsleyRoom_ShowGroup(playback, group, 0);
     playback->expObj = expObj;
     playback->playing = TRUE;
     playback->group = group;
 }
 
 // Once the group has played, has it shown as it ends
-static void func_ov123_021eef18(GroupPlayback *playback) {
+static void GrimsleyRoom_UpdatePlayback(GroupPlayback *playback) {
     if (playback->playing != FALSE) {
-        if (func_ov123_021eef3c(playback)) {
-            func_ov123_021eefa4(playback, playback->group, 1);
+        if (GrimsleyRoom_IsGroupFinished(playback)) {
+            GrimsleyRoom_ShowGroup(playback, playback->group, 1);
             playback->playing = FALSE;
         }
     }
@@ -221,7 +221,7 @@ static const int sGroupLastModels[2] = { 6, 4 };
 static const int sGroupFirstModels[2] = { 5, 1 };
 
 // Whether every animation of the group's models has finished
-static BOOL func_ov123_021eef3c(GroupPlayback *playback) {
+static BOOL GrimsleyRoom_IsGroupFinished(GroupPlayback *playback) {
     int lastModel = sGroupLastModels[playback->group];
     u8 model;
     u8 anim;
@@ -230,7 +230,7 @@ static BOOL func_ov123_021eef3c(GroupPlayback *playback) {
     for (model = sGroupFirstModels[playback->group]; model <= lastModel; model++) {
         for (anim = 0; anim <= 1; anim++) {
             anm = FieldExpObj_GetAnmInfo(playback->expObj, 0, model, anim);
-            func_ov036_021b8520(playback->expObj, 0, model, anim);
+            FieldExpObj_GetAnmFrame(playback->expObj, 0, model, anim);
             if (!FieldExpObjAnm_IsPlaybackFinished(anm)) {
                 return FALSE;
             }
@@ -241,7 +241,7 @@ static BOOL func_ov123_021eef3c(GroupPlayback *playback) {
 
 // Shows the group's models with their animations stopped and, if mode is 0, the first two playing once, and
 // otherwise the last two looping
-static void func_ov123_021eefa4(GroupPlayback *playback, int group, u8 mode) {
+static void GrimsleyRoom_ShowGroup(GroupPlayback *playback, int group, u8 mode) {
     FieldExpObjSystem *expObj = playback->expObj;
     int firstModel = sGroupFirstModels[group];
     int lastModel = sGroupLastModels[group];
@@ -280,7 +280,7 @@ static void func_ov123_021eefa4(GroupPlayback *playback, int group, u8 mode) {
 }
 
 // Plays one of model 0's animations and pauses the other
-static void func_ov123_021ef0d8(GrimsleyRoomWork *work, u16 animation) {
+static void GrimsleyRoom_PlayModel0Animation(GrimsleyRoomWork *work, u16 animation) {
     u32 i;
     FieldExpObjAnm *anm;
 
@@ -295,18 +295,18 @@ static void func_ov123_021ef0d8(GrimsleyRoomWork *work, u16 animation) {
     FieldExpObj_SetAnmFrame(work->expObj, 0, MODEL_0, animation, 0);
 }
 
-static void func_ov123_021ef144(GrimsleyRoomState *state, BOOL played) {
+static void GrimsleyRoom_SetGroup0Played(GrimsleyRoomState *state, BOOL played) {
     state->group0Played = played;
 }
 
-static BOOL func_ov123_021ef148(GrimsleyRoomState *state) {
+static BOOL GrimsleyRoom_GetGroup0Played(GrimsleyRoomState *state) {
     return state->group0Played;
 }
 
-static void func_ov123_021ef14c(GrimsleyRoomState *state, BOOL played) {
+static void GrimsleyRoom_SetGroup1Played(GrimsleyRoomState *state, BOOL played) {
     state->group1Played = played;
 }
 
-static BOOL func_ov123_021ef150(GrimsleyRoomState *state) {
+static BOOL GrimsleyRoom_GetGroup1Played(GrimsleyRoomState *state) {
     return state->group1Played;
 }

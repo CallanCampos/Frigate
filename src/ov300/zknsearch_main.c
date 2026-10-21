@@ -73,7 +73,7 @@ static void ZknSearchMain_VBlankTask(TCB *tcb, void *data) {
     ZknSearchWork *wk = data;
 
     GFL_BGSysUpdate();
-    func_0204b7c8();
+    ClActSys_VBlank();
     PaletteFade_Transfer(wk->paletteFade);
     if (wk->bgRequest == ZKNSEARCH_BG_REQUEST_ON) {
         GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG1 | GX_PLANEMASK_BG3, TRUE);
@@ -354,9 +354,10 @@ void ZknSearchMain_LoadGraphics(void) {
 
     // The touch bar, at the bottom of BG 0
     arc = GFL_ArcSysCreateFileHandle(getUINarcIdx(), HEAPID_ZUKAN_SEARCH | HEAPID_TAIL_BIT);
-    chars = GFL_BGSysLoadArcNCGRDynamic(arc, func_0202d824(), 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
-    GFL_G2DIOLoadArcNCLRDefault(arc, func_0202d820(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20, HEAPID_ZUKAN_SEARCH);
-    loadBGScrToVramByFileNoReserveNegAlign(arc, func_0202d828(), 0, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
+    chars = GFL_BGSysLoadArcNCGRDynamic(arc, AppMenuCommon_GetBarBgCharFile(), 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
+    GFL_G2DIOLoadArcNCLRDefault(arc, AppMenuCommon_GetBarBgPaletteFile(), PALTYPE_MAIN_BG, 14 * 0x20, 0x20,
+                                HEAPID_ZUKAN_SEARCH);
+    loadBGScrToVramByFileNoReserveNegAlign(arc, AppMenuCommon_GetBarScreenFile(), 0, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
     GFL_BGSysSetScrPaletteNo(0, 0, TOUCHBAR_Y, 32, TOUCHBAR_HEIGHT, 14);
     GFL_BGSysQueueScrLoad(0);
     GFL_ArcToolFree(arc);
@@ -430,13 +431,13 @@ void ZknSearchMain_InitMsg(ZknSearchWork *wk) {
     wk->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_ZKNSEARCH_MAIN, HEAPID_ZUKAN_SEARCH);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, HEAPID_ZUKAN_SEARCH);
     wk->wordSet = GFL_WordSetSystemCreateDefault(HEAPID_ZUKAN_SEARCH);
-    wk->printQueue = func_02021998(HEAPID_ZUKAN_SEARCH);
+    wk->printQueue = PrintQueue_CreateDefault(HEAPID_ZUKAN_SEARCH);
     wk->strbuf = GFL_StrBufCreate(0x80, HEAPID_ZUKAN_SEARCH);
 }
 
 void ZknSearchMain_ExitMsg(ZknSearchWork *wk) {
     GFL_StrBufFree(wk->strbuf);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_WordSetSystemFree(wk->wordSet);
     GFL_FontFree(wk->font);
     GFL_MsgDataFree(wk->msgData);

@@ -40,6 +40,12 @@ if(NOT EXISTS "${asm_oracle_python}")
 endif()
 add_test(NAME asm_oracle
     COMMAND "${CMAKE_COMMAND}" -E env PYTHONDONTWRITEBYTECODE=1 "ASM_ORACLE_BUILD_DIR=${CMAKE_BINARY_DIR}"
-        "${asm_oracle_python}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/asm_oracle/run_all.py"
+        "${asm_oracle_python}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/asm_oracle/run_all.py" --version "${PORT_VERSION}"
     WORKING_DIRECTORY "${REPO_ROOT}")
 set_tests_properties(asm_oracle PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 900)
+
+# DWC authentication names use MSL's 16-bit code units, independently of the host libc's wchar_t ABI.
+add_executable(test_hal_wstring tests/hal/test_wstring.c hal/stubs/wstring_host.c hal/stubs/extras_string.c)
+target_link_libraries(test_hal_wstring PRIVATE port_decomp_env)
+target_compile_options(test_hal_wstring PRIVATE -UNDEBUG)
+add_test(NAME hal_wstring COMMAND test_hal_wstring)

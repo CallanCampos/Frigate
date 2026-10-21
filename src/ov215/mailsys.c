@@ -274,15 +274,15 @@ static MailEdit *MailSys_CreateEdit(MailData *mail, u32 heapId) {
 
     MIi_CpuClearFast(0, edit, sizeof(MailEdit));
     edit->mode = 0;
-    edit->trainerId = func_02009730(mail);
+    edit->trainerId = MailData_GetTrainerID(mail);
     edit->name = GFL_StrBufCreate(16, heapId);
-    GFL_StrBufLoadString(edit->name, func_02009734(mail));
-    edit->design = func_02009750(mail);
-    edit->unk09 = func_0200975c(mail);
-    edit->unk0A = func_02009760(mail);
-    edit->word = func_02009764(mail);
+    GFL_StrBufLoadString(edit->name, MailData_GetTrainerName(mail));
+    edit->design = MailData_GetDesign(mail);
+    edit->unk09 = MailData_GetRegion(mail);
+    edit->unk0A = MailData_GetGameVersion(mail);
+    edit->word = MailData_GetStampWord(mail);
     for (i = 0; i < MAIL_WORD_COUNT; i++) {
-        PMSData_Copy(&edit->words[i], func_0200976c(mail, i));
+        PMSData_Copy(&edit->words[i], MailData_GetMessage(mail, i));
     }
     return edit;
 }
@@ -298,10 +298,10 @@ static void MailSys_ApplyEdit(MailData *mail, MailEdit *edit) {
     u16 i;
 
     for (i = 0; i < MAIL_WORD_COUNT; i++) {
-        func_0200977c(mail, &edit->words[i], i);
+        MailData_SetMessage(mail, &edit->words[i], i);
     }
-    func_02009768(mail, edit->word);
-    func_02009754(mail, edit->design);
+    MailData_SetStampWord(mail, edit->word);
+    MailData_SetDesign(mail, edit->design);
 }
 
 static void MailSys_InitPresets(MailSysWork *work, MailEdit *edit) {
@@ -334,7 +334,7 @@ static BOOL MailSys_EditInit(GameProc *proc, u32 *state, void *param, void *unus
     work->savedCursor = edit->cursor;
     work->blinkCurrent = work->blinkTarget = work->cursor;
     edit->mode = MAIL_EDIT_CANCEL;
-    work->textSpeed = func_02017bcc();
+    work->textSpeed = TextSpeed_GetCurrentWait();
     MailSys_InitPresets(work, work->edit);
     work->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, work->heapId);
     work->tcbEx = GFL_TCBExMgrCreate(work->heapId, work->heapId, 32, 32);
@@ -420,7 +420,7 @@ static BOOL MailSys_Update(MailSysWork *work) {
         break;
     }
     if (work->clUnit != NULL) {
-        func_0204b794();
+        ClActSys_Draw();
     }
     if (work->tcbMgr != NULL) {
         GFL_TCBMgrUpdate(work->tcbMgr);
@@ -429,10 +429,10 @@ static BOOL MailSys_Update(MailSysWork *work) {
         GFL_TCBExMgrUpdate(work->tcbEx);
     }
     if (work->printQueue != NULL) {
-        func_02021a3c(work->printQueue);
+        PrintQueue_Main(work->printQueue);
     }
     if (work->pmsQueue != NULL) {
-        func_02021a3c(work->pmsQueue);
+        PrintQueue_Main(work->pmsQueue);
     }
     return done;
 }
@@ -487,7 +487,7 @@ BOOL MailSys_OnKeyMode(MailSysWork *work) {
 // Switches between the keys and the touch screen when the other one is used, and returns whether the keys took over
 static BOOL MailSys_CheckInputModeSwitch(MailSysWork *work) {
     if (work->keyMode == FALSE) {
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             return FALSE;
         }
         if (GCTX_HIDGetHeldKeys() != 0) {
@@ -501,7 +501,7 @@ static BOOL MailSys_CheckInputModeSwitch(MailSysWork *work) {
         if (GCTX_HIDGetHeldKeys() != 0) {
             return FALSE;
         }
-        if (func_0203da2c()) {
+        if (GFL_HIDIsTouchHeld()) {
             if (work->onTouchMode != NULL) {
                 work->onTouchMode(work);
             }
@@ -515,7 +515,7 @@ static BOOL MailSys_CheckInputModeSwitch(MailSysWork *work) {
 static BOOL MailSys_PhaseView(MailSysWork *work) {
     if (GCTX_HIDGetPressedKeys() != 0) {
         work->keyMode = TRUE;
-    } else if (func_0203da48()) {
+    } else if (GFL_HIDIsTouchPressed()) {
         work->keyMode = FALSE;
     } else {
         return FALSE;
@@ -589,7 +589,7 @@ static BOOL MailSys_PhaseKeys(MailSysWork *work) {
 }
 
 static BOOL MailSys_PhaseTouch(MailSysWork *work) {
-    s32 touched = func_0203da0c(sMailSysTouchRects);
+    s32 touched = GFL_HIDGetTouchPressedRect(sMailSysTouchRects);
 
     if (touched == TOUCH_RECT_NONE) {
         return FALSE;
@@ -633,8 +633,8 @@ static void MailSys_ShowMessage(MailSysWork *work, u32 messageId) {
     BmpWin_DrawFrame(work->windows[6], WINFRAME_TRANSFER_NONE, 0xd, 4);
     GFL_BitmapFill(BmpWin_GetBitmap(work->windows[6]), 0xff);
     GFL_MsgDataLoadStrbuf(work->msgData, messageId, work->msgBuf);
-    work->printStream = func_02022268(work->windows[6], 0, 0, work->msgBuf, work->font, work->textSpeed, work->tcbEx, 4,
-                                      work->heapId, 15);
+    work->printStream = PrintStream_Create(work->windows[6], 0, 0, work->msgBuf, work->font, work->textSpeed,
+                                           work->tcbEx, 4, work->heapId, 15);
     BmpWin_TransferNow(work->windows[6]);
 }
 
@@ -655,9 +655,9 @@ static BOOL MailSys_PhaseNotice(MailSysWork *work) {
         }
         break;
     case 2:
-        if (func_020223b4(work->printStream) == PRINT_STREAM_DONE) {
-            if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || func_0203da48()) {
-                func_020223cc(work->printStream);
+        if (PrintStream_GetState(work->printStream) == PRINT_STREAM_DONE) {
+            if ((GCTX_HIDGetPressedKeys() & PAD_BUTTON_A) || GFL_HIDIsTouchPressed()) {
+                PrintStream_Delete(work->printStream);
                 work->subSeq = 3;
             }
         }
@@ -730,8 +730,8 @@ static BOOL MailSys_PhaseCancel(MailSysWork *work) {
         }
         return FALSE;
     case 2:
-        if (func_020223b4(work->printStream) == PRINT_STREAM_DONE) {
-            func_020223cc(work->printStream);
+        if (PrintStream_GetState(work->printStream) == PRINT_STREAM_DONE) {
+            PrintStream_Delete(work->printStream);
             MailSys_OpenConfirmMenu(work);
             work->subSeq = 3;
         }
@@ -783,7 +783,7 @@ static void MailSys_VBlank(TCB *tcb, void *data) {
     if (work->palFade != NULL) {
         PaletteFade_Transfer(work->palFade);
     }
-    func_0204b7c8();
+    ClActSys_VBlank();
     GFL_BGSysUpdate();
     OS_SetIrqCheckFlag(OS_IE_V_BLANK);
 }

@@ -10,14 +10,14 @@
 #include "battle/btl_handler.h"
 #include "struct_decls.h"
 
-u8 func_ov167_021ae32c(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, void *targets);
+u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, void *targets);
 void AddExpAndEVs(BtlServerFlow *flow, BattleParty *party, BattleMon *defeated, BtlFlowExpEntry *entries);
-u8 func_ov167_021af2ac(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot);
-s32 func_ov167_021b0318(BtlMainModule *mainModule, BtlPokeCon *pokeCon);
-u32 func_ov167_021b05b4(BtlServerFlow *flow);
-void func_ov167_021b0814(u32 *table);
-void func_ov167_021b0824(u32 *table, u8 monId, u32 value);
-u32 func_ov167_021b082c(u32 *table, u8 monId);
-u32 func_ov167_021b0834(u32 *table, u8 monId);
+u8 UseBagItem(BtlServerFlow *flow, BattleMon *mon, u16 item, u8 param, u8 slot);
+s32 CheckScriptedBattleRules(BtlMainModule *mainModule, BtlPokeCon *pokeCon);
+u32 CalcBattleResult(BtlServerFlow *flow);
+void EffectivenessTable_Init(u32 *table);
+void EffectivenessTable_Set(u32 *table, u8 monId, u32 value);
+u32 EffectivenessTable_Get(u32 *table, u8 monId);
+u32 EffectivenessTable_GetValue(u32 *table, u8 monId);
 
 #endif // POKEBW2_BATTLE_BTL_SERVER_FLOW_SUB_H

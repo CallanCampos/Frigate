@@ -21,9 +21,7 @@
 #define POS_TO_GRID(pos) ((s16)POS_TO_GRID_RAW(pos))
 
 #define OBJ_CODE_NONE 0xffff
-#define BLACT_IDX_NONE 0xffff
 #define PLAYER_ACTOR_ID 0xff
-#define DIR_NONE 9
 #define SEQ_NONE 10
 
 typedef BOOL (*ExStateChangeFunc)(FieldPlayerCore *core);
@@ -40,7 +38,7 @@ struct FieldPlayerCore {
     u16 keyDirH;
     u16 keyDirV;
     u32 specialSeq;
-    TCB *terrainEffectTCB;
+    FieldEffectTask *terrainEffectTCB;
     u16 unk2C;
     u16 unk2E;
     s16 seqStep;
@@ -49,8 +47,10 @@ struct FieldPlayerCore {
 
 static void FieldPlayerCore_ChangeObjCode(FieldPlayerCore *core, u16 objCode);
 static void FieldPlayerCore_InitModelCore(FieldPlayerCore *core, u32 exState);
-BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core);
+static BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core);
 static BOOL func_ov036_0219b1fc(FieldPlayerCore *core);
+static u32 GetMoveDirHByKey(u32 keys);
+static u32 GetMoveDirVByKey(u32 keys);
 static u16 FieldPlayerCore_GetMoveDirByKey_(FieldPlayerCore *core, u16 heldKeys);
 static void FieldPlayerCore_CalcSeparateKeyDirs_(FieldPlayerCore *core, u16 heldKeys);
 static BOOL FieldPlayerCore_CheckSpecialObjCode(FieldPlayerCore *core, u16 objCode);
@@ -181,7 +181,7 @@ void FieldPlayerCore_UpdateActionStatusObserver(FieldPlayerCore *core) {
             return;
         }
     }
-    if (func_ov012_02166ecc(actor) == TRUE) {
+    if (FldAct_CheckAcmdEnd(actor) == TRUE) {
         switch (moveStatus) {
         case 0:
             return;
@@ -234,11 +234,11 @@ u16 FieldPlayerCore_GetFaceDir(FieldPlayerCore *core) {
     return GetActorFaceDir(core->actor);
 }
 
-void FieldPlayerCore_SetDirection(FieldPlayerCore *core, u32 dir) {
+void FieldPlayerCore_SetDirection(FieldPlayerCore *core, u16 dir) {
     CheckSetActorFaceDir(core->actor, dir);
 }
 
-void FieldPlayerCore_ForceObjCode(FieldPlayerCore *core, u32 objCode) {
+void FieldPlayerCore_ForceObjCode(FieldPlayerCore *core, u16 objCode) {
     FieldPlayerCore_ChangeObjCode(core, objCode);
     FieldPlayerState_SetObjCode(core->playerState, objCode);
 }
@@ -307,7 +307,7 @@ void func_ov036_0219b014(FieldPlayerCore *core, u32 forme) {
 }
 
 BOOL func_ov036_0219b04c(FieldPlayerCore *core) {
-    if (FldAct_GetBlActIdx(FieldPlayerCore_GetActor(core), 0) != BLACT_IDX_NONE) {
+    if (FldAct_GetBlActIdx(FieldPlayerCore_GetActor(core), 0) != BLACT_NONE) {
         if (core->unk2C == 1) {
             return TRUE;
         }
@@ -336,7 +336,7 @@ BOOL func_ov036_0219b0a4(FieldPlayerCore *core) {
         return TRUE;
     }
     idx = FldAct_GetBlActIdx(core->actor, 0);
-    if (idx != BLACT_IDX_NONE && func_0204f768(blActSys, (u16)idx, &cmd) && cmd == 0x3fff) {
+    if (idx != BLACT_NONE && BlActSys_GetActorLastCmd(blActSys, idx, &cmd) && cmd == BLACT_ANIM_CMD_END) {
         return TRUE;
     }
     return FALSE;
@@ -357,11 +357,11 @@ void FieldPlayerCore_CalcSeparateKeyDirs(FieldPlayerCore *core, u32 heldKeys) {
     FieldPlayerCore_CalcSeparateKeyDirs_(core, heldKeys);
 }
 
-void func_ov036_0219b138(FieldPlayerCore *core, TCB *tcb) {
+void func_ov036_0219b138(FieldPlayerCore *core, FieldEffectTask *tcb) {
     core->terrainEffectTCB = tcb;
 }
 
-TCB *FieldPlayerCore_GetTerrainEffectTCB(FieldPlayerCore *core) {
+FieldEffectTask *FieldPlayerCore_GetTerrainEffectTCB(FieldPlayerCore *core) {
     return core->terrainEffectTCB;
 }
 
@@ -394,7 +394,7 @@ static void FieldPlayerCore_InitModelCore(FieldPlayerCore *core, u32 exState) {
     FieldPlayerCore_SetExState(core, exState);
 }
 
-BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core) {
+static BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core) {
     u16 objCode = FldAct_GetObjCode(FieldPlayerCore_GetActor(core));
 
     if (objCode == OBJ_CODE_HERO || objCode == OBJ_CODE_HEROINE) {
@@ -404,17 +404,13 @@ BOOL FieldPlayerCore_IsBaseFormeObjCode(FieldPlayerCore *core) {
 }
 
 static BOOL func_ov036_0219b1fc(FieldPlayerCore *core) {
-    BOOL result = FALSE;
     u16 idx = FldAct_GetBlActIdx(core->actor, 0);
 
-    if (idx != BLACT_IDX_NONE) {
-        result = TRUE;
+    if (idx != BLACT_NONE) {
+        return TRUE;
     }
-    return result;
+    return FALSE;
 }
-
-static u32 GetMoveDirHByKey(u32 keys);
-static u32 GetMoveDirVByKey(u32 keys);
 
 static u16 FieldPlayerCore_GetMoveDirByKey_(FieldPlayerCore *core, u16 heldKeys) {
     u32 dirH = GetMoveDirHByKey(heldKeys);
@@ -456,20 +452,20 @@ static void FieldPlayerCore_CalcSeparateKeyDirs_(FieldPlayerCore *core, u16 held
 
 static u32 GetMoveDirHByKey(u32 keys) {
     if (keys & PAD_KEY_LEFT) {
-        return 2;
+        return DIR_LEFT;
     }
     if (keys & PAD_KEY_RIGHT) {
-        return 3;
+        return DIR_RIGHT;
     }
     return DIR_NONE;
 }
 
 static u32 GetMoveDirVByKey(u32 keys) {
     if (keys & PAD_KEY_UP) {
-        return 0;
+        return DIR_UP;
     }
     if (keys & PAD_KEY_DOWN) {
-        return 1;
+        return DIR_DOWN;
     }
     return DIR_NONE;
 }
@@ -561,7 +557,7 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_NONE(FieldPlayerCore *core) {
     u32 sex = FieldPlayerCore_GetSex(core);
     FieldActor *actor = FieldPlayerCore_GetActor(core);
     u16 objCode = FieldPlayer_GetObjCodeByForme(sex, 0);
-    TCB *tcb;
+    FieldEffectTask *tcb;
 
     if (objCode != FldAct_GetObjCode(actor)) {
         FieldPlayerCore_ChangeObjCode(core, objCode);
@@ -570,10 +566,10 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_NONE(FieldPlayerCore *core) {
     FieldPlayerCore_ReqSyncBGM(core);
     tcb = FieldPlayerCore_GetTerrainEffectTCB(core);
     if (tcb != NULL) {
-        func_ov036_021a3a70((FieldEffectTask *)tcb);
+        func_ov036_021a3a70(tcb);
         func_ov036_0219b138(core, NULL);
     }
-    func_ov012_0216734c(actor, &offset);
+    FldAct_SetOuterDrawOffset(actor, &offset);
     core->seqDone = 1;
     return FALSE;
 }
@@ -612,7 +608,7 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_SURF(FieldPlayerCore *core) {
         u16 dir = GetActorFaceDir(actor);
 
         CopyActorWPos(actor, &pos);
-        func_ov036_0219b138(core, (TCB *)func_ov036_021a4484(effects, dir, &pos, actor, 1));
+        func_ov036_0219b138(core, func_ov036_021a4484(effects, dir, &pos, actor, 1));
     }
     core->seqDone = 1;
     return FALSE;
@@ -706,11 +702,11 @@ static BOOL FieldPlayerCore_ExStateChangeFunc_DIVE(FieldPlayerCore *core) {
         u16 dir = GetActorFaceDir(actor);
 
         CopyActorWPos(actor, &pos);
-        func_ov036_0219b138(core, (TCB *)func_ov036_021a4484(fieldEffects, dir, &pos, actor, 1));
+        func_ov036_0219b138(core, func_ov036_021a4484(fieldEffects, dir, &pos, actor, 1));
     }
     func_ov036_021c6934(core->actor, effects);
     if (core->terrainEffectTCB != NULL) {
-        func_ov036_021a4514((FieldEffectTask *)core->terrainEffectTCB, FALSE);
+        func_ov036_021a4514(core->terrainEffectTCB, FALSE);
     }
     core->seqDone = 1;
     return FALSE;
@@ -729,12 +725,13 @@ static BOOL func_ov036_0219b710(FieldPlayerCore *core) {
         BOOL blocked = FALSE;
         FieldActor *actor = FieldPlayerCore_GetActor(core);
         MMSys *mmSys = GetActorMModelSystem(actor);
-        s16 pos[2];
+        s16 x;
+        s16 z;
 
-        pos[1] = GetGPosX(actor);
-        pos[0] = GetGPosZ(actor);
-        AdjusGridXZByDir(1, &pos[1], &pos[0], 1);
-        if (GetFirstActorOnGPos(mmSys, pos[1], pos[0], TRUE) != NULL) {
+        x = GetGPosX(actor);
+        z = GetGPosZ(actor);
+        AdjusGridXZByDir(DIR_DOWN, &x, &z, 1);
+        if (GetFirstActorOnGPos(mmSys, x, z, TRUE) != NULL) {
             blocked = TRUE;
         }
         func_ov036_0219690c(actor, blocked);

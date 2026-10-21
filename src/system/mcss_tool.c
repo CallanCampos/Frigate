@@ -27,8 +27,8 @@ typedef struct {
 #define SPINDA_FRAME_ROWS 40
 
 static void SetupPokemonLoaderByBoxData(BoxPkm *pkm, MCSSLoadInfo *info, u32 dir);
-static BOOL func_0201c198(const MCSSLoadInfo *info, MCSSLoad *load, u32 personality);
-static void func_0201c2a4(uptr param, fx32 frame);
+static BOOL MCSS_SpindaLoadCallback(const MCSSLoadInfo *info, MCSSLoad *load, u32 personality);
+static void MCSS_RestartOnAnimationEnd(uptr param, fx32 frame);
 
 static const SpindaSpotPixel sMcssSpindaSpot0[] = {
     { 11, 7 },  { 12, 7 },  { 13, 7 },  { 14, 7 },  { 10, 8 },  { 11, 8 },  { 12, 8 },  { 13, 8 },      { 14, 8 },
@@ -76,8 +76,8 @@ static const SpindaSpotPixel *sMcssSpindaSpots[SPINDA_SPOT_COUNT] = {
     sMcssSpindaSpot3,
 };
 
-void func_0201bfdc(PartyPkm *pkm, MCSSLoadInfo *info, u32 dir) {
-    SetupPokemonLoaderByBoxData(func_0201d624(pkm), info, dir);
+void SetupPokemonLoaderByPartyPkm(PartyPkm *pkm, MCSSLoadInfo *info, u32 dir) {
+    SetupPokemonLoaderByBoxData(PokeParty_ToBoxPkm(pkm), info, dir);
 }
 
 static void SetupPokemonLoaderByBoxData(BoxPkm *pkm, MCSSLoadInfo *info, u32 dir) {
@@ -113,19 +113,19 @@ void GetTrainerSpriteResIDs(u32 trainerType, MCSSLoadInfo *info, BOOL back) {
     info->unk20 = 1;
 }
 
-MCSS *func_0201c14c(MCSSSystem *system, PartyPkm *pkm, u32 dir, fx32 x, fx32 y, fx32 z) {
+MCSS *MCSSSys_AddPartyPkm(MCSSSystem *system, PartyPkm *pkm, u32 dir, fx32 x, fx32 y, fx32 z) {
     MCSSLoadInfo info;
 
-    func_0201c188(system, PokeParty_GetParam(pkm, PKM_PARAM_PID, NULL));
-    func_0201bfdc(pkm, &info, dir);
+    MCSSSys_SetSpindaLoadCallback(system, PokeParty_GetParam(pkm, PKM_PARAM_PID, NULL));
+    SetupPokemonLoaderByPartyPkm(pkm, &info, dir);
     return MCSSSys_Add(system, x, y, z, &info);
 }
 
-void func_0201c188(MCSSSystem *system, u32 personality) {
-    MCSSSys_SetLoadCallback(system, func_0201c198, personality);
+void MCSSSys_SetSpindaLoadCallback(MCSSSystem *system, u32 personality) {
+    MCSSSys_SetLoadCallback(system, MCSS_SpindaLoadCallback, personality);
 }
 
-static BOOL func_0201c198(const MCSSLoadInfo *info, MCSSLoad *load, u32 personality) {
+static BOOL MCSS_SpindaLoadCallback(const MCSSLoadInfo *info, MCSSLoad *load, u32 personality) {
     if (info->bin == POKEGRA_SPINDA_BIN) {
         MCSS_DrawSpindaSpots(load->chars->rawData, personality);
     }
@@ -167,10 +167,10 @@ void MCSS_DrawSpindaSpots(void *chars, u32 personality) {
 }
 
 // Restarts the sprite's animation each time it ends
-void func_0201c290(MCSS *mcss) {
-    MCSS_SetAnimationEndCallback(mcss, (uptr)mcss, func_0201c2a4, 1);
+void MCSS_SetLoopAnimation(MCSS *mcss) {
+    MCSS_SetAnimationEndCallback(mcss, (uptr)mcss, MCSS_RestartOnAnimationEnd, 1);
 }
 
-static void func_0201c2a4(uptr param, fx32 frame) {
-    func_0201b25c((MCSS *)param);
+static void MCSS_RestartOnAnimationEnd(uptr param, fx32 frame) {
+    MCSS_RequestRestart((MCSS *)param);
 }

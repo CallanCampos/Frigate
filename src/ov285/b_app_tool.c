@@ -28,9 +28,9 @@ void BAppCursor_CreateActors(BAppCursor *cursor, ClActUnit *unit, u32 chars, u32
     setup.bgPriority = 1;
     for (i = 0; i < 4; i++) {
         setup.sequence = i;
-        cursor->corners[i] = func_0204c040(unit, chars, palette, cellAnims, &setup, 1, cursor->heapId);
-        func_0204c378(cursor->corners[i], 0, 1);
-        func_0204c520(cursor->corners[i], TRUE);
+        cursor->corners[i] = ClActor_Create(unit, chars, palette, cellAnims, &setup, 1, cursor->heapId);
+        ClActor_SetPalette(cursor->corners[i], 0, 1);
+        ClActor_SetAutoAnim(cursor->corners[i], TRUE);
     }
 }
 
@@ -38,7 +38,7 @@ void BAppCursor_DeleteActors(BAppCursor *cursor) {
     u32 i;
 
     for (i = 0; i < 4; i++) {
-        func_0204c108(cursor->corners[i]);
+        ClActor_Delete(cursor->corners[i]);
     }
 }
 
@@ -49,7 +49,7 @@ void BAppCursor_SetVisible(BAppCursor *cursor, BOOL visible) {
         return;
     }
     for (i = 0; i < 4; i++) {
-        func_0204c124(cursor->corners[i], visible);
+        ClActor_SetVisible(cursor->corners[i], visible);
     }
     cursor->visible = visible;
 }
@@ -61,16 +61,16 @@ void BAppCursor_SetPos(BAppCursor *cursor, const CursorMoveData *pos) {
 
     actorPos.x = pos->x - halfWidth;
     actorPos.y = pos->y - halfHeight;
-    func_0204c140(cursor->corners[0], &actorPos, 1);
+    ClActor_SetSurfacePos(cursor->corners[0], &actorPos, 1);
     actorPos.x = pos->x - halfWidth;
     actorPos.y = pos->y + halfHeight;
-    func_0204c140(cursor->corners[1], &actorPos, 1);
+    ClActor_SetSurfacePos(cursor->corners[1], &actorPos, 1);
     actorPos.x = pos->x + halfWidth;
     actorPos.y = pos->y - halfHeight;
-    func_0204c140(cursor->corners[2], &actorPos, 1);
+    ClActor_SetSurfacePos(cursor->corners[2], &actorPos, 1);
     actorPos.x = pos->x + halfWidth;
     actorPos.y = pos->y + halfHeight;
-    func_0204c140(cursor->corners[3], &actorPos, 1);
+    ClActor_SetSurfacePos(cursor->corners[3], &actorPos, 1);
 }
 
 void BAppTool_QueueWindowScreen(PrintWindow *printWindow) {
@@ -94,7 +94,7 @@ void BAppTool_QueueWindowScreens(PrintWindow *printWindows, const u8 *list) {
 void BAppTool_FlushPrintWindows(PrintWindow *printWindows, PrintQueue *queue, u32 count) {
     u32 i;
 
-    func_02021a3c(queue);
+    PrintQueue_Main(queue);
     for (i = 0; i < count; i++) {
         PrintWindow_Flush(&printWindows[i], queue);
     }

@@ -42,7 +42,7 @@ BOOL s00E0_GameGetVersion(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155608(VM *vm, FieldScriptEnv *env) {
+BOOL s00C9_ConfigToggleKanji(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     Config *trainerData;
@@ -51,17 +51,17 @@ BOOL func_ov012_02155608(VM *vm, FieldScriptEnv *env) {
     gameData = FieldScriptEnv_GetGameData(env);
     save = GameData_GetSaveControl(gameData);
     trainerData = (Config *)getTrainerDataBlkAddress(save);
-    mode = func_02008a84(trainerData);
+    mode = Config_GetKanji(trainerData);
     if (mode == 0) {
         mode = 1;
     } else if (mode == 1) {
         mode = 0;
     }
-    func_02008a8c(trainerData, mode);
+    Config_SetKanji(trainerData, mode);
     return FALSE;
 }
 
-BOOL func_ov012_02155638(VM *vm, FieldScriptEnv *env) {
+BOOL s00CA_ConfigGetKanji(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     SaveControl *save;
     Config *trainerData;
@@ -71,7 +71,7 @@ BOOL func_ov012_02155638(VM *vm, FieldScriptEnv *env) {
     save = GameData_GetSaveControl(gameData);
     trainerData = (Config *)getTrainerDataBlkAddress(save);
     value = ScriptReadVar(vm, env);
-    *value = func_02008a84(trainerData);
+    *value = Config_GetKanji(trainerData);
     return FALSE;
 }
 
@@ -88,13 +88,13 @@ BOOL s00CC_RTGetTextFile(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_0215569c(VM *vm, FieldScriptEnv *env) {
+BOOL s00CE_TrainerCardGetStars(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     u16 *value;
 
     gameData = FieldScriptEnv_GetGameData(env);
     value = ScriptReadVar(vm, env);
-    *value = func_ov012_02169b78(gameData);
+    *value = TrainerCard_CountStars(gameData);
     return FALSE;
 }
 
@@ -215,7 +215,7 @@ BOOL s0138_SaveDataGetStatus(VM *vm, FieldScriptEnv *env) {
 
     *present = SaveControl_IsDataAlreadyPresent(save);
     *status = SaveControl_GetStatus(save);
-    func_020074b8(save, &a1, &a2);
+    SaveControl_GetChangedSize(save, &a1, &a2);
     if (a1 * 3 < a2) {
         *result = 0;
     } else {
@@ -380,10 +380,10 @@ BOOL s02D0_PokeDexEnableHabitatList(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-// The system UI flags that func_ov012_02155bec sets and clears
+// The system UI flags that s02ED_SetSoftResetBlocked sets and clears
 static const u32 sSystemUIFlags[1] = { 0x40 };
 
-BOOL func_ov012_02155bec(VM *vm, FieldScriptEnv *env) {
+BOOL s02ED_SetSoftResetBlocked(VM *vm, FieldScriptEnv *env) {
     u16 mode = ScriptReadAny(vm, env);
     u16 index = ScriptReadAny(vm, env);
 
@@ -398,7 +398,7 @@ BOOL func_ov012_02155bec(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155c30(VM *vm, FieldScriptEnv *env) {
+BOOL s02F1_SetOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
@@ -407,7 +407,7 @@ BOOL func_ov012_02155c30(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155c64(VM *vm, FieldScriptEnv *env) {
+BOOL s02F2_IsOneShotDRObtained(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerInfo *playerInfo = GetGameDataPlayerInfo(gameData);
     TrainerCardSave *card = getTrainerCardDataBlkAddress(gameData);
@@ -425,7 +425,7 @@ BOOL s00E2_SaveDataCheckRequired(VM *vm, FieldScriptEnv *env) {
     Config *config = (Config *)getTrainerDataBlkAddress(save);
     u16 *value = ScriptReadVar(vm, env);
 
-    switch (func_02008ac8(config)) {
+    switch (Config_GetSaveBeforeIR(config)) {
     case 0:
         *value = 0;
         break;
@@ -442,7 +442,7 @@ BOOL s00E3_GiveRunningShoes(VM *vm, FieldScriptEnv *env) {
     return FALSE;
 }
 
-BOOL func_ov012_02155d00(VM *vm, FieldScriptEnv *env) {
+BOOL s00E4_BoxUnlockWallpapers(VM *vm, FieldScriptEnv *env) {
     u16 flags = ScriptReadAny(vm, env);
     BoxSaveAccessor *box = GameData_GetBoxSaveAccessor(FieldScriptEnv_GetGameData(env));
 
@@ -459,32 +459,36 @@ BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env) {
     PlayerState *playerState = GameData_GetPlayerState(gameData);
     void *timeSig = getTimeSigBlkAddress(GameData_GetSaveControl(gameData));
 
-    *value = func_0202b5e8(func_02008bf4(&playerState->playerInfo));
-    *flag = func_020091d0(timeSig);
-    func_020091dc(timeSig);
+    *value = UnionView_GetTrainerClass(PlayerInfo_GetUnionView(&playerState->playerInfo));
+    *flag = TimeSigSave_IsUnionViewChanged(timeSig);
+    TimeSigSave_SetUnionViewChanged(timeSig);
     return FALSE;
 }
 
-BOOL func_ov012_02155d80(VM *vm, FieldScriptEnv *env) {
+BOOL s00E6_StartMenuIsItemUnlocked(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = (func_0200ca50(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) & 1) ? TRUE : FALSE;
+    *result =
+        (TrainerGameInfo_GetStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) & 1)
+            ? TRUE
+            : FALSE;
     return FALSE;
 }
 
-BOOL func_ov012_02155db4(VM *vm, FieldScriptEnv *env) {
+BOOL s00E7_StartMenuUnlockItem(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
 
-    func_0200ca38(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item, 1);
+    TrainerGameInfo_AddStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item, 1);
     return FALSE;
 }
 
-BOOL func_ov012_02155dd4(VM *vm, FieldScriptEnv *env) {
+BOOL s00E8_StartMenuIsItemSelected(VM *vm, FieldScriptEnv *env) {
     u16 item = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    if (func_0200ca50(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) == 3) {
+    if (TrainerGameInfo_GetStartMenuItemFlags(getTrainerCardDataBlkAddress(FieldScriptEnv_GetGameData(env)), item) ==
+        3) {
         *result = TRUE;
     } else {
         *result = FALSE;
@@ -500,7 +504,7 @@ BOOL s00EA_HOFCheckIntegrity(VM *vm, FieldScriptEnv *env) {
 
     if (EventWork_FlagGet(eventWork, 0x960)) {
         save = GameData_GetSaveControl(gameData);
-        switch (func_020074ec(save, 8, HEAPID_GAMEEVENT)) {
+        switch (SaveControl_OpenExtraBlock(save, 8, HEAPID_GAMEEVENT)) {
         case 0:
             *result = 0;
             break;

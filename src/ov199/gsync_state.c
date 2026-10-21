@@ -319,7 +319,7 @@ static BOOL GSync_IsOnline(GSyncWork *wk) {
     if (param->hasAccountInfo && param->accountInfo.status == 4) {
         return FALSE;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         return TRUE;
     }
     return FALSE;
@@ -379,9 +379,9 @@ static void GSync_StateWaitCleanup(GSyncWork *wk) {
 }
 
 static void GSync_StateErrorWait(GSyncWork *wk) {
-    if (!wk->receiving && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+    if (!wk->receiving && ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         if (wk->saving) {
-            func_02017884(wk->gameData);
+            GameData_CancelSave(wk->gameData);
             wk->saving = FALSE;
         }
         GSync_RestoreDreamWorld(wk);
@@ -439,7 +439,7 @@ static void GSync_StateEnd(GSyncWork *wk) {
 
 static void GSync_StateWaitDownloadsShown(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 489);
     }
 }
@@ -467,7 +467,7 @@ static void GSync_StateWaitLevelUp(GSyncWork *wk) {
                 GFL_SndBGMSetPaused(FALSE);
                 GFL_SndBGMFadeIn(6);
             }
-            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+            if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
                 GSync_ChangeState(wk, GSync_StateShowDownloads, 539);
             }
         }
@@ -476,7 +476,7 @@ static void GSync_StateWaitLevelUp(GSyncWork *wk) {
 
 static void GSync_StateWaitReceived(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         if (wk->levels == 0) {
             GSync_ChangeState(wk, GSync_StateShowDownloads, 551);
             return;
@@ -512,7 +512,7 @@ static void GSync_ReceivePokemon(GSyncWork *wk) {
         PartyPkm *pkm = GFL_HeapAllocate(wk->heapId, PokeParty_GetPkmRawSize(), TRUE, "gsync_state.c", 597);
         u32 size = PokeParty_GetPkmRawSize();
 
-        MI_CpuCopy8(func_02009998(dreamWorld), pkm, size);
+        MI_CpuCopy8(DreamWorldSave_GetPkm(dreamWorld), pkm, size);
         if (wk->levels != 0) {
             int level = PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL);
 
@@ -527,10 +527,10 @@ static void GSync_ReceivePokemon(GSyncWork *wk) {
             }
             setLevel(pkm, level);
         }
-        BoxSaveAccessor_InsertPkm(wk->boxes, func_0201d624(pkm));
+        BoxSaveAccessor_InsertPkm(wk->boxes, PokeParty_ToBoxPkm(pkm));
         wk->pkm = pkm;
-        func_02009a00(dreamWorld, FALSE);
-        func_02009adc(dreamWorld, wk->resultId);
+        DreamWorldSave_SetPokemonAsleep(dreamWorld, FALSE);
+        DreamWorldSave_SetLastResultID(dreamWorld, wk->resultId);
         MedalBox_GiveMedal(SaveControl_GetMedalBox(wk->save), 232);
     }
 }
@@ -539,11 +539,11 @@ static void GSync_StateWaitReceiveSave(GSyncWork *wk) {
     ClActorCallback callback;
 
     getDreamWorldStuffAddress(wk->save);
-    if (func_02017850(wk->gameData) == 2) {
+    if (GameData_UpdateSave(wk->gameData) == 2) {
         wk->saving = FALSE;
         wk->receiving = FALSE;
         wk->busy = FALSE;
-        func_02038bc8(28);
+        JoinAvenue_RecordActivity(28);
         GSyncMessage_ClearMessage(wk->msg);
         GSyncMessage_FormatPokemonNumber(wk->msg, 45, 0, wk->pkm);
         GSyncMessage_PrintInfoAt(wk->msg, 1, 4);
@@ -556,7 +556,7 @@ static void GSync_StateWaitReceiveSave(GSyncWork *wk) {
         callback.func = GSync_OnPokemonAnimEnd;
         GSyncDisp_SetActorCallback(wk->disp, 0, &callback);
         GSyncDisp_StartFade(wk->disp, FALSE);
-        GSyncDisp_CreatePokeIcon(wk->disp, func_0201d620(wk->pkm), CLACT_SURFACE_MAIN);
+        GSyncDisp_CreatePokeIcon(wk->disp, PokeParty_GetBoxPkm(wk->pkm), CLACT_SURFACE_MAIN);
         GSyncDisp_PokeIconSequence1(wk->disp);
         GFL_SndSEPlay(SEQ_SE_SYS_25);
         GSync_ChangeState(wk, GSync_StateWaitReceived, 686);
@@ -579,7 +579,7 @@ static void GSync_StateFinishDownload(GSyncWork *wk) {
         wk->wait--;
         return;
     }
-    if (func_02042788() && NHttpRap_SendRequest(GSYNC_REQUEST_DOWNLOAD_FINISH, wk->http)) {
+    if (GFL_NetIsInitialized() && NHttpRap_SendRequest(GSYNC_REQUEST_DOWNLOAD_FINISH, wk->http)) {
         wk->request[0] = 1;
         wk->request[1] = 0;
         NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), wk->request, sizeof(wk->request));
@@ -594,7 +594,7 @@ static void GSync_StateWaitReceiveSaveStart(GSyncWork *wk) {
         wk->progress++;
     }
     GSyncDisp_SetProgress(wk->disp, wk->progress);
-    if (func_02017850(wk->gameData) == 1) {
+    if (GameData_UpdateSave(wk->gameData) == 1) {
         wk->wait = GFL_RandomLC(190);
         GSync_ChangeState(wk, GSync_StateFinishDownload, 768);
     }
@@ -618,11 +618,11 @@ static void GSync_StateReceive(GSyncWork *wk) {
 
         GSync_AddForestPokemon(wk, dreamWorld, info->species, info->sex, info->form, info->unk4, GFL_RandomLC(8));
         for (i = 0; i < 20; i++) {
-            func_02009a50(dreamWorld, i, info->items[i], info->itemCounts[i]);
+            DreamWorldSave_SetItem(dreamWorld, i, info->items[i], info->itemCounts[i]);
         }
     }
     wk->saving = TRUE;
-    func_0201782c(wk->gameData);
+    GameData_StartSave(wk->gameData);
     GSync_ChangeState(wk, GSync_StateWaitReceiveSaveStart, 814);
 }
 
@@ -646,9 +646,9 @@ static void GSync_StateCGearSaved(GSyncWork *wk) {
 static void GSync_StateWaitCGearSave(GSyncWork *wk) {
     SaveControl *save = GameData_GetSaveControl(wk->gameData);
 
-    if (func_020178f4(wk->gameData, 4) == 2) {
+    if (GameData_UpdateSaveBlock(wk->gameData, 4) == 2) {
         freeIntermediateSaveExtraBlksAfterLoad2(save, 4);
-        func_020098cc(func_02009918(save), TRUE);
+        CGearSettings_SetSkinValid(CGearSettings_GetFromSave(save), TRUE);
         GSync_ChangeState(wk, GSync_StateCGearSaved, 848);
     }
 }
@@ -667,10 +667,10 @@ static void GSync_StateCGearDownloaded(GSyncWork *wk) {
     wk->busy = TRUE;
     skin = GFL_HeapAllocate(wk->heapId, 0x2800, FALSE, "gsync_state.c", 871);
     wk->cgearSkin = skin;
-    func_02007560(save, 4, wk->heapId, skin, 0x2800);
+    SaveControl_LoadExtraBlock(save, 4, wk->heapId, skin, 0x2800);
     MI_CpuCopy8(buffer, skin, GSYNC_CGEAR_SKIN_SIZE);
-    func_020098d4(func_02009918(save), crc);
-    func_020178c4(wk->gameData, 4);
+    CGearSettings_SetSkinCrc(CGearSettings_GetFromSave(save), crc);
+    GameData_StartSaveBlock(wk->gameData, 4);
     GSync_ChangeState(wk, GSync_StateWaitCGearSave, 882);
 }
 
@@ -685,7 +685,7 @@ static void GSync_StateZukanSaved(GSyncWork *wk) {
 static void GSync_StateWaitZukanSave(GSyncWork *wk) {
     SaveControl *save = GameData_GetSaveControl(wk->gameData);
 
-    if (func_020178f4(wk->gameData, 7) == 2) {
+    if (GameData_UpdateSaveBlock(wk->gameData, 7) == 2) {
         freeIntermediateSaveExtraBlksAfterLoad2(save, 7);
         GSync_ChangeState(wk, GSync_StateZukanSaved, 903);
     }
@@ -703,15 +703,15 @@ static void GSync_StateZukanDownloaded(GSyncWork *wk) {
     }
     wk->busy = TRUE;
     wk->zukanSkin = GFL_HeapAllocate(wk->heapId, 0x6800, FALSE, "gsync_state.c", 922);
-    func_02007560(save, 7, wk->heapId, wk->zukanSkin, 0x6800);
+    SaveControl_LoadExtraBlock(save, 7, wk->heapId, wk->zukanSkin, 0x6800);
     MI_CpuCopy8(buffer, wk->zukanSkin, GSYNC_ZUKAN_SKIN_SIZE);
-    func_0200f194(wk->zukanSkin, TRUE);
-    func_020178c4(wk->gameData, 7);
+    PokedexSkinSave_SetValid(wk->zukanSkin, TRUE);
+    GameData_StartSaveBlock(wk->gameData, 7);
     GSync_ChangeState(wk, GSync_StateWaitZukanSave, 928);
 }
 
 static void GSync_StateWaitMusicalImport(GSyncWork *wk) {
-    if (func_0200cd64(wk->musical)) {
+    if (MusicalDist_WriteStep(wk->musical)) {
         wk->busy = FALSE;
         wk->musical = NULL;
         GSync_ChangeState(wk, GSync_StateCleanupDownload, 939);
@@ -739,7 +739,7 @@ static void GSync_MusicalDownloaded(GSyncWork *wk, int size) {
         return;
     }
     wk->busy = TRUE;
-    wk->musical = func_0200cd34(wk->gameData, buffer, size, wk->heapId);
+    wk->musical = MusicalDist_StartWrite(wk->gameData, buffer, size, wk->heapId);
     GSync_ChangeState(wk, GSync_StateWaitMusicalImport, 968);
 }
 
@@ -860,13 +860,13 @@ static void GSync_StateSetAttr(GSyncWork *wk) {
 static void GSync_StateStartDownload(GSyncWork *wk) {
     switch (wk->downloadKind) {
     case GSYNC_DOWNLOAD_CGEAR:
-        wk->download = GSyncDownload_Create(wk->heapId, func_0200ce50() + 4);
+        wk->download = GSyncDownload_Create(wk->heapId, CGearPictureSave_GetSize() + 4);
         break;
     case GSYNC_DOWNLOAD_MUSICAL:
         wk->download = GSyncDownload_Create(wk->heapId, 0x20000);
         break;
     case GSYNC_DOWNLOAD_ZUKAN:
-        wk->download = GSyncDownload_Create(wk->heapId, func_0200f164() + 4);
+        wk->download = GSyncDownload_Create(wk->heapId, PokedexSkinSave_GetSize() + 4);
         break;
     }
     if (GSyncDownload_Init(wk->download)) {
@@ -899,16 +899,17 @@ static void GSync_SetEntries(DreamWorldSave *dreamWorld, GSyncResult *result) {
     int i;
 
     for (i = 0; i < 5; i++) {
-        if (GFL_STD_MemCmp(func_02009a98(dreamWorld, i), result->entries[i], sizeof(result->entries[i])) != 0) {
+        if (GFL_STD_MemCmp(DreamWorldSave_GetResult(dreamWorld, i), result->entries[i], sizeof(result->entries[i])) !=
+            0) {
             changed = TRUE;
             break;
         }
     }
     if (changed) {
         for (i = 0; i < 5; i++) {
-            func_02009ab0(dreamWorld, i, result->entries[i]);
+            DreamWorldSave_SetResult(dreamWorld, i, result->entries[i]);
         }
-        func_02009af8(dreamWorld, 127);
+        DreamWorldSave_SetResultIndex(dreamWorld, 127);
     }
 }
 
@@ -920,7 +921,7 @@ static BOOL GSync_SetItems(DreamWorldSave *dreamWorld, GSyncResult *result) {
         u16 item = result->items[i];
 
         if (item != ITEM_NONE && item <= GSYNC_ITEM_MAX) {
-            func_02009a50(dreamWorld, i, item, result->itemCounts[i]);
+            DreamWorldSave_SetItem(dreamWorld, i, item, result->itemCounts[i]);
             any = TRUE;
         }
     }
@@ -976,7 +977,7 @@ static void GSync_AddForestPokemon(GSyncWork *wk, DreamWorldSave *dreamWorld, in
             forestSlot = 0;
         }
         if (GetFieldPokemonMMdlLUTIndex_(data, species, sex, modelForm) != 0xffff) {
-            func_0200ea40(getAreaNPCData(wk->save), species, unk2, sex, modelForm, forestSlot, size);
+            SymbolSave_AddPokemon(getAreaNPCData(wk->save), species, unk2, sex, modelForm, forestSlot, size);
         }
         FreeTPokeData(data);
     }
@@ -1014,7 +1015,7 @@ static void GSync_ReadResult(GSyncWork *wk, DreamWorldSave *dreamWorld, GSyncRes
         GSync_ChangeState(wk, GSync_StateError, 1323);
         return;
     }
-    if (!result->unk5B && result->id != func_02009ad8(dreamWorld)) {
+    if (!result->unk5B && result->id != DreamWorldSave_GetLastResultID(dreamWorld)) {
         wk->resultId = result->id;
         wk->getMusical = result->musical;
         wk->getCGear = result->cgear;
@@ -1142,7 +1143,7 @@ static void GSync_StateWake(GSyncWork *wk) {
 
 static void GSync_StateWaitTooSoon(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 1536);
     }
 }
@@ -1156,7 +1157,7 @@ static void GSync_StateTooSoon(GSyncWork *wk) {
 
 static void GSync_StateWaitNoRoomMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 1561);
     }
 }
@@ -1208,7 +1209,7 @@ static void GSync_StateWakeShow(GSyncWork *wk) {
     GSyncDisp_CreateActor(wk->disp, 12);
     GSyncDisp_CreateActor(wk->disp, 6);
     GSyncDisp_CreateActor(wk->disp, 8);
-    if (func_02009a78(getDreamWorldStuffAddress(wk->save)) != 0) {
+    if (DreamWorldSave_CountItems(getDreamWorldStuffAddress(wk->save)) != 0) {
         GSyncMessage_PrintStream(wk->msg, 21);
     } else {
         GSyncMessage_PrintStream(wk->msg, 10);
@@ -1223,16 +1224,16 @@ static void GSync_StateWaitAccountMessage(GSyncWork *wk) {
 }
 
 static void GSync_StateShowIdNext(GSyncWork *wk) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSyncMessage_ClearInfo(wk->msg);
-        func_020099e8(getDreamWorldStuffAddress(wk->save), TRUE);
+        DreamWorldSave_SetIDShown(getDreamWorldStuffAddress(wk->save), TRUE);
         wk->idShown = TRUE;
         GSync_ChangeState(wk, GSync_StateCheckDate, 1746);
     }
 }
 
 static void GSync_StateShowIdWait(GSyncWork *wk) {
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSyncMessage_LoadString(wk->msg, 48);
         GSyncMessage_PrintInfoAt(wk->msg, 7, 14);
         GSync_ChangeState(wk, GSync_StateShowIdNext, 1755);
@@ -1241,7 +1242,7 @@ static void GSync_StateShowIdWait(GSyncWork *wk) {
 
 // Shows the Game Sync ID
 static void GSync_StateShowId(GSyncWork *wk) {
-    GSyncMessage_FormatGSyncId(wk->msg, func_02008bdc(GetGameDataPlayerInfo(wk->param->gameData)));
+    GSyncMessage_FormatGSyncId(wk->msg, PlayerInfo_GetProfileId(GetGameDataPlayerInfo(wk->param->gameData)));
     GSyncMessage_PrintLoaded(wk->msg, TRUE);
     GSyncMessage_LoadString(wk->msg, 47);
     GSyncMessage_PrintInfoAt(wk->msg, 7, 14);
@@ -1249,7 +1250,7 @@ static void GSync_StateShowId(GSyncWork *wk) {
 }
 
 static void GSync_StateWaitCreate(GSyncWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response;
 
@@ -1275,23 +1276,23 @@ static void GSync_StateCreate(GSyncWork *wk) {
     u32 size;
     void *data;
 
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(GSYNC_REQUEST_CREATE, wk->http)) {
-            data = func_02007454(wk->save, &size);
+            data = SaveControl_GetUploadData(wk->save, &size);
             NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), data, 0x80000);
             GSyncDisp_CreateActor(wk->disp, 13);
             if (NHttpRap_StartRequest(wk->http) == 0) {
                 GSync_ChangeState(wk, GSync_StateWaitCreate, 1841);
             }
         }
-    } else if (GCTX_HIDGetPressedKeys() || func_0203da48()) {
+    } else if (GCTX_HIDGetPressedKeys() || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateWaitCreate, 1847);
     }
 }
 
 static void GSync_StateWaitNotDreamingMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateWaitAccountMessage, 1890);
     }
 }
@@ -1305,7 +1306,7 @@ static void GSync_StateNotDreaming(GSyncWork *wk) {
 
 static void GSync_StateWaitDreamingNowMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         GSync_ChangeState(wk, GSync_StateEnd, 1921);
     }
 }
@@ -1372,7 +1373,7 @@ static void GSync_HandleAccount(GSyncWork *wk, u16 status, GSyncResponse *respon
 }
 
 static void GSync_StateWaitAccount(GSyncWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
 
@@ -1388,18 +1389,18 @@ static void GSync_StateWaitAccount(GSyncWork *wk) {
 static void GSync_StateRequestAccount(GSyncWork *wk) {
     GSyncMessage_Print(wk->msg, 13);
     GSyncMessage_StartWaitIcon(wk->msg);
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(GSYNC_REQUEST_PLAY_STATUS, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitAccount, 2085);
         }
-    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateWaitAccount, 2092);
     }
 }
 
 static void GSync_StateWaitNoPokemonMessage(GSyncWork *wk) {
     if (GSyncMessage_IsPrintFinished(wk->msg) &&
-        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48())) {
+        ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed())) {
         wk->param->gsyncResult = GSYNC_RESULT_ACCOUNT;
         GSyncMessage_ClearMessage(wk->msg);
         GSync_ChangeState(wk, GSync_StateFadeOut, 2115);
@@ -1412,7 +1413,7 @@ static void GSync_StateNoPokemon(GSyncWork *wk) {
 }
 
 static void GSync_StateWaitSpeciesFlags(GSyncWork *wk) {
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (!GSync_CheckHttpStatus(wk, NHttpRap_GetStatus(wk->http)) && NHttpRap_Poll(wk->http) == 0) {
             GSyncResponse *response = NHttpRap_GetAnswer(wk->http);
             u32 status = response->status;
@@ -1443,21 +1444,21 @@ static void GSync_StateCheckDate(GSyncWork *wk) {
         GSync_ChangeState(wk, GSync_StateTooSoon, 2199);
         return;
     }
-    date = func_02009ad0(getDreamWorldStuffAddress(wk->save));
+    date = DreamWorldSave_GetSyncDate(getDreamWorldStuffAddress(wk->save));
     last.year = (u8)(date >> 24);
     last.month = (u8)(date >> 16);
     last.day = (u8)(date >> 8);
     last.week = (u8)date;
     RTC_GetCachedDate(&today);
-    if (func_02044298(&last) == func_02044298(&today)) {
+    if (RTC_GetDayOfYear(&last) == RTC_GetDayOfYear(&today)) {
         GSync_ChangeState(wk, GSync_StateTooSoon, 2212);
         return;
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         if (NHttpRap_SendRequest(GSYNC_REQUEST_SPECIES_FLAGS, wk->http) && NHttpRap_StartRequest(wk->http) == 0) {
             GSync_ChangeState(wk, GSync_StateWaitSpeciesFlags, 2220);
         }
-    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    } else if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateWaitSpeciesFlags, 2227);
     }
 }
@@ -1467,7 +1468,7 @@ static void GSync_StateWaitSentMessage(GSyncWork *wk) {
         GFL_SndSEPlay(SEQ_SE_SYS_26);
     }
     wk->seTimer++;
-    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
+    if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
         GSync_ChangeState(wk, GSync_StateEnd, 2249);
     }
 }
@@ -1501,7 +1502,7 @@ static void GSync_StateWaitSendSave(GSyncWork *wk) {
         wk->progress++;
     }
     GSyncDisp_SetProgress(wk->disp, wk->progress);
-    switch (func_02017850(wk->gameData)) {
+    switch (GameData_UpdateSave(wk->gameData)) {
     case 1:
         if (wk->dreamWorldCopy != NULL) {
             GFL_HeapFree(wk->dreamWorldCopy);
@@ -1509,8 +1510,8 @@ static void GSync_StateWaitSendSave(GSyncWork *wk) {
         }
         break;
     case 3:
-        func_020424ac(0, 0, 0, 1011);
-        func_02042454(0);
+        NetState_RecordError(0, 0, 0, 1011);
+        NetState_SetError(0);
         break;
     case 2:
         wk->saving = FALSE;
@@ -1526,16 +1527,17 @@ static void GSync_StateSendSave(GSyncWork *wk) {
 
     wk->pkmTaken = FALSE;
     RTC_GetCachedDate(&date);
-    func_02009ad4(dreamWorld, (date.year << 24) | ((date.month & 0xff) << 16) | ((date.day & 0xff) << 8) | date.week);
-    if (func_02009ae0(dreamWorld) != 127) {
+    DreamWorldSave_SetSyncDate(dreamWorld,
+                               (date.year << 24) | ((date.month & 0xff) << 16) | ((date.day & 0xff) << 8) | date.week);
+    if (DreamWorldSave_GetResultIndex(dreamWorld) != 127) {
         func_02009b30(dreamWorld, 1);
-        func_02009af8(dreamWorld, 126);
+        DreamWorldSave_SetResultIndex(dreamWorld, 126);
     }
     wk->progress = 50;
     RecordAddOne(GameData_GetRecords(wk->gameData), 119);
-    func_02038bc8(28);
+    JoinAvenue_RecordActivity(28);
     wk->saving = TRUE;
-    func_0201782c(wk->gameData);
+    GameData_StartSave(wk->gameData);
     GSync_ChangeState(wk, GSync_StateWaitSendSave, 2391);
 }
 
@@ -1592,7 +1594,7 @@ static void GSync_StateUpload(GSyncWork *wk) {
         wk->frames = 0;
         if (GSync_IsOnline(wk)) {
             if (NHttpRap_SendRequest(GSYNC_REQUEST_UPLOAD, wk->http)) {
-                void *data = func_02007454(wk->save, &size);
+                void *data = SaveControl_GetUploadData(wk->save, &size);
 
                 NHTTPSetPostDataRaw(NHttpRap_GetConnection(wk->http), data, 0x80000);
                 GSyncDisp_SetProgress(wk->disp, 0);
@@ -1651,7 +1653,7 @@ static void GSync_StateSendAnimIcon(GSyncWork *wk) {
 }
 
 static void GSync_StateSendShowIcon(GSyncWork *wk) {
-    GSyncDisp_CreatePokeIcon(wk->disp, func_0201d620(wk->pkm), CLACT_SURFACE_SUB);
+    GSyncDisp_CreatePokeIcon(wk->disp, PokeParty_GetBoxPkm(wk->pkm), CLACT_SURFACE_SUB);
     wk->timer = 10;
     GSync_ChangeState(wk, GSync_StateSendAnimIcon, 2621);
 }
@@ -1669,10 +1671,10 @@ static void GSync_StateSend(GSyncWork *wk) {
     if (boxPkm != NULL) {
         PartyPkm *pkm = boxPkmRegenToPartyPkm(boxPkm, wk->heapId);
 
-        func_0200999c(dreamWorld, pkm);
+        DreamWorldSave_SetPkm(dreamWorld, pkm);
         wk->pkm = pkm;
         BoxSaveAccessor_ClearPkm(wk->boxes, wk->boxTray, wk->boxPos);
-        func_02009a00(dreamWorld, TRUE);
+        DreamWorldSave_SetPokemonAsleep(dreamWorld, TRUE);
         wk->pkmTaken = TRUE;
     }
     GSyncDisp_CreateActor(wk->disp, 0);
@@ -1695,16 +1697,16 @@ static void GSync_RestoreDreamWorld(GSyncWork *wk) {
     DreamWorldSave *dreamWorld = getDreamWorldStuffAddress(wk->save);
 
     if (wk->dreamWorldCopy != NULL) {
-        MI_CpuCopy8(wk->dreamWorldCopy, dreamWorld, func_02009930());
+        MI_CpuCopy8(wk->dreamWorldCopy, dreamWorld, DreamWorldSave_GetSize());
         GFL_HeapFree(wk->dreamWorldCopy);
         wk->dreamWorldCopy = NULL;
     }
     if (wk->pkmTaken) {
-        PartyPkm *pkm = func_02009998(dreamWorld);
+        PartyPkm *pkm = DreamWorldSave_GetPkm(dreamWorld);
 
-        BoxSaveAccessor_SetPkm(wk->boxes, wk->boxTray, wk->boxPos, func_0201d624(pkm));
+        BoxSaveAccessor_SetPkm(wk->boxes, wk->boxTray, wk->boxPos, PokeParty_ToBoxPkm(pkm));
         PokeParty_ClearPkm(pkm);
-        func_02009a00(dreamWorld, FALSE);
+        DreamWorldSave_SetPokemonAsleep(dreamWorld, FALSE);
         wk->pkmTaken = FALSE;
     }
 }
@@ -1722,25 +1724,25 @@ static void GSync_PersonToPlayerInfo(GSyncResultPerson *person, PlayerInfo *info
 
     MI_CpuFill8(info, 0, 0x20);
     copyTrainerName(info, person->name);
-    func_02008be0(info, person->profileId);
-    func_02008c14(info, person->country, person->region);
+    PlayerInfo_InitProfileId(info, person->profileId);
+    PlayerInfo_SetCountryAndProvince(info, person->country, person->region);
     setTrainerGender(info, person->gender);
     setIDAsUInt(info, person->id);
-    func_02008c00(info, person->unk1B);
-    func_02008c08(info, person->unk1A);
+    PlayerInfo_SetVersion(info, person->unk1B);
+    PlayerInfo_SetRegion(info, person->unk1A);
     // The Union Room look: the ID picks one of 8, and girls have the other 8
     style = person->id & 7;
     if (person->gender) {
         offset = 8;
     }
     style = style + (u16)offset;
-    func_02008bf8(info, style);
+    PlayerInfo_SetUnionView(info, style);
 }
 
 static void GSync_AddJoinAvenuePeople(GameData *gameData, GSyncResultPerson *people, HeapID heapId) {
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData));
-    JoinAvenueEntry *entry = func_02037a40(heapId);
-    PlayerInfo *info = func_02008b0c(heapId);
+    JoinAvenueEntry *entry = JoinAvenueEntry_Create(heapId);
+    PlayerInfo *info = PlayerInfo_Create(heapId);
     int i;
 
     for (i = 0; i < 12; i++) {
@@ -1748,12 +1750,12 @@ static void GSync_AddJoinAvenuePeople(GameData *gameData, GSyncResultPerson *peo
 
         if (GSync_PersonExists(person)) {
             GSync_PersonToPlayerInfo(person, info);
-            func_02037ab4(entry, info, person->species, 7);
-            func_02010078(joinAvenue, gameData, entry, 2);
+            JoinAvenueEntry_Init(entry, info, person->species, 7);
+            JoinAvenue_Add(joinAvenue, gameData, entry, 2);
         }
     }
     GFL_HeapFree(info);
-    func_02037a68(entry);
+    JoinAvenueEntry_Free(entry);
 }
 
 static BOOL GSync_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
@@ -1771,11 +1773,11 @@ static BOOL GSync_ProcInit(GameProc *proc, u32 *state, void *param, void *work) 
         wk->param = pParent;
         wk->gameData = pParent->gameData;
         wk->save = GameData_GetSaveControl(pParent->gameData);
-        profileID = func_02008bdc(GetGameDataPlayerInfo(pParent->gameData));
+        profileID = PlayerInfo_GetProfileId(GetGameDataPlayerInfo(pParent->gameData));
         wk->boxes = GameData_GetBoxSaveAccessor(pParent->gameData);
         wk->boxTray = pParent->boxTray;
         wk->boxPos = pParent->boxPosition;
-        wk->idShownSaved = func_020099f4(getDreamWorldStuffAddress(wk->save));
+        wk->idShownSaved = DreamWorldSave_GetIDShown(getDreamWorldStuffAddress(wk->save));
         wk->idShown = wk->idShownSaved;
         getDreamWorldStuffAddress(wk->save);
         switch (pParent->gsyncResult) {
@@ -1807,7 +1809,7 @@ static BOOL GSync_ProcInit(GameProc *proc, u32 *state, void *param, void *work) 
     wk->disp = GSyncDisp_Create(wk->heapId);
     wk->msg = GSyncMessage_Create(wk->heapId, 44);
     GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, WIPE_COLOR_BLACK, 6, 1, wk->heapId);
-    func_02042ba8(FALSE, wk->heapId);
+    GFL_NetSetIconScreen(FALSE, wk->heapId);
     return TRUE;
 }
 
@@ -1822,12 +1824,12 @@ static BOOL GSync_ProcMain(GameProc *proc, u32 *state, void *param, void *work) 
         }
         NHttpRap_EndRequest(wk->http);
         if (wk->saving) {
-            func_02017884(wk->gameData);
+            GameData_CancelSave(wk->gameData);
             wk->saving = FALSE;
         }
         GSync_RestoreDreamWorld(wk);
         if (wk->receiving) {
-            func_02011d04(41);
+            GFL_NetErrShowWifi(41);
         }
         Wipe_SetScreenCovered(0, WIPE_COLOR_BLACK);
         Wipe_SetScreenCovered(1, WIPE_COLOR_BLACK);
@@ -1881,7 +1883,7 @@ static BOOL GSync_ProcExit(GameProc *proc, u32 *state, void *param, void *work) 
     if (wk->unk44 != NULL) {
         GFL_HeapFree(wk->unk44);
     }
-    if (func_02042788()) {
+    if (GFL_NetIsInitialized()) {
         DWCRap_SetEventFunc(NULL, NULL);
     }
     if (wk->http != NULL) {

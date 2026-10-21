@@ -367,7 +367,8 @@ static void BackupMain(void) {
     for (i = 0; i < 0x300; i++) {
         heap[i] = Pattern(i, 17);
     }
-    Check(func_0203bfd4(0x2000, heap, 0x300, NULL), "the game's write, which reads the first word into a local");
+    Check(writeFlashWaitSuccess(0x2000, heap, 0x300, NULL),
+          "the game's write, which reads the first word into a local");
     Check(memcmp(image + 0x2000, heap, 0x300) == 0, "writes the chip");
     memset(arena, 0, 0x10);
     Check(readFlashWaitSuccess(0x2004, arena, 0x10, NULL), "readFlashWaitSuccess into the arena");

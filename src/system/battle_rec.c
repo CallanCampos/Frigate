@@ -11,13 +11,14 @@
 // battle_rec.c (the name its allocation passes): the battle video that is loaded, and loading it from and saving it
 // to the extra save blocks of the four slots. Its body is encrypted with its CRC as the key.
 
-static BattleRecVideo *func_0200bb00(HeapID heapId);
-static BOOL func_0200bc04(SaveControl *save, BattleRecVideo *video, HeapID heapId, u32 *result, u32 slot);
-static void func_0200bf48(SaveControl *save, BattleRecHeader *header, BattleRecBody *body, u32 modeIndex, u32 counter);
-static BOOL func_0200bff8(SaveControl *save, BattleRecVideo *video);
-static BOOL func_0200c01c(SaveControl *save, BattleRecVideo *video);
+static BattleRecVideo *BattleRec_AllocVideo(HeapID heapId);
+static BOOL BattleRec_LoadSlot(SaveControl *save, BattleRecVideo *video, HeapID heapId, u32 *result, u32 slot);
+static void BattleRec_MakeHeader(SaveControl *save, BattleRecHeader *header, BattleRecBody *body, u32 modeIndex,
+                                 u32 counter);
+static BOOL BattleRec_IsEmpty(SaveControl *save, BattleRecVideo *video);
+static BOOL BattleRec_IsValid(SaveControl *save, BattleRecVideo *video);
 static void __decryptData(void *data, u32 size, u32 seed);
-static u32 func_0200c078(u32 slot);
+static u32 BattleRec_GetExtraBlock(u32 slot);
 
 // The battle modes that a header's mode can be. A video's mode is given as an index into them
 static const u16 sBattleRecModes[BATTLE_REC_MODE_MAX] = {
@@ -31,19 +32,19 @@ BattleRecVideo *data_02140f64;
 // The key that a body is encrypted with, of its CRC
 #define BATTLE_REC_KEY(body) ((body)->crc + (((body)->crc ^ 0xffff) << 16))
 
-static BattleRecVideo *func_0200bb00(HeapID heapId) {
+static BattleRecVideo *BattleRec_AllocVideo(HeapID heapId) {
     BattleRecVideo *video = GFL_HeapAllocate(heapId, BATTLE_REC_BLOCK_SIZE, TRUE, "battle_rec.c", 104);
 
     clearVSPlayerBlk(video);
     return video;
 }
 
-void func_0200bb24(HeapID heapId) {
+void BattleRec_Init(HeapID heapId) {
     if (data_02140f64 != NULL) {
         GFL_HeapFree(data_02140f64);
         data_02140f64 = NULL;
     }
-    data_02140f64 = func_0200bb00(heapId);
+    data_02140f64 = BattleRec_AllocVideo(heapId);
 }
 
 void freeVSPlayerBlkClearPtr(void) {
@@ -51,7 +52,7 @@ void freeVSPlayerBlkClearPtr(void) {
     data_02140f64 = NULL;
 }
 
-void func_0200bb5c(BattleRecVideo *video) {
+void BattleRec_FreeVideo(BattleRecVideo *video) {
     GFL_HeapFree(video);
 }
 
@@ -63,7 +64,7 @@ void clearVSPlayerBlk(BattleRecVideo *video) {
     MIi_CpuClear32(0, video, sizeof(BattleRecVideo));
 }
 
-BOOL func_0200bb80(void) {
+BOOL BattleRec_HasVideo(void) {
     if (addUpDataStream((u8 *)&data_02140f64->body, sizeof(BattleRecBody)) != 0) {
         return TRUE;
     }
@@ -74,19 +75,19 @@ void clearVSPlayer(void) {
     clearVSPlayerBlk(data_02140f64);
 }
 
-void func_0200bbb4(void) {
+void BattleRec_DecryptBody(void) {
     __decryptData(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 
-void func_0200bbdc(void) {
+void BattleRec_EncryptBody(void) {
     decryptVSPlayer(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 
-static BOOL func_0200bc04(SaveControl *save, BattleRecVideo *video, HeapID heapId, u32 *result, u32 slot) {
+static BOOL BattleRec_LoadSlot(SaveControl *save, BattleRecVideo *video, HeapID heapId, u32 *result, u32 slot) {
     BattleRecBody *body;
 
-    *result = func_02007560(save, func_0200c078(slot), heapId, video, BATTLE_REC_BLOCK_SIZE);
-    freeIntermediateSaveExtraBlksAfterLoad(save, func_0200c078(slot));
+    *result = SaveControl_LoadExtraBlock(save, BattleRec_GetExtraBlock(slot), heapId, video, BATTLE_REC_BLOCK_SIZE);
+    freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(slot));
     if (*result == 0) {
         *result = 0;
         return TRUE;
@@ -98,11 +99,11 @@ static BOOL func_0200bc04(SaveControl *save, BattleRecVideo *video, HeapID heapI
 
     body = &video->body;
     __decryptData(body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(body));
-    if (func_0200bff8(save, video) == TRUE) {
+    if (BattleRec_IsEmpty(save, video) == TRUE) {
         *result = 0;
         return TRUE;
     }
-    if (!func_0200c01c(save, video)) {
+    if (!BattleRec_IsValid(save, video)) {
         *result = 2;
         return TRUE;
     }
@@ -110,72 +111,72 @@ static BOOL func_0200bc04(SaveControl *save, BattleRecVideo *video, HeapID heapI
     return TRUE;
 }
 
-void func_0200bc9c(SaveControl *save, HeapID heapId, u32 *result, u32 slot) {
+void BattleRec_LoadToCurrent(SaveControl *save, HeapID heapId, u32 *result, u32 slot) {
     if (data_02140f64 != NULL) {
         clearVSPlayerBlk(data_02140f64);
     } else {
-        func_0200bb24(heapId);
+        BattleRec_Init(heapId);
     }
-    func_0200bc04(save, data_02140f64, heapId, result, slot);
+    BattleRec_LoadSlot(save, data_02140f64, heapId, result, slot);
 }
 
-BattleRecVideo *func_0200bcd0(SaveControl *save, HeapID heapId, u32 *result, u32 slot) {
-    BattleRecVideo *video = func_0200bb00(heapId);
+BattleRecVideo *BattleRec_LoadVideo(SaveControl *save, HeapID heapId, u32 *result, u32 slot) {
+    BattleRecVideo *video = BattleRec_AllocVideo(heapId);
 
-    func_0200bc04(save, video, heapId, result, slot);
+    BattleRec_LoadSlot(save, video, heapId, result, slot);
     return video;
 }
 
-// Whether a slot has a valid video, without keeping it. a2 is the u32 result of func_0200bc9c
-u32 func_0200bcf8(SaveControl *save, HeapID a1, void *a2, u32 a3) {
+// Whether a slot has a valid video, without keeping it. a2 is the u32 result of BattleRec_LoadToCurrent
+u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, void *a2, u32 a3) {
     u32 *result = a2;
     BattleRecVideo *video;
     BattleRecBody *body;
 
-    *result = func_020074ec(save, func_0200c078(a3), a1);
-    video = getAddressOfExtraSaveBlk(save, func_0200c078(a3), 0);
+    *result = SaveControl_OpenExtraBlock(save, BattleRec_GetExtraBlock(a3), a1);
+    video = getAddressOfExtraSaveBlk(save, BattleRec_GetExtraBlock(a3), 0);
     if (*result == 0) {
         *result = 0;
-        freeIntermediateSaveExtraBlksAfterLoad(save, func_0200c078(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
         return FALSE;
     }
     if (*result != 1) {
         *result = 3;
-        freeIntermediateSaveExtraBlksAfterLoad(save, func_0200c078(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
         return FALSE;
     }
 
     body = &video->body;
     __decryptData(body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(body));
-    if (func_0200bff8(save, video) == TRUE) {
+    if (BattleRec_IsEmpty(save, video) == TRUE) {
         *result = 0;
-        freeIntermediateSaveExtraBlksAfterLoad(save, func_0200c078(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
         return FALSE;
     }
-    if (!func_0200c01c(save, video)) {
+    if (!BattleRec_IsValid(save, video)) {
         *result = 2;
-        freeIntermediateSaveExtraBlksAfterLoad(save, func_0200c078(a3));
+        freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
         return FALSE;
     }
     *result = 1;
-    freeIntermediateSaveExtraBlksAfterLoad(save, func_0200c078(a3));
+    freeIntermediateSaveExtraBlksAfterLoad(save, BattleRec_GetExtraBlock(a3));
     return TRUE;
 }
 
-u32 func_0200bdd4(GameData *gameData, BattleRecVideo *video, u32 slot, u16 *seq, HeapID heapId) {
+u32 BattleRec_SaveSlot(GameData *gameData, BattleRecVideo *video, u32 slot, u16 *seq, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     u32 result;
 
     switch (*seq) {
     case 0:
-        func_020075b8(save, func_0200c078(slot), heapId, data_02140f64, BATTLE_REC_BLOCK_SIZE);
-        func_020178c4(gameData, func_0200c078(slot));
+        SaveControl_InitExtraBlock(save, BattleRec_GetExtraBlock(slot), heapId, data_02140f64, BATTLE_REC_BLOCK_SIZE);
+        GameData_StartSaveBlock(gameData, BattleRec_GetExtraBlock(slot));
         (*seq)++;
         break;
     case 1:
-        result = func_020178f4(gameData, func_0200c078(slot));
+        result = GameData_UpdateSaveBlock(gameData, BattleRec_GetExtraBlock(slot));
         if (result == 2 || result == 3) {
-            freeIntermediateSaveExtraBlksAfterLoad2(save, func_0200c078(slot));
+            freeIntermediateSaveExtraBlksAfterLoad2(save, BattleRec_GetExtraBlock(slot));
             return result;
         }
         break;
@@ -184,8 +185,9 @@ u32 func_0200bdd4(GameData *gameData, BattleRecVideo *video, u32 slot, u16 *seq,
 }
 
 // Makes the loaded video's header, signs and encrypts the video and saves it to slot a4, a step each call like
-// func_0200bdd4. a1 is the heap, a2 the index of the battle mode and a3 the header's counter. 3 if no video is loaded
-u32 func_0200be50(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6) {
+// BattleRec_SaveSlot. a1 is the heap, a2 the index of the battle mode and a3 the header's counter. 3 if no video is
+// loaded
+u32 BattleRec_FinishAndSaveSlot(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     BattleRecHeader *header;
     BattleRecBody *body;
@@ -197,22 +199,22 @@ u32 func_0200be50(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5
         }
         header = &data_02140f64->header;
         body = &data_02140f64->body;
-        func_0200bf48(save, header, body, a2, a3);
+        BattleRec_MakeHeader(save, header, body, a2, a3);
         header->magic = BATTLE_REC_MAGIC;
         header->crc = getCRC16(header, BATTLE_REC_HEADER_CRC_SIZE);
         body->magic = BATTLE_REC_MAGIC;
-        func_0200c1dc(body);
+        BattleRec_UpdateBodyCRC(body);
         decryptVSPlayer(body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(body));
         *a6 = 0;
         (*a5)++;
         break;
     case 1:
-        return func_0200bdd4(gameData, data_02140f64, a4, a6, a1);
+        return BattleRec_SaveSlot(gameData, data_02140f64, a4, a6, a1);
     }
     return 0;
 }
 
-void func_0200bef4(u16 mode, s32 *clientCount, s32 *pkmCount) {
+void BattleRec_GetModeCounts(u16 mode, s32 *clientCount, s32 *pkmCount) {
     s32 i;
 
     for (i = 0; i < BATTLE_REC_MODE_MAX; i++) {
@@ -233,7 +235,8 @@ void func_0200bef4(u16 mode, s32 *clientCount, s32 *pkmCount) {
     *pkmCount = 6;
 }
 
-static void func_0200bf48(SaveControl *save, BattleRecHeader *header, BattleRecBody *body, u32 modeIndex, u32 counter) {
+static void BattleRec_MakeHeader(SaveControl *save, BattleRecHeader *header, BattleRecBody *body, u32 modeIndex,
+                                 u32 counter) {
     s32 client;
     s32 i;
     s32 n = 0;
@@ -243,7 +246,7 @@ static void func_0200bf48(SaveControl *save, BattleRecHeader *header, BattleRecB
 
     MI_CpuFill8(header, 0, sizeof(BattleRecHeader));
     mode = sBattleRecModes[modeIndex];
-    func_0200bef4(mode, &clientCount, &pkmCount);
+    BattleRec_GetModeCounts(mode, &clientCount, &pkmCount);
     for (client = 0; client < clientCount; client++) {
         for (i = 0; i < pkmCount; i++) {
             BattleRecPkm *pkm = &body->parties[client].pkm[i];
@@ -261,7 +264,7 @@ static void func_0200bf48(SaveControl *save, BattleRecHeader *header, BattleRecB
 }
 
 // Whether a video is not one: a slot that was never saved to
-static BOOL func_0200bff8(SaveControl *save, BattleRecVideo *video) {
+static BOOL BattleRec_IsEmpty(SaveControl *save, BattleRecVideo *video) {
     BattleRecHeader *header = &video->header;
 
     if (video->body.magic != BATTLE_REC_MAGIC || header->magic != BATTLE_REC_MAGIC) {
@@ -271,7 +274,7 @@ static BOOL func_0200bff8(SaveControl *save, BattleRecVideo *video) {
 }
 
 // Whether a video's magic numbers and CRCs are right
-static BOOL func_0200c01c(SaveControl *save, BattleRecVideo *video) {
+static BOOL BattleRec_IsValid(SaveControl *save, BattleRecVideo *video) {
     BattleRecBody *body = &video->body;
     BattleRecHeader *header = &video->header;
     u16 crc;
@@ -295,7 +298,7 @@ static void __decryptData(void *data, u32 size, u32 seed) {
 }
 
 // The extra save block of a slot
-static u32 func_0200c078(u32 slot) {
+static u32 BattleRec_GetExtraBlock(u32 slot) {
     switch (slot) {
     default:
     case 0:
@@ -317,27 +320,27 @@ GdsProfile *getVSPlayerAllocation(void) {
     return (GdsProfile *)data_02140f64->profile;
 }
 
-BattleRecBody *func_0200c0b4(void) {
+BattleRecBody *BattleRec_GetBody(void) {
     return &data_02140f64->body;
 }
 
-BattleRecHeader *func_0200c0c0(void) {
+BattleRecHeader *BattleRec_GetHeader(void) {
     return &data_02140f64->header;
 }
 
-BattleRecHeader *func_0200c0cc(BattleRecVideo *video) {
+BattleRecHeader *BattleRec_GetVideoHeader(BattleRecVideo *video) {
     return &video->header;
 }
 
-void func_0200c0d0(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
-                   SaveControl *save) {
+void BattleRec_StoreDownloaded(const GdsProfile *profile, const BattleRecHeader *header, const BattleRecBody *body,
+                               SaveControl *save) {
     MI_CpuCopy8(header, &data_02140f64->header, sizeof(BattleRecHeader));
     MI_CpuCopy8(body, &data_02140f64->body, sizeof(BattleRecBody));
     MI_CpuCopy8(profile, data_02140f64->profile, sizeof(data_02140f64->profile));
     __decryptData(&data_02140f64->body, BATTLE_REC_BODY_CRC_SIZE, BATTLE_REC_KEY(&data_02140f64->body));
 }
 
-u64 func_0200c124(BattleRecHeader *header, u32 id, u32 index) {
+u64 BattleRec_GetHeaderValue(BattleRecHeader *header, u32 id, u32 index) {
     s32 i;
 
     switch (id) {
@@ -362,8 +365,8 @@ u64 func_0200c124(BattleRecHeader *header, u32 id, u32 index) {
         return 0;
     case BATTLE_REC_HEADER_DATA_NUMBER:
         return header->dataNumber;
-    case BATTLE_REC_HEADER_UNK2A:
-        return header->unk2A;
+    case BATTLE_REC_HEADER_SECURE:
+        return header->secure;
     case BATTLE_REC_HEADER_GENDER:
         return (header->formGender[index] & 0x80) >> 7;
     case BATTLE_REC_HEADER_VERSION:
@@ -373,22 +376,22 @@ u64 func_0200c124(BattleRecHeader *header, u32 id, u32 index) {
 }
 
 // Whether a video of this version can be played
-u32 func_0200c1d0(u8 a0) {
+u32 BattleRec_IsVersionSupported(u8 a0) {
     if (a0 <= BATTLE_REC_VERSION) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_0200c1dc(BattleRecBody *body) {
+void BattleRec_UpdateBodyCRC(BattleRecBody *body) {
     body->crc = getCRC16(body, BATTLE_REC_BODY_CRC_SIZE);
 }
 
 // Load and unload battle_rec_tool.c's overlay
-void func_0200c1f0(void) {
+void BattleRec_LoadToolOverlay(void) {
     GFL_OvlLoad(OVERLAY_ID(273));
 }
 
-void func_0200c200(void) {
+void BattleRec_UnloadToolOverlay(void) {
     GFL_OvlUnload(OVERLAY_ID(273));
 }

@@ -345,7 +345,7 @@ static BOOL IrcCompatMenu_Init(GameProc *proc, u32 *state, void *param, void *wo
     } else {
         save = SaveControl_GetInstance();
     }
-    log = func_0200afbc(save);
+    log = TrainerLogSave_Get(save);
     IrcCompatMenuHearts_Init(&wk->hearts, &wk->graphic, log, HEAP_ID);
     unit = IrcCompatMenuGraphic_GetUnit(&wk->graphic);
     font = IrcCompatMenuText_GetFont(&wk->text);
@@ -362,7 +362,7 @@ static BOOL IrcCompatMenu_Init(GameProc *proc, u32 *state, void *param, void *wo
         IrcCompatMenu_SetStep(wk, IrcCompatMenu_StepMenu);
         break;
     }
-    func_02005d8c();
+    GFL_SndBGMStopImmediate();
     CompatibleIrcSys_SetCount(wk->param->sys, 0);
     return TRUE;
 }
@@ -399,7 +399,7 @@ static BOOL IrcCompatMenu_Main(GameProc *proc, u32 *state, void *param, void *wo
         if (GFL_FadeIsRunning()) {
             break;
         }
-        func_0204c520(IrcCompatMenuGraphic_GetActor(&wk->graphic, ACTOR_BACKGROUND), TRUE);
+        ClActor_SetAutoAnim(IrcCompatMenuGraphic_GetActor(&wk->graphic, ACTOR_BACKGROUND), TRUE);
         IrcCompatMenuScroll_Start(&wk->scroll);
         GFL_SndBGMPlay(SEQ_ME_AISHOU_KIDOU, SND_CHANNEL_MASK_ALL);
         *state = 3;
@@ -519,31 +519,31 @@ static void IrcCompatMenuClAct_Init(IrcCompatMenuClAct *clact, const BGSysVRAMCo
 
     MI_CpuFill8(clact, 0, sizeof(IrcCompatMenuClAct));
     ClActSys_Create(&data_02093f08, vramConfig, heapId);
-    clact->unit = func_0204bf1c(128, 0, heapId);
-    func_0204c028(clact->unit);
+    clact->unit = ClActUnit_Create(128, 0, heapId);
+    ClActUnit_UseSystemRenderer(clact->unit);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     arc = GFL_ArcSysCreateFileHandle(ARCID_IRC_COMPAT, heapId);
-    clact->palette = func_0204bba0(arc, 12, CLACT_VRAM_SUB, 0, heapId);
-    clact->chars = func_0204b81c(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
-    clact->cellAnims = func_0204bde0(arc, 10, 9, heapId);
+    clact->palette = ClActSys_LoadPltt(arc, 12, CLACT_VRAM_SUB, 0, heapId);
+    clact->chars = ClActSys_LoadChars(arc, 11, FALSE, CLACT_VRAM_SUB, heapId);
+    clact->cellAnims = ClActSys_LoadCellAnims(arc, 10, 9, heapId);
     GFL_ArcToolFree(arc);
     MI_CpuFill8(&setup, 0, sizeof(ClActorSetup));
     for (i = 0; i < HEART_COUNT; i++) {
-        clact->actors[i] = func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
-                                         CLACT_SURFACE_SUB, heapId);
-        func_0204c124(clact->actors[i], FALSE);
-        func_0204c468(clact->actors[i], 3);
-        func_0204c520(clact->actors[i], TRUE);
+        clact->actors[i] = ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup,
+                                          CLACT_SURFACE_SUB, heapId);
+        ClActor_SetVisible(clact->actors[i], FALSE);
+        ClActor_SetBgPriority(clact->actors[i], 3);
+        ClActor_SetAutoAnim(clact->actors[i], TRUE);
     }
     setup.x = 129;
     setup.y = 104;
     setup.sequence = 15;
     clact->actors[ACTOR_BACKGROUND] =
-        func_0204c040(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
-    func_0204c124(clact->actors[ACTOR_BACKGROUND], TRUE);
-    func_0204c468(clact->actors[ACTOR_BACKGROUND], 2);
-    func_0204c520(clact->actors[ACTOR_BACKGROUND], FALSE);
+        ClActor_Create(clact->unit, clact->chars, clact->palette, clact->cellAnims, &setup, CLACT_SURFACE_SUB, heapId);
+    ClActor_SetVisible(clact->actors[ACTOR_BACKGROUND], TRUE);
+    ClActor_SetBgPriority(clact->actors[ACTOR_BACKGROUND], 2);
+    ClActor_SetAutoAnim(clact->actors[ACTOR_BACKGROUND], FALSE);
 }
 
 static void IrcCompatMenuClAct_Free(IrcCompatMenuClAct *clact) {
@@ -551,23 +551,23 @@ static void IrcCompatMenuClAct_Free(IrcCompatMenuClAct *clact) {
 
     for (i = 0; i < CLACT_COUNT; i++) {
         if (clact->actors[i] != NULL) {
-            func_0204c108(clact->actors[i]);
+            ClActor_Delete(clact->actors[i]);
         }
     }
-    func_0204bcd0(clact->palette);
-    func_0204b98c(clact->chars);
-    func_0204be64(clact->cellAnims);
-    func_0204bf98(clact->unit);
-    func_0204b758();
+    ClActSys_FreePltt(clact->palette);
+    ClActSys_FreeChars(clact->chars);
+    ClActSys_FreeCellAnims(clact->cellAnims);
+    ClActUnit_Delete(clact->unit);
+    ClActSys_Delete();
     MI_CpuFill8(clact, 0, sizeof(IrcCompatMenuClAct));
 }
 
 static void IrcCompatMenuClAct_Update(IrcCompatMenuClAct *clact) {
-    func_0204b794();
+    ClActSys_Draw();
 }
 
 static void IrcCompatMenuClAct_VBlank(IrcCompatMenuClAct *clact) {
-    func_0204b7c8();
+    ClActSys_VBlank();
 }
 
 static ClActor *IrcCompatMenuClAct_GetActor(IrcCompatMenuClAct *clact, int index) {
@@ -580,9 +580,9 @@ static ClActUnit *IrcCompatMenuClAct_GetUnit(IrcCompatMenuClAct *clact) {
 
 static void IrcCompatMenuText_Init(IrcCompatMenuText *text, HeapID heapId) {
     MI_CpuFill8(text, 0, sizeof(IrcCompatMenuText));
-    func_020232d0();
+    GFL_TextRndInitColorIndexLUT();
     text->font = GFL_FontCreate(ARCID_FONT, 0, 0, FALSE, heapId);
-    text->queue = func_02021998(heapId);
+    text->queue = PrintQueue_CreateDefault(heapId);
     text->msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_BTL_MAIN_4, heapId);
     text->wordSet = GFL_WordSetSystemCreateDefault(heapId);
     GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_SUB_BG, 0, 0x20, heapId);
@@ -592,13 +592,13 @@ static void IrcCompatMenuText_Init(IrcCompatMenuText *text, HeapID heapId) {
 static void IrcCompatMenuText_Free(IrcCompatMenuText *text) {
     GFL_WordSetSystemFree(text->wordSet);
     GFL_MsgDataFree(text->msgData);
-    func_02021a18(text->queue);
+    PrintQueue_Free(text->queue);
     GFL_FontFree(text->font);
     MI_CpuFill8(text, 0, sizeof(IrcCompatMenuText));
 }
 
 static BOOL IrcCompatMenuText_Update(IrcCompatMenuText *text) {
-    return func_02021a3c(text->queue);
+    return PrintQueue_Main(text->queue);
 }
 
 static Font *IrcCompatMenuText_GetFont(IrcCompatMenuText *text) {
@@ -669,7 +669,7 @@ static void IrcCompatMenuWindow_PrintMsgCentered(IrcCompatMenuWindow *win, IrcCo
     y = BmpWin_GetSizeY(win->window) * 4;
     x -= (u16)(GFL_FontGetBlockWidth(win->strbuf, font, 0) / 2);
     y -= (u16)(GFL_FontGetBlockHeight(win->strbuf, font) / 2);
-    func_02021c44(queue);
+    PrintQueue_Clear(queue);
     PrintWindow_Print(&win->printWindow, queue, x, y, win->strbuf, font, PRINT_COLOR(15, 14, 1));
 }
 
@@ -970,7 +970,7 @@ static void IrcCompatMenuButtons_Init(IrcCompatMenuButtons *buttons, u8 bg, cons
         GFL_StrBufFree(label);
         BmpWin_FlushChar(buttons->windows[i]);
     }
-    func_020232d8();
+    GFL_TextRndResetColorIndexLUT();
 }
 
 static void IrcCompatMenuButtons_Free(IrcCompatMenuButtons *buttons) {
@@ -1127,13 +1127,13 @@ static void IrcCompatMenuHeart_Init(IrcCompatMenuHeart *heart, ClActor *actor, B
     } else {
         sequence = 12;
     }
-    func_0204c488(heart->actor, sequence);
+    ClActor_SetSequence(heart->actor, sequence);
     IrcCompatMenuHeart_Reset(heart);
     pos.x = heart->startX;
     pos.y = heart->startY;
-    func_0204c140(heart->actor, &pos, TRUE);
-    func_0204c124(heart->actor, TRUE);
-    func_0204c4d4(heart->actor, GFL_RandomLCAlt(1 << 13));
+    ClActor_SetSurfacePos(heart->actor, &pos, TRUE);
+    ClActor_SetVisible(heart->actor, TRUE);
+    ClActor_SetAnimTime(heart->actor, GFL_RandomLCAlt(1 << 13));
 }
 
 static void IrcCompatMenuHeart_Free(IrcCompatMenuHeart *heart) {
@@ -1151,7 +1151,7 @@ static void IrcCompatMenuHeart_Update(IrcCompatMenuHeart *heart) {
     sign = diff / (diff < 0 ? -diff : diff);
     diff = diff < 0 ? -diff : diff;
     pos.y = heart->startY + sign * (diff * heart->frame / heart->duration);
-    func_0204c140(heart->actor, &pos, TRUE);
+    ClActor_SetSurfacePos(heart->actor, &pos, TRUE);
     if (heart->frame++ > heart->duration) {
         IrcCompatMenuHeart_Reset(heart);
     }
@@ -1174,7 +1174,7 @@ static void IrcCompatMenuHearts_Init(IrcCompatMenuHearts *hearts, IrcCompatMenuG
     if (log == NULL) {
         hearts->count = HEART_COUNT;
     } else {
-        hearts->count = func_0200afc8(log);
+        hearts->count = TrainerLogSave_CountEntries(log);
     }
     for (i = 0; i < hearts->count; i++) {
         ClActor *actor = IrcCompatMenuGraphic_GetActor(graphic, i);
@@ -1183,7 +1183,7 @@ static void IrcCompatMenuHearts_Init(IrcCompatMenuHearts *hearts, IrcCompatMenuG
         if (log == NULL) {
             isSpecial = GFL_RandomLCAlt(2);
         } else {
-            isSpecial = func_0200b014(log, i) == 1 ? TRUE : FALSE;
+            isSpecial = TrainerLogSave_IsEntryMale(log, i) == 1 ? TRUE : FALSE;
         }
         IrcCompatMenuHeart_Init(&hearts->hearts[i], actor, isSpecial, heapId);
     }

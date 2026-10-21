@@ -39,7 +39,6 @@ are in the module's fragment in [../cmake/](../cmake/README.md). A module's test
 | [input/](input/port_input.h) | KEYINPUT and the ARM7's XY word (hardware; the SDK's `PAD_Read` reads them) | Writes the buttons the program reports where the game reads them, active low, with X, Y and the lid in the shared memory | Every button press (`src/gfl/key.c`), the random seed's entropy | `integrate_input` |
 | [nnsys/](nnsys/reloc.h) | NitroSystem's G2D file loaders (`lib/nnsys/src/g2d/*_load.c`) and FND heaps' frees (wrapped) | Builds host-layout structs from G2D files (characters, palettes, cells, multi-cells, animations, fonts) instead of relocating them in place, and frees them with the heap memory they came from ([ADR 0007](../docs/adr/0007-nitrosystem-files-in-host-structs.md)) | Every sprite and cell animation (`src/gfl/clact.c`, `src/gfl/arc_util.c`), the GFL heaps (`src/gfl/heapsys.c`), the sound heap | `nnsys_*`, `nnsys_g2d_rom_equivalence`, `nnsys_ds_layout` |
 | [gfl/](gfl/heap_policy.c) | Hooks into Game Freak's library (`src/gfl`), and `src/system/gfl_use.c` compiled through `gfl_use_host.c` | The host's heap sizes (`port_heap_size`), the particle systems' larger work ([ADR 0008](../docs/adr/0008-particle-work-from-the-platform-layer.md)), and GFL's frame count for replays | Every heap (`src/gfl/heapsys.c`), particles (`src/gfl/particle.c`), input replays | whole-program tests (`replay_*`, `oracle_*`) |
-| [dwc/](dwc/ov011_pending.c) | Overlay 11 functions with no C yet that DWC's initialization reaches | Their offline effect | The boot, which calls `DWC_InitForProduction` (`src/ov011/dwc_rapcommon.c`) | whole-program tests |
 | [stubs/](stubs/dsprot.c) | DS Protect (`lib/dsprot`, overlays 165 and 337), and a call the decomp names by placeholder | The checks pass as on a genuine cartridge; the placeholder call has no effect | The checks in `src/system/game_system.c`, `src/ov012/event_battle.c`, `src/ov035/event_mapchange.c`, `src/ov165/pokelist.c`; `src/system/resh_zek_savedata.c` | whole-program tests |
 | [host/](host/host.h) | No SDK module: the host operating system's services that the platform layer, the program and the tests share where macOS, Linux and Windows differ ([ADR 0013](../docs/adr/0013-windows-build-with-msys2-clang64.md); the modules that keep their own branches are listed [below](#names)) | Pages and their protection, faults (a trap placeholder touched, by the game's code or the C library's, a fiber's stack overflowing into its guard, a crash, on a fiber too: a memory fault, a division by zero, an illegal instruction or a breakpoint, each reported as `port: crash: ...` with a backtrace), reported on a stack of their own, but for the exceptions off the fibers that Windows' vectored handler leaves to the unhandled-exception filter (a division by zero, an illegal instruction, a breakpoint, a memory fault in another module's code), reported on the faulting stack, backtraces and the program's names, writes to stderr that take no lock, the watchdog, the monotonic clock, the renderer's threads and the signals they wait on, directories, the environment and the program's static data; on Windows, binary stdout and stderr, no error dialogs and both exception handlers before `main()` | None directly: the trap stubs, the fibers' guards, the PXI pointers into static data, `--run-dump`, `--frame-times`, the 3D renderer's workers and the watchdog stand on it | `host_*`, `os_guard_*`, `app_symbols`, `pxi_bus_arena_overlap`, `integrate_overlay_sections`, the CI's macOS, Linux and Windows jobs |
 
@@ -161,7 +160,7 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [snd7/snd_command_host.c](snd7/snd_command_host.c), [snd7/snd_interface_host.c](snd7/snd_interface_host.c) | The decomp's command queue and driver interface compiled through |
 
 **[input/](input/port_input.h)**, **[nnsys/](nnsys/reloc.h)**, **[gfl/](gfl/heap_policy.c)**,
-**[dwc/](dwc/ov011_pending.c)**, **[stubs/](stubs/dsprot.c)**
+**[stubs/](stubs/dsprot.c)**
 
 | File | What it does |
 | --- | --- |
@@ -172,8 +171,9 @@ version, to find the file. `replaced.txt` in a module lists the decomp files tha
 | [gfl/heap_policy.c](gfl/heap_policy.c) | The host's heap sizes (`port_heap_size`, `--heap-scale-root`, `--heap-scale-child`) |
 | [gfl/particle_work.c](gfl/particle_work.c) | The particle systems' work, sized for 64-bit structs |
 | [gfl/gfl_frame.h](gfl/gfl_frame.h), [gfl/gfl_use_host.c](gfl/gfl_use_host.c) | GFL's frame count for replays; the decomp's `gfl_use.c` compiled through to read it |
-| [dwc/ov011_pending.c](dwc/ov011_pending.c) | The overlay 11 functions DWC's initialization reaches before their C exists, with their offline effect |
 | [stubs/dsprot.c](stubs/dsprot.c) | DS Protect's checks, passing as on a genuine cartridge |
+| [stubs/extras_string.c](stubs/extras_string.c) | MSL's ASCII-only case-blind comparison extensions for GameSpy's server browser |
+| [stubs/wstring_host.c](stubs/wstring_host.c) | Original MSL string scan and copy, compiled with private names for DWC authentication's 16-bit code units |
 | [stubs/unresolved.c](stubs/unresolved.c) | Calls the decomp names by placeholder, with the effect they have on the DS |
 
 **[host/](host/host.h)** — the host operating system

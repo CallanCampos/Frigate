@@ -55,46 +55,62 @@ enum {
 
 static int GameBeaconInfoTable_Add(GameBeaconInfoTable *table, const GameBeacon *beacon, const GameBeaconTime *time,
                                    BOOL overwrite);
-static u16 func_02013ebc(const GameBeacon *beacon);
-static u16 func_02013f00(const GameBeacon *beacon);
-static u16 func_02013f14(const GameBeacon *beacon);
-static u16 func_02013f24(const GameBeacon *beacon);
-static u16 func_02013f34(const GameBeacon *beacon);
-static void func_02013f54(const GameBeacon *beacon, StrBuf *dest);
-static u16 func_02013fb8(const GameBeacon *beacon);
-static u32 func_02013fec(const GameBeacon *beacon);
-static u16 func_02013ffc(const GameBeacon *beacon);
-static u32 func_0201400c(const GameBeacon *beacon);
-static u8 func_0201401c(const GameBeacon *beacon);
-static u16 func_0201402c(const GameBeacon *beacon);
-static u8 func_0201403c(const GameBeacon *beacon);
-static void func_02014050(const GameBeacon *beacon, u8 *tournament, u8 *round);
-static u8 func_02014098(const GameBeacon *beacon, u16 *zoneId);
+static u16 GameBeacon_GetSpecies(const GameBeacon *beacon);
+static u16 GameBeacon_GetItem(const GameBeacon *beacon);
+static u16 GameBeacon_GetMove(const GameBeacon *beacon);
+static u16 GameBeacon_GetGiftSpecies(const GameBeacon *beacon);
+static u16 GameBeacon_GetGiftItem(const GameBeacon *beacon);
+static void GameBeacon_GetNickname(const GameBeacon *beacon, StrBuf *dest);
+static u16 GameBeacon_GetTrainerID(const GameBeacon *beacon);
+static u32 GameBeacon_GetNumber3Long(const GameBeacon *beacon);
+static u16 GameBeacon_GetNumber3(const GameBeacon *beacon);
+static u32 GameBeacon_GetNumber1(const GameBeacon *beacon);
+static u8 GameBeacon_GetBattleInstitute(const GameBeacon *beacon);
+static u16 GameBeacon_GetPassPowerArg(const GameBeacon *beacon);
+static u8 GameBeacon_GetPokewoodLine(const GameBeacon *beacon);
+static void GameBeacon_GetTournamentRound(const GameBeacon *beacon, u8 *tournament, u8 *round);
+static u8 GameBeacon_GetZoneAndNumber(const GameBeacon *beacon, u16 *zoneId);
 static u8 GameBeacon_GetTypeFormat(int type);
-static BOOL func_020142e0(const GameBeacon *beacon);
-static BOOL func_020142e4(const GameBeacon *beacon);
-static BOOL func_0201430c(const GameBeacon *beacon);
-static BOOL func_02014324(const GameBeacon *beacon);
-static BOOL func_02014328(const GameBeacon *beacon);
-static BOOL func_02014340(const GameBeacon *beacon);
-static BOOL func_02014358(const GameBeacon *beacon);
-static BOOL func_02014378(const GameBeacon *beacon);
-static BOOL func_0201438c(const GameBeacon *beacon);
-static BOOL func_020143a4(const GameBeacon *beacon);
-static BOOL func_020143bc(const GameBeacon *beacon);
-static BOOL func_020143d4(const GameBeacon *beacon);
-static BOOL func_020143e8(const GameBeacon *beacon);
-static BOOL func_020143f8(const GameBeacon *beacon);
-static BOOL func_0201440c(const GameBeacon *beacon);
-static BOOL func_02014420(const GameBeacon *beacon);
-static BOOL func_02014430(const GameBeacon *beacon);
-static BOOL func_02014470(const GameBeacon *beacon);
+static BOOL GameBeacon_NeverInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsTrainerInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsSpeciesInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsNicknameInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsSpeciesNicknameInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsItemInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsPlayTimeInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsNumber3LongInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsGiftSpeciesInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsGiftItemInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsMoveInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsNumber1Invalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsBattleInstituteInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsPassPowerInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsGiftPassPowerInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsPokewoodInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsTournamentInvalid(const GameBeacon *beacon);
+static BOOL GameBeacon_IsZoneInvalid(const GameBeacon *beacon);
 
 // Whether the payload of a beacon is invalid, by format
 static BOOL (*const sFormatChecks[BEACON_FORMAT_COUNT])(const GameBeacon *beacon) = {
-    func_020142e0, func_020142e4, func_0201430c, func_02014324, func_02014328, func_02014340, func_02014358,
-    func_02014378, func_0201438c, func_020143a4, func_020143bc, func_020143d4, func_020143e8, func_020143f8,
-    func_020142e0, func_0201440c, func_02014420, func_02014430, func_02014470,
+    GameBeacon_NeverInvalid,
+    GameBeacon_IsTrainerInvalid,
+    GameBeacon_IsSpeciesInvalid,
+    GameBeacon_IsNicknameInvalid,
+    GameBeacon_IsSpeciesNicknameInvalid,
+    GameBeacon_IsItemInvalid,
+    GameBeacon_IsPlayTimeInvalid,
+    GameBeacon_IsNumber3LongInvalid,
+    GameBeacon_IsGiftSpeciesInvalid,
+    GameBeacon_IsGiftItemInvalid,
+    GameBeacon_IsMoveInvalid,
+    GameBeacon_IsNumber1Invalid,
+    GameBeacon_IsBattleInstituteInvalid,
+    GameBeacon_IsPassPowerInvalid,
+    GameBeacon_NeverInvalid,
+    GameBeacon_IsGiftPassPowerInvalid,
+    GameBeacon_IsPokewoodInvalid,
+    GameBeacon_IsTournamentInvalid,
+    GameBeacon_IsZoneInvalid,
 };
 
 // By beacon type; the types from BEACON_FORMAT_TYPE_MAX on have no format
@@ -280,7 +296,7 @@ BOOL GameBeacon_IsInvalid(const GameBeacon *beacon) {
     if (beacon->zoneId >= BEACON_ZONE_COUNT || beacon->parentZoneId >= BEACON_ZONE_COUNT) {
         return TRUE;
     }
-    if (beacon->unk04 > 99999 || beacon->unk08 > 99999) {
+    if (beacon->passerbyCount > 99999 || beacon->thankedCount > 99999) {
         return TRUE;
     }
     if (sFormatChecks[GameBeacon_GetTypeFormat(beacon->type)](beacon)) {
@@ -320,8 +336,8 @@ u8 GameBeacon_GetRegion(const GameBeacon *beacon) {
     return beacon->region;
 }
 
-u8 func_02013cd8(GameBeacon *beacon) {
-    u32 answer = func_0200ec3c(beacon->surveyAnswers, 0x1a);
+u8 GameBeacon_GetJob(GameBeacon *beacon) {
+    u32 answer = SurveySave_ReadAnswer(beacon->surveyAnswers, 0x1a);
 
     if (answer == 0) {
         return 0xff;
@@ -329,8 +345,8 @@ u8 func_02013cd8(GameBeacon *beacon) {
     return answer;
 }
 
-u8 func_02013cf0(GameBeacon *beacon) {
-    u32 answer = func_0200ec3c(beacon->surveyAnswers, 0x19);
+u8 GameBeacon_GetHobby(GameBeacon *beacon) {
+    u32 answer = SurveySave_ReadAnswer(beacon->surveyAnswers, 0x19);
 
     if (answer == 0) {
         return 0xff;
@@ -349,7 +365,7 @@ u8 GameBeacon_GetSurveyRank(const GameBeacon *beacon) {
     return beacon->surveyRank;
 }
 
-void func_02013d38(u16 *dest, const GameBeacon *beacon) {
+void GameBeacon_GetFavoriteColorRGB(u16 *dest, const GameBeacon *beacon) {
     u32 color = beacon->favoriteColor;
     const u16 *colors = OS_GetFavoriteColorTable();
 
@@ -392,16 +408,16 @@ u16 GameBeacon_GetParentZone(const GameBeacon *beacon) {
     return beacon->parentZoneId;
 }
 
-u32 func_02013db8(const GameBeacon *beacon) {
-    return beacon->unk08;
+u32 GameBeacon_GetThankedCount(const GameBeacon *beacon) {
+    return beacon->thankedCount;
 }
 
-u32 func_02013dc0(const GameBeacon *beacon) {
-    return beacon->unk04;
+u32 GameBeacon_GetPasserbyCount(const GameBeacon *beacon) {
+    return beacon->passerbyCount;
 }
 
-u8 func_02013dc8(const GameBeacon *beacon) {
-    return beacon->unk5B;
+u8 GameBeacon_GetFavoriteMedal(const GameBeacon *beacon) {
+    return beacon->favoriteMedal;
 }
 
 u8 GameBeacon_GetMedalCount(const GameBeacon *beacon) {
@@ -413,7 +429,7 @@ void GameBeacon_GetGreeting(const GameBeacon *beacon, StrBuf *dest) {
     GFL_StrBufLoadFixedString(dest, beacon->greeting, 9);
 }
 
-void func_02013df4(const GameBeacon *beacon, StrBuf *dest) {
+void GameBeacon_GetMessage(const GameBeacon *beacon, StrBuf *dest) {
     if (beacon->type != 0x18) {
         GFL_StrBufClear(dest);
         return;
@@ -421,7 +437,7 @@ void func_02013df4(const GameBeacon *beacon, StrBuf *dest) {
     GFL_StrBufLoadString(dest, beacon->payload.message.text);
 }
 
-void func_02013e14(const GameBeacon *beacon, StrBuf *dest) {
+void GameBeacon_GetTextMessage(const GameBeacon *beacon, StrBuf *dest) {
     if (beacon->type != 0x31) {
         GFL_StrBufClear(dest);
         return;
@@ -478,7 +494,7 @@ u16 GameBeacon_GetType(const GameBeacon *beacon) {
 
 // The readers of a type's value: it, or a default for another type
 
-static u16 func_02013ebc(const GameBeacon *beacon) {
+static u16 GameBeacon_GetSpecies(const GameBeacon *beacon) {
     switch (beacon->type) {
     case 0x2:
     case 0x3:
@@ -493,7 +509,7 @@ static u16 func_02013ebc(const GameBeacon *beacon) {
     return SPECIES_PATRAT;
 }
 
-static u16 func_02013f00(const GameBeacon *beacon) {
+static u16 GameBeacon_GetItem(const GameBeacon *beacon) {
     switch (beacon->type) {
     case 0x13:
     case 0x23:
@@ -502,21 +518,21 @@ static u16 func_02013f00(const GameBeacon *beacon) {
     return ITEM_POTION;
 }
 
-static u16 func_02013f14(const GameBeacon *beacon) {
+static u16 GameBeacon_GetMove(const GameBeacon *beacon) {
     if (beacon->type == 0x24) {
         return beacon->payload.value;
     }
     return MOVE_POUND;
 }
 
-static u16 func_02013f24(const GameBeacon *beacon) {
+static u16 GameBeacon_GetGiftSpecies(const GameBeacon *beacon) {
     if (beacon->type == 0x19) {
         return beacon->payload.gift.species;
     }
     return SPECIES_PATRAT;
 }
 
-static u16 func_02013f34(const GameBeacon *beacon) {
+static u16 GameBeacon_GetGiftItem(const GameBeacon *beacon) {
     if (beacon->type == 0x1a) {
         return beacon->payload.gift.item;
     }
@@ -532,7 +548,7 @@ u16 GameBeacon_GetGiftPassPower(const GameBeacon *beacon) {
 
 // Loads the nickname of the types that send one. The switch does nothing; its cases are the types whose format has
 // a nickname, and 0x17 is a guess, since the code only shows that the cases from 0x10 to 0x26 are dense
-static void func_02013f54(const GameBeacon *beacon, StrBuf *dest) {
+static void GameBeacon_GetNickname(const GameBeacon *beacon, StrBuf *dest) {
     GFL_StrBufClear(dest);
     GFL_StrBufLoadFixedString(dest, beacon->payload.text, GAME_BEACON_TEXT_LEN + 1);
     switch (beacon->type) {
@@ -551,7 +567,7 @@ static void func_02013f54(const GameBeacon *beacon, StrBuf *dest) {
     }
 }
 
-static u16 func_02013fb8(const GameBeacon *beacon) {
+static u16 GameBeacon_GetTrainerID(const GameBeacon *beacon) {
     switch (beacon->type) {
     case 0x6:
     case 0x7:
@@ -564,42 +580,42 @@ static u16 func_02013fb8(const GameBeacon *beacon) {
     return 1;
 }
 
-static u32 func_02013fec(const GameBeacon *beacon) {
+static u32 GameBeacon_GetNumber3Long(const GameBeacon *beacon) {
     if (beacon->type == 0x16) {
         return beacon->payload.value32;
     }
     return 1;
 }
 
-static u16 func_02013ffc(const GameBeacon *beacon) {
+static u16 GameBeacon_GetNumber3(const GameBeacon *beacon) {
     if (beacon->type == 0x14) {
         return beacon->payload.value;
     }
     return 1;
 }
 
-static u32 func_0201400c(const GameBeacon *beacon) {
+static u32 GameBeacon_GetNumber1(const GameBeacon *beacon) {
     if (beacon->type == 0x29) {
         return beacon->payload.value32;
     }
     return 1;
 }
 
-static u8 func_0201401c(const GameBeacon *beacon) {
+static u8 GameBeacon_GetBattleInstitute(const GameBeacon *beacon) {
     if (beacon->type == 0x2c) {
         return beacon->payload.value8;
     }
     return 0;
 }
 
-static u16 func_0201402c(const GameBeacon *beacon) {
+static u16 GameBeacon_GetPassPowerArg(const GameBeacon *beacon) {
     if (beacon->type == 0x30) {
         return beacon->payload.value;
     }
     return 0;
 }
 
-static u8 func_0201403c(const GameBeacon *beacon) {
+static u8 GameBeacon_GetPokewoodLine(const GameBeacon *beacon) {
     switch (beacon->type) {
     case 0x33:
     case 0x34:
@@ -608,7 +624,7 @@ static u8 func_0201403c(const GameBeacon *beacon) {
     return 0;
 }
 
-static void func_02014050(const GameBeacon *beacon, u8 *tournament, u8 *round) {
+static void GameBeacon_GetTournamentRound(const GameBeacon *beacon, u8 *tournament, u8 *round) {
     switch (beacon->type) {
     case 0x35:
     case 0x36:
@@ -627,7 +643,7 @@ static void func_02014050(const GameBeacon *beacon, u8 *tournament, u8 *round) {
     }
 }
 
-static u8 func_02014098(const GameBeacon *beacon, u16 *zoneId) {
+static u8 GameBeacon_GetZoneAndNumber(const GameBeacon *beacon, u16 *zoneId) {
     switch (beacon->type) {
     case 0x3a:
     case 0x3b:
@@ -645,11 +661,11 @@ static u8 GameBeacon_GetTypeFormat(int type) {
     return sTypeFormats[type].format;
 }
 
-u8 func_020140cc(int type) {
+u8 GameBeacon_GetTypeIcon(int type) {
     if (type >= BEACON_FORMAT_TYPE_MAX) {
         return 0;
     }
-    return sTypeFormats[type].unk1;
+    return sTypeFormats[type].icon;
 }
 
 void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, HeapID heapId) {
@@ -665,11 +681,11 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
         return;
     }
     GameBeacon_GetName(beacon, str);
-    func_0202437c(wordSet, 0, str, 0, 1, 2);
+    GFL_WordSetSetStrbuf(wordSet, 0, str, 0, 1, 2);
     format = GameBeacon_GetTypeFormat(GameBeacon_GetType(beacon));
     switch (format) {
     case BEACON_FORMAT_TRAINER: {
-        u16 trainerId = func_02013fb8(beacon);
+        u16 trainerId = GameBeacon_GetTrainerID(beacon);
 
         loadTrainerTypeToStrbuf(wordSet, 1, trainerId);
         loadTrainerNamesToStrbuf(wordSet, 2, trainerId);
@@ -677,56 +693,56 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
     }
     case BEACON_FORMAT_SPECIES:
     case BEACON_FORMAT_SPECIES_NICKNAME:
-        WordSet_LoadSpeciesName(wordSet, 1, func_02013ebc(beacon));
+        WordSet_LoadSpeciesName(wordSet, 1, GameBeacon_GetSpecies(beacon));
         if (format == BEACON_FORMAT_SPECIES) {
             break;
         }
         // fallthrough
     case BEACON_FORMAT_NICKNAME:
-        func_02013f54(beacon, str);
-        func_0202437c(wordSet, 2, str, 0, 1, 2);
+        GameBeacon_GetNickname(beacon, str);
+        GFL_WordSetSetStrbuf(wordSet, 2, str, 0, 1, 2);
         break;
     case BEACON_FORMAT_ITEM:
-        loadItemTextNameToStrbuf(wordSet, 1, func_02013f00(beacon));
+        loadItemTextNameToStrbuf(wordSet, 1, GameBeacon_GetItem(beacon));
         break;
     case BEACON_FORMAT_NUMBER3:
-        WordSetNumber(wordSet, 1, func_02013ffc(beacon), 3, 0, TRUE);
+        WordSetNumber(wordSet, 1, GameBeacon_GetNumber3(beacon), 3, 0, TRUE);
         break;
     case BEACON_FORMAT_NUMBER3_LONG:
-        WordSetNumber(wordSet, 1, func_02013fec(beacon), 3, 0, TRUE);
+        WordSetNumber(wordSet, 1, GameBeacon_GetNumber3Long(beacon), 3, 0, TRUE);
         break;
     case BEACON_FORMAT_GIFT_SPECIES:
-        WordSet_LoadSpeciesName(wordSet, 1, func_02013f24(beacon));
+        WordSet_LoadSpeciesName(wordSet, 1, GameBeacon_GetGiftSpecies(beacon));
         break;
     case BEACON_FORMAT_GIFT_ITEM:
-        loadItemNameToStrbuf(wordSet, 1, func_02013f34(beacon));
+        loadItemNameToStrbuf(wordSet, 1, GameBeacon_GetGiftItem(beacon));
         break;
     case BEACON_FORMAT_MOVE:
-        loadMoveNameToStrbuf(wordSet, 1, func_02013f14(beacon));
+        loadMoveNameToStrbuf(wordSet, 1, GameBeacon_GetMove(beacon));
         break;
     case BEACON_FORMAT_NUMBER1:
-        WordSetNumber(wordSet, 1, func_0201400c(beacon), 1, 0, TRUE);
+        WordSetNumber(wordSet, 1, GameBeacon_GetNumber1(beacon), 1, 0, TRUE);
         break;
     case BEACON_FORMAT_BATTLE_INSTITUTE:
-        loadBattleInstituteMsgForDisplay(wordSet, 1, func_0201401c(beacon));
+        loadBattleInstituteMsgForDisplay(wordSet, 1, GameBeacon_GetBattleInstitute(beacon));
         break;
     case BEACON_FORMAT_PASS_POWER:
-        loadPassPowerToStrbuf(wordSet, 1, func_0201402c(beacon));
+        loadPassPowerToStrbuf(wordSet, 1, GameBeacon_GetPassPowerArg(beacon));
         break;
     case BEACON_FORMAT_TEXT:
-        func_02013e14(beacon, str);
-        func_0202437c(wordSet, 1, str, GameBeacon_GetGender(beacon), 1, 2);
+        GameBeacon_GetTextMessage(beacon, str);
+        GFL_WordSetSetStrbuf(wordSet, 1, str, GameBeacon_GetGender(beacon), 1, 2);
         break;
     case BEACON_FORMAT_POKEWOOD:
-        loadPokewoodLineToStrbuf(wordSet, 1, func_0201403c(beacon));
+        loadPokewoodLineToStrbuf(wordSet, 1, GameBeacon_GetPokewoodLine(beacon));
         break;
     case BEACON_FORMAT_TOURNAMENT:
-        func_02014050(beacon, &tournament, &round);
-        func_0202483c(wordSet, 1, tournament);
+        GameBeacon_GetTournamentRound(beacon, &tournament, &round);
+        WordSet_LoadPWTTournamentType(wordSet, 1, tournament);
         WordSetNumber(wordSet, 2, round, 1, 0, TRUE);
         break;
     case BEACON_FORMAT_ZONE: {
-        u8 number = func_02014098(beacon, &zoneId);
+        u8 number = GameBeacon_GetZoneAndNumber(beacon, &zoneId);
 
         loadLocationNameToStrbuf(wordSet, 1, ZoneData_GetPlaceNameID(zoneId));
         WordSetNumber(wordSet, 2, number, 2, 0, TRUE);
@@ -738,12 +754,12 @@ void GameBeacon_SetMessageWords(const GameBeacon *beacon, WordSet *wordSet, Heap
 
 // The checks of a beacon's payload, by format: whether it is invalid
 
-static BOOL func_020142e0(const GameBeacon *beacon) {
+static BOOL GameBeacon_NeverInvalid(const GameBeacon *beacon) {
     return FALSE;
 }
 
 // Black and White have other trainers
-static BOOL func_020142e4(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsTrainerInvalid(const GameBeacon *beacon) {
     if (beacon->version == VERSION_WHITE || beacon->version == VERSION_BLACK) {
         return TRUE;
     }
@@ -753,95 +769,95 @@ static BOOL func_020142e4(const GameBeacon *beacon) {
     return FALSE;
 }
 
-static BOOL func_0201430c(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsSpeciesInvalid(const GameBeacon *beacon) {
     if (beacon->arg.value == SPECIES_NONE || beacon->arg.value > SPECIES_GENESECT) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_02014324(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsNicknameInvalid(const GameBeacon *beacon) {
     return FALSE;
 }
 
-static BOOL func_02014328(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsSpeciesNicknameInvalid(const GameBeacon *beacon) {
     if (beacon->arg.value == SPECIES_NONE || beacon->arg.value > SPECIES_GENESECT) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_02014340(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsItemInvalid(const GameBeacon *beacon) {
     if (beacon->payload.value == ITEM_NONE || beacon->payload.value > ITEM_LAST) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_02014358(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsPlayTimeInvalid(const GameBeacon *beacon) {
     if (beacon->playHours > BEACON_PLAY_HOURS_MAX || beacon->playMinutes > BEACON_PLAY_MINUTES_MAX) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_02014378(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsNumber3LongInvalid(const GameBeacon *beacon) {
     if (beacon->payload.value32 > 99999) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_0201438c(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsGiftSpeciesInvalid(const GameBeacon *beacon) {
     if (beacon->payload.gift.species == SPECIES_NONE || beacon->payload.gift.species > SPECIES_GENESECT) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_020143a4(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsGiftItemInvalid(const GameBeacon *beacon) {
     if (beacon->payload.gift.item == ITEM_NONE || beacon->payload.gift.item > ITEM_LAST) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_020143bc(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsMoveInvalid(const GameBeacon *beacon) {
     if (beacon->payload.value == MOVE_NONE || beacon->payload.value >= BEACON_MOVE_COUNT) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_020143d4(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsNumber1Invalid(const GameBeacon *beacon) {
     if (beacon->payload.value32 == 0 || beacon->payload.value32 > 7) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_020143e8(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsBattleInstituteInvalid(const GameBeacon *beacon) {
     if (beacon->payload.value8 > 6) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_020143f8(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsPassPowerInvalid(const GameBeacon *beacon) {
     if (!PassPower_IsIDValid(beacon->payload.value)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_0201440c(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsGiftPassPowerInvalid(const GameBeacon *beacon) {
     if (!PassPower_IsIDValid(beacon->payload.gift.passPower)) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL func_02014420(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsPokewoodInvalid(const GameBeacon *beacon) {
     if (beacon->payload.value8 >= 0x29) {
         return TRUE;
     }
@@ -849,7 +865,7 @@ static BOOL func_02014420(const GameBeacon *beacon) {
 }
 
 // The tournament, and the round, whose range depends on the type
-static BOOL func_02014430(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsTournamentInvalid(const GameBeacon *beacon) {
     u8 min;
     u8 max;
 
@@ -872,7 +888,7 @@ static BOOL func_02014430(const GameBeacon *beacon) {
     return FALSE;
 }
 
-static BOOL func_02014470(const GameBeacon *beacon) {
+static BOOL GameBeacon_IsZoneInvalid(const GameBeacon *beacon) {
     if (beacon->payload.withExtra.value != ZONE_WHITE_TREEHOLLOW &&
         beacon->payload.withExtra.value != ZONE_BLACK_TOWER) {
         return TRUE;

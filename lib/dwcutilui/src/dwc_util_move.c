@@ -1,5 +1,6 @@
 #include "dwc_util_move.h"
 #include "app/download_play_sys.h"
+#include "dwc_util_connection.h"
 #include "dwc_util_heap.h"
 #include "dwc_util_main.h"
 #include "dwc_util_msg_resource.h"
@@ -16,73 +17,74 @@ typedef struct DWCUtilMove {
     MBUserInfo user;
     DWCUtilMoveCallback callback;
     DWCUtilTask *task;
-    // Whether a console downloaded the program before there was a callback to tell, and whether the move ended
-    u8 entered;
+    // Whether an event came while there was no callback to tell (the next update tells it as an entry, whatever it
+    // was), and whether the move ended
+    u8 pending;
     u8 ended;
 } DWCUtilMove;
 
-static void func_ov182_021ae1e8(DWCUtilTask *task, void *arg);
-static void func_ov182_021ae254(DWCUtilTask *task, void *arg);
+static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg);
+static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg);
 
 static DownloadPlaySysGame sGame = {
     "dwc:/move/child.srl", NULL, NULL, "dwc:/move/banner.char", "dwc:/move/banner.plt", 0x159, 0,
 };
 static DWCUtilMove *sMove;
 
-void func_ov182_021ae134(DWCUtilMoveCallback callback) {
+void DWCUtilMove_Start(DWCUtilMoveCallback callback) {
     DownloadPlaySysGame game;
 
-    sMove = func_ov182_021bc4d8(sizeof(DWCUtilMove), 32);
+    sMove = DWCUtilHeap_AllocClear(sizeof(DWCUtilMove), 32);
     sMove->callback = callback;
-    sMove->entered = FALSE;
+    sMove->pending = FALSE;
     sMove->ended = FALSE;
     game = sGame;
-    game.gameNamep = func_ov182_021ae108(data_ov182_021c40b8, 0);
-    game.gameIntroductionp = func_ov182_021ae108(data_ov182_021c40b8, 1);
+    game.gameNamep = DWCUtilMsg_Get(gDWCUtilMsg, 0);
+    game.gameIntroductionp = DWCUtilMsg_Get(gDWCUtilMsg, 1);
     game.maxPlayerNum = func_ov182_021ae058();
     func_ov182_021ba768(&sMove->context, &game);
     if (!func_ov182_021ba918()) {
         OS_Terminate();
     }
-    sMove->task = func_ov182_021bd200(0, func_ov182_021ae254, NULL, 0x78);
+    sMove->task = DWCUtilTask_Create(0, DWCUtilMove_UpdateTask, NULL, 0x78);
 }
 
-void func_ov182_021ae1d4(void) {
-    func_ov182_021bd200(0, func_ov182_021ae1e8, NULL, 0x78);
+void DWCUtilMove_End(void) {
+    DWCUtilTask_Create(0, DWCUtilMove_EndTask, NULL, 0x78);
 }
 
-static void func_ov182_021ae1e8(DWCUtilTask *task, void *arg) {
+static void DWCUtilMove_EndTask(DWCUtilTask *task, void *arg) {
     if (func_ov182_021ba81c()) {
         sMove->ended = TRUE;
-        func_ov182_021bd268(0, task);
+        DWCUtilTask_QueueRemoval(0, task);
     }
 }
 
-BOOL func_ov182_021ae210(void) {
+BOOL DWCUtilMove_HasEnded(void) {
     if (sMove == NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-void func_ov182_021ae224(DWCUtilMoveCallback callback) {
+void DWCUtilMove_SetCallback(DWCUtilMoveCallback callback) {
     sMove->callback = callback;
 }
 
-void func_ov182_021ae238(void) {
+void DWCUtilMove_StartSending(void) {
     func_ov182_021ba950();
 }
 
-const void *func_ov182_021ae240(void) {
+const MBUserInfo *DWCUtilMove_GetChildUser(void) {
     return &sMove->user;
 }
 
-static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
+static void DWCUtilMove_UpdateTask(DWCUtilTask *task, void *arg) {
     u8 state;
     u8 changed;
 
     func_ov182_021ba974();
-    if (sMove->entered && !sMove->ended) {
+    if (sMove->pending && !sMove->ended) {
         if (sMove->callback == NULL) {
             return;
         }
@@ -100,7 +102,7 @@ static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_ENTERED);
             return;
         }
-        sMove->entered = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_CHILD_LEFT:
         if (!changed) {
@@ -110,7 +112,7 @@ static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_CHILD_LEFT);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_WIRELESS:
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_PEER:
@@ -121,7 +123,7 @@ static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_ENDED);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_CANCEL:
     case DOWNLOAD_PLAY_SYS_STATE_ENDED_ERROR:
@@ -132,7 +134,7 @@ static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_FAILED);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_DONE:
         if (!changed) {
@@ -142,27 +144,16 @@ static void func_ov182_021ae254(DWCUtilTask *task, void *arg) {
             sMove->callback(DWC_UTIL_MOVE_EVENT_DONE);
             return;
         }
-        sMove->ended = TRUE;
+        sMove->pending = TRUE;
         return;
     case DOWNLOAD_PLAY_SYS_STATE_ENDED:
-        func_ov182_021bd268(0, task);
-        func_ov182_021bc4f0(&sMove);
+        DWCUtilTask_QueueRemoval(0, task);
+        DWCUtilHeap_FreeAndNull(&sMove);
         return;
-    case DOWNLOAD_PLAY_SYS_STATE_NONE:
     case DOWNLOAD_PLAY_SYS_STATE_READY:
     case DOWNLOAD_PLAY_SYS_STATE_START_WIRELESS:
     case DOWNLOAD_PLAY_SYS_STATE_INIT_PARENT:
     case DOWNLOAD_PLAY_SYS_STATE_ENTRY:
-    case DOWNLOAD_PLAY_SYS_STATE_SENDING:
-    case DOWNLOAD_PLAY_SYS_STATE_START_CONNECT:
-    case DOWNLOAD_PLAY_SYS_STATE_CONNECT:
-    case DOWNLOAD_PLAY_SYS_STATE_CONNECT_PEER:
-    case DOWNLOAD_PLAY_SYS_STATE_CONNECT_ASKED:
-    case DOWNLOAD_PLAY_SYS_STATE_PEER_DONE:
-    case DOWNLOAD_PLAY_SYS_STATE_END_PARENT:
-    case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_PARENT:
-    case DOWNLOAD_PLAY_SYS_STATE_SENT:
-    case DOWNLOAD_PLAY_SYS_STATE_WAIT_END_WIRELESS:
     default:
         return;
     }

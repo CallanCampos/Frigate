@@ -9,7 +9,7 @@
 
 #define SAVE_BLOCK_TRAINER_CARD 0x26
 
-u32 func_020093d0(void) {
+u32 GameRecords_GetSize(void) {
     return sizeof(GameRecords);
 }
 

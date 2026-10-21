@@ -53,8 +53,9 @@ struct GameCommSys {
     // An exit requested while booting
     u8 exitReq : 1;
     u8 exitReqAgain : 1;
-    u8 unkFlag2 : 1;
-    u8 unkFlag3 : 1;
+    // Set while the research graph (research_graph.c) is shown, and while a Funfest mission runs
+    u8 inResearchGraph : 1;
+    u8 inFunfestMission : 1;
     u8 commNo;
     u8 lastCommNo;
     u32 unk8;
@@ -86,15 +87,15 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
 static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
     [GAME_COMM_NO_NULL] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
     [GAME_COMM_NO_BEACON_SEARCH] = {
-        func_ov012_0215f55c,
-        func_ov012_0215f5b4,
-        func_ov012_0215f654,
-        func_ov012_0215f610,
-        func_ov012_0215f628,
+        GameBeaconSearch_Init,
+        GameBeaconSearch_InitWait,
+        GameBeaconSearch_Main,
+        GameBeaconSearch_Exit,
+        GameBeaconSearch_ExitWait,
         NULL,
         NULL,
     },
-    [GAME_COMM_NO_UNK2] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+    [GAME_COMM_NO_INTRUDE] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL },
     [GAME_COMM_NO_UNION] = {
         UnionComm_Init,
         UnionComm_InitWait,
@@ -105,20 +106,20 @@ static const GameCommFuncs sGameCommFuncs[GAME_COMM_NO_MAX] = {
         UnionMain_OnFieldOut,
     },
     [GAME_COMM_NO_MUSICAL] = {
-        func_ov211_021ef230,
+        MusComm_Init,
         NULL,
-        func_ov211_021ef394,
-        func_ov211_021ef288,
-        func_ov211_021ef378,
+        MusComm_Update,
+        MusComm_Exit,
+        MusComm_ExitWait,
         NULL,
         NULL,
     },
     [GAME_COMM_NO_UNK5] = {
-        func_ov012_0215f55c,
-        func_ov012_0215f5b4,
-        func_ov012_0215f654,
-        func_ov012_0215f610,
-        func_ov012_0215f628,
+        GameBeaconSearch_Init,
+        GameBeaconSearch_InitWait,
+        GameBeaconSearch_Main,
+        GameBeaconSearch_Exit,
+        GameBeaconSearch_ExitWait,
         NULL,
         NULL,
     },
@@ -320,16 +321,16 @@ static void GameComm_SetSeq(GameCommSeq *seq, u8 next) {
     seq->changed = TRUE;
 }
 
-void func_0202be14(GameCommSys *comm, BOOL flag) {
-    comm->unkFlag2 = flag;
+void GameCommSys_SetInResearchGraph(GameCommSys *comm, BOOL flag) {
+    comm->inResearchGraph = flag;
 }
 
-void func_0202be28(GameCommSys *comm, BOOL flag) {
-    comm->unkFlag3 = flag;
+void GameCommSys_SetInFunfestMission(GameCommSys *comm, BOOL flag) {
+    comm->inFunfestMission = flag;
 }
 
-BOOL func_0202be3c(GameCommSys *comm) {
-    if (comm->unkFlag2 || comm->unkFlag3) {
+BOOL GameCommSys_IsInResearchGraphOrMission(GameCommSys *comm) {
+    if (comm->inResearchGraph || comm->inFunfestMission) {
         return TRUE;
     }
     return FALSE;
@@ -345,17 +346,17 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
     PlayerInfo *info2;
     GameCommLogEntry *entry;
 
-    if (netId1 == func_020175cc(comm->gameData)) {
+    if (netId1 == GameData_GetNetID(comm->gameData)) {
         info1 = GetGameDataPlayerInfo(comm->gameData);
     } else {
-        info1 = func_02017378(comm->gameData, netId1);
+        info1 = GameData_GetPlayerInfoByNetID(comm->gameData, netId1);
     }
-    if (netId2 == func_020175cc(comm->gameData)) {
+    if (netId2 == GameData_GetNetID(comm->gameData)) {
         info2 = GetGameDataPlayerInfo(comm->gameData);
     } else {
-        info2 = func_02017378(comm->gameData, netId2);
+        info2 = GameData_GetPlayerInfoByNetID(comm->gameData, netId2);
     }
-    if (func_02008b5c(info1) == TRUE || func_02008b5c(info2) == TRUE) {
+    if (PlayerInfo_IsNameEmpty(info1) == TRUE || PlayerInfo_IsNameEmpty(info2) == TRUE) {
         return;
     }
 
@@ -380,14 +381,14 @@ static void GameCommSys_LogPlayers(GameCommSys *comm, u32 netId1, u32 netId2, u3
     }
 }
 
-void func_0202bf68(GameCommSys *comm, u32 netId1, u32 netId2) {
+void GameCommSys_LogPassPowerReceived(GameCommSys *comm, u32 netId1, u32 netId2) {
     u16 beaconType = netId1 == netId2 ? 0x27 : 0x26;
 
     GameCommSys_LogPlayers(comm, netId1, netId2, beaconType);
 }
 
-void func_0202bf7c(GameCommSys *comm) {
-    u32 netId = func_020175cc(comm->gameData);
+void GameCommSys_LogMissionJoined(GameCommSys *comm) {
+    u32 netId = GameData_GetNetID(comm->gameData);
 
     GameCommSys_LogPlayers(comm, netId, netId, 0x37);
 }

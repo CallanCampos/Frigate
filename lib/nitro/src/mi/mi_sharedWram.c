@@ -6,6 +6,6 @@
 
 void func_02078000(void) {
     if (OS_IsRunOnTwl()) {
-        func_02768818();
+        MIi_InitWramManagerCore();
     }
 }

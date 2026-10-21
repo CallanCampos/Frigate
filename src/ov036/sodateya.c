@@ -3,8 +3,10 @@
 #include "types.h"
 #include "constants/arc.h"
 #include "constants/items.h"
+#include "constants/moves.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
+#include "constants/vars.h"
 #include "field/field.h"
 #include "field/field_daycare.h"
 #include "field/game_beacon_set.h"
@@ -27,6 +29,27 @@
 #include "save/pokedex.h"
 #include "system/game_data.h"
 #include "system/game_system.h"
+
+// Default parameter tables copied into the local work arrays used by move and IV inheritance.
+typedef struct {
+    u32 values[4];
+} DayCareMoveParamTable;
+typedef struct {
+    u32 values[6];
+} DayCareStatParamTable;
+typedef struct {
+    u32 values[12][3];
+} DayCareIncenseTable;
+
+static const DayCareMoveParamTable sOpenSlotMoveParams;
+static const DayCareMoveParamTable sExistingMoveParams;
+static const DayCareIncenseTable sIncenses;
+static const DayCareStatParamTable sPowerItems;
+static const DayCareMoveParamTable sLevelMoveParams;
+static const DayCareMoveParamTable sTmMoveParams;
+static const DayCareStatParamTable sInheritedIVParams;
+static const DayCareStatParamTable sEggIVParams;
+static const DayCareMoveParamTable sEggMoveParams;
 
 #define PERSONAL_EGG_GROUP_1 24
 #define PERSONAL_EGG_GROUP_2 25
@@ -147,7 +170,7 @@ static void inheritLvlUpMoves(EggParents *parents, EggData *egg);
 static void inheritTmMoves(EggParents *parents, EggData *egg, HeapID heapId);
 static void pichuLightBallHandler(EggParents *parents, EggData *egg);
 static void PushEggPkmMove(EggData *egg, int move);
-static void createEggPkm(PartyPkm *pkm, EggData *egg, PlayerInfo *info, u16 place, HeapID heapId);
+static void createEggPkm(PartyPkm *pkm, const EggData *egg, PlayerInfo *info, u32 place, HeapID heapId);
 static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 item);
 static u32 validateSpeciesAndGetOffspring(u32 species);
 
@@ -214,7 +237,7 @@ void DayCare_Breed(DayCare *dayCare, PokeParty *party) {
     if (DayCareSave_CheckSpawnFlag(dayCare->save) == TRUE) {
         GameData *gameData;
 
-        func_ov012_02160080();
+        GameBeacon_BroadcastEggReceived();
         setPartyFullToConst(dayCare->field);
         DayCare_CreateChildPkm(dayCare, egg);
         PokeParty_AddPkm(party, egg);
@@ -248,13 +271,13 @@ static void setPartyHasSpaceToConst(Field *field) {
     PokeParty *party = GameData_GetParty(gameData);
 
     if (PokeParty_GetPkmCount(party) < PokeParty_GetCapacity(party)) {
-        *EventWork_GetWkPtr(eventWork, 0x417f) = 1;
+        *EventWork_GetWkPtr(eventWork, EVENT_WORK_0x417f) = 1;
     }
 }
 
 static void setPartyFullToConst(Field *field) {
     EventWork *eventWork = GameData_GetEventWork(GSYS_GetGameData(Field_GetGameSystem(field)));
-    *EventWork_GetWkPtr(eventWork, 0x417f) = 0;
+    *EventWork_GetWkPtr(eventWork, EVENT_WORK_0x417f) = 0;
 }
 
 BOOL DayCare_CheckSpawnFlag(DayCare *dayCare) {
@@ -370,12 +393,12 @@ static void DayCare_CommitPkmGrowth(PartyPkm *pkm, u32 steps) {
 }
 
 static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move) {
-    u32 moveParams[4] = { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3, PKM_PARAM_MOVE4 };
+    DayCareMoveParamTable moveParams = sOpenSlotMoveParams;
     int i;
 
     if (move != 0 && !func_ov036_021bd788(pkm, move)) {
         for (i = 0; i < 4; i++) {
-            if (PokeParty_GetParam(pkm, moveParams[i], NULL) == 0) {
+            if (PokeParty_GetParam(pkm, moveParams.values[i], NULL) == 0) {
                 PokeParty_SetMove(pkm, move, i);
                 return;
             }
@@ -385,11 +408,11 @@ static void writeLvUpMoveOpenSlot(PartyPkm *pkm, u32 move) {
 }
 
 static BOOL func_ov036_021bd788(PartyPkm *pkm, int move) {
-    u32 moveParams[4] = { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3, PKM_PARAM_MOVE4 };
+    DayCareMoveParamTable moveParams = sExistingMoveParams;
     int i;
 
     for (i = 0; i < 4; i++) {
-        if (move == PokeParty_GetParam(pkm, moveParams[i], NULL)) {
+        if (move == PokeParty_GetParam(pkm, moveParams.values[i], NULL)) {
             return TRUE;
         }
     }
@@ -619,11 +642,8 @@ static void manaphyHandler(EggParents *parents, EggData *egg) {
 }
 
 static void incenseHandler(EggParents *parents, EggData *egg) {
-    u32 incenses[12][3] = {
-        { 0x12a, 0xfe, 0xb7 },   { 0x168, 0xff, 0xca },  { 0x1b7, 0x13a, 0x7a },
-        { 0x1b6, 0x13b, 0xb9 },  { 0x1be, 0x13c, 0x8f }, { 0x1ca, 0x13d, 0xe2 },
-        { 0x196, 0x13e, 0x13b }, { 0x1b8, 0x13f, 0x71 }, { 0x1b1, 0x140, 0x166 },
-    };
+    // Each baby species, the incense one of the parents has to hold for it, and the species the egg is without it
+    DayCareIncenseTable incenses = sIncenses;
     PartyPkm *pkm = checkSecondPokemonDitto(parents);
     int item1;
     u32 item2;
@@ -634,8 +654,8 @@ static void incenseHandler(EggParents *parents, EggData *egg) {
     item1 = PokeParty_GetParam(parents->parents[0], PKM_PARAM_ITEM, NULL);
     item2 = PokeParty_GetParam(parents->parents[1], PKM_PARAM_ITEM, NULL);
     for (i = 0; i < 12; i++) {
-        if (egg->species == incenses[i][0] && item1 != incenses[i][1] && item2 != incenses[i][1]) {
-            egg->species = incenses[i][2];
+        if (egg->species == incenses.values[i][0] && item1 != incenses.values[i][1] && item2 != incenses.values[i][1]) {
+            egg->species = incenses.values[i][2];
             return;
         }
     }
@@ -663,7 +683,7 @@ static void shellosHandler(EggParents *parents, EggData *egg) {
 static void burmyHandler(EggParents *parents, EggData *egg) {
     PartyPkm *pkm = checkSecondPokemonDitto2(parents);
 
-    if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) - 412 <= 1) {
+    if (PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL) - SPECIES_BURMY <= 1) {
         egg->form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
     }
 }
@@ -780,21 +800,20 @@ static void SetPowerItemInheritedIVs(EggParents *parents, EggData *egg, EggRando
     BOOL power2 = FALSE;
     int item1 = PokeParty_GetParam(parents->parents[0], PKM_PARAM_ITEM, NULL);
     int item2 = PokeParty_GetParam(parents->parents[1], PKM_PARAM_ITEM, NULL);
-    u32 powerItems[6] = { ITEM_POWER_WEIGHT, ITEM_POWER_BRACER, ITEM_POWER_BELT,
-                          ITEM_POWER_LENS,   ITEM_POWER_BAND,   ITEM_POWER_ANKLET };
+    DayCareStatParamTable powerItems = sPowerItems;
     int stat1;
     int stat2;
     int i;
 
     for (i = 0; i < 6; i++) {
-        if (item1 == powerItems[i]) {
+        if (item1 == powerItems.values[i]) {
             power1 = TRUE;
             stat1 = i;
             break;
         }
     }
     for (i = 0; i < 6; i++) {
-        if (item2 == powerItems[i]) {
+        if (item2 == powerItems.values[i]) {
             power2 = TRUE;
             stat2 = i;
             break;
@@ -836,19 +855,18 @@ static void SetRandomInheritedIVs(EggParents *parents, EggData *egg, EggRandom *
 }
 
 static void makeIVSet(EggParents *parents, EggData *egg, EggRandom *rnd) {
-    u32 ivParams[6] = { PKM_PARAM_IV_HP,        PKM_PARAM_IV_ATTACK,     PKM_PARAM_IV_DEFENSE,
-                        PKM_PARAM_IV_SP_ATTACK, PKM_PARAM_IV_SP_DEFENSE, PKM_PARAM_IV_SPEED };
+    DayCareStatParamTable ivParams = sInheritedIVParams;
     int i;
 
     for (i = 0; i < 6; i++) {
         BOOL set = FALSE;
 
         if (egg->ivFromParent1[i] != 0) {
-            egg->ivs[i] = PokeParty_GetParam(parents->parents[0], ivParams[i], NULL);
+            egg->ivs[i] = PokeParty_GetParam(parents->parents[0], ivParams.values[i], NULL);
             set = TRUE;
         }
         if (egg->ivFromParent2[i] != 0) {
-            egg->ivs[i] = PokeParty_GetParam(parents->parents[1], ivParams[i], NULL);
+            egg->ivs[i] = PokeParty_GetParam(parents->parents[1], ivParams.values[i], NULL);
             set = TRUE;
         }
         if (!set) {
@@ -920,13 +938,13 @@ static void levelMoves(EggData *egg) {
 }
 
 static void inheritEggMoves(EggParents *parents, EggData *egg, HeapID heapId) {
-    u32 moveParams[4] = { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3, PKM_PARAM_MOVE4 };
+    DayCareMoveParamTable moveParams = sEggMoveParams;
     u16 *eggMoves = GFL_ArcSysReadHeapNew(124, egg->species, heapId);
     u16 count = eggMoves[0];
     int i;
 
     for (i = 0; i < 4; i++) {
-        u32 move = PokeParty_GetParam(parents->parents[0], moveParams[i], NULL);
+        u32 move = PokeParty_GetParam(parents->parents[0], moveParams.values[i], NULL);
         int j;
 
         for (j = 1; j <= count; j++) {
@@ -940,7 +958,7 @@ static void inheritEggMoves(EggParents *parents, EggData *egg, HeapID heapId) {
 }
 
 static void inheritLvlUpMoves(EggParents *parents, EggData *egg) {
-    u32 moveParams[4] = { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3, PKM_PARAM_MOVE4 };
+    DayCareMoveParamTable moveParams = sLevelMoveParams;
     LearnsetEntry learnset[LEARNSET_MAX];
     int i;
     u32 param;
@@ -954,14 +972,14 @@ static void inheritLvlUpMoves(EggParents *parents, EggData *egg) {
         BOOL knownBy2 = FALSE;
 
         for (j = 0; j < 4; j++) {
-            param = PokeParty_GetParam(parents->parents[0], moveParams[j], NULL);
+            param = PokeParty_GetParam(parents->parents[0], moveParams.values[j], NULL);
             if (param == move) {
                 knownBy1 = TRUE;
                 break;
             }
         }
         for (j = 0; j < 4; j++) {
-            param = PokeParty_GetParam(parents->parents[1], moveParams[j], NULL);
+            param = PokeParty_GetParam(parents->parents[1], moveParams.values[j], NULL);
             if (param == move) {
                 knownBy2 = TRUE;
                 break;
@@ -975,14 +993,14 @@ static void inheritLvlUpMoves(EggParents *parents, EggData *egg) {
 }
 
 static void inheritTmMoves(EggParents *parents, EggData *egg, HeapID heapId) {
-    u32 moveParams[4] = { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3, PKM_PARAM_MOVE4 };
+    DayCareMoveParamTable moveParams = sTmMoveParams;
     int i = 0;
 
     do {
-        int move = PokeParty_GetParam(parents->parents[0], moveParams[i], NULL);
+        int move = PokeParty_GetParam(parents->parents[0], moveParams.values[i], NULL);
         int item;
 
-        for (item = ITEM_TM01; item <= 0x27e; item++) {
+        for (item = ITEM_TM01; item <= ITEM_LAST; item++) {
             if (move == PML_ItemGetTMWazaID(item) && canPkmLearnTMItemNumber(heapId, egg->species, egg->form, item)) {
                 PushEggPkmMove(egg, move);
                 break;
@@ -996,7 +1014,7 @@ static void pichuLightBallHandler(EggParents *parents, EggData *egg) {
     if (egg->species == SPECIES_PICHU &&
         (PokeParty_GetParam(parents->parents[0], PKM_PARAM_ITEM, NULL) == ITEM_LIGHT_BALL ||
          PokeParty_GetParam(parents->parents[1], PKM_PARAM_ITEM, NULL) == ITEM_LIGHT_BALL)) {
-        PushEggPkmMove(egg, 0x158);
+        PushEggPkmMove(egg, MOVE_VOLT_TACKLE);
     }
 }
 
@@ -1024,9 +1042,8 @@ static void PushEggPkmMove(EggData *egg, int move) {
     }
 }
 
-static void createEggPkm(PartyPkm *pkm, EggData *egg, PlayerInfo *info, u16 place, HeapID heapId) {
-    u32 ivParams[6] = { PKM_PARAM_IV_HP,        PKM_PARAM_IV_ATTACK,     PKM_PARAM_IV_DEFENSE,
-                        PKM_PARAM_IV_SP_ATTACK, PKM_PARAM_IV_SP_DEFENSE, PKM_PARAM_IV_SPEED };
+static void createEggPkm(PartyPkm *pkm, const EggData *egg, PlayerInfo *info, u32 place, HeapID heapId) {
+    DayCareStatParamTable ivParams = sEggIVParams;
     StrBuf *name;
     int i;
 
@@ -1038,16 +1055,16 @@ static void createEggPkm(PartyPkm *pkm, EggData *egg, PlayerInfo *info, u16 plac
         PokeParty_SetHiddenAbil(pkm, egg->species, egg->form);
     }
     for (i = 0; i < 6; i++) {
-        PokeParty_SetParam(pkm, ivParams[i], egg->ivs[i]);
+        PokeParty_SetParam(pkm, ivParams.values[i], egg->ivs[i]);
     }
     PokeParty_SetParam(pkm, PKM_PARAM_MOVE1, egg->moves[0]);
     PokeParty_SetParam(pkm, PKM_PARAM_MOVE2, egg->moves[1]);
     PokeParty_SetParam(pkm, PKM_PARAM_MOVE3, egg->moves[2]);
     PokeParty_SetParam(pkm, PKM_PARAM_MOVE4, egg->moves[3]);
-    name = copyTrainerNameToNewStrbuf((const u16 *)info, heapId);
+    name = copyTrainerNameToNewStrbuf(info->name, heapId);
     PokeParty_SetParam(pkm, PKM_PARAM_OT_NAME, (u32)name);
     GFL_StrBufFree(name);
-    name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, 650 + 0);
+    name = GFL_MsgDataLoadStrbufNew(g_PMLSpeciesNamesResident, SPECIES_EGG);
     PokeParty_SetParam(pkm, PKM_PARAM_NICKNAME, (u32)name);
     GFL_StrBufFree(name);
     PokeParty_SetupMetData(pkm, 5, info, place, heapId);
@@ -1062,7 +1079,7 @@ static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 it
     u32 bit;
     void *personal;
 
-    if (species >= 649) {
+    if (species >= SPECIES_GENESECT) {
         return FALSE;
     }
     if (!PML_ItemIsTMHM(item)) {
@@ -1089,9 +1106,47 @@ static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 it
 static u32 validateSpeciesAndGetOffspring(u32 species) {
     u16 baby;
 
-    if (species < 649) {
+    if (species < SPECIES_GENESECT) {
         GFL_ArcSysReadRange(&baby, ARCID_BABYMONS, species, 0, 2);
         return baby;
     }
     return species;
 }
+
+static const DayCareMoveParamTable sOpenSlotMoveParams = { { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3,
+                                                             PKM_PARAM_MOVE4 } };
+
+static const DayCareMoveParamTable sExistingMoveParams = { { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3,
+                                                             PKM_PARAM_MOVE4 } };
+
+static const DayCareIncenseTable sIncenses = { {
+    { SPECIES_AZURILL, ITEM_SEA_INCENSE, SPECIES_MARILL },
+    { SPECIES_WYNAUT, ITEM_LAX_INCENSE, SPECIES_WOBBUFFET },
+    { SPECIES_MIME_JR, ITEM_ODD_INCENSE, SPECIES_MR_MIME },
+    { SPECIES_BONSLY, ITEM_ROCK_INCENSE, SPECIES_SUDOWOODO },
+    { SPECIES_MUNCHLAX, ITEM_FULL_INCENSE, SPECIES_SNORLAX },
+    { SPECIES_MANTYKE, ITEM_WAVE_INCENSE, SPECIES_MANTINE },
+    { SPECIES_BUDEW, ITEM_ROSE_INCENSE, SPECIES_ROSELIA },
+    { SPECIES_HAPPINY, ITEM_LUCK_INCENSE, SPECIES_CHANSEY },
+    { SPECIES_CHINGLING, ITEM_PURE_INCENSE, SPECIES_CHIMECHO },
+} };
+
+static const DayCareStatParamTable sPowerItems = { { ITEM_POWER_WEIGHT, ITEM_POWER_BRACER, ITEM_POWER_BELT,
+                                                     ITEM_POWER_LENS, ITEM_POWER_BAND, ITEM_POWER_ANKLET } };
+
+static const DayCareMoveParamTable sLevelMoveParams = { { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3,
+                                                          PKM_PARAM_MOVE4 } };
+
+static const DayCareMoveParamTable sTmMoveParams = { { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3,
+                                                       PKM_PARAM_MOVE4 } };
+
+static const DayCareStatParamTable sInheritedIVParams = { { PKM_PARAM_IV_HP, PKM_PARAM_IV_ATTACK, PKM_PARAM_IV_DEFENSE,
+                                                            PKM_PARAM_IV_SP_ATTACK, PKM_PARAM_IV_SP_DEFENSE,
+                                                            PKM_PARAM_IV_SPEED } };
+
+static const DayCareStatParamTable sEggIVParams = { { PKM_PARAM_IV_HP, PKM_PARAM_IV_ATTACK, PKM_PARAM_IV_DEFENSE,
+                                                      PKM_PARAM_IV_SP_ATTACK, PKM_PARAM_IV_SP_DEFENSE,
+                                                      PKM_PARAM_IV_SPEED } };
+
+static const DayCareMoveParamTable sEggMoveParams = { { PKM_PARAM_MOVE1, PKM_PARAM_MOVE2, PKM_PARAM_MOVE3,
+                                                        PKM_PARAM_MOVE4 } };

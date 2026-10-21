@@ -6,7 +6,8 @@
 #include "types.h"
 #include "struct_decls.h"
 
-// The work of CallEventPrepareResidentActorsForZoneChange's event, whose callback is func_ov012_0215c59c
+// The work of CallEventPrepareResidentActorsForZoneChange's event, whose callback is
+// EventPrepareResidentActors_Callback
 struct PrepareResidentActorsWork {
     GameSystem *gameSystem;
     Field *field;

@@ -309,7 +309,7 @@ static void BattleRecTool_StoreClients(const BtlSetup *setup, BattleRecClient *c
             BattleRecTool_StoreTrainer(setup->trainers[i], &clients[i].info.trainer);
             clients[i].type = BATTLE_REC_CLIENT_TRAINER;
         } else if (setup->unk34[i] != NULL) {
-            func_02008b34(setup->unk34[i], &clients[i].info.player);
+            PlayerInfo_Copy(setup->unk34[i], &clients[i].info.player);
             clients[i].type = BATTLE_REC_CLIENT_PLAYER;
         } else {
             clients[i].type = BATTLE_REC_CLIENT_NONE;
@@ -325,7 +325,7 @@ static void BattleRecTool_StorePokewoodClients(const BtlSetup *setup, BattleRecC
     for (i = 0; i < count; i++) {
         switch (i) {
         case 0:
-            func_02008b34(setup->unk34[i], &clients[i].info.player);
+            PlayerInfo_Copy(setup->unk34[i], &clients[i].info.player);
             if (setup->trainers[i] != NULL) {
                 *trainerClass = setup->trainers[i]->trainerClass;
             } else if (getTrainerGender(setup->unk34[i]) == GENDER_MALE) {
@@ -352,7 +352,7 @@ static void BattleRecTool_LoadClients(BtlSetup *setup, BattleRecClient *clients,
         client = &clients[i];
         switch (clients[i].type) {
         case BATTLE_REC_CLIENT_PLAYER:
-            func_02008b34(&client->info.player, setup->unk34[i]);
+            PlayerInfo_Copy(&client->info.player, setup->unk34[i]);
             break;
         case BATTLE_REC_CLIENT_TRAINER:
             BattleRecTool_LoadTrainer(setup->trainers[i], &client->info.trainer);
@@ -369,7 +369,7 @@ static void BattleRecTool_LoadPokewoodClients(BtlSetup *setup, const BattleRecCl
     for (i = 0; i < count; i++) {
         switch (i) {
         case 0:
-            func_02008b34(&clients[i].info.player, setup->unk34[i]);
+            PlayerInfo_Copy(&clients[i].info.player, setup->unk34[i]);
             setup->trainers[i]->trainerId = 1;
             setup->trainers[i]->trainerClass = trainerClass;
             break;
@@ -439,7 +439,7 @@ static BOOL BattleRecTool_StoreSetupParams(const BtlSetup *setup, BattleRecSetup
     rec->env = setup->fieldSituation.env;
     rec->rand = setup->rand;
     rec->bgm = setup->fieldSituation.bgm;
-    rec->unk2E = setup->fieldSituation.unk12;
+    rec->winBgm = setup->fieldSituation.unk12;
     rec->battleType = setup->battleType;
     rec->battleStyle = setup->battleStyle;
     rec->unk33_4 = setup->fieldSituation.unk1a;
@@ -454,7 +454,7 @@ static BOOL BattleRecTool_LoadSetupParams(BtlSetup *setup, const BattleRecSetup 
     setup->fieldSituation.env = rec->env;
     setup->rand = rec->rand;
     setup->fieldSituation.bgm = rec->bgm;
-    setup->fieldSituation.unk12 = rec->unk2E;
+    setup->fieldSituation.unk12 = rec->winBgm;
     setup->battleType = rec->battleType;
     setup->battleStyle = rec->battleStyle;
     setup->fieldSituation.unk1a = rec->unk33_4;

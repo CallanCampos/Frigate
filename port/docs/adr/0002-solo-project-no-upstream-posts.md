@@ -1,6 +1,6 @@
 # 0002: A solo project with no upstream posts
 
-- **Status:** accepted
+- **Status:** accepted; contribution scope amended by [ADR 0017](0017-external-contributions.md)
 - **Date:** 2026-10-17
 - **Plan:** D10, §9
 - **Upstream:** `462e90193` (merge of PR #345)

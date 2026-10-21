@@ -134,7 +134,7 @@ void BeaconView_Update(BeaconViewWork *work, BOOL active) {
 }
 
 BOOL BeaconView_Draw(BeaconViewWork *work) {
-    return func_02021a3c(work->printQueue);
+    return PrintQueue_Main(work->printQueue);
 }
 
 GameEvent *BeaconView_CheckEvent(BeaconViewWork *work, BOOL enabled) {
@@ -263,11 +263,11 @@ static void BeaconView_DrawAll(BeaconViewWork *work) {
     BeaconView_UpdateArrows(work);
     BeaconView_UpdateThanksButton(work);
     BeaconView_UpdateBar(work);
-    func_0204c124(work->actors[BEACON_VIEW_ACTOR_BAR], work->logCount >= BEACON_VIEW_LINE_MAX + 1 ? TRUE : FALSE);
+    ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_BAR], work->logCount >= BEACON_VIEW_LINE_MAX + 1 ? TRUE : FALSE);
     if (work->passPower == PASS_POWER_NONE) {
         BeaconView_SetActorAnim(work->actors[BEACON_VIEW_ACTOR_PASS_POWER], 3);
     }
-    func_02042ba8(FALSE, work->tmpHeapId);
+    GFL_NetSetIconScreen(FALSE, work->tmpHeapId);
 }
 
 // What a touch does, and the sequence it gives
@@ -275,7 +275,7 @@ static int BeaconView_CheckTouch(BeaconViewWork *work) {
     BeaconViewTouch touch;
     int hit;
 
-    if (!func_0203dac8((u32 *)&touch.x, (u32 *)&touch.y)) {
+    if (!GFL_HIDGetTouchPressedPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
         return SEQ_MAIN;
     }
     hit = BeaconView_HitTestButton(work, &touch);
@@ -340,7 +340,7 @@ static int BeaconView_CheckTouch(BeaconViewWork *work) {
 static int BeaconView_GetHeldArrow(BeaconViewWork *work) {
     BeaconViewTouch touch;
 
-    if (func_0203da84((u32 *)&touch.x, (u32 *)&touch.y)) {
+    if (GFL_HIDGetTouchHeldPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
         return BeaconView_HitTestArrow(work, &touch);
     }
     return TOUCH_RECT_NONE;
@@ -350,7 +350,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
     BeaconViewTouch touch;
 
     if (work->barDragging) {
-        if (!func_0203da84((u32 *)&touch.x, (u32 *)&touch.y)) {
+        if (!GFL_HIDGetTouchHeldPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
             work->barDragging = FALSE;
             return SEQ_BAR;
         }
@@ -380,7 +380,7 @@ static int BeaconView_UpdateBarDrag(BeaconViewWork *work) {
 static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
     u32 state = func_ov012_02153650(work->commSys);
 
-    if (func_02016bec(work->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return TRUE;
     }
@@ -388,7 +388,7 @@ static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU_COMM);
         return TRUE;
     }
-    if (func_02012be4(work->wifiList) & 8) {
+    if (WihDwc_GetStatus(work->wifiList) & 8) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU_WIFI);
         return TRUE;
     }
@@ -397,13 +397,13 @@ static BOOL BeaconView_CheckLeave(BeaconViewWork *work) {
 
 // Shows the player's new greeting once it has been entered
 static BOOL BeaconView_CheckGreeting(BeaconViewWork *work) {
-    u16 *changed = (u16 *)func_0202d7d0(work->status);
+    u16 *changed = (u16 *)BeaconStatus_GetGreetingChanged(work->status);
 
     if (*changed == FALSE) {
         return FALSE;
     }
     *changed = FALSE;
-    func_0202437c(work->wordSet, 0, BeaconStatus_GetGreeting(work->status), work->gender, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, BeaconStatus_GetGreeting(work->status), work->gender, 1, 2);
     BeaconView_ShowMessage(work, GameBeacon_Text_Said);
     return TRUE;
 }
@@ -417,7 +417,7 @@ static BOOL BeaconView_CheckPassPower(BeaconViewWork *work) {
             BeaconStatus_ClearGivenPassPower(work->status);
             return FALSE;
         }
-        func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
         BeaconView_OfferPassPower(work, passPower, FALSE, &work->pending);
         return TRUE;
     }
@@ -443,9 +443,9 @@ static BOOL BeaconView_CheckMission(BeaconViewWork *work) {
     if (!BeaconView_GetMissionOffer(work->festival, &config, work->strTemplate)) {
         return FALSE;
     }
-    func_0202437c(work->wordSet, 0, work->strTemplate, 0, 1, 2);
-    func_ov027_02170d04(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
-    func_0202437c(work->wordSet, 1, work->strTemplate, 0, 1, 2);
+    GFL_WordSetSetStrbuf(work->wordSet, 0, work->strTemplate, 0, 1, 2);
+    FestMission_GetMessage(work->festText, work->strTemplate, (const FestMission *)&config, work->tmpHeapId);
+    GFL_WordSetSetStrbuf(work->wordSet, 1, work->strTemplate, 0, 1, 2);
     BeaconView_OfferMission(work, &config, &work->pending);
     return TRUE;
 }
@@ -465,7 +465,7 @@ static BOOL BeaconView_TakeNewBeacon(BeaconViewWork *work) {
         work->newPanel = BeaconView_FindPanel(work, work->newIndex);
     } else {
         work->newPanel = NULL;
-        work->passerbyCount = func_0200c928((TrainerGameInfoSave *)work->trainerCard);
+        work->passerbyCount = TrainerGameInfo_IncPasserbyCount((TrainerGameInfoSave *)work->trainerCard);
     }
     if (work->newPanel != NULL && work->newPanel->printTask != NULL) {
         work->subSeq = 0;
@@ -476,7 +476,7 @@ static BOOL BeaconView_TakeNewBeacon(BeaconViewWork *work) {
     if (work->logCount < GAME_BEACON_LOG_MAX) {
         work->logCount += (u8)work->isNew;
         if (work->isNew && work->logCount >= BEACON_VIEW_LINE_MAX + 1) {
-            func_0204c124(work->actors[BEACON_VIEW_ACTOR_BAR], TRUE);
+            ClActor_SetVisible(work->actors[BEACON_VIEW_ACTOR_BAR], TRUE);
         }
         if (work->logCount <= BEACON_VIEW_LINE_MAX) {
             work->viewCount = work->logCount;
@@ -513,7 +513,7 @@ void BeaconView_SetButtonAnim(BeaconViewWork *work, int button, int state) {
 }
 
 BOOL BeaconView_IsButtonAnimating(BeaconViewWork *work, int button) {
-    return func_0204c560(work->actors[button]);
+    return ClActor_IsAnimActive(work->actors[button]);
 }
 
 // Shows a beacon just taken: its message, then its line, which pushes the others down when the player is new
@@ -602,10 +602,10 @@ static int BeaconView_UpdateThanks(BeaconViewWork *work) {
         u8 dataIndex = GameBeaconInfoTable_RingIndex(work->log, work->selected + work->top);
         BeaconViewPanel *panel = BeaconView_FindPanel(work, dataIndex);
 
-        func_0202437c(work->wordSet, 0, panel->name, panel->gender, 1, 2);
+        GFL_WordSetSetStrbuf(work->wordSet, 0, panel->name, panel->gender, 1, 2);
         BeaconView_SetPrintTimeLimit(work->printQueue, TRUE);
         BeaconView_ShowMessage(work, GameBeacon_Text_Thanked);
-        func_ov012_02160390(work->gameData, panel->trainerId);
+        GameBeacon_BroadcastThanks(work->gameData, panel->trainerId);
         work->subSeq = THANKS_SENT;
         break;
     }
@@ -633,11 +633,11 @@ static int BeaconView_CheckThanksTouch(BeaconViewWork *work) {
     BeaconViewTouch touch;
     int hit;
 
-    if (func_02016bec(work->gsys)) {
+    if (GSYS_IsLowBatteryCGearOff(work->gsys)) {
         BeaconView_RequestEvent(work, BEACON_VIEW_EVENT_MENU);
         return THANKS_END;
     }
-    if (!func_0203dac8((u32 *)&touch.x, (u32 *)&touch.y)) {
+    if (!GFL_HIDGetTouchPressedPoint((u32 *)&touch.x, (u32 *)&touch.y)) {
         return THANKS_INPUT;
     }
     if (BeaconView_HitTestButton(work, &touch) == BEACON_VIEW_ACTOR_THANKS) {

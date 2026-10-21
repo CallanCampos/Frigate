@@ -30,6 +30,21 @@ Leave out `--compilers` for library code with its own compiler. Classify by what
 
 Fix them in that order. Registers and stack slots move with every structural change, so don't tune them first.
 
+Keep instruction bytes intact for aligned diagnosis. If a scratch comparison normalizes calls, disassemble first
+and label each stream's actual call sites with their callees, using that stream's relocations. Use byte masks only
+for raw-byte scores: zeroing the original at the compiled relocation offsets can erase non-call instructions and
+misclassify a structural improvement.
+
+For stack diagnosis, add the saved-register words to every explicit `sp` allocation and map the actual locals.
+A larger `sub sp` can replace a word saved only as padding: `RailMath_RailToWorldSlerpXZ` uses six pushed words
+plus 0x60 bytes in the ROM, and five plus 0x64 in a natural C spelling, both totaling 0x78 bytes. That spelling's
+extra scalar spill shifts the vector slots; the total stack consumption does not change.
+
+When comparing ELF metadata, identify sections by index and name together: MWCC can emit several `.text`
+sections in one object. A dictionary keyed only by section name silently discards earlier sections. Resolve
+compiler-generated local symbol names to their owning section, offset and relocation addend before treating a
+renamed anonymous label as a changed target; retain external and named symbol identities in the comparison.
+
 ## 2. Look up the levers
 
 [levers.md](levers.md) indexes every known lever by these classes, with the passage of `docs/matching.md` that explains it. Read the

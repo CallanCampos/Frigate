@@ -185,7 +185,7 @@ static BOOL EggDemo_Init(GameProc *proc, u32 *state, void *param, void *work) {
     EggDemo_InitBGM(param, wk);
     GFL_FadeSet(3, 16, 16, 0);
     wk->procManager = CreateGameProcManager(wk->heapId);
-    func_02042ba8(0, wk->heapId);
+    GFL_NetSetIconScreen(0, wk->heapId);
     return TRUE;
 }
 
@@ -307,11 +307,11 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
             wk->state = EGG_DEMO_WAIT_BGM_END;
             GFL_FadeSet(3, 0, 16, 2);
             EggDemo_FadeOutBGM(param, wk);
-            func_0203d564(0);
+            GCTX_HIDSetUsingTouch(0);
         } else if (answer == ANSWER_YES) {
             wk->state = EGG_DEMO_WAIT_FADE_NAME;
             GFL_FadeSet(3, 0, 16, 0);
-            func_0203d564(0);
+            GCTX_HIDSetUsingTouch(0);
         }
         break;
     case EGG_DEMO_WAIT_FADE_NAME:
@@ -328,16 +328,16 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
             if (func_ov012_02165b0c(wk->nameEntryParam) == FALSE) {
                 name = GFL_StrBufCreate(32, wk->heapId);
                 oldName = GFL_StrBufCreate(32, wk->heapId);
-                func_ov012_02165afc(wk->nameEntryParam, name);
+                NameEntryParam_GetName(wk->nameEntryParam, name);
                 PokeParty_GetParam(demoParam->pkm, PKM_PARAM_NICKNAME, oldName);
                 PokeParty_SetParam(demoParam->pkm, PKM_PARAM_NICKNAME, (uptr)name);
-                if (func_ov012_02165b10(wk->nameEntryParam, oldName) == FALSE) {
+                if (NameEntryParam_CompareName(wk->nameEntryParam, oldName) == FALSE) {
                     RecordAddOne(GameData_GetRecords(demoParam->gameData), 30);
                 }
                 GFL_StrBufFree(oldName);
                 GFL_StrBufFree(name);
             }
-            func_ov012_02165ae8(wk->nameEntryParam);
+            NameEntryParam_Free(wk->nameEntryParam);
             wk->state = EGG_DEMO_WAIT_BGM_NAMED;
             EggDemo_FadeOutBGM(param, wk);
             break;
@@ -371,7 +371,7 @@ static BOOL EggDemo_Main(GameProc *proc, u32 *state, void *param, void *work) {
         EggDemo_UpdateMsg(param, wk);
         EggDemo_UpdateDialog(param, wk);
         EggDemoView_Update(wk->view);
-        func_02021a3c(wk->printQueue);
+        PrintQueue_Main(wk->printQueue);
         EggDemoGraphic_Update(wk->graphic);
         EggDemoGraphic_Begin3D(wk->graphic);
         EggDemoView_Draw(wk->view);
@@ -397,7 +397,7 @@ static void EggDemo_InitGraphics(EggDemoParam *param, EggDemoWork *wk) {
     }
     wk->graphic = EggDemoGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
-    wk->printQueue = func_02021998(wk->heapId);
+    wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->vblankTask = GFL_VBlankTCBAdd(EggDemo_VBlank, wk, 1);
     EggDemo_InitBG(param, wk);
     EggDemo_InitActors(param, wk);
@@ -426,8 +426,8 @@ static void EggDemo_FreeGraphics(EggDemoParam *param, EggDemoWork *wk) {
     EggDemo_FreeActors(param, wk);
     EggDemo_FreeBG(param, wk);
     GFL_TCBRemove(wk->vblankTask);
-    func_02021c44(wk->printQueue);
-    func_02021a18(wk->printQueue);
+    PrintQueue_Clear(wk->printQueue);
+    PrintQueue_Free(wk->printQueue);
     GFL_FontFree(wk->font);
     EggDemoGraphic_Free(wk->graphic);
 }
@@ -449,14 +449,14 @@ static void EggDemo_InitActors(EggDemoParam *param, EggDemoWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_EGG_DEMO, wk->heapId);
     u8 i;
 
-    wk->palette = func_0204bbb8(arc, 3, 0, 0, 0, 1, wk->heapId);
-    wk->chars = func_0204b81c(arc, 2, 0, 0, wk->heapId);
-    wk->cellAnims = func_0204bde0(arc, 1, 0, wk->heapId);
+    wk->palette = ClActSys_LoadPlttRange(arc, 3, 0, 0, 0, 1, wk->heapId);
+    wk->chars = ClActSys_LoadChars(arc, 2, 0, 0, wk->heapId);
+    wk->cellAnims = ClActSys_LoadCellAnims(arc, 1, 0, wk->heapId);
     GFL_ArcToolFree(arc);
     for (i = 0; i < ACTOR_COUNT; i++) {
-        wk->actors[i] = func_0204c040(EggDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette, wk->cellAnims,
-                                      &sActorSetups[i], 0, wk->heapId);
-        func_0204c520(wk->actors[i], FALSE);
+        wk->actors[i] = ClActor_Create(EggDemoGraphic_GetClActUnit(wk->graphic), wk->chars, wk->palette, wk->cellAnims,
+                                       &sActorSetups[i], 0, wk->heapId);
+        ClActor_SetAutoAnim(wk->actors[i], FALSE);
     }
 }
 
@@ -464,19 +464,19 @@ static void EggDemo_FreeActors(EggDemoParam *param, EggDemoWork *wk) {
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c108(wk->actors[i]);
+        ClActor_Delete(wk->actors[i]);
     }
-    func_0204be64(wk->cellAnims);
-    func_0204b98c(wk->chars);
-    func_0204bcd0(wk->palette);
+    ClActSys_FreeCellAnims(wk->cellAnims);
+    ClActSys_FreeChars(wk->chars);
+    ClActSys_FreePltt(wk->palette);
 }
 
 static void EggDemo_StartActors(EggDemoParam *param, EggDemoWork *wk) {
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        func_0204c504(wk->actors[i], 0);
-        func_0204c520(wk->actors[i], TRUE);
+        ClActor_SetAnimFrame(wk->actors[i], 0);
+        ClActor_SetAutoAnim(wk->actors[i], TRUE);
     }
 }
 
@@ -485,7 +485,7 @@ static BOOL EggDemo_AreActorsDone(EggDemoParam *param, EggDemoWork *wk) {
     u8 i;
 
     for (i = 0; i < ACTOR_COUNT; i++) {
-        if (func_0204c560(wk->actors[i])) {
+        if (ClActor_IsAnimActive(wk->actors[i])) {
             done = FALSE;
             break;
         }
@@ -517,12 +517,12 @@ static void EggDemo_UpdateBGM(EggDemoParam *param, EggDemoWork *wk) {
         }
         break;
     case BGM_LOAD_KOUKAN:
-        if (func_02006424(SEQ_BGM_KOUKAN, &wk->bgmStep, FALSE)) {
+        if (GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, FALSE)) {
             wk->bgm = BGM_KOUKAN;
         }
         break;
     case BGM_LOAD_FANFARE:
-        if (func_02006424(SEQ_ME_SHINKAOME, &wk->bgmStep, FALSE)) {
+        if (GFL_SndBGMLoadStep(SEQ_ME_SHINKAOME, &wk->bgmStep, FALSE)) {
             wk->bgm = BGM_FANFARE;
         }
         break;
@@ -534,7 +534,7 @@ static void EggDemo_UpdateBGM(EggDemoParam *param, EggDemoWork *wk) {
         break;
     case BGM_FADE_OUT_END:
         if (GFL_SndBGMIsFading() == FALSE) {
-            func_02005d8c();
+            GFL_SndBGMStopImmediate();
             wk->bgm = BGM_IDLE;
         }
         break;
@@ -556,7 +556,7 @@ static BOOL EggDemo_IsBGMPlaying(EggDemoParam *param, EggDemoWork *wk) {
 
 static void EggDemo_PlayKoukan(EggDemoParam *param, EggDemoWork *wk) {
     wk->bgmStep = 0;
-    func_02006424(SEQ_BGM_KOUKAN, &wk->bgmStep, TRUE);
+    GFL_SndBGMLoadStep(SEQ_BGM_KOUKAN, &wk->bgmStep, TRUE);
     wk->bgm = BGM_LOAD_KOUKAN;
 }
 
@@ -577,7 +577,7 @@ static void EggDemo_PopBGM(EggDemoParam *param, EggDemoWork *wk) {
 
 static void EggDemo_PlayFanfare(EggDemoParam *param, EggDemoWork *wk) {
     wk->bgmStep = 0;
-    func_02006424(SEQ_ME_SHINKAOME, &wk->bgmStep, TRUE);
+    GFL_SndBGMLoadStep(SEQ_ME_SHINKAOME, &wk->bgmStep, TRUE);
     wk->bgm = BGM_LOAD_FANFARE;
 }
 
@@ -622,7 +622,7 @@ static void EggDemo_InitMsg(EggDemoParam *param, EggDemoWork *wk) {
 
 static void EggDemo_FreeMsg(EggDemoParam *param, EggDemoWork *wk) {
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     if (wk->message != NULL) {
         GFL_StrBufFree(wk->message);
@@ -655,7 +655,7 @@ static void EggDemo_Print(EggDemoParam *param, EggDemoWork *wk, u32 messageId) {
 
     GFL_BitmapFill(BmpWin_GetBitmap(wk->window), 15);
     if (wk->printStream != NULL) {
-        func_020223cc(wk->printStream);
+        PrintStream_Delete(wk->printStream);
     }
     if (wk->message != NULL) {
         GFL_StrBufFree(wk->message);
@@ -667,22 +667,22 @@ static void EggDemo_Print(EggDemoParam *param, EggDemoWork *wk, u32 messageId) {
     GFL_WordSetFormatStrbuf(wordSet, wk->message, format);
     GFL_WordSetSystemFree(wordSet);
     GFL_StrBufFree(format);
-    wk->printStream =
-        func_02022268(wk->window, 0, 0, wk->message, wk->font, func_02017bcc(), wk->tcbManager, 2, wk->heapId, 15);
+    wk->printStream = PrintStream_Create(wk->window, 0, 0, wk->message, wk->font, TextSpeed_GetCurrentWait(),
+                                         wk->tcbManager, 2, wk->heapId, 15);
 }
 
 static BOOL EggDemo_IsPrintDone(EggDemoParam *param, EggDemoWork *wk) {
     BOOL done = FALSE;
 
-    switch (func_020223b4(wk->printStream)) {
+    switch (PrintStream_GetState(wk->printStream)) {
     case PRINT_STREAM_RUNNING:
-        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da2c()) {
-            func_020223e0(wk->printStream, 0);
+        if ((GCTX_HIDGetHeldKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchHeld()) {
+            PrintStream_SkipWait(wk->printStream, 0);
         }
         break;
     case PRINT_STREAM_PAUSED:
-        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || func_0203da48()) {
-            func_020223bc(wk->printStream);
+        if ((GCTX_HIDGetPressedKeys() & (PAD_BUTTON_A | PAD_BUTTON_B)) || GFL_HIDIsTouchPressed()) {
+            PrintStream_Continue(wk->printStream);
         }
         break;
     case PRINT_STREAM_DONE:

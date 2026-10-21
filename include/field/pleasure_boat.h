@@ -66,7 +66,7 @@ u32 func_ov036_021c2238(PleasureBoat *boat, u32 room, u32 index);
 BOOL func_ov036_021c2248(PleasureBoat *boat, u32 room);
 
 // Overlay 12's event_royal_unova.c
-BOOL func_ov012_02160a90(VM *vm, FieldScriptEnv *env);
+BOOL s01A1_PleasureBoatGetRoomInfo(VM *vm, FieldScriptEnv *env);
 BOOL s01A2_CallRoyalUnovaView(VM *vm, FieldScriptEnv *env);
 
 #endif // POKEBW2_FIELD_PLEASURE_BOAT_H

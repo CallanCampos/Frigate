@@ -49,3 +49,9 @@ lib/dwc/src/ac/dwc_ac_soc.c # pointer-to-integer casts in static initializers
 lib/dwc/src/crypt/crypt.c # big-number asm helpers
 lib/dwc/src/ghttp/ghttpProcess.c # uses MSL's __ctype_map directly
 lib/dwcutil/src/dwc_aoss_ap.c # static definitions after non-static declarations
+
+# ARM9 boot assembly and BIOS SWI veneers: native startup and the existing HAL own their host equivalents.
+lib/nitro/src/init/crt0.c # DS boot memory/register setup; port/app and port/hal/os initialize the host
+lib/nitro/src/syscall/secure_area.c # BIOS call veneers; existing HAL implements used calls, others retain trap stubs
+lib/nitro/src/os/os_irqHandler_itcm.c # IRQ dispatch and thread switch; port/hal/os/core.c owns both
+lib/nitro/src/os/os_reset_itcm.c # DS reset/reboot and ROM verification; port/hal/os/os_terminate.c ends native resets

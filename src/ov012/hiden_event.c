@@ -1,6 +1,6 @@
 // The hidden moves' events (a descriptive name). CalcPlayerActionPossibilities is placed here as a guess: it fills the
-// PlayerActionPossibilities that this file's checks take and is the only caller of func_ov012_02159b70, but a file of
-// its own between field_encount_st.c and this one would give the same ROM. Names from swan
+// PlayerActionPossibilities that this file's checks take and is the only caller of HiddenArea_ContainsUnlessFlag, but a
+// file of its own between field_encount_st.c and this one would give the same ROM. Names from swan
 // (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "constants/obj_codes.h"
@@ -60,7 +60,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
         objCode = FldAct_GetObjCode(actor);
         actorSystem = Field_GetActorSystem(field);
         CopyActorWPos(actor, &position);
-        if (IsNPCStrengthRock(objCode) && !func_ov012_0216820c(actorSystem, &position)) {
+        if (IsNPCStrengthRock(objCode) && !IsSavedStrengthRockAtPos(actorSystem, &position)) {
             action->flags |= 8;
         }
         if (objCode == OBJ_CODE_108) {
@@ -92,15 +92,15 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
     if (IsZoneAbyssalRuinsInside(action->zoneId)) {
         FieldPlayer_GetGPos(Field_GetPlayer(action->field), &x, &y, &z);
         if (IsZoneAbyssalRuinsFlashRock(action->zoneId) &&
-            func_ov012_02159b70(&ABYSSAL_RUINS_FLASH_ROCK_RADIUS, x, z, 0xd7, field)) {
+            HiddenArea_ContainsUnlessFlag(&ABYSSAL_RUINS_FLASH_ROCK_RADIUS, x, z, 0xd7, field)) {
             action->flags |= 0x20;
         }
         if (IsZoneAbyssalRuinsStrengthRock(action->zoneId) &&
-            func_ov012_02159b70(&ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS, x, z, 0xd6, field)) {
+            HiddenArea_ContainsUnlessFlag(&ABYSSAL_RUINS_STRENGTH_ROCK_RADIUS, x, z, 0xd6, field)) {
             action->flags |= 8;
         }
     }
-    if (!func_02018c38(action->zoneId)) {
+    if (!IsZoneNormal(action->zoneId)) {
         action->flags = 0;
     } else {
         action->flags |= 0x100;
@@ -121,8 +121,8 @@ const HiddenEventSpec HIDEN_EVENTS_NORMAL[11] = {
     { EventFlash_Create, EventFlash_Check },
     { EventTeleportCall_Create, EventTeleportCall_Check },
     { EventDigCall_Create, EventDigCall_Check },
-    { func_ov012_02159658, func_ov012_02159644 },
-    { func_ov012_02159998, func_ov012_02159984 },
+    { EventSweetScentCall_Create, EventSweetScentCall_Check },
+    { EventChatterCall_Create, EventChatterCall_Check },
     { EventDivingCall_Create, EventDivingCall_Check },
 };
 
@@ -135,8 +135,8 @@ const HiddenEventSpec HIDEN_EVENTS_RUINS[11] = {
     { EventRuinsFlash_Create, EventFlash_Check },
     { EventTeleportCall_Create, EventTeleportCall_Check },
     { EventDigCall_Create, EventDigCall_Check },
-    { func_ov012_02159658, func_ov012_02159644 },
-    { func_ov012_02159998, func_ov012_02159984 },
+    { EventSweetScentCall_Create, EventSweetScentCall_Check },
+    { EventChatterCall_Create, EventChatterCall_Check },
     { EventDivingCall_Create, EventDivingCall_Check },
 };
 
@@ -148,7 +148,7 @@ u32 CheckAllowHidenEvent(u32 kind, PlayerActionPossibilities *context) {
     return check(context);
 }
 
-void func_ov012_02159418(HiddenEventArgs *args, u16 partySlot, u16 kind, u32 value) {
+void HiddenEventArgs_Set(HiddenEventArgs *args, u16 partySlot, u16 kind, u32 value) {
     args->partySlot = partySlot;
     args->kind = kind;
     args->value = value;
@@ -162,13 +162,13 @@ GameEvent *CreateHidenEvent(u32 kind, HiddenEventArgs *args, PlayerActionPossibi
     return ctor(args, context);
 }
 
-BOOL func_ov012_02159440(PlayerActionPossibilities *context) {
+BOOL HidenEvent_CheckPairFlag(PlayerActionPossibilities *context) {
     return GameData_CheckPairFlag(GSYS_GetGameData(context->gsys));
 }
 
 u32 EventCutCall_Check(PlayerActionPossibilities *context) {
     u32 result = FALSE;
-    if (func_ov012_02159b5c(context, 0) == 0) {
+    if (HidenEvent_CheckContextFlag(context, 0) == 0) {
         result = TRUE;
     }
     return result;
@@ -180,7 +180,7 @@ GameEvent *EventCutCall_Create(HiddenEventArgs *param, PlayerActionPossibilities
 
     event = GameEvent_Create(context->gsys, NULL, EventCutCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -204,8 +204,8 @@ u32 EventSurfCall_Check(PlayerActionPossibilities *context) {
     if (state == 3) {
         return 1;
     }
-    if (func_ov012_02159b5c(context, 1) != 0) {
-        if (func_ov012_02159440(context) != 0) {
+    if (HidenEvent_CheckContextFlag(context, 1) != 0) {
+        if (HidenEvent_CheckPairFlag(context) != 0) {
             return 3;
         }
         return 0;
@@ -219,7 +219,7 @@ GameEvent *EventSurfCall_Create(HiddenEventArgs *param, PlayerActionPossibilitie
 
     event = GameEvent_Create(context->gsys, NULL, EventSurfCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -236,8 +236,8 @@ GameEventReturnCode EventSurfCall_Callback(GameEvent *event, u32 *state, void *d
 }
 
 u32 EventWaterfallCall_Check(PlayerActionPossibilities *context) {
-    if (func_ov012_02159b5c(context, 2) != 0) {
-        if (func_ov012_02159440(context) != 0) {
+    if (HidenEvent_CheckContextFlag(context, 2) != 0) {
+        if (HidenEvent_CheckPairFlag(context) != 0) {
             return 3;
         }
         return 0;
@@ -251,7 +251,7 @@ GameEvent *EventWaterfallCall_Create(HiddenEventArgs *param, PlayerActionPossibi
 
     event = GameEvent_Create(context->gsys, NULL, EventWaterfallCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -268,7 +268,7 @@ GameEventReturnCode EventWaterfallCall_Callback(GameEvent *event, u32 *state, vo
 }
 
 u32 EventStrengthCall_Check(PlayerActionPossibilities *context) {
-    switch (func_ov012_02159b5c(context, 3)) {
+    switch (HidenEvent_CheckContextFlag(context, 3)) {
     default:
         return FALSE;
     case 0:
@@ -282,7 +282,7 @@ GameEvent *EventStrengthCall_Create(HiddenEventArgs *param, PlayerActionPossibil
 
     event = GameEvent_Create(context->gsys, NULL, EventStrengthCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -298,8 +298,8 @@ GameEventReturnCode EventStrengthCall_Callback(GameEvent *event, u32 *state, voi
     return GAMEEVENT_CONTINUE;
 }
 
-u32 func_ov012_02159644(PlayerActionPossibilities *context) {
-    switch (func_ov012_02159b5c(context, 8)) {
+u32 EventSweetScentCall_Check(PlayerActionPossibilities *context) {
+    switch (HidenEvent_CheckContextFlag(context, 8)) {
     default:
         return FALSE;
     case 0:
@@ -307,18 +307,18 @@ u32 func_ov012_02159644(PlayerActionPossibilities *context) {
     }
 }
 
-GameEvent *func_ov012_02159658(HiddenEventArgs *args, PlayerActionPossibilities *context) {
+GameEvent *EventSweetScentCall_Create(HiddenEventArgs *args, PlayerActionPossibilities *context) {
     return func_ov033_021785d4(context->gsys, context->field, args->partySlot);
 }
 
 GameEvent *EventFly_Create(HiddenEventArgs *args, PlayerActionPossibilities *context) {
-    func_ov012_0216002c(0x13);
+    GameBeacon_BroadcastFieldMove(0x13);
     return func_ov033_02178908(context->gsys, context->field, args->value);
 }
 
 u32 EventFly_Check(PlayerActionPossibilities *context) {
-    if (func_ov012_02159b5c(context, 4) != 0) {
-        if (func_ov012_02159440(context) != 0) {
+    if (HidenEvent_CheckContextFlag(context, 4) != 0) {
+        if (HidenEvent_CheckPairFlag(context) != 0) {
             return 3;
         }
         return 0;
@@ -327,7 +327,7 @@ u32 EventFly_Check(PlayerActionPossibilities *context) {
 }
 
 u32 EventFlash_Check(PlayerActionPossibilities *context) {
-    switch (func_ov012_02159b5c(context, 5)) {
+    switch (HidenEvent_CheckContextFlag(context, 5)) {
     default:
         return FALSE;
     case 0:
@@ -341,7 +341,7 @@ GameEvent *EventFlash_Create(HiddenEventArgs *param, PlayerActionPossibilities *
 
     event = GameEvent_Create(context->gsys, NULL, EventFlash_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -372,8 +372,8 @@ GameEventReturnCode EventFlash_Callback(GameEvent *event, u32 *state, void *data
         if (!FieldStatus_CheckFlashUsed(status)) {
             status2 = GameData_GetFieldStatus(gameData);
             FieldStatus_SetFlashUsed(status, TRUE);
-            func_ov012_0216002c(0x94);
-            func_ov036_021c1c68(flash, 1);
+            GameBeacon_BroadcastFieldMove(0x94);
+            FieldFlash_RequestState(flash, 1);
             flags = FieldStatus_GetFlashPerms(status2);
             flags &= ~FLD_FLASH_ALLOW;
             flags |= FLD_FLASH_ACTIVE;
@@ -384,7 +384,7 @@ GameEventReturnCode EventFlash_Callback(GameEvent *event, u32 *state, void *data
         ++*state;
         break;
     case 2:
-        if (func_ov036_021c1c6c(flash) == 3)
+        if (FieldFlash_GetState(flash) == 3)
             return GAMEEVENT_DONE;
         break;
     }
@@ -392,8 +392,8 @@ GameEventReturnCode EventFlash_Callback(GameEvent *event, u32 *state, void *data
 }
 
 u32 EventDigCall_Check(PlayerActionPossibilities *context) {
-    if (func_ov012_02159b5c(context, 7) != 0) {
-        if (func_ov012_02159440(context) != 0)
+    if (HidenEvent_CheckContextFlag(context, 7) != 0) {
+        if (HidenEvent_CheckPairFlag(context) != 0)
             return 3;
         return 0;
     }
@@ -403,10 +403,10 @@ u32 EventDigCall_Check(PlayerActionPossibilities *context) {
 GameEvent *EventDigCall_Create(HiddenEventArgs *param, PlayerActionPossibilities *context) {
     GameEvent *event;
     HiddenEventData *data;
-    func_ov012_0216002c(0x5b);
+    GameBeacon_BroadcastFieldMove(0x5b);
     event = GameEvent_Create(context->gsys, NULL, EventDigCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -430,8 +430,8 @@ GameEventReturnCode EventDigCall_Callback(GameEvent *event, u32 *state, void *da
 }
 
 u32 EventTeleportCall_Check(PlayerActionPossibilities *context) {
-    if (func_ov012_02159b5c(context, 6) != 0) {
-        if (func_ov012_02159440(context) != 0)
+    if (HidenEvent_CheckContextFlag(context, 6) != 0) {
+        if (HidenEvent_CheckPairFlag(context) != 0)
             return 3;
         return 0;
     }
@@ -441,10 +441,10 @@ u32 EventTeleportCall_Check(PlayerActionPossibilities *context) {
 GameEvent *EventTeleportCall_Create(HiddenEventArgs *param, PlayerActionPossibilities *context) {
     GameEvent *event;
     HiddenEventData *data;
-    func_ov012_0216002c(0x64);
+    GameBeacon_BroadcastFieldMove(0x64);
     event = GameEvent_Create(context->gsys, NULL, EventTeleportCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -468,8 +468,8 @@ GameEventReturnCode EventTeleportCall_Callback(GameEvent *event, u32 *state, voi
 }
 
 u32 EventDivingCall_Check(PlayerActionPossibilities *context) {
-    if (func_ov012_02159b5c(context, 10) != 0) {
-        if (func_ov012_02159440(context) != 0)
+    if (HidenEvent_CheckContextFlag(context, 10) != 0) {
+        if (HidenEvent_CheckPairFlag(context) != 0)
             return 3;
         return 0;
     }
@@ -481,7 +481,7 @@ GameEvent *EventDivingCall_Create(HiddenEventArgs *param, PlayerActionPossibilit
     HiddenEventData *data;
     event = GameEvent_Create(context->gsys, NULL, EventDivingCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -497,8 +497,8 @@ GameEventReturnCode EventDivingCall_Callback(GameEvent *event, u32 *state, void 
     return GAMEEVENT_CONTINUE;
 }
 
-u32 func_ov012_02159984(PlayerActionPossibilities *context) {
-    switch (func_ov012_02159b5c(context, 9)) {
+u32 EventChatterCall_Check(PlayerActionPossibilities *context) {
+    switch (HidenEvent_CheckContextFlag(context, 9)) {
     default:
         return FALSE;
     case 0:
@@ -506,8 +506,8 @@ u32 func_ov012_02159984(PlayerActionPossibilities *context) {
     }
 }
 
-GameEvent *func_ov012_02159998(HiddenEventArgs *args, PlayerActionPossibilities *context) {
-    func_ov012_0216002c(0x1c0);
+GameEvent *EventChatterCall_Create(HiddenEventArgs *args, PlayerActionPossibilities *context) {
+    GameBeacon_BroadcastFieldMove(0x1c0);
     return func_ov033_02178ca8(context->gsys, context->field, args->partySlot);
 }
 
@@ -538,7 +538,7 @@ GameEvent *EventRuinsStrengthCall_Create(HiddenEventArgs *param, PlayerActionPos
     HiddenEventData *data;
     event = GameEvent_Create(context->gsys, NULL, EventRuinsStrengthCall_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -569,7 +569,7 @@ GameEvent *EventRuinsFlash_Create(HiddenEventArgs *param, PlayerActionPossibilit
     HiddenEventData *data;
     event = GameEvent_Create(context->gsys, NULL, EventRuinsFlash_Callback, 0x14);
     data = GameEvent_GetData(event);
-    func_ov012_02159b40(data, param, context);
+    HiddenEventData_Init(data, param, context);
     return event;
 }
 
@@ -593,20 +593,20 @@ HiddenCtorFunc GetHidenEventCtorFunc(PlayerActionPossibilities *context, u32 kin
     return HIDEN_EVENTS_NORMAL[kind].create;
 }
 
-void func_ov012_02159b40(HiddenEventData *data, HiddenEventArgs *param, PlayerActionPossibilities *context) {
+void HiddenEventData_Init(HiddenEventData *data, HiddenEventArgs *param, PlayerActionPossibilities *context) {
     data->magic = 0x19740205;
     data->actor = context->actorInFront;
     data->args = *param;
     data->gsys = context->gsys;
 }
 
-u32 func_ov012_02159b5c(PlayerActionPossibilities *context, u32 value) {
+u32 HidenEvent_CheckContextFlag(PlayerActionPossibilities *context, u32 value) {
     u16 flags = context->flags;
     u32 mask = 1 << value;
     return (flags & mask) ? TRUE : FALSE;
 }
 
-BOOL func_ov012_02159b70(const HiddenArea *area, u16 x, u16 z, u16 flag, Field *field) {
+BOOL HiddenArea_ContainsUnlessFlag(const HiddenArea *area, u16 x, u16 z, u16 flag, Field *field) {
     GameSystem *gsys;
     GameData *gameData;
     EventWork *eventWork;

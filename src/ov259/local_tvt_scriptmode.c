@@ -167,7 +167,7 @@ LocalTvtScriptMode *LocalTvtScriptMode_Create(HeapID heapId, GameSystem *gsys, G
     mode->seq = SCRIPT_SEQ_WAIT_FACES;
     mode->commandStarted = TRUE;
     mode->command = 0;
-    func_02042ba8(FALSE, mode->heapId);
+    GFL_NetSetIconScreen(FALSE, mode->heapId);
     return mode;
 }
 

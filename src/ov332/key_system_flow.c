@@ -82,7 +82,7 @@ void KeySystemFlow_Init(KeySystemWork *wk, HeapID heapId) {
     if (wk->param->mode == UNOVA_LINK_MODE_GAME_CLEAR) {
         GFL_SndBGMPush();
         KeySystemBG_StartFade(wk->bg, KEY_SYSTEM_BG_FADE_1_TO_0, 1);
-        func_02042ba8(TRUE, heapId);
+        GFL_NetSetIconScreen(TRUE, heapId);
     }
 }
 
@@ -91,7 +91,7 @@ void KeySystemFlow_Exit(KeySystemWork *wk) {
 
     if (param->mode == UNOVA_LINK_MODE_GAME_CLEAR) {
         if (param->key <= KEY_SYSTEM_KEY_CHALLENGE) {
-            func_0200ca78(getTrainerCardDataBlkAddress(param->gameData), 1);
+            TrainerGameInfo_SetKeyNotice(getTrainerCardDataBlkAddress(param->gameData), 1);
         }
         GFL_SndBGMPop();
     }
@@ -134,9 +134,9 @@ void KeySystemFlow_SeqGameClear(KeySystemSeq *seq, int *state, void *work) {
         }
         break;
     case 4:
-        func_020104b0(wk->keyInfo, wk->param->key);
+        KeyInfo_UnlockKey(wk->keyInfo, wk->param->key);
         if (wk->param->key != KEY_SYSTEM_KEY_CITY) {
-            func_020104e0(wk->keyInfo, wk->param->key);
+            KeyInfo_EnableKey(wk->keyInfo, wk->param->key);
         }
         (*state)++;
         break;
@@ -267,7 +267,7 @@ static void KeySystemFlow_SeqExchange(KeySystemSeq *seq, int *state, void *work)
         wk->choice = 0;
         wk->noCancel = FALSE;
         KeySystemSeq_Push(seq, KeySystemFlow_SeqStartConnectScene);
-        func_02042ba8(TRUE, HEAPID_KEY_SYSTEM);
+        GFL_NetSetIconScreen(TRUE, HEAPID_KEY_SYSTEM);
         KeySystemNet_SetMode(wk->net, KEY_SYSTEM_NET_MODE_WIRELESS);
         GFL_SndSEPlay(SEQ_SE_SW_KEYSYS_01);
         (*state)++;
@@ -290,10 +290,10 @@ static void KeySystemFlow_SeqExchange(KeySystemSeq *seq, int *state, void *work)
             ClActor *actor2 = KeySystemClAct_GetActor(&wk->clact, 2);
             ClActor *actor3 = KeySystemClAct_GetActor(&wk->clact, 3);
 
-            func_0204c124(actor0, FALSE);
-            func_0204c124(actor1, FALSE);
-            func_0204c488(actor2, 4);
-            func_0204c488(actor3, 5);
+            ClActor_SetVisible(actor0, FALSE);
+            ClActor_SetVisible(actor1, FALSE);
+            ClActor_SetSequence(actor2, 4);
+            ClActor_SetSequence(actor3, 5);
             KeySystemMsgWin_PrintMsg(wk->msgWin, wk->msgData, 60, KEY_SYSTEM_MSG_PRINT_WAIT_ICON);
             GFL_SndStop();
             GFL_SndSEPlay(SEQ_SE_SYS_12);
@@ -302,7 +302,7 @@ static void KeySystemFlow_SeqExchange(KeySystemSeq *seq, int *state, void *work)
             KeySystemNet_Request(wk->net, KEY_SYSTEM_NET_REQUEST_CANCEL, NULL);
         }
         if (KeySystemNet_GetState(wk->net) == KEY_SYSTEM_NET_STATE_CONNECTED) {
-            wk->isParent = func_02042bc4();
+            wk->isParent = GFL_NetIsParent();
             *state = 13;
         } else if (KeySystemNet_GetState(wk->net) == KEY_SYSTEM_NET_STATE_IDLE) {
             GFL_SndStop();
@@ -668,7 +668,8 @@ static void KeySystemFlow_SeqChamber(KeySystemSeq *seq, int *state, void *work) 
         }
         break;
     case 5:
-        KeySystemMsgWin_PrintMsg(wk->msgWin, wk->msgData, func_020105a0(wk->keyInfo) + 117, KEY_SYSTEM_MSG_STREAM);
+        KeySystemMsgWin_PrintMsg(wk->msgWin, wk->msgData, KeyInfo_GetChamberKey(wk->keyInfo) + 117,
+                                 KEY_SYSTEM_MSG_STREAM);
         (*state)++;
         break;
     case 6:
@@ -864,7 +865,7 @@ static void KeySystemFlow_SeqSave(KeySystemSeq *seq, int *state, void *work) {
         if (KeySystemMsgWin_IsDone(wk->msgWin)) {
             GFL_BGSysQueueScrLoad(0);
             if (SaveControl_IsDataAlreadyPresent(GameData_GetSaveControl(wk->param->gameData))) {
-                func_0201782c(wk->param->gameData);
+                GameData_StartSave(wk->param->gameData);
             } else {
                 SaveOutside_StartSave(wk->ov331Work);
             }
@@ -875,7 +876,7 @@ static void KeySystemFlow_SeqSave(KeySystemSeq *seq, int *state, void *work) {
     case 2:
         wk->timer++;
         if (SaveControl_IsDataAlreadyPresent(GameData_GetSaveControl(wk->param->gameData))) {
-            if (func_02017850(wk->param->gameData) == 2) {
+            if (GameData_UpdateSave(wk->param->gameData) == 2) {
                 (*state)++;
             }
         } else if (SaveOutside_Save(wk->ov331Work)) {
@@ -892,7 +893,7 @@ static void KeySystemFlow_SeqSave(KeySystemSeq *seq, int *state, void *work) {
     case 5:
         if (wk->timer++ > 60) {
             mode = KEY_SYSTEM_MSG_STREAM;
-            if (func_02042788()) {
+            if (GFL_NetIsInitialized()) {
                 mode = KEY_SYSTEM_MSG_STREAM_FAST;
             }
             wk->timer = 0;

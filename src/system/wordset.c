@@ -1,6 +1,7 @@
 #include "types.h"
 #include "battle/trainer_data.h"
 #include "constants/arc.h"
+#include "constants/pokemon.h"
 #include "constants/script_text_banks.h"
 #include "constants/text_banks.h"
 #include "field/fest_mission_data.h"
@@ -29,10 +30,11 @@ typedef struct {
     u8 unk0;
     u8 unk1;
     u8 unk2;
-    u8 unk3_0 : 7;
-    u8 unk3_7 : 1;
+    // The grammatical gender of the word, and whether it is plural
+    u8 gender : 7;
+    u8 plural : 1;
     // Whether the word gets a layout command in front of it
-    u8 unk4;
+    u8 addLayoutCmd;
 } WordSetAttr;
 
 typedef struct {
@@ -105,7 +107,7 @@ void GFL_WordSetSystemFree(WordSet *wordSet) {
 
 static void GFL_WordSetClearBufFlags(WordSetAttr *attr) {
     MI_CpuFill8(attr, 0, sizeof(WordSetAttr));
-    attr->unk4 = FALSE;
+    attr->addLayoutCmd = FALSE;
 }
 
 static void GFL_WordSetClearBuf(WordSet *wordSet, u32 index) {
@@ -125,7 +127,7 @@ static void GFL_WordSetCopyStrbuf(WordSet *wordSet, u32 index, const StrBuf *str
 }
 
 static void GFL_WordSetLoadMsg(WordSet *wordSet, u32 index, u32 fileId, u32 messageId) {
-    MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, (u16)fileId, wordSet->heapId);
+    MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, (u16)fileId, wordSet->heapId);
 
     if (msgData != NULL) {
         GFL_MsgDataLoadStrbuf(msgData, messageId, wordSet->tmp);
@@ -134,12 +136,12 @@ static void GFL_WordSetLoadMsg(WordSet *wordSet, u32 index, u32 fileId, u32 mess
     }
 }
 
-void func_0202437c(WordSet *wordSet, u32 index, const StrBuf *strbuf, u32 a3, u32 a4, u32 a5) {
+void GFL_WordSetSetStrbuf(WordSet *wordSet, u32 index, const StrBuf *strbuf, u32 gender, u32 singular, u32 language) {
     WordSetAttr attr;
 
     GFL_WordSetClearBufFlags(&attr);
-    attr.unk3_0 = a3;
-    attr.unk3_7 = a4 == 0 ? TRUE : FALSE;
+    attr.gender = gender;
+    attr.plural = singular == 0 ? TRUE : FALSE;
     GFL_WordSetCopyStrbuf(wordSet, index, strbuf, &attr);
 }
 
@@ -149,7 +151,7 @@ void WordSet_LoadSpeciesName(WordSet *wordSet, u32 index, u32 species) {
 }
 
 void setPartyPokemonSpeciesNameToStrbuf(WordSet *wordSet, u32 index, PartyPkm *pkm) {
-    WordSet_LoadSpeciesName(wordSet, index, (u16)PokeParty_GetParam(pkm, 5, NULL));
+    WordSet_LoadSpeciesName(wordSet, index, (u16)PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL));
 }
 
 void setBoxPokemonSpeciesNameToStrbuf(WordSet *wordSet, u32 index, BoxPkm *pkm) {
@@ -157,37 +159,37 @@ void setBoxPokemonSpeciesNameToStrbuf(WordSet *wordSet, u32 index, BoxPkm *pkm) 
 }
 
 void loadPokemonTextNameToStrbuf(WordSet *wordSet, u32 index, u32 species) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x1e3, species);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_SPECIES_NAMES_WITH_ARTICLE, species);
 }
 
 void loadPokemonSpeciesTextNameToStrbuf(WordSet *wordSet, u32 index, PartyPkm *pkm) {
-    loadPokemonTextNameToStrbuf(wordSet, index, (u16)PokeParty_GetParam(pkm, 5, NULL));
+    loadPokemonTextNameToStrbuf(wordSet, index, (u16)PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL));
 }
 
 void loadPokemonNicknameToStrbuf(WordSet *wordSet, u32 index, PartyPkm *pkm) {
-    PokeParty_GetParam(pkm, 0x73, wordSet->tmp);
+    PokeParty_GetParam(pkm, PKM_PARAM_NICKNAME, wordSet->tmp);
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }
 
 void loadBoxPokemonNameToStrbuf(WordSet *wordSet, u32 index, BoxPkm *pkm) {
-    PML_PkmGetParam(pkm, 0x73, wordSet->tmp);
+    PML_PkmGetParam(pkm, PKM_PARAM_NICKNAME, wordSet->tmp);
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }
 
 void loadMoveNameToStrbuf(WordSet *wordSet, u32 index, u32 move) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x193, move);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_MOVE_NAMES, move);
 }
 
 void loadItemNameToStrbuf(WordSet *wordSet, u32 index, u32 item) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x40, item);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_ITEM_NAMES, item);
 }
 
 void loadItemTextNameToStrbuf(WordSet *wordSet, u32 index, u32 item) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x1e1, item);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_ITEM_NAMES_WITH_ARTICLE, item);
 }
 
 void loadItemsNameToStrbuf(WordSet *wordSet, u32 index, u32 item) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x1e2, item);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_ITEM_NAMES_PLURAL, item);
 }
 
 void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL a4) {
@@ -201,11 +203,11 @@ void loadItemText(WordSet *wordSet, u32 index, u32 item, BOOL plural, BOOL a4) {
 }
 
 void loadAbilityNameToStrbuf(WordSet *wordSet, u32 index, u32 ability) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x176, ability);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_ABILITY_NAMES, ability);
 }
 
 void loadNatureToStrbuf(WordSet *wordSet, u32 index, u32 nature) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x1b, nature);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_NATURES, nature);
 }
 
 void WordSetNumber(WordSet *wordSet, u32 index, s32 number, u32 digits, u32 pad, BOOL ascii) {
@@ -226,12 +228,12 @@ void func_02024574(WordSet *wordSet, u32 index, u32 value) {
 
     PMSNumber_Validate(&copy, FALSE);
     if (index < wordSet->count) {
-        wordSet->bufs[index].attr.unk4 = copy;
+        wordSet->bufs[index].attr.addLayoutCmd = copy;
     }
 }
 
 void loadTypeTextToStrbuf(WordSet *wordSet, u32 index, u32 type) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x18e, type);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_TYPE_NAMES, type);
 }
 
 void copyVarForText(WordSet *wordSet, u32 index, PlayerInfo *playerInfo) {
@@ -263,7 +265,7 @@ void loadCountryAreaToStrbuf(WordSet *wordSet, u32 index, u32 country, u32 area)
     u32 fileId = fetchFileNumOfDividedCountry(country);
 
     if (fileId != 0 && area != 0) {
-        MsgData *msgData = GFL_MsgSysLoadData(FALSE, 2, (u16)fileId, wordSet->heapId);
+        MsgData *msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, (u16)fileId, wordSet->heapId);
 
         if (msgData != NULL) {
             if (area < GFL_MsgDataGetLineCount(msgData)) {
@@ -279,7 +281,7 @@ void loadCountryAreaToStrbuf(WordSet *wordSet, u32 index, u32 country, u32 area)
 }
 
 void loadTrainerTypeText(WordSet *wordSet, u32 index, u8 trainerType) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x17f, trainerType);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_TRAINER_CLASS_NAMES, trainerType);
 }
 
 void loadTrainerTypeToStrbuf(WordSet *wordSet, u32 index, u32 trainerId) {
@@ -287,23 +289,23 @@ void loadTrainerTypeToStrbuf(WordSet *wordSet, u32 index, u32 trainerId) {
 }
 
 void loadTrainerTypeWithArticleToStrbuf(WordSet *wordSet, u32 index, u8 trainerType) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x1e5, trainerType);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_TRAINER_CLASS_NAMES_WITH_ARTICLE, trainerType);
 }
 
 void loadTrainerNamesToStrbuf(WordSet *wordSet, u32 index, u32 trainerId) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x17e, trainerId);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_TRAINER_NAMES, trainerId);
 }
 
 void loadStatNameToStrbuf(WordSet *wordSet, u32 index, u8 stat) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x174, stat);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_STAT_NAMES, stat);
 }
 
 void loadBagPocketNameToStrbuf(WordSet *wordSet, u32 index, u32 pocket) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x41, pocket);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_BAG_POCKETS, pocket);
 }
 
 void loadLocationNameToStrbuf(WordSet *wordSet, u32 index, u32 placeNameId) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x6d, placeNameId);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_PLACE_NAMES, placeNameId);
 }
 
 void loadBoxNameForDisplay(WordSet *wordSet, u32 index, void *boxData, u32 box) {
@@ -315,7 +317,7 @@ void loadPassPowerToStrbuf(WordSet *wordSet, u32 index, u32 passPower) {
     if (!PassPower_IsIDValid(passPower)) {
         passPower = 0;
     }
-    GFL_WordSetLoadMsg(wordSet, index, 0x107, passPower);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_PASS_POWERS, passPower);
 }
 
 void loadHobbyNameToStrbuf(WordSet *wordSet, u32 index, u8 hobby) {
@@ -323,7 +325,7 @@ void loadHobbyNameToStrbuf(WordSet *wordSet, u32 index, u8 hobby) {
         GFL_WordSetClearBuf(wordSet, index);
         return;
     }
-    GFL_WordSetLoadMsg(wordSet, index, 0x31, hobby);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_HOBBIES, hobby);
 }
 
 void loadQuestionnaireAnswerToStrbuf(WordSet *wordSet, u32 index, u8 answer) {
@@ -339,7 +341,7 @@ void loadJobAnswerToStrbuf(WordSet *wordSet, u32 index, u8 job) {
         GFL_WordSetClearBuf(wordSet, index);
         return;
     }
-    GFL_WordSetLoadMsg(wordSet, index, 0x42, job);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_JOB_ANSWERS, job);
 }
 
 void loadBattleInstituteMsgForDisplay(WordSet *wordSet, u32 index, u32 rank) {
@@ -360,18 +362,18 @@ void loadBattleInstituteMsgForDisplay(WordSet *wordSet, u32 index, u32 rank) {
 }
 
 void loadMedalNameToStrbuf(WordSet *wordSet, u32 index, u8 medal) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x53, medal);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_MEDAL_NAMES, medal);
 }
 
 void loadMedalRankToStrbuf(WordSet *wordSet, u32 index, u8 rank, u32 medalType) {
     if (rank == 4 && medalType == 0x16) {
         rank++;
     }
-    GFL_WordSetLoadMsg(wordSet, index, 0x54, rank);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_MEDAL_RANKS, rank);
 }
 
 void loadFromEmptyFile(WordSet *wordSet, u32 index, u8 messageId) {
-    GFL_WordSetLoadMsg(wordSet, index, 0x4f, messageId);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_EMPTY, messageId);
 }
 
 void loadPokewoodLineToStrbuf(WordSet *wordSet, u32 index, u32 line) {
@@ -379,10 +381,10 @@ void loadPokewoodLineToStrbuf(WordSet *wordSet, u32 index, u32 line) {
         GFL_WordSetClearBuf(wordSet, index);
         return;
     }
-    GFL_WordSetLoadMsg(wordSet, index, 0x162, line + 0x2a);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_POKEWOOD_LINES, line + 0x2a);
 }
 
-void func_0202483c(WordSet *wordSet, u32 index, u32 tournament) {
+void WordSet_LoadPWTTournamentType(WordSet *wordSet, u32 index, u32 tournament) {
     if (tournament >= 0x29) {
         GFL_WordSetClearBuf(wordSet, index);
         return;
@@ -391,12 +393,12 @@ void func_0202483c(WordSet *wordSet, u32 index, u32 tournament) {
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }
 
-void func_02024868(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
+void WordSet_LoadFestivalMission(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
     // The mission's config, whose first 0x14 bytes are a FestMission (system/fest_mission.h)
     FestMissionConfig *buffer;
     FestivalText *text;
 
-    if (mission >= 0x37) {
+    if (mission >= FEST_MISSION_COUNT) {
         GFL_WordSetClearBuf(wordSet, index);
         return;
     }
@@ -405,10 +407,10 @@ void func_02024868(WordSet *wordSet, u32 index, u8 mission, s32 a3) {
     }
     buffer = allocateForFestMission(HEAPID_TAIL((HeapID)wordSet->heapId));
     text = getTextFileForFestMissions(HEAPID_TAIL((HeapID)wordSet->heapId));
-    func_ov027_02170b98(text->archive, mission, a3, (FestMission *)buffer);
-    func_ov027_02170d04(text, wordSet->tmp, (const FestMission *)buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
+    FestMission_Load(text->archive, mission, a3, (FestMission *)buffer);
+    FestMission_GetMessage(text, wordSet->tmp, (const FestMission *)buffer, HEAPID_TAIL((HeapID)wordSet->heapId));
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
-    func_ov027_02170b00(text);
+    FestivalText_Free(text);
     GFL_HeapFree(buffer);
 }
 
@@ -418,7 +420,7 @@ void loadMonthToStrbuf(WordSet *wordSet, u32 index, u32 month) {
     } else if (month > 12) {
         month = 12;
     }
-    GFL_WordSetLoadMsg(wordSet, index, 0x1e0, month - 1);
+    GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_MONTHS, month - 1);
 }
 
 void GFL_WordSetFormatStrbuf(WordSet *wordSet, StrBuf *dest, const StrBuf *src) {
@@ -435,7 +437,7 @@ void GFL_WordSetFormatStrbuf(WordSet *wordSet, StrBuf *dest, const StrBuf *src) 
                 u32 i = GFL_WordSetGetCommandParameter(str, 0);
                 WordSetBuf *buf = &wordSet->bufs[i];
 
-                if (buf->attr.unk4) {
+                if (buf->attr.addLayoutCmd) {
                     u16 param = 0x54;
 
                     GFL_StrCmdBuild(buf->strbuf, 0xbd, 4, 1, &param);

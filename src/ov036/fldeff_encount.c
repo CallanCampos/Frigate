@@ -1,7 +1,9 @@
 // The phenomena of effect encounters: the rustling grass, dust clouds, rippling water and shadows of flying Pokémon
 // that mark a rare encounter, as 3D models with their sound. The name is the ROM's own, from GFL_HeapAllocate's file
 // argument. Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
+// Additional helper and table names are our descriptive guesses.
 #include "types.h"
+#include "constants/sound.h"
 #include "field/encounter.h"
 #include "field/field.h"
 #include "field/field_effect.h"
@@ -65,16 +67,16 @@ typedef struct {
 
 static void *func_ov036_021a5100(FieldEffects *effects, HeapID heapId, u32 kind);
 static void func_ov036_021a5130(FieldEffectEncount *effect, u32 kind);
-static void func_ov036_021a5178(EncountEffectObj *obj, FieldEffectEncount *effect, u8 variant);
-static void func_ov036_021a51f0(EncountEffectObj *obj, FieldEffectEncount *effect);
+static void EncountEffectObj_Create(EncountEffectObj *obj, FieldEffectEncount *effect, u8 variant);
+static void EncountEffectObj_Free(EncountEffectObj *obj, FieldEffectEncount *effect);
 static void func_ov036_021a5228(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
 static void func_ov036_021a52b8(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc);
-static void func_ov036_021a5368(FieldEffectEncount *effect);
-static void func_ov036_021a54b8(FieldEffectTask *task, void *work);
+static void EncountEffect_FreeResources(FieldEffectEncount *effect);
+static void EncountTask_Init(FieldEffectTask *task, void *work);
 static void func_ov036_021a54f8(FieldEffectTask *task, void *work);
-static void func_ov036_021a54fc(FieldEffectTask *task, void *work);
-static void func_ov036_021a5550(EncountTask *encountTask, FieldEffectEncount *effect);
-static void func_ov036_021a55b8(FieldEffectTask *task, void *work);
+static void EncountTask_Update(FieldEffectTask *task, void *work);
+static void EncountTask_PlaySound(EncountTask *encountTask, FieldEffectEncount *effect);
+static void EncountTask_Draw(FieldEffectTask *task, void *work);
 
 // The volume of the phenomenon's sound by the player's distance, in steps of 5 tiles
 static const u8 ENCOUNT_EFFECT_VOLUMES[4] = { 127, 90, 60, 40 };
@@ -85,22 +87,22 @@ static const u8 ENCOUNT_EFFECT_INDICES[8] = { 0, 0, 0, 1, 2, 3, 4, 5 };
 // clang-format off
 static const FieldEffectTaskVTable ENCOUNT_TASK_VTABLE = {
     sizeof(EncountTask),
-    func_ov036_021a54b8,
+    EncountTask_Init,
     func_ov036_021a54f8,
-    func_ov036_021a54fc,
-    func_ov036_021a55b8,
+    EncountTask_Update,
+    EncountTask_Draw,
 };
 
 // clang-format on
 
 // clang-format off
 static EncountEffectSpec ENCOUNT_EFFECT_SPECS[6] = {
-    { 1, 3, 4, TRUE, FALSE, 1749, 60, { 141, 0, 0, 0 } },
-    { 1, 1, 4, TRUE, FALSE, 1749, 68, { 149, 0, 0, 0 } },
-    { 2, 1, 1, FALSE, FALSE, 1752, 76, { 154, 123, 0, 0 } },
-    { 1, 1, 2, FALSE, TRUE, 1750, 72, { 119, 0, 0, 0 } },
-    { 1, 1, 1, FALSE, FALSE, 1750, 74, { 121, 0, 0, 0 } },
-    { 3, 1, 1, FALSE, FALSE, 1751, 75, { 153, 139, 122, 0 } },
+    { 1, 3, 4, TRUE, FALSE, SEQ_SE_FLD_70, 60, { 141, 0, 0, 0 } },
+    { 1, 1, 4, TRUE, FALSE, SEQ_SE_FLD_70, 68, { 149, 0, 0, 0 } },
+    { 2, 1, 1, FALSE, FALSE, SEQ_SE_FLD_73, 76, { 154, 123, 0, 0 } },
+    { 1, 1, 2, FALSE, TRUE, SEQ_SE_FLD_71, 72, { 119, 0, 0, 0 } },
+    { 1, 1, 1, FALSE, FALSE, SEQ_SE_FLD_71, 74, { 121, 0, 0, 0 } },
+    { 3, 1, 1, FALSE, FALSE, SEQ_SE_FLD_72, 75, { 153, 139, 122, 0 } },
 };
 
 // clang-format on
@@ -130,7 +132,7 @@ void *func_ov036_021a50e0(FieldEffects *effects, HeapID heapId) {
 }
 
 void func_ov036_021a50ec(FieldEffects *effects, void *data) {
-    func_ov036_021a5368(data);
+    EncountEffect_FreeResources(data);
     GFL_HeapFree(data);
 }
 
@@ -154,7 +156,7 @@ static void func_ov036_021a5130(FieldEffectEncount *effect, u32 kind) {
     }
 }
 
-static void func_ov036_021a5178(EncountEffectObj *obj, FieldEffectEncount *effect, u8 variant) {
+static void EncountEffectObj_Create(EncountEffectObj *obj, FieldEffectEncount *effect, u8 variant) {
     int i;
 
     obj->mdl = GFL_G3DMdlCreate(effect->mdlRes[variant], 0, effect->mdlRes[variant]);
@@ -167,7 +169,7 @@ static void func_ov036_021a5178(EncountEffectObj *obj, FieldEffectEncount *effec
     }
 }
 
-static void func_ov036_021a51f0(EncountEffectObj *obj, FieldEffectEncount *effect) {
+static void EncountEffectObj_Free(EncountEffectObj *obj, FieldEffectEncount *effect) {
     int i;
 
     for (i = 0; i < effect->spec.anmCount; i++) {
@@ -184,16 +186,16 @@ static void func_ov036_021a5228(FieldEffectEncount *effect, EncountEffectSpec *s
     effect->mdlRes[0] = GFL_G3DSysReadArcToolResource(arc, spec->mdlId + season);
     GFL_G3DResUploadTexData(effect->mdlRes[0]);
     effect->anmRes[0] = GFL_G3DSysReadArcToolResource(arc, spec->anmIds[0] + season);
-    func_ov036_021a5178(&effect->objs[0], effect, 0);
+    EncountEffectObj_Create(&effect->objs[0], effect, 0);
     season += spec->variantStep;
     effect->mdlRes[1] = GFL_G3DSysReadArcToolResource(arc, spec->mdlId + season);
     GFL_G3DResUploadTexData(effect->mdlRes[1]);
     effect->anmRes[1] = GFL_G3DSysReadArcToolResource(arc, spec->anmIds[0] + season);
-    func_ov036_021a5178(&effect->objs[1], effect, 1);
+    EncountEffectObj_Create(&effect->objs[1], effect, 1);
     effect->mdlRes[2] = GFL_G3DSysReadArcToolResource(arc, spec->mdlId);
     GFL_G3DResUploadTexData(effect->mdlRes[2]);
     effect->anmRes[2] = GFL_G3DSysReadArcToolResource(arc, spec->anmIds[0]);
-    func_ov036_021a5178(&effect->objs[2], effect, 2);
+    EncountEffectObj_Create(&effect->objs[2], effect, 2);
 }
 
 static void func_ov036_021a52b8(FieldEffectEncount *effect, EncountEffectSpec *spec, ArcTool *arc) {
@@ -214,15 +216,15 @@ static void func_ov036_021a52b8(FieldEffectEncount *effect, EncountEffectSpec *s
         for (j = 0; j < spec->anmCount; j++) {
             effect->anmRes[i * spec->anmCount + j] = GFL_G3DSysReadArcToolResource(arc, fileOffset + spec->anmIds[j]);
         }
-        func_ov036_021a5178(&effect->objs[i], effect, i);
+        EncountEffectObj_Create(&effect->objs[i], effect, i);
     }
 }
 
-static void func_ov036_021a5368(FieldEffectEncount *effect) {
+static void EncountEffect_FreeResources(FieldEffectEncount *effect) {
     int i;
 
     for (i = 0; i < effect->spec.variantCount; i++) {
-        func_ov036_021a51f0(&effect->objs[i], effect);
+        EncountEffectObj_Free(&effect->objs[i], effect);
     }
     for (i = 0; i < effect->spec.anmCount * effect->spec.variantCount; i++) {
         GFL_G3DResFree(effect->anmRes[i]);
@@ -283,7 +285,7 @@ void func_ov036_021a54a8(FieldEffectTask *task, BOOL hidden) {
     }
 }
 
-static void func_ov036_021a54b8(FieldEffectTask *task, void *work) {
+static void EncountTask_Init(FieldEffectTask *task, void *work) {
     EncountTask *encountTask = work;
     EncountTaskParams *params = func_ov036_021a3ac8(task);
 
@@ -299,13 +301,13 @@ static void func_ov036_021a54b8(FieldEffectTask *task, void *work) {
 static void func_ov036_021a54f8(FieldEffectTask *task, void *work) {
 }
 
-static void func_ov036_021a54fc(FieldEffectTask *task, void *work) {
+static void EncountTask_Update(FieldEffectTask *task, void *work) {
     int i;
     EncountTask *encountTask = work;
     FieldEffectEncount *effect = encountTask->params.effect;
 
     if (Field_CheckMapLoadFinished(FieldEffects_GetField(effect->effects)) && !encountTask->paused) {
-        func_ov036_021a5550(encountTask, effect);
+        EncountTask_PlaySound(encountTask, effect);
         for (i = 0; i < effect->spec.anmCount; i++) {
             GFL_G3DActorStepAnmFrameLoop(effect->objs[encountTask->params.variant].actor, i, FX32_ONE);
         }
@@ -313,7 +315,7 @@ static void func_ov036_021a54fc(FieldEffectTask *task, void *work) {
 }
 
 // Play the sound at the start of each loop, quieter the further away the player is
-static void func_ov036_021a5550(EncountTask *encountTask, FieldEffectEncount *effect) {
+static void EncountTask_PlaySound(EncountTask *encountTask, FieldEffectEncount *effect) {
     u16 distance = 0;
     fx32 frame;
 
@@ -334,7 +336,7 @@ static void func_ov036_021a5550(EncountTask *encountTask, FieldEffectEncount *ef
     }
 }
 
-static void func_ov036_021a55b8(FieldEffectTask *task, void *work) {
+static void EncountTask_Draw(FieldEffectTask *task, void *work) {
     SRTMatrix srt = { { 0, 0, 0 }, { FX32_ONE, FX32_ONE, FX32_ONE } };
     EncountTask *encountTask = work;
     FieldEffectEncount *effect = encountTask->params.effect;

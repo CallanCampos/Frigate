@@ -51,8 +51,8 @@ void FieldPlayer_GetRailWorldPos(FieldPlayer *player, VecFx32 *pos);
 GameEvent *FieldPlayer_CheckObjContactEvent(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void func_ov036_0219a58c(FieldPlayer *player);
 // The core's terrain effect task: set and get
-void func_ov036_0219a5b8(FieldPlayer *player, TCB *tcb);
-TCB *func_ov036_0219a5c4(FieldPlayer *player);
+void func_ov036_0219a5b8(FieldPlayer *player, FieldEffectTask *task);
+FieldEffectTask *func_ov036_0219a5c4(FieldPlayer *player);
 void func_ov036_0219a5fc(FieldPlayer *player);
 void FieldPlayer_UpdateActionStatusObserver(FieldPlayer *player);
 Field *FieldPlayer_GetField(FieldPlayer *player);
@@ -64,7 +64,7 @@ GameSystem *FieldPlayer_GetGameSystem(FieldPlayer *player);
 u32 FieldPlayer_GetTileTypeInDirEx(FieldPlayer *player, u16 direction, fx32 *height);
 // The form with the object code, 10 if it isn't one of the player's
 u32 FieldPlayer_GetExStateByObjCode(u32 objCode);
-void FieldPlayer_ForceObjCode(FieldPlayer *player, u32 objCode);
+void FieldPlayer_ForceObjCode(FieldPlayer *player, u16 objCode);
 void FieldPlayer_ClearObjCode(FieldPlayer *player);
 void FieldPlayer_GetGPosInFront(FieldPlayer *player, s16 *x, s16 *y, s16 *z);
 void FieldPlayer_InterruptCatwalkBalance(FieldPlayer *player, BOOL keep);
