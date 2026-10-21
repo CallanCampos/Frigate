@@ -26,6 +26,27 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-21: contribution-policy source traceability
+
+- **Upstream:** `fc478a9ee5`; no new sync.
+- **Port:** this documentation follow-up, based on `6c214613e4`, whose tree matches native head `551cd9b1ea`.
+- **ROM:** T0 passes, both SHA1s match (`/tmp/frigate-docfollowup-t0.log`).
+- **Host build:** both macOS builds pass (`/tmp/frigate-docfollowup-{b2,w2}-build.log`).
+- **Tests:** `hal_wstring` and `os_wcm_workspace` pass, 2/2 in each version
+  (`/tmp/frigate-docfollowup-{b2,w2}-tests.log`). Native source is unchanged from `551cd9b1ea`, whose Compile, Standards
+  and all nine target CI jobs pass ([manual run, attempt 2](https://github.com/CallanCampos/Frigate/actions/runs/39632971815)).
+  Prior local T2/T3/T6 full suites pass (Black 2 281 pass/16 skip; White 2 279 pass/16 skip). Full optional T4 and
+  local T5 routes were not rerun; CI's ROM-independent sanitized checks pass. T7 was not run.
+- **Tiers:** unchanged: a 37,150 functions, b 3,868, c zero per version; Black 2 code bytes a 3,369,134/b 481,132,
+  White 2 a 3,369,222/b 481,132, excluding 2,384 veneers and including 224 SDK assembly definitions.
+- **Trap stubs:** unchanged, 31 functions and 22 data placeholders per version.
+- **64-bit warnings:** unchanged native source; four pointer/int cast families 469 (game 234, libraries 235),
+  optional integer shortening 388; no remeasurement for Markdown edits.
+- **Work done:** corrected the review's policy wording and added primary-source observations to
+  [ADR 0017](adr/0017-external-contributions.md), distinguishing other projects' branches from Frigate's `main` choice.
+- **Next:** size the external field heap, then repeat field-entry and real menu checks.
+- **Blockers:** the fixed 64 KiB field heap still terminates field entry at frame 10,759; this records no gameplay fix.
+
 ## 2026-10-21: latest upstream sync and renewed validation
 
 - **Upstream:** `fc478a9ee5`, merged cleanly by `port/tools/sync_upstream.sh` in `c46687c006`.

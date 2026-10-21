@@ -12,6 +12,17 @@ Frigate is public and the user wants outside contributions. The inherited root c
 serve the decomp, while the port's checkout and sync tools assume a maintainer who publishes directly to main.
 ADR 0002's solo-project description no longer describes contribution policy; its no-upstream-posts boundary remains.
 
+## Primary-source basis
+
+Observed on 2026-10-21: Shipwright's default branch is `develop`; its official
+[development section](https://github.com/HarbourMasters/Shipwright/blob/develop/README.md#development) describes
+CI builds from that branch. No `CONTRIBUTING` file was found at its root, `.github` or `docs`, so this is evidence
+of its development branch, not a claimed contribution policy. Platinum's PC fork defaults to `pc_port`; its
+[forking guidelines](https://github.com/cybervisi0n/pokeplatinum/blob/pc_port/README.md#forking-guidelines) welcome
+forks. Its [pull-request guide](https://github.com/cybervisi0n/pokeplatinum/blob/pc_port/CONTRIBUTING.md#how-do-i-submit-a-pull-request)
+describes a fork and topic-branch workflow, but still identifies pret and addresses the decompilation project.
+These observations informed Frigate's separate contributor guide; Frigate chooses its own `main` target below.
+
 ## Decision
 
 External contributors fork Frigate, work on topic branches and submit pull requests to CallanCampos/Frigate:main.
