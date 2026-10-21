@@ -959,6 +959,7 @@ src/system/area_data.c:
     .text       start:0x02018ee4 end:0x02018fbc
 
 lib/nnsys/src/snd/snd_arc_stream.c:
+    complete
     .text       start:0x0206db40 end:0x0206ed04
     .rodata     start:0x0209447c end:0x02094540
     .bss        start:0x02149950 end:0x0214b3dc
