@@ -449,7 +449,7 @@ void PM_ForceToPowerOff(void) {
     OS_DisableInterrupts();
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        MI_StopAllNDma();
+        MI_StopNDmaChannels();
     }
     for (;;) {
         OS_Halt();

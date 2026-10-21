@@ -4,11 +4,11 @@
 #include "types.h"
 #include "twl/pm.h"
 
-// TwlSDK's NWM, the DSi's wireless manager, ARM9 side, in the LTD autoload (nwm.c). It does for the DSi's own wireless
-// chip what NitroSDK's WM does for the DS's: the ARM9 sends the ARM7 commands through the PXI tag 0x16, in buffers of a
-// system area that the game hands to the library (NWM_Init), and the ARM7 answers with events that run the command's
-// callback. The functions have the names of the SDK functions they implement, from what the code does, where those are
-// known. The game calls the functions through thumb veneers that the linker made.
+// TwlSDK's NWM, the DSi's wireless manager, ARM9 side, in the LTD autoload (nwm_setup.c, nwm_events.c and nwm.c). It
+// does for the DSi's own wireless chip what NitroSDK's WM does for the DS's: the ARM9 sends the ARM7 commands through
+// the PXI tag 0x16, in buffers of a system area that the game hands to the library (NWM_Init), and the ARM7 answers
+// with events that run the command's callback. The functions have the names of the SDK functions they implement, from
+// what the code does, where those are known. The game calls the functions through thumb veneers that the linker made.
 
 typedef enum {
     NWM_RETCODE_SUCCESS = 0,

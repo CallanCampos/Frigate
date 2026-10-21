@@ -32,8 +32,9 @@ flags = [
 "photo_sign.c" = ["-nothumb"]
 "photo_sign_util.c" = ["-nothumb"]
 
-# The LTD autoload's TwlSDK libraries are ARM code. camera_api.c and nwm.c load each static through a literal of its
-# own, as -ipa function does (-ipa file reaches them all from one base, and drops camera_api.c's unreferenced word);
+# The LTD autoload's TwlSDK libraries are ARM code. camera_api.c, nwm_setup.c and nwm.c load each static through a
+# literal of their own, as -ipa function does (-ipa file reaches them all from one base, and drops camera_api.c's
+# unreferenced word), while nwm_events.c reaches its three from one base, so it takes the default -ipa file;
 # fatfs_api.c is -O2,p, since -O4,p and -O3,p rotate its loops and fold its reloads
 "rtc/rtc_api_ex.c" = ["-nothumb"]
 "camera/camera_api.c" = ["-nothumb", "-ipa function"]
@@ -44,6 +45,8 @@ flags = [
 "mi/mi_sharedWram_twl.c" = ["-ipa function"]
 "os/os_application_jump_twl.c" = ["-nothumb"]
 "spi/pm_twl.c" = ["-ipa function"]
+"nwm/nwm_setup.c" = ["-nothumb", "-ipa function"]
+"nwm/nwm_events.c" = ["-nothumb"]
 "nwm/nwm.c" = ["-nothumb", "-ipa function"]
 "mic/mic_twl.c" = ["-nothumb"]
 "fatfs/fatfs_api.c" = ["-nothumb", "-O2,p", "-ipa function"]

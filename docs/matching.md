@@ -1858,6 +1858,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`dwc_transport.c`) and `DWCi_ProcessGT2MatchCommand` and `DWCi_QR2ClientMsgCallback` (`dwc_match.c`) match only
   so after `MI_CpuCopy8` of a received header, which reads as a byte order conversion that is the identity on the DS;
   with no such conversion known in DWC, the three stay rows.
+- A value narrowed to `u16` twice in a row (`lsl r0, #16; lsr r0, #16`, then `lsl r4, r0, #16; lsr r7, r4, #16`) is a
+  `u16` put through an identity that MWCC folds only after it narrows: TwlSDK's pipes round each chunk down to the
+  DSP's unit, `count = count & ~(DSP_MEMORY_UNIT - 1);`, where `DSP_MEMORY_UNIT` is `3 - sizeof(u16)`, 1 on the ARM9
+  (the shape of cybervisi0n/libntr's reconstruction). `DSP_ReadPipe` and `DSP_WritePipe` (`dsp_pipe.c`) match so;
+  `count &= ...` folds before the narrowing and loses the second one.
+- A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
+  offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `TWLHwNormalInfo *info =
+  TWL_HW_NORMAL_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
+  `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
+  the offset.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
   DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
@@ -3330,7 +3340,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
   file split at `0x0206f0f0`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
   one defined with a zero initializer (next bullet), which is known and also stays first in the `.bss`: TwlSDK's
-  `nwm.c` matches `func_02702468` with `static u8 sNwmInitialized = FALSE;` and no split.
+  `nwm_setup.c` matches `func_02702468` with `u8 NWMi_SetUpDone = FALSE;`.
+- A struct of statics whose functions need two addressings is several files. `nwm.c`'s system pointer, exit callback
+  and sleep callback (0x24 bytes at `0x0276c2e8`) matched `func_02702a40` only as members of one struct, reached from
+  its base at `#0x14`, and `NWM_LoadDevice` only with the exit callback a plain object, loaded after the callback it
+  is given. They are a file of their own, `nwm_events.c` (cybervisi0n/libntr's reconstruction splits NWM there too),
+  built with `-ipa file` (every static from the section's base, its two 16-byte callbacks in the reverse of their
+  definitions) and starting its own `.bss`, while `NWM_LoadDevice`, in an `-ipa function` file after it, takes the exit
+  callback as an `extern`. Split as `nwm_setup.c`, `nwm_events.c` and `nwm.c`, all 41 functions match.
 - Under `-ipa function` the same holds for zero: a `.bss` global or static defined with an initializer, `= 0`,
   `= NULL` or `= { 0 }`, is known to the functions below it, which reach it from one base (`ldr rN, =.bss; [rN, #off]`),
   where a tentative definition is loaded through a literal of its own. NitroWiFi's `SOCLi_CleanupCommandPacketQueue`
@@ -3799,12 +3816,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 ## When nothing moves it
 
 - A Thumb `bx pc; nop` followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, right after a function that calls it,
-  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from
-  C and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
+  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from C
+  and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
   `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
-  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. The LTD autoload's
+  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. NitroWiFi's code in the LTD autoload's
   `.ltdmain` gives each call its own veneer instead, as an overlay does (`docs/configs.md`), which the build gets by
-  linking the module's objects as an overlay group.
+  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so
+  `os_interrupt_twl.c` reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use
+  another file's veneers can be complete only once that file is.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
@@ -3852,3 +3871,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the order of instructions differs and no source change moves it, try `tools/decomp/permuter_setup.py`, which
   prepares a function for [decomp-permuter](https://github.com/simonlindholm/decomp-permuter). Its result can point to
   a plain change: `GFL_BGSysAllocChar`'s registers only matched with its tile size, a `u8` from a call, in an `int`.
+
+- A TwlSDK function that resists respellings can be in the shape of cybervisi0n/libntr's reconstruction, which keeps
+  the SDK's inlines and blocks: six of the LTD autoload's matched once rebuilt so, in our own names. `mi_ndma.c`'s
+  `MIi_NDma` and `MIi_NDmaAsync` set the registers through one-line `static inline` writers inside
+  `if (size > 0) { ... }`, with the locals declared there; `mi_ndma_gxcommand.c`'s `MIi_NDmaFIFOCallback` calls the
+  transfer through a `static inline`, `MIi_NDmaAsyncImmediate`, which adds the channel's config, so the arguments
+  are computed in the inline's order; `card_hash.c`'s `CARD_SetUpCheckedReads` lays its buffer out through a
+  cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect` gets the sector
+  index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops by
+  `slot + banks`. Look the function up there before grinding registers.

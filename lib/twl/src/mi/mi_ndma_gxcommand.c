@@ -89,10 +89,9 @@ static void MIi_NDmaFIFOCallback(void) {
         OS_DisableIrqMask(OS_IE_GXFIFO);
     }
     OS_ResetRequestIrqMask(OS_IE_GXFIFO);
-    MIi_NDmaAsync((sGXNDmaState.length == 0) ? MI_NDMA_MODE_SEND_IF : MI_NDMA_MODE_SEND, sGXNDmaState.ndmaNo,
-                  (const void *)src, (void *)REG_GXFIFO_ADDR, 0, part,
-                  (sGXNDmaState.length == 0) ? MIi_NDmaDMACallback : NULL, NULL, &MIi_NDmaConfig[sGXNDmaState.ndmaNo],
-                  (u32)-1, MI_NDMA_ENABLE);
+    MIi_NDmaAsyncImmediate((sGXNDmaState.length == 0) ? MI_NDMA_MODE_SEND_IF : MI_NDMA_MODE_SEND, sGXNDmaState.ndmaNo,
+                           (const void *)src, (void *)REG_GXFIFO_ADDR, 0, part,
+                           (sGXNDmaState.length == 0) ? MIi_NDmaDMACallback : NULL, NULL, MI_NDMA_ENABLE);
 }
 
 // The end of the last part: restores what the FIFO interrupted for, and calls back
@@ -125,8 +124,8 @@ void MI_SendNDmaGXCommandAsyncFast(u32 ndmaNo, const void *src, u32 length, MIND
     sGXNDmaState.callback = callback;
     sGXNDmaState.arg = arg;
     MI_WaitNDma(ndmaNo);
-    MIi_NDmaAsync(MI_NDMA_MODE_SEND_IF, ndmaNo, src, (void *)REG_GXFIFO_ADDR, 0, length, MIi_NDmaDMAFastCallback, NULL,
-                  &MIi_NDmaConfig[ndmaNo], (u32)-1, MI_NDMA_ENABLE);
+    MIi_NDmaAsyncImmediate(MI_NDMA_MODE_SEND_IF, ndmaNo, src, (void *)REG_GXFIFO_ADDR, 0, length,
+                           MIi_NDmaDMAFastCallback, NULL, MI_NDMA_ENABLE);
 }
 
 // The end of the transfer: calls back
