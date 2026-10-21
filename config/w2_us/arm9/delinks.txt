@@ -2556,3 +2556,7 @@ lib/dwc/src/base/dwc_init_version.c:
 lib/nitro/src/card/card_backup_version.c:
     complete
     .text       start:0x02005094 end:0x020050ac
+
+lib/nitrowifi/src/cps/cps_version.c:
+    complete
+    .text       start:0x020050ac end:0x020050c4
