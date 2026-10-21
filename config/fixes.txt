@@ -116,6 +116,7 @@
 . 0x0201a324 reloc_addend 0x258
 . 0x02020cec reloc_addend 9
 . 0x02020d24 reloc_addend 6
+. 0x020248c0 reloc_module overlay(27)
 . 0x02026708 reloc_addend 0x2
 . 0x02026710 reloc_addend 0x2
 . 0x0202678c reloc_addend 0x2
