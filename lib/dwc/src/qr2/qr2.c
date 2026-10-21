@@ -16,7 +16,7 @@
 
 // Where a reply that takes several packets has got to
 typedef struct QRSplitQueryProgress {
-    int curKeyType;
+    QR2KeyType curKeyType;
     int curPacketNum;
     int curKeyIndex;
     int curSubCount; // the players or the teams
@@ -557,7 +557,7 @@ static void qr_build_query_reply(QR2Implementation *qrec, QR2Buffer *buf, int se
 static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, QRSplitQueryProgress *progress) {
     u8 *packetNumPos = NULL;
 
-    if (progress->curKeyType >= 3) {
+    if (progress->curKeyType >= key_type_count) {
         return FALSE;
     }
     if (QR2_MAX_DATA_SIZE - buf->len < 32) {
@@ -566,11 +566,11 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
     qr2_buffer_addA(buf, "splitnum");
     packetNumPos = (u8 *)&buf->buffer[buf->len++];
     *packetNumPos = progress->curPacketNum++;
-    while (progress->curKeyType < 3) {
+    while (progress->curKeyType < key_type_count) {
         if (progress->keyBuffer.numKeys == 0) {
             qrec->keyListCallback(progress->curKeyType, &progress->keyBuffer, qrec->userData);
         }
-        if (progress->curSubCount == 0 && progress->curKeyType != 0) {
+        if (progress->curSubCount == 0 && progress->curKeyType != key_server) {
             progress->curSubCount = qrec->playerTeamCountCallback(progress->curKeyType, qrec->userData);
         }
         if (QR2_MAX_DATA_SIZE - buf->len < 100) {
@@ -584,7 +584,7 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
             if (!qr2_buffer_addA(buf, keyName)) {
                 return TRUE;
             }
-            if (progress->curKeyType == 0) {
+            if (progress->curKeyType == key_server) {
                 qrec->serverKeyCallback(registeredKeyIndex, buf, qrec->userData);
                 if (QR2_MAX_DATA_SIZE - buf->len < 1) {
                     return TRUE;
@@ -595,9 +595,9 @@ static BOOL qr_build_split_query_reply(QR2Implementation *qrec, QR2Buffer *buf, 
                 }
                 buf->buffer[buf->len++] = progress->curSubIndex;
                 while (progress->curSubIndex < progress->curSubCount) {
-                    if (progress->curKeyType == 1) {
+                    if (progress->curKeyType == key_player) {
                         qrec->playerKeyCallback(registeredKeyIndex, progress->curSubIndex, buf, qrec->userData);
-                    } else if (progress->curKeyType == 2) {
+                    } else if (progress->curKeyType == key_team) {
                         qrec->teamKeyCallback(registeredKeyIndex, progress->curSubIndex, buf, qrec->userData);
                     }
                     if (QR2_MAX_DATA_SIZE - buf->len < 1) {
@@ -682,7 +682,7 @@ static void qr_process_query(QR2Implementation *qrec, QR2Buffer *buf, const u8 *
         QRSplitQueryProgress progress;
 
         progress.curPacketNum = 0;
-        progress.curKeyType = 0;
+        progress.curKeyType = key_server;
         progress.curKeyIndex = 0;
         progress.curSubCount = 0;
         progress.curSubIndex = 0;

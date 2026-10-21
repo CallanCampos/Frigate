@@ -1890,7 +1890,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `fm->sendBufSize = sendBufSize ? sendBufSize : 0x2000;`.
 - A 0 loaded once from the literal pool, stored to one local's slot and copied from there to the others, is a local
   zeroed by a statement after the early returns, not at its declaration: DWC's `DWCi_Prof_StartRequest`
-  (`dwc_nasfunc.c`) matches with `total = 0;` just before its loop.
+  (`dwc_profanity.c`) matches with `total = 0;` just before its loop.
 - A compound assignment to a narrow field narrows its right side first: `work->checkFlag &= 0xff ^ (1 << waza);` on a
   `u8` shifts the mask down to a byte before the `and`, while `work->checkFlag = work->checkFlag & (0xff ^ (1 << waza));`
   ands the full mask, as the PC box's `Box2Main_PokeFreeWazaCheck` does.
@@ -2811,6 +2811,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
+  enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose
+  parameter has that enum type. GameSpy's `qr_build_split_query_reply` (`qr2.c`, overlay 11) matched only with its
+  progress's key type as `QR2KeyType`, the SDK's `qr2_key_type`, and the key list callback taking `QR2KeyType`; the
+  field alone, or the parameters alone, kept the register.
 - A table read in an unrolled loop through a pointer that each read steps (`*sines++`, `x[*index++]`) and the same
   table indexed (`sines[0]` to `sines[3]`, then `sines += 4`) give different registers and spills. libmath's
   `md5_transform` matches only stepped, with the message walked by its own pointer in the first round and through
@@ -3293,6 +3298,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`CryptOne`, a 20-byte `BigNum`) and its digit (`CryptOneDigit`) that only dead-stripped code used; as globals they
   sort into the shared `.rodata` by size, the digit first, which moved the file's start back 4 bytes from the
   previous file's range.
+- A string that the ROM has twice in one file's range, a few hundred bytes apart, is two files: MWCC pools a file's
+  equal literals. DWC's `"httpresult"`, `"returncd"` and `"Date"` in overlay 11 split its login range into the login,
+  the HTTP client, the connection test, the profanity check and the service locator (`dwc_nasfunc.c`,
+  `dwc_http_client.c`, `dwc_conntest.c`, `dwc_profanity.c`, `dwc_svcloc.c`), and only the split laid each one's `.data`
+  out as the ROM's. The 13 root certificates after them are each a data-only file under `-ipa file`, whose name and key
+  of 64 bytes or more and unreferenced global struct get 4-aligned sections of their own, which one file of all 13
+  can't give.
 - An object of 64 bytes or more gets a section of its own only under `-ipa file`; without it every size stays in the
   shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string

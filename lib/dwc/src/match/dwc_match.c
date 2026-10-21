@@ -417,8 +417,8 @@ static void DWCi_RandomizeServers(void);
 static void DWCi_QR2ServerKeyCallback(int keyId, QR2Buffer *outBuf, void *userData);
 static void DWCi_QR2PlayerKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData);
 static void DWCi_QR2TeamKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData);
-static void DWCi_QR2KeyListCallback(int keyType, QR2KeyBuffer *keyBuffer, void *userData);
-static int DWCi_QR2CountCallback(int keyType, void *userData);
+static void DWCi_QR2KeyListCallback(QR2KeyType keyType, QR2KeyBuffer *keyBuffer, void *userData);
+static int DWCi_QR2CountCallback(QR2KeyType keyType, void *userData);
 static void DWCi_QR2AddErrorCallback(int error, const char *errorMessage, void *userData);
 static void DWCi_QR2PublicAddrCallback(u32 ip, u16 port, void *userData);
 static void DWCi_QR2NatnegCallback(int cookie, void *userData);
@@ -5223,11 +5223,11 @@ static void DWCi_QR2PlayerKeyCallback(int keyId, int index, QR2Buffer *outBuf, v
 static void DWCi_QR2TeamKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData) {
 }
 
-static void DWCi_QR2KeyListCallback(int keyType, QR2KeyBuffer *keyBuffer, void *userData) {
+static void DWCi_QR2KeyListCallback(QR2KeyType keyType, QR2KeyBuffer *keyBuffer, void *userData) {
     int i;
 
     switch (keyType) {
-    case 0:
+    case key_server:
         qr2_keybuffer_add(keyBuffer, 8);
         qr2_keybuffer_add(keyBuffer, 10);
         qr2_keybuffer_add(keyBuffer, 0x32);
@@ -5243,14 +5243,14 @@ static void DWCi_QR2KeyListCallback(int keyType, QR2KeyBuffer *keyBuffer, void *
             }
         }
         break;
-    case 1:
+    case key_player:
         break;
-    case 2:
+    case key_team:
         break;
     }
 }
 
-static int DWCi_QR2CountCallback(int keyType, void *userData) {
+static int DWCi_QR2CountCallback(QR2KeyType keyType, void *userData) {
     return 0;
 }
 

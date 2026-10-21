@@ -120,6 +120,11 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
 | `dwc_match.c` | `0x0215fa0c`–`0x02168818` | 210 | partial | descriptive |
+| `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
+| `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | partial | descriptive |
+| `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |
+| `dwc_profanity.c` | `0x0216bbe4`–`0x0216c154` | 6 | partial | descriptive |
+| `dwc_svcloc.c` | `0x0216c154`–`0x0216c520` | 5 | complete | descriptive |
 | `gsAvailable.c` | `0x0216c520`–`0x0216c764` | 5 | complete | descriptive |
 | `gsCore.c` | `0x0216c764`–`0x0216cac0` | 11 | complete | descriptive |
 | `gsCrypt.c` | `0x0216cac0`–`0x0216cc2c` | 1 | complete | descriptive |
@@ -164,7 +169,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
 | `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
-| `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | partial | descriptive |
+| `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | complete | descriptive |
 | `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
 | `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |
 | `sb_queryengine.c` | `0x02182220`–`0x021828c4` | 20 | complete | descriptive |

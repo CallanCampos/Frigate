@@ -48,7 +48,7 @@ static BOOL NHttpRap_CreateRequest(u32 index, NHttpRap *rap);
 static void NHttpRap_BuildUrl(NHttpRap *rap, u32 index);
 static void NHttpRap_WriteHeader(NHttpRap *rap, int type);
 
-static void *sRootCertificates[1] = { data_ov011_021866c0 };
+static void *sRootCertificates[1] = { &DWCi_RootCertNintendoClass2 };
 
 // The request URL formats.
 static const char sUrlValidate[52] = "https://pkvldtprod.nintendo.co.jp/pokemon/validate";
