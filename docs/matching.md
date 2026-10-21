@@ -467,6 +467,15 @@ Same instructions, registers swapped.
   block layout gives needs the locals at function scope (`NNS_G2dInitMCAnimationInstance`). A second loop that
   reuses the first loop's counter swaps registers with its block's temporary, where a counter of its own declared
   after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
+- For a NitroSystem function that is close, the inlines of the public decompilation github.com/ntrtwl/NitroSystem
+  are worth following whole, in our own names: MWCC shares an expression between two inlines only when both spell it
+  the same. `g2d_OamSoftwareSpriteDraw.c`'s `SetTexParamsAndGetTexCoord_` matched once its 1D texture inline
+  (`SetCharTexture1D_`) computed `(u16)((shape & GX_OAM_ATTR0_SHAPE_MASK) >> 14)` as `NNS_G2dGetOamSizeX` does, so
+  the shape and size indices are computed once and spilled raw, and the `u16` conversions come late in the branch;
+  the flips had to be read through `BOOL` getters (`IsOamFlippedH_`), which as locals or direct reads swap
+  registers. How an inline assigns its locals counts too: `snd_arc_stream.c`'s `DecodeAdpcm`, with its locals
+  declared and then assigned (sample before index) as that decompilation writes it, took `ProcessCommand` from 208
+  differing bytes to 72, before the types below matched it.
 - A loop offset that starts at 0, grows by a step and is zeroed after the loop's hoisted invariants is a counter
   times the step: MWCC strength-reduces `x + step * line` into a running offset that it zeroes in the loop's
   preheader, where an offset kept by hand is zeroed before the hoisted code. NitroSystem's `g2d_TextCanvas.c`
@@ -1815,6 +1824,15 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `rtc_cache.c`'s `*(sDaysBeforeMonth + date->month - 1)`, `plist_sys.c`'s `*(sHidenMoves + hiden - 11)` (the
   literal is `sHidenMoves - 22`), `strbuf.c`, `startmenu.c` and others. A local `u8 *p = data + pos` read as `p[0]`,
   `p[1]` doesn't give it either.
+- The reverse holds for addresses passed to calls: `text + i` given to several calls is computed once and kept in a
+  saved register, and `&text[i]` is recomputed at each call (`adds r0, r5, r4`), with `&text[i + 3]` keeping `i + 3`
+  (on the stack across calls) rather than the address. GameSpy's `gsiXmlUtilDecodeString` (`gsXML.c`) matches only
+  with `&text[...]` throughout, each entity branch's `started`, `value`, `mask` and `end` declared in its own block
+  (the `&#` branch's `value` then stays in a register, where one shared with the `&#x` branch's `&value` goes to
+  the stack), and the byte mask as a variable set to 0xff000000 at the branch's start and shifted by 8 at the end of
+  each pass (`lsrs r6, r6, #8`), not `0xff000000 >> (j * 8)`. Its file then linked only with its namespace table in
+  GameSpy's order (`SOAP-ENV`, `SOAP-ENC`, `xsi`, `xsd`): the strings come out by size either way, so only the
+  table's pointers showed the wrong order.
 - An inline's pointer parameter of the argument's own type takes the argument expression itself, so a field of an
   indexed element passed to it has the field's offset folded into each of the inline's loads (`[r, #4 + k]`). A
   `const void *` parameter, read as `((const u8 *)b)[k]`, keeps the argument one address: DWC's `DWCAc_AddCandidate`
@@ -1852,6 +1870,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`dwc_transport.c`) and `DWCi_ProcessGT2MatchCommand` and `DWCi_QR2ClientMsgCallback` (`dwc_match.c`) match only
   so after `MI_CpuCopy8` of a received header, which reads as a byte order conversion that is the identity on the DS;
   with no such conversion known in DWC, the three stay rows.
+- A value narrowed to `u16` twice in a row (`lsl r0, #16; lsr r0, #16`, then `lsl r4, r0, #16; lsr r7, r4, #16`) is a
+  `u16` put through an identity that MWCC folds only after it narrows: TwlSDK's pipes round each chunk down to the
+  DSP's unit, `count = count & ~(DSP_MEMORY_UNIT - 1);`, where `DSP_MEMORY_UNIT` is `3 - sizeof(u16)`, 1 on the ARM9
+  (the shape of cybervisi0n/libntr's reconstruction). `DSP_ReadPipe` and `DSP_WritePipe` (`dsp_pipe.c`) match so;
+  `count &= ...` folds before the narrowing and loses the second one.
+- A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
+  offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `TWLHwNormalInfo *info =
+  TWL_HW_NORMAL_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
+  `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
+  the offset.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
   DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of
@@ -2333,6 +2361,26 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   rows match (`maya.c`'s `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, `scrcmd_shop.c`'s `ShopUI_PrintItemBuyMessage`) and 92
   matching functions in game code and libraries alike stop matching. `unsigned long` is a lever for one variable, not
   the type of the code.
+- A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
+  arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
+  reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.
+  As an `unsigned int` the index is a temporary, slotted below the named `isCached`; as `unsigned long` it is a named
+  local in its declared slot above, and the function matches. Declaration order and scope, `BOOL`, `u8` and `int`
+  types, and an inline for the bit test moved nothing. The same function also needs the joints' matrices as a field of
+  one object with the materials and the scales (`g_NNSG3DRenderCache`, grouped as the public decompilation of
+  NitroSystem groups them): as an array of their own MWCC folds the normal matrix's address into the clip matrix's
+  (`clip + 0x40`), 4 bytes short, where the original adds the index's offset to a second literal. And its weighted sums
+  add each product as a 64-bit value, `sum.invM.m[0][0] += (weight * clip->m[0][0]) >> FX32_SHIFT`: through an inline
+  that casts the product to `fx32` first, one load is scheduled after a store where the original has it before.
+- The same goes for NitroSystem's `s32` (a `long`) and for a spilled `u32` in a big function: two NitroSystem
+  functions matched only with one variable of the SDK's type. `g2d_Renderer.c`'s `NNS_G2dPushMtx` loads the stack
+  position once to check `next < 32` and again in each branch for the source index; with `static long mtxStackPos_`
+  (an `s32` in the decompilation of NitroSystem) it does, where an `int` keeps the first load (the decompilation of
+  HGSS's NitroSystem in ctrl-cheeb-del/pokeheartgold reaches the same code only through a `volatile` view of the
+  state). `snd_arc_stream.c`'s `ProcessCommand` homes `bufOffset` and `readSize` in their declared slots only with
+  `unsigned long bufOffset` (a `u32` in the decompilation of NitroSystem; Kingdom Hearts Re:coded's decompilation
+  writes `long`) and `s32 readSize`, the type of the read's result it is compared with; as `unsigned int`s they took
+  late spill slots. Rows that are left with a reload the original has, or with locals in late slots, are candidates.
 - `lsl #15; asr #16` is a halving folded with an `s16` narrowing, so the value is an `fx16`, not a statement-order
   problem: the Battle Competition's `WifiBattleMatchView_BlendColor` matched with `fx16 ratio`. In the same file a
   constant assigned in both arms of an `if`/`else` is written first in each arm (`frameBG = 2;` / `= 6;` in the two
@@ -3321,10 +3369,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without `-ipa file` therefore ask for the flag before any respelling. Under `-ipa function` a file's initialized
   statics come first in its `.bss`, by size, and the tentative ones follow in the reverse of their declarations (every
   dsi compiler and 2.0/sp2p2), so two literals for a static that the ROM places after the file's others, read at offset
-  0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
-  file split at `0x0206f0f0`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
+  0, mean that it opens another file's `.bss`: `CARDi_NotifyEvent` matches, and the CARD range links, only with
+  `card_common.c` split at `0x0206f0f0`, the hooks' head `= { NULL }` opening `card_task.c`'s `.bss`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
   one defined with a zero initializer (next bullet), which is known and also stays first in the `.bss`: TwlSDK's
-  `nwm.c` matches `func_02702468` with `static u8 sNwmInitialized = FALSE;` and no split.
+  `nwm_setup.c` matches `func_02702468` with `u8 NWMi_SetUpDone = FALSE;`.
+- A struct of statics whose functions need two addressings is several files. `nwm.c`'s system pointer, exit callback
+  and sleep callback (0x24 bytes at `0x0276c2e8`) matched `func_02702a40` only as members of one struct, reached from
+  its base at `#0x14`, and `NWM_LoadDevice` only with the exit callback a plain object, loaded after the callback it
+  is given. They are a file of their own, `nwm_events.c` (cybervisi0n/libntr's reconstruction splits NWM there too),
+  built with `-ipa file` (every static from the section's base, its two 16-byte callbacks in the reverse of their
+  definitions) and starting its own `.bss`, while `NWM_LoadDevice`, in an `-ipa function` file after it, takes the exit
+  callback as an `extern`. Split as `nwm_setup.c`, `nwm_events.c` and `nwm.c`, all 41 functions match.
 - Under `-ipa function` the same holds for zero: a `.bss` global or static defined with an initializer, `= 0`,
   `= NULL` or `= { 0 }`, is known to the functions below it, which reach it from one base (`ldr rN, =.bss; [rN, #off]`),
   where a tentative definition is loaded through a literal of its own. NitroWiFi's `SOCLi_CleanupCommandPacketQueue`
@@ -3333,10 +3388,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
   match (33 bytes to 0x2c off otherwise).
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
-  down to a multiple of 0x80, with the rest in the load's offset: in `card_common.c` a static at 0x584 is read as
-  `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read with no
-  offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584 into the
-  file's one `.bss`, is another sign that it opens a section of another file.
+  down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
+  read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read
+  with no offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584
+  into the file's one `.bss`, is another sign that it opens a section of another file.
 - Under `-ipa file`, objects defined between `#pragma section NAME begin` and `#pragma section NAME end` get a section
   each and are reached through literals of their own, as under `-ipa function`, while the block's functions still reach
   the file's default `.bss` from its pooled base. `#pragma define_section NAME "init" "uninit" "const" abs32 RWX` names
@@ -3380,6 +3435,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
   `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
   so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
+- A static that a function stores to at offsets from its own address (`ldr r1, =obj; str r3, [r1]; str r2,
+  [r1, #0x14]`, then the same `r1` passed to a call) is one that the function doesn't know. Under `-ipa file` every
+  object of the file is known and reached from its section's base rounded down to 0x80 (`[r1, #0x30]` for an object at
+  0x30), and a pointer local is folded back into that. NitroSystem G3D's `sbc.c` has it in PRJMAP's texture matrix, at
+  0x30 of its `.data`: the file matches under `-ipa function` (`file_flags`), with the matrix defined after the last
+  function. That flag writes the data out in runs, one before each function that follows it, each sorted by size: the
+  ROM's `.data` (8, 8, 16, 16, then 64, 72, 72, 128 bytes) is the two texture commands and the material and shape tables
+  at the top, and the matrix, the two billboard commands and the command table defined after the last function, the
+  billboards and the matrix declared ahead of their users. Within a run, statics of one size come out in definition
+  order and globals of one size in the reverse, and the tentative `.bss` arrays in the reverse of their definitions.
 - MWCC 2.0 sorts only that list: an object defined after the first function is written out, unsorted and in
   declaration order, with the next function, ahead of its string literals. So a ROM whose tables sort by size among the
   file's initialized statics had them above the first function, and data that sits between two functions' literals
@@ -3793,12 +3858,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 ## When nothing moves it
 
 - A Thumb `bx pc; nop` followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, right after a function that calls it,
-  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from
-  C and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
+  is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from C
+  and `mwldarm` adds the veneer after the calling function, one per target, which other callers in range share.
   `card_rom.c`, `card_pull_out.c` and `mi_init.c` call TwlSDK's code in the LTD autoload this way, and `pm.c`'s call to
-  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. The LTD autoload's
+  `func_02768298` shares `card_pull_out.c`'s veneer, as the original's does. NitroWiFi's code in the LTD autoload's
   `.ltdmain` gives each call its own veneer instead, as an overlay does (`docs/configs.md`), which the build gets by
-  linking the module's objects as an overlay group.
+  linking its objects as an overlay group; TwlSDK's `.ltdmain` objects share theirs across files, so
+  `os_interrupt_twl.c` reaches `OS_EnableIrqMask` through `mi_ndma_gxcommand.c`'s veneer, and a file whose calls use
+  another file's veneers can be complete only once that file is.
 
 - A Thumb function that ends 2 bytes past a word boundary is followed by the linker's `mov r8, r8` before an ARM veneer,
   a pad that belongs to no function: `mic.c`'s `MIC_StopLimitedSampling` is 0x16 bytes, then the pad and the veneer
@@ -3852,3 +3919,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the order of instructions differs and no source change moves it, try `tools/decomp/permuter_setup.py`, which
   prepares a function for [decomp-permuter](https://github.com/simonlindholm/decomp-permuter). Its result can point to
   a plain change: `GFL_BGSysAllocChar`'s registers only matched with its tile size, a `u8` from a call, in an `int`.
+
+- A TwlSDK function that resists respellings can be in the shape of cybervisi0n/libntr's reconstruction, which keeps
+  the SDK's inlines and blocks: six of the LTD autoload's matched once rebuilt so, in our own names. `mi_ndma.c`'s
+  `MIi_NDma` and `MIi_NDmaAsync` set the registers through one-line `static inline` writers inside
+  `if (size > 0) { ... }`, with the locals declared there; `mi_ndma_gxcommand.c`'s `MIi_NDmaFIFOCallback` calls the
+  transfer through a `static inline`, `MIi_NDmaAsyncImmediate`, which adds the channel's config, so the arguments
+  are computed in the inline's order; `card_hash.c`'s `CARD_SetUpCheckedReads` lays its buffer out through a
+  cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect` gets the sector
+  index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops by
+  `slot + banks`. Look the function up there before grinding registers.

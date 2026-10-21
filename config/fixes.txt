@@ -116,6 +116,7 @@
 . 0x0201a324 reloc_addend 0x258
 . 0x02020cec reloc_addend 9
 . 0x02020d24 reloc_addend 6
+. 0x020248c0 reloc_module overlay(27)
 . 0x02026708 reloc_addend 0x2
 . 0x02026710 reloc_addend 0x2
 . 0x0202678c reloc_addend 0x2
@@ -292,7 +293,8 @@
 . 0x0206716c reloc_addend 0x30
 . 0x02067170 reloc_addend 0x3c
 . 0x02067178 reloc_addend 0x4
-. 0x02067480 reloc_addend 0x40
+. 0x02067478 reloc_addend 0x1400
+. 0x02067480 reloc_addend 0x1440
 . 0x020678dc reloc_addend 0x4
 . 0x020678e0 reloc_addend 0x80
 . 0x020678e4 reloc_addend 0x4c
@@ -309,14 +311,15 @@
 . 0x02069700 reloc_addend 1
 . 0x02069704 reloc_addend 2
 . 0x02069708 reloc_addend 3
-. 0x0206a124 reloc_addend 0xc
-. 0x0206a128 reloc_addend 0x10
-. 0x0206a12c reloc_addend 0x14
-. 0x0206aa48 reloc_addend 0x4
-. 0x0206aa4c reloc_addend 0x8
-. 0x0206aa50 reloc_addend 0xc
-. 0x0206aa54 reloc_addend 0x10
-. 0x0206aa58 reloc_addend 0x14
+. 0x0206a124 reloc_addend 0xe0c
+. 0x0206a128 reloc_addend 0xe10
+. 0x0206a12c reloc_addend 0xe14
+. 0x0206aa44 reloc_addend 0xe00
+. 0x0206aa48 reloc_addend 0xe04
+. 0x0206aa4c reloc_addend 0xe08
+. 0x0206aa50 reloc_addend 0xe0c
+. 0x0206aa54 reloc_addend 0xe10
+. 0x0206aa58 reloc_addend 0xe14
 . 0x0206e1dc reloc_addend 0x10c8
 . 0x0206e228 reloc_addend 0x10e0
 . 0x0206e3fc reloc_addend 0x10c8
@@ -655,11 +658,13 @@
 . 0x02143c58 remove_symbol
 . 0x02143c64 remove_symbol
 . 0x0214409a remove_symbol
+. 0x02144a74 remove_symbol
 . 0x02144a78 remove_symbol
 . 0x02144a7c remove_symbol
 . 0x02144a80 remove_symbol
 . 0x02144a84 remove_symbol
 . 0x02144a88 remove_symbol
+. 0x02145074 remove_symbol
 . 0x021450b4 remove_symbol
 . 0x0214697c add_data NNS_G3dFlagUseFastDma
 . 0x02149878 add_data sCaptureReserved
@@ -668,7 +673,7 @@
 . 0x0214b3d0 remove_symbol
 . 0x0214b8c0 remove_symbol
 . 0x0214b940 remove_symbol
-. 0x0214b980 section_end lib/nitro/src/card/card_common.c:.bss
+. 0x0214b960 section_end lib/nitro/src/card/card_common.c:.bss
 . 0x0214b980 add_section lib/nitro/src/card/card_backup.c:.bss:0x100
 . 0x0214ba84 add_data sRomReader
 . 0x0214ba88 add_data sInvalidateIC
@@ -757,10 +762,7 @@ ltd_autoload_0 0x027017d8 reloc_addend 0x1000
 ltd_autoload_0 0x02701900 reloc_addend 0x1000
 ltd_autoload_0 0x027019b0 reloc_addend 0x1000
 ltd_autoload_0 0x02701fd0 reloc_addend 0x1000
-ltd_autoload_0 0x027028ac reloc_addend 0x4
-ltd_autoload_0 0x02702a6c reloc_addend 0x14
-ltd_autoload_0 0x02702a84 reloc_addend 0x14
-ltd_autoload_0 0x02702bf4 reloc_addend 0x4
+ltd_autoload_0 0x02702a98 section_start lib/twl/src/nwm/nwm.c:.text
 ltd_autoload_0 0x027041e4 reloc_addend 0x4c
 ltd_autoload_0 0x02704254 reloc_addend 0x4c
 ltd_autoload_0 0x0270430c reloc_addend 0x48
@@ -781,10 +783,10 @@ ltd_autoload_0 0x027675cc reloc_addend 0x500
 ltd_autoload_0 0x02767674 add_data sDigestKey
 ltd_autoload_0 0x027676ae remove_symbol
 ltd_autoload_0 0x02767bec add_reloc load,ltd_autoload(0),0x02767674
-ltd_autoload_0 0x02768614 add_data sGetWramBankMasterFuncs
-ltd_autoload_0 0x02768620 add_data sGetWramMapStartFuncs
-ltd_autoload_0 0x0276862c add_data sSetWramBankEnableFuncs
-ltd_autoload_0 0x02768638 add_data sSetWramBankMasterFuncs
+ltd_autoload_0 0x02768614 add_data sGetWramBankOwnerFuncs
+ltd_autoload_0 0x02768620 add_data sGetWramBaseFuncs
+ltd_autoload_0 0x0276862c add_data sEnableWramBankFuncs
+ltd_autoload_0 0x02768638 add_data sGiveWramBankFuncs
 ltd_autoload_0 0x027686c4 add_reloc load,ltd_autoload(0),0x02768638
 ltd_autoload_0 0x0276873c add_reloc load,ltd_autoload(0),0x0276862c
 ltd_autoload_0 0x02768780 add_reloc load,ltd_autoload(0),0x02768614
@@ -801,8 +803,7 @@ ltd_autoload_0 0x0276c10c remove_symbol
 ltd_autoload_0 0x0276c230 remove_symbol
 ltd_autoload_0 0x0276c2c0 remove_symbol
 ltd_autoload_0 0x0276c2e0 remove_symbol
-ltd_autoload_0 0x0276c2ec remove_symbol
-ltd_autoload_0 0x0276c2fc remove_symbol
+ltd_autoload_0 0x0276c30c section_start lib/twl/src/nwm/nwm.c:.bss
 ltd_autoload_0 0x0276c560 remove_symbol
 ltd_autoload_0 0x0276c568 remove_symbol
 ltd_autoload_0 0x0276c56c remove_symbol

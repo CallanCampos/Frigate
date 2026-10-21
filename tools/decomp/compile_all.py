@@ -20,9 +20,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from configure import (GENERATED_INCLUDE_DIR, INCLUDE_DIRS, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
-                       VERSIONS, download_tools, source_compiler, mwcc_command)
+                       VERSIONS, download_tools, overlay_digest_includes, source_compiler, mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.build import rom_blob  # noqa: E402
+from tools.build import overlay_digests, rom_blob  # noqa: E402
 from tools.data.gen_constants import generate  # noqa: E402
 from tools.text import pms_words, text_ids  # noqa: E402
 
@@ -68,8 +68,8 @@ def write_header(header: Path, text: str):
 
 def generate_constants():
     """Writes the headers that ninja generates, since the sources include them: the constants of generated/,
-    each message file's message IDs, the easy chat words and the embedded binaries, which are zeros without an
-    extracted ROM."""
+    each message file's message IDs, the easy chat words, the embedded binaries and the overlay digests, which are
+    zeros without an extracted ROM."""
     out_dir = ROOT / GENERATED_INCLUDE_DIR
     for source in sorted((ROOT / "generated").glob("*.txt")):
         write_header(out_dir / "constants" / source.with_suffix(".h").name, generate(source))
@@ -87,6 +87,21 @@ def generate_constants():
         data = rom_blob.blob(ROOT / "extract" / version / module,
                              ROOT / "config" / version / "arm9" / config_dir / "symbols.txt", name, allow_missing=True)
         write_header(out_dir / include, rom_blob.initializer(data))
+    for version in VERSIONS:
+        # From the version's base ROM, as ninja computes them. Without one, zero digests, one for each overlay of the
+        # config, which never replace those that ninja wrote
+        table_include, overlays_include = (out_dir / include for include in overlay_digest_includes(version))
+        rom = ROOT / "orig" / f"baserom_{version}.nds"
+        key = ROOT / "extract" / version / "arm9" / "hmac_sha1_key.bin"
+        if rom.exists() and key.exists():
+            table, overlays = overlay_digests.digests(rom.read_bytes(), key.read_bytes())
+        elif overlays_include.exists():
+            continue
+        else:
+            count = sum(1 for _ in (ROOT / "config" / version / "arm9" / "overlays").iterdir())
+            table, overlays = bytes(overlay_digests.DIGEST_SIZE), [bytes(overlay_digests.DIGEST_SIZE)] * count
+        write_header(table_include, overlay_digests.initializer(table))
+        write_header(overlays_include, "".join(overlay_digests.initializer(digest) for digest in overlays))
 
 
 def main():

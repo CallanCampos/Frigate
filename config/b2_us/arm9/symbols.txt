@@ -8868,7 +8868,7 @@ data_0209bbec kind:data(any) addr:0x0209bbec
 data_0209bbf0 kind:data(any) addr:0x0209bbf0
 data_0209bbf4 kind:data(any) addr:0x0209bbf4
 data_0209bbf8 kind:data(any) addr:0x0209bbf8
-data_0209bc20 kind:data(any) addr:0x0209bc20
+OverlayTableDigests kind:data(any) addr:0x0209bc20
 SDK_OVERLAY_DIGEST kind:data(any) addr:0x0209bc48
 SDK_OVERLAY_DIGEST_END kind:data(any) addr:0x0209d728
 g_MainMemoryPriorityBlocked kind:bss addr:0x0209d740
@@ -9144,9 +9144,7 @@ data_021439f8 kind:bss addr:0x021439f8
 pCurrentInstance_ kind:bss addr:0x02143a08
 NNS_G3dGlb kind:bss addr:0x02143a0c
 g_NNSG3DModelRenderer kind:bss addr:0x02143c70
-g_NNSMaterials kind:bss addr:0x02143c74
-g_NNSG3DJointScales kind:bss addr:0x02144a74
-g_NNSG3DIBPMatrices kind:bss addr:0x02145074
+g_NNSG3DRenderCache kind:bss addr:0x02143c74
 sGeBuffer kind:bss addr:0x02146974
 sDmaBusy kind:bss addr:0x02146978
 NNS_G3dFlagUseFastDma kind:bss addr:0x0214697c

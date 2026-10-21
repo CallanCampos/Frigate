@@ -23,10 +23,11 @@ static void hmac_generic(void *out, const void *data, u32 dataSize, const void *
 
 // Runs sha1_block with words 6 and 14 of the block cleared, and restores them after
 static void sha1_block_masked(MATHSHA1Context *context) {
+    u32 word6, word14;
     u32 *words = context->block.words;
-    u32 word6 = words[6];
-    u32 word14 = words[14];
 
+    word6 = words[6];
+    word14 = words[14];
     words[6] = 0;
     words[14] = 0;
     sha1_block(context);

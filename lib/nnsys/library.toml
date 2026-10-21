@@ -25,6 +25,9 @@ flags = [
 # Files built with other flags, each replacing the library's flag of the same option. The capture is built without
 # -ipa file: its code reaches each object through its own symbol (the struct as well as the flag and the queue), and
 # its .bss keeps a word and a message buffer that no surviving code uses, both of which only function-level analysis
-# gives. With -ipa file every object is reached from the .bss base and the unused ones are dropped
+# gives. With -ipa file every object is reached from the .bss base and the unused ones are dropped. G3D's sbc.c is
+# built without it too: PRJMAP stores to its texture matrix through the matrix's own address, which -ipa file never
+# gives a known object, and its .bss is the reverse of its definitions, as without -ipa file
 [file_flags]
 "snd/snd_capture.c" = ["-ipa function"]
+"g3d/sbc.c" = ["-ipa function"]

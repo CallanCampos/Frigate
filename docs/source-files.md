@@ -99,22 +99,22 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_rap.c` | `0x021505d4`–`0x02152078` | 77 | partial | string at `0x021852d0` |
 | `dwc_rapcommon.c` | `0x02152078`–`0x0215251c` | 14 | complete | string at `0x021853f0` |
 | `cps.c` | `0x0215251c`–`0x02155e34` | 113 | partial | descriptive |
-| `socl_startup.c` | `0x02155e34`–`0x02156000` | 6 | partial | descriptive |
-| `socl_command.c` | `0x02156000`–`0x02156200` | 13 | partial | descriptive |
+| `socl_startup.c` | `0x02155e34`–`0x02156000` | 6 | complete | descriptive |
+| `socl_command.c` | `0x02156000`–`0x02156200` | 13 | complete | descriptive |
 | `socl_create.c` | `0x02156200`–`0x021564cc` | 8 | complete | descriptive |
-| `socl_bind.c` | `0x021564cc`–`0x021566d8` | 4 | partial | descriptive |
-| `socl_read.c` | `0x021566d8`–`0x02156d8c` | 13 | partial | descriptive |
-| `socl_write.c` | `0x02156d8c`–`0x0215724c` | 8 | partial | descriptive |
-| `socl_shutdown.c` | `0x0215724c`–`0x021572f4` | 2 | partial | descriptive |
+| `socl_bind.c` | `0x021564cc`–`0x021566d8` | 4 | complete | descriptive |
+| `socl_read.c` | `0x021566d8`–`0x02156d8c` | 13 | complete | descriptive |
+| `socl_write.c` | `0x02156d8c`–`0x0215724c` | 8 | complete | descriptive |
+| `socl_shutdown.c` | `0x0215724c`–`0x021572f4` | 2 | complete | descriptive |
 | `socl_close.c` | `0x021572f4`–`0x02157620` | 7 | complete | descriptive |
 | `socl_cleanup.c` | `0x02157620`–`0x02157894` | 8 | complete | descriptive |
-| `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | partial | descriptive |
+| `socl_poll.c` | `0x02157894`–`0x02157978` | 2 | complete | descriptive |
 | `socl_misc.c` | `0x02157978`–`0x02157980` | 1 | complete | descriptive |
 | `socl_list.c` | `0x02157980`–`0x02157bd0` | 13 | partial | descriptive |
 | `soc.c` | `0x02157bd0`–`0x02158174` | 23 | partial | descriptive |
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
-| `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | partial | descriptive |
+| `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | complete | descriptive |
 | `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | partial | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
@@ -132,7 +132,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
 | `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
 | `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
-| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | partial | descriptive |
+| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | complete | descriptive |
 | `gs_screen_print.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
@@ -1077,7 +1077,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | partial | descriptive |
+| `gimmick_roller_coaster.c` | `0x021eec80`–`0x021f0194` | 27 | complete | descriptive |
 
 ### Overlay 103
 
@@ -1490,7 +1490,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `encounter_effect_ripple.c` | `0x021f5da0`–`0x021f6330` | 8 | partial | descriptive |
+| `encounter_effect_ripple.c` | `0x021f5da0`–`0x021f6330` | 8 | complete | descriptive |
 
 ### Overlay 152
 
@@ -1596,9 +1596,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `btl_main.c` | `0x021998c0`–`0x0219e3cc` | 231 | partial | string at `0x021dae80` |
+| `btl_main.c` | `0x021998c0`–`0x0219e3cc` | 231 | complete | string at `0x021dae80` |
 | `btl_server.c` | `0x0219e3cc`–`0x0219f390` | 55 | complete | string at `0x021dae8c` |
-| `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | partial | string at `0x021dae9c` |
+| `btl_server_flow.c` | `0x0219f390`–`0x021ae32c` | 997 | complete | string at `0x021dae9c` |
 | `btl_server_flow_sub.c` | `0x021ae32c`–`0x021b083c` | 151 | complete | descriptive |
 | `btl_handler_work.c` | `0x021b083c`–`0x021b0a1c` | 11 | complete | descriptive |
 | `btl_server_cmd.c` | `0x021b0a1c`–`0x021b1674` | 19 | partial | descriptive |
@@ -1656,7 +1656,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `condition_effects.c` | `0x0689b938`–`0x0689ca10` | 263 | complete | descriptive |
 | `btl_tables.c` | `0x0689ca10`–`0x0689cc20` | 27 | complete | descriptive |
 | `btl_poke_select.c` | `0x0689cc20`–`0x0689ccc4` | 10 | complete | descriptive |
-| `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | partial | descriptive |
+| `btl_monset.c` | `0x0689ccc4`–`0x0689d178` | 38 | complete | descriptive |
 | `btl_wazarec.c` | `0x0689d178`–`0x0689d284` | 7 | complete | descriptive |
 | `btl_faintrec.c` | `0x0689d284`–`0x0689d384` | 9 | complete | descriptive |
 | `btl_pospoke.c` | `0x0689d384`–`0x0689d790` | 44 | complete | descriptive |
@@ -1696,7 +1696,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `wifi_p2pmatchroom.c` | `0x0219ce80`–`0x0219e0ac` | 88 | complete | descriptive |
 | `wifi_p2pmatch_net.c` | `0x0219e0ac`–`0x0219e0f0` | 7 | complete | descriptive |
 | `wifi_p2pmatchroom_map.c` | `0x0219e0f0`–`0x0219e108` | 2 | complete | descriptive |
-| `wifi_p2pmatch.c` | `0x0219e108`–`0x021a61c0` | 332 | partial | descriptive |
+| `wifi_p2pmatch.c` | `0x0219e108`–`0x021a61c0` | 332 | complete | descriptive |
 | `wifi_status.c` | `0x021a61c0`–`0x021a6268` | 13 | complete | descriptive |
 
 ### Overlay 174
@@ -1786,7 +1786,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_aoss.c` | `0x021a49d0`–`0x021a6c1c` | 71 | partial | descriptive |
 | `dwc_aoss_ap.c` | `0x021a6c1c`–`0x021a71fc` | 12 | partial | descriptive |
 | `dwc_wcm.c` | `0x021a71fc`–`0x021a7858` | 9 | complete | descriptive |
-| `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | partial | descriptive |
+| `dwc_util_ui_effect.c` | `0x021ab040`–`0x021ab17c` | 3 | complete | descriptive |
 | `dwc_util_ui_object.c` | `0x021ab17c`–`0x021ab588` | 15 | complete | descriptive |
 | `dwc_util_screen.c` | `0x021ab588`–`0x021ab63c` | 3 | complete | descriptive |
 | `dwc_util_gfx_resource.c` | `0x021ab63c`–`0x021ab7c8` | 7 | complete | descriptive |
@@ -1798,7 +1798,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_aoss_session.c` | `0x021ada94`–`0x021adbc0` | 5 | complete | descriptive |
 | `dwc_util_main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
 | `dwc_util_msg_resource.c` | `0x021ae084`–`0x021ae134` | 6 | complete | descriptive |
-| `dwc_util_move.c` | `0x021ae134`–`0x021ae3d8` | 8 | partial | descriptive |
+| `dwc_util_move.c` | `0x021ae134`–`0x021ae3d8` | 8 | complete | descriptive |
 | `dwc_util_connection.c` | `0x021ae3d8`–`0x021ae4f4` | 7 | complete | descriptive |
 | `dwc_util_main_menu.c` | `0x021ae4f4`–`0x021aeafc` | 19 | partial | descriptive |
 | `dwc_util_info_menu.c` | `0x021aeafc`–`0x021af25c` | 39 | complete | descriptive |
@@ -2267,19 +2267,19 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | --- | --- | --- | --- | --- |
 | `camera_system.c` | `0x021998c0`–`0x0219a350` | 108 | complete | string at `0x021b25a0` |
 | `ima_adpcm.c` | `0x0219a350`–`0x0219a550` | 8 | complete | descriptive |
-| `draw_system.c` | `0x0219a550`–`0x0219a850` | 12 | partial | string at `0x021b25b0` |
-| `ctvt_camera.c` | `0x0219a850`–`0x0219b5b8` | 29 | partial | string at `0x021b25c0` |
+| `draw_system.c` | `0x0219a550`–`0x0219a850` | 12 | complete | string at `0x021b25b0` |
+| `ctvt_camera.c` | `0x0219a850`–`0x0219b5b8` | 29 | complete | string at `0x021b25c0` |
 | `ctvt_comm.c` | `0x0219b5b8`–`0x0219cd74` | 69 | complete | string at `0x021b25f8` |
 | `ctvt_talk.c` | `0x0219cd74`–`0x0219ef4c` | 40 | partial | string at `0x021b2604` |
 | `ctvt_mic.c` | `0x0219ef4c`–`0x0219f234` | 24 | complete | string at `0x021b261c` |
 | `ctvt_draw.c` | `0x0219f234`–`0x021a0ac4` | 15 | complete | string at `0x021b264c` |
-| `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | partial | string at `0x021b2658` |
+| `ctvt_call.c` | `0x021a0ac4`–`0x021a22bc` | 16 | complete | string at `0x021b2658` |
 | `ctvt_game.c` | `0x021a22bc`–`0x021a7620` | 93 | complete | string at `0x021b2674` |
-| `ctvt_game_target.c` | `0x021a7620`–`0x021a78d0` | 6 | partial | descriptive |
+| `ctvt_game_target.c` | `0x021a7620`–`0x021a78d0` | 6 | complete | descriptive |
 | `ctvt_game_balloon.c` | `0x021a78d0`–`0x021a8090` | 12 | complete | string at `0x021b2680` |
-| `ctvt_game_cam.c` | `0x021a8090`–`0x021a9704` | 67 | partial | string at `0x021b2694` |
+| `ctvt_game_cam.c` | `0x021a8090`–`0x021a9704` | 67 | complete | string at `0x021b2694` |
 | `ctvt_game_cam_graphic.c` | `0x021a9704`–`0x021a98d4` | 8 | complete | string at `0x021b26a4` |
-| `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | partial | string at `0x021b26c8` |
+| `comm_tvt_sys.c` | `0x021a98d4`–`0x021aafdc` | 75 | complete | string at `0x021b26c8` |
 | `ssp_jpegdec.c` | `0x021aafdc`–`0x021ac664` | 12 | partial | descriptive |
 | `ssp_exifdec.c` | `0x021ac664`–`0x021acc64` | 4 | complete | descriptive |
 | `ssp_jpegenc.c` | `0x021acc64`–`0x021ae378` | 21 | partial | descriptive |
@@ -2454,7 +2454,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `br_btn_data.c` | `0x021f23b8`–`0x021f266c` | 8 | complete | string at `0x021f7cd8` |
 | `br_res.c` | `0x021f266c`–`0x021f31b8` | 20 | complete | string at `0x021f7d50` |
 | `br_graphic.c` | `0x021f31b8`–`0x021f34a0` | 16 | complete | string at `0x021f7e10` |
-| `br_util.c` | `0x021f34a0`–`0x021f54d8` | 63 | partial | string at `0x021f7e20` |
+| `br_util.c` | `0x021f34a0`–`0x021f54d8` | 63 | complete | string at `0x021f7e20` |
 | `br_fade.c` | `0x021f54d8`–`0x021f5b68` | 17 | complete | string at `0x021f7eb0` |
 | `br_sidebar.c` | `0x021f5b68`–`0x021f6224` | 18 | complete | string at `0x021f7ebc` |
 | `br_net.c` | `0x021f6224`–`0x021f6a1c` | 37 | complete | string at `0x021f7ed4` |

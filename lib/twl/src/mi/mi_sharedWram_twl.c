@@ -1,9 +1,10 @@
 // TwlSDK's shared WRAM manager, the DSi part of mi_sharedWram.c in the LTD autoload (ARM9 main has the NITRO part):
 // the WRAM A, B and C banks' registers, and the bookkeeping of which processor has each bank, or has reserved it,
-// which the ARM7 asks for through the PXI FIFO. The register functions and the public functions have TwlSDK's names as
-// recalled, not shown by the code; the cores of the requests, the PXI handling and the locks are named for what they
-// do. The ARM9's own requests besides the slot allocation and the release are not linked. The file is built with
-// -ipa function (file_flags in lib/twl/library.toml): the original reaches each static through a literal of its own.
+// which the ARM7 asks for through the PXI FIFO. The ROM names none of it: the public functions that ARM9 main declared
+// before keep those names, and the register functions, the cores of the requests, the PXI handling and the locks are
+// named for what they do. The ARM9's own requests besides the slot allocation and the release are not linked. The
+// file is built with -ipa function (file_flags in lib/twl/library.toml): the original reaches each static through a
+// literal of its own.
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 #include "nitro/svc.h"
@@ -42,12 +43,12 @@
 // The lock word that the two processors share for the manager
 #define MI_WRAM_LOCK_WORD ((OSLockWord *)0x02fff680)
 
-static u8 MIi_GetWramBankCnt_A(int bank);
-static u8 MIi_GetWramBankCnt_B(int bank);
-static u8 MIi_GetWramBankCnt_C(int bank);
-static u32 MIi_GetWramBankAddr_A(int bank);
-static u32 MIi_GetWramBankAddr_B(int bank);
-static u32 MIi_GetWramBankAddr_C(int bank);
+static u8 MIi_ReadWramBankControl_A(int bank);
+static u8 MIi_ReadWramBankControl_B(int bank);
+static u8 MIi_ReadWramBankControl_C(int bank);
+static u32 MIi_WramBankToAddress_A(int bank);
+static u32 MIi_WramBankToAddress_B(int bank);
+static u32 MIi_WramBankToAddress_C(int bank);
 static void MIi_WramPxiCallback(u32 tag, u32 data, BOOL err);
 static u32 MIi_AllocWramCore(MIWram wram, int count, MIWramProc proc);
 static u32 MIi_AllocWramSlotCore(MIWram wram, int slot, int count, MIWramProc proc);
@@ -81,117 +82,117 @@ static BOOL sWramManagerInitialized;
 #pragma section LTDMAIN begin
 
 // The order of these definitions sets the order of the tables in the object
-static void (*const sSetWramBankEnableFuncs[])(int bank, BOOL enable) = {
-    MI_SetWramBankEnable_A,
-    MI_SetWramBankEnable_B,
-    MI_SetWramBankEnable_C,
+static void (*const sEnableWramBankFuncs[])(int bank, BOOL enable) = {
+    MI_EnableWramBank_A,
+    MI_EnableWramBank_B,
+    MI_EnableWramBank_C,
 };
-static void *(*const sGetWramMapStartFuncs[])(void) = {
-    MI_GetWramMapStart_A,
-    MI_GetWramMapStart_B,
-    MI_GetWramMapStart_C,
+static void *(*const sGetWramBaseFuncs[])(void) = {
+    MI_GetWramBase_A,
+    MI_GetWramBase_B,
+    MI_GetWramBase_C,
 };
-static MIWramProc (*const sGetWramBankMasterFuncs[])(int bank) = {
-    MI_GetWramBankMaster_A,
-    MI_GetWramBankMaster_B,
-    MI_GetWramBankMaster_C,
+static MIWramProc (*const sGetWramBankOwnerFuncs[])(int bank) = {
+    MI_GetWramBankOwner_A,
+    MI_GetWramBankOwner_B,
+    MI_GetWramBankOwner_C,
 };
-static void (*const sSetWramBankMasterFuncs[])(int bank, MIWramProc proc) = {
-    MI_SetWramBankMaster_A,
-    MI_SetWramBankMaster_B,
-    MI_SetWramBankMaster_C,
+static void (*const sGiveWramBankFuncs[])(int bank, MIWramProc proc) = {
+    MI_GiveWramBank_A,
+    MI_GiveWramBank_B,
+    MI_GiveWramBank_C,
 };
 
-static u8 MIi_GetWramBankCnt_A(int bank) {
+static u8 MIi_ReadWramBankControl_A(int bank) {
     return reg_MBK_A[bank];
 }
 
-static u8 MIi_GetWramBankCnt_B(int bank) {
+static u8 MIi_ReadWramBankControl_B(int bank) {
     return reg_MBK_B[bank];
 }
 
-static u8 MIi_GetWramBankCnt_C(int bank) {
+static u8 MIi_ReadWramBankControl_C(int bank) {
     return reg_MBK_C[bank];
 }
 
-void MI_SetWramBankMaster_A(int bank, MIWramProc proc) {
+void MI_GiveWramBank_A(int bank, MIWramProc proc) {
     reg_MBK_A[bank] = (reg_MBK_A[bank] & ~1) | proc;
 }
 
-void MI_SetWramBankMaster_B(int bank, MIWramProc proc) {
+void MI_GiveWramBank_B(int bank, MIWramProc proc) {
     reg_MBK_B[bank] = (reg_MBK_B[bank] & ~3) | proc;
 }
 
-void MI_SetWramBankMaster_C(int bank, MIWramProc proc) {
+void MI_GiveWramBank_C(int bank, MIWramProc proc) {
     reg_MBK_C[bank] = (reg_MBK_C[bank] & ~3) | proc;
 }
 
-void MI_SetWramBankMaster(MIWram wram, int bank, MIWramProc proc) {
-    sSetWramBankMasterFuncs[wram](bank, proc);
+void MI_GiveWramBank(MIWram wram, int bank, MIWramProc proc) {
+    sGiveWramBankFuncs[wram](bank, proc);
 }
 
-void MI_SetWramBankEnable_A(int bank, BOOL enable) {
+void MI_EnableWramBank_A(int bank, BOOL enable) {
     vu8 *cnt = &reg_MBK_A[bank];
     *cnt = (*cnt & ~MI_WRAM_BANK_ENABLE) | (enable ? MI_WRAM_BANK_ENABLE : 0);
 }
 
-void MI_SetWramBankEnable_B(int bank, BOOL enable) {
+void MI_EnableWramBank_B(int bank, BOOL enable) {
     vu8 *cnt = &reg_MBK_B[bank];
     *cnt = (*cnt & ~MI_WRAM_BANK_ENABLE) | (enable ? MI_WRAM_BANK_ENABLE : 0);
 }
 
-void MI_SetWramBankEnable_C(int bank, BOOL enable) {
+void MI_EnableWramBank_C(int bank, BOOL enable) {
     vu8 *cnt = &reg_MBK_C[bank];
     *cnt = (*cnt & ~MI_WRAM_BANK_ENABLE) | (enable ? MI_WRAM_BANK_ENABLE : 0);
 }
 
-void MI_SetWramBankEnable(MIWram wram, int bank, BOOL enable) {
-    sSetWramBankEnableFuncs[wram](bank, enable);
+void MI_EnableWramBank(MIWram wram, int bank, BOOL enable) {
+    sEnableWramBankFuncs[wram](bank, enable);
 }
 
-MIWramProc MI_GetWramBankMaster_A(int bank) {
+MIWramProc MI_GetWramBankOwner_A(int bank) {
     return reg_MBK_A[bank] & 1;
 }
 
-MIWramProc MI_GetWramBankMaster_B(int bank) {
+MIWramProc MI_GetWramBankOwner_B(int bank) {
     return reg_MBK_B[bank] & 3;
 }
 
-MIWramProc MI_GetWramBankMaster_C(int bank) {
+MIWramProc MI_GetWramBankOwner_C(int bank) {
     return reg_MBK_C[bank] & 3;
 }
 
-MIWramProc MI_GetWramBankMaster(MIWram wram, int bank) {
-    return sGetWramBankMasterFuncs[wram](bank);
+MIWramProc MI_GetWramBankOwner(MIWram wram, int bank) {
+    return sGetWramBankOwnerFuncs[wram](bank);
 }
 
-void *MI_GetWramMapStart_A(void) {
+void *MI_GetWramBase_A(void) {
     return (void *)((((reg_MI_MBK6 & 0xff0) >> 4) << 16) + HW_WRAM_AREA);
 }
 
-void *MI_GetWramMapStart_B(void) {
+void *MI_GetWramBase_B(void) {
     return (void *)((((reg_MI_MBK7 & 0xff8) >> 3) << 15) + HW_WRAM_AREA);
 }
 
-void *MI_GetWramMapStart_C(void) {
+void *MI_GetWramBase_C(void) {
     return (void *)((((reg_MI_MBK8 & 0xff8) >> 3) << 15) + HW_WRAM_AREA);
 }
 
-void *MI_GetWramMapStart(MIWram wram) {
-    return sGetWramMapStartFuncs[wram]();
+void *MI_GetWramBase(MIWram wram) {
+    return sGetWramBaseFuncs[wram]();
 }
 
 // The address of a bank: WRAM A's are 0x10000 bytes, B's and C's 0x8000
-static u32 MIi_GetWramBankAddr_A(int bank) {
-    return (bank << 16) + (u32)MI_GetWramMapStart_A();
+static u32 MIi_WramBankToAddress_A(int bank) {
+    return (bank << 16) + (u32)MI_GetWramBase_A();
 }
 
-static u32 MIi_GetWramBankAddr_B(int bank) {
-    return (bank << 15) + (u32)MI_GetWramMapStart_B();
+static u32 MIi_WramBankToAddress_B(int bank) {
+    return (bank << 15) + (u32)MI_GetWramBase_B();
 }
 
-static u32 MIi_GetWramBankAddr_C(int bank) {
-    return (bank << 15) + (u32)MI_GetWramMapStart_C();
+static u32 MIi_WramBankToAddress_C(int bank) {
+    return (bank << 15) + (u32)MI_GetWramBase_C();
 }
 
 void MIi_InitWramManagerCore(void) {
@@ -203,7 +204,7 @@ void MIi_InitWramManagerCore(void) {
     sWramManagerInitialized = TRUE;
 
     for (i = 0; i < 4; i++) {
-        switch (MIi_GetWramBankCnt_A(i) & 1) {
+        switch (MIi_ReadWramBankControl_A(i) & 1) {
         case MI_WRAM_ARM9:
             sWramState[MI_WRAM_A][i] = (sWramState[MI_WRAM_A][i] & ~MI_WRAM_STATE_RESERVE_MASK) |
                                        (MI_WRAM_ARM9 << MI_WRAM_STATE_RESERVE_SHIFT);
@@ -217,7 +218,7 @@ void MIi_InitWramManagerCore(void) {
         }
     }
     for (i = 0; i < 8; i++) {
-        switch (MIi_GetWramBankCnt_B(i) & 3) {
+        switch (MIi_ReadWramBankControl_B(i) & 3) {
         case MI_WRAM_ARM9:
             sWramState[MI_WRAM_B][i] = (sWramState[MI_WRAM_B][i] & ~MI_WRAM_STATE_RESERVE_MASK) |
                                        (MI_WRAM_ARM9 << MI_WRAM_STATE_RESERVE_SHIFT);
@@ -236,7 +237,7 @@ void MIi_InitWramManagerCore(void) {
         }
     }
     for (i = 0; i < 8; i++) {
-        switch (MIi_GetWramBankCnt_C(i) & 3) {
+        switch (MIi_ReadWramBankControl_C(i) & 3) {
         case MI_WRAM_ARM9:
             sWramState[MI_WRAM_C][i] = (sWramState[MI_WRAM_C][i] & ~MI_WRAM_STATE_RESERVE_MASK) |
                                        (MI_WRAM_ARM9 << MI_WRAM_STATE_RESERVE_SHIFT);
@@ -351,15 +352,15 @@ static u32 MIi_AllocWramCore(MIWram wram, int count, MIWramProc proc) {
 
     for (i = 0; i < count; i++) {
         sWramState[wram][start + i] = (sWramState[wram][start + i] & ~MI_WRAM_STATE_PROC_MASK) | proc;
-        MI_SetWramBankMaster(wram, start + i, proc);
-        MI_SetWramBankEnable(wram, start + i, TRUE);
+        MI_GiveWramBank(wram, start + i, proc);
+        MI_EnableWramBank(wram, start + i, TRUE);
     }
     if (wram == MI_WRAM_A) {
-        return MIi_GetWramBankAddr_A(start);
+        return MIi_WramBankToAddress_A(start);
     } else if (wram == MI_WRAM_B) {
-        return MIi_GetWramBankAddr_B(start);
+        return MIi_WramBankToAddress_B(start);
     } else if (wram == MI_WRAM_C) {
-        return MIi_GetWramBankAddr_C(start);
+        return MIi_WramBankToAddress_C(start);
     }
     return 0;
 }
@@ -391,15 +392,15 @@ static u32 MIi_AllocWramSlotCore(MIWram wram, int slot, int count, MIWramProc pr
 
     for (i = slot; i < end; i++) {
         sWramState[wram][i] = (sWramState[wram][i] & ~MI_WRAM_STATE_PROC_MASK) | proc;
-        MI_SetWramBankMaster(wram, i, proc);
-        MI_SetWramBankEnable(wram, i, TRUE);
+        MI_GiveWramBank(wram, i, proc);
+        MI_EnableWramBank(wram, i, TRUE);
     }
     if (wram == MI_WRAM_A) {
-        return MIi_GetWramBankAddr_A(slot);
+        return MIi_WramBankToAddress_A(slot);
     } else if (wram == MI_WRAM_B) {
-        return MIi_GetWramBankAddr_B(slot);
+        return MIi_WramBankToAddress_B(slot);
     } else if (wram == MI_WRAM_C) {
-        return MIi_GetWramBankAddr_C(slot);
+        return MIi_WramBankToAddress_C(slot);
     }
     return 0;
 }
@@ -422,8 +423,8 @@ static int MIi_FreeWramCore(MIWram wram, MIWramProc proc) {
         u16 state = sWramState[wram][i];
         if ((state & MI_WRAM_STATE_PROC_MASK) == proc) {
             sWramState[wram][i] = (sWramState[wram][i] & ~MI_WRAM_STATE_PROC_MASK) | MI_WRAM_FREE;
-            MI_SetWramBankMaster(wram, i, MI_WRAM_ARM7);
-            MI_SetWramBankEnable(wram, i, FALSE);
+            MI_GiveWramBank(wram, i, MI_WRAM_ARM7);
+            MI_EnableWramBank(wram, i, FALSE);
             freed++;
         }
     }
@@ -452,8 +453,8 @@ static int MIi_FreeWramSlotCore(MIWram wram, int slot, int count, MIWramProc pro
         u16 state = sWramState[wram][slot];
         if ((state & MI_WRAM_STATE_PROC_MASK) == proc) {
             sWramState[wram][slot] = (sWramState[wram][slot] & ~MI_WRAM_STATE_PROC_MASK) | MI_WRAM_FREE;
-            MI_SetWramBankMaster(wram, slot, MI_WRAM_ARM7);
-            MI_SetWramBankEnable(wram, slot, FALSE);
+            MI_GiveWramBank(wram, slot, MI_WRAM_ARM7);
+            MI_EnableWramBank(wram, slot, FALSE);
             freed++;
         }
     }
@@ -470,8 +471,8 @@ static int MIi_SwitchWramCore(MIWram wram, MIWramProc from, MIWramProc to) {
         u16 state = sWramState[wram][i];
         if ((state & MI_WRAM_STATE_PROC_MASK) == from) {
             sWramState[wram][i] = (sWramState[wram][i] & ~MI_WRAM_STATE_PROC_MASK) | to;
-            MI_SetWramBankMaster(wram, i, to);
-            MI_SetWramBankEnable(wram, i, TRUE);
+            MI_GiveWramBank(wram, i, to);
+            MI_EnableWramBank(wram, i, TRUE);
             switched++;
         }
     }
@@ -492,8 +493,8 @@ static int MIi_SwitchWramSlotCore(MIWram wram, int slot, int count, MIWramProc f
         u16 state = sWramState[wram][slot];
         if ((state & MI_WRAM_STATE_PROC_MASK) == from) {
             sWramState[wram][slot] = (sWramState[wram][slot] & ~MI_WRAM_STATE_PROC_MASK) | to;
-            MI_SetWramBankMaster(wram, slot, to);
-            MI_SetWramBankEnable(wram, slot, TRUE);
+            MI_GiveWramBank(wram, slot, to);
+            MI_EnableWramBank(wram, slot, TRUE);
             switched++;
         }
     }
@@ -536,25 +537,21 @@ static u32 MIi_ReserveWramCore(MIWram wram, int count, MIWramProc proc) {
             (sWramState[wram][start + i] & ~MI_WRAM_STATE_RESERVE_MASK) | (proc << MI_WRAM_STATE_RESERVE_SHIFT);
     }
     if (wram == MI_WRAM_A) {
-        return MIi_GetWramBankAddr_A(start);
+        return MIi_WramBankToAddress_A(start);
     } else if (wram == MI_WRAM_B) {
-        return MIi_GetWramBankAddr_B(start);
+        return MIi_WramBankToAddress_B(start);
     } else if (wram == MI_WRAM_C) {
-        return MIi_GetWramBankAddr_C(start);
+        return MIi_WramBankToAddress_C(start);
     }
     return 0;
 }
 
 // Reserves for proc the count banks from slot if they are free and not reserved, and returns their address
 static u32 MIi_ReserveWramSlotCore(MIWram wram, int slot, int count, MIWramProc proc) {
-    int end;
+    int banks = (wram == MI_WRAM_A) ? count / 2 : count;
     int i;
 
-    if (wram == MI_WRAM_A) {
-        count /= 2;
-    }
-    end = slot + count;
-    for (i = slot; i < end; i++) {
+    for (i = slot; i < slot + banks; i++) {
         // BUG: Each pass checks the first bank, not bank i
 #ifdef BUGFIX
         MIWramProc owner = sWramState[wram][i] & MI_WRAM_STATE_PROC_MASK;
@@ -568,16 +565,16 @@ static u32 MIi_ReserveWramSlotCore(MIWram wram, int slot, int count, MIWramProc 
         }
     }
 
-    for (i = slot; i < end; i++) {
+    for (i = slot; i < slot + banks; i++) {
         sWramState[wram][i] =
             (sWramState[wram][i] & ~MI_WRAM_STATE_RESERVE_MASK) | (proc << MI_WRAM_STATE_RESERVE_SHIFT);
     }
     if (wram == MI_WRAM_A) {
-        return MIi_GetWramBankAddr_A(slot);
+        return MIi_WramBankToAddress_A(slot);
     } else if (wram == MI_WRAM_B) {
-        return MIi_GetWramBankAddr_B(slot);
+        return MIi_WramBankToAddress_B(slot);
     } else if (wram == MI_WRAM_C) {
-        return MIi_GetWramBankAddr_C(slot);
+        return MIi_WramBankToAddress_C(slot);
     }
     return 0;
 }

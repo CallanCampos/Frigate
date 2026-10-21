@@ -143,14 +143,17 @@ Black 2 is an NDS/DSi hybrid built with the TWL-SDK, which differs from DS-only 
 A call out of `bl` range, such as from an overlay to overlay 169 or the LTD module, goes through a veneer the linker
 adds after the calling function. The original shares main's veneers among their callers, but gives every call in an
 overlay its own: `HandlerRapidSpin` (`src/ov167/move_handlers.c`) calls `func_ov169_06898cf4` three times and is
-followed by three identical veneers. `mwldarm` does this only for a file listed after its `-overlaygroup` and
-`-overlay` options, which must be how the SDK's response file places each overlay's objects; any other file shares one
-veneer per target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes
-`objects.txt` this way, while the LCF still places the objects. Before, a file that called the same far target twice,
-such as `camera_system.c`, couldn't be completed. The LTD autoload's Thumb code (`.ltdmain`) gives every call its own
-veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
-moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and
-`-overlay LTD_AUTOLOAD_0`, which gives `wcm_dsi.c`'s 56 calls of `WCM_SetState` their 56 veneers.
+followed by three identical veneers. `mwldarm` does this only for a file listed after its `-overlaygroup` and `-overlay`
+options, which must be how the SDK's response file places each overlay's objects; any other file shares one veneer per
+target with every call in range, even across overlays at the same address. dsd since v0.12.1-dsi.4 writes `objects.txt`
+this way, while the LCF still places the objects. Before, a file that called the same far target twice, such as
+`camera_system.c`, couldn't be completed. NitroWiFi's Thumb code in the LTD autoload (`.ltdmain`) gives every call its
+own veneer too, as an overlay does, while dsd lists the module's objects with ARM9 main's: `tools/build/ltd_objects.py`
+moves them to the end of the linker's object list, after `-overlaygroup LTD_AUTOLOAD_0,0` and `-overlay LTD_AUTOLOAD_0`,
+which gives `wcm_dsi.c`'s 56 calls of `WCM_SetState` their 56 veneers. TwlSDK's `.ltdmain` objects share one veneer per
+target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInterrupts` go through one veneer, which
+`mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
+`lib/twl/` with main's.
 
 ## Shifting
 

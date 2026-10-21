@@ -3,7 +3,8 @@
 
 // NitroSystem's g2d_OamSoftwareSpriteDraw.c: drawing an OAM as a textured quad with the 3D engine, for the renderer's
 // 3D surface. The file name is a guess, as the ROM has no string for it; the names of the public functions are the
-// SDK's, and the statics and the helpers are named here
+// SDK's, and the statics and the helpers are named here. The texture setup follows the public decompilation of
+// NitroSystem that pret's pokeplatinum and pokeheartgold build (github.com/ntrtwl/NitroSystem)
 
 // The texture coordinates of an OAM's corners, and its size in pixels
 typedef struct {
@@ -68,59 +69,84 @@ static inline u32 GetPlttOffset(GXTexFmt fmt, BOOL extendedPltt, u16 plttNo) {
     }
 }
 
-// Sets the texture and palette of an OAM's characters, and gives its texture coordinates, flipped as it is
+// An OAM's flips as BOOLs. Read through these, the flips take the original's registers, which they don't as locals
+// or read in the call
+static inline BOOL IsOamFlippedH_(const GXOamAttr *oam) {
+    return (BOOL)oam->flipH;
+}
+
+static inline BOOL IsOamFlippedV_(const GXOamAttr *oam) {
+    return (BOOL)oam->flipV;
+}
+
+// The texture coordinates of a 2D mapped image's character
+static inline void GetCharTexCoord2D_(const NNSG2dImageAttr *texImageAttr, u16 charName, fx32 *u0, fx32 *v0) {
+    if (texImageAttr->fmt == GX_TEXFMT_PLTT256) {
+        charName >>= 1;
+    }
+    {
+        const u32 numCharPerLine = GetNumTexChar(texImageAttr->sizeS);
+
+        *u0 = (fx32)(((charName & (numCharPerLine - 1)) << 3) << FX32_SHIFT);
+        *v0 = ((charName >> texImageAttr->sizeS) << 3) << FX32_SHIFT;
+    }
+}
+
+static inline void GetCharTexCoord1D_(fx32 *u0, fx32 *v0) {
+    *u0 = 0;
+    *v0 = 0;
+}
+
+// The texture of a 1D mapped image's character, by the OAM's shape and size. The shape and size indices are the same
+// expressions as NNS_G2dGetOamSizeX's, so MWCC computes them once, as the original does
+static inline void SetCharTexture1D_(const NNSG2dImageAttr *texImageAttr, u32 texBaseAddr, GXOamShape shape,
+                                     u16 charName) {
+    const u16 shapeBit = (u16)((shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT);
+    const u16 sizeBit = (u16)((shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT);
+    const int shiftBit = 5 + ((texImageAttr->mappingType & REG_GX_DISPCNT_EXOBJ_MASK) >> REG_GX_DISPCNT_EXOBJ_SHIFT);
+
+    reg_G3_TEXIMAGE_PARAM = GX_PACK_TEXIMAGE_PARAM(
+        texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texSizeSTbl_[shapeBit][sizeBit], texSizeTTbl_[shapeBit][sizeBit],
+        GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr + (charName << shiftBit));
+}
+
+static inline void SetCharTexture2D_(const NNSG2dImageAttr *texImageAttr, u32 texBaseAddr) {
+    reg_G3_TEXIMAGE_PARAM =
+        GX_PACK_TEXIMAGE_PARAM(texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texImageAttr->sizeS, texImageAttr->sizeT,
+                               GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr);
+}
+
+static inline void SetTexPalette_(const NNSG2dImageAttr *texImageAttr, u32 pltBaseAddr, const GXOamAttr *oam) {
+    const GXTexFmt fmt = texFmtTbl_[oam->colorMode];
+    const u32 pltOffset = GetPlttOffset(fmt, texImageAttr->bExtendedPlt, (u16)oam->cParam);
+
+    G3_TexPlttBase(pltBaseAddr + pltOffset, fmt);
+}
+
+// Sets the texture and palette of an OAM's characters, and gives its texture coordinates, flipped as it is. Its
+// shape and its helpers follow the public decompilation github.com/ntrtwl/NitroSystem
 static void SetTexParamsAndGetTexCoord_(const GXOamAttr *oam, const NNSG2dImageAttr *texImageAttr, u32 texBaseAddr,
                                         u32 pltBaseAddr, OamTexCoord *coord) {
     const GXOamShape shape = oam->attr01 & GX_OAM_ATTR01_SHAPE_MASK;
-    const int shapeIdx = (shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT;
-    const int sizeIdx = (shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT;
-    const u16 shapeBit = (u16)shapeIdx;
-    const u16 sizeBit = (u16)sizeIdx;
-    u16 charName;
+    const u16 charName = (u16)oam->charNo;
 
-    charName = oam->charNo;
-    coord->w = NNSi_objSizeWTbl[shapeIdx][sizeIdx];
-    coord->h = NNSi_objSizeHTbl[shapeIdx][sizeIdx];
+    coord->w = NNS_G2dGetOamSizeX(&shape);
+    coord->h = NNS_G2dGetOamSizeY(&shape);
 
     if (texImageAttr->mappingType == GX_OBJVRAMMODE_CHAR_2D) {
-        reg_G3_TEXIMAGE_PARAM =
-            GX_PACK_TEXIMAGE_PARAM(texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texImageAttr->sizeS, texImageAttr->sizeT,
-                                   GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr);
-        if (texImageAttr->fmt == GX_TEXFMT_PLTT256) {
-            charName >>= 1;
-        }
-        {
-            const u32 numCharPerLine = GetNumTexChar(texImageAttr->sizeS);
-
-            coord->u0 = ((charName & (numCharPerLine - 1)) << 3) << FX32_SHIFT;
-            coord->v0 = ((charName >> texImageAttr->sizeS) << 3) << FX32_SHIFT;
-        }
+        SetCharTexture2D_(texImageAttr, texBaseAddr);
+        GetCharTexCoord2D_(texImageAttr, charName, &coord->u0, &coord->v0);
     } else {
-        const int shiftBit =
-            5 + ((texImageAttr->mappingType & REG_GX_DISPCNT_EXOBJ_MASK) >> REG_GX_DISPCNT_EXOBJ_SHIFT);
-
-        reg_G3_TEXIMAGE_PARAM = GX_PACK_TEXIMAGE_PARAM(
-            texImageAttr->fmt, GX_TEXGEN_TEXCOORD, texSizeSTbl_[shapeBit][sizeBit], texSizeTTbl_[shapeBit][sizeBit],
-            GX_TEXREPEAT_NONE, GX_TEXFLIP_NONE, texImageAttr->plttUse, texBaseAddr + (charName << shiftBit));
-        coord->u0 = 0;
-        coord->v0 = 0;
+        SetCharTexture1D_(texImageAttr, texBaseAddr, shape, charName);
+        GetCharTexCoord1D_(&coord->u0, &coord->v0);
     }
+
     coord->u1 = coord->u0 + (coord->w << FX32_SHIFT);
     coord->v1 = coord->v0 + (coord->h << FX32_SHIFT);
 
-    {
-        const BOOL flipH = oam->flipH;
-        const BOOL flipV = oam->flipV;
+    DoFlip(IsOamFlippedH_(oam), IsOamFlippedV_(oam), &coord->u0, &coord->u1, &coord->v0, &coord->v1);
 
-        DoFlip(flipH, flipV, &coord->u0, &coord->u1, &coord->v0, &coord->v1);
-    }
-
-    {
-        const GXTexFmt fmt = texFmtTbl_[oam->colorMode];
-        const u32 pltOffset = GetPlttOffset(fmt, texImageAttr->bExtendedPlt, (u16)oam->cParam);
-
-        G3_TexPlttBase(pltBaseAddr + pltOffset, fmt);
-    }
+    SetTexPalette_(texImageAttr, pltBaseAddr, oam);
 }
 
 void NNSi_G2dSetOamSoftEmuAutoZOffsetFlag(BOOL flag) {

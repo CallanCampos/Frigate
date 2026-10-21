@@ -14,10 +14,10 @@ const CARDDmaInterface CARDi_NdmaInterface = { MIi_CardNDmaRecv, MI_StopNDma };
 static u32 sSecureAreaStart;
 static u32 sSecureAreaSize;
 static CARDiRomDmaRead sSecureRead;
-static CARDRomHashContext sSecureWork;
+static CARDCheckedReadContext sSecureWork;
 
 static u32 CARDi_ReadSecureRom(void *arg, void *dst, u32 src, u32 len) {
-    CARD_ReadRomHashImage(&sSecureWork, dst, src, len);
+    CARD_ReadRomChecked(&sSecureWork, dst, src, len);
     return len;
 }
 
@@ -26,7 +26,7 @@ static u32 CARDi_ReadSecureRomWithDMA(void *arg, void *dst, u32 src, u32 len) {
         len = 0;
     } else {
         DC_FlushRange(dst, len);
-        sSecureRead.callback = CARD_NotifyRomHashReadAsync;
+        sSecureRead.callback = CARD_OnCheckedReadDone;
         sSecureRead.arg = arg;
         sSecureRead.src = src;
         sSecureRead.dst = (u32)dst;
@@ -42,7 +42,7 @@ void CARDi_InitTwlRom(void) {
     u32 arenaLo = ((u32)OS_GetArenaLo(OS_ARENA_MAIN) + 31) & ~31;
     u32 arenaHi = (u32)OS_GetArenaHi(OS_ARENA_MAIN);
     const CARDTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
-    u32 workSize = CARD_CalcRomHashBufferLength(header);
+    u32 workSize = CARD_GetCheckedReadBufferSize(header);
 
     arenaHi &= ~31;
     if (arenaLo + workSize > arenaHi) {
@@ -62,8 +62,8 @@ void CARDi_InitTwlRom(void) {
         CARD_LockRom(lockId);
 
         header = CARD_GetOwnRomHeaderTWL();
-        CARD_InitRomHashContext(&sSecureWork, header, (void *)sSecureAreaStart, sSecureAreaSize, CARDi_ReadRomWithCPU,
-                                CARDi_ReadSecureRomWithDMA, &sSecureWork);
+        CARD_SetUpCheckedReads(&sSecureWork, header, (void *)sSecureAreaStart, sSecureAreaSize, CARDi_ReadRomWithCPU,
+                               CARDi_ReadSecureRomWithDMA, &sSecureWork);
 
         sSecureAreaStart = 0;
         sSecureAreaSize = 0;
