@@ -668,7 +668,7 @@
 . 0x0214b3d0 remove_symbol
 . 0x0214b8c0 remove_symbol
 . 0x0214b940 remove_symbol
-. 0x0214b980 section_end lib/nitro/src/card/card_common.c:.bss
+. 0x0214b960 section_end lib/nitro/src/card/card_common.c:.bss
 . 0x0214b980 add_section lib/nitro/src/card/card_backup.c:.bss:0x100
 . 0x0214ba84 add_data sRomReader
 . 0x0214ba88 add_data sInvalidateIC
