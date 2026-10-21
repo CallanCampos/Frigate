@@ -1838,6 +1838,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (`dwc_transport.c`) and `DWCi_ProcessGT2MatchCommand` and `DWCi_QR2ClientMsgCallback` (`dwc_match.c`) match only
   so after `MI_CpuCopy8` of a received header, which reads as a byte order conversion that is the identity on the DS;
   with no such conversion known in DWC, the three stay rows.
+- A value narrowed to `u16` twice in a row (`lsl r0, #16; lsr r0, #16`, then `lsl r4, r0, #16; lsr r7, r4, #16`) is a
+  `u16` put through an identity that MWCC folds only after it narrows: TwlSDK's pipes round each chunk down to the
+  DSP's unit, `count = count & ~(DSP_MEMORY_UNIT - 1);`, where `DSP_MEMORY_UNIT` is `3 - sizeof(u16)`, 1 on the ARM9
+  (the shape of cybervisi0n/libntr's reconstruction). `DSP_ReadPipe` and `DSP_WritePipe` (`dsp_pipe.c`) match so;
+  `count &= ...` folds before the narrowing and loses the second one.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
   frame with no slot of its own for it, is the parameter's spill, not an argument of the call that uses that area:
   DWC's `DWCi_SendGPBuddyMsgCommand` (`dwc_match.c`) had been given an `id` as a fourth argument of

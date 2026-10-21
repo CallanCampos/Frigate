@@ -669,6 +669,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   multiply into a select's arms, so the source selected byte offsets. When nothing else indexes the elements, that
   is a raw `u8` buffer of slots, the slot cast to the element, `(T *)&buf[c ? 0 : SLOT]`, as a stride rounded up to
   32 bytes also says. `moveq #1; movne #0` is `c ? 0 : 1`. (matching.md: "into the arms of a select")
+- A `u16` narrowed twice in a row (`lsl; lsr` in place, then again into another register): an identity in the
+  source, such as the DSP pipes' `count = count & ~(DSP_MEMORY_UNIT - 1);` (1 on the ARM9); `&=` folds it first.
+  (matching.md: "narrowed to `u16` twice in a row")
 
 ## Branches and block layout
 
