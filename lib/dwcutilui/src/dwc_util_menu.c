@@ -50,17 +50,18 @@ typedef struct DWCUtilMenu {
     u8 buzzed;
 } DWCUtilMenu;
 
+// The tables are defined in the order that gives the ROM's layout of MWCC's size sort, the button codes just above
+// the touch's end and the navigation above the cursor's move
 static const u8 sButtonEffects[2] = { 4, 5 };
-static const u8 sArrowCells[2] = { 0x37, 0x38 };
 static const u8 sButtonCells[2] = { 0x3c, 0x3d };
 static const u8 sKeyPalettes[2] = { 2, 3 };
-static const u8 sButtonCodes[3] = { 0x12, 0x13, 0 };
+static const u8 sArrowCells[2] = { 0x37, 0x38 };
 static const u8 sArrowCodes[3] = { 0x10, 0x11, 0 };
-static const u16 sKeySize[2] = { 0x1c, 0x14 };
-// The ROM keeps this size among the file's tables, but none of the file's code reads it
-const u16 data_ov182_021bfe8e[2] = { 0x0c, 0x04 };
 static const u16 sArrowSize[2] = { 0x1c, 0x14 };
 static const u16 sButtonSize[2] = { 0x78, 0x12 };
+// The size of a row's text, in tiles
+static const u16 sRowTextSize[2] = { 0x0c, 0x04 };
+static const u16 sKeySize[2] = { 0x1c, 0x14 };
 static const DWCUtilMenuPosition sArrowPositions[2] = { { 0x72, 0x91 }, { 0x92, 0x91 } };
 static const DWCUtilMenuPosition sButtonPositions[2] = { { 0x04, 0xaa }, { 0x84, 0xaa } };
 static const u8 sDigitCodes[12] = { '7', '8', '9', '4', '5', '6', '1', '2', '3', '0' };
@@ -72,13 +73,6 @@ static const DWCUtilMenuPosition sKeyPositions[10] = {
 static const DWCUtilMenuPosition sCursorPositions[14] = {
     { 0x50, 0x4a }, { 0x70, 0x4a }, { 0x90, 0x4a }, { 0x50, 0x61 }, { 0x70, 0x61 }, { 0x90, 0x61 }, { 0x50, 0x78 },
     { 0x70, 0x78 }, { 0x90, 0x78 }, { 0x50, 0x8f }, { 0x70, 0x8f }, { 0x90, 0x8f }, { 0x02, 0xa8 }, { 0x82, 0xa8 },
-};
-// The key the cursor moves to from each key, left, up, right and down; -1 and -2 pick an arrow or a key of the top
-// row from where the cursor came to the buttons from
-static const s8 sNavigation[14][4] = {
-    { 2, 12, 1, 3 },  { 0, 13, 2, 4 },  { 1, 13, 0, 5 },  { 5, 0, 4, 6 },     { 3, 1, 5, 7 },
-    { 4, 2, 3, 8 },   { 8, 3, 7, 9 },   { 6, 4, 8, 10 },  { 7, 5, 6, 11 },    { 11, 6, 10, 12 },
-    { 9, 7, 11, 13 }, { 10, 8, 9, 13 }, { 13, 9, 13, 0 }, { 12, -1, 12, -2 },
 };
 
 static DWCUtilMenu *sMenu;
@@ -138,7 +132,7 @@ void DWCUtilMenu_Open(void) {
     }
     label[1] = 0;
     for (i = 0; i < 4; i++) {
-        DWCUtilText *text = DWCUtilText_CreateObj(0, 0xc, 4, 0, &objCount, 0);
+        DWCUtilText *text = DWCUtilText_CreateObj(0, sRowTextSize[0], sRowTextSize[1], 0, &objCount, 0);
 
         sMenu->rows[i] = text;
         rect.x = 0;
@@ -296,6 +290,8 @@ static void DWCUtilMenu_HandleTouchStart(void) {
     }
 }
 
+static const u8 sButtonCodes[3] = { 0x12, 0x13, 0 };
+
 // The end of a touch: the key it chooses, if it ends on the key it started on
 static void DWCUtilMenu_HandleTouchEnd(void) {
     u16 rect[4];
@@ -384,18 +380,18 @@ static void DWCUtilMenu_HandleTouchHold(void) {
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
             if (DWCUtilTouch_IsTouchedIn(rect)) {
-                if (sMenu->touched == i + 12) {
-                    i += 12;
-                    goto held;
+                i += 12;
+                if (sMenu->touched == i) {
+                held:
+                    DWCUtilMenu_SetPressedKey(i);
+                    goto clear;
                 }
                 break;
             }
         }
     }
 released:
-    i = -1;
-held:
-    DWCUtilMenu_SetPressedKey(i);
+    DWCUtilMenu_SetPressedKey(-1);
 clear:
     sMenu->repeat = 0;
 }
@@ -512,6 +508,14 @@ static void DWCUtilMenu_DrawCursor(void) {
     DWCUtilOam_SetNodePosition(sMenu->cursor, -1, sCursorPositions[sMenu->cursorPos].x,
                                sCursorPositions[sMenu->cursorPos].y);
 }
+
+// The key the cursor moves to from each key, left, up, right and down; -1 and -2 pick an arrow or a key of the top
+// row from where the cursor came to the buttons from
+static const s8 sNavigation[14][4] = {
+    { 2, 12, 1, 3 },  { 0, 13, 2, 4 },  { 1, 13, 0, 5 },  { 5, 0, 4, 6 },     { 3, 1, 5, 7 },
+    { 4, 2, 3, 8 },   { 8, 3, 7, 9 },   { 6, 4, 8, 10 },  { 7, 5, 6, 11 },    { 11, 6, 10, 12 },
+    { 9, 7, 11, 13 }, { 10, 8, 9, 13 }, { 13, 9, 13, 0 }, { 12, -1, 12, -2 },
+};
 
 static void DWCUtilMenu_MoveCursor(int direction) {
     int previous = sMenu->cursorPos;

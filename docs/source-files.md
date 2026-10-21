@@ -1794,7 +1794,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dwc_util_bg_overlay.c` | `0x021ab90c`–`0x021ab9fc` | 6 | complete | descriptive |
 | `dwc_util_link_icon.c` | `0x021ab9fc`–`0x021abb10` | 3 | complete | descriptive |
 | `dwc_util_keyboard.c` | `0x021abb10`–`0x021acd80` | 30 | partial | descriptive |
-| `dwc_util_menu.c` | `0x021acd80`–`0x021ada94` | 28 | partial | descriptive |
+| `dwc_util_menu.c` | `0x021acd80`–`0x021ada94` | 28 | complete | descriptive |
 | `dwc_util_aoss_session.c` | `0x021ada94`–`0x021adbc0` | 5 | complete | descriptive |
 | `dwc_util_main.c` | `0x021adbc0`–`0x021ae084` | 15 | complete | descriptive |
 | `dwc_util_msg_resource.c` | `0x021ae084`–`0x021ae134` | 6 | complete | descriptive |

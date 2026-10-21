@@ -170,6 +170,7 @@ lib/dwcutilui/src/dwc_util_keyboard.c:
     .bss        start:0x021c407c end:0x021c4080
 
 lib/dwcutilui/src/dwc_util_menu.c:
+    complete
     .text       start:0x021acd80 end:0x021ada94
     .rodata     start:0x021bfe7c end:0x021bff88
     .bss        start:0x021c4080 end:0x021c4084

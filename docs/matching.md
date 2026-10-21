@@ -3591,6 +3591,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   values in case order, and the switch reading `sTrainerCounts[0]` to `[6]` compiles to the same `movs` while keeping
   the table. Its place among the packed tables is not definition order: defined between the room tables it came out
   one early, defined first it is where the ROM has it.
+  The DWC keypad's (`dwc_util_menu.c`) row text size, `{ 0x0c, 0x04 }` among its size tables, is such a table, read
+  by `DWCUtilText_CreateObj`'s arguments; as an unreferenced global it had a section of its own after them.
 - `GFL_ASSERT` keeps its expression as a string in `.data`, so the variable it tests keeps its original name, as the
   Medal Rally's `p_sv` does.
 - Japanese text in a string is written as is: sources are UTF-8, and the build hands them to MWCC in Shift JIS, the
