@@ -3292,6 +3292,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Data and sections
 
+- `dsi/1.2` with `-Cpp_exceptions on` emits exception indices for C functions with stack frames even when their
+  instructions are unchanged. MSL's `register_atexit.c`, `console_io.c` and `call_static_initializers.c` emit the ROM's
+  48-byte `.exceptix` prefix, with four relocations to their functions; leaf console procedures emit no entries.
+  Keep this as the compiler's section rather than writing a C table of its encoding.
 - A local array with an initializer goes in a `.rodata` section of its own, ahead of the file's shared one; a struct
   of the same bytes copied from a static gives the same inline `ldrb`/`strb` pairs and keeps the static in declaration
   order in the shared section. NitroWiFi's `WCM_FindVendorIE` matches, with the file's `.rodata`, only with its OUI as

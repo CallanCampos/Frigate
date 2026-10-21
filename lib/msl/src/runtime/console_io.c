@@ -2,7 +2,7 @@
 // debugger's UART. The hooks are empty functions in the game (trk_stubs.c), so a write goes nowhere and a read gets 0
 // characters, and the three procedures here are the ones the stream table points to. The original was built with
 // C++ exception handling on, as the exception index in the ROM has entries for the read and the write procedure (and
-// for none of the others, which have no stack frame); it is off in lib/msl's flags, since C code compiles alike.
+// for none of the others, which have no stack frame).
 #include "../console_io.h"
 #include "trk_stubs.h"
 
