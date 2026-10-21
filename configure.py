@@ -208,6 +208,12 @@ ROM_BLOBS = {
 }
 
 
+def overlay_digest_includes(version: str) -> list[str]:
+    """Returns the include files, under the generated headers, of a version's overlay table digest and overlay digests,
+    which lib/nitro/src/fs/fs_overlay_digest.c includes and tools/build/overlay_digests.py writes in that order."""
+    return [f"rom/{version}/overlay_table_digest.inc", f"rom/{version}/overlay_digests.inc"]
+
+
 def library_of(source: Path) -> tuple[str, list[str]] | None:
     """Returns the compiler and flags of the library a source file belongs to, or None for the game's own code."""
     try:
@@ -800,6 +806,15 @@ def main():
                 implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
                 variables={"module": str(Path("extract") / versions[0] / module), "name": name})
         constant_headers.append(output)
+    # Each version's digests of its overlays, computed from its base ROM (tools/build/overlay_digests.py)
+    n.rule("overlay_digests", "$python tools/build/overlay_digests.py $in $key $out", "Generating $out", restat="1")
+    for version in versions:
+        outputs = [Path(GENERATED_INCLUDE_DIR) / include for include in overlay_digest_includes(version)]
+        extract_dir = Path("extract") / version
+        n.build(outputs, "overlay_digests", [Path("orig") / f"baserom_{version}.nds"],
+                implicit=["tools/build/overlay_digests.py", extract_dir / "config.yaml"],
+                variables={"key": str(extract_dir / "arm9" / "hmac_sha1_key.bin")})
+        constant_headers += outputs
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []
