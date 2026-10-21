@@ -5,7 +5,7 @@
 // polygon mode, culling, fog, the alpha and the polygon ID. None of them checks that the material exists. The
 // functions have NitroSystem's names, and g3d.h notes swan's
 
-void NNS_G3dMdlSetMdlLightEnableFlag(NNSG3dResMdl *mdl, u32 matID, u32 lights) {
+void NNS_G3dMdlSetMdlLightEnableFlag(NNSG3dResMdl *mdl, u32 matID, int lights) {
     NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     NNSG3dResMatData *matData = NNS_G3dGetMatDataByIdx(mat, matID);
 
@@ -13,7 +13,7 @@ void NNS_G3dMdlSetMdlLightEnableFlag(NNSG3dResMdl *mdl, u32 matID, u32 lights) {
     matData->polyAttr |= lights;
 }
 
-void NNS_G3dMdlSetMdlPolygonMode(NNSG3dResMdl *mdl, u32 matID, u32 mode) {
+void NNS_G3dMdlSetMdlPolygonMode(NNSG3dResMdl *mdl, u32 matID, GXPolygonMode mode) {
     NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     NNSG3dResMatData *matData = NNS_G3dGetMatDataByIdx(mat, matID);
 
@@ -21,7 +21,7 @@ void NNS_G3dMdlSetMdlPolygonMode(NNSG3dResMdl *mdl, u32 matID, u32 mode) {
     matData->polyAttr |= mode << REG_G3_POLYGON_ATTR_PM_SHIFT;
 }
 
-void NNS_G3dMdlSetMdlCullMode(NNSG3dResMdl *mdl, u32 matID, u32 cull) {
+void NNS_G3dMdlSetMdlCullMode(NNSG3dResMdl *mdl, u32 matID, GXCull cull) {
     NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     NNSG3dResMatData *matData = NNS_G3dGetMatDataByIdx(mat, matID);
 
@@ -29,7 +29,7 @@ void NNS_G3dMdlSetMdlCullMode(NNSG3dResMdl *mdl, u32 matID, u32 cull) {
     matData->polyAttr |= cull << REG_G3_POLYGON_ATTR_BK_SHIFT;
 }
 
-void NNS_G3dMdlSetMdlPolygonID(NNSG3dResMdl *mdl, u32 matID, u32 polyID) {
+void NNS_G3dMdlSetMdlPolygonID(NNSG3dResMdl *mdl, u32 matID, int polyID) {
     NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     NNSG3dResMatData *matData = NNS_G3dGetMatDataByIdx(mat, matID);
 
@@ -37,7 +37,7 @@ void NNS_G3dMdlSetMdlPolygonID(NNSG3dResMdl *mdl, u32 matID, u32 polyID) {
     matData->polyAttr |= polyID << REG_G3_POLYGON_ATTR_ID_SHIFT;
 }
 
-void NNS_G3dMdlSetMdlAlpha(NNSG3dResMdl *mdl, u32 matID, u32 alpha) {
+void NNS_G3dMdlSetMdlAlpha(NNSG3dResMdl *mdl, u32 matID, int alpha) {
     NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     NNSG3dResMatData *matData = NNS_G3dGetMatDataByIdx(mat, matID);
 
@@ -56,7 +56,7 @@ void NNS_G3dMdlSetMdlFogEnableFlag(NNSG3dResMdl *mdl, u32 matID, BOOL enable) {
     }
 }
 
-u32 NNS_G3dMdlGetMdlAlpha(const NNSG3dResMdl *mdl, u32 matID) {
+int NNS_G3dMdlGetMdlAlpha(const NNSG3dResMdl *mdl, u32 matID) {
     NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     NNSG3dResMatData *matData = NNS_G3dGetMatDataByIdx(mat, matID);
 
@@ -64,7 +64,7 @@ u32 NNS_G3dMdlGetMdlAlpha(const NNSG3dResMdl *mdl, u32 matID) {
 }
 
 // Sets the polygon ID of every material of a model
-void NNS_G3dMdlSetMdlPolygonIDAll(NNSG3dResMdl *mdl, u32 polyID) {
+void NNS_G3dMdlSetMdlPolygonIDAll(NNSG3dResMdl *mdl, int polyID) {
     u32 i;
 
     for (i = 0; i < mdl->info.numMat; i++) {
@@ -73,7 +73,7 @@ void NNS_G3dMdlSetMdlPolygonIDAll(NNSG3dResMdl *mdl, u32 polyID) {
 }
 
 // Sets the alpha of every material of a model
-void NNS_G3dMdlSetMdlAlphaAll(NNSG3dResMdl *mdl, u32 alpha) {
+void NNS_G3dMdlSetMdlAlphaAll(NNSG3dResMdl *mdl, int alpha) {
     u32 i;
 
     for (i = 0; i < mdl->info.numMat; i++) {

@@ -6,8 +6,9 @@
 
 static const NNSG3dResTexPatAnmData *GetTexPatAnmData(const NNSG3dResTexPatAnm *anm, u32 idx);
 
-void *NNS_G3dGetAnmByIdx(const NNSG3dResFileHeader *header, u32 idx) {
-    if (header != NULL) {
+void *NNS_G3dGetAnmByIdx(const void *res, u32 idx) {
+    if (res != NULL) {
+        const NNSG3dResFileHeader *header = res;
         const u32 *blockOfs = (const u32 *)((const u8 *)header + header->headerSize);
         const NNSG3dResAnmSet *set = (const NNSG3dResAnmSet *)((const u8 *)header + blockOfs[0]);
         const u32 *ofs = NNS_G3dGetResDataByIdx(&set->dict, idx);
@@ -20,7 +21,7 @@ void *NNS_G3dGetAnmByIdx(const NNSG3dResFileHeader *header, u32 idx) {
 }
 
 // The name of a texture of the animation, or of a palette
-const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx) {
+const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u8 idx) {
     if (anm != NULL && idx < anm->numTex) {
         const NNSG3dResName *names = (const NNSG3dResName *)((const u8 *)anm + anm->ofsTexName);
 
@@ -29,7 +30,7 @@ const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *a
     return NULL;
 }
 
-const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u32 idx) {
+const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u8 idx) {
     if (anm != NULL && idx < anm->numPltt) {
         const NNSG3dResName *names = (const NNSG3dResName *)((const u8 *)anm + anm->ofsPlttName);
 

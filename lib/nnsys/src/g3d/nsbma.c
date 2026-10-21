@@ -136,7 +136,7 @@ static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
 // Fills in an animation object for a material color animation (NitroSystem's NNSi_G3dAnmObjInitNsBma, as recalled). It
 // applies the animation with NNS_G3dFuncAnmMatNsBma, and maps each material of the model to the data of the animation's
 // material of the same name, which is flagged as existing and holds the data's index
-void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
+void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResMatCAnm *matAnm = anm;
     const NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     u32 i;

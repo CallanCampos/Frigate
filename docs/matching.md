@@ -2505,10 +2505,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   its 0/1 only as `return a && b;`, which the if-form folds into the branches, so try both.
 - An inline's 0/1 result that the original materializes and then tests (`movs r0, #1`, `b`, `movs r0, #0`,
   `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2): a
-  `u32` return type with `if (c) { return TRUE; } return FALSE;` (`g2d_CellAnimation.c`'s
-  `NNS_G2dCellDataBankHasVramTransferData`, which every `BOOL` spelling folds into the test), or a cast,
-  `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
-  ternary, a plain comparison and a local all fold).
+  cast, `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
+  ternary, a plain comparison and a local all fold). It is NitroSystem's own spelling of its 0/1 inlines:
+  `g2d_CellAnimation.c`'s `ApplyCurrentAnimResult_` matches with `NNS_G2dCellDataBankHasVramTransferData` and the
+  handle test written `return (BOOL)(x != NULL);` as the SDK writes them, and comes out 10 bytes short, the test
+  folded, when the handle test is `if (c) { return TRUE; } return FALSE;`.
 - A 0/1 choice laid out first value first (`bhs`, `movs r0, #0`, `b`, `movs r0, #1`) is held in an enum type: every
   plain 0/1 spelling (ternary, `if`/`else`, `!`, `== FALSE`, an int local) gives `blo`, `movs r0, #1` first.
   `btl_main.c`'s `GetSideFromMonID` matches as `BtlSide side = monId < 12 ? BTL_SIDE_1ST : BTL_SIDE_2ND;`, with the

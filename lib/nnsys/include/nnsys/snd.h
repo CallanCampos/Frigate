@@ -25,10 +25,10 @@ typedef struct NNSSndHeap *NNSSndHeapHandle;
 void NNS_SndPlayerSetVolume(NNSSndHandle *handle, int volume);
 // Sets the pitch of the tracks in trackBitMask, in 64ths of a semitone; NitroSystem's NNS_SndPlayerSetTrackPitch by
 // its code
-void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u32 trackBitMask, int pitch);
+void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u16 trackBitMask, int pitch);
 // Set a value of the tracks in trackBitMask, as NNS_SndPlayerSetTrackPitch does the pitch
-void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u32 trackBitMask, int value);
-void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u32 trackBitMask, int value);
+void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u16 trackBitMask, int value);
+void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u16 trackBitMask, int value);
 
 // The library's setup and its work each frame (snd_main.c): NNS_SndInit, which swan names NNS_SndInit, sets up the
 // driver once; NNS_SndMain, swan's NNS_SndMain, runs the players, the capture and the streams and sends the commands
@@ -58,10 +58,17 @@ void NNS_SndPlayerPause(NNSSndHandle *handle, BOOL flag);
 void NNS_SndPlayerSetInitialVolume(NNSSndHandle *handle, int volume);
 void NNS_SndPlayerMoveVolume(NNSSndHandle *handle, int targetVolume, int frames);
 void NNS_SndPlayerSetChannelPriority(NNSSndHandle *handle, int prio);
-void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u32 trackBitMask, BOOL flag);
-void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u32 trackBitMask, int muteType);
-void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u32 trackBitMask, int volume);
-void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u32 trackBitMask, int pan);
+typedef enum {
+    NNS_SND_SEQ_MUTE_OFF = SND_SEQ_MUTE_OFF,
+    NNS_SND_SEQ_MUTE_NO_STOP = SND_SEQ_MUTE_NO_STOP,
+    NNS_SND_SEQ_MUTE_RELEASE = SND_SEQ_MUTE_RELEASE,
+    NNS_SND_SEQ_MUTE_STOP = SND_SEQ_MUTE_STOP,
+} NNSSndSeqMute;
+
+void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u16 trackBitMask, BOOL flag);
+void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u16 trackBitMask, NNSSndSeqMute muteType);
+void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u16 trackBitMask, int volume);
+void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u16 trackBitMask, int pan);
 void NNS_SndPlayerSetTempoRatio(NNSSndHandle *handle, int ratio);
 // The ticks the sequence has played, 0 before it starts
 u32 NNS_SndPlayerGetTick(NNSSndHandle *handle);
@@ -71,14 +78,17 @@ BOOL NNS_SndPlayerReadDriverTrackInfo(NNSSndHandle *handle, int trackNo, SNDTrac
 // NNS_SndWaveOutAllocChannel, NNS_SndWaveOutFreeChannel, NNS_SndWaveOutStart, NNS_SndWaveOutStop and
 // NNS_SndWaveOutIsPlaying
 
-typedef void *NNSSndWaveOutHandle;
+typedef struct NNSSndWaveOut *NNSSndWaveOutHandle;
 
-#define NNS_SND_WAVE_FORMAT_PCM16 1
+typedef enum {
+    NNS_SND_WAVE_FORMAT_PCM8,
+    NNS_SND_WAVE_FORMAT_PCM16,
+} NNSSndWaveFormat;
 
 NNSSndWaveOutHandle NNS_SndWaveOutAllocChannel(int channel);
 void NNS_SndWaveOutFreeChannel(NNSSndWaveOutHandle handle);
-BOOL NNS_SndWaveOutStart(NNSSndWaveOutHandle handle, int format, const void *data, BOOL loop, int loopStart,
-                         int samples, int rate, int volume, int speed, int pan);
+BOOL NNS_SndWaveOutStart(NNSSndWaveOutHandle handle, NNSSndWaveFormat format, const void *data, BOOL loop,
+                         int loopStart, int samples, int rate, int volume, int speed, int pan);
 void NNS_SndWaveOutStop(NNSSndWaveOutHandle handle);
 BOOL NNS_SndWaveOutIsPlaying(NNSSndWaveOutHandle handle);
 // NNS_SndWaveOutSetVolume and NNS_SndWaveOutSetSpeed, which swan names NNS_SndWaveOutSetVolume and
@@ -131,7 +141,7 @@ typedef struct NNSSndArcWaveArcInfo {
 const NNSSndArcSeqInfo *NNS_SndArcGetSeqInfo(int seqNo);
 const NNSSndArcBankInfo *NNS_SndArcGetBankInfo(int bankNo);
 const NNSSndArcWaveArcInfo *NNS_SndArcGetWaveArcInfo(int waveArcNo);
-const void *NNS_SndArcGetFileAddress(u32 fileId);
+void *NNS_SndArcGetFileAddress(u32 fileId);
 
 // The rest of the archive's info (snd_arc.c): a sequence archive's, a stream's, a sequence player's, a stream player's
 // and a group's, by number; NULL when the number is out of the table or the entry is empty
@@ -190,9 +200,9 @@ const NNSSndArcGroupInfo *NNS_SndArcGetGroupInfo(int groupNo);
 // for all at once
 u32 NNS_SndArcGetFileOffset(u32 fileId);
 u32 NNS_SndArcGetFileSize(u32 fileId);
-int NNS_SndArcReadFile(u32 fileId, void *buffer, int size, int offset);
-void NNS_SndArcSetFileAddress(u32 fileId, const void *address);
-void NNS_SndArcSetLoadBlockSize(int size);
+s32 NNS_SndArcReadFile(u32 fileId, void *buffer, s32 size, s32 offset);
+void NNS_SndArcSetFileAddress(u32 fileId, void *address);
+void NNS_SndArcSetLoadBlockSize(s32 size);
 
 // The current sound archive. NNS_SndArcInit opens one by path and makes it current, loading its info and file table,
 // and its symbols if symbolLoadFlag, into heap; NNS_SndArcInitOnMemory makes current one that is wholly in memory.
@@ -220,7 +230,7 @@ typedef struct NNSSndArc {
     struct NNSSndArcFat *fat;
     struct NNSSndArcSymbol *symbol;
     struct NNSSndArcInfo *info;
-    int loadBlockSize;
+    s32 loadBlockSize;
 } NNSSndArc;
 
 // NitroSystem's sound heap (snd_heap.c), a frame heap for sound data: NNS_SndHeapSaveState returns the level saved,

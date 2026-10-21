@@ -48,7 +48,7 @@ void DWCUtilSound_SetVolume(int volume) {
     NNS_SndPlayerSetVolume(&sSound->handle, volume);
 }
 
-void DWCUtilSound_SetTrackPitch(u32 trackMask, int pitch) {
+void DWCUtilSound_SetTrackPitch(u16 trackMask, int pitch) {
     NNS_SndPlayerSetTrackPitch(&sSound->handle, trackMask, pitch);
 }
 

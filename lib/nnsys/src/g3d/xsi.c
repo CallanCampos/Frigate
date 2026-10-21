@@ -170,7 +170,7 @@ static inline void sendPacket_(const u32 *packet, u32 num) {
 // magW, the ratio of the texture's size to its original size, and the second row and the T translation by magH,
 // between a change of the geometry engine's matrix mode to texture and back to position and vector. With TEXMTX_SET
 // it is loaded, and with TEXMTX_MULT it is multiplied into the matrix that is there
-void NNSi_G3dSendTexSRTXsi(NNSG3dMatAnmResult *result) {
+void NNSi_G3dSendTexSRTXsi(const NNSG3dMatAnmResult *result) {
     struct {
         u32 op; // MTX_MODE, MTX_LOAD_4x4 or MTX_MULT_4x4, MTX_MODE
         u32 modeTexture;
@@ -189,15 +189,19 @@ void NNSi_G3dSendTexSRTXsi(NNSG3dMatAnmResult *result) {
         cmd.mtx.m[2][2] = cmd.mtx.m[2][3] = cmd.mtx.m[3][2] = 0;
     cmd.mtx.m[3][3] = FX32_ONE;
 
-    if (result->flag & NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SCALEONE) {
-        result->scaleS = result->scaleT = FX32_ONE;
-    }
-    if (result->flag & NNS_G3D_MATANM_RESULTFLAG_TEXMTX_ROTZERO) {
-        result->cosR = FX32_ONE;
-        result->sinR = 0;
-    }
-    if (result->flag & NNS_G3D_MATANM_RESULTFLAG_TEXMTX_TRANSZERO) {
-        result->transS = result->transT = 0;
+    {
+        NNSG3dMatAnmResult *a = (NNSG3dMatAnmResult *)result;
+
+        if (result->flag & NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SCALEONE) {
+            a->scaleS = a->scaleT = FX32_ONE;
+        }
+        if (result->flag & NNS_G3D_MATANM_RESULTFLAG_TEXMTX_ROTZERO) {
+            a->cosR = FX32_ONE;
+            a->sinR = 0;
+        }
+        if (result->flag & NNS_G3D_MATANM_RESULTFLAG_TEXMTX_TRANSZERO) {
+            a->transS = a->transT = 0;
+        }
     }
     sTexMtxXsiFuncs[result->flag &
                     (NNS_G3D_MATANM_RESULTFLAG_TEXMTX_SCALEONE | NNS_G3D_MATANM_RESULTFLAG_TEXMTX_ROTZERO |

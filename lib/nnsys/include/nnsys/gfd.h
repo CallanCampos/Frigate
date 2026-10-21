@@ -121,7 +121,7 @@ int NNS_GfdFreeFrmTexVram(NNSGfdTexKey key);
 void NNS_GfdGetFrmTexVramState(NNSGfdFrmTexVramState *state);
 void NNS_GfdSetFrmTexVramState(const NNSGfdFrmTexVramState *state);
 // Allocates from the low end of palette VRAM when bAllocFromLo is set
-NNSGfdPlttKey NNS_GfdAllocFrmPlttVram(u32 szByte, BOOL is4pltt, BOOL bAllocFromLo);
+NNSGfdPlttKey NNS_GfdAllocFrmPlttVram(u32 szByte, BOOL is4pltt, u32 bAllocFromLo);
 void NNS_GfdGetFrmPlttVramState(NNSGfdFrmPlttVramState *state);
 void NNS_GfdSetFrmPlttVramState(const NNSGfdFrmPlttVramState *state);
 
@@ -181,7 +181,7 @@ typedef enum {
 
 typedef struct {
     NNS_GFD_DST_TYPE type;
-    const void *pSrc;
+    void *pSrc;
     u32 dstAddr;
     u32 szByte;
 } NNSGfdVramTransferTask;
@@ -197,18 +197,18 @@ typedef struct {
     u16 pad;
     // What the queued transfers come to
     u32 pendingBytes;
-} GfdVramTransferQueue;
+} NNSGfdVramTransferTaskQueue;
 
-BOOL NNSi_GfdPushVramTransferTaskQueue(GfdVramTransferQueue *queue);
-NNSGfdVramTransferTask *NNSi_GfdGetFrontVramTransferTaskQueue(GfdVramTransferQueue *queue);
-NNSGfdVramTransferTask *NNSi_GfdGetEndVramTransferTaskQueue(GfdVramTransferQueue *queue);
-BOOL NNSi_GfdPopVramTransferTaskQueue(GfdVramTransferQueue *queue);
+BOOL NNSi_GfdPushVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue);
+NNSGfdVramTransferTask *NNSi_GfdGetFrontVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue);
+NNSGfdVramTransferTask *NNSi_GfdGetEndVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue);
+BOOL NNSi_GfdPopVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue);
 void NNS_GfdInitVramTransferManager(NNSGfdVramTransferTask *pTaskArray, u32 lengthOfArray);
 // Drops every queued transfer
 void GfdClearVramTransferQueue(void);
 // Does every queued transfer, in the V-blank
 void NNS_GfdDoVramTransfer(void);
 // Queues a transfer to VRAM for the next V-blank, or returns FALSE if the queue is full
-BOOL NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_TYPE type, u32 dstAddr, const void *pSrc, u32 szByte);
+BOOL NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_TYPE type, u32 dstAddr, void *pSrc, u32 szByte);
 
 #endif // POKEBW2_NNSYS_GFD_H

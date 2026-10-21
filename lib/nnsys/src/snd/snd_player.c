@@ -158,49 +158,49 @@ void NNS_SndPlayerSetChannelPriority(NNSSndHandle *handle, int prio) {
     SND_SetPlayerChannelPriority(handle->player->playerNo, prio);
 }
 
-void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u32 trackBitMask, BOOL flag) {
+void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u16 trackBitMask, BOOL flag) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackMute(handle->player->playerNo, trackBitMask, flag);
 }
 
-void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u32 trackBitMask, int muteType) {
+void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u16 trackBitMask, NNSSndSeqMute muteType) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackMuteEx(handle->player->playerNo, trackBitMask, muteType);
 }
 
-void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u32 trackBitMask, int volume) {
+void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u16 trackBitMask, int volume) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackVolume(handle->player->playerNo, trackBitMask, CalcDecibel(volume));
 }
 
-void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u32 trackBitMask, int pitch) {
+void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u16 trackBitMask, int pitch) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackPitch(handle->player->playerNo, trackBitMask, pitch);
 }
 
-void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u32 trackBitMask, int pan) {
+void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u16 trackBitMask, int pan) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackPan(handle->player->playerNo, trackBitMask, pan);
 }
 
-void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u32 trackBitMask, int depth) {
+void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u16 trackBitMask, int depth) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackModDepth(handle->player->playerNo, trackBitMask, depth);
 }
 
-void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u32 trackBitMask, int speed) {
+void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u16 trackBitMask, int speed) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }

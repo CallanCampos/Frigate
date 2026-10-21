@@ -13,7 +13,7 @@ void DWCUtilSound_Exit(void);
 void DWCUtilSound_PlaySe(int seq);
 // Sets the volume and the pitch of the tracks of a mask of the sound effect that plays
 void DWCUtilSound_SetVolume(int volume);
-void DWCUtilSound_SetTrackPitch(u32 trackMask, int pitch);
+void DWCUtilSound_SetTrackPitch(u16 trackMask, int pitch);
 // Stops the sound effect
 void DWCUtilSound_StopSe(void);
 
