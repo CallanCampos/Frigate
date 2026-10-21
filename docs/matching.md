@@ -3363,6 +3363,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   32 such statics, which matched `DWCUtilAc_Start`. A `static const u8 *p = NULL;` goes to `.data` under 2.0, where
   `static u8 *p = NULL;` stays in `.bss`. It emits a jump table only when every value of the range has a case label,
   so `dwc_aoss.c`'s switches list the empty cases too, and so does `dwcutil_ac.c`'s `UtilAc_Scan`.
+- A static that a function stores to at offsets from its own address (`ldr r1, =obj; str r3, [r1]; str r2,
+  [r1, #0x14]`, then the same `r1` passed to a call) is one that the function doesn't know. Under `-ipa file` every
+  object of the file is known and reached from its section's base rounded down to 0x80 (`[r1, #0x30]` for an object at
+  0x30), and a pointer local is folded back into that. NitroSystem G3D's `sbc.c` has it in PRJMAP's texture matrix, at
+  0x30 of its `.data`: the file matches under `-ipa function` (`file_flags`), with the matrix defined after the last
+  function. That flag writes the data out in runs, one before each function that follows it, each sorted by size: the
+  ROM's `.data` (8, 8, 16, 16, then 64, 72, 72, 128 bytes) is the two texture commands and the material and shape tables
+  at the top, and the matrix, the two billboard commands and the command table defined after the last function, the
+  billboards and the matrix declared ahead of their users. Within a run, statics of one size come out in definition
+  order and globals of one size in the reverse, and the tentative `.bss` arrays in the reverse of their definitions.
 - A function-local static of a function MWCC doesn't emit is dropped, while a global read only by an unemitted
   static function stays in the shared section. Data that outlived code the original link dead-stripped can't be
   reproduced under `-nodead`: wipe_sub.c's `.data` and `.rodata` hold the parameters of about 31 handlers the ROM

@@ -21,26 +21,17 @@ static const u8 NNS_COMPACT_ROT_LUT[9][4] = {
     { 0, 1, 6, 7 }, { 1, 2, 4, 5 }, { 0, 2, 3, 5 }, { 0, 1, 3, 4 },
 };
 
-// The functions that draw a shape or a material of the item tag in its data, with room for three more of each; and the
-// function of each command, of which the model's byte code has fourteen
-NNSG3dFuncSbcMat NNS_G3D_MATERIAL_APPLY_FUNCS[4] = { NNS_G3DRenderFuncApplyMaterialDefault };
+// The texture image parameter commands that PRJMAP and ENVMAP send when they change a material's texture coordinates
+// source. The file is built with -ipa function, which writes each run of data out as the functions after it are emitted
+// and sorts each run by size: these two, with the material and shape tables, open its .data, and the larger objects
+// are defined after the last function, in the run that ends it
+static u32 sPrjMapCmd[2] = { G3OP_TEXIMAGE_PARAM, 0 };
+static u32 sEnvMapCmd[2] = { G3OP_TEXIMAGE_PARAM, 0 };
+
+// The functions that draw a shape or a material of the item tag in its data, with room for three more of each. Tables
+// of the same size come out in the reverse of their definitions
 NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4] = { NNS_G3DRenderFuncDrawMeshDefault };
-NNSG3dFuncSbc NNS_G3D_RENDER_FUNC[NNS_G3D_SBC_COMMAND_NUM] = {
-    NNS_G3DRenderFuncNop,
-    NNS_G3DRenderFuncReturn,
-    NNS_G3DRenderFuncSetVisGroup,
-    NNS_G3DRenderFuncLoadMatrix,
-    NNS_G3DRenderFuncApplyMaterial,
-    NNS_G3DRenderFuncDrawMesh,
-    NNS_G3DRenderFuncApplyJointMatrix,
-    NNS_G3DRenderFuncSetBillboardMatrix1,
-    NNS_G3DRenderFuncSetBillboardMatrix2,
-    NNS_G3DRenderFuncApplySmoSkMatrix,
-    NNS_G3DRenderFuncExecFIFOQueue,
-    NNS_G3DRenderFuncGlobalScale,
-    NNS_G3DRenderFuncApplySphereMap,
-    NNS_G3DRenderFuncApplyProjectionMap,
-};
+NNSG3dFuncSbcMat NNS_G3D_MATERIAL_APPLY_FUNCS[4] = { NNS_G3DRenderFuncApplyMaterialDefault };
 
 // The matrices that NNS_G3DRenderFuncApplySmoSkMatrix makes for a joint of the envelope: the clip matrix and the normal
 // matrix, 100 bytes together
@@ -50,12 +41,11 @@ typedef struct {
 } IbpMatrix;
 
 // The results of the materials that a model's nodes share, which a node reuses once one has made it. The scaling rules
-// set and read the scale of each joint. In the ROM the renderer's pointer and the three arrays are one block of .bss
-// (NitroSystem's render state on the global), which these four objects don't give: see the file's rows in
-// docs/nonmatching-functions.md
-NNSG3dMatAnmResult g_NNSMaterials[NNS_G3D_SIZE_MAT_MAX];
-NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
+// set and read the scale of each joint. Under -ipa function the .bss is laid out in the reverse of the definitions
+// here, which gives the ROM's order: the renderer's pointer, the materials, the scales and the joints' matrices
 IbpMatrix g_NNSG3DIBPMatrices[NNS_G3D_SIZE_JNT_MAX];
+NNSG3dJointScale g_NNSG3DJointScales[NNS_G3D_SIZE_JNT_MAX];
+NNSG3dMatAnmResult g_NNSMaterials[NNS_G3D_SIZE_MAT_MAX];
 NNSG3dRS *g_NNSG3DModelRenderer;
 
 // The timing of the command's callback, or zero when there is none
@@ -564,12 +554,9 @@ typedef struct {
     VecFx32 scale;
 } BillboardCmd;
 
-static BillboardCmd sBBCmd = {
-    0x1b171012, // MTX_POP, MTX_MODE, MTX_LOAD_4x3, MTX_SCALE
-    1,
-    2,
-    { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE } },
-};
+// Defined at the end of the file, with the command table
+static BillboardCmd sBBCmd;
+static BillboardCmd sBBYCmd;
 
 // BB: a billboard, facing the camera
 void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
@@ -661,13 +648,6 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
     }
     rs->c += size;
 }
-
-static BillboardCmd sBBYCmd = {
-    0x1b171012, // MTX_POP, MTX_MODE, MTX_LOAD_4x3, MTX_SCALE
-    1,
-    2,
-    { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE } },
-};
 
 // BBY: a billboard that turns about the y axis
 void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
@@ -903,8 +883,6 @@ void NNS_G3DRenderFuncGlobalScale(NNSG3dRS *rs, u32 opt) {
     rs->c += 1;
 }
 
-static u32 sEnvMapCmd[2] = { G3OP_TEXIMAGE_PARAM, 0 };
-
 // ENVMAP: maps the texture as a sphere map about the normals
 void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) && (rs->flag & NNS_G3D_RSFLAG_NODE_VISIBLE)) {
@@ -976,14 +954,12 @@ void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
     rs->c += 3;
 }
 
-static u32 sPrjMapCmd[2] = { G3OP_TEXIMAGE_PARAM, 0 };
+// The matrix that PRJMAP loads to map clip space to the texture, defined at the end of the file. Its stores here go
+// through its own address, as for a definition that comes after the function
+static MtxFx44 g_NNSTextureSpaceConvMatrix;
 
 // PRJMAP: maps the texture as if projected from the camera
 void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
-    static MtxFx44 g_NNSTextureSpaceConvMatrix = {
-        { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 1 << 16, 0 }, { 0, 0, 0, 1 << 16 } }
-    };
-
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) && (rs->flag & NNS_G3D_RSFLAG_NODE_VISIBLE)) {
         MtxFx43 pos;
         u32 timing;
@@ -1065,3 +1041,40 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
     }
     rs->c += 3;
 }
+
+// Defined after the functions, in the last run of the file's .data, which is sorted by size
+static MtxFx44 g_NNSTextureSpaceConvMatrix = {
+    { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 1 << 16, 0 }, { 0, 0, 0, 1 << 16 } }
+};
+
+static BillboardCmd sBBCmd = {
+    0x1b171012, // MTX_POP, MTX_MODE, MTX_LOAD_4x3, MTX_SCALE
+    1,
+    2,
+    { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE } },
+};
+
+static BillboardCmd sBBYCmd = {
+    0x1b171012, // MTX_POP, MTX_MODE, MTX_LOAD_4x3, MTX_SCALE
+    1,
+    2,
+    { { FX32_ONE, 0, 0 }, { 0, FX32_ONE, 0 }, { 0, 0, FX32_ONE } },
+};
+
+// The function of each command, of which the model's byte code has fourteen
+NNSG3dFuncSbc NNS_G3D_RENDER_FUNC[NNS_G3D_SBC_COMMAND_NUM] = {
+    NNS_G3DRenderFuncNop,
+    NNS_G3DRenderFuncReturn,
+    NNS_G3DRenderFuncSetVisGroup,
+    NNS_G3DRenderFuncLoadMatrix,
+    NNS_G3DRenderFuncApplyMaterial,
+    NNS_G3DRenderFuncDrawMesh,
+    NNS_G3DRenderFuncApplyJointMatrix,
+    NNS_G3DRenderFuncSetBillboardMatrix1,
+    NNS_G3DRenderFuncSetBillboardMatrix2,
+    NNS_G3DRenderFuncApplySmoSkMatrix,
+    NNS_G3DRenderFuncExecFIFOQueue,
+    NNS_G3DRenderFuncGlobalScale,
+    NNS_G3DRenderFuncApplySphereMap,
+    NNS_G3DRenderFuncApplyProjectionMap,
+};
