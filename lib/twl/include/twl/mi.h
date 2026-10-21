@@ -112,6 +112,12 @@ void MI_GetNDmaConfig(u32 ndmaNo, MINDmaConfig *config);
 // copy, by the address modes of mode, started at timing (-1: at once) with the channel's settings in config
 void MIi_NDmaAsync(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size, MINDmaCallback callback,
                    void *arg, const MINDmaConfig *config, u32 timing, u32 enable);
+
+// The transfer started at once with the channel's own settings
+static inline void MIi_NDmaAsyncImmediate(u32 mode, u32 ndmaNo, const void *src, void *dest, u32 data, u32 size,
+                                          MINDmaCallback callback, void *arg, u32 enable) {
+    MIi_NDmaAsync(mode, ndmaNo, src, dest, data, size, callback, arg, &MIi_NDmaConfig[ndmaNo], (u32)-1, enable);
+}
 // The card's reads by NDMA: one word at each request of the card, from its data register, until the card's transfer
 // ends. The second is the one that CARDi_NdmaInterface gives the card library
 void MIi_StartCardNDma(u32 ndmaNo, const void *src, void *dest);
