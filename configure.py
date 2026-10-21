@@ -660,8 +660,11 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
                 order_only=["constants_headers"])
 
     # Progress report, compares every delinked object with its compiled counterpart
+    # objdiff's report, then complete files counted as matched, which the ROM checks prove (tools/build/complete_report.py)
+    objdiff_report = build_dir / "report.objdiff.json"
+    n.build([objdiff_report], "report", [], implicit=["objdiff.json", *compiled, *delink_outputs])
     report = build_dir / "report.json"
-    n.build([report], "report", [], implicit=["objdiff.json", *compiled, *delink_outputs])
+    n.build([report], "complete_report", [objdiff_report], implicit=["tools/build/complete_report.py"])
     n.build([f"{version}_progress"], "progress", [report])
     # The checks also compile every source file, so that an incomplete file, whose object only feeds the report and
     # is never linked, can't stop compiling without the default build noticing.
@@ -772,6 +775,7 @@ def main():
     n.rule("objdiff_config", f"$python tools/build/objdiff_config.py $version --dsd $dsd "
            f"--compiler {DECOMP_ME_COMPILER} --c-flags '{decomp_me_flags}' -o $out", "Writing $out")
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
+    n.rule("complete_report", "$python tools/build/complete_report.py $in $out", "Counting complete files in $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),
                       *([f"--shift {args.shift:#x}"] if args.shift else [])]

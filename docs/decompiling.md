@@ -18,7 +18,9 @@ The current C mismatches and attempted translations still in assembly are tracke
 3. objdiff can also create a decomp.me scratch for a function. The scratch uses compiler `mwcc_40_1024` (dsi/1.1p1),
    and a context file preprocessed from the source.
 
-`ninja progress` prints how much of the game matches, from the report at `build/b2_us/report.json`.
+`ninja progress` prints how much of the game matches, from the report at `build/b2_us/report.json`: objdiff's,
+with every complete file counted as matched, since the ROM checks prove it, where objdiff scores a call below 100
+when the two objects name its target differently (`tools/build/complete_report.py`).
 CI's `build.yml` builds each version on every push to main and uploads its report as the artifact `b2_us_report` or
 `w2_us_report`. [ByteMatch](https://bytematch.dev/fuddlesworth/pokebw2) reads them, and the README shows its badges, so there is nothing
 to update by hand. `objdiff_config.py` gives each unit progress categories, which become ByteMatch's separate
