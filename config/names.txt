@@ -5287,6 +5287,7 @@
 . 0x0209b8a4 _loc_coll_C
 . 0x0209b8b4 _loc_tim_C
 . 0x0209b9e8 char_coll_tableC
+. 0x0209bc20 OverlayTableDigests
 . 0x0209bc48 SDK_OVERLAY_DIGEST
 . 0x0209d728 SDK_OVERLAY_DIGEST_END
 . 0x0209d740 g_MainMemoryPriorityBlocked
