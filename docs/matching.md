@@ -667,7 +667,10 @@ Same instructions, registers swapped.
   against a copy with the same include guard (`--extra-flags "-i DIR -prefix copy.h"`).
 - An array zeroed where it is declared in an inner block (`u8 list[N] = { 0 };` inside the block that fills it) is
   laid out and cleared differently from one declared at the top of the function and cleared by a call or a loop:
-  overlay 12's `MusicalEvent_RecordShow`, `s0249_GetRandomDistinctSix` and `MusicalProgram_Create` matched that way. A constant
+  overlay 12's `MusicalEvent_RecordShow`, `s0249_GetRandomDistinctSix` and `MusicalProgram_Create` matched that way.
+  Under 2.0/sp2p2 a clear in place by a down-counting byte loop (`movs r1, #0x22; movs r0, #0; strb r0, [r2];
+  adds r2, #1; subs r1, #1; bne`), where `memset` gives a call, is such an initializer, `char name[0x22] = { 0 };`, which
+  runs again on each pass when the array is declared in a loop's body (`dwcutil_ac.c`'s `UtilAc_FindSetupAp`). A constant
   the retail game fixes but the code still tests or passes as a variable is held in an enum-typed local, which MWCC
   does not fold (`FieldScript_LoadData`'s source, `CallTrialHouseBattle`'s battle type,
   `s01D6_MoveReminderCallMoveSelect`'s mode).
@@ -3890,10 +3893,16 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   grinding such a function. A file gets a compiler of its own in its `library.toml`'s `file_compilers`, as
   `syscall_twl_ltd.c` does, and keeps the library's flags.
 
-- MWCC 2.0/sp2p2 places a Thumb literal pool island 0x1c bytes earlier than the compiler of the DWC utility
-  (`lib/dwcutil`): `dwcutil_ac.c`'s `UtilAc_MD5Transform` and `UtilAc_Run` have the original's code and pool words with
-  the island one step early, through every form of the source tried, so the utility was likely built with another 2.0.
-  A same-size difference that is only a pool placed early, in a 2.0 file, is that and not the C.
+- MWCC 2.0/sp2p2 places a Thumb literal pool island by a fixed rule (`ConstantPools.c`, at 0x514fd0 in its
+  `mwccarm.exe`): it sizes each instruction from its opcode table (a conditional branch as 6 bytes and a `b` as 4, before
+  they are shortened; everything else at its real size), and at the first instruction that lies 0x3a0 bytes or more past
+  the first pending pool load (`0x3fc - 0x60`, plus the 4 of the pc), it dumps the pool after the last unconditional
+  branch since the last pool load, or else after that load with a `b` around it. The DWC utility's compiler used a
+  smaller margin: `UtilAc_MD5Transform` has no branch at all, so its sizes are exact, and the ROM's island after the load
+  at +0x3d2 (first load at +0x2a) needs a margin of 0x40 to 0x54 where sp2p2's 0x60 puts it one step (0x1c) early, after
+  +0x3b6; `UtilAc_Run`'s island after the `b` at +0x346 needs 0x1a bytes more room than sp2p2 gives it, a margin of at
+  most 0x46. Both have the original's instructions and pool words, so no source change can move them; another 2.0 build
+  with a margin of 0x40 is needed. A pool placed early in an otherwise same function of a 2.0 file is that, not the C.
 
 - MWCC's ARM assembler, in an `asm` function, takes the pre-UAL spellings that dsd prints, not Capstone's UAL ones:
   `ldmltia`, `ldrneb`, `subges`, `stmdb sp!, {...}` and `ldmia sp!, {...}` for push and pop, and shifts as operands
