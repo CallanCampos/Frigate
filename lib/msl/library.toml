@@ -58,8 +58,8 @@ flags = [
 # the three statics share one. Without it the compiler puts them all in the shared section, sorted by size
 "locale.c" = ["-ipa file"]
 
-# exit.c matches only under 2.0/sp2p2 and 1.2/base, the compilers of the TwlSDK system call library just before it:
-# every dsi build sets its flag with a plain mov and a moveq where the ROM has a movne and a moveq. It takes 2.0/sp2p2,
+# exit.c matches only under the 2.0 builds and 1.2/base, the compilers of the TwlSDK system call library just before
+# it: every dsi build sets its flag with a plain mov and a moveq where the ROM has a movne and a moveq. It takes 2.0/sp2,
 # as syscall_twl.c does
 [file_compilers]
-"exit.c" = "2.0/sp2p2"
+"exit.c" = "2.0/sp2"

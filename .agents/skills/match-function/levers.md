@@ -230,9 +230,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   owned by directional inlines; the latter improves the still-partial function. (matching.md: "snapshot ownership")
 - A local slotted above the temporaries where the original's value sits among them: the expression written at each
   use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
-- A NitroSystem (2.0/sp2p2) function's spill slots in another order: locals are slotted function scope first, then
+- A NitroSystem (2.0/sp2) function's spill slots in another order: locals are slotted function scope first, then
   the `if` block's, then the `else` block's, then inlines' in reverse; move them to function scope.
-  (matching.md: "In NitroSystem's 2.0/sp2p2 code a pointer sum")
+  (matching.md: "In NitroSystem's 2.0/sp2 code a pointer sum")
 - Spill slots grouped by kind across branches where ours are in declaration order: a local set from an inline's
   return is slotted as a temporary; compute it in place to make it named, or the reverse. (matching.md: "A local
   assigned straight from a `static inline`'s return")
@@ -382,7 +382,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "another processor holds")
 - A constant return value built between a load and its store: `result = CONST;` before that store, `break`, and one
   `return result;`. (matching.md: "A constant return value built between")
-- A member of a file static stored through a literal of its own address (2.0/sp2p2): a pointer local to the member.
+- A member of a file static stored through a literal of its own address (2.0/sp2): a pointer local to the member.
   (matching.md: "goes through the section's anchor")
 - An inline's argument evaluated in the original's order only through the SDK's own inline, enum parameter and all
   (`G3X_SetFifoIntrCond`). (matching.md: "It goes the other way as well")
@@ -772,10 +772,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "`ScClient_SubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
   it as a counter times the step. (matching.md: "A loop offset that starts at 0")
-- A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2p2): put it last
+- A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2): put it last
   in the `for` increment's comma list. (matching.md: "a `for` loop's comma-separated increment")
 - In library code, a store pointer stepped with `strb rX, [r2], #1`, set up after the loop's entry test and restarted
-  at `base + i`, where dsi/1.1p1 indexes: probe 2.0/sp2p2, which TwlSDK's `syscall_twl_ltd.c` matches under.
+  at `base + i`, where dsi/1.1p1 indexes: probe 2.0/sp2, which TwlSDK's `syscall_twl_ltd.c` matches under.
   (matching.md: "`syscall_twl_ltd.c` matches whole under it")
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
   `while (TRUE)` with a `break` or `return`. (matching.md: "is rotated")
@@ -835,7 +835,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "has a test whose value is 0/1"), (matching.md: "What keeps the `b`")
 - The same `b` in every function that reads one object, where the file's other loops are rotated: the object has an
   explicit alignment, as a 32-aligned address in the ROM shows; another file's object takes it on its `extern`
-  declaration. NitroSystem's 2.0/sp2p2 too (`NNS_SndArcStrmInit`). (matching.md: "An explicit alignment")
+  declaration. NitroSystem's 2.0/sp2 too (`NNS_SndArcStrmInit`). (matching.md: "An explicit alignment")
 - The same in an outer loop around an inner one: begin its body with the inner loop,
   `while (head[i] != NULL) { p = head[i]; ... }`. (matching.md: "whose body begins with another loop")
 - An empty loop that the original keeps and `-O4,p` drops: the function reads an aligned object (`lib/irc`'s
@@ -933,7 +933,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   globals get their own sections. Predict with `tools/decomp/rodata_order.py`; the object list must be complete, so
   `--from-object FILE.o` lists every object a compile made and `--check FILE.o` fails when the prediction and the
   compiler disagree. A "no order works" verdict means nothing until `--check` passes. (matching.md: "Static data is sorted by size")
-- On NitroSystem's `2.0/sp2p2`, initialized globals are ordered by size, smallest first, and objects of one size in the
+- On NitroSystem's `2.0/sp2`, initialized globals are ordered by size, smallest first, and objects of one size in the
   reverse of their declaration order (G3D's `anm.c`, `cgtool.c`). (matching.md: "gives each initialized global")
 - Stores at offsets from a static's own address (`ldr r1, =obj; str r3, [r1]`) where ours goes through the section's
   base: the function doesn't know the object, so `-ipa function` with the object defined after it (G3D's `sbc.c`).
