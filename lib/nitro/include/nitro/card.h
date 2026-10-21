@@ -270,7 +270,7 @@ BOOL CARD_WaitBackupAsync(void);
 BOOL CARD_TryWaitBackupAsync(void);
 void CARD_CancelBackupAsync(void);
 
-// What card_common.c gives the other files of the library
+// What card_common.c and card_task.c give the other files of the library
 void CARD_Init(void); // swan's cart_read_thread_init
 void CARD_CheckEnabled(void);
 const ROMHeader *CARD_GetRomHeader(void);
@@ -280,6 +280,7 @@ u32 CARDi_GetAccessLevel(void);
 BOOL CARDi_WaitAsync(void);
 BOOL CARDi_TryWaitAsync(void);
 BOOL CARDi_ExecuteOldTypeTask(CARDiTask task, BOOL async);
+void CARDi_OldTypeTaskThread(void *arg); // swan's cart_read_thread_proc
 BOOL CARDi_WaitForTask(CARDiCommon *p, BOOL start, MIDmaCallback callback, void *arg);
 void CARDi_EndTask(CARDiCommon *p);
 const CARDDmaInterface *CARDi_GetDmaInterface(u32 dma);

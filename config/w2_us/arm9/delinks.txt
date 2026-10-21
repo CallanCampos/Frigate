@@ -1878,9 +1878,9 @@ lib/dwc/src/bm/dwc_bm_check.c:
     .text       start:0x0205e04c end:0x0205ea68
 
 lib/nitro/src/card/card_common.c:
-    .text       start:0x0206edc0 end:0x0206f310
-    .rodata     start:0x0209456c end:0x02094574
-    .bss        start:0x0214b41c end:0x0214b9c0
+    complete
+    .text       start:0x0206edc0 end:0x0206f11c
+    .bss        start:0x0214b41c end:0x0214b9a0
 
 lib/nitro/src/card/card_request.c:
     complete
@@ -2577,3 +2577,9 @@ lib/msl/src/exit.c:
     complete
     .text       start:0x020828d8 end:0x020828f4
     .bss        start:0x0214ee08 end:0x0214ee0c
+
+lib/nitro/src/card/card_task.c:
+    complete
+    .text       start:0x0206f11c end:0x0206f310
+    .rodata     start:0x0209456c end:0x02094574
+    .bss        start:0x0214b9a0 end:0x0214b9c0

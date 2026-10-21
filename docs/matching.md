@@ -3304,8 +3304,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   without `-ipa file` therefore ask for the flag before any respelling. Under `-ipa function` a file's initialized
   statics come first in its `.bss`, by size, and the tentative ones follow in the reverse of their declarations (every
   dsi compiler and 2.0/sp2p2), so two literals for a static that the ROM places after the file's others, read at offset
-  0, mean that it opens another file's `.bss`: `card_common.c`'s `CARDi_NotifyEvent` matches in a scratch copy of the
-  file split at `0x0206f0f0`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
+  0, mean that it opens another file's `.bss`: `CARDi_NotifyEvent` matches, and the CARD range links, only with
+  `card_common.c` split at `0x0206f0f0`, the hooks' head `= { NULL }` opening `card_task.c`'s `.bss`. A static at the head of an `-ipa function` file's `.bss` reached through two literals is
   one defined with a zero initializer (next bullet), which is known and also stays first in the `.bss`: TwlSDK's
   `nwm.c` matches `func_02702468` with `static u8 sNwmInitialized = FALSE;` and no split.
 - Under `-ipa function` the same holds for zero: a `.bss` global or static defined with an initializer, `= 0`,
@@ -3316,10 +3316,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the 0x4000 default, takes it, and with the zeroed `.bss` globals in ntrtwl's definition order its four functions
   match (33 bytes to 0x2c off otherwise).
 - In Thumb code a word of a known static at section offset `off` is read through the literal `.bss` plus `off` rounded
-  down to a multiple of 0x80, with the rest in the load's offset: in `card_common.c` a static at 0x584 is read as
-  `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read with no
-  offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584 into the
-  file's one `.bss`, is another sign that it opens a section of another file.
+  down to a multiple of 0x80, with the rest in the load's offset: in the unsplit `card_common.c` a static at 0x584 is
+  read as `.bss+0x580` and `#4`, at 0x5a0 as `.bss+0x580` and `#0x20`, and at 0x600 as `.bss+0x600` and `[r0]`. A read
+  with no offset puts the static at a multiple of 0x80 in its section, which for `CARDi_NotifyEvent`'s head, 0x584
+  into the file's one `.bss`, is another sign that it opens a section of another file.
 - Under `-ipa file`, objects defined between `#pragma section NAME begin` and `#pragma section NAME end` get a section
   each and are reached through literals of their own, as under `-ipa function`, while the block's functions still reach
   the file's default `.bss` from its pooled base. `#pragma define_section NAME "init" "uninit" "const" abs32 RWX` names
