@@ -24,6 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
+from tools.build.object_aliases import label_aliases  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
 from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
@@ -549,15 +550,24 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     as_defines = " ".join(f"-D{define}" for define in version_defines)
     objects = []
     compiled = []
+    # A function's second names, kept as labels in the configs, which the compiled object gets added, see
+    # tools/build/object_aliases.py
+    aliases = label_aliases(arm9_config.parent)
     for f in files:
         source = Path(f["name"])
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
             settings = source_compiler(source)
             rule = f"mwcc_{LIBRARY_COMPILERS.index(settings.compiler)}" if settings.is_library else "mwcc"
-            variables = {"defines": defines, "dep": obj.with_suffix(".d")}
+            source_aliases = aliases.get(source.as_posix())
+            compiler_obj = obj.with_suffix(".unaliased.o") if source_aliases else obj
+            variables = {"defines": defines, "dep": compiler_obj.with_suffix(".d")}
             variables["flags"] = " ".join(settings.flags)
-            n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
+            n.build([compiler_obj], rule, [source], variables=variables, order_only=["constants_headers"])
+            if source_aliases:
+                n.build([obj], "object_aliases", [compiler_obj], implicit=["tools/build/object_aliases.py"],
+                        variables={"aliases": " ".join(f"{label}={function}"
+                                                       for label, function in sorted(source_aliases.items()))})
             compiled.append(obj)
         objects.append(f["object_to_link"])
 
@@ -650,8 +660,11 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
                 order_only=["constants_headers"])
 
     # Progress report, compares every delinked object with its compiled counterpart
+    # objdiff's report, then complete files counted as matched, which the ROM checks prove (tools/build/complete_report.py)
+    objdiff_report = build_dir / "report.objdiff.json"
+    n.build([objdiff_report], "report", [], implicit=["objdiff.json", *compiled, *delink_outputs])
     report = build_dir / "report.json"
-    n.build([report], "report", [], implicit=["objdiff.json", *compiled, *delink_outputs])
+    n.build([report], "complete_report", [objdiff_report], implicit=["tools/build/complete_report.py"])
     n.build([f"{version}_progress"], "progress", [report])
     # The checks also compile every source file, so that an incomplete file, whose object only feeds the report and
     # is never linked, can't stop compiling without the default build noticing.
@@ -732,6 +745,7 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
+    n.rule("object_aliases", "$python tools/build/object_aliases.py $in $out $aliases", "Adding labels to $out")
     n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
@@ -761,6 +775,7 @@ def main():
     n.rule("objdiff_config", f"$python tools/build/objdiff_config.py $version --dsd $dsd "
            f"--compiler {DECOMP_ME_COMPILER} --c-flags '{decomp_me_flags}' -o $out", "Writing $out")
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
+    n.rule("complete_report", "$python tools/build/complete_report.py $in $out", "Counting complete files in $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),
                       *([f"--shift {args.shift:#x}"] if args.shift else [])]
