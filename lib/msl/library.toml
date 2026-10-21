@@ -39,7 +39,11 @@ flags = [
 # that the ROM keeps (cmp r8, #0 / blt after the adds that sets m, and cmpgt r0, #0 before z = q[jz]). The other fdlibm
 # files match either way, so they follow it. fp/fp_fastI.c, the soft-float runtime, is hand-written assembly (mrs and
 # msr on the flags, several entry points per routine), not C.
+# These runtime files carry the original compiler-generated exception indices in ARM9 rodata.
 [file_flags]
+"runtime/register_atexit.c" = ["-Cpp_exceptions on"]
+"runtime/console_io.c" = ["-Cpp_exceptions on"]
+"runtime/call_static_initializers.c" = ["-Cpp_exceptions on"]
 "math/e_pow.c" = ["-inline off"]
 "math/e_rem_pio2.c" = ["-inline off"]
 "math/k_cos.c" = ["-inline off"]

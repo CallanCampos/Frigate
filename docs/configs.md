@@ -32,6 +32,17 @@ in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_ar
 `build/<version>/arm9_symbols.lcf`, the linker script that the link (or `--shift`'s padding) takes. Another one goes in
 the config when a file that reads it is written, with its value read from the pool word in both versions.
 
+## Compiler exception indices
+
+MSL's runtime/register_atexit.c, runtime/console_io.c and runtime/call_static_initializers.c use
+`-Cpp_exceptions on` and emit 48 bytes of exception indices in `.exceptix`. These are compiler output with relocations
+to their functions, placed before ARM9's ordinary `.rodata`. Analysis originally folded this prefix into `.rodata`;
+registering it there makes the runtime precede the game's data owners while code order puts the game first, creating
+a link-order cycle. `config_fixes.py split-section-prefix . .rodata .exceptix 0x30 0x0208ee28` restores the distinct
+module section in both versions and migrates any wholly contained registered ranges. The operation rejects a split
+through an owner's range and preserves the module section's kind and alignment. Each runtime file owns its emitted
+`.exceptix` range directly, so the linker keeps the compiler's relocations without a C reconstruction of the indices.
+
 ## Fixing the configs
 
 dsd sometimes cannot tell which overlay a relocation points to, because many overlays share addresses. It then lists

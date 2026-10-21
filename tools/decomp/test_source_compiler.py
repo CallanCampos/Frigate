@@ -110,6 +110,7 @@ class SourceCompilerTests(unittest.TestCase):
                     patch.object(sys, "argv", ["probe", source]), \
                     patch.object(Path, "iterdir", return_value=[Path("first"), Path("second")]), \
                     patch.object(compiler_probe, "load_modules", return_value={}), \
+                    patch.object(compiler_probe, "defined_functions", return_value=[]), \
                     patch.object(compiler_probe, "mwcc_command", return_value=["compiler"]) as command, \
                     patch.object(compiler_probe.subprocess, "run", return_value=subprocess.CompletedProcess([], 1, "", "")), \
                     contextlib.redirect_stdout(io.StringIO()):

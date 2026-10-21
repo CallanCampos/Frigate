@@ -447,6 +447,10 @@
 . 0x0208e144 add_function _fsub:arm:0xc
 . 0x0208e150 add_function fsub_magnitudes:arm:0x26c
 . 0x0208e798 add_label _ddiv
+. 0x0208ee28 split_section_prefix .rodata:.exceptix:0x30
+. 0x0208ee28 add_section lib/msl/src/runtime/register_atexit.c:.exceptix:0xc
+. 0x0208ee34 add_section lib/msl/src/runtime/console_io.c:.exceptix:0x18
+. 0x0208ee4c add_section lib/msl/src/runtime/call_static_initializers.c:.exceptix:0xc
 . 0x0208f021 remove_symbol
 . 0x0208f7c8 remove_reloc
 . 0x0208f976 remove_symbol
