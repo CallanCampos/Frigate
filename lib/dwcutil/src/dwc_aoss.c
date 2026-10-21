@@ -1823,7 +1823,7 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
     }
     if (CPSMyIp == 0) {
         do {
-            AossAp_Sleep(100);
+            OS_Sleep(100);
         } while (CPSMyIp == 0);
     }
     return 0;
