@@ -74,7 +74,7 @@ static void EffectEncount_ResumeSpot(EncountSystem *system, EffectEncountState *
 static BOOL EffectEncount_UpdateStepCounter(EncountState *encountState, EffectEncountState *state);
 static void setShakingSpotOff(EncountState *encountState);
 static void EffectEncount_GetSearchArea(EncountSystem *system, EffectEncountState *state, EffectEncountArea *area);
-static void positionShakingSpot(EncountSystem *system, EffectEncountState *state, u32 kindMask);
+static void positionShakingSpot(EncountSystem *system, EffectEncountState *state, u8 kindMask);
 static void EffectEncount_PlaceRandomCandidate(EncountSystem *system, EffectEncountState *state);
 static BOOL IsPositionOccupiedByActorAny(EncountSystem *system, s16 x, s16 y, s16 z, BOOL skipPlayer);
 static BOOL EncountSystem_CancelPhenomenonIfActorHitCore(EncountSystem *system);
@@ -91,7 +91,7 @@ static const u8 sPhenomenonStepChances[3][2] = { { 20, 10 }, { 20, 10 }, { 5, 15
 // The shards a dust cloud gives in the zones of DUST_CLOUD_SHARD_ZONES
 static const u16 DUST_CLOUD_ITEMS_SHARDS[4] = { ITEM_RED_SHARD, ITEM_BLUE_SHARD, ITEM_YELLOW_SHARD, ITEM_GREEN_SHARD };
 
-// The phenomena each kind of tile can have: 1 for grass, 2 for water and dust
+// Encounter-table availability flags for each terrain phenomenon kind
 static const u8 sPhenomenonKindMasks[10] = { 1, 1, 1, 1, 1, 2, 2, 1, 0, 0 };
 
 // The rarer items of a dust cloud
@@ -150,7 +150,7 @@ void func_ov036_021a203c(EncountSystem *system, EffectEncountState *state) {
 }
 
 void UpdatePhenomenon(EncountSystem *system) {
-    u32 kindMask = 0;
+    u8 kindMask = 0;
     EncountState *encountState = GameData_GetEncountState(system->gameData);
     EffectEncountState *state;
     MapMatrix *matrix;
@@ -434,7 +434,7 @@ static void EffectEncount_GetSearchArea(EncountSystem *system, EffectEncountStat
 }
 
 // Finds the tiles around the player where a phenomenon of the kinds can appear
-static void positionShakingSpot(EncountSystem *system, EffectEncountState *state, u32 kindMask) {
+static void positionShakingSpot(EncountSystem *system, EffectEncountState *state, u8 kindMask) {
     VecFx32 pos;
     EffectEncountArea area;
     MapTerrainBuf terrain;

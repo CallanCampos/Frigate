@@ -93,8 +93,8 @@ void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out) {
     VecFx32 dir;
     VecFx32 side;
     VecFx32 cross;
-    s32 posV;
-    s32 length;
+    fx32 length;
+    fx32 posV;
     fx32 t;
     s32 posH;
     s32 width;
@@ -105,11 +105,11 @@ void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out) {
     point1 = GetCurrentRailLinePoint2(unit);
     pos0 = &point0->pos;
     pos1 = &point1->pos;
-    posV = GetCurrentLinePosV(unit);
-    length = GetCurrentLineLength(unit);
-    t = FX_Div(posV << 12, length << 12);
+    posV = GetCurrentLinePosV(unit) << FX32_SHIFT;
+    length = GetCurrentLineLength(unit) << FX32_SHIFT;
+    t = FX_Div(posV, length);
     out->y = pos1->y - pos0->y;
-    out->y = FX_Div(FX_Mul(out->y, posV << 12), length << 12);
+    out->y = FX_Div(FX_Mul(out->y, posV), length);
     out->y += pos0->y;
     curve = RailUnit_GetCurve(unit);
     center.x = curve->center.x;
