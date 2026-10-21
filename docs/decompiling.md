@@ -25,7 +25,10 @@ to update by hand. `objdiff_config.py` gives each unit progress categories, whic
 categories: ARM9 main or the overlays, and the game's code or each library of `lib/`.
 
 `tools/decomp/add_source_file.py` adds a source file to both versions' `delinks.txt`, with White 2's ranges taken
-from the version map. `tools/decomp/compiler_probe.py src/... --compilers 1.1 --show-diff 1.1` compiles a file and
+from the version map. A code range may start or end where no function does (a section's edge, or filler and data in
+`.text`, as ARM9 main's secure area and version strings), and the tool places that address from the paired functions
+around it when they agree; when they don't, it stops and names both places instead of guessing, and a config is never
+edited by hand. `tools/decomp/compiler_probe.py src/... --compilers 1.1 --show-diff 1.1` compiles a file and
 diffs every function in it against the original. A library under `lib/` that has its own compiler, such as SPL
 with `1.2/base`, gets the compiler and flags of its `library.toml` by default. `--mismatches` leaves out the functions that
 match, and `--functions` limits the table and diffs to the functions named. `--align` shows only the hunks of the

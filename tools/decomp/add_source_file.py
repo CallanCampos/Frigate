@@ -3,7 +3,8 @@
 
 Section ranges are given for the primary version. The ranges in the other versions are derived from the version map:
 code ranges through the paired functions, other sections by their offset from the section start, which requires the
-section to have the same size in both versions.
+section to have the same size in both versions. A code range may start or end where no function does, at the section's
+edges or among padding, filler or data in .text, when the paired functions around that address agree on its place.
 """
 import argparse
 import csv
@@ -40,23 +41,62 @@ def function_ends(config: Path) -> dict[int, int]:
     return ends
 
 
+def code_anchors(primary_config, other_config, function_pairs) -> dict[int, int]:
+    """Returns the code addresses whose place in the other version is known, primary -> other: the start and end of
+    every paired function and of the module's .text. Where a function ends at the next one's start, the start wins, which
+    keeps a file that ends there next to the one that begins there when the padding between them differs."""
+    primary_ends = function_ends(primary_config)
+    other_ends = function_ends(other_config)
+    anchors = {}
+    for primary, other in function_pairs.items():
+        if primary in primary_ends and other in other_ends:
+            anchors[primary_ends[primary]] = other_ends[other]
+    anchors.update(function_pairs)
+    primary_text = parse_sections(primary_config / "delinks.txt")[".text"]
+    other_text = parse_sections(other_config / "delinks.txt")[".text"]
+    anchors.update(zip(primary_text, other_text))
+    return anchors
+
+
+def map_code_address(address, anchors, functions, module) -> int:
+    """Maps a code address to the other version: an anchor maps directly, and an address between two anchors only when
+    both give it the same place, that is when the bytes from the one before it to the one after it (padding, filler or
+    data in .text) have the same size in both versions, as in ARM9 main's secure area and version strings."""
+    if address in anchors:
+        return anchors[address]
+    for start, end in functions:
+        if start < address < end:
+            sys.exit(f".text address {address:#010x} is inside the function at {start:#010x} in {module}")
+    before = max((a for a in anchors if a < address), default=None)
+    after = min((a for a in anchors if a > address), default=None)
+    if before is None or after is None:
+        sys.exit(f".text address {address:#010x} is outside {module}'s .text")
+    from_before = anchors[before] + (address - before)
+    from_after = anchors[after] - (after - address)
+    if from_before != from_after:
+        sys.exit(
+            f".text address {address:#010x} of {module} has no function or section edge, and the anchors around it "
+            f"disagree on its place: {from_before:#010x} after {before:#010x}, {from_after:#010x} before {after:#010x}"
+        )
+    return from_before
+
+
 def map_range(name, start, end, module, other, primary_config, other_config, function_pairs):
     if name == ".text":
-        other_start = function_pairs.get(start)
-        # The end is either the end of the last function, or the start of the next one
-        starts = sorted(a for a in function_pairs if start <= a < end)
-        if other_start is None or not starts:
-            sys.exit(f"{name} {start:#010x}..{end:#010x} does not start at a function in {module}")
-        last = starts[-1]
-        last_end = function_ends(primary_config)[last]
-        other_last = function_pairs[last]
-        other_last_end = function_ends(other_config)[other_last]
-        if end == last_end:
-            return other_start, other_last_end
-        if end > last_end:
-            # Padding after the last function, which has the same size in both versions
-            return other_start, other_last_end + (end - last_end)
-        sys.exit(f"{name} end {end:#010x} is inside the function at {last:#010x}")
+        anchors = code_anchors(primary_config, other_config, function_pairs)
+        functions = list(function_ends(primary_config).items())
+        other_start = map_code_address(start, anchors, functions, module)
+        if end in anchors:
+            return other_start, anchors[end]
+        # Padding after the range's last paired function, which has the same size in both versions
+        starts = [a for a in function_pairs if start <= a < end]
+        if starts:
+            last = max(starts)
+            last_end = function_ends(primary_config)[last]
+            if end < last_end:
+                sys.exit(f"{name} end {end:#010x} is inside the function at {last:#010x}")
+            return other_start, function_ends(other_config)[function_pairs[last]] + (end - last_end)
+        return other_start, map_code_address(end, anchors, functions, module)
 
     primary_sections = parse_sections(primary_config / "delinks.txt")
     other_sections = parse_sections(other_config / "delinks.txt")
