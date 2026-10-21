@@ -597,12 +597,12 @@ typedef struct {
     NNSG2dFVec2 sizeView;
 } NNSG2dViewRect;
 
-enum {
+typedef enum {
     NNS_G2D_SURFACETYPE_MAIN3D,
     NNS_G2D_SURFACETYPE_MAIN2D,
     NNS_G2D_SURFACETYPE_SUB2D,
     NNS_G2D_SURFACETYPE_MAX,
-};
+} NNSG2dSurfaceType;
 
 typedef BOOL (*NNSG2dOamRegisterFunction)(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine);
 typedef u16 (*NNSG2dAffineRegisterFunction)(const MtxFx22 *mtx);
