@@ -5450,7 +5450,7 @@
 . 0x0214c210 OSi_SystemCallbackInSwitchThread
 . 0x0214c214 OSi_RescheduleCount
 . 0x0214c218 OSi_CurrentThreadPtr
-. 0x0214c21c OSi_ThreadInitialized
+. 0x0214c21c OSi_IsThreadInitialized
 . 0x0214c22c OSi_ThreadInfo
 . 0x0214c23c OSi_IdleThread
 . 0x0214c2fc OSi_LauncherThread

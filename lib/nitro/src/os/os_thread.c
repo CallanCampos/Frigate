@@ -29,7 +29,7 @@ static OSSwitchThreadCallback OSi_SystemCallbackInSwitchThread;
 // How many times the scheduler has been locked (NitroSDK's OS_DisableScheduler), which stops it from switching
 static u32 OSi_RescheduleCount;
 // Whether OS_InitThread has run (NitroSDK's OS_IsThreadAvailable), which other code reads
-BOOL OSi_ThreadInitialized;
+BOOL OSi_IsThreadInitialized;
 // A word that code the link removed used, the stack that a thread that ends runs the end on when it is not zero, and
 // the last ID that was given to a thread
 static struct {
@@ -226,10 +226,10 @@ static void OSi_RescheduleThread(void) {
 void OS_InitThread(void) {
     u32 stackTop;
 
-    if (OSi_ThreadInitialized) {
+    if (OSi_IsThreadInitialized) {
         return;
     }
-    OSi_ThreadInitialized = TRUE;
+    OSi_IsThreadInitialized = TRUE;
     OSi_CurrentThreadPtr = &OSi_ThreadInfo.current;
 
     OSi_LauncherThread.priority = OS_THREAD_LAUNCHER_PRIORITY;
@@ -262,9 +262,15 @@ void OS_InitThread(void) {
     OSi_IdleThread.state = OS_THREAD_STATE_READY;
 }
 
-BOOL OS_IsThreadAvailable(void) {
-    return OSi_ThreadInitialized;
+// NitroSDK's assembly getter for whether OS_InitThread has run, as in ntrtwl's SDK and pret's pokediamond.
+// clang-format off
+asm BOOL OS_IsThreadAvailable(void) {
+    ldr r0, =OSi_IsThreadInitialized
+    ldr r0, [r0, #0]
+    bx lr
 }
+
+// clang-format on
 
 // NitroSDK's OS_CreateThread: sets up a thread, which stays asleep until it is started. The stack is where it begins,
 // and the end of the function makes the thread exit
@@ -629,9 +635,13 @@ static void OSi_IdleThreadProc(void *arg) {
 // Gives the count it had
 u32 OS_DisableScheduler(void) {
     u32 enabled = OS_DisableInterrupts();
+    // BUG: When the nested-lock count is saturated, the original returns an uninitialized count.
+#ifdef BUGFIX
+    u32 old = OSi_RescheduleCount;
+#else
     u32 old;
+#endif
 
-    // As in the SDK, old is left unset when the count is at its maximum, which 0xffffffff nested locks would take
     if (OSi_RescheduleCount < 0xffffffff) {
         old = OSi_RescheduleCount++;
     }

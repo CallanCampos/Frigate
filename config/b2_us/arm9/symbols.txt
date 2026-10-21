@@ -9228,7 +9228,7 @@ sLockInitialized kind:bss addr:0x0214c20c
 OSi_SystemCallbackInSwitchThread kind:bss addr:0x0214c210
 OSi_RescheduleCount kind:bss addr:0x0214c214
 OSi_CurrentThreadPtr kind:bss addr:0x0214c218
-OSi_ThreadInitialized kind:bss addr:0x0214c21c
+OSi_IsThreadInitialized kind:bss addr:0x0214c21c
 sThreadState kind:bss addr:0x0214c220
 OSi_ThreadInfo kind:bss addr:0x0214c22c
 OSi_IdleThread kind:bss addr:0x0214c23c
