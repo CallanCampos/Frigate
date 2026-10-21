@@ -37,8 +37,8 @@ misclassify a structural improvement.
 
 For stack diagnosis, add the saved-register words to every explicit `sp` allocation and map the actual locals.
 A larger `sub sp` can replace a word saved only as padding: `RailMath_RailToWorldSlerpXZ` uses six pushed words
-plus 0x60 bytes in the ROM, and five plus 0x64 in the current C, both totaling 0x78 bytes. Its extra scalar spill
-shifts the vector slots; the total stack consumption does not change.
+plus 0x60 bytes in the ROM, and five plus 0x64 in a natural C spelling, both totaling 0x78 bytes. That spelling's
+extra scalar spill shifts the vector slots; the total stack consumption does not change.
 
 When comparing ELF metadata, identify sections by index and name together: MWCC can emit several `.text`
 sections in one object. A dictionary keyed only by section name silently discards earlier sections. Resolve

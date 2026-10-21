@@ -1092,6 +1092,12 @@ Same code, other `sp` offsets or frame size.
   [sp, #0xc]` for a `-1` and the counter started from a reload of it), was a `u8` local in DS Protect's
   `DSProt_DecryptCodeMulti`: its `u8 sum` gives the original's `push {r3}` frame of 0x10 and its 4 missing bytes,
   where a `u32 sum` lived in a register.
+- Using `u8` for `effect_encount.c`'s `positionShakingSpot` source-availability mask in the parameter and
+  `UpdatePhenomenon`'s local gives its original frame anchor. Its only flags are 1 and 2, and it intersects the mask
+  with a byte table. With `u32`, MWCC holds the position's zero y in `r6` across the candidate clear and rebuilds
+  the frame address for three bounds reads. The byte mask gives
+  the original's shared `r6 = sp + 0x10` anchor and 360-byte function; the caller stays unchanged. The spilled mask
+  is still stored and reloaded as a word, so those instructions alone do not establish its source width.
 
 ## Instruction order
 
