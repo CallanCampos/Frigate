@@ -295,6 +295,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Diagnose with `tools/decomp/locals.py`, which shows each variable's `sp+offset`.
 - A byte-sized running value kept on the stack and reloaded across calls where ours holds it in a register: declare
   it `u8`. (matching.md: "A running sum that only ever holds a byte")
+- `positionShakingSpot`'s missing shared frame anchor: a `u8` two-flag mask in the caller and callee recovers it,
+  despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
 

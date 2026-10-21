@@ -97,6 +97,7 @@ src/ov036/map_attr.c:
     .rodata     start:0x021d0324 end:0x021d0374
 
 src/ov036/effect_encount.c:
+    complete
     .text       start:0x021a1fdc end:0x021a29d0
     .rodata     start:0x021d02c4 end:0x021d0324
     .data       start:0x021d4f94 end:0x021d4fa8

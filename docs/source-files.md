@@ -550,7 +550,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `field_menu.c` | `0x0219fa10`–`0x021a0a1c` | 27 | partial | string at `0x021d4f74` |
 | `enc_pokeset.c` | `0x021a0a1c`–`0x021a1640` | 27 | complete | descriptive |
 | `field_encount.c` | `0x021a1640`–`0x021a1fdc` | 20 | complete | string at `0x021d4f84` |
-| `effect_encount.c` | `0x021a1fdc`–`0x021a29d0` | 30 | partial | string at `0x021d4f94` |
+| `effect_encount.c` | `0x021a1fdc`–`0x021a29d0` | 30 | complete | string at `0x021d4f94` |
 | `map_attr.c` | `0x021a29d0`–`0x021a2f08` | 69 | complete | descriptive |
 | `fld_scenearea.c` | `0x021a2f08`–`0x021a30f8` | 12 | complete | string at `0x021d4fa8` |
 | `fld_scenearea_loader.c` | `0x021a30f8`–`0x021a3664` | 20 | complete | string at `0x021d4fe0` |
