@@ -73,7 +73,7 @@ static inline void *DSPi_GetWramAddress(DSPProcessContext *context, MIWram wram,
     int slot = wordAddress / 0x4000;
     int offset = wordAddress - slot * 0x4000;
     int bank = (wram == MI_WRAM_B) ? context->bankB[slot] : context->bankC[slot];
-    return (u8 *)MI_GetWramMapStart(wram) + bank * DSP_BANK_SIZE + offset * 2;
+    return (u8 *)MI_GetWramBase(wram) + bank * DSP_BANK_SIZE + offset * 2;
 }
 
 static DSPProcessContext *sProcessList;
@@ -138,7 +138,7 @@ static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32
 static BOOL func_0270541c(DSPProcessContext *context, MIWram wram, int slot, MIWramProc proc) {
     int bank = (wram == MI_WRAM_B) ? context->bankB[slot] : context->bankC[slot];
     BOOL given = FALSE;
-    if (!MIi_IsWramSlotUsed(wram, bank) || MI_FreeWramSlot(wram, bank, 1, MI_GetWramBankMaster(wram, bank)) > 0) {
+    if (!MIi_IsWramSlotUsed(wram, bank) || MI_FreeWramSlot(wram, bank, 1, MI_GetWramBankOwner(wram, bank)) > 0) {
         if (MI_AllocWramSlot(wram, bank, 1, proc) != 0) {
             vu8 *master = (wram == MI_WRAM_B) ? reg_MBK_B : reg_MBK_C;
             if (proc == MI_WRAM_ARM9) {
@@ -328,8 +328,8 @@ static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB,
     context->freeBanksB = banksB;
     context->freeBanksC = banksC;
     if (func_02705980(context, func_027054e4)) {
-        DC_FlushRange(MI_GetWramMapStart_B(), 0x40000);
-        DC_FlushRange(MI_GetWramMapStart_C(), 0x40000);
+        DC_FlushRange(MI_GetWramBase_B(), 0x40000);
+        DC_FlushRange(MI_GetWramBase_C(), 0x40000);
         if (func_02705a4c(context, MI_WRAM_B, 0, 0x20000, MI_WRAM_DSP)) {
             if (func_02705a4c(context, MI_WRAM_C, 0, 0x20000, MI_WRAM_DSP)) {
                 ok = TRUE;

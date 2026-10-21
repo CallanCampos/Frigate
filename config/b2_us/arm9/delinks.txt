@@ -2585,3 +2585,7 @@ lib/nitro/src/card/card_task.c:
     .text       start:0x0206f0f0 end:0x0206f2e4
     .rodata     start:0x02094540 end:0x02094548
     .bss        start:0x0214b960 end:0x0214b980
+
+lib/nitro/src/fs/fs_overlay_digest.c:
+    complete
+    .data       start:0x0209bc20 end:0x0209d728

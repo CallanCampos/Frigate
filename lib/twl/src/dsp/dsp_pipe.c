@@ -402,10 +402,10 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
             func_02706cb4(pipe);
         } else {
             u16 offset = readPos & ~0x8000;
-            u16 base = pipe->base;
             u16 end = (difference < 0x8000) ? (writePos & ~0x8000) : pipe->length;
             u16 count = (length < end - offset) ? length : end - offset;
-            func_0270633c(base * 2 + offset, dst, count);
+            count = count & ~(DSP_MEMORY_UNIT - 1);
+            func_0270633c(pipe->base * 2 + offset, dst, count);
             length -= count;
             dst = (u8 *)dst + count;
             pipe->readPos = (offset + count < pipe->length) ? readPos + count : ~readPos & 0x8000;
@@ -435,10 +435,10 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
             func_02706cb4(pipe);
         } else {
             u16 offset = writePos & ~0x8000;
-            u16 base = pipe->base;
             u16 end = (difference < 0x8000) ? pipe->length : (readPos & ~0x8000);
             u16 count = (length < end - offset) ? length : end - offset;
-            func_02706694(base * 2 + offset, src, count);
+            count = count & ~(DSP_MEMORY_UNIT - 1);
+            func_02706694(pipe->base * 2 + offset, src, count);
             length -= count;
             src = (const u8 *)src + count;
             pipe->writePos = (offset + count < pipe->length) ? writePos + count : ~writePos & 0x8000;

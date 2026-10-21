@@ -671,6 +671,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   multiply into a select's arms, so the source selected byte offsets. When nothing else indexes the elements, that
   is a raw `u8` buffer of slots, the slot cast to the element, `(T *)&buf[c ? 0 : SLOT]`, as a stride rounded up to
   32 bytes also says. `moveq #1; movne #0` is `c ? 0 : 1`. (matching.md: "into the arms of a select")
+- A `u16` narrowed twice in a row (`lsl; lsr` in place, then again into another register): an identity in the
+  source, such as the DSP pipes' `count = count & ~(DSP_MEMORY_UNIT - 1);` (1 on the ARM9); `&=` folds it first.
+  (matching.md: "narrowed to `u16` twice in a row")
+- A fixed address's bit flag read as `ldrb [r0, #4]` from the block's base where ours folds the offset into the
+  literal: read it through a pointer local of the block's struct. (matching.md: "read through a pointer local")
 
 ## Branches and block layout
 
@@ -1008,6 +1013,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - `.bss` runs that are each sorted by size, with the same layout unreachable in one file: the range is several
   files, each with `-ipa file`; and sweep the declaration orders of the statics. (matching.md: "With `-ipa file` the
   order of a file's same-size statics")
+- A struct of statics whose functions need two addressings (base plus offset in one, a plain object in another): the
+  statics of two files, each with its own `-ipa`. (matching.md: "A struct of statics whose functions need two")
 
 ## Function order and presence
 
@@ -1025,6 +1032,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - SPL's `1.2/base` compiler emits a file's functions in reverse source order.
 - The MWCC linker here doesn't dead-strip unreferenced global functions.
 - A static function whose symbol isn't renamed to its C name shows as "unknown" in the probe.
+- TwlSDK code that resists respellings: rebuild it in the shape of cybervisi0n/libntr's reconstruction (its
+  `static inline` setters and wrappers, `if (n > 0) { ... }` blocks with their locals, cursor layouts), in our own
+  names. (matching.md: "in the shape of cybervisi0n/libntr's reconstruction")
 
 ## Diagnostic switches (not for committed code)
 

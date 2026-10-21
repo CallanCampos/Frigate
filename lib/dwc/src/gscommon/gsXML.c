@@ -59,10 +59,10 @@ static BOOL gsiXmlUtilTagMatches(const char *name, const XmlElement *element);
 
 // The namespaces that every message declares
 const char *GS_XML_SOAP_DEFAULT_NAMESPACES[4] = {
-    "xsd=\"http://www.w3.org/2001/XMLSchema\"",
-    "xsi=\"http://www.w3.org/2001/XMLSchema-instance\"",
     "SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"",
     "SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\"",
+    "xsi=\"http://www.w3.org/2001/XMLSchema-instance\"",
+    "xsd=\"http://www.w3.org/2001/XMLSchema\"",
 };
 
 SoapWriter *gsXmlCreateStreamWriter(const char **namespaceDeclarations, int declarationNum) {
@@ -431,10 +431,7 @@ static BOOL gsiXmlUtilParseString(SoapReader *reader, const char *text, int leng
 static BOOL gsiXmlUtilDecodeString(char *text, int *length) {
     int i;
     int removed;
-    int value;
     int j;
-    BOOL started;
-    char *end;
 
     i = 0;
     while (i < *length) {
@@ -443,58 +440,72 @@ static BOOL gsiXmlUtilDecodeString(char *text, int *length) {
             continue;
         }
         removed = 5;
-        if (strncmp(text + i, "&amp;", 5) == 0) {
+        if (strncmp(&text[i], "&amp;", 5) == 0) {
             text[i++] = '&';
             removed = 4;
-        } else if (strncmp(text + i, "&quot;", 6) == 0) {
+        } else if (strncmp(&text[i], "&quot;", 6) == 0) {
             text[i++] = '"';
-        } else if (strncmp(text + i, "&apos;", 6) == 0) {
+        } else if (strncmp(&text[i], "&apos;", 6) == 0) {
             text[i++] = '\'';
-        } else if (strncmp(text + i, "&lt;", 4) == 0) {
+        } else if (strncmp(&text[i], "&lt;", 4) == 0) {
             text[i++] = '<';
             removed = 3;
-        } else if (strncmp(text + i, "&gt;", 4) == 0) {
+        } else if (strncmp(&text[i], "&gt;", 4) == 0) {
             text[i++] = '>';
             removed = 3;
-        } else if (strncmp(text + i, "&#x", 3) == 0) {
+        } else if (strncmp(&text[i], "&#x", 3) == 0) {
+            BOOL started;
+            int value;
+            u32 mask;
+            char *end;
+
             started = FALSE;
             value = 0;
-            end = strchr(text + i + 3, ';');
+            mask = 0xff000000;
+            end = strchr(&text[i + 3], ';');
             if (end == NULL) {
                 return FALSE;
             }
-            if (end - (text + i + 3) > 8) {
+            if (end - &text[i + 3] > 8) {
                 return FALSE;
             }
-            STD_TSScanf(text + i + 3, "%08x", &value);
+            STD_TSScanf(&text[i + 3], "%08x", &value);
             for (j = 0; j < 4; j++) {
-                char byte = ((u32)value & (0xff000000u >> (j * 8))) >> ((3 - j) * 8);
+                char byte = ((u32)value & mask) >> ((3 - j) * 8);
                 if (started || byte != 0) {
                     text[i++] = byte;
                     started = TRUE;
                 }
+                mask >>= 8;
             }
-            removed = end - (text + i) + 1;
-        } else if (strncmp(text + i, "&#", 2) == 0) {
+            removed = end - &text[i] + 1;
+        } else if (strncmp(&text[i], "&#", 2) == 0) {
+            BOOL started;
+            int value;
+            u32 mask;
+            char *end;
+
             started = FALSE;
-            end = strchr(text + i + 2, ';');
+            mask = 0xff000000;
+            end = strchr(&text[i + 2], ';');
             if (end == NULL) {
                 return FALSE;
             }
-            value = atol(text + i + 2);
+            value = atol(&text[i + 2]);
             for (j = 0; j < 4; j++) {
-                char byte = ((u32)value & (0xff000000u >> (j * 8))) >> ((3 - j) * 8);
+                char byte = ((u32)value & mask) >> ((3 - j) * 8);
                 if (started || byte != 0) {
                     text[i++] = byte;
                     started = TRUE;
                 }
+                mask >>= 8;
             }
-            removed = end - (text + i) + 1;
+            removed = end - &text[i] + 1;
         } else {
             return FALSE;
         }
-        memmove(text + i, text + i + removed, *length - (i + removed));
-        memset(text + *length - removed, ' ', removed);
+        memmove(&text[i], &text[i + removed], *length - (i + removed));
+        memset(&text[*length - removed], ' ', removed);
         *length -= removed;
     }
     return TRUE;

@@ -42,7 +42,7 @@ void OS_ResetSystem(u32 parameter) {
     OS_ResetRequestIrqMask(0xffffffff);
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        MI_StopAllNDma();
+        MI_StopNDmaChannels();
     }
     *(u32 *)HW_RESET_PARAMETER_BUF = parameter;
     OSi_SendToPxi(OS_PXI_COMMAND_RESET);

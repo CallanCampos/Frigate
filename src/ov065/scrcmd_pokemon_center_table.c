@@ -14,7 +14,7 @@ const FieldScriptCommand POKEMON_CENTER_SCRIPT_COMMANDS[] = {
     PokemonCenterCmd_GetMatchState,
     PokemonCenterCmd_SetMatchInProgress,
     PokemonCenterCmd_ClearMatchInProgress,
-    func_ov065_021e65dc,
+    PokemonCenterCmd_SetMatchState,
     PokemonCenterCmd_AddBattlePoints,
     NULL,
     NULL,
