@@ -121,7 +121,7 @@ ParticleSystem *Particle_CreateSystemEx(void *work, u32 size, BOOL camera, u32 f
     // a host they outgrow the size the caller worked out for the DS (24 emitters of 208 bytes and 200 particles of 80
     // alone take 20,992 bytes, where the DS's 156 and 68 fit in the intro's 0x4800). The platform layer gives the
     // system work of its own instead, sized for the host's structs and freed with the system
-    // (port/hal/gfl/particle_work.c). workStart stays the caller's buffer, which func_020500c8 hands back for the
+    // (port/hal/gfl/particle_work.c). workStart stays the caller's buffer, which Particle_GetWork hands back for the
     // caller to free
     size = port_particle_work_size(size);
     work = port_particle_work(id, size);
@@ -184,7 +184,7 @@ void Particle_DeleteSystem(ParticleSystem *system) {
         GFL_G3DCameraFree(system->camera);
     }
 #ifdef PLATFORM_PC
-    // The host's own work, which func_0204f980 gave the system in place of the caller's
+    // The host's own work, which Particle_CreateSystemEx gave the system in place of the caller's
     port_particle_work_free(system->id);
 #endif
     GFL_HeapFree(system);

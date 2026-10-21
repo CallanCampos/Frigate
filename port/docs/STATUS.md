@@ -29,7 +29,7 @@ level that doesn't exist yet says "not yet"; no field is left out.
 ## 2026-10-21: latest upstream sync and renewed validation
 
 - **Upstream:** `fc478a9ee5`, merged cleanly by `port/tools/sync_upstream.sh` in `c46687c006`.
-- **Port:** `PORT_SHA`.
+- **Port:** `b418e7d15d`.
 - **ROM:** T0 passes after the sync, both SHA1s match (`/tmp/frigate-latest-t0.log`).
 - **Host build:** T1 passes on macOS for Black 2 (`build/port`) and White 2 (`build/port-w2`), with
   `/tmp/frigate-latest-build-{b2,w2}.log` recording the builds.
@@ -54,7 +54,9 @@ level that doesn't exist yet says "not yet"; no field is left out.
   754 function instances, all allocated sections and exact relocation targets
   (`/tmp/frigate-dwc-proof-fc478/{results,relocation-proof}.json`); DWC utility uses its configured `2.0/sp2` compiler.
   The portability rows in [game-changes.md](game-changes.md) identify their introduction commit `90ad973b12`.
-  [The review](REVIEW-2026-10-21.md) now describes this sync and its validation limits.
+  [The review](REVIEW-2026-10-21.md) now describes this sync and its validation limits. The publication check also
+  replaced two stale function names in port-authored particle-work comments with their current names; executable C
+  is unchanged.
 - **Next:** size the external field heap for host allocations, then repeat extended entry, CONTINUE, real menus
   and differential checks before claiming a playable field; follow up numeric-width and deferred hardware paths.
 - **Blockers:** field C is present, but the fixed 64 KiB external field heap cannot hold weather and place-name
