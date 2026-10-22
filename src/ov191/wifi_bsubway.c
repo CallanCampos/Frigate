@@ -1614,8 +1614,8 @@ static inline void WifiBSubwayView_InitCycle(WifiBSubwayView *view, ArcTool *arc
 
     MI_CpuFill8(&view->cycle, 0, sizeof(view->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    MI_CpuCopy8(palette->rawData, view->cycle.palettes, sizeof(view->cycle.palettes));
-    MI_CpuCopy8(palette->rawData, view->cycle.blended, sizeof(view->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, view->cycle.palettes, sizeof(view->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, view->cycle.blended, sizeof(view->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps

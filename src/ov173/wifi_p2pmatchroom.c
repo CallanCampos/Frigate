@@ -1021,7 +1021,7 @@ static void WifiMcr_PcAnmUseMain(MCR_PCANM *anm) {
 }
 
 static const void *WifiMcr_PcAnmColorGet(const MCR_PCANM *anm, u32 color) {
-    const u16 *colors = anm->palette->rawData;
+    const u16 *colors = anm->palette->pRawData;
 
     return &colors[color + 1];
 }

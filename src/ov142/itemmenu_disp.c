@@ -1299,12 +1299,12 @@ void ItemMenuDisp_DrawQuantityFrame(ItemMenuWork *work) {
 
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
         u16 *tiles = (u16 *)screen->rawData;
-        s32 count = (screen->width / 8) * (screen->height / 8);
+        s32 count = (screen->screenWidth / 8) * (screen->screenHeight / 8);
 
         for (; i < count; i++) {
             tiles[i] += (u16)work->bg3Chars | (3 << 12);
         }
-        GFL_BGSysLoadScrAreaAll(3, screen->rawData, 16, 12, screen->width / 8, screen->height / 8);
+        GFL_BGSysLoadScrAreaAll(3, screen->rawData, 16, 12, screen->screenWidth / 8, screen->screenHeight / 8);
         GFL_BGSysQueueScrLoad(3);
     }
     GFL_HeapFree(file);

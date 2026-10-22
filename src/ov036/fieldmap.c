@@ -1342,7 +1342,7 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset);
     NNS_G3dGlbSetProjectionMtx(&mtx);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
     FieldEffects_Draw(field->fieldEffects);
     FieldG3DObjSystem_Draw(field->g3DObjSystem);
@@ -1354,11 +1354,11 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset / 2);
     NNS_G3dGlbSetProjectionMtx(&mtx);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
     BlActSys_Draw(field->effectBlAct, field->g3dCamera, field->g3dLights);
     NNS_G3dGlbSetProjectionMtx(&saved);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     FieldAsyncProcManager_Draw(field->asyncProcManager);
     FieldWeather_Draw(field->weatherSystem);
     FieldExpObj_Draw(field->expObjSystem);

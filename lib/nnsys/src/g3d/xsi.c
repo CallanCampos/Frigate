@@ -1,32 +1,33 @@
 #include "nnsys/g3d.h"
 
-// NitroSystem's G3D texture matrix mode of models made with Softimage XSI: the function that sends a material's
-// texture matrix, which cgtool.c's table holds, and the eight that make its elements. The file is named after
-// NitroSystem's xsi.c, and holds no joint functions: cgtool.c's tables of them have no entry for XSI. A texture matrix
-// is made by one of eight functions, by which of the scale, rotation and translation the material's result has, as in
-// maya.c and 3dsmax.c. An XSI texture turns and scales about a corner, not its center, and its translation is turned
-// and scaled with it, so the S and T translations enter through their turned values. A product here is truncated, not
-// rounded. The function that sends the matrix first sets the identity values into the parts of the result that its
-// flag says are the identity, so it takes the result without const, and so does the table's type. Its name,
-// NNSi_G3dSendTexSRTXsi, is NitroSystem's as recalled, parallel to maya.c's; the statics' names are ours
+// NitroSystem's G3D texture matrix mode of models made with Softimage XSI: the function that sends a material's texture
+// matrix, which cgtool.c's table holds, and the eight that make its elements. The file is named after NitroSystem's
+// xsi.c, and holds no joint functions: cgtool.c's tables of them have no entry for XSI. A texture matrix is made by one
+// of eight functions, by which of the scale, rotation and translation the material's result has, as in maya.c and
+// 3dsmax.c. An XSI texture turns and scales about a corner, not its center, and its translation is turned and scaled
+// with it, so the S and T translations enter through their turned values. A product here is truncated, not rounded. The
+// function that sends the matrix first sets the identity values into the parts of the result that its flag says are the
+// identity, so it takes the result without const, and so does the table's type. The names are NitroSystem's, as
+// ntrtwl's reconstruction of NitroSystem has them, except sTexMtxXsiFuncs and sendPacket_, which are ours:
+// NitroSystem's table is calcTexMtx_, a static inside its function
 
 // A function that makes the elements of a material's texture matrix that its scale, rotation and translation set: the
 // matrix (of which the caller sets the others) and the result
 typedef void (*TexMtxXsiFunc)(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
 
-static void calcTexMtxXsiSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxXsiIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flag_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
 
 #pragma thumb off
 
 // The texture matrix elements of a material with a scale, a rotation and a translation
-static void calcTexMtxXsiSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flag_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 scaleSCos, scaleSSin, scaleTCos, scaleTSin;
@@ -52,7 +53,7 @@ static void calcTexMtxXsiSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a scale of one
-static void calcTexMtxXsiRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 turnedS, turnedT;
@@ -70,7 +71,7 @@ static void calcTexMtxXsiRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero rotation
-static void calcTexMtxXsiST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 scaledS, scaledT;
 
     mtx->m[0][0] = result->scaleS;
@@ -84,8 +85,8 @@ static void calcTexMtxXsiST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero rotation and a scale of one
-static void calcTexMtxXsiT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
-    // The turned translations of calcTexMtxXsiRT_, with a zero rotation: S as it is and T negated
+static void texmtxCalc_flagRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+    // The turned translations of texmtxCalc_flagS_, with a zero rotation: S as it is and T negated
     fx32 turnedS, turnedT;
 
     mtx->m[0][0] = FX32_ONE;
@@ -99,7 +100,7 @@ static void calcTexMtxXsiT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation
-static void calcTexMtxXsiSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 scaleSCos, scaleSSin, scaleTCos, scaleTSin;
@@ -119,7 +120,7 @@ static void calcTexMtxXsiSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation and a scale of one
-static void calcTexMtxXsiR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
 
@@ -134,7 +135,7 @@ static void calcTexMtxXsiR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation and a zero rotation
-static void calcTexMtxXsiS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = result->scaleS;
     mtx->m[1][1] = result->scaleT;
     mtx->m[0][1] = 0;
@@ -144,7 +145,7 @@ static void calcTexMtxXsiS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for none of them
-static void calcTexMtxXsiIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = FX32_ONE;
     mtx->m[0][1] = 0;
     mtx->m[1][0] = 0;
@@ -156,8 +157,8 @@ static void calcTexMtxXsiIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *resul
 // Indexed by the low three bits of a material result's flag: the scale of one, the zero rotation and the zero
 // translation
 static TexMtxXsiFunc sTexMtxXsiFuncs[8] = {
-    calcTexMtxXsiSRT_, calcTexMtxXsiRT_, calcTexMtxXsiST_, calcTexMtxXsiT_,
-    calcTexMtxXsiSR_,  calcTexMtxXsiR_,  calcTexMtxXsiS_,  calcTexMtxXsiIdentity_,
+    texmtxCalc_flag_,  texmtxCalc_flagS_,  texmtxCalc_flagR_,  texmtxCalc_flagRS_,
+    texmtxCalc_flagT_, texmtxCalc_flagTS_, texmtxCalc_flagTR_, texmtxCalc_flagTRS_,
 };
 
 // Sends a packet of num words to the geometry engine: the packed opcodes, then the arguments of their commands

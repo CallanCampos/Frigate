@@ -4,7 +4,9 @@
 #include "types.h"
 
 // NitroSystem's VRAM managers (NNS_Gfd) for textures and palettes, and its VRAM transfer manager. A key packs where an
-// allocation is and its size, 0 when it failed
+// allocation is and its size, 0 when it failed. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem
+// has them, where the code shows them, and ours elsewhere; the sources' header comments list swan's names where they
+// differ
 
 typedef u32 NNSGfdTexKey;
 typedef u32 NNSGfdPlttKey;
@@ -16,14 +18,15 @@ typedef u32 NNSGfdPlttKey;
 #define NNS_GFD_KEY_ADDR_SHIFT 3
 
 // A texture key's size counts 16-byte units, the smallest texture allocation
-#define NNS_GFD_KEY_SIZE_SHIFT 4
-#define GFD_TEX_ALLOC_MIN (1 << NNS_GFD_KEY_SIZE_SHIFT)
+#define NNS_GFD_TEXKEY_SIZE_SHIFT 4
+#define NNS_GFD_TEXSIZE_MIN (1 << NNS_GFD_TEXKEY_SIZE_SHIFT)
 // The first texture size a manager refuses
-#define GFD_TEX_ALLOC_LIMIT 0x7fff0
+#define NNS_GFD_TEXSIZE_MAX 0x7fff0
 
 // A key for the VRAM at the address, not allocated from a manager
 static inline NNSGfdTexKey NNS_GfdMakeTexKey(u32 addr, u32 size, BOOL is4x4comp) {
-    return ((size >> NNS_GFD_KEY_SIZE_SHIFT) << 16) | ((addr >> NNS_GFD_KEY_ADDR_SHIFT) & 0xffff) | (is4x4comp << 31);
+    return ((size >> NNS_GFD_TEXKEY_SIZE_SHIFT) << 16) | ((addr >> NNS_GFD_KEY_ADDR_SHIFT) & 0xffff) |
+           (is4x4comp << 31);
 }
 
 static inline u32 NNS_GfdGetTexKeyAddr(NNSGfdTexKey key) {
@@ -31,31 +34,31 @@ static inline u32 NNS_GfdGetTexKeyAddr(NNSGfdTexKey key) {
 }
 
 static inline u32 NNS_GfdGetTexKeySize(NNSGfdTexKey key) {
-    return (u32)(((key & 0x7fff0000) >> 16) << NNS_GFD_KEY_SIZE_SHIFT);
+    return (u32)(((key & 0x7fff0000) >> 16) << NNS_GFD_TEXKEY_SIZE_SHIFT);
 }
 
 // Whether the key is for a 4x4-compressed texture
-static inline BOOL GfdTexKeyIs4x4(NNSGfdTexKey key) {
+static inline BOOL NNS_GfdGetTexKey4x4Flag(NNSGfdTexKey key) {
     return (BOOL)((key & 0x80000000) >> 31);
 }
 
 // The size a texture allocation takes: whole 16-byte units, at least one
-static inline u32 GfdTexAllocSize(u32 size) {
+static inline u32 NNSi_GfdGetTexKeyRoundupSize(u32 size) {
     if (size == 0) {
-        return GFD_TEX_ALLOC_MIN;
+        return NNS_GFD_TEXSIZE_MIN;
     }
-    return (size + (GFD_TEX_ALLOC_MIN - 1)) & ~(GFD_TEX_ALLOC_MIN - 1);
+    return (size + (NNS_GFD_TEXSIZE_MIN - 1)) & ~(NNS_GFD_TEXSIZE_MIN - 1);
 }
 
 // A palette key's size counts 8-byte units, the smallest palette allocation
 #define NNS_GFD_PLTTKEY_SIZE_SHIFT 3
-#define GFD_PLTT_ALLOC_MIN (1 << NNS_GFD_PLTTKEY_SIZE_SHIFT)
+#define NNS_GFD_PLTTSIZE_MIN (1 << NNS_GFD_PLTTKEY_SIZE_SHIFT)
 // The first palette size a manager refuses
-#define GFD_PLTT_ALLOC_LIMIT 0x7fff8
+#define NNS_GFD_PLTTSIZE_MAX 0x7fff8
 // A 4-color palette must lie in the first 64 KB of palette VRAM
-#define GFD_PLTT4_LIMIT 0x10000
+#define NNS_GFD_4PLTT_MAX_ADDR 0x10000
 
-static inline NNSGfdPlttKey GfdMakePlttKey(u32 addr, u32 size) {
+static inline NNSGfdPlttKey NNS_GfdMakePlttKey(u32 addr, u32 size) {
     return ((size >> NNS_GFD_PLTTKEY_SIZE_SHIFT) << 16) | ((addr >> NNS_GFD_KEY_ADDR_SHIFT) & 0xffff);
 }
 
@@ -68,11 +71,11 @@ static inline u32 NNS_GfdGetPlttKeySize(NNSGfdPlttKey key) {
 }
 
 // The size a palette allocation takes: whole 8-byte units, at least one
-static inline u32 GfdPlttAllocSize(u32 size) {
+static inline u32 NNSi_GfdGetPlttKeyRoundupSize(u32 size) {
     if (size == 0) {
-        return GFD_PLTT_ALLOC_MIN;
+        return NNS_GFD_PLTTSIZE_MIN;
     }
-    return (size + (GFD_PLTT_ALLOC_MIN - 1)) & ~(GFD_PLTT_ALLOC_MIN - 1);
+    return (size + (NNS_GFD_PLTTSIZE_MIN - 1)) & ~(NNS_GFD_PLTTSIZE_MIN - 1);
 }
 
 typedef NNSGfdTexKey (*NNSGfdFuncAllocTexVram)(u32 szByte, BOOL is4x4comp, u32 opt);
@@ -188,15 +191,15 @@ typedef struct {
 
 // A ring buffer of transfers in the array given to NNS_GfdInitVramTransferManager
 typedef struct {
-    NNSGfdVramTransferTask *tasks;
-    u32 capacity;
+    NNSGfdVramTransferTask *pTaskArray;
+    u32 lengthOfArray;
     // The next transfer to do, and where the next one registered goes
-    u16 head;
-    u16 tail;
-    u16 count;
-    u16 pad;
+    u16 idxFront;
+    u16 idxRear;
+    u16 numTasks;
+    u16 pad16_;
     // What the queued transfers come to
-    u32 pendingBytes;
+    u32 totalSize;
 } NNSGfdVramTransferTaskQueue;
 
 BOOL NNSi_GfdPushVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue);
@@ -205,7 +208,7 @@ NNSGfdVramTransferTask *NNSi_GfdGetEndVramTransferTaskQueue(NNSGfdVramTransferTa
 BOOL NNSi_GfdPopVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue);
 void NNS_GfdInitVramTransferManager(NNSGfdVramTransferTask *pTaskArray, u32 lengthOfArray);
 // Drops every queued transfer
-void GfdClearVramTransferQueue(void);
+void NNS_GfdClearVramTransferManagerTask(void);
 // Does every queued transfer, in the V-blank
 void NNS_GfdDoVramTransfer(void);
 // Queues a transfer to VRAM for the next V-blank, or returns FALSE if the queue is full

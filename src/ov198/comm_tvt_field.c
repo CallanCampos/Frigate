@@ -528,8 +528,8 @@ static void CommTvtField_InitGraphics(CommTvtFieldWork *wk) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_SUB_BG, 0, 0, wk->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 1, &palette, wk->heapId);
-    MI_CpuCopy8(palette->rawData, wk->palettes, sizeof(wk->palettes));
-    MI_CpuCopy8(palette->rawData, wk->adjustedPalettes, sizeof(wk->palettes));
+    MI_CpuCopy8(palette->pRawData, wk->palettes, sizeof(wk->palettes));
+    MI_CpuCopy8(palette->pRawData, wk->adjustedPalettes, sizeof(wk->palettes));
     CommTvtField_AddPaletteOffsets(wk->adjustedPalettes, sPaletteOffsets, PALETTE_COUNT);
     GFL_HeapFree(file);
     wk->backgroundChars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, wk->heapId);

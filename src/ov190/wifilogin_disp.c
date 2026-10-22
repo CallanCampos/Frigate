@@ -511,8 +511,8 @@ static inline void WifiLoginDisp_InitCycle(WifiLoginDisp *disp, ArcTool *arc, He
 
     MI_CpuFill8(&disp->cycle, 0, sizeof(disp->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    MI_CpuCopy8(palette->rawData, disp->cycle.palettes, sizeof(disp->cycle.palettes));
-    MI_CpuCopy8(palette->rawData, disp->cycle.blended, sizeof(disp->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, disp->cycle.palettes, sizeof(disp->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, disp->cycle.blended, sizeof(disp->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps

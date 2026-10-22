@@ -583,27 +583,27 @@ static void AppTaskMenu_DrawFrame(BmpWin *window, AppTaskMenuRes *res, u32 type)
             offset = (x + BmpWin_GetSizeX(window) * y) * FRAME_TILE_SIZE;
 
             if (y == 0 && x == 0) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_TOP_LEFT * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_TOP_LEFT * FRAME_TILE_SIZE;
             } else if (y == 0 && x == BmpWin_GetSizeX(window) - 1) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_TOP_RIGHT * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_TOP_RIGHT * FRAME_TILE_SIZE;
             } else if (y == 0) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_TOP * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_TOP * FRAME_TILE_SIZE;
             } else if (y == BmpWin_GetSizeY(window) - 1 && x == 0) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_BOTTOM_LEFT * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_BOTTOM_LEFT * FRAME_TILE_SIZE;
             } else if (y == BmpWin_GetSizeY(window) - 1 && x == BmpWin_GetSizeX(window) - 1) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_BOTTOM_RIGHT * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_BOTTOM_RIGHT * FRAME_TILE_SIZE;
             } else if (y == BmpWin_GetSizeY(window) - 1) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_BOTTOM * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_BOTTOM * FRAME_TILE_SIZE;
             } else if (type != 0 && x == BmpWin_GetSizeX(window) - 3) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_ICON(type) * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_ICON(type) * FRAME_TILE_SIZE;
             } else if (type != 0 && x == BmpWin_GetSizeX(window) - 2) {
-                tile = (u8 *)res->character->rawData + (FRAME_TILE_ICON(type) + 1) * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + (FRAME_TILE_ICON(type) + 1) * FRAME_TILE_SIZE;
             } else if (x == 0) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_LEFT * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_LEFT * FRAME_TILE_SIZE;
             } else if (x == BmpWin_GetSizeX(window) - 1) {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_RIGHT * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_RIGHT * FRAME_TILE_SIZE;
             } else {
-                tile = (u8 *)res->character->rawData + FRAME_TILE_CENTER * FRAME_TILE_SIZE;
+                tile = (u8 *)res->character->pRawData + FRAME_TILE_CENTER * FRAME_TILE_SIZE;
             }
             MIi_CpuCopy32(tile, pixels + offset, FRAME_TILE_SIZE);
         }

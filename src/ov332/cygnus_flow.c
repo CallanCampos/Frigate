@@ -1553,7 +1553,7 @@ static int CygnusAppear_GetSpriteBottom(BoxPkm *pkm, HeapID heapId) {
 
         for (tileX = 0; tileX < 12; tileX++) {
             int y;
-            u32 *tile = &((u32 *)charData->rawData)[(tileX + tileY * 12) * 8];
+            u32 *tile = &((u32 *)charData->pRawData)[(tileX + tileY * 12) * 8];
 
             for (y = 7; y >= 0; y--) {
                 if (tile[y] != 0) {

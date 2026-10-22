@@ -7,7 +7,7 @@
 static BOOL GetUnpackedAnimBankImpl_(void *file, NNSG2dAnimBankData **anims);
 
 static BOOL GetUnpackedAnimBankImpl_(void *file, NNSG2dAnimBankData **anims) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_ANIMBANK);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BLKSIG_ANIMBANK);
 
     if (blk != NULL) {
         NNS_G2dUnpackNAN((NNSG2dAnimBankData *)(blk + 1));
@@ -33,19 +33,19 @@ void NNS_G2dUnpackNAN(NNSG2dAnimBankData *bank) {
     NNSG2dAnimSequence *seqArray;
     void *animData;
 
-    NNSi_G2dUnpackOffset(bank->pSequenceArrayHead, bank);
-    NNSi_G2dUnpackOffset(bank->pFrameArray, bank);
-    NNSi_G2dUnpackOffset(bank->pAnimationData, bank);
+    NNS_G2D_UNPACK_OFFSET_PTR(bank->pSequenceArrayHead, bank);
+    NNS_G2D_UNPACK_OFFSET_PTR(bank->pFrameArrayHead, bank);
+    NNS_G2D_UNPACK_OFFSET_PTR(bank->pAnimContents, bank);
 
     seqArray = bank->pSequenceArrayHead;
-    frameArray = bank->pFrameArray;
-    animData = bank->pAnimationData;
+    frameArray = bank->pFrameArrayHead;
+    animData = bank->pAnimContents;
     for (i = 0; i < bank->numSequences; i++) {
-        NNSi_G2dUnpackOffset(seqArray[i].pAnmFrameArray, frameArray);
+        NNS_G2D_UNPACK_OFFSET_PTR(seqArray[i].pAnmFrameArray, frameArray);
         for (j = 0; j < seqArray[i].numFrames; j++) {
             // The SDK assigns the macro's result again here
             seqArray[i].pAnmFrameArray[j].pContent =
-                NNSi_G2dUnpackOffset(seqArray[i].pAnmFrameArray[j].pContent, animData);
+                NNS_G2D_UNPACK_OFFSET_PTR(seqArray[i].pAnmFrameArray[j].pContent, animData);
         }
     }
 
@@ -54,18 +54,18 @@ void NNS_G2dUnpackNAN(NNSG2dAnimBankData *bank) {
         u32 seqIdx;
         u32 frmIdx;
 
-        NNSi_G2dUnpackOffset(bank->pExtendedData, bank);
+        NNS_G2D_UNPACK_OFFSET_PTR(bank->pExtendedData, bank);
         attrBank = (NNSG2dUserExAnimAttrBank *)((NNSG2dUserExDataBlock *)bank->pExtendedData + 1);
-        NNSi_G2dUnpackOffset(attrBank->pAnmSeqAttrArray, attrBank);
+        NNS_G2D_UNPACK_OFFSET_PTR(attrBank->pAnmSeqAttrArray, attrBank);
         for (seqIdx = 0; seqIdx < attrBank->numSequences; seqIdx++) {
             NNSG2dUserExAnimSequenceAttr *seqAttr = &attrBank->pAnmSeqAttrArray[seqIdx];
 
-            NNSi_G2dUnpackOffset(seqAttr->pAttr, attrBank);
-            NNSi_G2dUnpackOffset(seqAttr->pAnmFrmAttrArray, attrBank);
+            NNS_G2D_UNPACK_OFFSET_PTR(seqAttr->pAttr, attrBank);
+            NNS_G2D_UNPACK_OFFSET_PTR(seqAttr->pAnmFrmAttrArray, attrBank);
             for (frmIdx = 0; frmIdx < seqAttr->numFrames; frmIdx++) {
                 NNSG2dUserExAnimFrameAttr *frmAttr = &seqAttr->pAnmFrmAttrArray[frmIdx];
 
-                NNSi_G2dUnpackOffset(frmAttr->pAttr, attrBank);
+                NNS_G2D_UNPACK_OFFSET_PTR(frmAttr->pAttr, attrBank);
             }
         }
     }

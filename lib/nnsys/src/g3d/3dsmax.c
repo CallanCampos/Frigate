@@ -2,31 +2,32 @@
 
 // NitroSystem's G3D texture matrix mode of models made with 3ds Max: the function that sends a material's texture
 // matrix, which cgtool.c's table holds, and the eight that make its elements. The file is named after NitroSystem's
-// 3dsmax.c, and holds no joint functions: cgtool.c's tables of them have no entry for 3ds Max. A texture matrix is
-// made by one of eight functions, by which of the scale, rotation and translation the material's result has, as in
-// maya.c. A 3ds Max texture turns and scales about its center, half its original size: the matrix's translation is
-// the center plus the offsets from it, turned and scaled, where the offsets (offsetS and offsetT) are the center and
-// the translation negated, in the texture coordinates' 12.4 fixed point, and the T translation has the opposite sign. A
-// product here is truncated, not rounded. The function that sends the matrix, NNSi_G3dSendTexSRT3dsMax, has
-// NitroSystem's name as recalled, parallel to maya.c's; the statics' names are ours
+// 3dsmax.c, and holds no joint functions: cgtool.c's tables of them have no entry for 3ds Max. A texture matrix is made
+// by one of eight functions, by which of the scale, rotation and translation the material's result has, as in maya.c. A
+// 3ds Max texture turns and scales about its center, half its original size: the matrix's translation is the center
+// plus the offsets from it, turned and scaled, where the offsets (offsetS and offsetT) are the center and the
+// translation negated, in the texture coordinates' 12.4 fixed point, and the T translation has the opposite sign. A
+// product here is truncated, not rounded. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has
+// them, except sTexMtx3dsMaxFuncs and sendPacket_, which are ours: NitroSystem's table is calcTexMtx_, a static inside
+// its function
 
 // A function that makes the elements of a material's texture matrix that its scale, rotation and translation set: the
 // matrix (of which the caller sets the others) and the result
 typedef void (*TexMtx3dsMaxFunc)(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
 
-static void calcTexMtx3dsMaxSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtx3dsMaxIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flag_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
 
 #pragma thumb off
 
 // The texture matrix elements of a material with a scale, a rotation and a translation
-static void calcTexMtx3dsMaxSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flag_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 scaleSCos, scaleSSin, scaleTSin, scaleTCos;
@@ -50,7 +51,7 @@ static void calcTexMtx3dsMaxSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result)
 }
 
 // The same for a scale of one
-static void calcTexMtx3dsMaxRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 offsetS, offsetT;
@@ -70,7 +71,7 @@ static void calcTexMtx3dsMaxRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) 
 }
 
 // The same for a zero rotation
-static void calcTexMtx3dsMaxST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 offsetS, offsetT;
 
     mtx->m[0][0] = result->scaleS;
@@ -84,7 +85,7 @@ static void calcTexMtx3dsMaxST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) 
 }
 
 // The same for a zero rotation and a scale of one
-static void calcTexMtx3dsMaxT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = FX32_ONE;
     mtx->m[1][1] = FX32_ONE;
     mtx->m[0][1] = 0;
@@ -94,7 +95,7 @@ static void calcTexMtx3dsMaxT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation
-static void calcTexMtx3dsMaxSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 scaleSCos, scaleSSin, scaleTSin, scaleTCos;
@@ -118,7 +119,7 @@ static void calcTexMtx3dsMaxSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) 
 }
 
 // The same for a zero translation and a scale of one
-static void calcTexMtx3dsMaxR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 offsetS, offsetT;
@@ -138,7 +139,7 @@ static void calcTexMtx3dsMaxR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation and a zero rotation
-static void calcTexMtx3dsMaxS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = result->scaleS;
     mtx->m[1][1] = result->scaleT;
     mtx->m[0][1] = 0;
@@ -148,7 +149,7 @@ static void calcTexMtx3dsMaxS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for none of them
-static void calcTexMtx3dsMaxIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = FX32_ONE;
     mtx->m[0][1] = 0;
     mtx->m[1][0] = 0;
@@ -160,8 +161,8 @@ static void calcTexMtx3dsMaxIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *re
 // Indexed by the low three bits of a material result's flag: the scale of one, the zero rotation and the zero
 // translation
 static TexMtx3dsMaxFunc sTexMtx3dsMaxFuncs[8] = {
-    calcTexMtx3dsMaxSRT_, calcTexMtx3dsMaxRT_, calcTexMtx3dsMaxST_, calcTexMtx3dsMaxT_,
-    calcTexMtx3dsMaxSR_,  calcTexMtx3dsMaxR_,  calcTexMtx3dsMaxS_,  calcTexMtx3dsMaxIdentity_,
+    texmtxCalc_flag_,  texmtxCalc_flagS_,  texmtxCalc_flagR_,  texmtxCalc_flagRS_,
+    texmtxCalc_flagT_, texmtxCalc_flagTS_, texmtxCalc_flagTR_, texmtxCalc_flagTRS_,
 };
 
 // Sends a packet of num words to the geometry engine: the packed opcodes, then the arguments of their commands

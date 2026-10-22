@@ -33,8 +33,8 @@ tools that show the differences.
   parameter cast to a block-scoped typed pointer where it is used (`SOC_RecvFrom`'s `SOCSockAddrIn *addr = from;`) are
   allocated differently from typed parameters: NitroWiFi's `SOCL_Connect` (8 bytes) and `SOC_RecvFrom` (20 bytes)
   match only so, as the SDK declares them.
-- A macro that assigns, `NNSi_G2dUnpackOffset(ptr, base)` (`ptr = ptr + base`), with its result assigned again,
-  `ptr = NNSi_G2dUnpackOffset(ptr, base)`, as NitroSystem writes it at some sites, computes the index's shift before
+- A macro that assigns, `NNS_G2D_UNPACK_OFFSET_PTR(ptr, base)` (`ptr = ptr + base`), with its result assigned again,
+  `ptr = NNS_G2D_UNPACK_OFFSET_PTR(ptr, base)`, as NitroSystem writes it at some sites, computes the index's shift before
   the array's base and swaps the registers of an `[rn, rm]` address: `NNS_G2dUnpackNAN`'s `pContent` and
   `NNSi_G2dUnpackUserExCellAttrBank`'s `pAttr` stores match only so, and the other sites only without it.
 - A narrow count local changes the arithmetic it feeds: `NNS_G2dGetNewOamManagerInstanceAsFastTransferMode`
@@ -504,21 +504,21 @@ Same instructions, registers swapped.
   after the others doesn't (`gfd_LinkedListTexVramMan.c`'s `NNS_GfdResetLnkTexVramState`).
 - For a NitroSystem function that is close, the inlines of the public decompilation github.com/ntrtwl/NitroSystem
   are worth following whole, in our own names: MWCC shares an expression between two inlines only when both spell it
-  the same. `g2d_OamSoftwareSpriteDraw.c`'s `SetTexParamsAndGetTexCoord_` matched once its 1D texture inline
-  (`SetCharTexture1D_`) computed `(u16)((shape & GX_OAM_ATTR0_SHAPE_MASK) >> 14)` as `NNS_G2dGetOamSizeX` does, so
+  the same. `g2d_OamSoftwareSpriteDraw.c`'s `CalcSpriteParams_` matched once its 1D texture inline
+  (`SetTextureParamsFor3DDirect1DMap_`) computed `(u16)((shape & GX_OAM_ATTR0_SHAPE_MASK) >> 14)` as `NNS_G2dGetOamSizeX` does, so
   the shape and size indices are computed once and spilled raw, and the `u16` conversions come late in the branch;
-  the flips had to be read through `BOOL` getters (`IsOamFlippedH_`), which as locals or direct reads swap
+  the flips had to be read through `BOOL` getters (`NNSi_G2dGetOamFlipH`), which as locals or direct reads swap
   registers. How an inline assigns its locals counts too: `snd_arc_stream.c`'s `DecodeAdpcm`, with its locals
-  declared and then assigned (sample before index) as that decompilation writes it, took `ProcessCommand` from 208
+  declared and then assigned (sample before index) as that decompilation writes it, took `MakeWaveData` from 208
   differing bytes to 72, before the types below matched it.
 - A loop offset that starts at 0, grows by a step and is zeroed after the loop's hoisted invariants is a counter
   times the step: MWCC strength-reduces `x + step * line` into a running offset that it zeroes in the loop's
   preheader, where an offset kept by hand is zeroed before the hoisted code. NitroSystem's `g2d_TextCanvas.c`
-  `DrawTextAligned` matches with `int line = 0;`, `lineX = x + lfx * line;` and `line++`.
+  `NNSi_G2dTextCanvasDrawTextAlign` matches with `int line = 0;`, `lineX = x + lfx * line;` and `line++`.
 - A table indexed by a field, with the base in the higher register and the index's product added into the lower
   one where the original does the reverse (`ldr r4, =table; muls; adds r4, r4, r2`), is the table indexed inside a
   `static inline` whose index parameter is an enum type. NitroSystem's `g2d_OAM.c` reads its buffers through
-  `GetOamBuffer_(NNSG2dOamType type)` returning `&oamBuffers_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
+  `GetOamCachePtr_(NNSG2dOamType type)` returning `&oamCache_[type]`, which matches `NNS_G2dEntryOamManagerAffine`,
   `NNS_G2dEntryOamManagerOamWithAffineIdx` and both branches of `NNS_G2dResetOamManagerBuffer`. The same helper
   with a `u32` or `int` parameter, a cast to the enum, or an enum-typed field alone keeps the swap.
 - A narrow stack parameter used twice is read from its slot at each use, and declared `const` it is loaded once at
@@ -747,7 +747,7 @@ Same instructions, registers swapped.
   one expression per round: NitroWiFi's `CPSi_md5_block` (`ssl/md5.c`) matches with statement macros and an
   `int` counter, 0x310 against 0x338 otherwise (`u32 j` leaves 4 bytes).
 - A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
-  declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
+  declared local: NitroSystem's `DoRenderByRndCore2D_` (`g2d_RendererCore.c`) gets the original's slots only with
   `mtx` returned by an inline and `affined` taken from a `?:`; no declaration order of locals moves them there. An
   expression written at two uses is shared as such a temporary: `ica_anime.c`'s `GFL_G3DCurvePreloadFrames` gets the
   original's `sp+4`, below its loop's temporaries, with `frame >> FX32_SHIFT` written at both uses, where an
@@ -894,7 +894,7 @@ Same code, other `sp` offsets or frame size.
 - A sum of two 64-bit products in one expression, `(fx64)a * b + (fx64)c * d`, multiplies the right product first
   (`smull`) and accumulates the left one into it (`smlal`), so the source names the products in the reverse of the
   asm's order. G3D's `3dsmax.c` writes `(fx64)result->sinR * offsetS + (fx64)result->cosR * offsetT` in
-  `calcTexMtx3dsMaxRT_` for `smull` of `cosR` and `offsetT`, then `smlal` of `sinR` and `offsetS`; its `SR_` and
+  `texmtxCalc_flagS_` for `smull` of `cosR` and `offsetT`, then `smlal` of `sinR` and `offsetS`; its `SR_` and
   `SRT_` and `xsi.c`'s `RT_` and `SRT_` match the same way.
 - A `u64` written to a 64-bit hardware register in one store (`reg_CP_DIV_NUMER = sum;`, `nitro/cp.h`'s
   `volatile u64`) and the same value written as two 32-bit halves (`(u32)sum`, then `(u32)(sum >> 32)`) keep its low
@@ -1205,7 +1205,7 @@ Same code, other `sp` offsets or frame size.
   byte stored with `*dst++ =`, which add 0x10 to `src` after the eighth sample's load and 3 to `dst` after the third
   store; `vct_encode_adpcm_32` gets its `add r1, r1, #4` into the second sample's block the same way.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
-  result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
+  result assigned to a local as its own statement and then compared: `snd_arc.c`'s `NNS_SndArcSetup` matches with
   `readSize = FS_ReadFile(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
 - An argument of a call compared again unchanged after it is kept in a stack slot over the call; the original working
   it out again means its comparison was another expression. `snd_arc_loader.c`'s `LoadWaveArcTable` reads
@@ -1217,9 +1217,9 @@ Same code, other `sp` offsets or frame size.
   registers but `adds r1, r2, r1`, and `(u8 *)buffer + offset` other registers.
 - A sum of `s16` table entries matches read through an inline returning `s16`, where the table indexed in place or an
   `int` inline gives other registers and operand order in every order of the terms: `snd_arc_stream.c`'s
-  `NNSi_SndArcStrmMain` adds `CalcDecibel(fader) + CalcDecibel(player->volume) + CalcDecibel(player->userVolume)`.
+  `NNSi_SndArcStrmMain` adds `SND_CalcDecibel(fader) + SND_CalcDecibel(player->volume) + SND_CalcDecibel(player->userVolume)`.
 - A sum that MWCC reorders, loading a field first and putting it on the left whatever order it is written in, keeps
-  its order when the field is added in a statement of its own: `ProcessCommand`'s `fileOffset += dataOffset` was 4
+  its order when the field is added in a statement of its own: `MakeWaveData`'s `fileOffset += dataOffset` was 4
   bytes shorter than the one expression.
 - A statement between a call and an SDK inline that uses its result is scheduled inside the inline's code only when
   the result has its own variable: `ctvt_game.c`'s `CtvtGame_InitResults` keeps the texture key in a local, so
@@ -1317,17 +1317,17 @@ Same instructions, scheduled in another order.
   gives `adds r5, r5, r2`, where `<< 12` gave `adds r5, r2, r5`.
 - A weighted sum `3 * a + b` of two loaded values comes out `b + 3a` when both are loaded in the expression or both are
   locals. The original's `3a` first, built in `a`'s register (`lsls t, a, #1; adds a, a, t`), needs `a` read in a
-  statement of its own and `b` read where it is used: G3D's `getAlphaData_` (`nsbma.c`) returns `(3 * a + data[idxB]) >>
-  2` after `a = data[idxA];`, and `getColorData_` blends with `BLEND_3_1(a, data[idxB], ...)` twice. Where both are
+  statement of its own and `b` read where it is used: G3D's `GetMatColAnmuAlphaValue_` (`nsbma.c`) returns `(3 * a + data[idxB]) >>
+  2` after `a = data[idxA];`, and `GetMatColAnmValue_` blends with `BLEND_3_1(a, data[idxB], ...)` twice. Where both are
   locals assigned in branches, `a *= 3;` before `return (a + b) >> 2;` keeps `3a` first, where `3 * a`, `a * 3` and the
-  shift forms don't (`nsbta.c`'s `getTexSrtData_`, which is still off elsewhere).
+  shift forms don't (`nsbta.c`'s `GetTexSRTAnmVectorVal_`, which is still off elsewhere).
 - MWCC moves a fresh local's computation down to its first use, past a call in between, but not a value assigned back
   into the same variable. G3D's `NNS_G3dScrPosToWorldLine` (`util.c`) scales its quotients before
-  `NNS_G3DGetInvViewProjectionMatrix()`, as the original does, only as `ndcX = FX_Div(...);` and then `ndcX = (ndcX -
+  `NNS_G3dGlbGetInvVP()`, as the original does, only as `ndcX = FX_Div(...);` and then `ndcX = (ndcX -
   FX32_HALF) * 2;`; with the quotient in a `relX` of its own, the scaling went after the call, folded into the `fx64`
   conversion, and every register at the start changed.
 - NitroSDK's inline `VEC_Set(v, x, y, z)` evaluates all three values before its first store, where three field
-  assignments interleave each load with its store: G3D's `NNS_G3DRenderFuncSetBillboardMatrix2` (`sbc.c`) loads and
+  assignments interleave each load with its store: G3D's `NNSi_G3dFuncSbc_BBY` (`sbc.c`) loads and
   negates `y->x` before it loads `y->y` only as `VEC_Set(xAxis, yAxis->y, -yAxis->x, 0)`. Since the values go to
   temporaries first, the registers can change where the stores' order doesn't: `ctvt_game.c`'s
   `CtvtGame_LaunchTarget` stores z, x and y in that order either way, and builds the `FX32_CONST(128)` of x in `r3`,
@@ -1716,16 +1716,16 @@ Same instructions, scheduled in another order.
   stay two registers, with the moves between them: `decodeSSID` walks the permutation with a cursor
   for the place the byte came from and one for where it goes, and one cursor compiles 12 bytes shorter.
 - A double negation folds the same way: `-h * -t` compiles to `h * t`, and the two `rsb`s stay only when the negated
-  value goes through a local assigned first. G3D's `xsi.c` gives `calcTexMtxXsiT_` the turned translations of
-  `calcTexMtxXsiRT_` with a zero rotation, `turnedS = result->transS; turnedT = -result->transT;`, before the stores
-  and then writes `-result->origHeight * turnedT`; a cast keeps them too, as its `calcTexMtxXsiST_` does with
+  value goes through a local assigned first. G3D's `xsi.c` gives `texmtxCalc_flagRS_` the turned translations of
+  `texmtxCalc_flagS_` with a zero rotation, `turnedS = result->transS; turnedT = -result->transT;`, before the stores
+  and then writes `-result->origHeight * turnedT`; a cast keeps them too, as its `texmtxCalc_flagR_` does with
   `(fx64)(-result->transT) * result->scaleT`.
 - A negated sum folds into a constant added right after it, even through a local: `FX32_ONE - (a + b)`, `-(a + b) +
   FX32_ONE` and `sum = -(a + b);` then `sum + FX32_ONE` all compile to one `rsb r0, r0, #0x1000`. A type conversion
   between the negation and the add keeps `rsb r0, r0, #0; add r0, r0, #0x1000`: an explicit cast of the negation, even
   to its own type (`(fx32)-(a + b) + FX32_ONE`, where `-(fx32)(a + b)` folds), or an implicit one, a negated `int` sum
   added to a `long` constant. NitroSDK's `FX32_ONE` is `((fx32)0x00001000L)` with `fx32` a `long`, so G3D's `maya.c`,
-  which has the two instructions in `calcTexMtxMayaR_` and `calcTexMtxMayaRT_`, wrote `-(sinR + cosR) + FX32_ONE`, and
+  which has the two instructions in `texmtxCalc_flagTS_` and `texmtxCalc_flagS_`, wrote `-(sinR + cosR) + FX32_ONE`, and
   matches so under the SDK's types (an `int` `fx32` folds both to one `rsb`). The negation in a statement of its own
   (`sum = a + b; sum = -sum;`) keeps the two as well.
 - A difference taken back from its own first operand folds too: `d + ((d - last - d) >> 4)`, or the same with
@@ -1758,8 +1758,8 @@ Same instructions, scheduled in another order.
   `MAX_HEX_DIG` where a hexadecimal number starts. A macro, an enum, a `const`, a `static const` or `sizeof` all give
   `cmp rX, #0xe`.
 - Calls whose results are packed into one word with a bit kept from the old word are not kept in order with the bit:
-  G3D's `nsbma.c` builds a material's two color words in `NNS_G3DAnimationApply_MA`, and with
-  `GX_PACK_DIFFAMB_PARAM(getColorData_(...), getColorData_(...), result->prmMatColor0 & 0x8000)` in one expression
+  G3D's `nsbma.c` builds a material's two color words in `NNSi_G3dAnmCalcNsBma`, and with
+  `GX_PACK_DIFFAMB_PARAM(GetMatColAnmValue_(...), GetMatColAnmValue_(...), result->prmMatColor0 & 0x8000)` in one expression
   MWCC tests the kept bit before the calls and spills it (12 bytes larger). It matches with two calls into locals, the
   store of the first word, and then the other two calls.
 - An SDK inline written from memory can match every user that doesn't care about its order of terms and still be
@@ -2432,22 +2432,22 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   declares it) gives the folded `ldr r0, [r0, #4]` where the cast built the address first, and that alone made
   `NNProcessData` match.
 - A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
-  arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
+  arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNSi_G3dFuncSbc_NODEMIX`)
   reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.
   As an `unsigned int` the index is a temporary, slotted below the named `isCached`; as `unsigned long` it is a named
   local in its declared slot above, and the function matches. Declaration order and scope, `BOOL`, `u8` and `int`
   types, and an inline for the bit test moved nothing. The same function also needs the joints' matrices as a field of
-  one object with the materials and the scales (`g_NNSG3DRenderCache`, grouped as the public decompilation of
+  one object with the materials and the scales (`NNS_G3dRSOnGlb`, grouped as the public decompilation of
   NitroSystem groups them): as an array of their own MWCC folds the normal matrix's address into the clip matrix's
   (`clip + 0x40`), 4 bytes short, where the original adds the index's offset to a second literal. And its weighted sums
   add each product as a 64-bit value, `sum.invM.m[0][0] += (weight * clip->m[0][0]) >> FX32_SHIFT`: through an inline
   that casts the product to `fx32` first, one load is scheduled after a store where the original has it before.
 - The same goes for NitroSystem's `s32` (a `long`) and for a spilled `u32` in a big function: two NitroSystem
   functions matched only with one variable of the SDK's type. `g2d_Renderer.c`'s `NNS_G2dPushMtx` loads the stack
-  position once to check `next < 32` and again in each branch for the source index; with `static long mtxStackPos_`
+  position once to check `next < 32` and again in each branch for the source index; with `static long stackPos_`
   (an `s32` in the decompilation of NitroSystem) it does, where an `int` keeps the first load (the decompilation of
   HGSS's NitroSystem in ctrl-cheeb-del/pokeheartgold reaches the same code only through a `volatile` view of the
-  state). `snd_arc_stream.c`'s `ProcessCommand` homes `bufOffset` and `readSize` in their declared slots only with
+  state). `snd_arc_stream.c`'s `MakeWaveData` homes `bufOffset` and `readSize` in their declared slots only with
   `unsigned long bufOffset` (a `u32` in the decompilation of NitroSystem; Kingdom Hearts Re:coded's decompilation
   writes `long`) and `s32 readSize`, the type of the read's result it is compared with; as `unsigned int`s they took
   late spill slots. Rows that are left with a reload the original has, or with locals in late slots, are candidates.
@@ -2507,7 +2507,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   first, and set by nested tests, the first covering two compares. Flags like that in the asm are such a chain, not
   separate variables: multiboot's `MBi_ChildCallback` (`mb_wm.c`) has its beacon and BSSID checks as two of them.
 - With constant arguments, the order of an inline's `if`/`else` arms decides how much MWCC folds. NitroSDK's
-  `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `SetAffinedOamPosition_`
+  `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `DoAffineTransforme_`
   only when written `if (effect != AFFINE && effect != AFFINE_DOUBLE) { plain store } else { store with the
   parameter }`; the `==`/`||` order folds into one store.
 - When both branches of an `if`/`else` give a local a constant, MWCC emits the then-value, branches over the else
@@ -2535,12 +2535,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice.
 - An inline that returns a condition, `return a && b;`, builds the flag ahead of the tests (`movs r1, #0`, the
   tests, `movs r1, #1`) where the original's `movs r0, #1`, `b`, `movs r0, #0` after the tests is
-  `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2): `g2d_Animation.c`'s `IsFrameEnd_`, the test of
-  `NNS_G2dTickAnimCtrl`'s loop. It goes the other way too: `g2d_CellTransferManager.c`'s `IsTransferNeeded_` keeps
+  `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2): `g2d_Animation.c`'s `ShouldAnmCtrlMoveNext_`, the test of
+  `NNS_G2dTickAnimCtrl`'s loop. It goes the other way too: `g2d_CellTransferManager.c`'s `ShouldRegisterAsVramTransferTask_` keeps
   its 0/1 only as `return a && b;`, which the if-form folds into the branches, so try both.
 - An inline's 0/1 result that the original materializes and then tests (`movs r0, #1`, `b`, `movs r0, #0`,
   `cmp r0, #0`, `beq`) where ours branches on the comparison itself needs the result kept as a value (2.0/sp2): a
-  cast, `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `IsCapacityEnough_`, where the `if` form, a
+  cast, `return (BOOL)(GetCapacity_(region) >= num);` (`g2d_OAM.c`'s `HasEnoughCapacity_`, where the `if` form, a
   ternary, a plain comparison and a local all fold). It is NitroSystem's own spelling of its 0/1 inlines:
   `g2d_CellAnimation.c`'s `ApplyCurrentAnimResult_` matches with `NNS_G2dCellDataBankHasVramTransferData` and the
   handle test written `return (BOOL)(x != NULL);` as the SDK writes them, and comes out 10 bytes short, the test
@@ -2958,7 +2958,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A `for` loop with a constant bound keeps its test before the first pass only with a counter of an enum type, as the
   position loops of `btlv_mcss.c`, `btlv_effvm.c` and `btlv_gauge.c` do with `BtlvMcssPos` and `BtlvGaugePos`.
   It also keeps an array indexed by the counter indexed on each pass rather than walked by a pointer:
-  `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2).
+  `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNS_G2D_VRAM_TYPE type` (2.0/sp2).
 - A loop counted with `!=` tests with `beq` before the loop and `bne` at its end, where `<` gives `bls` and `blo`:
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
 - `sciMain.c`'s `scSubmitReport` needs a `u32` counter for its 16-byte digest clear,
@@ -3112,7 +3112,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   on its type-palette table, which only it reads, and whose address allows nothing above 4. The attribute on any other
   object it reads matches as well.
   NitroSystem's 2.0/sp2 does the same: `snd_arc_stream.c`'s `NNS_SndArcStrmInit` enters both its init loops at the
-  test and indexes its arrays with a multiply on each pass only with `sDecodeBuffer`, which it reads, aligned (4 to
+  test and indexes its arrays with a multiply on each pass only with `sDecodeBufferArea`, which it reads, aligned (4 to
   16 give the same code and fit the buffer's address, 32 does not). There a `u8` array with `ATTRIBUTE_ALIGN(4)` gets
   a `.bss` section of its own, while the `u32` array with the same attribute stays in the file's one section.
 - The same alignment keeps a chain of 64-bit constant multiplies apart: `OS_TicksToMicroSeconds(OS_GetTick() - start)`
@@ -3545,8 +3545,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   literal pool addresses off by another static's size: DPW's `dpw_tr.c` (overlay 189) differed in 61 bytes, each
   `sDpwTrWork` address 4 bytes off, until `sDpwTrWork` was defined before the 4-byte `sDpwTrServerType`. With
   `-ipa file` it is the definition order with the first one moved to the end, which is the reverse only for two
-  objects: NitroSystem G3D's `gecom.c` defines `NNS_G3dFlagUseFastDma`, `sGeBuffer` and `sDmaBusy`, which the ROM has
-  as `sGeBuffer`, `sDmaBusy`, `NNS_G3dFlagUseFastDma`, and three or four words compiled alone with the library's flags
+  objects: NitroSystem G3D's `gecom.c` defines `NNS_G3dFlagUseFastDma`, `NNS_G3dGeBuffer` and `NNS_G3dFlagGXDmaAsync`, which the ROM has
+  as `NNS_G3dGeBuffer`, `NNS_G3dFlagGXDmaAsync`, `NNS_G3dFlagUseFastDma`, and three or four words compiled alone with the library's flags
   come out the same way.
 - MWCC 2.0 (`2.0/sp2`) gives each initialized global of a file its own section and orders them by size, smallest
   first, with objects of the same size in the reverse of their declaration order. NitroSystem G3D's `anm.c` has a

@@ -1926,10 +1926,10 @@ static void BtlvInput_LoadTypePalettes(BtlvInput *work) {
     MI_CpuFill8(work->typePalBuf2, 0, 0x1e0);
 
     buf = GFL_G2DIOReadNCLRArc(work->arc, 0x23a, &palette, work->heapId);
-    MI_CpuCopy8(palette->rawData, work->typePalBuf, 0x180);
+    MI_CpuCopy8(palette->pRawData, work->typePalBuf, 0x180);
     GFL_HeapFree(buf);
     buf = GFL_G2DIOReadNCLRArc(work->arc, 0x230, &palette2, work->heapId);
-    MI_CpuCopy8(palette2->rawData, work->typePalBuf2, 0x1e0);
+    MI_CpuCopy8(palette2->pRawData, work->typePalBuf2, 0x1e0);
     GFL_HeapFree(buf);
     work->typePalLoaded = TRUE;
 }
@@ -2535,7 +2535,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
                                            BtlvInput_TempHeapId(work));
             ClActor_SetPalette(work->moveActors[i], AppMenuCommon_GetTypeIconPaletteIndex(type), 1);
             ClActor_GetImageProxy(work->moveActors[i], &proxy);
-            MI_CpuCopy16(character->rawData,
+            MI_CpuCopy16(character->pRawData,
                          (u8 *)G2S_GetOBJCharPtr() + proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB], 0x100);
             GFL_HeapFree(charBuf);
 
@@ -2564,7 +2564,7 @@ static void BtlvInput_DrawMoveTiles(BtlvInput *work, const BtlvInputMoveParam *p
             palette = 463;
         }
         palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, palette, &paletteData, BtlvInput_TempHeapId(work));
-        PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x90, 0x20);
+        PaletteFade_LoadData(work->paletteFade, paletteData->pRawData, 1, i * 16 + 0x90, 0x20);
         GFL_HeapFree(palBuf);
     }
     work->buttonEnabled[i] = TRUE;
@@ -2627,12 +2627,12 @@ static void BtlvInput_DrawTargetPanels(BtlvInput *work, BtlvInputScreenTask *tas
     count = (work->rule == 2) ? 3 : 2;
     for (i = 0; i < count; i++) {
         palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 481, &paletteData, HEAPID_TAIL(work->heapId));
-        PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
+        PaletteFade_LoadData(work->paletteFade, paletteData->pRawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
     for (; i < count * 2; i++) {
         palBuf = GFL_G2DIOReadNCLR(ARCID_BTLV, 482, &paletteData, HEAPID_TAIL(work->heapId));
-        PaletteFade_LoadData(work->paletteFade, paletteData->rawData, 1, i * 16 + 0x70, 0x20);
+        PaletteFade_LoadData(work->paletteFade, paletteData->pRawData, 1, i * 16 + 0x70, 0x20);
         GFL_HeapFree(palBuf);
     }
 }

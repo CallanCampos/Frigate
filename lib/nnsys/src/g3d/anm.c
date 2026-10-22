@@ -2,32 +2,32 @@
 
 // NitroSystem's G3D animation: the functions that combine the animations bound to a render object, for a material, a
 // joint or a node's visibility, and the tables that make an animation object of each kind of animation resource. The
-// file's name is a guess. The blend functions keep NitroSystem's names; the variables hold the functions that the
-// animation objects and render objects copy
+// file and its names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, and g3d.h notes swan's
+// where they differ; the variables hold the functions that the animation objects and render objects copy
 
-static void blendScale_(VecFx32 *dest, const VecFx32 *src, fx32 ratio, BOOL isOne);
+static void blendScaleVec_(VecFx32 *dest, const VecFx32 *src, fx32 ratio, BOOL isOne);
 
 // The data is sorted by size, and objects of one size come out in the reverse of their declaration order, so the words
 // are declared in the reverse of the ROM's
-NNSG3dFuncBlendMat NNS_G3dFuncBlendMat = NNSi_G3dAnmBlendMat;
-NNSG3dFuncBlendJnt NNS_G3dFuncBlendJnt = NNSi_G3dAnmBlendJnt;
-NNSG3dFuncBlendVis NNS_G3dFuncBlendVis = NNSi_G3dAnmBlendVis;
+NNSG3dFuncAnmBlendMat NNS_G3dFuncBlendMatDefault = NNSi_G3dAnmBlendMat;
+NNSG3dFuncAnmBlendJnt NNS_G3dFuncBlendJntDefault = NNSi_G3dAnmBlendJnt;
+NNSG3dFuncAnmBlendVis NNS_G3dFuncBlendVisDefault = NNSi_G3dAnmBlendVis;
 
-NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBma = NNS_G3DAnimationApply_MA;
-NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBtp = NNS_G3DAnimationApply_TP;
-NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBta = NNS_G3DAnimationApply_TA;
-NNSG3dFuncAnmJnt NNS_G3dFuncAnmJntNsBca = NNS_G3DAnimationApply_CA;
-NNSG3dFuncAnmVis NNS_G3dFuncAnmVisNsBva = NNS_G3DAnimationApply_VA;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBmaDefault = NNSi_G3dAnmCalcNsBma;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBtpDefault = NNSi_G3dAnmCalcNsBtp;
+NNSG3dFuncAnmMat NNS_G3dFuncAnmMatNsBtaDefault = NNSi_G3dAnmCalcNsBta;
+NNSG3dFuncAnmJnt NNS_G3dFuncAnmJntNsBcaDefault = NNSi_G3dAnmCalcNsBca;
+NNSG3dFuncAnmVis NNS_G3dFuncAnmVisNsBvaDefault = NNSi_G3dAnmCalcNsBva;
 
-u32 NNS_G3D_ANIMATION_INIT_HEADER_COUNT = 5;
+u32 NNS_G3dAnmFmtNum = 5;
 
-// The kinds of animation resource that NNS_G3DAnimationCreate knows, with room for five more
-NNSG3dAnmObjInit NNS_G3D_ANIMATION_INIT_HEADERS[10] = {
-    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_MA }, NNS_G3DAnimationInit_MA },
-    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TP }, NNS_G3DAnimationInit_TP },
-    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TA }, NNS_G3DAnimationInit_TA },
-    { { NNS_G3D_DATABLK_VIS_ANM, 0, NNS_G3D_ANM_CATEGORY1_VA }, NNS_G3DAnimationInit_VA },
-    { { NNS_G3D_DATABLK_JNT_ANM, 0, NNS_G3D_ANM_CATEGORY1_CA }, NNS_G3DAnimationInit_CA },
+// The kinds of animation resource that NNS_G3dAnmObjInit knows, with room for five more
+NNSG3dAnmObjInitFunc NNS_G3dAnmObjInitFuncArray[10] = {
+    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_MA }, NNSi_G3dAnmObjInitNsBma },
+    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TP }, NNSi_G3dAnmObjInitNsBtp },
+    { { NNS_G3D_DATABLK_MAT_ANM, 0, NNS_G3D_ANM_CATEGORY1_TA }, NNSi_G3dAnmObjInitNsBta },
+    { { NNS_G3D_DATABLK_VIS_ANM, 0, NNS_G3D_ANM_CATEGORY1_VA }, NNSi_G3dAnmObjInitNsBva },
+    { { NNS_G3D_DATABLK_JNT_ANM, 0, NNS_G3D_ANM_CATEGORY1_CA }, NNSi_G3dAnmObjInitNsBca },
 };
 
 // Calls the animation function of every animation object that has data for the material, in the order of the list, so
@@ -54,7 +54,7 @@ BOOL NNSi_G3dAnmBlendMat(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj,
 #pragma thumb off
 
 // Adds ratio times the vector to the sum, or just ratio if the vector is one (every component of it one)
-static void blendScale_(VecFx32 *dest, const VecFx32 *src, fx32 ratio, BOOL isOne) {
+static void blendScaleVec_(VecFx32 *dest, const VecFx32 *src, fx32 ratio, BOOL isOne) {
     if (isOne) {
         dest->x += ratio;
         dest->y += ratio;
@@ -160,9 +160,11 @@ BOOL NNSi_G3dAnmBlendJnt(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj,
                     ratio = FX_Div(anmObj->ratio, sum);
                 }
 
-                blendScale_(&result->scale, &tmp.scale, ratio, tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE);
-                blendScale_(&result->scaleEx0, &tmp.scaleEx0, ratio, tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE);
-                blendScale_(&result->scaleEx1, &tmp.scaleEx1, ratio, tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE);
+                blendScaleVec_(&result->scale, &tmp.scale, ratio, tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE);
+                blendScaleVec_(&result->scaleEx0, &tmp.scaleEx0, ratio,
+                               tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE);
+                blendScaleVec_(&result->scaleEx1, &tmp.scaleEx1, ratio,
+                               tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE);
 
                 if (!(tmp.flag & NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO)) {
                     result->trans.x += (fx32)(((fx64)ratio * tmp.trans.x) >> FX32_SHIFT);

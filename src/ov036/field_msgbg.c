@@ -1749,7 +1749,7 @@ static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID hea
     void *file = GFL_ArcSysReadHeapNewLZ(ARCID_WINFRAME, 7, FALSE, heapId);
 
     NNS_G2dGetUnpackedBGCharacterData(file, &charData);
-    MI_CpuCopy((u8 *)charData->rawData + tile * BGSYS_TILE_SIZE_16, pixels, BGSYS_TILE_SIZE_16);
+    MI_CpuCopy((u8 *)charData->pRawData + tile * BGSYS_TILE_SIZE_16, pixels, BGSYS_TILE_SIZE_16);
     GFL_HeapFree(file);
 }
 
@@ -1910,7 +1910,7 @@ void func_ov036_02189cd8(MsgBGCursor *cursor) {
 
 static void MsgBGCursor_Init(MsgBGCursor *cursor, FieldMsgBG *sys) {
     MI_CpuFill8(cursor, 0, sizeof(MsgBGCursor));
-    cursor->bitmap = GFL_BitmapWrap(sys->charData->rawData, 1, 1, BGSYS_TILE_SIZE_16, sys->heapId);
+    cursor->bitmap = GFL_BitmapWrap(sys->charData->pRawData, 1, 1, BGSYS_TILE_SIZE_16, sys->heapId);
 }
 
 static void MsgBGCursor_Free(MsgBGCursor *cursor) {

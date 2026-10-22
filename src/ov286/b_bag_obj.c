@@ -178,7 +178,7 @@ static void BBagObj_LoadCursorRes(BBagWork *wk) {
     wk->plttRes[8] = ClActSys_LoadPlttRange(arc, 421, CLACT_VRAM_SUB, 0x100, 4, 1, wk->param->heapId);
     wk->cellRes[2] = ClActSys_LoadCellAnims(arc, 425, 426, wk->param->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 421, &palette, HEAPID_TAIL(wk->param->heapId));
-    PaletteFade_LoadData(wk->paletteFade, (u16 *)palette->rawData + 4 * 16, PALFADE_BUFFER_SUB_OBJ, 0x80, 0x20);
+    PaletteFade_LoadData(wk->paletteFade, (u16 *)palette->pRawData + 4 * 16, PALFADE_BUFFER_SUB_OBJ, 0x80, 0x20);
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);
 }

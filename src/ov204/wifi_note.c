@@ -858,7 +858,7 @@ static inline void WifiNote_ShowWindowNow(BmpWin *window) {
 }
 
 static inline void WifiNote_LoadScreen(u8 bg, const NNSG2dScreenData *screen) {
-    GFL_BGSysLoadScrAreaAll(bg, screen->rawData, 0, 0, screen->width / 8, screen->height / 8);
+    GFL_BGSysLoadScrAreaAll(bg, screen->rawData, 0, 0, screen->screenWidth / 8, screen->screenHeight / 8);
 }
 
 static BOOL WifiNote_ProcInit(GameProc *proc, u32 *state, void *param, void *work) {
@@ -2560,7 +2560,7 @@ static void WifiNoteListArea_Exit(WifiNoteListArea *area, WifiNoteDraw *draw) {
 
 static void WifiNoteListArea_DrawBG(WifiNoteListArea *area, WifiNoteDraw *draw, WifiNoteScreens *screens) {
     GFL_BGSysLoadScrAreaAll(2, screens->screen[0]->rawData, MATH_ABS(area->area.x), MATH_ABS(area->area.y),
-                            screens->screen[0]->width / 8, screens->screen[0]->height / 8);
+                            screens->screen[0]->screenWidth / 8, screens->screen[0]->screenHeight / 8);
     GFL_BGSysQueueScrLoad(2);
 }
 
@@ -3271,10 +3271,10 @@ static void WifiNoteFriendInfo_SetPage(WifiNoteFriendInfo *info, WifiNoteData *d
 static void WifiNoteFriendInfo_DrawTabs(WifiNoteFriendInfo *info, WifiNoteDraw *draw, u32 tab) {
     if (info->unk10 == 1) {
         GFL_BGSysLoadScrArea(2, 0, 20, 32, 4, draw->screens.screen[1]->rawData, 0, 12,
-                             draw->screens.screen[1]->width / 8, draw->screens.screen[1]->height / 8);
+                             draw->screens.screen[1]->screenWidth / 8, draw->screens.screen[1]->screenHeight / 8);
     } else {
         GFL_BGSysLoadScrArea(2, 0, 20, 32, 4, draw->screens.screen[1]->rawData, 0, 20,
-                             draw->screens.screen[1]->width / 8, draw->screens.screen[1]->height / 8);
+                             draw->screens.screen[1]->screenWidth / 8, draw->screens.screen[1]->screenHeight / 8);
     }
     if (tab == 0xff) {
         GFL_BGSysQueueScrLoad(2);
@@ -3283,13 +3283,13 @@ static void WifiNoteFriendInfo_DrawTabs(WifiNoteFriendInfo *info, WifiNoteDraw *
     GFL_BGSysLoadScrArea(2, sWifiNoteFriendInfoTabX[info->unk10][tab], 20,
                          sWifiNoteFriendInfoTabWidth[info->unk10][tab], 4, draw->screens.screen[1]->rawData,
                          sWifiNoteFriendInfoTabX[info->unk10][tab], sWifiNoteFriendInfoTabSrcY[info->unk10],
-                         draw->screens.screen[1]->width / 8, draw->screens.screen[1]->height / 8);
+                         draw->screens.screen[1]->screenWidth / 8, draw->screens.screen[1]->screenHeight / 8);
     GFL_BGSysQueueScrLoad(2);
 }
 
 static void WifiNoteFriendInfo_ClearTabs(WifiNoteFriendInfo *info, WifiNoteDraw *draw) {
-    GFL_BGSysLoadScrArea(2, 0, 20, 32, 4, draw->screens.screen[1]->rawData, 0, 28, draw->screens.screen[1]->width / 8,
-                         draw->screens.screen[1]->height / 8);
+    GFL_BGSysLoadScrArea(2, 0, 20, 32, 4, draw->screens.screen[1]->rawData, 0, 28,
+                         draw->screens.screen[1]->screenWidth / 8, draw->screens.screen[1]->screenHeight / 8);
     GFL_BGSysQueueScrLoad(2);
 }
 

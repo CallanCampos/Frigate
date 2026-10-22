@@ -4,23 +4,23 @@
 // NitroSystem's gfd_LinkedListPlttVramMan.c: the linked-list palette VRAM manager, which frees what it allocated
 
 typedef struct {
-    GfdVramFreeList list;
-    GfdVramBlock *pool;
-    u32 size;
-    GfdVramBlock *work;
-    u32 workSize;
-} GfdLnkPlttVramManager;
+    NNSiGfdLnkVramMan mgr;
+    NNSiGfdLnkVramBlock *pBlockPoolList;
+    u32 szByte;
+    NNSiGfdLnkVramBlock *pWorkHead;
+    u32 szByteManagementWork;
+} NNS_GfdLnkPlttVramManager;
 
-static GfdLnkPlttVramManager plttMgr_;
+static NNS_GfdLnkPlttVramManager mgr_;
 
 u32 NNS_GfdGetLnkPlttVramManagerWorkSize(u32 numMemBlk) {
-    return numMemBlk * sizeof(GfdVramBlock);
+    return numMemBlk * sizeof(NNSiGfdLnkVramBlock);
 }
 
 void NNS_GfdInitLnkPlttVramManager(u32 szByte, void *pManagementWork, u32 szByteManagementWork, BOOL useAsDefault) {
-    plttMgr_.size = szByte;
-    plttMgr_.work = pManagementWork;
-    plttMgr_.workSize = szByteManagementWork;
+    mgr_.szByte = szByte;
+    mgr_.pWorkHead = pManagementWork;
+    mgr_.szByteManagementWork = szByteManagementWork;
     NNS_GfdResetLnkPlttVramState();
 
     if (useAsDefault) {
@@ -33,23 +33,23 @@ NNSGfdPlttKey NNS_GfdAllocLnkPlttVram(u32 szByte, BOOL is4pltt, u32 opt) {
     u32 addr;
     BOOL ok;
 
-    szByte = GfdPlttAllocSize(szByte);
-    if (szByte >= GFD_PLTT_ALLOC_LIMIT) {
+    szByte = NNSi_GfdGetPlttKeyRoundupSize(szByte);
+    if (szByte >= NNS_GFD_PLTTSIZE_MAX) {
         return NNS_GFD_ALLOC_ERROR_PLTTKEY;
     }
 
     if (is4pltt) {
-        ok = NNSi_GfdAllocLnkVramAligned(&plttMgr_.list, &plttMgr_.pool, &addr, szByte, 8);
-        if (addr + szByte > GFD_PLTT4_LIMIT) {
-            NNSi_GfdFreeLnkVram(&plttMgr_.list, &plttMgr_.pool, addr, szByte);
+        ok = NNSi_GfdAllocLnkVramAligned(&mgr_.mgr, &mgr_.pBlockPoolList, &addr, szByte, 8);
+        if (addr + szByte > NNS_GFD_4PLTT_MAX_ADDR) {
+            NNSi_GfdFreeLnkVram(&mgr_.mgr, &mgr_.pBlockPoolList, addr, szByte);
             return NNS_GFD_ALLOC_ERROR_PLTTKEY;
         }
     } else {
-        ok = NNSi_GfdAllocLnkVramAligned(&plttMgr_.list, &plttMgr_.pool, &addr, szByte, 16);
+        ok = NNSi_GfdAllocLnkVramAligned(&mgr_.mgr, &mgr_.pBlockPoolList, &addr, szByte, 16);
     }
 
     if (ok) {
-        return GfdMakePlttKey(addr, szByte);
+        return NNS_GfdMakePlttKey(addr, szByte);
     }
     return NNS_GFD_ALLOC_ERROR_PLTTKEY;
 }
@@ -58,7 +58,7 @@ NNSGfdPlttKey NNS_GfdAllocLnkPlttVram(u32 szByte, BOOL is4pltt, u32 opt) {
 int NNS_GfdFreeLnkPlttVram(NNSGfdPlttKey key) {
     const u32 addr = NNS_GfdGetPlttKeyAddr(key);
     const u32 size = NNS_GfdGetPlttKeySize(key);
-    const BOOL ok = NNSi_GfdFreeLnkVram(&plttMgr_.list, &plttMgr_.pool, addr, size);
+    const BOOL ok = NNSi_GfdFreeLnkVram(&mgr_.mgr, &mgr_.pBlockPoolList, addr, size);
 
     if (ok) {
         return 0;
@@ -67,8 +67,9 @@ int NNS_GfdFreeLnkPlttVram(NNSGfdPlttKey key) {
 }
 
 void NNS_GfdResetLnkPlttVramState(void) {
-    plttMgr_.pool = NNSi_GfdInitLnkVramBlockPool(plttMgr_.work, plttMgr_.workSize / sizeof(GfdVramBlock));
-    NNSi_GfdInitLnkVramMan(&plttMgr_.list);
-    NNSi_GfdAddNewFreeBlock(&plttMgr_.list, &plttMgr_.pool, 0, plttMgr_.size);
-    NNSi_GfdMergeAllFreeBlocks(&plttMgr_.list, &plttMgr_.pool);
+    mgr_.pBlockPoolList =
+        NNSi_GfdInitLnkVramBlockPool(mgr_.pWorkHead, mgr_.szByteManagementWork / sizeof(NNSiGfdLnkVramBlock));
+    NNSi_GfdInitLnkVramMan(&mgr_.mgr);
+    NNSi_GfdAddNewFreeBlock(&mgr_.mgr, &mgr_.pBlockPoolList, 0, mgr_.szByte);
+    NNSi_GfdMergeAllFreeBlocks(&mgr_.mgr, &mgr_.pBlockPoolList);
 }

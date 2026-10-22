@@ -471,9 +471,9 @@ static void ZknListObj_LoadIcon(ZknListWork *wk, u32 id, u16 species, u16 form, 
                                          HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
 
     if (touchScreen == TRUE) {
-        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_MAIN);
+        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->pRawData, 0x400, 0, CLACT_VRAM_MAIN);
     } else {
-        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_SUB);
+        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->pRawData, 0x400, 0, CLACT_VRAM_SUB);
     }
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);

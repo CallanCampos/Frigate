@@ -676,7 +676,7 @@ static void ZukanDetailTouchbar_UpdateGeneral(ZukanDetailTouchbar *touchbar) {
 static void ZukanDetailTouchbar_InitGlow(ZukanDetailTouchbar *touchbar) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLR(ARCID_ZUKAN_GRA, 3, &palette, touchbar->heapId);
-    u16 *data = palette->rawData;
+    u16 *data = palette->pRawData;
 
     MI_CpuCopy8(data + 16, touchbar->glowPalettes[0], 32);
     MI_CpuCopy8(data + 48, touchbar->glowPalettes[1], 32);

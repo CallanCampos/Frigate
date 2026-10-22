@@ -3,8 +3,8 @@
 // NitroSystem's G3D material color animation (NSBMA, the "BMA0" files): the function that fills in an animation object
 // for one, the function the object holds, which sets a material's colors and alpha at a frame, and the readers of the
 // animation's values. The file is named after NitroSystem's nsbma.c. The two global functions are the ones that anm.c's
-// tables hold; the readers are static because only this file calls them. Their names are guesses in NitroSystem's
-// style, ours in config/names.txt
+// tables hold; the readers are static because only this file calls them. The names are NitroSystem's, as ntrtwl's
+// reconstruction of NitroSystem has them, except BLEND_3_1 and COLOR_RB_MASK, which are ours
 
 // The red and blue bits of a color. They are far enough apart to be summed together, while the green bits are summed
 // on their own, so that no sum carries into the next channel
@@ -14,12 +14,12 @@
 // caller
 #define BLEND_3_1(a, b, mask) (3 * ((a) & (mask)) + ((b) & (mask)))
 
-static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame);
-static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame);
+static u16 GetMatColAnmValue_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame);
+static u16 GetMatColAnmuAlphaValue_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame);
 
 // The color of a material at a frame, from the word that says how its values are kept. The color between two stored
 // ones is made from them a group of bits at a time, red and blue then green
-static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
+static u16 GetMatColAnmValue_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
     const u16 *data;
     u32 last;
     u32 idx;
@@ -27,7 +27,7 @@ static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
     if (info & NNS_G3D_MATCANM_ELEM_CONST) {
         return info;
     }
-    data = (const u16 *)((const u8 *)anm + (info & NNS_G3D_MATCANM_ELEM_OFFSET_MASK));
+    data = (const u16 *)((const u8 *)anm + (info & NNS_G3D_MATCANM_ELEM_OFFSET_CONSTANT_MASK));
     if (!(info & NNS_G3D_MATCANM_ELEM_STEP_MASK)) {
         return data[frame];
     }
@@ -85,14 +85,14 @@ static u16 getColorData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
 }
 
 // The same for the alpha, a byte, where the one between two stored values is their average, rounded down
-static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
+static u16 GetMatColAnmuAlphaValue_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
     const u8 *data;
     u32 last;
 
     if (info & NNS_G3D_MATCANM_ELEM_CONST) {
         return info;
     }
-    data = (const u8 *)anm + (info & NNS_G3D_MATCANM_ELEM_OFFSET_MASK);
+    data = (const u8 *)anm + (info & NNS_G3D_MATCANM_ELEM_OFFSET_CONSTANT_MASK);
     if (!(info & NNS_G3D_MATCANM_ELEM_STEP_MASK)) {
         return data[frame];
     }
@@ -133,15 +133,15 @@ static u16 getAlphaData_(const NNSG3dResMatCAnm *anm, u32 info, u32 frame) {
     }
 }
 
-// Fills in an animation object for a material color animation (NitroSystem's NNSi_G3dAnmObjInitNsBma, as recalled). It
-// applies the animation with NNS_G3dFuncAnmMatNsBma, and maps each material of the model to the data of the animation's
-// material of the same name, which is flagged as existing and holds the data's index
-void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
+// Fills in an animation object for a material color animation. It applies the animation with
+// NNS_G3dFuncAnmMatNsBmaDefault, and maps each material of the model to the data of the animation's material of the
+// same name, which is flagged as existing and holds the data's index
+void NNSi_G3dAnmObjInitNsBma(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResMatCAnm *matAnm = anm;
     const NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     u32 i;
 
-    anmObj->funcAnm = (void *)NNS_G3dFuncAnmMatNsBma;
+    anmObj->funcAnm = (void *)NNS_G3dFuncAnmMatNsBmaDefault;
     anmObj->numMapData = mdl->info.numMat;
     MI_CpuClear16(anmObj->mapData, anmObj->numMapData * sizeof(u16));
     for (i = 0; i < matAnm->dict.numEntry; i++) {
@@ -157,21 +157,22 @@ void NNS_G3DAnimationInit_MA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl
 // The function of an animation object of a material color animation: the colors and alpha of a material at the
 // object's frame. The colors go in the material's color words, which keep their bit 15 (a flag of the diffuse and
 // specular colors' words), and the alpha in the polygon attributes
-void NNS_G3DAnimationApply_MA(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx) {
+void NNSi_G3dAnmCalcNsBma(NNSG3dMatAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx) {
     const NNSG3dResMatCAnm *matAnm = anmObj->resAnm;
     u32 frame = anmObj->frame >> FX32_SHIFT;
-    const NNSG3dResMatCAnmData *data = NNS_G3dGetResDataByIdx(&matAnm->dict, (u16)dataIdx);
+    const NNSG3dResDictMatCAnmData *data = NNS_G3dGetResDataByIdx(&matAnm->dict, (u16)dataIdx);
     u16 emission;
     u16 specular;
-    u16 diffuse = getColorData_(matAnm, data->diffuse, frame);
-    u16 ambient = getColorData_(matAnm, data->ambient, frame);
+    u16 diffuse = GetMatColAnmValue_(matAnm, data->diffuse, frame);
+    u16 ambient = GetMatColAnmValue_(matAnm, data->ambient, frame);
 
     result->prmMatColor0 =
         GX_PACK_DIFFAMB_PARAM(diffuse, ambient, result->prmMatColor0 & (1 << REG_G3_DIF_AMB_C_SHIFT));
-    emission = getColorData_(matAnm, data->emission, frame);
-    specular = getColorData_(matAnm, data->specular, frame);
+    emission = GetMatColAnmValue_(matAnm, data->emission, frame);
+    specular = GetMatColAnmValue_(matAnm, data->specular, frame);
     result->prmMatColor1 =
         GX_PACK_SPECEMI_PARAM(specular, emission, result->prmMatColor1 & (1 << REG_G3_SPE_EMI_S_SHIFT));
-    result->prmPolygonAttr = (result->prmPolygonAttr & ~(0x1f << REG_G3_POLYGON_ATTR_ALPHA_SHIFT)) |
-                             (getAlphaData_(matAnm, data->polygonAlpha, frame) << REG_G3_POLYGON_ATTR_ALPHA_SHIFT);
+    result->prmPolygonAttr =
+        (result->prmPolygonAttr & ~(0x1f << REG_G3_POLYGON_ATTR_ALPHA_SHIFT)) |
+        (GetMatColAnmuAlphaValue_(matAnm, data->polygon_alpha, frame) << REG_G3_POLYGON_ATTR_ALPHA_SHIFT);
 }

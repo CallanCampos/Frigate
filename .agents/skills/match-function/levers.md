@@ -16,7 +16,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)
   and cast it inside. (matching.md: "A handle parameter cast inside")
 - An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result
-  again, `p = NNSi_G2dUnpackOffset(p, base)`. (matching.md: "A macro that assigns")
+  again, `p = NNS_G2D_UNPACK_OFFSET_PTR(p, base)`. (matching.md: "A macro that assigns")
 - Rows of a matrix product whose registers rotate: the row of `a` in locals and a destination pointer of its own.
   (matching.md: "They match only with the row of `a` in locals")
 - Two of several independent statements with their registers swapped: write the other one first.
@@ -120,7 +120,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A caller's scheduling or stack slots differ only around a call: the callee's parameter type, `int` against `long`.
   (matching.md: "A narrow argument passed to a parameter")
 - A loop's setup registers swapped in a function that calls an inline with `u16` bounds: declare the inline's index
-  parameters `int` (`g2d_OAM.c`'s `LoadAffinesByFunction_`, 14 bytes to 4).
+  parameters `int` (`g2d_OAM.c`'s `LoadAffine_`, 14 bytes to 4).
 - A field read through a pointer parameter folded where the original builds the address, or the reverse: the original
   uses the pointer once more or less, or a `*(T *)&p->m` cast stands in for the field's real type. (matching.md:
   "depends on how many references")
@@ -1103,7 +1103,7 @@ whose original rotates its loops, since the attribute enters every loop of the f
 `addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
 placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the
 literal (`&G.field` as one pool word) and keeps two reads of a field apart, so an original with such a pool word or
-a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `SetAffinedOamPosition_` show.
+a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `DoAffineTransforme_` show.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").

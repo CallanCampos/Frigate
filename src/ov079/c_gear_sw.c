@@ -966,7 +966,7 @@ static void CGearSw_LoadBG(CGearSw *work, int gender, int skin, BOOL palettes) {
         GFL_G2DIOLoadArcNCLRDefault(work->arc, gender + 4, 4, 0, 0x1c0, HEAPID_TAIL(work->heapId));
 
         file = GFL_G2DIOReadNCLRArc(work->arc, gender + 14, &palette, HEAPID_TAIL(work->heapId));
-        colors = palette->rawData;
+        colors = palette->pRawData;
         for (i = 0; i < LAMP_COUNT; i++) {
             work->lampBaseColors[i] = colors[(i + 2) * 16 + 13];
         }
@@ -974,20 +974,20 @@ static void CGearSw_LoadBG(CGearSw *work, int gender, int skin, BOOL palettes) {
 
         file = GFL_G2DIOReadNCLRArc(work->arc, 13, &palette, HEAPID_TAIL(work->heapId));
         for (i = 0; i < 9; i++) {
-            CGearSw_ReadLampPalette(work, palette->rawData, i);
+            CGearSw_ReadLampPalette(work, palette->pRawData, i);
         }
         GFL_HeapFree(file);
 
         // Six color schemes for each gender
         file = GFL_G2DIOReadNCLRArc(work->arc, 6, &palette, HEAPID_TAIL(work->heapId));
-        colors = palette->rawData;
+        colors = palette->pRawData;
         for (i = 0; i < PANEL_COUNT + 1; i++) {
             MI_CpuCopy8(&colors[(i + gender * 6) * 16], work->panelColors[i], sizeof(work->panelColors[i]));
         }
         GFL_HeapFree(file);
 
         file = GFL_G2DIOReadNCLRArc(work->arc, 7, &palette, HEAPID_TAIL(work->heapId));
-        colors = palette->rawData;
+        colors = palette->pRawData;
         for (i = 0; i < PANEL_COUNT + 1; i++) {
             MI_CpuCopy8(&colors[(i + gender * 6) * 16], work->skinColors[i], sizeof(work->skinColors[i]));
         }
@@ -1016,7 +1016,7 @@ static void CGearSw_LoadObjRes(CGearSw *work, int gender) {
     work->objRes[4] = ClActSys_LoadCellAnims(work->arc, 29, 30, work->heapId);
 
     file = GFL_G2DIOReadNCLRArc(work->arc, 13, &palette, work->heapId);
-    MIi_CpuCopy16(&((u16 *)palette->rawData)[9 * 16], work->beaconColors, sizeof(work->beaconColors));
+    MIi_CpuCopy16(&((u16 *)palette->pRawData)[9 * 16], work->beaconColors, sizeof(work->beaconColors));
     GFL_HeapFree(file);
 
     GFL_NetMoveIcon(200, 10);

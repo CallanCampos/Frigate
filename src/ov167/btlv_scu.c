@@ -2514,7 +2514,7 @@ static void BtlvScu_InitAbilityWins(BtlvScu *scu, u32 charOffset) {
         scu->abilityWins[i].scu = scu;
         scu->abilityWins[i].side = i;
         scu->abilityWins[i].bg = i == BTLV_SCU_SIDE_PLAYER ? 2 : 3;
-        scu->abilityWins[i].chars = (u8 *)scu->abilityChars->rawData + i * 0x900;
+        scu->abilityWins[i].chars = (u8 *)scu->abilityChars->pRawData + i * 0x900;
         scu->abilityWins[i].bitmap = GFL_BitmapCreate(18, 4, 0x20, scu->heapId);
         scu->abilityWins[i].ability = 0;
         scu->abilityWins[i].monId = 0x1F;
@@ -2649,7 +2649,8 @@ static void BtlvScuAbilityWin_DrawText(BtlvScuAbilityWin *win) {
     int half;
 
     size = GFL_BitmapCalcPixelDataSize(win->bitmap);
-    MIi_CpuCopy32((u8 *)win->scu->abilityChars->rawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap), size);
+    MIi_CpuCopy32((u8 *)win->scu->abilityChars->pRawData + win->side * 0x900, GFL_BitmapGetPixelData(win->bitmap),
+                  size);
     GFL_TextRndUpdateColorIndexLUT(1, 2, 0);
     BtlString_FormatStdMsg(scu->abilityStrbuf, 0x67, 2, win->monId, win->ability);
     if ((u8)GFL_FontGetLineWidths(scu->abilityStrbuf, scu->smallFont, 0, widths, 2) > 1) {

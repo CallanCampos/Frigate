@@ -115,23 +115,23 @@ static void WFCUserInfoWarning_LoadWindow(void) {
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_CHAR, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
-        DC_FlushRange(chars->rawData, chars->size);
-        MI_CpuCopy16(chars->rawData, G2_GetBG1CharPtr(), chars->size);
+        DC_FlushRange(chars->pRawData, chars->szByte);
+        MI_CpuCopy16(chars->pRawData, G2_GetBG1CharPtr(), chars->szByte);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_SCRN, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
-        DC_FlushRange(screen->rawData, screen->size);
-        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->size);
+        DC_FlushRange(screen->rawData, screen->szByte);
+        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->szByte);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(ARCID_ERROR_WINDOW_GRA, ERROR_WINDOW_GRA_PLTT, FALSE, HEAPID_USER);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
-        DC_FlushRange(palette->rawData, 0x20);
-        MI_CpuCopy16(palette->rawData, (void *)HW_BG_PLTT, 0x20);
+        DC_FlushRange(palette->pRawData, 0x20);
+        MI_CpuCopy16(palette->pRawData, (void *)HW_BG_PLTT, 0x20);
     }
     GFL_HeapFree(file);
 }

@@ -72,7 +72,7 @@ TwoChoiceMenu *TwoChoiceMenu_Create(HeapID heapId, u32 textBg, u32 priority, u32
     file = GFL_HeapAllocate(menu->heapId, GFL_ArcToolGetDataLength(arc, 163), FALSE, "yesno_menu.c", 269);
     GFL_ArcToolRead(arc, 163, file);
     NNS_G2dGetUnpackedPaletteData(file, &paletteData);
-    colors = paletteData->rawData;
+    colors = paletteData->pRawData;
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 16; j++) {
             menu->palettes[i][j] = colors[(i + 1) * 16 + j];

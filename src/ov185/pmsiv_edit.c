@@ -249,7 +249,7 @@ static void PMSIVEdit_SetupPalette(PMSIVEdit *wk, ArcTool *arc) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 3, 0, 0, 0x1c0, HEAPID_PMS_INPUT);
     GFL_G2DIOLoadArcNCLRDefault(arc, 4, 4, 0, 0xa0, HEAPID_PMS_INPUT);
     buf = GFL_G2DIOReadNCLRArc(arc, 6, &palette, HEAPID_PMS_INPUT);
-    MIi_CpuCopy16(palette->rawData, wk->palette, sizeof(wk->palette));
+    MIi_CpuCopy16(palette->pRawData, wk->palette, sizeof(wk->palette));
     DC_FlushRange(wk->palette, sizeof(wk->palette));
     GFL_HeapFree(buf);
 }

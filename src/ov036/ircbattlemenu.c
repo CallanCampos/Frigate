@@ -522,8 +522,8 @@ static void IrcMenu_LoadGraphics(IrcMenuWork *wk) {
     arc = GFL_ArcSysCreateFileHandle(ARCID_GSYNC_MENU, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 2, PALTYPE_SUB_BG, 0, 0, wk->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, wk->heapId);
-    MI_CpuCopy8(palette->rawData, wk->palettes[0], sizeof(wk->palettes[0]));
-    MI_CpuCopy8(palette->rawData, wk->palettes[1], sizeof(wk->palettes[1]));
+    MI_CpuCopy8(palette->pRawData, wk->palettes[0], sizeof(wk->palettes[0]));
+    MI_CpuCopy8(palette->pRawData, wk->palettes[1], sizeof(wk->palettes[1]));
     IrcMenu_BrightenPalettes(wk->palettes[1], sIrcMenuBrightenAmounts, 8);
     GFL_HeapFree(file);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, wk->heapId);

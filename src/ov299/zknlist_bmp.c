@@ -123,7 +123,7 @@ static void ZknListBmp_LoadWindowBG(ZknListWork *wk, u32 window) {
     screenFile = GFL_G2DIOReadNSCRArc(arc, 71, FALSE, &screenData, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
     screen = (u16 *)screenData->rawData;
     charFile = GFL_G2DIOReadBGNCGRArc(arc, 59, FALSE, &charData, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
-    chars = charData->rawData;
+    chars = charData->pRawData;
     GFL_ArcToolFree(arc);
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {

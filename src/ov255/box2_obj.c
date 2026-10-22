@@ -426,7 +426,7 @@ void Box2Obj_LoadTrayPokeIcons(Box2SysWork *syswk, u32 tray) {
         } else {
             pkm = Box2Main_GetBoxPkm(syswk, tray, i);
             buf = ReadPokeIconChar(syswk->app, pkm, &chr);
-            MIi_CpuCopy32(chr->rawData, syswk->app->pokeIconChar[i], 0x200);
+            MIi_CpuCopy32(chr->pRawData, syswk->app->pokeIconChar[i], 0x200);
             GFL_HeapFree(buf);
             syswk->app->pokeIconPal[i] = GetPokeIconPalette(syswk, pkm);
             syswk->app->pokeIconExist[i] = TRUE;
@@ -499,7 +499,7 @@ static void SetPokeIcon(Box2SysWork *syswk, BoxPkm *pkm, u32 id) {
     NNSG2dCharacterData *chr;
     void *buf = ReadPokeIconChar(syswk->app, pkm, &chr);
 
-    TransferIconChar(syswk->app, chr->rawData, id, GetPokeIconPalette(syswk, pkm));
+    TransferIconChar(syswk->app, chr->pRawData, id, GetPokeIconPalette(syswk, pkm));
     GFL_HeapFree(buf);
 }
 
@@ -1420,7 +1420,7 @@ void Box2Obj_MakeTrayIconChar(Box2SysWork *syswk, u32 tray) {
     NNSG2dCharacterData *chr;
     void *buf = GFL_G2DIOReadOBJNCGR(ARCID_BOX2, 71, TRUE, &chr, HEAPID_BOX2_APP);
 
-    MI_CpuCopy8(chr->rawData, syswk->app->trayIconChar[tray], 0x400);
+    MI_CpuCopy8(chr->pRawData, syswk->app->trayIconChar[tray], 0x400);
     GFL_HeapFree(buf);
     ReplaceTrayIconColor(syswk, syswk->app->trayIconChar[tray], Box2Main_GetWallPaperNumber(syswk, tray), 8, 0x400);
     DrawTrayIconPokes(syswk, tray, syswk->app->trayIconChar[tray]);

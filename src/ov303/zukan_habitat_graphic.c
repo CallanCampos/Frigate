@@ -798,7 +798,7 @@ static void ZukanHabitatGraphic_LoadIcon(ZukanHabitatGraphic *graphic, u8 cell) 
     void *file = GFL_G2DIOReadOBJNCGRArc(graphic->iconArc, PokeParty_GetIconIndex(species, form, sex, FALSE), FALSE,
                                          &character, HEAPID_ZUKAN_HABITAT);
 
-    ClActSys_WriteCharData(ClActor_GetCharIdx(graphic->icons[cell]), character->rawData, 0x400, 0, 0);
+    ClActSys_WriteCharData(ClActor_GetCharIdx(graphic->icons[cell]), character->pRawData, 0x400, 0, 0);
     ClActSys_ReplaceCharData(ClActor_GetCharIdx(graphic->icons[cell]), character);
     ClActor_SetPalette(graphic->icons[cell], PokeIcon_GetPalette(species, form, sex, FALSE), 1);
     GFL_HeapFree(file);

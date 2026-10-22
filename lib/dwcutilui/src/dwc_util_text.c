@@ -36,8 +36,8 @@ static const u16 sBgCharNames[2] = { 0, 0x180 };
 static DWCUtilTextWork *sTextWork;
 
 // The direction of the font's text, from how its glyphs are rotated
-static inline NNSG2dTextDirection DWCUtilText_GetDirection(const NNSG2dFont *font) {
-    NNSG2dTextDirection dir = { 0, 0 };
+static inline NNSiG2dTextDirection DWCUtilText_GetDirection(const NNSG2dFont *font) {
+    NNSiG2dTextDirection dir = { 0, 0 };
 
     switch (font->pRes->pGlyph->flags) {
     case 0:
@@ -96,7 +96,7 @@ DWCUtilText *DWCi_FNTlFormEx(int screen, int width, int height, s16 fromFront, i
     text->u.obj.height = height;
     text->buffer = DWCi_OVRlAlloc(screen, width * height, fromFront, &charName);
     text->u.obj.charName = charName;
-    *objCount = NNS_G2dCalcRequireOBJ1D(width, height);
+    *objCount = NNSi_G2dCalcRequiredOBJ(width, height);
     NNS_G2dCharCanvasInitForOBJ1D(&text->canvas,
                                   (void *)((screen == 1 ? HW_DB_OBJ_VRAM : HW_OBJ_VRAM) + charName * 0x80), width,
                                   height, NNS_G2D_CHARA_COLORMODE_16);

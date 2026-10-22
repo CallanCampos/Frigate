@@ -4,34 +4,34 @@
 // top of each region and 4x4-compressed ones up from the bottom of slots 0 and 2, with their palette indices in the
 // halves of slot 1, and frees only by going back to a state saved before
 
-// One region of texture VRAM, a slot or half of slot 1, and how much of it is allocated: up to lo from the bottom and
-// down to hi from the top, as offsets from the region's VRAM address
+// One region of texture VRAM, a slot or half of slot 1, and how much of it is allocated: up to head from the bottom and
+// down to tail from the top, as offsets from the region's VRAM address, baseAddress
 typedef struct {
-    u32 lo;
-    u32 hi;
-    BOOL inUse;
-    BOOL isHalf;
-    u16 id;
-    u16 pad;
-    u32 vramAddr;
-} GfdFrmTexRegion;
+    u32 head;
+    u32 tail;
+    BOOL bActive;
+    BOOL bHalfSize;
+    u16 index;
+    u16 pad16_;
+    u32 baseAddress;
+} NNSGfdFrmTexRegionState;
 
 typedef struct {
     u16 numSlot;
     u16 pad;
-} GfdFrmTexManager;
+} NNSGfdFrmTexVramMnager;
 
-#define GFD_FRMTEX_REGION_COUNT 5
+#define NNS_GFD_NUM_TEX_VRAM_REGION 5
 
-static GfdFrmTexRegion vramRegions_[GFD_FRMTEX_REGION_COUNT];
+static NNSGfdFrmTexRegionState vramRegions_[NNS_GFD_NUM_TEX_VRAM_REGION];
 
 // The regions 4x4-compressed textures go in, and the regions normal textures go in in the order they are tried
-static GfdFrmTexRegion *tex4x4SearchArray_[2] = { &vramRegions_[0], &vramRegions_[3] };
-static GfdFrmTexRegion *texNrmSearchArray_[GFD_FRMTEX_REGION_COUNT] = {
+static NNSGfdFrmTexRegionState *tex4x4SearchArray_[2] = { &vramRegions_[0], &vramRegions_[3] };
+static NNSGfdFrmTexRegionState *texNrmSearchArray_[NNS_GFD_NUM_TEX_VRAM_REGION] = {
     &vramRegions_[4], &vramRegions_[3], &vramRegions_[0], &vramRegions_[2], &vramRegions_[1],
 };
 
-static GfdFrmTexRegion vramRegions_[GFD_FRMTEX_REGION_COUNT] = {
+static NNSGfdFrmTexRegionState vramRegions_[NNS_GFD_NUM_TEX_VRAM_REGION] = {
     { 0xffffffff, 0xffffffff, FALSE, FALSE, 0, 0xffff, 0x00000 },
     { 0xffffffff, 0xffffffff, FALSE, TRUE, 1, 0xffff, 0x20000 },
     { 0xffffffff, 0xffffffff, FALSE, TRUE, 2, 0xffff, 0x30000 },
@@ -39,7 +39,7 @@ static GfdFrmTexRegion vramRegions_[GFD_FRMTEX_REGION_COUNT] = {
     { 0xffffffff, 0xffffffff, FALSE, FALSE, 4, 0xffff, 0x60000 },
 };
 
-static GfdFrmTexManager frmExVramMan_;
+static NNSGfdFrmTexVramMnager frmExVramMan_;
 
 void NNSi_GfdSetTexNrmSearchArray(int first, int second, int third, int fourth, int fifth) {
     texNrmSearchArray_[0] = &vramRegions_[first];
@@ -72,26 +72,26 @@ void NNS_GfdResetFrmTexVramState(void) {
     // Slot 1 is two regions
     int numRegion = numSlot > 1 ? numSlot + 1 : numSlot;
 
-    for (i = 0; i < GFD_FRMTEX_REGION_COUNT; i++) {
+    for (i = 0; i < NNS_GFD_NUM_TEX_VRAM_REGION; i++) {
         if (i < numRegion) {
-            vramRegions_[i].inUse = TRUE;
+            vramRegions_[i].bActive = TRUE;
         } else {
-            vramRegions_[i].inUse = FALSE;
+            vramRegions_[i].bActive = FALSE;
         }
 
-        if (vramRegions_[i].isHalf) {
-            vramRegions_[i].lo = 0;
-            vramRegions_[i].hi = 0x10000;
+        if (vramRegions_[i].bHalfSize) {
+            vramRegions_[i].head = 0;
+            vramRegions_[i].tail = 0x10000;
         } else {
-            vramRegions_[i].lo = 0;
-            vramRegions_[i].hi = 0x20000;
+            vramRegions_[i].head = 0;
+            vramRegions_[i].tail = 0x20000;
         }
     }
 }
 
 // The region that holds the palette indices of the 4x4-compressed textures in a region
-static inline GfdFrmTexRegion *IndexRegionOf(GfdFrmTexRegion *region) {
-    switch (region->id) {
+static inline NNSGfdFrmTexRegionState *Get4x4IdxRegion_(NNSGfdFrmTexRegionState *region) {
+    switch (region->index) {
     case 0:
         return &vramRegions_[1];
     case 3:
@@ -101,25 +101,25 @@ static inline GfdFrmTexRegion *IndexRegionOf(GfdFrmTexRegion *region) {
     }
 }
 
-static inline BOOL HasRoom(const GfdFrmTexRegion *region, u32 size) {
-    return region->inUse && region->hi - region->lo >= size;
+static inline BOOL HasRoom(const NNSGfdFrmTexRegionState *region, u32 size) {
+    return region->bActive && region->tail - region->head >= size;
 }
 
-static inline BOOL Alloc4x4(u32 size, u32 *outAddr) {
+static inline BOOL DoAlloc4x4_(u32 size, u32 *outAddr) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        GfdFrmTexRegion *region = tex4x4SearchArray_[i];
+        NNSGfdFrmTexRegionState *region = tex4x4SearchArray_[i];
 
         if (HasRoom(region, size)) {
-            GfdFrmTexRegion *indexRegion = IndexRegionOf(region);
+            NNSGfdFrmTexRegionState *indexRegion = Get4x4IdxRegion_(region);
 
             if (HasRoom(indexRegion, size / 2)) {
-                u32 offset = region->lo;
+                u32 offset = region->head;
 
-                region->lo += size;
-                indexRegion->lo += size / 2;
-                *outAddr = offset + region->vramAddr;
+                region->head += size;
+                indexRegion->head += size / 2;
+                *outAddr = offset + region->baseAddress;
                 return TRUE;
             }
         }
@@ -127,15 +127,15 @@ static inline BOOL Alloc4x4(u32 size, u32 *outAddr) {
     return FALSE;
 }
 
-static inline BOOL AllocNormal(u32 size, u32 *outAddr) {
+static inline BOOL DoAllocNrm_(u32 size, u32 *outAddr) {
     int i;
 
-    for (i = 0; i < GFD_FRMTEX_REGION_COUNT; i++) {
-        GfdFrmTexRegion *region = texNrmSearchArray_[i];
+    for (i = 0; i < NNS_GFD_NUM_TEX_VRAM_REGION; i++) {
+        NNSGfdFrmTexRegionState *region = texNrmSearchArray_[i];
 
         if (HasRoom(region, size)) {
-            region->hi -= size;
-            *outAddr = region->hi + region->vramAddr;
+            region->tail -= size;
+            *outAddr = region->tail + region->baseAddress;
             return TRUE;
         }
     }
@@ -146,15 +146,15 @@ NNSGfdTexKey NNS_GfdAllocFrmTexVram(u32 szByte, BOOL is4x4comp, u32 opt) {
     u32 addr;
     BOOL ok;
 
-    szByte = GfdTexAllocSize(szByte);
-    if (szByte >= GFD_TEX_ALLOC_LIMIT) {
+    szByte = NNSi_GfdGetTexKeyRoundupSize(szByte);
+    if (szByte >= NNS_GFD_TEXSIZE_MAX) {
         return NNS_GFD_ALLOC_ERROR_TEXKEY;
     }
 
     if (is4x4comp) {
-        ok = Alloc4x4(szByte, &addr);
+        ok = DoAlloc4x4_(szByte, &addr);
     } else {
-        ok = AllocNormal(szByte, &addr);
+        ok = DoAllocNrm_(szByte, &addr);
     }
 
     if (ok) {
@@ -170,17 +170,17 @@ int NNS_GfdFreeFrmTexVram(NNSGfdTexKey key) {
 void NNS_GfdGetFrmTexVramState(NNSGfdFrmTexVramState *state) {
     int i;
 
-    for (i = 0; i < GFD_FRMTEX_REGION_COUNT; i++) {
-        state->address[i * 2] = vramRegions_[i].lo;
-        state->address[i * 2 + 1] = vramRegions_[i].hi;
+    for (i = 0; i < NNS_GFD_NUM_TEX_VRAM_REGION; i++) {
+        state->address[i * 2] = vramRegions_[i].head;
+        state->address[i * 2 + 1] = vramRegions_[i].tail;
     }
 }
 
 void NNS_GfdSetFrmTexVramState(const NNSGfdFrmTexVramState *state) {
     int i;
 
-    for (i = 0; i < GFD_FRMTEX_REGION_COUNT; i++) {
-        vramRegions_[i].lo = state->address[i * 2];
-        vramRegions_[i].hi = state->address[i * 2 + 1];
+    for (i = 0; i < NNS_GFD_NUM_TEX_VRAM_REGION; i++) {
+        vramRegions_[i].head = state->address[i * 2];
+        vramRegions_[i].tail = state->address[i * 2 + 1];
     }
 }

@@ -416,7 +416,7 @@ static void BtlvGauge_LoadResources(BtlvGauge *gauge) {
     PaletteFade_BlendPalettes(BtlvEffect_GetPaletteFade(), PALFADE_BUFFER_MAIN_OBJ, 1 << 9, 8, 0);
     GFL_ArcToolFree(arc);
     gauge->charFile = GFL_G2DIOReadOBJNCGRArc(gauge->arc, 0x1b2, FALSE, &character, gauge->heapId);
-    gauge->chars = character->rawData;
+    gauge->chars = character->pRawData;
     switch (BtlvEffect_GetBattleStyle()) {
     case BTL_STYLE_SINGLE:
         start = 0;

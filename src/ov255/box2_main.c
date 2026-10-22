@@ -362,7 +362,7 @@ void Box2Main_LoadBgGraphics(Box2SysWork *syswk) {
     {
         NNSG2dPaletteData *palette;
         void *buf = GFL_G2DIOReadNCLR(getUINarcIdx(), 31, &palette, HEAPID_TAIL(HEAPID_BOX2_APP));
-        u8 *colors = palette->rawData;
+        u8 *colors = palette->pRawData;
         u32 offset = 0x194;
 
         GFL_BGSysUploadStdPalette(0, colors + 0x34, 4, offset);
@@ -2320,7 +2320,7 @@ static void WallCharLoad(Box2SysWork *syswk, u32 wallpaper, u32 offset) {
     NNSG2dCharacterData *chr;
     void *buf = GFL_G2DIOReadBGNCGR(ARCID_BOX2, wallpaper + 14, TRUE, &chr, HEAPID_BOX2_APP);
 
-    GFL_BGSysLoadChar(3, chr->rawData, chr->size, offset);
+    GFL_BGSysLoadChar(3, chr->pRawData, chr->szByte, offset);
     GFL_HeapFree(buf);
 }
 

@@ -358,7 +358,7 @@ static void DrawButton(Box2SysWork *syswk, u32 index, u32 msgId, u16 frame, u16 
     GFL_BitmapFill(bitmap, 4);
 
     buf = GFL_G2DIOReadBGNCGR(ARCID_BOX2, 62, TRUE, &chars, HEAPID_TAIL(HEAPID_BOX2_APP));
-    pixels = chars->rawData;
+    pixels = chars->pRawData;
     frame *= 0x20;
 
     tile = GFL_BitmapWrap(&pixels[frame], 8, 8, 0x20, HEAPID_TAIL(HEAPID_BOX2_APP));
@@ -405,7 +405,7 @@ static void DrawButton(Box2SysWork *syswk, u32 index, u32 msgId, u16 frame, u16 
 
     if (arrow == TRUE) {
         buf = GFL_G2DIOReadBGNCGR(getUINarcIdx(), 32, FALSE, &chars, HEAPID_TAIL(HEAPID_BOX2_APP));
-        tile = GFL_BitmapWrap((u8 *)chars->rawData + 0x120, 16, 8, 0x20, HEAPID_TAIL(HEAPID_BOX2_APP));
+        tile = GFL_BitmapWrap((u8 *)chars->pRawData + 0x120, 16, 8, 0x20, HEAPID_TAIL(HEAPID_BOX2_APP));
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, (width - 3) * 8, 8, 16, 8, 5);
         GFL_BitmapFree(tile);
         GFL_HeapFree(buf);

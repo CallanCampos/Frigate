@@ -2,9 +2,9 @@
 
 // NitroSystem's G3D accessors for animation resources (res_struct_accessor_anm.c): the animations of a file, and the
 // names and frames of a texture pattern animation (BTP0). The functions have NitroSystem's names, and g3d.h notes
-// swan's. GetTexPatAnmData is static because only this file calls it
+// swan's. NNSi_G3dGetTexPatAnmDataByIdx is static because only this file calls it
 
-static const NNSG3dResTexPatAnmData *GetTexPatAnmData(const NNSG3dResTexPatAnm *anm, u32 idx);
+static const NNSG3dResDictTexPatAnmData *NNSi_G3dGetTexPatAnmDataByIdx(const NNSG3dResTexPatAnm *anm, u32 idx);
 
 void *NNS_G3dGetAnmByIdx(const void *res, u32 idx) {
     if (res != NULL) {
@@ -21,7 +21,7 @@ void *NNS_G3dGetAnmByIdx(const void *res, u32 idx) {
 }
 
 // The name of a texture of the animation, or of a palette
-const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u8 idx) {
+const NNSG3dResName *NNSi_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *anm, u8 idx) {
     if (anm != NULL && idx < anm->numTex) {
         const NNSG3dResName *names = (const NNSG3dResName *)((const u8 *)anm + anm->ofsTexName);
 
@@ -30,7 +30,7 @@ const NNSG3dResName *NNS_G3dGetTexPatAnmTexNameByIdx(const NNSG3dResTexPatAnm *a
     return NULL;
 }
 
-const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u8 idx) {
+const NNSG3dResName *NNSi_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *anm, u8 idx) {
     if (anm != NULL && idx < anm->numPltt) {
         const NNSG3dResName *names = (const NNSG3dResName *)((const u8 *)anm + anm->ofsPlttName);
 
@@ -42,7 +42,7 @@ const NNSG3dResName *NNS_G3dGetTexPatAnmPlttNameByIdx(const NNSG3dResTexPatAnm *
 // The texture and palette that the material animation at idx shows at a frame: the last pair of its frame values that
 // starts at or before the frame, found from where the frame is in the animation's length
 const NNSG3dResTexPatAnmFV *NNSi_G3dGetTexPatAnmFV(const NNSG3dResTexPatAnm *anm, u32 idx, u32 frame) {
-    const NNSG3dResTexPatAnmData *data = GetTexPatAnmData(anm, idx);
+    const NNSG3dResDictTexPatAnmData *data = NNSi_G3dGetTexPatAnmDataByIdx(anm, idx);
     const NNSG3dResTexPatAnmFV *fv = (const NNSG3dResTexPatAnmFV *)((const u8 *)anm + data->offset);
     u32 i = data->ratioDataFrame * frame >> FX32_SHIFT;
 
@@ -56,6 +56,6 @@ const NNSG3dResTexPatAnmFV *NNSi_G3dGetTexPatAnmFV(const NNSG3dResTexPatAnm *anm
 }
 
 // The data of the material animation at idx
-static const NNSG3dResTexPatAnmData *GetTexPatAnmData(const NNSG3dResTexPatAnm *anm, u32 idx) {
+static const NNSG3dResDictTexPatAnmData *NNSi_G3dGetTexPatAnmDataByIdx(const NNSG3dResTexPatAnm *anm, u32 idx) {
     return NNS_G3dGetResDataByIdx(&anm->dict, idx);
 }

@@ -1652,7 +1652,7 @@ static void MysteryPalFade_Init(MysteryPalFade *fade, ArcTool *arc, u32 fileId, 
 
     MI_CpuFill8(fade, 0, sizeof(MysteryPalFade));
     buf = GFL_G2DIOReadNCLRArc(arc, fileId, &pal, heapId);
-    data = pal->rawData;
+    data = pal->pRawData;
     MI_CpuCopy8(data + to * 32, fade->to, sizeof(fade->to));
     MI_CpuCopy8(data + from * 32, fade->from, sizeof(fade->from));
     GFL_HeapFree(buf);
@@ -1983,10 +1983,10 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
     } else {
         dst += HW_DB_OBJ_PLTT;
     }
-    MI_CpuCopy8(pal->rawData, (void *)dst, 0x60);
+    MI_CpuCopy8(pal->pRawData, (void *)dst, 0x60);
     GFL_HeapFree(buf);
     buf = GFL_G2DIOReadOBJNCGRArc(arc, MysteryCard_GetIconCharFile(&album->card), FALSE, &chars, album->heapId);
-    ClActSys_WriteCharData(res->chars, chars->rawData, 0x200, 0, res->vramType);
+    ClActSys_WriteCharData(res->chars, chars->pRawData, 0x200, 0, res->vramType);
     GFL_HeapFree(buf);
     GFL_ArcToolFree(arc);
     pos.x = 216;
@@ -2004,11 +2004,11 @@ static void MysteryAlbum_LoadIcon(MysteryAlbum *album, MysteryCardRes *res, Heap
 #ifdef BUGFIX
         ClActSys_ReplacePlttData(res->pokePalette, album->pal, 1);
 #else
-        ClActSys_ReplacePlttData(res->pokePalette, album->pal->rawData, 1);
+        ClActSys_ReplacePlttData(res->pokePalette, album->pal->pRawData, 1);
 #endif
-        MI_CpuCopy8(album->pal->rawData, res->fade.to, sizeof(res->fade.to));
+        MI_CpuCopy8(album->pal->pRawData, res->fade.to, sizeof(res->fade.to));
         MIi_CpuClear16(0, res->fade.from, sizeof(res->fade.from));
-        ClActSys_WriteCharData(res->pokeChars, album->chars->rawData, 0x1200, 0, res->vramType);
+        ClActSys_WriteCharData(res->pokeChars, album->chars->pRawData, 0x1200, 0, res->vramType);
         ClActor_SetRotation(res->poke, 0);
         ClActor_SetVisible(res->poke, TRUE);
         if (res->setup.bg < 4) {

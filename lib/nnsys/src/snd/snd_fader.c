@@ -1,7 +1,7 @@
 #include "snd_internal.h"
 
-// NitroSystem's faders (NNSi_Snd), which the players, the capture and the streams move their volumes with. The file
-// name is a guess, from NitroSystem's names for its sound files
+// NitroSystem's faders (NNSi_Snd), which the players, the capture and the streams move their volumes with. The SDK's
+// file is fader.c, and the names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them
 
 void NNSi_SndFaderInit(NNSSndFader *fader) {
     fader->origin = fader->target = 0;

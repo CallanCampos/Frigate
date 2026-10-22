@@ -17,21 +17,21 @@ static inline u32 GetAnimationPlayMode_(const NNSG2dAnimController *animCtrl) {
     return playMode;
 }
 
-static inline BOOL IsLoopAnimation_(const NNSG2dAnimController *animCtrl) {
+static inline BOOL IsLoopAnimSequence_(const NNSG2dAnimController *animCtrl) {
     u32 playMode = GetAnimationPlayMode_(animCtrl);
 
     return playMode == NNS_G2D_ANIMATIONPLAYMODE_FORWARD_LOOP || playMode == NNS_G2D_ANIMATIONPLAYMODE_REVERSE_LOOP;
 }
 
 // Whether the sequence plays forward and then back
-static inline BOOL IsReversePlayMode_(const NNSG2dAnimController *animCtrl) {
+static inline BOOL IsReversePlayAnim_(const NNSG2dAnimController *animCtrl) {
     u32 playMode = GetAnimationPlayMode_(animCtrl);
 
     return playMode == NNS_G2D_ANIMATIONPLAYMODE_REVERSE || playMode == NNS_G2D_ANIMATIONPLAYMODE_REVERSE_LOOP;
 }
 
 // Whether the frames are stepped forward: a negative speed reverses the direction
-static inline BOOL IsForward_(const NNSG2dAnimController *animCtrl) {
+static inline BOOL IsAnimCtrlMovingForward_(const NNSG2dAnimController *animCtrl) {
     return animCtrl->bReverse ^ (animCtrl->speed > 0);
 }
 
@@ -39,13 +39,13 @@ static inline BOOL IsForward_(const NNSG2dAnimController *animCtrl) {
 static inline BOOL IsReachEdge_(const NNSG2dAnimController *animCtrl) {
     const NNSG2dAnimFrameData *current = animCtrl->pCurrent;
 
-    if (IsForward_(animCtrl)) {
+    if (IsAnimCtrlMovingForward_(animCtrl)) {
         return current >= animCtrl->pAnimSequence->pAnmFrameArray + animCtrl->pAnimSequence->numFrames;
     }
     return current <= animCtrl->pAnimSequence->pAnmFrameArray + animCtrl->pAnimSequence->loopStartFrameIdx - 1;
 }
 
-static inline BOOL IsFrameEnd_(const NNSG2dAnimController *animCtrl) {
+static inline BOOL ShouldAnmCtrlMoveNext_(const NNSG2dAnimController *animCtrl) {
     if (animCtrl->bActive && animCtrl->currentTime >= (animCtrl->pCurrent->frames << FX32_SHIFT)) {
         return TRUE;
     }
@@ -57,11 +57,11 @@ static inline u16 GetCurrentFrameIdx_(const NNSG2dAnimController *animCtrl) {
 }
 
 // At the sequence's end: calls back if asked to, then loops or stops
-static inline void EndSequence_(NNSG2dAnimController *animCtrl) {
+static inline void SequenceEdgeHandleCommon_(NNSG2dAnimController *animCtrl) {
     if (animCtrl->callbackFunctor.type == NNS_G2D_ANMCALLBACKTYPE_LAST_FRM) {
         animCtrl->callbackFunctor.pFunc(animCtrl->callbackFunctor.param, animCtrl->currentTime);
     }
-    if (!IsLoopAnimation_(animCtrl)) {
+    if (!IsLoopAnimSequence_(animCtrl)) {
         animCtrl->bActive = FALSE;
     } else {
         NNS_G2dResetAnimCtrlState(animCtrl);
@@ -77,14 +77,14 @@ static inline const NNSG2dAnimFrameData *GetLastFrame_(const NNSG2dAnimSequence 
 static void SequenceEdgeHandle_(NNSG2dAnimController *animCtrl) {
     const NNSG2dAnimFrameData *current;
 
-    if (IsReversePlayMode_(animCtrl)) {
+    if (IsReversePlayAnim_(animCtrl)) {
         animCtrl->bReverse ^= TRUE;
         if (animCtrl->pCurrent <=
             animCtrl->pAnimSequence->pAnmFrameArray + animCtrl->pAnimSequence->loopStartFrameIdx - 1) {
-            EndSequence_(animCtrl);
+            SequenceEdgeHandleCommon_(animCtrl);
         }
     } else {
-        EndSequence_(animCtrl);
+        SequenceEdgeHandleCommon_(animCtrl);
     }
 
     current = animCtrl->pCurrent;
@@ -111,7 +111,7 @@ void *NNS_G2dGetAnimCtrlCurrentElement(NNSG2dAnimController *animCtrl) {
 }
 
 // Calls back at the chosen frame or at every frame
-static inline void CallBackFuncHandling_(const NNSG2dCallBackFunctor *functor, u16 frameIdx) {
+static inline void CallbackFuncHandling_(const NNSG2dCallBackFunctor *functor, u16 frameIdx) {
     switch (functor->type) {
     case NNS_G2D_ANMCALLBACKTYPE_SPEC_FRM:
         if (frameIdx == functor->frameIdx) {
@@ -132,10 +132,10 @@ BOOL NNS_G2dTickAnimCtrl(NNSG2dAnimController *animCtrl, fx32 frames) {
     }
 
     animCtrl->currentTime += abs(FX_MulFunc(animCtrl->speed, frames));
-    while (IsFrameEnd_(animCtrl)) {
+    while (ShouldAnmCtrlMoveNext_(animCtrl)) {
         changed = TRUE;
         animCtrl->currentTime -= (animCtrl->pCurrent->frames << FX32_SHIFT);
-        if (IsForward_(animCtrl)) {
+        if (IsAnimCtrlMovingForward_(animCtrl)) {
             animCtrl->pCurrent++;
         } else {
             animCtrl->pCurrent--;
@@ -148,7 +148,7 @@ BOOL NNS_G2dTickAnimCtrl(NNSG2dAnimController *animCtrl, fx32 frames) {
         }
 
         if (animCtrl->callbackFunctor.type != NNS_G2D_ANMCALLBACKTYPE_NONE) {
-            CallBackFuncHandling_(&animCtrl->callbackFunctor, GetCurrentFrameIdx_(animCtrl));
+            CallbackFuncHandling_(&animCtrl->callbackFunctor, GetCurrentFrameIdx_(animCtrl));
         }
     }
     return changed;
@@ -188,7 +188,7 @@ void NNS_G2dInitAnimCallBackFunctor(NNSG2dAnimCallBackFunctor *functor) {
 
 // Back to the first frame to play: the loop start going forward, the last frame in reverse
 void NNS_G2dResetAnimCtrlState(NNSG2dAnimController *animCtrl) {
-    if (IsForward_(animCtrl)) {
+    if (IsAnimCtrlMovingForward_(animCtrl)) {
         animCtrl->pCurrent = animCtrl->pAnimSequence->pAnmFrameArray + animCtrl->pAnimSequence->loopStartFrameIdx;
     } else {
         animCtrl->pCurrent = animCtrl->pAnimSequence->pAnmFrameArray + animCtrl->pAnimSequence->numFrames - 1;
@@ -220,5 +220,5 @@ void NNS_G2dSetAnimCtrlCallBackFunctorAtAnimFrame(NNSG2dAnimController *animCtrl
 }
 
 BOOL NNSi_G2dIsAnimCtrlLoopAnim(const NNSG2dAnimController *animCtrl) {
-    return IsLoopAnimation_(animCtrl);
+    return IsLoopAnimSequence_(animCtrl);
 }

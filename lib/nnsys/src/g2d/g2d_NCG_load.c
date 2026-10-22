@@ -5,7 +5,7 @@
 // into a pointer in place
 
 BOOL NNS_G2dGetUnpackedCharacterData(void *file, NNSG2dCharacterData **character) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARDATA);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARACTERDATA);
 
     if (blk != NULL) {
         NNS_G2dUnpackNCG((NNSG2dCharacterData *)(blk + 1));
@@ -17,11 +17,11 @@ BOOL NNS_G2dGetUnpackedCharacterData(void *file, NNSG2dCharacterData **character
 }
 
 void NNS_G2dUnpackNCG(NNSG2dCharacterData *character) {
-    NNSi_G2dUnpackOffset(character->rawData, character);
+    NNS_G2D_UNPACK_OFFSET_PTR(character->pRawData, character);
 }
 
 BOOL NNS_G2dGetUnpackedBGCharacterData(void *file, NNSG2dCharacterData **character) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARDATA);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_CHARACTERDATA);
 
     if (blk != NULL) {
         NNS_G2dUnpackBGNCG((NNSG2dCharacterData *)(blk + 1));
@@ -33,5 +33,5 @@ BOOL NNS_G2dGetUnpackedBGCharacterData(void *file, NNSG2dCharacterData **charact
 }
 
 void NNS_G2dUnpackBGNCG(NNSG2dCharacterData *character) {
-    NNSi_G2dUnpackOffset(character->rawData, character);
+    NNS_G2D_UNPACK_OFFSET_PTR(character->pRawData, character);
 }

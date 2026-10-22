@@ -5,8 +5,9 @@
 // A joint's translation, rotation and scale are each the identity, the node's own, a constant of the animation or a
 // curve of values read at the frame, blended with the next frame's where the animation says so. The file is named after
 // NitroSystem's nsbca.c. The two global functions are the ones that anm.c's tables hold; the others are static because
-// only this file calls them. Their names are guesses in NitroSystem's style, ours in config/names.txt, and so is
-// NNS_COMPACT_ROT_LUT_CA, after swan's NNS_COMPACT_ROT_LUT in sbc.c
+// only this file calls them. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, except
+// ScaleData, ScaleData16, makeRotRow2_ and NNS_COMPACT_ROT_LUT_CA, which are ours, the last after swan's
+// NNS_COMPACT_ROT_LUT in sbc.c
 
 // A scale component as the animation keeps it, the scale and its inverse, in fx32 or in fx16
 typedef struct {
@@ -20,17 +21,17 @@ typedef struct {
 } ScaleData16;
 
 static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32 frame, NNSG3dJntAnmResult *result);
-static void setBaseTrans_(NNSG3dJntAnmResult *result);
-static void setBaseScale_(NNSG3dJntAnmResult *result);
-static void setBaseRot_(NNSG3dJntAnmResult *result);
+static void getMdlTrans_(NNSG3dJntAnmResult *result);
+static void getMdlScale_(NNSG3dJntAnmResult *result);
+static void getMdlRot_(NNSG3dJntAnmResult *result);
 static void getTransData_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
-static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
+static void getTransDataEx_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
 static void getScaleData_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
-static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo,
-                                const NNSG3dResJntAnm *jntAnm);
+static void getScaleDataEx_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo,
+                            const NNSG3dResJntAnm *jntAnm);
 static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
-static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
-static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo);
+static void getRotDataEx_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
+static BOOL getRotDataByIdx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo);
 
 // For a rotation stored as its pivot (the one element that is 1 or -1, the others in its row and column being zero)
 // and two numbers, the pivot's index and where the numbers go in the matrix. sbc.c has the same table
@@ -53,16 +54,16 @@ static inline void makeRotRow2_(VecFx32 *rot) {
     rot[2].z = (x0 * y1 - y0 * x1) >> FX32_SHIFT;
 }
 
-// Fills in an animation object for a joint animation (NitroSystem's NNSi_G3dAnmObjInitNsBca, as recalled). It applies
-// the animation with NNS_G3dFuncAnmJntNsBca, and maps each node of the model to the data at its index, which is flagged
-// as existing and holds the index that the top byte of the data's tag gives
-void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
+// Fills in an animation object for a joint animation. It applies the animation with NNS_G3dFuncAnmJntNsBcaDefault, and
+// maps each node of the model to the data at its index, which is flagged as existing and holds the index that the top
+// byte of the data's tag gives
+void NNSi_G3dAnmObjInitNsBca(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResJntAnm *jntAnm = anm;
     const u16 *ofsTag;
     u32 i;
 
     anmObj->resAnm = anm;
-    anmObj->funcAnm = (void *)NNS_G3dFuncAnmJntNsBca;
+    anmObj->funcAnm = (void *)NNS_G3dFuncAnmJntNsBcaDefault;
     anmObj->numMapData = mdl->info.numNode;
     MI_CpuClear16(anmObj->mapData, anmObj->numMapData * sizeof(u16));
     ofsTag = jntAnm->ofsTag;
@@ -75,7 +76,7 @@ void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl
 
 // The function of an animation object of a joint animation: the pose of a joint at the object's frame, kept within the
 // animation's frames
-void NNS_G3DAnimationApply_CA(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx) {
+void NNSi_G3dAnmCalcNsBca(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *anmObj, u32 dataIdx) {
     const NNSG3dResJntAnm *jntAnm = anmObj->resAnm;
     fx32 numFrame = jntAnm->numFrame << FX32_SHIFT;
     fx32 frame = anmObj->frame;
@@ -91,8 +92,8 @@ void NNS_G3DAnimationApply_CA(NNSG3dJntAnmResult *result, const NNSG3dAnmObj *an
 // What the node that the render state is at (the node of the command being run) has of its own, for a joint animation
 // that leaves its translation, rotation or scale to the node: the node's translation and rotation, and the scale
 // through the render state's scaling rule
-static void setBaseTrans_(NNSG3dJntAnmResult *result) {
-    NNSG3dRS *rs = g_NNSG3DModelRenderer;
+static void getMdlTrans_(NNSG3dJntAnmResult *result) {
+    NNSG3dRS *rs = NNS_G3dRS;
     const NNSG3dResNodeData *node = NNS_G3dGetNodeDataByIdx(rs->pResNodeInfo, rs->c[1]);
 
     if (node->flag & NNS_G3D_SRTFLAG_TRANS_ZERO) {
@@ -106,8 +107,8 @@ static void setBaseTrans_(NNSG3dJntAnmResult *result) {
     }
 }
 
-static void setBaseScale_(NNSG3dJntAnmResult *result) {
-    NNSG3dRS *rs = g_NNSG3DModelRenderer;
+static void getMdlScale_(NNSG3dJntAnmResult *result) {
+    NNSG3dRS *rs = NNS_G3dRS;
     const u8 *cmd = rs->c;
     const NNSG3dResNodeData *node = NNS_G3dGetNodeDataByIdx(rs->pResNodeInfo, cmd[1]);
     const u8 *data = (const u8 *)(node + 1);
@@ -125,8 +126,8 @@ static void setBaseScale_(NNSG3dJntAnmResult *result) {
     rs->funcJntScale(result, (const fx32 *)data, cmd, node->flag);
 }
 
-static void setBaseRot_(NNSG3dJntAnmResult *result) {
-    NNSG3dRS *rs = g_NNSG3DModelRenderer;
+static void getMdlRot_(NNSG3dJntAnmResult *result) {
+    NNSG3dRS *rs = NNS_G3dRS;
     const NNSG3dResNodeData *node = NNS_G3dGetNodeDataByIdx(rs->pResNodeInfo, rs->c[1]);
     const u8 *data = (const u8 *)(node + 1);
 
@@ -207,7 +208,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
         if (!(tag & (NNS_G3D_JNTANM_SRTINFO_IDENTITY_T | NNS_G3D_JNTANM_SRTINFO_BASE_T))) {
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_TX)) {
                 if (interpolate) {
-                    getTransDataInterp_(&result->trans.x, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getTransDataEx_(&result->trans.x, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getTransData_(&result->trans.x, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
@@ -219,7 +220,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
 
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_TY)) {
                 if (interpolate) {
-                    getTransDataInterp_(&result->trans.y, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getTransDataEx_(&result->trans.y, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getTransData_(&result->trans.y, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
@@ -231,7 +232,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
 
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_TZ)) {
                 if (interpolate) {
-                    getTransDataInterp_(&result->trans.z, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getTransDataEx_(&result->trans.z, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getTransData_(&result->trans.z, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
@@ -243,20 +244,20 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
         } else if (tag & NNS_G3D_JNTANM_SRTINFO_IDENTITY_T) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO;
         } else {
-            setBaseTrans_(result);
+            getMdlTrans_(result);
         }
 
         if (!(tag & (NNS_G3D_JNTANM_SRTINFO_IDENTITY_R | NNS_G3D_JNTANM_SRTINFO_BASE_R))) {
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_R)) {
                 if (interpolate) {
-                    getRotDataInterp_(result->rotRow, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getRotDataEx_(result->rotRow, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getRotData_(result->rotRow, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
                 p += 2;
             } else {
-                if (getRotMtx_(result->rotRow, (const u8 *)jntAnm + jntAnm->ofsRot3,
-                               (const u8 *)jntAnm + jntAnm->ofsRot5, *p)) {
+                if (getRotDataByIdx_(result->rotRow, (const u8 *)jntAnm + jntAnm->ofsRot3,
+                                     (const u8 *)jntAnm + jntAnm->ofsRot5, *p)) {
                     makeRotRow2_(result->rotRow);
                 }
                 p++;
@@ -264,13 +265,13 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
         } else if (tag & NNS_G3D_JNTANM_SRTINFO_IDENTITY_R) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_ROT_ZERO;
         } else {
-            setBaseRot_(result);
+            getMdlRot_(result);
         }
 
         if (!(tag & (NNS_G3D_JNTANM_SRTINFO_IDENTITY_S | NNS_G3D_JNTANM_SRTINFO_BASE_S))) {
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_SX)) {
                 if (interpolate) {
-                    getScaleDataInterp_(&scaleX, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getScaleDataEx_(&scaleX, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getScaleData_(&scaleX, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
@@ -286,7 +287,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
 
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_SY)) {
                 if (interpolate) {
-                    getScaleDataInterp_(&scaleY, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getScaleDataEx_(&scaleY, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getScaleData_(&scaleY, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
@@ -302,7 +303,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
 
             if (!(tag & NNS_G3D_JNTANM_SRTINFO_CONST_SZ)) {
                 if (interpolate) {
-                    getScaleDataInterp_(&scaleZ, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
+                    getScaleDataEx_(&scaleZ, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 } else {
                     getScaleData_(&scaleZ, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
@@ -317,14 +318,13 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
         } else if (tag & NNS_G3D_JNTANM_SRTINFO_IDENTITY_S) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE;
         } else {
-            setBaseScale_(result);
+            getMdlScale_(result);
             return;
         }
     }
 
-    g_NNSG3DModelRenderer->funcJntScale(result, scale, g_NNSG3DModelRenderer->c,
-                                        (result->flag & NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE) ? NNS_G3D_SRTFLAG_SCALE_ONE
-                                                                                             : 0);
+    NNS_G3dRS->funcJntScale(result, scale, NNS_G3dRS->c,
+                            (result->flag & NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE) ? NNS_G3D_SRTFLAG_SCALE_ONE : 0);
 }
 
 // The value of a translation component at the frame, without its fraction. With a step of two or four the animation
@@ -375,7 +375,7 @@ static void getTransData_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInf
                 idx = f >> 2;
                 idxB = idx + 1;
             }
-            if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+            if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
                 const fx16 *v = data;
 
                 a = v[idx];
@@ -398,7 +398,7 @@ static void getTransData_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInf
 
 average:
     // The frame between two stored values is their average
-    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         const fx16 *v = data;
 
         *value = (*(v + idx) + *(v + idx + 1)) >> 1;
@@ -410,7 +410,7 @@ average:
     return;
 
 read:
-    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         *value = ((const fx16 *)data)[idx];
     } else {
         *value = ((const fx32 *)data)[idx];
@@ -419,8 +419,7 @@ read:
 
 // The same at a frame with a fraction: the value is blended with the one of the next frame, by the fraction. The last
 // frame blends with the first if the animation says to
-static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo,
-                                const NNSG3dResJntAnm *jntAnm) {
+static void getTransDataEx_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm) {
     const void *data = (const u8 *)jntAnm + tInfo->offset;
     u32 info = tInfo->info;
     u32 f = frame >> FX32_SHIFT;
@@ -441,7 +440,7 @@ static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo
         }
         if (jntAnm->flag & NNS_G3D_JNTANM_OPTION_END_TO_START_INTERPOLATION) {
             ratio = frame & 0xfff;
-            if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+            if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
                 v0 = ((const fx16 *)data)[f];
                 v1 = ((const fx16 *)data)[0];
             } else {
@@ -449,7 +448,7 @@ static void getTransDataInterp_(fx32 *value, fx32 frame, const NNSG3dJntAnmTInfo
                 v1 = ((const fx32 *)data)[0];
             }
             *value = v0 + (((v1 - v0) * ratio) >> FX32_SHIFT);
-        } else if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        } else if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
             *value = ((const fx16 *)data)[f];
         } else {
             *value = ((const fx32 *)data)[f];
@@ -487,7 +486,7 @@ plain:
     shift = 0;
 
 blend:
-    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         const fx16 *v = data;
 
         v0 = *(v + f);
@@ -541,7 +540,7 @@ static void getScaleData_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo 
                         idx = f >> 2;
                         idxB = idx + 1;
                     }
-                    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+                    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
                         const ScaleData16 *v = data;
 
                         a = v[idx].scale;
@@ -572,7 +571,7 @@ static void getScaleData_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo 
     } else {
         idx = f;
     }
-    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         const ScaleData16 *v = data;
 
         value->scale = v[idx].scale;
@@ -587,7 +586,7 @@ static void getScaleData_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo 
 
 average:
     // The frame between two stored values is their average
-    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         const ScaleData16 *v = data;
 
         value->scale = ((v + idx)->scale + (v + idx + 1)->scale) >> 1;
@@ -600,8 +599,8 @@ average:
     }
 }
 
-static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo,
-                                const NNSG3dResJntAnm *jntAnm) {
+static void getScaleDataEx_(ScaleData *value, fx32 frame, const NNSG3dJntAnmTInfo *tInfo,
+                            const NNSG3dResJntAnm *jntAnm) {
     const void *data = (const u8 *)jntAnm + tInfo->offset;
     u32 info = tInfo->info;
     u32 f = frame >> FX32_SHIFT;
@@ -628,7 +627,7 @@ static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnm
             next = 0;
             goto plain;
         }
-        if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+        if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
             const ScaleData16 *v = data;
 
             value->scale = v[f].scale;
@@ -677,7 +676,7 @@ plain:
     shift = 0;
 
 blend:
-    if (info & NNS_G3D_JNTANM_TINFO_FX16ARR) {
+    if (info & NNS_G3D_JNTANM_TINFO_FX16ARRAY) {
         const ScaleData16 *v = data;
 
         v0 = v[f].scale;
@@ -749,8 +748,8 @@ static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo
                 idx = f >> 2;
                 idxB = idx + 1;
             }
-            rot5 |= getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx]);
-            rot5 |= getRotMtx_(tmp, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idxB]);
+            rot5 |= getRotDataByIdx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx]);
+            rot5 |= getRotDataByIdx_(tmp, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idxB]);
             rot[0].x = 3 * rot[0].x + tmp[0].x;
             rot[0].y = 3 * rot[0].y + tmp[0].y;
             rot[0].z = 3 * rot[0].z + tmp[0].z;
@@ -781,8 +780,8 @@ average:
         VecFx32 tmp[3];
         BOOL rot5 = FALSE;
 
-        rot5 |= getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx]);
-        rot5 |= getRotMtx_(tmp, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, *(data + idx + 1));
+        rot5 |= getRotDataByIdx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx]);
+        rot5 |= getRotDataByIdx_(tmp, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, *(data + idx + 1));
         rot[0].x += tmp[0].x;
         rot[0].y += tmp[0].y;
         rot[0].z += tmp[0].z;
@@ -803,7 +802,7 @@ average:
     return;
 
 read:
-    if (getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx])) {
+    if (getRotDataByIdx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[idx])) {
         makeRotRow2_(rot);
     } else {
         VEC_Normalize(&rot[2], &rot[2]);
@@ -812,7 +811,7 @@ read:
 
 // The same at a frame with a fraction: the matrices of the frame and the next are blended by the fraction and
 // normalized. Where a step of two or four applies, the fraction counts the frames since the stored one
-static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm) {
+static void getRotDataEx_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm) {
     u32 ofsRot5;
     u32 ofsRot3;
     u32 info;
@@ -845,7 +844,7 @@ static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo 
             next = 0;
             goto plain;
         }
-        if (getRotMtx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f])) {
+        if (getRotDataByIdx_(rot, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f])) {
             makeRotRow2_(rot);
         } else {
             VEC_Normalize(&rot[2], &rot[2]);
@@ -886,8 +885,8 @@ plain:
 
 blend:
     rot5 = FALSE;
-    rot5 |= getRotMtx_(tmp0, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f]);
-    rot5 |= getRotMtx_(tmp1, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[next]);
+    rot5 |= getRotDataByIdx_(tmp0, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[f]);
+    rot5 |= getRotDataByIdx_(tmp1, (const u8 *)jntAnm + ofsRot3, (const u8 *)jntAnm + ofsRot5, data[next]);
     rot[0].x = tmp0[0].x * mul + (((tmp1[0].x - tmp0[0].x) * ratio) >> FX32_SHIFT);
     rot[0].y = tmp0[0].y * mul + (((tmp1[0].y - tmp0[0].y) * ratio) >> FX32_SHIFT);
     rot[0].z = tmp0[0].z * mul + (((tmp1[0].z - tmp0[0].z) * ratio) >> FX32_SHIFT);
@@ -911,7 +910,7 @@ blend:
 // to negate) or of five (the first two rows' elements but one, 13 bits each with the rest of the bits of the sixth
 // in the low three of them). Returns whether the third row still has to be made from the first two, which a rotation
 // of five values leaves to
-static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo) {
+static BOOL getRotDataByIdx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo) {
     fx32 *elem = (fx32 *)rot;
 
     if (rInfo & NNS_G3D_JNTANM_RIDX_PIVOT) {

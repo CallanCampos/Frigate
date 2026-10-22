@@ -6,7 +6,7 @@
 static void SetFirstObject(NNSFndList *list, void *object);
 
 // The link inside object that this list uses
-static inline NNSFndLink *LinkOf(const NNSFndList *list, void *object) {
+static inline NNSFndLink *OBJ_TO_LINK(const NNSFndList *list, void *object) {
     return (NNSFndLink *)((u8 *)object + list->offset);
 }
 
@@ -19,7 +19,7 @@ void NNS_FndInitList(NNSFndList *list, u16 offset) {
 
 // Makes object the only member of an empty list
 static void SetFirstObject(NNSFndList *list, void *object) {
-    NNSFndLink *link = LinkOf(list, object);
+    NNSFndLink *link = OBJ_TO_LINK(list, object);
 
     link->nextObject = NULL;
     link->prevObject = NULL;
@@ -35,10 +35,10 @@ void NNS_FndAppendListObject(NNSFndList *list, void *object) {
         SetFirstObject(list, object);
         return;
     }
-    link = LinkOf(list, object);
+    link = OBJ_TO_LINK(list, object);
     link->prevObject = list->tailObject;
     link->nextObject = NULL;
-    LinkOf(list, list->tailObject)->nextObject = object;
+    OBJ_TO_LINK(list, list->tailObject)->nextObject = object;
     list->tailObject = object;
     list->numObjects++;
 }
@@ -50,10 +50,10 @@ void NNS_FndPrependListObject(NNSFndList *list, void *object) {
         SetFirstObject(list, object);
         return;
     }
-    link = LinkOf(list, object);
+    link = OBJ_TO_LINK(list, object);
     link->prevObject = NULL;
     link->nextObject = list->headObject;
-    LinkOf(list, list->headObject)->prevObject = object;
+    OBJ_TO_LINK(list, list->headObject)->prevObject = object;
     list->headObject = object;
     list->numObjects++;
 }
@@ -66,30 +66,30 @@ void NNS_FndInsertListObject(NNSFndList *list, void *target, void *object) {
         NNS_FndPrependListObject(list, object);
     } else {
         NNSFndLink *beforeLink;
-        NNSFndLink *link = LinkOf(list, object);
-        void *before = LinkOf(list, target)->prevObject;
+        NNSFndLink *link = OBJ_TO_LINK(list, object);
+        void *before = OBJ_TO_LINK(list, target)->prevObject;
 
-        beforeLink = LinkOf(list, before);
+        beforeLink = OBJ_TO_LINK(list, before);
         link->prevObject = before;
         link->nextObject = target;
         beforeLink->nextObject = object;
-        LinkOf(list, target)->prevObject = object;
+        OBJ_TO_LINK(list, target)->prevObject = object;
         list->numObjects++;
     }
 }
 
 void NNS_FndRemoveListObject(NNSFndList *list, void *object) {
-    NNSFndLink *link = LinkOf(list, object);
+    NNSFndLink *link = OBJ_TO_LINK(list, object);
 
     if (link->prevObject == NULL) {
         list->headObject = link->nextObject;
     } else {
-        LinkOf(list, link->prevObject)->nextObject = link->nextObject;
+        OBJ_TO_LINK(list, link->prevObject)->nextObject = link->nextObject;
     }
     if (link->nextObject == NULL) {
         list->tailObject = link->prevObject;
     } else {
-        LinkOf(list, link->nextObject)->prevObject = link->prevObject;
+        OBJ_TO_LINK(list, link->nextObject)->prevObject = link->prevObject;
     }
     link->prevObject = NULL;
     link->nextObject = NULL;
@@ -101,7 +101,7 @@ void *NNS_FndGetNextListObject(NNSFndList *list, void *object) {
     if (object == NULL) {
         return list->headObject;
     }
-    return LinkOf(list, object)->nextObject;
+    return OBJ_TO_LINK(list, object)->nextObject;
 }
 
 // The object before object, or the last when object is NULL
@@ -109,5 +109,5 @@ void *NNS_FndGetPrevListObject(NNSFndList *list, void *object) {
     if (object == NULL) {
         return list->tailObject;
     }
-    return LinkOf(list, object)->prevObject;
+    return OBJ_TO_LINK(list, object)->prevObject;
 }

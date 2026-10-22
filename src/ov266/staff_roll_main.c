@@ -1209,14 +1209,14 @@ static void StaffRollPicture_Update(StaffRollWork *work, StaffRollPicture *pictu
     case PICTURE_SHOW:
         fileId = StaffRollPicture_GetFileID(picture, PICTURE_FILE_PALETTE, gender);
         if (picture->screens & SCREEN_TOP) {
-            GFL_BGSysLoadScrCore(0, picture->screenData->rawData, picture->screenData->size, 0);
-            GFL_BGSysLoadChar(0, picture->charData->rawData, picture->charData->size, 0);
+            GFL_BGSysLoadScrCore(0, picture->screenData->rawData, picture->screenData->szByte, 0);
+            GFL_BGSysLoadChar(0, picture->charData->pRawData, picture->charData->szByte, 0);
             GFL_G2DIOLoadArcNCLRDefault(arc, fileId, PALTYPE_MAIN_BG_EX, 0, 0, HEAPID_STAFF_ROLL);
             GFL_BGSysSetBGEnabledA(GX_PLANEMASK_BG0, TRUE);
         }
         if (picture->screens & SCREEN_BOTTOM) {
-            GFL_BGSysLoadScrCore(4, picture->screenData->rawData, picture->screenData->size, 0);
-            GFL_BGSysLoadChar(4, picture->charData->rawData, picture->charData->size, 0);
+            GFL_BGSysLoadScrCore(4, picture->screenData->rawData, picture->screenData->szByte, 0);
+            GFL_BGSysLoadChar(4, picture->charData->pRawData, picture->charData->szByte, 0);
             GFL_G2DIOLoadArcNCLRDefault(arc, fileId, PALTYPE_SUB_BG_EX, 0x4000, 0, HEAPID_STAFF_ROLL);
             GFL_BGSysSetBGEnabledB(GX_PLANEMASK_BG0, TRUE);
         }

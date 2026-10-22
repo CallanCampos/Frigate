@@ -2,11 +2,12 @@
 #include "nnsys/g2d.h"
 
 // NitroSystem's g2d_SRTControl.c: the scale, rotation and translation that a cell or multi-cell animation's frame
-// gives, with a flag for each one that is set. The file name is a guess from the functions' NNSi_G2dSrtc prefix
+// gives, with a flag for each one that is set. The file name is NitroSystem's, as ntrtwl's reconstruction of
+// NitroSystem has it
 
 void NNSi_G2dSrtcSetTrans(NNSG2dSRTControl *srtCtrl, s16 x, s16 y) {
     if (srtCtrl->type == NNS_G2D_SRTCONTROLTYPE_SRT) {
-        srtCtrl->srtData.SRT_EnableFlag |= NNS_G2D_SRTFLAG_TRANS;
+        srtCtrl->srtData.SRT_EnableFlag |= NNS_G2D_AFFINEENABLE_TRANS;
         srtCtrl->srtData.trans.x = x;
         srtCtrl->srtData.trans.y = y;
     }
@@ -14,14 +15,14 @@ void NNSi_G2dSrtcSetTrans(NNSG2dSRTControl *srtCtrl, s16 x, s16 y) {
 
 void NNSi_G2dSrtcSetSRTRotZ(NNSG2dSRTControl *srtCtrl, u16 rotZ) {
     if (srtCtrl->type == NNS_G2D_SRTCONTROLTYPE_SRT) {
-        srtCtrl->srtData.SRT_EnableFlag |= NNS_G2D_SRTFLAG_ROTZ;
+        srtCtrl->srtData.SRT_EnableFlag |= NNS_G2D_AFFINEENABLE_ROTATE;
         srtCtrl->srtData.rotZ = rotZ;
     }
 }
 
 void NNSi_G2dSrtcSetSRTScale(NNSG2dSRTControl *srtCtrl, fx32 sx, fx32 sy) {
     if (srtCtrl->type == NNS_G2D_SRTCONTROLTYPE_SRT) {
-        srtCtrl->srtData.SRT_EnableFlag |= NNS_G2D_SRTFLAG_SCALE;
+        srtCtrl->srtData.SRT_EnableFlag |= NNS_G2D_AFFINEENABLE_SCALE;
         srtCtrl->srtData.scale.x = sx;
         srtCtrl->srtData.scale.y = sy;
     }
