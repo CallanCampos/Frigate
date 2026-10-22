@@ -54,27 +54,6 @@ static const DayCareMoveParamTable sEggMoveParams;
 #define PERSONAL_EGG_GROUP_1 24
 #define PERSONAL_EGG_GROUP_2 25
 
-#define LEARNSET_MAX 26
-#define LEARNSET_END 0xffff
-
-// A move a species learns at a level
-typedef struct {
-    u16 move;
-    u16 level;
-} LearnsetEntry;
-
-static inline BOOL LearnsetEntry_IsEnd(LearnsetEntry entry) {
-    return entry.move == LEARNSET_END && entry.level == LEARNSET_END;
-}
-
-static inline u16 LearnsetEntry_GetMove(LearnsetEntry entry) {
-    return entry.move;
-}
-
-static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
-    return entry.level;
-}
-
 // The day care's work area
 struct DayCare {
     HeapID heapId;

@@ -84,8 +84,30 @@ u32 PML_PersonalGetParamSingleBW1(u16 species, u16 form, u32 param);
 void *PML_PersonalLoad(u16 species, u16 form, HeapID heapId);
 u32 PML_PersonalGetParam(void *personal, u32 param);
 void PML_PersonalFree(void *personal);
-// The moves a species learns by level, pairs of move and level that end with two 0xffff
-void PML_LearnsetLvUpLoad(u16 species, u16 form, void *dest);
+#define LEARNSET_MAX 26
+#define LEARNSET_END 0xffff
+
+// A move a species learns at a level
+typedef struct {
+    u16 move;
+    u16 level;
+} LearnsetEntry;
+
+static inline BOOL LearnsetEntry_IsEnd(LearnsetEntry entry) {
+    return entry.move == LEARNSET_END && entry.level == LEARNSET_END;
+}
+
+static inline u16 LearnsetEntry_GetMove(LearnsetEntry entry) {
+    return entry.move;
+}
+
+static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
+    return entry.level;
+}
+
+// The moves a species learns by level, at most LEARNSET_MAX entries that end with one whose move and level are both
+// LEARNSET_END
+void PML_LearnsetLvUpLoad(u16 species, u16 form, LearnsetEntry *dest);
 // The experience a Pokémon of the species needs for the level
 u32 PML_UtilGetPkmLvExp(u16 species, u16 form, u16 level);
 // The regional Pokédex numbers, by national number, and, if count is not NULL, how many species have one. The caller

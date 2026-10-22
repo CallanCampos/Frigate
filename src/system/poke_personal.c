@@ -36,7 +36,7 @@ void PML_PersonalFetchBW2(u16 species, u16 form, PersonalData *dest) {
     GFL_ArcToolReadRaw(g_PMLPersonalArcBW2[0], sizeof(PersonalData), dest);
 }
 
-void PML_LearnsetLvUpLoad(u16 species, u16 form, void *dest) {
+void PML_LearnsetLvUpLoad(u16 species, u16 form, LearnsetEntry *dest) {
     GFL_ArcSysRead(dest, ARCID_LEARNSETS, PML_PersonalGetDatID(species, form));
 }
 

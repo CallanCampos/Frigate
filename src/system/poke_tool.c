@@ -73,27 +73,6 @@
 #define PKM_BOX_DATA_SIZE sizeof(PkmBuffer)
 #define PKM_PARTY_DATA_SIZE (sizeof(PartyPkm) - sizeof(BoxPkm))
 
-#define LEARNSET_MAX 26
-#define LEARNSET_END 0xffff
-
-// A move a species learns at a level
-typedef struct {
-    u16 move;
-    u16 level;
-} LearnsetEntry;
-
-static inline BOOL LearnsetEntry_IsEnd(LearnsetEntry entry) {
-    return entry.move == LEARNSET_END && entry.level == LEARNSET_END;
-}
-
-static inline u16 LearnsetEntry_GetMove(LearnsetEntry entry) {
-    return entry.move;
-}
-
-static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
-    return entry.level;
-}
-
 // The species and form whose data g_PersonalDataCache holds
 typedef struct {
     u16 form;
