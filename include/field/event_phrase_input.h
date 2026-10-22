@@ -22,7 +22,7 @@ struct EventPhraseInputData {
     u32 mode;
 };
 
-GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *parent, u32 mode, u16 *result);
+GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *parent, unsigned int mode, u16 *result);
 GameEventReturnCode EventPhraseInput_Callback(GameEvent *event, u32 *state, void *data);
 void func_ov033_02177734(struct EventPhraseInputData *data, NameEntryParam *nameEntryParams);
 // Script commands

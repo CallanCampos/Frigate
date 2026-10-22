@@ -69,7 +69,7 @@ u32 FSi_GetOverlayBinarySize(const FSOverlayInfo *info) {
 
 // NitroSDK's FS_ClearOverlayImage: invalidates the caches over the overlay's memory, and clears the zeroed data that
 // follows its image
-void FS_ClearOverlayImage(const FSOverlayInfo *info) {
+void FS_ClearOverlayImage(FSOverlayInfo *info) {
     u8 *ram = info->ramAddress;
     u32 ramSize = info->ramSize;
     u32 totalSize = ramSize + info->bssSize;
@@ -90,7 +90,7 @@ FSFileID FS_GetOverlayFileID(const FSOverlayInfo *info) {
 
 // NitroSDK's FS_LoadOverlayInfo: reads an overlay's header from a processor's table, in memory or in the ROM, and finds
 // its file
-BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id) {
+BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, FSOverlayID id) {
     BOOL result = FALSE;
     u32 offset = id * FS_OVERLAY_HEADER_SIZE;
     const FSOverlayTable *table = &sArm9Overlays;
@@ -152,7 +152,7 @@ BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id) {
 }
 
 // NitroSDK's FS_LoadOverlayImage: reads the overlay's image into its memory
-BOOL FS_LoadOverlayImage(const FSOverlayInfo *info) {
+BOOL FS_LoadOverlayImage(FSOverlayInfo *info) {
     BOOL result = FALSE;
     FSFile file;
 
@@ -202,7 +202,7 @@ static BOOL FSi_CompareDigest(const FSOverlayDigest *expected, const void *data,
 
 // NitroSDK's FS_StartOverlay: checks the image's digest when the game was not booted from the ROM, expands the image
 // if it is compressed, and calls its static initializers
-void FS_StartOverlay(const FSOverlayInfo *info) {
+void FS_StartOverlay(FSOverlayInfo *info) {
     u32 size = FSi_GetOverlayBinarySize(info);
     void (**initializer)(void);
     void (**initializersEnd)(void);
@@ -242,7 +242,7 @@ void FS_StartOverlay(const FSOverlayInfo *info) {
 
 // NitroSDK's FS_EndOverlay: takes the objects that the overlay made out of the chain of global objects, and calls
 // their destructors. A destructor can make new objects, so it starts over until none is left
-void FS_EndOverlay(const FSOverlayInfo *info) {
+void FS_EndOverlay(FSOverlayInfo *info) {
     for (;;) {
         u8 *start = info->ramAddress;
         u8 *end = start + (info->ramSize + info->bssSize);
@@ -251,7 +251,7 @@ void FS_EndOverlay(const FSOverlayInfo *info) {
         DestructorChain *previous;
         DestructorChain *chain;
         DestructorChain *head;
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
         previous = NULL;
         head = __global_destructor_chain;
@@ -296,13 +296,13 @@ void FS_EndOverlay(const FSOverlayInfo *info) {
     }
 }
 
-BOOL FS_UnloadOverlayImage(const FSOverlayInfo *info) {
+BOOL FS_UnloadOverlayImage(FSOverlayInfo *info) {
     FS_EndOverlay(info);
     return TRUE;
 }
 
 // NitroSDK's FS_LoadOverlay: reads an overlay's header and image, and starts it
-BOOL FS_LoadOverlay(MIProcessor target, u32 id) {
+BOOL FS_LoadOverlay(MIProcessor target, FSOverlayID id) {
     BOOL result = FALSE;
     FSOverlayInfo info;
 
@@ -314,7 +314,7 @@ BOOL FS_LoadOverlay(MIProcessor target, u32 id) {
 }
 
 // NitroSDK's FS_UnloadOverlay: ends an overlay
-BOOL FS_UnloadOverlay(MIProcessor target, u32 id) {
+BOOL FS_UnloadOverlay(MIProcessor target, FSOverlayID id) {
     FSOverlayInfo info;
 
     if (FS_LoadOverlayInfo(&info, target, id) && FS_UnloadOverlayImage(&info)) {

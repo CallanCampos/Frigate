@@ -132,8 +132,8 @@ void ZukanAreaListView_Init(ZukanAreaListView *view, GameData *gameData) {
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetDisplayLayout(GX_DISP_SELECT_SUB_MAIN);
     ZukanAreaListView_InitVRAM();
     ZukanAreaListView_InitBG();
@@ -166,8 +166,8 @@ void ZukanAreaListView_Exit(ZukanAreaListView *view) {
     ZukanAreaListView_ExitPaletteFade(view);
     G2_BlendNone();
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     G2_BlendNone();
     G2S_BlendNone();
     GFL_BGSysSetEnabledBGsA(0);

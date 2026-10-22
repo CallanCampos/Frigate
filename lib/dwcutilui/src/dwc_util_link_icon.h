@@ -7,6 +7,6 @@
 // which a task updates from the wireless link level each frame.
 // The ROM does not embed this source file's name; dwc_util_link_icon.c is descriptive.
 void DWCUtilLinkIcon_Init(int set);
-void DWCUtilLinkIcon_Exit(void);
+void DWCi_ICONlEnd(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_LINK_ICON_H

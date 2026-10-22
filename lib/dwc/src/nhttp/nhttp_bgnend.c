@@ -45,7 +45,7 @@ int NHTTPi_GetSSLError(NHttpState *state) {
 
 // Starts the library: its lists and its mutex, the stack of the thread that runs the requests and the thread. Returns
 // whether it did, and the error says why not
-BOOL NHTTPi_Startup(NHttpRoot *root, NHttpAllocFunc alloc, NHttpFreeFunc free, int priority) {
+BOOL NHTTPi_Startup(NHttpRoot *root, NHTTPAlloc alloc, NHTTPFree free, int priority) {
     NHttpState *state = NHTTPi_GetBgnEndInfoP(root);
     NHttpListInfo *list = NHTTPi_GetListInfoP(root);
     NHttpReqInfo *req = NHTTPi_GetReqInfoP(root);

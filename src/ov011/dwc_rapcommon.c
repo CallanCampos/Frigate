@@ -87,7 +87,7 @@ void DWCRapCommon_SetSubHeapOwner(HeapID heapId) {
     pDwcRapWork->subHeapId = heapId;
 }
 
-void *DWCRapCommon_Alloc(u32 name, u32 size, int align) {
+void *DWCRapCommon_Alloc(DWCAllocType name, u32 size, int align) {
     void *ptr;
     u32 mask;
 
@@ -110,7 +110,7 @@ void *DWCRapCommon_Alloc(u32 name, u32 size, int align) {
     return ptr;
 }
 
-void DWCRapCommon_Free(u32 name, void *ptr, u32 size) {
+void DWCRapCommon_Free(DWCAllocType name, void *ptr, u32 size) {
     u32 mask;
 
     if (ptr != NULL) {

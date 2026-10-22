@@ -42,7 +42,7 @@ int ghiFindFreeSlot(void) {
             }
             return -1;
         }
-        sConnections.connections[i]->inUse = FALSE;
+        sConnections.connections[i]->inUse = gsi_false;
     }
     sConnections.count = newCount;
     return count;
@@ -61,49 +61,49 @@ GHIConnection *ghiNewConnection(void) {
     }
     connection = sConnections.connections[slot];
     memset(connection, 0, sizeof(GHIConnection));
-    connection->inUse = TRUE;
+    connection->inUse = gsi_true;
     connection->request = slot;
-    connection->uniqueId = sConnections.nextUniqueId++;
+    connection->uniqueID = sConnections.nextUniqueId++;
     connection->type = 0;
     connection->state = 0;
-    connection->url = NULL;
+    connection->URL = NULL;
     connection->serverAddress = NULL;
-    connection->serverIp = 0;
+    connection->serverIP = 0;
     connection->serverPort = 0;
     connection->requestPath = NULL;
-    connection->headers = NULL;
+    connection->sendHeaders = NULL;
     connection->unk_30 = 0;
-    connection->blocking = FALSE;
-    connection->keepAlive = FALSE;
+    connection->blocking = gsi_false;
+    connection->persistConnection = gsi_false;
     connection->result = 0;
     connection->progressCallback = NULL;
     connection->completedCallback = NULL;
     connection->callbackParam = NULL;
     connection->socket = -1;
     connection->socketError = 0;
-    connection->userBuffer = FALSE;
-    connection->httpMajor = 0;
-    connection->httpMinor = 0;
+    connection->userBufferSupplied = gsi_false;
+    connection->statusMajorVersion = 0;
+    connection->statusMinorVersion = 0;
     connection->statusCode = 0;
-    connection->statusTextPos = 0;
-    connection->headersPos = 0;
-    connection->completed = FALSE;
-    connection->bytesReceived = 0;
+    connection->statusStringIndex = 0;
+    connection->headerStringIndex = 0;
+    connection->completed = gsi_false;
+    connection->fileBytesReceived = 0;
     connection->totalSize = -1;
-    connection->redirectUrl = NULL;
+    connection->redirectURL = NULL;
     connection->redirectCount = 0;
-    connection->chunked = 0;
+    connection->chunkedTransfer = 0;
     connection->processing = 0;
     connection->throttle = 0;
-    connection->lastThrottleTime = 0;
+    connection->lastThrottleRecv = 0;
     connection->post = NULL;
     connection->maxRecvTime = 500;
-    connection->proxyPort = 80;
-    connection->proxyAddress = NULL;
-    connection->encryptor.state = NULL;
-    connection->encryptor.open = FALSE;
-    connection->hostLookup = NULL;
-    connection->lastRecvTime = 0;
+    connection->proxyOverridePort = 80;
+    connection->proxyOverrideServer = NULL;
+    connection->encryptor.mInterface = NULL;
+    connection->encryptor.mInitialized = gsi_false;
+    connection->handle = NULL;
+    connection->receiveFileIdleTime = 0;
 
     if (ghiInitBuffer(connection, &connection->sendBuffer, 0x800, 0x1000) &&
         ghiInitBuffer(connection, &connection->encodeBuffer, 0x800, 0x400) &&
@@ -119,112 +119,113 @@ GHIConnection *ghiNewConnection(void) {
 }
 
 // Ends the connection's lookup of its host and its socket, and says if that went well
-BOOL ghiCloseSocket(GHIConnection *connection) {
+GHTTPBool ghiCloseConnection(GHIConnection *connection) {
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (!connection->inUse) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request < 0) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request >= sConnections.count) {
-        return FALSE;
+        return gsi_false;
     }
 
     ghiLock();
-    if (connection->hostLookup != NULL) {
-        gsDebugFormat(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
-        gsiCancelResolvingHostname(connection->hostLookup);
-        connection->hostLookup = NULL;
+    if (connection->handle != NULL) {
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment,
+                      "Cancelling Thread and freeing memory\n");
+        gsiCancelResolvingHostname(connection->handle);
+        connection->handle = NULL;
     }
     if (connection->socket != -1) {
         shutdown(connection->socket, 2);
-        if (!gsiCloseSocketSecure(connection->socket, &connection->encryptor.secure)) {
+        if (!closesocketsure(connection->socket, &connection->encryptor.mNotInCloseSocket)) {
             ghiUnlock();
-            return FALSE;
+            return gsi_false;
         }
         connection->socket = -1;
     }
     ghiUnlock();
-    return TRUE;
+    return gsi_true;
 }
 
 // Frees what a connection owns and gives its slot back
-BOOL ghiFreeConnectionData(GHIConnection *connection) {
+GHTTPBool ghiFreeConnectionData(GHIConnection *connection) {
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (!connection->inUse) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request < 0) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request >= sConnections.count) {
-        return FALSE;
+        return gsi_false;
     }
 
     ghiLock();
-    gsifree(connection->url);
-    connection->url = NULL;
+    gsifree(connection->URL);
+    connection->URL = NULL;
     gsifree(connection->unk_34);
     connection->unk_34 = NULL;
     gsifree(connection->serverAddress);
     connection->serverAddress = NULL;
     gsifree(connection->requestPath);
     connection->requestPath = NULL;
-    gsifree(connection->headers);
-    connection->headers = NULL;
-    gsifree(connection->redirectUrl);
+    gsifree(connection->sendHeaders);
+    connection->sendHeaders = NULL;
+    gsifree(connection->redirectURL);
     // The redirect URL is not cleared, the headers are cleared a second time instead. The slot's memory is cleared when
     // it is used again
-    connection->headers = NULL;
-    gsifree(connection->proxyAddress);
-    connection->proxyAddress = NULL;
+    connection->sendHeaders = NULL;
+    gsifree(connection->proxyOverrideServer);
+    connection->proxyOverrideServer = NULL;
     ghiFreeBuffer(&connection->sendBuffer);
     ghiFreeBuffer(&connection->encodeBuffer);
     ghiFreeBuffer(&connection->recvBuffer);
     ghiFreeBuffer(&connection->decodeBuffer);
-    ghiFreeBuffer(&connection->fileBuffer);
+    ghiFreeBuffer(&connection->getFileBuffer);
     if (connection->postingState.states != NULL) {
         ghiPostCleanupState(connection);
     }
-    if (connection->encryptor.open) {
-        if (connection->encryptor.cleanup != NULL) {
-            connection->encryptor.cleanup(connection, &connection->encryptor);
+    if (connection->encryptor.mInitialized) {
+        if (connection->encryptor.mCleanupFunc != NULL) {
+            connection->encryptor.mCleanupFunc(connection, &connection->encryptor);
         }
-        connection->encryptor.open = FALSE;
+        connection->encryptor.mInitialized = gsi_false;
     }
-    connection->lastRecvTime = 0;
-    connection->inUse = FALSE;
+    connection->receiveFileIdleTime = 0;
+    connection->inUse = gsi_false;
     sConnections.activeCount--;
     ghiUnlock();
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL ghiFreeConnection(GHIConnection *connection) {
+GHTTPBool ghiFreeConnection(GHIConnection *connection) {
     if (connection == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (!connection->inUse) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request < 0) {
-        return FALSE;
+        return gsi_false;
     }
     if (connection->request >= sConnections.count) {
-        return FALSE;
+        return gsi_false;
     }
-    if (ghiCloseSocket(connection) != TRUE) {
-        return FALSE;
+    if (ghiCloseConnection(connection) != gsi_true) {
+        return gsi_false;
     }
     return ghiFreeConnectionData(connection);
 }
 
 // Gives the connection of a request, or NULL if the request has none
-GHIConnection *ghiRequestToConnection(int request) {
+GHIConnection *ghiRequestToConnection(GHTTPRequest request) {
     GHIConnection *connection;
 
     ghiLock();
@@ -241,7 +242,7 @@ GHIConnection *ghiRequestToConnection(int request) {
 }
 
 // Calls the function with each connection that is in use
-void ghiEnumConnections(GHIEnumFunc func) {
+void ghiEnumConnections(GHTTPBool (*func)(GHIConnection *)) {
     int i;
 
     if (sConnections.activeCount > 0) {
@@ -257,20 +258,21 @@ void ghiEnumConnections(GHIEnumFunc func) {
 
 // Starts a connection over at the address that it was redirected to
 void ghiRedirectConnection(GHIConnection *connection) {
-    gsDebugFormat(8, 3, 0x10, "Redirecting Connection\n");
-    if (connection->hostLookup != NULL) {
-        gsDebugFormat(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
-        gsiCancelResolvingHostname(connection->hostLookup);
-        connection->hostLookup = NULL;
+    gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Redirecting Connection\n");
+    if (connection->handle != NULL) {
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment,
+                      "Cancelling Thread and freeing memory\n");
+        gsiCancelResolvingHostname(connection->handle);
+        connection->handle = NULL;
     }
     shutdown(connection->socket, 2);
-    if (gsiCloseSocketSecure(connection->socket, &connection->encryptor.secure)) {
-        gsifree(connection->url);
-        connection->url = connection->redirectUrl;
-        connection->redirectUrl = NULL;
+    if (closesocketsure(connection->socket, &connection->encryptor.mNotInCloseSocket)) {
+        gsifree(connection->URL);
+        connection->URL = connection->redirectURL;
+        connection->redirectURL = NULL;
         gsifree(connection->serverAddress);
         connection->serverAddress = NULL;
-        connection->serverIp = 0;
+        connection->serverIP = 0;
         connection->serverPort = 0;
         gsifree(connection->requestPath);
         connection->socket = -1;
@@ -280,20 +282,20 @@ void ghiRedirectConnection(GHIConnection *connection) {
         ghiResetBuffer(&connection->encodeBuffer);
         ghiResetBuffer(&connection->recvBuffer);
         ghiResetBuffer(&connection->decodeBuffer);
-        connection->httpMajor = 0;
-        connection->httpMinor = 0;
+        connection->statusMajorVersion = 0;
+        connection->statusMinorVersion = 0;
         connection->statusCode = 0;
-        connection->statusTextPos = 0;
-        connection->headersPos = 0;
-        connection->closing = FALSE;
-        if (connection->encryptor.open) {
-            if (connection->encryptor.cleanup != NULL) {
-                connection->encryptor.cleanup(connection, &connection->encryptor);
+        connection->statusStringIndex = 0;
+        connection->headerStringIndex = 0;
+        connection->connectionClosed = gsi_false;
+        if (connection->encryptor.mInitialized) {
+            if (connection->encryptor.mCleanupFunc != NULL) {
+                connection->encryptor.mCleanupFunc(connection, &connection->encryptor);
             }
-            connection->encryptor.open = FALSE;
-            if (strncmp("https://", connection->url, 8) != 0) {
-                connection->encryptor.engine = 0;
-                connection->encryptor.state = NULL;
+            connection->encryptor.mInitialized = gsi_false;
+            if (strncmp("https://", connection->URL, 8) != 0) {
+                connection->encryptor.mEngine = 0;
+                connection->encryptor.mInterface = NULL;
             }
         }
         connection->redirectCount++;
@@ -318,9 +320,9 @@ void ghiCleanupConnections(void) {
 
 // Copies the name of the host of a URL, which is what is between its scheme and the first colon or slash. Returns NULL
 // if the URL has no scheme
-char *ghiCopyHost(char *url) {
+char *ghiGetServerAddressFromUrl(char *url) {
     char *host;
-    u32 length;
+    gsi_u32 length;
     char saved;
     char *copy;
 

@@ -118,7 +118,7 @@ void SOCLi_SocketUnregister(SOCLSocket *socket) {
 }
 
 static void SOCLi_SocketUnregisterList(SOCLSocket **list, SOCLSocket *socket) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     SOCLSocket **link = SOCLi_SocketGetNextPtr(list, socket);
 
     if (link != NULL) {
@@ -131,7 +131,7 @@ static void SOCLi_SocketUnregisterList(SOCLSocket **list, SOCLSocket *socket) {
 static SOCLSocket **SOCLi_SocketGetNextPtr(SOCLSocket **list, SOCLSocket *socket) {
     SOCLSocket **link = list;
     SOCLSocket *s;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     for (s = *link; s != NULL; s = *link) {
         if (s == socket) {

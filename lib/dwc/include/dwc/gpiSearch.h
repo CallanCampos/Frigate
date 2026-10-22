@@ -23,11 +23,12 @@
 #define GPI_SEARCH_PROFILE_UNIQUENICK 10
 #define GPI_SEARCH_PROFILE_LIST 11
 
-int gpiProfileSearch(GPConnection *connection, const char *nick, const char *uniquenick, const char *email,
-                     const char *firstname, const char *lastname, int icquin, int skip, int blocking,
-                     GPCallback callback, void *param);
-int gpiOthersBuddyList(GPConnection *connection, int *profiles, int numOfProfiles, int blocking, GPCallback callback,
-                       void *param);
-int gpiProcessSearches(GPConnection *connection);
+GPResult gpiProfileSearch(GPConnection *connection, const char nick[GP_NICK_LEN],
+                          const char uniquenick[GP_UNIQUENICK_LEN], const char email[GP_EMAIL_LEN],
+                          const char firstname[GP_FIRSTNAME_LEN], const char lastname[GP_LASTNAME_LEN], int icquin,
+                          int skip, GPEnum blocking, GPCallback callback, void *param);
+GPResult gpiOthersBuddyList(GPConnection *connection, int *profiles, int numOfProfiles, GPEnum blocking,
+                            GPCallback callback, void *param);
+GPResult gpiProcessSearches(GPConnection *connection);
 
 #endif // POKEBW2_DWC_GPISEARCH_H

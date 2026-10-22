@@ -11,7 +11,7 @@ void OS_InitEvent(OSEvent *event) {
 // set, then clears the flags of clearBits and gives the flags that were set, or 0 for a mode that is neither
 u32 OS_WaitEventEx(OSEvent *event, u32 pattern, u32 mode, u32 clearBits) {
     u32 flags = 0;
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     switch (mode) {
     case OS_EVENT_MODE_AND:
@@ -36,7 +36,7 @@ u32 OS_WaitEventEx(OSEvent *event, u32 pattern, u32 mode, u32 clearBits) {
 
 // TwlSDK's OS_SignalEvent: sets the flags and wakes the threads that wait on the event
 void OS_SignalEvent(OSEvent *event, u32 setPattern) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (setPattern != 0) {
         event->flag |= setPattern;

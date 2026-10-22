@@ -11,7 +11,7 @@ static void PutU24(BtlServerCmdQueue *que, u32 value);
 static u32 ReadU24(BtlServerCmdQueue *que);
 static void PutU32(BtlServerCmdQueue *que, u32 value);
 static u32 ReadU32(BtlServerCmdQueue *que);
-static void PutCmdArgs(BtlServerCmdQueue *que, u32 event, s32 format, const u32 *args);
+static void PutCmdArgs(BtlServerCmdQueue *que, u32 event, int format, const u32 *args);
 static void ReadCmdArgs(BtlServerCmdQueue *que, s32 format, u32 *args);
 static void ReadMsgArgs(BtlServerCmdQueue *que, u8 event, u32 *args);
 
@@ -81,7 +81,7 @@ static inline void PutHalfwords(BtlServerCmdQueue *que, u16 first, u16 second) {
 }
 
 // Writes a command and its arguments, packed as its format says
-static void PutCmdArgs(BtlServerCmdQueue *que, u32 event, s32 format, const u32 *args) {
+static void PutCmdArgs(BtlServerCmdQueue *que, u32 event, int format, const u32 *args) {
     s32 i;
 
     PutU16(que, event);

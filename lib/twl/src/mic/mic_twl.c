@@ -1,8 +1,8 @@
 // TwlSDK's microphone library (libspi), the DSi's limited sampling in the LTD autoload: the same PXI commands as
 // NitroSDK's MIC_StartAutoSampling and MIC_StopAutoSampling (nitro/spi/mic.c), with commands of their own and a check
 // of the sampling rate, which the Limited functions call when the console runs in its DSi mode. ARM code. The ROM names
-// none of it; the file's name is a guess (the SDK's may be mic_ex.c or micex.c), and the functions have the SDK's names
-// where they are known. The synchronous ones wait for the answer on a message queue.
+// none of it; the file's name is a guess (the SDK's may be mic_ex.c or micex.c), and the functions have the names of
+// libntr's micex.h where they are known. The synchronous ones wait for the answer on a message queue.
 
 #include "types.h"
 #include "nitro/mic.h"
@@ -32,12 +32,12 @@
 
 #define MIC_ALIGN_MASK 0x1f
 
-static MICResult MICEX_StopLimitedSamplingAsync(MICCallback callback, void *arg);
+static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg);
 static void func_02703f60(MICResult result, void *arg);
 static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type);
 static BOOL func_02704088(void);
 
-MICResult MICEX_StartLimitedSampling(const MICAutoParam *param) {
+MICResult MICEXi_StartLimitedSampling(const MICAutoParam *param) {
     MICResult result;
     OSMessage messages[1];
     OSMessageQueue queue;
@@ -46,18 +46,18 @@ MICResult MICEX_StartLimitedSampling(const MICAutoParam *param) {
         return MIC_RESULT_ILLEGAL_STATUS;
     }
     OS_InitMessageQueue(&queue, messages, 1);
-    result = MICEX_StartLimitedSamplingAsync(param, func_02703f60, &queue);
+    result = MICEXi_StartLimitedSamplingAsync(param, func_02703f60, &queue);
     if (result == MIC_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
     }
     return result;
 }
 
-MICResult MICEX_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
+MICResult MICEXi_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
     MICWork *work = MICi_GetSysWork();
     u32 type;
     u8 mode;
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (param->size == 0) {
         return MIC_RESULT_ILLEGAL_PARAMETER;
@@ -127,7 +127,7 @@ MICResult MICEX_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback
     return MIC_RESULT_SEND_ERROR;
 }
 
-MICResult MICEX_StopLimitedSampling(void) {
+MICResult MICEXi_StopLimitedSampling(void) {
     MICResult result;
     OSMessage messages[1];
     OSMessageQueue queue;
@@ -136,17 +136,17 @@ MICResult MICEX_StopLimitedSampling(void) {
         return MIC_RESULT_ILLEGAL_STATUS;
     }
     OS_InitMessageQueue(&queue, messages, 1);
-    result = MICEX_StopLimitedSamplingAsync(func_02703f60, &queue);
+    result = MICEXi_StopLimitedSamplingAsync(func_02703f60, &queue);
     if (result == MIC_RESULT_SUCCESS) {
         OS_ReceiveMessage(&queue, (OSMessage *)&result, OS_MESSAGE_BLOCK);
     }
     return result;
 }
 
-// TwlSDK's MICEX_StopLimitedSamplingAsync: sends the stop, and the callback gets the answer
-static MICResult MICEX_StopLimitedSamplingAsync(MICCallback callback, void *arg) {
+// TwlSDK's MICEXi_StopLimitedSamplingAsync: sends the stop, and the callback gets the answer
+static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg) {
     MICWork *work = MICi_GetSysWork();
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (work->busy) {
         OS_RestoreInterrupts(enabled);

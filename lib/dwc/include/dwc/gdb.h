@@ -18,7 +18,7 @@ typedef struct GdbBinaryData {
     u32 size;
 } GdbBinaryData;
 
-// A field of a record, to write and as read: SakeField's first fields. Its types are SakeFieldType's
+// A field of a record, to write and as read: SAKEField's first fields. Its types are SAKEFieldType's
 typedef struct GdbField {
     const char *name;
     u32 type;
@@ -28,9 +28,9 @@ typedef struct GdbField {
         GdbBinaryData binaryData;
     } value;
 } GdbField;
-#define GDB_FIELD_BYTE SAKE_FIELD_BYTE
-#define GDB_FIELD_INT SAKE_FIELD_INT
-#define GDB_FIELD_BINARY SAKE_FIELD_BINARY_DATA
+#define GDB_FIELD_BYTE SAKEFieldType_BYTE
+#define GDB_FIELD_INT SAKEFieldType_INT
+#define GDB_FIELD_BINARY SAKEFieldType_BINARY_DATA
 
 // Called when the library has the records that a request asked for: with their number, each an array of the fields the
 // request was given, and the work. The library passes the first three; a function may declare a fourth that it does not

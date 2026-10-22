@@ -906,7 +906,7 @@ static BOOL CGearSw_IsScreenShown(CGearSw *work) {
     if (!GFL_WipeIsFinished()) {
         return FALSE;
     }
-    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+    if (GXS_GetMasterBrightness() != 0) {
         return FALSE;
     }
     if (!Field_GetSeasonBannerOverdrawFlag(GSYS_GetField(work->gsys))) {

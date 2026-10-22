@@ -21,22 +21,22 @@
 #include "nitro/os.h"
 
 static BOOL DWCUtilUsbSetup_IsLidClosed(void);
-static void DWCUtilUsbSetup_LoadGraphics(void);
-static void DWCUtilUsbSetup_FadeIn(void);
-static void DWCUtilUsbSetup_WaitFadeIn(void);
-static void DWCUtilUsbSetup_WaitButtons(void);
-static void DWCUtilUsbSetup_Main(void);
-static void DWCUtilUsbSetup_HandleInput(void);
-static void func_ov182_021b6c94(void);
-static void DWCUtilUsbSetup_HandleCancel(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilUsbSetup_DisableButtons(void);
-static void DWCUtilUsbSetup_FadeOut(void);
-static void DWCUtilUsbSetup_WaitFadeOut(void);
-static void DWCUtilUsbSetup_OnScanResult(int result);
-static void DWCUtilUsbSetup_WaitNoneDialog(void);
-static void DWCUtilUsbSetup_WaitNoneDialogClosed(void);
-static void DWCUtilUsbSetup_WaitSeveralDialog(void);
-static void DWCUtilUsbSetup_WaitSeveralDialogClosed(void);
+static void endScene1(void);
+static void endScene2(void);
+static void cbUsb(int result);
+static void procNotFound(void);
+static void procNotFound1(void);
+static void procBoth(void);
+static void procBoth1(void);
 
 // How the setup ends
 enum {
@@ -61,20 +61,20 @@ void DWCUtilUsbSetup_Init(void) {
     OSOwnerInfo info;
 
     sUsbSetupState = USB_SETUP_RUNNING;
-    DWCUtilUsbSetup_LoadGraphics();
-    DWCUtilBgOverlay_Show(8);
-    DWCUtilGfxResource_ShowStep(2);
+    initGraphics();
+    DWCi_HLlLoad(8);
+    DWCi_CMNlStep(2);
     OS_GetOwnerInfo(&info);
     MI_CpuClear16(nickName, sizeof(nickName));
     MI_CpuCopy16(info.nickName, nickName, info.nickNameLength * 2);
-    DWCUtilGfxResource_ShowMessageWithString(nickName, 0x28);
-    DWCUtilUiEffect_Init(0);
-    DWCUtilUsbScan_Start(DWCUtilUsbSetup_OnScanResult);
+    DWCi_CMNlMsgNameDraw(nickName, 0x28);
+    DWCi_ANIMElInitEx(0);
+    DWCi_USBAPlBegin(cbUsb);
     DWCUtilSound_PlaySe(0xb);
-    DWCUtilMain_SetUpdate(DWCUtilUsbSetup_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilUsbSetup_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/jb4Usb.nsc.l", GX_LoadBG2Scr);
@@ -85,98 +85,97 @@ static void DWCUtilUsbSetup_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilUsbSetup_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilUsbSetup_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(2);
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(2);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilUsbSetup_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilUsbSetup_Main(void) {
-    DWCUtilUsbSetup_HandleInput();
-    func_ov182_021b6c94();
-    DWCUtilUsbSetup_HandleCancel();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
 // B, or closing the lid, presses the button that cancels
-static void DWCUtilUsbSetup_HandleInput(void) {
-    if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+static void input(void) {
+    if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
     } else if (DWCUtilUsbSetup_IsLidClosed()) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+        DWCi_BTNlSet(0);
     }
 }
 
-static void func_ov182_021b6c94(void) {
+static void draw(void) {
 }
 
-static void DWCUtilUsbSetup_HandleCancel(void) {
-    if (sUsbSetupState == USB_SETUP_RUNNING && DWCUtilUiObject_GetState() == 0) {
+static void button(void) {
+    if (sUsbSetupState == USB_SETUP_RUNNING && DWCi_BTNlGet() == 0) {
         sUsbSetupState = USB_SETUP_CANCEL;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_DisableButtons);
+        DWCi_ChangeScene(DWCUtilUsbSetup_DisableButtons);
     }
 }
 
 static void DWCUtilUsbSetup_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilUsbSetup_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilUsbSetup_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilUiObject_Exit();
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_BTNlEnd();
         if (sUsbSetupState == USB_SETUP_CANCEL || sUsbSetupState == USB_SETUP_RETRY) {
-            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+            DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilUsbSetup_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) == 0 && (sUsbSetupState != USB_SETUP_CANCEL || DWCUtilFade_IsActive(1) == 0) &&
-        DWCUtilUiObject_IsIdle()) {
-        DWCUtilUsbScan_Stop();
-        DWCUtilUiEffect_Destroy();
-        DWCUtilText_DestroyScreenBg(0);
+static void endScene2(void) {
+    if (DWCi_EFFlCheck(0) == 0 && (sUsbSetupState != USB_SETUP_CANCEL || DWCi_EFFlCheck(1) == 0) && DWCi_BTNlIsEnd()) {
+        DWCi_USBAPlEnd();
+        DWCi_ANIMElEnd();
+        DWCi_FNTlDeleteBgLcd(0);
         if (sUsbSetupState == USB_SETUP_CANCEL || sUsbSetupState == USB_SETUP_RETRY) {
-            DWCUtilScreen_Stop();
+            DWCi_COMMENTlDelete();
             DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (sUsbSetupState == USB_SETUP_CANCEL) {
-            DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
+            DWCi_SetParam_(2, 1);
+            DWCi_ChangeScene(DWCUtilScreenAp_Init);
         } else if (sUsbSetupState == USB_SETUP_RETRY) {
-            DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(DWCUtilUsbIntro_Init);
+            DWCi_SetParam_(2, 1);
+            DWCi_ChangeScene(DWCUtilUsbIntro_Init);
         } else {
-            DWCUtilMain_SetLayout(0, 0);
-            DWCUtilMain_SetUpdate(DWCUtilUsbDone_Init);
+            DWCi_SetParam_(0, 0);
+            DWCi_ChangeScene(DWCUtilUsbDone_Init);
         }
     }
 }
 
 // The search's callback
-static void DWCUtilUsbSetup_OnScanResult(int result) {
+static void cbUsb(int result) {
     if (sUsbSetupState != USB_SETUP_RUNNING) {
         return;
     }
@@ -186,47 +185,47 @@ static void DWCUtilUsbSetup_OnScanResult(int result) {
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(0x12);
         DWCUtilDialog_Open(0x10, 1, 1, -1, 0);
-        DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitNoneDialog);
+        DWCi_BTNlDisable();
+        DWCi_ChangeScene(procNotFound);
         break;
     case DWC_UTIL_USB_SCAN_FOUND:
         sUsbSetupState = USB_SETUP_DONE;
         DWCUtilSound_StopSe();
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_DisableButtons);
+        DWCi_ChangeScene(DWCUtilUsbSetup_DisableButtons);
         break;
     case DWC_UTIL_USB_SCAN_SEVERAL:
         DWCUtilSound_StopSe();
-        DWCUtilUsbScan_SetCallback(NULL);
+        DWCi_USBAPlSetCallback(NULL);
         DWCUtilDialog_Open(0x11, 0, 1, -1, 0);
-        DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitSeveralDialog);
+        DWCi_BTNlDisable();
+        DWCi_ChangeScene(procBoth);
         break;
     case 3:
         sUsbSetupState = USB_SETUP_CANCEL;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(9);
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_DisableButtons);
+        DWCi_ChangeScene(DWCUtilUsbSetup_DisableButtons);
         break;
     }
 }
 
-static void DWCUtilUsbSetup_WaitNoneDialog(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+static void procNotFound(void) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitNoneDialogClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(procNotFound1);
     }
 }
 
-static void DWCUtilUsbSetup_WaitNoneDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilMain_SetUpdate(DWCUtilUsbSetup_DisableButtons);
+static void procNotFound1(void) {
+    if (!DWCi_WINlIsInit()) {
+        DWCi_ChangeScene(DWCUtilUsbSetup_DisableButtons);
     }
 }
 
 // The dialog of several connectors: the first button ends the setup, the second searches again
-static void DWCUtilUsbSetup_WaitSeveralDialog(void) {
-    switch (DWCUtilDialog_GetChoice()) {
+static void procBoth(void) {
+    switch (DWCi_WINlGet()) {
     case 1:
         sUsbSetupState = USB_SETUP_RETRY;
         DWCUtilSound_PlaySe(6);
@@ -238,20 +237,20 @@ static void DWCUtilUsbSetup_WaitSeveralDialog(void) {
     default:
         return;
     }
-    DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(DWCUtilUsbSetup_WaitSeveralDialogClosed);
+    DWCi_WINlEnd();
+    DWCi_ChangeScene(procBoth1);
 }
 
-static void DWCUtilUsbSetup_WaitSeveralDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
+static void procBoth1(void) {
+    if (!DWCi_WINlIsInit()) {
         if (sUsbSetupState == USB_SETUP_DONE) {
-            DWCUtilMain_SetUpdate(DWCUtilUsbSetup_DisableButtons);
+            DWCi_ChangeScene(DWCUtilUsbSetup_DisableButtons);
         } else {
             DWCUtilSound_PlaySe(0xb);
-            DWCUtilUiObject_Enable();
+            DWCi_BTNlEnable();
             sUsbSetupState = USB_SETUP_RUNNING;
-            DWCUtilUsbScan_SetCallback(DWCUtilUsbSetup_OnScanResult);
-            DWCUtilMain_SetUpdate(DWCUtilUsbSetup_Main);
+            DWCi_USBAPlSetCallback(cbUsb);
+            DWCi_ChangeScene(procScene);
         }
     }
 }

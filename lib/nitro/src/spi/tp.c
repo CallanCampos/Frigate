@@ -85,7 +85,7 @@ typedef struct TPWork {
 
 static TPWork tpState;
 
-static void TPi_TpCallback(u32 tag, u32 data, BOOL err);
+static void TPi_TpCallback(PXIFifoTag tag, u32 data, BOOL err);
 
 // Reads the sample that the ARM7 wrote to the shared memory
 static inline void ReadSample(TPData *sample) {
@@ -101,7 +101,7 @@ static inline void ReadSample(TPData *sample) {
 
 // TPi_TpCallback: gets the ARM7's words with the touch panel's tag: a sample of the automatic sampling, or the last
 // word of the answer to a command
-static void TPi_TpCallback(u32 tag, u32 data, BOOL err) {
+static void TPi_TpCallback(PXIFifoTag tag, u32 data, BOOL err) {
     u16 word = (u16)data;
     u16 command = (word & TP_PXI_COMMAND_MASK) >> 8;
     u32 result;
@@ -220,7 +220,7 @@ BOOL TP_GetUserInfo(TPCalibrateParam *calibrate) {
 
 // TP_SetCalibrateParam: sets the calibration that TP_GetCalibratedPoint applies, or turns it off with NULL
 void TP_SetCalibrateParam(const TPCalibrateParam *calibrate) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (calibrate == NULL) {
         tpState.calibrated = FALSE;
@@ -262,7 +262,7 @@ void TP_SetCalibrateParam(const TPCalibrateParam *calibrate) {
 
 // TP_RequestSamplingAsync: asks the ARM7 for one sample
 void TP_RequestSamplingAsync(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     BOOL sent = FALSE;
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL, TP_PXI_START | TP_PXI_END | TP_PXI_COMMAND(TP_PXI_COMMAND_SAMPLING),
@@ -307,7 +307,7 @@ static inline BOOL SendAutoSamplingStart(u16 vcount, u16 frequency) {
 // TP_RequestAutoSamplingStartAsync: asks the ARM7 to take frequency samples a frame, from the line vcount on, into a
 // ring of count samples. The samples start as empty ones, which have no touch
 void TP_RequestAutoSamplingStartAsync(u16 vcount, u16 frequency, TPData samples[], u16 count) {
-    u32 enabled;
+    OSIntrMode enabled;
     u8 sent;
     u32 i;
 
@@ -336,7 +336,7 @@ void TP_RequestAutoSamplingStartAsync(u16 vcount, u16 frequency, TPData samples[
 
 // TP_RequestAutoSamplingStopAsync
 void TP_RequestAutoSamplingStopAsync(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     BOOL sent = FALSE;
 
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL, TP_PXI_START | TP_PXI_END | TP_PXI_COMMAND(TP_PXI_COMMAND_AUTO_OFF),
@@ -410,13 +410,13 @@ u16 TP_GetLatestIndexInAuto(void) {
 
 // TP_CalcCalibrateParam: works out the calibration from the raw values of two points and where they are on the screen.
 // 1 when a value is out of range or the two points don't differ in a coordinate, or the result does not fit
-BOOL TP_CalcCalibrateParam(TPCalibrateParam *calibrate, u16 rawX1, u16 rawY1, u16 screenX1, u16 screenY1, u16 rawX2,
-                           u16 rawY2, u16 screenX2, u16 screenY2) {
+u32 TP_CalcCalibrateParam(TPCalibrateParam *calibrate, u16 rawX1, u16 rawY1, u16 screenX1, u16 screenY1, u16 rawX2,
+                          u16 rawY2, u16 screenX2, u16 screenY2) {
     s32 dotSize;
     s32 origin;
     s32 rawYDiff;
     s32 screenYDiff;
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (rawX1 >= 0x1000 || rawY1 >= 0x1000 || rawX2 >= 0x1000 || rawY2 >= 0x1000) {
         return 1;
@@ -501,12 +501,12 @@ void TP_GetCalibratedPoint(TPData *disp, const TPData *raw) {
 }
 
 // TP_WaitBusy: waits until the ARM7 has answered the commands (TP_REQUEST_COMMAND_FLAG_*)
-void TP_WaitBusy(u32 command) {
+void TP_WaitBusy(TPRequestCommandFlag command) {
     while (tpState.busy & command) {
     }
 }
 
 // TP_CheckError: which of the commands failed
-u32 TP_CheckError(u32 command) {
+u32 TP_CheckError(TPRequestCommandFlag command) {
     return command & tpState.error;
 }

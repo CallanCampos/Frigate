@@ -1,6 +1,6 @@
 #include "dwc_util_string.h"
 
-int DWCUtilString_Length(const u8 *str, int max) {
+int DWCi_MOV_WH_SetUserGameInfo(const u8 *str, int max) {
     int i;
 
     for (i = 0; i < max; i++) {

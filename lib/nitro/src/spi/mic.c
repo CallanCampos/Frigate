@@ -46,7 +46,7 @@
 static u16 micInitialized;
 static MICWork micWork;
 
-static void MicCommonCallback(u32 tag, u32 data, BOOL err);
+static void MicCommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 static BOOL MicStartAutoSampling(void *buffer, u32 size, u32 rate, u8 type);
 static BOOL MicStopAutoSampling(void);
 static void MicGetResultCallback(MICResult result, void *arg);
@@ -67,7 +67,7 @@ void MIC_Init(void) {
 }
 
 MICResult MIC_StartAutoSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
     int type;
     u8 mode;
 
@@ -136,7 +136,7 @@ MICResult MIC_StartAutoSampling(const MICAutoParam *param) {
 }
 
 MICResult MIC_StopAutoSamplingAsync(MICCallback callback, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (micWork.busy) {
         OS_RestoreInterrupts(enabled);
@@ -169,27 +169,27 @@ void *MIC_GetLastSamplingAddress(void) {
 
 MICResult MIC_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StartLimitedSamplingAsync(param, callback, arg);
+        return MICEXi_StartLimitedSamplingAsync(param, callback, arg);
     }
     return MIC_StartAutoSamplingAsync(param, callback, arg);
 }
 
 MICResult MIC_StartLimitedSampling(const MICAutoParam *param) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StartLimitedSampling(param);
+        return MICEXi_StartLimitedSampling(param);
     }
     return MIC_StartAutoSampling(param);
 }
 
 MICResult MIC_StopLimitedSampling(void) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StopLimitedSampling();
+        return MICEXi_StopLimitedSampling();
     }
     return MIC_StopAutoSampling();
 }
 
 // Gets the ARM7's words with the microphone's tag
-static void MicCommonCallback(u32 tag, u32 data, BOOL err) {
+static void MicCommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     MICCallback callback;
     MICResult result;
     u16 command;

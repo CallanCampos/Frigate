@@ -25,7 +25,7 @@ void DWCUtilDisplay_SetRectFromSize(const void *position, const void *size, void
 }
 
 // Adds the planes to the screen's visible ones
-void DWCUtilDisplay_ShowPlanes(int screen, int planes) {
+void DWCi_GXlInvisible(int screen, int planes) {
     if (screen == 1) {
         GXS_SetVisiblePlane(planes | GXS_GetVisiblePlane());
     } else {
@@ -42,7 +42,7 @@ void DWCUtilDisplay_HidePlanes(int screen, int planes) {
     }
 }
 
-void DWCUtilDisplay_SetWindow(int screen, int window, const u16 *rect) {
+void DWCi_GXlSetWndPosition(int screen, int window, const u16 *rect) {
     if (screen == 1) {
         if (window == 0) {
             G2S_SetWnd0Position(rect[0], rect[1], rect[2], rect[3]);
@@ -58,7 +58,7 @@ void DWCUtilDisplay_SetWindow(int screen, int window, const u16 *rect) {
     }
 }
 
-void DWCUtilDisplay_SetWindowPlanes(int screen, int window, int planes, BOOL effect) {
+void DWCi_GXlSetWndPlane(int screen, int window, int planes, BOOL effect) {
     switch (window) {
     case 0:
         if (screen == 1) {

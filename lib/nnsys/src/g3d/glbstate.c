@@ -117,11 +117,11 @@ void NNS_G3dGlbSetBaseScale(const VecFx32 *scale) {
     }
 }
 
-void NNS_G3DSetLightVector(int lightID, fx16 x, fx16 y, fx16 z) {
+void NNS_G3DSetLightVector(GXLightId lightID, fx16 x, fx16 y, fx16 z) {
     NNS_G3dGlb.lightVec[lightID] = GX_PACK_LIGHTVECTOR_PARAM(lightID, x, y, z);
 }
 
-void NNS_G3DSetLightColor(int lightID, GXRgb rgb) {
+void NNS_G3DSetLightColor(GXLightId lightID, GXRgb rgb) {
     NNS_G3dGlb.lightColor[lightID] = GX_PACK_LIGHTCOLOR_PARAM(lightID, rgb);
 }
 

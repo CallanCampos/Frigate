@@ -23,12 +23,12 @@ struct DWCUtilApEntry {
 };
 
 // Allocates the scan, starts it (TRUE when it started), and stops it (TRUE once it has stopped)
-void DWCUtilApScan_Init(void);
-BOOL DWCUtilApScan_Start(void);
-BOOL DWCUtilApScan_Stop(void);
+void DWCi_SEARCHlInit(void);
+BOOL DWCi_SEARCHlBegin(void);
+BOOL DWCi_SEARCHlStop(void);
 // Waits for the wireless to end and frees the scan
-void DWCUtilApScan_Exit(void);
+void DWCi_SEARCHlEnd(void);
 // The access points found, and how many of them there are
-int DWCUtilApScan_GetEntries(DWCUtilApEntry **entries);
+int DWCi_SEARCHlGetApInfo(DWCUtilApEntry **entries);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_AP_SCAN_H

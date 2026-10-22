@@ -201,7 +201,7 @@ tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, sinc
 a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
 
 **Don't:** put a comment between a declaration's specifiers and the rest (`static // Connects ...` above
-`int AossAp_Connect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
+`int AOSSi_WLANConnect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
 
 **Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version, and a comment
 right after `static`, `inline`, `extern` or `const` that starts a line.
@@ -220,3 +220,20 @@ The skills in `.claude/skills/` have Codex copies in `.agents/skills/`; a change
 same commit.
 
 **Checked:** in CI, the two trees must be identical.
+
+## 14. The SDK's types, as the SDK has them
+
+`u32` and `s32` are NitroSDK's `unsigned long` and `long`, and its fixed-point constants and conversions are the SDK's
+(`FX32_ONE` is `((fx32)0x00001000L)`, `FX32_CONST` is `FX_F32_TO_FX32`), as ntrtwl's NitroSDK and pret's pokediamond
+have them. Game Freak's code mixes them with plain C types, so a declaration takes the type the original evidently
+had: `u32`/`s32` where it compiles as the SDK's, `int`/`unsigned int` where it compiles as those.
+GameSpy's code, which is cross-platform, uses GameSpy's own types from its `nonport.h` (`lib/dwc/include/dwc/nonport.h`:
+`gsi_u32` is `unsigned int`, `gsi_i32` is `int`, `gsi_bool` is `int`), and DWC's own code the SDK's.
+
+**Don't:** change a typedef or an SDK constant because more functions match with it, or cast to emulate another type.
+A function that matches only under a type the original didn't have isn't faithful.
+
+**Do:** give the declaration that decides it (a local, a parameter, a struct field, a prototype) its original type.
+An enum isn't a stand-in for `unsigned int`: under `-enum int` it is a signed `int`.
+
+**Checked:** by review. `docs/matching.md` ("Game Freak's code mixes the SDK's types") has the lever.

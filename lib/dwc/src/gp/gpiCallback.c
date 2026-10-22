@@ -8,13 +8,13 @@
 
 static void gpiCallCallback(GPConnection *connection, GPICallbackData *data);
 
-void gpiCallErrorCallback(GPConnection *connection, int result, int fatal) {
+void gpiCallErrorCallback(GPConnection *connection, GPResult result, GPEnum fatal) {
     GPIConnection *iconnection = *connection;
     GPICallback callback;
     GPErrorArg *arg;
 
     if (fatal == 1) {
-        iconnection->fatalError = TRUE;
+        iconnection->fatalError = gsi_true;
     }
     callback = iconnection->callbacks[0];
     if (callback.callback != NULL) {
@@ -29,7 +29,8 @@ void gpiCallErrorCallback(GPConnection *connection, int result, int fatal) {
     }
 }
 
-int gpiAddCallback(GPConnection *connection, GPICallback callback, void *arg, const GPIOperation *operation, int type) {
+GPResult gpiAddCallback(GPConnection *connection, GPICallback callback, void *arg, const GPIOperation *operation,
+                        int type) {
     GPIConnection *iconnection = *connection;
     GPICallbackData *data = gsimalloc(sizeof(GPICallbackData));
 
@@ -109,7 +110,7 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
         arg->suggestedNicks = NULL;
     } else if (type == GPI_ADD_BUDDYREVOKE) {
         // The buddy that revoked is deleted once the app knows, without telling the server
-        gpiDeleteBuddy(connection, ((GPRecvBuddyRevokeArg *)data->arg)->profile, FALSE);
+        gpiDeleteBuddy(connection, ((GPRecvBuddyRevokeArg *)data->arg)->profile, gsi_false);
     } else if (type == GPI_ADD_REVERSE_BUDDIES_LIST) {
         GPGetReverseBuddiesListResponseArg *arg = data->arg;
 
@@ -146,7 +147,7 @@ static void gpiCallCallback(GPConnection *connection, GPICallbackData *data) {
     gsifree(data);
 }
 
-int gpiProcessCallbacks(GPConnection *connection, int blockingOperationID) {
+GPResult gpiProcessCallbacks(GPConnection *connection, int blockingOperationID) {
     GPIConnection *iconnection = *connection;
     GPICallbackData *list;
     GPICallbackData *last;

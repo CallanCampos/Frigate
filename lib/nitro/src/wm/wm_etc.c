@@ -20,7 +20,7 @@ typedef struct {
 // 32 bytes, so the buffer's size is WM_SIZE_USER_GAMEINFO (0x70) rounded up
 static u8 tmpUserGameInfoBuf[0x80] ATTRIBUTE_ALIGN(32);
 
-int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
+WMErrCode WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const u16 *wepKey) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -43,7 +43,7 @@ int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey) {
+WMErrCode WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const u8 *wepKey) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -67,7 +67,8 @@ int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const voi
 }
 
 // The information is at most WM_SIZE_USER_GAMEINFO bytes
-int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr) {
+WMErrCode WM_SetGameInfo(WMCallbackFunc callback, const u16 *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid,
+                         u8 attr) {
     int result = WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_MP_PARENT);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -90,7 +91,7 @@ int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameIn
 }
 
 // Enable is 0 or 1
-int WM_SetBeaconIndication(WMCallbackFunc callback, int enable) {
+WMErrCode WM_SetBeaconIndication(WMCallbackFunc callback, u16 enable) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -107,7 +108,7 @@ int WM_SetBeaconIndication(WMCallbackFunc callback, int enable) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime) {
+WMErrCode WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -121,7 +122,7 @@ int WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u1
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime) {
+WMErrCode WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime) {
     int result;
     WmMeasureChannelCommand cmd;
 

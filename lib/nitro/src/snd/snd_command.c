@@ -22,7 +22,7 @@ static SNDSharedWork sSharedWork ATTRIBUTE_ALIGN(32);
 static int SND_CountFreeCommand(void);
 static int SND_CountReadyCommand(void);
 static int SND_CountWaitingCommand(void);
-static void SNDi_PxiFifoCallback(u32 fifoTag, u32 data, BOOL err);
+static void SNDi_PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err);
 static void SNDi_InitPxi(void);
 static void SNDi_WakeArm7(void);
 static SNDCommand *SNDi_PopFreeCommand(void);
@@ -61,8 +61,8 @@ void SND_CommandInit(void) {
 
 // NitroSDK's SND_RecvCommandReply: takes back the next packet that the ARM7 is done with and returns its commands, or
 // returns NULL when there is none. With SND_COMMAND_BLOCK it waits for one
-SNDCommand *SND_RecvCommandReply(u32 flags) {
-    u32 enabled = OS_DisableInterrupts();
+const SNDCommand *SND_RecvCommandReply(u32 flags) {
+    OSIntrMode enabled = OS_DisableInterrupts();
     SNDCommand *command;
     SNDCommand *last;
 
@@ -136,7 +136,7 @@ SNDCommand *SND_AllocCommand(u32 flags) {
 
 // NitroSDK's SND_PushCommand: adds a command to the ready list
 void SND_PushCommand(SNDCommand *command) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (SNDi_Queue.readyTail == NULL) {
         SNDi_Queue.readyHead = command;
@@ -152,7 +152,7 @@ void SND_PushCommand(SNDCommand *command) {
 // NitroSDK's SND_FlushCommand: sends the ready commands as a packet. It returns FALSE when it could not, because no
 // packet could be sent without waiting and SND_COMMAND_BLOCK is not set. SND_COMMAND_IMMEDIATE wakes the ARM7 up
 BOOL SND_FlushCommand(u32 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (!SNDi_Queue.readyHead) {
         OS_RestoreInterrupts(enabled);
@@ -228,7 +228,7 @@ void SND_WaitForCommandProc(u32 tag) {
 // NitroSDK's SND_GetCurrentCommandTag: the tag that SND_IsFinishedCommandTag tells for the commands pushed last,
 // which is the next packet's while commands wait to be flushed, and else the last packet taken back
 u32 SND_GetCurrentCommandTag(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u32 tag;
 
     if (SNDi_Queue.readyHead == NULL) {
@@ -242,7 +242,7 @@ u32 SND_GetCurrentCommandTag(void) {
 
 // NitroSDK's SND_IsFinishedCommandTag: whether the packet with the tag has come back. The tags wrap around
 BOOL SND_IsFinishedCommandTag(u32 tag) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     BOOL finished;
 
     if (tag > SNDi_Queue.receivedTag) {
@@ -263,7 +263,7 @@ BOOL SND_IsFinishedCommandTag(u32 tag) {
 }
 
 static int SND_CountFreeCommand(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     int count = 0;
     SNDCommand *command;
 
@@ -275,7 +275,7 @@ static int SND_CountFreeCommand(void) {
 }
 
 static int SND_CountReadyCommand(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     int count = 0;
     SNDCommand *command;
 
@@ -293,8 +293,8 @@ static int SND_CountWaitingCommand(void) {
 
 // The function that the PXI FIFO calls with the words that the ARM7 sends for the sound tag: the number of an alarm and
 // its ID, which are the alarm that went off. NitroSDK's SNDi_PxiFifoCallback (a guess)
-static void SNDi_PxiFifoCallback(u32 fifoTag, u32 data, BOOL err) {
-    u32 enabled = OS_DisableInterrupts();
+static void SNDi_PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     SNDi_CallAlarmHandler(data);
     OS_RestoreInterrupts(enabled);
@@ -318,7 +318,7 @@ static void SNDi_WakeArm7(void) {
 
 // Takes a command from the pool, or returns NULL when there is none
 static SNDCommand *SNDi_PopFreeCommand(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     SNDCommand *command = SNDi_Queue.freeHead;
 
     if (command == NULL) {
@@ -336,7 +336,7 @@ static SNDCommand *SNDi_PopFreeCommand(void) {
 // Whether there is a sound driver to send commands to: always on a console, while on the Ensata emulator
 // (OS_IsRunOnEmulator) it asks a register of the emulator
 static BOOL SNDi_IsDriverAvailable(void) {
-    u32 enabled;
+    OSIntrMode enabled;
     u32 present;
 
     if (!OS_IsRunOnEmulator()) {

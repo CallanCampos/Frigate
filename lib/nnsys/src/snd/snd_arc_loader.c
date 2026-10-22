@@ -247,7 +247,7 @@ static void *LoadFile(u32 fileId, NNSSndHeapDisposeCallback callback, u32 data1,
 }
 
 static void *LoadSeq(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
-    void *seq = (void *)NNS_SndArcGetFileAddress(fileId);
+    void *seq = NNS_SndArcGetFileAddress(fileId);
 
     if (seq == NULL) {
         seq = LoadFile(fileId, SeqDisposeCallback, bSetAddr ? (u32)NNS_SndArcGetCurrent() : 0, fileId, heap);
@@ -259,7 +259,7 @@ static void *LoadSeq(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
 }
 
 static void *LoadSeqArc(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
-    void *seqArc = (void *)NNS_SndArcGetFileAddress(fileId);
+    void *seqArc = NNS_SndArcGetFileAddress(fileId);
 
     if (seqArc == NULL) {
         seqArc = LoadFile(fileId, SeqDisposeCallback, bSetAddr ? (u32)NNS_SndArcGetCurrent() : 0, fileId, heap);
@@ -271,7 +271,7 @@ static void *LoadSeqArc(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
 }
 
 static void *LoadBank(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
-    void *bank = (void *)NNS_SndArcGetFileAddress(fileId);
+    void *bank = NNS_SndArcGetFileAddress(fileId);
 
     if (bank == NULL) {
         bank = LoadFile(fileId, BankDisposeCallback, bSetAddr ? (u32)NNS_SndArcGetCurrent() : 0, fileId, heap);
@@ -283,7 +283,7 @@ static void *LoadBank(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
 }
 
 static void *LoadWaveArc(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) {
-    void *waveArc = (void *)NNS_SndArcGetFileAddress(fileId);
+    void *waveArc = NNS_SndArcGetFileAddress(fileId);
 
     if (waveArc == NULL) {
         waveArc = LoadFile(fileId, WaveArcDisposeCallback, bSetAddr ? (u32)NNS_SndArcGetCurrent() : 0, fileId, heap);
@@ -331,7 +331,7 @@ static void *LoadWaveArcTable(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) 
 
 // Clears the file from arc's file table if mem is where it was loaded
 static void ClearFileAddress(void *mem, NNSSndArc *arc, u32 fileId) {
-    u32 enabled;
+    OSIntrMode enabled;
     NNSSndArc *current;
 
     if (arc != NULL) {

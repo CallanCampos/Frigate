@@ -69,7 +69,8 @@ static void PokeDataRangeMoveToTray(Box2SysWork *syswk, u32 tray, u32 pos, u32 d
 static void PokeDataPartyMoveToTray(Box2SysWork *syswk, u32 pos, u32 dstTray);
 static void PokeChangeForme(Box2SysWork *syswk, BoxPkm *pkm, u32 forme);
 static void PokeFormChangeShaymin(Box2SysWork *syswk, u32 putPos, u32 getPos, u32 tray);
-static void PokeIconRangeMove(Box2SysWork *syswk, Box2PokeMoveData *data, u32 cnt, u32 x, u32 y, u32 width);
+static void PokeIconRangeMove(Box2SysWork *syswk, Box2PokeMoveData *data, u32 cnt, unsigned int x, unsigned int y,
+                              unsigned int width);
 static BOOL Box2Main_VFuncRangePokeMove(Box2SysWork *syswk);
 static BOOL Box2Main_VFuncGetPokeMove(Box2SysWork *syswk);
 static BOOL Box2Main_VFuncPokeMoveParty(Box2SysWork *syswk);
@@ -1093,7 +1094,8 @@ BOOL Box2Main_IsSpeciesFlagged(Box2SysWork *syswk, u32 pos) {
 }
 
 // Puts an icon of a range where it is after cnt steps of its move
-static void PokeIconRangeMove(Box2SysWork *syswk, Box2PokeMoveData *data, u32 cnt, u32 x, u32 y, u32 width) {
+static void PokeIconRangeMove(Box2SysWork *syswk, Box2PokeMoveData *data, u32 cnt, unsigned int x, unsigned int y,
+                              unsigned int width) {
     s16 px = x * 24 + (data->dx + ((data->mx * cnt) >> 16) * data->vx);
     s16 py = y * 24 + (data->dy + ((data->my * cnt) >> 16) * data->vy);
 

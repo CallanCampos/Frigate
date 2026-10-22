@@ -53,8 +53,8 @@ void NNS_SndWaveOutFreeChannel(NNSSndWaveOutHandle handle) {
     NNS_SndUnlockChannel(1 << waveOut->chNo);
 }
 
-BOOL NNS_SndWaveOutStart(NNSSndWaveOutHandle handle, int format, const void *data, BOOL loop, int loopStartSample,
-                         int samples, int sampleRate, int volume, int speed, int pan) {
+BOOL NNS_SndWaveOutStart(NNSSndWaveOutHandle handle, NNSSndWaveFormat format, const void *data, BOOL loop,
+                         int loopStartSample, int samples, int sampleRate, int volume, int speed, int pan) {
     NNSSndWaveOut *waveOut = handle;
     int loopStart;
     int loopLen;

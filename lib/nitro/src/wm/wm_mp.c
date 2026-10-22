@@ -93,9 +93,9 @@ static int WMi_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, 
 
 // WM_StartMPEx: the same frequency for the parent and the children, and the retries, the polling and the fatal errors
 // as the game wants them. A frequency that is fixed is also given to the ARM7 as such
-int WM_StartMPEx(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
-                 u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
-                 BOOL ignoreFatalError) {
+WMErrCode WM_StartMPEx(WMCallbackFunc callback, u16 *recvBuf, u16 recvBufSize, u16 *sendBuf, u16 sendBufSize,
+                       u16 mpFreq, u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
+                       BOOL ignoreFatalError) {
     WmMpParam param;
 
     MIi_CpuClear32(0, &param, sizeof(param));
@@ -113,7 +113,8 @@ int WM_StartMPEx(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *
     return WMi_StartMP(callback, recvBuf, recvBufSize, sendBuf, sendBufSize, &param);
 }
 
-int WM_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq) {
+WMErrCode WM_StartMP(WMCallbackFunc callback, u16 *recvBuf, u16 recvBufSize, u16 *sendBuf, u16 sendBufSize,
+                     u16 mpFreq) {
     WmMpParam param;
 
     MIi_CpuClear32(0, &param, sizeof(param));
@@ -125,8 +126,8 @@ int WM_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *se
 
 // WM_SetMPDataToPortEx: sends the data to the ports of the children in the bitmap in the next round; the callback and
 // its argument come back with the result
-int WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap,
-                         u16 port, u16 prio) {
+WMErrCode WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const u16 *sendData, u16 sendDataSize,
+                               u16 destBitmap, u16 port, u16 prio) {
     u16 childBitmap = 1;
     WMStatus *status = WMi_GetSystemWork()->status;
     int result = WMi_CheckStateEx(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
@@ -164,7 +165,7 @@ int WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const void *sendDat
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_EndMP(WMCallbackFunc callback) {
+WMErrCode WM_EndMP(WMCallbackFunc callback) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     int result = WMi_CheckStateEx(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
 

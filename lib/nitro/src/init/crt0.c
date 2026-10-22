@@ -519,7 +519,7 @@ static asm void func_02004eac(void) {
 }
 
 // Keeps a library's signature in the link: the call is what references it
-asm void OSi_ReferSymbol(const char *signature) {
+asm void OSi_ReferSymbol(void *symbol) {
     bx lr
 }
 

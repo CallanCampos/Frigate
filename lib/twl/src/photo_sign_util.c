@@ -43,7 +43,7 @@ static void PhotoSign_SendWord(u32 fifoTag, u32 data) {
 
 // Sends data 3 bytes to a word, the first in the high byte
 static void PhotoSign_SendData(u32 fifoTag, const u8 *data, u32 size) {
-    u32 i;
+    unsigned int i;
 
     for (i = 0; size - i >= 3; i += 3) {
         PhotoSign_SendWord(fifoTag, (data[i] << 16) | (data[i + 1] << 8) | data[i + 2]);
@@ -71,7 +71,7 @@ void PhotoSign_InitLock(void) {
 }
 
 BOOL PhotoSign_TryLock(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSThread *current = OSi_ThreadInfo.current;
     BOOL result;
 
@@ -90,7 +90,7 @@ BOOL PhotoSign_TryLock(void) {
 }
 
 void PhotoSign_Lock(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSThread *current = OSi_ThreadInfo.current;
 
     while (TRUE) {
@@ -110,7 +110,7 @@ void PhotoSign_Lock(void) {
 }
 
 void PhotoSign_Unlock(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (sLock.owner != NULL && --sLock.count == 0) {
         sLock.owner = NULL;

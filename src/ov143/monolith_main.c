@@ -140,8 +140,8 @@ static const BGSetup sMonolithBGSetupSub = {
 static BOOL Monolith_Init(GameProc *proc, u32 *state, void *param, void *work) {
     MonolithWork *wk;
 
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GX_SetVisiblePlane(0);

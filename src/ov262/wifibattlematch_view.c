@@ -1035,7 +1035,7 @@ static void WifiBattleMatchView_LiveCardWindows(WifiBattleMatchCard *card, const
 
 static BOOL WifiBattleMatchView_CardFlush(WifiBattleMatchCard *card, PrintQueue *printQueue) {
     BOOL done = TRUE;
-    u32 i;
+    unsigned int i;
 
     for (i = 0; i < card->windowCount; i++) {
         if (card->windows[i] != NULL) {

@@ -7,7 +7,7 @@
 
 // Whether the encoder signs the image it writes, for the DSi's photo viewer. Its setter was dead-stripped, so it stays
 // 0
-extern u32 ExifEnc_SignMode;
+extern BOOL ExifEnc_SignMode;
 
 // Writes the SOI and the APP1 segment with the EXIF data of a width x height image, and its thumbnail if there is one,
 // to dst; returns the number of bytes written

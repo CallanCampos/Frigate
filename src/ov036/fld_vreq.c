@@ -53,11 +53,11 @@ void FieldDispControl_Update(FieldDispControl *control) {
     }
 
     if (control->brightnessRequest[0] != 0) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, control->brightnessValue[0]);
+        GX_SetMasterBrightness(control->brightnessValue[0]);
         control->brightnessRequest[0] = 0;
     }
     if (control->brightnessRequest[1] != 0) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, control->brightnessValue[1]);
+        GXS_SetMasterBrightness(control->brightnessValue[1]);
         control->brightnessRequest[1] = 0;
     }
 }

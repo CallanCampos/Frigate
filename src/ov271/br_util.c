@@ -103,7 +103,7 @@ typedef struct {
     s16 r_end;
     u16 rot_start;
     u16 rot_end;
-    s32 sync_max;
+    int sync_max;
 } BrBallCircle;
 
 typedef struct {
@@ -176,7 +176,7 @@ static void BrBallEff_Seq_Touch(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs);
 static void BrBallEff_Seq_Ring(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs);
 static void BrBallCircle_Init(BrBallCircle *p_wk, const BrPoint *cp_center, u16 r_start, u16 r_end, u16 rot_start,
                               u16 rot_end, s32 sync_max);
-static BOOL BrBallCircle_Main(BrBallCircle *p_wk, BrPoint *p_now, s32 sync);
+static BOOL BrBallCircle_Main(BrBallCircle *p_wk, BrPoint *p_now, int sync);
 static void BrBallRot_Init(BrBallRot *p_wk, const BrPoint *cp_center, u16 r, u16 rot, s32 sync_max);
 static BOOL BrBallRot_Main(BrBallRot *p_wk, BrPoint *p_now, s32 sync);
 static void BrBallLine_Init(BrBallLine *p_wk, const BrPoint *cp_start, const BrPoint *cp_end, s32 sync_start,
@@ -1348,7 +1348,7 @@ static void BrBallCircle_Init(BrBallCircle *p_wk, const BrPoint *cp_center, u16 
     BrBallCircle_Main(p_wk, &p_wk->now, 0);
 }
 
-static BOOL BrBallCircle_Main(BrBallCircle *p_wk, BrPoint *p_now, s32 sync) {
+static BOOL BrBallCircle_Main(BrBallCircle *p_wk, BrPoint *p_now, int sync) {
     u16 rot_dist = p_wk->rot_end - p_wk->rot_start;
     s16 r_dist = p_wk->r_end - (s16)p_wk->r_start;
     s8 dir = r_dist / MATH_ABS(r_dist);

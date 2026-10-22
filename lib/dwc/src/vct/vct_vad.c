@@ -10,59 +10,59 @@
 #include "vct_internal.h"
 
 // What the library has made of the microphone's loudness
-struct VCTCapture {
+struct VCTVADInfo {
     // Whether somebody is speaking
-    u32 speaking;
-    u32 level;
+    u32 activity;
+    u32 scale;
     // How many quiet frames end the speaking
-    int quietFrameLimit;
-    int unkC;
+    int releaseCount;
+    int releaseTime;
 };
 
-static VCTCapture sCapture = { 0, 0, 15, 0x3fc };
+static VCTVADInfo sVADInfo = { 0, 0, 15, 0x3fc };
 
 static u32 sNoiseThreshold;
-static int sQuietFrames;
-static u32 sNoiseIndex;
-static u32 sLoudnessHistory[4];
+static int sLostCount;
+static u32 sIndex;
+static u32 E2scales[4];
 
-void VCT_ResetCapture(void) {
+void VCT_ResetVAD(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
-        sLoudnessHistory[i] = 0x1000000;
+        E2scales[i] = 0x1000000;
     }
-    sNoiseIndex = 0;
+    sIndex = 0;
     sNoiseThreshold = 0;
-    sCapture.speaking = 0;
-    sCapture.level = 0;
-    sQuietFrames = 0;
+    sVADInfo.activity = 0;
+    sVADInfo.scale = 0;
+    sLostCount = 0;
 }
 
-void VCT_GetCaptureLevels(s32 *out) {
+void VCT_GetVADInfo(s32 *out) {
     if (out != NULL) {
-        MI_CpuCopy8(&sCapture, out, sizeof(VCTCapture));
+        MI_CpuCopy8(&sVADInfo, out, sizeof(VCTVADInfo));
     }
 }
 
 // Decides from the loudness of a frame whether a voice has started, goes on or has ended: 0 for none, 1 for the start,
 // 2 for the middle and 3 for the end
-int VCT_UpdateVad(u32 energy, u32 rms, u8 *level) {
+int VCTi_GetVADStatus(u32 energy, u32 rms, u8 *level) {
     u32 scaled = rms >> 8;
     int result;
 
-    sCapture.level = scaled;
+    sVADInfo.scale = scaled;
     if (level != NULL) {
         *level = scaled;
     }
-    if (sCapture.speaking == 0) {
+    if (sVADInfo.activity == 0) {
         u32 sum = 0;
         u32 floor;
         u32 j;
         int i;
 
         for (i = 0; i < 4; i++) {
-            sum += sLoudnessHistory[i];
+            sum += E2scales[i];
         }
         REG_SQRTCNT = 0;
         REG_SQRT_PARAM_LO = sum / 4;
@@ -72,52 +72,52 @@ int VCT_UpdateVad(u32 energy, u32 rms, u8 *level) {
         if (rms != 0 && rms >= floor * 2) {
             sum = 0;
             for (j = 0; j < 4; j++) {
-                sum += sLoudnessHistory[j];
+                sum += E2scales[j];
             }
             REG_SQRTCNT = 0;
             REG_SQRT_PARAM_LO = sum / 4;
             while (REG_SQRTCNT & REG_SQRTCNT_BUSY) {
             }
             sNoiseThreshold = REG_SQRT_RESULT * 3 / 2;
-            sNoiseIndex = 0;
-            sCapture.speaking = 1;
+            sIndex = 0;
+            sVADInfo.activity = 1;
             result = 1;
         } else {
             result = 0;
         }
-        sLoudnessHistory[sNoiseIndex] = energy;
-        sNoiseIndex = (sNoiseIndex + 1) & 3;
+        E2scales[sIndex] = energy;
+        sIndex = (sIndex + 1) & 3;
     } else {
         u32 sum = 0;
         int i;
 
-        sLoudnessHistory[sNoiseIndex] = energy;
-        sNoiseIndex = (sNoiseIndex + 1) & 3;
+        E2scales[sIndex] = energy;
+        sIndex = (sIndex + 1) & 3;
         for (i = 0; i < 4; i++) {
-            sum += sLoudnessHistory[i];
+            sum += E2scales[i];
         }
         REG_SQRTCNT = 0;
         REG_SQRT_PARAM_LO = sum / 4;
         while (REG_SQRTCNT & REG_SQRTCNT_BUSY) {
         }
         if (REG_SQRT_RESULT <= sNoiseThreshold) {
-            sQuietFrames++;
-            if (sQuietFrames > sCapture.quietFrameLimit) {
-                sCapture.speaking = 0;
-                sQuietFrames = 0;
-                sNoiseIndex = 0;
+            sLostCount++;
+            if (sLostCount > sVADInfo.releaseCount) {
+                sVADInfo.activity = 0;
+                sLostCount = 0;
+                sIndex = 0;
                 return 3;
             }
         } else {
-            sQuietFrames = 0;
+            sLostCount = 0;
         }
         result = 2;
     }
     return result;
 }
 
-void VCT_InitCapture(void) {
-    sCapture.quietFrameLimit = 15;
-    sCapture.unkC = sCapture.quietFrameLimit * 0x44;
-    VCT_ResetCapture();
+void vct_init_vad(void) {
+    sVADInfo.releaseCount = 15;
+    sVADInfo.releaseTime = sVADInfo.releaseCount * 0x44;
+    VCT_ResetVAD();
 }

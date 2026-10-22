@@ -550,7 +550,7 @@ static void PStaSkill_PrintMoveDetail(PStatusWork *wk, PStaSkillWork *skill) {
     BoxPkm *pkm = PStatus_GetBoxPkm(wk);
     u8 i;
     u32 move;
-    u32 category;
+    unsigned int category;
     u32 power;
     WordSet *wordSet;
     u32 accuracy;

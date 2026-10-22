@@ -8,29 +8,29 @@
 // and what the login gave
 typedef struct ScState {
     int loginDone;
-    ScClient *client;
+    SCInterface *client;
     ScResultFunc createSessionFunc;
     ScResultFunc reportIntentionFunc;
     ScResultFunc submitReportFunc;
-    AuthKeys keys;
-    AuthCertificate certificate;
+    GSLoginPrivateData keys;
+    GSLoginCertificate certificate;
 } ScState;
 
 static void Sc_Printf(int line, const char *format, ...);
-static void Sc_OnLogin(int status, AuthResult *result, void *userData);
+static void Sc_OnLogin(GHTTPResult status, WSLoginResponse *result, void *userData);
 static int Sc_GetErrorType(int error);
 static int Sc_GetErrorCode(int step, int error);
 static int Sc_SetAuthError(int error);
 static void Sc_ReleaseUrls(void);
-static void Sc_OnCreateSession(ScClient *client, int status, int error, void *userData);
-static void Sc_OnReportIntention(ScClient *client, int status, int error, void *userData);
-static void Sc_OnSubmitReport(ScClient *client, int status, int error, void *userData);
+static void Sc_OnCreateSession(SCInterface *client, GHTTPResult status, SCResult error, void *userData);
+static void Sc_OnReportIntention(SCInterface *client, GHTTPResult status, SCResult error, void *userData);
+static void Sc_OnSubmitReport(SCInterface *client, GHTTPResult status, SCResult error, void *userData);
 
 static ScState sScState;
 
 int Sc_Startup(int gameId, int server) {
-    const char *authToken;
-    const char *challenge;
+    char *authToken;
+    char *challenge;
     int error;
 
     gsCoreInitialize();
@@ -50,7 +50,7 @@ int Sc_Startup(int gameId, int server) {
     if (DWC_GetLastError(0) != 0) {
         return 7;
     }
-    error = ScClient_Create(gameId, &sScState.client);
+    error = scInitialize(gameId, &sScState.client);
     if (error != 0) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(2, error));
     }
@@ -58,7 +58,7 @@ int Sc_Startup(int gameId, int server) {
 }
 
 int Sc_Shutdown(void) {
-    int error = ScClient_Destroy(sScState.client);
+    int error = scShutdown(sScState.client);
 
     if (error != 0) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(3, error));
@@ -66,7 +66,7 @@ int Sc_Shutdown(void) {
     Sc_ReleaseUrls();
     gsCoreShutdown();
     gsCoreThink(0);
-    if (gsCoreIsShutdown() != 2) {
+    if (gsCoreIsShutdown() != GSCore_SHUTDOWN_COMPLETE) {
         gsCoreThink(0);
     }
     return error;
@@ -78,7 +78,7 @@ static void Sc_ReleaseUrls(void) {
 }
 
 int Sc_Update(void) {
-    int error = ScClient_Update(sScState.client);
+    int error = scThink(sScState.client);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(4, error));
@@ -90,15 +90,15 @@ int Sc_CreateSession(ScResultFunc func, int timeout, void *userData) {
     int error;
 
     sScState.createSessionFunc = func;
-    error = ScClient_CreateSession(sScState.client, &sScState.certificate, &sScState.keys, Sc_OnCreateSession, timeout,
-                                   userData);
+    error =
+        scCreateSession(sScState.client, &sScState.certificate, &sScState.keys, Sc_OnCreateSession, timeout, userData);
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(5, error));
     }
     return error;
 }
 
-static void Sc_OnCreateSession(ScClient *client, int status, int error, void *userData) {
+static void Sc_OnCreateSession(SCInterface *client, GHTTPResult status, SCResult error, void *userData) {
     sScState.createSessionFunc(error, userData);
 }
 
@@ -106,36 +106,36 @@ int Sc_SetReportIntention(int authoritative, ScResultFunc func, int timeout, voi
     int error;
 
     sScState.reportIntentionFunc = func;
-    error = ScClient_SetReportIntention(sScState.client, NULL, authoritative, &sScState.certificate, &sScState.keys,
-                                        Sc_OnReportIntention, timeout, userData);
+    error = scSetReportIntention(sScState.client, NULL, authoritative, &sScState.certificate, &sScState.keys,
+                                 Sc_OnReportIntention, timeout, userData);
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(7, error));
     }
     return error;
 }
 
-static void Sc_OnReportIntention(ScClient *client, int status, int error, void *userData) {
+static void Sc_OnReportIntention(SCInterface *client, GHTTPResult status, SCResult error, void *userData) {
     sScState.reportIntentionFunc(error, userData);
 }
 
-int Sc_SubmitReport(ScReport *report, int authoritative, ScResultFunc func, int timeout, void *userData) {
+int Sc_SubmitReport(SCIReport *report, int authoritative, ScResultFunc func, int timeout, void *userData) {
     int error;
 
     sScState.submitReportFunc = func;
-    error = ScClient_SubmitReport(sScState.client, report, authoritative, &sScState.certificate, &sScState.keys,
-                                  Sc_OnSubmitReport, timeout, userData);
+    error = scSubmitReport(sScState.client, report, authoritative, &sScState.certificate, &sScState.keys,
+                           Sc_OnSubmitReport, timeout, userData);
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(11, error));
     }
     return error;
 }
 
-static void Sc_OnSubmitReport(ScClient *client, int status, int error, void *userData) {
+static void Sc_OnSubmitReport(SCInterface *client, GHTTPResult status, SCResult error, void *userData) {
     sScState.submitReportFunc(error, userData);
 }
 
 int Sc_SetSessionId(const char *csid) {
-    int error = ScClient_SetCsid(sScState.client, csid);
+    int error = scSetSessionId(sScState.client, csid);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(8, error));
@@ -143,16 +143,16 @@ int Sc_SetSessionId(const char *csid) {
     return error;
 }
 
-char *Sc_GetSessionId(void) {
-    return ScClient_GetCsid(sScState.client);
+const char *Sc_GetSessionId(void) {
+    return scGetSessionId(sScState.client);
 }
 
-char *Sc_GetConnectionId(void) {
-    return ScClient_GetCcid(sScState.client);
+const char *Sc_GetConnectionId(void) {
+    return scGetConnectionId(sScState.client);
 }
 
-int Sc_CreateReport(int version, int playerNum, int teamNum, ScReport **report) {
-    int error = ScClient_CreateReport(sScState.client, version, playerNum, teamNum, report);
+int Sc_CreateReport(int version, int playerNum, int teamNum, SCIReport **report) {
+    int error = scCreateReport(sScState.client, version, playerNum, teamNum, report);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(9, error));
@@ -160,8 +160,8 @@ int Sc_CreateReport(int version, int playerNum, int teamNum, ScReport **report) 
     return error;
 }
 
-int Sc_BeginGame(ScReport *report) {
-    int error = ScReport_BeginGame(report);
+int Sc_BeginGame(SCIReport *report) {
+    int error = scReportBeginGlobalData(report);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(10, error));
@@ -169,8 +169,8 @@ int Sc_BeginGame(ScReport *report) {
     return error;
 }
 
-int Sc_BeginPlayers(ScReport *report) {
-    int error = ScReport_BeginPlayers(report);
+int Sc_BeginPlayers(SCIReport *report) {
+    int error = scReportBeginPlayerData(report);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(10, error));
@@ -178,8 +178,8 @@ int Sc_BeginPlayers(ScReport *report) {
     return error;
 }
 
-int Sc_BeginTeams(ScReport *report) {
-    int error = ScReport_BeginTeams(report);
+int Sc_BeginTeams(SCIReport *report) {
+    int error = scReportBeginTeamData(report);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(10, error));
@@ -187,8 +187,8 @@ int Sc_BeginTeams(ScReport *report) {
     return error;
 }
 
-int Sc_BeginGroup(ScReport *report) {
-    int error = ScReport_BeginGroup(report);
+int Sc_BeginGroup(SCIReport *report) {
+    int error = scReportBeginNewPlayer(report);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(10, error));
@@ -196,9 +196,9 @@ int Sc_BeginGroup(ScReport *report) {
     return error;
 }
 
-int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int result, const AuthCertificate *certificate,
-                 void *unused) {
-    int error = ScReport_SetPlayer(report, index, id, key, result, certificate->profileId, certificate, unused);
+int Sc_SetPlayer(SCIReport *report, int index, const char *id, int key, int result,
+                 const GSLoginCertificate *certificate, void *unused) {
+    int error = scReportSetPlayerData(report, index, id, key, result, certificate->mProfileId, certificate, unused);
 
     if (error != 0) {
         DWCi_SetError(8, Sc_GetErrorCode(10, error));
@@ -206,8 +206,8 @@ int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int resul
     return error;
 }
 
-int Sc_FinishReport(ScReport *report, int flag, int value) {
-    int error = ScReport_Finish(report, flag, value);
+int Sc_FinishReport(SCIReport *report, int flag, int value) {
+    int error = scReportEnd(report, flag, value);
 
     if (error != 0) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(10, error));
@@ -215,8 +215,8 @@ int Sc_FinishReport(ScReport *report, int flag, int value) {
     return error;
 }
 
-int Sc_AddInt(ScReport *report, int key, int value) {
-    int error = ScReport_AddInt(report, key, value);
+int Sc_AddInt(SCIReport *report, u16 key, s32 value) {
+    int error = scReportAddIntValue(report, key, value);
 
     if (error != 0) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(10, error));
@@ -224,8 +224,8 @@ int Sc_AddInt(ScReport *report, int key, int value) {
     return error;
 }
 
-int Sc_AddByte(ScReport *report, int key, int value) {
-    int error = ScReport_AddByte(report, key, value);
+int Sc_AddByte(SCIReport *report, u16 key, s8 value) {
+    int error = scReportAddByteValue(report, key, value);
 
     if (error != 0) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(10, error));
@@ -233,8 +233,8 @@ int Sc_AddByte(ScReport *report, int key, int value) {
     return error;
 }
 
-int Sc_FreeReport(ScReport *report) {
-    int error = ScReport_Free(report);
+int Sc_FreeReport(SCIReport *report) {
+    int error = scDestroyReport(report);
 
     if (error != 0) {
         DWCi_SetError(Sc_GetErrorType(error), Sc_GetErrorCode(13, error));
@@ -242,7 +242,7 @@ int Sc_FreeReport(ScReport *report) {
     return error;
 }
 
-int Sc_GetCertificate(const AuthCertificate **certificate) {
+int Sc_GetCertificate(const GSLoginCertificate **certificate) {
     *certificate = &sScState.certificate;
     return 0;
 }
@@ -258,7 +258,7 @@ static void Sc_Printf(int line, const char *format, ...) {
     va_end(args);
 }
 
-static void Sc_OnLogin(int status, AuthResult *result, void *userData) {
+static void Sc_OnLogin(GHTTPResult status, WSLoginResponse *result, void *userData) {
     if (status != 0) {
         Sc_Printf(789, "Failed on player login, GHTTP error: %d\n", status);
         if (status == 1) {
@@ -267,13 +267,13 @@ static void Sc_OnLogin(int status, AuthResult *result, void *userData) {
             DWCi_SetError(0x14, Sc_GetErrorCode(1, 7));
         }
         DWCi_HandleGHTTPError(status);
-    } else if (result->error != 0) {
-        Sc_Printf(803, "Failed on player login, Login result: %d\n", result->error);
-        Sc_SetAuthError(result->error);
+    } else if (result->mLoginResult != 0) {
+        Sc_Printf(803, "Failed on player login, Login result: %d\n", result->mLoginResult);
+        Sc_SetAuthError(result->mLoginResult);
     } else {
-        memcpy(&sScState.certificate, &result->certificate, sizeof(AuthCertificate));
-        memcpy(&sScState.keys, &result->keys, sizeof(AuthKeys));
-        Sc_Printf(811, "Player '%s' logged in.\r\n", result->certificate.uniqueNick);
+        memcpy(&sScState.certificate, &result->mCertificate, sizeof(GSLoginCertificate));
+        memcpy(&sScState.keys, &result->mPrivateData, sizeof(GSLoginPrivateData));
+        Sc_Printf(811, "Player '%s' logged in.\r\n", result->mCertificate.mUniqueNick);
     }
     sScState.loginDone = 1;
 }

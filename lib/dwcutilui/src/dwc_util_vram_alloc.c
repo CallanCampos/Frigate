@@ -16,22 +16,22 @@ typedef struct DWCUtilVramScreen {
 
 static DWCUtilVramScreen *sVramScreens;
 
-void DWCUtilVramAlloc_Init(void) {
+void DWCi_OVRlInit(void) {
     int i;
 
-    sVramScreens = DWCUtilHeap_AllocClear(sizeof(DWCUtilVramScreen) * 2, 4);
+    sVramScreens = DWCi_HEAPlAllocEx(sizeof(DWCUtilVramScreen) * 2, 4);
     for (i = 0; i < 2; i++) {
-        sVramScreens[i].freeNodes = DWCUtilStack_CreateFilled(32, (u8 *)sVramScreens[i].nodes, sizeof(DWCUtilVramNode));
-        sVramScreens[i].list = DWCUtilList_Create();
+        sVramScreens[i].freeNodes = DWCi_QUElFormEx(32, (u8 *)sVramScreens[i].nodes, sizeof(DWCUtilVramNode));
+        sVramScreens[i].list = DWCi_LSTlForm();
         sVramScreens[i].head.pos = 0x300;
         sVramScreens[i].tail.pos = 0x400;
-        DWCUtilList_Prepend(sVramScreens[i].list, &sVramScreens[i].head);
-        DWCUtilList_Append(sVramScreens[i].list, &sVramScreens[i].tail);
+        DWCi_LSTlPushFront(sVramScreens[i].list, &sVramScreens[i].head);
+        DWCi_LSTlPushBack(sVramScreens[i].list, &sVramScreens[i].tail);
     }
 }
 
-DWCUtilVramNode *DWCUtilVramAlloc_Alloc(int screen, int size, s16 fromFront, u32 *pos) {
-    DWCUtilVramNode *node = DWCUtilStack_Pop(sVramScreens[screen].freeNodes);
+DWCUtilVramNode *DWCi_OVRlAlloc(int screen, int size, s16 fromFront, u32 *pos) {
+    DWCUtilVramNode *node = DWCi_QUElPopFront(sVramScreens[screen].freeNodes);
     DWCUtilVramNode *position;
     int units = (size + 3 & ~3) >> 2;
     u32 irq;
@@ -46,7 +46,7 @@ DWCUtilVramNode *DWCUtilVramAlloc_Alloc(int screen, int size, s16 fromFront, u32
 
             if (end + units <= next->pos) {
                 node->pos = end;
-                DWCUtilList_InsertBefore(next, node);
+                DWCi_LSTlInsert(next, node);
                 break;
             }
             position = next;
@@ -62,7 +62,7 @@ DWCUtilVramNode *DWCUtilVramAlloc_Alloc(int screen, int size, s16 fromFront, u32
 
             if (start >= prev->pos + prev->size) {
                 node->pos = start;
-                DWCUtilList_InsertBefore(position, node);
+                DWCi_LSTlInsert(position, node);
                 break;
             }
             position = prev;
@@ -76,12 +76,12 @@ DWCUtilVramNode *DWCUtilVramAlloc_Alloc(int screen, int size, s16 fromFront, u32
     return node;
 }
 
-void DWCUtilVramAlloc_Free(DWCUtilVramNode *node) {
+void DWCi_OVRlFree(DWCUtilVramNode *node) {
     int screen = 0;
 
-    DWCUtilList_Remove(node);
+    DWCi_LSTlErase(node);
     if (node >= sVramScreens[1].nodes) {
         screen = 1;
     }
-    DWCUtilStack_Push(sVramScreens[screen].freeNodes, node);
+    DWCi_QUElPushBack(sVramScreens[screen].freeNodes, node);
 }

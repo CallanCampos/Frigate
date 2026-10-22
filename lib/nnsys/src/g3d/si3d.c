@@ -55,7 +55,7 @@ void NNSi_G3dSendJointSRTSi3d(const NNSG3dJntAnmResult *result) {
 // says so. Every joint keeps its scale and inverse scale, relative to the root, in g_NNSG3DRenderCache, and whether
 // that scale is one in the render state. The joint's scaleEx0 and scaleEx1 are the scale and inverse scale of its
 // parent, or flags say that they are one, as they are when the parent's scale is
-void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag) {
+void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const fx32 *p, const u8 *cmd, u32 srtFlag) {
     u32 node = cmd[1];
     u32 parent = cmd[2];
 
@@ -70,27 +70,27 @@ void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const NNSG3dJointScal
             MIi_CpuCopy32(&g_NNSG3DRenderCache.jointScales[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
         }
     } else {
-        result->scale.x = scale->scale.x;
-        result->scale.y = scale->scale.y;
-        result->scale.z = scale->scale.z;
+        result->scale.x = p[0];
+        result->scale.y = p[1];
+        result->scale.z = p[2];
         if (g_NNSG3DModelRenderer->isScaleOne[parent >> 5] & (1 << (parent & 0x1f))) {
-            MIi_CpuCopy32(scale, &g_NNSG3DRenderCache.jointScales[node], sizeof(NNSG3dJointScale));
+            MIi_CpuCopy32(p, &g_NNSG3DRenderCache.jointScales[node], sizeof(NNSG3dJointScale));
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE | NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE;
         } else {
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
             g_NNSG3DRenderCache.jointScales[node].scale.x =
-                (fx32)(((fx64)scale->scale.x * g_NNSG3DRenderCache.jointScales[parent].scale.x) >> FX32_SHIFT);
+                (fx32)(((fx64)p[0] * g_NNSG3DRenderCache.jointScales[parent].scale.x) >> FX32_SHIFT);
             g_NNSG3DRenderCache.jointScales[node].scale.y =
-                (fx32)(((fx64)scale->scale.y * g_NNSG3DRenderCache.jointScales[parent].scale.y) >> FX32_SHIFT);
+                (fx32)(((fx64)p[1] * g_NNSG3DRenderCache.jointScales[parent].scale.y) >> FX32_SHIFT);
             g_NNSG3DRenderCache.jointScales[node].scale.z =
-                (fx32)(((fx64)scale->scale.z * g_NNSG3DRenderCache.jointScales[parent].scale.z) >> FX32_SHIFT);
+                (fx32)(((fx64)p[2] * g_NNSG3DRenderCache.jointScales[parent].scale.z) >> FX32_SHIFT);
             g_NNSG3DRenderCache.jointScales[node].invScale.x =
-                (fx32)(((fx64)scale->invScale.x * g_NNSG3DRenderCache.jointScales[parent].invScale.x) >> FX32_SHIFT);
+                (fx32)(((fx64)p[3] * g_NNSG3DRenderCache.jointScales[parent].invScale.x) >> FX32_SHIFT);
             g_NNSG3DRenderCache.jointScales[node].invScale.y =
-                (fx32)(((fx64)scale->invScale.y * g_NNSG3DRenderCache.jointScales[parent].invScale.y) >> FX32_SHIFT);
+                (fx32)(((fx64)p[4] * g_NNSG3DRenderCache.jointScales[parent].invScale.y) >> FX32_SHIFT);
             g_NNSG3DRenderCache.jointScales[node].invScale.z =
-                (fx32)(((fx64)scale->invScale.z * g_NNSG3DRenderCache.jointScales[parent].invScale.z) >> FX32_SHIFT);
+                (fx32)(((fx64)p[5] * g_NNSG3DRenderCache.jointScales[parent].invScale.z) >> FX32_SHIFT);
             MIi_CpuCopy32(&g_NNSG3DRenderCache.jointScales[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
         }
     }
@@ -105,7 +105,7 @@ static inline void sendPacket_(const u32 *packet, u32 num) {
 // rotation for, with the scale of the texture's size to its original size on the S and T of the matrix, and then the
 // geometry engine's matrix mode back to position and vector. With TEXMTX_SET it is loaded, and with TEXMTX_MULT it is
 // multiplied into the matrix that is there
-void NNSi_G3dSendTexSRTSi3d(NNSG3dMatAnmResult *result) {
+void NNSi_G3dSendTexSRTSi3d(const NNSG3dMatAnmResult *result) {
     struct {
         u32 op; // MTX_MODE, MTX_LOAD_4x3 or MTX_MULT_4x3, MTX_MODE
         u32 modeTexture;

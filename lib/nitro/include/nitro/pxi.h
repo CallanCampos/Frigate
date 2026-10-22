@@ -35,27 +35,37 @@
 // The tags of the FIFO's words: each library has its own, 5 bits wide. The card's commands travel with the tag of the
 // ARM7's file system, which reads the card; the DSi's libraries in the LTD autoload have theirs from 20
 #define PXI_MAX_FIFO_TAG 32
-#define PXI_FIFO_TAG_EX 0
-#define PXI_FIFO_TAG_NVRAM 4
-#define PXI_FIFO_TAG_RTC 5
-#define PXI_FIFO_TAG_TOUCHPANEL 6
-#define PXI_FIFO_TAG_SOUND 7
-#define PXI_FIFO_TAG_PM 8
-#define PXI_FIFO_TAG_MIC 9
-#define PXI_FIFO_TAG_WM 10
-#define PXI_FIFO_TAG_FS 11
-#define PXI_FIFO_TAG_OS 12
-#define PXI_FIFO_TAG_CTRDG 13
-#define PXI_FIFO_TAG_CARD 14
-#define PXI_FIFO_TAG_FATFS 20
-#define PXI_FIFO_TAG_CAMERA 21
-#define PXI_FIFO_TAG_NWM 22
-#define PXI_FIFO_TAG_SCFG 23
-#define PXI_FIFO_TAG_SNDEX 24
+typedef enum {
+    PXI_FIFO_TAG_EX = 0,
+    PXI_FIFO_TAG_USER_0 = 1,
+    PXI_FIFO_TAG_USER_1 = 2,
+    PXI_FIFO_TAG_SYSTEM = 3,
+    PXI_FIFO_TAG_NVRAM = 4,
+    PXI_FIFO_TAG_RTC = 5,
+    PXI_FIFO_TAG_TOUCHPANEL = 6,
+    PXI_FIFO_TAG_SOUND = 7,
+    PXI_FIFO_TAG_PM = 8,
+    PXI_FIFO_TAG_MIC = 9,
+    PXI_FIFO_TAG_WM = 10,
+    PXI_FIFO_TAG_FS = 11,
+    PXI_FIFO_TAG_OS = 12,
+    PXI_FIFO_TAG_CTRDG = 13,
+    PXI_FIFO_TAG_CARD = 14,
+    PXI_FIFO_TAG_WVR = 15,
+    PXI_FIFO_TAG_CTRDG_Ex = 16,
+    PXI_FIFO_TAG_CTRDG_PHI = 17,
+    PXI_FIFO_TAG_FATFS = 20,
+    PXI_FIFO_TAG_CAMERA = 21,
+    PXI_FIFO_TAG_NWM = 22,
+    PXI_FIFO_TAG_SCFG = 23,
+    PXI_FIFO_TAG_SNDEX = 24,
+} PXIFifoTag;
 
 // The processors, for PXI_IsCallbackReady
-#define PXI_PROC_ARM9 0
-#define PXI_PROC_ARM7 1
+typedef enum {
+    PXI_PROC_ARM9 = 0,
+    PXI_PROC_ARM7 = 1,
+} PXIProc;
 
 // A word of the FIFO
 typedef union {
@@ -67,21 +77,21 @@ typedef union {
     } e;
 } PXIFifoMessage;
 
-typedef void (*PXIFifoCallback)(u32 fifoTag, u32 data, BOOL err);
+typedef void (*PXIFifoCallback)(PXIFifoTag fifoTag, u32 data, BOOL err);
 
 // Sets up the FIFO (NitroSDK's PXI_Init, which calls PXI_InitFifo, NitroSDK's PXI_InitFifo)
 void PXI_Init(void);
 void PXI_InitFifo(void);
 // Sets the function called with the words the ARM7 sends with the tag, and marks the tag ready for the ARM7 in the
 // shared memory; NULL clears both (PXI_SetFifoRecvCallback's code)
-void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback);
+void PXI_SetFifoRecvCallback(int fifoTag, PXIFifoCallback callback);
 // Sends a word with the tag. Negative when the FIFO is full or in error
-int PXI_SendWordByFifo(u32 fifoTag, u32 data, BOOL err);
+int PXI_SendWordByFifo(int fifoTag, u32 data, BOOL err);
 // NitroSDK's PXIi_HandlerRecvFifoNotEmpty: the interrupt handler that calls the callbacks with the words received,
 // which the loops that wait with the interrupts off also call
 void PXIi_HandlerRecvFifoNotEmpty(void);
 // NitroSDK's PXI_IsCallbackReady: whether the processor has a callback for the tag, by its bit in the shared memory
 // (OSSystemWork's pxiHandleChecker, nitro/os.h)
-BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor);
+BOOL PXI_IsCallbackReady(int fifoTag, PXIProc processor);
 
 #endif // POKEBW2_NITRO_PXI_H

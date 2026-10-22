@@ -224,7 +224,7 @@ static void CARDi_OnRomDmaInterrupt(void) {
 
 // Has the DMA channel receive the first page, and leaves the rest to the interrupt
 void CARDi_ReadRomWithDMA(CARDiRomDmaRead *read) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     sRomDmaActive = read;
     OS_SetIrqFunction(OS_IE_CARD_DATA, CARDi_OnRomDmaInterrupt);
     OS_ResetRequestIrqMask(OS_IE_CARD_DATA);
@@ -298,7 +298,7 @@ static void CARDi_ReadRomTask(CARDiCommon *p) {
 
 // CARDi_ReadRom: reads len bytes of the ROM from the offset src, by DMA if the channel and the addresses allow it, else
 // with the reader on the thread. Waits for the end unless async
-void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async) {
+void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async) {
     CARDiCommon *p = &cardi_common;
     u32 dmaNo;
     CARD_CheckEnabled();
@@ -316,7 +316,7 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
     if (dmaNo <= 3) {
         p->dmaInterface->Stop(dmaNo);
     }
-    p->src = src + cardi_rom_base;
+    p->src = (u32)src + cardi_rom_base;
     p->dst = (u32)dst;
     p->len = len;
     sRomDmaRead.callback = CARDi_OnReadRomDmaDone;
@@ -326,7 +326,7 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
     sRomDmaRead.len = p->len;
     sRomDmaRead.unk_18 = 0;
     if (sRomReader == CARDi_ReadRomWithCPU && CARDi_CanReadRomWithDMA(p->dma, (u32)dst, p->src, len)) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         if (sInvalidateIC) {
             CARDi_ICInvalidateSmart((void *)p->dst, p->len, p->icInvalidateThreshold);
         }

@@ -22,23 +22,23 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-static void DWCUtilAutoConnect_LoadGraphics(void);
+static void initGraphics(void);
 static void DWCUtilAutoConnect_StartAutoConnect(void);
-static void DWCUtilAutoConnect_FadeIn(void);
-static void DWCUtilAutoConnect_WaitFadeIn(void);
-static void DWCUtilAutoConnect_Main(void);
-static void func_ov182_021b62c4(void);
-static void func_ov182_021b62c8(void);
-static void func_ov182_021b62cc(void);
+static void procInit(void);
+static void procInit1(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilAutoConnect_FadeOut(void);
-static void DWCUtilAutoConnect_WaitFadeOut(void);
-static void DWCUtilAutoConnect_EndAutoConnect(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg);
-static void *DWCUtilAutoConnect_Alloc(u32 name, u32 size);
-static void DWCUtilAutoConnect_Free(u32 name, void *ptr, u32 size);
+static void *DWCUtilAutoConnect_Alloc(u32 name, s32 size);
+static void DWCUtilAutoConnect_Free(u32 name, void *ptr, s32 size);
 
 // What auto-connect is started with: the utility's allocator, DMA channel 3 and the radio on
-static const DWCAcParam sAutoConnectParam = { DWCUtilAutoConnect_Alloc, DWCUtilAutoConnect_Free, 3, 1, 0, 0, 0, 0, 0 };
+static const DWCACConfig sAutoConnectParam = { DWCUtilAutoConnect_Alloc, DWCUtilAutoConnect_Free, 3, 1, 0, 0, 0, 0, 0 };
 
 // Whether the connection test succeeded
 static u8 sAutoConnectSucceeded;
@@ -47,24 +47,24 @@ void DWCUtilAutoConnect_Init(void) {
     int from;
 
     sAutoConnectSucceeded = FALSE;
-    DWCUtilAutoConnect_LoadGraphics();
-    DWCUtilMain_GetScreenArgs(NULL, &from);
+    initGraphics();
+    DWCi_GetParam2_(NULL, &from);
     if (from == 0) {
-        DWCUtilScreen_Start(0x31, -1, 0);
+        DWCi_COMMENTlDispEx(0x31, -1, 0);
     }
-    DWCUtilGfxResource_ShowStep(2);
+    DWCi_CMNlStep(2);
     if (from == 0) {
-        DWCUtilBgOverlay_ShowConnectionSet();
+        DWCi_HLlLoadSet();
     }
-    DWCUtilGfxResource_ShowMessage(0x2c);
-    DWCUtilUiEffect_Init(0);
+    DWCi_CMNlMsgDraw(0x2c);
+    DWCi_ANIMElInitEx(0);
     DWCUtilAutoConnect_StartAutoConnect();
     DWCUtilLinkIcon_Init(0);
     DWCUtilSound_PlaySe(0xc);
-    DWCUtilMain_SetUpdate(DWCUtilAutoConnect_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilAutoConnect_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
@@ -79,116 +79,116 @@ static void DWCUtilAutoConnect_LoadGraphics(void) {
 // for that, and the task that waits for its result
 static void DWCUtilAutoConnect_StartAutoConnect(void) {
     DWCUtilSettingsEdit *edit = DWCUtilWifiSettings_GetEdit();
-    DWCAcParam param;
+    DWCACConfig param;
     int from;
 
-    MIi_CpuCopy32(&sAutoConnectParam, &param, sizeof(DWCAcParam));
-    DWCUtilMain_GetScreenArgs(NULL, &from);
+    MIi_CpuCopy32(&sAutoConnectParam, &param, sizeof(DWCACConfig));
+    DWCi_GetParam2_(NULL, &from);
     if (from == 2) {
         param.mode = 4;
     } else {
         param.mode = edit->index + 1;
     }
-    if (!DWCAc_Create(&param)) {
+    if (!DWC_AC_Create(&param)) {
         OS_Terminate();
     }
     if (from == 0) {
-        DWCAc_SetDsConnection(edit->index, edit);
+        DWCi_AC_InsertApInfo(edit->index, edit);
     }
-    DWCUtilTask_Create(0, DWCUtilAutoConnect_ProcessTask, NULL, 0x78);
+    DWCi_TSKlForm(0, DWCUtilAutoConnect_ProcessTask, NULL, 0x78);
 }
 
-static void DWCUtilAutoConnect_FadeIn(void) {
+static void procInit(void) {
     int from;
 
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_GetScreenArgs(NULL, &from);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_GetParam2_(NULL, &from);
     if (from == 0) {
-        DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
+        DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
     }
-    DWCUtilMain_SetUpdate(DWCUtilAutoConnect_WaitFadeIn);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilAutoConnect_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnect_Main);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilAutoConnect_Main(void) {
-    func_ov182_021b62c4();
-    func_ov182_021b62c8();
-    func_ov182_021b62cc();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void func_ov182_021b62c4(void) {
+static void input(void) {
 }
 
-static void func_ov182_021b62c8(void) {
+static void draw(void) {
 }
 
-static void func_ov182_021b62cc(void) {
+static void button(void) {
 }
 
 static void DWCUtilAutoConnect_FadeOut(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilMain_SetUpdate(DWCUtilAutoConnect_WaitFadeOut);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilAutoConnect_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnect_EndAutoConnect);
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_ChangeScene(endScene2);
     }
 }
 
 // Once auto-connect is down, puts the Wi-Fi ID back into the first two pages of the settings, and goes on to the
 // message of a success or to the error screen
-static void DWCUtilAutoConnect_EndAutoConnect(void) {
-    DWCBmNtrPage *pages = (DWCBmNtrPage *)DWCUtilWifiSettings_GetPages();
+static void endScene2(void) {
+    DWCMemPage *pages = (DWCMemPage *)DWCi_SETTINGlGetMemMap();
 
-    if (DWCAc_Destroy()) {
-        MI_CpuCopy8(DWCBm_GetPackedWifiIdInfo(), pages[0].wifiId, DWC_BM_PACKED_SIZE);
-        MI_CpuCopy8(DWCBm_GetPackedWifiIdInfo(), pages[1].wifiId, DWC_BM_PACKED_SIZE);
-        DWCUtilUiEffect_Destroy();
-        DWCUtilText_DestroyScreenBg(0);
+    if (DWC_AC_Destroy()) {
+        MI_CpuCopy8(DWCi_BACKUPlGetWifi(), pages[0].wifi, DWC_BM_PACKED_SIZE);
+        MI_CpuCopy8(DWCi_BACKUPlGetWifi(), pages[1].wifi, DWC_BM_PACKED_SIZE);
+        DWCi_ANIMElEnd();
+        DWCi_FNTlDeleteBgLcd(0);
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sAutoConnectSucceeded) {
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(DWCUtilError_Init);
+            DWCi_SetParam_(0, 1);
+            DWCi_ChangeScene(DWCUtilError_Init);
         } else {
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_Init);
+            DWCi_SetParam_(0, 1);
+            DWCi_ChangeScene(DWCUtilAutoConnectOk_Init);
         }
     }
 }
 
 // Runs auto-connect until it connects or fails, which keeps the error code for the error screen
 static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg) {
-    s32 result = DWCAc_Process();
+    s32 result = DWC_AC_Process();
 
     if (result != 0) {
-        DWCUtilLinkIcon_Exit();
+        DWCi_ICONlEnd();
         DWCUtilSound_StopSe();
         if (result > 0) {
             sAutoConnectSucceeded = TRUE;
             DWCUtilSound_PlaySe(0x11);
         } else {
-            DWCUtilError_SetCode(DWCAc_GetStatus());
+            DWCi_SetErrorCode(DWC_AC_GetStatus());
             DWCUtilSound_PlaySe(0x12);
         }
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnect_FadeOut);
-        DWCUtilTask_QueueRemoval(0, task);
+        DWCi_ChangeScene(DWCUtilAutoConnect_FadeOut);
+        DWCi_TSKlDelete(0, task);
     }
 }
 
-static void *DWCUtilAutoConnect_Alloc(u32 name, u32 size) {
-    return DWCUtilHeap_AllocClear(size, 0x20);
+static void *DWCUtilAutoConnect_Alloc(u32 name, s32 size) {
+    return DWCi_HEAPlAllocEx(size, 0x20);
 }
 
-static void DWCUtilAutoConnect_Free(u32 name, void *ptr, u32 size) {
-    DWCUtilHeap_Free(ptr);
+static void DWCUtilAutoConnect_Free(u32 name, void *ptr, s32 size) {
+    DWCi_HEAPlFree2(ptr);
 }

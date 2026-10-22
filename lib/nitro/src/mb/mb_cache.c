@@ -8,7 +8,7 @@ void MBCache_Clear(MBCache *cache) {
 
 // Keeps a part of the program in the first free entry
 void MBCache_Add(MBCache *cache, u32 offset, u32 size, void *buf, u32 state) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     MBCacheEntry *entry = &cache->entries[0];
     MBCacheEntry *end = &cache->entries[MB_CACHE_ENTRY_COUNT];
 
@@ -31,7 +31,7 @@ void MBCache_Add(MBCache *cache, u32 offset, u32 size, void *buf, u32 state) {
 // Copies a part of the program from the cache, if it is all there
 BOOL MBCache_Read(MBCache *cache, u32 offset, void *dst, u32 size) {
     BOOL found = FALSE;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     MBCacheEntry *entry;
 
     for (entry = &cache->entries[0]; entry < &cache->entries[MB_CACHE_ENTRY_COUNT]; entry++) {

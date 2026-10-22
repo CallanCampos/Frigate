@@ -55,26 +55,26 @@ typedef struct DWCUtilScreenApState {
     DWCUtilScreenAp *work;
 } DWCUtilScreenApState;
 
-static void DWCUtilScreenAp_LoadGraphics(void);
+static void initGraphics(void);
 static void DWCUtilScreenAp_CreateButtons(void);
-static void DWCUtilScreenAp_FadeIn(void);
-static void DWCUtilScreenAp_WaitFadeIn(void);
-static void DWCUtilScreenAp_WaitButtons(void);
-static void DWCUtilScreenAp_Main(void);
-static void DWCUtilScreenAp_HandleInput(void);
-static void func_ov182_021b5648(void);
-static void DWCUtilScreenAp_HandleChoice(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilScreenAp_DisableButtons(void);
-static void DWCUtilScreenAp_FadeOut(void);
-static void DWCUtilScreenAp_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilScreenAp_DrawCursor(void);
 static void DWCUtilScreenAp_MoveCursor(int direction);
-static void DWCUtilScreenAp_ShowErasePressed(void);
-static void DWCUtilScreenAp_WaitEraseAnswer(void);
-static void DWCUtilScreenAp_WaitDialogClosed(void);
+static void dispPushClear(void);
+static void procErase(void);
+static void procErase1(void);
 static void DWCUtilScreenAp_HighlightButton(void);
 
-// The cell of a connection's button by its status (DWCBmConnection.status, 3 for one not in use), where the cursor
+// The cell of a connection's button by its status (DWCBMApInfo.status, 3 for one not in use), where the cursor
 // frames each button and where it is touched (left, top, right and bottom), the slot of the erase prompt's number by
 // language, and where the buttons of the connections and then their erase buttons are. Declared in the order that,
 // with MWCC's sort of the file's data by size, gives the ROM's .rodata
@@ -95,26 +95,26 @@ static const u16 sScreenApButtonPos[SCREEN_AP_CONNECTIONS * 2][2] = {
 static DWCUtilScreenApState sScreenAp;
 
 void DWCUtilScreenAp_Init(void) {
-    sScreenAp.work = DWCUtilHeap_AllocClear(sizeof(DWCUtilScreenAp), 4);
+    sScreenAp.work = DWCi_HEAPlAllocEx(sizeof(DWCUtilScreenAp), 4);
     sScreenAp.work->end = SCREEN_AP_RUNNING;
-    DWCUtilScreenAp_LoadGraphics();
-    DWCUtilBgOverlay_Show(1);
-    DWCUtilScreen_Start(0x2f, -1, 0);
-    DWCUtilGfxResource_ShowStep(0);
+    initGraphics();
+    DWCi_HLlLoad(1);
+    DWCi_COMMENTlDispEx(0x2f, -1, 0);
+    DWCi_CMNlStep(0);
     DWCUtilScreenAp_CreateButtons();
     DWCUtilScreenAp_DrawCursor();
-    DWCUtilMain_SetUpdate(DWCUtilScreenAp_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilScreenAp_LoadGraphics(void) {
+static void initGraphics(void) {
     char palettePath[] = "char/ybBgStep11.ncl.l";
 
     DWCUtilGfxResource_Load("char/ybObjWay.ncl.l", GX_LoadOBJPltt);
     DWCUtilGfxResource_Load("char/jbBgStep1.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/jbBgStep1.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/jb2Ap.nsc.l", GX_LoadBG2Scr);
-    sScreenAp.work->palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_OBJ);
+    sScreenAp.work->palette = DWCUtilRomResource_LoadFile(DWCi_Char(palettePath), NULL, 4);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_OBJ);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
@@ -127,93 +127,93 @@ static void DWCUtilScreenAp_CreateButtons(void) {
     int status;
 
     for (i = 0; i < SCREEN_AP_CONNECTIONS; i++) {
-        status = DWCUtilWifiSettings_GetStatus(i);
-        if (status == DWC_BM_CONNECTION_UNUSED) {
+        status = DWCi_SETTINGlGetSetType(i);
+        if (status == DWC_SETTYPE_NONE) {
             status = 3;
         } else {
             int pos = i + SCREEN_AP_CONNECTIONS;
 
             sScreenAp.work->eraseButtons[i] = DWCUtilCell_AllocOamRun(0, 0x11, TRUE);
-            DWCUtilOam_SetNodePosition(sScreenAp.work->eraseButtons[i], -1, sScreenApButtonPos[pos][0],
-                                       sScreenApButtonPos[pos][1]);
-            DWCUtilOam_SetPriority(sScreenAp.work->eraseButtons[i], -1, 3);
+            DWCi_CELLlSetPosition(sScreenAp.work->eraseButtons[i], -1, sScreenApButtonPos[pos][0],
+                                  sScreenApButtonPos[pos][1]);
+            DWCi_CELLlSetPriority(sScreenAp.work->eraseButtons[i], -1, 3);
         }
         sScreenAp.work->buttons[i] = DWCUtilCell_AllocOamRun(0, sScreenApCells[status], TRUE);
-        DWCUtilOam_SetNodePosition(sScreenAp.work->buttons[i], -1, sScreenApButtonPos[i][0], sScreenApButtonPos[i][1]);
-        DWCUtilOam_SetPriority(sScreenAp.work->buttons[i], -1, 3);
+        DWCi_CELLlSetPosition(sScreenAp.work->buttons[i], -1, sScreenApButtonPos[i][0], sScreenApButtonPos[i][1]);
+        DWCi_CELLlSetPriority(sScreenAp.work->buttons[i], -1, 3);
     }
 }
 
-static void DWCUtilScreenAp_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilScreenAp_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(0);
-        DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(0);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilScreenAp_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2 && DWCUtilSubScreen_IsSliding() != TRUE) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilScreenAp_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2 && DWCi_STEPlGet() != TRUE) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilScreenAp_Main(void) {
-    DWCUtilScreenAp_HandleInput();
-    func_ov182_021b5648();
-    DWCUtilScreenAp_HandleChoice();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilScreenAp_HandleInput(void) {
+static void input(void) {
     u32 i;
 
     for (i = 0; i < SCREEN_AP_BUTTONS; i++) {
-        if (DWCUtilTouch_IsTriggeredIn(sScreenApTouchRects[i])) {
-            DWCUtilUiObject_SetStateIfIdle(1);
+        if (DWCi_TPlCheckTrigger(sScreenApTouchRects[i])) {
+            DWCi_BTNlSet(1);
             sScreenAp.cursor = i;
             DWCUtilScreenAp_DrawCursor();
             return;
         }
     }
-    if (DWCUtilTouch_IsKeyPressed(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
-    } else if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(1);
+    } else if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
+    } else if (DWCi_IPTlCheckRepeat(0x40)) {
         DWCUtilScreenAp_MoveCursor(1);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+    } else if (DWCi_IPTlCheckRepeat(0x80)) {
         DWCUtilScreenAp_MoveCursor(3);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x20)) {
+    } else if (DWCi_IPTlCheckRepeat(0x20)) {
         DWCUtilScreenAp_MoveCursor(0);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x10)) {
+    } else if (DWCi_IPTlCheckRepeat(0x10)) {
         DWCUtilScreenAp_MoveCursor(2);
     }
 }
 
-static void func_ov182_021b5648(void) {
+static void draw(void) {
 }
 
-static void DWCUtilScreenAp_HandleChoice(void) {
+static void button(void) {
     int index;
 
-    switch (DWCUtilUiObject_GetState()) {
+    switch (DWCi_BTNlGet()) {
     case 0:
-        switch (DWCUtilMain_GetStartScreen()) {
+        switch (DWCi_Entry()) {
         case 0:
             DWCUtilSound_PlaySe(7);
             sScreenAp.work->end = SCREEN_AP_CANCELLED;
             break;
         case 1:
-            DWCUtilUiObject_Disable();
-            DWCUtilMain_SetUpdate(DWCUtilMainMenu_ExitUtility);
+            DWCi_BTNlDisable();
+            DWCi_ChangeScene(DWCUtilMainMenu_ExitUtility);
             return;
         }
         break;
@@ -221,20 +221,20 @@ static void DWCUtilScreenAp_HandleChoice(void) {
         sScreenAp.work->end = SCREEN_AP_CHOSEN;
         if (sScreenAp.cursor >= SCREEN_AP_FIRST_ERASE) {
             index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
-            if (DWCUtilWifiSettings_GetStatus(index) == DWC_BM_CONNECTION_UNUSED) {
+            if (DWCi_SETTINGlGetSetType(index) == DWC_SETTYPE_NONE) {
                 DWCUtilSound_PlaySe(9);
-                DWCUtilUiObject_SetState(-1);
+                DWCi_BTNlSetForce(-1);
                 return;
             }
             DWCUtilSound_PlaySe(6);
-            DWCUtilDialog_Open(0x46, 0, 1, sScreenApMsgSlots[DWCUtilMain_GetLanguage()], index + 1);
-            DWCUtilScreenAp_ShowErasePressed();
-            DWCUtilUiObject_Disable();
-            DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitEraseAnswer);
+            DWCUtilDialog_Open(0x46, 0, 1, sScreenApMsgSlots[DWCi_Language()], index + 1);
+            dispPushClear();
+            DWCi_BTNlDisable();
+            DWCi_ChangeScene(procErase);
             return;
         }
         if (sScreenAp.cursor <= 2) {
-            DWCUtilWifiSettings_EditConnection(sScreenAp.cursor);
+            DWCi_SETTINGlSetSetting(sScreenAp.cursor);
         }
         DWCUtilSound_PlaySe(6);
         DWCUtilScreenAp_HighlightButton();
@@ -242,93 +242,92 @@ static void DWCUtilScreenAp_HandleChoice(void) {
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(DWCUtilScreenAp_DisableButtons);
+    DWCi_ChangeScene(DWCUtilScreenAp_DisableButtons);
 }
 
 static void DWCUtilScreenAp_DisableButtons(void) {
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
-        DWCUtilSubScreen_SlideOutRow();
+        DWCi_STEPlEnd();
     }
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilScreenAp_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilScreenAp_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
         if (sScreenAp.work->end == SCREEN_AP_CHOSEN &&
             (sScreenAp.cursor == SCREEN_AP_WIDE_BUTTON ||
-             DWCUtilWifiSettings_GetEdit()->connection.status != DWC_BM_CONNECTION_UNUSED)) {
-            DWCUtilUiObject_Exit();
+             DWCUtilWifiSettings_GetEdit()->connection.setType != DWC_SETTYPE_NONE)) {
+            DWCi_BTNlEnd();
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilScreenAp_WaitFadeOut(void) {
+static void endScene2(void) {
     u32 i;
 
-    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
+    if (DWCi_EFFlCheck(1) != 0 || DWCi_EFFlCheck(0) != 0) {
         return;
     }
-    if (!DWCUtilSubScreen_IsNotSlidingOut() || !DWCUtilUiObject_IsIdle()) {
+    if (!DWCi_STEPlIsEnd() || !DWCi_BTNlIsEnd()) {
         return;
     }
     for (i = 0; i < SCREEN_AP_CONNECTIONS; i++) {
         if (sScreenAp.work->buttons[i] != NULL) {
-            DWCUtilOam_Free(sScreenAp.work->buttons[i]);
+            DWCi_CELLlDelete(sScreenAp.work->buttons[i]);
         }
     }
     for (i = 0; i < SCREEN_AP_CONNECTIONS; i++) {
         if (sScreenAp.work->eraseButtons[i] != NULL) {
-            DWCUtilOam_Free(sScreenAp.work->eraseButtons[i]);
+            DWCi_CELLlDelete(sScreenAp.work->eraseButtons[i]);
         }
     }
-    DWCUtilButtonSprites_Hide();
-    DWCUtilScreen_Stop();
-    DWCUtilRomResource_FreeFile(sScreenAp.work->palette);
+    DWCi_FOCUSlDelete();
+    DWCi_COMMENTlDelete();
+    DWCi_ARClRelease(sScreenAp.work->palette);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (sScreenAp.work->end == SCREEN_AP_CANCELLED) {
-        DWCUtilMain_SetLayout(0, 0);
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
+        DWCi_SetParam_(0, 0);
+        DWCi_ChangeScene(DWCi_SceneMenu);
     } else {
         switch (sScreenAp.cursor) {
         case 0:
         case 1:
         case 2:
-            DWCUtilMain_SetLayout(2, 0);
-            if (DWCUtilWifiSettings_GetEdit()->connection.status == DWC_BM_CONNECTION_UNUSED) {
-                DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
+            DWCi_SetParam_(2, 0);
+            if (DWCUtilWifiSettings_GetEdit()->connection.setType == DWC_SETTYPE_NONE) {
+                DWCi_ChangeScene(DWCUtilScreenWay_Init);
             } else {
-                DWCUtilMain_SetScreenArgs(0, 0);
-                DWCUtilAddressSettings_SetFrom(0);
-                DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
+                DWCi_SetParam2_(0, 0);
+                DWCi_SetListReturn(0);
+                DWCi_ChangeScene(DWCUtilAddressSettings_Init);
             }
             break;
         case SCREEN_AP_WIDE_BUTTON:
-            DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(DWCUtilUsbIntro_Init);
+            DWCi_SetParam_(2, 1);
+            DWCi_ChangeScene(DWCUtilUsbIntro_Init);
             break;
         }
     }
-    DWCUtilHeap_FreeAndNull(&sScreenAp.work);
+    DWCi_HEAPlFree_(&sScreenAp.work);
 }
 
 // Frames the button under the cursor: the buttons of the top row and the wide button with the four corners, an erase
 // button with the pair of sprites
 static void DWCUtilScreenAp_DrawCursor(void) {
     if (sScreenAp.cursor < SCREEN_AP_FIRST_ERASE) {
-        DWCUtilButtonSprites_ShowFour(
-            sScreenApCursorRects[sScreenAp.cursor][0], sScreenApCursorRects[sScreenAp.cursor][2],
-            sScreenApCursorRects[sScreenAp.cursor][1], sScreenApCursorRects[sScreenAp.cursor][3]);
+        DWCi_FOCUSlDisp4(sScreenApCursorRects[sScreenAp.cursor][0], sScreenApCursorRects[sScreenAp.cursor][2],
+                         sScreenApCursorRects[sScreenAp.cursor][1], sScreenApCursorRects[sScreenAp.cursor][3]);
         return;
     }
-    DWCUtilButtonSprites_ShowPair(0, sScreenApCursorRects[sScreenAp.cursor][0],
-                                  sScreenApCursorRects[sScreenAp.cursor][2], sScreenApCursorRects[sScreenAp.cursor][1]);
+    DWCi_FOCUSlDisp(0, sScreenApCursorRects[sScreenAp.cursor][0], sScreenApCursorRects[sScreenAp.cursor][2],
+                    sScreenApCursorRects[sScreenAp.cursor][1]);
 }
 
 // Moves the cursor left, up, right or down (0 to 3)
@@ -429,49 +428,49 @@ static void DWCUtilScreenAp_MoveCursor(int direction) {
 }
 
 // Shows the chosen erase button pressed
-static void DWCUtilScreenAp_ShowErasePressed(void) {
+static void dispPushClear(void) {
     int index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
 
-    DWCUtilCell_Copy(0, 0x32, DWCUtilOam_GetEntry(sScreenAp.work->eraseButtons[index], 0));
-    DWCUtilOam_SetNodePosition(sScreenAp.work->eraseButtons[index], -1, sScreenApButtonPos[index + 3][0],
-                               sScreenApButtonPos[index + 3][1]);
-    DWCUtilOam_SetPriority(sScreenAp.work->eraseButtons[index], -1, 3);
+    DWCUtilCell_Copy(0, 0x32, DWCi_CELLlGetObj(sScreenAp.work->eraseButtons[index], 0));
+    DWCi_CELLlSetPosition(sScreenAp.work->eraseButtons[index], -1, sScreenApButtonPos[index + 3][0],
+                          sScreenApButtonPos[index + 3][1]);
+    DWCi_CELLlSetPriority(sScreenAp.work->eraseButtons[index], -1, 3);
 }
 
 // The answer to whether to erase the connection: yes erases it and shows its button as not in use, no shows the erase
 // button again
-static void DWCUtilScreenAp_WaitEraseAnswer(void) {
+static void procErase(void) {
     int index = sScreenAp.cursor - SCREEN_AP_FIRST_ERASE;
 
-    switch (DWCUtilDialog_GetChoice()) {
+    switch (DWCi_WINlGet()) {
     case 1:
         DWCUtilSound_PlaySe(0xe);
-        DWCUtilWifiSettings_Erase(index);
-        DWCUtilCell_Copy(0, 0x56, DWCUtilOam_GetEntry(sScreenAp.work->buttons[index], 0));
-        DWCUtilOam_SetNodePosition(sScreenAp.work->buttons[index], -1, sScreenApButtonPos[index][0],
-                                   sScreenApButtonPos[index][1]);
-        DWCUtilOam_SetPriority(sScreenAp.work->buttons[index], -1, 3);
-        DWCUtilOam_Free(sScreenAp.work->eraseButtons[index]);
+        DWCi_SETTINGlErasePage(index);
+        DWCUtilCell_Copy(0, 0x56, DWCi_CELLlGetObj(sScreenAp.work->buttons[index], 0));
+        DWCi_CELLlSetPosition(sScreenAp.work->buttons[index], -1, sScreenApButtonPos[index][0],
+                              sScreenApButtonPos[index][1]);
+        DWCi_CELLlSetPriority(sScreenAp.work->buttons[index], -1, 3);
+        DWCi_CELLlDelete(sScreenAp.work->eraseButtons[index]);
         sScreenAp.work->eraseButtons[index] = NULL;
         break;
     case 0:
         DWCUtilSound_PlaySe(7);
-        DWCUtilCell_Copy(0, 0x11, DWCUtilOam_GetEntry(sScreenAp.work->eraseButtons[index], 0));
-        DWCUtilOam_SetNodePosition(sScreenAp.work->eraseButtons[index], -1, sScreenApButtonPos[index + 3][0],
-                                   sScreenApButtonPos[index + 3][1]);
-        DWCUtilOam_SetPriority(sScreenAp.work->eraseButtons[index], -1, 3);
+        DWCUtilCell_Copy(0, 0x11, DWCi_CELLlGetObj(sScreenAp.work->eraseButtons[index], 0));
+        DWCi_CELLlSetPosition(sScreenAp.work->eraseButtons[index], -1, sScreenApButtonPos[index + 3][0],
+                              sScreenApButtonPos[index + 3][1]);
+        DWCi_CELLlSetPriority(sScreenAp.work->eraseButtons[index], -1, 3);
         break;
     default:
         return;
     }
-    DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(DWCUtilScreenAp_WaitDialogClosed);
+    DWCi_WINlEnd();
+    DWCi_ChangeScene(procErase1);
 }
 
-static void DWCUtilScreenAp_WaitDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilScreenAp_Main);
+static void procErase1(void) {
+    if (!DWCi_WINlIsInit()) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
@@ -482,13 +481,13 @@ static void DWCUtilScreenAp_HighlightButton(void) {
     int status;
 
     if (sScreenAp.cursor <= SCREEN_AP_WIDE_BUTTON) {
-        DWCUtilBgBuffer_LoadPaletteRow(sScreenAp.work->palette, rows[sScreenAp.cursor], rows[sScreenAp.cursor]);
+        DWCi_SCREENlCopyPalette(sScreenAp.work->palette, rows[sScreenAp.cursor], rows[sScreenAp.cursor]);
         if (sScreenAp.cursor != SCREEN_AP_WIDE_BUTTON) {
-            status = DWCUtilWifiSettings_GetStatus(sScreenAp.cursor);
+            status = DWCi_SETTINGlGetSetType(sScreenAp.cursor);
             if (status > 2) {
                 status = 3;
             }
-            DWCUtilOam_SetMode(sScreenAp.work->buttons[sScreenAp.cursor], -1, 0, palettes[status]);
+            DWCi_CELLlSetPalette(sScreenAp.work->buttons[sScreenAp.cursor], -1, 0, palettes[status]);
         }
     }
 }

@@ -10,7 +10,8 @@ extern const CARDDmaInterface CARDi_NdmaInterface;
 // TwlSDK's part of CARDi_InitRom for a DSi, in the LTD autoload
 void CARDi_InitTwlRom(void);
 
-// card_hash.c: the ROM reads that check what they read against the keyed hashes of the DSi's ROM header. A sector of
+// card_hash.c: the ROM reads that check what they read against the keyed hashes of the DSi's ROM header. The types,
+// fields and functions have the names of libntr's reconstruction of the SDK's card/hash.h. A sector of
 // the ROM is checked against its hash in the table of the sectors' hashes, and a run of those hashes, a block, against
 // its hash in the table of the blocks' hashes, which the header's own hash covers. The context caches the last sectors
 // and blocks read
@@ -30,52 +31,54 @@ typedef struct CARDRomHashBlock {
     u32 index;
     u32 offset;
     u8 *hash;
-    u8 *image;
+    u8 *hash_aligned;
 } CARDRomHashBlock;
 
-typedef struct CARDCheckedReadContext {
-    ROMHeaderRegion areaNtr;
-    ROMHeaderRegion areaTwl;
-    ROMHeaderRegion sectorHashes;
-    ROMHeaderRegion blockHashes;
-    u32 sectorSize;
-    u32 sectorsPerBlock;
-    u32 blockCount;
-    u32 sectorCount;
+typedef struct CARDRomHashContext {
+    ROMHeaderRegion area_ntr;
+    ROMHeaderRegion area_ltd;
+    ROMHeaderRegion sector_hash;
+    ROMHeaderRegion block_hash;
+    u32 bytes_per_sector;
+    u32 sectors_per_block;
+    u32 block_max;
+    u32 sector_max;
     // The functions that read the ROM, waiting for the end or not, and their first argument. The second returns 0 when
-    // it can't read without waiting
+    // it can't read without waiting. The SDK's type is MIDeviceReadFunction, which returns an int; NitroSDK's readers
+    // that card_rom_twl.c passes return a u32
     void *userdata;
-    CARDiRomReader readSync;
-    CARDiRomReader readAsync;
+    CARDiRomReader ReadSync;
+    CARDiRomReader ReadAsync;
     // The thread that reads, which an asynchronous read wakes when it is done
-    OSThread *thread;
+    OSThread *loader;
     // The sector or block being read, and the lists of the sectors and of the blocks: to read, read but not checked,
     // and checked, the most recently used first
-    void *loading;
-    CARDRomHashSector *loadingSectors;
-    CARDRomHashSector *loadedSectors;
-    CARDRomHashSector *validSectors;
-    CARDRomHashBlock *loadingBlocks;
-    CARDRomHashBlock *loadedBlocks;
-    CARDRomHashBlock *validBlocks;
+    void *recent_load;
+    CARDRomHashSector *loading_sector;
+    CARDRomHashSector *loaded_sector;
+    CARDRomHashSector *valid_sector;
+    CARDRomHashBlock *loading_block;
+    CARDRomHashBlock *loaded_block;
+    CARDRomHashBlock *valid_block;
     // The table of the blocks' hashes, the images of the sectors and the hashes of the blocks, and the entries of each
-    u8 *masterHash;
+    u8 *master_hash;
     u8 *images;
     u8 *hashes;
     CARDRomHashSector *sectors;
     CARDRomHashBlock *blocks;
-} CARDCheckedReadContext;
+} CARDRomHashContext;
 
-// The size of the buffer that CARD_SetUpCheckedReads needs for a ROM's header
-u32 CARD_GetCheckedReadBufferSize(const CARDTwlRomHeader *header);
+// The size of the buffer that CARD_InitRomHashContext needs for a ROM's header
+u32 CARD_CalcRomHashBufferLength(const CARDTwlRomHeader *header);
 // Lays the context's caches out in the buffer and reads and checks the table of the blocks' hashes; ends the program
 // if the buffer is too small or the table doesn't match
-void CARD_SetUpCheckedReads(CARDCheckedReadContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
-                            CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata);
+void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader *header, void *buffer, u32 length,
+                             CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata);
 // The callback of an asynchronous read of the context's: moves the sector or block read to the list of those to check
-// and starts the next read
-void CARD_OnCheckedReadDone(void *arg);
+// and starts the next read. The SDK's takes the CARDRomHashContext; this one is the DMA read's callback
+// (CARDiRomDmaRead), which takes a void *
+void CARD_NotifyRomHashReadAsync(void *arg);
 // Reads length bytes of the ROM at offset into buffer, and checks them
-void CARD_ReadRomChecked(CARDCheckedReadContext *context, void *buffer, u32 offset, u32 length);
+void CARD_ReadRomHashImage(CARDRomHashContext *context, void *buffer, u32 offset, u32 length);
 
 #endif // POKEBW2_TWL_CARD_H

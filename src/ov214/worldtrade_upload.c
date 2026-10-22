@@ -287,7 +287,7 @@ int WorldTrade_Upload_Main(WorldTradeWork *wk, int seq) {
 }
 
 int WorldTrade_Upload_End(WorldTradeWork *wk, int seq) {
-    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != 0) {
+    if (GXS_GetMasterBrightness() != 0) {
         WorldTrade_SetPartnerExchangePosIsReturns(wk);
     }
     Upload_FreeWork(wk);
@@ -1458,7 +1458,7 @@ static int Upload_SubSeqTimeoutSaveWait(WorldTradeWork *wk) {
 static int Upload_SubSeqEnd(WorldTradeWork *wk) {
     WorldTrade_TimeIconDel(wk);
     if (wk->subOutFlag == 1) {
-        if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == -16) {
+        if (GXS_GetMasterBrightness() == -16) {
             GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
             GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);

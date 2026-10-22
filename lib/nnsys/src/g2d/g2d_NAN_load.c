@@ -55,7 +55,7 @@ void NNS_G2dUnpackNAN(NNSG2dAnimBankData *bank) {
         u32 frmIdx;
 
         NNSi_G2dUnpackOffset(bank->pExtendedData, bank);
-        attrBank = (NNSG2dUserExAnimAttrBank *)(bank->pExtendedData + 1);
+        attrBank = (NNSG2dUserExAnimAttrBank *)((NNSG2dUserExDataBlock *)bank->pExtendedData + 1);
         NNSi_G2dUnpackOffset(attrBank->pAnmSeqAttrArray, attrBank);
         for (seqIdx = 0; seqIdx < attrBank->numSequences; seqIdx++) {
             NNSG2dUserExAnimSequenceAttr *seqAttr = &attrBank->pAnmSeqAttrArray[seqIdx];

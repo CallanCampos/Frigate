@@ -301,8 +301,7 @@ void EventSeasonBanner_UpdateRenderFXFieldOpen(const EventSeasonBanner *wk, u32 
         if (wk->season == wk->endSeason) {
             s32 alpha = (s32)((f32)wk->timer / (f32)wk->duration * 16.0f);
             G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 8, 0x11, 16 - alpha, alpha);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR,
-                                     (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
+            GXS_SetMasterBrightness((s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
         } else {
             G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, (s32)(0.0f - (f32)wk->timer / (f32)wk->duration * 16.0f));
         }
@@ -362,7 +361,7 @@ void EventSeasonBanner_ProcessState(EventSeasonBanner *wk, u32 *state, u32 newSt
     case SEASON_BANNER_STATE_FADE_IN:
         GFL_BGSysSetBGEnabled(SEASON_BANNER_BG, TRUE);
         GFL_BGSysSetBGEnabled(0, FALSE);
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+        GX_SetMasterBrightness(0);
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, -16);
         wk->duration = EventSeasonBanner_GetFadeInTime(wk);
         break;

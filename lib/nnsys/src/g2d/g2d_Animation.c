@@ -106,7 +106,7 @@ static BOOL SetAnimCtrlCurrentFrameImpl_(NNSG2dAnimController *animCtrl, u16 fra
     return FALSE;
 }
 
-void *NNS_G2dGetAnimCtrlCurrentElement(const NNSG2dAnimController *animCtrl) {
+void *NNS_G2dGetAnimCtrlCurrentElement(NNSG2dAnimController *animCtrl) {
     return animCtrl->pActiveCurrent->pContent;
 }
 
@@ -179,7 +179,7 @@ void NNS_G2dInitAnimCtrl(NNSG2dAnimController *animCtrl) {
     animCtrl->pAnimSequence = NULL;
 }
 
-void NNS_G2dInitAnimCallBackFunctor(NNSG2dCallBackFunctor *functor) {
+void NNS_G2dInitAnimCallBackFunctor(NNSG2dAnimCallBackFunctor *functor) {
     functor->type = NNS_G2D_ANMCALLBACKTYPE_NONE;
     functor->param = 0;
     functor->pFunc = NULL;
@@ -203,7 +203,7 @@ void NNS_G2dBindAnimCtrl(NNSG2dAnimController *animCtrl, const NNSG2dAnimSequenc
     NNS_G2dResetAnimCtrlState(animCtrl);
 }
 
-void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, u32 type, u32 param,
+void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, NNSG2dAnmCallbackType type, u32 param,
                                        NNSG2dAnmCallBackPtr pFunc) {
     animCtrl->callbackFunctor.pFunc = pFunc;
     animCtrl->callbackFunctor.param = param;

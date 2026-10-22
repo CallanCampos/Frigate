@@ -9,12 +9,8 @@ static inline u32 GetAnimSequenceElementType_(u32 animType) {
     return animType & 0xff;
 }
 
-// Returns u32, as NNS_G2dCellDataBankHasVramTransferData does: as a BOOL, MWCC folds the 0/1 result into the test
-static inline u32 IsCellAnimVramTransferHandleValid_(const NNSG2dCellAnimation *cellAnim) {
-    if (cellAnim->cellTransferStateHandle != NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE) {
-        return TRUE;
-    }
-    return FALSE;
+static inline BOOL IsCellAnimVramTransferHandleValid_(const NNSG2dCellAnimation *cellAnim) {
+    return (BOOL)(cellAnim->cellTransferStateHandle != NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE);
 }
 
 // Shows the current frame's cell, with its scale, rotation and translation, and asks for its characters to be

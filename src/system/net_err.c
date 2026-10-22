@@ -331,8 +331,8 @@ void GFL_NetErrClearKeepDark(void) {
 void GFL_NetErrApplyBrightness(void) {
     GFLNetErrWork *work = &g_GflNetErr;
 
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
+    GX_SetMasterBrightness(work->brightness);
+    GXS_SetMasterBrightness(work->subBrightness);
 }
 
 static void GFL_NetErrWaitVBlank(void) {
@@ -545,10 +545,10 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
     if (!GFL_NetErrIsReady()) {
         return;
     }
-    work->brightness = GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR);
-    work->subBrightness = GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    work->brightness = GX_GetMasterBrightness();
+    work->subBrightness = GXS_GetMasterBrightness();
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     if (!disconnecting) {
         work->hBlankIrq = GX_HBlankIntr(FALSE);
         work->vBlankIrq = GX_VBlankIntr(FALSE);
@@ -592,8 +592,8 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
         loadErrorBackground(ERROR_WINDOW_NET);
         GFL_NetErrDispMessage(fatal, disconnecting);
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
+    GXS_SetMasterBrightness(0);
 }
 
 // Puts back what the screens showed
@@ -605,8 +605,8 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     if (!GFL_NetErrIsReady()) {
         return;
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     *(u16 *)HW_DB_BG_PLTT = work->subBackdrop;
     GFL_BGSysSetEnabledBGsB(work->subEnabledBGs);
     reg_G2_BLDCNT = work->blend;
@@ -631,8 +631,8 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     GX_VBlankIntr(work->vBlankIrq);
     OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     if (!keepDark) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
+        GX_SetMasterBrightness(work->brightness);
+        GXS_SetMasterBrightness(work->subBrightness);
     }
 }
 

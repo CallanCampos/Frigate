@@ -19,7 +19,7 @@
 // Where the text goes: how many bytes are left, where the next one is written and where the text begins. The
 // writing goes on when no bytes are left, so that dst tells the length
 typedef struct StringBuffer {
-    u32 len;
+    size_t len;
     char *dst;
     char *start;
 } StringBuffer;
@@ -38,8 +38,8 @@ static void string_put_char(StringBuffer *str, char c) {
 
 static void string_fill_char(StringBuffer *str, char c, int len) {
     if (len > 0) {
-        u32 i;
-        u32 n = str->len;
+        size_t i;
+        size_t n = str->len;
 
         if (n > len) {
             n = len;
@@ -54,8 +54,8 @@ static void string_fill_char(StringBuffer *str, char c, int len) {
 
 static void string_put_string(StringBuffer *str, const char *src, int len) {
     if (len > 0) {
-        u32 i;
-        u32 n = str->len;
+        size_t i;
+        size_t n = str->len;
 
         if (n > len) {
             n = len;

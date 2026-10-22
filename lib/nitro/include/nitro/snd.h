@@ -6,11 +6,40 @@
 // NitroSDK's sound driver interface (SND), which queues commands for the ARM7's sound driver
 
 // A command for the driver: the ID of what to do and its arguments, which are chained in the pool of snd_command.c
+// The commands that the interface sends
+typedef enum {
+    SND_COMMAND_STOP_SEQ = 1,
+    SND_COMMAND_PREPARE_SEQ = 2,
+    SND_COMMAND_START_PREPARED_SEQ = 3,
+    SND_COMMAND_PAUSE_SEQ = 4,
+    SND_COMMAND_PLAYER_PARAM = 6,
+    SND_COMMAND_TRACK_PARAM = 7,
+    SND_COMMAND_MUTE_TRACK = 8,
+    SND_COMMAND_ALLOCATABLE_CHANNEL = 9,
+    SND_COMMAND_START_TIMER = 0xc,
+    SND_COMMAND_STOP_TIMER = 0xd,
+    SND_COMMAND_SETUP_CHANNEL_PCM = 0xe,
+    SND_COMMAND_SETUP_ALARM = 0x12,
+    SND_COMMAND_CHANNEL_TIMER = 0x13,
+    SND_COMMAND_CHANNEL_VOLUME = 0x14,
+    SND_COMMAND_CHANNEL_PAN = 0x15,
+    SND_COMMAND_MASTER_VOLUME = 0x17,
+    SND_COMMAND_MASTER_PAN = 0x18,
+    SND_COMMAND_OUTPUT_SELECTOR = 0x19,
+    SND_COMMAND_LOCK_CHANNEL = 0x1a,
+    SND_COMMAND_UNLOCK_CHANNEL = 0x1b,
+    SND_COMMAND_SHARED_WORK = 0x1d,
+    SND_COMMAND_INVALIDATE_SEQ = 0x1e,
+    SND_COMMAND_INVALIDATE_BANK = 0x1f,
+    SND_COMMAND_INVALIDATE_WAVE = 0x20,
+    SND_COMMAND_READ_DRIVER_INFO = 0x21,
+} SNDCommandID;
+
 typedef struct SNDCommand SNDCommand;
 
 struct SNDCommand {
     SNDCommand *next;
-    u32 id;
+    SNDCommandID id;
     u32 arg[4];
 };
 
@@ -36,33 +65,6 @@ typedef struct SNDCommandQueue {
 extern SNDCommandQueue SNDi_Queue;
 extern SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
 
-// The commands that the interface sends
-#define SND_COMMAND_STOP_SEQ 1
-#define SND_COMMAND_PREPARE_SEQ 2
-#define SND_COMMAND_START_PREPARED_SEQ 3
-#define SND_COMMAND_PAUSE_SEQ 4
-#define SND_COMMAND_PLAYER_PARAM 6
-#define SND_COMMAND_TRACK_PARAM 7
-#define SND_COMMAND_MUTE_TRACK 8
-#define SND_COMMAND_ALLOCATABLE_CHANNEL 9
-#define SND_COMMAND_START_TIMER 0xc
-#define SND_COMMAND_STOP_TIMER 0xd
-#define SND_COMMAND_SETUP_CHANNEL_PCM 0xe
-#define SND_COMMAND_SETUP_ALARM 0x12
-#define SND_COMMAND_CHANNEL_TIMER 0x13
-#define SND_COMMAND_CHANNEL_VOLUME 0x14
-#define SND_COMMAND_CHANNEL_PAN 0x15
-#define SND_COMMAND_MASTER_VOLUME 0x17
-#define SND_COMMAND_MASTER_PAN 0x18
-#define SND_COMMAND_OUTPUT_SELECTOR 0x19
-#define SND_COMMAND_LOCK_CHANNEL 0x1a
-#define SND_COMMAND_UNLOCK_CHANNEL 0x1b
-#define SND_COMMAND_SHARED_WORK 0x1d
-#define SND_COMMAND_INVALIDATE_SEQ 0x1e
-#define SND_COMMAND_INVALIDATE_BANK 0x1f
-#define SND_COMMAND_INVALIDATE_WAVE 0x20
-#define SND_COMMAND_READ_DRIVER_INFO 0x21
-
 // What the driver has: players, 16 tracks for each and 16 variables, channels and alarms
 #define SND_PLAYER_MAX 16
 #define SND_PLAYER_TRACK_MAX 16
@@ -71,19 +73,35 @@ extern SNDCommand *SNDi_Sent[SND_PACKET_MAX + 1];
 #define SND_ALARM_MAX 8
 
 // Channels: SND_SetChannelVolume, SND_SetChannelPan and SND_SetupChannelPcm
-#define SND_WAVE_FORMAT_PCM8 0
-#define SND_WAVE_FORMAT_PCM16 1
+typedef enum {
+    SND_WAVE_FORMAT_PCM8,
+    SND_WAVE_FORMAT_PCM16,
+    SND_WAVE_FORMAT_ADPCM,
+    SND_WAVE_FORMAT_PSG,
+    SND_WAVE_FORMAT_NOISE = SND_WAVE_FORMAT_PSG,
+} SNDWaveFormat;
 
-#define SND_CHANNEL_LOOP_REPEAT 1
+typedef enum {
+    SND_CHANNEL_LOOP_MANUAL,
+    SND_CHANNEL_LOOP_REPEAT,
+    SND_CHANNEL_LOOP_1SHOT,
+} SNDChannelLoop;
+
+typedef enum {
+    SND_CHANNEL_DATASHIFT_NONE,
+    SND_CHANNEL_DATASHIFT_1BIT,
+    SND_CHANNEL_DATASHIFT_2BIT,
+    SND_CHANNEL_DATASHIFT_4BIT,
+} SNDChannelDataShift;
 
 #define SND_CHANNEL_VOLUME_MAX 127
 #define SND_CHANNEL_PAN_CENTER 64
 
-void SND_SetChannelVolume(u32 chBitMask, int volume, int shift); // swan's sndSetVolume
-void SND_SetChannelPan(u32 chBitMask, int pan);                  // swan's sndSetPan
+void SND_SetChannelVolume(u32 chBitMask, int volume, SNDChannelDataShift shift); // swan's sndSetVolume
+void SND_SetChannelPan(u32 chBitMask, int pan);                                  // swan's sndSetPan
 // swan's sndQueuePacket_PlaySamples
-void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen, int volume,
-                         int shift, int timer, int pan);
+void SND_SetupChannelPcm(int chNo, SNDWaveFormat format, const void *dataAddr, SNDChannelLoop loop, int loopStart,
+                         int loopLen, int volume, SNDChannelDataShift shift, int timer, int pan);
 
 // Timers and alarms: NitroSDK's SND_StartTimer, SND_StopTimer and SND_SetupAlarm, by their code
 typedef void (*SNDAlarmHandler)(void *arg);
@@ -242,7 +260,7 @@ void SND_Init(void);
 void SNDi_LockMutex(void);
 void SNDi_UnlockMutex(void);
 void SND_CommandInit(void);
-SNDCommand *SND_RecvCommandReply(u32 flags);
+const SNDCommand *SND_RecvCommandReply(u32 flags);
 SNDCommand *SND_AllocCommand(u32 flags);   // swan's sndNewPacket
 void SND_PushCommand(SNDCommand *command); // swan's sndQueuePacket_
 BOOL SND_IsFinishedCommandTag(u32 tag);
@@ -262,6 +280,13 @@ void SND_SetPlayerChannelPriority(int playerNo, int prio);
 // and SND_SetTrackMuteEx, by their code. The types of mute are the values that the first sends for a flag
 #define SND_TRACK_MUTE_OFF 0
 #define SND_TRACK_MUTE_ON 3
+
+typedef enum {
+    SND_SEQ_MUTE_OFF,
+    SND_SEQ_MUTE_NO_STOP,
+    SND_SEQ_MUTE_RELEASE,
+    SND_SEQ_MUTE_STOP,
+} SNDSeqMute;
 #define SND_TRACK_PAN_CENTER 64
 
 void SND_SetTrackVolume(int playerNo, u32 trackBitMask, int volume);
@@ -271,22 +296,33 @@ void SND_SetTrackModDepth(int playerNo, u32 trackBitMask, int depth);
 void SND_SetTrackModSpeed(int playerNo, u32 trackBitMask, int speed);
 void SND_SetTrackAllocatableChannel(int playerNo, u32 trackBitMask, u32 chBitFlag);
 void SND_SetTrackMute(int playerNo, u32 trackBitMask, BOOL flag);
-void SND_SetTrackMuteEx(int playerNo, u32 trackBitMask, int muteType);
+void SND_SetTrackMuteEx(int playerNo, u32 trackBitMask, SNDSeqMute muteType);
 
 // NitroSDK's SND_LockChannel and SND_UnlockChannel, by their code; SND_SetChannelTimer and SND_SetMasterVolume (swan's
 // names noted); SND_SetOutputSelector, SND_SetMasterPan and SND_ResetMasterPan by their code
 #define SND_CHANNEL_TIMER_MIN 0x10
 #define SND_CHANNEL_TIMER_MAX 0xffff
-#define SND_CHANNEL_LOOP_1SHOT 2
-#define SND_CHANNEL_DATASHIFT_NONE 0
 // The channels' timer clock, half the system clock
 #define SND_TIMER_CLOCK 16756991
+
+// What the speakers' left and right outputs take, and where channels 1 and 3 go
+typedef enum {
+    SND_OUTPUT_MIXER,
+    SND_OUTPUT_CHANNEL1,
+    SND_OUTPUT_CHANNEL3,
+    SND_OUTPUT_CHANNEL1_3,
+} SNDOutput;
+
+typedef enum {
+    SND_CHANNEL_OUT_MIXER,
+    SND_CHANNEL_OUT_BYPASS,
+} SNDChannelOut;
 
 void SND_LockChannel(u32 chBitMask, u32 flags);
 void SND_UnlockChannel(u32 chBitMask, u32 flags);
 void SND_SetChannelTimer(u32 chBitMask, int timer); // swan's sndSetRate
 void SND_SetMasterVolume(int volume);               // swan's sndSetMasterVolume
-void SND_SetOutputSelector(int left, int right, int channel1, int channel3);
+void SND_SetOutputSelector(SNDOutput left, SNDOutput right, SNDChannelOut channel1, SNDChannelOut channel3);
 void SND_SetMasterPan(int pan);
 void SND_ResetMasterPan(void);
 #define SND_MASTER_PAN_RESET (-1)

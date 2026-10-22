@@ -394,7 +394,7 @@ void func_ov033_0217bbac(BSubwayScrWork *bsw) {
     u16 values[2];
     s32 index;
     u32 round;
-    u32 slot;
+    unsigned int slot;
 
     round = BSubwayPlayData_GetRound(bsw->unk70);
     switch (bsw->playMode) {
@@ -571,7 +571,7 @@ void func_ov033_0217be88(BSubwayScrWork *bsw, u8 variant) {
 }
 
 void func_ov033_0217bf04(BSubwayPokemon *dst, PartyPkm *pkm) {
-    s32 i;
+    int i;
 
     dst->species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     dst->form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);

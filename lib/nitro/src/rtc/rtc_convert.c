@@ -126,7 +126,7 @@ void RTC_ConvertSecondToDateTime(RTCDate *date, RTCTime *time, s64 seconds) {
 
 // NitroSDK's RTC_GetDayOfWeek, by Zeller's congruence with January and February as the months 11 and 12 of the year
 // before
-RTCWeek RTC_GetDayOfWeek(const RTCDate *date) {
+RTCWeek RTC_GetDayOfWeek(RTCDate *date) {
     int month;
     int year;
     int day;

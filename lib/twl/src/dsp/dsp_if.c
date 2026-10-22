@@ -5,11 +5,10 @@
 
 // TwlSDK's DSP library, the register interface (guessed file name, after the SDK's dsp_if.c): the DSP's power, its
 // reset and the ports of SCFG and of the DSP's own registers, through which the other DSP files talk to it. ARM code in
-// the DSi-only LTD autoload. The ROM names none of it; the functions have the SDK's names where twl/dsp.h knows them,
-// and keep their default names otherwise.
+// the DSi-only LTD autoload. The ROM names none of it; the functions have the names of libntr's dsp_if.h (twl/dsp.h).
 
-static void func_02704f9c(void);
-static BOOL func_02704fe4(int index);
+static void DSP_ResetInterfaceCore(void);
+static BOOL DSP_SendDataIsEmptyCore(u32 dataNo);
 
 // Powers the DSP: its clock, then its reset line, then the reset of its port
 void DSP_PowerOnCore(void) {
@@ -37,13 +36,13 @@ void DSP_ResetOnCore(void) {
 void DSP_ResetOffExCore(u16 mask) {
     while (reg_DSP_PSTS & DSP_PSTS_RESETTING) {
     }
-    func_02704f9c();
+    DSP_ResetInterfaceCore();
     reg_DSP_PCFG |= (u16)(mask << DSP_PCFG_REPLY_IRQ_SHIFT);
     reg_DSP_PCFG &= ~DSP_PCFG_RESET;
 }
 
 // Called in reset: clears the reply interrupts and the semaphores, and reads the replies to empty them
-static void func_02704f9c(void) {
+static void DSP_ResetInterfaceCore(void) {
     if (!(reg_DSP_PCFG & DSP_PCFG_RESET)) {
         return;
     }
@@ -55,37 +54,37 @@ static void func_02704f9c(void) {
     (void)reg_DSP_REP(2);
 }
 
-// Whether the DSP took command index
-static BOOL func_02704fe4(int index) {
+// Whether the DSP took command dataNo
+static BOOL DSP_SendDataIsEmptyCore(u32 dataNo) {
     BOOL empty = TRUE;
-    if (reg_DSP_PSTS & ((1 << index) << DSP_PSTS_COMMAND_SHIFT)) {
+    if (reg_DSP_PSTS & ((1 << dataNo) << DSP_PSTS_COMMAND_SHIFT)) {
         empty = FALSE;
     }
     return empty;
 }
 
-BOOL DSP_RecvDataIsReadyCore(int index) {
+BOOL DSP_RecvDataIsReadyCore(u32 dataNo) {
     BOOL ready = TRUE;
-    if (!(reg_DSP_PSTS & ((1 << index) << DSP_PSTS_REPLY_SHIFT))) {
+    if (!(reg_DSP_PSTS & ((1 << dataNo) << DSP_PSTS_REPLY_SHIFT))) {
         ready = FALSE;
     }
     return ready;
 }
 
-void DSP_SendDataCore(int index, u16 data) {
-    while (!func_02704fe4(index)) {
+void DSP_SendDataCore(u32 dataNo, u16 data) {
+    while (!DSP_SendDataIsEmptyCore(dataNo)) {
     }
-    reg_DSP_CMD(index) = data;
+    reg_DSP_CMD(dataNo) = data;
 }
 
-u16 DSP_RecvDataCore(int index) {
-    while (!DSP_RecvDataIsReadyCore(index)) {
+u16 DSP_RecvDataCore(u32 dataNo) {
+    while (!DSP_RecvDataIsReadyCore(dataNo)) {
     }
-    return reg_DSP_REP(index);
+    return reg_DSP_REP(dataNo);
 }
 
-void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags) {
-    u32 enabled = OS_DisableInterrupts();
+void DSP_SendFifoExCore(DSPFifoMemSel memory, u16 dspAddr, const u16 *src, int count, u16 flags) {
+    OSIntrMode enabled = OS_DisableInterrupts();
     u16 autoIncrement = (flags & DSP_WRITE_FIXED_ADDRESS) ? 0 : DSP_PCFG_AUTO_INCREMENT;
     reg_DSP_PADR = dspAddr;
     reg_DSP_PCFG = (reg_DSP_PCFG & ~(DSP_PCFG_MEMORY_MASK | DSP_PCFG_AUTO_INCREMENT)) | memory | autoIncrement;
@@ -105,8 +104,8 @@ void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags
     OS_RestoreInterrupts(enabled);
 }
 
-void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags) {
-    u32 enabled = OS_DisableInterrupts();
+void DSP_RecvFifoExCore(DSPFifoMemSel memory, u16 *dst, u16 dspAddr, int count, u16 flags) {
+    OSIntrMode enabled = OS_DisableInterrupts();
     u16 autoIncrement = (flags & DSP_READ_FIXED_ADDRESS) ? 0 : DSP_PCFG_AUTO_INCREMENT;
     u16 length;
 

@@ -104,13 +104,13 @@ static void OSi_DetachVAlarm(OSVAlarm *alarm) {
 void OS_CreateVAlarm(OSVAlarm *alarm) {
     alarm->handler = NULL;
     alarm->tag = 0;
-    alarm->unk_20 = 0;
+    alarm->finish = FALSE;
 }
 
 // NitroSDK's OS_SetVAlarm: calls the handler with the argument when the scan reaches the line (vcount), or at most
 // delay lines after it. If the scan has reached that line already in this frame, it waits for the next
 void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handler, void *arg) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     int current;
     u32 frame;
 
@@ -212,7 +212,7 @@ static int OSi_CompareVCount(OSVAlarm *alarm, u32 frame, int vcount) {
 
 // NitroSDK's OSi_GetVFrame: counts the frames, by a V-count lower than the last one; gives the count
 static u32 OSi_GetVFrame(int vcount) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (vcount < OSi_PrevVCount) {
         OSi_VFrameCount++;

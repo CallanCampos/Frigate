@@ -85,8 +85,8 @@ void WFCUserInfoWarning_Show(void) {
 }
 
 static void WFCUserInfoWarning_Init(u32 message) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GX_ResetBankForBG();
     GX_ResetBankForSubBG();
     GX_SetBankForBG(GX_VRAM_BG_128_C);
@@ -100,8 +100,8 @@ static void WFCUserInfoWarning_Init(u32 message) {
     G2_BlendNone();
     WFCUserInfoWarning_LoadWindow();
     WFCUserInfoWarning_PrintMessage(message);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
+    GX_SetMasterBrightness(0);
+    GXS_SetMasterBrightness(16);
 }
 
 static void WFCUserInfoWarning_LoadWindow(void) {
@@ -171,8 +171,8 @@ static void WFCUserInfoWarning_PrintMessage(u32 message) {
 
 // Clears the window and gives the banks back
 static void WFCUserInfoWarning_Exit(void) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetEnabledBGsB(0);
     MIi_CpuClear16(0, G2_GetBG1CharPtr(), 0x4000);
     MIi_CpuClear16(0, G2_GetBG1ScrPtr(), 0x800);
@@ -180,6 +180,6 @@ static void WFCUserInfoWarning_Exit(void) {
     GX_SetVisiblePlane(0);
     GX_ResetBankForSubBG();
     GX_ResetBankForBG();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
+    GXS_SetMasterBrightness(0);
 }

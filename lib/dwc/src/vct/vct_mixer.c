@@ -3,7 +3,7 @@
 
 #include "vct_dsp_internal.h"
 
-void VCT_MixSamples(s16 *a, s16 *b, s16 *out, u32 bytes) {
+void vct_mix_audio(s16 *a, s16 *b, s16 *out, u32 bytes) {
     u32 count = bytes >> 1;
     u32 i;
 

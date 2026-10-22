@@ -199,7 +199,7 @@ static void ZukanInfo_PrintStrbuf(HeapID heapId, BmpWin *window, PrintQueue *pri
 static void ZukanInfo_PrintMessage(HeapID heapId, BmpWin *window, MsgData *msgData, PrintQueue *printQueue, Font *font,
                                    u32 messageId, u16 x, u16 y, u16 color, u32 align, WordSet *wordSet);
 static void ZukanInfo_PrintEntry(ZukanInfo *info);
-static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, u32 language);
+static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, unsigned int language);
 static void ZukanInfo_ClearWindows(ZukanInfo *info);
 static void ZukanInfo_FlushWindows(ZukanInfo *info);
 static void ZukanInfo_InitLabelWindows(ZukanInfo *info);
@@ -965,7 +965,7 @@ static void ZukanInfo_PrintEntry(ZukanInfo *info) {
     ZukanInfo_FlushWindows(info);
 }
 
-static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, u32 language) {
+static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, unsigned int language) {
     MsgData *labels = info->msgs[ZUKAN_INFO_MSG_LABELS];
     MsgData *categories = info->msgs[ZUKAN_INFO_MSG_OTHER_CATEGORIES + language];
     MsgData *heights = info->msgs[ZUKAN_INFO_MSG_OTHER_HEIGHTS + language];

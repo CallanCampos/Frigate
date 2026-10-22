@@ -39,7 +39,7 @@ typedef struct {
 } TrainerData;
 
 // A field of a trainer's record, for TrainerData_GetParam
-enum {
+typedef enum {
     TRAINER_PARAM_PARTY_KIND,
     TRAINER_PARAM_CLASS,
     TRAINER_PARAM_BATTLE_STYLE,
@@ -52,7 +52,7 @@ enum {
     TRAINER_PARAM_HEALS,
     TRAINER_PARAM_MONEY,
     TRAINER_PARAM_REWARD_ITEM,
-};
+} TrainerDataParam;
 
 // A Pokémon of a trainer's party in ARCID_TRPOKE, in one of four layouts by the party's kind
 typedef struct {
@@ -83,7 +83,7 @@ typedef struct {
 } TrainerPokeItemMoves;
 
 // A field of a trainer's record (TRAINER_PARAM_*)
-u32 TrainerData_GetParam(int trainerId, u32 param);
+u32 TrainerData_GetParam(int trainerId, TrainerDataParam param);
 BOOL TrainerMsg_CheckExists(int trainerId, u32 msgId, HeapID heapId);
 // Loads the trainer's message of the type, or clears strbuf if it has none. Battle institution trainers only have types
 // 0 and 1, and any other type leaves strbuf as it was

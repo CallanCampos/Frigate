@@ -11,12 +11,12 @@
 
 static void DWCUtilScrollbar_UpdateTask(DWCUtilTask *task, void *arg);
 static void DWCUtilScrollbar_Drag(void);
-static void DWCUtilScrollbar_PlayDragSound(int pos);
-static void DWCUtilScrollbar_HoldArrow(int part);
+static void playSound(int pos);
+static void stepBar(int part);
 static void DWCUtilScrollbar_JumpToTouch(void);
-static int DWCUtilScrollbar_GetTouchedPart(void);
+static int isTrigger(void);
 static int DWCUtilScrollbar_GetHeldArrow(int part);
-static void DWCUtilScrollbar_GetPartRect(int part, u16 *rect);
+static void calcRect(int part, u16 *rect);
 static void DWCUtilScrollbar_MoveHandle(int pos);
 
 // The parts of the scroll bar that a touch can be on
@@ -59,40 +59,40 @@ static const u8 sScrollbarCells[3] = { 0x10, 0x0f, 0x0e };
 static DWCUtilScrollbar *sScrollbar;
 
 void DWCUtilScrollbar_Create(int kind, int range, u16 x, u16 y, int pos) {
-    sScrollbar = DWCUtilHeap_AllocClear(sizeof(DWCUtilScrollbar), 4);
+    sScrollbar = DWCi_HEAPlAllocEx(sizeof(DWCUtilScrollbar), 4);
     sScrollbar->kind = kind;
     sScrollbar->range = range;
     sScrollbar->pos = pos;
     DWCUtilDisplay_SetPoint(x, y, sScrollbar->origin);
     sScrollbar->handle = DWCUtilCell_AllocOamRun(0, sScrollbarCells[kind], TRUE);
-    DWCUtilOam_SetNodePosition(sScrollbar->handle, -1, x, y + pos);
-    DWCUtilOam_SetPriority(sScrollbar->handle, -1, 1);
-    sScrollbar->task = DWCUtilTask_Create(0, DWCUtilScrollbar_UpdateTask, NULL, 0x80);
+    DWCi_CELLlSetPosition(sScrollbar->handle, -1, x, y + pos);
+    DWCi_CELLlSetPriority(sScrollbar->handle, -1, 1);
+    sScrollbar->task = DWCi_TSKlForm(0, DWCUtilScrollbar_UpdateTask, NULL, 0x80);
 }
 
-void DWCUtilScrollbar_Destroy(void) {
-    DWCUtilTask_Remove(0, sScrollbar->task);
-    DWCUtilOam_Free(sScrollbar->handle);
-    DWCUtilHeap_FreeAndNull(&sScrollbar);
+void DWCi_SBlEnd(void) {
+    DWCi_TSKlDeleteEx(0, sScrollbar->task);
+    DWCi_CELLlDelete(sScrollbar->handle);
+    DWCi_HEAPlFree_(&sScrollbar);
 }
 
-u8 DWCUtilScrollbar_GetPos(void) {
+u8 DWCi_SBlGet(void) {
     return sScrollbar->pos;
 }
 
-u8 DWCUtilScrollbar_GetEvent(void) {
+u8 DWCi_SBlGetState(void) {
     return sScrollbar->event;
 }
 
-void DWCUtilScrollbar_SetPos(int pos) {
+void DWCi_SBlSet(int pos) {
     DWCUtilScrollbar_MoveHandle(pos);
 }
 
-void DWCUtilScrollbar_Unlock(void) {
+void DWCi_SBlEnable(void) {
     sScrollbar->locked = FALSE;
 }
 
-void DWCUtilScrollbar_Lock(void) {
+void DWCi_SBlDisable(void) {
     sScrollbar->locked = TRUE;
 }
 
@@ -103,22 +103,22 @@ static void DWCUtilScrollbar_UpdateTask(DWCUtilTask *task, void *arg) {
         if (sScrollbar->locked) {
             break;
         }
-        switch (DWCUtilScrollbar_GetTouchedPart()) {
+        switch (isTrigger()) {
         case SCROLLBAR_PART_HANDLE:
             if (sScrollbar->kind != 0) {
                 DWCUtilSound_PlaySe(0x16);
                 DWCUtilSound_SetVolume(0);
                 sScrollbar->event = DWC_UTIL_SCROLLBAR_GRAB;
-                DWCUtilTouch_GetPoint(sScrollbar->grabPoint);
+                DWCi_TPlGet(sScrollbar->grabPoint);
                 sScrollbar->grabPos = sScrollbar->pos;
                 sScrollbar->state = SCROLLBAR_DRAGGING;
             }
             break;
         case SCROLLBAR_PART_UP:
-            DWCUtilScrollbar_HoldArrow(SCROLLBAR_PART_UP);
+            stepBar(SCROLLBAR_PART_UP);
             break;
         case SCROLLBAR_PART_DOWN:
-            DWCUtilScrollbar_HoldArrow(SCROLLBAR_PART_DOWN);
+            stepBar(SCROLLBAR_PART_DOWN);
             break;
         case SCROLLBAR_PART_BAR:
             DWCUtilScrollbar_JumpToTouch();
@@ -132,16 +132,16 @@ static void DWCUtilScrollbar_UpdateTask(DWCUtilTask *task, void *arg) {
         if (DWCUtilScrollbar_GetHeldArrow(SCROLLBAR_PART_UP) != SCROLLBAR_PART_UP) {
             sScrollbar->event = DWC_UTIL_SCROLLBAR_UP_END;
             sScrollbar->state = SCROLLBAR_IDLE;
-        } else if (DWCUtilScrollbar_GetTouchedPart() == SCROLLBAR_PART_UP) {
-            DWCUtilScrollbar_HoldArrow(SCROLLBAR_PART_UP);
+        } else if (isTrigger() == SCROLLBAR_PART_UP) {
+            stepBar(SCROLLBAR_PART_UP);
         }
         break;
     case SCROLLBAR_PART_DOWN:
         if (DWCUtilScrollbar_GetHeldArrow(SCROLLBAR_PART_DOWN) != SCROLLBAR_PART_DOWN) {
             sScrollbar->event = DWC_UTIL_SCROLLBAR_DOWN_END;
             sScrollbar->state = SCROLLBAR_IDLE;
-        } else if (DWCUtilScrollbar_GetTouchedPart() == SCROLLBAR_PART_DOWN) {
-            DWCUtilScrollbar_HoldArrow(SCROLLBAR_PART_DOWN);
+        } else if (isTrigger() == SCROLLBAR_PART_DOWN) {
+            stepBar(SCROLLBAR_PART_DOWN);
         }
         break;
     }
@@ -153,8 +153,8 @@ static void DWCUtilScrollbar_Drag(void) {
     int pos;
     int max;
 
-    if (DWCUtilTouch_IsTouchedIn(gDWCUtilTouchScreenRect)) {
-        DWCUtilTouch_GetPoint(point);
+    if (DWCi_TPlCheck(gDWCUtilTouchScreenRect)) {
+        DWCi_TPlGet(point);
         if (point[0] >= sScrollbar->origin[0] - 30) {
             pos = sScrollbar->grabPos + (point[1] - sScrollbar->grabPoint[1]);
             if (pos < 0) {
@@ -165,7 +165,7 @@ static void DWCUtilScrollbar_Drag(void) {
                     pos = max;
                 }
             }
-            DWCUtilScrollbar_PlayDragSound(pos);
+            playSound(pos);
             DWCUtilScrollbar_MoveHandle(pos);
             sScrollbar->event = DWC_UTIL_SCROLLBAR_DRAG;
             return;
@@ -177,7 +177,7 @@ static void DWCUtilScrollbar_Drag(void) {
 }
 
 // The sound of the drag: louder and higher the farther the handle moves in a frame
-static void DWCUtilScrollbar_PlayDragSound(int pos) {
+static void playSound(int pos) {
     int distance = sScrollbar->pos - pos;
     int volume;
     int pitch;
@@ -204,7 +204,7 @@ static void DWCUtilScrollbar_PlayDragSound(int pos) {
 }
 
 // An arrow is held
-static void DWCUtilScrollbar_HoldArrow(int part) {
+static void stepBar(int part) {
     sScrollbar->state = part;
     sScrollbar->event = part == SCROLLBAR_PART_UP ? DWC_UTIL_SCROLLBAR_UP : DWC_UTIL_SCROLLBAR_DOWN;
 }
@@ -216,7 +216,7 @@ static void DWCUtilScrollbar_JumpToTouch(void) {
     int pos;
     int max;
 
-    DWCUtilTouch_GetPoint(point);
+    DWCi_TPlGet(point);
     length = sScrollbarHandleLengths[sScrollbar->kind];
     pos = point[1] - sScrollbar->origin[1] - length / 2;
     if (pos < 0) {
@@ -232,23 +232,23 @@ static void DWCUtilScrollbar_JumpToTouch(void) {
 }
 
 // The part of the scroll bar that a new touch is on
-static int DWCUtilScrollbar_GetTouchedPart(void) {
+static int isTrigger(void) {
     u16 rect[4];
     int part;
 
-    DWCUtilScrollbar_GetPartRect(SCROLLBAR_PART_HANDLE, rect);
-    if (DWCUtilTouch_IsRepeatedIn(rect)) {
+    calcRect(SCROLLBAR_PART_HANDLE, rect);
+    if (DWCi_TPlCheckRepeat(rect)) {
         return SCROLLBAR_PART_HANDLE;
     }
     for (part = SCROLLBAR_PART_UP; part <= SCROLLBAR_PART_DOWN; part++) {
-        DWCUtilScrollbar_GetPartRect(part, rect);
-        if (DWCUtilTouch_IsRepeatedIn(rect)) {
+        calcRect(part, rect);
+        if (DWCi_TPlCheckRepeat(rect)) {
             return part;
         }
     }
     part = SCROLLBAR_PART_BAR;
-    DWCUtilScrollbar_GetPartRect(SCROLLBAR_PART_BAR, rect);
-    if (!DWCUtilTouch_IsTriggeredIn(rect)) {
+    calcRect(SCROLLBAR_PART_BAR, rect);
+    if (!DWCi_TPlCheckTrigger(rect)) {
         part = SCROLLBAR_PART_NONE;
     }
     return part;
@@ -260,8 +260,8 @@ static int DWCUtilScrollbar_GetHeldArrow(int part) {
     int i;
 
     for (i = SCROLLBAR_PART_UP; i <= SCROLLBAR_PART_DOWN; i++) {
-        DWCUtilScrollbar_GetPartRect(i, rect);
-        if (DWCUtilTouch_IsTouchedIn(rect)) {
+        calcRect(i, rect);
+        if (DWCi_TPlCheck(rect)) {
             return i;
         }
     }
@@ -269,7 +269,7 @@ static int DWCUtilScrollbar_GetHeldArrow(int part) {
 }
 
 // The rectangle of a part, as in dwc_util_display.c
-static void DWCUtilScrollbar_GetPartRect(int part, u16 *rect) {
+static void calcRect(int part, u16 *rect) {
     u16 top;
 
     rect[0] = sScrollbar->origin[0];
@@ -296,6 +296,6 @@ static void DWCUtilScrollbar_GetPartRect(int part, u16 *rect) {
 }
 
 static void DWCUtilScrollbar_MoveHandle(int pos) {
-    DWCUtilOam_SetNodePosition(sScrollbar->handle, -1, sScrollbar->origin[0], pos + sScrollbar->origin[1]);
+    DWCi_CELLlSetPosition(sScrollbar->handle, -1, sScrollbar->origin[0], pos + sScrollbar->origin[1]);
     sScrollbar->pos = pos;
 }

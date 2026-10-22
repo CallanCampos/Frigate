@@ -40,7 +40,7 @@ static void FSi_RomReadEnd(void *arg) {
 
 // The ROM archive's read function: reads from the card, apart from the caller's thread
 static FSResult FSi_ReadRom(FSArchive *arc, void *buffer, u32 position, u32 length) {
-    CARDi_ReadRom(sDefaultDmaNo, position, buffer, length, FSi_RomReadEnd, arc, TRUE);
+    CARD_ReadRomAsync(sDefaultDmaNo, (const void *)position, buffer, length, FSi_RomReadEnd, arc);
     return FS_RESULT_PROC_ASYNC;
 }
 
@@ -120,7 +120,7 @@ void FSi_InitRomArchive(u32 dma) {
 // NitroSDK's FS_SetDefaultDMA: the DMA channel that the ROM archive reads with, or FS_DMA_NOT_USE. Returns the one
 // before. The archive is not running a command meanwhile
 u32 FS_SetDefaultDMA(u32 dma) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
     u32 previous = sDefaultDmaNo;
     BOOL suspended = FS_SuspendArchive(&sRomFileSystem);
 

@@ -221,7 +221,7 @@ static inline void LoadOamsByFunction_(u32 type, u16 from, u16 to) {
 }
 
 // Sends the affine parameters from from to to of the type alone, through the type's load function
-static inline void LoadAffinesByFunction_(u32 type, u16 from, u16 to) {
+static inline void LoadAffinesByFunction_(u32 type, int from, int to) {
     u16 i;
     const GXOamAttr *src = &oamBuffers_[type].oamBuffer[from * 4];
     u16 num = to - from + 1;

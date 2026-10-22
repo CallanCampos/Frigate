@@ -60,7 +60,7 @@ void DpwTr_Process(void) {
     const u8 *answer;
     int size;
     int type;
-    int group;
+    DWCErrorType group;
 
     switch (sDpwTrWork.state) {
     case 2:

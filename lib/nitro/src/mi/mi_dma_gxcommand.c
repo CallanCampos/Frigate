@@ -29,7 +29,7 @@ static void MIi_DMACallback(void *arg);
 static void MIi_DMAFastCallback(void *arg);
 
 void MI_SendGXCommandAsync(u32 dmaNo, const void *src, u32 length, MIDmaCallback callback, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (length == 0) {
         if (callback != NULL) {

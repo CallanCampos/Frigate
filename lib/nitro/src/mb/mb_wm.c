@@ -176,9 +176,9 @@ static void MBWm_ParentCallback(void *arg) {
                 if (sWmWork->mpFreq != 0) {
                     singleMode = FALSE;
                 }
-                MBWm_ReportError(MB_WM_API_START_MP,
-                                 WM_StartMPEx(MBWm_ParentCallback, sWmWork->recvBuf, sWmWork->recvBufSize,
-                                              sWmWork->sendBuf, sWmWork->sendBufSize, singleMode, 0, 0, 0, 1, 1));
+                MBWm_ReportError(MB_WM_API_START_MP, WM_StartMPEx(MBWm_ParentCallback, (u16 *)sWmWork->recvBuf,
+                                                                  sWmWork->recvBufSize, (u16 *)sWmWork->sendBuf,
+                                                                  sWmWork->sendBufSize, singleMode, 0, 0, 0, 1, 1));
                 return;
             }
             if (MBWm_CanSend()) {
@@ -502,8 +502,8 @@ static void MBWm_ChildCallback(void *arg) {
                     singleMode = TRUE;
                 }
                 MBWm_ReportError(MB_WM_API_START_MP,
-                                 WM_StartMPEx(MBWm_ChildCallback, work->recvBuf, work->recvBufSize, work->sendBuf,
-                                              work->sendBufSize, singleMode, 0, 0, 0, 1, 1));
+                                 WM_StartMPEx(MBWm_ChildCallback, (u16 *)work->recvBuf, work->recvBufSize,
+                                              (u16 *)work->sendBuf, work->sendBufSize, singleMode, 0, 0, 0, 1, 1));
                 return;
             }
             return;
@@ -608,7 +608,7 @@ static int MBWm_RandomBeaconPeriod(void) {
 int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     MBWmWork *wmWork;
     MBCommWork *commWork;
-    u32 irq;
+    OSIntrMode irq;
     u16 *name;
     int i;
     const u16 *src;
@@ -654,7 +654,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     wmWork->sendBufSize = 0;
     wmWork->recvBufSize = 0;
     wmWork->mpFreq = 1;
-    wmWork->recvBuf = commWork->recvBuf;
+    wmWork->recvBuf = (WMMpRecvBuf *)commWork->recvBuf;
     wmWork->parentParam.entryFlag = 0;
     wmWork->parentParam.multiBootFlag = 0;
     wmWork->parentParam.CS_Flag = 1;
@@ -686,7 +686,7 @@ static BOOL MBWm_CheckBufferSize(u32 parentSize, u32 childSize, u32 children) {
 }
 
 BOOL MB_SetParentCommParam(u16 sendSize, u16 maxChildren) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sWmWork->started != 0) {
         OS_RestoreInterrupts(irq);
@@ -732,7 +732,7 @@ static int MBWm_StartInit(void) {
 // Sets the library's work up for a parent on a channel and starts the wireless manager
 static int MBWm_Start(int channel) {
     MBCommPStateCallback callback;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int result;
     int i;
 
@@ -787,7 +787,7 @@ static void MBWm_ResetTask(MBTask *task) {
 // Asks the wireless manager to end, once what it is sending is done
 static BOOL MBWm_End(void) {
     BOOL result = TRUE;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sWmWork->started == 0) {
         MBWm_FinishEnd(NULL);
@@ -806,7 +806,7 @@ static BOOL MBWm_End(void) {
 }
 
 void MB_End(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (gMBCommWork->started == 0) {
         OS_Terminate();

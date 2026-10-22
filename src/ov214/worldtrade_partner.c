@@ -95,7 +95,7 @@ static int (*sPartnerSubSeqTable[])(WorldTradeWork *wk) = {
 int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     Partner_InitWork(wk);
     Partner_BgInit(-32 - wk->drawOffset);
-    if (GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == 0) {
+    if (GXS_GetMasterBrightness() == 0) {
         WorldTrade_SubLcdBgInit(wk, -32 - wk->drawOffset, 1);
     } else {
         WorldTrade_SubLcdBgInit(wk, -32 - wk->drawOffset, 0);
@@ -124,11 +124,9 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
     GFL_NetSetIconScreen(TRUE, HEAPID_WORLDTRADE);
 
     if (wk->subProcessMode == PARTNER_MODE_FROM_PARTNER) {
-        if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) == -16 &&
-            GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) != -16) {
+        if (GX_GetMasterBrightness() == -16 && GXS_GetMasterBrightness() != -16) {
             GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
-        } else if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) != -16 &&
-                   GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR) == -16) {
+        } else if (GX_GetMasterBrightness() != -16 && GXS_GetMasterBrightness() == -16) {
             GFL_WipeSet(4, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
             GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);

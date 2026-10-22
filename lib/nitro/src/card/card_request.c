@@ -10,7 +10,7 @@
 
 // CARDi_OnFifoRecv: called with each word the ARM7 sends. One with the error bit is the ARM7's acknowledgment of the
 // command, which wakes the thread that waits for it
-void CARDi_OnFifoRecv(u32 fifoTag, u32 data, BOOL err) {
+void CARDi_OnFifoRecv(PXIFifoTag fifoTag, u32 data, BOOL err) {
     if (fifoTag == PXI_FIFO_TAG_FS && err) {
         cardi_common.flag &= ~CARD_STAT_WAITFOR7ACK;
         OS_WakeupThreadDirect(cardi_common.curThread);
@@ -41,7 +41,7 @@ BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry) {
             }
         }
         {
-            u32 irq = OS_DisableInterrupts();
+            OSIntrMode irq = OS_DisableInterrupts();
             while ((p->flag & CARD_STAT_WAITFOR7ACK) != 0) {
                 OS_SleepThread(NULL);
             }

@@ -88,7 +88,7 @@ s32 OS_LockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void)) {
 }
 
 static s32 OSi_DoUnlockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void), BOOL disableFiq) {
-    u32 irq;
+    OSIntrMode irq;
 
     if (lockID != lockp->ownerID) {
         return OS_UNLOCK_ERROR;
@@ -117,7 +117,7 @@ s32 OS_UnlockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void)) {
 
 // NitroSDK's OSi_DoTryLockByWord: swaps the ID into the flag, and if the flag was clear it has the lock
 static s32 OSi_DoTryLockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void), BOOL disableFiq) {
-    u32 irq;
+    OSIntrMode irq;
     s32 lastLockFlag;
 
     if (disableFiq) {
@@ -203,7 +203,7 @@ static void OSi_FreeCardBus(void) {
     reg_MI_EXMEMCNT = (u16)(reg_MI_EXMEMCNT | EXMEMCNT_CARD_ARM7);
 }
 
-u16 OS_ReadOwnerOfLockWord(const OSLockWord *lockp) {
+u16 OS_ReadOwnerOfLockWord(OSLockWord *lockp) {
     return lockp->ownerID;
 }
 

@@ -590,8 +590,8 @@ void NNS_G2dCharCanvasInitForOBJ1D(NNSG2dCharCanvas *pCC, void *charBase, int ar
 
 // Maps an area of a text BG's screen to the characters of a canvas, in order. A screen wider than 32 characters is
 // made of 32 by 32 blocks
-void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop, int scnWidth,
-                             int charNo, int cplt) {
+void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop,
+                             NNSG2dTextBGWidth scnWidth, int charNo, int cplt) {
     if (scnWidth <= 32) {
         MapScrToCharLinear((u16 *)scnBase + (scnWidth * areaTop + areaLeft), areaWidth, areaHeight, scnWidth, charNo,
                            cplt);
@@ -646,8 +646,8 @@ int NNS_G2dCalcRequireOBJ1D(u32 areaWidth, u32 areaHeight) {
 }
 
 // Lays out the OBJs that show a 1D OBJ canvas at x, y, and returns their number
-int NNS_G2dArrangeOBJ1D(GXOamAttr *oam, int areaWidth, int areaHeight, int x, int y, int color, int charName,
-                        int vramMode) {
+int NNS_G2dArrangeOBJ1D(GXOamAttr *oam, int areaWidth, int areaHeight, int x, int y, GXOamColorMode color, int charName,
+                        NNSG2dOBJVramMode vramMode) {
     const ObjSizeShift *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
     const int objWidthShift = pSize->widthShift;
     const int objHeightShift = pSize->heightShift;

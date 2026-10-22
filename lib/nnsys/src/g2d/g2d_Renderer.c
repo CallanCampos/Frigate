@@ -162,7 +162,7 @@ static inline void TranslateFlipped_(const NNSG2dSVec2 *pos) {
     NNS_G2dTranslate(x << FX32_SHIFT, y << FX32_SHIFT, 0);
 }
 
-static inline void ApplySRT_(const NNSG2dSRT *srt) {
+static inline void ApplySRT_(const NNSG2dSRTData *srt) {
     if (srt->SRT_EnableFlag & NNS_G2D_SRTFLAG_TRANS) {
         TranslateFlipped_(&srt->trans);
     }
@@ -184,14 +184,14 @@ static inline void DrawCellToCore_(const NNSG2dCellData *cell) {
 
 static inline void BeginRndCoreRendering2D_(NNSG2dRendererInstance *rend, NNSG2dRenderSurface *surface) {
     rend->pCurrentSurface = surface;
-    NNS_G2dSetRndCoreSurface(&rend->rendererCore, surface);
+    NNS_G2dSetRndCoreSurface(&rend->rendererCore, &surface->coreSurface);
     NNS_G2dSetRndCoreOamRegisterFunc(&rend->rendererCore, surface->pFuncOamRegister, surface->pFuncOamAffineRegister);
     NNS_G2dRndCoreBeginRendering(&rend->rendererCore);
 }
 
 static inline void BeginRndCoreRendering3D_(NNSG2dRendererInstance *rend, NNSG2dRenderSurface *surface) {
     rend->pCurrentSurface = surface;
-    NNS_G2dSetRndCoreSurface(&rend->rendererCore, surface);
+    NNS_G2dSetRndCoreSurface(&rend->rendererCore, &surface->coreSurface);
     NNS_G2dRndCoreBeginRendering(&rend->rendererCore);
 }
 
@@ -392,7 +392,7 @@ static void DrawCellImpl_(const NNSG2dCellData *cell) {
 static void DrawCellAnimationImpl_(const NNSG2dCellAnimation *cellAnim) {
     const NNSG2dCellData *cell = cellAnim->pCurrentCell;
 
-    if (cellAnim->srtCtrl.data.srtData.SRT_EnableFlag == NNS_G2D_SRTFLAG_IDENTITY) {
+    if (cellAnim->srtCtrl.srtData.SRT_EnableFlag == NNS_G2D_SRTFLAG_IDENTITY) {
         if (IsVramTransferHandleValid_(cellAnim->cellTransferStateHandle)) {
             currentCellVramTransferHandle_ = cellAnim->cellTransferStateHandle;
             DrawCellImpl_(cell);
@@ -402,7 +402,7 @@ static void DrawCellAnimationImpl_(const NNSG2dCellAnimation *cellAnim) {
         }
     } else {
         NNS_G2dPushMtx();
-        ApplySRT_(&cellAnim->srtCtrl.data.srtData);
+        ApplySRT_(&cellAnim->srtCtrl.srtData);
         if (IsVramTransferHandleValid_(cellAnim->cellTransferStateHandle)) {
             currentCellVramTransferHandle_ = cellAnim->cellTransferStateHandle;
             DrawCellImpl_(cell);
@@ -419,7 +419,7 @@ static void DrawNode_(const NNSG2dNode *node) {
         const NNSG2dCellAnimation *cellAnim = node->pContent;
 
         NNS_G2dPushMtx();
-        ApplySRT_(&node->srtCtrl.data.srtData);
+        ApplySRT_(&node->srtCtrl.srtData);
         DrawCellAnimationImpl_(cellAnim);
         NNS_G2dPopMtx(1);
     }
@@ -613,11 +613,11 @@ static void DrawMCInstance_(const NNSG2dMultiCellInstance *instance) {
 }
 
 void NNS_G2dDrawMultiCellAnimation(const NNSG2dMultiCellAnimation *mcAnim) {
-    if (mcAnim->srtCtrl.data.srtData.SRT_EnableFlag == NNS_G2D_SRTFLAG_IDENTITY) {
+    if (mcAnim->srtCtrl.srtData.SRT_EnableFlag == NNS_G2D_SRTFLAG_IDENTITY) {
         DrawMCInstance_(&mcAnim->multiCellInstance);
     } else {
         NNS_G2dPushMtx();
-        ApplySRT_(&mcAnim->srtCtrl.data.srtData);
+        ApplySRT_(&mcAnim->srtCtrl.srtData);
         DrawMCInstance_(&mcAnim->multiCellInstance);
         NNS_G2dPopMtx(1);
     }
@@ -726,7 +726,7 @@ void NNS_G2dRotZ(fx32 sin, fx32 cos) {
     SetMtxStateSR_();
 }
 
-const NNSG2dPaletteSwapTable *NNS_G2dGetRendererPaletteTbl(const NNSG2dRendererInstance *rend) {
+const NNSG2dPaletteSwapTable *NNS_G2dGetRendererPaletteTbl(NNSG2dRendererInstance *rend) {
     return rend->pPaletteSwapTbl;
 }
 

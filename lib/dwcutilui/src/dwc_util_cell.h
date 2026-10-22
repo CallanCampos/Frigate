@@ -26,11 +26,11 @@ GXOamAttr *DWCUtilCell_AllocOam(int screen, int cell);
 DWCUtilOamNode *DWCUtilCell_AllocOamRun(int screen, int cell, BOOL fromFront);
 
 // An empty stack for count items, and one filled with the count items that start at first, stride bytes apart
-DWCUtilStack *DWCUtilStack_Create(int count);
-DWCUtilStack *DWCUtilStack_CreateFilled(int count, u8 *first, int stride);
-void DWCUtilStack_Destroy(DWCUtilStack *stack);
-void DWCUtilStack_Push(DWCUtilStack *stack, void *item);
+DWCUtilStack *DWCi_QUElForm(int count);
+DWCUtilStack *DWCi_QUElFormEx(int count, u8 *first, int stride);
+void DWCi_QUElDelete(DWCUtilStack *stack);
+void DWCi_QUElPushBack(DWCUtilStack *stack, void *item);
 // The last item pushed, or NULL
-void *DWCUtilStack_Pop(DWCUtilStack *stack);
+void *DWCi_QUElPopFront(DWCUtilStack *stack);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_CELL_H

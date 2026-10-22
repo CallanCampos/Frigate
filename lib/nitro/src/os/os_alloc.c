@@ -108,13 +108,13 @@ static OSAllocCell *DLInsert(OSAllocCell *list, OSAllocCell *cell) {
 
 // NitroSDK's OS_AllocFromHeap: gives memory of the size, aligned to 0x20, from the heap (the
 // arena's current one when negative); NULL when the arena has no heaps or no cell is big enough
-void *OS_AllocFromHeap(int arena, int heap, u32 size) {
+void *OS_AllocFromHeap(OSArenaId arena, OSHeapHandle heap, u32 size) {
     OSHeapInfo *info;
     OSHeap *hp;
     OSAllocCell *cell;
     OSAllocCell *rest;
     u32 leftover;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     info = sHeapInfo[arena];
     if (info == NULL) {
@@ -159,11 +159,11 @@ void *OS_AllocFromHeap(int arena, int heap, u32 size) {
 }
 
 // NitroSDK's OS_FreeToHeap: gives memory back to the heap (the arena's current one when negative)
-void OS_FreeToHeap(int arena, int heap, void *ptr) {
+void OS_FreeToHeap(OSArenaId arena, OSHeapHandle heap, void *ptr) {
     OSHeapInfo *info;
     OSHeap *hp;
     OSAllocCell *cell;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     info = sHeapInfo[arena];
     if (heap < 0) {
@@ -178,10 +178,10 @@ void OS_FreeToHeap(int arena, int heap, void *ptr) {
 
 // NitroSDK's OS_InitAlloc: makes the arena's table of heaps, with room for the number of them, at
 // the start of the memory that it is given, and returns where the memory that is left starts
-void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
+void *OS_InitAlloc(OSArenaId arena, void *start, void *end, int maxHeaps) {
     OSHeapInfo *info = start;
     u32 heapsSize;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
     sHeapInfo[arena] = info;
@@ -204,12 +204,12 @@ void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
 
 // NitroSDK's OS_CreateHeap: makes a heap of the memory from start to end (rounded in to 0x20), and
 // returns its number, or -1 when the arena has no room for another heap
-int OS_CreateHeap(int arena, void *start, void *end) {
+OSHeapHandle OS_CreateHeap(OSArenaId arena, void *start, void *end) {
     OSHeapInfo *info;
     OSHeap *hp;
     OSAllocCell *cell;
     int heap;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     info = sHeapInfo[arena];
     start = (void *)OS_ROUND_UP_32(start);
@@ -234,12 +234,12 @@ int OS_CreateHeap(int arena, void *start, void *end) {
 
 // On a DS, makes a heap of the 16 KB at the start of the main memory (which nothing else uses before the program)
 // once, in the first heap of the arena that is free. Gives the heap's number, or -1
-int OS_CreateExtraHeap(int arena) {
+OSHeapHandle OS_CreateExtraHeap(OSArenaId arena) {
     OSHeapInfo *info;
     OSHeap *hp;
     OSAllocCell *cell;
     int heap;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     info = sHeapInfo[arena];
     if (!OS_IsRunOnTwl() && sExtraHeap.heap < 0) {
@@ -265,8 +265,8 @@ int OS_CreateExtraHeap(int arena) {
 }
 
 // The usable size of an allocated block, which MSL's __sys_pointer_size asks for
-u32 OS_ReferentSize(int arena, void *ptr) {
-    u32 irq = OS_DisableInterrupts();
+u32 OS_ReferentSize(OSArenaId arena, void *ptr) {
+    OSIntrMode irq = OS_DisableInterrupts();
 
     OS_RestoreInterrupts(irq);
     return ((OSAllocCell *)((u8 *)ptr - OS_ALLOC_HEADER_SIZE))->size - OS_ALLOC_HEADER_SIZE;

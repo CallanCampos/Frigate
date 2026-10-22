@@ -10,28 +10,28 @@
 #include "dwc_util_text.h"
 #include "nitro/gx.h"
 
-static void DWCUtilPageMulti4_LoadGraphics(void);
-static void DWCUtilPageMulti4_FadeIn(void);
+static void initGraphics(void);
+static void procInit(void);
 static void DWCUtilPageMulti4_WaitFadeIn(void);
-static void DWCUtilPageMulti4_Main(void);
-static void func_ov182_021b0b8c(void);
+static void procScene(void);
+static void draw(void);
 static void DWCUtilPageMulti4_FadeOut(void);
 static void DWCUtilPageMulti4_WaitFadeOut(void);
-static void DWCUtilPageMulti4_UpdateTimer(void);
+static void wait(void);
 
 // The frames since the message appeared
 static u8 sPageMulti4Frames;
 
 void DWCUtilPageMulti4_Init(void) {
     sPageMulti4Frames = 0;
-    DWCUtilPageMulti4_LoadGraphics();
-    DWCUtilBgOverlay_ShowConnectionSet();
-    DWCUtilGfxResource_ShowMessage(0x23);
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_CMNlMsgDraw(0x23);
     DWCUtilSound_PlaySe(0x10);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti4_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilPageMulti4_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -39,41 +39,41 @@ static void DWCUtilPageMulti4_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilPageMulti4_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti4_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(DWCUtilPageMulti4_WaitFadeIn);
 }
 
 static void DWCUtilPageMulti4_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(DWCUtilPageMulti4_Main);
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilPageMulti4_Main(void) {
-    DWCUtilPageMulti4_UpdateTimer();
-    func_ov182_021b0b8c();
+static void procScene(void) {
+    wait();
+    draw();
 }
 
-static void func_ov182_021b0b8c(void) {
+static void draw(void) {
 }
 
 static void DWCUtilPageMulti4_FadeOut(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilMain_SetUpdate(DWCUtilPageMulti4_WaitFadeOut);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_ChangeScene(DWCUtilPageMulti4_WaitFadeOut);
 }
 
 static void DWCUtilPageMulti4_WaitFadeOut(void) {
     DWCUtilPageMulti4_WaitFadeOutInline();
 }
 
-static void DWCUtilPageMulti4_UpdateTimer(void) {
+static void wait(void) {
     sPageMulti4Frames++;
     if (sPageMulti4Frames >= 120) {
-        DWCUtilMain_SetUpdate(DWCUtilPageMulti4_FadeOut);
+        DWCi_ChangeScene(DWCUtilPageMulti4_FadeOut);
     }
 }

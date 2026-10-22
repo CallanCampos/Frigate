@@ -31,13 +31,13 @@ struct GSyncDownload {
     BOOL timedOut;
 };
 
-static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError);
+static void GSyncDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError);
 static u32 GSyncDownload_OnDwcEvent(void *work, int a1, int event, int a3);
 static BOOL GSyncDownload_UpdateTimer(GSyncDownload *dl);
 
 static GSyncDownload *_pDLWork;
 
-static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
+static void GSyncDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError) {
     u32 result = error;
 
     switch (error) {
@@ -49,7 +49,7 @@ static void GSyncDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
     case DWC_ND_ERROR_CANCELED:
         _pDLWork->cancelled = TRUE;
         break;
-    case ND_ERROR_FATAL:
+    case DWC_ND_ERROR_FATAL:
         GFL_NetErrShowFatal();
         break;
     }

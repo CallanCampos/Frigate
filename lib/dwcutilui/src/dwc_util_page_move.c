@@ -21,38 +21,38 @@ typedef struct DWCUtilPageMove {
     u8 yes;
 } DWCUtilPageMove;
 
-static void DWCUtilPageMove_LoadGraphics(void);
-static void DWCUtilPageMove_FadeIn(void);
-static void DWCUtilPageMove_WaitFadeIn(void);
-static void DWCUtilPageMove_WaitDialog(void);
-static void DWCUtilPageMove_Main(void);
-static void func_ov182_021b030c(void);
-static void func_ov182_021b0310(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
 static void DWCUtilPageMove_FadeOut(void);
-static void DWCUtilPageMove_WaitFadeOut(void);
-static void DWCUtilPageMove_WaitMoveEnd(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilPageMove_OnMoveEvent(int event);
 
 static DWCUtilPageMove sPageMove;
 
 void DWCUtilPageMove_Init(void) {
-    const MBUserInfo *user = DWCUtilMove_GetChildUser();
-    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
+    const MBUserInfo *user = DWCi_MOVlGetChild();
+    DWCUtilText *text = DWCi_FNTlFormBgEx(0, 0);
     u16 name[MB_USER_NAME_LENGTH + 1];
 
     sPageMove.yes = FALSE;
     sPageMove.interrupted = FALSE;
-    DWCUtilPageMove_LoadGraphics();
+    initGraphics();
     MI_CpuClear16(name, sizeof(name));
     MI_CpuCopy16(user->name, name, user->nameLength * 2);
-    DWCUtilText_DrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
+    DWCi_FNTlDrawRect(text, 8, 0x35, 0xf0, 0x1c, 2, 0x480, name);
     DWCUtilText_MarkDirty(text);
-    DWCUtilMove_SetCallback(DWCUtilPageMove_OnMoveEvent);
+    DWCi_MOVlChangeCallback(DWCUtilPageMove_OnMoveEvent);
     DWCUtilDialog_Open(0x1d, 4, 0, -1, 0);
-    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilPageMove_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/jb5Move.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -61,29 +61,29 @@ static void DWCUtilPageMove_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilPageMove_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilPageMove_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitDialog);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilPageMove_WaitDialog(void) {
-    if (DWCUtilDialog_GetChoice() != -2) {
-        DWCUtilMain_SetUpdate(DWCUtilPageMove_Main);
+static void procInit2(void) {
+    if (DWCi_WINlGet() != -2) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilPageMove_Main(void) {
-    func_ov182_021b030c();
-    func_ov182_021b0310();
-    switch (DWCUtilDialog_GetChoice()) {
+static void procScene(void) {
+    input();
+    draw();
+    switch (DWCi_WINlGet()) {
     case 0:
         sPageMove.yes = FALSE;
         DWCUtilSound_PlaySe(7);
@@ -95,59 +95,59 @@ static void DWCUtilPageMove_Main(void) {
     default:
         return;
     }
-    DWCUtilMove_SetCallback(NULL);
-    DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(DWCUtilPageMove_FadeOut);
+    DWCi_MOVlChangeCallback(NULL);
+    DWCi_WINlEnd();
+    DWCi_ChangeScene(DWCUtilPageMove_FadeOut);
 }
 
-static void func_ov182_021b030c(void) {
+static void input(void) {
 }
 
-static void func_ov182_021b0310(void) {
+static void draw(void) {
 }
 
 static void DWCUtilPageMove_FadeOut(void) {
-    if (!DWCUtilDialog_IsOpen()) {
+    if (!DWCi_WINlIsInit()) {
         if (!sPageMove.yes) {
-            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+            DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene1);
     }
 }
 
 // Sends the settings, or ends the move
-static void DWCUtilPageMove_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
         if (!sPageMove.interrupted && sPageMove.yes == TRUE) {
-            DWCUtilMove_StartSending();
+            DWCi_MOVlAdmitChild();
         } else {
             DWCUtilMove_End();
         }
-        DWCUtilMain_SetUpdate(DWCUtilPageMove_WaitMoveEnd);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
 // Waits for the end of the move, unless it goes on
-static void DWCUtilPageMove_WaitMoveEnd(void) {
-    if ((sPageMove.interrupted || !sPageMove.yes) && !DWCUtilMove_HasEnded()) {
+static void endScene2(void) {
+    if ((sPageMove.interrupted || !sPageMove.yes) && !DWCi_MOVlIsEnd()) {
         return;
     }
-    DWCUtilText_DestroyScreenBg(0);
+    DWCi_FNTlDeleteBgLcd(0);
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sPageMove.yes) {
-        DWCUtilScreen_Stop();
+        DWCi_COMMENTlDelete();
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     }
-    DWCUtilMain_SetLayout(0, 1);
+    DWCi_SetParam_(0, 1);
     if (sPageMove.interrupted) {
-        DWCUtilMain_SetUpdate(DWCUtilNoticeScreen_Init);
+        DWCi_ChangeScene(DWCUtilNoticeScreen_Init);
     } else if (!sPageMove.yes) {
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
-        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
+        DWCi_ChangeScene(DWCUtilOptionMenu_Init);
     } else {
-        DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitMove);
+        DWCi_ChangeScene(DWCUtilTopMenu_InitMove);
     }
 }
 

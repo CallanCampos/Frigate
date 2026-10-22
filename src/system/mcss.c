@@ -543,17 +543,16 @@ static void MCSS_DrawQuad(MCSSSystem *system, MCSS *mcss, fx32 x, fx32 y, fx32 w
         G3_End();
     }
 
-    // The constant steps are longs, the type of the SDK's fx32
     if (ortho == FALSE) {
         if (system->cellDepth == 0) {
-            *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100L : 0x100L;
+            *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100 : 0x100;
         } else {
             *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -system->cellDepth : system->cellDepth;
         }
     } else if (system->orthoNear) {
-        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100L : 0x100L;
+        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x100 : 0x100;
     } else {
-        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x400L : 0x400L;
+        *z -= ((mcss->alpha != MCSS_ALPHA_MAX) | mcss->reverse) ? -0x400 : 0x400;
     }
 }
 

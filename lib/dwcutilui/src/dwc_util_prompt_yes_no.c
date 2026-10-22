@@ -15,31 +15,31 @@
 #include "dwc_util_ui_object.h"
 #include "nitro/gx.h"
 
-static void DWCUtilPromptYesNo_LoadGraphics(void);
-static void DWCUtilPromptYesNo_FadeIn(void);
-static void DWCUtilPromptYesNo_WaitFadeIn(void);
-static void DWCUtilPromptYesNo_WaitButtons(void);
-static void DWCUtilPromptYesNo_Main(void);
-static void DWCUtilPromptYesNo_HandleInput(void);
-static void func_ov182_021afcd8(void);
-static void DWCUtilPromptYesNo_HandleChoice(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilPromptYesNo_DisableButtons(void);
-static void DWCUtilPromptYesNo_FadeOut(void);
-static void DWCUtilPromptYesNo_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 
 // Whether the player answered yes
 static u8 sYes;
 
 void DWCUtilPromptYesNo_Init(void) {
     sYes = FALSE;
-    DWCUtilPromptYesNo_LoadGraphics();
-    DWCUtilBgOverlay_Show(0x13);
-    DWCUtilScreen_Start(0x3c, -1, 0);
-    DWCUtilGfxResource_ShowMessage(0x1b);
-    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_FadeIn);
+    initGraphics();
+    DWCi_HLlLoad(0x13);
+    DWCi_COMMENTlDispEx(0x3c, -1, 0);
+    DWCi_CMNlMsgDraw(0x1b);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilPromptYesNo_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/yb5Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -48,44 +48,44 @@ static void DWCUtilPromptYesNo_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilPromptYesNo_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilPromptYesNo_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(3);
-        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(3);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilPromptYesNo_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilPromptYesNo_Main(void) {
-    DWCUtilPromptYesNo_HandleInput();
-    func_ov182_021afcd8();
-    DWCUtilPromptYesNo_HandleChoice();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilPromptYesNo_HandleInput(void) {
+static void input(void) {
     DWCUtilInfoMenu_EraseHandleInputInline();
 }
 
-static void func_ov182_021afcd8(void) {
+static void draw(void) {
 }
 
-static void DWCUtilPromptYesNo_HandleChoice(void) {
-    switch (DWCUtilUiObject_GetState()) {
+static void button(void) {
+    switch (DWCi_BTNlGet()) {
     case 0:
         DWCUtilSound_PlaySe(7);
         break;
@@ -96,41 +96,41 @@ static void DWCUtilPromptYesNo_HandleChoice(void) {
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_DisableButtons);
+    DWCi_ChangeScene(DWCUtilPromptYesNo_DisableButtons);
 }
 
 static void DWCUtilPromptYesNo_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilPromptYesNo_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilUiObject_Exit();
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_BTNlEnd();
         if (!sYes) {
-            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+            DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilPromptYesNo_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) == 0 && (sYes || DWCUtilFade_IsActive(1) == 0) && DWCUtilUiObject_IsIdle()) {
-        DWCUtilText_DestroyScreenBg(0);
+static void endScene2(void) {
+    if (DWCi_EFFlCheck(0) == 0 && (sYes || DWCi_EFFlCheck(1) == 0) && DWCi_BTNlIsEnd()) {
+        DWCi_FNTlDeleteBgLcd(0);
         if (!sYes) {
-            DWCUtilScreen_Stop();
+            DWCi_COMMENTlDelete();
             DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sYes) {
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Init);
+            DWCi_SetParam_(0, 1);
+            DWCi_ChangeScene(DWCUtilOptionMenu_Init);
         } else {
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetUpdate(DWCUtilTopMenu_InitInstructions);
+            DWCi_SetParam_(0, 1);
+            DWCi_ChangeScene(DWCUtilTopMenu_InitInstructions);
         }
     }
 }

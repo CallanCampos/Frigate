@@ -61,7 +61,7 @@ typedef struct NNSSndArcInfo {
 typedef struct NNSSndArcFileInfo {
     u32 offset;
     u32 size;
-    const void *mem;
+    void *mem;
     u32 reserved;
 } NNSSndArcFileInfo;
 

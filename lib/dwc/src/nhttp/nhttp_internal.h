@@ -54,16 +54,16 @@ enum {
 };
 
 typedef struct NHttpState NHttpState;
-typedef struct NHttpRequest NHttpRequest;
-typedef struct NHttpResponse NHttpResponse;
+typedef struct NHTTPReq NHTTPReq;
+typedef struct NHTTPRes NHTTPRes;
 typedef struct NHttpConnection NHttpConnection;
 typedef struct NHttpThreadInfo NHttpThreadInfo;
 typedef struct NHttpMutexInfo NHttpMutexInfo;
 
 // NHTTP_bgnend's: the allocator, the error and what the thread needs to run
 struct NHttpState {
-    NHttpAllocFunc alloc;
-    NHttpFreeFunc free;
+    NHTTPAlloc alloc;
+    NHTTPFree free;
     BOOL started;
     int socket;
     int sslError;
@@ -75,33 +75,33 @@ struct NHttpState {
 };
 
 // A part of the request's header or post data: its name and value, and for a post the size of the value
-typedef struct NHttpHeader {
-    struct NHttpHeader *prev;
-    struct NHttpHeader *next;
-    char *name;
+typedef struct NHTTPi_DATALIST {
+    struct NHTTPi_DATALIST *prev;
+    struct NHTTPi_DATALIST *next;
+    char *label;
     char *value;
     int length;
-    int binary;
-} NHttpHeader;
+    int isBinary;
+} NHTTPi_DATALIST;
 
 // A request that was sent and waits for the thread, or that the thread runs
-typedef struct NHttpQueueNode {
-    struct NHttpQueueNode *prev;
-    struct NHttpQueueNode *next;
+typedef struct NHTTPi_REQLIST {
+    struct NHTTPi_REQLIST *prev;
+    struct NHTTPi_REQLIST *next;
     int id;
     // The comm thread changes it while the caller's thread cancels it
-    NHttpRequest *volatile request;
+    NHTTPReq *volatile req;
     int socket;
-} NHttpQueueNode;
+} NHTTPi_REQLIST;
 
 typedef struct NHttpListInfo {
-    NHttpQueueNode *head;
+    NHTTPi_REQLIST *head;
     // The next request's ID, taken by the caller's thread while the HTTP thread works through the queue
     volatile int count;
 } NHttpListInfo;
 
 typedef struct NHttpReqInfo {
-    NHttpQueueNode *current;
+    NHTTPi_REQLIST *current;
 } NHttpReqInfo;
 
 // The mutex that guards the connections, and whether it is made
@@ -122,17 +122,17 @@ struct NHttpThreadInfo {
 };
 
 // A part of a response's header beyond the first NHTTP_HEADER_SIZE bytes
-typedef struct NHttpHeaderBlock {
-    struct NHttpHeaderBlock *next;
-    char data[NHTTP_HEADER_BLOCK_SIZE];
-} NHttpHeaderBlock;
+typedef struct NHTTPi_HDRBUFLIST {
+    struct NHTTPi_HDRBUFLIST *next;
+    char block[NHTTP_HEADER_BLOCK_SIZE];
+} NHTTPi_HDRBUFLIST;
 
 // Called when a response is destroyed with its buffer, the function to free it with and the user's parameter
-typedef void (*NHttpReleaseFunc)(void *buffer, NHttpFreeFunc free, void *param);
+typedef void (*NHttpReleaseFunc)(void *buffer, NHTTPFree free, void *param);
 
 // What the server answered: the raw header (the first NHTTP_HEADER_SIZE bytes here, the rest in blocks) and the body
 // in the user's buffer
-struct NHttpResponse {
+struct NHTTPRes {
     // Written by the receiving thread while the caller's thread reads it
     volatile int headerSize;
     int bufferUsed;
@@ -147,7 +147,7 @@ struct NHttpResponse {
     char *buffer;
     int unk_2C;
     NHttpReleaseFunc release;
-    NHttpHeaderBlock *blocks;
+    NHTTPi_HDRBUFLIST *blocks;
     char header[NHTTP_HEADER_SIZE];
     void *userParam;
 };
@@ -165,21 +165,21 @@ typedef struct NHttpSslInfo {
 
 // What a request is: its url and the parts of it, the headers and post data it carries, and the settings that
 // NHTTP_SetRootCA and the like give
-struct NHttpRequest {
-    BOOL canceled;
-    BOOL sent;
-    BOOL https;
+struct NHTTPReq {
+    BOOL doCancel;
+    BOOL isStarted;
+    BOOL isSSL;
     BOOL useProxy;
     BOOL rawPost;
     int hostEnd;
     int pathStart;
     int method;
     int port;
-    char *url;
+    char *pURL;
     char *host;
-    NHttpResponse *response;
-    NHttpHeader *headers;
-    NHttpHeader *postData;
+    NHTTPRes *response;
+    NHTTPi_DATALIST *pListHeader;
+    NHTTPi_DATALIST *postData;
     char boundary[NHTTP_BOUNDARY_SIZE];
     char authorization[0x5c];
     int authorizationSize;
@@ -214,8 +214,8 @@ struct NHttpConnection {
     int status;
     int unk_08;
     BOOL running;
-    NHttpRequest *request;
-    NHttpResponse *response;
+    NHTTPReq *request;
+    NHTTPRes *response;
     int id;
     NHttpCallback callback;
     NHttpConnection *next;
@@ -312,17 +312,16 @@ void NHTTPi_CheckCurrentThread(NHttpThreadInfo *info, BOOL outside);
 
 // NHTTP_socket
 int NHTTPi_SocCheck(int sock);
-int NHTTPi_SocOpen(NHttpRequest *request);
-int NHTTPi_SocClose(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock);
-int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, u32 addr,
-                      int port);
-int NHTTPi_SocSSLConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock);
+int NHTTPi_SocOpen(NHTTPReq *request);
+int NHTTPi_SocClose(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock);
+int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock, u32 addr, int port);
+int NHTTPi_SocSSLConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock);
 int NHTTPi_SocRecv_sub(NHttpConnection *connection, int sock, void *buffer, int size, int flags);
-int NHTTPi_SocRecv(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, void *buffer, int size, int flags);
+int NHTTPi_SocRecv(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock, void *buffer, int size, int flags);
 int NHTTPi_SocSend_sub(int sock, const void *buffer, int size, int flags);
-int NHTTPi_SocSend(NHttpRequest *request, int sock, const void *buffer, int size, int flags);
-void NHTTPi_SocCancel(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock);
-u32 NHTTPi_resolveHostname(NHttpRequest *request, const char *host);
+int NHTTPi_SocSend(NHTTPReq *request, int sock, const void *buffer, int size, int flags);
+void NHTTPi_SocCancel(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock);
+u32 NHTTPi_resolveHostname(NHTTPReq *request, const char *host);
 
 // NHTTP_stdlib
 void NHTTPi_memcpy(void *dest, const void *src, u32 size);
@@ -349,49 +348,49 @@ void NHTTPi_free(void *ptr);
 void NHTTPi_SetError(NHttpState *state, int error);
 void NHTTPi_SetSSLError(NHttpState *state, int error);
 int NHTTPi_GetSSLError(NHttpState *state);
-BOOL NHTTPi_Startup(NHttpRoot *root, NHttpAllocFunc alloc, NHttpFreeFunc free, int priority);
+BOOL NHTTPi_Startup(NHttpRoot *root, NHTTPAlloc alloc, NHTTPFree free, int priority);
 void NHTTPi_CleanupAsync(NHttpRoot *root, void (*callback)(void));
 int NHTTPi_GetError(NHttpState *state);
 
 // NHTTP_control
 extern const char NHTTPi_boundary[];
-BOOL NHTTPi_addHdrList(NHttpHeader **list, NHttpState *state, const char *name, const char *value);
-NHttpHeader *NHTTPi_getHdrFromList(void *list);
-BOOL NHTTP_AddHeaderField(NHttpRequest *request, NHttpState *state, const char *name, const char *value);
-BOOL NHTTP_AddPostDataAscii(NHttpRequest *request, NHttpState *state, const char *name, const char *value);
+BOOL NHTTPi_addHdrList(NHTTPi_DATALIST **list, NHttpState *state, const char *name, const char *value);
+NHTTPi_DATALIST *NHTTPi_getHdrFromList(void *list);
+BOOL NHTTP_AddHeaderField(NHTTPReq *request, NHttpState *state, const char *name, const char *value);
+BOOL NHTTP_AddPostDataAscii(NHTTPReq *request, NHttpState *state, const char *name, const char *value);
 
 // NHTTP_list
 void NHTTPi_InitListInfo(NHttpListInfo *info);
-int NHTTPi_setReqQueue(NHttpListInfo *info, NHttpRequest *request);
-NHttpQueueNode *NHTTPi_findReqQueue(NHttpListInfo *info, int id);
+int NHTTPi_setReqQueue(NHttpListInfo *info, NHTTPReq *request);
+NHTTPi_REQLIST *NHTTPi_findReqQueue(NHttpListInfo *info, int id);
 BOOL NHTTPi_freeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo, int id);
 void NHTTPi_allFreeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo);
-NHttpQueueNode *NHTTPi_getReqFromReqQueue(NHttpListInfo *info);
+NHTTPi_REQLIST *NHTTPi_getReqFromReqQueue(NHttpListInfo *info);
 
 // NHTTP_recvbuf
-BOOL NHTTPi_isRecvBufFull(NHttpResponse *response, u32 size);
-int NHTTPi_findNextLineHdrRecvBuf(NHttpResponse *response, int start, int end, int *colon, int *lineEnd);
-int NHTTPi_skipSpaceHdrRecvBuf(NHttpResponse *response, int start, int end);
-int NHTTPi_compareTokenN_HdrRecvBuf(NHttpResponse *response, int start, int end, const char *token, int terminator);
-BOOL NHTTPi_loadFromHdrRecvBuf(NHttpResponse *response, char *dest, int start, int size);
-int NHTTPi_RecvBuf(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, int offset, int flags);
-int NHTTPi_RecvBufN(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, int offset, int size, int flags);
+BOOL NHTTPi_isRecvBufFull(NHTTPRes *response, u32 size);
+int NHTTPi_findNextLineHdrRecvBuf(NHTTPRes *response, int start, int end, int *colon, int *lineEnd);
+int NHTTPi_skipSpaceHdrRecvBuf(NHTTPRes *response, int start, int end);
+int NHTTPi_compareTokenN_HdrRecvBuf(NHTTPRes *response, int start, int end, const char *token, int terminator);
+BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPRes *response, char *dest, int start, int size);
+int NHTTPi_RecvBuf(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock, int offset, int flags);
+int NHTTPi_RecvBufN(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock, int offset, int size, int flags);
 
 // NHTTP_request
 void NHTTPi_InitRequestInfo(NHttpReqInfo *info);
-NHttpRequest *NHTTP_CreateRequest(NHttpState *state, const char *url, int method, void *buffer, int bufferSize,
-                                  void *param, int unused, NHttpReleaseFunc release);
-void NHTTP_DestroyRequest(NHttpRoot *root, NHttpRequest *request);
-BOOL NHTTPi_destroyRequestObject(NHttpMutexInfo *mutexInfo, NHttpRequest *request);
-int NHTTP_SendRequestAsync(NHttpRoot *root, NHttpRequest *request);
+NHTTPReq *NHTTP_CreateRequest(NHttpState *state, const char *url, int method, void *buffer, int bufferSize, void *param,
+                              int unused, NHttpReleaseFunc release);
+void NHTTP_DestroyRequest(NHttpRoot *root, NHTTPReq *request);
+BOOL NHTTPi_destroyRequestObject(NHttpMutexInfo *mutexInfo, NHTTPReq *request);
+int NHTTP_SendRequestAsync(NHttpRoot *root, NHTTPReq *request);
 BOOL NHTTP_CancelRequestAsync(NHttpRoot *root, int id);
 void NHTTPi_cancelAllRequests(NHttpRoot *root);
 
 // NHTTP_response
-void NHTTP_DestroyResponse(NHttpMutexInfo *mutexInfo, NHttpResponse *response);
-int NHTTPi_getHeaderValue(NHttpResponse *response, const char *name, int *start);
-int NHTTP_GetHeaderField(NHttpResponse *response, const char *name, char **value);
-int NHTTP_GetHeaderAll(NHttpState *state, NHttpResponse *response, char **header);
+void NHTTP_DestroyResponse(NHttpMutexInfo *mutexInfo, NHTTPRes *response);
+int NHTTPi_getHeaderValue(NHTTPRes *response, const char *name, int *start);
+int NHTTP_GetHeaderField(NHTTPRes *response, const char *name, char **value);
+int NHTTP_GetHeaderAll(NHttpState *state, NHTTPRes *response, char **header);
 
 // NHTTP_thread
 void NHTTPi_InitThreadInfo(NHttpThreadInfo *info);
@@ -399,7 +398,7 @@ void NHTTPi_IsCreateCommThreadMessageQueueOn(NHttpThreadInfo *info);
 void NHTTPi_IsCreateCommThreadMessageQueueOff(NHttpThreadInfo *info);
 BOOL NHTTPi_IsCreateCommThreadMessageQueue(NHttpThreadInfo *info);
 BOOL NHTTPi_CheckHeaderEnd(const char *tail, int count);
-int NHTTPi_SaveBuf(NHttpRequest *request, u8 *sendBuffer, int sock, int *count, const u8 *data, int size);
+int saveBuf(NHTTPReq *request, u8 *sendBuffer, int sock, int *count, const u8 *data, int size);
 void NHTTPi_CommThreadProcMain(void);
 
 // d_nhttp_common
@@ -421,12 +420,12 @@ void NHTTPi_unlockReqList(NHttpMutexInfo *mutexInfo);
 NHttpConnection *NHTTPi_ControlConnectionList(NHttpMutexInfo *mutexInfo, NHttpConnection *key, int mode);
 int NHTTPi_CommitConnectionList(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
 int NHTTPi_OmitConnectionList(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
-NHttpResponse *NHTTPi_Connection2Response(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
-NHttpConnection *NHTTPi_Request2Connection(NHttpMutexInfo *mutexInfo, NHttpRequest *request);
-NHttpConnection *NHTTPi_Response2Connection(NHttpMutexInfo *mutexInfo, NHttpResponse *response);
+NHTTPRes *NHTTPi_Connection2Response(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
+NHttpConnection *NHTTPi_Request2Connection(NHttpMutexInfo *mutexInfo, NHTTPReq *request);
+NHttpConnection *NHTTPi_Response2Connection(NHttpMutexInfo *mutexInfo, NHTTPRes *response);
 NHttpConnection *NHTTPi_GetConnection(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
-NHttpRequest *NHTTPi_GetRequest(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
-NHttpResponse *NHTTPi_GetResponse(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
+NHTTPReq *NHTTPi_GetRequest(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
+NHTTPRes *NHTTPi_GetResponse(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);
 int NHTTPi_GetConnectionListLength(void);
 int NHTTPi_PostSendCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connection, const char *name, int offset);
 void NHTTPi_BufferFullCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connection);

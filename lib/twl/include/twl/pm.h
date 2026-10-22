@@ -5,11 +5,21 @@
 #include "nitro/pm.h"
 
 // TwlSDK's power management for the DSi, in the LTD autoload: the callbacks run when the console is about to exit the
-// application, as when the power button is pressed. The functions have the names of the SDK functions they implement,
-// from their code; the ones still named by address are not known
+// application, as when the power button is pressed. The functions and types have the names of the TWL-SDK Function
+// Reference Manual (PM_SetExitCallbackInfo, PM_GetExitFactor, the exit callback lists) from their code, and libntr's
+// where the manual has none
 
-typedef PMGenCallback PMExitCallback;
-typedef PMGenCallbackInfo PMExitCallbackInfo;
+// The exit callbacks are the general PM callbacks, which the SDK's header names so with macros
+#define PMExitCallback PMGenCallback
+#define PMExitCallbackInfo PMGenCallbackInfo
+
+// Why the system is exiting: none, the power button, a low battery, or the application (a forced power-off)
+typedef enum {
+    PM_EXIT_FACTOR_NONE = 0,
+    PM_EXIT_FACTOR_PWSW = 1,
+    PM_EXIT_FACTOR_BATTERY = 2,
+    PM_EXIT_FACTOR_USER = 3
+} PMExitFactor;
 
 static inline void PM_SetExitCallbackInfo(PMExitCallbackInfo *info, PMExitCallback callback, void *arg) {
     info->callback = callback;
@@ -20,19 +30,21 @@ void PM_AppendPreExitCallback(PMExitCallbackInfo *info);
 void PM_SetAutoExit(BOOL enabled);
 BOOL PM_GetAutoExit(void);
 void PM_ReadyToExit(void);
-// Like PM_AppendPreExitCallback, but with the callback's priority: inserts it into the list of the callbacks that run
-// before the application exits, and PM_DeletePreExitCallback takes it out
-void PM_InsertPreExitCallback(PMExitCallbackInfo *info, int priority);
-void PM_DeletePreExitCallback(PMExitCallbackInfo *info);
+// Inserts the callback, by its priority, into the post-processing list, the callbacks that run when the application is
+// ready to exit (PMi_ExecutePostExitCallbackList), and PM_DeletePostExitCallback takes it out. NWM and SNDEX pass
+// priorities beyond the manual's -255 to 255, which the function does not check: it may be libntr's
+// PMi_InsertPostExitCallbackEx
+void PM_InsertPostExitCallback(PMExitCallbackInfo *info, int priority);
+void PM_DeletePostExitCallback(PMExitCallbackInfo *info);
 // Why the system is exiting (PMi_ExitType), which NWM checks
-u32 PMi_GetExitType(void);
+PMExitFactor PM_GetExitFactor(void);
 
 // The part of TwlSDK's pm.c that main's pm.c calls on a DSi: the exit request, which starts the exit sequence and runs
 // the pre-exit callbacks, the DSi's battery level, and the stop of a new DMA channel, the DSi's part of PMi_StopDma
-void PMi_ProcessExitRequest(u32 exitType);
+void PMi_ProcessExitRequest(PMExitFactor exitType);
 u32 PMi_GetBatteryLevelCore(u16 *level);
 void PMi_StopNDma(u32 ndmaNo);
-// Runs the callbacks of PM_InsertPreExitCallback's list, as the power-off does, and as OS_ResetSystem and the card's
+// Runs the callbacks of the post-processing list, as the power-off does, and as OS_ResetSystem and the card's
 // pull-out do on a DSi
 void PMi_ExecutePostExitCallbackList(void);
 

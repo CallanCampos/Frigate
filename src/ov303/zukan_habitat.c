@@ -418,8 +418,8 @@ static void ZukanHabitat_SeqFadeIn(ZukanHabitatWork *wk) {
         break;
     case 1:
         if (!ZukanHabitatGraphic_IsFading(&wk->graphic)) {
-            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+            GX_SetMasterBrightness(0);
+            GXS_SetMasterBrightness(0);
             wk->step++;
         }
         break;
@@ -470,8 +470,8 @@ static void ZukanHabitat_SeqFadeOut(ZukanHabitatWork *wk) {
     case 1:
         if (!ZukanHabitatGraphic_IsFading(&wk->graphic)) {
             if (wk->slideMain >= SLIDE_DISTANCE) {
-                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+                GX_SetMasterBrightness(-16);
+                GXS_SetMasterBrightness(-16);
                 wk->finished = TRUE;
             } else {
                 ZukanHabitatGraphic_Scroll(&wk->graphic, SLIDE_SPEED, TRUE);

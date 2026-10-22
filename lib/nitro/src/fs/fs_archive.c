@@ -54,7 +54,7 @@ static BOOL FSi_IsEventCommand(u32 command) {
 static void FSi_EndCommand(FSFile *file, FSResult result) {
     FSArchive *arc;
     FSCommandType command;
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     arc = file->arc;
     if (arc != NULL) {
@@ -85,7 +85,7 @@ static void FSi_EndCommand(FSFile *file, FSResult result) {
 // until the archive ends it, and returns its result
 FSResult FSi_WaitForArchiveCompletion(FSFile *file, FSResult result) {
     if (result == FS_RESULT_PROC_ASYNC) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
         while (!(file->stat & FS_FILE_STATUS_ENDED)) {
             OS_SleepThread(&file->queue);
@@ -303,9 +303,9 @@ static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
 // returns the file whose command the caller has to run. A blocked thread runs its own, so none is returned for it
 static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
     FSFile *next = NULL;
-    u32 interrupts;
-    u32 activateInterrupts;
-    u32 runInterrupts;
+    OSIntrMode interrupts;
+    OSIntrMode activateInterrupts;
+    OSIntrMode runInterrupts;
     BOOL activate;
 
     interrupts = OS_DisableInterrupts();
@@ -373,7 +373,7 @@ static void FSi_ExecuteAsyncCommand(FSFile *file) {
     FSArchive *arc = file->arc;
 
     while (file != NULL) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
         file->stat |= FS_FILE_STATUS_RUNNING;
         if (file->stat & FS_FILE_STATUS_BLOCKING) {
@@ -394,7 +394,7 @@ static void FSi_ExecuteAsyncCommand(FSFile *file) {
 // NitroSDK's FSi_ExecuteSyncCommand: waits for a file's turn, runs its command in the calling thread, and goes on with
 // the next ones
 static void FSi_ExecuteSyncCommand(FSFile *file) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     while (!(file->stat & FS_FILE_STATUS_RUNNING) && (file->stat & FS_FILE_STATUS_BUSY)) {
         OS_SleepThread(&file->queue);
@@ -417,7 +417,7 @@ static void FSi_ExecuteSyncCommand(FSFile *file) {
 BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
     BOOL result = FALSE;
     FSArchive *arc = file->arc;
-    u32 interrupts;
+    OSIntrMode interrupts;
     BOOL start;
     FSFile *next;
 
@@ -470,7 +470,7 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
 // NitroSDK's FS_FindArchive: finds the mounted archive of a name with the given number of characters
 FSArchive *FS_FindArchive(const char *name, int nameLength) {
     FSArchive *arc;
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     for (arc = sArchives.list; arc != NULL; arc = arc->next) {
         if (FS_IsArchiveLoaded(arc)) {
@@ -640,7 +640,7 @@ void FS_InitArchive(FSArchive *arc) {
 // use
 BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
     BOOL result = FALSE;
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     if (FS_FindArchive(name, nameLength) == NULL) {
         FSArchive **link = &sArchives.list;
@@ -682,7 +682,7 @@ void FS_ReleaseArchiveName(FSArchive *arc) {
         OS_Terminate();
     }
     if (arc->longName != NULL) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
         FSArchive *current = sArchives.list;
         FSArchive **link = &sArchives.list;
 
@@ -730,7 +730,7 @@ BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *v
 
 // NitroSDK's FS_UnmountArchive: cancels the commands of an archive, and runs FS_COMMAND_UNMOUNT
 BOOL FS_UnmountArchive(FSArchive *arc) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     if (FS_IsArchiveLoaded(arc)) {
         BOOL suspended = FS_SuspendArchive(arc);
@@ -760,14 +760,14 @@ BOOL FS_UnmountArchive(FSArchive *arc) {
 // NitroSDK's FS_SuspendArchive: stops an archive from starting commands, waiting for the one it runs to end. Returns
 // FALSE if it was suspended already
 BOOL FS_SuspendArchive(FSArchive *arc) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
     BOOL result = !FS_IsArchiveSuspended(arc);
 
     if (result) {
         if (!(arc->flag & FS_ARCHIVE_FLAG_ACTIVE)) {
             arc->flag |= FS_ARCHIVE_FLAG_SUSPENDED;
         } else {
-            u32 waitInterrupts;
+            OSIntrMode waitInterrupts;
 
             arc->flag |= FS_ARCHIVE_FLAG_SUSPENDING;
             waitInterrupts = OS_DisableInterrupts();
@@ -783,7 +783,7 @@ BOOL FS_SuspendArchive(FSArchive *arc) {
 
 // NitroSDK's FS_ResumeArchive: lets a suspended archive start commands again. Returns TRUE if it was not suspended
 BOOL FS_ResumeArchive(FSArchive *arc) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
     BOOL result = !FS_IsArchiveSuspended(arc);
     FSFile *file;
 
@@ -804,7 +804,7 @@ void FS_NotifyArchiveAsyncEnd(FSArchive *arc, FSResult result) {
     FSFile *file = arc->list;
 
     if (file->stat & FS_FILE_STATUS_BLOCKING) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
         file->stat |= FS_FILE_STATUS_ENDED;
         file->error = result;

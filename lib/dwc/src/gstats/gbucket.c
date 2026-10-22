@@ -7,14 +7,14 @@
 // later SDK's
 
 static char *stripchars(char *s);
-static void *DoSet(GBucket *bucket, void *value);
-static void *DoGet(GBucket *bucket);
-static GBucket *DoFind(GBucketSet *set, char *name);
+static void *DoSet(bucket_t *bucket, void *value);
+static void *DoGet(bucket_t *bucket);
+static bucket_t *DoFind(bucketset_t set, char *name);
 
-GBucketSet *g_buckets = NULL;
+bucketset_t g_buckets = NULL;
 
-void *BucketNew(GBucketSet *set, char *name, BucketType type, void *initialvalue) {
-    GBucket bucket;
+void *BucketNew(bucketset_t set, char *name, BucketType type, void *initialvalue) {
+    bucket_t bucket;
 
     if (set == NULL) {
         set = g_buckets;
@@ -28,8 +28,8 @@ void *BucketNew(GBucketSet *set, char *name, BucketType type, void *initialvalue
     return DoGet(DoFind(set, name));
 }
 
-void *BucketSet(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketSet(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
 
     if (bucket == NULL) {
         return NULL;
@@ -38,8 +38,8 @@ void *BucketSet(GBucketSet *set, char *name, void *value) {
     return DoSet(bucket, value);
 }
 
-void *BucketAdd(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketAdd(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
 
     if (bucket == NULL) {
         return NULL;
@@ -53,8 +53,8 @@ void *BucketAdd(GBucketSet *set, char *name, void *value) {
     return BucketConcat(set, name, value);
 }
 
-void *BucketSub(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketSub(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
 
     if (bucket == NULL) {
         return NULL;
@@ -68,8 +68,8 @@ void *BucketSub(GBucketSet *set, char *name, void *value) {
     return DoGet(bucket);
 }
 
-void *BucketMult(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketMult(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
 
     if (bucket == NULL) {
         return NULL;
@@ -83,8 +83,8 @@ void *BucketMult(GBucketSet *set, char *name, void *value) {
     return DoGet(bucket);
 }
 
-void *BucketDiv(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketDiv(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
 
     if (bucket == NULL) {
         return NULL;
@@ -98,8 +98,8 @@ void *BucketDiv(GBucketSet *set, char *name, void *value) {
     return DoGet(bucket);
 }
 
-void *BucketConcat(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketConcat(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
     char *temp;
     char *s;
 
@@ -118,8 +118,8 @@ void *BucketConcat(GBucketSet *set, char *name, void *value) {
 // The average of nvals values and one more, which counts it
 #define BUCKET_AVG(cur, new, num) (((cur) * (num) + (new)) / (++(num)))
 
-void *BucketAvg(GBucketSet *set, char *name, void *value) {
-    GBucket *bucket = DoFind(set, name);
+void *BucketAvg(bucketset_t set, char *name, void *value) {
+    bucket_t *bucket = DoFind(set, name);
 
     if (bucket == NULL) {
         return NULL;
@@ -160,7 +160,7 @@ static char *stripchars(char *s) {
     return p;
 }
 
-static void *DoSet(GBucket *bucket, void *value) {
+static void *DoSet(bucket_t *bucket, void *value) {
     if (bucket->type == bt_int) {
         bucket->vals.ival = *(int *)value;
     } else if (bucket->type == bt_float) {
@@ -174,7 +174,7 @@ static void *DoSet(GBucket *bucket, void *value) {
     return DoGet(bucket);
 }
 
-static void *DoGet(GBucket *bucket) {
+static void *DoGet(bucket_t *bucket) {
     if (bucket == NULL) {
         return NULL;
     }
@@ -184,8 +184,8 @@ static void *DoGet(GBucket *bucket) {
     return &bucket->vals;
 }
 
-static GBucket *DoFind(GBucketSet *set, char *name) {
-    GBucket key;
+static bucket_t *DoFind(bucketset_t set, char *name) {
+    bucket_t key;
 
     if (set == NULL) {
         set = g_buckets;

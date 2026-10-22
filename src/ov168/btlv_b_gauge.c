@@ -98,7 +98,7 @@ BOOL BtlvBGauge_IsBusy(BtlvBGauge *work) {
 static void BtlvBGauge_LoadResources(BtlvBGauge *work) {
     ArcTool *arc;
     int i;
-    s32 x;
+    int x;
     BtlvBGaugeParam *param;
 
     arc = GFL_ArcSysCreateFileHandle(ARCID_BTLV, HEAPID_TAIL(work->heapId));

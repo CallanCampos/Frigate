@@ -9,39 +9,40 @@
 // A beacon scanner of DWC (TWL-DWC 5.3, ARM9 main; wds.c), on NitroSDK's wireless manager. It scans for the wireless
 // parents whose beacons carry the game ID 0x857 and a block of 0x70 bytes of game information, encrypted with RC4
 // under a key made from the text "WDS!" and four bytes of the beacon's BSSID, and checked with a CRC-16. The ROM names
-// none of it; the names, the WDS_ functions' included, are ours, taken from what the code does.
+// none of it; the names are NitroDWC's own, as its libraries' symbols and ntrtwl's reconstruction of NitroDWC have
+// them, where the code shows them, and ours elsewhere (the WDS_ functions').
 //
-// The caller gives a work area of WDS_GetWorkSize() bytes to WDS_Initialize (WM_Initialize), starts a scan with
-// WDS_StartScan, and when the scan's callback comes reads the beacons it found with WDS_GetEntries. WDS_EndScan stops
+// The caller gives a work area of WDS_GetWorkAreaSize() bytes to WDS_Initialize (WM_Initialize), starts a scan with
+// WDS_StartScan, and when the scan's callback comes reads the beacons it found with WDS_GetApInfoAll. WDS_EndScan stops
 // the scan and WDS_End ends the wireless manager.
 
 // What a beacon says, once it is decrypted: 0x70 bytes. WDS_IsBeaconInfoValid checks three of them, and the last two
 // are the CRC-16 of the rest (a beacon that carries 0 there is taken as it is)
-typedef struct WDSBeaconInfo {
+typedef struct WDSApInfo {
     u8 ssid[0x20];
-    u8 spotInfo[10]; // ten printable characters; the connection code reads the first as a digit
+    u8 apnum[10]; // ten printable characters; the connection code reads the first as a digit
     u8 unk_2a[0x1a];
-    u8 wepKey[0x20];
-    u8 unk_64;
-    u8 wepMode; // at most 3
-    u8 flags;   // bit 1 must be set
+    u8 wepkey[0x20];
+    u8 channel;
+    u8 encryptflag; // at most 3
+    u8 infoflag;    // bit 1 must be set
     u8 unk_67[5];
     u16 mtu;
     u16 crc;
-} WDSBeaconInfo;
+} WDSApInfo;
 
-// A beacon that the scan found, as WDS_GetEntries gives it out: whether the entry is filled, the strength of its
+// A beacon that the scan found, as WDS_GetApInfoAll gives it out: whether the entry is filled, the strength of its
 // signal and what the beacon says
-typedef struct WDSEntry {
-    int valid;
-    u16 signal;
-    WDSBeaconInfo info;
-} WDSEntry;
+typedef struct WDSBriefApInfo {
+    int isvalid;
+    u16 rssi;
+    WDSApInfo apinfo;
+} WDSBriefApInfo;
 
 #define WDS_MAX_ENTRIES 16
 
 // The size of the work area that WDS_Initialize takes, a multiple of the cache line of 32 bytes
-u32 WDS_GetWorkSize(void);
+u32 WDS_GetWorkAreaSize(void);
 // Sets up the work area and starts the wireless manager (WM_Initialize); 0 if it began, and the callback gets the rest.
 // A callback of NULL gives -1
 int WDS_Initialize(void *work, WMCallbackFunc callback, u16 dmaNo);
@@ -54,13 +55,13 @@ int WDS_StartScan(WMCallbackFunc callback);
 int WDS_EndScan(WMCallbackFunc callback);
 // Clears WDS_MAX_ENTRIES entries and fills them with the beacons that the scan took in, in the order it did;
 // -1 if there is no finished scan
-int WDS_GetEntries(WDSEntry *entries);
+int WDS_GetApInfoAll(WDSBriefApInfo *entries);
 // Decrypts the information of a beacon into `out` and checks its CRC-16. The caller gives the cipher's state, a
 // CRC-16 accumulator and its table (connectinet.c has them in its own work area). FALSE if the beacon fails, with
 // `out` cleared
 BOOL WDS_DecryptBeaconInfo(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *table, const WMBssDesc *desc,
-                           WDSBeaconInfo *out);
+                           WDSApInfo *out);
 // Whether the decrypted information of a beacon is well-formed
-BOOL WDS_IsBeaconInfoValid(const WDSBeaconInfo *info);
+BOOL WDS_IsBeaconInfoValid(const WDSApInfo *info);
 
 #endif // POKEBW2_DWC_WDS_H

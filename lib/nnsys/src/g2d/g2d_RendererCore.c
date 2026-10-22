@@ -212,7 +212,7 @@ static inline void GetFlippedMtx22_(const MtxFx22 *m, MtxFx22 *out, OAM_FLIP fli
 }
 
 // The affine parameter of the matrix cache with the flip on the surface, registered the first time
-static inline u16 GetAffineIndex_(NNSG2dRndCore2DMtxCache *cache, const NNSG2dRenderSurface *surface, OAM_FLIP flip) {
+static inline u16 GetAffineIndex_(NNSG2dRndCore2DMtxCache *cache, const NNSG2dRndCoreSurface *surface, OAM_FLIP flip) {
     u16 affineIdx = GetMtxCacheAffineIndex_(cache, surface->type, flip);
 
     if (!IsMtxCacheRegisteredAsAffineParams_(affineIdx)) {
@@ -260,7 +260,7 @@ static inline void FlipAndMoveOam_(GXOamAttr *oam, NNSG2dFVec2 *baseTrans) {
 // Registers each of a cell's OAMs to a 2D surface, moved by the current matrix's translation and with its characters
 // moved by the image's offset. With a matrix cache, each OAM gets the cached matrix's affine parameters, registered
 // once per flip and surface; otherwise the renderer's flip is applied to it
-static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2dCellData *cell) {
+static void DrawCellToSurface2D_(const NNSG2dRndCoreSurface *surface, const NNSG2dCellData *cell) {
     NNSG2dFVec2 baseTrans;
     MtxFx22 m22;
     const MtxFx32 *mtx = GetCurrentMtx_();
@@ -282,7 +282,7 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
             pCurrentInstance_->bDrawEnable = TRUE;
             NNS_G2dCopyCellAsOamAttr(cell, i, oam);
 
-            CallDrawOamCallBack_(surface->pBeforeDrawOamBackFuncCore, cell, i);
+            CallDrawOamCallBack_(surface->pBeforeDrawOamBackFunc, cell, i);
 
             if (!pCurrentInstance_->bDrawEnable) {
                 continue;
@@ -291,8 +291,8 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
             oam->charNo += baseCharOffset;
 
             if (affined) {
-                affineIdx = GetAffineIndex_((NNSG2dRndCore2DMtxCache *)pCurrentInstance_->pCurrentMxtCacheFor2D,
-                                            surface, TO_OAM_FLIP(IsOamFlippedH_(oam), IsOamFlippedV_(oam)));
+                affineIdx = GetAffineIndex_(pCurrentInstance_->pCurrentMxtCacheFor2D, surface,
+                                            TO_OAM_FLIP(IsOamFlippedH_(oam), IsOamFlippedV_(oam)));
                 m22._00 = mtx->_00;
                 m22._01 = mtx->_01;
                 m22._10 = mtx->_10;
@@ -307,7 +307,7 @@ static void DrawCellToSurface2D_(const NNSG2dRenderSurface *surface, const NNSG2
                 return;
             }
 
-            CallDrawOamCallBack_(surface->pAfterDrawOamBackFuncCore, cell, i);
+            CallDrawOamCallBack_(surface->pAfterDrawOamBackFunc, cell, i);
         }
     }
 }
@@ -342,21 +342,21 @@ static void DrawOamToSurface3D_(GXOamAttr *oam) {
     }
 }
 
-static void DrawCellToSurface3D_(const NNSG2dRenderSurface *surface, const NNSG2dCellData *cell) {
+static void DrawCellToSurface3D_(const NNSG2dRndCoreSurface *surface, const NNSG2dCellData *cell) {
     u16 i;
     GXOamAttr *oam = &pCurrentInstance_->currentOam;
 
     for (i = 0; i < cell->numOAMAttrs; i++) {
         pCurrentInstance_->bDrawEnable = TRUE;
         NNS_G2dCopyCellAsOamAttr(cell, i, oam);
-        if (surface->pBeforeDrawOamBackFuncCore != NULL) {
-            surface->pBeforeDrawOamBackFuncCore(pCurrentInstance_, cell, i);
+        if (surface->pBeforeDrawOamBackFunc != NULL) {
+            surface->pBeforeDrawOamBackFunc(pCurrentInstance_, cell, i);
         }
         if (pCurrentInstance_->bDrawEnable) {
             DrawOamToSurface3D_(oam);
         }
-        if (surface->pAfterDrawOamBackFuncCore != NULL) {
-            surface->pAfterDrawOamBackFuncCore(pCurrentInstance_, cell, i);
+        if (surface->pAfterDrawOamBackFunc != NULL) {
+            surface->pAfterDrawOamBackFunc(pCurrentInstance_, cell, i);
         }
     }
 }
@@ -384,7 +384,7 @@ void NNS_G2dSetRndCoreOamRegisterFunc(NNSG2dRndCoreInstance *core, NNSG2dOamRegi
     core->pFuncOamAffineRegister = affineRegister;
 }
 
-void NNS_G2dSetRndCoreAffineOverwriteMode(NNSG2dRndCoreInstance *core, u32 mode) {
+void NNS_G2dSetRndCoreAffineOverwriteMode(NNSG2dRndCoreInstance *core, NNSG2dRendererAffineTypeOverwiteMode mode) {
     core->affineOverwriteMode = mode;
 }
 
@@ -407,7 +407,7 @@ void NNS_G2dSetRndCoreCurrentMtx3D(const MtxFx32 *mtx) {
     core->mtx3D.m[3][2] = core->zFor3DSoftwareSprite;
 }
 
-void NNS_G2dSetRndCoreCurrentMtx2D(const MtxFx32 *mtx, const NNSG2dRndCore2DMtxCache *cache) {
+void NNS_G2dSetRndCoreCurrentMtx2D(const MtxFx32 *mtx, NNSG2dRndCore2DMtxCache *cache) {
     NNSG2dRndCoreInstance *core = pCurrentInstance_;
 
     core->pCurrentMtx = mtx;
@@ -418,7 +418,7 @@ void NNS_G2dSetRndCore3DSoftSpriteZvalue(NNSG2dRndCoreInstance *core, fx32 z) {
     core->zFor3DSoftwareSprite = z;
 }
 
-void NNS_G2dSetRndCoreSurface(NNSG2dRndCoreInstance *core, NNSG2dRenderSurface *surface) {
+void NNS_G2dSetRndCoreSurface(NNSG2dRndCoreInstance *core, NNSG2dRndCoreSurface *surface) {
     core->pCurrentTargetSurface = surface;
 }
 
@@ -505,14 +505,14 @@ void NNS_G2dRndCoreEndRendering(void) {
 }
 
 void NNS_G2dRndCoreDrawCell(const NNSG2dCellData *cell) {
-    NNSG2dRenderSurface *surface = pCurrentInstance_->pCurrentTargetSurface;
+    NNSG2dRndCoreSurface *surface = pCurrentInstance_->pCurrentTargetSurface;
 
     if (!surface->bActive) {
         return;
     }
     pCurrentInstance_->bDrawEnable = TRUE;
-    if (surface->pBeforeDrawCellBackFuncCore != NULL) {
-        surface->pBeforeDrawCellBackFuncCore(pCurrentInstance_, cell);
+    if (surface->pBeforeDrawCellBackFunc != NULL) {
+        surface->pBeforeDrawCellBackFunc(pCurrentInstance_, cell);
     }
     if (pCurrentInstance_->bDrawEnable) {
         switch (surface->type) {
@@ -529,22 +529,22 @@ void NNS_G2dRndCoreDrawCell(const NNSG2dCellData *cell) {
             break;
         }
     }
-    if (surface->pAfterDrawCellBackFuncCore != NULL) {
-        surface->pAfterDrawCellBackFuncCore(pCurrentInstance_, cell);
+    if (surface->pAfterDrawCellBackFunc != NULL) {
+        surface->pAfterDrawCellBackFunc(pCurrentInstance_, cell);
     }
 }
 
 // Draws a cell whose characters are transferred to VRAM, and marks them drawn by the surface's engine, so that they
 // are transferred there
 void NNS_G2dRndCoreDrawCellVramTransfer(const NNSG2dCellData *cell, u32 cellVramTransferHandle) {
-    NNSG2dRenderSurface *surface = pCurrentInstance_->pCurrentTargetSurface;
+    NNSG2dRndCoreSurface *surface = pCurrentInstance_->pCurrentTargetSurface;
 
     if (!surface->bActive) {
         return;
     }
     pCurrentInstance_->bDrawEnable = TRUE;
-    if (surface->pBeforeDrawCellBackFuncCore != NULL) {
-        surface->pBeforeDrawCellBackFuncCore(pCurrentInstance_, cell);
+    if (surface->pBeforeDrawCellBackFunc != NULL) {
+        surface->pBeforeDrawCellBackFunc(pCurrentInstance_, cell);
     }
     if (pCurrentInstance_->bDrawEnable) {
         if (cellVramTransferHandle != NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE) {
@@ -567,7 +567,7 @@ void NNS_G2dRndCoreDrawCellVramTransfer(const NNSG2dCellData *cell, u32 cellVram
             break;
         }
     }
-    if (surface->pAfterDrawCellBackFuncCore != NULL) {
-        surface->pAfterDrawCellBackFuncCore(pCurrentInstance_, cell);
+    if (surface->pAfterDrawCellBackFunc != NULL) {
+        surface->pAfterDrawCellBackFunc(pCurrentInstance_, cell);
     }
 }

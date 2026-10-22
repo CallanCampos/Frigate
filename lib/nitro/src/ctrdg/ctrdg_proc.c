@@ -4,7 +4,7 @@
 #include "nitro/ctrdg.h"
 #include "nitro/pxi.h"
 
-static void CTRDGi_DummyCallback(u32 fifoTag, u32 data, BOOL err);
+static void CTRDGi_DummyCallback(PXIFifoTag fifoTag, u32 data, BOOL err);
 
 void CTRDG_DummyInit(void) {
     CTRDGi_InitCommon();
@@ -13,5 +13,5 @@ void CTRDG_DummyInit(void) {
     CTRDGi_SendtoPxi(1);
 }
 
-static void CTRDGi_DummyCallback(u32 fifoTag, u32 data, BOOL err) {
+static void CTRDGi_DummyCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
 }

@@ -435,7 +435,7 @@ static void FieldMenu_LoadResources(FieldMenu *menu, ArcTool *arc, u8 menuType, 
     ArcTool *common;
     ClActorSetup setup;
 
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysCreateBG(5, &sFieldMenuBG5Setup, 0);
     GFL_BGSysSetBGEnabled(5, TRUE);
     GFL_BGSysClearScr(5);

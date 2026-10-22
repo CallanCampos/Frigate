@@ -168,9 +168,9 @@ static inline void InitMCAnimationNotShareCellAnim_(NNSG2dMultiCellAnimation *mc
     InitMCAnimation_(mcAnim, mcBank);
 }
 
-void NNS_G2dInitMCAnimationInstance(NNSG2dMultiCellAnimation *mcAnim, void *work, const NNSG2dAnimBankData *anims,
+void NNS_G2dInitMCAnimationInstance(NNSG2dMultiCellAnimation *mcAnim, void *work, const NNSG2dCellAnimBankData *anims,
                                     const NNSG2dCellDataBank *cells, const NNSG2dMultiCellDataBank *mcBank,
-                                    u32 mcType) {
+                                    NNSG2dMCType mcType) {
     NNSG2dMultiCellInstance *instance;
     NNSG2dCellAnimation *cellAnims;
     NNSG2dMCCellAnimation *mcCellAnims;
@@ -202,7 +202,7 @@ void NNS_G2dInitMCAnimationInstance(NNSG2dMultiCellAnimation *mcAnim, void *work
     InitMCAnimation_(mcAnim, mcBank);
 }
 
-u32 NNS_G2dGetMCWorkAreaSize(const NNSG2dMultiCellDataBank *mcBank, u32 mcType) {
+u32 NNS_G2dGetMCWorkAreaSize(const NNSG2dMultiCellDataBank *mcBank, NNSG2dMCType mcType) {
     if (mcType == NNS_G2D_MCTYPE_SHARE_CELLANIM) {
         return GetMaxCellAnimNum_(mcBank) * sizeof(NNSG2dMCCellAnimation);
     } else {
@@ -323,7 +323,7 @@ void NNS_G2dRestartMCAnimation(NNSG2dMultiCellAnimation *mcAnim) {
 }
 
 // Calls the callback for each node of the current multi-cell with its cell animation, until it returns FALSE
-void NNS_G2dTraverseMCNodes(const NNSG2dMultiCellInstance *instance, NNSG2dMCTraverseNodeCallBack callback, u32 param) {
+void NNS_G2dTraverseMCNodes(NNSG2dMultiCellInstance *instance, NNSG2dMCTraverseNodeCallBack callback, u32 param) {
     u16 i;
     const NNSG2dMultiCellData *mcData = instance->pCurrentMultiCell;
     u16 numNodes = mcData->numNodes;

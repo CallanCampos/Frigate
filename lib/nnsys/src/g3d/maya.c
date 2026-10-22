@@ -57,7 +57,7 @@ void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result) {
 // says so. A joint whose children cancel its scale (the NODEDESC command's flag) keeps its inverse scale in
 // g_NNSG3DRenderCache and whether its scale is one in the render state. A joint that cancels its parent's scale takes
 // the parent's inverse scale as its scaleEx0, or flags it as one if the parent's scale is
-void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScale *scale, const u8 *cmd, u32 srtFlag) {
+void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const fx32 *p, const u8 *cmd, u32 srtFlag) {
     u32 flags = cmd[3];
 
     if (srtFlag & NNS_G3D_SRTFLAG_SCALE_ONE) {
@@ -68,16 +68,16 @@ void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const NNSG3dJointScal
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] |= 1 << (node & 0x1f);
         }
     } else {
-        result->scale.x = scale->scale.x;
-        result->scale.y = scale->scale.y;
-        result->scale.z = scale->scale.z;
+        result->scale.x = p[0];
+        result->scale.y = p[1];
+        result->scale.z = p[2];
         if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_CHILD) {
             u32 node = cmd[1];
 
             g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
-            g_NNSG3DRenderCache.jointScales[node].invScale.x = scale->invScale.x;
-            g_NNSG3DRenderCache.jointScales[node].invScale.y = scale->invScale.y;
-            g_NNSG3DRenderCache.jointScales[node].invScale.z = scale->invScale.z;
+            g_NNSG3DRenderCache.jointScales[node].invScale.x = p[3];
+            g_NNSG3DRenderCache.jointScales[node].invScale.y = p[4];
+            g_NNSG3DRenderCache.jointScales[node].invScale.z = p[5];
         }
     }
     if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_APPLY) {
@@ -232,7 +232,7 @@ static inline void sendPacket_(const u32 *packet, u32 num) {
 // and the S translation scaled by magW, the ratio of the texture's size to its original size, and the second row and
 // the T translation by magH, between a change of the geometry engine's matrix mode to texture and back to position and
 // vector. With TEXMTX_SET it is loaded, and with TEXMTX_MULT it is multiplied into the matrix that is there
-void NNSi_G3dSendTexSRTMaya(NNSG3dMatAnmResult *result) {
+void NNSi_G3dSendTexSRTMaya(const NNSG3dMatAnmResult *result) {
     struct {
         u32 op; // MTX_MODE, MTX_LOAD_4x4 or MTX_MULT_4x4, MTX_MODE
         u32 modeTexture;

@@ -6,7 +6,7 @@
 #define MI_DMA0_DUMMY_CNT (MI_DMA_ENABLE | MI_DMA_SRC_FIX | MI_DMA_DEST_FIX | 1)
 
 void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags) {
-    u32 interrupts;
+    OSIntrMode interrupts;
     MIDmaRegs *dma;
 
     if (!(flags & MI_DMA_SET_NO_INTR)) {

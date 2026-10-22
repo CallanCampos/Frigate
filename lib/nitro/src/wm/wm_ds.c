@@ -13,14 +13,14 @@ static void WmDataSharingParentCallback(void *arg);
 static void WmDataSharingChildCallback(void *arg);
 static void WmDataSharingSetData(WMDataSharingInfo *dsi, u16 aid, const void *data);
 static void WmDataSharingSendDataSet(WMDataSharingInfo *dsi, int dropParent);
-static u8 *WmGetSharedDataAddress(const WMDataSharingInfo *dsi, u16 aidBitmap, const u16 *data, u16 aid);
+static u16 *WmGetSharedDataAddress(WMDataSharingInfo *dsi, u32 aidBitmap, u16 *data, u32 aid);
 
 // The data a child sends is not at the start of its set, but at this offset, which the cache lines divide
 #define WM_DS_CHILD_SEND_OFFSET 0x20
 
 // WM_StartDataSharing: dataLength is the bytes each console gives (all share at most WM_DS_SET_DATA_MAX) and the
 // AIDs in aidBitmap share, besides this console
-int WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode) {
+WMErrCode WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode) {
     u32 myAid;
     u32 connectedBitmap = 1;
     int result = WMi_CheckStateEx(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
@@ -70,7 +70,7 @@ int WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dat
         WM_SetPortCallback(port, WmDataSharingParentCallback, dsi);
         for (i = 0; i < (dsi->doubleMode == 1 ? 2 : 1); i++) {
             dsi->writeIndex = (dsi->writeIndex + 1) & 3;
-            result = WM_SetMPDataToPortEx(WmDataSharingSenderCallback, dsi, &dsi->ds[i], dsi->dataSetLength,
+            result = WM_SetMPDataToPortEx(WmDataSharingSenderCallback, dsi, (u16 *)&dsi->ds[i], dsi->dataSetLength,
                                           connectedBitmap & dsi->aidBitmap, dsi->port, 1);
             if (result == WM_ERRCODE_NO_CHILD) {
                 dsi->seqNum[i] = 0xffff;
@@ -87,7 +87,7 @@ int WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dat
     return WM_ERRCODE_SUCCESS;
 }
 
-int WM_EndDataSharing(WMDataSharingInfo *dsi) {
+WMErrCode WM_EndDataSharing(WMDataSharingInfo *dsi) {
     if (dsi == NULL) {
         return WM_ERRCODE_INVALID_PARAM;
     }
@@ -102,7 +102,7 @@ int WM_EndDataSharing(WMDataSharingInfo *dsi) {
 
 // WM_StepDataSharing: gives the game the next set (in dataSet) if there is one, and takes the data of this console for
 // the next round. NO_DATASET when there was no set
-int WM_StepDataSharing(WMDataSharingInfo *dsi, const void *data, WMDataSet *dataSet) {
+WMErrCode WM_StepDataSharing(WMDataSharingInfo *dsi, const u16 *data, WMDataSet *dataSet) {
     int result = WMi_CheckStateEx(2, WM_STATE_MP_PARENT, WM_STATE_MP_CHILD);
     u16 myAid;
     u16 connectedBitmap;
@@ -139,7 +139,7 @@ int WM_StepDataSharing(WMDataSharingInfo *dsi, const void *data, WMDataSet *data
         if (dsi->state == WM_DS_STATE_SEND_FAILED) {
             dsi->state = WM_DS_STATE_RUNNING;
             index = (dsi->writeIndex + 3) & 3;
-            step = WM_SetMPDataToPortEx(WmDataSharingSenderCallback, dsi, &dsi->ds[index], dsi->dataSetLength,
+            step = WM_SetMPDataToPortEx(WmDataSharingSenderCallback, dsi, (u16 *)&dsi->ds[index], dsi->dataSetLength,
                                         connectedBitmap & dsi->aidBitmap, dsi->port, 1);
             if (step == WM_ERRCODE_NO_CHILD) {
                 dsi->seqNum[index] = 0xffff;
@@ -250,7 +250,7 @@ static void WmDataSharingParentCallback(void *arg) {
         case WM_STATECODE_DISCONNECTED:
         case WM_STATECODE_DISCONNECTED_FROM_MYSELF: {
             int bit = 1 << cb->aid;
-            u32 irq = OS_DisableInterrupts();
+            OSIntrMode irq = OS_DisableInterrupts();
             u16 index = dsi->writeIndex;
 
             dsi->ds[index].aidBitmap &= ~bit;
@@ -323,8 +323,8 @@ static void WmDataSharingSetData(WMDataSharingInfo *dsi, u16 aid, const void *da
     u16 bit = 1 << aid;
     u16 aidBitmap = dsi->aidBitmap;
     u16 index;
-    u8 *dest;
-    u32 irq;
+    u16 *dest;
+    OSIntrMode irq;
 
     if (!(aidBitmap & bit)) {
         return;
@@ -354,7 +354,7 @@ static void WmDataSharingSetData(WMDataSharingInfo *dsi, u16 aid, const void *da
 // When the set that is being filled has the data of everyone it waited for, the parent sends it to all (without its
 // own data if dropParent) and starts the next one
 static void WmDataSharingSendDataSet(WMDataSharingInfo *dsi, int dropParent) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (dsi->ds[dsi->writeIndex].aidBitmap == 0) {
         u16 connectedBitmap = WMi_GetConnectedAidBitmap();
@@ -376,7 +376,7 @@ static void WmDataSharingSendDataSet(WMDataSharingInfo *dsi, int dropParent) {
             dsi->ds[index].aidBitmap &= 0xfffe;
         }
         OS_RestoreInterrupts(irq);
-        result = WM_SetMPDataToPortEx(WmDataSharingSenderCallback, dsi, &dsi->ds[index], dsi->dataSetLength,
+        result = WM_SetMPDataToPortEx(WmDataSharingSenderCallback, dsi, (u16 *)&dsi->ds[index], dsi->dataSetLength,
                                       connectedBitmap & dsi->aidBitmap, dsi->port, 1);
         if (result == WM_ERRCODE_NO_CHILD) {
             dsi->seqNum[index] = 0xffff;
@@ -390,7 +390,7 @@ static void WmDataSharingSendDataSet(WMDataSharingInfo *dsi, int dropParent) {
 }
 
 // Where the data of the AID is in a set that WM_StepDataSharing gave, or NULL if it has none
-void *WM_GetSharedDataAddress(const WMDataSharingInfo *dsi, const WMDataSet *dataSet, u16 aid) {
+u16 *WM_GetSharedDataAddress(WMDataSharingInfo *dsi, WMDataSet *dataSet, u16 aid) {
     int bit = 1 << aid;
     u16 aidBitmap;
     u16 receivedBitmap;
@@ -413,6 +413,6 @@ void *WM_GetSharedDataAddress(const WMDataSharingInfo *dsi, const WMDataSet *dat
 }
 
 // The data of an AID in a set: after the data of the AIDs below it that the set is for
-static u8 *WmGetSharedDataAddress(const WMDataSharingInfo *dsi, u16 aidBitmap, const u16 *data, u16 aid) {
-    return (u8 *)data + MATH_CountPopulation(aidBitmap & ((1 << aid) - 1)) * dsi->dataLength;
+static u16 *WmGetSharedDataAddress(WMDataSharingInfo *dsi, u32 aidBitmap, u16 *data, u32 aid) {
+    return (u16 *)((u8 *)data + MATH_CountPopulation(aidBitmap & ((1 << aid) - 1)) * dsi->dataLength);
 }

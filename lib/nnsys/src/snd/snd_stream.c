@@ -68,7 +68,7 @@ BOOL NNS_SndStrmSetup(NNSSndStrm *stream, NNSSndStrmFormat format, void *buffer,
     u32 samples;
     u32 alarmPeriod;
     int i;
-    u32 oldIntr;
+    OSIntrMode oldIntr;
 
     if (stream->active) {
         NNS_SndStrmStop(stream);
@@ -220,7 +220,7 @@ static void StrmEndSleep(void *arg) {
 
     if (stream->started) {
         while (stream->curBlock != 0) {
-            u32 oldIntr = OS_DisableInterrupts();
+            OSIntrMode oldIntr = OS_DisableInterrupts();
             StrmCallback(stream, NNS_SND_STRM_CALLBACK_INTERVAL);
             OS_RestoreInterrupts(oldIntr);
         }

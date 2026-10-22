@@ -35,7 +35,7 @@ typedef struct {
     // What each person is told by the mission's target: three values, for the actor's user parameters
     u16 params[4][3];
     FieldActor *actors[4];
-    s32 zoneCount;
+    int zoneCount;
     FesMissionZone zones[6];
     u32 speciesCount;
     u16 species[640];

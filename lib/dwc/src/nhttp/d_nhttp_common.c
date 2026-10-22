@@ -70,12 +70,12 @@ NHttpConnection *NHTTPi_ControlConnectionList(NHttpMutexInfo *mutexInfo, NHttpCo
                     }
                     break;
                 case 1:
-                    if (node->request == (NHttpRequest *)key) {
+                    if (node->request == (NHTTPReq *)key) {
                         found = node;
                     }
                     break;
                 case 2:
-                    if (node->response == (NHttpResponse *)key) {
+                    if (node->response == (NHTTPRes *)key) {
                         found = node;
                     }
                     break;
@@ -107,7 +107,7 @@ int NHTTPi_OmitConnectionList(NHttpMutexInfo *mutexInfo, NHttpConnection *connec
     return -(NHTTPi_ControlConnectionList(mutexInfo, connection, 4) == NULL);
 }
 
-NHttpResponse *NHTTPi_Connection2Response(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
+NHTTPRes *NHTTPi_Connection2Response(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
     NHttpConnection *found = NHTTPi_GetConnection(mutexInfo, connection);
 
     if (found != NULL) {
@@ -116,11 +116,11 @@ NHttpResponse *NHTTPi_Connection2Response(NHttpMutexInfo *mutexInfo, NHttpConnec
     return NULL;
 }
 
-NHttpConnection *NHTTPi_Request2Connection(NHttpMutexInfo *mutexInfo, NHttpRequest *request) {
+NHttpConnection *NHTTPi_Request2Connection(NHttpMutexInfo *mutexInfo, NHTTPReq *request) {
     return NHTTPi_ControlConnectionList(mutexInfo, (NHttpConnection *)request, 1);
 }
 
-NHttpConnection *NHTTPi_Response2Connection(NHttpMutexInfo *mutexInfo, NHttpResponse *response) {
+NHttpConnection *NHTTPi_Response2Connection(NHttpMutexInfo *mutexInfo, NHTTPRes *response) {
     return NHTTPi_ControlConnectionList(mutexInfo, (NHttpConnection *)response, 2);
 }
 
@@ -129,8 +129,8 @@ NHttpConnection *NHTTPi_GetConnection(NHttpMutexInfo *mutexInfo, NHttpConnection
 }
 
 // The request of a connection, or the argument if it is not one
-NHttpRequest *NHTTPi_GetRequest(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
-    NHttpRequest *request = (NHttpRequest *)connection;
+NHTTPReq *NHTTPi_GetRequest(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
+    NHTTPReq *request = (NHTTPReq *)connection;
     NHttpConnection *found = NHTTPi_GetConnection(mutexInfo, connection);
 
     if (found != NULL) {
@@ -139,8 +139,8 @@ NHttpRequest *NHTTPi_GetRequest(NHttpMutexInfo *mutexInfo, NHttpConnection *conn
     return request;
 }
 
-NHttpResponse *NHTTPi_GetResponse(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
-    NHttpResponse *response = (NHttpResponse *)connection;
+NHTTPRes *NHTTPi_GetResponse(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
+    NHTTPRes *response = (NHTTPRes *)connection;
     NHttpConnection *found = NHTTPi_GetConnection(mutexInfo, connection);
 
     if (found != NULL) {
@@ -183,7 +183,7 @@ int NHTTPi_PostSendCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connecti
 
 // Calls the callback of a connection when the buffer of its answer is full, and takes the buffer that it gives
 void NHTTPi_BufferFullCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
-    NHttpResponse *response;
+    NHTTPRes *response;
     NHttpBufferEvent event;
 
     if (NHTTPi_GetConnection(mutexInfo, connection) != NULL) {
@@ -200,7 +200,7 @@ void NHTTPi_BufferFullCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *conne
 
 // The same when the body has been received
 void NHTTPi_ReceivedCallback(NHttpMutexInfo *mutexInfo, NHttpConnection *connection) {
-    NHttpResponse *response;
+    NHTTPRes *response;
     NHttpBufferEvent event;
 
     if (NHTTPi_GetConnection(mutexInfo, connection) != NULL) {
@@ -236,7 +236,7 @@ static int NHTTPi_SetBufferInfo(NHttpMutexInfo *mutexInfo, NHttpConnection *conn
 static int NHTTPi_SetResponseBuffer(NHttpMutexInfo *mutexInfo, NHttpConnection *connection, void *buffer, int size,
                                     int used) {
     NHttpConnection *found = NHTTPi_GetConnection(mutexInfo, connection);
-    NHttpResponse *response;
+    NHTTPRes *response;
 
     if (found != NULL) {
         response = NHTTPi_Connection2Response(mutexInfo, found);

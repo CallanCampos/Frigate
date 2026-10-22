@@ -13,7 +13,7 @@ void OS_InitIrqTable(void) {
 
 // NitroSDK's OS_SetIrqFunction. The interrupts of DMA channels and timers get a callback in
 // OSi_IrqCallbackInfo, which their handlers call; the others go in the table of handlers
-void OS_SetIrqFunction(u32 interrupts, OSIrqFunction function) {
+void OS_SetIrqFunction(OSIrqMask interrupts, OSIrqFunction function) {
     int n;
     OSIrqCallbackInfo *info;
 
@@ -40,7 +40,7 @@ void OS_SetIrqFunction(u32 interrupts, OSIrqFunction function) {
 }
 
 // NitroSDK's OS_GetIrqFunction: the function of the first interrupt of the mask (not looking at the new DMA channels)
-OSIrqFunction OS_GetIrqFunction(u32 interrupts) {
+OSIrqFunction OS_GetIrqFunction(OSIrqMask interrupts) {
     int n;
     OSIrqFunction *table = OS_IRQTable;
 
@@ -77,7 +77,7 @@ void OSi_EnterNDmaCallback(u32 ndmaNo, OSIrqCallback callback, void *arg) {
     OSi_EnterNDmaCallbackCore(ndmaNo, callback, arg);
 }
 
-void OSi_EnterTimerCallback(int timerNo, OSIrqCallback callback, void *arg) {
+void OSi_EnterTimerCallback(u32 timerNo, OSIrqCallback callback, void *arg) {
     OSi_TIMER_CALLBACK_INFO[timerNo].func = callback;
     OSi_TIMER_CALLBACK_INFO[timerNo].arg = arg;
     OS_EnableIrqMask(1 << (timerNo + OS_IE_TIMER0_SHIFT));
@@ -86,36 +86,36 @@ void OSi_EnterTimerCallback(int timerNo, OSIrqCallback callback, void *arg) {
 
 // NitroSDK's OS_SetIrqMask, OS_EnableIrqMask, OS_DisableIrqMask and OS_ResetRequestIrqMask. Each
 // keeps IME off while it changes IE or acknowledges IF
-u32 OS_SetIrqMask(u32 mask) {
+OSIrqMask OS_SetIrqMask(OSIrqMask mask) {
     BOOL ime = OS_DisableIrq();
-    u32 prev = reg_OS_IE;
+    OSIrqMask prev = reg_OS_IE;
 
     reg_OS_IE = mask;
     OS_RestoreIrq(ime);
     return prev;
 }
 
-u32 OS_EnableIrqMask(u32 mask) {
+OSIrqMask OS_EnableIrqMask(OSIrqMask mask) {
     BOOL ime = OS_DisableIrq();
-    u32 prev = reg_OS_IE;
+    OSIrqMask prev = reg_OS_IE;
 
     reg_OS_IE = prev | mask;
     OS_RestoreIrq(ime);
     return prev;
 }
 
-u32 OS_DisableIrqMask(u32 mask) {
+OSIrqMask OS_DisableIrqMask(OSIrqMask mask) {
     BOOL ime = OS_DisableIrq();
-    u32 prev = reg_OS_IE;
+    OSIrqMask prev = reg_OS_IE;
 
     reg_OS_IE = prev & ~mask;
     OS_RestoreIrq(ime);
     return prev;
 }
 
-u32 OS_ResetRequestIrqMask(u32 mask) {
+OSIrqMask OS_ResetRequestIrqMask(OSIrqMask mask) {
     BOOL ime = OS_DisableIrq();
-    u32 prev = reg_OS_IF;
+    OSIrqMask prev = reg_OS_IF;
 
     reg_OS_IF = mask;
     OS_RestoreIrq(ime);

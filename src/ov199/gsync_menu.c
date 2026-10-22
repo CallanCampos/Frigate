@@ -872,8 +872,8 @@ static BOOL GSyncMenu_ProcInit(GameProc *proc, u32 *state, void *param, void *wo
     } else {
         brightness = -16;
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, brightness);
+    GX_SetMasterBrightness(brightness);
+    GXS_SetMasterBrightness(brightness);
     GXS_DispOn();
     GX_DispOn();
     GFL_BGSysCreate(wk->heapId);

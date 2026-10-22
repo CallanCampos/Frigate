@@ -138,8 +138,8 @@ PMSInputView *PMSIView_Create(const PMSInputWork *mwk, const PMSInputData *dwk) 
         vwk->actUnit = ClActUnit_Create(128, 0, HEAPID_PMS_INPUT);
         GFL_BGSysCreate(HEAPID_PMS_INPUT);
         BmpWin_InitAllocator(HEAPID_PMS_INPUT);
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+        GX_SetMasterBrightness(-16);
+        GXS_SetMasterBrightness(-16);
         vwk->mainTask = GFL_TCBMgrAddTask(PMSInput_GetTCBManager(mwk), PMSIView_MainTask, vwk, 2);
         vwk->vintrTask = PMSIView_AddVTask(PMSIView_VintrTask, vwk, 1);
         for (i = 0; i < PMSIV_COMMAND_MAX; i++) {

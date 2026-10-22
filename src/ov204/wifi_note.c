@@ -1064,8 +1064,8 @@ static void WifiNoteDraw_Init(WifiNoteDraw *draw, WifiNoteData *data, HeapID hea
     GFL_BGSysSetEnabledBGsB(0);
     G2_BlendNone();
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetDisplayLayout(0);
     draw->arc = GFL_ArcSysCreateFileHandle(ARCID_WIFI_NOTE, heapId);
     draw->heapId = heapId;

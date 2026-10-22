@@ -19,7 +19,7 @@ static inline u32 PXI_GetRemoteState(void) {
 
 void PXI_InitFifo(void) {
     OSSystemWork *work = OS_GetSystemWork();
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (!sFifoInitialized) {
         int i;
@@ -60,9 +60,9 @@ void PXI_InitFifo(void) {
     OS_RestoreInterrupts(enabled);
 }
 
-void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
+void PXI_SetFifoRecvCallback(int fifoTag, PXIFifoCallback callback) {
     OSSystemWork *work = OS_GetSystemWork();
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     sFifoCallbacks[fifoTag] = callback;
     if (callback != NULL) {
@@ -73,7 +73,7 @@ void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
     OS_RestoreInterrupts(enabled);
 }
 
-BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor) {
+BOOL PXI_IsCallbackReady(int fifoTag, PXIProc processor) {
     OSSystemWork *work = OS_GetSystemWork();
 
     return (work->pxiHandleChecker[processor] & (1 << fifoTag)) != 0;
@@ -81,7 +81,7 @@ BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor) {
 
 // Puts a word in the send FIFO, unless the FIFO is in error (the error is acknowledged) or full
 static inline int PXIi_SendRaw(u32 raw) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_ERR_MASK) {
         reg_PXI_FIFO_CNT |= REG_PXI_FIFO_CNT_ERR_ACK;
@@ -98,7 +98,7 @@ static inline int PXIi_SendRaw(u32 raw) {
 }
 
 // NitroSDK's PXI_SendWordByFifo: sends a word with the tag, unless the FIFO is in error or full
-int PXI_SendWordByFifo(u32 fifoTag, u32 data, BOOL err) {
+int PXI_SendWordByFifo(int fifoTag, u32 data, BOOL err) {
     PXIFifoMessage message;
 
     message.e.tag = fifoTag;
@@ -110,7 +110,7 @@ int PXI_SendWordByFifo(u32 fifoTag, u32 data, BOOL err) {
 
 // Takes a word from the receive FIFO, unless the FIFO is in error (the error is acknowledged) or empty
 static inline int PXIi_ReceiveRaw(u32 *raw) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_ERR_MASK) {
         reg_PXI_FIFO_CNT |= REG_PXI_FIFO_CNT_ERR_ACK;

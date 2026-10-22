@@ -53,8 +53,8 @@ void G3X_ClearFifo(void) {
 }
 
 void G3X_InitMtxStack(void) {
-    u32 posLevel;
-    u32 projLevel;
+    s32 posLevel;
+    s32 projLevel;
     reg_G3X_GXSTAT |= REG_G3X_GXSTAT_SE_MASK;
     while (G3X_GetMtxStackLevelPV(&posLevel) != 0) {
     }
@@ -73,8 +73,8 @@ void G3X_InitMtxStack(void) {
 }
 
 void G3X_ResetMtxStack(void) {
-    u32 posLevel;
-    u32 projLevel;
+    s32 posLevel;
+    s32 projLevel;
     reg_G3X_GXSTAT |= REG_G3X_GXSTAT_SE_MASK;
     while (G3X_GetMtxStackLevelPV(&posLevel) != 0) {
     }
@@ -91,7 +91,7 @@ void G3X_ResetMtxStack(void) {
     G3_Identity();
 }
 
-void G3X_SetFog(BOOL enabled, int alphaMode, int depthShift, int offset) {
+void G3X_SetFog(BOOL enabled, GXFogBlend alphaMode, GXFogSlope depthShift, int offset) {
     if (enabled) {
         reg_G3X_FOG_OFFSET = (u16)offset;
         reg_G3X_DISP3DCNT = (u16)((depthShift << REG_G3X_DISP3DCNT_FSHIFT_SHIFT) |
@@ -155,7 +155,7 @@ void G3X_InitTable(void) {
     }
 }
 
-int G3X_GetMtxStackLevelPV(u32 *level) {
+int G3X_GetMtxStackLevelPV(s32 *level) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_MB_MASK) {
         return -1;
     }
@@ -163,7 +163,7 @@ int G3X_GetMtxStackLevelPV(u32 *level) {
     return 0;
 }
 
-int G3X_GetMtxStackLevelPJ(u32 *level) {
+int G3X_GetMtxStackLevelPJ(s32 *level) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_MB_MASK) {
         return -1;
     }
