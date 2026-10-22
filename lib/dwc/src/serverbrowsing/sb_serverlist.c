@@ -382,8 +382,8 @@ static int ListStringHash(const char *s, int numbuckets) {
 }
 
 static SBError ServerListConnect(SBServerList *slist) {
-    SocAddrIn saddr;
-    SocHostEnt *hent;
+    SOCSockAddrIn saddr;
+    SOCHostEnt *hent;
     char masterHostname[128];
     int masterIndex;
 
@@ -1375,7 +1375,7 @@ SBError SBSendNatNegotiateCookieToServer(SBServerList *slist, goa_uint32 ip, uns
 // Adds the servers of the local network that answer, until the time of the search runs out
 static SBError ProcessLanData(SBServerList *slist) {
     char indata[1500];
-    SocAddrIn saddr;
+    SOCSockAddrIn saddr;
     int saddrlen = sizeof(saddr);
     int error;
     int foundexisting;

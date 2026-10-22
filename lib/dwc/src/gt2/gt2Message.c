@@ -764,7 +764,7 @@ GT2Bool gti2HandleHostUnreachable(GT2Socket socket, unsigned int ip, unsigned sh
 
 GT2Bool gti2ReceiveMessages(GT2Socket socket) {
     gsi_u8 buffer[1500];
-    SocAddrIn address;
+    SOCSockAddrIn address;
     int addressSize;
     int length;
     int error;

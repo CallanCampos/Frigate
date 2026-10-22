@@ -34,7 +34,7 @@ static int DWCi_Http_AddLabelValue(DWCHttp *http, NasFieldTable *table, const ch
 static void DWCi_Http_FreeLabelValues(DWCHttp *http, DWCHttpLabelValue *fields, int count);
 
 // The root certificates that the HTTPS connections accept
-void *DWCi_NasRootCerts[12] = {
+CPSCaInfo *DWCi_NasRootCerts[12] = {
     &DWCi_RootCertVeriSignClass3G3,    &DWCi_RootCertVeriSignClass3G2,    &DWCi_RootCertVeriSignClass3,
     &DWCi_RootCertRsaSecureServer,     &DWCi_RootCertGlobalSign,          &DWCi_RootCertGteCyberTrustGlobal,
     &DWCi_RootCertGteCyberTrust,       &DWCi_RootCertBaltimoreCyberTrust, &DWCi_RootCertThawteServer,
@@ -207,7 +207,7 @@ static void DWCi_Http_Thread(void *arg) {
         con->validateCertificate = DWCi_Http_VerifyCertificate;
         con->hostname = http->host;
         soc->con = con;
-        CPS_SslSetNamedParams(DWCi_NasRootCerts, 12);
+        CPS_SetRootCa(DWCi_NasRootCerts, 12);
         CPS_SetSsl(TRUE);
     }
     CPS_SocBind(0, http->port, ip);

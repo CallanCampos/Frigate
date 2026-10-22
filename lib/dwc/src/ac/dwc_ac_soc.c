@@ -17,7 +17,7 @@ static u8 DWCAc_StartConnectionTest(void);
 static u8 DWCAc_WaitConnectionTest(DWCAcSearchWork *work);
 static u8 DWCAc_NoteConnected(DWCAcSearchWork *work);
 static u8 DWCAc_StopSoc(void);
-static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfig *config);
+static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SOCConfig *config);
 static u32 DWCAc_ReadAddress(const u8 *address);
 static u32 DWCAc_MakeNetmask(u8 bits);
 static void DWCAc_SetResolver(DWCAcSearchWork *work);
@@ -27,7 +27,7 @@ static char sSocHostName[] = "NINTENDO-DS";
 
 // What DWCAc_MakeSocConfig starts the configuration of SOC_Startup from: DHCP on, the addresses, the allocators, the
 // MTU and the window left to the function, then buffers of 0x1000, the host name and four DHCP retries
-static const SocConfig sSocConfigInit = {
+static const SOCConfig sSocConfigInit = {
     SOC_VENDOR_NINTENDO,
     SOC_VERSION,
     NULL,
@@ -57,7 +57,7 @@ static const SocConfig sSocConfigInit = {
 // wireless manager will not start; and 1, to wait, while it is not in its first state
 u8 DWCAc_StepWcmStartup(void) {
     WCMConfig config;
-    s32 wcmState = WCM_GetState();
+    s32 wcmState = WCM_GetPhase();
     DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     s32 result;
 
@@ -87,7 +87,7 @@ u8 DWCAc_StepSockets(void) {
     u8 state = DWCAc_GetState();
     DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
 
-    if (WCM_GetState() == 9) {
+    if (WCM_GetPhase() == 9) {
         switch (state) {
         case 10:
             state = DWCAc_StartSoc(work);
@@ -133,7 +133,7 @@ u8 DWCAc_StepSockets(void) {
 // yields at 4. 12 to wait for the address, or 0x11, the teardown, if SOC will not start
 static u8 DWCAc_StartSoc(DWCAcSearchWork *work) {
     DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
-    SocConfig *config = DWCAc_GetBlock(DWC_AC_WORK_SOC_CONFIG);
+    SOCConfig *config = DWCAc_GetBlock(DWC_AC_WORK_SOC_CONFIG);
 
     DWCAc_MakeSocConfig(main, work, config);
     SOCLiYieldWait = 4;
@@ -236,11 +236,11 @@ static u8 DWCAc_StopSoc(void) {
 // its own, else DHCP; the MTU, which a DSi takes from the setting within 576 to 1500 (1400 if it has none); and on a
 // DSi the receive window of the search's work, unless the MTU is the smallest. The allocators have the type of DWC's
 // (size unsigned) where SOC wants a size with a sign
-static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfig *config) {
+static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SOCConfig *config) {
     DWCAcDsSetting *setting;
     u8 type;
 
-    MI_CpuCopy8(&sSocConfigInit, config, sizeof(SocConfig));
+    MI_CpuCopy8(&sSocConfigInit, config, sizeof(SOCConfig));
     config->alloc = (SocAllocFunc)main->alloc;
     config->free = (SocFreeFunc)main->free;
     if (work->kind >= 0x12) {
@@ -320,8 +320,8 @@ static u32 DWCAc_MakeNetmask(u8 bits) {
 // configuration already)
 static void DWCAc_SetResolver(DWCAcSearchWork *work) {
     DWCAcDsSetting *setting;
-    SocInAddr dns1;
-    SocInAddr dns2;
+    SOCInAddr dns1;
+    SOCInAddr dns2;
     int dnsSum;
     u8 type;
 
@@ -340,5 +340,5 @@ static void DWCAc_SetResolver(DWCAcSearchWork *work) {
     }
     dns1.addr = DWCAc_ReadAddress(setting->dns[0]);
     dns2.addr = DWCAc_ReadAddress(setting->dns[1]);
-    SOC_GetResolver(&dns1, &dns2);
+    SOC_SetResolver(&dns1, &dns2);
 }

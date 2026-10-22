@@ -36,7 +36,7 @@ BOOL DWCAc_StepTeardown(u8 *state) {
 
 // Asks the wireless manager for the next step down from the state it is in; 1 once it is down, -1 if it cannot be
 static int DWCAc_StepWcmTeardown(void) {
-    switch (WCM_GetState()) {
+    switch (WCM_GetPhase()) {
     case 0:
         return 1;
     case 1:
@@ -46,13 +46,13 @@ static int DWCAc_StepWcmTeardown(void) {
         WCM_CleanupAsync();
         break;
     case 6:
-        WCM_StopSearchAsync();
+        WCM_EndSearchAsync();
         break;
     case 9:
         WCM_DisconnectAsync();
         break;
     case 12:
-        WCM_RestoreIdleAsync();
+        WCM_TerminateAsync();
         break;
     case 11:
         DWCAc_SetError(0);

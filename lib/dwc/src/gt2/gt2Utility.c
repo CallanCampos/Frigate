@@ -14,7 +14,7 @@ const char *func_ov011_0217ed14(unsigned int ip, unsigned short port, char strin
         string = sStrings[sStringIndex];
     }
     if (ip != 0) {
-        SocInAddr address;
+        SOCInAddr address;
 
         address.addr = ip;
         if (port != 0) {
@@ -37,7 +37,7 @@ GT2Bool gt2StringToAddress(const char *string, unsigned int *ipOut, unsigned sho
     char *colon;
     char *digit;
     long number;
-    SocHostEnt *hostEnt;
+    SOCHostEnt *hostEnt;
 
     if (string == NULL || string[0] == '\0') {
         ip = 0;

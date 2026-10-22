@@ -4,8 +4,8 @@
 // GameSpy's MD5 (md5c.c), in overlay 11: RSA's reference MD5 (RFC 1321), with a function that gives the digest of some
 // bytes as 32 hex digits. The ROM has no names for the file or its functions: the file is named after GameSpy's, as
 // pret/pokerevo's Wii build has it (asm/SDK/DWC/gamespy/md5c.s), and so are the functions. MD5Init, MD5Update and
-// MD5Final keep their addresses, with their names in the comments: NitroWiFi's SSL (lib/nitrowifi/src/ssl/md5.c) has
-// functions of the same names in this overlay
+// MD5Final keep their addresses, with their names in the comments: NitroWiFi's SSL (lib/nitrowifi/src/ssl/md5.c) held
+// those names in this overlay until it took the SDK's own (CPSi_md5_init, CPSi_md5_calc, CPSi_md5_result)
 
 typedef unsigned char *POINTER;
 typedef unsigned int UINT4;

@@ -22,7 +22,7 @@ static char sSearchManagerHostname[64] = "gpsp.gs.nintendowifi.net";
 // Opens the search's socket to the search manager, which gpiProcessSearch waits on to connect
 static GPResult gpiStartProfileSearch(GPConnection *connection, GPIOperation *operation) {
     GPISearchData *search = operation->data;
-    SocHostEnt *host;
+    SOCHostEnt *host;
     int error;
 
     search->inputBuffer.size = 0x1000;
@@ -49,7 +49,7 @@ static GPResult gpiStartProfileSearch(GPConnection *connection, GPIOperation *op
         return 3;
     }
     {
-        SocAddrIn address = { 0 };
+        SOCSockAddrIn address = { 0 };
 
         address.family = 2;
         address.addr.addr = *(gsi_u32 *)host->addrList[0];

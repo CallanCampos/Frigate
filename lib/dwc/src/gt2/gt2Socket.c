@@ -58,7 +58,7 @@ GT2Connection gti2SocketFindConnection(GT2Socket socket, unsigned int ip, unsign
 GT2Result gti2CreateSocket(GT2Socket *socketOut, const char *localAddress, int outgoingBufferSize,
                            int incomingBufferSize, gt2SocketErrorCallback onSocketError, GTI2ProtocolType protocol) {
     gsi_u16 port;
-    SocAddrIn address;
+    SOCSockAddrIn address;
     GTI2Socket *socket;
     gsi_u32 ip;
     int addressSize;
@@ -242,7 +242,7 @@ GT2Bool gti2SocketSend(GT2Socket socket, unsigned int ip, unsigned short port, c
     if (socket->protocol != GTI2AdHocProtocol && !CanSendOnSocket(socket->handle)) {
         return gsi_true;
     }
-    SocAddrIn address = { 0 };
+    SOCSockAddrIn address = { 0 };
 
     address.family = 2;
     address.addr.addr = ip;

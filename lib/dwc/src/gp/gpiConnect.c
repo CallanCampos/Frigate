@@ -92,10 +92,10 @@ static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operatio
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
-    SocAddrIn address = { 0 };
+    SOCSockAddrIn address = { 0 };
     address.family = 2;
     if (inet_addr(sConnectionManagerHostname) == -1) {
-        SocHostEnt *host = SOC_GetHostByName(sConnectionManagerHostname);
+        SOCHostEnt *host = SOC_GetHostByName(sConnectionManagerHostname);
         if (host == NULL) {
             gpiSetError(connection, 5, "Could not resolve connection mananger host name.");
             gpiCallErrorCallback(connection, 3, 1);

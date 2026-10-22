@@ -19,7 +19,7 @@
 // The flags DWCAc_GetBlock takes
 #define DWC_AC_WORK_MAIN 0x01       // the control block: 0xcc bytes
 #define DWC_AC_WORK_WCM 0x02        // the wireless connection manager's work: 0x4800 bytes
-#define DWC_AC_WORK_SOC_CONFIG 0x04 // the SocConfig that SOC_Startup is given (dwc_ac_soc.c): 0x58 bytes
+#define DWC_AC_WORK_SOC_CONFIG 0x04 // the SOCConfig that SOC_Startup is given (dwc_ac_soc.c): 0x58 bytes
 #define DWC_AC_WORK_MEMFUNCS 0x08   // the connection test's DWCNetcheckParam: 0xc bytes
 #define DWC_AC_WORK_SEARCH 0x10     // the search's work: 0x14d8 bytes
 

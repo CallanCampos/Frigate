@@ -356,7 +356,7 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
     }
     sWep.keyId = connected;
     MI_CpuCopy8(param->key, sWep.key[connected], param->keyLength);
-    WCM_ClearApListBuffer();
+    WCM_ClearApList();
     if (DWC_Wcm_Search(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
         tries = 0;
         OS_CreateAlarm(&alarm);

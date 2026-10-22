@@ -617,7 +617,7 @@ void gpiPeerLeftCallback(unsigned int ip, unsigned short port, GSUdpCloseReason 
     GPIPeer *peer = gpiGetPeerByAddr(userData, ip, port);
 
     if (peer != NULL) {
-        SocInAddr addr;
+        SOCInAddr addr;
 
         addr.addr = ip;
         gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice,
@@ -630,7 +630,7 @@ void gpiPeerMessageCallback(unsigned int ip, unsigned short port, unsigned char 
                             void *userData) {
     GPConnection *connection = userData;
     GPIPeer *peer = gpiGetPeerByAddr(connection, ip, port);
-    SocInAddr addr;
+    SOCInAddr addr;
     int length;
     int size;
     char *buffer;
@@ -678,7 +678,7 @@ void gpiPeerMessageCallback(unsigned int ip, unsigned short port, unsigned char 
 void gpiPeerAcceptedCallback(unsigned int ip, unsigned short port, GSUdpErrorCode reason, gsi_bool rejected,
                              void *userData) {
     GPIPeer *peer = gpiGetPeerByAddr(userData, ip, port);
-    SocInAddr addr;
+    SOCInAddr addr;
 
     addr.addr = ip;
     if (peer == NULL) {

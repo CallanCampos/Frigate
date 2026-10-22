@@ -13,28 +13,28 @@ int SOCL_GetStatus(int s) {
     OSIntrMode irq;
 
     if (SOCL_SocketIsInvalid(socket)) {
-        status |= SOCL_STATUS_INVALID;
+        status |= SOCL_POLLNVAL;
     } else {
-        if (socket->state & SOCLI_STATE_CONNECT_FAILED) {
-            status |= SOCL_STATUS_ERROR;
+        if (socket->state & SOCL_STATUS_ERROR) {
+            status |= SOCL_POLLERR;
         }
-        if (socket->flag == 1 || (socket->state & SOCLI_STATE_CONNECTED)) {
+        if (socket->flag == 1 || (socket->state & SOCL_STATUS_CONNECTED)) {
             irq = OS_DisableInterrupts();
             if (SOCLi_GetReadBufferOccpiedSize(socket) > 0) {
-                status |= SOCL_STATUS_READABLE;
+                status |= SOCL_POLLRDNORM;
             }
             if (SOCLi_GetWriteBufferFreeSize(socket) > 0) {
-                status |= SOCL_STATUS_WRITABLE;
+                status |= SOCL_POLLWRNORM;
             }
             OS_RestoreInterrupts(irq);
         }
-        if (SOCLi_SocketIsTCP(socket)) {
-            if ((socket->state & SOCLI_STATE_CONNECTED) && socket->cps_socket.state != CPS_STT_ESTABLISHED &&
-                !(status & SOCL_STATUS_READABLE)) {
-                socket->state &= ~(SOCLI_STATE_BINDING | SOCLI_STATE_CONNECTED);
+        if (SOCL_SocketIsTCP(socket)) {
+            if ((socket->state & SOCL_STATUS_CONNECTED) && socket->cps_socket.state != CPS_STT_ESTABLISHED &&
+                !(status & SOCL_POLLRDNORM)) {
+                socket->state &= ~(SOCL_STATUS_CONNECTING | SOCL_STATUS_CONNECTED);
             }
-            if (!(socket->state & SOCLI_STATE_BINDING) && !(socket->state & SOCLI_STATE_CONNECTED)) {
-                status |= SOCL_STATUS_NOTCONN;
+            if (!(socket->state & SOCL_STATUS_CONNECTING) && !(socket->state & SOCL_STATUS_CONNECTED)) {
+                status |= SOCL_POLLHUP;
             }
         }
     }
@@ -43,14 +43,14 @@ int SOCL_GetStatus(int s) {
 
 // How much a read could take now: the next datagram's size for UDP, the buffered data for TCP
 static s32 SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket) {
-    SOCLRecvPipe *pipe = socket->recv_pipe;
+    SOCLiSocketRecvCommandPipe *pipe = socket->recv_pipe;
     s32 size = 0;
 
     if (pipe != NULL) {
         s8 mode = socket->flag;
 
         if (mode == 1) {
-            SOCLUdpPacket *head = pipe->udp_head;
+            SOCLiSocketUdpData *head = pipe->udp_head;
 
             size = head != NULL ? head->len : 0;
         } else if (mode == 0 || mode == 4) {

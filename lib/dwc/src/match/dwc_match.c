@@ -2109,7 +2109,7 @@ static void DWCi_MatchProcess(int a0) {
 static GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket, unsigned int ip, unsigned short port,
                                                    GT2Byte *message, int length) {
     const u8 *data = message;
-    SocAddrIn addr;
+    SOCSockAddrIn addr;
 
     if (length == 0 || data == NULL) {
         return gsi_false;
@@ -2962,7 +2962,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
     u32 reply[0x40];
     DWCNodeInfo request;
     DWCNodeInfo accepted;
-    SocAddrIn address;
+    SOCSockAddrIn address;
     u32 sendId[1];
     u8 result;
     u8 saved;

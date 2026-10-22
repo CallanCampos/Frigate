@@ -6,7 +6,7 @@
 // thread takes from its queue and runs, one at a time. This file keeps the pool of packets (a queue of the free ones)
 // and sends the packets to the pipes. pokediamond's NitroWiFi names the object socl_command.o and every function in it.
 
-static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet);
+static int SOCLi_ExecCommandPacket(SOCLiSocketCommandPipe *pipe, SOCLiCommandPacket *packet);
 
 // With their explicit zeros the code reaches both from one base, as the original does
 static OSMessage *SOCLiCommandPackets = NULL;
@@ -14,7 +14,7 @@ static OSMessageQueue SOCLiCommandPacketQueue = { 0 };
 
 int SOCLi_StartupCommandPacketQueue(s32 max) {
     int packets_offset = (max * sizeof(OSMessage) + 3) & ~3;
-    int packets_size = (max * sizeof(SOCLCommandPacket) + 3) & ~3;
+    int packets_size = (max * sizeof(SOCLiCommandPacket) + 3) & ~3;
     OSMessage *messages = (OSMessage *)SOCLiConfigPtr->alloc(packets_size + packets_offset);
     u8 *packet;
 
@@ -24,9 +24,9 @@ int SOCLi_StartupCommandPacketQueue(s32 max) {
     OS_InitMessageQueue(&SOCLiCommandPacketQueue, messages, max);
     packet = (u8 *)messages + packets_offset;
     while (max > 0) {
-        SOCLi_FreeCommandPacket((SOCLCommandPacket *)packet);
+        SOCLi_FreeCommandPacket((SOCLiCommandPacket *)packet);
         max--;
-        packet += sizeof(SOCLCommandPacket);
+        packet += sizeof(SOCLiCommandPacket);
     }
     SOCLiCommandPackets = messages;
     return 0;
@@ -41,8 +41,8 @@ int SOCLi_CleanupCommandPacketQueue(void) {
     return 0;
 }
 
-SOCLCommandPacket *SOCLi_AllocCommandPacket(s32 flags) {
-    SOCLCommandPacket *packet;
+SOCLiCommandPacket *SOCLi_AllocCommandPacket(s32 flags) {
+    SOCLiCommandPacket *packet;
 
     if (OS_ReceiveMessage(&SOCLiCommandPacketQueue, (OSMessage *)&packet, flags)) {
         return packet;
@@ -50,8 +50,8 @@ SOCLCommandPacket *SOCLi_AllocCommandPacket(s32 flags) {
     return NULL;
 }
 
-SOCLCommandPacket *SOCLi_CreateCommandPacket(SOCLCommandHandler handler, SOCLSocket *socket, s32 flag_block) {
-    SOCLCommandPacket *packet = SOCLi_AllocCommandPacket(flag_block);
+SOCLiCommandPacket *SOCLi_CreateCommandPacket(SOCLiCommandHandler handler, SOCLSocket *socket, s32 flag_block) {
+    SOCLiCommandPacket *packet = SOCLi_AllocCommandPacket(flag_block);
 
     if (packet != NULL) {
         packet->h.handler = handler;
@@ -63,17 +63,17 @@ SOCLCommandPacket *SOCLi_CreateCommandPacket(SOCLCommandHandler handler, SOCLSoc
     return packet;
 }
 
-void SOCLi_FreeCommandPacket(SOCLCommandPacket *packet) {
+void SOCLi_FreeCommandPacket(SOCLiCommandPacket *packet) {
     if (packet != NULL) {
         OS_SendMessage(&SOCLiCommandPacketQueue, packet, OS_MESSAGE_NOBLOCK);
     }
 }
 
-SOCLCommandPipe *SOCLi_GetCtrlPipe(SOCLSocket *socket) {
+SOCLiSocketCommandPipe *SOCLi_GetCtrlPipe(SOCLSocket *socket) {
     return socket->recv_pipe != NULL ? &socket->recv_pipe->base : &socket->send_pipe->base;
 }
 
-int SOCLi_SendCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet) {
+int SOCLi_SendCommandPacket(SOCLiSocketCommandPipe *pipe, SOCLiCommandPacket *packet) {
     BOOL sent = OS_SendMessage(&pipe->queue, packet,
                                packet == NULL || (packet->h.flag_block & 1) ? OS_MESSAGE_BLOCK : OS_MESSAGE_NOBLOCK);
 
@@ -83,11 +83,11 @@ int SOCLi_SendCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet) {
     return sent ? 0 : -42;
 }
 
-int SOCLi_SendCommandPacketToCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
+int SOCLi_SendCommandPacketToCtrlPipe(SOCLSocket *socket, SOCLiCommandPacket *packet) {
     return SOCLi_SendCommandPacket(SOCLi_GetCtrlPipe(socket), packet);
 }
 
-static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet) {
+static int SOCLi_ExecCommandPacket(SOCLiSocketCommandPipe *pipe, SOCLiCommandPacket *packet) {
     OSMessage result;
     OSMessage message[1];
     OSMessageQueue queue;
@@ -104,21 +104,21 @@ static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *pac
     return (int)result;
 }
 
-int SOCLi_ExecCommandPacketInRecvPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
+int SOCLi_ExecCommandPacketInRecvPipe(SOCLSocket *socket, SOCLiCommandPacket *packet) {
     return SOCLi_ExecCommandPacket(&socket->recv_pipe->base, packet);
 }
 
-int SOCLi_ExecCommandPacketInSendPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
+int SOCLi_ExecCommandPacketInSendPipe(SOCLSocket *socket, SOCLiCommandPacket *packet) {
     return SOCLi_ExecCommandPacket(&socket->send_pipe->base, packet);
 }
 
-int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *packet) {
+int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLiCommandPacket *packet) {
     return SOCLi_ExecCommandPacket(SOCLi_GetCtrlPipe(socket), packet);
 }
 
 void SOCLi_CommandPacketHandler(void *arg) {
-    SOCLCommandPipe *pipe = (SOCLCommandPipe *)arg;
-    SOCLCommandPacket *packet;
+    SOCLiSocketCommandPipe *pipe = (SOCLiSocketCommandPipe *)arg;
+    SOCLiCommandPacket *packet;
 
     while (1) {
         int result;

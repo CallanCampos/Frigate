@@ -19,23 +19,23 @@ static int SOCLi_MemCpy(u8 *dst, int len, SOCLiCommandWrite *cpacket);
 
 int SOCL_WriteTo(int s, const void *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags) {
     SOCLSocket *socket = (SOCLSocket *)s;
-    SOCLSendPipe *pipe;
+    SOCLiSocketSendCommandPipe *pipe;
     int block;
     int result;
 
     if (SOCL_SocketIsInvalid(socket)) {
         return SOCL_EINVAL;
     }
-    if (!SOCLi_SocketIsCreated(socket)) {
+    if (!SOCL_SocketIsCreated(socket)) {
         return SOCL_ENETRESET;
     }
-    if (SOCLi_SocketIsTCP(socket)) {
-        if (!(socket->state & SOCLI_STATE_CONNECTED) || (socket->state & SOCLI_STATE_CLOSING)) {
+    if (SOCL_SocketIsTCP(socket)) {
+        if (!(socket->state & SOCL_STATUS_CONNECTED) || (socket->state & SOCL_STATUS_CLOSING)) {
             return SOCL_ENOTCONN;
         }
     }
     pipe = socket->send_pipe;
-    if ((flags & SOCLI_WRITE_NOBLOCK) || socket->flag_block == 0) {
+    if ((flags & SOCL_MSG_DONTWAIT) || socket->flag_block == 0) {
         if (!OS_TryLockMutex(&pipe->base.mutex)) {
             return SOCL_EAGAIN;
         }
@@ -51,7 +51,7 @@ int SOCL_WriteTo(int s, const void *buf, int len, u16 remote_port, CPSInAddr rem
 
 static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, s32 len, u16 remote_port, CPSInAddr remote_ip,
                              s32 block) {
-    SOCLSendPipe *pipe = socket->send_pipe;
+    SOCLiSocketSendCommandPipe *pipe = socket->send_pipe;
     s32 sndbuf_len;
     s32 write_pos;
     s32 alloc_len;
@@ -92,7 +92,7 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, s32 len, u16 rem
 // Finds room for up to len bytes (at least chunk) in the pipe's buffer, sleeping for it when the socket blocks, and
 // gives the position to write at
 static s32 SOCLi_AllocWriteBuffer(SOCLSocket *socket, s32 len, s32 chunk, s32 *write_pos, s32 block) {
-    SOCLSendPipe *pipe = socket->send_pipe;
+    SOCLiSocketSendCommandPipe *pipe = socket->send_pipe;
     s32 free;
     OSIntrMode irq;
 
@@ -120,7 +120,7 @@ static s32 SOCLi_AllocWriteBuffer(SOCLSocket *socket, s32 len, s32 chunk, s32 *w
 }
 
 s32 SOCLi_GetWriteBufferFreeSize(SOCLSocket *socket) {
-    SOCLSendPipe *pipe = socket->send_pipe;
+    SOCLiSocketSendCommandPipe *pipe = socket->send_pipe;
     s32 size = pipe->buffer.size;
     s32 write_pos = pipe->write_pos;
     s32 read_pos = pipe->read_pos;
@@ -134,8 +134,8 @@ s32 SOCLi_GetWriteBufferFreeSize(SOCLSocket *socket) {
 
 static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, s32 len, s32 pos, u16 remote_port,
                                   CPSInAddr remote_ip, s32 block) {
-    SOCLSendPipe *pipe = socket->send_pipe;
-    SOCLCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_WriteCallBack, pipe->socket, block);
+    SOCLiSocketSendCommandPipe *pipe = socket->send_pipe;
+    SOCLiCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_WriteCallBack, pipe->socket, block);
     u16 old_write_pos;
     u8 *data;
     int size;
@@ -170,7 +170,7 @@ static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, s32 len, s3
     pipe->write_pos = packet->write.write_end;
     if (socket->flag == 1) {
         if (socket->local_port == 0) {
-            socket->local_port = CPSi_GetNewPort();
+            socket->local_port = CPS_SocGetEport();
             socket->cps_socket.local_port = socket->local_port;
         }
         packet->write.local_port = socket->local_port;
@@ -195,7 +195,7 @@ static int SOCLi_WriteCallBack(void *arg) {
     SOCLiCommandWrite *cpacket = (SOCLiCommandWrite *)arg;
     SOCLSocket *socket = cpacket->h.socket;
     int result = 0;
-    SOCLSendPipe *pipe = socket->send_pipe;
+    SOCLiSocketSendCommandPipe *pipe = socket->send_pipe;
     u8 *data;
     int overhead;
     s8 mode;
@@ -203,10 +203,10 @@ static int SOCLi_WriteCallBack(void *arg) {
     int len;
     int written;
 
-    if (socket->flag == 2 && (socket->state & SOCLI_STATE_CLOSING)) {
+    if (socket->flag == 2 && (socket->state & SOCL_STATUS_CLOSING)) {
         return SOCL_EINVAL;
     }
-    if (socket->flag != 0 && socket->flag != 4 || (socket->state & SOCLI_STATE_CONNECTED)) {
+    if (socket->flag != 0 && socket->flag != 4 || (socket->state & SOCL_STATUS_CONNECTED)) {
         if (cpacket->remote_ip != 0) {
             CPS_SocBind(cpacket->local_port, cpacket->remote_port, cpacket->remote_ip);
         }
@@ -225,9 +225,9 @@ static int SOCLi_WriteCallBack(void *arg) {
             }
             written = CPS_SocWrite(data + overhead, len);
             if (written <= 0) {
-                if (SOCLi_SocketIsTCP(socket)) {
-                    socket->state &= ~(SOCLI_STATE_BINDING | SOCLI_STATE_CONNECTED | SOCLI_STATE_CLOSING);
-                    socket->state |= SOCLI_STATE_RESET;
+                if (SOCL_SocketIsTCP(socket)) {
+                    socket->state &= ~(SOCL_STATUS_CONNECTING | SOCL_STATUS_CONNECTED | SOCL_STATUS_CLOSING);
+                    socket->state |= SOCL_STATUS_RESET;
                     CPS_TcpClose();
                 }
                 result = SOCL_ETIMEDOUT;

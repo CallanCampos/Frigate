@@ -205,7 +205,7 @@ void ghiDoConnecting(GHIConnection *connection) {
         }
 
         {
-            SocAddrIn address = { 0 };
+            SOCSockAddrIn address = { 0 };
 
             address.family = 2;
             if (connection->proxyAddress != NULL) {

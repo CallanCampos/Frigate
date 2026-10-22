@@ -11,34 +11,34 @@ extern const char SOCLi_Signature[];
 // socl_startup.c
 extern u32 SOCLiDefaultLanBufferSize; // The LAN buffer's size when the config gives none
 extern CPSInAddr SOCLiRequestedIP;    // The address that DHCP asks for
-extern int SOCLiDhcpState;            // SOCLI_DHCP_*
+extern int SOCLiDhcpState;            // SOCL_DHCP_*
 extern CPSConfig SOCLiCPSConfig;
 
 // SOCLiDhcpState: DHCP is in use, and it has finished (or the address is static)
-#define SOCLI_DHCP_REQUESTED 1
-#define SOCLI_DHCP_DONE 2
+#define SOCL_DHCP_REQUEST 1
+#define SOCL_DHCP_CALLBACK 2
 
 // A command pipe: the queue of the packets that its thread runs (the socket's fields at 0xa0 and 0xa4 point to its
 // receive and send pipes, and a socket without a receive pipe uses the send pipe for control). Its messages and the
 // thread's stack follow the pipe in the socket's memory.
-typedef struct SOCLCommandPipe {
+typedef struct SOCLiSocketCommandPipe {
     OSMessageQueue queue;
     OSThread thread;
     OSMutex mutex;
-} SOCLCommandPipe;
+} SOCLiSocketCommandPipe;
 
 // A datagram that SOCLi_UdpRecvCallback queued, followed by its data
-typedef struct SOCLUdpPacket {
-    struct SOCLUdpPacket *next;
+typedef struct SOCLiSocketUdpData {
+    struct SOCLiSocketUdpData *next;
     u16 len;
     u16 port;
     CPSInAddr ip;
     u8 data[];
-} SOCLUdpPacket;
+} SOCLiSocketUdpData;
 
 // The receive pipe, 0x114 bytes
-typedef struct SOCLRecvPipe {
-    SOCLCommandPipe base;
+typedef struct SOCLiSocketRecvCommandPipe {
+    SOCLiSocketCommandPipe base;
     // What the reads have taken from CPS's receive buffer and not yet consumed. volatile: the pipe's thread and the
     // readers both change it, and SOCLi_ReadCallBack's load of it is not moved (ntrtwl's NitroWiFi has it volatile too)
     vs32 cps_read_len;
@@ -48,33 +48,33 @@ typedef struct SOCLRecvPipe {
     // The datagrams that came in, oldest first. volatile: CPS's callback appends while readers take them;
     // SOCLi_UdpRecvCallback loads the tail again for its store, and SOCLi_GetReadBufferOccpiedSize reads the head once
     // into a local (ntrtwl's NitroWiFi has both ends and the byte count volatile)
-    SOCLUdpPacket *volatile udp_tail;
-    SOCLUdpPacket *volatile udp_head;
+    SOCLiSocketUdpData *volatile udp_tail;
+    SOCLiSocketUdpData *volatile udp_head;
     vu16 udp_queued;        // The bytes of datagram data they hold (volatile like the list ends)
     u16 udp_queued_max;     // From SOCLSocketParam's rcvpipe_unk_e
     OSThreadQueue udp_wait; // Where a blocking UDP read sleeps
-} SOCLRecvPipe;
+} SOCLiSocketRecvCommandPipe;
 
 struct SOCLSocket;
 
 // The send pipe, 0x110 bytes
-typedef struct SOCLSendPipe {
-    SOCLCommandPipe base;
+typedef struct SOCLiSocketSendCommandPipe {
+    SOCLiSocketCommandPipe base;
     CPSSocBuf buffer;
     // Where the next write goes in the buffer (a ring). volatile: the writers move it while the pipe's thread reads it
     volatile u16 write_pos;
     vu16 read_pos;      // How far the pipe's thread has taken data out of it; volatile: the writers read it meanwhile
     OSThreadQueue wait; // Where a blocking write sleeps until the buffer has room
     struct SOCLSocket *socket; // The socket that owns the pipe (a UDP socket shares the UDP send socket's)
-} SOCLSendPipe;
+} SOCLiSocketSendCommandPipe;
 
 // A socket, 0xbc bytes, followed in memory by its pipes and buffers
 typedef struct SOCLSocket {
-    CPSSoc cps_socket;       // Its buffers are in the socket's memory, after the pipes
-    SOCLRecvPipe *recv_pipe; // 0xa0, NULL for a socket that does not read
-    SOCLSendPipe *send_pipe; // A UDP socket's is the UDP send socket's
+    CPSSoc cps_socket;                     // Its buffers are in the socket's memory, after the pipes
+    SOCLiSocketRecvCommandPipe *recv_pipe; // 0xa0, NULL for a socket that does not read
+    SOCLiSocketSendCommandPipe *send_pipe; // A UDP socket's is the UDP send socket's
     vs32 result; // What the last command packet returned; volatile: the pipe's thread sets it while callers wait
-    // SOCLI_STATE_*. volatile: the command pipes' threads change it while callers test it, and the original reloads it
+    // SOCL_STATUS_*. volatile: the command pipes' threads change it while callers test it, and the original reloads it
     // for each test, with no call or store in between (SOCL_GetStatus loads it twice in a row)
     volatile s16 state;
     s8 flag_block;
@@ -88,27 +88,24 @@ typedef struct SOCLSocket {
 // socl_startup.c: the socket that sends every UDP socket's datagrams
 extern int SOCLiUDPSendSocket;
 
-// SOCLi_ReadFrom's flags (BSD's MSG_PEEK and MSG_DONTWAIT)
-#define SOCLI_READ_PEEK 2    // Retain UDP datagrams/plain-CPS read position; SSL reads still consume copied bytes
-#define SOCLI_READ_NOBLOCK 4 // Do not wait for data
-
-// SOCL_WriteTo's flags
-#define SOCLI_WRITE_NOBLOCK 4 // Do not wait for room in the send buffer
+// SOCL_ReadFrom's and SOCL_WriteTo's flags (BSD's MSG_PEEK and MSG_DONTWAIT)
+#define SOCL_MSG_PEEK 2     // Retain UDP datagrams/plain-CPS read position; SSL reads still consume copied bytes
+#define SOCL_MSG_DONTWAIT 4 // Do not wait for data to read or for room in the send buffer
 
 // SOCLSocket.state
-#define SOCLI_STATE_CREATED 1
-#define SOCLI_STATE_BINDING 2   // SOCLi_ExecBindCommand has queued the bind (and connect)
-#define SOCLI_STATE_CONNECTED 4 // The bind (and for TCP the connect) succeeded
-#define SOCLI_STATE_CLOSING 8
-#define SOCLI_STATE_CLOSE_CALLED 0x10   // SOCL_Close has run (it queued the close command)
-#define SOCLI_STATE_CLOSED 0x20         // The close command has run: the socket waits in the trash list
-#define SOCLI_STATE_CONNECT_FAILED 0x40 // The connect failed, with the error in the socket's result
-#define SOCLI_STATE_RESET 0x80          // The connection was reset
+#define SOCL_STATUS_CREATE 1
+#define SOCL_STATUS_CONNECTING 2 // SOCLi_ExecBindCommand has queued the bind (and connect)
+#define SOCL_STATUS_CONNECTED 4  // The bind (and for TCP the connect) succeeded
+#define SOCL_STATUS_CLOSING 8
+#define SOCL_STATUS_WAIT_CLOSE 0x10   // SOCL_Close has run (it queued the close command)
+#define SOCL_STATUS_WAIT_RELEASE 0x20 // The close command has run: the socket waits in the trash list
+#define SOCL_STATUS_ERROR 0x40        // The connect failed, with the error in the socket's result
+#define SOCL_STATUS_RESET 0x80        // The connection was reset
 
-static inline BOOL SOCLi_SocketIsCreated(const SOCLSocket *socket) {
+static inline BOOL SOCL_SocketIsCreated(const SOCLSocket *socket) {
     BOOL created = FALSE;
     if (socket != NULL) {
-        if (socket->state & SOCLI_STATE_CREATED) {
+        if (socket->state & SOCL_STATUS_CREATE) {
             created = TRUE;
         } else {
             created = FALSE;
@@ -126,7 +123,7 @@ static inline BOOL SOCLi_ModeIsTCP(s8 mode) {
     return tcp;
 }
 
-static inline BOOL SOCLi_SocketIsTCP(const SOCLSocket *socket) {
+static inline BOOL SOCL_SocketIsTCP(const SOCLSocket *socket) {
     BOOL tcp = TRUE;
     if (socket->flag != 0 && socket->flag != 4) {
         tcp = FALSE;
@@ -135,12 +132,12 @@ static inline BOOL SOCLi_SocketIsTCP(const SOCLSocket *socket) {
 }
 
 // A command's handler, run by the pipe's thread: it takes the packet and reads it as its own command's struct
-typedef int (*SOCLCommandHandler)(void *arg);
+typedef int (*SOCLiCommandHandler)(void *arg);
 
 // The command packets, in the shape of ntrtwl's NitroWiFi: every command starts with this 0x10-byte header and its
 // arguments follow it. The type names are ntrtwl's (SOCLiCommand*); the fields keep the names this code gave them.
 typedef struct SOCLiCommandHeader {
-    SOCLCommandHandler handler;
+    SOCLiCommandHandler handler;
     SOCLSocket *socket;
     OSMessageQueue *reply_queue; // Borrowed caller-stack result queue for mode 1, NULL otherwise
     s8 socket_flag;
@@ -198,7 +195,7 @@ typedef struct SOCLiCommandEnableSsl {
 } SOCLiCommandEnableSsl;
 
 // A command for a socket's pipe: the pool's packets are all the size of the largest command, 0x2c bytes (the write)
-typedef union SOCLCommandPacket {
+typedef union SOCLiCommandPacket {
     SOCLiCommandHeader h;
     SOCLiCommandCreateSocket create_socket;
     SOCLiCommandBind bind;
@@ -208,20 +205,20 @@ typedef union SOCLCommandPacket {
     SOCLiCommandShutdown shutdown;
     SOCLiCommandClose close;
     SOCLiCommandEnableSsl enable_ssl;
-} SOCLCommandPacket;
+} SOCLiCommandPacket;
 
 // socl_command.c
 int SOCLi_StartupCommandPacketQueue(s32 max);
 int SOCLi_CleanupCommandPacketQueue(void);
-SOCLCommandPacket *SOCLi_AllocCommandPacket(s32 flags);
-SOCLCommandPacket *SOCLi_CreateCommandPacket(SOCLCommandHandler handler, SOCLSocket *socket, s32 flag_block);
-void SOCLi_FreeCommandPacket(SOCLCommandPacket *packet);
-SOCLCommandPipe *SOCLi_GetCtrlPipe(SOCLSocket *socket);
-int SOCLi_SendCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet);
-int SOCLi_SendCommandPacketToCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *packet);
-int SOCLi_ExecCommandPacketInRecvPipe(SOCLSocket *socket, SOCLCommandPacket *packet);
-int SOCLi_ExecCommandPacketInSendPipe(SOCLSocket *socket, SOCLCommandPacket *packet);
-int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *packet);
+SOCLiCommandPacket *SOCLi_AllocCommandPacket(s32 flags);
+SOCLiCommandPacket *SOCLi_CreateCommandPacket(SOCLiCommandHandler handler, SOCLSocket *socket, s32 flag_block);
+void SOCLi_FreeCommandPacket(SOCLiCommandPacket *packet);
+SOCLiSocketCommandPipe *SOCLi_GetCtrlPipe(SOCLSocket *socket);
+int SOCLi_SendCommandPacket(SOCLiSocketCommandPipe *pipe, SOCLiCommandPacket *packet);
+int SOCLi_SendCommandPacketToCtrlPipe(SOCLSocket *socket, SOCLiCommandPacket *packet);
+int SOCLi_ExecCommandPacketInRecvPipe(SOCLSocket *socket, SOCLiCommandPacket *packet);
+int SOCLi_ExecCommandPacketInSendPipe(SOCLSocket *socket, SOCLiCommandPacket *packet);
+int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLiCommandPacket *packet);
 void SOCLi_CommandPacketHandler(void *arg);
 
 // socl_bind.c
@@ -234,7 +231,7 @@ int SOCL_Connect(int s, u16 remote_port, CPSInAddr remote_ip);
 // Returns admitted byte count, not callback/transmission completion. Nonblocking writes may return a prefix;
 // a later blocking-loop admission failure returns EAGAIN even if an earlier prefix was queued.
 // UDP copies destination scalars, using the stored peer only when remote_ip is zero and the stored IP is nonzero.
-// flags is SOCLI_WRITE_*; both command modes used by writes (3/0) return without waiting for callback completion.
+// flags is SOCL_MSG_*; both command modes used by writes (3/0) return without waiting for callback completion.
 int SOCL_WriteTo(int s, const void *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags);
 // How much room the socket's send pipe has in its buffer
 s32 SOCLi_GetWriteBufferFreeSize(SOCLSocket *socket);
@@ -268,11 +265,11 @@ void SOCLi_CleanupCPS(void);
 
 // socl_poll.c
 // SOCL_GetStatus's bits
-#define SOCL_STATUS_READABLE 0x01 // Data to read (or a datagram)
-#define SOCL_STATUS_WRITABLE 0x08 // Room in the send buffer
-#define SOCL_STATUS_ERROR 0x20    // The connect failed
-#define SOCL_STATUS_NOTCONN 0x40  // Neither connecting nor connected
-#define SOCL_STATUS_INVALID 0x80  // Not a socket
+#define SOCL_POLLRDNORM 0x01 // Data to read (or a datagram)
+#define SOCL_POLLWRNORM 0x08 // Room in the send buffer
+#define SOCL_POLLERR 0x20    // The connect failed
+#define SOCL_POLLHUP 0x40    // Neither connecting nor connected
+#define SOCL_POLLNVAL 0x80   // Not a socket
 int SOCL_GetStatus(int s);
 
 // socl_misc.c
@@ -281,8 +278,8 @@ u32 SOCLi_RoundUp4(u32 value);
 // socl_read.c
 // len is a byte capacity; queued UDP returns the full datagram length and discards any uncopied tail unless peeking.
 // UDP fills peer outputs independently; ordinary CPS requires both nonnull; SSL commands fill neither.
-// flags is SOCLI_READ_*. Peek prevents UDP dequeue/CPS offset advancement, but SSL still consumes copied bytes.
-int SOCLi_ReadFrom(int s, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int flags);
+// flags is SOCL_MSG_*. Peek prevents UDP dequeue/CPS offset advancement, but SSL still consumes copied bytes.
+int SOCL_ReadFrom(int s, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int flags);
 BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc);
 
 // socl_list.c

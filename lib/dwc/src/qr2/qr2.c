@@ -56,7 +56,7 @@ static qr2_t current_rec = &static_qr2_rec;
 // that the queries are read into last
 static char qr2_indata[256];
 char qr2_hostname[64];
-static SocInAddr local_ip_list[5];
+static SOCInAddr local_ip_list[5];
 static int num_local_ips;
 
 qr2_error_t qr2_init_socketA(qr2_t *qrec, SOCKET sock, int qport, const char *gamename, const char *secretKey,
@@ -177,8 +177,8 @@ void qr2_think(qr2_t qrec) {
 }
 
 void qr2_check_queries(qr2_t qrec) {
-    SocAddrIn saddr;
-    int saddrlen = sizeof(SocAddrIn);
+    SOCSockAddrIn saddr;
+    int saddrlen = sizeof(SOCSockAddrIn);
     int error;
 
     if (!qrec->readSocket) {
@@ -308,7 +308,7 @@ gsi_bool qr2_buffer_addA(qr2_buffer_t outBuf, const char *value) {
 }
 
 static void enum_local_ips(void) {
-    SocHostEnt *phost = getlocalhost();
+    SOCHostEnt *phost = getlocalhost();
 
     if (phost == NULL) {
         return;
@@ -317,15 +317,15 @@ static void enum_local_ips(void) {
         if (phost->addrList[num_local_ips] == NULL) {
             break;
         }
-        memcpy(&local_ip_list[num_local_ips], phost->addrList[num_local_ips], sizeof(SocInAddr));
+        memcpy(&local_ip_list[num_local_ips], phost->addrList[num_local_ips], sizeof(SOCInAddr));
     }
 }
 
 // The address of a host (four numbers or a name to look up) at a port, and the host's entry in savehent
 static gsi_bool qr2_get_sockaddrin(const char *host, int port, SOCKADDR_IN *saddr, HOSTENT **savehent) {
-    SocHostEnt *hent = NULL;
+    SOCHostEnt *hent = NULL;
 
-    memset(saddr, 0, sizeof(SocAddrIn));
+    memset(saddr, 0, sizeof(SOCSockAddrIn));
     saddr->family = 2;
     saddr->port = QR2_SWAP16((gsi_u16)port);
     if (host == NULL) {
@@ -475,7 +475,7 @@ static void handle_public_address(qr2_t qrec, char *buffer) {
     port = portTemp;
     ip = QR2_SWAP32(ip);
     if (ip != 0 && port != 0) {
-        SocInAddr addr;
+        SOCInAddr addr;
 
         addr.addr = ip;
         gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network, GSIDebugLevel_Notice,
@@ -705,7 +705,7 @@ static void qr_process_query(qr2_t qrec, qr2_buffer_t buf, unsigned char *qdata,
         gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network, GSIDebugLevel_Comment,
                       "Building query reply (split packet supported)\r\n");
         while (qr_build_split_query_reply(qrec, buf, &progress) == gsi_true) {
-            sendto(qrec->hbSock, buf->buffer, buf->len, 0, (SOCKADDR *)sender, sizeof(SocAddrIn));
+            sendto(qrec->hbSock, buf->buffer, buf->len, 0, (SOCKADDR *)sender, sizeof(SOCSockAddrIn));
             buf->len = 5;
             if (progress.curPacketNum > 7) {
                 return;
@@ -717,7 +717,7 @@ static void qr_process_query(qr2_t qrec, qr2_buffer_t buf, unsigned char *qdata,
         gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network, GSIDebugLevel_Comment,
                       "Building query reply (single packet)\r\n");
         qr_build_query_reply(qrec, buf, serverKeyCount, serverKeys, playerKeyCount, playerKeys, teamKeyCount, teamKeys);
-        sendto(qrec->hbSock, buf->buffer, buf->len, 0, (SOCKADDR *)sender, sizeof(SocAddrIn));
+        sendto(qrec->hbSock, buf->buffer, buf->len, 0, (SOCKADDR *)sender, sizeof(SOCSockAddrIn));
     }
 }
 
@@ -978,7 +978,7 @@ void qr2_parse_queryA(qr2_t qrec, char *query, int len, SOCKADDR *sender) {
     default:
         return;
     }
-    sendto(qrec->hbSock, buf.buffer, buf.len, 0, (SOCKADDR *)sender, sizeof(SocAddrIn));
+    sendto(qrec->hbSock, buf.buffer, buf.len, 0, (SOCKADDR *)sender, sizeof(SOCSockAddrIn));
     gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network, GSIDebugLevel_Comment,
                   "Sent %d bytes as QR2 query response\r\n", buf.len);
     gsDebugBinary(GSIDebugCat_QR2, GSIDebugType_Network, GSIDebugLevel_RawDump, buf.buffer, buf.len);
@@ -989,7 +989,7 @@ static void send_keepalive(qr2_t qrec) {
 
     buf.len = 0;
     qr_add_packet_header(&buf, 8, qrec->instanceKey);
-    sendto(qrec->hbSock, buf.buffer, buf.len, 0, (SOCKADDR *)&qrec->hbAddr, sizeof(SocAddrIn));
+    sendto(qrec->hbSock, buf.buffer, buf.len, 0, (SOCKADDR *)&qrec->hbAddr, sizeof(SOCSockAddrIn));
     qrec->lastKa = current_time();
     gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Network, GSIDebugLevel_Comment, "Sent keepalive to master\r\n", buf);
 }
@@ -1041,7 +1041,7 @@ static void send_heartbeat(qr2_t qrec, int stateChanged) {
     } else if (QR2_MAX_DATA_SIZE - buf.len >= 1) {
         buf.buffer[buf.len++] = '\0';
     }
-    sendto(qrec->hbSock, buf.buffer, buf.len, 0, (SOCKADDR *)&qrec->hbAddr, sizeof(SocAddrIn));
+    sendto(qrec->hbSock, buf.buffer, buf.len, 0, (SOCKADDR *)&qrec->hbAddr, sizeof(SOCSockAddrIn));
     qrec->lastKa = qrec->lastHeartbeat = current_time();
     if (stateChanged != 0) {
         qrec->userStateChangeRequested = gsi_false;

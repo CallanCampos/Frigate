@@ -131,9 +131,9 @@ static int UtilAc_Connect(void);
 static void UtilAc_Disconnect(void);
 static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous, int *index);
 static int UtilAc_Scan(void);
-static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, const void *data, int length);
+static int UtilAc_SendTo(int sock, const SOCSockAddrIn *to, const u8 *ownAddress, const void *data, int length);
 static int UtilAc_Broadcast(int sock, const void *data, int length);
-static int UtilAc_Send(int sock, const SocAddrIn *from, const void *data, int length);
+static int UtilAc_Send(int sock, const SOCSockAddrIn *from, const void *data, int length);
 static const u8 *UtilAc_ParsePacket(const u8 *packet, u32 *type, u32 *length);
 static const u8 *UtilAc_NextItem(const u8 **cursor, const u8 *end, u32 *type, u32 *length);
 static const u8 *UtilAc_FirstItem(const u8 *message, u32 *type, u32 *length);
@@ -144,7 +144,7 @@ static int UtilAc_ParseHello(const u8 *packet, int *secure);
 static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key);
 static int UtilAc_BuildHello(u8 *out);
 static int UtilAc_GetMacAddress(u8 *mac);
-static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from);
+static int UtilAc_MakeIds(u8 *key, const SOCSockAddrIn *from);
 static int UtilAc_ParseSettings(const u8 *message);
 static int UtilAc_ParseHex(u8 *out, const char *text, int length);
 static int UtilAc_MakeResult(void);
@@ -190,7 +190,7 @@ static UtilAcConfig sAcConfig = { sAcMessage + 8, TRUE, 0x800, 0xffffffff, 0x40 
 static char sAcHostName[12]; // Defined before the socket functions, where the ROM's .data has it
 // Fixed addresses on the access point's network, in network order: 192.168.0.176/24, with 192.168.0.200 as the
 // gateway and 192.168.0.32 as the DNS server
-static SocConfig sAcSocConfig = {
+static SOCConfig sAcSocConfig = {
     SOC_VENDOR_NINTENDO,
     SOC_VERSION,
     UtilAc_SocAlloc,
@@ -813,7 +813,7 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
         }
     } else {
         MI_CpuFill8(sAcBssid, 0xff, 6);
-        sAcSearchBssid = (u8 *)WCMiAnyBssid;
+        sAcSearchBssid = (u8 *)WCM_Bssid_Any;
     }
     sAcSearchEssid = sAcEssid;
     if (essid != NULL && essidLength > 0 && essidLength < 0x20) {
@@ -825,7 +825,7 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
         }
     } else {
         MI_CpuFill8(sAcEssid, 0xff, 0x20);
-        sAcSearchEssid = (u8 *)WCMiAnyEssid;
+        sAcSearchEssid = (u8 *)WCM_Essid_Any;
     }
     if (sAcWcmState == STATE_IDLE) {
         if (WCM_SearchAsync(sAcBssid, sAcSearchEssid, sAcSearchOption) == WCM_RESULT_ACCEPT) {
@@ -1392,7 +1392,7 @@ static u8 PADDING[64] = { 0x80 };
 #define SWAP16(value) ((u16)((((value) >> 8) & 0xff) | (((value) << 8) & 0xff00)))
 
 // Sends to the address, on the port the address has; ownAddress is not used
-static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, const void *data, int length) {
+static int UtilAc_SendTo(int sock, const SOCSockAddrIn *to, const u8 *ownAddress, const void *data, int length) {
     int result = SOC_SendTo(sock, data, length, 0, to);
 
     if (result < 0) {
@@ -1403,11 +1403,11 @@ static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, co
 
 // Sends to everyone on port 486
 static int UtilAc_Broadcast(int sock, const void *data, int length) {
-    SocAddrIn to;
+    SOCSockAddrIn to;
     u8 ownAddress[4];
 
-    to.len = sizeof(SocAddrIn);
-    to.family = POKE_NET_SOC_AF_INET;
+    to.len = sizeof(SOCSockAddrIn);
+    to.family = SOC_AF_INET;
     to.addr.addr = 0xffffffff;
     to.port = 486;
     SOC_U32to4U8(SOCL_GetHostID(), ownAddress);
@@ -1415,7 +1415,7 @@ static int UtilAc_Broadcast(int sock, const void *data, int length) {
 }
 
 // Answers whoever sent to us, by a broadcast; from is not used
-static int UtilAc_Send(int sock, const SocAddrIn *from, const void *data, int length) {
+static int UtilAc_Send(int sock, const SOCSockAddrIn *from, const void *data, int length) {
     return UtilAc_Broadcast(sock, data, length);
 }
 
@@ -1625,7 +1625,7 @@ static int UtilAc_GetMacAddress(u8 *mac) {
 }
 
 // Makes the key of the first exchange; from is not used
-static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
+static int UtilAc_MakeIds(u8 *key, const SOCSockAddrIn *from) {
     char ownText[0x20];
     char apText[0x20];
     MacAddress ap;
@@ -1847,8 +1847,8 @@ static int UtilAc_Run(void) {
     u32 sentAt = 0;
     int retries = 0;
     BOOL done = FALSE;
-    SocAddrIn address;
-    SocAddrIn from;
+    SOCSockAddrIn address;
+    SOCSockAddrIn from;
     u32 type;
     u32 length;
     u32 now;
@@ -1877,14 +1877,14 @@ static int UtilAc_Run(void) {
             }
             break;
         case 3:
-            sock = SOC_Socket(POKE_NET_SOC_AF_INET, 2, 0);
+            sock = SOC_Socket(SOC_AF_INET, 2, 0);
             if (sock < 0) {
                 result = RESULT_WIRELESS;
                 done = TRUE;
             } else {
                 memset(&address, 0, sizeof(address));
-                address.len = sizeof(SocAddrIn);
-                address.family = POKE_NET_SOC_AF_INET;
+                address.len = sizeof(SOCSockAddrIn);
+                address.family = SOC_AF_INET;
                 address.port = 486;
                 address.addr.addr = 0;
                 result = SOC_Bind(sock, &address);
@@ -1902,7 +1902,7 @@ static int UtilAc_Run(void) {
                 result = RESULT_SCAN_TIMEOUT;
                 done = TRUE;
             } else {
-                from.len = sizeof(SocAddrIn);
+                from.len = sizeof(SOCSockAddrIn);
                 UtilAc_MakeIds(sAcKey, &from);
                 if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
                     UtilAc_ParseHello(sAcPacket, &sAcSecure)) {

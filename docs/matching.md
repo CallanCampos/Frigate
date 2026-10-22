@@ -22,7 +22,7 @@ tools that show the differences.
   (`ldr r0, =s; strb r1, [r0]; ldr r1, =s; ldrb r1, [r1]`), where a ternary assigned to it keeps the address for the
   read: `wcm_dsi.c`'s `func_0276a9e4` sets `sConnectIndex` from the access point's capability bit so.
 - A handle parameter cast inside, `SOCL_Connect(int s, ...) { SOCLSocket *socket = (SOCLSocket *)s;`, and a `void *`
-  parameter cast to a block-scoped typed pointer where it is used (`SOC_RecvFrom`'s `SocAddrIn *addr = from;`) are
+  parameter cast to a block-scoped typed pointer where it is used (`SOC_RecvFrom`'s `SOCSockAddrIn *addr = from;`) are
   allocated differently from typed parameters: NitroWiFi's `SOCL_Connect` (8 bytes) and `SOC_RecvFrom` (20 bytes)
   match only so, as the SDK declares them.
 - A macro that assigns, `NNSi_G2dUnpackOffset(ptr, base)` (`ptr = ptr + base`), with its result assigned again,
@@ -706,15 +706,15 @@ Same instructions, registers swapped.
   Height interpolation reads the same raw fields, retaining its multiply-before-divide rounding. The ratio helper
   also serves the straight and XYZ conversions without changing their code. Scalar fixed-point locals instead
   spill the converted values and reuse their shifts, leaving the XZ conversion four bytes short.
-- A `static inline` accessor that returns a field cast to another type (`return (SOCLRecvPipe *)socket->recv_pipe;`)
+- A `static inline` accessor that returns a field cast to another type (`return (SOCLiSocketRecvCommandPipe *)socket->recv_pipe;`)
   reverses the stack slots of the locals spilled around its result. NitroWiFi's `SOCLi_ReadCallBack` gets the
-  original's slots only with the field typed as the SDK has it (`SOCLRecvPipe *recv_pipe`) and read directly (27 bytes
+  original's slots only with the field typed as the SDK has it (`SOCLiSocketRecvCommandPipe *recv_pipe`) and read directly (27 bytes
   to 21, and a match with the SDK's `volatile cps_read_len`). The SDK's command callbacks take `void *arg` and cast it
   to their command's struct (`SOCLiCommandRead *cpacket = arg;`) under a common header: that refactor changed no
   function by itself but is what the two typed fields needed. After such a refactor, retry a `volatile` that a row
   says no matching function needed.
 - The rounds of a hash written as statements, `a += F(b, c, d) + x + t; a = b + ROTL(a, s);`, spill differently from
-  one expression per round: GameSpy's `MD5Transform` (NitroWiFi's `ssl/md5.c`) matches with statement macros and an
+  one expression per round: NitroWiFi's `CPSi_md5_block` (`ssl/md5.c`) matches with statement macros and an
   `int` counter, 0x310 against 0x338 otherwise (`u32 j` leaves 4 bytes).
 - A value at a low stack slot, below the inner blocks' temporaries, may be a compiler temporary rather than a
   declared local: NitroSystem's `DrawCellToSurface2D_` (`g2d_RendererCore.c`) gets the original's slots only with
@@ -2396,7 +2396,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   diagnostic, not a fix: when only that differs, the original uses the pointer once more than the C, so look for the
   missing use. natneg.c's `ProcessPingPacket` matches with `(void)fromAddr;`, which nothing in GameSpy's code calls
   for, so it keeps its row. Check first that the cast isn't standing in for the field's real type: a field passed
-  by value as the struct it is (`SOC_InetNtoA(fromAddr->addr)`, with `SocAddrIn.addr` a `SocInAddr` as NitroWiFi
+  by value as the struct it is (`SOC_InetNtoA(fromAddr->addr)`, with `SOCSockAddrIn.addr` a `SOCInAddr` as NitroWiFi
   declares it) gives the folded `ldr r0, [r0, #4]` where the cast built the address first, and that alone made
   `NNProcessData` match.
 - A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
@@ -2439,7 +2439,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   computation, are locals of an explicit `if (count > 0) { ...; do { } while (++i < count); }` (`Flake_Add`).
 - A field that other threads change, tested more than once in a row: the original loads it again for each test where
   ours reuses the first load, so the field is `volatile`. NitroWiFi's `SOCLSocket.state` (`socl_internal.h`), which
-  the command pipes' threads set while the socket calls poll it, made `SOCL_GetStatus`, `SOCLi_ReadFrom` and
+  the command pipes' threads set while the socket calls poll it, made `SOCL_GetStatus`, `SOCL_ReadFrom` and
   `SOCL_WriteTo` match and brought `SOCL_Connect` and `SOCL_Shutdown` close; no spelling of the tests did it without.
   TwlSDK's DSP file server (`dsp_pipe.c`) keeps its `requests` mask `volatile`, since the DSP's interrupt sets it, and
   reloads it after its wait loop.
@@ -2456,7 +2456,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - An early exit with its own call, `if (work == NULL) { OS_RestoreInterrupts(irq); return 0; }`, then straight-line
   code, where one condition (`work != NULL && ...`) with one shared restore is 8 bytes short: NitroWiFi's
-  `WCM_CountApList` and `WCM_ClearApListBuffer`. A `result` local returned once, `result = f(...); return result;`,
+  `WCM_CountApList` and `WCM_ClearApList`. A `result` local returned once, `result = f(...); return result;`,
   lays out the blocks differently from `return f(...)`: `SOCLi_ConsumeBuffer` (4 bytes larger without it) and
   `SOCL_Shutdown`, which sets `result = 0` in an `else`.
 - A block that several branches share, chosen by a flag tested at the end (`BOOL average = FALSE; ... if (average)`),
@@ -3111,7 +3111,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   An empty `case 3:` stacked on `default:`, the case whose warning the SDK compiles out, is what fixes
   `WCM_StartupStep2` and four more steps: the empty labels set the jump table's range and the order of the compares.
   `case 3: case 4: default:`, the SDK's release build of its warning cases, matched 13 more of WCM's callbacks
-  (`WCM_OnConnectStatus`, `WCM_OnResetComplete` and others).
+  (`WcmWmcbConnect`, `WcmWmcbReset` and others).
 - A `switch` of two cases tests them in value order but lays their bodies out in source order, which no order of
   `if`s gives: GameSpy's `ghiSendBufferedData` (`ghttpBuffer.c`, overlay 189) matches only as `case -1: return FALSE;`
   written before `case -2: return TRUE;`. A final `if (!f()) return 0; return 1;` always puts the `return 1`
@@ -3307,7 +3307,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `VCTSession`), declares the C library's string functions in its own header (`dwc/ext.h`) and doesn't include
   `<string.h>`. MSL's own files include it, and so does TWL-DWC's `dwc_init.c`, whose `DWCi_Init` copies
   the stats server's host name with those loops. `strcmp` and `strlen` stay calls either way, but the code around them
-  changes: with `<string.h>`, NitroWiFi's `SSLi_FindNamedParam` (`ssl.c`) keeps `name` in r7 where the ROM spills it to
+  changes: with `<string.h>`, NitroWiFi's `get_rootCA` (`ssl.c`) keeps `name` in r7 where the ROM spills it to
   `[sp]`, so `ssl_internal.h` declares them itself. DWC's `DWCAc_AddCandidate` (`dwc_ac_wcm.c`) came closer with
   `<string.h>`'s `strncmp` before it matched, which lets MWCC hoist the loads through its `const` parameter and the
   loop's bases out of the loop that calls it. MWCC goes by the first declaration it sees: `<string.h>` included after

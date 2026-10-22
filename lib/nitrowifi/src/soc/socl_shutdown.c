@@ -9,20 +9,20 @@ static int SOCLi_ShutdownCallBack(void *arg);
 
 int SOCL_Shutdown(int s) {
     SOCLSocket *socket = (SOCLSocket *)s;
-    SOCLSendPipe *pipe;
-    SOCLCommandPacket *packet;
+    SOCLiSocketSendCommandPipe *pipe;
+    SOCLiCommandPacket *packet;
     int result;
 
     if (SOCL_SocketIsInvalid(socket)) {
         return SOCL_EINVAL;
     }
-    if (!SOCLi_SocketIsCreated(socket)) {
+    if (!SOCL_SocketIsCreated(socket)) {
         return SOCL_ENETRESET;
     }
-    if (!(socket->state & SOCLI_STATE_CONNECTED) || (socket->state & SOCLI_STATE_CLOSING)) {
+    if (!(socket->state & SOCL_STATUS_CONNECTED) || (socket->state & SOCL_STATUS_CLOSING)) {
         return SOCL_ENOTCONN;
     }
-    socket->state |= SOCLI_STATE_CLOSING;
+    socket->state |= SOCL_STATUS_CLOSING;
     pipe = socket->send_pipe;
     if (pipe != NULL && pipe->socket != NULL) {
         packet = SOCLi_CreateCommandPacket(SOCLi_ShutdownCallBack, pipe->socket, socket->flag_block);
@@ -40,7 +40,7 @@ static int SOCLi_ShutdownCallBack(void *arg) {
     SOCLiCommandShutdown *cpacket = (SOCLiCommandShutdown *)arg;
     SOCLSocket *socket = cpacket->h.socket;
 
-    if (SOCLi_SocketIsTCP(socket)) {
+    if (SOCL_SocketIsTCP(socket)) {
         CPS_TcpShutdown();
     }
     return 0;

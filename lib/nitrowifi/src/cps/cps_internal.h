@@ -47,7 +47,7 @@ static inline u16 CPS_SWAP16(u16 x) {
 #define CPS_IP_MTU 1480
 
 // The stack's clock, in units of 65536 ticks (about 0.125 s)
-#define CPS_NOW() ((u32)(OS_GetTick() >> 16))
+#define CPSi_GetTick() ((u32)(OS_GetTick() >> 16))
 // How long an ACK may wait for more data to go with it
 #define CPS_ACK_DELAY OS_MilliSecondsToTicks(200)
 
@@ -124,15 +124,15 @@ typedef struct CPSTcpHeader {
 #define CPS_TCP_DATA(tcp) ((u8 *)(tcp) + CPS_TCP_HEADER_LEN(tcp))
 
 // One entry of the ARP cache. time is when it was last used, in units of 65536 ticks
-typedef struct CPSArpEntry {
+typedef struct CPSArpCache {
     CPSInAddr ip;
     u8 mac[6];
     u16 time;
-} CPSArpEntry;
+} CPSArpCache;
 
 // An IP packet being put together from its fragments: where each fragment begins and ends, in units of 8 bytes, and
 // the end of the last one once it came
-typedef struct CPSReassembly {
+typedef struct CPSFragTable {
     CPSInAddr src;
     u16 count;
     u16 id;
@@ -143,6 +143,6 @@ typedef struct CPSReassembly {
     u32 time;
     u8 *data;
     u8 *buf;
-} CPSReassembly;
+} CPSFragTable;
 
 #endif // POKEBW2_NITROWIFI_CPS_INTERNAL_H

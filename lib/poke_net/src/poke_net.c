@@ -394,10 +394,10 @@ BOOL POKE_NET_IsIPAddress(const char *text) {
 // Gives a host's address as text, resolving its name if it is one
 BOOL POKE_NET_GetHostAddress(const char *host, char *address) {
     if (POKE_NET_IsIPAddress(host) == FALSE) {
-        SocHostEnt *entry = SOC_GetHostByName(host);
+        SOCHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry != NULL) {
-            strcpy(address, SOC_InetNtoA(*(SocInAddr *)entry->addrList[0]));
+            strcpy(address, SOC_InetNtoA(*(SOCInAddr *)entry->addrList[0]));
         } else {
             return FALSE;
         }
@@ -419,7 +419,7 @@ static inline u32 POKE_NET_Swap32(u32 x) {
 BOOL POKE_NET_Setup(void) {
     char address[16];
 
-    gPOKE_NET_Control.Socket = SOC_Socket(POKE_NET_SOC_AF_INET, POKE_NET_SOC_SOCK_STREAM, 0);
+    gPOKE_NET_Control.Socket = SOC_Socket(SOC_AF_INET, SOC_SOCK_STREAM, 0);
     if (gPOKE_NET_Control.Socket == -1) {
         gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_CREATESOCKET;
         return FALSE;
@@ -441,21 +441,21 @@ void POKE_NET_CloseSocket(void) {
     if (gPOKE_NET_Control.Socket == -1) {
         return;
     }
-    SOC_Shutdown(gPOKE_NET_Control.Socket, POKE_NET_SOC_SHUT_RDWR);
+    SOC_Shutdown(gPOKE_NET_Control.Socket, SOC_SHUT_RDWR);
     SOC_Close(gPOKE_NET_Control.Socket);
     gPOKE_NET_Control.Socket = -1;
     POKE_NET_SSL_EndConnection(&sPOKE_NET_SslConnection);
 }
 
 BOOL POKE_NET_Connecting(void) {
-    SocAddrIn address;
+    SOCSockAddrIn address;
     s32 start;
     int result;
 
     address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
     address.addr.addr = gPOKE_NET_Control.ServerAddr;
-    address.len = sizeof(SocAddrIn);
-    address.family = POKE_NET_SOC_AF_INET;
+    address.len = sizeof(SOCSockAddrIn);
+    address.family = SOC_AF_INET;
     start = POKE_NET_GetTime();
 
     for (;;) {
@@ -463,14 +463,14 @@ BOOL POKE_NET_Connecting(void) {
         if (result >= 0) {
             break;
         }
-        if (result == POKE_NET_SOC_EINPROGRESS) {
+        if (result == SOC_EINPROGRESS) {
             if (gPOKE_NET_Control.ConnectTimeOut != 0) {
                 if ((s32)(POKE_NET_GetTime() - start) >= gPOKE_NET_Control.ConnectTimeOut) {
                     gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_CONNECTTIMEOUT;
                     return FALSE;
                 }
             }
-        } else if (result == POKE_NET_SOC_EISCONN) {
+        } else if (result == SOC_EISCONN) {
             break;
         } else {
             gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_CONNECT;
@@ -501,7 +501,7 @@ BOOL POKE_NET_Sending(void) {
             size = gPOKE_NET_Control.SendSize;
         }
         result = SOC_Send(gPOKE_NET_Control.Socket, gPOKE_NET_Control.SendBuffer + offset, size, 0);
-        if (result != POKE_NET_SOC_EWOULDBLOCK) {
+        if (result != SOC_EWOULDBLOCK) {
             if (result < 0) {
                 gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_SENDTIMEOUT;
                 return FALSE;
@@ -537,7 +537,7 @@ void POKE_NET_RecvThreadEntry(void *arg) {
 
         POKE_NET_LockMutex();
         if (!gPOKE_NET_Control.RecvDone) {
-            gPOKE_NET_Control.RecvResult = SOC_Read(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
+            gPOKE_NET_Control.RecvResult = SOC_Recv(gPOKE_NET_Control.Socket, gPOKE_NET_Control.RecvBuffer + offset,
                                                     gPOKE_NET_Control.RecvSize - offset, 0);
             gPOKE_NET_Control.RecvDone = TRUE;
         }
@@ -555,7 +555,7 @@ BOOL POKE_NET_Receiving(void) {
     OS_CreateThread(&gPOKE_NET_Control.RecvThread, POKE_NET_RecvThreadEntry, NULL,
                     sPOKE_NET_RecvThreadStack + POKE_NET_THREAD_STACK_SIZE, POKE_NET_THREAD_STACK_SIZE,
                     gPOKE_NET_Control.ThreadPriority);
-    gPOKE_NET_Control.RecvResult = POKE_NET_SOC_EWOULDBLOCK;
+    gPOKE_NET_Control.RecvResult = SOC_EWOULDBLOCK;
     gPOKE_NET_Control.RecvOffset = 0;
     gPOKE_NET_Control.RecvDone = FALSE;
     OS_WakeupThreadDirect(&gPOKE_NET_Control.RecvThread);
@@ -572,7 +572,7 @@ BOOL POKE_NET_Receiving(void) {
         if (!gPOKE_NET_Control.RecvDone) {
             continue;
         }
-        if (gPOKE_NET_Control.RecvResult != POKE_NET_SOC_EWOULDBLOCK) {
+        if (gPOKE_NET_Control.RecvResult != SOC_EWOULDBLOCK) {
             if (gPOKE_NET_Control.RecvResult <= 0) {
                 gPOKE_NET_Control.LastErrorCode = POKE_NET_GDS_LASTERROR_RECVRESPONSE;
                 OS_DestroyThread(&gPOKE_NET_Control.RecvThread);

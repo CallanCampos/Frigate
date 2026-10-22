@@ -148,12 +148,12 @@ static int CheckMagic(const char *data) {
 }
 
 static int NNSendPacket(SOCKET sock, unsigned int toAddr, unsigned short toPort, void *data, int length) {
-    SocAddrIn address;
+    SOCSockAddrIn address;
 
     address.family = 2;
     address.port = NN_SWAP16(toPort);
     address.addr.addr = toAddr;
-    return sendto(sock, data, length, 0, (SOCKADDR *)&address, sizeof(SocAddrIn));
+    return sendto(sock, data, length, 0, (SOCKADDR *)&address, sizeof(SOCSockAddrIn));
 }
 
 // The first address of the console that isn't the loopback one and is a private one, else the last one
@@ -185,8 +185,8 @@ static unsigned int NNGetLocalIP(void) {
 
 // The port (in network order) that a socket is bound to, or 0
 static unsigned short NNGetLocalPort(SOCKET sock) {
-    SocAddrIn address;
-    int size = sizeof(SocAddrIn);
+    SOCSockAddrIn address;
+    int size = sizeof(SOCSockAddrIn);
 
     if (getsockname(sock, (SOCKADDR *)&address, &size) == -1) {
         return 0;
@@ -210,7 +210,7 @@ static void SendReportPacket(NATNegotiator *neg) {
     }
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                   "SendReportPacket(cookie=%d): Sending REPORT to %s:%d (result: %d)\n", neg->cookie,
-                  SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901, packet.packet.report.negResult);
+                  SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901, packet.packet.report.negResult);
     NNSendPacket(neg->negotiateSock, matchup1ip, 27901, &packet, 73);
 }
 
@@ -248,7 +248,7 @@ static void SendPreInitPacket(NATNegotiator *neg) {
     packet.packet.preInit.clientIndex = neg->clientIndex;
     packet.packet.preInit.clientId = GetClientID();
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Sending PREINIT to %s:%d\n",
-                  SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901);
+                  SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901);
     NNSendPacket(neg->negotiateSock, matchup1ip, 27901, &packet, 18);
     if (neg->state == 1) {
         neg->retryTime = current_time() + 10000;
@@ -286,14 +286,14 @@ static void SendInitPackets(NATNegotiator *neg) {
     if (packet->packet.init.useGamePort && !neg->initAckRecv[0]) {
         packet->packet.init.portType = 0;
         gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Sending INIT (GP) to %s:%d...\n",
-                      SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901);
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901);
         NNSendPacket(neg->gameSock, matchup1ip, 27901, packet, packetLength);
     }
     if (!neg->initAckRecv[1]) {
         packet->packet.init.portType = 1;
         gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                       "SendInitPackets(cookie=%d): Sending INIT (NN1) to %s:%d...\n", neg->cookie,
-                      SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901);
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901);
         NNSendPacket(neg->negotiateSock, matchup1ip, 27901, packet, packetLength);
     }
     localPort = NN_SWAP16(NNGetLocalPort(packet->packet.init.useGamePort ? neg->gameSock : neg->negotiateSock));
@@ -303,14 +303,14 @@ static void SendInitPackets(NATNegotiator *neg) {
         packet->packet.init.portType = 2;
         gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                       "SendInitPackets(cookie=%d): Sending INIT (NN2) to %s:%d...\n", neg->cookie,
-                      SOC_InetNtoA(*(SocInAddr *)&matchup2ip), 27901);
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup2ip), 27901);
         NNSendPacket(neg->negotiateSock, matchup2ip, 27901, packet, packetLength);
     }
     if (!neg->initAckRecv[3]) {
         packet->packet.init.portType = 3;
         gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                       "SendInitPackets(cookie=%d): Sending INIT (NN3) to %s:%d...\n", neg->cookie,
-                      SOC_InetNtoA(*(SocInAddr *)&matchup3ip), 27901);
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup3ip), 27901);
         NNSendPacket(neg->negotiateSock, matchup3ip, 27901, packet, packetLength);
     }
     neg->state = 2;
@@ -331,7 +331,7 @@ static void SendPingPacket(NATNegotiator *neg) {
     packet.packet.connect.finished = neg->gotRemoteData && neg->sendGotRemoteData ? 1 : 0;
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                   "SendPingPacket(cookie=%d): Sending PING to %s:%d (got remote data: %d)\n", neg->cookie,
-                  SOC_InetNtoA(*(SocInAddr *)&neg->guessedIp), neg->guessedPort, neg->gotRemoteData);
+                  SOC_InetNtoA(*(SOCInAddr *)&neg->guessedIp), neg->guessedPort, neg->gotRemoteData);
     NNSendPacket(neg->gameSock != -1 ? neg->gameSock : neg->negotiateSock, neg->guessedIp, neg->guessedPort, &packet,
                  20);
     neg->retryTime = current_time() + 700;
@@ -368,7 +368,7 @@ static gsi_bool CheckNatifyStatus(SOCKET sock) {
 
 static unsigned int NameToIp(const char *name) {
     gsi_u32 ip;
-    SocHostEnt *host;
+    SOCHostEnt *host;
 
     ip = inet_addr(name);
     if (ip == -1) {
@@ -453,8 +453,8 @@ NegotiateError NNBeginNegotiationWithSocket(SOCKET gameSocket, int cookie, int c
     neg->maxRetryCount = 0;
     SendPreInitPacket(neg);
     {
-        SocAddrIn address;
-        int size = sizeof(SocAddrIn);
+        SOCSockAddrIn address;
+        int size = sizeof(SOCSockAddrIn);
 
         getsockname(neg->negotiateSock, (SOCKADDR *)&address, &size);
         gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Negotiate Socket: %d\n",
@@ -490,8 +490,8 @@ static void FinishNegotiator(NATNegotiator *neg) {
 
 static void NegotiateThink(NATNegotiator *neg) {
     static char indata[0x200];
-    SocAddrIn saddr;
-    int saddrlen = sizeof(SocAddrIn);
+    SOCSockAddrIn saddr;
+    int saddrlen = sizeof(SOCSockAddrIn);
     int error;
 
     if (neg == NULL) {
@@ -629,7 +629,7 @@ static void SendConnectAck(NATNegotiator *neg, SOCKADDR_IN *toAddr) {
 static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr) {
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                   "ProcessConnectPacket(cookie=%d): Got connect packet (finish code: %d), guess: %s:%d\n", neg->cookie,
-                  packet->packet.connect.finished, SOC_InetNtoA(*(SocInAddr *)&packet->packet.connect.remoteIp),
+                  packet->packet.connect.finished, SOC_InetNtoA(*(SOCInAddr *)&packet->packet.connect.remoteIp),
                   NN_SWAP16(packet->packet.connect.remotePort));
     if (packet->packet.connect.finished == 0) {
         SendConnectAck(neg, fromAddr);

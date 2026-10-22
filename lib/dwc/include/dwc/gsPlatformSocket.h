@@ -10,10 +10,10 @@
 
 // The BSD names that GameSpy gives NitroWiFi's types on the DS
 typedef int SOCKET;
-typedef SocSockAddr SOCKADDR;
-typedef SocAddrIn SOCKADDR_IN;
-typedef SocInAddr IN_ADDR;
-typedef SocHostEnt HOSTENT;
+typedef SOCSockAddr SOCKADDR;
+typedef SOCSockAddrIn SOCKADDR_IN;
+typedef SOCInAddr IN_ADDR;
+typedef SOCHostEnt HOSTENT;
 
 int gsiSocket(int family, int type, int protocol);
 int closesocket(SOCKET sock);

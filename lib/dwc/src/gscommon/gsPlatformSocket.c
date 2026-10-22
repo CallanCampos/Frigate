@@ -72,7 +72,7 @@ int connect(SOCKET sock, const SOCKADDR *address, int size) {
 }
 
 int recv(SOCKET sock, char *buffer, int size, int flags) {
-    return gsiSocketCheckResult(SOC_Read(sock, buffer, size, flags), -1);
+    return gsiSocketCheckResult(SOC_Recv(sock, buffer, size, flags), -1);
 }
 
 int recvfrom(SOCKET sock, char *buffer, int size, int flags, SOCKADDR *address, int *addressSize) {
@@ -119,7 +119,7 @@ int GOAGetLastError(SOCKET sock) {
 }
 
 int GSISocketSelect(SOCKET sock, int *readable, int *writable, int *failed) {
-    SocPollFd fd;
+    SOCPollFD fd;
     int result;
 
     fd.fd = sock;

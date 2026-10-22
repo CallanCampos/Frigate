@@ -32,7 +32,7 @@ int NHTTPi_SocCheck(int sock) {
 
     if (sock == -1) {
         result = -1;
-    } else if (SOC_Read(sock, &byte, 1, 4) != -6) {
+    } else if (SOC_Recv(sock, &byte, 1, 4) != -6) {
         result = -1;
     }
     return result;
@@ -64,7 +64,7 @@ int NHTTPi_SocClose(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock) 
 
 int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, u32 addr,
                       int port) {
-    SocAddrIn address;
+    SOCSockAddrIn address;
     u16 hostPort;
 
     address.len = sizeof(address);
@@ -122,7 +122,7 @@ int NHTTPi_SocRecv_sub(NHttpConnection *connection, int sock, void *buffer, int 
         u32 count;
 
         if (connection->recvSize == 0) {
-            int result = SOC_Read(sock, recvBuffer, NHTTP_RECV_BUFFER_SIZE, flags);
+            int result = SOC_Recv(sock, recvBuffer, NHTTP_RECV_BUFFER_SIZE, flags);
 
             if (result <= 0) {
                 return result;
@@ -201,12 +201,12 @@ void NHTTPi_SocCancel(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock
 // Looks a host up, as an address or as a name, and returns its address (0 if there is none)
 u32 NHTTPi_resolveHostname(NHttpRequest *request, const char *host) {
     u32 address = 0;
-    SocInAddr parsed;
+    SOCInAddr parsed;
 
     if (SOC_InetAtoN(host, &parsed) != 0) {
         address = parsed.addr;
     } else {
-        SocHostEnt *entry = SOC_GetHostByName(host);
+        SOCHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry != NULL && entry->addrLength > 0) {
             NHTTPi_memcpy(&address, entry->addrList[0], 4);

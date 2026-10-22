@@ -602,7 +602,7 @@ static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
         level = 99;
     }
     OS_SNPrintf(info->apInfo, 0xe, "%02d:0000000-00", level);
-    ssid = WCM_GetConnectedApSsid(&channel);
+    ssid = WCM_GetApEssid(&channel);
     DC_InvalidateRange(ssid, 0x20);
     if (ssid == NULL) {
         OS_RestoreInterrupts(irq);

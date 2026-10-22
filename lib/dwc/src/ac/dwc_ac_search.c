@@ -11,7 +11,7 @@
 #include "nitro/os.h"
 
 // The options that a scan on one channel takes, by the index of the channel: the bit that says that the channel list
-// is given, and the bit of the channel. A scan for any access point adds 0x200000 to it (WCM_SetSearchOption's scan
+// is given, and the bit of the channel. A scan for any access point adds 0x200000 to it (WCM_UpdateOption's scan
 // type), and one that asks for a given SSID or access point 0x300000
 static const u32 sChannelOptions[13] = {
     0x8002, 0x8004, 0x8008, 0x8010, 0x8020, 0x8040, 0x8080, 0x8100, 0x8200, 0x8400, 0x8800, 0x9000, 0xa000,
@@ -58,7 +58,7 @@ u8 DWCAc_StepCandidateOver(void) {
     DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u8 state = 9;
 
-    switch (WCM_GetState()) {
+    switch (WCM_GetPhase()) {
     case 3:
         state = work->resumeState;
         if (work->sameSsid == 1) {
@@ -69,13 +69,13 @@ u8 DWCAc_StepCandidateOver(void) {
         }
         break;
     case 6:
-        WCM_StopSearchAsync();
+        WCM_EndSearchAsync();
         break;
     case 9:
         WCM_DisconnectAsync();
         break;
     case 12:
-        WCM_RestoreIdleAsync();
+        WCM_TerminateAsync();
         DWCAc_SetError(4);
         state = 17;
         break;
@@ -95,7 +95,7 @@ u8 DWCAc_StepCandidateOver(void) {
 u8 DWCAc_StepSearch(void) {
     DWCAcSearchWork *work = DWCAc_GetBlock(DWC_AC_WORK_SEARCH);
     u8 state = DWCAc_GetState();
-    s32 wcmState = WCM_GetState();
+    s32 wcmState = WCM_GetPhase();
 
     if (state == 2 && wcmState == 3) {
         u32 channels = WCM_GetChannelMask();
@@ -162,7 +162,7 @@ static void DWCAc_StartScan(u8 state) {
     switch (state) {
     case 3:
         work->connectedTime = OS_GetTick();
-        WCM_SearchAsync(WCMiAnyBssid, WCMiAnyEssid, sChannelOptions[work->tag] | 0x200000);
+        WCM_SearchAsync(WCM_Bssid_Any, WCM_Essid_Any, sChannelOptions[work->tag] | 0x200000);
         break;
     case 4:
         if (IsChannelAllowed(1 << (work->candidates[work->current].channel - 1)) == TRUE) {
@@ -175,7 +175,7 @@ static void DWCAc_StartScan(u8 state) {
         break;
     case 5:
         work->connectedTime = OS_GetTick();
-        WCM_SearchAsync(WCMiAnyBssid, work->targets[work->current].ssid, sChannelOptions[work->tag] | 0x300000);
+        WCM_SearchAsync(WCM_Bssid_Any, work->targets[work->current].ssid, sChannelOptions[work->tag] | 0x300000);
         break;
     }
 }
@@ -185,7 +185,7 @@ static u8 DWCAc_StartSearch(DWCAcSearchWork *work) {
     work->connectedTime = OS_GetTick();
     work->tag = DWCAc_FirstChannel(FALSE);
     work->connectedTime = OS_GetTick();
-    WCM_SearchAsync(WCMiAnyBssid, WCMiAnyEssid, sChannelOptions[work->tag] | 0x200000);
+    WCM_SearchAsync(WCM_Bssid_Any, WCM_Essid_Any, sChannelOptions[work->tag] | 0x200000);
     return 3;
 }
 
@@ -208,7 +208,7 @@ static u8 DWCAc_StepListenPass(DWCAcSearchWork *work) {
             return DWCAc_EndPass(work, 3);
         }
         work->connectedTime = OS_GetTick();
-        WCM_SearchAsync(WCMiAnyBssid, WCMiAnyEssid, sChannelOptions[work->tag] | 0x200000);
+        WCM_SearchAsync(WCM_Bssid_Any, WCM_Essid_Any, sChannelOptions[work->tag] | 0x200000);
     }
     return 3;
 }
@@ -257,7 +257,7 @@ static u8 DWCAc_StepHiddenPass(DWCAcSearchWork *work) {
             return DWCAc_EndPass(work, 5);
         }
         work->connectedTime = OS_GetTick();
-        WCM_SearchAsync(WCMiAnyBssid, work->targets[work->current].ssid, sChannelOptions[work->tag] | 0x300000);
+        WCM_SearchAsync(WCM_Bssid_Any, work->targets[work->current].ssid, sChannelOptions[work->tag] | 0x300000);
     }
     return 5;
 }
@@ -348,7 +348,7 @@ static u8 DWCAc_TryCandidate(DWCAcSearchWork *work, u8 state) {
     }
     work->selected = i;
     // 1 is the answer when the wireless manager can't stop the scan
-    if (WCM_StopSearchAsync() != 1) {
+    if (WCM_EndSearchAsync() != 1) {
         work->resumeState = state;
         state = 7;
     }

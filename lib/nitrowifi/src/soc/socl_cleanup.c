@@ -48,7 +48,7 @@ static int SOCL_CloseAll(void) {
     while (TRUE) {
         irq = OS_DisableInterrupts();
         for (socket = SOCLiSocketList; socket != NULL; socket = socket->next) {
-            if ((int)socket != SOCLiUDPSendSocket && !(socket->state & SOCLI_STATE_CLOSE_CALLED)) {
+            if ((int)socket != SOCLiUDPSendSocket && !(socket->state & SOCL_STATUS_WAIT_CLOSE)) {
                 break;
             }
         }
@@ -153,7 +153,7 @@ CPSInAddr SOCL_GetHostID(void) {
     CPSInAddr ip = CPSMyIp;
 
     if (ip == 0) {
-        if ((SOCLiDhcpState & (SOCLI_DHCP_REQUESTED | SOCLI_DHCP_DONE)) == SOCLI_DHCP_REQUESTED) {
+        if ((SOCLiDhcpState & (SOCL_DHCP_REQUEST | SOCL_DHCP_CALLBACK)) == SOCL_DHCP_REQUEST) {
             if (OS_GetProcMode() != OS_PROCMODE_IRQ) {
                 OS_Sleep(10);
             }

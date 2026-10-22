@@ -30,10 +30,10 @@ int SOCL_Bind(int s, u16 local_port) {
     if (SOCL_SocketIsInvalid(socket)) {
         return SOCL_EINVAL;
     }
-    if (!SOCLi_SocketIsCreated(socket)) {
+    if (!SOCL_SocketIsCreated(socket)) {
         return SOCL_ENETRESET;
     }
-    if (socket->state & SOCLI_STATE_BINDING) {
+    if (socket->state & SOCL_STATUS_CONNECTING) {
         return SOCL_EALREADY;
     }
     socket->local_port = local_port;
@@ -47,24 +47,24 @@ int SOCL_Connect(int s, u16 remote_port, CPSInAddr remote_ip) {
     SOCLSocket *socket = (SOCLSocket *)s;
     int result;
 
-    if (SOCL_SocketIsInvalid(socket) || (socket->state & SOCLI_STATE_CLOSING)) {
+    if (SOCL_SocketIsInvalid(socket) || (socket->state & SOCL_STATUS_CLOSING)) {
         return SOCL_EINVAL;
     }
-    if (!SOCLi_SocketIsCreated(socket)) {
+    if (!SOCL_SocketIsCreated(socket)) {
         return SOCL_ENETRESET;
     }
-    if (SOCLi_SocketIsTCP(socket)) {
+    if (SOCL_SocketIsTCP(socket)) {
         if ((remote_ip & 0xf0000000) == 0xe0000000 || SOCLi_IsBroadcast(remote_ip)) {
             return SOCL_EINVAL;
         }
-        if (socket->state & SOCLI_STATE_CONNECTED) {
+        if (socket->state & SOCL_STATUS_CONNECTED) {
             if (socket->flag_block == 1) {
                 return SOCL_EISCONN;
             }
             return 0;
         }
-        if (socket->state & SOCLI_STATE_BINDING) {
-            if (socket->state & SOCLI_STATE_CONNECT_FAILED) {
+        if (socket->state & SOCL_STATUS_CONNECTING) {
+            if (socket->state & SOCL_STATUS_ERROR) {
                 return socket->result;
             }
             return SOCLiResultCodeInConnecting;
@@ -80,7 +80,7 @@ int SOCL_Connect(int s, u16 remote_port, CPSInAddr remote_ip) {
 }
 
 static int SOCLi_ExecBindCommand(SOCLSocket *socket) {
-    SOCLCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_BindCallBack, socket, socket->flag_block);
+    SOCLiCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_BindCallBack, socket, socket->flag_block);
 
     if (packet == NULL) {
         return SOCL_EMFILE;
@@ -88,7 +88,7 @@ static int SOCLi_ExecBindCommand(SOCLSocket *socket) {
     packet->bind.local_port = socket->local_port;
     packet->bind.remote_port = socket->remote_port;
     packet->bind.remote_ip = socket->remote_ip;
-    socket->state |= SOCLI_STATE_BINDING;
+    socket->state |= SOCL_STATUS_CONNECTING;
     return SOCLi_ExecCommandPacketInRecvPipe(socket, packet);
 }
 
@@ -96,7 +96,7 @@ static int SOCLi_BindCallBack(void *arg) {
     SOCLiCommandBind *cpacket = (SOCLiCommandBind *)arg;
     SOCLSocket *socket = cpacket->h.socket;
     int result = 0;
-    SOCLRecvPipe *pipe = socket->recv_pipe;
+    SOCLiSocketRecvCommandPipe *pipe = socket->recv_pipe;
 
     OS_LockMutex(&pipe->base.mutex);
     CPS_SocBind(cpacket->local_port, cpacket->remote_port, cpacket->remote_ip);
@@ -106,9 +106,9 @@ static int SOCLi_BindCallBack(void *arg) {
     }
     OS_UnlockMutex(&pipe->base.mutex);
     if (result != 0) {
-        socket->state |= SOCLI_STATE_CONNECT_FAILED;
+        socket->state |= SOCL_STATUS_ERROR;
         return SOCL_ETIMEDOUT;
     }
-    socket->state |= SOCLI_STATE_CONNECTED;
+    socket->state |= SOCL_STATUS_CONNECTED;
     return 0;
 }

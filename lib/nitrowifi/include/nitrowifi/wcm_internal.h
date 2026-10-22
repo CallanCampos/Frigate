@@ -7,7 +7,7 @@
 // Descriptive private interface recovered from WCM and its LTD callers. The original header identity and
 // source-file boundaries are unconfirmed; these declarations do not establish additional SDK API names.
 typedef struct WCMWork WCMWork;
-typedef struct WCMGlobal WCMGlobal;
+typedef struct WCMCpsifWork WCMCpsifWork;
 
 // WCM's work, which WCM_Init's caller gives it: WCM_WORK_SIZE bytes for the DS's wireless (mode 1), 0x4800 for the
 // DSi's (mode 2), whose backend in the LTD autoload (wcm_dsi.c) drives NWM where the DS's drives WM. The part from
@@ -62,9 +62,9 @@ struct WCMWork {
     };
 };
 
-// sWcmGlobal, right after WCM's anchor: the globals WCM_InitOnce sets up once
-struct WCMGlobal {
-    u8 initialized; // 0x00, set once WCM_InitOnce has initialized the send state
+// sWcmGlobal, right after WCM's anchor: the globals WCMi_InitCpsif sets up once
+struct WCMCpsifWork {
+    u8 initialized; // 0x00, set once WCMi_InitCpsif has initialized the send state
     u8 unk_01[3];
     OSThreadQueue sendQueue; // 0x04
     OSMutex mutex;           // 0x0c
@@ -78,20 +78,20 @@ struct WCMGlobal {
 
 // Borrowed internal storage. WCM_Finish invalidates the work pointer; the globals have static lifetime.
 // Callers must obey WCM's initialization and IRQ synchronization requirements.
-WCMWork *WCM_GetWork(void);
-WCMGlobal *WCM_GetGlobal(void);
-void WCM_SetState(s32 newState);
-u16 WCM_PickChannel(s32 channelIndex);
+WCMWork *WCMi_GetSystemWork(void);
+WCMCpsifWork *WCM_GetGlobal(void);
+void WcmSetPhase(s32 newState);
+u16 WcmGetNextScanChannel(s32 channelIndex);
 
 // Notification callbacks run synchronously with temporary notice storage and must not retain its pointer.
 // Mixed pointer/integer payloads use ARM32 words; a host port must widen this representation.
-void WCM_Notify(s16 notify, s16 result, s32 parameter, void *param1, s32 param2);
+void WcmNotifyEx(s16 notify, s16 result, s32 parameter, void *param1, s32 param2);
 void WCM_NotifyResult(s16 result, void *parameter, u32 detail, u32 line);
 
 // Adds a mode-dependent encoded signal sample; its physical units are unconfirmed.
-void WCM_AddRssiSample(s32 rssi);
+void WCMi_ShelterRssi(s32 rssi);
 // Cancels the timeout alarm and rearms it while connected in state 9.
-void WCM_CancelTimeout(void);
+void WCMi_ResetKeepAliveAlarm(void);
 // Copies six MAC-address bytes into WCM's globals; the source pointer is not retained.
 void WCM_SetMacAddress(const u8 *mac);
 

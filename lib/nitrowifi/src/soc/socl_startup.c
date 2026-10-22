@@ -91,17 +91,17 @@ static void SOCLi_StartupCPS(void) {
 
     CPSMyIp = 0;
     if (config->use_dhcp) {
-        SOCLiDhcpState = SOCLI_DHCP_REQUESTED;
+        SOCLiDhcpState = SOCL_DHCP_REQUEST;
         cps->mode = 0;
         cps->dhcp_callback = SOCLi_DhcpTimeout;
         cps->requested_ip = SOCLiRequestedIP;
     } else {
         SOCLiDhcpState = 0;
-        cps->mode = CPS_MODE_STATIC_IP;
+        cps->mode = CPS_DONOTUSE_DHCP;
         cps->dhcp_callback = SOCLi_SetMyIP;
     }
     CPS_SetThreadPriority(config->cps_thread_prio ? config->cps_thread_prio : 11);
-    WCM_SetRecvDCFCallback(CPSi_RecvCallback);
+    WCM_SetRecvDCFCallback(CPSi_RecvCallbackFunc);
     CPS_SetScavengerCallback(SOCLi_TrashSocket);
     CPS_SetAddressCheckCallback(SOCLi_AddressCheckCallback);
     CPS_Startup(cps);
@@ -116,11 +116,11 @@ static void SOCLi_SetMyIP(void) {
     CPSGatewayIp = config->host_ip.gateway_ip;
     CPSDnsIp[0] = config->host_ip.dns_ip[0];
     CPSDnsIp[1] = config->host_ip.dns_ip[1];
-    SOCLiDhcpState |= SOCLI_DHCP_DONE;
+    SOCLiDhcpState |= SOCL_DHCP_CALLBACK;
 }
 
 static void SOCLi_DhcpTimeout(void) {
-    SOCLiDhcpState |= SOCLI_DHCP_DONE;
+    SOCLiDhcpState |= SOCL_DHCP_CALLBACK;
 }
 
 static BOOL SOCL_LinkIsOn(void) {

@@ -23,7 +23,7 @@ typedef struct {
     void *wcmWork;           // 0x00
     u32 searchOption;        // 0x04
     WCMConfig *config;       // 0x08
-    u32 connectOption;       // 0x0c, passed to WCM_SetSearchOption during connection setup
+    u32 connectOption;       // 0x0c, passed to WCM_UpdateOption during connection setup
     const u8 *bssid;         // 0x10
     const u8 *essid;         // 0x14
     int state;               // 0x18
@@ -271,7 +271,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         sWcm.bssid = sBssid;
     } else {
         MI_CpuFill8(sBssid, 0xff, 6);
-        sWcm.bssid = WCMiAnyBssid;
+        sWcm.bssid = WCM_Bssid_Any;
     }
     if (essid != NULL && essidLength > 0 && essidLength <= 0x20) {
         for (i = 0; i < essidLength; i++) {
@@ -283,7 +283,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         sWcm.essid = sEssid;
     } else {
         MI_CpuFill8(sEssid, 0xff, 0x20);
-        sWcm.essid = WCMiAnyEssid;
+        sWcm.essid = WCM_Essid_Any;
     }
     if (sWcm.state == STATE_IDLE) {
         if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) == WCM_RESULT_ACCEPT) {

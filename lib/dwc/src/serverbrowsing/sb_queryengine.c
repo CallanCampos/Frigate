@@ -81,7 +81,7 @@ static void QEStartQuery(SBQueryEngine *engine, SBServer server) {
     gsi_u8 queryBuffer[256];
     int queryLen;
     gsi_bool querySuccess = gsi_false;
-    SocAddrIn saddr;
+    SOCSockAddrIn saddr;
 
     saddr.family = 2;
     server->updatetime = current_time();
@@ -294,7 +294,7 @@ static SBBool ParseSingleICMPReply(SBQueryEngine *engine, SBServer server, char 
 static void ProcessIncomingReplies(SBQueryEngine *engine, SBBool icmpSocket) {
     int i;
     char indata[2048];
-    SocAddrIn saddr;
+    SOCSockAddrIn saddr;
     int saddrlen = sizeof(saddr);
     SBServer server;
     int recvSock = 0;

@@ -100,7 +100,7 @@ void DWC_InitInetEx(DWCInetControl *control, u16 dmaNo, u16 powerMode, u16 sslPr
     control->scanStage = DWC_INET_SCAN_NONE;
     control->skipEulaCheck = 0;
     sInet.control = control;
-    CPS_SslSetMaxPriority(sslPriority);
+    CPS_SetSslHandshakePriority(sslPriority);
 }
 
 static void DWCi_Inet_SetRecvWindow(int rwin) {
@@ -190,7 +190,7 @@ void DWC_ProcessInet(void) {
         sInet.control->result = DWCAc_Process();
     } else if (sInet.control->state == DWC_CONNECTINET_STATE_CONNECTED) {
         if (sInet.control->watch != 0) {
-            if (WCM_GetState() != WCM_STATE_CONNECTED) {
+            if (WCM_GetPhase() != WCM_STATE_CONNECTED) {
                 sInet.control->watch = 0;
                 sInet.control->state = DWC_CONNECTINET_STATE_DISCONNECTED;
             }
@@ -247,7 +247,7 @@ DWCInetResult DWC_GetInetStatus(void) {
         if (!sInet.control->ended) {
             DWCInetControl *control = sInet.control;
             u16 dmaNo = control->dmaNo;
-            u32 sslPriority = CPS_SslGetMaxPriority();
+            u32 sslPriority = CPS_GetSslHandshakePriority();
             u8 skipEulaCheck = sInet.control->skipEulaCheck;
             int rwin = sInet.control->rwin;
 
@@ -306,7 +306,7 @@ static BOOL DWCi_Inet_IsLinkLost(void) {
 }
 
 WMLinkLevel DWC_GetLinkLevel(void) {
-    return WCM_UpdateLinkQuality();
+    return WCM_GetLinkLevel();
 }
 
 static void DWCi_ApInfo_SetSpotInfo(const char *spotInfo, DWCApInfo *apInfo) {
@@ -341,7 +341,7 @@ BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     MI_CpuCopy8(bssid, apInfo->bssid, BSSID_SIZE);
     if (apInfo->apType == 0 || apInfo->apType == 1 || apInfo->apType == 2 ||
         (OS_IsRunOnTwl() && (apInfo->apType == 10 || apInfo->apType == 11 || apInfo->apType == 12))) {
-        ssid = WCM_GetConnectedApSsid(&ssidLength);
+        ssid = WCM_GetApEssid(&ssidLength);
         DC_InvalidateRange(ssid, SSID_SIZE);
         if (ssid == NULL) {
             OS_RestoreInterrupts(irq);
@@ -428,7 +428,7 @@ BOOL DWC_UpdateConnection(void) {
         if (apType == AP_TYPE_NONE || apType > AP_TYPE_UNKNOWN) {
             apType = AP_TYPE_UNKNOWN;
         }
-        if (WCM_GetState() == WCM_STATE_ERROR) {
+        if (WCM_GetPhase() == WCM_STATE_ERROR) {
             DWCi_SetError(DWC_ERROR_FATAL, LINK_LOST_FATAL_CODE - apType);
         } else {
             DWCi_SetError(DWC_ERROR_DISCONNECTED, LINK_LOST_CODE - apType);

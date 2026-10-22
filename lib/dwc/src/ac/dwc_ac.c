@@ -438,7 +438,7 @@ void DWCAc_NoteConnectedAp(u8 id) {
         type = DWCAc_GetApTypeOfId(id);
     }
     sBlocks.main->type = type;
-    ssid = WCM_GetConnectedApSsid(NULL);
+    ssid = WCM_GetApEssid(NULL);
     if (ssid != NULL) {
         DC_InvalidateRange(ssid, 32);
         if (DWCAc_GetNdwcShapSpotInfo(ssid, sBlocks.main->spotInfo)) {

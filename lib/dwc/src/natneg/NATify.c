@@ -33,7 +33,7 @@ const char *AddressToString(unsigned int ip, unsigned short port, char string[22
         strAddress = strAddressArray[nIndex];
     }
     if (ip != 0) {
-        SocInAddr inAddr;
+        SOCInAddr inAddr;
 
         inAddr.addr = ip;
         if (port != 0) {
@@ -78,8 +78,8 @@ static unsigned int GetLocalIP(void) {
 
 // The port (in network order) that a socket is bound to, or 0
 static unsigned short GetLocalPort(SOCKET sock) {
-    SocAddrIn address;
-    int size = sizeof(SocAddrIn);
+    SOCSockAddrIn address;
+    int size = sizeof(SOCSockAddrIn);
 
     if (getsockname(sock, (SOCKADDR *)&address, &size) == -1) {
         return 0;
@@ -103,8 +103,8 @@ static int Think(SOCKET sock, NAT *nat) {
     int length;
     gsi_u8 type;
     NatNegPacket packet;
-    SocAddrIn from;
-    int fromSize = sizeof(SocAddrIn);
+    SOCSockAddrIn from;
+    int fromSize = sizeof(SOCSockAddrIn);
 
     if (gotERT1 && gotERT2 && gotERT3 && gotADDRESS1a && gotADDRESS1b && gotADDRESS2 && gotADDRESS3) {
         return gsi_false;

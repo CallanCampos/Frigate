@@ -226,12 +226,12 @@ static int Net_Stop(void);
 static int Mem_Compare(const u8 *a, const u8 *b, int size);
 static void Mem_Copy(void *dest, const void *src, u32 size);
 static void Mem_Fill(void *dest, int value, u32 size);
-static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength);
-static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptFds, const SocTimeval *timeout);
-static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength);
+static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SOCSockAddrIn *from, int *fromLength);
+static int Net_Poll(int count, SOCPollFD *readFds, void *writeFds, void *exceptFds, const SocTimeval *timeout);
+static int Net_SendTo(int sock, const void *buffer, int size, int flags, SOCSockAddrIn *to, int toLength);
 static int Net_SetSockOpt(int sock, int level, int name, const void *value, int length);
 static int Net_Socket(int domain, int type, int protocol);
-static int Net_Bind(int sock, SocAddrIn *address, int length);
+static int Net_Bind(int sock, SOCSockAddrIn *address, int length);
 static int Net_Close(int sock);
 static u32 Net_Htonl(u32 value);
 static u32 Net_Htons(u16 value);
@@ -239,15 +239,15 @@ static u32 Net_Ntohl(u32 value);
 static u32 Net_Ntohs(u16 value);
 static u32 Str_Length(const char *text);
 static u16 Aoss_Rand(void);
-static void Net_PollInit(SocPollFd *fd);
-static void Net_PollSet(int sock, SocPollFd *fd);
+static void Net_PollInit(SOCPollFD *fd);
+static void Net_PollSet(int sock, SOCPollFD *fd);
 
 static u8 sRecordType[3] = { 9, 8, 0 };
 static struct {
     int socket;
     int mode;
 } sNet = { -1, -1 };
-static SocConfig sSocConfig = {
+static SOCConfig sSocConfig = {
     SOC_VENDOR_NINTENDO, SOC_VERSION, Soc_Alloc, Soc_Free, 0, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, 0x1000, 0x1000,
 };
 
@@ -308,11 +308,11 @@ static int Aoss_Run(AossParam *param) {
     AossRetry send = { 0, 0 };
     int option = 1;
     int sends = 0;
-    SocAddrIn from;
+    SOCSockAddrIn from;
     int fromLength;
-    SocPollFd pollFd;
+    SOCPollFD pollFd;
     SocTimeval timeval;
-    SocAddrIn addr;
+    SOCSockAddrIn addr;
     int scanResult;
     int state = 0;
     int newState;
@@ -1603,7 +1603,7 @@ static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags
 }
 
 static int Aoss_SendPacket(void *buffer, int length, int toAll, int sock) {
-    SocAddrIn to;
+    SOCSockAddrIn to;
 
     Mem_Fill(&to, 0, sizeof(to));
     to.family = 2;
@@ -1856,14 +1856,14 @@ static void Mem_Fill(void *dest, int value, u32 size) {
     MI_CpuFill8(dest, (u8)value, size);
 }
 
-static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength) {
+static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SOCSockAddrIn *from, int *fromLength) {
     from->len = *fromLength;
     return SOC_RecvFrom(sock, buffer, size, flags, from);
 }
 
 // Waits for the descriptor to be ready for at most the time
-static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptFds, const SocTimeval *timeout) {
-    SocPollFd fd = *readFds;
+static int Net_Poll(int count, SOCPollFD *readFds, void *writeFds, void *exceptFds, const SocTimeval *timeout) {
+    SOCPollFD fd = *readFds;
     u64 ticks = 0;
 
     ticks += ((u64)(s64)timeout->sec * 33514000) >> 6;
@@ -1871,7 +1871,7 @@ static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptF
     return SOC_Poll(&fd, 1, ticks);
 }
 
-static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength) {
+static int Net_SendTo(int sock, const void *buffer, int size, int flags, SOCSockAddrIn *to, int toLength) {
     to->len = toLength;
     return SOC_SendTo(sock, buffer, size, flags, to);
 }
@@ -1884,7 +1884,7 @@ static int Net_Socket(int domain, int type, int protocol) {
     return SOC_Socket(domain, type, protocol);
 }
 
-static int Net_Bind(int sock, SocAddrIn *address, int length) {
+static int Net_Bind(int sock, SOCSockAddrIn *address, int length) {
     address->len = length;
     return SOC_Bind(sock, address);
 }
@@ -1939,13 +1939,13 @@ static u16 Aoss_Rand(void) {
     return ((sAoss.randState >> 16) * 0x7fff) >> 16;
 }
 
-static void Net_PollInit(SocPollFd *fd) {
+static void Net_PollInit(SOCPollFD *fd) {
     fd->fd = 0;
     fd->events = 0;
     fd->revents = 0;
 }
 
-static void Net_PollSet(int sock, SocPollFd *fd) {
+static void Net_PollSet(int sock, SOCPollFD *fd) {
     fd->fd = sock;
     fd->events = 1;
 }

@@ -70,7 +70,7 @@ static u8 DWCAc_SettleKey(DWCAcSearchWork *work) {
 // full access point ends the candidate. When the connection is up it is state 10; when the wireless manager is in
 // trouble, the error is noted and the teardown, state 17, begins
 static u8 DWCAc_ConnectCandidate(DWCAcSearchWork *work) {
-    s32 state = WCM_GetState();
+    s32 state = WCM_GetPhase();
     WMBssDesc *bss = &work->candidates[work->selected];
     u32 option;
 
@@ -174,7 +174,7 @@ static u32 DWCAc_GetPowerOption(const DWCAcSearchWork *work) {
 
 // and with a shared key, or open
 static u32 DWCAc_GetAuthOption(const DWCAcSearchWork *work) {
-    return work->sharedKey == 1 ? WCM_OPTION_AUTH_SHARED : WCM_OPTION_AUTH_OPEN;
+    return work->sharedKey == 1 ? WCM_OPTION_AUTH_SHAREDKEY : WCM_OPTION_AUTH_OPENSYSTEM;
 }
 
 // Fills the key for WCM_ConnectAsync of the target `id`: 0 to 2 the WEP key of the three settings of the DS, 3 to 5
