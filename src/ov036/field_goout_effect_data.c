@@ -58,7 +58,7 @@ u16 FieldLensFlare_GetEffectSetID(FieldLensFlareData *data, u32 entryIndex, u32 
 }
 
 u32 FieldLensFlareData_BytesToEntryCount(FieldLensFlareData *data) {
-    return __aeabi_uidivmod(data->byteCount, sizeof(FieldLensFlareEntry));
+    return _u32_div_f(data->byteCount, sizeof(FieldLensFlareEntry));
 }
 
 u16 FieldLensFlareData_GetLensFlareID(FieldLensFlareData *data, u32 effectSet, u32 index) {

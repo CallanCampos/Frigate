@@ -2147,7 +2147,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   original does, where with a plain `dest` the clip's load stays live in a saved register and every register moves.
   A pointer field read through a `const` parameter at each use is loaded once into a compiler temporary, which the
   allocator places apart from the index: `ica_anime.c`'s `GFL_G3DCurveGetNowTranslationLoop` and its rotation and
-  scale siblings keep the remainder both in `r2` after `__aeabi_uidivmod` and in `r3` for `* 12`, as the original
+  scale siblings keep the remainder both in `r2` after `_u32_div_f` and in `r3` for `* 12`, as the original
   does, only with `const G3DCurve *curve`, `frame %= curve->frameCount` and `curve->translations[frame].x` (`.y`,
   `.z`) written out; a `values` local or a separate index keeps one of the two copies.
   An array element passed whole to a `static inline` taking a `const` pointer is formed again at that use from the
@@ -3343,11 +3343,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - `compiler_probe.py` skips relocated words, so a wrong addend, such as a table index that the compiler folds into a
   literal pool address, or a call to the wrong runtime helper needs a separate relocation check. A module check
   catches it only when the file's C is linked; incomplete files still link their original assembly. Division and
-  modulo call `_s32_div_f` for a signed operand and `_u32_div_f` (swan's `__aeabi_uidivmod`) for an unsigned one; a
+  modulo call `_s32_div_f` for a signed operand and `_u32_div_f` for an unsigned one; a
   `u8` or `u16` promotes to a signed `int`, so `(u8)id % 5u` is the unsigned one, and so is a `u16` divided by a
   `u32`. `wipe_sub.c`'s `WipeLineRange_Apply` divides `(range->end - range->start) * step` signed, its fields being
   `u8`, where the same difference of two `u32` locals called `_u32_div_f`. An integer converted to float calls
-  `__aeabi_i2f` (MWCC's `_fflt`) when it is signed and `_ffltu` when it is unsigned, and a `u8` or `u16` converted
+  `_fflt` when it is signed and `_ffltu` when it is unsigned, and a `u8` or `u16` converted
   to `f32`, by a cast or as a float operand, calls `_ffltu`, although it promotes to signed `int` in integer
   arithmetic: `ctvt_game.c`'s `CtvtGame_FindTouchedTarget` scales by `(f32)width / height` with the hit size in `int`
   locals. Two header inlines that differ only in the function they call hide the same way: `bmpwin.h`'s
@@ -3355,12 +3355,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `GFL_BGSysLoadScr`, and `ctvt_game.c`'s `CtvtGame_DrawTimeBar` ends with `BmpWin_TransferNow`. Compare the built
   overlay in
   `build/<version>/build` with the original to find it.
-- A 64-bit division calls `_ll_udiv` (swan's `__aeabi_uldivmod`) when either operand is unsigned, and `_ll_sdiv`
+- A 64-bit division calls `_ll_udiv` when either operand is unsigned, and `_ll_sdiv`
   (0x0208d414) when both are signed: `pass_power.c`'s `PassPower_ApplyCapture` divides an `s64 value` by 100. The
   probe masks the call's relocation, so check the helper in the object or the linked file. A call to `_ll_udiv` with
   operands sign-extended by `asr #0x1f` is an `int` cast to `u64`: the trade's box cubes turn by
-  `((u64)((x + 48) % width) << 16) / width` in `func_ov194_021c2844`. A file that calls it needs `_ll_udiv` added as a
-  label on `__aeabi_uldivmod` with `config_fixes.py add-label` before it can go complete.
+  `((u64)((x + 48) % width) << 16) / width` in `func_ov194_021c2844`.
 - A float one ULP off a round decimal is written with the shortest digits that round to it, and a comment:
   Kadabra's sprite offset in `pokemontrade_3d.c` is 0x40533334, next to `3.3f`'s 0x40533333, so it is `3.3000002f`.
 - MWCC has no count-leading-zeros intrinsic: `__clz`, `__CLZ` and `__builtin_clz` all compile to a real call to an

@@ -912,12 +912,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Float arithmetic on a local holding a constant isn't folded. (matching.md: "doesn't fold float arithmetic")
 - Division and modulo call `_s32_div_f` or `_u32_div_f` by signedness. A `u8`/`u16` promotes to signed `int`.
   (matching.md: "_s32_div_f")
-- `__aeabi_uldivmod` on sign-extended operands is an `int` cast to `u64`; MWCC calls it `_ll_udiv`.
+- `_ll_udiv` on sign-extended operands is an `int` cast to `u64`.
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
-- An integer converted to float calls `__aeabi_i2f` when signed and `_ffltu` when unsigned; a `u8` or `u16`
-  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `__aeabi_i2f` wants an `int` local. The
+- An integer converted to float calls `_fflt` when signed and `_ffltu` when unsigned; a `u8` or `u16`
+  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `_fflt` wants an `int` local. The
   probe masks it. (matching.md: "`_ffltu`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
