@@ -564,6 +564,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
   calls; check the SDK inline's mask (`y2 & 0xff`, not `(u8)y2`). (matching.md: "An `ands` with 0xffff kept")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
+- A round-up to 32 with `ands` against a -32 derived from a register 0x1f (`subs rX, #0x3f`) where ours has `bics`:
+  the sum is done in 64 bits, `((u64)ptr + 0x1f) & ~0x1f`. (matching.md: "the sum done in 64 bits")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or

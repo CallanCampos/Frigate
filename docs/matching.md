@@ -72,6 +72,12 @@ tools that show the differences.
   first: `key_data_savedata.c`'s `KeyDataSave_SetTrainerDefeated` and `KeyDataSave_SetFlag` clear with
   `mask = 0xffffffff; mask ^= 1 << bit; keyData->flags &= mask;`, and set with
   `mask = 1; mask <<= bit; keyData->flags |= mask;`, where `|= 1 << bit` adds a register copy.
+- A round-up to 32 that adds the 0x1f from a register and masks with an `ands` against a -32 derived from it
+  (`movs r1, #0x1f; adds r2, r0, r1; adds r0, r1, #0; subs r0, #0x3f; ands r3, r0`), where every 32-bit spelling
+  gives `adds r0, #0x1f` and `bics` (`& ~0x1f`, `& -32`, `/ 32 * 32`, `>> 5 << 5`, locals, inline helpers), is the
+  sum done in 64 bits: MWCC folds 64-bit constants only after its 32-bit passes, so both stay values in registers.
+  `dwcutil_ac.c`'s `UtilAc_StartWcm` matches with `(void *)(((u64)sAcBlock + 0x1f) & ~0x1f)` (a `0x1fULL` literal
+  or an `s64` cast compile the same), while `UtilAcWcm_Start` in the same file rounds in 32 bits with `bics`.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
   `clact.c`'s `ClAct_IsCellInViewTransformed`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which
