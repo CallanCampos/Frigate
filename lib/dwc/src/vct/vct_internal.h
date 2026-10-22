@@ -2,11 +2,13 @@
 #define POKEBW2_DWC_VCT_INTERNAL_H
 
 #include "types.h"
+#include "dwc/transport.h"
 #include "dwc/vct.h"
 
 // The voice chat library libVCT (the ROM carries its version string, "[SDK+Nintendo:libVCT 1.4.1]"), which sends the
 // microphone's sound to the machines of a Wi-Fi match and plays what they send. Overlay 29 holds it. The ROM names none
-// of its functions, so these names say what the code does.
+// of its functions: the names are libVCT's own, as ntrtwl's reconstruction of libVCT has them, where the code shows
+// them, and ours elsewhere.
 
 // libVCT's signature, "[SDK+Nintendo:libVCT 1.4.1]", in the main module, which VCT_Init registers
 extern const char VCTi_Signature[];
@@ -24,29 +26,31 @@ extern const char VCTi_Signature[];
 #define VCT_PACKET_MAGIC 0x5f564354
 
 // The kind of a packet
-#define VCT_TYPE_CONTROL 0x00
-#define VCT_TYPE_VOICE 0x40
-#define VCT_TYPE_SYNC 0x41
-#define VCT_TYPE_BROADCAST 0xff
+#define VCT_METHOD_RESPONSE 0x00
+#define VCT_HEADER_AUDIO 0x40
+#define VCT_HEADER_AUDIO_END 0x41
+#define VCT_METHOD_REQUEST 0xff
+
+// Whether this machine listens as a client or as the server of the transceiver mode: the SDK's VCTListenMode (ntrtwl's
+// libvct, src/vct_main.h)
+typedef enum VCTListenMode {
+    LISTEN_MODE_CLIENT = 0,
+    LISTEN_MODE_SERVER,
+} VCTListenMode;
 
 // What the library keeps of its configuration
-struct VCTSettings {
-    u8 aid;
-    u8 hostAid;
+struct VCTi_Globals {
+    u8 myAID;
+    u8 serverAID;
     u8 pad2[2];
-    VCTCallback callback;
+    VCTEventCallback callback;
     void *userData;
-    int unkC;
-    int mode;
-    int unk14;
+    VCTListenMode listenMode;
+    VCTMode SSPMode;
+    int autoResponse;
 };
 
-extern VCTSettings gVCTSettings;
-
-// Send a packet to the machine with the given ID, from DWC in overlay 11 (neither has a header yet): the first for
-// voice, the second for control packets
-BOOL DWC_SendUnreliable(u8 aid, const void *data, int size);
-BOOL DWC_SendReliable(u8 aid, const void *data, int size);
+extern VCTi_Globals vct;
 
 // The hardware's divider and square root unit
 #define REG_DIVCNT (*(vu16 *)0x04000280)

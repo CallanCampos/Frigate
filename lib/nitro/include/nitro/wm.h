@@ -35,7 +35,7 @@ typedef struct {
 
 // The results of the WM functions: they all start an operation and give OPERATING when it has begun, with its result
 // to come to the callback
-enum {
+typedef enum {
     WM_ERRCODE_SUCCESS,
     WM_ERRCODE_FAILED,
     WM_ERRCODE_OPERATING,
@@ -47,10 +47,10 @@ enum {
     WM_ERRCODE_FIFO_ERROR = 8,       // No command buffer is free, or the FIFO to the ARM7 is full
     WM_ERRCODE_SEND_QUEUE_FULL = 10, // The queue of the port has no room for the data
     WM_ERRCODE_FATAL = 0x13,         // What the ARM7 reports in an indication when it can't go on: the game ends
-};
+} WMErrCode;
 
 // The state of the manager, in the first halfword of its status
-enum {
+typedef enum {
     WM_STATE_READY,
     WM_STATE_STOP,
     WM_STATE_IDLE,
@@ -63,11 +63,11 @@ enum {
     WM_STATE_MP_PARENT,
     WM_STATE_MP_CHILD,
     WM_STATE_DCF_CHILD,
-};
+} WMState;
 
 // The number of an operation, which a callback starts with and a command to the ARM7 starts with. Only the ones that
 // the code of the manager's files uses are named
-enum {
+typedef enum {
     WM_APIID_INITIALIZE = 0,
     WM_APIID_RESET = 1,
     WM_APIID_END = 2,
@@ -98,10 +98,10 @@ enum {
     WM_APIID_INDICATION = 0x80,
     WM_APIID_PORT_SEND = 0x81,
     WM_APIID_PORT_RECV = 0x82,
-};
+} WMApiid;
 
 // The state that a callback reports, as the callback's function sees it
-enum {
+typedef enum {
     WM_STATECODE_PARENT_START = 0,
     WM_STATECODE_BEACON_SENT = 2,
     WM_STATECODE_PARENT_NOT_FOUND = 4,
@@ -115,7 +115,7 @@ enum {
     WM_STATECODE_PORT_RECV = 0x15,
     WM_STATECODE_PORT_INIT = 0x19,
     WM_STATECODE_DISCONNECTED_FROM_MYSELF = 0x1a,
-};
+} WMStateCode;
 
 // The first fields of every callback's argument
 typedef struct {
@@ -133,7 +133,7 @@ typedef void (*WMCallbackFunc)(void *arg);
 
 // What a parent gives out in its beacon: the game's ID and the user's data. Its size is 0x38
 typedef struct {
-    u8 *userGameInfo;
+    u16 *userGameInfo;
     u16 userGameInfoLength;
     u16 padding;
     u32 ggid;
@@ -206,7 +206,7 @@ typedef struct {
     u16 wlResult;
     u16 state;
     u16 channel;
-    u16 reserved;
+    u8 reserved[2];
     u16 bssDescCount;
     WMBssDesc *bssDesc[16];
     u16 linkLevel[16];
@@ -214,32 +214,65 @@ typedef struct {
 
 // What a parent received from one child in a round of the multi-point mode: the length of the data, which is 0xffff if
 // the child sent none, the child's AID, and the data
-typedef struct {
+typedef struct WMMpRecvData {
     u16 length;
-    u16 unk_02;
+    u16 rate_rssi;
     u16 aid;
-    u8 unk_06[4];
-    u8 data[];
+    u16 noResponse;
+    u16 wmHeader;
+    u16 cdata[1];
 } WMMpRecvData;
 
-// The buffer that the multi-point mode receives into: the number of children it has room for and the size of the room
-// of each
-typedef struct {
-    u8 unk_00[4];
+// What a parent received in a round of the multi-point mode: count entries of what each child sent, length bytes apart
+typedef struct WMMpRecvHeader {
+    u16 bitmap;
+    u16 errBitmap;
     u16 count;
-    u16 entrySize;
-    u8 unk_08[2];
-    u8 entries[];
+    u16 length;
+    u16 txCount;
+    WMMpRecvData data[1];
+} WMMpRecvHeader;
+
+// The buffer that the multi-point mode receives a frame into
+typedef struct WMMpRecvBuf {
+    u16 seqCtrl;
+    u16 txop;
+    u16 bitmap;
+    u16 wmHeader;
+    u16 data[2];
 } WMMpRecvBuf;
+
+// The buffer that the DCF mode receives a frame into: the frame's length, signal, addresses and data
+typedef struct WMDcfRecvBuf {
+    u16 frameID;
+    u16 rsv1[2];
+    u16 length;
+    u16 rsv2[3];
+    u16 rate_rssi; // The signal's strength in the high byte
+    u16 rsv3[4];
+    u8 destAdrs[6];
+    u8 srcAdrs[6];
+    u16 rsv4[4];
+    u16 data[2];
+} WMDcfRecvBuf;
 
 // The callback of the start of the multi-point mode
 typedef struct {
     u16 apiid;
     u16 errcode;
     u16 state;
-    u16 padding;
+    u8 reserved[2];
     WMMpRecvBuf *recvBuf;
 } WMStartMPCallback;
+
+// The callback of the DCF mode: its start (state 14) and each frame that comes in (state 15), in recvBuf
+typedef struct {
+    u16 apiid;
+    u16 errcode;
+    u16 state;
+    u8 reserved[2];
+    WMDcfRecvBuf *recvBuf;
+} WMStartDCFCallback;
 
 // The callback of a disconnection: the AIDs that are gone
 typedef struct {
@@ -292,8 +325,8 @@ typedef struct {
     u16 errcode;
     u16 state;
     u16 port;
-    u8 *recvBuf; // The ARM7's buffer of the round of the multi-point mode that the packet is in
-    u8 *data;
+    WMMpRecvBuf *recvBuf; // The ARM7's buffer of the round of the multi-point mode that the packet is in
+    u16 *data;
     u16 length;
     u16 aid;
     u8 macAddress[6];
@@ -337,12 +370,12 @@ typedef struct {
 } WMDataSet;
 
 // The state of a data sharing, in WMDataSharingInfo.state
-enum {
+typedef enum {
     WM_DS_STATE_OFF,
     WM_DS_STATE_RUNNING,
     WM_DS_STATE_SEND_FAILED = 4, // The queue was full: the next step sends again
     WM_DS_STATE_ERROR = 5,
-};
+} WMDataSharingState;
 
 // What a data sharing keeps: a ring of sets and the indexes into it (each a count modulo WM_DS_SET_COUNT). Its size is
 // 0x820
@@ -362,6 +395,9 @@ typedef struct {
     u16 state;         // WM_DS_STATE_*
     u16 unk_81e;
 } WMDataSharingInfo;
+
+// What a key sharing keeps: a data sharing's
+typedef WMDataSharingInfo WMKeySetBuf;
 
 // The elements of a beacon that are not the game's: the ID of each, its length and where its data is. At most 16. The
 // elements are in the order they are in the beacon; the sizes of WMOtherElement and WMOtherElements are 8 and 0x84
@@ -455,26 +491,26 @@ typedef struct {
 // WM_ERRCODE_*, WM_ERRCODE_SUCCESS being 0
 // WM_Init: starts the manager in the buffer, which must be WM_SYSTEM_BUF_SIZE bytes in main memory, 32-aligned, and
 // cleared by the DMA channel dmaNo (0 to 3)
-int WM_Init(void *wmSysBuf, u16 dmaNo);
+WMErrCode WM_Init(void *wmSysBuf, u16 dmaNo);
 // Ends the manager, which must be in the READY state
-int WM_Finish(void);
+WMErrCode WM_Finish(void);
 // Sets the callback of an operation
-void WMi_SetCallbackTable(u32 apiid, WMCallbackFunc callback);
+void WMi_SetCallbackTable(WMApiid apiid, WMCallbackFunc callback);
 // WMi_SendCommand: puts a command in a buffer, with paramNum more arguments (words) as its parameters, and sends it to
 // the ARM7. WM_ERRCODE_OPERATING if sent, FIFO_ERROR if no buffer is free or the FIFO is full
-int WMi_SendCommand(u16 apiid, u16 paramNum, ...);
+WMErrCode WMi_SendCommand(WMApiid apiid, u16 paramNum, ...);
 // The same, with the command already made: size bytes at cmd
-int WMi_SendCommandDirect(const void *cmd, u32 size);
+WMErrCode WMi_SendCommandDirect(void *cmd, u32 size);
 // The ARM9 part of the buffer, NULL before WM_Init
 WMArm9Buf *WMi_GetSystemWork(void);
 // WM_ERRCODE_ILLEGAL_STATE until WM_Init has been called
-int WMi_CheckInitialized(void);
+WMErrCode WMi_CheckInitialized(void);
 // WM_ERRCODE_ILLEGAL_STATE if the manager is in the READY or STOP state
-int WMi_CheckIdle(void);
+WMErrCode WMi_CheckIdle(void);
 // SUCCESS if the manager is in one of the paramNum states that follow, else ILLEGAL_STATE
-int WMi_CheckStateEx(int paramNum, ...);
+WMErrCode WMi_CheckStateEx(s32 paramNum, ...);
 // The status that the ARM7 keeps, NULL before WM_Init
-void *WMi_GetStatusAddress(void);
+const WMStatus *WMi_GetStatusAddress(void);
 // WMi_GetMyAid and WMi_GetConnectedAidBitmap: this console's AID and the AIDs connected, as the last connection
 // event left them
 u16 WMi_GetMyAid(void);
@@ -491,67 +527,69 @@ int WM_CheckInitialized(void);
 int NWM_CheckInitialized(void);
 
 // wm_sync.c
-int WM_SetIndCallback(WMCallbackFunc callback);
-int WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg);
+WMErrCode WM_SetIndCallback(WMCallbackFunc callback);
+WMErrCode WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg);
 // Copies the status (0x7d0 bytes)
-int WM_ReadStatus(WMStatus *statusBuf);
+WMErrCode WM_ReadStatus(WMStatus *statusBuf);
 int WM_GetMPSendBufferSize(void);
 int WM_GetMPReceiveBufferSize(void);
 u16 WM_GetAllowedChannel(void);
 u16 WM_GetDispersionBeaconPeriod(void);
 u16 WM_GetDispersionScanPeriod(void);
 // wm_standard.c
-int WM_Enable(WMCallbackFunc callback);
-int WM_Disable(WMCallbackFunc callback);
-int WM_PowerOn(WMCallbackFunc callback);
-int WM_PowerOff(WMCallbackFunc callback);
-int WM_Initialize(void *wmBuf, WMCallbackFunc callback, u16 dmaNo);
+WMErrCode WM_Enable(WMCallbackFunc callback);
+WMErrCode WM_Disable(WMCallbackFunc callback);
+WMErrCode WM_PowerOn(WMCallbackFunc callback);
+WMErrCode WM_PowerOff(WMCallbackFunc callback);
+WMErrCode WM_Initialize(void *wmBuf, WMCallbackFunc callback, u16 dmaNo);
 // Like WM_Initialize, with a fourth argument that changes the flags to the ARM7: bit 1 is set when it is 0
-int WM_InitializeForListening(void *wmBuf, WMCallbackFunc callback, u16 dmaNo, int extra);
-int WM_Reset(WMCallbackFunc callback);
-int WM_End(WMCallbackFunc callback);
-int WM_SetParentParameter(WMCallbackFunc callback, WMParentParam *param);
+WMErrCode WM_InitializeForListening(void *wmBuf, WMCallbackFunc callback, u16 dmaNo, BOOL extra);
+WMErrCode WM_Reset(WMCallbackFunc callback);
+WMErrCode WM_End(WMCallbackFunc callback);
+WMErrCode WM_SetParentParameter(WMCallbackFunc callback, const WMParentParam *param);
 // The data that a child sent in a round of the multi-point mode, or NULL
-const WMMpRecvData *WM_ReadMPData(const WMMpRecvBuf *recvBuf, u16 aid);
+WMMpRecvData *WM_ReadMPData(const WMMpRecvHeader *header, u16 aid);
 // The elements of a beacon that are not the game's, if it has no game information
 WMOtherElements WM_GetOtherElements(const WMBssDesc *bssDesc);
 // The calls that start the parent: apiids 8 and 0x19, each with a flag. The first is WMi_StartParentEx
-int WMi_StartParentEx(WMCallbackFunc callback, int enable);
-int WM_SetBeaconIndication(WMCallbackFunc callback, int enable);
-int WM_StartParent(WMCallbackFunc callback);
-int WM_EndParent(WMCallbackFunc callback);
-int WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param);
-int WM_EndScan(WMCallbackFunc callback);
+WMErrCode WMi_StartParentEx(WMCallbackFunc callback, BOOL enable);
+WMErrCode WM_SetBeaconIndication(WMCallbackFunc callback, u16 enable);
+WMErrCode WM_StartParent(WMCallbackFunc callback);
+WMErrCode WM_EndParent(WMCallbackFunc callback);
+WMErrCode WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param);
+WMErrCode WM_EndScan(WMCallbackFunc callback);
 // Like WM_StartMP, with five more parameters
-int WM_StartMPEx(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq,
-                 u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
-                 BOOL ignoreFatalError);
-int WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave, u16 authMode);
-int WM_Disconnect(WMCallbackFunc callback, u16 aid);
-int WM_StartMP(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize, void *sendBuf, u16 sendBufSize, u16 mpFreq);
-int WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const void *sendData, u16 sendDataSize, u16 destBitmap,
-                         u16 port, u16 prio);
-int WM_EndMP(WMCallbackFunc callback);
+WMErrCode WM_StartMPEx(WMCallbackFunc callback, u16 *recvBuf, u16 recvBufSize, u16 *sendBuf, u16 sendBufSize,
+                       u16 mpFreq, u16 defaultRetryCount, BOOL minPollBmpMode, BOOL singlePacketMode, BOOL fixFreqMode,
+                       BOOL ignoreFatalError);
+WMErrCode WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave,
+                            u16 authMode);
+WMErrCode WM_Disconnect(WMCallbackFunc callback, u16 aid);
+WMErrCode WM_StartMP(WMCallbackFunc callback, u16 *recvBuf, u16 recvBufSize, u16 *sendBuf, u16 sendBufSize, u16 mpFreq);
+WMErrCode WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const u16 *sendData, u16 sendDataSize,
+                               u16 destBitmap, u16 port, u16 prio);
+WMErrCode WM_EndMP(WMCallbackFunc callback);
 // Starts the DCF mode of a child, with the buffer that it receives into
-int WM_StartDCF(WMCallbackFunc callback, void *recvBuf, u16 recvBufSize);
+WMErrCode WM_StartDCF(WMCallbackFunc callback, WMDcfRecvBuf *recvBuf, u16 recvBufSize);
 // WM_SetDCFData: queues a DCF transmission to the six-byte destination address; buffer remains borrowed until
 // completion
-int WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const void *buffer, u16 byteLength);
-int WM_EndDCF(WMCallbackFunc callback);
-int WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode);
-int WM_EndDataSharing(WMDataSharingInfo *dsi);
-int WM_StepDataSharing(WMDataSharingInfo *dsi, const void *data, WMDataSet *dataSet);
-void *WM_GetSharedDataAddress(const WMDataSharingInfo *dsi, const WMDataSet *dataSet, u16 aid);
+WMErrCode WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const u16 *buffer, u16 byteLength);
+WMErrCode WM_EndDCF(WMCallbackFunc callback);
+WMErrCode WM_StartDataSharing(WMDataSharingInfo *dsi, u16 port, u16 aidBitmap, u16 dataLength, BOOL doubleMode);
+WMErrCode WM_EndDataSharing(WMDataSharingInfo *dsi);
+WMErrCode WM_StepDataSharing(WMDataSharingInfo *dsi, const u16 *data, WMDataSet *dataSet);
+u16 *WM_GetSharedDataAddress(WMDataSharingInfo *dsi, WMDataSet *dataSet, u16 aid);
 // wm_ks.c: the sharing of the keys of every console, two bytes each, in the double mode
-int WM_StartKeySharing(WMDataSharingInfo *dsi, u16 port);
-int WM_EndKeySharing(WMDataSharingInfo *dsi);
+WMErrCode WM_StartKeySharing(WMKeySetBuf *buf, u16 port);
+WMErrCode WM_EndKeySharing(WMKeySetBuf *buf);
 // wm_etc.c
 // Mode 0 (off) to 3, with a key of 0x50 bytes unless it is off
-int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey);
+WMErrCode WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const u16 *wepKey);
 // Like WM_SetWEPKey, with the number of the key to use
-int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey);
-int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr);
-int WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime);
-int WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime);
+WMErrCode WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const u8 *wepKey);
+WMErrCode WM_SetGameInfo(WMCallbackFunc callback, const u16 *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid,
+                         u8 attr);
+WMErrCode WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime);
+WMErrCode WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime);
 
 #endif // POKEBW2_NITRO_WM_H

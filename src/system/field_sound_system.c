@@ -400,7 +400,7 @@ void FieldSnd_SetAmbienceVolume(FieldSound *fieldSound, u32 se, u16 volume) {
 }
 
 void FieldSnd_StopAmbience(FieldSound *fieldSound, u32 se) {
-    s32 player = GFL_SndSeqGetPlayerIndex(se);
+    int player = GFL_SndSeqGetPlayerIndex(se);
 
     if (!FieldAmbience_CheckSoundID(se)) {
         GFL_SndPlayerStop(player);

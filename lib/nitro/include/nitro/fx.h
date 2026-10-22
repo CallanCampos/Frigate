@@ -3,25 +3,31 @@
 
 #include "types.h"
 
-// Fixed point numbers with 12 fractional bits
+// Fixed point numbers with 12 fractional bits. The types, constants and conversions are NitroSDK's (its fx.h, and the
+// fx_const.h it generates, as ntrtwl's NitroSDK and pret's pokediamond have them): fx32 is a long, and its constants
+// carry an L.
 typedef s16 fx16;
 typedef s32 fx32;
 typedef s64 fx64;
+// A 64-bit fixed point number with 32 fractional bits, as the divider gives its quotients
+typedef s64 fx64c;
 
-#define FX16_ONE (1 << 12)
+#define FX16_SHIFT 12
+#define FX16_ONE ((fx16)0x1000)
 #define FX32_SHIFT 12
-#define FX32_ONE (1 << FX32_SHIFT)
-#define FX32_HALF (FX32_ONE / 2)
-#define FX32_DEC_MASK (FX32_ONE - 1)
+#define FX32_DEC_MASK 0x00000fff
 #define FX32_MAX ((fx32)0x7fffffff)
 #define FX32_MIN ((fx32)0x80000000)
-#define FX32_CONST(x) ((fx32)(((x) > 0) ? ((x) * FX32_ONE + 0.5f) : ((x) * FX32_ONE - 0.5f)))
-#define FX16_CONST(x) ((fx16)(((x) > 0) ? ((x) * FX16_ONE + 0.5f) : ((x) * FX16_ONE - 0.5f)))
+#define FX32_ONE ((fx32)0x00001000L)
+#define FX32_HALF ((fx32)0x00000800L)
 // Conversions between fixed point numbers and floats, rounded to the nearest
-#define FX_F32_TO_FX16(x) ((fx16)(((x) > 0) ? (fx16)((x) * FX16_ONE + 0.5f) : (fx16)((x) * FX16_ONE - 0.5f)))
-#define FX_F32_TO_FX32(x) ((fx32)(((x) > 0) ? (fx32)((x) * FX32_ONE + 0.5f) : (fx32)((x) * FX32_ONE - 0.5f)))
-#define FX_FX16_TO_F32(x) ((f32)((x) / (f32)FX16_ONE))
-#define FX_FX32_TO_F32(x) ((f32)((x) / (f32)FX32_ONE))
+#define FX_FX16_TO_F32(x) ((f32)((x) / (f32)(1 << FX16_SHIFT)))
+#define FX_F32_TO_FX16(x)                                                                                              \
+    ((fx16)(((x) > 0) ? (fx16)((x) * (1 << FX16_SHIFT) + 0.5f) : (fx16)((x) * (1 << FX16_SHIFT) - 0.5f)))
+#define FX16_CONST(x) FX_F32_TO_FX16(x)
+#define FX_FX32_TO_F32(x) ((f32)((x) / (f32)(1 << FX32_SHIFT)))
+#define FX_F32_TO_FX32(x) ((fx32)(((x) > 0) ? ((x) * (1 << FX32_SHIFT) + 0.5f) : ((x) * (1 << FX32_SHIFT) - 0.5f)))
+#define FX32_CONST(x) FX_F32_TO_FX32(x)
 #define FX_Whole(a) ((s32)((a) >> FX32_SHIFT))
 
 typedef struct {
@@ -104,8 +110,8 @@ static inline void VEC_Fx16Set(VecFx16 *v, fx16 x, fx16 y, fx16 z) {
 }
 
 // An angle in fixed point degrees as a 16-bit angle
-#define FX64C_65536_360 ((s64)0x000000b60b60b60bLL)
-#define FX_DEG_TO_IDX(deg) ((u16)(((deg) * FX64C_65536_360 + 0x80000000000LL) >> 44))
+#define FX64C_65536_360 ((fx64c)0x000000b60b60b60bLL)
+#define FX_DEG_TO_IDX(deg) ((u16)((FX64C_65536_360 * (deg) + 0x80000000000LL) >> 44))
 
 // libfx, in link order. The names are NitroSDK's, as pret's pokediamond and pmd-sky use them; swan's names are noted
 // where they differ, and functions with no SDK name in pret keep swan's.
@@ -139,7 +145,7 @@ void MTX_Copy43To44_(const MtxFx43 *src, MtxFx44 *dst);
 void MTX_Scale43_(MtxFx43 *mtx, fx32 x, fx32 y, fx32 z);
 void MTX_ScaleApply43(const MtxFx43 *src, MtxFx43 *dest, fx32 x, fx32 y, fx32 z);
 void MTX_RotY43_(MtxFx43 *mtx, fx32 sin, fx32 cos);
-void MTX_RotAxis43(MtxFx43 *mtx, const VecFx32 *axis, fx16 sin, fx16 cos);
+void MTX_RotAxis43(MtxFx43 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos);
 // Returns -1 when the matrix has no inverse
 int MTX_Inverse43(const MtxFx43 *mtx, MtxFx43 *inv);
 void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab);
@@ -157,10 +163,10 @@ void MTX_OrthoW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, Mtx
 // fx_cp.c, on the hardware divider and square root unit. Swan: fx_recip_raw (FX_InvFx64c)
 fx32 FX_Div(fx32 numer, fx32 denom);
 fx32 FX_Inv(fx32 denom);
-fx64 FX_InvFx64c(fx32 denom);
+fx64c FX_InvFx64c(fx32 denom);
 fx32 FX_Sqrt(fx32 x);
 fx32 FX_InvSqrt(fx32 x);
-fx64 FX_GetDivResultFx64c(void);
+fx64c FX_GetDivResultFx64c(void);
 fx32 FX_GetDivResult(void);
 void FX_InvAsync(fx32 denom);
 void FX_DivAsync(fx32 numer, fx32 denom);
@@ -190,7 +196,7 @@ u16 FX_Atan2Idx(fx32 y, fx32 x);
 void FX_Init(void);
 fx32 FX_MulFunc(fx32 v1, fx32 v2);
 // The 32-bit fixed point number times a 64-bit fraction with 32 fractional bits, rounded
-fx32 FX_Mul32x64cFunc(fx32 v32, fx64 v64c);
+fx32 FX_Mul32x64cFunc(fx32 v32, fx64c v64c);
 // Returns the fraction of x and writes its whole part, both with the sign of x
 fx32 FX_Modf(fx32 x, fx32 *whole);
 

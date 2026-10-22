@@ -83,8 +83,8 @@ typedef struct {
 
 // What a player offers in a match, which is sent to the other player whole
 typedef struct {
-    const AuthCertificate *certificate;
-    ScReport *connection;
+    const GSLoginCertificate *certificate;
+    SCIReport *connection;
     u8 unk8[0x28];
     u8 unk30[0x28];
     u8 unk58[0x10];
@@ -202,7 +202,7 @@ struct WifiBattleMatchNet {
     u8 unk1b8[0x10];
     WifiBattleMatchNetRecordData recordData;
     u8 recvBuffer[0x1000];
-    DWCEvalFunc evalFunc;
+    DWCEvalPlayerCallback evalFunc;
     NHttpRap *p_nhttp;
     WifiBattleMatchNetValues httpValues;
     WifiBattleMatchNetValues postData;
@@ -272,7 +272,7 @@ static u32 WifiBattleMatchNet_GetHttpResultMessage(u32 result);
 static void WifiBattleMatchNet_StartDownloadWait(WifiBattleMatchNet *p_wk, u32 nextState);
 static void WifiBattleMatchNet_StartDownloadEnd(WifiBattleMatchNet *p_wk, u32 nextState);
 static void WifiBattleMatchNet_StartDownloadCancel(WifiBattleMatchNet *p_wk, u32 nextState);
-static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError);
+static void WifiBattleMatchNet_OnDownload(DWCNdCallbackReason reason, DWCNdError error, int serverError);
 static u32 WifiBattleMatchNet_GetDwcResult(u32 code);
 static u32 WifiBattleMatchNet_GetGdbResult(u32 code, u32 subCode1, u32 subCode2);
 static u32 WifiBattleMatchNet_GetTimeoutResult(u32 code);
@@ -2255,7 +2255,7 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
                 }
             }
         } else if (sDownload.code != 0) {
-            if (sDownload.code == ND_ERROR_FATAL) {
+            if (sDownload.code == DWC_ND_ERROR_FATAL) {
                 GFL_NetErrAbort();
             } else {
                 WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
@@ -2291,7 +2291,7 @@ u32 WifiBattleMatchNet_DownloadMain(WifiBattleMatchNet *p_wk) {
             WifiBattleMatchNet_StartDownloadCancel(p_wk, 8);
         }
         if (sDownload.code != 0) {
-            if (sDownload.code == ND_ERROR_FATAL) {
+            if (sDownload.code == DWC_ND_ERROR_FATAL) {
                 GFL_NetErrAbort();
             } else {
                 WifiBattleMatchNet_StartDownloadEnd(p_wk, 8);
@@ -2414,18 +2414,18 @@ static void WifiBattleMatchNet_StartDownloadCancel(WifiBattleMatchNet *p_wk, u32
     }
 }
 
-static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError) {
+static void WifiBattleMatchNet_OnDownload(DWCNdCallbackReason reason, DWCNdError error, int serverError) {
     switch (error) {
     case DWC_ND_ERROR_NONE:
     case DWC_ND_ERROR_ALLOC:
     case DWC_ND_ERROR_BUSY:
     case DWC_ND_ERROR_HTTP:
     case DWC_ND_ERROR_BUFFULL:
-    case ND_ERROR_BAD_PARAMETER:
+    case DWC_ND_ERROR_PARAM:
     case DWC_ND_ERROR_DLSERVER:
         break;
     case DWC_ND_ERROR_CANCELED:
-    case ND_ERROR_FATAL:
+    case DWC_ND_ERROR_FATAL:
         GFL_NetErrAbort();
         break;
     }

@@ -7,7 +7,7 @@
 // Fills in an animation object for a visibility animation (NitroSystem's NNSi_G3dAnmObjInitNsBva, as recalled). It
 // applies the animation with NNS_G3dFuncAnmVisNsBva, and maps each node of the model to the data at its index, which is
 // flagged as existing
-void NNS_G3DAnimationInit_VA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
+void NNS_G3DAnimationInit_VA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
     u32 i;
 
     anmObj->funcAnm = (void *)NNS_G3dFuncAnmVisNsBva;

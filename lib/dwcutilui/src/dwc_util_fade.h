@@ -23,13 +23,13 @@ enum {
      GX_BLEND_PLANEMASK_OBJ | GX_BLEND_PLANEMASK_BD)
 
 // Turns both screens white
-void DWCUtilFade_Init(void);
-void DWCUtilFade_Exit(void);
+void DWCi_EFFlInit(void);
+void DWCi_EFFlEnd(void);
 // Whether a fade of the screen is running
-u8 DWCUtilFade_IsActive(int screen);
+u8 DWCi_EFFlCheck(int screen);
 // Fades the planes of the screen over length frames, or returns FALSE if a fade of it is running
-BOOL DWCUtilFade_Start(int type, int screen, u32 planes, int length);
+BOOL DWCi_EFFlFade(int type, int screen, u32 planes, int length);
 // Waits length frames on the sub screen's fade, without changing its brightness
-BOOL DWCUtilFade_StartWait(int length);
+BOOL DWCi_EFFlWait(int length);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_FADE_H

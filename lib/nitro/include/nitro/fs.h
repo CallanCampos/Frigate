@@ -425,7 +425,7 @@ struct FSFile {
 };
 
 // NitroSDK's FS_GetResultCode: what the file's last command returned
-static inline FSResult FS_GetResultCode(const FSFile *file) {
+static inline FSResult FS_GetResultCode(volatile const FSFile *file) {
     return file->error;
 }
 
@@ -461,15 +461,22 @@ static inline BOOL FS_IsArchiveSuspended(volatile const FSArchive *arc) {
     return (arc->flag & FS_ARCHIVE_FLAG_SUSPENDED) ? TRUE : FALSE;
 }
 
+// Where FS_SeekFile counts the offset from
+typedef enum {
+    FS_SEEK_SET = 0,
+    FS_SEEK_CUR = 1,
+    FS_SEEK_END = 2,
+} FSSeekFileMode;
+
 void FS_InitFile(FSFile *file);                      // swan's finit
 BOOL FS_OpenFile(FSFile *file, const char *path);    // swan's romfs_fopen
 u32 FS_GetFileLength(FSFile *file);                  // swan's romfs_fgetsize
 u32 FS_GetLength(FSFile *file);                      // swan's GetFileSize
 s32 FS_ReadFile(FSFile *file, void *dest, s32 size); // swan's romfs_fread
 s32 FS_WriteFile(FSFile *file, const void *src, s32 size);
-BOOL FS_CloseFile(FSFile *file);                                        // swan's romfs_fclose
-BOOL FS_SeekFile(FSFile *file, s32 offset, int whence);                 // swan's romfs_fseek
-BOOL FS_CreateFileFromMemory(FSFile *file, const void *data, u32 size); // swan's extfs_fopen
+BOOL FS_CloseFile(FSFile *file);                                   // swan's romfs_fclose
+BOOL FS_SeekFile(FSFile *file, s32 offset, FSSeekFileMode whence); // swan's romfs_fseek
+BOOL FS_CreateFileFromMemory(FSFile *file, void *data, u32 size);  // swan's extfs_fopen
 // The position in the file
 u32 FS_GetFilePosition(FSFile *file); // swan's romfs_ftell
 // The ROM archive's shortcuts for the length and the position of a file: they set *value and return TRUE when the
@@ -477,13 +484,11 @@ u32 FS_GetFilePosition(FSFile *file); // swan's romfs_ftell
 BOOL FSi_GetFileLengthIfProc(FSFile *file, u32 *length);
 BOOL FSi_GetFilePositionIfProc(FSFile *file, u32 *position);
 // Opens a file that is a range of an archive's data, from start to end
-BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, int fileId); // swan's fopen_raw
+BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, u32 fileId); // swan's fopen_raw
 // The archive of a name of the given length, or NULL. NitroSDK's FS_FindArchive
 FSArchive *FS_FindArchive(const char *name, int nameLength);
 // A field of the file: where its data starts in its archive. NitroSDK's FS_GetFileImageTop
 u32 FS_GetFileImageTop(const FSFile *file);
-
-#define FS_SEEK_SET 0
 
 #define FS_FILEMODE_R 1
 
@@ -496,6 +501,9 @@ void FS_CancelFile(FSFile *file);
 // Overlays: NitroSDK's FS_LoadOverlayInfo, FS_LoadOverlay, FS_UnloadOverlay and FS_SetDefaultDMA.
 // The target is the processor, MI_PROCESSOR_ARM9 (nitro/mi.h)
 #define FS_DMA_NOT_USE 0xffffffff
+
+// The number of an overlay, from 0 in each processor's table
+typedef u32 FSOverlayID;
 
 // The bits of FSOverlayInfo.flag. An image that is compressed expands in place (backward LZ). One with a digest in the
 // table of the build has it checked, unless the game booted from the ROM
@@ -522,10 +530,10 @@ typedef struct FSOverlayInfo {
     u32 fileSize;
 } FSOverlayInfo;
 
-BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id); // swan's sys_read_overlay_header
-BOOL FS_LoadOverlay(MIProcessor target, u32 id);                          // swan's sys_load_overlay
-BOOL FS_UnloadOverlay(MIProcessor target, u32 id);                        // swan's sys_unload_overlay
-u32 FS_SetDefaultDMA(u32 dma);                                            // swan's fs_set_dma_id
+BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, FSOverlayID id); // swan's sys_read_overlay_header
+BOOL FS_LoadOverlay(MIProcessor target, FSOverlayID id);                          // swan's sys_load_overlay
+BOOL FS_UnloadOverlay(MIProcessor target, FSOverlayID id);                        // swan's sys_unload_overlay
+u32 FS_SetDefaultDMA(u32 dma);                                                    // swan's fs_set_dma_id
 
 // The digests of the overlays that the build makes, one of 20 bytes for each overlay in the order of their numbers, and
 // the end of the table
@@ -546,16 +554,16 @@ void FSi_InitOverlay(void);
 // NitroSDK's FSi_GetOverlayBinarySize: the size of an overlay's image in the ROM, without its zeroed data
 u32 FSi_GetOverlayBinarySize(const FSOverlayInfo *info); // swan's sys_get_overlay_size
 // NitroSDK's FS_ClearOverlayImage: invalidates the caches over the overlay's memory and clears its zeroed data
-void FS_ClearOverlayImage(const FSOverlayInfo *info); // swan's sys_prepare_overlay_area
+void FS_ClearOverlayImage(FSOverlayInfo *info); // swan's sys_prepare_overlay_area
 // NitroSDK's FS_GetOverlayFileID: the archive and the number of the overlay's file
 FSFileID FS_GetOverlayFileID(const FSOverlayInfo *info); // swan's sys_get_overlay_file_id
 // NitroSDK's FS_LoadOverlayImage: reads the overlay's image into its memory
-BOOL FS_LoadOverlayImage(const FSOverlayInfo *info); // swan's sys_mount_overlay
+BOOL FS_LoadOverlayImage(FSOverlayInfo *info); // swan's sys_mount_overlay
 // NitroSDK's FS_StartOverlay: checks the image's digest, expands it and calls its static initializers
-void FS_StartOverlay(const FSOverlayInfo *info); // swan's sys_start_overlay
+void FS_StartOverlay(FSOverlayInfo *info); // swan's sys_start_overlay
 // NitroSDK's FS_EndOverlay: calls the destructors of the objects that the overlay made, and forgets them
-void FS_EndOverlay(const FSOverlayInfo *info);         // swan's sys_call_ovl_dtors
-BOOL FS_UnloadOverlayImage(const FSOverlayInfo *info); // swan's sys_unmount_overlay
+void FS_EndOverlay(FSOverlayInfo *info);         // swan's sys_call_ovl_dtors
+BOOL FS_UnloadOverlayImage(FSOverlayInfo *info); // swan's sys_unmount_overlay
 
 // An archive with a file allocation table and a name table (fs_command_default.c): NitroSDK's FS_LoadArchive, which
 // gives the archive its tables (counted from the base) and the functions that read and write the storage, NULL for the

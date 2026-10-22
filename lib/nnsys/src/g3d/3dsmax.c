@@ -173,7 +173,7 @@ static inline void sendPacket_(const u32 *packet, u32 num) {
 // and the S translation scaled by magW, the ratio of the texture's size to its original size, and the second row and
 // the T translation by magH, between a change of the geometry engine's matrix mode to texture and back to position and
 // vector. With TEXMTX_SET it is loaded, and with TEXMTX_MULT it is multiplied into the matrix that is there
-void NNSi_G3dSendTexSRT3dsMax(NNSG3dMatAnmResult *result) {
+void NNSi_G3dSendTexSRT3dsMax(const NNSG3dMatAnmResult *result) {
     struct {
         u32 op; // MTX_MODE, MTX_LOAD_4x4 or MTX_MULT_4x4, MTX_MODE
         u32 modeTexture;

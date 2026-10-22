@@ -8,6 +8,7 @@
 #include "types.h"
 #include "battle/btl_setup.h"
 #include "battle/btlv_b_gauge.h"
+#include "battle/btlv_mcss.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/fx.h"
@@ -81,8 +82,8 @@ BOOL BtlvEffect_IsBusy(void);
 void BtlvEffect_AddPokemon(PartyPkm *pkm, u32 viewPos);
 void BtlvEffect_DelPokemon(u32 viewPos);
 BOOL BtlvEffect_CheckExist(int pos);
-void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z);
-void BtlvEffect_DelTrainer(u32 pos);
+void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx32 z);
+void BtlvEffect_DelTrainer(BtlvMcssPos pos);
 void BtlvEffect_SetPokeAnimeSpeed(u8 viewPos, fx32 speed);
 
 // The gauges and the ball gauges
@@ -113,7 +114,7 @@ void BtlvEffect_SetVanish(u32 target, BOOL hide);
 // Turns a side of a rotation battle; mode 1 does nothing
 void BtlvEffect_StartRotation(u8 mode, u32 side, u32 arg2);
 void BtlvEffect_SwapPokemon(u8 pos1, u8 pos2);
-s32 BtlvEffect_GetTrainerIndex(u32 pos);
+s32 BtlvEffect_GetTrainerIndex(BtlvMcssPos pos);
 
 // The timer
 void BtlvEffect_CreateTimer(u16 gameLimitTime, u16 cmdLimitTime);

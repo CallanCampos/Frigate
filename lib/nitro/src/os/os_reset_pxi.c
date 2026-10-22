@@ -15,7 +15,7 @@ BOOL OS_IsResetOccurred(void) {
 }
 
 // The function that handles the words of the FIFO's OS tag
-void OSi_CommonCallback(u32 fifoTag, u32 data, BOOL err) {
+void OSi_CommonCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
     u16 command = (data & OS_PXI_COMMAND_MASK) >> OS_PXI_COMMAND_SHIFT;
 
     if (command == OS_PXI_COMMAND_RESET) {
@@ -29,7 +29,7 @@ void OSi_CommonCallback(u32 fifoTag, u32 data, BOOL err) {
 }
 
 // Sends the ARM7 a command, until the FIFO takes it
-void OSi_SendToPxi(u32 command) {
+void OSi_SendToPxi(u16 command) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_OS, command << OS_PXI_COMMAND_SHIFT, FALSE) != 0) {
     }
 }

@@ -21,34 +21,34 @@ static const u8 sTaskCounts[2] = { 0x80, 0x20 };
 
 static DWCUtilTaskList *sTaskLists;
 
-void DWCUtilTask_Init(void) {
+void DWCi_TSKlInit(void) {
     int i;
 
-    sTaskLists = DWCUtilHeap_AllocClear(sizeof(DWCUtilTaskList) * 2, 4);
+    sTaskLists = DWCi_HEAPlAllocEx(sizeof(DWCUtilTaskList) * 2, 4);
     for (i = 0; i < 2; i++) {
         int count = sTaskCounts[i];
 
         sTaskLists[i].count = count;
-        sTaskLists[i].tasks = DWCUtilHeap_AllocClear(count * sizeof(DWCUtilTask), 4);
-        sTaskLists[i].freeTasks = DWCUtilStack_CreateFilled(count, (u8 *)sTaskLists[i].tasks, sizeof(DWCUtilTask));
-        sTaskLists[i].removals = DWCUtilStack_Create(count);
-        sTaskLists[i].list = DWCUtilList_Create();
+        sTaskLists[i].tasks = DWCi_HEAPlAllocEx(count * sizeof(DWCUtilTask), 4);
+        sTaskLists[i].freeTasks = DWCi_QUElFormEx(count, (u8 *)sTaskLists[i].tasks, sizeof(DWCUtilTask));
+        sTaskLists[i].removals = DWCi_QUElForm(count);
+        sTaskLists[i].list = DWCi_LSTlForm();
         sTaskLists[i].head.priority = 0;
         sTaskLists[i].tail.priority = 0xff;
-        DWCUtilList_Prepend(sTaskLists[i].list, &sTaskLists[i].head);
-        DWCUtilList_Append(sTaskLists[i].list, &sTaskLists[i].tail);
+        DWCi_LSTlPushFront(sTaskLists[i].list, &sTaskLists[i].head);
+        DWCi_LSTlPushBack(sTaskLists[i].list, &sTaskLists[i].tail);
         sTaskLists[i].active = TRUE;
     }
 }
 
-void DWCUtilTask_Exit(void) {
+void DWCi_TSKlEnd(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        DWCUtilList_Destroy(sTaskLists[i].list);
-        DWCUtilStack_Destroy(sTaskLists[i].freeTasks);
+        DWCi_LSTlDelete(sTaskLists[i].list);
+        DWCi_QUElDelete(sTaskLists[i].freeTasks);
     }
-    DWCUtilHeap_FreeAndNull(&sTaskLists);
+    DWCi_HEAPlFree_(&sTaskLists);
 }
 
 void DWCUtilTask_Run(int list) {
@@ -60,21 +60,21 @@ void DWCUtilTask_Run(int list) {
             task->callback(task, task->arg);
         }
         for (i = 0; i < sTaskLists[list].count; i++) {
-            task = DWCUtilStack_Pop(sTaskLists[list].removals);
+            task = DWCi_QUElPopFront(sTaskLists[list].removals);
             if (task == NULL) {
                 break;
             }
-            DWCUtilTask_Destroy(list, task);
+            deleteTcb(list, task);
         }
     }
 }
 
-DWCUtilTask *DWCUtilTask_Create(int list, DWCUtilTaskCallback callback, void *arg, u8 priority) {
-    return DWCUtilTask_CreateEx(list, callback, arg, priority, FALSE);
+DWCUtilTask *DWCi_TSKlForm(int list, DWCUtilTaskCallback callback, void *arg, u8 priority) {
+    return formTask(list, callback, arg, priority, FALSE);
 }
 
-DWCUtilTask *DWCUtilTask_CreateEx(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg) {
-    DWCUtilTask *task = DWCUtilStack_Pop(sTaskLists[list].freeTasks);
+DWCUtilTask *formTask(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg) {
+    DWCUtilTask *task = DWCi_QUElPopFront(sTaskLists[list].freeTasks);
     DWCUtilTask *position;
     u32 irq;
 
@@ -86,7 +86,7 @@ DWCUtilTask *DWCUtilTask_CreateEx(int list, DWCUtilTaskCallback callback, void *
     position = sTaskLists[list].head.next;
     for (;;) {
         if (priority < position->priority) {
-            DWCUtilList_InsertBefore(position, task);
+            DWCi_LSTlInsert(position, task);
             break;
         }
         position = position->next;
@@ -95,26 +95,26 @@ DWCUtilTask *DWCUtilTask_CreateEx(int list, DWCUtilTaskCallback callback, void *
     return task;
 }
 
-void DWCUtilTask_SetCallback(DWCUtilTask *task, DWCUtilTaskCallback callback) {
+void DWCi_TSKlChangeFunc(DWCUtilTask *task, DWCUtilTaskCallback callback) {
     task->callback = callback;
 }
 
-void DWCUtilTask_QueueRemoval(int list, DWCUtilTask *task) {
-    DWCUtilStack_Push(sTaskLists[list].removals, task);
+void DWCi_TSKlDelete(int list, DWCUtilTask *task) {
+    DWCi_QUElPushBack(sTaskLists[list].removals, task);
 }
 
-void DWCUtilTask_Remove(int list, DWCUtilTask *task) {
-    DWCUtilTask_Destroy(list, task);
+void DWCi_TSKlDeleteEx(int list, DWCUtilTask *task) {
+    deleteTcb(list, task);
 }
 
-void DWCUtilTask_Destroy(int list, DWCUtilTask *task) {
+void deleteTcb(int list, DWCUtilTask *task) {
     if (task->freeArg) {
-        DWCUtilHeap_FreeAndNull(&task->arg);
+        DWCi_HEAPlFree_(&task->arg);
     }
-    DWCUtilList_Remove(task);
-    DWCUtilStack_Push(sTaskLists[list].freeTasks, task);
+    DWCi_LSTlErase(task);
+    DWCi_QUElPushBack(sTaskLists[list].freeTasks, task);
 }
 
-void DWCUtilTask_SetActive(int list, u8 active) {
+void DWCi_TSKlOperate(int list, u8 active) {
     sTaskLists[list].active = active;
 }

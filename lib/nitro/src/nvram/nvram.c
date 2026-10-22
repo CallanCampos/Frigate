@@ -91,7 +91,7 @@ static NVRAMWork sNvramWork;
 static u8 sNvramBuffer[NVRAM_BUFFER_SIZE] ATTRIBUTE_ALIGN(32);
 static NVRAMInitState sNvramInitState;
 
-static void func_02079944(u32 tag, u32 data, BOOL err);
+static void func_02079944(PXIFifoTag tag, u32 data, BOOL err);
 static void func_020792f4(u32 data, BOOL err);
 static void func_02079458(u32 data, BOOL err);
 static void func_020797d4(u32 data, BOOL err);
@@ -126,7 +126,7 @@ static inline void NVRAMi_SetAlarm(u32 pxiResult) {
 }
 
 void NVRAM_Init(void) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     enabled = OS_DisableInterrupts();
     if (sNvramInitState != NVRAM_INIT_NONE) {
@@ -152,7 +152,7 @@ void NVRAM_Init(void) {
 }
 
 NVRAMResult NVRAM_ReadDataBytesAsync(u32 address, u32 size, void *buf, NVRAMCallback callback, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (!func_02079930()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
@@ -207,7 +207,7 @@ NVRAMResult NVRAM_ReadDataBytes(u32 address, u32 size, void *buf) {
     OSMessageQueue queue;
     NVRAMResult result;
     OSMessage message[1];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (OS_GetCurrentThread() == NULL) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
@@ -235,7 +235,7 @@ NVRAMResult NVRAM_ReadDataBytes(u32 address, u32 size, void *buf) {
 }
 
 NVRAMResult NVRAM_WriteDataBytesAsync(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (!func_02079930()) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
@@ -398,7 +398,7 @@ NVRAMResult NVRAM_WriteDataBytes(u32 address, u32 size, const void *src) {
     OSMessageQueue queue;
     NVRAMResult result;
     OSMessage message[1];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (OS_GetCurrentThread() == NULL) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
@@ -426,7 +426,7 @@ NVRAMResult NVRAM_WriteDataBytes(u32 address, u32 size, const void *src) {
 }
 
 NVRAMResult NVRAM_VerifyDataBytesAsync(u32 address, u32 size, const void *src, NVRAMCallback callback, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
     u32 chunk;
 
     if (!func_02079930()) {
@@ -520,7 +520,7 @@ NVRAMResult NVRAM_VerifyDataBytes(u32 address, u32 size, const void *src) {
     OSMessageQueue queue;
     NVRAMResult result;
     OSMessage message[1];
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (OS_GetCurrentThread() == NULL) {
         return NVRAM_RESULT_ILLEGAL_STATUS;
@@ -556,7 +556,7 @@ static BOOL func_02079930(void) {
 }
 
 // Gets the ARM7's words with the NVRAM's tag, and hands them to the function of the call that runs
-static void func_02079944(u32 tag, u32 data, BOOL err) {
+static void func_02079944(PXIFifoTag tag, u32 data, BOOL err) {
     switch (sNvramWork.command) {
     case NVRAM_COMMAND_READ:
         func_020792f4(data, err);

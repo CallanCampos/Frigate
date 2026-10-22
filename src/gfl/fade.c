@@ -90,15 +90,15 @@ BOOL GFL_FadeIsRunning(void) {
 
 void GFL_FadeFlush(void) {
     if (sFadeMgr->mode & FADE_ENGINE_A_BLACK) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -sFadeMgr->brightness);
+        GX_SetMasterBrightness(-sFadeMgr->brightness);
     }
     if (sFadeMgr->mode & FADE_ENGINE_B_BLACK) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -sFadeMgr->brightness);
+        GXS_SetMasterBrightness(-sFadeMgr->brightness);
     }
     if (sFadeMgr->mode & FADE_ENGINE_A_WHITE) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, sFadeMgr->brightness);
+        GX_SetMasterBrightness(sFadeMgr->brightness);
     }
     if (sFadeMgr->mode & FADE_ENGINE_B_WHITE) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, sFadeMgr->brightness);
+        GXS_SetMasterBrightness(sFadeMgr->brightness);
     }
 }

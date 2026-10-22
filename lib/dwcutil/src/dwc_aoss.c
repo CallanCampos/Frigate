@@ -12,7 +12,9 @@
 // 22416 in three stages, each answered by the access point: the hello (0x1000), the security settings that it offers
 // (0x2000) and the end (0x3000). The packets are encrypted with RC4 under the id of the access point. It ends with the
 // keys of the network. The file also has the small network helpers that it works with; the Wi-Fi scan and connect are
-// in dwc_aoss_ap.c. The ROM names none of it; the names are ours.
+// in dwc_aoss_ap.c. The ROM names none of it; the names are
+// the DWC utility library's own, as that library's symbols and debug information have them, where the code shows them,
+// and ours elsewhere.
 //
 // MWCC 2.0 lays the statics out in the reverse of their definition order
 
@@ -50,40 +52,40 @@ typedef struct AossRecord {
 } AossRecord;
 
 // The header of a message
-typedef struct AossHeader {
-    u16 version; // 0x00: 1
+typedef struct tagASTSpktHeader {
+    u16 PktVersion; // 0x00: 1
     u16 unk_02;
     u16 unk_04;
-    u16 type; // 0x06: 0x1010 + 0x1000 for each stage
-    u16 unk_08;
-    u16 length;  // 0x0a: of the body
-    u16 flags;   // 0x0c: bit 4 says it is encrypted
-    s8 checksum; // 0x0e
-    u8 protocol; // 0x0f
-    u8 id[8];    // 0x10: of a client, 6 bytes of address and 2 of a number
-} AossHeader;
+    u16 cmd; // 0x06: 0x1010 + 0x1000 for each stage
+    u16 type;
+    u16 size;      // 0x0a: of the body
+    u16 CryptType; // 0x0c: bit 4 says it is encrypted
+    s8 crc8;       // 0x0e
+    u8 Fragment;   // 0x0f
+    u8 SeqID[8];   // 0x10: of a client, 6 bytes of address and 2 of a number
+} tagASTSpktHeader;
 
 // A record with a status
-typedef struct AossStatusRecord {
+typedef struct tagASTSpktResult {
     u8 type;
     u8 reserved;
     u16 length; // big endian
-    s32 status; // big endian
-} AossStatusRecord;
+    s32 Result; // big endian
+} tagASTSpktResult;
 
 // The body of an encrypted message
-typedef struct AossEncrypted {
-    u16 length; // big endian, of the data
+typedef struct tagASTSpktCryptData {
+    u16 size; // big endian, of the data
     u8 iv[2];
-    u8 data[1];
-} AossEncrypted;
+    u8 Data[1];
+} tagASTSpktCryptData;
 
 typedef struct AossPacket {
     int sock;
     int length;
     int unk_08;
-    AossHeader header;
-    u8 body[AOSS_PACKET_SIZE - sizeof(AossHeader)];
+    tagASTSpktHeader header;
+    u8 body[AOSS_PACKET_SIZE - sizeof(tagASTSpktHeader)];
 } AossPacket;
 
 // What the hello has: two names and a number
@@ -94,33 +96,33 @@ typedef struct AossHello {
 } AossHello;
 
 // The hello's fields (see AossHello) take the first three buffers, and the keys of the stages the next ones
-typedef struct AossSession {
-    u8 buffer[5][0x80];
-} AossSession;
+typedef struct PRODUCT_INFO_AOSS {
+    u8 ProductInfo[5][0x80];
+} PRODUCT_INFO_AOSS;
 
-typedef struct AossWepInfo {
-    u32 unk_00;
-    u32 keyLength;
-    char ssid[0x28];
-    u8 key[4][0x40];
-} AossWepInfo;
+typedef struct ASTS_DATA_WEP {
+    u32 Enable;
+    u32 KeyLen;
+    char SSID[0x28];
+    u8 Data[4][0x40];
+} ASTS_DATA_WEP;
 
-typedef struct AossPskInfo {
-    u32 unk_00;
-    u32 keyLength;
-    char ssid[0x28];
-    u8 key[0x40];
-} AossPskInfo;
+typedef struct ASTS_DATA_AES {
+    u32 Enable;
+    u32 KeyLen;
+    char SSID[0x28];
+    u8 Data[0x40];
+} ASTS_DATA_AES;
 
-typedef struct AossApInfo {
-    u32 unk_00;
-    u32 unk_04;
-    AossWepInfo wep40;
-    AossWepInfo wep104;
-    AossPskInfo tkip;
-    AossPskInfo aes;
-    u32 unk_348[2];
-} AossApInfo;
+typedef struct ASTS_DATA_INFO {
+    u32 ReNew;
+    u32 EncryptLevel;
+    ASTS_DATA_WEP WepData_40;
+    ASTS_DATA_WEP WepData_104;
+    ASTS_DATA_AES TkipData;
+    ASTS_DATA_AES AesData;
+    u32 BSSID[2];
+} ASTS_DATA_INFO;
 
 // The request that is run
 typedef struct AossRequest {
@@ -147,10 +149,10 @@ typedef struct AossWork {
     AossRequest request; // 0x24
 } AossWork;
 
-typedef struct AossRetry {
+typedef struct RETRY_VAL {
     s16 count;
-    s16 delay;
-} AossRetry;
+    s16 time;
+} RETRY_VAL;
 
 typedef struct AossEndpoints {
     u32 router;
@@ -165,111 +167,115 @@ typedef struct RC4Context {
     u32 n;
 } RC4Context;
 
-typedef struct SocTimeval {
-    int sec;
-    int usec;
-} SocTimeval;
+typedef struct AOSS_timeval {
+    int tv_sec;
+    int tv_usec;
+} AOSS_timeval;
 
-static void *Aoss_Alloc(u32 size);
-static void Aoss_Free(void *ptr);
-static int Aoss_Run(AossParam *param);
-static u32 Aoss_NextAddress(u32 addr, u32 netmask);
-static void Aoss_ReleaseBuffers(void);
-static void Aoss_Begin(AossParam *param);
-static void Aoss_SetError(int error);
-static int Aoss_GetError(void);
-static int Aoss_StoreResult(AossParam *param);
-static int Aoss_IsPrintable(const u8 *text, int length);
-static int Aoss_CheckScan(const WifiScanList *list);
-static int Aoss_InitTarget(WifiConnectParam *target);
-static void Aoss_MakeIds(int count, u8 *ids, const u8 *mac);
-static int Aoss_SetMode(int mode);
-static int Aoss_ProcessPacket(int state, AossPacket *packet, int *errors, const u8 *ids, int sock);
-static int Aoss_OnStage0(int state, AossPacket *packet, int *errors, const u8 *ids);
-static int Aoss_OnStage1(int state, AossPacket *packet, int *errors, const u8 *ids);
-static int Aoss_OnStage2(int state, AossPacket *packet, int *errors, const u8 *ids);
-static int Aoss_DecodePacket(AossHeader *header);
-static int Aoss_CheckPeer(int type, const u8 *id);
-static int Aoss_CheckIds(const u8 *expected, u8 *received);
-static int Aoss_ParseHello(const AossItem *items, AossHello *hello);
-static u32 Aoss_ReadLe(const u8 *data, int length);
-static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info);
-static int Aoss_ParsePsk(const AossRecord *record, AossPskInfo *info);
-static int Aoss_ParseKey(const AossRecord *record, u8 *key);
-static int Aoss_ParseSecurity(int slot, const AossRecord *record, int length, AossApInfo *slots, AossSession *session);
-static int Aoss_IsEncrypted(int flags);
-static int Aoss_Send(int state, const AossEndpoints *endpoints, const u8 *ids, int sock);
-static int Aoss_SendStage0(const AossEndpoints *endpoints, const u8 *ids, int sock);
-static int Aoss_SendStage1(const AossEndpoints *endpoints, const u8 *ids, int sock);
-static int Aoss_SendStage2(const AossEndpoints *endpoints, const u8 *ids, int sock);
-static s16 Aoss_BuildHello(u8 *buffer);
-static void Aoss_BuildPayload(int encrypt, u8 *dest, const u8 *src, s16 *length, s16 *flags, s8 *checksum);
-static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags, s8 checksum, s8 protocol,
-                             const u8 *id);
-static int Aoss_SendPacket(void *buffer, int length, int toAll, int sock);
-static int Aoss_Encrypt(const u8 *in, u8 *out, u32 length, u8 *checksum, u8 *iv, const u8 *key, u32 keyLength);
-static int Aoss_Decrypt(const u8 *in, u8 *out, u32 length, u8 checksum, const u8 *iv, const u8 *key, u32 keyLength);
-static void Rc4_Init(RC4Context *context, const u8 *key, u32 keyLength, u32 n);
-static void Rc4_Crypt(RC4Context *context, u8 *out, const u8 *in, u32 length);
-static u32 Rc4_Next(RC4Context *context);
-static u8 Aoss_Checksum(const u8 *data, int length);
-static u32 Crc32_Update(u32 crc, const u8 *data, int length, int ready, u32 *table);
-static void Crc32_MakeTable(int ready, u32 *table);
-static int Aoss_Scramble(u8 *block, int length, const char *key, int keyLength);
-static void Aoss_ScrambleKey(int round, char *out, int length, const char *key, int keyLength);
-static void Aoss_ScrambleXor(const char *mask, u8 *block, int length);
-static void Aoss_ScrambleSwap(u8 *block, int length, u8 *work);
-static void *Soc_Alloc(u32 name, s32 size);
-static void Soc_Free(u32 name, void *ptr, s32 size);
-static int Net_Start(u32 addr, u32 netmask, u32 gateway);
-static int Net_Stop(void);
-static int Mem_Compare(const u8 *a, const u8 *b, int size);
-static void Mem_Copy(void *dest, const void *src, u32 size);
-static void Mem_Fill(void *dest, int value, u32 size);
-static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength);
-static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptFds, const SocTimeval *timeout);
-static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength);
-static int Net_SetSockOpt(int sock, int level, int name, const void *value, int length);
-static int Net_Socket(int domain, int type, int protocol);
-static int Net_Bind(int sock, SocAddrIn *address, int length);
-static int Net_Close(int sock);
-static u32 Net_Htonl(u32 value);
-static u32 Net_Htons(u16 value);
-static u32 Net_Ntohl(u32 value);
-static u32 Net_Ntohs(u16 value);
-static u32 Str_Length(const char *text);
-static u16 Aoss_Rand(void);
-static void Net_PollInit(SocPollFd *fd);
-static void Net_PollSet(int sock, SocPollFd *fd);
+static void *AOSS_MALLOC(u32 size);
+static void AOSS_FREE(void *ptr);
+static int AOSS_Init_old(AOSS_INFO *param);
+static u32 aoss_IP_sta(u32 addr, u32 netmask);
+static void aoss_release(void);
+static void aoss_data_init(AOSS_INFO *param);
+static void aoss_set_error(int error);
+static int aoss_get_error(void);
+static int AOSS_seq_data_copy(AOSS_INFO *param);
+static int aoss_check_str(const u8 *text, int length);
+static int checkAP(const WLLA_BSS_LIST *list);
+static int AOSS_set_APInfo(WLLA_CONNECT_PARAM *target);
+static void MakeSendSeqID(int count, u8 *ids, const u8 *mac);
+static int AOSS_StatusExclusion(int mode);
+static int RecvMessage(int state, AossPacket *packet, int *errors, const u8 *ids, int sock);
+static int AstsSetInitRes(int state, AossPacket *packet, int *errors, const u8 *ids);
+static int AstsSetSecureRes(int state, AossPacket *packet, int *errors, const u8 *ids);
+static int AstsRestartRes(int state, AossPacket *packet, int *errors, const u8 *ids);
+static int DecodePacket(tagASTSpktHeader *header);
+static int CheckSeqID(int type, const u8 *id);
+static int CheckRecvSeqID(const u8 *expected, u8 *received);
+static int GetProductInfo(const AossItem *items, AossHello *hello);
+static u32 aoss_get_bin(const u8 *data, int length);
+static int GetWEPData(const AossRecord *record, ASTS_DATA_WEP *info);
+static int GetWPAData(const AossRecord *record, ASTS_DATA_AES *info);
+static int GetBssidData(const AossRecord *record, u8 *key);
+static int GetSecurityData(int slot, const AossRecord *record, int length, ASTS_DATA_INFO *slots,
+                           PRODUCT_INFO_AOSS *session);
+static int GetSecurityType(int flags);
+static int SendMessage(int state, const AossEndpoints *endpoints, const u8 *ids, int sock);
+static int AstsSetInitReq(const AossEndpoints *endpoints, const u8 *ids, int sock);
+static int AstsSetSecureReq(const AossEndpoints *endpoints, const u8 *ids, int sock);
+static int AstsRestartReq(const AossEndpoints *endpoints, const u8 *ids, int sock);
+static s16 SetStaData(u8 *buffer);
+static void PacketDataSet(int encrypt, u8 *dest, const u8 *src, s16 *length, s16 *flags, s8 *checksum);
+static void SetPacketHeader(tagASTSpktHeader *header, int type, int length, int flags, s8 checksum, s8 protocol,
+                            const u8 *id);
+static int SendPacketUDP(void *buffer, int length, int toAll, int sock);
+static int EncodeRC4(const u8 *in, u8 *out, u32 length, u8 *checksum, u8 *iv, const u8 *key, u32 keyLength);
+static int DecodeRC4(const u8 *in, u8 *out, u32 length, u8 checksum, const u8 *iv, const u8 *key, u32 keyLength);
+static void RC4init(RC4Context *context, const u8 *key, u32 keyLength, u32 n);
+static void RC4encrypt(RC4Context *context, u8 *out, const u8 *in, u32 length);
+static u32 arcfour_byte(RC4Context *context);
+static u8 crc(const u8 *data, int length);
+static u32 update_crc(u32 crc, const u8 *data, int length, int ready, u32 *table);
+static void make_crc_table(int ready, u32 *table);
+static int CryptSeqNo(u8 *block, int length, const char *key, int keyLength);
+static void MakeKey(int round, char *out, int length, const char *key, int keyLength);
+static void AddKey(const char *mask, u8 *block, int length);
+static void Rotate(u8 *block, int length, u8 *work);
+static void *Alloc(u32 name, s32 size);
+static void Free(u32 name, void *ptr, s32 size);
+static int AOSS_SetIPAddr(u32 addr, u32 netmask, u32 gateway);
+static int AOSS_Disconnect(void);
+static int AOSS_Memcmp(const u8 *a, const u8 *b, int size);
+static void AOSS_Memcpy(void *dest, const void *src, u32 size);
+static void AOSS_Memset(void *dest, int value, u32 size);
+static int AOSS_Recvfrom(int sock, void *buffer, int size, int flags, SOCSockAddrIn *from, int *fromLength);
+static int AOSS_Select(int count, SOCPollFD *readFds, void *writeFds, void *exceptFds, const AOSS_timeval *timeout);
+static int AOSS_Sendto(int sock, const void *buffer, int size, int flags, SOCSockAddrIn *to, int toLength);
+static int AOSS_Setsockopt(int sock, int level, int name, const void *value, int length);
+static int AOSS_Socket(int domain, int type, int protocol);
+static int AOSS_Bind(int sock, SOCSockAddrIn *address, int length);
+static int AOSS_Close(int sock);
+static u32 AOSS_Htonl(u32 value);
+static u32 AOSS_Htons(u16 value);
+static u32 AOSS_Ntohl(u32 value);
+static u32 AOSS_Ntohs(u16 value);
+static u32 AOSS_Strlen(const char *text);
+static u16 AOSS_Rand(void);
+static void AOSS_FD_ZERO(SOCPollFD *fd);
+static void AOSS_FD_SET(int sock, SOCPollFD *fd);
 
 static u8 sRecordType[3] = { 9, 8, 0 };
 static struct {
     int socket;
     int mode;
 } sNet = { -1, -1 };
-static SocConfig sSocConfig = { 0x01000000, Soc_Alloc, Soc_Free, 0, 0, 0, 0, 0, 0, 0x1000, 0x1000 };
+static SOCConfig sSocConfig = {
+    SOC_VENDOR_NINTENDO, SOC_VERSION, Alloc, Free, 0, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, 0x1000, 0x1000,
+};
 
 static u8 sCipherKey[0x78];
 static u8 sPeerMac[8];
-static AossApInfo sApInfo[2];
+static ASTS_DATA_INFO sApInfo[2];
 static u32 sCrcTable[256];
-static AossSession sSession;
+static PRODUCT_INFO_AOSS sSession;
 static AossWork sAoss;
 
-static void *Aoss_Alloc(u32 size) {
+static void *AOSS_MALLOC(u32 size) {
     return gAossApAlloc(size);
 }
 
-static void Aoss_Free(void *ptr) {
+static void AOSS_FREE(void *ptr) {
     gAossApFree(ptr);
 }
 
-int DWC_Aoss_Start(AossParam *param) {
+int AOSSi_Init(AOSS_INFO *param) {
     int result;
 
-    if (param->scanCount == 0 || param->scanCount < -1 || param->scanDelay < -1 || param->sendCount == 0 ||
-        param->sendCount < -1 || param->sendDelay < -1 || param->timeout < -1 || param->client.length == 0 ||
-        param->client.length > 0x100 || param->client.data[param->client.length - 1] != 0) {
+    if (param->retryCount_Scan == 0 || param->retryCount_Scan < -1 || param->retryInterval_Scan < -1 ||
+        param->retryCount_Comu == 0 || param->retryCount_Comu < -1 || param->retryInterval_Comu < -1 ||
+        param->selectInterval < -1 || param->productInfo.dataLen == 0 || param->productInfo.dataLen > 0x100 ||
+        param->productInfo.productName[param->productInfo.dataLen - 1] != 0) {
         result = -1;
     } else {
         result = 0;
@@ -278,39 +284,39 @@ int DWC_Aoss_Start(AossParam *param) {
         result = -1;
     }
     if (result == -1) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    sAoss.packet = Aoss_Alloc(AOSS_BUFFER_SIZE);
+    sAoss.packet = AOSS_MALLOC(AOSS_BUFFER_SIZE);
     if (sAoss.packet == NULL) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    Aoss_SetMode(-1);
-    result = Aoss_Run(param);
-    Aoss_Free(sAoss.packet);
-    Aoss_ReleaseBuffers();
+    AOSS_StatusExclusion(-1);
+    result = AOSS_Init_old(param);
+    AOSS_FREE(sAoss.packet);
+    aoss_release();
     if (sNet.socket != -1) {
-        Net_Close(sNet.socket);
+        AOSS_Close(sNet.socket);
     }
     return result;
 }
 
-static int Aoss_Run(AossParam *param) {
+static int AOSS_Init_old(AOSS_INFO *param) {
     u8 ids[3][8];
-    WifiConnectParam target;
+    WLLA_CONNECT_PARAM target;
     AossEndpoints endpoints;
-    AossRetry scan = { -1, -1 };
-    AossRetry send = { 0, 0 };
+    RETRY_VAL scan = { -1, -1 };
+    RETRY_VAL send = { 0, 0 };
     int option = 1;
     int sends = 0;
-    SocAddrIn from;
+    SOCSockAddrIn from;
     int fromLength;
-    SocPollFd pollFd;
-    SocTimeval timeval;
-    SocAddrIn addr;
+    SOCPollFD pollFd;
+    AOSS_timeval timeval;
+    SOCSockAddrIn addr;
     int scanResult;
     int state = 0;
     int newState;
@@ -322,129 +328,129 @@ static int Aoss_Run(AossParam *param) {
     int ret;
     s16 i;
 
-    Mem_Fill(ids, state, sizeof(ids));
-    scan.count = param->scanCount;
+    AOSS_Memset(ids, state, sizeof(ids));
+    scan.count = param->retryCount_Scan;
     if (scan.count == -1) {
         scan.count = 10;
     }
-    send.count = param->sendCount;
+    send.count = param->retryCount_Comu;
     if (send.count == -1) {
         send.count = 10;
     }
-    scan.delay = param->scanDelay;
-    if (scan.delay == -1) {
-        scan.delay = 100;
+    scan.time = param->retryInterval_Scan;
+    if (scan.time == -1) {
+        scan.time = 100;
     }
-    send.delay = param->sendDelay;
-    if (send.delay == -1) {
-        send.delay = 100;
+    send.time = param->retryInterval_Comu;
+    if (send.time == -1) {
+        send.time = 100;
     }
-    timeout = param->timeout;
+    timeout = param->selectInterval;
     if (timeout == -1) {
         timeout = 2000;
     }
-    Aoss_Begin(param);
+    aoss_data_init(param);
     if ((sAoss.request.wanted & AOSS_TYPE_WEP40) != 1) {
-        Aoss_SetError(0x13);
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+        aoss_set_error(0x13);
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
 
     i = 0;
-    Aoss_SetMode(0);
+    AOSS_StatusExclusion(0);
     while (1) {
         if (sAoss.scanList != NULL) {
-            Aoss_Free(sAoss.scanList);
+            AOSS_FREE(sAoss.scanList);
             sAoss.scanList = NULL;
         }
-        if (AossAp_Scan((WifiScanList **)&sAoss.scanList) == -1) {
-            param->error = 0xf;
-            Aoss_ReleaseBuffers();
+        if (AOSSi_WLANGetBSSList((WLLA_BSS_LIST **)&sAoss.scanList) == -1) {
+            param->aossResult = 0xf;
+            aoss_release();
             return -1;
         }
-        ret = Aoss_CheckScan(sAoss.scanList);
+        ret = checkAP(sAoss.scanList);
         if (ret == 4) {
-            param->error = 2;
-            Aoss_ReleaseBuffers();
+            param->aossResult = 2;
+            aoss_release();
             return -1;
         }
         if (ret == 0) {
             break;
         }
         if (i >= scan.count) {
-            param->error = 1;
-            Aoss_ReleaseBuffers();
+            param->aossResult = 1;
+            aoss_release();
             return -1;
         }
-        AossAp_Sleep(scan.delay);
+        AOSSi_Sleep(scan.time);
         i++;
     }
 
-    Aoss_SetMode(1);
-    Mem_Fill(&target, 0, sizeof(target));
-    if (Aoss_InitTarget(&target) != 0) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+    AOSS_StatusExclusion(1);
+    AOSS_Memset(&target, 0, sizeof(target));
+    if (AOSS_set_APInfo(&target) != 0) {
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    sAoss.apInfo = Aoss_Alloc(sizeof(WifiConnectResult));
+    sAoss.apInfo = AOSS_MALLOC(sizeof(WLLA_LINK_STAT));
     if (sAoss.apInfo == NULL) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    Mem_Fill(sAoss.apInfo, 0, sizeof(WifiConnectResult));
+    AOSS_Memset(sAoss.apInfo, 0, sizeof(WLLA_LINK_STAT));
     for (i = 0; i < scan.count; i++) {
-        ret = AossAp_Connect(&target, sAoss.apInfo);
+        ret = AOSSi_WLANConnect(&target, sAoss.apInfo);
         if (ret == -1) {
-            param->error = 0xf;
-            Aoss_ReleaseBuffers();
+            param->aossResult = 0xf;
+            aoss_release();
             return -1;
         }
-        if (ret == 0 && ((WifiConnectResult *)sAoss.apInfo)->success == 1) {
+        if (ret == 0 && ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
             break;
         }
-        AossAp_Sleep(scan.delay);
+        AOSSi_Sleep(scan.time);
     }
     if (i == scan.count) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    if (Net_Start(AOSS_CLIENT_ADDR, ~0xff, AOSS_CLIENT_ADDR) != 0) {
-        Aoss_SetError(0xc);
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+    if (AOSS_SetIPAddr(AOSS_CLIENT_ADDR, ~0xff, AOSS_CLIENT_ADDR) != 0) {
+        aoss_set_error(0xc);
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    Aoss_ReleaseBuffers();
-    Aoss_MakeIds(3, ids[0], param->mac);
-    sNet.socket = Net_Socket(2, 2, 0);
+    aoss_release();
+    MakeSendSeqID(3, ids[0], param->macAddress);
+    sNet.socket = AOSS_Socket(2, 2, 0);
     if (sNet.socket < 0) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    if (Net_SetSockOpt(sNet.socket, 0xffff, 1, &option, 4) < 0) {
-        Aoss_SetError(0xb);
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+    if (AOSS_Setsockopt(sNet.socket, 0xffff, 1, &option, 4) < 0) {
+        aoss_set_error(0xb);
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
-    Mem_Fill(&addr, 0, sizeof(addr));
+    AOSS_Memset(&addr, 0, sizeof(addr));
     addr.family = 2;
-    addr.addr = Net_Htonl(AOSS_CLIENT_ADDR);
-    addr.port = Net_Htons(AOSS_PORT);
-    if (Net_Bind(sNet.socket, &addr, 8) < 0) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+    addr.addr.addr = AOSS_Htonl(AOSS_CLIENT_ADDR);
+    addr.port = AOSS_Htons(AOSS_PORT);
+    if (AOSS_Bind(sNet.socket, &addr, 8) < 0) {
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
 
     while (1) {
         packet = sAoss.packet;
-        Mem_Fill(&endpoints, 0, sizeof(endpoints));
+        AOSS_Memset(&endpoints, 0, sizeof(endpoints));
         endpoints.client = AOSS_CLIENT_ADDR;
         endpoints.router = AOSS_ROUTER_ADDR;
         sec = timeout / 1000;
@@ -452,141 +458,141 @@ static int Aoss_Run(AossParam *param) {
         while (1) {
             if (state == 1 && sAoss.request.reconnected != 1) {
                 if (sNet.socket != -1) {
-                    Net_Close(sNet.socket);
+                    AOSS_Close(sNet.socket);
                 }
                 sNet.socket = -1;
-                if (Net_Stop() != 0) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                if (AOSS_Disconnect() != 0) {
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                sAoss.scanList = Aoss_Alloc(sizeof(WifiConnectResult));
+                sAoss.scanList = AOSS_MALLOC(sizeof(WLLA_LINK_STAT));
                 if (sAoss.scanList == NULL) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
                 while (1) {
                     if (sAoss.scanList != NULL) {
-                        Aoss_Free(sAoss.scanList);
+                        AOSS_FREE(sAoss.scanList);
                         sAoss.scanList = NULL;
                     }
-                    scanResult = AossAp_Scan((WifiScanList **)&sAoss.scanList);
+                    scanResult = AOSSi_WLANGetBSSList((WLLA_BSS_LIST **)&sAoss.scanList);
                     if (scanResult == -1) {
-                        param->error = 0xf;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 0xf;
+                        aoss_release();
                         return -1;
                     }
-                    ret = Aoss_CheckScan(sAoss.scanList);
+                    ret = checkAP(sAoss.scanList);
                     if (ret == 4) {
-                        param->error = 2;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 2;
+                        aoss_release();
                         return -1;
                     }
                     if (ret == 0) {
                         break;
                     }
                     if (i >= scan.count) {
-                        param->error = 1;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 1;
+                        aoss_release();
                         return -1;
                     }
-                    AossAp_Sleep(scan.delay);
+                    AOSSi_Sleep(scan.time);
                     i++;
                 }
                 if (scanResult == -1) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                sAoss.apInfo = Aoss_Alloc(sizeof(WifiConnectResult));
+                sAoss.apInfo = AOSS_MALLOC(sizeof(WLLA_LINK_STAT));
                 if (sAoss.apInfo == NULL) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                Mem_Fill(sAoss.apInfo, 0, sizeof(WifiConnectResult));
+                AOSS_Memset(sAoss.apInfo, 0, sizeof(WLLA_LINK_STAT));
                 for (i = 0; i < scan.count; i++) {
-                    ret = AossAp_Connect(&target, sAoss.apInfo);
+                    ret = AOSSi_WLANConnect(&target, sAoss.apInfo);
                     if (ret == -1) {
-                        param->error = 0xf;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 0xf;
+                        aoss_release();
                         return -1;
                     }
-                    if (ret == 0 && ((WifiConnectResult *)sAoss.apInfo)->success == 1) {
+                    if (ret == 0 && ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
                         break;
                     }
-                    AossAp_Sleep(scan.delay);
+                    AOSSi_Sleep(scan.time);
                 }
                 if (i == scan.count) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                ip = Aoss_NextAddress(sAoss.request.addr, sAoss.request.netmask);
-                if (Net_Start(ip, sAoss.request.netmask, ip) != 0) {
-                    Aoss_SetError(0xc);
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                ip = aoss_IP_sta(sAoss.request.addr, sAoss.request.netmask);
+                if (AOSS_SetIPAddr(ip, sAoss.request.netmask, ip) != 0) {
+                    aoss_set_error(0xc);
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
                 sAoss.request.reconnected = 1;
-                Aoss_ReleaseBuffers();
-                sNet.socket = Net_Socket(2, 2, 0);
+                aoss_release();
+                sNet.socket = AOSS_Socket(2, 2, 0);
                 if (sNet.socket < 0) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                if (Net_SetSockOpt(sNet.socket, 0xffff, 1, &option, 4) < 0) {
-                    Aoss_SetError(0xb);
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                if (AOSS_Setsockopt(sNet.socket, 0xffff, 1, &option, 4) < 0) {
+                    aoss_set_error(0xb);
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                Mem_Fill(&addr, 0, sizeof(addr));
+                AOSS_Memset(&addr, 0, sizeof(addr));
                 addr.family = 2;
-                addr.addr = Net_Htonl(ip);
-                addr.port = Net_Htons(AOSS_PORT);
-                if (Net_Bind(sNet.socket, &addr, 8) < 0) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                addr.addr.addr = AOSS_Htonl(ip);
+                addr.port = AOSS_Htons(AOSS_PORT);
+                if (AOSS_Bind(sNet.socket, &addr, 8) < 0) {
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
             }
 
-            if (Aoss_Send(state, &endpoints, ids[0], sNet.socket) == -1) {
-                Aoss_SetError(0x1000 + state);
-                param->error = 0xf;
-                Aoss_ReleaseBuffers();
+            if (SendMessage(state, &endpoints, ids[0], sNet.socket) == -1) {
+                aoss_set_error(0x1000 + state);
+                param->aossResult = 0xf;
+                aoss_release();
                 return -1;
             }
-            Mem_Fill(packet, 0, AOSS_BUFFER_SIZE);
-            Net_PollInit(&pollFd);
-            Net_PollSet(sNet.socket, &pollFd);
-            timeval.sec = sec;
-            timeval.usec = usec;
-            if (Net_Poll(sNet.socket + 1, &pollFd, NULL, NULL, &timeval) <= 0) {
+            AOSS_Memset(packet, 0, AOSS_BUFFER_SIZE);
+            AOSS_FD_ZERO(&pollFd);
+            AOSS_FD_SET(sNet.socket, &pollFd);
+            timeval.tv_sec = sec;
+            timeval.tv_usec = usec;
+            if (AOSS_Select(sNet.socket + 1, &pollFd, NULL, NULL, &timeval) <= 0) {
                 sends++;
                 if (sends > send.count) {
                     if (state == 0) {
-                        Aoss_SetError(0xf);
+                        aoss_set_error(0xf);
                     } else if (state == 1) {
-                        Aoss_SetError(0x10);
+                        aoss_set_error(0x10);
                     } else {
-                        Aoss_SetError(0x11);
+                        aoss_set_error(0x11);
                     }
                     ret = -1;
                     goto done;
                 }
-                AossAp_Sleep(send.delay);
+                AOSSi_Sleep(send.time);
                 continue;
             }
             fromLength = 8;
             packet->sock = sNet.socket;
             packet->length =
-                Net_Ntohs(Net_RecvFrom(sNet.socket, &packet->header, AOSS_PACKET_SIZE, 0, &from, &fromLength));
-            newState = Aoss_ProcessPacket(state, packet, &sends, ids[0], sNet.socket);
+                AOSS_Ntohs(AOSS_Recvfrom(sNet.socket, &packet->header, AOSS_PACKET_SIZE, 0, &from, &fromLength));
+            newState = RecvMessage(state, packet, &sends, ids[0], sNet.socket);
             if (newState == 100) {
                 ret = 0;
                 goto done;
@@ -598,108 +604,108 @@ static int Aoss_Run(AossParam *param) {
             if (state == newState) {
                 if (sends > send.count) {
                     if (newState == 0) {
-                        Aoss_SetError(0xf);
+                        aoss_set_error(0xf);
                     } else if (newState == 1) {
-                        Aoss_SetError(0x10);
+                        aoss_set_error(0x10);
                     } else {
-                        Aoss_SetError(0x11);
+                        aoss_set_error(0x11);
                     }
                     ret = -1;
                     goto done;
                 }
-                AossAp_Sleep(send.delay);
+                AOSSi_Sleep(send.time);
                 break;
             }
             if (newState == 2) {
                 if (sNet.socket != -1) {
-                    Net_Close(sNet.socket);
+                    AOSS_Close(sNet.socket);
                 }
                 sNet.socket = -1;
-                if (Net_Stop() != 0) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                if (AOSS_Disconnect() != 0) {
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
                 i = 0;
-                Aoss_SetMode(4);
+                AOSS_StatusExclusion(4);
                 while (1) {
                     if (sAoss.scanList != NULL) {
-                        Aoss_Free(sAoss.scanList);
+                        AOSS_FREE(sAoss.scanList);
                         sAoss.scanList = NULL;
                     }
-                    scanResult = AossAp_Scan((WifiScanList **)&sAoss.scanList);
+                    scanResult = AOSSi_WLANGetBSSList((WLLA_BSS_LIST **)&sAoss.scanList);
                     if (scanResult == -1) {
-                        param->error = 0xf;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 0xf;
+                        aoss_release();
                         return -1;
                     }
-                    ret = Aoss_CheckScan(sAoss.scanList);
+                    ret = checkAP(sAoss.scanList);
                     if (ret == 4) {
-                        param->error = 2;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 2;
+                        aoss_release();
                         return -1;
                     }
                     if (ret == 0) {
                         break;
                     }
                     if (i >= scan.count) {
-                        param->error = 1;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 1;
+                        aoss_release();
                         return -1;
                     }
-                    AossAp_Sleep(scan.delay);
+                    AOSSi_Sleep(scan.time);
                     i++;
                 }
-                sAoss.apInfo = Aoss_Alloc(sizeof(WifiConnectResult));
+                sAoss.apInfo = AOSS_MALLOC(sizeof(WLLA_LINK_STAT));
                 if (sAoss.apInfo == NULL) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                Mem_Fill(sAoss.apInfo, 0, sizeof(WifiConnectResult));
+                AOSS_Memset(sAoss.apInfo, 0, sizeof(WLLA_LINK_STAT));
                 for (i = 0; i < scan.count; i++) {
-                    ret = AossAp_Connect(&target, sAoss.apInfo);
+                    ret = AOSSi_WLANConnect(&target, sAoss.apInfo);
                     if (ret == -1) {
-                        param->error = 0xf;
-                        Aoss_ReleaseBuffers();
+                        param->aossResult = 0xf;
+                        aoss_release();
                         return -1;
                     }
-                    if (ret == 0 && ((WifiConnectResult *)sAoss.apInfo)->success == 1) {
+                    if (ret == 0 && ((WLLA_LINK_STAT *)sAoss.apInfo)->LinkStat == 1) {
                         break;
                     }
-                    AossAp_Sleep(scan.delay);
+                    AOSSi_Sleep(scan.time);
                 }
                 if (i == scan.count) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                if (Net_Start(ip, sAoss.request.netmask, ip) != 0) {
-                    Aoss_SetError(0xc);
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                if (AOSS_SetIPAddr(ip, sAoss.request.netmask, ip) != 0) {
+                    aoss_set_error(0xc);
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                Aoss_ReleaseBuffers();
-                sNet.socket = Net_Socket(2, 2, 0);
+                aoss_release();
+                sNet.socket = AOSS_Socket(2, 2, 0);
                 if (sNet.socket < 0) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                if (Net_SetSockOpt(sNet.socket, 0xffff, 1, &option, 4) < 0) {
-                    Aoss_SetError(0xb);
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                if (AOSS_Setsockopt(sNet.socket, 0xffff, 1, &option, 4) < 0) {
+                    aoss_set_error(0xb);
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
-                Mem_Fill(&addr, 0, sizeof(addr));
+                AOSS_Memset(&addr, 0, sizeof(addr));
                 addr.family = 2;
-                addr.addr = Net_Htonl(ip);
-                addr.port = Net_Htons(AOSS_PORT);
-                if (Net_Bind(sNet.socket, &addr, 8) < 0) {
-                    param->error = 0xf;
-                    Aoss_ReleaseBuffers();
+                addr.addr.addr = AOSS_Htonl(ip);
+                addr.port = AOSS_Htons(AOSS_PORT);
+                if (AOSS_Bind(sNet.socket, &addr, 8) < 0) {
+                    param->aossResult = 0xf;
+                    aoss_release();
                     return -1;
                 }
             }
@@ -710,18 +716,18 @@ static int Aoss_Run(AossParam *param) {
 
 done:
     if (sNet.socket != -1) {
-        Net_Close(sNet.socket);
+        AOSS_Close(sNet.socket);
     }
     sNet.socket = -1;
-    if (Net_Stop() != 0) {
-        param->error = 0xf;
-        Aoss_ReleaseBuffers();
+    if (AOSS_Disconnect() != 0) {
+        param->aossResult = 0xf;
+        aoss_release();
         return -1;
     }
     if (ret != 0) {
         u8 error;
 
-        switch (Aoss_GetError()) {
+        switch (aoss_get_error()) {
         case 0xf:
             error = 3;
             break;
@@ -741,20 +747,20 @@ done:
             error = 0xf;
             break;
         }
-        param->error = error;
-        Aoss_ReleaseBuffers();
+        param->aossResult = error;
+        aoss_release();
         return -1;
     }
-    if (Aoss_StoreResult(param) != 0) {
-        param->error = 6;
-        Aoss_ReleaseBuffers();
+    if (AOSS_seq_data_copy(param) != 0) {
+        param->aossResult = 6;
+        aoss_release();
         return -1;
     }
     return 0;
 }
 
 // The first address after addr in its subnet, or the first one if that is the last
-static u32 Aoss_NextAddress(u32 addr, u32 netmask) {
+static u32 aoss_IP_sta(u32 addr, u32 netmask) {
     u32 network = addr & netmask;
     u32 next = ((addr & ~netmask) + 1) | network;
 
@@ -764,100 +770,100 @@ static u32 Aoss_NextAddress(u32 addr, u32 netmask) {
     return next;
 }
 
-static void Aoss_ReleaseBuffers(void) {
+static void aoss_release(void) {
     if (sAoss.apInfo != NULL) {
-        Aoss_Free(sAoss.apInfo);
+        AOSS_FREE(sAoss.apInfo);
         sAoss.apInfo = NULL;
     }
     if (sAoss.scanList != NULL) {
-        Aoss_Free(sAoss.scanList);
+        AOSS_FREE(sAoss.scanList);
         sAoss.scanList = NULL;
     }
 }
 
-static void Aoss_Begin(AossParam *param) {
-    Mem_Fill(sPeerMac, 0, 8);
+static void aoss_data_init(AOSS_INFO *param) {
+    AOSS_Memset(sPeerMac, 0, 8);
     sAoss.error = 1;
-    Mem_Fill(&sAoss.request, 0, sizeof(AossRequest));
-    sAoss.request.data = param->client.data;
-    sAoss.request.length = param->client.length;
-    sAoss.request.wanted = param->types & 0xf;
-    sAoss.request.version = param->client.version;
+    AOSS_Memset(&sAoss.request, 0, sizeof(AossRequest));
+    sAoss.request.data = param->productInfo.productName;
+    sAoss.request.length = param->productInfo.dataLen;
+    sAoss.request.wanted = param->supportSecurity & 0xf;
+    sAoss.request.version = param->productInfo.dataType;
     sAoss.request.found = 0;
     sAoss.request.addr = AOSS_ROUTER_ADDR;
     sAoss.request.reconnected = 0;
 }
 
-static void Aoss_SetError(int error) {
+static void aoss_set_error(int error) {
     sAoss.error = error;
 }
 
-static int Aoss_GetError(void) {
+static int aoss_get_error(void) {
     return sAoss.error;
 }
 
 // Copies the keys that the access point sent to the answer, if they are fit
-static int Aoss_StoreResult(AossParam *param) {
-    AossResult *result = &param->result;
-    AossPskInfo *tkip = &sApInfo[0].tkip;
-    AossWepInfo *wep104 = &sApInfo[0].wep104;
-    AossWepInfo *wep40 = &sApInfo[0].wep40;
-    AossPskInfo *aes = &sApInfo[0].aes;
+static int AOSS_seq_data_copy(AOSS_INFO *param) {
+    AOSS_SECURE_INFO *result = &param->secureInfo;
+    ASTS_DATA_AES *tkip = &sApInfo[0].TkipData;
+    ASTS_DATA_WEP *wep104 = &sApInfo[0].WepData_104;
+    ASTS_DATA_WEP *wep40 = &sApInfo[0].WepData_40;
+    ASTS_DATA_AES *aes = &sApInfo[0].AesData;
 
     if (result == NULL) {
         return -1;
     }
-    param->types = sAoss.request.wanted & sAoss.request.found;
-    Mem_Fill(result, 0, sizeof(AossResult));
-    if (param->types & AOSS_TYPE_WEP40) {
-        Mem_Copy(result->wep40Key[0], wep40->key[0], wep40->keyLength);
-        Mem_Copy(result->wep40Key[1], wep40->key[1], wep40->keyLength);
-        Mem_Copy(result->wep40Key[2], wep40->key[2], wep40->keyLength);
-        Mem_Copy(result->wep40Key[3], wep40->key[3], wep40->keyLength);
-        if (Aoss_IsPrintable((u8 *)wep40->ssid, Str_Length(wep40->ssid)) != 0) {
+    param->supportSecurity = sAoss.request.wanted & sAoss.request.found;
+    AOSS_Memset(result, 0, sizeof(AOSS_SECURE_INFO));
+    if (param->supportSecurity & AOSS_TYPE_WEP40) {
+        AOSS_Memcpy(result->wep40Key[0], wep40->Data[0], wep40->KeyLen);
+        AOSS_Memcpy(result->wep40Key[1], wep40->Data[1], wep40->KeyLen);
+        AOSS_Memcpy(result->wep40Key[2], wep40->Data[2], wep40->KeyLen);
+        AOSS_Memcpy(result->wep40Key[3], wep40->Data[3], wep40->KeyLen);
+        if (aoss_check_str((u8 *)wep40->SSID, AOSS_Strlen(wep40->SSID)) != 0) {
             goto fail;
         }
-        Mem_Copy(result->wep40Ssid, wep40->ssid, Str_Length(wep40->ssid));
+        AOSS_Memcpy(result->WEP40_SSID, wep40->SSID, AOSS_Strlen(wep40->SSID));
     }
-    if (param->types & AOSS_TYPE_WEP104) {
-        Mem_Copy(result->wep104Key[0], wep104->key[0], wep104->keyLength);
-        Mem_Copy(result->wep104Key[1], wep104->key[1], wep104->keyLength);
-        Mem_Copy(result->wep104Key[2], wep104->key[2], wep104->keyLength);
-        Mem_Copy(result->wep104Key[3], wep104->key[3], wep104->keyLength);
-        if (Aoss_IsPrintable((u8 *)wep104->ssid, Str_Length(wep104->ssid)) != 0) {
+    if (param->supportSecurity & AOSS_TYPE_WEP104) {
+        AOSS_Memcpy(result->wep104Key[0], wep104->Data[0], wep104->KeyLen);
+        AOSS_Memcpy(result->wep104Key[1], wep104->Data[1], wep104->KeyLen);
+        AOSS_Memcpy(result->wep104Key[2], wep104->Data[2], wep104->KeyLen);
+        AOSS_Memcpy(result->wep104Key[3], wep104->Data[3], wep104->KeyLen);
+        if (aoss_check_str((u8 *)wep104->SSID, AOSS_Strlen(wep104->SSID)) != 0) {
             goto fail;
         }
-        Mem_Copy(result->wep104Ssid, wep104->ssid, Str_Length(wep104->ssid));
+        AOSS_Memcpy(result->WEP104_SSID, wep104->SSID, AOSS_Strlen(wep104->SSID));
     }
-    if (param->types & AOSS_TYPE_TKIP) {
-        if (Aoss_IsPrintable(tkip->key, tkip->keyLength - 1) != 0) {
+    if (param->supportSecurity & AOSS_TYPE_TKIP) {
+        if (aoss_check_str(tkip->Data, tkip->KeyLen - 1) != 0) {
             goto fail;
         }
-        Mem_Copy(result->tkipKey, tkip->key, tkip->keyLength);
-        if (Aoss_IsPrintable((u8 *)tkip->ssid, Str_Length(tkip->ssid)) != 0) {
+        AOSS_Memcpy(result->WPA_PSK_TKIP, tkip->Data, tkip->KeyLen);
+        if (aoss_check_str((u8 *)tkip->SSID, AOSS_Strlen(tkip->SSID)) != 0) {
             goto fail;
         }
-        Mem_Copy(result->tkipSsid, tkip->ssid, Str_Length(tkip->ssid));
+        AOSS_Memcpy(result->WPA_PSK_TKIP_SSID, tkip->SSID, AOSS_Strlen(tkip->SSID));
     }
-    if (param->types & AOSS_TYPE_AES) {
-        if (Aoss_IsPrintable(aes->key, aes->keyLength - 1) != 0) {
+    if (param->supportSecurity & AOSS_TYPE_AES) {
+        if (aoss_check_str(aes->Data, aes->KeyLen - 1) != 0) {
             goto fail;
         }
-        Mem_Copy(result->aesKey, aes->key, aes->keyLength);
-        if (Aoss_IsPrintable((u8 *)aes->ssid, Str_Length(aes->ssid)) != 0) {
+        AOSS_Memcpy(result->WPA_PSK_AES, aes->Data, aes->KeyLen);
+        if (aoss_check_str((u8 *)aes->SSID, AOSS_Strlen(aes->SSID)) != 0) {
             goto fail;
         }
-        Mem_Copy(result->aesSsid, aes->ssid, Str_Length(aes->ssid));
+        AOSS_Memcpy(result->WPA_PSK_AES_SSID, aes->SSID, AOSS_Strlen(aes->SSID));
     }
-    param->error = 0;
+    param->aossResult = 0;
     return 0;
 
 fail:
-    Mem_Fill(result, 0, sizeof(AossResult));
+    AOSS_Memset(result, 0, sizeof(AOSS_SECURE_INFO));
     return -1;
 }
 
-static int Aoss_IsPrintable(const u8 *text, int length) {
+static int aoss_check_str(const u8 *text, int length) {
     int i;
 
     for (i = 0; i < length; i++) {
@@ -871,21 +877,21 @@ static int Aoss_IsPrintable(const u8 *text, int length) {
 }
 
 // Whether the scan has exactly one access point named ESSID-AOSS: 0 if so, 4 if there are several, 5 if none
-static int Aoss_CheckScan(const WifiScanList *list) {
+static int checkAP(const WLLA_BSS_LIST *list) {
     int result = 0;
     int found = 0;
-    int count = list->count;
+    int count = list->Num;
     int i;
 
     if (count == 0) {
         return 5;
     }
-    if (list->count > 0x40) {
+    if (list->Num > 0x40) {
         count = 0x40;
     }
     for (i = 0; i < count; i++) {
-        if ((list->ap[i].type & 1) && list->ap[i].ssidLength == Str_Length(AOSS_SSID) &&
-            Mem_Compare(list->ap[i].ssid, (u8 *)AOSS_SSID, Str_Length(AOSS_SSID)) == 0) {
+        if ((list->BssInfo[i].Capability & 1) && list->BssInfo[i].ssidLength == AOSS_Strlen(AOSS_SSID) &&
+            AOSS_Memcmp(list->BssInfo[i].ssid, (u8 *)AOSS_SSID, AOSS_Strlen(AOSS_SSID)) == 0) {
             found++;
         }
     }
@@ -899,19 +905,19 @@ static int Aoss_CheckScan(const WifiScanList *list) {
 }
 
 // The access point to connect to: ESSID-AOSS with the WEP key MELCO
-static int Aoss_InitTarget(WifiConnectParam *target) {
-    target->ssidLength = Str_Length(AOSS_SSID);
-    Mem_Copy(target->ssid, AOSS_SSID, target->ssidLength);
-    target->authMode = 1;
-    target->keyLength = Str_Length(AOSS_KEY);
+static int AOSS_set_APInfo(WLLA_CONNECT_PARAM *target) {
+    target->ssidLength = AOSS_Strlen(AOSS_SSID);
+    AOSS_Memcpy(target->ssid, AOSS_SSID, target->ssidLength);
+    target->AuthAlgo = 1;
+    target->keyLength = AOSS_Strlen(AOSS_KEY);
     if (target->keyLength > 13) {
         return -1;
     }
-    Mem_Copy(target->key, AOSS_KEY, target->keyLength);
+    AOSS_Memcpy(target->key, AOSS_KEY, target->keyLength);
     return 0;
 }
 
-static void Aoss_MakeIds(int count, u8 *ids, const u8 *mac) {
+static void MakeSendSeqID(int count, u8 *ids, const u8 *mac) {
     typedef struct {
         u8 mac[6];
         u16 number;
@@ -920,56 +926,56 @@ static void Aoss_MakeIds(int count, u8 *ids, const u8 *mac) {
     int i;
 
     for (i = 0; i < count; i++) {
-        Mem_Copy(id->mac, mac, 6);
-        id->number = Aoss_Rand();
-        id->number = Net_Htons(id->number);
+        AOSS_Memcpy(id->mac, mac, 6);
+        id->number = AOSS_Rand();
+        id->number = AOSS_Htons(id->number);
         id++;
     }
 }
 
-static int Aoss_SetMode(int mode) {
+static int AOSS_StatusExclusion(int mode) {
     if (mode == -1) {
         sNet.mode = mode;
         return 0;
     }
     if (sNet.mode != mode) {
         sNet.mode = mode;
-        return AossAp_NotifyModeChange(mode);
+        return AOSSi_Status(mode);
     }
     return 0;
 }
 
-static int Aoss_ProcessPacket(int state, AossPacket *packet, int *errors, const u8 *ids, int sock) {
-    AossHeader *header = &packet->header;
+static int RecvMessage(int state, AossPacket *packet, int *errors, const u8 *ids, int sock) {
+    tagASTSpktHeader *header = &packet->header;
 
-    if (Net_Ntohs(header->version) < 1) {
+    if (AOSS_Ntohs(header->PktVersion) < 1) {
         (*errors)++;
         return state;
     }
-    if (header->protocol != AOSS_PROTOCOL) {
+    if (header->Fragment != AOSS_PROTOCOL) {
         (*errors)++;
         return state;
     }
-    if (Aoss_DecodePacket(&packet->header) > 0) {
+    if (DecodePacket(&packet->header) > 0) {
         (*errors)++;
         return state;
     }
-    switch (Net_Ntohs(header->type)) {
+    switch (AOSS_Ntohs(header->cmd)) {
     case 0x1010:
-        state = Aoss_OnStage0(state, packet, errors, ids);
+        state = AstsSetInitRes(state, packet, errors, ids);
         break;
     case 0x2010:
-        state = Aoss_OnStage1(state, packet, errors, ids);
+        state = AstsSetSecureRes(state, packet, errors, ids);
         break;
     case 0x3010:
-        state = Aoss_OnStage2(state, packet, errors, ids);
+        state = AstsRestartRes(state, packet, errors, ids);
         break;
     }
     return state;
 }
 
-static int Aoss_OnStage0(int state, AossPacket *packet, int *errors, const u8 *ids) {
-    AossHeader *header;
+static int AstsSetInitRes(int state, AossPacket *packet, int *errors, const u8 *ids) {
+    tagASTSpktHeader *header;
     AossRecord *record;
     int result;
 
@@ -979,21 +985,21 @@ static int Aoss_OnStage0(int state, AossPacket *packet, int *errors, const u8 *i
     }
     header = &packet->header;
     record = (AossRecord *)packet->body;
-    if (Aoss_CheckIds(ids, header->id) < 0) {
+    if (CheckRecvSeqID(ids, header->SeqID) < 0) {
         (*errors)++;
         return state;
     }
-    if (Net_Ntohs(record->length) == 0) {
+    if (AOSS_Ntohs(record->length) == 0) {
         (*errors)++;
         return state;
     }
     if (record->type == 7) {
-        if (Net_Ntohl(record->payload.status) == -2) {
-            Aoss_SetError(0x14);
-        } else if (Net_Ntohl(record->payload.status) == -3) {
-            Aoss_SetError(0x15);
+        if (AOSS_Ntohl(record->payload.status) == -2) {
+            aoss_set_error(0x14);
+        } else if (AOSS_Ntohl(record->payload.status) == -3) {
+            aoss_set_error(0x15);
         } else {
-            Aoss_SetError(0x18);
+            aoss_set_error(0x18);
         }
         return -1;
     }
@@ -1001,22 +1007,22 @@ static int Aoss_OnStage0(int state, AossPacket *packet, int *errors, const u8 *i
         (*errors)++;
         return state;
     }
-    result = Aoss_ParseHello(record->payload.items, (AossHello *)sSession.buffer[0]);
+    result = GetProductInfo(record->payload.items, (AossHello *)sSession.ProductInfo[0]);
     if (result < 0) {
         if (result == -2) {
-            Aoss_SetError(0x16);
+            aoss_set_error(0x16);
             return -1;
         }
         (*errors)++;
         return state;
     }
-    sAoss.encrypt = Aoss_IsEncrypted(Net_Ntohs(header->flags));
+    sAoss.encrypt = GetSecurityType(AOSS_Ntohs(header->CryptType));
     *errors = 0;
     return 1;
 }
 
-static int Aoss_OnStage1(int state, AossPacket *packet, int *errors, const u8 *ids) {
-    AossHeader *header;
+static int AstsSetSecureRes(int state, AossPacket *packet, int *errors, const u8 *ids) {
+    tagASTSpktHeader *header;
     AossRecord *record;
 
     if (state != 1) {
@@ -1025,26 +1031,26 @@ static int Aoss_OnStage1(int state, AossPacket *packet, int *errors, const u8 *i
     }
     header = &packet->header;
     record = (AossRecord *)packet->body;
-    if (Aoss_CheckIds(ids + 8, header->id) < 0) {
+    if (CheckRecvSeqID(ids + 8, header->SeqID) < 0) {
         (*errors)++;
         return state;
     }
-    if (Net_Ntohs(record->length) == 0) {
+    if (AOSS_Ntohs(record->length) == 0) {
         (*errors)++;
         return state;
     }
     if (record->type == 7) {
-        if (Net_Ntohl(record->payload.status) == -2) {
-            Aoss_SetError(0x14);
-        } else if (Net_Ntohl(record->payload.status) == -3) {
-            Aoss_SetError(0x15);
+        if (AOSS_Ntohl(record->payload.status) == -2) {
+            aoss_set_error(0x14);
+        } else if (AOSS_Ntohl(record->payload.status) == -3) {
+            aoss_set_error(0x15);
         } else {
-            Aoss_SetError(0x18);
+            aoss_set_error(0x18);
         }
         return -1;
     }
-    Mem_Fill(sApInfo, 0, sizeof(sApInfo));
-    if (Aoss_ParseSecurity(0, record, Net_Ntohs(header->length), sApInfo, &sSession) < 0) {
+    AOSS_Memset(sApInfo, 0, sizeof(sApInfo));
+    if (GetSecurityData(0, record, AOSS_Ntohs(header->size), sApInfo, &sSession) < 0) {
         (*errors)++;
         return state;
     }
@@ -1055,8 +1061,8 @@ static int Aoss_OnStage1(int state, AossPacket *packet, int *errors, const u8 *i
     return 2;
 }
 
-static int Aoss_OnStage2(int state, AossPacket *packet, int *errors, const u8 *ids) {
-    AossHeader *header;
+static int AstsRestartRes(int state, AossPacket *packet, int *errors, const u8 *ids) {
+    tagASTSpktHeader *header;
     AossRecord *record;
 
     if (state != 2) {
@@ -1065,7 +1071,7 @@ static int Aoss_OnStage2(int state, AossPacket *packet, int *errors, const u8 *i
     }
     header = &packet->header;
     record = (AossRecord *)(header + 1);
-    if (Aoss_CheckIds(ids + 16, header->id) < 0) {
+    if (CheckRecvSeqID(ids + 16, header->SeqID) < 0) {
         (*errors)++;
         return state;
     }
@@ -1073,69 +1079,69 @@ static int Aoss_OnStage2(int state, AossPacket *packet, int *errors, const u8 *i
         (*errors)++;
         return state;
     }
-    if (Net_Ntohs(record->length) == 0) {
+    if (AOSS_Ntohs(record->length) == 0) {
         (*errors)++;
         return state;
     }
-    if (Net_Ntohl(record->payload.status) == 0) {
+    if (AOSS_Ntohl(record->payload.status) == 0) {
         return 100;
     }
-    if (Net_Ntohl(record->payload.status) == -2) {
-        Aoss_SetError(0x14);
+    if (AOSS_Ntohl(record->payload.status) == -2) {
+        aoss_set_error(0x14);
         return -1;
     }
-    if (Net_Ntohl(record->payload.status) == -3) {
-        Aoss_SetError(0x15);
+    if (AOSS_Ntohl(record->payload.status) == -3) {
+        aoss_set_error(0x15);
         return -1;
     }
-    Aoss_SetError(0x18);
+    aoss_set_error(0x18);
     return -1;
 }
 
 // Checks the id of a message and decrypts its body; 0 if it is fit
-static int Aoss_DecodePacket(AossHeader *header) {
-    AossEncrypted *body = (AossEncrypted *)(header + 1);
+static int DecodePacket(tagASTSpktHeader *header) {
+    tagASTSpktCryptData *body = (tagASTSpktCryptData *)(header + 1);
     u8 id[8];
     u32 length;
     u8 *buffer;
     int result;
 
-    Mem_Copy(id, header->id, 8);
-    if (Aoss_Scramble(id, 8, AOSS_KEY, Str_Length(AOSS_KEY)) == -1) {
-        Aoss_SetError(2);
+    AOSS_Memcpy(id, header->SeqID, 8);
+    if (CryptSeqNo(id, 8, AOSS_KEY, AOSS_Strlen(AOSS_KEY)) == -1) {
+        aoss_set_error(2);
         return -100;
     }
-    result = Aoss_CheckPeer(Net_Ntohs(header->type), id);
+    result = CheckSeqID(AOSS_Ntohs(header->cmd), id);
     if (result != 0) {
         return result;
     }
-    if (Net_Ntohs(header->type) == 0x1000) {
-        Mem_Copy(sPeerMac, id, 8);
+    if (AOSS_Ntohs(header->cmd) == 0x1000) {
+        AOSS_Memcpy(sPeerMac, id, 8);
     }
-    if ((Net_Ntohs(header->flags) & 0xf) == 0) {
+    if ((AOSS_Ntohs(header->CryptType) & 0xf) == 0) {
         return 0;
     }
-    length = Net_Ntohs(body->length);
-    buffer = Aoss_Alloc(length);
+    length = AOSS_Ntohs(body->size);
+    buffer = AOSS_MALLOC(length);
     if (buffer == NULL) {
-        Aoss_SetError(2);
+        aoss_set_error(2);
         return 100;
     }
-    if (Aoss_Decrypt(body->data, buffer, length, header->checksum, body->iv, sPeerMac, 8) < 0) {
-        Aoss_Free(buffer);
-        if (Aoss_GetError() == 2) {
+    if (DecodeRC4(body->Data, buffer, length, header->crc8, body->iv, sPeerMac, 8) < 0) {
+        AOSS_FREE(buffer);
+        if (aoss_get_error() == 2) {
             return 100;
         }
         return 200;
     }
-    Mem_Copy(body, buffer, length);
-    header->length = Net_Htons(length);
-    Aoss_Free(buffer);
+    AOSS_Memcpy(body, buffer, length);
+    header->size = AOSS_Htons(length);
+    AOSS_FREE(buffer);
     return 0;
 }
 
 // Whether a message may come from the access point we talk to: 0 if so, 1 if it is another, 2 if there is none yet
-static int Aoss_CheckPeer(int type, const u8 *id) {
+static int CheckSeqID(int type, const u8 *id) {
     int result = 0;
     int i;
     int known = 0;
@@ -1147,7 +1153,7 @@ static int Aoss_CheckPeer(int type, const u8 *id) {
         }
     }
     if (known) {
-        if (Mem_Compare(sPeerMac, id, 6) != 0) {
+        if (AOSS_Memcmp(sPeerMac, id, 6) != 0) {
             result = 1;
         }
     } else if (type != 0x1000) {
@@ -1157,52 +1163,52 @@ static int Aoss_CheckPeer(int type, const u8 *id) {
 }
 
 // Whether the id that came back is the one that was sent, with its number one higher: 0 if so, -1 or -2
-static int Aoss_CheckIds(const u8 *expected, u8 *received) {
+static int CheckRecvSeqID(const u8 *expected, u8 *received) {
     int result = 0;
 
-    Aoss_Scramble(received, 8, AOSS_KEY, Str_Length(AOSS_KEY));
-    if (Mem_Compare(expected, received, 6) != 0) {
+    CryptSeqNo(received, 8, AOSS_KEY, AOSS_Strlen(AOSS_KEY));
+    if (AOSS_Memcmp(expected, received, 6) != 0) {
         result--;
-    } else if (Net_Ntohs(*(u16 *)(expected + 6)) + 1 != Net_Ntohs(*(u16 *)(received + 6))) {
+    } else if (AOSS_Ntohs(*(u16 *)(expected + 6)) + 1 != AOSS_Ntohs(*(u16 *)(received + 6))) {
         result -= 2;
     }
     return result;
 }
 
-static int Aoss_ParseHello(const AossItem *items, AossHello *hello) {
+static int GetProductInfo(const AossItem *items, AossHello *hello) {
     const AossItem *item;
 
-    Mem_Fill(hello, 0, 0x104);
+    AOSS_Memset(hello, 0, 0x104);
     item = items;
     while (1) {
-        int length = Net_Ntohs(item->length);
+        int length = AOSS_Ntohs(item->length);
 
         if (length <= 0) {
             return -1;
         }
         switch (item->type) {
         case 0:
-            Mem_Copy(hello->name, item->data, length);
+            AOSS_Memcpy(hello->name, item->data, length);
             break;
         case 1:
-            Mem_Copy(hello->info, item->data, length);
+            AOSS_Memcpy(hello->info, item->data, length);
             break;
         case 2:
-            Mem_Copy(hello->extra, item->data, length);
+            AOSS_Memcpy(hello->extra, item->data, length);
             break;
         case 3:
         case 4: {
-            int value = Net_Ntohs(item->data[0]);
+            int value = AOSS_Ntohs(item->data[0]);
 
             if (value <= 0) {
                 return -2;
             }
         } break;
         case 5:
-            sAoss.request.addr = Net_Ntohl(Aoss_ReadLe(item->data, length));
+            sAoss.request.addr = AOSS_Ntohl(aoss_get_bin(item->data, length));
             break;
         case 6:
-            sAoss.request.netmask = Net_Ntohl(Aoss_ReadLe(item->data, length));
+            sAoss.request.netmask = AOSS_Ntohl(aoss_get_bin(item->data, length));
             break;
         default:
             return -1;
@@ -1210,12 +1216,12 @@ static int Aoss_ParseHello(const AossItem *items, AossHello *hello) {
         if (item->next == 0) {
             break;
         }
-        item = (const AossItem *)((const u8 *)items + Net_Ntohs(item->next));
+        item = (const AossItem *)((const u8 *)items + AOSS_Ntohs(item->next));
     }
     return 0;
 }
 
-static u32 Aoss_ReadLe(const u8 *data, int length) {
+static u32 aoss_get_bin(const u8 *data, int length) {
     u32 value = 0;
     int i;
     const u8 *p = data + (length - 1);
@@ -1226,19 +1232,19 @@ static u32 Aoss_ReadLe(const u8 *data, int length) {
     return value;
 }
 
-static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info) {
+static int GetWEPData(const AossRecord *record, ASTS_DATA_WEP *info) {
     const AossItem *item = record->payload.secure.items;
     const AossItem *items;
-    char *ssid = info->ssid;
-    u8 *key3 = info->key[3];
-    u8 *key2 = info->key[2];
-    u8 *key1 = info->key[1];
-    u8 *key0 = info->key[0];
+    char *ssid = info->SSID;
+    u8 *key3 = info->Data[3];
+    u8 *key2 = info->Data[2];
+    u8 *key1 = info->Data[1];
+    u8 *key0 = info->Data[0];
 
     items = item;
 
     while (1) {
-        u32 length = Net_Ntohs(item->length);
+        u32 length = AOSS_Ntohs(item->length);
 
         switch (item->type) {
         case 0x10:
@@ -1267,30 +1273,30 @@ static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info) {
         switch (item->type) {
         case 0x10:
         case 0x20:
-            Mem_Copy(key0, item->data, length);
-            info->keyLength = length;
+            AOSS_Memcpy(key0, item->data, length);
+            info->KeyLen = length;
             break;
         case 0x11:
         case 0x21:
-            Mem_Copy(key1, item->data, length);
-            info->keyLength = length;
+            AOSS_Memcpy(key1, item->data, length);
+            info->KeyLen = length;
             break;
         case 0x12:
         case 0x22:
-            Mem_Copy(key2, item->data, length);
-            info->keyLength = length;
+            AOSS_Memcpy(key2, item->data, length);
+            info->KeyLen = length;
             break;
         case 0x13:
         case 0x23:
-            Mem_Copy(key3, item->data, length);
-            info->keyLength = length;
+            AOSS_Memcpy(key3, item->data, length);
+            info->KeyLen = length;
             break;
         case 0x15:
         case 0x25:
             if (length != 0 && item->data[length - 1] != 0) {
                 return -1;
             }
-            Mem_Copy(ssid, item->data, length);
+            AOSS_Memcpy(ssid, item->data, length);
             break;
         default:
             return -1;
@@ -1298,21 +1304,21 @@ static int Aoss_ParseWep(const AossRecord *record, AossWepInfo *info) {
         if (item->next == 0) {
             break;
         }
-        item = (const AossItem *)((const u8 *)items + Net_Ntohs(item->next));
+        item = (const AossItem *)((const u8 *)items + AOSS_Ntohs(item->next));
     }
     return 0;
 }
 
-static int Aoss_ParsePsk(const AossRecord *record, AossPskInfo *info) {
+static int GetWPAData(const AossRecord *record, ASTS_DATA_AES *info) {
     const AossItem *item = record->payload.secure.items;
     const AossItem *items;
-    char *ssid = info->ssid;
-    u8 *key = info->key;
+    char *ssid = info->SSID;
+    u8 *key = info->Data;
 
     items = item;
 
     while (1) {
-        u32 length = Net_Ntohs(item->length);
+        u32 length = AOSS_Ntohs(item->length);
 
         switch (item->type) {
         case 0x30:
@@ -1331,21 +1337,21 @@ static int Aoss_ParsePsk(const AossRecord *record, AossPskInfo *info) {
         switch (item->type) {
         case 0x30:
         case 0x40:
-            Mem_Copy(key, item->data, length);
-            info->keyLength = length;
+            AOSS_Memcpy(key, item->data, length);
+            info->KeyLen = length;
             break;
         case 0x35:
         case 0x45:
             if (length != 0 && item->data[length - 1] != 0) {
                 return -1;
             }
-            Mem_Copy(ssid, item->data, length);
+            AOSS_Memcpy(ssid, item->data, length);
             break;
         default:
             return -1;
         }
         if (item->next != 0) {
-            item = (const AossItem *)((const u8 *)items + Net_Ntohs(item->next));
+            item = (const AossItem *)((const u8 *)items + AOSS_Ntohs(item->next));
         } else {
             break;
         }
@@ -1353,9 +1359,9 @@ static int Aoss_ParsePsk(const AossRecord *record, AossPskInfo *info) {
     return 0;
 }
 
-static int Aoss_ParseKey(const AossRecord *record, u8 *key) {
+static int GetBssidData(const AossRecord *record, u8 *key) {
     const AossItem *item = record->payload.secure.items;
-    int length = Net_Ntohs(item->length);
+    int length = AOSS_Ntohs(item->length);
 
     if (length <= 0) {
         return -1;
@@ -1363,15 +1369,16 @@ static int Aoss_ParseKey(const AossRecord *record, u8 *key) {
     if (item->type != 0x70) {
         return -1;
     }
-    Mem_Copy(key, item->data, length);
+    AOSS_Memcpy(key, item->data, length);
     return 0;
 }
 
 // Reads the security settings that the reply of a stage has into slot of slots; 0 if they are fit
-static int Aoss_ParseSecurity(int slot, const AossRecord *record, int length, AossApInfo *slots, AossSession *session) {
+static int GetSecurityData(int slot, const AossRecord *record, int length, ASTS_DATA_INFO *slots,
+                           PRODUCT_INFO_AOSS *session) {
     u32 found = 0;
     int result;
-    AossApInfo *ap;
+    ASTS_DATA_INFO *ap;
     const AossRecord *entry;
     int size;
 
@@ -1385,36 +1392,36 @@ static int Aoss_ParseSecurity(int slot, const AossRecord *record, int length, Ao
         if (entry->type == sRecordType[slot]) {
             break;
         }
-        step = Net_Ntohs(entry->length) + 4;
+        step = AOSS_Ntohs(entry->length) + 4;
         length -= step;
         record = (const AossRecord *)((const u8 *)entry + step);
         if (length <= 0) {
             return -4;
         }
     }
-    size = Net_Ntohs(entry->length);
+    size = AOSS_Ntohs(entry->length);
     record = (const AossRecord *)((const u8 *)entry + 4);
     ap = &slots[slot];
     do {
         switch (record->type) {
         case 3:
-            result = Aoss_ParseWep(record, &ap->wep40);
+            result = GetWEPData(record, &ap->WepData_40);
             found |= AOSS_TYPE_WEP40;
             break;
         case 4:
-            result = Aoss_ParseWep(record, &ap->wep104);
+            result = GetWEPData(record, &ap->WepData_104);
             found |= AOSS_TYPE_WEP104;
             break;
         case 5:
-            result = Aoss_ParsePsk(record, &ap->tkip);
+            result = GetWPAData(record, &ap->TkipData);
             found |= AOSS_TYPE_TKIP;
             break;
         case 6:
-            result = Aoss_ParsePsk(record, &ap->aes);
+            result = GetWPAData(record, &ap->AesData);
             found |= AOSS_TYPE_AES;
             break;
         case 10:
-            result = Aoss_ParseKey(record, session->buffer[slot + 3]);
+            result = GetBssidData(record, session->ProductInfo[slot + 3]);
             break;
         default:
             result = -3;
@@ -1424,7 +1431,7 @@ static int Aoss_ParseSecurity(int slot, const AossRecord *record, int length, Ao
             return result;
         }
         {
-            int step = Net_Ntohs(record->length) + 4;
+            int step = AOSS_Ntohs(record->length) + 4;
 
             size -= step;
             record = (const AossRecord *)((const u8 *)record + step);
@@ -1434,7 +1441,7 @@ static int Aoss_ParseSecurity(int slot, const AossRecord *record, int length, Ao
     return 0;
 }
 
-static int Aoss_IsEncrypted(int flags) {
+static int GetSecurityType(int flags) {
     int result = 0;
 
     if (flags & 0x10) {
@@ -1443,111 +1450,111 @@ static int Aoss_IsEncrypted(int flags) {
     return result;
 }
 
-static int Aoss_Send(int state, const AossEndpoints *endpoints, const u8 *ids, int sock) {
+static int SendMessage(int state, const AossEndpoints *endpoints, const u8 *ids, int sock) {
     switch (state) {
     case 0:
-        Aoss_SetMode(2);
-        return Aoss_SendStage0(endpoints, ids, sock);
+        AOSS_StatusExclusion(2);
+        return AstsSetInitReq(endpoints, ids, sock);
     case 1:
-        Aoss_SetMode(3);
-        return Aoss_SendStage1(endpoints, ids, sock);
+        AOSS_StatusExclusion(3);
+        return AstsSetSecureReq(endpoints, ids, sock);
     case 2:
-        Aoss_SetMode(5);
-        return Aoss_SendStage2(endpoints, ids, sock);
+        AOSS_StatusExclusion(5);
+        return AstsRestartReq(endpoints, ids, sock);
     }
     return -1;
 }
 
-static int Aoss_SendStage0(const AossEndpoints *endpoints, const u8 *ids, int sock) {
+static int AstsSetInitReq(const AossEndpoints *endpoints, const u8 *ids, int sock) {
     s8 checksum = 0;
     s16 length = 0;
     s16 flags = 0;
     u8 id[8];
-    AossHeader *header = (AossHeader *)sAoss.packet;
+    tagASTSpktHeader *header = (tagASTSpktHeader *)sAoss.packet;
     u8 *body;
     u8 *payload;
 
-    Mem_Fill(header, 0, AOSS_PACKET_SIZE);
-    body = Aoss_Alloc(0x210);
+    AOSS_Memset(header, 0, AOSS_PACKET_SIZE);
+    body = AOSS_MALLOC(0x210);
     if (body == NULL) {
-        Aoss_SetError(2);
+        aoss_set_error(2);
         return -1;
     }
-    Mem_Fill(body, 0, 0x210);
+    AOSS_Memset(body, 0, 0x210);
     payload = (u8 *)(header + 1);
-    Mem_Copy(sPeerMac, ids, 8);
-    Mem_Copy(id, sPeerMac, 8);
-    length = Aoss_BuildHello(body + 4);
+    AOSS_Memcpy(sPeerMac, ids, 8);
+    AOSS_Memcpy(id, sPeerMac, 8);
+    length = SetStaData(body + 4);
     if (length < 0) {
-        Aoss_SetError(3);
+        aoss_set_error(3);
         if (body != NULL) {
-            Aoss_Free(body);
+            AOSS_FREE(body);
         }
         return -1;
     }
     body[0] = 0;
-    *(u16 *)(body + 2) = Net_Htons(length);
+    *(u16 *)(body + 2) = AOSS_Htons(length);
     length += 4;
-    Aoss_BuildPayload(0, payload, body, &length, &flags, &checksum);
+    PacketDataSet(0, payload, body, &length, &flags, &checksum);
     flags |= 0x10;
-    if (Aoss_Scramble(id, 8, AOSS_KEY, sizeof(AOSS_KEY)) != 0) {
-        Aoss_SetError(2);
+    if (CryptSeqNo(id, 8, AOSS_KEY, sizeof(AOSS_KEY)) != 0) {
+        aoss_set_error(2);
         if (body != NULL) {
-            Aoss_Free(body);
+            AOSS_FREE(body);
         }
         return -1;
     }
-    Aoss_BuildHeader(header, 0x1000, length, flags, checksum, AOSS_PROTOCOL, id);
-    length += sizeof(AossHeader);
-    Aoss_SendPacket(header, length, 0xff, sock);
+    SetPacketHeader(header, 0x1000, length, flags, checksum, AOSS_PROTOCOL, id);
+    length += sizeof(tagASTSpktHeader);
+    SendPacketUDP(header, length, 0xff, sock);
     if (body != NULL) {
-        Aoss_Free(body);
+        AOSS_FREE(body);
     }
     return 0;
 }
 
-static int Aoss_SendStage1(const AossEndpoints *endpoints, const u8 *ids, int sock) {
+static int AstsSetSecureReq(const AossEndpoints *endpoints, const u8 *ids, int sock) {
     s8 checksum = 0;
     s16 length = 0;
     s16 flags = 0;
     u8 id[8];
-    AossStatusRecord record;
-    AossHeader *header = (AossHeader *)sAoss.packet;
+    tagASTSpktResult record;
+    tagASTSpktHeader *header = (tagASTSpktHeader *)sAoss.packet;
 
-    Mem_Fill(&record, 0, 8);
-    Mem_Fill(header, 0, AOSS_PACKET_SIZE);
+    AOSS_Memset(&record, 0, 8);
+    AOSS_Memset(header, 0, AOSS_PACKET_SIZE);
     record.type = 2;
     record.reserved = 0;
-    record.length = Net_Htons(4);
-    record.status = sAoss.request.wanted;
-    record.status = Net_Htonl(record.status);
+    record.length = AOSS_Htons(4);
+    record.Result = sAoss.request.wanted;
+    record.Result = AOSS_Htonl(record.Result);
     length = 8;
-    Aoss_BuildPayload(sAoss.encrypt, (u8 *)(header + 1), (u8 *)&record, &length, &flags, &checksum);
-    Mem_Copy(id, ids + 8, 8);
-    if (Aoss_Scramble(id, 8, AOSS_KEY, sizeof(AOSS_KEY)) != 0) {
-        Aoss_SetError(2);
+    PacketDataSet(sAoss.encrypt, (u8 *)(header + 1), (u8 *)&record, &length, &flags, &checksum);
+    AOSS_Memcpy(id, ids + 8, 8);
+    if (CryptSeqNo(id, 8, AOSS_KEY, sizeof(AOSS_KEY)) != 0) {
+        aoss_set_error(2);
         return -1;
     }
-    Aoss_BuildHeader(header, 0x2000, length, flags, checksum, AOSS_PROTOCOL, id);
-    length += sizeof(AossHeader);
-    Aoss_SendPacket(header, length, 0, sock);
+    SetPacketHeader(header, 0x2000, length, flags, checksum, AOSS_PROTOCOL, id);
+    length += sizeof(tagASTSpktHeader);
+    SendPacketUDP(header, length, 0, sock);
     return 0;
 }
 
-static int Aoss_SendStage2(const AossEndpoints *endpoints, const u8 *ids, int sock) {
+static int AstsRestartReq(const AossEndpoints *endpoints, const u8 *ids, int sock) {
     u8 id[8];
-    AossHeader *header = (AossHeader *)sAoss.packet;
+    tagASTSpktHeader *header = (tagASTSpktHeader *)sAoss.packet;
 
-    Mem_Fill(header, 0, AOSS_PACKET_SIZE);
-    Mem_Copy(id, ids + 16, 8);
-    Aoss_Scramble(id, 8, AOSS_KEY, Str_Length(AOSS_KEY));
-    Aoss_BuildHeader(header, 0x3000, 0, 0, 0, AOSS_PROTOCOL, id);
-    Aoss_SendPacket(header, sizeof(AossHeader), 0, sock);
+    AOSS_Memset(header, 0, AOSS_PACKET_SIZE);
+    AOSS_Memcpy(id, ids + 16, 8);
+    CryptSeqNo(id, 8, AOSS_KEY, AOSS_Strlen(AOSS_KEY));
+    SetPacketHeader(header, 0x3000, 0, 0, 0, AOSS_PROTOCOL, id);
+    SendPacketUDP(header, sizeof(tagASTSpktHeader), 0, sock);
     return 0;
 }
 
 // The body of the hello: the request's data and the item 0x60 with 14; returns its length
-static s16 Aoss_BuildHello(u8 *buffer) {
+static s16 SetStaData(u8 *buffer) {
     AossItem *first = (AossItem *)buffer;
     s16 length;
     s16 total = 0;
@@ -1558,104 +1565,104 @@ static s16 Aoss_BuildHello(u8 *buffer) {
     first->type = sAoss.request.version;
     first->reserved = 1;
     length = sAoss.request.length;
-    Mem_Copy(first->data, sAoss.request.data, length);
-    first->length = Net_Htons(length);
+    AOSS_Memcpy(first->data, sAoss.request.data, length);
+    first->length = AOSS_Htons(length);
     offset = ((s16)(length + 6) + 1) / 2 * 2;
-    first->next = Net_Htons(offset);
+    first->next = AOSS_Htons(offset);
     total += offset;
     second = (AossItem *)(buffer + offset);
     second->type = 0x60;
     second->reserved = 0;
-    second->next = Net_Htons(0);
-    value = Net_Htonl(0xe);
-    Mem_Copy(second->data, &value, 4);
-    second->length = Net_Htons(4);
+    second->next = AOSS_Htons(0);
+    value = AOSS_Htonl(0xe);
+    AOSS_Memcpy(second->data, &value, 4);
+    second->length = AOSS_Htons(4);
     total += 10;
     return total;
 }
 
 // Puts the body in the packet, encrypted when the client wants it so
-static void Aoss_BuildPayload(int encrypt, u8 *dest, const u8 *src, s16 *length, s16 *flags, s8 *checksum) {
+static void PacketDataSet(int encrypt, u8 *dest, const u8 *src, s16 *length, s16 *flags, s8 *checksum) {
     if (encrypt == 1) {
         *flags = 1;
-        Aoss_Encrypt(src, dest + 4, *length, (u8 *)checksum, dest + 2, sPeerMac, 8);
-        *(u16 *)dest = Net_Htons(*length);
+        EncodeRC4(src, dest + 4, *length, (u8 *)checksum, dest + 2, sPeerMac, 8);
+        *(u16 *)dest = AOSS_Htons(*length);
         *length += 4;
     } else {
-        Mem_Copy(dest, src, *length);
+        AOSS_Memcpy(dest, src, *length);
     }
 }
 
-static void Aoss_BuildHeader(AossHeader *header, int type, int length, int flags, s8 checksum, s8 protocol,
-                             const u8 *id) {
-    header->version = Net_Htons(1);
+static void SetPacketHeader(tagASTSpktHeader *header, int type, int length, int flags, s8 checksum, s8 protocol,
+                            const u8 *id) {
+    header->PktVersion = AOSS_Htons(1);
     header->unk_02 = 0;
     header->unk_04 = 0;
-    header->type = Net_Htons(type);
-    header->unk_08 = 0;
-    header->length = Net_Htons(length);
-    header->flags = Net_Htons(flags);
-    header->checksum = checksum;
-    header->protocol = protocol;
-    Mem_Copy(header->id, id, 8);
+    header->cmd = AOSS_Htons(type);
+    header->type = 0;
+    header->size = AOSS_Htons(length);
+    header->CryptType = AOSS_Htons(flags);
+    header->crc8 = checksum;
+    header->Fragment = protocol;
+    AOSS_Memcpy(header->SeqID, id, 8);
 }
 
-static int Aoss_SendPacket(void *buffer, int length, int toAll, int sock) {
-    SocAddrIn to;
+static int SendPacketUDP(void *buffer, int length, int toAll, int sock) {
+    SOCSockAddrIn to;
 
-    Mem_Fill(&to, 0, sizeof(to));
+    AOSS_Memset(&to, 0, sizeof(to));
     to.family = 2;
-    to.port = Net_Htons(AOSS_PORT);
-    to.addr = Net_Htonl(sAoss.request.addr);
+    to.port = AOSS_Htons(AOSS_PORT);
+    to.addr.addr = AOSS_Htonl(sAoss.request.addr);
     if (toAll == 0xff || sAoss.request.reconnected == 0) {
-        to.addr = -1;
+        to.addr.addr = -1;
     }
-    return Net_SendTo(sock, buffer, length, 0, &to, 8);
+    return AOSS_Sendto(sock, buffer, length, 0, &to, 8);
 }
 
-static int Aoss_Encrypt(const u8 *in, u8 *out, u32 length, u8 *checksum, u8 *iv, const u8 *key, u32 keyLength) {
+static int EncodeRC4(const u8 *in, u8 *out, u32 length, u8 *checksum, u8 *iv, const u8 *key, u32 keyLength) {
     RC4Context context;
     u16 number;
 
-    *checksum = Aoss_Checksum(in, length);
-    context.s = Aoss_Alloc(length);
+    *checksum = crc(in, length);
+    context.s = AOSS_MALLOC(length);
     if (context.s == NULL) {
         return -1;
     }
-    number = Aoss_Rand();
-    Mem_Copy(iv, &number, 2);
-    Mem_Copy(sCipherKey, iv, 2);
-    Mem_Copy(sCipherKey + 2, key, keyLength);
-    Rc4_Init(&context, sCipherKey, keyLength + 2, length);
-    Rc4_Crypt(&context, out, in, length);
-    Aoss_Free(context.s);
+    number = AOSS_Rand();
+    AOSS_Memcpy(iv, &number, 2);
+    AOSS_Memcpy(sCipherKey, iv, 2);
+    AOSS_Memcpy(sCipherKey + 2, key, keyLength);
+    RC4init(&context, sCipherKey, keyLength + 2, length);
+    RC4encrypt(&context, out, in, length);
+    AOSS_FREE(context.s);
     return 0;
 }
 
-static int Aoss_Decrypt(const u8 *in, u8 *out, u32 length, u8 checksum, const u8 *iv, const u8 *key, u32 keyLength) {
+static int DecodeRC4(const u8 *in, u8 *out, u32 length, u8 checksum, const u8 *iv, const u8 *key, u32 keyLength) {
     RC4Context context;
 
-    context.s = Aoss_Alloc(length);
+    context.s = AOSS_MALLOC(length);
     if (context.s == NULL) {
-        Aoss_SetError(2);
+        aoss_set_error(2);
         return -1;
     }
-    Mem_Copy(sCipherKey, iv, 2);
-    Mem_Copy(sCipherKey + 2, key, keyLength);
-    Rc4_Init(&context, sCipherKey, keyLength + 2, length);
-    Rc4_Crypt(&context, out, in, length);
-    u8 actual = Aoss_Checksum(out, length);
+    AOSS_Memcpy(sCipherKey, iv, 2);
+    AOSS_Memcpy(sCipherKey + 2, key, keyLength);
+    RC4init(&context, sCipherKey, keyLength + 2, length);
+    RC4encrypt(&context, out, in, length);
+    u8 actual = crc(out, length);
     if (actual != checksum) {
-        Aoss_SetError(0x12);
-        Aoss_Free(context.s);
+        aoss_set_error(0x12);
+        AOSS_FREE(context.s);
         return -1;
     }
-    Aoss_Free(context.s);
+    AOSS_FREE(context.s);
     return 0;
 }
 
 // RC4 with a state of n bytes instead of 256
-static void Rc4_Init(RC4Context *context, const u8 *key, u32 keyLength, u32 n) {
+static void RC4init(RC4Context *context, const u8 *key, u32 keyLength, u32 n) {
     u8 *s = context->s;
     u32 i;
     u32 j;
@@ -1683,17 +1690,17 @@ static void Rc4_Init(RC4Context *context, const u8 *key, u32 keyLength, u32 n) {
     }
 }
 
-static void Rc4_Crypt(RC4Context *context, u8 *out, const u8 *in, u32 length) {
+static void RC4encrypt(RC4Context *context, u8 *out, const u8 *in, u32 length) {
     u32 i;
 
     for (i = 0; i < length; i++) {
-        u8 key = Rc4_Next(context);
+        u8 key = arcfour_byte(context);
 
         out[i] = in[i] ^ key;
     }
 }
 
-static u32 Rc4_Next(RC4Context *context) {
+static u32 arcfour_byte(RC4Context *context) {
     u8 *s = context->s;
     u32 n = context->n;
     u8 i = (context->i + 1) % n;
@@ -1710,15 +1717,15 @@ static u32 Rc4_Next(RC4Context *context) {
 }
 
 // The low byte of the complement of the CRC-32
-static u8 Aoss_Checksum(const u8 *data, int length) {
-    return Crc32_Update(-1, data, length, 0, sCrcTable) ^ 0xffffffff;
+static u8 crc(const u8 *data, int length) {
+    return update_crc(-1, data, length, 0, sCrcTable) ^ 0xffffffff;
 }
 
-static u32 Crc32_Update(u32 crc, const u8 *data, int length, int ready, u32 *table) {
+static u32 update_crc(u32 crc, const u8 *data, int length, int ready, u32 *table) {
     int i;
 
     if (ready == 0) {
-        Crc32_MakeTable(ready, table);
+        make_crc_table(ready, table);
     }
     for (i = 0; i < length; i++) {
         crc = (crc >> 8) ^ table[(u8)(data[i] ^ crc)];
@@ -1727,7 +1734,7 @@ static u32 Crc32_Update(u32 crc, const u8 *data, int length, int ready, u32 *tab
 }
 
 // Fills the table of the CRC-32; the caller passes its flag of a ready table, which isn't read
-static void Crc32_MakeTable(int ready, u32 *table) {
+static void make_crc_table(int ready, u32 *table) {
     u32 value;
     int i;
     int bit;
@@ -1746,31 +1753,31 @@ static void Crc32_MakeTable(int ready, u32 *table) {
 }
 
 // Scrambles a block with two rounds of a Feistel network keyed by the text; 0 if it had the memory
-static int Aoss_Scramble(u8 *block, int length, const char *key, int keyLength) {
+static int CryptSeqNo(u8 *block, int length, const char *key, int keyLength) {
     char *mask;
     u8 *work;
     int round;
 
-    mask = Aoss_Alloc(length / 2);
+    mask = AOSS_MALLOC(length / 2);
     if (mask == NULL) {
         return -1;
     }
-    work = Aoss_Alloc(length);
+    work = AOSS_MALLOC(length);
     if (work == NULL) {
-        Aoss_Free(mask);
+        AOSS_FREE(mask);
         return -1;
     }
     for (round = 0; round < 2; round++) {
-        Aoss_ScrambleKey(round, mask, length, key, keyLength);
-        Aoss_ScrambleXor(mask, block, length);
-        Aoss_ScrambleSwap(block, length, work);
+        MakeKey(round, mask, length, key, keyLength);
+        AddKey(mask, block, length);
+        Rotate(block, length, work);
     }
-    Aoss_Free(mask);
-    Aoss_Free(work);
+    AOSS_FREE(mask);
+    AOSS_FREE(work);
     return 0;
 }
 
-static void Aoss_ScrambleKey(int round, char *out, int length, const char *key, int keyLength) {
+static void MakeKey(int round, char *out, int length, const char *key, int keyLength) {
     int half = length / 2;
     int k = round % keyLength;
     int i;
@@ -1785,7 +1792,7 @@ static void Aoss_ScrambleKey(int round, char *out, int length, const char *key, 
     }
 }
 
-static void Aoss_ScrambleXor(const char *mask, u8 *block, int length) {
+static void AddKey(const char *mask, u8 *block, int length) {
     int i;
     int half = length / 2;
 
@@ -1794,30 +1801,30 @@ static void Aoss_ScrambleXor(const char *mask, u8 *block, int length) {
     }
 }
 
-static void Aoss_ScrambleSwap(u8 *block, int length, u8 *work) {
+static void Rotate(u8 *block, int length, u8 *work) {
     int half = length / 2;
 
-    Mem_Copy(work, block + half, half);
-    Mem_Copy(work + half, block, half);
-    Mem_Copy(block, work, length);
+    AOSS_Memcpy(work, block + half, half);
+    AOSS_Memcpy(work + half, block, half);
+    AOSS_Memcpy(block, work, length);
 }
 
-static void *Soc_Alloc(u32 name, s32 size) {
+static void *Alloc(u32 name, s32 size) {
     if (size > 0) {
         return gAossApAlloc(size);
     }
     return NULL;
 }
 
-static void Soc_Free(u32 name, void *ptr, s32 size) {
+static void Free(u32 name, void *ptr, s32 size) {
     gAossApFree(ptr);
 }
 
 // Starts the socket library with a fixed address
-static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
-    sSocConfig.addr = Net_Htonl(addr);
-    sSocConfig.netmask = Net_Htonl(netmask);
-    sSocConfig.gateway = Net_Htonl(gateway);
+static int AOSS_SetIPAddr(u32 addr, u32 netmask, u32 gateway) {
+    sSocConfig.addr.addr = AOSS_Htonl(addr);
+    sSocConfig.netmask.addr = AOSS_Htonl(netmask);
+    sSocConfig.router.addr = AOSS_Htonl(gateway);
     if (SOC_Startup(&sSocConfig) < 0) {
         return -1;
     }
@@ -1829,14 +1836,14 @@ static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
     return 0;
 }
 
-static int Net_Stop(void) {
+static int AOSS_Disconnect(void) {
     if (SOC_Cleanup() < 0) {
         return -1;
     }
-    return -(AossAp_Disconnect() != 0);
+    return -(AOSSi_Disconnect() != 0);
 }
 
-static int Mem_Compare(const u8 *a, const u8 *b, int size) {
+static int AOSS_Memcmp(const u8 *a, const u8 *b, int size) {
     int difference = 0;
 
     while (size-- > 0 && (difference = *a - *b) == 0) {
@@ -1846,68 +1853,68 @@ static int Mem_Compare(const u8 *a, const u8 *b, int size) {
     return difference;
 }
 
-static void Mem_Copy(void *dest, const void *src, u32 size) {
+static void AOSS_Memcpy(void *dest, const void *src, u32 size) {
     MI_CpuCopy8(src, dest, size);
 }
 
-static void Mem_Fill(void *dest, int value, u32 size) {
+static void AOSS_Memset(void *dest, int value, u32 size) {
     MI_CpuFill8(dest, (u8)value, size);
 }
 
-static int Net_RecvFrom(int sock, void *buffer, int size, int flags, SocAddrIn *from, int *fromLength) {
+static int AOSS_Recvfrom(int sock, void *buffer, int size, int flags, SOCSockAddrIn *from, int *fromLength) {
     from->len = *fromLength;
     return SOC_RecvFrom(sock, buffer, size, flags, from);
 }
 
 // Waits for the descriptor to be ready for at most the time
-static int Net_Poll(int count, SocPollFd *readFds, void *writeFds, void *exceptFds, const SocTimeval *timeout) {
-    SocPollFd fd = *readFds;
+static int AOSS_Select(int count, SOCPollFD *readFds, void *writeFds, void *exceptFds, const AOSS_timeval *timeout) {
+    SOCPollFD fd = *readFds;
     u64 ticks = 0;
 
-    ticks += ((u64)(s64)timeout->sec * 33514000) >> 6;
-    ticks += ((u64)(s64)timeout->usec * 33514000) >> 6;
+    ticks += ((u64)(s64)timeout->tv_sec * 33514000) >> 6;
+    ticks += ((u64)(s64)timeout->tv_usec * 33514000) >> 6;
     return SOC_Poll(&fd, 1, ticks);
 }
 
-static int Net_SendTo(int sock, const void *buffer, int size, int flags, SocAddrIn *to, int toLength) {
+static int AOSS_Sendto(int sock, const void *buffer, int size, int flags, SOCSockAddrIn *to, int toLength) {
     to->len = toLength;
     return SOC_SendTo(sock, buffer, size, flags, to);
 }
 
 // The socket library takes no options
-static int Net_SetSockOpt(int sock, int level, int name, const void *value, int length) {
+static int AOSS_Setsockopt(int sock, int level, int name, const void *value, int length) {
 }
 
-static int Net_Socket(int domain, int type, int protocol) {
+static int AOSS_Socket(int domain, int type, int protocol) {
     return SOC_Socket(domain, type, protocol);
 }
 
-static int Net_Bind(int sock, SocAddrIn *address, int length) {
+static int AOSS_Bind(int sock, SOCSockAddrIn *address, int length) {
     address->len = length;
     return SOC_Bind(sock, address);
 }
 
-static int Net_Close(int sock) {
+static int AOSS_Close(int sock) {
     return SOC_Close(sock);
 }
 
-static u32 Net_Htonl(u32 value) {
+static u32 AOSS_Htonl(u32 value) {
     return ((value >> 24) & 0xff) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | ((value << 24) & 0xff000000);
 }
 
-static u32 Net_Htons(u16 value) {
+static u32 AOSS_Htons(u16 value) {
     return (u16)(((value >> 8) & 0xff) | ((value << 8) & 0xff00));
 }
 
-static u32 Net_Ntohl(u32 value) {
+static u32 AOSS_Ntohl(u32 value) {
     return ((value >> 24) & 0xff) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | ((value << 24) & 0xff000000);
 }
 
-static u32 Net_Ntohs(u16 value) {
+static u32 AOSS_Ntohs(u16 value) {
     return (u16)(((value >> 8) & 0xff) | ((value << 8) & 0xff00));
 }
 
-static u32 Str_Length(const char *text) {
+static u32 AOSS_Strlen(const char *text) {
     u32 length = 0;
 
     while (text[length] != '\0') {
@@ -1917,12 +1924,12 @@ static u32 Str_Length(const char *text) {
 }
 
 // A linear congruential generator, seeded with the time
-static u16 Aoss_Rand(void) {
+static u16 AOSS_Rand(void) {
     if (sAoss.randReady == 0) {
         RTCTime time;
         u32 seed = 0;
 
-        Mem_Fill(&time, 0, sizeof(time));
+        AOSS_Memset(&time, 0, sizeof(time));
         if (RTC_GetTime(&time) == 0) {
             seed += time.hour << 10;
             seed += time.minute << 3;
@@ -1937,13 +1944,13 @@ static u16 Aoss_Rand(void) {
     return ((sAoss.randState >> 16) * 0x7fff) >> 16;
 }
 
-static void Net_PollInit(SocPollFd *fd) {
+static void AOSS_FD_ZERO(SOCPollFD *fd) {
     fd->fd = 0;
     fd->events = 0;
     fd->revents = 0;
 }
 
-static void Net_PollSet(int sock, SocPollFd *fd) {
+static void AOSS_FD_SET(int sock, SOCPollFD *fd) {
     fd->fd = sock;
     fd->events = 1;
 }

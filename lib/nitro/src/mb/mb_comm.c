@@ -11,7 +11,7 @@ static BOOL MBComm_IsValidAid(u16 aid);
 static void MBComm_NotifyState(u16 aid, u32 state, void *arg);
 static void MBComm_SetState(u16 aid, u32 state, void *arg);
 static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid);
-static void MBComm_ReadMPData(const WMMpRecvBuf *mp);
+static void MBComm_ReadMPData(const WMMpRecvHeader *mp);
 static int MBComm_SendFrame(u8 type, u16 aidBitmap);
 static int MBComm_SendFileInfo(void);
 static void MBComm_LoadCacheBlock(MBTask *task);
@@ -22,14 +22,14 @@ static u16 MBComm_MaxBlock(u32 a, u32 b);
 static void MBComm_NotifyError(u16 aid, u16 errcode);
 
 void MB_CommSetParentStateCallback(MBCommPStateCallback callback) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     MB_PARENT_WORK->callback = callback;
     OS_RestoreInterrupts(irq);
 }
 
 const MBUserInfo *MB_CommGetChildUser(u16 childAid) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)) {
         MI_CpuCopy8(&MB_PARENT_WORK->childUser[childAid - 1], &MB_PARENT_WORK->childUserCopy, sizeof(MBUserInfo));
@@ -49,7 +49,7 @@ BOOL MB_CommIsBootable(u16 childAid) {
 }
 
 BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u16 response;
     u16 state;
 
@@ -228,7 +228,7 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
     if (aid == 0 || aid > 15) {
         return;
     }
-    request = MBFrame_Decode(recv->data, &frame, aid);
+    request = MBFrame_Decode((const u8 *)&recv->cdata[0], &frame, aid);
     state = MB_PARENT_WORK->childState[aid - 1];
 
     switch (frame.type) {
@@ -334,7 +334,7 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
 }
 
 // Reads what every child sent in the last round
-static void MBComm_ReadMPData(const WMMpRecvBuf *mp) {
+static void MBComm_ReadMPData(const WMMpRecvHeader *mp) {
     u16 i;
     u16 aid;
 

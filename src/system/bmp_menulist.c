@@ -579,8 +579,8 @@ static void Bitmap_Scroll256(GFLBitmap *bitmap, u8 dir, u8 dist, u8 fill, u16 si
     u32 fill32;
     s32 end;
     s32 i;
-    s32 src;
-    s32 dst;
+    int src;
+    int dst;
     u32 y;
     s32 j;
 

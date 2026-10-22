@@ -58,7 +58,7 @@ static FSResult FSi_MemoryArchiveProc(FSFile *file, FSCommandType command) {
 // Makes the memory archive once: its hook set for every command, and nothing of the tables. The program ends if it
 // cannot be mounted
 static void FSi_InitMemoryArchive(void) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     if (!sMemoryArchiveReady || !FS_IsArchiveLoaded(&sMemoryArchive)) {
         FS_InitArchive(&sMemoryArchive);
@@ -72,7 +72,7 @@ static void FSi_InitMemoryArchive(void) {
 }
 
 // NitroSDK's FS_CreateFileFromMemory: opens the memory from data to data + size as a file
-BOOL FS_CreateFileFromMemory(FSFile *file, const void *data, u32 size) {
+BOOL FS_CreateFileFromMemory(FSFile *file, void *data, u32 size) {
     FSi_InitMemoryArchive();
     return FS_OpenFileDirect(file, &sMemoryArchive, (u32)data, (u32)data + size, 0);
 }

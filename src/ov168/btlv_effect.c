@@ -566,7 +566,7 @@ BOOL BtlvEffect_CheckExist(int pos) {
     return sBtlvEffect->trainers[pos - 8] != -1;
 }
 
-void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z) {
+void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx32 z) {
     switch (sBtlvEffect->setup.unk2C) {
     case 1:
         if (trainerType == 0 || trainerType == 1) {
@@ -632,7 +632,7 @@ void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z) {
     sBtlvEffect->trainers[pos - 8] = pos;
 }
 
-void BtlvEffect_DelTrainer(u32 pos) {
+void BtlvEffect_DelTrainer(BtlvMcssPos pos) {
     if (sBtlvEffect->trainers[pos - 8] != -1) {
         BtlvMcss_Remove(sBtlvEffect->mcss, pos);
         sBtlvEffect->trainers[pos - 8] = -1;
@@ -817,7 +817,7 @@ void BtlvEffect_SwapPokemon(u8 pos1, u8 pos2) {
     BtlvMcss_SwapPositions(sBtlvEffect->mcss, pos1, pos2);
 }
 
-s32 BtlvEffect_GetTrainerIndex(u32 pos) {
+s32 BtlvEffect_GetTrainerIndex(BtlvMcssPos pos) {
     return sBtlvEffect->trainers[pos - 8];
 }
 

@@ -393,7 +393,7 @@ static u32 PdcMain_ProcLeave(PdcMain *work) {
 
 // Fades in from black, or from white if the screens were white
 static void PdcMain_FadeIn(u32 slowness) {
-    if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) <= 0) {
+    if (GX_GetMasterBrightness() <= 0) {
         GFL_FadeSet(3, 16, 0, slowness);
     } else {
         GFL_FadeSet(12, 16, 0, slowness);

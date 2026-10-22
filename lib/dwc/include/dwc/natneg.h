@@ -1,8 +1,8 @@
 #ifndef POKEBW2_DWC_NATNEG_H
 #define POKEBW2_DWC_NATNEG_H
 
-#include "types.h"
 #include "dwc/NATify.h"
+#include "dwc/nonport.h"
 #include "nitrowifi/soc.h"
 
 // GameSpy's NAT negotiation (natneg.c), in overlay 11: two consoles behind NATs find each other's public address
@@ -19,71 +19,94 @@
 // memory), 2 (no socket, or the backend is down) and 3 (the servers' names can't be resolved)
 
 // The byte order of the network
-#define NN_SWAP16(x) ((u16)((u8)((x) >> 8) | ((x) << 8 & 0xff00)))
+#define NN_SWAP16(x) ((gsi_u16)((gsi_u8)((x) >> 8) | ((x) << 8 & 0xff00)))
 #define NN_SWAP32(x)                                                                                                   \
-    ((((u32)(x) >> 24) & 0xff) | (((u32)(x) >> 8) & 0xff00) | (((u32)(x) << 8) & 0xff0000) |                           \
-     (((u32)(x) << 24) & 0xff000000))
+    ((((gsi_u32)(x) >> 24) & 0xff) | (((gsi_u32)(x) >> 8) & 0xff00) | (((gsi_u32)(x) << 8) & 0xff0000) |               \
+     (((gsi_u32)(x) << 24) & 0xff000000))
 
 #define NATNEG_MAGIC_LEN 6
 
 // The packets' fields after the header, by type. The sizes sent are the header's 12 bytes and 9 for an init
 // packet (and the game's name after them), 8 for a connect packet or a ping, 61 for a report and 6 for a pre-init
-typedef struct InitPacket {
-    u8 portType; // 0 sent from the game's socket, 1 to 3 to each server from the negotiation's
-    u8 clientIndex;
-    u8 useGamePort;
-    u32 localIp;
-    u16 localPort;
+typedef struct _InitPacket {
+    unsigned char porttype; // 0 sent from the game's socket, 1 to 3 to each server from the negotiation's
+    unsigned char clientindex;
+    unsigned char usegameport;
+    unsigned int localip;
+    unsigned short localport;
 } InitPacket;
 
-typedef struct ReportPacket {
-    u8 portType;
-    u8 clientIndex;
-    u8 negResult; // whether it succeeded
-    int natType;
-    int natMappingScheme;
+typedef struct _ReportPacket {
+    unsigned char porttype;
+    unsigned char clientindex;
+    unsigned char negResult; // whether it succeeded
+    NatType natType;
+    NatMappingScheme natMappingScheme;
     char gamename[50];
 } ReportPacket;
 
-typedef struct ConnectPacket {
-    u32 remoteIp;
-    u16 remotePort;
-    u8 gotYourData;
-    u8 finished; // 0 while it goes on, else the reason it failed: 1 a deadbeat partner, 2 the init timed out
+typedef struct _ConnectPacket {
+    unsigned int remoteIP;
+    unsigned short remotePort;
+    unsigned char gotyourdata;
+    unsigned char finished; // 0 while it goes on, else the reason it failed: 1 a deadbeat partner, 2 the init timed out
 } ConnectPacket;
 
-typedef struct PreInitPacket {
-    u8 clientIndex;
-    u8 state; // in the ack: 2 when the init packets can be sent
-    u32 clientId;
-} PreInitPacket;
+typedef struct _PreinitPacket {
+    gsi_u8 clientindex;
+    gsi_u8 state; // in the ack: 2 when the init packets can be sent
+    gsi_u32 clientID;
+} PreinitPacket;
 
-typedef struct NatNegPacket {
-    u8 magic[NATNEG_MAGIC_LEN];
-    u8 version;
-    u8 packetType;
+typedef struct _NatNegPacket {
+    unsigned char magic[NATNEG_MAGIC_LEN];
+    unsigned char version;
+    unsigned char packettype;
     int cookie;
     union {
         InitPacket init;
         ConnectPacket connect;
         ReportPacket report;
-        PreInitPacket preInit;
-    } packet;
+        PreinitPacket preInit;
+    } Packet;
 } NatNegPacket;
 
-typedef void (*NegotiateProgressFunc)(int state, void *userData);
-typedef void (*NegotiateCompletedFunc)(int result, int gameSocket, SocAddrIn *remoteAddr, void *userData);
-typedef void (*NatDetectionResultsFunc)(BOOL success, NAT nat);
+typedef enum {
+    ns_initsent,
+    ns_initack,
+    ns_connectping,
+    ns_finished,
+    ns_canceled,
+    ns_reportsent,
+    ns_reportack
+} NegotiateState;
 
-extern u8 NNMagicData[NATNEG_MAGIC_LEN];
+typedef enum {
+    nr_success,
+    nr_deadbeatpartner,
+    nr_inittimeout,
+    nr_pingtimeout,
+    nr_unknownerror,
+    nr_noresult
+} NegotiateResult;
+
+typedef enum { ne_noerror, ne_allocerror, ne_socketerror, ne_dnserror } NegotiateError;
+
+typedef void (*NegotiateProgressFunc)(NegotiateState state, void *userData);
+typedef void (*NegotiateCompletedFunc)(NegotiateResult result, SOCKET gameSocket, SOCKADDR_IN *remoteAddr,
+                                       void *userData);
+typedef void (*NatDetectionResultsFunc)(gsi_bool success, NAT nat);
+
+extern unsigned char NNMagicData[NATNEG_MAGIC_LEN];
 
 void NNFreeNegotiateList(void);
 // Starts a negotiation that shares the game's socket, or uses its own when it is -1; the game passes the packets
 // that come in on its socket with the magic bytes to NNProcessData
-int NNBeginNegotiationWithSocket(int gameSocket, int cookie, int clientIndex, NegotiateProgressFunc progress,
-                                 NegotiateCompletedFunc completed, void *userData);
+NegotiateError NNBeginNegotiationWithSocket(SOCKET gameSocket, int cookie, int clientIndex,
+                                            NegotiateProgressFunc progress, NegotiateCompletedFunc completed,
+                                            void *userData);
 void NNCancel(int cookie);
 void NNThink(void);
-void NNProcessData(char *data, int length, SocAddrIn *from);
+void NNProcessData(char *data, int length, SOCKADDR_IN *from);
 
 #endif // POKEBW2_DWC_NATNEG_H

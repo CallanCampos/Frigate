@@ -61,11 +61,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `u64`'s low and high words in each other's registers before it goes to a 64-bit hardware register: write it in
   one `u64` store, not two 32-bit halves. (matching.md: "64-bit hardware register in one store")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
-  with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
+  with the parameter, as `DecodeRC4` does. (matching.md: "`DecodeRC4` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
   Declaring every local first and assigning them below moves both registers and slots (matching.md: "declared first")
 - A pointer needs an earlier slot but a later store: declare it without an initializer and assign it after other
-  pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
+  pointers, as in `GetWEPData` and `GetWPAData`. (matching.md: "A pointer that must")
 - An element pointer grows the frame and replaces the original's struct-base-plus-index field access: index the
   member at each use; declare a saved flag before a zeroed index and assign the flag afterward if the loop counter
   must copy that index's zero. (matching.md: "each received picture is accessed")
@@ -108,9 +108,18 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Registers of a scheduled function swapped although every order of the computation was tried: write the `volatile`
   stores first, and read fields at each use. (matching.md: "registers still follow the source order")
 - A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
-  declare it `unsigned long`, the SDK's `u32`. (matching.md: "`WDS_OnScan`")
+  declare it `u32`, the SDK's `unsigned long`, not `unsigned int`. (matching.md: "`WDSScanCallback`")
 - An array entry's address recomputed after a call, where the original keeps it from before the call in a saved
-  register: declare the index `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
+  register: declare the index `u32`, the SDK's `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
+- A constant added or subtracted before an index where ours folds it into the base, or the reverse: the index, count
+  or field's type, `int`/`unsigned int` against `u32`/`s32`. (matching.md: "Game Freak's code mixes the SDK's types")
+- A caller's scheduling or stack slots differ only around a call: the callee's parameter type, `int` against `long`.
+  (matching.md: "A narrow argument passed to a parameter")
+- A loop's setup registers swapped in a function that calls an inline with `u16` bounds: declare the inline's index
+  parameters `int` (`g2d_OAM.c`'s `LoadAffinesByFunction_`, 14 bytes to 4).
+- A field read through a pointer parameter folded where the original builds the address, or the reverse: the original
+  uses the pointer once more or less, or a `*(T *)&p->m` cast stands in for the field's real type. (matching.md:
+  "depends on how many references")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
   "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
@@ -310,8 +319,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
 - A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
   byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
-- `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
-  (matching.md: "`ScClient_Reset` matches")
+- `sciInterfaceDestroy`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer
+  locals. (matching.md: "`sciInterfaceDestroy` matches")
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - An inline's loads with a field's offset folded in (`[r, #4 + k]`), where the original adds the row to a base
@@ -567,7 +576,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
-  a sum that adds a counter known to be 0, has an enum counter. `ScReport_SetPlayer` keeps its known-zero error
+  a sum that adds a counter known to be 0, has an enum counter. `scReportSetPlayerData` keeps its known-zero error
   test with the real `SCResult` type. (matching.md: "enum type")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
   (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
@@ -691,8 +700,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
   it with fewer registers pushed: forward gotos to labelled tail blocks. (matching.md: "chosen by a flag tested")
-- `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
-  (matching.md: "`ScClient_OnCreateSession` keeps")
+- `sciWsCreateSessionCallback` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
+  (matching.md: "`sciWsCreateSessionCallback` keeps")
 - A combined `&&` camera check moves a copied parameter, where the original has two false branches with the same
   call: nest the checks and write that call in both false arms. (matching.md: "tests `cameraEnabled` first")
 - A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
@@ -776,8 +785,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - An unrolled loop over tables with the wrong registers and spills: step the tables by pointer (`*p++`) instead of
   indexing them. (matching.md: "A table read in an unrolled loop")
-- `ScClient_SubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
-  (matching.md: "`ScClient_SubmitReport` needs")
+- `scSubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
+  (matching.md: "`scSubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
   it as a counter times the step. (matching.md: "A loop offset that starts at 0")
 - A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2): put it last

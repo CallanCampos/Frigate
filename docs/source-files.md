@@ -136,9 +136,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
 | `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
 | `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
-| `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
-| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | complete | descriptive |
-| `gs_screen_print.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
+| `gsUdpEngine.c` | `0x0216eea8`–`0x0216fbe0` | 26 | partial | descriptive |
+| `gsXML.c` | `0x0216fbe0`–`0x021713e0` | 50 | complete | descriptive |
+| `screen.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
@@ -2332,16 +2332,18 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
-| `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
-| `sake_error.c` | `0x021bc4fc`–`0x021bc7c4` | 3 | complete | descriptive |
-| `sake_post.c` | `0x021bc7c4`–`0x021bc82c` | 2 | complete | descriptive |
-| `sake_storage.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
-| `sake_records.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
+| `sakeMain.c` | `0x021bc218`–`0x021bc478` | 16 | complete | descriptive |
+| `sakeRequest.c` | `0x021bc478`–`0x021bc82c` | 8 | complete | descriptive |
+| `sakeRequestModify.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
+| `sakeRequestRead.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
-| `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
-| `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
+| `sciInterface.c` | `0x021bda1c`–`0x021bdbdc` | 7 | complete | descriptive |
+| `sciMain.c` | `0x021bdbdc`–`0x021bde88` | 20 | complete | descriptive |
+| `sciReport.c` | `0x021bde88`–`0x021be340` | 14 | complete | descriptive |
+| `sciSerialize.c` | `0x021be340`–`0x021be474` | 4 | complete | descriptive |
+| `sciWebServices.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
-| `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
+| `AuthService.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 
 ### Overlay 261
 

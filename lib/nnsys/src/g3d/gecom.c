@@ -7,22 +7,13 @@
 // the commands that follow it wait in the buffer, if there is one, until the DMA is done. The file is named after
 // NitroSystem's own gecom.c. WaitDma and OnDmaDone are static because only this file refers to them
 
-#define GEBUFFER_ARRAY_SIZE 192
-
-// The commands that wait for the DMA: the number of words, then the words as the FIFO takes them (each command, then
-// its parameters). GeBuffer and GEBUFFER_ARRAY_SIZE are our names
-typedef struct {
-    u32 idx;
-    u32 data[GEBUFFER_ARRAY_SIZE];
-} GeBuffer;
-
 static void WaitDma(void);
 static void OnDmaDone(void *arg);
 
 // With -ipa file, MWCC lays these out in the order they are declared but with the first one last: sGeBuffer, sDmaBusy,
 // then NNS_G3dFlagUseFastDma
 u32 NNS_G3dFlagUseFastDma;
-static GeBuffer *sGeBuffer;
+static NNSG3dGeBuffer *sGeBuffer;
 // Whether a display list is on its way by DMA; the DMA's callback (OnDmaDone) clears it from the interrupt
 static volatile BOOL sDmaBusy;
 
@@ -30,17 +21,15 @@ BOOL NNS_G3dGeIsBufferExist(void) {
     return sGeBuffer != NULL;
 }
 
-void NNS_G3dGeSetBuffer(void *buffer) {
-    GeBuffer *buf = buffer;
-
+void NNS_G3dGeSetBuffer(NNSG3dGeBuffer *buf) {
     if (sGeBuffer == NULL) {
         buf->idx = 0;
         sGeBuffer = buf;
     }
 }
 
-void *NNS_G3dGeReleaseBuffer(void) {
-    GeBuffer *buf;
+NNSG3dGeBuffer *NNS_G3dGeReleaseBuffer(void) {
+    NNSG3dGeBuffer *buf;
 
     NNS_G3dGeFlushBuffer();
     buf = sGeBuffer;
@@ -134,7 +123,7 @@ void NNS_G3dGeSendDL(const void *list, u32 size) {
 // after what is before them
 void NNS_G3dGeBufferOP_N(u32 op, const u32 *args, u32 num) {
     if (sGeBuffer != NULL) {
-        if (sDmaBusy && sGeBuffer->idx + 1 + num <= GEBUFFER_ARRAY_SIZE) {
+        if (sDmaBusy && sGeBuffer->idx + 1 + num <= NNS_G3D_SIZE_COMBUFFER) {
             sGeBuffer->data[sGeBuffer->idx++] = op;
             if (num != 0) {
                 MIi_CpuCopyFast(args, &sGeBuffer->data[sGeBuffer->idx], num * sizeof(u32));

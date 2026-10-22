@@ -14,7 +14,7 @@ void OS_InitMessageQueue(OSMessageQueue *mq, OSMessage *msgArray, s32 msgCount) 
 // NitroSDK's OS_SendMessage: puts the message at the end of the queue, waiting for room if it is full and flags says
 // OS_MESSAGE_BLOCK
 BOOL OS_SendMessage(OSMessageQueue *mq, OSMessage msg, s32 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (mq->msgCount <= mq->usedCount) {
         if (!(flags & OS_MESSAGE_BLOCK)) {
@@ -35,7 +35,7 @@ BOOL OS_SendMessage(OSMessageQueue *mq, OSMessage msg, s32 flags) {
 // NitroSDK's OS_ReceiveMessage: takes the first message out of the queue (msg may be NULL to drop it), waiting for one
 // if it is empty and flags says OS_MESSAGE_BLOCK
 BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (mq->usedCount == 0) {
         if (!(flags & OS_MESSAGE_BLOCK)) {
@@ -58,7 +58,7 @@ BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags) {
 
 // NitroSDK's OS_JamMessage: puts the message at the front of the queue
 BOOL OS_JamMessage(OSMessageQueue *mq, OSMessage msg, s32 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (mq->msgCount <= mq->usedCount) {
         if (!(flags & OS_MESSAGE_BLOCK)) {
@@ -79,7 +79,7 @@ BOOL OS_JamMessage(OSMessageQueue *mq, OSMessage msg, s32 flags) {
 
 // NitroSDK's OS_ReadMessage: the first message, which stays in the queue
 BOOL OS_ReadMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (mq->usedCount == 0) {
         if (!(flags & OS_MESSAGE_BLOCK)) {

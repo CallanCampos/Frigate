@@ -5,24 +5,24 @@
 // The boundary that a request starts with; its last 18 characters change while the data has the boundary in it
 const char NHTTPi_boundary[] = "--t9Sf4yfjf1RtvDu3AA";
 
-static char NHTTPi_nextBoundaryChar(u8 c);
-static BOOL NHTTPi_makeBoundaryUnique(NHttpRequest *request, const char *data, int length);
+static char incAscii(u8 c);
+static BOOL checkTagPost(NHTTPReq *request, const char *data, int length);
 
 // Adds a part to the end of a list, or sets the value of the part that has the name (the name is compared as
 // NHTTPi_compareToken does)
-BOOL NHTTPi_addHdrList(NHttpHeader **list, NHttpState *state, const char *name, const char *value) {
-    NHttpHeader *head = *list;
-    NHttpHeader *node;
+BOOL NHTTPi_addHdrList(NHTTPi_DATALIST **list, NHttpState *state, const char *name, const char *value) {
+    NHTTPi_DATALIST *head = *list;
+    NHTTPi_DATALIST *node;
     BOOL found = FALSE;
-    NHttpHeader *created;
+    NHTTPi_DATALIST *created;
 
     if (head != NULL) {
         node = head;
-        if (NHTTPi_compareToken(name, head->name) != 0) {
+        if (NHTTPi_compareToken(name, head->label) != 0) {
             node = head->next;
             if (node != *list) {
                 do {
-                    if (NHTTPi_compareToken(name, node->name) == 0) {
+                    if (NHTTPi_compareToken(name, node->label) == 0) {
                         found = TRUE;
                         break;
                     }
@@ -36,15 +36,15 @@ BOOL NHTTPi_addHdrList(NHttpHeader **list, NHttpState *state, const char *name, 
     if (found) {
         node->value = (char *)value;
     } else {
-        created = NHTTPi_alloc(sizeof(NHttpHeader), 4);
+        created = NHTTPi_alloc(sizeof(NHTTPi_DATALIST), 4);
         if (created == NULL) {
             NHTTPi_SetError(state, 1);
             return FALSE;
         }
-        created->name = (char *)name;
+        created->label = (char *)name;
         created->value = (char *)value;
         created->length = 0;
-        created->binary = 0;
+        created->isBinary = 0;
         if (*list != NULL) {
             created->prev = (*list)->prev;
             created->next = *list;
@@ -59,7 +59,7 @@ BOOL NHTTPi_addHdrList(NHttpHeader **list, NHttpState *state, const char *name, 
     return TRUE;
 }
 
-static char NHTTPi_nextBoundaryChar(u8 c) {
+static char incAscii(u8 c) {
     u8 next = c + 1;
 
     if (next == '{') {
@@ -73,7 +73,7 @@ static char NHTTPi_nextBoundaryChar(u8 c) {
 }
 
 // Changes the end of the boundary until it is not in the data. Returns FALSE if no change is enough
-static BOOL NHTTPi_makeBoundaryUnique(NHttpRequest *request, const char *data, int length) {
+static BOOL checkTagPost(NHTTPReq *request, const char *data, int length) {
     char *name;
     int i;
     char c;
@@ -88,7 +88,7 @@ static BOOL NHTTPi_makeBoundaryUnique(NHttpRequest *request, const char *data, i
         c = request->boundary[i];
         original = NHTTPi_boundary[i];
         do {
-            c = NHTTPi_nextBoundaryChar(c);
+            c = incAscii(c);
             request->boundary[i] = c;
             if (c == original) {
                 break;
@@ -102,13 +102,13 @@ static BOOL NHTTPi_makeBoundaryUnique(NHttpRequest *request, const char *data, i
 }
 
 // Takes the first part off a list and returns it
-NHttpHeader *NHTTPi_getHdrFromList(void *list) {
-    NHttpHeader **headPtr = list;
-    NHttpHeader *head = *headPtr;
+NHTTPi_DATALIST *NHTTPi_getHdrFromList(void *list) {
+    NHTTPi_DATALIST **headPtr = list;
+    NHTTPi_DATALIST *head = *headPtr;
 
     if (head != NULL) {
-        NHttpHeader *prev = head->prev;
-        NHttpHeader *next;
+        NHTTPi_DATALIST *prev = head->prev;
+        NHTTPi_DATALIST *next;
 
         if (head != prev) {
             prev->next = head->next;
@@ -122,18 +122,18 @@ NHttpHeader *NHTTPi_getHdrFromList(void *list) {
     return head;
 }
 
-BOOL NHTTP_AddHeaderField(NHttpRequest *request, NHttpState *state, const char *name, const char *value) {
-    if (request->sent != 0) {
+BOOL NHTTP_AddHeaderField(NHTTPReq *request, NHttpState *state, const char *name, const char *value) {
+    if (request->isStarted != 0) {
         return FALSE;
     }
-    return NHTTPi_addHdrList(&request->headers, state, name, value);
+    return NHTTPi_addHdrList(&request->pListHeader, state, name, value);
 }
 
-BOOL NHTTP_AddPostDataAscii(NHttpRequest *request, NHttpState *state, const char *name, const char *value) {
+BOOL NHTTP_AddPostDataAscii(NHTTPReq *request, NHttpState *state, const char *name, const char *value) {
     BOOL added = FALSE;
     int length = 0;
 
-    if (request->sent != 0) {
+    if (request->isStarted != 0) {
         return FALSE;
     }
     if (request->rawPost != 0) {
@@ -142,7 +142,7 @@ BOOL NHTTP_AddPostDataAscii(NHttpRequest *request, NHttpState *state, const char
     if (value != NULL) {
         length = NHTTPi_strlen(value);
     }
-    if (NHTTPi_makeBoundaryUnique(request, value, length)) {
+    if (checkTagPost(request, value, length)) {
         added = NHTTPi_addHdrList(&request->postData, state, name, value);
         if (added) {
             request->postData->prev->length = length;

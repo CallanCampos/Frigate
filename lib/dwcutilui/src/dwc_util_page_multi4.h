@@ -16,16 +16,16 @@
 void DWCUtilPageMulti4_Init(void);
 
 // The end of the message once both screens have faded out: it goes on to the message of the connection test.
-// dwc_util_test_done.c has the same function, DWCUtilTestDone_WaitFadeOut
+// dwc_util_test_done.c has the same function, endScene1
 static inline void DWCUtilPageMulti4_WaitFadeOutInline(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilText_DestroyScreenBg(0);
-        DWCUtilScreen_Stop();
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_FNTlDeleteBgLcd(0);
+        DWCi_COMMENTlDelete();
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-        DWCUtilMain_SetLayout(0, 0);
-        DWCUtilMain_SetScreenArgs(0, 1);
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
+        DWCi_SetParam_(0, 0);
+        DWCi_SetParam2_(0, 1);
+        DWCi_ChangeScene(DWCUtilAutoConnectIntro_Init);
     }
 }
 

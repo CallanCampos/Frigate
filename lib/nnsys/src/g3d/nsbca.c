@@ -30,7 +30,7 @@ static void getScaleDataInterp_(ScaleData *value, fx32 frame, const NNSG3dJntAnm
                                 const NNSG3dResJntAnm *jntAnm);
 static void getRotData_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
 static void getRotDataInterp_(VecFx32 *rot, fx32 frame, const NNSG3dJntAnmTInfo *tInfo, const NNSG3dResJntAnm *jntAnm);
-static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, u32 rInfo);
+static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo);
 
 // For a rotation stored as its pivot (the one element that is 1 or -1, the others in its row and column being zero)
 // and two numbers, the pivot's index and where the numbers go in the matrix. sbc.c has the same table
@@ -56,7 +56,7 @@ static inline void makeRotRow2_(VecFx32 *rot) {
 // Fills in an animation object for a joint animation (NitroSystem's NNSi_G3dAnmObjInitNsBca, as recalled). It applies
 // the animation with NNS_G3dFuncAnmJntNsBca, and maps each node of the model to the data at its index, which is flagged
 // as existing and holds the index that the top byte of the data's tag gives
-void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
+void NNS_G3DAnimationInit_CA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResJntAnm *jntAnm = anm;
     const u16 *ofsTag;
     u32 i;
@@ -122,7 +122,7 @@ static void setBaseScale_(NNSG3dJntAnmResult *result) {
             data += 8 * sizeof(fx16);
         }
     }
-    rs->funcJntScale(result, (const NNSG3dJointScale *)data, cmd, node->flag);
+    rs->funcJntScale(result, (const fx32 *)data, cmd, node->flag);
 }
 
 static void setBaseRot_(NNSG3dJntAnmResult *result) {
@@ -185,7 +185,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
     const u32 *p;
     BOOL interpolate;
     u32 tag;
-    NNSG3dJointScale scale;
+    fx32 scale[6];
     ScaleData scaleX;
     ScaleData scaleY;
     ScaleData scaleZ;
@@ -274,13 +274,13 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
                 } else {
                     getScaleData_(&scaleX, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
-                scale.scale.x = scaleX.scale;
-                scale.invScale.x = scaleX.invScale;
+                scale[0] = scaleX.scale;
+                scale[3] = scaleX.invScale;
             } else {
                 const ScaleData *c = (const ScaleData *)p;
 
-                scale.scale.x = c->scale;
-                scale.invScale.x = c->invScale;
+                scale[0] = c->scale;
+                scale[3] = c->invScale;
             }
             p += 2;
 
@@ -290,13 +290,13 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
                 } else {
                     getScaleData_(&scaleY, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
-                scale.scale.y = scaleY.scale;
-                scale.invScale.y = scaleY.invScale;
+                scale[1] = scaleY.scale;
+                scale[4] = scaleY.invScale;
             } else {
                 const ScaleData *c = (const ScaleData *)p;
 
-                scale.scale.y = c->scale;
-                scale.invScale.y = c->invScale;
+                scale[1] = c->scale;
+                scale[4] = c->invScale;
             }
             p += 2;
 
@@ -306,13 +306,13 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
                 } else {
                     getScaleData_(&scaleZ, frame, (const NNSG3dJntAnmTInfo *)p, jntAnm);
                 }
-                scale.scale.z = scaleZ.scale;
-                scale.invScale.z = scaleZ.invScale;
+                scale[2] = scaleZ.scale;
+                scale[5] = scaleZ.invScale;
             } else {
                 const ScaleData *c = (const ScaleData *)p;
 
-                scale.scale.z = c->scale;
-                scale.invScale.z = c->invScale;
+                scale[2] = c->scale;
+                scale[5] = c->invScale;
             }
         } else if (tag & NNS_G3D_JNTANM_SRTINFO_IDENTITY_S) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE;
@@ -322,7 +322,7 @@ static void getJntSRTAnmResult_(const NNSG3dResJntAnm *jntAnm, u32 dataIdx, fx32
         }
     }
 
-    g_NNSG3DModelRenderer->funcJntScale(result, &scale, g_NNSG3DModelRenderer->c,
+    g_NNSG3DModelRenderer->funcJntScale(result, scale, g_NNSG3DModelRenderer->c,
                                         (result->flag & NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE) ? NNS_G3D_SRTFLAG_SCALE_ONE
                                                                                              : 0);
 }
@@ -911,17 +911,17 @@ blend:
 // to negate) or of five (the first two rows' elements but one, 13 bits each with the rest of the bits of the sixth
 // in the low three of them). Returns whether the third row still has to be made from the first two, which a rotation
 // of five values leaves to
-static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, u32 rInfo) {
+static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Table, NNSG3dJntAnmRIdx rInfo) {
     fx32 *elem = (fx32 *)rot;
 
-    if (rInfo & NNS_G3D_JNTANM_RINFO_IS_ROT3) {
+    if (rInfo & NNS_G3D_JNTANM_RIDX_PIVOT) {
         const s16 *p;
         fx32 b;
         fx32 a;
         u32 pivot;
 
         elem[0] = elem[1] = elem[2] = elem[3] = elem[4] = elem[5] = elem[6] = elem[7] = elem[8] = 0;
-        p = (const s16 *)rot3Table + 3 * (rInfo & NNS_G3D_JNTANM_RINFO_IDX_MASK);
+        p = (const s16 *)rot3Table + 3 * (rInfo & NNS_G3D_JNTANM_RIDX_IDXDATA_MASK);
         a = p[1];
         b = p[2];
         pivot = p[0] & 0xf;
@@ -938,7 +938,7 @@ static BOOL getRotMtx_(VecFx32 *rot, const void *rot3Table, const void *rot5Tabl
         elem[NNS_COMPACT_ROT_LUT_CA[pivot][3]] = a;
         return FALSE;
     } else {
-        const s16 *p = (const s16 *)rot5Table + 5 * (rInfo & NNS_G3D_JNTANM_RINFO_IDX_MASK);
+        const s16 *p = (const s16 *)rot5Table + 5 * (rInfo & NNS_G3D_JNTANM_RIDX_IDXDATA_MASK);
         s16 bits;
 
         bits = p[4] & 7;

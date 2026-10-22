@@ -154,8 +154,8 @@ void TrainerLogSave_Init(TrainerLogSave *log) {
 }
 
 u8 TrainerLogSave_InsertEntry(TrainerLogSave *log, s32 count, const TrainerLogEntry *entry) {
-    s32 slot = -1;
-    s32 i;
+    int slot = -1;
+    int i;
 
     for (i = 0; i < count; i++) {
         if (!log->entries[i].used || log->entries[i].value <= entry->value) {

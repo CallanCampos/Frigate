@@ -28,6 +28,7 @@ typedef struct {
 static MICResult SndMic_StartSampling(MICAutoParam *param);
 static void *SndMic_GetAlignedBuffer(void);
 
+// The microphone filter's coefficients, an SNDEXIirFilterParam, and a sixth halfword that is not sent
 static u16 sMicFilter[6] = { 0x7e46, 0x81ba, 0x7e46, 0x7e43, 0x836e, 0 };
 
 static SndMic *sSndMic;
@@ -45,9 +46,7 @@ void setupMic(HeapID heapId) {
     PM_SetAmpGain(2);
     mic->enabled = TRUE;
     MIC_Init();
-    if (OS_IsRunOnTwl() == TRUE) {
-        SNDEX_SetIirFilter(0, sMicFilter);
-    }
+    SNDEX_SetIirFilter(SNDEX_IIR_FILTER_ADC_1, (const SNDEXIirFilterParam *)sMicFilter);
     sSndMic = mic;
 }
 

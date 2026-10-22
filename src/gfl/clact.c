@@ -132,7 +132,7 @@ static void ClActTransfer_AllocTasks(ClActTransfer *transfer, u32 count, HeapID 
 static void ClActTransfer_FreeTasks(ClActTransfer *transfer);
 static void ClActTransfer_RunTasks(ClActTransfer *transfer);
 static ClActTransferTask *ClActTransfer_FindFreeTask(ClActTransfer *transfer);
-static BOOL ClActTransfer_Request(u32 type, u32 dstAddr, void *src, u32 size);
+static BOOL ClActTransfer_Request(NNS_GFD_DST_TYPE type, u32 dstAddr, void *src, u32 size);
 static void ClActTransferTask_Set(ClActTransferTask *task, u32 screen, u32 dst, void *src, u32 size);
 static void ClActTransferTask_Run(ClActTransferTask *task);
 static ClActor *ClActUnit_FindFreeActor(ClActUnit *unit);
@@ -1310,10 +1310,10 @@ static BOOL ClAct_IsCellInViewTransformed(const NNSG2dCellData *cell, const MtxF
     fx32 right;
 
     if (((cell->cellAttr >> NNSi_G2D_CELLATTR_BOUNDINGRECT_SHIFT) & 1) == 1) {
-        minY = rect->minBounding.y << FX32_SHIFT;
-        maxY = rect->maxBounding.y << FX32_SHIFT;
-        minX = rect->minBounding.x << FX32_SHIFT;
-        maxX = rect->maxBounding.x << FX32_SHIFT;
+        minY = rect->minY << FX32_SHIFT;
+        maxY = rect->maxY << FX32_SHIFT;
+        minX = rect->minX << FX32_SHIFT;
+        maxX = rect->maxX << FX32_SHIFT;
     } else {
         minY = -r << FX32_SHIFT;
         maxY = r << FX32_SHIFT;
@@ -1352,10 +1352,10 @@ static BOOL ClAct_IsCellInView(const NNSG2dCellData *cell, const MtxFx32 *mtx, c
     fx32 maxX;
 
     if (((cell->cellAttr >> NNSi_G2D_CELLATTR_BOUNDINGRECT_SHIFT) & 1) == 1) {
-        minY = rect->minBounding.y << FX32_SHIFT;
-        maxY = rect->maxBounding.y << FX32_SHIFT;
-        minX = rect->minBounding.x << FX32_SHIFT;
-        maxX = rect->maxBounding.x << FX32_SHIFT;
+        minY = rect->minY << FX32_SHIFT;
+        maxY = rect->maxY << FX32_SHIFT;
+        minX = rect->minX << FX32_SHIFT;
+        maxX = rect->maxX << FX32_SHIFT;
     } else {
         minY = -r << FX32_SHIFT;
         maxY = r << FX32_SHIFT;
@@ -1498,7 +1498,7 @@ static ClActTransferTask *ClActTransfer_FindFreeTask(ClActTransfer *transfer) {
     return NULL;
 }
 
-static BOOL ClActTransfer_Request(u32 type, u32 dstAddr, void *src, u32 size) {
+static BOOL ClActTransfer_Request(NNS_GFD_DST_TYPE type, u32 dstAddr, void *src, u32 size) {
     ClActTransferTask *task = ClActTransfer_FindFreeTask(&g_ClActSys->transfer);
     u32 screen;
 

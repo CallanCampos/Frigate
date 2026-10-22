@@ -33,7 +33,7 @@ void OSi_InitVramExclusive(void) {
 
 // NitroSDK's OSi_UnlockVram: gives back the banks of the mask that the lock ID has
 void OSi_UnlockVram(u16 bank, u16 lockId) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u32 unlocking = bank & OSi_vramExclusive & OSi_VRAM_ALL_BANKS;
 
     for (;;) {

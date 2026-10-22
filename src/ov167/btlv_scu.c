@@ -578,7 +578,7 @@ BOOL BtlvScu_WaitEncount(BtlvScu *scu) {
 }
 
 static void BtlvScu_EncountFadeIn(s32 wait) {
-    if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) <= 0) {
+    if (GX_GetMasterBrightness() <= 0) {
         GFL_FadeSet(FADE_ENGINE_A_BLACK | FADE_ENGINE_B_BLACK, 16, 0, wait);
     } else {
         GFL_FadeSet(FADE_ENGINE_A_WHITE | FADE_ENGINE_B_WHITE, 16, 0, wait);

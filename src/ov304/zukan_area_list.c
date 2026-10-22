@@ -282,8 +282,8 @@ static void ZukanAreaList_StateFadeIn(ZukanAreaListWork *wk) {
         break;
     case 1:
         if (!ZukanAreaListView_IsFading(&wk->view)) {
-            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+            GX_SetMasterBrightness(0);
+            GXS_SetMasterBrightness(0);
             ZukanAreaListView_StartFade(&wk->view, 16, 0);
             wk->step++;
         }
@@ -318,8 +318,8 @@ static void ZukanAreaList_StateFadeOut(ZukanAreaListWork *wk) {
     case 1:
         if (!ZukanAreaListView_IsFading(&wk->view)) {
             if (wk->touchbarOffset >= SLIDE_DISTANCE) {
-                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+                GX_SetMasterBrightness(-16);
+                GXS_SetMasterBrightness(-16);
                 ZukanAreaList_SetState(wk, STATE_END, STATE_PARAM_NORMAL);
             } else {
                 ZukanAreaListView_Slide(&wk->view, SLIDE_SPEED, TRUE);

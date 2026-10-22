@@ -13,7 +13,7 @@
 // ours. The game's functions (sending, the receive buffers, the callbacks and the receive timeouts) are in dwc/dwc.h.
 
 // The function called with the latency of a ping to a machine, in milliseconds
-typedef void (*DWCPingFunc)(int latency, u8 aid, void *param);
+typedef void (*DWCUserPingCallback)(int latency, u8 aid, void *param);
 
 // What the transport keeps for each machine of the match: the data being sent and how much of it is sent, the game's
 // receive buffer, how much of the data being received has come and its size, whether data is being sent, the state of
@@ -34,8 +34,8 @@ typedef struct DWCTransportConnection {
     u8 pad;
     u16 unk_20;
     u16 lastRecvType;
-    u64 recvTimeoutTime;
-    u32 recvTimeout;
+    u64 previousRecvTick;
+    u32 recvTimeoutTime;
     u64 lastRecvTime;
 } DWCTransportConnection;
 
@@ -44,10 +44,10 @@ typedef struct DWCTransportConnection {
 // milliseconds
 typedef struct DWCTransportInfo {
     DWCTransportConnection connections[32];
-    DWCSendFunc sendCallback;
-    DWCRecvFunc recvCallback;
-    DWCTimeoutFunc recvTimeoutCallback;
-    DWCPingFunc pingCallback;
+    DWCUserSendCallback sendCallback;
+    DWCUserRecvCallback recvCallback;
+    DWCUserRecvTimeoutCallback recvTimeoutCallback;
+    DWCUserPingCallback pingCallback;
     void *sendParam;
     void *recvParam;
     void *recvTimeoutParam;
@@ -61,13 +61,13 @@ typedef struct DWCTransportInfo {
 BOOL DWC_SendReliable(u8 aid, const void *data, int size);
 BOOL DWC_SendUnreliable(u8 aid, const void *data, int size);
 // Sends data of a kind (1 the game's, 2 to 4 the match's own) to a machine, returning FALSE if it can't be sent now
-BOOL DWCi_SendReliable(int type, u8 aid, const void *data, int size);
+BOOL DWCi_SendReliable(u16 type, u8 aid, const void *data, int size);
 // Starts the transport in the memory the match gives it, and ends it
 void DWCi_InitTransport(DWCTransportInfo *info);
 void DWCi_ShutdownTransport(void);
 // GT2's callbacks of a connection: a message received, and the latency of a ping
-void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable);
-void DWCi_PingCallback(GTI2Connection *connection, u32 latency);
+void DWCi_RecvCallback(GT2Connection connection, GT2Byte *message, int length, GT2Bool reliable);
+void DWCi_PingCallback(GT2Connection connection, int latency);
 // Runs the transport for a frame: drops the machines that sent nothing for too long, calls the receive timeouts and
 // sends the next piece of the data being sent
 void DWCi_TransportProcess(void);

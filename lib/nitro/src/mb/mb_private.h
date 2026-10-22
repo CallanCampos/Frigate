@@ -465,10 +465,10 @@ typedef struct {
 typedef struct {
     WMParentParam parentParam;
     u8 unk_38[8];
-    u8 sendBuf[0x500 - 0x40];
+    u16 sendBuf[(0x500 - 0x40) / sizeof(u16)];
     u16 parentSendSize;
     u16 childSendSize;
-    void *recvBuf;
+    WMMpRecvBuf *recvBuf;
     WMCallbackFunc wmCallback;
     u8 sending;
     u8 started;

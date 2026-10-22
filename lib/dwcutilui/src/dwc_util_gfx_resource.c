@@ -32,14 +32,14 @@ static const DWCUtilTextPos sStrPositions[7] = {
 };
 static char sPath[0x40];
 
-char *DWCUtilGfxResource_LocalizePath(const char *path) {
+char *DWCi_Char(const char *path) {
     int language;
 
     strncpy(sPath, path, sizeof(sPath) - 1);
     if (path[5] == 'x') {
         return sPath;
     }
-    language = DWCUtilMain_GetLanguage();
+    language = DWCi_Language();
     if (path[5] == 'y' && language != 0) {
         return sPath;
     }
@@ -51,52 +51,50 @@ void DWCUtilGfxResource_Load(const char *path, void (*upload)(const void *, u32,
     u32 size;
     void *data;
 
-    data = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(path), &size, 4);
+    data = DWCUtilRomResource_LoadFile(DWCi_Char(path), &size, 4);
     DC_FlushRange(data, size);
     upload(data, 0, size);
-    DWCUtilRomResource_FreeFile(data);
+    DWCi_ARClRelease(data);
 }
 
-void DWCUtilGfxResource_ShowStep(int variant) {
+void DWCi_CMNlStep(int variant) {
     u32 layout;
 
-    DWCUtilMain_GetLayout(&layout, NULL);
+    DWCi_GetParam_(&layout, NULL);
     if (layout == 1) {
         DWCUtilSubScreen_SlideInRow(variant);
     } else if (layout == 2) {
-        DWCUtilSubScreen_ChangeRow(variant);
+        DWCi_STEPlChange(variant);
     }
 }
 
-void DWCUtilGfxResource_ShowButtons(int variant) {
+void DWCi_CMNlButton(int variant) {
     u32 layout;
 
-    DWCUtilMain_GetLayout(NULL, &layout);
+    DWCi_GetParam_(NULL, &layout);
     if (layout == 1) {
-        DWCUtilUiObject_Init(variant);
+        DWCi_BTNlInit(variant);
     }
 }
 
-void DWCUtilGfxResource_ShowMessage(int msgIndex) {
-    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
-    u16 *str = DWCUtilMsg_Get(gDWCUtilMsg, msgIndex);
+void DWCi_CMNlMsgDraw(int msgIndex) {
+    DWCUtilText *text = DWCi_FNTlFormBgEx(0, 0);
+    u16 *str = DWCi_MSGlGet(gDWCUtilMsg, msgIndex);
 
-    DWCUtilText_DrawRect(text, sMsgBox.x, sMsgBox.y, sMsgBox.width, sMsgBox.height, 2,
-                         DWCUtilGfxResource_GetTextFlags(), str);
+    DWCi_FNTlDrawRect(text, sMsgBox.x, sMsgBox.y, sMsgBox.width, sMsgBox.height, 2, DWCi_CMNlFontFlag(), str);
     DWCUtilText_MarkDirty(text);
 }
 
-void DWCUtilGfxResource_ShowMessageWithString(const void *str, int msgIndex) {
-    DWCUtilText *text = DWCUtilText_CreateBg(0, 0);
-    u16 *msg = DWCUtilMsg_Get(gDWCUtilMsg, msgIndex);
+void DWCi_CMNlMsgNameDraw(const void *str, int msgIndex) {
+    DWCUtilText *text = DWCi_FNTlFormBgEx(0, 0);
+    u16 *msg = DWCi_MSGlGet(gDWCUtilMsg, msgIndex);
 
-    DWCUtilText_DrawRect(text, sStrMsgBox.x, sStrMsgBox.y, sStrMsgBox.width, sStrMsgBox.height, 2,
-                         DWCUtilGfxResource_GetTextFlags(), msg);
-    DWCUtilText_Draw(text, sStrPositions[DWCUtilMain_GetLanguage()].x, sStrPositions[DWCUtilMain_GetLanguage()].y, 2,
-                     0x209, str);
+    DWCi_FNTlDrawRect(text, sStrMsgBox.x, sStrMsgBox.y, sStrMsgBox.width, sStrMsgBox.height, 2, DWCi_CMNlFontFlag(),
+                      msg);
+    DWCi_FNTlDraw(text, sStrPositions[DWCi_Language()].x, sStrPositions[DWCi_Language()].y, 2, 0x209, str);
     DWCUtilText_MarkDirty(text);
 }
 
-u32 DWCUtilGfxResource_GetTextFlags(void) {
-    return sTextFlags[DWCUtilMain_GetLanguage()];
+u32 DWCi_CMNlFontFlag(void) {
+    return sTextFlags[DWCi_Language()];
 }

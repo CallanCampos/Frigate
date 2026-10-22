@@ -6,9 +6,9 @@
 #include "struct_decls.h"
 
 // A voice packet as it goes over the wire
-struct VCTVoicePacket {
+struct AudioHeader {
     u32 magic;
-    u8 type;
+    u8 header;
     // The codec, with the top bit set on the first frame after a silence
     u8 codec;
     u16 sequence;
@@ -18,10 +18,10 @@ struct VCTVoicePacket {
 };
 
 // vct_audio.c: the frames going out and coming in
-BOOL VCT_InitAudio(void);
-void VCT_ClearSessionCount(void);
-BOOL VCT_HandleVoicePacket(int aid, VCTVoicePacket *packet, int size, u64 now);
-int VCT_DecodeReceived(void);
-BOOL VCT_SendPending(void);
+BOOL vct_init_audio(void);
+void vct_finish_audio(void);
+BOOL vct_handle_audio(int aid, AudioHeader *packet, int size, u64 now);
+int vct_decode_audio_buffer(void);
+BOOL vct_flush_send_buffer(void);
 
 #endif // POKEBW2_DWC_VCT_AUDIO_INTERNAL_H

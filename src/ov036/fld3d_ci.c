@@ -1539,16 +1539,16 @@ static void Fld3DCi_AllFadeTCB(TCB *tcb, void *work) {
 
 static void Fld3DCiFadeState_Apply(Fld3DCiFade *fade) {
     if (fade->flags & 1) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -(fade->current >> 12));
+        GX_SetMasterBrightness(-(fade->current >> 12));
     }
     if (fade->flags & 2) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -(fade->current >> 12));
+        GXS_SetMasterBrightness(-(fade->current >> 12));
     }
     if (fade->flags & 4) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, fade->current >> 12);
+        GX_SetMasterBrightness(fade->current >> 12);
     }
     if (fade->flags & 8) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, fade->current >> 12);
+        GXS_SetMasterBrightness(fade->current >> 12);
     }
 }
 

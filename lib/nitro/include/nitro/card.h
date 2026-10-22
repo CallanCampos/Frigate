@@ -273,7 +273,7 @@ void CARD_CancelBackupAsync(void);
 // What card_common.c and card_task.c give the other files of the library
 void CARD_Init(void); // swan's cart_read_thread_init
 void CARD_CheckEnabled(void);
-const ROMHeader *CARD_GetRomHeader(void);
+const u8 *CARD_GetRomHeader(void);
 void CARD_LockRom(u16 lockId);
 void CARD_UnlockRom(u16 lockId);
 u32 CARDi_GetAccessLevel(void);
@@ -288,7 +288,7 @@ void CARDi_ICInvalidateSmart(void *addr, u32 len, u32 threshold);
 void CARDi_DCInvalidateSmart(void *addr, u32 len, u32 threshold);
 // Called with each word the ARM7 sends with the card's tag, and sends it its commands. CARDi_OnFifoRecv and
 // CARDi_Request
-void CARDi_OnFifoRecv(u32 fifoTag, u32 data, BOOL err);
+void CARDi_OnFifoRecv(PXIFifoTag fifoTag, u32 data, BOOL err);
 BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry);
 
 // The middleware signature of the backup part of the library, "[SDK+NINTENDO:BACKUP]", which lies in the version
@@ -316,7 +316,17 @@ typedef struct CARDiRomDmaRead {
 
 // Reads len bytes of the ROM at the offset src into dst, with a DMA channel of the number dma if it can, and calls the
 // callback with the argument once done. Waits for the end unless async
-void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async);
+void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async);
+
+// The SDK's two forms of it, which most callers use
+static inline void CARD_ReadRomAsync(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg) {
+    CARDi_ReadRom(dma, src, dst, len, callback, arg, TRUE);
+}
+
+static inline void CARD_ReadRom(u32 dma, const void *src, void *dst, u32 len) {
+    CARDi_ReadRom(dma, src, dst, len, NULL, NULL, FALSE);
+}
+
 // NitroSDK's CARDi_ReadRomWithCPU and CARDi_ReadRomWithDMA, which TwlSDK's part of the library in the LTD autoload
 // calls. The first reads len bytes from src into dst and returns len; its first parameter is for the argument of a
 // callback that it has no use for

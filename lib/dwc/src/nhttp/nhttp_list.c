@@ -8,9 +8,9 @@ void NHTTPi_InitListInfo(NHttpListInfo *info) {
 }
 
 // Puts a request at the end of the list and gives it an id, or returns -1 if there is no memory
-int NHTTPi_setReqQueue(NHttpListInfo *info, NHttpRequest *request) {
+int NHTTPi_setReqQueue(NHttpListInfo *info, NHTTPReq *request) {
     int id = -1;
-    NHttpQueueNode *node = NHTTPi_alloc(sizeof(NHttpQueueNode), 4);
+    NHTTPi_REQLIST *node = NHTTPi_alloc(sizeof(NHTTPi_REQLIST), 4);
 
     if (node != NULL) {
         if (info->head != NULL) {
@@ -25,7 +25,7 @@ int NHTTPi_setReqQueue(NHttpListInfo *info, NHttpRequest *request) {
         }
         id = info->count++;
         node->id = id;
-        node->request = request;
+        node->req = request;
         node->socket = -1;
         if (info->count < 0) {
             info->count = 0;
@@ -35,10 +35,10 @@ int NHTTPi_setReqQueue(NHttpListInfo *info, NHttpRequest *request) {
 }
 
 // Finds the request that has an id
-NHttpQueueNode *NHTTPi_findReqQueue(NHttpListInfo *info, int id) {
-    NHttpQueueNode *found = NULL;
-    NHttpQueueNode *head = info->head;
-    NHttpQueueNode *node;
+NHTTPi_REQLIST *NHTTPi_findReqQueue(NHttpListInfo *info, int id) {
+    NHTTPi_REQLIST *found = NULL;
+    NHTTPi_REQLIST *head = info->head;
+    NHTTPi_REQLIST *node;
 
     if (head != NULL) {
         if (head->id == id) {
@@ -60,7 +60,7 @@ NHttpQueueNode *NHTTPi_findReqQueue(NHttpListInfo *info, int id) {
 // Takes a request out of the list and ends its connection
 BOOL NHTTPi_freeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo, int id) {
     BOOL freed = FALSE;
-    NHttpQueueNode *node = NHTTPi_findReqQueue(info, id);
+    NHTTPi_REQLIST *node = NHTTPi_findReqQueue(info, id);
 
     if (node != NULL) {
         NHttpConnection *connection;
@@ -74,8 +74,8 @@ BOOL NHTTPi_freeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo, int id)
         } else {
             info->head = NULL;
         }
-        connection = NHTTPi_Request2Connection(mutexInfo, node->request);
-        NHTTPi_destroyRequestObject(mutexInfo, node->request);
+        connection = NHTTPi_Request2Connection(mutexInfo, node->req);
+        NHTTPi_destroyRequestObject(mutexInfo, node->req);
         NHTTPi_free(node);
         if (connection != NULL) {
             connection->status = 8;
@@ -88,7 +88,7 @@ BOOL NHTTPi_freeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo, int id)
 }
 
 void NHTTPi_allFreeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo) {
-    NHttpQueueNode *node = info->head;
+    NHTTPi_REQLIST *node = info->head;
 
     if (node != NULL) {
         do {
@@ -99,6 +99,6 @@ void NHTTPi_allFreeReqQueue(NHttpListInfo *info, NHttpMutexInfo *mutexInfo) {
 }
 
 // Takes the request that runs next off the list
-NHttpQueueNode *NHTTPi_getReqFromReqQueue(NHttpListInfo *info) {
-    return (NHttpQueueNode *)NHTTPi_getHdrFromList(info);
+NHTTPi_REQLIST *NHTTPi_getReqFromReqQueue(NHttpListInfo *info) {
+    return (NHTTPi_REQLIST *)NHTTPi_getHdrFromList(info);
 }

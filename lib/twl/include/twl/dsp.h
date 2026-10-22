@@ -8,15 +8,17 @@
 #include "twl/pm.h"
 
 // TwlSDK's DSP library, in the DSi's LTD autoload, which plays the camera's shutter and video sounds through the G.711
-// component. As with the camera, the SDK's inline functions only call it on a DSi, and its functions have the SDK's
-// names, from what they do; some keep their default names.
+// component. As with the camera, the SDK's inline functions only call it on a DSi. The public functions and types have
+// the names of the TWL-SDK Function Reference Manual, and the Core functions, the process and pipe types those of
+// libntr's reconstruction of TwlSDK's headers (dsp_util.h, g711.h, graphics.h, dsp_if.h, process.h, pipe.h), from what
+// they do; some keep their default names.
 
-void DSP_StopSoundCore(void); // stops the sound playing
-BOOL DSP_PlayShutterSoundCore(const void *src, u32 length);
-BOOL DSP_IsShutterSoundPlayingCore(void);
-BOOL DSP_OpenStaticComponentG711Core(FSFile *file);
-BOOL DSP_LoadG711Core(FSFile *file, int slotB, int slotC);
-void DSP_UnloadG711Core(void);
+void DSPi_StopSoundCore(void); // stops the sound playing
+BOOL DSPi_PlayShutterSoundCore(const void *src, u32 length);
+BOOL DSPi_IsShutterSoundPlayingCore(void);
+void DSPi_OpenStaticComponentG711Core(FSFile *file);
+BOOL DSPi_LoadG711Core(FSFile *file, int slotB, int slotC);
+void DSPi_UnloadG711Core(void);
 
 // The COFF images of the G.711 and the graphics component, in the LTD autoload's .rodata after its code
 // (dsp_g711_image.c, dsp_graphics_image.c). The openers hand them to the file system as memory files of this size,
@@ -27,13 +29,13 @@ extern const u8 DSP_GraphicsImage[];
 
 static inline void DSP_StopSound(void) {
     if (OS_IsRunOnTwl()) {
-        DSP_StopSoundCore();
+        DSPi_StopSoundCore();
     }
 }
 
 static inline BOOL DSP_PlayShutterSound(const void *src, u32 length) {
     if (OS_IsRunOnTwl()) {
-        return DSP_PlayShutterSoundCore(src, length);
+        return DSPi_PlayShutterSoundCore(src, length);
     }
     return FALSE;
 }
@@ -41,58 +43,65 @@ static inline BOOL DSP_PlayShutterSound(const void *src, u32 length) {
 static inline BOOL DSP_IsShutterSoundPlaying(void) {
     BOOL playing = FALSE;
     if (OS_IsRunOnTwl()) {
-        playing = DSP_IsShutterSoundPlayingCore();
+        playing = DSPi_IsShutterSoundPlayingCore();
     }
     return playing;
 }
 
-static inline BOOL DSP_OpenStaticComponentG711(FSFile *file) {
+static inline void DSP_OpenStaticComponentG711(FSFile *file) {
     if (OS_IsRunOnTwl()) {
-        return DSP_OpenStaticComponentG711Core(file);
+        DSPi_OpenStaticComponentG711Core(file);
     }
-    return FALSE;
 }
 
 static inline BOOL DSP_LoadG711(FSFile *file, int slotB, int slotC) {
     if (OS_IsRunOnTwl()) {
-        return DSP_LoadG711Core(file, slotB, slotC);
+        return DSPi_LoadG711Core(file, slotB, slotC);
     }
     return FALSE;
 }
 
 static inline void DSP_UnloadG711(void) {
     if (OS_IsRunOnTwl()) {
-        DSP_UnloadG711Core();
+        DSPi_UnloadG711Core();
     }
 }
 
 // The graphics component, which the minigames' camera uses to scale its pictures
-BOOL DSP_OpenStaticComponentGraphicsCore(FSFile *file);
-BOOL DSP_LoadGraphicsCore(FSFile *file, int slotB, int slotC);
-void DSP_UnloadGraphicsCore(void);
+void DSPi_OpenStaticComponentGraphicsCore(FSFile *file);
+BOOL DSPi_LoadGraphicsCore(FSFile *file, int slotB, int slotC);
+void DSPi_UnloadGraphicsCore(void);
+// How a scaling interpolates
+typedef u16 DSPGraphicsScalingMode;
+#define DSP_GRAPHICS_SCALING_MODE_N_NEIGHBOR (DSPGraphicsScalingMode)0x0001
+#define DSP_GRAPHICS_SCALING_MODE_BILINEAR (DSPGraphicsScalingMode)0x0002
+#define DSP_GRAPHICS_SCALING_MODE_BICUBIC (DSPGraphicsScalingMode)0x0003
+#define DSP_GRAPHICS_SCALING_MODE_NPARTSHRINK (DSPGraphicsScalingMode)0x000A
+// What an asynchronous operation of the graphics component calls when it is done
+typedef void (*DSP_GraphicsCallback)(void);
 // DSPi_ScalingCore: scales the area at (x, y) of a width by height image by rx and ry. If async, returns TRUE at once
 // and calls callback when the DSP is done; if not, waits for the DSP and returns whether it scaled the image. Returns
 // FALSE when a scaling is in progress
-BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry, u16 mode, u16 x,
-                      u16 y, u16 width, u16 height, void (*callback)(void), BOOL async);
+BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry,
+                      DSPGraphicsScalingMode mode, u16 x, u16 y, u16 width, u16 height, DSP_GraphicsCallback callback,
+                      BOOL async);
 
-static inline BOOL DSP_OpenStaticComponentGraphics(FSFile *file) {
+static inline void DSP_OpenStaticComponentGraphics(FSFile *file) {
     if (OS_IsRunOnTwl()) {
-        return DSP_OpenStaticComponentGraphicsCore(file);
+        DSPi_OpenStaticComponentGraphicsCore(file);
     }
-    return FALSE;
 }
 
 static inline BOOL DSP_LoadGraphics(FSFile *file, int slotB, int slotC) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return DSP_LoadGraphicsCore(file, slotB, slotC);
+        return DSPi_LoadGraphicsCore(file, slotB, slotC);
     }
     return FALSE;
 }
 
 static inline void DSP_UnloadGraphics(void) {
     if (OS_IsRunOnTwl()) {
-        DSP_UnloadGraphicsCore();
+        DSPi_UnloadGraphicsCore();
     }
 }
 
@@ -136,11 +145,11 @@ static inline void DSP_UnloadGraphics(void) {
 // call them on a DSi
 void DSP_PowerOnCore(void); // starts the DSP's clock and releases its reset line
 void DSP_PowerOffCore(void);
-void DSP_ResetOnCore(void);                 // puts the DSP in reset
-void DSP_ResetOffExCore(u16 mask);          // takes it out, with the reply interrupts of mask
-BOOL DSP_RecvDataIsReadyCore(int index);    // reply index has data
-void DSP_SendDataCore(int index, u16 data); // waits for command index to be free, then writes it
-u16 DSP_RecvDataCore(int index);            // waits for reply index and reads it
+void DSP_ResetOnCore(void);                  // puts the DSP in reset
+void DSP_ResetOffExCore(u16 mask);           // takes it out, with the reply interrupts of mask
+BOOL DSP_RecvDataIsReadyCore(u32 dataNo);    // reply dataNo has data
+void DSP_SendDataCore(u32 dataNo, u16 data); // waits for command dataNo to be free, then writes it
+u16 DSP_RecvDataCore(u32 dataNo);            // waits for reply dataNo and reads it
 
 static inline void DSP_PowerOn(void) {
     if (OS_IsRunOnTwl() == TRUE) {
@@ -166,30 +175,37 @@ static inline void DSP_ResetOffEx(u16 mask) {
     }
 }
 
-static inline void DSP_SendData(int index, u16 data) {
+static inline void DSP_SendData(u32 dataNo, u16 data) {
     if (OS_IsRunOnTwl() == TRUE) {
-        DSP_SendDataCore(index, data);
+        DSP_SendDataCore(dataNo, data);
     }
 }
 
-static inline BOOL DSP_RecvDataIsReady(int index) {
+static inline BOOL DSP_RecvDataIsReady(u32 dataNo) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return DSP_RecvDataIsReadyCore(index);
+        return DSP_RecvDataIsReadyCore(dataNo);
     }
     return FALSE;
 }
 
-static inline u16 DSP_RecvData(int index) {
+static inline u16 DSP_RecvData(u32 dataNo) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return DSP_RecvDataCore(index);
+        return DSP_RecvDataCore(dataNo);
     }
     return 0;
 }
 
-// Writes count words at the DSP's address dspAddr, memory being the memory's PCFG bits
+// Which of the DSP's memories a FIFO transfer reaches: its PCFG bits
+typedef enum DSPFifoMemSel {
+    DSP_FIFO_MEMSEL_DATA = 0x0 << 12,
+    DSP_FIFO_MEMSEL_MMIO = 0x1 << 12,
+    DSP_FIFO_MEMSEL_PROGRAM = 0x5 << 12
+} DSPFifoMemSel;
+
+// Writes count words at the DSP's address dspAddr of the memory
 #define DSP_WRITE_FIXED_SOURCE 0x1  // writes the first word count times
 #define DSP_WRITE_FIXED_ADDRESS 0x2 // does not move the DSP's address
-void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags);
+void DSP_SendFifoExCore(DSPFifoMemSel memory, u16 dspAddr, const u16 *src, int count, u16 flags);
 // Reads count words from the DSP's address dspAddr
 #define DSP_READ_FIXED_ADDRESS 0x1     // does not move the DSP's address
 #define DSP_READ_FIXED_DESTINATION 0x2 // stores every word in *dst
@@ -197,7 +213,7 @@ void func_02705088(u16 memory, u16 dspAddr, const u16 *src, int count, u16 flags
 #define DSP_READ_BURST_1 0x100
 #define DSP_READ_BURST_8 0x200
 #define DSP_READ_BURST_16 0x300
-void func_02705150(u16 memory, u16 *dst, u16 dspAddr, int count, u16 flags);
+void DSP_RecvFifoExCore(DSPFifoMemSel memory, u16 *dst, u16 dspAddr, int count, u16 flags);
 u16 DSP_GetSemaphoreCore(void);
 void DSP_ClearSemaphoreCore(u16 mask);
 void DSP_MaskSemaphoreCore(u16 mask);
@@ -225,34 +241,36 @@ static inline void DSP_MaskSemaphore(u16 mask) {
 // WRAM C, in banks of 32 KB that the ARM9 gives it from the ones its context allows, and its events (the 16 bits of the
 // semaphore from the DSP and its 3 replies) call the callbacks of its context. The named functions have TwlSDK's names;
 // the ones named by address are not known.
-#define DSP_EVENT_COUNT 19
-#define DSP_EVENT_REPLY_SHIFT 16 // reply n is event 16 + n
+#define DSP_HOOK_SEMAPHORE_(id) (1 << (id))
+#define DSP_HOOK_REPLY_(id) (1 << (16 + (id)))
+#define DSP_HOOK_MAX (16 + 3)
+#define DSP_HOOK_REPLY_SHIFT 16 // reply n is event 16 + n
 
-typedef void (*DSPCallback)(void *userData);
+typedef void (*DSPHookFunction)(void *userdata);
 
 // The image has the section of the DSP's OS, which answers on each of the 3 ports when the process starts
-#define DSP_PROCESS_USING_OS 0x1
+#define DSP_PROCESS_FLAG_USING_OS 0x1
 
 typedef struct DSPProcessContext {
     struct DSPProcessContext *next; // the list of running processes
     char name[16];
-    FSFile *image;  // the COFF file, while it loads
-    u16 freeBanksB; // the banks of WRAM B that the process can still take, a bit each
-    u16 freeBanksC; // and of WRAM C
-    u32 flags;      // DSP_PROCESS_*
-    u32 usedSlotsB; // the 32 KB slots of its program memory that have a bank
-    u32 usedSlotsC; // and of its data memory
-    int bankB[8];   // the bank of WRAM B behind each slot, or -1
-    int bankC[8];   // and of WRAM C
-    int events;     // the events that have a callback
-    DSPCallback callback[DSP_EVENT_COUNT];
-    void *userData[DSP_EVENT_COUNT];
-    int group[DSP_EVENT_COUNT]; // the events set along with each one, which its callback takes together
+    FSFile *image;            // the COFF file, while it loads
+    u16 slotB;                // the banks of WRAM B that the process can still take, a bit each
+    u16 slotC;                // and of WRAM C
+    int flags;                // DSP_PROCESS_FLAG_*
+    int segmentCode;          // the 32 KB slots of its program memory that have a bank
+    int segmentData;          // and of its data memory
+    int slotOfSegmentCode[8]; // the bank of WRAM B behind each slot, or -1
+    int slotOfSegmentData[8]; // and of WRAM C
+    int hookFactors;          // the events that have a callback
+    DSPHookFunction hookFunction[DSP_HOOK_MAX];
+    void *hookUserdata[DSP_HOOK_MAX];
+    int hookGroup[DSP_HOOK_MAX]; // the events set along with each one, which its callback takes together
 } DSPProcessContext;
 
 void DSP_InitProcessContext(DSPProcessContext *context, const char *name);
 // Calls callback for each of the events (NULL stops that)
-void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callback, void *userData);
+void DSP_SetProcessHook(DSPProcessContext *context, int events, DSPHookFunction callback, void *userData);
 // Loads the image into the banks given by banksB and banksC, one bit each, and starts the DSP
 BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, int banksC);
 void DSP_QuitProcess(DSPProcessContext *context);
@@ -267,35 +285,35 @@ void DSP_WriteProcessPipe(DSPProcessContext *context, int port, const void *src,
 // positions are bytes, with a bit 0x8000 that flips each time one wraps around: equal positions are an empty pipe and
 // positions that differ in the bit only, a full one.
 typedef struct DSPPipe {
-    u16 base;     // the ring buffer's address in the DSP's memory, in half words
-    u16 length;   // its length in bytes
-    u16 readPos;  // where the reader is
-    u16 writePos; // where the writer is
-    u16 id;       // port * 2 + direction in the low byte, and the flags
+    u16 address; // the ring buffer's address in the DSP's memory, in half words
+    u16 length;  // its length in bytes
+    u16 rpos;    // where the reader is
+    u16 wpos;    // where the writer is
+    u16 flags;   // port * 2 + peer in the low byte, and the flags
 } DSPPipe;
 
-// A flag of a pipe's id: the DSP writes to this port requests for the files (func_02706b60's thread answers them)
+// A flag of a pipe's flags: the DSP writes to this port requests for the files (func_02706b60's thread answers them)
 #define DSP_PIPE_FILE_FLAG 0x100
 
-// What a pipe's events call: the user data of DSP_SetPipeCallback, the port and the direction
-typedef void (*DSPPipeCallback)(void *userData, int port, int direction);
+// What a pipe's events call: the user data of DSP_SetPipeCallback, the port and the peer (the pipe's direction)
+typedef void (*DSPPipeCallback)(void *userData, int port, int peer);
 
 // The named functions have TwlSDK's names. The ports are 0 to 7, and the first has a callback of its own at the start
 void DSP_InitPipe(void); // forgets the pipes' address and the callbacks, and drops what port 0 gets
 // Calls callback for the pipes' events of a port, with userData (NULL stops that)
 void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData);
-// DSP_LoadPipe: reads the header of the pipe of a port and direction from the DSP into pipe, or into a scratch copy if
-// pipe is NULL, and returns it. Waits until the DSP has sent the pipes' address. A port or direction out of range
+// DSP_LoadPipe: reads the header of the pipe of a port and peer from the DSP into pipe, or into a scratch copy if
+// pipe is NULL, and returns it. Waits until the DSP has sent the pipes' address. A port or peer out of range
 // leaves pipe alone
-DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction);
+DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int peer);
 // How many bytes the pipe has to read, by the header that was loaded
 u16 DSP_GetPipeReadableSize(const DSPPipe *pipe);
 // Reads length bytes of the pipe into dst, waiting for the DSP when it is empty
 void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length);
 // Writes length bytes of src to the pipe, waiting for the DSP when it is full
 void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length);
-// The callback of the DSP's events (DSPCallback): hands each change of a pipe to its port's callback, and to the file
-// server thread when the pipe has the file flag
+// The callback of the DSP's events (DSPHookFunction): hands each change of a pipe to its port's callback, and to the
+// file server thread when the pipe has the file flag
 void func_027070dc(void *userData);
 
 #endif // POKEBW2_TWL_DSP_H

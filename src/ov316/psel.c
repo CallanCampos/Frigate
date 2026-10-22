@@ -189,7 +189,7 @@ typedef struct {
     ClActor *cursor;
     s32 choice;
     // The ball whose animation plays
-    s32 ball;
+    int ball;
     // Set when the picked Pokémon reaches the front
     BOOL pokeArrived;
     MsgData *msgData;
@@ -278,7 +278,7 @@ static BOOL PselCamera_IsZoomDone(PselWork *wk);
 static void PselCamera_UpdateZoom(PselWork *wk);
 static void PselCamera_StartDecide(PselWork *wk, s32 ball);
 static void PselCamera_UpdateDecide(PselWork *wk);
-static void PselBall_Select(PselWork *wk, s32 ball);
+static void PselBall_Select(PselWork *wk, int ball);
 static void PselBall_Update(PselWork *wk);
 static void PselPoke_Load(PselWork *wk);
 static void PselPoke_Unload(PselWork *wk);
@@ -711,7 +711,7 @@ static void PselCamera_UpdateDecide(PselWork *wk) {
 }
 
 // Stops the animations of the ball that was picked and starts those of the new one
-static void PselBall_Select(PselWork *wk, s32 ball) {
+static void PselBall_Select(PselWork *wk, int ball) {
     if (wk->ball != PSEL_CHOICE_NONE && wk->ball != ball) {
         G3DActor *actor = GFL_G3DMgrGetActor(wk->g3dMgr, wk->objs[wk->objIdx[wk->ball + 1]].actor);
         u16 count = GFL_G3DActorGetAnmCount(actor);

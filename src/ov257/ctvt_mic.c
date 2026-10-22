@@ -39,6 +39,7 @@ static void CtvtMic_OnBufferFull(MICResult result, void *arg);
 static void CtvtMic_AllocChannel(CtvtMic *work, HeapID heapId);
 static void CtvtMic_FreeChannel(CtvtMic *work);
 
+// The microphone filter's coefficients, an SNDEXIirFilterParam, and a sixth halfword that is not sent
 static u16 sFilter[6] = { 0x7e46, 0x81ba, 0x7e46, 0x7e43, 0x836e, 0 };
 
 static CtvtMic *sCtvtMic;
@@ -50,9 +51,7 @@ CtvtMic *CtvtMic_Create(HeapID heapId) {
     PM_Init();
     PM_SetAmp(PM_AMP_ON);
     PM_SetAmpGainLevel(80);
-    if (OS_IsRunOnTwl() == TRUE) {
-        SNDEX_SetIirFilter(0, sFilter);
-    }
+    SNDEX_SetIirFilter(SNDEX_IIR_FILTER_ADC_1, (const SNDEXIirFilterParam *)sFilter);
     CtvtMic_AllocChannel(work, heapId);
     work->buffer = allocConfigDSSoftwareFeature(heapId, CTVT_MIC_BUFFER_SIZE, "ctvt_mic.c", 134);
     work->recordedSize = 0;

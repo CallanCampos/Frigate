@@ -16,15 +16,15 @@ static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo);
 // stores it through one literal and passes DC_StoreRange its address through another
 u8 NWMi_SetUpDone = FALSE;
 
-NWMRetCode NWM_Init(void *systemBuffer, u32 size, u32 dmaNo) {
-    if (!func_027026b4()) {
-        return NWM_RETCODE_UNAVAILABLE;
+NWMRetCode NWM_Init(void *sysBuf, u32 bufSize, u8 dmaNo) {
+    if (!NWMi_CheckEnableFlag()) {
+        return NWM_RETCODE_NWM_DISABLE;
     }
-    return func_02702468(systemBuffer, size, dmaNo);
+    return func_02702468(sysBuf, bufSize, dmaNo);
 }
 
 static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
-    u32 irq;
+    OSIntrMode irq;
     int i;
 
     irq = OS_DisableInterrupts();
@@ -51,7 +51,7 @@ static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
     PXI_Init();
     if (!PXI_IsCallbackReady(PXI_FIFO_TAG_NWM, PXI_PROC_ARM7)) {
         OS_RestoreInterrupts(irq);
-        return NWM_RETCODE_UNAVAILABLE;
+        return NWM_RETCODE_NWM_DISABLE;
     }
     DC_InvalidateRange(sys, size);
     MIi_DmaFill32(dmaNo, sys, 0, size, TRUE);
@@ -78,12 +78,12 @@ static NWMRetCode func_02702468(NWMSys *sys, u32 size, u32 dmaNo) {
     return NWM_RETCODE_SUCCESS;
 }
 
-NWMRetCode func_02702698(void) {
+NWMRetCode NWMi_CheckInitialized(void) {
     return NWMi_SetUpDone ? NWM_RETCODE_SUCCESS : NWM_RETCODE_ILLEGAL_STATE;
 }
 
 // Whether the wireless is available and not turned off
-BOOL func_027026b4(void) {
+BOOL NWMi_CheckEnableFlag(void) {
     if (OS_IsAvailableWireless() == TRUE && !OS_IsForceDisableWireless()) {
         return TRUE;
     }

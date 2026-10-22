@@ -1,7 +1,8 @@
 #include "nitro/mi.h"
 #include "ssl_internal.h"
 
-// SSL's own MD5 (RFC 1321), written from the asm. The ROM names none of it, so the names are the algorithm's.
+// SSL's own MD5 (RFC 1321), written from the asm. The ROM names none of it; the names are NitroWiFi's own, as
+// ntrtwl's reconstruction of NitroWiFi has them.
 
 // The per-round rotation amounts, repeated every four steps
 #define S11 7
@@ -49,7 +50,7 @@
         (a) = (b) + ROTL(a, s);                                                                                        \
     }
 
-// The 64-byte padding MD5Final appends to a message before its length
+// The 64-byte padding CPSi_md5_result appends to a message before its length
 static u8 sMD5Padding[64] = {
     0x80,
 };
@@ -87,16 +88,16 @@ static u32 sMD5Constants[64] = {
 
 // RFC 1321's Encode, which packs an array of 32-bit words into bytes, low byte first: on this little-endian target
 // that is a plain copy, through MI_CpuCopy8 (whose argument order is the opposite of this one's)
-static void MD5Encode(u8 *output, const u32 *input, u32 len) {
+static void char_from_long(u8 *output, const u32 *input, u32 len) {
     MI_CpuCopy8(input, output, len);
 }
 
-// RFC 1321's Decode, the opposite of MD5Encode: also a plain copy on this little-endian target
-static void MD5Decode(u32 *output, const u8 *input, u32 len) {
+// RFC 1321's Decode, the opposite of char_from_long: also a plain copy on this little-endian target
+static void long_from_char(u32 *output, const u8 *input, u32 len) {
     MI_CpuCopy8(input, output, len);
 }
 
-static void MD5Transform(u32 state[4], const u8 block[64]) {
+static void CPSi_md5_block(u32 state[4], const u8 block[64]) {
     u32 a = state[0];
     u32 b = state[1];
     u32 c = state[2];
@@ -105,7 +106,7 @@ static void MD5Transform(u32 state[4], const u8 block[64]) {
     u32 i;
     int j;
 
-    MD5Decode(x, block, 64);
+    long_from_char(x, block, 64);
     i = 0;
 
     for (j = 0; j < 4; j++) {
@@ -158,15 +159,15 @@ static void MD5Transform(u32 state[4], const u8 block[64]) {
     state[3] += d;
 }
 
-void MD5Init(MD5Context *context) {
-    MI_CpuFill8(context, 0, sizeof(MD5Context));
+void CPSi_md5_init(CPSMd5Ctx *context) {
+    MI_CpuFill8(context, 0, sizeof(CPSMd5Ctx));
     context->state[0] = 0x67452301;
     context->state[1] = 0xefcdab89;
     context->state[2] = 0x98badcfe;
     context->state[3] = 0x10325476;
 }
 
-void MD5Update(MD5Context *context, const u8 *input, u32 inputLen) {
+void CPSi_md5_calc(CPSMd5Ctx *context, const u8 *input, u32 inputLen) {
     u32 index;
     u32 partLen;
     u32 i;
@@ -183,10 +184,10 @@ void MD5Update(MD5Context *context, const u8 *input, u32 inputLen) {
     if (inputLen >= partLen) {
         MI_CpuCopy8(input, &context->buffer[index], partLen);
         index = 0;
-        MD5Transform(context->state, context->buffer);
+        CPSi_md5_block(context->state, context->buffer);
 
         for (i = partLen; i + 63 < inputLen; i += 64) {
-            MD5Transform(context->state, &input[i]);
+            CPSi_md5_block(context->state, &input[i]);
         }
     } else {
         i = 0;
@@ -195,16 +196,16 @@ void MD5Update(MD5Context *context, const u8 *input, u32 inputLen) {
     MI_CpuCopy8(&input[i], &context->buffer[index], inputLen - i);
 }
 
-void MD5Final(MD5Context *context, u8 digest[16]) {
+void CPSi_md5_result(CPSMd5Ctx *context, u8 digest[16]) {
     int index;
     int padLen;
 
-    MD5Encode(digest, context->count, 8);
+    char_from_long(digest, context->count, 8);
 
     index = (context->count[0] >> 3) & 0x3f;
     padLen = (index < 56) ? (56 - index) : (120 - index);
-    MD5Update(context, sMD5Padding, padLen);
-    MD5Update(context, digest, 8);
+    CPSi_md5_calc(context, sMD5Padding, padLen);
+    CPSi_md5_calc(context, digest, 8);
 
-    MD5Encode(digest, context->state, 16);
+    char_from_long(digest, context->state, 16);
 }

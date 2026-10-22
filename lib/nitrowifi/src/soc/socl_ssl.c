@@ -18,17 +18,17 @@ int SOCL_EnableSsl(int sock, void *sslInfo) {
     if (!SOCLi_ModeIsTCP(socket->flag)) {
         return SOCL_EINVAL;
     }
-    if (!SOCLi_SocketIsCreated(socket)) {
+    if (!SOCL_SocketIsCreated(socket)) {
         return SOCL_ENETRESET;
     }
-    if (socket->state & SOCLI_STATE_BINDING) {
+    if (socket->state & SOCL_STATUS_CONNECTING) {
         return SOCL_EINVAL;
     }
     return SOCLi_ExecEnableSslCommand(socket, sslInfo);
 }
 
 static int SOCLi_ExecEnableSslCommand(SOCLSocket *socket, void *ssl) {
-    SOCLCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_EnableSslCallBack, socket, TRUE);
+    SOCLiCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_EnableSslCallBack, socket, TRUE);
 
     if (packet == NULL) {
         return SOCL_EMFILE;
@@ -40,7 +40,7 @@ static int SOCLi_ExecEnableSslCommand(SOCLSocket *socket, void *ssl) {
 static int SOCLi_EnableSslCallBack(void *arg) {
     SOCLiCommandEnableSsl *cpacket = (SOCLiCommandEnableSsl *)arg;
     SOCLSocket *socket = cpacket->h.socket;
-    SOCLRecvPipe *pipe = socket->recv_pipe;
+    SOCLiSocketRecvCommandPipe *pipe = socket->recv_pipe;
     CPSSoc *soc = (CPSSoc *)pipe->base.thread.specific[0];
 
     OS_LockMutex(&pipe->base.mutex);

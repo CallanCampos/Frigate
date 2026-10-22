@@ -2,29 +2,32 @@
 #include "dwc/ext.h"
 
 // GameSpy's debug output (gsDebug.c). The ROM names neither the file nor its functions: gsDebugVaList, gsDebugFormat,
-// gsDebugBinary, HexEncode16 and gGSIDebugInstance are the later SDK's names, and gsiDebugPrintToConsole is ours
+// gsDebugBinary, HexEncode16, gsiDebugCallback and gGSIDebugInstance are the later SDK's names
 
 // The output: the game's callback, whether the lock was made, the lock, and the levels to show of each category and
 // type (13 categories of 5 types)
 typedef struct GSIDebugInstance {
     GSIDebugCallback callback;
-    BOOL initialized;
+    gsi_i32 initialized;
     GSICriticalSection crit;
-    u8 levels[13][5];
+    GSIDebugLevel levels[GSIDebugCat_Count][GSIDebugType_Count];
 } GSIDebugInstance;
 
-static void gsiDebugPrintToConsole(int category, int type, int level, const char *format, va_list args);
-static void HexEncode16(const u8 *data, char *line, int size);
+static void gsiDebugCallback(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
+                             va_list args);
+static void HexEncode16(const char *data, char *line, unsigned int size);
 
 static GSIDebugInstance gGSIDebugInstance;
 
-static void gsiDebugPrintToConsole(int category, int type, int level, const char *format, va_list args) {
-    ScreenVPrintf(format, args);
+static void gsiDebugCallback(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
+                             va_list args) {
+    VPrintf(format, args);
 }
 
-void gsDebugVaList(int category, int type, int level, const char *format, va_list args) {
+void gsDebugVaList(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
+                   va_list args) {
     if (!gGSIDebugInstance.initialized) {
-        gGSIDebugInstance.initialized = TRUE;
+        gGSIDebugInstance.initialized = gsi_true;
         gsiInitializeCriticalSection(&gGSIDebugInstance.crit);
     }
     gsiEnterCriticalSection(&gGSIDebugInstance.crit);
@@ -32,13 +35,13 @@ void gsDebugVaList(int category, int type, int level, const char *format, va_lis
         if (gGSIDebugInstance.callback != NULL) {
             gGSIDebugInstance.callback(category, type, level, format, args);
         } else {
-            gsiDebugPrintToConsole(category, type, level, format, args);
+            gsiDebugCallback(category, type, level, format, args);
         }
     }
     gsiLeaveCriticalSection(&gGSIDebugInstance.crit);
 }
 
-void gsDebugFormat(int category, int type, int level, const char *format, ...) {
+void gsDebugFormat(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format, ...) {
     va_list args;
 
     va_start(args, format);
@@ -47,13 +50,13 @@ void gsDebugFormat(int category, int type, int level, const char *format, ...) {
 }
 
 // Writes up to 16 bytes as a line: pairs of hexadecimal digits, then the bytes as characters from column 41
-static void HexEncode16(const u8 *data, char *line, int size) {
+static void HexEncode16(const char *data, char *line, unsigned int size) {
     char *chars = line + 41;
-    int odd = size & 1;
+    unsigned int odd = size & 1;
 
     memset(line, ' ', 0x40);
     while (size--) {
-        u8 c = *data++;
+        unsigned char c = (unsigned char)*data++;
 
         OS_SPrintf(line, "%02X", c);
         if (isgraph(c)) {
@@ -71,7 +74,7 @@ static void HexEncode16(const u8 *data, char *line, int size) {
     *chars = '\0';
 }
 
-void gsDebugBinary(int category, int type, int level, const u8 *data, int size) {
+void gsDebugBinary(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *data, gsi_i32 size) {
     int left = size;
     char line[0x50];
 

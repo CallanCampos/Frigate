@@ -455,7 +455,7 @@ void ZknListMain_InitList(ZknListWork *wk) {
     ArcTool *arc = GFL_ArcSysCreateFileHandle(ARCID_ZUKAN_GRA, HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
     u16 last = PokeDex_GetLastSpecies(wk->param->pokedex);
     FrameListSetup setup = sZknListSetup;
-    unsigned long i;
+    u32 i;
 
     setup.count = ZKNLIST_SPECIES_COUNT;
     setup.work = wk;

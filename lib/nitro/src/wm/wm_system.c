@@ -27,11 +27,11 @@ static struct {
 
 static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size);
 static void *WmGetCommandBuffer4Arm7(void);
-static void WmReceiveFifo(u32 tag, u32 data, BOOL err);
+static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err);
 static void WmResetRssiPool(void);
 static void WmSleepCallback(void *arg);
 
-int WM_Init(void *wmSysBuf, u16 dmaNo) {
+WMErrCode WM_Init(void *wmSysBuf, u16 dmaNo) {
     int result = WmInit(wmSysBuf, dmaNo, WM_SYSTEM_BUF_SIZE);
 
     if (result == WM_ERRCODE_SUCCESS) {
@@ -42,7 +42,7 @@ int WM_Init(void *wmSysBuf, u16 dmaNo) {
 
 // Sets the manager up in the buffer of size bytes
 static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
     if (OS_IsRunOnTwl() && NWM_CheckInitialized() != NWM_RETCODE_ILLEGAL_STATE) {
@@ -106,8 +106,8 @@ static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
     return WM_ERRCODE_SUCCESS;
 }
 
-int WM_Finish(void) {
-    u32 irq = OS_DisableInterrupts();
+WMErrCode WM_Finish(void) {
+    OSIntrMode irq = OS_DisableInterrupts();
     int result;
 
     if (WMi_CheckInitialized() != WM_ERRCODE_SUCCESS) {
@@ -131,7 +131,7 @@ int WM_Finish(void) {
     return WM_ERRCODE_SUCCESS;
 }
 
-void WMi_SetCallbackTable(u32 apiid, WMCallbackFunc callback) {
+void WMi_SetCallbackTable(WMApiid apiid, WMCallbackFunc callback) {
     sWm.wm9buf->callbackTable[apiid] = callback;
 }
 
@@ -151,7 +151,7 @@ static void *WmGetCommandBuffer4Arm7(void) {
 }
 
 // WMi_SendCommand
-int WMi_SendCommand(u16 apiid, u16 paramNum, ...) {
+WMErrCode WMi_SendCommand(WMApiid apiid, u16 paramNum, ...) {
     WMCommandBuf *cmd = WmGetCommandBuffer4Arm7();
     va_list vl;
     int i;
@@ -174,7 +174,7 @@ int WMi_SendCommand(u16 apiid, u16 paramNum, ...) {
 }
 
 // WMi_SendCommandDirect
-int WMi_SendCommandDirect(const void *cmd, u32 size) {
+WMErrCode WMi_SendCommandDirect(void *cmd, u32 size) {
     WMCommandBuf *buf = WmGetCommandBuffer4Arm7();
     int fifoResult;
 
@@ -192,14 +192,14 @@ WMArm9Buf *WMi_GetSystemWork(void) {
     return sWm.wm9buf;
 }
 
-int WMi_CheckInitialized(void) {
+WMErrCode WMi_CheckInitialized(void) {
     if (sWm.initialized) {
         return WM_ERRCODE_SUCCESS;
     }
     return WM_ERRCODE_ILLEGAL_STATE;
 }
 
-int WMi_CheckIdle(void) {
+WMErrCode WMi_CheckIdle(void) {
     int result = WMi_CheckInitialized();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -212,7 +212,7 @@ int WMi_CheckIdle(void) {
     return WM_ERRCODE_SUCCESS;
 }
 
-int WMi_CheckStateEx(int paramNum, ...) {
+WMErrCode WMi_CheckStateEx(s32 paramNum, ...) {
     int result = WMi_CheckInitialized();
     va_list vl;
     u16 state;
@@ -235,7 +235,7 @@ int WMi_CheckStateEx(int paramNum, ...) {
 
 // Receives what the ARM7 sends through the FIFO: a pointer to a callback (of a command) or an indication. It does
 // what the callback's kind asks, calls the game's callback for it and makes the buffer free again
-static void WmReceiveFifo(u32 tag, u32 data, BOOL err) {
+static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
     WMArm9Buf *w9b = sWm.wm9buf;
     WMCallback *cb = (WMCallback *)data;
     WMCallbackFunc callback;
@@ -405,7 +405,7 @@ static void WmResetRssiPool(void) {
     }
 }
 
-void *WMi_GetStatusAddress(void) {
+const WMStatus *WMi_GetStatusAddress(void) {
     if (WMi_CheckInitialized() != WM_ERRCODE_SUCCESS) {
         return NULL;
     }
@@ -413,7 +413,7 @@ void *WMi_GetStatusAddress(void) {
 }
 
 u16 WMi_GetMyAid(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u16 aid;
 
     if (sWm.wm9buf != NULL) {
@@ -426,7 +426,7 @@ u16 WMi_GetMyAid(void) {
 }
 
 u16 WMi_GetConnectedAidBitmap(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u32 bitmap;
 
     if (sWm.wm9buf != NULL) {

@@ -9,11 +9,11 @@
 static char sBlankScreenPath[] = "char/jtNull.nsc.l";
 static u8 sScreenActive;
 
-void DWCUtilScreen_Reset(void) {
+void DWCi_COMMENTlInit(void) {
     sScreenActive = FALSE;
 }
 
-BOOL DWCUtilScreen_Start(int msgIndex, int slot, int value) {
+BOOL DWCi_COMMENTlDispEx(int msgIndex, int slot, int value) {
     DWCUtilText *text;
     u16 *str;
     u32 flags;
@@ -24,20 +24,20 @@ BOOL DWCUtilScreen_Start(int msgIndex, int slot, int value) {
 
     DWCUtilGfxResource_Load(sBlankScreenPath, GXS_LoadBG0Scr);
     reg_G2S_DB_BG0OFS = 0x01920000;
-    text = DWCUtilText_CreateBg(1, 0);
-    str = DWCUtilMsg_GetWithDigit(gDWCUtilMsg, msgIndex, slot, value);
-    flags = DWCUtilGfxResource_GetTextFlags();
-    DWCUtilText_DrawRect(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
+    text = DWCi_FNTlFormBgEx(1, 0);
+    str = DWCi_MSGlGetEx(gDWCUtilMsg, msgIndex, slot, value);
+    flags = DWCi_CMNlFontFlag();
+    DWCi_FNTlDrawRect(text, 0x14, 0, 0xd8, 0x40, 2, flags, str);
     DWCUtilText_MarkDirty(text);
     sScreenActive = TRUE;
     return TRUE;
 }
 
-BOOL DWCUtilScreen_Stop(void) {
+BOOL DWCi_COMMENTlDelete(void) {
     if (!sScreenActive) {
         return FALSE;
     }
-    DWCUtilText_DestroyScreenBg(1);
+    DWCi_FNTlDeleteBgLcd(1);
     sScreenActive = FALSE;
     return TRUE;
 }

@@ -258,10 +258,10 @@ BOOL BtlMain_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
         if (GetStudioMode(mainModule)) {
             BtlMain_FreeStudioData(mainModule);
         }
-        if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR)) {
+        if (GX_GetMasterBrightness()) {
             mainModule->unk460 = -16;
-            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+            GX_SetMasterBrightness(-16);
+            GXS_SetMasterBrightness(-16);
             *state += 2;
             break;
         }
@@ -270,13 +270,13 @@ BOOL BtlMain_ProcExit(GameProc *proc, u32 *state, void *param, void *work) {
     case 1:
         if (mainModule->unk460 > -16) {
             mainModule->unk460--;
-            brightness = GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR);
+            brightness = GX_GetMasterBrightness();
             if (brightness > mainModule->unk460) {
-                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, mainModule->unk460);
+                GX_SetMasterBrightness(mainModule->unk460);
             }
-            brightness = GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR);
+            brightness = GXS_GetMasterBrightness();
             if (brightness > mainModule->unk460) {
-                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, mainModule->unk460);
+                GXS_SetMasterBrightness(mainModule->unk460);
             }
             break;
         }
@@ -3356,8 +3356,7 @@ void BtlMain_StorePartiesToSetup(BtlMainModule *mainModule) {
     u16 item;
     u8 clientId;
     u32 j;
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long index;
+    u32 index;
     u32 k;
     BattleParty *battleParty;
     u32 monCount;

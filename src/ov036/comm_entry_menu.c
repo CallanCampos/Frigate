@@ -304,7 +304,7 @@ static u8 CommEntryMenu_UpdateMemberList(CommEntryMenu *menu);
 static void CommEntryMenu_CheckLeft(CommEntryMenu *menu);
 static void CommEntryMenu_DrawMembers(CommEntryMenu *menu);
 static void CommEntryMenu_UpdateEntries(CommEntryMenu *menu);
-static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, u32 netId);
+static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, int netId);
 static BOOL CommEntryMenu_QueueAsk(CommEntryMenu *menu, CommEntryMember *member);
 static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu);
 static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu);
@@ -1177,7 +1177,7 @@ static void CommEntryMenu_UpdateEntries(CommEntryMenu *menu) {
     }
 }
 
-static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, u32 netId) {
+static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, int netId) {
     menu->members[netId].state = COMM_ENTRY_MEMBER_NONE;
 }
 

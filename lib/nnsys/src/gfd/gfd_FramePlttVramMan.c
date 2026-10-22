@@ -65,7 +65,7 @@ static inline BOOL AllocHigh(u32 size, BOOL is4pltt, u32 *outAddr) {
     return FALSE;
 }
 
-NNSGfdPlttKey NNS_GfdAllocFrmPlttVram(u32 szByte, BOOL is4pltt, BOOL bAllocFromLo) {
+NNSGfdPlttKey NNS_GfdAllocFrmPlttVram(u32 szByte, BOOL is4pltt, u32 bAllocFromLo) {
     u32 addr = 0;
     BOOL ok;
 

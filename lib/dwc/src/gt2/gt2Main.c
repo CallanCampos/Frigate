@@ -6,45 +6,46 @@
 #include "dwc/gt2Socket.h"
 #include "dwc/gt2Utility.h"
 
-// GameSpy GT2's API (gt2Main.c). The names of the functions that keep their addresses are in dwc/gt2Main.h
+// GameSpy GT2's API (gt2Main.c): see dwc/gt2Main.h
 
 static void gti2CloseAllConnectionsHardMap(void *element, void *clientData);
 
-int func_ov011_0217d144(GTI2Socket **socket, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
-                        GTI2SocketErrorCallback onSocketError) {
-    return gti2CreateSocket(socket, localAddress, outgoingBufferSize, incomingBufferSize, onSocketError, 0);
+GT2Result gt2CreateSocket(GT2Socket *socket, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
+                          gt2SocketErrorCallback onSocketError) {
+    return gti2CreateSocket(socket, localAddress, outgoingBufferSize, incomingBufferSize, onSocketError,
+                            GTI2UdpProtocol);
 }
 
-void func_ov011_0217d158(GTI2Socket *socket) {
+void gt2CloseSocket(GT2Socket socket) {
     gt2CloseAllConnectionsHard(socket);
     gti2CloseSocket(socket);
 }
 
-void func_ov011_0217d168(GTI2Socket *socket) {
+void gt2Think(GT2Socket socket) {
     if (gti2ReceiveMessages(socket) && gti2SocketConnectionsThink(socket)) {
         gti2FreeClosedConnections(socket);
     }
 }
 
-void func_ov011_0217d188(GTI2Socket *socket, GTI2ConnectAttemptCallback callback) {
+void gt2Listen(GT2Socket socket, gt2ConnectAttemptCallback callback) {
     gti2Listen(socket, callback);
 }
 
-BOOL func_ov011_0217d190(GTI2Connection *connection, const GTI2ConnectionCallbacks *callbacks) {
+GT2Bool gt2Accept(GT2Connection connection, GT2ConnectionCallbacks *callbacks) {
     return gti2AcceptConnection(connection, callbacks);
 }
 
-void func_ov011_0217d198(GTI2Connection *connection, const void *message, int length) {
+void gt2Reject(GT2Connection connection, const GT2Byte *message, int length) {
     gti2RejectConnection(connection, message, length);
 }
 
-int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const char *remoteAddress, const void *message,
-                        int length, u32 timeout, const GTI2ConnectionCallbacks *callbacks, BOOL blocking) {
-    GTI2Connection *created;
-    u32 ip;
-    u16 port;
+GT2Result gt2Connect(GT2Socket socket, GT2Connection *connection, const char *remoteAddress, const GT2Byte *message,
+                     int length, int timeout, GT2ConnectionCallbacks *callbacks, GT2Bool blocking) {
+    GT2Connection created;
+    gsi_u32 ip;
+    gsi_u16 port;
     int result;
-    BOOL done;
+    gsi_bool done;
 
     if (!gt2StringToAddress(remoteAddress, &ip, &port) || ip == 0 || port == 0) {
         return 4;
@@ -71,7 +72,7 @@ int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const c
     }
     created->callbackLevel++;
     do {
-        func_ov011_0217d168(socket);
+        gt2Think(socket);
         done = created->state >= 5;
         if (!done) {
             msleep(1);
@@ -81,19 +82,19 @@ int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const c
     if (created->state == 5) {
         *connection = created;
     }
-    return created->result;
+    return created->connectionResult;
 }
 
-int func_ov011_0217d290(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+GT2Result gt2Send(GT2Connection connection, const GT2Byte *message, int length, GT2Bool reliable) {
     if (connection->state != 5) {
         return 8;
     }
     gti2MessageCheck(&message, &length);
     // A reliable message of protocol 2 starts with its own length, copied out as it may be unaligned
-    if (reliable && connection->socket->protocol == 2) {
-        u16 size;
-        u8 *dest = (u8 *)&size;
-        const u8 *src = message;
+    if (reliable && connection->socket->protocolType == GTI2VdpProtocol) {
+        gsi_u16 size;
+        gsi_u8 *dest = (gsi_u8 *)&size;
+        const gsi_u8 *src = message;
 
         dest[0] = src[0];
         dest[1] = src[1];
@@ -101,7 +102,7 @@ int func_ov011_0217d290(GTI2Connection *connection, const void *message, int len
             return 9;
         }
     }
-    if (func_ov011_02171588(connection->sendFilters) != 0) {
+    if (ArrayLength(connection->sendFilters) != 0) {
         gti2SendFilterCallback(connection, 0, message, length, reliable);
         return 0;
     }
@@ -111,19 +112,19 @@ int func_ov011_0217d290(GTI2Connection *connection, const void *message, int len
     return 10;
 }
 
-void gt2CloseConnectionHard(GTI2Connection *connection) {
-    gti2CloseConnection(connection, TRUE);
+void gt2CloseConnectionHard(GT2Connection connection) {
+    gti2CloseConnection(connection, gsi_true);
 }
 
 static void gti2CloseAllConnectionsHardMap(void *element, void *clientData) {
-    gt2CloseConnectionHard(*(GTI2Connection **)element);
+    gt2CloseConnectionHard(*(GT2Connection *)element);
 }
 
-void gt2CloseAllConnectionsHard(GTI2Socket *socket) {
+void gt2CloseAllConnectionsHard(GT2Socket socket) {
     TableMapSafe(socket->connections, gti2CloseAllConnectionsHardMap, NULL);
 }
 
-int func_ov011_0217d364(GTI2Connection *connection) {
+GT2ConnectionState gt2GetConnectionState(GT2Connection connection) {
     if (connection->state < 5) {
         return 0;
     }
@@ -136,42 +137,42 @@ int func_ov011_0217d364(GTI2Connection *connection) {
     return 3;
 }
 
-u32 func_ov011_0217d380(GTI2Connection *connection) {
+unsigned int gt2GetRemoteIP(GT2Connection connection) {
     return connection->ip;
 }
 
-u16 func_ov011_0217d384(GTI2Connection *connection) {
+unsigned short gt2GetRemotePort(GT2Connection connection) {
     return connection->port;
 }
 
-u32 func_ov011_0217d388(GTI2Socket *socket) {
+unsigned int gt2GetLocalIP(GT2Socket socket) {
     return socket->ip;
 }
 
-u16 func_ov011_0217d38c(GTI2Socket *socket) {
+unsigned short gt2GetLocalPort(GT2Socket socket) {
     return socket->port;
 }
 
-int func_ov011_0217d390(GTI2Connection *connection) {
-    return connection->outgoing.capacity;
+int gt2GetOutgoingBufferSize(GT2Connection connection) {
+    return connection->outgoingBuffer.size;
 }
 
-int func_ov011_0217d394(GTI2Connection *connection) {
-    return connection->outgoing.capacity - connection->outgoing.length;
+int gt2GetOutgoingBufferFreeSpace(GT2Connection connection) {
+    return connection->outgoingBuffer.size - connection->outgoingBuffer.len;
 }
 
-int gt2GetSocketSOCKET(GTI2Socket *socket) {
-    return socket->handle;
+SOCKET gt2GetSocketSOCKET(GT2Socket socket) {
+    return socket->socket;
 }
 
-void func_ov011_0217d3a0(GTI2Socket *socket, GTI2UnrecognizedMessageCallback callback) {
-    socket->onUnrecognizedMessage = callback;
+void gt2SetUnrecognizedMessageCallback(GT2Socket socket, gt2UnrecognizedMessageCallback callback) {
+    socket->unrecognizedMessageCallback = callback;
 }
 
-void gt2SetConnectionData(GTI2Connection *connection, void *userData) {
-    connection->userData = userData;
+void gt2SetConnectionData(GT2Connection connection, void *userData) {
+    connection->data = userData;
 }
 
-void *gt2GetConnectionData(GTI2Connection *connection) {
-    return connection->userData;
+void *gt2GetConnectionData(GT2Connection connection) {
+    return connection->data;
 }

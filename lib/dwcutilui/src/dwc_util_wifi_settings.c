@@ -8,14 +8,14 @@
 #include "nitro/os.h"
 #include "stdlib.h"
 
-static void DWCUtilWifiSettings_WritePage(int index);
-static int DWCUtilWifiSettings_ParseHexDigit(u8 digit);
+static void write(int index);
+static int ascii2hex(u8 digit);
 
 #define DWC_UTIL_SETTINGS_PAGES 4
 #define DWC_UTIL_SETTINGS_CONNECTIONS 3
 
 typedef struct DWCUtilWifiSettings {
-    DWCBmNtrPage pages[DWC_UTIL_SETTINGS_PAGES];
+    DWCMemPage pages[DWC_UTIL_SETTINGS_PAGES];
     DWCUtilSettingsEdit edit;
     MATHCRC16Table crcTable;
 } DWCUtilWifiSettings;
@@ -24,54 +24,54 @@ static const u8 sWifiSettingsZeroAddress[4] = { 0, 0, 0, 0 };
 
 static DWCUtilWifiSettings *sWifiSettings;
 
-void DWCUtilWifiSettings_Init(void) {
-    sWifiSettings = DWCUtilHeap_AllocClear(sizeof(DWCUtilWifiSettings), 32);
+void DWCi_SETTIGNlInit(void) {
+    sWifiSettings = DWCi_HEAPlAllocEx(sizeof(DWCUtilWifiSettings), 32);
     MATHi_CRC16InitTableRev(&sWifiSettings->crcTable, 0xa001);
     DWCBm_ReadAllNtrPages(sWifiSettings);
 }
 
-void DWCUtilWifiSettings_Exit(void) {
-    DWCUtilHeap_FreeAndNull(&sWifiSettings);
+void DWCi_SETTIGNlEnd(void) {
+    DWCi_HEAPlFree_(&sWifiSettings);
 }
 
 DWCUtilSettingsEdit *DWCUtilWifiSettings_GetEdit(void) {
     return &sWifiSettings->edit;
 }
 
-void DWCUtilWifiSettings_SetAutoAddress(BOOL autoAddress) {
+void DWCi_SETTINGlSetIpAuto(BOOL autoAddress) {
     sWifiSettings->edit.autoAddress = autoAddress;
 }
 
-void DWCUtilWifiSettings_SetAutoDns(BOOL autoDns) {
+void DWCi_SETTINGlSetDnsAuto(BOOL autoDns) {
     sWifiSettings->edit.autoDns = autoDns;
 }
 
-void DWCUtilWifiSettings_SetSsid(const u8 *ssid) {
+void DWCi_SETTINGlSetSsid(const u8 *ssid) {
     MI_CpuCopy8(ssid, sWifiSettings->edit.connection.ssid, sizeof(sWifiSettings->edit.connection.ssid));
-    sWifiSettings->edit.connection.status = 0;
+    sWifiSettings->edit.connection.setType = 0;
 }
 
-void DWCUtilWifiSettings_SetWepKey(const u8 *key) {
+void DWCi_SETTINGlSetWep(const u8 *key) {
     int i;
     int length;
     u8 *dest;
 
     MI_CpuFill8(sWifiSettings->edit.connection.wepKey[0], 0, sizeof(sWifiSettings->edit.connection.wepKey[0]));
-    length = DWCUtilString_Length(key, 32);
+    length = DWCi_MOV_WH_SetUserGameInfo(key, 32);
     switch (length) {
     case 0:
     case 10:
     case 26:
     case 32:
-        sWifiSettings->edit.connection.wepKeyText = 0;
+        sWifiSettings->edit.connection.wepNotation = 0;
         dest = sWifiSettings->edit.connection.wepKey[0];
         for (i = 0; i < length; i += 2) {
-            *dest = (DWCUtilWifiSettings_ParseHexDigit(key[i]) << 4) + DWCUtilWifiSettings_ParseHexDigit(key[i + 1]);
+            *dest = (ascii2hex(key[i]) << 4) + ascii2hex(key[i + 1]);
             dest++;
         }
         break;
     default:
-        sWifiSettings->edit.connection.wepKeyText = 1;
+        sWifiSettings->edit.connection.wepNotation = 1;
         MI_CpuCopy8(key, sWifiSettings->edit.connection.wepKey[0], sizeof(sWifiSettings->edit.connection.wepKey[0]));
         break;
     }
@@ -94,114 +94,114 @@ void DWCUtilWifiSettings_SetWepKey(const u8 *key) {
 }
 
 void DWCUtilWifiSettings_SetIp(const u8 *digits) {
-    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.ip);
+    DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.connection.ip);
 }
 
 void DWCUtilWifiSettings_SetNetmask(const u8 *digits) {
-    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.netmask);
+    DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.netmask);
 }
 
-void DWCUtilWifiSettings_SetGateway(const u8 *digits) {
-    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.gateway);
+void DWCi_SETTINGlSetGateway(const u8 *digits) {
+    DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.connection.gateway);
 }
 
-void DWCUtilWifiSettings_SetDns1(const u8 *digits) {
-    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.dns[0]);
+void DWCi_SETTINGlSetDnsP(const u8 *digits) {
+    DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.connection.dns[0]);
 }
 
-void DWCUtilWifiSettings_SetDns2(const u8 *digits) {
-    DWCUtilWifiSettings_DigitsToAddress(digits, sWifiSettings->edit.connection.dns[1]);
+void DWCi_SETTINGlSetDnsS(const u8 *digits) {
+    DWCi_SETTINGlConvAddress(digits, sWifiSettings->edit.connection.dns[1]);
 }
 
-void DWCUtilWifiSettings_GetSsid(u8 *ssid) {
+void DWCi_SETTINGlGetSsid(u8 *ssid) {
     MI_CpuCopy8(sWifiSettings->edit.connection.ssid, ssid, sizeof(sWifiSettings->edit.connection.ssid));
 }
 
-void DWCUtilWifiSettings_GetIp(u8 *digits) {
+void DWCi_SETTINGlGetIp(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.ip;
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void DWCUtilWifiSettings_GetNetmask(u8 *digits) {
+void DWCi_SETTINGlGetNetMask(u8 *digits) {
     u8 *address = sWifiSettings->edit.netmask;
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void DWCUtilWifiSettings_GetGateway(u8 *digits) {
+void DWCi_SETTINGlGetGateway(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.gateway;
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void DWCUtilWifiSettings_GetDns1(u8 *digits) {
+void DWCi_SETTINGlGetDnsP(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.dns[0];
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-void DWCUtilWifiSettings_GetDns2(u8 *digits) {
+void DWCi_SETTINGlGetDnsS(u8 *digits) {
     u8 *address = sWifiSettings->edit.connection.dns[1];
 
     OS_SPrintf((char *)digits, "%3d%3d%3d%3d", address[0], address[1], address[2], address[3]);
 }
 
-u8 DWCUtilWifiSettings_GetStatus(int index) {
-    return sWifiSettings->pages[index].connection.status;
+u8 DWCi_SETTINGlGetSetType(int index) {
+    return sWifiSettings->pages[index].ap.setType;
 }
 
-void DWCUtilWifiSettings_EditConnection(int index) {
+void DWCi_SETTINGlSetSetting(int index) {
     DWCUtilWifiSettings *settings = sWifiSettings;
 
-    settings->edit.connection = settings->pages[index].connection;
+    settings->edit.connection = settings->pages[index].ap;
     settings->edit.index = index;
-    if (memcmp(settings->pages[index].connection.ip, sWifiSettingsZeroAddress, 4) != 0) {
+    if (memcmp(settings->pages[index].ap.ip, sWifiSettingsZeroAddress, 4) != 0) {
         sWifiSettings->edit.autoAddress = FALSE;
     } else {
         sWifiSettings->edit.autoAddress = TRUE;
     }
-    if (memcmp(settings->pages[index].connection.dns[0], sWifiSettingsZeroAddress, 4) != 0 ||
-        memcmp(settings->pages[index].connection.dns[1], sWifiSettingsZeroAddress, 4) != 0) {
+    if (memcmp(settings->pages[index].ap.dns[0], sWifiSettingsZeroAddress, 4) != 0 ||
+        memcmp(settings->pages[index].ap.dns[1], sWifiSettingsZeroAddress, 4) != 0) {
         sWifiSettings->edit.autoDns = FALSE;
     } else {
         sWifiSettings->edit.autoDns = TRUE;
     }
-    DWCBm_MakeMask(settings->pages[index].connection.netmaskBits, sWifiSettings->edit.netmask);
+    DWCi_BACKUPlConvMaskAddr(settings->pages[index].ap.netmask, sWifiSettings->edit.netmask);
 }
 
-void DWCUtilWifiSettings_Save(void) {
+void DWCi_SETTINGlSet(void) {
     DWCUtilWifiSettings *settings = sWifiSettings;
     DWCUtilSettingsEdit *edit = &settings->edit;
-    DWCBmConnection *connection = &settings->pages[edit->index].connection;
+    DWCBMApInfo *connection = &settings->pages[edit->index].ap;
 
     *connection = edit->connection;
     if (edit->autoAddress) {
         MI_CpuFill8(connection->ip, 0, 4);
         MI_CpuFill8(connection->gateway, 0, 4);
-        connection->netmaskBits = 0;
+        connection->netmask = 0;
     } else {
         MI_CpuCopy8(edit->connection.ip, connection->ip, 4);
         MI_CpuCopy8(edit->connection.gateway, connection->gateway, 4);
-        connection->netmaskBits = DWCBm_CountMaskBits(edit->netmask);
+        connection->netmask = DWCi_BACKUPlConvMaskCidr(edit->netmask);
     }
     if (edit->autoDns) {
         MI_CpuFill8(connection->dns, 0, 8);
     } else {
         MI_CpuCopy8(edit->connection.dns, connection->dns, 8);
     }
-    DWCUtilWifiSettings_WritePage(edit->index);
+    write(edit->index);
 }
 
-void DWCUtilWifiSettings_SaveAcResult(const DWCUtilAcResult *result) {
+void DWCi_SETTINGlSetRaku(const ATERMApConfigParam *result) {
     DWCUtilWifiSettings *settings = sWifiSettings;
     DWCUtilSettingsEdit *edit = &settings->edit;
     int length = 0;
     int i;
 
-    MI_CpuFill8(&edit->connection, 0, offsetof(DWCBmConnection, usedMask));
+    MI_CpuFill8(&edit->connection, 0, offsetof(DWCBMApInfo, state));
     MI_CpuCopy8(result->ssid, edit->connection.ssid, sizeof(edit->connection.ssid));
-    switch (result->wepMode) {
+    switch (result->auth_mode) {
     case 1:
         edit->connection.wepMode = 1;
         length = 5;
@@ -218,111 +218,111 @@ void DWCUtilWifiSettings_SaveAcResult(const DWCUtilAcResult *result) {
         edit->connection.wepMode = 0;
         break;
     }
-    edit->connection.wepKeyText = 0;
+    edit->connection.wepNotation = 0;
     for (i = 0; i < 4; i++) {
-        MI_CpuCopy8(result->keys[i], edit->connection.wepKey[i], length);
+        MI_CpuCopy8(result->wepkey[i], edit->connection.wepKey[i], length);
     }
-    edit->connection.status = 2;
+    edit->connection.setType = 2;
     MI_CpuFill8(edit->netmask, 0, 4);
     edit->autoAddress = TRUE;
     edit->autoDns = TRUE;
-    DWCUtilWifiSettings_Save();
+    DWCi_SETTINGlSet();
 }
 
-void DWCUtilWifiSettings_SaveAossResult(const AossResult *result) {
+void DWCi_SETTINGlSetAoss(const AOSS_SECURE_INFO *result) {
     DWCUtilWifiSettings *settings = sWifiSettings;
     DWCUtilSettingsEdit *edit = &settings->edit;
 
-    MI_CpuFill8(&edit->connection, 0, offsetof(DWCBmConnection, usedMask));
-    MI_CpuCopy8(result->wep40Key[0], edit->connection.aossKey[0], 5);
-    MI_CpuCopy8(result->wep40Key[1], edit->connection.aossKey[1], 5);
-    MI_CpuCopy8(result->wep40Key[2], edit->connection.aossKey[2], 5);
-    MI_CpuCopy8(result->wep40Key[3], edit->connection.aossKey[3], 5);
-    MI_CpuCopy8(result->wep40Ssid, edit->connection.aossSsid, 32);
+    MI_CpuFill8(&edit->connection, 0, offsetof(DWCBMApInfo, state));
+    MI_CpuCopy8(result->wep40Key[0], edit->connection.wep2[0], 5);
+    MI_CpuCopy8(result->wep40Key[1], edit->connection.wep2[1], 5);
+    MI_CpuCopy8(result->wep40Key[2], edit->connection.wep2[2], 5);
+    MI_CpuCopy8(result->wep40Key[3], edit->connection.wep2[3], 5);
+    MI_CpuCopy8(result->WEP40_SSID, edit->connection.aossSsid, 32);
     MI_CpuCopy8(result->wep104Key[0], edit->connection.wepKey[0], 13);
     MI_CpuCopy8(result->wep104Key[1], edit->connection.wepKey[1], 13);
     MI_CpuCopy8(result->wep104Key[2], edit->connection.wepKey[2], 13);
     MI_CpuCopy8(result->wep104Key[3], edit->connection.wepKey[3], 13);
-    MI_CpuCopy8(result->wep104Ssid, edit->connection.ssid, 32);
+    MI_CpuCopy8(result->WEP104_SSID, edit->connection.ssid, 32);
     edit->connection.wepMode = 2;
-    edit->connection.wepKeyText = 0;
-    edit->connection.status = 1;
+    edit->connection.wepNotation = 0;
+    edit->connection.setType = 1;
     MI_CpuFill8(edit->netmask, 0, 4);
     edit->autoAddress = TRUE;
     edit->autoDns = TRUE;
-    DWCUtilWifiSettings_Save();
+    DWCi_SETTINGlSet();
 }
 
-u8 *DWCUtilWifiSettings_GetPages(void) {
+u8 *DWCi_SETTINGlGetMemMap(void) {
     return (u8 *)sWifiSettings;
 }
 
-void DWCUtilWifiSettings_Erase(int index) {
+void DWCi_SETTINGlErasePage(int index) {
     DWCUtilWifiSettings *settings = sWifiSettings;
 
-    MI_CpuFill8(&settings->pages[index], 0, offsetof(DWCBmConnection, usedMask));
-    settings->pages[index].connection.status = DWC_BM_CONNECTION_UNUSED;
-    DWCUtilWifiSettings_WritePage(index);
+    MI_CpuFill8(&settings->pages[index], 0, offsetof(DWCBMApInfo, state));
+    settings->pages[index].ap.setType = DWC_SETTYPE_NONE;
+    write(index);
 }
 
-void DWCUtilWifiSettings_EraseAll(void) {
-    DWCBmWifiIdInfo info;
+void DWCi_SETTINGlEraseAll(void) {
+    DWCWiFiInfo info;
     const u8 *packed;
     int i;
 
     MI_CpuClear16(sWifiSettings->pages, sizeof(sWifiSettings->pages));
     for (i = 0; i < DWC_UTIL_SETTINGS_CONNECTIONS; i++) {
-        sWifiSettings->pages[i].connection.status = DWC_BM_CONNECTION_UNUSED;
+        sWifiSettings->pages[i].ap.setType = DWC_SETTYPE_NONE;
     }
-    DWCBm_MakePendingWifiId(&info);
-    packed = DWCBm_PackWifiIdInfo(&info);
+    DWCi_AUTH_GetNewWiFiInfo(&info);
+    packed = DWCi_BACKUPlConvWifiInfo(&info);
     for (i = 0; i < 2; i++) {
-        MI_CpuCopy8(packed, sWifiSettings->pages[i].wifiId, DWC_BM_PACKED_SIZE);
+        MI_CpuCopy8(packed, sWifiSettings->pages[i].wifi, DWC_BM_PACKED_SIZE);
     }
     for (i = 0; i < DWC_UTIL_SETTINGS_PAGES; i++) {
-        DWCUtilWifiSettings_WritePage(i);
+        write(i);
     }
 }
 
 // Writes a page to the NVRAM, with the first two, which keep the mask of the connections in use, when that changes
-static void DWCUtilWifiSettings_WritePage(int index) {
-    u8 status = sWifiSettings->pages[index].connection.status;
+static void write(int index) {
+    u8 status = sWifiSettings->pages[index].ap.setType;
     u32 bit = 1 << index;
     BOOL used = FALSE;
-    u32 write[DWC_UTIL_SETTINGS_PAGES];
+    BOOL write[DWC_UTIL_SETTINGS_PAGES];
     void *scratch;
     int i;
 
     MI_CpuFill8(write, 0, sizeof(write));
     write[index] = TRUE;
     if (index <= 2) {
-        if (sWifiSettings->pages[0].connection.usedMask & bit) {
+        if (sWifiSettings->pages[0].ap.state & bit) {
             used = TRUE;
         }
-        if (status == DWC_BM_CONNECTION_UNUSED && used) {
-            sWifiSettings->pages[0].connection.usedMask &= ~bit;
-            sWifiSettings->pages[1].connection.usedMask &= ~bit;
+        if (status == DWC_SETTYPE_NONE && used) {
+            sWifiSettings->pages[0].ap.state &= ~bit;
+            sWifiSettings->pages[1].ap.state &= ~bit;
             write[1] = TRUE;
             write[0] = TRUE;
-        } else if (status != DWC_BM_CONNECTION_UNUSED && !used) {
-            sWifiSettings->pages[0].connection.usedMask |= bit;
-            sWifiSettings->pages[1].connection.usedMask |= bit;
+        } else if (status != DWC_SETTYPE_NONE && !used) {
+            sWifiSettings->pages[0].ap.state |= bit;
+            sWifiSettings->pages[1].ap.state |= bit;
             write[1] = TRUE;
             write[0] = TRUE;
         }
     }
     for (i = 0; i < DWC_UTIL_SETTINGS_PAGES; i++) {
         if (write[i]) {
-            sWifiSettings->pages[i].crc16 =
-                MATH_CalcCRC16(&sWifiSettings->crcTable, &sWifiSettings->pages[i], sizeof(DWCBmNtrPage) - sizeof(u16));
+            sWifiSettings->pages[i].crc =
+                MATH_CalcCRC16(&sWifiSettings->crcTable, &sWifiSettings->pages[i], sizeof(DWCMemPage) - sizeof(u16));
         }
     }
-    scratch = DWCUtilHeap_AllocClear(0x100, 32);
+    scratch = DWCi_HEAPlAllocEx(0x100, 32);
     DWCBm_WriteNtrPages(sWifiSettings, write, scratch);
-    DWCUtilHeap_FreeAndNull(&scratch);
+    DWCi_HEAPlFree_(&scratch);
 }
 
-void DWCUtilWifiSettings_DigitsToAddress(const u8 *digits, u8 *address) {
+void DWCi_SETTINGlConvAddress(const u8 *digits, u8 *address) {
     u8 number[4];
     int i;
     int j;
@@ -341,7 +341,7 @@ void DWCUtilWifiSettings_DigitsToAddress(const u8 *digits, u8 *address) {
 }
 
 // The value of a hex digit
-static int DWCUtilWifiSettings_ParseHexDigit(u8 digit) {
+static int ascii2hex(u8 digit) {
     if (digit <= '9') {
         return digit - '0';
     }

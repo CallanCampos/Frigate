@@ -357,7 +357,7 @@ void GX_SetBankForARM7(GXVRamARM7 banks) {
     GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
 }
 
-void GX_SetBankForLCDC(u32 banks) {
+void GX_SetBankForLCDC(int banks) {
     gGXState.lcdc |= banks;
     GX_VRAMCNT_SetLCDC_(banks);
 }
@@ -437,11 +437,11 @@ static u32 resetBankForX_(u16 *banks) {
     return acquired;
 }
 
-u32 GX_ResetBankForBG(void) {
+GXVRamBG GX_ResetBankForBG(void) {
     return resetBankForX_(&gGXState.bg);
 }
 
-u32 GX_ResetBankForOBJ(void) {
+GXVRamOBJ GX_ResetBankForOBJ(void) {
     return resetBankForX_(&gGXState.obj);
 }
 
@@ -455,7 +455,7 @@ GXVRamOBJExtPltt GX_ResetBankForOBJExtPltt(void) {
     return (GXVRamOBJExtPltt)resetBankForX_(&gGXState.objExtPltt);
 }
 
-u32 GX_ResetBankForTex(void) {
+GXVRamTex GX_ResetBankForTex(void) {
     return resetBankForX_(&gGXState.tex);
 }
 
@@ -463,24 +463,24 @@ GXVRamTexPltt GX_ResetBankForTexPltt(void) {
     return (GXVRamTexPltt)resetBankForX_(&gGXState.texPltt);
 }
 
-u32 GX_ResetBankForClearImage(void) {
+GXVRamClearImage GX_ResetBankForClearImage(void) {
     return resetBankForX_(&gGXState.clrImg);
 }
 
-u32 GX_ResetBankForSubBG(void) {
+GXVRamSubBG GX_ResetBankForSubBG(void) {
     return resetBankForX_(&gGXState.subBg);
 }
 
-u32 GX_ResetBankForSubOBJ(void) {
+GXVRamSubOBJ GX_ResetBankForSubOBJ(void) {
     return resetBankForX_(&gGXState.subObj);
 }
 
-u32 GX_ResetBankForSubBGExtPltt(void) {
+GXVRamSubBGExtPltt GX_ResetBankForSubBGExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
     return resetBankForX_(&gGXState.subBgExtPltt);
 }
 
-u32 GX_ResetBankForSubOBJExtPltt(void) {
+GXVRamSubOBJExtPltt GX_ResetBankForSubOBJExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
     return resetBankForX_(&gGXState.subObjExtPltt);
 }
@@ -521,82 +521,82 @@ static u32 disableBankForX_(u16 *banks) {
     return disabled;
 }
 
-u32 GX_DisableBankForBG(void) {
+GXVRamBG GX_DisableBankForBG(void) {
     return disableBankForX_(&gGXState.bg);
 }
 
-u32 GX_DisableBankForOBJ(void) {
+GXVRamOBJ GX_DisableBankForOBJ(void) {
     return disableBankForX_(&gGXState.obj);
 }
 
-u32 GX_DisableBankForBGExtPltt(void) {
+GXVRamBGExtPltt GX_DisableBankForBGExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
     return disableBankForX_(&gGXState.bgExtPltt);
 }
 
-u32 GX_DisableBankForOBJExtPltt(void) {
+GXVRamOBJExtPltt GX_DisableBankForOBJExtPltt(void) {
     reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
     return disableBankForX_(&gGXState.objExtPltt);
 }
 
-u32 GX_DisableBankForTex(void) {
+GXVRamTex GX_DisableBankForTex(void) {
     return disableBankForX_(&gGXState.tex);
 }
 
-u32 GX_DisableBankForTexPltt(void) {
+GXVRamTexPltt GX_DisableBankForTexPltt(void) {
     return disableBankForX_(&gGXState.texPltt);
 }
 
-u32 GX_DisableBankForClearImage(void) {
+GXVRamClearImage GX_DisableBankForClearImage(void) {
     return disableBankForX_(&gGXState.clrImg);
 }
 
-u32 GX_DisableBankForARM7(void) {
+GXVRamARM7 GX_DisableBankForARM7(void) {
     return disableBankForX_(&gGXState.arm7);
 }
 
-u32 GX_DisableBankForLCDC(void) {
+GXVRamLCDC GX_DisableBankForLCDC(void) {
     return disableBankForX_(&gGXState.lcdc);
 }
 
-u32 GX_DisableBankForSubBG(void) {
+GXVRamSubBG GX_DisableBankForSubBG(void) {
     return disableBankForX_(&gGXState.subBg);
 }
 
-u32 GX_DisableBankForSubOBJ(void) {
+GXVRamSubOBJ GX_DisableBankForSubOBJ(void) {
     return disableBankForX_(&gGXState.subObj);
 }
 
-u32 GX_DisableBankForSubBGExtPltt(void) {
+GXVRamSubBGExtPltt GX_DisableBankForSubBGExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
     return disableBankForX_(&gGXState.subBgExtPltt);
 }
 
-u32 GX_DisableBankForSubOBJExtPltt(void) {
+GXVRamSubOBJExtPltt GX_DisableBankForSubOBJExtPltt(void) {
     reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
     return disableBankForX_(&gGXState.subObjExtPltt);
 }
 
-u16 GX_GetBankForOBJ(void) {
+GXVRamOBJ GX_GetBankForOBJ(void) {
     return gGXState.obj;
 }
 
-u32 GX_GetBankForOBJExtPltt(void) {
+GXVRamOBJExtPltt GX_GetBankForOBJExtPltt(void) {
     return gGXState.objExtPltt;
 }
 
-u32 GX_GetBankForTex(void) {
+GXVRamTex GX_GetBankForTex(void) {
     return gGXState.tex;
 }
 
-u32 GX_GetBankForLCDC(void) {
+GXVRamLCDC GX_GetBankForLCDC(void) {
     return gGXState.lcdc;
 }
 
-u16 GX_GetBankForSubOBJ(void) {
+GXVRamSubOBJ GX_GetBankForSubOBJ(void) {
     return gGXState.subObj;
 }
 
-u32 GX_GetBankForSubOBJExtPltt(void) {
+GXVRamSubOBJExtPltt GX_GetBankForSubOBJExtPltt(void) {
     return gGXState.subObjExtPltt;
 }

@@ -157,7 +157,7 @@ asm void MI_Copy64B(const void *src, void *dest) {
 
 // MI_CpuFill8: fills size bytes with a byte, writing halfwords and words only: the ARM9 can't write a byte to
 // VRAM, so an odd start or end is a halfword that keeps the byte next to it
-asm void MI_CpuFill8(void *dest, u32 value, u32 size) {
+asm void MI_CpuFill8(void *dest, u8 value, u32 size) {
     cmp r2, #0
     bxeq lr
     tst r0, #1

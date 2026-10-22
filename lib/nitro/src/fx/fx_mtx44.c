@@ -130,9 +130,9 @@ void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab) {
 }
 
 void MTX_FrustumW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx) {
-    fx64 invWidth;
-    fx64 invHeight;
-    fx64 invDepth;
+    fx64c invWidth;
+    fx64c invHeight;
+    fx64c invDepth;
     fx32 n2;
 
     FX_InvAsync(r - l);
@@ -171,7 +171,7 @@ void MTX_FrustumW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, M
 
 void MTX_PerspectiveW(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx) {
     fx32 cot;
-    fx64 invDepth;
+    fx64c invDepth;
 
     cot = FX_Div(fovyCos, fovySin);
     CP_SetDivImm64_32((u64)FX32_ONE << 32, (u32)(n - f));
@@ -202,9 +202,9 @@ void MTX_PerspectiveW(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, f
 }
 
 void MTX_OrthoW(fx32 t, fx32 b, fx32 l, fx32 r, fx32 n, fx32 f, fx32 scaleW, MtxFx44 *mtx) {
-    fx64 invWidth;
-    fx64 invHeight;
-    fx64 invDepth;
+    fx64c invWidth;
+    fx64c invHeight;
+    fx64c invDepth;
 
     FX_InvAsync(r - l);
     mtx->m[0][1] = 0;

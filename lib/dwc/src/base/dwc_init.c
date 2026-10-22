@@ -17,33 +17,32 @@
 static int sStarted;
 static u32 sGameCode;
 
-static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free);
+static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocEx alloc, DWCFreeEx free);
 static void DWCi_SetStarted(int started);
 
-int DWC_InitForProduction(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int),
-                          void (*free)(u32, void *, u32)) {
-    OSi_ReferSymbol(DWCi_Signature);
+int DWC_InitForProduction(const char *gameName, u32 gameCode, DWCAllocEx alloc, DWCFreeEx free) {
+    SDK_USING_MIDDLEWARE(DWCi_Signature);
     return DWCi_Init(1, gameName, gameCode, alloc, free);
 }
 
-static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free) {
+static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocEx alloc, DWCFreeEx free) {
     int checked;
     int result;
     BOOL created = FALSE;
     void *work;
 
-    DWCi_SetMemFunc(alloc, free);
+    DWC_SetMemFunc(alloc, free);
     OS_InitTick();
     OS_InitAlarm();
     RTC_Init();
 
-    work = DWC_Alloc(DWC_ALLOCTYPE_BM, DWC_BM_WORK_SIZE);
+    work = DWC_Alloc(DWC_ALLOCTYPE_BM, DWC_BM_INIT_WORK_SIZE);
     if (work == NULL) {
         return DWC_INIT_RESULT_OUT_OF_MEMORY;
     }
     checked = DWC_BM_Init(work);
-    if (DWCBm_HasNoWifiId()) {
-        DWCBm_MakeAndSaveWifiId(work);
+    if (DWC_Auth_CheckWiFiIDNeedCreate()) {
+        DWCi_AUTH_MakeWiFiID(work);
         created = TRUE;
     }
     DWC_Free(DWC_ALLOCTYPE_BM, work, 0);
@@ -64,7 +63,7 @@ static int DWCi_Init(int server, const char *gameName, u32 gameCode, DWCAllocFun
 
     DWCi_Auth_InitInterface(server);
     sGameCode = gameCode;
-    gsiMemoryCallbacksSet(DWCi_GsAlloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
+    gsiMemoryCallbacksSet(DWCi_GsMalloc, DWCi_GsFree, DWCi_GsRealloc, DWCi_GsMemalign);
     if (gameName != NULL) {
         strcpy(gcd_gamename, gameName);
     }

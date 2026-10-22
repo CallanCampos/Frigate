@@ -1,19 +1,18 @@
 #include "dwc/ext.h"
 #include "dwc/md5.h"
 
-// GameSpy's MD5 (md5c.c): RSA's reference MD5, from RFC 1321, whose names the static functions carry. MD5Transform
-// keeps its address, with its name in the comment: NitroWiFi's SSL has a function of that name in this overlay
+// GameSpy's MD5 (md5c.c): RSA's reference MD5, from RFC 1321, whose names the functions carry
 
 // RFC 1321's MD5Transform, and its helpers
-static void func_ov011_02171af0(u32 state[4], const u8 block[64]);
-static void Encode(u8 *output, u32 *input, u32 length);
-static void Decode(u32 *output, const u8 *input, u32 length);
-static void MD5_memcpy(void *output, const void *input, u32 length);
-static void MD5_memset(void *output, int value, u32 length);
+static void MD5Transform(UINT4 state[4], unsigned char block[64]);
+static void Encode(unsigned char *output, UINT4 *input, unsigned int length);
+static void Decode(UINT4 *output, unsigned char *input, unsigned int length);
+static void MD5_memcpy(POINTER output, POINTER input, unsigned int length);
+static void MD5_memset(POINTER output, int value, unsigned int length);
 // Writes a digest as hex digits
-static void MD5Print(u8 digest[16], char *output);
+static void MD5Print(unsigned char digest[16], char output[33]);
 
-static u8 PADDING[64] = { 0x80 };
+static unsigned char PADDING[64] = { 0x80 };
 
 #define S11 7
 #define S12 12
@@ -41,38 +40,37 @@ static u8 PADDING[64] = { 0x80 };
 
 #define FF(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += F((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += F((b), (c), (d)) + (x) + (UINT4)(ac);                                                                   \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 #define GG(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += G((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += G((b), (c), (d)) + (x) + (UINT4)(ac);                                                                   \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 #define HH(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += H((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += H((b), (c), (d)) + (x) + (UINT4)(ac);                                                                   \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 #define II(a, b, c, d, x, s, ac)                                                                                       \
     {                                                                                                                  \
-        (a) += I((b), (c), (d)) + (x) + (u32)(ac);                                                                     \
+        (a) += I((b), (c), (d)) + (x) + (UINT4)(ac);                                                                   \
         (a) = ROTATE_LEFT((a), (s));                                                                                   \
         (a) += (b);                                                                                                    \
     }
 
-void func_ov011_021719fc(HashContext *context) {
-    func_ov011_021719fcInline(context);
+void MD5Init(MD5_CTX *context) {
+    MD5InitInline(context);
 }
 
-void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
-    const u8 *input = data;
-    u32 i;
-    u32 index;
-    u32 partLen;
+void MD5Update(MD5_CTX *context, unsigned char *input, unsigned int inputLen) {
+    unsigned int i;
+    unsigned int index;
+    unsigned int partLen;
 
     index = (context->count[0] >> 3) & 0x3F;
     if ((context->count[0] += (inputLen << 3)) < (inputLen << 3)) {
@@ -82,9 +80,9 @@ void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
     partLen = 64 - index;
     if (inputLen >= partLen) {
         MD5_memcpy(&context->buffer[index], input, partLen);
-        func_ov011_02171af0(context->state, context->buffer);
+        MD5Transform(context->state, context->buffer);
         for (i = partLen; i + 63 < inputLen; i += 64) {
-            func_ov011_02171af0(context->state, &input[i]);
+            MD5Transform(context->state, &input[i]);
         }
         index = 0;
     } else {
@@ -93,26 +91,26 @@ void func_ov011_02171a24(HashContext *context, const void *data, u32 inputLen) {
     MD5_memcpy(&context->buffer[index], &input[i], inputLen - i);
 }
 
-void func_ov011_02171a9c(u8 digest[16], HashContext *context) {
-    u8 bits[8];
-    u32 index;
-    u32 padLen;
+void MD5Final(unsigned char digest[16], MD5_CTX *context) {
+    unsigned char bits[8];
+    unsigned int index;
+    unsigned int padLen;
 
     Encode(bits, context->count, 8);
     index = (context->count[0] >> 3) & 0x3f;
     padLen = (index < 56) ? (56 - index) : (120 - index);
-    func_ov011_02171a24(context, PADDING, padLen);
-    func_ov011_02171a24(context, bits, 8);
+    MD5Update(context, PADDING, padLen);
+    MD5Update(context, bits, 8);
     Encode(digest, context->state, 16);
-    MD5_memset(context, 0, sizeof(*context));
+    MD5_memset((POINTER)context, 0, sizeof(*context));
 }
 
-static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
-    u32 a = state[0];
-    u32 b = state[1];
-    u32 c = state[2];
-    u32 d = state[3];
-    u32 x[16];
+static void MD5Transform(UINT4 state[4], unsigned char block[64]) {
+    UINT4 a = state[0];
+    UINT4 b = state[1];
+    UINT4 c = state[2];
+    UINT4 d = state[3];
+    UINT4 x[16];
 
     Decode(x, block, 64);
 
@@ -189,43 +187,43 @@ static void func_ov011_02171af0(u32 state[4], const u8 block[64]) {
     state[2] += c;
     state[3] += d;
 
-    MD5_memset(x, 0, sizeof(x));
+    MD5_memset((POINTER)x, 0, sizeof(x));
 }
 
-static void Encode(u8 *output, u32 *input, u32 length) {
-    u32 i;
-    u32 j;
+static void Encode(unsigned char *output, UINT4 *input, unsigned int length) {
+    unsigned int i;
+    unsigned int j;
 
     for (i = 0, j = 0; j < length; i++, j += 4) {
-        output[j] = (u8)(input[i] & 0xff);
-        output[j + 1] = (u8)((input[i] >> 8) & 0xff);
-        output[j + 2] = (u8)((input[i] >> 16) & 0xff);
-        output[j + 3] = (u8)((input[i] >> 24) & 0xff);
+        output[j] = (unsigned char)(input[i] & 0xff);
+        output[j + 1] = (unsigned char)((input[i] >> 8) & 0xff);
+        output[j + 2] = (unsigned char)((input[i] >> 16) & 0xff);
+        output[j + 3] = (unsigned char)((input[i] >> 24) & 0xff);
     }
 }
 
-static void Decode(u32 *output, const u8 *input, u32 length) {
-    u32 i;
-    u32 j;
+static void Decode(UINT4 *output, unsigned char *input, unsigned int length) {
+    unsigned int i;
+    unsigned int j;
 
     for (i = 0, j = 0; j < length; i++, j += 4) {
-        output[i] =
-            ((u32)input[j]) | (((u32)input[j + 1]) << 8) | (((u32)input[j + 2]) << 16) | (((u32)input[j + 3]) << 24);
+        output[i] = ((UINT4)input[j]) | (((UINT4)input[j + 1]) << 8) | (((UINT4)input[j + 2]) << 16) |
+                    (((UINT4)input[j + 3]) << 24);
     }
 }
 
-static void MD5_memcpy(void *output, const void *input, u32 length) {
+static void MD5_memcpy(POINTER output, POINTER input, unsigned int length) {
     memcpy(output, input, length);
 }
 
-static void MD5_memset(void *output, int value, u32 length) {
+static void MD5_memset(POINTER output, int value, unsigned int length) {
     memset(output, value, length);
 }
 
 // Writes the digest as 32 hex digits and an end
-static void MD5Print(u8 digest[16], char *output) {
+static void MD5Print(unsigned char digest[16], char output[33]) {
     static const char hexDigits[] = "0123456789abcdef";
-    u32 i;
+    unsigned int i;
 
     for (i = 0; i < 16; i++) {
         output[i * 2] = hexDigits[digest[i] / 16];
@@ -234,12 +232,12 @@ static void MD5Print(u8 digest[16], char *output) {
     output[32] = '\0';
 }
 
-void MD5Digest(const u8 *input, u32 length, char *output) {
-    HashContext context;
-    u8 digest[16];
+void MD5Digest(unsigned char *input, unsigned int len, char output[33]) {
+    MD5_CTX context;
+    unsigned char digest[16];
 
-    func_ov011_021719fc(&context);
-    func_ov011_02171a24(&context, input, length);
-    func_ov011_02171a9c(digest, &context);
+    MD5Init(&context);
+    MD5Update(&context, input, len);
+    MD5Final(digest, &context);
     MD5Print(digest, output);
 }

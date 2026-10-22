@@ -386,7 +386,7 @@ static const TrClassResource TRAINER_CLASS_RESOURCES[TRAINER_CLASS_COUNT] = {
     [TRAINER_CLASS_PKMN_TRAINER_COLRESS_235] = { TRAINER_SPRITE_TEAM_PLASMA_COLRESS, 0, SEQ_BGM_EYE_01 },
 };
 
-u32 TrainerData_GetParam(int trainerId, u32 param) {
+u32 TrainerData_GetParam(int trainerId, TrainerDataParam param) {
     TrainerData data;
     u32 value;
 

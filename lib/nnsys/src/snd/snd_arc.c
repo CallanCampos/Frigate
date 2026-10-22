@@ -202,7 +202,7 @@ u32 NNS_SndArcGetFileSize(u32 fileId) {
 }
 
 // Reads at most size bytes from offset in the file, loadBlockSize bytes at a time
-int NNS_SndArcReadFile(u32 fileId, void *buffer, int size, int offset) {
+s32 NNS_SndArcReadFile(u32 fileId, void *buffer, s32 size, s32 offset) {
     NNSSndArc *arc = sCurrent;
     const NNSSndArcFileInfo *fileInfo;
     int blockSize;
@@ -257,7 +257,7 @@ const char *NNSi_SndArcGetFilePath(void) {
     return sCurrent->filePath;
 }
 
-const void *NNS_SndArcGetFileAddress(u32 fileId) {
+void *NNS_SndArcGetFileAddress(u32 fileId) {
     const NNSSndArcFat *fat = sCurrent->fat;
 
     if (fileId >= fat->count) {
@@ -266,11 +266,11 @@ const void *NNS_SndArcGetFileAddress(u32 fileId) {
     return fat->files[fileId].mem;
 }
 
-void NNS_SndArcSetFileAddress(u32 fileId, const void *address) {
+void NNS_SndArcSetFileAddress(u32 fileId, void *address) {
     sCurrent->fat->files[fileId].mem = address;
 }
 
-void NNS_SndArcSetLoadBlockSize(int size) {
+void NNS_SndArcSetLoadBlockSize(s32 size) {
     sCurrent->loadBlockSize = size;
 }
 

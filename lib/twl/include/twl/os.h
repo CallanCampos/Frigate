@@ -6,27 +6,52 @@
 
 // TwlSDK's OS code in the LTD autoload: the DSi's parts of NitroSDK's OS functions, which main's OS code calls when
 // the game runs on a DSi (os_interrupt_twl.c, os_arena_twl.c, os_ownerInfoEx_twl.c and os_application_jump_twl.c).
-// The names are ours
+// The functions' names are ours; the types and the shared memory's addresses are those of libntr's reconstruction of
+// TwlSDK's headers (os/common/ownerInfoEx_private.h, hw/common/mmap_shared.h)
 
-// The pointer to the DSi's system settings, which the system puts in the shared memory
-#define HW_TWL_SETTINGS_BUF_PTR 0x02fffdfc
+// The pointer to the DSi's system settings (the preloaded parameters), which the system puts in the shared memory
+#define HW_PRELOAD_PARAMETER_ADDR 0x02fffdfc
 
-// The DSi's system settings, of which only what os_ownerInfoEx.c and its DSi part read is named
-typedef struct TWLSettings {
-    u32 unk0_0 : 3;
-    u32 wirelessEnabled : 1; // bit 3: the wireless is enabled in the settings
-    u32 unk0_4 : 20;
-    u32 eulaFlags : 8; // bit 0: the EULA was agreed to
-    u8 unk_04;
+typedef struct OSTWLDate {
+    u8 month;
+    u8 day;
+} OSTWLDate;
+
+// The owner's information in the DSi's system settings
+typedef struct OSTWLOwnerInfo {
+    u8 userColor : 4;
+    u8 rsv : 4;
+    u8 pad;
+    OSTWLDate birthday;
+    u16 nickname[10 + 1];
+    u16 comment[26 + 1];
+} OSTWLOwnerInfo;
+
+// The DSi's system settings
+typedef struct OSTWLSettingsData {
+    struct {
+        u32 isFinishedInitialSetting : 1;
+        u32 isFinishedInitialSetting_Launcher : 1;
+        u32 isSetLanguage : 1;
+        u32 isAvailableWireless : 1; // the wireless is enabled in the settings
+        u32 rsv : 20;
+        u32 isAgreeEULAFlagList : 8; // bit 0: the EULA was agreed to
+    } flags;
+    u8 rsv[1];
     u8 country;
     u8 language;
-    u8 unk_07[9];
-    u8 agreedEULAVersion;
-    u8 unk_11[0x83];
-    TWLParentalControl parentalControl;
-} TWLSettings;
+    u8 rtcLastSetYear;
+    s64 rtcOffset;
+    u8 agreeEulaVersion[8];
+    u8 pad1[2];
+    u8 pad2[6];
+    u8 pad3[16];
+    u8 pad4[20];
+    OSTWLOwnerInfo owner;
+    OSTWLParentalControl parentalControl;
+} OSTWLSettingsData;
 
-#define TWL_SETTINGS (*(TWLSettings **)HW_TWL_SETTINGS_BUF_PTR)
+#define TWL_SETTINGS (*(OSTWLSettingsData **)HW_PRELOAD_PARAMETER_ADDR)
 
 // The DSi's part of OS_IsAvailableWireless and of the function next to it: a bit of the DSi's settings and a byte of
 // the shared memory

@@ -17,21 +17,21 @@
 static struct {
     u32 unk0;
     u8 packed[DWC_BM_PACKED_SIZE];
-} sWifiId;
+} Wifi;
 
 // The buffer that the Wi-Fi ID is written to the NTR console's settings with: a page, a scratch buffer for the write,
 // and the table that the page's CRC16 is made with
-typedef struct PageWriteBuffer {
-    DWCBmNtrPage page;
-    u8 scratch[0x100];
-    MATHCRC16Table crcTable;
-} PageWriteBuffer;
+typedef struct MEMSWI {
+    DWCMemPage mem;
+    u8 work[0x100];
+    MATHCRC16Table table;
+} MEMSWI;
 
-static BOOL ReadNtrPages(DWCBmNtrPage *pages, u32 first, u32 count);
-static BOOL WriteNtrPage(const DWCBmNtrPage *page, u32 index, void *scratch);
+static BOOL ReadNtrPages(DWCMemPage *pages, u32 first, u32 count);
+static BOOL WriteNtrPage(const DWCMemPage *page, u32 index, void *scratch);
 static BOOL ReadTwlPages(DWCBmTwlPage *pages, u32 first, u32 count);
 
-BOOL DWCBm_ReadNtrSettings(void *buf) {
+BOOL DWCi_BM_GetApInfo(void *buf) {
     return ReadNtrPages(buf, 0, 3);
 }
 
@@ -39,23 +39,23 @@ BOOL DWCBm_ReadTwlSettings(void *buf) {
     return ReadTwlPages(buf, 0, 3) != FALSE;
 }
 
-void DWCBm_GetWifiIdInfo(DWCBmWifiIdInfo *info) {
-    MI_CpuCopy8(sWifiId.packed, &info->id, 6);
-    info->id &= WIFI_ID_MASK;
-    MI_CpuCopy8(&sWifiId.packed[5], &info->pendingId, 6);
-    info->pendingId >>= 3;
-    info->pendingId &= WIFI_ID_MASK;
-    MI_CpuCopy8(&sWifiId.packed[10], &info->number, 2);
-    info->number >>= 6;
-    info->number &= 0x3FF;
-    MI_CpuCopy8(&sWifiId.packed[12], &info->salt, 2);
+void DWCi_BM_GetWiFiInfo(DWCWiFiInfo *info) {
+    MI_CpuCopy8(Wifi.packed, &info->attestedUserId, 6);
+    info->attestedUserId &= WIFI_ID_MASK;
+    MI_CpuCopy8(&Wifi.packed[5], &info->notAttestedId, 6);
+    info->notAttestedId >>= 3;
+    info->notAttestedId &= WIFI_ID_MASK;
+    MI_CpuCopy8(&Wifi.packed[10], &info->pass, 2);
+    info->pass >>= 6;
+    info->pass &= 0x3FF;
+    MI_CpuCopy8(&Wifi.packed[12], &info->randomHistory, 2);
 }
 
-static BOOL ReadNtrPages(DWCBmNtrPage *pages, u32 first, u32 count) {
+static BOOL ReadNtrPages(DWCMemPage *pages, u32 first, u32 count) {
     u32 index;
 
     for (index = first; index < first + count; index++) {
-        if (func_0205dca4(&pages[index - first], sizeof(DWCBmNtrPage), index) == -1) {
+        if (func_0205dca4(&pages[index - first], sizeof(DWCMemPage), index) == -1) {
             return FALSE;
         }
     }
@@ -63,8 +63,8 @@ static BOOL ReadNtrPages(DWCBmNtrPage *pages, u32 first, u32 count) {
 }
 
 // The scratch buffer that the callers pass is not used
-static BOOL WriteNtrPage(const DWCBmNtrPage *page, u32 index, void *scratch) {
-    return func_0205dd40(index, page, sizeof(DWCBmNtrPage)) != -1;
+static BOOL WriteNtrPage(const DWCMemPage *page, u32 index, void *scratch) {
+    return func_0205dd40(index, page, sizeof(DWCMemPage)) != -1;
 }
 
 static BOOL ReadTwlPages(DWCBmTwlPage *pages, u32 first, u32 count) {
@@ -78,21 +78,21 @@ static BOOL ReadTwlPages(DWCBmTwlPage *pages, u32 first, u32 count) {
     return TRUE;
 }
 
-BOOL DWCBm_WriteWifiIdInfo(const DWCBmWifiIdInfo *info, void *work) {
-    PageWriteBuffer *buf = work;
+BOOL DWCi_BM_SetWiFiInfo(const DWCWiFiInfo *info, void *work) {
+    MEMSWI *buf = work;
     int index;
 
-    DWCBm_PackWifiIdInfo(info);
-    MATHi_CRC16InitTableRev(&buf->crcTable, 0xA001);
+    DWCi_BACKUPlConvWifiInfo(info);
+    MATHi_CRC16InitTableRev(&buf->table, 0xA001);
     for (index = 0; index < 2; index++) {
         // The page can't be read back before it is written: the game stops
-        if (!ReadNtrPages(&buf->page, index, 1)) {
+        if (!ReadNtrPages(&buf->mem, index, 1)) {
             OS_Terminate();
             return FALSE;
         }
-        MI_CpuCopy8(sWifiId.packed, buf->page.wifiId, DWC_BM_PACKED_SIZE);
-        buf->page.crc16 = MATH_CalcCRC16(&buf->crcTable, &buf->page, sizeof(DWCBmNtrPage) - sizeof(u16));
-        while (!WriteNtrPage(&buf->page, index, buf->scratch)) {
+        MI_CpuCopy8(Wifi.packed, buf->mem.wifi, DWC_BM_PACKED_SIZE);
+        buf->mem.crc = MATH_CalcCRC16(&buf->table, &buf->mem, sizeof(DWCMemPage) - sizeof(u16));
+        while (!WriteNtrPage(&buf->mem, index, buf->work)) {
         }
     }
     return func_02056e74() != 0;
@@ -102,8 +102,8 @@ BOOL DWCBm_ReadAllNtrPages(void *buf) {
     return ReadNtrPages(buf, 0, 4);
 }
 
-BOOL DWCBm_WriteNtrPages(void *buf, const u32 flags[4], void *scratch) {
-    DWCBmNtrPage *pages = buf;
+BOOL DWCBm_WriteNtrPages(void *buf, const BOOL flags[4], void *scratch) {
+    DWCMemPage *pages = buf;
     int index;
 
     for (index = 0; index < 4; index++) {
@@ -115,11 +115,11 @@ BOOL DWCBm_WriteNtrPages(void *buf, const u32 flags[4], void *scratch) {
     return func_02056e74() != 0;
 }
 
-void DWCBm_SetPackedWifiIdInfo(const void *packed) {
-    MI_CpuCopy8(packed, sWifiId.packed, DWC_BM_PACKED_SIZE);
+void DWCi_BACKUPlSetWiFi(const u8 *packed) {
+    MI_CpuCopy8(packed, Wifi.packed, DWC_BM_PACKED_SIZE);
 }
 
-u8 DWCBm_CountMaskBits(const u8 *mask) {
+u8 DWCi_BACKUPlConvMaskCidr(const u8 *mask) {
     int bits;
     int i;
     int bit;
@@ -134,7 +134,7 @@ u8 DWCBm_CountMaskBits(const u8 *mask) {
     return bits;
 }
 
-void DWCBm_MakeMask(u32 bits, u8 *mask) {
+void DWCi_BACKUPlConvMaskAddr(int bits, u8 *mask) {
     int i;
     u32 value = 0xFFFFFFFF ^ (0xFFFFFFFF >> bits);
 
@@ -143,11 +143,11 @@ void DWCBm_MakeMask(u32 bits, u8 *mask) {
     }
 }
 
-BOOL DWCBm_HasHostBits(const u8 *address, const u8 *mask) {
+BOOL DWC_BACKUPlCheckIp(const u8 *address, const u8 *mask) {
     u32 addressBits;
     u32 maskBits;
 
-    if (!DWCBm_IsUsableAddress(address)) {
+    if (!DWC_BACKUPlCheckAddress(address)) {
         return FALSE;
     }
     MI_CpuCopy8(address, &addressBits, 4);
@@ -155,7 +155,7 @@ BOOL DWCBm_HasHostBits(const u8 *address, const u8 *mask) {
     return (addressBits & ~maskBits) != 0;
 }
 
-BOOL DWCBm_IsUsableAddress(const u8 *address) {
+BOOL DWC_BACKUPlCheckAddress(const u8 *address) {
     u8 first = address[0];
 
     if (first == 127) {
@@ -172,19 +172,19 @@ BOOL func_02056e74(void) {
     return TRUE;
 }
 
-const u8 *DWCBm_PackWifiIdInfo(const DWCBmWifiIdInfo *info) {
-    u64 pendingId = info->pendingId;
+const u8 *DWCi_BACKUPlConvWifiInfo(const DWCWiFiInfo *info) {
+    u64 pendingId = info->notAttestedId;
 
-    MI_CpuCopy8(info, sWifiId.packed, 5);
-    sWifiId.packed[5] = ((info->id >> 40) & 7) | ((pendingId & 0x1F) << 3);
+    MI_CpuCopy8(info, Wifi.packed, 5);
+    Wifi.packed[5] = ((info->attestedUserId >> 40) & 7) | ((pendingId & 0x1F) << 3);
     pendingId >>= 5;
-    MI_CpuCopy8(&pendingId, &sWifiId.packed[6], 4);
-    sWifiId.packed[10] = ((pendingId >> 32) & 0x3F) | ((info->number & 3) << 6);
-    sWifiId.packed[11] = info->number >> 2;
-    MI_CpuCopy8(&info->salt, &sWifiId.packed[12], 2);
-    return sWifiId.packed;
+    MI_CpuCopy8(&pendingId, &Wifi.packed[6], 4);
+    Wifi.packed[10] = ((pendingId >> 32) & 0x3F) | ((info->pass & 3) << 6);
+    Wifi.packed[11] = info->pass >> 2;
+    MI_CpuCopy8(&info->randomHistory, &Wifi.packed[12], 2);
+    return Wifi.packed;
 }
 
-const u8 *DWCBm_GetPackedWifiIdInfo(void) {
-    return sWifiId.packed;
+const void *DWCi_BACKUPlGetWifi(void) {
+    return Wifi.packed;
 }

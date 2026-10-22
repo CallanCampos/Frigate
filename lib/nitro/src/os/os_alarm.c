@@ -100,7 +100,7 @@ static void OSi_InsertAlarm(OSAlarm *alarm, OSTick fire) {
 
 // Fires the alarm once, in some ticks from now. An alarm that is set already is a fatal error
 void OS_SetAlarm(OSAlarm *alarm, OSTick tick, OSAlarmHandler handler, void *arg) {
-    u32 enabled;
+    OSIntrMode enabled;
 
     if (alarm == NULL || alarm->handler != NULL) {
         OS_Terminate();
@@ -114,7 +114,7 @@ void OS_SetAlarm(OSAlarm *alarm, OSTick tick, OSAlarmHandler handler, void *arg)
 }
 
 void OS_CancelAlarm(OSAlarm *alarm) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSAlarm *next;
 
     if (alarm->handler == NULL) {

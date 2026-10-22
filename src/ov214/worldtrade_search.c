@@ -547,7 +547,7 @@ static int Search_SubSeqStart(WorldTradeWork *wk) {
         } else {
             Search_SubSeqMessagePrint(wk, 8, 1, 0, 0xf0f);
         }
-        if (GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR) == -16) {
+        if (GX_GetMasterBrightness() == -16) {
             GFL_WipeSet(0, 1, 1, 0, 16, 1, HEAPID_WORLDTRADE);
             wk->subprocessSeq = SEARCH_SEQ_RETURN_SCREEN2;
         } else {

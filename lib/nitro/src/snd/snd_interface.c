@@ -96,7 +96,7 @@ void SND_SetTrackMute(int playerNo, u32 trackBitMask, BOOL flag) {
     sndQueuePacket(SND_COMMAND_MUTE_TRACK, playerNo, trackBitMask, flag ? SND_TRACK_MUTE_ON : SND_TRACK_MUTE_OFF, 0);
 }
 
-void SND_SetTrackMuteEx(int playerNo, u32 trackBitMask, int muteType) {
+void SND_SetTrackMuteEx(int playerNo, u32 trackBitMask, SNDSeqMute muteType) {
     sndQueuePacket(SND_COMMAND_MUTE_TRACK, playerNo, trackBitMask, muteType, 0);
 }
 
@@ -114,7 +114,7 @@ void SND_SetChannelTimer(u32 chBitMask, int timer) {
 }
 
 // NitroSDK's SND_SetChannelVolume
-void SND_SetChannelVolume(u32 chBitMask, int volume, int shift) {
+void SND_SetChannelVolume(u32 chBitMask, int volume, SNDChannelDataShift shift) {
     sndQueuePacket(SND_COMMAND_CHANNEL_VOLUME, chBitMask, volume, shift, 0);
 }
 
@@ -126,8 +126,8 @@ void SND_SetChannelPan(u32 chBitMask, int pan) {
 // NitroSDK's SND_SetupChannelPcm. The arguments share the words of the command: the channel and the timer, the
 // address, the length of the loop with the volume and the data shift, and the start of the loop with the pan, the
 // format and the loop mode
-void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen, int volume,
-                         int shift, int timer, int pan) {
+void SND_SetupChannelPcm(int chNo, SNDWaveFormat format, const void *dataAddr, SNDChannelLoop loop, int loopStart,
+                         int loopLen, int volume, SNDChannelDataShift shift, int timer, int pan) {
     sndQueuePacket(SND_COMMAND_SETUP_CHANNEL_PCM, (timer << 16) | chNo, (u32)dataAddr,
                    (volume << 24) | (shift << 22) | loopLen, (loop << 26) | (format << 24) | (pan << 16) | loopStart);
 }
@@ -149,7 +149,7 @@ void SND_SetMasterVolume(int volume) {
     sndQueuePacket(SND_COMMAND_MASTER_VOLUME, volume, 0, 0, 0);
 }
 
-void SND_SetOutputSelector(int left, int right, int channel1, int channel3) {
+void SND_SetOutputSelector(SNDOutput left, SNDOutput right, SNDChannelOut channel1, SNDChannelOut channel3) {
     sndQueuePacket(SND_COMMAND_OUTPUT_SELECTOR, left, right, channel1, channel3);
 }
 

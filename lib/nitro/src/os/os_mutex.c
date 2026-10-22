@@ -32,7 +32,7 @@ void OS_InitMutex(OSMutex *mutex) {
 
 // NitroSDK's OS_LockMutex: waits until the mutex is free (or already the thread's), then holds it
 void OS_LockMutex(OSMutex *mutex) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     OSThread *current = OS_GetCurrentThread();
 
     for (;;) {
@@ -68,7 +68,7 @@ void OSi_UnlockAllMutex(OSThread *thread) {
 // TRUE when the thread has the mutex now, either by taking it when it is free or by locking
 // it again
 BOOL OS_TryLockMutex(OSMutex *mutex) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     OSThread *current = OS_GetCurrentThread();
     BOOL locked;
 
@@ -91,7 +91,7 @@ BOOL OS_TryLockMutex(OSMutex *mutex) {
 // TwlSDK's body of OS_UnlockMutex: lowers the count of the mutex, if it is of the type that is asked for (any type when
 // that is 0) and the thread may unlock it, and once the count is 0 gives the mutex up and wakes the threads that wait
 static void OSi_UnlockMutexCore(OSMutex *mutex, u32 type) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     OSThread *current = OS_GetCurrentThread();
     BOOL free = FALSE;
     u32 mutexType;

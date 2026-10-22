@@ -3,7 +3,7 @@
 // NitroSystem's multi-cell nodes. The file name is a guess: this one function sits alone between the SRT control and
 // the cell animation, and only the multi-cell animation calls it
 
-void NNSi_G2dInitializeNode(NNSG2dNode *node, u32 type) {
+void NNSi_G2dInitializeNode(NNSG2dNode *node, NNSG2dNodeType type) {
     node->pContent = NULL;
     node->type = type;
     node->bVisible = TRUE;

@@ -11,24 +11,24 @@
     (((buffer)[(i) - 1] & 1) ^ ((i) & 1) ^ (oddmode) ^ ((buffer)[0] & 1) ^ ((buffer)[0] < 79 ? 1 : 0) ^                \
      ((buffer)[(i) - 1] < (buffer)[0] ? 1 : 0))
 
-static BOOL gti2VerifyChallenge(const u8 *buffer);
+static int gti2VerifyChallenge(const GT2Byte *buffer);
 
 char GT2ChallengeKey[33] = "3b8dd8995f7c40a9a5c5b7dd5b481341";
 
-static BOOL gti2VerifyChallenge(const u8 *buffer) {
+static int gti2VerifyChallenge(const GT2Byte *buffer) {
     int oddmode = 0;
     int i;
 
     for (i = 1; i < 32; i++) {
         oddmode = GTI2_ODD_MODE(buffer, i, oddmode);
         if ((oddmode && (buffer[i] & 1) == 0) || (!oddmode && (buffer[i] & 1) == 1)) {
-            return FALSE;
+            return gsi_false;
         }
     }
-    return TRUE;
+    return gsi_true;
 }
 
-u8 *gti2GetChallenge(u8 *buffer) {
+GT2Byte *gti2GetChallenge(GT2Byte *buffer) {
     int i;
     int oddmode;
 
@@ -45,9 +45,9 @@ u8 *gti2GetChallenge(u8 *buffer) {
     return buffer;
 }
 
-u8 *gti2GetResponse(u8 *buffer, const u8 *challenge) {
+GT2Byte *gti2GetResponse(GT2Byte *buffer, const GT2Byte *challenge) {
     int i;
-    BOOL valid;
+    gsi_bool valid;
     char cchar;
     int keylen = strlen(GT2ChallengeKey);
     int chalrand;
@@ -70,13 +70,13 @@ u8 *gti2GetResponse(u8 *buffer, const u8 *challenge) {
     return buffer;
 }
 
-BOOL gti2CheckResponse(const u8 *response1, const u8 *response2) {
+GT2Bool gti2CheckResponse(const GT2Byte *response1, const GT2Byte *response2) {
     int i;
 
     for (i = 0; i < 32; i++) {
         if (i != 0 && i != 13 && response1[i] != response2[i]) {
-            return FALSE;
+            return gsi_false;
         }
     }
-    return TRUE;
+    return gsi_true;
 }

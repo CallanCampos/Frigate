@@ -254,12 +254,12 @@ static void StartMenu_FreeItemScreens(StartMenuWork *wk);
 static void StartMenu_SetActorY(StartMenuWork *wk, u32 actor, s16 y);
 static void StartMenu_DrawItems(StartMenuWork *wk);
 static void StartMenu_DrawItem(StartMenuWork *wk, u32 item, u32 row);
-static void StartMenu_SetItemPalette(StartMenuWork *wk, u32 item, s8 row, u8 palette);
+static void StartMenu_SetItemPalette(StartMenuWork *wk, unsigned int item, s8 row, u8 palette);
 static s8 StartMenu_GetScreenRow(StartMenuWork *wk, s8 row);
 static void StartMenu_ShowSavedGame(StartMenuWork *wk);
 static void StartMenu_HideSavedGame(StartMenuWork *wk);
 static void StartMenu_MoveItemActors(StartMenuWork *wk, s32 dy);
-static BOOL StartMenu_MoveCursor(StartMenuWork *wk, s32 dir);
+static BOOL StartMenu_MoveCursor(StartMenuWork *wk, int dir);
 static void StartMenu_SetItemActorsVisible(StartMenuWork *wk, BOOL visible);
 static void StartMenu_DrawFrame(u8 x, u8 y, u8 width, u8 height, u8 bg);
 static void StartMenu_ClearFrame(u8 x, u8 y, u8 width, u8 height, u8 bg);
@@ -1462,7 +1462,7 @@ static void StartMenu_DrawItem(StartMenuWork *wk, u32 item, u32 row) {
     GFL_BGSysQueueScrLoad(2);
 }
 
-static void StartMenu_SetItemPalette(StartMenuWork *wk, u32 item, s8 row, u8 palette) {
+static void StartMenu_SetItemPalette(StartMenuWork *wk, unsigned int item, s8 row, u8 palette) {
     GFL_BGSysSetScrPaletteNo(2, 3, row, ITEM_WIDTH, sItemLayouts[item].rows, palette);
     GFL_BGSysQueueScrLoad(2);
 }
@@ -1542,7 +1542,7 @@ static void StartMenu_MoveItemActors(StartMenuWork *wk, s32 dy) {
 }
 
 // Moves the cursor up or down an item. The list only scrolls when it has the saved game, and so more items than fit
-static BOOL StartMenu_MoveCursor(StartMenuWork *wk, s32 dir) {
+static BOOL StartMenu_MoveCursor(StartMenuWork *wk, int dir) {
     u8 item = wk->items[wk->cursor];
     s8 row = 0;
     u16 rows;

@@ -86,10 +86,10 @@ static void DWCUtilMenu_UpdateTask(DWCUtilTask *task, void *arg);
 static void DWCUtilMenu_HandleTouchStart(void);
 static void DWCUtilMenu_HandleTouchEnd(void);
 static void DWCUtilMenu_HandleTouchHold(void);
-static void DWCUtilMenu_SetPressedKey(int key);
+static void exchangeBack(int key);
 static void DWCUtilMenu_HandlePad(void);
 static void DWCUtilMenu_MoveRow(int row, u32 y);
-static void DWCUtilMenu_DrawKey(int key, int pressed);
+static void changeColor(int key, int pressed);
 static void DWCUtilMenu_DrawCursor(void);
 static void DWCUtilMenu_MoveCursor(int direction);
 static void DWCUtilMenu_SlideOutButtonsTask(DWCUtilTask *task, void *arg);
@@ -109,7 +109,7 @@ void DWCUtilMenu_Open(void) {
 
     rect.width = 0x1c;
     rect.height = 0x14;
-    sMenu = DWCUtilHeap_AllocClear(sizeof(DWCUtilMenu), 4);
+    sMenu = DWCi_HEAPlAllocEx(sizeof(DWCUtilMenu), 4);
     sMenu->code = 0x1f;
     sMenu->cursorPos = 0;
     sMenu->leftEnabled = TRUE;
@@ -127,51 +127,51 @@ void DWCUtilMenu_Open(void) {
     }
     for (i = 0; i < 2; i++) {
         sMenu->buttons[i] = DWCUtilCell_AllocOamRun(0, sButtonCells[i], TRUE);
-        DWCUtilOam_SetEffect(sMenu->buttons[i], -1, GX_OAM_EFFECT_NODISPLAY, 0);
-        DWCUtilOam_SetPriority(sMenu->buttons[i], -1, 3);
+        DWCi_CELLlSetEffect(sMenu->buttons[i], -1, GX_OAM_EFFECT_NODISPLAY, 0);
+        DWCi_CELLlSetPriority(sMenu->buttons[i], -1, 3);
     }
     label[1] = 0;
     for (i = 0; i < 4; i++) {
-        DWCUtilText *text = DWCUtilText_CreateObj(0, sRowTextSize[0], sRowTextSize[1], 0, &objCount, 0);
+        DWCUtilText *text = DWCi_FNTlFormEx(0, sRowTextSize[0], sRowTextSize[1], 0, &objCount, 0);
 
         sMenu->rows[i] = text;
         rect.x = 0;
         for (j = 0, k = i * 3; j < 3; j++, k++) {
             label[0] = sLabels[k];
-            DWCUtilText_DrawRect(sMenu->rows[i], rect.x, rect.y, rect.width, rect.height, 2, 0x480, label);
+            DWCi_FNTlDrawRect(sMenu->rows[i], rect.x, rect.y, rect.width, rect.height, 2, 0x480, label);
             rect.x += 0x20;
         }
-        sMenu->rowNodes[i] = DWCUtilOam_Alloc(0, objCount, FALSE);
+        sMenu->rowNodes[i] = DWCi_CELLlForm(0, objCount, FALSE);
     }
     sMenu->cursor = DWCUtilCell_AllocOamRun(0, 0x44, TRUE);
-    DWCUtilOam_SetEffect(sMenu->cursor, -1, GX_OAM_EFFECT_NODISPLAY, 0);
-    DWCUtilOam_SetPriority(sMenu->cursor, -1, 2);
-    sMenu->task = DWCUtilTask_Create(0, DWCUtilMenu_SlideInRow0Task, NULL, 0x78);
+    DWCi_CELLlSetEffect(sMenu->cursor, -1, GX_OAM_EFFECT_NODISPLAY, 0);
+    DWCi_CELLlSetPriority(sMenu->cursor, -1, 2);
+    sMenu->task = DWCi_TSKlForm(0, DWCUtilMenu_SlideInRow0Task, NULL, 0x78);
     DWCUtilMenu_MoveRow(0, 0xc0);
 }
 
-void DWCUtilMenu_Close(void) {
-    DWCUtilOam_Free(sMenu->cursor);
-    DWCUtilTask_SetCallback(sMenu->task, DWCUtilMenu_SlideOutButtonsTask);
+void DWCi_KB10lEnd(void) {
+    DWCi_CELLlDelete(sMenu->cursor);
+    DWCi_TSKlChangeFunc(sMenu->task, DWCUtilMenu_SlideOutButtonsTask);
 }
 
-u8 DWCUtilMenu_GetKey(void) {
+u8 DWCi_KB10lGet(void) {
     return sMenu->code;
 }
 
-void DWCUtilMenu_SetLeftEnabled(u8 enabled) {
+void DWCi_KB10lSetErase(u8 enabled) {
     sMenu->leftEnabled = enabled;
 }
 
-void DWCUtilMenu_SetDigitsEnabled(u8 enabled) {
+void DWCi_KB10lSetInput(u8 enabled) {
     sMenu->digitsEnabled = enabled;
 }
 
-void DWCUtilMenu_SetRightEnabled(u8 enabled) {
+void DWCi_KB10lSetShift(u8 enabled) {
     sMenu->rightEnabled = enabled;
 }
 
-BOOL DWCUtilMenu_IsOpen(void) {
+BOOL DWCi_KB10lIsInit(void) {
     if (sMenu != NULL) {
         return TRUE;
     }
@@ -187,7 +187,7 @@ static void DWCUtilMenu_SlideInRow0Task(DWCUtilTask *task, void *arg) {
     }
     DWCUtilMenu_MoveRow(0, 0x4c);
     DWCUtilMenu_MoveRow(1, 0xc0);
-    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInRow1Task);
+    DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideInRow1Task);
 }
 
 static void DWCUtilMenu_SlideInRow1Task(DWCUtilTask *task, void *arg) {
@@ -199,7 +199,7 @@ static void DWCUtilMenu_SlideInRow1Task(DWCUtilTask *task, void *arg) {
     }
     DWCUtilMenu_MoveRow(1, 0x63);
     DWCUtilMenu_MoveRow(2, 0xc0);
-    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInRow2Task);
+    DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideInRow2Task);
 }
 
 static void DWCUtilMenu_SlideInRow2Task(DWCUtilTask *task, void *arg) {
@@ -211,7 +211,7 @@ static void DWCUtilMenu_SlideInRow2Task(DWCUtilTask *task, void *arg) {
     }
     DWCUtilMenu_MoveRow(2, 0x7a);
     DWCUtilMenu_MoveRow(3, 0xc0);
-    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInRow3Task);
+    DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideInRow3Task);
 }
 
 static void DWCUtilMenu_SlideInRow3Task(DWCUtilTask *task, void *arg) {
@@ -223,14 +223,14 @@ static void DWCUtilMenu_SlideInRow3Task(DWCUtilTask *task, void *arg) {
     }
     DWCUtilMenu_MoveRow(3, 0x91);
     DWCUtilMenu_MoveRow(4, 0xc0);
-    DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideInButtonsTask);
+    DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideInButtonsTask);
 }
 
 static void DWCUtilMenu_SlideInButtonsTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    DWCUtilOam_GetNodePosition(sMenu->buttons[0], 0, &x, &y);
+    DWCi_CELLlGetPosition(sMenu->buttons[0], 0, &x, &y);
     y -= 12;
     if (y > 0xaa) {
         DWCUtilMenu_MoveRow(4, y);
@@ -238,7 +238,7 @@ static void DWCUtilMenu_SlideInButtonsTask(DWCUtilTask *task, void *arg) {
     }
     DWCUtilMenu_MoveRow(4, 0xaa);
     DWCUtilMenu_DrawCursor();
-    DWCUtilTask_SetCallback(task, DWCUtilMenu_UpdateTask);
+    DWCi_TSKlChangeFunc(task, DWCUtilMenu_UpdateTask);
 }
 
 static void DWCUtilMenu_UpdateTask(DWCUtilTask *task, void *arg) {
@@ -253,11 +253,11 @@ static void DWCUtilMenu_HandleTouchStart(void) {
     u16 rect[4];
     int i;
 
-    if (DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
         sMenu->touched = -1;
         for (i = 0; i < 10; i++) {
             DWCUtilDisplay_SetRectFromSize(&sKeyPositions[i], sKeySize, rect);
-            if (DWCUtilTouch_IsTriggeredIn(rect)) {
+            if (DWCi_TPlCheckTrigger(rect)) {
                 if (!sMenu->digitsEnabled) {
                     DWCUtilSound_PlaySe(9);
                     return;
@@ -269,7 +269,7 @@ static void DWCUtilMenu_HandleTouchStart(void) {
         }
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sArrowPositions[i], sArrowSize, rect);
-            if (DWCUtilTouch_IsTriggeredIn(rect)) {
+            if (DWCi_TPlCheckTrigger(rect)) {
                 if ((i == 0 && !sMenu->leftEnabled) || (i == 1 && !sMenu->rightEnabled)) {
                     DWCUtilSound_PlaySe(9);
                     return;
@@ -281,7 +281,7 @@ static void DWCUtilMenu_HandleTouchStart(void) {
         }
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
-            if (DWCUtilTouch_IsTriggeredIn(rect)) {
+            if (DWCi_TPlCheckTrigger(rect)) {
                 DWCUtilSound_PlaySe(0);
                 sMenu->touched = i + 12;
                 return;
@@ -298,10 +298,10 @@ static void DWCUtilMenu_HandleTouchEnd(void) {
     int i;
 
     sMenu->code = 0;
-    if (DWCUtilTouch_IsReleasedIn(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckRelease(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < 10; i++) {
             DWCUtilDisplay_SetRectFromSize(&sKeyPositions[i], sKeySize, rect);
-            if (DWCUtilTouch_IsReleasedIn(rect)) {
+            if (DWCi_TPlCheckRelease(rect)) {
                 if (sMenu->touched != i) {
                     return;
                 }
@@ -313,7 +313,7 @@ static void DWCUtilMenu_HandleTouchEnd(void) {
         }
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sArrowPositions[i], sArrowSize, rect);
-            if (DWCUtilTouch_IsReleasedIn(rect)) {
+            if (DWCi_TPlCheckRelease(rect)) {
                 if (sMenu->touched != i + 10) {
                     return;
                 }
@@ -325,7 +325,7 @@ static void DWCUtilMenu_HandleTouchEnd(void) {
         }
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
-            if (DWCUtilTouch_IsReleasedIn(rect)) {
+            if (DWCi_TPlCheckRelease(rect)) {
                 if (sMenu->touched != i + 12) {
                     return;
                 }
@@ -343,10 +343,10 @@ static void DWCUtilMenu_HandleTouchHold(void) {
     u16 rect[4];
     int i;
 
-    if (DWCUtilTouch_IsTouchedIn(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheck(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < 10; i++) {
             DWCUtilDisplay_SetRectFromSize(&sKeyPositions[i], sKeySize, rect);
-            if (DWCUtilTouch_IsTouchedIn(rect)) {
+            if (DWCi_TPlCheck(rect)) {
                 if (sMenu->touched != i) {
                     goto released;
                 }
@@ -355,11 +355,11 @@ static void DWCUtilMenu_HandleTouchHold(void) {
         }
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sArrowPositions[i], sArrowSize, rect);
-            if (DWCUtilTouch_IsTouchedIn(rect)) {
+            if (DWCi_TPlCheck(rect)) {
                 if (sMenu->touched != i + 10) {
                     goto released;
                 }
-                DWCUtilMenu_SetPressedKey(i + 10);
+                exchangeBack(i + 10);
                 if (i != 0) {
                     goto clear;
                 }
@@ -379,11 +379,11 @@ static void DWCUtilMenu_HandleTouchHold(void) {
         }
         for (i = 0; i < 2; i++) {
             DWCUtilDisplay_SetRectFromSize(&sButtonPositions[i], sButtonSize, rect);
-            if (DWCUtilTouch_IsTouchedIn(rect)) {
+            if (DWCi_TPlCheck(rect)) {
                 i += 12;
                 if (sMenu->touched == i) {
                 held:
-                    DWCUtilMenu_SetPressedKey(i);
+                    exchangeBack(i);
                     goto clear;
                 }
                 break;
@@ -391,15 +391,15 @@ static void DWCUtilMenu_HandleTouchHold(void) {
         }
     }
 released:
-    DWCUtilMenu_SetPressedKey(-1);
+    exchangeBack(-1);
 clear:
     sMenu->repeat = 0;
 }
 
-static void DWCUtilMenu_SetPressedKey(int key) {
+static void exchangeBack(int key) {
     if (key != sMenu->pressed) {
-        DWCUtilMenu_DrawKey(key, TRUE);
-        DWCUtilMenu_DrawKey(sMenu->pressed, FALSE);
+        changeColor(key, TRUE);
+        changeColor(sMenu->pressed, FALSE);
         sMenu->pressed = key;
     }
 }
@@ -408,19 +408,19 @@ static void DWCUtilMenu_SetPressedKey(int key) {
 static void DWCUtilMenu_HandlePad(void) {
     int key;
 
-    if (DWCUtilTouch_IsKeyRepeated(0x20)) {
+    if (DWCi_IPTlCheckRepeat(0x20)) {
         DWCUtilMenu_MoveCursor(0);
     }
-    if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+    if (DWCi_IPTlCheckRepeat(0x40)) {
         DWCUtilMenu_MoveCursor(1);
     }
-    if (DWCUtilTouch_IsKeyRepeated(0x10)) {
+    if (DWCi_IPTlCheckRepeat(0x10)) {
         DWCUtilMenu_MoveCursor(2);
     }
-    if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+    if (DWCi_IPTlCheckRepeat(0x80)) {
         DWCUtilMenu_MoveCursor(3);
     }
-    if (DWCUtilTouch_IsKeyPressed(1)) {
+    if (DWCi_IPTlCheckTrigger(1)) {
         key = sMenu->cursorPos;
         if (key < 10) {
             if (sMenu->digitsEnabled) {
@@ -440,7 +440,7 @@ static void DWCUtilMenu_HandlePad(void) {
         }
         sMenu->code = sButtonCodes[key - 12];
     }
-    if (DWCUtilTouch_IsKeyRepeated(2)) {
+    if (DWCi_IPTlCheckRepeat(2)) {
         if (!sMenu->leftEnabled) {
             if (!sMenu->buzzed) {
                 DWCUtilSound_PlaySe(9);
@@ -449,7 +449,7 @@ static void DWCUtilMenu_HandlePad(void) {
         } else {
             sMenu->code = 0x10;
         }
-    } else if (DWCUtilTouch_IsKeyReleased(2)) {
+    } else if (DWCi_IPTlCheckRelease(2)) {
         sMenu->buzzed = FALSE;
     }
 }
@@ -470,7 +470,7 @@ static void DWCUtilMenu_MoveRow(int row, u32 y) {
         key++;
     }
     if (row < 4) {
-        DWCUtilText_ShowObj(sMenu->rows[row], sKeyPositions[row * 3].x, y, sMenu->rowNodes[row], 2);
+        DWCi_FNTlDisp(sMenu->rows[row], sKeyPositions[row * 3].x, y, sMenu->rowNodes[row], 2);
     }
     for (i = 0; i < arrowCounts[row]; i++) {
         G2_SetOBJEffect(sMenu->arrowOams[i], GX_OAM_EFFECT_NONE, 0);
@@ -479,12 +479,12 @@ static void DWCUtilMenu_MoveRow(int row, u32 y) {
             ((sMenu->arrowOams[i]->attr01 & ~(GX_OAM_ATTR01_X_MASK | GX_OAM_ATTR01_Y_MASK)) | (y & 0xff));
     }
     for (i = 0; i < buttonCounts[row]; i++) {
-        DWCUtilOam_SetEffect(sMenu->buttons[i], -1, GX_OAM_EFFECT_NONE, 0);
-        DWCUtilOam_SetNodePosition(sMenu->buttons[i], -1, sButtonPositions[i].x, y);
+        DWCi_CELLlSetEffect(sMenu->buttons[i], -1, GX_OAM_EFFECT_NONE, 0);
+        DWCi_CELLlSetPosition(sMenu->buttons[i], -1, sButtonPositions[i].x, y);
     }
 }
 
-static void DWCUtilMenu_DrawKey(int key, int pressed) {
+static void changeColor(int key, int pressed) {
     if (key < 0) {
         return;
     }
@@ -493,7 +493,7 @@ static void DWCUtilMenu_DrawKey(int key, int pressed) {
     } else if (key - 10 < 2) {
         G2_SetOBJMode(sMenu->arrowOams[key - 10], GX_OAM_MODE_NORMAL, sKeyPalettes[pressed]);
     } else {
-        DWCUtilOam_SetMode(sMenu->buttons[key - 12], -1, GX_OAM_MODE_NORMAL, sButtonEffects[pressed]);
+        DWCi_CELLlSetPalette(sMenu->buttons[key - 12], -1, GX_OAM_MODE_NORMAL, sButtonEffects[pressed]);
     }
 }
 
@@ -503,10 +503,10 @@ static void DWCUtilMenu_DrawCursor(void) {
     if (sMenu->cursorPos > 11) {
         cell = 0x45;
     }
-    DWCUtilCell_Copy(0, cell, DWCUtilOam_GetEntry(sMenu->cursor, 0));
-    DWCUtilOam_SetPriority(sMenu->cursor, -1, 2);
-    DWCUtilOam_SetNodePosition(sMenu->cursor, -1, sCursorPositions[sMenu->cursorPos].x,
-                               sCursorPositions[sMenu->cursorPos].y);
+    DWCUtilCell_Copy(0, cell, DWCi_CELLlGetObj(sMenu->cursor, 0));
+    DWCi_CELLlSetPriority(sMenu->cursor, -1, 2);
+    DWCi_CELLlSetPosition(sMenu->cursor, -1, sCursorPositions[sMenu->cursorPos].x,
+                          sCursorPositions[sMenu->cursorPos].y);
 }
 
 // The key the cursor moves to from each key, left, up, right and down; -1 and -2 pick an arrow or a key of the top
@@ -541,11 +541,11 @@ static void DWCUtilMenu_MoveCursor(int direction) {
 }
 
 static void DWCUtilMenu_SlideOutButtonsTask(DWCUtilTask *task, void *arg) {
-    int y = (u8)DWCUtilOam_ReadAttr01(DWCUtilOam_GetEntry(sMenu->buttons[0], 0)).attr01 + 12;
+    int y = (u8)DWCUtilOam_ReadAttr01(DWCi_CELLlGetObj(sMenu->buttons[0], 0)).attr01 + 12;
 
     DWCUtilMenu_MoveRow(4, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow3Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideOutRow3Task);
     }
 }
 
@@ -554,7 +554,7 @@ static void DWCUtilMenu_SlideOutRow3Task(DWCUtilTask *task, void *arg) {
 
     DWCUtilMenu_MoveRow(3, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow2Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideOutRow2Task);
     }
 }
 
@@ -563,7 +563,7 @@ static void DWCUtilMenu_SlideOutRow2Task(DWCUtilTask *task, void *arg) {
 
     DWCUtilMenu_MoveRow(2, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow1Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideOutRow1Task);
     }
 }
 
@@ -572,7 +572,7 @@ static void DWCUtilMenu_SlideOutRow1Task(DWCUtilTask *task, void *arg) {
 
     DWCUtilMenu_MoveRow(1, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, DWCUtilMenu_SlideOutRow0Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilMenu_SlideOutRow0Task);
     }
 }
 
@@ -581,26 +581,26 @@ static void DWCUtilMenu_SlideOutRow0Task(DWCUtilTask *task, void *arg) {
 
     DWCUtilMenu_MoveRow(0, y);
     if (y >= 0xc0) {
-        DWCUtilTask_SetCallback(task, DWCUtilMenu_DestroyTask);
+        DWCi_TSKlChangeFunc(task, DWCUtilMenu_DestroyTask);
     }
 }
 
 static void DWCUtilMenu_DestroyTask(DWCUtilTask *task, void *arg) {
     int i;
 
-    DWCUtilTask_QueueRemoval(0, task);
+    DWCi_TSKlDelete(0, task);
     for (i = 0; i < 4; i++) {
-        DWCUtilOam_Free(sMenu->rowNodes[i]);
-        DWCUtilText_DestroyObj(sMenu->rows[i]);
+        DWCi_CELLlDelete(sMenu->rowNodes[i]);
+        DWCi_FNTlDelete(sMenu->rows[i]);
     }
     for (i = 0; i < 2; i++) {
-        DWCUtilOam_Free(sMenu->buttons[i]);
+        DWCi_CELLlDelete(sMenu->buttons[i]);
     }
     for (i = 0; i < 2; i++) {
-        DWCUtilOamBuf_Free(sMenu->arrowOams[i]);
+        DWCi_MOV_MBP_GetChildBmp(sMenu->arrowOams[i]);
     }
     for (i = 0; i < 10; i++) {
-        DWCUtilOamBuf_Free(sMenu->keyOams[i]);
+        DWCi_MOV_MBP_GetChildBmp(sMenu->keyOams[i]);
     }
-    DWCUtilHeap_FreeAndNull(&sMenu);
+    DWCi_HEAPlFree_(&sMenu);
 }

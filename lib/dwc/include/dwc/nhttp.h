@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_NHTTP_H
 
 #include "types.h"
+#include "nitrowifi/cps.h"
 
 // Nintendo's HTTP client (NHTTP), in overlay 189 beside nhttp_rap.c, which wraps it. The library's code is
 // lib/dwc/src/nhttp/. The ROM names none of it except in one assertion's text, " NHTTP_SetRootCA(%d)"; the names are
@@ -11,18 +12,18 @@
 // NHTTPSetVerifyOption), or descriptive for the rest. A connection is a handle that NHTTPCreateConnection returns: 0 if
 // it could not
 
-typedef void *(*NHttpAllocFunc)(u32 size, int align);
-typedef void (*NHttpFreeFunc)(void *ptr);
+typedef void *(*NHTTPAlloc)(u32 size, int align);
+typedef void (*NHTTPFree)(void *ptr);
 // Called with the connection, the event and the argument given to NHTTPCreateConnection. The events are the post data
 // being sent (1), the buffer being full (2), the body being received (3) and the connection ending (4)
 typedef int (*NHttpCallback)(int connection, int event, void *arg);
 
-// The root certificate that the answers' TLS is checked against, in overlay 11 (dwc_rootcert_nintendo_class2.c, with
-// its type in dwc/nasfunc.h)
-extern struct NasRootCert DWCi_RootCertNintendoClass2;
+// The root certificate that the answers' TLS is checked against, in overlay 11 (dwc_rootcert_nintendo_class2.c): a
+// CPSCaInfo of NitroWiFi
+extern CPSCaInfo DWCi_RootCertNintendoClass2;
 
 // Starts the library with an allocator and the priority of the thread that runs the requests; 0 once it started
-int NHTTPStartup(NHttpAllocFunc alloc, NHttpFreeFunc free, u32 priority);
+int NHTTPStartup(NHTTPAlloc alloc, NHTTPFree free, u32 priority);
 // Ends the library, calling back when it has ended
 void NHTTPCleanupAsync(void (*callback)(void));
 void NHTTPCleanup(void);

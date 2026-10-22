@@ -5,9 +5,9 @@
 
 // Snapshot of the divider and square-root hardware registers.
 typedef struct {
-    u32 divisionNumerator[2];
-    u32 divisionDenominator[2];
-    u32 squareRootValue[2];
+    u64 divisionNumerator;
+    u64 divisionDenominator;
+    u64 squareRootValue;
     u16 divisionMode;
     u16 squareRootMode;
 } CPContext;

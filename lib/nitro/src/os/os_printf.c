@@ -17,7 +17,7 @@ int OS_VSPrintf(char *dest, const char *format, va_list args) {
     return OS_VSNPrintf(dest, 0x7fffffff, format, args);
 }
 
-int OS_SNPrintf(char *dest, u32 size, const char *format, ...) {
+int OS_SNPrintf(char *dest, size_t size, const char *format, ...) {
     va_list args;
     int length;
 
@@ -28,6 +28,6 @@ int OS_SNPrintf(char *dest, u32 size, const char *format, ...) {
 }
 
 // NitroSDK's OS_VSNPrintf, which passes everything on to the formatter
-int OS_VSNPrintf(char *dest, u32 size, const char *format, va_list args) {
+int OS_VSNPrintf(char *dest, size_t size, const char *format, va_list args) {
     return STD_TVSNPrintf(dest, size, format, args);
 }

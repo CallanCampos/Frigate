@@ -18,18 +18,34 @@
 // Called with the result when the ARM7 has answered
 typedef void (*PMCallback)(u32 result, void *arg);
 
-#define PM_LCD_TOP 0
-#define PM_LCD_BOTTOM 1
-#define PM_LCD_ALL 2
+typedef enum {
+    PM_LCD_TOP = 0,
+    PM_LCD_BOTTOM = 1,
+    PM_LCD_ALL = 2,
+} PMLCDTarget;
 
-#define PM_BACKLIGHT_OFF 0
-#define PM_BACKLIGHT_ON 1
+typedef enum {
+    PM_BACKLIGHT_OFF = 0,
+    PM_BACKLIGHT_ON = 1,
+} PMBackLightSwitch;
 
-#define PM_BATTERY_HIGH 0
-#define PM_BATTERY_LOW 1
+typedef enum {
+    PM_BATTERY_HIGH = 0,
+    PM_BATTERY_LOW = 1,
+} PMBattery;
 
-#define PM_AMP_OFF 0
-#define PM_AMP_ON 1
+typedef enum {
+    PM_AMP_OFF = 0,
+    PM_AMP_ON = 1,
+} PMAmpSwitch;
+
+typedef enum {
+    PM_AMPGAIN_20 = 0,
+    PM_AMPGAIN_40 = 1,
+    PM_AMPGAIN_80 = 2,
+    PM_AMPGAIN_160 = 3,
+    PM_AMPGAIN_DEFAULT = PM_AMPGAIN_40,
+} PMAmpGain;
 
 // What wakes the system from the sleep mode: opening the lid, or the card in the DS slot being pulled out. The
 // cartridge of the GBA slot works only on a DS
@@ -54,17 +70,17 @@ extern u32 PMi_ExitType;
 extern BOOL PMi_AutoExitFlag;
 
 // PM_SetBackLight sends the request and waits for the answer, PM_SetBackLightAsync calls back
-u32 PM_SetBackLightAsync(u32 target, u32 backlight, PMCallback callback, void *arg);
-u32 PM_SetBackLight(u32 target, u32 backlight);
-u32 PM_GetBackLight(u32 *top, u32 *bottom);
-u32 PM_GetBattery(u32 *battery);
+u32 PM_SetBackLightAsync(PMLCDTarget target, PMBackLightSwitch backlight, PMCallback callback, void *arg);
+u32 PM_SetBackLight(PMLCDTarget target, PMBackLightSwitch backlight);
+u32 PM_GetBackLight(PMBackLightSwitch *top, PMBackLightSwitch *bottom);
+u32 PM_GetBattery(PMBattery *battery);
 // The battery level of the DSi, 2 (PM_RESULT_ERROR) on a DS
 u32 PM_GetBatteryLevel(u16 *level);
 
 // The sound amplifier of the microphone. The setting is kept and sent again when the screens come back on
-u32 PM_SetAmp(int amp);
-u32 PM_GetAmp(int *amp);
-u32 PM_SetAmpGain(int gain);
+u32 PM_SetAmp(PMAmpSwitch amp);
+u32 PM_GetAmp(PMAmpSwitch *amp);
+u32 PM_SetAmpGain(PMAmpGain gain);
 u32 PM_SetAmpGainLevel(u8 level);
 
 // Turns the system off, and never returns

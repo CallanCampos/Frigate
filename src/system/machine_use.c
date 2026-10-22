@@ -42,7 +42,7 @@ static NNSGfdVramTransferTask sVramTransferTasks[VRAM_TRANSFER_TASK_COUNT];
 void SystemInit(void) {
     u32 tableSize;
     void *table;
-    int amp;
+    PMAmpSwitch amp;
 
     OS_Init();
     OS_InitTick();

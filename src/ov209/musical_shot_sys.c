@@ -159,8 +159,8 @@ static BOOL MusicalShotSys_Exit(GameProc *proc, u32 *state, void *param, void *w
     if (GFL_WipeIsFinished() == FALSE) {
         return FALSE;
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0, 31, 31);
     MusShotInfo_Delete(sys->info);
     MusShotPhoto_Delete(sys->photo);

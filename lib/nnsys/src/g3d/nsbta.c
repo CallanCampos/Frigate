@@ -210,7 +210,7 @@ static void getTexSrtAnmResult_(const NNSG3dResTexSrtAnm *anm, u32 idx, u32 fram
 // Fills in an animation object for a texture SRT animation (NitroSystem's NNSi_G3dAnmObjInitNsBta, as recalled). It
 // applies the animation with NNS_G3dFuncAnmMatNsBta, and maps each material of the model to the data of the animation's
 // material of the same name, which is flagged as existing and holds the data's index
-void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, const void *anm, const NNSG3dResMdl *mdl) {
+void NNS_G3DAnimationInit_TA(NNSG3dAnmObj *anmObj, void *anm, const NNSG3dResMdl *mdl) {
     const NNSG3dResTexSrtAnm *srtAnm = anm;
     const NNSG3dResMat *mat = NNS_G3dGetMat(mdl);
     u32 i;

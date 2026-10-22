@@ -306,7 +306,7 @@ static void BPlistObj_ShowStatusIcon(u8 status, ClActor *actor, const ClActorPos
 }
 
 static void BPlistObj_ShowPokeTypes(BPlistWork *wk, BPlistPokemon *pkm, const ClActorPos *pos) {
-    u32 actor;
+    unsigned int actor;
     u32 chars;
 
     if (wk->pokeTypeIconBuf == 0) {

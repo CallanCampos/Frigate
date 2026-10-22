@@ -5,8 +5,8 @@
 
 // NitroSDK's OS_WaitIrq: sleeps until one of the interrupts has happened, after forgetting the
 // interrupts that already did if clear is set
-void OS_WaitIrq(BOOL clear, u32 interrupts) {
-    u32 irq = OS_DisableInterrupts();
+void OS_WaitIrq(BOOL clear, OSIrqMask interrupts) {
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (clear) {
         *(vu32 *)HW_INTR_CHECK_BUF &= ~interrupts;

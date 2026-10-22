@@ -4,10 +4,10 @@
 #include "nitro/wm.h"
 
 // Shares with all the AIDs, in the double mode
-int WM_StartKeySharing(WMDataSharingInfo *dsi, u16 port) {
-    return WM_StartDataSharing(dsi, port, 0xffff, 2, TRUE);
+WMErrCode WM_StartKeySharing(WMKeySetBuf *buf, u16 port) {
+    return WM_StartDataSharing(buf, port, 0xffff, 2, TRUE);
 }
 
-int WM_EndKeySharing(WMDataSharingInfo *dsi) {
-    return WM_EndDataSharing(dsi);
+WMErrCode WM_EndKeySharing(WMKeySetBuf *buf) {
+    return WM_EndDataSharing(buf);
 }

@@ -66,7 +66,7 @@ static int ActorPalSlots_Alloc(ActorPalSlots *slots, int count, BOOL sub) {
 
 static void ActorPalSlots_Free(ActorPalSlots *slots, int first, BOOL sub) {
     int engine = sub ? 1 : 0;
-    u32 i;
+    unsigned int i;
 
     for (i = first; first == slots->slots[engine][i]; i++) {
         slots->slots[engine][i] = PAL_SLOT_FREE;

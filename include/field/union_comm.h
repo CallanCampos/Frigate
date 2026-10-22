@@ -180,7 +180,7 @@ typedef struct {
     u8 unk438[4];
     // How many lines were added, the newest line the touch screen shows at its bottom, and the one it showed before
     s32 count;
-    s32 viewEnd;
+    int viewEnd;
     s32 drawnEnd;
 } UnionVisitorList;
 

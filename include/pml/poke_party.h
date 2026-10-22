@@ -199,7 +199,7 @@ BoxPkm *PokeParty_GetBoxPkm(PartyPkm *pkm);
 void PML_PkmSetMove(BoxPkm *pkm, u16 move, u8 slot);
 // How a nature changes a stat, in the order attack, defense, special attack, special defense and speed from 1:
 // 1 raised, -1 lowered, 0 neither
-s8 statAffectedByNature(u8 nature, u32 stat);
+s8 statAffectedByNature(u8 nature, unsigned int stat);
 // Allocates a party Pokémon made from a boxed one
 void PML_PkmSetParam(BoxPkm *pkm, u32 param, u32 value);
 // The size of a Pokémon's data

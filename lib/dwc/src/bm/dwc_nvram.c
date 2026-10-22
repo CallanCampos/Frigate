@@ -24,7 +24,7 @@
 #define NVRAM_WRITE_TRIES 3
 
 // The offset of the Wi-Fi settings in the NVRAM, -1 until it is read
-static int sSettingsOffset = -1;
+static int Address = -1;
 
 // The version byte, and the buffers that the ARM7 reads the header into, a cache line each. The file is built with
 // -ipa file: the objects share one section, reached from the byte, and the two buffers lie in the reverse of their
@@ -38,10 +38,10 @@ static int func_0205dee8(u32 address, u16 size, void *buf);
 static int func_0205df50(u32 address, u16 size, const void *src);
 static int func_0205dfb8(u32 address, u16 size, const void *src);
 
-int func_0205dbc0(void) {
+int DWCi_BACKUPlInit(void) {
     int result;
 
-    if (sSettingsOffset != -1) {
+    if (Address != -1) {
         return 0;
     }
     NVRAM_Init();
@@ -57,7 +57,7 @@ int func_0205dbc0(void) {
         }
         DC_InvalidateRange(sUserSettingsBuffer, sizeof(sUserSettingsBuffer));
         if (func_0205dee8(NVRAM_ADDRESS_USER_SETTINGS, sizeof(sUserSettingsBuffer), sUserSettingsBuffer) == 0) {
-            sSettingsOffset = sUserSettingsBuffer[0] * 8 - NVRAM_WIFI_SETTINGS_SIZE;
+            Address = sUserSettingsBuffer[0] * 8 - NVRAM_WIFI_SETTINGS_SIZE;
         } else {
             result = -1;
         }
@@ -66,7 +66,7 @@ int func_0205dbc0(void) {
 }
 
 u32 func_0205dc78(void) {
-    if (func_0205dbc0() != 0) {
+    if (DWCi_BACKUPlInit() != 0) {
         return 0;
     }
     if (sVersion == 0xff) {
@@ -80,7 +80,7 @@ int func_0205dca4(void *dst, u32 size, u32 page) {
     u32 pageSize;
     int result;
 
-    result = func_0205dbc0();
+    result = DWCi_BACKUPlInit();
     if (result != 0) {
         return result;
     }
@@ -106,7 +106,7 @@ int func_0205dd40(u32 page, const void *src, u32 size) {
     int result;
     int tries;
 
-    result = func_0205dbc0();
+    result = DWCi_BACKUPlInit();
     if (result != 0) {
         return result;
     }
@@ -148,7 +148,7 @@ static BOOL func_0205de18(int page, u32 *address, u32 *size) {
     case 1:
     case 2:
     case 3:
-        *address = sSettingsOffset + page * NVRAM_NTR_PAGE_SIZE;
+        *address = Address + page * NVRAM_NTR_PAGE_SIZE;
         *size = NVRAM_NTR_PAGE_SIZE;
         return TRUE;
     case NVRAM_TWL_FIRST_PAGE:
@@ -159,7 +159,7 @@ static BOOL func_0205de18(int page, u32 *address, u32 *size) {
             *size = 0;
             return FALSE;
         }
-        *address = sSettingsOffset - NVRAM_TWL_PAGES_SIZE + (page - NVRAM_TWL_FIRST_PAGE) * NVRAM_TWL_PAGE_SIZE;
+        *address = Address - NVRAM_TWL_PAGES_SIZE + (page - NVRAM_TWL_FIRST_PAGE) * NVRAM_TWL_PAGE_SIZE;
         *size = NVRAM_TWL_PAGE_SIZE;
         return TRUE;
     default:
