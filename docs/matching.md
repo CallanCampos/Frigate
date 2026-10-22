@@ -3108,6 +3108,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `break` written in place leaves the counter as it is. The inline also walks its table with a post-incremented pointer
   (`ldr r8, [fp], #4`) from `value <= *table++`. libVCT's `VCT_EncodeMulaw` (`vct_buffer.c`) reaches its size only with
   G.711's `search(val, table, size)` as a `static inline` (its row).
+- A counted loop that reads through a post-incremented pointer copies the counter's start into a register of its own
+  after the guard and loads from the stepped pointer indexed by that copy (`adds r7, r6, #0`, then
+  `ldrsb r1, [r5, r7]; adds r5, r5, #1` beside the load), and only when the counter's test is signed. `dwcutil_ac.c`'s
+  `UtilAc_ParseSettings` matches with `p += UtilAc_FormatHexByte(p, *data++);` under `i < (int)length`: `data[i]` (or
+  `((const s8 *)data)[i]`) indexes by the counter and steps the pointer after the call, and the `u32` length's
+  unsigned test (`bcc`) gives no copy at all. The copy's register can push a value that the loop doesn't use onto the
+  stack: there the start of the message's items, stored as the message and then as the message plus 8. NHTTP's
+  `NHTTPi_getUrlEncodedSize2` (`c = *s++;` under `i < length`) shows the same copy.
 
 ## Switches
 

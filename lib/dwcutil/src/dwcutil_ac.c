@@ -1647,7 +1647,7 @@ static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
 // Takes the items of the message with the settings; whether it named the network
 static int UtilAc_ParseSettings(const u8 *message) {
     const u8 *cursor = message + 8;
-    const u8 *end = cursor + SWAP16(*(u16 *)message);
+    const u8 *end;
     const u8 *data;
     u32 type;
     u32 length;
@@ -1655,6 +1655,7 @@ static int UtilAc_ParseSettings(const u8 *message) {
     int i;
     u16 value;
 
+    end = cursor + SWAP16(*(u16 *)message);
     while ((data = UtilAc_NextItem(&cursor, end, &type, &length)) != NULL) {
         switch (type) {
         case 0x201:
@@ -1688,8 +1689,8 @@ static int UtilAc_ParseSettings(const u8 *message) {
             if (sAcSettings.keys[0].format == 1) {
                 char *p = sAcSettings.keys[type - 0x206].key;
 
-                for (i = 0; i < length; i++) {
-                    p += UtilAc_FormatHexByte(p, data[i]);
+                for (i = 0; i < (int)length; i++) {
+                    p += UtilAc_FormatHexByte(p, *data++);
                 }
             } else {
                 memcpy(sAcSettings.keys[type - 0x206].key, data, length);
