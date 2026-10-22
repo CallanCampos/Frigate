@@ -262,7 +262,7 @@ static SAKERequestResult sakeiReadOutputRecords(SAKERequest request, SAKEField *
                 field->mType = SAKEFieldType_BOOLEAN;
                 field->mValue.mBoolean = value;
             } else if (gsXmlMoveToChild(request->mSoapResponse, "dateAndTimeValue")) {
-                int value;
+                time_t value;
 
                 if (gsXmlReadChildAsDateTimeElement(request->mSoapResponse, "value", &value) == gsi_false) {
                     return SAKERequestResult_MALFORMED_RESPONSE;

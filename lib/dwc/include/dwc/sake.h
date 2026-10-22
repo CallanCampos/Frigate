@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_SAKE_H
 
 #include "dwc/nonport.h"
+#include <time.h>
 
 // GameSpy's Sake, the online record storage that Nintendo's Wi-Fi Connection games keep their ranking data in, in
 // overlay 260 (sakeMain.c and sakeRequest*.c). It posts SOAP requests to a game's tables on the storage server and
@@ -71,7 +72,7 @@ typedef union {
     char *mAsciiString;
     gsi_u16 *mUnicodeString;
     gsi_bool mBoolean;
-    int mDateAndTime;
+    time_t mDateAndTime;
     SAKEBinaryData mBinaryData;
     gsi_i64 mInt64;
 } SAKEValue;

@@ -6,6 +6,7 @@
 #include "dwc/gsPlatformSocket.h"
 #include "dwc/hashtable.h"
 #include "dwc/nonport.h"
+#include <time.h>
 
 // The state of a connection of GameSpy's GP (gpi.c) and the layouts that the files of GP share, in overlay 11, after
 // GameSpy's gpi.h and the headers of its gpi*.c (see dwc/gp.h for the names). The functions of each file are in its
@@ -271,7 +272,7 @@ struct GPIPeer_s {
     unsigned int ip;
     unsigned short port;
     GPProfile profile;
-    int timeout;
+    time_t timeout;
     int nackCount;
     GPIBuffer inputBuffer;
     GPIBuffer outputBuffer;

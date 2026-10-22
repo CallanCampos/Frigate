@@ -55,7 +55,7 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input)
     char strTemp[0x100];
     int type;
     int profileid;
-    gsi_u32 date;
+    time_t date;
     int result;
     char *str;
 
@@ -356,7 +356,7 @@ GPResult gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *inp
     GPRecvBuddyStatusArg *arg;
     char buffer[0x400];
     int profileid;
-    gsi_u32 date;
+    time_t date;
     GPIConnection *iconnection;
 
     iconnection = *connection;

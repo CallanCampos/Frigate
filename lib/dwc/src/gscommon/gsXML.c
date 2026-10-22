@@ -732,14 +732,14 @@ gsi_bool gsXmlWriteBase64BinaryElement(GSXmlStreamWriter stream, const char *pre
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteDateTimeElement(GSXmlStreamWriter stream, const char *prefix, const char *name, int dateAndTime) {
+gsi_bool gsXmlWriteDateTimeElement(GSXmlStreamWriter stream, const char *prefix, const char *name, time_t dateAndTime) {
     GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     char text[24];
-    GSTime *time;
+    struct tm *time;
 
     time = gsiSecondsToDate(&dateAndTime);
-    sprintf(text, "%d-%02d-%02dT%02d:%02d:%02dZ", time->year + 1900, time->mon + 1, time->mday, time->hour, time->min,
-            time->sec);
+    sprintf(text, "%d-%02d-%02dT%02d:%02d:%02dZ", time->tm_year + 1900, time->tm_mon + 1, time->tm_mday, time->tm_hour,
+            time->tm_min, time->tm_sec);
     if (!gsXmlWriteOpenTag(writer, prefix, name) || !gsiXmlUtilWriteString(writer, text) ||
         !gsXmlWriteCloseTag(writer, prefix, name)) {
         return gsi_false;
@@ -1133,10 +1133,10 @@ gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader stream, const char *name, gsi_i
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char *name, int *value) {
+gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char *name, time_t *value) {
     GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     GSIXmlElement *element;
-    GSTime time;
+    struct tm time;
     int i;
 
     if (reader->mValueReadIndex == -1) {
@@ -1149,11 +1149,11 @@ gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char *n
             if (element->mValue.mData == NULL) {
                 return gsi_false;
             }
-            STD_TSScanf(element->mValue.mData, "%i-%02d-%02dT%02d:%02d:%02d", &time.year, &time.mon, &time.mday,
-                        &time.hour, &time.min, &time.sec);
-            time.year -= 1900;
-            time.mon -= 1;
-            time.isdst = -1;
+            STD_TSScanf(element->mValue.mData, "%i-%02d-%02dT%02d:%02d:%02d", &time.tm_year, &time.tm_mon,
+                        &time.tm_mday, &time.tm_hour, &time.tm_min, &time.tm_sec);
+            time.tm_year -= 1900;
+            time.tm_mon -= 1;
+            time.tm_isdst = -1;
             *value = gsiDateToSeconds(&time);
             return gsi_true;
         }

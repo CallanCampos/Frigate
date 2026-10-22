@@ -2,23 +2,11 @@
 #define POKEBW2_DWC_GSPLATFORMUTIL_H
 
 #include "dwc/nonport.h"
+#include <time.h>
 
 // GameSpy's helpers (gsPlatformUtil.c), in overlay 11: 64-bit numbers as texts, the lookup of a host, texts, the clock,
 // dates, the generator of random numbers and base 64. A base 64 text has one of three alphabets, which differ in
 // their last two digits and their padding: encodingType 0 (+, / and =), 1 ([, ] and _) or 2 (-, _ and =)
-
-// A date as the C library's struct tm has it: the year from 1900, the month from 0 and the day of the year from 0
-typedef struct GSTime {
-    int sec;
-    int min;
-    int hour;
-    int mday;
-    int mon;
-    int year;
-    int wday;
-    int yday;
-    int isdst;
-} GSTime;
 
 // The state of a base 64 encoding that gives four digits at a time: what is left of the input, and the alphabet
 typedef struct B64StreamData {
@@ -48,8 +36,8 @@ gsi_time current_time_hires(void);
 void msleep(gsi_time milliseconds);
 // The date of some seconds from 1970 (in a buffer that the next call overwrites, NULL before 1970), and the seconds
 // of a date, which it also corrects (-1 for a year before 1969 or after 2039)
-GSTime *gsiSecondsToDate(const int *seconds);
-int gsiDateToSeconds(GSTime *date);
+struct tm *gsiSecondsToDate(const time_t *seconds);
+time_t gsiDateToSeconds(struct tm *date);
 // Seeds the generator, and gives a number from low up to (not with) high
 void Util_RandSeed(unsigned long seed);
 int Util_RandInt(int low, int high);
