@@ -59,9 +59,9 @@ void SystemInit(void) {
 
     (void)OS_EnableIrq();
     FS_Init(1);
-    tableSize = FS_LoadTable(NULL, 0);
+    tableSize = FS_TryLoadTable(NULL, 0);
     table = OS_AllocFromArenaLo(OS_ARENA_MAIN, tableSize, 4);
-    FS_LoadTable(table, tableSize);
+    FS_TryLoadTable(table, tableSize);
 
     NNS_GfdInitVramTransferManager(sVramTransferTasks, VRAM_TRANSFER_TASK_COUNT);
 

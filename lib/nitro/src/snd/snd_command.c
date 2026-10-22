@@ -16,29 +16,29 @@
 
 // The ARM7 reads the pool and shares the work with the ARM9 through the cache, so each starts on a cache line. The
 // queue's state and the packets are in nitro_snd_main.c (see snd.h), before these
-static SNDCommand sSndCommands[SND_COMMAND_NUM] ATTRIBUTE_ALIGN(32);
+static SNDCommand sCommandArray[SND_COMMAND_NUM] ATTRIBUTE_ALIGN(32);
 static SNDSharedWork sSharedWork ATTRIBUTE_ALIGN(32);
 
 static int SND_CountFreeCommand(void);
-static int SND_CountReadyCommand(void);
+static int SND_CountReservedCommand(void);
 static int SND_CountWaitingCommand(void);
-static void SNDi_PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err);
-static void SNDi_InitPxi(void);
-static void SNDi_WakeArm7(void);
-static SNDCommand *SNDi_PopFreeCommand(void);
-static BOOL SNDi_IsDriverAvailable(void);
+static void PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err);
+static void InitPXI(void);
+static void RequestCommandProc(void);
+static SNDCommand *AllocCommand(void);
+static BOOL IsCommandAvailable(void);
 
 void SND_CommandInit(void) {
     int i;
     SNDCommand *command;
 
-    SNDi_InitPxi();
-    SNDi_Queue.freeHead = sSndCommands;
+    InitPXI();
+    SNDi_Queue.freeHead = sCommandArray;
     for (i = 0; i < SND_COMMAND_NUM - 1; i++) {
-        sSndCommands[i].next = &sSndCommands[i + 1];
+        sCommandArray[i].next = &sCommandArray[i + 1];
     }
-    sSndCommands[SND_COMMAND_NUM - 1].next = NULL;
-    SNDi_Queue.freeTail = &sSndCommands[SND_COMMAND_NUM - 1];
+    sCommandArray[SND_COMMAND_NUM - 1].next = NULL;
+    SNDi_Queue.freeTail = &sCommandArray[SND_COMMAND_NUM - 1];
     SNDi_Queue.readyHead = NULL;
     SNDi_Queue.readyTail = NULL;
     SNDi_Queue.sentCount = 0;
@@ -77,9 +77,9 @@ const SNDCommand *SND_RecvCommandReply(u32 flags) {
         return NULL;
     }
 
-    command = SNDi_Sent[SNDi_Queue.sentRead];
+    command = sWaitingCommandListQueue[SNDi_Queue.sentRead];
     SNDi_Queue.sentRead++;
-    if (SNDi_Queue.sentRead > SND_PACKET_MAX) {
+    if (SNDi_Queue.sentRead > SND_PXI_FIFO_MESSAGE_BUFSIZE) {
         SNDi_Queue.sentRead = 0;
     }
 
@@ -103,10 +103,10 @@ const SNDCommand *SND_RecvCommandReply(u32 flags) {
 SNDCommand *SND_AllocCommand(u32 flags) {
     SNDCommand *command;
 
-    if (!SNDi_IsDriverAvailable()) {
+    if (!IsCommandAvailable()) {
         return NULL;
     }
-    command = SNDi_PopFreeCommand();
+    command = AllocCommand();
     if (command != NULL) {
         return command;
     }
@@ -118,7 +118,7 @@ SNDCommand *SND_AllocCommand(u32 flags) {
         // Packets are on their way: take back what is there
         while (SND_RecvCommandReply(SND_COMMAND_NOBLOCK) != NULL) {
         }
-        command = SNDi_PopFreeCommand();
+        command = AllocCommand();
         if (command != NULL) {
             return command;
         }
@@ -126,10 +126,10 @@ SNDCommand *SND_AllocCommand(u32 flags) {
         // Everything is waiting to be sent
         SND_FlushCommand(SND_COMMAND_BLOCK);
     }
-    SNDi_WakeArm7();
+    RequestCommandProc();
     do {
         SND_RecvCommandReply(SND_COMMAND_BLOCK);
-        command = SNDi_PopFreeCommand();
+        command = AllocCommand();
     } while (command == NULL);
     return command;
 }
@@ -159,32 +159,32 @@ BOOL SND_FlushCommand(u32 flags) {
         return TRUE;
     }
 
-    if (SNDi_Queue.sentCount >= SND_PACKET_MAX) {
+    if (SNDi_Queue.sentCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE) {
         if (!(flags & SND_COMMAND_BLOCK)) {
             OS_RestoreInterrupts(enabled);
             return FALSE;
         }
         do {
             SND_RecvCommandReply(SND_COMMAND_BLOCK);
-        } while (SNDi_Queue.sentCount >= SND_PACKET_MAX);
+        } while (SNDi_Queue.sentCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE);
         if (!SNDi_Queue.readyHead) {
             OS_RestoreInterrupts(enabled);
             return TRUE;
         }
     }
 
-    DC_FlushRange(sSndCommands, sizeof(sSndCommands));
+    DC_FlushRange(sCommandArray, sizeof(sCommandArray));
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32)SNDi_Queue.readyHead, FALSE) < 0) {
         if (!(flags & SND_COMMAND_BLOCK)) {
             OS_RestoreInterrupts(enabled);
             return FALSE;
         }
-        while (SNDi_Queue.sentCount >= SND_PACKET_MAX ||
+        while (SNDi_Queue.sentCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE ||
                PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32)SNDi_Queue.readyHead, FALSE) < 0) {
             OS_RestoreInterrupts(enabled);
             SND_RecvCommandReply(SND_COMMAND_NOBLOCK);
             enabled = OS_DisableInterrupts();
-            DC_FlushRange(sSndCommands, sizeof(sSndCommands));
+            DC_FlushRange(sCommandArray, sizeof(sCommandArray));
             if (!SNDi_Queue.readyHead) {
                 OS_RestoreInterrupts(enabled);
                 return TRUE;
@@ -192,9 +192,9 @@ BOOL SND_FlushCommand(u32 flags) {
         }
     }
 
-    SNDi_Sent[SNDi_Queue.sentWrite] = SNDi_Queue.readyHead;
+    sWaitingCommandListQueue[SNDi_Queue.sentWrite] = SNDi_Queue.readyHead;
     SNDi_Queue.sentWrite++;
-    if (SNDi_Queue.sentWrite > SND_PACKET_MAX) {
+    if (SNDi_Queue.sentWrite > SND_PXI_FIFO_MESSAGE_BUFSIZE) {
         SNDi_Queue.sentWrite = 0;
     }
     SNDi_Queue.readyHead = NULL;
@@ -204,7 +204,7 @@ BOOL SND_FlushCommand(u32 flags) {
     OS_RestoreInterrupts(enabled);
 
     if (flags & SND_COMMAND_IMMEDIATE) {
-        SNDi_WakeArm7();
+        RequestCommandProc();
     }
     return TRUE;
 }
@@ -219,7 +219,7 @@ void SND_WaitForCommandProc(u32 tag) {
     if (SND_IsFinishedCommandTag(tag)) {
         return;
     }
-    SNDi_WakeArm7();
+    RequestCommandProc();
     while (!SND_IsFinishedCommandTag(tag)) {
         SND_RecvCommandReply(SND_COMMAND_BLOCK);
     }
@@ -274,7 +274,7 @@ static int SND_CountFreeCommand(void) {
     return count;
 }
 
-static int SND_CountReadyCommand(void) {
+static int SND_CountReservedCommand(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     int count = 0;
     SNDCommand *command;
@@ -288,22 +288,22 @@ static int SND_CountReadyCommand(void) {
 
 // NitroSDK's SND_CountWaitingCommand: the commands that are in neither the pool nor the ready list, so with the ARM7
 static int SND_CountWaitingCommand(void) {
-    return SND_COMMAND_NUM - SND_CountFreeCommand() - SND_CountReadyCommand();
+    return SND_COMMAND_NUM - SND_CountFreeCommand() - SND_CountReservedCommand();
 }
 
 // The function that the PXI FIFO calls with the words that the ARM7 sends for the sound tag: the number of an alarm and
-// its ID, which are the alarm that went off. NitroSDK's SNDi_PxiFifoCallback (a guess)
-static void SNDi_PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
+// its ID, which are the alarm that went off. NitroSDK's PxiFifoCallback (a guess)
+static void PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
     OSIntrMode enabled = OS_DisableInterrupts();
 
     SNDi_CallAlarmHandler(data);
     OS_RestoreInterrupts(enabled);
 }
 
-// NitroSDK's SNDi_InitPxi: sets the FIFO's callback for the sound tag and waits until the ARM7 has set its own
-static void SNDi_InitPxi(void) {
-    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SOUND, SNDi_PxiFifoCallback);
-    if (SNDi_IsDriverAvailable()) {
+// NitroSDK's InitPXI: sets the FIFO's callback for the sound tag and waits until the ARM7 has set its own
+static void InitPXI(void) {
+    PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SOUND, PxiFifoCallback);
+    if (IsCommandAvailable()) {
         while (!PXI_IsCallbackReady(PXI_FIFO_TAG_SOUND, PXI_PROC_ARM7)) {
             OS_SpinWaitSysCycles(SND_WAIT_CYCLES);
         }
@@ -311,13 +311,13 @@ static void SNDi_InitPxi(void) {
 }
 
 // Sends the ARM7 an empty word, to make it look at the packets
-static void SNDi_WakeArm7(void) {
+static void RequestCommandProc(void) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, 0, FALSE) < 0) {
     }
 }
 
 // Takes a command from the pool, or returns NULL when there is none
-static SNDCommand *SNDi_PopFreeCommand(void) {
+static SNDCommand *AllocCommand(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     SNDCommand *command = SNDi_Queue.freeHead;
 
@@ -335,7 +335,7 @@ static SNDCommand *SNDi_PopFreeCommand(void) {
 
 // Whether there is a sound driver to send commands to: always on a console, while on the Ensata emulator
 // (OS_IsRunOnEmulator) it asks a register of the emulator
-static BOOL SNDi_IsDriverAvailable(void) {
+static BOOL IsCommandAvailable(void) {
     OSIntrMode enabled;
     u32 present;
 

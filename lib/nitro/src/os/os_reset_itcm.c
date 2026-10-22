@@ -7,7 +7,7 @@
 #include "nitro/pxi.h"
 
 // The ROM header that the card read leaves at the top of main memory
-#define HW_ROM_HEADER ((const ROMHeader *)HW_ROM_HEADER_BUF)
+#define HW_ROM_HEADER ((const CARDRomHeader *)HW_ROM_HEADER_BUF)
 
 // clang-format off
 #pragma thumb on
@@ -153,14 +153,14 @@ void OSi_DoResetSystem(void) {
     } else {
         OSi_LoadProgram(FALSE);
     }
-    OSi_StartProgram();
+    OSi_DoBoot();
 }
 
 // clang-format off
-// OSi_StartProgram (our name), in ITCM, in assembly: it turns the interrupts off, takes the program that the card read
+// OSi_DoBoot (our name), in ITCM, in assembly: it turns the interrupts off, takes the program that the card read
 // left in the handoff area at the top of main memory, gives the area back to the program and jumps to the entry that
 // the ROM header gives, with the registers that the area holds. Neither the jump nor the register load is a C call
-asm void OSi_StartProgram(void) {
+asm void OSi_DoBoot(void) {
     mov ip, #0x4000000
     str ip, [ip, #0x208]        // IME: its low half is 0, so the interrupts go off
     ldr r1, =SDK_AUTOLOAD_DTCM_START
@@ -168,7 +168,7 @@ asm void OSi_StartProgram(void) {
     add r1, r1, #0x3c
     mov r0, #0
     str r0, [r1, #0x0]          // clears the word that the ARM7 reads the request in
-    ldr r1, =REG_PXI_MAINP_INTF_ADDR
+    ldr r1, =REG_SUBPINTF_ADDR
 @waitArm7:
     ldrh r0, [r1, #0x0]
     and r0, r0, #0xf
@@ -181,17 +181,17 @@ asm void OSi_StartProgram(void) {
     ldr r4, [r3, #0x0]
     ldr r1, =0x2fffd80
     mov r2, #0x80
-    bl OSi_Clear32
+    bl OSi_CpuClear32
     str r4, [r3, #0x0]
     ldr r1, =0x2ffff80
     mov r2, #0x18
-    bl OSi_Clear32
+    bl OSi_CpuClear32
     ldr r1, =0x2ffff98
     strh r0, [r1, #0x0]
     ldr r1, =0x2ffff9c
     mov r2, #0x64
-    bl OSi_Clear32
-    ldr r1, =REG_PXI_MAINP_INTF_ADDR
+    bl OSi_CpuClear32
+    ldr r1, =REG_SUBPINTF_ADDR
 @waitArm7Again:
     ldrh r0, [r1, #0x0]
     and r0, r0, #0xf
@@ -208,10 +208,10 @@ asm void OSi_StartProgram(void) {
     bx ip
 }
 
-// OSi_Clear32 (our name): the boot code's word fill, which OSi_StartProgram uses. It is instruction for instruction
+// OSi_CpuClear32 (our name): the boot code's word fill, which OSi_DoBoot uses. It is instruction for instruction
 // NitroSDK's MIi_CpuClear32, which the SDK wrote in assembly in mi_memory.c and copied into the ITCM image as a
 // function of its own
-asm void OSi_Clear32(u32 value, void *dest, u32 size) {
+asm void OSi_CpuClear32(u32 value, void *dest, u32 size) {
     add r12, r1, r2
 @loop:
     cmp r1, r12
@@ -256,7 +256,7 @@ asm void OSi_LoadProgram(BOOL twl) {
     cmp r0, #0x8000
     ldrhs r1, =HW_ROM_HEADER_BUF
     movhs r2, #0x160
-    blhs OSi_ReadRom
+    blhs OSi_ReadCardRom32
     ldr ip, =HW_ROM_HEADER_BUF
     ldr r0, [ip, #0x20]
     ldr r1, [ip, #0x28]
@@ -268,7 +268,7 @@ asm void OSi_LoadProgram(BOOL twl) {
     sublt r1, r1, r3
     addlt r2, r2, r3
     cmp r2, #0x0
-    blgt OSi_ReadRom
+    blgt OSi_ReadCardRom32
     ldr ip, =HW_ROM_HEADER_BUF
     ldr r0, [ip, #0x30]
     ldr r1, [ip, #0x38]
@@ -276,7 +276,7 @@ asm void OSi_LoadProgram(BOOL twl) {
     ldr r3, [sp, #0x0]
     add r0, r0, r3
     cmp r2, #0x0
-    blgt OSi_ReadRom
+    blgt OSi_ReadCardRom32
     ldmia sp!, {r0}
     cmp r4, #0x0
     beq @discardCaches
@@ -292,7 +292,7 @@ asm void OSi_LoadProgram(BOOL twl) {
     sublt r1, r1, r3
     addlt r2, r2, r3
     cmp r2, #0x0
-    blgt OSi_ReadRom
+    blgt OSi_ReadCardRom32
     ldr ip, =HW_TWL_ROM_HEADER_BUF
     ldr r0, [ip, #0x1d0]
     ldr r1, [ip, #0x1d8]
@@ -305,7 +305,7 @@ asm void OSi_LoadProgram(BOOL twl) {
     sublt r1, r1, r3
     addlt r2, r2, r3
     cmp r2, #0x0
-    blgt OSi_ReadRom
+    blgt OSi_ReadCardRom32
 @discardCaches:
     mov r1, #0x0
 @segment:
@@ -345,9 +345,9 @@ asm void OSi_LoadProgram(BOOL twl) {
 
 // clang-format on
 
-// OSi_ReadRom (our name): reads size bytes of the card's ROM at address into dest, a page of 0x200 bytes at a
+// OSi_ReadCardRom32 (our name): reads size bytes of the card's ROM at address into dest, a page of 0x200 bytes at a
 // time. Each page's request is a command (0xb7) and the page's address, and the words that come back are copied to dest
-void OSi_ReadRom(u32 address, void *dest, u32 size) {
+void OSi_ReadCardRom32(u32 address, void *dest, u32 size) {
     // The card's command bytes, reached from the high byte of MCCNT0: the enable bit at 0x040001a1, MCCMD0's command
     // then address bytes at +7 to +0xa, and MCCMD1's at +0xb to +0xe
     vu8 *card = (vu8 *)0x040001a1;

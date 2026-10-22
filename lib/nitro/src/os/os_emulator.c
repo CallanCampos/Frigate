@@ -11,7 +11,7 @@
 // booted adds to it (indexed by OS_GetBootType)
 #define OS_CONSOLE_TWL_BASE 0x01800004
 #define OS_CONSOLE_NITRO_BASE 0x80000001
-#define OS_CONSOLE_UNKNOWN 0xffffffff
+#define OSi_CONSOLE_NOT_DETECT 0xffffffff
 
 static u32 func_0207ac60(void);
 
@@ -19,7 +19,7 @@ static u32 func_0207ac60(void);
 static struct {
     u32 unk_00;
     u32 consoleType;
-} sConsole = { 0xffffffff, OS_CONSOLE_UNKNOWN };
+} sConsole = { 0xffffffff, OSi_CONSOLE_NOT_DETECT };
 
 static struct {
     u32 unk_00;
@@ -34,7 +34,7 @@ static const u32 sBootTypeConsoleBits[5] = {
 
 // NitroSDK's OS_GetConsoleType: the console type, worked out once
 u32 OS_GetConsoleType(void) {
-    if (sConsole.consoleType == OS_CONSOLE_UNKNOWN) {
+    if (sConsole.consoleType == OSi_CONSOLE_NOT_DETECT) {
         if (OS_IsRunOnTwl()) {
             sConsole.consoleType = OS_CONSOLE_TWL_BASE;
         } else {

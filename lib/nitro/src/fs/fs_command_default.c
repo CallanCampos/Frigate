@@ -3,7 +3,7 @@
 // of its interface that run them, and the functions that set such an archive up and load its tables into memory. The
 // file name is a guess from NitroSDK's own layout (fs_command.c and fs_rom.c); no string in the ROM names it. The
 // functions have TwlSDK's names, as they are recalled from the SDK (the default commands FSi_*Default, the interface's
-// FSi_ROMFAT_*); FSi_IgnoredCommand and func_02071ff8 are ours, and fs_call_filecmd is swan's name.
+// FSi_ROMFAT_*); FSi_CloseFileCommand and FS_GetArchiveOffset are ours, and FSi_TranslateCommand is swan's name.
 
 #include "nitro/card.h"
 #include "nitro/fs.h"
@@ -12,125 +12,125 @@
 #include "nitro/std.h"
 
 // Where the next bytes of the archive's tables are read from
-typedef struct FSTableReader {
+typedef struct FSiSyncReadParam {
     FSArchive *arc;
-    u32 position;
-} FSTableReader;
+    u32 pos;
+} FSiSyncReadParam;
 
 // An entry of the file allocation table: where a file starts and ends in the archive
-typedef struct FSFatEntry {
+typedef struct FSArchiveFAT {
     u32 top;
     u32 bottom;
-} FSFatEntry;
+} FSArchiveFAT;
 
 // An entry of the name table's main table, one for each directory: where its entries start in the name table, the
 // number of its first file, and its parent (of the root: the number of directories)
-typedef struct FSDirTableEntry {
-    u32 entryOffset;
-    u16 firstFileId;
-    u16 parentId;
-} FSDirTableEntry;
+typedef struct FSArchiveFNT {
+    u32 start;
+    u16 index;
+    u16 parent;
+} FSArchiveFNT;
 
 // The number that says there is no file, or no directory
 #define FS_NO_ID 0x10000
 
-static FSResult fs_call_filecmd(FSFile *file, FSCommandType command, BOOL blocking);
-static void *func_02071ff8(const FSArchive *arc, u32 offset);
+static FSResult FSi_TranslateCommand(FSFile *file, FSCommandType command, BOOL blocking);
+static void *FS_GetArchiveOffset(const FSArchive *arc, u32 offset);
 static BOOL FS_IsArchiveTableLoaded(const FSArchive *arc);
 
 // Reads length bytes of the archive's tables at the reader's position, and moves the position on. The tables are read
 // through the archive's read function, or copied from memory once they were loaded into it
-static FSResult FSi_ReadTable(FSTableReader *reader, void *buffer, u32 length) {
+static FSResult FSi_ReadTable(FSiSyncReadParam *reader, void *buffer, u32 length) {
     FSArchive *arc = reader->arc;
     FSArchiveTables *tables = arc->userdata;
     FSResult result;
 
-    if (tables->loadedMemory != NULL) {
-        MI_CpuCopy8((void *)reader->position, buffer, length);
+    if (tables->load_mem != NULL) {
+        MI_CpuCopy8((void *)reader->pos, buffer, length);
         result = FS_RESULT_SUCCESS;
     } else {
-        result = tables->readFunc(arc, buffer, reader->position, length);
+        result = tables->read_func(arc, buffer, reader->pos, length);
         result = FSi_WaitForArchiveCompletion(arc->list, result);
     }
-    reader->position += length;
+    reader->pos += length;
     return result;
 }
 
 // Sets the directory that a command of the file works on: the one with the number dirId, at its start
 static FSResult FSi_SeekDirDirect(FSFile *file, u32 dirId) {
     file->arg.seekDirectory.arc = file->arc;
-    file->arg.seekDirectory.dirId = dirId;
-    file->arg.seekDirectory.fileId = 0;
-    file->arg.seekDirectory.position = 0;
-    return fs_call_filecmd(file, FS_COMMAND_SEEKDIR, TRUE);
+    file->arg.seekDirectory.own_id = dirId;
+    file->arg.seekDirectory.index = 0;
+    file->arg.seekDirectory.pos = 0;
+    return FSi_TranslateCommand(file, FS_COMMAND_SEEKDIR, TRUE);
 }
 
 // The default command FS_COMMAND_SEEKDIR: puts the file in the directory at the position it holds. A position that is
 // the start of the directory takes its first file and its entries from the directory's main table entry
-static FSResult FSi_SeekDirDefault(FSFile *file) {
+static FSResult FSi_SeekDirCommand(FSFile *file) {
     FSArchive *arc = file->arc;
     FSArchiveTables *tables = arc->userdata;
     FSDirPos *pos = &file->arg.seekDirectory;
-    FSDirTableEntry entry;
-    FSTableReader reader;
+    FSArchiveFNT entry;
+    FSiSyncReadParam reader;
     FSResult result;
 
     reader.arc = arc;
-    reader.position = tables->fnt + pos->dirId * sizeof(FSDirTableEntry);
+    reader.pos = tables->fnt + pos->own_id * sizeof(FSArchiveFNT);
     result = FSi_ReadTable(&reader, &entry, sizeof(entry));
     if (result == FS_RESULT_SUCCESS) {
         file->body.dir.pos = *pos;
-        if (pos->fileId == 0 && pos->position == 0) {
-            file->body.dir.pos.fileId = entry.firstFileId;
-            file->body.dir.pos.position = tables->fnt + entry.entryOffset;
+        if (pos->index == 0 && pos->pos == 0) {
+            file->body.dir.pos.index = entry.index;
+            file->body.dir.pos.pos = tables->fnt + entry.start;
         }
-        file->body.dir.parentId = entry.parentId & 0xfff;
+        file->body.dir.parentId = entry.parent & 0xfff;
     }
     return result;
 }
 
 // The default command FS_COMMAND_READDIR: reads the next entry of the file's directory into the entry that the
 // command holds, with its name unless the command skips it. A length of 0 ends the directory
-static FSResult FSi_ReadDirDefault(FSFile *file) {
+static FSResult FSi_ReadDirCommand(FSFile *file) {
     FSDirEntry *entry = file->arg.readDirectory.entry;
-    FSTableReader reader;
+    FSiSyncReadParam reader;
     u8 info;
     u16 dirId;
     FSResult result;
 
     reader.arc = file->arc;
-    reader.position = file->body.dir.pos.position;
+    reader.pos = file->body.dir.pos.pos;
     result = FSi_ReadTable(&reader, &info, 1);
     if (result == FS_RESULT_SUCCESS) {
-        entry->nameLength = info & 0x7f;
-        entry->isDirectory = (info >> 7) & 1;
-        if (entry->nameLength == 0) {
+        entry->name_len = info & 0x7f;
+        entry->is_directory = (info >> 7) & 1;
+        if (entry->name_len == 0) {
             return FS_RESULT_FAILURE;
         }
         if (file->arg.readDirectory.skipName == FALSE) {
-            result = FSi_ReadTable(&reader, entry->name, entry->nameLength);
+            result = FSi_ReadTable(&reader, entry->name, entry->name_len);
             if (result != FS_RESULT_SUCCESS) {
                 return result;
             }
-            entry->name[entry->nameLength] = '\0';
+            entry->name[entry->name_len] = '\0';
         } else {
-            reader.position += entry->nameLength;
+            reader.pos += entry->name_len;
         }
-        if (entry->isDirectory == FALSE) {
+        if (entry->is_directory == FALSE) {
             entry->id.file.arc = file->arc;
-            entry->id.file.file_id = file->body.dir.pos.fileId;
-            file->body.dir.pos.fileId++;
+            entry->id.file.file_id = file->body.dir.pos.index;
+            file->body.dir.pos.index++;
         } else {
             result = FSi_ReadTable(&reader, &dirId, 2);
             if (result == FS_RESULT_SUCCESS) {
                 entry->id.dir.arc = file->arc;
-                entry->id.dir.dirId = dirId & 0xfff;
-                entry->id.dir.fileId = 0;
-                entry->id.dir.position = 0;
+                entry->id.dir.own_id = dirId & 0xfff;
+                entry->id.dir.index = 0;
+                entry->id.dir.pos = 0;
             }
         }
         if (result == FS_RESULT_SUCCESS) {
-            file->body.dir.pos.position = reader.position;
+            file->body.dir.pos.pos = reader.pos;
         }
     }
     return result;
@@ -163,14 +163,14 @@ static inline int FSi_CompareNames(const char *a, const char *b, u32 length) {
 // The default command FS_COMMAND_FINDPATH: follows the path from the directory that the command holds, entry by
 // entry of each directory, and gives the position of the directory or the number of the file that it names. "." and
 // ".." are followed, and a "*" ends the path
-static FSResult FSi_FindPathDefault(FSFile *file) {
+static FSResult FSi_FindPathCommand(FSFile *file) {
     const char *path = file->arg.findPath.path;
     BOOL isDirectory = file->arg.findPath.isDirectory;
     FSDirEntry entry;
     BOOL wantDirectory;
     int length;
 
-    fs_call_filecmd(file, FS_COMMAND_SEEKDIR, TRUE);
+    FSi_TranslateCommand(file, FS_COMMAND_SEEKDIR, TRUE);
     for (; *path != '\0'; path += (*path != '\0') ? 1 : 0) {
         char c;
 
@@ -185,7 +185,7 @@ static FSResult FSi_FindPathDefault(FSFile *file) {
                 path += 1;
                 continue;
             } else if (length == 2 && path[1] == '.') {
-                if (file->body.dir.pos.dirId != 0) {
+                if (file->body.dir.pos.own_id != 0) {
                     FSi_SeekDirDirect(file, file->body.dir.parentId);
                 }
                 path += 2;
@@ -194,16 +194,16 @@ static FSResult FSi_FindPathDefault(FSFile *file) {
         } else if (c == '*') {
             break;
         }
-        if (length > FS_ENTRY_NAME_LEN_MAX) {
+        if (length > FS_FILE_NAME_MAX) {
             return FS_RESULT_NO_ENTRY;
         }
         file->arg.readDirectory.entry = &entry;
         file->arg.readDirectory.skipName = FALSE;
         for (;;) {
-            if (fs_call_filecmd(file, FS_COMMAND_READDIR, TRUE) != FS_RESULT_SUCCESS) {
+            if (FSi_TranslateCommand(file, FS_COMMAND_READDIR, TRUE) != FS_RESULT_SUCCESS) {
                 return FS_RESULT_NO_ENTRY;
             }
-            if (wantDirectory != entry.isDirectory || length != entry.nameLength) {
+            if (wantDirectory != entry.is_directory || length != entry.name_len) {
                 continue;
             }
             if (FSi_CompareNames(path, entry.name, length) == 0) {
@@ -213,7 +213,7 @@ static FSResult FSi_FindPathDefault(FSFile *file) {
         if (wantDirectory) {
             file->arg.seekDirectory = entry.id.dir;
             path += length;
-            fs_call_filecmd(file, FS_COMMAND_SEEKDIR, TRUE);
+            FSi_TranslateCommand(file, FS_COMMAND_SEEKDIR, TRUE);
         } else {
             if (isDirectory) {
                 return FS_RESULT_NO_ENTRY;
@@ -231,7 +231,7 @@ static FSResult FSi_FindPathDefault(FSFile *file) {
 
 // The default command FS_COMMAND_GETPATH: writes the path of the file or directory to the command's buffer, from the
 // archive's name, if it fits there, and gives its length and its directory
-static FSResult FSi_GetPathDefault(FSFile *file) {
+static FSResult FSi_GetPathCommand(FSFile *file) {
     const char *name;
     FSArchive *arc = file->arc;
     FSPathBuffer *args = &file->arg.getPath;
@@ -250,7 +250,7 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
     FS_InitFile(&dir);
     dir.arc = arc;
     if (FS_IsDir(file)) {
-        dirId = file->body.dir.pos.dirId;
+        dirId = file->body.dir.pos.own_id;
         fileId = FS_NO_ID;
     } else {
         fileId = file->body.file.fileId;
@@ -264,13 +264,13 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
             }
             dir.arg.readDirectory.entry = &entry;
             dir.arg.readDirectory.skipName = TRUE;
-            if (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
+            if (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
                 do {
-                    if (entry.isDirectory == FALSE && entry.id.file.file_id == fileId) {
-                        dirId = dir.body.dir.pos.dirId;
+                    if (entry.is_directory == FALSE && entry.id.file.file_id == fileId) {
+                        dirId = dir.body.dir.pos.own_id;
                         break;
                     }
-                } while (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
+                } while (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
             }
             if (dirId != FS_NO_ID) {
                 break;
@@ -286,22 +286,22 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
     length = STD_GetStringLength(FS_GetArchiveName(arc)) + 2;
     FSi_SeekDirDirect(&dir, dirId);
     if (fileId != FS_NO_ID) {
-        length += entry.nameLength;
+        length += entry.name_len;
     }
     if (dirId != 0) {
         do {
             FSi_SeekDirDirect(&dir, dir.body.dir.parentId);
             dir.arg.readDirectory.entry = &entry;
             dir.arg.readDirectory.skipName = TRUE;
-            if (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
+            if (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
                 do {
-                    if (entry.isDirectory && entry.id.dir.dirId == child) {
-                        length += entry.nameLength + 1;
+                    if (entry.is_directory && entry.id.dir.own_id == child) {
+                        length += entry.name_len + 1;
                         break;
                     }
-                } while (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
+                } while (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
             }
-            child = dir.body.dir.pos.dirId;
+            child = dir.body.dir.pos.own_id;
         } while (child != 0);
     }
     args->pathLength = length + 1;
@@ -321,15 +321,15 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
             if (fileId != FS_NO_ID) {
                 dir.arg.readDirectory.entry = &entry;
                 dir.arg.readDirectory.skipName = FALSE;
-                if (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
+                if (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
                     do {
-                        if (entry.isDirectory == FALSE && entry.id.file.file_id == fileId) {
+                        if (entry.is_directory == FALSE && entry.id.file.file_id == fileId) {
                             break;
                         }
-                    } while (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
+                    } while (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
                 }
                 {
-                    u32 nameLength = entry.nameLength + 1;
+                    u32 nameLength = entry.name_len + 1;
 
                     MI_CpuCopy8(entry.name, buffer + pathLength - nameLength, nameLength);
                     pathLength -= nameLength;
@@ -345,18 +345,18 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
                     dir.arg.readDirectory.entry = &entry;
                     *(buffer + pathLength - 1) = '/';
                     pathLength--;
-                    if (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
+                    if (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS) {
                         do {
-                            if (entry.isDirectory && entry.id.dir.dirId == dirId) {
-                                u32 nameLength = entry.nameLength;
+                            if (entry.is_directory && entry.id.dir.own_id == dirId) {
+                                u32 nameLength = entry.name_len;
 
                                 MI_CpuCopy8(entry.name, buffer + pathLength - nameLength, nameLength);
                                 pathLength -= nameLength;
                                 break;
                             }
-                        } while (fs_call_filecmd(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
+                        } while (FSi_TranslateCommand(&dir, FS_COMMAND_READDIR, TRUE) == FS_RESULT_SUCCESS);
                     }
-                    dirId = dir.body.dir.pos.dirId;
+                    dirId = dir.body.dir.pos.own_id;
                 } while (dirId != 0);
             }
         }
@@ -365,32 +365,32 @@ static FSResult FSi_GetPathDefault(FSFile *file) {
 }
 
 // The default command FS_COMMAND_OPENFILEFAST: reads the file's entry of the allocation table and opens it by its range
-static FSResult FSi_OpenFileFastDefault(FSFile *file) {
+static FSResult FSi_OpenFileFastCommand(FSFile *file) {
     FSArchive *arc = file->arc;
     u32 fileId = file->arg.openFileFast.file_id;
     FSArchiveTables *tables = arc->userdata;
-    u32 offset = fileId * sizeof(FSFatEntry);
-    FSFatEntry entry;
-    FSTableReader reader;
+    u32 offset = fileId * sizeof(FSArchiveFAT);
+    FSArchiveFAT entry;
+    FSiSyncReadParam reader;
     FSResult result;
 
-    if (offset >= tables->fatSize) {
+    if (offset >= tables->fat_size) {
         return FS_RESULT_NO_ENTRY;
     }
     reader.arc = arc;
-    reader.position = tables->fat + offset;
+    reader.pos = tables->fat + offset;
     result = FSi_ReadTable(&reader, &entry, sizeof(entry));
     if (result == FS_RESULT_SUCCESS) {
         file->arg.openFileDirect.top = entry.top;
         file->arg.openFileDirect.bottom = entry.bottom;
         file->arg.openFileDirect.fileId = fileId;
-        result = fs_call_filecmd(file, FS_COMMAND_OPENFILEDIRECT, TRUE);
+        result = FSi_TranslateCommand(file, FS_COMMAND_OPENFILEDIRECT, TRUE);
     }
     return result;
 }
 
 // The default command FS_COMMAND_OPENFILEDIRECT: makes the file a range of the archive, with its position at the start
-static FSResult FSi_OpenFileDirectDefault(FSFile *file) {
+static FSResult FSi_OpenFileDirectCommand(FSFile *file) {
     file->body.file.top = file->arg.openFileDirect.top;
     file->body.file.position = file->arg.openFileDirect.top;
     file->body.file.bottom = file->arg.openFileDirect.bottom;
@@ -399,7 +399,7 @@ static FSResult FSi_OpenFileDirectDefault(FSFile *file) {
 }
 
 // The default command FS_COMMAND_READFILE: reads from the archive at the file's position, and moves it on
-static FSResult FSi_ReadFileDefault(FSFile *file) {
+static FSResult FSi_ReadFileCommand(FSFile *file) {
     FSArchive *arc = file->arc;
     u32 position = file->body.file.position;
     u32 length = file->arg.readFile.length;
@@ -407,11 +407,11 @@ static FSResult FSi_ReadFileDefault(FSFile *file) {
     void *buffer = file->arg.readFile.buffer;
 
     file->body.file.position = position + length;
-    return tables->readFunc(arc, buffer, position, length);
+    return tables->read_func(arc, buffer, position, length);
 }
 
 // The default command FS_COMMAND_WRITEFILE: the same, to the archive
-static FSResult FSi_WriteFileDefault(FSFile *file) {
+static FSResult FSi_WriteFileCommand(FSFile *file) {
     FSArchive *arc = file->arc;
     u32 position = file->body.file.position;
     u32 length = file->arg.writeFile.length;
@@ -419,29 +419,30 @@ static FSResult FSi_WriteFileDefault(FSFile *file) {
     const void *buffer = file->arg.writeFile.buffer;
 
     file->body.file.position = position + length;
-    return tables->writeFunc(arc, buffer, position, length);
+    return tables->write_func(arc, buffer, position, length);
 }
 
 // The default command for the events and for FS_COMMAND_CLOSEFILE, which have nothing to do
-static FSResult FSi_IgnoredCommand(FSFile *file) {
+static FSResult FSi_CloseFileCommand(FSFile *file) {
     return FS_RESULT_SUCCESS;
 }
 
 // The default commands, by command number
-static FSResult (*const FS_COMMAND_DEFAULT[])(FSFile *file) = {
-    FSi_ReadFileDefault, FSi_WriteFileDefault,    FSi_SeekDirDefault,        FSi_ReadDirDefault, FSi_FindPathDefault,
-    FSi_GetPathDefault,  FSi_OpenFileFastDefault, FSi_OpenFileDirectDefault, FSi_IgnoredCommand, FSi_IgnoredCommand,
-    FSi_IgnoredCommand,  FSi_IgnoredCommand,      FSi_IgnoredCommand,
+static FSResult (*const fsi_default_command[])(FSFile *file) = {
+    FSi_ReadFileCommand,  FSi_WriteFileCommand, FSi_SeekDirCommand,      FSi_ReadDirCommand,
+    FSi_FindPathCommand,  FSi_GetPathCommand,   FSi_OpenFileFastCommand, FSi_OpenFileDirectCommand,
+    FSi_CloseFileCommand, FSi_CloseFileCommand, FSi_CloseFileCommand,    FSi_CloseFileCommand,
+    FSi_CloseFileCommand,
 };
 
 // Runs a command of a file, through the archive's hook if it has one for the command, and otherwise (or if the hook
 // leaves it) through the default commands. With blocking set, it waits for a command that went on apart from the
 // thread to end
-static FSResult fs_call_filecmd(FSFile *file, FSCommandType command, BOOL blocking) {
+static FSResult FSi_TranslateCommand(FSFile *file, FSCommandType command, BOOL blocking) {
     FSArchiveTables *tables = file->arc->userdata;
     FSResult result = FS_RESULT_PROC_UNKNOWN;
 
-    if (tables->procMask & (1 << command)) {
+    if (tables->proc_flag & (1 << command)) {
         result = tables->proc(file, command);
         switch (result) {
         case FS_RESULT_SUCCESS:
@@ -450,14 +451,14 @@ static FSResult fs_call_filecmd(FSFile *file, FSCommandType command, BOOL blocki
         case FS_RESULT_PROC_ASYNC:
             break;
         case FS_RESULT_PROC_DEFAULT:
-            tables->procMask &= ~(1 << command);
+            tables->proc_flag &= ~(1 << command);
             result = FS_RESULT_PROC_UNKNOWN;
             break;
         }
     }
     if (result == FS_RESULT_PROC_UNKNOWN) {
-        if (command < NELEMS(FS_COMMAND_DEFAULT)) {
-            result = FS_COMMAND_DEFAULT[command](file);
+        if (command < NELEMS(fsi_default_command)) {
+            result = fsi_default_command[command](file);
         } else {
             result = FS_RESULT_UNSUPPORTED;
         }
@@ -480,7 +481,7 @@ static FSResult FSi_ROMFAT_ReadFile(FSArchive *arc, FSFile *file, void *buffer, 
     file->arg.readFile.buffer = buffer;
     file->arg.readFile.requested = requested;
     file->arg.readFile.length = *length;
-    return fs_call_filecmd(file, FS_COMMAND_READFILE, FALSE);
+    return FSi_TranslateCommand(file, FS_COMMAND_READFILE, FALSE);
 }
 
 // FS_COMMAND_WRITEFILE of the interface
@@ -495,7 +496,7 @@ static FSResult FSi_ROMFAT_WriteFile(FSArchive *arc, FSFile *file, const void *b
     file->arg.writeFile.buffer = buffer;
     file->arg.writeFile.requested = requested;
     file->arg.writeFile.length = *length;
-    return fs_call_filecmd(file, FS_COMMAND_WRITEFILE, FALSE);
+    return FSi_TranslateCommand(file, FS_COMMAND_WRITEFILE, FALSE);
 }
 
 // FS_COMMAND_SEEKDIR of the interface: opens the directory with the number that the low half of id says
@@ -504,12 +505,12 @@ static FSResult FSi_ROMFAT_SeekDirectory(FSArchive *arc, FSFile *file, u32 id, u
     FSDirPos *pos = &file->arg.seekDirectory;
     FSResult result;
 
-    pos->dirId = id;
-    pos->fileId = id >> 16;
-    pos->position = position;
+    pos->own_id = id;
+    pos->index = id >> 16;
+    pos->pos = position;
     file->arc = arc;
     pos->arc = arc;
-    result = fs_call_filecmd(file, FS_COMMAND_SEEKDIR, TRUE);
+    result = FSi_TranslateCommand(file, FS_COMMAND_SEEKDIR, TRUE);
     if (result == FS_RESULT_SUCCESS) {
         file->stat |= FS_FILE_STATUS_IS_DIR;
         file->stat &= ~FS_FILE_STATUS_IS_FILE;
@@ -527,15 +528,15 @@ static FSResult FSi_ROMFAT_ReadDirectory(FSArchive *arc, FSFile *file, FSDirecto
 
     args->entry = &entry;
     args->skipName = FALSE;
-    result = fs_call_filecmd(file, FS_COMMAND_READDIR, TRUE);
+    result = FSi_TranslateCommand(file, FS_COMMAND_READDIR, TRUE);
     if (result == FS_RESULT_SUCCESS) {
         info->shortnameLength = 0;
-        info->longnameLength = entry.nameLength;
+        info->longnameLength = entry.name_len;
         MI_CpuCopy8(entry.name, info->longname, info->longnameLength);
         info->longname[info->longnameLength] = '\0';
-        if (entry.isDirectory) {
+        if (entry.is_directory) {
             info->attributes = FS_ATTRIBUTE_IS_DIRECTORY;
-            info->id = entry.id.dir.dirId | entry.id.dir.fileId << 16;
+            info->id = entry.id.dir.own_id | entry.id.dir.index << 16;
             info->filesize = 0;
         } else {
             FSArchiveTables *tables;
@@ -545,13 +546,13 @@ static FSResult FSi_ROMFAT_ReadDirectory(FSArchive *arc, FSFile *file, FSDirecto
             info->id = entry.id.file.file_id;
             info->filesize = 0;
             tables = arc->userdata;
-            offset = info->id * sizeof(FSFatEntry);
-            if (offset < tables->fatSize) {
-                FSFatEntry fat;
-                FSTableReader reader;
+            offset = info->id * sizeof(FSArchiveFAT);
+            if (offset < tables->fat_size) {
+                FSArchiveFAT fat;
+                FSiSyncReadParam reader;
 
                 reader.arc = arc;
-                reader.position = tables->fat + offset;
+                reader.pos = tables->fat + offset;
                 if (FSi_ReadTable(&reader, &fat, sizeof(fat)) == FS_RESULT_SUCCESS) {
                     info->filesize = fat.bottom - fat.top;
                     if (FSi_IsDsiOnlyRomOffset(arc, fat.top)) {
@@ -578,18 +579,18 @@ static FSResult FSi_ROMFAT_FindPath(FSArchive *arc, u32 baseDirId, const char *p
     FSResult result;
 
     FS_InitFile(&file);
-    file.arg.findPath.start.dirId = baseDirId;
-    file.arg.findPath.start.fileId = 0;
-    file.arg.findPath.start.position = 0;
+    file.arg.findPath.start.own_id = baseDirId;
+    file.arg.findPath.start.index = 0;
+    file.arg.findPath.start.pos = 0;
     file.arg.findPath.isDirectory = isDirectory;
     file.arg.findPath.result = &id;
     file.arc = arc;
     file.arg.findPath.start.arc = arc;
     file.arg.findPath.path = path;
-    result = fs_call_filecmd(&file, FS_COMMAND_FINDPATH, TRUE);
+    result = FSi_TranslateCommand(&file, FS_COMMAND_FINDPATH, TRUE);
     if (result == FS_RESULT_SUCCESS) {
         if (isDirectory) {
-            *targetId = id.dir.dirId;
+            *targetId = id.dir.own_id;
         } else {
             *targetId = id.file.file_id;
         }
@@ -607,7 +608,7 @@ static FSResult FSi_ROMFAT_GetPath(FSArchive *arc, FSFile *file, u32 arg0, char 
     args->pathLength = 0;
     args->dirId = 0;
     args->length = *length;
-    result = fs_call_filecmd(file, FS_COMMAND_GETPATH, TRUE);
+    result = FSi_TranslateCommand(file, FS_COMMAND_GETPATH, TRUE);
     if (result == FS_RESULT_SUCCESS) {
         *length = args->length;
     }
@@ -621,7 +622,7 @@ static FSResult FSi_ROMFAT_OpenFileFast(FSArchive *arc, FSFile *file, u32 fileId
 
     args->file_id = fileId;
     args->arc = arc;
-    result = fs_call_filecmd(file, FS_COMMAND_OPENFILEFAST, TRUE);
+    result = FSi_TranslateCommand(file, FS_COMMAND_OPENFILEFAST, TRUE);
     if (result == FS_RESULT_SUCCESS) {
         file->stat |= FS_FILE_STATUS_IS_FILE;
         file->stat &= ~FS_FILE_STATUS_IS_DIR;
@@ -639,7 +640,7 @@ static FSResult FSi_ROMFAT_OpenFileDirect(FSArchive *arc, FSFile *file, u32 top,
     args->top = top;
     args->bottom = bottom;
     args->fileId = *fileId;
-    result = fs_call_filecmd(file, FS_COMMAND_OPENFILEDIRECT, TRUE);
+    result = FSi_TranslateCommand(file, FS_COMMAND_OPENFILEDIRECT, TRUE);
     if (result == FS_RESULT_SUCCESS) {
         file->stat |= FS_FILE_STATUS_IS_FILE;
         file->stat &= ~FS_FILE_STATUS_IS_DIR;
@@ -651,7 +652,7 @@ static FSResult FSi_ROMFAT_OpenFileDirect(FSArchive *arc, FSFile *file, u32 top,
 
 // FS_COMMAND_CLOSEFILE of the interface
 static FSResult FSi_ROMFAT_CloseFile(FSArchive *arc, FSFile *file) {
-    FSResult result = fs_call_filecmd(file, FS_COMMAND_CLOSEFILE, TRUE);
+    FSResult result = FSi_TranslateCommand(file, FS_COMMAND_CLOSEFILE, TRUE);
 
     file->prop = NULL;
     file->stat &= ~(FS_FILE_STATUS_IS_FILE | FS_FILE_STATUS_IS_DIR);
@@ -665,7 +666,7 @@ static void FSi_ROMFAT_Activate(FSArchive *arc) {
 
     FS_InitFile(&file);
     file.arc = arc;
-    fs_call_filecmd(&file, FS_COMMAND_ACTIVATE, FALSE);
+    FSi_TranslateCommand(&file, FS_COMMAND_ACTIVATE, FALSE);
 }
 
 static void FSi_ROMFAT_Idle(FSArchive *arc) {
@@ -673,7 +674,7 @@ static void FSi_ROMFAT_Idle(FSArchive *arc) {
 
     FS_InitFile(&file);
     file.arc = arc;
-    fs_call_filecmd(&file, FS_COMMAND_IDLE, FALSE);
+    FSi_TranslateCommand(&file, FS_COMMAND_IDLE, FALSE);
 }
 
 static void FSi_ROMFAT_Suspend(FSArchive *arc) {
@@ -681,7 +682,7 @@ static void FSi_ROMFAT_Suspend(FSArchive *arc) {
 
     FS_InitFile(&file);
     file.arc = arc;
-    fs_call_filecmd(&file, FS_COMMAND_SUSPEND, FALSE);
+    FSi_TranslateCommand(&file, FS_COMMAND_SUSPEND, FALSE);
 }
 
 static void FSi_ROMFAT_Resume(FSArchive *arc) {
@@ -689,7 +690,7 @@ static void FSi_ROMFAT_Resume(FSArchive *arc) {
 
     FS_InitFile(&file);
     file.arc = arc;
-    fs_call_filecmd(&file, FS_COMMAND_RESUME, FALSE);
+    FSi_TranslateCommand(&file, FS_COMMAND_RESUME, FALSE);
 }
 
 // FS_COMMAND_OPENFILE of the interface: finds the file that a path names, and opens it
@@ -753,11 +754,11 @@ static void FSi_ROMFAT_Unmount(FSArchive *arc) {
     FS_IsArchiveTableLoaded(arc);
     tables->base = 0;
     tables->fat = 0;
-    tables->fatSize = 0;
+    tables->fat_size = 0;
     tables->fnt = 0;
-    tables->fntSize = 0;
-    tables->fatBackup = 0;
-    tables->fntBackup = 0;
+    tables->fnt_size = 0;
+    tables->fat_bak = 0;
+    tables->fnt_bak = 0;
 }
 
 // FS_COMMAND_GETARCHIVECAPS of the interface: the ROM archive has no capabilities (the game never sends it)
@@ -802,13 +803,13 @@ static FSResult FSi_ROMFAT_GetPathInfo(FSArchive *arc, u32 baseDirId, const char
         info->id = id;
         info->filesize = 0;
         tables = arc->userdata;
-        offset = id * sizeof(FSFatEntry);
-        if (offset < tables->fatSize) {
-            FSFatEntry fat;
-            FSTableReader reader;
+        offset = id * sizeof(FSArchiveFAT);
+        if (offset < tables->fat_size) {
+            FSArchiveFAT fat;
+            FSiSyncReadParam reader;
 
             reader.arc = arc;
-            reader.position = tables->fat + offset;
+            reader.pos = tables->fat + offset;
             if (FSi_ReadTable(&reader, &fat, sizeof(fat)) == FS_RESULT_SUCCESS) {
                 info->filesize = fat.bottom - fat.top;
                 if (FSi_IsDsiOnlyRomOffset(arc, fat.top)) {
@@ -824,13 +825,13 @@ static FSResult FSi_ROMFAT_GetPathInfo(FSArchive *arc, u32 baseDirId, const char
 
 // FS_COMMAND_GETARCHIVERESOURCE of the interface: the archive is the ROM, as big as the ROM header says
 static FSResult FSi_ROMFAT_GetArchiveResource(FSArchive *arc, FSArchiveResource *resource) {
-    const ROMHeader *header = (const ROMHeader *)CARD_GetRomHeader();
+    const CARDRomHeader *header = (const CARDRomHeader *)CARD_GetRomHeader();
 
     resource->unk_20[0] = 0;
     resource->unk_20[1] = 0;
     resource->unk_20[2] = 0;
     resource->unk_20[3] = 0;
-    resource->totalSize = header->romSize;
+    resource->totalSize = header->rom_size;
     resource->availableSize = 0;
     resource->maxFileSize = 0x7fffffff;
     resource->maxDirectorySize = 0x7fffffff;
@@ -866,31 +867,31 @@ static const FSArchiveInterface FS_VTABLE_BASE = {
 
 // The default functions to read and write an archive: it is in memory, at the base
 static FSResult FSi_ReadMemCallback(FSArchive *arc, void *buffer, u32 position, u32 length) {
-    MI_CpuCopy8(func_02071ff8(arc, position), buffer, length);
+    MI_CpuCopy8(FS_GetArchiveOffset(arc, position), buffer, length);
     return FS_RESULT_SUCCESS;
 }
 
 static FSResult FSi_WriteMemCallback(FSArchive *arc, const void *buffer, u32 position, u32 length) {
-    MI_CpuCopy8(buffer, func_02071ff8(arc, position), length);
+    MI_CpuCopy8(buffer, FS_GetArchiveOffset(arc, position), length);
     return FS_RESULT_SUCCESS;
 }
 
 // NitroSDK's FS_LoadArchive: gives an archive its tables, in the storage at the base or in memory, and the functions
 // to read and write it (the defaults for NULL), and mounts it
-BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FSReadFunc readFunc,
-                    FSWriteFunc writeFunc) {
+BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FS_ARCHIVE_READ_FUNC readFunc,
+                    FS_ARCHIVE_WRITE_FUNC writeFunc) {
     FSArchiveTables *tables = &arc->tables;
 
     tables->base = base;
-    tables->fatSize = fatSize;
-    tables->fntSize = fntSize;
+    tables->fat_size = fatSize;
+    tables->fnt_size = fntSize;
     tables->fat = fat;
     tables->fnt = fnt;
-    tables->fntBackup = fnt;
-    tables->fatBackup = fat;
-    tables->readFunc = readFunc != NULL ? readFunc : FSi_ReadMemCallback;
-    tables->writeFunc = writeFunc != NULL ? writeFunc : FSi_WriteMemCallback;
-    tables->loadedMemory = NULL;
+    tables->fnt_bak = fnt;
+    tables->fat_bak = fat;
+    tables->read_func = readFunc != NULL ? readFunc : FSi_ReadMemCallback;
+    tables->write_func = writeFunc != NULL ? writeFunc : FSi_WriteMemCallback;
+    tables->load_mem = NULL;
     return FS_MountArchive(arc, tables, &FS_VTABLE_BASE, 0);
 }
 
@@ -912,7 +913,7 @@ BOOL FSi_GetFilePositionIfProc(FSFile *file, u32 *position) {
 }
 
 // NitroSDK's FS_SetArchiveProc: sets the hook, and the commands that it is run for; neither goes without the other
-void FS_SetArchiveProc(FSArchive *arc, FSProc proc, u32 procMask) {
+void FS_SetArchiveProc(FSArchive *arc, FS_ARCHIVE_PROC_FUNC proc, u32 procMask) {
     FSArchiveTables *tables = &arc->tables;
 
     if (procMask == 0) {
@@ -921,7 +922,7 @@ void FS_SetArchiveProc(FSArchive *arc, FSProc proc, u32 procMask) {
         procMask = 0;
     }
     tables->proc = proc;
-    tables->procMask = procMask;
+    tables->proc_flag = procMask;
 }
 
 // NitroSDK's FS_LoadArchiveTables: copies the tables into the memory (aligned up to 32 bytes) and keeps reading them
@@ -936,27 +937,27 @@ u32 FS_LoadArchiveTables(FSArchive *arc, void *memory, u32 memorySize) {
         FS_UnloadArchiveTables(arc);
     }
     tables = arc->userdata;
-    size = (tables->fatSize + tables->fntSize + 0x3f) & ~0x1f;
+    size = (tables->fat_size + tables->fnt_size + 0x3f) & ~0x1f;
     if (size <= memorySize) {
         aligned = ((u32)memory + 0x1f) & ~0x1f;
         FS_InitFile(&file);
-        if (FS_OpenFileDirect(&file, arc, tables->fat, tables->fat + tables->fatSize, -1)) {
-            if (FS_ReadFile(&file, (void *)aligned, tables->fatSize) < 0) {
-                MI_CpuFill8((void *)aligned, 0, tables->fatSize);
+        if (FS_OpenFileDirect(&file, arc, tables->fat, tables->fat + tables->fat_size, -1)) {
+            if (FS_ReadFile(&file, (void *)aligned, tables->fat_size) < 0) {
+                MI_CpuFill8((void *)aligned, 0, tables->fat_size);
             }
             FS_CloseFile(&file);
         }
         tables->fat = aligned;
-        aligned += tables->fatSize;
-        if (FS_OpenFileDirect(&file, arc, tables->fnt, tables->fnt + tables->fntSize, -1)) {
-            if (FS_ReadFile(&file, (void *)aligned, tables->fntSize) < 0) {
-                MI_CpuFill8((void *)aligned, 0, tables->fntSize);
+        aligned += tables->fat_size;
+        if (FS_OpenFileDirect(&file, arc, tables->fnt, tables->fnt + tables->fnt_size, -1)) {
+            if (FS_ReadFile(&file, (void *)aligned, tables->fnt_size) < 0) {
+                MI_CpuFill8((void *)aligned, 0, tables->fnt_size);
             }
             FS_CloseFile(&file);
         }
         tables->fnt = aligned;
-        tables->loadedMemory = memory;
-        arc->flag |= FS_ARCHIVE_FLAG_TABLE_LOADED;
+        tables->load_mem = memory;
+        arc->flag |= FS_ARCHIVE_FLAG_TABLE_LOAD;
     }
     return size;
 }
@@ -970,11 +971,11 @@ void *FS_UnloadArchiveTables(FSArchive *arc) {
         BOOL suspended = FS_SuspendArchive(arc);
 
         if (FS_IsArchiveTableLoaded(arc)) {
-            arc->flag &= ~FS_ARCHIVE_FLAG_TABLE_LOADED;
-            memory = tables->loadedMemory;
-            tables->fat = tables->fatBackup;
-            tables->fnt = tables->fntBackup;
-            tables->loadedMemory = NULL;
+            arc->flag &= ~FS_ARCHIVE_FLAG_TABLE_LOAD;
+            memory = tables->load_mem;
+            tables->fat = tables->fat_bak;
+            tables->fnt = tables->fnt_bak;
+            tables->load_mem = NULL;
         }
         if (suspended) {
             FS_ResumeArchive(arc);
@@ -990,14 +991,14 @@ u32 FS_GetArchiveBase(const FSArchive *arc) {
 }
 
 // The memory that an offset of the archive is at, when the archive is in memory at its base
-static void *func_02071ff8(const FSArchive *arc, u32 offset) {
+static void *FS_GetArchiveOffset(const FSArchive *arc, u32 offset) {
     FSArchiveTables *tables = arc->userdata;
 
     return (void *)(tables->base + offset);
 }
 
 static BOOL FS_IsArchiveTableLoaded(const FSArchive *arc) {
-    return (arc->flag & FS_ARCHIVE_FLAG_TABLE_LOADED) != 0;
+    return (arc->flag & FS_ARCHIVE_FLAG_TABLE_LOAD) != 0;
 }
 
 u32 FS_GetFileImageTop(const FSFile *file) {

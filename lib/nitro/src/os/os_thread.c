@@ -247,8 +247,8 @@ void OS_InitThread(void) {
     OSi_LauncherThread.stackBottom = HW_IRQ_STACK_END;
     OSi_LauncherThread.stackTop = stackTop;
     OSi_LauncherThread.stackWarningOffset = 0;
-    *(u32 *)(OSi_LauncherThread.stackBottom - 8) = OS_STACK_BEGIN_MAGIC;
-    *(u32 *)OSi_LauncherThread.stackTop = OS_STACK_END_MAGIC;
+    *(u32 *)(OSi_LauncherThread.stackBottom - 8) = OSi_STACK_CHECKNUM_BOTTOM;
+    *(u32 *)OSi_LauncherThread.stackTop = OSi_STACK_CHECKNUM_TOP;
     OS_InitThreadQueue(&OSi_LauncherThread.joinQueue);
 
     OSi_ThreadInfo.isNeedRescheduling = FALSE;
@@ -289,8 +289,8 @@ void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *st
     stackTop = (u32)stack - stackSize;
     thread->stackTop = stackTop;
     thread->stackWarningOffset = 0;
-    *(u32 *)(thread->stackBottom - 8) = OS_STACK_BEGIN_MAGIC;
-    *(u32 *)thread->stackTop = OS_STACK_END_MAGIC;
+    *(u32 *)(thread->stackBottom - 8) = OSi_STACK_CHECKNUM_BOTTOM;
+    *(u32 *)thread->stackTop = OSi_STACK_CHECKNUM_TOP;
     OS_InitThreadQueue(&thread->joinQueue);
 
     OS_InitContext(&thread->context, (u32)func, (u32)stack - 8);

@@ -18,9 +18,9 @@ void GX_InitGXState(void) {
     gGXState.subObj = 0;
     gGXState.subBgExtPltt = 0;
     gGXState.subObjExtPltt = 0;
-    reg_GX_VRAMCNT_ABCD = 0;
+    reg_GX_VRAMCNT = 0;
     reg_GX_VRAMCNT_E = 0;
     reg_GX_VRAMCNT_F = 0;
     reg_GX_VRAMCNT_G = 0;
-    reg_GX_VRAMCNT_HI = 0;
+    reg_GX_VRAM_HI_CNT = 0;
 }

@@ -201,7 +201,7 @@ static void func_ov036_02198da0(Field3DBgQuad *quad, const Field3DBg *bg, Field3
     quad->texV1 = v + (bg->height << FX32_SHIFT);
     MTX_Identity33_(&quad->mtx);
     MTX_RotZ33_(&quad->mtx, FX_SinIdx(bg->angle), FX_CosIdx(bg->angle));
-    MAT3_Scaling(&scaling, bg->scaleX, bg->scaleY, FX32_ONE);
+    MTX_Scale33_(&scaling, bg->scaleX, bg->scaleY, FX32_ONE);
     MTX_Concat33(&quad->mtx, &scaling, &quad->mtx);
 }
 

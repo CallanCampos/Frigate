@@ -9,26 +9,26 @@
 #define PXI_SYNC_DONE_ROUNDS 4
 
 // The function called for each tag, and whether the FIFO was set up
-static PXIFifoCallback sFifoCallbacks[PXI_MAX_FIFO_TAG];
-static u16 sFifoInitialized;
+static PXIFifoCallback FifoRecvCallbackTable[PXI_MAX_FIFO_TAG];
+static u16 FifoCtrlInit;
 
 // The ARM7's state, which it sets in the bits of the register that the ARM9 reads
 static inline u32 PXI_GetRemoteState(void) {
-    return reg_PXI_MAINP_INTF & REG_PXI_MAINP_INTF_RECV_MASK;
+    return reg_PXI_INTF & REG_PXI_INTF_RECV_MASK;
 }
 
 void PXI_InitFifo(void) {
     OSSystemWork *work = OS_GetSystemWork();
     OSIntrMode enabled = OS_DisableInterrupts();
 
-    if (!sFifoInitialized) {
+    if (!FifoCtrlInit) {
         int i;
         int round;
 
-        sFifoInitialized = TRUE;
+        FifoCtrlInit = TRUE;
         work->pxiHandleChecker[MI_PROCESSOR_ARM9] = 0;
         for (i = 0; i < PXI_MAX_FIFO_TAG; i++) {
-            sFifoCallbacks[i] = NULL;
+            FifoRecvCallbackTable[i] = NULL;
         }
 
         reg_PXI_FIFO_CNT = REG_PXI_FIFO_CNT_INIT;
@@ -42,12 +42,12 @@ void PXI_InitFifo(void) {
             u32 state = PXI_GetRemoteState();
             int wait;
 
-            reg_PXI_MAINP_INTF = state << REG_PXI_MAINP_INTF_SEND_SHIFT;
+            reg_PXI_INTF = state << REG_PXI_INTF_SEND_SHIFT;
             if (state == 0 && round > PXI_SYNC_DONE_ROUNDS) {
                 break;
             }
             wait = PXI_SYNC_WAIT_COUNT;
-            while ((reg_PXI_MAINP_INTF & REG_PXI_MAINP_INTF_RECV_MASK) == state) {
+            while ((reg_PXI_INTF & REG_PXI_INTF_RECV_MASK) == state) {
                 if (wait <= 0) {
                     round = 0;
                     break;
@@ -64,7 +64,7 @@ void PXI_SetFifoRecvCallback(int fifoTag, PXIFifoCallback callback) {
     OSSystemWork *work = OS_GetSystemWork();
     OSIntrMode enabled = OS_DisableInterrupts();
 
-    sFifoCallbacks[fifoTag] = callback;
+    FifoRecvCallbackTable[fifoTag] = callback;
     if (callback != NULL) {
         work->pxiHandleChecker[MI_PROCESSOR_ARM9] |= 1 << fifoTag;
     } else {
@@ -80,7 +80,7 @@ BOOL PXI_IsCallbackReady(int fifoTag, PXIProc processor) {
 }
 
 // Puts a word in the send FIFO, unless the FIFO is in error (the error is acknowledged) or full
-static inline int PXIi_SendRaw(u32 raw) {
+static inline int PXIi_SetToFifo(u32 raw) {
     OSIntrMode enabled;
 
     if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_ERR_MASK) {
@@ -105,11 +105,11 @@ int PXI_SendWordByFifo(int fifoTag, u32 data, BOOL err) {
     message.e.err = err;
     message.e.data = data;
 
-    return PXIi_SendRaw(message.raw);
+    return PXIi_SetToFifo(message.raw);
 }
 
 // Takes a word from the receive FIFO, unless the FIFO is in error (the error is acknowledged) or empty
-static inline int PXIi_ReceiveRaw(u32 *raw) {
+static inline int PXIi_GetFromFifo(u32 *raw) {
     OSIntrMode enabled;
 
     if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_ERR_MASK) {
@@ -117,7 +117,7 @@ static inline int PXIi_ReceiveRaw(u32 *raw) {
         return PXI_FIFO_FAIL_RECV_ERR;
     }
     enabled = OS_DisableInterrupts();
-    if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_RECV_EMPTY_MASK) {
+    if (reg_PXI_FIFO_CNT & REG_PXI_FIFO_CNT_RECV_EMP_MASK) {
         OS_RestoreInterrupts(enabled);
         return PXI_FIFO_FAIL_RECV_EMPTY;
     }
@@ -133,7 +133,7 @@ void PXIi_HandlerRecvFifoNotEmpty(void) {
     int result;
 
     while (TRUE) {
-        result = PXIi_ReceiveRaw(&message.raw);
+        result = PXIi_GetFromFifo(&message.raw);
 
         if (result == PXI_FIFO_FAIL_RECV_EMPTY) {
             break;
@@ -144,11 +144,11 @@ void PXIi_HandlerRecvFifoNotEmpty(void) {
         if (message.e.tag == PXI_FIFO_TAG_EX) {
             continue;
         }
-        if (sFifoCallbacks[message.e.tag] != NULL) {
-            sFifoCallbacks[message.e.tag](message.e.tag, message.e.data, message.e.err);
+        if (FifoRecvCallbackTable[message.e.tag] != NULL) {
+            FifoRecvCallbackTable[message.e.tag](message.e.tag, message.e.data, message.e.err);
         } else if (!message.e.err) {
             message.e.err = TRUE;
-            PXIi_SendRaw(message.raw);
+            PXIi_SetToFifo(message.raw);
         }
     }
 }

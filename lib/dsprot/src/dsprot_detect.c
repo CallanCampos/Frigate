@@ -62,10 +62,10 @@ u32 DSProt_Crc32(const u8 *data, u32 size) {
 }
 
 static inline u32 DSProt_GetRomSize(void) {
-    const ROMHeader *header;
+    const CARDRomHeader *header;
     u32 size;
-    header = (const ROMHeader *)CARD_GetRomHeader();
-    size = 1 << (header->deviceSize + 17);
+    header = (const CARDRomHeader *)CARD_GetRomHeader();
+    size = 1 << (header->device_size + 17);
     return size;
 }
 

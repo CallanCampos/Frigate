@@ -86,9 +86,9 @@ u32 SndMic_StartRecording(void (*callback)(u32 result, u32 *done), u32 *done) {
         param.size &= ~0x1f;
     }
     param.rate = MIC_SAMPLING_RATE_8180;
-    param.loop = FALSE;
-    param.fullCallback = (MICCallback)callback;
-    param.fullArg = done;
+    param.loop_enable = FALSE;
+    param.full_callback = (MICCallback)callback;
+    param.full_arg = done;
     return SndMic_StartSampling(&param);
 }
 

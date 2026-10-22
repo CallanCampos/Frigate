@@ -4,7 +4,7 @@
 #include "nitro/svc.h"
 #include "twl/scfg.h"
 
-static asm void OSi_SpinWaitCpuCycles(u32 cycles);
+static asm void OS_SpinWait(u32 cycles);
 static u16 *sys_get_boot_indicator_ptr(void);
 
 #pragma thumb off
@@ -71,8 +71,8 @@ asm OSProcMode OS_GetProcMode(void) {
     bx lr
 }
 
-// NitroSDK's OSi_SpinWaitCpuCycles, assembly in the SDK: a loop of four CPU cycles per turn
-static asm void OSi_SpinWaitCpuCycles(u32 cycles) {
+// NitroSDK's OS_SpinWait, assembly in the SDK: a loop of four CPU cycles per turn
+static asm void OS_SpinWait(u32 cycles) {
 @loop:
     subs r0, r0, #4
     bhs @loop
@@ -86,7 +86,7 @@ static asm void OSi_SpinWaitCpuCycles(u32 cycles) {
 void OS_SpinWaitSysCycles(u32 cycles) {
     cycles <<= ((reg_SCFG_CLK & SCFG_CLK_CPU_2X) == 1) ? 2 : 1;
     if (cycles > 16) {
-        OSi_SpinWaitCpuCycles(cycles - 16);
+        OS_SpinWait(cycles - 16);
     }
 }
 

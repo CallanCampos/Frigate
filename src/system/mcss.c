@@ -324,7 +324,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
-    MAT3_To4x4(&rotation, &billboard);
+    MTX_Copy33To44_(&rotation, &billboard);
 
     for (i = 0; i < system->count; i++) {
         NNSG2dMultiCellAnimation *mcAnim;

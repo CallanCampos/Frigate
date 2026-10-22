@@ -178,10 +178,10 @@ u16 NNS_G2dEntryOamManagerAffine(NNSG2dOamManagerInstance *man, const MtxFx22 *m
         GXOamAttr *dst = &GetOamBuffer_(man->type)->oamBuffer[man->managedAffineRegion.currentIdx * 4];
         u16 affineIdx = man->managedAffineRegion.currentIdx;
 
-        dst[0].affineParam = mtx->_00 >> 4;
-        dst[1].affineParam = mtx->_01 >> 4;
-        dst[2].affineParam = mtx->_10 >> 4;
-        dst[3].affineParam = mtx->_11 >> 4;
+        dst[0]._3 = mtx->_00 >> 4;
+        dst[1]._3 = mtx->_01 >> 4;
+        dst[2]._3 = mtx->_10 >> 4;
+        dst[3]._3 = mtx->_11 >> 4;
         man->managedAffineRegion.currentIdx++;
         return affineIdx;
     }
@@ -229,10 +229,10 @@ static inline void LoadAffinesByFunction_(u32 type, int from, int to) {
     OamLoadFunction load = loadFunctions_[type];
 
     for (i = 0; i < num; i++) {
-        load(&src[0].affineParam, offset + 6, sizeof(u16));
-        load(&src[1].affineParam, offset + 14, sizeof(u16));
-        load(&src[2].affineParam, offset + 22, sizeof(u16));
-        load(&src[3].affineParam, offset + 30, sizeof(u16));
+        load(&src[0]._3, offset + 6, sizeof(u16));
+        load(&src[1]._3, offset + 14, sizeof(u16));
+        load(&src[2]._3, offset + 22, sizeof(u16));
+        load(&src[3]._3, offset + 30, sizeof(u16));
         offset += 4 * sizeof(GXOamAttr);
         src += 4;
     }

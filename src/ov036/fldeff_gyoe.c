@@ -258,7 +258,7 @@ static void func_ov036_021b41a0(G3DCamera *camera, const VecFx32 *src, VecFx32 *
     GFL_G3DCameraGetLookatTarget(camera, &target);
     MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     MI_Copy36B(&lookAt, &rot);
-    MAT3_Invert(&rot, &rot);
+    MTX_Inverse33(&rot, &rot);
     MTX_MultVec33(src, &rot, dest);
 }
 

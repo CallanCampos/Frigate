@@ -55,7 +55,7 @@ tools that show the differences.
   through an out-pointer rather than returning it into a local raises that variable's priority (`ReadWindow` in
   `ModExpMont`), and an inline's own declaration order sets its registers (`MulHalves` in `BigDiv`).
 - A static's base reloaded from the literal pool at each use, under `-ipa file`, means every callee-saved register was
-  taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBFrame_Store`
+  taken. An index local set early (`int index = aid - 1;`) is the usual culprit: multiboot's `MBi_ReceiveRequestDataPiece`
   (`mb_frame.c`) matches only with `aid - 1` written at each of its three uses, which keeps `aid` in r6 and the
   difference late in r7.
 - Results of an unrolled run of inline calls that are all collected before they are combined stay live together and
@@ -66,7 +66,7 @@ tools that show the differences.
   more and keeps the tables in `r4`/`r2` and the 4 in `fp` for the whole loop. `vct_encode_adpcm_16` gets the original's
   frame and hoisted tables the same way, ORing its four codes into one `u8` with `|=` as they come.
 - A value passed to a `static inline` stays in a register across the inline's stores, where a field read again at
-  each use (`cb->aid`) is reloaded after each store: multiboot's `MBComm_OnWmEvent` (`mb_comm.c`) matches with its
+  each use (`cb->aid`) is reloaded after each store: multiboot's `MBi_CommParentCallback` (`mb_comm.c`) matches with its
   disconnect step as an inline taking the aid.
 - A loop that walks on from a parameter reuses the parameter as its cursor, with the start kept in a local
   (`int start = pos;`), as `b_plist_main.c`'s `BPlistMain_GetNextPos` does; a separate counter swaps the registers.
@@ -216,7 +216,7 @@ Same instructions, registers swapped.
   functions; in `status_rcv.c`'s `StatusRcv_CanUseItem`, six effort values with the same uses, assigned one after
   another, went to `r5` and `r7` by declaration order instead: the last declared got `r5` and the one before it `r7`,
   and the rest took stack slots, the first declared highest. In a large function the declaration order can outweigh a
-  wide gap in uses: NitroSDK's `FSi_GetPathDefault` (`fs_command_default.c`, 0x24c bytes) gives `r4` to `fileId` and
+  wide gap in uses: NitroSDK's `FSi_GetPathCommand` (`fs_command_default.c`, 0x24c bytes) gives `r4` to `fileId` and
   `r5` to `dirId`, with about 6 and 14 uses, only with `fileId` declared first.
 - A narrow local that is only ever used widened, compared after promotion or used as an index, is colored after every
   declared local wherever it is declared, since what the code holds is the compiler's widened copy. Declared `int`, it
@@ -1281,7 +1281,7 @@ Same code, other `sp` offsets or frame size.
   `if`) rather than through `ab` reassigned or a ternary: with `a` read in the products, its loads are scheduled
   between the stores and the registers rotate (196 bytes in `MTX_Concat33`).
 - Of independent statements that all feed later code, the one written first takes the lower registers. libfx's
-  `MAT3_Invert` and `MTX_Inverse43` compute their three cofactors as `t1`, `t0`, `t2`, not in their index order:
+  `MTX_Inverse33` and `MTX_Inverse43` compute their three cofactors as `t1`, `t0`, `t2`, not in their index order:
   with `t0` first, the registers of the first products swap (14 and 16 bytes).
 - A field read in an `if`'s condition and again in its body is a global common subexpression, loaded into a
   temporary ahead of the condition's other loads: `btlv_mcss.c`'s move end callbacks, `if (task->seq ==
@@ -1355,7 +1355,7 @@ Same instructions, scheduled in another order.
   BtlPokeCon *pokeCon`, like the file's `GetPokeParamConst`. Ours stored `pos` at entry, and its width and the
   callee's did not move it.
   The reverse also shows: a store the original keeps after loads through a pointer, which ours hoists above them, means
-  the parameter isn't `const`. Multiboot's `MBFile_LocateBlock` (`mb_segment.c`) matched once its `file` lost the
+  the parameter isn't `const`. Multiboot's `MBi_get_blockinfo` (`mb_segment.c`) matched once its `file` lost the
   `const`, and a non-`const` local cast from it did nothing.
   It has to be the parameter: `fld_scenearea_loader.c`'s camera-area callbacks scheduled their area's loads only
   once the callback typedefs took `const CameraArea *`, and a `const` local pointer to the member did nothing. The
@@ -1407,7 +1407,7 @@ Same instructions, scheduled in another order.
   `field_player_grid.c`'s `FieldPlayerGrid_DecideCommandBike`.
 - A constant return value built between a load and the store of the loaded value (`ldr r1, [r6, #4]; movs r0, #0; str
   r1, [r4, #0x28]`) is a `result` assigned before that store, with every case ending in `break` and one `return result;`
-  after the switch. NitroSDK's `FSi_MemoryArchiveProc` (`fs_memfile.c`) matches with `result = FS_RESULT_SUCCESS;` right
+  after the switch. NitroSDK's `FSi_MemArchiveProc` (`fs_memfile.c`) matches with `result = FS_RESULT_SUCCESS;` right
   before its last store; `return FS_RESULT_SUCCESS;`, or the assignment after the store, builds the constant after it,
   and MWCC gives each path its own `pop` either way.
 - The order of a switch's cases in the source is the order of their bodies, while the compares stay sorted by value:
@@ -1790,7 +1790,7 @@ Same instructions, scheduled in another order.
   the first block's transform (31 bytes).
 - `(u16)(n * 2)` in one expression folds into `lsls #0x11; lsrs #0x10`; the product in an `int` or `u32` local, cast at
   the use, keeps `lsls #1` and `lsls #0x10; lsrs #0x10` apart. A `u16` local or parameter and `& 0xffff` fold too.
-  Multiboot's `MBGameInfo_Build` (`mb_gameinfo.c`) matched with `nameSize = MBGameInfo_CountChars(name) *
+  Multiboot's `MBi_MakeGameInfo` (`mb_gameinfo.c`) matched with `nameSize = mystrlen(name) *
   sizeof(u16);` and `(u16)nameSize` in the copy.
 - An `ands` with 0xffff kept before a `strh`, its mask built at run time (`movs r5, #0xff; lsls; orrs`) and shared
   by two stores, is one packed-byte expression in two inline calls: MWCC holds the expression's constants in
@@ -1800,7 +1800,7 @@ Same instructions, scheduled in another order.
   store to `reg_G2_WIN0V` keeps it. When an SDK inline won't give the original's code, compare it with the SDK's text.
 - Two loops in a row that share one counter can swap the second loop's counter with another local; a counter of its
   own, declared before that local, fixes it where no declaration order with the shared one does
-  (`MBGameInfo_SendMembers`, `mb_gameinfo.c`).
+  (`MBi_SendVolatBeacon`, `mb_gameinfo.c`).
 - MWCC folds `x | 2 | 1` into one OR. Two ORs in the original come from an inline that ORs its `u32` parameter with
   one flag, called with the other already in: multiboot's `MBGameInfo_SetBeacon` (`mb_gameinfo.c`). An `int`
   parameter still folds, since the argument expression is substituted, and a `u8`/`u16` one adds a narrowing.
@@ -1812,16 +1812,16 @@ Same instructions, scheduled in another order.
   `&= ~~overwrite` written in place, which leaves each of the four renderers 4 bytes short.
 - A field loaded again at every use, even right after it was read into a local (`task = q->head;` then
   `q->head->next`), is `volatile` in its struct, and that is natural for data that other threads change. Multiboot's
-  task queue (`mb_task.c`) keeps `MBTask *volatile head`, which the task thread and the threads adding jobs share;
-  with it `MBTask_ThreadMain` and `MBTask_Add` match. The same goes for DWC's HTTP client (`nhttp_internal.h`): the response's `headerSize`, which the receiving thread
+  task queue (`mb_task.c`) keeps `MBiTaskInfo *volatile head`, which the task thread and the threads adding jobs share;
+  with it `MBi_TaskThread` and `MBi_SetTask` match. The same goes for DWC's HTTP client (`nhttp_internal.h`): the response's `headerSize`, which the receiving thread
   stores and reloads at once, and the request list's `count`, whose `id = info->count++` loads the field twice, once
   for the result and once for the increment, as only a `volatile` lvalue does.
 - A global reached through a cast to a derived struct, `((Derived *)gBase)->arr[n].f`, is addressed as
   `(base + n * size) + offsetof(f)`, where the global's own type folds the constants first. Multiboot's work global
-  is the parent's and child's shared part, which the parent's code casts to its extension (`MB_PARENT_WORK`), and
+  is the parent's and child's shared part, which the parent's code casts to its extension (`pPwork`), and
   `MB_DisconnectChild` (`mb_wm.c`) only matches through it.
 - A narrowing missing after an `if`/`else` that assigns a `u16` in both branches comes from a conditional expression:
-  `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `MBWm_NextChannel`
+  `channel = (channel == 0) ? 1 : channel << 1;` narrows once after the merge, which multiboot's `changeScanChannel`
   (`mb_wm.c`) needed.
 - A member's address kept in a callee-saved register from an early store to a later call's argument, where ours
   recomputes it: `btlv_mcss.c`'s `BtlvMcss_Transform` needed a pointer local declared at the top but assigned just
@@ -2087,7 +2087,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `PStatus_InitText` sets two font colors through `GXRgb *pltt = (GXRgb *)(HW_DB_BG_PLTT + 0x1c0);`.
 - A register's address that a function both writes through and then uses as a value is one pointer local, written
   through and converted: NitroSDK's `MIi_DmaSetParameters` (`mi_dma_itcm.c`) sets a channel's fill data with
-  `vu32 *fill = (vu32 *)(MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32)); *fill = src; src = (u32)fill;` in each fill
+  `vu32 *fill = (vu32 *)(MIi_DMA_CLEAR_DATA_BUF + dmaNo * sizeof(u32)); *fill = src; src = (u32)fill;` in each fill
   arm. A typed index for the store and integer arithmetic for the value (`((vu16 *)BASE)[dmaNo * 2] = src;` and
   `src = BASE + dmaNo * 4;`) are two expressions that MWCC merges only late: that costs a register copy and another use
   of the index, moves every register of the function, and keeps the 16-bit arm from cross-jumping into the 32-bit
@@ -2181,7 +2181,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A pointer compared with `NULL`, which is `((void *)0)`, can share a zero that the function keeps in a register for its
   stores, `cmp r0, r5`, where `if (p)` and `if (!p)` compare with `#0`; keeping that zero alive moves other registers
   too. `snd_command.c`'s `SND_CommandInit` stores eight zeros before its calls and matches only with `if (command)`;
-  `wm_system.c`'s `WmInit` and `nvram.c`'s callbacks need the same. The zero can also be kept in a saved register
+  `wm_system.c`'s `WmInitCore` and `nvram.c`'s callbacks need the same. The zero can also be kept in a saved register
   across a call and returned for a `FALSE` (`movne r0, r6`), and then every `NULL` test that shares it has to go:
   libVCT's `vct_flush_send_buffer` (`vct_audio.c`) tests `sSendInfo.ptr` before and after its `vct_prepare_send_buffer` call
   and matches only with both tests written `!p` and `p && ...`; either one left against `NULL` keeps the zero.
@@ -2505,7 +2505,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   also puts the loop counter in `r4` rather than `r5`.
 - `BOOL x = a && b && c && ...` used as a value compiles to one flag per `&&` level, all zeroed up front, outermost
   first, and set by nested tests, the first covering two compares. Flags like that in the asm are such a chain, not
-  separate variables: multiboot's `MBWm_ChildCallback` (`mb_wm.c`) has its beacon and BSSID checks as two of them.
+  separate variables: multiboot's `MBi_ChildCallback` (`mb_wm.c`) has its beacon and BSSID checks as two of them.
 - With constant arguments, the order of an inline's `if`/`else` arms decides how much MWCC folds. NitroSDK's
   `G2_SetOBJEffect` (`nitro/gx.h`) keeps two stores and a `cmp #0x100` in NitroSystem's `SetAffinedOamPosition_`
   only when written `if (effect != AFFINE && effect != AFFINE_DOUBLE) { plain store } else { store with the
@@ -2927,10 +2927,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   the register too, but names nothing. See the function's row for what still differs.
 - A loop bound held in a local is computed where the local is set, and one set before a call lives across it and can
   push another local to the stack. Written in the loop condition, the bound is computed just before the loop:
-  multiboot's `MBCache_Read` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_ENTRY_COUNT]` in the `for`
+  multiboot's `MBi_ReadFromCache` (`mb_cache.c`) matched with `entry < &cache->entries[MB_CACHE_INFO_MAX]` in the `for`
   and lost its `end` local, which had been computed before `OS_DisableInterrupts()` and pushed `found` to the stack.
 - MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
-  stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
+  stepped them: multiboot's `MBi_MakeDownloadFileInfo` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
 - Inside a loop, MWCC rewrites the reads `p[v]`, `p[v + 1]` and `p[v + 2]` of a 32-bit `v` into one `p + v * 4` kept
   in a register and the offsets 4 and 8 in the loads, whatever the loop's size and whether or not `v` is an induction

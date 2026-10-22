@@ -37,9 +37,9 @@ typedef struct {
 // The smallest packet the parent sends
 #define MB_COMM_PARENT_SEND_MIN 256
 
-// The results of the library's calls (MB_SUCCESS) and the error codes of MB_COMM_PSTATE_ERROR
+// The results of the library's calls (MB_ERRCODE_SUCCESS) and the error codes of MB_COMM_PSTATE_ERROR
 enum {
-    MB_SUCCESS,
+    MB_ERRCODE_SUCCESS,
     MB_ERRCODE_INVALID_PARAM,
     MB_ERRCODE_INVALID_STATE,
     MB_ERRCODE_INVALID_DLFILEINFO,

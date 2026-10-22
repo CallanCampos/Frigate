@@ -9,12 +9,9 @@
 // NNS_SndPlayerSetTrackModSpeed by their code
 
 #define NNS_SND_PLAYER_NUM 32
-#define SND_PLAYER_NUM 16
 
 #define NNS_SND_VOLUME_MAX 127
 #define SND_TRACK_MASK_ALL 0xffff
-// The quietest volume in decibels, which a sequence fading out stops at
-#define SND_VOLUME_DB_MIN -723
 
 // A player number: its sequences playing, by priority, and its free heaps
 struct NNSSndPlayer {

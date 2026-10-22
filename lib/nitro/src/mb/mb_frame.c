@@ -8,56 +8,56 @@
 // The pieces of the requests so far, the size of a piece and how many a request has
 static struct {
     u32 unk_00;
-    MBFrameBuffer *buf;
-    int payloadSize;
-    int fragmentCount;
-    int slotSize;
+    MbRequestPieceBuf *buf;
+    int size;
+    int num;
+    int bufSize;
     u32 unk_14;
 } sMBFrame;
 
-static BOOL MBFrame_IsComplete(u16 aid);
-static const void *MBFrame_Store(const MBChildFrame *frame, u16 aid);
+static BOOL IsGetAllRequestData(u16 aid);
+static const void *MBi_ReceiveRequestDataPiece(const MBCommChildBlockHeader *frame, u16 aid);
 
 // Sets the size of the frames of the children, which tells the size of a piece of a request
-void MBFrame_SetPayloadSize(int size) {
-    sMBFrame.payloadSize = size - 2;
-    sMBFrame.fragmentCount = MB_FRAME_SLOT_SIZE / sMBFrame.payloadSize;
-    sMBFrame.slotSize = MB_FRAME_SLOT_SIZE;
+void MBi_SetChildMPMaxSize(int size) {
+    sMBFrame.size = size - 2;
+    sMBFrame.num = MB_FRAME_SLOT_SIZE / sMBFrame.size;
+    sMBFrame.bufSize = MB_FRAME_SLOT_SIZE;
 }
 
-void MBFrame_SetBuffer(MBFrameBuffer *buf) {
+void MBi_SetParentPieceBuffer(MbRequestPieceBuf *buf) {
     sMBFrame.buf = buf;
-    MI_CpuFill8(buf, 0, sizeof(MBFrameBuffer));
+    MI_CpuFill8(buf, 0, sizeof(MbRequestPieceBuf));
 }
 
 // Forgets the pieces of a child's request
-void MBFrame_ClearChild(u16 aid) {
+void MBi_ClearParentPieceBuffer(u16 aid) {
     if (sMBFrame.buf != NULL) {
         int index = aid - 1;
 
-        MI_CpuFill8(sMBFrame.buf->slot[index], 0, MB_FRAME_SLOT_SIZE);
-        sMBFrame.buf->received[index] = 0;
+        MI_CpuFill8(sMBFrame.buf->data_buf[index], 0, MB_FRAME_SLOT_SIZE);
+        sMBFrame.buf->data_bmp[index] = 0;
     }
 }
 
 // Writes a frame of the parent to a buffer, and gives where the data that goes with it starts, or NULL for a type
 // that is not known
-u8 *MBFrame_Encode(const MBFrame *frame, u8 *dst) {
+u8 *MBi_MakeParentSendBuffer(const MBCommParentBlockHeader *frame, u8 *dst) {
     u8 *p = dst;
 
     *p++ = frame->type;
     switch (frame->type) {
-    case MB_FRAME_CONNECTED:
-    case MB_FRAME_KICK:
-    case MB_FRAME_FILE_INFO:
-    case MB_FRAME_BOOT:
-    case MB_FRAME_MEMBER_FULL:
+    case MB_COMM_TYPE_PARENT_SENDSTART:
+    case MB_COMM_TYPE_PARENT_KICKREQ:
+    case MB_COMM_TYPE_PARENT_DL_FILEINFO:
+    case MB_COMM_TYPE_PARENT_BOOTREQ:
+    case MB_COMM_TYPE_PARENT_MEMBER_FULL:
         break;
-    case MB_FRAME_BLOCK:
-        *p++ = frame->value & 0xff;
-        *p++ = (frame->value & 0xff00) >> 8;
-        *p++ = frame->value2 & 0xff;
-        *p++ = (frame->value2 & 0xff00) >> 8;
+    case MB_COMM_TYPE_PARENT_DATA:
+        *p++ = frame->fid & 0xff;
+        *p++ = (frame->fid & 0xff00) >> 8;
+        *p++ = frame->seqno & 0xff;
+        *p++ = (frame->seqno & 0xff00) >> 8;
         break;
     default:
         return NULL;
@@ -66,33 +66,33 @@ u8 *MBFrame_Encode(const MBFrame *frame, u8 *dst) {
 }
 
 // Reads a frame of a child. A piece of a request is stored; the request is given once it is whole
-const void *MBFrame_Decode(const u8 *src, MBChildFrame *out, u16 aid) {
+const void *MBi_SetRecvBufferFromChild(const u8 *src, MBCommChildBlockHeader *out, u16 aid) {
     const u8 *next;
 
     out->type = src[0];
     switch (out->type) {
-    case MB_FRAME_REQUEST:
-        if (MBFrame_IsComplete(aid)) {
-            return sMBFrame.buf->slot[aid - 1];
+    case MB_COMM_TYPE_CHILD_FILEREQ:
+        if (IsGetAllRequestData(aid)) {
+            return sMBFrame.buf->data_buf[aid - 1];
         }
         out->fragment = src[1];
-        if (out->fragment > sMBFrame.fragmentCount) {
+        if (out->fragment > sMBFrame.num) {
             return NULL;
         }
-        MI_CpuCopy8(src + 2, out->pieceData, sMBFrame.payloadSize);
-        next = MBFrame_Store(out, aid);
+        MI_CpuCopy8(src + 2, out->pieceData, sMBFrame.size);
+        next = MBi_ReceiveRequestDataPiece(out, aid);
         break;
-    case MB_FRAME_DOWNLOAD_REQUEST:
+    case MB_COMM_TYPE_CHILD_ACCEPT_FILEINFO:
         next = src + 3;
         out->value = src[1];
         out->value |= (src[2] << 8) & 0xff00;
         break;
-    case MB_FRAME_BLOCK_REQUEST:
+    case MB_COMM_TYPE_CHILD_CONTINUE:
         next = src + 3;
         out->value = src[1];
         out->value |= (src[2] << 8) & 0xff00;
-        MI_CpuCopy8(next, out->data, sMBFrame.payloadSize);
-        next += sMBFrame.payloadSize;
+        MI_CpuCopy8(next, out->data, sMBFrame.size);
+        next += sMBFrame.size;
         break;
     default:
         return NULL;
@@ -101,29 +101,29 @@ const void *MBFrame_Decode(const u8 *src, MBChildFrame *out, u16 aid) {
 }
 
 // Puts a piece of a request in its place in the child's slot
-static const void *MBFrame_Store(const MBChildFrame *frame, u16 aid) {
+static const void *MBi_ReceiveRequestDataPiece(const MBCommChildBlockHeader *frame, u16 aid) {
     u8 fragment;
 
     if (sMBFrame.buf == NULL) {
         return NULL;
     }
     fragment = frame->fragment;
-    if (fragment > sMBFrame.fragmentCount) {
+    if (fragment > sMBFrame.num) {
         return NULL;
     }
-    MI_CpuCopy8(frame->pieceData, &sMBFrame.buf->slot[aid - 1][fragment * sMBFrame.payloadSize], sMBFrame.payloadSize);
-    sMBFrame.buf->received[aid - 1] |= 1 << fragment;
-    if (MBFrame_IsComplete(aid)) {
-        return sMBFrame.buf->slot[aid - 1];
+    MI_CpuCopy8(frame->pieceData, &sMBFrame.buf->data_buf[aid - 1][fragment * sMBFrame.size], sMBFrame.size);
+    sMBFrame.buf->data_bmp[aid - 1] |= 1 << fragment;
+    if (IsGetAllRequestData(aid)) {
+        return sMBFrame.buf->data_buf[aid - 1];
     }
     return NULL;
 }
 
-static BOOL MBFrame_IsComplete(u16 aid) {
+static BOOL IsGetAllRequestData(u16 aid) {
     u16 i;
 
-    for (i = 0; i < sMBFrame.fragmentCount; i++) {
-        if ((sMBFrame.buf->received[aid - 1] & (1 << i)) == 0) {
+    for (i = 0; i < sMBFrame.num; i++) {
+        if ((sMBFrame.buf->data_bmp[aid - 1] & (1 << i)) == 0) {
             return FALSE;
         }
     }

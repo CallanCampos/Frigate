@@ -11,8 +11,8 @@
 #include "twl/mic.h"
 
 // A command is a series of words with the microphone's tag, as in nitro/spi/mic.c
-#define MIC_PXI_START 0x02000000
-#define MIC_PXI_END 0x01000000
+#define SPI_PXI_START_BIT 0x02000000
+#define SPI_PXI_END_BIT 0x01000000
 #define MIC_PXI_INDEX(index) ((index) << 16)
 #define MIC_PXI_COMMAND(command) ((command) << 8)
 // The DSi's commands, which start and stop the sampling that is limited to the sampling rates below
@@ -105,25 +105,25 @@ MICResult MICEXi_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallbac
         return MIC_RESULT_ILLEGAL_PARAMETER;
     }
 
-    mode = param->loop ? (type | MIC_PXI_TYPE_LOOP) : (type & ~MIC_PXI_TYPE_LOOP);
+    mode = param->loop_enable ? (type | MIC_PXI_TYPE_LOOP) : (type & ~MIC_PXI_TYPE_LOOP);
     mode = mode & ~MIC_PXI_TYPE_UNK_20;
 
     enabled = OS_DisableInterrupts();
-    if (work->busy) {
+    if (work->lock) {
         OS_RestoreInterrupts(enabled);
         return MIC_RESULT_BUSY;
     }
-    work->busy = TRUE;
+    work->lock = TRUE;
     OS_RestoreInterrupts(enabled);
 
     work->callback = callback;
     work->callbackArg = arg;
-    work->fullCallback = param->fullCallback;
-    work->fullArg = param->fullArg;
+    work->full = param->full_callback;
+    work->fullArg = param->full_arg;
     if (func_02703f7c(param->buffer, param->size, param->rate, mode)) {
         return MIC_RESULT_SUCCESS;
     }
-    work->busy = FALSE;
+    work->lock = FALSE;
     return MIC_RESULT_SEND_ERROR;
 }
 
@@ -148,11 +148,11 @@ static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg
     MICWork *work = MICi_GetSysWork();
     OSIntrMode enabled = OS_DisableInterrupts();
 
-    if (work->busy) {
+    if (work->lock) {
         OS_RestoreInterrupts(enabled);
         return MIC_RESULT_BUSY;
     }
-    work->busy = TRUE;
+    work->lock = TRUE;
     OS_RestoreInterrupts(enabled);
 
     work->callback = callback;
@@ -160,7 +160,7 @@ static MICResult MICEXi_StopLimitedSamplingAsync(MICCallback callback, void *arg
     if (func_02704088()) {
         return MIC_RESULT_SUCCESS;
     }
-    work->busy = FALSE;
+    work->lock = FALSE;
     return MIC_RESULT_SEND_ERROR;
 }
 
@@ -174,7 +174,7 @@ static void func_02703f60(MICResult result, void *arg) {
 
 // Sends the command that starts the sampling, in seven words
 static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type) {
-    if (MIC_PXI_SEND(MIC_PXI_START | MIC_PXI_COMMAND(MICEX_PXI_COMMAND_LIMITED_ON) | type) < 0) {
+    if (MIC_PXI_SEND(SPI_PXI_START_BIT | MIC_PXI_COMMAND(MICEX_PXI_COMMAND_LIMITED_ON) | type) < 0) {
         return FALSE;
     }
     if (MIC_PXI_SEND(MIC_PXI_INDEX(1) | ((u32)buffer >> 16)) < 0) {
@@ -192,7 +192,7 @@ static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type) {
     if (MIC_PXI_SEND(MIC_PXI_INDEX(5) | (rate >> 16)) < 0) {
         return FALSE;
     }
-    if (MIC_PXI_SEND(MIC_PXI_END | MIC_PXI_INDEX(6) | (rate & 0xffff)) < 0) {
+    if (MIC_PXI_SEND(SPI_PXI_END_BIT | MIC_PXI_INDEX(6) | (rate & 0xffff)) < 0) {
         return FALSE;
     }
     return TRUE;
@@ -200,7 +200,7 @@ static BOOL func_02703f7c(void *buffer, u32 size, u32 rate, u8 type) {
 
 // Sends the command that stops the sampling
 static BOOL func_02704088(void) {
-    if (MIC_PXI_SEND(MIC_PXI_START | MIC_PXI_END | MIC_PXI_COMMAND(MICEX_PXI_COMMAND_LIMITED_OFF)) < 0) {
+    if (MIC_PXI_SEND(SPI_PXI_START_BIT | SPI_PXI_END_BIT | MIC_PXI_COMMAND(MICEX_PXI_COMMAND_LIMITED_OFF)) < 0) {
         return FALSE;
     }
     return TRUE;

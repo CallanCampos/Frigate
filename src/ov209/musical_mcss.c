@@ -251,7 +251,7 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
     }
     MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
-    MAT3_To4x4(&rotation, &billboard);
+    MTX_Copy33To44_(&rotation, &billboard);
 
     for (i = 0; i < sys->count; i++) {
         NNSG2dMultiCellAnimation *mcAnim;

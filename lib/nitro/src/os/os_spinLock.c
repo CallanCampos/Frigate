@@ -19,7 +19,7 @@ static void OSi_AllocateCardBus(void);
 static void OSi_FreeCardBus(void);
 
 // Whether OS_InitLock has run
-static BOOL sLockInitialized;
+static BOOL isInitialized;
 
 // NitroSDK's OSi_SyncWithOtherProc: a handshake through four bytes of shared memory that the other processor runs
 // the opposite half of. With c 0 it writes a counter into p[0] until the other side echoes it into p[1], or says in
@@ -60,10 +60,10 @@ void OSi_SyncWithOtherProc(int c, vu8 *p) {
 }
 
 void OS_InitLock(void) {
-    if (sLockInitialized) {
+    if (isInitialized) {
         return;
     }
-    sLockInitialized = TRUE;
+    isInitialized = TRUE;
     *(u32 *)HW_INIT_LOCK_BUF = 0xffffffff;
     *(u32 *)(HW_INIT_LOCK_BUF + 4) = 0xffff0000;
     MI_CpuClear32((void *)(HW_INIT_LOCK_BUF + 0x10), 0x28);

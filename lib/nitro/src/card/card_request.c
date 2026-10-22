@@ -12,7 +12,7 @@
 // command, which wakes the thread that waits for it
 void CARDi_OnFifoRecv(PXIFifoTag fifoTag, u32 data, BOOL err) {
     if (fifoTag == PXI_FIFO_TAG_FS && err) {
-        cardi_common.flag &= ~CARD_STAT_WAITFOR7ACK;
+        cardi_common.flag &= ~CARD_STAT_REQ;
         OS_WakeupThreadDirect(cardi_common.curThread);
     }
 }
@@ -32,7 +32,7 @@ BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry) {
     DC_WaitWriteBufferEmpty();
     p->curThread = OS_GetCurrentThread();
     do {
-        p->flag |= CARD_STAT_WAITFOR7ACK;
+        p->flag |= CARD_STAT_REQ;
         while (PXI_SendWordByFifo(PXI_FIFO_TAG_FS, reqType, TRUE) < 0) {
         }
         if (reqType == CARD_REQ_INIT) {
@@ -42,7 +42,7 @@ BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry) {
         }
         {
             OSIntrMode irq = OS_DisableInterrupts();
-            while ((p->flag & CARD_STAT_WAITFOR7ACK) != 0) {
+            while ((p->flag & CARD_STAT_REQ) != 0) {
                 OS_SleepThread(NULL);
             }
             OS_RestoreInterrupts(irq);

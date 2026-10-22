@@ -4,34 +4,34 @@
 #include "nitro/snd.h"
 
 typedef struct SNDAlarm {
-    SNDAlarmHandler handler;
+    SNDAlarmHandler func;
     void *arg;
     u8 id;
 } SNDAlarm;
 
-static SNDAlarm sAlarms[SND_ALARM_MAX];
+static SNDAlarm sCallbackTable[SND_ALARM_NUM];
 
 void SND_AlarmInit(void) {
     int i;
 
-    for (i = 0; i < SND_ALARM_MAX; i++) {
-        sAlarms[i].handler = NULL;
-        sAlarms[i].arg = NULL;
-        sAlarms[i].id = 0;
+    for (i = 0; i < SND_ALARM_NUM; i++) {
+        sCallbackTable[i].func = NULL;
+        sCallbackTable[i].arg = NULL;
+        sCallbackTable[i].id = 0;
     }
 }
 
 void SNDi_IncAlarmId(int alarmNo) {
-    SNDAlarm *alarm = &sAlarms[alarmNo];
+    SNDAlarm *alarm = &sCallbackTable[alarmNo];
 
     alarm->id++;
 }
 
 // NitroSDK's SNDi_SetAlarmHandler: returns the alarm's new ID
 u8 SNDi_SetAlarmHandler(int alarmNo, SNDAlarmHandler handler, void *arg) {
-    SNDAlarm *alarm = &sAlarms[alarmNo];
+    SNDAlarm *alarm = &sCallbackTable[alarmNo];
 
-    alarm->handler = handler;
+    alarm->func = handler;
     alarm->arg = arg;
     alarm->id++;
     return alarm->id;
@@ -42,9 +42,9 @@ u8 SNDi_SetAlarmHandler(int alarmNo, SNDAlarmHandler handler, void *arg) {
 void SNDi_CallAlarmHandler(int data) {
     int alarmNo = (u8)data;
     int id = (u8)(data >> 8);
-    SNDAlarm *alarm = &sAlarms[alarmNo];
+    SNDAlarm *alarm = &sCallbackTable[alarmNo];
 
-    if (id == alarm->id && alarm->handler != NULL) {
-        alarm->handler(alarm->arg);
+    if (id == alarm->id && alarm->func != NULL) {
+        alarm->func(alarm->arg);
     }
 }

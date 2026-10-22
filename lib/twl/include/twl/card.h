@@ -35,10 +35,10 @@ typedef struct CARDRomHashBlock {
 } CARDRomHashBlock;
 
 typedef struct CARDRomHashContext {
-    ROMHeaderRegion area_ntr;
-    ROMHeaderRegion area_ltd;
-    ROMHeaderRegion sector_hash;
-    ROMHeaderRegion block_hash;
+    CARDRomRegion area_ntr;
+    CARDRomRegion area_ltd;
+    CARDRomRegion sector_hash;
+    CARDRomRegion block_hash;
     u32 bytes_per_sector;
     u32 sectors_per_block;
     u32 block_max;

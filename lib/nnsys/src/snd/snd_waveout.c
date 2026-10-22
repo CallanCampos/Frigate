@@ -7,8 +7,6 @@
 // NNS_SndWaveOutIsPlaying, and NNS_SndWaveOutSetVolume and NNS_SndWaveOutSetSpeed NNS_SndWaveOutSetVolume and
 // NNS_SndWaveOutSetSpeed
 
-#define SND_CHANNEL_NUM 16
-
 #define NNS_SND_WAVE_FORMAT_PCM8 0
 #define NNS_SND_WAVE_FORMAT_ADPCM 2
 

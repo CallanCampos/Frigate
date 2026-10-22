@@ -27,7 +27,7 @@ NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the address
 script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's linker
 script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values, the same
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
-(`Entry`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
+(`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
 `os_arena.c` reads. `tools/build/lcf_symbols.py` adds them after `__OVERLAY_COUNT` as absolute symbols, in
 `build/<version>/arm9_symbols.lcf`, the linker script that the link (or `--shift`'s padding) takes. Another one goes in
 the config when a file that reads it is written, with its value read from the pool word in both versions.

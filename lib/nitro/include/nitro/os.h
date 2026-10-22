@@ -61,16 +61,16 @@ void OSi_TerminateCore(void);
 #define OS_PXI_COMMAND_TERMINATE 0x20
 // NitroSDK's OSi_DoResetSystem, in ITCM: the function that OS_ResetSystem ends in
 void OSi_DoResetSystem(void);
-// The rest of the boot code in ITCM, which OSi_DoResetSystem calls and ends by jumping to OSi_StartProgram with: the
+// The rest of the boot code in ITCM, which OSi_DoResetSystem calls and ends by jumping to OSi_DoBoot with: the
 // check of the images that the card loaded against the hashes of the DSi header, the load of the program's images, the
 // card read, the word fill and the jump to the program's entry. All but OSi_DoResetSystem are named as guesses from
 // what their code does
 BOOL OSi_VerifyHmac(const void *data, u32 size, const void *hash);
 void OSi_VerifyRomBlocks(void);
 void OSi_LoadProgram(BOOL twl);
-void OSi_ReadRom(u32 address, void *dest, u32 size);
-void OSi_Clear32(u32 value, void *dest, u32 size);
-void OSi_StartProgram(void);
+void OSi_ReadCardRom32(u32 address, void *dest, u32 size);
+void OSi_CpuClear32(u32 value, void *dest, u32 size);
+void OSi_DoBoot(void);
 // NitroSDK's OS_Halt (swan's cp15_halt): stops the CPU until an interrupt
 void OS_Halt(void);
 // Writes a range of the data cache back to memory, before DMA reads it. NitroSDK's DC_FlushRange
@@ -95,9 +95,9 @@ u32 OS_GetDTCMAddress(void);
 // NitroSDK's OS_SetProtectionRegion (os_protectionRegion.c): sets the address and size of a region
 // of the memory protection unit, and enables it. The size is the size field of the region's register in place (bits 1
 // to 5, n for 2^(n + 1) bytes): 4 KB is n = 11 and 4 MB is n = 21
-#define OS_PROTECTION_SIZE_4KB (11 << 1)
-#define OS_PROTECTION_SIZE_4MB (21 << 1)
-#define OS_PROTECTION_SIZE_64MB (25 << 1)
+#define HW_C6_PR_4KB (11 << 1)
+#define HW_C6_PR_4MB (21 << 1)
+#define HW_C6_PR_64MB (25 << 1)
 void OS_SetProtectionRegion(int regionNo, u32 address, u32 size); // swan's SetMemoryProtectionRegion
 
 // The start of DTCM, where the linker places the DTCM module
@@ -138,16 +138,16 @@ typedef struct OSSystemWork {
     u32 bootCardId; // the ID of the card that the system read at boot
     u8 unk_004[0x38];
     u32 vblankCount;
-    u8 unk_040[0x40];
+    u8 wmBootBuf[0x40];
     u8 nvramUserInfo[0x80];
     u8 unk_100[0xe8];
-    u32 realTimeClock[2];
+    u32 real_time_clock[2];
     u8 unk_1f0[0x198];
     u32 pxiHandleChecker[2]; // one for each processor, with a bit for each PXI tag that it has a callback for
-    u32 micLastAddress;
-    u16 micSampling;
-    u16 unk_396;
-    u16 unk_398;
+    u32 mic_last_address;
+    u16 mic_sampling_data;
+    u16 wm_callback_control;
+    u16 wm_rssi_pool;
     u8 unk_39a[0x10];
     u16 touchPanelX;
     u16 touchPanelY;
@@ -162,8 +162,8 @@ typedef struct OSSystemWork {
 #define OS_IE_TIMER0 0x8
 #define OS_IE_TIMER1 0x10
 // The timers' bits start here, and the DMA channels' and the DSi's new DMA channels', each a bit after the last
-#define OS_IE_TIMER0_SHIFT 3
-#define OS_IE_DMA0_SHIFT 8
+#define REG_OS_IE_T0_SHIFT 3
+#define REG_OS_IE_D0_SHIFT 8
 #define OS_IE_NDMA0_SHIFT 28
 // The FIFO to the other processor has a word to receive
 #define OS_IE_FIFO_RECV 0x40000
@@ -441,36 +441,36 @@ typedef struct {
 // console's MAC address after them. Of the settings, the version and the alarm are not named
 #define HW_NVRAM_USER_INFO 0x02fffc80
 
-typedef struct NVRAMOwnerInfo {
+typedef struct NVRAMConfigOwnerInfo {
     u8 favoriteColor : 4;
     u8 : 4;
     OSBirthday birthday;
-    u8 unk_03;
+    u8 pad;
     u16 nickName[OS_OWNERINFO_NICKNAME_MAX];
     u8 nickNameLength;
     u8 unk_19;
     u16 comment[OS_OWNERINFO_COMMENT_MAX];
     u8 commentLength;
     u8 unk_4f;
-} NVRAMOwnerInfo;
+} NVRAMConfigOwnerInfo;
 
 // The touch screen's calibration: the raw values of two points, and where they are on the screen
-typedef struct NVRAMTouchCalibration {
-    u16 rawX1;
-    u16 rawY1;
-    u8 screenX1;
-    u8 screenY1;
-    u16 rawX2;
-    u16 rawY2;
-    u8 screenX2;
-    u8 screenY2;
-} NVRAMTouchCalibration;
+typedef struct NVRAMConfigTpCalibData {
+    u16 raw_x1;
+    u16 raw_y1;
+    u8 dx1;
+    u8 dy1;
+    u16 raw_x2;
+    u16 raw_y2;
+    u8 dx2;
+    u8 dy2;
+} NVRAMConfigTpCalibData;
 
 typedef struct NVRAMConfig {
     u16 unk_00;
-    NVRAMOwnerInfo owner;
-    u8 unk_52[6]; // the alarm
-    NVRAMTouchCalibration touch;
+    NVRAMConfigOwnerInfo owner;
+    u8 alarm[6]; // the alarm
+    NVRAMConfigTpCalibData tp;
     u16 language : 3;
     u16 unk_64_3 : 13;
     u16 unk_66;
@@ -566,8 +566,8 @@ typedef struct OSMutexQueue {
 
 // The numbers at the ends of a stack that the stack overflow checks look for: at the beginning of a stack, 8 bytes
 // under the address that a thread is given (4 under the IRQ stack's), and at the end where it would overflow
-#define OS_STACK_BEGIN_MAGIC 0xfddb597d
-#define OS_STACK_END_MAGIC 0x7bf9dd5b
+#define OSi_STACK_CHECKNUM_BOTTOM 0xfddb597d
+#define OSi_STACK_CHECKNUM_TOP 0x7bf9dd5b
 
 // A thread's destructor runs in the thread, when it ends, with the value that it ended with
 typedef void (*OSThreadDestructor)(void *arg);
@@ -784,27 +784,27 @@ void OS_CreateAlarm(OSAlarm *alarm);
 void OS_SetAlarm(OSAlarm *alarm, OSTick tick, OSAlarmHandler handler, void *arg);
 void OS_CancelAlarm(OSAlarm *alarm);
 
-// A V-count alarm: NitroSDK's OSVAlarm. It fires when the LCD scan is at line vcount of the frame, which the alarm's
+// A V-count alarm: NitroSDK's OSiVAlarm. It fires when the LCD scan is at line vcount of the frame, which the alarm's
 // frame counts from the first V-count alarm that was set, and up to delay lines later
 typedef void (*OSVAlarmHandler)(void *arg);
 
-typedef struct OSVAlarm {
+typedef struct OSiVAlarm {
     OSVAlarmHandler handler;
     void *arg;
     u32 tag;
     u32 frame;
-    s16 vcount;
+    s16 fire;
     s16 delay;
-    struct OSVAlarm *prev;
-    struct OSVAlarm *next;
-    BOOL periodic;
+    struct OSiVAlarm *prev;
+    struct OSiVAlarm *next;
+    BOOL period;
     BOOL finish;
     BOOL canceled;
-} OSVAlarm;
+} OSiVAlarm;
 
 // NitroSDK's OS_CreateVAlarm and OS_SetVAlarm
-void OS_CreateVAlarm(OSVAlarm *alarm);
-void OS_SetVAlarm(OSVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handler, void *arg);
+void OS_CreateVAlarm(OSiVAlarm *alarm);
+void OS_SetVAlarm(OSiVAlarm *alarm, s16 vcount, s16 delay, OSVAlarmHandler handler, void *arg);
 
 // NitroSDK's mutexes, which a thread may lock again; OS_LockMutex sleeps until the mutex is free
 typedef struct OSMutexLink {

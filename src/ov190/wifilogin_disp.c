@@ -677,8 +677,8 @@ static void WifiLoginDisp_HBlank(TCB *task, void *work) {
     int line = (reg_GX_VCOUNT + (disp->waveOffset + 1)) % WIFILOGIN_WAVE_COUNT;
 
     if (reg_GX_DISPSTAT & REG_GX_DISPSTAT_HBLK_MASK) {
-        reg_G2_BG1OFS = disp->wave[line] & REG_G2_BGOFS_HOFFSET_MASK;
-        reg_G2S_DB_BG2OFS = disp->wave[line] & REG_G2_BGOFS_HOFFSET_MASK;
+        reg_G2_BG1OFS = disp->wave[line] & REG_G2_BG0OFS_HOFFSET_MASK;
+        reg_G2S_DB_BG2OFS = disp->wave[line] & REG_G2_BG0OFS_HOFFSET_MASK;
     }
 }
 

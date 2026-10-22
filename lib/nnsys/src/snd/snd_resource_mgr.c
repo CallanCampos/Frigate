@@ -5,8 +5,6 @@
 // files. NNS_SndLockChannel and NNS_SndUnlockChannel are swan's names for NNS_SndLockChannel and NNS_SndUnlockChannel,
 // and NNSi_SndAllocAlarm and NNSi_SndFreeAlarm are NNSi_SndAllocAlarm and NNSi_SndFreeAlarm by their code
 
-#define SND_ALARM_NUM 8
-
 static u32 sLockChannel;
 static u32 sLockCapture;
 static u32 sAllocatedAlarm;

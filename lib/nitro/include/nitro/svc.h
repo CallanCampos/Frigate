@@ -11,9 +11,7 @@
 void SVC_WaitByLoop(u32 cycles);
 
 // SVC_CpuSet: copies or fills the words or halfwords the mode gives (the count in its low bits, the flags below), from
-// src to dest. A fill reads src once
-#define SVC_CPUSET_FILL 0x01000000
-#define SVC_CPUSET_32BIT 0x04000000
+// src to dest: MI_DMA_SRC_FIX fills, reading src once, and MI_DMA_32BIT_BUS moves words
 void SVC_CpuSet(const void *src, void *dest, u32 mode); // swan's CpuSet
 // SVC_CpuSetFast: SVC_CpuSet for words, 32 bytes at a time
 void SVC_CpuSetFast(const void *src, void *dest, u32 mode); // swan's CpuFastSet

@@ -13,7 +13,7 @@
 #define PM_RESULT_BUSY 1
 #define PM_RESULT_ERROR 2
 // A parameter has no request
-#define PM_RESULT_ILLEGAL_PARAMETER 0xffff
+#define PM_INVALID_COMMAND 0xffff
 
 // Called with the result when the ARM7 has answered
 typedef void (*PMCallback)(u32 result, void *arg);
@@ -121,10 +121,10 @@ static inline void PM_SetSleepCallbackInfo(PMSleepCallbackInfo *info, PMGenCallb
 #define PM_INSERT_APPEND 0
 #define PM_INSERT_PREPEND 1
 
-// PMi_InsertList, PMi_DeleteList and PMi_CallCallbackList, which TwlSDK's exit callbacks (the LTD autoload) use too
+// PMi_InsertList, PMi_DeleteList and PMi_ExecuteList, which TwlSDK's exit callbacks (the LTD autoload) use too
 void PMi_InsertList(PMGenCallbackInfo **list, PMGenCallbackInfo *info, int priority, int insertType);
 void PMi_DeleteList(PMGenCallbackInfo **list, PMGenCallbackInfo *info);
-void PMi_CallCallbackList(PMGenCallbackInfo *list);
+void PMi_ExecuteList(PMGenCallbackInfo *list);
 
 void PM_PrependPreSleepCallback(PMSleepCallbackInfo *info);
 void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info);

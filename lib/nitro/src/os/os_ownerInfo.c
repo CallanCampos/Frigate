@@ -5,7 +5,7 @@
 #include "nitro/os.h"
 
 // The favorite colors, as the RGB555 values that a color setting indexes
-static const u16 OSi_FavoriteColorTable[16] = {
+static const u16 col_table[16] = {
     0x4e0c, 0x0137, 0x0c1f, 0x7e3f, 0x025f, 0x039e, 0x03f5, 0x03e0,
     0x1e80, 0x4769, 0x7ae6, 0x7960, 0x4800, 0x6811, 0x741a, 0x481f,
 };
@@ -38,5 +38,5 @@ s64 OS_GetOwnerRtcOffset(void) {
 }
 
 const u16 *OS_GetFavoriteColorTable(void) {
-    return OSi_FavoriteColorTable;
+    return col_table;
 }

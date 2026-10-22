@@ -11,7 +11,7 @@
 // it
 typedef struct {
     OSEvent event;
-    OSVAlarm alarm;
+    OSiVAlarm alarm;
     BOOL (*condition)(void *arg);
     void *arg;
     // Only for the layout, not data: nothing reads or writes it, but CARD_LockRom's frame has the room for it
@@ -30,7 +30,7 @@ static void CARDi_InitCommand(void);
 // The statics lie in memory in reverse of the order here
 CARDiCommon cardi_common;
 static CARDiCommandArg cardi_arg;
-static BOOL sCardEnabled;
+static BOOL CARDi_EnableFlag;
 
 // Calls the condition each frame, at the first line of the vertical blank, until it holds
 static void CARDi_PollRomLock(void *arg) {
@@ -82,7 +82,7 @@ void CARD_Init(void) {
 }
 
 static BOOL CARD_IsEnabled(void) {
-    return sCardEnabled;
+    return CARDi_EnableFlag;
 }
 
 void CARD_CheckEnabled(void) {
@@ -92,7 +92,7 @@ void CARD_CheckEnabled(void) {
 }
 
 static void CARD_Enable(BOOL enable) {
-    sCardEnabled = enable;
+    CARDi_EnableFlag = enable;
 }
 
 CARDResult CARD_GetResultCode(void) {
@@ -103,8 +103,8 @@ const u8 *CARD_GetRomHeader(void) {
     return (const u8 *)HW_CARD_ROM_HEADER;
 }
 
-const ROMHeader *CARD_GetOwnRomHeader(void) {
-    return (const ROMHeader *)HW_ROM_HEADER_BUF;
+const CARDRomHeader *CARD_GetOwnRomHeader(void) {
+    return (const CARDRomHeader *)HW_ROM_HEADER_BUF;
 }
 
 const void *CARD_GetOwnRomHeaderTWL(void) {

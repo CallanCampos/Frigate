@@ -10,7 +10,7 @@
 // The card's registers are in nitro/hw.h
 
 // The control word of the ROM header for the card's normal commands
-#define CARD_ROM_HEADER_NORMAL_CONTROL (((const ROMHeader *)HW_CARD_ROM_HEADER)->normalCommandControl)
+#define CARD_ROM_HEADER_NORMAL_CONTROL (((const CARDRomHeader *)HW_CARD_ROM_HEADER)->normalCommandControl)
 // The bit of the boot card's ID that says that the card has the refresh command
 #define CARD_ROM_ID_HAS_REFRESH 0x20000000
 
@@ -111,7 +111,7 @@ static u32 CARDi_ReadRomIDCore(void) {
     reg_MI_MCCNT1 = ((CARD_ROM_HEADER_NORMAL_CONTROL & ~REG_MI_MCCNT1_PC_MASK) | REG_MI_MCCNT1_START_MASK |
                      REG_MI_MCCNT1_RESB_MASK | REG_MI_MCCNT1_PC_4B) &
                     ~REG_MI_MCCNT1_L1_MASK;
-    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_READY_MASK) == 0) {
+    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_RDY_MASK) == 0) {
     }
     return reg_MI_MCD1;
 }
@@ -125,7 +125,7 @@ static u32 CARDi_ReadRomStatus(void) {
     reg_MI_MCCNT1 = ((CARD_ROM_HEADER_NORMAL_CONTROL & ~REG_MI_MCCNT1_PC_MASK) | REG_MI_MCCNT1_START_MASK |
                      REG_MI_MCCNT1_RESB_MASK | REG_MI_MCCNT1_PC_4B) &
                     ~REG_MI_MCCNT1_L1_MASK;
-    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_READY_MASK) == 0) {
+    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_RDY_MASK) == 0) {
     }
     return reg_MI_MCD1;
 }
@@ -175,7 +175,7 @@ u32 CARDi_ReadRomWithCPU(void *arg, void *dst, u32 src, u32 len) {
             i = 0;
             do {
                 control = reg_MI_MCCNT1;
-                if ((control & REG_MI_MCCNT1_READY_MASK) != 0) {
+                if ((control & REG_MI_MCCNT1_RDY_MASK) != 0) {
                     u32 word = reg_MI_MCD1;
                     if (i < CARD_ROM_PAGE_SIZE / 4) {
                         buffer[i++] = word;
@@ -350,10 +350,10 @@ void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback c
 void CARDi_InitRom(void) {
     sRomReader = CARDi_ReadRomWithCPU;
     if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
-        if (CARD_GetOwnRomHeader()->romSize != 0) {
+        if (CARD_GetOwnRomHeader()->rom_size != 0) {
             u16 lockId = OS_GetLockID();
             CARD_LockRom(lockId);
-            CARDi_ReadRomWithCPU(NULL, sRomAuthCode, CARD_GetOwnRomHeader()->romSize, sizeof(sRomAuthCode));
+            CARDi_ReadRomWithCPU(NULL, sRomAuthCode, CARD_GetOwnRomHeader()->rom_size, sizeof(sRomAuthCode));
             CARD_UnlockRom(lockId);
             OS_ReleaseLockID(lockId);
         }

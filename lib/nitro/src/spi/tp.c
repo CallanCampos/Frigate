@@ -9,51 +9,51 @@
 #include "nitro/pxi.h"
 
 // A sample as the ARM7 writes it, in the two halfwords of the shared memory
-typedef union TPRawData {
-    u16 half[2];
+typedef union SPITpData {
+    u16 halfs[2];
     struct {
         u32 x : 12;
         u32 y : 12;
         u32 touch : 1;
         u32 validity : 2;
         u32 reserved : 5;
-    } sample;
-} TPRawData;
+    } e;
+} SPITpData;
 
-// A command is a series of words with the touch panel's tag: the first has TP_PXI_START and the command in bits 8 to
-// 14, the last has TP_PXI_END, and each of the others carries its index in bits 16 to 22 and 16 bits of data. The
-// ARM7 answers with the command in the same place and the result in the low byte
-#define TP_PXI_START 0x02000000
-#define TP_PXI_END 0x01000000
+// A command is a series of words with the touch panel's tag: the first has SPI_PXI_START_BIT and the command in bits 8
+// to 14, the last has SPI_PXI_END_BIT, and each of the others carries its index in bits 16 to 22 and 16 bits of data.
+// The ARM7 answers with the command in the same place and the result in the low byte
+#define SPI_PXI_START_BIT 0x02000000
+#define SPI_PXI_END_BIT 0x01000000
 #define TP_PXI_INDEX(index) ((index) << 16)
 #define TP_PXI_COMMAND(command) ((command) << 8)
-#define TP_PXI_COMMAND_MASK 0x7f00
-#define TP_PXI_RESULT_MASK 0xff
+#define SPI_PXI_RESULT_COMMAND_MASK 0x7f00
+#define SPI_PXI_RESULT_DATA_MASK 0xff
 
-#define TP_PXI_COMMAND_SAMPLING 0
-#define TP_PXI_COMMAND_AUTO_ON 1
-#define TP_PXI_COMMAND_AUTO_OFF 2
+#define SPI_PXI_COMMAND_TP_SAMPLING 0
+#define SPI_PXI_COMMAND_TP_AUTO_ON 1
+#define SPI_PXI_COMMAND_TP_AUTO_OFF 2
 // Sent by the ARM7 with every sample of the automatic sampling, which it has written to the shared memory
-#define TP_PXI_COMMAND_AUTO_SAMPLE 0x10
+#define SPI_PXI_COMMAND_TP_AUTO_SAMPLING 0x10
 
 #define TP_PXI_RESULT_SUCCESS 0
 #define TP_PXI_RESULT_INVALID_COMMAND 1
 #define TP_PXI_RESULT_INVALID_PARAMETER 2
 #define TP_PXI_RESULT_ILLEGAL_STATUS 3
-#define TP_PXI_RESULT_BUSY 4
+#define SPI_PXI_RESULT_EXCLUSIVE 4
 
 // What the callback is told
 #define TP_RESULT_SUCCESS 0
 #define TP_RESULT_INVALID_PARAMETER 1
 #define TP_RESULT_ILLEGAL_STATUS 2
-#define TP_RESULT_BUSY 3
-#define TP_RESULT_FATAL_ERROR 4
+#define TP_RESULT_EXCLUSIVE 3
+#define TP_RESULT_PXI_BUSY 4
 
 // The state of the automatic sampling (a guess)
-#define TP_AUTO_OFF 0
-#define TP_AUTO_ON 2
+#define TP_STATE_READY 0
+#define TP_STATE_AUTO_SAMPLING 2
 
-typedef void (*TPCallback)(u16 command, u8 result, u8 index);
+typedef void (*TPRecvCallback)(u16 command, u8 result, u8 index);
 
 // One axis of the calibration, from a TPCalibrateParam: the raw value of the screen's origin, the raw values for each
 // pixel (in 24.8 fixed point) and 2^28 divided by that, which TP_GetCalibratedPoint multiplies by
@@ -63,24 +63,24 @@ typedef struct TPAxisCalibration {
     s32 dotSizeInv;
 } TPAxisCalibration;
 
-typedef struct TPCalibration {
+typedef struct TPiCalibrateParam {
     TPAxisCalibration x;
     TPAxisCalibration y;
-} TPCalibration;
+} TPiCalibrateParam;
 
 typedef struct TPWork {
     u16 initialized;
-    TPCallback callback;
-    TPData raw;      // the answer of the last request for one sample
-    u16 index;       // of the newest sample of the automatic sampling in samples
-    u16 frequency;   // the number of samples that the ARM7 takes in a frame
-    TPData *samples; // the buffer of the automatic sampling, a ring
-    u16 count;       // the length of samples
-    TPCalibration calibration;
-    u16 calibrated;
-    u16 autoStatus; // set when the ARM7 answers the commands of the automatic sampling, and not read here
-    u16 error;      // a bit for each command of TP_REQUEST_COMMAND_FLAG_*, set when it failed
-    vu16 busy;      // a bit for each command that waits for the ARM7's answer, which the callback clears
+    TPRecvCallback callback;
+    TPData buf;           // the answer of the last request for one sample
+    u16 index;            // of the newest sample of the automatic sampling in samples
+    u16 frequence;        // the number of samples that the ARM7 takes in a frame
+    TPData *samplingBufs; // the buffer of the automatic sampling, a ring
+    u16 bufSize;          // the length of samples
+    TPiCalibrateParam calibrate;
+    u16 calibrate_flg;
+    u16 state;        // set when the ARM7 answers the commands of the automatic sampling, and not read here
+    u16 err_flg;      // a bit for each command of TP_REQUEST_COMMAND_FLAG_*, set when it failed
+    vu16 command_flg; // a bit for each command that waits for the ARM7's answer, which the callback clears
 } TPWork;
 
 static TPWork tpState;
@@ -88,69 +88,69 @@ static TPWork tpState;
 static void TPi_TpCallback(PXIFifoTag tag, u32 data, BOOL err);
 
 // Reads the sample that the ARM7 wrote to the shared memory
-static inline void ReadSample(TPData *sample) {
-    TPRawData raw;
+static inline void TPi_CopyTpFromSystemWork(TPData *sample) {
+    SPITpData raw;
 
-    raw.half[0] = OS_GetSystemWork()->touchPanelX;
-    raw.half[1] = OS_GetSystemWork()->touchPanelY;
-    sample->x = raw.sample.x;
-    sample->y = raw.sample.y;
-    sample->touch = (u8)raw.sample.touch;
-    sample->validity = (u8)raw.sample.validity;
+    raw.halfs[0] = OS_GetSystemWork()->touchPanelX;
+    raw.halfs[1] = OS_GetSystemWork()->touchPanelY;
+    sample->x = raw.e.x;
+    sample->y = raw.e.y;
+    sample->touch = (u8)raw.e.touch;
+    sample->validity = (u8)raw.e.validity;
 }
 
 // TPi_TpCallback: gets the ARM7's words with the touch panel's tag: a sample of the automatic sampling, or the last
 // word of the answer to a command
 static void TPi_TpCallback(PXIFifoTag tag, u32 data, BOOL err) {
     u16 word = (u16)data;
-    u16 command = (word & TP_PXI_COMMAND_MASK) >> 8;
+    u16 command = (word & SPI_PXI_RESULT_COMMAND_MASK) >> 8;
     u32 result;
 
     if (err) {
-        tpState.error |= 1 << command;
+        tpState.err_flg |= 1 << command;
         if (tpState.callback) {
-            tpState.callback(command, TP_RESULT_FATAL_ERROR, 0);
+            tpState.callback(command, TP_RESULT_PXI_BUSY, 0);
         }
         return;
     }
 
-    if (command == TP_PXI_COMMAND_AUTO_SAMPLE) {
+    if (command == SPI_PXI_COMMAND_TP_AUTO_SAMPLING) {
         tpState.index++;
-        if (tpState.index >= tpState.count) {
+        if (tpState.index >= tpState.bufSize) {
             tpState.index = 0;
         }
-        ReadSample(&tpState.samples[tpState.index]);
+        TPi_CopyTpFromSystemWork(&tpState.samplingBufs[tpState.index]);
         if (tpState.callback) {
             tpState.callback(command, TP_RESULT_SUCCESS, (u8)tpState.index);
         }
         return;
     }
 
-    if (!(data & TP_PXI_END)) {
+    if (!(data & SPI_PXI_END_BIT)) {
         return;
     }
 
     switch ((u8)word) {
     case TP_PXI_RESULT_SUCCESS:
         switch (command) {
-        case TP_PXI_COMMAND_SAMPLING:
-            ReadSample(&tpState.raw);
-            tpState.autoStatus = TP_AUTO_OFF;
+        case SPI_PXI_COMMAND_TP_SAMPLING:
+            TPi_CopyTpFromSystemWork(&tpState.buf);
+            tpState.state = TP_STATE_READY;
             break;
-        case TP_PXI_COMMAND_AUTO_ON:
-            tpState.autoStatus = TP_AUTO_ON;
+        case SPI_PXI_COMMAND_TP_AUTO_ON:
+            tpState.state = TP_STATE_AUTO_SAMPLING;
             break;
-        case TP_PXI_COMMAND_AUTO_OFF:
-            tpState.autoStatus = TP_AUTO_OFF;
+        case SPI_PXI_COMMAND_TP_AUTO_OFF:
+            tpState.state = TP_STATE_READY;
             break;
         }
-        tpState.busy &= ~(1 << command);
+        tpState.command_flg &= ~(1 << command);
         if (tpState.callback) {
             tpState.callback(command, TP_RESULT_SUCCESS, 0);
         }
         return;
-    case TP_PXI_RESULT_BUSY:
-        result = TP_RESULT_BUSY;
+    case SPI_PXI_RESULT_EXCLUSIVE:
+        result = TP_RESULT_EXCLUSIVE;
         goto error;
     case TP_PXI_RESULT_INVALID_PARAMETER:
         result = TP_RESULT_INVALID_PARAMETER;
@@ -158,8 +158,8 @@ static void TPi_TpCallback(PXIFifoTag tag, u32 data, BOOL err) {
     case TP_PXI_RESULT_ILLEGAL_STATUS:
         result = TP_RESULT_ILLEGAL_STATUS;
     error:
-        tpState.error |= 1 << command;
-        tpState.busy &= ~(1 << command);
+        tpState.err_flg |= 1 << command;
+        tpState.command_flg &= ~(1 << command);
         if (tpState.callback) {
             tpState.callback(command, result, 0);
         }
@@ -179,11 +179,11 @@ void TP_Init(void) {
     PXI_Init();
     tpState.index = 0;
     tpState.callback = NULL;
-    tpState.samples = NULL;
-    tpState.autoStatus = TP_AUTO_OFF;
-    tpState.calibrated = FALSE;
-    tpState.busy = 0;
-    tpState.error = 0;
+    tpState.samplingBufs = NULL;
+    tpState.state = TP_STATE_READY;
+    tpState.calibrate_flg = FALSE;
+    tpState.command_flg = 0;
+    tpState.err_flg = 0;
     while (!PXI_IsCallbackReady(PXI_FIFO_TAG_TOUCHPANEL, PXI_PROC_ARM7)) {
     }
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_TOUCHPANEL, TPi_TpCallback);
@@ -192,14 +192,14 @@ void TP_Init(void) {
 // TP_GetUserInfo: the calibration in the user settings, or zeros when they hold none or an invalid one
 BOOL TP_GetUserInfo(TPCalibrateParam *calibrate) {
     const NVRAMConfig *settings = (const NVRAMConfig *)HW_NVRAM_USER_INFO;
-    u16 rawX1 = settings->touch.rawX1;
-    u16 rawY1 = settings->touch.rawY1;
-    u8 screenX1 = settings->touch.screenX1;
-    u8 screenY1 = settings->touch.screenY1;
-    u16 rawX2 = settings->touch.rawX2;
-    u16 rawY2 = settings->touch.rawY2;
-    u8 screenX2 = settings->touch.screenX2;
-    u8 screenY2 = settings->touch.screenY2;
+    u16 rawX1 = settings->tp.raw_x1;
+    u16 rawY1 = settings->tp.raw_y1;
+    u8 screenX1 = settings->tp.dx1;
+    u8 screenY1 = settings->tp.dy1;
+    u16 rawX2 = settings->tp.raw_x2;
+    u16 rawY2 = settings->tp.raw_y2;
+    u8 screenX2 = settings->tp.dx2;
+    u8 screenY2 = settings->tp.dy2;
 
     if ((rawX1 == 0 && rawX2 == 0 && rawY1 == 0 && rawY2 == 0) ||
         TP_CalcCalibrateParam(calibrate, rawX1, rawY1, screenX1, screenY1, rawX2, rawY2, screenX2, screenY2) != 0) {
@@ -223,41 +223,41 @@ void TP_SetCalibrateParam(const TPCalibrateParam *calibrate) {
     OSIntrMode enabled;
 
     if (calibrate == NULL) {
-        tpState.calibrated = FALSE;
+        tpState.calibrate_flg = FALSE;
         return;
     }
 
     enabled = OS_DisableInterrupts();
     if (calibrate->xDotSize != 0) {
         reg_CP_DIVCNT = 0;
-        reg_CP_DIV_NUMER_LO = 1 << 28;
+        reg_CP_DIV_NUMER_L = 1 << 28;
         reg_CP_DIV_DENOM = (u32)calibrate->xDotSize;
-        tpState.calibration.x.origin = calibrate->x0;
-        tpState.calibration.x.dotSize = calibrate->xDotSize;
+        tpState.calibrate.x.origin = calibrate->x0;
+        tpState.calibrate.x.dotSize = calibrate->xDotSize;
         while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
         }
-        tpState.calibration.x.dotSizeInv = reg_CP_DIV_RESULT_LO;
+        tpState.calibrate.x.dotSizeInv = reg_CP_DIV_RESULT_L;
     } else {
-        tpState.calibration.x.origin = 0;
-        tpState.calibration.x.dotSize = 0;
-        tpState.calibration.x.dotSizeInv = 0;
+        tpState.calibrate.x.origin = 0;
+        tpState.calibrate.x.dotSize = 0;
+        tpState.calibrate.x.dotSizeInv = 0;
     }
     if (calibrate->yDotSize != 0) {
         reg_CP_DIVCNT = 0;
-        reg_CP_DIV_NUMER_LO = 1 << 28;
+        reg_CP_DIV_NUMER_L = 1 << 28;
         reg_CP_DIV_DENOM = (u32)calibrate->yDotSize;
-        tpState.calibration.y.origin = calibrate->y0;
-        tpState.calibration.y.dotSize = calibrate->yDotSize;
+        tpState.calibrate.y.origin = calibrate->y0;
+        tpState.calibrate.y.dotSize = calibrate->yDotSize;
         while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
         }
-        tpState.calibration.y.dotSizeInv = reg_CP_DIV_RESULT_LO;
+        tpState.calibrate.y.dotSizeInv = reg_CP_DIV_RESULT_L;
     } else {
-        tpState.calibration.y.origin = 0;
-        tpState.calibration.y.dotSize = 0;
-        tpState.calibration.y.dotSizeInv = 0;
+        tpState.calibrate.y.origin = 0;
+        tpState.calibrate.y.dotSize = 0;
+        tpState.calibrate.y.dotSizeInv = 0;
     }
     OS_RestoreInterrupts(enabled);
-    tpState.calibrated = TRUE;
+    tpState.calibrate_flg = TRUE;
 }
 
 // TP_RequestSamplingAsync: asks the ARM7 for one sample
@@ -265,40 +265,41 @@ void TP_RequestSamplingAsync(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     BOOL sent = FALSE;
 
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL, TP_PXI_START | TP_PXI_END | TP_PXI_COMMAND(TP_PXI_COMMAND_SAMPLING),
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL,
+                           SPI_PXI_START_BIT | SPI_PXI_END_BIT | TP_PXI_COMMAND(SPI_PXI_COMMAND_TP_SAMPLING),
                            FALSE) >= 0) {
         sent = TRUE;
     }
     if (!sent) {
         OS_RestoreInterrupts(enabled);
-        tpState.error |= TP_REQUEST_COMMAND_FLAG_SAMPLING;
+        tpState.err_flg |= TP_REQUEST_COMMAND_FLAG_SAMPLING;
         if (tpState.callback) {
-            tpState.callback(TP_PXI_COMMAND_SAMPLING, TP_RESULT_FATAL_ERROR, 0);
+            tpState.callback(SPI_PXI_COMMAND_TP_SAMPLING, TP_RESULT_PXI_BUSY, 0);
         }
         return;
     }
-    tpState.busy |= TP_REQUEST_COMMAND_FLAG_SAMPLING;
-    tpState.error &= ~TP_REQUEST_COMMAND_FLAG_SAMPLING;
+    tpState.command_flg |= TP_REQUEST_COMMAND_FLAG_SAMPLING;
+    tpState.err_flg &= ~TP_REQUEST_COMMAND_FLAG_SAMPLING;
     OS_RestoreInterrupts(enabled);
 }
 
 // TP_WaitRawResult: waits for the sample that TP_RequestSamplingAsync asked for. 1 when the request failed
 u32 TP_WaitRawResult(TPData *result) {
     TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_SAMPLING);
-    if (tpState.error & TP_REQUEST_COMMAND_FLAG_SAMPLING) {
+    if (tpState.err_flg & TP_REQUEST_COMMAND_FLAG_SAMPLING) {
         return 1;
     }
-    *result = tpState.raw;
+    *result = tpState.buf;
     return 0;
 }
 
 // Sends the command that starts the automatic sampling, in two words. FALSE when the FIFO is full
-static inline BOOL SendAutoSamplingStart(u16 vcount, u16 frequency) {
+static inline BOOL TPi_AutoSamplingOn(u16 vcount, u16 frequency) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL,
-                           TP_PXI_START | TP_PXI_COMMAND(TP_PXI_COMMAND_AUTO_ON) | (u8)frequency, FALSE) < 0) {
+                           SPI_PXI_START_BIT | TP_PXI_COMMAND(SPI_PXI_COMMAND_TP_AUTO_ON) | (u8)frequency, FALSE) < 0) {
         return FALSE;
     }
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL, TP_PXI_END | TP_PXI_INDEX(1) | vcount, FALSE) < 0) {
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL, SPI_PXI_END_BIT | TP_PXI_INDEX(1) | vcount, FALSE) < 0) {
         return FALSE;
     }
     return TRUE;
@@ -311,26 +312,26 @@ void TP_RequestAutoSamplingStartAsync(u16 vcount, u16 frequency, TPData samples[
     u8 sent;
     u32 i;
 
-    tpState.samples = samples;
+    tpState.samplingBufs = samples;
     tpState.index = 0;
-    tpState.frequency = frequency;
-    tpState.count = count;
+    tpState.frequence = frequency;
+    tpState.bufSize = count;
     for (i = 0; i < count; i++) {
-        tpState.samples[i].touch = 0;
+        tpState.samplingBufs[i].touch = 0;
     }
 
     enabled = OS_DisableInterrupts();
-    sent = SendAutoSamplingStart(vcount, frequency);
+    sent = TPi_AutoSamplingOn(vcount, frequency);
     if (!sent) {
         OS_RestoreInterrupts(enabled);
-        tpState.error |= TP_REQUEST_COMMAND_FLAG_AUTO_ON;
+        tpState.err_flg |= TP_REQUEST_COMMAND_FLAG_AUTO_ON;
         if (tpState.callback) {
-            tpState.callback(TP_PXI_COMMAND_AUTO_ON, TP_RESULT_FATAL_ERROR, 0);
+            tpState.callback(SPI_PXI_COMMAND_TP_AUTO_ON, TP_RESULT_PXI_BUSY, 0);
         }
         return;
     }
-    tpState.busy |= TP_REQUEST_COMMAND_FLAG_AUTO_ON;
-    tpState.error &= ~TP_REQUEST_COMMAND_FLAG_AUTO_ON;
+    tpState.command_flg |= TP_REQUEST_COMMAND_FLAG_AUTO_ON;
+    tpState.err_flg &= ~TP_REQUEST_COMMAND_FLAG_AUTO_ON;
     OS_RestoreInterrupts(enabled);
 }
 
@@ -339,20 +340,21 @@ void TP_RequestAutoSamplingStopAsync(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     BOOL sent = FALSE;
 
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL, TP_PXI_START | TP_PXI_END | TP_PXI_COMMAND(TP_PXI_COMMAND_AUTO_OFF),
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_TOUCHPANEL,
+                           SPI_PXI_START_BIT | SPI_PXI_END_BIT | TP_PXI_COMMAND(SPI_PXI_COMMAND_TP_AUTO_OFF),
                            FALSE) >= 0) {
         sent = TRUE;
     }
     if (!sent) {
         OS_RestoreInterrupts(enabled);
-        tpState.error |= TP_REQUEST_COMMAND_FLAG_AUTO_OFF;
+        tpState.err_flg |= TP_REQUEST_COMMAND_FLAG_AUTO_OFF;
         if (tpState.callback) {
-            tpState.callback(TP_PXI_COMMAND_AUTO_OFF, TP_RESULT_FATAL_ERROR, 0);
+            tpState.callback(SPI_PXI_COMMAND_TP_AUTO_OFF, TP_RESULT_PXI_BUSY, 0);
         }
         return;
     }
-    tpState.busy |= TP_REQUEST_COMMAND_FLAG_AUTO_OFF;
-    tpState.error &= ~TP_REQUEST_COMMAND_FLAG_AUTO_OFF;
+    tpState.command_flg |= TP_REQUEST_COMMAND_FLAG_AUTO_OFF;
+    tpState.err_flg &= ~TP_REQUEST_COMMAND_FLAG_AUTO_OFF;
     OS_RestoreInterrupts(enabled);
 }
 
@@ -366,19 +368,19 @@ void TP_GetLatestRawPointInAuto(TPData *point) {
 
     point->validity = TP_VALIDITY_INVALID_XY;
     index = tpState.index;
-    if (tpState.frequency == 1 || tpState.count == 1) {
-        *point = tpState.samples[index];
+    if (tpState.frequence == 1 || tpState.bufSize == 1) {
+        *point = tpState.samplingBufs[index];
         return;
     }
 
-    for (i = 0; i < tpState.frequency && i < tpState.count - 1; i++) {
+    for (i = 0; i < tpState.frequence && i < tpState.bufSize - 1; i++) {
         int j = index - i;
         TPData *sample;
 
         if (j < 0) {
-            j += tpState.count;
+            j += tpState.bufSize;
         }
-        sample = &tpState.samples[j];
+        sample = &tpState.samplingBufs[j];
         if (sample->touch == 0) {
             *point = *sample;
             return;
@@ -430,15 +432,15 @@ u32 TP_CalcCalibrateParam(TPCalibrateParam *calibrate, u16 rawX1, u16 rawY1, u16
 
     enabled = OS_DisableInterrupts();
     reg_CP_DIVCNT = 0;
-    reg_CP_DIV_NUMER_LO = (rawX1 - rawX2) << 8;
+    reg_CP_DIV_NUMER_L = (rawX1 - rawX2) << 8;
     reg_CP_DIV_DENOM = (u32)(screenX1 - screenX2);
     rawYDiff = rawY1 - rawY2;
     screenYDiff = screenY1 - screenY2;
     while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
     }
-    dotSize = reg_CP_DIV_RESULT_LO;
+    dotSize = reg_CP_DIV_RESULT_L;
     reg_CP_DIVCNT = 0;
-    reg_CP_DIV_NUMER_LO = rawYDiff << 8;
+    reg_CP_DIV_NUMER_L = rawYDiff << 8;
     reg_CP_DIV_DENOM = (u32)screenYDiff;
     if (dotSize >= 0x8000 || dotSize < -0x8000) {
         OS_RestoreInterrupts(enabled);
@@ -454,7 +456,7 @@ u32 TP_CalcCalibrateParam(TPCalibrateParam *calibrate, u16 rawX1, u16 rawY1, u16
 
     while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
     }
-    dotSize = reg_CP_DIV_RESULT_LO;
+    dotSize = reg_CP_DIV_RESULT_L;
     OS_RestoreInterrupts(enabled);
     if (dotSize >= 0x8000 || dotSize < -0x8000) {
         return 1;
@@ -470,9 +472,9 @@ u32 TP_CalcCalibrateParam(TPCalibrateParam *calibrate, u16 rawX1, u16 rawY1, u16
 
 // TP_GetCalibratedPoint: the point on the screen of a raw one. Without a calibration it is the raw one
 void TP_GetCalibratedPoint(TPData *disp, const TPData *raw) {
-    const TPCalibration *cal = &tpState.calibration;
+    const TPiCalibrateParam *cal = &tpState.calibrate;
 
-    if (!tpState.calibrated) {
+    if (!tpState.calibrate_flg) {
         *disp = *raw;
         return;
     }
@@ -502,11 +504,11 @@ void TP_GetCalibratedPoint(TPData *disp, const TPData *raw) {
 
 // TP_WaitBusy: waits until the ARM7 has answered the commands (TP_REQUEST_COMMAND_FLAG_*)
 void TP_WaitBusy(TPRequestCommandFlag command) {
-    while (tpState.busy & command) {
+    while (tpState.command_flg & command) {
     }
 }
 
 // TP_CheckError: which of the commands failed
 u32 TP_CheckError(TPRequestCommandFlag command) {
-    return command & tpState.error;
+    return command & tpState.err_flg;
 }

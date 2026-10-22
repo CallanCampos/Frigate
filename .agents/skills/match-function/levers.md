@@ -125,7 +125,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
   uses the pointer once more or less, or a `*(T *)&p->m` cast stands in for the field's real type. (matching.md:
   "depends on how many references")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
-  "`FSi_GetPathDefault`")
+  "`FSi_GetPathCommand`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
   `cmp rX, #0`: test the pointer as `if (p)`, not against `NULL`. (matching.md: "A pointer compared with `NULL`")
 - A zero kept in a saved register across a call and returned for `FALSE` (`movne r0, r6`), where the original
@@ -1098,7 +1098,7 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row. The lever never applies to a function
+arguments), and `MBi_SendVolatBeacon` shows the same symptom in its row. The lever never applies to a function
 whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
 `addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
 placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the

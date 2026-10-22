@@ -38,7 +38,7 @@ static const u8 sDigestKey[64] ATTRIBUTE_ALIGN(4) = {
 
 u32 CARD_CalcRomHashBufferLength(const CARDTwlRomHeader *header) {
     u32 length = 0;
-    length += MATH_ROUNDUP32(header->digestBlockHashes.size);
+    length += MATH_ROUNDUP32(header->digestBlockHashes.length);
     length += MATH_ROUNDUP32(header->digestSectorSize * CARD_ROM_HASH_SECTOR_MAX);
     length += MATH_ROUNDUP32(MATH_ROUNDUP(header->digestSectorsPerBlock * CARD_ROM_HASH_SIZE, CARD_ROM_PAGE_SIZE * 3) *
                              CARD_ROM_HASH_BLOCK_MAX);
@@ -190,10 +190,10 @@ static CARDRomHashBlock *CARDi_TouchRomHashBlock(CARDRomHashContext *context, u3
 // The index of the sector of the hashed areas that holds the card's offset, counting the NITRO area's sectors first
 static inline u32 CARDi_RomOffsetToHashSector(const CARDRomHashContext *context, u32 offset) {
     offset -= context->area_ntr.offset;
-    if (offset >= context->area_ntr.size) {
+    if (offset >= context->area_ntr.length) {
         offset += context->area_ntr.offset - context->area_ltd.offset;
-        if (offset < context->area_ltd.size) {
-            offset += context->area_ntr.size;
+        if (offset < context->area_ltd.length) {
+            offset += context->area_ntr.length;
         } else {
             OS_Terminate();
         }
@@ -241,7 +241,7 @@ void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader
                              CARDiRomReader readSync, CARDiRomReader readAsync, void *userdata) {
     const u32 sectorSize = header->digestSectorSize;
     const u32 sectorsPerBlock = header->digestSectorsPerBlock;
-    const u32 blockHashesSize = header->digestBlockHashes.size;
+    const u32 blockHashesSize = header->digestBlockHashes.length;
     u8 *lo = (u8 *)MATH_ROUNDUP32((u32)buffer);
     u8 *hi = (u8 *)MATH_ROUNDDOWN32((u32)&lo[length]);
     u8 *end = lo;
@@ -286,8 +286,8 @@ void CARD_InitRomHashContext(CARDRomHashContext *context, const CARDTwlRomHeader
             SVC_SHA1Update(&sOuterContext, opad, sizeof(opad));
         }
         context->ReadSync(context->userdata, context->master_hash, context->block_hash.offset,
-                          context->block_hash.size);
-        CARDi_CompareHash(header->digestBlockHashesHash, context->master_hash, context->block_hash.size);
+                          context->block_hash.length);
+        CARDi_CompareHash(header->digestBlockHashesHash, context->master_hash, context->block_hash.length);
         {
             CARDRomHashSector *sectors = context->sectors;
             int i;

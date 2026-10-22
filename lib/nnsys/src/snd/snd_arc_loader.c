@@ -319,8 +319,8 @@ static void *LoadWaveArcTable(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) 
         if (result != (int)sizeof(SNDWaveArc) + tableSize) {
             return NULL;
         }
-        MI_CpuCopy8(waveArc->offsetTable, &waveArc->offsetTable[waveArc->waveCount], tableSize);
-        MI_CpuFill8(waveArc->offsetTable, 0, tableSize);
+        MI_CpuCopy8(waveArc->waveOffset, &waveArc->waveOffset[waveArc->waveCount], tableSize);
+        MI_CpuFill8(waveArc->waveOffset, 0, tableSize);
         DC_StoreRange(waveArc, size);
         if (bSetAddr) {
             NNS_SndArcSetFileAddress(fileId, waveArc);
@@ -392,9 +392,9 @@ static BOOL LoadSingleWave(SNDWaveArc *waveArc, int index, u32 fileId, NNSSndHea
     // The wave runs to the next one's offset, the last to the end of the file. The table's second half keeps the
     // waves' offsets in the file, since the first half is overwritten with the loaded waves
     waveCount = SND_GetWaveDataCount(waveArc);
-    offset = waveArc->offsetTable[waveArc->waveCount + index];
+    offset = waveArc->waveOffset[waveArc->waveCount + index];
     if (index < waveCount - 1) {
-        size = GetNextWaveOffset(&waveArc->offsetTable[waveArc->waveCount + index]) - offset;
+        size = GetNextWaveOffset(&waveArc->waveOffset[waveArc->waveCount + index]) - offset;
     } else {
         size = waveArc->fileHeader.fileSize - offset;
     }

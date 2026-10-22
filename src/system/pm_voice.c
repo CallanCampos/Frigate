@@ -291,9 +291,9 @@ static BOOL PokeVoice_LoadWaveArc(PokeVoiceEntry *entry, u32 waveArc) {
         return FALSE;
     }
     arc = entry->buffer;
-    wave = (PokeVoiceWaveData *)((u8 *)arc + arc->offsetTable[0]);
+    wave = (PokeVoiceWaveData *)((u8 *)arc + arc->waveOffset[0]);
     SND_GetWaveDataCount(arc);
-    size = arc->fileHeader.fileSize - arc->offsetTable[0];
+    size = arc->fileHeader.fileSize - arc->waveOffset[0];
     size -= sizeof(PokeVoiceWaveData);
     entry->samples = wave + 1;
     entry->size = size;

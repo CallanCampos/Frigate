@@ -29,7 +29,7 @@ typedef enum {
 
 // The sampling rate is the number of ARM7 clocks (33.51 MHz) between two samples, and the buffer and its size are
 // multiples of 32 bytes, which the cache needs
-#define MIC_SAMPLING_RATE_MIN 0x400
+#define MIC_SAMPLING_RATE_LIMIT 0x400
 // 8180 Hz
 #define MIC_SAMPLING_RATE_8180 0x1001
 
@@ -40,21 +40,21 @@ typedef struct {
     void *buffer;
     u32 size;
     u32 rate;
-    BOOL loop;
-    MICCallback fullCallback;
-    void *fullArg;
+    BOOL loop_enable;
+    MICCallback full_callback;
+    void *full_arg;
 } MICAutoParam;
 
 // The library's state, which the DSi's MICEX code in the LTD autoload reaches through MICi_GetSysWork. The busy flag is
 // set from the call that starts or stops the sampling until the ARM7 answers
 typedef struct {
-    BOOL busy;
+    BOOL lock;
     MICCallback callback;
     void *callbackArg;
-    MICResult result;
-    MICCallback fullCallback;
+    MICResult commonResult;
+    MICCallback full;
     void *fullArg;
-    u16 *sampleDest;
+    u16 *dst_buf;
 } MICWork;
 
 void MIC_Init(void);

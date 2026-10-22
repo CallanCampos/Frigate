@@ -20,19 +20,19 @@ typedef struct {
     u16 ssidLength;
     u8 ssid[32];
     u16 ssidMatchLength;
-    u8 unk_38[4];
-} WmStartScanExCommand;
+    u8 rsv[4];
+} WMStartScanExReq;
 
 // What it sends to start the connection of a child. Its size is 0x28; the halfword at 0x24 is not set
 typedef struct {
     u16 apiid;
-    u16 unk_02;
-    const WMBssDesc *bssDesc;
+    u16 reserved;
+    const WMBssDesc *pInfo;
     u8 ssid[24];
     BOOL powerSave;
-    u16 unk_24;
+    u16 reserved2;
     u16 authMode;
-} WmStartConnectCommand;
+} WMStartConnectReq;
 
 static int WMi_EnableEx(WMCallbackFunc callback, int flags);
 static int WMi_InitializeEx(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo, int flags);
@@ -53,7 +53,7 @@ static int WMi_EnableEx(WMCallbackFunc callback, int flags) {
     WMi_SetCallbackTable(WM_APIID_ENABLE, callback);
     WMi_RegisterSleepCallback();
     w9b = WMi_GetSystemWork();
-    result = WMi_SendCommand(WM_APIID_ENABLE, 4, w9b->wm7buf, w9b->status, w9b->indBuf, flags);
+    result = WMi_SendCommand(WM_APIID_ENABLE, 4, w9b->WM7, w9b->status, w9b->fifo7to9, flags);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
@@ -127,7 +127,7 @@ static int WMi_InitializeEx(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo, 
     WMi_SetCallbackTable(WM_APIID_INITIALIZE, callback);
     WMi_RegisterSleepCallback();
     w9b = WMi_GetSystemWork();
-    result = WMi_SendCommand(WM_APIID_INITIALIZE, 4, w9b->wm7buf, w9b->status, w9b->indBuf, flags);
+    result = WMi_SendCommand(WM_APIID_INITIALIZE, 4, w9b->WM7, w9b->status, w9b->fifo7to9, flags);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
@@ -259,7 +259,7 @@ WMErrCode WM_EndParent(WMCallbackFunc callback) {
 
 // Scans the channels of the list for parents. The scan type is 0 to 3, 2 and 3 matching the SSID
 WMErrCode WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param) {
-    WmStartScanExCommand cmd;
+    WMStartScanExReq cmd;
     int result = WMi_CheckStateEx(3, WM_STATE_IDLE, WM_STATE_CLASS1, WM_STATE_SCAN);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -322,7 +322,7 @@ WMErrCode WM_EndScan(WMCallbackFunc callback) {
 // Connects to the parent that the scan found; the SSID is the 24 bytes that the child gives, or none
 WMErrCode WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave,
                             u16 authMode) {
-    WmStartConnectCommand cmd;
+    WMStartConnectReq cmd;
     WMArm9Buf *w9b;
     int result = WMi_CheckStateEx(1, WM_STATE_IDLE);
 
@@ -342,7 +342,7 @@ WMErrCode WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, c
     WMi_SetCallbackTable(WM_APIID_START_CONNECT, callback);
 
     cmd.apiid = WM_APIID_START_CONNECT;
-    cmd.bssDesc = bssDesc;
+    cmd.pInfo = bssDesc;
     if (ssid != NULL) {
         MI_CpuCopy8(ssid, cmd.ssid, sizeof(cmd.ssid));
     } else {
@@ -370,8 +370,8 @@ WMErrCode WM_Disconnect(WMCallbackFunc callback, u16 aid) {
         if (aid < 1 || aid > 15) {
             return WM_ERRCODE_INVALID_PARAM;
         }
-        DC_InvalidateRange(&w9b->status->childBitmap, 2);
-        if (!(w9b->status->childBitmap & (1 << aid))) {
+        DC_InvalidateRange(&w9b->status->child_bitmap, 2);
+        if (!(w9b->status->child_bitmap & (1 << aid))) {
             return WM_ERRCODE_NO_CHILD;
         }
     } else if (aid != 0) {

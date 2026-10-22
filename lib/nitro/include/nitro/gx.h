@@ -66,7 +66,7 @@ typedef u16 GXRgb;
 #define reg_G3_SWAP_BUFFERS (*(vu32 *)0x04000540)
 #define reg_G3_VIEWPORT (*(vu32 *)0x04000580)
 // The counts of polygons in polygon list RAM and of vertices in vertex RAM
-#define reg_G3X_RAM_COUNT (*(vu16 *)0x04000604)
+#define reg_G3X_LISTRAM_COUNT (*(vu16 *)0x04000604)
 #define reg_G3X_VTXRAM_COUNT (*(vu16 *)0x04000606)
 #define reg_GXS_DB_DISPCNT (*(vu32 *)0x04001000)
 #define reg_G2S_DB_WIN0H (*(vu16 *)0x04001040)
@@ -133,7 +133,7 @@ typedef union {
         u16 attr0;
         u16 attr1;
         u16 attr2;
-        u16 affineParam;
+        u16 _3;
     };
     struct {
         u32 y : 8;
@@ -473,11 +473,11 @@ typedef enum {
 // the second image
 typedef enum {
     GX_VRAM_CLEARIMAGE_NONE = GX_VRAM_NONE,
-    GX_VRAM_CLEARIMAGE_128_A = GX_VRAM_A,
-    GX_VRAM_CLEARIMAGE_128_B = GX_VRAM_B,
+    GX_VRAM_CLEARDEPTH_128_A = GX_VRAM_A,
+    GX_VRAM_CLEARDEPTH_128_B = GX_VRAM_B,
     GX_VRAM_CLEARIMAGE_256_AB = GX_VRAM_A | GX_VRAM_B,
-    GX_VRAM_CLEARIMAGE_128_C = GX_VRAM_C,
-    GX_VRAM_CLEARIMAGE_128_D = GX_VRAM_D,
+    GX_VRAM_CLEARDEPTH_128_C = GX_VRAM_C,
+    GX_VRAM_CLEARDEPTH_128_D = GX_VRAM_D,
     GX_VRAM_CLEARIMAGE_256_CD = GX_VRAM_C | GX_VRAM_D,
 } GXVRamClearImage;
 
@@ -775,7 +775,7 @@ typedef enum {
 #define REG_GX_DISPCAPCNT_SRCB_SHIFT 25
 #define REG_GX_DISPCAPCNT_SRCA_SHIFT 24
 #define REG_GX_DISPCAPCNT_WSIZE_SHIFT 20
-#define REG_GX_DISPCAPCNT_WB_SHIFT 16
+#define REG_GX_DISPCAPCNT_DEST_SHIFT 16
 #define REG_GX_DISPCAPCNT_EVB_SHIFT 8
 #define REG_GX_DISPCAPCNT_EVA_SHIFT 0
 
@@ -844,7 +844,7 @@ static inline void GX_SetCapture(GXCaptureSize sz, GXCaptureMode mode, GXCapture
                                  GXCaptureDest dest, int eva, int evb) {
     reg_GX_DISPCAPCNT = REG_GX_DISPCAPCNT_E_MASK | (mode << REG_GX_DISPCAPCNT_MOD_SHIFT) |
                         (b << REG_GX_DISPCAPCNT_SRCB_SHIFT) | (a << REG_GX_DISPCAPCNT_SRCA_SHIFT) |
-                        (sz << REG_GX_DISPCAPCNT_WSIZE_SHIFT) | (dest << REG_GX_DISPCAPCNT_WB_SHIFT) |
+                        (sz << REG_GX_DISPCAPCNT_WSIZE_SHIFT) | (dest << REG_GX_DISPCAPCNT_DEST_SHIFT) |
                         (evb << REG_GX_DISPCAPCNT_EVB_SHIFT) | (eva << REG_GX_DISPCAPCNT_EVA_SHIFT);
 }
 
@@ -1173,20 +1173,20 @@ static inline void G3_Vtx10(fx16 x, fx16 y, fx16 z) {
 
 // The fields of a BG control register. Bit 13 is the extended palette slot of BG 0 and 1, and the area overflow
 // mode of BG 2 and 3
-#define REG_G2_BGCNT_CHARBASE_SHIFT 2
-#define REG_G2_BGCNT_CHARBASE_MASK 0x003c
-#define REG_G2_BGCNT_MOSAIC_MASK 0x0040
-#define REG_G2_BGCNT_COLORMODE_SHIFT 7
-#define REG_G2_BGCNT_COLORMODE_MASK 0x0080
-#define REG_G2_BGCNT_SCREENBASE_SHIFT 8
-#define REG_G2_BGCNT_SCREENBASE_MASK 0x1f00
-#define REG_G2_BGCNT_BGPLTTSLOT_SHIFT 13
-#define REG_G2_BGCNT_AREAOVER_SHIFT 13
-#define REG_G2_BGCNT_SCREENSIZE_SHIFT 14
+#define REG_G2_BG0CNT_CHARBASE_SHIFT 2
+#define REG_G2_BG0CNT_CHARBASE_MASK 0x003c
+#define REG_G2_BG0CNT_MOSAIC_MASK 0x0040
+#define REG_G2_BG0CNT_COLORMODE_SHIFT 7
+#define REG_G2_BG0CNT_COLORMODE_MASK 0x0080
+#define REG_G2_BG0CNT_SCREENBASE_SHIFT 8
+#define REG_G2_BG0CNT_SCREENBASE_MASK 0x1f00
+#define REG_G2_BG0CNT_BGPLTTSLOT_SHIFT 13
+#define REG_G2_BG2CNT_AREAOVER_SHIFT 13
+#define REG_G2_BG0CNT_SCREENSIZE_SHIFT 14
 
-#define REG_G2_BGOFS_HOFFSET_MASK 0x000001ff
-#define REG_G2_BGOFS_VOFFSET_SHIFT 16
-#define REG_G2_BGOFS_VOFFSET_MASK 0x01ff0000
+#define REG_G2_BG0OFS_HOFFSET_MASK 0x000001ff
+#define REG_G2_BG0OFS_VOFFSET_SHIFT 16
+#define REG_G2_BG0OFS_VOFFSET_MASK 0x01ff0000
 
 // The OBJ character boundary of 1D mapping, as a shift of 32 bytes
 #define REG_GX_DISPCNT_EXOBJ_SHIFT 20
@@ -1312,42 +1312,42 @@ static inline void GX_SetBGCharOffset(GXBGCharOffset offset) {
 #define GX_DEFINE_BG01_CONTROL(name, reg)                                                                              \
     static inline void name(GXBGScrSizeText screenSize, GXBGColorMode colorMode, GXBGScrBase screenBase,               \
                             GXBGCharBase charBase, GXBGExtPltt bgExtPltt) {                                            \
-        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BGCNT_MOSAIC_MASK)) |                                 \
-                    (screenSize << REG_G2_BGCNT_SCREENSIZE_SHIFT) | (colorMode << REG_G2_BGCNT_COLORMODE_SHIFT) |      \
-                    (screenBase << REG_G2_BGCNT_SCREENBASE_SHIFT) | (charBase << REG_G2_BGCNT_CHARBASE_SHIFT) |        \
-                    (bgExtPltt << REG_G2_BGCNT_BGPLTTSLOT_SHIFT));                                                     \
+        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BG0CNT_MOSAIC_MASK)) |                                \
+                    (screenSize << REG_G2_BG0CNT_SCREENSIZE_SHIFT) | (colorMode << REG_G2_BG0CNT_COLORMODE_SHIFT) |    \
+                    (screenBase << REG_G2_BG0CNT_SCREENBASE_SHIFT) | (charBase << REG_G2_BG0CNT_CHARBASE_SHIFT) |      \
+                    (bgExtPltt << REG_G2_BG0CNT_BGPLTTSLOT_SHIFT));                                                    \
     }
 
 #define GX_DEFINE_BG23_CONTROL_TEXT(name, reg)                                                                         \
     static inline void name(GXBGScrSizeText screenSize, GXBGColorMode colorMode, GXBGScrBase screenBase,               \
                             GXBGCharBase charBase) {                                                                   \
-        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BGCNT_MOSAIC_MASK)) |                                 \
-                    (screenSize << REG_G2_BGCNT_SCREENSIZE_SHIFT) | (colorMode << REG_G2_BGCNT_COLORMODE_SHIFT) |      \
-                    (screenBase << REG_G2_BGCNT_SCREENBASE_SHIFT) | (charBase << REG_G2_BGCNT_CHARBASE_SHIFT));        \
+        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BG0CNT_MOSAIC_MASK)) |                                \
+                    (screenSize << REG_G2_BG0CNT_SCREENSIZE_SHIFT) | (colorMode << REG_G2_BG0CNT_COLORMODE_SHIFT) |    \
+                    (screenBase << REG_G2_BG0CNT_SCREENBASE_SHIFT) | (charBase << REG_G2_BG0CNT_CHARBASE_SHIFT));      \
     }
 
 #define GX_DEFINE_BG23_CONTROL_AFFINE(name, reg)                                                                       \
     static inline void name(GXBGScrSizeAffine screenSize, GXBGAreaOver areaOver, GXBGScrBase screenBase,               \
                             GXBGCharBase charBase) {                                                                   \
-        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BGCNT_MOSAIC_MASK)) |                                 \
-                    (screenSize << REG_G2_BGCNT_SCREENSIZE_SHIFT) | (screenBase << REG_G2_BGCNT_SCREENBASE_SHIFT) |    \
-                    (charBase << REG_G2_BGCNT_CHARBASE_SHIFT) | (areaOver << REG_G2_BGCNT_AREAOVER_SHIFT));            \
+        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BG0CNT_MOSAIC_MASK)) |                                \
+                    (screenSize << REG_G2_BG0CNT_SCREENSIZE_SHIFT) | (screenBase << REG_G2_BG0CNT_SCREENBASE_SHIFT) |  \
+                    (charBase << REG_G2_BG0CNT_CHARBASE_SHIFT) | (areaOver << REG_G2_BG2CNT_AREAOVER_SHIFT));          \
     }
 
 #define GX_DEFINE_BG23_CONTROL_256x16PLTT(name, reg)                                                                   \
     static inline void name(GXBGScrSize256x16Pltt screenSize, GXBGAreaOver areaOver, GXBGScrBase screenBase,           \
                             GXBGCharBase charBase) {                                                                   \
-        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BGCNT_MOSAIC_MASK)) |                                 \
-                    (screenSize << REG_G2_BGCNT_SCREENSIZE_SHIFT) | (charBase << REG_G2_BGCNT_CHARBASE_SHIFT) |        \
-                    GX_BG_EXTMODE_256x16PLTT | (screenBase << REG_G2_BGCNT_SCREENBASE_SHIFT) |                         \
-                    (areaOver << REG_G2_BGCNT_AREAOVER_SHIFT));                                                        \
+        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BG0CNT_MOSAIC_MASK)) |                                \
+                    (screenSize << REG_G2_BG0CNT_SCREENSIZE_SHIFT) | (charBase << REG_G2_BG0CNT_CHARBASE_SHIFT) |      \
+                    GX_BG_EXTMODE_256x16PLTT | (screenBase << REG_G2_BG0CNT_SCREENBASE_SHIFT) |                        \
+                    (areaOver << REG_G2_BG2CNT_AREAOVER_SHIFT));                                                       \
     }
 
 #define GX_DEFINE_BG23_CONTROL_DCBMP(name, reg)                                                                        \
     static inline void name(GXBGScrSizeDcBmp screenSize, GXBGAreaOver areaOver, GXBGBmpScrBase screenBase) {           \
-        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BGCNT_MOSAIC_MASK)) |                                 \
-                    (screenSize << REG_G2_BGCNT_SCREENSIZE_SHIFT) | GX_BG_EXTMODE_DCBMP |                              \
-                    (screenBase << REG_G2_BGCNT_SCREENBASE_SHIFT) | (areaOver << REG_G2_BGCNT_AREAOVER_SHIFT));        \
+        reg = (u16)((reg & (REG_G2_BG0CNT_PRIORITY_MASK | REG_G2_BG0CNT_MOSAIC_MASK)) |                                \
+                    (screenSize << REG_G2_BG0CNT_SCREENSIZE_SHIFT) | GX_BG_EXTMODE_DCBMP |                             \
+                    (screenBase << REG_G2_BG0CNT_SCREENBASE_SHIFT) | (areaOver << REG_G2_BG2CNT_AREAOVER_SHIFT));      \
     }
 
 #define GX_DEFINE_BG_PRIORITY(name, reg)                                                                               \
@@ -1358,16 +1358,16 @@ static inline void GX_SetBGCharOffset(GXBGCharOffset offset) {
 #define GX_DEFINE_BG_MOSAIC(name, reg)                                                                                 \
     static inline void name(BOOL enable) {                                                                             \
         if (enable) {                                                                                                  \
-            reg |= REG_G2_BGCNT_MOSAIC_MASK;                                                                           \
+            reg |= REG_G2_BG0CNT_MOSAIC_MASK;                                                                          \
         } else {                                                                                                       \
-            reg &= ~REG_G2_BGCNT_MOSAIC_MASK;                                                                          \
+            reg &= ~REG_G2_BG0CNT_MOSAIC_MASK;                                                                         \
         }                                                                                                              \
     }
 
 #define GX_DEFINE_BG_OFFSET(name, reg)                                                                                 \
     static inline void name(int hOffset, int vOffset) {                                                                \
-        reg = (u32)((hOffset & REG_G2_BGOFS_HOFFSET_MASK) |                                                            \
-                    ((vOffset << REG_G2_BGOFS_VOFFSET_SHIFT) & REG_G2_BGOFS_VOFFSET_MASK));                            \
+        reg = (u32)((hOffset & REG_G2_BG0OFS_HOFFSET_MASK) |                                                           \
+                    ((vOffset << REG_G2_BG0OFS_VOFFSET_SHIFT) & REG_G2_BG0OFS_VOFFSET_MASK));                          \
     }
 
 #define GX_DEFINE_BG_GET_CONTROL(name, type, reg)                                                                      \
@@ -1420,15 +1420,15 @@ GX_DEFINE_BG_MOSAIC(G2S_BG2Mosaic, reg_G2S_DB_BG2CNT)
 GX_DEFINE_BG_MOSAIC(G2S_BG3Mosaic, reg_G2S_DB_BG3CNT)
 // clang-format on
 
-#define REG_G2_MOSAIC_BG_V_SHIFT 4
+#define REG_G2_MOSAIC_BGVSIZE_SHIFT 4
 
                                                                                 static inline void G2_SetBGMosaicSize(
                                                                                     int hSize, int vSize) {
-    *(vu8 *)REG_MOSAIC_ADDR = (u8)(hSize | (vSize << REG_G2_MOSAIC_BG_V_SHIFT));
+    *(vu8 *)REG_MOSAIC_ADDR = (u8)(hSize | (vSize << REG_G2_MOSAIC_BGVSIZE_SHIFT));
 }
 
 static inline void G2S_SetBGMosaicSize(int hSize, int vSize) {
-    *(vu8 *)REG_DB_MOSAIC_ADDR = (u8)(hSize | (vSize << REG_G2_MOSAIC_BG_V_SHIFT));
+    *(vu8 *)REG_DB_MOSAIC_ADDR = (u8)(hSize | (vSize << REG_G2_MOSAIC_BGVSIZE_SHIFT));
 }
 // clang-format off
 
@@ -1654,20 +1654,20 @@ void GX_DispOn(void); // swan's gfxEngineEnableA
 #define reg_GX_VRAMCNT_H (*(vu8 *)0x04000248)
 #define reg_GX_VRAMCNT_I (*(vu8 *)0x04000249)
 // A to D together, and H and I together
-#define reg_GX_VRAMCNT_ABCD (*(vu32 *)0x04000240)
-#define reg_GX_VRAMCNT_HI (*(vu16 *)0x04000248)
-#define REG_GX_VRAMCNT_MST_SHIFT 0
-#define REG_GX_VRAMCNT_OFS_SHIFT 3
-#define REG_GX_VRAMCNT_ENABLE_MASK 0x80
-#define GX_VRAMCNT(mst, ofs) ((u8)(REG_GX_VRAMCNT_ENABLE_MASK | ((ofs) << REG_GX_VRAMCNT_OFS_SHIFT) | (mst)))
+#define reg_GX_VRAMCNT (*(vu32 *)0x04000240)
+#define reg_GX_VRAM_HI_CNT (*(vu16 *)0x04000248)
+#define REG_GX_VRAMCNT_A_MST_SHIFT 0
+#define REG_GX_VRAMCNT_A_OFS_SHIFT 3
+#define REG_GX_VRAMCNT_A_E_MASK 0x80
+#define GX_VRAMCNT(mst, ofs) ((u8)(REG_GX_VRAMCNT_A_E_MASK | ((ofs) << REG_GX_VRAMCNT_A_OFS_SHIFT) | (mst)))
 // The bank in LCDC mode: the CPU sees it at its HW_LCDC_VRAM address
-#define GX_VRAMCNT_LCDC REG_GX_VRAMCNT_ENABLE_MASK
+#define GX_VRAMCNT_LCDC REG_GX_VRAMCNT_A_E_MASK
 
 // The bits of DISPCNT and DISP3DCNT that the banks of the extended palettes and of the textures turn on
-#define REG_GX_DISPCNT_BGEXTPLTT_MASK 0x40000000
-#define REG_GX_DISPCNT_OBJEXTPLTT_MASK 0x80000000
+#define REG_GX_DISPCNT_BG_MASK 0x40000000
+#define REG_GX_DISPCNT_O_MASK 0x80000000
 #define REG_G3X_DISP3DCNT_TME_MASK 0x0001
-#define REG_G3X_DISP3DCNT_CLRIMG_MASK 0x4000
+#define REG_G3X_DISP3DCNT_PRI_MASK 0x4000
 
 // The state of the VRAM banks that NitroSDK keeps in gGXState (gx_state.c): the banks that each use has taken, and the
 // free ones, which are in LCDC mode. A bank is in only one of the fields
@@ -1819,7 +1819,7 @@ static inline void GX_SetPower(int power) {
 #define REG_GX_DISPSTAT_STATUS_MASK 0x0007
 #define REG_GX_DISPSTAT_VBI_MASK 0x0008
 #define REG_GX_DISPSTAT_HBI_MASK 0x0010
-#define REG_GX_DISPSTAT_VCI_MASK 0x0020
+#define REG_GX_DISPSTAT_VQI_MASK 0x0020
 // What a new V-count line leaves: the flags and the enables
 #define REG_GX_DISPSTAT_FLAGS_MASK 0x003f
 
@@ -1836,8 +1836,8 @@ static inline void GX_SetPower(int power) {
 #define REG_GXS_DB_DISPCNT_BGMODE_MASK 0x00000007
 
 // The master brightness registers: a factor of 0 to 16 and a direction
-#define REG_GX_MASTER_BRIGHT_FACTOR_MASK 0x001f
-#define REG_GX_MASTER_BRIGHT_MODE_MASK 0xc000
+#define REG_GX_MASTER_BRIGHT_E_VALUE_MASK 0x001f
+#define REG_GX_MASTER_BRIGHT_E_MOD_MASK 0xc000
 #define REG_GX_MASTER_BRIGHT_MODE_UP 0x4000
 #define REG_GX_MASTER_BRIGHT_MODE_DOWN 0x8000
 
@@ -1905,37 +1905,37 @@ void GX_SendFifo48B(const void *src, volatile void *dest); // swan's gfxUploadMa
 // NitroSDK libgx's g3x.c: the 3D engine's registers that it clears, polls and loads, and its entry points
 #define reg_G3X_GXSTAT (*(vu32 *)0x04000600)
 #define reg_G3X_DISP_1DOT_DEPTH (*(vu16 *)0x04000610)
-#define reg_G3X_CLIPMTX_RESULT (*(vu32 *)0x04000640)
-#define reg_G3X_VECMTX_RESULT (*(vu32 *)0x04000680)
-#define reg_G3X_EDGE_COLOR (*(vu16 *)0x04000330)
+#define reg_G3X_CLIPMTX_RESULT_0 (*(vu32 *)0x04000640)
+#define reg_G3X_VECMTX_RESULT_0 (*(vu32 *)0x04000680)
+#define reg_G3X_EDGE_COLOR_0 (*(vu16 *)0x04000330)
 #define reg_G3X_CLEAR_COLOR (*(vu32 *)0x04000350)
 #define reg_G3X_CLEAR_DEPTH (*(vu16 *)0x04000354)
 #define reg_G3X_CLRIMAGE_OFFSET (*(vu16 *)0x04000356)
 #define reg_G3X_FOG_COLOR (*(vu32 *)0x04000358)
 #define reg_G3X_FOG_OFFSET (*(vu16 *)0x0400035c)
-#define reg_G3X_FOG_TABLE (*(vu32 *)0x04000360)
-#define reg_G3X_SHININESS (*(vu32 *)0x040004d0)
+#define reg_G3X_FOG_TABLE_0 (*(vu32 *)0x04000360)
+#define reg_G3_SHININESS (*(vu32 *)0x040004d0)
 
 // GXSTAT: the box test's state and result, the matrix stacks' levels and errors, the command FIFO's state (bit 25 of
 // it, the second of the three, is set while the FIFO is less than half full) and whether the geometry engine is busy,
 // with the condition of the FIFO's interrupt
-#define REG_G3X_GXSTAT_BT_MASK 0x00000001
-#define REG_G3X_GXSTAT_BR_MASK 0x00000002
-#define REG_G3X_GXSTAT_PVMTX_SHIFT 8
-#define REG_G3X_GXSTAT_PVMTX_MASK 0x00001f00
-#define REG_G3X_GXSTAT_PJMTX_SHIFT 13
-#define REG_G3X_GXSTAT_PJMTX_MASK 0x00002000
-#define REG_G3X_GXSTAT_MB_MASK 0x00004000
+#define REG_G3X_GXSTAT_TB_MASK 0x00000001
+#define REG_G3X_GXSTAT_TR_MASK 0x00000002
+#define REG_G3X_GXSTAT_PV_SHIFT 8
+#define REG_G3X_GXSTAT_PV_MASK 0x00001f00
+#define REG_G3X_GXSTAT_PJ_SHIFT 13
+#define REG_G3X_GXSTAT_PJ_MASK 0x00002000
+#define REG_G3X_GXSTAT_SB_MASK 0x00004000
 #define REG_G3X_GXSTAT_SE_MASK 0x00008000
 #define REG_G3X_GXSTAT_FIFO_STAT_SHIFT 24
 #define REG_G3X_GXSTAT_FIFO_STAT_MASK 0x07000000
 #define REG_G3X_GXSTAT_FIFO_LESS_HALF 0x2
 #define REG_G3X_GXSTAT_B_MASK 0x08000000
-#define REG_G3X_GXSTAT_FIFO_IRQ_SHIFT 30
-#define REG_G3X_GXSTAT_FIFO_IRQ_MASK 0xc0000000
+#define REG_G3X_GXSTAT_FI_SHIFT 30
+#define REG_G3X_GXSTAT_FI_MASK 0xc0000000
 
 typedef enum {
-    GX_FIFOINTR_COND_NEVER,
+    GX_FIFOINTR_COND_DISABLE,
     GX_FIFOINTR_COND_UNDERHALF,
     GX_FIFOINTR_COND_EMPTY,
 } GXFifoIntrCond;
@@ -1943,17 +1943,17 @@ typedef enum {
 // The fog of DISP3DCNT: its blending mode, its enable and the shift of its depth slope
 #define REG_G3X_DISP3DCNT_FMOD_SHIFT 6
 #define REG_G3X_DISP3DCNT_FMOD_MASK 0x0040
-#define REG_G3X_DISP3DCNT_FE_MASK 0x0080
-#define REG_G3X_DISP3DCNT_FSHIFT_SHIFT 8
-#define REG_G3X_DISP3DCNT_FSHIFT_MASK 0x0f00
+#define REG_G3X_DISP3DCNT_FME_MASK 0x0080
+#define REG_G3X_DISP3DCNT_FOG_SHIFT_SHIFT 8
+#define REG_G3X_DISP3DCNT_FOG_SHIFT_MASK 0x0f00
 
 // The clear color: the color, an alpha and a polygon ID, with the fog
 #define REG_G3X_CLEAR_COLOR_ALPHA_SHIFT 16
-#define REG_G3X_CLEAR_COLOR_ID_SHIFT 24
-#define REG_G3X_CLEAR_COLOR_FOG_MASK 0x00008000
+#define REG_G3X_CLEAR_COLOR_POLYGONID_SHIFT 24
+#define REG_G3X_CLEAR_COLOR_F_MASK 0x00008000
 
 static inline void G3X_SetFifoIntrCond(GXFifoIntrCond cond) {
-    reg_G3X_GXSTAT = (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FIFO_IRQ_MASK) | (cond << REG_G3X_GXSTAT_FIFO_IRQ_SHIFT);
+    reg_G3X_GXSTAT = (reg_G3X_GXSTAT & ~REG_G3X_GXSTAT_FI_MASK) | (cond << REG_G3X_GXSTAT_FI_SHIFT);
 }
 
 // NitroSDK's GXi_NopClearFifo128_, which writes 128 zero words to the FIFO port

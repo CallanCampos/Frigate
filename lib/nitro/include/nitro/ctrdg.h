@@ -12,10 +12,10 @@
 #define HW_CTRDG_MODULE_INFO_BUF 0x02fffc30
 
 typedef struct {
-    u16 romCheck; // The halfword that the ROM had at the address that the library checks
-    u8 unk_02[3];
+    u16 moduleID; // The halfword that the ROM had at the address that the library checks
+    u8 exLsiID[3];
     u8 isAgbCartridge : 1; // The ROM has the header of a GBA cartridge, so its game code can be compared
-    u8 pulledOut : 1;      // The library found that the cartridge was pulled out or exchanged
+    u8 detectPullOut : 1;  // The library found that the cartridge was pulled out or exchanged
     u8 unk_05 : 6;
     u16 makerCode;
     u32 gameCode; // The cartridge's game code

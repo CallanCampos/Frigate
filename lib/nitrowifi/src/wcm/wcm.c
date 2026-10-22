@@ -1517,7 +1517,7 @@ static void WcmWmcbIndication(void *ind) {
     WCMWork *work = WCMi_GetSystemWork();
 
     if (indication->errcode == 8) {
-        if (indication->state == 0x16 && indication->unk_06 == 0x25) {
+        if (indication->state == 0x16 && indication->reason == 0x25) {
             switch (work->state) {
             case 8:
                 WcmSetPhase(0xc);
@@ -1643,7 +1643,7 @@ static void WcmWmcbScanEx(void *ind) {
                 }
             }
             work->scanRequest.channelList =
-                (u16)((1 << WcmGetNextScanChannel((u16)(32 - MATH_CountLeadingZerosFunc(callback->channel)))) >> 1);
+                (u16)((1 << WcmGetNextScanChannel((u16)(32 - MATH_CountLeadingZerosFunc(callback->channelList)))) >> 1);
             DC_StoreRange(work->scanRequest.scanBuf, work->scanRequest.scanBufSize);
             work->scanCount++;
             result = WM_StartScanEx((WMCallbackFunc)WcmWmcbScanEx, &work->scanRequest);

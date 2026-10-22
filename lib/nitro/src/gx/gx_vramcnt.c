@@ -170,11 +170,11 @@ void GX_SetBankForBGExtPltt(GXVRamBGExtPltt banks) {
     gGXState.bgExtPltt = banks;
     switch (banks) {
     case GX_VRAM_BGEXTPLTT_0123_E:
-        reg_GX_DISPCNT |= REG_GX_DISPCNT_BGEXTPLTT_MASK;
+        reg_GX_DISPCNT |= REG_GX_DISPCNT_BG_MASK;
         reg_GX_VRAMCNT_E = GX_VRAMCNT(4, 0);
         break;
     case GX_VRAM_BGEXTPLTT_23_G:
-        reg_GX_DISPCNT |= REG_GX_DISPCNT_BGEXTPLTT_MASK;
+        reg_GX_DISPCNT |= REG_GX_DISPCNT_BG_MASK;
         reg_GX_VRAMCNT_G = GX_VRAMCNT(4, 1);
         break;
     case GX_VRAM_BGEXTPLTT_0123_FG:
@@ -182,10 +182,10 @@ void GX_SetBankForBGExtPltt(GXVRamBGExtPltt banks) {
         // fallthrough
     case GX_VRAM_BGEXTPLTT_01_F:
         reg_GX_VRAMCNT_F = GX_VRAMCNT(4, 0);
-        reg_GX_DISPCNT |= REG_GX_DISPCNT_BGEXTPLTT_MASK;
+        reg_GX_DISPCNT |= REG_GX_DISPCNT_BG_MASK;
         break;
     case GX_VRAM_BGEXTPLTT_NONE:
-        reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
+        reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BG_MASK;
         break;
     }
     GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
@@ -196,15 +196,15 @@ void GX_SetBankForOBJExtPltt(GXVRamOBJExtPltt banks) {
     gGXState.objExtPltt = banks;
     switch (banks) {
     case GX_VRAM_OBJEXTPLTT_0_F:
-        reg_GX_DISPCNT |= REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+        reg_GX_DISPCNT |= REG_GX_DISPCNT_O_MASK;
         reg_GX_VRAMCNT_F = GX_VRAMCNT(5, 0);
         break;
     case GX_VRAM_OBJEXTPLTT_0_G:
-        reg_GX_DISPCNT |= REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+        reg_GX_DISPCNT |= REG_GX_DISPCNT_O_MASK;
         reg_GX_VRAMCNT_G = GX_VRAMCNT(5, 0);
         break;
     case GX_VRAM_OBJEXTPLTT_NONE:
-        reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+        reg_GX_DISPCNT &= ~REG_GX_DISPCNT_O_MASK;
         break;
     }
     GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
@@ -311,27 +311,27 @@ void GX_SetBankForClearImage(GXVRamClearImage banks) {
     case GX_VRAM_CLEARIMAGE_256_AB:
         reg_GX_VRAMCNT_A = GX_VRAMCNT(3, 2);
         // fallthrough
-    case GX_VRAM_CLEARIMAGE_128_B:
+    case GX_VRAM_CLEARDEPTH_128_B:
         reg_GX_VRAMCNT_B = GX_VRAMCNT(3, 3);
-        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_CLRIMG_MASK;
+        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_PRI_MASK;
         break;
     case GX_VRAM_CLEARIMAGE_256_CD:
         reg_GX_VRAMCNT_C = GX_VRAMCNT(3, 2);
         // fallthrough
-    case GX_VRAM_CLEARIMAGE_128_D:
+    case GX_VRAM_CLEARDEPTH_128_D:
         reg_GX_VRAMCNT_D = GX_VRAMCNT(3, 3);
-        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_CLRIMG_MASK;
+        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_PRI_MASK;
         break;
     case GX_VRAM_CLEARIMAGE_NONE:
-        reg_G3X_DISP3DCNT &= ~REG_G3X_DISP3DCNT_CLRIMG_MASK;
+        reg_G3X_DISP3DCNT &= ~REG_G3X_DISP3DCNT_PRI_MASK;
         break;
-    case GX_VRAM_CLEARIMAGE_128_A:
+    case GX_VRAM_CLEARDEPTH_128_A:
         reg_GX_VRAMCNT_A = GX_VRAMCNT(3, 3);
-        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_CLRIMG_MASK;
+        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_PRI_MASK;
         break;
-    case GX_VRAM_CLEARIMAGE_128_C:
+    case GX_VRAM_CLEARDEPTH_128_C:
         reg_GX_VRAMCNT_C = GX_VRAMCNT(3, 3);
-        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_CLRIMG_MASK;
+        reg_G3X_DISP3DCNT |= REG_G3X_DISP3DCNT_PRI_MASK;
         break;
     }
     GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
@@ -402,11 +402,11 @@ void GX_SetBankForSubBGExtPltt(GXVRamSubBGExtPltt banks) {
     gGXState.subBgExtPltt = banks;
     switch (banks) {
     case GX_VRAM_SUB_BGEXTPLTT_0123_H:
-        reg_GXS_DB_DISPCNT |= REG_GX_DISPCNT_BGEXTPLTT_MASK;
+        reg_GXS_DB_DISPCNT |= REG_GX_DISPCNT_BG_MASK;
         reg_GX_VRAMCNT_H = GX_VRAMCNT(2, 0);
         break;
     case GX_VRAM_SUB_BGEXTPLTT_NONE:
-        reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
+        reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BG_MASK;
         break;
     }
     GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
@@ -417,11 +417,11 @@ void GX_SetBankForSubOBJExtPltt(GXVRamSubOBJExtPltt banks) {
     gGXState.subObjExtPltt = banks;
     switch (banks) {
     case GX_VRAM_SUB_OBJEXTPLTT_0_I:
-        reg_GXS_DB_DISPCNT |= REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+        reg_GXS_DB_DISPCNT |= REG_GX_DISPCNT_O_MASK;
         reg_GX_VRAMCNT_I = GX_VRAMCNT(3, 0);
         break;
     case GX_VRAM_SUB_OBJEXTPLTT_NONE:
-        reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+        reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_O_MASK;
         break;
     }
     GX_VRAMCNT_SetLCDC_(gGXState.lcdc);
@@ -446,12 +446,12 @@ GXVRamOBJ GX_ResetBankForOBJ(void) {
 }
 
 GXVRamBGExtPltt GX_ResetBankForBGExtPltt(void) {
-    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
+    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BG_MASK;
     return (GXVRamBGExtPltt)resetBankForX_(&gGXState.bgExtPltt);
 }
 
 GXVRamOBJExtPltt GX_ResetBankForOBJExtPltt(void) {
-    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_O_MASK;
     return (GXVRamOBJExtPltt)resetBankForX_(&gGXState.objExtPltt);
 }
 
@@ -476,12 +476,12 @@ GXVRamSubOBJ GX_ResetBankForSubOBJ(void) {
 }
 
 GXVRamSubBGExtPltt GX_ResetBankForSubBGExtPltt(void) {
-    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
+    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BG_MASK;
     return resetBankForX_(&gGXState.subBgExtPltt);
 }
 
 GXVRamSubOBJExtPltt GX_ResetBankForSubOBJExtPltt(void) {
-    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_O_MASK;
     return resetBankForX_(&gGXState.subObjExtPltt);
 }
 
@@ -530,12 +530,12 @@ GXVRamOBJ GX_DisableBankForOBJ(void) {
 }
 
 GXVRamBGExtPltt GX_DisableBankForBGExtPltt(void) {
-    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
+    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_BG_MASK;
     return disableBankForX_(&gGXState.bgExtPltt);
 }
 
 GXVRamOBJExtPltt GX_DisableBankForOBJExtPltt(void) {
-    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+    reg_GX_DISPCNT &= ~REG_GX_DISPCNT_O_MASK;
     return disableBankForX_(&gGXState.objExtPltt);
 }
 
@@ -568,12 +568,12 @@ GXVRamSubOBJ GX_DisableBankForSubOBJ(void) {
 }
 
 GXVRamSubBGExtPltt GX_DisableBankForSubBGExtPltt(void) {
-    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BGEXTPLTT_MASK;
+    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_BG_MASK;
     return disableBankForX_(&gGXState.subBgExtPltt);
 }
 
 GXVRamSubOBJExtPltt GX_DisableBankForSubOBJExtPltt(void) {
-    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_OBJEXTPLTT_MASK;
+    reg_GXS_DB_DISPCNT &= ~REG_GX_DISPCNT_O_MASK;
     return disableBankForX_(&gGXState.subObjExtPltt);
 }
 

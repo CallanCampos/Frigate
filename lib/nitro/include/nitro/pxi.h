@@ -9,17 +9,17 @@
 
 // The FIFO's registers: the four bits each processor sets for the other, and the FIFO's control and ports. The
 // register's address is its own macro for the boot code's assembly, which loads the register instead of reading it
-#define REG_PXI_MAINP_INTF_ADDR 0x04000180
-#define reg_PXI_MAINP_INTF (*(vu16 *)REG_PXI_MAINP_INTF_ADDR)
-#define REG_PXI_MAINP_INTF_RECV_MASK 0x000f
-#define REG_PXI_MAINP_INTF_SEND_SHIFT 8
+#define REG_SUBPINTF_ADDR 0x04000180
+#define reg_PXI_INTF (*(vu16 *)REG_SUBPINTF_ADDR)
+#define REG_PXI_INTF_RECV_MASK 0x000f
+#define REG_PXI_INTF_SEND_SHIFT 8
 #define reg_PXI_FIFO_CNT (*(vu16 *)0x04000184)
 #define REG_PXI_FIFO_CNT_SEND_FULL_MASK 0x0002
-#define REG_PXI_FIFO_CNT_RECV_EMPTY_MASK 0x0100
+#define REG_PXI_FIFO_CNT_RECV_EMP_MASK 0x0100
 #define REG_PXI_FIFO_CNT_ERR_MASK 0x4000
-#define REG_PXI_FIFO_CNT_ENABLE_MASK 0x8000
+#define REG_PXI_FIFO_CNT_E_MASK 0x8000
 // Writing the error bit clears it
-#define REG_PXI_FIFO_CNT_ERR_ACK (REG_PXI_FIFO_CNT_ENABLE_MASK | REG_PXI_FIFO_CNT_ERR_MASK)
+#define REG_PXI_FIFO_CNT_ERR_ACK (REG_PXI_FIFO_CNT_E_MASK | REG_PXI_FIFO_CNT_ERR_MASK)
 // Clears the send FIFO, enables the FIFO and its interrupt when the receive FIFO is not empty
 #define REG_PXI_FIFO_CNT_INIT 0xc408
 #define reg_PXI_SEND_FIFO (*(vu32 *)0x04000188)

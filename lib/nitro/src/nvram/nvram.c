@@ -8,27 +8,27 @@
 #include "nitro/os.h"
 #include "nitro/pxi.h"
 
-// A command is a series of words with the NVRAM's tag: the first has NVRAM_PXI_START, the command in bits 8 to 14 and
-// 8 bits of data, the last has NVRAM_PXI_END, and each of the others carries its index in bits 16 to 22 and 16 bits of
-// data
-#define NVRAM_PXI_START 0x02000000
-#define NVRAM_PXI_END 0x01000000
+// A command is a series of words with the NVRAM's tag: the first has SPI_PXI_START_BIT, the command in bits 8 to 14 and
+// 8 bits of data, the last has SPI_PXI_END_BIT, and each of the others carries its index in bits 16 to 22 and 16 bits
+// of data
+#define SPI_PXI_START_BIT 0x02000000
+#define SPI_PXI_END_BIT 0x01000000
 #define NVRAM_PXI_INDEX(index) ((index) << 16)
 #define NVRAM_PXI_COMMAND(command) ((command) << 8)
-#define NVRAM_PXI_COMMAND_WRITE_ENABLE 0x20
-#define NVRAM_PXI_COMMAND_WRITE_DISABLE 0x21
-#define NVRAM_PXI_COMMAND_READ_STATUS 0x22
-#define NVRAM_PXI_COMMAND_READ 0x23
-#define NVRAM_PXI_COMMAND_PAGE_WRITE 0x25
+#define SPI_PXI_COMMAND_NVRAM_WREN 0x20
+#define SPI_PXI_COMMAND_NVRAM_WRDI 0x21
+#define SPI_PXI_COMMAND_NVRAM_RDSR 0x22
+#define SPI_PXI_COMMAND_NVRAM_READ 0x23
+#define SPI_PXI_COMMAND_NVRAM_PW 0x25
 // Sent when the status register shows its error bit, after which the write ends in an error
-#define NVRAM_PXI_COMMAND_CLEAR_ERROR 0x2d
+#define SPI_PXI_COMMAND_NVRAM_SR 0x2d
 
 // What the ARM7 answers with in bits 0 to 7 of a word, which repeats the command in bits 8 to 14
-#define NVRAM_PXI_RESULT_MASK 0xff
+#define SPI_PXI_RESULT_DATA_MASK 0xff
 #define NVRAM_PXI_RESULT_SUCCESS 0
 #define NVRAM_PXI_RESULT_ILLEGAL_PARAMETER 2
 #define NVRAM_PXI_RESULT_ILLEGAL_STATUS 3
-#define NVRAM_PXI_RESULT_BUSY 4
+#define SPI_PXI_RESULT_EXCLUSIVE 4
 
 // The flash's status register: the bit set while it works, and the bit of an error
 #define NVRAM_STATUS_WRITE_IN_PROGRESS 0x01
@@ -36,7 +36,7 @@
 
 // A flash page is 256 bytes, which a write may not cross. The cache line of 32 bytes is the unit of what the ARM7
 // writes into the buffers
-#define NVRAM_PAGE_SIZE 0x100
+#define SPI_NVRAM_PAGE_SIZE 0x100
 #define NVRAM_BUFFER_SIZE 0x20
 
 // What the poll waits between two reads of the status register
@@ -99,12 +99,12 @@ static BOOL func_02079930(void);
 static void func_0207997c(NVRAMResult result, void *arg);
 static void func_02079994(void *arg);
 static BOOL func_020799a4(const u8 *a, const u8 *b, u32 size);
-static BOOL func_020799c8(void);
-static BOOL func_020799e4(void);
-static BOOL func_02079a00(u8 *status);
-static BOOL func_02079a5c(u32 address, u32 size, void *buf);
-static BOOL func_02079b08(u32 address, u16 size, const void *src);
-static BOOL func_02079b94(void);
+static BOOL SPI_NvramWriteEnable(void);
+static BOOL SPI_NvramWriteDisable(void);
+static BOOL SPI_NvramReadStatusRegister(u8 *status);
+static BOOL SPI_NvramReadDataBytes(u32 address, u32 size, void *buf);
+static BOOL SPI_NvramPageWrite(u32 address, u16 size, const void *src);
+static BOOL SPI_NvramSoftwareReset(void);
 
 // Calls back with the result, ending the call, and wakes the threads that wait for it
 static inline void NVRAMi_EndCommand(NVRAMResult result) {
@@ -168,7 +168,7 @@ NVRAMResult NVRAM_ReadDataBytesAsync(u32 address, u32 size, void *buf, NVRAMCall
     sNvramWork.callbackArg = arg;
     sNvramWork.phase = 0;
     enabled = OS_DisableInterrupts();
-    if (func_02079a5c(address, size, buf) == TRUE) {
+    if (SPI_NvramReadDataBytes(address, size, buf) == TRUE) {
         OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_SUCCESS;
     }
@@ -181,7 +181,7 @@ NVRAMResult NVRAM_ReadDataBytesAsync(u32 address, u32 size, void *buf, NVRAMCall
 // The answer to a read
 static void func_020792f4(u32 data, BOOL err) {
     NVRAMResult result = NVRAM_RESULT_FATAL_ERROR;
-    u16 status = data & NVRAM_PXI_RESULT_MASK;
+    u16 status = data & SPI_PXI_RESULT_DATA_MASK;
 
     if (err == FALSE && status == NVRAM_PXI_RESULT_SUCCESS) {
         result = NVRAM_RESULT_SUCCESS;
@@ -195,7 +195,7 @@ static void func_020792f4(u32 data, BOOL err) {
         case NVRAM_PXI_RESULT_ILLEGAL_STATUS:
             result = NVRAM_RESULT_ILLEGAL_STATUS;
             break;
-        case NVRAM_PXI_RESULT_BUSY:
+        case SPI_PXI_RESULT_EXCLUSIVE:
             result = NVRAM_RESULT_BUSY;
             break;
         }
@@ -254,7 +254,7 @@ NVRAMResult NVRAM_WriteDataBytesAsync(u32 address, u32 size, const void *src, NV
     sNvramWork.buf = (u8 *)src;
     sNvramWork.phase = NVRAM_WRITE_ENABLE_SENT;
     enabled = OS_DisableInterrupts();
-    if (func_020799c8() == TRUE) {
+    if (SPI_NvramWriteEnable() == TRUE) {
         OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_SUCCESS;
     }
@@ -267,8 +267,8 @@ NVRAMResult NVRAM_WriteDataBytesAsync(u32 address, u32 size, const void *src, NV
 // The answer to a write, or the alarm that stands for one
 static void func_02079458(u32 data, BOOL err) {
     NVRAMResult result = NVRAM_RESULT_FATAL_ERROR;
-    u16 status = data & NVRAM_PXI_RESULT_MASK;
-    u16 room = NVRAM_PAGE_SIZE - (u8)sNvramWork.address;
+    u16 status = data & SPI_PXI_RESULT_DATA_MASK;
+    u16 room = SPI_NVRAM_PAGE_SIZE - (u8)sNvramWork.address;
     u32 size = sNvramWork.size;
     u16 chunk;
     u8 flash;
@@ -277,14 +277,14 @@ static void func_02079458(u32 data, BOOL err) {
     switch (sNvramWork.phase) {
     case NVRAM_WRITE_ENABLE_SENT:
         if (err == FALSE && status == NVRAM_PXI_RESULT_SUCCESS) {
-            if (func_02079b08(sNvramWork.address, chunk, sNvramWork.buf) == TRUE) {
+            if (SPI_NvramPageWrite(sNvramWork.address, chunk, sNvramWork.buf) == TRUE) {
                 sNvramWork.phase = NVRAM_WRITE_PAGE_SENT;
                 return;
             }
             result = NVRAM_RESULT_SEND_ERROR;
         } else if (err == TRUE) {
             result = NVRAM_RESULT_SEND_ERROR;
-        } else if (status == NVRAM_PXI_RESULT_BUSY) {
+        } else if (status == SPI_PXI_RESULT_EXCLUSIVE) {
             result = NVRAM_RESULT_BUSY;
         }
         break;
@@ -307,8 +307,8 @@ static void func_02079458(u32 data, BOOL err) {
             case NVRAM_PXI_RESULT_ILLEGAL_STATUS:
                 result = NVRAM_RESULT_ILLEGAL_STATUS;
                 break;
-            case NVRAM_PXI_RESULT_BUSY:
-                if (func_02079b08(sNvramWork.address, chunk, sNvramWork.buf) == TRUE) {
+            case SPI_PXI_RESULT_EXCLUSIVE:
+                if (SPI_NvramPageWrite(sNvramWork.address, chunk, sNvramWork.buf) == TRUE) {
                     return;
                 }
                 result = NVRAM_RESULT_SEND_ERROR;
@@ -320,32 +320,32 @@ static void func_02079458(u32 data, BOOL err) {
         if (err == FALSE && status == NVRAM_PXI_RESULT_SUCCESS) {
             flash = sNvramBuffer[0];
             if (flash & NVRAM_STATUS_ERROR) {
-                if (func_02079b94() == TRUE) {
+                if (SPI_NvramSoftwareReset() == TRUE) {
                     sNvramWork.phase = NVRAM_WRITE_CLEAR_ERROR_SENT;
                     return;
                 }
                 sNvramWork.phase = NVRAM_WRITE_CLEAR_ERROR_SENT;
-                NVRAMi_SetAlarm(NVRAM_PXI_RESULT_BUSY);
+                NVRAMi_SetAlarm(SPI_PXI_RESULT_EXCLUSIVE);
                 return;
             }
             if (!(flash & NVRAM_STATUS_WRITE_IN_PROGRESS)) {
                 if (chunk != 0) {
-                    if (func_020799c8() == TRUE) {
+                    if (SPI_NvramWriteEnable() == TRUE) {
                         sNvramWork.phase = NVRAM_WRITE_ENABLE_SENT;
                         return;
                     }
                     result = NVRAM_RESULT_SEND_ERROR;
                     break;
                 }
-                if (func_020799e4() == TRUE) {
+                if (SPI_NvramWriteDisable() == TRUE) {
                     sNvramWork.phase = NVRAM_WRITE_DISABLE_SENT;
                     return;
                 }
                 sNvramWork.phase = NVRAM_WRITE_DISABLE_SENT;
-                NVRAMi_SetAlarm(NVRAM_PXI_RESULT_BUSY);
+                NVRAMi_SetAlarm(SPI_PXI_RESULT_EXCLUSIVE);
                 return;
             }
-        } else if (err == FALSE && status != NVRAM_PXI_RESULT_BUSY) {
+        } else if (err == FALSE && status != SPI_PXI_RESULT_EXCLUSIVE) {
             break;
         }
         sNvramWork.phase = NVRAM_WRITE_POLL_WAIT;
@@ -356,32 +356,32 @@ static void func_02079458(u32 data, BOOL err) {
             result = NVRAM_RESULT_SUCCESS;
             break;
         }
-        if (err == FALSE && status != NVRAM_PXI_RESULT_BUSY) {
+        if (err == FALSE && status != SPI_PXI_RESULT_EXCLUSIVE) {
             break;
         }
-        if (func_020799e4() == TRUE) {
+        if (SPI_NvramWriteDisable() == TRUE) {
             return;
         }
         sNvramWork.phase = NVRAM_WRITE_DISABLE_SENT;
-        NVRAMi_SetAlarm(NVRAM_PXI_RESULT_BUSY);
+        NVRAMi_SetAlarm(SPI_PXI_RESULT_EXCLUSIVE);
         return;
     case NVRAM_WRITE_CLEAR_ERROR_SENT:
         if (err == FALSE && status == NVRAM_PXI_RESULT_SUCCESS) {
             result = NVRAM_RESULT_WRITE_ERROR;
             break;
         }
-        if (err == FALSE && status != NVRAM_PXI_RESULT_BUSY) {
+        if (err == FALSE && status != SPI_PXI_RESULT_EXCLUSIVE) {
             break;
         }
-        if (func_02079b94() == TRUE) {
+        if (SPI_NvramSoftwareReset() == TRUE) {
             return;
         }
         sNvramWork.phase = NVRAM_WRITE_CLEAR_ERROR_SENT;
-        NVRAMi_SetAlarm(NVRAM_PXI_RESULT_BUSY);
+        NVRAMi_SetAlarm(SPI_PXI_RESULT_EXCLUSIVE);
         return;
     case NVRAM_WRITE_POLL_WAIT:
         DC_InvalidateRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
-        if (func_02079a00(sNvramBuffer) == TRUE) {
+        if (SPI_NvramReadStatusRegister(sNvramBuffer) == TRUE) {
             sNvramWork.phase = NVRAM_WRITE_STATUS_SENT;
             return;
         }
@@ -451,7 +451,7 @@ NVRAMResult NVRAM_VerifyDataBytesAsync(u32 address, u32 size, const void *src, N
     if (size <= NVRAM_BUFFER_SIZE) {
         chunk = size;
     }
-    if (func_02079a5c(address, chunk, sNvramBuffer) == TRUE) {
+    if (SPI_NvramReadDataBytes(address, chunk, sNvramBuffer) == TRUE) {
         OS_RestoreInterrupts(enabled);
         return NVRAM_RESULT_SUCCESS;
     }
@@ -464,7 +464,7 @@ NVRAMResult NVRAM_VerifyDataBytesAsync(u32 address, u32 size, const void *src, N
 // The answer to a verify, which compares what the ARM7 read into the buffer with the data and reads the next 32 bytes
 static void func_020797d4(u32 data, BOOL err) {
     NVRAMResult result = NVRAM_RESULT_FATAL_ERROR;
-    u16 status = data & NVRAM_PXI_RESULT_MASK;
+    u16 status = data & SPI_PXI_RESULT_DATA_MASK;
     u32 remaining = sNvramWork.size;
     u32 next;
     u16 chunk;
@@ -486,7 +486,7 @@ static void func_020797d4(u32 data, BOOL err) {
                 if (sNvramWork.size <= NVRAM_BUFFER_SIZE) {
                     next = sNvramWork.size;
                 }
-                if (func_02079a5c(sNvramWork.address, next, sNvramBuffer) == TRUE) {
+                if (SPI_NvramReadDataBytes(sNvramWork.address, next, sNvramBuffer) == TRUE) {
                     return;
                 }
                 result = NVRAM_RESULT_SEND_ERROR;
@@ -504,9 +504,9 @@ static void func_020797d4(u32 data, BOOL err) {
         case NVRAM_PXI_RESULT_ILLEGAL_STATUS:
             result = NVRAM_RESULT_ILLEGAL_STATUS;
             break;
-        case NVRAM_PXI_RESULT_BUSY:
+        case SPI_PXI_RESULT_EXCLUSIVE:
             DC_InvalidateRange(sNvramBuffer, NVRAM_BUFFER_SIZE);
-            if (func_02079a5c(sNvramWork.address, chunk, sNvramBuffer) == TRUE) {
+            if (SPI_NvramReadDataBytes(sNvramWork.address, chunk, sNvramBuffer) == TRUE) {
                 return;
             }
             result = NVRAM_RESULT_SEND_ERROR;
@@ -595,9 +595,9 @@ static BOOL func_020799a4(const u8 *a, const u8 *b, u32 size) {
 }
 
 // Sends the command that enables writing
-static BOOL func_020799c8(void) {
+static BOOL SPI_NvramWriteEnable(void) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
-                           NVRAM_PXI_START | NVRAM_PXI_END | NVRAM_PXI_COMMAND(NVRAM_PXI_COMMAND_WRITE_ENABLE),
+                           SPI_PXI_START_BIT | SPI_PXI_END_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_WREN),
                            FALSE) < 0) {
         return FALSE;
     }
@@ -605,9 +605,9 @@ static BOOL func_020799c8(void) {
 }
 
 // Sends the command that disables writing
-static BOOL func_020799e4(void) {
+static BOOL SPI_NvramWriteDisable(void) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
-                           NVRAM_PXI_START | NVRAM_PXI_END | NVRAM_PXI_COMMAND(NVRAM_PXI_COMMAND_WRITE_DISABLE),
+                           SPI_PXI_START_BIT | SPI_PXI_END_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_WRDI),
                            FALSE) < 0) {
         return FALSE;
     }
@@ -615,16 +615,16 @@ static BOOL func_020799e4(void) {
 }
 
 // Sends the command that reads the status register to the address of status, which is the byte that the ARM7 writes
-static BOOL func_02079a00(u8 *status) {
+static BOOL SPI_NvramReadStatusRegister(u8 *status) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
-                           NVRAM_PXI_START | NVRAM_PXI_COMMAND(NVRAM_PXI_COMMAND_READ_STATUS) | ((u32)status >> 24),
+                           SPI_PXI_START_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_RDSR) | ((u32)status >> 24),
                            FALSE) < 0) {
         return FALSE;
     }
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, NVRAM_PXI_INDEX(1) | (((u32)status >> 8) & 0xffff), FALSE) < 0) {
         return FALSE;
     }
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, NVRAM_PXI_END | NVRAM_PXI_INDEX(2) | (((u32)status << 8) & 0xff00),
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, SPI_PXI_END_BIT | NVRAM_PXI_INDEX(2) | (((u32)status << 8) & 0xff00),
                            FALSE) < 0) {
         return FALSE;
     }
@@ -632,9 +632,9 @@ static BOOL func_02079a00(u8 *status) {
 }
 
 // Sends the command that reads size bytes of the NVRAM from address to buf
-static BOOL func_02079a5c(u32 address, u32 size, void *buf) {
+static BOOL SPI_NvramReadDataBytes(u32 address, u32 size, void *buf) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
-                           NVRAM_PXI_START | NVRAM_PXI_COMMAND(NVRAM_PXI_COMMAND_READ) | ((address >> 16) & 0xff),
+                           SPI_PXI_START_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_READ) | ((address >> 16) & 0xff),
                            FALSE) < 0) {
         return FALSE;
     }
@@ -650,16 +650,16 @@ static BOOL func_02079a5c(u32 address, u32 size, void *buf) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, NVRAM_PXI_INDEX(4) | ((u32)buf >> 16), FALSE) < 0) {
         return FALSE;
     }
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, NVRAM_PXI_END | NVRAM_PXI_INDEX(5) | ((u32)buf & 0xffff), FALSE) < 0) {
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, SPI_PXI_END_BIT | NVRAM_PXI_INDEX(5) | ((u32)buf & 0xffff), FALSE) < 0) {
         return FALSE;
     }
     return TRUE;
 }
 
 // Sends the command that writes size bytes from src to the page of the NVRAM at address
-static BOOL func_02079b08(u32 address, u16 size, const void *src) {
+static BOOL SPI_NvramPageWrite(u32 address, u16 size, const void *src) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
-                           NVRAM_PXI_START | NVRAM_PXI_COMMAND(NVRAM_PXI_COMMAND_PAGE_WRITE) | ((address >> 16) & 0xff),
+                           SPI_PXI_START_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_PW) | ((address >> 16) & 0xff),
                            FALSE) < 0) {
         return FALSE;
     }
@@ -672,16 +672,16 @@ static BOOL func_02079b08(u32 address, u16 size, const void *src) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, NVRAM_PXI_INDEX(3) | ((u32)src >> 16), FALSE) < 0) {
         return FALSE;
     }
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, NVRAM_PXI_END | NVRAM_PXI_INDEX(4) | ((u32)src & 0xffff), FALSE) < 0) {
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM, SPI_PXI_END_BIT | NVRAM_PXI_INDEX(4) | ((u32)src & 0xffff), FALSE) < 0) {
         return FALSE;
     }
     return TRUE;
 }
 
 // Sends the command that clears the flash's error
-static BOOL func_02079b94(void) {
+static BOOL SPI_NvramSoftwareReset(void) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
-                           NVRAM_PXI_START | NVRAM_PXI_END | NVRAM_PXI_COMMAND(NVRAM_PXI_COMMAND_CLEAR_ERROR),
+                           SPI_PXI_START_BIT | SPI_PXI_END_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_SR),
                            FALSE) < 0) {
         return FALSE;
     }

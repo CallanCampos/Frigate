@@ -2135,7 +2135,7 @@ static void BtlvInput_BallScaleTask(TCB *tcb, void *data) {
     } else if (param->step < 0) {
         param->y += 2;
     }
-    MAT2_Scaling(&mtx, param->scale, param->scale);
+    MTX_Scale22_(&mtx, param->scale, param->scale);
     GFL_BGSysSetBGTransformEx(7, BG_MOVE_SET_X, 128, &mtx, 256, 256);
     GFL_BGSysSetBGTransformEx(7, BG_MOVE_SET_Y, param->y, &mtx, 256, 256);
     if (param->scale == param->target) {

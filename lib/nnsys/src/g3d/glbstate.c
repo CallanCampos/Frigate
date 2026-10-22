@@ -92,7 +92,7 @@ void NNS_G3DFlushModelViewProjection(void) {
     NNS_G3dGeMultMtx43(&NNS_G3dGlb.cameraMtx);
     NNS_G3dGeBufferOP_N(0x1b19, (const u32 *)&NNS_G3dGlb.prmBaseMtx, 15); // MTX_MULT_4x3 and MTX_SCALE
     NNS_G3dGeMtxMode(GX_MTXMODE_POSITION_VECTOR);
-    MAT3_Invert(&NNS_G3dGlb.prmBaseRot, &invBaseRot.rt.rot);
+    MTX_Inverse33(&NNS_G3dGlb.prmBaseRot, &invBaseRot.rt.rot);
     NNS_G3dGeLoadMtx43(&invBaseRot);
     NNS_G3dGeBufferOP_N(NNS_G3dGlb.cmd1, (const u32 *)&NNS_G3dGlb.cmd1 + 1, 14);
     NNS_G3dGeIdentity();

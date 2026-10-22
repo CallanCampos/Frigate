@@ -14,8 +14,8 @@ WMErrCode WM_StartDCF(WMCallbackFunc callback, WMDcfRecvBuf *recvBuf, u16 recvBu
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
-    if (w9b->status->dcfFlag == TRUE) {
+    DC_InvalidateRange(&w9b->status->dcf_flag, 4);
+    if (w9b->status->dcf_flag == TRUE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (recvBufSize < 0x10) {
@@ -43,8 +43,8 @@ WMErrCode WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const u16 *buffe
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
-    if (w9b->status->dcfFlag == FALSE) {
+    DC_InvalidateRange(&w9b->status->dcf_flag, 4);
+    if (w9b->status->dcf_flag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (byteLength > 0x5e4) {
@@ -67,8 +67,8 @@ WMErrCode WM_EndDCF(WMCallbackFunc callback) {
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
-    if (w9b->status->dcfFlag == FALSE) {
+    DC_InvalidateRange(&w9b->status->dcf_flag, 4);
+    if (w9b->status->dcf_flag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     WMi_SetCallbackTable(WM_APIID_END_DCF, callback);

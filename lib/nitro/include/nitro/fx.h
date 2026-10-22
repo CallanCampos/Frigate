@@ -118,23 +118,23 @@ static inline void VEC_Fx16Set(VecFx16 *v, fx16 x, fx16 y, fx16 z) {
 
 // fx_mtx22.c. Swan: MAT2_Identity, MAT2_Rotation, MAT2_Scale
 void MTX_Identity22_(MtxFx22 *mtx);
-void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y);
+void MTX_Scale22_(MtxFx22 *mtx, fx32 x, fx32 y);
 // A rotation from its sine and cosine
 void MTX_Rot22_(MtxFx22 *mtx, fx32 sin, fx32 cos);
 void MTX_ScaleApply22(const MtxFx22 *src, MtxFx22 *dest, fx32 x, fx32 y);
 
 // fx_mtx33.c. Swan: MAT3_Identity, MAT3_Scale, MAT3_RotationX/Y/Z, MAT3_Mul, MAT3_MulVec
 void MTX_Identity33_(MtxFx33 *mtx);
-void MAT3_To4x4(const MtxFx33 *src, MtxFx44 *dst);
-void MAT3_Scaling(MtxFx33 *mtx, fx32 x, fx32 y, fx32 z);
+void MTX_Copy33To44_(const MtxFx33 *src, MtxFx44 *dst);
+void MTX_Scale33_(MtxFx33 *mtx, fx32 x, fx32 y, fx32 z);
 void MTX_ScaleApply33(const MtxFx33 *src, MtxFx33 *dest, fx32 x, fx32 y, fx32 z);
 // Rotations about an axis from its sine and cosine
 void MTX_RotX33_(MtxFx33 *mtx, fx32 sin, fx32 cos);
 void MTX_RotY33_(MtxFx33 *mtx, fx32 sin, fx32 cos);
 void MTX_RotZ33_(MtxFx33 *mtx, fx32 sin, fx32 cos);
-void MAT3_RotationAxisAngle(MtxFx33 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos);
+void MTX_RotAxis33(MtxFx33 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos);
 // Returns -1 when the matrix has no inverse
-int MAT3_Invert(const MtxFx33 *mtx, MtxFx33 *inv);
+int MTX_Inverse33(const MtxFx33 *mtx, MtxFx33 *inv);
 void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab);
 void MTX_MultVec33(const VecFx32 *vec, const MtxFx33 *mtx, VecFx32 *dest);
 
