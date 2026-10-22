@@ -1584,7 +1584,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | complete | descriptive |
 | `dsprot_stub_check.c` | `0x021a33fc`–`0x021a37b0` | 5 | complete | descriptive |
 | `dsprot_decrypt.c` | `0x021a37b0`–`0x021a3ab0` | 5 | complete | descriptive |
-| `dsprot_detect.c` | `0x021a3ab0`–`0x021a4484` | 14 | partial | descriptive |
+| `dsprot_detect.c` | `0x021a3ab0`–`0x021a4484` | 6 (+8 generated veneers) | complete | descriptive |
 | `dsprot_cipher.c` | `0x021a4484`–`0x021a49dc` | 8 | complete | descriptive |
 
 ### Overlay 166

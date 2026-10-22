@@ -8,6 +8,14 @@ tools that show the differences.
 
 ## Registers
 
+- Nested inline boundaries and file-level interprocedural analysis can explain saved-result lifetimes and register
+  allocation. DS Protect's `DSProt_RunChecks` matches with an inline Boolean checksum helper inside an inline
+  queue runner, whose result the public function returns. Its flashcart check uses an inline test returning
+  the encoded success/failure values and an inline raw reader taking a byte count. Both files match their
+  functions, data and relocations in both versions with per-source `-ipa file`; other DS Protect sources keep
+  their own settings. The loader-owned static constructor registrations need `__attribute__((used))` under
+  this analysis because their references are outside the C call graph.
+
 - A missing variadic log argument can change registers throughout a function without changing its size. Check the
   ROM's format string before tuning allocation: `download_play_wih.c`'s parent and MP callbacks and finalizer require
   a state argument for their strings' `%d`. Supplying the state

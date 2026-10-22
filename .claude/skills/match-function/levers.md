@@ -7,6 +7,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Saved-result lifetimes and widespread register differences in a nested check runner: recover its semantic
+  inline boundaries and probe per-source `-ipa file`, including loader-owned constructor data.
+  (matching.md: "Nested inline boundaries and file-level interprocedural analysis")
+
 - Registers differ around an indirect log call: read the ROM format string and check every variadic argument before
   tuning allocation. (matching.md: "A missing variadic log argument")
 - A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)

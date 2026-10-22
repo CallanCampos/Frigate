@@ -71,6 +71,7 @@ lib/dsprot/src/dsprot_decrypt.c:
     .bss        start:0x021a4d84 end:0x021a4da0
 
 lib/dsprot/src/dsprot_detect.c:
+    complete
     .text       start:0x021a3af0 end:0x021a44c4
     .rodata     start:0x021a4ce4 end:0x021a4cec
     .ctor       start:0x021a4d14 end:0x021a4d18
