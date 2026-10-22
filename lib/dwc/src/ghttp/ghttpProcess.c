@@ -212,7 +212,7 @@ void ghiDoConnecting(GHIConnection *connection) {
             } else {
                 address.port = GHI_SWAP16(connection->serverPort);
             }
-            address.addr = connection->serverIp;
+            address.addr.addr = connection->serverIp;
             result = connect(connection->socket, &address, 8);
         }
         if (result == -1) {

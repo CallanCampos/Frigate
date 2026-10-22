@@ -33,7 +33,7 @@ struct WCMApEntry {
     u8 inUse;
     u8 unk_01;
     u16 scanLinkLevel; // DS scan link level; the DSi producer's value domain is unconfirmed
-    s32 id;            // the AP list header's count when this entry was allocated or reused
+    u32 id;            // the AP list header's count when this entry was allocated or reused
     WCMApEntry *prev;
     WCMApEntry *next;
     u32 data[WCM_APLIST_SIZE / sizeof(u32)]; // a WMBssDesc's prefix; bytes 0x40..0xbf hold packed IEs, not WMGameInfo
@@ -83,11 +83,11 @@ static void WCM_SetConfig(WCMConfig *config, WCMNotify notify);
 static void WCM_ResetSearchOption(void);
 static void WCM_TimeoutAlarmHandler(void);
 static s32 WCM_GetDefaultWirelessMode(void);
-static void *WCM_PointApListCore(u16 index);
+static WMBssDesc *WCM_PointApListCore(u16 index);
 static WCMApEntry *WCM_AllocApEntry(void);
 static WCMApEntry *WCM_GetOldestApEntry(void);
 static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid);
-static WCMApEntry *WCM_FindApEntryById(s32 id);
+static WCMApEntry *WCM_FindApEntryById(u32 id);
 static void WCM_TouchApEntry(WCMApEntry *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
 static void *WCM_GetInformationElement(const void *frame, u32 tag, const u8 *oui);
@@ -96,7 +96,7 @@ static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 h
                                  s32 dataLen);
 static BOOL WCM_CompareBytes(const void *a, const void *b, u32 size);
 static BOOL WCM_CompareBssID(const u8 *a, const u8 *b);
-static s32 WCM_RssiToQuality(u32 rssi);
+static WMLinkLevel WCM_RssiToQuality(u32 rssi);
 static u8 WCM_GetAverageRssi(void);
 static s32 WCM_StartupStep1(void);
 static s32 WCM_StartupStep2(void);
@@ -303,7 +303,7 @@ s32 WCM_CleanupAsync(void) {
     return result;
 }
 
-s32 WCM_SearchAsync(const u8 *bssid, const u8 *essid, u32 option) {
+s32 WCM_SearchAsync(void *bssid, void *essid, u32 option) {
     if (bssid == NULL || essid == NULL) {
         return WCM_StopSearchAsync();
     }
@@ -365,7 +365,7 @@ s32 WCM_StopSearchAsync(void) {
     return 3;
 }
 
-s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option) {
+s32 WCM_ConnectAsync(void *bssDesc, void *wepDesc, u32 option) {
     u32 irq;
     WCMWork *work;
     s32 result;
@@ -557,7 +557,7 @@ s32 WCM_GetState(void) {
     return state;
 }
 
-s32 WCM_SetSearchOption(u32 option) {
+u32 WCM_SetSearchOption(u32 option) {
     u32 irq = OS_DisableInterrupts();
     u32 mask = 0;
     // BUG: The original reads the search option before checking whether WCM has been initialized.
@@ -770,11 +770,11 @@ s32 WCM_LockApList(s32 lock) {
     return lock;
 }
 
-void *WCM_PointApList(u16 index) {
+WMBssDesc *WCM_PointApList(u16 index) {
     return WCM_PointApListCore(index);
 }
 
-static void *WCM_PointApListCore(u16 index) {
+static WMBssDesc *WCM_PointApListCore(u16 index) {
     u32 irq = OS_DisableInterrupts();
     WCMWork *work = WCM_GetWork();
     WCMApEntry *entry;
@@ -885,7 +885,7 @@ static WCMApEntry *WCM_FindApEntryByBssid(const u8 *bssid) {
     return entry;
 }
 
-static WCMApEntry *WCM_FindApEntryById(s32 id) {
+static WCMApEntry *WCM_FindApEntryById(u32 id) {
     WCMWork *work = WCM_GetWork();
     WCMApListHeader *header = (WCMApListHeader *)work->apBuffer;
     WCMApEntry *entry = NULL;
@@ -1031,7 +1031,7 @@ static void WCM_InitOnce(void) {
     }
 }
 
-void WCM_DispatchRecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
+void WCM_DispatchRecvCallback(const u8 *src, const u8 *dst, const u8 *data, s32 len) {
     if (sWcmGlobal.recvCallback != NULL) {
         sWcmGlobal.recvCallback(src, dst, data, len);
     }
@@ -1041,8 +1041,8 @@ WCMGlobal *WCM_GetGlobal(void) {
     return &sWcmGlobal;
 }
 
-const u8 *WCM_GetApMacAddress(void) {
-    const u8 *mac = NULL;
+u8 *WCM_GetApMacAddress(void) {
+    u8 *mac = NULL;
     WCMWork *work = WCM_GetWork();
     u32 irq = OS_DisableInterrupts();
 
@@ -1054,8 +1054,8 @@ const u8 *WCM_GetApMacAddress(void) {
 }
 
 // The SSID is borrowed from the connected BSS descriptor and is not necessarily NUL-terminated.
-const u8 *WCM_GetConnectedApSsid(u16 *ssidLength) {
-    const u8 *ssid = NULL;
+u8 *WCM_GetConnectedApSsid(u16 *ssidLength) {
+    u8 *ssid = NULL;
     u16 length = 0;
     WCMWork *work = WCM_GetWork();
     u32 irq = OS_DisableInterrupts();
@@ -1073,7 +1073,7 @@ const u8 *WCM_GetConnectedApSsid(u16 *ssidLength) {
     return ssid;
 }
 
-void WCM_SetRecvDCFCallback(void (*callback)(u8 *src, u8 *dst, u8 *data, u32 len)) {
+void WCM_SetRecvDCFCallback(WCMRecvInd callback) {
     u32 irq = OS_DisableInterrupts();
     sWcmGlobal.recvCallback = callback;
     OS_RestoreInterrupts(irq);
@@ -1181,10 +1181,10 @@ static BOOL WCM_CompareBssID(const u8 *a, const u8 *b) {
     return WCM_CompareBytes(a, b, 6);
 }
 
-s32 WCM_UpdateLinkQuality(void) {
+WMLinkLevel WCM_UpdateLinkQuality(void) {
     u32 irq = OS_DisableInterrupts();
     WCMWork *work = WCM_GetWork();
-    s32 quality = 0;
+    WMLinkLevel quality = WM_LINK_LEVEL_0;
 
     if (work != NULL && work->state == 9) {
         quality = WCM_RssiToQuality(WCM_GetAverageRssi());
@@ -1193,31 +1193,31 @@ s32 WCM_UpdateLinkQuality(void) {
     return quality;
 }
 
-static s32 WCM_RssiToQuality(u32 rssi) {
+static WMLinkLevel WCM_RssiToQuality(u32 rssi) {
     switch (WCM_GetWork()->wirelessMode) {
     case 1:
     default:
         if (rssi >= 0x1c) {
-            return 3;
+            return WM_LINK_LEVEL_3;
         }
         if (rssi >= 0x16) {
-            return 2;
+            return WM_LINK_LEVEL_2;
         }
         if (rssi >= 0x10) {
-            return 1;
+            return WM_LINK_LEVEL_1;
         }
-        return 0;
+        return WM_LINK_LEVEL_0;
     case 2:
         if (rssi >= 0x16) {
-            return 3;
+            return WM_LINK_LEVEL_3;
         }
         if (rssi >= 0x11) {
-            return 2;
+            return WM_LINK_LEVEL_2;
         }
         if (rssi >= 0xc) {
-            return 1;
+            return WM_LINK_LEVEL_1;
         }
-        return 0;
+        return WM_LINK_LEVEL_0;
     }
 }
 

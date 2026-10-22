@@ -98,9 +98,9 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
             gpiCallErrorCallback(connection, 3, 1);
             return 3;
         }
-        address.addr = *(gsi_u32 *)host->addrList[0];
+        address.addr.addr = *(gsi_u32 *)host->addrList[0];
     } else {
-        address.addr = inet_addr(sConnectionManagerHostname);
+        address.addr.addr = inet_addr(sConnectionManagerHostname);
     }
     address.port = GPI_CONNECTION_MANAGER_PORT;
     if (connect(iconnection->cmSocket, &address, sizeof(address)) == -1) {

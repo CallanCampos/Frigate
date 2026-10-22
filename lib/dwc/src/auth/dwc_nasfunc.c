@@ -550,7 +550,7 @@ static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
     RTCTime time;
     OSOwnerInfo owner;
     u32 irq;
-    const u8 *apMac;
+    u8 *apMac;
     u8 *ssid;
     int i;
     u32 level;
@@ -589,7 +589,7 @@ static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
                 time.minute, time.second);
     irq = OS_DisableInterrupts();
     apMac = WCM_GetApMacAddress();
-    DC_InvalidateRange((void *)apMac, 6);
+    DC_InvalidateRange(apMac, 6);
     if (apMac == NULL) {
         OS_RestoreInterrupts(irq);
         return FALSE;
@@ -602,7 +602,7 @@ static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
         level = 99;
     }
     OS_SNPrintf(info->apInfo, 0xe, "%02d:0000000-00", level);
-    ssid = (u8 *)WCM_GetConnectedApSsid(&channel);
+    ssid = WCM_GetConnectedApSsid(&channel);
     DC_InvalidateRange(ssid, 0x20);
     if (ssid == NULL) {
         OS_RestoreInterrupts(irq);

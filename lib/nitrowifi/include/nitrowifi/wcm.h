@@ -58,6 +58,9 @@ typedef struct {
 
 typedef void (*WCMNotify)(WCMNotice *notice);
 
+// The function that every received data frame goes to
+typedef void (*WCMRecvInd)(const u8 *srcAddr, const u8 *dstAddr, const u8 *buf, s32 len);
+
 s32 WCM_Init(void *work, s32 size);
 // WCM_Init selects mode 1 (DS). The core also accepts 2 (DSi, requiring 0x4800 bytes), or 0 to use the stored
 // preference or hardware default. Main's direct caller selects mode 2; this parameter is a mode, not a boolean.
@@ -67,18 +70,18 @@ s32 WCM_Finish(void);
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify);
 s32 WCM_CleanupAsync(void);
 // Either NULL pointer requests a stop; option is ignored on that path.
-s32 WCM_SearchAsync(const u8 *bssid, const u8 *essid, u32 option);
+s32 WCM_SearchAsync(void *bssid, void *essid, u32 option);
 // Descriptive name: requests a scan stop, with completion through WCM_NOTIFY_END_SEARCH.
 s32 WCM_StopSearchAsync(void);
 // Accepted descriptors are copied into WCM's work during this call; their pointers are not retained.
 // option is applied through WCM_SetSearchOption before the connection backend starts.
-s32 WCM_ConnectAsync(const void *bssDesc, const void *wepDesc, u32 option);
+s32 WCM_ConnectAsync(void *bssDesc, void *wepDesc, u32 option);
 s32 WCM_DisconnectAsync(void);
 // Descriptive name: restores idle operation through the selected backend, resetting an active connection if needed.
 s32 WCM_RestoreIdleAsync(void);
 s32 WCM_GetState(void);
 // Updates the selected option fields and ORs the entire normalized incoming word, returning the previous word.
-s32 WCM_SetSearchOption(u32 option);
+u32 WCM_SetSearchOption(u32 option);
 // The options of WCM_ConnectAsync that pick the power saving and the authentication (descriptive names). Each is a
 // pair of bits: the upper one says that the option is given, the lower one is its value (WCM_SetSearchOption sets or
 // clears 0x10000 and 0x40000 by it), and the connection reads them back as "!= 0x30000" for power saving and
@@ -93,18 +96,18 @@ s32 WCM_GetChannelMask(void);
 // Clears the AP-list storage with IRQs disabled, invalidating borrowed AP-list records regardless of list lock.
 void WCM_ClearApListBuffer(void);
 // Descriptive name: returns a computed level from 0 through 3 in connected state 9, or zero otherwise.
-s32 WCM_UpdateLinkQuality(void);
+WMLinkLevel WCM_UpdateLinkQuality(void);
 s32 WCM_CountApList(void);
 s32 WCM_LockApList(s32 lock);
-void *WCM_PointApList(u16 index);
+WMBssDesc *WCM_PointApList(u16 index);
 // A beacon or probe response NitroSDK's WM handed WCM; fills or touches its WCM_PointApList entry
 void WCM_OnBeaconReceived(const WMBssDesc *bss, u16 scanLinkLevel);
 // Descriptive name: destination is a raw 0xc0-byte retained descriptor with selected IEs packed after offset 0x40.
 void WCM_FillApEntry(const WMBssDesc *source, WMBssDesc *destination);
 // Descriptive name: borrowed SSID bytes and optional length, or NULL/zero while disconnected. The bytes need not be
 // NUL-terminated and remain owned by WCM; a connection change or Finish can invalidate the pointer.
-const u8 *WCM_GetConnectedApSsid(u16 *ssidLength);
-void WCM_DispatchRecvCallback(u8 *src, u8 *dst, u8 *data, u32 len);
+u8 *WCM_GetConnectedApSsid(u16 *ssidLength);
+void WCM_DispatchRecvCallback(const u8 *src, const u8 *dst, const u8 *data, s32 len);
 // Descriptive name: releases one mutex level only when its owner is the IRQ-handler address used as a special marker.
 void WCM_ReleaseIrqOwnedMutex(OSMutex *mutex);
 // Sends to the six-byte address dst, copying headerLen/dataLen bytes into WCM's work during this call. Assembly
@@ -115,9 +118,9 @@ s32 WCM_SendDCFDataEx(const u8 *dst, const u8 *header, s32 headerLen, const u8 *
 void WCM_GetMacAddress(u8 *mac);
 // The MAC address of the access point the connection is with, or NULL while there is none; NitroWiFi's SOCL takes
 // the link to be up while there is one
-const u8 *WCM_GetApMacAddress(void);
+u8 *WCM_GetApMacAddress(void);
 // Sets the function that every received data frame goes to
-void WCM_SetRecvDCFCallback(void (*callback)(u8 *src, u8 *dst, u8 *data, u32 len));
+void WCM_SetRecvDCFCallback(WCMRecvInd callback);
 
 // The "any" BSSID and ESSID that a search takes when the caller gives none
 extern const u8 WCMiAnyBssid[];

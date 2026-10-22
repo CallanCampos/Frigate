@@ -432,7 +432,7 @@ s32 DWCAc_GetError(void) {
 // the target id; and its spot information, which an NDWCSHAP's SSID holds (zeroes for any other)
 void DWCAc_NoteConnectedAp(u8 id) {
     u8 type = sBlocks.main->givenType;
-    const u8 *ssid;
+    u8 *ssid;
 
     if (type == 0) {
         type = DWCAc_GetApTypeOfId(id);
@@ -440,7 +440,7 @@ void DWCAc_NoteConnectedAp(u8 id) {
     sBlocks.main->type = type;
     ssid = WCM_GetConnectedApSsid(NULL);
     if (ssid != NULL) {
-        DC_InvalidateRange((void *)ssid, 32);
+        DC_InvalidateRange(ssid, 32);
         if (DWCAc_GetNdwcShapSpotInfo(ssid, sBlocks.main->spotInfo)) {
             return;
         }

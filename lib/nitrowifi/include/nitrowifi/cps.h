@@ -77,6 +77,12 @@ typedef struct CPSSocOoo {
     u32 order;
 } CPSSocOoo;
 
+// A buffer a socket gives CPS
+typedef struct CPSSocBuf {
+    u32 size;
+    u8 *data;
+} CPSSocBuf;
+
 typedef struct CPSSoc {
     OSThread *thread;
     u32 block_type;
@@ -84,7 +90,7 @@ typedef struct CPSSoc {
     u8 ssl;
     u16 local_port;
     void *con;               // The SSL connection
-    s32 when;                // When the connection began, in units of 65536 ticks
+    u32 when;                // When the connection began, in units of 65536 ticks
     CPSInAddr local_ip_real; // The address the last datagram or SYN was sent to
     u16 remote_port;
     u16 remote_port_bound;
@@ -102,13 +108,11 @@ typedef struct CPSSoc {
     u32 remote_ackno;
     u32 segments;                                                // Segments received with data
     BOOL (*udp_callback)(u8 *data, u32 len, struct CPSSoc *soc); // TRUE when it took the datagram
-    u32 rcvbuf_size;
-    u8 *rcvbuf;
-    u32 rcvbuf_len;
-    u32 sndbuf_size;
-    u8 *sndbuf;
-    u8 unk_5c[0xc];
-    u8 *outbuf; // Data that CPS_SocWrite sends ahead of the next write
+    CPSSocBuf rcvbuf;
+    u32 rcvbuf_len; // How much of the receive buffer holds data
+    CPSSocBuf sndbuf;
+    CPSSocBuf linbuf;
+    CPSSocBuf outbuf; // Data that CPS_SocWrite sends ahead of the next write
     u32 outbuf_len;
     CPSSocOoo ooo[4];
 } CPSSoc;
@@ -120,7 +124,7 @@ extern CPSInAddr CPSNetMask;
 extern void *(*CPSiAlloc)(u32 size); // CPSConfig.alloc, or a no-op when alloc or free is missing
 extern CPSInAddr CPSGatewayIp;
 extern void (*CPSiFree)(void *ptr);
-extern u32 CPSNoIpReason; // Why there is no address: the CPS_NOIP_REASON_ value
+extern int CPSNoIpReason; // Why there is no address: the CPS_NOIP_REASON_ value
 extern CPSInAddr CPSMyIp; // 0 until DHCP gives an address
 extern CPSInAddr CPSDnsIp[2];
 extern MATHRandContext32 CPSiRand; // Seeded by CPS_Startup; the SSL layer draws from it too
@@ -134,7 +138,7 @@ void CPS_SetAddressCheckCallback(BOOL (*callback)(void));
 // Starts the receive, scavenger and ACK threads over the config's LAN buffer
 void CPS_Startup(CPSConfig *config);
 // Asks the scavenger (DHCP) thread to end; TRUE once it has
-BOOL CPS_CalmDown(void);
+int CPS_CalmDown(void);
 // The function the scavenger thread calls once a second
 void CPS_SetScavengerCallback(void (*callback)(void));
 // Ends CPS's threads and forgets the address and the LAN buffer
@@ -142,7 +146,7 @@ void CPS_Cleanup(void);
 // Sets the priority of the receive and scavenger threads
 void CPS_SetThreadPriority(u32 priority);
 // The wireless driver's receive callback, which puts a frame in the LAN buffer
-void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len);
+void CPSi_RecvCallback(const u8 *src, const u8 *dst, const u8 *data, s32 len);
 // A free local port
 u16 CPSi_GetNewPort(void);
 
@@ -162,8 +166,8 @@ void CPS_SocDup(OSThread *thread);
 // The function that gets the datagrams of the registered socket; it returns TRUE if it took the datagram
 void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc));
 // TCP's connect, 0 once connected; CPS_TcpConnect does it for the registered socket
-int CPSi_TcpConnect(CPSSoc *soc);
-int CPS_TcpConnect(void);
+u32 CPSi_TcpConnect(CPSSoc *soc);
+u32 CPS_TcpConnect(void);
 void CPS_TcpShutdown(void);
 // Waits up to about five seconds for the connection to close
 void CPS_TcpClose(void);
@@ -189,8 +193,8 @@ void CPS_SslSetMaxPriority(u32 priority);
 // Registers the caller's named params (pinned certificates) on the current thread's connection
 void CPS_SslSetNamedParams(void *const *params, u32 count);
 // Stirs entropy into the pool that SSLi_GetRandomBytes draws from
-void CPS_SslAddRandomSeed(const void *seed, u32 len);
-int CPS_SslConnect(CPSSoc *soc);
+void CPS_SslAddRandomSeed(void *seed, u32 len);
+u32 CPS_SslConnect(CPSSoc *soc);
 u8 *CPS_SslRead(u32 *len, CPSSoc *soc);
 void CPS_SslReadRelease(u32 len, CPSSoc *soc);
 s32 CPS_SslCanRead(CPSSoc *soc);
@@ -198,10 +202,10 @@ u32 CPS_SslWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc);
 void CPS_SslShutdown(CPSSoc *soc);
 void CPS_SslClose(CPSSoc *soc);
 // Called once a second by CPS's scavenger thread: expires old session cache entries and wakes stalled handshakes
-void CPS_SslTick(s32 now);
+void CPS_SslTick(u32 now);
 // Clears the session cache, whenever CPS drops its address
 void CPS_SslInit(void);
 // Turns the SSL layer on, or off, for the caller's socket
-void CPS_SetSsl(BOOL enable);
+void CPS_SetSsl(int enable);
 
 #endif // POKEBW2_NITROWIFI_CPS_H

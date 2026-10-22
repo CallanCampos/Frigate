@@ -151,7 +151,7 @@ static int NNSendPacket(int sock, gsi_u32 toAddr, gsi_u16 toPort, const void *da
 
     address.family = 2;
     address.port = NN_SWAP16(toPort);
-    address.addr = toAddr;
+    address.addr.addr = toAddr;
     return sendto(sock, data, length, 0, &address, sizeof(SocAddrIn));
 }
 
@@ -593,7 +593,7 @@ static void SendConnectAck(NATNegotiator *neg, SocAddrIn *toAddr) {
     packet.cookie = NN_SWAP32(neg->cookie);
     packet.packet.init.clientIndex = neg->clientIndex;
     gsDebugFormat(7, 0, 8, "SendConnectAck(cookie=%d): Sending connect ack...\n", neg->cookie);
-    NNSendPacket(neg->negotiateSock, toAddr->addr, NN_SWAP16(toAddr->port), &packet, 21);
+    NNSendPacket(neg->negotiateSock, toAddr->addr.addr, NN_SWAP16(toAddr->port), &packet, 21);
 }
 
 static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr) {
@@ -633,17 +633,16 @@ static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SocAd
 
 static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr) {
     gsDebugFormat(7, 0, 8, "ProcessPingPacket(cookie=%d): Got ping from: %s:%d (gotmydata: %d, finished: %d)\n",
-                  neg->cookie, SOC_InetNtoA(*(SocInAddr *)&fromAddr->addr), NN_SWAP16(fromAddr->port),
+                  neg->cookie, SOC_InetNtoA(fromAddr->addr), NN_SWAP16(fromAddr->port),
                   packet->packet.connect.gotYourData, packet->packet.connect.finished);
     if (neg->state < 4) {
         gsDebugFormat(7, 0, 8, "ProcessPingPacket(cookie=%d): Received ping before ns_connectping state, ignoring\n",
                       neg->cookie);
         return;
     }
-    gsDebugFormat(7, 0, 8, "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n",
-                  SOC_InetNtoA(*(SocInAddr *)&fromAddr->addr), NN_SWAP16(fromAddr->port),
-                  packet->packet.connect.gotYourData, packet->packet.connect.finished);
-    neg->guessedIp = fromAddr->addr;
+    gsDebugFormat(7, 0, 8, "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", SOC_InetNtoA(fromAddr->addr),
+                  NN_SWAP16(fromAddr->port), packet->packet.connect.gotYourData, packet->packet.connect.finished);
+    neg->guessedIp = fromAddr->addr.addr;
     neg->guessedPort = NN_SWAP16(fromAddr->port);
     neg->gotRemoteData = 1;
     neg->sendGotRemoteData = packet->packet.connect.gotYourData ? 1 : 0;
@@ -694,7 +693,7 @@ static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrI
     case 2:
         gsDebugFormat(7, 0, 8, "Got ERT\n");
         packet->packetType = 3;
-        NNSendPacket(neg->negotiateSock, fromAddr->addr, NN_SWAP16(fromAddr->port), packet, 21);
+        NNSendPacket(neg->negotiateSock, fromAddr->addr.addr, NN_SWAP16(fromAddr->port), packet, 21);
         break;
     case 14:
         gsDebugFormat(7, 0, 8, "ProcessInitPacket(cookie=%d): Got REPORT_ACK, finishing\n", neg->cookie);
@@ -714,7 +713,7 @@ void NNProcessData(char *data, int length, SocAddrIn *fromAddr) {
     }
     type = data[7];
     gsDebugFormat(7, 0, 8, "NNProcessData: Packet type: %d, %d bytes (%s:%d)\n", type, length,
-                  SOC_InetNtoA(*(SocInAddr *)&fromAddr->addr), NN_SWAP16(fromAddr->port));
+                  SOC_InetNtoA(fromAddr->addr), NN_SWAP16(fromAddr->port));
     if (type == 5 || type == 7) {
         if (length < 20) {
             gsDebugFormat(7, 0, 4, "NNProcessData: CONNECT or CONNECT_PING packet too small, ignoring\n");

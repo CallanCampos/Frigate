@@ -70,9 +70,9 @@ struct WCMGlobal {
     OSMutex mutex;           // 0x0c
     u16 sendStatus;          // 0x24
     u8 padding_26[2];
-    void (*recvCallback)(u8 *src, u8 *dst, u8 *data, u32 len); // 0x28
-    void (*sendCompletion)(s32);                               // 0x2c
-    u8 ownMac[6];                                              // 0x30
+    WCMRecvInd recvCallback;     // 0x28
+    void (*sendCompletion)(s32); // 0x2c
+    u8 ownMac[6];                // 0x30
     u8 unk_36[2];
 };
 

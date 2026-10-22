@@ -107,7 +107,7 @@ int gti2CreateSocket(GTI2Socket **socketOut, const char *localAddress, int outgo
     }
     memset(&address, 0, sizeof(address));
     address.family = 2;
-    address.addr = ip;
+    address.addr.addr = ip;
     address.port = GTI2_SWAP16(port);
     if (protocol != 3) {
         if (bind(socket->handle, &address, sizeof(address)) == -1) {
@@ -120,7 +120,7 @@ int gti2CreateSocket(GTI2Socket **socketOut, const char *localAddress, int outgo
     }
     addressSize = sizeof(address);
     getsockname(socket->handle, &address, &addressSize);
-    socket->ip = address.addr;
+    socket->ip = address.addr.addr;
     socket->port = GTI2_SWAP16(address.port);
     *socketOut = socket;
     return 0;
@@ -243,7 +243,7 @@ gsi_bool gti2SocketSend(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void
     SocAddrIn address = { 0 };
 
     address.family = 2;
-    address.addr = ip;
+    address.addr.addr = ip;
     address.port = GTI2_SWAP16(port);
     result = sendto(socket->handle, message, length, 0, &address, sizeof(address));
     if (result == -1) {

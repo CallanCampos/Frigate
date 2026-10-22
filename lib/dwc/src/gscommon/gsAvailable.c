@@ -32,14 +32,14 @@ static gsi_bool get_sockaddrin(const char *host, int port, SocAddrIn *address) {
     address->family = 2;
     // The port in network order
     address->port = (gsi_u8)((gsi_u16)port >> 8) | (((gsi_u16)port << 8) & 0xff00);
-    address->addr = inet_addr(host);
-    if (address->addr == -1) {
+    address->addr.addr = inet_addr(host);
+    if (address->addr.addr == -1) {
         SocHostEnt *entry = SOC_GetHostByName(host);
 
         if (entry == NULL) {
             return gsi_false;
         }
-        address->addr = *(gsi_u32 *)entry->addrList[0];
+        address->addr.addr = *(gsi_u32 *)entry->addrList[0];
     }
     return gsi_true;
 }

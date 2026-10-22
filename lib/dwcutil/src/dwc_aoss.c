@@ -247,7 +247,9 @@ static struct {
     int socket;
     int mode;
 } sNet = { -1, -1 };
-static SocConfig sSocConfig = { 0x01000000, Soc_Alloc, Soc_Free, 0, 0, 0, 0, 0, 0, 0x1000, 0x1000 };
+static SocConfig sSocConfig = {
+    SOC_VENDOR_NINTENDO, SOC_VERSION, Soc_Alloc, Soc_Free, 0, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, 0x1000, 0x1000,
+};
 
 static u8 sCipherKey[0x78];
 static u8 sPeerMac[8];
@@ -434,7 +436,7 @@ static int Aoss_Run(AossParam *param) {
     }
     Mem_Fill(&addr, 0, sizeof(addr));
     addr.family = 2;
-    addr.addr = Net_Htonl(AOSS_CLIENT_ADDR);
+    addr.addr.addr = Net_Htonl(AOSS_CLIENT_ADDR);
     addr.port = Net_Htons(AOSS_PORT);
     if (Net_Bind(sNet.socket, &addr, 8) < 0) {
         param->error = 0xf;
@@ -546,7 +548,7 @@ static int Aoss_Run(AossParam *param) {
                 }
                 Mem_Fill(&addr, 0, sizeof(addr));
                 addr.family = 2;
-                addr.addr = Net_Htonl(ip);
+                addr.addr.addr = Net_Htonl(ip);
                 addr.port = Net_Htons(AOSS_PORT);
                 if (Net_Bind(sNet.socket, &addr, 8) < 0) {
                     param->error = 0xf;
@@ -695,7 +697,7 @@ static int Aoss_Run(AossParam *param) {
                 }
                 Mem_Fill(&addr, 0, sizeof(addr));
                 addr.family = 2;
-                addr.addr = Net_Htonl(ip);
+                addr.addr.addr = Net_Htonl(ip);
                 addr.port = Net_Htons(AOSS_PORT);
                 if (Net_Bind(sNet.socket, &addr, 8) < 0) {
                     param->error = 0xf;
@@ -1606,9 +1608,9 @@ static int Aoss_SendPacket(void *buffer, int length, int toAll, int sock) {
     Mem_Fill(&to, 0, sizeof(to));
     to.family = 2;
     to.port = Net_Htons(AOSS_PORT);
-    to.addr = Net_Htonl(sAoss.request.addr);
+    to.addr.addr = Net_Htonl(sAoss.request.addr);
     if (toAll == 0xff || sAoss.request.reconnected == 0) {
-        to.addr = -1;
+        to.addr.addr = -1;
     }
     return Net_SendTo(sock, buffer, length, 0, &to, 8);
 }
@@ -1815,9 +1817,9 @@ static void Soc_Free(u32 name, void *ptr, s32 size) {
 
 // Starts the socket library with a fixed address
 static int Net_Start(u32 addr, u32 netmask, u32 gateway) {
-    sSocConfig.addr = Net_Htonl(addr);
-    sSocConfig.netmask = Net_Htonl(netmask);
-    sSocConfig.gateway = Net_Htonl(gateway);
+    sSocConfig.addr.addr = Net_Htonl(addr);
+    sSocConfig.netmask.addr = Net_Htonl(netmask);
+    sSocConfig.router.addr = Net_Htonl(gateway);
     if (SOC_Startup(&sSocConfig) < 0) {
         return -1;
     }

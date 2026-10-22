@@ -137,10 +137,10 @@ static void QEStartQuery(SBQueryEngine *engine, SBServer *server) {
             queryLen = 8;
         }
         if (server->publicip == engine->mypublicip && (server->flags & PRIVATE_IP_FLAG)) {
-            saddr.addr = server->privateip;
+            saddr.addr.addr = server->privateip;
             saddr.port = server->privateport;
         } else {
-            saddr.addr = server->publicip;
+            saddr.addr.addr = server->publicip;
             saddr.port = server->publicport;
         }
         sendto(engine->querysock, queryBuffer, queryLen, 0, &saddr, sizeof(saddr));
@@ -309,10 +309,10 @@ static void ProcessIncomingReplies(SBQueryEngine *engine, gsi_bool icmpSocket) {
         }
         indata[i] = '\0';
         for (server = engine->querylist.first; server != NULL; server = server->next) {
-            if ((icmpSocket && (server->flags & ICMP_IP_FLAG) && server->icmpip == saddr.addr) ||
-                (server->publicip == saddr.addr && (server->publicport == saddr.port || icmpSocket)) ||
+            if ((icmpSocket && (server->flags & ICMP_IP_FLAG) && server->icmpip == saddr.addr.addr) ||
+                (server->publicip == saddr.addr.addr && (server->publicport == saddr.port || icmpSocket)) ||
                 (server->publicip == engine->mypublicip && (server->flags & PRIVATE_IP_FLAG) &&
-                 server->privateip == saddr.addr && server->privateport == saddr.port)) {
+                 server->privateip == saddr.addr.addr && server->privateport == saddr.port)) {
                 if (icmpSocket) {
                     // Several pings may wait on one address
                     if (ParseSingleICMPReply(engine, server, indata, i)) {

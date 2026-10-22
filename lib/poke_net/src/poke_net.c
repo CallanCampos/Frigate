@@ -453,7 +453,7 @@ BOOL POKE_NET_Connecting(void) {
     int result;
 
     address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
-    address.addr = gPOKE_NET_Control.ServerAddr;
+    address.addr.addr = gPOKE_NET_Control.ServerAddr;
     address.len = sizeof(SocAddrIn);
     address.family = POKE_NET_SOC_AF_INET;
     start = POKE_NET_GetTime();

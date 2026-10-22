@@ -71,7 +71,7 @@ int NHTTPi_SocConnect(NHttpState *state, NHttpMutexInfo *mutexInfo, NHttpRequest
     address.family = 2;
     hostPort = port;
     address.port = ((hostPort >> 8) & 0xff) | ((hostPort << 8) & 0xff00);
-    address.addr = addr;
+    address.addr.addr = addr;
     if (request->https != 0 && request->useProxy == 0) {
         int result = NHTTPi_SocSSLConnect(state, mutexInfo, request, sock);
 
@@ -201,10 +201,10 @@ void NHTTPi_SocCancel(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock
 // Looks a host up, as an address or as a name, and returns its address (0 if there is none)
 u32 NHTTPi_resolveHostname(NHttpRequest *request, const char *host) {
     u32 address = 0;
-    u32 parsed;
+    SocInAddr parsed;
 
     if (SOC_InetAtoN(host, &parsed) != 0) {
-        address = parsed;
+        address = parsed.addr;
     } else {
         SocHostEnt *entry = SOC_GetHostByName(host);
 

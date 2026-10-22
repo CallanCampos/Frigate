@@ -318,8 +318,8 @@ BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     u16 ssidLength;
     char spotInfo[10];
     u32 irq;
-    const u8 *bssid;
-    const u8 *ssid;
+    u8 *bssid;
+    u8 *ssid;
 
     MI_CpuFill8(apInfo, 0, sizeof(DWCApInfo));
     apInfo->area = AP_AREA_UNKNOWN;

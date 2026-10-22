@@ -2117,7 +2117,7 @@ static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 
     }
     MIi_CpuClear32(0, &addr, sizeof(addr));
     addr.family = 2;
-    addr.addr = ip;
+    addr.addr.addr = ip;
     addr.port = MATCH_SWAP16(port);
     if ((data[0] == 0xfe && data[1] == 0xfd) || data[0] == 0x5c) {
         if (DWCi_GetMatchCnt()->qr2 != NULL) {
@@ -3209,7 +3209,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
         }
         DWCi_GetMatchCnt()->cmdCommand = 0xff;
         address.port = MATCH_SWAP16(hostPort);
-        address.addr = hostIp;
+        address.addr.addr = hostIp;
         DWCi_GetMatchCnt()->target.kind = 1;
         conn = gt2GetSocketSOCKET(DWCi_GetMatchCnt()->fm->socket);
         DWCi_NNCompletedCallback(0, conn, &address, &DWCi_GetMatchCnt()->target);
@@ -5351,7 +5351,7 @@ static void DWCi_NNCompletedCallback(int result, int gameSocket, SocAddrIn *addr
     if ((DWCi_GetMatchCnt()->state == 5 || DWCi_GetMatchCnt()->state == 0xe) && connection != NULL) {
         if (result == 0) {
             if (connection->kind != 0) {
-                DWCi_GetMatchCnt()->self.hostIp = address->addr;
+                DWCi_GetMatchCnt()->self.hostIp = address->addr.addr;
                 DWCi_GetMatchCnt()->self.hostPort = MATCH_SWAP16(address->port);
                 DWCi_GetMatchCnt()->nnRecvCount = 0;
                 DWCi_GetMatchCnt()->nnLastCookie = 0;
@@ -5381,7 +5381,7 @@ static void DWCi_NNCompletedCallback(int result, int gameSocket, SocAddrIn *addr
                 }
             } else {
                 if (address != NULL) {
-                    DWCi_GetMatchCnt()->self.hostIp = address->addr;
+                    DWCi_GetMatchCnt()->self.hostIp = address->addr.addr;
                     DWCi_GetMatchCnt()->self.hostPort = MATCH_SWAP16(address->port);
                 }
                 {

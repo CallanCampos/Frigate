@@ -9,26 +9,26 @@
 static int SOCLi_ExecCommandPacket(SOCLCommandPipe *pipe, SOCLCommandPacket *packet);
 
 // With their explicit zeros the code reaches both from one base, as the original does
-static SOCLCommandPacket *SOCLiCommandPackets = NULL;
+static OSMessage *SOCLiCommandPackets = NULL;
 static OSMessageQueue SOCLiCommandPacketQueue = { 0 };
 
-int SOCLi_StartupCommandPacketQueue(u32 max) {
+int SOCLi_StartupCommandPacketQueue(s32 max) {
     int packets_offset = (max * sizeof(OSMessage) + 3) & ~3;
     int packets_size = (max * sizeof(SOCLCommandPacket) + 3) & ~3;
-    SOCLCommandPacket *packets = (SOCLCommandPacket *)SOCLiConfigPtr->alloc(packets_size + packets_offset);
+    OSMessage *messages = (OSMessage *)SOCLiConfigPtr->alloc(packets_size + packets_offset);
     u8 *packet;
 
-    if (packets == NULL) {
+    if (messages == NULL) {
         return -1;
     }
-    OS_InitMessageQueue(&SOCLiCommandPacketQueue, (OSMessage *)packets, max);
-    packet = (u8 *)packets + packets_offset;
-    while ((s32)max > 0) {
+    OS_InitMessageQueue(&SOCLiCommandPacketQueue, messages, max);
+    packet = (u8 *)messages + packets_offset;
+    while (max > 0) {
         SOCLi_FreeCommandPacket((SOCLCommandPacket *)packet);
         max--;
         packet += sizeof(SOCLCommandPacket);
     }
-    SOCLiCommandPackets = packets;
+    SOCLiCommandPackets = messages;
     return 0;
 }
 
@@ -116,21 +116,22 @@ int SOCLi_ExecCommandPacketInCtrlPipe(SOCLSocket *socket, SOCLCommandPacket *pac
     return SOCLi_ExecCommandPacket(SOCLi_GetCtrlPipe(socket), packet);
 }
 
-void SOCLi_CommandPacketHandler(OSMessageQueue *queue) {
+void SOCLi_CommandPacketHandler(void *arg) {
+    SOCLCommandPipe *pipe = (SOCLCommandPipe *)arg;
     SOCLCommandPacket *packet;
 
     while (1) {
         int result;
         u32 irq;
 
-        OS_ReadMessage(queue, (OSMessage *)&packet, OS_MESSAGE_BLOCK);
+        OS_ReadMessage(&pipe->queue, (OSMessage *)&packet, OS_MESSAGE_BLOCK);
         if (packet == NULL) {
             return;
         }
         result = packet->h.handler(packet);
         irq = OS_DisableInterrupts();
         OS_DisableScheduler();
-        OS_ReceiveMessage(queue, NULL, OS_MESSAGE_NOBLOCK);
+        OS_ReceiveMessage(&pipe->queue, NULL, OS_MESSAGE_NOBLOCK);
         if (packet->h.socket != NULL) {
             packet->h.socket->result = result;
         }

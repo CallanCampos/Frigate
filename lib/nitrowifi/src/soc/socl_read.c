@@ -11,22 +11,24 @@
 // reads without waiting, which this version added. Its write half is socl_write.c here.
 static int SOCLi_ReadAndConsumeBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
                                       int block, int flags);
-static int SOCLi_ReadBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int block);
-static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip);
+static int SOCLi_ReadBuffer(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, s32 block);
+static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip);
 static u8 *SOCLi_ReadCPSBuffer(SOCLSocket *socket, int *avail, u16 *local_port, u16 *remote_port, CPSInAddr *remote_ip);
-static int SOCLi_ExecReadCommand(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
+static int SOCLi_ExecReadCommand(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
                                  int block);
 static int SOCLi_ReadCallBack(void *arg);
 static int SOCLi_ReadNoWaitCallBack(void *arg);
 static int SOCLi_ConsumeBuffer(SOCLSocket *socket);
 static int SOCLi_ConsumeCallBack(void *arg);
 static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket);
-static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int block);
+static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
+                               s32 block);
 
 // How often the UDP queue had no memory for a datagram, and how often it was full
-static s32 SOCLi_CheckCount[2];
+static u32 SOCLi_CheckCount[2];
 
-int SOCLi_ReadFrom(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int flags) {
+int SOCLi_ReadFrom(int s, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int flags) {
+    SOCLSocket *socket = (SOCLSocket *)s;
     int block;
     int result;
     SOCLRecvPipe *pipe;
@@ -88,7 +90,7 @@ static int SOCLi_ReadAndConsumeBuffer(SOCLSocket *socket, u8 *buf, int len, u16 
     return result;
 }
 
-static int SOCLi_ReadBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, int block) {
+static int SOCLi_ReadBuffer(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip, s32 block) {
     int result;
 
     if (socket->flag == 4) {
@@ -101,7 +103,7 @@ static int SOCLi_ReadBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_po
     return result;
 }
 
-static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip) {
+static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip) {
     u16 local_port;
     u16 sender_port;
     int avail;
@@ -169,10 +171,10 @@ static u8 *SOCLi_ReadCPSBuffer(SOCLSocket *socket, int *avail, u16 *local_port, 
         *avail = -1;
         return NULL;
     }
-    return soc->rcvbuf + read_len;
+    return soc->rcvbuf.data + read_len;
 }
 
-static int SOCLi_ExecReadCommand(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
+static int SOCLi_ExecReadCommand(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
                                  int block) {
     SOCLCommandPacket *packet;
 
@@ -207,7 +209,7 @@ static int SOCLi_ReadCallBack(void *arg) {
         if (data == NULL || (int)cps_len - read_len > 0) {
             break;
         }
-        if (SOCLi_SocketIsTCP(socket) && ((CPSSoc *)socket)->state != CPS_STT_ESTABLISHED) {
+        if (SOCLi_SocketIsTCP(socket) && socket->cps_socket.state != CPS_STT_ESTABLISHED) {
             data = NULL;
             break;
         }
@@ -265,7 +267,7 @@ static int SOCLi_ReadNoWaitCallBack(void *arg) {
     data = CPS_SocRead(&cps_len);
     if (data != NULL && (int)(cps_len - read_len) <= 0) {
         if (SOCLi_SocketIsTCP(socket)) {
-            if (((CPSSoc *)socket)->state != CPS_STT_ESTABLISHED) {
+            if (socket->cps_socket.state != CPS_STT_ESTABLISHED) {
                 data = NULL;
             }
         }
@@ -318,8 +320,8 @@ static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket) {
     return consume_len;
 }
 
-static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, u8 *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
-                               int block) {
+static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, void *buf, int len, u16 *remote_port, CPSInAddr *remote_ip,
+                               s32 block) {
     SOCLRecvPipe *pipe = socket->recv_pipe;
     SOCLUdpPacket *packet;
     u32 irq = OS_DisableInterrupts();

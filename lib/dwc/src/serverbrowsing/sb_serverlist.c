@@ -395,8 +395,8 @@ static SBError ServerListConnect(SBServerList *slist) {
     }
     saddr.family = 2;
     saddr.port = SB_SWAP16(MSPORT2);
-    saddr.addr = inet_addr(masterHostname);
-    if (saddr.addr == -1) {
+    saddr.addr.addr = inet_addr(masterHostname);
+    if (saddr.addr.addr == -1) {
         hent = SOC_GetHostByName(masterHostname);
         if (hent == NULL) {
             return sbe_dnserror;
@@ -1386,11 +1386,11 @@ static SBError ProcessLanData(SBServerList *slist) {
         if (error == -1) {
             continue;
         }
-        foundexisting = SBServerListFindServerByIP(slist, saddr.addr, saddr.port);
+        foundexisting = SBServerListFindServerByIP(slist, saddr.addr.addr, saddr.port);
         if (foundexisting != -1) {
             continue;
         }
-        server = SBAllocServer(slist, saddr.addr, saddr.port);
+        server = SBAllocServer(slist, saddr.addr.addr, saddr.port);
         if (SBIsNullServer(server)) {
             return sbe_allocerror;
         }

@@ -118,7 +118,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A loop's setup registers swapped in a function that calls an inline with `u16` bounds: declare the inline's index
   parameters `int` (`g2d_OAM.c`'s `LoadAffinesByFunction_`, 14 bytes to 4).
 - A field read through a pointer parameter folded where the original builds the address, or the reverse: the original
-  uses the pointer once more or less. (matching.md: "depends on how many references")
+  uses the pointer once more or less, or a `*(T *)&p->m` cast stands in for the field's real type. (matching.md:
+  "depends on how many references")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
   "`FSi_GetPathDefault`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has

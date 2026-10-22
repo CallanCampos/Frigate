@@ -5,9 +5,10 @@
 // SOCL_GetStatus: what a socket can do now (data to read, room to write, an error, not connected). pokediamond's
 // NitroWiFi names the object socl_poll.o and its functions.
 
-static int SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket);
+static s32 SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket);
 
-int SOCL_GetStatus(SOCLSocket *socket) {
+int SOCL_GetStatus(int s) {
+    SOCLSocket *socket = (SOCLSocket *)s;
     int status = 0;
     u32 irq;
 
@@ -28,7 +29,7 @@ int SOCL_GetStatus(SOCLSocket *socket) {
             OS_RestoreInterrupts(irq);
         }
         if (SOCLi_SocketIsTCP(socket)) {
-            if ((socket->state & SOCLI_STATE_CONNECTED) && socket->cps_state != CPS_STT_ESTABLISHED &&
+            if ((socket->state & SOCLI_STATE_CONNECTED) && socket->cps_socket.state != CPS_STT_ESTABLISHED &&
                 !(status & SOCL_STATUS_READABLE)) {
                 socket->state &= ~(SOCLI_STATE_BINDING | SOCLI_STATE_CONNECTED);
             }
@@ -41,17 +42,19 @@ int SOCL_GetStatus(SOCLSocket *socket) {
 }
 
 // How much a read could take now: the next datagram's size for UDP, the buffered data for TCP
-static int SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket) {
+static s32 SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket) {
     SOCLRecvPipe *pipe = socket->recv_pipe;
-    int size = 0;
+    s32 size = 0;
 
     if (pipe != NULL) {
         s8 mode = socket->flag;
 
         if (mode == 1) {
-            size = pipe->udp_head != NULL ? pipe->udp_head->len : 0;
+            SOCLUdpPacket *head = pipe->udp_head;
+
+            size = head != NULL ? head->len : 0;
         } else if (mode == 0 || mode == 4) {
-            size = socket->rcvbuf_len - pipe->cps_read_len;
+            size = socket->cps_socket.rcvbuf_len - pipe->cps_read_len;
         }
     }
     return size;

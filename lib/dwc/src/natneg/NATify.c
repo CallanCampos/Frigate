@@ -131,19 +131,19 @@ static gsi_bool Think(int sock, NAT *nat) {
                 case 1:
                     gotERT1 = gsi_true;
                     gsDebugFormat(7, 0, 0x10, "(1) Got the solicited ERT from: %s\n",
-                                  AddressToString(from.addr, NN_SWAP16(from.port), NULL));
+                                  AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                     break;
                 case 2:
                     nat->ipRestricted = gsi_false;
                     gotERT2 = gsi_true;
                     gsDebugFormat(7, 0, 0x10, "(2) Got the unsolicited (address) ERT from: %s\n",
-                                  AddressToString(from.addr, NN_SWAP16(from.port), NULL));
+                                  AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                     break;
                 case 3:
                     nat->portRestricted = gsi_false;
                     gotERT3 = gsi_true;
                     gsDebugFormat(7, 0, 0x10, "(3) Got the unsolicited (port) ERT from: %s\n",
-                                  AddressToString(from.addr, NN_SWAP16(from.port), NULL));
+                                  AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                     break;
                 }
             } else if (type == 11) {
@@ -170,7 +170,7 @@ static gsi_bool Think(int sock, NAT *nat) {
                 nat->mappings[packet.cookie].publicIp = packet.packet.init.localIp;
                 nat->mappings[packet.cookie].publicPort = NN_SWAP16(packet.packet.init.localPort);
                 gsDebugFormat(7, 0, 0x10, "Got ADDRESS REPLY %d from: %s\n", packet.cookie,
-                              AddressToString(from.addr, NN_SWAP16(from.port), NULL));
+                              AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                 OutputMapping(&nat->mappings[packet.cookie]);
             }
             if (sock == -1) {

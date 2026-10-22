@@ -776,11 +776,11 @@ gsi_bool gti2ReceiveMessages(GTI2Socket *socket) {
             if (length == -1) {
                 error = GOAGetLastError(socket->handle);
                 if (error == -15) {
-                    if (!gti2HandleConnectionReset(socket, address.addr, GTI2_SWAP16(address.port))) {
+                    if (!gti2HandleConnectionReset(socket, address.addr.addr, GTI2_SWAP16(address.port))) {
                         return gsi_false;
                     }
                 } else if (error == -23) {
-                    if (!gti2HandleHostUnreachable(socket, address.addr, GTI2_SWAP16(address.port), gsi_false)) {
+                    if (!gti2HandleHostUnreachable(socket, address.addr.addr, GTI2_SWAP16(address.port), gsi_false)) {
                         return gsi_false;
                     }
                 } else if (error != -35) {
@@ -788,7 +788,7 @@ gsi_bool gti2ReceiveMessages(GTI2Socket *socket) {
                     return gsi_false;
                 }
             } else {
-                if (!gti2HandleMessage(socket, buffer, length, address.addr, GTI2_SWAP16(address.port))) {
+                if (!gti2HandleMessage(socket, buffer, length, address.addr.addr, GTI2_SWAP16(address.port))) {
                     return gsi_false;
                 }
             }

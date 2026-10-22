@@ -123,7 +123,7 @@ int qr2_init_socketA(QR2Implementation **qrec, int sock, int qport, const char *
         ret = qr2_get_sockaddrin(override ? qr2_hostname : hostname, 27900, &cr->hbAddr, NULL);
         if (ret == 1) {
             gsDebugFormat(3, 0, 0x10, "%s resolved to %s\r\n", override ? qr2_hostname : hostname,
-                          SOC_InetNtoA(*(SocInAddr *)&cr->hbAddr.addr));
+                          SOC_InetNtoA(cr->hbAddr.addr));
         } else {
             gsDebugFormat(3, 0, 1, "Failed on DNS lookup for %s \r\n", override ? qr2_hostname : hostname);
         }
@@ -321,16 +321,16 @@ static gsi_bool qr2_get_sockaddrin(const char *host, int port, SocAddrIn *saddr,
     saddr->family = 2;
     saddr->port = QR2_SWAP16((gsi_u16)port);
     if (host == NULL) {
-        saddr->addr = 0;
+        saddr->addr.addr = 0;
     } else {
-        saddr->addr = inet_addr(host);
+        saddr->addr.addr = inet_addr(host);
     }
-    if (saddr->addr == -1 && strcmp(host, "255.255.255.255") != 0) {
+    if (saddr->addr.addr == -1 && strcmp(host, "255.255.255.255") != 0) {
         hent = SOC_GetHostByName(host);
         if (hent == NULL) {
             return gsi_false;
         }
-        saddr->addr = *(gsi_u32 *)hent->addrList[0];
+        saddr->addr.addr = *(gsi_u32 *)hent->addrList[0];
     }
     if (savehent != NULL) {
         *savehent = hent;
@@ -768,10 +768,10 @@ static gsi_bool qr2_process_ip_verify(QR2Implementation *qrec, QR2Buffer *buf, S
         return gsi_true;
     }
     for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
-        if (firstFreeIndex == -1 && qrec->ipVerify[i].addr.addr == 0) {
+        if (firstFreeIndex == -1 && qrec->ipVerify[i].addr.addr.addr == 0) {
             firstFreeIndex = i;
         }
-        if (qrec->ipVerify[i].addr.addr == sender->addr && qrec->ipVerify[i].addr.port == sender->port) {
+        if (qrec->ipVerify[i].addr.addr.addr == sender->addr.addr && qrec->ipVerify[i].addr.port == sender->port) {
             numDuplicates++;
         }
     }
@@ -793,9 +793,9 @@ static gsi_bool qr2_check_ip_verify(QR2Implementation *qrec, SocAddrIn *sender, 
     int i = 0;
 
     for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
-        if (qrec->ipVerify[i].addr.addr == sender->addr && qrec->ipVerify[i].addr.port == sender->port) {
+        if (qrec->ipVerify[i].addr.addr.addr == sender->addr.addr && qrec->ipVerify[i].addr.port == sender->port) {
             if (qrec->ipVerify[i].challenge == ipVerify) {
-                qrec->ipVerify[i].addr.addr = 0;
+                qrec->ipVerify[i].addr.addr.addr = 0;
                 qrec->ipVerify[i].addr.port = 0;
                 return gsi_true;
             }
@@ -810,8 +810,8 @@ static void qr2_expire_ip_verify(QR2Implementation *qrec) {
     gsi_u32 now = current_time();
 
     for (; i < QR2_IPVERIFY_ARRAY_SIZE; i++) {
-        if (qrec->ipVerify[i].addr.addr != 0 && now - qrec->ipVerify[i].createTime > 4000) {
-            qrec->ipVerify[i].addr.addr = 0;
+        if (qrec->ipVerify[i].addr.addr.addr != 0 && now - qrec->ipVerify[i].createTime > 4000) {
+            qrec->ipVerify[i].addr.addr.addr = 0;
         }
     }
 }

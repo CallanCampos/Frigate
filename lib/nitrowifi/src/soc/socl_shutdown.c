@@ -7,7 +7,8 @@
 
 static int SOCLi_ShutdownCallBack(void *arg);
 
-int SOCL_Shutdown(SOCLSocket *socket) {
+int SOCL_Shutdown(int s) {
+    SOCLSocket *socket = (SOCLSocket *)s;
     SOCLSendPipe *pipe;
     SOCLCommandPacket *packet;
     int result;

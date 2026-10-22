@@ -61,14 +61,14 @@ int bind(int sock, const SocAddrIn *address, int size) {
     }
     local = *(const SocSockAddr *)address;
     local.len = size;
-    return gsiSocketCheckResult(SOC_Bind(sock, (const SocAddrIn *)&local), -1);
+    return gsiSocketCheckResult(SOC_Bind(sock, &local), -1);
 }
 
 int connect(int sock, const SocAddrIn *address, int size) {
     SocSockAddr remote = *(const SocSockAddr *)address;
 
     remote.len = size;
-    return gsiSocketCheckResult(SOC_Connect(sock, (const SocAddrIn *)&remote), -1);
+    return gsiSocketCheckResult(SOC_Connect(sock, &remote), -1);
 }
 
 int recv(int sock, void *buffer, int size, int flags) {
@@ -91,7 +91,7 @@ int sendto(int sock, const void *buffer, int size, int flags, const SocAddrIn *a
 
     remote = *(const SocSockAddr *)address;
     remote.len = addressSize;
-    return gsiSocketCheckResult(SOC_SendTo(sock, buffer, size, flags, (const SocAddrIn *)&remote), -1);
+    return gsiSocketCheckResult(SOC_SendTo(sock, buffer, size, flags, &remote), -1);
 }
 
 int setsockopt(int sock, int level, int name, const void *value, int size) {
@@ -106,12 +106,12 @@ int getsockname(int sock, SocAddrIn *address, int *size) {
 }
 
 int inet_addr(const char *host) {
-    gsi_u32 address;
+    SocInAddr address;
 
     if (SOC_InetAtoN(host, &address) == 0) {
         return -1;
     }
-    return address;
+    return address.addr;
 }
 
 int GOAGetLastError(int sock) {

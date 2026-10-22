@@ -13,18 +13,18 @@ static void SOCLi_DhcpTimeout(void);
 static BOOL SOCL_LinkIsOn(void);
 
 // The explicit zeros and this order lay the globals out as the original's .bss, which the code reaches from one base
-SOCLSocket *SOCLiUDPSendSocket = NULL;
-u32 SOCLiDhcpState = 0;
+int SOCLiUDPSendSocket = 0;
+int SOCLiDhcpState = 0;
 CPSInAddr SOCLiRequestedIP = 0;
 u32 SOCLiYieldWait = 0;
 CPSConfig SOCLiCPSConfig = { 0 };
 // SOCLiConfigPtr's NULL is in .data, before the default buffer size
 #pragma explicit_zero_data on
-SOCLConfig *SOCLiConfigPtr = NULL;
+const SOCLConfig *SOCLiConfigPtr = NULL;
 #pragma explicit_zero_data reset
 u32 SOCLiDefaultLanBufferSize = 0x4000;
 
-int SOCL_Startup(SOCLConfig *config) {
+int SOCL_Startup(const SOCLConfig *config) {
     int result;
 
     SDK_USING_MIDDLEWARE(SOCLi_Signature);
@@ -46,14 +46,14 @@ static int SOCLi_StartupSOCL(void) {
     int result = SOCLi_StartupCommandPacketQueue(SOCLiConfigPtr->cmd_packet_max);
 
     if (result >= 0) {
-        SOCLiUDPSendSocket = (SOCLSocket *)SOCL_CreateSocket(&SOCLSocketParamUDPSend);
+        SOCLiUDPSendSocket = SOCL_CreateSocket(&SOCLSocketParamUDPSend);
     }
     return result;
 }
 
 static void SOCLi_StartupCPS(void) {
     CPSConfig *cps = &SOCLiCPSConfig;
-    SOCLConfig *config = SOCLiConfigPtr;
+    const SOCLConfig *config = SOCLiConfigPtr;
 
     MI_CpuFill8(cps, 0, sizeof(CPSConfig));
     cps->alloc = config->alloc;
@@ -109,7 +109,7 @@ static void SOCLi_StartupCPS(void) {
 
 // The address of the config's own, which CPS calls for when it does without DHCP
 static void SOCLi_SetMyIP(void) {
-    SOCLConfig *config = SOCLiConfigPtr;
+    const SOCLConfig *config = SOCLiConfigPtr;
 
     CPSMyIp = config->host_ip.my_ip;
     CPSNetMask = config->host_ip.net_mask;

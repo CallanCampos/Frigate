@@ -11,7 +11,7 @@ static SOCLSocket *SOCLi_StartupSocket(const SOCLSocketParam *param);
 static u32 SOCLi_GetSizeSocket(const SOCLSocketParam *param);
 static u32 SOCLi_GetSizeCommandPipe(const SOCLPipeParam *param);
 static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param);
-static u8 *SOCLi_InitSocketBuffer(u8 *data, SOCLSocketBuffer *buffer, u32 size);
+static u8 *SOCLi_InitSocketBuffer(u8 *data, CPSSocBuf *buffer, u32 size);
 static u8 *SOCLi_InitCommandPipe(u8 *data, SOCLCommandPipe *pipe, const SOCLPipeParam *param);
 
 int SOCL_CreateSocket(const SOCLSocketParam *param) {
@@ -40,7 +40,7 @@ static int SOCLi_CreateSocketCallBack(void *arg) {
     SOCLSocket *socket = cpacket->h.socket;
     SOCLSendPipe *send_pipe;
 
-    CPS_SocRegister((CPSSoc *)socket);
+    CPS_SocRegister(&socket->cps_socket);
     send_pipe = socket->send_pipe;
     switch (socket->flag) {
     case 0:
@@ -109,8 +109,8 @@ static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param) {
         socket->recv_pipe = pipe;
         pipe->rcvbuf_consume_min = param->buffer.rcvbuf_consume_min;
         data = SOCLi_InitCommandPipe(data + sizeof(SOCLRecvPipe), &pipe->base, &param->rcv_pipe);
-        data = SOCLi_InitSocketBuffer(data, &socket->rcvbuf, param->buffer.rcvbuf_size);
-        data = SOCLi_InitSocketBuffer(data, &socket->rcvbuf_aux, param->buffer.rcvbuf_aux_size);
+        data = SOCLi_InitSocketBuffer(data, &socket->cps_socket.rcvbuf, param->buffer.rcvbuf_size);
+        data = SOCLi_InitSocketBuffer(data, &socket->cps_socket.linbuf, param->buffer.rcvbuf_aux_size);
         pipe->udp_queued_max = param->buffer.rcvpipe_unk_e;
         pipe->udp_wait.head = pipe->udp_wait.tail = NULL;
     }
@@ -120,17 +120,17 @@ static u8 *SOCLi_InitSocket(SOCLSocket *socket, const SOCLSocketParam *param) {
         socket->send_pipe = pipe;
         pipe->socket = socket;
         data = SOCLi_InitCommandPipe(data + sizeof(SOCLSendPipe), &pipe->base, &param->snd_pipe);
-        data = SOCLi_InitSocketBuffer(data, &socket->sndbuf, param->buffer.sndbuf_size);
-        data = SOCLi_InitSocketBuffer(data, &socket->sndbuf_aux, param->buffer.sndbuf_aux_size);
+        data = SOCLi_InitSocketBuffer(data, &socket->cps_socket.sndbuf, param->buffer.sndbuf_size);
+        data = SOCLi_InitSocketBuffer(data, &socket->cps_socket.outbuf, param->buffer.sndbuf_aux_size);
         data = SOCLi_InitSocketBuffer(data, &pipe->buffer, param->buffer.sndpipe_buf_size);
         pipe->wait.head = pipe->wait.tail = NULL;
     } else {
-        socket->send_pipe = SOCLiUDPSendSocket->send_pipe;
+        socket->send_pipe = ((SOCLSocket *)SOCLiUDPSendSocket)->send_pipe;
     }
     return data;
 }
 
-static u8 *SOCLi_InitSocketBuffer(u8 *data, SOCLSocketBuffer *buffer, u32 size) {
+static u8 *SOCLi_InitSocketBuffer(u8 *data, CPSSocBuf *buffer, u32 size) {
     u8 *end = data;
 
     if (size == 0) {
@@ -146,8 +146,7 @@ static u8 *SOCLi_InitCommandPipe(u8 *data, SOCLCommandPipe *pipe, const SOCLPipe
 
     OS_InitMessageQueue(&pipe->queue, (OSMessage *)data, param->queue_length);
     OS_InitMutex(&pipe->mutex);
-    OS_CreateThread(&pipe->thread, (void (*)(void *))SOCLi_CommandPacketHandler, pipe, data + size, param->stack_size,
-                    param->priority);
+    OS_CreateThread(&pipe->thread, SOCLi_CommandPacketHandler, pipe, data + size, param->stack_size, param->priority);
     OS_WakeupThreadDirect(&pipe->thread);
     return data + size;
 }

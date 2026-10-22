@@ -8,16 +8,17 @@
 // the socket's send buffer in packets and has CPS send it (SOCLi_WriteCallBack). pokediamond's NitroWiFi has this in
 // the object socl_read.o, where this version has the write half in an object of its own.
 
-static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip,
-                             int block);
-static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *write_pos, int block);
-static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, int pos, u16 remote_port,
-                                  CPSInAddr remote_ip, int block);
+static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, s32 len, u16 remote_port, CPSInAddr remote_ip,
+                             s32 block);
+static s32 SOCLi_AllocWriteBuffer(SOCLSocket *socket, s32 len, s32 chunk, s32 *write_pos, s32 block);
+static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, s32 len, s32 pos, u16 remote_port,
+                                  CPSInAddr remote_ip, s32 block);
 static int SOCLi_WriteCallBack(void *arg);
 static int SOCLi_GetOptimumSendBufLen(int len);
 static int SOCLi_MemCpy(u8 *dst, int len, SOCLiCommandWrite *cpacket);
 
-int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags) {
+int SOCL_WriteTo(int s, const void *buf, int len, u16 remote_port, CPSInAddr remote_ip, int flags) {
+    SOCLSocket *socket = (SOCLSocket *)s;
     SOCLSendPipe *pipe;
     int block;
     int result;
@@ -48,16 +49,16 @@ int SOCL_WriteTo(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CP
     return result;
 }
 
-static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 remote_port, CPSInAddr remote_ip,
-                             int block) {
+static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, s32 len, u16 remote_port, CPSInAddr remote_ip,
+                             s32 block) {
     SOCLSendPipe *pipe = socket->send_pipe;
-    int sndbuf_len;
-    int write_pos;
-    int alloc_len;
-    int chunk_max;
-    int written = 0;
+    s32 sndbuf_len;
+    s32 write_pos;
+    s32 alloc_len;
+    s32 chunk_max;
+    s32 written = 0;
 
-    sndbuf_len = pipe->socket->sndbuf.size;
+    sndbuf_len = pipe->socket->cps_socket.sndbuf.size;
     if (socket->flag == 1) {
         sndbuf_len -= 0x2a;
         if (len > sndbuf_len) {
@@ -90,9 +91,9 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, int len, u16 rem
 
 // Finds room for up to len bytes (at least chunk) in the pipe's buffer, sleeping for it when the socket blocks, and
 // gives the position to write at
-static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *write_pos, int block) {
+static s32 SOCLi_AllocWriteBuffer(SOCLSocket *socket, s32 len, s32 chunk, s32 *write_pos, s32 block) {
     SOCLSendPipe *pipe = socket->send_pipe;
-    int free;
+    s32 free;
     u32 irq;
 
     if (chunk > len) {
@@ -118,12 +119,12 @@ static int SOCLi_AllocWriteBuffer(SOCLSocket *socket, int len, int chunk, int *w
     return free;
 }
 
-int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket) {
+s32 SOCLi_GetWriteBufferFreeSize(SOCLSocket *socket) {
     SOCLSendPipe *pipe = socket->send_pipe;
-    int size = pipe->buffer.size;
-    int write_pos = pipe->write_pos;
-    int read_pos = pipe->read_pos;
-    int free = read_pos - write_pos - 1;
+    s32 size = pipe->buffer.size;
+    s32 write_pos = pipe->write_pos;
+    s32 read_pos = pipe->read_pos;
+    s32 free = read_pos - write_pos - 1;
 
     if (free < 0) {
         free += size;
@@ -131,8 +132,8 @@ int SOCLi_GetWriteBufferFreeSize(const SOCLSocket *socket) {
     return free;
 }
 
-static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, int pos, u16 remote_port,
-                                  CPSInAddr remote_ip, int block) {
+static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, s32 len, s32 pos, u16 remote_port,
+                                  CPSInAddr remote_ip, s32 block) {
     SOCLSendPipe *pipe = socket->send_pipe;
     SOCLCommandPacket *packet = SOCLi_CreateCommandPacket(SOCLi_WriteCallBack, pipe->socket, block);
     u16 old_write_pos;
@@ -170,7 +171,7 @@ static int SOCLi_ExecWriteCommand(SOCLSocket *socket, const u8 *buf, int len, in
     if (socket->flag == 1) {
         if (socket->local_port == 0) {
             socket->local_port = CPSi_GetNewPort();
-            ((CPSSoc *)socket)->local_port = socket->local_port;
+            socket->cps_socket.local_port = socket->local_port;
         }
         packet->write.local_port = socket->local_port;
         if (socket->remote_ip == 0 || remote_ip != 0) {
@@ -211,11 +212,11 @@ static int SOCLi_WriteCallBack(void *arg) {
         }
         mode = socket->flag;
         overhead = SOCLi_ModeIsTCP(mode) ? 0x36 : 0x2a;
-        data = socket->sndbuf.data;
+        data = socket->cps_socket.sndbuf.data;
         if (mode == 0 || mode == 4) {
-            chunk = SOCLi_GetOptimumSendBufLen(socket->sndbuf.size - overhead);
+            chunk = SOCLi_GetOptimumSendBufLen(socket->cps_socket.sndbuf.size - overhead);
         } else {
-            chunk = socket->sndbuf.size - overhead;
+            chunk = socket->cps_socket.sndbuf.size - overhead;
         }
         while (1) {
             len = SOCLi_MemCpy(data + overhead, chunk, cpacket);

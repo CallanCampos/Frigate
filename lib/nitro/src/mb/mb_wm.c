@@ -654,7 +654,7 @@ int MB_Init(void *work, const MBUserInfo *user, u32 ggid, u32 tgid, u32 dma) {
     wmWork->sendBufSize = 0;
     wmWork->recvBufSize = 0;
     wmWork->mpFreq = 1;
-    wmWork->recvBuf = commWork->recvBuf;
+    wmWork->recvBuf = (WMMpRecvBuf *)commWork->recvBuf;
     wmWork->parentParam.entryFlag = 0;
     wmWork->parentParam.multiBootFlag = 0;
     wmWork->parentParam.CS_Flag = 1;

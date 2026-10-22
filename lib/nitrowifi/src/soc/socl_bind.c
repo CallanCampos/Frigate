@@ -11,7 +11,7 @@ static int SOCLi_ExecBindCommand(SOCLSocket *socket);
 static int SOCLi_BindCallBack(void *arg);
 
 // What SOCL_Connect returns for a connect that is still running and has no error yet
-static s32 SOCLiResultCodeInConnecting = SOCL_EINPROGRESS;
+static int SOCLiResultCodeInConnecting = SOCL_EINPROGRESS;
 
 // Whether an address is a broadcast one: the all-ones address, or the network's with every host bit set
 static inline BOOL SOCLi_IsBroadcast(CPSInAddr ip) {
@@ -24,7 +24,9 @@ static inline BOOL SOCLi_IsBroadcast(CPSInAddr ip) {
     }
 }
 
-int SOCL_Bind(SOCLSocket *socket, u16 local_port) {
+int SOCL_Bind(int s, u16 local_port) {
+    SOCLSocket *socket = (SOCLSocket *)s;
+
     if (SOCL_SocketIsInvalid(socket)) {
         return SOCL_EINVAL;
     }

@@ -2395,7 +2395,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   #off]` depends on how many references `p` has: a `(void)p;` statement counts as one and flips it. That makes it a
   diagnostic, not a fix: when only that differs, the original uses the pointer once more than the C, so look for the
   missing use. natneg.c's `ProcessPingPacket` matches with `(void)fromAddr;`, which nothing in GameSpy's code calls
-  for, so it keeps its row.
+  for, so it keeps its row. Check first that the cast isn't standing in for the field's real type: a field passed
+  by value as the struct it is (`SOC_InetNtoA(fromAddr->addr)`, with `SocAddrIn.addr` a `SocInAddr` as NitroWiFi
+  declares it) gives the folded `ldr r0, [r0, #4]` where the cast built the address first, and that alone made
+  `NNProcessData` match.
 - A spilled index slotted below a value computed from it, where the original slots it above, can be an index into
   arrays of structs that the SDK types `u32`: NitroSystem G3D's NODEMIX (`sbc.c`'s `NNS_G3DRenderFuncApplySmoSkMatrix`)
   reads `jointID = p[1]`, tests the joint's bit into `isCached` and indexes the envelope and the matrix cache with it.

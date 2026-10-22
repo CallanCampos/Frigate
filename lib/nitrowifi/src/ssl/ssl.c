@@ -12,7 +12,7 @@
 typedef struct SSLSessionCacheEntry {
     u8 session_id[0x20];
     u8 secret[0x30];
-    s32 time; // OS_GetTick() >> 16 when the entry was last used
+    u32 time; // OS_GetTick() >> 16 when the entry was last used
     CPSInAddr ip;
     u16 port;
     u8 valid;
@@ -1502,7 +1502,7 @@ static void SSLi_GetRandomBytes(u8 *dest, int len) {
 
 // CPS_SslAddRandomSeed's role: stirs more entropy into SSLi_GetRandomBytes's pool (a plain SHA1 of the old pool and
 // the new seed) and marks it seeded, so the next draw no longer reseeds from CPSiRand on its own
-void CPS_SslAddRandomSeed(const void *seed, u32 len) {
+void CPS_SslAddRandomSeed(void *seed, u32 len) {
     SHA1Context sha1;
     u32 enabled;
 
@@ -1725,7 +1725,7 @@ static BOOL SSLi_DoHandshake(CPSSoc *soc) {
 }
 
 // CPS_SslConnect's role: connects the socket's TCP first if it isn't already, then runs the handshake
-int CPS_SslConnect(CPSSoc *soc) {
+u32 CPS_SslConnect(CPSSoc *soc) {
     u8 state = soc->state;
     SSLContext *ctx = (SSLContext *)soc->con;
 
@@ -1925,7 +1925,7 @@ void CPS_SslClose(CPSSoc *soc) {
 
 // CPS_SetSsl's role: turns the SSL layer on for the caller's socket (SOCL_EnableSsl's own caller already set
 // soc->con before this)
-void CPS_SetSsl(BOOL enable) {
+void CPS_SetSsl(int enable) {
     OSThread *thread;
     CPSSoc *soc;
 
@@ -1940,14 +1940,14 @@ void CPS_SetSsl(BOOL enable) {
 // CPS_SslTick's role: called once a second by CPS's own housekeeping thread. Expires session cache entries that
 // have sat unused too long, and wakes any thread that has been blocked reading an SSL socket for too long, so its
 // own timeout logic can run
-void CPS_SslTick(s32 now) {
+void CPS_SslTick(u32 now) {
     u32 enabled = OS_DisableInterrupts();
     int i;
     OSThread *thread;
 
     for (i = 0; i < 4; i++) {
         SSLSessionCacheEntry *entry = &sSessionCache[i];
-        if (entry->valid && now - entry->time > 0x3bd) {
+        if (entry->valid && (int)(now - entry->time) > 0x3bd) {
             entry->valid = FALSE;
         }
     }
@@ -1956,7 +1956,7 @@ void CPS_SslTick(s32 now) {
     for (thread = OSi_ThreadInfo.list; thread != NULL; thread = thread->next) {
         CPSSoc *soc = (CPSSoc *)thread->specific[0];
         if (soc != NULL && soc->thread != NULL && soc->ssl != 0 && soc->state == CPS_STT_ESTABLISHED &&
-            ((SSLContext *)soc->con)->state < SSLI_STATE_APPLICATION_DATA && now - soc->when > 0xef &&
+            ((SSLContext *)soc->con)->state < SSLI_STATE_APPLICATION_DATA && (int)(now - soc->when) > 0xef &&
             soc->block_type == CPS_BLOCK_TCPREAD) {
             soc->state = 0;
             soc->block_type = CPS_BLOCK_NONE;

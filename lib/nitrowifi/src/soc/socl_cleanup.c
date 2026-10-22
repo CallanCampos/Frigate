@@ -48,7 +48,7 @@ static int SOCL_CloseAll(void) {
     while (TRUE) {
         irq = OS_DisableInterrupts();
         for (socket = SOCLiSocketList; socket != NULL; socket = socket->next) {
-            if (socket != SOCLiUDPSendSocket && !(socket->state & SOCLI_STATE_CLOSE_CALLED)) {
+            if ((int)socket != SOCLiUDPSendSocket && !(socket->state & SOCLI_STATE_CLOSE_CALLED)) {
                 break;
             }
         }
@@ -58,7 +58,7 @@ static int SOCL_CloseAll(void) {
         }
         SOCL_Close((int)socket);
     }
-    if (SOCLiSocketList == NULL || (SOCLiSocketList == SOCLiUDPSendSocket && SOCLiSocketList->next == NULL)) {
+    if (SOCLiSocketList == NULL || ((int)SOCLiSocketList == SOCLiUDPSendSocket && SOCLiSocketList->next == NULL)) {
         if (SOCLiSocketListTrash == NULL) {
             return 0;
         }
@@ -69,12 +69,12 @@ static int SOCL_CloseAll(void) {
 int SOCL_CalmDown(void) {
     int result;
 
-    if (SOCLiUDPSendSocket != NULL) {
+    if (SOCLiUDPSendSocket != 0) {
         result = SOCL_CloseAll();
         if (result == 0) {
-            SOCL_Close((int)SOCLiUDPSendSocket);
-            if (SOCL_IsClosed((int)SOCLiUDPSendSocket)) {
-                SOCLiUDPSendSocket = NULL;
+            SOCL_Close(SOCLiUDPSendSocket);
+            if (SOCL_IsClosed(SOCLiUDPSendSocket)) {
+                SOCLiUDPSendSocket = 0;
             }
             result = SOCL_EINPROGRESS;
         }
@@ -105,10 +105,10 @@ CPSInAddr SOCL_Resolve(const char *name) {
         return 0;
     }
     MI_CpuFill8(&soc, 0, sizeof(CPSSoc));
-    soc.rcvbuf = buf;
-    soc.rcvbuf_size = 0xb68;
-    soc.sndbuf = buf + 0xb68;
-    soc.sndbuf_size = 0xb9e;
+    soc.rcvbuf.data = buf;
+    soc.rcvbuf.size = 0xb68;
+    soc.sndbuf.data = buf + 0xb68;
+    soc.sndbuf.size = 0xb9e;
     CPS_SocRegister(&soc);
     ip = CPS_Resolve(name);
     CPS_SocUnRegister();
@@ -133,7 +133,7 @@ CPSInAddr SOCL_InetAtoH(const char *name) {
     return ip;
 }
 
-int SOCL_SetResolver(CPSInAddr dns1, CPSInAddr dns2) {
+int SOCL_SetResolver(const CPSInAddr dns1, const CPSInAddr dns2) {
     if (SOCL_GetHostID() == 0) {
         return SOCL_ENETRESET;
     }

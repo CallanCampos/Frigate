@@ -132,10 +132,10 @@ static BOOL DWCi_Http_SleepUnlessAborted(DWCHttp *http) {
 
 static void DWCi_Http_RegisterSocket(DWCHttp *http) {
     MI_CpuFill8(&http->soc, 0, sizeof(CPSSoc));
-    http->soc.rcvbuf_size = 0xb68;
-    http->soc.rcvbuf = http->rcvBuffer;
-    http->soc.sndbuf_size = 0x5ea;
-    http->soc.sndbuf = http->sndBuffer;
+    http->soc.rcvbuf.size = 0xb68;
+    http->soc.rcvbuf.data = http->rcvBuffer;
+    http->soc.sndbuf.size = 0x5ea;
+    http->soc.sndbuf.data = http->sndBuffer;
     CPS_SocRegister(&http->soc);
 }
 

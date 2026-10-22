@@ -84,11 +84,16 @@ extern SOCLSocketParam SOCLSocketParamUDPSend;
 #define POKE_NET_SOC_EINPROGRESS (-26)
 #define POKE_NET_SOC_EISCONN (-30)
 
+// An address (in network order) passed by value
+typedef struct SocInAddr {
+    u32 addr;
+} SocInAddr;
+
 typedef struct SocAddrIn {
     u8 len;
     u8 family;
     u16 port;
-    u32 addr;
+    SocInAddr addr;
 } SocAddrIn;
 // A socket address of any family, which an address in network order (SocAddrIn) is one of
 typedef struct SocSockAddr {
@@ -103,10 +108,6 @@ typedef struct SocHostEnt {
     s16 addrLength;
     u8 **addrList;
 } SocHostEnt;
-// An address (in network order) passed by value
-typedef struct SocInAddr {
-    u32 addr;
-} SocInAddr;
 // A poll descriptor, and the configuration that SOC_Startup takes (its addresses are in network order)
 typedef struct SocPollFd {
     int fd;
@@ -115,31 +116,42 @@ typedef struct SocPollFd {
 } SocPollFd;
 typedef void *(*SocAllocFunc)(u32 name, s32 size);
 typedef void (*SocFreeFunc)(u32 name, void *ptr, s32 size);
+#define SOC_VENDOR_NINTENDO 0x0000
+#define SOC_VERSION 0x0100
+#define SOC_FLAG_DHCP 0x0001 // SocConfig's flag: get the addresses by DHCP
 typedef struct SocConfig {
-    u32 flag;           // 0x00
+    u16 vendor;         // 0x00, SOC_VENDOR_NINTENDO
+    u16 version;        // 0x02, SOC_VERSION
     SocAllocFunc alloc; // 0x04
     SocFreeFunc free;   // 0x08
-    int useDhcp;        // 0x0c
-    u32 addr;           // 0x10
-    u32 netmask;        // 0x14
-    u32 gateway;        // 0x18
-    u32 dns1;           // 0x1c
-    u32 dns2;           // 0x20
-    u32 unk_24;         // 0x24
-    u32 unk_28;         // 0x28
-    u32 mtu;            // 0x2c: SOCLConfig's mtu
-    u32 rwin;           // 0x30: SOCLConfig's rwin
-    u32 unk_34[9];      // 0x34
+    u32 flag;           // 0x0c, SOC_FLAG_*
+    SocInAddr addr;     // 0x10
+    SocInAddr netmask;  // 0x14
+    SocInAddr router;   // 0x18
+    SocInAddr dns1;     // 0x1c
+    SocInAddr dns2;     // 0x20
+    s32 timeWaitBuffer;
+    s32 reassemblyBuffer;
+    s32 mtu;  // 0x2c: SOCLConfig's mtu
+    s32 rwin; // 0x30: SOCLConfig's rwin
+    s64 r2;   // 0x34
+    const char *peerid;
+    const char *passwd;
+    const char *serviceName;
+    const char *hostName; // 0x48
+    s32 rdhcp;
+    s32 udpSendBuff;
+    s32 udpRecvBuff;
 } SocConfig;
 
 // Only type selects the transport: 1 creates TCP, every other value UDP. domain/protocol are ignored.
 int SOC_Socket(int domain, int type, int protocol);
 // Address fields are read during the call, not retained: Bind uses port, Connect uses port/addr; len/family ignored.
 // TCP Bind records the local port for a later connect; UDP may queue a bind. Errors need not roll back endpoint/state.
-int SOC_Bind(int sock, const SocAddrIn *address);
+int SOC_Bind(int sock, const void *sockAddr);
 // A fresh TCP attempt waits for the callback with flag_block==1; other modes map admission to EINPROGRESS.
 // UDP only stores the peer; repeated TCP attempts report existing connection/pending state.
-int SOC_Connect(int sock, const SocAddrIn *address);
+int SOC_Connect(int sock, const void *sockAddr);
 // Receive sizes are byte capacities. UDP returns the full datagram length even when fewer bytes fit; ordinary
 // TCP/SSL reads return the copied count. Read flag 2 retains UDP/plain-CPS data, but SSL reads still consume it.
 int SOC_Read(int sock, void *buffer, int size, int flags);
@@ -150,7 +162,7 @@ int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from);
 // Positive results count admitted payload bytes, not transmission completion. Nonblocking sends can return a prefix;
 // a later admission failure can return an error after an earlier prefix was queued.
 int SOC_Send(int sock, const void *buffer, int size, int flags);
-int SOC_SendTo(int sock, const void *buffer, int size, int flags, const SocAddrIn *to);
+int SOC_SendTo(int sock, const void *buffer, int size, int flags, const void *sockTo);
 // Ignores how; the TCP callback requests send-half shutdown without freeing the socket. flag_block==1 waits for it;
 // other modes report queue admission. A missing send pipe can return zero without issuing a command.
 int SOC_Shutdown(int sock, int how);
@@ -159,10 +171,10 @@ int SOC_Shutdown(int sock, int how);
 int SOC_Close(int sock);
 // Returns shared static result/name/address storage, overwritten by later successful lookups; do not free it.
 SocHostEnt *SOC_GetHostByName(const char *host);
-int SOC_GetSockName(int sock, SocAddrIn *address);
-u32 SOC_GetHostID(void);
+int SOC_GetSockName(int sock, void *sockAddr);
+long SOC_GetHostID(void);
 // Sets the DNS servers, despite the name (the SDK's; pokediamond's is the same)
-int SOC_GetResolver(const u32 *dns1, const u32 *dns2);
+int SOC_GetResolver(const SocInAddr *dns1, const SocInAddr *dns2);
 // Command 3 returns zero for flag_block==1, otherwise 4. Command 4 stores mode 0 for flags&4, otherwise mode 1.
 // Other commands return zero without changing mode.
 // A zero handle returns -1.
@@ -172,14 +184,14 @@ int SOC_Startup(const SocConfig *config);
 int SOC_Cleanup(void);
 // Returns a shared 16-byte static formatting buffer, overwritten by the next call; do not free it.
 char *SOC_InetNtoA(SocInAddr addr);
-int SOC_InetAtoN(const char *text, u32 *address);
+int SOC_InetAtoN(const char *text, SocInAddr *address);
 // AF_INET only: reads four address bytes and needs at least 16 writable buffer bytes; returns buffer or NULL.
-char *SOC_InetNtoP(int family, const void *address, char *buffer, u32 size);
+const char *SOC_InetNtoP(int family, const void *address, char *buffer, unsigned int size);
 void SOC_U32to4U8(u32 value, u8 *bytes);
 // count counts descriptors; each scan replaces revents and always checks status bits 0xe0 as well as requested events.
 // -1 disables the timeout budget; other nonpositive values scan once. Positive ticks decrease by 523 per delay;
 // this loop does not measure an absolute deadline. Returns the number of descriptors with nonzero revents.
-int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks);
+int SOC_Poll(SocPollFd *fds, unsigned int count, OSTick timeout);
 // Borrows mutable connection storage on a created TCP-mode socket whose binding-state bit is clear. Keep nonnull
 // sslInfo alive while installed and through SSL operations/close using it. Success confirms the change, not a
 // handshake. NULL detaches/selects plain TCP; it does not reset/free the old context or perform SSL shutdown. The state
@@ -189,9 +201,9 @@ void SOCLi_TrashSocket(void);
 
 // Successful initial startup retains config for later callbacks and cleanup. Keep it alive until cleanup succeeds;
 // an already active layer ignores the new pointer. SOC_Startup instead supplies its own static SOCLConfig.
-int SOCL_Startup(SOCLConfig *config);
+int SOCL_Startup(const SOCLConfig *config);
 // The config SOCL_Startup was given, NULL while SOCL is down
-extern SOCLConfig *SOCLiConfigPtr;
+extern const SOCLConfig *SOCLiConfigPtr;
 // The wait between CPS's yields, which DWC's AC sets to 4 before SOC_Startup
 extern u32 SOCLiYieldWait;
 // TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on

@@ -191,20 +191,28 @@ static char sAcHostName[12]; // Defined before the socket functions, where the R
 // Fixed addresses on the access point's network, in network order: 192.168.0.176/24, with 192.168.0.200 as the
 // gateway and 192.168.0.32 as the DNS server
 static SocConfig sAcSocConfig = {
-    0x01000000,
+    SOC_VENDOR_NINTENDO,
+    SOC_VERSION,
     UtilAc_SocAlloc,
     UtilAc_SocFree,
-    FALSE,
-    0xb000a8c0,
-    0x00ffffff,
-    0xc800a8c0,
-    0x2000a8c0,
     0,
+    { 0xb000a8c0 },
+    { 0x00ffffff },
+    { 0xc800a8c0 },
+    { 0x2000a8c0 },
+    { 0 },
     0x1000,
     0x1000,
     0,
     0,
-    { 0, 0, 0, 0, 0, (u32)sAcHostName, 4, 0, 0 },
+    0,
+    NULL,
+    NULL,
+    NULL,
+    sAcHostName,
+    4,
+    0,
+    0,
 };
 // The setup's state, defined with initializers so that the functions reach it from one base. MWCC 2.0 lays out the
 // initialized objects defined above a file's first function by size with one heapsort, each in its own section (.bss,
@@ -1400,7 +1408,7 @@ static int UtilAc_Broadcast(int sock, const void *data, int length) {
 
     to.len = sizeof(SocAddrIn);
     to.family = POKE_NET_SOC_AF_INET;
-    to.addr = 0xffffffff;
+    to.addr.addr = 0xffffffff;
     to.port = 486;
     SOC_U32to4U8(SOCL_GetHostID(), ownAddress);
     return UtilAc_SendTo(sock, &to, ownAddress, data, length);
@@ -1878,7 +1886,7 @@ static int UtilAc_Run(void) {
                 address.len = sizeof(SocAddrIn);
                 address.family = POKE_NET_SOC_AF_INET;
                 address.port = 486;
-                address.addr = 0;
+                address.addr.addr = 0;
                 result = SOC_Bind(sock, &address);
                 if (result < 0) {
                     result = RESULT_WIRELESS;

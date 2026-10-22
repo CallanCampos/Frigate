@@ -21,7 +21,7 @@ static BOOL CPSi_IsMulticast(CPSInAddr ip);
 static BOOL CPSi_IsForMe(CPSInAddr ip);
 static BOOL CPSi_MacDiffers(u16 *a, u16 *b);
 static void CPSi_SendFrame(u8 *frame, u32 len, u8 *data, u32 dataLen);
-static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data, u32 dataLen);
+static void CPSi_PutFrame(const u8 *src, const u8 *dst, const u8 *header, u32 headerLen, const u8 *data, u32 dataLen);
 static CPSEtherHeader *CPSi_GetFrame(u32 *len);
 static void CPSi_ConsumeFrame(void);
 static u8 *CPSi_LookupMac(CPSInAddr ip);
@@ -148,7 +148,7 @@ static u16 sPingSeq;
 static u16 sIpId;
 static void (*sDhcpCallback)(void);
 u32 CPSMode;
-u32 CPSNoIpReason;
+int CPSNoIpReason;
 static u32 sRenewTime;
 static void (*sScavengerCallback)(void);
 static u32 sLeaseTime;
@@ -196,7 +196,7 @@ void CPS_SetAddressCheckCallback(BOOL (*callback)(void)) {
 }
 
 // CPSi_SetNoIp: drops the address, and with it the ARP cache, the connections and the fragments
-static void CPSi_SetNoIp(u32 reason) {
+static void CPSi_SetNoIp(int reason) {
     BOOL hadIp = CPSMyIp != 0;
     OSThread *thread;
     int i;
@@ -303,7 +303,7 @@ void CPS_Startup(CPSConfig *config) {
 }
 
 // CPS_CalmDown
-BOOL CPS_CalmDown(void) {
+int CPS_CalmDown(void) {
     u32 enabled = OS_DisableInterrupts();
     BOOL ended = OS_IsThreadTerminated(&sScavengerThread);
 
@@ -507,7 +507,7 @@ static void CPSi_SendFrame(u8 *frame, u32 len, u8 *data, u32 dataLen) {
 }
 
 // CPSi_PutFrame: puts a received frame in the LAN buffer, as its size and the Ethernet frame that it was
-static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data, u32 dataLen) {
+static void CPSi_PutFrame(const u8 *src, const u8 *dst, const u8 *header, u32 headerLen, const u8 *data, u32 dataLen) {
     u8 *buf = sLanBuf;
     u32 len;
     u16 size;
@@ -559,7 +559,7 @@ static void CPSi_PutFrame(u8 *src, u8 *dst, u8 *header, u32 headerLen, u8 *data,
 }
 
 // CPSi_RecvCallback
-void CPSi_RecvCallback(u8 *src, u8 *dst, u8 *data, u32 len) {
+void CPSi_RecvCallback(const u8 *src, const u8 *dst, const u8 *data, s32 len) {
     CPSi_PutFrame(src, dst, data, len, NULL, 0);
     if (sRecvWaiter != NULL && !OS_IsThreadTerminated(sRecvWaiter)) {
         OS_WakeupThreadDirect(sRecvWaiter);
@@ -803,7 +803,7 @@ static void CPSi_SendIp(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u
 
 // CPSi_SendPing: sends an echo request
 static void CPSi_SendPing(u8 *data, u32 len, CPSSoc *soc) {
-    u16 *icmp = (u16 *)(soc->sndbuf + CPS_SNDBUF_HEADER);
+    u16 *icmp = (u16 *)(soc->sndbuf.data + CPS_SNDBUF_HEADER);
 
     icmp[0] = 8;
     icmp[2] = (u32)OS_GetCurrentThread();
@@ -815,7 +815,7 @@ static void CPSi_SendPing(u8 *data, u32 len, CPSSoc *soc) {
 
 // CPSi_SendUdp
 static void CPSi_SendUdp(u8 *data, u32 len, CPSSoc *soc) {
-    u8 *buf = soc->sndbuf;
+    u8 *buf = soc->sndbuf.data;
     u8 *udp = buf + CPS_SNDBUF_HEADER;
 
     CPS_PUT32(udp - 12, CPSMyIp);
@@ -843,7 +843,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
     if (OS_GetCurrentThread() == &sRecvThread) {
         tcp = sReplyBuf + CPS_SNDBUF_HEADER;
     } else {
-        tcp = soc->sndbuf + CPS_SNDBUF_HEADER;
+        tcp = soc->sndbuf.data + CPS_SNDBUF_HEADER;
     }
     syn = flags & CPS_TCP_SYN;
     if (syn) {
@@ -898,7 +898,7 @@ static u32 CPSi_SendTcp(u8 *data, u32 len, CPSSoc *soc, u32 flags) {
     CPS_PUT32(tcp + 8, soc->acked = soc->ackno);
     tcp[12] = headerLen << 2;
     tcp[13] = flags;
-    soc->acked_window = soc->rcvbuf_size - soc->rcvbuf_len;
+    soc->acked_window = soc->rcvbuf.size - soc->rcvbuf_len;
     CPS_PUT16(tcp + 14, soc->acked_window);
     *(u16 *)(tcp + 16) = 0;
     *(u16 *)(tcp + 18) = 0;
@@ -998,12 +998,12 @@ static void CPSi_ReceiveEchoReply(CPSIpHeader *ip, CPSIcmpHeader *icmp, u32 len)
         if (soc != NULL && soc->thread != NULL && soc->state == CPS_STT_PING && (u16)(u32)soc->thread == icmp->id &&
             soc->local_port == icmp->seq && soc->rcvbuf_len == 0 && soc->remote_ip == CPS_GET32(ip->src)) {
             len -= sizeof(CPSIcmpHeader);
-            if (len > soc->rcvbuf_size) {
-                soc->rcvbuf_len = soc->rcvbuf_size;
+            if (len > soc->rcvbuf.size) {
+                soc->rcvbuf_len = soc->rcvbuf.size;
             } else {
                 soc->rcvbuf_len = len;
             }
-            MI_CpuCopy(icmp + 1, soc->rcvbuf, soc->rcvbuf_len);
+            MI_CpuCopy(icmp + 1, soc->rcvbuf.data, soc->rcvbuf_len);
             if (soc->block_type == CPS_BLOCK_UDPREAD) {
                 soc->block_type = CPS_BLOCK_NONE;
                 OS_WakeupThreadDirect(soc->thread);
@@ -1145,7 +1145,7 @@ static void CPSi_SendTcpControl(CPSSoc *soc, u32 flags) {
 // second segment or the ACK delay
 static void CPSi_SendAck(CPSSoc *soc, int mode) {
     if (mode != 2) {
-        if (soc->acked == soc->ackno && soc->acked_window == (u16)(soc->rcvbuf_size - soc->rcvbuf_len)) {
+        if (soc->acked == soc->ackno && soc->acked_window == (u16)(soc->rcvbuf.size - soc->rcvbuf_len)) {
             return;
         }
         if (mode != 1) {
@@ -1354,9 +1354,9 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
             // Ahead of what is expected: keep it as a run
             if (!(flags & CPS_TCP_FIN)) {
                 offset = soc->rcvbuf_len + seq - soc->ackno;
-                if (soc->rcvbuf_len < offset && offset < soc->rcvbuf_size) {
-                    if (len > soc->rcvbuf_size - offset) {
-                        len = soc->rcvbuf_size - offset;
+                if (soc->rcvbuf_len < offset && offset < soc->rcvbuf.size) {
+                    if (len > soc->rcvbuf.size - offset) {
+                        len = soc->rcvbuf.size - offset;
                     }
                     if (len != 0) {
                         int i;
@@ -1367,7 +1367,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
 
                         retry:
                             if (soc->ooo[i].start == 0) {
-                                MI_CpuCopy(CPS_TCP_DATA(tcp), soc->rcvbuf + offset, len);
+                                MI_CpuCopy(CPS_TCP_DATA(tcp), soc->rcvbuf.data + offset, len);
                                 soc->ooo[i].start = offset;
                                 soc->ooo[i].len = len;
                                 CPSi_MarkOoo(soc, i);
@@ -1376,7 +1376,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
                             }
                             runEnd = soc->ooo[i].start + soc->ooo[i].len;
                             if (offset < soc->ooo[i].start && soc->ooo[i].start <= end) {
-                                MI_CpuCopy(CPS_TCP_DATA(tcp), soc->rcvbuf + offset, soc->ooo[i].start - offset);
+                                MI_CpuCopy(CPS_TCP_DATA(tcp), soc->rcvbuf.data + offset, soc->ooo[i].start - offset);
                                 soc->ooo[i].len += soc->ooo[i].start - offset;
                                 soc->ooo[i].start = offset;
                                 CPSi_MarkOoo(soc, i);
@@ -1386,7 +1386,7 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
                             if (offset <= runEnd && runEnd < end) {
                                 u32 more = end - runEnd;
 
-                                MI_CpuCopy(CPS_TCP_DATA(tcp) + runEnd - offset, soc->rcvbuf + runEnd, more);
+                                MI_CpuCopy(CPS_TCP_DATA(tcp) + runEnd - offset, soc->rcvbuf.data + runEnd, more);
                                 soc->ooo[i].len += more;
                                 CPSi_MergeOoo(soc);
                                 CPSi_MarkOoo(soc, i);
@@ -1440,8 +1440,8 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
 
         soc->segments++;
         rcvLen = soc->rcvbuf_len;
-        if (len > soc->rcvbuf_size - rcvLen) {
-            len = soc->rcvbuf_size - rcvLen;
+        if (len > soc->rcvbuf.size - rcvLen) {
+            len = soc->rcvbuf.size - rcvLen;
             whole = FALSE;
         } else {
             whole = TRUE;
@@ -1449,15 +1449,15 @@ static void CPSi_ReceiveTcpData(CPSIpHeader *ip, CPSTcpHeader *tcp, u32 len) {
         if (len != 0) {
             if (soc->ooo[0].start != 0 && soc->ooo[0].start <= rcvLen + len) {
                 if (!(flags & CPS_TCP_FIN)) {
-                    MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, soc->ooo[0].start - rcvLen);
+                    MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf.data + rcvLen, soc->ooo[0].start - rcvLen);
                     len = soc->ooo[0].start + soc->ooo[0].len - soc->rcvbuf_len;
                 } else {
-                    MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, len);
+                    MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf.data + rcvLen, len);
                 }
                 soc->ooo[0].start = 0;
                 CPSi_PackOoo(soc);
             } else {
-                MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf + rcvLen, len);
+                MI_CpuCopy(CPS_TCP_DATA(tcp) + offset, soc->rcvbuf.data + rcvLen, len);
             }
             soc->rcvbuf_len += len;
             soc->ackno += len;
@@ -1647,16 +1647,16 @@ static void CPSi_ReceiveUdp(CPSIpHeader *ip, CPSUdpHeader *udp, u32 len) {
             }
             if (soc->rcvbuf_len == 0) {
                 len -= sizeof(CPSUdpHeader);
-                if (len > soc->rcvbuf_size) {
-                    soc->rcvbuf_len = soc->rcvbuf_size;
+                if (len > soc->rcvbuf.size) {
+                    soc->rcvbuf_len = soc->rcvbuf.size;
                 } else {
                     soc->rcvbuf_len = len;
                 }
-                MI_CpuCopy(udp + 1, soc->rcvbuf, soc->rcvbuf_len);
+                MI_CpuCopy(udp + 1, soc->rcvbuf.data, soc->rcvbuf_len);
                 if (soc->block_type == CPS_BLOCK_UDPREAD) {
                     soc->block_type = CPS_BLOCK_NONE;
                     OS_WakeupThreadDirect(soc->thread);
-                } else if (soc->udp_callback != NULL && soc->udp_callback(soc->rcvbuf, soc->rcvbuf_len, soc)) {
+                } else if (soc->udp_callback != NULL && soc->udp_callback(soc->rcvbuf.data, soc->rcvbuf_len, soc)) {
                     soc->rcvbuf_len = 0;
                 }
             }
@@ -1931,7 +1931,7 @@ void CPS_SetUdpCallback(BOOL (*callback)(u8 *data, u32 len, CPSSoc *soc)) {
 }
 
 // CPSi_TcpConnect: sends the SYN up to three times, returning 0 once connected
-int CPSi_TcpConnect(CPSSoc *soc) {
+u32 CPSi_TcpConnect(CPSSoc *soc) {
     u32 seqno = CPSi_Rand();
     u32 i;
 
@@ -1959,7 +1959,7 @@ int CPSi_TcpConnect(CPSSoc *soc) {
 }
 
 // CPS_TcpConnect
-int CPS_TcpConnect(void) {
+u32 CPS_TcpConnect(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL) {
@@ -2006,7 +2006,7 @@ void CPS_TcpShutdown(void) {
 // CPS_TcpClose: waits up to about five seconds for the connection to close
 void CPS_TcpClose(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
-    s32 start;
+    u32 start;
 
     if (soc == NULL) {
         return;
@@ -2015,7 +2015,7 @@ void CPS_TcpClose(void) {
         CPS_SslClose(soc);
     }
     start = CPS_NOW();
-    while (sLinkIsOn() && soc->state != CPS_STT_CLOSED && CPS_NOW() - start < 39) {
+    while (sLinkIsOn() && soc->state != CPS_STT_CLOSED && (int)(CPS_NOW() - start) < 39) {
         CPSi_Yield();
     }
     soc->state = CPS_STT_CLOSED;
@@ -2033,7 +2033,7 @@ static u8 *CPSi_UdpRead(u32 *len, CPSSoc *soc) {
     }
     OS_RestoreInterrupts(enabled);
     *len = received;
-    return soc->rcvbuf;
+    return soc->rcvbuf.data;
 }
 
 // CPSi_TcpRead
@@ -2053,7 +2053,7 @@ u8 *CPSi_TcpRead(u32 *len, CPSSoc *soc) {
         OS_YieldThread();
     }
     if ((*len = soc->rcvbuf_len) != 0) {
-        return soc->rcvbuf;
+        return soc->rcvbuf.data;
     }
     return NULL;
 }
@@ -2082,14 +2082,14 @@ void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
     BOOL wasFull = FALSE;
     u32 start;
 
-    if (received == soc->rcvbuf_size && len != 0) {
+    if (received == soc->rcvbuf.size && len != 0) {
         wasFull = TRUE;
     }
     if (len >= received) {
         soc->rcvbuf_len = 0;
     } else {
         soc->rcvbuf_len = received - len;
-        MI_CpuMove(soc->rcvbuf + len, soc->rcvbuf, received - len);
+        MI_CpuMove(soc->rcvbuf.data + len, soc->rcvbuf.data, received - len);
     }
     start = soc->ooo[0].start;
     if (start != 0) {
@@ -2101,7 +2101,7 @@ void CPSi_TcpConsume(u32 len, CPSSoc *soc) {
             for (i = 0; i < 4 && soc->ooo[i].start != 0; i++) {
             }
             if (start > consumed) {
-                u8 *runs = soc->rcvbuf + start;
+                u8 *runs = soc->rcvbuf.data + start;
 
                 MI_CpuMove(runs, runs - consumed, soc->ooo[i - 1].start + soc->ooo[i - 1].len - start);
                 for (i = 0; i < 4 && soc->ooo[i].start != 0; i++) {
@@ -2191,13 +2191,13 @@ u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
     u32 total = 0;
     BOOL probe;
     u32 base;
-    s32 lastProgress;
+    u32 lastProgress;
 
     soc->segments = 0;
     probe = FALSE;
     lastProgress = CPS_NOW();
-    while (sLinkIsOn() && len != 0 && soc->state == CPS_STT_ESTABLISHED && CPS_NOW() - lastProgress < 159) {
-        s32 start;
+    while (sLinkIsOn() && len != 0 && soc->state == CPS_STT_ESTABLISHED && (int)(CPS_NOW() - lastProgress) < 159) {
+        u32 start;
         u32 acked;
 
         base = soc->seqno;
@@ -2206,7 +2206,7 @@ u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
         do {
             CPSi_Yield();
         } while (sLinkIsOn() && soc->state == CPS_STT_ESTABLISHED && soc->seqno != soc->remote_ackno &&
-                 CPS_NOW() - start < 15 && (!probe || soc->remote_win == 0));
+                 (int)(CPS_NOW() - start) < 15 && (!probe || soc->remote_win == 0));
         acked = soc->remote_ackno - base;
         if (acked > soc->seqno - base) {
             acked = 0;
@@ -2219,7 +2219,7 @@ u32 CPSi_TcpWrite(u8 *data, u32 len, u8 *data2, u32 len2, CPSSoc *soc) {
         if (soc->state == CPS_STT_ESTABLISHED && soc->remote_win == 0 && acked == 0) {
             if (!probe) {
                 start = CPS_NOW();
-                while (sLinkIsOn() && CPS_NOW() - start < 15) {
+                while (sLinkIsOn() && (int)(CPS_NOW() - start) < 15) {
                     CPSi_Yield();
                     if (soc->remote_win != 0) {
                         break;
@@ -2289,10 +2289,10 @@ u32 CPS_SocWrite(u8 *data, u32 len) {
         u32 pending = soc->outbuf_len;
 
         if (pending != 0) {
-            u32 sent = CPSi_SocWrite(soc->outbuf, pending, data, len);
+            u32 sent = CPSi_SocWrite(soc->outbuf.data, pending, data, len);
 
             if (sent < soc->outbuf_len) {
-                MI_CpuMove(soc->outbuf + sent, soc->outbuf, soc->outbuf_len - sent);
+                MI_CpuMove(soc->outbuf.data + sent, soc->outbuf.data, soc->outbuf_len - sent);
                 soc->outbuf_len -= sent;
                 return 0;
             }
@@ -2330,20 +2330,20 @@ void CPS_SocFlush(void) {
     CPSSoc *soc = CPS_CURRENT_SOC();
 
     if (soc != NULL && soc->outbuf_len != 0) {
-        CPSi_SocWrite(soc->outbuf, soc->outbuf_len, NULL, 0);
+        CPSi_SocWrite(soc->outbuf.data, soc->outbuf_len, NULL, 0);
         soc->outbuf_len = 0;
     }
 }
 
 // CPSi_CheckCollision: asks twice who has the address and waits for an answer, FALSE when another host has it
 static BOOL CPSi_CheckCollision(void) {
-    s32 start;
+    u32 start;
 
     CPSi_SendArpRequest(CPSMyIp);
     OS_Sleep(100);
     CPSi_SendArpRequest(CPSMyIp);
     start = CPS_NOW();
-    while (sLinkIsOn() && CPS_NOW() - start < 23) {
+    while (sLinkIsOn() && (int)(CPS_NOW() - start) < 23) {
         if (sIpCollision) {
             return FALSE;
         }
@@ -2371,17 +2371,17 @@ static void CPSi_ScavengerThread(void *arg) {
     u32 arpTimer;
     u32 leaseTimer;
     BOOL first;
-    s32 now;
+    u32 now;
     int i;
     OSThread *thread;
 
     sCalmDown = FALSE;
     state = DHCP_STATE_INIT;
     MI_CpuFill8(&sDhcpSoc, 0, sizeof(CPSSoc));
-    sDhcpSoc.rcvbuf_size = sizeof(sDhcpRcvBuf);
-    sDhcpSoc.rcvbuf = sDhcpRcvBuf;
-    sDhcpSoc.sndbuf_size = sizeof(sDhcpSndBuf);
-    sDhcpSoc.sndbuf = sDhcpSndBuf;
+    sDhcpSoc.rcvbuf.size = sizeof(sDhcpRcvBuf);
+    sDhcpSoc.rcvbuf.data = sDhcpRcvBuf;
+    sDhcpSoc.sndbuf.size = sizeof(sDhcpSndBuf);
+    sDhcpSoc.sndbuf.data = sDhcpSndBuf;
     CPS_SocRegister(&sDhcpSoc);
     arpTimer = 1;
     leaseTimer = 1;
@@ -2480,11 +2480,11 @@ static void CPSi_ScavengerThread(void *arg) {
             CPSSoc *soc = thread->specific[0];
 
             if (soc != NULL && soc->thread != NULL) {
-                if (soc->state == CPS_STT_SYN_RCVD && now - soc->when > 39) {
+                if (soc->state == CPS_STT_SYN_RCVD && (int)(now - soc->when) > 39) {
                     soc->state = CPS_STT_LISTEN;
                     soc->remote_port = soc->remote_port_bound;
                     soc->remote_ip = soc->remote_ip_bound;
-                } else if (soc->state == CPS_STT_SYN_SENT && now - soc->when > 39) {
+                } else if (soc->state == CPS_STT_SYN_SENT && (int)(now - soc->when) > 39) {
                     if (soc->block_type == CPS_BLOCK_TCPCON) {
                         soc->state = CPS_STT_CLOSED;
                         soc->block_type = CPS_BLOCK_NONE;
@@ -2499,7 +2499,7 @@ static void CPSi_ScavengerThread(void *arg) {
         for (i = 0; i < CPS_REASSEMBLY_COUNT; i++) {
             CPSReassembly *reassembly = &sReassembly[i];
 
-            if (reassembly->count != 0 && now - reassembly->time > 239) {
+            if (reassembly->count != 0 && (int)(now - reassembly->time) > 239) {
                 CPSiFree(reassembly->buf);
                 reassembly->count = 0;
             }
@@ -2643,14 +2643,14 @@ static int CPSi_DhcpWait(u32 xid, int try) {
     u8 *end;
     u32 len;
     u8 code;
-    s32 start;
+    u32 start;
     s32 timeout = sDhcpWaits[try] * 7;
     int result;
 
     start = CPS_NOW();
     result = DHCP_WAIT_NONE;
 
-    while (sLinkIsOn() && result == DHCP_WAIT_NONE && CPS_NOW() - start < timeout) {
+    while (sLinkIsOn() && result == DHCP_WAIT_NONE && (int)(CPS_NOW() - start) < timeout) {
         if (CPS_SocGetLength() == 0) {
             CPSi_Yield();
         } else {
@@ -2812,7 +2812,7 @@ static u8 *CPSi_DnsSkipName(u8 *p) {
 static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resultSize) {
     u32 len;
     u8 query[0x44];
-    s32 start;
+    u32 start;
     u8 *labelLen;
     u8 *p;
     s32 answer;
@@ -2853,7 +2853,7 @@ static s32 CPSi_DnsQuery(const u8 *name, u32 type, u16 id, u8 *result, u32 resul
     answer = 0;
     CPS_SocWrite(query, p + 5 - query);
     start = CPS_NOW();
-    while (sLinkIsOn() && answer == 0 && CPS_NOW() - start < 15) {
+    while (sLinkIsOn() && answer == 0 && (int)(CPS_NOW() - start) < 15) {
         u8 *reply;
 
         if (CPS_SocGetLength() == 0) {

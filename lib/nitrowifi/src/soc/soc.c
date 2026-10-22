@@ -63,16 +63,20 @@ int SOC_Socket(int domain, int type, int protocol) {
     return SOCL_CreateSocket(&SOCLSocketParamUDP);
 }
 
-int SOC_Bind(int sock, const SocAddrIn *address) {
-    return SOCL_Bind((SOCLSocket *)sock, SOC_Swap16(address->port));
+int SOC_Bind(int sock, const void *sockAddr) {
+    const SocAddrIn *address = (const SocAddrIn *)sockAddr;
+
+    return SOCL_Bind(sock, SOC_Swap16(address->port));
 }
 
-int SOC_Connect(int sock, const SocAddrIn *address) {
-    return SOCL_Connect(sock, SOC_Swap16(address->port), SOC_Swap32(address->addr));
+int SOC_Connect(int sock, const void *sockAddr) {
+    const SocAddrIn *address = (const SocAddrIn *)sockAddr;
+
+    return SOCL_Connect(sock, SOC_Swap16(address->port), SOC_Swap32(address->addr.addr));
 }
 
 int SOC_Read(int sock, void *buffer, int size, int flags) {
-    return SOCLi_ReadFrom((SOCLSocket *)sock, buffer, size, NULL, NULL, flags);
+    return SOCLi_ReadFrom(sock, buffer, size, NULL, NULL, flags);
 }
 
 int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from) {
@@ -80,36 +84,38 @@ int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from) {
     CPSInAddr ip;
     int result;
 
-    result = SOCLi_ReadFrom((SOCLSocket *)sock, buffer, size, &port, &ip, flags);
+    result = SOCLi_ReadFrom(sock, buffer, size, &port, &ip, flags);
     if (result >= 0 && from != NULL) {
         SocAddrIn *addr = (SocAddrIn *)from;
 
         addr->port = SOC_Swap16(port);
-        addr->addr = SOC_Swap32(ip);
+        addr->addr.addr = SOC_Swap32(ip);
     }
     return result;
 }
 
 int SOC_Send(int sock, const void *buffer, int size, int flags) {
-    return SOCL_WriteTo((SOCLSocket *)sock, buffer, size, 0, 0, flags);
+    return SOCL_WriteTo(sock, buffer, size, 0, 0, flags);
 }
 
-int SOC_SendTo(int sock, const void *buffer, int size, int flags, const SocAddrIn *to) {
+int SOC_SendTo(int sock, const void *buffer, int size, int flags, const void *sockTo) {
+    const SocAddrIn *to;
     u16 port;
     CPSInAddr ip;
 
-    if (to != NULL) {
+    if (sockTo != NULL) {
+        to = (const SocAddrIn *)sockTo;
         port = SOC_Swap16(to->port);
-        ip = SOC_Swap32(to->addr);
+        ip = SOC_Swap32(to->addr.addr);
     } else {
         port = 0;
         ip = 0;
     }
-    return SOCL_WriteTo((SOCLSocket *)sock, buffer, size, port, ip, flags);
+    return SOCL_WriteTo(sock, buffer, size, port, ip, flags);
 }
 
 int SOC_Shutdown(int sock, int how) {
-    return SOCL_Shutdown((SOCLSocket *)sock);
+    return SOCL_Shutdown(sock);
 }
 
 int SOC_Close(int sock) {
@@ -135,7 +141,8 @@ SocHostEnt *SOC_GetHostByName(const char *host) {
     return &sHostEnt;
 }
 
-int SOC_GetSockName(int sock, SocAddrIn *address) {
+int SOC_GetSockName(int sock, void *sockAddr) {
+    SocAddrIn *address = (SocAddrIn *)sockAddr;
     CPSInAddr host_ip;
     u32 port;
 
@@ -150,17 +157,17 @@ int SOC_GetSockName(int sock, SocAddrIn *address) {
     address->len = 8;
     address->family = POKE_NET_SOC_AF_INET;
     address->port = SOC_Swap16(port);
-    address->addr = SOC_Swap32(host_ip);
+    address->addr.addr = SOC_Swap32(host_ip);
     return 0;
 }
 
-u32 SOC_GetHostID(void) {
-    return SOC_Swap32(SOCL_GetHostID());
+long SOC_GetHostID(void) {
+    return (long)SOC_Swap32(SOCL_GetHostID());
 }
 
 // The SDK's name, which is wrong: it sets the DNS servers
-int SOC_GetResolver(const u32 *dns1, const u32 *dns2) {
-    return SOCL_SetResolver(SOC_Swap32(*dns1), SOC_Swap32(*dns2));
+int SOC_GetResolver(const SocInAddr *dns1, const SocInAddr *dns2) {
+    return SOCL_SetResolver(SOC_Swap32(dns1->addr), SOC_Swap32(dns2->addr));
 }
 
 int SOC_Fcntl(int sock, int command, int flags) {
@@ -209,12 +216,12 @@ static void FreeFunc_SOCL(void *ptr) {
 }
 
 int SOC_Startup(const SocConfig *config) {
-    sSoclConfig.use_dhcp = config->useDhcp == 1 ? TRUE : FALSE;
-    sSoclConfig.host_ip.my_ip = SOC_Swap32(config->addr);
-    sSoclConfig.host_ip.net_mask = SOC_Swap32(config->netmask);
-    sSoclConfig.host_ip.gateway_ip = SOC_Swap32(config->gateway);
-    sSoclConfig.host_ip.dns_ip[0] = SOC_Swap32(config->dns1);
-    sSoclConfig.host_ip.dns_ip[1] = SOC_Swap32(config->dns2);
+    sSoclConfig.use_dhcp = config->flag == SOC_FLAG_DHCP ? TRUE : FALSE;
+    sSoclConfig.host_ip.my_ip = SOC_Swap32(config->addr.addr);
+    sSoclConfig.host_ip.net_mask = SOC_Swap32(config->netmask.addr);
+    sSoclConfig.host_ip.gateway_ip = SOC_Swap32(config->router.addr);
+    sSoclConfig.host_ip.dns_ip[0] = SOC_Swap32(config->dns1.addr);
+    sSoclConfig.host_ip.dns_ip[1] = SOC_Swap32(config->dns2.addr);
     sSoclConfig.alloc = AllocFunc_SOCL;
     sSoclConfig.free = FreeFunc_SOCL;
     AllocFunc_SOC = config->alloc;
@@ -234,19 +241,19 @@ char *SOC_InetNtoA(SocInAddr addr) {
     return sInetNtoABuffer;
 }
 
-int SOC_InetAtoN(const char *text, u32 *address) {
+int SOC_InetAtoN(const char *text, SocInAddr *address) {
     CPSInAddr ip = SOCL_InetAtoH(text);
 
     if (ip == 0) {
         return 0;
     }
     if (address != NULL) {
-        *address = SOC_Swap32(ip);
+        address->addr = SOC_Swap32(ip);
     }
     return 1;
 }
 
-char *SOC_InetNtoP(int family, const void *address, char *buffer, u32 size) {
+const char *SOC_InetNtoP(int family, const void *address, char *buffer, unsigned int size) {
     u32 ip;
     u8 octets[4];
 
@@ -269,8 +276,9 @@ void SOC_U32to4U8(u32 value, u8 *bytes) {
     bytes[3] = value;
 }
 
-int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks) {
+int SOC_Poll(SocPollFd *fds, unsigned int count, OSTick timeout) {
     BOOL timed;
+    s64 ticks;
     int ready;
     SocPollFd *fd;
     u32 i;
@@ -278,13 +286,14 @@ int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks) {
     if (count == 0 || fds == NULL) {
         return 0;
     }
-    timed = ticks != -1;
+    timed = timeout != (OSTick)-1;
+    ticks = (s64)timeout;
     while (1) {
         fd = fds;
         ready = 0;
         for (i = 0; i < count; i++, fd++) {
             int mask = fd->events | 0xe0;
-            int status = SOCL_GetStatus((SOCLSocket *)fd->fd) & mask;
+            int status = SOCL_GetStatus(fd->fd) & mask;
 
             if (status != 0) {
                 ready++;

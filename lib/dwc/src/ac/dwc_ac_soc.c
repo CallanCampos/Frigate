@@ -26,10 +26,30 @@ static void DWCAc_SetResolver(DWCAcSearchWork *work);
 static char sSocHostName[] = "NINTENDO-DS";
 
 // What DWCAc_MakeSocConfig starts the configuration of SOC_Startup from: DHCP on, the addresses, the allocators, the
-// MTU and the window left to the function, then the two words of 0x1000 and the host name. The flag and these words are
-// not known
+// MTU and the window left to the function, then buffers of 0x1000, the host name and four DHCP retries
 static const SocConfig sSocConfigInit = {
-    0x01000000, NULL, NULL, TRUE, 0, 0, 0, 0, 0, 0x1000, 0x1000, 0, 0, { 0, 0, 0, 0, 0, (u32)sSocHostName, 4, 0, 0 },
+    SOC_VENDOR_NINTENDO,
+    SOC_VERSION,
+    NULL,
+    NULL,
+    SOC_FLAG_DHCP,
+    { 0 },
+    { 0 },
+    { 0 },
+    { 0 },
+    { 0 },
+    0x1000,
+    0x1000,
+    0,
+    0,
+    0,
+    NULL,
+    NULL,
+    NULL,
+    sSocHostName,
+    4,
+    0,
+    0,
 };
 
 // State 1, starts the wireless manager with the notification callback of dwc_ac_wcm.c, after
@@ -233,19 +253,19 @@ static void DWCAc_MakeSocConfig(DWCAcMain *main, DWCAcSearchWork *work, SocConfi
         setting = &work->dsiSettings[type - 10].base;
     }
     if (setting->ip[0] != 0) {
-        config->useDhcp = FALSE;
-        config->addr = DWCAc_ReadAddress(setting->ip);
-        config->netmask = DWCAc_MakeNetmask(setting->netmaskBits);
-        config->gateway = DWCAc_ReadAddress(setting->gateway);
-        config->dns1 = DWCAc_ReadAddress(setting->dns[0]);
-        config->dns2 = DWCAc_ReadAddress(setting->dns[1]);
+        config->flag = 0;
+        config->addr.addr = DWCAc_ReadAddress(setting->ip);
+        config->netmask.addr = DWCAc_MakeNetmask(setting->netmaskBits);
+        config->router.addr = DWCAc_ReadAddress(setting->gateway);
+        config->dns1.addr = DWCAc_ReadAddress(setting->dns[0]);
+        config->dns2.addr = DWCAc_ReadAddress(setting->dns[1]);
     } else {
-        config->useDhcp = TRUE;
-        config->addr = 0;
-        config->netmask = 0;
-        config->gateway = 0;
-        config->dns1 = 0;
-        config->dns2 = 0;
+        config->flag = SOC_FLAG_DHCP;
+        config->addr.addr = 0;
+        config->netmask.addr = 0;
+        config->router.addr = 0;
+        config->dns1.addr = 0;
+        config->dns2.addr = 0;
     }
     if (OS_IsRunOnTwl()) {
         if (setting->unk_ea == 0) {
@@ -300,8 +320,8 @@ static u32 DWCAc_MakeNetmask(u8 bits) {
 // configuration already)
 static void DWCAc_SetResolver(DWCAcSearchWork *work) {
     DWCAcDsSetting *setting;
-    u32 dns1;
-    u32 dns2;
+    SocInAddr dns1;
+    SocInAddr dns2;
     int dnsSum;
     u8 type;
 
@@ -318,7 +338,7 @@ static void DWCAc_SetResolver(DWCAcSearchWork *work) {
     if (setting->ip[0] != 0 || dnsSum == 0) {
         return;
     }
-    dns1 = DWCAc_ReadAddress(setting->dns[0]);
-    dns2 = DWCAc_ReadAddress(setting->dns[1]);
+    dns1.addr = DWCAc_ReadAddress(setting->dns[0]);
+    dns2.addr = DWCAc_ReadAddress(setting->dns[1]);
     SOC_GetResolver(&dns1, &dns2);
 }
