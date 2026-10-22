@@ -3116,6 +3116,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   unsigned test (`bcc`) gives no copy at all. The copy's register can push a value that the loop doesn't use onto the
   stack: there the start of the message's items, stored as the message and then as the message plus 8. NHTTP's
   `NHTTPi_getUrlEncodedSize2` (`c = *s++;` under `i < length`) shows the same copy.
+- Two identical conditional branches in a row ahead of a loop (`cmp r4, #0; ble end; ble end`) are an `if (n > 0)`
+  around a `for` whose counter was set before the `if`: `int i = 0; ... if (length > 0) { for (; i < length; i++) ... }`
+  in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `dwcutil_ac.c`'s `UtilAc_Scan` (still in its row). A
+  bare `for`, or the `if` without the earlier start, gives one branch.
 
 ## Switches
 
