@@ -150,11 +150,14 @@ void *DeliveryBeacon_Init(const DeliveryInit *init) {
     return pWork;
 }
 
+// File metadata for failed assertions.
+static char sDeliveryBeaconAssertFileName[] = "";
+
 static void DeliveryBeacon_CheckDataSize(DeliveryBeaconWork *pWork) {
     if (pWork->aInit.data[0].datasize != 0) {
         // The assert's text is the game's, spacing included
         // clang-format off
-        GFL_ASSERT(pWork->aInit.data[0].datasize < (DELIVERY_BEACON_MAX_NUM*DELIVERY_BEACON_ONCE_NUM));
+        GFL_ASSERT_WITH_FILE(sDeliveryBeaconAssertFileName, pWork->aInit.data[0].datasize < (DELIVERY_BEACON_MAX_NUM*DELIVERY_BEACON_ONCE_NUM));
         // clang-format on
     }
 }

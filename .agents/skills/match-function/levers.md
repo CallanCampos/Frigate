@@ -930,6 +930,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
   (matching.md: "`dsi/1.2` with `-Cpp_exceptions on` emits exception indices")
+- A live empty assertion filename before earlier allocation literals: recover its named data object and probe
+  per-function IPA with `explicit_zero_data on`; compare all data and pool targets.
+  (matching.md: "A named `static char name[]")
+
 - A local array initializer's bytes in a `.rodata` section of their own: copy a struct from a static instead.
   (matching.md: "A local array with an initializer goes in a `.rodata` section of its own")
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
