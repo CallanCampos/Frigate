@@ -8,6 +8,14 @@ tools that show the differences.
 
 ## Registers
 
+- Nested inline boundaries and file-level interprocedural analysis can explain saved-result lifetimes and register
+  allocation. DS Protect's `DSProt_RunChecks` matches with an inline Boolean checksum helper inside an inline
+  queue runner, whose result the public function returns. Its flashcart check uses an inline test returning
+  the encoded success/failure values and an inline raw reader taking a byte count. Both files match their
+  functions, data and relocations in both versions with per-source `-ipa file`; other DS Protect sources keep
+  their own settings. The loader-owned static constructor registrations need `__attribute__((used))` under
+  this analysis because their references are outside the C call graph.
+
 - A missing variadic log argument can change registers throughout a function without changing its size. Check the
   ROM's format string before tuning allocation: `download_play_wih.c`'s parent and MP callbacks and finalizer require
   a state argument for their strings' `%d`. Supplying the state
@@ -3991,6 +3999,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   spelling did.
 
 ## When nothing moves it
+
+- ARM-to-Thumb interworking veneers are generated code rather than C functions. DS Protect's
+  `dsprot_detect.c` has six source functions and eight 12-byte veneers. MWCC's per-source processor
+  flag does not preserve them under the ARM946E final link; a global ARMv4T link restores them but
+  changes unrelated modules. The build retains genuine MWLD-generated fragments from a real-input
+  prelink with SDK-symbol relocations, while keeping every source body intact (see
+  [Long-branch veneers](configs.md#long-branch-veneers)). Verify the complete module and every call
+  and Thumb pointer in both versions; masked function probes alone cannot validate generated glue.
 
 - A Thumb `bx pc; nop` followed by an ARM `ldr ip, [pc, #0]; bx ip; dcd ADDRESS`, right after a function that calls it,
   is the linker's long-branch veneer (`docs/configs.md`, "Long-branch veneers"), not source: call the far target from C

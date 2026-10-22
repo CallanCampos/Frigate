@@ -169,6 +169,21 @@ target, across files, as main's do: `card_hash.c`'s six calls of `OS_DisableInte
 `mi_ndma.c`, `mi_ndma_gxcommand.c`, `mi_sharedWram_twl.c` and `pm_twl.c` call too, so the tool leaves the objects of
 `lib/twl/` with main's.
 
+DS Protect's `dsprot_detect.c` also retains eight legacy ARM-to-Thumb veneers. The normal
+ARM946E linker replaces those calls with BLX and drops 96 bytes. When the compiled file is linked,
+`tools/build/restore_dsprot_veneers.py` runs a private ARMv4T prelink using the current real object
+list and effective LCF. It retains only this file's generated instructions, gives their pointers
+ABS32 relocations to the actual Thumb SDK symbols, and redirects the compiler's call relocations
+to generated local symbols. The normal ARM946E final link uses that derived object; objdiff uses
+the unchanged compiler object. No source-function bytes, sizes or data are replaced.
+
+This is a representation of genuine linker-generated code; the original architecture settings
+and Nintendo's exact build procedure remain unknown. The helper has no ROM input or fixed game
+addresses. It discovers addresses on every prelink, including `--shift` builds, and requires
+contiguous generated fragments, real Thumb mappings and eight veneers. Unsupported ELF metadata,
+unexpected layouts and linker diagnostics fail with an error. Modified code that changes these
+invariants needs a new layout audit; do not change the count merely to bypass the check.
+
 ## Shifting
 
 A mod that changes code sizes moves everything after the change, so it only works if every pointer to code or data
