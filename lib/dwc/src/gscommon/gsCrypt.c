@@ -4,9 +4,9 @@
 // GameSpy's RSA (gsCrypt.c). The ROM names neither the file nor its function; both are GameSpy's, as pret's pokerevo
 // Wii build has the file (gsCrypt.s) and the later SDK the function
 
-int gsCryptRSAVerifySignedHash(const RsaPublicKey *key, const gsi_u8 *hash, gsi_u32 hashSize, const gsi_u8 *signature,
-                               gsi_u32 signatureSize) {
-    BigNum value;
+gsi_i32 gsCryptRSAVerifySignedHash(const gsCryptRSAKey *key, const unsigned char *hash, gsi_u32 hashSize,
+                                   const unsigned char *signature, gsi_u32 signatureSize) {
+    gsLargeInt_t value;
     // The signature as bytes, once it is decrypted: 00 01, FF up to a 00, the DER prefix of the hash, the hash
     gsi_u8 *bytes = (gsi_u8 *)value.data;
     const gsi_u8 md5Prefix[18] = { 0x30, 0x20, 0x30, 0x0c, 0x06, 0x08, 0x2a, 0x86, 0x48,

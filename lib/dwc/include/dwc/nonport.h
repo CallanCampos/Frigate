@@ -16,6 +16,8 @@ typedef int gsi_i32;
 typedef unsigned int gsi_u32;
 typedef s64 gsi_i64;
 typedef u64 gsi_u64;
+typedef gsi_i32 goa_int32;
+typedef gsi_u32 goa_uint32;
 
 typedef int gsi_bool;
 #define gsi_false ((gsi_bool)0)

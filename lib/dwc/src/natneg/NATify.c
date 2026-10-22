@@ -17,11 +17,11 @@ static gsi_bool gotADDRESS1b;
 static gsi_bool gotADDRESS2;
 static gsi_bool gotADDRESS3;
 
-static gsi_u32 GetLocalIP(void);
-static gsi_u16 GetLocalPort(int sock);
-static gsi_bool Think(int sock, NAT *nat);
+static unsigned int GetLocalIP(void);
+static unsigned short GetLocalPort(SOCKET sock);
+static int Think(SOCKET sock, NAT *nat);
 
-const char *AddressToString(gsi_u32 ip, gsi_u16 port, char *string) {
+const char *AddressToString(unsigned int ip, unsigned short port, char string[22]) {
     static char strAddressArray[2][22];
     static int nIndex;
     char *strAddress;
@@ -50,10 +50,10 @@ const char *AddressToString(gsi_u32 ip, gsi_u16 port, char *string) {
 }
 
 // The first address of the console that isn't the loopback one and is a private one, else the last one
-static gsi_u32 GetLocalIP(void) {
+static unsigned int GetLocalIP(void) {
     int i;
-    SocHostEnt *host;
-    gsi_u32 *addr;
+    HOSTENT *host;
+    IN_ADDR *addr;
     gsi_u32 localIp = 0;
 
     host = getlocalhost();
@@ -64,11 +64,11 @@ static gsi_u32 GetLocalIP(void) {
         if (host->addrList[i] == NULL) {
             break;
         }
-        addr = (gsi_u32 *)host->addrList[i];
-        if (*(gsi_u32 *)host->addrList[i] == NN_SWAP32(0x7f000001)) {
+        addr = (IN_ADDR *)host->addrList[i];
+        if (addr->addr == NN_SWAP32(0x7f000001)) {
             continue;
         }
-        localIp = *addr;
+        localIp = addr->addr;
         if (IsPrivateIP(addr)) {
             return localIp;
         }
@@ -77,11 +77,11 @@ static gsi_u32 GetLocalIP(void) {
 }
 
 // The port (in network order) that a socket is bound to, or 0
-static gsi_u16 GetLocalPort(int sock) {
+static unsigned short GetLocalPort(SOCKET sock) {
     SocAddrIn address;
     int size = sizeof(SocAddrIn);
 
-    if (getsockname(sock, &address, &size) == -1) {
+    if (getsockname(sock, (SOCKADDR *)&address, &size) == -1) {
         return 0;
     }
     return address.port;
@@ -89,15 +89,16 @@ static gsi_u16 GetLocalPort(int sock) {
 
 void OutputMapping(const AddressMapping *mapping) {
     if (mapping == NULL) {
-        gsDebugFormat(7, 0, 0x10, "ERROR: Port mapping not available.");
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
+                      "ERROR: Port mapping not available.");
     } else {
-        gsDebugFormat(7, 0, 0x10, "Discovered map: [%s] -> [%s]\n",
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment, "Discovered map: [%s] -> [%s]\n",
                       AddressToString(mapping->privateIp, mapping->privatePort, NULL),
                       AddressToString(mapping->publicIp, mapping->publicPort, NULL));
     }
 }
 
-static gsi_bool Think(int sock, NAT *nat) {
+static int Think(SOCKET sock, NAT *nat) {
     static char data[0x200];
     int length;
     gsi_u8 type;
@@ -110,9 +111,10 @@ static gsi_bool Think(int sock, NAT *nat) {
     }
     if (sock != -1) {
         while (CanReceiveOnSocket(sock)) {
-            length = recvfrom(sock, data, sizeof(data), 0, &from, &fromSize);
+            length = recvfrom(sock, data, sizeof(data), 0, (SOCKADDR *)&from, &fromSize);
             if (length == -1) {
-                gsDebugFormat(7, 0, 8, "RECV SOCKET ERROR: %d\n", GOAGetLastError(sock));
+                gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "RECV SOCKET ERROR: %d\n",
+                              GOAGetLastError(sock));
                 break;
             }
             if (memcmp(data, NNMagicData, NATNEG_MAGIC_LEN) != 0) {
@@ -130,19 +132,22 @@ static gsi_bool Think(int sock, NAT *nat) {
                 switch (packet.packet.init.portType) {
                 case 1:
                     gotERT1 = gsi_true;
-                    gsDebugFormat(7, 0, 0x10, "(1) Got the solicited ERT from: %s\n",
+                    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
+                                  "(1) Got the solicited ERT from: %s\n",
                                   AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                     break;
                 case 2:
                     nat->ipRestricted = gsi_false;
                     gotERT2 = gsi_true;
-                    gsDebugFormat(7, 0, 0x10, "(2) Got the unsolicited (address) ERT from: %s\n",
+                    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
+                                  "(2) Got the unsolicited (address) ERT from: %s\n",
                                   AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                     break;
                 case 3:
                     nat->portRestricted = gsi_false;
                     gotERT3 = gsi_true;
-                    gsDebugFormat(7, 0, 0x10, "(3) Got the unsolicited (port) ERT from: %s\n",
+                    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
+                                  "(3) Got the unsolicited (port) ERT from: %s\n",
                                   AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                     break;
                 }
@@ -169,7 +174,8 @@ static gsi_bool Think(int sock, NAT *nat) {
                 nat->mappings[packet.cookie].privatePort = NN_SWAP16(GetLocalPort(sock));
                 nat->mappings[packet.cookie].publicIp = packet.packet.init.localIp;
                 nat->mappings[packet.cookie].publicPort = NN_SWAP16(packet.packet.init.localPort);
-                gsDebugFormat(7, 0, 0x10, "Got ADDRESS REPLY %d from: %s\n", packet.cookie,
+                gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
+                              "Got ADDRESS REPLY %d from: %s\n", packet.cookie,
                               AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));
                 OutputMapping(&nat->mappings[packet.cookie]);
             }
@@ -181,7 +187,7 @@ static gsi_bool Think(int sock, NAT *nat) {
     return gsi_true;
 }
 
-gsi_bool NatifyThink(int sock, NAT *nat) {
+int NatifyThink(SOCKET sock, NAT *nat) {
     return Think(sock, nat);
 }
 

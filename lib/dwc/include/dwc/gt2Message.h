@@ -10,20 +10,20 @@
 // gt2Message.c names them
 
 // The socket errors of a datagram to an address
-gsi_bool gti2HandleConnectionReset(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port);
-gsi_bool gti2HandleHostUnreachable(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, gsi_bool send);
+GT2Bool gti2HandleConnectionReset(GT2Socket socket, unsigned int ip, unsigned short port);
+GT2Bool gti2HandleHostUnreachable(GT2Socket socket, unsigned int ip, unsigned short port, GT2Bool send);
 // Handles every datagram waiting on the socket
-gsi_bool gti2ReceiveMessages(GTI2Socket *socket);
-gsi_bool gti2SendClientChallenge(GTI2Connection *connection, const gsi_u8 *challenge);
-gsi_bool gti2SendAccept(GTI2Connection *connection);
-gsi_bool gti2SendReject(GTI2Connection *connection, const void *message, int length);
-gsi_bool gti2SendClose(GTI2Connection *connection);
-gsi_bool gti2SendKeepAlive(GTI2Connection *connection);
-gsi_bool gti2SendAck(GTI2Connection *connection);
+GT2Bool gti2ReceiveMessages(GT2Socket socket);
+GT2Bool gti2SendClientChallenge(GT2Connection connection, const char challenge[]);
+GT2Bool gti2SendAccept(GT2Connection connection);
+GT2Bool gti2SendReject(GT2Connection connection, const GT2Byte *message, int length);
+GT2Bool gti2SendClose(GT2Connection connection);
+GT2Bool gti2SendKeepAlive(GT2Connection connection);
+GT2Bool gti2SendAck(GT2Connection connection);
 // Tells the peer the connection is closed
-gsi_bool gti2SendClosed(GTI2Connection *connection);
+GT2Bool gti2SendClosed(GT2Connection connection);
 // gti2ResendMessage resends a reliable message the peer hasn't acked, and gti2Send sends the app's message
-gsi_bool gti2ResendMessage(GTI2Connection *connection, GTI2OutgoingMessage *message);
-gsi_bool gti2Send(GTI2Connection *connection, const void *message, int length, gsi_bool reliable);
+GT2Bool gti2ResendMessage(GT2Connection connection, GTI2OutgoingBufferMessage *message);
+GT2Bool gti2Send(GT2Connection connection, const GT2Byte *message, int length, GT2Bool reliable);
 
 #endif // POKEBW2_DWC_GT2MESSAGE_H

@@ -16,7 +16,7 @@ void gpiStatusInfoKeyFree(void *element) {
     key->keyValue = NULL;
 }
 
-int gpiStatusInfoKeysInit(GPConnection *connection) {
+GPResult gpiStatusInfoKeysInit(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
 
     iconnection->extendedInfoKeys = func_ov011_02171514(sizeof(GPIKey), 1, gpiStatusInfoKeyFree);
@@ -40,7 +40,7 @@ static int gpiStatusInfoKeyCompFunc(const void *elem1, const void *elem2) {
     return strcmp(((const GPIKey *)elem1)->keyName, ((const GPIKey *)elem2)->keyName);
 }
 
-int gpiStatusInfoAddKey(GPConnection *connection, DArray *keys, const char *keyName, const char *keyValue) {
+GPResult gpiStatusInfoAddKey(GPConnection *connection, DArray keys, const char *keyName, const char *keyValue) {
     GPIKey key;
 
     if (keyName == NULL) {
@@ -57,7 +57,7 @@ int gpiStatusInfoAddKey(GPConnection *connection, DArray *keys, const char *keyN
     return 0;
 }
 
-int gpiStatusInfoSetKey(GPConnection *connection, DArray *keys, const char *keyName, const char *newValue) {
+GPResult gpiStatusInfoSetKey(GPConnection *connection, DArray keys, const char *keyName, const char *newValue) {
     GPIKey key;
     int index;
     GPIKey *found;
@@ -78,7 +78,7 @@ int gpiStatusInfoSetKey(GPConnection *connection, DArray *keys, const char *keyN
     return 0;
 }
 
-int gpiStatusInfoGetKey(GPConnection *connection, DArray *keys, const char *keyName, char **keyValue) {
+GPResult gpiStatusInfoGetKey(GPConnection *connection, DArray keys, const char *keyName, char **keyValue) {
     GPIKey key;
     int index;
 
@@ -99,7 +99,7 @@ int gpiStatusInfoGetKey(GPConnection *connection, DArray *keys, const char *keyN
 // The length of a text of length bytes in base 64, padded to whole groups of 4
 #define GPI_B64_LENGTH(length) (((length) % 3) ? 4 - ((length) % 3) + (length) * 4 / 3 : (length) * 4 / 3)
 
-int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
+GPResult gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
     GPIConnection *iconnection = *connection;
     int len = 0;
     int num;
@@ -122,7 +122,8 @@ int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
     }
     *buffer = gsimalloc(len + strlen(keysHeader) + 1);
     if (*buffer == NULL) {
-        gsDebugFormat(1, 2, 1, "gpiSaveKeysToBuffer: buffer Out of memory.");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "gpiSaveKeysToBuffer: buffer Out of memory.");
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
     }

@@ -3,69 +3,109 @@
 
 #include "dwc/nonport.h"
 
-// Nintendo's wrapper around GameSpy's GT2 (the UDP transport that DWC's matchmaking talks through), named from the
-// only string this module's data pool carries about it: "[Udp Engine] error creating gt2 socket, error code: %d".
-// It builds on GameSpy's GT2 itself (dwc/gt2Main.h). Every name here is a guess read off this file's own behavior,
-// not the SDK's or swan's; this file's name ("gt2.c") is a guess too. There is one global engine, which is why every
-// public function below takes no socket handle.
+// GameSpy's UDP engine (gsUdpEngine.c, a file of GameSpy's common code), which GP's peers talk through over GameSpy's
+// GT2 (dwc/gt2Main.h): its debug texts start with "[Udp Engine]" as GameSpy's do, and its types are GameSpy's
+// gsUdpEngine.h's. The file is named gt2.c and the functions have names guessed from what they do; GameSpy's names are
+// in the comments beside them. There is one global engine, which is why no function below takes a socket handle.
 
-// Notified once with a code (3 for a socket-wide error) and the engine's or a pending connect's userData
-typedef void (*Gt2EventCallback)(int code, void *userData);
-// Notified with the ip and port of a connect attempt that just finished, and its raw result
-typedef void (*Gt2AttemptResultCallback)(gsi_u32 ip, gsi_u16 port, int reason, gsi_bool wasRejected, void *userData);
-// Notified with the ip and port of a connection that closed, and why
-typedef void (*Gt2ClosedCallback)(gsi_u32 ip, gsi_u16 port, int reason, void *userData);
-// Notified with the ip and port of a ping, and its latency in milliseconds
-typedef void (*Gt2PingCallback)(gsi_u32 ip, gsi_u16 port, int latencyMs, void *userData);
-// Notified with the ip and port of a received datagram, its data and length, whether it is reliable, and userData
-typedef void (*Gt2ReceivedCallback)(gsi_u32 ip, gsi_u16 port, const void *data, int len, gsi_bool reliable,
-                                    void *userData);
-// An incoming attempt not claimed by a pending connect, with elapsed milliseconds, init data and userData
-typedef void (*Gt2IncomingAttemptCallback)(gsi_u32 ip, gsi_u16 port, gsi_u32 elapsedMilliseconds, const void *data,
-                                           int len, void *userData);
-// A pending connect's own received callback, including the userData supplied to Gt2_Connect
-typedef void (*Gt2PendingDataCallback)(gsi_u32 ip, gsi_u16 port, const void *data, int len, gsi_bool reliable,
-                                       void *userData);
-// Handles a datagram offered by the lower socket's unknown-message path, independently of pending headers;
-// its result tells the lower socket whether the app handled it
-typedef gsi_bool (*Gt2UnknownMessageCallback)(gsi_u32 ip, gsi_u16 port, int len, const void *data, void *userData);
+// The length of a message handler's init message and header
+#define GS_UDP_MSG_HEADER_LEN 16
 
-// Creates the one engine with its app-wide callbacks; pending connects can supply their own event handlers.
-// Buffer sizes are bytes; zero selects 1500 incoming or 1460 outgoing bytes.
-// Returns 0 (success), 1 (out of memory), or 3 (the lower socket could not be created)
-int Gt2_CreateSocket(gsi_u16 localPort, int incomingBufferSize, int outgoingBufferSize, Gt2EventCallback onSocketError,
-                     Gt2AttemptResultCallback onAttemptResult, Gt2ClosedCallback onClosed, Gt2PingCallback onPing,
-                     Gt2ReceivedCallback onReceived, Gt2UnknownMessageCallback onUnknownMessage,
-                     Gt2IncomingAttemptCallback onUnhandledAttempt, void *userData);
-// Stops the engine's socket without freeing it, and the full teardown
-int Gt2_StopSocket(void);
-int Gt2_CloseSocket(void);
+typedef enum _GSUdpErrorCode {
+    GS_UDP_NO_ERROR,
+    GS_UDP_NO_MEMORY,
+    GS_UDP_REJECTED,
+    GS_UDP_NETWORK_ERROR,
+    GS_UDP_ADDRESS_ERROR,
+    GS_UDP_ADDRESS_ALREADY_IN_USE,
+    GS_UDP_TIMED_OUT,
+    GS_UDP_REMOTE_ERROR,
+    GS_UDP_SEND_FAILED,
+    GS_UDP_INVALID_MESSAGE,
+    GS_UDP_PARAMETER_ERROR,
+    GS_UDP_NOT_INITIALIZED,
+    GS_UDP_MSG_TOO_BIG,
+    GS_UDP_UNKNOWN_ERROR,
+    GS_UDP_NUM_ERROR_CODES
+} GSUdpErrorCode;
 
-// Whether the engine was initialized, and its bound local port
+typedef enum _GSUdpPeerState {
+    GS_UDP_PEER_CONNECTING,
+    GS_UDP_PEER_CONNECTED,
+    GS_UDP_PEER_CLOSING,
+    GS_UDP_PEER_CLOSED,
+    GS_UDP_PEER_STATE_NUM
+} GSUdpPeerState;
+
+typedef enum _GSUdpCloseReason {
+    GS_UDP_CLOSED_LOCALLY,
+    GS_UDP_CLOSED_REMOTELY,
+    GS_UDP_CLOSED_BY_COMM_ERROR,
+    GS_UDP_CLOSED_BY_LOW_MEM,
+    GS_UDP_CLOSED_NUM
+} GSUdpCloseReason;
+
+// Notified of an error of the socket, with the engine's or a message handler's user data
+typedef void (*gsUdpErrorCallback)(GSUdpErrorCode code, void *userData);
+// An incoming attempt not claimed by a message handler, with its latency, init message and user data
+typedef void (*gsUdpAppConnectAttemptCallback)(unsigned int ip, unsigned short port, int latency,
+                                               unsigned char *initMsg, unsigned int initMsgLen, void *userData);
+// A connection that closed, and why
+typedef void (*gsUdpConnClosedCallback)(unsigned int ip, unsigned short port, GSUdpCloseReason reason, void *userData);
+// A received message, whether it is reliable, and the user data. The length is an int in BW2's engine, where the later
+// SDK's is unsigned: gpiPeerMessageCallback compares it signed
+typedef void (*gsUdpConnReceivedDataCallback)(unsigned int ip, unsigned short port, unsigned char *message,
+                                              int messageLength, gsi_bool reliable, void *userData);
+// A connect attempt that just finished, its error and whether the peer rejected it
+typedef void (*gsUdpConnConnectedCallback)(unsigned int ip, unsigned short port, GSUdpErrorCode error,
+                                           gsi_bool rejected, void *userData);
+// A ping's latency in milliseconds
+typedef void (*gsUdpConnPingCallback)(unsigned int ip, unsigned short port, unsigned int latency, void *userData);
+// A datagram that isn't GT2's; returns whether the app handled it
+typedef gsi_bool (*gsUdpUnknownMsgCallback)(unsigned int ip, unsigned short port, unsigned char *message,
+                                            unsigned int messageLength, void *userData);
+
+// gsUdpEngineInitialize: creates the one engine with its app-wide callbacks; message handlers can supply their own.
+// Buffer sizes are bytes; zero selects 1500 incoming or 1460 outgoing bytes
+GSUdpErrorCode Gt2_CreateSocket(unsigned short localPort, int incomingBufferSize, int outgoingBufferSize,
+                                gsUdpErrorCallback onSocketError, gsUdpConnConnectedCallback onAttemptResult,
+                                gsUdpConnClosedCallback onClosed, gsUdpConnPingCallback onPing,
+                                gsUdpConnReceivedDataCallback onReceived, gsUdpUnknownMsgCallback onUnknownMessage,
+                                gsUdpAppConnectAttemptCallback onUnhandledAttempt, void *userData);
+// gsUdpEngineThink, and gsUdpEngineShutdown, the full teardown
+GSUdpErrorCode Gt2_StopSocket(void);
+GSUdpErrorCode Gt2_CloseSocket(void);
+
+// gsUdpEngineIsInitialized, and gsUdpEngineGetLocalPort
 gsi_bool Gt2_IsInitialized(void);
-gsi_u16 Gt2_GetLocalPort(void);
-// Whether there are no pending connects left
+unsigned short Gt2_GetLocalPort(void);
+// gsUdpEngineNoMoreMsgHandlers: whether there are no message handlers left
 gsi_bool Gt2_IsIdle(void);
-// Whether Gt2_CreateSocket was given none of its app-wide callbacks
+// gsUdpEngineNoApp: whether Gt2_CreateSocket was given none of its app-wide callbacks
 gsi_bool Gt2_HasNoAppCallbacks(void);
 
-// Registers a pending connect; initMessage and header each point to 16 readable bytes with a nonzero first byte.
-// Its callbacks are this pending connect's own.
-int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback onEvent,
-                Gt2AttemptResultCallback onAttemptResult, Gt2ClosedCallback onClosed, Gt2PingCallback onPing,
-                Gt2PendingDataCallback onReceived, void *userData);
-// Removes the pending connect matching the fixed 16-byte header, whose first byte must be nonzero
-int Gt2_CancelConnect(const char *header);
-// Opens a connection using a 16-byte init message; timeoutMs is milliseconds, or zero for no timeout
-int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u32 timeoutMs);
-// Closes an established connection
-int Gt2_Close(gsi_u32 ip, gsi_u16 port);
-// Sends a message of size bytes, with a 16-byte header, to the connection of an address
-int Gt2_Send(gsi_u32 ip, gsi_u16 port, const void *header, const void *message, int size, gsi_bool reliable);
-// The state of the connection to an address (its lower-layer handle's own state), written to *state
-int Gt2_GetConnectionState(gsi_u32 ip, gsi_u16 port, int *state);
+// gsUdpEngineAddMsgHandler: registers a message handler; initMessage and header each point to 16 readable bytes with
+// a nonzero first byte
+GSUdpErrorCode Gt2_Connect(char initMessage[GS_UDP_MSG_HEADER_LEN], char header[GS_UDP_MSG_HEADER_LEN],
+                           gsUdpErrorCallback onEvent, gsUdpConnConnectedCallback onAttemptResult,
+                           gsUdpConnClosedCallback onClosed, gsUdpConnPingCallback onPing,
+                           gsUdpConnReceivedDataCallback onReceived, void *userData);
+// gsUdpEngineRemoveMsgHandler: removes the message handler of the fixed 16-byte header, whose first byte must be
+// nonzero
+GSUdpErrorCode Gt2_CancelConnect(char header[GS_UDP_MSG_HEADER_LEN]);
+// gsUdpEngineStartTalkingToPeer: opens a connection with a 16-byte init message; timeoutMs is milliseconds, or zero
+// for no timeout
+GSUdpErrorCode Gt2_OpenConnection(unsigned int ip, unsigned short port, char initMessage[GS_UDP_MSG_HEADER_LEN],
+                                  int timeoutMs);
+// gsUdpEngineGetPeerOutBufferFreeSpace: the free space of the outgoing buffer of the connection to an address
+int Gt2_Close(unsigned int ip, unsigned short port);
+// gsUdpEngineSendMessage: sends a message of size bytes, with a 16-byte header, to the connection of an address
+GSUdpErrorCode Gt2_Send(unsigned int ip, unsigned short port, char header[GS_UDP_MSG_HEADER_LEN],
+                        unsigned char *message, unsigned int size, gsi_bool reliable);
+// gsUdpEngineGetPeerState: the state of the connection to an address, written to *state
+GSUdpErrorCode Gt2_GetConnectionState(unsigned int ip, unsigned short port, GSUdpPeerState *state);
 
-// A wide-character string's length, unrelated to GT2 itself but public and placed in this file by the original
+// A wide-character string's length, unrelated to the engine but public and placed in this file by the original
 int Gt2_WStrLen(const gsi_u16 *str);
 
 #endif // POKEBW2_DWC_GT2_H

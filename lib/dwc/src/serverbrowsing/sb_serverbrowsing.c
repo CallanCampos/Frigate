@@ -7,8 +7,8 @@
 // functions are GameSpy's, as pret's pokerevo Wii build has them (sb_serverbrowsing.s), and ServerBrowserHalt, which
 // the Wii's build doesn't name, is named after the later SDK
 
-static void ListCallback(SBServerList *serverlist, SBListCallbackReason reason, SBServer *server, void *instance) {
-    ServerBrowser *sb = instance;
+static void ListCallback(SBServerList *serverlist, SBListCallbackReason reason, SBServer server, void *instance) {
+    ServerBrowser sb = instance;
 
     switch (reason) {
     case slc_serveradded:
@@ -75,9 +75,8 @@ static void ListCallback(SBServerList *serverlist, SBListCallbackReason reason, 
     }
 }
 
-static void EngineCallback(SBQueryEngine *engine, SBQueryEngineCallbackReason reason, SBServer *server,
-                           void *instance) {
-    ServerBrowser *sb = instance;
+static void EngineCallback(SBQueryEngine *engine, SBQueryEngineCallbackReason reason, SBServer server, void *instance) {
+    ServerBrowser sb = instance;
 
     switch (reason) {
     case qe_updatefailed:
@@ -98,15 +97,15 @@ static void EngineCallback(SBQueryEngine *engine, SBQueryEngineCallbackReason re
     }
 }
 
-ServerBrowser *ServerBrowserNewA(const char *queryForGamename, const char *queryFromGamename, const char *queryFromKey,
-                                 int queryFromVersion, int maxConcUpdates, int queryVersion, gsi_bool lanBrowse,
-                                 ServerBrowserCallback callback, void *instance) {
-    ServerBrowser *sb;
+ServerBrowser ServerBrowserNewA(const char *queryForGamename, const char *queryFromGamename, const char *queryFromKey,
+                                int queryFromVersion, int maxConcUpdates, int queryVersion, SBBool lanBrowse,
+                                ServerBrowserCallback callback, void *instance) {
+    ServerBrowser sb;
 
-    if (lanBrowse == gsi_false && __GSIACResult != 1) {
+    if (lanBrowse == gsi_false && __GSIACResult != GSIACAvailable) {
         return NULL;
     }
-    sb = gsimalloc(sizeof(ServerBrowser));
+    sb = gsimalloc(sizeof(struct _ServerBrowser));
     if (sb == NULL) {
         return NULL;
     }
@@ -120,7 +119,7 @@ ServerBrowser *ServerBrowserNewA(const char *queryForGamename, const char *query
     return sb;
 }
 
-void ServerBrowserFree(ServerBrowser *sb) {
+void ServerBrowserFree(ServerBrowser sb) {
     SBServerListCleanup(&sb->list);
     SBEngineCleanup(&sb->engine);
     if (sb->ConnectCallback != NULL) {
@@ -129,8 +128,8 @@ void ServerBrowserFree(ServerBrowser *sb) {
     gsifree(sb);
 }
 
-SBError ServerBrowserBeginUpdate2(ServerBrowser *sb, gsi_bool async, gsi_bool disconnectOnComplete,
-                                  const gsi_u8 *basicFields, int numBasicFields, const char *serverFilter,
+SBError ServerBrowserBeginUpdate2(ServerBrowser sb, SBBool async, SBBool disconnectOnComplete,
+                                  const unsigned char *basicFields, int numBasicFields, const char *serverFilter,
                                   int updateOptions, int maxServers) {
     char keyList[MAX_FIELD_LIST_LEN] = "";
     int listLen = 0;
@@ -139,7 +138,8 @@ SBError ServerBrowserBeginUpdate2(ServerBrowser *sb, gsi_bool async, gsi_bool di
     SBError err;
 
     if (numBasicFields > MAX_QUERY_KEYS) {
-        gsDebugFormat(4, 4, 2, "numBasicFields passed to ServerBrowserUpdate is too high!\r\n");
+        gsDebugFormat(GSIDebugCat_SB, GSIDebugType_Misc, GSIDebugLevel_WarmError,
+                      "numBasicFields passed to ServerBrowserUpdate is too high!\r\n");
         return sbe_paramerror;
     }
     sb->disconnectFlag = disconnectOnComplete;
@@ -167,22 +167,24 @@ SBError ServerBrowserBeginUpdate2(ServerBrowser *sb, gsi_bool async, gsi_bool di
     return err;
 }
 
-SBError ServerBrowserLimitUpdateA(ServerBrowser *sb, gsi_bool async, gsi_bool disconnectOnComplete,
-                                  const gsi_u8 *basicFields, int numBasicFields, const char *serverFilter,
+SBError ServerBrowserLimitUpdateA(ServerBrowser sb, SBBool async, SBBool disconnectOnComplete,
+                                  const unsigned char *basicFields, int numBasicFields, const char *serverFilter,
                                   int maxServers) {
     return ServerBrowserBeginUpdate2(sb, async, disconnectOnComplete, basicFields, numBasicFields, serverFilter,
                                      LIMIT_RESULT_COUNT, maxServers);
 }
 
-SBError ServerBrowserSendMessageToServerA(ServerBrowser *sb, const char *ip, gsi_u16 port, const char *data, int len) {
+SBError ServerBrowserSendMessageToServerA(ServerBrowser sb, const char *ip, unsigned short port, const char *data,
+                                          int len) {
     return SBSendMessageToServer(&sb->list, inet_addr(ip), SB_SWAP16(port), data, len);
 }
 
-SBError ServerBrowserSendNatNegotiateCookieToServerA(ServerBrowser *sb, const char *ip, gsi_u16 port, int cookie) {
+SBError ServerBrowserSendNatNegotiateCookieToServerA(ServerBrowser sb, const char *ip, unsigned short port,
+                                                     int cookie) {
     return SBSendNatNegotiateCookieToServer(&sb->list, inet_addr(ip), SB_SWAP16(port), cookie);
 }
 
-void ServerBrowserRemoveServer(ServerBrowser *sb, SBServer *server) {
+void ServerBrowserRemoveServer(ServerBrowser sb, SBServer server) {
     int i = SBServerListFindServer(&sb->list, server);
 
     if (i != -1) {
@@ -190,23 +192,23 @@ void ServerBrowserRemoveServer(ServerBrowser *sb, SBServer *server) {
     }
 }
 
-SBError ServerBrowserThink(ServerBrowser *sb) {
+SBError ServerBrowserThink(ServerBrowser sb) {
     NNThink();
     SBQueryEngineThink(&sb->engine);
     return SBListThink(&sb->list);
 }
 
-void ServerBrowserHalt(ServerBrowser *sb) {
+void ServerBrowserHalt(ServerBrowser sb) {
     SBServerListDisconnect(&sb->list);
     SBEngineHaltUpdates(&sb->engine);
 }
 
-void ServerBrowserClear(ServerBrowser *sb) {
+void ServerBrowserClear(ServerBrowser sb) {
     ServerBrowserHalt(sb);
     SBServerListClear(&sb->list);
 }
 
-SBState ServerBrowserState(ServerBrowser *sb) {
+SBState ServerBrowserState(ServerBrowser sb) {
     if (sb->engine.querylist.count > 0) {
         return sb_querying;
     }
@@ -219,15 +221,15 @@ SBState ServerBrowserState(ServerBrowser *sb) {
     return sb_connected;
 }
 
-SBServer *ServerBrowserGetServer(ServerBrowser *sb, int index) {
+SBServer ServerBrowserGetServer(ServerBrowser sb, int index) {
     return SBServerListNth(&sb->list, index);
 }
 
-int ServerBrowserCount(ServerBrowser *sb) {
+int ServerBrowserCount(ServerBrowser sb) {
     return SBServerListCount(&sb->list);
 }
 
-void ServerBrowserSortA(ServerBrowser *sb, gsi_bool ascending, const char *sortkey, SBCompareMode comparemode) {
+void ServerBrowserSortA(ServerBrowser sb, SBBool ascending, const char *sortkey, SBCompareMode comparemode) {
     SortInfo info;
 
     info.comparemode = comparemode;
@@ -235,6 +237,6 @@ void ServerBrowserSortA(ServerBrowser *sb, gsi_bool ascending, const char *sortk
     SBServerListSort(&sb->list, ascending, info);
 }
 
-gsi_u32 ServerBrowserGetMyPublicIPAddr(ServerBrowser *sb) {
+unsigned int ServerBrowserGetMyPublicIPAddr(ServerBrowser sb) {
     return sb->list.mypublicip;
 }

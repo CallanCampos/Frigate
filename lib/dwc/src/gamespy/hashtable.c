@@ -3,17 +3,17 @@
 
 // GameSpy's hash tables (hashtable.c)
 
-HashTable *TableNew(int elementSize, int bucketCount, TableHashFunc hashFunc, TableCompareFunc compareFunc,
-                    TableFreeFunc freeFunc) {
+HashTable TableNew(int elementSize, int bucketCount, TableHashFn hashFunc, TableCompareFn compareFunc,
+                   TableElementFreeFn freeFunc) {
     return TableNew2(elementSize, bucketCount, 4, hashFunc, compareFunc, freeFunc);
 }
 
-HashTable *TableNew2(int elementSize, int bucketCount, int bucketGrowBy, TableHashFunc hashFunc,
-                     TableCompareFunc compareFunc, TableFreeFunc freeFunc) {
-    HashTable *table = gsimalloc(sizeof(HashTable));
+HashTable TableNew2(int elementSize, int bucketCount, int bucketGrowBy, TableHashFn hashFunc,
+                    TableCompareFn compareFunc, TableElementFreeFn freeFunc) {
+    HashTable table = gsimalloc(sizeof(struct HashImplementation));
     int i;
 
-    table->buckets = gsimalloc(bucketCount * sizeof(DArray *));
+    table->buckets = gsimalloc(bucketCount * sizeof(DArray));
     for (i = 0; i < bucketCount; i++) {
         table->buckets[i] = func_ov011_02171514(elementSize, bucketGrowBy, freeFunc);
     }
@@ -24,7 +24,7 @@ HashTable *TableNew2(int elementSize, int bucketCount, int bucketGrowBy, TableHa
     return table;
 }
 
-void TableFree(HashTable *table) {
+void TableFree(HashTable table) {
     int i;
 
     if (table != NULL) {
@@ -36,7 +36,7 @@ void TableFree(HashTable *table) {
     }
 }
 
-int TableCount(HashTable *table) {
+int TableCount(HashTable table) {
     int count = 0;
     int i;
 
@@ -49,7 +49,7 @@ int TableCount(HashTable *table) {
     return count;
 }
 
-void TableEnter(HashTable *table, const void *element) {
+void TableEnter(HashTable table, const void *element) {
     int hash;
     int index;
 
@@ -64,23 +64,23 @@ void TableEnter(HashTable *table, const void *element) {
     }
 }
 
-gsi_bool TableRemove(HashTable *table, const void *element) {
+int TableRemove(HashTable table, const void *element) {
     int hash;
     int index;
 
     if (table == NULL) {
-        return gsi_false;
+        return 0;
     }
     hash = table->hashFunc(element, table->bucketCount);
     index = func_ov011_021716ac(table->buckets[hash], element, table->compareFunc, 0, gsi_false);
     if (index == -1) {
-        return gsi_false;
+        return 0;
     }
     func_ov011_02171668(table->buckets[hash], index);
-    return gsi_true;
+    return 1;
 }
 
-void *TableLookup(HashTable *table, const void *element) {
+void *TableLookup(HashTable table, const void *element) {
     int hash;
     int index;
     void *result;
@@ -97,7 +97,7 @@ void *TableLookup(HashTable *table, const void *element) {
     return result;
 }
 
-void TableMapSafe(HashTable *table, TableMapFunc func, void *clientData) {
+void TableMapSafe(HashTable table, TableMapFn func, void *clientData) {
     int i;
 
     for (i = 0; i < table->bucketCount; i++) {
@@ -105,7 +105,7 @@ void TableMapSafe(HashTable *table, TableMapFunc func, void *clientData) {
     }
 }
 
-void *TableMapSafe2(HashTable *table, TableMapFunc2 func, void *clientData) {
+void *TableMapSafe2(HashTable table, TableMapFn2 func, void *clientData) {
     int i;
     void *element;
 

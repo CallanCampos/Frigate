@@ -12,7 +12,7 @@ static int gsiSocketCheckResult(int result, int error);
 static struct {
     char *aliases;
     int lastError;
-    SocHostEnt hostEnt;
+    HOSTENT hostEnt;
     gsi_u32 ips[5];
     gsi_u8 *ipPtrs[17];
 } sSocketState;
@@ -30,11 +30,11 @@ int gsiSocket(int family, int type, int protocol) {
     return gsiSocketCheckResult(SOC_Socket(family, type, protocol), -1);
 }
 
-int closesocket(int sock) {
+int closesocket(SOCKET sock) {
     return gsiSocketCheckResult(SOC_Close(sock), -1);
 }
 
-gsi_bool gsiCloseSocketSecure(int sock, gsi_bool *secure) {
+gsi_bool gsiCloseSocketSecure(SOCKET sock, gsi_bool *secure) {
     int result = SOC_Close(sock);
 
     if (result == 0) {
@@ -49,64 +49,64 @@ gsi_bool gsiCloseSocketSecure(int sock, gsi_bool *secure) {
     return gsi_true;
 }
 
-int shutdown(int sock, int how) {
+int shutdown(SOCKET sock, int how) {
     return gsiSocketCheckResult(SOC_Shutdown(sock, how), -1);
 }
 
-int bind(int sock, const SocAddrIn *address, int size) {
-    SocSockAddr local;
+int bind(SOCKET sock, const SOCKADDR *address, int size) {
+    SOCKADDR local;
 
-    if (address->port == 0) {
+    if (((const SOCKADDR_IN *)address)->port == 0) {
         return 0;
     }
-    local = *(const SocSockAddr *)address;
+    local = *address;
     local.len = size;
     return gsiSocketCheckResult(SOC_Bind(sock, &local), -1);
 }
 
-int connect(int sock, const SocAddrIn *address, int size) {
-    SocSockAddr remote = *(const SocSockAddr *)address;
+int connect(SOCKET sock, const SOCKADDR *address, int size) {
+    SOCKADDR remote = *address;
 
     remote.len = size;
     return gsiSocketCheckResult(SOC_Connect(sock, &remote), -1);
 }
 
-int recv(int sock, void *buffer, int size, int flags) {
+int recv(SOCKET sock, char *buffer, int size, int flags) {
     return gsiSocketCheckResult(SOC_Read(sock, buffer, size, flags), -1);
 }
 
-int recvfrom(int sock, void *buffer, int size, int flags, SocAddrIn *address, int *addressSize) {
+int recvfrom(SOCKET sock, char *buffer, int size, int flags, SOCKADDR *address, int *addressSize) {
     address->len = *addressSize;
     int result = SOC_RecvFrom(sock, buffer, size, flags, address);
     *addressSize = address->len;
     return gsiSocketCheckResult(result, -1);
 }
 
-int send(int sock, const void *buffer, int size, int flags) {
+int send(SOCKET sock, const char *buffer, int size, int flags) {
     return gsiSocketCheckResult(SOC_Send(sock, buffer, size, flags), -1);
 }
 
-int sendto(int sock, const void *buffer, int size, int flags, const SocAddrIn *address, int addressSize) {
-    SocSockAddr remote;
+int sendto(SOCKET sock, const char *buffer, int size, int flags, const SOCKADDR *address, int addressSize) {
+    SOCKADDR remote;
 
-    remote = *(const SocSockAddr *)address;
+    remote = *address;
     remote.len = addressSize;
     return gsiSocketCheckResult(SOC_SendTo(sock, buffer, size, flags, &remote), -1);
 }
 
-int setsockopt(int sock, int level, int name, const void *value, int size) {
+int setsockopt(SOCKET sock, int level, int name, const char *value, int size) {
     return gsiSocketCheckResult(0, -1);
 }
 
-int getsockname(int sock, SocAddrIn *address, int *size) {
+int getsockname(SOCKET sock, SOCKADDR *address, int *size) {
     address->len = *size;
     int result = SOC_GetSockName(sock, address);
     *size = address->len;
     return gsiSocketCheckResult(result, -1);
 }
 
-int inet_addr(const char *host) {
-    SocInAddr address;
+unsigned long inet_addr(const char *host) {
+    IN_ADDR address;
 
     if (SOC_InetAtoN(host, &address) == 0) {
         return -1;
@@ -114,11 +114,11 @@ int inet_addr(const char *host) {
     return address.addr;
 }
 
-int GOAGetLastError(int sock) {
+int GOAGetLastError(SOCKET sock) {
     return sSocketState.lastError;
 }
 
-int GSISocketSelect(int sock, gsi_bool *readable, gsi_bool *writable, gsi_bool *failed) {
+int GSISocketSelect(SOCKET sock, int *readable, int *writable, int *failed) {
     SocPollFd fd;
     int result;
 
@@ -159,7 +159,7 @@ int GSISocketSelect(int sock, gsi_bool *readable, gsi_bool *writable, gsi_bool *
     return result;
 }
 
-gsi_bool SetSockBlocking(int sock, gsi_bool blocking) {
+int SetSockBlocking(SOCKET sock, int blocking) {
     int flags = SOC_Fcntl(sock, 3, 0);
 
     if (blocking) {
@@ -168,25 +168,26 @@ gsi_bool SetSockBlocking(int sock, gsi_bool blocking) {
         flags |= 4;
     }
     if (SOC_Fcntl(sock, 4, flags) == 0) {
-        gsDebugFormat(12, 0, 0x10, "SetSockBlocking: Set socket %d to %s\r\n", sock,
-                      blocking ? "blocking" : "non-blocking");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                      "SetSockBlocking: Set socket %d to %s\r\n", sock, blocking ? "blocking" : "non-blocking");
         return gsi_true;
     }
-    gsDebugFormat(12, 0, 0x10, "SetSockBlocking failed: tried to set socket %d to %s\r\n", sock,
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "SetSockBlocking failed: tried to set socket %d to %s\r\n", sock,
                   blocking ? "blocking" : "non-blocking");
     return gsi_false;
 }
 
-gsi_bool SetReceiveBufferSize(int sock, int size) {
-    if (setsockopt(sock, 0xffff, 0x1002, &size, sizeof(size)) != -1) {
+int SetReceiveBufferSize(SOCKET sock, int size) {
+    if (setsockopt(sock, 0xffff, 0x1002, (const char *)&size, sizeof(size)) != -1) {
         return gsi_true;
     }
     return gsi_false;
 }
 
-gsi_bool CanReceiveOnSocket(int sock) {
-    gsi_bool result = gsi_false;
-    gsi_bool readable = gsi_false;
+int CanReceiveOnSocket(SOCKET sock) {
+    int result = gsi_false;
+    int readable = gsi_false;
 
     if (GSISocketSelect(sock, &readable, NULL, NULL) == 1) {
         result = readable;
@@ -194,9 +195,9 @@ gsi_bool CanReceiveOnSocket(int sock) {
     return result;
 }
 
-gsi_bool CanSendOnSocket(int sock) {
-    gsi_bool result = gsi_false;
-    gsi_bool writable = gsi_false;
+int CanSendOnSocket(SOCKET sock) {
+    int result = gsi_false;
+    int writable = gsi_false;
 
     if (GSISocketSelect(sock, NULL, &writable, NULL) == 1) {
         result = writable;
@@ -204,7 +205,7 @@ gsi_bool CanSendOnSocket(int sock) {
     return result;
 }
 
-SocHostEnt *getlocalhost(void) {
+HOSTENT *getlocalhost(void) {
     sSocketState.hostEnt.name = "localhost";
     sSocketState.hostEnt.aliases = &sSocketState.aliases;
     sSocketState.hostEnt.addrType = 2;
@@ -221,8 +222,8 @@ SocHostEnt *getlocalhost(void) {
     return &sSocketState.hostEnt;
 }
 
-gsi_bool IsPrivateIP(const gsi_u32 *address) {
-    gsi_u32 ip = *address;
+int IsPrivateIP(IN_ADDR *address) {
+    gsi_u32 ip = address->addr;
     int a;
     int b;
 

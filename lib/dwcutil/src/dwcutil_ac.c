@@ -157,9 +157,9 @@ static int rijndaelKeySetupEnc(u32 *rk, const u8 *cipherKey, int keyBits);
 static int rijndaelKeySetupDec(u32 *rk, const u8 *cipherKey, int keyBits);
 static void rijndaelEncrypt(const u32 *rk, int Nr, const u8 *pt, u8 *ct);
 static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt);
-static void UtilAc_MD5Init(HashContext *context);
-static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen);
-static void UtilAc_MD5Final(u8 *digest, HashContext *context);
+static void UtilAc_MD5Init(MD5_CTX *context);
+static void UtilAc_MD5Update(MD5_CTX *context, const u8 *input, u32 inputLen);
+static void UtilAc_MD5Final(u8 *digest, MD5_CTX *context);
 static void UtilAc_MD5Transform(u32 *state, const u8 *block);
 static void UtilAc_MD5Encode(u8 *output, const u32 *input, u32 length);
 static void UtilAc_MD5Decode(u32 *output, const u8 *input, u32 length);
@@ -2368,11 +2368,11 @@ static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt) {
         (a) += (b);                                                                                                    \
     }
 
-static void UtilAc_MD5Init(HashContext *context) {
+static void UtilAc_MD5Init(MD5_CTX *context) {
     func_ov011_021719fcInline(context);
 }
 
-static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen) {
+static void UtilAc_MD5Update(MD5_CTX *context, const u8 *input, u32 inputLen) {
     u32 i;
     u32 index;
     u32 partLen;
@@ -2396,7 +2396,7 @@ static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen
     UtilAc_MD5Memcpy(&context->buffer[index], &input[i], inputLen - i);
 }
 
-static void UtilAc_MD5Final(u8 *digest, HashContext *context) {
+static void UtilAc_MD5Final(u8 *digest, MD5_CTX *context) {
     u8 bits[8];
     u32 index;
     u32 padLen;
@@ -2535,7 +2535,7 @@ static void UtilAc_MD5Memset(char *output, int value, u32 length) {
 
 // The 16 bytes of the MD5 of the data
 static void UtilAc_Md5(u8 *digest, const u8 *data, u32 length) {
-    HashContext context;
+    MD5_CTX context;
 
     UtilAc_MD5Init(&context);
     UtilAc_MD5Update(&context, data, length);

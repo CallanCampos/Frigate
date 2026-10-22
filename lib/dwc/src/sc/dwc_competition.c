@@ -32,7 +32,7 @@ static int ScReport_Destroy(ScReport *report);
 static int ScReport_SetPlayerId(ScReport *report, int index, const char *id);
 static int ScReport_SetPlayerKey(ScReport *report, int index, int key);
 static int ScReport_SetPlayerResult(ScReport *report, int index, int result);
-static int ScReport_SetPlayerUnused(ScReport *report, int index, const AuthCertificate *certificate, void *unused);
+static int ScReport_SetPlayerUnused(ScReport *report, int index, const GSLoginCertificate *certificate, void *unused);
 static int ScReport_StartGroup(ScReport *report);
 static int ScReport_StartGame(ScReport *report);
 static int ScReport_StartPlayers(ScReport *report);
@@ -74,7 +74,7 @@ void ScClient_SetServers(int server) {
 }
 
 static int ScClient_Alloc(ScClient **client) {
-    if (__GSIACResult == 1) {
+    if (__GSIACResult == GSIACAvailable) {
         if (gCompetitionUrl[0] == '\0') {
             OS_SNPrintf(gCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
@@ -132,7 +132,7 @@ void ScClient_CopyCcid(ScClient *client, const char *ccid) {
 }
 
 static char *ScClient_BuildUrl(void) {
-    if (__GSIACResult == 1) {
+    if (__GSIACResult == GSIACAvailable) {
         if (gCompetitionUrl[0] == '\0') {
             OS_SNPrintf(gCompetitionUrl, 128,
                         "http://%s.comp.pubsvs.gs.nintendowifi.net/CompetitionService/CompetitionService.asmx",
@@ -140,11 +140,11 @@ static char *ScClient_BuildUrl(void) {
         }
         return gCompetitionUrl;
     }
-    gsDebugFormat(0, 3, 1, "No availability\r\n");
+    gsDebugFormat(GSIDebugCat_App, GSIDebugType_State, GSIDebugLevel_HotError, "No availability\r\n");
     return NULL;
 }
 
-int ScClient_Create(int gameId, ScClient **client) {
+SCResult ScClient_Create(int gameId, ScClient **client) {
     ScClient *created = NULL;
     int error;
 
@@ -165,7 +165,7 @@ int ScClient_Create(int gameId, ScClient **client) {
     return 0;
 }
 
-int ScClient_Destroy(ScClient *client) {
+SCResult ScClient_Destroy(ScClient *client) {
     if (client == NULL) {
         return 2;
     }
@@ -176,7 +176,7 @@ int ScClient_Destroy(ScClient *client) {
     return 0;
 }
 
-int ScClient_Update(ScClient *client) {
+SCResult ScClient_Update(ScClient *client) {
     if (client == NULL) {
         return 2;
     }
@@ -187,29 +187,30 @@ int ScClient_Update(ScClient *client) {
     return 0;
 }
 
-char *ScClient_GetCsid(ScClient *client) {
+const char *ScClient_GetCsid(ScClient *client) {
     return client->csid;
 }
 
-char *ScClient_GetCcid(ScClient *client) {
+const char *ScClient_GetCcid(ScClient *client) {
     return client->ccid;
 }
 
-int ScClient_SetCsid(ScClient *client, const char *csid) {
+SCResult ScClient_SetCsid(ScClient *client, const gsi_u8 *csid) {
     ScClient_CopyCsid(client, csid);
     return 0;
 }
 
-int ScClient_CreateSession(ScClient *client, AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func,
-                           int timeout, void *userData) {
+SCResult ScClient_CreateSession(ScClient *client, GSLoginCertificate *certificate, GSLoginPrivateData *keys,
+                                ScClientFunc func, gsi_time timeout, void *userData) {
     if (Auth_CheckCertificate(certificate)) {
         return ScClient_PostCreateSession(client, client->gameId, certificate, keys, func, timeout, userData);
     }
     return 2;
 }
 
-int ScClient_SetReportIntention(ScClient *client, const char *ccid, int authoritative, AuthCertificate *certificate,
-                                AuthKeys *keys, ScClientFunc func, int timeout, void *userData) {
+SCResult ScClient_SetReportIntention(ScClient *client, const gsi_u8 *ccid, gsi_bool authoritative,
+                                     GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                                     gsi_time timeout, void *userData) {
     if (client == NULL) {
         return 2;
     }
@@ -227,9 +228,10 @@ int ScClient_SetReportIntention(ScClient *client, const char *ccid, int authorit
                                         keys, func, timeout, userData);
 }
 
-int ScClient_SubmitReport(ScClient *client, ScReport *report, int authoritative, AuthCertificate *certificate,
-                          AuthKeys *keys, ScClientFunc func, int timeout, void *userData) {
-    HashContext context;
+SCResult ScClient_SubmitReport(ScClient *client, ScReport *report, gsi_bool authoritative,
+                               GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                               gsi_time timeout, void *userData) {
+    MD5_CTX context;
     gsi_u8 *digest;
     gsi_u8 *clear;
     gsi_u32 i;
@@ -253,7 +255,8 @@ int ScClient_SubmitReport(ScClient *client, ScReport *report, int authoritative,
                                keys, func, timeout, userData);
 }
 
-int ScClient_CreateReport(ScClient *client, int version, int playerNum, int teamNum, ScReport **report) {
+SCResult ScClient_CreateReport(ScClient *client, gsi_u32 version, gsi_u32 playerNum, gsi_u32 teamNum,
+                               ScReport **report) {
     ScReport *created = NULL;
     int error;
 
@@ -270,28 +273,28 @@ int ScClient_CreateReport(ScClient *client, int version, int playerNum, int team
     return error;
 }
 
-int ScReport_BeginGame(ScReport *report) {
+SCResult ScReport_BeginGame(ScReport *report) {
     return ScReport_StartGame(report);
 }
 
-int ScReport_BeginPlayers(ScReport *report) {
+SCResult ScReport_BeginPlayers(ScReport *report) {
     return ScReport_StartPlayers(report);
 }
 
-int ScReport_BeginTeams(ScReport *report) {
+SCResult ScReport_BeginTeams(ScReport *report) {
     return ScReport_StartTeams(report);
 }
 
-int ScReport_BeginGroup(ScReport *report) {
+SCResult ScReport_BeginGroup(ScReport *report) {
     return ScReport_StartGroup(report);
 }
 
-int ScReport_Finish(ScReport *report, int flag, int value) {
+SCResult ScReport_Finish(ScReport *report, gsi_bool flag, SCGameStatus value) {
     return ScReport_End(report, flag, value);
 }
 
-int ScReport_SetPlayer(ScReport *report, int index, const char *id, int key, int result, int profileId,
-                       const AuthCertificate *certificate, void *unused) {
+SCResult ScReport_SetPlayer(ScReport *report, gsi_u32 index, const gsi_u8 *id, gsi_u32 key, SCGameResult result,
+                            gsi_u32 profileId, const GSLoginCertificate *certificate, const gsi_u8 *unused) {
     SCResult error = SCResult_NO_ERROR;
     int add = gsi_true;
     gsi_u32 i;
@@ -324,15 +327,15 @@ int ScReport_SetPlayer(ScReport *report, int index, const char *id, int key, int
     return error;
 }
 
-int ScReport_AddInt(ScReport *report, int key, int value) {
+SCResult ScReport_AddInt(ScReport *report, gsi_u16 key, gsi_i32 value) {
     return ScReport_PutInt(report, key, value);
 }
 
-int ScReport_AddByte(ScReport *report, int key, int value) {
+SCResult ScReport_AddByte(ScReport *report, gsi_u16 key, gsi_i8 value) {
     return ScReport_PutByte(report, key, value);
 }
 
-int ScReport_Free(ScReport *report) {
+SCResult ScReport_Free(ScReport *report) {
     return ScReport_Destroy(report);
 }
 
@@ -418,7 +421,7 @@ static int ScReport_SetPlayerResult(ScReport *report, int index, int result) {
     return 0;
 }
 
-static int ScReport_SetPlayerUnused(ScReport *report, int index, const AuthCertificate *certificate, void *unused) {
+static int ScReport_SetPlayerUnused(ScReport *report, int index, const GSLoginCertificate *certificate, void *unused) {
     return 0;
 }
 

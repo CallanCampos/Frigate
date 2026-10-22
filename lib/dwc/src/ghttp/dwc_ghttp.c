@@ -1,3 +1,4 @@
+#include "dwc/dwc_ghttp.h"
 #include "dwc/nhttp.h"
 #include "ghttp_internal.h"
 
@@ -7,14 +8,10 @@
 // The heap that DWC's requests are made in
 #define DWC_GHTTP_HEAP 6
 
-// What the game gives to be done with the result of a request
-typedef void (*DWCGHTTPCompletedFunc)(char *buffer, int length, int result, void *param);
-typedef void (*DWCGHTTPProgressFunc)(int state, const char *buffer, int length, int received, int total, void *param);
-
 typedef struct DWCGHTTPParam {
     void *param;
-    DWCGHTTPCompletedFunc completed;
-    DWCGHTTPProgressFunc progress;
+    DWCGHTTPCompletedCallback completed;
+    DWCGHTTPProgressCallback progress;
     int unk_0C;
     BOOL freeBuffer;
 } DWCGHTTPParam;
@@ -28,12 +25,6 @@ struct DWCGHTTPEntry {
     DWCGHTTPEntry *next;
 };
 
-int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost **post, DWCGHTTPProgressFunc progress,
-                       DWCGHTTPCompletedFunc completed, void *param);
-int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressFunc progress,
-                     DWCGHTTPCompletedFunc completed, void *param);
-void DWC_CancelGHTTPRequest(int request);
-int DWCi_HandleGHTTPError(int error);
 static DWCGHTTPEntry *DWCi_NewGHTTPEntry(const DWCGHTTPParam *param);
 static void DWCi_RemoveDWCGHTTPParamEntry(DWCGHTTPEntry *entry);
 static DWCGHTTPEntry *DWCi_FindGHTTPEntry(int request);
@@ -47,20 +38,20 @@ static DWCGHTTPEntry *sGHTTPEntries;
 static int sGHTTPStartCount;
 
 BOOL DWCi_SetGHTTPRootCA(const char *url) {
-    if (ghttpSetRootCAList(url, &sDWCRootCAList) == 1) {
+    if (ghttpSetRootCAList(url, &sDWCRootCAList) == GHTTPTrue) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL DWCi_RemoveGHTTPRootCA(const char *url) {
-    if (ghttpRemoveRootCAList(url) == 1) {
+    if (ghttpRemoveRootCAList(url) == GHTTPTrue) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL DWC_InitGHTTP(int unused) {
+BOOL DWC_InitGHTTP(const char *gamename) {
     ghttpStartup();
     sGHTTPStartCount++;
     return TRUE;
@@ -88,9 +79,10 @@ BOOL DWC_ProcessGHTTP(void) {
 
 // Tells the game that its request has ended, and frees what DWC made for it. Returns whether the client may free the
 // buffer that it received into
-static BOOL DWCi_GHTTPCompleted(int request, int result, char *buffer, int length, void *param) {
+static GHTTPBool DWCi_GHTTPCompleted(GHTTPRequest request, GHTTPResult result, char *buffer, GHTTPByteCount length,
+                                     void *param) {
     DWCGHTTPEntry *entry = param;
-    DWCGHTTPCompletedFunc completed;
+    DWCGHTTPCompletedCallback completed;
     BOOL freeBuffer;
 
     completed = entry->param.completed;
@@ -116,25 +108,25 @@ static BOOL DWCi_GHTTPCompleted(int request, int result, char *buffer, int lengt
     return freeBuffer != FALSE ? TRUE : FALSE;
 }
 
-static void DWCi_GHTTPProgress(int request, int state, const char *buffer, int length, int received, int total,
-                               void *param) {
+static void DWCi_GHTTPProgress(GHTTPRequest request, GHTTPState state, const char *buffer, GHTTPByteCount length,
+                               GHTTPByteCount received, GHTTPByteCount total, void *param) {
     DWCGHTTPEntry *entry = param;
-    DWCGHTTPProgressFunc progress = entry->param.progress;
+    DWCGHTTPProgressCallback progress = entry->param.progress;
 
     if (progress != NULL) {
         progress(state, buffer, length, received, total, entry->param.param);
     }
 }
 
-int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressFunc progress,
-                     DWCGHTTPCompletedFunc completed, void *param) {
+int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressCallback progress,
+                     DWCGHTTPCompletedCallback completed, void *param) {
     return DWC_GetGHTTPDataEx(url, bufferSize, freeBuffer, NULL, progress, completed, param);
 }
 
 // Starts the request for a URL, with a buffer of this size (the game gets it in the callbacks). Returns the request, or
 // an error that is below 0
-int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHIPost **post, DWCGHTTPProgressFunc progress,
-                       DWCGHTTPCompletedFunc completed, void *param) {
+int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHTTPPost *post,
+                       DWCGHTTPProgressCallback progress, DWCGHTTPCompletedCallback completed, void *param) {
     char *buffer = NULL;
     DWCGHTTPParam entryParam;
     DWCGHTTPEntry *entry;
@@ -196,7 +188,7 @@ void DWC_CancelGHTTPRequest(int request) {
 }
 
 // Sets the error of the Wi-Fi library from the result of a request (or the error that making it gave)
-int DWCi_HandleGHTTPError(int error) {
+DWCGHTTPResult DWCi_HandleGHTTPError(DWCGHTTPResult error) {
     int code = -98000;
     int type = 7;
 

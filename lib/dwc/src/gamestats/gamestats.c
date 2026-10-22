@@ -28,10 +28,10 @@ typedef struct GamestatsClient {
     char *url;
     char *hashField;
     char *urlEnd;
-    char *answer;
+    const char *answer;
     int answerSize;
     // The answer to the second request, once checked, without the hash that ends it
-    char *body;
+    const char *body;
     int bodySize;
     GamestatsCheckFunc check;
     // The hash that the second request carries
@@ -44,9 +44,9 @@ static void SeedRandom(u32 seed);
 static u8 NextRandom(void);
 static BOOL Configure(const char *gameName, const char *secret, u32 multiplier, u32 increment, u32 modulus,
                       u32 hashKey);
-static BOOL CheckAnswer(char *data, int size);
-static void OnSent(void);
-static void OnAnswered(char *data, int size, int status, void *arg);
+static BOOL CheckAnswer(const char *data, int size);
+static void OnSent(DWCGHTTPState state, const char *buffer, int length, int received, int total, void *arg);
+static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *arg);
 static int EncodePayload(char *dest, const u8 *header, int headerSize, const u8 *payload, u32 payloadSize);
 static void SetFailed(void);
 static int Send(const char *page, int pid, const void *payload, int size, GamestatsCheckFunc check, BOOL useHash);
@@ -113,7 +113,7 @@ static inline void CopySecret(char *dest) {
     *(GamestatsSecret *)dest = sClient.secret;
 }
 
-static BOOL CheckAnswer(char *data, int size) {
+static BOOL CheckAnswer(const char *data, int size) {
     char hash[0x29];
     u8 digest[0x14];
     char digits[17] = "0123456789abcdef";
@@ -148,12 +148,12 @@ static BOOL CheckAnswer(char *data, int size) {
     return TRUE;
 }
 
-static void OnSent(void) {
+static void OnSent(DWCGHTTPState state, const char *buffer, int length, int received, int total, void *arg) {
 }
 
 // The HTTP client's answer to either request. The first one answers with a challenge of 32 characters, from which the
 // hash of the second request is made; the second answers with the data, or with a text that starts with "error:"
-static void OnAnswered(char *data, int size, int status, void *arg) {
+static void OnAnswered(const char *data, int size, DWCGHTTPResult status, void *arg) {
     sClient.request = -1;
     if (sClient.state == 1) {
         return;
@@ -280,7 +280,7 @@ void Gamestats_Start(int server, const char *key) {
     modulus = strtoul(strncpy(digits, key + 0x24, 8), NULL, 16);
     hashKey = strtoul(strncpy(digits, key + 0x2c, 8), NULL, 16);
     Configure(key + 0x34, secret, multiplier, increment, modulus, hashKey);
-    DWC_InitGHTTP(0);
+    DWC_InitGHTTP(NULL);
     sClient.state = 3;
     sClient.active = TRUE;
 }

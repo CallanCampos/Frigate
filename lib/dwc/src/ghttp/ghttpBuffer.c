@@ -2,7 +2,7 @@
 
 // ghttpBuffer: the buffers that a connection reads into and writes from
 
-gsi_bool ghiResizeBuffer(GHIBuffer *buffer, int count) {
+GHTTPBool ghiResizeBuffer(GHIBuffer *buffer, int count) {
     int newSize;
     char *newData;
 
@@ -22,7 +22,7 @@ gsi_bool ghiResizeBuffer(GHIBuffer *buffer, int count) {
     return gsi_true;
 }
 
-gsi_bool ghiInitBuffer(GHIConnection *connection, GHIBuffer *buffer, int initialSize, int sizeIncrement) {
+GHTTPBool ghiInitBuffer(GHIConnection *connection, GHIBuffer *buffer, int initialSize, int sizeIncrement) {
     if (connection == NULL) {
         return gsi_false;
     }
@@ -51,7 +51,7 @@ gsi_bool ghiInitBuffer(GHIConnection *connection, GHIBuffer *buffer, int initial
     return gsi_true;
 }
 
-gsi_bool ghiInitFixedBuffer(GHIConnection *connection, GHIBuffer *buffer, char *data, int size) {
+GHTTPBool ghiInitFixedBuffer(GHIConnection *connection, GHIBuffer *buffer, char *data, int size) {
     if (connection == NULL) {
         return gsi_false;
     }
@@ -88,7 +88,7 @@ void ghiFreeBuffer(GHIBuffer *buffer) {
 
 // Adds data to the end of a buffer (size 0 is for a text), making the buffer bigger if it can. When it can't, the
 // connection ends with the result 2 (a fixed buffer is full) or 1 (no memory)
-gsi_bool ghiAppendDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
+GHTTPBool ghiAppendDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
     int newLength;
 
     if (buffer == NULL) {
@@ -126,7 +126,7 @@ gsi_bool ghiAppendDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
 }
 
 // The same through the connection's encryption, if it has one active
-gsi_bool ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
+GHTTPBool ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
     int offset = 0;
     int available = 0;
 
@@ -175,7 +175,8 @@ gsi_bool ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
             offset += chunk;
             buffer->length = buffer->size - available;
         } else {
-            gsDebugFormat(8, 4, 2, "ghiEncryptDataToBuffer encountered unhandled return code: %d\r\n", result);
+            gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_WarmError,
+                          "ghiEncryptDataToBuffer encountered unhandled return code: %d\r\n", result);
             return gsi_false;
         }
     } while (offset < size);
@@ -183,7 +184,7 @@ gsi_bool ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
 }
 
 // Adds a header field: name, ": ", value and a line end
-gsi_bool ghiAppendHeaderToBuffer(GHIBuffer *buffer, const char *name, const char *value) {
+GHTTPBool ghiAppendHeaderToBuffer(GHIBuffer *buffer, const char *name, const char *value) {
     gsi_bool result = gsi_false;
 
     if (!ghiAppendDataToBuffer(buffer, name, 0)) {
@@ -201,7 +202,7 @@ gsi_bool ghiAppendHeaderToBuffer(GHIBuffer *buffer, const char *name, const char
     return result;
 }
 
-gsi_bool ghiAppendCharToBuffer(GHIBuffer *buffer, int c) {
+GHTTPBool ghiAppendCharToBuffer(GHIBuffer *buffer, int c) {
     if (buffer == NULL) {
         return gsi_false;
     }
@@ -226,7 +227,7 @@ gsi_bool ghiAppendCharToBuffer(GHIBuffer *buffer, int c) {
     return gsi_true;
 }
 
-gsi_bool ghiAppendIntToBuffer(GHIBuffer *buffer, int value) {
+GHTTPBool ghiAppendIntToBuffer(GHIBuffer *buffer, int value) {
     char text[16];
 
     OS_SPrintf(text, "%d", value);
@@ -242,7 +243,7 @@ void ghiResetBuffer(GHIBuffer *buffer) {
 }
 
 // Sends what the send buffer has, as far as the socket takes it. Returns gsi_false if the connection broke
-gsi_bool ghiSendBufferedData(GHIConnection *connection) {
+GHTTPBool ghiSendBufferedData(GHIConnection *connection) {
     int ready;
     int failed;
 

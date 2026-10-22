@@ -15,7 +15,7 @@
 
 static void gpiDestroyOperation(GPConnection *connection, GPIOperation *operation);
 
-int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation) {
+GPResult gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation) {
     GPIConnection *iconnection = *connection;
     GPICallback callback = operation->callback;
     int result;
@@ -138,8 +138,8 @@ int gpiFailedOpCallback(GPConnection *connection, const GPIOperation *operation)
     return 0;
 }
 
-int gpiAddOperation(GPConnection *connection, int type, void *data, GPIOperation **op, gsi_bool blocking,
-                    GPCallback callback, void *param) {
+GPResult gpiAddOperation(GPConnection *connection, int type, void *data, GPIOperation **op, GPEnum blocking,
+                         GPCallback callback, void *param) {
     GPIConnection *iconnection = *connection;
     GPIOperation *operation = gsimalloc(sizeof(GPIOperation));
 
@@ -208,7 +208,7 @@ void gpiRemoveOperation(GPConnection *connection, GPIOperation *operation) {
     }
 }
 
-gsi_bool gpiFindOperationByID(const GPConnection *connection, GPIOperation **operation, int id) {
+GPIBool gpiFindOperationByID(const GPConnection *connection, GPIOperation **operation, int id) {
     GPIConnection *iconnection = *connection;
     GPIOperation *op = iconnection->operationList;
 
@@ -228,7 +228,7 @@ gsi_bool gpiFindOperationByID(const GPConnection *connection, GPIOperation **ope
 }
 
 // Searches don't block the connection manager's loop: gpiProcessSearches waits on them
-gsi_bool gpiOperationsAreBlocking(const GPConnection *connection) {
+GPIBool gpiOperationsAreBlocking(const GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     GPIOperation *operation = iconnection->operationList;
 
@@ -241,7 +241,7 @@ gsi_bool gpiOperationsAreBlocking(const GPConnection *connection) {
     return gsi_false;
 }
 
-int gpiProcessOperation(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessOperation(GPConnection *connection, GPIOperation *operation, const char *input) {
     int result = 0;
 
     switch (operation->type) {
@@ -264,8 +264,8 @@ int gpiProcessOperation(GPConnection *connection, GPIOperation *operation, const
         result = gpiProcessRegisterCdKey(connection, operation, input);
         break;
     default:
-        gsDebugFormat(1, 4, 1, "gpiProcessOperation was passed an operation with an invalid type (%d)\n",
-                      operation->type);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_HotError,
+                      "gpiProcessOperation was passed an operation with an invalid type (%d)\n", operation->type);
         break;
     }
     if (result != 0) {

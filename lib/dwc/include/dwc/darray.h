@@ -8,42 +8,44 @@
 // has it (src/SDK/DWC/gamespy/darray.c), and so are the functions, after GameSpy's darray.c. The ones that gt2.c and
 // GameSpy's other files still being worked on call keep their addresses, with their names in the comments beside them
 
-typedef int (*DArrayCompareFunc)(const void *a, const void *b);
-typedef void (*DArrayFreeFunc)(void *element);
-typedef void (*DArrayMapFunc)(void *element, void *clientData);
-typedef int (*DArrayMapFunc2)(void *element, void *clientData);
+typedef int (*ArrayCompareFn)(const void *a, const void *b);
+typedef void (*ArrayElementFreeFn)(void *element);
+typedef void (*ArrayMapFn)(void *element, void *clientData);
+typedef int (*ArrayMapFn2)(void *element, void *clientData);
 
 // An array of count elements of elementSize bytes, with room for capacity; it grows by growBy, and frees each element
 // that it drops with freeFunc
-typedef struct DArray {
+typedef struct DArrayImplementation *DArray;
+
+struct DArrayImplementation {
     int count;
     int capacity;
     int elementSize;
     int growBy;
-    DArrayFreeFunc freeFunc;
-    char *list;
-} DArray;
+    ArrayElementFreeFn freeFunc;
+    void *list;
+};
 
 // ArrayNew, ArrayFree, ArrayLength and ArrayNth (NULL for an index out of the array)
-DArray *func_ov011_02171514(int elementSize, int growBy, DArrayFreeFunc freeFunc);
-void func_ov011_02171558(DArray *array);
-int func_ov011_02171588(DArray *array);
-void *func_ov011_0217158c(DArray *array, int index);
+DArray func_ov011_02171514(int elementSize, int growBy, ArrayElementFreeFn freeFunc);
+void func_ov011_02171558(DArray array);
+int func_ov011_02171588(const DArray array);
+void *func_ov011_0217158c(DArray array, int index);
 // ArrayAppend, then insertions at an index and in the order of a compare function
-void func_ov011_021715a4(DArray *array, const void *element);
-void ArrayInsertAt(DArray *array, const void *element, int index);
-void ArrayInsertSorted(DArray *array, const void *element, DArrayCompareFunc compare);
+void func_ov011_021715a4(DArray array, const void *element);
+void ArrayInsertAt(DArray array, const void *element, int index);
+void ArrayInsertSorted(DArray array, const void *element, ArrayCompareFn compare);
 // ArrayRemoveAt, which doesn't free the element, ArrayDeleteAt and ArrayReplaceAt, which do, and ArraySort
-void func_ov011_02171634(DArray *array, int index);
-void func_ov011_02171668(DArray *array, int index);
-void ArrayReplaceAt(DArray *array, const void *element, int index);
-void ArraySort(DArray *array, DArrayCompareFunc compare);
+void func_ov011_02171634(DArray array, int index);
+void func_ov011_02171668(DArray array, int index);
+void ArrayReplaceAt(DArray array, const void *element, int index);
+void ArraySort(DArray array, ArrayCompareFn compare);
 // ArraySearch: the index of the element from start on that compares equal to the key, or -1, searching a sorted array
 // by halves
-int func_ov011_021716ac(DArray *array, const void *key, DArrayCompareFunc compare, int start, int sorted);
+int func_ov011_021716ac(DArray array, const void *key, ArrayCompareFn compare, int start, int sorted);
 // ArrayMapBackwards2 stops at the first element the function returns 0 for and returns it
-void ArrayMapBackwards(DArray *array, DArrayMapFunc func, void *clientData);
-void *ArrayMapBackwards2(DArray *array, DArrayMapFunc2 func, void *clientData);
-void ArrayClear(DArray *array);
+void ArrayMapBackwards(DArray array, ArrayMapFn func, void *clientData);
+void *ArrayMapBackwards2(DArray array, ArrayMapFn2 func, void *clientData);
+void ArrayClear(DArray array);
 
 #endif // POKEBW2_DWC_DARRAY_H

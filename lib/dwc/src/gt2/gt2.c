@@ -3,99 +3,97 @@
 #include "dwc/gt2Main.h"
 #include "dwc/gt2Utility.h"
 
-// Guessed as "gt2.c": Nintendo's "Udp Engine" wrapper around GameSpy's GT2, named only from the error string this
-// file's data pool carries, "[Udp Engine] error creating gt2 socket, error code: %d". It builds on GameSpy's GT2
-// (dwc/gt2Main.h); every name and struct field here is a guess read off this file's own behavior, never swan's or the
-// SDK's.
+// GameSpy's UDP engine (gsUdpEngine.c): see dwc/gt2.h. The engine, its connections and its message handlers are
+// GameSpy's GSUdpEngineObject, GSUdpRemotePeer and GSUdpMsgHandler; the field names are guesses
 
 // The one engine this build creates (sEngine); every function below reaches it through Gt2_GetEngine
-typedef struct GT2Engine {
-    GTI2Socket *socket;   // the lower layer's socket
-    void *connections;    // GT2Connection array, the established connections, keyed by ip and port
-    void *pending;        // GT2PendingConnect array, keyed by its 16-byte header
+typedef struct {
+    GT2Socket socket;     // the lower layer's socket
+    DArray connections;   // GSUdpRemotePeer, the established connections, keyed by ip and port
+    DArray pending;       // GSUdpMsgHandler, keyed by its 16-byte header
     gsi_bool initialized; // whether Gt2_CreateSocket completed successfully
-    Gt2AttemptResultCallback onAttemptResult;
-    Gt2ClosedCallback onClosed;
-    Gt2PingCallback onPing;
-    Gt2ReceivedCallback onReceived;
-    Gt2IncomingAttemptCallback onUnhandledAttempt;
-    Gt2EventCallback onSocketError;
-    Gt2UnknownMessageCallback onUnknownMessage;
+    gsUdpConnConnectedCallback onAttemptResult;
+    gsUdpConnClosedCallback onClosed;
+    gsUdpConnPingCallback onPing;
+    gsUdpConnReceivedDataCallback onReceived;
+    gsUdpAppConnectAttemptCallback onUnhandledAttempt;
+    gsUdpErrorCallback onSocketError;
+    gsUdpUnknownMsgCallback onUnknownMessage;
     void *userData;
     int pendingCount;
-    gsi_u32 localIp;
-    gsi_u16 localPort;
-} GT2Engine;
+    unsigned int localIp;
+    unsigned short localPort;
+} GSUdpEngineObject;
 
 // An established connection, keyed by its peer's address
-typedef struct GT2Connection {
-    gsi_u32 ip;
-    gsi_u16 port;
-    GTI2Connection *handle; // the lower layer's connection
-} GT2Connection;
+typedef struct {
+    unsigned int ip;
+    unsigned short port;
+    GT2Connection handle; // the lower layer's connection
+} GSUdpRemotePeer;
 
-// A pending connect with a fixed 16-byte init message and header
-typedef struct GT2PendingConnect {
-    gsi_u8 initMessage[0x10];
-    gsi_u8 header[0x10];
+// A message handler, with a fixed 16-byte init message and header
+typedef struct {
+    unsigned char initMessage[GS_UDP_MSG_HEADER_LEN];
+    unsigned char header[GS_UDP_MSG_HEADER_LEN];
     // The original uses four-byte entries, but appends a record word or a record pointer on different paths.
     // Completion searches use the connection-address comparator; the inconsistent representation is unresolved.
-    void *attempts;
-    Gt2ClosedCallback onClosed;
-    Gt2PendingDataCallback onReceived;
-    Gt2AttemptResultCallback onAttemptResult;
-    Gt2PingCallback onPing;
-    Gt2EventCallback onEvent;
+    DArray attempts;
+    gsUdpConnClosedCallback onClosed;
+    gsUdpConnReceivedDataCallback onReceived;
+    gsUdpConnConnectedCallback onAttemptResult;
+    gsUdpConnPingCallback onPing;
+    gsUdpErrorCallback onEvent;
     void *userData;
-} GT2PendingConnect;
+} GSUdpMsgHandler;
 
-static GT2Engine *Gt2_GetEngine(void);
+static GSUdpEngineObject *Gt2_GetEngine(void);
 static void Gt2_FreePendingConnect(void *element);
 static int Gt2_CompareInitMessage(const void *a, const void *b);
 static int Gt2_ComparePendingHeader(const void *a, const void *b);
 static int Gt2_CompareConnectionAddr(const void *a, const void *b);
 static int Gt2_CompareConnectionHandle(const void *a, const void *b);
-static void Gt2_OnSocketCreateError(GTI2Socket *unused);
-static void Gt2_OnClosed(GTI2Connection *addr, int reason);
-static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const void *message, int length);
-static void Gt2_OnPing(GTI2Connection *addr, int latencyMs);
-static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, gsi_bool reliable);
-static gsi_bool Gt2_OnUnknownMessage(GTI2Socket *unused, gsi_u32 ip, gsi_u16 port, const void *data, int len);
-static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, gsi_u32 ip, gsi_u16 port,
-                                  int elapsedMilliseconds, const void *data, int len);
+static void Gt2_OnSocketCreateError(GT2Socket unused);
+static void Gt2_OnClosed(GT2Connection addr, GT2CloseReason reason);
+static void Gt2_OnConnectAttemptDone(GT2Connection addr, GT2Result rawResult, GT2Byte *message, int length);
+static void Gt2_OnPing(GT2Connection addr, int latencyMs);
+static void Gt2_OnReceivedData(GT2Connection addr, GT2Byte *data, int len, GT2Bool reliable);
+static GT2Bool Gt2_OnUnknownMessage(GT2Socket unused, unsigned int ip, unsigned short port, GT2Byte *data, int len);
+static void Gt2_OnIncomingAttempt(GT2Socket unused, GT2Connection handle, unsigned int ip, unsigned short port,
+                                  int elapsedMilliseconds, GT2Byte *data, int len);
 
 // The one engine this build creates
-static GT2Engine sEngine;
+static GSUdpEngineObject sEngine;
 
 // Returns the one engine
-static GT2Engine *Gt2_GetEngine(void) {
+static GSUdpEngineObject *Gt2_GetEngine(void) {
     return &sEngine;
 }
 
 // The freeFunc of the pending-connect array: frees the attempts it was still racing
 static void Gt2_FreePendingConnect(void *element) {
-    GT2PendingConnect *pending = (GT2PendingConnect *)element;
+    GSUdpMsgHandler *pending = (GSUdpMsgHandler *)element;
 
     func_ov011_02171558(pending->attempts);
 }
 
-// Compares the 16-byte init messages at offset 0 of two GT2PendingConnect
+// Compares the 16-byte init messages at offset 0 of two GSUdpMsgHandler
 static int Gt2_CompareInitMessage(const void *a, const void *b) {
     return memcmp(a, b, 0x10);
 }
 
-// Compares the 16-byte headers at offset 0x10 of two GT2PendingConnect
+// Compares the 16-byte headers at offset 0x10 of two GSUdpMsgHandler
 static int Gt2_ComparePendingHeader(const void *a, const void *b) {
-    const GT2PendingConnect *pendingA = a;
-    const GT2PendingConnect *pendingB = b;
+    const GSUdpMsgHandler *pendingA = a;
+    const GSUdpMsgHandler *pendingB = b;
 
     return memcmp(pendingA->header, pendingB->header, sizeof(pendingA->header));
 }
 
-// Compares the ip and port of two GT2Connection
+// Compares the ip and port of two GSUdpRemotePeer
 static int Gt2_CompareConnectionAddr(const void *a, const void *b) {
-    const GT2Connection *ca = (const GT2Connection *)a;
-    const GT2Connection *cb = (const GT2Connection *)b;
+    const GSUdpRemotePeer *ca = (const GSUdpRemotePeer *)a;
+    const GSUdpRemotePeer *cb = (const GSUdpRemotePeer *)b;
 
     if (ca->ip != cb->ip) {
         return 1;
@@ -106,29 +104,30 @@ static int Gt2_CompareConnectionAddr(const void *a, const void *b) {
     return 0;
 }
 
-// Compares the lower-layer handle of two GT2Connection
+// Compares the lower-layer handle of two GSUdpRemotePeer
 static int Gt2_CompareConnectionHandle(const void *a, const void *b) {
-    const GT2Connection *ca = (const GT2Connection *)a;
-    const GT2Connection *cb = (const GT2Connection *)b;
+    const GSUdpRemotePeer *ca = (const GSUdpRemotePeer *)a;
+    const GSUdpRemotePeer *cb = (const GSUdpRemotePeer *)b;
 
     return ca->handle != cb->handle;
 }
 
 // The lower socket's error callback; notifies the app and every pending connect.
 // Its socket argument is unused because this wrapper has one global engine.
-static void Gt2_OnSocketCreateError(GTI2Socket *unused) {
+static void Gt2_OnSocketCreateError(GT2Socket unused) {
     int i;
-    GT2Engine *engine = Gt2_GetEngine();
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     int count;
 
-    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Socket error, passing to app and message handlers\n");
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "[Udp Engine] Socket error, passing to app and message handlers\n");
     if (engine->onSocketError != NULL) {
         engine->onSocketError(3, engine->userData);
     }
 
     count = func_ov011_02171588(engine->pending);
     for (i = 0; i < count; i++) {
-        GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
+        GSUdpMsgHandler *pending = (GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, i);
         if (pending->onEvent != NULL) {
             pending->onEvent(3, pending->userData);
         }
@@ -136,12 +135,12 @@ static void Gt2_OnSocketCreateError(GTI2Socket *unused) {
 }
 
 // Notifies that a connection closed, with its mapped reason, then drops it
-static void Gt2_OnClosed(GTI2Connection *addr, int reason) {
-    GT2Engine *engine = Gt2_GetEngine();
+static void Gt2_OnClosed(GT2Connection addr, GT2CloseReason reason) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     int i;
     int count;
     int index;
-    GT2Connection key;
+    GSUdpRemotePeer key;
     char buf[0x18];
 
     if (reason == 2 || reason == 3) {
@@ -150,20 +149,23 @@ static void Gt2_OnClosed(GTI2Connection *addr, int reason) {
         reason = 3;
     }
 
-    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection closed to %s\n",
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "[Udp Engine] Connection closed to %s\n",
                   func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     count = func_ov011_02171588(engine->pending);
     for (i = 0; i < count; i++) {
-        GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
+        GSUdpMsgHandler *pending = (GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, i);
         if (pending->onClosed != NULL) {
-            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection closed: passed to message handler\n");
+            gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                          "[Udp Engine] Connection closed: passed to message handler\n");
             pending->onClosed(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, pending->userData);
         }
     }
 
     if (engine->onClosed != NULL) {
-        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection closed: passed to app\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                      "[Udp Engine] Connection closed: passed to app\n");
         engine->onClosed(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, engine->userData);
     }
 
@@ -176,15 +178,15 @@ static void Gt2_OnClosed(GTI2Connection *addr, int reason) {
 
 // The callback the lower socket calls when one low-level attempt of a Gt2_Connect call finishes; notifies that
 // attempt's own handler and the app, and drops the attempt
-static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const void *message, int length) {
-    GT2Engine *engine = Gt2_GetEngine();
+static void Gt2_OnConnectAttemptDone(GT2Connection addr, GT2Result rawResult, GT2Byte *message, int length) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char buf[0x18];
     int count;
     int reason;
     int i;
     int index;
-    GT2Connection connKey;
-    GT2Connection attemptKey;
+    GSUdpRemotePeer connKey;
+    GSUdpRemotePeer attemptKey;
 
     (void)message;
     (void)length;
@@ -211,7 +213,8 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
         connKey.port = (gsi_u16)func_ov011_0217d384(addr);
         index = func_ov011_021716ac(engine->connections, &connKey, Gt2_CompareConnectionAddr, 0, gsi_false);
         if (index != -1) {
-            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connect rejected by %s\n",
+            gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                          "[Udp Engine] Connect rejected by %s\n",
                           func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
             func_ov011_02171668(engine->connections, index);
         }
@@ -219,14 +222,15 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 
     count = func_ov011_02171588(engine->pending);
     for (i = 0; i < count; i++) {
-        GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
+        GSUdpMsgHandler *pending = (GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, i);
 
         attemptKey.ip = func_ov011_0217d380(addr);
         attemptKey.port = (gsi_u16)func_ov011_0217d384(addr);
         index = func_ov011_021716ac(pending->attempts, &attemptKey, Gt2_CompareConnectionAddr, 0, gsi_false);
         if (index != -1) {
             if (pending->onAttemptResult != NULL) {
-                gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing connect result to message handler\n");
+                gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                              "[Udp Engine] Passing connect result to message handler\n");
                 pending->onAttemptResult(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, rawResult == 2,
                                          pending->userData);
             }
@@ -237,7 +241,8 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 
     if (engine->pendingCount > 0) {
         if (engine->onAttemptResult != NULL) {
-            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing connect result to app\n");
+            gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                          "[Udp Engine] Passing connect result to app\n");
             engine->onAttemptResult(func_ov011_0217d380(addr), func_ov011_0217d384(addr), reason, rawResult == 2,
                                     engine->userData);
         }
@@ -246,43 +251,46 @@ static void Gt2_OnConnectAttemptDone(GTI2Connection *addr, int rawResult, const 
 }
 
 // Reports ping latency to the first pending connect with a ping callback, otherwise to the app
-static void Gt2_OnPing(GTI2Connection *addr, int latencyMs) {
-    GT2Engine *engine = Gt2_GetEngine();
+static void Gt2_OnPing(GT2Connection addr, int latencyMs) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char buf[0x18];
     int i;
     int count;
 
-    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Received ping from %s\n",
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "[Udp Engine] Received ping from %s\n",
                   func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     count = func_ov011_02171588(engine->pending);
     for (i = 0; i < count; i++) {
-        GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, i);
+        GSUdpMsgHandler *pending = (GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, i);
         if (pending->onPing != NULL) {
-            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing to message handler\n");
+            gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                          "[Udp Engine] Passing to message handler\n");
             pending->onPing(func_ov011_0217d380(addr), func_ov011_0217d384(addr), latencyMs, pending->userData);
             return;
         }
     }
 
     if (engine->onPing != NULL) {
-        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passing to app\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment, "[Udp Engine] Passing to app\n");
         engine->onPing(func_ov011_0217d380(addr), func_ov011_0217d384(addr), latencyMs, engine->userData);
     }
 }
 
 // The callback for a received datagram; if its first 16 bytes match a pending connect's header, notifies
 // that connect's own handler, otherwise the app
-static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, gsi_bool reliable) {
-    GT2Engine *engine = Gt2_GetEngine();
+static void Gt2_OnReceivedData(GT2Connection addr, GT2Byte *data, int len, GT2Bool reliable) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char buf[0x18];
-    GT2PendingConnect key;
+    GSUdpMsgHandler key;
     int index;
     const gsi_u8 *src;
     gsi_u8 *dest;
     gsi_u32 n;
 
-    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Received data from %s\n",
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "[Udp Engine] Received data from %s\n",
                   func_ov011_0217ed14(func_ov011_0217d380(addr), func_ov011_0217d384(addr), buf));
 
     if (len >= 0x10) {
@@ -294,25 +302,26 @@ static void Gt2_OnReceivedData(GTI2Connection *addr, const void *data, int len, 
         } while (--n != 0);
         index = func_ov011_021716ac(engine->pending, &key, Gt2_ComparePendingHeader, 0, gsi_false);
         if (index != -1) {
-            GT2PendingConnect *pending = (GT2PendingConnect *)func_ov011_0217158c(engine->pending, index);
+            GSUdpMsgHandler *pending = (GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, index);
             if (pending->onReceived != NULL) {
-                gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passed to message handler\n");
-                pending->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), (const gsi_u8 *)data + 0x10,
-                                    len - 0x10, reliable, pending->userData);
+                gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                              "[Udp Engine] Passed to message handler\n");
+                pending->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), data + 0x10, len - 0x10,
+                                    reliable, pending->userData);
                 return;
             }
         }
     }
 
     if (engine->onReceived != NULL) {
-        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Passed to app\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment, "[Udp Engine] Passed to app\n");
         engine->onReceived(func_ov011_0217d380(addr), func_ov011_0217d384(addr), data, len, reliable, engine->userData);
     }
 }
 
 // Handles a datagram offered by the lower socket's unknown-message path; returns whether the app handled it
-static gsi_bool Gt2_OnUnknownMessage(GTI2Socket *unused, gsi_u32 ip, gsi_u16 port, const void *data, int len) {
-    GT2Engine *engine = Gt2_GetEngine();
+static GT2Bool Gt2_OnUnknownMessage(GT2Socket unused, unsigned int ip, unsigned short port, GT2Byte *data, int len) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char buf[0x18];
     gsi_bool handled;
 
@@ -322,9 +331,9 @@ static gsi_bool Gt2_OnUnknownMessage(GTI2Socket *unused, gsi_u32 ip, gsi_u16 por
     }
 
     handled = gsi_false;
-    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Unknown message from %s, passing to app\n",
-                  func_ov011_0217ed14(ip, port, buf));
-    if (engine->onUnknownMessage(ip, port, len, data, engine->userData) != 0) {
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "[Udp Engine] Unknown message from %s, passing to app\n", func_ov011_0217ed14(ip, port, buf));
+    if (engine->onUnknownMessage(ip, port, data, len, engine->userData) != 0) {
         handled = gsi_true;
     }
     return handled;
@@ -332,20 +341,21 @@ static gsi_bool Gt2_OnUnknownMessage(GTI2Socket *unused, gsi_u32 ip, gsi_u16 por
 
 // The lower socket's incoming-attempt callback; auto-accepts when the first 16 data bytes match a pending
 // connect's init message, otherwise asks the app whether to accept it
-static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, gsi_u32 ip, gsi_u16 port,
-                                  int elapsedMilliseconds, const void *data, int len) {
-    GT2Engine *engine = Gt2_GetEngine();
+static void Gt2_OnIncomingAttempt(GT2Socket unused, GT2Connection handle, unsigned int ip, unsigned short port,
+                                  int elapsedMilliseconds, GT2Byte *data, int len) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char buf[0x18];
-    GT2Connection newConnection;
-    GTI2ConnectionCallbacks table;
+    GSUdpRemotePeer newConnection;
+    GT2ConnectionCallbacks table;
     int index;
-    GT2PendingConnect key;
+    GSUdpMsgHandler key;
     const gsi_u8 *src;
     gsi_u8 *dest;
     gsi_u32 n;
 
     (void)unused;
-    gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s\n", func_ov011_0217ed14(ip, port, buf));
+    gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                  "[Udp Engine] Connection attempt from %s\n", func_ov011_0217ed14(ip, port, buf));
 
     if (len >= 0x10) {
         src = (const gsi_u8 *)data;
@@ -361,19 +371,21 @@ static void Gt2_OnIncomingAttempt(GTI2Socket *unused, GTI2Connection *handle, gs
         func_ov011_021715a4(engine->connections, &newConnection);
         index = func_ov011_021716ac(engine->pending, &key, Gt2_CompareInitMessage, 0, gsi_false);
         if (index != -1) {
-            table.onClosed = Gt2_OnClosed;
-            table.onReceived = Gt2_OnReceivedData;
-            table.onPing = Gt2_OnPing;
-            table.onConnected = Gt2_OnConnectAttemptDone;
+            table.closed = Gt2_OnClosed;
+            table.received = Gt2_OnReceivedData;
+            table.ping = Gt2_OnPing;
+            table.connected = Gt2_OnConnectAttemptDone;
             func_ov011_0217d190(handle, &table);
 
-            gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt auto-accepted for message handler\n");
+            gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                          "[Udp Engine] Connection attempt auto-accepted for message handler\n");
             return;
         }
     }
 
     if (engine->onUnhandledAttempt != NULL) {
-        gsDebugFormat(0xc, 0, 0x10, "[Udp Engine] Connection attempt from %s, asking app to accept/reject\n",
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Comment,
+                      "[Udp Engine] Connection attempt from %s, asking app to accept/reject\n",
                       func_ov011_0217ed14(ip, port, buf));
         engine->onUnhandledAttempt(ip, port, elapsedMilliseconds, data, len, engine->userData);
         return;
@@ -389,11 +401,12 @@ gsi_bool Gt2_IsInitialized(void) {
 }
 
 // Creates the one engine, binding its socket to localPort
-int Gt2_CreateSocket(gsi_u16 localPort, int incomingBufferSize, int outgoingBufferSize, Gt2EventCallback onSocketError,
-                     Gt2AttemptResultCallback onAttemptResult, Gt2ClosedCallback onClosed, Gt2PingCallback onPing,
-                     Gt2ReceivedCallback onReceived, Gt2UnknownMessageCallback onUnknownMessage,
-                     Gt2IncomingAttemptCallback onUnhandledAttempt, void *userData) {
-    GT2Engine *engine = Gt2_GetEngine();
+GSUdpErrorCode Gt2_CreateSocket(unsigned short localPort, int incomingBufferSize, int outgoingBufferSize,
+                                gsUdpErrorCallback onSocketError, gsUdpConnConnectedCallback onAttemptResult,
+                                gsUdpConnClosedCallback onClosed, gsUdpConnPingCallback onPing,
+                                gsUdpConnReceivedDataCallback onReceived, gsUdpUnknownMsgCallback onUnknownMessage,
+                                gsUdpAppConnectAttemptCallback onUnhandledAttempt, void *userData) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char addrBuf[0x18];
     int error;
 
@@ -416,19 +429,22 @@ int Gt2_CreateSocket(gsi_u16 localPort, int incomingBufferSize, int outgoingBuff
     error =
         func_ov011_0217d144(&engine->socket, addrBuf, outgoingBufferSize, incomingBufferSize, Gt2_OnSocketCreateError);
     if (error != 0) {
-        gsDebugFormat(0xc, 0, 2, "[Udp Engine] error creating gt2 socket, error code: %d\n", error);
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
+                      "[Udp Engine] error creating gt2 socket, error code: %d\n", error);
         return 3;
     }
 
     engine->connections = func_ov011_02171514(0xc, 1, NULL);
     if (engine->connections == NULL) {
-        gsDebugFormat(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "[Udp Engine] No more memory!!!\n");
         return 1;
     }
 
     engine->pending = func_ov011_02171514(0x3c, 1, Gt2_FreePendingConnect);
     if (engine->pending == NULL) {
-        gsDebugFormat(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "[Udp Engine] No more memory!!!\n");
         return 1;
     }
 
@@ -447,14 +463,15 @@ int Gt2_CreateSocket(gsi_u16 localPort, int incomingBufferSize, int outgoingBuff
 }
 
 // The lower-layer state of the connection to an address, written to *state
-int Gt2_GetConnectionState(gsi_u32 ip, gsi_u16 port, int *state) {
-    GT2Engine *engine = Gt2_GetEngine();
-    GT2Connection key;
-    GT2Connection *conn;
+GSUdpErrorCode Gt2_GetConnectionState(unsigned int ip, unsigned short port, GSUdpPeerState *state) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
+    GSUdpRemotePeer key;
+    GSUdpRemotePeer *conn;
     int index;
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 3, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_State, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         *state = 3;
         return 0xb;
     }
@@ -466,19 +483,20 @@ int Gt2_GetConnectionState(gsi_u32 ip, gsi_u16 port, int *state) {
         *state = 3;
         return 0;
     }
-    conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
+    conn = (GSUdpRemotePeer *)func_ov011_0217158c(engine->connections, index);
     *state = func_ov011_0217d364(conn->handle);
     return 0;
 }
 
 // Reuses a known connection or starts one through the lower layer, then associates it with a pending init message
-int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u32 timeoutMs) {
-    GT2Engine *engine = Gt2_GetEngine();
+GSUdpErrorCode Gt2_OpenConnection(unsigned int ip, unsigned short port, char initMessage[GS_UDP_MSG_HEADER_LEN],
+                                  int timeoutMs) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
     char buf[0x18];
-    GT2Connection key;
-    GT2Connection *conn;
-    GTI2ConnectionCallbacks table;
-    GT2PendingConnect pendingKey;
+    GSUdpRemotePeer key;
+    GSUdpRemotePeer *conn;
+    GT2ConnectionCallbacks table;
+    GSUdpMsgHandler pendingKey;
     const gsi_u8 *src;
     gsi_u8 *dest;
     gsi_u32 n;
@@ -486,11 +504,13 @@ int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u3
     int state;
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     if (ip == 0 || port == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid parameter(s), check ip, port");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Invalid parameter(s), check ip, port");
         return 0xa;
     }
 
@@ -498,10 +518,11 @@ int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u3
     key.port = port;
     index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, gsi_false);
     if (index != -1) {
-        conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
+        conn = (GSUdpRemotePeer *)func_ov011_0217158c(engine->connections, index);
         state = func_ov011_0217d364(conn->handle);
         if (state == 1) {
-            gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine is already talking to remote address\n");
+            gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                          "[Udp Engine] Engine is already talking to remote address\n");
             return 5;
         }
         if (state != 0) {
@@ -518,15 +539,15 @@ int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u3
         if (index == -1) {
             return 0;
         }
-        func_ov011_021715a4(((GT2PendingConnect *)func_ov011_0217158c(engine->pending, index))->attempts, conn);
+        func_ov011_021715a4(((GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, index))->attempts, conn);
         return 0;
     }
 
     func_ov011_0217ed14(ip, port, buf);
-    table.onClosed = Gt2_OnClosed;
-    table.onReceived = Gt2_OnReceivedData;
-    table.onPing = Gt2_OnPing;
-    table.onConnected = Gt2_OnConnectAttemptDone;
+    table.closed = Gt2_OnClosed;
+    table.received = Gt2_OnReceivedData;
+    table.ping = Gt2_OnPing;
+    table.connected = Gt2_OnConnectAttemptDone;
     func_ov011_0217d1a0(engine->socket, &key.handle, buf, initMessage, 0x10, timeoutMs, &table, 0);
 
     func_ov011_021715a4(engine->connections, &key);
@@ -538,8 +559,9 @@ int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u3
     } while (--n != 0);
     index = func_ov011_021716ac(engine->pending, &pendingKey, Gt2_CompareInitMessage, 0, gsi_false);
     if (index != -1) {
-        conn = (GT2Connection *)func_ov011_0217158c(engine->connections, func_ov011_02171588(engine->connections) - 1);
-        func_ov011_021715a4(((GT2PendingConnect *)func_ov011_0217158c(engine->pending, index))->attempts, &conn);
+        conn =
+            (GSUdpRemotePeer *)func_ov011_0217158c(engine->connections, func_ov011_02171588(engine->connections) - 1);
+        func_ov011_021715a4(((GSUdpMsgHandler *)func_ov011_0217158c(engine->pending, index))->attempts, &conn);
     } else {
         engine->pendingCount++;
     }
@@ -547,11 +569,12 @@ int Gt2_OpenConnection(gsi_u32 ip, gsi_u16 port, const void *initMessage, gsi_u3
 }
 
 // Sends a message to the connection of an address, with a 16-byte header prepended
-int Gt2_Send(gsi_u32 ip, gsi_u16 port, const void *header, const void *message, int size, gsi_bool reliable) {
-    GT2Engine *engine = Gt2_GetEngine();
-    GT2Connection key;
+GSUdpErrorCode Gt2_Send(unsigned int ip, unsigned short port, char header[GS_UDP_MSG_HEADER_LEN],
+                        unsigned char *message, unsigned int size, gsi_bool reliable) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
+    GSUdpRemotePeer key;
     char buf[0x18];
-    GT2Connection *conn;
+    GSUdpRemotePeer *conn;
     void *packet;
     int index;
     int maxSize;
@@ -561,7 +584,8 @@ int Gt2_Send(gsi_u32 ip, gsi_u16 port, const void *header, const void *message, 
     int n;
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 3;
     }
 
@@ -573,19 +597,20 @@ int Gt2_Send(gsi_u32 ip, gsi_u16 port, const void *header, const void *message, 
     if (index == -1) {
         // BUG: The formatted address is computed but the format string has no %s to print it
 #ifdef BUGFIX
-        gsDebugFormat(0xc, 0, 2, "[Udp Engine] address not found for sending message: %s\n",
-                      func_ov011_0217ed14(ip, port, buf));
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
+                      "[Udp Engine] address not found for sending message: %s\n", func_ov011_0217ed14(ip, port, buf));
 #else
-        gsDebugFormat(0xc, 0, 2, "[Udp Engine] address not found for sending message\n",
-                      func_ov011_0217ed14(ip, port, buf));
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
+                      "[Udp Engine] address not found for sending message\n", func_ov011_0217ed14(ip, port, buf));
 #endif
         return 4;
     }
 
-    conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
+    conn = (GSUdpRemotePeer *)func_ov011_0217158c(engine->connections, index);
     maxSize = func_ov011_0217d390(conn->handle);
     if (total > maxSize && reliable != 0) {
-        gsDebugFormat(0xc, 0, 2, "[Udp Engine] Message Size too large, dropping message\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_WarmError,
+                      "[Udp Engine] Message Size too large, dropping message\n");
         return 0xc;
     }
 
@@ -609,11 +634,12 @@ int Gt2_Send(gsi_u32 ip, gsi_u16 port, const void *header, const void *message, 
 }
 
 // Stops the engine's socket without freeing it
-int Gt2_StopSocket(void) {
-    GT2Engine *engine = Gt2_GetEngine();
+GSUdpErrorCode Gt2_StopSocket(void) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     func_ov011_0217d168(engine->socket);
@@ -621,11 +647,12 @@ int Gt2_StopSocket(void) {
 }
 
 // Tears the engine down entirely
-int Gt2_CloseSocket(void) {
-    GT2Engine *engine = Gt2_GetEngine();
+GSUdpErrorCode Gt2_CloseSocket(void) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     func_ov011_0217d158(engine->socket);
@@ -636,37 +663,41 @@ int Gt2_CloseSocket(void) {
 }
 
 // The engine's own bound local port
-gsi_u16 Gt2_GetLocalPort(void) {
-    GT2Engine *engine = Gt2_GetEngine();
+unsigned short Gt2_GetLocalPort(void) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 1, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_HotError,
+                      "[Udp Engine] Engine not initialized\n");
         return 0;
     }
     return engine->localPort;
 }
 
 // Registers a pending connect; initMessage and header each point to 16 readable bytes with a nonzero first byte
-int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback onEvent,
-                Gt2AttemptResultCallback onAttemptResult, Gt2ClosedCallback onClosed, Gt2PingCallback onPing,
-                Gt2PendingDataCallback onReceived, void *userData) {
-    GT2Engine *engine = Gt2_GetEngine();
-    GT2PendingConnect pending;
+GSUdpErrorCode Gt2_Connect(char initMessage[GS_UDP_MSG_HEADER_LEN], char header[GS_UDP_MSG_HEADER_LEN],
+                           gsUdpErrorCallback onEvent, gsUdpConnConnectedCallback onAttemptResult,
+                           gsUdpConnClosedCallback onClosed, gsUdpConnPingCallback onPing,
+                           gsUdpConnReceivedDataCallback onReceived, void *userData) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
+    GSUdpMsgHandler pending;
     void *attempts;
     const gsi_u8 *src;
     gsi_u8 *dest;
     int n;
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     if (initMessage[0] == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid init message\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Invalid init message\n");
         return 0xa;
     }
     if (header[0] == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid header\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug, "[Udp Engine] Invalid header\n");
         return 0xa;
     }
 
@@ -685,7 +716,8 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
 
     attempts = func_ov011_02171514(4, 1, NULL);
     if (attempts == NULL) {
-        gsDebugFormat(0xc, 2, 1, "[Udp Engine] No more memory!!!\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "[Udp Engine] No more memory!!!\n");
         return 1;
     }
 
@@ -701,20 +733,22 @@ int Gt2_Connect(const char *initMessage, const char *header, Gt2EventCallback on
 }
 
 // Removes the pending connect with a matching 16-byte header
-int Gt2_CancelConnect(const char *header) {
-    GT2Engine *engine = Gt2_GetEngine();
-    GT2PendingConnect key;
+GSUdpErrorCode Gt2_CancelConnect(char header[GS_UDP_MSG_HEADER_LEN]) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
+    GSUdpMsgHandler key;
     const gsi_u8 *src;
     gsi_u8 *dest;
     gsi_u32 n;
     int index;
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 3;
     }
     if (header == NULL || header[0] == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Invalid or empty header\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Invalid or empty header\n");
         return 0xa;
     }
 
@@ -734,10 +768,11 @@ int Gt2_CancelConnect(const char *header) {
 
 // Whether there are no pending connects left
 gsi_bool Gt2_IsIdle(void) {
-    GT2Engine *engine = Gt2_GetEngine();
+    GSUdpEngineObject *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return gsi_true;
     }
     return func_ov011_02171588(engine->pending) == 0;
@@ -745,10 +780,11 @@ gsi_bool Gt2_IsIdle(void) {
 
 // Whether Gt2_CreateSocket was given none of its app-wide callbacks
 gsi_bool Gt2_HasNoAppCallbacks(void) {
-    GT2Engine *engine = Gt2_GetEngine();
+    GSUdpEngineObject *engine = Gt2_GetEngine();
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return gsi_true;
     }
     if (engine->onClosed != NULL || engine->onUnhandledAttempt != NULL || engine->onAttemptResult != NULL ||
@@ -760,14 +796,15 @@ gsi_bool Gt2_HasNoAppCallbacks(void) {
 }
 
 // Closes an established connection
-int Gt2_Close(gsi_u32 ip, gsi_u16 port) {
-    GT2Engine *engine = Gt2_GetEngine();
-    GT2Connection key;
-    GT2Connection *conn;
+int Gt2_Close(unsigned int ip, unsigned short port) {
+    GSUdpEngineObject *engine = Gt2_GetEngine();
+    GSUdpRemotePeer key;
+    GSUdpRemotePeer *conn;
     int index;
 
     if (engine->initialized == 0) {
-        gsDebugFormat(0xc, 0, 0xf, "[Udp Engine] Engine not initialized\n");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Network, GSIDebugLevel_Debug,
+                      "[Udp Engine] Engine not initialized\n");
         return 0;
     }
 
@@ -775,7 +812,7 @@ int Gt2_Close(gsi_u32 ip, gsi_u16 port) {
     key.port = port;
     index = func_ov011_021716ac(engine->connections, &key, Gt2_CompareConnectionAddr, 0, gsi_false);
     if (index != -1) {
-        conn = (GT2Connection *)func_ov011_0217158c(engine->connections, index);
+        conn = (GSUdpRemotePeer *)func_ov011_0217158c(engine->connections, index);
         return func_ov011_0217d394(conn->handle);
     }
     return 0;

@@ -10,52 +10,54 @@
 // ours
 
 // A part of the text of a message, which isn't ended
-typedef struct XmlString {
-    char *data;
+typedef struct GSIXmlString {
+    const gsi_u8 *data;
     int len;
-} XmlString;
+} GSIXmlString;
 
 // An element (or an attribute) that the reader found: its name and value, its index and the index of the element it
 // is in (for an attribute, the element it belongs to), -1 for none
-typedef struct XmlElement {
-    XmlString name;
-    XmlString value;
+typedef struct GSIXmlElement {
+    GSIXmlString name;
+    GSIXmlString value;
     int index;
     int parent;
-} XmlElement;
+} GSIXmlElement;
 
 // A writer: its text, the length and the size of the buffer, and whether the message was ended
-struct SoapWriter {
+typedef struct GSIXmlStreamWriter {
     char *buffer;
     int length;
     int capacity;
     gsi_bool closed;
-};
+} GSIXmlStreamWriter;
 
 // A reader: the elements and the attributes that the text had, the element it is in, the child that was read last and
 // the attribute that was read last, -1 for none
-struct SoapReader {
-    DArray *elements;
-    DArray *attributes;
+typedef struct GSIXmlStreamReader {
+    DArray elements;
+    DArray attributes;
     int element;
     int child;
     int attribute;
-};
+} GSIXmlStreamReader;
 
 static void gsiXmlUtilElementFree(void *element);
 static void gsiXmlUtilAttributeFree(void *element);
-static gsi_bool gsiXmlUtilSkipWhiteSpace(SoapReader *reader, const char *text, int length, int *pos);
-static gsi_bool gsiXmlUtilParseElement(SoapReader *reader, char *text, int length, int *pos, int parent);
-static gsi_bool gsiXmlUtilParseName(SoapReader *reader, const char *text, int length, int *pos, XmlString *out);
-static gsi_bool gsiXmlUtilParseString(SoapReader *reader, const char *text, int length, int *pos, XmlString *out);
+static gsi_bool gsiXmlUtilSkipWhiteSpace(GSIXmlStreamReader *reader, const char *text, int length, int *pos);
+static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, int length, int *pos, int parent);
+static gsi_bool gsiXmlUtilParseName(GSIXmlStreamReader *reader, const char *text, int length, int *pos,
+                                    GSIXmlString *out);
+static gsi_bool gsiXmlUtilParseString(GSIXmlStreamReader *reader, const char *text, int length, int *pos,
+                                      GSIXmlString *out);
 static gsi_bool gsiXmlUtilDecodeString(char *text, int *length);
-static gsi_bool gsiXmlUtilParseValue(SoapReader *reader, char *text, int length, int *pos, XmlString *out);
-static gsi_bool gsiXmlUtilWriteChar(SoapWriter *writer, int character);
-static gsi_bool gsiXmlUtilWriteString(SoapWriter *writer, const char *text);
-static gsi_bool gsiXmlUtilWriteUnicodeString(SoapWriter *writer, const gsi_u16 *text);
-static gsi_bool gsiXmlUtilWriteXmlSafeString(SoapWriter *writer, const char *text);
-static gsi_bool gsiXmlUtilGrowBuffer(SoapWriter *writer);
-static gsi_bool gsiXmlUtilTagMatches(const char *name, const XmlElement *element);
+static gsi_bool gsiXmlUtilParseValue(GSIXmlStreamReader *reader, char *text, int length, int *pos, GSIXmlString *out);
+static gsi_bool gsiXmlUtilWriteChar(GSIXmlStreamWriter *writer, int character);
+static gsi_bool gsiXmlUtilWriteString(GSIXmlStreamWriter *writer, const char *text);
+static gsi_bool gsiXmlUtilWriteUnicodeString(GSIXmlStreamWriter *writer, const gsi_u16 *text);
+static gsi_bool gsiXmlUtilWriteXmlSafeString(GSIXmlStreamWriter *writer, const char *text);
+static gsi_bool gsiXmlUtilGrowBuffer(GSIXmlStreamWriter *writer);
+static gsi_bool gsiXmlUtilTagMatches(const char *name, const GSIXmlElement *element);
 
 // The namespaces that every message declares
 const char *GS_XML_SOAP_DEFAULT_NAMESPACES[4] = {
@@ -65,17 +67,18 @@ const char *GS_XML_SOAP_DEFAULT_NAMESPACES[4] = {
     "xsd=\"http://www.w3.org/2001/XMLSchema\"",
 };
 
-SoapWriter *gsXmlCreateStreamWriter(const char **namespaceDeclarations, int declarationNum) {
-    SoapWriter *writer;
+GSXmlStreamWriter gsXmlCreateStreamWriter(const char **namespaceDeclarations, int declarationNum) {
+    GSIXmlStreamWriter *writer;
     int size;
     int capacity;
     int i;
 
     capacity = 0x400;
     size = 0;
-    writer = gsimalloc(sizeof(SoapWriter));
+    writer = gsimalloc(sizeof(GSIXmlStreamWriter));
     if (writer == NULL) {
-        gsDebugFormat(12, 2, 1, "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", sizeof(SoapWriter));
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", sizeof(GSIXmlStreamWriter));
         return NULL;
     }
     for (i = 0; i < 4; i++) {
@@ -93,7 +96,8 @@ SoapWriter *gsXmlCreateStreamWriter(const char **namespaceDeclarations, int decl
     }
     writer->buffer = gsimalloc(capacity);
     if (writer->buffer == NULL) {
-        gsDebugFormat(12, 2, 1, "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", capacity);
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", capacity);
         return NULL;
     }
     writer->capacity = capacity;
@@ -129,23 +133,26 @@ SoapWriter *gsXmlCreateStreamWriter(const char **namespaceDeclarations, int decl
     return writer;
 }
 
-SoapReader *gsXmlCreateStreamReader(void) {
-    SoapReader *reader;
+GSXmlStreamReader gsXmlCreateStreamReader(void) {
+    GSIXmlStreamReader *reader;
 
-    reader = gsimalloc(sizeof(SoapReader));
+    reader = gsimalloc(sizeof(GSIXmlStreamReader));
     if (reader == NULL) {
-        gsDebugFormat(12, 2, 1, "Out of memory in gsXmlCreateStream, needed %d bytes", sizeof(SoapReader));
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "Out of memory in gsXmlCreateStream, needed %d bytes", sizeof(GSIXmlStreamReader));
         return NULL;
     }
-    reader->elements = func_ov011_02171514(sizeof(XmlElement), 32, gsiXmlUtilElementFree);
+    reader->elements = func_ov011_02171514(sizeof(GSIXmlElement), 32, gsiXmlUtilElementFree);
     if (reader->elements == NULL) {
-        gsDebugFormat(12, 2, 1, "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
         gsifree(reader);
         return NULL;
     }
-    reader->attributes = func_ov011_02171514(sizeof(XmlElement), 16, gsiXmlUtilAttributeFree);
+    reader->attributes = func_ov011_02171514(sizeof(GSIXmlElement), 16, gsiXmlUtilAttributeFree);
     if (reader->attributes == NULL) {
-        gsDebugFormat(12, 2, 1, "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
+        gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
         func_ov011_02171558(reader->elements);
         gsifree(reader);
         return NULL;
@@ -154,7 +161,8 @@ SoapReader *gsXmlCreateStreamReader(void) {
     return reader;
 }
 
-gsi_bool gsXmlParseXml(SoapReader *reader, char *text, int length) {
+gsi_bool gsXmlParseXml(GSXmlStreamReader stream, char *text, int length) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     int pos;
 
     pos = 0;
@@ -167,24 +175,32 @@ gsi_bool gsXmlParseXml(SoapReader *reader, char *text, int length) {
     return gsi_true;
 }
 
-void gsXmlFreeWriter(SoapWriter *writer) {
+void gsXmlFreeWriter(GSXmlStreamWriter stream) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
+
     gsifree(writer->buffer);
     gsifree(writer);
 }
 
-void gsXmlFreeReader(SoapReader *reader) {
+void gsXmlFreeReader(GSXmlStreamReader stream) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+
     func_ov011_02171558(reader->attributes);
     func_ov011_02171558(reader->elements);
     gsifree(reader);
 }
 
-void gsXmlResetReader(SoapReader *reader) {
+void gsXmlResetReader(GSXmlStreamReader stream) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+
     ArrayClear(reader->attributes);
     ArrayClear(reader->elements);
     gsXmlMoveToStart(reader);
 }
 
-gsi_bool gsXmlCloseWriter(SoapWriter *writer) {
+gsi_bool gsXmlCloseWriter(GSXmlStreamWriter stream) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
+
     if (!gsiXmlUtilWriteString(writer, "</SOAP-ENV:Body></SOAP-ENV:Envelope>")) {
         return gsi_false;
     }
@@ -198,15 +214,19 @@ static void gsiXmlUtilElementFree(void *element) {
 static void gsiXmlUtilAttributeFree(void *element) {
 }
 
-const char *gsXmlWriterGetData(SoapWriter *writer) {
+const char *gsXmlWriterGetData(GSXmlStreamWriter stream) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
+
     return writer->buffer;
 }
 
-int gsXmlWriterGetDataLength(SoapWriter *writer) {
+int gsXmlWriterGetDataLength(GSXmlStreamWriter stream) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
+
     return writer->length;
 }
 
-static gsi_bool gsiXmlUtilSkipWhiteSpace(SoapReader *reader, const char *text, int length, int *pos) {
+static gsi_bool gsiXmlUtilSkipWhiteSpace(GSIXmlStreamReader *reader, const char *text, int length, int *pos) {
     while (*pos < length) {
         if (strchr(" \t\r\n", text[*pos]) == NULL) {
             return gsi_true;
@@ -216,7 +236,7 @@ static gsi_bool gsiXmlUtilSkipWhiteSpace(SoapReader *reader, const char *text, i
     return gsi_false;
 }
 
-static gsi_bool gsiXmlUtilParseElement(SoapReader *reader, char *text, int length, int *pos, int parent) {
+static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, int length, int *pos, int parent) {
     int tagStart;
     gsi_bool store;
     int nameLength;
@@ -227,7 +247,7 @@ static gsi_bool gsiXmlUtilParseElement(SoapReader *reader, char *text, int lengt
     if (*pos >= length) {
         return gsi_true;
     }
-    XmlElement element = { { NULL, 0 }, { NULL, 0 }, 0, 0 };
+    GSIXmlElement element = { { NULL, 0 }, { NULL, 0 }, 0, 0 };
     if (text[*pos] != '<') {
         return gsi_false;
     }
@@ -257,7 +277,7 @@ static gsi_bool gsiXmlUtilParseElement(SoapReader *reader, char *text, int lengt
         func_ov011_021715a4(reader->elements, &element);
     }
     while (*pos < length && isalnum(text[*pos])) {
-        XmlElement attribute = { { NULL, 0 }, { NULL, 0 }, 0, 0 };
+        GSIXmlElement attribute = { { NULL, 0 }, { NULL, 0 }, 0, 0 };
 
         if (!gsiXmlUtilParseName(reader, text, length, pos, &attribute.name)) {
             return gsi_false;
@@ -355,7 +375,8 @@ static gsi_bool gsiXmlUtilParseElement(SoapReader *reader, char *text, int lengt
     return gsi_false;
 }
 
-static gsi_bool gsiXmlUtilParseName(SoapReader *reader, const char *text, int length, int *pos, XmlString *out) {
+static gsi_bool gsiXmlUtilParseName(GSIXmlStreamReader *reader, const char *text, int length, int *pos,
+                                    GSIXmlString *out) {
     gsi_bool colon;
     char *start;
     int c;
@@ -390,7 +411,8 @@ static gsi_bool gsiXmlUtilParseName(SoapReader *reader, const char *text, int le
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilParseString(SoapReader *reader, const char *text, int length, int *pos, XmlString *out) {
+static gsi_bool gsiXmlUtilParseString(GSIXmlStreamReader *reader, const char *text, int length, int *pos,
+                                      GSIXmlString *out) {
     char *start;
     int quote;
 
@@ -511,7 +533,7 @@ static gsi_bool gsiXmlUtilDecodeString(char *text, int *length) {
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilParseValue(SoapReader *reader, char *text, int length, int *pos, XmlString *out) {
+static gsi_bool gsiXmlUtilParseValue(GSIXmlStreamReader *reader, char *text, int length, int *pos, GSIXmlString *out) {
     char *start;
 
     start = NULL;
@@ -532,7 +554,9 @@ static gsi_bool gsiXmlUtilParseValue(SoapReader *reader, char *text, int length,
     return gsi_false;
 }
 
-gsi_bool gsXmlWriteOpenTag(SoapWriter *writer, const char *prefix, const char *name) {
+gsi_bool gsXmlWriteOpenTag(GSXmlStreamWriter stream, const char *prefix, const char *name) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
+
     if (!gsiXmlUtilWriteChar(writer, '<') || !gsiXmlUtilWriteString(writer, prefix) ||
         !gsiXmlUtilWriteChar(writer, ':') || !gsiXmlUtilWriteString(writer, name) ||
         !gsiXmlUtilWriteChar(writer, '>')) {
@@ -541,7 +565,9 @@ gsi_bool gsXmlWriteOpenTag(SoapWriter *writer, const char *prefix, const char *n
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteCloseTag(SoapWriter *writer, const char *prefix, const char *name) {
+gsi_bool gsXmlWriteCloseTag(GSXmlStreamWriter stream, const char *prefix, const char *name) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
+
     if (!gsiXmlUtilWriteChar(writer, '<') || !gsiXmlUtilWriteChar(writer, '/') ||
         !gsiXmlUtilWriteString(writer, prefix) || !gsiXmlUtilWriteChar(writer, ':') ||
         !gsiXmlUtilWriteString(writer, name) || !gsiXmlUtilWriteChar(writer, '>')) {
@@ -550,7 +576,8 @@ gsi_bool gsXmlWriteCloseTag(SoapWriter *writer, const char *prefix, const char *
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteStringElement(SoapWriter *writer, const char *prefix, const char *name, const char *value) {
+gsi_bool gsXmlWriteStringElement(GSXmlStreamWriter stream, const char *prefix, const char *name, const char *value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     int length;
     int i;
 
@@ -568,7 +595,9 @@ gsi_bool gsXmlWriteStringElement(SoapWriter *writer, const char *prefix, const c
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteAsciiStringElement(SoapWriter *writer, const char *prefix, const char *name, const char *value) {
+gsi_bool gsXmlWriteAsciiStringElement(GSXmlStreamWriter stream, const char *prefix, const char *name,
+                                      const gsi_char *value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     int length;
     int i;
 
@@ -586,8 +615,9 @@ gsi_bool gsXmlWriteAsciiStringElement(SoapWriter *writer, const char *prefix, co
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteUnicodeStringElement(SoapWriter *writer, const char *prefix, const char *name,
-                                        const gsi_u16 *value) {
+gsi_bool gsXmlWriteUnicodeStringElement(GSXmlStreamWriter stream, const char *prefix, const char *name,
+                                        const unsigned short *value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     int i;
     int length;
 
@@ -611,7 +641,8 @@ gsi_bool gsXmlWriteUnicodeStringElement(SoapWriter *writer, const char *prefix, 
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteIntElement(SoapWriter *writer, const char *prefix, const char *name, int value) {
+gsi_bool gsXmlWriteIntElement(GSXmlStreamWriter stream, const char *prefix, const char *name, gsi_u32 value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     char text[32];
 
     sprintf(text, "%d", value);
@@ -622,7 +653,8 @@ gsi_bool gsXmlWriteIntElement(SoapWriter *writer, const char *prefix, const char
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteInt64Element(SoapWriter *writer, const char *prefix, const char *name, gsi_i64 value) {
+gsi_bool gsXmlWriteInt64Element(GSXmlStreamWriter stream, const char *prefix, const char *name, gsi_i64 value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     char text[36];
 
     gsiInt64ToString(text, value);
@@ -633,7 +665,8 @@ gsi_bool gsXmlWriteInt64Element(SoapWriter *writer, const char *prefix, const ch
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteFloatElement(SoapWriter *writer, const char *prefix, const char *name, float value) {
+gsi_bool gsXmlWriteFloatElement(GSXmlStreamWriter stream, const char *prefix, const char *name, float value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     char text[32];
 
     sprintf(text, "%f", (double)value);
@@ -644,8 +677,9 @@ gsi_bool gsXmlWriteFloatElement(SoapWriter *writer, const char *prefix, const ch
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteHexBinaryElement(SoapWriter *writer, const char *prefix, const char *name, const void *data,
+gsi_bool gsXmlWriteHexBinaryElement(GSXmlStreamWriter stream, const char *prefix, const char *name, const gsi_u8 *data,
                                     int size) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     char hex[3];
     int i;
 
@@ -670,8 +704,9 @@ gsi_bool gsXmlWriteHexBinaryElement(SoapWriter *writer, const char *prefix, cons
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteBase64BinaryElement(SoapWriter *writer, const char *prefix, const char *name, const void *data,
-                                       int size) {
+gsi_bool gsXmlWriteBase64BinaryElement(GSXmlStreamWriter stream, const char *prefix, const char *name,
+                                       const gsi_u8 *data, int size) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     B64StreamData coder;
     char chunk[5];
 
@@ -691,7 +726,8 @@ gsi_bool gsXmlWriteBase64BinaryElement(SoapWriter *writer, const char *prefix, c
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteDateTimeElement(SoapWriter *writer, const char *prefix, const char *name, int dateAndTime) {
+gsi_bool gsXmlWriteDateTimeElement(GSXmlStreamWriter stream, const char *prefix, const char *name, int dateAndTime) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     char text[24];
     GSTime *time;
 
@@ -705,7 +741,9 @@ gsi_bool gsXmlWriteDateTimeElement(SoapWriter *writer, const char *prefix, const
     return gsi_true;
 }
 
-gsi_bool gsXmlWriteLargeIntElement(SoapWriter *writer, const char *prefix, const char *name, const BigNum *value) {
+gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter stream, const char *prefix, const char *name,
+                                   const gsLargeInt_t *value) {
+    GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
     const gsi_u32 *words;
     int i;
     gsi_u32 j;
@@ -748,7 +786,7 @@ gsi_bool gsXmlWriteLargeIntElement(SoapWriter *writer, const char *prefix, const
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilWriteChar(SoapWriter *writer, int character) {
+static gsi_bool gsiXmlUtilWriteChar(GSIXmlStreamWriter *writer, int character) {
     if (writer->length >= writer->capacity) {
         if (!gsiXmlUtilGrowBuffer(writer)) {
             return gsi_false;
@@ -759,7 +797,7 @@ static gsi_bool gsiXmlUtilWriteChar(SoapWriter *writer, int character) {
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilWriteString(SoapWriter *writer, const char *text) {
+static gsi_bool gsiXmlUtilWriteString(GSIXmlStreamWriter *writer, const char *text) {
     int length;
 
     length = strlen(text);
@@ -776,7 +814,7 @@ static gsi_bool gsiXmlUtilWriteString(SoapWriter *writer, const char *text) {
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilWriteUnicodeString(SoapWriter *writer, const gsi_u16 *text) {
+static gsi_bool gsiXmlUtilWriteUnicodeString(GSIXmlStreamWriter *writer, const gsi_u16 *text) {
     char utf8[4] = { 0, 0, 0, 0 };
     int length;
     int i;
@@ -792,7 +830,7 @@ static gsi_bool gsiXmlUtilWriteUnicodeString(SoapWriter *writer, const gsi_u16 *
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilWriteXmlSafeString(SoapWriter *writer, const char *text) {
+static gsi_bool gsiXmlUtilWriteXmlSafeString(GSIXmlStreamWriter *writer, const char *text) {
     char reference[8];
     int length;
     int i;
@@ -827,7 +865,7 @@ static gsi_bool gsiXmlUtilWriteXmlSafeString(SoapWriter *writer, const char *tex
     return gsi_true;
 }
 
-static gsi_bool gsiXmlUtilGrowBuffer(SoapWriter *writer) {
+static gsi_bool gsiXmlUtilGrowBuffer(GSIXmlStreamWriter *writer) {
     int newCapacity;
     char *newBuffer;
 
@@ -843,14 +881,17 @@ static gsi_bool gsiXmlUtilGrowBuffer(SoapWriter *writer) {
     return gsi_true;
 }
 
-gsi_bool gsXmlMoveToStart(SoapReader *reader) {
+gsi_bool gsXmlMoveToStart(GSXmlStreamReader stream) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+
     reader->element = -1;
     reader->child = -1;
     reader->attribute = -1;
     return gsi_true;
 }
 
-gsi_bool gsXmlMoveToNext(SoapReader *reader, const char *name) {
+gsi_bool gsXmlMoveToNext(GSXmlStreamReader stream, const char *name) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     int i;
 
     for (i = reader->element + 1; i < func_ov011_02171588(reader->elements); i++) {
@@ -864,7 +905,8 @@ gsi_bool gsXmlMoveToNext(SoapReader *reader, const char *name) {
     return gsi_false;
 }
 
-gsi_bool gsXmlMoveToParent(SoapReader *reader) {
+gsi_bool gsXmlMoveToParent(GSXmlStreamReader stream) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     int element;
     int parent;
 
@@ -872,7 +914,7 @@ gsi_bool gsXmlMoveToParent(SoapReader *reader) {
     if (element >= func_ov011_02171588(reader->elements) || element == -1) {
         return gsi_false;
     }
-    parent = ((XmlElement *)func_ov011_0217158c(reader->elements, element))->parent;
+    parent = ((GSIXmlElement *)func_ov011_0217158c(reader->elements, element))->parent;
     if (parent == -1) {
         return gsi_false;
     }
@@ -885,8 +927,9 @@ gsi_bool gsXmlMoveToParent(SoapReader *reader) {
     return gsi_true;
 }
 
-gsi_bool gsXmlMoveToChild(SoapReader *reader, const char *name) {
-    XmlElement *element;
+gsi_bool gsXmlMoveToChild(GSXmlStreamReader stream, const char *name) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
 
     for (i = reader->element + 1; i < func_ov011_02171588(reader->elements); i++) {
@@ -904,8 +947,9 @@ gsi_bool gsXmlMoveToChild(SoapReader *reader, const char *name) {
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsString(SoapReader *reader, const char *name, char **text, int *length) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsString(GSXmlStreamReader stream, const char *name, const char **text, int *length) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
 
     if (reader->child == -1) {
@@ -926,8 +970,9 @@ gsi_bool gsXmlReadChildAsString(SoapReader *reader, const char *name, char **tex
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsStringNT(SoapReader *reader, const char *name, char *buffer, int size) {
-    char *text;
+gsi_bool gsXmlReadChildAsStringNT(GSXmlStreamReader stream, const char *name, char buffer[], int size) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    const char *text;
     int length;
     int end;
 
@@ -943,8 +988,10 @@ gsi_bool gsXmlReadChildAsStringNT(SoapReader *reader, const char *name, char *bu
     return gsi_true;
 }
 
-gsi_bool gsXmlReadChildAsHexBinary(SoapReader *reader, const char *name, void *buffer, int size, int *readSize) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsHexBinary(GSXmlStreamReader stream, const char *name, gsi_u8 buffer[], int size,
+                                   int *readSize) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
     int hexLength;
     int written;
@@ -998,8 +1045,9 @@ gsi_bool gsXmlReadChildAsHexBinary(SoapReader *reader, const char *name, void *b
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsBase64Binary(SoapReader *reader, const char *name, void *buffer, int *size) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsBase64Binary(GSXmlStreamReader stream, const char *name, gsi_u8 buffer[], int *size) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
 
     if (reader->child == -1) {
@@ -1029,8 +1077,9 @@ gsi_bool gsXmlReadChildAsBase64Binary(SoapReader *reader, const char *name, void
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsInt(SoapReader *reader, const char *name, int *value) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsInt(GSXmlStreamReader stream, const char *name, int *value) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
 
     if (reader->child == -1) {
@@ -1053,8 +1102,9 @@ gsi_bool gsXmlReadChildAsInt(SoapReader *reader, const char *name, int *value) {
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsInt64(SoapReader *reader, const char *name, gsi_i64 *value) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader stream, const char *name, gsi_i64 *value) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
 
     if (reader->child == -1) {
@@ -1077,8 +1127,9 @@ gsi_bool gsXmlReadChildAsInt64(SoapReader *reader, const char *name, gsi_i64 *va
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsDateTimeElement(SoapReader *reader, const char *name, int *value) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char *name, int *value) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     GSTime time;
     int i;
 
@@ -1107,8 +1158,9 @@ gsi_bool gsXmlReadChildAsDateTimeElement(SoapReader *reader, const char *name, i
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsFloat(SoapReader *reader, const char *name, float *value) {
-    XmlElement *element;
+gsi_bool gsXmlReadChildAsFloat(GSXmlStreamReader stream, const char *name, float *value) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int i;
 
     if (reader->child == -1) {
@@ -1132,7 +1184,7 @@ gsi_bool gsXmlReadChildAsFloat(SoapReader *reader, const char *name, float *valu
 }
 
 // Whether the name (with the namespace prefix that its last colon ends, if it has one) is the one of the element
-static gsi_bool gsiXmlUtilTagMatches(const char *name, const XmlElement *element) {
+static gsi_bool gsiXmlUtilTagMatches(const char *name, const GSIXmlElement *element) {
     int i;
     int nameLength;
     int compareLength;
@@ -1170,12 +1222,13 @@ static gsi_bool gsiXmlUtilTagMatches(const char *name, const XmlElement *element
     return gsi_false;
 }
 
-gsi_bool gsXmlReadChildAsLargeInt(SoapReader *reader, const char *name, BigNum *value) {
+gsi_bool gsXmlReadChildAsLargeInt(GSXmlStreamReader stream, const char *name, gsLargeInt_t *value) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     int readSize;
 
     readSize = 0;
-    memset(value, 0, sizeof(BigNum));
-    if (!gsXmlReadChildAsHexBinary(reader, name, &value->data[0], 0x200, &readSize)) {
+    memset(value, 0, sizeof(gsLargeInt_t));
+    if (!gsXmlReadChildAsHexBinary(reader, name, (gsi_u8 *)value->data, 0x200, &readSize)) {
         return gsi_false;
     }
     value->length = (gsi_u32)readSize / 4;
@@ -1188,8 +1241,9 @@ gsi_bool gsXmlReadChildAsLargeInt(SoapReader *reader, const char *name, BigNum *
     return gsi_true;
 }
 
-int gsXmlCountChildren(SoapReader *reader, const char *name) {
-    XmlElement *element;
+int gsXmlCountChildren(GSXmlStreamReader stream, const char *name) {
+    GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
+    GSIXmlElement *element;
     int count;
     int i;
 

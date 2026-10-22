@@ -10,7 +10,8 @@
 #include "nitro/os.h"
 
 // GT2's send, which the pool sends again through
-typedef int (*DWCTransportSendFunc)(GTI2Connection *connection, const void *message, int length, BOOL reliable);
+typedef GT2Result (*DWCTransportSendFunc)(GT2Connection connection, const GT2Byte *message, int length,
+                                          GT2Bool reliable);
 
 // The header that comes before the game's data and the match's own: its size and kind, and the marks "DT"
 typedef struct DWCTransportHeader {
@@ -25,7 +26,7 @@ void DWCs_ClearSendPool(void);
 BOOL DWCs_HasSendPoolSpace(void);
 BOOL DWCs_FlushSendPool(void);
 BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send);
-BOOL DWCs_AddToSendPool(GTI2Connection *connection, const void *data, int size);
+BOOL DWCs_AddToSendPool(GT2Connection connection, const void *data, int size);
 BOOL DWCi_IsSendableReliable(u8 aid, int type);
 void DWCs_EncodeHeader(DWCTransportHeader *header, int type, int size);
 u16 DWCs_DecodeHeader(const void *data);
@@ -36,17 +37,17 @@ DWCTransportConnection *DWCs_GetTransConnection(u8 aid);
 u8 DWCs_GetSendState(u8 aid);
 u8 DWCs_GetRecvState(u8 aid);
 void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable);
-void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, int size);
-void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, int size);
+void DWCs_HandleReliableMessage(GT2Connection connection, const void *data, int size);
+void DWCs_HandleUnreliableMessage(GT2Connection connection, const void *data, int size);
 void DWCs_RecvDataHeader(u8 aid, const void *data, int size);
 void DWCs_RecvDataBody(u8 aid, const void *data, int size);
 void DWCs_RecvSystemDataBody(u8 aid, const void *data, int size);
 int DWCs_GetOutgoingBufferFreeSize(u8 aid);
-void DWCs_ResetLastRecvTime(GTI2Connection *connection);
+void DWCs_ResetLastRecvTime(GT2Connection connection);
 
 // A copy of data that GT2 could not take yet, to be sent again to its connection
 typedef struct TransportSendNode {
-    GTI2Connection *connection;
+    GT2Connection connection;
     void *data;
     int size;
     struct TransportSendNode *next;
@@ -130,7 +131,7 @@ BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
     return node == NULL;
 }
 
-BOOL DWCs_AddToSendPool(GTI2Connection *connection, const void *data, int size) {
+BOOL DWCs_AddToSendPool(GT2Connection connection, const void *data, int size) {
     TransportSendNode **link = &sSendPool.head;
     TransportSendNode *node;
 
@@ -362,7 +363,7 @@ void DWCi_InitTransport(DWCTransportInfo *info) {
     DWCs_InitSendPool();
 }
 
-void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+void DWCi_RecvCallback(GT2Connection connection, GT2Byte *message, int length, GT2Bool reliable) {
     if (sTransport == NULL || message == NULL || length == 0) {
         return;
     }
@@ -374,7 +375,7 @@ void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int leng
     }
 }
 
-void DWCi_PingCallback(GTI2Connection *connection, int latency) {
+void DWCi_PingCallback(GT2Connection connection, int latency) {
     if (sTransport->pingCallback != NULL) {
         u8 aid = DWCi_GetConnectionAID(connection);
 
@@ -503,7 +504,7 @@ u8 DWCs_GetRecvState(u8 aid) {
 // Sends data to a machine; reliable data that GT2 can't take now goes to the pool, and is lost with an error when the
 // pool is full
 void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable) {
-    GTI2Connection *connection = DWCi_GetGT2Connection(aid);
+    GT2Connection connection = DWCi_GetGT2Connection(aid);
 
     if (reliable) {
         if (!DWCs_FlushSendPool() || func_ov011_0217d290(connection, data, size, reliable)) {
@@ -517,7 +518,7 @@ void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable) {
 }
 
 void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay) {
-    GTI2Connection *connection;
+    GT2Connection connection;
     BOOL viaServer = FALSE;
     TransportRelayHeader *header;
 
@@ -542,7 +543,7 @@ void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay
         header->aids = 1 << aid;
         MI_CpuCopy8(data, header + 1, size);
         size += sizeof(TransportRelayHeader);
-        func_ov011_0217d290(connection, header, size, FALSE);
+        func_ov011_0217d290(connection, (const GT2Byte *)header, size, FALSE);
         size = 0;
         if (header != NULL) {
             DWC_Free(4, header, size);
@@ -552,7 +553,7 @@ void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay
     }
 }
 
-void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, int size) {
+void DWCs_HandleReliableMessage(GT2Connection connection, const void *data, int size) {
     u8 aid = DWCi_GetConnectionAID(connection);
     u16 type;
 
@@ -587,7 +588,7 @@ void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, in
     }
 }
 
-void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, int size) {
+void DWCs_HandleUnreliableMessage(GT2Connection connection, const void *data, int size) {
     const u8 *bytes = data;
     u8 aid = DWCi_GetConnectionAID(connection);
     BOOL relayed = FALSE;
@@ -737,7 +738,7 @@ int DWCs_GetOutgoingBufferFreeSize(u8 aid) {
     return n;
 }
 
-void DWCs_ResetLastRecvTime(GTI2Connection *connection) {
+void DWCs_ResetLastRecvTime(GT2Connection connection) {
     u8 aid = DWCi_GetConnectionAID(connection);
 
     if (aid < 0x20 && aid != DWC_GetMyAID()) {

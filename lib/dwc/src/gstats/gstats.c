@@ -7,17 +7,17 @@
 // other functions and the data are the later SDK's
 
 // What a request is
-typedef enum StatsRequestType {
+typedef enum {
     rt_authcb,
     rt_datacb,
     rt_savecb,
     rt_profilecb,
-} StatsRequestType;
+} reqtype_t;
 
 // A request that waits for the server's answer: its type, the player's local id and profile, the persistent data's
 // type and index, and the callback with its argument
 typedef struct StatsServerRequest {
-    StatsRequestType reqtype;
+    reqtype_t reqtype;
     int localid;
     int profileid;
     int pdtype;
@@ -37,9 +37,9 @@ typedef void (*ProfileCallbackFn)(int localid, int profileid, int success, void 
 static void xcode_buf(char *buf, int len);
 static char *value_for_key(const char *s, const char *key);
 static char *value_for_key_safe(const char *s, const char *key);
-static gsi_bool SocketReadable(int s);
+static int SocketReadable(SOCKET s);
 static char *FindFinal(char *buff, int len);
-static int FindRequest(StatsRequestType reqtype, int localid, int profileid);
+static int FindRequest(reqtype_t reqtype, int localid, int profileid);
 static void ProcessPlayerAuth(const char *buf, int len);
 static void ProcessGetPid(const char *buf, int len);
 static void ProcessGetData(const char *buf, int len);
@@ -48,15 +48,15 @@ static void ProcessStatement(char *buff, int len);
 static int ProcessInBuffer(char *buff, int len);
 static void CallReqCallback(int reqindex, int success, gsi_u32 modified, char *data, int length);
 static void ClosePendingCallbacks(void);
-static int ServerOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index);
-static double ServerOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index);
-static char *ServerOpString(StatsGame *game, char *name, BucketFunc func, char *value, int index);
-static int TeamOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index);
-static double TeamOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index);
-static char *TeamOpString(StatsGame *game, char *name, BucketFunc func, char *value, int index);
-static int PlayerOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index);
-static double PlayerOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index);
-static char *PlayerOpString(StatsGame *game, char *name, BucketFunc func, char *value, int index);
+static int ServerOpInt(statsgame_t game, char *name, BucketFunc func, int value, int index);
+static double ServerOpFloat(statsgame_t game, char *name, BucketFunc func, double value, int index);
+static char *ServerOpString(statsgame_t game, char *name, BucketFunc func, char *value, int index);
+static int TeamOpInt(statsgame_t game, char *name, BucketFunc func, int value, int index);
+static double TeamOpFloat(statsgame_t game, char *name, BucketFunc func, double value, int index);
+static char *TeamOpString(statsgame_t game, char *name, BucketFunc func, char *value, int index);
+static int PlayerOpInt(statsgame_t game, char *name, BucketFunc func, int value, int index);
+static double PlayerOpFloat(statsgame_t game, char *name, BucketFunc func, double value, int index);
+static char *PlayerOpString(statsgame_t game, char *name, BucketFunc func, char *value, int index);
 
 // MWCC lays out a file's initialized data, which the zeroed variables of the .bss are part of, with a heap sort by size
 // of the reverse of the order of their definitions, so these are defined in an order that gives the ROM's layout.
@@ -68,7 +68,7 @@ char gcd_gamename[256] = "";
 static int connid = 0;
 char gcd_secret_key[256] = "";
 static int sUnused1 = 0;
-static StatsGame *g_statsgame = NULL;
+static statsgame_t g_statsgame = NULL;
 static int sock = -1;
 // The keys that the messages are scrambled with, "GameSpy3D" and "ProjectAphex", whose first letters the code sets,
 // so that the texts aren't in the ROM as they are
@@ -94,7 +94,7 @@ static int stats_initstate = 0;
 static int gameport = 0;
 // value_for_key's, which takes its two buffers in turn
 static int valueindex = 0;
-static DArray *serverreqs = NULL;
+static DArray serverreqs = NULL;
 static int sUnused2 = 0;
 char StatsServerHostname[64] = "gamestats.gs.nintendowifi.net";
 static int rcvmax = 0;
@@ -208,7 +208,7 @@ static char *value_for_key_safe(const char *s, const char *key) {
     return temp;
 }
 
-static gsi_bool SocketReadable(int s) {
+static int SocketReadable(SOCKET s) {
     return CanReceiveOnSocket(s);
 }
 
@@ -227,7 +227,7 @@ static char *FindFinal(char *buff, int len) {
 }
 
 // The index of a request in the list, or -1
-static int FindRequest(StatsRequestType reqtype, int localid, int profileid) {
+static int FindRequest(reqtype_t reqtype, int localid, int profileid) {
     int i;
     StatsServerRequest *req;
 
@@ -406,7 +406,7 @@ static void ClosePendingCallbacks(void) {
     serverreqs = NULL;
 }
 
-int GetTeamIndex(StatsGame *game, int tnum) {
+int GetTeamIndex(statsgame_t game, int tnum) {
     if (game == NULL) {
         game = g_statsgame;
     }
@@ -416,7 +416,7 @@ int GetTeamIndex(StatsGame *game, int tnum) {
     return *(int *)func_ov011_0217158c(game->teamnums, tnum);
 }
 
-int GetPlayerIndex(StatsGame *game, int pnum) {
+int GetPlayerIndex(statsgame_t game, int pnum) {
     if (game == NULL) {
         game = g_statsgame;
     }
@@ -440,63 +440,63 @@ int GetPlayerIndex(StatsGame *game, int pnum) {
         }                                                                                                              \
     }
 
-static int ServerOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index) {
+static int ServerOpInt(statsgame_t game, char *name, BucketFunc func, int value, int index) {
     int *ret;
 
     DO_FUNC(func, game, name, &value, bt_int, ret);
     return *ret;
 }
 
-static double ServerOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index) {
+static double ServerOpFloat(statsgame_t game, char *name, BucketFunc func, double value, int index) {
     double *ret;
 
     DO_FUNC(func, game, name, &value, bt_float, ret);
     return *ret;
 }
 
-static char *ServerOpString(StatsGame *game, char *name, BucketFunc func, char *value, int index) {
+static char *ServerOpString(statsgame_t game, char *name, BucketFunc func, char *value, int index) {
     char *ret;
 
     DO_FUNC(func, game, name, value, bt_string, ret);
     return ret;
 }
 
-static int TeamOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index) {
+static int TeamOpInt(statsgame_t game, char *name, BucketFunc func, int value, int index) {
     char fullname[64];
 
     OS_SPrintf(fullname, "%s_t%d", name, GetTeamIndex(game, index));
     return ServerOpInt(game, fullname, func, value, index);
 }
 
-static double TeamOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index) {
+static double TeamOpFloat(statsgame_t game, char *name, BucketFunc func, double value, int index) {
     char fullname[64];
 
     OS_SPrintf(fullname, "%s_t%d", name, GetTeamIndex(game, index));
     return ServerOpFloat(game, fullname, func, value, index);
 }
 
-static char *TeamOpString(StatsGame *game, char *name, BucketFunc func, char *value, int index) {
+static char *TeamOpString(statsgame_t game, char *name, BucketFunc func, char *value, int index) {
     char fullname[64];
 
     OS_SPrintf(fullname, "%s_t%d", name, GetTeamIndex(game, index));
     return ServerOpString(game, fullname, func, value, index);
 }
 
-static int PlayerOpInt(StatsGame *game, char *name, BucketFunc func, int value, int index) {
+static int PlayerOpInt(statsgame_t game, char *name, BucketFunc func, int value, int index) {
     char fullname[64];
 
     OS_SPrintf(fullname, "%s_%d", name, GetPlayerIndex(game, index));
     return ServerOpInt(game, fullname, func, value, index);
 }
 
-static double PlayerOpFloat(StatsGame *game, char *name, BucketFunc func, double value, int index) {
+static double PlayerOpFloat(statsgame_t game, char *name, BucketFunc func, double value, int index) {
     char fullname[64];
 
     OS_SPrintf(fullname, "%s_%d", name, GetPlayerIndex(game, index));
     return ServerOpFloat(game, fullname, func, value, index);
 }
 
-static char *PlayerOpString(StatsGame *game, char *name, BucketFunc func, char *value, int index) {
+static char *PlayerOpString(statsgame_t game, char *name, BucketFunc func, char *value, int index) {
     char fullname[64];
 
     OS_SPrintf(fullname, "%s_%d", name, GetPlayerIndex(game, index));

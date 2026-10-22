@@ -27,12 +27,15 @@ typedef struct B64StreamData {
     int encodingType;
 } B64StreamData;
 
+// A lookup of a host's address
+typedef struct GSIResolveHostnameInfo *GSIResolveHostnameHandle;
+
 gsi_i64 gsiStringToInt64(const char *text);
-int gsiInt64ToString(char *text, gsi_i64 value);
+void gsiInt64ToString(char text[33], gsi_i64 value);
 // Looks up a host, at once: 0 with a lookup that gsiGetResolvedIP reads (and frees), or -1; and frees a lookup
-int gsiStartResolvingHostname(const char *host, void **lookup);
-void gsiCancelResolvingHostname(void *lookup);
-int gsiGetResolvedIP(void *lookup);
+int gsiStartResolvingHostname(const char *host, GSIResolveHostnameHandle *lookup);
+void gsiCancelResolvingHostname(GSIResolveHostnameHandle lookup);
+unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle lookup);
 // A copy of a text that it allocates, or NULL; and a text made lower case in place, which it returns
 char *goastrdup(const char *text);
 char *_strlwr(char *text);
@@ -40,15 +43,15 @@ char *_strlwr(char *text);
 void SocketStartUp(void);
 void SocketShutDown(void);
 // The clock in milliseconds and in microseconds, and a sleep
-gsi_u32 current_time(void);
-gsi_u32 current_time_hires(void);
-void msleep(gsi_u32 milliseconds);
+gsi_time current_time(void);
+gsi_time current_time_hires(void);
+void msleep(gsi_time milliseconds);
 // The date of some seconds from 1970 (in a buffer that the next call overwrites, NULL before 1970), and the seconds
 // of a date, which it also corrects (-1 for a year before 1969 or after 2039)
 GSTime *gsiSecondsToDate(const int *seconds);
 int gsiDateToSeconds(GSTime *date);
 // Seeds the generator, and gives a number from low up to (not with) high
-void Util_RandSeed(gsi_u32 seed);
+void Util_RandSeed(unsigned long seed);
 int Util_RandInt(int low, int high);
 // Decodes a base 64 text of a length, writing the length of the bytes unless that is NULL; encodes bytes as a text
 // that it ends; the length of the bytes of a text; and the encoding as a stream, four digits at a time, which gives

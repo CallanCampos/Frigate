@@ -2,13 +2,13 @@
 
 // Posting a request's message to the storage server, whose URL is made once from the game's name.
 
-static void Sake_PostMessage(SakeRequest *request);
+static void Sake_PostMessage(SAKERequest request);
 
 // The URL of the storage server, which the Wi-Fi library sets up (in gdb.c) once it knows the server it uses
 char gSakeStorageUrl[128];
 
-static void Sake_PostMessage(SakeRequest *request) {
-    GsHttpRequest *http;
+static void Sake_PostMessage(SAKERequest request) {
+    GSSoapTask *http;
 
     if (gSakeStorageUrl[0] == '\0') {
         OS_SNPrintf(gSakeStorageUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
@@ -22,7 +22,7 @@ static void Sake_PostMessage(SakeRequest *request) {
     }
 }
 
-int Sake_Submit(SakeRequest *request, SakeRequestType *type) {
+SAKEStartRequestResult Sake_Submit(SAKERequest request, SAKEIRequestInfo *type) {
     int error;
 
     request->type = type;

@@ -12,9 +12,9 @@
 static int gpiProfilesTableHash(const void *element, int numBuckets);
 static int gpiProfilesTableCompare(const void *element1, const void *element2);
 static void gpiProfilesTableFree(void *element);
-static gsi_bool gpiCheckProfileForUser(GPConnection *connection, GPIProfile *profile, void *data);
+static GPIBool gpiCheckProfileForUser(GPConnection *connection, GPIProfile *profile, void *data);
 static int gpiProfileMapCallback(void *element, void *clientData);
-static gsi_bool gpiCheckForBuddy(GPConnection *connection, GPIProfile *profile, void *data);
+static GPIBool gpiCheckForBuddy(GPConnection *connection, GPIProfile *profile, void *data);
 
 // What gpiFindProfileByUser looks for, and where it puts what it found
 typedef struct GPIFindProfileByUserData {
@@ -27,7 +27,7 @@ typedef struct GPIFindProfileByUserData {
 // What gpiProfileMap calls for each element of the table
 typedef struct GPIProfileMapData {
     GPConnection *connection;
-    GPIProfileMapFunc func;
+    gpiProfileMapFunc func;
     void *data;
 } GPIProfileMapData;
 
@@ -79,7 +79,7 @@ static void gpiProfilesTableFree(void *element) {
     profile->peerSig = NULL;
 }
 
-gsi_bool gpiInitProfiles(GPConnection *connection) {
+GPIBool gpiInitProfiles(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
 
     iconnection->profileList.numBuddies = 0;
@@ -91,7 +91,7 @@ gsi_bool gpiInitProfiles(GPConnection *connection) {
 }
 
 // The server's "\npr\" answer to the making of a profile
-int gpiProcessNewProfile(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessNewProfile(GPConnection *connection, GPIOperation *operation, const char *input) {
     char buffer[16];
     int pid;
     GPICallback callback;
@@ -160,7 +160,7 @@ GPIProfile *gpiProfileListAdd(GPConnection *connection, int id) {
     return result;
 }
 
-gsi_bool gpiGetProfile(GPConnection *connection, int profileid, GPIProfile **profile) {
+GPIBool gpiGetProfile(GPConnection *connection, GPProfile profileid, GPIProfile **profile) {
     GPIConnection *iconnection = *connection;
     GPIProfile profileTemp;
     GPIProfile *pProfile;
@@ -177,7 +177,7 @@ gsi_bool gpiGetProfile(GPConnection *connection, int profileid, GPIProfile **pro
 }
 
 // The server's "\dpr\" answer to the deletion of the profile of the login
-int gpiProcessDeleteProfle(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessDeleteProfle(GPConnection *connection, GPIOperation *operation, const char *input) {
     GPIConnection *iconnection = *connection;
     GPICallback callback;
     GPDeleteProfileResponseArg *arg;
@@ -224,7 +224,7 @@ void gpiRemoveProfile(GPConnection *connection, GPIProfile *profile) {
     TableRemove(iconnection->profileList.profileTable, profile);
 }
 
-static gsi_bool gpiCheckProfileForUser(GPConnection *connection, GPIProfile *profile, void *data) {
+static GPIBool gpiCheckProfileForUser(GPConnection *connection, GPIProfile *profile, void *data) {
     GPIFindProfileByUserData *findData = data;
     GPIInfoCache *cache = profile->cache;
 
@@ -236,7 +236,8 @@ static gsi_bool gpiCheckProfileForUser(GPConnection *connection, GPIProfile *pro
     return gsi_true;
 }
 
-int gpiFindProfileByUser(GPConnection *connection, const char *nick, const char *email, GPIProfile **profile) {
+GPResult gpiFindProfileByUser(GPConnection *connection, char nick[GP_NICK_LEN], char email[GP_EMAIL_LEN],
+                              GPIProfile **profile) {
     GPIFindProfileByUserData data;
 
     data.nick = nick;
@@ -256,7 +257,7 @@ static int gpiProfileMapCallback(void *element, void *clientData) {
     return data->func(data->connection, element, data->data);
 }
 
-gsi_bool gpiProfileMap(GPConnection *connection, GPIProfileMapFunc func, void *data) {
+GPIBool gpiProfileMap(GPConnection *connection, gpiProfileMapFunc func, void *data) {
     GPIConnection *iconnection = *connection;
     GPIProfileMapData mapData;
 
@@ -269,7 +270,7 @@ gsi_bool gpiProfileMap(GPConnection *connection, GPIProfileMapFunc func, void *d
     return gsi_false;
 }
 
-static gsi_bool gpiCheckForBuddy(GPConnection *connection, GPIProfile *profile, void *data) {
+static GPIBool gpiCheckForBuddy(GPConnection *connection, GPIProfile *profile, void *data) {
     GPIFindBuddyData *findData = data;
 
     if (profile->buddyStatus != NULL && findData->buddyIndex == profile->buddyStatus->buddyIndex) {
@@ -315,7 +316,7 @@ void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo *buddyStatusInfo) {
 }
 
 // Whether nothing keeps a profile in the table any more
-gsi_bool gpiCanFreeProfile(GPIProfile *profile) {
+GPIBool gpiCanFreeProfile(GPIProfile *profile) {
     if (profile != NULL && profile->cache == NULL && profile->buddyStatus == NULL && profile->buddyStatusInfo == NULL &&
         profile->peerSig == NULL && profile->authSig == NULL && !profile->blocked) {
         return gsi_true;
@@ -324,7 +325,7 @@ gsi_bool gpiCanFreeProfile(GPIProfile *profile) {
 }
 
 // The list is "\blk\<count>\list\<id>,<id>,...", whose first id is read in place
-int gpiProcessRecvBlockedList(GPConnection *connection, const char *input) {
+GPResult gpiProcessRecvBlockedList(GPConnection *connection, const char *input) {
     int i = 0;
     int index = 0;
     GPIConnection *iconnection = *connection;

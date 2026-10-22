@@ -1405,7 +1405,7 @@ BOOL DWCi_GetLoginTicket(SakeLoginTicket *ticket) {
     if (!DWCi_CheckLogin()) {
         return FALSE;
     }
-    if (gpGetLoginTicket(sLogin->connection, (GPLoginTicket *)ticket) == 0) {
+    if (gpGetLoginTicket(sLogin->connection, ticket->data) == 0) {
         return TRUE;
     }
     return FALSE;

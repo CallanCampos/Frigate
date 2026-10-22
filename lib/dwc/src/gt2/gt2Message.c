@@ -3,6 +3,7 @@
 // <string.h> declares them first
 #include "dwc/ext.h"
 #include "dwc/gt2Auth.h"
+#include "dwc/gt2Buffer.h"
 #include "dwc/gt2Callback.h"
 #include "dwc/gt2Connection.h"
 #include "dwc/gt2Message.h"
@@ -10,55 +11,54 @@
 
 // GameSpy GT2's messages (gt2Message.c)
 
-static int gti2UShortFromBuffer(const gsi_u8 *buffer, int index);
-static void gti2UShortToBuffer(gsi_u8 *buffer, int index, gsi_u16 value);
+static int gti2UShortFromBuffer(const GT2Byte *buffer, int index);
+static void gti2UShortToBuffer(GT2Byte *buffer, int index, unsigned short value);
 static gsi_i16 gti2SNDiff(int a, int b);
-static gsi_bool gti2ConnectionError(GTI2Connection *connection, int result, int reason);
-static gsi_bool gti2ConnectionCommunicationError(GTI2Connection *connection);
-static gsi_bool gti2ConnectionMemoryError(GTI2Connection *connection);
-static gsi_bool gti2HandleESN(GTI2Connection *connection, int ack);
-static gsi_bool gti2HandleAppUnreliable(GTI2Connection *connection, const void *data, int length);
-static gsi_bool gti2HandleAppReliable(GTI2Connection *connection, const void *data, int length);
-static gsi_bool gti2HandleClientChallenge(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2HandleServerChallenge(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2HandleClientResponse(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2HandleAccept(GTI2Connection *connection);
-static gsi_bool gti2HandleReject(GTI2Connection *connection, const void *data, int length);
-static gsi_bool gti2HandleClose(GTI2Connection *connection);
-static gsi_bool gti2DeliverReliableMessage(GTI2Connection *connection, int type, const gsi_u8 *data, int length);
+static GT2Bool gti2ConnectionError(GT2Connection connection, GT2Result result, GT2CloseReason reason);
+static GT2Bool gti2ConnectionCommunicationError(GT2Connection connection);
+static GT2Bool gti2ConnectionMemoryError(GT2Connection connection);
+static GT2Bool gti2HandleESN(GT2Connection connection, int ack);
+static GT2Bool gti2HandleAppUnreliable(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandleAppReliable(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandleClientChallenge(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandleServerChallenge(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandleClientResponse(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandleAccept(GT2Connection connection);
+static GT2Bool gti2HandleReject(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandleClose(GT2Connection connection);
+static GT2Bool gti2DeliverReliableMessage(GT2Connection connection, GTI2MessageType type, GT2Byte *data, int length);
 static int gti2IncomingBufferMessageCompare(const void *a, const void *b);
-static gsi_bool gti2BufferIncomingMessage(GTI2Connection *connection, int type, int sequence, const gsi_u8 *data,
-                                          int length, gsi_bool *dropped);
-static void gti2RemoveHoldMessage(GTI2Connection *connection, GTI2IncomingMessage *message, int index);
-static gsi_bool gti2DeliverHoldMessages(GTI2Connection *connection);
-static void gti2SetPendingAck(GTI2Connection *connection);
-static gsi_bool gti2HandleReliableMessage(GTI2Connection *connection, int type, gsi_u8 *data, int length);
-static gsi_bool gti2HandleAck(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2HandleNack(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2HandlePing(GTI2Connection *connection, gsi_u8 *data, int length);
-static gsi_bool gti2HandlePong(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2HandleClosed(GTI2Connection *connection);
-static gsi_bool gti2HandleUnreliableMessage(GTI2Connection *connection, int type, gsi_u8 *data, int length);
-static gsi_bool gti2HandleMessage(GTI2Socket *socket, gsi_u8 *data, int length, gsi_u32 ip, gsi_u16 port);
-static gsi_bool gti2StoreOutgoingReliableMessageInfo(GTI2Connection *connection, gsi_u16 sequence, int length);
-static gsi_bool gti2BeginReliableMessage(GTI2Connection *connection, int type, int size, gsi_bool *dropped);
-static gsi_bool gti2EndReliableMessage(GTI2Connection *connection);
-static gsi_bool gti2SendAppReliable(GTI2Connection *connection, const void *data, int length);
-static gsi_bool gti2SendServerChallenge(GTI2Connection *connection, const gsi_u8 *response, const gsi_u8 *challenge);
-static gsi_bool gti2SendClientResponse(GTI2Connection *connection, const gsi_u8 *response, const void *message,
-                                       int length);
-static gsi_bool gti2SendAppUnreliable(GTI2Connection *connection, const gsi_u8 *data, int length);
-static gsi_bool gti2SendNack(GTI2Connection *connection, gsi_u16 first, gsi_u16 last);
-static gsi_bool gti2SendPong(GTI2Connection *connection, gsi_u8 *data, int length);
-static gsi_bool gti2SendClosedOnSocket(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port);
+static GT2Bool gti2BufferIncomingMessage(GT2Connection connection, GTI2MessageType type, int sequence, GT2Byte *data,
+                                         int length, GT2Bool *dropped);
+static void gti2RemoveHoldMessage(GT2Connection connection, GTI2IncomingBufferMessage *message, int index);
+static GT2Bool gti2DeliverHoldMessages(GT2Connection connection);
+static void gti2SetPendingAck(GT2Connection connection);
+static GT2Bool gti2HandleReliableMessage(GT2Connection connection, GTI2MessageType type, GT2Byte *data, int length);
+static GT2Bool gti2HandleAck(GT2Connection connection, const GT2Byte *data, int length);
+static GT2Bool gti2HandleNack(GT2Connection connection, const GT2Byte *data, int length);
+static GT2Bool gti2HandlePing(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2HandlePong(GT2Connection connection, const GT2Byte *data, int length);
+static GT2Bool gti2HandleClosed(GT2Connection connection);
+static GT2Bool gti2HandleUnreliableMessage(GT2Connection connection, GTI2MessageType type, GT2Byte *data, int length);
+static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte *data, int length, unsigned int ip, unsigned short port);
+static GT2Bool gti2StoreOutgoingReliableMessageInfo(GT2Connection connection, unsigned short sequence, int length);
+static GT2Bool gti2BeginReliableMessage(GT2Connection connection, GTI2MessageType type, int size, GT2Bool *dropped);
+static GT2Bool gti2EndReliableMessage(GT2Connection connection);
+static GT2Bool gti2SendAppReliable(GT2Connection connection, const GT2Byte *data, int length);
+static GT2Bool gti2SendServerChallenge(GT2Connection connection, const char response[], const char challenge[]);
+static GT2Bool gti2SendClientResponse(GT2Connection connection, const char response[], const char *message, int length);
+static GT2Bool gti2SendAppUnreliable(GT2Connection connection, const GT2Byte *data, int length);
+static GT2Bool gti2SendNack(GT2Connection connection, unsigned short first, unsigned short last);
+static GT2Bool gti2SendPong(GT2Connection connection, GT2Byte *data, int length);
+static GT2Bool gti2SendClosedOnSocket(GT2Socket socket, unsigned int ip, unsigned short port);
 
 // Reads the big-endian gsi_u16 at an index
-static int gti2UShortFromBuffer(const gsi_u8 *buffer, int index) {
+static int gti2UShortFromBuffer(const GT2Byte *buffer, int index) {
     return (gsi_u16)((buffer[index] << 8) & 0xFF00) | buffer[index + 1];
 }
 
 // Writes a big-endian gsi_u16 at an index
-static void gti2UShortToBuffer(gsi_u8 *buffer, int index, gsi_u16 value) {
+static void gti2UShortToBuffer(GT2Byte *buffer, int index, unsigned short value) {
     buffer[index] = value >> 8;
     buffer[index + 1] = value;
 }
@@ -70,7 +70,7 @@ static gsi_i16 gti2SNDiff(int a, int b) {
 
 // Closes a connection after a message that ends it: a connecting one ends its attempt with the result, an open
 // one closes with the reason
-static gsi_bool gti2ConnectionError(GTI2Connection *connection, int result, int reason) {
+static GT2Bool gti2ConnectionError(GT2Connection connection, GT2Result result, GT2CloseReason reason) {
     int state = connection->state;
 
     if (state < 5) {
@@ -95,12 +95,12 @@ static gsi_bool gti2ConnectionError(GTI2Connection *connection, int result, int 
 }
 
 // Closes a connection after a message that breaks the protocol
-static gsi_bool gti2ConnectionCommunicationError(GTI2Connection *connection) {
+static GT2Bool gti2ConnectionCommunicationError(GT2Connection connection) {
     return gti2ConnectionError(connection, 7, 2);
 }
 
 // Closes a connection that ran out of memory, telling the peer
-static gsi_bool gti2ConnectionMemoryError(GTI2Connection *connection) {
+static GT2Bool gti2ConnectionMemoryError(GT2Connection connection) {
     if (gti2SendClosed(connection)) {
         return gti2ConnectionError(connection, 1, 4);
     }
@@ -108,7 +108,7 @@ static gsi_bool gti2ConnectionMemoryError(GTI2Connection *connection) {
 }
 
 // Drops the reliable messages that the peer's expected serial number acks
-static gsi_bool gti2HandleESN(GTI2Connection *connection, int ack) {
+static GT2Bool gti2HandleESN(GT2Connection connection, int ack) {
     int count = func_ov011_02171588(connection->outgoingMessages);
     int i;
     int base;
@@ -117,7 +117,7 @@ static gsi_bool gti2HandleESN(GTI2Connection *connection, int ack) {
         return gsi_true;
     }
     for (i = 0; i < count; i++) {
-        GTI2OutgoingMessage *sent = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *sent = func_ov011_0217158c(connection->outgoingMessages, i);
 
         if (gti2SNDiff(sent->serialNumber, ack) >= 0) {
             break;
@@ -134,9 +134,9 @@ static gsi_bool gti2HandleESN(GTI2Connection *connection, int ack) {
         connection->outgoing.length = 0;
         return gsi_true;
     }
-    base = ((GTI2OutgoingMessage *)func_ov011_0217158c(connection->outgoingMessages, 0))->offset;
+    base = ((GTI2OutgoingBufferMessage *)func_ov011_0217158c(connection->outgoingMessages, 0))->offset;
     for (i = 0; i < count; i++) {
-        GTI2OutgoingMessage *sent = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *sent = func_ov011_0217158c(connection->outgoingMessages, i);
 
         sent->offset -= base;
     }
@@ -145,7 +145,7 @@ static gsi_bool gti2HandleESN(GTI2Connection *connection, int ack) {
 }
 
 // Delivers the app's unreliable message, through the receive filters if there are any
-static gsi_bool gti2HandleAppUnreliable(GTI2Connection *connection, const void *data, int length) {
+static GT2Bool gti2HandleAppUnreliable(GT2Connection connection, GT2Byte *data, int length) {
     if (connection->state != 5 && connection->state != 6) {
         return gsi_true;
     }
@@ -156,7 +156,7 @@ static gsi_bool gti2HandleAppUnreliable(GTI2Connection *connection, const void *
 }
 
 // Delivers the app's reliable message
-static gsi_bool gti2HandleAppReliable(GTI2Connection *connection, const void *data, int length) {
+static GT2Bool gti2HandleAppReliable(GT2Connection connection, GT2Byte *data, int length) {
     if (connection->state != 5 && connection->state != 6) {
         if (!gti2ConnectionCommunicationError(connection)) {
             return gsi_false;
@@ -173,7 +173,7 @@ static gsi_bool gti2HandleAppReliable(GTI2Connection *connection, const void *da
 }
 
 // The client's challenge, on the side that listens: answers with the server's challenge
-static gsi_bool gti2HandleClientChallenge(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2HandleClientChallenge(GT2Connection connection, GT2Byte *data, int length) {
     gsi_u8 response[32];
     gsi_u8 challenge[32];
 
@@ -200,7 +200,7 @@ static gsi_bool gti2HandleClientChallenge(GTI2Connection *connection, const gsi_
 }
 
 // Checks the response to this side's challenge and answers the server's
-static gsi_bool gti2HandleServerChallenge(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2HandleServerChallenge(GT2Connection connection, GT2Byte *data, int length) {
     gsi_u8 response[32];
 
     if (connection->state != 0) {
@@ -234,7 +234,7 @@ static gsi_bool gti2HandleServerChallenge(GTI2Connection *connection, const gsi_
 }
 
 // Checks the response and gives the app the attempt
-static gsi_bool gti2HandleClientResponse(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2HandleClientResponse(GT2Connection connection, GT2Byte *data, int length) {
     if (connection->state != 3) {
         if (gti2ConnectionCommunicationError(connection)) {
             return gsi_true;
@@ -269,7 +269,7 @@ static gsi_bool gti2HandleClientResponse(GTI2Connection *connection, const gsi_u
 }
 
 // The server accepted the connection
-static gsi_bool gti2HandleAccept(GTI2Connection *connection) {
+static GT2Bool gti2HandleAccept(GT2Connection connection) {
     if (connection->state != 1) {
         if (gti2ConnectionCommunicationError(connection)) {
             return gsi_true;
@@ -281,7 +281,7 @@ static gsi_bool gti2HandleAccept(GTI2Connection *connection) {
 }
 
 // The server rejected the connection, with its message
-static gsi_bool gti2HandleReject(GTI2Connection *connection, const void *data, int length) {
+static GT2Bool gti2HandleReject(GT2Connection connection, GT2Byte *data, int length) {
     if (connection->state != 1) {
         if (gti2ConnectionCommunicationError(connection)) {
             return gsi_true;
@@ -299,7 +299,7 @@ static gsi_bool gti2HandleReject(GTI2Connection *connection, const void *data, i
 }
 
 // The peer closed the connection
-static gsi_bool gti2HandleClose(GTI2Connection *connection) {
+static GT2Bool gti2HandleClose(GT2Connection connection) {
     int reason;
 
     if (!gti2SendClosed(connection)) {
@@ -316,7 +316,7 @@ static gsi_bool gti2HandleClose(GTI2Connection *connection) {
 }
 
 // Delivers a reliable message, by its type
-static gsi_bool gti2DeliverReliableMessage(GTI2Connection *connection, int type, const gsi_u8 *data, int length) {
+static GT2Bool gti2DeliverReliableMessage(GT2Connection connection, GTI2MessageType type, GT2Byte *data, int length) {
     connection->expectedSerialNumber++;
     if (type == 0) {
         if (!gti2HandleAppReliable(connection, data, length)) {
@@ -352,22 +352,22 @@ static gsi_bool gti2DeliverReliableMessage(GTI2Connection *connection, int type,
 
 // Compares two held messages by serial number
 static int gti2IncomingBufferMessageCompare(const void *a, const void *b) {
-    const GTI2IncomingMessage *messageA = a;
-    const GTI2IncomingMessage *messageB = b;
+    const GTI2IncomingBufferMessage *messageA = a;
+    const GTI2IncomingBufferMessage *messageB = b;
 
     return gti2SNDiff(messageA->serialNumber, messageB->serialNumber);
 }
 
 // Keeps a reliable message that arrived ahead of its turn, and nacks the ones it
 // skipped; dropped when there is no room
-static gsi_bool gti2BufferIncomingMessage(GTI2Connection *connection, int type, int sequence, const gsi_u8 *data,
-                                          int length, gsi_bool *dropped) {
-    GTI2IncomingMessage message;
+static GT2Bool gti2BufferIncomingMessage(GT2Connection connection, GTI2MessageType type, int sequence, GT2Byte *data,
+                                         int length, GT2Bool *dropped) {
+    GTI2IncomingBufferMessage message;
     int count = func_ov011_02171588(connection->incomingMessages);
     int i;
 
     for (i = 0; i < count; i++) {
-        GTI2IncomingMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
+        GTI2IncomingBufferMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
 
         if (pending->serialNumber == sequence) {
             *dropped = gsi_false;
@@ -396,10 +396,10 @@ static gsi_bool gti2BufferIncomingMessage(GTI2Connection *connection, int type, 
             return gsi_false;
         }
     } else {
-        GTI2IncomingMessage *inserted = func_ov011_0217158c(connection->incomingMessages, count);
+        GTI2IncomingBufferMessage *inserted = func_ov011_0217158c(connection->incomingMessages, count);
 
         if (inserted->serialNumber == sequence) {
-            GTI2IncomingMessage *previous = func_ov011_0217158c(connection->incomingMessages, count - 1);
+            GTI2IncomingBufferMessage *previous = func_ov011_0217158c(connection->incomingMessages, count - 1);
 
             if ((gsi_u16)gti2SNDiff(sequence, previous->serialNumber) > 1) {
                 if (!gti2SendNack(connection, previous->serialNumber + 1, sequence - 1)) {
@@ -413,7 +413,7 @@ static gsi_bool gti2BufferIncomingMessage(GTI2Connection *connection, int type, 
 }
 
 // Removes a buffered incoming message from the buffer
-static void gti2RemoveHoldMessage(GTI2Connection *connection, GTI2IncomingMessage *message, int index) {
+static void gti2RemoveHoldMessage(GT2Connection connection, GTI2IncomingBufferMessage *message, int index) {
     int offset = message->offset;
     int length = message->length;
     int count;
@@ -423,7 +423,7 @@ static void gti2RemoveHoldMessage(GTI2Connection *connection, GTI2IncomingMessag
     func_ov011_02171668(connection->incomingMessages, index);
     count = func_ov011_02171588(connection->incomingMessages);
     for (i = 0; i < count; i++) {
-        GTI2IncomingMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
+        GTI2IncomingBufferMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
 
         if (pending->offset > offset) {
             pending->offset -= length;
@@ -436,12 +436,12 @@ static void gti2RemoveHoldMessage(GTI2Connection *connection, GTI2IncomingMessag
 }
 
 // Delivers the buffered messages whose turn has come
-static gsi_bool gti2DeliverHoldMessages(GTI2Connection *connection) {
+static GT2Bool gti2DeliverHoldMessages(GT2Connection connection) {
     int i;
 
 restart:
     for (i = func_ov011_02171588(connection->incomingMessages) - 1; i >= 0; i--) {
-        GTI2IncomingMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
+        GTI2IncomingBufferMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
 
         if (pending->serialNumber == connection->expectedSerialNumber) {
             if (!gti2DeliverReliableMessage(connection, pending->type, connection->incoming.data + pending->offset,
@@ -456,7 +456,7 @@ restart:
 }
 
 // Starts the wait before an ack
-static void gti2SetPendingAck(GTI2Connection *connection) {
+static void gti2SetPendingAck(GT2Connection connection) {
     if (!connection->pendingAck) {
         connection->pendingAck = gsi_true;
         connection->pendingAckTime = current_time();
@@ -464,7 +464,7 @@ static void gti2SetPendingAck(GTI2Connection *connection) {
 }
 
 // Delivers it in its turn, keeps it for later or drops a repeat
-static gsi_bool gti2HandleReliableMessage(GTI2Connection *connection, int type, gsi_u8 *data, int length) {
+static GT2Bool gti2HandleReliableMessage(GT2Connection connection, GTI2MessageType type, GT2Byte *data, int length) {
     int headerSize = connection->socket->protocolOffset + 7;
     int sequence;
     int ack;
@@ -478,7 +478,7 @@ static gsi_bool gti2HandleReliableMessage(GTI2Connection *connection, int type, 
     }
     sequence = gti2UShortFromBuffer(data + connection->socket->protocolOffset, 3);
     ack = gti2UShortFromBuffer(data + connection->socket->protocolOffset, 5);
-    if (connection->socket->protocol == 2 && type == 0) {
+    if (connection->socket->protocol == GTI2VdpProtocol && type == 0) {
         data[connection->socket->protocolOffset + 5] = data[0];
         data[connection->socket->protocolOffset + 6] = data[1];
         data += headerSize - connection->socket->protocolOffset;
@@ -516,7 +516,7 @@ static gsi_bool gti2HandleReliableMessage(GTI2Connection *connection, int type, 
 }
 
 // An ack
-static gsi_bool gti2HandleAck(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2HandleAck(GT2Connection connection, const GT2Byte *data, int length) {
     if (length != 2) {
         if (gti2ConnectionCommunicationError(connection)) {
             return gsi_true;
@@ -527,7 +527,7 @@ static gsi_bool gti2HandleAck(GTI2Connection *connection, const gsi_u8 *data, in
 }
 
 // Resends the messages from the first serial number to the last
-static gsi_bool gti2HandleNack(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2HandleNack(GT2Connection connection, const GT2Byte *data, int length) {
     int first = gti2UShortFromBuffer(data, 0);
     int last;
     int count;
@@ -542,7 +542,7 @@ static gsi_bool gti2HandleNack(GTI2Connection *connection, const gsi_u8 *data, i
     }
     count = func_ov011_02171588(connection->outgoingMessages);
     for (i = 0; i < count; i++) {
-        GTI2OutgoingMessage *message = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *message = func_ov011_0217158c(connection->outgoingMessages, i);
 
         if (gti2SNDiff(message->serialNumber, first) >= 0 && gti2SNDiff(message->serialNumber, last) <= 0) {
             if (!gti2ResendMessage(connection, message)) {
@@ -554,17 +554,17 @@ static gsi_bool gti2HandleNack(GTI2Connection *connection, const gsi_u8 *data, i
 }
 
 // A ping, which is answered with a pong
-static gsi_bool gti2HandlePing(GTI2Connection *connection, gsi_u8 *data, int length) {
+static GT2Bool gti2HandlePing(GT2Connection connection, GT2Byte *data, int length) {
     return gti2SendPong(connection, data, length);
 }
 
 // A pong, with the time its ping was sent
-static gsi_bool gti2HandlePong(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2HandlePong(GT2Connection connection, const GT2Byte *data, int length) {
     gsi_u32 sendTime;
     const gsi_u8 *src;
     gsi_u8 *dest;
 
-    if (connection->callbacks.onPing == NULL) {
+    if (connection->callbacks.ping == NULL) {
         return gsi_true;
     }
     if (length != 8) {
@@ -586,7 +586,7 @@ static gsi_bool gti2HandlePong(GTI2Connection *connection, const gsi_u8 *data, i
 }
 
 // The peer's note that the connection is closed
-static gsi_bool gti2HandleClosed(GTI2Connection *connection) {
+static GT2Bool gti2HandleClosed(GT2Connection connection) {
     int reason;
 
     if (connection->state == 7) {
@@ -603,7 +603,7 @@ static gsi_bool gti2HandleClosed(GTI2Connection *connection) {
 }
 
 // Handles an unreliable message, by its type
-static gsi_bool gti2HandleUnreliableMessage(GTI2Connection *connection, int type, gsi_u8 *data, int length) {
+static GT2Bool gti2HandleUnreliableMessage(GT2Connection connection, GTI2MessageType type, GT2Byte *data, int length) {
     int offset = connection->socket->protocolOffset + 3;
     int rest = length - offset;
 
@@ -632,10 +632,10 @@ static gsi_bool gti2HandleUnreliableMessage(GTI2Connection *connection, int type
 }
 
 // A datagram from an address, GT2's or the app's
-static gsi_bool gti2HandleMessage(GTI2Socket *socket, gsi_u8 *data, int length, gsi_u32 ip, gsi_u16 port) {
+static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte *data, int length, unsigned int ip, unsigned short port) {
     int payloadLength = length - socket->protocolOffset;
     gsi_u8 *payload = data + socket->protocolOffset;
-    GTI2Connection *connection = gti2SocketFindConnection(socket, ip, port);
+    GT2Connection connection = gti2SocketFindConnection(socket, ip, port);
     gsi_bool handled;
     gsi_bool hasMagic;
     int result;
@@ -722,8 +722,8 @@ static gsi_bool gti2HandleMessage(GTI2Socket *socket, gsi_u8 *data, int length, 
     return gsi_false;
 }
 
-gsi_bool gti2HandleConnectionReset(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port) {
-    GTI2Connection *connection = gti2SocketFindConnection(socket, ip, port);
+GT2Bool gti2HandleConnectionReset(GT2Socket socket, unsigned int ip, unsigned short port) {
+    GT2Connection connection = gti2SocketFindConnection(socket, ip, port);
 
     if (socket->onReceiveDump != NULL) {
         if (!gti2DumpCallback(socket, connection, ip, port, gsi_true, NULL, 0, gsi_false)) {
@@ -748,8 +748,8 @@ gsi_bool gti2HandleConnectionReset(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port)
     return gsi_true;
 }
 
-gsi_bool gti2HandleHostUnreachable(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, gsi_bool send) {
-    GTI2Connection *connection = gti2SocketFindConnection(socket, ip, port);
+GT2Bool gti2HandleHostUnreachable(GT2Socket socket, unsigned int ip, unsigned short port, GT2Bool send) {
+    GT2Connection connection = gti2SocketFindConnection(socket, ip, port);
 
     if (socket->onReceiveDump != NULL) {
         if (!gti2DumpCallback(socket, connection, ip, port, gsi_true, NULL, 0, send)) {
@@ -762,7 +762,7 @@ gsi_bool gti2HandleHostUnreachable(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port,
     return gti2ConnectionError(connection, 6, 1) != 0;
 }
 
-gsi_bool gti2ReceiveMessages(GTI2Socket *socket) {
+GT2Bool gti2ReceiveMessages(GT2Socket socket) {
     gsi_u8 buffer[1500];
     SocAddrIn address;
     int addressSize;
@@ -772,7 +772,7 @@ gsi_bool gti2ReceiveMessages(GTI2Socket *socket) {
     if (CanReceiveOnSocket(socket->handle) != 0) {
         do {
             addressSize = sizeof(address);
-            length = recvfrom(socket->handle, buffer, sizeof(buffer), 0, &address, &addressSize);
+            length = recvfrom(socket->handle, buffer, sizeof(buffer), 0, (SOCKADDR *)&address, &addressSize);
             if (length == -1) {
                 error = GOAGetLastError(socket->handle);
                 if (error == -15) {
@@ -798,8 +798,8 @@ gsi_bool gti2ReceiveMessages(GTI2Socket *socket) {
 }
 
 // Keeps a reliable message that was sent, for its ack
-static gsi_bool gti2StoreOutgoingReliableMessageInfo(GTI2Connection *connection, gsi_u16 sequence, int length) {
-    GTI2OutgoingMessage message = { 0, 0, 0, 0 };
+static GT2Bool gti2StoreOutgoingReliableMessageInfo(GT2Connection connection, unsigned short sequence, int length) {
+    GTI2OutgoingBufferMessage message = { 0, 0, 0, 0 };
     int count;
 
     message.offset = connection->outgoing.length;
@@ -812,7 +812,7 @@ static gsi_bool gti2StoreOutgoingReliableMessageInfo(GTI2Connection *connection,
 }
 
 // The header of a reliable message in the outgoing buffer, dropped when there is no room
-static gsi_bool gti2BeginReliableMessage(GTI2Connection *connection, int type, int size, gsi_bool *dropped) {
+static GT2Bool gti2BeginReliableMessage(GT2Connection connection, GTI2MessageType type, int size, GT2Bool *dropped) {
     gsi_u16 payloadLength = size - connection->socket->protocolOffset;
 
     if (gti2GetBufferFreeSpace(&connection->outgoing) < size) {
@@ -829,8 +829,8 @@ static gsi_bool gti2BeginReliableMessage(GTI2Connection *connection, int type, i
         *dropped = gsi_true;
         return gsi_true;
     }
-    if (connection->socket->protocol == 2) {
-        gti2BufferWriteData(&connection->outgoing, &payloadLength, connection->socket->protocolOffset);
+    if (connection->socket->protocol == GTI2VdpProtocol) {
+        gti2BufferWriteData(&connection->outgoing, (const GT2Byte *)&payloadLength, connection->socket->protocolOffset);
     }
     gti2BufferWriteData(&connection->outgoing, "\xfe\xfe", 2);
     gti2BufferWriteByte(&connection->outgoing, type);
@@ -841,8 +841,8 @@ static gsi_bool gti2BeginReliableMessage(GTI2Connection *connection, int type, i
 }
 
 // Sends the reliable message just built
-static gsi_bool gti2EndReliableMessage(GTI2Connection *connection) {
-    GTI2OutgoingMessage *last =
+static GT2Bool gti2EndReliableMessage(GT2Connection connection) {
+    GTI2OutgoingBufferMessage *last =
         func_ov011_0217158c(connection->outgoingMessages, func_ov011_02171588(connection->outgoingMessages) - 1);
 
     if (!gti2ConnectionSendData(connection, connection->outgoing.data + last->offset, last->length)) {
@@ -853,7 +853,7 @@ static gsi_bool gti2EndReliableMessage(GTI2Connection *connection) {
 }
 
 // Sends the app's reliable message
-static gsi_bool gti2SendAppReliable(GTI2Connection *connection, const void *data, int length) {
+static GT2Bool gti2SendAppReliable(GT2Connection connection, const GT2Byte *data, int length) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 0, length + 7, &dropped)) {
@@ -866,7 +866,7 @@ static gsi_bool gti2SendAppReliable(GTI2Connection *connection, const void *data
     return gti2EndReliableMessage(connection) != 0;
 }
 
-gsi_bool gti2SendClientChallenge(GTI2Connection *connection, const gsi_u8 *challenge) {
+GT2Bool gti2SendClientChallenge(GT2Connection connection, const char challenge[]) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 1, connection->socket->protocolOffset + 0x27, &dropped)) {
@@ -880,7 +880,7 @@ gsi_bool gti2SendClientChallenge(GTI2Connection *connection, const gsi_u8 *chall
 }
 
 // The server's challenge, with the response to the client's
-static gsi_bool gti2SendServerChallenge(GTI2Connection *connection, const gsi_u8 *response, const gsi_u8 *challenge) {
+static GT2Bool gti2SendServerChallenge(GT2Connection connection, const char response[], const char challenge[]) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 2, connection->socket->protocolOffset + 0x47, &dropped)) {
@@ -899,8 +899,8 @@ static gsi_bool gti2SendServerChallenge(GTI2Connection *connection, const gsi_u8
 }
 
 // The client's response, with the connect attempt's message
-static gsi_bool gti2SendClientResponse(GTI2Connection *connection, const gsi_u8 *response, const void *message,
-                                       int length) {
+static GT2Bool gti2SendClientResponse(GT2Connection connection, const char response[], const char *message,
+                                      int length) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 3, length + 0x27 + connection->socket->protocolOffset, &dropped)) {
@@ -917,7 +917,7 @@ static gsi_bool gti2SendClientResponse(GTI2Connection *connection, const gsi_u8 
     return gsi_false;
 }
 
-gsi_bool gti2SendAccept(GTI2Connection *connection) {
+GT2Bool gti2SendAccept(GT2Connection connection) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 4, connection->socket->protocolOffset + 7, &dropped)) {
@@ -932,7 +932,7 @@ gsi_bool gti2SendAccept(GTI2Connection *connection) {
     return gsi_false;
 }
 
-gsi_bool gti2SendReject(GTI2Connection *connection, const void *message, int length) {
+GT2Bool gti2SendReject(GT2Connection connection, const GT2Byte *message, int length) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 5, length + 7 + connection->socket->protocolOffset, &dropped)) {
@@ -948,7 +948,7 @@ gsi_bool gti2SendReject(GTI2Connection *connection, const void *message, int len
     return gsi_false;
 }
 
-gsi_bool gti2SendClose(GTI2Connection *connection) {
+GT2Bool gti2SendClose(GT2Connection connection) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 6, connection->socket->protocolOffset + 7, &dropped)) {
@@ -963,7 +963,7 @@ gsi_bool gti2SendClose(GTI2Connection *connection) {
     return gsi_false;
 }
 
-gsi_bool gti2SendKeepAlive(GTI2Connection *connection) {
+GT2Bool gti2SendKeepAlive(GT2Connection connection) {
     gsi_bool dropped;
 
     if (!gti2BeginReliableMessage(connection, 7, connection->socket->protocolOffset + 7, &dropped)) {
@@ -979,7 +979,7 @@ gsi_bool gti2SendKeepAlive(GTI2Connection *connection) {
 }
 
 // A message that starts with 0xfe 0xfe gets them twice, so it isn't read as GT2's
-static gsi_bool gti2SendAppUnreliable(GTI2Connection *connection, const gsi_u8 *data, int length) {
+static GT2Bool gti2SendAppUnreliable(GT2Connection connection, const GT2Byte *data, int length) {
     int base;
     gsi_u8 *start;
     int total;
@@ -996,7 +996,7 @@ static gsi_bool gti2SendAppUnreliable(GTI2Connection *connection, const gsi_u8 *
     }
     start = connection->outgoing.data;
     base = connection->outgoing.length;
-    if (connection->socket->protocol == 2) {
+    if (connection->socket->protocol == GTI2VdpProtocol) {
         gti2BufferWriteData(&connection->outgoing, data, 2);
     }
     gti2BufferWriteData(&connection->outgoing, "\xfe\xfe", 2);
@@ -1009,12 +1009,12 @@ static gsi_bool gti2SendAppUnreliable(GTI2Connection *connection, const gsi_u8 *
     return gsi_true;
 }
 
-gsi_bool gti2SendAck(GTI2Connection *connection) {
+GT2Bool gti2SendAck(GT2Connection connection) {
     gsi_u16 prefix;
     gsi_u8 packet[10];
     int length = 0;
 
-    if (connection->socket->protocol == 2) {
+    if (connection->socket->protocol == GTI2VdpProtocol) {
         prefix = 5;
         memcpy(packet, &prefix, 2);
         length += 2;
@@ -1030,12 +1030,12 @@ gsi_bool gti2SendAck(GTI2Connection *connection) {
 }
 
 // Nacks the serial numbers from first to last
-static gsi_bool gti2SendNack(GTI2Connection *connection, gsi_u16 first, gsi_u16 last) {
+static GT2Bool gti2SendNack(GT2Connection connection, unsigned short first, unsigned short last) {
     gsi_u16 prefix;
     gsi_u8 packet[10];
     int length = 0;
 
-    if (connection->socket->protocol == 2) {
+    if (connection->socket->protocol == GTI2VdpProtocol) {
         prefix = 7;
         memcpy(packet, &prefix, 2);
         length += 2;
@@ -1055,22 +1055,22 @@ static gsi_bool gti2SendNack(GTI2Connection *connection, gsi_u16 first, gsi_u16 
 }
 
 // Answers a ping with a pong
-static gsi_bool gti2SendPong(GTI2Connection *connection, gsi_u8 *data, int length) {
+static GT2Bool gti2SendPong(GT2Connection connection, GT2Byte *data, int length) {
     data[2] = 0x67;
     return gti2ConnectionSendData(connection, data, length);
 }
 
-gsi_bool gti2SendClosed(GTI2Connection *connection) {
+GT2Bool gti2SendClosed(GT2Connection connection) {
     return gti2SendClosedOnSocket(connection->socket, connection->ip, connection->port);
 }
 
 // Sends an address the note that its connection is closed
-static gsi_bool gti2SendClosedOnSocket(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port) {
+static GT2Bool gti2SendClosedOnSocket(GT2Socket socket, unsigned int ip, unsigned short port) {
     gsi_u16 prefix;
     gsi_u8 packet[5];
     int length = 0;
 
-    if (socket->protocol == 2) {
+    if (socket->protocol == GTI2VdpProtocol) {
         prefix = 3;
         memcpy(packet, &prefix, 2);
         length += 2;
@@ -1083,7 +1083,7 @@ static gsi_bool gti2SendClosedOnSocket(GTI2Socket *socket, gsi_u32 ip, gsi_u16 p
     return gsi_true;
 }
 
-gsi_bool gti2ResendMessage(GTI2Connection *connection, GTI2OutgoingMessage *message) {
+GT2Bool gti2ResendMessage(GT2Connection connection, GTI2OutgoingBufferMessage *message) {
     gti2UShortToBuffer(connection->outgoing.data, message->offset + connection->socket->protocolOffset + 5,
                        connection->expectedSerialNumber);
     if (!gti2ConnectionSendData(connection, connection->outgoing.data + message->offset, message->length)) {
@@ -1096,7 +1096,7 @@ gsi_bool gti2ResendMessage(GTI2Connection *connection, GTI2OutgoingMessage *mess
     return gsi_true;
 }
 
-gsi_bool gti2Send(GTI2Connection *connection, const void *data, int length, gsi_bool reliable) {
+GT2Bool gti2Send(GT2Connection connection, const GT2Byte *data, int length, GT2Bool reliable) {
     if (reliable) {
         return gti2SendAppReliable(connection, data, length);
     }

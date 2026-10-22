@@ -17,10 +17,10 @@
 #define GPI_CONNECTION_MANAGER_PORT 0xcc74
 
 static void randomString(char *buffer, int numChars);
-static int gpiStartConnect(GPConnection *connection, GPIOperation *operation);
-static int gpiSendLogin(GPConnection *connection, GPIConnectData *data);
-static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data);
-static gsi_bool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data);
+static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operation);
+static GPResult gpiSendLogin(GPConnection *connection, GPIConnectData *data);
+static GPResult gpiSendNewuser(GPConnection *connection, GPIConnectData *data);
+static GPIBool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data);
 
 // The host of the connection manager, and the characters of randomString's challenges, which are defined after
 // randomString, as their order in .data shows
@@ -38,7 +38,7 @@ static void randomString(char *buffer, int numChars) {
 
 static char sCharacters[63] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
+static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
     GPIConnection *iconnection = *connection;
     gsi_u16 port;
     int result;
@@ -47,16 +47,18 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
     strncpy(iconnection->mHeader, "gamespygp", 0x10);
     if (!Gt2_IsInitialized()) {
         port = GPI_PEER_PORT;
-        gsDebugFormat(1, 0, 8, "Initializing UDP Layer\n");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice, "Initializing UDP Layer\n");
         result = Gt2_CreateSocket(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         if (result != 0) {
             while (result != 0 && port < GPI_PEER_PORT + 100) {
-                gsDebugFormat(1, 0, 16, "Port %d failed, trying next port\n", port);
+                gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Comment,
+                              "Port %d failed, trying next port\n", port);
                 port++;
                 result = Gt2_CreateSocket(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
             }
             if (result != 0) {
-                gsDebugFormat(1, 0, 1, "Tryed all 100 ports after default port, giving up.\n");
+                gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
+                              "Tryed all 100 ports after default port, giving up.\n");
                 gpiSetError(connection, 8, "There was error starting the UDP layer.");
                 gpiCallErrorCallback(connection, 3, 1);
                 return 3;
@@ -66,7 +68,8 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
             iconnection->peerPort = port;
         }
     } else {
-        gsDebugFormat(1, 0, 8, "UDP Layer already initialized, using existing port.\n");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "UDP Layer already initialized, using existing port.\n");
         iconnection->peerPort = Gt2_GetLocalPort();
     }
     if (Gt2_Connect(iconnection->mHeader, iconnection->mHeader, NULL, gpiPeerAcceptedCallback, gpiPeerLeftCallback,
@@ -103,7 +106,7 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
         address.addr.addr = inet_addr(sConnectionManagerHostname);
     }
     address.port = GPI_CONNECTION_MANAGER_PORT;
-    if (connect(iconnection->cmSocket, &address, sizeof(address)) == -1) {
+    if (connect(iconnection->cmSocket, (SOCKADDR *)&address, sizeof(address)) == -1) {
         error = GOAGetLastError(iconnection->cmSocket);
         if (error != -6 && error != -26 && error != -76) {
             gpiSetError(connection, 5, "There was an error connecting a socket.");
@@ -116,9 +119,11 @@ static int gpiStartConnect(GPConnection *connection, GPIOperation *operation) {
     return 0;
 }
 
-int gpiConnect(GPConnection *connection, const char *nick, const char *uniquenick, const char *email,
-               const char *password, const char *authtoken, const char *partnerchallenge, const char *cdkey,
-               gsi_bool firewall, gsi_bool newuser, int blocking, GPCallback callback, void *param) {
+GPResult gpiConnect(GPConnection *connection, const char nick[GP_NICK_LEN], const char uniquenick[GP_UNIQUENICK_LEN],
+                    const char email[GP_EMAIL_LEN], const char password[GP_PASSWORD_LEN],
+                    const char authtoken[GP_AUTHTOKEN_LEN], const char partnerchallenge[GP_PARTNERCHALLENGE_LEN],
+                    const char cdkey[GP_CDKEY_LEN], GPEnum firewall, GPIBool newuser, GPEnum blocking,
+                    GPCallback callback, void *param) {
     GPIConnection *iconnection = *connection;
     GPIConnectData *data;
     GPIOperation *operation;
@@ -174,7 +179,7 @@ int gpiConnect(GPConnection *connection, const char *nick, const char *uniquenic
     return 0;
 }
 
-static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
+static GPResult gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     GPIConnection *iconnection = *connection;
     const char *passphrase;
     char *user;
@@ -190,7 +195,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     } else {
         passphrase = iconnection->password;
     }
-    MD5Digest((const gsi_u8 *)passphrase, strlen(passphrase), data->passwordHash);
+    MD5Digest((unsigned char *)passphrase, strlen(passphrase), data->passwordHash);
     if (iconnection->partnerID != 0) {
         OS_SPrintf(partnerBuffer, "%d@", iconnection->partnerID);
     } else {
@@ -207,7 +212,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     }
     OS_SPrintf(buffer, "%s%s%s%s%s%s", data->passwordHash, "                                                ", user,
                data->userChallenge, data->serverChallenge, data->passwordHash);
-    MD5Digest((const gsi_u8 *)buffer, strlen(buffer), response);
+    MD5Digest((unsigned char *)buffer, strlen(buffer), response);
     if (iconnection->infoCaching) {
         gpiFindProfileByUser(connection, iconnection->nick, iconnection->email, &profile);
         if (profile != NULL) {
@@ -262,7 +267,7 @@ static int gpiSendLogin(GPConnection *connection, GPIConnectData *data) {
     return 0;
 }
 
-static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data) {
+static GPResult gpiSendNewuser(GPConnection *connection, GPIConnectData *data) {
     GPIConnection *iconnection = *connection;
     char cdkeyxor[0x41];
     char cdkeyenc[0x5a];
@@ -313,7 +318,7 @@ static int gpiSendNewuser(GPConnection *connection, GPIConnectData *data) {
         return 3;                                                                                                      \
     } while (0)
 
-int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const char *input) {
     GPIConnection *iconnection = *connection;
     GPIConnectData *data;
     GPIProfile *profile;
@@ -403,8 +408,8 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
         if (!gpiValueForKey(input, "\\uniquenick\\", uniquenick, 0x15)) {
             uniquenick[0] = '\0';
         }
-        if (!gpiValueForKey(input, "\\lt\\", iconnection->loginTicket.ticket, 0x19)) {
-            iconnection->loginTicket.ticket[0] = '\0';
+        if (!gpiValueForKey(input, "\\lt\\", iconnection->loginTicket, 0x19)) {
+            iconnection->loginTicket[0] = '\0';
         }
         if (iconnection->partnerID != 0) {
             OS_SPrintf(partnerBuffer, "%d@", iconnection->partnerID);
@@ -423,7 +428,7 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
         // The server proves that it knows the password with the challenges the other way around
         OS_SPrintf(buffer, "%s%s%s%s%s%s", data->passwordHash, "                                                ", user,
                    data->serverChallenge, data->userChallenge, data->passwordHash);
-        MD5Digest((const gsi_u8 *)buffer, strlen(buffer), check);
+        MD5Digest((unsigned char *)buffer, strlen(buffer), check);
         if (!gpiValueForKey(input, "\\proof\\", buffer, 0x200)) {
             GPI_UNEXPECTED_DATA(connection, "Unexepected data was received from the server.");
         }
@@ -460,7 +465,7 @@ int gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const c
     return 0;
 }
 
-int gpiCheckConnect(GPConnection *connection) {
+GPResult gpiCheckConnect(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     int state;
     int result;
@@ -481,7 +486,7 @@ int gpiCheckConnect(GPConnection *connection) {
     return 0;
 }
 
-static gsi_bool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data) {
+static GPIBool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile *profile, void *data) {
     GPIConnection *iconnection = *connection;
 
     if (profile->buddyStatus != NULL) {
@@ -526,9 +531,9 @@ static gsi_bool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile
     return gsi_true;
 }
 
-void gpiDisconnect(GPConnection *connection, gsi_bool tellServer) {
+void gpiDisconnect(GPConnection *connection, GPIBool tellServer) {
     GPIConnection *iconnection = *connection;
-    gsi_bool connClosed;
+    GPIBool connClosed;
 
     if (iconnection->connectState == GPI_DISCONNECTED) {
         return;

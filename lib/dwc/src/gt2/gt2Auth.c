@@ -11,11 +11,11 @@
     (((buffer)[(i) - 1] & 1) ^ ((i) & 1) ^ (oddmode) ^ ((buffer)[0] & 1) ^ ((buffer)[0] < 79 ? 1 : 0) ^                \
      ((buffer)[(i) - 1] < (buffer)[0] ? 1 : 0))
 
-static gsi_bool gti2VerifyChallenge(const gsi_u8 *buffer);
+static int gti2VerifyChallenge(const GT2Byte *buffer);
 
 char GT2ChallengeKey[33] = "3b8dd8995f7c40a9a5c5b7dd5b481341";
 
-static gsi_bool gti2VerifyChallenge(const gsi_u8 *buffer) {
+static int gti2VerifyChallenge(const GT2Byte *buffer) {
     int oddmode = 0;
     int i;
 
@@ -28,7 +28,7 @@ static gsi_bool gti2VerifyChallenge(const gsi_u8 *buffer) {
     return gsi_true;
 }
 
-gsi_u8 *gti2GetChallenge(gsi_u8 *buffer) {
+GT2Byte *gti2GetChallenge(GT2Byte *buffer) {
     int i;
     int oddmode;
 
@@ -45,7 +45,7 @@ gsi_u8 *gti2GetChallenge(gsi_u8 *buffer) {
     return buffer;
 }
 
-gsi_u8 *gti2GetResponse(gsi_u8 *buffer, const gsi_u8 *challenge) {
+GT2Byte *gti2GetResponse(GT2Byte *buffer, const GT2Byte *challenge) {
     int i;
     gsi_bool valid;
     char cchar;
@@ -70,7 +70,7 @@ gsi_u8 *gti2GetResponse(gsi_u8 *buffer, const gsi_u8 *challenge) {
     return buffer;
 }
 
-gsi_bool gti2CheckResponse(const gsi_u8 *response1, const gsi_u8 *response2) {
+GT2Bool gti2CheckResponse(const GT2Byte *response1, const GT2Byte *response2) {
     int i;
 
     for (i = 0; i < 32; i++) {

@@ -5,17 +5,18 @@
 // Tells the game that the request has ended, with its result and the data that it received. If the game doesn't want
 // the buffer (the callback returns gsi_false), the buffer stays
 void ghiCallCompletedCallback(GHIConnection *connection) {
-    GHICompletedFunc completed;
+    ghttpCompletedCallback completed;
     char *buffer;
 
     if (connection->result != 0) {
-        gsDebugFormat(8, 0, 2, "Socket Error: %d\n", connection->socketError);
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_WarmError, "Socket Error: %d\n",
+                      connection->socketError);
     }
     completed = connection->completedCallback;
     if (completed != NULL) {
-        gsi_bool keep;
+        GHTTPBool keep;
 
-        if (connection->type == 0) {
+        if (connection->type == GHIGET) {
             buffer = connection->fileBuffer.data;
         } else {
             buffer = NULL;
@@ -28,8 +29,8 @@ void ghiCallCompletedCallback(GHIConnection *connection) {
     }
 }
 
-void ghiCallProgressCallback(GHIConnection *connection, const char *buffer, int length) {
-    GHIProgressFunc progress = connection->progressCallback;
+void ghiCallProgressCallback(GHIConnection *connection, const char *buffer, GHTTPByteCount length) {
+    ghttpProgressCallback progress = connection->progressCallback;
 
     if (progress != NULL) {
         progress(connection->request, connection->state, buffer, length, connection->bytesReceived,

@@ -7,16 +7,19 @@
 // file; the name is ours. Its .data starts with the namespace table, which is why it is a file of its own
 // (docs/matching.md). The first three functions have no data of their own, so that they start the file is a guess.
 
-static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader, void *userData);
-static void ScClient_OnReportIntention(int status, int unused, SoapReader *reader, void *userData);
-static void ScClient_PutReportForm(void *form, void *userData);
-static void ScClient_OnSubmitReport(int status, int unused, SoapReader *reader, void *userData);
+static void ScClient_OnCreateSession(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                     void *userData);
+static void ScClient_OnReportIntention(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                       void *userData);
+static void ScClient_PutReportForm(GHTTPPost form, void *userData);
+static void ScClient_OnSubmitReport(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                    void *userData);
 
 // The declaration of the messages' namespace
 static const char *sCompetitionNamespaces[] = { "gsc=\"http://gamespy.net/competition/\"" };
 
 int ScClient_Begin(ScClient *client, ScClient *self) {
-    if (gsCoreIsShutdown() != 0) {
+    if (gsCoreIsShutdown() != GSCore_IN_USE) {
         return 4;
     }
     client->self = self;
@@ -51,9 +54,9 @@ void ScClient_RunLibrary(ScClient *client) {
     gsCoreThink(0);
 }
 
-int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *certificate, AuthKeys *keys,
+int ScClient_PostCreateSession(ScClient *client, int gameId, GSLoginCertificate *certificate, GSLoginPrivateData *keys,
                                ScClientFunc func, int timeout, void *userData) {
-    SoapWriter *writer;
+    GSXmlStreamWriter writer;
 
     if (client->createSessionBusy != 0) {
         return 6;
@@ -78,7 +81,8 @@ int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *ce
     return 0;
 }
 
-static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader, void *userData) {
+static void ScClient_OnCreateSession(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                     void *userData) {
     ScClient *client = userData;
     int result;
     char csid[0xff];
@@ -129,9 +133,9 @@ static void ScClient_OnCreateSession(int status, int unused, SoapReader *reader,
 }
 
 int ScClient_PostReportIntention(ScClient *client, int gameId, const char *csid, const char *ccid, int authoritative,
-                                 AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func, int timeout,
-                                 void *userData) {
-    SoapWriter *writer;
+                                 GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                                 int timeout, void *userData) {
+    GSXmlStreamWriter writer;
 
     if (client->reportIntentionBusy != 0) {
         return 6;
@@ -159,7 +163,8 @@ int ScClient_PostReportIntention(ScClient *client, int gameId, const char *csid,
     return 0;
 }
 
-static void ScClient_OnReportIntention(int status, int unused, SoapReader *reader, void *userData) {
+static void ScClient_OnReportIntention(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                       void *userData) {
     ScClient *client = userData;
     int result;
     char ccid[0xff];
@@ -193,16 +198,16 @@ static void ScClient_OnReportIntention(int status, int unused, SoapReader *reade
     }
 }
 
-static void ScClient_PutReportForm(void *form, void *userData) {
+static void ScClient_PutReportForm(GHTTPPost form, void *userData) {
     ScClient *client = userData;
 
     ghttpPostAddFileFromMemory(form, "report", client->report, client->reportSize, "report", "application/bin");
 }
 
 int ScClient_PostReport(ScClient *client, int gameId, const char *csid, const char *ccid, ScReport *report,
-                        int authoritative, AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func, int timeout,
-                        void *userData) {
-    SoapWriter *writer;
+                        int authoritative, GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                        int timeout, void *userData) {
+    GSXmlStreamWriter writer;
 
     if (client->submitReportBusy != 0) {
         return 6;
@@ -235,7 +240,8 @@ int ScClient_PostReport(ScClient *client, int gameId, const char *csid, const ch
     return 0;
 }
 
-static void ScClient_OnSubmitReport(int status, int unused, SoapReader *reader, void *userData) {
+static void ScClient_OnSubmitReport(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader,
+                                    void *userData) {
     ScClient *client = userData;
     int result;
     ScClientFunc func;

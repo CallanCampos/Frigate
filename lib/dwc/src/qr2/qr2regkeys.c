@@ -21,11 +21,12 @@ gsi_bool qr2_internal_is_master_only_key(const char *key) {
 }
 
 void qr2_register_keyA(int keyid, const char *key) {
-    gsDebugFormat(3, 4, 0x40, "qr2_register_keyA()\r\n");
+    gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Misc, GSIDebugLevel_StackTrace, "qr2_register_keyA()\r\n");
     if (keyid < 50 || keyid > 254) {
-        gsDebugFormat(3, 4, 2, "Attempted to register invalid key %d - %s\r\n", keyid, key);
+        gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Misc, GSIDebugLevel_WarmError,
+                      "Attempted to register invalid key %d - %s\r\n", keyid, key);
         return;
     }
-    gsDebugFormat(3, 4, 0x10, "Registered key %d - %s\r\n", keyid, key);
+    gsDebugFormat(GSIDebugCat_QR2, GSIDebugType_Misc, GSIDebugLevel_Comment, "Registered key %d - %s\r\n", keyid, key);
     qr2_registered_key_list[keyid] = key;
 }

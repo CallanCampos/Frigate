@@ -12,7 +12,7 @@
 // QueueNextQueries, which the Wii's build doesn't name, are named after the later SDK. The DS has no ICMP: a ping query
 // sends nothing, and its socket is never opened
 
-static void FIFOAddRear(SBServerFIFO *fifo, SBServer *server) {
+static void FIFOAddRear(SBServerFIFO *fifo, SBServer server) {
     if (fifo->last != NULL) {
         fifo->last->next = server;
     }
@@ -24,7 +24,7 @@ static void FIFOAddRear(SBServerFIFO *fifo, SBServer *server) {
     fifo->count++;
 }
 
-static void FIFOAddFront(SBServerFIFO *fifo, SBServer *server) {
+static void FIFOAddFront(SBServerFIFO *fifo, SBServer server) {
     server->next = fifo->first;
     fifo->first = server;
     if (fifo->last == NULL) {
@@ -33,8 +33,8 @@ static void FIFOAddFront(SBServerFIFO *fifo, SBServer *server) {
     fifo->count++;
 }
 
-static SBServer *FIFOGetFirst(SBServerFIFO *fifo) {
-    SBServer *hold = fifo->first;
+static SBServer FIFOGetFirst(SBServerFIFO *fifo) {
+    SBServer hold = fifo->first;
 
     if (hold != NULL) {
         fifo->first = hold->next;
@@ -46,9 +46,9 @@ static SBServer *FIFOGetFirst(SBServerFIFO *fifo) {
     return hold;
 }
 
-static gsi_bool FIFORemove(SBServerFIFO *fifo, SBServer *server) {
-    SBServer *hold;
-    SBServer *prev = NULL;
+static SBBool FIFORemove(SBServerFIFO *fifo, SBServer server) {
+    SBServer hold;
+    SBServer prev = NULL;
 
     hold = fifo->first;
     while (hold != NULL) {
@@ -77,7 +77,7 @@ static void FIFOClear(SBServerFIFO *fifo) {
 }
 
 // Sends a server its query: QR2's challenge request, or its query of the basic keys or of all, or the old protocol's
-static void QEStartQuery(SBQueryEngine *engine, SBServer *server) {
+static void QEStartQuery(SBQueryEngine *engine, SBServer server) {
     gsi_u8 queryBuffer[256];
     int queryLen;
     gsi_bool querySuccess = gsi_false;
@@ -143,7 +143,7 @@ static void QEStartQuery(SBQueryEngine *engine, SBServer *server) {
             saddr.addr.addr = server->publicip;
             saddr.port = server->publicport;
         }
-        sendto(engine->querysock, queryBuffer, queryLen, 0, &saddr, sizeof(saddr));
+        sendto(engine->querysock, queryBuffer, queryLen, 0, (SOCKADDR *)&saddr, sizeof(saddr));
         querySuccess = gsi_true;
     }
     if (querySuccess) {
@@ -153,9 +153,9 @@ static void QEStartQuery(SBQueryEngine *engine, SBServer *server) {
     }
 }
 
-void SBQueryEngineInit(SBQueryEngine *engine, int maxupdates, int queryversion, gsi_bool lanBrowse,
+void SBQueryEngineInit(SBQueryEngine *engine, int maxupdates, int queryversion, SBBool lanBrowse,
                        SBEngineCallbackFn callback, void *instance) {
-    if (lanBrowse == gsi_false && __GSIACResult != 1) {
+    if (lanBrowse == gsi_false && __GSIACResult != GSIACAvailable) {
         return;
     }
     SocketStartUp();
@@ -170,7 +170,7 @@ void SBQueryEngineInit(SBQueryEngine *engine, int maxupdates, int queryversion, 
     FIFOClear(&engine->querylist);
 }
 
-void SBQueryEngineSetPublicIP(SBQueryEngine *engine, gsi_u32 mypublicip) {
+void SBQueryEngineSetPublicIP(SBQueryEngine *engine, goa_uint32 mypublicip) {
     engine->mypublicip = mypublicip;
 }
 
@@ -186,8 +186,8 @@ void SBEngineCleanup(SBQueryEngine *engine) {
     FIFOClear(&engine->querylist);
 }
 
-void SBQueryEngineUpdateServer(SBQueryEngine *engine, SBServer *server, gsi_bool addfront, int querytype,
-                               gsi_bool usequerychallenge) {
+void SBQueryEngineUpdateServer(SBQueryEngine *engine, SBServer server, int addfront, int querytype,
+                               SBBool usequerychallenge) {
     server->state &= ~(STATE_PENDINGBASICQUERY | STATE_PENDINGFULLQUERY | STATE_PENDINGICMPQUERY |
                        STATE_PENDINGQUERYCHALLENGE | STATE_QUERYFAILED);
     server->splitResponseBitmap = 0;
@@ -220,7 +220,7 @@ void SBQueryEngineUpdateServer(SBQueryEngine *engine, SBServer *server, gsi_bool
 }
 
 // QR2's answer of a server (0) or of its challenge (9), after the request key
-static void ParseSingleQR2Reply(SBQueryEngine *engine, SBServer *server, char *data, int len) {
+static void ParseSingleQR2Reply(SBQueryEngine *engine, SBServer server, char *data, int len) {
     int i;
     int dlen;
 
@@ -269,7 +269,7 @@ static void ParseSingleQR2Reply(SBQueryEngine *engine, SBServer *server, char *d
 }
 
 // The old protocol's answer, which is complete once it has "\final\"
-static void ParseSingleGOAReply(SBQueryEngine *engine, SBServer *server, char *data, int len) {
+static void ParseSingleGOAReply(SBQueryEngine *engine, SBServer server, char *data, int len) {
     gsi_bool isfinal = strstr(data, "\\final\\") != NULL;
 
     SBServerParseKeyVals(server, data);
@@ -287,23 +287,23 @@ static void ParseSingleGOAReply(SBQueryEngine *engine, SBServer *server, char *d
 }
 
 // The answer of a ping, which the DS doesn't send
-static gsi_bool ParseSingleICMPReply(SBQueryEngine *engine, SBServer *server, char *data, int len) {
+static SBBool ParseSingleICMPReply(SBQueryEngine *engine, SBServer server, char *data, int len) {
     return gsi_true;
 }
 
-static void ProcessIncomingReplies(SBQueryEngine *engine, gsi_bool icmpSocket) {
+static void ProcessIncomingReplies(SBQueryEngine *engine, SBBool icmpSocket) {
     int i;
     char indata[2048];
     SocAddrIn saddr;
     int saddrlen = sizeof(saddr);
-    SBServer *server;
+    SBServer server;
     int recvSock = 0;
 
     if (!icmpSocket) {
         recvSock = engine->querysock;
     }
     while (CanReceiveOnSocket(recvSock)) {
-        i = recvfrom(recvSock, indata, sizeof(indata) - 1, 0, &saddr, &saddrlen);
+        i = recvfrom(recvSock, indata, sizeof(indata) - 1, 0, (SOCKADDR *)&saddr, &saddrlen);
         if (i == -1) {
             break;
         }
@@ -359,7 +359,7 @@ static void TimeoutOldQueries(SBQueryEngine *engine) {
 
 static void QueueNextQueries(SBQueryEngine *engine) {
     while (engine->querylist.count < engine->maxupdates && engine->pendinglist.count > 0) {
-        SBServer *server = FIFOGetFirst(&engine->pendinglist);
+        SBServer server = FIFOGetFirst(&engine->pendinglist);
 
         QEStartQuery(engine, server);
     }
@@ -379,13 +379,13 @@ void SBQueryEngineThink(SBQueryEngine *engine) {
     }
 }
 
-void SBQueryEngineAddQueryKey(SBQueryEngine *engine, gsi_u8 keyid) {
+void SBQueryEngineAddQueryKey(SBQueryEngine *engine, unsigned char keyid) {
     if (engine->numserverkeys < MAX_QUERY_KEYS) {
         engine->serverkeys[engine->numserverkeys++] = keyid;
     }
 }
 
-void SBQueryEngineRemoveServerFromFIFOs(SBQueryEngine *engine, SBServer *server) {
+void SBQueryEngineRemoveServerFromFIFOs(SBQueryEngine *engine, SBServer server) {
     if (FIFORemove(&engine->querylist, server)) {
         return;
     }

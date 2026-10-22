@@ -25,7 +25,7 @@ static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, gsi
 static AvailableCheck sAvailableCheck;
 char GSIACHostname[0x40];
 char __GSIACGamename[0x40];
-int __GSIACResult;
+GSIACResult __GSIACResult;
 
 // The address of a host (a text of four numbers or a name to look up) at a port
 static gsi_bool get_sockaddrin(const char *host, int port, SocAddrIn *address) {
@@ -45,8 +45,8 @@ static gsi_bool get_sockaddrin(const char *host, int port, SocAddrIn *address) {
 }
 
 static void SendPacket(void) {
-    sendto(sAvailableCheck.sock, sAvailableCheck.packet, sAvailableCheck.packetSize, 0, &sAvailableCheck.address,
-           sizeof(SocAddrIn));
+    sendto(sAvailableCheck.sock, sAvailableCheck.packet, sAvailableCheck.packetSize, 0,
+           (SOCKADDR *)&sAvailableCheck.address, sizeof(SocAddrIn));
     sAvailableCheck.sendTime = current_time();
 }
 
@@ -106,27 +106,27 @@ static int HandlePacket(const char *buffer, int size, const SocAddrIn *from, gsi
     return 0;
 }
 
-int GSIAvailableCheckThink(void) {
+GSIACResult GSIAvailableCheckThink(void) {
     char buffer[0x40];
     SocAddrIn from;
     int fromSize = sizeof(SocAddrIn);
     gsi_u32 flags;
 
     if (sAvailableCheck.sock == -1) {
-        __GSIACResult = 1;
+        __GSIACResult = GSIACAvailable;
         return __GSIACResult;
     }
     if (CanReceiveOnSocket(sAvailableCheck.sock)) {
-        int size = recvfrom(sAvailableCheck.sock, buffer, sizeof(buffer), 0, &from, &fromSize);
+        int size = recvfrom(sAvailableCheck.sock, buffer, sizeof(buffer), 0, (SOCKADDR *)&from, &fromSize);
 
         if (HandlePacket(buffer, size, &from, &flags) == 0) {
             closesocket(sAvailableCheck.sock);
             if (flags & 1) {
-                __GSIACResult = 2;
+                __GSIACResult = GSIACUnavailable;
             } else if (flags & 2) {
-                __GSIACResult = 3;
+                __GSIACResult = GSIACTemporarilyUnavailable;
             } else {
-                __GSIACResult = 1;
+                __GSIACResult = GSIACAvailable;
             }
             return __GSIACResult;
         }
@@ -134,11 +134,11 @@ int GSIAvailableCheckThink(void) {
     if (current_time() > sAvailableCheck.sendTime + 2000) {
         if (sAvailableCheck.sendCount == 1) {
             closesocket(sAvailableCheck.sock);
-            __GSIACResult = 1;
+            __GSIACResult = GSIACAvailable;
             return __GSIACResult;
         }
         SendPacket();
         sAvailableCheck.sendCount++;
     }
-    return 0;
+    return GSIACWaiting;
 }

@@ -119,7 +119,7 @@ GHIConnection *ghiNewConnection(void) {
 }
 
 // Ends the connection's lookup of its host and its socket, and says if that went well
-gsi_bool ghiCloseSocket(GHIConnection *connection) {
+GHTTPBool ghiCloseSocket(GHIConnection *connection) {
     if (connection == NULL) {
         return gsi_false;
     }
@@ -135,7 +135,8 @@ gsi_bool ghiCloseSocket(GHIConnection *connection) {
 
     ghiLock();
     if (connection->hostLookup != NULL) {
-        gsDebugFormat(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment,
+                      "Cancelling Thread and freeing memory\n");
         gsiCancelResolvingHostname(connection->hostLookup);
         connection->hostLookup = NULL;
     }
@@ -152,7 +153,7 @@ gsi_bool ghiCloseSocket(GHIConnection *connection) {
 }
 
 // Frees what a connection owns and gives its slot back
-gsi_bool ghiFreeConnectionData(GHIConnection *connection) {
+GHTTPBool ghiFreeConnectionData(GHIConnection *connection) {
     if (connection == NULL) {
         return gsi_false;
     }
@@ -204,7 +205,7 @@ gsi_bool ghiFreeConnectionData(GHIConnection *connection) {
     return gsi_true;
 }
 
-gsi_bool ghiFreeConnection(GHIConnection *connection) {
+GHTTPBool ghiFreeConnection(GHIConnection *connection) {
     if (connection == NULL) {
         return gsi_false;
     }
@@ -224,7 +225,7 @@ gsi_bool ghiFreeConnection(GHIConnection *connection) {
 }
 
 // Gives the connection of a request, or NULL if the request has none
-GHIConnection *ghiRequestToConnection(int request) {
+GHIConnection *ghiRequestToConnection(GHTTPRequest request) {
     GHIConnection *connection;
 
     ghiLock();
@@ -241,7 +242,7 @@ GHIConnection *ghiRequestToConnection(int request) {
 }
 
 // Calls the function with each connection that is in use
-void ghiEnumConnections(GHIEnumFunc func) {
+void ghiEnumConnections(GHTTPBool (*func)(GHIConnection *)) {
     int i;
 
     if (sConnections.activeCount > 0) {
@@ -257,9 +258,10 @@ void ghiEnumConnections(GHIEnumFunc func) {
 
 // Starts a connection over at the address that it was redirected to
 void ghiRedirectConnection(GHIConnection *connection) {
-    gsDebugFormat(8, 3, 0x10, "Redirecting Connection\n");
+    gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Redirecting Connection\n");
     if (connection->hostLookup != NULL) {
-        gsDebugFormat(8, 3, 0x10, "Cancelling Thread and freeing memory\n");
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment,
+                      "Cancelling Thread and freeing memory\n");
         gsiCancelResolvingHostname(connection->hostLookup);
         connection->hostLookup = NULL;
     }

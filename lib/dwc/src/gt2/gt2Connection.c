@@ -8,12 +8,12 @@
 
 // GameSpy GT2's connections (gt2Connection.c)
 
-static gsi_bool gti2CheckTimeout(GTI2Connection *connection, gsi_u32 now);
-static gsi_bool gti2SendRetries(GTI2Connection *connection, gsi_u32 now);
-static gsi_bool gti2CheckPendingAck(GTI2Connection *connection, gsi_u32 now);
-static gsi_bool gti2CheckKeepAlive(GTI2Connection *connection, gsi_u32 now);
+static GT2Bool gti2CheckTimeout(GT2Connection connection, gsi_time now);
+static GT2Bool gti2SendRetries(GT2Connection connection, gsi_time now);
+static GT2Bool gti2CheckPendingAck(GT2Connection connection, gsi_time now);
+static GT2Bool gti2CheckKeepAlive(GT2Connection connection, gsi_time now);
 
-int gti2NewOutgoingConnection(GTI2Socket *socket, GTI2Connection **connection, gsi_u32 ip, gsi_u16 port) {
+GT2Result gti2NewOutgoingConnection(GT2Socket socket, GT2Connection *connection, unsigned int ip, unsigned short port) {
     int result = gti2NewSocketConnection(socket, connection, ip, port);
 
     if (result != 0) {
@@ -24,7 +24,7 @@ int gti2NewOutgoingConnection(GTI2Socket *socket, GTI2Connection **connection, g
     return 0;
 }
 
-int gti2NewIncomingConnection(GTI2Socket *socket, GTI2Connection **connection, gsi_u32 ip, gsi_u16 port) {
+GT2Result gti2NewIncomingConnection(GT2Socket socket, GT2Connection *connection, unsigned int ip, unsigned short port) {
     int result = gti2NewSocketConnection(socket, connection, ip, port);
 
     if (result != 0) {
@@ -35,8 +35,8 @@ int gti2NewIncomingConnection(GTI2Socket *socket, GTI2Connection **connection, g
     return 0;
 }
 
-int gti2StartConnectionAttempt(GTI2Connection *connection, const void *message, int length,
-                               const GTI2ConnectionCallbacks *callbacks) {
+GT2Result gti2StartConnectionAttempt(GT2Connection connection, const GT2Byte *message, int length,
+                                     GT2ConnectionCallbacks *callbacks) {
     gsi_u8 challenge[0x20];
 
     gti2MessageCheck(&message, &length);
@@ -58,7 +58,7 @@ int gti2StartConnectionAttempt(GTI2Connection *connection, const void *message, 
     return 0;
 }
 
-gsi_bool gti2AcceptConnection(GTI2Connection *connection, const GTI2ConnectionCallbacks *callbacks) {
+GT2Bool gti2AcceptConnection(GT2Connection connection, GT2ConnectionCallbacks *callbacks) {
     if (connection->freeAtAcceptReject) {
         connection->freeAtAcceptReject = gsi_false;
         return gsi_false;
@@ -75,7 +75,7 @@ gsi_bool gti2AcceptConnection(GTI2Connection *connection, const GTI2ConnectionCa
     return gsi_true;
 }
 
-void gti2RejectConnection(GTI2Connection *connection, const void *message, int length) {
+void gti2RejectConnection(GT2Connection connection, const GT2Byte *message, int length) {
     connection->freeAtAcceptReject = gsi_false;
     if (connection->state == 4) {
         gti2MessageCheck(&message, &length);
@@ -84,7 +84,7 @@ void gti2RejectConnection(GTI2Connection *connection, const void *message, int l
     }
 }
 
-gsi_bool gti2ConnectionSendData(GTI2Connection *connection, const void *data, int length) {
+GT2Bool gti2ConnectionSendData(GT2Connection connection, const GT2Byte *data, int length) {
     if (!gti2SocketSend(connection->socket, connection->ip, connection->port, data, length)) {
         return gsi_false;
     }
@@ -94,7 +94,7 @@ gsi_bool gti2ConnectionSendData(GTI2Connection *connection, const void *data, in
 
 // A connection that is still connecting times out after its own timeout, or a minute on the side
 // that listens
-static gsi_bool gti2CheckTimeout(GTI2Connection *connection, gsi_u32 now) {
+static GT2Bool gti2CheckTimeout(GT2Connection connection, gsi_time now) {
     gsi_bool timedOut;
 
     if (connection->state < 5) {
@@ -118,12 +118,12 @@ static gsi_bool gti2CheckTimeout(GTI2Connection *connection, gsi_u32 now) {
 }
 
 // Resends the reliable messages the peer hasn't acked for a second
-static gsi_bool gti2SendRetries(GTI2Connection *connection, gsi_u32 now) {
+static GT2Bool gti2SendRetries(GT2Connection connection, gsi_time now) {
     int count = func_ov011_02171588(connection->outgoingMessages);
     int i;
 
     for (i = 0; i < count; i++) {
-        GTI2OutgoingMessage *message = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *message = func_ov011_0217158c(connection->outgoingMessages, i);
 
         if (now - message->sendTime > 1000) {
             if (!gti2ResendMessage(connection, message)) {
@@ -135,7 +135,7 @@ static gsi_bool gti2SendRetries(GTI2Connection *connection, gsi_u32 now) {
 }
 
 // Sends the ack that has waited for 100 milliseconds
-static gsi_bool gti2CheckPendingAck(GTI2Connection *connection, gsi_u32 now) {
+static GT2Bool gti2CheckPendingAck(GT2Connection connection, gsi_time now) {
     if (!connection->pendingAck) {
         return gsi_true;
     }
@@ -148,7 +148,7 @@ static gsi_bool gti2CheckPendingAck(GTI2Connection *connection, gsi_u32 now) {
 }
 
 // Sends a keep-alive after 30 seconds without sending
-static gsi_bool gti2CheckKeepAlive(GTI2Connection *connection, gsi_u32 now) {
+static GT2Bool gti2CheckKeepAlive(GT2Connection connection, gsi_time now) {
     if (now - connection->lastSendTime > 30000) {
         if (!gti2SendKeepAlive(connection)) {
             return gsi_false;
@@ -157,7 +157,7 @@ static gsi_bool gti2CheckKeepAlive(GTI2Connection *connection, gsi_u32 now) {
     return gsi_true;
 }
 
-gsi_bool gti2ConnectionThink(GTI2Connection *connection, gsi_u32 now) {
+GT2Bool gti2ConnectionThink(GT2Connection connection, gsi_time now) {
     if (!gti2CheckTimeout(connection, now)) {
         return gsi_false;
     }
@@ -173,7 +173,7 @@ gsi_bool gti2ConnectionThink(GTI2Connection *connection, gsi_u32 now) {
     return gsi_false;
 }
 
-void gti2CloseConnection(GTI2Connection *connection, gsi_bool hard) {
+void gti2CloseConnection(GT2Connection connection, GT2Bool hard) {
     if (hard) {
         if (connection->state < 7) {
             gti2ConnectionClosed(connection);
@@ -187,7 +187,7 @@ void gti2CloseConnection(GTI2Connection *connection, gsi_bool hard) {
     }
 }
 
-void gti2ConnectionClosed(GTI2Connection *connection) {
+void gti2ConnectionClosed(GT2Connection connection) {
     if (connection->state != 7) {
         connection->state = 7;
         TableRemove(connection->socket->connections, &connection);
@@ -195,7 +195,7 @@ void gti2ConnectionClosed(GTI2Connection *connection) {
     }
 }
 
-void gti2ConnectionCleanup(GTI2Connection *connection) {
+void gti2ConnectionCleanup(GT2Connection connection) {
     if (connection->initialMessage != NULL) {
         gsifree(connection->initialMessage);
     }

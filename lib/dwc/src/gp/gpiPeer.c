@@ -18,24 +18,24 @@
 // Engine and sends "\auth\" with it; the other side checks it against our password and answers "\aack\" or "\anack\".
 // Once connected, the peers send each other messages of the form "\m\<type>\len\<len>\msg\" and the text
 
-static int gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer *peer);
-static int gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *peer);
+static GPResult gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer *peer);
+static GPResult gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *peer);
 static int gpiPeerSendMessages(GPConnection *connection, GPIPeer *peer);
-static int gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer);
+static GPResult gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer);
 static void gpiCheckTimedOutPeerOperations(GPConnection *connection, GPIPeer *peer);
-static int gpiProcessPeer(GPConnection *connection, GPIPeer *peer);
+static GPResult gpiProcessPeer(GPConnection *connection, GPIPeer *peer);
 static void gpiRemovePeer(GPConnection *connection, GPIPeer *peer);
 static GPIPeer *gpiGetPeerByAddr(const GPConnection *connection, gsi_u32 ip, gsi_u16 port);
 static void gpiFreeMessage(void *element);
 
-static int gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer *peer) {
+static GPResult gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer *peer) {
     GPIConnection *iconnection = *connection;
     char *footer = NULL;
-    gsi_bool connClosed;
+    GPIBool connClosed;
     int result;
     gsi_bool freeSig;
     GPIProfile *profile;
-    int state;
+    GSUdpPeerState state;
     GPIPeer *other;
     char *message;
 
@@ -49,7 +49,8 @@ static int gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer 
     case GPI_PEER_GETTING_SIG:
         break;
     case GPI_PEER_GOT_SIG:
-        gsDebugFormat(1, 3, 0x1f, "Got the peer signature for profileid: %d\n", peer->profile);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_State, GSIDebugLevel_Verbose,
+                      "Got the peer signature for profileid: %d\n", peer->profile);
         result = gpiPeerStartConnect(connection, peer);
         if (result != 0) {
             return result;
@@ -122,12 +123,12 @@ static int gpiProcessPeerInitiatingConnection(GPConnection *connection, GPIPeer 
     return 0;
 }
 
-static int gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *peer) {
+static GPResult gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *peer) {
     GPIConnection *iconnection = *connection;
     char *footer;
     char *message;
-    int state;
-    gsi_bool connClosed;
+    GSUdpPeerState state;
+    GPIBool connClosed;
     int pid;
     char intValue[16];
     char nick[31];
@@ -163,7 +164,7 @@ static int gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *
             }
             // The signature is the digest of our password with our profile and the peer's
             OS_SPrintf(buffer, "%s%d%d", iconnection->password, iconnection->profileid, pid);
-            MD5Digest((const gsi_u8 *)buffer, strlen(buffer), sigCheck);
+            MD5Digest((unsigned char *)buffer, strlen(buffer), sigCheck);
             if (strcmp(sig, sigCheck) != 0) {
                 gpiAppendStringToBuffer(connection, &peer->outputBuffer, "\\anack\\");
                 gpiAppendStringToBuffer(connection, &peer->outputBuffer, "\\final\\");
@@ -186,7 +187,7 @@ static int gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIPeer *
 
 static int gpiPeerSendMessages(GPConnection *connection, GPIPeer *peer) {
     GPIMessage *message;
-    gsi_bool connClosed;
+    GPIBool connClosed;
     int result;
 
     if (peer == NULL) {
@@ -211,13 +212,13 @@ static int gpiPeerSendMessages(GPConnection *connection, GPIPeer *peer) {
     return 0;
 }
 
-static int gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer) {
+static GPResult gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer) {
     GPIConnection *iconnection = *connection;
     GPRecvBuddyMessageArg *messageArg;
     GPRecvBuddyUTMArg *utmArg;
     int result;
-    int state;
-    gsi_bool connClosed;
+    GSUdpPeerState state;
+    GPIBool connClosed;
     GPICallback callback;
     char *message;
     int type;
@@ -344,14 +345,14 @@ static void gpiCheckTimedOutPeerOperations(GPConnection *connection, GPIPeer *pe
                     arg->profile = peer->profile;
                     gpiAddCallback(connection, callback, arg, NULL, GPI_ADD_NORMAL);
                 }
-                gsDebugFormat(1, 4, 8, "Peer operation timed out");
+                gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice, "Peer operation timed out");
                 gpiPeerRemoveOp(peer, op);
             }
         }
     }
 }
 
-static int gpiProcessPeer(GPConnection *connection, GPIPeer *peer) {
+static GPResult gpiProcessPeer(GPConnection *connection, GPIPeer *peer) {
     int result = 0;
 
     if (peer->state == GPI_PEER_NOT_CONNECTED) {
@@ -396,7 +397,8 @@ static void gpiRemovePeer(GPConnection *connection, GPIPeer *peer) {
         } else {
             for (current = previous->pnext; current != peer; current = current->pnext) {
                 if (current == NULL) {
-                    gsDebugFormat(1, 4, 1, "Tried to remove peer not in list.");
+                    gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_HotError,
+                                  "Tried to remove peer not in list.");
                     return;
                 }
                 previous = current;
@@ -416,7 +418,7 @@ static void gpiRemovePeer(GPConnection *connection, GPIPeer *peer) {
     }
 }
 
-int gpiProcessPeers(GPConnection *connection) {
+GPResult gpiProcessPeers(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     GPIPeer *peer;
     GPIPeer *next;
@@ -427,12 +429,14 @@ int gpiProcessPeers(GPConnection *connection) {
     for (peer = iconnection->peerList; peer != NULL; peer = next) {
         next = peer->pnext;
         if (peer->state == GPI_PEER_DISCONNECTED) {
-            gsDebugFormat(1, 4, 8, "Peer disconnected, pid: %d", peer->profile);
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice, "Peer disconnected, pid: %d",
+                          peer->profile);
             gpiRemovePeer(connection, peer);
         } else {
             result = gpiProcessPeer(connection, peer);
             if (peer->state == GPI_PEER_DISCONNECTED || result != 0 || gsiTimeInSec(NULL) > peer->timeout) {
-                gsDebugFormat(1, 4, 8, "Peer disconnected, pid: %d", peer->profile);
+                gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice, "Peer disconnected, pid: %d",
+                              peer->profile);
                 gpiRemovePeer(connection, peer);
             }
         }
@@ -474,7 +478,7 @@ static void gpiFreeMessage(void *element) {
     message->buffer.buffer = NULL;
 }
 
-GPIPeer *gpiAddPeer(GPConnection *connection, int profileid, gsi_bool initiate) {
+GPIPeer *gpiAddPeer(GPConnection *connection, int profileid, GPIBool initiate) {
     GPIConnection *iconnection = *connection;
     GPIPeer *peer = gsimalloc(sizeof(GPIPeer));
 
@@ -495,7 +499,7 @@ GPIPeer *gpiAddPeer(GPConnection *connection, int profileid, gsi_bool initiate) 
     return peer;
 }
 
-int gpiPeerGetSig(GPConnection *connection, GPIPeer *peer) {
+GPResult gpiPeerGetSig(GPConnection *connection, GPIPeer *peer) {
     GPIOperation *operation;
     int result;
 
@@ -507,10 +511,10 @@ int gpiPeerGetSig(GPConnection *connection, GPIPeer *peer) {
     return result;
 }
 
-int gpiPeerStartConnect(GPConnection *connection, GPIPeer *peer) {
+GPResult gpiPeerStartConnect(GPConnection *connection, GPIPeer *peer) {
     GPIConnection *iconnection = *connection;
     GPIProfile *profile;
-    int state;
+    GSUdpPeerState state;
     int result;
 
     if (!gpiGetProfile(connection, peer->profile, &profile)) {
@@ -541,7 +545,7 @@ int gpiPeerStartConnect(GPConnection *connection, GPIPeer *peer) {
     return 0;
 }
 
-int gpiPeerAddMessage(GPConnection *connection, GPIPeer *peer, int type, const char *message) {
+GPResult gpiPeerAddMessage(GPConnection *connection, GPIPeer *peer, int type, const char *message) {
     int result;
 
     if (peer == NULL) {
@@ -572,7 +576,8 @@ int gpiPeerAddMessage(GPConnection *connection, GPIPeer *peer, int type, const c
     return result;
 }
 
-int gpiPeerStartTransferMessage(GPConnection *connection, GPIPeer *peer, int type, const GPITransferID *transferID) {
+GPResult gpiPeerStartTransferMessage(GPConnection *connection, GPIPeer *peer, int type,
+                                     const GPITransferID *transferID) {
     char buffer[64];
     gsi_u32 count = transferID->count;
     int profileid = transferID->profileid;
@@ -585,7 +590,7 @@ int gpiPeerStartTransferMessage(GPConnection *connection, GPIPeer *peer, int typ
     return gpiSendOrBufferString(connection, peer, buffer);
 }
 
-int gpiPeerFinishTransferMessage(GPConnection *connection, GPIPeer *peer, const char *message, int len) {
+GPResult gpiPeerFinishTransferMessage(GPConnection *connection, GPIPeer *peer, const char *message, int len) {
     char buffer[32];
     int result;
 
@@ -608,19 +613,21 @@ int gpiPeerFinishTransferMessage(GPConnection *connection, GPIPeer *peer, const 
     return result;
 }
 
-void gpiPeerLeftCallback(gsi_u32 ip, gsi_u16 port, int reason, void *userData) {
+void gpiPeerLeftCallback(unsigned int ip, unsigned short port, GSUdpCloseReason reason, void *userData) {
     GPIPeer *peer = gpiGetPeerByAddr(userData, ip, port);
 
     if (peer != NULL) {
         SocInAddr addr;
 
         addr.addr = ip;
-        gsDebugFormat(1, 0, 8, "Peer left: addr: %s:%d, profile: %d\n", SOC_InetNtoA(addr), port, peer->profile);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "Peer left: addr: %s:%d, profile: %d\n", SOC_InetNtoA(addr), port, peer->profile);
         peer->state = GPI_PEER_DISCONNECTED;
     }
 }
 
-void gpiPeerMessageCallback(gsi_u32 ip, gsi_u16 port, const void *data, int len, gsi_bool reliable, void *userData) {
+void gpiPeerMessageCallback(unsigned int ip, unsigned short port, unsigned char *data, int len, gsi_bool reliable,
+                            void *userData) {
     GPConnection *connection = userData;
     GPIPeer *peer = gpiGetPeerByAddr(connection, ip, port);
     SocInAddr addr;
@@ -638,8 +645,9 @@ void gpiPeerMessageCallback(gsi_u32 ip, gsi_u16 port, const void *data, int len,
             peer->ip = ip;
             peer->port = port;
         } else {
-            gsDebugFormat(1, 2, 1, "gpiPeerMessageCallback: out of memory when allocating peer, addr: %s:%d",
-                          SOC_InetNtoA(addr), port);
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                          "gpiPeerMessageCallback: out of memory when allocating peer, addr: %s:%d", SOC_InetNtoA(addr),
+                          port);
             return;
         }
     }
@@ -650,7 +658,8 @@ void gpiPeerMessageCallback(gsi_u32 ip, gsi_u16 port, const void *data, int len,
         size = length + (len >= 0x4000 ? len : 0x4000);
         newBuffer = gsirealloc(buffer, size + 1);
         if (newBuffer == NULL) {
-            gsDebugFormat(1, 2, 1, "gpiPeerMessageCallback: out of memory when reallocating buffer, addr: %s:%d",
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                          "gpiPeerMessageCallback: out of memory when reallocating buffer, addr: %s:%d",
                           SOC_InetNtoA(addr), port);
             gsifree(buffer);
             gpiSetErrorString(connection, "Out of memory.");
@@ -666,27 +675,31 @@ void gpiPeerMessageCallback(gsi_u32 ip, gsi_u16 port, const void *data, int len,
     buffer[peer->inputBuffer.len] = '\0';
 }
 
-void gpiPeerAcceptedCallback(gsi_u32 ip, gsi_u16 port, int reason, gsi_bool rejected, void *userData) {
+void gpiPeerAcceptedCallback(unsigned int ip, unsigned short port, GSUdpErrorCode reason, gsi_bool rejected,
+                             void *userData) {
     GPIPeer *peer = gpiGetPeerByAddr(userData, ip, port);
     SocInAddr addr;
 
     addr.addr = ip;
     if (peer == NULL) {
-        gsDebugFormat(1, 0, 1, "Peer does not exist: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
+                      "Peer does not exist: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
     } else if (rejected) {
         peer->state = GPI_PEER_DISCONNECTED;
-        gsDebugFormat(1, 0, 8, "Peer Connection rejected: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "Peer Connection rejected: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
         return;
     }
-    gsDebugFormat(1, 0, 8, "Peer Connection accepted: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
+    gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "Peer Connection accepted: ip-port: %s:%d\n", SOC_InetNtoA(addr), port);
 }
 
-void gpiPeerPingReplyCallback(gsi_u32 ip, gsi_u16 port, int latency, void *userData) {
+void gpiPeerPingReplyCallback(unsigned int ip, unsigned short port, unsigned int latency, void *userData) {
 }
 
 void gpiPeerAddOp(GPIPeer *peer, GPIPeerOp *operation) {
     if (peer == NULL || operation == NULL) {
-        gsDebugFormat(1, 4, 2, "Peer operation not added");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError, "Peer operation not added");
         return;
     }
     if (peer->peerOpQueue.first == NULL) {
@@ -701,7 +714,7 @@ void gpiPeerAddOp(GPIPeer *peer, GPIPeerOp *operation) {
         }
         peer->peerOpQueue.last = operation;
     }
-    gsDebugFormat(1, 4, 8, "Peer Operation Added");
+    gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice, "Peer Operation Added");
 }
 
 void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
@@ -709,11 +722,11 @@ void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
     GPIPeerOp *current;
 
     if (peer == NULL || operation == NULL) {
-        gsDebugFormat(1, 4, 2, "Peer operation not removed");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError, "Peer operation not removed");
         return;
     }
     if (peer->peerOpQueue.first == NULL) {
-        gsDebugFormat(1, 4, 2, "Peer operation not removed");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError, "Peer operation not removed");
         return;
     }
     previous = peer->peerOpQueue.opList;
@@ -724,13 +737,14 @@ void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
     } else {
         for (current = previous->next; current != operation; current = current->next) {
             if (current == NULL) {
-                gsDebugFormat(1, 4, 1, "Tried to remove peer operation not in list.");
+                gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_HotError,
+                              "Tried to remove peer operation not in list.");
                 return;
             }
             previous = current;
         }
         previous->next = operation->next;
     }
-    gsDebugFormat(1, 4, 8, "Peer operation removed");
+    gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_Notice, "Peer operation removed");
     gsifree(operation);
 }

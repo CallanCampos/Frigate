@@ -23,7 +23,7 @@ void ghiUnlock(void) {
 }
 
 // Decrypts what was received into the connection's decode buffer, to its receive buffer
-gsi_bool ghiDecryptReceivedData(GHIConnection *connection) {
+GHTTPBool ghiDecryptReceivedData(GHIConnection *connection) {
     int inSize = 0;
     int outSize = 0;
     int result;
@@ -47,7 +47,7 @@ gsi_bool ghiDecryptReceivedData(GHIConnection *connection) {
         } while (result == 2 && outSize == 0);
 
         if (inSize > connection->decodeBuffer.length) {
-            gsDebugFormat(8, 4, 1,
+            gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_HotError,
                           "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
                           inSize, connection->decodeBuffer.length);
             return gsi_false;
@@ -73,7 +73,7 @@ gsi_bool ghiDecryptReceivedData(GHIConnection *connection) {
 
 // Reads what the socket has, up to size - 1 bytes, into buffer and sets size to the count. Returns 0 for data, 1 for
 // none yet, 2 for the end of the connection and 3 for an error
-int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
+GHIRecvResult ghiDoReceive(GHIConnection *connection, char buffer[], int *size) {
     int max = *size - 1;
     int received;
     int error;
@@ -131,7 +131,7 @@ int ghiDoReceive(GHIConnection *connection, char *buffer, int *size) {
     }
     buffer[received] = '\0';
     *size = received;
-    gsDebugFormat(8, 0, 0x20, "Received %d bytes\n", received);
+    gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_RawDump, "Received %d bytes\n", received);
     return 0;
 }
 
@@ -182,7 +182,7 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
 
 // Sends the data if nothing waits to be sent before it, and buffers what could not be. Returns 0 for an error, 1 if
 // all was sent and 2 if some is buffered
-int ghiTrySendThenBuffer(GHIConnection *connection, const char *data, int size) {
+GHITrySendResult ghiTrySendThenBuffer(GHIConnection *connection, const char *data, int size) {
     int sent = 0;
 
     if (connection->encryptor.engine != 0 && connection->encryptor.active == 1 && connection->encryptor.mode == 1) {

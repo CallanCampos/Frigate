@@ -9,18 +9,18 @@
 // GameSpy's gt2Socket.c names them
 
 // The connection to an address, or NULL
-GTI2Connection *gti2SocketFindConnection(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port);
+GT2Connection gti2SocketFindConnection(GT2Socket socket, unsigned int ip, unsigned short port);
 // gti2CreateSocket takes the protocol, and gti2CloseSocket waits for the callbacks to return
-int gti2CreateSocket(GTI2Socket **socket, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
-                     GTI2SocketErrorCallback onSocketError, int protocol);
-void gti2CloseSocket(GTI2Socket *socket);
-void gti2Listen(GTI2Socket *socket, GTI2ConnectAttemptCallback callback);
-int gti2NewSocketConnection(GTI2Socket *socket, GTI2Connection **connection, gsi_u32 ip, gsi_u16 port);
-void gti2FreeSocketConnection(GTI2Connection *connection);
+GT2Result gti2CreateSocket(GT2Socket *socket, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
+                           gt2SocketErrorCallback onSocketError, GTI2ProtocolType protocol);
+void gti2CloseSocket(GT2Socket socket);
+void gti2Listen(GT2Socket socket, gt2ConnectAttemptCallback callback);
+GT2Result gti2NewSocketConnection(GT2Socket socket, GT2Connection *connection, unsigned int ip, unsigned short port);
+void gti2FreeSocketConnection(GT2Connection connection);
 // Sends a datagram to an address; gsi_false when a callback closed the socket
-gsi_bool gti2SocketSend(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message, int length);
-gsi_bool gti2SocketConnectionsThink(GTI2Socket *socket);
-void gti2FreeClosedConnections(GTI2Socket *socket);
-void gti2SocketError(GTI2Socket *socket);
+GT2Bool gti2SocketSend(GT2Socket socket, unsigned int ip, unsigned short port, const GT2Byte *message, int length);
+GT2Bool gti2SocketConnectionsThink(GT2Socket socket);
+void gti2FreeClosedConnections(GT2Socket socket);
+void gti2SocketError(GT2Socket socket);
 
 #endif // POKEBW2_DWC_GT2SOCKET_H

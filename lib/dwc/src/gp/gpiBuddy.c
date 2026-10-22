@@ -14,8 +14,8 @@
 // GameSpy GP's buddy messages and buddy list (gpiBuddy.c). The functions' names, from pret/pokerevo's Wii build and
 // GameSpy's later SDK, are in dwc/gp.h
 
-static int gpiSendAuthBuddyRequest(GPConnection *connection, GPIProfile *profile);
-static gsi_bool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data);
+static GPResult gpiSendAuthBuddyRequest(GPConnection *connection, GPIProfile *profile);
+static GPIBool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data);
 
 // Swaps the bytes of an address or a port from the server's order to the network's
 #define GPI_HTONL(x) (((x) << 24 & 0xff000000) | (((x) << 8 & 0xff0000) | ((gsi_u8)((x) >> 24) | ((x) >> 8 & 0xff00))))
@@ -32,7 +32,7 @@ static inline gsi_u16 gpiHtons(gsi_u16 x) {
         return 3;                                                                                                      \
     } while (0)
 
-static int gpiSendAuthBuddyRequest(GPConnection *connection, GPIProfile *profile) {
+static GPResult gpiSendAuthBuddyRequest(GPConnection *connection, GPIProfile *profile) {
     GPIConnection *iconnection = *connection;
 
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\authadd\\");
@@ -46,7 +46,7 @@ static int gpiSendAuthBuddyRequest(GPConnection *connection, GPIProfile *profile
     return 0;
 }
 
-int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
+GPResult gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
     GPIConnection *iconnection;
     GPIProfile *profile;
     GPICallback callback;
@@ -218,7 +218,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
             return 1;
         }
         if (iconnection->connectState == GPI_CONNECTED && profile->deleted) {
-            gsDebugFormat(1, 4, 2,
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError,
                           "Deliberately ignoring Buddy Message Status update from profile id [%i], "
                           "\t\t\t\tbecause could not be found in the local buddy list. It must have been "
                           "removed \n",
@@ -349,7 +349,7 @@ int gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input) {
     return 0;
 }
 
-int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
+GPResult gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
     GPIProfile *profile;
     GPIBuddyStatusInfo *buddyStatusInfo;
     GPICallback callback;
@@ -479,7 +479,7 @@ int gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *input) {
     return 0;
 }
 
-int gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
+GPResult gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
     int num;
     int profileid;
     GPIConnection *iconnection;
@@ -533,7 +533,7 @@ int gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
     return 0;
 }
 
-int gpiSendServerBuddyMessage(GPConnection *connection, int profileid, int type, const char *message) {
+GPResult gpiSendServerBuddyMessage(GPConnection *connection, int profileid, int type, const char *message) {
     GPIConnection *iconnection = *connection;
     char buffer[0xdad];
 
@@ -550,8 +550,8 @@ int gpiSendServerBuddyMessage(GPConnection *connection, int profileid, int type,
     return 0;
 }
 
-int gpiSendBuddyMessage(GPConnection *connection, int profileid, int type, const char *message, int sendOption,
-                        GPIPeerOp *peerOp) {
+GPResult gpiSendBuddyMessage(GPConnection *connection, int profileid, int type, const char *message, int sendOption,
+                             GPIPeerOp *peerOp) {
     GPIProfile *profile;
     GPIPeer *peer;
     int result;
@@ -601,7 +601,7 @@ int gpiSendBuddyMessage(GPConnection *connection, int profileid, int type, const
     return 0;
 }
 
-int gpiBuddyHandleKeyRequest(GPConnection *connection, GPIPeer *peer) {
+GPResult gpiBuddyHandleKeyRequest(GPConnection *connection, GPIPeer *peer) {
     char *message;
     int result;
 
@@ -630,7 +630,7 @@ int gpiBuddyHandleKeyRequest(GPConnection *connection, GPIPeer *peer) {
         }                                                                                                              \
     }
 
-int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer) {
+GPResult gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer) {
     // The order of these declarations sets the locals' stack slots
     GPIProfile *profile;
     GPIPeerOp *op;
@@ -738,7 +738,7 @@ int gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *buffer
     return 0;
 }
 
-int gpiAuthBuddyRequest(GPConnection *connection, int profile) {
+GPResult gpiAuthBuddyRequest(GPConnection *connection, GPProfile profile) {
     GPIConnection *iconnection = *connection;
     GPIProfile *pProfile;
     int result;
@@ -767,7 +767,7 @@ int gpiAuthBuddyRequest(GPConnection *connection, int profile) {
 }
 
 // Moves down the buddy indexes after the one of a deleted buddy (data)
-static gsi_bool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data) {
+static GPIBool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile, void *data) {
     int baseIndex = (int)data;
 
     if (profile->buddyStatus != NULL && profile->buddyStatus->buddyIndex > baseIndex) {
@@ -778,7 +778,7 @@ static gsi_bool gpiFixBuddyIndices(GPConnection *connection, GPIProfile *profile
     return gsi_true;
 }
 
-int gpiDeleteBuddy(GPConnection *connection, int profile, gsi_bool sendServerRequest) {
+GPResult gpiDeleteBuddy(GPConnection *connection, GPProfile profile, GPIBool sendServerRequest) {
     GPIConnection *iconnection = *connection;
     GPIProfile *pProfile;
     GPIBuddyStatus *buddyStatus;

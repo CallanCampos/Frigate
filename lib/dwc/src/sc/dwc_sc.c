@@ -12,19 +12,19 @@ typedef struct ScState {
     ScResultFunc createSessionFunc;
     ScResultFunc reportIntentionFunc;
     ScResultFunc submitReportFunc;
-    AuthKeys keys;
-    AuthCertificate certificate;
+    GSLoginPrivateData keys;
+    GSLoginCertificate certificate;
 } ScState;
 
 static void Sc_Printf(int line, const char *format, ...);
-static void Sc_OnLogin(int status, AuthResult *result, void *userData);
+static void Sc_OnLogin(GHTTPResult status, WSLoginResponse *result, void *userData);
 static int Sc_GetErrorType(int error);
 static int Sc_GetErrorCode(int step, int error);
 static int Sc_SetAuthError(int error);
 static void Sc_ReleaseUrls(void);
-static void Sc_OnCreateSession(ScClient *client, int status, int error, void *userData);
-static void Sc_OnReportIntention(ScClient *client, int status, int error, void *userData);
-static void Sc_OnSubmitReport(ScClient *client, int status, int error, void *userData);
+static void Sc_OnCreateSession(ScClient *client, GHTTPResult status, SCResult error, void *userData);
+static void Sc_OnReportIntention(ScClient *client, GHTTPResult status, SCResult error, void *userData);
+static void Sc_OnSubmitReport(ScClient *client, GHTTPResult status, SCResult error, void *userData);
 
 static ScState sScState;
 
@@ -66,7 +66,7 @@ int Sc_Shutdown(void) {
     Sc_ReleaseUrls();
     gsCoreShutdown();
     gsCoreThink(0);
-    if (gsCoreIsShutdown() != 2) {
+    if (gsCoreIsShutdown() != GSCore_SHUTDOWN_COMPLETE) {
         gsCoreThink(0);
     }
     return error;
@@ -98,7 +98,7 @@ int Sc_CreateSession(ScResultFunc func, int timeout, void *userData) {
     return error;
 }
 
-static void Sc_OnCreateSession(ScClient *client, int status, int error, void *userData) {
+static void Sc_OnCreateSession(ScClient *client, GHTTPResult status, SCResult error, void *userData) {
     sScState.createSessionFunc(error, userData);
 }
 
@@ -114,7 +114,7 @@ int Sc_SetReportIntention(int authoritative, ScResultFunc func, int timeout, voi
     return error;
 }
 
-static void Sc_OnReportIntention(ScClient *client, int status, int error, void *userData) {
+static void Sc_OnReportIntention(ScClient *client, GHTTPResult status, SCResult error, void *userData) {
     sScState.reportIntentionFunc(error, userData);
 }
 
@@ -130,7 +130,7 @@ int Sc_SubmitReport(ScReport *report, int authoritative, ScResultFunc func, int 
     return error;
 }
 
-static void Sc_OnSubmitReport(ScClient *client, int status, int error, void *userData) {
+static void Sc_OnSubmitReport(ScClient *client, GHTTPResult status, SCResult error, void *userData) {
     sScState.submitReportFunc(error, userData);
 }
 
@@ -143,11 +143,11 @@ int Sc_SetSessionId(const char *csid) {
     return error;
 }
 
-char *Sc_GetSessionId(void) {
+const char *Sc_GetSessionId(void) {
     return ScClient_GetCsid(sScState.client);
 }
 
-char *Sc_GetConnectionId(void) {
+const char *Sc_GetConnectionId(void) {
     return ScClient_GetCcid(sScState.client);
 }
 
@@ -196,8 +196,8 @@ int Sc_BeginGroup(ScReport *report) {
     return error;
 }
 
-int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int result, const AuthCertificate *certificate,
-                 void *unused) {
+int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int result,
+                 const GSLoginCertificate *certificate, void *unused) {
     int error = ScReport_SetPlayer(report, index, id, key, result, certificate->profileId, certificate, unused);
 
     if (error != 0) {
@@ -215,7 +215,7 @@ int Sc_FinishReport(ScReport *report, int flag, int value) {
     return error;
 }
 
-int Sc_AddInt(ScReport *report, int key, int value) {
+int Sc_AddInt(ScReport *report, u16 key, s32 value) {
     int error = ScReport_AddInt(report, key, value);
 
     if (error != 0) {
@@ -224,7 +224,7 @@ int Sc_AddInt(ScReport *report, int key, int value) {
     return error;
 }
 
-int Sc_AddByte(ScReport *report, int key, int value) {
+int Sc_AddByte(ScReport *report, u16 key, s8 value) {
     int error = ScReport_AddByte(report, key, value);
 
     if (error != 0) {
@@ -242,7 +242,7 @@ int Sc_FreeReport(ScReport *report) {
     return error;
 }
 
-int Sc_GetCertificate(const AuthCertificate **certificate) {
+int Sc_GetCertificate(const GSLoginCertificate **certificate) {
     *certificate = &sScState.certificate;
     return 0;
 }
@@ -258,7 +258,7 @@ static void Sc_Printf(int line, const char *format, ...) {
     va_end(args);
 }
 
-static void Sc_OnLogin(int status, AuthResult *result, void *userData) {
+static void Sc_OnLogin(GHTTPResult status, WSLoginResponse *result, void *userData) {
     if (status != 0) {
         Sc_Printf(789, "Failed on player login, GHTTP error: %d\n", status);
         if (status == 1) {
@@ -271,8 +271,8 @@ static void Sc_OnLogin(int status, AuthResult *result, void *userData) {
         Sc_Printf(803, "Failed on player login, Login result: %d\n", result->error);
         Sc_SetAuthError(result->error);
     } else {
-        memcpy(&sScState.certificate, &result->certificate, sizeof(AuthCertificate));
-        memcpy(&sScState.keys, &result->keys, sizeof(AuthKeys));
+        memcpy(&sScState.certificate, &result->certificate, sizeof(GSLoginCertificate));
+        memcpy(&sScState.keys, &result->keys, sizeof(GSLoginPrivateData));
         Sc_Printf(811, "Player '%s' logged in.\r\n", result->certificate.uniqueNick);
     }
     sScState.loginDone = 1;

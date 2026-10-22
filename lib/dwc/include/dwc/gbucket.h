@@ -14,13 +14,15 @@ typedef enum BucketType {
     bt_string,
 } BucketType;
 
-// A set of buckets, the later SDK's bucketset_t
-typedef struct GBucketSet {
-    HashTable *buckets;
-} GBucketSet;
+// A set of buckets
+typedef struct bucketset_s *bucketset_t;
+
+struct bucketset_s {
+    HashTable buckets;
+};
 
 // One value: its name, its type, how many values its average was made of, and the value
-typedef struct GBucket {
+typedef struct bucket_s {
     char *name;
     BucketType type;
     int nvals;
@@ -29,23 +31,23 @@ typedef struct GBucket {
         double fval;
         char *sval;
     } vals;
-} GBucket;
+} bucket_t;
 
 // The set that the functions use when they are given none
-extern GBucketSet *g_buckets;
+extern bucketset_t g_buckets;
 
 // Each returns the bucket's new value (an int *, a double * or the text), or NULL if the set has no bucket of the name
-void *BucketNew(GBucketSet *set, char *name, BucketType type, void *initialvalue);
-void *BucketSet(GBucketSet *set, char *name, void *value);
+void *BucketNew(bucketset_t set, char *name, BucketType type, void *initialvalue);
+void *BucketSet(bucketset_t set, char *name, void *value);
 // The operations change an int or a double by the value; on a text BucketAdd appends the value and the others do
 // nothing
-void *BucketAdd(GBucketSet *set, char *name, void *value);
-void *BucketSub(GBucketSet *set, char *name, void *value);
-void *BucketMult(GBucketSet *set, char *name, void *value);
-void *BucketDiv(GBucketSet *set, char *name, void *value);
-void *BucketConcat(GBucketSet *set, char *name, void *value);
+void *BucketAdd(bucketset_t set, char *name, void *value);
+void *BucketSub(bucketset_t set, char *name, void *value);
+void *BucketMult(bucketset_t set, char *name, void *value);
+void *BucketDiv(bucketset_t set, char *name, void *value);
+void *BucketConcat(bucketset_t set, char *name, void *value);
 // Averages the value in, counting the values the bucket has had since it was set
-void *BucketAvg(GBucketSet *set, char *name, void *value);
+void *BucketAvg(bucketset_t set, char *name, void *value);
 // The address of a copy of an int or a double, for the functions above
 void *bint(int i);
 void *bfloat(double f);

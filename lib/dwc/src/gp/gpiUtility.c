@@ -4,12 +4,12 @@
 
 // GameSpy GP's helpers (gpiUtility.c). The functions' names, from pret/pokerevo's Wii build, are in dwc/gp.h
 
-void strzcpy(char *dest, const char *src, gsi_u32 len) {
+void strzcpy(char *dest, const char *src, size_t len) {
     strncpy(dest, src, len);
     *(dest + len - 1) = '\0';
 }
 
-gsi_bool gpiCheckForError(GPConnection *connection, const char *input, gsi_bool callErrorCallback) {
+GPIBool gpiCheckForError(GPConnection *connection, const char *input, GPIBool callErrorCallback) {
     char buffer[16];
     GPIConnection *iconnection = *connection;
 
@@ -29,7 +29,7 @@ gsi_bool gpiCheckForError(GPConnection *connection, const char *input, gsi_bool 
     return gsi_false;
 }
 
-gsi_bool gpiValueForKeyWithIndex(const char *command, const char *key, int *index, char *value, int len) {
+GPIBool gpiValueForKeyWithIndex(const char *command, const char *key, int *index, char *value, int len) {
     const char *start;
     const char *found;
     char delimiter = key[0];
@@ -52,7 +52,7 @@ gsi_bool gpiValueForKeyWithIndex(const char *command, const char *key, int *inde
     return gsi_true;
 }
 
-gsi_bool gpiValueForKey(const char *command, const char *key, char *value, int len) {
+GPIBool gpiValueForKey(const char *command, const char *key, char *value, int len) {
     const char *found;
     char delimiter = key[0];
     int c;
@@ -72,25 +72,25 @@ gsi_bool gpiValueForKey(const char *command, const char *key, char *value, int l
     return gsi_true;
 }
 
-int gpiCheckSocketConnect(GPConnection *connection, int sock, int *state) {
+GPResult gpiCheckSocketConnect(GPConnection *connection, SOCKET sock, int *state) {
     int writeFlag = 0;
     int exceptFlag = 0;
     int result = GSISocketSelect(sock, NULL, &writeFlag, &exceptFlag);
 
     if (result == -1) {
-        gsDebugFormat(1, 0, 1, "Error connecting\n");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError, "Error connecting\n");
         gpiSetError(connection, 5, "There was an error checking for a completed connection.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
     if (result > 0) {
         if (exceptFlag) {
-            gsDebugFormat(1, 0, 1, "Connection rejected\n");
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError, "Connection rejected\n");
             *state = 4;
             return 0;
         }
         if (writeFlag) {
-            gsDebugFormat(1, 0, 8, "Connection accepted\n");
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice, "Connection accepted\n");
             *state = 3;
             return 0;
         }
@@ -107,7 +107,7 @@ int gpiCheckSocketConnect(GPConnection *connection, int sock, int *state) {
         return 3;                                                                                                      \
     } while (0)
 
-int gpiReadKeyAndValue(GPConnection *connection, const char *buffer, int *index, char *key, char *value) {
+GPResult gpiReadKeyAndValue(GPConnection *connection, const char *buffer, int *index, char key[512], char value[512]) {
     const char *start;
     int c;
     int i;
@@ -142,7 +142,7 @@ int gpiReadKeyAndValue(GPConnection *connection, const char *buffer, int *index,
     return 0;
 }
 
-void gpiSetError(GPConnection *connection, int errorCode, const char *errorString) {
+void gpiSetError(GPConnection *connection, GPErrorCode errorCode, const char *errorString) {
     GPIConnection *iconnection = *connection;
 
     strzcpy(iconnection->errorString, errorString, 256);

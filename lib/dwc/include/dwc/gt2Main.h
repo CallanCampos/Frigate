@@ -2,7 +2,7 @@
 #define POKEBW2_DWC_GT2MAIN_H
 
 #include "dwc/darray.h"
-#include "dwc/gt2Buffer.h"
+#include "dwc/gsPlatformSocket.h"
 #include "dwc/hashtable.h"
 #include "dwc/nonport.h"
 
@@ -28,135 +28,215 @@
 #define GTI2_SWAP16(x) ((gsi_u16)((gsi_u8)((x) >> 8) | ((x) << 8 & 0xff00)))
 #define GTI2_SWAP32(x) ((gsi_u8)((x) >> 24) | ((x) >> 8 & 0xff00) | ((x) << 8 & 0xff0000) | ((x) << 24 & 0xff000000))
 
-typedef struct GTI2Socket GTI2Socket;
-typedef struct GTI2Connection GTI2Connection;
+// GameSpy's public types of GT2 (gt2.h)
+typedef int GT2Bool;
+#define GT2False 0
+#define GT2True 1
+
+typedef unsigned char GT2Byte;
+
+typedef struct GTI2Socket *GT2Socket;
+typedef struct GTI2Connection *GT2Connection;
+
+typedef unsigned short GT2MessageID;
+
+typedef enum {
+    GT2Success,
+    GT2OutOfMemory,
+    GT2Rejected,
+    GT2NetworkError,
+    GT2AddressError,
+    GT2DuplicateAddress,
+    GT2TimedOut,
+    GT2NegotiationError,
+    GT2InvalidConnection,
+    GT2InvalidMessage,
+    GT2SendFailed
+} GT2Result;
+
+typedef enum { GT2Connecting, GT2Connected, GT2Closing, GT2Closed } GT2ConnectionState;
+
+typedef enum {
+    GT2LocalClose,
+    GT2RemoteClose,
+    GT2CommunicationError,
+    GT2SocketError,
+    GT2NotEnoughMemory
+} GT2CloseReason;
 
 // A socket's callbacks: an error of the socket, a connection attempt from a peer (with the milliseconds the handshake
 // took and the attempt's message), every datagram sent or received (reset when the peer's port was unreachable),
 // and a datagram that isn't GT2's, which returns whether the app handled it
-typedef void (*GTI2SocketErrorCallback)(GTI2Socket *socket);
-typedef void (*GTI2ConnectAttemptCallback)(GTI2Socket *socket, GTI2Connection *connection, gsi_u32 ip, gsi_u16 port,
-                                           int latency, const void *message, int length);
-typedef void (*GTI2DumpCallback)(GTI2Socket *socket, GTI2Connection *connection, gsi_u32 ip, gsi_u16 port,
-                                 gsi_bool reset, const void *message, int length);
-typedef gsi_bool (*GTI2UnrecognizedMessageCallback)(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message,
-                                                    int length);
+typedef void (*gt2SocketErrorCallback)(GT2Socket socket);
+typedef void (*gt2ConnectAttemptCallback)(GT2Socket socket, GT2Connection connection, unsigned int ip,
+                                          unsigned short port, int latency, GT2Byte *message, int len);
+typedef void (*gt2DumpCallback)(GT2Socket socket, GT2Connection connection, unsigned int ip, unsigned short port,
+                                GT2Bool reset, const GT2Byte *message, int len);
+typedef GT2Bool (*gt2UnrecognizedMessageCallback)(GT2Socket socket, unsigned int ip, unsigned short port,
+                                                  GT2Byte *message, int len);
 
 // A connection's callbacks: the result of its connect attempt (with the peer's message for a rejection), a message
 // received, the connection closed (with the reason), and the latency of a ping in milliseconds
-typedef struct GTI2ConnectionCallbacks {
-    void (*onConnected)(GTI2Connection *connection, int result, const void *message, int length);
-    void (*onReceived)(GTI2Connection *connection, const void *message, int length, gsi_bool reliable);
-    void (*onClosed)(GTI2Connection *connection, int reason);
-    void (*onPing)(GTI2Connection *connection, int latency);
-} GTI2ConnectionCallbacks;
+typedef void (*gt2ConnectedCallback)(GT2Connection connection, GT2Result result, GT2Byte *message, int len);
+typedef void (*gt2ReceivedCallback)(GT2Connection connection, GT2Byte *message, int len, GT2Bool reliable);
+typedef void (*gt2ClosedCallback)(GT2Connection connection, GT2CloseReason reason);
+typedef void (*gt2PingCallback)(GT2Connection connection, int latency);
+
+typedef struct {
+    gt2ConnectedCallback connected;
+    gt2ReceivedCallback received;
+    gt2ClosedCallback closed;
+    gt2PingCallback ping;
+} GT2ConnectionCallbacks;
 
 // The filters a connection passes the messages it sends and receives through
-typedef void (*GTI2FilterCallback)(GTI2Connection *connection, int filterId, const void *message, int length,
-                                   gsi_bool reliable);
+typedef void (*gt2SendFilterCallback)(GT2Connection connection, int filterID, const GT2Byte *message, int len,
+                                      GT2Bool reliable);
+typedef void (*gt2ReceiveFilterCallback)(GT2Connection connection, int filterID, GT2Byte *message, int len,
+                                         GT2Bool reliable);
 
-struct GTI2Socket {
-    int handle; // the socket's descriptor
-    gsi_u32 ip;
-    gsi_u16 port;
-    HashTable *connections;    // of GTI2Connection *, by address
-    DArray *closedConnections; // the GTI2Connection * that closed and wait to be freed
-    gsi_bool close;            // closed inside a callback, so it is freed once the callbacks return
-    gsi_bool error;
+// A buffer of bytes: length bytes of capacity are used
+typedef struct GTI2Buffer {
+    GT2Byte *data;
+    int capacity;
+    int length;
+} GTI2Buffer;
+
+// A connection's state inside GT2, and the types of its messages
+typedef enum {
+    GTI2AwaitingServerChallenge,
+    GTI2AwaitingAcceptance,
+    GTI2AwaitingClientChallenge,
+    GTI2AwaitingClientResponse,
+    GTI2AwaitingAcceptReject,
+    GTI2Connected,
+    GTI2Closing,
+    GTI2Closed
+} GTI2ConnectionState;
+
+typedef enum {
+    GTI2MsgAppReliable,
+    GTI2MsgClientChallenge,
+    GTI2MsgServerChallenge,
+    GTI2MsgClientResponse,
+    GTI2MsgAccept,
+    GTI2MsgReject,
+    GTI2MsgClose,
+    GTI2MsgKeepAlive,
+    GTI2NumReliableMessages,
+    GTI2MsgAck = 100,
+    GTI2MsgNack,
+    GTI2MsgPing,
+    GTI2MsgPong,
+    GTI2MsgClosed
+} GTI2MessageType;
+
+// What a socket sends over: UDP, or UDP with a length before each message (VDP), or ad hoc
+typedef enum { GTI2UdpProtocol, GTI2VdpProtocol = 2, GTI2AdHocProtocol = 3 } GTI2ProtocolType;
+
+typedef struct GTI2Socket {
+    SOCKET handle; // the socket's descriptor
+    unsigned int ip;
+    unsigned short port;
+    HashTable connections;    // of GT2Connection, by address
+    DArray closedConnections; // the GT2Connection that closed and wait to be freed
+    GT2Bool close;            // closed inside a callback, so it is freed once the callbacks return
+    GT2Bool error;
     int callbackLevel; // how many callbacks are running
-    GTI2ConnectAttemptCallback onConnectAttempt;
-    GTI2SocketErrorCallback onSocketError;
-    GTI2DumpCallback onSendDump;
-    GTI2DumpCallback onReceiveDump;
-    GTI2UnrecognizedMessageCallback onUnrecognizedMessage;
-    gsi_u8 unk_34[4];
+    gt2ConnectAttemptCallback onConnectAttempt;
+    gt2SocketErrorCallback onSocketError;
+    gt2DumpCallback onSendDump;
+    gt2DumpCallback onReceiveDump;
+    gt2UnrecognizedMessageCallback onUnrecognizedMessage;
+    void *data; // the app's data
     int outgoingBufferSize;
     int incomingBufferSize;
-    int protocol;       // 2 puts a 2-byte length before every message, 3 isn't bound to the local address
-    int protocolOffset; // the bytes before GT2's own header: the protocol, or 0 for protocol 3
-    gsi_u8 unk_48[4];
-};
+    GTI2ProtocolType protocol; // VDP puts a 2-byte length before every message, ad hoc isn't bound to the local address
+    int protocolOffset;        // the bytes before GT2's own header: the protocol, or 0 for ad hoc
+    GT2Bool broadcastEnabled;
+} GTI2Socket;
 
 // A reliable message that arrived ahead of its turn and waits in the incoming buffer
-typedef struct GTI2IncomingMessage {
+typedef struct GTI2IncomingBufferMessage {
     int offset;
     int length;
-    int type;
-    gsi_u16 serialNumber;
-} GTI2IncomingMessage;
+    GTI2MessageType type;
+    unsigned short serialNumber;
+} GTI2IncomingBufferMessage;
 
 // A reliable message that was sent and waits in the outgoing buffer for the peer's ack
-typedef struct GTI2OutgoingMessage {
+typedef struct GTI2OutgoingBufferMessage {
     int offset;
     int length;
-    gsi_u16 serialNumber;
-    gsi_u32 sendTime;
-} GTI2OutgoingMessage;
+    unsigned short serialNumber;
+    gsi_time sendTime;
+} GTI2OutgoingBufferMessage;
 
-struct GTI2Connection {
-    gsi_u32 ip;
-    gsi_u16 port;
+typedef struct GTI2Connection {
+    unsigned int ip;
+    unsigned short port;
     GTI2Socket *socket;
-    int state;
-    gsi_bool initiated;          // opened from this side
-    gsi_bool freeAtAcceptReject; // closed while the app decides, so it is freed once it has
-    int result;                  // the result of the connect attempt
-    gsi_u32 startTime;
-    gsi_u32 timeout; // in milliseconds, 0 for none
+    GTI2ConnectionState state;
+    GT2Bool initiated;          // opened from this side
+    GT2Bool freeAtAcceptReject; // closed while the app decides, so it is freed once it has
+    GT2Result result;           // the result of the connect attempt
+    gsi_time startTime;
+    gsi_time timeout; // in milliseconds, 0 for none
     int callbackLevel;
-    GTI2ConnectionCallbacks callbacks;
-    gsi_u8 *initialMessage; // the message the connect attempt sends
+    GT2ConnectionCallbacks callbacks;
+    char *initialMessage; // the message the connect attempt sends
     int initialMessageLength;
     void *userData;
     GTI2Buffer incoming;
     GTI2Buffer outgoing;
-    DArray *incomingMessages;     // GTI2IncomingMessage
-    DArray *outgoingMessages;     // GTI2OutgoingMessage
-    gsi_u16 serialNumber;         // of the next reliable message sent
-    gsi_u16 expectedSerialNumber; // of the next reliable message to receive
-    gsi_u8 response[0x20];        // the response the peer must give to this side's challenge
-    gsi_u32 lastSendTime;
-    gsi_u32 challengeTime; // when the server's challenge was sent, which the attempt's latency counts from
-    gsi_bool pendingAck;
-    gsi_u32 pendingAckTime;
-    DArray *sendFilters;    // GTI2FilterCallback
-    DArray *receiveFilters; // GTI2FilterCallback
-};
+    DArray incomingMessages;             // GTI2IncomingBufferMessage
+    DArray outgoingMessages;             // GTI2OutgoingBufferMessage
+    unsigned short serialNumber;         // of the next reliable message sent
+    unsigned short expectedSerialNumber; // of the next reliable message to receive
+    char response[0x20];                 // the response the peer must give to this side's challenge
+    gsi_time lastSendTime;
+    gsi_time challengeTime; // when the server's challenge was sent, which the attempt's latency counts from
+    GT2Bool pendingAck;
+    gsi_time pendingAckTime;
+    DArray sendFilters;    // gt2SendFilterCallback
+    DArray receiveFilters; // gt2ReceiveFilterCallback
+} GTI2Connection;
 
 // gt2CreateSocket, bound to a local address ("ip:port", or ":port"), with the buffer sizes of its connections (0 for
 // 64 KB); gt2CloseSocket and gt2Think, which receives, runs every connection's timers and frees the closed ones
-int func_ov011_0217d144(GTI2Socket **socket, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
-                        GTI2SocketErrorCallback onSocketError);
-void func_ov011_0217d158(GTI2Socket *socket);
-void func_ov011_0217d168(GTI2Socket *socket);
+GT2Result func_ov011_0217d144(GT2Socket *socket, const char *localAddress, int outgoingBufferSize,
+                              int incomingBufferSize, gt2SocketErrorCallback onSocketError);
+void func_ov011_0217d158(GT2Socket socket);
+void func_ov011_0217d168(GT2Socket socket);
 // gt2Listen, which takes connection attempts with the callback (none without it), and gt2Accept and gt2Reject, for a
 // connection waiting for the app; gt2Accept returns gsi_false unless it was
-void func_ov011_0217d188(GTI2Socket *socket, GTI2ConnectAttemptCallback callback);
-gsi_bool func_ov011_0217d190(GTI2Connection *connection, const GTI2ConnectionCallbacks *callbacks);
-void func_ov011_0217d198(GTI2Connection *connection, const void *message, int length);
+void func_ov011_0217d188(GT2Socket socket, gt2ConnectAttemptCallback callback);
+GT2Bool func_ov011_0217d190(GT2Connection connection, GT2ConnectionCallbacks *callbacks);
+void func_ov011_0217d198(GT2Connection connection, const GT2Byte *message, int length);
 // gt2Connect, to "host:port" with a message for the peer: blocking, it runs the socket until the attempt ends and
 // returns its result, otherwise it returns once the attempt started
-int func_ov011_0217d1a0(GTI2Socket *socket, GTI2Connection **connection, const char *remoteAddress, const void *message,
-                        int length, gsi_u32 timeout, const GTI2ConnectionCallbacks *callbacks, gsi_bool blocking);
+GT2Result func_ov011_0217d1a0(GT2Socket socket, GT2Connection *connection, const char *remoteAddress,
+                              const GT2Byte *message, int length, int timeout, GT2ConnectionCallbacks *callbacks,
+                              GT2Bool blocking);
 // gt2Send; a length of -1 sends a text with its end
-int func_ov011_0217d290(GTI2Connection *connection, const void *message, int length, gsi_bool reliable);
+GT2Result func_ov011_0217d290(GT2Connection connection, const GT2Byte *message, int length, GT2Bool reliable);
 // Close at once without waiting for the peer
-void gt2CloseConnectionHard(GTI2Connection *connection);
-void gt2CloseAllConnectionsHard(GTI2Socket *socket);
+void gt2CloseConnectionHard(GT2Connection connection);
+void gt2CloseAllConnectionsHard(GT2Socket socket);
 // The connection's state as the app sees it: 0 connecting, 1 connected, 2 closing, 3 closed
-int func_ov011_0217d364(GTI2Connection *connection);
+GT2ConnectionState func_ov011_0217d364(GT2Connection connection);
 // The peer's ip and port, the socket's own ip and port (gt2GetLocalPort), and the size and free space of the
 // connection's outgoing buffer (gt2GetOutgoingBufferFreeSpace)
-gsi_u32 func_ov011_0217d380(GTI2Connection *connection);
-gsi_u16 func_ov011_0217d384(GTI2Connection *connection);
-gsi_u32 func_ov011_0217d388(GTI2Socket *socket);
-gsi_u16 func_ov011_0217d38c(GTI2Socket *socket);
-int func_ov011_0217d390(GTI2Connection *connection);
-int func_ov011_0217d394(GTI2Connection *connection);
-int gt2GetSocketSOCKET(GTI2Socket *socket);
+unsigned int func_ov011_0217d380(GT2Connection connection);
+unsigned short func_ov011_0217d384(GT2Connection connection);
+unsigned int func_ov011_0217d388(GT2Socket socket);
+unsigned short func_ov011_0217d38c(GT2Socket socket);
+int func_ov011_0217d390(GT2Connection connection);
+int func_ov011_0217d394(GT2Connection connection);
+SOCKET gt2GetSocketSOCKET(GT2Socket socket);
 // gt2SetUnrecognizedMessageCallback
-void func_ov011_0217d3a0(GTI2Socket *socket, GTI2UnrecognizedMessageCallback callback);
-void gt2SetConnectionData(GTI2Connection *connection, void *userData);
-void *gt2GetConnectionData(GTI2Connection *connection);
+void func_ov011_0217d3a0(GT2Socket socket, gt2UnrecognizedMessageCallback callback);
+void gt2SetConnectionData(GT2Connection connection, void *userData);
+void *gt2GetConnectionData(GT2Connection connection);
 
 #endif // POKEBW2_DWC_GT2MAIN_H

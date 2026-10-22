@@ -42,13 +42,13 @@ void ScClient_End(ScClient *client);
 void ScClient_RunLibrary(ScClient *client);
 // Each posts a request's SOAP message to the service, returning 0 or an error code; the client's function is called
 // when the answer has been read
-int ScClient_PostCreateSession(ScClient *client, int gameId, AuthCertificate *certificate, AuthKeys *keys,
+int ScClient_PostCreateSession(ScClient *client, int gameId, GSLoginCertificate *certificate, GSLoginPrivateData *keys,
                                ScClientFunc func, int timeout, void *userData);
 int ScClient_PostReportIntention(ScClient *client, int gameId, const char *csid, const char *ccid, int authoritative,
-                                 AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func, int timeout,
-                                 void *userData);
+                                 GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                                 int timeout, void *userData);
 int ScClient_PostReport(ScClient *client, int gameId, const char *csid, const char *ccid, ScReport *report,
-                        int authoritative, AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func, int timeout,
-                        void *userData);
+                        int authoritative, GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                        int timeout, void *userData);
 
 #endif // POKEBW2_DWC_COMPETITION_INTERNAL_H

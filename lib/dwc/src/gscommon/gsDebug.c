@@ -8,21 +8,24 @@
 // type (13 categories of 5 types)
 typedef struct GSIDebugInstance {
     GSIDebugCallback callback;
-    gsi_bool initialized;
+    gsi_i32 initialized;
     GSICriticalSection crit;
-    gsi_u8 levels[13][5];
+    GSIDebugLevel levels[GSIDebugCat_Count][GSIDebugType_Count];
 } GSIDebugInstance;
 
-static void gsiDebugPrintToConsole(int category, int type, int level, const char *format, va_list args);
-static void HexEncode16(const gsi_u8 *data, char *line, int size);
+static void gsiDebugPrintToConsole(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level,
+                                   const char *format, va_list args);
+static void HexEncode16(const char *data, char *line, unsigned int size);
 
 static GSIDebugInstance gGSIDebugInstance;
 
-static void gsiDebugPrintToConsole(int category, int type, int level, const char *format, va_list args) {
+static void gsiDebugPrintToConsole(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level,
+                                   const char *format, va_list args) {
     ScreenVPrintf(format, args);
 }
 
-void gsDebugVaList(int category, int type, int level, const char *format, va_list args) {
+void gsDebugVaList(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
+                   va_list args) {
     if (!gGSIDebugInstance.initialized) {
         gGSIDebugInstance.initialized = gsi_true;
         gsiInitializeCriticalSection(&gGSIDebugInstance.crit);
@@ -38,7 +41,7 @@ void gsDebugVaList(int category, int type, int level, const char *format, va_lis
     gsiLeaveCriticalSection(&gGSIDebugInstance.crit);
 }
 
-void gsDebugFormat(int category, int type, int level, const char *format, ...) {
+void gsDebugFormat(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format, ...) {
     va_list args;
 
     va_start(args, format);
@@ -47,13 +50,13 @@ void gsDebugFormat(int category, int type, int level, const char *format, ...) {
 }
 
 // Writes up to 16 bytes as a line: pairs of hexadecimal digits, then the bytes as characters from column 41
-static void HexEncode16(const gsi_u8 *data, char *line, int size) {
+static void HexEncode16(const char *data, char *line, unsigned int size) {
     char *chars = line + 41;
-    int odd = size & 1;
+    unsigned int odd = size & 1;
 
     memset(line, ' ', 0x40);
     while (size--) {
-        gsi_u8 c = *data++;
+        unsigned char c = (unsigned char)*data++;
 
         OS_SPrintf(line, "%02X", c);
         if (isgraph(c)) {
@@ -71,7 +74,7 @@ static void HexEncode16(const gsi_u8 *data, char *line, int size) {
     *chars = '\0';
 }
 
-void gsDebugBinary(int category, int type, int level, const gsi_u8 *data, int size) {
+void gsDebugBinary(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *data, gsi_i32 size) {
     int left = size;
     char line[0x50];
 

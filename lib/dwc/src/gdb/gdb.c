@@ -8,7 +8,7 @@
 // when any request ends, which logs it and gives the answer to the function the caller passed.
 
 // The operations the library has, as the texts of its log name them. Only some have calls in the ROM
-typedef void (*GdbRecordsCallback)(int recordNum, SakeField **records, void *work);
+typedef void (*GdbRecordsCallback)(int recordNum, SAKEField **records, void *work);
 
 typedef enum GdbOperation {
     GDB_OPERATION_NONE,
@@ -31,19 +31,19 @@ typedef enum GdbOperation {
 // What a request was asked, which the answer's log and function need: the Sake's request, then what its operation
 // takes (the Sake's input first, the rest after it)
 typedef struct GdbRequest {
-    SakeRequest *request;
+    SAKERequest request;
     union {
         struct {
-            SakeCreateRecordInput input;
+            SAKECreateRecordInput input;
             int *recordId;
         } create;
         struct {
             const char *table;
             int recordId;
         } delete;
-        SakeUpdateRecordInput update;
+        SAKEUpdateRecordInput update;
         struct {
-            SakeGetMyRecordsInput input;
+            SAKEGetMyRecordsInput input;
             GdbRecordsCallback func;
         } getMy;
         struct {
@@ -52,7 +52,7 @@ typedef struct GdbRequest {
             int *ownedNum;
         } getRecordLimit;
         struct {
-            SakeGetSpecificRecordsInput input;
+            SAKEGetSpecificRecordsInput input;
             GdbRecordsCallback func;
         } getSpecific;
         struct {
@@ -83,7 +83,7 @@ typedef struct GdbRequest {
 // The library: the Sake, the state, the operation running, the result and which request is the current
 typedef struct Gdb {
     int unk_00;
-    Sake *sake;
+    SAKE sake;
     int state;
     GdbOperation operation;
     int result;
@@ -99,7 +99,8 @@ typedef struct GdbUserData {
 static void Gdb_Printf(int line, const char *format, ...);
 static BOOL Gdb_CheckReady(int *error);
 static void Gdb_RunLibrary(void);
-static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *input, void *output, void *userData);
+static void Gdb_OnResult(SAKE sake, SAKERequest request, SAKERequestResult error, void *input, void *output,
+                         void *userData);
 static int Gdb_ConvertStartupError(int sakeError, int *type);
 static int Gdb_ConvertRequestError(int sakeError, int *type);
 static int Gdb_GetErrorCode(int step, int error);
@@ -174,7 +175,7 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
     Sake_SetGame(sGdb.sake, gcd_gamename, gameId, gcd_secret_key);
     Sake_SetLoginTicket(sGdb.sake, ((const GdbUserData *)userData)->profileId, &ticket);
     Gdb_SetUrls(server);
-    DWC_InitGHTTP(0);
+    DWC_InitGHTTP(NULL);
     sGdb.state = GDB_STATE_IDLE;
     sGdb.result = 0;
     sGdb.operation = 0;
@@ -267,7 +268,7 @@ void Gdb_ReleaseUrls(void) {
 }
 
 void Gdb_Update(void) {
-    if (gsCoreIsShutdown() != 2) {
+    if (gsCoreIsShutdown() != GSCore_SHUTDOWN_COMPLETE) {
         gsCoreThink(0);
     }
     DWC_ProcessGHTTP();
@@ -286,7 +287,7 @@ int Gdb_GetResult(void) {
 
 int Gdb_CreateRecord(const char *table, GdbField *fields, int fieldNum, int *recordId) {
     GdbRequest *slot;
-    SakeRequest *request;
+    SAKERequest request;
     int error;
     int checkError;
 
@@ -295,8 +296,8 @@ int Gdb_CreateRecord(const char *table, GdbField *fields, int fieldNum, int *rec
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.create.input.tableId = table;
-    slot->u.create.input.fields = (SakeField *)fields;
+    slot->u.create.input.tableId = (char *)table;
+    slot->u.create.input.fields = (SAKEField *)fields;
     slot->u.create.input.fieldNum = fieldNum;
     slot->u.create.recordId = recordId;
     error = 0;
@@ -313,7 +314,7 @@ int Gdb_CreateRecord(const char *table, GdbField *fields, int fieldNum, int *rec
 
 int Gdb_UpdateRecord(const char *table, int recordId, GdbField *fields, int fieldNum) {
     GdbRequest *slot;
-    SakeRequest *request;
+    SAKERequest request;
     int error;
     int checkError;
 
@@ -322,9 +323,9 @@ int Gdb_UpdateRecord(const char *table, int recordId, GdbField *fields, int fiel
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.update.tableId = table;
+    slot->u.update.tableId = (char *)table;
     slot->u.update.recordId = recordId;
-    slot->u.update.fields = (SakeField *)fields;
+    slot->u.update.fields = (SAKEField *)fields;
     slot->u.update.fieldNum = fieldNum;
     error = 0;
     request = sakeUpdateRecord(sGdb.sake, &slot->u.update, Gdb_OnResult, NULL);
@@ -340,7 +341,7 @@ int Gdb_UpdateRecord(const char *table, int recordId, GdbField *fields, int fiel
 
 int Gdb_GetMyRecords(const char *table, const char **fieldNames, int fieldNum, GdbRecordsFunc func, void *work) {
     GdbRequest *slot;
-    SakeRequest *request;
+    SAKERequest request;
     int error;
     int checkError;
 
@@ -349,8 +350,8 @@ int Gdb_GetMyRecords(const char *table, const char **fieldNames, int fieldNum, G
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.getMy.input.tableId = table;
-    slot->u.getMy.input.fieldNames = fieldNames;
+    slot->u.getMy.input.tableId = (char *)table;
+    slot->u.getMy.input.fieldNames = (char **)fieldNames;
     slot->u.getMy.input.fieldNum = fieldNum;
     slot->u.getMy.func = (GdbRecordsCallback)func;
     request = sakeGetMyRecords(sGdb.sake, &slot->u.getMy.input, Gdb_OnResult, work);
@@ -367,7 +368,7 @@ int Gdb_GetMyRecords(const char *table, const char **fieldNames, int fieldNum, G
 int Gdb_GetSpecificRecords(const char *table, int *recordIds, int recordNum, const char **fieldNames, int fieldNum,
                            GdbRecordsFunc func, void *work) {
     GdbRequest *slot;
-    SakeRequest *request;
+    SAKERequest request;
     int error;
     int checkError;
 
@@ -376,10 +377,10 @@ int Gdb_GetSpecificRecords(const char *table, int *recordIds, int recordNum, con
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.getSpecific.input.tableId = table;
+    slot->u.getSpecific.input.tableId = (char *)table;
     slot->u.getSpecific.input.recordIds = recordIds;
     slot->u.getSpecific.input.recordNum = recordNum;
-    slot->u.getSpecific.input.fieldNames = fieldNames;
+    slot->u.getSpecific.input.fieldNames = (char **)fieldNames;
     slot->u.getSpecific.input.fieldNum = fieldNum;
     slot->u.getSpecific.func = (GdbRecordsCallback)func;
     request = sakeGetSpecificRecords(sGdb.sake, &slot->u.getSpecific.input, Gdb_OnResult, work);
@@ -438,12 +439,13 @@ static BOOL Gdb_CheckReady(int *error) {
 static void Gdb_RunLibrary(void) {
     gsCoreShutdown();
     gsCoreThink(0);
-    if (gsCoreIsShutdown() != 2) {
+    if (gsCoreIsShutdown() != GSCore_SHUTDOWN_COMPLETE) {
         gsCoreThink(0);
     }
 }
 
-static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *input, void *output, void *userData) {
+static void Gdb_OnResult(SAKE sake, SAKERequest request, SAKERequestResult error, void *input, void *output,
+                         void *userData) {
     GdbRequest *slot;
     GdbOperation operation = sGdb.operation;
     int state = sGdb.state;
@@ -475,9 +477,9 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
         case GDB_OPERATION_GET_MY_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1483, "%s[record_num=>%d].\n", sOperationNames[operation],
-                       ((SakeGetRecordsOutput *)output)->recordNum);
-            slot->u.getMy.func(((SakeGetRecordsOutput *)output)->recordNum, ((SakeGetRecordsOutput *)output)->records,
-                               userData);
+                       ((SAKEGetMyRecordsOutput *)output)->recordNum);
+            slot->u.getMy.func(((SAKEGetMyRecordsOutput *)output)->recordNum,
+                               ((SAKEGetMyRecordsOutput *)output)->records, userData);
             break;
         case GDB_OPERATION_GET_RECORD_LIMIT:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -490,9 +492,9 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
         case GDB_OPERATION_GET_SPECIFIC_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1505, "%s[record_num=>%d].\n", sOperationNames[operation],
-                       ((SakeGetRecordsOutput *)output)->recordNum);
-            slot->u.getSpecific.func(((SakeGetRecordsOutput *)output)->recordNum,
-                                     ((SakeGetRecordsOutput *)output)->records, userData);
+                       ((SAKEGetSpecificRecordsOutput *)output)->recordNum);
+            slot->u.getSpecific.func(((SAKEGetSpecificRecordsOutput *)output)->recordNum,
+                                     ((SAKEGetSpecificRecordsOutput *)output)->records, userData);
             break;
         case GDB_OPERATION_RATE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -502,9 +504,9 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
         case GDB_OPERATION_SEARCH_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1525, "%s[record_num=>%d].\n", sOperationNames[operation],
-                       ((SakeGetRecordsOutput *)output)->recordNum);
-            slot->u.search.func(((SakeGetRecordsOutput *)output)->recordNum, ((SakeGetRecordsOutput *)output)->records,
-                                userData);
+                       ((SAKESearchForRecordsOutput *)output)->recordNum);
+            slot->u.search.func(((SAKESearchForRecordsOutput *)output)->recordNum,
+                                ((SAKESearchForRecordsOutput *)output)->records, userData);
             break;
         case GDB_OPERATION_GET_RANDOM_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -525,7 +527,7 @@ static void Gdb_OnResult(Sake *sake, SakeRequest *request, int error, void *inpu
             Gdb_Printf(1555, "illegal process[%d].\n", operation);
             break;
         }
-    } else if (error == SAKE_RESULT_CANCELED) {
+    } else if (error == SAKERequestResult_CANCELED) {
         Gdb_Printf(1562, "%s canceled.[%d]\n", sOperationNames[sGdb.operation], error);
         sGdb.result = 0x20;
         sGdb.state = GDB_STATE_IDLE;

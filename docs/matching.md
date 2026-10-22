@@ -922,7 +922,7 @@ Same code, other `sp` offsets or frame size.
   `WifiP2PMatch_StateConnectFriendYesNo` and `WifiP2PMatch_StateFriendSelect` declare it: its `wk->seq` stores of
   0xa2 and 0x76 are then built fresh and the second joins the common tail. No join is needed there. With the pointer
   used at one call only, only the store after that call is fixed. A pointer to a member of a struct local is rebuilt
-  the same way, from `sp`: `dwc_auth.c`'s `Auth_OnResponse` declares `AuthCertificate *certificate =
+  the same way, from `sp`: `dwc_auth.c`'s `Auth_OnResponse` declares `GSLoginCertificate *certificate =
   &result.certificate;` and compiles each access as the ROM's `add r1, sp, #0x64; str r0, [r1]` (and `adds r1, #0x78`
   for a field inside it), where `result.certificate` written out stores at `[sp, #0x64]` and keeps the address in a
   saved register, which the ROM gives the hash context.
@@ -2855,7 +2855,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - A field that the loop's test reads, kept in a register for the body where the original loads it again, can be an
   enum: MWCC reuses a loaded `int` field across the loop's head, but not an enum-typed one passed to a function whose
   parameter has that enum type. GameSpy's `qr_build_split_query_reply` (`qr2.c`, overlay 11) matched only with its
-  progress's key type as `QR2KeyType`, the SDK's `qr2_key_type`, and the key list callback taking `QR2KeyType`; the
+  progress's key type as GameSpy's `qr2_key_type` and the key list callback taking `qr2_key_type`; the
   field alone, or the parameters alone, kept the register.
 - A table read in an unrolled loop through a pointer that each read steps (`*sines++`, `x[*index++]`) and the same
   table indexed (`sines[0]` to `sines[3]`, then `sines += 4`) give different registers and spills. libmath's
@@ -3313,13 +3313,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   loop's bases out of the loop that calls it. MWCC goes by the first declaration it sees: `<string.h>` included after
   `dwc/ext.h`'s prototypes still leaves a call. `dwc_auth.c` includes it first (`dwc/ext.h` takes its `size_t`), and its
   `Auth_OnResponse` then clears the 0x5a4-byte result in place, as the ROM does, while its `memcpy` of a 0x104-byte
-  `BigNum` stays a call, also as in the ROM: a call to `memcpy` in the ROM doesn't rule `<string.h>` out. `poke_net.c`
-  also includes `<string.h>` first: its `POKE_NET_Release` clears the 0x138-byte authentication structure in place,
-  while its variable-size copies remain calls. GT2's `gt2Message.c` and `gt2Socket.c` include it first too, for
-  the packets' 2-byte `memcpy`s (`add r2, sp, #0; adds r2, #2`, then `ldrb`/`strb` pairs) and the bound address's
-  8-byte `memset`, and so does ghttp's `ghttpEncryption.c`, whose `ghiEncryptorSslInitFunc` clears its 8-byte state
-  with eight `strb`, where every loop spelling stays a loop and `memset` from `dwc/ext.h` stays a call. The other functions retain their matches, apart from
-  `POKE_NET_Connecting`'s documented scheduling difference.
+  `gsLargeInt_t` stays a call, also as in the ROM: a call to `memcpy` in the ROM doesn't rule `<string.h>` out.
+  `poke_net.c` also includes `<string.h>` first: its `POKE_NET_Release` clears the 0x138-byte authentication structure
+  in place, while its variable-size copies remain calls. GT2's `gt2Message.c` and `gt2Socket.c` include it first too,
+  for the packets' 2-byte `memcpy`s (`add r2, sp, #0; adds r2, #2`, then `ldrb`/`strb` pairs) and the bound address's
+  8-byte `memset`, and so does ghttp's `ghttpEncryption.c`, whose `ghiEncryptorSslInitFunc` clears its 8-byte state with
+  eight `strb`, where every loop spelling stays a loop and `memset` from `dwc/ext.h` stays a call. The other functions
+  retain their matches, apart from `POKE_NET_Connecting`'s documented scheduling difference.
 - In the same way, MWCC takes the `exit` that a header named `stdlib.h` declares for a function that doesn't return,
   and drops the code after a call of it: `gfl/heap.c`'s `GFL_HeapDumpOnFailure` calls `exit(1)` and goes on, and comes
   out 0x22 bytes against 0x3c with `<stdlib.h>`. It gets `exit` from `nitro/os.h` instead.

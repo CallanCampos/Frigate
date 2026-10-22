@@ -84,8 +84,8 @@ BOOL DWC_IsServerMyself(void);
 int DWCi_GT2Startup(void);
 // The GT2 connection to the machine with an aid, the aid of a connection (0xff if it has none) and whether there is a
 // connection to an aid
-GTI2Connection *DWCi_GetGT2Connection(u8 aid);
-u8 DWCi_GetConnectionAID(GTI2Connection *connection);
+GT2Connection DWCi_GetGT2Connection(u8 aid);
+u8 DWCi_GetConnectionAID(GT2Connection connection);
 BOOL DWCi_IsValidAID(u8 aid);
 // Closes the connection to a machine; 0 once closed, -1 when it can't and -2 for an unknown machine
 int DWCi_CloseConnectionHard(u8 aid);

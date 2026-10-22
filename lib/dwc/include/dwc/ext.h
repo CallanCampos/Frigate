@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "dwc/darray.h"
+#include "dwc/dwc_ghttp.h"
 #include "dwc/error.h"
 // GameSpy's common code in overlay 11, which the HTTP code and the rest of GameSpy's code call
 #include "dwc/gsAvailable.h"
@@ -63,23 +64,6 @@ BOOL DWCi_GetAuthInfo(char **authToken, char **challenge);
 
 // The login ticket of the player's profile, which the Wi-Fi library keeps; returns FALSE if it has none
 BOOL DWCi_GetLoginTicket(SakeLoginTicket *ticket);
-// Overlay 189's, which keep the list of the hosts that may be reached: adds the host of a URL, or removes it (the
-// second), returning a BOOL
-BOOL DWCi_SetGHTTPRootCA(const char *url);
-BOOL DWCi_RemoveGHTTPRootCA(const char *url);
-// Starts and ends the module (the first returns a BOOL), and runs it for a frame
-BOOL DWC_InitGHTTP(int unused);
-BOOL DWC_ShutdownGHTTP(void);
-BOOL DWC_ProcessGHTTP(void);
-// A post: the form (or message) that a request sends
-typedef struct GHIPost GHIPost;
-// Adds a file made of bytes in memory to a post (a form), with the name of its field, the name of the file and its type
-int ghttpPostAddFileFromMemory(GHIPost *post, const char *field, const void *bytes, int size, const char *name,
-                               const char *type);
-// Called with an error code, to log it
-int DWCi_HandleGHTTPError(int error);
-// The state of a transfer that was started with a request of the module, and cancelling it
-int ghttpGetState(int request);
-void ghttpCancelRequest(int request);
+// DWC's use of the GameSpy HTTP client is in dwc/dwc_ghttp.h
 
 #endif // POKEBW2_DWC_EXT_H

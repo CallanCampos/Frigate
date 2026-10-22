@@ -10,15 +10,15 @@
 // public key, which is in the file below.
 
 // What a login is waiting for: the function to call and its user data
-typedef struct AuthRequest {
-    AuthResultFunc func;
+typedef struct WSIRequestData {
+    WSLoginCallback func;
     void *userData;
-} AuthRequest;
+} WSIRequestData;
 
-static BOOL Auth_PrepareUrl(void);
-static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *userData);
-static u32 Auth_ToWire(u32 value);
-static BOOL Auth_ReadCertificate(AuthCertificate *certificate, SoapReader *reader);
+static gsi_bool Auth_PrepareUrl(void);
+static void Auth_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData);
+static gsi_u32 Auth_ToWire(gsi_u32 value);
+static gsi_bool Auth_ReadCertificate(GSLoginCertificate *certificate, GSXmlStreamReader reader);
 
 // The service's RSA public key: the exponent and the modulus, as hexadecimal numbers
 static const char sPublicKeyExponent[] = "010001";
@@ -33,63 +33,63 @@ static const char *sAuthNamespaces[] = { "ns1=\"http://gamespy.net/AuthService/\
 // The URL of the authentication service, set by ScClient_SetServers or once it is asked for
 char gAuthUrl[128];
 
-static BOOL Auth_PrepareUrl(void) {
-    if (__GSIACResult == 1) {
+static gsi_bool Auth_PrepareUrl(void) {
+    if (__GSIACResult == GSIACAvailable) {
         if (gAuthUrl[0] == '\0') {
             OS_SNPrintf(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
                         __GSIACGamename);
         }
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
 char *Auth_GetUrl(void) {
-    if (__GSIACResult == 1) {
+    if (__GSIACResult == GSIACAvailable) {
         if (gAuthUrl[0] == '\0') {
             OS_SNPrintf(gAuthUrl, 128, "https://%s.auth.pubsvs.gs.nintendowifi.net/AuthService/AuthService.asmx",
                         __GSIACGamename);
         }
         return gAuthUrl;
     }
-    gsDebugFormat(0, 3, 1, "No availability\r\n");
+    gsDebugFormat(GSIDebugCat_App, GSIDebugType_State, GSIDebugLevel_HotError, "No availability\r\n");
     return NULL;
 }
 
-static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *userData) {
-    AuthRequest *request = userData;
-    AuthResult result;
-    AuthCertificate *certificate = &result.certificate;
-    HashContext context;
+static void Auth_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
+    WSIRequestData *request = userData;
+    WSLoginResponse result;
+    GSLoginCertificate *certificate = &result.certificate;
+    MD5_CTX context;
 
     // As in GameSpy's login callbacks, the certificate is marked invalid before the whole result is cleared
-    certificate->valid = FALSE;
+    certificate->valid = gsi_false;
     memset(&result, 0, sizeof(result));
     if (status == 0) {
         if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, "LoginRemoteAuthResult")) {
-            result.error = AUTH_ERROR_BAD_RESPONSE;
-        } else if (!gsXmlReadChildAsInt(reader, "responseCode", &result.responseCode)) {
-            result.error = AUTH_ERROR_BAD_RESPONSE;
+            result.error = WSLogin_ParseError;
+        } else if (!gsXmlReadChildAsInt(reader, "responseCode", (int *)&result.responseCode)) {
+            result.error = WSLogin_ParseError;
         } else if (result.responseCode != 0) {
             result.error = 7;
         } else if (!gsXmlMoveToChild(reader, "certificate") || !Auth_ReadCertificate(certificate, reader) ||
                    !gsXmlMoveToParent(reader) ||
-                   !gsXmlReadChildAsLargeInt(reader, "peerkeyprivate", &result.keys.privateKey)) {
-            result.error = AUTH_ERROR_BAD_RESPONSE;
+                   !gsXmlReadChildAsLargeInt(reader, "peerkeyprivate", &result.keys.peerPrivateKey.exponent)) {
+            result.error = WSLogin_ParseError;
         } else {
-            memcpy(&result.keys.modulus, &certificate->peerKeyModulus, sizeof(BigNum));
+            memcpy(&result.keys.peerPrivateKey.modulus, &certificate->peerPublicKey.modulus, sizeof(gsLargeInt_t));
             func_ov011_021719fc(&context);
-            gsLargeIntAddToMD5(&result.keys.privateKey, &context);
+            gsLargeIntAddToMD5(&result.keys.peerPrivateKey.exponent, &context);
             func_ov011_02171a9c(result.keys.proof, &context);
             certificate->valid = Auth_CheckCertificate(certificate);
             if (!certificate->valid) {
-                result.error = AUTH_ERROR_BAD_CERTIFICATE;
+                result.error = WSLogin_InvalidCertificate;
             }
         }
     } else if (status == 0x12) {
-        result.error = AUTH_ERROR_CANCELED;
+        result.error = WSLogin_Cancelled;
     } else {
-        result.error = AUTH_ERROR_BAD_ANSWER;
+        result.error = WSLogin_HttpError;
     }
     if (request->func != NULL) {
         request->func(status, &result, request->userData);
@@ -97,23 +97,23 @@ static void Auth_OnResponse(int status, int unused, SoapReader *reader, void *us
     gsifree(request);
 }
 
-int wsLoginRemoteAuth(int partnerCode, int namespaceId, const char *authToken, const char *challenge,
-                      AuthResultFunc func, void *userData) {
-    AuthRequest *request;
-    SoapWriter *writer;
+gsi_u32 wsLoginRemoteAuth(int partnerCode, int namespaceId, const gsi_char *authToken, const gsi_char *challenge,
+                          WSLoginCallback func, void *userData) {
+    WSIRequestData *request;
+    GSXmlStreamWriter writer;
 
     if (!Auth_PrepareUrl()) {
-        return AUTH_ERROR_NOT_AVAILABLE;
+        return WSLogin_NoAvailabilityCheck;
     }
-    request = gsimalloc(sizeof(AuthRequest));
+    request = gsimalloc(sizeof(WSIRequestData));
     if (request == NULL) {
-        return AUTH_ERROR_NO_MEMORY;
+        return WSLogin_OutOfMemory;
     }
     request->func = func;
     request->userData = userData;
     writer = gsXmlCreateStreamWriter(sAuthNamespaces, 1);
     if (writer == NULL) {
-        return AUTH_ERROR_NO_MEMORY;
+        return WSLogin_OutOfMemory;
     }
     if (!gsXmlWriteOpenTag(writer, "ns1", "LoginRemoteAuth") || !gsXmlWriteIntElement(writer, "ns1", "version", 1) ||
         !gsXmlWriteIntElement(writer, "ns1", "partnercode", partnerCode) ||
@@ -122,59 +122,59 @@ int wsLoginRemoteAuth(int partnerCode, int namespaceId, const char *authToken, c
         !gsXmlWriteStringElement(writer, "ns1", "challenge", challenge) ||
         !gsXmlWriteCloseTag(writer, "ns1", "LoginRemoteAuth") || !gsXmlCloseWriter(writer)) {
         gsXmlFreeWriter(writer);
-        return AUTH_ERROR_NO_MEMORY;
+        return WSLogin_OutOfMemory;
     }
     if (gsiExecuteSoap(gAuthUrl, "SOAPAction: \"http://gamespy.net/AuthService/LoginRemoteAuth\"", writer,
                        Auth_OnResponse, request) == NULL) {
         gsXmlFreeWriter(writer);
         gsifree(request);
-        return AUTH_ERROR_NO_MEMORY;
+        return WSLogin_OutOfMemory;
     }
     return 0;
 }
 
-static u32 Auth_ToWire(u32 value) {
+static gsi_u32 Auth_ToWire(gsi_u32 value) {
     return value;
 }
 
-BOOL Auth_CheckCertificate(AuthCertificate *certificate) {
-    RsaPublicKey key;
-    HashContext context;
-    u8 digest[0x10];
-    u32 word;
+gsi_bool Auth_CheckCertificate(const GSLoginCertificate *certificate) {
+    gsCryptRSAKey key;
+    MD5_CTX context;
+    gsi_u8 digest[0x10];
+    gsi_u32 word;
 
     func_ov011_021719fc(&context);
     word = Auth_ToWire(certificate->length);
-    func_ov011_02171a24(&context, &word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
     word = Auth_ToWire(certificate->version);
-    func_ov011_02171a24(&context, &word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
     word = Auth_ToWire(certificate->partnerCode);
-    func_ov011_02171a24(&context, &word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
     word = Auth_ToWire(certificate->namespaceId);
-    func_ov011_02171a24(&context, &word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
     word = Auth_ToWire(certificate->userId);
-    func_ov011_02171a24(&context, &word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
     word = Auth_ToWire(certificate->profileId);
-    func_ov011_02171a24(&context, &word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
     word = Auth_ToWire(certificate->expireTime);
-    func_ov011_02171a24(&context, &word, sizeof(word));
-    func_ov011_02171a24(&context, certificate->profileNick, strlen(certificate->profileNick));
-    func_ov011_02171a24(&context, certificate->uniqueNick, strlen(certificate->uniqueNick));
-    func_ov011_02171a24(&context, certificate->cdkeyHash, strlen(certificate->cdkeyHash));
-    gsLargeIntAddToMD5(&certificate->peerKeyModulus, &context);
-    gsLargeIntAddToMD5(&certificate->peerKeyExponent, &context);
-    func_ov011_02171a24(&context, certificate->serverData, sizeof(certificate->serverData));
+    func_ov011_02171a24(&context, (unsigned char *)&word, sizeof(word));
+    func_ov011_02171a24(&context, (unsigned char *)certificate->profileNick, strlen(certificate->profileNick));
+    func_ov011_02171a24(&context, (unsigned char *)certificate->uniqueNick, strlen(certificate->uniqueNick));
+    func_ov011_02171a24(&context, (unsigned char *)certificate->cdkeyHash, strlen(certificate->cdkeyHash));
+    gsLargeIntAddToMD5(&certificate->peerPublicKey.modulus, &context);
+    gsLargeIntAddToMD5(&certificate->peerPublicKey.exponent, &context);
+    func_ov011_02171a24(&context, (unsigned char *)certificate->serverData, sizeof(certificate->serverData));
     func_ov011_02171a9c(digest, &context);
     gsLargeIntSetFromHexString(&key.modulus, sPublicKeyModulus);
     gsLargeIntSetFromHexString(&key.exponent, sPublicKeyExponent);
     if (gsCryptRSAVerifySignedHash(&key, digest, sizeof(digest), certificate->signature,
                                    sizeof(certificate->signature)) != 0) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL Auth_WriteCertificate(const AuthCertificate *certificate, const char *prefix, SoapWriter *writer) {
+gsi_bool Auth_WriteCertificate(const GSLoginCertificate *certificate, const char *prefix, GSXmlStreamWriter writer) {
     if (!gsXmlWriteIntElement(writer, prefix, "length", certificate->length) ||
         !gsXmlWriteIntElement(writer, prefix, "version", certificate->version) ||
         !gsXmlWriteIntElement(writer, prefix, "partnercode", certificate->partnerCode) ||
@@ -185,18 +185,18 @@ BOOL Auth_WriteCertificate(const AuthCertificate *certificate, const char *prefi
         !gsXmlWriteAsciiStringElement(writer, prefix, "profilenick", certificate->profileNick) ||
         !gsXmlWriteAsciiStringElement(writer, prefix, "uniquenick", certificate->uniqueNick) ||
         !gsXmlWriteAsciiStringElement(writer, prefix, "cdkeyhash", certificate->cdkeyHash) ||
-        !gsXmlWriteLargeIntElement(writer, prefix, "peerkeymodulus", &certificate->peerKeyModulus) ||
-        !gsXmlWriteLargeIntElement(writer, prefix, "peerkeyexponent", &certificate->peerKeyExponent) ||
+        !gsXmlWriteLargeIntElement(writer, prefix, "peerkeymodulus", &certificate->peerPublicKey.modulus) ||
+        !gsXmlWriteLargeIntElement(writer, prefix, "peerkeyexponent", &certificate->peerPublicKey.exponent) ||
         !gsXmlWriteHexBinaryElement(writer, prefix, "serverdata", certificate->serverData,
                                     sizeof(certificate->serverData)) ||
         !gsXmlWriteHexBinaryElement(writer, prefix, "signature", certificate->signature,
                                     sizeof(certificate->signature))) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-static BOOL Auth_ReadCertificate(AuthCertificate *certificate, SoapReader *reader) {
+static gsi_bool Auth_ReadCertificate(GSLoginCertificate *certificate, GSXmlStreamReader reader) {
     int size;
     char text[0x101];
 
@@ -211,14 +211,14 @@ static BOOL Auth_ReadCertificate(AuthCertificate *certificate, SoapReader *reade
         !gsXmlReadChildAsStringNT(reader, "uniquenick", certificate->uniqueNick, sizeof(certificate->uniqueNick)) ||
         !gsXmlReadChildAsStringNT(reader, "cdkeyhash", certificate->cdkeyHash, sizeof(certificate->cdkeyHash)) ||
         !gsXmlReadChildAsStringNT(reader, "peerkeymodulus", text, sizeof(text)) ||
-        !gsLargeIntSetFromHexString(&certificate->peerKeyModulus, text) ||
+        !gsLargeIntSetFromHexString(&certificate->peerPublicKey.modulus, text) ||
         !gsXmlReadChildAsStringNT(reader, "peerkeyexponent", text, sizeof(text)) ||
-        !gsLargeIntSetFromHexString(&certificate->peerKeyExponent, text) ||
+        !gsLargeIntSetFromHexString(&certificate->peerPublicKey.exponent, text) ||
         !gsXmlReadChildAsHexBinary(reader, "serverdata", certificate->serverData, sizeof(certificate->serverData),
                                    &size) ||
         !gsXmlReadChildAsHexBinary(reader, "signature", certificate->signature, sizeof(certificate->signature),
                                    &size)) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }

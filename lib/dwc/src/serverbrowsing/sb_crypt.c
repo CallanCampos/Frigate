@@ -4,12 +4,12 @@
 // ROM names neither the file nor its functions: the file, keyrand, GOACryptInit and GOADecrypt are GameSpy's, as
 // pret's pokerevo Wii build has them (sb_crypt.s), and GOAHashInit and GOADecryptByte after the later SDK
 
-static gsi_u8 keyrand(GOACryptState *state, int limit, const gsi_u8 *user_key, gsi_u8 keysize, gsi_u8 *rsum,
-                      gsi_u32 *keypos);
+static unsigned char keyrand(GOACryptState *state, int limit, unsigned char *user_key, unsigned char keysize,
+                             unsigned char *rsum, unsigned *keypos);
 
 // A number from 0 up to limit, from the permutation and the next bytes of the key
-static gsi_u8 keyrand(GOACryptState *state, int limit, const gsi_u8 *user_key, gsi_u8 keysize, gsi_u8 *rsum,
-                      gsi_u32 *keypos) {
+static unsigned char keyrand(GOACryptState *state, int limit, unsigned char *user_key, unsigned char keysize,
+                             unsigned char *rsum, unsigned *keypos) {
     gsi_u32 u;
     gsi_u32 retry_limiter;
     gsi_u32 mask;
@@ -50,7 +50,7 @@ void GOAHashInit(GOACryptState *state) {
     }
 }
 
-void GOACryptInit(GOACryptState *state, const gsi_u8 *key, gsi_u8 keysize) {
+void GOACryptInit(GOACryptState *state, unsigned char *key, unsigned char keysize) {
     int i;
     gsi_u8 toswap;
     gsi_u8 swaptemp;
@@ -83,7 +83,7 @@ void GOACryptInit(GOACryptState *state, const gsi_u8 *key, gsi_u8 keysize) {
     keypos = 0;
 }
 
-gsi_u8 GOADecryptByte(GOACryptState *state, gsi_u8 b) {
+unsigned char GOADecryptByte(GOACryptState *state, unsigned char b) {
     gsi_u8 swaptemp;
 
     state->ratchet += state->cards[state->rotor++];
@@ -101,7 +101,7 @@ gsi_u8 GOADecryptByte(GOACryptState *state, gsi_u8 b) {
     return state->last_plain;
 }
 
-void GOADecrypt(GOACryptState *state, gsi_u8 *bp, int len) {
+void GOADecrypt(GOACryptState *state, unsigned char *bp, int len) {
     int i;
 
     for (i = 0; i < len; i++) {

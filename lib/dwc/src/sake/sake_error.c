@@ -3,71 +3,71 @@
 // How an answer from the storage server is taken in, and how a request becomes a message: the server names its
 // error in the answer's result element, and every message starts with the game's ID, secret key and login ticket.
 
-static int Sake_GetServerError(const char *name);
+static SAKERequestResult Sake_GetServerError(const char *name);
 
 // The declaration of the message's namespace
 static const char *sSakeNamespaceDeclarations[] = { "ns1=\"http://gamespy.net/sake\"" };
 
-static int Sake_GetServerError(const char *name) {
+static SAKERequestResult Sake_GetServerError(const char *name) {
     if (strcmp(name, "Success") == 0) {
-        return SAKE_RESULT_SUCCESS;
+        return SAKERequestResult_SUCCESS;
     }
     if (strcmp(name, "SecretKeyInvalid") == 0) {
-        return SAKE_RESULT_SECRET_KEY_INVALID;
+        return SAKERequestResult_SECRET_KEY_INVALID;
     }
     if (strcmp(name, "ServiceDisabled") == 0) {
-        return SAKE_RESULT_SERVICE_DISABLED;
+        return SAKERequestResult_SERVICE_DISABLED;
     }
     if (strcmp(name, "DatabaseUnavailable") == 0) {
-        return SAKE_RESULT_DATABASE_UNAVAILABLE;
+        return SAKERequestResult_DATABASE_UNAVAILABLE;
     }
     if (strcmp(name, "LoginTicketInvalid") == 0) {
-        return SAKE_RESULT_LOGIN_TICKET_INVALID;
+        return SAKERequestResult_LOGIN_TICKET_INVALID;
     }
     if (strcmp(name, "LoginTicketExpired") == 0) {
-        return SAKE_RESULT_LOGIN_TICKET_EXPIRED;
+        return SAKERequestResult_LOGIN_TICKET_EXPIRED;
     }
     if (strcmp(name, "TableNotFound") == 0) {
-        return SAKE_RESULT_TABLE_NOT_FOUND;
+        return SAKERequestResult_TABLE_NOT_FOUND;
     }
     if (strcmp(name, "RecordNotFound") == 0) {
-        return SAKE_RESULT_RECORD_NOT_FOUND;
+        return SAKERequestResult_RECORD_NOT_FOUND;
     }
     if (strcmp(name, "FieldNotFound") == 0) {
-        return SAKE_RESULT_FIELD_NOT_FOUND;
+        return SAKERequestResult_FIELD_NOT_FOUND;
     }
     if (strcmp(name, "FieldTypeInvalid") == 0) {
-        return SAKE_RESULT_FIELD_TYPE_INVALID;
+        return SAKERequestResult_FIELD_TYPE_INVALID;
     }
     if (strcmp(name, "NoPermission") == 0) {
-        return SAKE_RESULT_NO_PERMISSION;
+        return SAKERequestResult_NO_PERMISSION;
     }
     if (strcmp(name, "RecordLimitReached") == 0) {
-        return SAKE_RESULT_RECORD_LIMIT_REACHED;
+        return SAKERequestResult_RECORD_LIMIT_REACHED;
     }
     if (strcmp(name, "AlreadyRated") == 0) {
-        return SAKE_RESULT_ALREADY_RATED;
+        return SAKERequestResult_ALREADY_RATED;
     }
     if (strcmp(name, "NotRateable") == 0) {
-        return SAKE_RESULT_NOT_RATEABLE;
+        return SAKERequestResult_NOT_RATEABLE;
     }
     if (strcmp(name, "NotOwned") == 0) {
-        return SAKE_RESULT_NOT_OWNED;
+        return SAKERequestResult_NOT_OWNED;
     }
     if (strcmp(name, "FilterInvalid") == 0) {
-        return SAKE_RESULT_FILTER_INVALID;
+        return SAKERequestResult_FILTER_INVALID;
     }
     if (strcmp(name, "SortInvalid") == 0) {
-        return SAKE_RESULT_SORT_INVALID;
+        return SAKERequestResult_SORT_INVALID;
     }
     if (strcmp(name, "TargetFilterInvalid") == 0) {
-        return SAKE_RESULT_TARGET_FILTER_INVALID;
+        return SAKERequestResult_TARGET_FILTER_INVALID;
     }
-    return SAKE_RESULT_UNKNOWN;
+    return SAKERequestResult_UNKNOWN_ERROR;
 }
 
-void Sake_OnResponse(int status, int unused, SoapReader *reader, void *userData) {
-    SakeRequest *request = userData;
+void Sake_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
+    SAKERequest request = userData;
     char result[0x20];
     void *output = NULL;
     int error;
@@ -76,22 +76,22 @@ void Sake_OnResponse(int status, int unused, SoapReader *reader, void *userData)
         return;
     }
     error = Sake_GetHttpResultError(status);
-    if (error == SAKE_RESULT_SUCCESS) {
+    if (error == SAKERequestResult_SUCCESS) {
         if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, request->type->responseName) ||
             !gsXmlReadChildAsStringNT(reader, request->type->resultName, result, sizeof(result))) {
-            error = SAKE_RESULT_MALFORMED_RESPONSE;
+            error = SAKERequestResult_MALFORMED_RESPONSE;
         } else {
             error = Sake_GetServerError(result);
-            if (error == SAKE_RESULT_SUCCESS && request->type->outputSize != 0) {
+            if (error == SAKERequestResult_SUCCESS && request->type->outputSize != 0) {
                 request->output = gsimalloc(request->type->outputSize);
                 if (request->output != NULL) {
                     request->response = reader;
                     error = request->type->parse(request);
-                    if (error == SAKE_RESULT_SUCCESS) {
+                    if (error == SAKERequestResult_SUCCESS) {
                         output = request->output;
                     }
                 } else {
-                    error = SAKE_RESULT_OUT_OF_MEMORY;
+                    error = SAKERequestResult_OUT_OF_MEMORY;
                 }
             }
         }
@@ -107,8 +107,8 @@ void Sake_OnResponse(int status, int unused, SoapReader *reader, void *userData)
     Sake_FreeRequest(request);
 }
 
-int Sake_BuildMessage(SakeRequest *request) {
-    SakeRequestType *type = request->type;
+SAKEStartRequestResult Sake_BuildMessage(SAKERequest request) {
+    SAKEIRequestInfo *type = request->type;
     int error;
 
     error = type->validate(request);
@@ -117,7 +117,7 @@ int Sake_BuildMessage(SakeRequest *request) {
     }
     request->writer = gsXmlCreateStreamWriter(sSakeNamespaceDeclarations, 1);
     if (request->writer == NULL) {
-        return SAKE_REQUEST_ERROR_OUT_OF_MEMORY;
+        return SAKEStartRequestResult_OUT_OF_MEMORY;
     }
     gsXmlWriteOpenTag(request->writer, "ns1", request->type->name);
     gsXmlWriteIntElement(request->writer, "ns1", "gameid", request->sake->gameId);

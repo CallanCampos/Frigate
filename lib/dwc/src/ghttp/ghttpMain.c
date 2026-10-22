@@ -42,7 +42,7 @@ void ghiHandleStatus(GHIConnection *connection) {
 }
 
 // Does what the state of the connection has to do. Returns gsi_true once it has ended
-gsi_bool ghiProcessConnection(GHIConnection *connection) {
+GHTTPBool ghiProcessConnection(GHIConnection *connection) {
     gsi_bool completed;
 
     if (connection->processing) {
@@ -84,7 +84,7 @@ gsi_bool ghiProcessConnection(GHIConnection *connection) {
         ghiDoReceivingFile(connection);
     }
     if (connection->state == 11) {
-        gsDebugFormat(8, 3, 0x10, "Connection Closing\n");
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Connection Closing\n");
     }
 
     if (connection->redirectUrl != NULL) {
@@ -159,8 +159,9 @@ void ghttpCleanup(void) {
 
 // Starts a request for a URL. With a buffer the result is received into it, without one into a buffer of the client's.
 // Returns the request, or -1 if it couldn't be made. If blocking it only returns when the request has ended, with 0
-int ghttpGetExA(const char *url, const char *headers, char *buffer, int bufferSize, GHIPost *post, gsi_bool throttle,
-                gsi_bool blocking, GHIProgressFunc progress, GHICompletedFunc completed, void *param) {
+GHTTPRequest ghttpGetExA(const char *url, const char *headers, char *buffer, int bufferSize, GHTTPPost post,
+                         GHTTPBool throttle, GHTTPBool blocking, ghttpProgressCallback progress,
+                         ghttpCompletedCallback completed, void *param) {
     GHIConnection *connection;
     gsi_bool ready;
 
@@ -233,7 +234,7 @@ void ghttpThink(void) {
     ghiEnumConnections(ghiProcessConnection);
 }
 
-gsi_bool ghttpThinkRequest(int request) {
+GHTTPBool ghttpThinkRequest(GHTTPRequest request) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection == NULL) {
@@ -244,7 +245,7 @@ gsi_bool ghttpThinkRequest(int request) {
 }
 
 // Ends a request, as cancelled (0x12)
-void ghttpCancelRequest(int request) {
+void ghttpCancelRequest(GHTTPRequest request) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection != NULL) {
@@ -255,7 +256,7 @@ void ghttpCancelRequest(int request) {
     }
 }
 
-int ghttpGetState(int request) {
+GHTTPState ghttpGetState(GHTTPRequest request) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection != NULL) {
@@ -264,7 +265,7 @@ int ghttpGetState(int request) {
     return 0;
 }
 
-void ghttpSetMaxRecvTime(int request, int time) {
+void ghttpSetMaxRecvTime(GHTTPRequest request, gsi_time time) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection != NULL) {
@@ -272,30 +273,30 @@ void ghttpSetMaxRecvTime(int request, int time) {
     }
 }
 
-GHIPost *ghttpNewPost(void) {
+GHTTPPost ghttpNewPost(void) {
     return ghiNewPost();
 }
 
-void ghttpPostSetAutoFree(GHIPost *post, gsi_bool autoFree) {
+void ghttpPostSetAutoFree(GHTTPPost post, GHTTPBool autoFree) {
     if (post != NULL) {
         ghiPostSetAutoFree(post, autoFree);
     }
 }
 
-void ghttpFreePost(int request, GHIPost *post) {
+void ghttpFreePost(GHTTPRequest request, GHTTPPost post) {
     if (post != NULL) {
         ghiFreePostOfRequest(request, post);
     }
 }
 
-gsi_bool ghttpPostAddXml(GHIPost *post, SoapWriter *writer) {
+GHTTPBool ghttpPostAddXml(GHTTPPost post, GSXmlStreamWriter writer) {
     return ghiPostAddXml(post, writer);
 }
 
-gsi_bool ghttpSetRootCAList(const char *url, GHICertList *rootCA) {
+GHTTPBool ghttpSetRootCAList(const char *url, GHICertList *rootCA) {
     return ghiEncyptorSetRootCAList(url, rootCA);
 }
 
-gsi_bool ghttpRemoveRootCAList(const char *url) {
+GHTTPBool ghttpRemoveRootCAList(const char *url) {
     return ghiEncryptorRemoveRootCAList(url);
 }

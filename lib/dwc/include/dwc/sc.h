@@ -27,8 +27,8 @@ int Sc_SetReportIntention(int authoritative, ScResultFunc func, int timeout, voi
 int Sc_SubmitReport(ScReport *report, int authoritative, ScResultFunc func, int timeout, void *userData);
 // Takes the ID of the session from the other player, and gives the IDs of the session and of the connection
 int Sc_SetSessionId(const char *csid);
-char *Sc_GetSessionId(void);
-char *Sc_GetConnectionId(void);
+const char *Sc_GetSessionId(void);
+const char *Sc_GetConnectionId(void);
 // Makes a report of a version for a number of players and of teams
 int Sc_CreateReport(int version, int playerNum, int teamNum, ScReport **report);
 // The steps of the report's building, each returning 0 or an error code: the sections of the game's records, of the
@@ -37,13 +37,13 @@ int Sc_BeginGame(ScReport *report);
 int Sc_BeginPlayers(ScReport *report);
 int Sc_BeginTeams(ScReport *report);
 int Sc_BeginGroup(ScReport *report);
-int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int result, const AuthCertificate *certificate,
-                 void *unused);
+int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int result,
+                 const GSLoginCertificate *certificate, void *unused);
 int Sc_FinishReport(ScReport *report, int flag, int value);
-int Sc_AddInt(ScReport *report, int key, int value);
-int Sc_AddByte(ScReport *report, int key, int value);
+int Sc_AddInt(ScReport *report, u16 key, s32 value);
+int Sc_AddByte(ScReport *report, u16 key, s8 value);
 int Sc_FreeReport(ScReport *report);
 // Gives the player's certificate
-int Sc_GetCertificate(const AuthCertificate **certificate);
+int Sc_GetCertificate(const GSLoginCertificate **certificate);
 
 #endif // POKEBW2_DWC_SC_H

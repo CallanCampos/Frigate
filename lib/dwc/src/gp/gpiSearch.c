@@ -10,17 +10,17 @@
 // GameSpy GP's searches (gpiSearch.c), each on its own socket to the search manager, which answers once and closes. The
 // functions' names, from pret/pokerevo's Wii build and GameSpy's later SDK, are in dwc/gp.h
 
-static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operation);
-static int gpiInitSearchData(GPConnection *connection, GPISearchData **searchData, int type);
-static int gpiStartSearch(GPConnection *connection, GPISearchData *data, int blocking, GPCallback callback,
-                          void *param);
-static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation);
+static GPResult gpiStartProfileSearch(GPConnection *connection, GPIOperation *operation);
+static GPResult gpiInitSearchData(GPConnection *connection, GPISearchData **searchData, int type);
+static GPResult gpiStartSearch(GPConnection *connection, GPISearchData *data, GPEnum blocking, GPCallback callback,
+                               void *param);
+static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operation);
 
 // The host of the search manager
 static char sSearchManagerHostname[64] = "gpsp.gs.nintendowifi.net";
 
 // Opens the search's socket to the search manager, which gpiProcessSearch waits on to connect
-static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operation) {
+static GPResult gpiStartProfileSearch(GPConnection *connection, GPIOperation *operation) {
     GPISearchData *search = operation->data;
     SocHostEnt *host;
     int error;
@@ -55,7 +55,7 @@ static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operati
         address.addr.addr = *(gsi_u32 *)host->addrList[0];
         // Port 29901, in network order
         address.port = 0xcd74;
-        if (connect(search->sock, &address, 8) == -1) {
+        if (connect(search->sock, (SOCKADDR *)&address, 8) == -1) {
             error = GOAGetLastError(search->sock);
             if (error != -6 && error != -26 && error != -76) {
                 gpiSetError(connection, 5, "There was an error connecting a socket.");
@@ -69,7 +69,7 @@ static int gpiStartProfileSearch(GPConnection *connection, GPIOperation *operati
     return 0;
 }
 
-static int gpiInitSearchData(GPConnection *connection, GPISearchData **searchData, int type) {
+static GPResult gpiInitSearchData(GPConnection *connection, GPISearchData **searchData, int type) {
     GPISearchData *data = gsimalloc(sizeof(GPISearchData));
 
     if (data == NULL) {
@@ -98,8 +98,8 @@ static int gpiInitSearchData(GPConnection *connection, GPISearchData **searchDat
 }
 
 // Starts a search as an operation, and runs it to its end if it blocks
-static int gpiStartSearch(GPConnection *connection, GPISearchData *data, int blocking, GPCallback callback,
-                          void *param) {
+static GPResult gpiStartSearch(GPConnection *connection, GPISearchData *data, GPEnum blocking, GPCallback callback,
+                               void *param) {
     GPIOperation *operation;
     int result;
 
@@ -121,9 +121,10 @@ static int gpiStartSearch(GPConnection *connection, GPISearchData *data, int blo
     return 0;
 }
 
-int gpiProfileSearch(GPConnection *connection, const char *nick, const char *uniquenick, const char *email,
-                     const char *firstname, const char *lastname, int icquin, int skip, int blocking,
-                     GPCallback callback, void *param) {
+GPResult gpiProfileSearch(GPConnection *connection, const char nick[GP_NICK_LEN],
+                          const char uniquenick[GP_UNIQUENICK_LEN], const char email[GP_EMAIL_LEN],
+                          const char firstname[GP_FIRSTNAME_LEN], const char lastname[GP_LASTNAME_LEN], int icquin,
+                          int skip, GPEnum blocking, GPCallback callback, void *param) {
     GPISearchData *search;
     int result;
 
@@ -175,8 +176,8 @@ int gpiProfileSearch(GPConnection *connection, const char *nick, const char *uni
     return 0;
 }
 
-int gpiOthersBuddyList(GPConnection *connection, int *profiles, int numOfProfiles, int blocking, GPCallback callback,
-                       void *param) {
+GPResult gpiOthersBuddyList(GPConnection *connection, int *profiles, int numOfProfiles, GPEnum blocking,
+                            GPCallback callback, void *param) {
     GPISearchData *search;
     int result;
 
@@ -196,7 +197,7 @@ int gpiOthersBuddyList(GPConnection *connection, int *profiles, int numOfProfile
 // Moves a search on: once connected it sends the request, and once the answer has ended ("\\final\\") it reads it
 // into the argument of the app's callback. A search that doesn't block gives up after a minute, and one that blocks
 // loops until it is done
-static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
+static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
     GPIConnection *iconnection = *connection;
     GPISearchData *search = operation->data;
     int blocking = operation->blocking != 0;
@@ -208,7 +209,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
     int index;
     GPICallback callback;
     int bytesRead;
-    gsi_bool connClosed;
+    GPIBool connClosed;
     GPICallback profileListCallback;
     GPICallback uniqueCallback;
     GPICallback othersListCallback;
@@ -1041,7 +1042,7 @@ static int gpiProcessSearch(GPConnection *connection, GPIOperation *operation) {
 
 // Processes each search that isn't done, and removes the ones that ended. A search's callback may start another search,
 // so the ones to process are listed first
-int gpiProcessSearches(GPConnection *connection) {
+GPResult gpiProcessSearches(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     GPIOperation **list;
     GPIOperation *operation;

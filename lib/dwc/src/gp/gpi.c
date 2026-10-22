@@ -15,9 +15,9 @@
 // GameSpy GP's connection and its main loop (gpi.c). The functions' names, from pret/pokerevo's Wii build (the later
 // SDK's for gpiInitialize and gpiDestroy), are in dwc/gp.h
 
-static gsi_bool gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data);
+static GPIBool gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data);
 
-int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
+GPResult gpiInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
     GPIConnection *iconnection;
     int i;
     int result;
@@ -68,7 +68,7 @@ void gpiDestroy(GPConnection *connection) {
 }
 
 // Forgets what a profile knew of the last login, for gpiReset
-static gsi_bool gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data) {
+static GPIBool gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data) {
     profile->buddyStatus = NULL;
     profile->buddyStatusInfo = NULL;
     profile->authSig = NULL;
@@ -79,7 +79,7 @@ static gsi_bool gpiResetProfile(GPConnection *connection, GPIProfile *profile, v
     return gsi_true;
 }
 
-int gpiReset(GPConnection *connection) {
+GPResult gpiReset(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     int result;
 
@@ -144,11 +144,11 @@ int gpiReset(GPConnection *connection) {
     return 0;
 }
 
-int gpiProcessConnectionManager(GPConnection *connection) {
+GPResult gpiProcessConnectionManager(GPConnection *connection) {
     GPIConnection *iconnection;
     GPIOperation *operation;
     int len;
-    gsi_bool connClosed;
+    GPIBool connClosed;
     int result;
     gsi_bool loop;
     char *next;
@@ -183,7 +183,8 @@ int gpiProcessConnectionManager(GPConnection *connection) {
         while ((next = strstr(iconnection->socketBuffer.buffer, "\\final\\")) != NULL) {
             iconnection->kaTransmit = now;
             *next = '\0';
-            gsDebugFormat(1, 0, 0x20, "CMD: %s\n", iconnection->socketBuffer.buffer);
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_RawDump, "CMD: %s\n",
+                          iconnection->socketBuffer.buffer);
             len = next - iconnection->socketBuffer.buffer;
             if (len > iconnection->inputBufferSize) {
                 int increase = len;
@@ -210,7 +211,8 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                 int id = atol(str + 4);
 
                 if (!gpiFindOperationByID(connection, &operation, id)) {
-                    gsDebugFormat(1, 0, 1, "No matching operation found for id %d\n", id);
+                    gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
+                                  "No matching operation found for id %d\n", id);
                 } else {
                     result = gpiProcessOperation(connection, operation, iconnection->inputBuffer);
                     if (result != 0) {
@@ -229,7 +231,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                     }
                 } else if (strncmp(input, "\\ka\\", 4) != 0) {
                     if (strncmp(input, "\\lt\\", 4) == 0) {
-                        gpiValueForKey(input, "\\lt\\", iconnection->loginTicket.ticket, 25);
+                        gpiValueForKey(input, "\\lt\\", iconnection->loginTicket, 25);
                     } else if (strncmp(input, "\\bsi\\", 5) == 0) {
                         result = gpiProcessRecvBuddyStatusInfo(connection, input);
                         if (result != 0) {
@@ -251,7 +253,8 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                             return result;
                         }
                     } else {
-                        gsDebugFormat(1, 0, 1, "Received an unrecognized message.\n");
+                        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
+                                      "Received an unrecognized message.\n");
                     }
                 }
             }
@@ -274,7 +277,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
     return 0;
 }
 
-int gpiProcess(GPConnection *connection, int blockingOperationID) {
+GPResult gpiProcess(GPConnection *connection, int blockingOperationID) {
     GPIConnection *iconnection = *connection;
     GPIOperation *operation;
     GPIOperation *delOperation;

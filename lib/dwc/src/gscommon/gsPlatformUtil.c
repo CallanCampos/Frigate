@@ -30,40 +30,41 @@ gsi_i64 gsiStringToInt64(const char *text) {
     return atoll(text);
 }
 
-int gsiInt64ToString(char *text, gsi_i64 value) {
-    return OS_SPrintf(text, "%lld", value);
+void gsiInt64ToString(char text[33], gsi_i64 value) {
+    OS_SPrintf(text, "%lld", value);
 }
 
-// The lookup of a host: what was left of GameSpy's thread, and the address
-typedef struct GSIResolveHostname {
-    gsi_u32 unused;
-    gsi_u32 ip;
-} GSIResolveHostname;
+// The lookup of a host: the name, which the DS's lookup doesn't keep, and the address
+typedef struct GSIResolveHostnameInfo {
+    char *hostname;
+    unsigned int ip;
+} GSIResolveHostnameInfo;
 
-int gsiStartResolvingHostname(const char *host, void **lookup) {
-    SocHostEnt *entry;
-    GSIResolveHostname *resolve;
+int gsiStartResolvingHostname(const char *host, GSIResolveHostnameHandle *lookup) {
+    HOSTENT *entry;
+    GSIResolveHostnameInfo *resolve;
 
-    gsDebugFormat(8, 3, 0x10, "(NON-Asynchrounous) DNS lookup starting\n");
+    gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment,
+                  "(NON-Asynchrounous) DNS lookup starting\n");
     entry = SOC_GetHostByName(host);
     if (entry == NULL) {
         return -1;
     }
-    resolve = gsimalloc(sizeof(GSIResolveHostname));
+    resolve = gsimalloc(sizeof(GSIResolveHostnameInfo));
     if (resolve == NULL) {
         return -1;
     }
-    resolve->ip = *(gsi_u32 *)entry->addrList[0];
+    resolve->ip = *(unsigned int *)entry->addrList[0];
     *lookup = resolve;
     return 0;
 }
 
-void gsiCancelResolvingHostname(void *lookup) {
+void gsiCancelResolvingHostname(GSIResolveHostnameHandle lookup) {
     gsifree(lookup);
 }
 
-int gsiGetResolvedIP(void *lookup) {
-    int ip = ((GSIResolveHostname *)lookup)->ip;
+unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle lookup) {
+    unsigned int ip = lookup->ip;
 
     gsifree(lookup);
     return ip;
@@ -100,15 +101,15 @@ void SocketStartUp(void) {
 void SocketShutDown(void) {
 }
 
-gsi_u32 current_time(void) {
+gsi_time current_time(void) {
     return OS_TicksToMilliSeconds(OS_GetTick());
 }
 
-gsi_u32 current_time_hires(void) {
+gsi_time current_time_hires(void) {
     return OS_TicksToMicroSeconds(OS_GetTick());
 }
 
-void msleep(gsi_u32 milliseconds) {
+void msleep(gsi_time milliseconds) {
     OS_Sleep(milliseconds);
 }
 
@@ -257,7 +258,7 @@ static gsi_u32 RandomGenerate(void) {
     return sRandSeed = RandomNext(sRandSeed);
 }
 
-void Util_RandSeed(gsi_u32 seed) {
+void Util_RandSeed(unsigned long seed) {
     sRandSeed = seed != 0 ? seed & 0x7fffffff : 1;
 }
 

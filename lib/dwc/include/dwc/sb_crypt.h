@@ -16,10 +16,10 @@ typedef struct GOACryptState {
 } GOACryptState;
 
 // Sets the cipher up from a key, or as the hash's fixed permutation for a key of no bytes
-void GOACryptInit(GOACryptState *state, const gsi_u8 *key, gsi_u8 keysize);
+void GOACryptInit(GOACryptState *state, unsigned char *key, unsigned char keysize);
 void GOAHashInit(GOACryptState *state);
 // Decrypts one byte, and a buffer in place
-gsi_u8 GOADecryptByte(GOACryptState *state, gsi_u8 b);
-void GOADecrypt(GOACryptState *state, gsi_u8 *bp, int len);
+unsigned char GOADecryptByte(GOACryptState *state, unsigned char b);
+void GOADecrypt(GOACryptState *state, unsigned char *bp, int len);
 
 #endif // POKEBW2_DWC_SB_CRYPT_H

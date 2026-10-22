@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_COMPETITION_H
 
 #include "dwc/auth.h"
+#include "dwc/ghttp.h"
 #include "dwc/nonport.h"
 
 // GameSpy's competition service in overlay 260 (dwc_competition.c and dwc_competition_soap.c), which keeps the results
@@ -32,7 +33,20 @@ typedef enum {
 } SCResult;
 
 // Called with the client, the status of the request, the error (0 if none) and the user data
-typedef void (*ScClientFunc)(ScClient *client, int status, int error, void *userData);
+// How a player's game ended, and how complete a report is
+typedef enum {
+    SCGameResult_WIN,
+    SCGameResult_LOSS,
+    SCGameResult_DRAW,
+    SCGameResult_DISCONNECT,
+    SCGameResult_DESYNC,
+    SCGameResult_NONE,
+    SCGameResultMax
+} SCGameResult;
+
+typedef enum { SCGameStatus_COMPLETE, SCGameStatus_PARTIAL, SCGameStatus_BROKEN, SCGameStatusMax } SCGameStatus;
+
+typedef void (*ScClientFunc)(ScClient *client, GHTTPResult httpResult, SCResult result, void *userData);
 
 // The client of the service: the functions to call back and the flags that tell that a request is running, each for
 // the three requests, then the report being submitted, the game, and the IDs of the session and of the connection
@@ -95,39 +109,42 @@ void ScClient_SetServers(int server);
 char *ScClient_GetUrl(void);
 // Makes a client for a game, returning 0 or an error code, and frees it and runs the library for a frame (the
 // second returns 2 for no client and 3 for one that is not set up)
-int ScClient_Create(int gameId, ScClient **client);
-int ScClient_Destroy(ScClient *client);
-int ScClient_Update(ScClient *client);
+SCResult ScClient_Create(int gameId, ScClient **client);
+SCResult ScClient_Destroy(ScClient *client);
+SCResult ScClient_Update(ScClient *client);
 // The IDs of the session and of the connection, and storing the session's
-char *ScClient_GetCsid(ScClient *client);
-char *ScClient_GetCcid(ScClient *client);
-int ScClient_SetCsid(ScClient *client, const char *csid);
+const char *ScClient_GetCsid(ScClient *client);
+const char *ScClient_GetCcid(ScClient *client);
+SCResult ScClient_SetCsid(ScClient *client, const gsi_u8 *csid);
 // The three requests, each returning 0 or an error code and calling a function when it has ended. The time they may
 // take is not used
-int ScClient_CreateSession(ScClient *client, AuthCertificate *certificate, AuthKeys *keys, ScClientFunc func,
-                           int timeout, void *userData);
-int ScClient_SetReportIntention(ScClient *client, const char *ccid, int authoritative, AuthCertificate *certificate,
-                                AuthKeys *keys, ScClientFunc func, int timeout, void *userData);
-int ScClient_SubmitReport(ScClient *client, ScReport *report, int authoritative, AuthCertificate *certificate,
-                          AuthKeys *keys, ScClientFunc func, int timeout, void *userData);
+SCResult ScClient_CreateSession(ScClient *client, GSLoginCertificate *certificate, GSLoginPrivateData *keys,
+                                ScClientFunc func, gsi_time timeout, void *userData);
+SCResult ScClient_SetReportIntention(ScClient *client, const gsi_u8 *ccid, gsi_bool authoritative,
+                                     GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                                     gsi_time timeout, void *userData);
+SCResult ScClient_SubmitReport(ScClient *client, ScReport *report, gsi_bool authoritative,
+                               GSLoginCertificate *certificate, GSLoginPrivateData *keys, ScClientFunc func,
+                               gsi_time timeout, void *userData);
 
 // Makes a report of a version for players and teams, returning 0 or an error code
-int ScClient_CreateReport(ScClient *client, int version, int playerNum, int teamNum, ScReport **report);
+SCResult ScClient_CreateReport(ScClient *client, gsi_u32 version, gsi_u32 playerNum, gsi_u32 teamNum,
+                               ScReport **report);
 // Starts the records of the game, of the players and of the teams, and a group of them (one for each player or team)
-int ScReport_BeginGame(ScReport *report);
-int ScReport_BeginPlayers(ScReport *report);
-int ScReport_BeginTeams(ScReport *report);
-int ScReport_BeginGroup(ScReport *report);
+SCResult ScReport_BeginGame(ScReport *report);
+SCResult ScReport_BeginPlayers(ScReport *report);
+SCResult ScReport_BeginTeams(ScReport *report);
+SCResult ScReport_BeginGroup(ScReport *report);
 // Sets the ID of a player, his key and his result; the profile ID of the certificate and the last two are given on but
 // not used
-int ScReport_SetPlayer(ScReport *report, int index, const char *id, int key, int result, int profileId,
-                       const AuthCertificate *certificate, void *unused);
+SCResult ScReport_SetPlayer(ScReport *report, gsi_u32 index, const gsi_u8 *id, gsi_u32 key, SCGameResult result,
+                            gsi_u32 profileId, const GSLoginCertificate *certificate, const gsi_u8 *unused);
 // Ends the header, with a flag and a value
-int ScReport_Finish(ScReport *report, int flag, int value);
+SCResult ScReport_Finish(ScReport *report, gsi_bool flag, SCGameStatus value);
 // Adds a record of an int, or of a byte, to the section that is being added to
-int ScReport_AddInt(ScReport *report, int key, int value);
-int ScReport_AddByte(ScReport *report, int key, int value);
+SCResult ScReport_AddInt(ScReport *report, gsi_u16 key, gsi_i32 value);
+SCResult ScReport_AddByte(ScReport *report, gsi_u16 key, gsi_i8 value);
 // Frees the report
-int ScReport_Free(ScReport *report);
+SCResult ScReport_Free(ScReport *report);
 
 #endif // POKEBW2_DWC_COMPETITION_H

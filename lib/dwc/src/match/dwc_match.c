@@ -65,11 +65,11 @@ typedef struct FriendsMatchControl FriendsMatchControl;
 typedef struct MatchControl {
     GPConnection *gp;
     FriendsMatchControl *fm;
-    GTI2ConnectionCallbacks *callbacks;
+    GT2ConnectionCallbacks *callbacks;
     u8 retries;
     u8 matched;
     u8 unk_0e[0x2];
-    QR2Implementation *qr2;
+    qr2_t qr2;
     u8 mode;
     u8 matchType;
     u8 hostState;
@@ -101,7 +101,7 @@ typedef struct MatchControl {
     u8 unk_5d6[0x2];
     s32 qr2Ip;
     s32 qr2Reservation;
-    ServerBrowser *sb;
+    ServerBrowser sb;
     s32 sbUpdateFlag;
     u64 sbUpdateTick;
     u64 sbUpdateRequestTick;
@@ -194,7 +194,7 @@ typedef struct MatchControl {
 // ID, the game's callbacks and the login, friend list and match parts
 struct FriendsMatchControl {
     GTI2Socket *socket;
-    GTI2ConnectionCallbacks callbacks;
+    GT2ConnectionCallbacks callbacks;
     int sendBufSize;
     int recvBufSize;
     GPConnection gp;
@@ -280,7 +280,7 @@ typedef struct MatchPacket {
 
 static MatchRoot sMatchRoot;
 static u8 sNetIds[0x20];
-static GTI2Connection *sConnections[0x20];
+static GT2Connection sConnections[0x20];
 static MatchConnectionInfo sConnectionInfos[0x20];
 static MatchState sMatchState;
 static MatchKey sKeys[0x9a];
@@ -292,31 +292,31 @@ static int DWC_GetState(void);
 static u8 func_ov011_021603b8(void);
 static int DWCi_GT2GetConnectionListIdx(void);
 static void DWCi_ClearGT2ConnectionList(void);
-static GTI2Connection **DWCi_GetGT2ConnectionByIdx(int index);
-static GTI2Connection **DWCi_GetGT2ConnectionByProfileID(s32 profileId, int a1);
+static GT2Connection *DWCi_GetGT2ConnectionByIdx(int index);
+static GT2Connection *DWCi_GetGT2ConnectionByProfileID(s32 profileId, int a1);
 static MatchConnectionInfo *DWCi_GetConnectionInfoByIdx(int index);
 static void DWCi_SetState(int state);
 static s32 DWCi_DeleteAID(u8 netId);
 static u32 DWCi_GetAIDBitmapFromList(const u8 *netIds, int count);
 static int DWCi_HandleGPError(int result);
-static int DWCi_HandleGT2Error(int result);
+static GT2Result DWCi_HandleGT2Error(GT2Result result);
 static void DWCi_LoginCallback(DWCError error, int profileId, void *param);
 static void DWCi_UpdateServersCallback(DWCError error, BOOL isChanged, void *param);
 static void DWCi_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static void DWCi_GPErrorCallback(GPConnection *connection, void *arg, void *param);
 static void DWCi_GPRecvBuddyMessageCallback(GPConnection *connection, void *arg, void *param);
-static void DWCi_GT2ReceivedCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable);
-static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int isNetId, u8 netId);
-static void DWCi_GT2ClosedCallback(GTI2Connection *conn, int closeType);
-static void DWCi_GT2PingCallback(GTI2Connection *connection, int latency);
-static void DWCi_GT2SocketErrorCallback(GTI2Socket *socket);
+static void DWCi_GT2ReceivedCallback(GT2Connection connection, GT2Byte *message, int length, GT2Bool reliable);
+static void DWCi_HandleClosedConnection(GT2Connection conn, int closeType, int isNetId, u8 netId);
+static void DWCi_GT2ClosedCallback(GT2Connection conn, GT2CloseReason closeType);
+static void DWCi_GT2PingCallback(GT2Connection connection, int latency);
+static void DWCi_GT2SocketErrorCallback(GT2Socket socket);
 static void DWCi_SetMatchType(u8 mode);
 static BOOL func_ov011_02160d88(void);
 static BOOL func_ov011_02160dac(void);
 static BOOL DWC_IsValidCancelMatching(void);
 static BOOL func_ov011_02160fd8(void);
 static void DWCi_MatchInit(MatchControl *cnt, GPConnection *gp, FriendsMatchControl *fm,
-                           GTI2ConnectionCallbacks *callbacks, char *gameName, char *secretKey,
+                           GT2ConnectionCallbacks *callbacks, char *gameName, char *secretKey,
                            DWCFriendData *friendList, int friendListLen);
 static int DWCi_QR2Startup(s32 profileId);
 static void DWCi_ConnectToAnybodyAsync(int type, u8 numEntry, const char *query, DWCMatchedFunc matched,
@@ -329,14 +329,14 @@ static void DWCi_SetupGameServer(int type, u8 numEntry, DWCMatchedFunc matched, 
 static void DWCi_ConnectToGameServerAsync(int type, s32 profileId, DWCMatchedFunc matched, void *matchedParam,
                                           DWCNewClientFunc newClient, void *newClientParam, DWCAttemptFunc attempt,
                                           int *attemptParam, void *param);
-static void DWCi_SendStateChanged(QR2Implementation *server);
+static void DWCi_SendStateChanged(qr2_t server);
 static void DWCi_MatchProcess(int a0);
-static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message,
-                                                    int length);
-static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, gsi_u32 ip, gsi_u16 port,
-                                           int latency, const void *message, int length);
+static GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket, unsigned int ip, unsigned short port,
+                                                   GT2Byte *message, int length);
+static void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection, unsigned int ip,
+                                           unsigned short port, int latency, GT2Byte *message, int length);
 static void DWCi_FormatProfileID(char *dest, u32 size);
-static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, const void *message, int length);
+static void DWCi_GT2ConnectedCallback(GT2Connection connection, GT2Result result, GT2Byte *message, int length);
 static void DWCi_MatchGPRecvBuddyMsgCallback(void *unused, int id, u8 *str);
 static void DWCi_StopResendingMatchCommand(void);
 static void DWCi_StopMatching(int type, int code);
@@ -401,7 +401,7 @@ static int DWCi_ProcessCancelMatchSynTimeout(void);
 static u8 DWCi_GetNewMatchKey(void);
 static void DWCi_ClearGameMatchKeys(void);
 static BOOL DWCi_IsFriendByIdxList(int profileId);
-static int DWCi_CheckDWCServer(SBServer *server);
+static int DWCi_CheckDWCServer(SBServer server);
 static u8 DWCi_GetAIDFromProfileID(int index, int a1);
 static u32 DWCi_GetAIDBitmask(int excludeSelf);
 static void DWCi_InitClWaitTimeout(void);
@@ -411,21 +411,21 @@ static int DWCi_HandleQR2Error(int result);
 static int DWCi_HandleNNError(int result);
 static int DWCi_HandleNNResult(int result);
 static int DWCi_HandleMatchGT2Error(int result);
-static void DWCi_SBCallback(ServerBrowser *sb, SBCallbackReason reason, SBServer *server, void *instance);
-static void DWCi_SBPrintServerData(SBServer *server);
+static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer server, void *instance);
+static void DWCi_SBPrintServerData(SBServer server);
 static BOOL DWCi_EvaluateServers(int sortAfter);
 static void DWCi_RandomizeServers(void);
-static void DWCi_QR2ServerKeyCallback(int keyId, QR2Buffer *outBuf, void *userData);
-static void DWCi_QR2PlayerKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData);
-static void DWCi_QR2TeamKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData);
-static void DWCi_QR2KeyListCallback(QR2KeyType keyType, QR2KeyBuffer *keyBuffer, void *userData);
-static int DWCi_QR2CountCallback(QR2KeyType keyType, void *userData);
-static void DWCi_QR2AddErrorCallback(int error, const char *errorMessage, void *userData);
+static void DWCi_QR2ServerKeyCallback(int keyId, qr2_buffer_t outBuf, void *userData);
+static void DWCi_QR2PlayerKeyCallback(int keyId, int index, qr2_buffer_t outBuf, void *userData);
+static void DWCi_QR2TeamKeyCallback(int keyId, int index, qr2_buffer_t outBuf, void *userData);
+static void DWCi_QR2KeyListCallback(qr2_key_type keyType, qr2_keybuffer_t keyBuffer, void *userData);
+static int DWCi_QR2CountCallback(qr2_key_type keyType, void *userData);
+static void DWCi_QR2AddErrorCallback(qr2_error_t error, gsi_char *errorMessage, void *userData);
 static void DWCi_QR2PublicAddrCallback(gsi_u32 ip, gsi_u16 port, void *userData);
 static void DWCi_QR2NatnegCallback(int cookie, void *userData);
-static void DWCi_QR2ClientMsgCallback(const char *data, int size, void *userData);
-static void DWCi_NNProgressCallback(int state, void *userData);
-static void DWCi_NNCompletedCallback(int result, int gameSocket, SocAddrIn *address, void *userData);
+static void DWCi_QR2ClientMsgCallback(gsi_char *data, int size, void *userData);
+static void DWCi_NNProgressCallback(NegotiateState state, void *userData);
+static void DWCi_NNCompletedCallback(NegotiateResult result, SOCKET gameSocket, SOCKADDR_IN *address, void *userData);
 static BOOL DWCi_ProcessNNFailure(int skip);
 static BOOL DWCi_SendSvDownCommands(void);
 static u32 DWCi_MakeGroupID(void);
@@ -483,10 +483,10 @@ void DWC_InitFriendsMatch(DWCUserData *userData, int productId, const char *secr
     MI_CpuFill8(sMatchRoot.fm, 0, sizeof(FriendsMatchControl));
     DWC_ClearError();
     sMatchRoot.fm->socket = NULL;
-    sMatchRoot.fm->callbacks.onConnected = DWCi_GT2ConnectedCallback;
-    sMatchRoot.fm->callbacks.onReceived = DWCi_GT2ReceivedCallback;
-    sMatchRoot.fm->callbacks.onClosed = DWCi_GT2ClosedCallback;
-    sMatchRoot.fm->callbacks.onPing = DWCi_GT2PingCallback;
+    sMatchRoot.fm->callbacks.connected = DWCi_GT2ConnectedCallback;
+    sMatchRoot.fm->callbacks.received = DWCi_GT2ReceivedCallback;
+    sMatchRoot.fm->callbacks.closed = DWCi_GT2ClosedCallback;
+    sMatchRoot.fm->callbacks.ping = DWCi_GT2PingCallback;
     sMatchRoot.fm->sendBufSize = sendBufSize ? sendBufSize : 0x2000;
     sMatchRoot.fm->recvBufSize = recvBufSize ? recvBufSize : 0x2000;
     sMatchRoot.fm->gp = NULL;
@@ -567,7 +567,7 @@ void DWC_ProcessFriendsMatch(void) {
     switch (sMatchRoot.fm->state) {
     case 1:
         switch (GSIAvailableCheckThink()) {
-        case 1:
+        case GSIACAvailable:
             if (DWCi_HandleGPError(gpInitialize(&sMatchRoot.fm->gp, sMatchRoot.fm->login.productId, 0x10, 0xb))) {
                 return;
             }
@@ -593,10 +593,10 @@ void DWC_ProcessFriendsMatch(void) {
                 DWCi_StopLogin(2, -20100);
             }
             break;
-        case 2:
+        case GSIACUnavailable:
             DWCi_StopLogin(3, -20110);
             return;
-        case 3:
+        case GSIACTemporarilyUnavailable:
             DWCi_StopLogin(4, -20101);
             return;
         }
@@ -939,7 +939,7 @@ int DWCi_GT2Startup(void) {
     return result;
 }
 
-GTI2Connection *DWCi_GetGT2Connection(u8 aid) {
+GT2Connection DWCi_GetGT2Connection(u8 aid) {
     int i;
 
     if (sMatchRoot.fm == NULL) {
@@ -953,7 +953,7 @@ GTI2Connection *DWCi_GetGT2Connection(u8 aid) {
     return NULL;
 }
 
-u8 DWCi_GetConnectionAID(GTI2Connection *connection) {
+u8 DWCi_GetConnectionAID(GT2Connection connection) {
     MatchConnectionInfo *info = gt2GetConnectionData(connection);
 
     if (info != NULL) {
@@ -978,11 +978,11 @@ static void DWCi_ClearGT2ConnectionList(void) {
     MIi_CpuClear32(0, sConnectionInfos, sizeof(sConnectionInfos));
 }
 
-static GTI2Connection **DWCi_GetGT2ConnectionByIdx(int index) {
+static GT2Connection *DWCi_GetGT2ConnectionByIdx(int index) {
     return &sConnections[index];
 }
 
-static GTI2Connection **DWCi_GetGT2ConnectionByProfileID(s32 profileId, int a1) {
+static GT2Connection *DWCi_GetGT2ConnectionByProfileID(s32 profileId, int a1) {
     int i;
 
     for (i = 0; i < 0x20; i++) {
@@ -1084,7 +1084,7 @@ static int DWCi_HandleGPError(int result) {
     return result;
 }
 
-static int DWCi_HandleGT2Error(int result) {
+static GT2Result DWCi_HandleGT2Error(GT2Result result) {
     int type;
     int code;
 
@@ -1211,11 +1211,11 @@ static void DWCi_GPRecvBuddyMessageCallback(GPConnection *connection, void *arg,
     }
 }
 
-static void DWCi_GT2ReceivedCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+static void DWCi_GT2ReceivedCallback(GT2Connection connection, GT2Byte *message, int length, GT2Bool reliable) {
     DWCi_RecvCallback(connection, message, length, reliable);
 }
 
-static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int isNetId, u8 netId) {
+static void DWCi_HandleClosedConnection(GT2Connection conn, int closeType, int isNetId, u8 netId) {
     u8 id;
     int profileId = 0;
     int errorCode;
@@ -1369,15 +1369,15 @@ static void DWCi_HandleClosedConnection(GTI2Connection *conn, int closeType, int
     }
 }
 
-static void DWCi_GT2ClosedCallback(GTI2Connection *conn, int closeType) {
+static void DWCi_GT2ClosedCallback(GT2Connection conn, GT2CloseReason closeType) {
     DWCi_HandleClosedConnection(conn, closeType, 0, 0xff);
 }
 
-static void DWCi_GT2PingCallback(GTI2Connection *connection, int latency) {
+static void DWCi_GT2PingCallback(GT2Connection connection, int latency) {
     DWCi_PingCallback(connection, latency);
 }
 
-static void DWCi_GT2SocketErrorCallback(GTI2Socket *socket) {
+static void DWCi_GT2SocketErrorCallback(GT2Socket socket) {
     sMatchRoot.socketError = GOAGetLastError(gt2GetSocketSOCKET(socket));
     DWCi_SetError(9, -97003);
     sMatchRoot.fm->socket = NULL;
@@ -1542,7 +1542,7 @@ static BOOL func_ov011_02160fd8(void) {
 }
 
 static void DWCi_MatchInit(MatchControl *cnt, GPConnection *gp, FriendsMatchControl *fm,
-                           GTI2ConnectionCallbacks *callbacks, char *gameName, char *secretKey,
+                           GT2ConnectionCallbacks *callbacks, char *gameName, char *secretKey,
                            DWCFriendData *friendList, int friendListLen) {
     DWCi_SetMatchCnt(cnt);
     DWCi_GetMatchCnt()->gp = gp;
@@ -1760,7 +1760,7 @@ static void DWCi_ConnectToGameServerAsync(int type, s32 profileId, DWCMatchedFun
     }
 }
 
-static void DWCi_SendStateChanged(QR2Implementation *server) {
+static void DWCi_SendStateChanged(qr2_t server) {
     if (server != NULL) {
         qr2_think(server);
         if (server->userStateChangeRequested == 0) {
@@ -2106,8 +2106,8 @@ static void DWCi_MatchProcess(int a0) {
     }
 }
 
-static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 ip, gsi_u16 port, const void *message,
-                                                    int length) {
+static GT2Bool DWCi_GT2UnrecognizedMessageCallback(GT2Socket socket, unsigned int ip, unsigned short port,
+                                                   GT2Byte *message, int length) {
     const u8 *data = message;
     SocAddrIn addr;
 
@@ -2120,7 +2120,7 @@ static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 
     addr.port = MATCH_SWAP16(port);
     if ((data[0] == 0xfe && data[1] == 0xfd) || data[0] == 0x5c) {
         if (DWCi_GetMatchCnt()->qr2 != NULL) {
-            qr2_parse_queryA(DWCi_GetMatchCnt()->qr2, (char *)data, length, &addr);
+            qr2_parse_queryA(DWCi_GetMatchCnt()->qr2, (char *)data, length, (SOCKADDR *)&addr);
         }
     } else if (memcmp(data, NNMagicData, NATNEG_MAGIC_LEN) == 0) {
         NNProcessData((char *)data, length, &addr);
@@ -2135,12 +2135,12 @@ static gsi_bool DWCi_GT2UnrecognizedMessageCallback(GTI2Socket *socket, gsi_u32 
     return gsi_true;
 }
 
-static void DWCi_GT2ConnectAttemptCallback(GTI2Socket *socket, GTI2Connection *connection, gsi_u32 ip, gsi_u16 port,
-                                           int latency, const void *message, int length) {
+static void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection, unsigned int ip,
+                                           unsigned short port, int latency, GT2Byte *message, int length) {
     int slot;
     u32 gameId = 0;
     int half;
-    GTI2Connection **slotConn;
+    GT2Connection *slotConn;
     MatchConnectionInfo *info;
 
     if (DWCi_GetMatchCnt() != NULL && DWCi_GetMatchCnt()->state == 5) {
@@ -2201,13 +2201,13 @@ static void DWCi_FormatProfileID(char *dest, u32 size) {
     OS_SNPrintf(dest, size, "%u", DWCi_GetMatchCnt()->profileId);
 }
 
-static void DWCi_GT2ConnectedCallback(GTI2Connection *connection, int result, const void *message, int length) {
+static void DWCi_GT2ConnectedCallback(GT2Connection connection, GT2Result result, GT2Byte *message, int length) {
     char text[0x18];
     MatchControl *work;
     const char *address;
     int status;
     int slot;
-    GTI2Connection **slotConn;
+    GT2Connection *slotConn;
     MatchConnectionInfo *info;
 
     if (!(((DWCi_GetMatchCnt() != NULL && (DWCi_GetMatchCnt()->state == 6 || DWCi_GetMatchCnt()->state == 0xf)) ||
@@ -4196,7 +4196,7 @@ static int DWCi_ResumeMatching(void) {
 }
 
 static int DWCi_CloseCancelHostAsync(int profileId) {
-    GTI2Connection **conn;
+    GT2Connection *conn;
     int result;
 
     DWCi_GetMatchCnt()->cbEventPid = profileId;
@@ -4646,7 +4646,7 @@ static BOOL DWCi_IsFriendByIdxList(int profileId) {
     return FALSE;
 }
 
-static int DWCi_CheckDWCServer(SBServer *server) {
+static int DWCi_CheckDWCServer(SBServer server) {
     if (SBServerGetIntValueA(server, "numplayers", -1) == -1) {
         return 0;
     }
@@ -4892,11 +4892,11 @@ static int DWCi_HandleMatchGT2Error(int result) {
     return result;
 }
 
-static void DWCi_SBCallback(ServerBrowser *sb, SBCallbackReason reason, SBServer *server, void *instance) {
+static void DWCi_SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer server, void *instance) {
     int index;
     int count;
-    SBServer *chosen;
-    SBServer *host;
+    SBServer chosen;
+    SBServer host;
     int best;
     DWCNodeInfo peer;
 
@@ -5077,7 +5077,7 @@ static void DWCi_SBCallback(ServerBrowser *sb, SBCallbackReason reason, SBServer
     sMatchState.sbCallbackLevel--;
 }
 
-static void DWCi_SBPrintServerData(SBServer *server) {
+static void DWCi_SBPrintServerData(SBServer server) {
 }
 
 // How often each of the first servers is picked
@@ -5172,7 +5172,7 @@ static void DWCi_RandomizeServers(void) {
     }
 }
 
-static void DWCi_QR2ServerKeyCallback(int keyId, QR2Buffer *outBuf, void *userData) {
+static void DWCi_QR2ServerKeyCallback(int keyId, qr2_buffer_t outBuf, void *userData) {
     int count;
 
     switch (keyId) {
@@ -5218,13 +5218,13 @@ static void DWCi_QR2ServerKeyCallback(int keyId, QR2Buffer *outBuf, void *userDa
     }
 }
 
-static void DWCi_QR2PlayerKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData) {
+static void DWCi_QR2PlayerKeyCallback(int keyId, int index, qr2_buffer_t outBuf, void *userData) {
 }
 
-static void DWCi_QR2TeamKeyCallback(int keyId, int index, QR2Buffer *outBuf, void *userData) {
+static void DWCi_QR2TeamKeyCallback(int keyId, int index, qr2_buffer_t outBuf, void *userData) {
 }
 
-static void DWCi_QR2KeyListCallback(QR2KeyType keyType, QR2KeyBuffer *keyBuffer, void *userData) {
+static void DWCi_QR2KeyListCallback(qr2_key_type keyType, qr2_keybuffer_t keyBuffer, void *userData) {
     int i;
 
     switch (keyType) {
@@ -5251,11 +5251,11 @@ static void DWCi_QR2KeyListCallback(QR2KeyType keyType, QR2KeyBuffer *keyBuffer,
     }
 }
 
-static int DWCi_QR2CountCallback(QR2KeyType keyType, void *userData) {
+static int DWCi_QR2CountCallback(qr2_key_type keyType, void *userData) {
     return 0;
 }
 
-static void DWCi_QR2AddErrorCallback(int error, const char *errorMessage, void *userData) {
+static void DWCi_QR2AddErrorCallback(qr2_error_t error, gsi_char *errorMessage, void *userData) {
     DWCi_HandleQR2Error(error);
 }
 
@@ -5308,7 +5308,7 @@ void DWCi_ProcessGT2MatchCommand(const u8 *data, int size) {
     }
 }
 
-static void DWCi_QR2ClientMsgCallback(const char *data, int size, void *userData) {
+static void DWCi_QR2ClientMsgCallback(gsi_char *data, int size, void *userData) {
     MatchPacketHeader header;
     u32 payload[0x20];
     int offset = 0;
@@ -5338,10 +5338,10 @@ static void DWCi_QR2ClientMsgCallback(const char *data, int size, void *userData
     } while (offset + 0x14 <= size);
 }
 
-static void DWCi_NNProgressCallback(int state, void *userData) {
+static void DWCi_NNProgressCallback(NegotiateState state, void *userData) {
 }
 
-static void DWCi_NNCompletedCallback(int result, int gameSocket, SocAddrIn *address, void *userData) {
+static void DWCi_NNCompletedCallback(NegotiateResult result, SOCKET gameSocket, SOCKADDR_IN *address, void *userData) {
     MatchTarget *connection = userData;
     u8 buffer[0x18];
     int status;

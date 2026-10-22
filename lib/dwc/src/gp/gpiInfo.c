@@ -13,16 +13,16 @@
 // connection, network and OS), 0x717 the AIM name, and 0x718 to 0x71e the picture, occupation, industry, income,
 // marriage, children and interests
 
-static gsi_bool gpiIsValidDate(int day, int month, int year);
-static int gpiIntToDate(GPConnection *connection, int date, int *day, int *month, int *year);
+static GPIBool gpiIsValidDate(int day, int month, int year);
+static GPResult gpiIntToDate(GPConnection *connection, int date, int *day, int *month, int *year);
 static void gpiInfoCacheToArg(const GPIInfoCache *cache, GPGetInfoResponseArg *arg);
-static int gpiSendLocalInfo(GPConnection *connection, const char *info, const char *value);
-static int gpiSendUserInfo(GPConnection *connection, const char *info, const char *value);
+static GPResult gpiSendLocalInfo(GPConnection *connection, const char *info, const char *value);
+static GPResult gpiSendUserInfo(GPConnection *connection, const char *info, const char *value);
 static int gpiSetInfoi(GPConnection *connection, int info, int value);
 static gsi_bool gpiSetInfoCache(GPConnection *connection, GPIProfile *profile, const GPIInfoCache *cache);
 
 // All zero is no date; the last date the server takes is 6 June 2079
-static gsi_bool gpiIsValidDate(int day, int month, int year) {
+static GPIBool gpiIsValidDate(int day, int month, int year) {
     if (day == 0 && month == 0 && year == 0) {
         return gsi_true;
     }
@@ -84,7 +84,7 @@ static gsi_bool gpiIsValidDate(int day, int month, int year) {
 }
 
 // A date is packed as the day, the month and the year in the bytes from the top
-static int gpiIntToDate(GPConnection *connection, int date, int *day, int *month, int *year) {
+static GPResult gpiIntToDate(GPConnection *connection, int date, int *day, int *month, int *year) {
     int d = (gsi_u8)(date >> 24);
     int m = (gsi_u8)(date >> 16);
     int y = (gsi_u16)date;
@@ -172,7 +172,7 @@ static void gpiInfoCacheToArg(const GPIInfoCache *cache, GPGetInfoResponseArg *a
 
 // The server's "\pi\" answer to "\getprofile\": the info is cached if the connection caches info, and the profile's
 // signature is kept for a peer that waits for it
-int gpiProcessGetInfo(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessGetInfo(GPConnection *connection, GPIOperation *operation, const char *input) {
     GPIConnection *iconnection = *connection;
     char buffer[0x40];
     char nick[31];
@@ -372,7 +372,7 @@ int gpiProcessGetInfo(GPConnection *connection, GPIOperation *operation, const c
     return 0;
 }
 
-int gpiAddLocalInfo(GPConnection *connection, GPIBuffer *buffer) {
+GPResult gpiAddLocalInfo(GPConnection *connection, GPIBuffer *buffer) {
     GPIConnection *iconnection = *connection;
 
     if (iconnection->updateproBuffer.len > 0) {
@@ -395,7 +395,7 @@ int gpiAddLocalInfo(GPConnection *connection, GPIBuffer *buffer) {
 }
 
 // Adds a key and its value to the changes of the profile (sent as "\updatepro\") or of the user ("\updateui\")
-static int gpiSendLocalInfo(GPConnection *connection, const char *info, const char *value) {
+static GPResult gpiSendLocalInfo(GPConnection *connection, const char *info, const char *value) {
     GPIConnection *iconnection = *connection;
     int result;
 
@@ -410,7 +410,7 @@ static int gpiSendLocalInfo(GPConnection *connection, const char *info, const ch
     return 0;
 }
 
-static int gpiSendUserInfo(GPConnection *connection, const char *info, const char *value) {
+static GPResult gpiSendUserInfo(GPConnection *connection, const char *info, const char *value) {
     GPIConnection *iconnection = *connection;
     int result;
 
@@ -588,7 +588,7 @@ static int gpiSetInfoi(GPConnection *connection, int info, int value) {
     return 0;
 }
 
-int gpiSetInfos(GPConnection *connection, int info, const char *value) {
+GPResult gpiSetInfos(GPConnection *connection, GPEnum info, const char *value) {
     GPIConnection *iconnection = *connection;
     char passwordEnc[45];
     char buffer[256];
@@ -831,7 +831,7 @@ int gpiSetInfos(GPConnection *connection, int info, const char *value) {
     return 0;
 }
 
-int gpiSendGetInfo(GPConnection *connection, int profileid, int operationid) {
+GPResult gpiSendGetInfo(GPConnection *connection, int profileid, int operationid) {
     GPIConnection *iconnection = *connection;
 
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\getprofile\\\\sesskey\\");
@@ -845,7 +845,8 @@ int gpiSendGetInfo(GPConnection *connection, int profileid, int operationid) {
 }
 
 // Gives the info from the cache when it is asked for (checkCache 1) and there, and asks the server otherwise
-int gpiGetInfo(GPConnection *connection, int profile, int checkCache, int blocking, GPCallback callback, void *param) {
+GPResult gpiGetInfo(GPConnection *connection, GPProfile profile, GPEnum checkCache, GPEnum blocking,
+                    GPCallback callback, void *param) {
     GPIConnection *iconnection = *connection;
     GPIProfile *pProfile;
     GPIOperation *operation = NULL;

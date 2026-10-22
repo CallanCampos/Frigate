@@ -8,7 +8,7 @@
 // pret/pokerevo's Wii build and GameSpy's later SDK, are in dwc/gp.h
 
 // The server's "\rn\" answer
-int gpiProcessRegisterUniqueNick(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessRegisterUniqueNick(GPConnection *connection, GPIOperation *operation, const char *input) {
     GPICallback callback;
     GPRegisterUniqueNickResponseArg *arg;
     int result;
@@ -39,7 +39,7 @@ int gpiProcessRegisterUniqueNick(GPConnection *connection, GPIOperation *operati
 }
 
 // The server's "\rc\" answer
-int gpiProcessRegisterCdKey(GPConnection *connection, GPIOperation *operation, const char *input) {
+GPResult gpiProcessRegisterCdKey(GPConnection *connection, GPIOperation *operation, const char *input) {
     GPICallback callback;
     GPRegisterCdKeyResponseArg *arg;
     int result;

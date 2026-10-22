@@ -10,8 +10,8 @@
 typedef OSMutex GSICriticalSection;
 
 // Adds one to or takes one from a counter, and returns its new value
-gsi_i32 gsiInterlockedIncrement(gsi_i32 *value);
-gsi_i32 gsiInterlockedDecrement(gsi_i32 *value);
+gsi_u32 gsiInterlockedIncrement(gsi_u32 *value);
+gsi_u32 gsiInterlockedDecrement(gsi_u32 *value);
 void gsiInitializeCriticalSection(GSICriticalSection *section);
 void gsiEnterCriticalSection(GSICriticalSection *section);
 void gsiLeaveCriticalSection(GSICriticalSection *section);

@@ -48,11 +48,11 @@ char *SBOverrideMasterServer;
 // The list that a sort sorts, which its compare functions read the keys from
 static SBServerList *g_sortserverlist;
 
-static int prevKeyCompare(SBServer *server1, SBServer *server2);
+static int prevKeyCompare(SBServer server1, SBServer server2);
 
 // Compares two servers by the key of the sort before, which keeps the order of the servers that the key of this one
 // can't tell apart
-static int prevKeyCompare(SBServer *server1, SBServer *server2) {
+static int prevKeyCompare(SBServer server1, SBServer server2) {
     const char *prevsortkey = g_sortserverlist->prevsortinfo.sortkey;
     int diff;
     double f;
@@ -91,8 +91,8 @@ static int prevKeyCompare(SBServer *server1, SBServer *server2) {
 }
 
 static int IntKeyCompare(const void *entry1, const void *entry2) {
-    SBServer *server1 = *(SBServer **)entry1;
-    SBServer *server2 = *(SBServer **)entry2;
+    SBServer server1 = *(SBServer *)entry1;
+    SBServer server2 = *(SBServer *)entry2;
     int diff;
     const char *currsortkey = g_sortserverlist->currsortinfo.sortkey;
 
@@ -107,8 +107,8 @@ static int IntKeyCompare(const void *entry1, const void *entry2) {
 }
 
 static int FloatKeyCompare(const void *entry1, const void *entry2) {
-    SBServer *server1 = *(SBServer **)entry1;
-    SBServer *server2 = *(SBServer **)entry2;
+    SBServer server1 = *(SBServer *)entry1;
+    SBServer server2 = *(SBServer *)entry2;
     double f;
     const char *currsortkey = g_sortserverlist->currsortinfo.sortkey;
 
@@ -129,8 +129,8 @@ static int FloatKeyCompare(const void *entry1, const void *entry2) {
 }
 
 static int StrCaseKeyCompare(const void *entry1, const void *entry2) {
-    SBServer *server1 = *(SBServer **)entry1;
-    SBServer *server2 = *(SBServer **)entry2;
+    SBServer server1 = *(SBServer *)entry1;
+    SBServer server2 = *(SBServer *)entry2;
     int diff;
     const char *currsortkey = g_sortserverlist->currsortinfo.sortkey;
 
@@ -145,8 +145,8 @@ static int StrCaseKeyCompare(const void *entry1, const void *entry2) {
 }
 
 static int StrNoCaseKeyCompare(const void *entry1, const void *entry2) {
-    SBServer *server1 = *(SBServer **)entry1;
-    SBServer *server2 = *(SBServer **)entry2;
+    SBServer server1 = *(SBServer *)entry1;
+    SBServer server2 = *(SBServer *)entry2;
     int diff;
     const char *currsortkey = g_sortserverlist->currsortinfo.sortkey;
 
@@ -161,8 +161,8 @@ static int StrNoCaseKeyCompare(const void *entry1, const void *entry2) {
     return diff;
 }
 
-void SBServerListSort(SBServerList *slist, gsi_bool ascending, SortInfo sortinfo) {
-    DArrayCompareFunc comparator;
+void SBServerListSort(SBServerList *slist, SBBool ascending, SortInfo sortinfo) {
+    ArrayCompareFn comparator;
 
     switch (sortinfo.comparemode) {
     case sbcm_int:
@@ -192,31 +192,31 @@ void SBServerListSort(SBServerList *slist, gsi_bool ascending, SortInfo sortinfo
     ArraySort(slist->servers, comparator);
 }
 
-void SBServerListAppendServer(SBServerList *slist, SBServer *server) {
+void SBServerListAppendServer(SBServerList *slist, SBServer server) {
     func_ov011_021715a4(slist->servers, &server);
     slist->ListCallback(slist, slc_serveradded, server, slist->instance);
 }
 
-int SBServerListFindServer(SBServerList *slist, SBServer *findserver) {
+int SBServerListFindServer(SBServerList *slist, SBServer findserver) {
     int numservers = func_ov011_02171588(slist->servers);
     int i;
 
     for (i = 0; i < numservers; i++) {
-        if (findserver == *(SBServer **)func_ov011_0217158c(slist->servers, i)) {
+        if (findserver == *(SBServer *)func_ov011_0217158c(slist->servers, i)) {
             return i;
         }
     }
     return -1;
 }
 
-int SBServerListFindServerByIP(SBServerList *slist, gsi_u32 ip, gsi_u16 port) {
+int SBServerListFindServerByIP(SBServerList *slist, goa_uint32 ip, unsigned short port) {
     int numservers;
-    SBServer *server;
+    SBServer server;
     int i;
 
     numservers = func_ov011_02171588(slist->servers);
     for (i = 0; i < numservers; i++) {
-        server = *(SBServer **)func_ov011_0217158c(slist->servers, i);
+        server = *(SBServer *)func_ov011_0217158c(slist->servers, i);
         if (SBServerGetPublicInetAddress(server) == ip && SBServerGetPublicQueryPortNBO(server) == port) {
             return i;
         }
@@ -225,7 +225,7 @@ int SBServerListFindServerByIP(SBServerList *slist, gsi_u32 ip, gsi_u16 port) {
 }
 
 // The servers taken off the list wait in a list of their own until SBListThink frees them
-static void AddServerToDeadlist(SBServerList *slist, SBServer *server) {
+static void AddServerToDeadlist(SBServerList *slist, SBServer server) {
     if (slist->deadlist == NULL) {
         SBServerSetNext(server, NULL);
     } else {
@@ -235,7 +235,7 @@ static void AddServerToDeadlist(SBServerList *slist, SBServer *server) {
 }
 
 void SBServerListRemoveAt(SBServerList *slist, int index) {
-    SBServer *server = *(SBServer **)func_ov011_0217158c(slist->servers, index);
+    SBServer server = *(SBServer *)func_ov011_0217158c(slist->servers, index);
 
     slist->ListCallback(slist, slc_serverdeleted, server, slist->instance);
     func_ov011_02171668(slist->servers, index);
@@ -246,13 +246,13 @@ int SBServerListCount(SBServerList *slist) {
     return func_ov011_02171588(slist->servers);
 }
 
-SBServer *SBServerListNth(SBServerList *slist, int i) {
-    return *(SBServer **)func_ov011_0217158c(slist->servers, i);
+SBServer SBServerListNth(SBServerList *slist, int i) {
+    return *(SBServer *)func_ov011_0217158c(slist->servers, i);
 }
 
 void SBFreeDeadList(SBServerList *slist) {
-    SBServer *server;
-    SBServer *next;
+    SBServer server;
+    SBServer next;
 
     if (slist->deadlist == NULL) {
         return;
@@ -271,14 +271,14 @@ void SBServerListClear(SBServerList *slist) {
     int nservers = func_ov011_02171588(slist->servers);
 
     for (i = 0; i < nservers; i++) {
-        AddServerToDeadlist(slist, *(SBServer **)func_ov011_0217158c(slist->servers, i));
+        AddServerToDeadlist(slist, *(SBServer *)func_ov011_0217158c(slist->servers, i));
     }
     ArrayClear(slist->servers);
     SBFreeDeadList(slist);
 }
 
 void SBAllocateServerList(SBServerList *slist) {
-    slist->servers = func_ov011_02171514(sizeof(SBServer *), 100, NULL);
+    slist->servers = func_ov011_02171514(sizeof(SBServer), 100, NULL);
     slist->deadlist = NULL;
 }
 
@@ -325,9 +325,9 @@ int NTSLengthSB(char *buf, int len) {
 }
 
 void SBServerListInit(SBServerList *slist, const char *queryForGamename, const char *queryFromGamename,
-                      const char *queryFromKey, int queryFromVersion, gsi_bool lanBrowse, SBListCallBackFn callback,
+                      const char *queryFromKey, int queryFromVersion, SBBool lanBrowse, SBListCallBackFn callback,
                       void *instance) {
-    if (lanBrowse == gsi_false && __GSIACResult != 1) {
+    if (lanBrowse == gsi_false && __GSIACResult != GSIACAvailable) {
         return;
     }
     slist->state = sl_disconnected;
@@ -409,7 +409,7 @@ static SBError ServerListConnect(SBServerList *slist) {
             return sbe_socketerror;
         }
     }
-    if (connect(slist->slsocket, &saddr, sizeof(saddr)) != 0) {
+    if (connect(slist->slsocket, (SOCKADDR *)&saddr, sizeof(saddr)) != 0) {
         closesocket(slist->slsocket);
         slist->slsocket = -1;
         return sbe_connecterror;
@@ -431,7 +431,7 @@ static void BufferAddNTS(char **buffer, const char *str, int *len) {
     *buffer += slen;
 }
 
-static void BufferAddByte(char **buffer, gsi_u8 bval, int *len) {
+static void BufferAddByte(char **buffer, unsigned char bval, int *len) {
     **buffer = bval;
     *len += 1;
     *buffer += 1;
@@ -727,7 +727,7 @@ static int AllKeysPresent(SBServerList *slist, char *buf, int len) {
     return 1;
 }
 
-static void ParseServerIPPort(SBServerList *slist, char *buf, int len, gsi_u32 *ip, gsi_u16 *port) {
+static void ParseServerIPPort(SBServerList *slist, char *buf, int len, goa_uint32 *ip, unsigned short *port) {
     gsi_u8 flags;
 
     if (len < 5) {
@@ -751,7 +751,7 @@ static void ParseServerIPPort(SBServerList *slist, char *buf, int len, gsi_u32 *
 
 // Reads a server of the list, or of the master server's message of one, which has no popular values: its flags,
 // addresses, keys and rules. Returns its size
-static int ParseServer(SBServerList *slist, SBServer *server, char *buf, int len, int usepopularlist) {
+static int ParseServer(SBServerList *slist, SBServer server, char *buf, int len, int usepopularlist) {
     int numkeys;
     int i;
     short sval;
@@ -866,7 +866,7 @@ static int IncomingListParseServer(SBServerList *slist, char *buf, int len) {
     int i;
     gsi_u32 ip;
     gsi_u16 port;
-    SBServer *server;
+    SBServer server;
     gsi_u8 flags;
 
     if (len < 1) {
@@ -1151,7 +1151,7 @@ static SBError ProcessMaploop(SBServerList *slist, char *buf, int len) {
     gsi_u32 changeTime;
     gsi_u32 ip;
     gsi_u16 port;
-    SBServer *server;
+    SBServer server;
     gsi_u8 mapCount;
     int i;
     char *mapList[MAX_MAPLOOP_LENGTH];
@@ -1212,7 +1212,7 @@ static SBError ProcessDeleteServer(SBServerList *slist, char *buf, int len) {
 
 // A server that the master server sends after the list, as the list has them but without popular values
 static SBError ProcessPushServer(SBServerList *slist, char *buf, int len) {
-    SBServer *server;
+    SBServer server;
     gsi_u32 ip;
     gsi_u16 port;
     int foundexisting;
@@ -1328,7 +1328,7 @@ static SBError ProcessIncomingData(SBServerList *slist) {
 }
 
 // The message's length, its type and the server's address, then its data
-SBError SBSendMessageToServer(SBServerList *slist, gsi_u32 ip, gsi_u16 port, const char *data, int len) {
+SBError SBSendMessageToServer(SBServerList *slist, goa_uint32 ip, unsigned short port, const char *data, int len) {
     char requestBuffer[16];
     gsi_u16 tmp;
     gsi_u16 msgLen = 9;
@@ -1358,7 +1358,7 @@ SBError SBSendMessageToServer(SBServerList *slist, gsi_u32 ip, gsi_u16 port, con
 }
 
 // The cookie after NAT negotiation's magic bytes
-SBError SBSendNatNegotiateCookieToServer(SBServerList *slist, gsi_u32 ip, gsi_u16 port, int cookie) {
+SBError SBSendNatNegotiateCookieToServer(SBServerList *slist, goa_uint32 ip, unsigned short port, int cookie) {
     gsi_u8 negotiateBuffer[6 + 4];
 
     negotiateBuffer[0] = 0xfd;
@@ -1379,10 +1379,10 @@ static SBError ProcessLanData(SBServerList *slist) {
     int saddrlen = sizeof(saddr);
     int error;
     int foundexisting;
-    SBServer *server;
+    SBServer server;
 
     while (CanReceiveOnSocket(slist->slsocket)) {
-        error = recvfrom(slist->slsocket, indata, sizeof(indata) - 1, 0, &saddr, &saddrlen);
+        error = recvfrom(slist->slsocket, indata, sizeof(indata) - 1, 0, (SOCKADDR *)&saddr, &saddrlen);
         if (error == -1) {
             continue;
         }

@@ -4,32 +4,32 @@
 // table and random ones. A message lists the names of the fields to read, and the answer lists the records, each
 // with a field of its own in the order of the names.
 
-static int Sake_CheckNames(const char **names, int nameNum);
-static void Sake_WriteNames(SakeRequest *request, const char **names, int nameNum);
-static void Sake_WriteRecordIds(SakeRequest *request, const int *recordIds, int recordNum);
-static void Sake_WriteOwnerIds(SakeRequest *request, const int *ownerIds, int ownerNum);
-static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *recordNum, int fieldNum,
-                             const char **fieldNames);
-static void Sake_FreeFields(int fieldNum, SakeField *fields);
-static void Sake_FreeRecords(int fieldNum, int recordNum, SakeField **records);
-static int Sake_ValidateSearchRecords(SakeRequest *request);
-static int Sake_BuildSearchRecords(SakeRequest *request);
-static int Sake_ParseSearchRecords(SakeRequest *request);
-static void Sake_FreeSearchRecords(SakeRequest *request);
-static int Sake_ValidateGetMyRecords(SakeRequest *request);
-static int Sake_BuildGetMyRecords(SakeRequest *request);
-static int Sake_ParseGetMyRecords(SakeRequest *request);
-static void Sake_FreeGetMyRecords(SakeRequest *request);
-static int Sake_ValidateGetSpecificRecords(SakeRequest *request);
-static int Sake_BuildGetSpecificRecords(SakeRequest *request);
-static int Sake_ParseGetSpecificRecords(SakeRequest *request);
-static void Sake_FreeGetSpecificRecords(SakeRequest *request);
-static int Sake_ValidateGetRandomRecords(SakeRequest *request);
-static int Sake_BuildGetRandomRecords(SakeRequest *request);
-static int Sake_ParseGetRandomRecords(SakeRequest *request);
-static void Sake_FreeGetRandomRecords(SakeRequest *request);
+static SAKEStartRequestResult Sake_CheckNames(char **names, int nameNum);
+static void Sake_WriteNames(SAKERequest request, char **names, int nameNum);
+static void Sake_WriteRecordIds(SAKERequest request, int *recordIds, int recordNum);
+static void Sake_WriteOwnerIds(SAKERequest request, int *ownerIds, int ownerNum);
+static SAKERequestResult Sake_ParseRecords(SAKERequest request, SAKEField ***records, int *recordNum, int fieldNum,
+                                           char **fieldNames);
+static void Sake_FreeFields(int fieldNum, SAKEField *fields);
+static void Sake_FreeRecords(int fieldNum, int recordNum, SAKEField **records);
+static SAKEStartRequestResult Sake_ValidateSearchRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_BuildSearchRecords(SAKERequest request);
+static SAKERequestResult Sake_ParseSearchRecords(SAKERequest request);
+static void Sake_FreeSearchRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_ValidateGetMyRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_BuildGetMyRecords(SAKERequest request);
+static SAKERequestResult Sake_ParseGetMyRecords(SAKERequest request);
+static void Sake_FreeGetMyRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_ValidateGetSpecificRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_BuildGetSpecificRecords(SAKERequest request);
+static SAKERequestResult Sake_ParseGetSpecificRecords(SAKERequest request);
+static void Sake_FreeGetSpecificRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_ValidateGetRandomRecords(SAKERequest request);
+static SAKEStartRequestResult Sake_BuildGetRandomRecords(SAKERequest request);
+static SAKERequestResult Sake_ParseGetRandomRecords(SAKERequest request);
+static void Sake_FreeGetRandomRecords(SAKERequest request);
 
-static SakeRequestType sSearchRecordsType = {
+static SAKEIRequestInfo sSearchRecordsType = {
     8,
     "SearchForRecords",
     "SOAPAction: \"http://gamespy.net/sake/SearchForRecords\"",
@@ -42,7 +42,7 @@ static SakeRequestType sSearchRecordsType = {
     NULL,
 };
 
-static SakeRequestType sGetMyRecordsType = {
+static SAKEIRequestInfo sGetMyRecordsType = {
     8,
     "GetMyRecords",
     "SOAPAction: \"http://gamespy.net/sake/GetMyRecords\"",
@@ -55,7 +55,7 @@ static SakeRequestType sGetMyRecordsType = {
     NULL,
 };
 
-static SakeRequestType sGetSpecificRecordsType = {
+static SAKEIRequestInfo sGetSpecificRecordsType = {
     8,
     "GetSpecificRecords",
     "SOAPAction: \"http://gamespy.net/sake/GetSpecificRecords\"",
@@ -68,7 +68,7 @@ static SakeRequestType sGetSpecificRecordsType = {
     NULL,
 };
 
-static SakeRequestType sGetRandomRecordsType = {
+static SAKEIRequestInfo sGetRandomRecordsType = {
     4,
     "GetRandomRecords",
     "SOAPAction: \"http://gamespy.net/sake/GetRandomRecords\"",
@@ -81,18 +81,18 @@ static SakeRequestType sGetRandomRecordsType = {
     NULL,
 };
 
-static int Sake_CheckNames(const char **names, int nameNum) {
+static SAKEStartRequestResult Sake_CheckNames(char **names, int nameNum) {
     int i;
 
     for (i = 0; i < nameNum; i++) {
         if (names[i] == NULL || names[i][0] == '\0') {
-            return SAKE_REQUEST_ERROR_NO_FIELD_NAME;
+            return SAKEStartRequestResult_BAD_FIELD_NAME;
         }
     }
     return 0;
 }
 
-static void Sake_WriteNames(SakeRequest *request, const char **names, int nameNum) {
+static void Sake_WriteNames(SAKERequest request, char **names, int nameNum) {
     int i;
 
     gsXmlWriteOpenTag(request->writer, "ns1", "fields");
@@ -102,7 +102,7 @@ static void Sake_WriteNames(SakeRequest *request, const char **names, int nameNu
     gsXmlWriteCloseTag(request->writer, "ns1", "fields");
 }
 
-static void Sake_WriteRecordIds(SakeRequest *request, const int *recordIds, int recordNum) {
+static void Sake_WriteRecordIds(SAKERequest request, int *recordIds, int recordNum) {
     int i;
 
     gsXmlWriteOpenTag(request->writer, "ns1", "recordids");
@@ -112,7 +112,7 @@ static void Sake_WriteRecordIds(SakeRequest *request, const int *recordIds, int 
     gsXmlWriteCloseTag(request->writer, "ns1", "recordids");
 }
 
-static void Sake_WriteOwnerIds(SakeRequest *request, const int *ownerIds, int ownerNum) {
+static void Sake_WriteOwnerIds(SAKERequest request, int *ownerIds, int ownerNum) {
     int i;
 
     gsXmlWriteOpenTag(request->writer, "ns1", "ownerids");
@@ -122,17 +122,17 @@ static void Sake_WriteOwnerIds(SakeRequest *request, const int *ownerIds, int ow
     gsXmlWriteCloseTag(request->writer, "ns1", "ownerids");
 }
 
-static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *recordNum, int fieldNum,
-                             const char **fieldNames) {
-    SakeField **list;
-    SakeField *record;
+static SAKERequestResult Sake_ParseRecords(SAKERequest request, SAKEField ***records, int *recordNum, int fieldNum,
+                                           char **fieldNames) {
+    SAKEField **list;
+    SAKEField *record;
     int i;
     int j;
     int count;
     int listSize;
 
     if (gsXmlMoveToChild(request->response, "values") == gsi_false) {
-        return SAKE_RESULT_MALFORMED_RESPONSE;
+        return SAKERequestResult_MALFORMED_RESPONSE;
     }
     count = gsXmlCountChildren(request->response, "ArrayOfRecordValue");
     *recordNum = count;
@@ -140,94 +140,94 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
         *records = NULL;
         return 0;
     }
-    listSize = count * sizeof(SakeField *);
+    listSize = count * sizeof(SAKEField *);
     list = gsimalloc(listSize);
     if (list == NULL) {
-        return SAKE_RESULT_OUT_OF_MEMORY;
+        return SAKERequestResult_OUT_OF_MEMORY;
     }
     memset(list, 0, listSize);
     *records = list;
     for (i = 0; i < *recordNum; i++) {
         if (gsXmlMoveToNext(request->response, "ArrayOfRecordValue") == gsi_false) {
-            return SAKE_RESULT_MALFORMED_RESPONSE;
+            return SAKERequestResult_MALFORMED_RESPONSE;
         }
-        record = gsimalloc(fieldNum * sizeof(SakeField));
+        record = gsimalloc(fieldNum * sizeof(SAKEField));
         if (record == NULL) {
-            return SAKE_RESULT_OUT_OF_MEMORY;
+            return SAKERequestResult_OUT_OF_MEMORY;
         }
-        memset(record, 0, fieldNum * sizeof(SakeField));
+        memset(record, 0, fieldNum * sizeof(SAKEField));
         list[i] = record;
         if (fieldNum != gsXmlCountChildren(request->response, "RecordValue")) {
-            return SAKE_RESULT_MALFORMED_RESPONSE;
+            return SAKERequestResult_MALFORMED_RESPONSE;
         }
         for (j = 0; j < fieldNum; j++) {
-            SakeField *field = &record[j];
+            SAKEField *field = &record[j];
 
             field->name = fieldNames[j];
             if (gsXmlMoveToNext(request->response, "RecordValue") == gsi_false) {
-                return SAKE_RESULT_MALFORMED_RESPONSE;
+                return SAKERequestResult_MALFORMED_RESPONSE;
             }
             if (gsXmlMoveToChild(request->response, "byteValue")) {
                 int value;
 
                 if (gsXmlReadChildAsInt(request->response, "value", &value) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
-                field->type = SAKE_FIELD_BYTE;
+                field->type = SAKEFieldType_BYTE;
                 field->value.byteValue = value;
             } else if (gsXmlMoveToChild(request->response, "shortValue")) {
                 int value;
 
                 if (gsXmlReadChildAsInt(request->response, "value", &value) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
-                field->type = SAKE_FIELD_SHORT;
+                field->type = SAKEFieldType_SHORT;
                 field->value.shortValue = value;
             } else if (gsXmlMoveToChild(request->response, "intValue")) {
                 int value;
 
                 if (gsXmlReadChildAsInt(request->response, "value", &value) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
-                field->type = SAKE_FIELD_INT;
+                field->type = SAKEFieldType_INT;
                 field->value.intValue = value;
             } else if (gsXmlMoveToChild(request->response, "int64Value")) {
                 gsi_i64 value;
 
                 if (gsXmlReadChildAsInt64(request->response, "value", &value) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
-                field->type = SAKE_FIELD_INT64;
+                field->type = SAKEFieldType_INT64;
                 field->value.int64Value = value;
             } else if (gsXmlMoveToChild(request->response, "floatValue")) {
                 float value;
 
                 if (gsXmlReadChildAsFloat(request->response, "value", &value) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
-                field->type = SAKE_FIELD_FLOAT;
+                field->type = SAKEFieldType_FLOAT;
                 field->value.floatValue = value;
             } else if (gsXmlMoveToChild(request->response, "asciiStringValue")) {
                 char *text;
                 int length;
 
-                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                if (gsXmlReadChildAsString(request->response, "value", (const char **)&text, &length) == gsi_false) {
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
                     text[length] = '\0';
                 } else {
                     text = "";
                 }
-                field->type = SAKE_FIELD_ASCII_STRING;
+                field->type = SAKEFieldType_ASCII_STRING;
                 field->value.asciiStringValue = text;
             } else if (gsXmlMoveToChild(request->response, "unicodeStringValue")) {
                 char *text;
                 int length;
                 gsi_u16 *wide;
 
-                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                if (gsXmlReadChildAsString(request->response, "value", (const char **)&text, &length) == gsi_false) {
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
                     text[length] = '\0';
@@ -236,17 +236,17 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 }
                 wide = UTF8ToUCS2StringAlloc(text);
                 if (wide == NULL) {
-                    return SAKE_RESULT_OUT_OF_MEMORY;
+                    return SAKERequestResult_OUT_OF_MEMORY;
                 }
-                field->type = SAKE_FIELD_UNICODE_STRING;
+                field->type = SAKEFieldType_UNICODE_STRING;
                 field->value.unicodeStringValue = wide;
             } else if (gsXmlMoveToChild(request->response, "booleanValue")) {
                 char *text;
                 int length;
                 gsi_bool value;
 
-                if (gsXmlReadChildAsString(request->response, "value", &text, &length) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                if (gsXmlReadChildAsString(request->response, "value", (const char **)&text, &length) == gsi_false) {
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
                 if (text != NULL) {
                     text[length] = '\0';
@@ -254,67 +254,67 @@ static int Sake_ParseRecords(SakeRequest *request, SakeField ***records, int *re
                 } else {
                     value = gsi_false;
                 }
-                field->type = SAKE_FIELD_BOOLEAN;
+                field->type = SAKEFieldType_BOOLEAN;
                 field->value.booleanValue = value;
             } else if (gsXmlMoveToChild(request->response, "dateAndTimeValue")) {
                 int value;
 
                 if (gsXmlReadChildAsDateTimeElement(request->response, "value", &value) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
-                field->type = SAKE_FIELD_DATE_AND_TIME;
+                field->type = SAKEFieldType_DATE_AND_TIME;
                 field->value.dateAndTimeValue = value;
             } else if (gsXmlMoveToChild(request->response, "binaryDataValue")) {
                 void *data;
                 int length;
 
                 if (gsXmlReadChildAsBase64Binary(request->response, "value", NULL, &length) == gsi_false) {
-                    return SAKE_RESULT_MALFORMED_RESPONSE;
+                    return SAKERequestResult_MALFORMED_RESPONSE;
                 }
                 if (length > 0) {
                     data = gsimalloc(length);
                     if (data == NULL) {
-                        return SAKE_RESULT_OUT_OF_MEMORY;
+                        return SAKERequestResult_OUT_OF_MEMORY;
                     }
                     if (gsXmlReadChildAsBase64Binary(request->response, "value", data, &length) == gsi_false) {
                         gsifree(data);
-                        return SAKE_RESULT_MALFORMED_RESPONSE;
+                        return SAKERequestResult_MALFORMED_RESPONSE;
                     }
                 } else {
                     data = NULL;
                     length = 0;
                 }
-                field->type = SAKE_FIELD_BINARY_DATA;
+                field->type = SAKEFieldType_BINARY_DATA;
                 field->value.binaryDataValue.length = length;
                 field->value.binaryDataValue.data = data;
             } else {
-                return SAKE_RESULT_UNKNOWN;
+                return SAKERequestResult_UNKNOWN_ERROR;
             }
         }
     }
     return 0;
 }
 
-static void Sake_FreeFields(int fieldNum, SakeField *fields) {
+static void Sake_FreeFields(int fieldNum, SAKEField *fields) {
     int i;
 
     if (fields == NULL) {
         return;
     }
     for (i = 0; i < fieldNum; i++) {
-        SakeField *field = &fields[i];
+        SAKEField *field = &fields[i];
 
-        if (field->type == SAKE_FIELD_BINARY_DATA && field->value.binaryDataValue.data != NULL) {
+        if (field->type == SAKEFieldType_BINARY_DATA && field->value.binaryDataValue.data != NULL) {
             gsifree(field->value.binaryDataValue.data);
         }
-        if (field->type == SAKE_FIELD_UNICODE_STRING) {
+        if (field->type == SAKEFieldType_UNICODE_STRING) {
             gsifree(field->value.unicodeStringValue);
         }
     }
     gsifree(fields);
 }
 
-static void Sake_FreeRecords(int fieldNum, int recordNum, SakeField **records) {
+static void Sake_FreeRecords(int fieldNum, int recordNum, SAKEField **records) {
     int i;
     int j;
 
@@ -324,10 +324,11 @@ static void Sake_FreeRecords(int fieldNum, int recordNum, SakeField **records) {
     for (i = 0; i < recordNum; i++) {
         if (records[i] != NULL) {
             for (j = 0; j < fieldNum; j++) {
-                if (records[i][j].type == SAKE_FIELD_BINARY_DATA && records[i][j].value.binaryDataValue.data != NULL) {
+                if (records[i][j].type == SAKEFieldType_BINARY_DATA &&
+                    records[i][j].value.binaryDataValue.data != NULL) {
                     gsifree(records[i][j].value.binaryDataValue.data);
                 }
-                if (records[i][j].type == SAKE_FIELD_UNICODE_STRING) {
+                if (records[i][j].type == SAKEFieldType_UNICODE_STRING) {
                     gsifree(records[i][j].value.unicodeStringValue);
                 }
             }
@@ -338,29 +339,29 @@ static void Sake_FreeRecords(int fieldNum, int recordNum, SakeField **records) {
     gsifree(records);
 }
 
-static int Sake_ValidateSearchRecords(SakeRequest *request) {
-    SakeSearchRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_ValidateSearchRecords(SAKERequest request) {
+    SAKESearchForRecordsInput *input = request->input;
 
     if (input->tableId == NULL) {
-        return SAKE_REQUEST_ERROR_NO_TABLE;
+        return SAKEStartRequestResult_BAD_TABLEID;
     }
     if (input->fieldNum <= 0) {
-        return SAKE_REQUEST_ERROR_BAD_FIELD_NUM;
+        return SAKEStartRequestResult_BAD_NUM_FIELDS;
     }
     if (input->fieldNames == NULL) {
-        return SAKE_REQUEST_ERROR_NO_FIELDS;
+        return SAKEStartRequestResult_BAD_FIELDS;
     }
     if (input->offset < 0) {
-        return SAKE_REQUEST_ERROR_BAD_OFFSET;
+        return SAKEStartRequestResult_BAD_OFFSET;
     }
     if (input->max <= 0) {
-        return SAKE_REQUEST_ERROR_BAD_MAX;
+        return SAKEStartRequestResult_BAD_MAX;
     }
     return Sake_CheckNames(input->fieldNames, input->fieldNum);
 }
 
-static int Sake_BuildSearchRecords(SakeRequest *request) {
-    SakeSearchRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_BuildSearchRecords(SAKERequest request) {
+    SAKESearchForRecordsInput *input = request->input;
 
     gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     if (input->filter != NULL) {
@@ -381,88 +382,88 @@ static int Sake_BuildSearchRecords(SakeRequest *request) {
     return 0;
 }
 
-static int Sake_ParseSearchRecords(SakeRequest *request) {
-    SakeSearchRecordsInput *input = request->input;
-    SakeGetRecordsOutput *output = request->output;
+static SAKERequestResult Sake_ParseSearchRecords(SAKERequest request) {
+    SAKESearchForRecordsInput *input = request->input;
+    SAKESearchForRecordsOutput *output = request->output;
 
     return Sake_ParseRecords(request, &output->records, &output->recordNum, input->fieldNum, input->fieldNames);
 }
 
-static void Sake_FreeSearchRecords(SakeRequest *request) {
-    SakeSearchRecordsInput *input = request->input;
-    SakeGetRecordsOutput *output = request->output;
+static void Sake_FreeSearchRecords(SAKERequest request) {
+    SAKESearchForRecordsInput *input = request->input;
+    SAKESearchForRecordsOutput *output = request->output;
 
     if (output != NULL) {
         Sake_FreeRecords(input->fieldNum, output->recordNum, output->records);
     }
 }
 
-static int Sake_ValidateGetMyRecords(SakeRequest *request) {
-    SakeGetMyRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_ValidateGetMyRecords(SAKERequest request) {
+    SAKEGetMyRecordsInput *input = request->input;
 
     if (input->tableId == NULL) {
-        return SAKE_REQUEST_ERROR_NO_TABLE;
+        return SAKEStartRequestResult_BAD_TABLEID;
     }
     if (input->fieldNum <= 0) {
-        return SAKE_REQUEST_ERROR_BAD_FIELD_NUM;
+        return SAKEStartRequestResult_BAD_NUM_FIELDS;
     }
     if (input->fieldNames != NULL) {
         return Sake_CheckNames(input->fieldNames, input->fieldNum);
     }
-    return SAKE_REQUEST_ERROR_NO_FIELDS;
+    return SAKEStartRequestResult_BAD_FIELDS;
 }
 
-static int Sake_BuildGetMyRecords(SakeRequest *request) {
-    SakeGetMyRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_BuildGetMyRecords(SAKERequest request) {
+    SAKEGetMyRecordsInput *input = request->input;
 
     gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     Sake_WriteNames(request, input->fieldNames, input->fieldNum);
     return 0;
 }
 
-static int Sake_ParseGetMyRecords(SakeRequest *request) {
-    SakeGetMyRecordsInput *input = request->input;
-    SakeGetRecordsOutput *output = request->output;
+static SAKERequestResult Sake_ParseGetMyRecords(SAKERequest request) {
+    SAKEGetMyRecordsInput *input = request->input;
+    SAKEGetMyRecordsOutput *output = request->output;
 
     return Sake_ParseRecords(request, &output->records, &output->recordNum, input->fieldNum, input->fieldNames);
 }
 
-static void Sake_FreeGetMyRecords(SakeRequest *request) {
-    SakeGetMyRecordsInput *input = request->input;
-    SakeGetRecordsOutput *output = request->output;
+static void Sake_FreeGetMyRecords(SAKERequest request) {
+    SAKEGetMyRecordsInput *input = request->input;
+    SAKEGetMyRecordsOutput *output = request->output;
 
     if (output != NULL) {
         Sake_FreeRecords(input->fieldNum, output->recordNum, output->records);
     }
 }
 
-int Sake_SubmitGetMyRecords(SakeRequest *request) {
+SAKEStartRequestResult Sake_SubmitGetMyRecords(SAKERequest request) {
     return Sake_Submit(request, &sGetMyRecordsType);
 }
 
-static int Sake_ValidateGetSpecificRecords(SakeRequest *request) {
-    SakeGetSpecificRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_ValidateGetSpecificRecords(SAKERequest request) {
+    SAKEGetSpecificRecordsInput *input = request->input;
 
     if (input->tableId == NULL) {
-        return SAKE_REQUEST_ERROR_NO_TABLE;
+        return SAKEStartRequestResult_BAD_TABLEID;
     }
     if (input->recordNum <= 0) {
-        return SAKE_REQUEST_ERROR_BAD_RECORD_NUM;
+        return SAKEStartRequestResult_BAD_NUM_RECORDIDS;
     }
     if (input->recordIds == NULL) {
-        return SAKE_REQUEST_ERROR_NO_RECORD_IDS;
+        return SAKEStartRequestResult_BAD_RECORDIDS;
     }
     if (input->fieldNum <= 0) {
-        return SAKE_REQUEST_ERROR_BAD_FIELD_NUM;
+        return SAKEStartRequestResult_BAD_NUM_FIELDS;
     }
     if (input->fieldNames != NULL) {
         return Sake_CheckNames(input->fieldNames, input->fieldNum);
     }
-    return SAKE_REQUEST_ERROR_NO_FIELDS;
+    return SAKEStartRequestResult_BAD_FIELDS;
 }
 
-static int Sake_BuildGetSpecificRecords(SakeRequest *request) {
-    SakeGetSpecificRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_BuildGetSpecificRecords(SAKERequest request) {
+    SAKEGetSpecificRecordsInput *input = request->input;
 
     gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     Sake_WriteRecordIds(request, input->recordIds, input->recordNum);
@@ -470,43 +471,43 @@ static int Sake_BuildGetSpecificRecords(SakeRequest *request) {
     return 0;
 }
 
-static int Sake_ParseGetSpecificRecords(SakeRequest *request) {
-    SakeGetSpecificRecordsInput *input = request->input;
-    SakeGetRecordsOutput *output = request->output;
+static SAKERequestResult Sake_ParseGetSpecificRecords(SAKERequest request) {
+    SAKEGetSpecificRecordsInput *input = request->input;
+    SAKEGetSpecificRecordsOutput *output = request->output;
 
     return Sake_ParseRecords(request, &output->records, &output->recordNum, input->fieldNum, input->fieldNames);
 }
 
-static void Sake_FreeGetSpecificRecords(SakeRequest *request) {
-    SakeGetSpecificRecordsInput *input = request->input;
-    SakeGetRecordsOutput *output = request->output;
+static void Sake_FreeGetSpecificRecords(SAKERequest request) {
+    SAKEGetSpecificRecordsInput *input = request->input;
+    SAKEGetSpecificRecordsOutput *output = request->output;
 
     if (output != NULL) {
         Sake_FreeRecords(input->fieldNum, output->recordNum, output->records);
     }
 }
 
-int Sake_SubmitGetSpecificRecords(SakeRequest *request) {
+SAKEStartRequestResult Sake_SubmitGetSpecificRecords(SAKERequest request) {
     return Sake_Submit(request, &sGetSpecificRecordsType);
 }
 
-static int Sake_ValidateGetRandomRecords(SakeRequest *request) {
-    SakeGetRandomRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_ValidateGetRandomRecords(SAKERequest request) {
+    SAKEGetRandomRecordInput *input = request->input;
 
     if (input->tableId == NULL) {
-        return SAKE_REQUEST_ERROR_NO_TABLE;
+        return SAKEStartRequestResult_BAD_TABLEID;
     }
     if (input->fieldNum <= 0) {
-        return SAKE_REQUEST_ERROR_BAD_FIELD_NUM;
+        return SAKEStartRequestResult_BAD_NUM_FIELDS;
     }
     if (input->fieldNames != NULL) {
         return Sake_CheckNames(input->fieldNames, input->fieldNum);
     }
-    return SAKE_REQUEST_ERROR_NO_FIELDS;
+    return SAKEStartRequestResult_BAD_FIELDS;
 }
 
-static int Sake_BuildGetRandomRecords(SakeRequest *request) {
-    SakeGetRandomRecordsInput *input = request->input;
+static SAKEStartRequestResult Sake_BuildGetRandomRecords(SAKERequest request) {
+    SAKEGetRandomRecordInput *input = request->input;
 
     gsXmlWriteStringElement(request->writer, "ns1", "tableid", input->tableId);
     if (input->filter != NULL) {
@@ -517,30 +518,30 @@ static int Sake_BuildGetRandomRecords(SakeRequest *request) {
     return 0;
 }
 
-static int Sake_ParseGetRandomRecords(SakeRequest *request) {
-    SakeGetRandomRecordsInput *input = request->input;
-    SakeField **output = request->output;
-    SakeField **records;
+static SAKERequestResult Sake_ParseGetRandomRecords(SAKERequest request) {
+    SAKEGetRandomRecordInput *input = request->input;
+    SAKEGetRandomRecordOutput *output = request->output;
+    SAKEField **records;
     int recordNum;
     int error;
 
     error = Sake_ParseRecords(request, &records, &recordNum, input->fieldNum, input->fieldNames);
     if (error == 0) {
         if (records != NULL && recordNum > 0) {
-            *output = records[0];
+            output->record = records[0];
         } else {
-            *output = NULL;
+            output->record = NULL;
         }
     }
     gsifree(records);
     return error;
 }
 
-static void Sake_FreeGetRandomRecords(SakeRequest *request) {
-    SakeGetRandomRecordsInput *input = request->input;
-    SakeField **output = request->output;
+static void Sake_FreeGetRandomRecords(SAKERequest request) {
+    SAKEGetRandomRecordInput *input = request->input;
+    SAKEGetRandomRecordOutput *output = request->output;
 
     if (output != NULL) {
-        Sake_FreeFields(input->fieldNum, *output);
+        Sake_FreeFields(input->fieldNum, output->record);
     }
 }

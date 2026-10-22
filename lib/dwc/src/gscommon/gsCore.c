@@ -10,19 +10,19 @@
 // The core: how many users started it, whether its lock was made, whether it started and whether it shuts down, the
 // lock of its list and the list of its tasks
 typedef struct GSCore {
-    gsi_i32 refCount;
+    gsi_u32 refCount;
     // The flags are volatile because another thread sets them while gsCoreInitialize waits for them
     volatile gsi_bool critSecCreated;
     volatile gsi_bool isStaticInitComplete;
     volatile gsi_bool isShuttingDown;
     GSICriticalSection queueCrit;
-    DArray *taskArray;
+    DArray taskArray;
 } GSCore;
 
 static GSCore *gsiGetStaticCore(void);
 static void gsiCoreAtExit(void);
-static void gsiCoreTaskDispatchCallback(GSTask *task, int result);
-static int gsiCoreRunTask(GSTask *task);
+static void gsiCoreTaskDispatchCallback(GSTask *task, GSTaskResult result);
+static GSTaskResult gsiCoreRunTask(GSTask *task);
 
 static GSCore sCore;
 
@@ -67,7 +67,7 @@ void gsCoreInitialize(void) {
 }
 
 // Calls the task's callback once, with its result
-static void gsiCoreTaskDispatchCallback(GSTask *task, int result) {
+static void gsiCoreTaskDispatchCallback(GSTask *task, GSTaskResult result) {
     if (task->isCallbackPending) {
         task->isCallbackPending = gsi_false;
         if (task->callbackFunc != NULL) {
@@ -77,24 +77,24 @@ static void gsiCoreTaskDispatchCallback(GSTask *task, int result) {
 }
 
 // Runs a task once: cancels it when it timed out, and calls its callback and frees it once it is done
-static int gsiCoreRunTask(GSTask *task) {
+static GSTaskResult gsiCoreRunTask(GSTask *task) {
     GSCore *core = gsiGetStaticCore();
-    int result = 0;
+    GSTaskResult result = GSTaskResult_None;
 
     if (task == NULL) {
-        return 4;
+        return GSTaskResult_Finished;
     }
     if (task->isRunning && task->thinkFunc != NULL) {
         result = task->thinkFunc(task->taskData);
     }
-    if (!task->isCanceled && result == 1) {
+    if (!task->isCanceled && result == GSTaskResult_InProgress) {
         if (task->timeout != 0) {
             if (current_time() - task->startTime > task->timeout) {
                 gsiCoreCancelTask(task);
-                gsiCoreTaskDispatchCallback(task, 3);
+                gsiCoreTaskDispatchCallback(task, GSTaskResult_TimedOut);
             }
         }
-    } else if (result != 1) {
+    } else if (result != GSTaskResult_InProgress) {
         gsi_bool cleanup = gsi_true;
         int count;
         int i;
@@ -117,18 +117,18 @@ static int gsiCoreRunTask(GSTask *task) {
                 }
             }
             gsiLeaveCriticalSection(&core->queueCrit);
-            return 4;
+            return GSTaskResult_Finished;
         }
     }
-    return 1;
+    return GSTaskResult_InProgress;
 }
 
-void gsCoreThink(gsi_u32 timeLimit) {
+void gsCoreThink(gsi_time timeLimit) {
     GSCore *core = gsiGetStaticCore();
     gsi_bool allDone = gsi_true;
 
     if (core->isStaticInitComplete) {
-        gsi_u32 startTime;
+        gsi_time startTime;
         int count;
         int i;
 
@@ -182,19 +182,19 @@ void gsCoreShutdown(void) {
     }
 }
 
-int gsCoreIsShutdown(void) {
+GSCoreValue gsCoreIsShutdown(void) {
     GSCore *core = gsiGetStaticCore();
 
     if (core->isShuttingDown) {
-        return 1;
+        return GSCore_SHUTDOWN_PENDING;
     }
     if (core->refCount == 0) {
-        return 2;
+        return GSCore_SHUTDOWN_COMPLETE;
     }
-    return 0;
+    return GSCore_IN_USE;
 }
 
-void gsiCoreExecuteTask(GSTask *task, gsi_u32 timeout) {
+void gsiCoreExecuteTask(GSTask *task, gsi_time timeout) {
     GSCore *core = gsiGetStaticCore();
 
     task->isCallbackPending = gsi_true;

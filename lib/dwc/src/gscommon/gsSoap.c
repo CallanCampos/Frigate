@@ -4,21 +4,22 @@
 
 // GameSpy's SOAP requests (gsSoap.c). The ROM names neither the file nor its functions; both are the later SDK's
 
-static gsi_bool gsiSoapTaskHttpCompletedCallback(int request, int result, char *buffer, int bufferLen, void *param);
-static int gsiSoapTaskThink(void *task);
+static GHTTPBool gsiSoapTaskHttpCompletedCallback(GHTTPRequest request, GHTTPResult result, char *buffer,
+                                                  GHTTPByteCount bufferLen, void *param);
+static GSTaskResult gsiSoapTaskThink(void *task);
 static void gsiSoapTaskExecute(void *task);
 static void gsiSoapTaskCancel(void *task);
-static void gsiSoapTaskCallback(void *task, int result);
+static void gsiSoapTaskCallback(void *task, GSTaskResult result);
 static gsi_bool gsiSoapTaskCleanup(void *task);
 
-GsHttpRequest *gsiExecuteSoap(const char *url, const char *service, SoapWriter *request, GsHttpResponseFunc func,
-                              void *userData) {
+GSSoapTask *gsiExecuteSoap(const char *url, const char *service, GSXmlStreamWriter request, GSSoapCallbackFunc func,
+                           void *userData) {
     return gsiExecuteSoapWithTimeout(url, service, request, func, 0, userData);
 }
 
-GsHttpRequest *gsiExecuteSoapWithTimeout(const char *url, const char *service, SoapWriter *request,
-                                         GsHttpResponseFunc func, gsi_u32 timeout, void *userData) {
-    GsHttpRequest *soap = gsimalloc(sizeof(GsHttpRequest));
+GSSoapTask *gsiExecuteSoapWithTimeout(const char *url, const char *service, GSXmlStreamWriter request,
+                                      GSSoapCallbackFunc func, gsi_u32 timeout, void *userData) {
+    GSSoapTask *soap = gsimalloc(sizeof(GSSoapTask));
     GSTask *task;
 
     if (soap == NULL) {
@@ -33,7 +34,7 @@ GsHttpRequest *gsiExecuteSoapWithTimeout(const char *url, const char *service, S
     soap->responseSoap = NULL;
     soap->responseBuffer = NULL;
     soap->userData = userData;
-    soap->requestResult = 0;
+    soap->requestResult = GHTTPSuccess;
     soap->completed = gsi_false;
     task = gsiCoreCreateTask();
     if (task == NULL) {
@@ -51,9 +52,9 @@ GsHttpRequest *gsiExecuteSoapWithTimeout(const char *url, const char *service, S
     return soap;
 }
 
-GsHttpRequest *gsiExecuteSoapCustom(const char *url, const char *service, SoapWriter *request, GsHttpResponseFunc func,
-                                    GSSoapCustomFunc customFunc, void *userData) {
-    GsHttpRequest *soap = gsimalloc(sizeof(GsHttpRequest));
+GSSoapTask *gsiExecuteSoapCustom(const char *url, const char *service, GSXmlStreamWriter request,
+                                 GSSoapCallbackFunc func, GSSoapCustomFunc customFunc, void *userData) {
+    GSSoapTask *soap = gsimalloc(sizeof(GSSoapTask));
     GSTask *task;
 
     soap->callbackFunc = func;
@@ -65,7 +66,7 @@ GsHttpRequest *gsiExecuteSoapCustom(const char *url, const char *service, SoapWr
     soap->responseSoap = NULL;
     soap->responseBuffer = NULL;
     soap->userData = userData;
-    soap->requestResult = 0;
+    soap->requestResult = GHTTPSuccess;
     soap->completed = gsi_false;
     task = gsiCoreCreateTask();
     task->callbackFunc = gsiSoapTaskCallback;
@@ -80,70 +81,71 @@ GsHttpRequest *gsiExecuteSoapCustom(const char *url, const char *service, SoapWr
 }
 
 // Reads the answer, which the request then frees, when the HTTP request ended
-static gsi_bool gsiSoapTaskHttpCompletedCallback(int request, int result, char *buffer, int bufferLen, void *param) {
-    GsHttpRequest *soap = param;
+static GHTTPBool gsiSoapTaskHttpCompletedCallback(GHTTPRequest request, GHTTPResult result, char *buffer,
+                                                  GHTTPByteCount bufferLen, void *param) {
+    GSSoapTask *soap = param;
 
     soap->requestResult = result;
     soap->completed = gsi_true;
     soap->responseBuffer = buffer;
-    if (result == 0) {
+    if (result == GHTTPSuccess) {
         soap->responseSoap = gsXmlCreateStreamReader();
         if (soap->responseSoap == NULL) {
-            soap->requestResult = 1;
+            soap->requestResult = GHTTPOutOfMemory;
         } else if (gsXmlParseXml(soap->responseSoap, buffer, bufferLen) == gsi_false) {
-            soap->requestResult = 7;
+            soap->requestResult = GHTTPBadResponse;
         }
     }
-    return gsi_false;
+    return GHTTPFalse;
 }
 
-static int gsiSoapTaskThink(void *task) {
-    GsHttpRequest *soap = task;
+static GSTaskResult gsiSoapTaskThink(void *task) {
+    GSSoapTask *soap = task;
 
     if (soap->completed != gsi_false) {
-        return 4;
+        return GSTaskResult_Finished;
     }
     ghttpThinkRequest(soap->requestId);
-    return 1;
+    return GSTaskResult_InProgress;
 }
 
 static void gsiSoapTaskExecute(void *task) {
-    GsHttpRequest *soap = task;
+    GSSoapTask *soap = task;
 
     soap->postData = ghttpNewPost();
     if (soap->postData == NULL) {
         soap->completed = gsi_true;
-        soap->requestResult = 1;
+        soap->requestResult = GHTTPOutOfMemory;
         return;
     }
-    ghttpPostSetAutoFree(soap->postData, gsi_false);
+    ghttpPostSetAutoFree(soap->postData, GHTTPFalse);
     ghttpPostAddXml(soap->postData, soap->requestSoap);
     if (soap->customFunc != NULL) {
         soap->customFunc(soap->postData, soap->userData);
     }
-    soap->requestId = ghttpGetExA(soap->url, soap->service, NULL, 0, soap->postData, gsi_false, gsi_false, NULL,
+    soap->requestId = ghttpGetExA(soap->url, soap->service, NULL, 0, soap->postData, GHTTPFalse, GHTTPFalse, NULL,
                                   gsiSoapTaskHttpCompletedCallback, soap);
 }
 
 static void gsiSoapTaskCancel(void *task) {
-    GsHttpRequest *soap = task;
+    GSSoapTask *soap = task;
 
     if (soap->completed == gsi_false) {
         if (soap->requestId >= 0) {
             ghttpCancelRequest(soap->requestId);
         }
-        soap->requestResult = 0x12;
+        soap->requestResult = GHTTPRequestCancelled;
     }
 }
 
-static void gsiSoapTaskCallback(void *task, int result) {
-    GsHttpRequest *soap = task;
+static void gsiSoapTaskCallback(void *task, GSTaskResult result) {
+    GSSoapTask *soap = task;
 
-    soap->callbackFunc(soap->requestResult, (int)soap->requestSoap, soap->responseSoap, soap->userData);
+    soap->callbackFunc(soap->requestResult, soap->requestSoap, soap->responseSoap, soap->userData);
 }
 
 static gsi_bool gsiSoapTaskCleanup(void *task) {
-    GsHttpRequest *soap = task;
+    GSSoapTask *soap = task;
 
     if (soap->responseSoap != NULL) {
         gsXmlFreeReader(soap->responseSoap);

@@ -8,7 +8,7 @@
 static char sStrings[2][22];
 static int sStringIndex;
 
-const char *func_ov011_0217ed14(gsi_u32 ip, gsi_u16 port, char *string) {
+const char *func_ov011_0217ed14(unsigned int ip, unsigned short port, char string[22]) {
     if (string == NULL) {
         sStringIndex ^= 1;
         string = sStrings[sStringIndex];
@@ -30,7 +30,7 @@ const char *func_ov011_0217ed14(gsi_u32 ip, gsi_u16 port, char *string) {
     return string;
 }
 
-gsi_bool gt2StringToAddress(const char *string, gsi_u32 *ipOut, gsi_u16 *portOut) {
+GT2Bool gt2StringToAddress(const char *string, unsigned int *ipOut, unsigned short *portOut) {
     gsi_u32 ip = 0;
     gsi_u16 port;
     char host[0x104];
@@ -87,7 +87,7 @@ gsi_bool gt2StringToAddress(const char *string, gsi_u32 *ipOut, gsi_u16 *portOut
     return gsi_true;
 }
 
-void gti2MessageCheck(const void **message, int *length) {
+void gti2MessageCheck(const GT2Byte **message, int *length) {
     if (*message == NULL) {
         *message = "";
         *length = 0;
