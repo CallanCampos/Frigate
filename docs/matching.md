@@ -78,6 +78,9 @@ tools that show the differences.
   sum done in 64 bits: MWCC folds 64-bit constants only after its 32-bit passes, so both stay values in registers.
   `dwcutil_ac.c`'s `UtilAc_StartWcm` matches with `(void *)(((u64)sAcBlock + 0x1f) & ~0x1f)` (a `0x1fULL` literal
   or an `s64` cast compile the same), while `UtilAcWcm_Start` in the same file rounds in 32 bits with `bics`.
+- A `char` read into an `int` local declared first at the top (`int c; int value = 0; int i;`, `c = text[i];` in
+  the loop) takes another register than a `char` declared in the loop or an `int` declared later: `dwcutil_ac.c`'s
+  `UtilAc_ParseHex` swapped its character and index between `r1` and `r3` with every other order and type.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
   `clact.c`'s `ClAct_IsCellInViewTransformed`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which

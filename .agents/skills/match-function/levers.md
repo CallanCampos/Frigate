@@ -214,6 +214,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
   `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
 
+- A loop's character and index swapped although every order of the locals was tried: read the character into an
+  `int c;` declared first at the top. (matching.md: "declared first at the top")
+
 ## Stack slots or frame size
 
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio

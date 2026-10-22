@@ -1706,12 +1706,12 @@ static int UtilAc_ParseSettings(const u8 *message) {
 
 // Turns a key in hex digits into its bytes; 0 at a character that is no digit
 static int UtilAc_ParseHex(u8 *out, const char *text, int length) {
-    int i;
+    int c;
     int value = 0;
+    int i;
 
     for (i = 0; i < length; i++) {
-        char c = text[i];
-
+        c = text[i];
         switch (c) {
         case '0':
         case '1':
