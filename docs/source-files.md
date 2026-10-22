@@ -189,7 +189,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `musical_stage_sys.c` | `0x02151f90`–`0x021522d8` | 9 | complete | string at `0x0216dff4` |
 | `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | complete | string at `0x0216e008` |
 | `event_colosseum_battle.c` | `0x0215264c`–`0x0215291c` | 3 | complete | descriptive |
-| `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | partial | string at `0x0216e0a8` |
+| `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | complete | string at `0x0216e0a8` |
 | `delivery_irc.c` | `0x02152c0c`–`0x02153160` | 27 | complete | string at `0x0216e180` |
 | `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | complete | descriptive |
 | `intrude_work.c` | `0x021535dc`–`0x0215366c` | 12 | complete | descriptive |

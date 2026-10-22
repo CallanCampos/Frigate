@@ -3606,26 +3606,39 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   Folding the array into the struct also showed in the code: `&s.players[i].handle` folds the field's 4 into the
   literal, while the separate array adds it after indexing, as the original does. The six statics' order came from
   compiling every declaration order of them (720), since `rodata_order.py`'s prediction differed from the built object.
-- String literals are laid out in `.data` in the order they first appear in the source, each aligned to 4, and an
-  identical literal is shared from its first use. An assert's text is the expression as written, spacing included, so
-  `GFL_ASSERT(a < (B*C))` needs the game's spacing (`delivery_beacon.c` turns clang-format off for it). In
-  `delivery_beacon.c` the game has the asserts' `""` before the file name of an earlier allocation, which no source
-  order tried reproduces: a folded assert or an unused inline creates no literal. Overlay 28 shows more of it: in
-  `union_main.c` one `""` serves the first two functions' asserts, a second the next twelve, a third the rest, and
-  `colosseum.c` has two, each shared across functions, where MWCC gives every file one. What starts a new one is not
-  known yet; `GFL_ASSERT(0)` stringifies to `"0"`, which is not one of them.
-- String literals are created during code generation, for the references that survive optimization, so they come
-  after all of a file's file-scope data, and dead code, unused locals and folded asserts create none. A literal
-  laid out earlier than any surviving reference to it points to code the original linker dead-stripped. A file name
-  ahead of a table in `.data` is a file-scope array: `script_command.c` declares `static char sFile[] =
-  "script_command.c";` and passes `sFile` to its allocations, as `event_research_radar.c` does.
-- Each literal that code creates gets a `.data` section of its own, placed just before the `.text` of the first
-  function that uses it, so the linker strips a dead function's literals with it and keeps one that a later function
-  shares. A static function is emitted, literals included, whenever a call to it reaches the optimizer, even one the
-  optimizer then removes: a call under `int n = 0; if (n)` or in an `int` zero-trip loop, or the function's address
-  in an unused local. A call the front end drops (`if (0)`, code after `return`, an unsigned `i < 0` loop) leaves it
-  out. A static assert helper called so, before `delivery_beacon.c`'s allocation, gives the game's `""` first but
-  leaves its own code and text, which a dead-stripping link would remove and this build's `-nodead` link keeps.
+- Ordinary code string literals are laid out in `.data` in the order of the generated functions that first use them,
+  each linker-aligned to 4, and an identical literal is shared from its first emitted use. An assert's text is the
+  expression as written, spacing included, so `GFL_ASSERT(a < (B*C))` needs the game's spacing (`delivery_beacon.c`
+  turns clang-format off for it). An empty literal before its first surviving ordinary code reference does not by
+  itself prove that code was dead-stripped: inline linkage and named metadata can place strings in the shared data
+  section before the separate code-literal sections. Overlay 28's separate groups of empty strings still need their
+  own boundary/emission explanation.
+- Ordinary code literals are created during code generation, for references that survive optimization, so they come
+  after a file's shared file-scope data. Dead code, unused locals and folded asserts create none. A literal earlier
+  than every surviving ordinary code reference can come from code the original linker stripped, but shared inline
+  strings or named data are alternatives. A file name ahead of a table in `.data` can be a file-scope array:
+  `script_command.c` declares `static char sFile[] = "script_command.c";` and passes `sFile` to its allocations, as
+  `event_research_radar.c` does.
+- Each ordinary code literal gets a `.data` section of its own, just before the `.text` of its first emitted user. A
+  static function is emitted, literals included, whenever a call to it reaches the optimizer, even one subsequently
+  removed: a call under `int n = 0; if (n)` or in an `int` zero-trip loop, or the function's address in an unused
+  local. A call the front end drops (`if (0)`, code after `return`, an unsigned `i < 0` loop) leaves it out. Such a
+  helper can explain a shared empty literal left behind by dead-stripping, but adding a helper solely for that order
+  is not acceptable source.
+- Under `-ipa function`, a plain `inline` function's string is appended to the file's shared data section rather than
+  emitted as a separate ordinary code-literal section. A private delivery_beacon experiment puts its init table first,
+  an inline accessor's `""` next in the same 0x71-byte section, then the allocation filename and assertion expression
+  as their own sections. It matches all 22 functions and linked section bytes in both versions without extra code.
+  `static inline` retains the ordinary code-literal behavior. This is evidence about the compiler, not permission to
+  invent an accessor for ordering.
+- A named `static char name[] = "";` normally goes to BSS. `explicit_zero_data on` keeps that explicitly initialized
+  object in `.data`. Under `-ipa function`, delivery_beacon.c defines its assertion filename metadata immediately
+  before its assertion helper; the byte joins the existing 0x70-byte network-init table in a 0x71-byte shared data
+  section, before the separately emitted allocation filename and expression strings. Normal 4-byte section alignment
+  supplies the gaps. Passing the named string through `GFL_ASSERT_WITH_FILE` preserves the actual assertion-file
+  argument and reproduces all 22 functions, relocation targets and registered section bytes in both versions.
+  `sDeliveryBeaconAssertFileName` is descriptive recovery; the binary does not establish the original identifier
+  spelling.
 - Under `-ipa function`, a table initialized with string literals comes before its strings only when it is defined
   above the file's first function; defined between functions, it has its strings laid out ahead of it, whether it is
   `static` or global, sized or not, declared earlier or not. A table right before its own strings in the middle of a

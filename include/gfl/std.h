@@ -55,6 +55,14 @@ void GFL_DebugAssertFailEx(const char *file, u32 line, const char *format, ...);
             GFL_DebugAssertFail("", 0, #expression);                                                                   \
         }                                                                                                              \
     } while (0)
+// A failed assertion with file metadata supplied by its caller.
+#define GFL_ASSERT_WITH_FILE(file, expression)                                                                         \
+    do {                                                                                                               \
+        if (!(expression)) {                                                                                           \
+            GFL_DebugAssertFail(file, 0, #expression);                                                                 \
+        }                                                                                                              \
+    } while (0)
+
 #define GFL_ASSERT_MSG(expression, ...)                                                                                \
     do {                                                                                                               \
         if (!(expression)) {                                                                                           \
