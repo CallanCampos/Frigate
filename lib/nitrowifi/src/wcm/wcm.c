@@ -90,7 +90,7 @@ static WCMApList *WcmSearchApList(const u8 *bssid);
 static WCMApList *WcmSearchIndexedApList(u32 id);
 static void WcmAppendApList(WCMApList *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
-static void *WCM_GetInformationElement(const void *frame, u32 tag, const u8 *oui);
+static void *WCM_GetInformationElement(const void *frame, u8 tag, const u8 *oui);
 static void WCMi_InitCpsif(void);
 static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, s32 headerLen, const void *data,
                                  s32 dataLen);
@@ -1017,8 +1017,8 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     return NULL;
 }
 
-static void *WCM_GetInformationElement(const void *frame, u32 tag, const u8 *oui) {
-    return func_02703250((NWMBssDesc *)frame, tag, oui);
+static void *WCM_GetInformationElement(const void *frame, u8 tag, const u8 *oui) {
+    return NWM_GetVenderInfoElements((NWMBssDesc *)frame, tag, oui);
 }
 
 static void WCMi_InitCpsif(void) {

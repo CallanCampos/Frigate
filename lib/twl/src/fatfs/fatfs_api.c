@@ -3,7 +3,9 @@
 // 0x14, and waits until the ARM7 has answered and the request is in the list of the done ones. Only the code that the
 // game keeps is here: getting a request buffer, sending it, waiting for it and giving it back, and the one request
 // that the exit code sends. The ROM names none of it; the file name and those of the types and data are descriptive
-// guesses, and the functions keep their default names (twl/fatfs.h says what the public ones do).
+// guesses, the public functions and the command and result values have the names of libntr's reconstruction of
+// TwlSDK's fatfs headers (api.h, types.h), and the others keep their default names (twl/fatfs.h says what the public
+// ones do).
 
 #include "types.h"
 #include "nitro/os.h"
@@ -15,11 +17,11 @@
 #define FATFS_REQUEST_SIZE 0x800
 
 // The request that the exit code sends, which the ARM7 answers with 0 for success
-#define FATFS_COMMAND_1A 0x1a
+#define FATFS_COMMAND_UNMOUNT_ALL 26
 #define FATFS_RESULT_SUCCESS 0
 
-// What a request holds until the ARM7 answers; its meaning is a guess
-#define FATFS_RESULT_UNANSWERED 2
+// What a request holds until the ARM7 answers
+#define FATFS_RESULT_BUSY 2
 
 // The two values that the library gives a request's kind, whose names are guesses: one that was reserved for a thread,
 // and one that is shared
@@ -147,7 +149,7 @@ static FatfsRequest *func_0270410c(u32 command) {
     OS_RestoreInterrupts(irq);
 
     request->command = command;
-    request->result = FATFS_RESULT_UNANSWERED;
+    request->result = FATFS_RESULT_BUSY;
     request->next = NULL;
     return request;
 }
@@ -161,7 +163,7 @@ static FatfsRequest *func_027041e8(u32 command) {
     }
     request = sFatfs.interruptRequest;
     request->command = command;
-    request->result = FATFS_RESULT_UNANSWERED;
+    request->result = FATFS_RESULT_BUSY;
     request->next = NULL;
     request->kind = FATFS_KIND_SHARED;
     return request;
@@ -209,12 +211,12 @@ static void func_02704264(FatfsRequest *request) {
     }
 }
 
-BOOL func_02704318(void) {
+BOOL FATFSi_IsInitialized(void) {
     return sFatfsInitialized;
 }
 
-BOOL func_02704328(void) {
-    FatfsRequest *request = func_027041e8(FATFS_COMMAND_1A);
+BOOL FATFS_UnmountAll(void) {
+    FatfsRequest *request = func_027041e8(FATFS_COMMAND_UNMOUNT_ALL);
     BOOL success;
 
     func_02704258(request);

@@ -61,19 +61,19 @@ static void func_027052fc(void *arg);
 static void func_02705320(void *arg);
 static void func_0270532c(void);
 static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32 size);
-static BOOL func_0270541c(DSPProcessContext *context, MIWram wram, int slot, MIWramProc proc);
+static BOOL func_0270541c(DSPProcessContext *context, MIWramPos wram, int slot, MIWramProc proc);
 static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, const COFFSection *section);
 static BOOL func_02705980(DSPProcessContext *context, COFFSectionFunc callback);
-static BOOL func_02705a4c(DSPProcessContext *context, MIWram wram, u32 start, u32 length, MIWramProc proc);
+static BOOL func_02705a4c(DSPProcessContext *context, MIWramPos wram, u32 start, u32 length, MIWramProc proc);
 static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB, int banksC);
 static void func_02705c20(void);
 
 // Where a word of the process's memory is in the ARM9's memory
-static inline void *DSPi_GetWramAddress(DSPProcessContext *context, MIWram wram, int wordAddress) {
+static inline void *DSPi_GetWramAddress(DSPProcessContext *context, MIWramPos wram, int wordAddress) {
     int slot = wordAddress / 0x4000;
     int offset = wordAddress - slot * 0x4000;
-    int bank = (wram == MI_WRAM_B) ? context->bankB[slot] : context->bankC[slot];
-    return (u8 *)MI_GetWramBase(wram) + bank * DSP_BANK_SIZE + offset * 2;
+    int bank = (wram == MI_WRAM_B) ? context->slotOfSegmentCode[slot] : context->slotOfSegmentData[slot];
+    return (u8 *)MI_GetWramMapStart(wram) + bank * DSP_BANK_SIZE + offset * 2;
 }
 
 static DSPProcessContext *sProcessList;
@@ -84,7 +84,7 @@ static BOOL sSleepCallbackSet;
 
 // Tells the DSP's OS to quit, and waits for its answer
 static void func_027052b4(void) {
-    sProcessList->events = 0;
+    sProcessList->hookFactors = 0;
     DSP_SendData(2, 0x8000);
     DSP_RecvData(2);
 }
@@ -110,15 +110,15 @@ static void func_0270532c(void) {
     DSPProcessContext *context = sProcessList;
     if (context != NULL) {
         for (;;) {
-            int signaled = reg_DSP_SEM | (((reg_DSP_PSTS >> DSP_PSTS_REPLY_SHIFT) & 7) << DSP_EVENT_REPLY_SHIFT);
-            int events = signaled & context->events;
+            int signaled = reg_DSP_SEM | (((reg_DSP_PSTS >> DSP_PSTS_REPLY_SHIFT) & 7) << DSP_HOOK_REPLY_SHIFT);
+            int events = signaled & context->hookFactors;
             if (events == 0) {
                 break;
             }
             while (events != 0) {
                 int event = 32 - MATH_CountLeadingZeros(~events & (events - 1));
-                events &= ~context->group[event];
-                context->callback[event](context->userData[event]);
+                events &= ~context->hookGroup[event];
+                context->hookFunction[event](context->hookUserdata[event]);
             }
         }
     }
@@ -135,11 +135,12 @@ static BOOL func_027053d4(DSPProcessContext *context, u32 offset, void *dst, u32
 }
 
 // Gives the bank behind a slot of the process to a processor
-static BOOL func_0270541c(DSPProcessContext *context, MIWram wram, int slot, MIWramProc proc) {
-    int bank = (wram == MI_WRAM_B) ? context->bankB[slot] : context->bankC[slot];
+static BOOL func_0270541c(DSPProcessContext *context, MIWramPos wram, int slot, MIWramProc proc) {
+    int bank = (wram == MI_WRAM_B) ? context->slotOfSegmentCode[slot] : context->slotOfSegmentData[slot];
     BOOL given = FALSE;
-    if (!MIi_IsWramSlotUsed(wram, bank) || MI_FreeWramSlot(wram, bank, 1, MI_GetWramBankOwner(wram, bank)) > 0) {
-        if (MI_AllocWramSlot(wram, bank, 1, proc) != 0) {
+    if (!MI_IsWramSlotUsed(wram, bank) ||
+        MI_FreeWramSlot(wram, bank, MI_WRAM_SIZE_32KB, MI_GetWramBankMaster(wram, bank)) > 0) {
+        if (MI_AllocWramSlot(wram, bank, MI_WRAM_SIZE_32KB, proc) != 0) {
             vu8 *master = (wram == MI_WRAM_B) ? reg_MBK_B : reg_MBK_C;
             if (proc == MI_WRAM_ARM9) {
                 master[bank] = (master[bank] & ~0x1c) | (bank << 2);
@@ -158,7 +159,7 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
     const char *name = section->name.chars;
     BOOL result = TRUE;
     int count = 0;
-    MIWram wrams[4];
+    MIWramPos wrams[4];
     u32 addresses[4];
     int empties[4];
     char nameBuffer[128];
@@ -173,7 +174,7 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
         }
     }
     if (STD_CompareString(name, "SDK_USING_OS@d0") == 0) {
-        context->flags |= DSP_PROCESS_USING_OS;
+        context->flags |= DSP_PROCESS_FLAG_USING_OS;
     }
     if (section->flags & COFF_SECTION_PROGRAM) {
         u32 address = section->programAddress * 2;
@@ -208,7 +209,7 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
         }
     }
     for (i = 0; i < count; i++) {
-        MIWram wram = wrams[i];
+        MIWramPos wram = wrams[i];
         int address = addresses[i];
         int size = section->size;
         u32 fileOffset = section->dataOffset;
@@ -219,12 +220,12 @@ static BOOL func_027054e4(DSPProcessContext *context, const COFFHeader *header, 
             if (size <= chunk) {
                 chunk = size;
             }
-            if (((wram == MI_WRAM_B) ? context->bankB[address / DSP_BANK_SIZE]
-                                     : context->bankC[address / DSP_BANK_SIZE]) == DSP_BANK_NONE) {
+            if (((wram == MI_WRAM_B) ? context->slotOfSegmentCode[address / DSP_BANK_SIZE]
+                                     : context->slotOfSegmentData[address / DSP_BANK_SIZE]) == DSP_BANK_NONE) {
                 int slot = address / DSP_BANK_SIZE;
-                u16 *freeMask = (wram == MI_WRAM_B) ? &context->freeBanksB : &context->freeBanksC;
-                u32 *used = (wram == MI_WRAM_B) ? &context->usedSlotsB : &context->usedSlotsC;
-                int *banks = (wram == MI_WRAM_B) ? context->bankB : context->bankC;
+                u16 *freeMask = (wram == MI_WRAM_B) ? &context->slotB : &context->slotC;
+                int *used = (wram == MI_WRAM_B) ? &context->segmentCode : &context->segmentData;
+                int *banks = (wram == MI_WRAM_B) ? context->slotOfSegmentCode : context->slotOfSegmentData;
                 u32 freeBanks = *freeMask;
                 int bank = 32 - MATH_CountLeadingZeros(~freeBanks & (freeBanks - 1));
                 if (bank >= 8) {
@@ -261,19 +262,19 @@ void DSP_InitProcessContext(DSPProcessContext *context, const char *name) {
     context->flags = 0;
     STD_CopyString(context->name, name != NULL ? name : "");
     context->image = NULL;
-    context->usedSlotsB = 0;
-    context->usedSlotsC = 0;
+    context->segmentCode = 0;
+    context->segmentData = 0;
     for (i = 0; i < 8; i++) {
-        context->bankB[i] = DSP_BANK_NONE;
+        context->slotOfSegmentCode[i] = DSP_BANK_NONE;
     }
     for (i = 0; i < 8; i++) {
-        context->bankC[i] = DSP_BANK_NONE;
+        context->slotOfSegmentData[i] = DSP_BANK_NONE;
     }
-    context->events = 0;
-    for (i = 0; i < DSP_EVENT_COUNT; i++) {
-        context->callback[i] = NULL;
-        context->userData[i] = NULL;
-        context->group[i] = 0;
+    context->hookFactors = 0;
+    for (i = 0; i < DSP_HOOK_MAX; i++) {
+        context->hookFunction[i] = NULL;
+        context->hookUserdata[i] = NULL;
+        context->hookGroup[i] = 0;
     }
 }
 
@@ -301,16 +302,16 @@ static BOOL func_02705980(DSPProcessContext *context, COFFSectionFunc callback) 
 }
 
 // Gives the banks of the slots that cover length words from start to a processor
-static BOOL func_02705a4c(DSPProcessContext *context, MIWram wram, u32 start, u32 length, MIWramProc proc) {
+static BOOL func_02705a4c(DSPProcessContext *context, MIWramPos wram, u32 start, u32 length, MIWramProc proc) {
     int slot;
     int lastSlot;
-    u32 *used;
+    int *used;
     if (length < 1) {
         length = 1;
     }
     start *= 2;
     lastSlot = (start + length * 2 - 1) >> 15;
-    used = (wram == MI_WRAM_B) ? &context->usedSlotsB : &context->usedSlotsC;
+    used = (wram == MI_WRAM_B) ? &context->segmentCode : &context->segmentData;
     for (slot = start >> 15; slot <= lastSlot; slot++) {
         if (*used & (1 << slot)) {
             if (!func_0270541c(context, wram, slot, proc)) {
@@ -325,11 +326,11 @@ static BOOL func_02705a4c(DSPProcessContext *context, MIWram wram, u32 start, u3
 static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB, int banksC) {
     BOOL ok = FALSE;
     context->image = image;
-    context->freeBanksB = banksB;
-    context->freeBanksC = banksC;
+    context->slotB = banksB;
+    context->slotC = banksC;
     if (func_02705980(context, func_027054e4)) {
-        DC_FlushRange(MI_GetWramBase_B(), 0x40000);
-        DC_FlushRange(MI_GetWramBase_C(), 0x40000);
+        DC_FlushRange((void *)MI_GetWramMapStart_B(), 0x40000);
+        DC_FlushRange((void *)MI_GetWramMapStart_C(), 0x40000);
         if (func_02705a4c(context, MI_WRAM_B, 0, 0x20000, MI_WRAM_DSP)) {
             if (func_02705a4c(context, MI_WRAM_C, 0, 0x20000, MI_WRAM_DSP)) {
                 ok = TRUE;
@@ -339,7 +340,7 @@ static BOOL func_02705acc(DSPProcessContext *context, FSFile *image, int banksB,
     return ok;
 }
 
-void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callback, void *userData) {
+void DSP_SetProcessHook(DSPProcessContext *context, int events, DSPHookFunction callback, void *userData) {
     OSIntrMode irq = OS_DisableInterrupts();
     int i;
     int replies;
@@ -347,25 +348,25 @@ void DSP_SetCallback(DSPProcessContext *context, int events, DSPCallback callbac
     u16 pcfg;
     u16 pmask;
 
-    for (i = 0; i < DSP_EVENT_COUNT; i++) {
+    for (i = 0; i < DSP_HOOK_MAX; i++) {
         if (events & (1 << i)) {
-            context->callback[i] = callback;
-            context->userData[i] = userData;
-            context->group[i] = events;
+            context->hookFunction[i] = callback;
+            context->hookUserdata[i] = userData;
+            context->hookGroup[i] = events;
         }
     }
-    replies = ((events >> DSP_EVENT_REPLY_SHIFT) & 7) << DSP_PCFG_REPLY_IRQ_SHIFT;
+    replies = ((events >> DSP_HOOK_REPLY_SHIFT) & 7) << DSP_PCFG_REPLY_IRQ_SHIFT;
     mask = events;
     pcfg = reg_DSP_PCFG;
     pmask = reg_DSP_PMASK;
     if (callback != NULL) {
         reg_DSP_PCFG = pcfg | replies;
         reg_DSP_PMASK = pmask & ~mask;
-        context->events |= events;
+        context->hookFactors |= events;
     } else {
         reg_DSP_PCFG = pcfg & ~replies;
         reg_DSP_PMASK = pmask | mask;
-        context->events &= ~events;
+        context->hookFactors &= ~events;
     }
     OS_RestoreInterrupts(irq);
 }
@@ -380,7 +381,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
     }
     DSP_InitPipe();
     OS_SetIrqFunction(OS_IE_DSP, func_0270532c);
-    DSP_SetCallback(context, 0x48000, func_027070dc, NULL);
+    DSP_SetProcessHook(context, 0x48000, func_027070dc, NULL);
     OS_EnableIrqMask(OS_IE_DSP);
     if (func_02705acc(context, image, banksB, banksC)) {
         OSIntrMode irq = OS_DisableInterrupts();
@@ -392,7 +393,7 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
         context->image = NULL;
         if (!sExitCallbackSet) {
             PM_SetExitCallbackInfo(&sDspExitCallbackInfo, func_027052fc, NULL);
-            PM_InsertPreExitCallback(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
+            PM_InsertPostExitCallback(&sDspExitCallbackInfo, DSP_PM_PRIORITY);
             sExitCallbackSet = TRUE;
         }
         if (!sSleepCallbackSet) {
@@ -401,10 +402,10 @@ BOOL DSP_ExecuteProcess(DSPProcessContext *context, FSFile *image, int banksB, i
             sSleepCallbackSet = TRUE;
         }
         DSP_PowerOn();
-        DSP_ResetOffEx(context->events >> 16);
-        DSP_MaskSemaphore(~context->events);
+        DSP_ResetOffEx(context->hookFactors >> 16);
+        DSP_MaskSemaphore(~context->hookFactors);
         func_02705c20();
-        if (context->flags & DSP_PROCESS_USING_OS) {
+        if (context->flags & DSP_PROCESS_FLAG_USING_OS) {
             u16 port;
 
             for (port = 0; port < 3; port++) {

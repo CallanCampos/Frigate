@@ -52,8 +52,8 @@ struct WCMWork {
         };
         // The DSi's, with the same fields for NWM
         struct {
-            u8 nwmSystemBuffer[0x3000];  // 0x13a0, passed to NWM_Init
-            NWMScanParam nwmScanRequest; // 0x43a0
+            u8 nwmSystemBuffer[0x3000];    // 0x13a0, passed to NWM_Init
+            NWMScanExParam nwmScanRequest; // 0x43a0
             u8 unk_43d8[8];
             u32 nwmScanCount;               // 0x43e0
             u16 nwmAssociationId;           // 0x43e4

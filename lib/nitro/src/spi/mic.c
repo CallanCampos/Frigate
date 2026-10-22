@@ -169,21 +169,21 @@ void *MIC_GetLastSamplingAddress(void) {
 
 MICResult MIC_StartLimitedSamplingAsync(const MICAutoParam *param, MICCallback callback, void *arg) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StartLimitedSamplingAsync(param, callback, arg);
+        return MICEXi_StartLimitedSamplingAsync(param, callback, arg);
     }
     return MIC_StartAutoSamplingAsync(param, callback, arg);
 }
 
 MICResult MIC_StartLimitedSampling(const MICAutoParam *param) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StartLimitedSampling(param);
+        return MICEXi_StartLimitedSampling(param);
     }
     return MIC_StartAutoSampling(param);
 }
 
 MICResult MIC_StopLimitedSampling(void) {
     if (OSi_IsCodecTwlMode() == TRUE) {
-        return MICEX_StopLimitedSampling();
+        return MICEXi_StopLimitedSampling();
     }
     return MIC_StopAutoSampling();
 }

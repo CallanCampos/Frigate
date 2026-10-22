@@ -21,7 +21,7 @@ PMExitCallbackInfo NWMi_UnloadOnExit;
 
 // The library's system area. The commands' bare calls of it, whose result they drop, are left from the SDK's fetches of
 // the work for assertions that its release build compiles out
-NWMSys *func_027026dc(void) {
+NWMSys *NWMi_GetSystemWork(void) {
     return NWMi_SystemArea;
 }
 
@@ -44,7 +44,7 @@ void func_027026ec(void) {
 void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
     NWMSys *sys = NWMi_SystemArea;
     NWMEvent *event = (NWMEvent *)data;
-    NWMCallback callback;
+    NWMCallbackFunc callback;
 
     if (sys == NULL) {
         return;
@@ -59,7 +59,7 @@ void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
 #ifdef BUGFIX
     DC_InvalidateRange(event, sizeof(NWMEvent));
 #endif
-    if (event->cmd >= NWM_CMD_COUNT) {
+    if (event->cmd >= NWM_APIID_ASYNC_KIND_MAX) {
         return;
     }
     DC_InvalidateRange(sys->event, sizeof(NWMEvent));
@@ -67,20 +67,21 @@ void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
     if (event != sys->event) {
         DC_InvalidateRange(event, sizeof(NWMEvent));
     }
-    if ((event->cmd == NWM_CMD_LOAD_DEVICE && event->result != 0) ||
-        (event->cmd == NWM_CMD_UNLOAD_DEVICE && event->result == 0) || event->cmd == NWM_CMD_19) {
+    if ((event->cmd == NWM_APIID_LOAD_DEVICE && event->result != 0) ||
+        (event->cmd == NWM_APIID_UNLOAD_DEVICE && event->result == 0) || event->cmd == NWM_APIID_INSTALL_FIRMWARE) {
         func_02702a78();
     }
-    if (event->cmd == NWM_CMD_SEND_FRAME && event->result != NWM_RESULT_12 && event->u04.sendCallback != NULL) {
+    if (event->cmd == NWM_APIID_SEND_FRAME && event->result != NWM_RETCODE_INDICATION &&
+        event->u04.sendCallback != NULL) {
         event->u04.sendCallback(event);
     }
-    if (event->cmd != NWM_CMD_SEND_FRAME) {
-        if (event->cmd == NWM_CMD_UNLOAD_DEVICE || event->cmd == NWM_CMD_19 ||
-            (event->cmd == NWM_CMD_LOAD_DEVICE && event->result != 0)) {
-            PM_DeletePreExitCallback(&NWMi_UnloadOnExit);
+    if (event->cmd != NWM_APIID_SEND_FRAME) {
+        if (event->cmd == NWM_APIID_UNLOAD_DEVICE || event->cmd == NWM_APIID_INSTALL_FIRMWARE ||
+            (event->cmd == NWM_APIID_LOAD_DEVICE && event->result != 0)) {
+            PM_DeletePostExitCallback(&NWMi_UnloadOnExit);
         }
         callback = sys->callbacks[event->cmd];
-        if (event->cmd == NWM_CMD_SCAN) {
+        if (event->cmd == NWM_APIID_START_SCAN) {
             DC_InvalidateRange(event->data, event->u0c.size);
         }
         if (callback != NULL) {
@@ -94,8 +95,8 @@ void func_02702740(PXIFifoTag tag, u32 data, BOOL err) {
     }
 }
 
-u16 func_027028b0(void) {
-    NWMSys *sys = func_027026dc();
+u16 NWM_GetState(void) {
+    NWMSys *sys = NWMi_GetSystemWork();
     NWMStatus *status;
     u16 state = 0;
 
@@ -112,22 +113,22 @@ u16 func_027028b0(void) {
     return state;
 }
 
-// Whether the state is one of the count states that follow
-NWMRetCode func_027028e4(u32 count, ...) {
+// Whether the state is one of the paramNum states that follow
+NWMRetCode NWMi_CheckState(s32 paramNum, ...) {
     NWMRetCode result;
     u16 state;
     va_list args;
-    NWMSys *sys = func_027026dc();
+    NWMSys *sys = NWMi_GetSystemWork();
 
-    result = func_02702698();
+    result = NWMi_CheckInitialized();
     if (result != NWM_RETCODE_SUCCESS && result != NWM_RETCODE_OPERATING) {
         return result;
     }
     DC_InvalidateRange(&sys->status->state, 2);
     state = sys->status->state;
-    va_start(args, count);
+    va_start(args, paramNum);
     result = NWM_RETCODE_ILLEGAL_STATE;
-    for (; count != 0; count--) {
+    for (; paramNum != 0; paramNum--) {
         if (va_arg(args, u32) == state) {
             result = NWM_RETCODE_SUCCESS;
         }
@@ -136,10 +137,10 @@ NWMRetCode func_027028e4(u32 count, ...) {
 }
 
 u16 func_02702980(void) {
-    return func_027026dc()->status->unk_9e;
+    return NWMi_GetSystemWork()->status->unk_9e;
 }
 
-u16 func_02702998(int type) {
+u16 NWM_GetDispersionScanPeriod(u16 scanType) {
     u8 mac[6];
     u16 sum;
     int i;
@@ -151,7 +152,7 @@ u16 func_02702998(int type) {
     }
     sum += OS_GetVBlankCount();
     value = sum * 13;
-    if (type == 1) {
+    if (scanType == 1) {
         return value % 10 + 30;
     }
     return value % 10 + 105;

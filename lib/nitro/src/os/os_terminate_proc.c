@@ -28,8 +28,8 @@ void OS_Terminate(void) {
             OS_EnableInterrupts();
         }
         if (OS_IsRunOnTwl()) {
-            if (func_02704318()) {
-                func_02704328();
+            if (FATFSi_IsInitialized()) {
+                FATFS_UnmountAll();
             }
         }
         OSi_SendToPxi(OS_PXI_COMMAND_TERMINATE);

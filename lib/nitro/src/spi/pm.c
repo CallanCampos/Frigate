@@ -41,9 +41,6 @@
 #define PM_PXI_NOTIFY_EXIT_1 0
 #define PM_PXI_NOTIFY_BATTERY_LOW 4
 #define PM_PXI_NOTIFY_EXIT_2 5
-#define PM_EXIT_TYPE_1 1
-#define PM_EXIT_TYPE_2 2
-#define PM_EXIT_TYPE_FORCED 3
 
 // The requests, in the low byte of the first word of a PM_PXI_COMMAND_REQUEST: three that follow the screens' power,
 // six for the backlights, the power-off, and the settings and reads of the registers
@@ -239,7 +236,7 @@ static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     case PM_PXI_COMMAND_NOTIFY:
         switch (value) {
         case PM_PXI_NOTIFY_EXIT_1:
-            PMi_ProcessExitRequest(PM_EXIT_TYPE_1);
+            PMi_ProcessExitRequest(PM_EXIT_FACTOR_PWSW);
             *(vu32 *)HW_PM_EXIT_FLAG = 1;
             break;
         case 1:
@@ -252,7 +249,7 @@ static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
             }
             break;
         case PM_PXI_NOTIFY_EXIT_2:
-            PMi_ProcessExitRequest(PM_EXIT_TYPE_2);
+            PMi_ProcessExitRequest(PM_EXIT_FACTOR_BATTERY);
             *(vu32 *)HW_PM_EXIT_FLAG = 1;
             break;
         }
@@ -420,7 +417,7 @@ u32 PM_SetBackLight(PMLCDTarget target, PMBackLightSwitch backlight) {
 }
 
 static u32 PM_ForceToPowerOffAsync(PMCallback callback, void *arg) {
-    PMi_ExitType = PM_EXIT_TYPE_FORCED;
+    PMi_ExitType = PM_EXIT_FACTOR_USER;
     func_0207f64c();
     if (OS_IsRunOnTwl()) {
         PMi_CallCallbackList(PMi_PostExitCallbackList);
@@ -449,7 +446,7 @@ void PM_ForceToPowerOff(void) {
     OS_DisableInterrupts();
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        MI_StopNDmaChannels();
+        MI_StopAllNDma();
     }
     for (;;) {
         OS_Halt();

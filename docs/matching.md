@@ -1360,7 +1360,7 @@ Same instructions, scheduled in another order.
   (offset 4) below the store through the free list's last link only with the state an 8-byte struct of `count` and
   `mask` and the request time a `u64` static beside it, which `-ipa file` pools right after the state; with the time
   as the state's third field, the store moves above the link's. The split moves a stack reload too, around stores at
-  constant offsets: TwlSDK's `SNDEX_SetIirFilter` (`sndex.c`) clears two flags and then reloads `result`, a local
+  constant offsets: TwlSDK's `SNDEXi_SetIirFilter` (`sndex.c`) clears two flags and then reloads `result`, a local
   whose address it passed to `OS_ReceiveMessage`. With the two flags as fields at 0x18 and 4 of a 0x5c-byte struct,
   the reload goes between the two stores, and with them separate statics it stays after both, as in the original.
 - Stores to `volatile` fields are scheduled apart from the instructions around them even when they are written in order:
@@ -1903,8 +1903,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   (the shape of cybervisi0n/libntr's reconstruction). `DSP_ReadPipe` and `DSP_WritePipe` (`dsp_pipe.c`) match so;
   `count &= ...` folds before the narrowing and loses the second one.
 - A bit flag at a fixed address read with `ldrb r0, [r0, #4]` from a literal of the block's base, where ours folds the
-  offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `TWLHwNormalInfo *info =
-  TWL_HW_NORMAL_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
+  offset into the literal (`0x02fffd6c`, then `[r0]`), is read through a pointer local: `OSTWLHWSecureInfo *info =
+  (OSTWLHWSecureInfo *)HW_HW_SECURE_INFO; return info->flags.forceDisableWireless == 1 ...` with a `u8` bitfield matches
   `os_ownerInfoEx_twl.c`'s `OSi_IsForceDisableWirelessTwl`, and the same field through a cast in the expression folds
   the offset.
 - A parameter stored at entry to an outgoing argument slot (`str r2, [sp, #8]`) and read back from it later, in a
@@ -2525,7 +2525,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BOOL b = FALSE; if (x) { b = TRUE; }`; `x != 0` builds 1 first. `script_command.c`'s `StaScriptCmd_PokeFlip`
   also needs the call before it in the argument list read into a local first. For a `u16` parameter the local also
   saves the narrowing that a comparison or a ternary as the argument gets (`lsls`, `lsrs`): `wcm_dsi.c`'s
-  `func_02769b80` passes `NWM_Connect` its `u16 authMode = 0;`, set to 1 under the shared-key option.
+  `func_02769b80` passes `NWM_SetWEPKey` its `u16 authMode = 0;`, set to 1 under the shared-key option.
 - A 0/1 comparison flag is built set-then-clear (`movs r5, #1; beq; movs r5, #0`) when its register is free at
   the `cmp`, and with branches (`bne; movs r1, #1; b; movs r1, #0`) when its register is an operand of the
   `cmp`, so the shape follows the registers, not the spelling. `MysteryCardView_SeqMove` writes both flags as
@@ -2536,8 +2536,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `btlv_effvm.c`'s `BtlvEffvm_GetDefenderPositions` stores
   `(wk->attacker & 1) ? BTLV_MCSS_POS_SINGLE_PLAYER : BTLV_MCSS_POS_SINGLE_ENEMY` into its `int` array. One enum arm,
   a cast of the whole ternary, or the condition inverted stays 5 bytes off. A 0/1 argument laid out 0 first after a
-  `bne` is the same: `wcm_dsi.c`'s `func_0276a0ac` passes `x == WCM_OPTION_POWER_ACTIVE ? NWM_POWER_MODE_ACTIVE :
-  NWM_POWER_MODE_SAVE`, where `? 0 : 1`, `? FALSE : TRUE`, `!=` and casts all give `beq` and the 1 first.
+  `bne` is the same: `wcm_dsi.c`'s `func_0276a0ac` passes `x == WCM_OPTION_POWER_ACTIVE ? NWM_POWERMODE_ACTIVE :
+  NWM_POWERMODE_STANDARD`, where `? 0 : 1`, `? FALSE : TRUE`, `!=` and casts all give `beq` and the 1 first.
 - Blocks are laid out in source order. A switch whose default code comes right after its comparisons or jump table
   had `default:` written first, and `if (f()) { n++; } else { return FALSE; }` puts the return after the code that goes
   on, where `if (!f()) { return FALSE; } n++;` puts it before. In a loop the `else` lands after the whole body, just
@@ -3983,10 +3983,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A TwlSDK function that resists respellings can be in the shape of cybervisi0n/libntr's reconstruction, which keeps
   the SDK's inlines and blocks: six of the LTD autoload's matched once rebuilt so, in our own names. `mi_ndma.c`'s
-  `MIi_NDma` and `MIi_NDmaAsync` set the registers through one-line `static inline` writers inside
-  `if (size > 0) { ... }`, with the locals declared there; `mi_ndma_gxcommand.c`'s `MIi_NDmaFIFOCallback` calls the
-  transfer through a `static inline`, `MIi_NDmaAsyncImmediate`, which adds the channel's config, so the arguments
-  are computed in the inline's order; `card_hash.c`'s `CARD_SetUpCheckedReads` lays its buffer out through a
-  cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect` gets the sector
-  index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops by
-  `slot + banks`. Look the function up there before grinding registers.
+  `MIi_NDma_withConfig_Dev` and `MIi_NDmaAsync_withConfig_Dev` set the registers through one-line `static inline`
+  writers inside `if (size > 0) { ... }`, with the locals declared there; `mi_ndma_gxcommand.c`'s
+  `MIi_NDmaFIFOCallback` calls the transfer through a `static inline`, `MIi_NDmaAsync`, which adds the channel's
+  config, so the arguments are computed in the inline's order; `card_hash.c`'s `CARD_InitRomHashContext` lays its
+  buffer out through a cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect`
+  gets the sector index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops
+  by `slot + banks`. Look the function up there before grinding registers.

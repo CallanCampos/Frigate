@@ -98,9 +98,7 @@ void GFL_SndInit(void) {
     sSndHeap = NNS_SndHeapCreate(g_GFLSndHeap, sizeof(g_GFLSndHeap));
     NNS_SndArcInit(&sSndArc, "swan_sound_data.sdat", sSndHeap, FALSE);
     GFL_SndInitCore(TRUE);
-    if (OS_IsRunOnTwl() == TRUE) {
-        SNDEX_Init();
-    }
+    SNDEX_Init();
 }
 
 static void GFL_SndInitCore(BOOL loadGroup) {

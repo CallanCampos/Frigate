@@ -10,11 +10,15 @@
 // otherwise. The functions
 // have the SDK's names, and the cores in the LTD autoload keep their default names
 
-// The state of a SHA-1 computation, of which the BIOS keeps the first 0x60 bytes. The library's init core clears the
-// word after them, and the HMAC's context continues after it (the key at 0x64, its length at 0xa4)
-typedef struct {
-    u8 unk_00[0x60];
-    u32 unk_60;
+// The state of a SHA-1 computation, in the layout of the TWL-SDK Function Reference Manual (SVC_SHA1Init), of which the
+// BIOS keeps the first 0x60 bytes. The library's init core clears sha_block, and the HMAC's context continues after it
+// (the key at 0x64, its length at 0xa4)
+typedef struct SVCSHA1Context {
+    u32 h0, h1, h2, h3, h4;
+    u32 Nl, Nh;
+    u32 data[16];
+    int num;
+    void (*sha_block)(struct SVCSHA1Context *c, const u8 *W, int num);
 } SVCSHA1Context;
 
 // syscall_twl.c, the half in ARM9 main
@@ -27,7 +31,7 @@ void SVC_SHA1GetHash(SVCSHA1Context *context, void *digest);
 void SVC_CalcHMACSHA1(void *digest, const void *bin_ptr, u32 bin_len, const void *key_ptr, u32 key_len);
 
 // syscall_twl_ltd.c, the half in the LTD autoload; the wrappers call these cores
-// The cores of SVC_SHA1Init, SVC_SHA1Update and SVC_SHA1GetHash: the first clears the word at 0x60 of the context, and
+// The cores of SVC_SHA1Init, SVC_SHA1Update and SVC_SHA1GetHash: the first clears the context's sha_block, and
 // each calls the BIOS (system calls 0x24, 0x25 and 0x26). The last takes the digest after the context, as the BIOS
 // does not
 void func_027696e8(SVCSHA1Context *context);

@@ -6,45 +6,12 @@
 #include "nitro/pm.h"
 #include "twl/nwm.h"
 
-// What NWM's files share and twl/nwm.h doesn't export: the commands, the system area and the blocks that the ARM7
-// shares with the ARM9. The name is ours
-
-// The commands, by their numbers: the first halfword of the buffer that goes to the ARM7 and of the event that comes
-// back. They also index the callbacks and the ARM7's flags of the commands it is running. The names are guessed from
-// the states that take a command and from its parameters; a number is left in the name of those with nothing to
-// show what they do
-enum {
-    NWM_CMD_1 = 1,
-    NWM_CMD_LOAD_DEVICE = 3,
-    NWM_CMD_UNLOAD_DEVICE = 4,
-    NWM_CMD_OPEN = 5,
-    NWM_CMD_CLOSE = 6,
-    NWM_CMD_SCAN = 7,
-    NWM_CMD_8 = 8,
-    NWM_CMD_DISCONNECT = 9,
-    NWM_CMD_SET_RECEIVE_BUFFER = 10,
-    NWM_CMD_SEND_FRAME = 11,
-    NWM_CMD_12 = 12,
-    NWM_CMD_CONNECT = 13,
-    NWM_CMD_14 = 14,
-    NWM_CMD_SET_PMK = 18,
-    NWM_CMD_19 = 19,
-    NWM_CMD_COUNT = 20
-};
-
-// The results of an event that the library tells apart: a sent frame that the ARM7 gave up, and a receive buffer
-// that is full (the callback of the command that sets it gives it back)
-#define NWM_RESULT_12 12
-#define NWM_RESULT_BUFFER_FULL 11
-
-// What the ARM7 reports as the library's state, which the commands check. The numbers 0 to 4 are in the order that
-// the commands take them in; 5 is only known from the command that unloads the device in any state
-enum { NWM_STATE_NONE, NWM_STATE_INITIALIZED, NWM_STATE_LOADED, NWM_STATE_READY, NWM_STATE_CONNECTED, NWM_STATE_5 };
+// What NWM's files share and twl/nwm.h doesn't export: the system area and the blocks that the ARM7 shares with the
+// ARM9, and the library's internal functions (libntr's nwm_arm9_private.h names those). The name is ours
 
 // The first halfword of a command buffer while the ARM7 is done with the buffer, and the number of buffers
 #define NWM_CMD_BUF_FREE 0x8000
 #define NWM_CMD_BUF_COUNT 32
-#define NWM_INDICATE_COUNT 3
 
 // The priority of the library's callbacks in the lists of those that run when the console sleeps and exits
 #define NWM_PM_PRIORITY 0xffff
@@ -86,8 +53,8 @@ typedef struct NWMEvent {
     u16 cmd;
     u16 result;
     union {
-        NWMCallback sendCallback; // The event of a frame sent: the callback that the frame was given
-        u16 index;                // The event of frames received: the index of the callback
+        NWMCallbackFunc sendCallback; // The event of a frame sent: the callback that the frame was given
+        u16 port;                     // The event of frames received: the port of the callback
     } u04;
     u32 unk_08;
     union {
@@ -101,31 +68,31 @@ typedef struct NWMEvent {
 // The system area that the game gives the library, its first part: the buffers of the commands, the queue of those the
 // ARM7 is done with, the callbacks and pointers to the three blocks that follow it (the flags, the status and an event)
 typedef struct NWMSys {
-    NWMCmdBuf cmdBuf[NWM_CMD_BUF_COUNT];      // 0x0000
-    OSMessageQueue freeQueue;                 // 0x2000
-    OSMessage freeMsgs[NWM_CMD_BUF_COUNT];    // 0x2020
-    u8 unk_20a0[0x80];                        // 0x20a0
-    u8 unk_2120[0x154];                       // 0x2120: cleared when the library starts
-    NWMInfo *info;                            // 0x2274
-    NWMStatus *status;                        // 0x2278
-    NWMEvent *event;                          // 0x227c
-    u16 dmaNo;                                // 0x2280
-    NWMCallback callbacks[NWM_CMD_COUNT];     // 0x2284: of the commands
-    NWMCallback indicate[NWM_INDICATE_COUNT]; // 0x22d4: of the frames received, by index
+    NWMCmdBuf cmdBuf[NWM_CMD_BUF_COUNT];                 // 0x0000
+    OSMessageQueue freeQueue;                            // 0x2000
+    OSMessage freeMsgs[NWM_CMD_BUF_COUNT];               // 0x2020
+    u8 unk_20a0[0x80];                                   // 0x20a0
+    u8 unk_2120[0x154];                                  // 0x2120: cleared when the library starts
+    NWMInfo *info;                                       // 0x2274
+    NWMStatus *status;                                   // 0x2278
+    NWMEvent *event;                                     // 0x227c
+    u16 dmaNo;                                           // 0x2280
+    NWMCallbackFunc callbacks[NWM_APIID_ASYNC_KIND_MAX]; // 0x2284: of the commands
+    NWMCallbackFunc indicate[NWM_PORT_NUM];              // 0x22d4: of the frames received, by port
 } NWMSys;
 
 // nwm_setup.c: whether NWM_Init has set the library up
 extern u8 NWMi_SetUpDone;
-BOOL func_027026b4(void);
+BOOL NWMi_CheckEnableFlag(void);
 
 // nwm_events.c: the system area that NWM_Init was given, and the callback that unloads the device before the
 // application exits (NWM_LoadDevice puts it)
 extern NWMSys *NWMi_SystemArea;
 extern PMExitCallbackInfo NWMi_UnloadOnExit;
-NWMSys *func_027026dc(void);
+NWMSys *NWMi_GetSystemWork(void);
 void func_027026ec(void);
 void func_02702740(PXIFifoTag tag, u32 data, BOOL err);
-NWMRetCode func_027028e4(u32 count, ...);
+NWMRetCode NWMi_CheckState(s32 paramNum, ...);
 void func_02702a40(void);
 
 #endif // POKEBW2_TWL_NWM_PRIVATE_H

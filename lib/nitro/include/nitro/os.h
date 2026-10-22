@@ -375,16 +375,17 @@ BOOL OS_IsRunOnTwl(void);                          // swan's hw_isDSi
 // TwlSDK's OSi_IsCodecTwlMode: whether the game runs with the DSi's codec in TWL mode (on a DSi, with the TWL ROM
 // header's codec flag set)
 BOOL OSi_IsCodecTwlMode(void);
-// The DSi's parental controls, of its settings. The fields' meanings are not known
-typedef struct {
+// The DSi's parental controls, of its settings (TwlSDK's OSTWLParentalControl, of which only the first word is laid
+// out here). The fields' meanings are not known
+typedef struct OSTWLParentalControl {
     u32 unk0_0 : 1;
     u32 unk0_1 : 4;
     u32 unk0_5 : 1;
     u32 unk0_6 : 26;
-} TWLParentalControl;
+} OSTWLParentalControl;
 
 // The DSi's parental controls, NULL on a DS
-TWLParentalControl *OS_GetParentalControlInfoPtr(void);
+OSTWLParentalControl *OS_GetParentalControlInfoPtr(void);
 // TwlSDK's OS_IsAvailableWireless, TRUE on a DS, and OS_IsAgreeEULA, FALSE on a DS
 BOOL OS_IsAvailableWireless(void);
 BOOL OS_IsAgreeEULA(void);

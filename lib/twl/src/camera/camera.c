@@ -1,8 +1,9 @@
 // TwlSDK's camera library (libcamera), the camera interface's registers, in the DSi's LTD autoload: resetting the
 // interface and its clock, starting and stopping a capture, and the interface's control bits (the transfer size, the
 // trimming, the output format, the interrupt). ARM code. The ROM names none of it; the file's name is a guess, after
-// the SDK's camera.h, whose Core names twl/camera.h gives. The functions have those names where they are known, and
-// keep their default names otherwise.
+// the SDK's camera.h, whose Core names twl/camera.h gives: the TWL-SDK Function Reference Manual's, and libntr's for
+// the interrupt bits (camera_intr.h). The functions have those names where they are known, and keep their default
+// names otherwise.
 //
 // The interface has two registers in the I/O space after SCFG_CLK: 0x04004200, which the reset writes, and 0x04004202,
 // the control word. The functions that change the control word do so with the interrupts off.
@@ -22,9 +23,9 @@
 #define CAMERA_CNT_LINES_MASK 0xf // The number of lines per transfer, less one
 #define CAMERA_CNT_BUFFER_ERROR 0x10
 #define CAMERA_CNT_CLEAR_BUFFER 0x20
-#define CAMERA_CNT_UNK_MASK 0x300    // A field of two bits, which camera_api.c sets to 2 while the camera runs
-#define CAMERA_CNT_UNK_BIT10 0x400   // Set while the camera runs
-#define CAMERA_CNT_INTR_ENABLE 0x800 // Set while the camera interrupt has a handler
+#define CAMERA_CNT_VSYNC_INTR_MASK 0x300   // The VSync interrupt's edge (CAMERAIntrVsync)
+#define CAMERA_CNT_BUFFER_ERROR_INTR 0x400 // The buffer error's interrupt
+#define CAMERA_CNT_MASTER_INTR 0x800       // The interface's interrupt enable
 #define CAMERA_CNT_FORMAT_RGB 0x2000
 #define CAMERA_CNT_TRIMMING 0x4000
 #define CAMERA_CNT_CAPTURE 0x8000 // Set to start a capture, and on until it ends
@@ -87,7 +88,7 @@ void CAMERA_SetOutputFormatCore(CAMERAOutput output) {
 }
 
 // Whether the interface reports a buffer error
-BOOL CAMERA_IsBufferErrorCore(void) {
+BOOL CAMERA_GetErrorStatusCore(void) {
     return (reg_CAMERA_CNT & CAMERA_CNT_BUFFER_ERROR) >> 4;
 }
 
@@ -98,33 +99,33 @@ void CAMERA_ClearBufferCore(void) {
 }
 
 // Sets or clears the interface's interrupt enable
-void CAMERA_SetInterruptEnableCore(BOOL on) {
+void CAMERA_SetMasterInterruptCore(BOOL enabled) {
     OSIntrMode irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
-    if (on) {
-        cnt |= CAMERA_CNT_INTR_ENABLE;
+    if (enabled) {
+        cnt |= CAMERA_CNT_MASTER_INTR;
     } else {
-        cnt &= ~CAMERA_CNT_INTR_ENABLE;
+        cnt &= ~CAMERA_CNT_MASTER_INTR;
     }
     reg_CAMERA_CNT = cnt;
     OS_RestoreInterrupts(irq);
 }
 
-// Replaces the two-bit field of bits 8 and 9 of the control word
-void func_0270223c(u32 bits) {
+// Sets the edge of the VSync interrupt, bits 8 and 9 of the control word
+void CAMERA_SetVsyncInterruptCore(CAMERAIntrVsync type) {
     OSIntrMode enabled = OS_DisableInterrupts();
-    reg_CAMERA_CNT = (reg_CAMERA_CNT & ~CAMERA_CNT_UNK_MASK) | bits;
+    reg_CAMERA_CNT = (reg_CAMERA_CNT & ~CAMERA_CNT_VSYNC_INTR_MASK) | type;
     OS_RestoreInterrupts(enabled);
 }
 
-// Sets or clears bit 10 of the control word
-void func_02702268(BOOL on) {
+// Sets or clears the buffer error's interrupt, bit 10 of the control word
+void CAMERA_SetBufferErrorInterruptCore(BOOL enabled) {
     OSIntrMode irq = OS_DisableInterrupts();
     u32 cnt = reg_CAMERA_CNT;
-    if (on) {
-        cnt |= CAMERA_CNT_UNK_BIT10;
+    if (enabled) {
+        cnt |= CAMERA_CNT_BUFFER_ERROR_INTR;
     } else {
-        cnt &= ~CAMERA_CNT_UNK_BIT10;
+        cnt &= ~CAMERA_CNT_BUFFER_ERROR_INTR;
     }
     reg_CAMERA_CNT = cnt;
     OS_RestoreInterrupts(irq);
@@ -168,7 +169,7 @@ u32 CAMERA_GetBytesAtOnceCore(u16 width) {
 
 u16 CAMERA_SizeToWidthCore(CAMERASize size) {
     switch (size) {
-    case CAMERA_SIZE_DSI_VGA:
+    case CAMERA_SIZE_VGA:
         return 640;
     case CAMERA_SIZE_QVGA:
         return 320;
@@ -180,7 +181,7 @@ u16 CAMERA_SizeToWidthCore(CAMERASize size) {
         return 176;
     case CAMERA_SIZE_DS_LCD:
         return 256;
-    case CAMERA_SIZE_DS_LCDX4:
+    case CAMERA_SIZE_DS_LCDx4:
         return 512;
     default:
         return 0;
@@ -189,7 +190,7 @@ u16 CAMERA_SizeToWidthCore(CAMERASize size) {
 
 u16 CAMERA_SizeToHeightCore(CAMERASize size) {
     switch (size) {
-    case CAMERA_SIZE_DSI_VGA:
+    case CAMERA_SIZE_VGA:
         return 480;
     case CAMERA_SIZE_QVGA:
         return 240;
@@ -201,7 +202,7 @@ u16 CAMERA_SizeToHeightCore(CAMERASize size) {
         return 144;
     case CAMERA_SIZE_DS_LCD:
         return 192;
-    case CAMERA_SIZE_DS_LCDX4:
+    case CAMERA_SIZE_DS_LCDx4:
         return 384;
     default:
         return 0;

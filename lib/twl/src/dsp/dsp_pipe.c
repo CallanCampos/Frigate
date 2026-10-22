@@ -40,7 +40,7 @@ typedef struct DSPFileServer {
 static void func_02706530(u32 address, u8 value);
 static void func_027067b4(void *arg);
 static void func_02706b60(int port);
-static void func_02706c2c(void *userData, int port, int direction);
+static void func_02706c2c(void *userData, int port, int peer);
 static void func_02706cb4(DSPPipe *pipe);
 static void func_02706dfc(DSPPipe *pipe);
 static void func_02706e18(DSPPipe *pipe);
@@ -58,7 +58,7 @@ static DSPFileServer sFileServer;
 static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
     OSIntrMode irq = OS_DisableInterrupts();
     if (OS_IsRunOnTwl() == TRUE) {
-        func_02705150(0, dst, wordAddress, count, 0);
+        DSP_RecvFifoExCore(DSP_FIFO_MEMSEL_DATA, dst, wordAddress, count, 0);
     }
     reg_DSP_PCFG &= ~(DSP_PCFG_AUTO_INCREMENT | DSP_PCFG_READ_LENGTH_MASK);
     OS_RestoreInterrupts(irq);
@@ -67,7 +67,7 @@ static inline void DSPi_ReadWords(u16 *dst, u16 wordAddress, u16 count) {
 static inline void DSPi_WriteWords(u16 wordAddress, const u16 *src, u16 count) {
     OSIntrMode irq = OS_DisableInterrupts();
     if (OS_IsRunOnTwl() == TRUE) {
-        func_02705088(0, wordAddress, src, count, 0);
+        DSP_SendFifoExCore(DSP_FIFO_MEMSEL_DATA, wordAddress, src, count, 0);
     }
     OS_RestoreInterrupts(irq);
 }
@@ -299,16 +299,16 @@ static void func_02706b60(int port) {
 }
 
 // The callback of the first port: reads what the DSP wrote there, and drops it
-static void func_02706c2c(void *userData, int port, int direction) {
+static void func_02706c2c(void *userData, int port, int peer) {
     DSPPipe pipe;
     u8 buffer[0x80];
     u16 length;
     u16 done;
 
-    if (direction != 0) {
+    if (peer != 0) {
         return;
     }
-    DSP_LoadPipe(&pipe, port, direction);
+    DSP_LoadPipe(&pipe, port, peer);
     length = DSP_GetPipeReadableSize(&pipe);
     done = 0;
     if (length == 0) {
@@ -344,18 +344,18 @@ void DSP_SetPipeCallback(int port, DSPPipeCallback callback, void *userData) {
     sPipeUserData[port] = userData;
 }
 
-DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction) {
+DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int peer) {
     OSIntrMode irq = OS_DisableInterrupts();
     while (sPipeBase == 0) {
         OS_SleepThread(&sPipeQueue);
     }
     OS_RestoreInterrupts(irq);
-    if (port >= 0 && port < DSP_PORT_COUNT && direction >= 0 && direction < 2) {
+    if (port >= 0 && port < DSP_PORT_COUNT && peer >= 0 && peer < 2) {
         // the DSP keeps the headers at sPipeBase in its memory, in a table laid out like sPipes
         DSPPipe(*headers)[2] = (DSPPipe(*)[2])sPipeBase;
-        u32 address = (u32)&headers[port][direction];
+        u32 address = (u32)&headers[port][peer];
         if (pipe == NULL) {
-            pipe = &sPipes[port][direction];
+            pipe = &sPipes[port][peer];
         }
         func_0270633c(address, (u8 *)pipe, sizeof(DSPPipe));
     }
@@ -364,24 +364,24 @@ DSPPipe *DSP_LoadPipe(DSPPipe *pipe, int port, int direction) {
 
 // Gets the header of a pipe from the DSP again
 static void func_02706dfc(DSPPipe *pipe) {
-    DSP_LoadPipe(pipe, (pipe->id & 0xff) >> 1, pipe->id & 1);
+    DSP_LoadPipe(pipe, (pipe->flags & 0xff) >> 1, pipe->flags & 1);
 }
 
 // Tells the DSP that the ARM9 moved the pipe's read or write position
 static void func_02706e18(DSPPipe *pipe) {
-    u32 address = sPipeBase + ((pipe->id & 0xff) >> 1) * sizeof(sPipes[0]) + (pipe->id & 1) * sizeof(DSPPipe);
+    u32 address = sPipeBase + ((pipe->flags & 0xff) >> 1) * sizeof(sPipes[0]) + (pipe->flags & 1) * sizeof(DSPPipe);
 
-    if ((pipe->id & 1) == 0) {
-        func_02706694(address + 4, (u8 *)&pipe->readPos, 2);
+    if ((pipe->flags & 1) == 0) {
+        func_02706694(address + 4, (u8 *)&pipe->rpos, 2);
     } else {
-        func_02706694(address + 6, (u8 *)&pipe->writePos, 2);
+        func_02706694(address + 6, (u8 *)&pipe->wpos, 2);
     }
-    DSP_SendData(2, pipe->id & 0xff);
+    DSP_SendData(2, pipe->flags & 0xff);
 }
 
 u16 DSP_GetPipeReadableSize(const DSPPipe *pipe) {
-    u16 writePos = pipe->writePos;
-    u16 readPos = pipe->readPos;
+    u16 writePos = pipe->wpos;
+    u16 readPos = pipe->rpos;
     return (writePos - readPos + (((readPos ^ writePos) < 0x8000) ? 0 : pipe->length)) & ~0x8000;
 }
 
@@ -391,8 +391,8 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
 
     func_02706dfc(pipe);
     while (length != 0) {
-        u16 writePos = pipe->writePos;
-        u16 readPos = pipe->readPos;
+        u16 writePos = pipe->wpos;
+        u16 readPos = pipe->rpos;
         u16 difference = readPos ^ writePos;
         if (difference == 0) {
             if (moved) {
@@ -405,10 +405,10 @@ void DSP_ReadPipe(DSPPipe *pipe, void *dst, u16 length) {
             u16 end = (difference < 0x8000) ? (writePos & ~0x8000) : pipe->length;
             u16 count = (length < end - offset) ? length : end - offset;
             count = count & ~(DSP_MEMORY_UNIT - 1);
-            func_0270633c(pipe->base * 2 + offset, dst, count);
+            func_0270633c(pipe->address * 2 + offset, dst, count);
             length -= count;
             dst = (u8 *)dst + count;
-            pipe->readPos = (offset + count < pipe->length) ? readPos + count : ~readPos & 0x8000;
+            pipe->rpos = (offset + count < pipe->length) ? readPos + count : ~readPos & 0x8000;
             moved = TRUE;
         }
     }
@@ -424,8 +424,8 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
 
     func_02706dfc(pipe);
     while (length != 0) {
-        u16 writePos = pipe->writePos;
-        u16 readPos = pipe->readPos;
+        u16 writePos = pipe->wpos;
+        u16 readPos = pipe->rpos;
         u16 difference = readPos ^ writePos;
         if (difference == 0x8000) {
             if (moved) {
@@ -438,10 +438,10 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
             u16 end = (difference < 0x8000) ? pipe->length : (readPos & ~0x8000);
             u16 count = (length < end - offset) ? length : end - offset;
             count = count & ~(DSP_MEMORY_UNIT - 1);
-            func_02706694(pipe->base * 2 + offset, src, count);
+            func_02706694(pipe->address * 2 + offset, src, count);
             length -= count;
             src = (const u8 *)src + count;
-            pipe->writePos = (offset + count < pipe->length) ? writePos + count : ~writePos & 0x8000;
+            pipe->wpos = (offset + count < pipe->length) ? writePos + count : ~writePos & 0x8000;
             moved = TRUE;
         }
     }
@@ -452,7 +452,8 @@ void DSP_WritePipe(DSPPipe *pipe, const void *src, u16 length) {
 }
 
 // The DSP's interrupt: the first word the DSP sends on the third reply is the pipes' address, and each after it is a
-// port and a direction that changed, which goes to the port's callback, or to the file server if it has the file flag
+// port and a peer (direction) that changed, which goes to the port's callback, or to the file server if it has the file
+// flag
 void func_027070dc(void *userData) {
     while (DSP_GetSemaphore() & 0x8000 || DSP_RecvDataIsReady(2)) {
         DSP_ClearSemaphore(0x8000);
@@ -462,14 +463,14 @@ void func_027070dc(void *userData) {
             } else {
                 int message = DSP_RecvData(2);
                 int port = message >> 1;
-                int direction = message & 1;
+                int peer = message & 1;
                 if (port >= 0 && port < DSP_PORT_COUNT) {
                     if (sPipeCallbacks[port] != NULL) {
-                        sPipeCallbacks[port](sPipeUserData[port], port, direction);
+                        sPipeCallbacks[port](sPipeUserData[port], port, peer);
                     } else {
                         DSPPipe pipe;
-                        DSP_LoadPipe(&pipe, port, direction);
-                        if (direction == 0 && (pipe.id & DSP_PIPE_FILE_FLAG)) {
+                        DSP_LoadPipe(&pipe, port, peer);
+                        if (peer == 0 && (pipe.flags & DSP_PIPE_FILE_FLAG)) {
                             func_02706b60(port);
                         }
                     }
