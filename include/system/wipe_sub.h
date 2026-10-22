@@ -7,6 +7,15 @@
 // The wipe patterns (wipe_sub.c): each runs a frame of a screen's wipe and returns TRUE when it is done. The even ones
 // cover the screen and the odd ones uncover it
 
+// The steps of a pattern, in its WipeScreen's seq: setting up, running, freeing its work (where GFL_WipeForceEnd sends
+// it) and done
+enum {
+    WIPE_SEQ_INIT,
+    WIPE_SEQ_MAIN,
+    WIPE_SEQ_EXIT,
+    WIPE_SEQ_DONE,
+};
+
 // Master brightness fades
 BOOL WipeFunc_BrightnessOut(WipeScreen *screen);
 BOOL WipeFunc_BrightnessIn(WipeScreen *screen);

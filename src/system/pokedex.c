@@ -216,13 +216,13 @@ static int getIndexNumOfPkmForm(u16 species) {
 
 // Sets a species as seen in a sex and shininess
 static void PokeDex_SetSeenSex(PokeDexSave *pokedex, u32 species, u32 sex, BOOL rare) {
-    if (sex == 0) {
+    if (sex == GENDER_MALE) {
         if (rare == TRUE) {
             SetSeen(pokedex, POKEDEX_KIND_RARE_MALE, species);
         } else {
             SetSeen(pokedex, POKEDEX_KIND_MALE, species);
         }
-    } else if (sex == 1) {
+    } else if (sex == GENDER_FEMALE) {
         if (rare == TRUE) {
             SetSeen(pokedex, POKEDEX_KIND_RARE_FEMALE, species);
         } else {
@@ -378,13 +378,13 @@ void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
     for (i = 0; i < POKEDEX_KIND_COUNT; i++) {
         shown[i * POKEDEX_SPECIES_BYTES + byte] &= mask;
     }
-    if (sex == 0) {
+    if (sex == GENDER_MALE) {
         if (rare == TRUE) {
             pokedex->shown[POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
         } else {
             pokedex->shown[POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
         }
-    } else if (sex == 1) {
+    } else if (sex == GENDER_FEMALE) {
         if (rare == TRUE) {
             pokedex->shown[POKEDEX_KIND_RARE_FEMALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
         } else {
@@ -429,34 +429,34 @@ void PokeDex_GetShownSexRareForm(PokeDexSave *pokedex, u16 species, u32 *sex, u3
             }
         }
         if (CheckShown(pokedex, POKEDEX_KIND_MALE, species) || CheckShown(pokedex, POKEDEX_KIND_RARE_MALE, species)) {
-            *sex = 0;
+            *sex = GENDER_MALE;
         }
         if (CheckShown(pokedex, POKEDEX_KIND_FEMALE, species) ||
             CheckShown(pokedex, POKEDEX_KIND_RARE_FEMALE, species)) {
-            *sex = 1;
+            *sex = GENDER_FEMALE;
         }
     } else {
         *form = 0;
         if (CheckShown(pokedex, POKEDEX_KIND_MALE, species)) {
-            *sex = 0;
+            *sex = GENDER_MALE;
             *rare = FALSE;
         }
         if (CheckShown(pokedex, POKEDEX_KIND_FEMALE, species)) {
-            *sex = 1;
+            *sex = GENDER_FEMALE;
             *rare = FALSE;
         }
         if (CheckShown(pokedex, POKEDEX_KIND_RARE_MALE, species)) {
-            *sex = 0;
+            *sex = GENDER_MALE;
             *rare = TRUE;
         }
         if (CheckShown(pokedex, POKEDEX_KIND_RARE_FEMALE, species)) {
-            *sex = 1;
+            *sex = GENDER_FEMALE;
             *rare = TRUE;
         }
     }
     personal = PML_PersonalLoad(species, *form, heapId);
-    if (PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO) == 0xff) {
-        *sex = 2;
+    if (PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO) == GENDER_RATIO_GENDERLESS) {
+        *sex = GENDER_UNKNOWN;
     }
     PML_PersonalFree(personal);
 }
@@ -525,7 +525,7 @@ u16 PokeDex_GetCaughtNoNational(PokeDexSave *pokedex) {
 u16 PokeDex_GetCaughtNoUnova(PokeDexSave *pokedex, HeapID heapId) {
     u16 i;
     u16 count = 0;
-    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, 0);
+    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, NULL);
 
     for (i = 1; i <= SPECIES_GENESECT; i++) {
         if (PokeDex_IsCaught(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE) {
@@ -603,7 +603,7 @@ u16 PokeDex_GetSeenNoNational(PokeDexSave *pokedex) {
 u16 PokeDex_GetSeenNoUnova(PokeDexSave *pokedex, HeapID heapId) {
     u16 i;
     u16 count = 0;
-    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, 0);
+    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, NULL);
 
     for (i = 1; i <= SPECIES_GENESECT; i++) {
         if (PokeDex_IsSeen(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE) {
@@ -624,13 +624,13 @@ BOOL PokeDex_HasSeenVariant(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rar
     if (index != -1) {
         return CheckBit(pokedex->seenForms + rare * POKEDEX_FORM_BYTES, index + form);
     }
-    if (sex == 0) {
+    if (sex == GENDER_MALE) {
         if (rare == TRUE) {
             return CheckSeen(pokedex, POKEDEX_KIND_RARE_MALE, species);
         } else {
             return CheckSeen(pokedex, POKEDEX_KIND_MALE, species);
         }
-    } else if (sex == 1) {
+    } else if (sex == GENDER_FEMALE) {
         if (rare == TRUE) {
             return CheckSeen(pokedex, POKEDEX_KIND_RARE_FEMALE, species);
         } else {
@@ -695,7 +695,7 @@ static u16 PokeDex_GetCaughtNoPermissive(PokeDexSave *pokedex) {
 static u16 PokeDex_GetCaughtNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapId) {
     u16 i;
     u16 count = 0;
-    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, 0);
+    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, NULL);
 
     for (i = 1; i <= SPECIES_GENESECT; i++) {
         if (PokeDex_IsCaught(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE &&
@@ -710,7 +710,7 @@ static u16 PokeDex_GetCaughtNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapI
 static u16 PokeDex_GetSeenNoUnovaPermissive(PokeDexSave *pokedex, HeapID heapId) {
     u16 i;
     u16 count = 0;
-    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, 0);
+    u16 *table = PML_PersonalLoadRegionalDexTable(heapId, NULL);
 
     for (i = 1; i <= SPECIES_GENESECT; i++) {
         if (PokeDex_IsSeen(pokedex, i) == TRUE && table[i] != REGIONAL_DEX_NONE &&
@@ -754,7 +754,7 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
     *count = 0;
     *unk = 1311;
     switch (mode) {
-    case 3:
+    case POKEDEX_EVALUATION_REGIONAL_CAUGHT:
         *count = PokeDex_GetCaughtNoUnova(pokedex, heapId);
         if (PokeDex_IsCompleteUnova(pokedex, heapId) == TRUE) {
             *message = 33;
@@ -764,7 +764,7 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
         *message = PokeDex_LookupEvaluation(data_0208f89a, *count);
         *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
         break;
-    case 2:
+    case POKEDEX_EVALUATION_REGIONAL_SEEN:
         *count = PokeDex_GetSeenNoUnova(pokedex, heapId);
         if (PokeDex_IsSeenAllUnova(pokedex, heapId) == TRUE) {
             *message = 18;
@@ -774,7 +774,7 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
         *message = PokeDex_LookupEvaluation(data_0208f85e, *count);
         *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
         break;
-    case 1:
+    case POKEDEX_EVALUATION_NATIONAL_CAUGHT:
         *count = PokeDex_GetCaughtNo(pokedex, heapId);
         if (PokeDex_IsCompleteNational(pokedex) == TRUE) {
             *message = 60;

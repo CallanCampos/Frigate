@@ -84,9 +84,17 @@ static inline void PrintWindow_Flush(PrintWindow *printWindow, PrintQueue *queue
 }
 
 // PrintStream_GetState's states
-#define PRINT_STREAM_RUNNING 0
-#define PRINT_STREAM_PAUSED 1
-#define PRINT_STREAM_DONE 2
+enum {
+    PRINT_STREAM_RUNNING,
+    PRINT_STREAM_PAUSED,
+    PRINT_STREAM_DONE,
+};
+
+// PrintStream_GetPageMode's modes: how the page continues, scrolling the text up a line or clearing the window
+enum {
+    PRINT_STREAM_PAGE_SCROLL,
+    PRINT_STREAM_PAGE_CLEAR,
+};
 
 // Prints a string into a window a character at a time
 PrintStream *PrintStream_Create(BmpWin *window, s16 x, s16 y, const StrBuf *strbuf, Font *font, s32 wait,
@@ -100,7 +108,7 @@ PrintStream *PrintStream_CreateWithCallback(BmpWin *window, s16 x, s16 y, const 
 void PrintStream_Pause(PrintStream *stream);
 void PrintStream_Resume(PrintStream *stream);
 u32 PrintStream_GetState(PrintStream *stream);
-// Whether the page scrolls or clears at the next page break
+// Whether the page scrolls or clears at the next page break, a PRINT_STREAM_PAGE_* mode
 u32 PrintStream_GetPageMode(PrintStream *stream);
 // Continues printing after PRINT_STREAM_PAUSED
 void PrintStream_Continue(PrintStream *stream);
@@ -123,7 +131,27 @@ u32 GFL_FontGetLineWidths(const StrBuf *strbuf, Font *font, u32 spacing, u32 *wi
 BOOL GFL_FontCopyLine(const StrBuf *strbuf, StrBuf *dest, u32 line);
 u32 GFL_FontGetBlockHeight(const StrBuf *strbuf, Font *font);
 
-// The commands in strings
+// The commands in strings, by category: a word set's words and numbers (whose index is the number's digits less one),
+// the layout commands, the stream commands that only a stream carries out, and the colors
+enum {
+    STRCMD_CATEGORY_WORD = 1,
+    STRCMD_CATEGORY_NUMBER,
+    STRCMD_CATEGORY_LAYOUT = 0xbd,
+    STRCMD_CATEGORY_STREAM,
+    STRCMD_CATEGORY_COLOR = 0xff,
+};
+
+// The layout commands: set the colors (letter, shadow and background), go back to the renderer's color, center the
+// line, align it to the right less a margin, move x by the parameter, and set x
+enum {
+    STRCMD_LAYOUT_COLOR,
+    STRCMD_LAYOUT_RESTORE_COLOR,
+    STRCMD_LAYOUT_CENTER,
+    STRCMD_LAYOUT_ALIGN_RIGHT,
+    STRCMD_LAYOUT_MOVE_X,
+    STRCMD_LAYOUT_SET_X,
+};
+
 u16 GFL_StrCmdGetWordSetCommandCount(const StrBuf *strbuf);
 u8 GFL_StrCmdCountLinesUntilWordSetIndex(const StrBuf *strbuf, u8 index);
 u8 GFL_StrCmdGetStrWidthUntilWordSetIndex(const StrBuf *strbuf, u8 index, Font *font, u32 spacing);
