@@ -1246,13 +1246,15 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
 
 // Scans for the access points until one opens its setup; 1 when one did, or a negative number
 static int UtilAc_Scan(void) {
-    UtilAcScan *scan = NULL;
     int result = RESULT_NO_MEMORY;
-    UtilAcScan *previous = NULL;
-    int round;
     int foundIndex = 0;
-    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
     char text[0x20];
+    int round;
+    int j;
+    int i;
+    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
+    UtilAcScan *scan = NULL;
+    UtilAcScan *previous = NULL;
 
     scan = UtilAc_Calloc(1, size);
     if (scan != NULL) {
@@ -1262,7 +1264,6 @@ static int UtilAc_Scan(void) {
                 OSAlarm alarm;
                 BOOL waiting;
                 int count;
-                int i;
                 WMBssDesc *bss;
 
                 if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
@@ -1292,17 +1293,15 @@ static int UtilAc_Scan(void) {
                         case EVENT_SCAN_TIMEOUT:
                             waiting = FALSE;
                             break;
-                        case DWC_WCM_EVENT_FOUND_AP: {
-                            int found = UtilAcWcm_GetApList(sAcApList, sAcApCount);
-
-                            if (found > count) {
-                                count = found;
+                        case DWC_WCM_EVENT_FOUND_AP:
+                            i = UtilAcWcm_GetApList(sAcApList, sAcApCount);
+                            if (i > count) {
+                                count = i;
                                 OS_CancelAlarm(&alarm);
                                 OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm,
                                             (void *)EVENT_SCAN_TIMEOUT);
                             }
                             break;
-                        }
                         case DWC_WCM_EVENT_SEARCH_ENDED:
                             waiting = FALSE;
                             break;
@@ -1338,8 +1337,9 @@ static int UtilAc_Scan(void) {
                     goto done;
                 }
                 bss = (WMBssDesc *)sAcApList;
+                j = 0;
                 if (count > 0) {
-                    for (; i < count; i++) {
+                    for (; j < count; j++) {
                         memcpy(scan->entries[i].ssid, bss->ssid, 0x20);
                         scan->entries[i].ssidLength = bss->ssidLength;
                         scan->entries[i].ssid[bss->ssidLength] = 0;
@@ -1350,6 +1350,7 @@ static int UtilAc_Scan(void) {
                         }
                         memcpy(scan->entries[i].bssid, bss->bssid, 6);
                         bss++;
+                        i++;
                     }
                 }
                 scan->count = count;
