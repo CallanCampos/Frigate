@@ -3035,6 +3035,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   reads. Under the attribute `IrcLink_Poll` matches with `if (IrcLink.connectCallback)`, while `!= NULL` compares with
   the zero it has just stored (`cmp r2, r1` for the original's `cmp r2, #0`; An instruction too many or too few:
   "A pointer compared with `NULL`").
+  The DWC utility's `AossAp_Connect` (`dwc_aoss_ap.c`, 2.0/sp2) is the same case: its empty loop over the SSID, entered
+  with a `b`, and its `connected` flag kept in a register from its first 0 (where MWCC otherwise folds the 0 into the
+  stores) come only with its file statics `sWep` and `sBss`, both on 32-byte boundaries in the ROM, declared
+  `ATTRIBUTE_ALIGN(32)`: 335 bytes became 31.
   In overlay 139's `UpdateScroll` the attribute on any object or member the function reads also keeps the two reads
   of `list->dragDelta` in the arms of an `||` from being merged (4 bytes more), and leaves its index-first table read
   as it is (Instruction order: "that MWCC shares between two accesses").

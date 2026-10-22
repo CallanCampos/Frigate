@@ -30,8 +30,9 @@ static void Wifi_ReportConnect(WifiConnectResult *result, const WMBssDesc *bss, 
 static void Wifi_OnEvent(int event, int param);
 static void Wifi_OnAlarm(void *arg);
 
-static WifiWepDesc sWep;
-static WMBssDesc sBss;
+// 32-byte aligned, as the ROM places them, which also keeps AossAp_Connect's empty loop
+static WifiWepDesc sWep ATTRIBUTE_ALIGN(32);
+static WMBssDesc sBss ATTRIBUTE_ALIGN(32);
 static OSMessageQueue sAossApQueue;
 static OSMessage sAossApMessages[4];
 DWCAossFreeFunc gAossApFree = NULL;
@@ -364,6 +365,13 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
         while (running) {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
+            case 18:
+                if (!connected) {
+                    running = FALSE;
+                }
+                break;
+            case 19:
+                break;
             case 4:
             case DWC_WCM_EVENT_SEARCHING:
                 break;
@@ -404,13 +412,6 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
                     running = FALSE;
                 }
                 break;
-            case 18:
-                if (!connected) {
-                    running = FALSE;
-                }
-                break;
-            case 19:
-                break;
             case 0:
             case 1:
             case 2:
@@ -423,8 +424,6 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
             case 15:
             case 16:
             case 17:
-                running = FALSE;
-                break;
             default:
                 running = FALSE;
                 break;
