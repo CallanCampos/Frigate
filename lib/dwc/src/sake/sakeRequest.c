@@ -1,13 +1,66 @@
 #include "sake_internal.h"
 
-// How an answer from the storage server is taken in, and how a request becomes a message: the server names its
-// error in the answer's result element, and every message starts with the game's ID, secret key and login ticket. With
-// sake_post.c it is GameSpy's sakeRequest.c, whose names it has where the code shows them.
+// A request to the storage server: making and freeing it, taking in the server's answer, and writing and posting its
+// message. The server names its error in the answer's result element, and every message starts with the game's ID,
+// secret key and login ticket. The file and the names in it are GameSpy's own, as its sakeRequest.c (UniSpySDK) has
+// them: its eight functions are sakeRequest.c's, in its order, from sakeiInitRequest to sakeiStartRequest, and its data
+// starts with sakeRequest.c's namespace table GSI_SAKE_SERVICE_NAMESPACES. The ROM doesn't name the file.
 
+static SAKERequestResult sakeiCheckHttpResult(GHTTPResult status);
 static SAKERequestResult sakeiCheckSakeResult(const char *name);
+static void sakeiSoapCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData);
+static SAKEStartRequestResult sakeiSetupRequest(SAKERequest request);
+static void sakeiExecuteRequest(SAKERequest request);
 
 // The declaration of the message's namespace
 static const char *GSI_SAKE_SERVICE_NAMESPACES[] = { "ns1=\"http://gamespy.net/sake\"" };
+
+// The URL of the storage server, which the Wi-Fi library sets up (in gdb.c) once it knows the server it uses
+char sakeiSoapUrl[128];
+
+SAKERequest sakeiInitRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
+                             void *userData) {
+    SAKERequest request;
+
+    sake->mStartRequestResult = 0;
+    if (input == NULL) {
+        sake->mStartRequestResult = SAKEStartRequestResult_BAD_INPUT;
+        return NULL;
+    }
+    if (!sake->mIsGameAuthenticated || !sake->mIsProfileAuthenticated) {
+        sake->mStartRequestResult = SAKEStartRequestResult_NOT_AUTHENTICATED;
+        return NULL;
+    }
+    request = gsimalloc(sizeof(struct SAKERequestInternal));
+    if (request == NULL) {
+        sake->mStartRequestResult = SAKEStartRequestResult_OUT_OF_MEMORY;
+        return NULL;
+    }
+    memset(request, 0, sizeof(struct SAKERequestInternal));
+    request->mSake = sake;
+    request->mType = kind;
+    request->mInput = input;
+    request->mCallback = callback;
+    request->mUserData = userData;
+    return request;
+}
+
+void sakeiFreeRequest(SAKERequest request) {
+    gsifree(request);
+}
+
+static SAKERequestResult sakeiCheckHttpResult(GHTTPResult status) {
+    switch (status) {
+    case 0:
+        return SAKERequestResult_SUCCESS;
+    case 1:
+        return SAKERequestResult_OUT_OF_MEMORY;
+    case 0x12:
+        return SAKERequestResult_CANCELED;
+    default:
+        return SAKERequestResult_CONNECTION_ERROR;
+    }
+}
 
 static SAKERequestResult sakeiCheckSakeResult(const char *name) {
     if (strcmp(name, "Success") == 0) {
@@ -67,7 +120,7 @@ static SAKERequestResult sakeiCheckSakeResult(const char *name) {
     return SAKERequestResult_UNKNOWN_ERROR;
 }
 
-void sakeiSoapCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
+static void sakeiSoapCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
     SAKERequest request = userData;
     char result[0x20];
     void *output = NULL;
@@ -108,7 +161,7 @@ void sakeiSoapCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStream
     sakeiFreeRequest(request);
 }
 
-SAKEStartRequestResult sakeiSetupRequest(SAKERequest request) {
+static SAKEStartRequestResult sakeiSetupRequest(SAKERequest request) {
     SAKEIRequestInfo *type = request->mInfo;
     int error;
 
@@ -135,5 +188,32 @@ SAKEStartRequestResult sakeiSetupRequest(SAKERequest request) {
     }
     gsXmlWriteCloseTag(request->mSoapRequest, "ns1", request->mInfo->mFuncName);
     gsXmlCloseWriter(request->mSoapRequest);
+    return 0;
+}
+
+static void sakeiExecuteRequest(SAKERequest request) {
+    GSSoapTask *http;
+
+    if (sakeiSoapUrl[0] == '\0') {
+        OS_SNPrintf(sakeiSoapUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+                    request->mSake->mGameName);
+    }
+    http = gsiExecuteSoap(sakeiSoapUrl, request->mInfo->mSoapAction, request->mSoapRequest, sakeiSoapCallback, request);
+    if (http != NULL) {
+        request->mInfo->http = http->mCoreTask;
+    } else {
+        request->mInfo->http = NULL;
+    }
+}
+
+SAKEStartRequestResult sakeiStartRequest(SAKERequest request, SAKEIRequestInfo *type) {
+    int error;
+
+    request->mInfo = type;
+    error = sakeiSetupRequest(request);
+    if (error != 0) {
+        return error;
+    }
+    sakeiExecuteRequest(request);
     return 0;
 }

@@ -4,12 +4,12 @@
 #include "dwc/nonport.h"
 
 // GameSpy's Sake, the online record storage that Nintendo's Wi-Fi Connection games keep their ranking data in, in
-// overlay 260 (sake.c). It posts SOAP requests to a game's tables on the storage server and calls a function back with
-// the answer. The ROM names five of its calls in the texts of gdb.c ("sakeStartup failed", "sakeCreateRecord failed"
-// and the likewise for "sakeUpdateRecord", "sakeGetMyRecords" and "sakeGetSpecificRecords"); the rest are
-// GameSpy's own, as its sake.h and sakeMain.c have them, where the code shows them, and ours elsewhere. The ROM's texts
-// name the types of a field's value (`byteValue`, `asciiStringValue`...) and the requests (`CreateRecord`,
-// `SearchForRecords`...)
+// overlay 260 (sakeMain.c and sakeRequest*.c). It posts SOAP requests to a game's tables on the storage server and
+// calls a function back with the answer. The ROM names five of its calls in the texts of gdb.c ("sakeStartup failed",
+// "sakeCreateRecord failed" and the likewise for "sakeUpdateRecord", "sakeGetMyRecords" and "sakeGetSpecificRecords");
+// the rest are GameSpy's own, as its sake.h and sakeMain.c have them, where the code shows them, and ours elsewhere.
+// The ROM's texts name the types of a field's value (`byteValue`, `asciiStringValue`...) and the requests
+// (`CreateRecord`, `SearchForRecords`...)
 
 typedef struct SAKEInternal *SAKE;
 typedef struct SAKERequestInternal *SAKERequest;
@@ -133,7 +133,7 @@ typedef struct {
     SAKEField **mRecords;
 } SAKEGetSpecificRecordsOutput;
 
-// What the callback is given: sake_error.c turns the server's answer text into SUCCESS to TARGET_FILTER_INVALID or
+// What the callback is given: sakeRequest.c turns the server's answer text into SUCCESS to TARGET_FILTER_INVALID or
 // UNKNOWN_ERROR, and the HTTP client's result into SUCCESS, OUT_OF_MEMORY, CANCELED or CONNECTION_ERROR. CANCELED is
 // BW2's own, after GameSpy's results; its name is ours
 typedef enum {

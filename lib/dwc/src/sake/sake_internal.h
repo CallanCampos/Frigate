@@ -5,8 +5,8 @@
 #include "dwc/sake.h"
 #include "dwc/soap.h"
 
-// The parts of Sake that its files share (sake.c, sake_error.c, sakeRequestModify.c and sakeRequestRead.c): a request,
-// and the description of each kind of request that tells how to check, write and read it
+// The parts of Sake that its files share (sakeMain.c, sakeRequest.c, sakeRequestModify.c and sakeRequestRead.c): a
+// request, and the description of each kind of request that tells how to check, write and read it
 
 // The kinds of request; the Sake has calls for CREATE_RECORD, UPDATE_RECORD, GET_MY_RECORDS and GET_SPECIFIC_RECORDS
 typedef enum {
@@ -86,14 +86,12 @@ struct SAKEIRequestInfo {
     GSTask *http;
 };
 
-// sake.c
+// sakeRequest.c
+SAKERequest sakeiInitRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
+                             void *userData);
 void sakeiFreeRequest(SAKERequest request);
-SAKERequestResult sakeiCheckHttpResult(GHTTPResult status);
-// sake_error.c
-void sakeiSoapCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData);
-SAKEStartRequestResult sakeiSetupRequest(SAKERequest request);
-// sakeRequestModify.c
 SAKEStartRequestResult sakeiStartRequest(SAKERequest request, SAKEIRequestInfo *type);
+// sakeRequestModify.c
 SAKEStartRequestResult sakeiStartCreateRecordRequest(SAKERequest request);
 SAKEStartRequestResult sakeiStartUpdateRecordRequest(SAKERequest request);
 // sakeRequestRead.c

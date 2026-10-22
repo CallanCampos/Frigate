@@ -1,12 +1,10 @@
 #include "sake_internal.h"
 
 // The Sake itself: setting it up for a game and a player, starting the requests, and the URLs of the file server.
-// The names are GameSpy's own, as its sakeMain.c has them (the ROM keeps the texts of "sakeStartup",
-// "sakeCreateRecord", "sakeUpdateRecord", "sakeGetMyRecords" and "sakeGetSpecificRecords"); the last three functions,
-// sakeiInitRequest, sakeiFreeRequest and sakeiCheckHttpResult, are the first of GameSpy's sakeRequest.c.
+// The file and the names in it are GameSpy's own, as its sakeMain.c (UniSpySDK) has them: its functions are
+// sakeMain.c's, in its order (the ROM keeps the texts of "sakeStartup", "sakeCreateRecord", "sakeUpdateRecord",
+// "sakeGetMyRecords" and "sakeGetSpecificRecords"), and the functions after it are sakeRequest.c's.
 
-static SAKERequest sakeiInitRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
-                                    void *userData);
 static SAKERequest sakeiRunRequest(SAKE sake, void *input, SAKERequestCallback callback, void *userData,
                                    SAKEIRequestType kind, SAKEStartRequestResult (*submit)(SAKERequest request));
 static int Sake_StopHttp(SAKE sake, SAKERequest request);
@@ -154,48 +152,4 @@ gsi_bool sakeGetFileUploadURL(SAKE sake, char *url) {
 
 int Sake_CancelRequest(SAKE sake, SAKERequest request) {
     return Sake_StopHttp(sake, request);
-}
-
-static SAKERequest sakeiInitRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
-                                    void *userData) {
-    SAKERequest request;
-
-    sake->mStartRequestResult = 0;
-    if (input == NULL) {
-        sake->mStartRequestResult = SAKEStartRequestResult_BAD_INPUT;
-        return NULL;
-    }
-    if (!sake->mIsGameAuthenticated || !sake->mIsProfileAuthenticated) {
-        sake->mStartRequestResult = SAKEStartRequestResult_NOT_AUTHENTICATED;
-        return NULL;
-    }
-    request = gsimalloc(sizeof(struct SAKERequestInternal));
-    if (request == NULL) {
-        sake->mStartRequestResult = SAKEStartRequestResult_OUT_OF_MEMORY;
-        return NULL;
-    }
-    memset(request, 0, sizeof(struct SAKERequestInternal));
-    request->mSake = sake;
-    request->mType = kind;
-    request->mInput = input;
-    request->mCallback = callback;
-    request->mUserData = userData;
-    return request;
-}
-
-void sakeiFreeRequest(SAKERequest request) {
-    gsifree(request);
-}
-
-SAKERequestResult sakeiCheckHttpResult(GHTTPResult status) {
-    switch (status) {
-    case 0:
-        return SAKERequestResult_SUCCESS;
-    case 1:
-        return SAKERequestResult_OUT_OF_MEMORY;
-    case 0x12:
-        return SAKERequestResult_CANCELED;
-    default:
-        return SAKERequestResult_CONNECTION_ERROR;
-    }
 }

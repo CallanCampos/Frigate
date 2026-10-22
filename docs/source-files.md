@@ -2332,13 +2332,15 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
-| `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
-| `sake_error.c` | `0x021bc4fc`–`0x021bc7c4` | 3 | complete | descriptive |
-| `sake_post.c` | `0x021bc7c4`–`0x021bc82c` | 2 | complete | descriptive |
+| `sakeMain.c` | `0x021bc218`–`0x021bc478` | 16 | complete | descriptive |
+| `sakeRequest.c` | `0x021bc478`–`0x021bc82c` | 8 | complete | descriptive |
 | `sakeRequestModify.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
 | `sakeRequestRead.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
-| `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
+| `sciInterface.c` | `0x021bda1c`–`0x021bdbdc` | 7 | complete | descriptive |
+| `sciMain.c` | `0x021bdbdc`–`0x021bde88` | 20 | complete | descriptive |
+| `sciReport.c` | `0x021bde88`–`0x021be340` | 14 | complete | descriptive |
+| `sciSerialize.c` | `0x021be340`–`0x021be474` | 4 | complete | descriptive |
 | `sciWebServices.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
 | `AuthService.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |

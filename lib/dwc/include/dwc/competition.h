@@ -5,12 +5,12 @@
 #include "dwc/ghttp.h"
 #include "dwc/nonport.h"
 
-// GameSpy's competition service in overlay 260 (dwc_competition.c and sciWebServices.c), which keeps the results
-// of the Wi-Fi battle competitions. A client makes a session, tells that it will report on it, and submits a report,
-// three requests that post a SOAP message to the service ("CreateSession", "SetReportIntention", "SubmitReport"). The
-// report is a buffer of big-endian numbers that the game builds record by record. The names are GameSpy's own, as its
-// sc.h and sci*.h have them, where the code shows them, and ours elsewhere: the client is one object of an SCInterface
-// whose SCWebServices is laid out in front of its own fields
+// GameSpy's competition service in overlay 260 (sciInterface.c, sciMain.c, sciReport.c, sciSerialize.c and
+// sciWebServices.c), which keeps the results of the Wi-Fi battle competitions. A client makes a session, tells that it
+// will report on it, and submits a report, three requests that post a SOAP message to the service ("CreateSession",
+// "SetReportIntention", "SubmitReport"). The report is a buffer of big-endian numbers that the game builds record by
+// record. The names are GameSpy's own, as its sc.h and sci*.h have them, where the code shows them, and ours elsewhere:
+// the client is one object of an SCInterface whose SCWebServices is laid out in front of its own fields
 
 typedef struct SCInterface SCInterface;
 typedef struct SCIReport SCIReport;

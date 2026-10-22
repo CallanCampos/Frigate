@@ -1464,7 +1464,7 @@ Same instructions, scheduled in another order.
   afresh with `add r2, sp, #0x10`. The same function needs `offset.x = mode == 2 ? 128 : -16;`: as an `if`/`else`,
   the two stores keep `&offset` in a saved register and spill `i * 4`.
 - A swapped scalar serialized through `const u8 *bytes = (const u8 *)&swapped;` and fixed byte stores gives different
-  address scheduling from a cast to a byte-array struct. `dwc_competition.c`'s `sciSerializeInt16` and
+  address scheduling from a cast to a byte-array struct. `sciSerialize.c`'s `sciSerializeInt16` and
   `sciSerializeInt32` match with this character view of the scalar's object representation: the struct copy omits one
   address instruction in the halfword writer and swaps the copy registers in the word writer. Both return `dest +
   sizeof(swapped)`.
@@ -1935,7 +1935,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   as two statements, `work->winV -= 0x100; work->winV++;`, both operations stay, as `btlv_effvm.c`'s
   `BtlvEffvm_WindowTask` needs (an unsigned `1u` mixed in also keeps them apart, but less naturally).
 - An offset local stepped by statements keeps each step the same way, with its starting constant in a register of its
-  own. GameSpy's competition report (`dwc_competition.c`) reaches a player's key with `u32 offset =
+  own. GameSpy's competition report (`sciReport.c`) reaches a player's key with `u32 offset =
   sizeof(SCIReportHeader); offset += index * 0x14; offset += 0x10;`, so `sciReportSetPlayerTeamIndex` adds the 0x10 last
   (`add r0, r3, r4; add r0, #0x10`), and `sciReportSetPlayerConnectionId` builds the buffer field's offset 0x124 from
   the 0x44 it already holds (`add r4, #0xe0`). Written as one expression, `report->mBuffer.mData +
@@ -2006,7 +2006,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
   so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
   its register setters both ways, as the ROM has them. In Thumb both are an `ands` with a pool word.
-- MWCC doesn't propagate constants into a variable of an enum type. `dwc_competition.c`'s `scReportSetPlayerData`
+- MWCC doesn't propagate constants into a variable of an enum type. `sciMain.c`'s `scReportSetPlayerData`
   retains the comparison with 0 before its first player setter only with `SCResult error = SCResult_NO_ERROR;`.
   The [GameSpy SCResult reference](https://documentation.help/GameSpy-SDK/SCResult.html) supplies its names and values.
   A loop that still checks its bound before the
@@ -2916,7 +2916,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2).
 - A loop counted with `!=` tests with `beq` before the loop and `bne` at its end, where `<` gives `bls` and `blo`:
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
-- `dwc_competition.c`'s `scSubmitReport` needs a `u32` counter for its 16-byte digest clear,
+- `sciMain.c`'s `scSubmitReport` needs a `u32` counter for its 16-byte digest clear,
   `for (i = 0x10; i != 0; i--)`: the unsigned form ends with `subs; bne`, while an `int` counter adds `cmp; bgt`.
   Changing only the signed loop to `do`/`while` does not recover the original test.
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
@@ -3631,7 +3631,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `static` or global, sized or not, declared earlier or not. A table right before its own strings in the middle of a
   file's `.data` is therefore the first data of another original file. Overlay 260's `SC_SERVICE_NAMESPACES` is
   before its namespace string, after `sciSerializeGUID`'s literals: it starts `sciWebServices.c`, from `sciWsInit`
-  on, with the table above the file's first function, and the overlay links only when `dwc_competition.c` is split there.
+  on, with the table above the file's first function, and the overlay links only when `sciSerialize.c` ends there.
 - The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its
   call, and a run of strings with no padding between them is a set of arrays. The function matches either way, but

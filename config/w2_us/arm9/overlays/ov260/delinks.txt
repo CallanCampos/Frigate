@@ -31,21 +31,16 @@ src/ov260/wifibattlematch_net_fields.c:
     .text       start:0x021bc098 end:0x021bc258
     .data       start:0x021c0124 end:0x021c0790
 
-lib/dwc/src/sake/sake.c:
+lib/dwc/src/sake/sakeMain.c:
     complete
-    .text       start:0x021bc258 end:0x021bc53c
+    .text       start:0x021bc258 end:0x021bc4b8
     .data       start:0x021c0790 end:0x021c0860
     .bss        start:0x021c1ce8 end:0x021c1de8
 
-lib/dwc/src/sake/sake_error.c:
+lib/dwc/src/sake/sakeRequest.c:
     complete
-    .text       start:0x021bc53c end:0x021bc804
-    .data       start:0x021c0860 end:0x021c09d0
-
-lib/dwc/src/sake/sake_post.c:
-    complete
-    .text       start:0x021bc804 end:0x021bc86c
-    .data       start:0x021c09d0 end:0x021c0a18
+    .text       start:0x021bc4b8 end:0x021bc86c
+    .data       start:0x021c0860 end:0x021c0a18
     .bss        start:0x021c1de8 end:0x021c1e68
 
 lib/dwc/src/sake/sakeRequestModify.c:
@@ -64,10 +59,10 @@ lib/dwc/src/sc/dwc_sc.c:
     .data       start:0x021c109c end:0x021c113c
     .bss        start:0x021c1e68 end:0x021c2414
 
-lib/dwc/src/sc/dwc_competition.c:
+lib/dwc/src/sc/sciInterface.c:
     complete
-    .text       start:0x021bda5c end:0x021be4b4
-    .data       start:0x021c113c end:0x021c130c
+    .text       start:0x021bda5c end:0x021bdc1c
+    .data       start:0x021c113c end:0x021c12ec
     .bss        start:0x021c2414 end:0x021c2494
 
 lib/dwc/src/gdb/gdb.c:
@@ -86,3 +81,16 @@ lib/dwc/src/sc/sciWebServices.c:
     complete
     .text       start:0x021be4b4 end:0x021beae0
     .data       start:0x021c130c end:0x021c1554
+
+lib/dwc/src/sc/sciMain.c:
+    complete
+    .text       start:0x021bdc1c end:0x021bdec8
+
+lib/dwc/src/sc/sciReport.c:
+    complete
+    .text       start:0x021bdec8 end:0x021be380
+
+lib/dwc/src/sc/sciSerialize.c:
+    complete
+    .text       start:0x021be380 end:0x021be4b4
+    .data       start:0x021c12ec end:0x021c130c
