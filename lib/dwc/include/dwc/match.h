@@ -33,7 +33,7 @@ typedef struct DWCNodeInfo {
 } DWCNodeInfo;
 
 // Asked how well another machine fits a random match, and the function's work
-typedef int (*DWCEvalFunc)(int index, void *work);
+typedef int (*DWCEvalPlayerCallback)(int index, void *work);
 
 // Starts the friends match control with the user data, the product ID, the secret key of the game, the sizes of the
 // GT2 buffers (0 for 8 KB) and the friend list
@@ -50,21 +50,24 @@ BOOL DWC_UpdateServersAsync(const char *name, DWCUpdateServersCallback callback,
                             DWCDeleteFriendListCallback deleteCallback, void *deleteParam);
 
 // Matching: with the key and number, anybody, or a friend, and the callbacks that tell how it went
-typedef void (*DWCMatchedFunc)(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
-typedef void (*DWCNewClientFunc)(int index, void *param);
+typedef void (*DWCMatchedSCCallback)(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index, void *param);
+typedef void (*DWCNewClientCallback)(int index, void *param);
 typedef BOOL (*DWCAttemptFunc)(void *param);
-BOOL DWC_ConnectToAnybodyAsync(int type, u8 numEntry, const char *query, DWCMatchedFunc matched, void *matchedParam,
-                               DWCNewClientFunc newClient, void *newClientParam, DWCEvalFunc eval, void *evalParam,
-                               DWCAttemptFunc attempt, int *attemptParam, void *param);
-BOOL DWC_SetupGameServer(int type, u8 numEntry, DWCMatchedFunc matched, void *matchedParam, DWCNewClientFunc newClient,
-                         void *newClientParam, DWCAttemptFunc attempt, int *attemptParam, void *param);
-BOOL DWC_ConnectToGameServerAsync(int type, int friendIndex, DWCMatchedFunc matched, void *matchedParam,
-                                  DWCNewClientFunc newClient, void *newClientParam, DWCAttemptFunc attempt,
+BOOL DWC_ConnectToAnybodyAsync(int type, u8 numEntry, const char *query, DWCMatchedSCCallback matched,
+                               void *matchedParam, DWCNewClientCallback newClient, void *newClientParam,
+                               DWCEvalPlayerCallback eval, void *evalParam, DWCAttemptFunc attempt, int *attemptParam,
+                               void *param);
+BOOL DWC_SetupGameServer(int type, u8 numEntry, DWCMatchedSCCallback matched, void *matchedParam,
+                         DWCNewClientCallback newClient, void *newClientParam, DWCAttemptFunc attempt,
+                         int *attemptParam, void *param);
+BOOL DWC_ConnectToGameServerAsync(int type, int friendIndex, DWCMatchedSCCallback matched, void *matchedParam,
+                                  DWCNewClientCallback newClient, void *newClientParam, DWCAttemptFunc attempt,
                                   int *attemptParam, void *param);
 
 // The function called when a connection to another machine has been closed, which FALSE says could not be set
-typedef void (*DWCClosedFunc)(DWCError error, BOOL a1, BOOL a2, u8 netId, int index, void *param);
-BOOL DWC_SetConnectionClosedCallback(DWCClosedFunc func, void *param);
+typedef void (*DWCConnectionClosedCallback)(DWCError error, BOOL isLocal, BOOL isServer, u8 aid, int index,
+                                            void *param);
+BOOL DWC_SetConnectionClosedCallback(DWCConnectionClosedCallback func, void *param);
 // Closes every connection at once: 0 once closing, 1 when there were none (or matching was canceled), -1 when it can't
 int DWC_CloseAllConnectionsHard(void);
 // Closes the connection to a machine at once: 0 once closed, -1 when it can't, -2 for an unknown machine and -3 when

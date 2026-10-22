@@ -49,7 +49,7 @@ static void GSyncDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error
     case DWC_ND_ERROR_CANCELED:
         _pDLWork->cancelled = TRUE;
         break;
-    case ND_ERROR_FATAL:
+    case DWC_ND_ERROR_FATAL:
         GFL_NetErrShowFatal();
         break;
     }

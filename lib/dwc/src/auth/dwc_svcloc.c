@@ -11,28 +11,28 @@
 // ROM embeds no name; the file is named after that request's action
 
 // The service locator's state (0x1c5c bytes)
-typedef struct NasLocator {
-    DWCHttpAlloc alloc;
-    DWCHttpFree free;
+typedef struct DWCSvlIntWorkarea {
+    DWCAuthAlloc alloc;
+    DWCAuthFree free;
     DWCHttp http;
     DWCSvlResult *result;
-} NasLocator;
+} DWCSvlIntWorkarea;
 
-static BOOL DWCi_Svl_ParseResult(void);
+static BOOL DWCi_Svl_ParseHttp(void);
 
-static NasLocator *sLocator;
+static DWCSvlIntWorkarea *sLocator;
 
-BOOL DWC_Svl_Init(DWCHttpAlloc alloc, DWCHttpFree free) {
+BOOL DWC_Svl_Init(DWCAuthAlloc alloc, DWCAuthFree free) {
     if (sLocator != NULL) {
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    sLocator = alloc(0, sizeof(NasLocator));
+    sLocator = alloc(0, sizeof(DWCSvlIntWorkarea));
     if (sLocator == NULL) {
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    MI_CpuFill8(sLocator, 0, sizeof(NasLocator));
+    MI_CpuFill8(sLocator, 0, sizeof(DWCSvlIntWorkarea));
     sLocator->alloc = alloc;
     sLocator->free = free;
     return TRUE;
@@ -48,8 +48,8 @@ void DWC_Svl_Cleanup(void) {
 
 BOOL DWC_Svl_GetTokenAsync(char *service, DWCSvlResult *result) {
     DWCHttpParam config;
-    NasAuthInfo info;
-    NasLocator *locator;
+    DWCCalInfo info;
+    DWCSvlIntWorkarea *locator;
 
     sLocator->result = result;
     MI_CpuFill8(result, 0, sizeof(DWCSvlResult));
@@ -57,22 +57,22 @@ BOOL DWC_Svl_GetTokenAsync(char *service, DWCSvlResult *result) {
         OS_Terminate();
     }
     locator = sLocator;
-    config.url = DWCi_AuthConfig.url;
-    config.action = DWC_HTTP_POST;
-    config.bufferSize = 0x1000;
+    config.url = DWCauthhttpparam.url;
+    config.action = DWCHTTP_POST;
+    config.len_recvbuf = 0x1000;
     config.alloc = locator->alloc;
     config.free = locator->free;
-    if (strcmp(DWCi_AuthConfig.url, "https://nas.nintendowifi.net/ac") != 0) {
-        config.ignoreCa = 1;
+    if (strcmp(DWCauthhttpparam.url, "https://nas.nintendowifi.net/ac") != 0) {
+        config.ignoreca = 1;
     } else {
-        config.ignoreCa = 0;
+        config.ignoreca = 0;
     }
     config.timeout = 20000;
     if (DWC_Http_Create(&locator->http, &config) != 0) {
         DWCi_SetError(9, -24100);
         return FALSE;
     }
-    if (!DWCi_Auth_GetCurrentInfo(&info) || !DWCi_Auth_AddCommonItems(&sLocator->http, &info, 0)) {
+    if (!DWC_Auth_GetCalInfoFromNVRAM(&info) || !DWC_Auth_SetCalInfoToHttp(&sLocator->http, &info, 0)) {
         DWC_Http_Destroy(&sLocator->http);
         DWCi_SetError(9, -24100);
         return FALSE;
@@ -105,9 +105,9 @@ DWCSvlState DWC_Svl_Process(void) {
         return 1;
     }
     if (OS_IsThreadTerminated(&sLocator->http.thread) == 1) {
-        switch (sLocator->http.result) {
+        switch (sLocator->http.error) {
         case 8:
-            if (DWCi_Svl_ParseResult() == 0) {
+            if (DWCi_Svl_ParseHttp() == 0) {
                 DWC_Http_Destroy(&sLocator->http);
                 return 4;
             }
@@ -125,7 +125,7 @@ DWCSvlState DWC_Svl_Process(void) {
     return 2;
 }
 
-static BOOL DWCi_Svl_ParseResult(void) {
+static BOOL DWCi_Svl_ParseHttp(void) {
     DWCHttp *http = &sLocator->http;
     char text[4];
     const char *date;

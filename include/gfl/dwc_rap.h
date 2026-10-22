@@ -32,7 +32,7 @@ void DWCRap_SetRequestFunc(DWCRapRequestFunc func);
 // Starts matching with whoever has the same key, as numEntry machines
 BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3);
 // Starts a match of numEntry machines on a query, with a function that rates the candidates
-BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFunc, void *evalWork);
+BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalPlayerCallback evalFunc, void *evalWork);
 // Runs the connection for a frame
 int DWCRap_Process(int a0);
 // Sends data to the other machines, as a packet of the type

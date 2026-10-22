@@ -9,21 +9,22 @@
 // DWC's connection test (overlay 11, Thumb): it reaches the test server, logs in to the Nintendo server when the
 // console has no Wi-Fi ID yet, and answers a hotspot's login page through the server ("HotSpotResponse" and "parse").
 // The ROM embeds no name; the file is named after the test server it reaches ("http://conntest.nintendowifi.net/"),
-// and its globals' names are ours. The thread's error exits are written as ctrl-cheeb-del/pokeheartgold writes
-// NitroDWC's connection test
+// and its globals' names are NitroDWC's own, as its libraries' symbols and ntrtwl's reconstruction of NitroDWC have
+// them where the code shows them, and ours elsewhere. The thread's error exits are written as
+// ctrl-cheeb-del/pokeheartgold writes NitroDWC's connection test
 
 // The work of the connection test (0x11f4 bytes), whose first 0x1000 bytes are the stack of its thread
-typedef struct NasPrWork {
+typedef struct DWCNetcheck {
     u8 stack[0x1000];
-    int state;
-    int result;
-    u8 unk_1008[0x100];
-    DWCNetcheckParam memFuncs;
-    char *redirectUrl;
-    char *hotspotUrl;
+    int error;
+    int returncode;
+    u8 http_labelvalue[0x100];
+    DWCNetcheckParam param;
+    char *body_302;
+    char *body_wayport;
     OSThread thread;
-    OSMutex lock;
-} NasPrWork;
+    OSMutex mutex;
+} DWCNetcheck;
 
 static void DWCi_Netcheck_StartThread(void);
 static void DWCi_Netcheck_Thread(void *arg);
@@ -40,9 +41,9 @@ static struct {
 CPSInAddr DWCi_ConnTestIp;
 // The test's HTTP client
 DWCHttp *DWCi_ConnTestHttp;
-BOOL DWCi_SendSsid;
+BOOL DWCishotspot;
 // The test's work
-NasPrWork *DWCi_ConnTestWork;
+DWCNetcheck *DWCi_ConnTestWork;
 // 4 bytes, and 0x18 bytes below, that only code the linker stripped reads
 int DWCi_ConnTestUnk08;
 // Whether a redirect (302) counts as reaching the network, which nothing sets (the SDK's DWC_Netcheck_SetAllow302)
@@ -53,18 +54,18 @@ DWCHttpParam DWCi_ConnTestConfig;
 DWCAuthParam DWCi_ConnTestInit;
 
 DWCNetcheckError DWC_Netcheck_Create(DWCNetcheckParam *init) {
-    DWCHttpAlloc alloc = init->alloc;
+    DWCAuthAlloc alloc = init->alloc;
 
     if (DWCi_ConnTestWork != NULL) {
         return 4;
     }
-    DWCi_ConnTestWork = alloc(0, sizeof(NasPrWork));
+    DWCi_ConnTestWork = alloc(0, sizeof(DWCNetcheck));
     if (DWCi_ConnTestWork == NULL) {
         return 4;
     }
-    MI_CpuFill8(DWCi_ConnTestWork, 0, sizeof(NasPrWork));
-    DWCi_ConnTestWork->result = -99999;
-    DWCi_ConnTestWork->memFuncs = *init;
+    MI_CpuFill8(DWCi_ConnTestWork, 0, sizeof(DWCNetcheck));
+    DWCi_ConnTestWork->returncode = -99999;
+    DWCi_ConnTestWork->param = *init;
     if (DWCi_ConnTestHttp != NULL) {
         return 4;
     }
@@ -72,14 +73,14 @@ DWCNetcheckError DWC_Netcheck_Create(DWCNetcheckParam *init) {
     if (DWCi_ConnTestHttp == NULL) {
         return 4;
     }
-    DWCi_SendSsid = 0;
-    OS_InitMutex(&DWCi_ConnTestWork->lock);
+    DWCishotspot = 0;
+    OS_InitMutex(&DWCi_ConnTestWork->mutex);
     DWCi_Netcheck_StartThread();
     return 0;
 }
 
 void DWC_Netcheck_Destroy(void) {
-    DWCHttpFree free = DWCi_ConnTestWork->memFuncs.free;
+    DWCAuthFree free = DWCi_ConnTestWork->param.free;
 
     if (DWCi_ConnTestHttp != NULL) {
         DWC_Http_Destroy(DWCi_ConnTestHttp);
@@ -88,13 +89,13 @@ void DWC_Netcheck_Destroy(void) {
     }
     DWC_Auth_Destroy();
     if (DWCi_ConnTestWork != NULL) {
-        if (DWCi_ConnTestWork->redirectUrl != NULL) {
-            free(0, DWCi_ConnTestWork->redirectUrl, 0);
-            DWCi_ConnTestWork->redirectUrl = NULL;
+        if (DWCi_ConnTestWork->body_302 != NULL) {
+            free(0, DWCi_ConnTestWork->body_302, 0);
+            DWCi_ConnTestWork->body_302 = NULL;
         }
-        if (DWCi_ConnTestWork->hotspotUrl != NULL) {
-            free(0, DWCi_ConnTestWork->hotspotUrl, 0);
-            DWCi_ConnTestWork->hotspotUrl = NULL;
+        if (DWCi_ConnTestWork->body_wayport != NULL) {
+            free(0, DWCi_ConnTestWork->body_wayport, 0);
+            DWCi_ConnTestWork->body_wayport = NULL;
         }
         free(0, DWCi_ConnTestWork, 0);
         DWCi_ConnTestWork = NULL;
@@ -110,21 +111,21 @@ void DWC_Netcheck_Abort(void) {
         if (DWCi_ConnTestWork->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestWork->thread)) {
             OS_JoinThread(&DWCi_ConnTestWork->thread);
         }
-        DWCi_ConnTestWork->result = -7;
+        DWCi_ConnTestWork->returncode = -7;
     }
 }
 
 DWCNetcheckError DWC_Netcheck_GetError(void) {
     int state;
 
-    OS_LockMutex(&DWCi_ConnTestWork->lock);
-    state = DWCi_ConnTestWork->state;
-    OS_UnlockMutex(&DWCi_ConnTestWork->lock);
+    OS_LockMutex(&DWCi_ConnTestWork->mutex);
+    state = DWCi_ConnTestWork->error;
+    OS_UnlockMutex(&DWCi_ConnTestWork->mutex);
     return state;
 }
 
 int DWC_Netcheck_GetReturnCode(void) {
-    return DWCi_ConnTestWork->result;
+    return DWCi_ConnTestWork->returncode;
 }
 
 static void DWCi_Netcheck_StartThread(void) {
@@ -136,8 +137,8 @@ static void DWCi_Netcheck_StartThread(void) {
 }
 
 static void DWCi_Netcheck_Thread(void *arg) {
-    DWCHttpAlloc alloc = DWCi_ConnTestWork->memFuncs.alloc;
-    DWCHttpFree free = DWCi_ConnTestWork->memFuncs.free;
+    DWCAuthAlloc alloc = DWCi_ConnTestWork->param.alloc;
+    DWCAuthFree free = DWCi_ConnTestWork->param.free;
     char *url = NULL;
     char *data = NULL;
     char *waitText = NULL;
@@ -149,18 +150,18 @@ static void DWCi_Netcheck_Thread(void *arg) {
     int returnCode;
     char returnText[4];
     char *location;
-    DWCBmWifiIdInfo userInfo;
-    NasAuthInfo info;
+    DWCWiFiInfo userInfo;
+    DWCCalInfo info;
     DWCAuthResult nasStatus;
 
     for (;;) {
         DWCi_ConnTestConfig.url = sConnTest.url;
-        DWCi_ConnTestConfig.action = DWC_HTTP_GET;
-        DWCi_ConnTestConfig.bufferSize = 0x1000;
+        DWCi_ConnTestConfig.action = DWCHTTP_GET;
+        DWCi_ConnTestConfig.len_recvbuf = 0x1000;
         DWCi_ConnTestConfig.alloc = alloc;
         DWCi_ConnTestConfig.free = free;
         DWCi_ConnTestConfig.timeout = 20000;
-        DWCi_ConnTestWork->result = -2;
+        DWCi_ConnTestWork->returncode = -2;
         if (DWC_Http_Create(DWCi_ConnTestHttp, &DWCi_ConnTestConfig) != 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(1);
@@ -175,13 +176,13 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
             OS_JoinThread(&DWCi_ConnTestHttp->thread);
         }
-        if (DWCi_ConnTestHttp->result == 2) {
-            DWCi_ConnTestWork->result = -1;
+        if (DWCi_ConnTestHttp->error == 2) {
+            DWCi_ConnTestWork->returncode = -1;
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
         }
-        if (DWCi_ConnTestHttp->result != 8) {
+        if (DWCi_ConnTestHttp->error != 8) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
@@ -197,27 +198,27 @@ static void DWCi_Netcheck_Thread(void *arg) {
             goto done;
         }
         if (status == 200) {
-            DWCi_ConnTestIp = DWCi_ConnTestHttp->ip;
+            DWCi_ConnTestIp = DWCi_ConnTestHttp->hostip;
         } else if (status == 302) {
-            DWCi_SendSsid = 1;
-            if (DWCi_ConnTestWork->hotspotUrl != NULL) {
-                DWCi_ConnTestWork->result = -6;
+            DWCishotspot = 1;
+            if (DWCi_ConnTestWork->body_wayport != NULL) {
+                DWCi_ConnTestWork->returncode = -6;
                 DWC_Http_Destroy(DWCi_ConnTestHttp);
-                DWCi_ConnTestConfig.url = DWCi_AuthConfig.url;
-                DWCi_ConnTestConfig.action = DWC_HTTP_POST;
-                DWCi_ConnTestConfig.bufferSize = 0x200;
+                DWCi_ConnTestConfig.url = DWCauthhttpparam.url;
+                DWCi_ConnTestConfig.action = DWCHTTP_POST;
+                DWCi_ConnTestConfig.len_recvbuf = 0x200;
                 DWCi_ConnTestConfig.alloc = alloc;
                 DWCi_ConnTestConfig.free = free;
                 DWCi_ConnTestConfig.timeout = 20000;
-                if (strcmp(DWCi_AuthConfig.url, "https://nas.nintendowifi.net/ac") != 0) {
-                    DWCi_ConnTestConfig.ignoreCa = 1;
+                if (strcmp(DWCauthhttpparam.url, "https://nas.nintendowifi.net/ac") != 0) {
+                    DWCi_ConnTestConfig.ignoreca = 1;
                 }
                 if (DWC_Http_Create(DWCi_ConnTestHttp, &DWCi_ConnTestConfig) != 0) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(1);
                     goto done;
                 }
-                if (!DWCi_Auth_GetCurrentInfo(&info) || !DWCi_Auth_AddCommonItems(DWCi_ConnTestHttp, &info, 1)) {
+                if (!DWC_Auth_GetCalInfoFromNVRAM(&info) || !DWC_Auth_SetCalInfoToHttp(DWCi_ConnTestHttp, &info, 1)) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(8);
                     goto done;
@@ -227,14 +228,14 @@ static void DWCi_Netcheck_Thread(void *arg) {
                     DWCi_Netcheck_SetError(8);
                     goto done;
                 }
-                if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HotSpotResponse", DWCi_ConnTestWork->hotspotUrl,
-                                                strlen(DWCi_ConnTestWork->hotspotUrl)) != 0) {
+                if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HotSpotResponse", DWCi_ConnTestWork->body_wayport,
+                                                strlen(DWCi_ConnTestWork->body_wayport)) != 0) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(8);
                     goto done;
                 }
-                free(0, DWCi_ConnTestWork->hotspotUrl, 0);
-                DWCi_ConnTestWork->hotspotUrl = NULL;
+                free(0, DWCi_ConnTestWork->body_wayport, 0);
+                DWCi_ConnTestWork->body_wayport = NULL;
                 if (DWC_Http_FinishHeader(DWCi_ConnTestHttp) != 0) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(1);
@@ -244,9 +245,9 @@ static void DWCi_Netcheck_Thread(void *arg) {
                 if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
                     OS_JoinThread(&DWCi_ConnTestHttp->thread);
                 }
-                if (DWCi_ConnTestHttp->result == 2) {
-                    DWCi_ConnTestWork->result = -1;
-                } else if (DWCi_ConnTestHttp->result == 8) {
+                if (DWCi_ConnTestHttp->error == 2) {
+                    DWCi_ConnTestWork->returncode = -1;
+                } else if (DWCi_ConnTestHttp->error == 8) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(7);
                     goto done;
@@ -255,19 +256,19 @@ static void DWCi_Netcheck_Thread(void *arg) {
                 DWCi_Netcheck_SetError(3);
                 goto done;
             } else {
-                location = DWCi_ConnTestHttp->response.start;
+                location = DWCi_ConnTestHttp->rep.buffer;
                 if (location == NULL) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(2);
                     goto done;
                 }
-                DWCi_ConnTestWork->redirectUrl = alloc(0, strlen(location) + 1);
-                if (DWCi_ConnTestWork->redirectUrl == NULL) {
+                DWCi_ConnTestWork->body_302 = alloc(0, strlen(location) + 1);
+                if (DWCi_ConnTestWork->body_302 == NULL) {
                     DWC_Http_Destroy(DWCi_ConnTestHttp);
                     DWCi_Netcheck_SetError(4);
                     goto done;
                 }
-                strncpy(DWCi_ConnTestWork->redirectUrl, location, strlen(location) + 1);
+                strncpy(DWCi_ConnTestWork->body_302, location, strlen(location) + 1);
             }
         } else {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
@@ -275,13 +276,13 @@ static void DWCi_Netcheck_Thread(void *arg) {
             goto done;
         }
         DWC_Http_Destroy(DWCi_ConnTestHttp);
-        DWCBm_GetWifiIdInfo(&userInfo);
-        if (userInfo.id == 0) {
-            DWCi_ConnTestWork->result = -3;
+        DWCi_BM_GetWiFiInfo(&userInfo);
+        if (userInfo.attestedUserId == 0) {
+            DWCi_ConnTestWork->returncode = -3;
             DWCi_ConnTestInit.ingamesn[0] = 0;
             DWCi_ConnTestInit.gsbrcd[0] = 0;
-            DWCi_ConnTestInit.alloc = DWCi_ConnTestWork->memFuncs.alloc;
-            DWCi_ConnTestInit.free = DWCi_ConnTestWork->memFuncs.free;
+            DWCi_ConnTestInit.alloc = DWCi_ConnTestWork->param.alloc;
+            DWCi_ConnTestInit.free = DWCi_ConnTestWork->param.free;
             if (DWC_Auth_Create(&DWCi_ConnTestInit, DWCi_ConnTestHttp) != 0) {
                 DWCi_Netcheck_SetError(5);
                 goto done;
@@ -289,17 +290,17 @@ static void DWCi_Netcheck_Thread(void *arg) {
             DWC_Auth_Join();
             if (DWC_Auth_GetError() != 0x15) {
                 if (DWC_Auth_GetError() == 9) {
-                    nasStatus.returnCode = -1;
+                    nasStatus.returncode = -1;
                 } else {
                     DWC_Auth_GetResult(&nasStatus);
-                    if (DWCi_ConnTestAllow302 == 1 && (nasStatus.returnCode == -23302 || DWC_Auth_GetError() == 0xb)) {
-                        DWCi_ConnTestWork->result = 0;
+                    if (DWCi_ConnTestAllow302 == 1 && (nasStatus.returncode == -23302 || DWC_Auth_GetError() == 0xb)) {
+                        DWCi_ConnTestWork->returncode = 0;
                         DWC_Auth_Destroy();
                         DWCi_Netcheck_SetError(0xb);
                         goto done;
                     }
                 }
-                DWCi_ConnTestWork->result = nasStatus.returnCode;
+                DWCi_ConnTestWork->returncode = nasStatus.returncode;
                 DWC_Auth_Destroy();
                 DWCi_Netcheck_SetError(6);
                 goto done;
@@ -307,39 +308,39 @@ static void DWCi_Netcheck_Thread(void *arg) {
             DWC_Auth_Destroy();
         }
         if (status == 200) {
-            DWCi_ConnTestWork->result = 0;
+            DWCi_ConnTestWork->returncode = 0;
             DWCi_Netcheck_SetError(0xb);
             goto done;
         }
-        DWCi_ConnTestWork->result = -4;
-        DWCi_ConnTestConfig.url = DWCi_AuthConfig.url;
-        DWCi_ConnTestConfig.action = DWC_HTTP_POST;
-        DWCi_ConnTestConfig.bufferSize = 0x1000;
+        DWCi_ConnTestWork->returncode = -4;
+        DWCi_ConnTestConfig.url = DWCauthhttpparam.url;
+        DWCi_ConnTestConfig.action = DWCHTTP_POST;
+        DWCi_ConnTestConfig.len_recvbuf = 0x1000;
         DWCi_ConnTestConfig.alloc = alloc;
         DWCi_ConnTestConfig.free = free;
         DWCi_ConnTestConfig.timeout = 40000;
-        if (strcmp(DWCi_AuthConfig.url, "https://nas.nintendowifi.net/ac") != 0) {
-            DWCi_ConnTestConfig.ignoreCa = 1;
+        if (strcmp(DWCauthhttpparam.url, "https://nas.nintendowifi.net/ac") != 0) {
+            DWCi_ConnTestConfig.ignoreca = 1;
         }
         if (DWC_Http_Create(DWCi_ConnTestHttp, &DWCi_ConnTestConfig) != 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(1);
             goto done;
         }
-        if (!DWCi_Auth_GetCurrentInfo(&info) || !DWCi_Auth_AddCommonItems(DWCi_ConnTestHttp, &info, 1) ||
+        if (!DWC_Auth_GetCalInfoFromNVRAM(&info) || !DWC_Auth_SetCalInfoToHttp(DWCi_ConnTestHttp, &info, 1) ||
             DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "action", "parse", 5) != 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(8);
             goto done;
         }
-        if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HTML", DWCi_ConnTestWork->redirectUrl,
-                                        strlen(DWCi_ConnTestWork->redirectUrl)) != 0) {
+        if (DWC_Http_Add_PostBase64Item(DWCi_ConnTestHttp, "HTML", DWCi_ConnTestWork->body_302,
+                                        strlen(DWCi_ConnTestWork->body_302)) != 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(8);
             goto done;
         }
-        free(0, DWCi_ConnTestWork->redirectUrl, 0);
-        DWCi_ConnTestWork->redirectUrl = NULL;
+        free(0, DWCi_ConnTestWork->body_302, 0);
+        DWCi_ConnTestWork->body_302 = NULL;
         if (DWC_Http_FinishHeader(DWCi_ConnTestHttp) != 0) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(1);
@@ -349,9 +350,9 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
             OS_JoinThread(&DWCi_ConnTestHttp->thread);
         }
-        status = DWCi_ConnTestHttp->result;
+        status = DWCi_ConnTestHttp->error;
         if (status == 2) {
-            DWCi_ConnTestWork->result = -1;
+            DWCi_ConnTestWork->returncode = -1;
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
@@ -359,7 +360,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (status == 3) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             if (DWCi_ConnTestAllow302 == 1) {
-                DWCi_ConnTestWork->result = 0;
+                DWCi_ConnTestWork->returncode = 0;
                 DWCi_Netcheck_SetError(0xb);
             } else {
                 DWCi_Netcheck_SetError(3);
@@ -385,7 +386,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (status != 200) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             if (DWCi_ConnTestAllow302 == 1 && status == 302) {
-                DWCi_ConnTestWork->result = 0;
+                DWCi_ConnTestWork->returncode = 0;
                 DWCi_Netcheck_SetError(0xb);
             } else {
                 DWCi_Netcheck_SetError(2);
@@ -404,7 +405,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
             goto done;
         }
         if (DWCi_ConnTestAllow302 == 1 && returnCode == 0x72) {
-            DWCi_ConnTestWork->result = 0;
+            DWCi_ConnTestWork->returncode = 0;
             DWCi_Netcheck_SetError(0xb);
             goto done;
         }
@@ -481,10 +482,10 @@ static void DWCi_Netcheck_Thread(void *arg) {
             }
         }
         DWC_Http_Destroy(DWCi_ConnTestHttp);
-        DWCi_ConnTestWork->result = -5;
+        DWCi_ConnTestWork->returncode = -5;
         DWCi_ConnTestConfig.url = url;
-        DWCi_ConnTestConfig.action = DWC_HTTP_POST;
-        DWCi_ConnTestConfig.bufferSize = 0x1000;
+        DWCi_ConnTestConfig.action = DWCHTTP_POST;
+        DWCi_ConnTestConfig.len_recvbuf = 0x1000;
         DWCi_ConnTestConfig.alloc = alloc;
         DWCi_ConnTestConfig.free = free;
         DWCi_ConnTestConfig.timeout = 120000;
@@ -507,13 +508,13 @@ static void DWCi_Netcheck_Thread(void *arg) {
         if (DWCi_ConnTestHttp->thread.id != 0 && !OS_IsThreadTerminated(&DWCi_ConnTestHttp->thread)) {
             OS_JoinThread(&DWCi_ConnTestHttp->thread);
         }
-        if (DWCi_ConnTestHttp->result == 2) {
-            DWCi_ConnTestWork->result = -1;
+        if (DWCi_ConnTestHttp->error == 2) {
+            DWCi_ConnTestWork->returncode = -1;
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
         }
-        if (DWCi_ConnTestHttp->result != 8) {
+        if (DWCi_ConnTestHttp->error != 8) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(3);
             goto done;
@@ -523,19 +524,19 @@ static void DWCi_Netcheck_Thread(void *arg) {
             DWCi_Netcheck_SetError(2);
             goto done;
         }
-        location = DWCi_ConnTestHttp->response.start;
+        location = DWCi_ConnTestHttp->rep.buffer;
         if (location == NULL) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(2);
             goto done;
         }
-        DWCi_ConnTestWork->hotspotUrl = alloc(0, strlen(location) + 1);
-        if (DWCi_ConnTestWork->hotspotUrl == NULL) {
+        DWCi_ConnTestWork->body_wayport = alloc(0, strlen(location) + 1);
+        if (DWCi_ConnTestWork->body_wayport == NULL) {
             DWC_Http_Destroy(DWCi_ConnTestHttp);
             DWCi_Netcheck_SetError(4);
             goto done;
         }
-        strncpy(DWCi_ConnTestWork->hotspotUrl, location, strlen(location) + 1);
+        strncpy(DWCi_ConnTestWork->body_wayport, location, strlen(location) + 1);
         DWC_Http_Destroy(DWCi_ConnTestHttp);
         OS_Sleep(waitMs);
     }
@@ -552,9 +553,9 @@ done:
 }
 
 static void DWCi_Netcheck_SetError(int state) {
-    OS_LockMutex(&DWCi_ConnTestWork->lock);
-    DWCi_ConnTestWork->state = state;
-    OS_UnlockMutex(&DWCi_ConnTestWork->lock);
+    OS_LockMutex(&DWCi_ConnTestWork->mutex);
+    DWCi_ConnTestWork->error = state;
+    OS_UnlockMutex(&DWCi_ConnTestWork->mutex);
 }
 
 // Stands for the code that the linker stripped: nothing calls it, so MWCC doesn't emit it, and reading

@@ -18,13 +18,13 @@ struct DWCUtilList {
     DWCUtilNode tail;
 };
 
-DWCUtilList *DWCUtilList_Create(void);
-void DWCUtilList_Destroy(DWCUtilList *list);
-void DWCUtilList_Remove(void *node);
+DWCUtilList *DWCi_LSTlForm(void);
+void DWCi_LSTlDelete(DWCUtilList *list);
+void DWCi_LSTlErase(void *node);
 // Links the node in before position
-void DWCUtilList_InsertBefore(void *position, void *node);
+void DWCi_LSTlInsert(void *position, void *node);
 // Links the node in last, or first
-void DWCUtilList_Append(DWCUtilList *list, void *node);
-void DWCUtilList_Prepend(DWCUtilList *list, void *node);
+void DWCi_LSTlPushBack(DWCUtilList *list, void *node);
+void DWCi_LSTlPushFront(DWCUtilList *list, void *node);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_LIST_H

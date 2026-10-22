@@ -4,15 +4,15 @@
 
 #include "dwc/ac.h"
 
-static int DWCAc_StepWcmTeardown(void);
-static BOOL DWCAc_StepSocTeardown(void);
+static int DisConnectAP(void);
+static BOOL CloseSocket(void);
 
 // Steps the teardown whose state is *state. Up to 10 is the wireless manager's, brought down to idle by
-// DWCAc_StepWcmTeardown; from 0xb to 0x11 the sockets are brought down first, by DWCAc_StepSocTeardown, and 0xe lets go
+// DisConnectAP; from 0xb to 0x11 the sockets are brought down first, by CloseSocket, and 0xe lets go
 // of CPS before that. TRUE when it is over (the state is then 0), or when it failed (the state is then 0x12)
-BOOL DWCAc_StepTeardown(u8 *state) {
+BOOL DWCi_AC_CloseNetwork(u8 *state) {
     if (*state <= 10) {
-        int result = DWCAc_StepWcmTeardown();
+        int result = DisConnectAP();
 
         if (result == 1) {
             *state = 0;
@@ -27,7 +27,7 @@ BOOL DWCAc_StepTeardown(u8 *state) {
         DWC_Netcheck_Destroy();
         *state = 12;
     } else if (*state < 18) {
-        if (DWCAc_StepSocTeardown() == TRUE) {
+        if (CloseSocket() == TRUE) {
             *state = 10;
         }
     }
@@ -35,7 +35,7 @@ BOOL DWCAc_StepTeardown(u8 *state) {
 }
 
 // Asks the wireless manager for the next step down from the state it is in; 1 once it is down, -1 if it cannot be
-static int DWCAc_StepWcmTeardown(void) {
+static int DisConnectAP(void) {
     switch (WCM_GetPhase()) {
     case 0:
         return 1;
@@ -55,14 +55,14 @@ static int DWCAc_StepWcmTeardown(void) {
         WCM_TerminateAsync();
         break;
     case 11:
-        DWCAc_SetError(0);
+        DWCi_AC_SetError(0);
         return -1;
     }
     return 0;
 }
 
 // Brings the sockets down: TRUE once SOCL has closed them and SOC is cleaned up (or was never started)
-static BOOL DWCAc_StepSocTeardown(void) {
+static BOOL CloseSocket(void) {
     int result;
 
     if (SOCLiConfigPtr == NULL) {

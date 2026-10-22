@@ -130,14 +130,14 @@ BOOL DWC_GetDateTime(RTCDate *date, RTCTime *time) {
 }
 
 BOOL DWC_SVLGetTokenAsync(char *svc, DWCSvlResult *buffer) {
-    DWCBmWifiId id;
+    DWCAuthWiFiId id;
     BOOL started;
 
-    DWCBm_GetWifiId(&id);
-    if (!id.isSet) {
+    DWC_Auth_GetId(&id);
+    if (!id.flag) {
         return FALSE;
     }
-    if (!DWC_Svl_Init((DWCHttpAlloc)DWC_Alloc, (DWCHttpFree)DWC_Free)) {
+    if (!DWC_Svl_Init((DWCAuthAlloc)DWC_Alloc, (DWCAuthFree)DWC_Free)) {
         return FALSE;
     }
     if (strlen(svc) == 0) {
@@ -172,8 +172,8 @@ BOOL DWC_NASLoginAsync(void) {
     }
     MI_CpuFill8(sNasLogin, 0, sizeof(NasLogin));
     MI_CpuCopy8("", sNasLogin->param.gsbrcd, 9);
-    sNasLogin->param.alloc = (DWCHttpAlloc)DWC_Alloc;
-    sNasLogin->param.free = (DWCHttpFree)DWC_Free;
+    sNasLogin->param.alloc = (DWCAuthAlloc)DWC_Alloc;
+    sNasLogin->param.free = (DWCAuthFree)DWC_Free;
     DWC_Auth_Create(&sNasLogin->param, &sNasLogin->http);
     return TRUE;
 }
@@ -191,7 +191,7 @@ DWCNasLoginState DWC_NASLoginProcess(void) {
         MI_CpuFill8(&result, 0, sizeof(result));
         DWC_Auth_GetResult(&result);
         DWC_Auth_Destroy();
-        if (result.returnCode == 20002) {
+        if (result.returncode == 20002) {
             DWC_Auth_Create(&sNasLogin->param, &sNasLogin->http);
             return 2;
         }
@@ -208,7 +208,7 @@ DWCNasLoginState DWC_NASLoginProcess(void) {
         DWC_Auth_Destroy();
         DWC_Free(4, sNasLogin, sizeof(NasLogin));
         sNasLogin = NULL;
-        DWCi_SetError(DWC_ERROR_AUTH_ANY, result.returnCode);
+        DWCi_SetError(DWC_ERROR_AUTH_ANY, result.returncode);
         return 4;
     }
 }
@@ -452,7 +452,7 @@ void DWCi_FriendInit(DWCFriendControl *control, GPConnection *connection, const 
 
     sFriend.control = control;
     control->state = 0;
-    sFriend.control->connection = connection;
+    sFriend.control->pGpObj = connection;
     sFriend.control->gpProcessCount = 0;
     sFriend.control->lastGpProcess = 0;
     sFriend.control->friendListLen = friendListLen;
@@ -491,7 +491,7 @@ void DWCi_FriendProcess(void) {
         return;
     }
     if (sFriend.control->friendList == NULL) {
-        if (sFriend.control->connection != NULL && *sFriend.control->connection != NULL) {
+        if (sFriend.control->pGpObj != NULL && *sFriend.control->pGpObj != NULL) {
             DWCi_GPProcess();
         }
         return;
@@ -506,7 +506,7 @@ void DWCi_FriendProcess(void) {
             CloseStatsConnection();
         }
     }
-    if (sFriend.control->connection != NULL && *sFriend.control->connection != NULL) {
+    if (sFriend.control->pGpObj != NULL && *sFriend.control->pGpObj != NULL) {
         if (DWCi_GPProcess() != 0) {
             return;
         }
@@ -525,11 +525,11 @@ void DWCi_FriendProcess(void) {
         }
     }
     if (sFriend.control->updateSteps >= 2) {
-        if (sFriend.control->connection != NULL && *sFriend.control->connection != NULL) {
+        if (sFriend.control->pGpObj != NULL && *sFriend.control->pGpObj != NULL) {
             count = 0;
             added = 0;
             for (i = 0; i < sFriend.control->friendListLen; i++) {
-                if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID) {
+                if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID) {
                     count++;
                 }
             }
@@ -544,14 +544,14 @@ void DWCi_FriendProcess(void) {
                 return;
             }
             for (i = 0; i < sFriend.control->friendListLen; i++) {
-                if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID) {
+                if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID) {
                     sFriend.control->profileIds[added] =
                         DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i]);
                     added++;
                 }
             }
             if (DWCi_HandleFriendGPError(
-                    gpGetReverseBuddiesList(sFriend.control->connection, sFriend.control->profileIds, count, 0,
+                    gpGetReverseBuddiesList(sFriend.control->pGpObj, sFriend.control->profileIds, count, 0,
                                             (GPCallback)DWCi_GPGetReverseBuddiesListCallback, NULL)) != 0) {
                 return;
             }
@@ -669,15 +669,15 @@ int DWCi_SetGPStatus(int status, const char *statusString, const char *locationS
         return 0;
     }
     if (status == -1) {
-        status = ((GPIConnection *)*sFriend.control->connection)->lastStatusState;
+        status = ((GPIConnection *)*sFriend.control->pGpObj)->lastStatusState;
     }
     if (statusString == NULL) {
-        statusString = ((GPIConnection *)*sFriend.control->connection)->lastStatusString;
+        statusString = ((GPIConnection *)*sFriend.control->pGpObj)->lastStatusString;
     }
     if (locationString == NULL) {
-        locationString = ((GPIConnection *)*sFriend.control->connection)->lastLocationString;
+        locationString = ((GPIConnection *)*sFriend.control->pGpObj)->lastLocationString;
     }
-    return gpSetStatus(sFriend.control->connection, status, statusString, locationString);
+    return gpSetStatus(sFriend.control->pGpObj, status, statusString, locationString);
 }
 
 // Tells the game that a friend became a buddy, and its status
@@ -706,7 +706,7 @@ static int DWCi_GPProcess(void) {
 
     if (OS_TicksToMilliSeconds(now - control->lastGpProcess) >= 300) {
         control->gpProcessCount++;
-        result = gpProcess(sFriend.control->connection);
+        result = gpProcess(sFriend.control->pGpObj);
         sFriend.control->lastGpProcess = OS_GetTick();
     }
     return result;
@@ -730,14 +730,14 @@ static void DWCi_UpdateFriendReq(DWCFriendData *friendList, int friendListLen) {
     int i;
 
     if (sFriend.control->buddyUpdateState == 0) {
-        DWCi_HandleFriendGPError(gpGetNumBuddies(sFriend.control->connection, &count));
+        DWCi_HandleFriendGPError(gpGetNumBuddies(sFriend.control->pGpObj, &count));
         for (index = 0; index < count; index++) {
-            DWCi_HandleFriendGPError(gpGetBuddyStatus(sFriend.control->connection, index, &status));
+            DWCi_HandleFriendGPError(gpGetBuddyStatus(sFriend.control->pGpObj, index, &status));
             for (i = 0; i < friendListLen; i++) {
                 if (status.profile == DWCi_GetProfileIDFromList(i)) {
-                    if (!DWCi_Acc_IsAuthentic(&friendList[i])) {
-                        DWCi_Acc_CreateProfileIdToken(&friendList[i], status.profile);
-                        DWCi_Acc_SetAuthentic(&friendList[i]);
+                    if (!DWCi_Acc_IsBuddyData(&friendList[i])) {
+                        DWC_SetGsProfileId(&friendList[i], status.profile);
+                        DWCi_SetBuddyFriendData(&friendList[i]);
                         if (DWC_IsBuddyFriendData(&sFriend.control->friendList[i])) {
                             DWCi_Acc_SetFlag4(&sFriend.control->friendList[i], TRUE);
                         }
@@ -747,7 +747,7 @@ static void DWCi_UpdateFriendReq(DWCFriendData *friendList, int friendListLen) {
                 }
             }
             if (i == friendListLen) {
-                DWCi_HandleFriendGPError(gpDeleteBuddy(sFriend.control->connection, status.profile));
+                DWCi_HandleFriendGPError(gpDeleteBuddy(sFriend.control->pGpObj, status.profile));
                 count--;
                 index--;
             }
@@ -763,15 +763,15 @@ static void DWCi_UpdateFriendReq(DWCFriendData *friendList, int friendListLen) {
 
             if (profileId != 0) {
                 if (!DWCi_RefreshFriendListForth(friendList, sFriend.control->buddyUpdateIdx, profileId)) {
-                    DWCi_HandleFriendGPError(gpGetBuddyIndex(sFriend.control->connection, profileId, &index));
+                    DWCi_HandleFriendGPError(gpGetBuddyIndex(sFriend.control->pGpObj, profileId, &index));
                     if (index == -1) {
                         DWCi_GPSendBuddyRequest(profileId);
                         DWCi_Acc_SetFlag5(&friendList[sFriend.control->buddyUpdateIdx], TRUE);
                     }
                 }
             } else if (DWC_GetGsProfileId(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx]) == -1) {
-                DWCi_Acc_GetLoginName(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx], loginName);
-                gpProfileSearch(sFriend.control->connection, NULL, NULL, NULL, NULL, loginName, 0, 0,
+                DWC_LoginIdToUserName(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx], loginName);
+                gpProfileSearch(sFriend.control->pGpObj, NULL, NULL, NULL, NULL, loginName, 0, 0,
                                 (GPCallback)DWCi_GPProfileSearchCallback, (void *)sFriend.control->buddyUpdateIdx);
                 sFriend.control->buddyUpdateState = 2;
                 return;
@@ -800,14 +800,14 @@ static BOOL DWCi_RefreshFriendListForth(DWCFriendData *friendList, int index, in
     DWCFriendData *friendData = &friendList[index];
     int i;
 
-    if (DWC_GetFriendDataType(friendData) == DWC_FRIEND_TYPE_LOGIN_ID) {
+    if (DWC_GetFriendDataType(friendData) == DWC_ACC_FRIENDDATA_LOGIN_ID) {
         return FALSE;
     }
     for (i = 0; i < index; i++) {
         int otherId = DWCi_GetProfileIDFromList(i);
 
         if (otherId != 0 && otherId == profileId) {
-            if (DWCi_Acc_IsAuthentic(friendData) && !DWCi_Acc_IsAuthentic(&friendList[i])) {
+            if (DWCi_Acc_IsBuddyData(friendData) && !DWCi_Acc_IsBuddyData(&friendList[i])) {
                 DWCi_DeleteFriendFromList(friendList, i, index);
             } else {
                 DWCi_DeleteFriendFromList(friendList, index, i);
@@ -836,12 +836,12 @@ static int DWCi_RefreshFriendListAll(DWCFriendData *friendList, int friendListLe
         }
         for (j = i + 1; j < friendListLen; j++) {
             if (id == DWCi_GetProfileIDFromList(j)) {
-                if (DWC_GetFriendDataType(&friendList[i]) == DWC_FRIEND_TYPE_FRIEND_KEY &&
-                    DWC_GetFriendDataType(&friendList[j]) == DWC_FRIEND_TYPE_PROFILE_ID) {
-                    DWCi_Acc_CreateProfileIdToken(&friendList[i], id);
+                if (DWC_GetFriendDataType(&friendList[i]) == DWC_ACC_FRIENDDATA_FRIEND_KEY &&
+                    DWC_GetFriendDataType(&friendList[j]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID) {
+                    DWC_SetGsProfileId(&friendList[i], id);
                 }
-                if (DWCi_Acc_IsAuthentic(&friendList[j])) {
-                    DWCi_Acc_SetAuthentic(&friendList[i]);
+                if (DWCi_Acc_IsBuddyData(&friendList[j])) {
+                    DWCi_SetBuddyFriendData(&friendList[i]);
                     if (DWC_IsBuddyFriendData(&sFriend.control->friendList[i])) {
                         DWCi_Acc_SetFlag4(&sFriend.control->friendList[i], TRUE);
                     }
@@ -855,7 +855,7 @@ static int DWCi_RefreshFriendListAll(DWCFriendData *friendList, int friendListLe
 }
 
 static int DWCi_GPSendBuddyRequest(int profileId) {
-    int result = gpSendBuddyRequest(sFriend.control->connection, profileId, "");
+    int result = gpSendBuddyRequest(sFriend.control->pGpObj, profileId, "");
 
     DWCi_HandleFriendGPError(result);
     return result;
@@ -870,13 +870,13 @@ static BOOL DWCi_GetFriendBuddyStatus(const DWCFriendData *friendData, GPBuddySt
         return FALSE;
     }
     profileId = DWC_GetGsProfileId(DWCi_GetUserData(), friendData);
-    if (profileId > 0 && gpGetBuddyIndex(sFriend.control->connection, profileId, &index)) {
+    if (profileId > 0 && gpGetBuddyIndex(sFriend.control->pGpObj, profileId, &index)) {
         return result;
     }
     if (profileId <= 0 || index == -1) {
         return FALSE;
     }
-    if (gpGetBuddyStatus(sFriend.control->connection, index, status) == 0) {
+    if (gpGetBuddyStatus(sFriend.control->pGpObj, index, status) == 0) {
         result = TRUE;
     }
     return result;
@@ -919,7 +919,7 @@ static void DWCi_GPProfileSearchCallback(GPConnection *connection, GPProfileSear
     int buddyIndex;
 
     if (arg->result == 0 && arg->numMatches != 0 &&
-        DWC_GetFriendDataType(&sFriend.control->friendList[index]) != DWC_FRIEND_TYPE_NONE) {
+        DWC_GetFriendDataType(&sFriend.control->friendList[index]) != DWC_ACC_FRIENDDATA_NODATA) {
         if (sFriend.control->state != 1) {
             return;
         }
@@ -937,8 +937,8 @@ static void DWCi_GPProfileSearchCallback(GPConnection *connection, GPProfileSear
                 DWCi_GPSendBuddyRequest(arg->matches[i].profile);
                 DWCi_Acc_SetFlag5(&sFriend.control->friendList[index], TRUE);
             } else {
-                DWCi_Acc_CreateProfileIdToken(&sFriend.control->friendList[index], arg->matches[0].profile);
-                DWCi_Acc_SetAuthentic(&sFriend.control->friendList[index]);
+                DWC_SetGsProfileId(&sFriend.control->friendList[index], arg->matches[0].profile);
+                DWCi_SetBuddyFriendData(&sFriend.control->friendList[index]);
                 DWCi_Acc_SetBuddyFlag(&sFriend.control->friendList[index], TRUE);
                 if (DWC_IsBuddyFriendData(&sFriend.control->friendList[index])) {
                     DWCi_Acc_SetFlag4(&sFriend.control->friendList[index], TRUE);
@@ -962,7 +962,7 @@ static void DWCi_GPProfileSearchCallback(GPConnection *connection, GPProfileSear
             return;
         }
     } else if (sFriend.control->state == 1 ||
-               DWC_GetFriendDataType(&sFriend.control->friendList[index]) == DWC_FRIEND_TYPE_NONE) {
+               DWC_GetFriendDataType(&sFriend.control->friendList[index]) == DWC_ACC_FRIENDDATA_NODATA) {
         sFriend.control->buddyUpdateIdx++;
         sFriend.control->buddyUpdateState = 1;
     }
@@ -981,19 +981,19 @@ static void DWCi_GPGetInfoCallback_RecvBuddyRequest(GPConnection *connection, GP
         return;
     }
     for (i = 0; i < sFriend.control->friendListLen; i++) {
-        if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_LOGIN_ID) {
-            DWCi_Acc_GetLoginName(DWCi_GetUserData(), &sFriend.control->friendList[i], loginName);
+        if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_LOGIN_ID) {
+            DWC_LoginIdToUserName(DWCi_GetUserData(), &sFriend.control->friendList[i], loginName);
             if (strcmp(loginName, arg->lastname) == 0) {
                 if (DWC_IsBuddyFriendData(&sFriend.control->friendList[i])) {
                     wasBuddy = TRUE;
                 }
                 gpAuthBuddyRequest(connection, arg->profile);
-                DWCi_Acc_CreateProfileIdToken(&sFriend.control->friendList[i], arg->profile);
+                DWC_SetGsProfileId(&sFriend.control->friendList[i], arg->profile);
                 found = TRUE;
             }
-        } else if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID ||
-                   DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_FRIEND_KEY) {
-            u32 code = DWCi_GetUserData()->gameCode;
+        } else if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID ||
+                   DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_FRIEND_KEY) {
+            u32 code = DWCi_GetUserData()->gamecode;
 
             OS_SNPrintf(gameCode, 5, "%c%c%c%c", (u8)(code >> 24), (u8)(code >> 16), (u8)(code >> 8), (u8)code);
             if (arg->profile == DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i]) &&
@@ -1033,21 +1033,21 @@ static void DWCi_GPGetInfoCallback_RecvAuthMessage(GPConnection *connection, GPG
 
     if (arg->result == 0) {
         for (i = 0; i < sFriend.control->friendListLen; i++) {
-            if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_LOGIN_ID) {
-                DWCi_Acc_GetLoginName(DWCi_GetUserData(), &sFriend.control->friendList[i], loginName);
+            if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_LOGIN_ID) {
+                DWC_LoginIdToUserName(DWCi_GetUserData(), &sFriend.control->friendList[i], loginName);
                 if (strcmp(loginName, arg->lastname) == 0) {
-                    DWCi_Acc_CreateProfileIdToken(&sFriend.control->friendList[i], arg->profile);
-                    DWCi_Acc_SetAuthentic(&sFriend.control->friendList[i]);
+                    DWC_SetGsProfileId(&sFriend.control->friendList[i], arg->profile);
+                    DWCi_SetBuddyFriendData(&sFriend.control->friendList[i]);
                     found = TRUE;
                 }
-            } else if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID ||
-                       DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_FRIEND_KEY) {
+            } else if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID ||
+                       DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_FRIEND_KEY) {
                 if (arg->profile == DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i])) {
-                    if (DWCi_Acc_IsAuthentic(&sFriend.control->friendList[i]) == TRUE) {
+                    if (DWCi_Acc_IsBuddyData(&sFriend.control->friendList[i]) == TRUE) {
                         wasAuthentic = TRUE;
                     } else {
-                        DWCi_Acc_CreateProfileIdToken(&sFriend.control->friendList[i], arg->profile);
-                        DWCi_Acc_SetAuthentic(&sFriend.control->friendList[i]);
+                        DWC_SetGsProfileId(&sFriend.control->friendList[i], arg->profile);
+                        DWCi_SetBuddyFriendData(&sFriend.control->friendList[i]);
                         found = TRUE;
                     }
                 }
@@ -1098,7 +1098,7 @@ static void DWCi_GPGetReverseBuddiesListCallback(GPConnection *connection, GPGet
             return;
         }
         for (i = 0; i < sFriend.control->friendListLen; i++) {
-            if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_FRIEND_TYPE_PROFILE_ID) {
+            if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID) {
                 for (j = 0; j < arg->numOfUniqueMatchs; j++) {
                     if (arg->matches[j].profile ==
                         DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i])) {
@@ -1129,21 +1129,21 @@ void DWCi_LoginInit(DWCLoginControl *control, DWCUserData *userData, GPConnectio
                     u32 gameCode, const u16 *playerName, DWCLoginCallback callback, void *param) {
     sLogin = control;
     MI_CpuFill8(control, 0, sizeof(DWCLoginControl));
-    sLogin->connection = connection;
+    sLogin->pGpObj = connection;
     sLogin->state = 0;
-    sLogin->productId = productId;
-    sLogin->gameCode = gameCode;
+    sLogin->productID = productId;
+    sLogin->gamecode = gameCode;
     sLogin->playerName = playerName;
     sLogin->callback = callback;
     sLogin->param = param;
-    sLogin->userData = userData;
+    sLogin->userdata = userData;
     DWCi_Auth_HasConsoleUserId();
 }
 
 BOOL DWCi_LoginAsync(void) {
     if (DWCi_RemoteLogin()) {
         sLogin->state = 1;
-        sLogin->connecting = FALSE;
+        sLogin->connectFlag = FALSE;
         return TRUE;
     }
     return FALSE;
@@ -1161,12 +1161,12 @@ void DWCi_LoginProcess(void) {
         case 2:
         case 3:
         case 4:
-            if (sLogin->connection != NULL && *sLogin->connection != NULL) {
-                gpProcess(sLogin->connection);
+            if (sLogin->pGpObj != NULL && *sLogin->pGpObj != NULL) {
+                gpProcess(sLogin->pGpObj);
             }
-            if (sLogin->connecting && OS_TicksToMilliSeconds(OS_GetTick() - sLogin->connectTick) > 60000) {
+            if (sLogin->connectFlag && OS_TicksToMilliSeconds(OS_GetTick() - sLogin->connectTick) > 60000) {
                 DWCi_StopLogin(DWC_ERROR_NETWORK, -61070);
-                sLogin->connecting = FALSE;
+                sLogin->connectFlag = FALSE;
             }
             break;
         }
@@ -1175,7 +1175,7 @@ void DWCi_LoginProcess(void) {
 
 DWCUserData *DWCi_GetUserData(void) {
     if (sLogin != NULL) {
-        return sLogin->userData;
+        return sLogin->userdata;
     }
     return NULL;
 }
@@ -1201,7 +1201,7 @@ static void DWCi_CloseLogin(void) {
     if (sLogin != NULL) {
         DWCi_Auth_EndAuthentication();
         sLogin->state = 0;
-        sLogin->connecting = FALSE;
+        sLogin->connectFlag = FALSE;
     }
 }
 
@@ -1241,12 +1241,12 @@ static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseAr
     char consoleId[0x21];
     char userId[0x33];
 
-    sLogin->connecting = FALSE;
+    sLogin->connectFlag = FALSE;
     OS_SNPrintf(consoleId, 0x1f, "%s:%016llu", DWCi_Np_GetConsoleName(), DWCi_Np_GetConsoleId());
     if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_FIRSTNAME, consoleId)) != 0) {
         return;
     }
-    DWCi_Acc_EncodeBase32(DWCi_Auth_GetConsoleUserId(), 43, userId);
+    DWCi_Acc_U64ToString32(DWCi_Auth_GetConsoleUserId(), 43, userId);
     if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_AIMNAME, userId)) != 0) {
         return;
     }
@@ -1255,7 +1255,7 @@ static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseAr
     }
     if (arg->result == 0) {
         if (sLogin->state == 2) {
-            if (sLogin->userData->gsProfileId == arg->profile) {
+            if (sLogin->userdata->gs_profile_id == arg->profile) {
                 sLogin->state = 5;
                 if (DWCi_HandleLoginGPError(DWCi_GPSetServerStatus(1)) != 0) {
                     return;
@@ -1285,9 +1285,9 @@ static void DWCi_GPConnect(GPCallback callback, int nextState) {
     OSTick now = OS_GetTick();
 
     sLogin->connectTick = now;
-    sLogin->connecting = TRUE;
-    if (DWCi_HandleLoginGPError(gpConnectPreAuthenticated(sLogin->connection, sLogin->authToken,
-                                                          sLogin->partnerChallenge, 1, 0, callback, NULL)) == 0) {
+    sLogin->connectFlag = TRUE;
+    if (DWCi_HandleLoginGPError(gpConnectPreAuthenticated(sLogin->pGpObj, sLogin->authToken, sLogin->partnerChallenge,
+                                                          1, 0, callback, NULL)) == 0) {
         sLogin->state = nextState;
     }
 }
@@ -1296,24 +1296,24 @@ static void DWCi_GPConnect(GPCallback callback, int nextState) {
 static BOOL DWCi_RemoteLogin(void) {
     u64 userId;
 
-    if (DWCi_Acc_HasAuthenticLoginId(sLogin->userData)) {
-        DWCi_Acc_CreateLoginName(&sLogin->userData->authentic, sLogin->userData->gameCode, sLogin->loginName);
-        userId = DWCi_Acc_GetUserId(&sLogin->userData->authentic);
+    if (DWCi_Acc_IsAuthentic(sLogin->userdata)) {
+        DWCi_Acc_LoginIdToUserName(&sLogin->userdata->authentic, sLogin->userdata->gamecode, sLogin->username);
+        userId = DWCi_Acc_GetUserId(&sLogin->userdata->authentic);
     } else {
-        if (!DWCi_Acc_IsLoginId(&sLogin->tempLoginId)) {
-            if (DWCi_Acc_IsConsoleLoginId(&sLogin->userData->pseudo)) {
-                sLogin->tempLoginId = sLogin->userData->pseudo;
+        if (!DWCi_Acc_IsValidLoginId(&sLogin->tempLoginId)) {
+            if (DWCi_Acc_CheckConsoleUserId(&sLogin->userdata->pseudo)) {
+                sLogin->tempLoginId = sLogin->userdata->pseudo;
             } else {
-                DWCi_Acc_CreateLoginId(&sLogin->tempLoginId);
+                DWCi_Acc_CreateTempLoginId(&sLogin->tempLoginId);
             }
         } else {
             DWCi_Acc_SetPlayerId(&sLogin->tempLoginId, (OS_GetTick() * 0x5d588b656c078965 + 0x269ec3) >> 32);
         }
-        DWCi_Acc_CreateLoginName(&sLogin->tempLoginId, sLogin->gameCode, sLogin->loginName);
+        DWCi_Acc_LoginIdToUserName(&sLogin->tempLoginId, sLogin->gamecode, sLogin->username);
         userId = 0;
     }
-    return DWCi_Auth_StartAuthentication(sLogin->playerName, &sLogin->loginName[9], userId, (DWCHttpAlloc)DWC_Alloc,
-                                         (DWCHttpFree)DWC_Free);
+    return DWCi_Auth_StartAuthentication(sLogin->playerName, &sLogin->username[9], userId, (DWCAuthAlloc)DWC_Alloc,
+                                         (DWCAuthFree)DWC_Free);
 }
 
 // Waits for the authentication server, then connects to GP with the profile of the user data, or looks for it
@@ -1323,7 +1323,7 @@ static void DWCi_RemoteLoginProcess(void) {
         if (DWCi_Auth_IsSucceeded()) {
             DWCi_Auth_GetGameSpyToken(sLogin->authToken, sLogin->partnerChallenge);
             DWCi_Auth_EndAuthentication();
-            if (DWCi_Acc_HasAuthenticLoginId(sLogin->userData)) {
+            if (DWCi_Acc_IsAuthentic(sLogin->userdata)) {
                 DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 2);
                 return;
             }
@@ -1353,7 +1353,7 @@ static void DWCi_GPGetInfoCallback(GPConnection *connection, GPGetInfoResponseAr
     if (arg->result == 0) {
         if (sLogin->state == 3) {
             if (arg->lastname[0] == 0) {
-                DWCi_Acc_CreateLoginName(&sLogin->userData->pseudo, sLogin->gameCode, loginName);
+                DWCi_Acc_LoginIdToUserName(&sLogin->userdata->pseudo, sLogin->gamecode, loginName);
                 if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_LASTNAME, loginName)) != 0) {
                     return;
                 }
@@ -1368,10 +1368,10 @@ static void DWCi_GPGetInfoCallback(GPConnection *connection, GPGetInfoResponseAr
                 sLogin->state = 1;
             }
         } else if (sLogin->state == 4) {
-            DWCi_Acc_CreateLoginName(&sLogin->userData->pseudo, sLogin->gameCode, userName);
+            DWCi_Acc_LoginIdToUserName(&sLogin->userdata->pseudo, sLogin->gamecode, userName);
             if (strcmp(arg->lastname, userName) == 0) {
-                DWCi_Acc_CreateLoginName(&sLogin->tempLoginId, sLogin->gameCode, tempName);
-                DWCi_Acc_SetAuthenticLoginId(sLogin->userData, &sLogin->tempLoginId, arg->profile);
+                DWCi_Acc_LoginIdToUserName(&sLogin->tempLoginId, sLogin->gamecode, tempName);
+                DWCi_Acc_SetLoginIdToUserData(sLogin->userdata, &sLogin->tempLoginId, arg->profile);
                 gpDisconnect(connection);
                 DWCi_GPConnect((GPCallback)DWCi_GPConnectCallback, 2);
                 return;
@@ -1405,7 +1405,7 @@ BOOL DWCi_GetLoginTicket(SakeLoginTicket *ticket) {
     if (!DWCi_CheckLogin()) {
         return FALSE;
     }
-    if (gpGetLoginTicket(sLogin->connection, ticket->data) == 0) {
+    if (gpGetLoginTicket(sLogin->pGpObj, ticket->data) == 0) {
         return TRUE;
     }
     return FALSE;

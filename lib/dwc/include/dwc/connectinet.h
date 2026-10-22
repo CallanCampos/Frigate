@@ -6,9 +6,10 @@
 
 // Connecting to the internet (TWL-DWC 5.3's dwc_connectinet.c, in ARM9 main): the library starts the auto connect of
 // the DS and DSi (AC) with the console's Wi-Fi settings, and when that fails it looks for a Nintendo Zone access point
-// with the WDS scan and connects to the one it finds. The ROM names none of it: the DWC_ functions have the SDK's
-// names, by what they do, and the others are ours. The access point information that the same file gives is in
-// dwc/apinfo.h, and the WDS scan, a file of its own, is in dwc/wdsscan.h.
+// with the WDS scan and connects to the one it finds. The ROM names none of it: the names are
+// NitroDWC's own, as its libraries' symbols and ntrtwl's reconstruction of NitroDWC have them, where the code shows
+// them, and ours elsewhere. The access point information that the same file gives is in dwc/apinfo.h, and the WDS scan,
+// a file of its own, is in dwc/wdsscan.h.
 
 // What a connection is in (DWCInetControl.state), and what DWC_GetInetStatus reports. The names follow the SDK's
 // DWC_CONNECTINET_STATE_* and its order from memory; the code confirms IDLE, OPERATING, CONNECTED, DISCONNECTED, ERROR
@@ -36,11 +37,11 @@ typedef enum DWCInetResult {
 
 // Where the connection is with the WDS scan (DWCInetControl.scanStage)
 enum {
-    DWC_INET_SCAN_NONE = 0,
-    DWC_INET_SCAN_SCANNING = 1,
+    DWC_WDS_STATE_IDLE = 0,
+    DWC_WDS_STATE_PROCESS = 1,
     // The scan found an access point, which is waiting in DWCInetControl.ap
-    DWC_INET_SCAN_FOUND = 2,
-    DWC_INET_SCAN_FAILED = 3,
+    DWC_WDS_STATE_COMPLETED = 2,
+    DWC_WDS_STATE_FAILED = 3,
     // The failure was reported as an error
     DWC_INET_SCAN_REPORTED = 4,
     // Reported as a state of its own, and nothing in main sets it
@@ -49,24 +50,24 @@ enum {
 
 // An access point to connect to: what the WDS scan found, which the connection starts with in place of the console's
 // settings. Its size is 0x50
-typedef struct DWCInetApSettings {
+typedef struct DWCWDSData {
     char ssid[32];
     // The WEP key: its first 5, 13 or 16 bytes, by the mode
-    u8 wepKey[32];
+    u8 wep[32];
     // 0 for none, 1 for WEP 40, 2 for WEP 104 and 3 for WEP 128
     int wepMode;
     u16 mtu;
     // The area digit and the nine characters of the spot's name that a Nintendo access point tells
-    char spotInfo[10];
-} DWCInetApSettings;
+    char apnum[10];
+} DWCWDSData;
 
 // A DWCInetControl of the SDK, which the game gives the library to keep the connection in. Its size is 0x68
 typedef struct DWCInetControl {
     // The AC's last result: 0 while it runs, 5 once it is connected, a negative number for an error
-    int result;
+    int ac_state;
     u16 state;
     // 1 while the connection is up and being watched for a loss
-    u16 watch;
+    u16 online;
     u16 dmaNo;
     u16 powerMode;
     // The TCP receive window that the sockets of a DSi get (SOCLConfig.rwin), or 0 for the default
@@ -75,8 +76,8 @@ typedef struct DWCInetControl {
     u8 skipEulaCheck;
     // Set once the connection cannot try again: it succeeded, it failed for good, or it was given the access point
     u8 ended;
-    int scanStage;
-    DWCInetApSettings ap;
+    int processWDSstate;
+    DWCWDSData nspotInfo;
 } DWCInetControl;
 
 // Starts a connection control, a DWCInetControl that the game gives: it takes the DMA channel for the AC and the

@@ -13,7 +13,7 @@
 // ours. The game's functions (sending, the receive buffers, the callbacks and the receive timeouts) are in dwc/dwc.h.
 
 // The function called with the latency of a ping to a machine, in milliseconds
-typedef void (*DWCPingFunc)(int latency, u8 aid, void *param);
+typedef void (*DWCUserPingCallback)(int latency, u8 aid, void *param);
 
 // What the transport keeps for each machine of the match: the data being sent and how much of it is sent, the game's
 // receive buffer, how much of the data being received has come and its size, whether data is being sent, the state of
@@ -34,8 +34,8 @@ typedef struct DWCTransportConnection {
     u8 pad;
     u16 unk_20;
     u16 lastRecvType;
-    u64 recvTimeoutTime;
-    u32 recvTimeout;
+    u64 previousRecvTick;
+    u32 recvTimeoutTime;
     u64 lastRecvTime;
 } DWCTransportConnection;
 
@@ -44,10 +44,10 @@ typedef struct DWCTransportConnection {
 // milliseconds
 typedef struct DWCTransportInfo {
     DWCTransportConnection connections[32];
-    DWCSendFunc sendCallback;
-    DWCRecvFunc recvCallback;
-    DWCTimeoutFunc recvTimeoutCallback;
-    DWCPingFunc pingCallback;
+    DWCUserSendCallback sendCallback;
+    DWCUserRecvCallback recvCallback;
+    DWCUserRecvTimeoutCallback recvTimeoutCallback;
+    DWCUserPingCallback pingCallback;
     void *sendParam;
     void *recvParam;
     void *recvTimeoutParam;

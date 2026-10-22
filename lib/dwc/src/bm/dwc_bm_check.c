@@ -18,44 +18,44 @@
 #define TWL_FIRST_PAGE 0x11
 
 // What a page's CRC16 is made of: all that comes before it
-#define NTR_CRC_SIZE (sizeof(DWCBmNtrPage) - sizeof(u16))
+#define NTR_CRC_SIZE (sizeof(DWCMemPage) - sizeof(u16))
 #define TWL_EXTRA_CRC_SIZE (sizeof(DWCBmTwlExtra) - sizeof(u16))
 
 // The work area of the NTR check is 0x700 bytes, and the TWL check's 0x1000: the pages, and the table that makes their
 // CRC16
 #define NTR_WORK_SIZE 0x700
-#define TWL_WORK_SIZE DWC_BM_WORK_SIZE
+#define TWL_WORK_SIZE DWC_BM_INIT_WORK_SIZE
 
 typedef struct NtrWork {
-    DWCBmNtrPage pages[NTR_PAGE_COUNT];
+    DWCMemPage pages[NTR_PAGE_COUNT];
     MATHCRC16Table crcTable;
 } NtrWork;
 
 typedef struct TwlWork {
     DWCBmTwlPage twlPages[TWL_PAGE_COUNT];
-    DWCBmNtrPage ntrPages[NTR_PAGE_COUNT];
+    DWCMemPage ntrPages[NTR_PAGE_COUNT];
     MATHCRC16Table crcTable;
 } TwlWork;
 
-static DWCBmReadResult func_0205e020(DWCBmNtrPage *pages);
-static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table);
+static DWCBmReadResult func_0205e020(DWCMemPage *pages);
+static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table);
 static int func_0205e380(TwlWork *work, const MATHCRC16Table *table);
-static void func_0205e540(DWCBmNtrPage *pages, int index);
+static void func_0205e540(DWCMemPage *pages, int index);
 static void func_0205e56c(DWCBmTwlPage *pages, int index);
-static BOOL func_0205e598(DWCBmNtrPage *pages);
+static BOOL func_0205e598(DWCMemPage *pages);
 static BOOL func_0205e614(DWCBmTwlPage *pages);
-static BOOL func_0205e668(DWCBmNtrPage *pages, const MATHCRC16Table *table);
+static BOOL func_0205e668(DWCMemPage *pages, const MATHCRC16Table *table);
 static BOOL func_0205e714(DWCBmTwlPage *pages, const MATHCRC16Table *table);
-static BOOL func_0205e7a8(const DWCBmConnection *connection);
-static BOOL func_0205e7f8(const DWCBmConnection *connection, const DWCBmTwlExtra *extra);
-static BOOL func_0205e870(const DWCBmConnection *connection);
+static BOOL checkAp(const DWCBMApInfo *connection);
+static BOOL func_0205e7f8(const DWCBMApInfo *connection, const DWCBmTwlExtra *extra);
+static BOOL func_0205e870(const DWCBMApInfo *connection);
 static void func_0205e93c(u32 bits, u8 *mask);
 static BOOL func_0205e968(const u8 *ssid);
 static BOOL func_0205e990(const u8 *address, const u8 *mask);
 static BOOL func_0205ea10(const u8 *address);
 
 // Reads the four pages of the NTR settings
-static DWCBmReadResult func_0205e020(DWCBmNtrPage *pages) {
+static DWCBmReadResult func_0205e020(DWCMemPage *pages) {
     if (func_0205e598(pages)) {
         return DWC_BM_READ_OK;
     }
@@ -91,12 +91,12 @@ int func_0205e094(void *work) {
     NtrWork *ntr = work;
 
     MI_CpuFill8(work, 0, NTR_WORK_SIZE);
-    if (func_0205dbc0() != 0) {
-        return DWC_BM_CHECK_READ_FAILED;
+    if (DWCi_BACKUPlInit() != 0) {
+        return DWC_BM_INIT_READ_ERROR;
     }
     MATHi_CRC16InitTableRev(&ntr->crcTable, 0xA001);
     if (!func_0205e598(ntr->pages)) {
-        return DWC_BM_CHECK_READ_FAILED;
+        return DWC_BM_INIT_READ_ERROR;
     }
     return func_0205e160(ntr->pages, &ntr->crcTable);
 }
@@ -106,15 +106,15 @@ int func_0205e0f0(void *work) {
     TwlWork *twl = work;
 
     MI_CpuFill8(work, 0, TWL_WORK_SIZE);
-    if (func_0205dbc0() != 0) {
-        return DWC_BM_CHECK_READ_FAILED;
+    if (DWCi_BACKUPlInit() != 0) {
+        return DWC_BM_INIT_READ_ERROR;
     }
     MATHi_CRC16InitTableRev(&twl->crcTable, 0xA001);
     if (!func_0205e598(twl->ntrPages)) {
-        return DWC_BM_CHECK_READ_FAILED;
+        return DWC_BM_INIT_READ_ERROR;
     }
     if (!func_0205e614(twl->twlPages)) {
-        return DWC_BM_CHECK_READ_FAILED;
+        return DWC_BM_INIT_READ_ERROR;
     }
     return func_0205e380(twl, &twl->crcTable);
 }
@@ -122,7 +122,7 @@ int func_0205e0f0(void *work) {
 // Checks the four pages of the NTR settings and makes them whole: a page whose CRC16 or connection is wrong is emptied
 // (the Wi-Fi ID of the first two pages is copied from the other, when that one is fine), and the mask of the
 // connections in use is made again. Returns 0, or what was lost
-static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
+static int func_0205e160(DWCMemPage *pages, const MATHCRC16Table *table) {
     BOOL valid[NTR_PAGE_COUNT];
     u8 usedMask;
     u8 newUsedMask;
@@ -134,66 +134,66 @@ static int func_0205e160(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
     for (i = 0; i < CONNECTION_COUNT; i++) {
         crc = MATH_CalcCRC16(table, &pages[i], NTR_CRC_SIZE);
 
-        if (crc == pages[i].crc16) {
-            if (func_0205e7a8(&pages[i].connection)) {
+        if (crc == pages[i].crc) {
+            if (checkAp(&pages[i].ap)) {
                 valid[i] = TRUE;
             }
         }
     }
     // The fourth page holds no connection
     crc = MATH_CalcCRC16(table, &pages[3], NTR_CRC_SIZE);
-    if (crc == pages[3].crc16) {
+    if (crc == pages[3].crc) {
         valid[3] = TRUE;
     }
     if (valid[0] && valid[1] && valid[2] && valid[3]) {
         return 0;
     }
 
-    usedMask = pages[0].connection.usedMask;
+    usedMask = pages[0].ap.state;
     if (!valid[0]) {
         usedMask = 0;
         func_0205e540(pages, 0);
         if (valid[1]) {
-            usedMask = pages[1].connection.usedMask;
-            MI_CpuCopy8(pages[1].wifiId, pages[0].wifiId, DWC_BM_PACKED_SIZE);
+            usedMask = pages[1].ap.state;
+            MI_CpuCopy8(pages[1].wifi, pages[0].wifi, DWC_BM_PACKED_SIZE);
         }
     }
     if (!valid[1]) {
         func_0205e540(pages, 1);
         if (valid[0]) {
-            MI_CpuCopy8(pages[0].wifiId, pages[1].wifiId, DWC_BM_PACKED_SIZE);
+            MI_CpuCopy8(pages[0].wifi, pages[1].wifi, DWC_BM_PACKED_SIZE);
         }
     }
     if (!valid[2]) {
         func_0205e540(pages, 2);
     }
     if (!valid[3]) {
-        MI_CpuClear16(&pages[3], sizeof(DWCBmNtrPage));
+        MI_CpuClear16(&pages[3], sizeof(DWCMemPage));
     }
 
     lost = FALSE;
     newUsedMask = 0;
     for (i = 0; i < CONNECTION_COUNT; i++) {
-        if (pages[i].connection.status != DWC_BM_CONNECTION_UNUSED) {
+        if (pages[i].ap.setType != DWC_SETTYPE_NONE) {
             newUsedMask |= (u8)(1 << i);
         } else if (usedMask & (1 << i)) {
             lost = TRUE;
         }
     }
-    pages[0].connection.usedMask = newUsedMask;
-    pages[1].connection.usedMask = newUsedMask;
+    pages[0].ap.state = newUsedMask;
+    pages[1].ap.state = newUsedMask;
     if (!func_0205e668(pages, table)) {
-        return DWC_BM_CHECK_WRITE_FAILED;
+        return DWC_BM_INIT_WRITE_ERROR;
     }
 
     if (!valid[0] && !valid[1] && !valid[2]) {
         return 0;
     }
     if (!valid[0] && !valid[1]) {
-        return DWC_BM_CHECK_WIFI_ID_LOST;
+        return DWC_BM_INIT_OK_INIT;
     }
     if (lost) {
-        return DWC_BM_CHECK_CONNECTION_LOST;
+        return DWC_BM_INIT_OK_CLEAR;
     }
     return 0;
 }
@@ -214,8 +214,8 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
         u16 ntrCrc = MATH_CalcCRC16(table, &pages[i].ntr, NTR_CRC_SIZE);
         u16 extraCrc = MATH_CalcCRC16(table, &pages[i].extra, TWL_EXTRA_CRC_SIZE);
 
-        if (ntrCrc == pages[i].ntr.crc16 && extraCrc == pages[i].extra.crc16) {
-            if (func_0205e7f8(&pages[i].ntr.connection, &pages[i].extra)) {
+        if (ntrCrc == pages[i].ntr.crc && extraCrc == pages[i].extra.crc16) {
+            if (func_0205e7f8(&pages[i].ntr.ap, &pages[i].extra)) {
                 valid[i] = TRUE;
             }
         }
@@ -224,11 +224,11 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
         return ntrResult;
     }
 
-    usedMask = pages[0].ntr.connection.usedMask;
+    usedMask = pages[0].ntr.ap.state;
     if (!valid[0]) {
         func_0205e56c(pages, 0);
         if (valid[1]) {
-            usedMask = pages[1].ntr.connection.usedMask;
+            usedMask = pages[1].ntr.ap.state;
         } else {
             usedMask = 7;
         }
@@ -243,16 +243,16 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
     lost = FALSE;
     newUsedMask = 0;
     for (i = 0; i < CONNECTION_COUNT; i++) {
-        if (pages[i].ntr.connection.status != DWC_BM_CONNECTION_UNUSED) {
+        if (pages[i].ntr.ap.setType != DWC_SETTYPE_NONE) {
             newUsedMask |= (u8)(1 << i);
         } else if (usedMask & (1 << i)) {
             lost = TRUE;
         }
     }
-    pages[0].ntr.connection.usedMask = newUsedMask;
-    pages[1].ntr.connection.usedMask = newUsedMask;
+    pages[0].ntr.ap.state = newUsedMask;
+    pages[1].ntr.ap.state = newUsedMask;
     if (!func_0205e714(pages, table)) {
-        return DWC_BM_CHECK_WRITE_FAILED;
+        return DWC_BM_INIT_WRITE_ERROR;
     }
 
     if (!valid[0] && !valid[1] && !valid[2]) {
@@ -260,7 +260,7 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
     }
     if (ntrResult == 0) {
         if (lost) {
-            return DWC_BM_CHECK_CONNECTION_LOST;
+            return DWC_BM_INIT_OK_CLEAR;
         }
         return 0;
     }
@@ -268,18 +268,18 @@ static int func_0205e380(TwlWork *work, const MATHCRC16Table *table) {
 }
 
 // Empties a page, and marks its connection as not in use
-static void func_0205e540(DWCBmNtrPage *pages, int index) {
-    MI_CpuClear16(&pages[index], sizeof(DWCBmNtrPage));
-    pages[index].connection.status = DWC_BM_CONNECTION_UNUSED;
+static void func_0205e540(DWCMemPage *pages, int index) {
+    MI_CpuClear16(&pages[index], sizeof(DWCMemPage));
+    pages[index].ap.setType = DWC_SETTYPE_NONE;
 }
 
 static void func_0205e56c(DWCBmTwlPage *pages, int index) {
     MI_CpuClear16(&pages[index], sizeof(DWCBmTwlPage));
-    pages[index].ntr.connection.status = DWC_BM_CONNECTION_UNUSED;
+    pages[index].ntr.ap.setType = DWC_SETTYPE_NONE;
 }
 
 // Reads the four pages of the NTR settings; TRUE when all could be read
-static BOOL func_0205e598(DWCBmNtrPage *pages) {
+static BOOL func_0205e598(DWCMemPage *pages) {
     BOOL ok = TRUE;
     int i;
 
@@ -287,7 +287,7 @@ static BOOL func_0205e598(DWCBmNtrPage *pages) {
         BOOL read = FALSE;
 
         if (ok) {
-            int size = func_0205dca4(&pages[i], sizeof(DWCBmNtrPage), i);
+            int size = func_0205dca4(&pages[i], sizeof(DWCMemPage), i);
 
             if (size >= 0) {
                 read = TRUE;
@@ -296,7 +296,7 @@ static BOOL func_0205e598(DWCBmNtrPage *pages) {
         ok = read;
     }
     if (ok) {
-        if (func_0205dca4(&pages[3], sizeof(DWCBmNtrPage), 3) >= 0) {
+        if (func_0205dca4(&pages[3], sizeof(DWCMemPage), 3) >= 0) {
             return TRUE;
         }
     }
@@ -315,17 +315,17 @@ static BOOL func_0205e614(DWCBmTwlPage *pages) {
 }
 
 // Writes the four pages of the NTR settings, each with the CRC16 of what comes before it
-static BOOL func_0205e668(DWCBmNtrPage *pages, const MATHCRC16Table *table) {
+static BOOL func_0205e668(DWCMemPage *pages, const MATHCRC16Table *table) {
     int i;
     BOOL ok = TRUE;
 
     for (i = 0; i < CONNECTION_COUNT; i++) {
-        pages[i].crc16 = MATH_CalcCRC16(table, &pages[i], NTR_CRC_SIZE);
-        ok = ok && func_0205dd40(i, &pages[i], sizeof(DWCBmNtrPage)) >= 0;
+        pages[i].crc = MATH_CalcCRC16(table, &pages[i], NTR_CRC_SIZE);
+        ok = ok && func_0205dd40(i, &pages[i], sizeof(DWCMemPage)) >= 0;
     }
-    pages[3].crc16 = MATH_CalcCRC16(table, &pages[3], NTR_CRC_SIZE);
+    pages[3].crc = MATH_CalcCRC16(table, &pages[3], NTR_CRC_SIZE);
     if (ok) {
-        if (func_0205dd40(3, &pages[3], sizeof(DWCBmNtrPage)) >= 0) {
+        if (func_0205dd40(3, &pages[3], sizeof(DWCMemPage)) >= 0) {
             return TRUE;
         }
     }
@@ -337,7 +337,7 @@ static BOOL func_0205e714(DWCBmTwlPage *pages, const MATHCRC16Table *table) {
     BOOL ok = TRUE;
 
     for (i = 0; i < TWL_PAGE_COUNT; i++) {
-        pages[i].ntr.crc16 = MATH_CalcCRC16(table, &pages[i].ntr, NTR_CRC_SIZE);
+        pages[i].ntr.crc = MATH_CalcCRC16(table, &pages[i].ntr, NTR_CRC_SIZE);
         pages[i].extra.crc16 = MATH_CalcCRC16(table, &pages[i].extra, TWL_EXTRA_CRC_SIZE);
         ok = ok && func_0205dd40(i + TWL_FIRST_PAGE, &pages[i], sizeof(DWCBmTwlPage)) >= 0;
     }
@@ -346,11 +346,11 @@ static BOOL func_0205e714(DWCBmTwlPage *pages, const MATHCRC16Table *table) {
 
 // Whether a connection of an NTR page is one that the console could have made: unused, or a kind from 0 to 2 with a
 // network name and the address settings in order
-static BOOL func_0205e7a8(const DWCBmConnection *connection) {
-    if (connection->status == DWC_BM_CONNECTION_UNUSED) {
+static BOOL checkAp(const DWCBMApInfo *connection) {
+    if (connection->setType == DWC_SETTYPE_NONE) {
         return TRUE;
     }
-    if (connection->status > 2) {
+    if (connection->setType > 2) {
         return FALSE;
     }
     if (!func_0205e968(connection->ssid)) {
@@ -363,12 +363,12 @@ static BOOL func_0205e7a8(const DWCBmConnection *connection) {
 }
 
 // The same for the first half of a TWL page, whose kinds above 2 also need the flags of the second half to be 0 or 1
-static BOOL func_0205e7f8(const DWCBmConnection *connection, const DWCBmTwlExtra *extra) {
-    if (connection->status == DWC_BM_CONNECTION_UNUSED) {
+static BOOL func_0205e7f8(const DWCBMApInfo *connection, const DWCBmTwlExtra *extra) {
+    if (connection->setType == DWC_SETTYPE_NONE) {
         return TRUE;
     }
-    if (connection->status <= 2) {
-        return func_0205e7a8(connection);
+    if (connection->setType <= 2) {
+        return checkAp(connection);
     }
     if (!func_0205e968(connection->ssid)) {
         return FALSE;
@@ -388,17 +388,17 @@ static BOOL func_0205e7f8(const DWCBmConnection *connection, const DWCBmTwlExtra
 // Whether the address settings of a connection are in order: when it has an address of its own, a gateway that can be
 // one, a mask length of at most 32 and an address that suits the mask; and when it has DNS servers, either of them
 // can be one
-static BOOL func_0205e870(const DWCBmConnection *connection) {
+static BOOL func_0205e870(const DWCBMApInfo *connection) {
     if (connection->ip[0] != 0 || connection->ip[1] != 0 || connection->ip[2] != 0 || connection->ip[3] != 0) {
         u8 mask[4];
 
         if (!func_0205ea10(connection->gateway)) {
             return FALSE;
         }
-        if (connection->netmaskBits > 0x20) {
+        if (connection->netmask > 0x20) {
             return FALSE;
         }
-        func_0205e93c(connection->netmaskBits, mask);
+        func_0205e93c(connection->netmask, mask);
         if (!func_0205e990(connection->ip, mask)) {
             return FALSE;
         }

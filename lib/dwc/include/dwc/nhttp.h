@@ -12,8 +12,8 @@
 // NHTTPSetVerifyOption), or descriptive for the rest. A connection is a handle that NHTTPCreateConnection returns: 0 if
 // it could not
 
-typedef void *(*NHttpAllocFunc)(u32 size, int align);
-typedef void (*NHttpFreeFunc)(void *ptr);
+typedef void *(*NHTTPAlloc)(u32 size, int align);
+typedef void (*NHTTPFree)(void *ptr);
 // Called with the connection, the event and the argument given to NHTTPCreateConnection. The events are the post data
 // being sent (1), the buffer being full (2), the body being received (3) and the connection ending (4)
 typedef int (*NHttpCallback)(int connection, int event, void *arg);
@@ -23,7 +23,7 @@ typedef int (*NHttpCallback)(int connection, int event, void *arg);
 extern CPSCaInfo DWCi_RootCertNintendoClass2;
 
 // Starts the library with an allocator and the priority of the thread that runs the requests; 0 once it started
-int NHTTPStartup(NHttpAllocFunc alloc, NHttpFreeFunc free, u32 priority);
+int NHTTPStartup(NHTTPAlloc alloc, NHTTPFree free, u32 priority);
 // Ends the library, calling back when it has ended
 void NHTTPCleanupAsync(void (*callback)(void));
 void NHTTPCleanup(void);

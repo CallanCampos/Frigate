@@ -201,7 +201,7 @@ tables laid out by hand, and a `GFL_ASSERT` whose expression has operators, sinc
 a string in the ROM and clang-format's spacing would change it (`GFL_ASSERT((u16)size < (0xffff/2))`).
 
 **Don't:** put a comment between a declaration's specifiers and the rest (`static // Connects ...` above
-`int AossAp_Connect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
+`int AOSSi_WLANConnect(...)`): clang-format then indents the declaration as a continuation. The comment goes above.
 
 **Checked:** in CI, `clang-format --dry-run --Werror` on the changed files, with the pinned version, and a comment
 right after `static`, `inline`, `extern` or `const` that starts a line.

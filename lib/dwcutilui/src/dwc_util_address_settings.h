@@ -12,6 +12,6 @@
 void DWCUtilAddressSettings_Init(void);
 // Where the settings were opened from: 0 from the first screen of the connection settings, 1 from the choice of the
 // setup of a connection
-void DWCUtilAddressSettings_SetFrom(int from);
+void DWCi_SetListReturn(int from);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_ADDRESS_SETTINGS_H

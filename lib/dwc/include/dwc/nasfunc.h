@@ -16,15 +16,15 @@
 // dwc/ac.h.
 
 // The allocator and the deallocator of a request, with a name (0 here) first, as DWC_Alloc and DWC_Free take them
-typedef void *(*DWCHttpAlloc)(unsigned long name, long size);
-typedef void (*DWCHttpFree)(unsigned long name, void *ptr, long size);
+typedef void *(*DWCAuthAlloc)(unsigned long name, long size);
+typedef void (*DWCAuthFree)(unsigned long name, void *ptr, long size);
 
 // A text of the HTTP client: where it starts, where the next byte goes, where it ends, and its size
 typedef struct DWCHttpBuffer {
-    char *start;
-    char *cur;
-    char *end;
-    unsigned long capacity;
+    char *buffer;
+    char *write_index;
+    char *buffer_tail;
+    unsigned long length;
 } DWCHttpBuffer;
 
 // A name and value of an answer's headers and form fields, as copies
@@ -35,8 +35,8 @@ typedef struct DWCHttpLabelValue {
 
 // Whether a request is a POST or a GET: the SDK's DWCHttpAction
 typedef enum DWCHttpAction {
-    DWC_HTTP_POST = 0,
-    DWC_HTTP_GET = 1,
+    DWCHTTP_POST = 0,
+    DWCHTTP_GET = 1,
 } DWCHttpAction;
 
 // What a request is made with: the URL, whether it is a GET or a POST, the size of the buffer of the answer, the
@@ -45,10 +45,10 @@ typedef enum DWCHttpAction {
 typedef struct DWCHttpParam {
     const char *url;
     DWCHttpAction action;
-    unsigned long bufferSize;
-    DWCHttpAlloc alloc;
-    DWCHttpFree free;
-    BOOL ignoreCa;
+    unsigned long len_recvbuf;
+    DWCAuthAlloc alloc;
+    DWCAuthFree free;
+    BOOL ignoreca;
     int timeout;
 } DWCHttpParam;
 
@@ -66,43 +66,43 @@ typedef struct DWCHttpSslConnection {
 // connection refused, the send timed out (4, which the code doesn't set), the send failed, the receive timed out,
 // cancelled, and done
 typedef enum DWCHttpError {
-    DWC_HTTP_READY = 0,
-    DWC_HTTP_NO_MEMORY = 1,
-    DWC_HTTP_DNS_ERROR = 2,
-    DWC_HTTP_CONNECT_ERROR = 3,
-    DWC_HTTP_SEND_ERROR = 5,
-    DWC_HTTP_TIMEOUT = 6,
-    DWC_HTTP_CANCELLED = 7,
-    DWC_HTTP_DONE = 8,
+    DWCHTTP_E_NOERR = 0,
+    DWCHTTP_E_MEMERR = 1,
+    DWCHTTP_E_DNSERR = 2,
+    DWCHTTP_E_CONERR = 3,
+    DWCHTTP_E_SENDERR = 5,
+    DWCHTTP_E_RECVTOUT = 6,
+    DWCHTTP_E_ABORT = 7,
+    DWCHTTP_E_FINISH = 8,
 } DWCHttpError;
 
 // An HTTP request and its thread, whose stack is the first 0x1000 bytes (0x1c50 bytes)
 typedef struct DWCHttp {
     u8 stack[0x1000];
-    u8 started; // 0xff once the request is ready to run
+    u8 initflag; // 0xff once the request is ready to run
     DWCHttpParam param;
-    DWCHttpError result;
+    DWCHttpError error;
     char url[0x100];
-    char *host;
-    char *path;
-    CPSInAddr ip;
-    BOOL secure;
+    char *hostname;
+    char *filepath;
+    CPSInAddr hostip;
+    BOOL ssl_enabled;
     u16 port;
     CPSSoc soc;
     DWCHttpSslConnection con;
-    u8 *rcvBuffer;
-    u8 *sndBuffer;
-    u32 entropy[8];
-    int fieldCount;
-    DWCHttpBuffer request;
-    DWCHttpBuffer response;
-    OSMutex lock;
-    int contentLength;
-    int bodyLength;
-    DWCHttpLabelValue fields[32];
+    u8 *lowrecvbuf;
+    u8 *lowsendbuf;
+    u32 lowentropydata[8];
+    int num_postitem;
+    DWCHttpBuffer req;
+    DWCHttpBuffer rep;
+    OSMutex content_len_mutex;
+    int content_len;
+    int receivedbody_len;
+    DWCHttpLabelValue labelvalue[32];
     OSThread thread;
-    OSMutex cancelLock;
-    BOOL cancelled;
+    OSMutex mutex;
+    BOOL abort;
 } DWCHttp;
 
 // What the login is started with: the player's name in the game, the game's code for the server (gsbrcd) and the memory
@@ -110,15 +110,15 @@ typedef struct DWCHttp {
 typedef struct DWCAuthParam {
     u16 ingamesn[0x1a];
     char gsbrcd[0xc];
-    DWCHttpAlloc alloc;
-    DWCHttpFree free;
+    DWCAuthAlloc alloc;
+    DWCAuthFree free;
 } DWCAuthParam;
 
 // What the server answered the login: the result (20000 and the return code, or the error), the return code's text,
 // the server's time, the address of the service locator, the token and the challenge that the player logs in to the
 // other servers with, and the cookie
 typedef struct DWCAuthResult {
-    int returnCode;
+    int returncode;
     char retcode[4];
     char datetime[0xf];
     char locator[0x33];
@@ -173,8 +173,8 @@ void DWC_Auth_GetResult(DWCAuthResult *result);
 
 // The login that the friends' match runs: starts it with the player's name, the game's code and the user ID, and runs
 // it; whether it is over, whether it worked and its error; the token and the challenge that it got; and the end of it
-BOOL DWCi_Auth_StartAuthentication(const u16 *ingamesn, const char *gsbrcd, u64 userId, DWCHttpAlloc alloc,
-                                   DWCHttpFree free);
+BOOL DWCi_Auth_StartAuthentication(const u16 *ingamesn, const char *gsbrcd, u64 userId, DWCAuthAlloc alloc,
+                                   DWCAuthFree free);
 void DWCi_Auth_AbortAuthentication(void);
 void DWCi_Auth_ProcessAuthentication(void);
 BOOL DWCi_Auth_IsFinished(void);
@@ -199,7 +199,7 @@ typedef enum DWCSvlState {
 
 // The service locator: makes its memory, lets go of it, asks for a service and runs the request, which answers 0 when
 // there is none, 1 when it did not start, 2 while it runs, 3 once done, 4 for an error and 5 once cancelled
-BOOL DWC_Svl_Init(DWCHttpAlloc alloc, DWCHttpFree free);
+BOOL DWC_Svl_Init(DWCAuthAlloc alloc, DWCAuthFree free);
 void DWC_Svl_Cleanup(void);
 BOOL DWC_Svl_GetTokenAsync(char *service, DWCSvlResult *result);
 DWCSvlState DWC_Svl_Process(void);
@@ -207,35 +207,35 @@ DWCSvlState DWC_Svl_Process(void);
 // The login's HTTP client and helpers that the connection test (dwc_conntest.c), the profanity check
 // (dwc_profanity.c) and the service locator (dwc_svcloc.c) share with dwc_nasfunc.c
 // What the requests to the server tell about the player and the console, as the form fields are made from them
-typedef struct NasAuthInfo {
-    char userId[0xe];
-    char password[7];
-    char gameCode[5];
-    char makerCode[3];
-    char unitCode[2];
-    char macAddress[0xd];
-    char language[3];
-    char birthday[5];
-    char deviceTime[0xd];
+typedef struct DWCCalInfo {
+    char userid[0xe];
+    char passwd[7];
+    char gamecd[5];
+    char makercd[3];
+    char unitcd[2];
+    char macadr[0xd];
+    char lang[3];
+    char birth[5];
+    char devtime[0xd];
     char bssid[0xd];
     char ssid[0x20];
     char unk_6e;
-    char apInfo[0xe];
+    char apinfo[0xe];
     char unk_7d;
-    u16 deviceName[10];
+    u16 devname[10];
     u8 unk_92[2];
-} NasAuthInfo;
+} DWCCalInfo;
 
 // The login's request: the server's URL and the rest of what it is made with (the URL that DWC_Auth_SetCustomNas sets)
-extern DWCHttpParam DWCi_AuthConfig;
+extern DWCHttpParam DWCauthhttpparam;
 
 // Cancels the login and waits for its thread
 void DWC_Auth_Abort(void);
 // Waits for the login's thread
 void DWC_Auth_Join(void);
 // The player's and the console's details for a request, from the current Wi-Fi ID, and the form fields made from them
-BOOL DWCi_Auth_GetCurrentInfo(NasAuthInfo *info);
-BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, NasAuthInfo *info, BOOL sendSsid);
+BOOL DWC_Auth_GetCalInfoFromNVRAM(DWCCalInfo *info);
+BOOL DWC_Auth_SetCalInfoToHttp(DWCHttp *http, DWCCalInfo *info, BOOL sendSsid);
 
 // Makes a request, ends its headers, runs it in a thread at a priority, and cancels it
 DWCHttpError DWC_Http_Create(DWCHttp *http, DWCHttpParam *param);
@@ -257,7 +257,7 @@ BOOL DWC_Http_GetRawResult(DWCHttp *http, char *label, char *dest, int size);
 
 // dwc_conntest.c: whether the requests to the server send the access point's SSID, which the connection test sets
 // once it has been redirected
-extern BOOL DWCi_SendSsid;
+extern BOOL DWCishotspot;
 
 // The connection test (dwc_conntest.c), which the states 13 and 14 of dwc_ac_soc.c run, by the 52xxx errors it leads
 // to in dwc_ac_result.c. Its states, the SDK's DWCNetcheckError (NitroDWC's auth/dwc_netcheck.h): 0 while the test is
@@ -281,9 +281,9 @@ typedef enum DWCNetcheckError {
 // What the test is started with, the SDK's DWCNetcheckParam: the memory functions and the work of the backup
 // manager. Auto-connect keeps it in its block DWC_AC_WORK_MEMFUNCS
 typedef struct DWCNetcheckParam {
-    DWCHttpAlloc alloc;
-    DWCHttpFree free;
-    void *bmWorkArea;
+    DWCAuthAlloc alloc;
+    DWCAuthFree free;
+    void *bmworkarea;
 } DWCNetcheckParam;
 
 // Starts the test from the memory functions (copied), answering 0 once it is going; DWC_Netcheck_Abort ends CPS's

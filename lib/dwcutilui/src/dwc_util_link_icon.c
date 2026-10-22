@@ -23,19 +23,19 @@ void DWCUtilLinkIcon_Init(int set) {
     if (sLinkIcon != NULL) {
         return;
     }
-    sLinkIcon = DWCUtilHeap_AllocClear(sizeof(DWCUtilLinkIcon), 4);
+    sLinkIcon = DWCi_HEAPlAllocEx(sizeof(DWCUtilLinkIcon), 4);
     sLinkIcon->set = set;
     sLinkIcon->oam = DWCUtilCell_AllocOam(0, sLevelCells[set][0]);
     G2_SetOBJPosition(sLinkIcon->oam, 0xe5, 0x26);
     G2_SetOBJPriority(sLinkIcon->oam, 2);
-    sLinkIcon->task = DWCUtilTask_Create(0, DWCUtilLinkIcon_UpdateTask, NULL, 0x78);
+    sLinkIcon->task = DWCi_TSKlForm(0, DWCUtilLinkIcon_UpdateTask, NULL, 0x78);
 }
 
-void DWCUtilLinkIcon_Exit(void) {
+void DWCi_ICONlEnd(void) {
     if (sLinkIcon != NULL) {
-        DWCUtilTask_Remove(0, sLinkIcon->task);
-        DWCUtilOamBuf_Free(sLinkIcon->oam);
-        DWCUtilHeap_FreeAndNull(&sLinkIcon);
+        DWCi_TSKlDeleteEx(0, sLinkIcon->task);
+        DWCi_MOV_MBP_GetChildBmp(sLinkIcon->oam);
+        DWCi_HEAPlFree_(&sLinkIcon);
     }
 }
 

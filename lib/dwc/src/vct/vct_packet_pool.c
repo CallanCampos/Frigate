@@ -9,15 +9,15 @@
 
 // The packets that are free, and the memory they are made of
 struct VCTPacketPool {
-    VCTPacket *freeList;
-    VCTPacket *base;
+    UDPPacket *freeList;
+    UDPPacket *base;
 };
 
 static VCTPacketPool sPacketPool;
 
-BOOL VCT_InitPacketPool(void *buffer, u32 size) {
+BOOL vct_init_packet_buffer(void *buffer, u32 size) {
     unsigned int i;
-    u32 count = size / sizeof(VCTPacket);
+    u32 count = size / sizeof(UDPPacket);
 
     sPacketPool.base = buffer;
     if (count < 4 || count > 0x48) {
@@ -32,35 +32,35 @@ BOOL VCT_InitPacketPool(void *buffer, u32 size) {
     }
     MI_CpuClearFast(buffer, size);
     for (i = 0; i < count - 1; i++) {
-        sPacketPool.base[i].nextFree = &sPacketPool.base[i + 1];
+        sPacketPool.base[i].free = &sPacketPool.base[i + 1];
     }
-    (sPacketPool.base + count - 1)->nextFree = NULL;
+    (sPacketPool.base + count - 1)->free = NULL;
     sPacketPool.freeList = sPacketPool.base;
     return TRUE;
 }
 
-void VCT_ClearPacketPool(void) {
+void vct_cleanup_packet_buffer(void) {
     sPacketPool.freeList = NULL;
     sPacketPool.base = NULL;
 }
 
-VCTPacket *VCT_AllocPacket(void) {
-    VCTPacket *packet = NULL;
+UDPPacket *vct_alloc_packet_buffer(void) {
+    UDPPacket *packet = NULL;
     OSIntrMode irq = OS_DisableInterrupts();
-    VCTPacket *head = sPacketPool.freeList;
+    UDPPacket *head = sPacketPool.freeList;
 
     if (head != NULL) {
         packet = head;
-        sPacketPool.freeList = head->nextFree;
+        sPacketPool.freeList = head->free;
     }
     OS_RestoreInterrupts(irq);
     return packet;
 }
 
-void VCT_FreePacket(VCTPacket *packet) {
+void vct_free_packet_buffer(UDPPacket *packet) {
     OSIntrMode irq = OS_DisableInterrupts();
 
-    packet->nextFree = sPacketPool.freeList;
+    packet->free = sPacketPool.freeList;
     sPacketPool.freeList = packet;
     packet->prev = NULL;
     packet->next = NULL;

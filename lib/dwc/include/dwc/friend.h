@@ -36,7 +36,7 @@ typedef enum DWCFriendState {
 typedef struct DWCFriendControl {
     // 0 until the update starts, 1 while it runs and 2 once it is over
     DWCFriendState state;
-    GPConnection *connection;
+    GPConnection *pGpObj;
     // How many times GameSpy's GP has been run, and when it was last
     u32 gpProcessCount;
     OSTick lastGpProcess;
@@ -89,30 +89,30 @@ typedef enum DWCLoginState {
 
 // The login's state, which dwc_match.c gives the memory for
 typedef struct DWCLoginControl {
-    GPConnection *connection;
+    GPConnection *pGpObj;
     // 0 before the login, 1 while the authentication server is asked, 2 to 4 while GP logs in (with the user data's
     // profile, or looking for it with the login ID) and 5 once logged in
     DWCLoginState state;
-    int productId;
-    u32 gameCode;
+    int productID;
+    u32 gamecode;
     const u16 *playerName;
     DWCLoginCallback callback;
     void *param;
-    DWCUserData *userData;
+    DWCUserData *userdata;
     // The SDK's work of the backup manager, HTTP client and start of the login, which this version leaves unused
-    void *bmWork;
+    void *bmwork;
     void *http;
     OSTick startTick;
     // Whether GP is being connected to, and since when
-    u32 connecting;
+    u32 connectFlag;
     OSTick connectTick;
     // The login ID that the login uses until the user data has an authenticated one
-    DWCAccLoginId tempLoginId;
+    DWCstAccLoginId tempLoginId;
     // What the authentication server gave for GP's login
     char authToken[0x100];
     char partnerChallenge[0x100];
     // The login name: the user ID, the game code and the player ID as text
-    char loginName[21];
+    char username[21];
 } DWCLoginControl;
 
 // The server's date and time, and the "Date" header of the authentication server's answer, such as

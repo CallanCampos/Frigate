@@ -21,19 +21,19 @@ struct DWCUtilTask {
     u8 freeArg;
 };
 
-void DWCUtilTask_Init(void);
-void DWCUtilTask_Exit(void);
+void DWCi_TSKlInit(void);
+void DWCi_TSKlEnd(void);
 // Runs the list's tasks, then removes the ones queued for removal
 void DWCUtilTask_Run(int list);
 // Adds a task, after the list's tasks of the same or a lower priority value
-DWCUtilTask *DWCUtilTask_Create(int list, DWCUtilTaskCallback callback, void *arg, u8 priority);
-DWCUtilTask *DWCUtilTask_CreateEx(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg);
-void DWCUtilTask_SetCallback(DWCUtilTask *task, DWCUtilTaskCallback callback);
+DWCUtilTask *DWCi_TSKlForm(int list, DWCUtilTaskCallback callback, void *arg, u8 priority);
+DWCUtilTask *formTask(int list, DWCUtilTaskCallback callback, void *arg, u8 priority, u8 freeArg);
+void DWCi_TSKlChangeFunc(DWCUtilTask *task, DWCUtilTaskCallback callback);
 // Queues the task's removal
-void DWCUtilTask_QueueRemoval(int list, DWCUtilTask *task);
-void DWCUtilTask_Remove(int list, DWCUtilTask *task);
-void DWCUtilTask_Destroy(int list, DWCUtilTask *task);
+void DWCi_TSKlDelete(int list, DWCUtilTask *task);
+void DWCi_TSKlDeleteEx(int list, DWCUtilTask *task);
+void deleteTcb(int list, DWCUtilTask *task);
 // Turns the running of the list's tasks on or off
-void DWCUtilTask_SetActive(int list, u8 active);
+void DWCi_TSKlOperate(int list, u8 active);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_TASK_H

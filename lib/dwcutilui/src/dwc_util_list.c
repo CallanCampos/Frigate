@@ -2,8 +2,8 @@
 #include "dwc_util_heap.h"
 #include "nitro/os.h"
 
-DWCUtilList *DWCUtilList_Create(void) {
-    DWCUtilList *list = DWCUtilHeap_AllocClear(sizeof(DWCUtilList), 4);
+DWCUtilList *DWCi_LSTlForm(void) {
+    DWCUtilList *list = DWCi_HEAPlAllocEx(sizeof(DWCUtilList), 4);
 
     list->head.prev = NULL;
     list->head.next = &list->tail;
@@ -12,11 +12,11 @@ DWCUtilList *DWCUtilList_Create(void) {
     return list;
 }
 
-void DWCUtilList_Destroy(DWCUtilList *list) {
-    DWCUtilHeap_FreeAndNull(&list);
+void DWCi_LSTlDelete(DWCUtilList *list) {
+    DWCi_HEAPlFree_(&list);
 }
 
-void DWCUtilList_Remove(void *node) {
+void DWCi_LSTlErase(void *node) {
     DWCUtilNode *links = node;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
 
@@ -27,7 +27,7 @@ void DWCUtilList_Remove(void *node) {
     OS_EnableIrqMask(irq);
 }
 
-void DWCUtilList_InsertBefore(void *position, void *node) {
+void DWCi_LSTlInsert(void *position, void *node) {
     DWCUtilNode *at = position;
     DWCUtilNode *links = node;
     u32 irq = OS_DisableIrqMask(OS_IE_V_BLANK);
@@ -39,10 +39,10 @@ void DWCUtilList_InsertBefore(void *position, void *node) {
     OS_EnableIrqMask(irq);
 }
 
-void DWCUtilList_Append(DWCUtilList *list, void *node) {
-    DWCUtilList_InsertBefore(&list->tail, node);
+void DWCi_LSTlPushBack(DWCUtilList *list, void *node) {
+    DWCi_LSTlInsert(&list->tail, node);
 }
 
-void DWCUtilList_Prepend(DWCUtilList *list, void *node) {
-    DWCUtilList_InsertBefore(list->head.next, node);
+void DWCi_LSTlPushFront(DWCUtilList *list, void *node) {
+    DWCi_LSTlInsert(list->head.next, node);
 }

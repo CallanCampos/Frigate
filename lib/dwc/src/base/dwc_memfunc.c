@@ -6,48 +6,48 @@
 // deallocator, with a header before every block that keeps its size, and the four functions that it gives GameSpy.
 
 // The magic number of a block's header, 'DWCM'
-#define DWC_MEM_MAGIC 0x4457434d
+#define DWCi_MEMFUNC_SIGNATURE 0x4457434d
 // The alignment of a block that has none given
 #define DWC_MEM_ALIGN 32
 
-typedef struct DWCMemHeader {
-    u32 magic;
+typedef struct DWCiAllocHeader {
+    u32 signature;
     // The size of the block that the caller asked for, without this header
     u32 size;
-    u8 unk8[0x18];
-} DWCMemHeader;
+    u8 dummy[0x18];
+} DWCiAllocHeader;
 
 typedef struct DWCMemFuncs {
-    DWCFreeFunc free;
-    DWCAllocFunc alloc;
+    DWCFreeEx free;
+    DWCAllocEx alloc;
 } DWCMemFuncs;
 
 static DWCMemFuncs sMemFuncs;
 
 static void *DWC_ReallocEx(DWCAllocType name, void *ptr, u32 oldSize, u32 newSize, int align);
-static DWCMemHeader *DWCi_GetMemHeader(void *ptr);
-static void *DWCi_InitMemHeader(DWCMemHeader *header, u32 size);
-static u32 DWCi_GetMemSize(void *ptr);
+static DWCiAllocHeader *DWCi_GetAllocateHeader(void *ptr);
+static void *DWCi_SetAllocateHeader(DWCiAllocHeader *header, u32 size);
+static u32 DWCi_GetAllocateSize(void *ptr);
 static void *DWC_Realloc(DWCAllocType name, void *ptr, u32 oldSize, u32 newSize);
 
 // The header of a block
-static DWCMemHeader *DWCi_GetMemHeader(void *ptr) {
-    return (DWCMemHeader *)ptr - 1;
+static DWCiAllocHeader *DWCi_GetAllocateHeader(void *ptr) {
+    return (DWCiAllocHeader *)ptr - 1;
 }
 
 // Makes the header of a block that the allocator gave, and returns the block that the caller gets
-static void *DWCi_InitMemHeader(DWCMemHeader *header, u32 size) {
+static void *DWCi_SetAllocateHeader(DWCiAllocHeader *header, u32 size) {
     header->size = size;
-    header->magic = DWC_MEM_MAGIC;
+    header->signature = DWCi_MEMFUNC_SIGNATURE;
     return header + 1;
 }
 
 // The size of a block
-static u32 DWCi_GetMemSize(void *ptr) {
-    return DWCi_GetMemHeader(ptr)->size;
+static u32 DWCi_GetAllocateSize(void *ptr) {
+    return DWCi_GetAllocateHeader(ptr)->size;
 }
 
-void DWCi_SetMemFunc(DWCAllocFunc alloc, DWCFreeFunc free) {
+void DWC_SetMemFunc(DWCAllocEx alloc, DWCFreeEx free) {
     sMemFuncs.alloc = alloc;
     sMemFuncs.free = free;
 }
@@ -57,22 +57,22 @@ void *DWC_Alloc(DWCAllocType name, u32 size) {
 }
 
 void *DWC_AllocEx(DWCAllocType name, u32 size, int align) {
-    DWCMemHeader *header = sMemFuncs.alloc(name, size + sizeof(DWCMemHeader), align);
+    DWCiAllocHeader *header = sMemFuncs.alloc(name, size + sizeof(DWCiAllocHeader), align);
 
     if (header == NULL) {
         return NULL;
     }
-    return DWCi_InitMemHeader(header, size);
+    return DWCi_SetAllocateHeader(header, size);
 }
 
 void DWC_Free(DWCAllocType name, void *ptr, u32 size) {
-    DWCMemHeader *header;
+    DWCiAllocHeader *header;
 
     if (ptr == NULL) {
         return;
     }
-    header = DWCi_GetMemHeader(ptr);
-    sMemFuncs.free(name, header, header->size + sizeof(DWCMemHeader));
+    header = DWCi_GetAllocateHeader(ptr);
+    sMemFuncs.free(name, header, header->size + sizeof(DWCiAllocHeader));
 }
 
 // Gives a block another size, keeping what fits of its contents. The old size is not read: the header has it
@@ -87,14 +87,14 @@ static void *DWC_ReallocEx(DWCAllocType name, void *ptr, u32 oldSize, u32 newSiz
         return NULL;
     }
     if (ptr != NULL) {
-        oldSize = DWCi_GetMemSize(ptr);
+        oldSize = DWCi_GetAllocateSize(ptr);
         MI_CpuCopy8(ptr, newPtr, oldSize <= newSize ? oldSize : newSize);
         DWC_Free(name, ptr, oldSize);
     }
     return newPtr;
 }
 
-void *DWCi_GsAlloc(size_t size) {
+void *DWCi_GsMalloc(size_t size) {
     return DWC_Alloc(DWC_ALLOCTYPE_GS, size);
 }
 

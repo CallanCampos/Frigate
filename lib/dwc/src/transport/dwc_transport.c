@@ -17,7 +17,7 @@ typedef GT2Result (*DWCTransportSendFunc)(GT2Connection connection, const GT2Byt
 typedef struct DWCTransportHeader {
     u32 size;
     u16 type;
-    char magic[2];
+    char magicStrings[2];
 } DWCTransportHeader;
 
 // The file's own functions, which aren't static: as statics MWCC inlines the small ones into their callers
@@ -268,7 +268,7 @@ BOOL DWC_SetRecvBuffer(u8 netId, void *buffer, int size) {
     return TRUE;
 }
 
-BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param) {
+BOOL DWC_SetUserSendCallback(DWCUserSendCallback func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -277,7 +277,7 @@ BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param) {
     return TRUE;
 }
 
-BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param) {
+BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -286,7 +286,7 @@ BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param) {
     return TRUE;
 }
 
-BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param) {
+BOOL DWC_SetUserRecvTimeoutCallback(DWCUserRecvTimeoutCallback func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -296,7 +296,7 @@ BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param) {
 }
 
 void DWCs_EncodeHeader(DWCTransportHeader *header, int type, int size) {
-    strncpy(header->magic, "DT", 2);
+    strncpy(header->magicStrings, "DT", 2);
     header->type = type;
     header->size = size;
 }
@@ -305,7 +305,7 @@ u16 DWCs_DecodeHeader(const void *data) {
     DWCTransportHeader header;
 
     MI_CpuCopy8(data, &header, sizeof(DWCTransportHeader));
-    if (memcmp(header.magic, "DT", 2) == 0) {
+    if (memcmp(header.magicStrings, "DT", 2) == 0) {
         return header.type;
     }
     return 0;
@@ -335,8 +335,8 @@ BOOL DWC_SetRecvTimeoutTime(u8 netId, u32 timeout) {
     if (sTransport == NULL) {
         return FALSE;
     }
-    sTransport->connections[netId].recvTimeout = timeout;
-    sTransport->connections[netId].recvTimeoutTime = OS_GetTick();
+    sTransport->connections[netId].recvTimeoutTime = timeout;
+    sTransport->connections[netId].previousRecvTick = OS_GetTick();
     return TRUE;
 }
 
@@ -424,15 +424,15 @@ void DWCi_TransportProcess(void) {
         if (DWC_IsValidAID(aid)) {
             u64 current = OS_GetTick();
             u32 limit;
-            DWCTimeoutFunc callback;
+            DWCUserRecvTimeoutCallback callback;
 
             connection = DWCs_GetTransConnection(aid);
             callback = sTransport->recvTimeoutCallback;
             if (callback != NULL) {
-                limit = connection->recvTimeout;
-                if (limit != 0 && (u32)OS_TicksToMilliSeconds(current - connection->recvTimeoutTime) > limit) {
+                limit = connection->recvTimeoutTime;
+                if (limit != 0 && (u32)OS_TicksToMilliSeconds(current - connection->previousRecvTick) > limit) {
                     callback(aid, sTransport->recvTimeoutParam);
-                    connection->recvTimeoutTime = current;
+                    connection->previousRecvTick = current;
                 }
             }
         }
@@ -646,8 +646,8 @@ void DWCs_HandleUnreliableMessage(GT2Connection connection, const void *data, in
     if (sTransport->recvCallback != NULL) {
         sTransport->recvCallback(aid, (u8 *)bytes, size, sTransport->recvParam);
     }
-    if (sTransport->recvTimeoutCallback != NULL && transport->recvTimeout != 0) {
-        transport->recvTimeoutTime = OS_GetTick();
+    if (sTransport->recvTimeoutCallback != NULL && transport->recvTimeoutTime != 0) {
+        transport->previousRecvTick = OS_GetTick();
     }
 }
 
@@ -702,8 +702,8 @@ void DWCs_RecvDataBody(u8 aid, const void *data, int size) {
             sTransport->recvCallback(aid, connection->recvBuffer, total, sTransport->recvParam);
         }
     }
-    if (sTransport->recvTimeoutCallback != NULL && connection->recvTimeout != 0) {
-        connection->recvTimeoutTime = OS_GetTick();
+    if (sTransport->recvTimeoutCallback != NULL && connection->recvTimeoutTime != 0) {
+        connection->previousRecvTick = OS_GetTick();
     }
 }
 

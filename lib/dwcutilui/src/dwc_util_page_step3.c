@@ -27,22 +27,22 @@ typedef struct DWCUtilPageStep3 {
 } DWCUtilPageStep3;
 
 static BOOL DWCUtilPageStep3_IsLidClosed(void);
-static void DWCUtilPageStep3_LoadGraphics(void);
-static void DWCUtilPageStep3_FadeIn(void);
-static void DWCUtilPageStep3_WaitFadeIn(void);
-static void DWCUtilPageStep3_WaitButtons(void);
-static void DWCUtilPageStep3_RunSetup(void);
-static void DWCUtilPageStep3_HandleInput(void);
-static void func_ov182_021b08ec(void);
-static void DWCUtilPageStep3_HandleCancel(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilPageStep3_DisableButtons(void);
-static void DWCUtilPageStep3_FadeOut(void);
-static void DWCUtilPageStep3_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilPageStep3_InputTask(DWCUtilTask *task, void *arg);
-static void DWCUtilPageStep3_WaitDialog(void);
-static void DWCUtilPageStep3_WaitDialogClosed(void);
+static void procError(void);
+static void procError1(void);
 static void DWCUtilPageStep3_ShowSuccess(void);
-static void DWCUtilPageStep3_Cancel(void);
+static void procCancel(void);
 
 static DWCUtilPageStep3 sPageStep3;
 
@@ -56,18 +56,18 @@ static BOOL DWCUtilPageStep3_IsLidClosed(void) {
 
 void DWCUtilPageStep3_Init(void) {
     sPageStep3.frames = 0;
-    DWCUtilPageStep3_LoadGraphics();
-    DWCUtilBgOverlay_ShowConnectionSet();
-    DWCUtilScreen_Start(0x36, -1, 0);
-    DWCUtilGfxResource_ShowStep(2);
-    DWCUtilGfxResource_ShowMessage(0x22);
-    DWCUtilUiEffect_Init(0);
-    DWCUtilAossSession_Init();
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_COMMENTlDispEx(0x36, -1, 0);
+    DWCi_CMNlStep(2);
+    DWCi_CMNlMsgDraw(0x22);
+    DWCi_ANIMElInitEx(0);
+    DWCi_AOSSlInit();
     DWCUtilSound_PlaySe(0xb);
-    DWCUtilMain_SetUpdate(DWCUtilPageStep3_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilPageStep3_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
@@ -78,43 +78,43 @@ static void DWCUtilPageStep3_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilPageStep3_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilPageStep3_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(1);
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(1);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilPageStep3_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        sPageStep3.task = DWCUtilTask_Create(1, DWCUtilPageStep3_InputTask, NULL, 0x78);
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_RunSetup);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        sPageStep3.task = DWCi_TSKlForm(1, DWCUtilPageStep3_InputTask, NULL, 0x78);
+        DWCi_ChangeScene(procScene);
     }
 }
 
 // Runs the setup
-static void DWCUtilPageStep3_RunSetup(void) {
-    DWCUtilPageStep3_HandleInput();
-    func_ov182_021b08ec();
-    DWCUtilPageStep3_HandleCancel();
+static void procScene(void) {
+    input();
+    draw();
+    button();
     switch (DWCUtilAossSession_Run()) {
     case 0:
         break;
     case 1:
         if (sPageStep3.task != NULL) {
             sPageStep3.succeeded = TRUE;
-            DWCUtilTask_Remove(1, sPageStep3.task);
+            DWCi_TSKlDeleteEx(1, sPageStep3.task);
             sPageStep3.task = NULL;
-            DWCUtilMain_SetUpdate(DWCUtilPageStep3_ShowSuccess);
+            DWCi_ChangeScene(DWCUtilPageStep3_ShowSuccess);
         }
         break;
     case 2:
@@ -122,120 +122,120 @@ static void DWCUtilPageStep3_RunSetup(void) {
             DWCUtilSound_StopSe();
             DWCUtilDialog_Open(0xc, 1, 1, -1, 0);
             DWCUtilSound_PlaySe(9);
-            DWCUtilUiObject_Disable();
-            DWCUtilTask_Remove(1, sPageStep3.task);
+            DWCi_BTNlDisable();
+            DWCi_TSKlDeleteEx(1, sPageStep3.task);
             sPageStep3.task = NULL;
-            DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitDialog);
+            DWCi_ChangeScene(procError);
         }
         break;
     }
 }
 
-static void DWCUtilPageStep3_HandleInput(void) {
-    if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+static void input(void) {
+    if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
     } else if (DWCUtilPageStep3_IsLidClosed()) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+        DWCi_BTNlSet(0);
     }
 }
 
-static void func_ov182_021b08ec(void) {
+static void draw(void) {
 }
 
 // Cancels the setup
-static void DWCUtilPageStep3_HandleCancel(void) {
-    if (DWCUtilUiObject_GetState() == 0 && sPageStep3.task != NULL) {
-        DWCUtilTask_QueueRemoval(1, sPageStep3.task);
+static void button(void) {
+    if (DWCi_BTNlGet() == 0 && sPageStep3.task != NULL) {
+        DWCi_TSKlDelete(1, sPageStep3.task);
         sPageStep3.task = NULL;
-        DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_Cancel);
+        DWCi_BTNlDisable();
+        DWCi_ChangeScene(procCancel);
     }
 }
 
 static void DWCUtilPageStep3_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
+    DWCi_BTNlDisable();
     if (sPageStep3.task != NULL) {
-        DWCUtilTask_Remove(1, sPageStep3.task);
+        DWCi_TSKlDeleteEx(1, sPageStep3.task);
     }
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilPageStep3_FadeOut);
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilPageStep3_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilUiObject_Exit();
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_BTNlEnd();
         if (!sPageStep3.succeeded) {
-            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+            DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilPageStep3_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) != 0) {
+static void endScene2(void) {
+    if (DWCi_EFFlCheck(0) != 0) {
         return;
     }
-    if (!sPageStep3.succeeded && DWCUtilFade_IsActive(1) != 0) {
+    if (!sPageStep3.succeeded && DWCi_EFFlCheck(1) != 0) {
         return;
     }
-    if (!DWCUtilUiObject_IsIdle()) {
+    if (!DWCi_BTNlIsEnd()) {
         return;
     }
     DWCUtilAossSession_Exit(sPageStep3.succeeded != FALSE);
-    DWCUtilUiEffect_Destroy();
-    DWCUtilText_DestroyScreenBg(0);
+    DWCi_ANIMElEnd();
+    DWCi_FNTlDeleteBgLcd(0);
     if (!sPageStep3.succeeded) {
-        DWCUtilScreen_Stop();
+        DWCi_COMMENTlDelete();
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     }
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
     if (!sPageStep3.succeeded) {
-        DWCUtilMain_SetLayout(2, 1);
-        DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
+        DWCi_SetParam_(2, 1);
+        DWCi_ChangeScene(DWCUtilScreenWay_Init);
     } else {
-        DWCUtilMain_SetLayout(0, 0);
-        DWCUtilMain_SetUpdate(DWCUtilPageMulti4_Init);
+        DWCi_SetParam_(0, 0);
+        DWCi_ChangeScene(DWCUtilPageMulti4_Init);
     }
 }
 
 static void DWCUtilPageStep3_InputTask(DWCUtilTask *task, void *arg) {
-    DWCUtilTouch_Update();
+    DWCi_IPTlRead();
     DWCUtilTask_Run(0);
-    DWCUtilPageStep3_HandleInput();
-    DWCUtilPageStep3_HandleCancel();
+    input();
+    button();
 }
 
-static void DWCUtilPageStep3_WaitDialog(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+static void procError(void) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_WaitDialogClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(procError1);
     }
 }
 
-static void DWCUtilPageStep3_WaitDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_DisableButtons);
+static void procError1(void) {
+    if (!DWCi_WINlIsInit()) {
+        DWCi_ChangeScene(DWCUtilPageStep3_DisableButtons);
     }
 }
 
 // Keeps the message of the success for 1080 frames
 static void DWCUtilPageStep3_ShowSuccess(void) {
-    DWCUtilPageStep3_HandleInput();
-    func_ov182_021b08ec();
-    DWCUtilPageStep3_HandleCancel();
+    input();
+    draw();
+    button();
     sPageStep3.frames++;
     if (sPageStep3.frames >= 1080) {
         DWCUtilSound_StopSe();
-        DWCUtilMain_SetUpdate(DWCUtilPageStep3_DisableButtons);
+        DWCi_ChangeScene(DWCUtilPageStep3_DisableButtons);
     }
 }
 
-static void DWCUtilPageStep3_Cancel(void) {
+static void procCancel(void) {
     DWCUtilSound_StopSe();
     DWCUtilSound_PlaySe(7);
     sPageStep3.succeeded = FALSE;
-    DWCUtilMain_SetUpdate(DWCUtilPageStep3_DisableButtons);
+    DWCi_ChangeScene(DWCUtilPageStep3_DisableButtons);
 }

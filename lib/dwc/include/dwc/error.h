@@ -8,8 +8,8 @@
 // carry its names in the comments, where the code shows them.
 
 // The error that none has set, and the numbers that the part that failed gives: the SDK's DWCError, in its order
-// (recalled from the SDK, which the types that DWC_GetLastErrorEx gives them fit). The numbers from 14 to 22 are left
-// bare
+// (recalled from the SDK, which the types that DWC_GetLastErrorEx gives them fit). The numbers from 19 to 22 are left
+// bare. From ND_ANY on, the ROM's numbers sit one below the reference's, whose MO_SC_CONNECT_BLOCK comes before ND_ANY
 typedef enum DWCError {
     DWC_ERROR_NONE = 0,
     DWC_ERROR_DS_MEMORY_ANY = 1,
@@ -26,6 +26,14 @@ typedef enum DWCError {
     DWC_ERROR_NOT_FRIEND_SERVER = 11,
     DWC_ERROR_SERVER_FULL = 12,
     DWC_ERROR_ND_ANY = 13,
+    // The download library's HTTP failure
+    DWC_ERROR_ND_HTTP = 14,
+    // The service locator's answer and server errors, and its HTTP failure
+    DWC_ERROR_SVL_ANY = 15,
+    DWC_ERROR_SVL_HTTP = 16,
+    // The profanity check's answer errors, and its HTTP failure
+    DWC_ERROR_PROF_ANY = 17,
+    DWC_ERROR_PROF_HTTP = 18,
 } DWCError;
 
 // What a caller does about an error, which DWC_GetLastErrorEx gives from the error: the SDK's DWCErrorType, in its

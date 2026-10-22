@@ -75,12 +75,12 @@ BOOL DWC_SetRecvTimeoutTime(u8 netId, u32 timeout);
 // The functions called when data has been sent, when it has been received and when a machine has not sent for too
 // long, with the parameter they were set with; the setters of the transport's (dwc/transport.h) return FALSE while it
 // isn't running
-typedef void (*DWCSendFunc)(int size, u8 netId, void *param);
-typedef void (*DWCRecvFunc)(u8 netId, u8 *data, int size, void *param);
-typedef void (*DWCTimeoutFunc)(u8 netId, void *param);
-BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param);
-BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param);
-BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param);
+typedef void (*DWCUserSendCallback)(int size, u8 netId, void *param);
+typedef void (*DWCUserRecvCallback)(u8 netId, u8 *data, int size, void *param);
+typedef void (*DWCUserRecvTimeoutCallback)(u8 netId, void *param);
+BOOL DWC_SetUserSendCallback(DWCUserSendCallback func, void *param);
+BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback func, void *param);
+BOOL DWC_SetUserRecvTimeoutCallback(DWCUserRecvTimeoutCallback func, void *param);
 
 // Overlay 11's, which the library's start in main (dwc_init.c) calls: chooses the servers that the library talks to
 // by the kind of start, 0 for development, 1 for retail (it knows a 2, which the start in main never gives), returning

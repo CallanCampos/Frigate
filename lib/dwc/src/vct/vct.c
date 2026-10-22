@@ -14,9 +14,9 @@ struct VCTLibrary {
 };
 
 static VCTLibrary sLibrary;
-VCTSettings gVCTSettings;
+VCTi_Globals vct;
 
-static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result);
+static int VCTi_HandleData(int aid, void *data, int size, VCTResult *result);
 
 BOOL VCT_Init(VCTConfig *config) {
     SDK_USING_MIDDLEWARE(VCTi_Signature);
@@ -32,67 +32,67 @@ BOOL VCT_Init(VCTConfig *config) {
     if (config->callback == NULL) {
         return FALSE;
     }
-    if (config->buffer == NULL || config->bufferSize == 0) {
+    if (config->audioBuffer == NULL || config->audioBufferSize == 0) {
         return FALSE;
     }
-    if ((int)config->buffer % 32 != 0) {
+    if ((int)config->audioBuffer % 32 != 0) {
         return FALSE;
     }
-    MI_CpuFill8(&gVCTSettings, 0, sizeof(gVCTSettings));
-    gVCTSettings.callback = config->callback;
-    gVCTSettings.userData = config->userData;
-    gVCTSettings.mode = config->mode;
-    gVCTSettings.listenMode = 0;
+    MI_CpuFill8(&vct, 0, sizeof(vct));
+    vct.callback = config->callback;
+    vct.userData = config->userData;
+    vct.SSPMode = config->mode;
+    vct.listenMode = 0;
     if (config->aid >= VCT_AID_MAX) {
         return FALSE;
     }
-    gVCTSettings.aid = config->aid;
-    if (!VCT_InitPacketPool(config->buffer, config->bufferSize)) {
-        VCT_ClearPacketPool();
+    vct.myAID = config->aid;
+    if (!vct_init_packet_buffer(config->audioBuffer, config->audioBufferSize)) {
+        vct_cleanup_packet_buffer();
         return FALSE;
     }
-    if (!VCT_InitSessions(config)) {
-        VCT_ClearPacketPool();
+    if (!vct_init_ssp(config)) {
+        vct_cleanup_packet_buffer();
         return FALSE;
     }
-    if (VCT_InitAudio()) {
+    if (vct_init_audio()) {
         sLibrary.initialized = TRUE;
         return TRUE;
     }
-    VCT_ClearSessions();
-    VCT_ClearPacketPool();
+    vct_finish_ssp();
+    vct_cleanup_packet_buffer();
     return FALSE;
 }
 
-void VCT_Shutdown(void) {
-    VCT_ClearSessionCount();
-    VCT_ClearSessions();
-    VCT_ClearPacketPool();
-    gVCTSettings.mode = 0;
+void VCT_Cleanup(void) {
+    vct_finish_audio();
+    vct_finish_ssp();
+    vct_cleanup_packet_buffer();
+    vct.SSPMode = 0;
     sLibrary.initialized = FALSE;
 }
 
-void VCT_Tick(void) {
+void VCT_Main(void) {
     if (!sLibrary.initialized) {
         return;
     }
     sLibrary.tickCount++;
     if ((sLibrary.tickCount & 0xf) == 0) {
-        VCT_CheckTimeout();
+        vct_check_timeout();
     }
-    if (VCT_SendPending()) {
-        VCT_DecodeReceived();
+    if (vct_flush_send_buffer()) {
+        vct_decode_audio_buffer();
     }
 }
 
-BOOL VCT_ReceivePacket(u8 aid, u8 *data, int size) {
-    VCTEventResult result;
+BOOL VCT_HandleData(u8 aid, u8 *data, int size) {
+    VCTResult result;
 
-    switch (DispatchPacket(aid, data, size, &result)) {
+    switch (VCTi_HandleData(aid, data, size, &result)) {
     case 0:
         break;
     case 1:
-        gVCTSettings.callback(aid, result.event, result.session, gVCTSettings.userData);
+        vct.callback(aid, result.event, result.session, vct.userData);
         return TRUE;
     case 2:
         return FALSE;
@@ -102,9 +102,9 @@ BOOL VCT_ReceivePacket(u8 aid, u8 *data, int size) {
 
 // Hands a packet to the voice or the control side by its type, returning 0 for one that has been dealt with, 1 for
 // one that has given an event and 2 for one that does not belong to the library
-static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result) {
-    VCTVoicePacket *voice = data;
-    VCTControlPacket *control = data;
+static int VCTi_HandleData(int aid, void *data, int size, VCTResult *result) {
+    AudioHeader *voice = data;
+    SSPHeader *control = data;
     u64 now;
 
     if (data == NULL) {
@@ -113,19 +113,19 @@ static int DispatchPacket(int aid, void *data, int size, VCTEventResult *result)
     if (voice->magic != VCT_PACKET_MAGIC) {
         return 2;
     }
-    if (gVCTSettings.mode == 0 || !sLibrary.initialized) {
+    if (vct.SSPMode == 0 || !sLibrary.initialized) {
         return 0;
     }
     result->event = 0;
     result->session = NULL;
     now = OS_GetTick();
-    if ((voice->type & 0xf0) == VCT_TYPE_VOICE) {
+    if ((voice->header & 0xf0) == VCT_HEADER_AUDIO) {
         sLibrary.receivedCount++;
-        VCT_HandleVoicePacket(aid, voice, size, now);
+        vct_handle_audio(aid, voice, size, now);
         return 0;
     }
-    if (control->type == VCT_TYPE_CONTROL || control->type == VCT_TYPE_BROADCAST) {
-        return VCT_HandleControlPacket(aid, control, size, result) != FALSE ? 1 : 0;
+    if (control->method == VCT_METHOD_RESPONSE || control->method == VCT_METHOD_REQUEST) {
+        return vct_handle_ssp(aid, control, size, result) != FALSE ? 1 : 0;
     }
     return 0;
 }

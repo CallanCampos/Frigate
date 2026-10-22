@@ -24,7 +24,7 @@ extern const char DWCi_Signature[];
 
 // Starts the library for the retail servers with the game's name and code, and the allocator and deallocator it uses,
 // and returns one of the results above: DWC_InitForProduction
-int DWC_InitForProduction(const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free);
+int DWC_InitForProduction(const char *gameName, u32 gameCode, DWCAllocEx alloc, DWCFreeEx free);
 // The game code that the library was started with
 u32 DWCi_GetGameCode(void);
 

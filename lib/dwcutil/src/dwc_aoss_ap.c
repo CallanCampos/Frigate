@@ -7,8 +7,9 @@
 #include "nitrowifi/wcm.h"
 
 // The access point layer of the AOSS client (see dwc_aoss_ap.h): the scan for the access points, the connection to one
-// with a WEP key, and the disconnection, over DWC_Wcm_*. A message queue turns the WCM's events into waits. The ROM
-// names none of it; the names are ours.
+// with a WEP key, and the disconnection, over APC_*. A message queue turns the WCM's events into waits. The ROM
+// names none of it; the names are the DWC utility library's own, as that library's symbols and debug information have
+// them, where the code shows them, and ours elsewhere.
 //
 // MWCC 2.0 lays the statics out in the reverse of their definition order. The four globals are defined with an
 // initializer, which lets the functions below reach them from one base.
@@ -17,20 +18,20 @@
 #define WIFI_ALARM_SCAN 0x13
 #define WIFI_ALARM_CONNECT 0x12
 
-typedef struct WifiWepDesc {
+typedef struct WCMWepDesc {
     u8 mode;
     u8 keyId;
     u8 key[4][20];
     u8 padding[14];
-} WifiWepDesc;
+} WCMWepDesc;
 
-static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap);
-static void Wifi_MakeBss(const WifiConnectParam *param, WMBssDesc *bss);
-static void Wifi_ReportConnect(WifiConnectResult *result, const WMBssDesc *bss, int success);
-static void Wifi_OnEvent(int event, int param);
-static void Wifi_OnAlarm(void *arg);
+static void Set_WLLA_BSS_INFO(const WMBssDesc *bss, WLLA_BSS_INFO *ap);
+static void Get_WLLA_SSID_PARAM(const WLLA_CONNECT_PARAM *param, WMBssDesc *bss);
+static void Set_WLLA_LINK_STAT(WLLA_LINK_STAT *result, const WMBssDesc *bss, int success);
+static void aoss_apc_callback(int event, int param);
+static void alarmCallback(void *arg);
 
-static WifiWepDesc sWep;
+static WCMWepDesc sWep;
 static WMBssDesc sBss;
 static OSMessageQueue sAossApQueue;
 static OSMessage sAossApMessages[4];
@@ -40,7 +41,7 @@ void (*gAossApOnModeChange)(int mode) = NULL;
 DWCAossAllocFunc gAossApAlloc = NULL;
 
 // The WM's description of an access point to ours
-static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
+static void Set_WLLA_BSS_INFO(const WMBssDesc *bss, WLLA_BSS_INFO *ap) {
     static struct {
         u16 mask;
         u8 rate;
@@ -53,8 +54,8 @@ static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
 
     ap->ssidLength = bss->ssidLength;
     MIi_CpuCopy16(bss->ssid, ap->ssid, 0x20);
-    ap->channel = bss->channel;
-    MIi_CpuCopy16(bss->bssid, ap->bssid, 6);
+    ap->Channel = bss->channel;
+    MIi_CpuCopy16(bss->bssid, ap->Bssid, 6);
     count = 0;
     for (i = 0; i < 12; i++) {
         if (bss->rateSetSupport & sRates[i].mask) {
@@ -66,36 +67,36 @@ static void Wifi_ConvertBss(const WMBssDesc *bss, WifiApInfo *ap) {
         }
     }
     ap->rateCount = count;
-    ap->beaconPeriod = bss->beaconPeriod;
+    ap->BeaconPeriod = bss->beaconPeriod;
     if ((bss->capaInfo & 3) == 1) {
-        ap->type = 1;
+        ap->Capability = 1;
     } else if ((bss->capaInfo & 3) == 2) {
-        ap->type = 2;
+        ap->Capability = 2;
     } else {
-        ap->type = 0;
+        ap->Capability = 0;
     }
 }
 
-static void Wifi_MakeBss(const WifiConnectParam *param, WMBssDesc *bss) {
+static void Get_WLLA_SSID_PARAM(const WLLA_CONNECT_PARAM *param, WMBssDesc *bss) {
     MI_CpuClear16(bss->ssid, 0x20);
     bss->ssidLength = param->ssidLength;
     MI_CpuCopy8(param->ssid, bss->ssid, bss->ssidLength);
 }
 
-static void Wifi_ReportConnect(WifiConnectResult *result, const WMBssDesc *bss, int success) {
-    result->success = success;
-    Wifi_ConvertBss(bss, &result->ap);
+static void Set_WLLA_LINK_STAT(WLLA_LINK_STAT *result, const WMBssDesc *bss, int success) {
+    result->LinkStat = success;
+    Set_WLLA_BSS_INFO(bss, &result->BssInfo);
 }
 
-static void Wifi_OnEvent(int event, int param) {
+static void aoss_apc_callback(int event, int param) {
     OS_SendMessage(&sAossApQueue, (OSMessage)event, 0);
 }
 
-static void Wifi_OnAlarm(void *arg) {
+static void alarmCallback(void *arg) {
     OS_SendMessage(&sAossApQueue, arg, 0);
 }
 
-int DWC_Aoss_Init(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
+int AOSSi_InitLocal(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
     BOOL ok = TRUE;
     OSMessage message;
     u32 mask;
@@ -112,7 +113,7 @@ int DWC_Aoss_Init(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
     if (gAossApBlock == NULL) {
         return -1;
     }
-    if (DWC_Wcm_Start(Wifi_OnEvent, gAossApBlock, 0x5890) == 0) {
+    if (APC_Init(aoss_apc_callback, gAossApBlock, 0x5890) == 0) {
         ok = FALSE;
     }
     if (ok) {
@@ -146,7 +147,7 @@ int DWC_Aoss_Init(DWCAossAllocFunc alloc, DWCAossFreeFunc free) {
     return -1;
 }
 
-int DWC_Aoss_Shutdown(void) {
+int AOSSi_EndLocal(void) {
     BOOL ok = TRUE;
     int result = -1;
     OSMessage message;
@@ -155,7 +156,7 @@ int DWC_Aoss_Shutdown(void) {
     if (gAossApFree == NULL) {
         return result;
     }
-    if (DWC_Wcm_Cleanup() == 0) {
+    if (APC_End() == 0) {
         return -1;
     }
     do {
@@ -198,12 +199,12 @@ int DWC_Aoss_Shutdown(void) {
     return result;
 }
 
-int AossAp_Disconnect(void) {
+int AOSSi_Disconnect(void) {
     int result = -1;
     OSMessage message;
     BOOL more;
 
-    if (DWC_Wcm_Disconnect()) {
+    if (APC_Disconnect()) {
         do {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             if ((int)message == DWC_WCM_EVENT_DISCONNECTED) {
@@ -218,7 +219,7 @@ int AossAp_Disconnect(void) {
 }
 
 // Searches for access points and lists them; 0 if it ended well
-static int AossAp_Scan(WifiScanList **list) {
+int AOSSi_WLANGetBSSList(WLLA_BSS_LIST **list) {
     int result = -1;
     BOOL running = TRUE;
     BOOL started = FALSE;
@@ -238,18 +239,18 @@ static int AossAp_Scan(WifiScanList **list) {
         return -1;
     }
     buffer = descs;
-    if (DWC_Wcm_Search(NULL, NULL, 0, 0x30bffe)) {
+    if (APC_SearchStart(NULL, NULL, 0, 0x30bffe)) {
         OS_CreateAlarm(&alarm);
-        OS_SetAlarm(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_SCAN);
+        OS_SetAlarm(&alarm, 0x3fec42, alarmCallback, (void *)WIFI_ALARM_SCAN);
         do {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
             case WIFI_ALARM_SCAN:
                 if (!started) {
                     if (waits != 0) {
-                        count = DWC_Wcm_GetApList(descs, 0x40);
+                        count = APC_GetAPList(descs, 0x40);
                     }
-                    if (DWC_Wcm_EndSearch()) {
+                    if (APC_SearchEnd()) {
                         started = TRUE;
                     } else {
                         goto cancel;
@@ -261,8 +262,8 @@ static int AossAp_Scan(WifiScanList **list) {
                     if (waits < 8) {
                         waits++;
                     } else {
-                        count = DWC_Wcm_GetApList(descs, 0x40);
-                        if (DWC_Wcm_EndSearch()) {
+                        count = APC_GetAPList(descs, 0x40);
+                        if (APC_SearchEnd()) {
                             started = TRUE;
                         } else {
                             goto cancel;
@@ -297,24 +298,24 @@ static int AossAp_Scan(WifiScanList **list) {
             }
         } while (running);
         {
-            WifiScanList *scanList;
+            WLLA_BSS_LIST *scanList;
             int i;
 
             if (count != 0) {
-                scanList = gAossApAlloc(sizeof(WifiScanList) + (count - 1) * sizeof(WifiApInfo));
+                scanList = gAossApAlloc(sizeof(WLLA_BSS_LIST) + (count - 1) * sizeof(WLLA_BSS_INFO));
                 if (scanList == NULL) {
                     goto cancel;
                 }
             } else {
-                scanList = gAossApAlloc(sizeof(WifiScanList));
+                scanList = gAossApAlloc(sizeof(WLLA_BSS_LIST));
                 if (scanList == NULL) {
                     goto cancel;
                 }
             }
             *list = scanList;
-            scanList->count = count;
+            scanList->Num = count;
             for (i = 0; i < count; i++) {
-                Wifi_ConvertBss(descs, &scanList->ap[i]);
+                Set_WLLA_BSS_INFO(descs, &scanList->BssInfo[i]);
                 descs++;
             }
         }
@@ -328,7 +329,7 @@ static int AossAp_Scan(WifiScanList **list) {
 }
 
 // Connects to the access point; 0 if it did
-static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *result) {
+int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
     BOOL running = TRUE;
     int status = -1;
     int connected = 0;
@@ -338,9 +339,9 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
     OSAlarm alarm;
     int i;
 
-    if (param->authMode == 0) {
+    if (param->AuthAlgo == 0) {
         option = 1 << 19;
-    } else if (param->authMode == 1) {
+    } else if (param->AuthAlgo == 1) {
         option = 3 << 18;
     }
     option |= 3 << 16;
@@ -357,10 +358,10 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
     sWep.keyId = connected;
     MI_CpuCopy8(param->key, sWep.key[connected], param->keyLength);
     WCM_ClearApList();
-    if (DWC_Wcm_Search(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
+    if (APC_SearchStart(NULL, param->ssid, param->ssidLength, 0x30bffe)) {
         tries = 0;
         OS_CreateAlarm(&alarm);
-        OS_SetAlarm(&alarm, 0x3fec42, Wifi_OnAlarm, (void *)WIFI_ALARM_CONNECT);
+        OS_SetAlarm(&alarm, 0x3fec42, alarmCallback, (void *)WIFI_ALARM_CONNECT);
         while (running) {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
@@ -370,14 +371,14 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
             case DWC_WCM_EVENT_FOUND_AP:
                 if (!connected) {
                     OS_CancelAlarm(&alarm);
-                    if (DWC_Wcm_GetApList(&sBss, 1) != 1) {
+                    if (APC_GetAPList(&sBss, 1) != 1) {
                         running = FALSE;
                         break;
                     }
-                    Wifi_MakeBss(param, &sBss);
+                    Get_WLLA_SSID_PARAM(param, &sBss);
                     for (i = 0; i < sBss.ssidLength; i++) {
                     }
-                    if (!DWC_Wcm_Connect(&sBss, &sWep, option)) {
+                    if (!APC_Connect(&sBss, &sWep, option)) {
                         running = FALSE;
                     } else {
                         connected = 1;
@@ -385,8 +386,8 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
                 }
                 break;
             case DWC_WCM_EVENT_SEARCH_ENDED:
-                Wifi_MakeBss(param, &sBss);
-                if (!DWC_Wcm_Connect(&sBss, &sWep, option)) {
+                Get_WLLA_SSID_PARAM(param, &sBss);
+                if (!APC_Connect(&sBss, &sWep, option)) {
                     running = FALSE;
                 }
                 break;
@@ -397,7 +398,7 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
             case DWC_WCM_EVENT_CONNECT_FAILED:
                 tries++;
                 if (tries < 3) {
-                    if (!DWC_Wcm_Connect(&sBss, &sWep, option)) {
+                    if (!APC_Connect(&sBss, &sWep, option)) {
                         running = FALSE;
                     }
                 } else {
@@ -434,15 +435,15 @@ static int AossAp_Connect(const WifiConnectParam *param, WifiConnectResult *resu
         while (OS_ReceiveMessage(&sAossApQueue, &message, 0) == 1) {
         }
     }
-    Wifi_ReportConnect(result, &sBss, status == 0);
+    Set_WLLA_LINK_STAT(result, &sBss, status == 0);
     return status;
 }
 
-void AossAp_Sleep(u32 milliseconds) {
+void AOSSi_Sleep(u32 milliseconds) {
     OS_Sleep(milliseconds);
 }
 
-int AossAp_NotifyModeChange(int mode) {
+int AOSSi_Status(int mode) {
     if (gAossApOnModeChange != NULL) {
         gAossApOnModeChange(mode);
     }

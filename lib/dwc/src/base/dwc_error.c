@@ -56,13 +56,13 @@ DWCError DWC_GetLastErrorEx(int *code, DWCErrorType *type) {
         case DWC_ERROR_ND_ANY:
             *type = DWC_ETYPE_SHUTDOWN_ND;
             break;
-        case 14:
-        case 16:
-        case 18:
+        case DWC_ERROR_ND_HTTP:
+        case DWC_ERROR_SVL_HTTP:
+        case DWC_ERROR_PROF_HTTP:
             *type = DWC_ETYPE_DISCONNECT;
             break;
-        case 15:
-        case 17:
+        case DWC_ERROR_SVL_ANY:
+        case DWC_ERROR_PROF_ANY:
         case 19:
         case 20:
             *type = DWC_ETYPE_SHOW_ERROR;

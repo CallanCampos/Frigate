@@ -12,6 +12,6 @@ void DWCUtilMainMenu_ExitUtility(void);
 // The utility's first screen, which loads the graphics and the message file
 void DWCUtilMainMenu_InitUtility(void);
 // The choice between the connection settings and the options
-void DWCUtilMainMenu_Init(void);
+void DWCi_SceneMenu(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_MAIN_MENU_H

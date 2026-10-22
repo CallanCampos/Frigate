@@ -4,13 +4,13 @@
 
 // Frees a response: the blocks of its header, the copies that were made of it, the buffer of the body (by the user's
 // function) and the response itself
-void NHTTP_DestroyResponse(NHttpMutexInfo *mutexInfo, NHttpResponse *response) {
-    NHttpHeaderBlock *block = response->blocks;
+void NHTTP_DestroyResponse(NHttpMutexInfo *mutexInfo, NHTTPRes *response) {
+    NHTTPi_HDRBUFLIST *block = response->blocks;
     NHttpConnection *connection;
 
     if (block != NULL) {
         do {
-            NHttpHeaderBlock *next = block->next;
+            NHTTPi_HDRBUFLIST *next = block->next;
 
             NHTTPi_free(block);
             block = next;
@@ -36,7 +36,7 @@ void NHTTP_DestroyResponse(NHttpMutexInfo *mutexInfo, NHttpResponse *response) {
 }
 
 // Finds a header field by its name. Gives the place of its value in valueStart and returns the value's length, or -1
-int NHTTPi_getHeaderValue(NHttpResponse *response, const char *name, int *valueStart) {
+int NHTTPi_getHeaderValue(NHTTPRes *response, const char *name, int *valueStart) {
     int colon;
     int lineEnd = 0;
     int line;
@@ -75,7 +75,7 @@ int NHTTPi_getHeaderValue(NHttpResponse *response, const char *name, int *valueS
 
 // Copies the value of a header field (a text that stays until the next call), and gives its length. The name
 // HTTPSTATUSCODE gives the status code of the answer
-int NHTTP_GetHeaderField(NHttpResponse *response, const char *name, char **value) {
+int NHTTP_GetHeaderField(NHTTPRes *response, const char *name, char **value) {
     int start;
     int length;
 
@@ -111,7 +111,7 @@ int NHTTP_GetHeaderField(NHttpResponse *response, const char *name, char **value
 }
 
 // Gives the whole header: the part of the response if it fits there, or a copy
-int NHTTP_GetHeaderAll(NHttpState *state, NHttpResponse *response, char **header) {
+int NHTTP_GetHeaderAll(NHttpState *state, NHTTPRes *response, char **header) {
     if (!response->headerDone || response->headerSize == 0) {
         return -1;
     }

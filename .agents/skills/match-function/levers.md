@@ -61,11 +61,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `u64`'s low and high words in each other's registers before it goes to a 64-bit hardware register: write it in
   one `u64` store, not two 32-bit halves. (matching.md: "64-bit hardware register in one store")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
-  with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
+  with the parameter, as `DecodeRC4` does. (matching.md: "`DecodeRC4` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
   Declaring every local first and assigning them below moves both registers and slots (matching.md: "declared first")
 - A pointer needs an earlier slot but a later store: declare it without an initializer and assign it after other
-  pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
+  pointers, as in `GetWEPData` and `GetWPAData`. (matching.md: "A pointer that must")
 - An element pointer grows the frame and replaces the original's struct-base-plus-index field access: index the
   member at each use; declare a saved flag before a zeroed index and assign the flag afterward if the loop counter
   must copy that index's zero. (matching.md: "each received picture is accessed")
@@ -108,7 +108,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Registers of a scheduled function swapped although every order of the computation was tried: write the `volatile`
   stores first, and read fields at each use. (matching.md: "registers still follow the source order")
 - A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
-  declare it `u32`, the SDK's `unsigned long`, not `unsigned int`. (matching.md: "`WDS_OnScan`")
+  declare it `u32`, the SDK's `unsigned long`, not `unsigned int`. (matching.md: "`WDSScanCallback`")
 - An array entry's address recomputed after a call, where the original keeps it from before the call in a saved
   register: declare the index `u32`, the SDK's `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
 - A constant added or subtracted before an index where ours folds it into the base, or the reverse: the index, count

@@ -7,14 +7,14 @@
 
 // The predictor and step index that every sample of an ADPCM stream is coded against, which the stream's packets
 // start with
-struct VCTAdpcmState {
-    s16 predictor;
-    u8 stepIndex;
+struct AdpcmState {
+    s16 prevSample;
+    u8 prevIndex;
     u8 pad;
 };
 
 // vct_adpcm.c
-void VCT_DecodeAdpcm(u8 *packet, s16 *dst, u32 size, VCTCodec bits);
-void VCT_EncodeAdpcm(u8 *packet, s16 *src, u32 count, VCTAdpcmState *state, VCTCodec bits);
+void vct_decode_adpcm(u8 *packet, s16 *dst, u32 size, VCTCodec bits);
+void vct_encode_adpcm(u8 *packet, s16 *src, u32 count, AdpcmState *state, VCTCodec bits);
 
 #endif // POKEBW2_DWC_VCT_ADPCM_H

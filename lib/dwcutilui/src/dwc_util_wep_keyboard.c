@@ -41,22 +41,22 @@ typedef struct DWCUtilWepKeyboard {
     u8 result;
 } DWCUtilWepKeyboard;
 
-static void DWCUtilWepKeyboard_LoadGraphics(void);
-static void DWCUtilWepKeyboard_FadeIn(void);
-static void DWCUtilWepKeyboard_OpenKeyboard(void);
-static void DWCUtilWepKeyboard_WaitKeyboardOpen(void);
-static void DWCUtilWepKeyboard_Main(void);
-static void DWCUtilWepKeyboard_HandleInput(void);
-static void func_ov182_021b1d00(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
 static void DWCUtilWepKeyboard_StartClose(void);
-static void DWCUtilWepKeyboard_CloseKeyboard(void);
-static void DWCUtilWepKeyboard_WaitKeyboardClosed(void);
-static void DWCUtilWepKeyboard_Exit(void);
-static void DWCUtilWepKeyboard_DrawText(void);
-static void DWCUtilWepKeyboard_DrawCursor(void);
-static void DWCUtilWepKeyboard_WaitConfirmChoice(void);
-static void DWCUtilWepKeyboard_TakeText(void);
-static BOOL DWCUtilWepKeyboard_IsTextValid(void);
+static void endScene1(void);
+static void endScene2(void);
+static void endScene3(void);
+static void drawSsid(void);
+static void dispCaret(void);
+static void procWin(void);
+static void procWin1(void);
+static BOOL isCorrect(void);
 static void DWCUtilWepKeyboard_WaitInvalidChoice(void);
 static void DWCUtilWepKeyboard_WaitInvalidClosed(void);
 
@@ -67,26 +67,26 @@ void DWCUtilWepKeyboard_Init(void) {
     int field;
     int fromList;
 
-    sWepKeyboard = DWCUtilHeap_AllocClear(sizeof(DWCUtilWepKeyboard), 4);
-    DWCUtilMain_GetScreenArgs(&field, &fromList);
+    sWepKeyboard = DWCi_HEAPlAllocEx(sizeof(DWCUtilWepKeyboard), 4);
+    DWCi_GetParam2_(&field, &fromList);
     if (field == 0) {
-        DWCUtilWifiSettings_GetSsid(sWepKeyboard->str);
-        sWepKeyboard->length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+        DWCi_SETTINGlGetSsid(sWepKeyboard->str);
+        sWepKeyboard->length = DWCi_MOV_WH_SetUserGameInfo(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     }
-    DWCUtilWepKeyboard_LoadGraphics();
-    DWCUtilBgOverlay_Show(field + 9);
+    initGraphics();
+    DWCi_HLlLoad(field + 9);
     if (fromList == 1) {
-        DWCUtilScreen_Start(0x35, -1, 0);
+        DWCi_COMMENTlDispEx(0x35, -1, 0);
     } else {
-        DWCUtilScreen_Start(msgIndices[field], -1, 0);
+        DWCi_COMMENTlDispEx(msgIndices[field], -1, 0);
     }
-    DWCUtilGfxResource_ShowStep(2);
-    sWepKeyboard->text = DWCUtilText_CreateBg(0, 0);
+    DWCi_CMNlStep(2);
+    sWepKeyboard->text = DWCi_FNTlFormBgEx(0, 0);
     sWepKeyboard->cursor = DWCUtilCell_AllocOam(0, 0x3e);
     G2_SetOBJPriority(sWepKeyboard->cursor, 3);
-    DWCUtilWepKeyboard_DrawCursor();
-    DWCUtilWepKeyboard_DrawText();
-    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_FadeIn);
+    dispCaret();
+    drawSsid();
+    DWCi_ChangeScene(procInit);
 }
 
 // Where the characters are drawn: the two rows' y, the size of a character and each column's x
@@ -96,7 +96,7 @@ static const u8 sWepKeyboardColumnX[16] = {
     0x08, 0x17, 0x26, 0x35, 0x44, 0x53, 0x62, 0x71, 0x80, 0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9,
 };
 
-static void DWCUtilWepKeyboard_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
@@ -108,42 +108,42 @@ static void DWCUtilWepKeyboard_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilWepKeyboard_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilWepKeyboard_OpenKeyboard(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
         DWCUtilKeyboard_Open();
         DWCUtilSound_PlaySe(0x14);
         if (sWepKeyboard->length == 0) {
-            DWCUtilKeyboard_SetBackspaceEnabled(FALSE);
+            DWCi_KBlSetErase(FALSE);
         }
         if (sWepKeyboard->length == WEP_KEYBOARD_LENGTH) {
-            DWCUtilKeyboard_SetCharsEnabled(FALSE);
+            DWCi_KBlSetInput(FALSE);
         }
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitKeyboardOpen);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilWepKeyboard_WaitKeyboardOpen(void) {
-    if (DWCUtilKeyboard_GetKey() != 0xff) {
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Main);
+static void procInit2(void) {
+    if (DWCi_KBlGet() != 0xff) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilWepKeyboard_Main(void) {
-    DWCUtilWepKeyboard_HandleInput();
-    func_ov182_021b1d00();
+static void procScene(void) {
+    input();
+    draw();
 }
 
-static void DWCUtilWepKeyboard_HandleInput(void) {
-    int key = DWCUtilKeyboard_GetKey();
+static void input(void) {
+    int key = DWCi_KBlGet();
 
     switch (key) {
     case 0:
@@ -154,18 +154,18 @@ static void DWCUtilWepKeyboard_HandleInput(void) {
             sWepKeyboard->length--;
             sWepKeyboard->str[sWepKeyboard->length] = '\0';
             if (sWepKeyboard->length == 0) {
-                DWCUtilKeyboard_SetBackspaceEnabled(FALSE);
+                DWCi_KBlSetErase(FALSE);
             }
-            DWCUtilKeyboard_SetCharsEnabled(TRUE);
+            DWCi_KBlSetInput(TRUE);
         }
         break;
     case 0x82:
         DWCUtilSound_PlaySe(7);
         sWepKeyboard->result = WEP_KEYBOARD_CANCELLED;
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_StartClose);
+        DWCi_ChangeScene(DWCUtilWepKeyboard_StartClose);
         return;
     case 0x83:
-        if (DWCUtilWepKeyboard_IsTextValid()) {
+        if (isCorrect()) {
             DWCUtilSound_PlaySe(6);
             sWepKeyboard->result = WEP_KEYBOARD_ENTERED;
         } else {
@@ -173,7 +173,7 @@ static void DWCUtilWepKeyboard_HandleInput(void) {
             DWCUtilSound_PlaySe(9);
         }
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_StartClose);
+        DWCi_ChangeScene(DWCUtilWepKeyboard_StartClose);
         return;
     case WEP_KEYBOARD_SPACE:
     default:
@@ -181,85 +181,85 @@ static void DWCUtilWepKeyboard_HandleInput(void) {
             DWCUtilSound_PlaySe(1);
             sWepKeyboard->str[sWepKeyboard->length] = key;
             sWepKeyboard->length++;
-            DWCUtilKeyboard_SetBackspaceEnabled(TRUE);
+            DWCi_KBlSetErase(TRUE);
             if (sWepKeyboard->length == WEP_KEYBOARD_LENGTH) {
-                DWCUtilKeyboard_SetCharsEnabled(FALSE);
+                DWCi_KBlSetInput(FALSE);
             }
         }
         break;
     }
-    DWCUtilWepKeyboard_DrawText();
-    DWCUtilWepKeyboard_DrawCursor();
+    drawSsid();
+    dispCaret();
 }
 
-static void func_ov182_021b1d00(void) {
+static void draw(void) {
 }
 
 static void DWCUtilWepKeyboard_StartClose(void) {
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_CloseKeyboard);
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilWepKeyboard_CloseKeyboard(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilKeyboard_Close();
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_KBlEnd();
         DWCUtilSound_PlaySe(0x15);
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitKeyboardClosed);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
 // Once the keyboard has closed, asks whether to keep the text, or shows that it isn't a WEP key
-static void DWCUtilWepKeyboard_WaitKeyboardClosed(void) {
+static void endScene2(void) {
     int msgIndices[2] = { 0x47, 0x48 };
     int fromList;
 
-    if (!DWCUtilKeyboard_IsOpen()) {
+    if (!DWCi_KBlIsInit()) {
         if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
-            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Exit);
+            DWCi_ChangeScene(endScene3);
             return;
         }
         if (sWepKeyboard->result == WEP_KEYBOARD_INVALID) {
             DWCUtilDialog_Open(6, 3, 1, -1, 0);
-            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitInvalidChoice);
+            DWCi_ChangeScene(DWCUtilWepKeyboard_WaitInvalidChoice);
             return;
         }
-        DWCUtilMain_GetScreenArgs(NULL, &fromList);
+        DWCi_GetParam2_(NULL, &fromList);
         DWCUtilDialog_Open(msgIndices[fromList], 2, 1, -1, 0);
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitConfirmChoice);
+        DWCi_ChangeScene(procWin);
     }
 }
 
 // Frees the keyboard and goes back to the connection's settings or to the list of access points, or on to the
 // connection test
-static void DWCUtilWepKeyboard_Exit(void) {
+static void endScene3(void) {
     int field;
     int fromList;
 
-    DWCUtilScreen_Stop();
-    DWCUtilOamBuf_Free(sWepKeyboard->cursor);
-    DWCUtilText_DestroyScreenBg(0);
+    DWCi_COMMENTlDelete();
+    DWCi_MOV_MBP_GetChildBmp(sWepKeyboard->cursor);
+    DWCi_FNTlDeleteBgLcd(0);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_GetScreenArgs(&field, &fromList);
+    DWCi_GetParam2_(&field, &fromList);
     if (fromList == 0) {
-        DWCUtilMain_SetLayout(2, 1);
-        DWCUtilMain_SetScreenArgs(0, field);
-        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
+        DWCi_SetParam_(2, 1);
+        DWCi_SetParam2_(0, field);
+        DWCi_ChangeScene(DWCUtilAddressSettings_Init);
     } else if (sWepKeyboard->result == WEP_KEYBOARD_CANCELLED) {
-        DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetScreenArgs(1, 0);
-        DWCUtilMain_SetUpdate(DWCUtilPageApList_Init);
+        DWCi_SetParam_(0, 1);
+        DWCi_SetParam2_(1, 0);
+        DWCi_ChangeScene(DWCUtilPageApList_Init);
     } else {
-        DWCUtilMain_SetLayout(0, 0);
-        DWCUtilMain_SetScreenArgs(0, 1);
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
+        DWCi_SetParam_(0, 0);
+        DWCi_SetParam2_(0, 1);
+        DWCi_ChangeScene(DWCUtilAutoConnectIntro_Init);
     }
-    DWCUtilHeap_FreeAndNull(&sWepKeyboard);
+    DWCi_HEAPlFree_(&sWepKeyboard);
 }
 
 // Draws the text, one character at a time, as a string of one character
-static void DWCUtilWepKeyboard_DrawText(void) {
+static void drawSsid(void) {
     u16 rect[4] = { 0, 0, 0, 0 };
     u16 str[2];
     int i;
@@ -268,7 +268,7 @@ static void DWCUtilWepKeyboard_DrawText(void) {
     rect[1] = sWepKeyboardRowY[0];
     rect[2] = sWepKeyboardCharSize[0];
     rect[3] = sWepKeyboardCharSize[1];
-    DWCUtilText_Clear(sWepKeyboard->text, 0);
+    DWCi_FNTlClear(sWepKeyboard->text, 0);
     str[1] = 0;
     for (i = 0, column = 0; i < WEP_KEYBOARD_LENGTH; i++, column++) {
         if (i == 16) {
@@ -281,13 +281,13 @@ static void DWCUtilWepKeyboard_DrawText(void) {
             str[0] = sWepKeyboard->str[i];
         }
         rect[0] = sWepKeyboardColumnX[column];
-        DWCUtilText_DrawRect(sWepKeyboard->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
+        DWCi_FNTlDrawRect(sWepKeyboard->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
     }
     DWCUtilText_MarkDirty(sWepKeyboard->text);
 }
 
 // Moves the cursor after the text
-static void DWCUtilWepKeyboard_DrawCursor(void) {
+static void dispCaret(void) {
     u8 length = sWepKeyboard->length;
     int column = length & 15;
     int row = length >> 4;
@@ -299,8 +299,8 @@ static void DWCUtilWepKeyboard_DrawCursor(void) {
     DWCUtilOam_SetPosition(sWepKeyboard->cursor, sWepKeyboardColumnX[column], sWepKeyboardRowY[row]);
 }
 
-static void DWCUtilWepKeyboard_WaitConfirmChoice(void) {
-    sWepKeyboard->result = DWCUtilDialog_GetChoice();
+static void procWin(void) {
+    sWepKeyboard->result = DWCi_WINlGet();
     switch (sWepKeyboard->result) {
     case 0:
         DWCUtilSound_PlaySe(7);
@@ -311,40 +311,40 @@ static void DWCUtilWepKeyboard_WaitConfirmChoice(void) {
     default:
         return;
     }
-    DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_TakeText);
+    DWCi_WINlEnd();
+    DWCi_ChangeScene(procWin1);
 }
 
 // Takes the text into the connection being edited as its SSID or its WEP key, or goes back to the keyboard
-static void DWCUtilWepKeyboard_TakeText(void) {
-    void (*take[2])(const u8 *) = { DWCUtilWifiSettings_SetSsid, DWCUtilWifiSettings_SetWepKey };
+static void procWin1(void) {
+    void (*take[2])(const u8 *) = { DWCi_SETTINGlSetSsid, DWCi_SETTINGlSetWep };
     int field;
 
-    if (!DWCUtilDialog_IsOpen()) {
+    if (!DWCi_WINlIsInit()) {
         if (sWepKeyboard->result == 0) {
             G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
-            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
+            DWCi_ChangeScene(procInit1);
             return;
         }
-        DWCUtilMain_GetScreenArgs(&field, NULL);
+        DWCi_GetParam2_(&field, NULL);
         take[field](sWepKeyboard->str);
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Exit);
+        DWCi_ChangeScene(endScene3);
     }
 }
 
 // Whether the text can be kept: an SSID that isn't empty, or a WEP key of 5, 13 or 16 characters or of 10, 26 or 32
 // hexadecimal digits
-static BOOL DWCUtilWepKeyboard_IsTextValid(void) {
+static BOOL isCorrect(void) {
     int field;
     int fromList;
     int length;
     int i;
 
-    DWCUtilMain_GetScreenArgs(&field, &fromList);
+    DWCi_GetParam2_(&field, &fromList);
     if (fromList == 1) {
-        DWCUtilScreen_Start(0x35, -1, 0);
+        DWCi_COMMENTlDispEx(0x35, -1, 0);
     }
-    DWCUtilMain_GetScreenArgs(&field, &fromList);
+    DWCi_GetParam2_(&field, &fromList);
     if (field == 0) {
         if (sWepKeyboard->str[0] != '\0') {
             return TRUE;
@@ -354,7 +354,7 @@ static BOOL DWCUtilWepKeyboard_IsTextValid(void) {
     if (fromList == 1 && sWepKeyboard->str[0] == '\0') {
         return FALSE;
     }
-    length = DWCUtilString_Length(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
+    length = DWCi_MOV_WH_SetUserGameInfo(sWepKeyboard->str, WEP_KEYBOARD_LENGTH);
     switch (length) {
     case 0:
     case 5:
@@ -378,16 +378,16 @@ static BOOL DWCUtilWepKeyboard_IsTextValid(void) {
 }
 
 static void DWCUtilWepKeyboard_WaitInvalidChoice(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_WaitInvalidClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(DWCUtilWepKeyboard_WaitInvalidClosed);
     }
 }
 
 static void DWCUtilWepKeyboard_WaitInvalidClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
+    if (!DWCi_WINlIsInit()) {
         G2_SetOBJEffect(sWepKeyboard->cursor, GX_OAM_EFFECT_NONE, 0);
-        DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_OpenKeyboard);
+        DWCi_ChangeScene(procInit1);
     }
 }

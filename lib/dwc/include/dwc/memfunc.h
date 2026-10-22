@@ -26,11 +26,11 @@ typedef enum DWCAllocType {
 
 // The game's allocator, which gets the name, the size with the header and the alignment, and its deallocator, which
 // gets the name, the block and its size with the header
-typedef void *(*DWCAllocFunc)(DWCAllocType name, u32 size, int align);
-typedef void (*DWCFreeFunc)(DWCAllocType name, void *ptr, u32 size);
+typedef void *(*DWCAllocEx)(DWCAllocType name, u32 size, int align);
+typedef void (*DWCFreeEx)(DWCAllocType name, void *ptr, u32 size);
 
-// Gives the library its allocator and deallocator: DWCi_SetMemFunc
-void DWCi_SetMemFunc(DWCAllocFunc alloc, DWCFreeFunc free);
+// Gives the library its allocator and deallocator: DWC_SetMemFunc
+void DWC_SetMemFunc(DWCAllocEx alloc, DWCFreeEx free);
 // Allocates a block of size bytes, aligned to 32: DWC_Alloc
 void *DWC_Alloc(DWCAllocType name, u32 size);
 // The same with an alignment: DWC_AllocEx. Returns NULL if the allocator has no memory
@@ -40,7 +40,7 @@ void *DWC_AllocEx(DWCAllocType name, u32 size, int align);
 void DWC_Free(DWCAllocType name, void *ptr, u32 size);
 
 // The allocator that the library hands to GameSpy, which all use the name 9: malloc, realloc, free and memalign
-void *DWCi_GsAlloc(size_t size);
+void *DWCi_GsMalloc(size_t size);
 void *DWCi_GsRealloc(void *ptr, size_t size);
 void DWCi_GsFree(void *ptr);
 void *DWCi_GsMemalign(size_t align, size_t size);

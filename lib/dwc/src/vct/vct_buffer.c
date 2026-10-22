@@ -12,27 +12,27 @@
 
 // The packets in the order they came
 struct VCTList {
-    VCTPacket *head;
-    VCTPacket *tail;
+    UDPPacket *head;
+    UDPPacket *tail;
 };
 
-static int PopQueue(int slot);
-static void ResetSequence(VCTReceiver *receiver, u16 sequence);
-static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequence);
+static int vct_pop_audio_queue(int slot);
+static void vct_init_sequence(AudioStream *receiver, u16 sequence);
+static BOOL vct_update_sequence(AudioStream *receiver, UDPPacket *packet, u16 sequence);
 
 // The ends of the segments of the mu-law curve
 static int sSegmentEnds[8] = { 0x3f, 0x7f, 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff };
 
 // MWCC lays these out in reverse, so they are declared from the last to the first
 // Each machine's packets in the order of their sequence numbers
-static VCTPacket *sQueueTails[VCT_SLOT_MAX];
+static UDPPacket *sQueueTails[VCT_SLOT_MAX];
 static int sQueueCounts[VCT_SLOT_MAX];
-static VCTPacket *sQueueHeads[VCT_SLOT_MAX];
+static UDPPacket *sQueueHeads[VCT_SLOT_MAX];
 // The packets in the order they came, and how many of each slot's
 static int sActiveCounts[VCT_SLOT_MAX];
 static VCTList sActiveList;
 
-void VCT_ResetActiveList(void) {
+void vct_init_decoder(void) {
     OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
@@ -45,28 +45,28 @@ void VCT_ResetActiveList(void) {
 }
 
 // Frees the packets in the order of arrival that belong to a slot
-void VCT_FreeActiveOfSlot(u32 slot) {
+void vct_flush_decoder(u32 slot) {
     OSIntrMode irq = OS_DisableInterrupts();
-    VCTPacket *packet;
+    UDPPacket *packet;
 
-    for (packet = VCT_FindActiveBySlot(slot); packet != NULL; packet = VCT_FindActiveBySlot(slot)) {
-        VCT_RemoveActive(packet);
-        VCT_FreePacket(packet);
+    for (packet = vct_get_packet_from_decoder(slot); packet != NULL; packet = vct_get_packet_from_decoder(slot)) {
+        vct_remove_packet_from_decoder(packet);
+        vct_free_packet_buffer(packet);
     }
     sActiveCounts[slot] = 0;
     OS_RestoreInterrupts(irq);
 }
 
-void VCT_FreeAllActive(void) {
+void vct_flush_all_decoder(void) {
     OSIntrMode irq = OS_DisableInterrupts();
-    VCTPacket *packet = sActiveList.head;
+    UDPPacket *packet = sActiveList.head;
     int i;
 
     while (packet != NULL) {
-        VCTPacket *current = packet;
+        UDPPacket *current = packet;
 
         packet = packet->next;
-        VCT_FreePacket(current);
+        vct_free_packet_buffer(current);
     }
     sActiveList.head = NULL;
     sActiveList.tail = NULL;
@@ -76,7 +76,7 @@ void VCT_FreeAllActive(void) {
     OS_RestoreInterrupts(irq);
 }
 
-int VCT_AppendActive(VCTPacket *packet) {
+int vct_insert_decoder(UDPPacket *packet) {
     OSIntrMode irq = OS_DisableInterrupts();
 
     if (sActiveList.head == NULL) {
@@ -90,25 +90,25 @@ int VCT_AppendActive(VCTPacket *packet) {
         sActiveList.tail->next = packet;
         sActiveList.tail = packet;
     }
-    sActiveCounts[packet->slot]++;
+    sActiveCounts[packet->channel]++;
     OS_RestoreInterrupts(irq);
-    return sActiveCounts[packet->slot];
+    return sActiveCounts[packet->channel];
 }
 
-VCTPacket *VCT_GetActiveHead(void) {
+UDPPacket *vct_top_decoder(void) {
     return sActiveList.head;
 }
 
-int VCT_GetActiveCount(u32 slot) {
+int vct_count_decoder_queue(u32 slot) {
     return sActiveCounts[slot];
 }
 
-VCTPacket *VCT_FindActiveBySlot(u32 slot) {
-    VCTPacket *packet = sActiveList.head;
+UDPPacket *vct_get_packet_from_decoder(u32 slot) {
+    UDPPacket *packet = sActiveList.head;
     OSIntrMode irq = OS_DisableInterrupts();
 
     for (; packet != NULL; packet = packet->next) {
-        if (packet->slot == slot) {
+        if (packet->channel == slot) {
             OS_RestoreInterrupts(irq);
             return packet;
         }
@@ -117,7 +117,7 @@ VCTPacket *VCT_FindActiveBySlot(u32 slot) {
     return NULL;
 }
 
-int VCT_RemoveActive(VCTPacket *packet) {
+int vct_remove_packet_from_decoder(UDPPacket *packet) {
     OSIntrMode irq = OS_DisableInterrupts();
 
     if (packet->prev != NULL) {
@@ -136,14 +136,14 @@ int VCT_RemoveActive(VCTPacket *packet) {
             sActiveList.tail->next = NULL;
         }
     }
-    sActiveCounts[packet->slot]--;
+    sActiveCounts[packet->channel]--;
     OS_RestoreInterrupts(irq);
-    return sActiveCounts[packet->slot];
+    return sActiveCounts[packet->channel];
 }
 
 // Finds the segment of a mu-law magnitude, as search() does in the public-domain G.711 code whose table and constants
 // these are
-static inline void SearchSegment(int value, const int *table, int size, int *segment) {
+static inline void search(int value, const int *table, int size, int *segment) {
     *segment = 0;
     while (*segment < size) {
         if (value <= *table++) {
@@ -155,7 +155,7 @@ static inline void SearchSegment(int value, const int *table, int size, int *seg
 }
 
 // Codes samples as 8-bit mu-law
-void VCT_EncodeMulaw(u8 *dst, s16 *src, u32 count) {
+void vct_encode_g711_ulaw(u8 *dst, s16 *src, u32 count) {
     unsigned int i;
 
     for (i = 0; i < count; i++) {
@@ -173,7 +173,7 @@ void VCT_EncodeMulaw(u8 *dst, s16 *src, u32 count) {
             sample = 0x1fdf;
         }
         sample += 0x21;
-        SearchSegment(sample, sSegmentEnds, 8, &segment);
+        search(sample, sSegmentEnds, 8, &segment);
         if (segment >= 8) {
             dst[i] = sign ^ 0x7f;
         } else {
@@ -185,7 +185,7 @@ void VCT_EncodeMulaw(u8 *dst, s16 *src, u32 count) {
     }
 }
 
-void VCT_DecodeMulaw(u8 *src, s16 *dst, u32 count) {
+void vct_decode_g711_ulaw(u8 *src, s16 *dst, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -197,7 +197,7 @@ void VCT_DecodeMulaw(u8 *src, s16 *dst, u32 count) {
 }
 
 // Keeps the top eight bits of the samples
-void VCT_EncodePcm8(u8 *dst, s16 *src, u32 count) {
+void vct_encode_8bit_raw(u8 *dst, s16 *src, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -205,7 +205,7 @@ void VCT_EncodePcm8(u8 *dst, s16 *src, u32 count) {
     }
 }
 
-void VCT_DecodePcm8(s8 *src, s16 *dst, u32 count) {
+void vct_decode_8bit_raw(s8 *src, s16 *dst, u32 count) {
     u32 i;
 
     for (i = 0; i < count; i++) {
@@ -213,7 +213,7 @@ void VCT_DecodePcm8(s8 *src, s16 *dst, u32 count) {
     }
 }
 
-void VCT_ClearSlotQueues(u32 slot) {
+void vct_init_audio_queue(u32 slot) {
     OSIntrMode irq = OS_DisableInterrupts();
 
     sQueueTails[slot] = NULL;
@@ -222,18 +222,18 @@ void VCT_ClearSlotQueues(u32 slot) {
     OS_RestoreInterrupts(irq);
 }
 
-void VCT_FlushSlotQueue(u32 slot) {
+void vct_flush_audio_queue(u32 slot) {
     OSIntrMode irq = OS_DisableInterrupts();
-    VCTPacket *packet = sQueueHeads[slot];
+    UDPPacket *packet = sQueueHeads[slot];
 
     while (packet != NULL) {
-        VCTPacket *next = packet->next;
+        UDPPacket *next = packet->next;
 
         sQueueHeads[slot] = next;
         if (next != NULL) {
             next->prev = NULL;
         }
-        VCT_FreePacket(packet);
+        vct_free_packet_buffer(packet);
         packet = sQueueHeads[slot];
     }
     sQueueTails[slot] = NULL;
@@ -241,20 +241,20 @@ void VCT_FlushSlotQueue(u32 slot) {
     OS_RestoreInterrupts(irq);
 }
 
-void VCT_FlushAllQueues(void) {
+void vct_flush_all_audio_queue(void) {
     OSIntrMode irq = OS_DisableInterrupts();
     int slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
         while (sQueueHeads[slot] != NULL) {
-            VCTPacket *packet = sQueueHeads[slot];
-            VCTPacket *next = packet->next;
+            UDPPacket *packet = sQueueHeads[slot];
+            UDPPacket *next = packet->next;
 
             sQueueHeads[slot] = next;
             if (next != NULL) {
                 next->prev = NULL;
             }
-            VCT_FreePacket(packet);
+            vct_free_packet_buffer(packet);
         }
         sQueueTails[slot] = NULL;
         sQueueCounts[slot] = 0;
@@ -263,9 +263,9 @@ void VCT_FlushAllQueues(void) {
 }
 
 // Puts a packet in a slot's queue before the packets with higher sequence numbers
-int VCT_InsertSorted(VCTPacket *packet, u32 slot) {
+int vct_insert_audio_queue(UDPPacket *packet, u32 slot) {
     OSIntrMode irq;
-    VCTPacket *at;
+    UDPPacket *at;
 
     if (packet == NULL) {
         return -1;
@@ -305,7 +305,7 @@ inserted:
     return sQueueCounts[slot];
 }
 
-VCTPacket *VCT_PeekQueue(u32 slot) {
+UDPPacket *vct_top_audio_queue(u32 slot) {
     OSIntrMode irq = OS_DisableInterrupts();
 
     if (sQueueHeads[slot] != NULL) {
@@ -316,11 +316,11 @@ VCTPacket *VCT_PeekQueue(u32 slot) {
     return NULL;
 }
 
-static int PopQueue(int slot) {
+static int vct_pop_audio_queue(int slot) {
     OSIntrMode irq = OS_DisableInterrupts();
 
     if (sQueueHeads[slot] != NULL) {
-        VCTPacket *next = sQueueHeads[slot]->next;
+        UDPPacket *next = sQueueHeads[slot]->next;
 
         sQueueHeads[slot] = next;
         sQueueCounts[slot]--;
@@ -334,16 +334,16 @@ static int PopQueue(int slot) {
     return sQueueCounts[slot];
 }
 
-int VCT_GetQueueCount(u32 slot) {
+int vct_count_audio_queue(u32 slot) {
     return sQueueCounts[slot];
 }
 
-void VCT_InitReceiver(VCTReceiver *receiver, u32 slot, int aid) {
+void vct_init_stream(AudioStream *receiver, u32 slot, int aid) {
     MI_CpuFill8(receiver, 0, 0x28);
     receiver->playoutDelay = 0x134df;
     receiver->lastDelay = 0;
     receiver->avgDelayCopy = 0;
-    receiver->slot = slot;
+    receiver->channel = slot;
     receiver->aid = aid;
     receiver->jitterAverage = 0;
     receiver->lastSkew = 0;
@@ -359,30 +359,30 @@ void VCT_InitReceiver(VCTReceiver *receiver, u32 slot, int aid) {
     receiver->lastSequence = 0;
     receiver->lastPlayedSequence = 0;
     receiver->needsReset = TRUE;
-    receiver->held = NULL;
+    receiver->prevBuffer = NULL;
     receiver->unk40 = 0;
     receiver->syncSequence = 0;
 }
 
 // Lets go of the packet held back for the machine, and of the machine
-void VCT_DropHeld(VCTReceiver *receiver) {
-    if (receiver->held != NULL) {
-        VCT_FreePacket(receiver->held);
-        receiver->held = NULL;
+void vct_reset_stream(AudioStream *receiver) {
+    if (receiver->prevBuffer != NULL) {
+        vct_free_packet_buffer(receiver->prevBuffer);
+        receiver->prevBuffer = NULL;
     }
     receiver->aid = -1;
 }
 
 // Holds a packet back in place of the last, taking it off the front of its queue
-int VCT_SetHeld(VCTReceiver *receiver, VCTPacket *packet) {
-    if (receiver->held != NULL) {
-        VCT_FreePacket(receiver->held);
+int vct_save_previous_buffer(AudioStream *receiver, UDPPacket *packet) {
+    if (receiver->prevBuffer != NULL) {
+        vct_free_packet_buffer(receiver->prevBuffer);
     }
-    receiver->held = packet;
-    return PopQueue(receiver->slot);
+    receiver->prevBuffer = packet;
+    return vct_pop_audio_queue(receiver->channel);
 }
 
-static void ResetSequence(VCTReceiver *receiver, u16 sequence) {
+static void vct_init_sequence(AudioStream *receiver, u16 sequence) {
     receiver->sequence16 = sequence;
     receiver->expectedSequence = 0x10001;
     receiver->wrap = 0;
@@ -391,7 +391,7 @@ static void ResetSequence(VCTReceiver *receiver, u16 sequence) {
 
 // Turns the 16-bit sequence number of a packet into one that goes on past 65535, returning FALSE for one so far off
 // that the machine has probably started over
-static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequence) {
+static BOOL vct_update_sequence(AudioStream *receiver, UDPPacket *packet, u16 sequence) {
     u16 distance = sequence - receiver->sequence16;
 
     if (distance < 3000) {
@@ -401,7 +401,7 @@ static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequenc
         receiver->sequence16 = sequence;
     } else if (distance <= 0xff9c) {
         if (sequence == receiver->expectedSequence) {
-            ResetSequence(receiver, sequence);
+            vct_init_sequence(receiver, sequence);
             receiver->lastSequence = (u16)(sequence - 1);
         } else {
             receiver->expectedSequence = (u16)(sequence + 1);
@@ -422,16 +422,16 @@ static BOOL UnwrapSequence(VCTReceiver *receiver, VCTPacket *packet, u16 sequenc
 // Works out when a packet is to be played from the time it came and the time its machine stamped it with, and keeps
 // track of how much the delay between the two wanders so as to widen or narrow the margin the playing is kept behind.
 // Returns FALSE for a packet that is a repeat, out of range or too late or early to be of use
-BOOL VCT_UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
+BOOL vct_calc_jitter_and_skew(AudioStream *receiver, UDPPacket *packet) {
     u64 tickDelta;
     int skew;
     int trend = 0;
     u64 now;
 
     if (receiver->needsReset) {
-        ResetSequence(receiver, packet->sequence);
+        vct_init_sequence(receiver, packet->sequence);
     } else {
-        if (!UnwrapSequence(receiver, packet, packet->sequence)) {
+        if (!vct_update_sequence(receiver, packet, packet->sequence)) {
             receiver->lostCount++;
             return FALSE;
         }
@@ -440,7 +440,7 @@ BOOL VCT_UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
             receiver->lostCount++;
             return FALSE;
         }
-        if (receiver->lastSequence + 1 != packet->sequence && packet->silence == 0) {
+        if (receiver->lastSequence + 1 != packet->sequence && packet->marker == 0) {
             int distance = packet->sequence - receiver->lastSequence;
 
             if (distance < 0) {
@@ -458,12 +458,12 @@ BOOL VCT_UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
     receiver->lastSequence = packet->sequence;
     if (receiver->firstTimestamp == 0) {
         receiver->firstTimestamp = packet->timestamp;
-        receiver->firstArrival = packet->arrival;
+        receiver->firstArrival = packet->receive_time;
         receiver->warmup = 0;
     }
     tickDelta = (packet->timestamp - receiver->firstTimestamp) << 6;
-    skew = tickDelta - (packet->arrival - receiver->firstArrival);
-    if (receiver->lastSkew == 0 || packet->silence != 0) {
+    skew = tickDelta - (packet->receive_time - receiver->firstArrival);
+    if (receiver->lastSkew == 0 || packet->marker != 0) {
         receiver->lastSkew = skew;
     } else {
         int change = skew - receiver->lastSkew;
@@ -480,12 +480,12 @@ BOOL VCT_UpdateTiming(VCTReceiver *receiver, VCTPacket *packet) {
             receiver->unk18 = receiver->jitterAverage;
         }
     }
-    packet->playTime = tickDelta + receiver->firstArrival + receiver->playoutDelay;
+    packet->performance_time = tickDelta + receiver->firstArrival + receiver->playoutDelay;
     now = OS_GetTick();
-    if (packet->playTime + 0x8b18 < now) {
+    if (packet->performance_time + 0x8b18 < now) {
         return FALSE;
     }
-    if (packet->playTime > now + 0x7fd88) {
+    if (packet->performance_time > now + 0x7fd88) {
         return FALSE;
     }
     if (receiver->burstCount <= 0) {

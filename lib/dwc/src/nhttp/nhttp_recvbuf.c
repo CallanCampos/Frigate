@@ -3,12 +3,12 @@
 // NHTTP_recvbuf: the header that a response has received, which is kept in the first NHTTP_HEADER_SIZE bytes of the
 // response and in blocks after them, and the body that is read into the user's buffer
 
-static void NHTTPi_getRecvBufPos(NHttpResponse *response, int offset, NHttpHeaderBlock **block, int *blockOffset);
-static char NHTTPi_getRecvBufChar(NHttpResponse *response, NHttpHeaderBlock **block, int *blockOffset);
+static void setupGetcharFromHdrRecvBuf(NHTTPRes *response, int offset, NHTTPi_HDRBUFLIST **block, int *blockOffset);
+static char getcharFromHdrRecvBuf(NHTTPRes *response, NHTTPi_HDRBUFLIST **block, int *blockOffset);
 
 // Gives the block that holds a byte of the header and the byte's place in it (no block for the first bytes)
-static void NHTTPi_getRecvBufPos(NHttpResponse *response, int offset, NHttpHeaderBlock **block, int *blockOffset) {
-    NHttpHeaderBlock *current;
+static void setupGetcharFromHdrRecvBuf(NHTTPRes *response, int offset, NHTTPi_HDRBUFLIST **block, int *blockOffset) {
+    NHTTPi_HDRBUFLIST *current;
     int count;
 
     if (offset < NHTTP_HEADER_SIZE) {
@@ -26,7 +26,7 @@ static void NHTTPi_getRecvBufPos(NHttpResponse *response, int offset, NHttpHeade
 }
 
 // Reads the byte at the cursor of the header and moves it on
-static char NHTTPi_getRecvBufChar(NHttpResponse *response, NHttpHeaderBlock **block, int *blockOffset) {
+static char getcharFromHdrRecvBuf(NHTTPRes *response, NHTTPi_HDRBUFLIST **block, int *blockOffset) {
     int index;
 
     if (*block == NULL) {
@@ -42,14 +42,14 @@ static char NHTTPi_getRecvBufChar(NHttpResponse *response, NHttpHeaderBlock **bl
         *block = (*block)->next;
     }
     index = (*blockOffset)++;
-    return (*block)->data[index];
+    return (*block)->block[index];
 }
 
 // Looks for the end of the line that starts at start. Gives where the next line starts (0 if the header ends there),
 // and the place of the first colon in colon, and how the line ended in lineEnd (1 for LF or CR, 2 for CR LF). -1 if the
 // line does not end before end
-int NHTTPi_findNextLineHdrRecvBuf(NHttpResponse *response, int start, int end, int *colon, int *lineEnd) {
-    NHttpHeaderBlock *block;
+int NHTTPi_findNextLineHdrRecvBuf(NHTTPRes *response, int start, int end, int *colon, int *lineEnd) {
+    NHTTPi_HDRBUFLIST *block;
     int offset;
     int result;
     int last;
@@ -62,11 +62,11 @@ int NHTTPi_findNextLineHdrRecvBuf(NHttpResponse *response, int start, int end, i
     if (start < end) {
         result = -1;
         sawCR = FALSE;
-        NHTTPi_getRecvBufPos(response, start, &block, &offset);
+        setupGetcharFromHdrRecvBuf(response, start, &block, &offset);
         if (start < end) {
             last = end - 1;
             do {
-                c = NHTTPi_getRecvBufChar(response, &block, &offset);
+                c = getcharFromHdrRecvBuf(response, &block, &offset);
                 if (c == ':' && colon != NULL && *colon < 0) {
                     *colon = start;
                 }
@@ -103,15 +103,15 @@ int NHTTPi_findNextLineHdrRecvBuf(NHttpResponse *response, int start, int end, i
 }
 
 // Gives the place of the first byte that is not a space, or -1
-int NHTTPi_skipSpaceHdrRecvBuf(NHttpResponse *response, int start, int end) {
-    NHttpHeaderBlock *block;
+int NHTTPi_skipSpaceHdrRecvBuf(NHTTPRes *response, int start, int end) {
+    NHTTPi_HDRBUFLIST *block;
     int offset;
 
     if (start < end) {
-        NHTTPi_getRecvBufPos(response, start, &block, &offset);
+        setupGetcharFromHdrRecvBuf(response, start, &block, &offset);
         if (start < end) {
             do {
-                if (NHTTPi_getRecvBufChar(response, &block, &offset) != ' ') {
+                if (getcharFromHdrRecvBuf(response, &block, &offset) != ' ') {
                     return start;
                 }
                 start++;
@@ -123,19 +123,19 @@ int NHTTPi_skipSpaceHdrRecvBuf(NHttpResponse *response, int start, int end) {
 
 // Compares the header from start with a token without caring for the case. 0 if they are equal up to the end of the
 // token (its end, a space or the terminator), -1 if not
-int NHTTPi_compareTokenN_HdrRecvBuf(NHttpResponse *response, int start, int end, const char *token, int terminator) {
-    NHttpHeaderBlock *block;
+int NHTTPi_compareTokenN_HdrRecvBuf(NHTTPRes *response, int start, int end, const char *token, int terminator) {
+    NHTTPi_HDRBUFLIST *block;
     int offset;
     int c;
 
     if (start < end) {
-        NHTTPi_getRecvBufPos(response, start, &block, &offset);
-        c = NHTTPi_getRecvBufChar(response, &block, &offset);
+        setupGetcharFromHdrRecvBuf(response, start, &block, &offset);
+        c = getcharFromHdrRecvBuf(response, &block, &offset);
         while ((NHTTPi_isUpper(c) ? c + ('a' - 'A') : c) == (NHTTPi_isUpper(*token) ? *token + ('a' - 'A') : *token)) {
             if (*token == 0 || *token == ' ' || *token == terminator || start == end - 1) {
                 return 0;
             }
-            c = NHTTPi_getRecvBufChar(response, &block, &offset);
+            c = getcharFromHdrRecvBuf(response, &block, &offset);
             start++;
             token++;
         }
@@ -144,8 +144,8 @@ int NHTTPi_compareTokenN_HdrRecvBuf(NHttpResponse *response, int start, int end,
 }
 
 // Copies size bytes of the header, from start, into dest. FALSE if the header does not reach that far
-BOOL NHTTPi_loadFromHdrRecvBuf(NHttpResponse *response, char *dest, int start, int size) {
-    NHttpHeaderBlock *block;
+BOOL NHTTPi_loadFromHdrRecvBuf(NHTTPRes *response, char *dest, int start, int size) {
+    NHTTPi_HDRBUFLIST *block;
     int count;
 
     if (start + size <= response->headerSize) {
@@ -176,7 +176,7 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHttpResponse *response, char *dest, int start, i
                         if (size <= count) {
                             count = size;
                         }
-                        NHTTPi_memcpy(dest, block->data + start, count);
+                        NHTTPi_memcpy(dest, block->block + start, count);
                         start = (start + count) & (NHTTP_HEADER_BLOCK_SIZE - 1);
                         size -= count;
                         block = block->next;
@@ -190,13 +190,13 @@ BOOL NHTTPi_loadFromHdrRecvBuf(NHttpResponse *response, char *dest, int start, i
     return FALSE;
 }
 
-BOOL NHTTPi_isRecvBufFull(NHttpResponse *response, u32 size) {
+BOOL NHTTPi_isRecvBufFull(NHTTPRes *response, u32 size) {
     return response->bufferSize <= size;
 }
 
 // Reads from the socket into the free part of the user's buffer
-int NHTTPi_RecvBuf(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, int offset, int flags) {
-    NHttpResponse *response = request->response;
+int NHTTPi_RecvBuf(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock, int offset, int flags) {
+    NHTTPRes *response = request->response;
     int size = response->bufferSize - offset;
     char *buffer = response->buffer + offset;
 
@@ -204,8 +204,8 @@ int NHTTPi_RecvBuf(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, i
 }
 
 // The same for no more than size bytes, or -1003 when there is no room left
-int NHTTPi_RecvBufN(NHttpMutexInfo *mutexInfo, NHttpRequest *request, int sock, int offset, int size, int flags) {
-    NHttpResponse *response = request->response;
+int NHTTPi_RecvBufN(NHttpMutexInfo *mutexInfo, NHTTPReq *request, int sock, int offset, int size, int flags) {
+    NHTTPRes *response = request->response;
     int available;
 
     if (NHTTPi_isRecvBufFull(response, offset)) {

@@ -344,7 +344,7 @@ BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3) {
     return TRUE;
 }
 
-BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFunc, void *evalWork) {
+BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalPlayerCallback evalFunc, void *evalWork) {
     int i;
 
     GFL_ASSERT(_dWork != NULL);

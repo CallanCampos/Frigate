@@ -43,24 +43,24 @@ typedef struct DWCUtilAddressEdit {
     u8 result;
 } DWCUtilAddressEdit;
 
-static void DWCUtilAddressEdit_LoadGraphics(void);
-static void DWCUtilAddressEdit_FadeIn(void);
-static void DWCUtilAddressEdit_OpenKeypad(void);
-static void DWCUtilAddressEdit_WaitKeypad(void);
-static void DWCUtilAddressEdit_Main(void);
-static void DWCUtilAddressEdit_HandleInput(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
 static BOOL DWCUtilAddressEdit_IsNumberFull(int min);
-static void func_ov182_021b2568(void);
+static void draw(void);
 static void DWCUtilAddressEdit_EndEntry(void);
-static void DWCUtilAddressEdit_CloseKeypad(void);
-static void DWCUtilAddressEdit_WaitKeypadClosed(void);
-static void DWCUtilAddressEdit_ExitToSettings(void);
+static void endScene1(void);
+static void endScene2(void);
+static void endScene3(void);
 static void DWCUtilAddressEdit_DrawDigits(void);
 static void DWCUtilAddressEdit_UpdateCursor(void);
-static void DWCUtilAddressEdit_WaitConfirm(void);
-static void DWCUtilAddressEdit_WaitConfirmClosed(void);
+static void procWin(void);
+static void procWin1(void);
 static void DWCUtilAddressEdit_PadDigits(void);
-static BOOL DWCUtilAddressEdit_IsValid(void);
+static BOOL isCorrect(void);
 static void DWCUtilAddressEdit_WaitInvalidDialog(void);
 static void DWCUtilAddressEdit_WaitInvalidClosed(void);
 
@@ -73,15 +73,15 @@ static DWCUtilAddressEdit *sAddressEdit;
 
 void DWCUtilAddressEdit_Init(void) {
     void (*read[5])(u8 *) = {
-        DWCUtilWifiSettings_GetIp,   DWCUtilWifiSettings_GetNetmask, DWCUtilWifiSettings_GetGateway,
-        DWCUtilWifiSettings_GetDns1, DWCUtilWifiSettings_GetDns2,
+        DWCi_SETTINGlGetIp,   DWCi_SETTINGlGetNetMask, DWCi_SETTINGlGetGateway,
+        DWCi_SETTINGlGetDnsP, DWCi_SETTINGlGetDnsS,
     };
     u8 msgIndices[5] = { 0x3f, 0x40, 0x41, 0x42, 0x43 };
     int field;
     DWCUtilAddressEdit *edit;
 
-    sAddressEdit = DWCUtilHeap_AllocClear(sizeof(DWCUtilAddressEdit), 4);
-    DWCUtilMain_GetScreenArgs(&field, NULL);
+    sAddressEdit = DWCi_HEAPlAllocEx(sizeof(DWCUtilAddressEdit), 4);
+    DWCi_GetParam2_(&field, NULL);
     read[field](sAddressEdit->digits);
     edit = sAddressEdit;
     if (memcmp(edit->digits, "  0", 3) != 0) {
@@ -90,19 +90,19 @@ void DWCUtilAddressEdit_Init(void) {
         MI_CpuFill8(edit->digits, 0, sizeof(edit->digits));
         sAddressEdit->group = 0;
     }
-    DWCUtilAddressEdit_LoadGraphics();
-    DWCUtilBgOverlay_Show(field + 0xb);
-    DWCUtilScreen_Start(msgIndices[field], -1, 0);
-    DWCUtilGfxResource_ShowStep(2);
-    sAddressEdit->text = DWCUtilText_CreateBg(0, 0);
+    initGraphics();
+    DWCi_HLlLoad(field + 0xb);
+    DWCi_COMMENTlDispEx(msgIndices[field], -1, 0);
+    DWCi_CMNlStep(2);
+    sAddressEdit->text = DWCi_FNTlFormBgEx(0, 0);
     sAddressEdit->cursor = DWCUtilCell_AllocOam(0, 0x3f);
     G2_SetOBJPriority(sAddressEdit->cursor, 3);
     DWCUtilAddressEdit_UpdateCursor();
     DWCUtilAddressEdit_DrawDigits();
-    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilAddressEdit_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/ybObjKb.ncl.l", GX_LoadOBJPltt);
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
@@ -114,45 +114,45 @@ static void DWCUtilAddressEdit_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilAddressEdit_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_OpenKeypad);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilAddressEdit_OpenKeypad(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
         DWCUtilMenu_Open();
         DWCUtilSound_PlaySe(0x14);
         if (sAddressEdit->group == 0) {
-            DWCUtilMenu_SetLeftEnabled(FALSE);
-            DWCUtilMenu_SetRightEnabled(FALSE);
+            DWCi_KB10lSetErase(FALSE);
+            DWCi_KB10lSetShift(FALSE);
         } else {
             if (DWCUtilAddressEdit_IsNumberFull(26)) {
-                DWCUtilMenu_SetDigitsEnabled(FALSE);
+                DWCi_KB10lSetInput(FALSE);
             }
-            DWCUtilMenu_SetRightEnabled(FALSE);
+            DWCi_KB10lSetShift(FALSE);
         }
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitKeypad);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilAddressEdit_WaitKeypad(void) {
-    if (DWCUtilMenu_GetKey() != 0x1f) {
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_Main);
+static void procInit2(void) {
+    if (DWCi_KB10lGet() != 0x1f) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilAddressEdit_Main(void) {
-    DWCUtilAddressEdit_HandleInput();
-    func_ov182_021b2568();
+static void procScene(void) {
+    input();
+    draw();
 }
 
-static void DWCUtilAddressEdit_HandleInput(void) {
-    int key = DWCUtilMenu_GetKey();
+static void input(void) {
+    int key = DWCi_KB10lGet();
     u8 *digits;
     int first;
 
@@ -169,25 +169,25 @@ static void DWCUtilAddressEdit_HandleInput(void) {
         }
         MI_CpuFill8(&sAddressEdit->digits[sAddressEdit->group * 3], 0, 3);
         if (sAddressEdit->group == 0 && sAddressEdit->digits[2] == 0) {
-            DWCUtilMenu_SetLeftEnabled(FALSE);
+            DWCi_KB10lSetErase(FALSE);
         }
-        DWCUtilMenu_SetDigitsEnabled(TRUE);
-        DWCUtilMenu_SetRightEnabled(FALSE);
+        DWCi_KB10lSetInput(TRUE);
+        DWCi_KB10lSetShift(FALSE);
         break;
     case 0x11:
         if (sAddressEdit->group < ADDRESS_EDIT_LAST_GROUP && sAddressEdit->digits[sAddressEdit->group * 3 + 2] != 0) {
             DWCUtilSound_PlaySe(1);
             sAddressEdit->group++;
-            DWCUtilMenu_SetRightEnabled(FALSE);
+            DWCi_KB10lSetShift(FALSE);
         }
         break;
     case 0x12:
         sAddressEdit->result = ADDRESS_EDIT_CANCELLED;
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_EndEntry);
+        DWCi_ChangeScene(DWCUtilAddressEdit_EndEntry);
         return;
     case 0x13:
-        if (DWCUtilAddressEdit_IsValid()) {
+        if (isCorrect()) {
             DWCUtilSound_PlaySe(6);
             sAddressEdit->result = ADDRESS_EDIT_ENTERED;
         } else {
@@ -198,7 +198,7 @@ static void DWCUtilAddressEdit_HandleInput(void) {
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NODISPLAY, 0);
         DWCUtilAddressEdit_UpdateCursor();
         DWCUtilAddressEdit_PadDigits();
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_EndEntry);
+        DWCi_ChangeScene(DWCUtilAddressEdit_EndEntry);
         return;
     default:
         if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && DWCUtilAddressEdit_IsNumberFull(26)) {
@@ -225,14 +225,14 @@ static void DWCUtilAddressEdit_HandleInput(void) {
                 sAddressEdit->group++;
             }
         }
-        DWCUtilMenu_SetLeftEnabled(TRUE);
+        DWCi_KB10lSetErase(TRUE);
         if (sAddressEdit->group < ADDRESS_EDIT_LAST_GROUP) {
-            DWCUtilMenu_SetRightEnabled(TRUE);
+            DWCi_KB10lSetShift(TRUE);
         } else {
-            DWCUtilMenu_SetRightEnabled(FALSE);
+            DWCi_KB10lSetShift(FALSE);
         }
         if (sAddressEdit->group == ADDRESS_EDIT_LAST_GROUP && DWCUtilAddressEdit_IsNumberFull(26)) {
-            DWCUtilMenu_SetDigitsEnabled(FALSE);
+            DWCi_KB10lSetInput(FALSE);
         }
         break;
     }
@@ -262,57 +262,57 @@ static BOOL DWCUtilAddressEdit_IsNumberFull(int min) {
     return atol((char *)number) >= min;
 }
 
-static void func_ov182_021b2568(void) {
+static void draw(void) {
 }
 
 static void DWCUtilAddressEdit_EndEntry(void) {
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_CloseKeypad);
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilAddressEdit_CloseKeypad(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilMenu_Close();
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_KB10lEnd();
         DWCUtilSound_PlaySe(0x15);
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitKeypadClosed);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
 // Once the keypad has closed, asks whether to keep the address, or shows that it isn't valid
-static void DWCUtilAddressEdit_WaitKeypadClosed(void) {
-    if (!DWCUtilMenu_IsOpen()) {
+static void endScene2(void) {
+    if (!DWCi_KB10lIsInit()) {
         if (sAddressEdit->result == ADDRESS_EDIT_CANCELLED) {
-            DWCUtilMain_SetUpdate(DWCUtilAddressEdit_ExitToSettings);
+            DWCi_ChangeScene(endScene3);
             return;
         }
         if (sAddressEdit->result == ADDRESS_EDIT_INVALID) {
             DWCUtilDialog_Open(6, 3, 1, -1, 0);
-            DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitInvalidDialog);
+            DWCi_ChangeScene(DWCUtilAddressEdit_WaitInvalidDialog);
             return;
         }
         DWCUtilDialog_Open(0x47, 2, 1, -1, 0);
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitConfirm);
+        DWCi_ChangeScene(procWin);
     }
 }
 
 // Frees the screen and goes back to the connection's settings, on the address's row
-static void DWCUtilAddressEdit_ExitToSettings(void) {
+static void endScene3(void) {
     int field;
 
-    DWCUtilScreen_Stop();
-    DWCUtilOamBuf_Free(sAddressEdit->cursor);
-    DWCUtilText_DestroyScreenBg(0);
+    DWCi_COMMENTlDelete();
+    DWCi_MOV_MBP_GetChildBmp(sAddressEdit->cursor);
+    DWCi_FNTlDeleteBgLcd(0);
     DWCUtilGfxResource_Load("char/ybObjMain.ncl.l", GX_LoadOBJPltt);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_GetScreenArgs(&field, NULL);
+    DWCi_GetParam2_(&field, NULL);
     if (field >= 3) {
         field++;
     }
-    DWCUtilMain_SetLayout(2, 1);
-    DWCUtilMain_SetScreenArgs(0, field + 3);
-    DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
-    DWCUtilHeap_FreeAndNull(&sAddressEdit);
+    DWCi_SetParam_(2, 1);
+    DWCi_SetParam2_(0, field + 3);
+    DWCi_ChangeScene(DWCUtilAddressSettings_Init);
+    DWCi_HEAPlFree_(&sAddressEdit);
 }
 
 // Draws the digits, one at a time, as a string of one character
@@ -323,12 +323,12 @@ static void DWCUtilAddressEdit_DrawDigits(void) {
     u16 str[2];
     int i;
 
-    DWCUtilText_Clear(sAddressEdit->text, 0);
+    DWCi_FNTlClear(sAddressEdit->text, 0);
     str[1] = 0;
     for (i = 0; i < ADDRESS_EDIT_DIGITS; i++) {
         str[0] = sAddressEdit->digits[i];
         rect[0] = sAddressEditDigitX[i];
-        DWCUtilText_DrawRect(sAddressEdit->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
+        DWCi_FNTlDrawRect(sAddressEdit->text, rect[0], rect[1], rect[2], rect[3], 2, 0x480, str);
     }
     DWCUtilText_MarkDirty(sAddressEdit->text);
 }
@@ -343,8 +343,8 @@ static void DWCUtilAddressEdit_UpdateCursor(void) {
     DWCUtilOam_SetPosition(sAddressEdit->cursor, sAddressEditDigitX[group * 3 + 2], 0x28);
 }
 
-static void DWCUtilAddressEdit_WaitConfirm(void) {
-    sAddressEdit->result = DWCUtilDialog_GetChoice();
+static void procWin(void) {
+    sAddressEdit->result = DWCi_WINlGet();
     switch (sAddressEdit->result) {
     case 0:
         DWCUtilSound_PlaySe(7);
@@ -355,27 +355,27 @@ static void DWCUtilAddressEdit_WaitConfirm(void) {
     default:
         return;
     }
-    DWCUtilDialog_Close();
-    DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitConfirmClosed);
+    DWCi_WINlEnd();
+    DWCi_ChangeScene(procWin1);
 }
 
 // Takes the address into the connection being edited, or goes back to the keypad
-static void DWCUtilAddressEdit_WaitConfirmClosed(void) {
+static void procWin1(void) {
     void (*take[5])(const u8 *) = {
-        DWCUtilWifiSettings_SetIp,   DWCUtilWifiSettings_SetNetmask, DWCUtilWifiSettings_SetGateway,
-        DWCUtilWifiSettings_SetDns1, DWCUtilWifiSettings_SetDns2,
+        DWCUtilWifiSettings_SetIp, DWCUtilWifiSettings_SetNetmask, DWCi_SETTINGlSetGateway,
+        DWCi_SETTINGlSetDnsP,      DWCi_SETTINGlSetDnsS,
     };
     int field;
 
-    if (!DWCUtilDialog_IsOpen()) {
+    if (!DWCi_WINlIsInit()) {
         if (sAddressEdit->result == 0) {
             G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
-            DWCUtilMain_SetUpdate(DWCUtilAddressEdit_OpenKeypad);
+            DWCi_ChangeScene(procInit1);
             return;
         }
-        DWCUtilMain_GetScreenArgs(&field, NULL);
+        DWCi_GetParam2_(&field, NULL);
         take[field](sAddressEdit->digits);
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_ExitToSettings);
+        DWCi_ChangeScene(endScene3);
     }
 }
 
@@ -398,7 +398,7 @@ static void DWCUtilAddressEdit_PadDigits(void) {
 }
 
 // Whether every number is at most 255, and the address is a subnet mask of contiguous bits, or a usable address
-static BOOL DWCUtilAddressEdit_IsValid(void) {
+static BOOL isCorrect(void) {
     u8 *group;
     int i;
     u8 max[4] = "255";
@@ -420,9 +420,9 @@ static BOOL DWCUtilAddressEdit_IsValid(void) {
             }
         }
     }
-    DWCUtilWifiSettings_DigitsToAddress(sAddressEdit->digits, address);
+    DWCi_SETTINGlConvAddress(sAddressEdit->digits, address);
     result = FALSE;
-    DWCUtilMain_GetScreenArgs(&field, NULL);
+    DWCi_GetParam2_(&field, NULL);
     if (field == 1) {
         for (i = 0; i < 4; i++) {
             for (j = 0; j < 8; j++) {
@@ -437,23 +437,23 @@ static BOOL DWCUtilAddressEdit_IsValid(void) {
         }
         return TRUE;
     }
-    if (DWCBm_IsUsableAddress(address)) {
+    if (DWC_BACKUPlCheckAddress(address)) {
         result = TRUE;
     }
     return result;
 }
 
 static void DWCUtilAddressEdit_WaitInvalidDialog(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_WaitInvalidClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(DWCUtilAddressEdit_WaitInvalidClosed);
     }
 }
 
 static void DWCUtilAddressEdit_WaitInvalidClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
+    if (!DWCi_WINlIsInit()) {
         G2_SetOBJEffect(sAddressEdit->cursor, GX_OAM_EFFECT_NONE, 0);
-        DWCUtilMain_SetUpdate(DWCUtilAddressEdit_OpenKeypad);
+        DWCi_ChangeScene(procInit1);
     }
 }

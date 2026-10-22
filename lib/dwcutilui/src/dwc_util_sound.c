@@ -21,7 +21,7 @@ void DWCUtilSound_Init(void) {
     u32 size;
     int i;
 
-    sSound = DWCUtilHeap_AllocClear(sizeof(DWCUtilSound), 4);
+    sSound = DWCi_HEAPlAllocEx(sizeof(DWCUtilSound), 4);
     sSound->data = DWCUtilRomResource_LoadFile("sound/sound_data.sdat.l", &size, 32);
     NNS_SndInit();
     NNS_SndArcInitOnMemory(&sSound->arc, sSound->data);
@@ -32,12 +32,12 @@ void DWCUtilSound_Init(void) {
         NNS_SndPlayerSetPlayableSeqCount(i, 1);
         NNS_SndPlayerSetAllocatableChannel(i, 0);
     }
-    sSound->task = DWCUtilTask_Create(0, DWCUtilSound_UpdateTask, NULL, 200);
+    sSound->task = DWCi_TSKlForm(0, DWCUtilSound_UpdateTask, NULL, 200);
 }
 
-void DWCUtilSound_Exit(void) {
-    DWCUtilTask_QueueRemoval(0, sSound->task);
-    DWCUtilHeap_FreeAndNull(&sSound);
+void DWCi_SNDlEnd(void) {
+    DWCi_TSKlDelete(0, sSound->task);
+    DWCi_HEAPlFree_(&sSound);
 }
 
 void DWCUtilSound_PlaySe(int seq) {

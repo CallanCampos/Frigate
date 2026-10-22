@@ -6,13 +6,14 @@
 // NitroDWC's download library (DWC_Nd), in overlay 189, which Mystery Gift receives Wi-Fi gifts with. The ROM names
 // none of it. The names of the calls, of DWCNdFileInfo and of most values of the enums come from pret's symbols
 // (pokeheartgold's NitroDWC and pokeplatinum's use of them), matched to these functions by what they do; the names of
-// DWCNdFileInfo's fields and the values that pret does not show (ND_*) are ours
+// DWCNdFileInfo's fields, the errors and the work are NitroDWC's own, as its libraries' symbols and ntrtwl's
+// reconstruction of NitroDWC have them, and the value that neither shows (ND_CBREASON_CLEANED_UP) is ours
 
 // A file the server offers, 0xb0 bytes
 typedef struct DWCNdFileInfo {
     // The name that the file is asked for with, and a text about it in UTF-16
-    char fileName[33];
-    short description[51];
+    char name[33];
+    short explain[51];
     char param1[11];
     // Mystery Gift's gifts give the games they are for here, as a hexadecimal mask of 1 << GAME_VERSION
     char param2[11];
@@ -29,18 +30,18 @@ typedef enum DWCNdCallbackReason {
     ND_CBREASON_CLEANED_UP,
 } DWCNdCallbackReason;
 
-// The errors of the download library; ND_ERROR_BAD_PARAMETER (a text that is too long) and ND_ERROR_FATAL (the library
-// could not be set up) are ours. The SDK's DWCNdError
+// The errors of the download library, among them DWC_ND_ERROR_PARAM (a text that is too long) and DWC_ND_ERROR_FATAL
+// (the library could not be set up): the SDK's DWCNdError
 typedef enum DWCNdError {
     DWC_ND_ERROR_NONE,
     DWC_ND_ERROR_ALLOC,
     DWC_ND_ERROR_BUSY,
     DWC_ND_ERROR_HTTP,
     DWC_ND_ERROR_BUFFULL,
-    ND_ERROR_BAD_PARAMETER,
+    DWC_ND_ERROR_PARAM,
     DWC_ND_ERROR_CANCELED,
     DWC_ND_ERROR_DLSERVER,
-    ND_ERROR_FATAL,
+    DWC_ND_ERROR_FATAL,
 } DWCNdError;
 
 // The callback of every asynchronous call, with its result and the code of a failure of the server (-1 when there is

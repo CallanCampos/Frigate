@@ -45,13 +45,13 @@ typedef enum VCTResponseCode {
 
 struct VCTSession {
     // Not 0 while the session is in use: the library's mode
-    VCTMode active;
+    VCTMode mode;
     u8 aid;
     // The machine that asked for the machine's voice, when it is not the machine itself
-    u8 origin;
+    u8 talking;
     u8 pad6[2];
     // The machines whose voice is heard, a bit each
-    u32 mask;
+    u32 aidBitmap;
     // 2 once the voice flows both ways
     VCTState state;
     void *userData;
@@ -59,11 +59,11 @@ struct VCTSession {
 };
 
 // The sessions: one for a machine, and its voice's start and end
-VCTSession *VCT_AllocSession(u8 aid);
-BOOL VCT_ReleaseSession(VCTSession *session);
+VCTSession *VCT_CreateSession(u8 aid);
+BOOL VCT_DeleteSession(VCTSession *session);
 int VCT_Request(VCTSession *session, VCTRequestCode command);
-int VCT_Respond(VCTSession *session, VCTResponseCode command);
-int VCT_AddSession(u8 aid);
-int VCT_RemoveSession(u8 aid);
+int VCT_Response(VCTSession *session, VCTResponseCode command);
+int VCT_AddConferenceClient(u8 aid);
+int VCT_RemoveConferenceClient(u8 aid);
 
 #endif // POKEBW2_DWC_VCT_SESSION_H

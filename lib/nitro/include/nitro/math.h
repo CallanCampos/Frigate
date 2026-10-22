@@ -101,8 +101,8 @@ static inline u32 MATH_CountLeadingZeros(u32 x) {
 }
 #else
 // ARM code has the CLZ instruction, which the SDK's inline puts in place: assembly a library inlines at its call sites
-// (libVCT's VCT_SendPending is one), so a static inline with an asm block, as lib/ allows. MWCC defines __thumb only
-// for Thumb code
+// (libVCT's vct_flush_send_buffer is one), so a static inline with an asm block, as lib/ allows. MWCC defines __thumb
+// only for Thumb code
 static inline u32 MATH_CountLeadingZeros(u32 x) {
     asm {
         clz x, x

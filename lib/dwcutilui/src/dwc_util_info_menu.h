@@ -10,16 +10,16 @@
 // address and its Wi-Fi ID.
 // The ROM does not embed this source file's name; dwc_util_info_menu.c is descriptive.
 void DWCUtilInfoMenu_InitErase(void);
-void DWCUtilInfoMenu_InitInfo(void);
+void DWCi_SceneOptInfo(void);
 
 // The keys of a screen with two buttons: A presses the first button, B the second, once they are idle.
 // dwc_util_prompt_yes_no.c, dwc_util_notice_screen.c and dwc_util_usb_intro.c have the same function
 static inline void DWCUtilInfoMenu_EraseHandleInputInline(void) {
-    if (DWCUtilTouch_IsKeyPressed(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(1);
     }
-    if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+    if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
     }
 }
 

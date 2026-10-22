@@ -39,7 +39,7 @@ typedef enum DWCApInfoArea {
 // A DWCApInfo of the SDK. Its size is 0x40
 typedef struct DWCApInfo {
     // The kind of the access point (the SDK's aptype)
-    DWCApInfoType apType;
+    DWCApInfoType aptype;
     // The digit of the area in a Nintendo access point's information, 0xff if there is none
     DWCApInfoArea area;
     // The key mode of the setting that the connection is made with (DWCAc_GetKeyMode)

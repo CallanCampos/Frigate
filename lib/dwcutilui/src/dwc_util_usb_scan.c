@@ -7,9 +7,9 @@
 #include "nitro/wm.h"
 
 static BOOL DWCUtilUsbScan_StartScan(void);
-static void DWCUtilUsbScan_WmCallback(void *arg);
-static void DWCUtilUsbScan_ListConnectors(const WMStartScanExCallback *cb);
-static void DWCUtilUsbScan_CheckConnectors(const WMStartScanExCallback *cb);
+static void cbWm(void *arg);
+static void scanFirst(const WMStartScanExCallback *cb);
+static void scanWait(const WMStartScanExCallback *cb);
 static void DWCUtilUsbScan_FirstResultTask(DWCUtilTask *task, void *arg);
 
 #define USB_SCAN_CONNECTORS 16
@@ -34,7 +34,7 @@ typedef struct DWCUtilUsbScan {
     // The task that gives the result of the first scan
     DWCUtilTask *task;
     // TRUE while the wireless is stopped, 2 once WM_End's callback came: volatile, as the WM callback sets it from
-    // the ARM7's interrupt while DWCUtilUsbScan_Stop waits for it
+    // the ARM7's interrupt while DWCi_USBAPlEnd waits for it
     volatile u8 stopping;
     // A result found while there was no callback
     u8 pending;
@@ -53,13 +53,13 @@ static const WMScanExParam sUsbScanParam = {
 
 static DWCUtilUsbScan *sUsbScan;
 
-BOOL DWCUtilUsbScan_Start(DWCUtilUsbScanCallback callback) {
+BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
     OSOwnerInfo info;
 
-    sUsbScan = DWCUtilHeap_AllocClear(sizeof(DWCUtilUsbScan), 32);
+    sUsbScan = DWCi_HEAPlAllocEx(sizeof(DWCUtilUsbScan), 32);
     sUsbScan->callback = callback;
     sUsbScan->startTick = OS_GetTick();
-    if (WM_Initialize(sUsbScan, DWCUtilUsbScan_WmCallback, 3) == WM_ERRCODE_OPERATING) {
+    if (WM_Initialize(sUsbScan, cbWm, 3) == WM_ERRCODE_OPERATING) {
         do {
             WM_ReadStatus(&sUsbScan->status);
         } while (sUsbScan->status.state != WM_STATE_IDLE);
@@ -71,50 +71,50 @@ BOOL DWCUtilUsbScan_Start(DWCUtilUsbScanCallback callback) {
         sUsbScan->param.ssid[9] = TRUE;
         MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
         if (DWCUtilUsbScan_StartScan()) {
-            sUsbScan->task = DWCUtilTask_Create(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
+            sUsbScan->task = DWCi_TSKlForm(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
             return TRUE;
         }
     }
-    DWCUtilHeap_FreeAndNull(&sUsbScan);
+    DWCi_HEAPlFree_(&sUsbScan);
     return FALSE;
 }
 
 static BOOL DWCUtilUsbScan_StartScan(void) {
-    if (WM_StartScanEx(DWCUtilUsbScan_WmCallback, &sUsbScan->param) == WM_ERRCODE_OPERATING) {
+    if (WM_StartScanEx(cbWm, &sUsbScan->param) == WM_ERRCODE_OPERATING) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL DWCUtilUsbScan_Stop(void) {
+BOOL DWCi_USBAPlEnd(void) {
     sUsbScan->stopping = TRUE;
     WM_ReadStatus(&sUsbScan->status);
     if (sUsbScan->status.state != WM_STATE_IDLE) {
-        if (WM_Reset(DWCUtilUsbScan_WmCallback) != WM_ERRCODE_OPERATING) {
+        if (WM_Reset(cbWm) != WM_ERRCODE_OPERATING) {
             return FALSE;
         }
         do {
             WM_ReadStatus(&sUsbScan->status);
         } while (sUsbScan->status.state != WM_STATE_IDLE);
     }
-    if (WM_End(DWCUtilUsbScan_WmCallback) != WM_ERRCODE_OPERATING) {
+    if (WM_End(cbWm) != WM_ERRCODE_OPERATING) {
         return FALSE;
     }
     if (sUsbScan->task != NULL) {
-        DWCUtilTask_Remove(0, sUsbScan->task);
+        DWCi_TSKlDeleteEx(0, sUsbScan->task);
     }
     while (sUsbScan->stopping != 2) {
     }
-    DWCUtilHeap_FreeAndNull(&sUsbScan);
+    DWCi_HEAPlFree_(&sUsbScan);
     return TRUE;
 }
 
-void DWCUtilUsbScan_SetCallback(DWCUtilUsbScanCallback callback) {
+void DWCi_USBAPlSetCallback(DWCUtilUsbScanCallback callback) {
     sUsbScan->callback = callback;
 }
 
 // The callback of the wireless: the scan is started again after each channel, and takes the connectors found
-static void DWCUtilUsbScan_WmCallback(void *arg) {
+static void cbWm(void *arg) {
     WMStartScanExCallback *cb = arg;
 
     if (cb->errcode == WM_ERRCODE_SUCCESS) {
@@ -126,9 +126,9 @@ static void DWCUtilUsbScan_WmCallback(void *arg) {
             switch (cb->state) {
             case WM_STATECODE_PARENT_FOUND:
                 if (sUsbScan->listed) {
-                    DWCUtilUsbScan_CheckConnectors(cb);
+                    scanWait(cb);
                 } else {
-                    DWCUtilUsbScan_ListConnectors(cb);
+                    scanFirst(cb);
                 }
                 DWCUtilUsbScan_StartScan();
                 break;
@@ -145,7 +145,7 @@ static void DWCUtilUsbScan_WmCallback(void *arg) {
 
 // The first scan: keeps the connectors found, and gives the result at once when one that didn't take the console
 // starts to
-static void DWCUtilUsbScan_ListConnectors(const WMStartScanExCallback *cb) {
+static void scanFirst(const WMStartScanExCallback *cb) {
     int i;
     int j;
 
@@ -182,7 +182,7 @@ static void DWCUtilUsbScan_ListConnectors(const WMStartScanExCallback *cb) {
 }
 
 // The scans after the first: a connector that didn't take the console and now does is the result
-static void DWCUtilUsbScan_CheckConnectors(const WMStartScanExCallback *cb) {
+static void scanWait(const WMStartScanExCallback *cb) {
     int i;
     DWCUtilUsbScan *scan;
     int count;
@@ -258,6 +258,6 @@ static void DWCUtilUsbScan_FirstResultTask(DWCUtilTask *task, void *arg) {
         }
         sUsbScan->task = NULL;
         sUsbScan->listed = TRUE;
-        DWCUtilTask_QueueRemoval(0, task);
+        DWCi_TSKlDelete(0, task);
     }
 }
