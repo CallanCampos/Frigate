@@ -72,10 +72,10 @@ typedef struct TPWork {
     u16 initialized;
     TPRecvCallback callback;
     TPData buf;           // the answer of the last request for one sample
-    u16 index;            // of the newest sample of the automatic sampling in samples
+    u16 index;            // of the newest sample of the automatic sampling in samplingBufs
     u16 frequence;        // the number of samples that the ARM7 takes in a frame
     TPData *samplingBufs; // the buffer of the automatic sampling, a ring
-    u16 bufSize;          // the length of samples
+    u16 bufSize;          // the length of samplingBufs
     TPiCalibrateParam calibrate;
     u16 calibrate_flg;
     u16 state;        // set when the ARM7 answers the commands of the automatic sampling, and not read here

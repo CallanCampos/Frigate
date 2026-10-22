@@ -1,7 +1,7 @@
-// The wireless manager's multi-point mode (libwm, TwlSDK's wm/ARM9/src/wm_mp.c, by its place in the library: the file
-// name is a guess): the start of the mode, in a round of which a parent sends to all of its children and each child
-// answers, the data that a port sends in it, and its end. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// The wireless manager's multi-point mode (libwm, TwlSDK's wm/ARM9/src/wm_mp.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file): the start of the mode, in a round of which a parent sends to all of
+// its children and each child answers, the data that a port sends in it, and its end. The names are NitroSDK's, as
+// that reconstruction has them
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"

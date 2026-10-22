@@ -1,7 +1,7 @@
-// The wireless manager's DCF mode (libwm, TwlSDK's wm/ARM9/src/wm_dcf.c, by its place in the library: the file name is
-// a guess): the mode in which a child, connected to an ordinary access point, sends and receives frames of the
-// distributed coordination function. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// The wireless manager's DCF mode (libwm, TwlSDK's wm/ARM9/src/wm_dcf.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file): the mode in which a child, connected to an ordinary access point,
+// sends and receives frames of the distributed coordination function. The names are NitroSDK's, as that
+// reconstruction has them
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"

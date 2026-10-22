@@ -60,9 +60,9 @@ typedef struct SNDCommandQueue {
     u32 nextTag;   // the tag of the packet that the ready commands will make
 } SNDCommandQueue;
 
-// They are in the .bss of nitro_snd_main.c: the 32-aligned pool and shared work of snd_command.c start after them. The
-// names SNDCommandQueue, SNDi_Queue and sWaitingCommandListQueue are ours, for what NitroSDK keeps as statics of
-// snd_command.c
+// They are in the .bss of nitro_snd_main.c: the 32-aligned pool and shared work of snd_command.c start after them.
+// NitroSDK keeps them as statics of snd_command.c: SNDCommandQueue and SNDi_Queue are our names for the SDK's separate
+// statics, and sWaitingCommandListQueue is the SDK's name
 extern SNDCommandQueue SNDi_Queue;
 extern SNDCommand *sWaitingCommandListQueue[SND_PXI_FIFO_MESSAGE_BUFSIZE + 1];
 

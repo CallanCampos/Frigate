@@ -5,8 +5,9 @@
 
 // NitroSDK's power management (TwlSDK's libspi pm.c, whose ARM9 part is lib/nitro/src/spi/pm.c): the backlights, the
 // battery, the sound amplifier of the microphone, the sleep mode and the power-off. Each call sends the ARM7 a request
-// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions have the SDK's names, by what
-// the code does
+// through the PXI FIFO and returns a result, PM_RESULT_SUCCESS or why not. The functions have NitroSDK's names, as
+// ntrtwl's reconstruction of NitroSDK has them, where it has the code, and the SDK's names by what the code does
+// elsewhere
 
 #define PM_RESULT_SUCCESS 0
 // The ARM7 is still on a request
@@ -57,8 +58,8 @@ typedef enum {
 void PM_Init(void);
 
 // Sends the ARM7 a request with a number and a halfword, waits for the answer and returns its result. A request that
-// reads gives the ARM7's answer in *result. Swan calls it PMi_ReadRegister, after the register reads that it is
-// mostly used for
+// reads gives the ARM7's answer in *result. pret's pokeheartgold calls it PMi_ReadRegister, after the register reads
+// that it is mostly used for; NitroSDK 4.2's PMi_ReadRegister is another call
 u32 PMi_ReadRegister(u8 request, u16 data, u16 *result);
 // The cycles of the system clock that the retries of a request wait for (about 10 ms)
 #define PM_RETRY_CYCLES 0x51d23

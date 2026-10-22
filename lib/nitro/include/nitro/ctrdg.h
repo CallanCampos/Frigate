@@ -3,8 +3,9 @@
 
 #include "types.h"
 
-// NitroSDK's cartridge library (libctrdg): the slot 2 of the DS, for GBA cartridges and other devices. The functions
-// have the names of the SDK functions they appear to be
+// NitroSDK's cartridge library (libctrdg): the slot 2 of the DS, for GBA cartridges and other devices. The names are
+// NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them, where it has the code, and ours, in the SDK's style,
+// elsewhere
 
 // What the console's start-up code noted about the cartridge, in the part of main memory the DSi mirrors at this
 // address (the DS has it at 0x027ffc30): the halfword of the cartridge's ROM that identifies it, the flags and the

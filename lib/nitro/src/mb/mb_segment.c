@@ -1,5 +1,7 @@
 // The multiboot parent's view of the program it hands out: reading it into a buffer as a list of segments, registering
-// it, and cutting it into the blocks that go to a child (libmb). The names are descriptive, except swan's MB_*
+// it, and cutting it into the blocks that go to a child (libmb). It is the SDK's mb_fileinfo.c, as ntrtwl's
+// reconstruction of NitroSDK has it. The names are NitroSDK's, as that reconstruction has them, except
+// MBCache_SetArchive, MBi_GetRomSize, sRegisteredCount and sSecureAreaPartsDSi, which are ours
 #include "mb_private.h"
 
 // The kind of memory each segment of a program is loaded to: the ROM header, ARM9 code and ARM7 code

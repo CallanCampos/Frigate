@@ -1,9 +1,10 @@
 // NitroSDK's file system (libfs): an archive that has a file allocation table and a name table, such as the ROM's. The
 // commands that it runs itself when its hook leaves them to it (the default commands, on the tables), the functions
 // of its interface that run them, and the functions that set such an archive up and load its tables into memory. The
-// file name is a guess from NitroSDK's own layout (fs_command.c and fs_rom.c); no string in the ROM names it. The
-// functions have TwlSDK's names, as they are recalled from the SDK (the default commands FSi_*Default, the interface's
-// FSi_ROMFAT_*); FSi_CloseFileCommand and FS_GetArchiveOffset are ours, and FSi_TranslateCommand is swan's name.
+// file name is NitroSDK's (fs_command_default.c, as ntrtwl's reconstruction of NitroSDK has it); no string in the ROM
+// names it. The default commands (FSi_*Command), their table fsi_default_command and FSi_TranslateCommand have
+// NitroSDK's names, as that reconstruction has them; the interface's FSi_ROMFAT_* functions have TwlSDK's names as they
+// are recalled from the SDK, which the reference, older than TwlSDK, can't confirm; FS_GetArchiveOffset is ours.
 
 #include "nitro/card.h"
 #include "nitro/fs.h"
@@ -34,7 +35,7 @@ typedef struct FSArchiveFNT {
 // The number that says there is no file, or no directory
 #define FS_NO_ID 0x10000
 
-static FSResult FSi_TranslateCommand(FSFile *file, FSCommandType command, BOOL blocking);
+static FSResult FSi_TranslateCommand(FSFile *file, FSCommandType command, BOOL blocking); // swan's fs_call_filecmd
 static void *FS_GetArchiveOffset(const FSArchive *arc, u32 offset);
 static BOOL FS_IsArchiveTableLoaded(const FSArchive *arc);
 
@@ -427,7 +428,7 @@ static FSResult FSi_CloseFileCommand(FSFile *file) {
     return FS_RESULT_SUCCESS;
 }
 
-// The default commands, by command number
+// The default commands, by command number (swan's FS_COMMAND_DEFAULT)
 static FSResult (*const fsi_default_command[])(FSFile *file) = {
     FSi_ReadFileCommand,  FSi_WriteFileCommand, FSi_SeekDirCommand,      FSi_ReadDirCommand,
     FSi_FindPathCommand,  FSi_GetPathCommand,   FSi_OpenFileFastCommand, FSi_OpenFileDirectCommand,

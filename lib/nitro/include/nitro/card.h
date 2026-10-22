@@ -292,7 +292,8 @@ void CARDi_OnFifoRecv(PXIFifoTag fifoTag, u32 data, BOOL err);
 BOOL CARDi_Request(CARDiCommon *p, int reqType, int retry);
 
 // The middleware signature of the backup part of the library, "[SDK+NINTENDO:BACKUP]", which lies in the version
-// strings at the start of the program
+// strings at the start of the program. NitroSDK's cardi_backup_assert, a static of its card_backup.c, is a global here
+// because the string is a file of its own (card_backup_version.c)
 extern const char cardi_backup_assert[];
 
 // What card_rom.c gives card_common.c: the object that holds the ROM's base address, and the setup of the ROM reads

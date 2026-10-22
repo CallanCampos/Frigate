@@ -2,7 +2,8 @@
 // extfs_fopen) opens a range of memory as a file of an archive that has no name, no tables and the default functions
 // that read memory (its base is 0, so a position is an address). Its hook also answers FS_COMMAND_READDIR by listing
 // the registered archives, as the entries of a root directory. The file name is a guess from the function's purpose; no
-// string in the ROM names it. The functions have NitroSDK's names where they are known.
+// string in the ROM names it, and ntrtwl's reconstruction of NitroSDK 4.2 has this code in fs_mem.c. The functions and
+// objects have NitroSDK's names, as that reconstruction has them.
 
 #include "nitro/fs.h"
 #include "nitro/os.h"

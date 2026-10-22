@@ -316,7 +316,7 @@ static void RtcCommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
         }
         // The sequences that set the alarm bits of the status register: the answer to the read of the register changes
         // it in the shared memory and has the ARM7 write it back, if it is to change, and the answer to the write ends
-        // the command (busy is set between the two)
+        // the command (index is set between the two)
         case RTC_SEQ_ALARM1_ENABLED_SET:
             if (rtcWork.index == 0) {
                 if (*(u32 *)rtcWork.buffer[0] == TRUE) {

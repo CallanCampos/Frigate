@@ -6,7 +6,8 @@
 #include "nitro/os.h"
 #include "nitro/pm.h"
 
-// Whether the main engine's display is on, and the mode it shows when it is turned on again (swan's names)
+// Whether the main engine's display is on, and the mode it shows when it is turned on again (swan's
+// g_GfxEngineAEnabled and g_GfxEngineAMode)
 static u16 sIsDispOn = TRUE;
 u32 GXi_DmaId = GX_DEFAULT_DMAID;
 u16 GXi_VRamLockId;

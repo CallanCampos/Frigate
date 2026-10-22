@@ -113,17 +113,18 @@ static inline void VEC_Fx16Set(VecFx16 *v, fx16 x, fx16 y, fx16 z) {
 #define FX64C_65536_360 ((fx64c)0x000000b60b60b60bLL)
 #define FX_DEG_TO_IDX(deg) ((u16)((FX64C_65536_360 * (deg) + 0x80000000000LL) >> 44))
 
-// libfx, in link order. The names are NitroSDK's, as pret's pokediamond and pmd-sky use them; swan's names are noted
-// where they differ, and functions with no SDK name in pret keep swan's.
+// libfx, in link order. The names are NitroSDK's, as ntrtwl's reconstruction of NitroSDK and pret's pokediamond and
+// pmd-sky have them; swan's names are noted where they differ.
 
-// fx_mtx22.c. Swan: MAT2_Identity, MAT2_Rotation, MAT2_Scale
+// fx_mtx22.c. Swan: MAT2_Identity, MAT2_Scaling, MAT2_Rotation, MAT2_Scale
 void MTX_Identity22_(MtxFx22 *mtx);
 void MTX_Scale22_(MtxFx22 *mtx, fx32 x, fx32 y);
 // A rotation from its sine and cosine
 void MTX_Rot22_(MtxFx22 *mtx, fx32 sin, fx32 cos);
 void MTX_ScaleApply22(const MtxFx22 *src, MtxFx22 *dest, fx32 x, fx32 y);
 
-// fx_mtx33.c. Swan: MAT3_Identity, MAT3_Scale, MAT3_RotationX/Y/Z, MAT3_Mul, MAT3_MulVec
+// fx_mtx33.c. Swan: MAT3_Identity, MAT3_To4x4, MAT3_Scaling, MAT3_Scale, MAT3_RotationX/Y/Z, MAT3_RotationAxisAngle,
+// MAT3_Invert, MAT3_Mul, MAT3_MulVec
 void MTX_Identity33_(MtxFx33 *mtx);
 void MTX_Copy33To44_(const MtxFx33 *src, MtxFx44 *dst);
 void MTX_Scale33_(MtxFx33 *mtx, fx32 x, fx32 y, fx32 z);
@@ -200,7 +201,7 @@ fx32 FX_Mul32x64cFunc(fx32 v32, fx64c v64c);
 // Returns the fraction of x and writes its whole part, both with the sign of x
 fx32 FX_Modf(fx32 x, fx32 *whole);
 
-// fx_trig.c (the file name is a guess). Swan: fx_acos
+// fx_trig.c, which is fx_asinacosidx.c in the SDK. Swan: fx_acos
 u16 FX_AcosIdx(fx32 x);
 
 // GFL's calctool.c, also declared in gfl/calctool.h

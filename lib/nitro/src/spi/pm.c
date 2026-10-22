@@ -5,7 +5,9 @@
 // part in the LTD autoload (the exit callbacks and the battery level), which this part reaches through the linker's
 // veneers (func_0207ece4/e8, func_0207f058/5c and func_0207f16c/70, after their callers) and which reaches back to
 // the work of this part by the addresses of its first objects, so PMi_IsInit, PMi_WaitBusyMethod and PMi_AutoExitFlag
-// are not static. The named functions have the SDK's names; the statics still named by address are not known.
+// are not static. The named functions have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them, where it
+// has the code, and names in the SDK's style that it can't confirm elsewhere: the TwlSDK-era functions and
+// PMi_SendPxiRequest, which is ours. The statics still named by address are not known.
 #include "nitro/pm.h"
 #include "nitro/card.h"
 #include "nitro/ctrdg.h"
@@ -262,7 +264,8 @@ static void PMi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     }
 }
 
-// Sends the words of a request, if the ARM7 is not on another. PM_RESULT_BUSY if it is
+// Sends the words of a request, if the ARM7 is not on another. PM_RESULT_BUSY if it is. The name is ours: NitroSDK's
+// PMi_SendPxiData is the one-word sender that this calls
 static u32 PMi_SendPxiRequest(const u32 *words, int length, u16 *result, PMCallback callback, void *arg) {
     OSIntrMode irq = OS_DisableInterrupts();
     int i;
@@ -325,7 +328,8 @@ static u32 PMi_SendRequestAsync(u32 request, u32 data, u16 *result, PMCallback c
     return PMi_SendPxiRequest(words, 2, result, callback, arg);
 }
 
-// NitroSDK's PMi_ReadRegister
+// PMi_ReadRegister (pokeheartgold's name): sends a request with a halfword of data and waits for the answer. NitroSDK
+// 4.2's PMi_ReadRegister is another call
 u32 PMi_ReadRegister(u8 request, u16 data, u16 *result) {
     u32 res;
     u32 sent = PMi_SendRequestAsync(request, data, result, PMi_DummyCallback, &res);
@@ -526,7 +530,7 @@ u32 PM_GetAmp(PMAmpSwitch *amp) {
     return result;
 }
 
-// Sends a word to the ARM7 until the FIFO takes it
+// NitroSDK's PMi_SendPxiData: sends a word to the ARM7 until the FIFO takes it
 static void PMi_SendPxiData(u32 word) {
     while (PXI_SendWordByFifo(PXI_FIFO_TAG_PM, word, FALSE) != 0) {
     }

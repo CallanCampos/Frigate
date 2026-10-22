@@ -63,8 +63,8 @@ void OSi_TerminateCore(void);
 void OSi_DoResetSystem(void);
 // The rest of the boot code in ITCM, which OSi_DoResetSystem calls and ends by jumping to OSi_DoBoot with: the
 // check of the images that the card loaded against the hashes of the DSi header, the load of the program's images, the
-// card read, the word fill and the jump to the program's entry. All but OSi_DoResetSystem are named as guesses from
-// what their code does
+// card read, the word fill and the jump to the program's entry. OSi_DoBoot, OSi_ReadCardRom32 and OSi_CpuClear32 have
+// NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them; the others are ours, from what their code does
 BOOL OSi_VerifyHmac(const void *data, u32 size, const void *hash);
 void OSi_VerifyRomBlocks(void);
 void OSi_LoadProgram(BOOL twl);
@@ -351,7 +351,7 @@ void OS_GetLowEntropyData(u32 buffer[8]);
 // TwlSDK's OS_SpinWaitSysCycles: busy-waits for some cycles of the system clock
 void OS_SpinWaitSysCycles(u32 cycles);
 
-// An empty function that the program's autoload step calls
+// An empty function that the program's autoload step calls: NitroSDK's _start_AutoloadDoneCallback, under dsd's name
 void AutoloadCallback(void);
 // Reads the console's MAC address (NitroSDK's OS_GetMacAddress)
 void OS_GetMacAddress(u8 *macAddress);

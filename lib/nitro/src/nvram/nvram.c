@@ -2,7 +2,9 @@
 // the firmware. Reading, writing and verifying are calls that send the ARM7 their commands through the PXI FIFO and
 // finish in the function that gets its answers. The write sends a page at a time, and after each polls the flash's
 // status register on an alarm until the flash is done. The public functions have the SDK's names, known from how the
-// code works but not from the ROM; the statics are named by their addresses, and the static inlines' names are ours.
+// code works but not from the ROM. The statics that send one command each are NitroSDK's static inlines of spi.h
+// (SPI_NvramWriteEnable and the rest, as ntrtwl's reconstruction of NitroSDK has them), out of line here; the other
+// statics are named by their addresses, and the static inlines NVRAMi_EndCommand and NVRAMi_SetAlarm are ours.
 #include "nitro/nvram.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -678,7 +680,7 @@ static BOOL SPI_NvramPageWrite(u32 address, u16 size, const void *src) {
     return TRUE;
 }
 
-// Sends the command that clears the flash's error
+// Sends the command that clears the flash's error, which the SDK calls a software reset
 static BOOL SPI_NvramSoftwareReset(void) {
     if (PXI_SendWordByFifo(PXI_FIFO_TAG_NVRAM,
                            SPI_PXI_START_BIT | SPI_PXI_END_BIT | NVRAM_PXI_COMMAND(SPI_PXI_COMMAND_NVRAM_SR),

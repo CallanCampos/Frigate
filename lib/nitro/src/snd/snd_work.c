@@ -1,6 +1,6 @@
-// NitroSDK's SND (snd_work.c, a guess from the SDK's file names): the work that the ARM7's sound driver shares with the
-// ARM9, and the functions that read what the driver reports in it. The driver writes it, so each read first discards
-// the data cache's copy of the word.
+// NitroSDK's SND (snd_work.c, as ntrtwl's reconstruction of NitroSDK has it): the work that the ARM7's sound driver
+// shares with the ARM9, and the functions that read what the driver reports in it. The driver writes it, so each read
+// first discards the data cache's copy of the word.
 #include "nitro/os.h"
 #include "nitro/snd.h"
 

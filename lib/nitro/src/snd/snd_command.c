@@ -1,6 +1,7 @@
-// NitroSDK's SND (snd_command.c, a guess from the SDK's file names): the queue of commands for the ARM7's sound driver.
-// A command is taken from a pool of 256, filled in and pushed on the list of ready commands; flushing sends the list as
-// one packet through the PXI FIFO, and when the ARM7 is done with a packet the commands go back to the pool.
+// NitroSDK's SND (snd_command.c, as ntrtwl's reconstruction of NitroSDK has it): the queue of commands for the ARM7's
+// sound driver. A command is taken from a pool of 256, filled in and pushed on the list of ready commands; flushing
+// sends the list as one packet through the PXI FIFO, and when the ARM7 is done with a packet the commands go back to
+// the pool.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"
@@ -292,7 +293,7 @@ static int SND_CountWaitingCommand(void) {
 }
 
 // The function that the PXI FIFO calls with the words that the ARM7 sends for the sound tag: the number of an alarm and
-// its ID, which are the alarm that went off. NitroSDK's PxiFifoCallback (a guess)
+// its ID, which are the alarm that went off. NitroSDK's PxiFifoCallback
 static void PxiFifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
     OSIntrMode enabled = OS_DisableInterrupts();
 

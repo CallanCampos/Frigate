@@ -1,5 +1,6 @@
 // The frames that the multiboot parent and its children send each other, and the putting together of the requests
-// that a child sends in pieces (libmb). The names are descriptive
+// that a child sends in pieces (libmb). It is the SDK's mb_block.c, as ntrtwl's reconstruction of NitroSDK has it. The
+// names are NitroSDK's, as that reconstruction has them, except sMBFrame, ours for the SDK's separate statics
 #include "mb_private.h"
 
 // How many bytes of a request the children's slots hold

@@ -1,8 +1,8 @@
-// The wireless manager's data sharing (libwm, TwlSDK's wm/ARM9/src/wm_ds.c, by its place in the library: the file name
-// is a guess): in every round of the multi-point mode each console gives a few bytes, the parent collects them in a
-// set and sends the set back to all, and the game reads the sets out in step with the rounds. The parent keeps
-// WM_DS_DATASET_NUM sets in a ring, one being filled; in the double mode a second one is in flight. The names are
-// descriptive
+// The wireless manager's data sharing (libwm, TwlSDK's wm/ARM9/src/wm_ds.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file): in every round of the multi-point mode each console gives a few bytes,
+// the parent collects them in a set and sends the set back to all, and the game reads the sets out in step with the
+// rounds. The parent keeps WM_DS_DATASET_NUM sets in a ring, one being filled; in the double mode a second one is in
+// flight. The names are NitroSDK's, as that reconstruction has them
 #include "nitro/math.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

@@ -1,5 +1,5 @@
-// NitroSDK's mi_dma_card.c (the name is a guess): the DMA setup that CARD uses to read the cartridge's data port. The
-// card code's table of DMA functions points to it, so it is global.
+// NitroSDK's mi_dma_card.c (as ntrtwl's reconstruction of NitroSDK has it): the DMA setup that CARD uses to read the
+// cartridge's data port. The card code's table of DMA functions points to it, so it is global.
 #include "nitro/mi.h"
 
 // One word that repeats whenever the card has one ready (continuous mode, started by the card's own timing): from a

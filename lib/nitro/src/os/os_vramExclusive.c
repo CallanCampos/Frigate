@@ -14,7 +14,7 @@ static u32 OSi_vramExclusive;
 
 #pragma thumb off
 // clang-format off
-// NitroSDK's helper that counts the zero bits at the top of a word. It is assembly in the SDK
+// NitroSDK's OsCountZeroBits: counts the zero bits at the top of a word. It is assembly in the SDK
 static asm u32 OsCountZeroBits(u32 value) {
     clz r0, r0
     bx lr

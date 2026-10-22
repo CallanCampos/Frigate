@@ -1,6 +1,6 @@
 // NitroSDK's file system (libfs): the archives, the queue of the commands that their files send, and the paths that
-// name a file in an archive ("rom:/dir/file"). The file name is a guess from NitroSDK's own layout (fs_archive.c); no
-// string in the ROM names it. The functions have NitroSDK's names where they are known.
+// name a file in an archive ("rom:/dir/file"). The file name is NitroSDK's (fs_archive.c, as ntrtwl's reconstruction
+// of NitroSDK has it); no string in the ROM names it. The functions have NitroSDK's names where they are known.
 
 #include "nitro/fs.h"
 #include "nitro/mi.h"

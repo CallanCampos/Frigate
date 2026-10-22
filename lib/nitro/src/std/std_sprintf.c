@@ -17,7 +17,7 @@
 #define flag_unsigned 0x1000
 
 // Where the text goes: how many bytes are left, where the next one is written and where the text begins. The
-// writing goes on when no bytes are left, so that dst tells the length
+// writing goes on when no bytes are left, so that cur tells the length
 typedef struct StringBuffer {
     size_t len;
     char *cur;

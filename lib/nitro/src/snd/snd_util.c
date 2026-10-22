@@ -1,5 +1,5 @@
-// NitroSDK's SND (snd_util.c, a guess from the SDK's file names): the tables that turn a volume into what the sound
-// driver takes, and the function that converts a decibel value to a channel volume.
+// NitroSDK's SND (snd_util.c, as ntrtwl's reconstruction of NitroSDK has it): the tables that turn a volume into what
+// the sound driver takes, and the function that converts a decibel value to a channel volume.
 #include "nitro/snd.h"
 
 // The volume in decibels, in tenths, of each linear volume from 0 (silence, -32768) to 127 (0). NitroSDK's
@@ -14,8 +14,7 @@ const s16 SNDi_DecibelTable[128] = {
     -9,     -9,   -8,   -7,   -6,   -6,   -5,   -4,   -3,   -3,   -2,   -1,   -1,   0,
 };
 
-// The channel volume (0 to 127) of each decibel value, in tenths, from SND_VOLUME_DB_MIN to 0. NitroSDK's
-// SNDi_DecibelSquareTable (a guess)
+// The channel volume (0 to 127) of each decibel value, in tenths, from SND_VOLUME_DB_MIN to 0. NitroSDK's VolumeTable
 static const u8 VolumeTable[724] = {
     0,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
     1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,

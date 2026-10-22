@@ -1,4 +1,4 @@
-// NitroSDK's mi_init.c (the name is a guess): MI_Init.
+// NitroSDK's mi_init.c (as ntrtwl's reconstruction of NitroSDK has it): MI_Init.
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "twl/mi.h"

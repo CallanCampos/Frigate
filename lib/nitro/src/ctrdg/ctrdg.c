@@ -1,7 +1,7 @@
-// The cartridge library's common part (libctrdg, TwlSDK's ctrdg/common/src/ctrdg.c by its place in the library: the
-// file name is a guess): taking the bus of slot 2 for the ARM9, saying whether the cartridge is still the one that was
-// there at the start, and the word to the ARM7. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// The cartridge library's common part (libctrdg, TwlSDK's ctrdg/common/src/ctrdg.c by its place in the library;
+// ntrtwl's reconstruction of NitroSDK has the same file): taking the bus of slot 2 for the ARM9, saying whether the
+// cartridge is still the one that was there at the start, and the word to the ARM7. The names are NitroSDK's, as that
+// reconstruction has them, except CTRDGi_IsExistedAtInit and ctrdgWork, which are ours
 #include "nitro/ctrdg.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -25,7 +25,7 @@ typedef struct {
     u8 makerCode[2];
     u8 isRomCode; // CTRDG_IS_ROM_CODE
     u8 unk_b3[0xb];
-    u16 moduleID; // What the start noted in CTRDGModuleInfo.romCheck
+    u16 moduleID; // What the start noted in CTRDGModuleInfo.moduleID
 } CTRDGHeader;
 
 #define CTRDG_AGB_HEADER ((const CTRDGHeader *)HW_CTRDG_ROM)
@@ -57,7 +57,8 @@ typedef struct {
 } CTRDGRomCycle;
 
 // The library's state, of which this file uses the lock ID: CTRDGi_InitCommon clears the last four bytes as a word, and
-// then sets the ID in their second half
+// then sets the ID in their second half. The struct is ours, for what the SDK keeps as CTRDGi_EnableFlag and the
+// CTRDGWork CTRDGi_Work
 static struct {
     u32 unk_00;
     u16 subpInitialized;

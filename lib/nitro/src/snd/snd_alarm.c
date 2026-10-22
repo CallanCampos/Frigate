@@ -1,6 +1,6 @@
-// NitroSDK's SND (snd_alarm.c, a guess from the SDK's file names): the handlers of the sound driver's alarms. The ARM7
-// tells the ARM9 when an alarm goes off with the alarm's number and its ID, and the ID tells a call that is still on
-// its way after the alarm was stopped or set up again from a call for the alarm as it is now.
+// NitroSDK's SND (snd_alarm.c, as ntrtwl's reconstruction of NitroSDK has it): the handlers of the sound driver's
+// alarms. The ARM7 tells the ARM9 when an alarm goes off with the alarm's number and its ID, and the ID tells a call
+// that is still on its way after the alarm was stopped or set up again from a call for the alarm as it is now.
 #include "nitro/snd.h"
 
 typedef struct SNDAlarm {

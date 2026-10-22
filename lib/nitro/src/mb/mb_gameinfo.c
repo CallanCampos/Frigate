@@ -1,5 +1,6 @@
 // The multiboot parent's beacon: the description of each program on offer, cut into pieces that go out one by one in
-// the game info of the wireless beacon (libmb). The names are descriptive
+// the game info of the wireless beacon (libmb). The names are NitroSDK's, as ntrtwl's reconstruction of NitroSDK has
+// them, except MBGameInfo_SetBeacon and sSender, which are ours
 #include "mb_private.h"
 
 // What the beacon sends: the list of programs, the one being sent, and how far it is

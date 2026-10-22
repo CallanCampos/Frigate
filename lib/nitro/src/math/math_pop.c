@@ -1,4 +1,5 @@
-// NitroSDK libmath's math_pop.c: leading zero count and population count.
+// NitroSDK libmath's leading zero count and population count, which are in the SDK's math.c, as ntrtwl's
+// reconstruction of NitroSDK has it.
 // The split from math_md5.c is certain (the first two functions of libmath, in front of the MD5 code).
 #include "nitro/math.h"
 

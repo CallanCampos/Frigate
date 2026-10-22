@@ -1,5 +1,5 @@
 // The thread that reads the multiboot parent's program into the cache, and the jobs it runs (libmb). The names are
-// descriptive
+// NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them
 #include "mb_private.h"
 
 // The jobs that wait for the thread to be ready, as a queue ordered by priority

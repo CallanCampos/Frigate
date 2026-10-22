@@ -10,8 +10,9 @@
 #include "nitro/wm.h"
 #include <stddef.h>
 
-// What the multiboot library's files share (libmb, the parent's side). The names are descriptive: the library keeps no
-// assert strings, so none of its own names survive
+// What the multiboot library's files share (libmb, the parent's side). The library keeps no assert strings, so the ROM
+// names none of it; the names are NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them, where it has the code,
+// and ours, in the SDK's style, elsewhere
 
 #define MB_MAX_CHILD 15
 #define MB_MAX_FILE 16

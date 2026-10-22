@@ -31,6 +31,7 @@ typedef struct {
 
 #define TEX_RANGE(addr, addr2, size) { (addr) >> 12, (addr2) >> 12, (size) >> 12 }
 
+// NitroSDK's sTexStartAddrTable, swan's TEX_VRAM_BANK_RANGES
 static const TexBankRange sTexStartAddrTable[16] = {
     TEX_RANGE(0, 0, 0),
     TEX_RANGE(HW_LCDC_VRAM_A, 0, 0),
@@ -51,8 +52,9 @@ static const TexBankRange sTexStartAddrTable[16] = {
 };
 
 // The state of the loads: the banks that each Begin took (0 when none) and the End gives back, and where the CPU sees
-// them. The first of the eight words is swan's sClrImg. MWCC lays the words out in a fixed
-// permutation of their order here, which is why the declarations are not grouped by load
+// them. The names are NitroSDK's; swan names the first of the eight words, sClrImg, g_GfxVRAMUploadBanksRearPlaneImage.
+// MWCC lays the words out in a fixed permutation of their order here, which is why the declarations are not grouped by
+// load
 static GXVRamTexPltt sTexPltt;
 static u32 sTexPlttLCDCBlk;
 static u32 sTexLCDCBlk1;

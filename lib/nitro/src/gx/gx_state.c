@@ -1,5 +1,5 @@
-// NitroSDK libgx's gx_state.c: the state that libgx keeps of the VRAM banks, which gx_vramcnt.c updates, and its
-// initialization. The file has no strings; its name is the SDK's, from the layout of libgx.
+// NitroSDK libgx's state of the VRAM banks, which gx_vramcnt.c updates, and its initialization. The SDK's file is
+// gxstate.c, as ntrtwl's reconstruction of NitroSDK has it.
 #include "nitro/gx.h"
 
 GXState gGXState;

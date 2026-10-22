@@ -1,6 +1,6 @@
 // NitroSDK's file system (libfs): the entry points of the whole system, FS_Init and FS_IsAvailable. The file name is a
-// guess from NitroSDK's own layout (fs_api.c); no string in the ROM names it. The functions have NitroSDK's names where
-// they are known.
+// guess (fs_api.c); no string in the ROM names it, and ntrtwl's reconstruction of NitroSDK 4.2 has the two functions
+// in fs_file.c. The functions and is_init have NitroSDK's names, as that reconstruction has them.
 
 #include "nitro/fs.h"
 

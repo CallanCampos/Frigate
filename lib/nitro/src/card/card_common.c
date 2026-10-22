@@ -1,6 +1,7 @@
 // NitroSDK's CARD library, the part that ROM and backup commands share: initialization, the lock of the card's
 // resources and the command block; card_task.c, which follows it, has the thread that runs the commands' tasks. The
-// file name is a guess, descriptive from the SDK's structure (card_common.c); the library has no file name string.
+// file name is NitroSDK's (card_common.c, as ntrtwl's reconstruction of NitroSDK has it); the library has no file name
+// string.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"

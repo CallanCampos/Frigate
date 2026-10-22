@@ -1,7 +1,7 @@
-// NitroSDK/TwlSDK OS: the console type and whether the program runs on a DSi. The file name is a guess, from
-// OS_IsRunOnEmulator, which the console type has a bit for (the SDK's os_emulator.c); whether the DSi check belongs
-// here or in a file of its own that has the last 0x20 bytes of .bss is not known. Built with -ipa file: the file's
-// statics are reached from one base.
+// NitroSDK/TwlSDK OS: the console type and whether the program runs on a DSi. The file name is NitroSDK's: ntrtwl's
+// reconstruction of NitroSDK has OS_GetConsoleType and OS_IsRunOnEmulator in its os_emulator.c; whether the DSi check
+// belongs here or in a file of its own that has the last 0x20 bytes of .bss is not known. Built with -ipa file: the
+// file's statics are reached from one base.
 #include "nitro/os.h"
 
 // SCFG_A9ROM, whose low two bits say that the program runs in the DSi's mode (the DS compatible mode leaves them 0)

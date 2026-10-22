@@ -1,6 +1,6 @@
 // NitroSDK's CARD library, the commands for the ARM7: sending a command through the FIFO and waiting for the ARM7 to
-// answer it. The file name is a guess, from NitroSDK's card_request.c, which these two functions came from; the binary
-// can't tell whether they are a file of their own or belong to card_common.c or card_backup.c.
+// answer it. The file name is NitroSDK's card_request.c, which has these two functions in ntrtwl's reconstruction of
+// NitroSDK; the binary can't tell whether they are a file of their own or belong to card_common.c or card_backup.c.
 #include "nitro/card.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"

@@ -1,5 +1,7 @@
 // The parent side of the multiboot library's talk with its children: it keeps each child's state, takes in what the
-// children send and chooses the next frame to send (libmb). The names are descriptive, except swan's MB_Comm*
+// children send and chooses the next frame to send (libmb). It is the SDK's mb_parent.c, as ntrtwl's reconstruction of
+// NitroSDK has it. The names are NitroSDK's, as that reconstruction has them, except sLastFile, ours for what the SDK
+// keeps as a static of MBi_CommParentSendDLFileInfo
 #include "mb_private.h"
 
 // The file whose block was sent last, so that the next frame goes to the next file

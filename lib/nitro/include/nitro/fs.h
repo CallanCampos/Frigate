@@ -387,7 +387,7 @@ typedef struct FSFileRangeArgs {
 } FSFileRangeArgs;
 
 // The words that the default commands of an archive with tables work on, which the interface functions set in the
-// file before they run the command (fs_call_filecmd)
+// file before they run the command (FSi_TranslateCommand)
 typedef union FSFileCommandArgs {
     struct {
         void *buffer;
@@ -616,8 +616,8 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
 BOOL FS_SetCurrentDirectory(const char *path);
 int FSi_IncrementSjisPositionToSlash(const char *path, int position);
 BOOL FS_ChangeDir(const char *path);
-// Opens a file that is a range of the ROM, from start, for size bytes. The name is swan's
-BOOL FS_CreateFileFromRom(FSFile *file, u32 start, u32 size);
+// Opens a file that is a range of the ROM, from start, for size bytes
+BOOL FS_CreateFileFromRom(FSFile *file, u32 start, u32 size); // swan's romfs_fopen_raw
 
 // The ROM archive (fs_rom.c) and the file system as a whole (fs_api.c): NitroSDK's FSi_InitRom, which makes the
 // archive "rom" with the default DMA channel (FS_DMA_NOT_USE for none); FS_Init, which runs it and the overlays' setup

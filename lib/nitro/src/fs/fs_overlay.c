@@ -1,7 +1,7 @@
 // NitroSDK's file system (libfs): overlays. They are found in the ROM's tables of overlay headers, read into memory,
 // checked against the digests of the build when the game was not booted from the ROM, and started and ended with their
-// static initializers and destructors. The file name is a guess from NitroSDK's own layout (fs_overlay.c); no string
-// in the ROM names it. The functions have NitroSDK's names where they are known.
+// static initializers and destructors. The file name is NitroSDK's (fs_overlay.c, as ntrtwl's reconstruction of
+// NitroSDK has it); no string in the ROM names it. The functions have NitroSDK's names where they are known.
 
 #include "nitro/card.h"
 #include "nitro/fs.h"

@@ -1,5 +1,5 @@
-// NitroSDK's SND (snd_bank.c, a guess from the SDK's file names): the links between a bank and the wave archives
-// that hold its waves, the walk over a bank's instruments, and the table of a wave archive's wave addresses.
+// NitroSDK's SND (snd_bank.c, as ntrtwl's reconstruction of NitroSDK has it): the links between a bank and the wave
+// archives that hold its waves, the walk over a bank's instruments, and the table of a wave archive's wave addresses.
 #include "nitro/os.h"
 #include "nitro/snd.h"
 

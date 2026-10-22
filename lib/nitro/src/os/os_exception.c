@@ -94,7 +94,7 @@ static asm void OSi_ExceptionHandler(void) {
     bx lr
 }
 
-// NitroSDK's OSi_GetAndDisplayContext (a guess): logs the registers and calls the game's handler, keeping r0 (the low
+// NitroSDK's OSi_GetAndDisplayContext: logs the registers and calls the game's handler, keeping r0 (the low
 // bit of the stack pointer) across the two calls
 static asm void OSi_GetAndDisplayContext(void) {
     stmdb sp!, {r0, lr}
@@ -104,7 +104,7 @@ static asm void OSi_GetAndDisplayContext(void) {
     bx lr
 }
 
-// NitroSDK's OSi_SetExContext (a guess): gets the registers of the mode that took the exception into OSi_ExContext,
+// NitroSDK's OSi_SetExContext: gets the registers of the mode that took the exception into OSi_ExContext,
 // from the BIOS's frame at ip, r4 to r11 as they are and the mode's own sp and lr, which it reads by switching to the
 // mode with IRQs off
 static asm void OSi_SetExContext(void) {
@@ -142,7 +142,7 @@ static asm void OSi_SetExContext(void) {
 }
 // clang-format on
 
-// NitroSDK's OSi_DisplayExContext (a guess): calls the game's handler, if it set one, with the registers and its
+// NitroSDK's OSi_DisplayExContext: calls the game's handler, if it set one, with the registers and its
 // argument, in system mode on the current stack and with the protection unit switched on for the call and off after
 // it. The assembly is the SDK's own, in a C function whose prologue and early return the compiler makes
 static void OSi_DisplayExContext(void) {

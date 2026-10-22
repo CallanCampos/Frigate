@@ -1,5 +1,5 @@
 // The parts of the program that the multiboot parent keeps in memory to send them to the children (libmb). The names
-// are descriptive
+// are NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them
 #include "mb_private.h"
 
 void MBi_InitCache(MBiCacheList *cache) {

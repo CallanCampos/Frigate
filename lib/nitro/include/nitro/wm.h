@@ -3,7 +3,8 @@
 
 #include "types.h"
 
-// NitroSDK's wireless manager. The functions have the names of the SDK functions they appear to be
+// NitroSDK's wireless manager. The names are NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them, where it has
+// the code, and ours, in the SDK's style, elsewhere
 
 // The signal strength, 0 (none) to 3
 typedef enum {

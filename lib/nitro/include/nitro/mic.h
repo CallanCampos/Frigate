@@ -45,8 +45,8 @@ typedef struct {
     void *full_arg;
 } MICAutoParam;
 
-// The library's state, which the DSi's MICEX code in the LTD autoload reaches through MICi_GetSysWork. The busy flag is
-// set from the call that starts or stops the sampling until the ARM7 answers
+// The library's state, which the DSi's MICEX code in the LTD autoload reaches through MICi_GetSysWork. The lock is set
+// from the call that starts or stops the sampling until the ARM7 answers
 typedef struct {
     BOOL lock;
     MICCallback callback;

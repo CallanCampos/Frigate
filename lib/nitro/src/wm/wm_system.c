@@ -1,8 +1,10 @@
-// The core of the wireless manager (libwm, TwlSDK's wm/ARM9/src/wm_system.c, by its place in the library: the file name
-// is a guess). It sets the manager up in a buffer of the game's, keeps the queue of buffers for the commands to the
-// ARM7, sends a command and receives every callback and indication that the ARM7 sends back, and checks the manager's
-// state for the functions of the other files. The public functions have the SDK's names, from
-// what they do, swan's for the WMi_ ones, and the static ones' names are ours
+// The core of the wireless manager (libwm, TwlSDK's wm/ARM9/src/wm_system.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file). It sets the manager up in a buffer of the game's, keeps the queue of
+// buffers for the commands to the ARM7, sends a command and receives every callback and indication that the ARM7 sends
+// back, and checks the manager's state for the functions of the other files. The names are NitroSDK's, as that
+// reconstruction has them, where it has the code; the DSi's sleep callback and wireless check
+// (WMi_RegisterSleepCallback, WMi_DeleteSleepCallback, WmSleepCallback and WMi_IsWirelessAvailable) have no counterpart
+// there, and their names are ours
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pm.h"

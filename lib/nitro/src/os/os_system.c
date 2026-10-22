@@ -1,5 +1,5 @@
-// NitroSDK OS: the processor's interrupt state and waiting (os_system.c, a guessed name). The functions that change
-// the CPSR are assembly in the SDK, in ARM code; the others are Thumb.
+// NitroSDK OS: the processor's interrupt state and waiting (os_system.c, as ntrtwl's reconstruction of NitroSDK has
+// it). The functions that change the CPSR are assembly in the SDK, in ARM code; the others are Thumb.
 #include "nitro/os.h"
 #include "nitro/svc.h"
 #include "twl/scfg.h"

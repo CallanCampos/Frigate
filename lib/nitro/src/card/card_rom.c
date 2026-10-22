@@ -1,6 +1,6 @@
 // NitroSDK's CARD library, the game card's ROM: the commands to the card through its registers, reading the ROM a page
-// at a time with the CPU or with a DMA channel, and the setup of the reads. The file name is a guess, from NitroSDK's
-// card_rom.c; the library has no file name string.
+// at a time with the CPU or with a DMA channel, and the setup of the reads. The file name is NitroSDK's (card_rom.c, as
+// ntrtwl's reconstruction of NitroSDK has it); the library has no file name string.
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"

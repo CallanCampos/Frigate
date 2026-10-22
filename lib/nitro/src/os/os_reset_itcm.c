@@ -1,6 +1,7 @@
 // The ITCM part of NitroSDK's os_reset.c: the boot code that checks the card's images with the DSi's SHA-1 calls, loads
 // them and jumps to the program's entry. The SDK wrote some of it in assembly, so those functions are MWCC asm
-// functions.
+// functions. OSi_DoBoot, OSi_CpuClear32 and OSi_ReadCardRom32 have NitroSDK's names, as ntrtwl's reconstruction of
+// NitroSDK has them; the DSi's checks and OSi_LoadProgram, which that reconstruction doesn't have, have ours.
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/os.h"
@@ -157,9 +158,9 @@ void OSi_DoResetSystem(void) {
 }
 
 // clang-format off
-// OSi_DoBoot (our name), in ITCM, in assembly: it turns the interrupts off, takes the program that the card read
-// left in the handoff area at the top of main memory, gives the area back to the program and jumps to the entry that
-// the ROM header gives, with the registers that the area holds. Neither the jump nor the register load is a C call
+// NitroSDK's OSi_DoBoot, in ITCM, in assembly: it turns the interrupts off, takes the program that the card read left
+// in the handoff area at the top of main memory, gives the area back to the program and jumps to the entry that the ROM
+// header gives, with the registers that the area holds. Neither the jump nor the register load is a C call
 asm void OSi_DoBoot(void) {
     mov ip, #0x4000000
     str ip, [ip, #0x208]        // IME: its low half is 0, so the interrupts go off
@@ -208,7 +209,7 @@ asm void OSi_DoBoot(void) {
     bx ip
 }
 
-// OSi_CpuClear32 (our name): the boot code's word fill, which OSi_DoBoot uses. It is instruction for instruction
+// NitroSDK's OSi_CpuClear32: the boot code's word fill, which OSi_DoBoot uses. It is instruction for instruction
 // NitroSDK's MIi_CpuClear32, which the SDK wrote in assembly in mi_memory.c and copied into the ITCM image as a
 // function of its own
 asm void OSi_CpuClear32(u32 value, void *dest, u32 size) {
@@ -345,7 +346,7 @@ asm void OSi_LoadProgram(BOOL twl) {
 
 // clang-format on
 
-// OSi_ReadCardRom32 (our name): reads size bytes of the card's ROM at address into dest, a page of 0x200 bytes at a
+// NitroSDK's OSi_ReadCardRom32: reads size bytes of the card's ROM at address into dest, a page of 0x200 bytes at a
 // time. Each page's request is a command (0xb7) and the page's address, and the words that come back are copied to dest
 void OSi_ReadCardRom32(u32 address, void *dest, u32 size) {
     // The card's command bytes, reached from the high byte of MCCNT0: the enable bit at 0x040001a1, MCCMD0's command

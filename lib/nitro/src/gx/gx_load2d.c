@@ -7,10 +7,11 @@
 #include "nitro/gx.h"
 
 // The extended palette being loaded. The banks are what a Begin took from the engine (0 when it took none) and the End
-// gives back; dest is the address of the first of them in the CPU's view, and offset where in the extended palette that
-// bank starts, which is not 0 when only bank G holds the BGs' palette: it starts at its third slot. The first of the
-// seven words is swan's sSubBGExtPltt. MWCC lays the words out in a fixed permutation of their order
-// here, which is why sSubOBJExtPltt, the last in .bss, is declared first
+// gives back; the LCDCBlk words are the address of the first of them in the CPU's view, and sBGExtPlttLCDCOffset where
+// in the extended palette that bank starts, which is not 0 when only bank G holds the BGs' palette: it starts at its
+// third slot. The names are NitroSDK's; swan names the first of the seven words, sSubBGExtPltt,
+// g_GfxVRAMUploadBanksBGExtPltB. MWCC lays the words out in a fixed permutation of their order here, which is why
+// sSubOBJExtPltt, the last in .bss, is declared first
 static u32 sSubOBJExtPltt;
 static u32 sSubBGExtPltt;
 static u32 sOBJExtPlttLCDCBlk;

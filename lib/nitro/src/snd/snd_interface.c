@@ -1,5 +1,5 @@
-// NitroSDK's SND (snd_interface.c, a guess from the SDK's file names): the functions that the ARM9 calls to drive the
-// ARM7's sound driver. Each puts a command with its arguments in the queue that snd_command.c sends.
+// NitroSDK's SND (snd_interface.c, as ntrtwl's reconstruction of NitroSDK has it): the functions that the ARM9 calls to
+// drive the ARM7's sound driver. Each puts a command with its arguments in the queue that snd_command.c sends.
 #include "nitro/snd.h"
 
 // The offsets in the driver's player and track that the setters write
@@ -177,7 +177,7 @@ static void SNDi_SetTrackParam(int playerNo, u32 trackBitMask, u32 offset, u32 v
     PushCommand_impl(SND_COMMAND_TRACK_PARAM, playerNo | (size << 24), trackBitMask, offset, value);
 }
 
-// Fills the next command of the queue and puts it in
+// NitroSDK's PushCommand_impl (swan's sndQueuePacket): fills the next command of the queue and puts it in
 static void PushCommand_impl(u32 id, u32 arg0, u32 arg1, u32 arg2, u32 arg3) {
     SNDCommand *command = SND_AllocCommand(SND_COMMAND_BLOCK);
 

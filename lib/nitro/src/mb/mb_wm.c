@@ -1,6 +1,8 @@
 // The multiboot library's use of the wireless manager: the setup of the parent (MB_Init, MB_StartParent), its callbacks
 // for the manager's replies, the scan that the child side of the library starts, and the sending of frames (libmb).
-// The names are descriptive, except swan's MB_*
+// It is the SDK's mb_wm_base.c, as ntrtwl's reconstruction of NitroSDK has it. The names are NitroSDK's, as that
+// reconstruction has them, except MBWm_IsMultibootBeacon and the file's objects (sParentName and the rest), which are
+// ours
 #include "mb_private.h"
 #include "nitro/os.h"
 #include "nitro/pxi.h"

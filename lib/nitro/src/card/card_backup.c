@@ -1,6 +1,6 @@
 // NitroSDK's CARD library, the backup memory: telling which kind it is, and reading and writing it a page at a time.
-// The file name is a guess, from NitroSDK's card_backup.c; the library's middleware signature "[SDK+NINTENDO:BACKUP]"
-// is passed by the first and the fourth function here and nowhere else.
+// The file name is NitroSDK's (card_backup.c, as ntrtwl's reconstruction of NitroSDK has it); the library's middleware
+// signature "[SDK+NINTENDO:BACKUP]" is passed by the first and the fourth function here and nowhere else.
 #include "nitro/card.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
