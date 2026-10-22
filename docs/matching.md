@@ -357,6 +357,14 @@ Same instructions, registers swapped.
   pointer grows the frame from 0x10 to 0x1c and computes a separate address. Declaring `finished` before `slot`, then
   assigning its zero after `slot` is initialized, copies the saved zero into the loop counter instead of reloading the
   stack slot. The two timing calls also need the picture number narrowed to `u8` after adding 32.
+- A stack buffer's address that the original computes once before a loop into a saved register (`add r4, sp, #4`),
+  while calls in the loop still rebuild it from `sp`, is a pointer to the buffer assigned in the loop body. MWCC folds
+  `text`, `&text[0]` and an inline helper's pointer parameter back into `sp`-relative addresses, but hoists
+  `char *key = text;` declared in the loop, and the hoisted pointer then outranks a result that the original keeps on
+  the stack. The DWC utility's `UtilAc_MakeResult` (`dwcutil_ac.c`) matches with the WEP key switch in the loop and
+  every use of the key text through `key`; the same pointer at function scope is hoisted to the function's start
+  instead (59 bytes), and an inline helper taking the text, the key and the result in any shape keeps the result in
+  `r7` (292 to 300 bytes).
 - A loop-invariant field read through a `const` pointer parameter, which the original keeps in `ip`, `r7` or a stack
   slot across the loop, can be a load MWCC hoisted itself. Written as a local before the loop it keeps the same
   copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:

@@ -1754,43 +1754,8 @@ static int UtilAc_ParseHex(u8 *out, const char *text, int length) {
     return 1;
 }
 
-// Turns the settings into the result; 1, or RESULT_BAD_KEY when the keys make no sense
-// Sets a WEP key and the result's mode from the key's text: 5, 13 or 16 characters, or twice as many hex digits.
-// FALSE when the length is none of those
-static inline BOOL UtilAc_SetKey(u8 *key, const char *text, u32 length) {
-    switch (length) {
-    case 0:
-        break;
-    case 5:
-        sAcResult.wepMode = 1;
-        memcpy(key, text, 5);
-        break;
-    case 10:
-        sAcResult.wepMode = 1;
-        UtilAc_ParseHex(key, text, 10);
-        break;
-    case 13:
-        sAcResult.wepMode = 2;
-        memcpy(key, text, 13);
-        break;
-    case 26:
-        sAcResult.wepMode = 2;
-        UtilAc_ParseHex(key, text, 26);
-        break;
-    case 16:
-        sAcResult.wepMode = 3;
-        memcpy(key, text, 16);
-        break;
-    case 32:
-        sAcResult.wepMode = 3;
-        UtilAc_ParseHex(key, text, 32);
-        break;
-    default:
-        return FALSE;
-    }
-    return TRUE;
-}
-
+// Turns the settings into the result; 1, or RESULT_BAD_KEY when the keys make no sense. A WEP key is 5, 13 or 16
+// characters, or twice as many hex digits, and its length sets the result's mode
 static int UtilAc_MakeResult(void) {
     int result = RESULT_OK;
     char text[0x21];
@@ -1807,13 +1772,40 @@ static int UtilAc_MakeResult(void) {
         } else {
             sAcResult.keyCount = sAcSettings.keyCount;
             for (i = 0; i < 4; i++) {
-                u32 length;
+                char *key = text;
 
-                memcpy(text, sAcSettings.keys[i].key, 0x20);
-                text[0x20] = 0;
-                length = strlen(text);
-                if (!UtilAc_SetKey(sAcResult.keys[i], text, length)) {
+                memcpy(key, sAcSettings.keys[i].key, 0x20);
+                key[0x20] = 0;
+                switch (strlen(key)) {
+                case 0:
+                    break;
+                case 5:
+                    sAcResult.wepMode = 1;
+                    memcpy(sAcResult.keys[i], key, 5);
+                    break;
+                case 10:
+                    sAcResult.wepMode = 1;
+                    UtilAc_ParseHex(sAcResult.keys[i], key, 10);
+                    break;
+                case 13:
+                    sAcResult.wepMode = 2;
+                    memcpy(sAcResult.keys[i], key, 13);
+                    break;
+                case 26:
+                    sAcResult.wepMode = 2;
+                    UtilAc_ParseHex(sAcResult.keys[i], key, 26);
+                    break;
+                case 16:
+                    sAcResult.wepMode = 3;
+                    memcpy(sAcResult.keys[i], key, 16);
+                    break;
+                case 32:
+                    sAcResult.wepMode = 3;
+                    UtilAc_ParseHex(sAcResult.keys[i], key, 32);
+                    break;
+                default:
                     result = RESULT_BAD_KEY;
+                    break;
                 }
             }
         }
