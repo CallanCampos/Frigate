@@ -85,57 +85,66 @@ asm void *DSProt_CallCrash(void *arg0, void *arg1) {
 }
 // clang-format on
 
-// Runs the checks, each of which returns a nonzero code when it passes, and calls the callback if the codes add up
-// to a multiple of 241 with the salt. A check whose code was changed, or that fails, crashes the game
+// Checks the first 37 words of a decryption wrapper before it is called.
+static inline BOOL DSProt_CheckWrapper(const void *function) {
+    u32 i;
+    const u32 *code;
+    u32 checksum;
+
+    code = function;
+    i = 0x25;
+    checksum = 0;
+    do {
+        checksum ^= (*code >> i) | (*code << (32 - i));
+        code++;
+    } while (--i != 0);
+    return checksum == DSPROT_CHECKSUM;
+}
+
+// Adds the checks' encoded results and invokes the callback only when the total has the expected remainder.
+static inline void *DSProt_RunQueue(u32 *check, DSProtCallback callback, void *arg0, void *arg1) {
+    u32 total;
+    u32 (*func)(void *);
+    u32 value;
+
+    total = 0x30eb87;
+    do {
+        func = (u32 (*)(void *))(*check - 0x2200);
+        if (!DSProt_CheckWrapper(func)) {
+            return DSProt_CallCrash(NULL, NULL);
+        }
+        value = func(NULL);
+        if (value == 0) {
+            return DSProt_CallCrash(NULL, NULL);
+        }
+        total += value;
+        check++;
+    } while (*check != 0);
+    if (total % 241 == 0) {
+        if (callback) {
+            return callback(arg0, arg1);
+        } else {
+            return NULL;
+        }
+    } else {
+        return DSProt_CallCrash(NULL, NULL);
+    }
+}
+
+// Runs the emulator and flashcart checks and their integrity checks.
 void *DSProt_RunChecks(DSProtCallback callback, void *arg0, void *arg1) {
     u32 checks[5];
-    u32 *check;
-    u32 total;
-    void *result;
 
     checks[0] = (u32)(DSProt_CallCheckEmulatorStub + 0x2200);
     checks[1] = (u32)(DSProt_CallCheckEmulator + 0x2200);
     checks[2] = (u32)(DSProt_CallCheckFlashcart + 0x2200);
     checks[3] = (u32)(DSProt_CallCheckFlashcartStub + 0x2200);
     checks[4] = 0;
-    check = checks;
-    total = 0x30eb87;
-    result = NULL;
-    do {
-        u32 (*func)(void *) = (u32 (*)(void *))(*check - 0x2200);
-        u32 *code = (u32 *)func;
-        u32 checksum = 0;
-        u32 i;
-        u32 value;
-
-        for (i = 0x25; i != 0; i--) {
-            checksum ^= (*code << (32 - i)) | (*code >> i);
-            code++;
-        }
-        if (checksum != DSPROT_CHECKSUM) {
-            result = DSProt_CallCrash(NULL, NULL);
-            goto end;
-        }
-        value = func(result);
-        if (value == 0) {
-            goto fail;
-        }
-        total += value;
-        check++;
-    } while (*check != 0);
-    if (total % 241 != 0) {
-        goto fail;
-    }
-    if (callback != NULL) {
-        result = callback(arg0, arg1);
-    }
-    goto end;
-fail:
-    result = DSProt_CallCrash(result, result);
-end:
-    return result;
+    return DSProt_RunQueue(checks, callback, arg0, arg1);
 }
 
+// Hand-written, as every DSProt_Call* is: verifies DSProt_Dispatch, then has it decrypt DSProt_RunChecks, run it
+// and encrypt it again
 // clang-format off
 asm void *DSProt_CallRunChecks(DSProtCallback callback, void *arg0, void *arg1) {
     orr ip, pc, pc
@@ -205,4 +214,5 @@ asm void DSProt_DecryptRun(void) {
 #pragma define_section ctor ".ctor"                                                                                    \
                             ".ctor"                                                                                    \
                             ".ctor" abs32 RW
-__declspec(ctor) static void (*const sDecryptRun)(void) = DSProt_DecryptRun;
+// The loader, rather than C code, references this registration.
+__attribute__((used)) __declspec(ctor) static void (*const sDecryptRun)(void) = DSProt_DecryptRun;

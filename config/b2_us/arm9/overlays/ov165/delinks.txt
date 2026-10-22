@@ -53,6 +53,7 @@ src/ov165/status_rcv.c:
     .text       start:0x021a23e8 end:0x021a30f8
 
 lib/dsprot/src/dsprot_run.c:
+    complete
     .text       start:0x021a30f8 end:0x021a33fc
     .rodata     start:0x021a4c84 end:0x021a4c9c
     .ctor       start:0x021a4cc8 end:0x021a4ccc
