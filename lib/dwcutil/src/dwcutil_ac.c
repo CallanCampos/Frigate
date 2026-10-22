@@ -1006,6 +1006,7 @@ static int UtilAc_StartWcm(int apCount) {
     BOOL waiting = TRUE;
     int result;
     int wcmSize;
+    int size;
 
     sAcApCount = apCount;
     UtilAc_ClearEvents();
@@ -1015,8 +1016,9 @@ static int UtilAc_StartWcm(int apCount) {
         return RESULT_NO_MEMORY;
     }
     sAcWcmBuffer = (void *)(((int)sAcBlock + 0x1f) & ~0x1f);
-    sAcApList = (u8 *)(((int)sAcWcmBuffer + wcmSize + 0x2490 + 0x1f) & ~0x1f);
-    if (!UtilAcWcm_Start(UtilAc_OnEvent, sAcWcmBuffer, wcmSize + 0x2490)) {
+    size = wcmSize + 0x2490;
+    sAcApList = (u8 *)(((int)sAcWcmBuffer + size + 0x1f) & ~0x1f);
+    if (!UtilAcWcm_Start(UtilAc_OnEvent, sAcWcmBuffer, size)) {
         return RESULT_WIRELESS;
     }
     do {
