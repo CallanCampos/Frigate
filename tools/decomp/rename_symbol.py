@@ -10,7 +10,8 @@ regenerate_configs.py runs after importing names from swan.
     rename_symbol.py --file renames.txt
 
 The sources are rewritten everywhere, except for a static: only its own file, the one delinks.txt places it in, can
-refer to it, and another file may have a static of the same name.
+refer to it, and another file may have a static of the same name. A static may also take a name that only other
+files' statics have; any other name already in use is refused.
     rename_symbol.py --apply
 """
 import argparse
@@ -47,10 +48,6 @@ def find_symbols(version: str, name: str) -> list[tuple[str, int]]:
             if match and match.group(1) == name:
                 found.append((module, int(match.group(4), 16)))
     return found
-
-
-def name_in_use(version: str, name: str) -> bool:
-    return bool(find_symbols(version, name))
 
 
 def owning_source(module: str, addr: int) -> Path | None:
@@ -163,6 +160,12 @@ def is_static(source: Path, name: str) -> bool:
     return re.search(rf"^\s*static\b[^;{{(]*\b{re.escape(name)}\b", source.read_text(), re.MULTILINE) is not None
 
 
+def static_elsewhere(module: str, addr: int, name: str, source: Path) -> bool:
+    """Whether the symbol at an address is a static of another source file than this one."""
+    owner = owning_source(module, addr)
+    return owner is not None and owner != source and owner.exists() and is_static(owner, name)
+
+
 def rename_in_sources(old_names: list[str], new: str, only: Path | None = None):
     """Rewrites the old names in the sources, or only in one file, the one that defines them as static."""
     patterns = [re.compile(rf"\b{re.escape(old)}\b") for old in set(old_names) if old != new]
@@ -193,16 +196,21 @@ def rename(old: str, new: str, pairs, names: list, module: str | None = None) ->
     if len(found) > 1:
         places = ", ".join(f"{m} {a:#010x}" for m, a in found)
         sys.exit(f"{old} names several symbols ({places}): give --module")
-    for version in [PRIMARY, *OTHERS]:
-        if name_in_use(version, new):
-            sys.exit(f"{new} is already a symbol in {version}")
-
     module, addr = found[0]
     # Statics in different files can share a name, including one whose symbol still has its default name. A static is
     # only visible in its own file, so only that file is rewritten; rewriting everywhere would rename the others too
     only = owning_source(module, addr)
     if only is not None and not (only.exists() and is_static(only, old)):
         only = None
+
+    # For the same reason a static may take a name that only other files' statics have. The other versions' holders
+    # are the same statics, paired, so they must be as many
+    holders = find_symbols(PRIMARY, new)
+    if holders and not (only is not None and all(static_elsewhere(m, a, new, only) for m, a in holders)):
+        sys.exit(f"{new} is already a symbol in {PRIMARY}")
+    for version in OTHERS:
+        if len(find_symbols(version, new)) != len(holders):
+            sys.exit(f"{new} is already a symbol in {version}")
     old_names = apply(module, addr, new, pairs)
     # A default name is not recorded, so renaming a symbol back to it removes its entry
     names = [n for n in names if (n[0], n[1]) != (module, addr)]

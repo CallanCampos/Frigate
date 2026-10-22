@@ -6227,8 +6227,8 @@ overlays/ov011 0x0215aa0c CPSi_md5_init
 overlays/ov011 0x0215aa3c CPSi_md5_calc
 overlays/ov011 0x0215aabc CPSi_md5_result
 overlays/ov011 0x0215ab04 R
-overlays/ov011 0x0215ab38 Sha1PutBigEndian
-overlays/ov011 0x0215ab64 Sha1GetBigEndian
+overlays/ov011 0x0215ab38 char_from_long
+overlays/ov011 0x0215ab64 long_from_char
 overlays/ov011 0x0215ab90 CPSi_sha1_block
 overlays/ov011 0x0215b0b8 CPSi_sha1_init
 overlays/ov011 0x0215b0f0 CPSi_sha1_calc

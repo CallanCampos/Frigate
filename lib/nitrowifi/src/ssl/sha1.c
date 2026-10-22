@@ -2,8 +2,8 @@
 #include "ssl_internal.h"
 
 // SSL's own SHA-1 (FIPS 180), written from the asm. The ROM names none of it; the names are NitroWiFi's own, as
-// ntrtwl's reconstruction of NitroWiFi has them, except Sha1PutBigEndian and Sha1GetBigEndian, whose NitroWiFi names
-// (char_from_long and long_from_char) md5.c's helpers already carry in this overlay.
+// ntrtwl's reconstruction of NitroWiFi has them. char_from_long and long_from_char are statics of the same names as
+// md5.c's, as in NitroWiFi.
 
 #define SHA1_BLOCK_SIZE 64
 
@@ -23,8 +23,8 @@
 static u8 sSha1Padding[SHA1_BLOCK_SIZE] = { 0x80 };
 
 static u32 R(int t, u32 *w);
-static void Sha1PutBigEndian(u8 *dst, const u32 *src, u32 len);
-static void Sha1GetBigEndian(u32 *dst, const u8 *src, u32 len);
+static void char_from_long(u8 *dst, const u32 *src, u32 len);
+static void long_from_char(u32 *dst, const u8 *src, u32 len);
 static void CPSi_sha1_block(CPSSha1Ctx *context, const u8 *block);
 
 // The next word of the 16-word circular message schedule, replacing the one it displaces
@@ -36,7 +36,7 @@ static u32 R(int t, u32 *w) {
 }
 
 // Packs len/4 words into len big-endian bytes
-static void Sha1PutBigEndian(u8 *dst, const u32 *src, u32 len) {
+static void char_from_long(u8 *dst, const u32 *src, u32 len) {
     u32 i;
 
     len >>= 2;
@@ -50,7 +50,7 @@ static void Sha1PutBigEndian(u8 *dst, const u32 *src, u32 len) {
 }
 
 // Unpacks len big-endian bytes into len/4 words
-static void Sha1GetBigEndian(u32 *dst, const u8 *src, u32 len) {
+static void long_from_char(u32 *dst, const u8 *src, u32 len) {
     u32 i;
 
     for (i = 0; i < len; i += 4) {
@@ -63,7 +63,7 @@ static void CPSi_sha1_block(CPSSha1Ctx *context, const u8 *block) {
     u32 a, b, c, d, e;
     int t;
 
-    Sha1GetBigEndian(w, block, SHA1_BLOCK_SIZE);
+    long_from_char(w, block, SHA1_BLOCK_SIZE);
 
     a = context->state[0];
     b = context->state[1];
@@ -169,7 +169,7 @@ void CPSi_sha1_result(CPSSha1Ctx *context, u8 *digest) {
 
     // Captures the bit count before the padding below changes it (digest is only used as scratch here; it is
     // overwritten with the real digest further down)
-    Sha1PutBigEndian(digest, context->count, 8);
+    char_from_long(digest, context->count, 8);
 
     index = (context->count[1] >> 3) & 0x3f;
     padLen = (index < 0x38) ? (0x38 - index) : (0x78 - index);
@@ -177,10 +177,10 @@ void CPSi_sha1_result(CPSSha1Ctx *context, u8 *digest) {
 
     CPSi_sha1_calc(context, digest, 8);
 
-    Sha1PutBigEndian(digest, context->state, sizeof(context->state));
+    char_from_long(digest, context->state, sizeof(context->state));
 }
 
 void CPSi_sha1_result_prng(CPSSha1Ctx *context, u8 *digest) {
     CPSi_sha1_calc(context, &sSha1Padding[1], 0x2c);
-    Sha1PutBigEndian(digest, context->state, sizeof(context->state));
+    char_from_long(digest, context->state, sizeof(context->state));
 }
