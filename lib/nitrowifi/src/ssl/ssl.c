@@ -19,14 +19,6 @@ typedef struct CPSSslSession {
     u8 valid;
 } CPSSslSession;
 
-// File-local descriptive names; no original SDK type names have been established.
-typedef struct SSLCertificatePublicKey {
-    u8 modulus[0x100];
-    s32 modulus_len;
-    u8 exponent[8];
-    s32 exponent_len;
-} SSLCertificatePublicKey;
-
 // RSA-CRT private key: six alternating length/pointer pairs observed in the original function.
 // First/second names avoid assuming a particular p/q ordering for the caller's key material.
 typedef struct CPSPrivateKey {
@@ -43,79 +35,6 @@ typedef struct CPSPrivateKey {
     s32 coefficient_len;
     const u8 *coefficient;
 } CPSPrivateKey;
-
-// A connection, DER-parsed certificate fields included. 0x830 bytes
-typedef struct CPSSslConnection {
-    u8 secret[0x30]; // The pre-master secret, overwritten with the master secret once derived
-    u8 resumed;      // TRUE once a cached session's secret was restored
-    u8 unk_031;
-    u16 cipher_suite;
-    u8 client_random[0x20];
-    u8 server_random[0x20];
-    // Session storage becomes the embedded key block after session-cache operations.
-    // The final generated block overlaps pointer slots, assigned only after generation.
-    union {
-        u8 key_block[0x50];
-        struct {
-            u8 session_id[0x20];
-            u8 unk_094[0x28];
-            u8 *write_mac_secret;
-            u8 *write_key;
-        } fields;
-    } key_storage; // Descriptive reconstruction: 0x74..0xc3, not an established SDK type.
-    u8 unk_0c4[4];
-    CPSRc4Ctx write_rc4;
-    u8 unk_1ca[2];
-    u8 write_seq_num[8]; // The 8-byte big-endian sequence number make_ciphertext folds into an outgoing record's MAC
-    u8 *read_mac_secret;
-    u8 *read_key;
-    u8 unk_1dc[4];
-    CPSRc4Ctx read_rc4;
-    u8 unk_2e2[2];
-    u8 read_seq_num[8];                 // Same, for a received record's MAC; both start at 0 and add1_be8 advances them
-    CPSSha1Ctx handshake_sha1;          // The running hash of every handshake message so far
-    CPSSha1Ctx handshake_sha1_snapshot; // Copied for Finished; the snapshot contexts also serve as certificate-hash
-                                        // scratch storage
-    CPSMd5Ctx handshake_md5;
-    CPSMd5Ctx handshake_md5_snapshot;
-    u8 is_server;                // Descriptive role name: nonzero selects the server handshake path
-    u8 state;                    // SSLI_STATE_*, read back by parse_record's caller
-    u8 application_record_ready; // TRUE when read_buf holds a complete application record retained by dispatch
-    u8 pad_457;
-    s32 signature_algorithm; // 0x458: OID index 3 (MD5) or 4 (SHA1)
-    s32 public_key_algorithm;
-    const u8 *signed_start; // Borrowed DER span, valid while the input certificate buffer is owned by the caller
-    const u8 *signed_end;
-    u8 certificate_digest[0x14];
-    u32 certificate_digest_len;
-    CPSCaInfo chain_key;                     // 0x480; borrowed next-certificate key spans, with the dn slot unused
-    SSLCertificatePublicKey certificate_key; // 0x494, ends at 0x5a4
-    const u8 *certificate_signature;
-    s32 certificate_signature_len;
-    // One byte reused across phases, not two independent flags.
-    union {
-        u8 parsing_subject;
-        u8 certificate_requested;
-    } certificate_phase; // 0x5ac
-    u8 parsing_rsa_key;
-    u8 attribute_oid;
-    u8 certificate_date_valid;
-    char issuer[0x100];
-    char subject[0x100];
-    char common_name[0x50];
-    const char *hostname;  // 0x800
-    const u8 *certificate; // 0x804
-    s32 certificate_len;
-    u32 current_date;
-    int (*validate_certificate)(int result, struct CPSSslConnection *ctx, int index);
-    CPSCaInfo **named_params; // The caller's root CAs, set with CPS_SetRootCa
-    u32 named_param_count;
-    void *key_param; // Private key consumed by rcv_client_key_exchange; its writer is not recovered
-    u8 unk_820[4];
-    u8 *read_buf; // Owned incomplete record, or a dispatched application record awaiting consumption
-    u32 read_buf_len;
-    u32 read_buf_pos;
-} CPSSslConnection;
 
 // CPSSslConnection.state
 enum {

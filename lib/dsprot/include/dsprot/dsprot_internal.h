@@ -67,15 +67,19 @@ typedef struct DSProtCipherState {
     u8 table[256];
 } DSProtCipherState;
 
+// The type of DSProt_EncryptCodeWithKey and DSProt_DecryptCodeWithKey, which DSProt_EncryptFunction and
+// DSProt_DecryptFunction (and their Multi copies) call through the entries
+typedef s32 (*DSProtCodeWithKeyFunc)(const u8 *key, u8 *src, u8 *dest, u32 size);
+
 extern const u32 DSProt_DecryptCodeEntry;
 extern const u32 DSProt_EncryptCodeEntry;
 u32 DSProt_GetBranchType(u32 instruction);
 void DSProt_Rc4Init(DSProtCipherState *state, const u8 *key, u32 keyLength);
 u32 DSProt_Rc4Next(DSProtCipherState *state);
-int DSProt_EncryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
-int DSProt_DecryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
-int DSProt_EncryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size);
-int DSProt_DecryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size);
+s32 DSProt_EncryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+s32 DSProt_DecryptCode(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+s32 DSProt_EncryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size);
+s32 DSProt_DecryptCodeWithKey(const u8 *key, u8 *src, u8 *dest, u32 size);
 asm void DSProt_DecryptCipher(void);
 
 // dsprot_detect.c
@@ -142,10 +146,10 @@ extern const u32 DSProt_EncryptCodeEntryMulti;
 u32 DSProt_GetBranchTypeMulti(u32 instruction);
 void DSProt_Rc4InitMulti(DSProtCipherState *state, const u8 *key, u32 keyLength);
 u32 DSProt_Rc4NextMulti(DSProtCipherState *state);
-int DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
-int DSProt_DecryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
-int DSProt_EncryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size);
-int DSProt_DecryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size);
+s32 DSProt_EncryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+s32 DSProt_DecryptCodeMulti(DSProtCipherState *state, u8 *src, u8 *dest, u32 size);
+s32 DSProt_EncryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size);
+s32 DSProt_DecryptCodeWithKeyMulti(const u8 *key, u8 *src, u8 *dest, u32 size);
 asm void DSProt_DecryptCipherMulti(void);
 u32 DSProt_Crc32Multi(const u8 *data, u32 size);
 

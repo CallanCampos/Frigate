@@ -5345,6 +5345,8 @@
 . 0x0209aa54 sState
 . 0x0209ab24 _BaseTable
 . 0x0209aecc sTerminator
+. 0x0209b044 sPlaneFuncs
+. 0x0209b04c sRotateFuncs
 . 0x0209b090 sBase64Chars
 . 0x0209b10c sNwcUsbApSsid
 . 0x0209b118 SHMASKkey0
@@ -22649,6 +22651,16 @@ overlays/ov201 0x021b79c0 POKE_NET_SSL_SetAuthCallback
 overlays/ov201 0x021b79d4 POKE_NET_SSL_SetCaInfo
 overlays/ov201 0x021b79f0 POKE_NET_SSL_StartConnection
 overlays/ov201 0x021b7a38 POKE_NET_SSL_EndConnection
+overlays/ov201 0x021b7b98 sPOKE_NET_SSL_CaExponent
+overlays/ov201 0x021b7b9c sPOKE_NET_SSL_CaInfoList
+overlays/ov201 0x021b7ba0 sPOKE_NET_SSL_CaInfo
+overlays/ov201 0x021b7bb4 sPOKE_NET_SSL_CaDn
+overlays/ov201 0x021b7c0c sPOKE_NET_SSL_CaModulo
+overlays/ov201 0x021b8ca0 gPOKE_NET_Control
+overlays/ov201 0x021b90b8 sPOKE_NET_SslConnection
+overlays/ov201 0x021b98e8 sPOKE_NET_SSL_Connection
+overlays/ov201 0x021b98ec sPOKE_NET_SSL_Entropy
+overlays/ov201 0x021b990c sPOKE_NET_SSL_DefaultConnection
 overlays/ov203 0x021a78c0 WF_2DC_SysInit
 overlays/ov203 0x021a7960 WF_2DC_SysExit
 overlays/ov203 0x021a79bc WF_2DC_ResSet
@@ -34914,6 +34926,8 @@ overlays/ov337 0x021823f0 DSProt_EncryptCodeEntryMulti
 overlays/ov337 0x021823f4 sCipherFunctionsMulti
 overlays/ov337 0x02182408 DSProt_DecryptCodeEntryMulti
 overlays/ov337 0x0218240c sEncryptedKeyMulti
+overlays/ov337 0x02182424 sDecryptFunctionMulti
+overlays/ov337 0x02182428 sEncryptFunctionMulti
 overlays/ov337 0x0218242c sEmulatorMacMulti
 overlays/ov337 0x0218244c DSProt_WorkMulti
 overlays/ov338 0x0217c940 IrCheck_ReadId

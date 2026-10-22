@@ -8729,8 +8729,8 @@ BillboardC kind:data(any) addr:0x0209b04c
 BillboardActC kind:data(any) addr:0x0209b058
 ParticleC kind:data(any) addr:0x0209b068
 ButtonManC kind:data(any) addr:0x0209b074
-data_0209b044 kind:data(any) addr:0x0209b084
-data_0209b04c kind:data(any) addr:0x0209b08c
+sPlaneFuncs kind:data(any) addr:0x0209b084
+sRotateFuncs kind:data(any) addr:0x0209b08c
 data_0209b054 kind:data(any) addr:0x0209b094
 data_0209b05c kind:data(any) addr:0x0209b09c
 data_0209b080 kind:data(any) addr:0x0209b0c0

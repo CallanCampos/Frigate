@@ -295,7 +295,7 @@ typedef struct {
 // A force on an emitter's particles: the function applying it, and its parameters
 typedef struct {
     SPLBehaviorFunc applyFunc;
-    void *object;
+    const void *object;
 } SPLBehavior;
 
 typedef struct {
@@ -481,8 +481,9 @@ typedef struct SPLManager {
     u32 maxPolygonID : 6;
     u32 currentPolygonID : 6;
     u32 fixPolygonID : 6;
-    // Draws the emitters from the last created
-    u32 reverseDrawOrder : 1;
+    // Draws the emitters from the first created to the newest, instead of the newest first (emitters are pushed to
+    // the front of the active list)
+    u32 drawOldestFirst : 1;
     u32 reserved : 7;
     // Ored into the particles' polygon attributes
     u32 polygonAttr;
