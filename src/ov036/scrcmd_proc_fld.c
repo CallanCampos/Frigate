@@ -38,26 +38,7 @@ typedef struct {
     Box2Param *param;
 } PCCallWork;
 
-// The Xtransceiver's parameters
-typedef struct {
-    u32 mode;
-    u32 unk04;
-    u16 unk08;
-    GameData *gameData;
-    GameSystem *gsys;
-} XTransceiverParam;
-
-// The town map's parameters, and where its callback stores the place picked
-typedef struct {
-    u32 unk00;
-    u32 result;
-    u16 zoneId;
-    u16 escapeZoneId;
-    u32 unk0C;
-    u32 unk10;
-    GameSystem *gsys;
-} TownMapParam;
-
+// Where the town map's callback stores the place picked
 typedef struct {
     u16 *picked;
     u16 *zoneId;
@@ -227,12 +208,11 @@ BOOL s0155_CallXTransceiver(VM *vm, FieldScriptEnv *env) {
     Field *field = GSYS_GetField(gsys);
     u16 a1 = ScriptReadAny(vm, env);
     u16 a2 = VM_Read16(vm);
-    XTransceiverParam *param =
-        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(XTransceiverParam), TRUE, "scrcmd_proc_fld.c", 401);
+    LocalTvtParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 401);
 
-    param->mode = 0;
+    param->mode = LOCAL_TVT_MODE_SCRIPT;
     param->unk04 = a2;
-    param->unk08 = a1;
+    param->scriptId = a1;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
     ScriptWork_CallEvent(work, EventFieldSubprocessCall_CreateWithCallback(gsys, field, OVERLAY_XTRANSCEIVER,
@@ -246,12 +226,12 @@ BOOL func_ov036_021ae18c(VM *vm, FieldScriptEnv *env) {
     GameSystem *gsys = FieldScriptEnv_GetGameSystem(env);
     Field *field = GSYS_GetField(gsys);
     u16 a1;
-    XTransceiverParam *param;
+    LocalTvtParam *param;
 
     getHollow_RivalBlk(GameData_GetSaveControl(GSYS_GetGameData(gsys)));
     a1 = ScriptReadAny(vm, env);
-    param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(XTransceiverParam), TRUE, "scrcmd_proc_fld.c", 437);
-    param->mode = 2;
+    param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "scrcmd_proc_fld.c", 437);
+    param->mode = LOCAL_TVT_MODE_CALL_SECRET;
     param->unk04 = a1;
     param->gameData = FieldScriptEnv_GetGameData(env);
     param->gsys = gsys;
@@ -264,7 +244,7 @@ BOOL func_ov036_021ae18c(VM *vm, FieldScriptEnv *env) {
 static void func_ov036_021ae21c(void *data) {
     PlaceSelectWork *work = data;
 
-    if (work->param->result == 2) {
+    if (work->param->result == TOWNMAP_RESULT_FLY) {
         *work->picked = TRUE;
         *work->zoneId = work->param->zoneId;
     } else {
@@ -285,7 +265,7 @@ BOOL s0284_CallPlaceSelect(VM *vm, FieldScriptEnv *env) {
     TownMapParam *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(TownMapParam), TRUE, "scrcmd_proc_fld.c", 512);
     PlaceSelectWork *selectWork;
 
-    param->unk00 = 0;
+    param->mode = TOWNMAP_MODE_FLY;
     param->gsys = gsys;
     param->zoneId = PlayerState_GetZoneID(playerState);
     param->escapeZoneId = GameData_GetEscapeRopeZone(gameData)->zoneId;
