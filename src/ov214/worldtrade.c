@@ -287,15 +287,15 @@ static void WorldTrade_InitCellActor(WorldTradeWork *wk, const BGSysVRAMConfig *
 
     // The Pokémon icons' palettes, and a copy at half brightness for icons that can't be chosen
     plttBuf = GFL_G2DIOReadNCLR(7, 0, &pltt, HEAPID_WORLDTRADE);
-    DC_FlushRange(pltt->rawData, 0x60);
-    GX_LoadOBJPltt(pltt->rawData, 0xa0, 0x60);
-    colors = pltt->rawData;
+    DC_FlushRange(pltt->pRawData, 0x60);
+    GX_LoadOBJPltt(pltt->pRawData, 0xa0, 0x60);
+    colors = pltt->pRawData;
     for (i = 0; i < 48; i++) {
         colors[i] =
             (((colors[i] >> 10) & 0x1f) / 2 << 10) | (((colors[i] >> 5) & 0x1f) / 2 << 5) | (colors[i] & 0x1f) / 2;
     }
-    DC_FlushRange(pltt->rawData, 0x60);
-    GX_LoadOBJPltt(pltt->rawData, 0x100, 0x60);
+    DC_FlushRange(pltt->pRawData, 0x60);
+    GX_LoadOBJPltt(pltt->pRawData, 0x100, 0x60);
     GFL_HeapFree(plttBuf);
 
     if ((u8)getTrainerGender(wk->param->mystatus) == 1) {

@@ -1213,7 +1213,7 @@ static void IrcBattleMatch_InitScreen(IrcBattleMatch *work) {
     work->paletteHeapId = work->heapId;
     arc = GFL_ArcSysCreateFileHandle(ARCID_IRCBATTLE, work->paletteHeapId);
     paletteFile = GFL_G2DIOReadNCLRArc(arc, 2, &palette, work->paletteHeapId);
-    MI_CpuCopy8(palette->rawData, work->palettes, 0x120);
+    MI_CpuCopy8(palette->pRawData, work->palettes, 0x120);
     for (i = 0; i < 9; i++) {
         MI_CpuCopy8(work->palettes[8 - i], work->palettes[9 + i], 0x20);
     }

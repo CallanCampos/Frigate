@@ -5,11 +5,11 @@
 
 static void ApplyCurrentAnimResult_(NNSG2dCellAnimation *cellAnim);
 
-static inline u32 GetAnimSequenceElementType_(u32 animType) {
+static inline u32 NNSi_G2dGetAnimSequenceElementType(u32 animType) {
     return animType & 0xff;
 }
 
-static inline BOOL IsCellAnimVramTransferHandleValid_(const NNSG2dCellAnimation *cellAnim) {
+static inline BOOL NNSi_G2dIsCellAnimVramTransferHandleValid(const NNSG2dCellAnimation *cellAnim) {
     return (BOOL)(cellAnim->cellTransferStateHandle != NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE);
 }
 
@@ -28,10 +28,10 @@ static void ApplyCurrentAnimResult_(NNSG2dCellAnimation *cellAnim) {
     bank = cellAnim->pCellDataBank;
     cellAnim->pCurrentCell = NNS_G2dGetCellDataByIdx(bank, result->index);
 
-    elemType = GetAnimSequenceElementType_(cellAnim->animCtrl.pAnimSequence->animType);
+    elemType = NNSi_G2dGetAnimSequenceElementType(cellAnim->animCtrl.pAnimSequence->animType);
     NNSi_G2dSrtcInitControl(&cellAnim->srtCtrl, NNS_G2D_SRTCONTROLTYPE_SRT);
-    if (elemType != NNS_G2D_ANIMELEM_INDEX) {
-        if (elemType == NNS_G2D_ANIMELEM_INDEX_T) {
+    if (elemType != NNS_G2D_ANIMELEMENT_INDEX) {
+        if (elemType == NNS_G2D_ANIMELEMENT_INDEX_T) {
             const NNSG2dAnimDataT *resultT = (const NNSG2dAnimDataT *)result;
 
             NNSi_G2dSrtcSetTrans(&cellAnim->srtCtrl, resultT->px, resultT->py);
@@ -42,7 +42,7 @@ static void ApplyCurrentAnimResult_(NNSG2dCellAnimation *cellAnim) {
         }
     }
 
-    if (NNS_G2dCellDataBankHasVramTransferData(bank) && IsCellAnimVramTransferHandleValid_(cellAnim)) {
+    if (NNS_G2dCellDataBankHasVramTransferData(bank) && NNSi_G2dIsCellAnimVramTransferHandleValid(cellAnim)) {
         const NNSG2dCellVramTransferData *transfer = &bank->pVramTransferData->pCellTransferDataArray[result->index];
 
         NNS_G2dSetCellTransferStateRequested(cellAnim->cellTransferStateHandle, transfer->srcDataOffset,

@@ -2,11 +2,15 @@
 
 // NitroSystem's G3D model renderer: draws a render object by running the commands of its model's byte code (the SBC),
 // each of which sets up the node, material or shape it names and sends the geometry commands for it. The file is named
-// after NitroSystem's sbc.c. The functions keep swan's names, and g3d.h gives NitroSystem's where the code shows them.
-// NNS_G3DRenderCodeExec, NNS_G3DDrawCore and updateHintVec_ are static because only this file calls them
+// after NitroSystem's sbc.c. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, and g3d.h
+// notes swan's where they differ. BillboardCmd, NNS_G3D_GET_U32 and RunCallBack are ours. NitroSystem declares its
+// tables, command buffers and matrix inside the functions that use them; here MAT_COLOR_MASKS, sBBCmd, sBBYCmd,
+// sEnvMapCmd and sPrjMapCmd have our names, and NNS_COMPACT_ROT_LUT and g_NNSTextureSpaceConvMatrix swan's.
+// G3dDrawInternal_Loop_ (swan's NNS_G3DRenderCodeExec), G3dDrawInternal_ (swan's NNS_G3DDrawCore) and updateHintVec_
+// are static because only this file calls them
 
-static void NNS_G3DRenderCodeExec(NNSG3dRS *rs);
-static void NNS_G3DDrawCore(NNSG3dRS *rs, NNSG3dRenderObj *obj);
+static void G3dDrawInternal_Loop_(NNSG3dRS *rs);
+static void G3dDrawInternal_(NNSG3dRS *rs, NNSG3dRenderObj *obj);
 static void updateHintVec_(u32 *hint, const NNSG3dAnmObj *anmObj);
 
 // The mask of the parts of a color word that a material sets, for the diffuse, ambient and vertex color flags (or the
@@ -30,16 +34,16 @@ static u32 sEnvMapCmd[2] = { G3OP_TEXIMAGE_PARAM, 0 };
 
 // The functions that draw a shape or a material of the item tag in its data, with room for three more of each. Tables
 // of the same size come out in the reverse of their definitions
-NNSG3dFuncSbcShp NNS_G3D_SHAPE_DRAW_FUNCS[4] = { NNS_G3DRenderFuncDrawMeshDefault };
-NNSG3dFuncSbcMat NNS_G3D_MATERIAL_APPLY_FUNCS[4] = { NNS_G3DRenderFuncApplyMaterialDefault };
+NNSG3dFuncSbc_ShpInternal NNS_G3dFuncSbcShpTable[4] = { NNSi_G3dFuncSbc_SHP_InternalDefault };
+NNSG3dFuncSbc_MatInternal NNS_G3dFuncSbcMatTable[4] = { NNSi_G3dFuncSbc_MAT_InternalDefault };
 
 // What the model being drawn keeps for its nodes, and the renderer's pointer. Under -ipa function the .bss is laid out
 // in the reverse of the definitions here, which gives the ROM's order
-NNSG3dRenderCache g_NNSG3DRenderCache;
-NNSG3dRS *g_NNSG3DModelRenderer;
+NNSG3dRSOnGlb NNS_G3dRSOnGlb;
+NNSG3dRS *NNS_G3dRS;
 
 // The timing of the command's callback, or zero when there is none
-static inline u32 GetCallBackTiming(const NNSG3dRS *rs, u32 cmd) {
+static inline u32 NNSi_CheckPossibilityOfCallBack(const NNSG3dRS *rs, u32 cmd) {
     return rs->cbVecFunc[cmd] != NULL ? rs->cbVecTiming[cmd] : 0;
 }
 
@@ -49,23 +53,23 @@ static inline u32 RunCallBack(NNSG3dRS *rs, u32 cmd, u32 *timing, u32 when) {
     if (*timing == when) {
         rs->flag &= ~NNS_G3D_RSFLAG_SKIP;
         rs->cbVecFunc[cmd](rs);
-        *timing = GetCallBackTiming(rs, cmd);
+        *timing = NNSi_CheckPossibilityOfCallBack(rs, cmd);
         return rs->flag & NNS_G3D_RSFLAG_SKIP;
     }
     return 0;
 }
 
-static void NNS_G3DRenderCodeExec(NNSG3dRS *rs) {
+static void G3dDrawInternal_Loop_(NNSG3dRS *rs) {
     do {
         rs->flag &= ~NNS_G3D_RSFLAG_SKIP;
-        NNS_G3D_RENDER_FUNC[*rs->c & 0x1f](rs, *rs->c & 0xe0);
+        NNS_G3dFuncSbcTable[*rs->c & 0x1f](rs, *rs->c & 0xe0);
     } while (!(rs->flag & NNS_G3D_RSFLAG_RETURN));
 }
 
-static void NNS_G3DDrawCore(NNSG3dRS *rs, NNSG3dRenderObj *obj) {
+static void G3dDrawInternal_(NNSG3dRS *rs, NNSG3dRenderObj *obj) {
     MI_CpuClearFast(rs, sizeof(NNSG3dRS));
     // The first joint, which has no parent, has a scale of one
-    rs->isScaleOne[0] = 1;
+    rs->isScaleCacheOne[0] = 1;
     rs->flag = NNS_G3D_RSFLAG_NODE_VISIBLE;
     if (obj->ptrUserSbc != NULL) {
         rs->c = obj->ptrUserSbc;
@@ -76,9 +80,9 @@ static void NNS_G3DDrawCore(NNSG3dRS *rs, NNSG3dRenderObj *obj) {
     rs->pResNodeInfo = NNS_G3dGetNodeInfo(obj->resMdl);
     rs->pResMat = NNS_G3dGetMat(obj->resMdl);
     rs->pResShp = NNS_G3dGetShp(obj->resMdl);
-    rs->funcJntScale = NNS_G3D_JOINT_SCALE_FUNCS[NNS_G3dGetMdlInfo(obj->resMdl)->scalingRule];
-    rs->funcJntMtx = NNS_G3D_JOINT_FLUSH_FUNCS[NNS_G3dGetMdlInfo(obj->resMdl)->scalingRule];
-    rs->funcTexMtx = NNS_G3D_TEX_MATRIX_FUNCS[NNS_G3dGetMdlInfo(obj->resMdl)->texMtxMode];
+    rs->funcJntScale = NNS_G3dGetJointScale_FuncArray[NNS_G3dGetMdlInfo(obj->resMdl)->scalingRule];
+    rs->funcJntMtx = NNS_G3dSendJointSRT_FuncArray[NNS_G3dGetMdlInfo(obj->resMdl)->scalingRule];
+    rs->funcTexMtx = NNS_G3dSendTexSRT_FuncArray[NNS_G3dGetMdlInfo(obj->resMdl)->texMtxMode];
     rs->posScale = NNS_G3dGetMdlInfo(obj->resMdl)->posScale;
     rs->invPosScale = NNS_G3dGetMdlInfo(obj->resMdl)->invPosScale;
 
@@ -93,17 +97,17 @@ static void NNS_G3DDrawCore(NNSG3dRS *rs, NNSG3dRenderObj *obj) {
     if (obj->flag & NNS_G3D_RENDEROBJ_FLAG_NOGECMD) {
         rs->flag |= NNS_G3D_RSFLAG_OPT_NOGECMD;
     }
-    if (obj->flag & NNS_G3D_RENDEROBJ_FLAG_SKIP_SBCDRAW) {
+    if (obj->flag & NNS_G3D_RENDEROBJ_FLAG_SKIP_SBC_DRAW) {
         rs->flag |= NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW;
     }
-    if (obj->flag & NNS_G3D_RENDEROBJ_FLAG_SKIP_SBCMTXCALC) {
+    if (obj->flag & NNS_G3D_RENDEROBJ_FLAG_SKIP_SBC_MTXCALC) {
         rs->flag |= NNS_G3D_RSFLAG_OPT_SKIP_SBCMTXCALC;
     }
 
     if (obj->cbInitFunc != NULL) {
         obj->cbInitFunc(rs);
     }
-    NNS_G3DRenderCodeExec(rs);
+    G3dDrawInternal_Loop_(rs);
     obj->flag &= ~NNS_G3D_RENDEROBJ_FLAG_RECORD;
 }
 
@@ -121,7 +125,7 @@ static void updateHintVec_(u32 *hint, const NNSG3dAnmObj *anmObj) {
     }
 }
 
-void NNS_G3DDraw(NNSG3dRenderObj *obj) {
+void NNS_G3dDraw(NNSG3dRenderObj *obj) {
     NNSG3dRS rs;
 
     if ((obj->flag & NNS_G3D_RENDEROBJ_FLAG_HINT_OBSOLETE) == NNS_G3D_RENDEROBJ_FLAG_HINT_OBSOLETE) {
@@ -140,23 +144,23 @@ void NNS_G3DDraw(NNSG3dRenderObj *obj) {
         obj->flag &= ~NNS_G3D_RENDEROBJ_FLAG_HINT_OBSOLETE;
     }
 
-    if (g_NNSG3DModelRenderer != NULL) {
-        NNS_G3DDrawCore(g_NNSG3DModelRenderer, obj);
+    if (NNS_G3dRS != NULL) {
+        G3dDrawInternal_(NNS_G3dRS, obj);
     } else {
-        g_NNSG3DModelRenderer = &rs;
-        NNS_G3DDrawCore(&rs, obj);
-        g_NNSG3DModelRenderer = NULL;
+        NNS_G3dRS = &rs;
+        G3dDrawInternal_(&rs, obj);
+        NNS_G3dRS = NULL;
     }
 }
 
-void NNS_G3DRenderFuncNop(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_NOP(NNSG3dRS *rs, u32 opt) {
     if (rs->cbVecFunc[NNS_G3D_SBC_NOP] != NULL) {
         rs->cbVecFunc[NNS_G3D_SBC_NOP](rs);
     }
     rs->c += 1;
 }
 
-void NNS_G3DRenderFuncReturn(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_RET(NNSG3dRS *rs, u32 opt) {
     if (rs->cbVecFunc[NNS_G3D_SBC_RET] != NULL) {
         rs->cbVecFunc[NNS_G3D_SBC_RET](rs);
     }
@@ -164,7 +168,7 @@ void NNS_G3DRenderFuncReturn(NNSG3dRS *rs, u32 opt) {
 }
 
 // NODE: sets the node that the commands that follow draw, and whether it is shown
-void NNS_G3DRenderFuncSetVisGroup(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_NODE(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW)) {
         u32 nodeID;
         u32 timing;
@@ -172,9 +176,9 @@ void NNS_G3DRenderFuncSetVisGroup(NNSG3dRS *rs, u32 opt) {
         rs->currentNode = rs->c[1];
         nodeID = rs->currentNode;
         rs->flag |= NNS_G3D_RSFLAG_CURRENT_NODE_VALID;
-        rs->pVisAnmResult = &rs->visAnmResult;
+        rs->pVisAnmResult = &rs->tmpVisAnmResult;
 
-        timing = GetCallBackTiming(rs, NNS_G3D_SBC_NODE);
+        timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_NODE);
         if (!RunCallBack(rs, NNS_G3D_SBC_NODE, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A)) {
             const NNSG3dRenderObj *obj = rs->pRenderObj;
 
@@ -198,9 +202,9 @@ void NNS_G3DRenderFuncSetVisGroup(NNSG3dRS *rs, u32 opt) {
 }
 
 // MTX: restores a matrix that a node stored in the matrix stack
-void NNS_G3DRenderFuncLoadMatrix(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_MTX(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) && (rs->flag & NNS_G3D_RSFLAG_NODE_VISIBLE)) {
-        u32 timing = GetCallBackTiming(rs, NNS_G3D_SBC_MTX);
+        u32 timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_MTX);
 
         if (!RunCallBack(rs, NNS_G3D_SBC_MTX, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A)) {
             u32 param = rs->c[1];
@@ -217,15 +221,15 @@ void NNS_G3DRenderFuncLoadMatrix(NNSG3dRS *rs, u32 opt) {
 
 // MAT's default function: makes the result for the material, from its own values and the global state's, then the
 // animations'; and sends it to the geometry engine. With the option 010 a result that is made stays in
-// g_NNSG3DRenderCache, for the nodes that follow with the material, and with 001 one that stayed there is used
-void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResMatData *mat, u32 matID) {
+// NNS_G3dRSOnGlb, for the nodes that follow with the material, and with 001 one that stayed there is used
+void NNSi_G3dFuncSbc_MAT_InternalDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResMatData *mat, u32 matID) {
     u32 timing;
 
     rs->currentMat = matID;
     rs->flag |= NNS_G3D_RSFLAG_CURRENT_MAT_VALID;
-    rs->pMatAnmResult = &rs->matAnmResult;
+    rs->pMatAnmResult = &rs->tmpMatAnmResult;
 
-    timing = GetCallBackTiming(rs, NNS_G3D_SBC_MAT);
+    timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_MAT);
     if (!RunCallBack(rs, NNS_G3D_SBC_MAT, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A)) {
         NNSG3dMatAnmResult *result;
 
@@ -236,7 +240,7 @@ void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dRe
             if (rs->pRenderObj->recMatAnm != NULL) {
                 result = &rs->pRenderObj->recMatAnm[matID];
             } else {
-                result = &g_NNSG3DRenderCache.materials[matID];
+                result = &NNS_G3dRSOnGlb.matCache[matID];
             }
         } else {
             if (rs->pRenderObj->recMatAnm != NULL) {
@@ -244,9 +248,9 @@ void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dRe
                 result = &rs->pRenderObj->recMatAnm[matID];
             } else if (opt == NNS_G3D_SBCFLG_010) {
                 rs->isMatCached[matID >> 5] |= 1 << (matID & 0x1f);
-                result = &g_NNSG3DRenderCache.materials[matID];
+                result = &NNS_G3dRSOnGlb.matCache[matID];
             } else {
-                result = &rs->matAnmResult;
+                result = &rs->tmpMatAnmResult;
             }
 
             result->flag = 0;
@@ -351,7 +355,7 @@ void NNS_G3DRenderFuncApplyMaterialDefault(NNSG3dRS *rs, u32 opt, const NNSG3dRe
 }
 
 // MAT: draws what follows with the material, unless the node is hidden and that material is the current one
-void NNS_G3DRenderFuncApplyMaterial(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_MAT(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW)) {
         u32 matID = rs->c[1];
 
@@ -359,15 +363,15 @@ void NNS_G3DRenderFuncApplyMaterial(NNSG3dRS *rs, u32 opt) {
             matID != rs->currentMat) {
             const NNSG3dResMatData *mat = NNS_G3dGetMatDataByIdx(rs->pResMat, matID);
 
-            NNS_G3D_MATERIAL_APPLY_FUNCS[mat->itemTag](rs, opt, mat, matID);
+            NNS_G3dFuncSbcMatTable[mat->itemTag](rs, opt, mat, matID);
         }
     }
     rs->c += 2;
 }
 
 // SHP's default function: sends the display list of the shape
-void NNS_G3DRenderFuncDrawMeshDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResShpData *shp, u32 shpID) {
-    u32 timing = GetCallBackTiming(rs, NNS_G3D_SBC_SHP);
+void NNSi_G3dFuncSbc_SHP_InternalDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResShpData *shp, u32 shpID) {
+    u32 timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_SHP);
 
     if (!RunCallBack(rs, NNS_G3D_SBC_SHP, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A)) {
         if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD)) {
@@ -380,13 +384,13 @@ void NNS_G3DRenderFuncDrawMeshDefault(NNSG3dRS *rs, u32 opt, const NNSG3dResShpD
 }
 
 // SHP: draws the shape, if the node and the material are shown
-void NNS_G3DRenderFuncDrawMesh(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_SHP(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) && (rs->flag & NNS_G3D_RSFLAG_NODE_VISIBLE) &&
         !(rs->flag & NNS_G3D_RSFLAG_MAT_TRANSPARENT)) {
         u32 shpID = rs->c[1];
         const NNSG3dResShpData *shp = NNS_G3dGetShpDataByIdx(rs->pResShp, shpID);
 
-        NNS_G3D_SHAPE_DRAW_FUNCS[shp->itemTag](rs, opt, shp, shpID);
+        NNS_G3dFuncSbcShpTable[shp->itemTag](rs, opt, shp, shpID);
     }
     rs->c += 2;
 }
@@ -396,7 +400,7 @@ void NNS_G3DRenderFuncDrawMesh(NNSG3dRS *rs, u32 opt) {
 
 // NODEDESC: makes the matrix of a joint from the node's data and sets it as the current one, restoring the matrix it
 // is relative to before, and storing it after, as the option says
-void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_NODEDESC(NNSG3dRS *rs, u32 opt) {
     u32 size = 4;
     u32 nodeID = rs->c[1];
     u32 timing;
@@ -435,8 +439,8 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
         }
     }
 
-    rs->pJntAnmResult = &rs->jntAnmResult;
-    timing = GetCallBackTiming(rs, NNS_G3D_SBC_NODEDESC);
+    rs->pJntAnmResult = &rs->tmpJntAnmResult;
+    timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_NODEDESC);
     if (!RunCallBack(rs, NNS_G3D_SBC_NODEDESC, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A)) {
         NNSG3dJntAnmResult *result;
         BOOL isRecorded;
@@ -446,7 +450,7 @@ void NNS_G3DRenderFuncApplyJointMatrix(NNSG3dRS *rs, u32 opt) {
             isRecorded = !(rs->flag & NNS_G3D_RSFLAG_OPT_RECORD);
         } else {
             isRecorded = FALSE;
-            result = &rs->jntAnmResult;
+            result = &rs->tmpJntAnmResult;
         }
 
         if (!isRecorded) {
@@ -549,7 +553,7 @@ static BillboardCmd sBBCmd;
 static BillboardCmd sBBYCmd;
 
 // BB: a billboard, facing the camera
-void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_BB(NNSG3dRS *rs, u32 opt) {
     u32 size = 2;
     u32 timing;
     u32 skip;
@@ -579,7 +583,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
         }
     }
 
-    timing = GetCallBackTiming(rs, NNS_G3D_SBC_BB);
+    timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_BB);
     skip = RunCallBack(rs, NNS_G3D_SBC_BB, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         MtxFx44 clip;
@@ -596,7 +600,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             MtxFx44 mv;
 
-            MTX_Copy43To44_(NNS_G3DGetTempMVMatrix(), &mv);
+            MTX_Copy43To44_(NNS_G3dGlbGetWV(), &mv);
             MTX_Concat44(&clip, &mv, &clip);
         } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
             MtxFx44 cam;
@@ -615,13 +619,13 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
             MIi_CpuSend32(&sBBCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            MIi_CpuSend32(NNS_G3DGetTempInvMVMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(NNS_G3dGlbGetInvWV(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
             MIi_CpuSend32(sBBCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
             MIi_CpuSend32(&sBBCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            MIi_CpuSend32(NNS_G3DGetInvViewMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(NNS_G3dGlbGetInvV(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
             MIi_CpuSend32(sBBCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else {
@@ -640,7 +644,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix1(NNSG3dRS *rs, u32 opt) {
 }
 
 // BBY: a billboard that turns about the y axis
-void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_BBY(NNSG3dRS *rs, u32 opt) {
     u32 size = 2;
     u32 timing;
     u32 skip;
@@ -673,7 +677,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
         }
     }
 
-    timing = GetCallBackTiming(rs, NNS_G3D_SBC_BBY);
+    timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_BBY);
     skip = RunCallBack(rs, NNS_G3D_SBC_BBY, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
         MtxFx44 clip;
@@ -690,7 +694,7 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             MtxFx44 mv;
 
-            MTX_Copy43To44_(NNS_G3DGetTempMVMatrix(), &mv);
+            MTX_Copy43To44_(NNS_G3dGlbGetWV(), &mv);
             MTX_Concat44(&clip, &mv, &clip);
         } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
             MtxFx44 cam;
@@ -719,13 +723,13 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
         if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_WVP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
             MIi_CpuSend32(&sBBYCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            MIi_CpuSend32(NNS_G3DGetTempInvMVMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(NNS_G3dGlbGetInvWV(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
             MIi_CpuSend32(sBBYCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
             reg_G3X_GXFIFO = 0x171012; // MTX_POP, MTX_MODE, MTX_LOAD_4x3
             MIi_CpuSend32(&sBBYCmd.popNum, &reg_G3X_GXFIFO, 2 * sizeof(u32));
-            MIi_CpuSend32(NNS_G3DGetInvViewMatrix(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
+            MIi_CpuSend32(NNS_G3dGlbGetInvV(), &reg_G3X_GXFIFO, sizeof(MtxFx43));
             reg_G3X_GXFIFO = 0x1b19; // MTX_MULT_4x3, MTX_SCALE
             MIi_CpuSend32(sBBYCmd.axis, &reg_G3X_GXFIFO, sizeof(BillboardCmd) - 3 * sizeof(u32));
         } else {
@@ -744,10 +748,10 @@ void NNS_G3DRenderFuncSetBillboardMatrix2(NNSG3dRS *rs, u32 opt) {
 }
 
 // NODEMIX: makes a matrix from the matrices of several joints, each applied to the joint's inverse bind pose and
-// weighted, and stores it. The matrices that the joints make are kept in g_NNSG3DRenderCache for the nodes that
+// weighted, and stores it. The matrices that the joints make are kept in NNS_G3dRSOnGlb for the nodes that
 // follow. Each product is added to the sum as a 64-bit value, the shape that the public decompilation of NitroSystem
 // (github.com/ntrtwl/NitroSystem) gives this function
-void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_NODEMIX(NNSG3dRS *rs, u32 opt) {
     const NNSG3dResEvpMtx *evpMtx =
         (const NNSG3dResEvpMtx *)((u8 *)rs->pRenderObj->resMdl + rs->pRenderObj->resMdl->ofsEvpMtx);
     u32 numMtx = rs->c[2];
@@ -769,11 +773,11 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
     for (i = 0; i < numMtx; i++) {
         // NitroSDK's u32, which is unsigned long
         unsigned long jointID = p[1];
-        u32 isCached = rs->isEnvMtxCached[jointID >> 5] & (1 << (jointID & 0x1f));
-        MtxFx44 *clip = &g_NNSG3DRenderCache.ibpMatrices[jointID].clip;
+        u32 isCached = rs->isEvpCached[jointID >> 5] & (1 << (jointID & 0x1f));
+        MtxFx44 *clip = &NNS_G3dRSOnGlb.evpCache[jointID].clip;
 
         if (!isCached) {
-            rs->isEnvMtxCached[jointID >> 5] |= 1 << (jointID & 0x1f);
+            rs->isEvpCached[jointID >> 5] |= 1 << (jointID & 0x1f);
             reg_G3_MTX_RESTORE = p[0];
             reg_G3_MTX_MODE = GX_MTXMODE_POSITION;
             G3_MultMtx43(&evpMtx[jointID].invM);
@@ -812,7 +816,7 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
         sum.invM.m[3][1] += (weight * clip->m[3][1]) >> FX32_SHIFT;
         sum.invM.m[3][2] += (weight * clip->m[3][2]) >> FX32_SHIFT;
         p += 3;
-        nrm = &g_NNSG3DRenderCache.ibpMatrices[jointID].normal;
+        nrm = &NNS_G3dRSOnGlb.evpCache[jointID].normal;
         if (!isCached) {
             while (G3X_GetVectorMtx(nrm) != 0) {
             }
@@ -841,8 +845,8 @@ void NNS_G3DRenderFuncApplySmoSkMatrix(NNSG3dRS *rs, u32 opt) {
 }
 
 // CALLDL: sends a display list that the command holds the offset and size of
-void NNS_G3DRenderFuncExecFIFOQueue(NNSG3dRS *rs, u32 opt) {
-    u32 timing = GetCallBackTiming(rs, NNS_G3D_SBC_CALLDL);
+void NNSi_G3dFuncSbc_CALLDL(NNSG3dRS *rs, u32 opt) {
+    u32 timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_CALLDL);
     u32 skip = RunCallBack(rs, NNS_G3D_SBC_CALLDL, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
 
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !skip) {
@@ -856,7 +860,7 @@ void NNS_G3DRenderFuncExecFIFOQueue(NNSG3dRS *rs, u32 opt) {
 }
 
 // POSSCALE: scales by the model's position scale, or with the option 000 off, its inverse
-void NNS_G3DRenderFuncGlobalScale(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_POSSCALE(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_NOGECMD) && !(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW)) {
         VecFx32 scale;
 
@@ -871,7 +875,7 @@ void NNS_G3DRenderFuncGlobalScale(NNSG3dRS *rs, u32 opt) {
 }
 
 // ENVMAP: maps the texture as a sphere map about the normals
-void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_ENVMAP(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) && (rs->flag & NNS_G3D_RSFLAG_NODE_VISIBLE)) {
         MtxFx33 vec;
         VecFx32 scale;
@@ -887,7 +891,7 @@ void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
         }
         NNS_G3dGeMtxMode(GX_MTXMODE_TEXTURE);
 
-        timing = GetCallBackTiming(rs, NNS_G3D_SBC_ENVMAP);
+        timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_ENVMAP);
         skip = RunCallBack(rs, NNS_G3D_SBC_ENVMAP, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
         if (!skip) {
             u32 width = rs->pMatAnmResult->origWidth;
@@ -946,7 +950,7 @@ void NNS_G3DRenderFuncApplySphereMap(NNSG3dRS *rs, u32 opt) {
 static MtxFx44 g_NNSTextureSpaceConvMatrix;
 
 // PRJMAP: maps the texture as if projected from the camera
-void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
+void NNSi_G3dFuncSbc_PRJMAP(NNSG3dRS *rs, u32 opt) {
     if (!(rs->flag & NNS_G3D_RSFLAG_OPT_SKIP_SBCDRAW) && (rs->flag & NNS_G3D_RSFLAG_NODE_VISIBLE)) {
         MtxFx43 pos;
         u32 timing;
@@ -963,7 +967,7 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
             NNS_G3dGeBufferOP_N(sPrjMapCmd[0], &sPrjMapCmd[1], 1);
         }
 
-        timing = GetCallBackTiming(rs, NNS_G3D_SBC_PRJMAP);
+        timing = NNSi_CheckPossibilityOfCallBack(rs, NNS_G3D_SBC_PRJMAP);
         skip = RunCallBack(rs, NNS_G3D_SBC_PRJMAP, &timing, NNS_G3D_SBC_CALLBACK_TIMING_A);
         if (!skip) {
             u32 width = rs->pMatAnmResult->origWidth;
@@ -1007,7 +1011,7 @@ void NNS_G3DRenderFuncApplyProjectionMap(NNSG3dRS *rs, u32 opt) {
             } else if (NNS_G3dGlb.flag & NNS_G3D_GLB_FLAG_FLUSH_VP) {
                 NNS_G3dGeMultMtx43(&pos);
             } else {
-                NNS_G3dGeMultMtx43(NNS_G3DGetInvViewMatrix());
+                NNS_G3dGeMultMtx43(NNS_G3dGlbGetInvV());
                 NNS_G3dGeMultMtx43(&pos);
             }
 
@@ -1049,19 +1053,9 @@ static BillboardCmd sBBYCmd = {
 };
 
 // The function of each command, of which the model's byte code has fourteen
-NNSG3dFuncSbc NNS_G3D_RENDER_FUNC[NNS_G3D_SBC_COMMAND_NUM] = {
-    NNS_G3DRenderFuncNop,
-    NNS_G3DRenderFuncReturn,
-    NNS_G3DRenderFuncSetVisGroup,
-    NNS_G3DRenderFuncLoadMatrix,
-    NNS_G3DRenderFuncApplyMaterial,
-    NNS_G3DRenderFuncDrawMesh,
-    NNS_G3DRenderFuncApplyJointMatrix,
-    NNS_G3DRenderFuncSetBillboardMatrix1,
-    NNS_G3DRenderFuncSetBillboardMatrix2,
-    NNS_G3DRenderFuncApplySmoSkMatrix,
-    NNS_G3DRenderFuncExecFIFOQueue,
-    NNS_G3DRenderFuncGlobalScale,
-    NNS_G3DRenderFuncApplySphereMap,
-    NNS_G3DRenderFuncApplyProjectionMap,
+NNSG3dFuncSbc NNS_G3dFuncSbcTable[NNS_G3D_SBC_COMMAND_NUM] = {
+    NNSi_G3dFuncSbc_NOP,    NNSi_G3dFuncSbc_RET,     NNSi_G3dFuncSbc_NODE,     NNSi_G3dFuncSbc_MTX,
+    NNSi_G3dFuncSbc_MAT,    NNSi_G3dFuncSbc_SHP,     NNSi_G3dFuncSbc_NODEDESC, NNSi_G3dFuncSbc_BB,
+    NNSi_G3dFuncSbc_BBY,    NNSi_G3dFuncSbc_NODEMIX, NNSi_G3dFuncSbc_CALLDL,   NNSi_G3dFuncSbc_POSSCALE,
+    NNSi_G3dFuncSbc_ENVMAP, NNSi_G3dFuncSbc_PRJMAP,
 };

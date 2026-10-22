@@ -204,7 +204,7 @@ void MCSSSys_Free(MCSSSystem *system) {
     if (system->shadowTcb != NULL) {
         MCSSLoad *load = GFL_TCBGetData(system->shadowTcb);
 
-        GFL_HeapFree(load->pltt->rawData);
+        GFL_HeapFree(load->pltt->pRawData);
         GFL_HeapFree(load->pltt);
         GFL_HeapFree(load);
         GFL_TCBRemove(system->shadowTcb);
@@ -272,7 +272,7 @@ void MCSS_Reload(MCSSSystem *system, MCSS *mcss, const MCSSLoadInfo *info) {
 // The current frame of an animation, as the SRT it may hold
 static inline void MCSS_GetAnimSrt(const NNSG2dAnimController *animCtrl, NNSG2dAnimDataSRT *srt) {
     switch ((u16)animCtrl->pAnimSequence->animType) {
-    case NNS_G2D_ANIMELEM_INDEX:
+    case NNS_G2D_ANIMELEMENT_INDEX:
         srt->index = *(u16 *)animCtrl->pCurrent->pContent;
         srt->rotZ = 0;
         srt->sx = FX32_ONE;
@@ -280,10 +280,10 @@ static inline void MCSS_GetAnimSrt(const NNSG2dAnimController *animCtrl, NNSG2dA
         srt->px = 0;
         srt->py = 0;
         break;
-    case NNS_G2D_ANIMELEM_INDEX_SRT:
+    case NNS_G2D_ANIMELEMENT_INDEX_SRT:
         *srt = *(NNSG2dAnimDataSRT *)animCtrl->pCurrent->pContent;
         break;
-    case NNS_G2D_ANIMELEM_INDEX_T: {
+    case NNS_G2D_ANIMELEMENT_INDEX_T: {
         NNSG2dAnimDataT *data = animCtrl->pCurrent->pContent;
 
         srt->index = data->index;
@@ -324,7 +324,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
     G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
     MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
-    MAT3_To4x4(&rotation, &billboard);
+    MTX_Copy33To44_(&rotation, &billboard);
 
     for (i = 0; i < system->count; i++) {
         NNSG2dMultiCellAnimation *mcAnim;
@@ -347,7 +347,7 @@ void MCSSSys_Draw(MCSSSystem *system) {
             G3i_LookAt_(&camPos, &camUp, &camTarget, TRUE, NULL);
         }
         mcAnim = &mcss->mcAnim;
-        cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimArray;
+        cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimInstasnces;
         MCSS_GetAnimSrt(&mcAnim->animCtrl, &mcSrt);
         pos.x = mcss->pos.x + mcss->posOffset.x;
         pos.y = mcss->pos.y + mcss->posOffset.y;
@@ -915,12 +915,12 @@ void MCSS_BlendPalette(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color) {
     load->plttProxy = &mcss->plttProxy;
     load->plttAddr = system->plttBase + mcss->index * MCSS_PLTT_SIZE;
     load->pltt = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), sizeof(NNSG2dPaletteData), FALSE, "mcss.c", 1899);
-    load->pltt->format = mcss->plttProxy.fmt;
-    load->pltt->extendedPalette = FALSE;
-    load->pltt->size = mcss->plttSize;
-    load->pltt->rawData = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), mcss->plttSize, FALSE, "mcss.c", 1904);
-    BlendColors(mcss->pltt, load->pltt->rawData, mcss->plttSize / 2, evy, color);
-    MI_CpuCopy16(load->pltt->rawData, mcss->blendedPltt, mcss->plttSize);
+    load->pltt->fmt = mcss->plttProxy.fmt;
+    load->pltt->bExtendedPlt = FALSE;
+    load->pltt->szByte = mcss->plttSize;
+    load->pltt->pRawData = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), mcss->plttSize, FALSE, "mcss.c", 1904);
+    BlendColors(mcss->pltt, load->pltt->pRawData, mcss->plttSize / 2, evy, color);
+    MI_CpuCopy16(load->pltt->pRawData, mcss->blendedPltt, mcss->plttSize);
     if (mcss->blendTcb != NULL) {
         MCSS_RemovePaletteTask(mcss->blendTcb);
         mcss->blendTcb = NULL;
@@ -932,7 +932,7 @@ void MCSS_BlendPalette(MCSSSystem *system, MCSS *mcss, u8 evy, u32 color) {
             mcss->blendTcb = GFL_VBlankTCBAdd(MCSS_PaletteTask, load, 0);
         }
     } else {
-        GFL_HeapFree(load->pltt->rawData);
+        GFL_HeapFree(load->pltt->pRawData);
         GFL_HeapFree(load->pltt);
         GFL_HeapFree(load);
     }
@@ -949,11 +949,11 @@ void MCSS_ResetPalette(MCSSSystem *system, MCSS *mcss) {
     load->plttProxy = &mcss->plttProxy;
     load->plttAddr = system->plttBase + mcss->index * MCSS_PLTT_SIZE;
     load->pltt = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), sizeof(NNSG2dPaletteData), FALSE, "mcss.c", 1952);
-    load->pltt->format = mcss->plttProxy.fmt;
-    load->pltt->extendedPalette = FALSE;
-    load->pltt->size = mcss->plttSize;
-    load->pltt->rawData = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), mcss->plttSize, FALSE, "mcss.c", 1957);
-    MI_CpuCopy16(mcss->pltt, load->pltt->rawData, mcss->plttSize);
+    load->pltt->fmt = mcss->plttProxy.fmt;
+    load->pltt->bExtendedPlt = FALSE;
+    load->pltt->szByte = mcss->plttSize;
+    load->pltt->pRawData = GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), mcss->plttSize, FALSE, "mcss.c", 1957);
+    MI_CpuCopy16(mcss->pltt, load->pltt->pRawData, mcss->plttSize);
     if (mcss->blendTcb != NULL) {
         MCSS_RemovePaletteTask(mcss->blendTcb);
         mcss->blendTcb = NULL;
@@ -1019,10 +1019,10 @@ static void LoadMCSSGraphicsData(MCSSSystem *system, int index, const MCSSLoadIn
     load->charFile =
         GFL_G2DIOReadBGNCGR(info->arcId, info->character, TRUE, &load->chars, HEAPID_TAIL((HeapID)mcss->heapId));
     load->plttFile = GFL_G2DIOReadNCLR(info->arcId, info->palette, &load->pltt, HEAPID_TAIL((HeapID)mcss->heapId));
-    mcss->pltt = GFL_HeapAllocate(heapId, load->pltt->size, FALSE, "mcss.c", 2138);
-    mcss->blendedPltt = GFL_HeapAllocate(heapId, load->pltt->size, FALSE, "mcss.c", 2139);
-    mcss->plttSize = load->pltt->size;
-    MI_CpuCopy16(load->pltt->rawData, mcss->pltt, load->pltt->size);
+    mcss->pltt = GFL_HeapAllocate(heapId, load->pltt->szByte, FALSE, "mcss.c", 2138);
+    mcss->blendedPltt = GFL_HeapAllocate(heapId, load->pltt->szByte, FALSE, "mcss.c", 2139);
+    mcss->plttSize = load->pltt->szByte;
+    MI_CpuCopy16(load->pltt->pRawData, mcss->pltt, load->pltt->szByte);
     if (system->loadCallback != NULL) {
         if (system->loadCallback(info, load, system->loadCallbackWork) == TRUE) {
             system->loadCallback = NULL;
@@ -1067,10 +1067,10 @@ static void LoadMCSSGraphicsDataArc(MCSSSystem *system, int index, const MCSSLoa
     load->charFile =
         GFL_G2DIOReadBGNCGRArc(arc, info->character, TRUE, &load->chars, HEAPID_TAIL((HeapID)mcss->heapId));
     load->plttFile = GFL_G2DIOReadNCLRArc(arc, info->palette, &load->pltt, HEAPID_TAIL((HeapID)mcss->heapId));
-    mcss->pltt = GFL_HeapAllocate(mcss->heapId, load->pltt->size, FALSE, "mcss.c", 2245);
-    mcss->blendedPltt = GFL_HeapAllocate(mcss->heapId, load->pltt->size, FALSE, "mcss.c", 2246);
-    mcss->plttSize = load->pltt->size;
-    MI_CpuCopy16(load->pltt->rawData, mcss->pltt, load->pltt->size);
+    mcss->pltt = GFL_HeapAllocate(mcss->heapId, load->pltt->szByte, FALSE, "mcss.c", 2245);
+    mcss->blendedPltt = GFL_HeapAllocate(mcss->heapId, load->pltt->szByte, FALSE, "mcss.c", 2246);
+    mcss->plttSize = load->pltt->szByte;
+    MI_CpuCopy16(load->pltt->pRawData, mcss->pltt, load->pltt->szByte);
     if (system->loadCallback != NULL) {
         if (system->loadCallback(info, load, system->loadCallbackWork) == TRUE) {
             system->loadCallback = NULL;
@@ -1144,7 +1144,7 @@ static void MCSS_PaletteTask(TCB *tcb, void *data) {
             load->mcss->blendTcb = NULL;
         }
     }
-    GFL_HeapFree(load->pltt->rawData);
+    GFL_HeapFree(load->pltt->pRawData);
     GFL_HeapFree(load->pltt);
     GFL_HeapFree(load);
     GFL_TCBRemove(tcb);
@@ -1174,15 +1174,15 @@ static void MCSS_UpdatePaletteFade(MCSSSystem *system, MCSS *mcss) {
         load->plttAddr = system->plttBase + mcss->index * MCSS_PLTT_SIZE;
         load->pltt =
             GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), sizeof(NNSG2dPaletteData), FALSE, "mcss.c", 2475);
-        load->pltt->format = mcss->plttProxy.fmt;
-        load->pltt->extendedPalette = FALSE;
-        load->pltt->size = mcss->plttSize;
-        load->pltt->rawData =
+        load->pltt->fmt = mcss->plttProxy.fmt;
+        load->pltt->bExtendedPlt = FALSE;
+        load->pltt->szByte = mcss->plttSize;
+        load->pltt->pRawData =
             GFL_HeapAllocate(HEAPID_TAIL((HeapID)mcss->heapId), mcss->plttSize, FALSE, "mcss.c", 2480);
         if (mcss->blended) {
-            BlendColors(mcss->blendedPltt, load->pltt->rawData, mcss->plttSize / 2, mcss->fadeLevel, mcss->fadeColor);
+            BlendColors(mcss->blendedPltt, load->pltt->pRawData, mcss->plttSize / 2, mcss->fadeLevel, mcss->fadeColor);
         } else {
-            BlendColors(mcss->pltt, load->pltt->rawData, mcss->plttSize / 2, mcss->fadeLevel, mcss->fadeColor);
+            BlendColors(mcss->pltt, load->pltt->pRawData, mcss->plttSize / 2, mcss->fadeLevel, mcss->fadeColor);
         }
         if (mcss->fadeTcb != NULL) {
             MCSS_RemovePaletteTask(mcss->fadeTcb);
@@ -1250,7 +1250,7 @@ static void MCSS_RemoveLoadTask(TCB *tcb) {
 static void MCSS_RemovePaletteTask(TCB *tcb) {
     MCSSLoad *load = GFL_TCBGetData(tcb);
 
-    GFL_HeapFree(load->pltt->rawData);
+    GFL_HeapFree(load->pltt->pRawData);
     GFL_HeapFree(load->pltt);
     GFL_HeapFree(load);
     GFL_TCBRemove(tcb);
@@ -1262,7 +1262,7 @@ static void MCSS_MakeMosaic(MCSS *mcss, MCSSLoad *load) {
     if (mcss->imageProxy.attr.fmt == GX_TEXFMT_PLTT16) {
         u32 i;
         int texWidth = pow(2, mcss->imageProxy.attr.sizeS + 2);
-        u8 *chars = load->chars->rawData;
+        u8 *chars = load->chars->pRawData;
 
         for (i = 0; i < mcss->bin->count; i++) {
             {

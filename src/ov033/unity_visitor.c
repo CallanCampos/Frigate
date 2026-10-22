@@ -113,7 +113,7 @@ u32 func_ov033_0217ab58(u32 gender, u32 id, u32 province, u32 a3, u32 hasProvinc
     }
     if (a3 == 0) {
         messageId++;
-        messageId += (u32)(__aeabi_uidivmod(id, 5) >> 32);
+        messageId += (u32)(_u32_div_f(id, 5) >> 32);
     }
     return messageId;
 }

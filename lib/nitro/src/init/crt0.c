@@ -1,9 +1,12 @@
 // NitroSDK's crt0.c, the ARM9's startup code (with TwlSDK's DSi additions), which the ROM header's entry address
-// points at: Entry sets up the CP15 (the caches, the tightly coupled memories and the protection regions), waits for
+// points at: _start sets up the CP15 (the caches, the tightly coupled memories and the protection regions), waits for
 // the ARM7, clears the memories it needs, decompresses the static module and copies the autoload blocks to their
 // places, clears the static .bss, runs the static initializers and jumps to main. The SDK wrote these functions in
-// assembly, so they are MWCC asm functions. The file name is NitroSDK's; the names are swan's, since no string gives
-// the SDK's own.
+// assembly, so they are MWCC asm functions. The file name is NitroSDK's. _start, INITi_CpuClear32 and NitroStartUp
+// have NitroSDK's names, as ntrtwl's reconstruction of NitroSDK has them; AutoloadCallback and BuildInfo keep dsd's
+// names for NitroSDK's _start_AutoloadDoneCallback and _start_ModuleParams, since dsd needs them. The rest is
+// TwlSDK's split of the start-up, which the reference, older than TwlSDK, doesn't have: those functions keep swan's
+// names, or ours, or their addresses.
 //
 // The module parameters among the code, BuildInfo and the LTD module's, hold the addresses of the two modules'
 // autoload lists, which the build writes after each module and dsd's linker script has no symbols for, so the file
@@ -11,7 +14,7 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "system/main.h"
-// MSL's floating-point and static initializers' set-up, which Entry calls before main
+// MSL's floating-point and static initializers' set-up, which _start calls before main
 #include "../../../msl/src/fp/fp_fastI.h"
 #include "../../../msl/src/runtime/call_static_initializers.h"
 
@@ -20,14 +23,14 @@
 #define REG_SCFG_CLK_ADDR 0x04004004
 
 // The entry point, which the ROM header gives
-void Entry(void);
-static void asm_MemSet32(u32 value, void *dest, u32 size);
+void _start(void);
+static void INITi_CpuClear32(u32 value, void *dest, u32 size);
 static void boot_InitTCM(void);
 static void func_02004a98(void);
 static void boot_BootstrapExec(void);
 static void func_02004d50(const u32 *functions);
 static void func_02004da0(void);
-static void func_02004eac(void);
+static void NitroStartUp(void);
 static BOOL asm_HWIsDSi(void);
 static void asm_MemCpy32Fast(void *dest, const void *src, u32 size);
 static void boot_MemSet32Fast(void *dest, u32 value, u32 size);
@@ -45,7 +48,7 @@ __declspec(section "textdata") void *const LtdModuleParams[6];
 // clang-format off
 // The entry point. It runs in the system mode with the interrupts off, sets up the IRQ, supervisor and system
 // stacks at the end of DTCM, and doesn't return: main is entered with lr at the BIOS
-asm void Entry(void) {
+asm void _start(void) {
     // Disable the interrupts (REG_IME) and set up the CP15
     mov ip, #0x4000000
     str ip, [ip, #0x208]
@@ -55,11 +58,11 @@ asm void Entry(void) {
     mov r0, #0x0
     ldr r1, =0x2ffff80
     ldr r2, =0x68
-    bl asm_MemSet32
+    bl INITi_CpuClear32
     mov r0, #0x0
     ldr r1, =0x2fffff0
     ldr r2, =0x10
-    bl asm_MemSet32
+    bl INITi_CpuClear32
     ldr r1, =0x2fffc40
     ldrh r2, [r1, #0x0]
     cmp r2, #0x0
@@ -135,7 +138,7 @@ asm void Entry(void) {
     mov r0, #0x0
     ldr r1, =SDK_AUTOLOAD_DTCM_START
     mov r2, #0x4000
-    bl asm_MemSet32
+    bl INITi_CpuClear32
     mov r1, #0x0
     ldr r0, =0x5000000
     mov r2, #0x400
@@ -158,7 +161,7 @@ asm void Entry(void) {
     ldr r0, =OS_IrqHandler
     str r0, [r1, #0x0]
     bl _fp_init
-    bl func_02004eac
+    bl NitroStartUp
     bl __call_static_initializers
     bl func_02004da0
     // Start main at the start of a frame (when REG_VCOUNT is 0)
@@ -172,8 +175,8 @@ asm void Entry(void) {
     bx r1
 }
 
-// Fills size bytes at dest with value, a word at a time
-static asm void asm_MemSet32(u32 value, void *dest, u32 size) {
+// NitroSDK's INITi_CpuClear32 (swan's asm_MemSet32): fills size bytes at dest with value, a word at a time
+static asm void INITi_CpuClear32(u32 value, void *dest, u32 size) {
     add ip, r1, r2
 @loop:
     cmp r1, ip
@@ -508,13 +511,14 @@ asm void MIi_UncompressBackward(void *end) {
     bx lr
 }
 
-// The hook called after the autoloads, empty unless a program defines its own
+// The hook called after the autoloads, empty unless a program defines its own: NitroSDK's
+// _start_AutoloadDoneCallback, under dsd's name
 asm void AutoloadCallback(void) {
     bx lr
 }
 
-// The hook called before the static initializers, empty unless a program defines its own
-static asm void func_02004eac(void) {
+// NitroSDK's NitroStartUp: the hook called before the static initializers, empty unless a program defines its own
+static asm void NitroStartUp(void) {
     bx lr
 }
 
@@ -599,7 +603,7 @@ __declspec(section "textdata") void *const LtdModuleParams[6] = {
 };
 
 // clang-format off
-// Waits until the halfword at address is value, a little while between reads. Entry runs it from ITCM
+// Waits until the halfword at address is value, a little while between reads. _start runs it from ITCM
 static asm void WaitForHalfword(vu16 *address, u16 value) {
 @read:
     ldrh r2, [r0]
@@ -614,16 +618,16 @@ static asm void WaitForHalfword(vu16 *address, u16 value) {
 
 // clang-format on
 
-// The module parameters, in the code (NitroSDK's _start_ModuleParams): the static module's autoload list and its
-// end, where the autoload blocks start, the static .bss, the end of the compressed module (0 until the compressor
-// writes it), the SDK's version and the two magic numbers that the build tools look for
+// The module parameters, in the code (NitroSDK's _start_ModuleParams, under dsd's name): the static module's autoload
+// list and its end, where the autoload blocks start, the static .bss, the end of the compressed module (0 until the
+// compressor writes it), the SDK's version and the two magic numbers that the build tools look for
 __declspec(section "textdata") void *const BuildInfo[9] = {
     SDK_AUTOLOAD_LIST, SDK_AUTOLOAD_LIST_END, ARM9_DATA_END,      ARM9_BSS_START,     ARM9_BSS_END,
     (void *)0,         (void *)0x0503757c,    (void *)0xdec00621, (void *)0x2106c0de,
 };
 
 // clang-format off
-// Counts in counter until the halfword at watched changes. Entry runs it from ITCM
+// Counts in counter until the halfword at watched changes. _start runs it from ITCM
 static asm void func_02004fd4(vu16 *counter, vu16 *watched) {
     ldrh r2, [r1, #0x0]
     ldrh r3, [r0, #0x0]
@@ -639,7 +643,7 @@ static asm void func_02004fd4(vu16 *counter, vu16 *watched) {
 }
 
 // Sets bit 0 of REG_SCFG_CLK if enable, clears it otherwise, and when that changes it waits for delay / 4 loops.
-// Returns the bit as it was. Entry runs it from ITCM
+// Returns the bit as it was. _start runs it from ITCM
 static asm BOOL func_02004ffc(BOOL enable, s32 delay) {
     cmp r0, #0x0
     ldr r3, =REG_SCFG_CLK_ADDR

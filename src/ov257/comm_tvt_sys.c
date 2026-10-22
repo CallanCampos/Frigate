@@ -608,7 +608,7 @@ static void CommTvt_LoadResources(CommTvtWork *sys) {
     } else {
         file = GFL_G2DIOReadNCLRArc(sys->arc, 6, &palette, sys->heapId);
     }
-    MIi_CpuCopy32((u8 *)palette->rawData + 0xc0, sys->palettes, sizeof(sys->palettes));
+    MIi_CpuCopy32((u8 *)palette->pRawData + 0xc0, sys->palettes, sizeof(sys->palettes));
     GFL_HeapFree(file);
 }
 

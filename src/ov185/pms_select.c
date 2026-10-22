@@ -463,8 +463,8 @@ static void PMSSelect_BGUnload(PMSSelectBG *bg) {
 static void PMSSelect_BGDrawPlate(PMSSelectBG *bg, u8 line, u32 palette, BOOL active) {
     int i;
     NNSG2dScreenData *screen = bg->screen;
-    int width = screen->width / 8;
-    int height = screen->height / 8;
+    int width = screen->screenWidth / 8;
+    int height = screen->screenHeight / 8;
     u16 *entries = (u16 *)screen->rawData;
 
     if (active) {
@@ -528,8 +528,8 @@ static void PMSSelect_BGResetPlateFade(PMSSelectBG *bg) {
 static void PMSSelect_BGDrawPlateEdge(PMSSelectBG *bg, u32 palette) {
     int i;
     NNSG2dScreenData *screen = bg->screen;
-    int width = screen->width / 8;
-    int height = screen->height / 8;
+    int width = screen->screenWidth / 8;
+    int height = screen->screenHeight / 8;
     u16 *entries = (u16 *)screen->rawData;
 
     for (i = 0; i < width * height; i++) {

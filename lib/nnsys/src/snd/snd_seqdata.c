@@ -1,8 +1,8 @@
 #include "snd_internal.h"
 
 // NitroSystem's sequence archives: a sequence of one by index, NULL when there is none. It stands alone between
-// snd_arc_stream.c and snd_fader.c, and is called only by snd_arc_player.c; the name is NitroSystem's by its code and
-// the file name, snd_seqdata.c, is a guess
+// snd_arc_stream.c and snd_fader.c, and is called only by snd_arc_player.c; the name is NitroSystem's, as ntrtwl's
+// reconstruction of NitroSystem has it, and the SDK's file is seqdata.c
 
 const NNSSndSeqArcSeqInfo *NNSi_SndSeqArcGetSeqInfo(const NNSSndSeqArc *seqArc, int index) {
     const NNSSndSeqArcSeqInfo *info;

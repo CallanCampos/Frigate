@@ -5,26 +5,29 @@
 // NitroSystem's G3D geometry command buffer: every geometry command that G3D sends goes through NNS_G3dGeBufferOP_N,
 // and a display list through NNS_G3dGeSendDL. A large display list goes to the FIFO by DMA when GX has a channel, and
 // the commands that follow it wait in the buffer, if there is one, until the DMA is done. The file is named after
-// NitroSystem's own gecom.c. WaitDma and OnDmaDone are static because only this file refers to them
+// NitroSystem's own gecom.c, and the names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them,
+// except those of the DSi's NDMA path (ToDmaNo, ToNDmaNo, SendDisplayList and SendDisplayListFast), which is newer than
+// that reconstruction and named here. NNS_G3dGeWaitSendDL and simpleUnlock_ are static because only this file refers to
+// them
 
-static void WaitDma(void);
-static void OnDmaDone(void *arg);
+static void NNS_G3dGeWaitSendDL(void);
+static void simpleUnlock_(void *arg);
 
-// With -ipa file, MWCC lays these out in the order they are declared but with the first one last: sGeBuffer, sDmaBusy,
-// then NNS_G3dFlagUseFastDma
+// With -ipa file, MWCC lays these out in the order they are declared but with the first one last: NNS_G3dGeBuffer,
+// NNS_G3dFlagGXDmaAsync, then NNS_G3dFlagUseFastDma
 u32 NNS_G3dFlagUseFastDma;
-static NNSG3dGeBuffer *sGeBuffer;
-// Whether a display list is on its way by DMA; the DMA's callback (OnDmaDone) clears it from the interrupt
-static volatile BOOL sDmaBusy;
+static NNSG3dGeBuffer *NNS_G3dGeBuffer;
+// Whether a display list is on its way by DMA; the DMA's callback (simpleUnlock_) clears it from the interrupt
+static volatile BOOL NNS_G3dFlagGXDmaAsync;
 
 BOOL NNS_G3dGeIsBufferExist(void) {
-    return sGeBuffer != NULL;
+    return NNS_G3dGeBuffer != NULL;
 }
 
 void NNS_G3dGeSetBuffer(NNSG3dGeBuffer *buf) {
-    if (sGeBuffer == NULL) {
+    if (NNS_G3dGeBuffer == NULL) {
         buf->idx = 0;
-        sGeBuffer = buf;
+        NNS_G3dGeBuffer = buf;
     }
 }
 
@@ -32,29 +35,29 @@ NNSG3dGeBuffer *NNS_G3dGeReleaseBuffer(void) {
     NNSG3dGeBuffer *buf;
 
     NNS_G3dGeFlushBuffer();
-    buf = sGeBuffer;
-    sGeBuffer = NULL;
+    buf = NNS_G3dGeBuffer;
+    NNS_G3dGeBuffer = NULL;
     return buf;
 }
 
 // Waits for the DMA to be done, and sends the commands that waited for it
 void NNS_G3dGeFlushBuffer(void) {
-    if (sDmaBusy) {
-        WaitDma();
+    if (NNS_G3dFlagGXDmaAsync) {
+        NNS_G3dGeWaitSendDL();
     }
-    if (sGeBuffer != NULL && sGeBuffer->idx != 0) {
-        MIi_CpuSend32(sGeBuffer->data, &reg_G3X_GXFIFO, sGeBuffer->idx * sizeof(u32));
-        sGeBuffer->idx = 0;
-    }
-}
-
-static void WaitDma(void) {
-    while (sDmaBusy) {
+    if (NNS_G3dGeBuffer != NULL && NNS_G3dGeBuffer->idx != 0) {
+        MIi_CpuSend32(NNS_G3dGeBuffer->data, &reg_G3X_GXFIFO, NNS_G3dGeBuffer->idx * sizeof(u32));
+        NNS_G3dGeBuffer->idx = 0;
     }
 }
 
-// The DMA's callback, run from its interrupt: arg is sDmaBusy, which WaitDma spins on
-static void OnDmaDone(void *arg) {
+static void NNS_G3dGeWaitSendDL(void) {
+    while (NNS_G3dFlagGXDmaAsync) {
+    }
+}
+
+// The DMA's callback, run from its interrupt: arg is NNS_G3dFlagGXDmaAsync, which NNS_G3dGeWaitSendDL spins on
+static void simpleUnlock_(void *arg) {
     *(volatile BOOL *)arg = FALSE;
 }
 
@@ -76,12 +79,12 @@ static inline void SendDisplayListFast(const u32 *dl, u32 size) {
         u32 dmaNo = ToDmaNo(id);
 
         if (dmaNo == GX_DMA_NOT_USE) {
-            MI_SendNDmaGXCommandAsyncFast(ToNDmaNo(id), dl, size, OnDmaDone, (void *)&sDmaBusy);
+            MI_SendNDmaGXCommandAsyncFast(ToNDmaNo(id), dl, size, simpleUnlock_, (void *)&NNS_G3dFlagGXDmaAsync);
         } else {
-            MI_SendGXCommandAsyncFast(dmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+            MI_SendGXCommandAsyncFast(dmaNo, dl, size, simpleUnlock_, (void *)&NNS_G3dFlagGXDmaAsync);
         }
     } else {
-        MI_SendGXCommandAsyncFast(ToDmaNo(GXi_DmaId), dl, size, OnDmaDone, (void *)&sDmaBusy);
+        MI_SendGXCommandAsyncFast(ToDmaNo(GXi_DmaId), dl, size, simpleUnlock_, (void *)&NNS_G3dFlagGXDmaAsync);
     }
 }
 
@@ -91,12 +94,12 @@ static inline void SendDisplayList(const u32 *dl, u32 size) {
         u32 dmaNo = ToDmaNo(id);
 
         if (dmaNo == GX_DMA_NOT_USE) {
-            MI_SendNDmaGXCommandAsync(ToNDmaNo(id), dl, size, OnDmaDone, (void *)&sDmaBusy);
+            MI_SendNDmaGXCommandAsync(ToNDmaNo(id), dl, size, simpleUnlock_, (void *)&NNS_G3dFlagGXDmaAsync);
         } else {
-            MI_SendGXCommandAsync(dmaNo, dl, size, OnDmaDone, (void *)&sDmaBusy);
+            MI_SendGXCommandAsync(dmaNo, dl, size, simpleUnlock_, (void *)&NNS_G3dFlagGXDmaAsync);
         }
     } else {
-        MI_SendGXCommandAsync(ToDmaNo(GXi_DmaId), dl, size, OnDmaDone, (void *)&sDmaBusy);
+        MI_SendGXCommandAsync(ToDmaNo(GXi_DmaId), dl, size, simpleUnlock_, (void *)&NNS_G3dFlagGXDmaAsync);
     }
 }
 
@@ -111,7 +114,7 @@ void NNS_G3dGeSendDL(const void *list, u32 size) {
     }
 
     NNS_G3dGeFlushBuffer();
-    sDmaBusy = TRUE;
+    NNS_G3dFlagGXDmaAsync = TRUE;
     if (NNS_G3dFlagUseFastDma) {
         SendDisplayListFast(dl, size);
     } else {
@@ -122,22 +125,22 @@ void NNS_G3dGeSendDL(const void *list, u32 size) {
 // Sends a geometry command and its parameters: into the buffer if the DMA is going and they fit, or else to the FIFO
 // after what is before them
 void NNS_G3dGeBufferOP_N(u32 op, const u32 *args, u32 num) {
-    if (sGeBuffer != NULL) {
-        if (sDmaBusy && sGeBuffer->idx + 1 + num <= NNS_G3D_SIZE_COMBUFFER) {
-            sGeBuffer->data[sGeBuffer->idx++] = op;
+    if (NNS_G3dGeBuffer != NULL) {
+        if (NNS_G3dFlagGXDmaAsync && NNS_G3dGeBuffer->idx + 1 + num <= NNS_G3D_SIZE_COMBUFFER) {
+            NNS_G3dGeBuffer->data[NNS_G3dGeBuffer->idx++] = op;
             if (num != 0) {
-                MIi_CpuCopyFast(args, &sGeBuffer->data[sGeBuffer->idx], num * sizeof(u32));
-                sGeBuffer->idx += num;
+                MIi_CpuCopyFast(args, &NNS_G3dGeBuffer->data[NNS_G3dGeBuffer->idx], num * sizeof(u32));
+                NNS_G3dGeBuffer->idx += num;
             }
             return;
         }
-        if (sGeBuffer->idx != 0) {
+        if (NNS_G3dGeBuffer->idx != 0) {
             NNS_G3dGeFlushBuffer();
-        } else if (sDmaBusy) {
-            WaitDma();
+        } else if (NNS_G3dFlagGXDmaAsync) {
+            NNS_G3dGeWaitSendDL();
         }
-    } else if (sDmaBusy) {
-        WaitDma();
+    } else if (NNS_G3dFlagGXDmaAsync) {
+        NNS_G3dGeWaitSendDL();
     }
     reg_G3X_GXFIFO = op;
     MIi_CpuSend32(args, &reg_G3X_GXFIFO, num * sizeof(u32));

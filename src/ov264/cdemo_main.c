@@ -95,7 +95,7 @@ void CDemo_LoadPalette(CDemoWork *work, u32 index, u32 fileId) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLRArc(work->arc, fileId, &palette, HEAPID_TAIL(HEAPID_CDEMO));
     CDemoPalette *buffer = &work->palettes[index];
-    buffer->size = palette->size;
-    MIi_CpuCopy32(palette->rawData, buffer->data, buffer->size);
+    buffer->size = palette->szByte;
+    MIi_CpuCopy32(palette->pRawData, buffer->data, buffer->size);
     GFL_HeapFree(file);
 }

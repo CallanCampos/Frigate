@@ -1,8 +1,10 @@
-// The core of the wireless manager (libwm, TwlSDK's wm/ARM9/src/wm_system.c, by its place in the library: the file name
-// is a guess). It sets the manager up in a buffer of the game's, keeps the queue of buffers for the commands to the
-// ARM7, sends a command and receives every callback and indication that the ARM7 sends back, and checks the manager's
-// state for the functions of the other files. The public functions have the SDK's names, from
-// what they do, swan's for the WMi_ ones, and the static ones' names are ours
+// The core of the wireless manager (libwm, TwlSDK's wm/ARM9/src/wm_system.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file). It sets the manager up in a buffer of the game's, keeps the queue of
+// buffers for the commands to the ARM7, sends a command and receives every callback and indication that the ARM7 sends
+// back, and checks the manager's state for the functions of the other files. The names are NitroSDK's, as that
+// reconstruction has them, where it has the code; the DSi's sleep callback and wireless check
+// (WMi_RegisterSleepCallback, WMi_DeleteSleepCallback, WmSleepCallback and WMi_IsWirelessAvailable) have no counterpart
+// there, and their names are ours
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/pm.h"
@@ -12,10 +14,10 @@
 #include <stdarg.h>
 
 // The buffers for commands and callbacks, and the queue that hands them out: a free buffer is in it
-static WMCommandBuf sCommandBufs[WM_NUM_OF_COMMAND_BUFS] ATTRIBUTE_ALIGN(8);
-static WMPortRecvCallback sPortRecvCallback;
-static OSMessage sCommandMessages[WM_NUM_OF_COMMAND_BUFS];
-static OSMessageQueue sCommandQueue;
+static WMCommandBuf fifoBuf[WM_BUF_MSG_NUM] ATTRIBUTE_ALIGN(8);
+static WMPortRecvCallback cb_Port;
+static OSMessage bufMsg[WM_BUF_MSG_NUM];
+static OSMessageQueue bufMsgQ;
 
 // The manager's state: whether WM_Init has run, the buffer it was given and the callback that ends the game if the
 // console sleeps while the manager is on
@@ -25,23 +27,23 @@ static struct {
     PMSleepCallbackInfo sleepCallbackInfo;
 } sWm;
 
-static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size);
+static int WmInitCore(void *wmSysBuf, u16 dmaNo, u32 size);
 static void *WmGetCommandBuffer4Arm7(void);
 static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err);
-static void WmResetRssiPool(void);
+static void WmClearFifoRecvFlag(void);
 static void WmSleepCallback(void *arg);
 
 WMErrCode WM_Init(void *wmSysBuf, u16 dmaNo) {
-    int result = WmInit(wmSysBuf, dmaNo, WM_SYSTEM_BUF_SIZE);
+    int result = WmInitCore(wmSysBuf, dmaNo, WM_SYSTEM_BUF_SIZE);
 
     if (result == WM_ERRCODE_SUCCESS) {
-        sWm.wm9buf->unk_16 = 0;
+        sWm.wm9buf->scanOnlyFlag = 0;
     }
     return result;
 }
 
 // Sets the manager up in the buffer of size bytes
-static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
+static int WmInitCore(void *wmSysBuf, u16 dmaNo, u32 size) {
     OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
@@ -80,24 +82,24 @@ static int WmInit(void *wmSysBuf, u16 dmaNo, u32 size) {
     MIi_DmaFill32(dmaNo, wmSysBuf, 0, size, TRUE);
 
     sWm.wm9buf = wmSysBuf;
-    sWm.wm9buf->wm7buf = (u8 *)wmSysBuf + sizeof(WMArm9Buf);
-    sWm.wm9buf->status = (WMStatus *)((u8 *)sWm.wm9buf->wm7buf + WM_ARM7_BUF_SIZE);
-    sWm.wm9buf->unk_0c = (u8 *)sWm.wm9buf->status + WM_STATUS_AREA_SIZE;
-    sWm.wm9buf->indBuf = (WMCommandBuf *)((u8 *)sWm.wm9buf->unk_0c + WM_INDICATION_BUF_SIZE);
-    WmResetRssiPool();
+    sWm.wm9buf->WM7 = (u8 *)wmSysBuf + sizeof(WMArm9Buf);
+    sWm.wm9buf->status = (WMStatus *)((u8 *)sWm.wm9buf->WM7 + WM_ARM7WM_BUF_SIZE);
+    sWm.wm9buf->fifo9to7 = (u8 *)sWm.wm9buf->status + WM_STATUS_BUF_SIZE;
+    sWm.wm9buf->fifo7to9 = (WMCommandBuf *)((u8 *)sWm.wm9buf->fifo9to7 + WM_FIFO_BUF_SIZE);
+    WmClearFifoRecvFlag();
     sWm.wm9buf->dmaNo = dmaNo;
     sWm.wm9buf->connectedAidBitmap = 0;
     sWm.wm9buf->myAid = 0;
     for (i = 0; i < WM_NUM_OF_PORT; i++) {
         sWm.wm9buf->portCallbackTable[i] = NULL;
-        sWm.wm9buf->portCallbackArgTable[i] = NULL;
+        sWm.wm9buf->portCallbackArgument[i] = NULL;
     }
 
-    OS_InitMessageQueue(&sCommandQueue, sCommandMessages, WM_NUM_OF_COMMAND_BUFS);
-    for (i = 0; i < WM_NUM_OF_COMMAND_BUFS; i++) {
-        sCommandBufs[i].apiid = WM_COMMAND_BUF_FREE;
-        DC_StoreRange(&sCommandBufs[i], 2);
-        OS_SendMessage(&sCommandQueue, &sCommandBufs[i], OS_MESSAGE_BLOCK);
+    OS_InitMessageQueue(&bufMsgQ, bufMsg, WM_BUF_MSG_NUM);
+    for (i = 0; i < WM_BUF_MSG_NUM; i++) {
+        fifoBuf[i].apiid = WM_API_REQUEST_ACCEPTED;
+        DC_StoreRange(&fifoBuf[i], 2);
+        OS_SendMessage(&bufMsgQ, &fifoBuf[i], OS_MESSAGE_BLOCK);
     }
 
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_WM, WmReceiveFifo);
@@ -123,7 +125,7 @@ WMErrCode WM_Finish(void) {
         return result;
     }
 
-    WmResetRssiPool();
+    WmClearFifoRecvFlag();
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_WM, NULL);
     sWm.wm9buf = NULL;
     sWm.initialized = FALSE;
@@ -132,19 +134,19 @@ WMErrCode WM_Finish(void) {
 }
 
 void WMi_SetCallbackTable(WMApiid apiid, WMCallbackFunc callback) {
-    sWm.wm9buf->callbackTable[apiid] = callback;
+    sWm.wm9buf->CallbackTable[apiid] = callback;
 }
 
 // Takes a free buffer from the queue, or NULL if there is none
 static void *WmGetCommandBuffer4Arm7(void) {
     WMCommandBuf *cmd;
 
-    if (!OS_ReceiveMessage(&sCommandQueue, (OSMessage *)&cmd, OS_MESSAGE_NOBLOCK)) {
+    if (!OS_ReceiveMessage(&bufMsgQ, (OSMessage *)&cmd, OS_MESSAGE_NOBLOCK)) {
         return NULL;
     }
     DC_InvalidateRange(cmd, 2);
-    if (!(cmd->apiid & WM_COMMAND_BUF_FREE)) {
-        OS_JamMessage(&sCommandQueue, cmd, OS_MESSAGE_BLOCK);
+    if (!(cmd->apiid & WM_API_REQUEST_ACCEPTED)) {
+        OS_JamMessage(&bufMsgQ, cmd, OS_MESSAGE_BLOCK);
         return NULL;
     }
     return cmd;
@@ -167,9 +169,9 @@ WMErrCode WMi_SendCommand(WMApiid apiid, u16 paramNum, ...) {
     }
     va_end(vl);
 
-    DC_StoreRange(cmd, WM_COMMAND_BUF_SIZE);
+    DC_StoreRange(cmd, WM_FIFO_BUF_SIZE);
     fifoResult = PXI_SendWordByFifo(PXI_FIFO_TAG_WM, (u32)cmd, FALSE);
-    OS_SendMessage(&sCommandQueue, cmd, OS_MESSAGE_BLOCK);
+    OS_SendMessage(&bufMsgQ, cmd, OS_MESSAGE_BLOCK);
     return fifoResult < 0 ? WM_ERRCODE_FIFO_ERROR : WM_ERRCODE_OPERATING;
 }
 
@@ -184,7 +186,7 @@ WMErrCode WMi_SendCommandDirect(void *cmd, u32 size) {
     MI_CpuCopy8(cmd, buf, size);
     DC_StoreRange(buf, size);
     fifoResult = PXI_SendWordByFifo(PXI_FIFO_TAG_WM, (u32)buf, FALSE);
-    OS_SendMessage(&sCommandQueue, buf, OS_MESSAGE_BLOCK);
+    OS_SendMessage(&bufMsgQ, buf, OS_MESSAGE_BLOCK);
     return fifoResult < 0 ? WM_ERRCODE_FIFO_ERROR : WM_ERRCODE_OPERATING;
 }
 
@@ -244,17 +246,17 @@ static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
         return;
     }
 
-    DC_InvalidateRange(w9b->indBuf, WM_INDICATION_BUF_SIZE);
-    if (w9b->unk_16 == 0) {
-        DC_InvalidateRange(w9b->status, WM_STATUS_AREA_SIZE);
+    DC_InvalidateRange(w9b->fifo7to9, WM_FIFO_BUF_SIZE);
+    if (w9b->scanOnlyFlag == 0) {
+        DC_InvalidateRange(w9b->status, WM_STATUS_BUF_SIZE);
     }
-    if ((void *)cb != w9b->indBuf) {
-        DC_InvalidateRange(cb, WM_COMMAND_BUF_SIZE);
+    if ((void *)cb != w9b->fifo7to9) {
+        DC_InvalidateRange(cb, WM_FIFO_BUF_SIZE);
     }
 
-    if (cb->apiid >= WM_APIID_ASYNC_KIND_MAX) {
+    if (cb->apiid >= WM_NUM_OF_CALLBACK) {
         if (cb->apiid == WM_APIID_INDICATION) {
-            if (cb->errcode == WM_ERRCODE_FATAL) {
+            if (cb->errcode == WM_ERRCODE_FLASH_ERROR) {
                 OS_Terminate();
             }
             if (w9b->indCallback != NULL) {
@@ -264,9 +266,9 @@ static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
             WMPortRecvCallback *portCb = (WMPortRecvCallback *)cb;
 
             if (w9b->portCallbackTable[portCb->port] != NULL) {
-                portCb->arg = w9b->portCallbackArgTable[portCb->port];
+                portCb->arg = w9b->portCallbackArgument[portCb->port];
                 portCb->connectedAidBitmap = w9b->connectedAidBitmap;
-                DC_InvalidateRange(portCb->recvBuf, w9b->status->mpRecvBufSize);
+                DC_InvalidateRange(portCb->recvBuf, w9b->status->mp_recvBufSize);
                 w9b->portCallbackTable[portCb->port](portCb);
             }
         } else if (cb->apiid == WM_APIID_PORT_SEND) {
@@ -282,7 +284,7 @@ static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
             WMStartMPCallback *mpCb = (WMStartMPCallback *)cb;
 
             if ((mpCb->state == WM_STATECODE_MPEND_IND || mpCb->state == WM_STATECODE_MP_IND) && mpCb->errcode == 0) {
-                DC_InvalidateRange(mpCb->recvBuf, w9b->status->mpRecvBufSize);
+                DC_InvalidateRange(mpCb->recvBuf, w9b->status->mp_recvBufSize);
             }
         }
 
@@ -292,7 +294,7 @@ static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
         }
 
         if (cb->apiid == WM_APIID_END && cb->errcode == WM_ERRCODE_SUCCESS) {
-            callback = w9b->callbackTable[cb->apiid];
+            callback = w9b->CallbackTable[cb->apiid];
             WM_Finish();
             if (callback != NULL) {
                 callback(cb);
@@ -300,7 +302,7 @@ static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
             return;
         }
 
-        callback = w9b->callbackTable[cb->apiid];
+        callback = w9b->CallbackTable[cb->apiid];
         if (callback != NULL) {
             callback(cb);
             if (!sWm.initialized) {
@@ -353,55 +355,55 @@ static void WmReceiveFifo(PXIFifoTag tag, u32 data, BOOL err) {
                 w9b->myAid = myAid;
 
                 // Tells the ports that someone connected or disconnected
-                MI_CpuFill8(&sPortRecvCallback, 0, sizeof(sPortRecvCallback));
-                sPortRecvCallback.apiid = WM_APIID_PORT_RECV;
-                sPortRecvCallback.errcode = WM_ERRCODE_SUCCESS;
-                sPortRecvCallback.state = state;
-                sPortRecvCallback.recvBuf = NULL;
-                sPortRecvCallback.data = NULL;
-                sPortRecvCallback.length = 0;
-                sPortRecvCallback.aid = aid;
-                sPortRecvCallback.myAid = myAid;
-                sPortRecvCallback.connectedAidBitmap = w9b->connectedAidBitmap;
-                sPortRecvCallback.seqNo = 0xffff;
-                sPortRecvCallback.reason = reason;
-                MI_CpuCopy8(macAddress, sPortRecvCallback.macAddress, sizeof(sPortRecvCallback.macAddress));
+                MI_CpuFill8(&cb_Port, 0, sizeof(cb_Port));
+                cb_Port.apiid = WM_APIID_PORT_RECV;
+                cb_Port.errcode = WM_ERRCODE_SUCCESS;
+                cb_Port.state = state;
+                cb_Port.recvBuf = NULL;
+                cb_Port.data = NULL;
+                cb_Port.length = 0;
+                cb_Port.aid = aid;
+                cb_Port.myAid = myAid;
+                cb_Port.connectedAidBitmap = w9b->connectedAidBitmap;
+                cb_Port.seqNo = 0xffff;
+                cb_Port.reason = reason;
+                MI_CpuCopy8(macAddress, cb_Port.macAddress, sizeof(cb_Port.macAddress));
                 if (ssid != NULL) {
-                    MIi_CpuCopy16(ssid, sPortRecvCallback.ssid, sizeof(sPortRecvCallback.ssid));
+                    MIi_CpuCopy16(ssid, cb_Port.ssid, sizeof(cb_Port.ssid));
                 } else {
-                    MIi_CpuClear16(0, sPortRecvCallback.ssid, sizeof(sPortRecvCallback.ssid));
+                    MIi_CpuClear16(0, cb_Port.ssid, sizeof(cb_Port.ssid));
                 }
-                sPortRecvCallback.maxSendDataSize = myAid == 0 ? parentSize : childSize;
+                cb_Port.maxSendDataSize = myAid == 0 ? parentSize : childSize;
                 if (myAid != 0) {
                     childSize = parentSize;
                 }
-                sPortRecvCallback.maxRecvDataSize = childSize;
+                cb_Port.maxRecvDataSize = childSize;
 
                 for (port = 0; port < WM_NUM_OF_PORT; port++) {
-                    sPortRecvCallback.port = port;
+                    cb_Port.port = port;
                     if (w9b->portCallbackTable[port] != NULL) {
-                        sPortRecvCallback.arg = w9b->portCallbackArgTable[port];
-                        w9b->portCallbackTable[port](&sPortRecvCallback);
+                        cb_Port.arg = w9b->portCallbackArgument[port];
+                        w9b->portCallbackTable[port](&cb_Port);
                     }
                 }
             }
         }
     }
 
-    DC_InvalidateRange(w9b->indBuf, WM_COMMAND_BUF_SIZE);
-    WmResetRssiPool();
-    if ((void *)cb != w9b->indBuf) {
-        cb->apiid |= WM_COMMAND_BUF_FREE;
-        DC_StoreRange(cb, WM_COMMAND_BUF_SIZE);
+    DC_InvalidateRange(w9b->fifo7to9, WM_FIFO_BUF_SIZE);
+    WmClearFifoRecvFlag();
+    if ((void *)cb != w9b->fifo7to9) {
+        cb->apiid |= WM_API_REQUEST_ACCEPTED;
+        DC_StoreRange(cb, WM_FIFO_BUF_SIZE);
     }
 }
 
 // Clears bit 0 of the pool of signal strengths that the ARM7 writes
-static void WmResetRssiPool(void) {
-    u16 pool = *(vu16 *)HW_WM_RSSI_POOL;
+static void WmClearFifoRecvFlag(void) {
+    u16 pool = *(vu16 *)HW_WM_CALLBACK_CONTROL;
 
     if (pool & 1) {
-        *(vu16 *)HW_WM_RSSI_POOL = pool & 0xfffe;
+        *(vu16 *)HW_WM_CALLBACK_CONTROL = pool & 0xfffe;
     }
 }
 
@@ -412,7 +414,7 @@ const WMStatus *WMi_GetStatusAddress(void) {
     return sWm.wm9buf->status;
 }
 
-u16 WMi_GetMyAid(void) {
+u16 WM_GetAID(void) {
     OSIntrMode irq = OS_DisableInterrupts();
     u16 aid;
 
@@ -425,7 +427,7 @@ u16 WMi_GetMyAid(void) {
     return aid;
 }
 
-u16 WMi_GetConnectedAidBitmap(void) {
+u16 WM_GetConnectedAIDs(void) {
     OSIntrMode irq = OS_DisableInterrupts();
     u32 bitmap;
 

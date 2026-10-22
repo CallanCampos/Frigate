@@ -2,8 +2,8 @@
 
 // NitroSystem's G3D standard (basic, no tool) scaling rule: the function that sends a joint's pose to the geometry
 // engine, and the one that sets the scale of a joint's pose from its node. The file is named after NitroSystem's
-// basic.c. Both functions are the ones that cgtool.c's tables hold. Their names are NitroSystem's as recalled, not
-// shown by the code, and ours in config/names.txt
+// basic.c. Both functions are the ones that cgtool.c's tables hold. Their names are NitroSystem's, as ntrtwl's
+// reconstruction of NitroSystem has them
 
 // Sends a joint's pose to the geometry engine: the rotation and translation as one matrix (the translation follows the
 // rotation in the result), or either of them alone, then the scale, each unless the result's flag says it is the

@@ -1,5 +1,6 @@
-// NitroSDK libfx's fx_trig.c: FX_AcosIdx, a binary search of the cosines in FX_SinCosTable_. The file name is a guess
-// after the SDK's fx_trig.h header; the split from fx.c is only by the function boundary and the order in the library.
+// NitroSDK libfx's FX_AcosIdx, a binary search of the cosines in FX_SinCosTable_. The SDK's file is fx_asinacosidx.c,
+// as ntrtwl's reconstruction of NitroSDK has it (its fx_trig.c holds FX_SinFx64c and FX_CosFx64c); the split from fx.c
+// is only by the function boundary and the order in the library.
 #include "nitro/fx.h"
 
 u16 FX_AcosIdx(fx32 x) {

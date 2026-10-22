@@ -652,7 +652,7 @@ static void ConfigPanelBg_Init(ConfigPanelBg *bg, HeapID heapId) {
     GFL_ArcToolFree(arc);
 
     buf = GFL_G2DIOReadNCLR(ARCID_CONFIG_PANEL, 1, &palette, heapId);
-    MI_CpuCopy8((u16 *)palette->rawData + 7 * 16, bg->cursorPalette, sizeof(bg->cursorPalette));
+    MI_CpuCopy8((u16 *)palette->pRawData + 7 * 16, bg->cursorPalette, sizeof(bg->cursorPalette));
     GFL_HeapFree(buf);
 
     bg->windows[WINDOW_MESSAGE] = BmpWin_CreateDynamic(BG_MESSAGE, 1, 19, 30, 4, 4, TRUE);
@@ -726,7 +726,7 @@ static void ConfigPanelBg_PrintLabels(ConfigPanelBg *bg) {
     }
 
     // The title's window starts as the bar's graphic of it
-    chars = bg->titleChars->rawData;
+    chars = bg->titleChars->pRawData;
     MIi_CpuCopy32(chars, GFL_BitmapGetPixelData(BmpWin_GetBitmap(bg->windows[WINDOW_TITLE])), 16 * 3 * 0x20);
     str = GFL_MsgDataLoadStrbufNew(msgData, Title2_Text_Options);
     x = BmpWin_GetSizeX(bg->windows[WINDOW_TITLE]) * 4;

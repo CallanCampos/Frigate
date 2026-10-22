@@ -27,7 +27,7 @@ NitroSDK's code reads a few numbers, such as `SDK_IRQ_STACKSIZE`, as the address
 script defines, so the ROM has them as plain words in the literal pools that load them, with no relocation. dsd's linker
 script defines only `__OVERLAY_COUNT` of them. `config/linker_symbols.toml` gives the others and their values, the same
 in both versions: the stack sizes, which `os_interrupt.c`, `os_thread.c`, `os_arena.c` and the startup code `crt0.c`
-(`Entry`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
+(`_start`, `func_02004d50` and `func_02004da0`) read, and the start of the DSi's extended main memory arena, which
 `os_arena.c` reads. `tools/build/lcf_symbols.py` adds them after `__OVERLAY_COUNT` as absolute symbols, in
 `build/<version>/arm9_symbols.lcf`, the linker script that the link (or `--shift`'s padding) takes. Another one goes in
 the config when a file that reads it is written, with its value read from the pool word in both versions.
@@ -57,8 +57,8 @@ records them in `config/fixes.txt`:
 
 It also removes relocations and symbols that are not real (`remove-reloc`, `remove-symbol`), and gives a function a
 second name with `add-label`. MWCC calls the runtime's 64-bit multiply `_ll_mul` for signed values and `_ull_mul` for
-unsigned ones, while the game has one copy of it, so `_ll_mul` is a label on `_ull_mul`. In the same way, `_fflt` (int
-to float) is a label on swan's `__aeabi_i2f`, and `_u32_div_f` (unsigned division) on `__aeabi_uidivmod`. A delinked
+unsigned ones, while the game has one copy of it, so `_ll_mul` is a label on `_ull_mul`. `remove-label` drops a label
+again once its function takes the name, as the runtime's functions did when they took its names over swan's. A delinked
 object defines the label, and when the function's file is complete, `tools/build/object_aliases.py` adds the label to the
 compiled object, which can't define two names for one `asm` function (`docs/matching.md`). `add-data`
 adds an object that nothing references, such as a global constant that the compiler folds into the code but still emits,

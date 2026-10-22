@@ -4,8 +4,8 @@
 // joint's pose to the geometry engine, the one that sets the scale of a joint's pose from its node, and the one that
 // sends a material's texture matrix. They are the ones that cgtool.c's tables hold. The file is named after
 // NitroSystem's si3d.c. In this rule a joint cancels the scale of its parent, and the joints keep their scales in
-// g_NNSG3DRenderCache for the joints below them. NNSi_G3dGetJointScaleSi3d is NitroSystem's name, as pokeheartgold
-// has it; the other two are NitroSystem's as recalled, parallel to maya.c's
+// NNS_G3dRSOnGlb for the joints below them. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem and
+// pokeheartgold have them, except sendPacket_, which is ours
 
 #pragma thumb off
 
@@ -52,7 +52,7 @@ void NNSi_G3dSendJointSRTSi3d(const NNSG3dJntAnmResult *result) {
 }
 
 // Sets the scale of a joint's pose from the scale of its node: the node's scale, or a scale of one if the node's flag
-// says so. Every joint keeps its scale and inverse scale, relative to the root, in g_NNSG3DRenderCache, and whether
+// says so. Every joint keeps its scale and inverse scale, relative to the root, in NNS_G3dRSOnGlb, and whether
 // that scale is one in the render state. The joint's scaleEx0 and scaleEx1 are the scale and inverse scale of its
 // parent, or flags say that they are one, as they are when the parent's scale is
 void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const fx32 *p, const u8 *cmd, u32 srtFlag) {
@@ -61,37 +61,37 @@ void NNSi_G3dGetJointScaleSi3d(NNSG3dJntAnmResult *result, const fx32 *p, const 
 
     if (srtFlag & NNS_G3D_SRTFLAG_SCALE_ONE) {
         result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE;
-        if (g_NNSG3DModelRenderer->isScaleOne[parent >> 5] & (1 << (parent & 0x1f))) {
-            g_NNSG3DModelRenderer->isScaleOne[node >> 5] |= 1 << (node & 0x1f);
+        if (NNS_G3dRS->isScaleCacheOne[parent >> 5] & (1 << (parent & 0x1f))) {
+            NNS_G3dRS->isScaleCacheOne[node >> 5] |= 1 << (node & 0x1f);
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE | NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE;
         } else {
-            MIi_CpuCopy32(&g_NNSG3DRenderCache.jointScales[parent], &g_NNSG3DRenderCache.jointScales[node],
+            MIi_CpuCopy32(&NNS_G3dRSOnGlb.scaleCache[parent], &NNS_G3dRSOnGlb.scaleCache[node],
                           sizeof(NNSG3dJointScale));
-            MIi_CpuCopy32(&g_NNSG3DRenderCache.jointScales[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
+            MIi_CpuCopy32(&NNS_G3dRSOnGlb.scaleCache[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
         }
     } else {
         result->scale.x = p[0];
         result->scale.y = p[1];
         result->scale.z = p[2];
-        if (g_NNSG3DModelRenderer->isScaleOne[parent >> 5] & (1 << (parent & 0x1f))) {
-            MIi_CpuCopy32(p, &g_NNSG3DRenderCache.jointScales[node], sizeof(NNSG3dJointScale));
-            g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
+        if (NNS_G3dRS->isScaleCacheOne[parent >> 5] & (1 << (parent & 0x1f))) {
+            MIi_CpuCopy32(p, &NNS_G3dRSOnGlb.scaleCache[node], sizeof(NNSG3dJointScale));
+            NNS_G3dRS->isScaleCacheOne[node >> 5] &= ~(1 << (node & 0x1f));
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE | NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE;
         } else {
-            g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
-            g_NNSG3DRenderCache.jointScales[node].scale.x =
-                (fx32)(((fx64)p[0] * g_NNSG3DRenderCache.jointScales[parent].scale.x) >> FX32_SHIFT);
-            g_NNSG3DRenderCache.jointScales[node].scale.y =
-                (fx32)(((fx64)p[1] * g_NNSG3DRenderCache.jointScales[parent].scale.y) >> FX32_SHIFT);
-            g_NNSG3DRenderCache.jointScales[node].scale.z =
-                (fx32)(((fx64)p[2] * g_NNSG3DRenderCache.jointScales[parent].scale.z) >> FX32_SHIFT);
-            g_NNSG3DRenderCache.jointScales[node].invScale.x =
-                (fx32)(((fx64)p[3] * g_NNSG3DRenderCache.jointScales[parent].invScale.x) >> FX32_SHIFT);
-            g_NNSG3DRenderCache.jointScales[node].invScale.y =
-                (fx32)(((fx64)p[4] * g_NNSG3DRenderCache.jointScales[parent].invScale.y) >> FX32_SHIFT);
-            g_NNSG3DRenderCache.jointScales[node].invScale.z =
-                (fx32)(((fx64)p[5] * g_NNSG3DRenderCache.jointScales[parent].invScale.z) >> FX32_SHIFT);
-            MIi_CpuCopy32(&g_NNSG3DRenderCache.jointScales[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
+            NNS_G3dRS->isScaleCacheOne[node >> 5] &= ~(1 << (node & 0x1f));
+            NNS_G3dRSOnGlb.scaleCache[node].scale.x =
+                (fx32)(((fx64)p[0] * NNS_G3dRSOnGlb.scaleCache[parent].scale.x) >> FX32_SHIFT);
+            NNS_G3dRSOnGlb.scaleCache[node].scale.y =
+                (fx32)(((fx64)p[1] * NNS_G3dRSOnGlb.scaleCache[parent].scale.y) >> FX32_SHIFT);
+            NNS_G3dRSOnGlb.scaleCache[node].scale.z =
+                (fx32)(((fx64)p[2] * NNS_G3dRSOnGlb.scaleCache[parent].scale.z) >> FX32_SHIFT);
+            NNS_G3dRSOnGlb.scaleCache[node].invScale.x =
+                (fx32)(((fx64)p[3] * NNS_G3dRSOnGlb.scaleCache[parent].invScale.x) >> FX32_SHIFT);
+            NNS_G3dRSOnGlb.scaleCache[node].invScale.y =
+                (fx32)(((fx64)p[4] * NNS_G3dRSOnGlb.scaleCache[parent].invScale.y) >> FX32_SHIFT);
+            NNS_G3dRSOnGlb.scaleCache[node].invScale.z =
+                (fx32)(((fx64)p[5] * NNS_G3dRSOnGlb.scaleCache[parent].invScale.z) >> FX32_SHIFT);
+            MIi_CpuCopy32(&NNS_G3dRSOnGlb.scaleCache[parent], &result->scaleEx0, sizeof(NNSG3dJointScale));
         }
     }
 }

@@ -17,7 +17,7 @@ BOOL NNS_G2dGetUnpackedPaletteData(void *file, NNSG2dPaletteData **palette) {
 }
 
 BOOL NNS_G2dGetUnpackedPaletteCompressInfo(void *file, NNSG2dPaletteCompressInfo **info) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_PALETTECOMPRESSINFO);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_PALETTECOMPINFO);
 
     if (blk != NULL) {
         NNSi_G2dUnpackNCLCmpInfo((NNSG2dPaletteCompressInfo *)(blk + 1));
@@ -29,9 +29,9 @@ BOOL NNS_G2dGetUnpackedPaletteCompressInfo(void *file, NNSG2dPaletteCompressInfo
 }
 
 void NNSi_G2dUnpackNCLCmpInfo(NNSG2dPaletteCompressInfo *info) {
-    NNSi_G2dUnpackOffset(info->paletteIndexTable, info);
+    NNS_G2D_UNPACK_OFFSET_PTR(info->pPlttIdxTbl, info);
 }
 
 void NNS_G2dUnpackNCL(NNSG2dPaletteData *palette) {
-    NNSi_G2dUnpackOffset(palette->rawData, palette);
+    NNS_G2D_UNPACK_OFFSET_PTR(palette->pRawData, palette);
 }

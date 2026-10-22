@@ -20,12 +20,12 @@ void OS_SetIrqFunction(OSIrqMask interrupts, OSIrqFunction function) {
     for (n = 0; n < 32; n++) {
         if (interrupts & 1) {
             info = NULL;
-            if (n >= OS_IE_DMA0_SHIFT && n <= OS_IE_DMA0_SHIFT + 3) {
-                info = &OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + n - OS_IE_DMA0_SHIFT];
+            if (n >= REG_OS_IE_D0_SHIFT && n <= REG_OS_IE_D0_SHIFT + 3) {
+                info = &OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + n - REG_OS_IE_D0_SHIFT];
             } else if (n >= OS_IE_NDMA0_SHIFT && n <= OS_IE_NDMA0_SHIFT + 3) {
                 info = &OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_NDMA0 + n - OS_IE_NDMA0_SHIFT];
-            } else if (n >= OS_IE_TIMER0_SHIFT && n <= OS_IE_TIMER0_SHIFT + 3) {
-                info = &OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_TIMER0 + n - OS_IE_TIMER0_SHIFT];
+            } else if (n >= REG_OS_IE_T0_SHIFT && n <= REG_OS_IE_T0_SHIFT + 3) {
+                info = &OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_TIMER0 + n - REG_OS_IE_T0_SHIFT];
             } else {
                 OS_IRQTable[n] = function;
             }
@@ -46,11 +46,11 @@ OSIrqFunction OS_GetIrqFunction(OSIrqMask interrupts) {
 
     for (n = 0; n < 32; n++) {
         if (interrupts & 1) {
-            if (n >= OS_IE_DMA0_SHIFT && n <= OS_IE_DMA0_SHIFT + 3) {
-                return (OSIrqFunction)OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + n - OS_IE_DMA0_SHIFT].func;
+            if (n >= REG_OS_IE_D0_SHIFT && n <= REG_OS_IE_D0_SHIFT + 3) {
+                return (OSIrqFunction)OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + n - REG_OS_IE_D0_SHIFT].func;
             }
-            if (n >= OS_IE_TIMER0_SHIFT && n <= OS_IE_TIMER0_SHIFT + 3) {
-                return (OSIrqFunction)OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_TIMER0 + n - OS_IE_TIMER0_SHIFT].func;
+            if (n >= REG_OS_IE_T0_SHIFT && n <= REG_OS_IE_T0_SHIFT + 3) {
+                return (OSIrqFunction)OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_TIMER0 + n - REG_OS_IE_T0_SHIFT].func;
             }
             return *table;
         }
@@ -63,7 +63,7 @@ OSIrqFunction OS_GetIrqFunction(OSIrqMask interrupts) {
 // NitroSDK's OSi_EnterDmaCallback: calls the function with the argument when the DMA channel's
 // interrupt happens, enabling it for that if it was not enabled
 void OSi_EnterDmaCallback(u32 dmaNo, OSIrqCallback callback, void *arg) {
-    u32 mask = 1 << (dmaNo + OS_IE_DMA0_SHIFT);
+    u32 mask = 1 << (dmaNo + REG_OS_IE_D0_SHIFT);
     u32 enabled;
 
     OSi_IrqCallbackInfo[OSi_IRQCALLBACK_NO_DMA0 + dmaNo].func = callback;
@@ -80,7 +80,7 @@ void OSi_EnterNDmaCallback(u32 ndmaNo, OSIrqCallback callback, void *arg) {
 void OSi_EnterTimerCallback(u32 timerNo, OSIrqCallback callback, void *arg) {
     OSi_TIMER_CALLBACK_INFO[timerNo].func = callback;
     OSi_TIMER_CALLBACK_INFO[timerNo].arg = arg;
-    OS_EnableIrqMask(1 << (timerNo + OS_IE_TIMER0_SHIFT));
+    OS_EnableIrqMask(1 << (timerNo + REG_OS_IE_T0_SHIFT));
     OSi_TIMER_CALLBACK_INFO[timerNo].enable = TRUE;
 }
 
@@ -124,6 +124,6 @@ OSIrqMask OS_ResetRequestIrqMask(OSIrqMask mask) {
 
 // Puts the magic numbers that the exception handler checks at the top and at the end of the IRQ stack
 void OS_SetIrqStackChecker(void) {
-    *(u32 *)(HW_IRQ_STACK - 4) = OS_STACK_BEGIN_MAGIC;
-    *(u32 *)HW_IRQ_STACK_END = OS_STACK_END_MAGIC;
+    *(u32 *)(HW_IRQ_STACK - 4) = OSi_STACK_CHECKNUM_BOTTOM;
+    *(u32 *)HW_IRQ_STACK_END = OSi_STACK_CHECKNUM_TOP;
 }

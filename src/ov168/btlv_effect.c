@@ -371,9 +371,9 @@ void BtlvEffect_Main(void) {
         BtlvMcss_Draw(sBtlvEffect->mcss);
         // The game reads the polygon list RAM count before each of these and drops it, likely what is left of a debug
         // print of the counts
-        reg_G3X_RAM_COUNT;
+        reg_G3X_LISTRAM_COUNT;
         Particle_DrawAndUpdateAll();
-        reg_G3X_RAM_COUNT;
+        reg_G3X_LISTRAM_COUNT;
         GFL_G3DSysReqSwapBuffers();
     }
 }

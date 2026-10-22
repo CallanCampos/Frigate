@@ -137,8 +137,8 @@ static void WF2DMAP_SCRDrawSysScrnWrite(void *unk0, u32 bg, const NNSG2dScreenDa
     s16 width;
     s16 height;
 
-    scrnWidth = scrn->width / 8;
-    scrnHeight = scrn->height / 8;
+    scrnWidth = scrn->screenWidth / 8;
+    scrnHeight = scrn->screenHeight / 8;
 
     if (x < 0) {
         srcX = -x;

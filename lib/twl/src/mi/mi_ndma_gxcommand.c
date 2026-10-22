@@ -58,7 +58,7 @@ void MI_SendNDmaGXCommandAsync(u32 ndmaNo, const void *src, u32 length, MINDmaCa
     MI_WaitNDma(ndmaNo);
     enabled = OS_DisableInterrupts();
     sGXNDmaState.fifoIrqCondition =
-        (GXFifoIntrCond)((reg_G3X_GXSTAT & REG_G3X_GXSTAT_FIFO_IRQ_MASK) >> REG_G3X_GXSTAT_FIFO_IRQ_SHIFT);
+        (GXFifoIntrCond)((reg_G3X_GXSTAT & REG_G3X_GXSTAT_FI_MASK) >> REG_G3X_GXSTAT_FI_SHIFT);
     sGXNDmaState.irqFunc = OS_GetIrqFunction(OS_IE_GXFIFO);
     G3X_SetFifoIntrCond(GX_FIFOINTR_COND_UNDERHALF);
     OS_SetIrqFunction(OS_IE_GXFIFO, MIi_NDmaFIFOCallback);

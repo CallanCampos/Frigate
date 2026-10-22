@@ -7,7 +7,7 @@
 static void UnpackExtendedData_(NNSG2dUserExDataBlock *blk);
 
 BOOL NNS_G2dGetUnpackedMultiCellBank(void *file, NNSG2dMultiCellDataBank **cells) {
-    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BINBLK_SIG_MULTICELLBANK);
+    NNSG2dBinaryBlockHeader *blk = NNS_G2dFindBinaryBlock(file, NNS_G2D_BLKSIG_MULTICELLBANK);
 
     if (blk != NULL) {
         NNS_G2dUnpackNMC((NNSG2dMultiCellDataBank *)(blk + 1));
@@ -26,16 +26,16 @@ void NNS_G2dUnpackNMC(NNSG2dMultiCellDataBank *bank) {
     u16 i;
     NNSG2dMultiCellData *cellArray;
 
-    NNSi_G2dUnpackOffset(bank->pMultiCellDataArray, bank);
-    NNSi_G2dUnpackOffset(bank->pHierarchyDataArray, bank);
+    NNS_G2D_UNPACK_OFFSET_PTR(bank->pMultiCellDataArray, bank);
+    NNS_G2D_UNPACK_OFFSET_PTR(bank->pHierarchyDataArray, bank);
 
     cellArray = bank->pMultiCellDataArray;
     for (i = 0; i < bank->numMultiCellData; i++) {
-        NNSi_G2dUnpackOffset(cellArray[i].pHierDataArray, bank->pHierarchyDataArray);
+        NNS_G2D_UNPACK_OFFSET_PTR(cellArray[i].pHierDataArray, bank->pHierarchyDataArray);
     }
 
     if (bank->pExtendedData != NULL) {
-        NNSi_G2dUnpackOffset(bank->pExtendedData, bank);
+        NNS_G2D_UNPACK_OFFSET_PTR(bank->pExtendedData, bank);
         UnpackExtendedData_(bank->pExtendedData);
     }
 }

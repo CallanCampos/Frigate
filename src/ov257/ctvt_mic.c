@@ -113,10 +113,10 @@ BOOL CtvtMic_StartRecording(CtvtMic *work) {
     if (param.size & 0x1f) {
         param.size &= ~0x1f;
     }
-    param.fullCallback = CtvtMic_OnBufferFull;
-    param.loop = FALSE;
+    param.full_callback = CtvtMic_OnBufferFull;
+    param.loop_enable = FALSE;
     param.rate = MIC_SAMPLING_RATE_8180;
-    param.fullArg = work;
+    param.full_arg = work;
     if (MIC_StartLimitedSampling(&param) == MIC_RESULT_SUCCESS) {
         work->recording = TRUE;
         work->recordedSize = 0;

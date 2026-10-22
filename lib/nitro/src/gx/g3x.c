@@ -94,12 +94,13 @@ void G3X_ResetMtxStack(void) {
 void G3X_SetFog(BOOL enabled, GXFogBlend alphaMode, GXFogSlope depthShift, int offset) {
     if (enabled) {
         reg_G3X_FOG_OFFSET = (u16)offset;
-        reg_G3X_DISP3DCNT = (u16)((depthShift << REG_G3X_DISP3DCNT_FSHIFT_SHIFT) |
-                                  (alphaMode << REG_G3X_DISP3DCNT_FMOD_SHIFT) | REG_G3X_DISP3DCNT_FE_MASK |
-                                  (reg_G3X_DISP3DCNT & ~(REG_G3X_DISP3DCNT_FMOD_MASK | REG_G3X_DISP3DCNT_FSHIFT_MASK |
-                                                         REG_G3X_DISP3DCNT_RO_MASK | REG_G3X_DISP3DCNT_GO_MASK)));
+        reg_G3X_DISP3DCNT =
+            (u16)((depthShift << REG_G3X_DISP3DCNT_FOG_SHIFT_SHIFT) | (alphaMode << REG_G3X_DISP3DCNT_FMOD_SHIFT) |
+                  REG_G3X_DISP3DCNT_FME_MASK |
+                  (reg_G3X_DISP3DCNT & ~(REG_G3X_DISP3DCNT_FMOD_MASK | REG_G3X_DISP3DCNT_FOG_SHIFT_MASK |
+                                         REG_G3X_DISP3DCNT_RO_MASK | REG_G3X_DISP3DCNT_GO_MASK)));
     } else {
-        reg_G3X_DISP3DCNT &= ~(REG_G3X_DISP3DCNT_FE_MASK | REG_G3X_DISP3DCNT_RO_MASK | REG_G3X_DISP3DCNT_GO_MASK);
+        reg_G3X_DISP3DCNT &= ~(REG_G3X_DISP3DCNT_FME_MASK | REG_G3X_DISP3DCNT_RO_MASK | REG_G3X_DISP3DCNT_GO_MASK);
     }
 }
 
@@ -107,7 +108,7 @@ int G3X_GetClipMtx(MtxFx44 *dest) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
         return -1;
     }
-    MI_Copy64B((const void *)&reg_G3X_CLIPMTX_RESULT, dest);
+    MI_Copy64B((const void *)&reg_G3X_CLIPMTX_RESULT_0, dest);
     return 0;
 }
 
@@ -115,22 +116,22 @@ int G3X_GetVectorMtx(MtxFx33 *dest) {
     if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_B_MASK) {
         return -1;
     }
-    MI_Copy36B((const void *)&reg_G3X_VECMTX_RESULT, dest);
+    MI_Copy36B((const void *)&reg_G3X_VECMTX_RESULT_0, dest);
     return 0;
 }
 
 void G3X_SetEdgeColorTable(const GXRgb *table) {
-    MI_CpuCopy16(table, (void *)&reg_G3X_EDGE_COLOR, 16);
+    MI_CpuCopy16(table, (void *)&reg_G3X_EDGE_COLOR_0, 16);
 }
 
 void G3X_SetFogTable(const u32 *table) {
-    MI_Copy32B(table, (void *)&reg_G3X_FOG_TABLE);
+    MI_Copy32B(table, (void *)&reg_G3X_FOG_TABLE_0);
 }
 
 void G3X_SetClearColor(GXRgb color, int alpha, int depth, int polygonId, BOOL fog) {
-    u32 value = color | (alpha << REG_G3X_CLEAR_COLOR_ALPHA_SHIFT) | (polygonId << REG_G3X_CLEAR_COLOR_ID_SHIFT);
+    u32 value = color | (alpha << REG_G3X_CLEAR_COLOR_ALPHA_SHIFT) | (polygonId << REG_G3X_CLEAR_COLOR_POLYGONID_SHIFT);
     if (fog) {
-        value |= REG_G3X_CLEAR_COLOR_FOG_MASK;
+        value |= REG_G3X_CLEAR_COLOR_F_MASK;
     }
     reg_G3X_CLEAR_COLOR = value;
     reg_G3X_CLEAR_DEPTH = (u16)depth;
@@ -140,34 +141,34 @@ void G3X_InitTable(void) {
     int i;
     if (GXi_DmaId != GX_DMA_NOT_USE) {
         if (GXi_DmaId > MI_DMA_MAX_NUM) {
-            MI_NDmaFillAsync(GXi_DmaId - 4, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL);
-            MI_NDmaFill(GXi_DmaId - 4, (void *)&reg_G3X_FOG_TABLE, 0, 0x60);
+            MI_NDmaFillAsync(GXi_DmaId - 4, (void *)&reg_G3X_EDGE_COLOR_0, 0, 0x10, NULL, NULL);
+            MI_NDmaFill(GXi_DmaId - 4, (void *)&reg_G3X_FOG_TABLE_0, 0, 0x60);
         } else {
-            MIi_DmaFill32Async(GXi_DmaId, (void *)&reg_G3X_EDGE_COLOR, 0, 0x10, NULL, NULL, TRUE);
-            MIi_DmaFill32(GXi_DmaId, (void *)&reg_G3X_FOG_TABLE, 0, 0x60, TRUE);
+            MIi_DmaFill32Async(GXi_DmaId, (void *)&reg_G3X_EDGE_COLOR_0, 0, 0x10, NULL, NULL, TRUE);
+            MIi_DmaFill32(GXi_DmaId, (void *)&reg_G3X_FOG_TABLE_0, 0, 0x60, TRUE);
         }
     } else {
-        MI_CpuClear32((void *)&reg_G3X_EDGE_COLOR, 0x10);
-        MI_CpuClear32((void *)&reg_G3X_FOG_TABLE, 0x60);
+        MI_CpuClear32((void *)&reg_G3X_EDGE_COLOR_0, 0x10);
+        MI_CpuClear32((void *)&reg_G3X_FOG_TABLE_0, 0x60);
     }
     for (i = 0; i < 32; i++) {
-        reg_G3X_SHININESS = 0;
+        reg_G3_SHININESS = 0;
     }
 }
 
 int G3X_GetMtxStackLevelPV(s32 *level) {
-    if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_MB_MASK) {
+    if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_SB_MASK) {
         return -1;
     }
-    *level = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_PVMTX_MASK) >> REG_G3X_GXSTAT_PVMTX_SHIFT;
+    *level = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_PV_MASK) >> REG_G3X_GXSTAT_PV_SHIFT;
     return 0;
 }
 
 int G3X_GetMtxStackLevelPJ(s32 *level) {
-    if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_MB_MASK) {
+    if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_SB_MASK) {
         return -1;
     }
-    *level = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_PJMTX_MASK) >> REG_G3X_GXSTAT_PJMTX_SHIFT;
+    *level = (reg_G3X_GXSTAT & REG_G3X_GXSTAT_PJ_MASK) >> REG_G3X_GXSTAT_PJ_SHIFT;
     return 0;
 }
 
@@ -176,10 +177,10 @@ void G3X_SetDisp1DotDepth(fx32 depth) {
 }
 
 int G3X_GetBoxTestResult(s32 *result) {
-    if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_BT_MASK) {
+    if (reg_G3X_GXSTAT & REG_G3X_GXSTAT_TB_MASK) {
         return -1;
     }
-    *result = reg_G3X_GXSTAT & REG_G3X_GXSTAT_BR_MASK;
+    *result = reg_G3X_GXSTAT & REG_G3X_GXSTAT_TR_MASK;
     return 0;
 }
 

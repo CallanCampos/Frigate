@@ -214,7 +214,7 @@ static void GFL_HeapDumpAllocFailure(HeapID heapId, u32 size, const char *file, 
     NNSFndHeapHandle heap = GFL_HeapGetValidHeapBase(heapId);
 
     NNS_FndGetTotalFreeSizeForExpHeap(heap);
-    HeapBase_GetHighestAllocatableSize(heap, 4);
+    NNS_FndGetAllocatableSizeForExpHeapEx(heap, 4);
     GFL_HeapDumpOnFailure(heapId);
 }
 
@@ -290,7 +290,7 @@ void GFL_HeapDumpOnFailure(HeapID heapId) {
     GFL_HeapGetHighestAllocatableSize(heapId);
     GFL_HeapGetAllocationCount(heapId);
     exit(1);
-    HeapBase_DumpMemory(GFL_HeapGetValidHeapBase(heapId), GFL_HeapDumpProc, 0);
+    NNS_FndVisitAllocatedForExpHeap(GFL_HeapGetValidHeapBase(heapId), GFL_HeapDumpProc, 0);
     exit(0);
 }
 

@@ -116,9 +116,9 @@ void PaletteFade_LoadNCLREx(PaletteFade *fade, u32 arcId, u32 fileId, HeapID hea
     void *file = GFL_G2DIOReadNCLR(arcId, fileId, &palette, HEAPID_TAIL(heapId));
 
     if (size == 0) {
-        size = palette->size;
+        size = palette->szByte;
     }
-    PaletteFade_LoadData(fade, (u16 *)palette->rawData + srcOffset, buffer, offset, size);
+    PaletteFade_LoadData(fade, (u16 *)palette->pRawData + srcOffset, buffer, offset, size);
     GFL_HeapFree(file);
 }
 
@@ -132,9 +132,9 @@ void PaletteFade_LoadArcNCLREx(PaletteFade *fade, ArcTool *arc, u32 fileId, Heap
     void *file = GFL_G2DIOReadNCLRArc(arc, fileId, &palette, HEAPID_TAIL(heapId));
 
     if (size == 0) {
-        size = palette->size;
+        size = palette->szByte;
     }
-    PaletteFade_LoadData(fade, (u16 *)palette->rawData + srcOffset, buffer, offset, size);
+    PaletteFade_LoadData(fade, (u16 *)palette->pRawData + srcOffset, buffer, offset, size);
     GFL_HeapFree(file);
 }
 

@@ -7,57 +7,59 @@
 // NitroSystem's g2d_CharCanvas.c: drawing glyphs into, and clearing, a canvas of characters laid out as a BG's or as
 // the OBJs of a 1D OBJ area, and laying out the screen or the OBJs that show a canvas. A 1D OBJ canvas is covered with
 // the largest OBJs that fit, then the rest of it to the right, below and at the bottom right likewise. The game keeps
-// the 2D OBJ canvas's functions table but not the function that uses it
+// the 2D OBJ canvas's functions table but not the function that uses it. The names are NitroSystem's, as ntrtwl's
+// reconstruction of NitroSystem has them, except ObjSizeShiftOf, sMaxObjSize and sOamShape, which are ours: the two
+// tables are statics in NitroSystem's functions
 
 // The log2 sizes in characters of an OBJ
 typedef struct {
     u8 widthShift;
     u8 heightShift;
-} ObjSizeShift;
+} ObjectSize;
 
 // A 1D OBJ canvas's param: the size of its largest OBJ
 typedef union {
-    u32 param;
+    u32 packed;
     struct {
         u32 objWidthShift : 8;
         u32 objHeightShift : 8;
         u32 : 16;
     };
-} Obj1DParam;
+} OBJ1DParam;
 
 // A glyph drawn into one character: x and y place the glyph's top left in the character, and may be negative
 typedef struct {
-    u32 *pChar;
-    const u8 *pSrc;
-    int x;
-    int y;
+    u32 *dst;
+    const u8 *src;
+    int ofs_x;
+    int ofs_y;
     int width;
     int height;
-    int srcLineBits;
+    int dsrc;
     int srcBpp;
     int dstBpp;
-    int colorOffset;
-} DrawGlyphParam;
+    int cl;
+} LC_INFO;
 
-static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
-                            const NNSG2dGlyph *pGlyph);
+static void DrawGlyphLine(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
+                          const NNSG2dGlyph *pGlyph);
 static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
                         const NNSG2dGlyph *pGlyph);
 static void ClearContinuous(const NNSG2dCharCanvas *pCC, int cl);
-static void ClearLinear(const NNSG2dCharCanvas *pCC, int cl);
-static void ClearAreaLinear(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w, int h);
+static void ClearLine(const NNSG2dCharCanvas *pCC, int cl);
+static void ClearAreaLine(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w, int h);
 static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w, int h);
-static void MapScrToCharLinear(u16 *pScr, int areaWidth, int areaHeight, int scnWidth, int charNo, int cplt);
+static void NNS_G2dMapScrToChar256x16Pltt(u16 *pScr, int areaWidth, int areaHeight, int scnWidth, int charNo, int cplt);
 
-// The 2D OBJ canvas's functions. Not static, since nothing the game keeps uses it and MWCC would leave it out; the name
-// is ours
-const NNSiG2dCharCanvasVTable NNSi_G2dCharCanvasVTableOBJ2DRect = { DrawGlyphLinear, ClearLinear, ClearAreaLinear };
+// The 2D OBJ canvas's functions. NitroSystem's table is static, but this one is not, since nothing the game keeps uses
+// it and MWCC would leave it out
+const NNSiG2dCharCanvasVTable VTABLE_OBJ2DRECT = { DrawGlyphLine, ClearLine, ClearAreaLine };
 // MWCC emits these two in the reverse of their order here, which puts the BG's first as in the ROM
 static const NNSiG2dCharCanvasVTable VTABLE_OBJ1D = { DrawGlyph1D, ClearContinuous, ClearArea1D };
-static const NNSiG2dCharCanvasVTable VTABLE_BG = { DrawGlyphLinear, ClearContinuous, ClearAreaLinear };
+static const NNSiG2dCharCanvasVTable VTABLE_BG = { DrawGlyphLine, ClearContinuous, ClearAreaLine };
 
 // The largest OBJ that fits in an area, by the log2 sizes of the area, at most 8 characters: [height][width]
-static const ObjSizeShift sMaxObjSize[4][4] = {
+static const ObjectSize sMaxObjSize[4][4] = {
     { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 2, 0 } },
     { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 2, 1 } },
     { { 0, 2 }, { 1, 2 }, { 2, 2 }, { 3, 2 } },
@@ -72,7 +74,7 @@ static const u32 sOamShape[4][4] = {
     { 0, 0, GX_OAM_SHAPE_32x64, GX_OAM_SHAPE_64x64 },
 };
 
-static inline int CharSize(int bpp) {
+static inline int GetCharacterSize(int bpp) {
     return bpp * 8 * 8 / 8;
 }
 
@@ -123,7 +125,7 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
         }
 
         {
-            const ObjSizeShift *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
+            const ObjectSize *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
 
             objWidthShift = pSize->widthShift;
             objHeightShift = pSize->heightShift;
@@ -131,12 +133,12 @@ static u32 GetCharIndex1D(u32 x, u32 y, int areaWidth, int areaHeight, int objWi
     }
 }
 
-static u32 GetOamShape(const ObjSizeShift *pSize) {
+static u32 OBJSizeToShape(const ObjectSize *pSize) {
     return sOamShape[pSize->heightShift][pSize->widthShift];
 }
 
 // Fills the w by h pixels at x, y of a character
-static void FillChar(u32 *pChar, int x, int y, int w, int h, u32 cl, int bpp) {
+static void ClearChar(u32 *pChar, int x, int y, int w, int h, u32 cl, int bpp) {
     if (w == 8 && h == 8) {
         MI_CpuFillFast(pChar, cl, (u32)bpp * 8);
         return;
@@ -197,23 +199,23 @@ static void FillChar(u32 *pChar, int x, int y, int w, int h, u32 cl, int bpp) {
     }
 }
 
-static void DrawGlyphChar(const DrawGlyphParam *p) {
-    u32 sx = (p->x >= 0) ? p->x : 0;
-    const int sy = (p->y >= 0) ? p->y : 0;
-    u32 ex = (p->x + p->width < 8) ? p->x + p->width : 8;
-    const int ey = (p->y + p->height < 8) ? p->y + p->height : 8;
-    const int offsetY = -MATH_MIN(p->y, 0);
-    const int offsetX = -MATH_MIN(p->x, 0);
+static void LetterChar(const LC_INFO *p) {
+    u32 sx = (p->ofs_x >= 0) ? p->ofs_x : 0;
+    const int sy = (p->ofs_y >= 0) ? p->ofs_y : 0;
+    u32 ex = (p->ofs_x + p->width < 8) ? p->ofs_x + p->width : 8;
+    const int ey = (p->ofs_y + p->height < 8) ? p->ofs_y + p->height : 8;
+    const int offsetY = -MATH_MIN(p->ofs_y, 0);
+    const int offsetX = -MATH_MIN(p->ofs_x, 0);
     const u8 *pSrc;
     int srcOffset;
     int srcLineBits;
     int srcBpp;
     int dstBpp;
 
-    srcLineBits = p->srcLineBits;
+    srcLineBits = p->dsrc;
     srcBpp = p->srcBpp;
     srcOffset = offsetY * srcLineBits + srcBpp * offsetX;
-    pSrc = p->pSrc;
+    pSrc = p->src;
     dstBpp = p->dstBpp;
 
     // From pixels to bit positions in a line of the character
@@ -221,9 +223,9 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
     ex *= dstBpp;
 
     if (dstBpp == 4) {
-        u32 *pLine = p->pChar + sy;
-        u32 *pEnd = p->pChar + ey;
-        const u32 colorOffset = p->colorOffset;
+        u32 *pLine = p->dst + sy;
+        u32 *pEnd = p->dst + ey;
+        const u32 colorOffset = p->cl;
 
         for (; pLine < pEnd; pLine++) {
             u32 line = *pLine;
@@ -243,9 +245,9 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
             srcOffset += srcLineBits;
         }
     } else {
-        u32 *pLine = p->pChar + sy * 2;
-        u32 *pEnd = p->pChar + ey * 2;
-        const u32 colorOffset = p->colorOffset;
+        u32 *pLine = p->dst + sy * 2;
+        u32 *pEnd = p->dst + ey * 2;
+        const u32 colorOffset = p->cl;
 
         for (; pLine < pEnd; pLine += 2) {
             u32 line0 = pLine[0];
@@ -276,8 +278,8 @@ static void DrawGlyphChar(const DrawGlyphParam *p) {
 }
 
 // Draws a glyph into a canvas whose characters are in rows of param characters: a BG's, or a 2D OBJ area's
-static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
-                            const NNSG2dGlyph *pGlyph) {
+static void DrawGlyphLine(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
+                          const NNSG2dGlyph *pGlyph) {
     int cx;
     int cy;
     int xBase;
@@ -288,8 +290,8 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
     u8 *pChar;
     u8 glyphWidth;
     u8 glyphHeight;
-    const int charSize = CharSize(pCC->dstBpp);
-    DrawGlyphParam param;
+    const int charSize = GetCharacterSize(pCC->dstBpp);
+    LC_INFO param;
 
     {
         int numX;
@@ -333,20 +335,20 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
         yEnd = yStart - 8 * numY;
     }
 
-    param.pSrc = pGlyph->image;
+    param.src = pGlyph->image;
     param.width = glyphWidth;
     param.height = glyphHeight;
-    param.colorOffset = cl - 1;
+    param.cl = cl - 1;
     param.srcBpp = pFont->pRes->pGlyph->bpp;
     param.dstBpp = pCC->dstBpp;
-    param.srcLineBits = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
+    param.dsrc = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
 
     for (cy = yStart; cy > yEnd; cy -= 8) {
-        param.y = cy;
+        param.ofs_y = cy;
         for (cx = xBase; cx > xEnd; cx -= 8) {
-            param.pChar = (u32 *)pChar;
-            param.x = cx;
-            DrawGlyphChar(&param);
+            param.dst = (u32 *)pChar;
+            param.ofs_x = cx;
+            LetterChar(&param);
             pChar += charSize;
         }
         pChar += lineSkip;
@@ -355,7 +357,7 @@ static void DrawGlyphLinear(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont
 
 static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl,
                         const NNSG2dGlyph *pGlyph) {
-    const int charSize = CharSize(pCC->dstBpp);
+    const int charSize = GetCharacterSize(pCC->dstBpp);
     const u8 glyphWidth = pGlyph->pWidths->glyphWidth;
     const int glyphHeight = pFont->pRes->pGlyph->cellHeight;
     const int areaW = pCC->areaWidth;
@@ -365,8 +367,8 @@ static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, in
     int xEnd, yEnd;
     int cy;
     u8 *charBase;
-    Obj1DParam objParam;
-    DrawGlyphParam param;
+    OBJ1DParam objParam;
+    LC_INFO param;
 
     if (glyphWidth == 0 || x + glyphWidth < 0 || y + glyphHeight < 0) {
         return;
@@ -398,15 +400,15 @@ static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, in
     yEnd = y - numY * 8;
     charBase = pCC->charBase;
 
-    param.pSrc = pGlyph->image;
+    param.src = pGlyph->image;
     param.height = glyphHeight;
     param.width = glyphWidth;
-    param.colorOffset = cl - 1;
+    param.cl = cl - 1;
     param.srcBpp = pFont->pRes->pGlyph->bpp;
     param.dstBpp = pCC->dstBpp;
-    param.srcLineBits = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
+    param.dsrc = param.srcBpp * pFont->pRes->pGlyph->cellWidth;
 
-    objParam.param = pCC->param;
+    objParam.packed = pCC->param;
     const int areaWidth = pCC->areaWidth;
     const int areaHeight = pCC->areaHeight;
     const int objWidthShift = objParam.objWidthShift;
@@ -414,18 +416,18 @@ static void DrawGlyph1D(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, in
     for (cy = top; y > yEnd; cy++, y -= 8) {
         int px, cx;
 
-        param.y = y;
+        param.ofs_y = y;
         for (px = x, cx = left; px > xEnd; px -= 8, cx++) {
             const u32 charNo = GetCharIndex1D(cx, cy, areaWidth, areaHeight, objWidthShift, objHeightShift);
 
-            param.x = px;
-            param.pChar = (u32 *)(charBase + charNo * charSize);
-            DrawGlyphChar(&param);
+            param.ofs_x = px;
+            param.dst = (u32 *)(charBase + charNo * charSize);
+            LetterChar(&param);
         }
     }
 }
 
-static inline u32 FillPattern(u32 cl, int bpp) {
+static inline u32 SpreadColor32(u32 cl, int bpp) {
     if (bpp == 4) {
         cl |= cl << 4;
         cl |= cl << 8;
@@ -438,14 +440,14 @@ static inline u32 FillPattern(u32 cl, int bpp) {
 }
 
 static void ClearContinuous(const NNSG2dCharCanvas *pCC, int cl) {
-    const u32 pattern = FillPattern(cl, pCC->dstBpp);
+    const u32 pattern = SpreadColor32(cl, pCC->dstBpp);
 
-    MI_CpuFillFast(pCC->charBase, pattern, CharSize(pCC->dstBpp) * (pCC->areaWidth * pCC->areaHeight));
+    MI_CpuFillFast(pCC->charBase, pattern, GetCharacterSize(pCC->dstBpp) * (pCC->areaWidth * pCC->areaHeight));
 }
 
-static void ClearLinear(const NNSG2dCharCanvas *pCC, int cl) {
-    const u32 pattern = FillPattern(cl, pCC->dstBpp);
-    const int charSize = CharSize(pCC->dstBpp);
+static void ClearLine(const NNSG2dCharCanvas *pCC, int cl) {
+    const u32 pattern = SpreadColor32(cl, pCC->dstBpp);
+    const int charSize = GetCharacterSize(pCC->dstBpp);
     const int lineSize = charSize * pCC->param;
     const int areaSize = charSize * pCC->areaWidth;
     int i;
@@ -457,18 +459,18 @@ static void ClearLinear(const NNSG2dCharCanvas *pCC, int cl) {
     }
 }
 
-static void ClearAreaLinear(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w, int h) {
+static void ClearAreaLine(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w, int h) {
     int cy;
     int height;
     const int right = x + w;
     const int bottom = y + h;
     const int bpp = pCC->dstBpp;
-    const u32 pattern = FillPattern(cl, bpp);
+    const u32 pattern = SpreadColor32(cl, bpp);
     const int x0 = x & ~7;
     cy = y & ~7;
     const int x1 = (right + 7) & ~7;
     const int y1 = (bottom + 7) & ~7;
-    const int charSize = CharSize(bpp);
+    const int charSize = GetCharacterSize(bpp);
     const int lineSize = pCC->param * charSize;
     u8 *pLine = pCC->charBase + (x0 / 8 + (cy / 8) * pCC->param) * charSize;
 
@@ -482,7 +484,7 @@ static void ClearAreaLinear(const NNSG2dCharCanvas *pCC, int cl, int x, int y, i
             const int left = (cx < x) ? x - cx : 0;
             const int width = MATH_MIN(right - cx, 8) - left;
 
-            FillChar((u32 *)p, left, top, width, height, pattern, bpp);
+            ClearChar((u32 *)p, left, top, width, height, pattern, bpp);
             p += charSize;
         }
         pLine += lineSize;
@@ -495,10 +497,10 @@ static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w
     const int right = x + w;
     const int bottom = y + h;
     const int bpp = pCC->dstBpp;
-    const u32 pattern = FillPattern(cl, bpp);
-    Obj1DParam objParam;
+    const u32 pattern = SpreadColor32(cl, bpp);
+    OBJ1DParam objParam;
 
-    objParam.param = pCC->param;
+    objParam.packed = pCC->param;
     const int x0 = x & ~7;
     cy = y & ~7;
     const int x1 = (right + 7) & ~7;
@@ -507,7 +509,7 @@ static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w
     const int areaHeight = pCC->areaHeight;
     const int objWidthShift = objParam.objWidthShift;
     const int objHeightShift = objParam.objHeightShift;
-    const int charSize = CharSize(bpp);
+    const int charSize = GetCharacterSize(bpp);
     const int charX0 = x0 / 8;
     u8 *charBase = pCC->charBase;
     int charY = cy / 8;
@@ -523,7 +525,7 @@ static void ClearArea1D(const NNSG2dCharCanvas *pCC, int cl, int x, int y, int w
             const int left = (cx < x) ? x - cx : 0;
             const int width = MATH_MIN(right - cx, 8) - left;
 
-            FillChar((u32 *)(charBase + charNo * charSize), left, top, width, height, pattern, bpp);
+            ClearChar((u32 *)(charBase + charNo * charSize), left, top, width, height, pattern, bpp);
         }
     }
 }
@@ -580,12 +582,12 @@ void NNS_G2dCharCanvasInitForBG(NNSG2dCharCanvas *pCC, void *charBase, int areaW
 
 void NNS_G2dCharCanvasInitForOBJ1D(NNSG2dCharCanvas *pCC, void *charBase, int areaWidth, int areaHeight,
                                    NNSG2dCharaColorMode colorMode) {
-    const ObjSizeShift *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
-    Obj1DParam param;
+    const ObjectSize *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
+    OBJ1DParam param;
 
     param.objWidthShift = pSize->widthShift;
     param.objHeightShift = pSize->heightShift;
-    InitCharCanvas(pCC, charBase, areaWidth, areaHeight, colorMode, &VTABLE_OBJ1D, param.param);
+    InitCharCanvas(pCC, charBase, areaWidth, areaHeight, colorMode, &VTABLE_OBJ1D, param.packed);
 }
 
 // Maps an area of a text BG's screen to the characters of a canvas, in order. A screen wider than 32 characters is
@@ -593,8 +595,8 @@ void NNS_G2dCharCanvasInitForOBJ1D(NNSG2dCharCanvas *pCC, void *charBase, int ar
 void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop,
                              NNSG2dTextBGWidth scnWidth, int charNo, int cplt) {
     if (scnWidth <= 32) {
-        MapScrToCharLinear((u16 *)scnBase + (scnWidth * areaTop + areaLeft), areaWidth, areaHeight, scnWidth, charNo,
-                           cplt);
+        NNS_G2dMapScrToChar256x16Pltt((u16 *)scnBase + (scnWidth * areaTop + areaLeft), areaWidth, areaHeight, scnWidth,
+                                      charNo, cplt);
     } else {
         const int right = areaLeft + areaWidth;
         const int bottom = areaTop + areaHeight;
@@ -614,7 +616,8 @@ void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int a
     }
 }
 
-static void MapScrToCharLinear(u16 *pScr, int areaWidth, int areaHeight, int scnWidth, int charNo, int cplt) {
+static void NNS_G2dMapScrToChar256x16Pltt(u16 *pScr, int areaWidth, int areaHeight, int scnWidth, int charNo,
+                                          int cplt) {
     const u16 palette = (u16)(cplt << 12);
     int x, y;
 
@@ -629,7 +632,7 @@ static void MapScrToCharLinear(u16 *pScr, int areaWidth, int areaHeight, int scn
 }
 
 // The number of OBJs that NNS_G2dArrangeOBJ1D lays out for an area
-int NNS_G2dCalcRequireOBJ1D(u32 areaWidth, u32 areaHeight) {
+int NNSi_G2dCalcRequiredOBJ(u32 areaWidth, u32 areaHeight) {
     const u32 numX8 = areaWidth / 8;
     const u32 numY8 = areaHeight / 8;
     const u32 numX4 = (areaWidth & 4) / 4;
@@ -648,14 +651,14 @@ int NNS_G2dCalcRequireOBJ1D(u32 areaWidth, u32 areaHeight) {
 // Lays out the OBJs that show a 1D OBJ canvas at x, y, and returns their number
 int NNS_G2dArrangeOBJ1D(GXOamAttr *oam, int areaWidth, int areaHeight, int x, int y, GXOamColorMode color, int charName,
                         NNSG2dOBJVramMode vramMode) {
-    const ObjSizeShift *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
+    const ObjectSize *pSize = &sMaxObjSize[ObjSizeShiftOf(areaHeight)][ObjSizeShiftOf(areaWidth)];
     const int objWidthShift = pSize->widthShift;
     const int objHeightShift = pSize->heightShift;
     const u32 bodyWidth = areaWidth & (0xffffffff << objWidthShift);
     const u32 bodyHeight = areaHeight & (0xffffffff << objHeightShift);
     const int charUnit = (color == GX_OAM_COLORMODE_16) ? 1 : 2;
     int numObj = 0;
-    const u32 shape = GetOamShape(pSize);
+    const u32 shape = OBJSizeToShape(pSize);
     const int numX = areaWidth >> objWidthShift;
     const int numY = areaHeight >> objHeightShift;
     const int charNameStep = ((charUnit << objWidthShift) << objHeightShift) >> vramMode;

@@ -365,7 +365,7 @@ LD_FLAGS = [
     "-interworking",
     "-map closure,unused",
     "-msgstyle gcc",
-    "-m Entry",
+    "-m _start",
 ]
 
 

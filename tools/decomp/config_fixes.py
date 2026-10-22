@@ -14,6 +14,7 @@ after importing names from swan.
     config_fixes.py reloc-addend overlays/ov036 2 0x021841e8                 # a relocation to inside an object
     config_fixes.py remove-symbol overlays/ov005 0x0214f5fd                  # a symbol that is not one
     config_fixes.py add-label . _ll_mul 0x0208d60c                           # a second name for a function
+    config_fixes.py remove-label . _dadd 0x0208c224                          # a second name the function now has
     config_fixes.py add-data overlays/ov307 EGG_DEMO_VIEW_UNK_FX32 0x021df70c  # an object that nothing references
     config_fixes.py add-function . ampOffFreeBlocks thumb 0x20 0x02006dec     # a function that dsd took for a label
     config_fixes.py add-reloc overlays/ov036 load 'overlay(259)' 0x021a039c 0x021ae188  # a pointer dsd missed
@@ -103,6 +104,16 @@ def plan_fix(version: str, module: str, addr: int, action: str, argument: str):
         path = config_dir(version, module) / "symbols.txt"
         lines = path.read_text().splitlines()
         kept = [line for line in lines if not (m := SYMBOL_ADDR_RE.search(line)) or int(m.group(1), 16) != addr]
+        return path, "\n".join(kept) + "\n"
+    if action == "remove_label":
+        # A label that its function no longer needs, such as the runtime's name once the function has it: two symbols
+        # of one name would clash. Only the label of that name at the address goes
+        path = config_dir(version, module) / "symbols.txt"
+        lines = path.read_text().splitlines()
+        kept = [line for line in lines if not (line.split()[0] == argument and "kind:label" in line
+                                               and (m := SYMBOL_ADDR_RE.search(line)) and int(m.group(1), 16) == addr)]
+        if len(kept) == len(lines):
+            return
         return path, "\n".join(kept) + "\n"
     if action == "add_data":
         # A data object that dsd found no reference to, such as a global constant that the compiler folds into code but
@@ -430,6 +441,10 @@ def main():
     command.add_argument("module")
     command.add_argument("name")
     command.add_argument("addresses", nargs="+")
+    command = commands.add_parser("remove-label", help="remove a function's second name")
+    command.add_argument("module")
+    command.add_argument("name")
+    command.add_argument("addresses", nargs="+")
     command = commands.add_parser("add-data", help="add a data object that nothing references")
     command.add_argument("module")
     command.add_argument("name")
@@ -484,7 +499,8 @@ def main():
     action = args.command.replace("-", "_")
     argument = {"reloc_module": getattr(args, "destination", ""), "overlay_id": str(getattr(args, "overlay", "")),
                 "remove_orphan_reloc": getattr(args, "source_module", ""),
-                "reloc_addend": getattr(args, "addend", ""), "add_label": getattr(args, "name", ""), "add_data": getattr(args, "name", ""),
+                "reloc_addend": getattr(args, "addend", ""), "add_label": getattr(args, "name", ""),
+                "remove_label": getattr(args, "name", ""), "add_data": getattr(args, "name", ""),
                 "add_function": f"{getattr(args, 'name', '')}:{getattr(args, 'mode', '')}:{getattr(args, 'size', '')}",
                 "add_reloc": ",".join([getattr(args, "kind", ""), getattr(args, "destination", ""),
                                        getattr(args, "target", ""), *([args.addend] if getattr(args, "addend", None)
@@ -508,6 +524,9 @@ def main():
         fixes = [f for f in fixes if (f[0], f[1], f[2]) != (args.module, addr, action)
                  and not (action in ("section_start", "section_end") and (f[0], f[2], f[3]) == (args.module, action, argument))
                  ] + [(args.module, addr, action, argument)]
+        # Removing a label that a recorded fix added drops both records: dsd never makes such a label itself
+        if action == "remove_label" and (args.module, addr, "add_label", argument) in fixes:
+            fixes = [f for f in fixes if f not in ((args.module, addr, "add_label", argument), (args.module, addr, action, argument))]
         print(f"{action} {args.module} {addr:#010x} {argument}".rstrip())
     save_fixes(fixes)
 

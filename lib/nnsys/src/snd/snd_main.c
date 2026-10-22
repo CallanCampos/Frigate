@@ -1,9 +1,9 @@
 #include "nitro/os.h"
 #include "snd_internal.h"
 
-// NitroSystem's sound library setup and its work each frame (NNS_Snd), and the copy of the ARM7 driver's state that
-// it reads the driver's info from. The file name is a guess, from NitroSystem's names for its sound files. swan names
-// NNS_SndInit and NNS_SndMain NNS_SndInit and NNS_SndMain
+// NitroSystem's sound library setup and its work each frame (NNS_Snd), and the copy of the ARM7 driver's state that it
+// reads the driver's info from. The SDK's file is main.c, and the names are NitroSystem's, as ntrtwl's reconstruction
+// of NitroSystem has them. swan names NNS_SndInit and NNS_SndMain sndInit and sndSync
 
 // Two copies of the driver's state: one the library reads, the other the ARM7 writes. sCurDriverInfo is the one to
 // read, or -1 before the first copy has arrived
@@ -17,7 +17,7 @@ static PMSleepCallbackInfo sPreSleepCallback;
 static void BeginSleep(void *arg);
 static void EndSleep(void *arg);
 
-static inline const SNDDriverInfo *GetCurrentDriverInfo(void) {
+static inline const SNDDriverInfo *GetCurDriverInfo(void) {
     if (sCurDriverInfo < 0) {
         return NULL;
     }
@@ -102,7 +102,7 @@ BOOL NNS_SndUpdateDriverInfo(void) {
 }
 
 BOOL NNSi_SndReadDriverTrackInfo(int playerNo, int trackNo, SNDTrackInfo *trackInfo) {
-    const SNDDriverInfo *driverInfo = GetCurrentDriverInfo();
+    const SNDDriverInfo *driverInfo = GetCurDriverInfo();
 
     if (!driverInfo) {
         return FALSE;

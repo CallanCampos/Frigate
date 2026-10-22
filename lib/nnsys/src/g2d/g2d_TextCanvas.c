@@ -4,7 +4,7 @@
 // flags, in any of the font's directions
 
 void NNSi_G2dTextCanvasDrawString(const NNSG2dTextCanvas *pTxn, int x, int y, int cl, const void *str,
-                                  const void **ppEnd, NNSG2dTextDirection dir) {
+                                  const void **ppEnd, NNSiG2dTextDirection dir) {
     const int hSpace = pTxn->hSpace;
     const NNSG2dFont *pFont = pTxn->pFont;
     const void *pos = str;
@@ -28,8 +28,8 @@ void NNSi_G2dTextCanvasDrawString(const NNSG2dTextCanvas *pTxn, int x, int y, in
 }
 
 // Draws the lines of a text, each aligned in a box areaWidth wide
-static void DrawTextAligned(const NNSG2dTextCanvas *pTxn, int x, int y, int areaWidth, int cl, u32 flags,
-                            const void *txt, NNSG2dTextDirection dir) {
+static void NNSi_G2dTextCanvasDrawTextAlign(const NNSG2dTextCanvas *pTxn, int x, int y, int areaWidth, int cl,
+                                            u32 flags, const void *txt, NNSiG2dTextDirection dir) {
     int lineX, lineY;
     const int linefeed = NNS_G2dFontGetLineFeed(pTxn->pFont) + pTxn->vSpace;
     const void *pos = txt;
@@ -60,7 +60,7 @@ static void DrawTextAligned(const NNSG2dTextCanvas *pTxn, int x, int y, int area
 }
 
 void NNSi_G2dTextCanvasDrawText(const NNSG2dTextCanvas *pTxn, int x, int y, int cl, u32 flags, const void *txt,
-                                NNSG2dTextDirection dir) {
+                                NNSiG2dTextDirection dir) {
     const NNSG2dTextRect rect = NNS_G2dFontGetTextRect(pTxn->pFont, pTxn->hSpace, pTxn->vSpace, txt);
 
     if (flags & NNS_G2D_HORIZONTALORIGIN_CENTER) {
@@ -87,11 +87,11 @@ void NNSi_G2dTextCanvasDrawText(const NNSG2dTextCanvas *pTxn, int x, int y, int 
         y += shift * dir.x;
     }
 
-    DrawTextAligned(pTxn, x, y, rect.width, cl, flags, txt, dir);
+    NNSi_G2dTextCanvasDrawTextAlign(pTxn, x, y, rect.width, cl, flags, txt, dir);
 }
 
 void NNSi_G2dTextCanvasDrawTextRect(const NNSG2dTextCanvas *pTxn, int x, int y, int w, int h, int cl, u32 flags,
-                                    const void *txt, NNSG2dTextDirection dir) {
+                                    const void *txt, NNSiG2dTextDirection dir) {
     if (flags & NNS_G2D_VERTICALALIGN_BOTTOM) {
         const int shift = h - NNSi_G2dFontGetTextHeight(pTxn->pFont, pTxn->vSpace, txt);
 
@@ -105,5 +105,5 @@ void NNSi_G2dTextCanvasDrawTextRect(const NNSG2dTextCanvas *pTxn, int x, int y, 
         y += shift * dir.x;
     }
 
-    DrawTextAligned(pTxn, x, y, w, cl, flags, txt, dir);
+    NNSi_G2dTextCanvasDrawTextAlign(pTxn, x, y, w, cl, flags, txt, dir);
 }

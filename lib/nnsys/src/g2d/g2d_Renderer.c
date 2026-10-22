@@ -4,145 +4,147 @@
 
 // NitroSystem's g2d_Renderer.c: the renderer, which draws cells, cell animations and multi-cell animations to its
 // surfaces through the renderer core, with a matrix stack of its own. The 2D surfaces share their affine matrices
-// through a cache, which tracks, per level of the stack, whether the level's scale and rotation have been cached.
-// The file name is a guess from the NNS_G2d*Renderer* names: the ROM has no string for it. So are the names of the
-// statics and the static functions, and the matrix stack's and cache's layout, which SDK headers may have held as
-// inlines
+// through a cache, which tracks, per level of the stack, whether the level's scale and rotation have been cached. The
+// file name and the names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, the matrix stack's and
+// cache's from its internal headers g2di_RendererMtxStack.hpp, g2di_RendererMtxCache.h and g2di_RendererMtxState.h; the
+// ROM has no string for the file. ApplySRT_, DrawCellToCore_, DrawMCNodeShared_, GetMtxCacheState_, IsRndOverwriteOn_,
+// SetMtxCacheToGroup_ and TranslateFlipped_ are ours, and SetOBJMode_ is a copy of NitroSDK's G2_SetOBJMode
 
-#define MTX_STACK_SIZE 32
-#define MTX_CACHE_NUM 32
-#define MTX_STACK_POS_NONE 0xfffe
+#define NNS_G2D_MAXLENGTH_OF_2DMTXSTACK 32
+#define G2Di_NUM_MTX_CACHE 32
+#define G2Di_RENDERER_MTX_SR_NONE 0xfffe
 
 // How a level of the matrix stack stands with the cache: scaled or rotated at this level, or by the level below,
 // since the last cache. The levels set up together share a group ID
 enum {
-    MTXSTATE_NO_SR,
-    MTXSTATE_SR_NEW,
-    MTXSTATE_SR_INHERITED,
-    MTXSTATE_CACHED,
+    MCM_MTX_NOT_SR,
+    MCM_MTX_SR_NOT_CACHELOADED,
+    MCM_MTX_SR_NOT_CACHELOADED_STACKCHANGED,
+    MCM_MTX_SR_CACHELOADED,
 };
 
 typedef struct {
     u16 mtxCacheIdx;
     u16 groupID;
-    u16 state;
-    u16 pad;
-} MtxCacheState;
+    u16 stateType;
+    u16 pad16;
+} MCMMtxState;
 
-static void SetIdentityMtx_(void);
-static void SetMtxCache_(void);
+static void NNSi_G2dIdentity(void);
+static void NNSi_G2dMCMStoreCurrentMtxToMtxCache(void);
 static void RndCoreCBFuncBeforeCell_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell);
 static void RndCoreCBFuncAfterCell_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell);
-static void RndCoreCBFuncBeforeOam_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx);
-static void RndCoreCBFuncAfterOam_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx);
+static void RndCoreCBFuncBeforeOBJ_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx);
+static void RndCoreCBFuncAfterOBJ_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx);
 static void DrawCellImpl_(const NNSG2dCellData *cell);
 static void DrawCellAnimationImpl_(const NNSG2dCellAnimation *cellAnim);
 static void DrawNode_(const NNSG2dNode *node);
-static void DrawMCInstance_(const NNSG2dMultiCellInstance *instance);
+static void NNS_G2dDrawMultiCell(const NNSG2dMultiCellInstance *instance);
 
 // The stack level from which the matrix is scaled or rotated, the current cell transfer handle, and the matrix that
 // NNS_G2D_RDR_OPZHINT_NOT_SR builds from a translation
-static u16 mtxStackPosSR_ = MTX_STACK_POS_NONE;
-static u32 currentCellVramTransferHandle_ = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
-static MtxFx32 mtxTransOnly_ = { FX32_ONE, 0, 0, FX32_ONE, 0, 0 };
+static u16 firstSRTransformedMtxIdx_ = G2Di_RENDERER_MTX_SR_NONE;
+static u32 currenVramTransferHandle_ = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
+static MtxFx32 mtxI_ = { FX32_ONE, 0, 0, FX32_ONE, 0, 0 };
 
 // Declared in this order, MWCC lays them out as the original does
-static u16 mtxCacheGroupID_;
-static u16 mtxCacheCount_;
+static u16 groupID_;
+static u16 currentMtxCachePos_;
 static NNSG2dRendererInstance *pCurrentInstance_;
 // The SDK's s32, a long, as the public decompilation of NitroSystem declares the stack position: as an int,
 // NNS_G2dPushMtx keeps the position it loaded first where the original loads it again after the bound check
-static long mtxStackPos_;
-static BOOL bNotSR_;
-static fx32 zStack_[MTX_STACK_SIZE];
-static MtxCacheState mtxCacheState_[MTX_STACK_SIZE];
+static long stackPos_;
+static BOOL bDonotUseSRTransform;
+static fx32 fxZStack_[NNS_G2D_MAXLENGTH_OF_2DMTXSTACK];
+static MCMMtxState mtxStateStack_[NNS_G2D_MAXLENGTH_OF_2DMTXSTACK];
 // The matrices, and the same with the inverse scale, which the 2D engines' affine parameters take
-static MtxFx32 mtxStackFor2DHW_[MTX_STACK_SIZE];
-static MtxFx32 mtxStack_[MTX_STACK_SIZE];
-static NNSG2dRndCore2DMtxCache mtxCache_[MTX_CACHE_NUM];
+static MtxFx32 mtxStackFor2DHW_[NNS_G2D_MAXLENGTH_OF_2DMTXSTACK];
+static MtxFx32 mtxStack_[NNS_G2D_MAXLENGTH_OF_2DMTXSTACK];
+static NNSG2dRndCore2DMtxCache mtxCacheBuffer_[G2Di_NUM_MTX_CACHE];
 
-static inline const MtxFx32 *GetCurrentMtx_(void) {
-    if (bNotSR_) {
-        mtxTransOnly_._20 = mtxStack_[mtxStackPos_]._20;
-        mtxTransOnly_._21 = mtxStack_[mtxStackPos_]._21;
-        return &mtxTransOnly_;
+static inline const MtxFx32 *NNSi_G2dGetCurrentMtx(void) {
+    if (bDonotUseSRTransform) {
+        mtxI_._20 = mtxStack_[stackPos_]._20;
+        mtxI_._21 = mtxStack_[stackPos_]._21;
+        return &mtxI_;
     } else {
-        return &mtxStack_[mtxStackPos_];
+        return &mtxStack_[stackPos_];
     }
 }
 
-static inline const MtxFx32 *GetCurrentMtxFor2DHW_(void) {
-    if (bNotSR_) {
-        mtxTransOnly_._20 = mtxStack_[mtxStackPos_]._20;
-        mtxTransOnly_._21 = mtxStack_[mtxStackPos_]._21;
-        return &mtxTransOnly_;
+static inline const MtxFx32 *NNSi_G2dGetCurrentMtxFor2DHW(void) {
+    if (bDonotUseSRTransform) {
+        mtxI_._20 = mtxStack_[stackPos_]._20;
+        mtxI_._21 = mtxStack_[stackPos_]._21;
+        return &mtxI_;
     } else {
-        return &mtxStackFor2DHW_[mtxStackPos_];
+        return &mtxStackFor2DHW_[stackPos_];
     }
 }
 
-static inline MtxCacheState *GetMtxCacheState_(u16 pos) {
-    return &mtxCacheState_[pos];
+static inline MCMMtxState *GetMtxCacheState_(u16 pos) {
+    return &mtxStateStack_[pos];
 }
 
-static inline NNSG2dRndCore2DMtxCache *GetCurrentMtxCache_(void) {
-    return &mtxCache_[GetMtxCacheState_(mtxStackPos_)->mtxCacheIdx];
+static inline NNSG2dRndCore2DMtxCache *NNSi_G2dMCMGetCurrentMtxCache(void) {
+    return &mtxCacheBuffer_[GetMtxCacheState_(stackPos_)->mtxCacheIdx];
 }
 
-static inline void InitMtxCache_(NNSG2dRndCore2DMtxCache *cache) {
+static inline void NNS_G2dInitRndCore2DMtxCache(NNSG2dRndCore2DMtxCache *cache) {
     MI_CpuFillFast(cache->affineIndex, 0xffffffff, sizeof(cache->affineIndex));
 }
 
-static inline u16 GetNewMtxCacheIdx_(void) {
-    u16 idx = mtxCacheCount_;
+static inline u16 NNSi_RMCUseNewMtxCache(void) {
+    u16 idx = currentMtxCachePos_;
 
-    if (mtxCacheCount_ < MTX_CACHE_NUM - 1) {
-        mtxCacheCount_++;
+    if (currentMtxCachePos_ < G2Di_NUM_MTX_CACHE - 1) {
+        currentMtxCachePos_++;
     }
     return idx;
 }
 
-static inline BOOL IsMtxCacheStateNotCached_(const MtxCacheState *state) {
-    return state->state == MTXSTATE_SR_NEW || state->state == MTXSTATE_SR_INHERITED;
+static inline BOOL NNSi_G2dMCMShouldCurrentMtxBeLoadedToMtxCache(const MCMMtxState *state) {
+    return state->stateType == MCM_MTX_SR_NOT_CACHELOADED ||
+           state->stateType == MCM_MTX_SR_NOT_CACHELOADED_STACKCHANGED;
 }
 
-static inline u32 IsMtxSR_(void) {
-    if (!bNotSR_ && mtxStackPosSR_ != MTX_STACK_POS_NONE) {
+static inline u32 NNSi_G2dIsRndCurrentMtxSRTransformed(void) {
+    if (!bDonotUseSRTransform && firstSRTransformedMtxIdx_ != G2Di_RENDERER_MTX_SR_NONE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static inline u32 IsVramTransferHandleValid_(u32 handle) {
+static inline u32 IsRendererDrawingVramTransferedCell_(u32 handle) {
     if (handle != NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE) {
         return TRUE;
     }
     return FALSE;
 }
 
-static inline u32 IsMtxStackEmpty_(void) {
-    if (mtxStackPos_ <= 0) {
+static inline u32 NNSi_G2dIsStackEmpty(void) {
+    if (stackPos_ <= 0) {
         return TRUE;
     }
     return FALSE;
 }
 
 // A new group of levels was scaled or rotated
-static inline void SetMtxStateSR_(void) {
-    MtxCacheState *state;
+static inline void NNSi_G2dMCMSetCurrentMtxSRChanged(void) {
+    MCMMtxState *state;
 
-    if (!IsMtxSR_()) {
-        mtxStackPosSR_ = mtxStackPos_;
+    if (!NNSi_G2dIsRndCurrentMtxSRTransformed()) {
+        firstSRTransformedMtxIdx_ = stackPos_;
     }
-    state = GetMtxCacheState_(mtxStackPos_);
-    switch (state->state) {
-    case MTXSTATE_NO_SR:
-    case MTXSTATE_SR_INHERITED:
-    case MTXSTATE_CACHED:
-        state->groupID = mtxCacheGroupID_++;
-        state->state = MTXSTATE_SR_NEW;
+    state = GetMtxCacheState_(stackPos_);
+    switch (state->stateType) {
+    case MCM_MTX_NOT_SR:
+    case MCM_MTX_SR_NOT_CACHELOADED_STACKCHANGED:
+    case MCM_MTX_SR_CACHELOADED:
+        state->groupID = groupID_++;
+        state->stateType = MCM_MTX_SR_NOT_CACHELOADED;
         break;
-    case MTXSTATE_SR_NEW:
+    case MCM_MTX_SR_NOT_CACHELOADED:
         break;
     }
 }
@@ -163,20 +165,20 @@ static inline void TranslateFlipped_(const NNSG2dSVec2 *pos) {
 }
 
 static inline void ApplySRT_(const NNSG2dSRTData *srt) {
-    if (srt->SRT_EnableFlag & NNS_G2D_SRTFLAG_TRANS) {
+    if (srt->SRT_EnableFlag & NNS_G2D_AFFINEENABLE_TRANS) {
         TranslateFlipped_(&srt->trans);
     }
-    if (srt->SRT_EnableFlag & NNS_G2D_SRTFLAG_ROTZ) {
+    if (srt->SRT_EnableFlag & NNS_G2D_AFFINEENABLE_ROTATE) {
         NNS_G2dRotZ(FX_SinIdx(srt->rotZ), FX_CosIdx(srt->rotZ));
     }
-    if (srt->SRT_EnableFlag & NNS_G2D_SRTFLAG_SCALE) {
+    if (srt->SRT_EnableFlag & NNS_G2D_AFFINEENABLE_SCALE) {
         NNS_G2dScale(srt->scale.x, srt->scale.y, FX32_ONE);
     }
 }
 
 static inline void DrawCellToCore_(const NNSG2dCellData *cell) {
-    if (IsVramTransferHandleValid_(currentCellVramTransferHandle_)) {
-        NNS_G2dRndCoreDrawCellVramTransfer(cell, currentCellVramTransferHandle_);
+    if (IsRendererDrawingVramTransferedCell_(currenVramTransferHandle_)) {
+        NNS_G2dRndCoreDrawCellVramTransfer(cell, currenVramTransferHandle_);
     } else {
         NNS_G2dRndCoreDrawCell(cell);
     }
@@ -200,12 +202,12 @@ static inline void EndRndCoreRendering_(void) {
     NNS_G2dRndCoreEndRendering();
 }
 
-static void SetIdentityMtx_(void) {
-    if (bNotSR_) {
-        mtxStack_[mtxStackPos_]._20 = 0;
-        mtxStack_[mtxStackPos_]._21 = 0;
+static void NNSi_G2dIdentity(void) {
+    if (bDonotUseSRTransform) {
+        mtxStack_[stackPos_]._20 = 0;
+        mtxStack_[stackPos_]._21 = 0;
     } else {
-        MtxFx32 *mtx = &mtxStack_[mtxStackPos_];
+        MtxFx32 *mtx = &mtxStack_[stackPos_];
 
         mtx->_00 = FX32_ONE;
         mtx->_01 = 0;
@@ -213,42 +215,42 @@ static void SetIdentityMtx_(void) {
         mtx->_11 = FX32_ONE;
         mtx->_20 = 0;
         mtx->_21 = 0;
-        mtxStackFor2DHW_[mtxStackPos_] = *mtx;
+        mtxStackFor2DHW_[stackPos_] = *mtx;
     }
-    zStack_[mtxStackPos_] = 0;
+    fxZStack_[stackPos_] = 0;
 }
 
 static inline void SetMtxCacheToGroup_(u16 pos, u16 groupID, u16 cacheIdx) {
     int i;
 
     for (i = pos; i >= 0; i--) {
-        if (mtxCacheState_[i].groupID != groupID) {
+        if (mtxStateStack_[i].groupID != groupID) {
             break;
         }
-        mtxCacheState_[i].state = MTXSTATE_CACHED;
-        mtxCacheState_[i].mtxCacheIdx = cacheIdx;
+        mtxStateStack_[i].stateType = MCM_MTX_SR_CACHELOADED;
+        mtxStateStack_[i].mtxCacheIdx = cacheIdx;
     }
 }
 
 // Gives the current level's scale and rotation a cache, shared with the levels below it of the same group
-static void SetMtxCache_(void) {
-    MtxCacheState *state = GetMtxCacheState_(mtxStackPos_);
+static void NNSi_G2dMCMStoreCurrentMtxToMtxCache(void) {
+    MCMMtxState *state = GetMtxCacheState_(stackPos_);
 
-    if (IsMtxCacheStateNotCached_(state)) {
-        const u16 cacheIdx = GetNewMtxCacheIdx_();
+    if (NNSi_G2dMCMShouldCurrentMtxBeLoadedToMtxCache(state)) {
+        const u16 cacheIdx = NNSi_RMCUseNewMtxCache();
         const u16 groupID = state->groupID;
         const MtxFx32 *mtx;
         NNSG2dRndCore2DMtxCache *cache;
 
         state->mtxCacheIdx = cacheIdx;
-        InitMtxCache_(&mtxCache_[cacheIdx]);
-        mtx = GetCurrentMtxFor2DHW_();
-        cache = GetCurrentMtxCache_();
+        NNS_G2dInitRndCore2DMtxCache(&mtxCacheBuffer_[cacheIdx]);
+        mtx = NNSi_G2dGetCurrentMtxFor2DHW();
+        cache = NNSi_G2dMCMGetCurrentMtxCache();
         cache->m22._00 = mtx->_00;
         cache->m22._01 = mtx->_01;
         cache->m22._10 = mtx->_10;
         cache->m22._11 = mtx->_11;
-        SetMtxCacheToGroup_(mtxStackPos_, groupID, cacheIdx);
+        SetMtxCacheToGroup_(stackPos_, groupID, cacheIdx);
     }
 }
 
@@ -256,14 +258,14 @@ static void RndCoreCBFuncBeforeCell_(NNSG2dRndCoreInstance *core, const NNSG2dCe
     NNSG2dRenderSurface *surface = pCurrentInstance_->pCurrentSurface;
 
     if (surface->pFuncVisibilityCulling != NULL) {
-        if (!surface->pFuncVisibilityCulling(cell, GetCurrentMtx_(), &surface->viewRect)) {
+        if (!surface->pFuncVisibilityCulling(cell, NNSi_G2dGetCurrentMtx(), &surface->viewRect)) {
             core->bDrawEnable = FALSE;
             return;
         }
         core->bDrawEnable = TRUE;
     }
     if (surface->pBeforeDrawCellBackFunc != NULL) {
-        surface->pBeforeDrawCellBackFunc(pCurrentInstance_, surface, cell, GetCurrentMtx_());
+        surface->pBeforeDrawCellBackFunc(pCurrentInstance_, surface, cell, NNSi_G2dGetCurrentMtx());
     }
 }
 
@@ -271,7 +273,7 @@ static void RndCoreCBFuncAfterCell_(NNSG2dRndCoreInstance *core, const NNSG2dCel
     NNSG2dRenderSurface *surface = pCurrentInstance_->pCurrentSurface;
 
     if (surface->pAfterDrawCellBackFunc != NULL) {
-        surface->pAfterDrawCellBackFunc(pCurrentInstance_, surface, cell, GetCurrentMtx_());
+        surface->pAfterDrawCellBackFunc(pCurrentInstance_, surface, cell, NNSi_G2dGetCurrentMtx());
     }
 }
 
@@ -286,7 +288,7 @@ static inline void SetOBJMode_(GXOamAttr *oam, int mode, int cParam) {
     oam->attr2 = (u16)((oam->attr2 & ~GX_OAM_ATTR2_CPARAM_MASK) | (cParam << GX_OAM_ATTR2_CPARAM_SHIFT));
 }
 
-static void RndCoreCBFuncBeforeOam_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx) {
+static void RndCoreCBFuncBeforeOBJ_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx) {
     GXOamAttr *oam = &core->currentOam;
     const NNSG2dPaletteSwapTable *tbl = NNS_G2dGetRendererPaletteTbl(pCurrentInstance_);
 
@@ -321,43 +323,43 @@ static void RndCoreCBFuncBeforeOam_(NNSG2dRndCoreInstance *core, const NNSG2dCel
         NNSG2dRenderSurface *surface = rend->pCurrentSurface;
 
         if (surface->pBeforeDrawOamBackFunc != NULL) {
-            surface->pBeforeDrawOamBackFunc(rend, surface, cell, oamIdx, GetCurrentMtx_());
+            surface->pBeforeDrawOamBackFunc(rend, surface, cell, oamIdx, NNSi_G2dGetCurrentMtx());
         }
     }
 }
 
-static void RndCoreCBFuncAfterOam_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx) {
+static void RndCoreCBFuncAfterOBJ_(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx) {
     NNSG2dRendererInstance *rend = pCurrentInstance_;
     NNSG2dRenderSurface *surface = rend->pCurrentSurface;
 
     if (surface->pAfterDrawOamBackFunc != NULL) {
-        surface->pAfterDrawOamBackFunc(rend, surface, cell, oamIdx, GetCurrentMtx_());
+        surface->pAfterDrawOamBackFunc(rend, surface, cell, oamIdx, NNSi_G2dGetCurrentMtx());
     }
 }
 
 static inline void DrawCellToSurface2D_(const NNSG2dCellData *cell) {
     NNSG2dRndCore2DMtxCache *cache = NULL;
 
-    if (IsMtxSR_()) {
-        if (NNSi_G2dMCRenderState.bDrawMC) {
-            cache = NNSi_G2dMCRenderState.cellAnimMtxCache[NNSi_G2dMCRenderState.currentCellAnimIdx];
+    if (NNSi_G2dIsRndCurrentMtxSRTransformed()) {
+        if (mcRenderState_.bDrawMC) {
+            cache = mcRenderState_.cellAnimMtxCacheTbl[mcRenderState_.currentCellAnimIdx];
             if (cache == NULL) {
-                SetMtxCache_();
-                cache = GetCurrentMtxCache_();
-                NNSi_G2dMCRenderState.cellAnimMtxCache[NNSi_G2dMCRenderState.currentCellAnimIdx] = cache;
+                NNSi_G2dMCMStoreCurrentMtxToMtxCache();
+                cache = NNSi_G2dMCMGetCurrentMtxCache();
+                mcRenderState_.cellAnimMtxCacheTbl[mcRenderState_.currentCellAnimIdx] = cache;
             }
         } else {
-            SetMtxCache_();
-            cache = GetCurrentMtxCache_();
+            NNSi_G2dMCMStoreCurrentMtxToMtxCache();
+            cache = NNSi_G2dMCMGetCurrentMtxCache();
         }
     }
-    NNS_G2dSetRndCoreCurrentMtx2D(GetCurrentMtx_(), cache);
+    NNS_G2dSetRndCoreCurrentMtx2D(NNSi_G2dGetCurrentMtx(), cache);
     DrawCellToCore_(cell);
 }
 
 static inline void DrawCellToSurface3D_(NNSG2dRendererInstance *rend, const NNSG2dCellData *cell) {
-    NNS_G2dSetRndCore3DSoftSpriteZvalue(&rend->rendererCore, zStack_[mtxStackPos_]);
-    NNS_G2dSetRndCoreCurrentMtx3D(GetCurrentMtx_());
+    NNS_G2dSetRndCore3DSoftSpriteZvalue(&rend->rendererCore, fxZStack_[stackPos_]);
+    NNS_G2dSetRndCoreCurrentMtx3D(NNSi_G2dGetCurrentMtx());
     DrawCellToCore_(cell);
 }
 
@@ -392,21 +394,21 @@ static void DrawCellImpl_(const NNSG2dCellData *cell) {
 static void DrawCellAnimationImpl_(const NNSG2dCellAnimation *cellAnim) {
     const NNSG2dCellData *cell = cellAnim->pCurrentCell;
 
-    if (cellAnim->srtCtrl.srtData.SRT_EnableFlag == NNS_G2D_SRTFLAG_IDENTITY) {
-        if (IsVramTransferHandleValid_(cellAnim->cellTransferStateHandle)) {
-            currentCellVramTransferHandle_ = cellAnim->cellTransferStateHandle;
+    if (cellAnim->srtCtrl.srtData.SRT_EnableFlag == NNS_G2D_AFFINEENABLE_NONE) {
+        if (IsRendererDrawingVramTransferedCell_(cellAnim->cellTransferStateHandle)) {
+            currenVramTransferHandle_ = cellAnim->cellTransferStateHandle;
             DrawCellImpl_(cell);
-            currentCellVramTransferHandle_ = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
+            currenVramTransferHandle_ = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
         } else {
             DrawCellImpl_(cell);
         }
     } else {
         NNS_G2dPushMtx();
         ApplySRT_(&cellAnim->srtCtrl.srtData);
-        if (IsVramTransferHandleValid_(cellAnim->cellTransferStateHandle)) {
-            currentCellVramTransferHandle_ = cellAnim->cellTransferStateHandle;
+        if (IsRendererDrawingVramTransferedCell_(cellAnim->cellTransferStateHandle)) {
+            currenVramTransferHandle_ = cellAnim->cellTransferStateHandle;
             DrawCellImpl_(cell);
-            currentCellVramTransferHandle_ = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
+            currenVramTransferHandle_ = NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE;
         } else {
             DrawCellImpl_(cell);
         }
@@ -441,15 +443,15 @@ void NNS_G2dInitRenderer(NNSG2dRendererInstance *rend) {
     rend->overwriteMosaicFlag = FALSE;
     rend->overwritePlttNoOffset = 0;
 
-    mtxStackPos_ = 0;
-    mtxStackPosSR_ = MTX_STACK_POS_NONE;
-    for (i = 0; i < MTX_CACHE_NUM; i++) {
-        InitMtxCache_(&mtxCache_[i]);
+    stackPos_ = 0;
+    firstSRTransformedMtxIdx_ = G2Di_RENDERER_MTX_SR_NONE;
+    for (i = 0; i < G2Di_NUM_MTX_CACHE; i++) {
+        NNS_G2dInitRndCore2DMtxCache(&mtxCacheBuffer_[i]);
     }
-    mtxCacheCount_ = 0;
-    mtxCacheGroupID_ = 0;
-    MI_CpuClearFast(mtxCacheState_, sizeof(mtxCacheState_));
-    bNotSR_ = FALSE;
+    currentMtxCachePos_ = 0;
+    groupID_ = 0;
+    MI_CpuClearFast(mtxStateStack_, sizeof(mtxStateStack_));
+    bDonotUseSRTransform = FALSE;
 }
 
 void NNS_G2dAddRendererTargetSurface(NNSG2dRendererInstance *rend, NNSG2dRenderSurface *surface) {
@@ -463,31 +465,31 @@ void NNS_G2dInitRenderSurface(NNSG2dRenderSurface *surface) {
     surface->type = NNS_G2D_SURFACETYPE_MAX;
     surface->pBeforeDrawCellBackFuncCore = RndCoreCBFuncBeforeCell_;
     surface->pAfterDrawCellBackFuncCore = RndCoreCBFuncAfterCell_;
-    surface->pBeforeDrawOamBackFuncCore = RndCoreCBFuncBeforeOam_;
-    surface->pAfterDrawOamBackFuncCore = RndCoreCBFuncAfterOam_;
+    surface->pBeforeDrawOamBackFuncCore = RndCoreCBFuncBeforeOBJ_;
+    surface->pAfterDrawOamBackFuncCore = RndCoreCBFuncAfterOBJ_;
 }
 
 void NNS_G2dBeginRendering(NNSG2dRendererInstance *rend) {
     int i;
 
     pCurrentInstance_ = rend;
-    mtxStackPos_ = 0;
-    mtxStackPosSR_ = MTX_STACK_POS_NONE;
-    for (i = 0; i < mtxCacheCount_; i++) {
-        InitMtxCache_(&mtxCache_[i]);
+    stackPos_ = 0;
+    firstSRTransformedMtxIdx_ = G2Di_RENDERER_MTX_SR_NONE;
+    for (i = 0; i < currentMtxCachePos_; i++) {
+        NNS_G2dInitRndCore2DMtxCache(&mtxCacheBuffer_[i]);
     }
-    mtxCacheCount_ = 0;
-    mtxCacheGroupID_ = 0;
-    MI_CpuClearFast(mtxCacheState_, sizeof(mtxCacheState_));
+    currentMtxCachePos_ = 0;
+    groupID_ = 0;
+    MI_CpuClearFast(mtxStateStack_, sizeof(mtxStateStack_));
     G3_PushMtx();
     G3_Identity();
-    SetIdentityMtx_();
+    NNSi_G2dIdentity();
 }
 
 void NNS_G2dBeginRenderingEx(NNSG2dRendererInstance *rend, u32 opzHint) {
     rend->opzHint = opzHint;
     if (opzHint & NNS_G2D_RDR_OPZHINT_NOT_SR) {
-        bNotSR_ = TRUE;
+        bDonotUseSRTransform = TRUE;
     }
     if (opzHint & NNS_G2D_RDR_OPZHINT_LOCK_PARAMS) {
         NNSG2dRenderSurface *surface = rend->pTargetSurfaceList;
@@ -509,7 +511,7 @@ void NNS_G2dEndRendering(void) {
         const u32 opzHint = pCurrentInstance_->opzHint;
 
         if (opzHint & NNS_G2D_RDR_OPZHINT_NOT_SR) {
-            bNotSR_ = FALSE;
+            bDonotUseSRTransform = FALSE;
         }
         if (opzHint & NNS_G2D_RDR_OPZHINT_LOCK_PARAMS) {
             EndRndCoreRendering_();
@@ -549,30 +551,30 @@ void NNS_G2dDrawCellAnimation(const NNSG2dCellAnimation *cellAnim) {
     }
 }
 
-static inline u16 GetMCNodeCellAnimIdx_(const NNSG2dMultiCellHierarchyData *node) {
+static inline u16 NNSi_G2dGetMC2NodeCellAinmIdx(const NNSG2dMultiCellHierarchyData *node) {
     return (node->nodeAttr & 0xff00) >> 8;
 }
 
 static inline void DrawMCNodeShared_(const NNSG2dMultiCellInstance *instance, u16 nodeIdx) {
     const NNSG2dMultiCellHierarchyData *node = &instance->pCurrentMultiCell->pHierDataArray[nodeIdx];
-    const u16 cellAnimIdx = GetMCNodeCellAnimIdx_(node);
-    NNSG2dMCCellAnimation *cellAnims = instance->pCellAnimArray;
+    const u16 cellAnimIdx = NNSi_G2dGetMC2NodeCellAinmIdx(node);
+    NNSG2dMCCellAnimation *cellAnims = instance->pCellAnimInstasnces;
 
-    NNSi_G2dMCRenderState.currentCellAnimIdx = cellAnimIdx;
+    mcRenderState_.currentCellAnimIdx = cellAnimIdx;
     NNS_G2dPushMtx();
     TranslateFlipped_(&node->pos);
     DrawCellAnimationImpl_(&cellAnims[cellAnimIdx].cellAnim);
     NNS_G2dPopMtx(1);
 }
 
-static void DrawMCInstance_(const NNSG2dMultiCellInstance *instance) {
+static void NNS_G2dDrawMultiCell(const NNSG2dMultiCellInstance *instance) {
     u16 i;
 
     if (instance->mcType == NNS_G2D_MCTYPE_SHARE_CELLANIM) {
         for (i = 0; i < instance->pCurrentMultiCell->numCellAnim; i++) {
-            NNSi_G2dMCRenderState.cellAnimMtxCache[i] = NULL;
+            mcRenderState_.cellAnimMtxCacheTbl[i] = NULL;
         }
-        NNSi_G2dMCRenderState.bDrawMC = TRUE;
+        mcRenderState_.bDrawMC = TRUE;
         if (pCurrentInstance_->spriteZoffsetStep != 0) {
             fx32 step = NNSi_G2dGetOamSoftEmuAutoZOffsetStep();
 
@@ -589,9 +591,9 @@ static void DrawMCInstance_(const NNSG2dMultiCellInstance *instance) {
                 DrawMCNodeShared_(instance, i);
             }
         }
-        NNSi_G2dMCRenderState.bDrawMC = FALSE;
+        mcRenderState_.bDrawMC = FALSE;
     } else {
-        const NNSG2dNode *nodes = instance->pCellAnimArray;
+        const NNSG2dNode *nodes = instance->pCellAnimInstasnces;
 
         if (pCurrentInstance_->spriteZoffsetStep != 0) {
             fx32 step = NNSi_G2dGetOamSoftEmuAutoZOffsetStep();
@@ -613,70 +615,70 @@ static void DrawMCInstance_(const NNSG2dMultiCellInstance *instance) {
 }
 
 void NNS_G2dDrawMultiCellAnimation(const NNSG2dMultiCellAnimation *mcAnim) {
-    if (mcAnim->srtCtrl.srtData.SRT_EnableFlag == NNS_G2D_SRTFLAG_IDENTITY) {
-        DrawMCInstance_(&mcAnim->multiCellInstance);
+    if (mcAnim->srtCtrl.srtData.SRT_EnableFlag == NNS_G2D_AFFINEENABLE_NONE) {
+        NNS_G2dDrawMultiCell(&mcAnim->multiCellInstance);
     } else {
         NNS_G2dPushMtx();
         ApplySRT_(&mcAnim->srtCtrl.srtData);
-        DrawMCInstance_(&mcAnim->multiCellInstance);
+        NNS_G2dDrawMultiCell(&mcAnim->multiCellInstance);
         NNS_G2dPopMtx(1);
     }
 }
 
-static inline u32 CanPushMtx_(int pos) {
-    if (pos < MTX_STACK_SIZE) {
+static inline u32 NNSi_G2dStackHasEnoughCapacity(int pos) {
+    if (pos < NNS_G2D_MAXLENGTH_OF_2DMTXSTACK) {
         return TRUE;
     }
     return FALSE;
 }
 
-static inline void PushMtxStack_(void) {
-    const int next = mtxStackPos_ + 1;
+static inline void NNSi_G2dMtxPush(void) {
+    const int next = stackPos_ + 1;
 
-    if (CanPushMtx_(next)) {
-        if (bNotSR_) {
-            mtxStack_[next]._20 = mtxStack_[mtxStackPos_]._20;
-            mtxStack_[next]._21 = mtxStack_[mtxStackPos_]._21;
-            zStack_[next] = zStack_[mtxStackPos_];
+    if (NNSi_G2dStackHasEnoughCapacity(next)) {
+        if (bDonotUseSRTransform) {
+            mtxStack_[next]._20 = mtxStack_[stackPos_]._20;
+            mtxStack_[next]._21 = mtxStack_[stackPos_]._21;
+            fxZStack_[next] = fxZStack_[stackPos_];
         } else {
-            mtxStack_[next] = mtxStack_[mtxStackPos_];
-            mtxStackFor2DHW_[next] = mtxStackFor2DHW_[mtxStackPos_];
-            zStack_[next] = zStack_[mtxStackPos_];
+            mtxStack_[next] = mtxStack_[stackPos_];
+            mtxStackFor2DHW_[next] = mtxStackFor2DHW_[stackPos_];
+            fxZStack_[next] = fxZStack_[stackPos_];
         }
-        mtxStackPos_ = next;
+        stackPos_ = next;
     }
 }
 
 void NNS_G2dPushMtx(void) {
     if (!(pCurrentInstance_->opzHint & NNS_G2D_RDR_OPZHINT_NOT_SR)) {
-        const u16 lastPos = mtxStackPos_;
+        const u16 lastPos = stackPos_;
 
-        PushMtxStack_();
-        mtxCacheState_[(u16)mtxStackPos_] = mtxCacheState_[lastPos];
-        if (mtxCacheState_[lastPos].state == MTXSTATE_SR_NEW) {
-            mtxCacheState_[(u16)mtxStackPos_].state = MTXSTATE_SR_INHERITED;
+        NNSi_G2dMtxPush();
+        mtxStateStack_[(u16)stackPos_] = mtxStateStack_[lastPos];
+        if (mtxStateStack_[lastPos].stateType == MCM_MTX_SR_NOT_CACHELOADED) {
+            mtxStateStack_[(u16)stackPos_].stateType = MCM_MTX_SR_NOT_CACHELOADED_STACKCHANGED;
         } else {
-            mtxCacheState_[(u16)mtxStackPos_].state = mtxCacheState_[lastPos].state;
+            mtxStateStack_[(u16)stackPos_].stateType = mtxStateStack_[lastPos].stateType;
         }
     } else {
-        PushMtxStack_();
+        NNSi_G2dMtxPush();
     }
 }
 
 void NNS_G2dPopMtx(u16 num) {
-    if (!IsMtxStackEmpty_()) {
-        mtxStackPos_--;
-        if (mtxStackPosSR_ > mtxStackPos_) {
-            mtxStackPosSR_ = MTX_STACK_POS_NONE;
+    if (!NNSi_G2dIsStackEmpty()) {
+        stackPos_--;
+        if (firstSRTransformedMtxIdx_ > stackPos_) {
+            firstSRTransformedMtxIdx_ = G2Di_RENDERER_MTX_SR_NONE;
         }
     }
 }
 
 void NNS_G2dTranslate(fx32 x, fx32 y, fx32 z) {
-    if (bNotSR_) {
-        mtxStack_[mtxStackPos_]._20 += x;
-        mtxStack_[mtxStackPos_]._21 += y;
-        zStack_[mtxStackPos_] += z;
+    if (bDonotUseSRTransform) {
+        mtxStack_[stackPos_]._20 += x;
+        mtxStack_[stackPos_]._21 += y;
+        fxZStack_[stackPos_] += z;
     } else {
         MtxFx32 mtx;
 
@@ -686,9 +688,9 @@ void NNS_G2dTranslate(fx32 x, fx32 y, fx32 z) {
         mtx._11 = FX32_ONE;
         mtx._20 = x;
         mtx._21 = y;
-        MAT32_Mul(&mtx, &mtxStack_[mtxStackPos_], &mtxStack_[mtxStackPos_]);
-        MAT32_Mul(&mtx, &mtxStackFor2DHW_[mtxStackPos_], &mtxStackFor2DHW_[mtxStackPos_]);
-        zStack_[mtxStackPos_] += z;
+        NNSi_G2dMtxConcat32(&mtx, &mtxStack_[stackPos_], &mtxStack_[stackPos_]);
+        NNSi_G2dMtxConcat32(&mtx, &mtxStackFor2DHW_[stackPos_], &mtxStackFor2DHW_[stackPos_]);
+        fxZStack_[stackPos_] += z;
     }
 }
 
@@ -701,15 +703,15 @@ void NNS_G2dScale(fx32 x, fx32 y, fx32 z) {
     mtx._11 = y;
     mtx._20 = 0;
     mtx._21 = 0;
-    MAT32_Mul(&mtx, &mtxStack_[mtxStackPos_], &mtxStack_[mtxStackPos_]);
+    NNSi_G2dMtxConcat32(&mtx, &mtxStack_[stackPos_], &mtxStack_[stackPos_]);
     mtx._00 = FX_Inv(x);
     mtx._01 = 0;
     mtx._10 = 0;
     mtx._11 = FX_Inv(y);
     mtx._20 = 0;
     mtx._21 = 0;
-    MAT32_Mul(&mtx, &mtxStackFor2DHW_[mtxStackPos_], &mtxStackFor2DHW_[mtxStackPos_]);
-    SetMtxStateSR_();
+    NNSi_G2dMtxConcat32(&mtx, &mtxStackFor2DHW_[stackPos_], &mtxStackFor2DHW_[stackPos_]);
+    NNSi_G2dMCMSetCurrentMtxSRChanged();
 }
 
 void NNS_G2dRotZ(fx32 sin, fx32 cos) {
@@ -721,9 +723,9 @@ void NNS_G2dRotZ(fx32 sin, fx32 cos) {
     mtx._11 = cos;
     mtx._20 = 0;
     mtx._21 = 0;
-    MAT32_Mul(&mtx, &mtxStack_[mtxStackPos_], &mtxStack_[mtxStackPos_]);
-    MAT32_Mul(&mtx, &mtxStackFor2DHW_[mtxStackPos_], &mtxStackFor2DHW_[mtxStackPos_]);
-    SetMtxStateSR_();
+    NNSi_G2dMtxConcat32(&mtx, &mtxStack_[stackPos_], &mtxStack_[stackPos_]);
+    NNSi_G2dMtxConcat32(&mtx, &mtxStackFor2DHW_[stackPos_], &mtxStackFor2DHW_[stackPos_]);
+    NNSi_G2dMCMSetCurrentMtxSRChanged();
 }
 
 const NNSG2dPaletteSwapTable *NNS_G2dGetRendererPaletteTbl(NNSG2dRendererInstance *rend) {

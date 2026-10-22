@@ -65,7 +65,7 @@ void BlinkPalAnm_SetPalBufferArc(BlinkPalAnm *anm, u32 arcId, u32 fileId, u32 st
     anm->startColors = GFL_HeapAllocate(anm->heapId, anm->count * sizeof(u16), FALSE, "blink_palanm.c", 102);
     anm->endColors = GFL_HeapAllocate(anm->heapId, anm->count * sizeof(u16), FALSE, "blink_palanm.c", 103);
     file = GFL_G2DIOReadNCLR(arcId, fileId, &palette, anm->heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(&colors[startPos], anm->startColors, anm->count * sizeof(u16));
     MI_CpuCopy8(&colors[endPos], anm->endColors, anm->count * sizeof(u16));
     GFL_HeapFree(file);
@@ -79,7 +79,7 @@ void BlinkPalAnm_SetPalBufferArcTool(BlinkPalAnm *anm, ArcTool *arc, u32 fileId,
     anm->startColors = GFL_HeapAllocate(anm->heapId, anm->count * sizeof(u16), FALSE, "blink_palanm.c", 133);
     anm->endColors = GFL_HeapAllocate(anm->heapId, anm->count * sizeof(u16), FALSE, "blink_palanm.c", 134);
     file = GFL_G2DIOReadNCLRArc(arc, fileId, &palette, anm->heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(&colors[startPos], anm->startColors, anm->count * sizeof(u16));
     MI_CpuCopy8(&colors[endPos], anm->endColors, anm->count * sizeof(u16));
     GFL_HeapFree(file);

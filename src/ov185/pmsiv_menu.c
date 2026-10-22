@@ -570,7 +570,7 @@ static void PMSIVMenu_SetupSearchButtons(PMSIVMenu *wk) {
 static void PMSIVMenu_SetupColors(PMSIVMenu *wk) {
     NNSG2dPaletteData *palette;
     void *buf = GFL_G2DIOReadNCLR(ARCID_PMSI, 7, &palette, HEAPID_PMS_INPUT);
-    u16 *colors = palette->rawData;
+    u16 *colors = palette->pRawData;
 
     MI_CpuCopy8(&colors[75], wk->pulseFrom, sizeof(wk->pulseFrom));
     MI_CpuCopy8(&colors[59], wk->pulseTo, sizeof(wk->pulseTo));

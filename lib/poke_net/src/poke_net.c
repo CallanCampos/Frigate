@@ -46,7 +46,7 @@ typedef struct {
 } POKE_NET_CONTROL;
 
 // The compiler lays these out from the last to the first: the stacks come first in the ROM
-static POKE_NET_SSL_CONNECTION sPOKE_NET_SslConnection;
+static CPSSslConnection sPOKE_NET_SslConnection;
 static POKE_NET_CONTROL gPOKE_NET_Control;
 static u8 sPOKE_NET_RecvThreadStack[POKE_NET_THREAD_STACK_SIZE];
 static u8 sPOKE_NET_ThreadStack[POKE_NET_THREAD_STACK_SIZE];

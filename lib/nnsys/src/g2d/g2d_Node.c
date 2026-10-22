@@ -1,7 +1,8 @@
 #include "nnsys/g2d.h"
 
-// NitroSystem's multi-cell nodes. The file name is a guess: this one function sits alone between the SRT control and
-// the cell animation, and only the multi-cell animation calls it
+// NitroSystem's multi-cell nodes. The file name is NitroSystem's, as ntrtwl's reconstruction of NitroSystem has it:
+// this one function sits alone between the SRT control and the cell animation, and only the multi-cell animation calls
+// it
 
 void NNSi_G2dInitializeNode(NNSG2dNode *node, NNSG2dNodeType type) {
     node->pContent = NULL;

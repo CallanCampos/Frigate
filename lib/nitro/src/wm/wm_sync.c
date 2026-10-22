@@ -1,8 +1,8 @@
 // The wireless manager's functions that give their answer at once (libwm, TwlSDK's wm/ARM9/src/wm_sync.c, by its place
-// in the library: the file name is a guess): setting the callbacks of indications and ports, reading the status and
-// the data of the multi-point mode, the sizes of its buffers, the channels and the link level, the dispersion of the
-// beacon and the scan, the elements of a beacon and the next TGID. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// in the library; ntrtwl's reconstruction of NitroSDK has the same file): setting the callbacks of indications and
+// ports, reading the status and the data of the multi-point mode, the sizes of its buffers, the channels and the link
+// level, the dispersion of the beacon and the scan, the elements of a beacon and the next TGID. The names are
+// NitroSDK's, as that reconstruction has them
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/rtc.h"
@@ -51,10 +51,10 @@ WMErrCode WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg) {
 
     w9b = WMi_GetSystemWork();
     w9b->portCallbackTable[port] = callback;
-    w9b->portCallbackArgTable[port] = arg;
+    w9b->portCallbackArgument[port] = arg;
     if (callback != NULL) {
-        cb.connectedAidBitmap = WMi_GetConnectedAidBitmap();
-        cb.myAid = WMi_GetMyAid();
+        cb.connectedAidBitmap = WM_GetConnectedAIDs();
+        cb.myAid = WM_GetAID();
         callback(&cb);
     }
     OS_RestoreInterrupts(irq);
@@ -82,12 +82,12 @@ int WM_GetMPSendBufferSize(void) {
     if (WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_CHILD) != WM_ERRCODE_SUCCESS) {
         return 0;
     }
-    DC_InvalidateRange(&w9b->status->mpFlag, 4);
-    if (w9b->status->mpFlag == TRUE) {
+    DC_InvalidateRange(&w9b->status->mp_flag, 4);
+    if (w9b->status->mp_flag == TRUE) {
         return 0;
     }
-    DC_InvalidateRange(&w9b->status->mpSendSize, 4);
-    return (w9b->status->mpSendSize + 0x1f) & ~0x1f;
+    DC_InvalidateRange(&w9b->status->mp_maxSendSize, 4);
+    return (w9b->status->mp_maxSendSize + 0x1f) & ~0x1f;
 }
 
 int WM_GetMPReceiveBufferSize(void) {
@@ -98,8 +98,8 @@ int WM_GetMPReceiveBufferSize(void) {
     if (WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_CHILD) != WM_ERRCODE_SUCCESS) {
         return 0;
     }
-    DC_InvalidateRange(&w9b->status->mpFlag, 4);
-    if (w9b->status->mpFlag == TRUE) {
+    DC_InvalidateRange(&w9b->status->mp_flag, 4);
+    if (w9b->status->mp_flag == TRUE) {
         return 0;
     }
     DC_InvalidateRange(&w9b->status->aid, 2);
@@ -107,8 +107,8 @@ int WM_GetMPReceiveBufferSize(void) {
     if (w9b->status->aid != 0) {
         isParent = FALSE;
     }
-    DC_InvalidateRange(&w9b->status->mpRecvSize, 2);
-    size = w9b->status->mpRecvSize;
+    DC_InvalidateRange(&w9b->status->mp_maxRecvSize, 2);
+    size = w9b->status->mp_maxRecvSize;
     if (isParent == TRUE) {
         DC_InvalidateRange(&w9b->status->maxEntry, 2);
         size += 0xc;
@@ -135,8 +135,8 @@ WMMpRecvData *WM_ReadMPData(const WMMpRecvHeader *header, u16 aid) {
     if (aid < 1 || aid > 15) {
         return NULL;
     }
-    DC_InvalidateRange(&w9b->status->childBitmap, 2);
-    if (!(w9b->status->childBitmap & (1 << aid))) {
+    DC_InvalidateRange(&w9b->status->child_bitmap, 2);
+    if (!(w9b->status->child_bitmap & (1 << aid))) {
         return NULL;
     }
     if (header->count == 0 || header->count > 15) {
@@ -175,8 +175,8 @@ WMLinkLevel WM_GetLinkLevel(void) {
     DC_InvalidateRange(w9b->status, 2);
     switch (w9b->status->state) {
     case WM_STATE_MP_PARENT:
-        DC_InvalidateRange(&w9b->status->childBitmap, 2);
-        if (w9b->status->childBitmap == 0) {
+        DC_InvalidateRange(&w9b->status->child_bitmap, 2);
+        if (w9b->status->child_bitmap == 0) {
             return WM_LINK_LEVEL_0;
         }
         // fall through

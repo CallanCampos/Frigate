@@ -62,10 +62,10 @@ u32 DSProt_Crc32(const u8 *data, u32 size) {
 }
 
 static inline u32 DSProt_GetRomSize(void) {
-    const ROMHeader *header;
+    const CARDRomHeader *header;
     u32 size;
-    header = (const ROMHeader *)CARD_GetRomHeader();
-    size = 1 << (header->deviceSize + 17);
+    header = (const CARDRomHeader *)CARD_GetRomHeader();
+    size = 1 << (header->device_size + 17);
     return size;
 }
 
@@ -78,7 +78,7 @@ static inline void DSProt_ReadCardRaw(void *dest, u32 address, s32 size, u8 flag
     u32 base;
     vu8 *regs;
     u32 header;
-    s32 control;
+    u32 control;
     s32 offset;
     u16 exmemcnt;
     u32 page;
@@ -96,7 +96,7 @@ static inline void DSProt_ReadCardRaw(void *dest, u32 address, s32 size, u8 flag
     header -= 13;
     header <<= 5;
     control = (*(u32 *)header & ~0x07000000) | 0xa1000000;
-    offset = -(int)(address & 0x1ff);
+    offset = -(s32)(address & 0x1ff);
     while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000) {
     }
     *(vu8 *)(base + OFFSET_AUXSPICNT_H) = 0x80;
@@ -119,7 +119,8 @@ static inline void DSProt_ReadCardRaw(void *dest, u32 address, s32 size, u8 flag
                 word = *(vu32 *)(base + OFFSET_CARD_DATA);
 
                 if (offset >= 0 && offset < size) {
-                    // The untyped raw-reader interface counts bytes; each ready card transfer supplies a word.
+                    // The address is an integer sum here, where overlay 337's copy (dsprot_detect_multi.c) adds to a
+                    // u8 pointer: MWCC compiles the two differently, and the ROM's copies differ the same way
                     *(u32 *)((u32)dest + offset) = word;
                 }
                 offset += 4;

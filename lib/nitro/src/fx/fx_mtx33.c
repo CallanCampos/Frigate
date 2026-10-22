@@ -21,8 +21,9 @@ asm void MTX_Identity33_(MtxFx33 *mtx) {
 
 // clang-format on
 
+// Copies through ldm and stm with writeback, which MWCC does not generate
 // clang-format off
-asm void MAT3_To4x4(const MtxFx33 *src, MtxFx44 *dst) {
+asm void MTX_Copy33To44_(const MtxFx33 *src, MtxFx44 *dst) {
     stmdb sp!, {r4}
     mov ip, #0
     ldmia r0!, {r2, r3, r4}
@@ -43,8 +44,9 @@ asm void MAT3_To4x4(const MtxFx33 *src, MtxFx44 *dst) {
 // clang-format on
 #pragma thumb on
 
+// Stores through stm with writeback, which MWCC does not generate
 // clang-format off
-asm void MAT3_Scaling(MtxFx33 *mtx, fx32 x, fx32 y, fx32 z) {
+asm void MTX_Scale33_(MtxFx33 *mtx, fx32 x, fx32 y, fx32 z) {
     stmia r0!, {r1}
     mov r1, #0
     str r3, [r0, #0x1c]
@@ -131,7 +133,7 @@ asm void MTX_RotZ33_(MtxFx33 *mtx, fx32 sin, fx32 cos) {
 // clang-format on
 
 #pragma thumb off
-void MAT3_RotationAxisAngle(MtxFx33 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos) {
+void MTX_RotAxis33(MtxFx33 *mtx, const VecFx32 *axis, fx32 sin, fx32 cos) {
     fx64 omc = FX32_ONE - cos;
     fx64 x = axis->x;
     fx64 y = axis->y;
@@ -159,7 +161,7 @@ void MAT3_RotationAxisAngle(MtxFx33 *mtx, const VecFx32 *axis, fx32 sin, fx32 co
     mtx->m[2][1] = axisTerm - sinTerm;
 }
 
-int MAT3_Invert(const MtxFx33 *mtx, MtxFx33 *inv) {
+int MTX_Inverse33(const MtxFx33 *mtx, MtxFx33 *inv) {
     MtxFx33 tmp;
     MtxFx33 *dst;
     fx32 t0, t1, t2, u0, u1, u2, u3, u4, u5;

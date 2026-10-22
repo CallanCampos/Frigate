@@ -55,7 +55,7 @@ u32 DSProt_DecryptFunctionMulti(u32 key, u32 code, u32 end) {
     words[1] = end ^ ((key << 8) | (key >> 24));
     words[2] = end ^ ((key << 16) | (key >> 16));
     words[3] = end ^ ((key << 24) | (key >> 8));
-    ((int (*)(u32 *, u32, u32, u32))(DSProt_DecryptCodeEntryMulti - 0x2200))(words, code, code, end);
+    ((DSProtCodeWithKeyFunc)(DSProt_DecryptCodeEntryMulti - 0x2200))((const u8 *)words, (u8 *)code, (u8 *)code, end);
     DSProt_FlushCache();
     return code;
 }
@@ -72,7 +72,7 @@ u32 DSProt_EncryptFunctionMulti(u32 key, u32 code, u32 end) {
     words[1] = end ^ ((key << 8) | (key >> 24));
     words[2] = end ^ ((key << 16) | (key >> 16));
     words[3] = end ^ ((key << 24) | (key >> 8));
-    ((int (*)(u32 *, u8 *, u8 *, u32))(DSProt_EncryptCodeEntryMulti - 0x2200))(words, dest, dest, end);
+    ((DSProtCodeWithKeyFunc)(DSProt_EncryptCodeEntryMulti - 0x2200))((const u8 *)words, dest, dest, end);
     DSProt_FlushCache();
     return key + (((u32)DSProt_WorkMulti + 0x2200) + (code & 0xffff));
 }

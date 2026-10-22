@@ -29,7 +29,7 @@ void NNS_G3dGetCurrentMtx(MtxFx43 *pos, MtxFx33 *nrm) {
 
 void NNS_G3dInit(void) {
     G3X_Init();
-    NNS_G3DRenderStateInit();
+    NNS_G3dGlbInit();
     G3X_SetFifoIntrCond(GX_FIFOINTR_COND_EMPTY);
 }
 
@@ -74,7 +74,7 @@ int NNS_G3dWorldPosToScrPos(const VecFx32 *world, int *x, int *y) {
         result = 0;
     }
     // The viewport's y counts up from the bottom of the screen, whose last line is 191
-    NNS_G3DGetViewport(&x1, &y1, &x2, &y2);
+    NNS_G3dGlbGetViewPort(&x1, &y1, &x2, &y2);
     width = x2 - x1;
     height = y2 - y1;
     *x = x1 + ((fracX * width + FX32_HALF) >> FX32_SHIFT);
@@ -105,7 +105,7 @@ int NNS_G3dScrPosToWorldLine(int px, int py, VecFx32 *nearPos, VecFx32 *farPos) 
     fx32 farY;
     fx32 farZ;
 
-    NNS_G3DGetViewport(&x1, &y1, &x2, &y2);
+    NNS_G3dGlbGetViewPort(&x1, &y1, &x2, &y2);
     height = y2 - y1;
     ndcX = FX_Div((px - x1) << FX32_SHIFT, (x2 - x1) << FX32_SHIFT);
     ndcY = FX_Div((py + y1 - 191) << FX32_SHIFT, -height << FX32_SHIFT);
@@ -116,7 +116,7 @@ int NNS_G3dScrPosToWorldLine(int px, int py, VecFx32 *nearPos, VecFx32 *farPos) 
     }
     ndcX = (ndcX - FX32_HALF) * 2;
     ndcY = (ndcY - FX32_HALF) * 2;
-    inv = NNS_G3DGetInvViewProjectionMatrix();
+    inv = NNS_G3dGlbGetInvVP();
     wBase = (fx32)(((fx64)ndcX * inv->m[0][3] + (fx64)ndcY * inv->m[1][3]) >> FX32_SHIFT) + inv->m[3][3];
     FX_InvAsync(wBase - inv->m[2][3]);
     x = (fx32)(((fx64)ndcX * inv->m[0][0] + (fx64)ndcY * inv->m[1][0]) >> FX32_SHIFT) + inv->m[3][0];

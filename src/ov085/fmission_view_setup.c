@@ -500,7 +500,7 @@ static void FMissionViewSetup_LoadResources(FMissionView *view, ArcTool *arc) {
     PaletteFade_LoadNCLR(view->fade, 0, 1, view->tmpHeapId, PALFADE_BUFFER_SUB_OBJ, 0x20, 0xe0);
     view->iconPaletteFile = GFL_ArcToolReadHeapNew(iconArc, 0, view->heapId);
     NNS_G2dGetUnpackedPaletteData(view->iconPaletteFile, &view->iconPaletteData);
-    view->iconPalettes = view->iconPaletteData->rawData;
+    view->iconPalettes = view->iconPaletteData->pRawData;
     for (i = 0; i < FMISSION_VIEW_LOOK_COUNT; i++) {
         view->iconChars[i].file = GFL_ArcToolReadHeapNew(iconArc, i + 49, view->heapId);
         NNS_G2dGetUnpackedCharacterData(view->iconChars[i].file, &view->iconChars[i].data);

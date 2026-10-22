@@ -5,21 +5,22 @@
 // material's texture matrix. They are the ones that cgtool.c's tables hold. The file is named after NitroSystem's
 // maya.c. A Maya joint can cancel the scale of its parent (segment scale compensate): the parent keeps its inverse
 // scale for the joint, and the joint scales by it after its translation. A texture matrix is made by one of eight
-// functions, by which of the scale, rotation and translation the material's result has. The three global names are
-// NitroSystem's as recalled, parallel to basic.c's; the statics' names are ours
+// functions, by which of the scale, rotation and translation the material's result has. The names are NitroSystem's, as
+// ntrtwl's reconstruction of NitroSystem has them, except sTexMtxMayaFuncs and sendPacket_, which are ours:
+// NitroSystem's table is calcTexMtx_, a static inside its function
 
 // A function that makes the elements of a material's texture matrix that its scale, rotation and translation set: the
 // matrix (of which the caller sets the others) and the result
 typedef void (*TexMtxMayaFunc)(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
 
-static void calcTexMtxMayaSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
-static void calcTexMtxMayaIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flag_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
+static void texmtxCalc_flagTRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result);
 
 // Sends a joint's pose to the geometry engine. A joint that cancels the scale of its parent sends the translation
 // first and then the inverse of its parent's scale (scaleEx0), so that the parent's scale moves the joint but does not
@@ -31,7 +32,7 @@ void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result) {
     if (!(result->flag & NNS_G3D_JNTANM_RESULTFLAG_TRANS_ZERO)) {
         hasTrans = TRUE;
     }
-    if ((result->flag & NNS_G3D_JNTANM_RESULTFLAG_MAYA_SSC_APPLY) &&
+    if ((result->flag & NNS_G3D_JNTANM_RESULTFLAG_MAYA_SSC) &&
         !(result->flag & NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE)) {
         if (hasTrans) {
             NNS_G3dGeTranslateVec(&result->trans);
@@ -55,39 +56,39 @@ void NNSi_G3dSendJointSRTMaya(const NNSG3dJntAnmResult *result) {
 
 // Sets the scale of a joint's pose from the scale of its node: the node's scale, or a scale of one if the node's flag
 // says so. A joint whose children cancel its scale (the NODEDESC command's flag) keeps its inverse scale in
-// g_NNSG3DRenderCache and whether its scale is one in the render state. A joint that cancels its parent's scale takes
+// NNS_G3dRSOnGlb and whether its scale is one in the render state. A joint that cancels its parent's scale takes
 // the parent's inverse scale as its scaleEx0, or flags it as one if the parent's scale is
 void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const fx32 *p, const u8 *cmd, u32 srtFlag) {
     u32 flags = cmd[3];
 
     if (srtFlag & NNS_G3D_SRTFLAG_SCALE_ONE) {
         result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALE_ONE;
-        if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_CHILD) {
+        if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYASSC_PARENT) {
             u32 node = cmd[1];
 
-            g_NNSG3DModelRenderer->isScaleOne[node >> 5] |= 1 << (node & 0x1f);
+            NNS_G3dRS->isScaleCacheOne[node >> 5] |= 1 << (node & 0x1f);
         }
     } else {
         result->scale.x = p[0];
         result->scale.y = p[1];
         result->scale.z = p[2];
-        if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_CHILD) {
+        if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYASSC_PARENT) {
             u32 node = cmd[1];
 
-            g_NNSG3DModelRenderer->isScaleOne[node >> 5] &= ~(1 << (node & 0x1f));
-            g_NNSG3DRenderCache.jointScales[node].invScale.x = p[3];
-            g_NNSG3DRenderCache.jointScales[node].invScale.y = p[4];
-            g_NNSG3DRenderCache.jointScales[node].invScale.z = p[5];
+            NNS_G3dRS->isScaleCacheOne[node >> 5] &= ~(1 << (node & 0x1f));
+            NNS_G3dRSOnGlb.scaleCache[node].invScale.x = p[3];
+            NNS_G3dRSOnGlb.scaleCache[node].invScale.y = p[4];
+            NNS_G3dRSOnGlb.scaleCache[node].invScale.z = p[5];
         }
     }
-    if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYA_SSC_APPLY) {
+    if (flags & NNS_G3D_SBC_NODEDESC_FLAG_MAYASSC_APPLY) {
         u32 parent = cmd[2];
 
-        result->flag |= NNS_G3D_JNTANM_RESULTFLAG_MAYA_SSC_APPLY;
-        if (g_NNSG3DModelRenderer->isScaleOne[parent >> 5] & (1 << (parent & 0x1f))) {
+        result->flag |= NNS_G3D_JNTANM_RESULTFLAG_MAYA_SSC;
+        if (NNS_G3dRS->isScaleCacheOne[parent >> 5] & (1 << (parent & 0x1f))) {
             result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX0_ONE;
         } else {
-            result->scaleEx0 = g_NNSG3DRenderCache.jointScales[parent].invScale;
+            result->scaleEx0 = NNS_G3dRSOnGlb.scaleCache[parent].invScale;
         }
     }
     result->flag |= NNS_G3D_JNTANM_RESULTFLAG_SCALEEX1_ONE;
@@ -98,7 +99,7 @@ void NNSi_G3dGetJointScaleMaya(NNSG3dJntAnmResult *result, const fx32 *p, const 
 // The texture matrix elements of a material with a scale, a rotation and a translation. A Maya texture is turned about
 // its center and flipped vertically, so the translation has the center and the flip in it, and the shear of the
 // rotation follows the texture's proportions. A product here is truncated, not rounded
-static void calcTexMtxMayaSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flag_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
     fx32 scaleSCos, scaleSSin, scaleTSin, scaleTCos;
@@ -121,7 +122,7 @@ static void calcTexMtxMayaSRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a scale of one
-static void calcTexMtxMayaRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
 
@@ -138,7 +139,7 @@ static void calcTexMtxMayaRT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero rotation
-static void calcTexMtxMayaST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = result->scaleS;
     mtx->m[1][1] = result->scaleT;
     mtx->m[0][1] = 0;
@@ -149,7 +150,7 @@ static void calcTexMtxMayaST_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero rotation and a scale of one
-static void calcTexMtxMayaT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = FX32_ONE;
     mtx->m[1][1] = FX32_ONE;
     mtx->m[0][1] = 0;
@@ -159,7 +160,7 @@ static void calcTexMtxMayaT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation
-static void calcTexMtxMayaSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagT_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 scaleSCos;
     fx32 scaleSSin;
     fx32 scaleTSin;
@@ -182,7 +183,7 @@ static void calcTexMtxMayaSR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation and a scale of one
-static void calcTexMtxMayaR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     fx32 width = result->origWidth << FX32_SHIFT;
     fx32 height = result->origHeight << FX32_SHIFT;
 
@@ -197,7 +198,7 @@ static void calcTexMtxMayaR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for a zero translation and a zero rotation
-static void calcTexMtxMayaS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTR_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = result->scaleS;
     mtx->m[1][1] = result->scaleT;
     mtx->m[0][1] = 0;
@@ -207,7 +208,7 @@ static void calcTexMtxMayaS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
 }
 
 // The same for none of them
-static void calcTexMtxMayaIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
+static void texmtxCalc_flagTRS_(MtxFx44 *mtx, const NNSG3dMatAnmResult *result) {
     mtx->m[0][0] = FX32_ONE;
     mtx->m[0][1] = 0;
     mtx->m[1][0] = 0;
@@ -219,8 +220,8 @@ static void calcTexMtxMayaIdentity_(MtxFx44 *mtx, const NNSG3dMatAnmResult *resu
 // Indexed by the low three bits of a material result's flag: the scale of one, the zero rotation and the zero
 // translation
 static TexMtxMayaFunc sTexMtxMayaFuncs[8] = {
-    calcTexMtxMayaSRT_, calcTexMtxMayaRT_, calcTexMtxMayaST_, calcTexMtxMayaT_,
-    calcTexMtxMayaSR_,  calcTexMtxMayaR_,  calcTexMtxMayaS_,  calcTexMtxMayaIdentity_,
+    texmtxCalc_flag_,  texmtxCalc_flagS_,  texmtxCalc_flagR_,  texmtxCalc_flagRS_,
+    texmtxCalc_flagT_, texmtxCalc_flagTS_, texmtxCalc_flagTR_, texmtxCalc_flagTRS_,
 };
 
 // Sends a packet of num words to the geometry engine: the packed opcodes, then the arguments of their commands

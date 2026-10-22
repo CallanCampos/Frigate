@@ -1698,7 +1698,7 @@ static void CtvtGame_InitBalloons(CommTvtWork *sys, CtvtGame *game) {
     GFL_BGSysLoadScr(7);
     game->paletteFrame = 0;
     game->paletteFile = GFL_G2DIOReadNCLR(ARCID_CTVT_GAME, 7, &game->palette, game->heapId);
-    GFL_BGSysUploadStdPalette(4, (u8 *)game->palette->rawData + 0x20, 0x20, 0);
+    GFL_BGSysUploadStdPalette(4, (u8 *)game->palette->pRawData + 0x20, 0x20, 0);
     GFL_BGSysLoadNCLRDefault(ARCID_CTVT_GAME, 2, 4, 0x1a0, 0x20, heapId);
     setup.x = 128;
     setup.y = 96;
@@ -1828,7 +1828,7 @@ static BOOL CtvtGame_UpdateIntro(CommTvtWork *sys, CtvtGame *game) {
         game->paletteFrame %= 20;
         frame = game->paletteFrame;
         if (frame % 10 == 0) {
-            GFL_BGSysUploadStdPalette(4, (u8 *)game->palette->rawData + (u8)(frame / 10 + 1) * 0x20, 0x20, 0);
+            GFL_BGSysUploadStdPalette(4, (u8 *)game->palette->pRawData + (u8)(frame / 10 + 1) * 0x20, 0x20, 0);
         }
         break;
     }
@@ -2648,10 +2648,10 @@ static void CtvtGame_DrawTargets3D(CtvtGame *game) {
         GFL_G3DSysReset();
         GFL_G3DCameraFlush(game->camera);
         GFL_G3DSysMtxViewFlush();
-        NNS_G3DSetLightVector(0, 0, 0, FX16_ONE);
-        NNS_G3DSetLightColor(0, GX_RGB(31, 31, 31));
-        NNS_G3DSetMatDifAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
-        NNS_G3DSetMatSpeEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
+        NNS_G3dGlbLightVector(0, 0, 0, FX16_ONE);
+        NNS_G3dGlbLightColor(0, GX_RGB(31, 31, 31));
+        NNS_G3dGlbMaterialColorDiffAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
+        NNS_G3dGlbMaterialColorSpecEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
         for (i = 0; i < 4; i++) {
             first = GFL_G3DMgrGetSceneFirstActorIdx(game->g3d, game->scenes[i]);
             for (j = 0; j < 3; j++) {
@@ -2673,10 +2673,10 @@ static void CtvtGame_Draw3D(CtvtGame *game) {
         GFL_G3DSysReset();
         GFL_G3DCameraFlush(game->camera);
         GFL_G3DSysMtxViewFlush();
-        NNS_G3DSetLightVector(0, 0, 0, FX16_ONE);
-        NNS_G3DSetLightColor(0, GX_RGB(31, 31, 31));
-        NNS_G3DSetMatDifAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
-        NNS_G3DSetMatSpeEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
+        NNS_G3dGlbLightVector(0, 0, 0, FX16_ONE);
+        NNS_G3dGlbLightColor(0, GX_RGB(31, 31, 31));
+        NNS_G3dGlbMaterialColorDiffAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
+        NNS_G3dGlbMaterialColorSpecEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
         GFL_TCBMgrUpdate(game->tcbManager);
         GFL_G3DSysReqSwapBuffers();
     }

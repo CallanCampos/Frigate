@@ -291,9 +291,9 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     } else {
         sVChatWork->micParam.rate = 0x1001;
     }
-    sVChatWork->micParam.loop = TRUE;
-    sVChatWork->micParam.fullCallback = NULL;
-    sVChatWork->micParam.fullArg = NULL;
+    sVChatWork->micParam.loop_enable = TRUE;
+    sVChatWork->micParam.full_callback = NULL;
+    sVChatWork->micParam.full_arg = NULL;
     sVChatWork->micRunning = TRUE;
     NNS_SndStrmAllocChannel((NNSSndStrm *)sVChatWork->stream, 1, channels);
     NNS_SndStrmSetVolume((NNSSndStrm *)sVChatWork->stream, 0);

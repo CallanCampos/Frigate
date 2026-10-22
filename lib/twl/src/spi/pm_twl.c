@@ -79,7 +79,7 @@ void PMi_StopNDma(u32 ndmaNo) {
 void PMi_ProcessExitRequest(PMExitFactor exitType) {
     if (PMi_TryLockExit()) {
         PMi_ExitType = exitType;
-        PMi_CallCallbackList(PMi_PreExitCallbackList);
+        PMi_ExecuteList(PMi_PreExitCallbackList);
         if (PMi_AutoExitFlag) {
             PM_ReadyToExit();
         }
@@ -116,7 +116,7 @@ void PM_DeletePostExitCallback(PMExitCallbackInfo *info) {
 }
 
 void PMi_ExecutePostExitCallbackList(void) {
-    PMi_CallCallbackList(PMi_PostExitCallbackList);
+    PMi_ExecuteList(PMi_PostExitCallbackList);
 }
 
 void PM_SetAutoExit(BOOL enabled) {
@@ -133,7 +133,7 @@ static void PMi_ExecuteExit(BOOL reset) {
     int i;
     u16 result;
 
-    PMi_CallCallbackList(PMi_PostExitCallbackList);
+    PMi_ExecuteList(PMi_PostExitCallbackList);
     GX_DispOff();
     GXS_DispOff();
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);

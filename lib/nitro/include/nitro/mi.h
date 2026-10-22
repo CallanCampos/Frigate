@@ -8,20 +8,20 @@
 #define REG_MI_EXMEMCNT_EP_SHIFT 15
 
 // The shared WRAM's bank control: which processor gets which half of it
-#define reg_MI_WRAMCNT (*(vu8 *)0x04000247)
+#define reg_GX_VRAMCNT_WRAM (*(vu8 *)0x04000247)
 
 // Who gets the shared WRAM's two 16 KiB halves: the ARM7 gets those that the ARM9 doesn't
 typedef enum {
     MI_WRAM_ARM9_ALL,
-    MI_WRAM_ARM9_2ND_HALF,
-    MI_WRAM_ARM9_1ST_HALF,
+    MI_WRAM_1616_1,
+    MI_WRAM_1616_2,
     MI_WRAM_ARM7_ALL,
-} MIWramBank;
+} MIWram;
 
 // On a DSi, sets up TwlSDK's shared WRAM manager, which is in the LTD autoload (MIi_InitWramManagerCore). OS_Init calls
 // it
 void func_02078000(void);
-void MI_SetWramBank(MIWramBank bank);
+void MI_SetWramBank(MIWram bank);
 // NitroSDK's MI_Init: gives the shared WRAM to the ARM7, sets up the new DMA on a DSi and stops DMA channel 0. OS_Init
 // calls it
 void MI_Init(void);
@@ -53,7 +53,7 @@ typedef struct MIDmaRegs {
 #define MI_DMA_TIMING_CARTRIDGE 0x30000000
 #define MI_DMA_TIMING_GXFIFO 0x38000000
 #define MI_DMA_CONTINUOUS_ON 0x02000000
-#define MI_DMA_32BIT_BUF 0x04000000
+#define MI_DMA_32BIT_BUS 0x04000000
 #define MI_DMA_SRC_INC 0x00000000
 #define MI_DMA_SRC_DEC 0x00800000
 #define MI_DMA_SRC_FIX 0x01000000

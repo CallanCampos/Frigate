@@ -506,7 +506,7 @@ static void TransformVecByCamera(G3DCamera *camera, VecFx32 *vec, VecFx32 *dest)
     GFL_G3DCameraGetLookatTarget(camera, &target);
     MTX_LookAt(&pos, &up, &target, &view);
     MI_Copy36B(&view, &inverse);
-    MAT3_Invert(&inverse, &inverse);
+    MTX_Inverse33(&inverse, &inverse);
     MTX_MultVec33(vec, &inverse, dest);
 }
 

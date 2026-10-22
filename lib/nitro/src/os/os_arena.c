@@ -58,8 +58,8 @@ void OS_InitArenaEx(void) {
     OS_SetArenaHi(OS_ARENA_MAINEX, OS_GetInitArenaHi(OS_ARENA_MAINEX));
     OS_SetArenaLo(OS_ARENA_MAINEX, OS_GetInitArenaLo(OS_ARENA_MAINEX));
     if (!OS_IsRunOnTwl()) {
-        OS_SetProtectionRegion(1, 0x02000000, OS_PROTECTION_SIZE_4MB);
-        OS_SetProtectionRegion(2, 0x027ff000, OS_PROTECTION_SIZE_4KB);
+        OS_SetProtectionRegion(1, 0x02000000, HW_C6_PR_4MB);
+        OS_SetProtectionRegion(2, 0x027ff000, HW_C6_PR_4KB);
     } else {
         OSi_InitArenaExTwl();
     }

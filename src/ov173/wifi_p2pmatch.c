@@ -1342,7 +1342,7 @@ static void WifiP2PMatch_RedrawFriendDetail(WIFIP2PMATCH_WORK *wk, HeapID heapId
 // Opens the detail page of the friend whose button was touched, in place of the buttons
 static void WifiP2PMatch_OpenFriendDetail(WIFIP2PMATCH_WORK *wk, HeapID heapId) {
     WifiList_GetFriendParam(wk->wifiList, wk->view.touchFriendNo - 1, WIFI_LIST_FRIEND_GENDER);
-    GFL_BGSysBufferScr(6, wk->view.backScrn->rawData, wk->view.backScrn->size, 0);
+    GFL_BGSysBufferScr(6, wk->view.backScrn->rawData, wk->view.backScrn->szByte, 0);
     GFL_BGSysClearBG(7);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->view.detailWin[1]), 0);
     GFL_BitmapFill(BmpWin_GetBitmap(wk->view.detailWin[0]), 0);
@@ -3818,7 +3818,7 @@ static void WifiP2PMatch_IconWrite(WIFIP2PMATCH_ICON *icon, u32 bg, u8 x, u8 y, 
     u32 palette = WifiP2PMatch_GetIconPalette(bg);
     u32 srcY = (iconNo / 16) * 2;
     u32 srcX = (iconNo % 16) * 2;
-    u32 width = icon->scrn->width / 8;
+    u32 width = icon->scrn->screenWidth / 8;
 
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
@@ -6591,8 +6591,8 @@ static void WifiP2PMatch_ViewScreenAddCharOffset(NNSG2dScreenData *scrn, u16 add
     int y;
     int x;
     u16 *tiles = (u16 *)scrn->rawData;
-    int width = scrn->width / 8;
-    int height = scrn->height / 8;
+    int width = scrn->screenWidth / 8;
+    int height = scrn->screenHeight / 8;
 
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {

@@ -346,7 +346,7 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
 }
 
 static void PStatus_ExitGraphics(PStatusWork *wk) {
-    GfdClearVramTransferQueue();
+    NNS_GfdClearVramTransferManagerTask();
     MCSSSys_Free(wk->mcssSys);
     GFL_G3DCameraFree(wk->camera);
     GFL_G3DSysFree();

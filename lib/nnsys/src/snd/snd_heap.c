@@ -4,38 +4,39 @@
 #include <stddef.h>
 
 // NitroSystem's sound heap (NNS_SndHeap): a frame heap for sound data. Each saved state opens a level of the heap,
-// which lists the blocks allocated since, so that loading a state can call their dispose callbacks before freeing
-// them. swan names NNS_SndHeapCreate NNS_SndHeapCreate. The file name is a guess, and so are the statics' names
+// which lists the blocks allocated since, so that loading a state can call their dispose callbacks before freeing them.
+// swan names NNS_SndHeapCreate NNS_FrmHeapCreate. The SDK's file is heap.c, and the names are NitroSystem's, as
+// ntrtwl's reconstruction of NitroSystem has them, except BLOCK_HEAD_SIZE, which is ours
 
 // Every block starts with its head, rounded up to the cache line
 #define HEAP_ALIGN 32
 #define BLOCK_HEAD_SIZE 32
-#define ROUND_UP(value, alignment) (((value) + ((alignment) - 1)) & ~((alignment) - 1))
+#define ROUNDUP(value, alignment) (((value) + ((alignment) - 1)) & ~((alignment) - 1))
 
-typedef struct SndHeapBlock {
+typedef struct NNSSndHeapBlock {
     NNSFndLink link;
     u32 size;
     NNSSndHeapDisposeCallback callback;
     u32 data1;
     u32 data2;
-} SndHeapBlock;
+} NNSSndHeapBlock;
 
-typedef struct SndHeapSection {
+typedef struct NNSSndHeapSection {
     NNSFndList blockList;
     NNSFndLink link;
-} SndHeapSection;
+} NNSSndHeapSection;
 
-static void InitHeapSection(SndHeapSection *section);
+static void InitHeapSection(NNSSndHeapSection *section);
 static BOOL InitHeap(NNSSndHeap *heap, NNSFndHeapHandle handle);
 static BOOL NewSection(NNSSndHeap *heap);
-static void WaitSoundDriver(void);
+static void EraseSync(void);
 
 NNSSndHeapHandle NNS_SndHeapCreate(void *startAddress, u32 size) {
     NNSSndHeap *heap;
     NNSFndHeapHandle handle;
     void *endAddress = (u8 *)startAddress + size;
 
-    startAddress = (void *)ROUND_UP((u32)startAddress, 4);
+    startAddress = (void *)ROUNDUP((u32)startAddress, 4);
     if (startAddress > endAddress) {
         return NNS_SND_HEAP_INVALID_HANDLE;
     }
@@ -62,11 +63,11 @@ void NNS_SndHeapDestroy(NNSSndHeapHandle heap) {
 }
 
 void NNS_SndHeapClear(NNSSndHeapHandle heap) {
-    SndHeapSection *section;
-    SndHeapBlock *block;
+    NNSSndHeapSection *section;
+    NNSSndHeapBlock *block;
     BOOL doCallback = FALSE;
 
-    while ((section = NNS_FndGetPrevListObject(&heap->levelList, NULL)) != NULL) {
+    while ((section = NNS_FndGetPrevListObject(&heap->sectionList, NULL)) != NULL) {
         block = NULL;
         while ((block = NNS_FndGetPrevListObject(&section->blockList, block)) != NULL) {
             if (block->callback != NULL) {
@@ -74,24 +75,24 @@ void NNS_SndHeapClear(NNSSndHeapHandle heap) {
                 doCallback = TRUE;
             }
         }
-        NNS_FndRemoveListObject(&heap->levelList, section);
+        NNS_FndRemoveListObject(&heap->sectionList, section);
     }
-    NNS_FndFreeToFrmHeap(heap->handle, NNS_FND_FRMHEAP_RELEASE_BOTH);
+    NNS_FndFreeToFrmHeap(heap->handle, NNS_FND_FRMHEAP_FREE_ALL);
     if (doCallback) {
-        WaitSoundDriver();
+        EraseSync();
     }
     NewSection(heap);
 }
 
 void *NNS_SndHeapAlloc(NNSSndHeapHandle heap, u32 size, NNSSndHeapDisposeCallback callback, u32 data1, u32 data2) {
-    SndHeapSection *section;
-    SndHeapBlock *block =
-        NNS_FndAllocFromFrmHeapEx(heap->handle, ROUND_UP(size, HEAP_ALIGN) + BLOCK_HEAD_SIZE, HEAP_ALIGN);
+    NNSSndHeapSection *section;
+    NNSSndHeapBlock *block =
+        NNS_FndAllocFromFrmHeapEx(heap->handle, ROUNDUP(size, HEAP_ALIGN) + BLOCK_HEAD_SIZE, HEAP_ALIGN);
 
     if (block == NULL) {
         return NULL;
     }
-    section = NNS_FndGetPrevListObject(&heap->levelList, NULL);
+    section = NNS_FndGetPrevListObject(&heap->sectionList, NULL);
     block->size = size;
     block->callback = callback;
     block->data1 = data1;
@@ -101,53 +102,53 @@ void *NNS_SndHeapAlloc(NNSSndHeapHandle heap, u32 size, NNSSndHeapDisposeCallbac
 }
 
 int NNS_SndHeapSaveState(NNSSndHeapHandle heap) {
-    if (!NNS_FndRecordStateForFrmHeap(heap->handle, heap->levelList.numObjects)) {
+    if (!NNS_FndRecordStateForFrmHeap(heap->handle, heap->sectionList.numObjects)) {
         return -1;
     }
     if (!NewSection(heap)) {
         NNS_FndFreeByStateToFrmHeap(heap->handle, 0);
         return -1;
     }
-    return heap->levelList.numObjects - 1;
+    return heap->sectionList.numObjects - 1;
 }
 
 void NNS_SndHeapLoadState(NNSSndHeapHandle heap, int level) {
-    SndHeapSection *section;
-    SndHeapBlock *block = NULL;
+    NNSSndHeapSection *section;
+    NNSSndHeapBlock *block = NULL;
     BOOL doCallback = FALSE;
 
     if (level == 0) {
         NNS_SndHeapClear(heap);
         return;
     }
-    while (level < heap->levelList.numObjects) {
-        section = NNS_FndGetPrevListObject(&heap->levelList, NULL);
+    while (level < heap->sectionList.numObjects) {
+        section = NNS_FndGetPrevListObject(&heap->sectionList, NULL);
         while ((block = NNS_FndGetPrevListObject(&section->blockList, block)) != NULL) {
             if (block->callback != NULL) {
                 block->callback((u8 *)block + BLOCK_HEAD_SIZE, block->size, block->data1, block->data2);
                 doCallback = TRUE;
             }
         }
-        NNS_FndRemoveListObject(&heap->levelList, section);
+        NNS_FndRemoveListObject(&heap->sectionList, section);
     }
     NNS_FndFreeByStateToFrmHeap(heap->handle, (u32)level);
     if (doCallback) {
-        WaitSoundDriver();
+        EraseSync();
     }
-    NNS_FndRecordStateForFrmHeap(heap->handle, heap->levelList.numObjects);
+    NNS_FndRecordStateForFrmHeap(heap->handle, heap->sectionList.numObjects);
     NewSection(heap);
 }
 
 int NNS_SndHeapGetCurrentLevel(NNSSndHeapHandle heap) {
-    return heap->levelList.numObjects - 1;
+    return heap->sectionList.numObjects - 1;
 }
 
-static void InitHeapSection(SndHeapSection *section) {
-    NNS_FndInitList(&section->blockList, offsetof(SndHeapBlock, link));
+static void InitHeapSection(NNSSndHeapSection *section) {
+    NNS_FndInitList(&section->blockList, offsetof(NNSSndHeapBlock, link));
 }
 
 static BOOL InitHeap(NNSSndHeap *heap, NNSFndHeapHandle handle) {
-    NNS_FndInitList(&heap->levelList, offsetof(SndHeapSection, link));
+    NNS_FndInitList(&heap->sectionList, offsetof(NNSSndHeapSection, link));
     heap->handle = handle;
     if (!NewSection(heap)) {
         return FALSE;
@@ -156,18 +157,18 @@ static BOOL InitHeap(NNSSndHeap *heap, NNSFndHeapHandle handle) {
 }
 
 static BOOL NewSection(NNSSndHeap *heap) {
-    SndHeapSection *section = NNS_FndAllocFromFrmHeapEx(heap->handle, sizeof(SndHeapSection), 4);
+    NNSSndHeapSection *section = NNS_FndAllocFromFrmHeapEx(heap->handle, sizeof(NNSSndHeapSection), 4);
 
     if (section == NULL) {
         return FALSE;
     }
     InitHeapSection(section);
-    NNS_FndAppendListObject(&heap->levelList, section);
+    NNS_FndAppendListObject(&heap->sectionList, section);
     return TRUE;
 }
 
 // Waits for the sound driver to have run every command sent, so that nothing plays from the memory freed
-static void WaitSoundDriver(void) {
+static void EraseSync(void) {
     u32 tag = SND_GetCurrentCommandTag();
 
     SND_FlushCommand(SND_COMMAND_BLOCK);

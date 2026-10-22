@@ -114,11 +114,11 @@ GFLBitmap *GFL_G2DIOLoadBitmap(u32 arcId, u32 fileId, BOOL compressed, HeapID he
 }
 
 void GFL_BitmapConvFromCHAR(GFLBitmap *bitmap, NNSG2dCharacterData *chars, HeapID heapId) {
-    bitmap->width = chars->width * 8;
-    bitmap->height = chars->height * 8;
-    bitmap->pixels = GFL_HeapAllocate(heapId, chars->size, FALSE, "bmp.c", 321);
+    bitmap->width = chars->W * 8;
+    bitmap->height = chars->H * 8;
+    bitmap->pixels = GFL_HeapAllocate(heapId, chars->szByte, FALSE, "bmp.c", 321);
     bitmap->storage = GFL_BITMAP_OWNED;
-    switch (chars->pixelFormat) {
+    switch (chars->pixelFmt) {
     case GX_TEXFMT_PLTT16:
         bitmap->tileSize = 0x20;
         break;
@@ -126,7 +126,7 @@ void GFL_BitmapConvFromCHAR(GFLBitmap *bitmap, NNSG2dCharacterData *chars, HeapI
         bitmap->tileSize = 0x40;
         break;
     }
-    MIi_CpuCopy32(chars->rawData, bitmap->pixels, chars->size);
+    MIi_CpuCopy32(chars->pRawData, bitmap->pixels, chars->szByte);
 }
 
 u8 GFL_BitmapGetBytesPerTile(GFLBitmap *bitmap) {

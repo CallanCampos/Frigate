@@ -1,7 +1,7 @@
-// The wireless manager's DCF mode (libwm, TwlSDK's wm/ARM9/src/wm_dcf.c, by its place in the library: the file name is
-// a guess): the mode in which a child, connected to an ordinary access point, sends and receives frames of the
-// distributed coordination function. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// The wireless manager's DCF mode (libwm, TwlSDK's wm/ARM9/src/wm_dcf.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file): the mode in which a child, connected to an ordinary access point,
+// sends and receives frames of the distributed coordination function. The names are NitroSDK's, as that
+// reconstruction has them
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
@@ -14,8 +14,8 @@ WMErrCode WM_StartDCF(WMCallbackFunc callback, WMDcfRecvBuf *recvBuf, u16 recvBu
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
-    if (w9b->status->dcfFlag == TRUE) {
+    DC_InvalidateRange(&w9b->status->dcf_flag, 4);
+    if (w9b->status->dcf_flag == TRUE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (recvBufSize < 0x10) {
@@ -43,8 +43,8 @@ WMErrCode WM_SetDCFData(WMCallbackFunc callback, const u8 *dst, const u16 *buffe
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
-    if (w9b->status->dcfFlag == FALSE) {
+    DC_InvalidateRange(&w9b->status->dcf_flag, 4);
+    if (w9b->status->dcf_flag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (byteLength > 0x5e4) {
@@ -67,8 +67,8 @@ WMErrCode WM_EndDCF(WMCallbackFunc callback) {
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    DC_InvalidateRange(&w9b->status->dcfFlag, 4);
-    if (w9b->status->dcfFlag == FALSE) {
+    DC_InvalidateRange(&w9b->status->dcf_flag, 4);
+    if (w9b->status->dcf_flag == FALSE) {
         return WM_ERRCODE_ILLEGAL_STATE;
     }
     WMi_SetCallbackTable(WM_APIID_END_DCF, callback);

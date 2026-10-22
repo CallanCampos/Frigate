@@ -2,6 +2,7 @@
 #define POKEBW2_NITROWIFI_SSL_INTERNAL_H
 
 #include "types.h"
+#include "nitrowifi/cps.h"
 
 // SSL's state and helpers, shared by its files
 
@@ -18,23 +19,12 @@ int memcmp(const void *a, const void *b, u32 size);
 int strcmp(const char *a, const char *b);
 u32 strlen(const char *s);
 
-// rc4.c: RC4's state, with pokediamond's field layout (CPSi_rc4_init writes s right after i and j, with no padding)
-typedef struct CPSRc4Ctx {
-    u8 i;
-    u8 j;
-    u8 s[256];
-} CPSRc4Ctx;
-
+// rc4.c: RC4, over a CPSRc4Ctx (cps.h)
 void CPSi_rc4_init(CPSRc4Ctx *context, const u8 *key, int keyLength);
 void CPSi_rc4_crypt(CPSRc4Ctx *context, void *buf, int length);
 
-// md5.c: MD5 (RFC 1321). No swan name for the object or any of its functions; they carry NitroWiFi's own names.
-typedef struct CPSMd5Ctx {
-    u32 state[4];
-    u32 count[2]; // The message's length so far, in bits, as a 64-bit little-endian pair
-    u8 buffer[64];
-} CPSMd5Ctx;
-
+// md5.c: MD5 (RFC 1321), over a CPSMd5Ctx (cps.h). No swan name for the object or any of its functions; they carry
+// NitroWiFi's own names.
 void CPSi_md5_init(CPSMd5Ctx *context);
 // inputLen counts bytes; input is borrowed synchronously, with partial blocks copied into the context.
 void CPSi_md5_calc(CPSMd5Ctx *context, const u8 *input, u32 inputLen);
@@ -42,14 +32,8 @@ void CPSi_md5_calc(CPSMd5Ctx *context, const u8 *input, u32 inputLen);
 // it does not reset the context for another message. These storage requirements are not checked.
 void CPSi_md5_result(CPSMd5Ctx *context, u8 digest[16]);
 
-// sha1.c: SHA-1 (FIPS 180). No swan name for the object or any of its functions; they carry NitroWiFi's own names.
-typedef struct CPSSha1Ctx {
-    u32 state[5];
-    u32 count[2]; // The total bits hashed so far: count[0] is the high word, count[1] the low one CPSi_sha1_calc adds
-                  // to
-    u8 buffer[64];
-} CPSSha1Ctx;
-
+// sha1.c: SHA-1 (FIPS 180), over a CPSSha1Ctx (cps.h). No swan name for the object or any of its functions; they
+// carry NitroWiFi's own names.
 void CPSi_sha1_init(CPSSha1Ctx *context);
 // len counts bytes; data is borrowed synchronously, with partial blocks copied into the context.
 void CPSi_sha1_calc(CPSSha1Ctx *context, const u8 *data, u32 len);

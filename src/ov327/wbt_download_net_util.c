@@ -755,8 +755,8 @@ static inline void WbtDownloadNetBG_InitCycle(WbtDownloadBG *bg, ArcTool *arc, u
 
     MI_CpuFill8(&bg->cycle, 0, sizeof(bg->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    MI_CpuCopy8(palette->rawData, bg->cycle.palettes, sizeof(bg->cycle.palettes));
-    MI_CpuCopy8(palette->rawData, bg->cycle.blended, sizeof(bg->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, bg->cycle.palettes, sizeof(bg->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, bg->cycle.blended, sizeof(bg->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps

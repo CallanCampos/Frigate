@@ -105,12 +105,12 @@ u32 DSProt_Crc32Multi(const u8 *data, u32 size) {
 // memory controller afterwards. `flag` is the sixth byte of the command. The register block is reached from a base
 // built at run time (1 shifted by 26) and a second pointer to 0x04000000 for the command bytes, the way the original's
 // constants are built.
-static inline void DSProt_ReadCardRaw(u8 *dest, u32 address, u32 flag) {
+static inline void DSProt_ReadCardRaw(u8 *dest, u32 address, u8 flag) {
     u32 page;
     int i;
     u16 exmemcnt = reg_MI_EXMEMCNT;
     vu8 *regs;
-    int offset;
+    s32 offset;
     u32 control;
     u32 header;
     u8 savedCommand[8];
@@ -126,7 +126,7 @@ static inline void DSProt_ReadCardRaw(u8 *dest, u32 address, u32 flag) {
     header -= 13;
     header <<= 5;
     control = (*(u32 *)header & ~0x07000000) | 0xa1000000;
-    offset = -(int)(address & 0x1ff);
+    offset = -(s32)(address & 0x1ff);
     while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000) {
     }
     *(vu8 *)(base + OFFSET_AUXSPICNT_H) = 0x80;
@@ -175,7 +175,8 @@ u32 DSProt_CheckFlashcartA(DSProtCheckArgs *args) {
     lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw((u8 *)page, address + (1 << (((const ROMHeader *)CARD_GetRomHeader())->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw((u8 *)page,
+                           address + (1 << (((const CARDRomHeader *)CARD_GetRomHeader())->device_size + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARD_ReadRom((u32)-1, (const void *)(address + offset), page, 0x200);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);
@@ -247,7 +248,8 @@ u32 DSProt_CheckFlashcartB(DSProtCheckArgs *args) {
     lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw((u8 *)page, address + (1 << (((const ROMHeader *)CARD_GetRomHeader())->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw((u8 *)page,
+                           address + (1 << (((const CARDRomHeader *)CARD_GetRomHeader())->device_size + 17)), 0);
         crcs[i] = DSProt_Crc32Multi((u8 *)page, 0x200);
         CARD_ReadRom((u32)-1, (const void *)(address + offset), page, 0x200);
         crcs[i + 6] = DSProt_Crc32Multi((u8 *)page, 0x200);

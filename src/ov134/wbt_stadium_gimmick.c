@@ -632,7 +632,7 @@ static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource,
     work->palette = NULL;
     work->characterFile = GFL_G2DIOReadBGNCGR(ARCID_WBT_STADIUM_GIMMICK, file * 2, TRUE, &work->character, heapId);
     work->paletteFile = GFL_G2DIOReadNCLR(ARCID_WBT_STADIUM_GIMMICK, file * 2 + 1, &work->palette, heapId);
-    src = work->character->rawData;
+    src = work->character->pRawData;
     pixels = GFL_BitmapGetPixelData(work->bitmap);
     MIi_CpuClear32(0, pixels, 16 * 32);
     for (y = 0; y < 4; y++) {
@@ -642,7 +642,7 @@ static void WbtStadiumGimmick_LoadPortrait(GimmickWork *work, void *texResource,
     }
     GFL_BitmapMakeLinear(work->bitmap, FALSE, heapId);
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(work->bitmap), 0x200);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, plttAddr, work->palette->rawData, 0x20);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, plttAddr, work->palette->pRawData, 0x20);
 }
 
 // Loads scene 2 with the two actors of a lone portrait (the Trainer's own and a cutscene's)

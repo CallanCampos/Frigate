@@ -1086,7 +1086,7 @@ void TDownloadUtil_SetCursorKeys(TDownloadWork *wk, BOOL active) {
 static void TDownloadUtil_LoadPalettes(TDownloadWork *wk) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLR(ARCID_T_DOWNLOAD, 3, &palette, wk->heapId);
-    u8 *colors = palette->rawData;
+    u8 *colors = palette->pRawData;
 
     MI_CpuCopy8(colors + 0x60, wk->palFadeFrom, 0x20);
     MI_CpuCopy8(colors + 0x80, wk->palFadeTo, 0x20);
@@ -1450,7 +1450,7 @@ static void TDownloadUtil_LoadTextPalette(TDownloadWork *wk) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLR(ARCID_T_DOWNLOAD, 2, &palette, wk->heapId);
 
-    MI_CpuCopy8(palette->rawData, wk->textPltt, 0x40);
+    MI_CpuCopy8(palette->pRawData, wk->textPltt, 0x40);
     GFL_HeapFree(file);
 }
 

@@ -1,58 +1,57 @@
 // The thread that reads the multiboot parent's program into the cache, and the jobs it runs (libmb). The names are
-// descriptive
+// NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them
 #include "mb_private.h"
 
 // The jobs that wait for the thread to be ready, as a queue ordered by priority
-#define MB_TASK_PRIORITY_MAX 0x1f
-#define MB_TASK_PRIORITY_HIGHER 0x20
-#define MB_TASK_PRIORITY_LOWER 0x21
-#define MB_TASK_PRIORITY_KEEP 0x22
+#define MB_TASK_PRIORITY_ABOVE 0x20
+#define MB_TASK_PRIORITY_BELOW 0x21
+#define MB_TASK_PRIORITY_NORMAL 0x22
 
 // The thread that runs the jobs, or NULL
-static MBTaskThread *sTaskThread;
+static MBiTaskWork *mbi_task_work;
 
-static void MBTask_ThreadMain(void *arg);
+static void MBi_TaskThread(void *arg);
 
-static void MBTask_ThreadMain(void *arg) {
-    MBTaskThread *thread = arg;
+static void MBi_TaskThread(void *arg) {
+    MBiTaskWork *thread = arg;
 
     while (TRUE) {
         OSIntrMode irq = OS_DisableInterrupts();
-        MBTask *task;
-        void (*done)(MBTask *task);
+        MBiTaskInfo *task;
+        void (*done)(MBiTaskInfo *task);
         u32 priority;
         u32 next;
 
-        while (thread->head == NULL) {
-            OS_SetThreadPriority(&thread->thread, 0);
+        while (thread->list == NULL) {
+            OS_SetThreadPriority(&thread->th, 0);
             OS_SleepThread(NULL);
         }
-        task = thread->head;
-        thread->head = thread->head->next;
-        OS_SetThreadPriority(&thread->thread, task->priority);
+        task = thread->list;
+        thread->list = thread->list->next;
+        OS_SetThreadPriority(&thread->th, task->priority);
         OS_RestoreInterrupts(irq);
-        if (task->func != NULL) {
-            task->func(task);
+        if (task->task != NULL) {
+            task->task(task);
         }
         irq = OS_DisableInterrupts();
-        done = task->done;
-        priority = OS_GetThreadPriority(&thread->thread);
-        if (thread->head == NULL) {
+        done = task->callback;
+        priority = OS_GetThreadPriority(&thread->th);
+        if (thread->list == NULL) {
             next = 0;
-        } else if (priority < thread->head->priority) {
-            next = thread->head->priority;
+        } else if (priority < thread->list->priority) {
+            next = thread->list->priority;
         } else {
             next = priority;
         }
         if (next != priority) {
-            OS_SetThreadPriority(&thread->thread, next);
+            OS_SetThreadPriority(&thread->th, next);
         }
         task->next = NULL;
         task->busy = 0;
         if (done != NULL) {
             done(task);
         }
-        if (task == &thread->exitTask) {
+        if (task == &thread->end_task) {
             break;
         }
         OS_RestoreInterrupts(irq);
@@ -61,34 +60,34 @@ static void MBTask_ThreadMain(void *arg) {
 }
 
 // Starts the thread, with a block of memory for it and its stack
-void MBTask_StartThread(MBTaskThread *thread, u32 size) {
+void MBi_InitTaskThread(MBiTaskWork *thread, u32 size) {
     OSIntrMode irq = OS_DisableInterrupts();
 
-    if (sTaskThread == NULL) {
+    if (mbi_task_work == NULL) {
         u32 stackSize;
 
-        sTaskThread = thread;
-        MBTask_Clear(&thread->exitTask);
-        thread->head = NULL;
-        stackSize = (size - sizeof(MBTaskThread) + sizeof(thread->stack)) & ~3;
-        OS_CreateThread(&thread->thread, MBTask_ThreadMain, thread, thread->stack + stackSize, stackSize, 0);
-        OS_WakeupThreadDirect(&thread->thread);
+        mbi_task_work = thread;
+        MBi_InitTaskInfo(&thread->end_task);
+        thread->list = NULL;
+        stackSize = (size - sizeof(MBiTaskWork) + sizeof(thread->stack)) & ~3;
+        OS_CreateThread(&thread->th, MBi_TaskThread, thread, thread->stack + stackSize, stackSize, 0);
+        OS_WakeupThreadDirect(&thread->th);
     }
     OS_RestoreInterrupts(irq);
 }
 
-BOOL MBTask_IsThreadStarted(void) {
-    if (sTaskThread != NULL) {
+BOOL MBi_IsTaskAvailable(void) {
+    if (mbi_task_work != NULL) {
         return TRUE;
     }
     return FALSE;
 }
 
-void MBTask_Clear(MBTask *task) {
-    MI_CpuFill8(task, 0, sizeof(MBTask));
+void MBi_InitTaskInfo(MBiTaskInfo *task) {
+    MI_CpuFill8(task, 0, sizeof(MBiTaskInfo));
 }
 
-BOOL MBTask_IsBusy(const MBTask *task) {
+BOOL MBi_IsTaskBusy(const MBiTaskInfo *task) {
     if (task->busy) {
         return TRUE;
     }
@@ -96,29 +95,29 @@ BOOL MBTask_IsBusy(const MBTask *task) {
 }
 
 // Puts a job in the queue, after the jobs of a priority up to its own
-void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *task), u32 priority) {
-    MBTaskThread *thread = sTaskThread;
+void MBi_SetTask(MBiTaskInfo *task, void (*func)(MBiTaskInfo *task), void (*done)(MBiTaskInfo *task), u32 priority) {
+    MBiTaskWork *thread = mbi_task_work;
 
-    if (!MBTask_IsThreadStarted() || task->busy) {
+    if (!MBi_IsTaskAvailable() || task->busy) {
         return;
     }
-    if (priority > MB_TASK_PRIORITY_MAX) {
-        u32 current = OS_GetThreadPriority(&thread->thread);
+    if (priority > OS_THREAD_PRIORITY_MAX) {
+        u32 current = OS_GetThreadPriority(&thread->th);
 
-        if (priority == MB_TASK_PRIORITY_HIGHER) {
+        if (priority == MB_TASK_PRIORITY_ABOVE) {
             priority = current - 1;
             if (current == 0) {
                 priority = 0;
             }
-        } else if (priority == MB_TASK_PRIORITY_LOWER) {
+        } else if (priority == MB_TASK_PRIORITY_BELOW) {
             priority = current + 1;
-            if (current >= MB_TASK_PRIORITY_MAX) {
-                priority = MB_TASK_PRIORITY_MAX;
+            if (current >= OS_THREAD_PRIORITY_MAX) {
+                priority = OS_THREAD_PRIORITY_MAX;
             }
-        } else if (priority == MB_TASK_PRIORITY_KEEP) {
+        } else if (priority == MB_TASK_PRIORITY_NORMAL) {
             priority = current;
         } else {
-            priority = MB_TASK_PRIORITY_MAX;
+            priority = OS_THREAD_PRIORITY_MAX;
         }
     }
     {
@@ -126,28 +125,28 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
 
         task->busy = 1;
         task->priority = priority;
-        task->func = func;
-        task->done = done;
-        if (thread->head == NULL) {
-            if (task == &thread->exitTask) {
-                sTaskThread = NULL;
+        task->task = func;
+        task->callback = done;
+        if (thread->list == NULL) {
+            if (task == &thread->end_task) {
+                mbi_task_work = NULL;
             }
-            thread->head = task;
-            OS_WakeupThreadDirect(&thread->thread);
+            thread->list = task;
+            OS_WakeupThreadDirect(&thread->th);
         } else {
-            MBTask *queued = thread->head;
+            MBiTaskInfo *queued = thread->list;
 
-            if (task == &thread->exitTask) {
+            if (task == &thread->end_task) {
                 while (queued->next != NULL) {
                     queued = queued->next;
                 }
                 queued->next = task;
-                sTaskThread = NULL;
+                mbi_task_work = NULL;
             } else if (queued->priority > priority) {
-                thread->head = task;
+                thread->list = task;
                 task->next = queued;
             } else {
-                MBTask *next;
+                MBiTaskInfo *next;
 
                 while ((next = queued->next) != NULL && next->priority <= priority) {
                     queued = next;
@@ -161,11 +160,11 @@ void MBTask_Add(MBTask *task, void (*func)(MBTask *task), void (*done)(MBTask *t
 }
 
 // Ends the thread once its jobs are done, and then runs a function
-void MBTask_EndThread(void (*done)(MBTask *task)) {
+void MBi_EndTaskThread(void (*done)(MBiTaskInfo *task)) {
     OSIntrMode irq = OS_DisableInterrupts();
 
-    if (MBTask_IsThreadStarted()) {
-        MBTask_Add(&sTaskThread->exitTask, NULL, done, 0);
+    if (MBi_IsTaskAvailable()) {
+        MBi_SetTask(&mbi_task_work->end_task, NULL, done, 0);
     }
     OS_RestoreInterrupts(irq);
 }

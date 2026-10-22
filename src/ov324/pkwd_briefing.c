@@ -2009,10 +2009,10 @@ static void PkwdBriefingAudience_LoadPalettes(PkwdBriefingAudience *audience, He
     MI_CpuFill8(audience->bgPalettes, 0, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
 
     file = GFL_G2DIOReadNCLRArc(audience->arc, FILE_AUDIENCE_PALETTE, &objPalette, heapId);
-    MI_CpuCopy8(objPalette->rawData, audience->objPalettes, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
+    MI_CpuCopy8(objPalette->pRawData, audience->objPalettes, AUDIENCE_OBJ_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
     GFL_HeapFree(file);
     file = GFL_G2DIOReadNCLRArc(audience->arc, FILE_AUDIENCE_BG_PALETTE, &bgPalette, heapId);
-    MI_CpuCopy8(bgPalette->rawData, audience->bgPalettes, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
+    MI_CpuCopy8(bgPalette->pRawData, audience->bgPalettes, AUDIENCE_BG_PALETTE_SIZE * AUDIENCE_PALETTE_FRAMES);
     GFL_HeapFree(file);
 }
 

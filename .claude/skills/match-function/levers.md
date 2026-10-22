@@ -16,7 +16,7 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)
   and cast it inside. (matching.md: "A handle parameter cast inside")
 - An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result
-  again, `p = NNSi_G2dUnpackOffset(p, base)`. (matching.md: "A macro that assigns")
+  again, `p = NNS_G2D_UNPACK_OFFSET_PTR(p, base)`. (matching.md: "A macro that assigns")
 - Rows of a matrix product whose registers rotate: the row of `a` in locals and a destination pointer of its own.
   (matching.md: "They match only with the row of `a` in locals")
 - Two of several independent statements with their registers swapped: write the other one first.
@@ -120,12 +120,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A caller's scheduling or stack slots differ only around a call: the callee's parameter type, `int` against `long`.
   (matching.md: "A narrow argument passed to a parameter")
 - A loop's setup registers swapped in a function that calls an inline with `u16` bounds: declare the inline's index
-  parameters `int` (`g2d_OAM.c`'s `LoadAffinesByFunction_`, 14 bytes to 4).
+  parameters `int` (`g2d_OAM.c`'s `LoadAffine_`, 14 bytes to 4).
 - A field read through a pointer parameter folded where the original builds the address, or the reverse: the original
   uses the pointer once more or less, or a `*(T *)&p->m` cast stands in for the field's real type. (matching.md:
   "depends on how many references")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
-  "`FSi_GetPathDefault`")
+  "`FSi_GetPathCommand`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
   `cmp rX, #0`: test the pointer as `if (p)`, not against `NULL`. (matching.md: "A pointer compared with `NULL`")
 - A zero kept in a saved register across a call and returned for `FALSE` (`movne r0, r6`), where the original
@@ -912,12 +912,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Float arithmetic on a local holding a constant isn't folded. (matching.md: "doesn't fold float arithmetic")
 - Division and modulo call `_s32_div_f` or `_u32_div_f` by signedness. A `u8`/`u16` promotes to signed `int`.
   (matching.md: "_s32_div_f")
-- `__aeabi_uldivmod` on sign-extended operands is an `int` cast to `u64`; MWCC calls it `_ll_udiv`.
+- `_ll_udiv` on sign-extended operands is an `int` cast to `u64`.
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
-- An integer converted to float calls `__aeabi_i2f` when signed and `_ffltu` when unsigned; a `u8` or `u16`
-  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `__aeabi_i2f` wants an `int` local. The
+- An integer converted to float calls `_fflt` when signed and `_ffltu` when unsigned; a `u8` or `u16`
+  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `_fflt` wants an `int` local. The
   probe masks it. (matching.md: "`_ffltu`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
@@ -1098,12 +1098,12 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row. The lever never applies to a function
+arguments), and `MBi_SendVolatBeacon` shows the same symptom in its row. The lever never applies to a function
 whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
 `addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
 placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the
 literal (`&G.field` as one pool word) and keeps two reads of a field apart, so an original with such a pool word or
-a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `SetAffinedOamPosition_` show.
+a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `DoAffineTransforme_` show.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").

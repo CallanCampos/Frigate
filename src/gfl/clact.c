@@ -207,7 +207,7 @@ static ClActCharRes *ClActCharRes_AllocArray(HeapID heapId, u32 count);
 static void ClActResMan_SetupChars(ClActResMan *man, u32 idx, NNSG2dCharacterData *charData,
                                    NNSG2dCellDataBank *transferCells, u32 vramType);
 static void ClActCharRes_FreeArray(ClActCharRes *chars);
-static void ClAct_SetCharMapping(NNSG2dCharacterData *charData, NNSG2dVRamType type);
+static void ClAct_SetCharMapping(NNSG2dCharacterData *charData, NNS_G2D_VRAM_TYPE type);
 static ClActPlttRes *ClActPlttRes_AllocArray(HeapID heapId, u32 count);
 static void ClActResMan_SetupPlttRange(ClActResMan *man, u32 idx, void *file, u32 vramType, u16 offset, u16 start,
                                        u16 count);
@@ -457,13 +457,13 @@ u32 ClActSys_AllocChars(u32 size, u32 vramType, HeapID heapId) {
     res = &g_ClActSys->res.chars[idx];
     charData = sCharDataTemplate;
     charData.mappingType = GX_GetOBJVRamModeChar();
-    charData.size = size;
-    charData.rawData = GFL_HeapAllocate(HEAPID_TAIL(heapId), size, TRUE, "clact.c", 992);
+    charData.szByte = size;
+    charData.pRawData = GFL_HeapAllocate(HEAPID_TAIL(heapId), size, TRUE, "clact.c", 992);
     ClActResMan_SetupChars(&g_ClActSys->res, idx, &charData, NULL, vramType);
     res->free = FALSE;
     res->data = NULL;
     res->extData = FALSE;
-    GFL_HeapFree(charData.rawData);
+    GFL_HeapFree(charData.pRawData);
     return idx;
 }
 
@@ -490,14 +490,14 @@ void ClActSys_ReplaceCharData(u32 chars, NNSG2dCharacterData *character) {
     if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
         u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
 
-        DC_FlushRange(character->rawData, character->size);
-        GX_LoadOBJ(character->rawData, addr, character->size);
+        DC_FlushRange(character->pRawData, character->szByte);
+        GX_LoadOBJ(character->pRawData, addr, character->szByte);
     }
     if (NNS_G2dIsImageReadyToUse(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DSUB)) {
         u32 addr = NNS_G2dGetImageLocation(&g_ClActSys->res.chars[chars].proxy, NNS_G2D_VRAM_TYPE_2DSUB);
 
-        DC_FlushRange(character->rawData, character->size);
-        GXS_LoadOBJ(character->rawData, addr, character->size);
+        DC_FlushRange(character->pRawData, character->szByte);
+        GXS_LoadOBJ(character->pRawData, addr, character->szByte);
     }
 }
 
@@ -526,7 +526,7 @@ void ClActSys_GetCharProxy(u32 chars, NNSG2dImageProxy *proxy) {
 
 u32 ClActSys_GetCharVramAddr(u32 chars, BOOL sub) {
     NNSG2dImageProxy proxy;
-    NNSG2dVRamType type = NNS_G2D_VRAM_TYPE_2DMAIN;
+    NNS_G2D_VRAM_TYPE type = NNS_G2D_VRAM_TYPE_2DMAIN;
 
     if (sub) {
         type = NNS_G2D_VRAM_TYPE_2DSUB;
@@ -574,19 +574,19 @@ void ClActSys_ReplacePlttData(u32 palette, NNSG2dPaletteData *data, u32 count) {
     u32 size = count * 32;
 
     if (count == 0) {
-        size = data->size;
+        size = data->szByte;
     }
     if (NNS_G2dIsImagePaletteReadyToUse(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DMAIN)) {
         u32 addr = NNS_G2dGetImagePaletteLocation(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DMAIN);
 
-        DC_FlushRange(data->rawData, size);
-        GX_LoadOBJPltt(data->rawData, addr, size);
+        DC_FlushRange(data->pRawData, size);
+        GX_LoadOBJPltt(data->pRawData, addr, size);
     }
     if (NNS_G2dIsImagePaletteReadyToUse(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DSUB)) {
         u32 addr = NNS_G2dGetImagePaletteLocation(&g_ClActSys->res.pltts[palette].proxy, NNS_G2D_VRAM_TYPE_2DSUB);
 
-        DC_FlushRange(data->rawData, size);
-        GXS_LoadOBJPltt(data->rawData, addr, size);
+        DC_FlushRange(data->pRawData, size);
+        GXS_LoadOBJPltt(data->pRawData, addr, size);
     }
 }
 
@@ -596,7 +596,7 @@ void ClActSys_GetPlttProxy(u32 palette, NNSG2dImagePaletteProxy *proxy) {
 
 u32 ClActSys_GetPlttVramAddr(u32 palette, BOOL sub) {
     NNSG2dImagePaletteProxy proxy;
-    NNSG2dVRamType type = NNS_G2D_VRAM_TYPE_2DMAIN;
+    NNS_G2D_VRAM_TYPE type = NNS_G2D_VRAM_TYPE_2DMAIN;
 
     if (sub) {
         type = NNS_G2D_VRAM_TYPE_2DSUB;
@@ -1309,7 +1309,7 @@ static BOOL ClAct_IsCellInViewTransformed(const NNSG2dCellData *cell, const MtxF
     fx32 left;
     fx32 right;
 
-    if (((cell->cellAttr >> NNSi_G2D_CELLATTR_BOUNDINGRECT_SHIFT) & 1) == 1) {
+    if (((cell->cellAttr >> NNS_G2D_CELL_HAS_BR_SHIFT) & 1) == 1) {
         minY = rect->minY << FX32_SHIFT;
         maxY = rect->maxY << FX32_SHIFT;
         minX = rect->minX << FX32_SHIFT;
@@ -1351,7 +1351,7 @@ static BOOL ClAct_IsCellInView(const NNSG2dCellData *cell, const MtxFx32 *mtx, c
     fx32 minX;
     fx32 maxX;
 
-    if (((cell->cellAttr >> NNSi_G2D_CELLATTR_BOUNDINGRECT_SHIFT) & 1) == 1) {
+    if (((cell->cellAttr >> NNS_G2D_CELL_HAS_BR_SHIFT) & 1) == 1) {
         minY = rect->minY << FX32_SHIFT;
         maxY = rect->maxY << FX32_SHIFT;
         minX = rect->minX << FX32_SHIFT;
@@ -1722,7 +1722,7 @@ static void ClActAnim_InitVramTransfer(ClActAnim *anim, const ClActResSetup *res
                                            NNS_G2D_VRAM_ADDR_NONE,
                                            NNS_G2dGetImageLocation(&res->chars->proxy, NNS_G2D_VRAM_TYPE_2DMAIN),
                                            NNS_G2dGetImageLocation(&res->chars->proxy, NNS_G2D_VRAM_TYPE_2DSUB),
-                                           transferChar->rawData, NULL, transferChar->size);
+                                           transferChar->pRawData, NULL, transferChar->szByte);
 }
 
 static void ClActAnim_InitMultiCell(ClActAnim *anim, const ClActResSetup *res, HeapID heapId) {
@@ -1866,7 +1866,7 @@ static void ClActAnim_RestartVramTransfer(ClActAnim *anim) {
 
 static void ClActAnim_RestartMultiCell(ClActAnim *anim) {
     ClActAnim_RestartCell(anim);
-    NNS_G2dRestartMCCellAnimations(&anim->mcAnim.multiCellInstance);
+    NNS_G2dResetMCCellAnimationAll(&anim->mcAnim.multiCellInstance);
 }
 
 static const NNSG2dUserExAnimSequenceAttr *ClActAnim_GetUserExSeqAttrCell(ClActAnim *anim, u32 sequence) {
@@ -2035,7 +2035,7 @@ static void ClActResMan_SetupChars(ClActResMan *man, u32 idx, NNSG2dCharacterDat
     BOOL vramTransfer;
 
     if (transferCells == NULL) {
-        size = charData->size;
+        size = charData->szByte;
         vramTransfer = FALSE;
     } else {
         size = ClAct_GetTransferSize(transferCells);
@@ -2079,7 +2079,7 @@ static void ClActCharRes_FreeArray(ClActCharRes *chars) {
 }
 
 // Makes the characters' mapping the engine's, which loading them follows
-static void ClAct_SetCharMapping(NNSG2dCharacterData *charData, NNSG2dVRamType type) {
+static void ClAct_SetCharMapping(NNSG2dCharacterData *charData, NNS_G2D_VRAM_TYPE type) {
     u32 mapping = type == NNS_G2D_VRAM_TYPE_2DMAIN ? GX_GetOBJVRamModeChar() : GXS_GetOBJVRamModeChar();
 
     if (charData->mappingType != mapping) {
@@ -2120,15 +2120,15 @@ static void ClActResMan_SetupPlttRange(ClActResMan *man, u32 idx, void *file, u3
         u32 banks;
 
         NNS_G2dInitImagePaletteProxy(&res->proxy);
-        if (start != 0 && start * 32 < pltt->size) {
-            pltt->rawData = (u8 *)pltt->rawData + start * 32;
-            pltt->size -= start * 32;
+        if (start != 0 && start * 32 < pltt->szByte) {
+            pltt->pRawData = (u8 *)pltt->pRawData + start * 32;
+            pltt->szByte -= start * 32;
         }
-        if (count != 0 && start + count <= maxPalettes && count * 32 < pltt->size) {
-            pltt->size = count * 32;
+        if (count != 0 && start + count <= maxPalettes && count * 32 < pltt->szByte) {
+            pltt->szByte = count * 32;
         }
-        if (offset != 0 && pltt->size + offset > limit) {
-            pltt->size = limit - offset;
+        if (offset != 0 && pltt->szByte + offset > limit) {
+            pltt->szByte = limit - offset;
         }
         if (ClAct_VramTypeIncludes(vramType, CLACT_VRAM_MAIN)) {
             banks = GX_GetBankForOBJExtPltt();
@@ -2151,7 +2151,7 @@ static void ClActResMan_SetupPlttRange(ClActResMan *man, u32 idx, void *file, u3
             }
         }
         man->pltts[idx].free = FALSE;
-        man->pltts[idx].size = pltt->size;
+        man->pltts[idx].size = pltt->szByte;
     }
 }
 

@@ -2,8 +2,8 @@
 #include "nitro/mi.h"
 #include "nitro/os.h"
 
-#define MI_DMA_FILL_DATA_ADDR 0x040000e0
-#define MI_DMA0_DUMMY_CNT (MI_DMA_ENABLE | MI_DMA_SRC_FIX | MI_DMA_DEST_FIX | 1)
+#define MIi_DMA_CLEAR_DATA_BUF 0x040000e0
+#define MIi_DUMMY_CNT (MI_DMA_ENABLE | MI_DMA_SRC_FIX | MI_DMA_DEST_FIX | 1)
 
 void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags) {
     OSIntrMode interrupts;
@@ -15,11 +15,11 @@ void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags) {
 
     dma = &MI_DMA_REGS[dmaNo];
     if (flags & MI_DMA_SET_FILL32) {
-        vu32 *fill = (vu32 *)(MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32));
+        vu32 *fill = (vu32 *)(MIi_DMA_CLEAR_DATA_BUF + dmaNo * sizeof(u32));
         *fill = src;
         src = (u32)fill;
     } else if (flags & MI_DMA_SET_FILL16) {
-        vu16 *fill = (vu16 *)(MI_DMA_FILL_DATA_ADDR + dmaNo * sizeof(u32));
+        vu16 *fill = (vu16 *)(MIi_DMA_CLEAR_DATA_BUF + dmaNo * sizeof(u32));
         *fill = src;
         src = (u32)fill;
     }
@@ -34,7 +34,7 @@ void MIi_DmaSetParameters(u32 dmaNo, u32 src, u32 dest, u32 ctrl, u32 flags) {
         if (!(flags & MI_DMA_SET_NO_DMA0_FIX) && dmaNo == 0) {
             dma->src = 0;
             dma->dest = 0;
-            dma->cnt = MI_DMA0_DUMMY_CNT;
+            dma->cnt = MIi_DUMMY_CNT;
         }
     }
 

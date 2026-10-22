@@ -522,8 +522,8 @@ static void GSyncMenu_LoadGraphics(GSyncMenuWork *wk) {
     GFL_G2DIOLoadArcNCLRDefault(arc, 1, PALTYPE_SUB_BG, 0, 0, wk->heapId);
     GFL_G2DIOLoadArcNCLRDefault(arc, 0, PALTYPE_MAIN_BG, 0, 0, wk->heapId);
     file = GFL_G2DIOReadNCLRArc(arc, 1, &palette, wk->heapId);
-    MI_CpuCopy8(palette->rawData, wk->palettes[0], sizeof(wk->palettes[0]));
-    MI_CpuCopy8(palette->rawData, wk->palettes[1], sizeof(wk->palettes[1]));
+    MI_CpuCopy8(palette->pRawData, wk->palettes[0], sizeof(wk->palettes[0]));
+    MI_CpuCopy8(palette->pRawData, wk->palettes[1], sizeof(wk->palettes[1]));
     GSyncMenu_BrightenPalettes(wk->palettes[1], sBrightenAmounts, 7);
     GFL_HeapFree(file);
     wk->bgChars = GFL_BGSysLoadArcNCGRDynamic(arc, 4, 4, 0, FALSE, wk->heapId);
