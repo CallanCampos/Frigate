@@ -11,7 +11,8 @@ regenerate_configs.py runs after importing names from swan.
 
 The sources are rewritten everywhere, except for a static: only its own file, the one delinks.txt places it in, can
 refer to it, and another file may have a static of the same name. A static may also take a name that only other
-files' statics have; any other name already in use is refused.
+files' statics have, unless one of them is in the same module and both files are incomplete: an incomplete file links
+its delinked assembly, whose statics are global, so the two would clash. Any other name already in use is refused.
     rename_symbol.py --apply
 """
 import argparse
@@ -155,6 +156,20 @@ def apply(module: str, addr: int, name: str, pairs) -> list[str]:
     return [old for old, path, text in planned]
 
 
+def is_complete(module: str, source: Path) -> bool:
+    """Whether the primary version's delinks.txt marks a source file of a module complete."""
+    lines = (ROOT / "config" / PRIMARY / "arm9" / module / "delinks.txt").read_text().splitlines()
+    header = str(source.relative_to(ROOT)) + ":"
+    for i, line in enumerate(lines):
+        if line == header:
+            for body in lines[i + 1:]:
+                if not body.startswith(" "):
+                    break
+                if body.strip() == "complete":
+                    return True
+    return False
+
+
 def is_static(source: Path, name: str) -> bool:
     """Whether a source file defines a name as static, such as `static const u16 sTable[] = {...}`."""
     return re.search(rf"^\s*static\b[^;{{(]*\b{re.escape(name)}\b", source.read_text(), re.MULTILINE) is not None
@@ -208,6 +223,11 @@ def rename(old: str, new: str, pairs, names: list, module: str | None = None) ->
     holders = find_symbols(PRIMARY, new)
     if holders and not (only is not None and all(static_elsewhere(m, a, new, only) for m, a in holders)):
         sys.exit(f"{new} is already a symbol in {PRIMARY}")
+    for holder_module, holder_addr in holders:
+        holder = owning_source(holder_module, holder_addr)
+        if holder_module == module and not (is_complete(module, only) or is_complete(module, holder)):
+            sys.exit(f"{new} is a static of {holder.relative_to(ROOT)} in the same module, and both files are "
+                     "incomplete, and an incomplete file's statics are global")
     for version in OTHERS:
         if len(find_symbols(version, new)) != len(holders):
             sys.exit(f"{new} is already a symbol in {version}")
