@@ -452,10 +452,10 @@ BOOL POKE_NET_Connecting(void) {
     s32 start;
     int result;
 
-    address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
-    address.addr.addr = gPOKE_NET_Control.ServerAddr;
     address.len = sizeof(SOCSockAddrIn);
+    address.port = POKE_NET_Swap16(gPOKE_NET_Control.ServerPort);
     address.family = SOC_AF_INET;
+    address.addr.addr = gPOKE_NET_Control.ServerAddr;
     start = POKE_NET_GetTime();
 
     for (;;) {
