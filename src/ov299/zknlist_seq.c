@@ -38,11 +38,6 @@ enum {
     SEQ_END,
 };
 
-// Which Pokédex counts, PokeDex_GetMode's values
-#define DEX_REGIONAL 0
-#define DEX_NATIONAL 1
-#define DEX_HABITAT 2
-
 // No button to wait for while the list jumps
 #define BUTTON_NONE ZKNLIST_OBJ_COUNT
 

@@ -440,7 +440,7 @@ void GFL_WordSetFormatStrbuf(WordSet *wordSet, StrBuf *dest, const StrBuf *src) 
                 if (buf->attr.addLayoutCmd) {
                     u16 param = 0x54;
 
-                    GFL_StrCmdBuild(buf->strbuf, 0xbd, 4, 1, &param);
+                    GFL_StrCmdBuild(buf->strbuf, STRCMD_CATEGORY_LAYOUT, STRCMD_LAYOUT_MOVE_X, 1, &param);
                 }
                 GFL_StrBufUncompress(dest, wordSet->bufs[i].strbuf);
                 str = GFL_StrCmdSkipCommand(str);

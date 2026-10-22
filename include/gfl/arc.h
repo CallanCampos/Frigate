@@ -35,6 +35,5 @@ void *GFL_ArcToolReadHeapNew(ArcTool *handle, u32 fileId, HeapID heapId);
 // Read an archive's files in pieces: the offset of a file in the archive, and seeking to an offset and reading from it
 u32 GFL_ArcToolGetDataOfs(ArcTool *handle, u32 fileId);
 void GFL_ArcToolSeek(ArcTool *handle, u32 offset);
-void GFL_ArcToolReadRaw(ArcTool *handle, u32 size, void *dest);
 
 #endif // POKEBW2_GFL_ARC_H
