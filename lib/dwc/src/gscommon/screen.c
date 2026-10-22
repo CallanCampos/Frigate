@@ -63,8 +63,8 @@ void VPrintf(const char *format, va_list args) {
     }
 }
 
-int gsiTimeInSec(int *seconds) {
-    int time = OS_TicksToSeconds(OS_GetTick());
+time_t gsiTimeInSec(time_t *seconds) {
+    time_t time = OS_TicksToSeconds(OS_GetTick());
 
     if (seconds != NULL) {
         *seconds = time;

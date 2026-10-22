@@ -24,7 +24,7 @@ static gsi_u32 randomnum = 1;
 // The days before each month, less one, in a leap year and in another year
 static int _lpdays[13] = { -1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 static int _days[13] = { -1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364 };
-static GSTime tb;
+static struct tm tb;
 
 gsi_i64 gsiStringToInt64(const char *text) {
     return atoll(text);
@@ -117,10 +117,10 @@ void msleep(gsi_time milliseconds) {
 #define ADD_OVERFLOWS(a, b, sum) (((a) >= 0 && (b) >= 0 && (sum) < 0) || ((a) < 0 && (b) < 0 && (sum) >= 0))
 #define MUL_OVERFLOWS(a, b, product) ((a) ? ((product) / (a) != (b)) : 0)
 
-GSTime *gsiSecondsToDate(const int *seconds) {
-    int time = *seconds;
+struct tm *gsiSecondsToDate(const time_t *seconds) {
+    time_t time = *seconds;
     gsi_bool leap = gsi_false;
-    GSTime *date = &tb;
+    struct tm *date = &tb;
     int year;
     int yday;
     int month;
@@ -147,54 +147,54 @@ GSTime *gsiSecondsToDate(const int *seconds) {
             }
         }
     }
-    date->year = year;
+    date->tm_year = year;
     yday = time / 86400;
-    date->yday = yday;
+    date->tm_yday = yday;
     time -= yday * 86400;
     days = leap ? _lpdays : _days;
     month = 1;
     while (days[month] < yday) {
         month++;
     }
-    date->mon = month - 1;
-    date->mday = date->yday - days[date->mon];
-    date->wday = (*seconds / 86400 + 4) % 7;
-    date->hour = time / 3600;
-    time -= date->hour * 3600;
-    date->min = time / 60;
-    date->sec = time - date->min * 60;
-    date->isdst = 0;
+    date->tm_mon = month - 1;
+    date->tm_mday = date->tm_yday - days[date->tm_mon];
+    date->tm_wday = (*seconds / 86400 + 4) % 7;
+    date->tm_hour = time / 3600;
+    time -= date->tm_hour * 3600;
+    date->tm_min = time / 60;
+    date->tm_sec = time - date->tm_min * 60;
+    date->tm_isdst = 0;
     return date;
 }
 
-int gsiDateToSeconds(GSTime *date) {
-    int value = date->year;
+time_t gsiDateToSeconds(struct tm *date) {
+    time_t value = date->tm_year;
     int days;
     int sum;
     int addend;
-    GSTime *result;
+    struct tm *result;
 
     if (value < 69 || value > 139) {
         return -1;
     }
-    if (date->mon < 0 || date->mon > 11) {
-        value += date->mon / 12;
-        date->mon = date->mon % 12;
-        if (date->mon < 0) {
-            date->mon += 12;
+    if (date->tm_mon < 0 || date->tm_mon > 11) {
+        value += date->tm_mon / 12;
+        date->tm_mon = date->tm_mon % 12;
+        if (date->tm_mon < 0) {
+            date->tm_mon += 12;
             value--;
         }
         if (value < 69 || value > 139) {
             return -1;
         }
     }
-    days = _days[date->mon];
-    if ((value & 3) == 0 && date->mon > 1) {
+    days = _days[date->tm_mon];
+    if ((value & 3) == 0 && date->tm_mon > 1) {
         days++;
     }
     sum = (value - 1 >> 2) + 365 * (value - 70) - 17;
     sum += days;
-    addend = date->mday;
+    addend = date->tm_mday;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -203,7 +203,7 @@ int gsiDateToSeconds(GSTime *date) {
     if (MUL_OVERFLOWS(value, 24, sum)) {
         return -1;
     }
-    addend = date->hour;
+    addend = date->tm_hour;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -212,7 +212,7 @@ int gsiDateToSeconds(GSTime *date) {
     if (MUL_OVERFLOWS(value, 60, sum)) {
         return -1;
     }
-    addend = date->min;
+    addend = date->tm_min;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -221,7 +221,7 @@ int gsiDateToSeconds(GSTime *date) {
     if (MUL_OVERFLOWS(value, 60, sum)) {
         return -1;
     }
-    addend = date->sec;
+    addend = date->tm_sec;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;

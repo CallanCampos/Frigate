@@ -3,6 +3,7 @@
 
 #include "dwc/gsLargeInt.h"
 #include "dwc/nonport.h"
+#include <time.h>
 
 // GameSpy's XML (gsXML.c), in overlay 11: the writer of the SOAP messages that GameSpy's services in overlay 260
 // (Sake, the competition and the authentication) post, and the reader of their answers. Every writing and reading
@@ -39,7 +40,7 @@ gsi_bool gsXmlWriteHexBinaryElement(GSXmlStreamWriter writer, const char *prefix
                                     int size);
 gsi_bool gsXmlWriteBase64BinaryElement(GSXmlStreamWriter writer, const char *prefix, const char *name,
                                        const gsi_u8 *data, int size);
-gsi_bool gsXmlWriteDateTimeElement(GSXmlStreamWriter writer, const char *prefix, const char *name, int seconds);
+gsi_bool gsXmlWriteDateTimeElement(GSXmlStreamWriter writer, const char *prefix, const char *name, time_t seconds);
 gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter writer, const char *prefix, const char *name,
                                    const gsLargeInt_t *value);
 
@@ -66,7 +67,7 @@ gsi_bool gsXmlReadChildAsHexBinary(GSXmlStreamReader reader, const char *name, g
 gsi_bool gsXmlReadChildAsBase64Binary(GSXmlStreamReader reader, const char *name, gsi_u8 buffer[], int *size);
 gsi_bool gsXmlReadChildAsInt(GSXmlStreamReader reader, const char *name, int *value);
 gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader reader, const char *name, gsi_i64 *value);
-gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader reader, const char *name, int *seconds);
+gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader reader, const char *name, time_t *seconds);
 gsi_bool gsXmlReadChildAsFloat(GSXmlStreamReader reader, const char *name, float *value);
 gsi_bool gsXmlReadChildAsLargeInt(GSXmlStreamReader reader, const char *name, gsLargeInt_t *value);
 // How many children of the name (or of any name, for NULL) the element it is in has
