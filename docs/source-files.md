@@ -15,7 +15,16 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
   and the file is named for what it does, never for an overlay number.
 - **Status.** "complete" files link their compiled C. "partial" files link the original code until every function
   matches and the data they use is written; `docs/nonmatching-functions.md` lists the functions in C that do not match.
-- The functions outside every file are in the gaps that dsd leaves between them, in original assembly.
+- Functions outside every file remain in the gaps that dsd leaves between them, in original assembly.
+  A gap can also contain linker-generated metadata or alignment fill, as in ITCM below.
+
+ITCM's 15 functions are in five complete source files in both versions, covering `0x01ff8020`-`0x01ff939c`.
+The leading `0x01ff8000`-`0x01ff8020` gap contains the empty static-initializer list's zero terminator
+and alignment fill: each original ROM's autoload entry points its initializer field at `0x01ff8000`,
+and the startup code copies initializer pointers through the first zero. The final four bytes through
+`0x01ff93a0` are zero alignment fill, and ITCM has no BSS. These ranges require no additional source
+registration. Resolving the compiled objects' calls and pool references reproduces each original
+ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 ### Overlay 0
 
