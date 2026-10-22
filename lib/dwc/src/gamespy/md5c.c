@@ -1,11 +1,10 @@
 #include "dwc/ext.h"
 #include "dwc/md5.h"
 
-// GameSpy's MD5 (md5c.c): RSA's reference MD5, from RFC 1321, whose names the static functions carry. MD5Transform
-// keeps its address, with its name in the comment: NitroWiFi's SSL has a function of that name in this overlay
+// GameSpy's MD5 (md5c.c): RSA's reference MD5, from RFC 1321, whose names the functions carry
 
 // RFC 1321's MD5Transform, and its helpers
-static void func_ov011_02171af0(UINT4 state[4], unsigned char block[64]);
+static void MD5Transform(UINT4 state[4], unsigned char block[64]);
 static void Encode(unsigned char *output, UINT4 *input, unsigned int length);
 static void Decode(UINT4 *output, unsigned char *input, unsigned int length);
 static void MD5_memcpy(POINTER output, POINTER input, unsigned int length);
@@ -64,11 +63,11 @@ static unsigned char PADDING[64] = { 0x80 };
         (a) += (b);                                                                                                    \
     }
 
-void func_ov011_021719fc(MD5_CTX *context) {
-    func_ov011_021719fcInline(context);
+void MD5Init(MD5_CTX *context) {
+    MD5InitInline(context);
 }
 
-void func_ov011_02171a24(MD5_CTX *context, unsigned char *input, unsigned int inputLen) {
+void MD5Update(MD5_CTX *context, unsigned char *input, unsigned int inputLen) {
     unsigned int i;
     unsigned int index;
     unsigned int partLen;
@@ -81,9 +80,9 @@ void func_ov011_02171a24(MD5_CTX *context, unsigned char *input, unsigned int in
     partLen = 64 - index;
     if (inputLen >= partLen) {
         MD5_memcpy(&context->buffer[index], input, partLen);
-        func_ov011_02171af0(context->state, context->buffer);
+        MD5Transform(context->state, context->buffer);
         for (i = partLen; i + 63 < inputLen; i += 64) {
-            func_ov011_02171af0(context->state, &input[i]);
+            MD5Transform(context->state, &input[i]);
         }
         index = 0;
     } else {
@@ -92,7 +91,7 @@ void func_ov011_02171a24(MD5_CTX *context, unsigned char *input, unsigned int in
     MD5_memcpy(&context->buffer[index], &input[i], inputLen - i);
 }
 
-void func_ov011_02171a9c(unsigned char digest[16], MD5_CTX *context) {
+void MD5Final(unsigned char digest[16], MD5_CTX *context) {
     unsigned char bits[8];
     unsigned int index;
     unsigned int padLen;
@@ -100,13 +99,13 @@ void func_ov011_02171a9c(unsigned char digest[16], MD5_CTX *context) {
     Encode(bits, context->count, 8);
     index = (context->count[0] >> 3) & 0x3f;
     padLen = (index < 56) ? (56 - index) : (120 - index);
-    func_ov011_02171a24(context, PADDING, padLen);
-    func_ov011_02171a24(context, bits, 8);
+    MD5Update(context, PADDING, padLen);
+    MD5Update(context, bits, 8);
     Encode(digest, context->state, 16);
     MD5_memset((POINTER)context, 0, sizeof(*context));
 }
 
-static void func_ov011_02171af0(UINT4 state[4], unsigned char block[64]) {
+static void MD5Transform(UINT4 state[4], unsigned char block[64]) {
     UINT4 a = state[0];
     UINT4 b = state[1];
     UINT4 c = state[2];
@@ -237,8 +236,8 @@ void MD5Digest(unsigned char *input, unsigned int len, char output[33]) {
     MD5_CTX context;
     unsigned char digest[16];
 
-    func_ov011_021719fc(&context);
-    func_ov011_02171a24(&context, input, len);
-    func_ov011_02171a9c(digest, &context);
+    MD5Init(&context);
+    MD5Update(&context, input, len);
+    MD5Final(digest, &context);
     MD5Print(digest, output);
 }

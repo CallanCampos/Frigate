@@ -19,19 +19,19 @@ typedef void (*GSSoapCustomFunc)(GHTTPPost post, void *userData);
 // A request: the callback, what it posts and where, the answer, the HTTP post, the task that runs the request
 // (handle) and the HTTP request's number, its result and whether it ended
 typedef struct {
-    GSSoapCallbackFunc callbackFunc;
-    GSSoapCustomFunc customFunc;
-    const char *url;
-    const char *service;
-    GSXmlStreamWriter requestSoap;
-    GSXmlStreamReader responseSoap;
-    char *responseBuffer;
-    GHTTPPost postData;
-    void *userData;
-    GSTask *handle;
-    GHTTPRequest requestId;
-    GHTTPResult requestResult;
-    gsi_bool completed;
+    GSSoapCallbackFunc mCallbackFunc;
+    GSSoapCustomFunc mCustomFunc;
+    const char *mURL;
+    const char *mService;
+    GSXmlStreamWriter mRequestSoap;
+    GSXmlStreamReader mResponseSoap;
+    char *mResponseBuffer;
+    GHTTPPost mPostData;
+    void *mUserData;
+    GSTask *mCoreTask;
+    GHTTPRequest mRequestId;
+    GHTTPResult mRequestResult;
+    gsi_bool mCompleted;
 } GSSoapTask;
 
 // Starts a request, with a time limit or none; returns it, or NULL when it could not start

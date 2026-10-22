@@ -3,7 +3,7 @@
 // ghttpMain: starting the client, a request and the walk of the requests' states
 
 // How many times the client was started: it is stopped when the count comes back to 0
-static int sStartCount;
+static int ghiReferenceCount;
 
 // Gives a connection that the server answered with an error its result, by the status code
 void ghiHandleStatus(GHIConnection *connection) {
@@ -87,7 +87,7 @@ GHTTPBool ghiProcessConnection(GHIConnection *connection) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Connection Closing\n");
     }
 
-    if (connection->redirectUrl != NULL) {
+    if (connection->redirectURL != NULL) {
         ghiRedirectConnection(connection);
     }
 
@@ -99,9 +99,9 @@ GHTTPBool ghiProcessConnection(GHIConnection *connection) {
     }
 
     if (connection->completed) {
-        if (connection->encryptor.secure == gsi_true) {
+        if (connection->encryptor.mNotInCloseSocket == gsi_true) {
             ghiHandleStatus(connection);
-            if (!ghiCloseSocket(connection)) {
+            if (!ghiCloseConnection(connection)) {
                 connection->processing = gsi_false;
                 connection->state = 11;
                 return gsi_false;
@@ -112,7 +112,7 @@ GHTTPBool ghiProcessConnection(GHIConnection *connection) {
                 return gsi_false;
             }
         } else {
-            if (!ghiCloseSocket(connection)) {
+            if (!ghiCloseConnection(connection)) {
                 connection->processing = gsi_false;
                 connection->state = 11;
                 return gsi_false;
@@ -131,11 +131,11 @@ GHTTPBool ghiProcessConnection(GHIConnection *connection) {
 
 void ghttpStartup(void) {
     ghiLock();
-    sStartCount++;
-    if (sStartCount == 1) {
+    ghiReferenceCount++;
+    if (ghiReferenceCount == 1) {
         ghiCreateLock();
-        ghiThrottleBytes = 125;
-        ghiThrottleInterval = 250;
+        ghiThrottleBufferSize = 125;
+        ghiThrottleTimeDelay = 250;
         return;
     }
     ghiUnlock();
@@ -143,8 +143,8 @@ void ghttpStartup(void) {
 
 void ghttpCleanup(void) {
     ghiLock();
-    sStartCount--;
-    if (sStartCount == 0) {
+    ghiReferenceCount--;
+    if (ghiReferenceCount == 0) {
         ghiCleanupConnections();
         if (ghiProxyAddress != NULL) {
             gsifree(ghiProxyAddress);
@@ -174,7 +174,7 @@ GHTTPRequest ghttpGetExA(const char *url, const char *headers, char *buffer, int
     if (buffer != NULL && bufferSize == 0) {
         return -1;
     }
-    if (sStartCount == 0) {
+    if (ghiReferenceCount == 0) {
         ghttpStartup();
     }
 
@@ -183,14 +183,14 @@ GHTTPRequest ghttpGetExA(const char *url, const char *headers, char *buffer, int
         return -1;
     }
     connection->type = 0;
-    connection->url = goastrdup(url);
-    if (connection->url == NULL) {
+    connection->URL = goastrdup(url);
+    if (connection->URL == NULL) {
         ghiFreeConnection(connection);
         return -1;
     }
     if (headers != NULL && headers[0] != '\0') {
-        connection->headers = goastrdup(headers);
-        if (connection->headers == NULL) {
+        connection->sendHeaders = goastrdup(headers);
+        if (connection->sendHeaders == NULL) {
             ghiFreeConnection(connection);
             return -1;
         }
@@ -201,11 +201,11 @@ GHTTPRequest ghttpGetExA(const char *url, const char *headers, char *buffer, int
     connection->completedCallback = completed;
     connection->callbackParam = param;
     connection->throttle = throttle;
-    connection->userBuffer = buffer != NULL;
-    if (connection->userBuffer) {
-        ready = ghiInitFixedBuffer(connection, &connection->fileBuffer, buffer, bufferSize);
+    connection->userBufferSupplied = buffer != NULL;
+    if (connection->userBufferSupplied) {
+        ready = ghiInitFixedBuffer(connection, &connection->getFileBuffer, buffer, bufferSize);
     } else {
-        ready = ghiInitBuffer(connection, &connection->fileBuffer, 0x800, 0x800);
+        ready = ghiInitBuffer(connection, &connection->getFileBuffer, 0x800, 0x800);
     }
     if (!ready) {
         ghiFreeConnection(connection);
@@ -234,7 +234,7 @@ void ghttpThink(void) {
     ghiEnumConnections(ghiProcessConnection);
 }
 
-GHTTPBool ghttpThinkRequest(GHTTPRequest request) {
+GHTTPBool ghttpRequestThink(GHTTPRequest request) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection == NULL) {
@@ -252,7 +252,7 @@ void ghttpCancelRequest(GHTTPRequest request) {
         connection->result = 0x12;
         connection->state = 11;
         connection->completed = gsi_true;
-        ghiCloseSocket(connection);
+        ghiCloseConnection(connection);
     }
 }
 
@@ -285,7 +285,7 @@ void ghttpPostSetAutoFree(GHTTPPost post, GHTTPBool autoFree) {
 
 void ghttpFreePost(GHTTPRequest request, GHTTPPost post) {
     if (post != NULL) {
-        ghiFreePostOfRequest(request, post);
+        ghiFreePostAndUpdateConnection(request, post);
     }
 }
 
@@ -297,6 +297,6 @@ GHTTPBool ghttpSetRootCAList(const char *url, GHICertList *rootCA) {
     return ghiEncyptorSetRootCAList(url, rootCA);
 }
 
-GHTTPBool ghttpRemoveRootCAList(const char *url) {
-    return ghiEncryptorRemoveRootCAList(url);
+GHTTPBool ghttpCleanupRootCAList(const char *url) {
+    return ghiEncyptorCleanupRootCAList(url);
 }

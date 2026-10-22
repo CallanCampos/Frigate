@@ -165,7 +165,7 @@ void SBQueryEngineInit(SBQueryEngine *engine, int maxupdates, int queryversion, 
     engine->ListCallback = callback;
     engine->instance = instance;
     engine->mypublicip = 0;
-    engine->querysock = gsiSocket(2, 2, 0);
+    engine->querysock = socket(2, 2, 0);
     FIFOClear(&engine->pendinglist);
     FIFOClear(&engine->querylist);
 }

@@ -29,16 +29,16 @@
 // The packets' fields after the header, by type. The sizes sent are the header's 12 bytes and 9 for an init
 // packet (and the game's name after them), 8 for a connect packet or a ping, 61 for a report and 6 for a pre-init
 typedef struct _InitPacket {
-    unsigned char portType; // 0 sent from the game's socket, 1 to 3 to each server from the negotiation's
-    unsigned char clientIndex;
-    unsigned char useGamePort;
-    unsigned int localIp;
-    unsigned short localPort;
+    unsigned char porttype; // 0 sent from the game's socket, 1 to 3 to each server from the negotiation's
+    unsigned char clientindex;
+    unsigned char usegameport;
+    unsigned int localip;
+    unsigned short localport;
 } InitPacket;
 
 typedef struct _ReportPacket {
-    unsigned char portType;
-    unsigned char clientIndex;
+    unsigned char porttype;
+    unsigned char clientindex;
     unsigned char negResult; // whether it succeeded
     NatType natType;
     NatMappingScheme natMappingScheme;
@@ -46,29 +46,29 @@ typedef struct _ReportPacket {
 } ReportPacket;
 
 typedef struct _ConnectPacket {
-    unsigned int remoteIp;
+    unsigned int remoteIP;
     unsigned short remotePort;
-    unsigned char gotYourData;
+    unsigned char gotyourdata;
     unsigned char finished; // 0 while it goes on, else the reason it failed: 1 a deadbeat partner, 2 the init timed out
 } ConnectPacket;
 
-typedef struct PreInitPacket {
-    gsi_u8 clientIndex;
+typedef struct _PreinitPacket {
+    gsi_u8 clientindex;
     gsi_u8 state; // in the ack: 2 when the init packets can be sent
-    gsi_u32 clientId;
-} PreInitPacket;
+    gsi_u32 clientID;
+} PreinitPacket;
 
 typedef struct _NatNegPacket {
     unsigned char magic[NATNEG_MAGIC_LEN];
     unsigned char version;
-    unsigned char packetType;
+    unsigned char packettype;
     int cookie;
     union {
         InitPacket init;
         ConnectPacket connect;
         ReportPacket report;
-        PreInitPacket preInit;
-    } packet;
+        PreinitPacket preInit;
+    } Packet;
 } NatNegPacket;
 
 typedef enum {

@@ -17,14 +17,14 @@ void ghiCallCompletedCallback(GHIConnection *connection) {
         GHTTPBool keep;
 
         if (connection->type == GHIGET) {
-            buffer = connection->fileBuffer.data;
+            buffer = connection->getFileBuffer.data;
         } else {
             buffer = NULL;
         }
-        keep = completed(connection->request, connection->result, buffer, connection->bytesReceived,
+        keep = completed(connection->request, connection->result, buffer, connection->fileBytesReceived,
                          connection->callbackParam);
         if (buffer != NULL && !keep) {
-            connection->fileBuffer.dontFree = gsi_true;
+            connection->getFileBuffer.dontFree = gsi_true;
         }
     }
 }
@@ -33,7 +33,7 @@ void ghiCallProgressCallback(GHIConnection *connection, const char *buffer, GHTT
     ghttpProgressCallback progress = connection->progressCallback;
 
     if (progress != NULL) {
-        progress(connection->request, connection->state, buffer, length, connection->bytesReceived,
+        progress(connection->request, connection->state, buffer, length, connection->fileBytesReceived,
                  connection->totalSize, connection->callbackParam);
     }
 }
@@ -42,7 +42,6 @@ void ghiCallPostCallback(GHIConnection *connection) {
     if (connection->postingState.callback != NULL) {
         connection->postingState.callback(connection->request, connection->postingState.bytesPosted,
                                           connection->postingState.totalBytes, connection->postingState.index,
-                                          func_ov011_02171588(connection->postingState.states),
-                                          connection->callbackParam);
+                                          ArrayLength(connection->postingState.states), connection->callbackParam);
     }
 }

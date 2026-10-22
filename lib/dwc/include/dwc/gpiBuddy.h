@@ -21,7 +21,7 @@ GPResult gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *b
 // Authorize a buddy request, and delete a buddy, telling the server if asked to
 GPResult gpiAuthBuddyRequest(GPConnection *connection, GPProfile profile);
 GPResult gpiDeleteBuddy(GPConnection *connection, GPProfile profile, GPIBool sendServerRequest);
-// Sets whether a profile's buddy was deleted (the name is ours)
-int gpiSetBuddyDeleted(GPConnection *connection, int profile, gsi_bool deleted);
+// Sets whether a profile's buddy was deleted
+int gpiBuddyDeletedLocally(GPConnection *connection, int profile, gsi_bool deleted);
 
 #endif // POKEBW2_DWC_GPIBUDDY_H

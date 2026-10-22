@@ -172,8 +172,8 @@ int Gdb_Startup(int gameId, const DWCUserData *userData, int server) {
         Gdb_RunLibrary();
         return Gdb_SetStartupError(error);
     }
-    Sake_SetGame(sGdb.sake, gcd_gamename, gameId, gcd_secret_key);
-    Sake_SetLoginTicket(sGdb.sake, ((const GdbUserData *)userData)->profileId, &ticket);
+    sakeSetGame(sGdb.sake, gcd_gamename, gameId, gcd_secret_key);
+    sakeSetProfile(sGdb.sake, ((const GdbUserData *)userData)->profileId, &ticket);
     Gdb_SetUrls(server);
     DWC_InitGHTTP(NULL);
     sGdb.state = GDB_STATE_IDLE;
@@ -251,7 +251,7 @@ int Gdb_Shutdown(void) {
     Gdb_ReleaseUrls();
     sGdb.state = GDB_STATE_OFF;
     DWC_ShutdownGHTTP();
-    Sake_Free(sGdb.sake);
+    sakeShutdown(sGdb.sake);
     Gdb_RunLibrary();
     return 0;
 }
@@ -260,10 +260,10 @@ void Gdb_ReleaseUrls(void) {
     char uploadUrl[128];
     char downloadUrl[128];
 
-    DWCi_RemoveGHTTPRootCA(gSakeStorageUrl);
-    Sake_GetUploadUrl(sGdb.sake, uploadUrl);
+    DWCi_RemoveGHTTPRootCA(sakeiSoapUrl);
+    sakeGetFileUploadURL(sGdb.sake, uploadUrl);
     DWCi_RemoveGHTTPRootCA(uploadUrl);
-    Sake_GetDownloadUrl(sGdb.sake, 1, downloadUrl);
+    sakeGetFileDownloadURL(sGdb.sake, 1, downloadUrl);
     DWCi_RemoveGHTTPRootCA(downloadUrl);
 }
 
@@ -296,14 +296,14 @@ int Gdb_CreateRecord(const char *table, GdbField *fields, int fieldNum, int *rec
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.create.input.tableId = (char *)table;
-    slot->u.create.input.fields = (SAKEField *)fields;
-    slot->u.create.input.fieldNum = fieldNum;
+    slot->u.create.input.mTableId = (char *)table;
+    slot->u.create.input.mFields = (SAKEField *)fields;
+    slot->u.create.input.mNumFields = fieldNum;
     slot->u.create.recordId = recordId;
     error = 0;
     request = sakeCreateRecord(sGdb.sake, &slot->u.create.input, Gdb_OnResult, NULL);
     if (request == NULL) {
-        error = Sake_GetLastError(sGdb.sake);
+        error = sakeGetStartRequestResult(sGdb.sake);
         Gdb_Printf(559, "sakeCreateRecord failed.[%d]\n", error);
         return Gdb_SetRequestError(2, error);
     }
@@ -323,14 +323,14 @@ int Gdb_UpdateRecord(const char *table, int recordId, GdbField *fields, int fiel
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.update.tableId = (char *)table;
-    slot->u.update.recordId = recordId;
-    slot->u.update.fields = (SAKEField *)fields;
-    slot->u.update.fieldNum = fieldNum;
+    slot->u.update.mTableId = (char *)table;
+    slot->u.update.mRecordId = recordId;
+    slot->u.update.mFields = (SAKEField *)fields;
+    slot->u.update.mNumFields = fieldNum;
     error = 0;
     request = sakeUpdateRecord(sGdb.sake, &slot->u.update, Gdb_OnResult, NULL);
     if (request == NULL) {
-        error = Sake_GetLastError(sGdb.sake);
+        error = sakeGetStartRequestResult(sGdb.sake);
         Gdb_Printf(668, "sakeUpdateRecord failed.[%d]\n", error);
         return Gdb_SetRequestError(4, error);
     }
@@ -350,13 +350,13 @@ int Gdb_GetMyRecords(const char *table, const char **fieldNames, int fieldNum, G
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.getMy.input.tableId = (char *)table;
-    slot->u.getMy.input.fieldNames = (char **)fieldNames;
-    slot->u.getMy.input.fieldNum = fieldNum;
+    slot->u.getMy.input.mTableId = (char *)table;
+    slot->u.getMy.input.mFieldNames = (char **)fieldNames;
+    slot->u.getMy.input.mNumFields = fieldNum;
     slot->u.getMy.func = (GdbRecordsCallback)func;
     request = sakeGetMyRecords(sGdb.sake, &slot->u.getMy.input, Gdb_OnResult, work);
     if (request == NULL) {
-        error = Sake_GetLastError(sGdb.sake);
+        error = sakeGetStartRequestResult(sGdb.sake);
         Gdb_Printf(859, "sakeGetMyRecords failed.[%d]\n", error);
         return Gdb_SetRequestError(7, error);
     }
@@ -377,15 +377,15 @@ int Gdb_GetSpecificRecords(const char *table, int *recordIds, int recordNum, con
     }
     Gdb_NextRequest();
     slot = &sGdbRequests[sGdb.requestIndex];
-    slot->u.getSpecific.input.tableId = (char *)table;
-    slot->u.getSpecific.input.recordIds = recordIds;
-    slot->u.getSpecific.input.recordNum = recordNum;
-    slot->u.getSpecific.input.fieldNames = (char **)fieldNames;
-    slot->u.getSpecific.input.fieldNum = fieldNum;
+    slot->u.getSpecific.input.mTableId = (char *)table;
+    slot->u.getSpecific.input.mRecordIds = recordIds;
+    slot->u.getSpecific.input.mNumRecordIds = recordNum;
+    slot->u.getSpecific.input.mFieldNames = (char **)fieldNames;
+    slot->u.getSpecific.input.mNumFields = fieldNum;
     slot->u.getSpecific.func = (GdbRecordsCallback)func;
     request = sakeGetSpecificRecords(sGdb.sake, &slot->u.getSpecific.input, Gdb_OnResult, work);
     if (request == NULL) {
-        error = Sake_GetLastError(sGdb.sake);
+        error = sakeGetStartRequestResult(sGdb.sake);
         Gdb_Printf(970, "sakeGetSpecificRecords failed.[%d]\n", error);
         return Gdb_SetRequestError(9, error);
     }
@@ -462,7 +462,7 @@ static void Gdb_OnResult(SAKE sake, SAKERequest request, SAKERequestResult error
             slot = &sGdbRequests[sGdb.requestIndex];
             *slot->u.create.recordId = ((int *)output)[0];
             Gdb_Printf(1455, "%s[gdb=>%s field_num=>%d record_id=>%d].\n", sOperationNames[operation],
-                       slot->u.create.input.tableId, slot->u.create.input.fieldNum, *slot->u.create.recordId);
+                       slot->u.create.input.mTableId, slot->u.create.input.mNumFields, *slot->u.create.recordId);
             break;
         case GDB_OPERATION_DELETE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -472,14 +472,14 @@ static void Gdb_OnResult(SAKE sake, SAKERequest request, SAKERequestResult error
         case GDB_OPERATION_UPDATE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1474, "%s[gdb=>%s record_id=>%d field_num=>%d].\n", sOperationNames[operation],
-                       slot->u.update.tableId, slot->u.update.recordId, slot->u.update.fieldNum);
+                       slot->u.update.mTableId, slot->u.update.mRecordId, slot->u.update.mNumFields);
             break;
         case GDB_OPERATION_GET_MY_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1483, "%s[record_num=>%d].\n", sOperationNames[operation],
-                       ((SAKEGetMyRecordsOutput *)output)->recordNum);
-            slot->u.getMy.func(((SAKEGetMyRecordsOutput *)output)->recordNum,
-                               ((SAKEGetMyRecordsOutput *)output)->records, userData);
+                       ((SAKEGetMyRecordsOutput *)output)->mNumRecords);
+            slot->u.getMy.func(((SAKEGetMyRecordsOutput *)output)->mNumRecords,
+                               ((SAKEGetMyRecordsOutput *)output)->mRecords, userData);
             break;
         case GDB_OPERATION_GET_RECORD_LIMIT:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -492,9 +492,9 @@ static void Gdb_OnResult(SAKE sake, SAKERequest request, SAKERequestResult error
         case GDB_OPERATION_GET_SPECIFIC_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1505, "%s[record_num=>%d].\n", sOperationNames[operation],
-                       ((SAKEGetSpecificRecordsOutput *)output)->recordNum);
-            slot->u.getSpecific.func(((SAKEGetSpecificRecordsOutput *)output)->recordNum,
-                                     ((SAKEGetSpecificRecordsOutput *)output)->records, userData);
+                       ((SAKEGetSpecificRecordsOutput *)output)->mNumRecords);
+            slot->u.getSpecific.func(((SAKEGetSpecificRecordsOutput *)output)->mNumRecords,
+                                     ((SAKEGetSpecificRecordsOutput *)output)->mRecords, userData);
             break;
         case GDB_OPERATION_RATE_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -504,9 +504,9 @@ static void Gdb_OnResult(SAKE sake, SAKERequest request, SAKERequestResult error
         case GDB_OPERATION_SEARCH_RECORDS:
             slot = &sGdbRequests[sGdb.requestIndex];
             Gdb_Printf(1525, "%s[record_num=>%d].\n", sOperationNames[operation],
-                       ((SAKESearchForRecordsOutput *)output)->recordNum);
-            slot->u.search.func(((SAKESearchForRecordsOutput *)output)->recordNum,
-                                ((SAKESearchForRecordsOutput *)output)->records, userData);
+                       ((SAKESearchForRecordsOutput *)output)->mNumRecords);
+            slot->u.search.func(((SAKESearchForRecordsOutput *)output)->mNumRecords,
+                                ((SAKESearchForRecordsOutput *)output)->mRecords, userData);
             break;
         case GDB_OPERATION_GET_RANDOM_RECORD:
             slot = &sGdbRequests[sGdb.requestIndex];
@@ -718,9 +718,9 @@ static void Gdb_SetUrls(int server) {
 
     switch (server) {
     case 1:
-        OS_SNPrintf(gSakeStorageUrl, 128,
+        OS_SNPrintf(sakeiSoapUrl, 128,
                     "https://%s.secure2.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx", gcd_gamename);
-        DWCi_SetGHTTPRootCA(gSakeStorageUrl);
+        DWCi_SetGHTTPRootCA(sakeiSoapUrl);
         OS_SNPrintf(uploadUrl, 128, "https://%s.secure2.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
                     gcd_gamename);
         DWCi_SetGHTTPRootCA(uploadUrl);
@@ -730,9 +730,9 @@ static void Gdb_SetUrls(int server) {
         break;
     case 0:
     default:
-        OS_SNPrintf(gSakeStorageUrl, 128,
+        OS_SNPrintf(sakeiSoapUrl, 128,
                     "https://%s.secure.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx", gcd_gamename);
-        DWCi_SetGHTTPRootCA(gSakeStorageUrl);
+        DWCi_SetGHTTPRootCA(sakeiSoapUrl);
         OS_SNPrintf(uploadUrl, 128, "https://%s.secure.sake.gs.nintendowifi.net/SakeFileServer/upload.aspx",
                     gcd_gamename);
         DWCi_SetGHTTPRootCA(uploadUrl);
@@ -741,6 +741,6 @@ static void Gdb_SetUrls(int server) {
         DWCi_SetGHTTPRootCA(downloadUrl);
         break;
     }
-    Sake_SetUploadUrl(sGdb.sake, uploadUrl);
-    Sake_SetDownloadUrl(sGdb.sake, downloadUrl);
+    sakeSetFileUploadURL(sGdb.sake, uploadUrl);
+    sakeSetFileDownloadURL(sGdb.sake, downloadUrl);
 }

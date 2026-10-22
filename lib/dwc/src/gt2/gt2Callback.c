@@ -8,11 +8,11 @@ GT2Bool gti2SocketErrorCallback(GT2Socket socket) {
     if (socket == NULL) {
         return gsi_true;
     }
-    if (socket->onSocketError == NULL) {
+    if (socket->socketErrorCallback == NULL) {
         return gsi_true;
     }
     socket->callbackLevel++;
-    socket->onSocketError(socket);
+    socket->socketErrorCallback(socket);
     socket->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
         gti2CloseSocket(socket);
@@ -26,7 +26,7 @@ GT2Bool gti2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection, u
     if (socket == NULL || connection == NULL) {
         return gsi_true;
     }
-    if (socket->onConnectAttempt == NULL) {
+    if (socket->connectAttemptCallback == NULL) {
         return gsi_true;
     }
     if (length == 0 || message == NULL) {
@@ -35,7 +35,7 @@ GT2Bool gti2ConnectAttemptCallback(GT2Socket socket, GT2Connection connection, u
     }
     socket->callbackLevel++;
     connection->callbackLevel++;
-    socket->onConnectAttempt(socket, connection, ip, port, latency, message, length);
+    socket->connectAttemptCallback(socket, connection, ip, port, latency, message, length);
     socket->callbackLevel--;
     connection->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
@@ -49,7 +49,7 @@ GT2Bool gti2ConnectedCallback(GT2Connection connection, GT2Result result, GT2Byt
     if (connection == NULL) {
         return gsi_true;
     }
-    connection->result = result;
+    connection->connectionResult = result;
     if (connection->callbacks.connected == NULL) {
         return gsi_true;
     }
@@ -137,7 +137,7 @@ GT2Bool gti2SendFilterCallback(GT2Connection connection, int filterId, const GT2
     if (connection == NULL) {
         return gsi_true;
     }
-    filter = func_ov011_0217158c(connection->sendFilters, filterId);
+    filter = ArrayNth(connection->sendFilters, filterId);
     if (filter == NULL) {
         return gsi_true;
     }
@@ -164,7 +164,7 @@ GT2Bool gti2ReceiveFilterCallback(GT2Connection connection, int filterId, GT2Byt
     if (connection == NULL) {
         return gsi_true;
     }
-    filter = func_ov011_0217158c(connection->receiveFilters, filterId);
+    filter = ArrayNth(connection->receiveFilters, filterId);
     if (filter == NULL) {
         return gsi_true;
     }
@@ -192,9 +192,9 @@ GT2Bool gti2DumpCallback(GT2Socket socket, GT2Connection connection, unsigned in
         return gsi_true;
     }
     if (send) {
-        callback = socket->onSendDump;
+        callback = socket->sendDumpCallback;
     } else {
-        callback = socket->onReceiveDump;
+        callback = socket->receiveDumpCallback;
     }
     if (callback == NULL) {
         return gsi_true;
@@ -225,7 +225,7 @@ GT2Bool gti2UnrecognizedMessageCallback(GT2Socket socket, unsigned int ip, unsig
     if (socket == NULL) {
         return gsi_true;
     }
-    if (socket->onUnrecognizedMessage == NULL) {
+    if (socket->unrecognizedMessageCallback == NULL) {
         return gsi_true;
     }
     if (length == 0 || message == NULL) {
@@ -233,7 +233,7 @@ GT2Bool gti2UnrecognizedMessageCallback(GT2Socket socket, unsigned int ip, unsig
         length = 0;
     }
     socket->callbackLevel++;
-    *handled = socket->onUnrecognizedMessage(socket, ip, port, message, length);
+    *handled = socket->unrecognizedMessageCallback(socket, ip, port, message, length);
     socket->callbackLevel--;
     if (socket->close && socket->callbackLevel == 0) {
         gti2CloseSocket(socket);

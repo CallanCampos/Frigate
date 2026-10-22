@@ -31,25 +31,25 @@ typedef struct GHIPostData {
         struct {
             GSXmlStreamWriter message;
         } xml;
-    } u;
+    } data;
 } GHIPostData;
 
 // How far an item of the post of a connection has got
 typedef struct GHIPostState {
-    GHIPostData *item;
-    int position;
+    GHIPostData *data;
+    int pos;
     void *file;
     long fileSize;
 } GHIPostState;
 
 // The header of a DIME record, with its numbers in network order
-typedef struct GHIDimeHeader {
-    gsi_u8 flags;
-    gsi_u8 type;
-    gsi_u16 optionsLength;
-    gsi_u16 idLength;
-    gsi_u16 typeLength;
-    gsi_u32 dataLength;
+typedef struct GSIDimeHeader {
+    gsi_u8 mVersionAndFlags;
+    gsi_u8 mTypeT;
+    gsi_u16 mOptionsLength;
+    gsi_u16 mIdLength;
+    gsi_u16 mTypeLength;
+    gsi_u32 mDataLength;
 } GHIDimeHeader;
 
 #define GHI_DIME_VERSION 0x08
@@ -77,23 +77,23 @@ typedef struct GHIDimeHeader {
 static char sUnreservedChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_@-.*";
 
 // Frees what an item holds
-static void ghiFreePostItem(void *element) {
+static void ghiPostDataFree(void *element) {
     GHIPostData *item = element;
 
     if (item->type != GHIXmlData) {
         gsifree(item->name);
     }
     if (item->type == GHIString) {
-        gsifree(item->u.string.value);
+        gsifree(item->data.string.value);
     } else if (item->type == GHIFileDisk) {
-        gsifree(item->u.disk.path);
-        gsifree(item->u.disk.fileName);
-        gsifree(item->u.disk.contentType);
+        gsifree(item->data.disk.path);
+        gsifree(item->data.disk.fileName);
+        gsifree(item->data.disk.contentType);
     } else if (item->type == GHIFileMemory) {
-        gsifree(item->u.memory.fileName);
-        gsifree(item->u.memory.contentType);
+        gsifree(item->data.memory.fileName);
+        gsifree(item->data.memory.contentType);
     } else if (item->type == GHIXmlData) {
-        gsXmlFreeWriter(item->u.xml.message);
+        gsXmlFreeWriter(item->data.xml.message);
     }
 }
 
@@ -111,8 +111,8 @@ GHTTPPost ghiNewPost(void) {
         *p++ = 0;
     }
     post->autoFree = gsi_true;
-    post->items = func_ov011_02171514(sizeof(GHIPostData), 0, ghiFreePostItem);
-    if (post->items == NULL) {
+    post->data = ArrayNew(sizeof(GHIPostData), 0, ghiPostDataFree);
+    if (post->data == NULL) {
         gsifree(post);
         return NULL;
     }
@@ -124,15 +124,15 @@ void ghiPostSetAutoFree(GHTTPPost post, GHTTPBool autoFree) {
 }
 
 void ghiFreePost(GHTTPPost post) {
-    if (post->items != NULL) {
-        func_ov011_02171558(post->items);
+    if (post->data != NULL) {
+        ArrayFree(post->data);
     }
-    post->items = NULL;
+    post->data = NULL;
     gsifree(post);
 }
 
 // Frees a post of a request, and what the request keeps of it
-void ghiFreePostOfRequest(GHTTPRequest request, GHTTPPost post) {
+void ghiFreePostAndUpdateConnection(GHTTPRequest request, GHTTPPost post) {
     GHIConnection *connection = ghiRequestToConnection(request);
 
     if (connection != NULL) {
@@ -142,8 +142,8 @@ void ghiFreePostOfRequest(GHTTPRequest request, GHTTPPost post) {
 }
 
 // Adds a file that is in memory: the post copies the texts but not the bytes. Returns gsi_false if it can't
-GHTTPBool ghttpPostAddFileFromMemory(GHTTPPost post, const gsi_char *field, const char *bytes, int size,
-                                     const gsi_char *fileName, const gsi_char *contentType) {
+GHTTPBool ghiPostAddFileFromMemory(GHTTPPost post, const gsi_char *field, const char *bytes, int size,
+                                   const gsi_char *fileName, const gsi_char *contentType) {
     char *fieldCopy = goastrdup(field);
     char *fileNameCopy = goastrdup(fileName);
     char *contentTypeCopy = goastrdup(contentType);
@@ -158,14 +158,14 @@ GHTTPBool ghttpPostAddFileFromMemory(GHTTPPost post, const gsi_char *field, cons
 
         item.type = GHIFileMemory;
         item.name = fieldCopy;
-        item.u.memory.data = bytes;
-        item.u.memory.length = size;
-        item.u.memory.fileName = fileNameCopy;
-        item.u.memory.contentType = contentTypeCopy;
-        func_ov011_021715a4(post->items, &item);
+        item.data.memory.data = bytes;
+        item.data.memory.length = size;
+        item.data.memory.fileName = fileNameCopy;
+        item.data.memory.contentType = contentTypeCopy;
+        ArrayAppend(post->data, &item);
         post->hasFiles = gsi_true;
-        if (post->hasXml == gsi_true) {
-            post->mixed = gsi_true;
+        if (post->hasSoap == gsi_true) {
+            post->useDIME = gsi_true;
         }
         return gsi_true;
     }
@@ -176,11 +176,11 @@ GHTTPBool ghiPostAddXml(GHTTPPost post, GSXmlStreamWriter message) {
     GHIPostData item;
 
     item.type = GHIXmlData;
-    item.u.xml.message = message;
-    func_ov011_021715a4(post->items, &item);
-    post->hasXml = gsi_true;
+    item.data.xml.message = message;
+    ArrayAppend(post->data, &item);
+    post->hasSoap = gsi_true;
     if (post->hasFiles == gsi_true) {
-        post->mixed = gsi_true;
+        post->useDIME = gsi_true;
     }
     return gsi_true;
 }
@@ -192,45 +192,45 @@ const char *ghiPostGetContentType(GHIConnection *connection) {
     if (post == NULL) {
         return "";
     }
-    if (post->mixed) {
+    if (post->useDIME) {
         return "application/dime";
     }
     if (post->hasFiles) {
         return "multipart/form-data; boundary=" GHI_BOUNDARY;
     }
-    if (post->hasXml) {
+    if (post->hasSoap) {
         return "text/xml";
     }
     return "application/x-www-form-urlencoded";
 }
 
 // The length of a post without files: the names, the values (as they will be urlencoded) and the = and & between them
-static int ghiPostGetUrlEncodedLength(GHIConnection *connection) {
+static int ghiPostGetNoFilesContentLength(GHIConnection *connection) {
     GHTTPPost post = connection->post;
     int length = 0;
-    int count = func_ov011_02171588(post->items);
+    int count = ArrayLength(post->data);
     int i;
 
     if (count == 0) {
         return 0;
     }
     for (i = 0; i < count; i++) {
-        GHIPostData *item = func_ov011_0217158c(post->items, i);
+        GHIPostData *item = ArrayNth(post->data, i);
 
         if (item->type == GHIString) {
             length += strlen(item->name);
-            length += item->u.string.length;
-            length += item->u.string.escapeCount * 2;
+            length += item->data.string.length;
+            length += item->data.string.escapeCount * 2;
             length += 1;
         } else if (item->type == GHIXmlData) {
-            length += gsXmlWriterGetDataLength(item->u.xml.message);
+            length += gsXmlWriterGetDataLength(item->data.xml.message);
         }
     }
     return length + (count - 1);
 }
 
 // The length of a post with files: what the multipart format or the DIME one add to each item, and the item
-static int ghiPostGetMultipartLength(GHIConnection *connection) {
+static int ghiPostGetHasFilesContentLength(GHIConnection *connection) {
     GHTTPPost post = connection->post;
     GHIPostData *item;
     int length = 0;
@@ -242,7 +242,7 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
     int i;
     int padding;
 
-    if (post->mixed) {
+    if (post->useDIME) {
         stringExtra = 12;
         fileExtra = 12;
         xmlExtra = 12;
@@ -256,14 +256,14 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
         lastExtra = boundaryLength + 4;
     }
 
-    count = func_ov011_02171588(post->items);
+    count = ArrayLength(post->data);
     for (i = 0; i < count; i++) {
-        item = func_ov011_0217158c(post->items, i);
+        item = ArrayNth(post->data, i);
 
         if (item->type == GHIString) {
             length += stringExtra;
             length += strlen(item->name);
-            length += item->u.string.length;
+            length += item->data.string.length;
         } else if (item->type == GHIFileDisk) {
             GHIPostState *state;
             gsi_bool mixed;
@@ -271,20 +271,20 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
 
             length += fileExtra;
             length += strlen(item->name);
-            length += strlen(item->u.disk.contentType);
-            state = func_ov011_0217158c(connection->postingState.states, i);
+            length += strlen(item->data.disk.contentType);
+            state = ArrayNth(connection->postingState.states, i);
             fileSize = state->fileSize;
             length += fileSize;
-            mixed = post->mixed;
+            mixed = post->useDIME;
             if (!mixed) {
-                length += strlen(item->u.disk.fileName);
+                length += strlen(item->data.disk.fileName);
             }
             if (mixed) {
                 padding = GHI_DIME_PAD((int)strlen(item->name));
                 if (padding != 4) {
                     length += padding;
                 }
-                padding = GHI_DIME_PAD((int)strlen(item->u.disk.contentType));
+                padding = GHI_DIME_PAD((int)strlen(item->data.disk.contentType));
                 if (padding != 4) {
                     length += padding;
                 }
@@ -302,13 +302,13 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
             length += fileExtra;
             name = item->name;
             length += strlen(name);
-            contentType = item->u.memory.contentType;
+            contentType = item->data.memory.contentType;
             length += strlen(contentType);
-            dataLength = item->u.memory.length;
+            dataLength = item->data.memory.length;
             length += dataLength;
-            mixed = post->mixed;
+            mixed = post->useDIME;
             if (!mixed) {
-                length += strlen(item->u.memory.fileName);
+                length += strlen(item->data.memory.fileName);
             }
             if (mixed) {
                 padding = GHI_DIME_PAD((int)strlen(name));
@@ -326,8 +326,8 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
             }
         } else if (item->type == GHIXmlData) {
             length += xmlExtra;
-            length += gsXmlWriterGetDataLength(item->u.xml.message);
-            padding = GHI_DIME_PAD(gsXmlWriterGetDataLength(item->u.xml.message));
+            length += gsXmlWriterGetDataLength(item->data.xml.message);
+            padding = GHI_DIME_PAD(gsXmlWriterGetDataLength(item->data.xml.message));
             if (padding != 4) {
                 length += padding;
             }
@@ -348,21 +348,21 @@ static int ghiPostGetMultipartLength(GHIConnection *connection) {
     return length + lastExtra;
 }
 
-int ghiPostGetLength(GHIConnection *connection) {
+int ghiPostGetContentLength(GHIConnection *connection) {
     if (connection->post == NULL) {
         return 0;
     }
     if (connection->post->hasFiles) {
-        return ghiPostGetMultipartLength(connection);
+        return ghiPostGetHasFilesContentLength(connection);
     }
-    return ghiPostGetUrlEncodedLength(connection);
+    return ghiPostGetNoFilesContentLength(connection);
 }
 
 // Starts an item's state: a file on disk is measured
-static gsi_bool ghiPostItemStateInit(GHIPostState *state) {
-    int type = state->item->type;
+static gsi_bool ghiPostStateInit(GHIPostState *state) {
+    int type = state->data->type;
 
-    state->position = -1;
+    state->pos = -1;
     if (type == GHIString) {
     } else if (type == GHIFileDisk) {
         if (state->file == NULL) {
@@ -383,8 +383,8 @@ static gsi_bool ghiPostItemStateInit(GHIPostState *state) {
     return gsi_true;
 }
 
-static void ghiPostItemStateCleanup(GHIPostState *state) {
-    int type = state->item->type;
+static void ghiPostStateCleanup(GHIPostState *state) {
+    int type = state->data->type;
 
     if (type == GHIString) {
     } else if (type == GHIFileDisk) {
@@ -407,34 +407,34 @@ GHTTPBool ghiPostInitState(GHIConnection *connection) {
     connection->postingState.index = 0;
     connection->postingState.bytesPosted = 0;
     connection->postingState.totalBytes = 0;
-    connection->postingState.finished = 0;
+    connection->postingState.completed = 0;
     connection->postingState.callback = post->callback;
     connection->postingState.param = post->param;
-    count = func_ov011_02171588(post->items);
-    connection->postingState.states = func_ov011_02171514(sizeof(GHIPostState), count, NULL);
+    count = ArrayLength(post->data);
+    connection->postingState.states = ArrayNew(sizeof(GHIPostState), count, NULL);
     if (connection->postingState.states == NULL) {
         return gsi_false;
     }
     for (i = 0; i < count; i++) {
-        GHIPostData *item = func_ov011_0217158c(connection->post->items, i);
+        GHIPostData *item = ArrayNth(connection->post->data, i);
         GHIPostState state = { 0 };
 
-        state.item = item;
-        if (!ghiPostItemStateInit(&state)) {
+        state.data = item;
+        if (!ghiPostStateInit(&state)) {
             for (i--; i >= 0; i--) {
-                ghiPostItemStateCleanup(func_ov011_0217158c(connection->postingState.states, i));
+                ghiPostStateCleanup(ArrayNth(connection->postingState.states, i));
             }
-            func_ov011_02171558(connection->postingState.states);
+            ArrayFree(connection->postingState.states);
             connection->postingState.states = NULL;
             return gsi_false;
         }
-        func_ov011_021715a4(connection->postingState.states, &state);
+        ArrayAppend(connection->postingState.states, &state);
     }
-    connection->postingState.totalBytes = ghiPostGetLength(connection);
-    if (connection->post->hasXml == gsi_true) {
-        connection->postingState.isXml = gsi_true;
+    connection->postingState.totalBytes = ghiPostGetContentLength(connection);
+    if (connection->post->hasSoap == gsi_true) {
+        connection->postingState.waitPostContinue = gsi_true;
     } else {
-        connection->postingState.isXml = gsi_false;
+        connection->postingState.waitPostContinue = gsi_false;
     }
     return gsi_true;
 }
@@ -444,11 +444,11 @@ void ghiPostCleanupState(GHIConnection *connection) {
     int i;
 
     if (connection->postingState.states != NULL) {
-        count = func_ov011_02171588(connection->postingState.states);
+        count = ArrayLength(connection->postingState.states);
         for (i = 0; i < count; i++) {
-            ghiPostItemStateCleanup(func_ov011_0217158c(connection->postingState.states, i));
+            ghiPostStateCleanup(ArrayNth(connection->postingState.states, i));
         }
-        func_ov011_02171558(connection->postingState.states);
+        ArrayFree(connection->postingState.states);
         connection->postingState.states = NULL;
     }
     if (connection->post != NULL && connection->post->autoFree) {
@@ -459,22 +459,22 @@ void ghiPostCleanupState(GHIConnection *connection) {
 
 // Sends a string item's value, urlencoded if the post is. Returns 0 for an error, 1 once it is all sent
 static GHIPostingResult ghiPostStringStateDoPosting(GHIPostState *state, GHIConnection *connection) {
-    GHIPostData *item = state->item;
+    GHIPostData *item = state->data;
     GHTTPPost post;
 
-    if (item->u.string.length == 0) {
+    if (item->data.string.length == 0) {
         return gsi_true;
     }
     post = connection->post;
-    if (!post->hasFiles && !post->hasXml && item->u.string.unk_10 != 0) {
-        char *value = item->u.string.value;
+    if (!post->hasFiles && !post->hasSoap && item->data.string.unk_10 != 0) {
+        char *value = item->data.string.value;
         char escape[4] = "%00";
         GHIBuffer *buffer;
         const char *hexDigits;
         int i;
         char c;
 
-        if (connection->encryptor.engine == 0) {
+        if (connection->encryptor.mEngine == 0) {
             buffer = &connection->sendBuffer;
         } else {
             buffer = &connection->encodeBuffer;
@@ -496,18 +496,18 @@ static GHIPostingResult ghiPostStringStateDoPosting(GHIPostState *state, GHIConn
             c = value[i];
         }
     } else {
-        switch (ghiTrySendThenBuffer(connection, item->u.string.value, item->u.string.length)) {
+        switch (ghiTrySendThenBuffer(connection, item->data.string.value, item->data.string.length)) {
         case 0:
             return gsi_false;
         default:
             return gsi_true;
         }
     }
-    if (connection->encryptor.engine == 0) {
+    if (connection->encryptor.mEngine == 0) {
         if (!ghiSendBufferedData(connection)) {
             return gsi_false;
         }
-        if (connection->sendBuffer.pos == connection->sendBuffer.length) {
+        if (connection->sendBuffer.pos == connection->sendBuffer.len) {
             ghiResetBuffer(&connection->sendBuffer);
         }
         return gsi_true;
@@ -518,32 +518,32 @@ static GHIPostingResult ghiPostStringStateDoPosting(GHIPostState *state, GHIConn
 
 // Sends an XML message, with the padding that a DIME record has
 static GHIPostingResult ghiPostXmlStateDoPosting(GHIPostState *state, GHIConnection *connection) {
-    GSXmlStreamWriter message = state->item->u.xml.message;
+    GSXmlStreamWriter message = state->data->data.xml.message;
     char padding[3];
     int padLength = 0;
 
     padding[0] = 0;
     padding[1] = 0;
     padding[2] = 0;
-    if (connection->post->mixed) {
+    if (connection->post->useDIME) {
         padLength = 4 - gsXmlWriterGetDataLength(message) % 4;
         if (padLength == 4) {
             padLength = 0;
         }
     }
-    if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
+    if (connection->encryptor.mEngine != 0 && connection->encryptor.mEncryptOnBuffer == 1) {
         if (!ghiAppendDataToBuffer(&connection->encodeBuffer, gsXmlWriterGetData(message),
                                    gsXmlWriterGetDataLength(message)) ||
             !ghiAppendDataToBuffer(&connection->encodeBuffer, padding, padLength) ||
             !ghiEncryptDataToBuffer(&connection->sendBuffer, connection->encodeBuffer.data,
-                                    connection->encodeBuffer.length)) {
+                                    connection->encodeBuffer.len)) {
             return gsi_false;
         }
         ghiResetBuffer(&connection->encodeBuffer);
         if (!ghiSendBufferedData(connection)) {
             return gsi_false;
         }
-        if (connection->sendBuffer.pos == connection->sendBuffer.length) {
+        if (connection->sendBuffer.pos == connection->sendBuffer.len) {
             ghiResetBuffer(&connection->sendBuffer);
         }
         return gsi_true;
@@ -572,8 +572,8 @@ static GHIPostingResult ghiPostFileDiskStateDoPosting(GHIPostState *state, GHICo
             connection->result = 14;
             return 0;
         }
-        state->position += count;
-        if (state->position > state->fileSize) {
+        state->pos += count;
+        if (state->pos > state->fileSize) {
             connection->completed = gsi_true;
             connection->result = 14;
             return 0;
@@ -582,8 +582,8 @@ static GHIPostingResult ghiPostFileDiskStateDoPosting(GHIPostState *state, GHICo
         if (!result) {
             return 0;
         }
-        if (state->position == state->fileSize) {
-            if (connection->post->mixed) {
+        if (state->pos == state->fileSize) {
+            if (connection->post->useDIME) {
                 char padding[3] = { 0, 0, 0 };
                 int padLength;
 
@@ -602,28 +602,28 @@ static GHIPostingResult ghiPostFileDiskStateDoPosting(GHIPostState *state, GHICo
 
 // Sends a file that is in memory: the same
 static GHIPostingResult ghiPostFileMemoryStateDoPosting(GHIPostState *state, GHIConnection *connection) {
-    GHIPostData *item = state->item;
-    int length = item->u.memory.length;
+    GHIPostData *item = state->data;
+    int length = item->data.memory.length;
     int result;
 
     if (length == 0) {
         return 1;
     }
-    if (connection->encryptor.engine == 0) {
+    if (connection->encryptor.mEngine == 0) {
         do {
-            result = ghiDoSend(connection, item->u.memory.data + state->position, length - state->position);
+            result = ghiDoSend(connection, item->data.memory.data + state->pos, length - state->pos);
             if (result == -1) {
                 return 0;
             }
-            state->position += result;
-            item = state->item;
-            length = item->u.memory.length;
-            if (length == state->position) {
-                if (connection->post->mixed) {
+            state->pos += result;
+            item = state->data;
+            length = item->data.memory.length;
+            if (length == state->pos) {
+                if (connection->post->useDIME) {
                     char padding[3] = { 0, 0, 0 };
                     int padLength;
 
-                    padLength = 4 - item->u.memory.length % 4;
+                    padLength = 4 - item->data.memory.length % 4;
                     if (padLength != 4 && padLength > 0) {
                         if (!ghiTrySendThenBuffer(connection, padding, padLength)) {
                             return 0;
@@ -636,24 +636,24 @@ static GHIPostingResult ghiPostFileMemoryStateDoPosting(GHIPostState *state, GHI
         return 2;
     }
     do {
-        int chunk = length - state->position;
+        int chunk = length - state->pos;
 
         if (chunk >= GHI_ENCRYPT_CHUNK_SIZE) {
             chunk = GHI_ENCRYPT_CHUNK_SIZE;
         }
-        result = ghiTrySendThenBuffer(connection, item->u.memory.data + state->position, chunk);
+        result = ghiTrySendThenBuffer(connection, item->data.memory.data + state->pos, chunk);
         if (!result) {
             return 0;
         }
-        state->position += chunk;
-        item = state->item;
-        length = item->u.memory.length;
-        if (length == state->position) {
-            if (connection->post->mixed) {
+        state->pos += chunk;
+        item = state->data;
+        length = item->data.memory.length;
+        if (length == state->pos) {
+            if (connection->post->useDIME) {
                 char padding[3] = { 0, 0, 0 };
                 int padLength;
 
-                padLength = 4 - item->u.memory.length % 4;
+                padLength = 4 - item->data.memory.length % 4;
                 if (padLength != 4 && padLength > 0) {
                     if (!ghiTrySendThenBuffer(connection, padding, padLength)) {
                         return 0;
@@ -675,37 +675,37 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
     int length = 0;
     int result;
 
-    if (state->position == -1) {
-        state->position = 0;
-        if (!connection->post->hasFiles && !connection->post->hasXml) {
+    if (state->pos == -1) {
+        state->pos = 0;
+        if (!connection->post->hasFiles && !connection->post->hasSoap) {
             if (first) {
-                OS_SPrintf(buffer, "%s=", state->item->name);
+                OS_SPrintf(buffer, "%s=", state->data->name);
             } else {
-                OS_SPrintf(buffer, "&%s=", state->item->name);
+                OS_SPrintf(buffer, "&%s=", state->data->name);
             }
         } else {
-            GHIPostData *item = state->item;
+            GHIPostData *item = state->data;
 
             if (item->type == GHIString) {
                 OS_SPrintf(buffer, "%sContent-Disposition: form-data; name=\"%s\"\r\n\r\n",
                            first ? GHI_BOUNDARY_LINE "\r\n" : "\r\n" GHI_BOUNDARY_LINE "\r\n", item->name);
             } else if (item->type == GHIXmlData) {
-                if (connection->post->mixed) {
+                if (connection->post->useDIME) {
                     int count;
                     int padding;
 
-                    headers[1].flags = GHI_DIME_VERSION;
+                    headers[1].mVersionAndFlags = GHI_DIME_VERSION;
                     if (first) {
-                        headers[1].flags |= GHI_DIME_FIRST;
+                        headers[1].mVersionAndFlags |= GHI_DIME_FIRST;
                     }
                     if (last) {
-                        headers[1].flags |= GHI_DIME_LAST;
+                        headers[1].mVersionAndFlags |= GHI_DIME_LAST;
                     }
-                    headers[1].type = GHI_DIME_TYPE_URI;
-                    headers[1].optionsLength = 0;
-                    headers[1].idLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_ID));
-                    headers[1].typeLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_TYPE));
-                    headers[1].dataLength = GHI_SWAP32(gsXmlWriterGetDataLength(state->item->u.xml.message));
+                    headers[1].mTypeT = GHI_DIME_TYPE_URI;
+                    headers[1].mOptionsLength = 0;
+                    headers[1].mIdLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_ID));
+                    headers[1].mTypeLength = GHI_DIME_LENGTH16(strlen(GHI_MESSAGE_TYPE));
+                    headers[1].mDataLength = GHI_SWAP32(gsXmlWriterGetDataLength(state->data->data.xml.message));
                     ghiCopy(buffer, &headers[1], sizeof(GHIDimeHeader));
                     length += sizeof(GHIDimeHeader);
                     count = gsiSafeStrcpyA(buffer + length, GHI_MESSAGE_ID, sizeof(buffer) - length);
@@ -734,34 +734,34 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
 
                 if (item->type == GHIFileDisk) {
                     dataLength = state->fileSize;
-                    fileName = item->u.disk.fileName;
-                    contentType = item->u.disk.contentType;
+                    fileName = item->data.disk.fileName;
+                    contentType = item->data.disk.contentType;
                 } else {
-                    dataLength = item->u.memory.length;
-                    fileName = item->u.memory.fileName;
-                    contentType = item->u.memory.contentType;
+                    dataLength = item->data.memory.length;
+                    fileName = item->data.memory.fileName;
+                    contentType = item->data.memory.contentType;
                 }
-                if (connection->post->mixed) {
+                if (connection->post->useDIME) {
                     int count;
                     int padding;
                     char *name;
 
-                    headers[0].flags = GHI_DIME_VERSION;
+                    headers[0].mVersionAndFlags = GHI_DIME_VERSION;
                     if (first) {
-                        headers[0].flags |= GHI_DIME_FIRST;
+                        headers[0].mVersionAndFlags |= GHI_DIME_FIRST;
                     }
                     if (last) {
-                        headers[0].flags |= GHI_DIME_LAST;
+                        headers[0].mVersionAndFlags |= GHI_DIME_LAST;
                     }
-                    headers[0].type = GHI_DIME_TYPE_MEDIA;
-                    headers[0].optionsLength = 0;
-                    name = state->item->name;
-                    headers[0].idLength = GHI_DIME_LENGTH16(strlen(name));
-                    headers[0].typeLength = GHI_DIME_LENGTH16(strlen(contentType));
-                    headers[0].dataLength = GHI_SWAP32(dataLength);
+                    headers[0].mTypeT = GHI_DIME_TYPE_MEDIA;
+                    headers[0].mOptionsLength = 0;
+                    name = state->data->name;
+                    headers[0].mIdLength = GHI_DIME_LENGTH16(strlen(name));
+                    headers[0].mTypeLength = GHI_DIME_LENGTH16(strlen(contentType));
+                    headers[0].mDataLength = GHI_SWAP32(dataLength);
                     ghiCopy(buffer, &headers[0], sizeof(GHIDimeHeader));
                     length += sizeof(GHIDimeHeader);
-                    count = gsiSafeStrcpyA(buffer + length, state->item->name, sizeof(buffer) - length);
+                    count = gsiSafeStrcpyA(buffer + length, state->data->name, sizeof(buffer) - length);
                     length += count;
                     padding = 4 - (count & 3);
                     if (padding != 4) {
@@ -787,7 +787,7 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
             }
         }
 
-        if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
+        if (connection->encryptor.mEngine != 0 && connection->encryptor.mEncryptOnBuffer == 1) {
             if (length == 0) {
                 length = strlen(buffer);
             }
@@ -797,7 +797,7 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
             if (!ghiSendBufferedData(connection)) {
                 return 0;
             }
-            if (connection->sendBuffer.pos < connection->sendBuffer.length) {
+            if (connection->sendBuffer.pos < connection->sendBuffer.len) {
                 return 2;
             }
         } else {
@@ -815,13 +815,13 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
         ghiResetBuffer(&connection->sendBuffer);
     }
 
-    if (state->item->type == GHIString) {
+    if (state->data->type == GHIString) {
         return ghiPostStringStateDoPosting(state, connection);
     }
-    if (state->item->type == GHIXmlData) {
+    if (state->data->type == GHIXmlData) {
         return ghiPostXmlStateDoPosting(state, connection);
     }
-    if (state->item->type == GHIFileDisk) {
+    if (state->data->type == GHIFileDisk) {
         return ghiPostFileDiskStateDoPosting(state, connection);
     }
     return ghiPostFileMemoryStateDoPosting(state, connection);
@@ -831,17 +831,17 @@ static GHIPostingResult ghiPostStateDoPosting(GHIPostState *state, GHIConnection
 // and 3 once the head of an XML message is sent
 GHIPostingResult ghiPostDoPosting(GHIConnection *connection) {
     GHIPostingState *posting = &connection->postingState;
-    int count = func_ov011_02171588(posting->states);
+    int count = ArrayLength(posting->states);
 
-    if (connection->sendBuffer.pos < connection->sendBuffer.length) {
+    if (connection->sendBuffer.pos < connection->sendBuffer.len) {
         if (!ghiSendBufferedData(connection)) {
             return 0;
         }
-        if (connection->sendBuffer.pos < connection->sendBuffer.length) {
+        if (connection->sendBuffer.pos < connection->sendBuffer.len) {
             return 2;
         }
         ghiResetBuffer(&connection->sendBuffer);
-        if (connection->postingState.isXml) {
+        if (connection->postingState.waitPostContinue) {
             return 3;
         }
         if (connection->postingState.index == count) {
@@ -849,8 +849,8 @@ GHIPostingResult ghiPostDoPosting(GHIConnection *connection) {
         }
     }
 
-    if (connection->postingState.isXml) {
-        if (connection->post->hasFiles || connection->post->hasXml) {
+    if (connection->postingState.waitPostContinue) {
+        if (connection->post->hasFiles || connection->post->hasSoap) {
             const char *lineEnd = "\r\n";
             int result = ghiTrySendThenBuffer(connection, lineEnd, strlen(lineEnd));
 
@@ -860,18 +860,18 @@ GHIPostingResult ghiPostDoPosting(GHIConnection *connection) {
             if (result == 2) {
                 return 2;
             }
-            if (connection->postingState.isXml == 1) {
+            if (connection->postingState.waitPostContinue == 1) {
                 return 3;
             }
         } else {
-            connection->postingState.isXml = gsi_false;
+            connection->postingState.waitPostContinue = gsi_false;
         }
     }
 
     while (posting->index < count) {
-        GHIPostState *state = func_ov011_0217158c(posting->states, posting->index);
+        GHIPostState *state = ArrayNth(posting->states, posting->index);
         int index = posting->index;
-        gsi_bool last = index == func_ov011_02171588(posting->states) - 1;
+        gsi_bool last = index == ArrayLength(posting->states) - 1;
         int result = ghiPostStateDoPosting(state, connection, index == 0, last);
 
         if (!result) {
@@ -883,23 +883,23 @@ GHIPostingResult ghiPostDoPosting(GHIConnection *connection) {
         posting->index++;
     }
 
-    if (connection->encryptor.engine != 0) {
-        if (connection->encodeBuffer.length > 0) {
+    if (connection->encryptor.mEngine != 0) {
+        if (connection->encodeBuffer.len > 0) {
             if (!ghiEncryptDataToBuffer(&connection->sendBuffer, connection->encodeBuffer.data,
-                                        connection->encodeBuffer.length)) {
+                                        connection->encodeBuffer.len)) {
                 return 0;
             }
             ghiResetBuffer(&connection->encodeBuffer);
         }
     }
-    if (connection->post->hasFiles && !connection->post->mixed) {
+    if (connection->post->hasFiles && !connection->post->useDIME) {
         const char *lastBoundary = "\r\n" GHI_BOUNDARY_LINE "--\r\n";
 
         if (!ghiTrySendThenBuffer(connection, lastBoundary, strlen(lastBoundary))) {
             return 0;
         }
     }
-    if (connection->sendBuffer.pos < connection->sendBuffer.length) {
+    if (connection->sendBuffer.pos < connection->sendBuffer.len) {
         return 2;
     }
     return 1;

@@ -5,13 +5,13 @@
 
 // gt2AddressToString's two buffers, which it uses in turn; MWCC lays .bss out in the reverse order of the
 // declarations
-static char sStrings[2][22];
-static int sStringIndex;
+static char strAddressArray[2][22];
+static int nIndex;
 
-const char *func_ov011_0217ed14(unsigned int ip, unsigned short port, char string[22]) {
+const char *gt2AddressToString(unsigned int ip, unsigned short port, char string[22]) {
     if (string == NULL) {
-        sStringIndex ^= 1;
-        string = sStrings[sStringIndex];
+        nIndex ^= 1;
+        string = strAddressArray[nIndex];
     }
     if (ip != 0) {
         SOCInAddr address;

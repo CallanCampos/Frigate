@@ -31,7 +31,7 @@ static GPResult gpiStartProfileSearch(GPConnection *connection, GPIOperation *op
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
     }
-    search->sock = gsiSocket(2, 1, 0);
+    search->sock = socket(2, 1, 0);
     if (search->sock == -1) {
         gpiSetError(connection, 5, "There was an error creating a socket.");
         gpiCallErrorCallback(connection, 3, 1);
@@ -397,7 +397,7 @@ static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operati
                     gpiAppendStringToBuffer(connection, &search->outputBuffer, "\\profileid\\");
                     gpiAppendIntToBuffer(connection, &search->outputBuffer, iconnection->profileid);
                     gpiAppendStringToBuffer(connection, &search->outputBuffer, "\\searchprofileid\\");
-                    gpiAppendIntToBuffer(connection, &search->outputBuffer, search->searchProfileId);
+                    gpiAppendIntToBuffer(connection, &search->outputBuffer, search->profile);
                     gpiAppendStringToBuffer(connection, &search->outputBuffer, "\\maxresults\\");
                     gpiAppendIntToBuffer(connection, &search->outputBuffer, search->maxResults);
                 }
@@ -650,7 +650,7 @@ static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operati
                                 }
                                 match = &data->matches[data->numMatches - 1];
                                 memset(match, 0, sizeof(GPFindPlayerMatch));
-                                match->playerStatus = 1;
+                                match->status = 1;
                                 match->profile = atol(value);
                                 fieldDone = 0;
                                 do {
@@ -666,7 +666,7 @@ static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operati
                                         strzcpy(match->nick, value, 0x1f);
                                     }
                                     if (strcmp(key, "statuscode") == 0) {
-                                        match->playerStatus = atol(value);
+                                        match->status = atol(value);
                                     } else if (strcmp(key, "psr") == 0 || strcmp(key, "psrdone") == 0) {
                                         fieldDone = 1;
                                         index = savedIndex;
@@ -850,7 +850,7 @@ static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operati
                             return 1;
                         }
                         data->result = 0;
-                        data->numOfUniqueMatchs = 0;
+                        data->numOfUniqueMatches = 0;
                         data->matches = NULL;
                         result = gpiReadKeyAndValue(connection, search->inputBuffer.buffer, &index, key, value);
                         if (result != 0) {
@@ -879,14 +879,14 @@ static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operati
                                     return 3;
                                 }
                                 data->matches =
-                                    gsirealloc(data->matches, (data->numOfUniqueMatchs + 1) * sizeof(GPUniqueMatch));
+                                    gsirealloc(data->matches, (data->numOfUniqueMatches + 1) * sizeof(GPUniqueMatch));
                                 if (data->matches == NULL) {
                                     gpiSetErrorString(connection, "Out of memory.");
                                     return 1;
                                 }
-                                other = &data->matches[data->numOfUniqueMatchs];
+                                other = &data->matches[data->numOfUniqueMatches];
                                 memset(other, 0, sizeof(GPUniqueMatch));
-                                data->numOfUniqueMatchs++;
+                                data->numOfUniqueMatches++;
                                 other->profile = atol(value);
                                 fieldDone = 0;
                                 do {
@@ -983,7 +983,7 @@ static GPResult gpiProcessSearch(GPConnection *connection, GPIOperation *operati
                         data->numProfiles = 0;
                         data->profiles = NULL;
                         data->hidden = 0;
-                        data->profile = search->searchProfileId;
+                        data->profile = search->profile;
                         result = gpiReadKeyAndValue(connection, search->inputBuffer.buffer, &index, key, value);
                         if (result != 0) {
                             return result;

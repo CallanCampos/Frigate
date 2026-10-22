@@ -3,8 +3,8 @@
 
 // GameSpy's availability check (gsAvailable.c). The ROM names neither the file nor its functions: the file,
 // GSIStartAvailableCheckA and GSIAvailableCheckThink are GameSpy's, as pret's pokerevo Wii build has them
-// (gsAvailable.s), and so are __GSIACResult, __GSIACGamename and GSIACHostname after the later SDK; the static
-// functions and data are named by us
+// (gsAvailable.s), and so are __GSIACResult, __GSIACGamename and GSIACHostname after the later SDK; so are the
+// static functions and data
 
 // The check in progress: the socket, the server's address, the packet, its size, when it was last sent and how many
 // times it was sent again
@@ -22,7 +22,7 @@ static void SendPacket(void);
 static int HandlePacket(const char *buffer, int size, const SOCSockAddrIn *from, gsi_u32 *flags);
 
 // MWCC lays out the .bss in the reverse order of the definitions, and the ROM has __GSIACResult first
-static AvailableCheck sAvailableCheck;
+static AvailableCheck AC;
 char GSIACHostname[0x40];
 char __GSIACGamename[0x40];
 GSIACResult __GSIACResult;
@@ -45,9 +45,8 @@ static gsi_bool get_sockaddrin(const char *host, int port, SOCSockAddrIn *addres
 }
 
 static void SendPacket(void) {
-    sendto(sAvailableCheck.sock, sAvailableCheck.packet, sAvailableCheck.packetSize, 0,
-           (SOCKADDR *)&sAvailableCheck.address, sizeof(SOCSockAddrIn));
-    sAvailableCheck.sendTime = current_time();
+    sendto(AC.sock, AC.packet, AC.packetSize, 0, (SOCKADDR *)&AC.address, sizeof(SOCSockAddrIn));
+    AC.sendTime = current_time();
 }
 
 void GSIStartAvailableCheckA(const char *gamename) {
@@ -56,7 +55,7 @@ void GSIStartAvailableCheckA(const char *gamename) {
     const char *useHost;
 
     gsiSafeStrcpyA(__GSIACGamename, gamename, sizeof(__GSIACGamename));
-    sAvailableCheck.sock = -1;
+    AC.sock = -1;
     SocketStartUp();
     hostSet = GSIACHostname[0];
     if (hostSet == '\0') {
@@ -66,17 +65,17 @@ void GSIStartAvailableCheckA(const char *gamename) {
     if (hostSet == '\0') {
         useHost = host;
     }
-    if (get_sockaddrin(useHost, 27900, &sAvailableCheck.address)) {
-        sAvailableCheck.sock = gsiSocket(2, 2, 0);
-        if (sAvailableCheck.sock != -1) {
+    if (get_sockaddrin(useHost, 27900, &AC.address)) {
+        AC.sock = socket(2, 2, 0);
+        if (AC.sock != -1) {
             gsi_u32 length;
 
-            sAvailableCheck.packet[0] = 9;
+            AC.packet[0] = 9;
             length = strlen(gamename);
-            memcpy(&sAvailableCheck.packet[5], gamename, length + 1);
-            sAvailableCheck.packetSize = length + 6;
+            memcpy(&AC.packet[5], gamename, length + 1);
+            AC.packetSize = length + 6;
             SendPacket();
-            sAvailableCheck.sendCount = 0;
+            AC.sendCount = 0;
         }
     }
 }
@@ -86,10 +85,10 @@ static int HandlePacket(const char *buffer, int size, const SOCSockAddrIn *from,
     if (size < 7) {
         return 1;
     }
-    if (memcmp(&from->addr, &sAvailableCheck.address.addr, 4) != 0) {
+    if (memcmp(&from->addr, &AC.address.addr, 4) != 0) {
         return 1;
     }
-    if (from->port != sAvailableCheck.address.port) {
+    if (from->port != AC.address.port) {
         return 1;
     }
     if (memcmp(buffer, "\xfe\xfd\x09", 3) != 0) {
@@ -112,15 +111,15 @@ GSIACResult GSIAvailableCheckThink(void) {
     int fromSize = sizeof(SOCSockAddrIn);
     gsi_u32 flags;
 
-    if (sAvailableCheck.sock == -1) {
+    if (AC.sock == -1) {
         __GSIACResult = GSIACAvailable;
         return __GSIACResult;
     }
-    if (CanReceiveOnSocket(sAvailableCheck.sock)) {
-        int size = recvfrom(sAvailableCheck.sock, buffer, sizeof(buffer), 0, (SOCKADDR *)&from, &fromSize);
+    if (CanReceiveOnSocket(AC.sock)) {
+        int size = recvfrom(AC.sock, buffer, sizeof(buffer), 0, (SOCKADDR *)&from, &fromSize);
 
         if (HandlePacket(buffer, size, &from, &flags) == 0) {
-            closesocket(sAvailableCheck.sock);
+            closesocket(AC.sock);
             if (flags & 1) {
                 __GSIACResult = GSIACUnavailable;
             } else if (flags & 2) {
@@ -131,14 +130,14 @@ GSIACResult GSIAvailableCheckThink(void) {
             return __GSIACResult;
         }
     }
-    if (current_time() > sAvailableCheck.sendTime + 2000) {
-        if (sAvailableCheck.sendCount == 1) {
-            closesocket(sAvailableCheck.sock);
+    if (current_time() > AC.sendTime + 2000) {
+        if (AC.sendCount == 1) {
+            closesocket(AC.sock);
             __GSIACResult = GSIACAvailable;
             return __GSIACResult;
         }
         SendPacket();
-        sAvailableCheck.sendCount++;
+        AC.sendCount++;
     }
     return GSIACWaiting;
 }

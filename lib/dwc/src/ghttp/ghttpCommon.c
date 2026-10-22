@@ -4,8 +4,8 @@
 
 // How a request's receiving is throttled, in milliseconds and in bytes (ghttpStartup sets them again), and the proxy
 // that the requests go through, which nothing in this build sets
-int ghiThrottleInterval = 250;
-int ghiThrottleBytes = 125;
+int ghiThrottleTimeDelay = 250;
+int ghiThrottleBufferSize = 125;
 char *ghiProxyAddress;
 gsi_u16 ghiProxyPort;
 
@@ -33,10 +33,10 @@ GHTTPBool ghiDecryptReceivedData(GHIConnection *connection) {
             const char *in = connection->decodeBuffer.data + connection->decodeBuffer.pos;
             char *out;
 
-            inSize = connection->decodeBuffer.length - connection->decodeBuffer.pos;
-            out = connection->recvBuffer.data + connection->recvBuffer.length;
-            outSize = connection->recvBuffer.size - connection->recvBuffer.length;
-            result = connection->encryptor.decrypt(connection, &connection->encryptor, in, &inSize, out, &outSize);
+            inSize = connection->decodeBuffer.len - connection->decodeBuffer.pos;
+            out = connection->recvBuffer.data + connection->recvBuffer.len;
+            outSize = connection->recvBuffer.size - connection->recvBuffer.len;
+            result = connection->encryptor.mDecryptFunc(connection, &connection->encryptor, in, &inSize, out, &outSize);
             if (result == 2) {
                 if (!ghiResizeBuffer(&connection->recvBuffer, connection->recvBuffer.sizeIncrement)) {
                     return gsi_false;
@@ -46,18 +46,18 @@ GHTTPBool ghiDecryptReceivedData(GHIConnection *connection) {
             }
         } while (result == 2 && outSize == 0);
 
-        if (inSize > connection->decodeBuffer.length) {
+        if (inSize > connection->decodeBuffer.len) {
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_HotError,
                           "ghiDecryptReceivedData read past the end of connection->decodeBuffer! (%d\\%d bytes)\r\n",
-                          inSize, connection->decodeBuffer.length);
+                          inSize, connection->decodeBuffer.len);
             return gsi_false;
         }
         connection->decodeBuffer.pos += inSize;
-        connection->recvBuffer.length += outSize;
+        connection->recvBuffer.len += outSize;
     } while (outSize > 0);
 
     if (connection->decodeBuffer.pos > 0xff) {
-        int remaining = connection->decodeBuffer.length - connection->decodeBuffer.pos;
+        int remaining = connection->decodeBuffer.len - connection->decodeBuffer.pos;
 
         if (remaining == 0) {
             ghiResetBuffer(&connection->decodeBuffer);
@@ -65,7 +65,7 @@ GHTTPBool ghiDecryptReceivedData(GHIConnection *connection) {
             memmove(connection->decodeBuffer.data, connection->decodeBuffer.data + connection->decodeBuffer.pos,
                     remaining);
             connection->decodeBuffer.pos = 0;
-            connection->decodeBuffer.length = remaining;
+            connection->decodeBuffer.len = remaining;
         }
     }
     return gsi_true;
@@ -81,20 +81,20 @@ GHIRecvResult ghiDoReceive(GHIConnection *connection, char buffer[], int *size) 
     if (connection->throttle != 0) {
         gsi_u32 now = current_time();
 
-        if (now < connection->lastThrottleTime + ghiThrottleInterval) {
+        if (now < connection->lastThrottleRecv + ghiThrottleTimeDelay) {
             return 1;
         }
-        connection->lastThrottleTime = now;
-        if (max >= ghiThrottleBytes) {
-            max = ghiThrottleBytes;
+        connection->lastThrottleRecv = now;
+        if (max >= ghiThrottleBufferSize) {
+            max = ghiThrottleBufferSize;
         }
     }
 
-    if (connection->encryptor.engine != 0 && connection->encryptor.active == 1 &&
-        connection->encryptor.established == 1) {
+    if (connection->encryptor.mEngine != 0 && connection->encryptor.mSessionEstablished == 1 &&
+        connection->encryptor.mEncryptOnSend == 1) {
         int length = max;
 
-        if (ghiEncryptorRecv(connection, &connection->encryptor, buffer, &length) == 1) {
+        if (ghiEncryptorSslDecryptRecv(connection, &connection->encryptor, buffer, &length) == 1) {
             if (length == -1) {
                 return 1;
             }
@@ -103,7 +103,7 @@ GHIRecvResult ghiDoReceive(GHIConnection *connection, char buffer[], int *size) 
             connection->completed = gsi_true;
             connection->result = 5;
             connection->socketError = 0;
-            connection->closing = gsi_true;
+            connection->connectionClosed = gsi_true;
             return 3;
         }
     } else {
@@ -111,7 +111,7 @@ GHIRecvResult ghiDoReceive(GHIConnection *connection, char buffer[], int *size) 
         if (received == -1) {
             error = GOAGetLastError(connection->socket);
             if (error == -56) {
-                connection->closing = gsi_true;
+                connection->connectionClosed = gsi_true;
                 return 2;
             }
             if (error == -6 || error == -26 || error == -76) {
@@ -120,13 +120,13 @@ GHIRecvResult ghiDoReceive(GHIConnection *connection, char buffer[], int *size) 
             connection->completed = gsi_true;
             connection->result = 5;
             connection->socketError = error;
-            connection->closing = gsi_true;
+            connection->connectionClosed = gsi_true;
             return 3;
         }
     }
 
     if (received == 0) {
-        connection->closing = gsi_true;
+        connection->connectionClosed = gsi_true;
         return 2;
     }
     buffer[received] = '\0';
@@ -144,11 +144,11 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
         return 0;
     }
 
-    if (connection->encryptor.engine != 0 && connection->encryptor.active == 1 &&
-        connection->encryptor.established == 1) {
+    if (connection->encryptor.mEngine != 0 && connection->encryptor.mSessionEstablished == 1 &&
+        connection->encryptor.mEncryptOnSend == 1) {
         int count = 0;
 
-        if (ghiEncryptorSend(connection, &connection->encryptor, data, size, &count) == 1) {
+        if (ghiEncryptorSslEncryptSend(connection, &connection->encryptor, data, size, &count) == 1) {
             if (count == -1) {
                 return -2;
             }
@@ -174,7 +174,7 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
         }
     }
 
-    if (connection->state == 6 && !connection->postingState.isXml) {
+    if (connection->state == 6 && !connection->postingState.waitPostContinue) {
         connection->postingState.bytesPosted += sent;
     }
     return sent;
@@ -185,21 +185,22 @@ int ghiDoSend(GHIConnection *connection, const char *data, int size) {
 GHITrySendResult ghiTrySendThenBuffer(GHIConnection *connection, const char *data, int size) {
     int sent = 0;
 
-    if (connection->encryptor.engine != 0 && connection->encryptor.active == 1 && connection->encryptor.mode == 1) {
+    if (connection->encryptor.mEngine != 0 && connection->encryptor.mSessionEstablished == 1 &&
+        connection->encryptor.mEncryptOnBuffer == 1) {
         if (!ghiEncryptDataToBuffer(&connection->sendBuffer, data, size)) {
             return 0;
         }
         if (!ghiSendBufferedData(connection)) {
             return 0;
         }
-        if (connection->sendBuffer.pos >= connection->sendBuffer.length) {
+        if (connection->sendBuffer.pos >= connection->sendBuffer.len) {
             ghiResetBuffer(&connection->sendBuffer);
             return 1;
         }
         return 2;
     }
 
-    if (connection->sendBuffer.pos >= connection->sendBuffer.length) {
+    if (connection->sendBuffer.pos >= connection->sendBuffer.len) {
         sent = ghiDoSend(connection, data, size);
         if (sent == -2) {
             return 2;

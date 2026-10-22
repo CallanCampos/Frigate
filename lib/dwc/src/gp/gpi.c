@@ -248,7 +248,7 @@ GPResult gpiProcessConnectionManager(GPConnection *connection) {
                             return result;
                         }
                     } else if (strncmp(input, "\\rar\\", 5) == 0) {
-                        result = gpiProcessRemoteAuthReply(connection, input);
+                        result = gpiProcessRemoteAuthResponse(connection, input);
                         if (result != 0) {
                             return result;
                         }

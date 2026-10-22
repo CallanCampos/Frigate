@@ -2,7 +2,7 @@
 #include "dwc/ext.h"
 #include "dwc/gpiCallback.h"
 #include "dwc/gpiUtility.h"
-#include "dwc/gt2.h"
+#include "dwc/gsUdpEngine.h"
 
 // GameSpy GP's growing texts and their sending and receiving (gpiBuffer.c). The functions' names, from
 // pret/pokerevo's Wii build, are in dwc/gp.h
@@ -128,17 +128,17 @@ int gpiSendOrBufferStringLen(GPConnection *connection, GPIPeer *peer, const char
     if (stringLen == 0) {
         return 0;
     }
-    if (peer->outputBuffer.len - peer->outputBuffer.pos == 0 && func_ov011_02171588(peer->messages) == 0) {
-        // Gt2_Close gives the free space of the connection's outgoing buffer
-        if (stringLen <= Gt2_Close(peer->ip, peer->port) - GPI_PEER_HEADER_SIZE) {
-            Gt2_Send(peer->ip, peer->port, iconnection->mHeader, string, stringLen, gsi_true);
+    if (peer->outputBuffer.len - peer->outputBuffer.pos == 0 && ArrayLength(peer->messages) == 0) {
+        // gsUdpEngineGetPeerOutBufferFreeSpace gives the free space of the connection's outgoing buffer
+        if (stringLen <= gsUdpEngineGetPeerOutBufferFreeSpace(peer->ip, peer->port) - GPI_PEER_HEADER_SIZE) {
+            gsUdpEngineSendMessage(peer->ip, peer->port, iconnection->mHeader, string, stringLen, gsi_true);
             sent = stringLen;
             stringLen = 0;
         } else {
-            freeSpace = Gt2_Close(peer->ip, peer->port);
+            freeSpace = gsUdpEngineGetPeerOutBufferFreeSpace(peer->ip, peer->port);
             if (freeSpace > GPI_PEER_HEADER_SIZE) {
                 sent = freeSpace - GPI_PEER_HEADER_SIZE;
-                Gt2_Send(peer->ip, peer->port, iconnection->mHeader, string, sent, gsi_true);
+                gsUdpEngineSendMessage(peer->ip, peer->port, iconnection->mHeader, string, sent, gsi_true);
                 stringLen -= sent;
             }
         }
@@ -273,18 +273,19 @@ GPResult gpiSendBufferToPeer(GPConnection *connection, unsigned int ip, unsigned
     if (remaining == 0) {
         return 0;
     }
-    // Gt2_Close gives the free space of the connection's outgoing buffer
-    if (remaining <= Gt2_Close(ip, port) - GPI_PEER_HEADER_SIZE) {
-        Gt2_Send(ip, port, iconnection->mHeader, buffer + pos, remaining, gsi_true);
+    // gsUdpEngineGetPeerOutBufferFreeSpace gives the free space of the connection's outgoing buffer
+    if (remaining <= gsUdpEngineGetPeerOutBufferFreeSpace(ip, port) - GPI_PEER_HEADER_SIZE) {
+        gsUdpEngineSendMessage(ip, port, iconnection->mHeader, buffer + pos, remaining, gsi_true);
         total = remaining;
         remaining = 0;
     } else {
         do {
-            freeSpace = Gt2_Close(ip, port) - GPI_PEER_HEADER_SIZE;
+            freeSpace = gsUdpEngineGetPeerOutBufferFreeSpace(ip, port) - GPI_PEER_HEADER_SIZE;
             if (freeSpace <= GPI_PEER_HEADER_SIZE) {
                 break;
             }
-            if (Gt2_Send(ip, port, iconnection->mHeader, buffer + (pos + total), freeSpace, gsi_true) == 8) {
+            if (gsUdpEngineSendMessage(ip, port, iconnection->mHeader, buffer + (pos + total), freeSpace, gsi_true) ==
+                8) {
                 break;
             }
             total += freeSpace;
@@ -301,7 +302,7 @@ GPResult gpiSendBufferToPeer(GPConnection *connection, unsigned int ip, unsigned
     }
     outputBuffer->len = len;
     outputBuffer->pos = pos;
-    Gt2_GetConnectionState(ip, port, &state);
+    gsUdpEngineGetPeerState(ip, port, &state);
     if (state == 3) {
         *connClosed = gsi_true;
     } else {

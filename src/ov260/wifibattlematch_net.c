@@ -84,7 +84,7 @@ typedef struct {
 // What a player offers in a match, which is sent to the other player whole
 typedef struct {
     const GSLoginCertificate *certificate;
-    ScReport *connection;
+    SCIReport *connection;
     u8 unk8[0x28];
     u8 unk30[0x28];
     u8 unk58[0x10];

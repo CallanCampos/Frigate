@@ -2,7 +2,7 @@
 #define POKEBW2_DWC_SC_H
 
 #include "types.h"
-#include "dwc/auth.h"
+#include "dwc/AuthService.h"
 #include "dwc/competition.h"
 
 // The Wi-Fi library's client of the competition service in overlay 260 (dwc_sc.c), which wrote its debug texts as
@@ -24,25 +24,25 @@ int Sc_Update(void);
 // a report. Each returns 0 or an error code and calls a function with the error when it has ended
 int Sc_CreateSession(ScResultFunc func, int timeout, void *userData);
 int Sc_SetReportIntention(int authoritative, ScResultFunc func, int timeout, void *userData);
-int Sc_SubmitReport(ScReport *report, int authoritative, ScResultFunc func, int timeout, void *userData);
+int Sc_SubmitReport(SCIReport *report, int authoritative, ScResultFunc func, int timeout, void *userData);
 // Takes the ID of the session from the other player, and gives the IDs of the session and of the connection
 int Sc_SetSessionId(const char *csid);
 const char *Sc_GetSessionId(void);
 const char *Sc_GetConnectionId(void);
 // Makes a report of a version for a number of players and of teams
-int Sc_CreateReport(int version, int playerNum, int teamNum, ScReport **report);
+int Sc_CreateReport(int version, int playerNum, int teamNum, SCIReport **report);
 // The steps of the report's building, each returning 0 or an error code: the sections of the game's records, of the
 // players' and of the teams', a group of records, a player, the end of the header and the records
-int Sc_BeginGame(ScReport *report);
-int Sc_BeginPlayers(ScReport *report);
-int Sc_BeginTeams(ScReport *report);
-int Sc_BeginGroup(ScReport *report);
-int Sc_SetPlayer(ScReport *report, int index, const char *id, int key, int result,
+int Sc_BeginGame(SCIReport *report);
+int Sc_BeginPlayers(SCIReport *report);
+int Sc_BeginTeams(SCIReport *report);
+int Sc_BeginGroup(SCIReport *report);
+int Sc_SetPlayer(SCIReport *report, int index, const char *id, int key, int result,
                  const GSLoginCertificate *certificate, void *unused);
-int Sc_FinishReport(ScReport *report, int flag, int value);
-int Sc_AddInt(ScReport *report, u16 key, s32 value);
-int Sc_AddByte(ScReport *report, u16 key, s8 value);
-int Sc_FreeReport(ScReport *report);
+int Sc_FinishReport(SCIReport *report, int flag, int value);
+int Sc_AddInt(SCIReport *report, u16 key, s32 value);
+int Sc_AddByte(SCIReport *report, u16 key, s8 value);
+int Sc_FreeReport(SCIReport *report);
 // Gives the player's certificate
 int Sc_GetCertificate(const GSLoginCertificate **certificate);
 

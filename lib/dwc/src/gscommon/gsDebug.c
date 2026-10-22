@@ -2,7 +2,7 @@
 #include "dwc/ext.h"
 
 // GameSpy's debug output (gsDebug.c). The ROM names neither the file nor its functions: gsDebugVaList, gsDebugFormat,
-// gsDebugBinary, HexEncode16 and gGSIDebugInstance are the later SDK's names, and gsiDebugPrintToConsole is ours
+// gsDebugBinary, HexEncode16, gsiDebugCallback and gGSIDebugInstance are the later SDK's names
 
 // The output: the game's callback, whether the lock was made, the lock, and the levels to show of each category and
 // type (13 categories of 5 types)
@@ -13,15 +13,15 @@ typedef struct GSIDebugInstance {
     GSIDebugLevel levels[GSIDebugCat_Count][GSIDebugType_Count];
 } GSIDebugInstance;
 
-static void gsiDebugPrintToConsole(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level,
-                                   const char *format, va_list args);
+static void gsiDebugCallback(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
+                             va_list args);
 static void HexEncode16(const char *data, char *line, unsigned int size);
 
 static GSIDebugInstance gGSIDebugInstance;
 
-static void gsiDebugPrintToConsole(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level,
-                                   const char *format, va_list args) {
-    ScreenVPrintf(format, args);
+static void gsiDebugCallback(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
+                             va_list args) {
+    VPrintf(format, args);
 }
 
 void gsDebugVaList(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel level, const char *format,
@@ -35,7 +35,7 @@ void gsDebugVaList(GSIDebugCategory category, GSIDebugType type, GSIDebugLevel l
         if (gGSIDebugInstance.callback != NULL) {
             gGSIDebugInstance.callback(category, type, level, format, args);
         } else {
-            gsiDebugPrintToConsole(category, type, level, format, args);
+            gsiDebugCallback(category, type, level, format, args);
         }
     }
     gsiLeaveCriticalSection(&gGSIDebugInstance.crit);

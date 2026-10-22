@@ -94,7 +94,7 @@ BOOL DWCs_HasSendPoolSpace(void) {
 }
 
 BOOL DWCs_FlushSendPool(void) {
-    return DWCs_FlushSendPoolWith(func_ov011_0217d290);
+    return DWCs_FlushSendPoolWith(gt2Send);
 }
 
 BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
@@ -507,13 +507,13 @@ void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable) {
     GT2Connection connection = DWCi_GetGT2Connection(aid);
 
     if (reliable) {
-        if (!DWCs_FlushSendPool() || func_ov011_0217d290(connection, data, size, reliable)) {
+        if (!DWCs_FlushSendPool() || gt2Send(connection, data, size, reliable)) {
             if (!DWCs_AddToSendPool(connection, data, size)) {
                 DWCi_SetError(DWC_ERROR_NETWORK, -0x17d5e);
             }
         }
     } else {
-        func_ov011_0217d290(connection, data, size, reliable);
+        gt2Send(connection, data, size, reliable);
     }
 }
 
@@ -543,13 +543,13 @@ void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay
         header->aids = 1 << aid;
         MI_CpuCopy8(data, header + 1, size);
         size += sizeof(TransportRelayHeader);
-        func_ov011_0217d290(connection, (const GT2Byte *)header, size, FALSE);
+        gt2Send(connection, (const GT2Byte *)header, size, FALSE);
         size = 0;
         if (header != NULL) {
             DWC_Free(4, header, size);
         }
     } else {
-        func_ov011_0217d290(connection, data, size, FALSE);
+        gt2Send(connection, data, size, FALSE);
     }
 }
 
@@ -730,7 +730,7 @@ void DWCs_RecvSystemDataBody(u8 aid, const void *data, int size) {
 
 // The free space of GT2's buffer to a machine, less what the transport keeps for itself
 int DWCs_GetOutgoingBufferFreeSize(u8 aid) {
-    int n = func_ov011_0217d394(DWCi_GetGT2Connection(aid)) - 0x207;
+    int n = gt2GetOutgoingBufferFreeSpace(DWCi_GetGT2Connection(aid)) - 0x207;
 
     if (n <= 0) {
         return 0;

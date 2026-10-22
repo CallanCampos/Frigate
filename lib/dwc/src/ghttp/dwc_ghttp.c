@@ -45,7 +45,7 @@ BOOL DWCi_SetGHTTPRootCA(const char *url) {
 }
 
 BOOL DWCi_RemoveGHTTPRootCA(const char *url) {
-    if (ghttpRemoveRootCAList(url) == GHTTPTrue) {
+    if (ghttpCleanupRootCAList(url) == GHTTPTrue) {
         return TRUE;
     }
     return FALSE;
@@ -118,15 +118,15 @@ static void DWCi_GHTTPProgress(GHTTPRequest request, GHTTPState state, const cha
     }
 }
 
-int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressCallback progress,
-                     DWCGHTTPCompletedCallback completed, void *param) {
-    return DWC_GetGHTTPDataEx(url, bufferSize, freeBuffer, NULL, progress, completed, param);
+int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressCallback progress,
+                       DWCGHTTPCompletedCallback completed, void *param) {
+    return DWC_GetGHTTPDataEx2(url, bufferSize, freeBuffer, NULL, progress, completed, param);
 }
 
 // Starts the request for a URL, with a buffer of this size (the game gets it in the callbacks). Returns the request, or
 // an error that is below 0
-int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHTTPPost *post,
-                       DWCGHTTPProgressCallback progress, DWCGHTTPCompletedCallback completed, void *param) {
+int DWC_GetGHTTPDataEx2(const char *url, int bufferSize, BOOL freeBuffer, GHTTPPost *post,
+                        DWCGHTTPProgressCallback progress, DWCGHTTPCompletedCallback completed, void *param) {
     char *buffer = NULL;
     DWCGHTTPParam entryParam;
     DWCGHTTPEntry *entry;

@@ -1,45 +1,42 @@
 #include "dwc/gsXML.h"
 #include "dwc/ext.h"
-// The length of a wide text, which gt2.c has
-#include "dwc/gt2.h"
 #include "nitro/std.h"
 
 // GameSpy's XML (gsXML.c). The ROM names neither the file nor its functions: the file, gsXmlWriterGetData and
 // gsXmlWriterGetDataLength are GameSpy's, as pret's pokerevo Wii build has them (gsXML.s), and the other functions are
-// the later SDK's (the debug texts name gsXmlCreateStreamWriter and gsXmlCreateStream), but for gsiXmlUtilGrowBuffer,
-// ours
+// the later SDK's (the debug texts name gsXmlCreateStreamWriter and gsXmlCreateStream)
 
 // A part of the text of a message, which isn't ended
 typedef struct GSIXmlString {
-    const gsi_u8 *data;
-    int len;
+    const gsi_u8 *mData;
+    int mLen;
 } GSIXmlString;
 
 // An element (or an attribute) that the reader found: its name and value, its index and the index of the element it
 // is in (for an attribute, the element it belongs to), -1 for none
 typedef struct GSIXmlElement {
-    GSIXmlString name;
-    GSIXmlString value;
-    int index;
-    int parent;
+    GSIXmlString mName;
+    GSIXmlString mValue;
+    int mIndex;
+    int mParentIndex;
 } GSIXmlElement;
 
 // A writer: its text, the length and the size of the buffer, and whether the message was ended
 typedef struct GSIXmlStreamWriter {
-    char *buffer;
-    int length;
-    int capacity;
-    gsi_bool closed;
+    char *mBuffer;
+    int mLen;
+    int mCapacity;
+    gsi_bool mClosed;
 } GSIXmlStreamWriter;
 
 // A reader: the elements and the attributes that the text had, the element it is in, the child that was read last and
 // the attribute that was read last, -1 for none
 typedef struct GSIXmlStreamReader {
-    DArray elements;
-    DArray attributes;
-    int element;
-    int child;
-    int attribute;
+    DArray mElementArray;
+    DArray mAttributeArray;
+    int mElemReadIndex;
+    int mValueReadIndex;
+    int mAttribReadIndex;
 } GSIXmlStreamReader;
 
 static void gsiXmlUtilElementFree(void *element);
@@ -66,6 +63,15 @@ const char *GS_XML_SOAP_DEFAULT_NAMESPACES[4] = {
     "xsi=\"http://www.w3.org/2001/XMLSchema-instance\"",
     "xsd=\"http://www.w3.org/2001/XMLSchema\"",
 };
+
+// A wide-character string's length
+static int gsUnicodeStringLen(const gsi_u16 *str) {
+    const gsi_u16 *p = str;
+
+    while (*p++ != 0) {
+    }
+    return p - str - 1;
+}
 
 GSXmlStreamWriter gsXmlCreateStreamWriter(const char **namespaceDeclarations, int declarationNum) {
     GSIXmlStreamWriter *writer;
@@ -94,25 +100,25 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char **namespaceDeclarations, in
             capacity += 0x400;
         } while (capacity < size);
     }
-    writer->buffer = gsimalloc(capacity);
-    if (writer->buffer == NULL) {
+    writer->mBuffer = gsimalloc(capacity);
+    if (writer->mBuffer == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
                       "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", capacity);
         return NULL;
     }
-    writer->capacity = capacity;
-    writer->length = 0;
-    writer->buffer[0] = 0;
-    writer->closed = gsi_false;
+    writer->mCapacity = capacity;
+    writer->mLen = 0;
+    writer->mBuffer[0] = 0;
+    writer->mClosed = gsi_false;
     if (!gsiXmlUtilWriteString(writer, "<?xml version=\"1.0\" encoding=\"UTF-8\"?><SOAP-ENV:Envelope")) {
-        gsifree(writer->buffer);
+        gsifree(writer->mBuffer);
         gsifree(writer);
         return NULL;
     }
     for (i = 0; i < 4; i++) {
         if (!gsiXmlUtilWriteChar(writer, ' ') || !gsiXmlUtilWriteString(writer, "xmlns:") ||
             !gsiXmlUtilWriteString(writer, GS_XML_SOAP_DEFAULT_NAMESPACES[i])) {
-            gsifree(writer->buffer);
+            gsifree(writer->mBuffer);
             gsifree(writer);
             return NULL;
         }
@@ -120,13 +126,13 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char **namespaceDeclarations, in
     for (i = 0; i < declarationNum; i++) {
         if (!gsiXmlUtilWriteChar(writer, ' ') || !gsiXmlUtilWriteString(writer, "xmlns:") ||
             !gsiXmlUtilWriteString(writer, namespaceDeclarations[i])) {
-            gsifree(writer->buffer);
+            gsifree(writer->mBuffer);
             gsifree(writer);
             return NULL;
         }
     }
     if (!gsiXmlUtilWriteChar(writer, '>') || !gsiXmlUtilWriteString(writer, "<SOAP-ENV:Body>")) {
-        gsifree(writer->buffer);
+        gsifree(writer->mBuffer);
         gsifree(writer);
         return NULL;
     }
@@ -142,18 +148,18 @@ GSXmlStreamReader gsXmlCreateStreamReader(void) {
                       "Out of memory in gsXmlCreateStream, needed %d bytes", sizeof(GSIXmlStreamReader));
         return NULL;
     }
-    reader->elements = func_ov011_02171514(sizeof(GSIXmlElement), 32, gsiXmlUtilElementFree);
-    if (reader->elements == NULL) {
+    reader->mElementArray = ArrayNew(sizeof(GSIXmlElement), 32, gsiXmlUtilElementFree);
+    if (reader->mElementArray == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
                       "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
         gsifree(reader);
         return NULL;
     }
-    reader->attributes = func_ov011_02171514(sizeof(GSIXmlElement), 16, gsiXmlUtilAttributeFree);
-    if (reader->attributes == NULL) {
+    reader->mAttributeArray = ArrayNew(sizeof(GSIXmlElement), 16, gsiXmlUtilAttributeFree);
+    if (reader->mAttributeArray == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
                       "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
-        func_ov011_02171558(reader->elements);
+        ArrayFree(reader->mElementArray);
         gsifree(reader);
         return NULL;
     }
@@ -161,7 +167,7 @@ GSXmlStreamReader gsXmlCreateStreamReader(void) {
     return reader;
 }
 
-gsi_bool gsXmlParseXml(GSXmlStreamReader stream, char *text, int length) {
+gsi_bool gsXmlParseBuffer(GSXmlStreamReader stream, char *text, int length) {
     GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     int pos;
 
@@ -178,23 +184,23 @@ gsi_bool gsXmlParseXml(GSXmlStreamReader stream, char *text, int length) {
 void gsXmlFreeWriter(GSXmlStreamWriter stream) {
     GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
 
-    gsifree(writer->buffer);
+    gsifree(writer->mBuffer);
     gsifree(writer);
 }
 
 void gsXmlFreeReader(GSXmlStreamReader stream) {
     GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
 
-    func_ov011_02171558(reader->attributes);
-    func_ov011_02171558(reader->elements);
+    ArrayFree(reader->mAttributeArray);
+    ArrayFree(reader->mElementArray);
     gsifree(reader);
 }
 
 void gsXmlResetReader(GSXmlStreamReader stream) {
     GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
 
-    ArrayClear(reader->attributes);
-    ArrayClear(reader->elements);
+    ArrayClear(reader->mAttributeArray);
+    ArrayClear(reader->mElementArray);
     gsXmlMoveToStart(reader);
 }
 
@@ -204,7 +210,7 @@ gsi_bool gsXmlCloseWriter(GSXmlStreamWriter stream) {
     if (!gsiXmlUtilWriteString(writer, "</SOAP-ENV:Body></SOAP-ENV:Envelope>")) {
         return gsi_false;
     }
-    writer->closed = gsi_true;
+    writer->mClosed = gsi_true;
     return gsi_true;
 }
 
@@ -217,13 +223,13 @@ static void gsiXmlUtilAttributeFree(void *element) {
 const char *gsXmlWriterGetData(GSXmlStreamWriter stream) {
     GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
 
-    return writer->buffer;
+    return writer->mBuffer;
 }
 
 int gsXmlWriterGetDataLength(GSXmlStreamWriter stream) {
     GSIXmlStreamWriter *writer = (GSIXmlStreamWriter *)stream;
 
-    return writer->length;
+    return writer->mLen;
 }
 
 static gsi_bool gsiXmlUtilSkipWhiteSpace(GSIXmlStreamReader *reader, const char *text, int length, int *pos) {
@@ -265,21 +271,21 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, i
     } else {
         tagStart = *pos - 1;
     }
-    if (!gsiXmlUtilParseName(reader, text, length, pos, &element.name)) {
+    if (!gsiXmlUtilParseName(reader, text, length, pos, &element.mName)) {
         return gsi_false;
     }
     if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
         return gsi_false;
     }
     if (store) {
-        element.index = func_ov011_02171588(reader->elements);
-        element.parent = parent;
-        func_ov011_021715a4(reader->elements, &element);
+        element.mIndex = ArrayLength(reader->mElementArray);
+        element.mParentIndex = parent;
+        ArrayAppend(reader->mElementArray, &element);
     }
     while (*pos < length && isalnum(text[*pos])) {
         GSIXmlElement attribute = { { NULL, 0 }, { NULL, 0 }, 0, 0 };
 
-        if (!gsiXmlUtilParseName(reader, text, length, pos, &attribute.name)) {
+        if (!gsiXmlUtilParseName(reader, text, length, pos, &attribute.mName)) {
             return gsi_false;
         }
         if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
@@ -289,16 +295,16 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, i
             return gsi_false;
         }
         (*pos)++;
-        if (!gsiXmlUtilParseString(reader, text, length, pos, &attribute.value)) {
+        if (!gsiXmlUtilParseString(reader, text, length, pos, &attribute.mValue)) {
             return gsi_false;
         }
         if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
             return gsi_false;
         }
         if (store) {
-            attribute.index = func_ov011_02171588(reader->attributes);
-            attribute.parent = element.index;
-            func_ov011_021715a4(reader->attributes, &attribute);
+            attribute.mIndex = ArrayLength(reader->mAttributeArray);
+            attribute.mParentIndex = element.mIndex;
+            ArrayAppend(reader->mAttributeArray, &attribute);
         }
     }
     if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
@@ -323,11 +329,11 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, i
         return gsi_false;
     }
     if (text[*pos] != '<') {
-        if (!gsiXmlUtilParseValue(reader, text, length, pos, &element.value)) {
+        if (!gsiXmlUtilParseValue(reader, text, length, pos, &element.mValue)) {
             return gsi_false;
         }
         if (store) {
-            ArrayReplaceAt(reader->elements, &element, element.index);
+            ArrayReplaceAt(reader->mElementArray, &element, element.mIndex);
         }
         if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
             return gsi_false;
@@ -346,11 +352,11 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, i
             if (!gsiXmlUtilSkipWhiteSpace(reader, text, length, pos)) {
                 return gsi_false;
             }
-            nameLength = element.name.len;
+            nameLength = element.mName.mLen;
             if (*pos + nameLength >= length) {
                 return gsi_false;
             }
-            if (strncmp(element.name.data, text + *pos, nameLength) != 0) {
+            if (strncmp(element.mName.mData, text + *pos, nameLength) != 0) {
                 return gsi_false;
             }
             *pos += nameLength;
@@ -363,11 +369,11 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader *reader, char *text, i
             (*pos)++;
             return gsi_true;
         }
-        if (element.value.data != NULL) {
+        if (element.mValue.mData != NULL) {
             return gsi_false;
         }
         *pos = childStart;
-        if (!gsiXmlUtilParseElement(reader, text, length, pos, element.index)) {
+        if (!gsiXmlUtilParseElement(reader, text, length, pos, element.mIndex)) {
             return gsi_false;
         }
         gsiXmlUtilSkipWhiteSpace(reader, text, length, pos);
@@ -393,8 +399,8 @@ static gsi_bool gsiXmlUtilParseName(GSIXmlStreamReader *reader, const char *text
     if (!isalnum(c) || isdigit(c)) {
         return gsi_false;
     }
-    out->data = start;
-    out->len = 1;
+    out->mData = start;
+    out->mLen = 1;
     (*pos)++;
     while (*pos < length && strchr(" \t\r\n", c = text[*pos]) == NULL) {
         if (c == ':') {
@@ -405,7 +411,7 @@ static gsi_bool gsiXmlUtilParseName(GSIXmlStreamReader *reader, const char *text
         } else if (c != '_' && c != '-' && !isalnum(c)) {
             return gsi_true;
         }
-        out->len++;
+        out->mLen++;
         (*pos)++;
     }
     return gsi_true;
@@ -425,12 +431,12 @@ static gsi_bool gsiXmlUtilParseString(GSIXmlStreamReader *reader, const char *te
     }
     (*pos)++;
     start = (char *)text + *pos;
-    out->len = 0;
+    out->mLen = 0;
     if (*pos >= length) {
         return gsi_false;
     }
     if (quote == text[*pos]) {
-        out->data = start;
+        out->mData = start;
         (*pos)++;
         return gsi_true;
     }
@@ -439,13 +445,13 @@ static gsi_bool gsiXmlUtilParseString(GSIXmlStreamReader *reader, const char *te
             return gsi_false;
         }
         (*pos)++;
-        out->len++;
+        out->mLen++;
     }
     (*pos)++;
-    if (!gsiXmlUtilDecodeString(start, &out->len)) {
+    if (!gsiXmlUtilDecodeString(start, &out->mLen)) {
         return gsi_false;
     }
-    out->data = start;
+    out->mData = start;
     return gsi_true;
 }
 
@@ -542,14 +548,14 @@ static gsi_bool gsiXmlUtilParseValue(GSIXmlStreamReader *reader, char *text, int
     }
     if (text[*pos] != '<') {
         start = text + *pos;
-        out->data = start;
+        out->mData = start;
     }
     while (*pos < length) {
         if (text[*pos] == '<') {
-            return gsiXmlUtilDecodeString(start, &out->len) != 0;
+            return gsiXmlUtilDecodeString(start, &out->mLen) != 0;
         }
         (*pos)++;
-        out->len++;
+        out->mLen++;
     }
     return gsi_false;
 }
@@ -621,7 +627,7 @@ gsi_bool gsXmlWriteUnicodeStringElement(GSXmlStreamWriter stream, const char *pr
     int i;
     int length;
 
-    length = Gt2_WStrLen(value);
+    length = gsUnicodeStringLen(value);
     for (i = 0; i < length; i++) {
         gsi_u16 c = value[i];
         if (c < 0x20) {
@@ -750,8 +756,8 @@ gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter stream, const char *prefix,
     gsi_bool leading;
     char hex[4];
 
-    i = value->length - 1;
-    words = &value->data[0];
+    i = value->mLength - 1;
+    words = &value->mData[0];
     leading = gsi_true;
     if (!gsXmlWriteOpenTag(writer, prefix, name)) {
         return gsi_false;
@@ -762,7 +768,7 @@ gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter stream, const char *prefix,
     for (; i >= 0; i--) {
         if (leading) {
             for (j = 0; j < 4; j++) {
-                if ((gsi_u8)(value->data[i] >> ((3 - j) * 8)) != 0) {
+                if ((gsi_u8)(value->mData[i] >> ((3 - j) * 8)) != 0) {
                     break;
                 }
             }
@@ -771,7 +777,7 @@ gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter stream, const char *prefix,
             j = 0;
         }
         for (; j < 4; j++) {
-            sprintf(hex, "%02x", (gsi_u8)(value->data[i] >> ((3 - j) * 8)));
+            sprintf(hex, "%02x", (gsi_u8)(value->mData[i] >> ((3 - j) * 8)));
             if (!gsiXmlUtilWriteChar(writer, hex[0])) {
                 return gsi_false;
             }
@@ -787,13 +793,13 @@ gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter stream, const char *prefix,
 }
 
 static gsi_bool gsiXmlUtilWriteChar(GSIXmlStreamWriter *writer, int character) {
-    if (writer->length >= writer->capacity) {
+    if (writer->mLen >= writer->mCapacity) {
         if (!gsiXmlUtilGrowBuffer(writer)) {
             return gsi_false;
         }
     }
-    writer->buffer[writer->length] = character;
-    writer->length++;
+    writer->mBuffer[writer->mLen] = character;
+    writer->mLen++;
     return gsi_true;
 }
 
@@ -804,13 +810,13 @@ static gsi_bool gsiXmlUtilWriteString(GSIXmlStreamWriter *writer, const char *te
     if (length == 0) {
         return gsi_true;
     }
-    while (writer->capacity - writer->length <= length) {
+    while (writer->mCapacity - writer->mLen <= length) {
         if (!gsiXmlUtilGrowBuffer(writer)) {
             return gsi_false;
         }
     }
-    strcpy(writer->buffer + writer->length, text);
-    writer->length += length;
+    strcpy(writer->mBuffer + writer->mLen, text);
+    writer->mLen += length;
     return gsi_true;
 }
 
@@ -819,7 +825,7 @@ static gsi_bool gsiXmlUtilWriteUnicodeString(GSIXmlStreamWriter *writer, const g
     int length;
     int i;
 
-    length = Gt2_WStrLen(text);
+    length = gsUnicodeStringLen(text);
     utf8[3] = 0;
     for (i = 0; i < length; i++) {
         utf8[_UCS2CharToUTF8String(text[i], utf8)] = 0;
@@ -869,24 +875,24 @@ static gsi_bool gsiXmlUtilGrowBuffer(GSIXmlStreamWriter *writer) {
     int newCapacity;
     char *newBuffer;
 
-    newCapacity = writer->capacity + 0x400;
-    newBuffer = gsirealloc(writer->buffer, newCapacity);
+    newCapacity = writer->mCapacity + 0x400;
+    newBuffer = gsirealloc(writer->mBuffer, newCapacity);
     if (newBuffer == NULL) {
         return gsi_false;
     }
-    if (newBuffer != writer->buffer) {
-        writer->buffer = newBuffer;
+    if (newBuffer != writer->mBuffer) {
+        writer->mBuffer = newBuffer;
     }
-    writer->capacity = newCapacity;
+    writer->mCapacity = newCapacity;
     return gsi_true;
 }
 
 gsi_bool gsXmlMoveToStart(GSXmlStreamReader stream) {
     GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
 
-    reader->element = -1;
-    reader->child = -1;
-    reader->attribute = -1;
+    reader->mElemReadIndex = -1;
+    reader->mValueReadIndex = -1;
+    reader->mAttribReadIndex = -1;
     return gsi_true;
 }
 
@@ -894,11 +900,11 @@ gsi_bool gsXmlMoveToNext(GSXmlStreamReader stream, const char *name) {
     GSIXmlStreamReader *reader = (GSIXmlStreamReader *)stream;
     int i;
 
-    for (i = reader->element + 1; i < func_ov011_02171588(reader->elements); i++) {
-        if (gsiXmlUtilTagMatches(name, func_ov011_0217158c(reader->elements, i))) {
-            reader->element = i;
-            reader->child = -1;
-            reader->attribute = -1;
+    for (i = reader->mElemReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        if (gsiXmlUtilTagMatches(name, ArrayNth(reader->mElementArray, i))) {
+            reader->mElemReadIndex = i;
+            reader->mValueReadIndex = -1;
+            reader->mAttribReadIndex = -1;
             return gsi_true;
         }
     }
@@ -910,20 +916,20 @@ gsi_bool gsXmlMoveToParent(GSXmlStreamReader stream) {
     int element;
     int parent;
 
-    element = reader->element;
-    if (element >= func_ov011_02171588(reader->elements) || element == -1) {
+    element = reader->mElemReadIndex;
+    if (element >= ArrayLength(reader->mElementArray) || element == -1) {
         return gsi_false;
     }
-    parent = ((GSIXmlElement *)func_ov011_0217158c(reader->elements, element))->parent;
+    parent = ((GSIXmlElement *)ArrayNth(reader->mElementArray, element))->mParentIndex;
     if (parent == -1) {
         return gsi_false;
     }
-    if (parent >= func_ov011_02171588(reader->elements)) {
+    if (parent >= ArrayLength(reader->mElementArray)) {
         return gsi_false;
     }
-    reader->element = parent;
-    reader->child = -1;
-    reader->attribute = -1;
+    reader->mElemReadIndex = parent;
+    reader->mValueReadIndex = -1;
+    reader->mAttribReadIndex = -1;
     return gsi_true;
 }
 
@@ -932,15 +938,15 @@ gsi_bool gsXmlMoveToChild(GSXmlStreamReader stream, const char *name) {
     GSIXmlElement *element;
     int i;
 
-    for (i = reader->element + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
-            reader->element = i;
-            reader->child = -1;
-            reader->attribute = -1;
+    for (i = reader->mElemReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
+            reader->mElemReadIndex = i;
+            reader->mValueReadIndex = -1;
+            reader->mAttribReadIndex = -1;
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -952,18 +958,18 @@ gsi_bool gsXmlReadChildAsString(GSXmlStreamReader stream, const char *name, cons
     GSIXmlElement *element;
     int i;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
-            reader->child = i;
-            *text = element->value.data;
-            *length = element->value.len;
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
+            reader->mValueReadIndex = i;
+            *text = element->mValue.mData;
+            *length = element->mValue.mLen;
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -999,21 +1005,21 @@ gsi_bool gsXmlReadChildAsHexBinary(GSXmlStreamReader stream, const char *name, g
     int value;
     int textLength;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
             written = 0;
             value = 0;
             offset = 0;
             hexLength = size * 2;
-            textLength = element->value.len;
+            textLength = element->mValue.mLen;
             if (hexLength >= textLength) {
                 hexLength = textLength;
             }
-            if (textLength == 0 || element->value.data == NULL) {
+            if (textLength == 0 || element->mValue.mData == NULL) {
                 *(gsi_u8 *)buffer = 0;
                 *readSize = 0;
                 return gsi_true;
@@ -1023,22 +1029,22 @@ gsi_bool gsXmlReadChildAsHexBinary(GSXmlStreamReader stream, const char *name, g
                 return gsi_true;
             }
             while (hexLength > 1) {
-                STD_TSScanf(element->value.data + offset, "%02x", &value);
+                STD_TSScanf(element->mValue.mData + offset, "%02x", &value);
                 ((gsi_u8 *)buffer)[written++] = value;
                 offset += 2;
                 hexLength -= 2;
             }
             if (hexLength == 1) {
-                STD_TSScanf(element->value.data + offset, "%01x", &value);
+                STD_TSScanf(element->mValue.mData + offset, "%01x", &value);
                 ((gsi_u8 *)buffer)[written++] = value;
             }
             if (readSize != NULL) {
                 *readSize = written;
             }
-            reader->child = i;
+            reader->mValueReadIndex = i;
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -1050,27 +1056,27 @@ gsi_bool gsXmlReadChildAsBase64Binary(GSXmlStreamReader stream, const char *name
     GSIXmlElement *element;
     int i;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
             if (buffer != NULL) {
-                reader->child = i;
-                if (element->value.data != NULL) {
-                    B64Decode(element->value.data, buffer, element->value.len, size, 0);
+                reader->mValueReadIndex = i;
+                if (element->mValue.mData != NULL) {
+                    B64Decode(element->mValue.mData, buffer, element->mValue.mLen, size, 0);
                 } else {
                     *size = 0;
                 }
-            } else if (element->value.data != NULL) {
-                *size = B64DecodeLen(element->value.data, 0);
+            } else if (element->mValue.mData != NULL) {
+                *size = B64DecodeLen(element->mValue.mData, 0);
             } else {
                 *size = 0;
             }
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -1082,20 +1088,20 @@ gsi_bool gsXmlReadChildAsInt(GSXmlStreamReader stream, const char *name, int *va
     GSIXmlElement *element;
     int i;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
-            reader->child = i;
-            if (element->value.data == NULL) {
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
+            reader->mValueReadIndex = i;
+            if (element->mValue.mData == NULL) {
                 return gsi_false;
             }
-            *value = atol(element->value.data);
+            *value = atol(element->mValue.mData);
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -1107,20 +1113,20 @@ gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader stream, const char *name, gsi_i
     GSIXmlElement *element;
     int i;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
-            reader->child = i;
-            if (element->value.data == NULL) {
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
+            reader->mValueReadIndex = i;
+            if (element->mValue.mData == NULL) {
                 return gsi_false;
             }
-            *value = gsiStringToInt64(element->value.data);
+            *value = gsiStringToInt64(element->mValue.mData);
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -1133,17 +1139,17 @@ gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char *n
     GSTime time;
     int i;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
-            reader->child = i;
-            if (element->value.data == NULL) {
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
+            reader->mValueReadIndex = i;
+            if (element->mValue.mData == NULL) {
                 return gsi_false;
             }
-            STD_TSScanf(element->value.data, "%i-%02d-%02dT%02d:%02d:%02d", &time.year, &time.mon, &time.mday,
+            STD_TSScanf(element->mValue.mData, "%i-%02d-%02dT%02d:%02d:%02d", &time.year, &time.mon, &time.mday,
                         &time.hour, &time.min, &time.sec);
             time.year -= 1900;
             time.mon -= 1;
@@ -1151,7 +1157,7 @@ gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char *n
             *value = gsiDateToSeconds(&time);
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -1163,20 +1169,20 @@ gsi_bool gsXmlReadChildAsFloat(GSXmlStreamReader stream, const char *name, float
     GSIXmlElement *element;
     int i;
 
-    if (reader->child == -1) {
-        reader->child = reader->element;
+    if (reader->mValueReadIndex == -1) {
+        reader->mValueReadIndex = reader->mElemReadIndex;
     }
-    for (i = reader->child + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element && gsiXmlUtilTagMatches(name, element)) {
-            reader->child = i;
-            if (element->value.data == NULL) {
+    for (i = reader->mValueReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex && gsiXmlUtilTagMatches(name, element)) {
+            reader->mValueReadIndex = i;
+            if (element->mValue.mData == NULL) {
                 return gsi_false;
             }
-            *value = atof(element->value.data);
+            *value = atof(element->mValue.mData);
             return gsi_true;
         }
-        if (element->parent < reader->element) {
+        if (element->mParentIndex < reader->mElemReadIndex) {
             return gsi_false;
         }
     }
@@ -1202,8 +1208,8 @@ static gsi_bool gsiXmlUtilTagMatches(const char *name, const GSIXmlElement *elem
     if (part == NULL) {
         part = name;
     }
-    nameLength = element->name.len;
-    while (i < nameLength && (gsi_u8)element->name.data[i] != ':') {
+    nameLength = element->mName.mLen;
+    while (i < nameLength && (gsi_u8)element->mName.mData[i] != ':') {
         i++;
     }
     if (i == nameLength) {
@@ -1211,7 +1217,7 @@ static gsi_bool gsiXmlUtilTagMatches(const char *name, const GSIXmlElement *elem
     } else {
         i++;
     }
-    elementName = element->name.data;
+    elementName = element->mName.mData;
     compareLength = nameLength - i;
     if (compareLength <= strlen(part)) {
         compareLength = strlen(part);
@@ -1228,12 +1234,12 @@ gsi_bool gsXmlReadChildAsLargeInt(GSXmlStreamReader stream, const char *name, gs
 
     readSize = 0;
     memset(value, 0, sizeof(gsLargeInt_t));
-    if (!gsXmlReadChildAsHexBinary(reader, name, (gsi_u8 *)value->data, 0x200, &readSize)) {
+    if (!gsXmlReadChildAsHexBinary(reader, name, (gsi_u8 *)value->mData, 0x200, &readSize)) {
         return gsi_false;
     }
-    value->length = (gsi_u32)readSize / 4;
+    value->mLength = (gsi_u32)readSize / 4;
     if (readSize & 3) {
-        value->length++;
+        value->mLength++;
     }
     if (!gsLargeIntReverseBytes(value)) {
         return gsi_false;
@@ -1248,13 +1254,13 @@ int gsXmlCountChildren(GSXmlStreamReader stream, const char *name) {
     int i;
 
     count = 0;
-    for (i = reader->element + 1; i < func_ov011_02171588(reader->elements); i++) {
-        element = func_ov011_0217158c(reader->elements, i);
-        if (element->parent == reader->element) {
+    for (i = reader->mElemReadIndex + 1; i < ArrayLength(reader->mElementArray); i++) {
+        element = ArrayNth(reader->mElementArray, i);
+        if (element->mParentIndex == reader->mElemReadIndex) {
             if (name == NULL || gsiXmlUtilTagMatches(name, element)) {
                 count++;
             }
-        } else if (element->parent < reader->element) {
+        } else if (element->mParentIndex < reader->mElemReadIndex) {
             break;
         }
     }

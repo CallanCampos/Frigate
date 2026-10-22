@@ -46,7 +46,7 @@ GT2Result gti2StartConnectionAttempt(GT2Connection connection, const GT2Byte *me
             return 1;
         }
         memcpy(connection->initialMessage, message, length);
-        connection->initialMessageLength = length;
+        connection->initialMessageLen = length;
     }
     if (callbacks != NULL) {
         connection->callbacks = *callbacks;
@@ -88,7 +88,7 @@ GT2Bool gti2ConnectionSendData(GT2Connection connection, const GT2Byte *data, in
     if (!gti2SocketSend(connection->socket, connection->ip, connection->port, data, length)) {
         return gsi_false;
     }
-    connection->lastSendTime = current_time();
+    connection->lastSend = current_time();
     return gsi_true;
 }
 
@@ -119,13 +119,13 @@ static GT2Bool gti2CheckTimeout(GT2Connection connection, gsi_time now) {
 
 // Resends the reliable messages the peer hasn't acked for a second
 static GT2Bool gti2SendRetries(GT2Connection connection, gsi_time now) {
-    int count = func_ov011_02171588(connection->outgoingMessages);
+    int count = ArrayLength(connection->outgoingBufferMessages);
     int i;
 
     for (i = 0; i < count; i++) {
-        GTI2OutgoingBufferMessage *message = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *message = ArrayNth(connection->outgoingBufferMessages, i);
 
-        if (now - message->sendTime > 1000) {
+        if (now - message->lastSend > 1000) {
             if (!gti2ResendMessage(connection, message)) {
                 return gsi_false;
             }
@@ -149,7 +149,7 @@ static GT2Bool gti2CheckPendingAck(GT2Connection connection, gsi_time now) {
 
 // Sends a keep-alive after 30 seconds without sending
 static GT2Bool gti2CheckKeepAlive(GT2Connection connection, gsi_time now) {
-    if (now - connection->lastSendTime > 30000) {
+    if (now - connection->lastSend > 30000) {
         if (!gti2SendKeepAlive(connection)) {
             return gsi_false;
         }
@@ -191,7 +191,7 @@ void gti2ConnectionClosed(GT2Connection connection) {
     if (connection->state != 7) {
         connection->state = 7;
         TableRemove(connection->socket->connections, &connection);
-        func_ov011_021715a4(connection->socket->closedConnections, &connection);
+        ArrayAppend(connection->socket->closedConnections, &connection);
     }
 }
 
@@ -199,23 +199,23 @@ void gti2ConnectionCleanup(GT2Connection connection) {
     if (connection->initialMessage != NULL) {
         gsifree(connection->initialMessage);
     }
-    if (connection->incoming.data != NULL) {
-        gsifree(connection->incoming.data);
+    if (connection->incomingBuffer.buffer != NULL) {
+        gsifree(connection->incomingBuffer.buffer);
     }
-    if (connection->outgoing.data != NULL) {
-        gsifree(connection->outgoing.data);
+    if (connection->outgoingBuffer.buffer != NULL) {
+        gsifree(connection->outgoingBuffer.buffer);
     }
-    if (connection->incomingMessages != NULL) {
-        func_ov011_02171558(connection->incomingMessages);
+    if (connection->incomingBufferMessages != NULL) {
+        ArrayFree(connection->incomingBufferMessages);
     }
-    if (connection->outgoingMessages != NULL) {
-        func_ov011_02171558(connection->outgoingMessages);
+    if (connection->outgoingBufferMessages != NULL) {
+        ArrayFree(connection->outgoingBufferMessages);
     }
     if (connection->sendFilters != NULL) {
-        func_ov011_02171558(connection->sendFilters);
+        ArrayFree(connection->sendFilters);
     }
     if (connection->receiveFilters != NULL) {
-        func_ov011_02171558(connection->receiveFilters);
+        ArrayFree(connection->receiveFilters);
     }
     gsifree(connection);
 }

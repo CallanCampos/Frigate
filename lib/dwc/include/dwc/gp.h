@@ -5,7 +5,7 @@
 
 // GameSpy's GP (Presence), in overlay 11: the API (gp.c) that DWC's friends and login code calls, which logs in to the
 // connection manager (gpcm.gs.nintendowifi.net), keeps the buddy list and the statuses of the buddies, sends them
-// messages directly (through gt2.c's "Udp Engine") or through the server, and searches the search manager
+// messages directly (through gsUdpEngine.c's "Udp Engine") or through the server, and searches the search manager
 // (gpsp.gs.nintendowifi.net). The ROM has no names for the files: they and their functions are named after GameSpy's,
 // as pret/pokerevo's Wii build has them (asm/SDK/DWC/gamespy/gp.s and the other gp*.s), or the later SDK's for the
 // functions that the Wii's GP doesn't have, as some of this code's debug texts give them ("gpiSaveKeysToBuffer: buffer
@@ -453,7 +453,7 @@ typedef struct GPGetUserNicksResponseArg {
 typedef struct GPFindPlayerMatch {
     GPProfile profile;
     char nick[31];
-    GPEnum playerStatus;
+    GPEnum status;
     char statusString[256];
 } GPFindPlayerMatch;
 
@@ -477,7 +477,7 @@ typedef struct GPUniqueMatch {
 
 typedef struct GPGetReverseBuddiesListResponseArg {
     GPResult result;
-    int numOfUniqueMatchs;
+    int numOfUniqueMatches;
     GPUniqueMatch *matches;
 } GPGetReverseBuddiesListResponseArg;
 
@@ -501,17 +501,17 @@ GPResult gpInitialize(GPConnection *connection, int productID, int namespaceID, 
 void gpDestroy(GPConnection *connection);
 GPResult gpProcess(GPConnection *connection);
 GPResult gpSetCallback(GPConnection *connection, GPEnum func, GPCallback callback, void *param);
-GPResult gpConnectPreAuthenticated(GPConnection *connection, const gsi_char *authtoken,
-                                   const gsi_char *partnerchallenge, GPEnum firewall, GPEnum blocking,
-                                   GPCallback callback, void *param);
+GPResult gpConnectPreAuthenticatedA(GPConnection *connection, const gsi_char *authtoken,
+                                    const gsi_char *partnerchallenge, GPEnum firewall, GPEnum blocking,
+                                    GPCallback callback, void *param);
 void gpDisconnect(GPConnection *connection);
-GPResult gpProfileSearch(GPConnection *connection, const gsi_char *nick, const gsi_char *uniquenick,
-                         const gsi_char *email, const gsi_char *firstname, const gsi_char *lastname, int icquin,
-                         GPEnum blocking, GPCallback callback, void *param);
+GPResult gpProfileSearchA(GPConnection *connection, const gsi_char *nick, const gsi_char *uniquenick,
+                          const gsi_char *email, const gsi_char *firstname, const gsi_char *lastname, int icquin,
+                          GPEnum blocking, GPCallback callback, void *param);
 GPResult gpGetInfo(GPConnection *connection, GPProfile profile, GPEnum checkCache, GPEnum blocking, GPCallback callback,
                    void *param);
-GPResult gpSetInfos(GPConnection *connection, GPEnum info, const gsi_char *value);
-GPResult gpSendBuddyRequest(GPConnection *connection, GPProfile profile, const gsi_char *reason);
+GPResult gpSetInfosA(GPConnection *connection, GPEnum info, const gsi_char *value);
+GPResult gpSendBuddyRequestA(GPConnection *connection, GPProfile profile, const gsi_char *reason);
 GPResult gpAuthBuddyRequest(GPConnection *connection, GPProfile profile);
 GPResult gpDenyBuddyRequest(GPConnection *connection, GPProfile profile);
 GPResult gpGetNumBuddies(GPConnection *connection, int *numBuddies);
@@ -519,9 +519,9 @@ GPResult gpGetBuddyStatus(GPConnection *connection, int index, GPBuddyStatus *st
 GPResult gpGetBuddyIndex(GPConnection *connection, GPProfile profile, int *index);
 int gpIsBuddy(GPConnection *connection, GPProfile profile);
 GPResult gpDeleteBuddy(GPConnection *connection, GPProfile profile);
-GPResult gpSetStatus(GPConnection *connection, GPEnum status, const gsi_char *statusString,
-                     const gsi_char *locationString);
-GPResult gpSendBuddyMessage(GPConnection *connection, GPProfile profile, const gsi_char *message);
+GPResult gpSetStatusA(GPConnection *connection, GPEnum status, const gsi_char *statusString,
+                      const gsi_char *locationString);
+GPResult gpSendBuddyMessageA(GPConnection *connection, GPProfile profile, const gsi_char *message);
 GPResult gpGetReverseBuddiesList(GPConnection *connection, GPProfile *targets, int numOfTargets, GPEnum blocking,
                                  GPCallback callback, void *param);
 GPResult gpGetLoginTicket(GPConnection *connection, char loginTicket[GP_LOGIN_TICKET_LEN]);

@@ -882,6 +882,8 @@ overlays/ov011 0x0215cd8c add_label ReshZekSave_UnresolvedInitTarget
 overlays/ov011 0x0216c7ea reloc_module overlay(189)
 overlays/ov011 0x0216eba2 reloc_module overlay(189)
 overlays/ov011 0x0216ebe8 reloc_module overlay(189)
+overlays/ov011 0x0216fbe0 section_end lib/dwc/src/gt2/gsUdpEngine.c:.text
+overlays/ov011 0x0216fbe0 section_start lib/dwc/src/gscommon/gsXML.c:.text
 overlays/ov011 0x021722c4 remove_reloc
 overlays/ov011 0x02185568 remove_reloc
 overlays/ov012 0x02150aa0 overlay_id 36

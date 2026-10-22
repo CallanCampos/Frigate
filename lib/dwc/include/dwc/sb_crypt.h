@@ -6,7 +6,7 @@
 // The stream cipher of GameSpy's server browser (sb_crypt.c), in overlay 11, that the master server encrypts its
 // lists with: a permutation of the bytes, which every byte shuffles a little more, and five indexes
 
-typedef struct GOACryptState {
+typedef struct _GOACryptState {
     gsi_u8 cards[256];  // a permutation of 0 to 255
     gsi_u8 rotor;       // moves on by one
     gsi_u8 ratchet;     // moves erratically

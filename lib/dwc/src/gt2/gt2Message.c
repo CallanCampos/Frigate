@@ -109,7 +109,7 @@ static GT2Bool gti2ConnectionMemoryError(GT2Connection connection) {
 
 // Drops the reliable messages that the peer's expected serial number acks
 static GT2Bool gti2HandleESN(GT2Connection connection, int ack) {
-    int count = func_ov011_02171588(connection->outgoingMessages);
+    int count = ArrayLength(connection->outgoingBufferMessages);
     int i;
     int base;
 
@@ -117,7 +117,7 @@ static GT2Bool gti2HandleESN(GT2Connection connection, int ack) {
         return gsi_true;
     }
     for (i = 0; i < count; i++) {
-        GTI2OutgoingBufferMessage *sent = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *sent = ArrayNth(connection->outgoingBufferMessages, i);
 
         if (gti2SNDiff(sent->serialNumber, ack) >= 0) {
             break;
@@ -127,20 +127,20 @@ static GT2Bool gti2HandleESN(GT2Connection connection, int ack) {
         return gsi_true;
     }
     while (i-- != 0) {
-        func_ov011_02171668(connection->outgoingMessages, i);
+        ArrayDeleteAt(connection->outgoingBufferMessages, i);
     }
-    count = func_ov011_02171588(connection->outgoingMessages);
+    count = ArrayLength(connection->outgoingBufferMessages);
     if (count == 0) {
-        connection->outgoing.length = 0;
+        connection->outgoingBuffer.len = 0;
         return gsi_true;
     }
-    base = ((GTI2OutgoingBufferMessage *)func_ov011_0217158c(connection->outgoingMessages, 0))->offset;
+    base = ((GTI2OutgoingBufferMessage *)ArrayNth(connection->outgoingBufferMessages, 0))->start;
     for (i = 0; i < count; i++) {
-        GTI2OutgoingBufferMessage *sent = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *sent = ArrayNth(connection->outgoingBufferMessages, i);
 
-        sent->offset -= base;
+        sent->start -= base;
     }
-    gti2BufferShorten(&connection->outgoing, 0, base);
+    gti2BufferShorten(&connection->outgoingBuffer, 0, base);
     return gsi_true;
 }
 
@@ -149,7 +149,7 @@ static GT2Bool gti2HandleAppUnreliable(GT2Connection connection, GT2Byte *data, 
     if (connection->state != 5 && connection->state != 6) {
         return gsi_true;
     }
-    if (func_ov011_02171588(connection->receiveFilters) != 0) {
+    if (ArrayLength(connection->receiveFilters) != 0) {
         return gti2ReceiveFilterCallback(connection, 0, data, length, gsi_false) != 0;
     }
     return gti2ReceivedCallback(connection, data, length, gsi_false) != 0;
@@ -162,7 +162,7 @@ static GT2Bool gti2HandleAppReliable(GT2Connection connection, GT2Byte *data, in
             return gsi_false;
         }
     } else {
-        if (func_ov011_02171588(connection->receiveFilters) != 0) {
+        if (ArrayLength(connection->receiveFilters) != 0) {
             return gti2ReceiveFilterCallback(connection, 0, data, length, gsi_true) != 0;
         }
         if (!gti2ReceivedCallback(connection, data, length, gsi_true)) {
@@ -222,7 +222,7 @@ static GT2Bool gti2HandleServerChallenge(GT2Connection connection, GT2Byte *data
         return gsi_false;
     }
     gti2GetResponse(response, data + 32);
-    if (!gti2SendClientResponse(connection, response, connection->initialMessage, connection->initialMessageLength)) {
+    if (!gti2SendClientResponse(connection, response, connection->initialMessage, connection->initialMessageLen)) {
         return gsi_false;
     }
     if (connection->initialMessage != NULL) {
@@ -253,7 +253,7 @@ static GT2Bool gti2HandleClientResponse(GT2Connection connection, GT2Byte *data,
         }
         return gsi_false;
     }
-    if (connection->socket->onConnectAttempt == NULL) {
+    if (connection->socket->connectAttemptCallback == NULL) {
         if (!gti2SendClosed(connection)) {
             return gsi_false;
         }
@@ -363,11 +363,11 @@ static int gti2IncomingBufferMessageCompare(const void *a, const void *b) {
 static GT2Bool gti2BufferIncomingMessage(GT2Connection connection, GTI2MessageType type, int sequence, GT2Byte *data,
                                          int length, GT2Bool *dropped) {
     GTI2IncomingBufferMessage message;
-    int count = func_ov011_02171588(connection->incomingMessages);
+    int count = ArrayLength(connection->incomingBufferMessages);
     int i;
 
     for (i = 0; i < count; i++) {
-        GTI2IncomingBufferMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
+        GTI2IncomingBufferMessage *pending = ArrayNth(connection->incomingBufferMessages, i);
 
         if (pending->serialNumber == sequence) {
             *dropped = gsi_false;
@@ -377,29 +377,29 @@ static GT2Bool gti2BufferIncomingMessage(GT2Connection connection, GTI2MessageTy
             break;
         }
     }
-    if (gti2GetBufferFreeSpace(&connection->incoming) < length) {
+    if (gti2GetBufferFreeSpace(&connection->incomingBuffer) < length) {
         *dropped = gsi_true;
         return gsi_true;
     }
-    message.offset = connection->incoming.length;
-    message.length = length;
+    message.start = connection->incomingBuffer.len;
+    message.len = length;
     message.type = type;
     message.serialNumber = sequence;
-    ArrayInsertSorted(connection->incomingMessages, &message, gti2IncomingBufferMessageCompare);
-    if (count + 1 != func_ov011_02171588(connection->incomingMessages)) {
+    ArrayInsertSorted(connection->incomingBufferMessages, &message, gti2IncomingBufferMessageCompare);
+    if (count + 1 != ArrayLength(connection->incomingBufferMessages)) {
         *dropped = gsi_true;
         return gsi_true;
     }
-    gti2BufferWriteData(&connection->incoming, data, length);
+    gti2BufferWriteData(&connection->incomingBuffer, data, length);
     if (count == 0) {
         if (!gti2SendNack(connection, connection->expectedSerialNumber, sequence - 1)) {
             return gsi_false;
         }
     } else {
-        GTI2IncomingBufferMessage *inserted = func_ov011_0217158c(connection->incomingMessages, count);
+        GTI2IncomingBufferMessage *inserted = ArrayNth(connection->incomingBufferMessages, count);
 
         if (inserted->serialNumber == sequence) {
-            GTI2IncomingBufferMessage *previous = func_ov011_0217158c(connection->incomingMessages, count - 1);
+            GTI2IncomingBufferMessage *previous = ArrayNth(connection->incomingBufferMessages, count - 1);
 
             if ((gsi_u16)gti2SNDiff(sequence, previous->serialNumber) > 1) {
                 if (!gti2SendNack(connection, previous->serialNumber + 1, sequence - 1)) {
@@ -414,25 +414,25 @@ static GT2Bool gti2BufferIncomingMessage(GT2Connection connection, GTI2MessageTy
 
 // Removes a buffered incoming message from the buffer
 static void gti2RemoveHoldMessage(GT2Connection connection, GTI2IncomingBufferMessage *message, int index) {
-    int offset = message->offset;
-    int length = message->length;
+    int offset = message->start;
+    int length = message->len;
     int count;
     int i;
     int end = 0;
 
-    func_ov011_02171668(connection->incomingMessages, index);
-    count = func_ov011_02171588(connection->incomingMessages);
+    ArrayDeleteAt(connection->incomingBufferMessages, index);
+    count = ArrayLength(connection->incomingBufferMessages);
     for (i = 0; i < count; i++) {
-        GTI2IncomingBufferMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
+        GTI2IncomingBufferMessage *pending = ArrayNth(connection->incomingBufferMessages, i);
 
-        if (pending->offset > offset) {
-            pending->offset -= length;
-            if (end <= pending->offset + pending->length) {
-                end = pending->offset + pending->length;
+        if (pending->start > offset) {
+            pending->start -= length;
+            if (end <= pending->start + pending->len) {
+                end = pending->start + pending->len;
             }
         }
     }
-    gti2BufferShorten(&connection->incoming, offset, length);
+    gti2BufferShorten(&connection->incomingBuffer, offset, length);
 }
 
 // Delivers the buffered messages whose turn has come
@@ -440,12 +440,12 @@ static GT2Bool gti2DeliverHoldMessages(GT2Connection connection) {
     int i;
 
 restart:
-    for (i = func_ov011_02171588(connection->incomingMessages) - 1; i >= 0; i--) {
-        GTI2IncomingBufferMessage *pending = func_ov011_0217158c(connection->incomingMessages, i);
+    for (i = ArrayLength(connection->incomingBufferMessages) - 1; i >= 0; i--) {
+        GTI2IncomingBufferMessage *pending = ArrayNth(connection->incomingBufferMessages, i);
 
         if (pending->serialNumber == connection->expectedSerialNumber) {
-            if (!gti2DeliverReliableMessage(connection, pending->type, connection->incoming.data + pending->offset,
-                                            pending->length)) {
+            if (!gti2DeliverReliableMessage(connection, pending->type,
+                                            connection->incomingBuffer.buffer + pending->start, pending->len)) {
                 return gsi_false;
             }
             gti2RemoveHoldMessage(connection, pending, i);
@@ -478,7 +478,7 @@ static GT2Bool gti2HandleReliableMessage(GT2Connection connection, GTI2MessageTy
     }
     sequence = gti2UShortFromBuffer(data + connection->socket->protocolOffset, 3);
     ack = gti2UShortFromBuffer(data + connection->socket->protocolOffset, 5);
-    if (connection->socket->protocol == GTI2VdpProtocol && type == 0) {
+    if (connection->socket->protocolType == GTI2VdpProtocol && type == 0) {
         data[connection->socket->protocolOffset + 5] = data[0];
         data[connection->socket->protocolOffset + 6] = data[1];
         data += headerSize - connection->socket->protocolOffset;
@@ -540,9 +540,9 @@ static GT2Bool gti2HandleNack(GT2Connection connection, const GT2Byte *data, int
     } else {
         return gti2ConnectionCommunicationError(connection) != 0;
     }
-    count = func_ov011_02171588(connection->outgoingMessages);
+    count = ArrayLength(connection->outgoingBufferMessages);
     for (i = 0; i < count; i++) {
-        GTI2OutgoingBufferMessage *message = func_ov011_0217158c(connection->outgoingMessages, i);
+        GTI2OutgoingBufferMessage *message = ArrayNth(connection->outgoingBufferMessages, i);
 
         if (gti2SNDiff(message->serialNumber, first) >= 0 && gti2SNDiff(message->serialNumber, last) <= 0) {
             if (!gti2ResendMessage(connection, message)) {
@@ -641,7 +641,7 @@ static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte *data, int length, un
     int result;
     int type;
 
-    if (socket->onReceiveDump != NULL) {
+    if (socket->receiveDumpCallback != NULL) {
         if (!gti2DumpCallback(socket, connection, ip, port, gsi_false, data, length, gsi_false)) {
             return gsi_false;
         }
@@ -668,7 +668,7 @@ static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte *data, int length, un
             }
             return gsi_true;
         }
-        if (socket->onConnectAttempt == NULL) {
+        if (socket->connectAttemptCallback == NULL) {
             return gsi_true;
         }
         result = gti2NewIncomingConnection(socket, &connection, ip, port);
@@ -725,7 +725,7 @@ static GT2Bool gti2HandleMessage(GT2Socket socket, GT2Byte *data, int length, un
 GT2Bool gti2HandleConnectionReset(GT2Socket socket, unsigned int ip, unsigned short port) {
     GT2Connection connection = gti2SocketFindConnection(socket, ip, port);
 
-    if (socket->onReceiveDump != NULL) {
+    if (socket->receiveDumpCallback != NULL) {
         if (!gti2DumpCallback(socket, connection, ip, port, gsi_true, NULL, 0, gsi_false)) {
             return gsi_false;
         }
@@ -751,7 +751,7 @@ GT2Bool gti2HandleConnectionReset(GT2Socket socket, unsigned int ip, unsigned sh
 GT2Bool gti2HandleHostUnreachable(GT2Socket socket, unsigned int ip, unsigned short port, GT2Bool send) {
     GT2Connection connection = gti2SocketFindConnection(socket, ip, port);
 
-    if (socket->onReceiveDump != NULL) {
+    if (socket->receiveDumpCallback != NULL) {
         if (!gti2DumpCallback(socket, connection, ip, port, gsi_true, NULL, 0, send)) {
             return gsi_false;
         }
@@ -769,12 +769,12 @@ GT2Bool gti2ReceiveMessages(GT2Socket socket) {
     int length;
     int error;
 
-    if (CanReceiveOnSocket(socket->handle) != 0) {
+    if (CanReceiveOnSocket(socket->socket) != 0) {
         do {
             addressSize = sizeof(address);
-            length = recvfrom(socket->handle, buffer, sizeof(buffer), 0, (SOCKADDR *)&address, &addressSize);
+            length = recvfrom(socket->socket, buffer, sizeof(buffer), 0, (SOCKADDR *)&address, &addressSize);
             if (length == -1) {
-                error = GOAGetLastError(socket->handle);
+                error = GOAGetLastError(socket->socket);
                 if (error == -15) {
                     if (!gti2HandleConnectionReset(socket, address.addr.addr, GTI2_SWAP16(address.port))) {
                         return gsi_false;
@@ -792,7 +792,7 @@ GT2Bool gti2ReceiveMessages(GT2Socket socket) {
                     return gsi_false;
                 }
             }
-        } while (CanReceiveOnSocket(socket->handle));
+        } while (CanReceiveOnSocket(socket->socket));
     }
     return gsi_true;
 }
@@ -802,20 +802,20 @@ static GT2Bool gti2StoreOutgoingReliableMessageInfo(GT2Connection connection, un
     GTI2OutgoingBufferMessage message = { 0, 0, 0, 0 };
     int count;
 
-    message.offset = connection->outgoing.length;
-    message.length = length;
+    message.start = connection->outgoingBuffer.len;
+    message.len = length;
     message.serialNumber = sequence;
-    message.sendTime = current_time();
-    count = func_ov011_02171588(connection->outgoingMessages);
-    func_ov011_021715a4(connection->outgoingMessages, &message);
-    return count + 1 == func_ov011_02171588(connection->outgoingMessages);
+    message.lastSend = current_time();
+    count = ArrayLength(connection->outgoingBufferMessages);
+    ArrayAppend(connection->outgoingBufferMessages, &message);
+    return count + 1 == ArrayLength(connection->outgoingBufferMessages);
 }
 
 // The header of a reliable message in the outgoing buffer, dropped when there is no room
 static GT2Bool gti2BeginReliableMessage(GT2Connection connection, GTI2MessageType type, int size, GT2Bool *dropped) {
     gsi_u16 payloadLength = size - connection->socket->protocolOffset;
 
-    if (gti2GetBufferFreeSpace(&connection->outgoing) < size) {
+    if (gti2GetBufferFreeSpace(&connection->outgoingBuffer) < size) {
         if (!gti2ConnectionMemoryError(connection)) {
             return gsi_false;
         }
@@ -829,13 +829,14 @@ static GT2Bool gti2BeginReliableMessage(GT2Connection connection, GTI2MessageTyp
         *dropped = gsi_true;
         return gsi_true;
     }
-    if (connection->socket->protocol == GTI2VdpProtocol) {
-        gti2BufferWriteData(&connection->outgoing, (const GT2Byte *)&payloadLength, connection->socket->protocolOffset);
+    if (connection->socket->protocolType == GTI2VdpProtocol) {
+        gti2BufferWriteData(&connection->outgoingBuffer, (const GT2Byte *)&payloadLength,
+                            connection->socket->protocolOffset);
     }
-    gti2BufferWriteData(&connection->outgoing, "\xfe\xfe", 2);
-    gti2BufferWriteByte(&connection->outgoing, type);
-    gti2BufferWriteUShort(&connection->outgoing, connection->serialNumber++);
-    gti2BufferWriteUShort(&connection->outgoing, connection->expectedSerialNumber);
+    gti2BufferWriteData(&connection->outgoingBuffer, "\xfe\xfe", 2);
+    gti2BufferWriteByte(&connection->outgoingBuffer, type);
+    gti2BufferWriteUShort(&connection->outgoingBuffer, connection->serialNumber++);
+    gti2BufferWriteUShort(&connection->outgoingBuffer, connection->expectedSerialNumber);
     *dropped = gsi_false;
     return gsi_true;
 }
@@ -843,9 +844,9 @@ static GT2Bool gti2BeginReliableMessage(GT2Connection connection, GTI2MessageTyp
 // Sends the reliable message just built
 static GT2Bool gti2EndReliableMessage(GT2Connection connection) {
     GTI2OutgoingBufferMessage *last =
-        func_ov011_0217158c(connection->outgoingMessages, func_ov011_02171588(connection->outgoingMessages) - 1);
+        ArrayNth(connection->outgoingBufferMessages, ArrayLength(connection->outgoingBufferMessages) - 1);
 
-    if (!gti2ConnectionSendData(connection, connection->outgoing.data + last->offset, last->length)) {
+    if (!gti2ConnectionSendData(connection, connection->outgoingBuffer.buffer + last->start, last->len)) {
         return gsi_false;
     }
     connection->pendingAck = gsi_false;
@@ -862,7 +863,7 @@ static GT2Bool gti2SendAppReliable(GT2Connection connection, const GT2Byte *data
     if (dropped) {
         return gsi_true;
     }
-    gti2BufferWriteData(&connection->outgoing, data, length);
+    gti2BufferWriteData(&connection->outgoingBuffer, data, length);
     return gti2EndReliableMessage(connection) != 0;
 }
 
@@ -875,7 +876,7 @@ GT2Bool gti2SendClientChallenge(GT2Connection connection, const char challenge[]
     if (dropped) {
         return gsi_true;
     }
-    gti2BufferWriteData(&connection->outgoing, challenge, 32);
+    gti2BufferWriteData(&connection->outgoingBuffer, challenge, 32);
     return gti2EndReliableMessage(connection) != 0;
 }
 
@@ -889,12 +890,12 @@ static GT2Bool gti2SendServerChallenge(GT2Connection connection, const char resp
     if (dropped) {
         return gsi_true;
     }
-    gti2BufferWriteData(&connection->outgoing, response, 32);
-    gti2BufferWriteData(&connection->outgoing, challenge, 32);
+    gti2BufferWriteData(&connection->outgoingBuffer, response, 32);
+    gti2BufferWriteData(&connection->outgoingBuffer, challenge, 32);
     if (!gti2EndReliableMessage(connection)) {
         return gsi_false;
     }
-    connection->challengeTime = connection->lastSendTime;
+    connection->challengeTime = connection->lastSend;
     return gsi_true;
 }
 
@@ -909,8 +910,8 @@ static GT2Bool gti2SendClientResponse(GT2Connection connection, const char respo
     if (dropped) {
         return gsi_true;
     }
-    gti2BufferWriteData(&connection->outgoing, response, 32);
-    gti2BufferWriteData(&connection->outgoing, message, length);
+    gti2BufferWriteData(&connection->outgoingBuffer, response, 32);
+    gti2BufferWriteData(&connection->outgoingBuffer, message, length);
     if (gti2EndReliableMessage(connection)) {
         return gsi_true;
     }
@@ -941,7 +942,7 @@ GT2Bool gti2SendReject(GT2Connection connection, const GT2Byte *message, int len
     if (dropped) {
         return gsi_true;
     }
-    gti2BufferWriteData(&connection->outgoing, message, length);
+    gti2BufferWriteData(&connection->outgoingBuffer, message, length);
     if (gti2EndReliableMessage(connection)) {
         return gsi_true;
     }
@@ -991,21 +992,21 @@ static GT2Bool gti2SendAppUnreliable(GT2Connection connection, const GT2Byte *da
         return gsi_true;
     }
     total = length + 2;
-    if (gti2GetBufferFreeSpace(&connection->outgoing) < total) {
+    if (gti2GetBufferFreeSpace(&connection->outgoingBuffer) < total) {
         return gsi_true;
     }
-    start = connection->outgoing.data;
-    base = connection->outgoing.length;
-    if (connection->socket->protocol == GTI2VdpProtocol) {
-        gti2BufferWriteData(&connection->outgoing, data, 2);
+    start = connection->outgoingBuffer.buffer;
+    base = connection->outgoingBuffer.len;
+    if (connection->socket->protocolType == GTI2VdpProtocol) {
+        gti2BufferWriteData(&connection->outgoingBuffer, data, 2);
     }
-    gti2BufferWriteData(&connection->outgoing, "\xfe\xfe", 2);
-    gti2BufferWriteData(&connection->outgoing, data + connection->socket->protocolOffset,
+    gti2BufferWriteData(&connection->outgoingBuffer, "\xfe\xfe", 2);
+    gti2BufferWriteData(&connection->outgoingBuffer, data + connection->socket->protocolOffset,
                         length - connection->socket->protocolOffset);
     if (!gti2ConnectionSendData(connection, start + base, total)) {
         return gsi_false;
     }
-    gti2BufferShorten(&connection->outgoing, -1, total);
+    gti2BufferShorten(&connection->outgoingBuffer, -1, total);
     return gsi_true;
 }
 
@@ -1014,7 +1015,7 @@ GT2Bool gti2SendAck(GT2Connection connection) {
     gsi_u8 packet[10];
     int length = 0;
 
-    if (connection->socket->protocol == GTI2VdpProtocol) {
+    if (connection->socket->protocolType == GTI2VdpProtocol) {
         prefix = 5;
         memcpy(packet, &prefix, 2);
         length += 2;
@@ -1035,7 +1036,7 @@ static GT2Bool gti2SendNack(GT2Connection connection, unsigned short first, unsi
     gsi_u8 packet[10];
     int length = 0;
 
-    if (connection->socket->protocol == GTI2VdpProtocol) {
+    if (connection->socket->protocolType == GTI2VdpProtocol) {
         prefix = 7;
         memcpy(packet, &prefix, 2);
         length += 2;
@@ -1070,7 +1071,7 @@ static GT2Bool gti2SendClosedOnSocket(GT2Socket socket, unsigned int ip, unsigne
     gsi_u8 packet[5];
     int length = 0;
 
-    if (socket->protocol == GTI2VdpProtocol) {
+    if (socket->protocolType == GTI2VdpProtocol) {
         prefix = 3;
         memcpy(packet, &prefix, 2);
         length += 2;
@@ -1084,14 +1085,14 @@ static GT2Bool gti2SendClosedOnSocket(GT2Socket socket, unsigned int ip, unsigne
 }
 
 GT2Bool gti2ResendMessage(GT2Connection connection, GTI2OutgoingBufferMessage *message) {
-    gti2UShortToBuffer(connection->outgoing.data, message->offset + connection->socket->protocolOffset + 5,
+    gti2UShortToBuffer(connection->outgoingBuffer.buffer, message->start + connection->socket->protocolOffset + 5,
                        connection->expectedSerialNumber);
-    if (!gti2ConnectionSendData(connection, connection->outgoing.data + message->offset, message->length)) {
+    if (!gti2ConnectionSendData(connection, connection->outgoingBuffer.buffer + message->start, message->len)) {
         return gsi_false;
     }
-    message->sendTime = connection->lastSendTime;
-    if (connection->outgoing.data[message->offset + connection->socket->protocolOffset + 2] == 2) {
-        connection->challengeTime = connection->lastSendTime;
+    message->lastSend = connection->lastSend;
+    if (connection->outgoingBuffer.buffer[message->start + connection->socket->protocolOffset + 2] == 2) {
+        connection->challengeTime = connection->lastSend;
     }
     return gsi_true;
 }

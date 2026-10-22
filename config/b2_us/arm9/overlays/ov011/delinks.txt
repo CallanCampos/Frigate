@@ -116,8 +116,8 @@ lib/nitrowifi/src/wcm/wcm.c:
     .rodata     start:0x02184fdc end:0x02185014
     .bss        start:0x0218df74 end:0x0218dfc8
 
-lib/dwc/src/gt2/gt2.c:
-    .text       start:0x0216eea8 end:0x0216fbf8
+lib/dwc/src/gt2/gsUdpEngine.c:
+    .text       start:0x0216eea8 end:0x0216fbe0
     .data       start:0x02186ffc end:0x021874a0
     .bss        start:0x02190928 end:0x02190964
 
@@ -297,10 +297,10 @@ lib/dwc/src/gscommon/gsStringUtil.c:
 
 lib/dwc/src/gscommon/gsXML.c:
     complete
-    .text       start:0x0216fbf8 end:0x021713e0
+    .text       start:0x0216fbe0 end:0x021713e0
     .data       start:0x021874a0 end:0x02187750
 
-lib/dwc/src/gscommon/gs_screen_print.c:
+lib/dwc/src/gscommon/screen.c:
     complete
     .text       start:0x021713e0 end:0x021714cc
     .data       start:0x02187750 end:0x02187754

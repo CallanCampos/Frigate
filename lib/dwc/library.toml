@@ -55,7 +55,7 @@ flags = [
 "ghttp/ghttpEncryption.c" = ["-ipa file"]
 # The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
 # exponent, which only -ipa file gives
-"auth/dwc_auth.c" = ["-ipa file"]
+"auth/AuthService.c" = ["-ipa file"]
 # The connection test (overlay 11) reaches its globals from one base
 "auth/dwc_conntest.c" = ["-ipa file"]
 # The profanity check (overlay 11) has DWCi_Prof_ParseResponse's local table of field names, and its strings, at the head

@@ -38,7 +38,7 @@ GHTTPBool ghiInitBuffer(GHIConnection *connection, GHIBuffer *buffer, int initia
     buffer->connection = connection;
     buffer->data = NULL;
     buffer->size = 0;
-    buffer->length = 0;
+    buffer->len = 0;
     buffer->pos = 0;
     buffer->sizeIncrement = sizeIncrement;
     buffer->fixed = gsi_false;
@@ -67,7 +67,7 @@ GHTTPBool ghiInitFixedBuffer(GHIConnection *connection, GHIBuffer *buffer, char 
     buffer->connection = connection;
     buffer->size = size;
     buffer->data = data;
-    buffer->length = 0;
+    buffer->len = 0;
     buffer->pos = 0;
     buffer->sizeIncrement = 0;
     buffer->fixed = gsi_true;
@@ -106,7 +106,7 @@ GHTTPBool ghiAppendDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
     if (size == 0) {
         size = strlen(data);
     }
-    newLength = buffer->length + size;
+    newLength = buffer->len + size;
     while (newLength >= buffer->size) {
         if (buffer->fixed) {
             buffer->connection->completed = gsi_true;
@@ -119,8 +119,8 @@ GHTTPBool ghiAppendDataToBuffer(GHIBuffer *buffer, const char *data, int size) {
             return gsi_false;
         }
     }
-    memcpy(buffer->data + buffer->length, data, size);
-    buffer->length = newLength;
+    memcpy(buffer->data + buffer->len, data, size);
+    buffer->len = newLength;
     buffer->data[newLength] = 0;
     return gsi_true;
 }
@@ -142,7 +142,7 @@ GHTTPBool ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) 
     if (buffer->readOnly) {
         return gsi_false;
     }
-    if (buffer->connection->encryptor.engine == 0 || !buffer->connection->encryptor.active) {
+    if (buffer->connection->encryptor.mEngine == 0 || !buffer->connection->encryptor.mSessionEstablished) {
         return ghiAppendDataToBuffer(buffer, data, size);
     }
     if (size == 0) {
@@ -151,29 +151,29 @@ GHTTPBool ghiEncryptDataToBuffer(GHIBuffer *buffer, const char *data, int size) 
     if (size == 0) {
         return gsi_true;
     }
-    available = buffer->size - buffer->length;
+    available = buffer->size - buffer->len;
     do {
         int chunk = (size < GHI_ENCRYPT_CHUNK_SIZE) ? size : GHI_ENCRYPT_CHUNK_SIZE;
         // BUG: the piece is size bytes, not chunk, so the data is encrypted again from the second piece on; the offset
         // advances by a chunk
 #ifdef BUGFIX
-        int result = buffer->connection->encryptor.encrypt(buffer->connection, &buffer->connection->encryptor,
-                                                           data + offset, size - offset < chunk ? size - offset : chunk,
-                                                           buffer->data + buffer->length, &available);
+        int result = buffer->connection->encryptor.mEncryptFunc(
+            buffer->connection, &buffer->connection->encryptor, data + offset,
+            size - offset < chunk ? size - offset : chunk, buffer->data + buffer->len, &available);
 #else
         int result =
-            buffer->connection->encryptor.encrypt(buffer->connection, &buffer->connection->encryptor, data + offset,
-                                                  size, buffer->data + buffer->length, &available);
+            buffer->connection->encryptor.mEncryptFunc(buffer->connection, &buffer->connection->encryptor,
+                                                       data + offset, size, buffer->data + buffer->len, &available);
 #endif
 
         if (result == 2) {
             if (!ghiResizeBuffer(buffer, buffer->sizeIncrement)) {
                 return gsi_false;
             }
-            available = buffer->size - buffer->length;
+            available = buffer->size - buffer->len;
         } else if (result == 1) {
             offset += chunk;
-            buffer->length = buffer->size - available;
+            buffer->len = buffer->size - available;
         } else {
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_WarmError,
                           "ghiEncryptDataToBuffer encountered unhandled return code: %d\r\n", result);
@@ -209,7 +209,7 @@ GHTTPBool ghiAppendCharToBuffer(GHIBuffer *buffer, int c) {
     if (buffer->readOnly) {
         return gsi_false;
     }
-    if (buffer->length + 1 >= buffer->size) {
+    if (buffer->len + 1 >= buffer->size) {
         if (buffer->fixed) {
             buffer->connection->completed = gsi_true;
             buffer->connection->result = 2;
@@ -221,9 +221,9 @@ GHTTPBool ghiAppendCharToBuffer(GHIBuffer *buffer, int c) {
             return gsi_false;
         }
     }
-    buffer->data[buffer->length] = c;
-    buffer->length++;
-    buffer->data[buffer->length] = 0;
+    buffer->data[buffer->len] = c;
+    buffer->len++;
+    buffer->data[buffer->len] = 0;
     return gsi_true;
 }
 
@@ -235,7 +235,7 @@ GHTTPBool ghiAppendIntToBuffer(GHIBuffer *buffer, int value) {
 }
 
 void ghiResetBuffer(GHIBuffer *buffer) {
-    buffer->length = 0;
+    buffer->len = 0;
     buffer->pos = 0;
     if (!buffer->readOnly) {
         buffer->data[0] = 0;
@@ -250,7 +250,7 @@ GHTTPBool ghiSendBufferedData(GHIConnection *connection) {
     do {
         int sent;
 
-        if (connection->encryptor.engine == 0 || connection->encryptor.mode == 1) {
+        if (connection->encryptor.mEngine == 0 || connection->encryptor.mEncryptOnBuffer == 1) {
             int result = GSISocketSelect(connection->socket, 0, &ready, &failed);
 
             if (result == -1 || (result == 1 && failed != 0)) {
@@ -268,7 +268,7 @@ GHTTPBool ghiSendBufferedData(GHIConnection *connection) {
             }
         }
         sent = ghiDoSend(connection, connection->sendBuffer.data + connection->sendBuffer.pos,
-                         connection->sendBuffer.length - connection->sendBuffer.pos);
+                         connection->sendBuffer.len - connection->sendBuffer.pos);
         switch (sent) {
         case -1:
             return gsi_false;
@@ -276,6 +276,6 @@ GHTTPBool ghiSendBufferedData(GHIConnection *connection) {
             return gsi_true;
         }
         connection->sendBuffer.pos += sent;
-    } while (connection->sendBuffer.pos < connection->sendBuffer.length);
+    } while (connection->sendBuffer.pos < connection->sendBuffer.len);
     return gsi_true;
 }

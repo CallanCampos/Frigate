@@ -9,7 +9,7 @@
 #include "dwc/gpiProfile.h"
 #include "dwc/gpiTransfer.h"
 #include "dwc/gpiUtility.h"
-#include "dwc/gt2.h"
+#include "dwc/gsUdpEngine.h"
 #include "dwc/md5.h"
 #include "nitrowifi/soc.h"
 
@@ -57,7 +57,7 @@ static GPResult gpiProcessPeerInitiatingConnection(GPConnection *connection, GPI
         }
         break;
     case GPI_PEER_CONNECTING:
-        Gt2_GetConnectionState(peer->ip, peer->port, &state);
+        gsUdpEngineGetPeerState(peer->ip, peer->port, &state);
         if (state == 1) {
             freeSig = gsi_true;
             if (!gpiGetProfile(connection, peer->profile, &profile)) {
@@ -139,7 +139,7 @@ static GPResult gpiProcessPeerAcceptingConnection(GPConnection *connection, GPIP
     if (peer->state != GPI_PEER_WAITING) {
         return 3;
     }
-    Gt2_GetConnectionState(peer->ip, peer->port, &state);
+    gsUdpEngineGetPeerState(peer->ip, peer->port, &state);
     if (state == 3) {
         peer->state = GPI_PEER_DISCONNECTED;
         return 0;
@@ -196,8 +196,8 @@ static int gpiPeerSendMessages(GPConnection *connection, GPIPeer *peer) {
     if (peer->outputBuffer.len != 0) {
         return 0;
     }
-    while (func_ov011_02171588(peer->messages) != 0) {
-        message = func_ov011_0217158c(peer->messages, 0);
+    while (ArrayLength(peer->messages) != 0) {
+        message = ArrayNth(peer->messages, 0);
         result = gpiSendBufferToPeer(connection, peer->ip, peer->port, &message->buffer, &connClosed, gsi_false);
         if (connClosed || result != 0) {
             peer->state = GPI_PEER_DISCONNECTED;
@@ -207,7 +207,7 @@ static int gpiPeerSendMessages(GPConnection *connection, GPIPeer *peer) {
         if (message->buffer.pos != message->buffer.len) {
             break;
         }
-        func_ov011_02171668(peer->messages, 0);
+        ArrayDeleteAt(peer->messages, 0);
     }
     return 0;
 }
@@ -317,7 +317,7 @@ static GPResult gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer)
             gpiClipBufferToPosition(connection, &peer->inputBuffer);
         }
         if (message == NULL) {
-            Gt2_GetConnectionState(peer->ip, peer->port, &state);
+            gsUdpEngineGetPeerState(peer->ip, peer->port, &state);
             if (state == 3) {
                 peer->state = GPI_PEER_DISCONNECTED;
             }
@@ -327,15 +327,15 @@ static GPResult gpiProcessPeerConnected(GPConnection *connection, GPIPeer *peer)
 }
 
 static void gpiCheckTimedOutPeerOperations(GPConnection *connection, GPIPeer *peer) {
-    GPIPeerOp *op = peer->peerOpQueue.opList;
+    GPIPeerOp *op = peer->peerOpQueue.first;
     GPICallback callback;
     GPGetBuddyStatusInfoKeysArg *arg;
 
     if (peer != NULL) {
         for (; op != NULL && op != peer->peerOpQueue.last; op = op->next) {
-            if (op->type != 2 && current_time() > op->timeout && op->callback != NULL) {
+            if (op->state != 2 && current_time() > op->timeout && op->callback != NULL) {
                 // A request for the keys of the buddy's status gets an answer with none
-                if (op->state == GPI_BM_KEYS_REQUEST) {
+                if (op->type == GPI_BM_KEYS_REQUEST) {
                     arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
                     callback.callback = op->callback;
                     callback.param = op->userData;
@@ -378,7 +378,7 @@ void gpiDestroyPeer(GPConnection *connection, GPIPeer *peer) {
     gsifree(peer->outputBuffer.buffer);
     peer->outputBuffer.buffer = NULL;
     if (peer->messages != NULL) {
-        func_ov011_02171558(peer->messages);
+        ArrayFree(peer->messages);
         peer->messages = NULL;
     }
     gsifree(peer);
@@ -406,13 +406,13 @@ static void gpiRemovePeer(GPConnection *connection, GPIPeer *peer) {
             previous->pnext = peer->pnext;
         }
         // The buddy messages that the peer didn't send go through the server
-        while (func_ov011_02171588(peer->messages) != 0) {
-            message = func_ov011_0217158c(peer->messages, 0);
+        while (ArrayLength(peer->messages) != 0) {
+            message = ArrayNth(peer->messages, 0);
             if (message->type < GPI_BM_STATUS) {
                 gpiSendServerBuddyMessage(connection, peer->profile, message->type,
                                           message->buffer.buffer + message->start);
             }
-            func_ov011_02171668(peer->messages, 0);
+            ArrayDeleteAt(peer->messages, 0);
         }
         gpiDestroyPeer(connection, peer);
     }
@@ -424,8 +424,8 @@ GPResult gpiProcessPeers(GPConnection *connection) {
     GPIPeer *next;
     int result;
 
-    // Gt2_StopSocket runs the Udp Engine's socket for a frame
-    Gt2_StopSocket();
+    // gsUdpEngineThink runs the Udp Engine's socket for a frame
+    gsUdpEngineThink();
     for (peer = iconnection->peerList; peer != NULL; peer = next) {
         next = peer->pnext;
         if (peer->state == GPI_PEER_DISCONNECTED) {
@@ -491,11 +491,11 @@ GPIPeer *gpiAddPeer(GPConnection *connection, int profileid, GPIBool initiate) {
     peer->profile = profileid;
     peer->timeout = gsiTimeInSec(NULL) + 10000;
     peer->pnext = iconnection->peerList;
-    peer->messages = func_ov011_02171514(sizeof(GPIMessage), 0, gpiFreeMessage);
+    peer->messages = ArrayNew(sizeof(GPIMessage), 0, gpiFreeMessage);
     iconnection->peerList = peer;
-    peer->peerOpQueue.opList = NULL;
-    peer->peerOpQueue.last = NULL;
     peer->peerOpQueue.first = NULL;
+    peer->peerOpQueue.last = NULL;
+    peer->peerOpQueue.opList = NULL;
     return peer;
 }
 
@@ -522,7 +522,7 @@ GPResult gpiPeerStartConnect(GPConnection *connection, GPIPeer *peer) {
         return 3;
     }
     if (profile->buddyStatusInfo != NULL) {
-        Gt2_GetConnectionState(profile->buddyStatusInfo->buddyIp, profile->buddyStatusInfo->buddyPort, &state);
+        gsUdpEngineGetPeerState(profile->buddyStatusInfo->buddyIp, profile->buddyStatusInfo->buddyPort, &state);
         // BUG: The test is always true, so a connection that is already being made, or made, is opened again
 #ifdef BUGFIX
         if (state != 1 && state != 0)
@@ -530,8 +530,8 @@ GPResult gpiPeerStartConnect(GPConnection *connection, GPIPeer *peer) {
         if (state != 1 || state != 0)
 #endif
         {
-            result = Gt2_OpenConnection(profile->buddyStatusInfo->buddyIp, profile->buddyStatusInfo->buddyPort,
-                                        iconnection->mHeader, 10000);
+            result = gsUdpEngineStartTalkingToPeer(profile->buddyStatusInfo->buddyIp,
+                                                   profile->buddyStatusInfo->buddyPort, iconnection->mHeader, 10000);
             if (result != 5) {
                 gpiSetError(connection, 5, "There was an error starting communication with a peer.");
                 gpiCallErrorCallback(connection, 3, 0);
@@ -567,7 +567,7 @@ GPResult gpiPeerAddMessage(GPConnection *connection, GPIPeer *peer, int type, co
             gpiMessage.start = gpiMessage.buffer.len;
             result = gpiAppendStringToBufferLen(connection, &gpiMessage.buffer, message, len);
             if (result == 0 && (result = gpiAppendCharToBuffer(connection, &gpiMessage.buffer, '\0')) == 0) {
-                func_ov011_021715a4(peer->messages, &gpiMessage);
+                ArrayAppend(peer->messages, &gpiMessage);
                 peer->timeout = gsiTimeInSec(NULL) + 10000;
                 result = 0;
             }
@@ -702,13 +702,13 @@ void gpiPeerAddOp(GPIPeer *peer, GPIPeerOp *operation) {
         gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError, "Peer operation not added");
         return;
     }
-    if (peer->peerOpQueue.first == NULL) {
-        peer->peerOpQueue.opList = operation;
-        peer->peerOpQueue.last = operation;
+    if (peer->peerOpQueue.opList == NULL) {
         peer->peerOpQueue.first = operation;
+        peer->peerOpQueue.last = operation;
+        peer->peerOpQueue.opList = operation;
     } else {
-        if (peer->peerOpQueue.opList == peer->peerOpQueue.last) {
-            peer->peerOpQueue.opList->next = operation;
+        if (peer->peerOpQueue.first == peer->peerOpQueue.last) {
+            peer->peerOpQueue.first->next = operation;
         } else {
             peer->peerOpQueue.last->next = operation;
         }
@@ -725,15 +725,15 @@ void gpiPeerRemoveOp(GPIPeer *peer, GPIPeerOp *operation) {
         gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError, "Peer operation not removed");
         return;
     }
-    if (peer->peerOpQueue.first == NULL) {
+    if (peer->peerOpQueue.opList == NULL) {
         gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError, "Peer operation not removed");
         return;
     }
-    previous = peer->peerOpQueue.opList;
+    previous = peer->peerOpQueue.first;
     if (previous == peer->peerOpQueue.last && previous == operation) {
-        peer->peerOpQueue.first = peer->peerOpQueue.opList = peer->peerOpQueue.last = operation->next;
+        peer->peerOpQueue.opList = peer->peerOpQueue.first = peer->peerOpQueue.last = operation->next;
     } else if (previous == operation) {
-        peer->peerOpQueue.first = peer->peerOpQueue.opList = previous->next;
+        peer->peerOpQueue.opList = peer->peerOpQueue.first = previous->next;
     } else {
         for (current = previous->next; current != operation; current = current->next) {
             if (current == NULL) {

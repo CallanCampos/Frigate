@@ -76,12 +76,12 @@ typedef void (*SBPlayerSearchCallbackFn)(SBServerList *serverlist, char *nick, g
                                          void *instance);
 
 // A key that the master server sends for every server: its name and type (0 a text, 1 a byte, 2 a short)
-typedef struct KeyInfo {
+typedef struct _KeyInfo {
     const char *keyName;
     int keyType;
 } KeyInfo;
 
-typedef struct SortInfo {
+typedef struct _SortInfo {
     char sortkey[SORTKEY_LENGTH];
     SBCompareMode comparemode;
 } SortInfo;

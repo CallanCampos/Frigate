@@ -59,9 +59,9 @@ GPResult gpSetCallback(GPConnection *connection, GPEnum func, GPCallback callbac
     return 0;
 }
 
-GPResult gpConnectPreAuthenticated(GPConnection *connection, const gsi_char *authtoken,
-                                   const gsi_char *partnerchallenge, GPEnum firewall, GPEnum blocking,
-                                   GPCallback callback, void *param) {
+GPResult gpConnectPreAuthenticatedA(GPConnection *connection, const gsi_char *authtoken,
+                                    const gsi_char *partnerchallenge, GPEnum firewall, GPEnum blocking,
+                                    GPCallback callback, void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -101,9 +101,9 @@ void gpDisconnect(GPConnection *connection) {
     }
 }
 
-GPResult gpProfileSearch(GPConnection *connection, const gsi_char *nick, const gsi_char *uniquenick,
-                         const gsi_char *email, const gsi_char *firstname, const gsi_char *lastname, int icquin,
-                         GPEnum blocking, GPCallback callback, void *param) {
+GPResult gpProfileSearchA(GPConnection *connection, const gsi_char *nick, const gsi_char *uniquenick,
+                          const gsi_char *email, const gsi_char *firstname, const gsi_char *lastname, int icquin,
+                          GPEnum blocking, GPCallback callback, void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -148,7 +148,7 @@ GPResult gpGetInfo(GPConnection *connection, GPProfile profile, GPEnum checkCach
     return gpiGetInfo(connection, profile, checkCache, blocking, callback, param);
 }
 
-GPResult gpSetInfos(GPConnection *connection, GPEnum info, const gsi_char *value) {
+GPResult gpSetInfosA(GPConnection *connection, GPEnum info, const gsi_char *value) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -164,7 +164,7 @@ GPResult gpSetInfos(GPConnection *connection, GPEnum info, const gsi_char *value
     return gpiSetInfos(connection, info, value);
 }
 
-GPResult gpSendBuddyRequest(GPConnection *connection, GPProfile profile, const gsi_char *reason) {
+GPResult gpSendBuddyRequestA(GPConnection *connection, GPProfile profile, const gsi_char *reason) {
     GPIConnection *iconnection;
     char reasonFixed[1025];
     int i;
@@ -190,7 +190,7 @@ GPResult gpSendBuddyRequest(GPConnection *connection, GPProfile profile, const g
             reasonFixed[i] = '/';
         }
     }
-    gpiSetBuddyDeleted(connection, profile, gsi_false);
+    gpiBuddyDeletedLocally(connection, profile, gsi_false);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\addbuddy\\");
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\sesskey\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->sessKey);
@@ -365,8 +365,8 @@ GPResult gpDeleteBuddy(GPConnection *connection, GPProfile profile) {
     return 0;
 }
 
-GPResult gpSetStatus(GPConnection *connection, GPEnum status, const gsi_char *statusString,
-                     const gsi_char *locationString) {
+GPResult gpSetStatusA(GPConnection *connection, GPEnum status, const gsi_char *statusString,
+                      const gsi_char *locationString) {
     GPIConnection *iconnection;
     char statusStringFixed[256];
     char locationStringFixed[256];
@@ -422,7 +422,7 @@ GPResult gpSetStatus(GPConnection *connection, GPEnum status, const gsi_char *st
     return 0;
 }
 
-GPResult gpSendBuddyMessage(GPConnection *connection, GPProfile profile, const gsi_char *message) {
+GPResult gpSendBuddyMessageA(GPConnection *connection, GPProfile profile, const gsi_char *message) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {

@@ -922,9 +922,9 @@ Same code, other `sp` offsets or frame size.
   `WifiP2PMatch_StateConnectFriendYesNo` and `WifiP2PMatch_StateFriendSelect` declare it: its `wk->seq` stores of
   0xa2 and 0x76 are then built fresh and the second joins the common tail. No join is needed there. With the pointer
   used at one call only, only the store after that call is fixed. A pointer to a member of a struct local is rebuilt
-  the same way, from `sp`: `dwc_auth.c`'s `Auth_OnResponse` declares `GSLoginCertificate *certificate =
-  &result.certificate;` and compiles each access as the ROM's `add r1, sp, #0x64; str r0, [r1]` (and `adds r1, #0x78`
-  for a field inside it), where `result.certificate` written out stores at `[sp, #0x64]` and keeps the address in a
+  the same way, from `sp`: `AuthService.c`'s `Auth_OnResponse` declares `GSLoginCertificate *certificate =
+  &result.mCertificate;` and compiles each access as the ROM's `add r1, sp, #0x64; str r0, [r1]` (and `adds r1, #0x78`
+  for a field inside it), where `result.mCertificate` written out stores at `[sp, #0x64]` and keeps the address in a
   saved register, which the ROM gives the hash context.
 - A local assigned straight from a `static inline`'s return is copy-propagated into the inline's result temporary,
   which is slotted by first use after the named locals, while the same value computed in place stays a named local
@@ -1464,11 +1464,12 @@ Same instructions, scheduled in another order.
   afresh with `add r2, sp, #0x10`. The same function needs `offset.x = mode == 2 ? 128 : -16;`: as an `if`/`else`,
   the two stores keep `&offset` in a saved register and spill `i * 4`.
 - A swapped scalar serialized through `const u8 *bytes = (const u8 *)&swapped;` and fixed byte stores gives different
-  address scheduling from a cast to a byte-array struct. `dwc_competition.c`'s `Sc_PutU16` and `Sc_PutU32` match with
-  this character view of the scalar's object representation: the struct copy omits one address instruction in the
-  halfword writer and swaps the copy registers in the word writer. Both return `dest + sizeof(swapped)`.
-- `ScClient_Reset` matches with consistent direct unsigned-character views for the ID marker stores,
-  `((u8 *)client->csid)[0] = 0xde;`. Pointer-local views retain the two array bases across stores; direct views
+  address scheduling from a cast to a byte-array struct. `dwc_competition.c`'s `sciSerializeInt16` and
+  `sciSerializeInt32` match with this character view of the scalar's object representation: the struct copy omits one
+  address instruction in the halfword writer and swaps the copy registers in the word writer. Both return `dest +
+  sizeof(swapped)`.
+- `sciInterfaceDestroy` matches with consistent direct unsigned-character views for the ID marker stores,
+  `((u8 *)client->mSessionId)[0] = 0xde;`. Pointer-local views retain the two array bases across stores; direct views
   recompute each byte address from the client. Both forms write the binary bytes while preserving the fields' `char`
   string interfaces.
 - A struct assignment loads every field before it stores any, through a pointer that is not `const` too. Two
@@ -1819,9 +1820,10 @@ Same instructions, scheduled in another order.
 - A small fixed-size copy the original wrote as a hand `ldrb`/`strb` loop, rather than calling `memcpy`, only keeps
   that shape when the loop runs over its own `const u8 *`/`u8 *` locals; written directly over the function's raw
   `const void *`/`const char *` parameter, the same `do { *dst++ = *src++; } while (--n);` compiles differently and
-  doesn't match. DWC's `gt2.c` (`Gt2_Send`, `Gt2_Connect`, `Gt2_CancelConnect`) copies a 16-byte header with
-  `const u8 *src = header; u8 *dst = buf;` declared first, then the loop; a separate, variable-length copy in the
-  same functions (over the caller-given `message` buffer) is a plain `memcpy` call, as the original has there too.
+  doesn't match. DWC's `gsUdpEngine.c` (`gsUdpEngineSendMessage`, `gsUdpEngineAddMsgHandler`,
+  `gsUdpEngineRemoveMsgHandler`) copies a 16-byte header with `const u8 *src = header; u8 *dst = buf;` declared first,
+  then the loop; a separate, variable-length copy in the same functions (over the caller-given `message` buffer) is a
+  plain `memcpy` call, as the original has there too.
 Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 - A last call that passes four arguments in registers is a `bl` with a frame, not a tail call: MWCC's tail call
@@ -1934,12 +1936,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `BtlvEffvm_WindowTask` needs (an unsigned `1u` mixed in also keeps them apart, but less naturally).
 - An offset local stepped by statements keeps each step the same way, with its starting constant in a register of its
   own. GameSpy's competition report (`dwc_competition.c`) reaches a player's key with `u32 offset =
-  sizeof(ScReportHeader); offset += index * 0x14; offset += 0x10;`, so `ScReport_SetPlayerKey` adds the 0x10 last
-  (`add r0, r3, r4; add r0, #0x10`), and `ScReport_SetPlayerId` builds the buffer field's offset 0x124 from the 0x44 it
-  already holds (`add r4, #0xe0`). Written as one expression, `report->buffer + (sizeof(ScReportHeader) + index *
-  0x14 + 0x10)`, the constants fold into 0x54 and `ScReport_SetPlayerId` loads the buffer first; `offset += index *
-  0x14 + 0x10`, `offset = offset + index * 0x14 + 0x10` and a local that starts at `sizeof(ScReportHeader) + index *
-  0x14` don't match either.
+  sizeof(SCIReportHeader); offset += index * 0x14; offset += 0x10;`, so `sciReportSetPlayerTeamIndex` adds the 0x10 last
+  (`add r0, r3, r4; add r0, #0x10`), and `sciReportSetPlayerConnectionId` builds the buffer field's offset 0x124 from
+  the 0x44 it already holds (`add r4, #0xe0`). Written as one expression, `report->mBuffer.mData +
+  (sizeof(SCIReportHeader) + index * 0x14 + 0x10)`, the constants fold into 0x54 and `sciReportSetPlayerConnectionId`
+  loads the buffer first; `offset += index * 0x14 + 0x10`, `offset = offset + index * 0x14 + 0x10` and a local that
+  starts at `sizeof(SCIReportHeader) + index * 0x14` don't match either.
 - A chained assignment to fields, `a->x = a->y = value;`, stores `y`, reloads it and stores `x`. When the original
   narrows the value once and stores it to both, the stores were separate statements, as in the PC box's
   `PokeIconChgDataMake`.
@@ -2004,7 +2006,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
   so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
   its register setters both ways, as the ROM has them. In Thumb both are an `ands` with a pool word.
-- MWCC doesn't propagate constants into a variable of an enum type. `dwc_competition.c`'s `ScReport_SetPlayer`
+- MWCC doesn't propagate constants into a variable of an enum type. `dwc_competition.c`'s `scReportSetPlayerData`
   retains the comparison with 0 before its first player setter only with `SCResult error = SCResult_NO_ERROR;`.
   The [GameSpy SCResult reference](https://documentation.help/GameSpy-SDK/SCResult.html) supplies its names and values.
   A loop that still checks its bound before the
@@ -2693,7 +2695,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - When the original puts an `if`'s then-block after the else path, write the condition negated with the bodies
   swapped: brightness.c's `BrightnessData_Step` matches with the long advance body first and `done = TRUE` in the
   `else`, for both its tests.
-  `dwc_competition_soap.c`'s `ScClient_OnCreateSession` keeps its three `bne; b` pairs with failure-first SOAP-begin,
+  `sciWebServices.c`'s `sciWsCreateSessionCallback` keeps its three `bne; b` pairs with failure-first SOAP-begin,
   result-read and ID-read tests; the ID test is `!readCsid || !readCcid` with success in the `else`. Its `csid` array
   also precedes `ccid` in the declarations to recover their stack slots.
 - A negated test and its expansion by De Morgan's laws compile to different branch targets: `btlv_effvm.c`'s
@@ -2914,7 +2916,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `g2d_CellTransferManager.c`'s `NNS_G2dUpdateCellTransferStateManager` needs `NNSG2dVRamType type` (2.0/sp2).
 - A loop counted with `!=` tests with `beq` before the loop and `bne` at its end, where `<` gives `bls` and `blo`:
   the forms page walks its form-name table with `for (i = 0; i != form; i++)`.
-- `dwc_competition.c`'s `ScClient_SubmitReport` needs a `u32` counter for its 16-byte digest clear,
+- `dwc_competition.c`'s `scSubmitReport` needs a `u32` counter for its 16-byte digest clear,
   `for (i = 0x10; i != 0; i--)`: the unsigned form ends with `subs; bne`, while an `int` counter adds `cmp; bgt`.
   Changing only the signed loop to `do`/`while` does not recover the original test.
 - `while (cond)` is rotated, with a copy of its test before the loop. A loop that tests once, at its top, is
@@ -3311,8 +3313,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `[sp]`, so `ssl_internal.h` declares them itself. DWC's `AddList` (`dwc_ac_wcm.c`) came closer with
   `<string.h>`'s `strncmp` before it matched, which lets MWCC hoist the loads through its `const` parameter and the
   loop's bases out of the loop that calls it. MWCC goes by the first declaration it sees: `<string.h>` included after
-  `dwc/ext.h`'s prototypes still leaves a call. `dwc_auth.c` includes it first (`dwc/ext.h` takes its `size_t`), and its
-  `Auth_OnResponse` then clears the 0x5a4-byte result in place, as the ROM does, while its `memcpy` of a 0x104-byte
+  `dwc/ext.h`'s prototypes still leaves a call. `AuthService.c` includes it first (`dwc/ext.h` takes its `size_t`), and
+  its `Auth_OnResponse` then clears the 0x5a4-byte result in place, as the ROM does, while its `memcpy` of a 0x104-byte
   `gsLargeInt_t` stays a call, also as in the ROM: a call to `memcpy` in the ROM doesn't rule `<string.h>` out.
   `poke_net.c` also includes `<string.h>` first: its `POKE_NET_Release` clears the 0x138-byte authentication structure
   in place, while its variable-size copies remain calls. GT2's `gt2Message.c` and `gt2Socket.c` include it first too,
@@ -3354,7 +3356,7 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   shared section. So padding before a large object in a file's `.rodata` (the linker starts each section on a 4-byte
   boundary) shows the file was built with `-ipa file`: DWC's `nhttp_thread.c` has its 76-byte content type string
   apart, 2 bytes after the other strings, and links from C only with `-ipa file` in `lib/dwc/library.toml`, and
-  `dwc_auth.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent. libVCT's `vct_session.c` has its four
+  `AuthService.c` has its 257-byte RSA modulus 1 byte after the 7-byte exponent. libVCT's `vct_session.c` has its four
   66-byte transition tables 0x44 apart, where one shared section packs them 0x42 apart.
 - `-ipa file` and `-ipa function` address statics differently, which tells a library file's setting. With
   `-ipa file`, a file's `.bss` and `.data` objects share one section, are reached from its base (one literal, then
@@ -3627,8 +3629,8 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 - Under `-ipa function`, a table initialized with string literals comes before its strings only when it is defined
   above the file's first function; defined between functions, it has its strings laid out ahead of it, whether it is
   `static` or global, sized or not, declared earlier or not. A table right before its own strings in the middle of a
-  file's `.data` is therefore the first data of another original file. Overlay 260's `sCompetitionNamespaces` is
-  before its namespace string, after `Sc_PutGuid`'s literals: it starts `dwc_competition_soap.c`, from `ScClient_Begin`
+  file's `.data` is therefore the first data of another original file. Overlay 260's `SC_SERVICE_NAMESPACES` is
+  before its namespace string, after `sciSerializeGUID`'s literals: it starts `sciWebServices.c`, from `sciWsInit`
   on, with the table above the file's first function, and the overlay links only when `dwc_competition.c` is split there.
 - The reverse holds too: a file-scope `static char x[] = "..."` is 1-aligned and packs against the string before it,
   while a literal is 4-aligned. A path padded to a 4-byte boundary in the ROM's `.data` is a literal written at its

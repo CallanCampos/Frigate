@@ -55,7 +55,7 @@ static void ListCallback(SBServerList *serverlist, SBListCallbackReason reason, 
         if (sb->disconnectFlag) {
             SBServerListDisconnect(serverlist);
         }
-        if (func_ov011_02171588(serverlist->servers) == 0 || sb->engine.querylist.count == 0) {
+        if (ArrayLength(serverlist->servers) == 0 || sb->engine.querylist.count == 0) {
             sb->BrowserCallback(sb, sbc_updatecomplete, NULL, sb->instance);
         }
         break;

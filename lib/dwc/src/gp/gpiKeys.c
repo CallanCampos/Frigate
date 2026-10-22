@@ -19,7 +19,7 @@ void gpiStatusInfoKeyFree(void *element) {
 GPResult gpiStatusInfoKeysInit(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
 
-    iconnection->extendedInfoKeys = func_ov011_02171514(sizeof(GPIKey), 1, gpiStatusInfoKeyFree);
+    iconnection->extendedInfoKeys = ArrayNew(sizeof(GPIKey), 1, gpiStatusInfoKeyFree);
     if (iconnection->extendedInfoKeys == NULL) {
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
@@ -31,7 +31,7 @@ void gpiStatusInfoKeysDestroy(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
 
     if (iconnection->extendedInfoKeys != NULL) {
-        func_ov011_02171558(iconnection->extendedInfoKeys);
+        ArrayFree(iconnection->extendedInfoKeys);
         iconnection->extendedInfoKeys = NULL;
     }
 }
@@ -67,9 +67,9 @@ GPResult gpiStatusInfoSetKey(GPConnection *connection, DArray keys, const char *
         return 2;
     }
     key.keyName = goastrdup(keyName);
-    index = func_ov011_021716ac(keys, &key, gpiStatusInfoKeyCompFunc, 0, 1);
+    index = ArraySearch(keys, &key, gpiStatusInfoKeyCompFunc, 0, 1);
     if (index != -1) {
-        found = func_ov011_0217158c(keys, index);
+        found = ArrayNth(keys, index);
         gsifree(found->keyValue);
         found->keyValue = goastrdup(newValue);
     }
@@ -87,9 +87,9 @@ GPResult gpiStatusInfoGetKey(GPConnection *connection, DArray keys, const char *
         return 2;
     }
     key.keyName = goastrdup(keyName);
-    index = func_ov011_021716ac(keys, &key, gpiStatusInfoKeyCompFunc, 0, 1);
+    index = ArraySearch(keys, &key, gpiStatusInfoKeyCompFunc, 0, 1);
     if (index != -1) {
-        *keyValue = ((GPIKey *)func_ov011_0217158c(keys, index))->keyValue;
+        *keyValue = ((GPIKey *)ArrayNth(keys, index))->keyValue;
     }
     gsifree(key.keyName);
     key.keyName = NULL;
@@ -111,10 +111,10 @@ GPResult gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
     char keysHeader[0x40];
     char *pos;
 
-    num = func_ov011_02171588(iconnection->extendedInfoKeys);
+    num = ArrayLength(iconnection->extendedInfoKeys);
     OS_SPrintf(keysHeader, "\\keys\\%d", num);
     for (i = 0; i < num; i++) {
-        key = func_ov011_0217158c(iconnection->extendedInfoKeys, i);
+        key = ArrayNth(iconnection->extendedInfoKeys, i);
         name = key->keyName;
         nameLength = GPI_B64_LENGTH((gsi_u32)strlen(name));
         value = key->keyValue;
@@ -129,7 +129,7 @@ GPResult gpiSaveKeysToBuffer(GPConnection *connection, char **buffer) {
     }
     pos = *buffer + OS_SPrintf(*buffer, "%s", keysHeader);
     for (i = 0; i < num; i++) {
-        key = func_ov011_0217158c(iconnection->extendedInfoKeys, i);
+        key = ArrayNth(iconnection->extendedInfoKeys, i);
         strcat(pos, "\\");
         pos++;
         name = key->keyName;

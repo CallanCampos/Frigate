@@ -48,12 +48,12 @@ lib/dwc/src/sake/sake_post.c:
     .data       start:0x021c0990 end:0x021c09d8
     .bss        start:0x021c1da8 end:0x021c1e28
 
-lib/dwc/src/sake/sake_storage.c:
+lib/dwc/src/sake/sakeRequestModify.c:
     complete
     .text       start:0x021bc82c end:0x021bcc04
     .data       start:0x021c09d8 end:0x021c0c74
 
-lib/dwc/src/sake/sake_records.c:
+lib/dwc/src/sake/sakeRequestRead.c:
     complete
     .text       start:0x021bcc04 end:0x021bd43c
     .data       start:0x021c0c74 end:0x021c105c
@@ -76,13 +76,13 @@ lib/dwc/src/gdb/gdb.c:
     .data       start:0x021c1514 end:0x021c1ab8
     .bss        start:0x021c2454 end:0x021c24dc
 
-lib/dwc/src/auth/dwc_auth.c:
+lib/dwc/src/auth/AuthService.c:
     .text       start:0x021bf63c end:0x021bfcd8
     .rodata     start:0x021bfd38 end:0x021bfe44
     .data       start:0x021c1ab8 end:0x021c1ca0
     .bss        start:0x021c24dc end:0x021c2560
 
-lib/dwc/src/sc/dwc_competition_soap.c:
+lib/dwc/src/sc/sciWebServices.c:
     complete
     .text       start:0x021be474 end:0x021beaa0
     .data       start:0x021c12cc end:0x021c1514

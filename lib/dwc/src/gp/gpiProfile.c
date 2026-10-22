@@ -66,7 +66,7 @@ static void gpiProfilesTableFree(void *element) {
         gsifree(profile->buddyStatusInfo->gameMapName);
         profile->buddyStatusInfo->gameMapName = NULL;
         if (profile->buddyStatusInfo->extendedInfoKeys != NULL) {
-            func_ov011_02171558(profile->buddyStatusInfo->extendedInfoKeys);
+            ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
             profile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
         gsifree(profile->buddyStatusInfo);
@@ -151,7 +151,7 @@ GPIProfile *gpiProfileListAdd(GPConnection *connection, int id) {
     newProfile.authSig = NULL;
     newProfile.peerSig = NULL;
     newProfile.requestCount = 0;
-    newProfile.deleted = gsi_false;
+    newProfile.deletedLocally = gsi_false;
     TableEnter(profileList->profileTable, &newProfile);
     profileList->num++;
     if (gpiGetProfile(connection, id, &profile)) {
@@ -310,7 +310,7 @@ void gpiRemoveBuddyStatusInfo(GPIBuddyStatusInfo *buddyStatusInfo) {
     buddyStatusInfo->gameVariant = NULL;
     gsifree(buddyStatusInfo->gameMapName);
     buddyStatusInfo->gameMapName = NULL;
-    func_ov011_02171558(buddyStatusInfo->extendedInfoKeys);
+    ArrayFree(buddyStatusInfo->extendedInfoKeys);
     buddyStatusInfo->extendedInfoKeys = NULL;
     gsifree(buddyStatusInfo);
 }
@@ -373,7 +373,7 @@ GPResult gpiProcessRecvBlockedList(GPConnection *connection, const char *input) 
         }
         profile->blocked = gsi_true;
         profile->blockIndex = iconnection->profileList.numBlocked++;
-        gpiSetBuddyDeleted(connection, profileid, gsi_true);
+        gpiBuddyDeletedLocally(connection, profileid, gsi_true);
     }
     return 0;
 }

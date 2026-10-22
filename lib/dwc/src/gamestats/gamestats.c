@@ -304,7 +304,7 @@ int Gamestats_Poll(void) {
         SetFailed();
         break;
     case 4:
-        sClient.request = DWC_GetGHTTPData(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
+        sClient.request = DWC_GetGHTTPDataEx(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
         if (sClient.request >= 0) {
             sClient.state = 5;
         } else {
@@ -317,7 +317,7 @@ int Gamestats_Poll(void) {
         }
         break;
     case 6:
-        sClient.request = DWC_GetGHTTPData(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
+        sClient.request = DWC_GetGHTTPDataEx(sClient.url, 0, 0, OnSent, OnAnswered, NULL);
         if (sClient.request >= 0) {
             sClient.state = 7;
         } else {

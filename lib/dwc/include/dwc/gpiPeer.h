@@ -2,12 +2,12 @@
 #define POKEBW2_DWC_GPIPEER_H
 
 #include "dwc/gpi.h"
-#include "dwc/gt2.h"
+#include "dwc/gsUdpEngine.h"
 #include "dwc/nonport.h"
 
 // The peers of GameSpy's GP (gpiPeer.c), in overlay 11: the buddies that messages go to directly, through the Udp
-// Engine (dwc/gt2.h), once they have authorized each other with the signatures the server gives (see dwc/gp.h for the
-// names)
+// Engine (dwc/gsUdpEngine.h), once they have authorized each other with the signatures the server gives (see dwc/gp.h
+// for the names)
 
 void gpiDestroyPeer(GPConnection *connection, GPIPeer *peer);
 GPResult gpiProcessPeers(GPConnection *connection);
@@ -19,7 +19,7 @@ GPResult gpiPeerAddMessage(GPConnection *connection, GPIPeer *peer, int type, co
 GPResult gpiPeerStartTransferMessage(GPConnection *connection, GPIPeer *peer, int type,
                                      const GPITransferID *transferID);
 GPResult gpiPeerFinishTransferMessage(GPConnection *connection, GPIPeer *peer, const char *message, int len);
-// The Udp Engine's callbacks (dwc/gt2.h), with the connection as their user data
+// The Udp Engine's callbacks (dwc/gsUdpEngine.h), with the connection as their user data
 void gpiPeerLeftCallback(unsigned int ip, unsigned short port, GSUdpCloseReason reason, void *userData);
 void gpiPeerMessageCallback(unsigned int ip, unsigned short port, unsigned char *data, int len, gsi_bool reliable,
                             void *userData);

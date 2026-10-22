@@ -18,10 +18,10 @@ typedef struct HashImplementation *HashTable;
 
 struct HashImplementation {
     DArray *buckets;
-    int bucketCount;
-    TableElementFreeFn freeFunc;
-    TableHashFn hashFunc;
-    TableCompareFn compareFunc;
+    int nbuckets;
+    TableElementFreeFn freefn;
+    TableHashFn hashfn;
+    TableCompareFn compfn;
 };
 
 // TableNew's buckets grow by 4

@@ -1,14 +1,15 @@
 #include "sake_internal.h"
 
 // How an answer from the storage server is taken in, and how a request becomes a message: the server names its
-// error in the answer's result element, and every message starts with the game's ID, secret key and login ticket.
+// error in the answer's result element, and every message starts with the game's ID, secret key and login ticket. With
+// sake_post.c it is GameSpy's sakeRequest.c, whose names it has where the code shows them.
 
-static SAKERequestResult Sake_GetServerError(const char *name);
+static SAKERequestResult sakeiCheckSakeResult(const char *name);
 
 // The declaration of the message's namespace
-static const char *sSakeNamespaceDeclarations[] = { "ns1=\"http://gamespy.net/sake\"" };
+static const char *GSI_SAKE_SERVICE_NAMESPACES[] = { "ns1=\"http://gamespy.net/sake\"" };
 
-static SAKERequestResult Sake_GetServerError(const char *name) {
+static SAKERequestResult sakeiCheckSakeResult(const char *name) {
     if (strcmp(name, "Success") == 0) {
         return SAKERequestResult_SUCCESS;
     }
@@ -66,29 +67,29 @@ static SAKERequestResult Sake_GetServerError(const char *name) {
     return SAKERequestResult_UNKNOWN_ERROR;
 }
 
-void Sake_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
+void sakeiSoapCallback(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamReader reader, void *userData) {
     SAKERequest request = userData;
     char result[0x20];
     void *output = NULL;
     int error;
 
-    if (request == NULL || request->sake == NULL || request->type == NULL) {
+    if (request == NULL || request->mSake == NULL || request->mInfo == NULL) {
         return;
     }
-    error = Sake_GetHttpResultError(status);
+    error = sakeiCheckHttpResult(status);
     if (error == SAKERequestResult_SUCCESS) {
-        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, request->type->responseName) ||
-            !gsXmlReadChildAsStringNT(reader, request->type->resultName, result, sizeof(result))) {
+        if (!gsXmlMoveToStart(reader) || !gsXmlMoveToNext(reader, request->mInfo->mResponseTag) ||
+            !gsXmlReadChildAsStringNT(reader, request->mInfo->mResultTag, result, sizeof(result))) {
             error = SAKERequestResult_MALFORMED_RESPONSE;
         } else {
-            error = Sake_GetServerError(result);
-            if (error == SAKERequestResult_SUCCESS && request->type->outputSize != 0) {
-                request->output = gsimalloc(request->type->outputSize);
-                if (request->output != NULL) {
-                    request->response = reader;
-                    error = request->type->parse(request);
+            error = sakeiCheckSakeResult(result);
+            if (error == SAKERequestResult_SUCCESS && request->mInfo->mSakeOutputSize != 0) {
+                request->mOutput = gsimalloc(request->mInfo->mSakeOutputSize);
+                if (request->mOutput != NULL) {
+                    request->mSoapResponse = reader;
+                    error = request->mInfo->mProcessSoapResponseFunc(request);
                     if (error == SAKERequestResult_SUCCESS) {
-                        output = request->output;
+                        output = request->mOutput;
                     }
                 } else {
                     error = SAKERequestResult_OUT_OF_MEMORY;
@@ -96,43 +97,43 @@ void Sake_OnResponse(GHTTPResult status, GSXmlStreamWriter unused, GSXmlStreamRe
             }
         }
     }
-    if (request->callback != NULL) {
-        request->callback(request->sake, request, error, request->input, output, request->userData);
+    if (request->mCallback != NULL) {
+        request->mCallback(request->mSake, request, error, request->mInput, output, request->mUserData);
     }
-    if (request->type->freeOutput != NULL) {
-        request->type->freeOutput(request);
+    if (request->mInfo->mFreeDataFunc != NULL) {
+        request->mInfo->mFreeDataFunc(request);
     }
-    gsifree(request->output);
-    request->output = NULL;
-    Sake_FreeRequest(request);
+    gsifree(request->mOutput);
+    request->mOutput = NULL;
+    sakeiFreeRequest(request);
 }
 
-SAKEStartRequestResult Sake_BuildMessage(SAKERequest request) {
-    SAKEIRequestInfo *type = request->type;
+SAKEStartRequestResult sakeiSetupRequest(SAKERequest request) {
+    SAKEIRequestInfo *type = request->mInfo;
     int error;
 
-    error = type->validate(request);
+    error = type->mValidateInputFunc(request);
     if (error != 0) {
         return error;
     }
-    request->writer = gsXmlCreateStreamWriter(sSakeNamespaceDeclarations, 1);
-    if (request->writer == NULL) {
+    request->mSoapRequest = gsXmlCreateStreamWriter(GSI_SAKE_SERVICE_NAMESPACES, 1);
+    if (request->mSoapRequest == NULL) {
         return SAKEStartRequestResult_OUT_OF_MEMORY;
     }
-    gsXmlWriteOpenTag(request->writer, "ns1", request->type->name);
-    gsXmlWriteIntElement(request->writer, "ns1", "gameid", request->sake->gameId);
-    gsXmlWriteStringElement(request->writer, "ns1", "secretKey", request->sake->secretKey);
-    gsXmlWriteStringElement(request->writer, "ns1", "loginTicket", request->sake->loginTicket.data);
-    error = type->build(request);
+    gsXmlWriteOpenTag(request->mSoapRequest, "ns1", request->mInfo->mFuncName);
+    gsXmlWriteIntElement(request->mSoapRequest, "ns1", "gameid", request->mSake->mGameId);
+    gsXmlWriteStringElement(request->mSoapRequest, "ns1", "secretKey", request->mSake->mSecretKey);
+    gsXmlWriteStringElement(request->mSoapRequest, "ns1", "loginTicket", request->mSake->mLoginTicket.data);
+    error = type->mFillSoapRequestFunc(request);
     if (error != 0) {
-        gsXmlFreeWriter(request->writer);
-        request->writer = NULL;
-        if (type->freeOutput != NULL) {
-            type->freeOutput(request);
+        gsXmlFreeWriter(request->mSoapRequest);
+        request->mSoapRequest = NULL;
+        if (type->mFreeDataFunc != NULL) {
+            type->mFreeDataFunc(request);
         }
         return error;
     }
-    gsXmlWriteCloseTag(request->writer, "ns1", request->type->name);
-    gsXmlCloseWriter(request->writer);
+    gsXmlWriteCloseTag(request->mSoapRequest, "ns1", request->mInfo->mFuncName);
+    gsXmlCloseWriter(request->mSoapRequest);
     return 0;
 }

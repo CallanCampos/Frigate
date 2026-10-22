@@ -45,7 +45,7 @@ gsi_bool gsXmlWriteLargeIntElement(GSXmlStreamWriter writer, const char *prefix,
 
 // Makes a reader; reads a text of a length into it (the reader keeps pointers into the text); frees it; and empties it
 GSXmlStreamReader gsXmlCreateStreamReader(void);
-gsi_bool gsXmlParseXml(GSXmlStreamReader reader, char *text, int length);
+gsi_bool gsXmlParseBuffer(GSXmlStreamReader reader, char *text, int length);
 void gsXmlFreeReader(GSXmlStreamReader reader);
 void gsXmlResetReader(GSXmlStreamReader reader);
 

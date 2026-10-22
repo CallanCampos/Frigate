@@ -6,7 +6,7 @@
 
 // GameSpy's debug output (gsDebug.c), in overlay 11. A message has a category, a type and a level (bits); it is shown
 // when the table of levels has its level for its category and type, through the callback that the game set or else
-// on the screen (gs_screen_print.c)
+// on the screen (screen.c)
 
 // The levels a message is reported at, and the masks of the levels a category and type shows
 typedef gsi_u8 GSIDebugLevel;

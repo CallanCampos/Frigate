@@ -28,20 +28,20 @@ typedef GSTaskResult (*GSTaskThinkFunc)(void *taskData);
 // A task: its time limit and when it started, whether it started, runs and was cancelled, whether its callback is
 // still to be called, and the data that its functions are given
 typedef struct GSTask {
-    int id;
-    gsi_time timeout;
-    gsi_time startTime;
-    gsi_bool autoThink;
-    gsi_i32 isStarted;
-    gsi_i32 isRunning;
-    gsi_i32 isCanceled;
-    gsi_i32 isCallbackPending;
-    void *taskData;
-    GSTaskExecuteFunc executeFunc;
-    GSTaskCallbackFunc callbackFunc;
-    GSTaskCancelFunc cancelFunc;
-    GSTaskCleanupFunc cleanupFunc;
-    GSTaskThinkFunc thinkFunc;
+    int mId;
+    gsi_time mTimeout;
+    gsi_time mStartTime;
+    gsi_bool mAutoThink;
+    gsi_i32 mIsStarted;
+    gsi_i32 mIsRunning;
+    gsi_i32 mIsCanceled;
+    gsi_i32 mIsCallbackPending;
+    void *mTaskData;
+    GSTaskExecuteFunc mExecuteFunc;
+    GSTaskCallbackFunc mCallbackFunc;
+    GSTaskCancelFunc mCancelFunc;
+    GSTaskCleanupFunc mCleanupFunc;
+    GSTaskThinkFunc mThinkFunc;
 } GSTask;
 
 // Starts the core for one more user of it; runs the tasks, for at most timeLimit milliseconds unless it is 0; and ends

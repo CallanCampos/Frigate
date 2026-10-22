@@ -13,8 +13,8 @@
 #include "dwc/gsPlatformSocket.h"
 #include "dwc/gsPlatformUtil.h"
 #include "dwc/gsSoap.h"
-#include "dwc/gs_screen_print.h"
 #include "dwc/sake.h"
+#include "dwc/screen.h"
 #include "dwc/soap.h"
 #include "nitro/os.h"
 #include "system/rtc.h"
@@ -34,7 +34,7 @@
 // The C library's string functions that the main module links, not taken from <string.h>: MWCC builds them in place
 // (memset and memcpy of a size it knows, strcpy of a literal, strcmp and strlen) when <string.h> declares them,
 // where the ROM calls them. MWCC goes by the first declaration it sees, and these have <string.h>'s types, so a file
-// whose ROM builds one in place, as dwc_auth.c's memset, includes <string.h> before this header
+// whose ROM builds one in place, as AuthService.c's memset, includes <string.h> before this header
 void *memset(void *dest, int value, size_t size);
 void *memcpy(void *dest, const void *src, size_t size);
 void *memmove(void *dest, const void *src, size_t size);

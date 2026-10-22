@@ -6,9 +6,10 @@
 // GameSpy's Sake, the online record storage that Nintendo's Wi-Fi Connection games keep their ranking data in, in
 // overlay 260 (sake.c). It posts SOAP requests to a game's tables on the storage server and calls a function back with
 // the answer. The ROM names five of its calls in the texts of gdb.c ("sakeStartup failed", "sakeCreateRecord failed"
-// and the likewise for "sakeUpdateRecord", "sakeGetMyRecords" and "sakeGetSpecificRecords"); the rest are named by
-// what they do. The ROM's texts name the types of a field's value (`byteValue`, `asciiStringValue`...) and the
-// requests (`CreateRecord`, `SearchForRecords`...)
+// and the likewise for "sakeUpdateRecord", "sakeGetMyRecords" and "sakeGetSpecificRecords"); the rest are
+// GameSpy's own, as its sake.h and sakeMain.c have them, where the code shows them, and ours elsewhere. The ROM's texts
+// name the types of a field's value (`byteValue`, `asciiStringValue`...) and the requests (`CreateRecord`,
+// `SearchForRecords`...)
 
 typedef struct SAKEInternal *SAKE;
 typedef struct SAKERequestInternal *SAKERequest;
@@ -57,79 +58,79 @@ typedef enum {
 
 // Binary data: its bytes and their count
 typedef struct {
-    gsi_u8 *data;
-    int length;
+    gsi_u8 *mValue;
+    int mLength;
 } SAKEBinaryData;
 
 // The value of a field, of its type
 typedef union {
-    gsi_u8 byteValue;
-    gsi_i16 shortValue;
-    gsi_i32 intValue;
-    float floatValue;
-    char *asciiStringValue;
-    gsi_u16 *unicodeStringValue;
-    gsi_bool booleanValue;
-    int dateAndTimeValue;
-    SAKEBinaryData binaryDataValue;
-    gsi_i64 int64Value;
+    gsi_u8 mByte;
+    gsi_i16 mShort;
+    gsi_i32 mInt;
+    float mFloat;
+    char *mAsciiString;
+    gsi_u16 *mUnicodeString;
+    gsi_bool mBoolean;
+    int mDateAndTime;
+    SAKEBinaryData mBinaryData;
+    gsi_i64 mInt64;
 } SAKEValue;
 
 // A field of a record: its name, its type and its value
 typedef struct {
-    char *name;
-    SAKEFieldType type;
-    SAKEValue value;
+    char *mName;
+    SAKEFieldType mType;
+    SAKEValue mValue;
 } SAKEField;
 
 // What a request is told, one for each request. A table is named by its ID; the fields of a record to write by
 // SAKEField, and the fields to read by their names
 typedef struct {
-    char *tableId;
-    SAKEField *fields;
-    int fieldNum;
+    char *mTableId;
+    SAKEField *mFields;
+    int mNumFields;
 } SAKECreateRecordInput;
 
 typedef struct {
-    char *tableId;
-    int recordId;
-    SAKEField *fields;
-    int fieldNum;
+    char *mTableId;
+    int mRecordId;
+    SAKEField *mFields;
+    int mNumFields;
 } SAKEUpdateRecordInput;
 
 typedef struct {
-    char *tableId;
-    char **fieldNames;
-    int fieldNum;
+    char *mTableId;
+    char **mFieldNames;
+    int mNumFields;
 } SAKEGetMyRecordsInput;
 
 typedef struct {
-    char *tableId;
-    int *recordIds;
-    int recordNum;
-    char **fieldNames;
-    int fieldNum;
+    char *mTableId;
+    int *mRecordIds;
+    int mNumRecordIds;
+    char **mFieldNames;
+    int mNumFields;
 } SAKEGetSpecificRecordsInput;
 
 // The answers: the new record's ID for a created record, and the records that were read, each an array of fieldNum
 // fields and all freed with the request
 typedef struct {
-    int recordId;
+    int mRecordId;
 } SAKECreateRecordOutput;
 
 typedef struct {
-    int recordNum;
-    SAKEField **records;
+    int mNumRecords;
+    SAKEField **mRecords;
 } SAKESearchForRecordsOutput;
 
 typedef struct {
-    int recordNum;
-    SAKEField **records;
+    int mNumRecords;
+    SAKEField **mRecords;
 } SAKEGetMyRecordsOutput;
 
 typedef struct {
-    int recordNum;
-    SAKEField **records;
+    int mNumRecords;
+    SAKEField **mRecords;
 } SAKEGetSpecificRecordsOutput;
 
 // What the callback is given: sake_error.c turns the server's answer text into SUCCESS to TARGET_FILTER_INVALID or
@@ -175,28 +176,28 @@ typedef struct SakeLoginTicket {
 // The Sake: set up for a game, and with the login ticket of the player's profile. The URLs of the file server are
 // the library's, not the Sake's
 struct SAKEInternal {
-    gsi_bool hasGame;
-    char gameName[16];
-    int gameId;
-    char secretKey[12];
-    gsi_bool hasTicket;
-    int profileId;
-    SakeLoginTicket loginTicket;
-    SAKEStartRequestResult lastError;
+    gsi_bool mIsGameAuthenticated;
+    char mGameName[16];
+    int mGameId;
+    char mSecretKey[12];
+    gsi_bool mIsProfileAuthenticated;
+    int mProfileId;
+    SakeLoginTicket mLoginTicket;
+    SAKEStartRequestResult mStartRequestResult;
 };
 
 // The URL of the storage server, which the Wi-Fi library built (gdb.c)
-extern char gSakeStorageUrl[128];
+extern char sakeiSoapUrl[128];
 
 // Makes a Sake, returning 0 or an error code. It needs the Wi-Fi library to be running and not busy
 SAKEStartupResult sakeStartup(SAKE *sake);
 // Frees a Sake
-void Sake_Free(SAKE sake);
+void sakeShutdown(SAKE sake);
 // Sets the game's name, ID and secret key, and the profile and login ticket of the player
-void Sake_SetGame(SAKE sake, const char *gameName, int gameId, const char *secretKey);
-void Sake_SetLoginTicket(SAKE sake, int profileId, const SakeLoginTicket *loginTicket);
+void sakeSetGame(SAKE sake, const char *gameName, int gameId, const char *secretKey);
+void sakeSetProfile(SAKE sake, int profileId, const SakeLoginTicket *loginTicket);
 // The error that the last call left
-SAKEStartRequestResult Sake_GetLastError(SAKE sake);
+SAKEStartRequestResult sakeGetStartRequestResult(SAKE sake);
 // Starts a request, returning it or 0 with the error in the Sake
 SAKERequest sakeCreateRecord(SAKE sake, SAKECreateRecordInput *input, SAKERequestCallback callback, void *userData);
 SAKERequest sakeUpdateRecord(SAKE sake, SAKEUpdateRecordInput *input, SAKERequestCallback callback, void *userData);
@@ -204,10 +205,10 @@ SAKERequest sakeGetMyRecords(SAKE sake, SAKEGetMyRecordsInput *input, SAKEReques
 SAKERequest sakeGetSpecificRecords(SAKE sake, SAKEGetSpecificRecordsInput *input, SAKERequestCallback callback,
                                    void *userData);
 // Sets the URLs of the file server in place of the standard, and gets those of a file to download and to upload
-gsi_bool Sake_SetDownloadUrl(SAKE sake, const char *url);
-gsi_bool Sake_GetDownloadUrl(SAKE sake, int fileId, char *url);
-gsi_bool Sake_SetUploadUrl(SAKE sake, const char *url);
-gsi_bool Sake_GetUploadUrl(SAKE sake, char *url);
+gsi_bool sakeSetFileDownloadURL(SAKE sake, const char *url);
+gsi_bool sakeGetFileDownloadURL(SAKE sake, int fileId, char *url);
+gsi_bool sakeSetFileUploadURL(SAKE sake, const char *url);
+gsi_bool sakeGetFileUploadURL(SAKE sake, char *url);
 // Stops a request, returning 0 or an error code
 int Sake_CancelRequest(SAKE sake, SAKERequest request);
 

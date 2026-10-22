@@ -25,12 +25,12 @@ typedef struct GHIEncryptorState {
 
 // A post: its items, the callback that tells the game of its progress, and what kinds of items it has
 typedef struct GHIPost {
-    DArray items;
+    DArray data;
     ghttpPostCallback callback;
     void *param;
     GHTTPBool hasFiles;
-    GHTTPBool hasXml;
-    GHTTPBool mixed;
+    GHTTPBool hasSoap;
+    GHTTPBool useDIME;
     GHTTPBool autoFree;
 } GHIPost;
 
@@ -39,7 +39,7 @@ typedef struct GHIBuffer {
     GHIConnection *connection;
     char *data;
     int size;
-    int length;
+    int len;
     int pos;
     int sizeIncrement;
     GHTTPBool fixed;
@@ -97,20 +97,20 @@ typedef GHIEncryptionResult (*GHTTPEncryptorEncryptFunc)(GHIConnection *connecti
 typedef GHIEncryptionResult (*GHTTPEncryptorDecryptFunc)(GHIConnection *connection, GHIEncryptor *encryptor,
                                                          const char *in, int *inSize, char *out, int *outSize);
 struct GHIEncryptor {
-    GHIEncryptorState *state;
-    GHTTPEncryptionEngine engine;
-    GHTTPBool open;
-    GHTTPBool unk_0C;
-    GHTTPBool active;
-    GHTTPBool mode;
-    GHTTPBool established;
-    GHTTPBool unk_1C;
-    GHTTPEncryptorInitFunc init;
-    GHTTPEncryptorCleanupFunc cleanup;
-    GHTTPEncryptorStartFunc start;
-    GHTTPEncryptorEncryptFunc encrypt;
-    GHTTPEncryptorDecryptFunc decrypt;
-    gsi_bool secure;
+    GHIEncryptorState *mInterface;
+    GHTTPEncryptionEngine mEngine;
+    GHTTPBool mInitialized;
+    GHTTPBool mSessionStarted;
+    GHTTPBool mSessionEstablished;
+    GHTTPBool mEncryptOnBuffer;
+    GHTTPBool mEncryptOnSend;
+    GHTTPBool mLibSendsHandshakeMessages;
+    GHTTPEncryptorInitFunc mInitFunc;
+    GHTTPEncryptorCleanupFunc mCleanupFunc;
+    GHTTPEncryptorStartFunc mStartFunc;
+    GHTTPEncryptorEncryptFunc mEncryptFunc;
+    GHTTPEncryptorDecryptFunc mDecryptFunc;
+    gsi_bool mNotInCloseSocket;
 };
 
 // The progress of a post and the callback that tells the game of it
@@ -121,8 +121,8 @@ typedef struct GHIPostingState {
     int totalBytes;
     ghttpPostCallback callback;
     void *param;
-    GHTTPBool isXml;
-    GHTTPBool finished;
+    GHTTPBool waitPostContinue;
+    GHTTPBool completed;
 } GHIPostingState;
 
 typedef enum { GHIGET, GHISAVE, GHISTREAM, GHIHEAD, GHIPOST } GHIRequestType;
@@ -137,21 +137,21 @@ typedef enum { CRHeader, CRChunk, CRCRLF, CRFooter } CRState;
 struct GHIConnection {
     GHTTPBool inUse;
     GHTTPRequest request;
-    int uniqueId;
+    int uniqueID;
     GHIRequestType type;
     GHTTPState state;
-    char *url;
+    char *URL;
     char *serverAddress;
-    unsigned int serverIp;
+    unsigned int serverIP;
     unsigned short serverPort;
     gsi_u8 pad_22[2];
     char *requestPath;
-    GHIProtocol secure;
-    char *headers;
+    GHIProtocol protocol;
+    char *sendHeaders;
     int unk_30;
     char *unk_34;
     GHTTPBool blocking;
-    GHTTPBool keepAlive;
+    GHTTPBool persistConnection;
     GHTTPResult result;
     ghttpProgressCallback progressCallback;
     ghttpCompletedCallback completedCallback;
@@ -162,36 +162,36 @@ struct GHIConnection {
     GHIBuffer encodeBuffer;
     GHIBuffer recvBuffer;
     GHIBuffer decodeBuffer;
-    GHIBuffer fileBuffer;
-    GHTTPBool userBuffer;
-    int httpMajor;
-    int httpMinor;
+    GHIBuffer getFileBuffer;
+    GHTTPBool userBufferSupplied;
+    int statusMajorVersion;
+    int statusMinorVersion;
     int statusCode;
-    int statusTextPos;
-    int headersPos;
+    int statusStringIndex;
+    int headerStringIndex;
     GHTTPBool completed;
-    GHTTPByteCount bytesReceived;
+    GHTTPByteCount fileBytesReceived;
     GHTTPByteCount totalSize;
-    char *redirectUrl;
+    char *redirectURL;
     int redirectCount;
-    GHTTPBool chunked;
+    GHTTPBool chunkedTransfer;
     char chunkHeader[12];
-    int chunkHeaderLength;
-    int chunkRemaining;
-    CRState chunkState;
+    int chunkHeaderLen;
+    int chunkBytesLeft;
+    CRState chunkReadingState;
     GHTTPBool processing;
-    GHTTPBool closing;
+    GHTTPBool connectionClosed;
     GHTTPBool throttle;
-    gsi_time lastThrottleTime;
+    gsi_time lastThrottleRecv;
     GHTTPPost post;
     GHIPostingState postingState;
     gsi_time maxRecvTime;
-    char *proxyAddress;
-    unsigned short proxyPort;
+    char *proxyOverrideServer;
+    unsigned short proxyOverridePort;
     gsi_u8 pad_192[2];
     GHIEncryptor encryptor;
-    GSIResolveHostnameHandle hostLookup;
-    gsi_time lastRecvTime;
+    GSIResolveHostnameHandle handle;
+    gsi_time receiveFileIdleTime;
 };
 
 // The allocator that DWC's code gets its memory from (a heap of the game), and its free, are in dwc/memfunc.h
@@ -219,8 +219,8 @@ typedef enum { GHIRecvData, GHINoData, GHIConnClosed, GHIError } GHIRecvResult;
 
 typedef enum { GHITrySendError, GHITrySendSent, GHITrySendBuffered } GHITrySendResult;
 
-extern int ghiThrottleInterval;
-extern int ghiThrottleBytes;
+extern int ghiThrottleTimeDelay;
+extern int ghiThrottleBufferSize;
 extern unsigned short ghiProxyPort;
 extern char *ghiProxyAddress;
 void ghiCreateLock(void);
@@ -236,7 +236,7 @@ GHITrySendResult ghiTrySendThenBuffer(GHIConnection *connection, const char *dat
 
 int ghiFindFreeSlot(void);
 GHIConnection *ghiNewConnection(void);
-GHTTPBool ghiCloseSocket(GHIConnection *connection);
+GHTTPBool ghiCloseConnection(GHIConnection *connection);
 GHTTPBool ghiFreeConnectionData(GHIConnection *connection);
 GHTTPBool ghiFreeConnection(GHIConnection *connection);
 GHIConnection *ghiRequestToConnection(GHTTPRequest request);
@@ -244,13 +244,13 @@ void ghiEnumConnections(GHTTPBool (*func)(GHIConnection *));
 void ghiRedirectConnection(GHIConnection *connection);
 void ghiCleanupConnections(void);
 
-char *ghiCopyHost(char *url);
+char *ghiGetServerAddressFromUrl(char *url);
 
 // ghttpMain: the calls of the game (and DWC) to the client are in dwc/ghttp.h
 void ghiHandleStatus(GHIConnection *connection);
 GHTTPBool ghiProcessConnection(GHIConnection *connection);
 GHTTPBool ghttpSetRootCAList(const char *url, GHICertList *rootCA);
-GHTTPBool ghttpRemoveRootCAList(const char *url);
+GHTTPBool ghttpCleanupRootCAList(const char *url);
 
 // ghttpPost: a post is a list of items; the one of a connection is made by the game and the connection keeps its state
 typedef enum { GHIPostingError, GHIPostingDone, GHIPostingPosting, GHIPostingWaitForContinue } GHIPostingResult;
@@ -258,10 +258,10 @@ typedef enum { GHIPostingError, GHIPostingDone, GHIPostingPosting, GHIPostingWai
 GHTTPPost ghiNewPost(void);
 void ghiPostSetAutoFree(GHTTPPost post, GHTTPBool autoFree);
 void ghiFreePost(GHTTPPost post);
-void ghiFreePostOfRequest(GHTTPRequest request, GHTTPPost post);
+void ghiFreePostAndUpdateConnection(GHTTPRequest request, GHTTPPost post);
 GHTTPBool ghiPostAddXml(GHTTPPost post, GSXmlStreamWriter writer);
 const char *ghiPostGetContentType(GHIConnection *connection);
-int ghiPostGetLength(GHIConnection *connection);
+int ghiPostGetContentLength(GHIConnection *connection);
 GHTTPBool ghiPostInitState(GHIConnection *connection);
 GHIPostingResult ghiPostDoPosting(GHIConnection *connection);
 void ghiPostCleanupState(GHIConnection *connection);
@@ -283,7 +283,7 @@ void ghiDoReceivingFile(GHIConnection *connection);
 
 // ghttpEncryption
 GHTTPBool ghiEncyptorSetRootCAList(const char *url, GHICertList *rootCA);
-GHTTPBool ghiEncryptorRemoveRootCAList(const char *url);
+GHTTPBool ghiEncyptorCleanupRootCAList(const char *url);
 GHICertList *ghiEncryptorGetRootCAList(const char *url);
 GHTTPBool ghiEncryptorSetTwlRootCA(const char *url, GHICertList *rootCA);
 GHTTPBool ghiEncryptorCleanupTwlRootCA(const char *url);
@@ -294,8 +294,9 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(GHIConnection *connection, GHIEnc
                                                int inSize, char *out, int *outSize);
 GHIEncryptionResult ghiEncryptorSslDecryptFunc(GHIConnection *connection, GHIEncryptor *encryptor, const char *in,
                                                int *inSize, char *out, int *outSize);
-GHIEncryptionResult ghiEncryptorSend(GHIConnection *connection, GHIEncryptor *encryptor, const char *data, int size,
-                                     int *sent);
-GHIEncryptionResult ghiEncryptorRecv(GHIConnection *connection, GHIEncryptor *encryptor, char *buffer, int *size);
+GHIEncryptionResult ghiEncryptorSslEncryptSend(GHIConnection *connection, GHIEncryptor *encryptor, const char *data,
+                                               int size, int *sent);
+GHIEncryptionResult ghiEncryptorSslDecryptRecv(GHIConnection *connection, GHIEncryptor *encryptor, char *buffer,
+                                               int *size);
 
 #endif // POKEBW2_DWC_GHTTP_INTERNAL_H

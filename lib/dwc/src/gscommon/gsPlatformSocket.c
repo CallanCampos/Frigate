@@ -2,10 +2,10 @@
 #include "dwc/gsDebug.h"
 
 // GameSpy's sockets (gsPlatformSocket.c). The ROM names neither the file nor its functions: the file is the later
-// SDK's, and the functions are GameSpy's as pret's pokerevo Wii build has them (nonport.s) but for three of ours:
-// gsiSocketCheckResult, gsiCloseSocketSecure, and gsiSocket for socket, whose name GT2's own `socket` variables hide
+// SDK's, and the functions are GameSpy's, as pret's pokerevo Wii build has them (nonport.s), or the later SDK's
+// (CheckRcode, closesocketsure and socket, of the nitro/gsSocketNitro.c that it includes)
 
-static int gsiSocketCheckResult(int result, int error);
+static int CheckRcode(int result, int error);
 
 // The state of the sockets: the aliases of the console's host entry (none), the error of the last call that failed,
 // and the host entry with the console's address
@@ -18,7 +18,7 @@ static struct {
 } sSocketState;
 
 // Keeps the error of a call that failed and returns the error value, or returns the result
-static int gsiSocketCheckResult(int result, int error) {
+static int CheckRcode(int result, int error) {
     if (result < 0) {
         sSocketState.lastError = result;
         return error;
@@ -26,15 +26,15 @@ static int gsiSocketCheckResult(int result, int error) {
     return result;
 }
 
-int gsiSocket(int family, int type, int protocol) {
-    return gsiSocketCheckResult(SOC_Socket(family, type, protocol), -1);
+int socket(int family, int type, int protocol) {
+    return CheckRcode(SOC_Socket(family, type, protocol), -1);
 }
 
 int closesocket(SOCKET sock) {
-    return gsiSocketCheckResult(SOC_Close(sock), -1);
+    return CheckRcode(SOC_Close(sock), -1);
 }
 
-gsi_bool gsiCloseSocketSecure(SOCKET sock, gsi_bool *secure) {
+gsi_bool closesocketsure(SOCKET sock, gsi_bool *secure) {
     int result = SOC_Close(sock);
 
     if (result == 0) {
@@ -44,13 +44,13 @@ gsi_bool gsiCloseSocketSecure(SOCKET sock, gsi_bool *secure) {
     if (!SOCL_IsNotClosing(sock)) {
         return gsi_false;
     }
-    gsiSocketCheckResult(result, -1);
+    CheckRcode(result, -1);
     *secure = gsi_true;
     return gsi_true;
 }
 
 int shutdown(SOCKET sock, int how) {
-    return gsiSocketCheckResult(SOC_Shutdown(sock, how), -1);
+    return CheckRcode(SOC_Shutdown(sock, how), -1);
 }
 
 int bind(SOCKET sock, const SOCKADDR *address, int size) {
@@ -61,29 +61,29 @@ int bind(SOCKET sock, const SOCKADDR *address, int size) {
     }
     local = *address;
     local.len = size;
-    return gsiSocketCheckResult(SOC_Bind(sock, &local), -1);
+    return CheckRcode(SOC_Bind(sock, &local), -1);
 }
 
 int connect(SOCKET sock, const SOCKADDR *address, int size) {
     SOCKADDR remote = *address;
 
     remote.len = size;
-    return gsiSocketCheckResult(SOC_Connect(sock, &remote), -1);
+    return CheckRcode(SOC_Connect(sock, &remote), -1);
 }
 
 int recv(SOCKET sock, char *buffer, int size, int flags) {
-    return gsiSocketCheckResult(SOC_Recv(sock, buffer, size, flags), -1);
+    return CheckRcode(SOC_Recv(sock, buffer, size, flags), -1);
 }
 
 int recvfrom(SOCKET sock, char *buffer, int size, int flags, SOCKADDR *address, int *addressSize) {
     address->len = *addressSize;
     int result = SOC_RecvFrom(sock, buffer, size, flags, address);
     *addressSize = address->len;
-    return gsiSocketCheckResult(result, -1);
+    return CheckRcode(result, -1);
 }
 
 int send(SOCKET sock, const char *buffer, int size, int flags) {
-    return gsiSocketCheckResult(SOC_Send(sock, buffer, size, flags), -1);
+    return CheckRcode(SOC_Send(sock, buffer, size, flags), -1);
 }
 
 int sendto(SOCKET sock, const char *buffer, int size, int flags, const SOCKADDR *address, int addressSize) {
@@ -91,18 +91,18 @@ int sendto(SOCKET sock, const char *buffer, int size, int flags, const SOCKADDR 
 
     remote = *address;
     remote.len = addressSize;
-    return gsiSocketCheckResult(SOC_SendTo(sock, buffer, size, flags, &remote), -1);
+    return CheckRcode(SOC_SendTo(sock, buffer, size, flags, &remote), -1);
 }
 
 int setsockopt(SOCKET sock, int level, int name, const char *value, int size) {
-    return gsiSocketCheckResult(0, -1);
+    return CheckRcode(0, -1);
 }
 
 int getsockname(SOCKET sock, SOCKADDR *address, int *size) {
     address->len = *size;
     int result = SOC_GetSockName(sock, address);
     *size = address->len;
-    return gsiSocketCheckResult(result, -1);
+    return CheckRcode(result, -1);
 }
 
 unsigned long inet_addr(const char *host) {

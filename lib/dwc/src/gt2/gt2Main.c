@@ -6,42 +6,41 @@
 #include "dwc/gt2Socket.h"
 #include "dwc/gt2Utility.h"
 
-// GameSpy GT2's API (gt2Main.c). The names of the functions that keep their addresses are in dwc/gt2Main.h
+// GameSpy GT2's API (gt2Main.c): see dwc/gt2Main.h
 
 static void gti2CloseAllConnectionsHardMap(void *element, void *clientData);
 
-GT2Result func_ov011_0217d144(GT2Socket *socket, const char *localAddress, int outgoingBufferSize,
-                              int incomingBufferSize, gt2SocketErrorCallback onSocketError) {
+GT2Result gt2CreateSocket(GT2Socket *socket, const char *localAddress, int outgoingBufferSize, int incomingBufferSize,
+                          gt2SocketErrorCallback onSocketError) {
     return gti2CreateSocket(socket, localAddress, outgoingBufferSize, incomingBufferSize, onSocketError,
                             GTI2UdpProtocol);
 }
 
-void func_ov011_0217d158(GT2Socket socket) {
+void gt2CloseSocket(GT2Socket socket) {
     gt2CloseAllConnectionsHard(socket);
     gti2CloseSocket(socket);
 }
 
-void func_ov011_0217d168(GT2Socket socket) {
+void gt2Think(GT2Socket socket) {
     if (gti2ReceiveMessages(socket) && gti2SocketConnectionsThink(socket)) {
         gti2FreeClosedConnections(socket);
     }
 }
 
-void func_ov011_0217d188(GT2Socket socket, gt2ConnectAttemptCallback callback) {
+void gt2Listen(GT2Socket socket, gt2ConnectAttemptCallback callback) {
     gti2Listen(socket, callback);
 }
 
-GT2Bool func_ov011_0217d190(GT2Connection connection, GT2ConnectionCallbacks *callbacks) {
+GT2Bool gt2Accept(GT2Connection connection, GT2ConnectionCallbacks *callbacks) {
     return gti2AcceptConnection(connection, callbacks);
 }
 
-void func_ov011_0217d198(GT2Connection connection, const GT2Byte *message, int length) {
+void gt2Reject(GT2Connection connection, const GT2Byte *message, int length) {
     gti2RejectConnection(connection, message, length);
 }
 
-GT2Result func_ov011_0217d1a0(GT2Socket socket, GT2Connection *connection, const char *remoteAddress,
-                              const GT2Byte *message, int length, int timeout, GT2ConnectionCallbacks *callbacks,
-                              GT2Bool blocking) {
+GT2Result gt2Connect(GT2Socket socket, GT2Connection *connection, const char *remoteAddress, const GT2Byte *message,
+                     int length, int timeout, GT2ConnectionCallbacks *callbacks, GT2Bool blocking) {
     GT2Connection created;
     gsi_u32 ip;
     gsi_u16 port;
@@ -73,7 +72,7 @@ GT2Result func_ov011_0217d1a0(GT2Socket socket, GT2Connection *connection, const
     }
     created->callbackLevel++;
     do {
-        func_ov011_0217d168(socket);
+        gt2Think(socket);
         done = created->state >= 5;
         if (!done) {
             msleep(1);
@@ -83,16 +82,16 @@ GT2Result func_ov011_0217d1a0(GT2Socket socket, GT2Connection *connection, const
     if (created->state == 5) {
         *connection = created;
     }
-    return created->result;
+    return created->connectionResult;
 }
 
-GT2Result func_ov011_0217d290(GT2Connection connection, const GT2Byte *message, int length, GT2Bool reliable) {
+GT2Result gt2Send(GT2Connection connection, const GT2Byte *message, int length, GT2Bool reliable) {
     if (connection->state != 5) {
         return 8;
     }
     gti2MessageCheck(&message, &length);
     // A reliable message of protocol 2 starts with its own length, copied out as it may be unaligned
-    if (reliable && connection->socket->protocol == GTI2VdpProtocol) {
+    if (reliable && connection->socket->protocolType == GTI2VdpProtocol) {
         gsi_u16 size;
         gsi_u8 *dest = (gsi_u8 *)&size;
         const gsi_u8 *src = message;
@@ -103,7 +102,7 @@ GT2Result func_ov011_0217d290(GT2Connection connection, const GT2Byte *message, 
             return 9;
         }
     }
-    if (func_ov011_02171588(connection->sendFilters) != 0) {
+    if (ArrayLength(connection->sendFilters) != 0) {
         gti2SendFilterCallback(connection, 0, message, length, reliable);
         return 0;
     }
@@ -125,7 +124,7 @@ void gt2CloseAllConnectionsHard(GT2Socket socket) {
     TableMapSafe(socket->connections, gti2CloseAllConnectionsHardMap, NULL);
 }
 
-GT2ConnectionState func_ov011_0217d364(GT2Connection connection) {
+GT2ConnectionState gt2GetConnectionState(GT2Connection connection) {
     if (connection->state < 5) {
         return 0;
     }
@@ -138,42 +137,42 @@ GT2ConnectionState func_ov011_0217d364(GT2Connection connection) {
     return 3;
 }
 
-unsigned int func_ov011_0217d380(GT2Connection connection) {
+unsigned int gt2GetRemoteIP(GT2Connection connection) {
     return connection->ip;
 }
 
-unsigned short func_ov011_0217d384(GT2Connection connection) {
+unsigned short gt2GetRemotePort(GT2Connection connection) {
     return connection->port;
 }
 
-unsigned int func_ov011_0217d388(GT2Socket socket) {
+unsigned int gt2GetLocalIP(GT2Socket socket) {
     return socket->ip;
 }
 
-unsigned short func_ov011_0217d38c(GT2Socket socket) {
+unsigned short gt2GetLocalPort(GT2Socket socket) {
     return socket->port;
 }
 
-int func_ov011_0217d390(GT2Connection connection) {
-    return connection->outgoing.capacity;
+int gt2GetOutgoingBufferSize(GT2Connection connection) {
+    return connection->outgoingBuffer.size;
 }
 
-int func_ov011_0217d394(GT2Connection connection) {
-    return connection->outgoing.capacity - connection->outgoing.length;
+int gt2GetOutgoingBufferFreeSpace(GT2Connection connection) {
+    return connection->outgoingBuffer.size - connection->outgoingBuffer.len;
 }
 
 SOCKET gt2GetSocketSOCKET(GT2Socket socket) {
-    return socket->handle;
+    return socket->socket;
 }
 
-void func_ov011_0217d3a0(GT2Socket socket, gt2UnrecognizedMessageCallback callback) {
-    socket->onUnrecognizedMessage = callback;
+void gt2SetUnrecognizedMessageCallback(GT2Socket socket, gt2UnrecognizedMessageCallback callback) {
+    socket->unrecognizedMessageCallback = callback;
 }
 
 void gt2SetConnectionData(GT2Connection connection, void *userData) {
-    connection->userData = userData;
+    connection->data = userData;
 }
 
 void *gt2GetConnectionData(GT2Connection connection) {
-    return connection->userData;
+    return connection->data;
 }

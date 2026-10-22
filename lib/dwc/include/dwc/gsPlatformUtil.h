@@ -23,7 +23,7 @@ typedef struct GSTime {
 // The state of a base 64 encoding that gives four digits at a time: what is left of the input, and the alphabet
 typedef struct B64StreamData {
     const char *input;
-    int length;
+    int len;
     int encodingType;
 } B64StreamData;
 

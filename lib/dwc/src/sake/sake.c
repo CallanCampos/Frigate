@@ -1,18 +1,19 @@
 #include "sake_internal.h"
 
 // The Sake itself: setting it up for a game and a player, starting the requests, and the URLs of the file server.
-// The names of the calls whose texts the ROM keeps ("sakeStartup", "sakeCreateRecord", "sakeUpdateRecord",
-// "sakeGetMyRecords" and "sakeGetSpecificRecords") are the SDK's; the others are named by what they do.
+// The names are GameSpy's own, as its sakeMain.c has them (the ROM keeps the texts of "sakeStartup",
+// "sakeCreateRecord", "sakeUpdateRecord", "sakeGetMyRecords" and "sakeGetSpecificRecords"); the last three functions,
+// sakeiInitRequest, sakeiFreeRequest and sakeiCheckHttpResult, are the first of GameSpy's sakeRequest.c.
 
-static SAKERequest Sake_AllocRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
-                                     void *userData);
-static SAKERequest Sake_StartRequest(SAKE sake, void *input, SAKERequestCallback callback, void *userData,
-                                     SAKEIRequestType kind, SAKEStartRequestResult (*submit)(SAKERequest request));
+static SAKERequest sakeiInitRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
+                                    void *userData);
+static SAKERequest sakeiRunRequest(SAKE sake, void *input, SAKERequestCallback callback, void *userData,
+                                   SAKEIRequestType kind, SAKEStartRequestResult (*submit)(SAKERequest request));
 static int Sake_StopHttp(SAKE sake, SAKERequest request);
 
 // The URLs of a file server that the game asked for, in place of the standard
-static char sSakeUploadUrl[128];
-static char sSakeDownloadUrl[128];
+static char gSakeUploadUrlOverride[128];
+static char gSakeDownloadUrlOverride[128];
 
 SAKEStartupResult sakeStartup(SAKE *sake) {
     SAKE created;
@@ -32,89 +33,92 @@ SAKEStartupResult sakeStartup(SAKE *sake) {
     return 0;
 }
 
-void Sake_Free(SAKE sake) {
+void sakeShutdown(SAKE sake) {
     gsifree(sake);
 }
 
-void Sake_SetGame(SAKE sake, const char *gameName, int gameId, const char *secretKey) {
-    strcpy(sake->gameName, gameName);
-    strcpy(sake->secretKey, secretKey);
-    sake->gameId = gameId;
-    sake->hasGame = gsi_true;
+void sakeSetGame(SAKE sake, const char *gameName, int gameId, const char *secretKey) {
+    strcpy(sake->mGameName, gameName);
+    strcpy(sake->mSecretKey, secretKey);
+    sake->mGameId = gameId;
+    sake->mIsGameAuthenticated = gsi_true;
 }
 
-void Sake_SetLoginTicket(SAKE sake, int profileId, const SakeLoginTicket *loginTicket) {
-    sake->profileId = profileId;
-    sake->loginTicket = *loginTicket;
-    sake->hasTicket = gsi_true;
+void sakeSetProfile(SAKE sake, int profileId, const SakeLoginTicket *loginTicket) {
+    sake->mProfileId = profileId;
+    sake->mLoginTicket = *loginTicket;
+    sake->mIsProfileAuthenticated = gsi_true;
 }
 
-SAKEStartRequestResult Sake_GetLastError(SAKE sake) {
-    return sake->lastError;
+SAKEStartRequestResult sakeGetStartRequestResult(SAKE sake) {
+    return sake->mStartRequestResult;
 }
 
-static SAKERequest Sake_StartRequest(SAKE sake, void *input, SAKERequestCallback callback, void *userData,
-                                     SAKEIRequestType kind, SAKEStartRequestResult (*submit)(SAKERequest request)) {
-    SAKERequest request = Sake_AllocRequest(sake, kind, input, callback, userData);
+static SAKERequest sakeiRunRequest(SAKE sake, void *input, SAKERequestCallback callback, void *userData,
+                                   SAKEIRequestType kind, SAKEStartRequestResult (*submit)(SAKERequest request)) {
+    SAKERequest request = sakeiInitRequest(sake, kind, input, callback, userData);
 
     if (request == NULL) {
         return NULL;
     }
-    sake->lastError = submit(request);
-    if (sake->lastError != 0) {
-        Sake_FreeRequest(request);
+    sake->mStartRequestResult = submit(request);
+    if (sake->mStartRequestResult != 0) {
+        sakeiFreeRequest(request);
         return NULL;
     }
     return request;
 }
 
 static int Sake_StopHttp(SAKE sake, SAKERequest request) {
-    if (sake == NULL || request == NULL || request->type == NULL || request->type->http == NULL) {
+    if (sake == NULL || request == NULL || request->mInfo == NULL || request->mInfo->http == NULL) {
         return SAKEStartRequestResult_BAD_INPUT;
     }
-    gsiCoreCancelTask(request->type->http);
+    gsiCoreCancelTask(request->mInfo->http);
     return 0;
 }
 
 SAKERequest sakeCreateRecord(SAKE sake, SAKECreateRecordInput *input, SAKERequestCallback callback, void *userData) {
-    return Sake_StartRequest(sake, input, callback, userData, SAKEIRequestType_CREATE_RECORD, Sake_SubmitCreateRecord);
+    return sakeiRunRequest(sake, input, callback, userData, SAKEIRequestType_CREATE_RECORD,
+                           sakeiStartCreateRecordRequest);
 }
 
 SAKERequest sakeUpdateRecord(SAKE sake, SAKEUpdateRecordInput *input, SAKERequestCallback callback, void *userData) {
-    return Sake_StartRequest(sake, input, callback, userData, SAKEIRequestType_UPDATE_RECORD, Sake_SubmitUpdateRecord);
+    return sakeiRunRequest(sake, input, callback, userData, SAKEIRequestType_UPDATE_RECORD,
+                           sakeiStartUpdateRecordRequest);
 }
 
 SAKERequest sakeGetMyRecords(SAKE sake, SAKEGetMyRecordsInput *input, SAKERequestCallback callback, void *userData) {
-    return Sake_StartRequest(sake, input, callback, userData, SAKEIRequestType_GET_MY_RECORDS, Sake_SubmitGetMyRecords);
+    return sakeiRunRequest(sake, input, callback, userData, SAKEIRequestType_GET_MY_RECORDS,
+                           sakeiStartGetMyRecordsRequest);
 }
 
 SAKERequest sakeGetSpecificRecords(SAKE sake, SAKEGetSpecificRecordsInput *input, SAKERequestCallback callback,
                                    void *userData) {
-    return Sake_StartRequest(sake, input, callback, userData, SAKEIRequestType_GET_SPECIFIC_RECORDS,
-                             Sake_SubmitGetSpecificRecords);
+    return sakeiRunRequest(sake, input, callback, userData, SAKEIRequestType_GET_SPECIFIC_RECORDS,
+                           sakeiStartGetSpecificRecordsRequest);
 }
 
-gsi_bool Sake_SetDownloadUrl(SAKE sake, const char *url) {
+gsi_bool sakeSetFileDownloadURL(SAKE sake, const char *url) {
     if (sake == NULL || url == NULL) {
         return gsi_false;
     }
-    strcpy(sSakeDownloadUrl, url);
+    strcpy(gSakeDownloadUrlOverride, url);
     return gsi_true;
 }
 
-gsi_bool Sake_GetDownloadUrl(SAKE sake, int fileId, char *url) {
+gsi_bool sakeGetFileDownloadURL(SAKE sake, int fileId, char *url) {
     int length;
 
-    if (sake == NULL || url == NULL || !sake->hasGame || !sake->hasTicket) {
+    if (sake == NULL || url == NULL || !sake->mIsGameAuthenticated || !sake->mIsProfileAuthenticated) {
         return gsi_false;
     }
-    if (sSakeDownloadUrl[0] != '\0') {
-        length = OS_SNPrintf(url, 128, "%s?fileid=%d&gameid=%d&pid=%d", sSakeDownloadUrl, fileId, sake->gameId,
-                             sake->profileId);
+    if (gSakeDownloadUrlOverride[0] != '\0') {
+        length = OS_SNPrintf(url, 128, "%s?fileid=%d&gameid=%d&pid=%d", gSakeDownloadUrlOverride, fileId, sake->mGameId,
+                             sake->mProfileId);
     } else {
         length =
             OS_SNPrintf(url, 128, "http://%s.sake.gamespy.com/SakeFileServer/download.aspx?fileid=%d&gameid=%d&pid=%d",
-                        sake->gameName, fileId, sake->gameId, sake->profileId);
+                        sake->mGameName, fileId, sake->mGameId, sake->mProfileId);
     }
     if (length < 0) {
         return gsi_false;
@@ -122,25 +126,25 @@ gsi_bool Sake_GetDownloadUrl(SAKE sake, int fileId, char *url) {
     return gsi_true;
 }
 
-gsi_bool Sake_SetUploadUrl(SAKE sake, const char *url) {
+gsi_bool sakeSetFileUploadURL(SAKE sake, const char *url) {
     if (sake == NULL || url == NULL) {
         return gsi_false;
     }
-    strcpy(sSakeUploadUrl, url);
+    strcpy(gSakeUploadUrlOverride, url);
     return gsi_true;
 }
 
-gsi_bool Sake_GetUploadUrl(SAKE sake, char *url) {
+gsi_bool sakeGetFileUploadURL(SAKE sake, char *url) {
     int length;
 
-    if (sake == NULL || url == NULL || !sake->hasGame || !sake->hasTicket) {
+    if (sake == NULL || url == NULL || !sake->mIsGameAuthenticated || !sake->mIsProfileAuthenticated) {
         return gsi_false;
     }
-    if (sSakeUploadUrl[0] != '\0') {
-        length = OS_SNPrintf(url, 128, "%s?gameid=%d&pid=%d", sSakeUploadUrl, sake->gameId, sake->profileId);
+    if (gSakeUploadUrlOverride[0] != '\0') {
+        length = OS_SNPrintf(url, 128, "%s?gameid=%d&pid=%d", gSakeUploadUrlOverride, sake->mGameId, sake->mProfileId);
     } else {
         length = OS_SNPrintf(url, 128, "http://%s.sake.gamespy.com/SakeFileServer/upload.aspx?gameid=%d&pid=%d",
-                             sake->gameName, sake->gameId, sake->profileId);
+                             sake->mGameName, sake->mGameId, sake->mProfileId);
     }
     if (length < 0) {
         return gsi_false;
@@ -152,38 +156,38 @@ int Sake_CancelRequest(SAKE sake, SAKERequest request) {
     return Sake_StopHttp(sake, request);
 }
 
-static SAKERequest Sake_AllocRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
-                                     void *userData) {
+static SAKERequest sakeiInitRequest(SAKE sake, SAKEIRequestType kind, void *input, SAKERequestCallback callback,
+                                    void *userData) {
     SAKERequest request;
 
-    sake->lastError = 0;
+    sake->mStartRequestResult = 0;
     if (input == NULL) {
-        sake->lastError = SAKEStartRequestResult_BAD_INPUT;
+        sake->mStartRequestResult = SAKEStartRequestResult_BAD_INPUT;
         return NULL;
     }
-    if (!sake->hasGame || !sake->hasTicket) {
-        sake->lastError = SAKEStartRequestResult_NOT_AUTHENTICATED;
+    if (!sake->mIsGameAuthenticated || !sake->mIsProfileAuthenticated) {
+        sake->mStartRequestResult = SAKEStartRequestResult_NOT_AUTHENTICATED;
         return NULL;
     }
     request = gsimalloc(sizeof(struct SAKERequestInternal));
     if (request == NULL) {
-        sake->lastError = SAKEStartRequestResult_OUT_OF_MEMORY;
+        sake->mStartRequestResult = SAKEStartRequestResult_OUT_OF_MEMORY;
         return NULL;
     }
     memset(request, 0, sizeof(struct SAKERequestInternal));
-    request->sake = sake;
-    request->kind = kind;
-    request->input = input;
-    request->callback = callback;
-    request->userData = userData;
+    request->mSake = sake;
+    request->mType = kind;
+    request->mInput = input;
+    request->mCallback = callback;
+    request->mUserData = userData;
     return request;
 }
 
-void Sake_FreeRequest(SAKERequest request) {
+void sakeiFreeRequest(SAKERequest request) {
     gsifree(request);
 }
 
-SAKERequestResult Sake_GetHttpResultError(GHTTPResult status) {
+SAKERequestResult sakeiCheckHttpResult(GHTTPResult status) {
     switch (status) {
     case 0:
         return SAKERequestResult_SUCCESS;

@@ -2373,7 +2373,7 @@ static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt) {
     }
 
 static void MY_MD5Init(MD5_CTX *context) {
-    func_ov011_021719fcInline(context);
+    MD5InitInline(context);
 }
 
 static void MY_MD5Update(MD5_CTX *context, const u8 *input, u32 inputLen) {

@@ -15,11 +15,11 @@ typedef SOCSockAddrIn SOCKADDR_IN;
 typedef SOCInAddr IN_ADDR;
 typedef SOCHostEnt HOSTENT;
 
-int gsiSocket(int family, int type, int protocol);
+int socket(int family, int type, int protocol);
 int closesocket(SOCKET sock);
 // Closes a socket of the HTTP code: gsi_true once it is closed, gsi_false while it is still closing; secure is the
 // connection's flag that it flips on a close that worked and sets on an error
-gsi_bool gsiCloseSocketSecure(SOCKET sock, gsi_bool *secure);
+gsi_bool closesocketsure(SOCKET sock, gsi_bool *secure);
 int shutdown(SOCKET sock, int how);
 int bind(SOCKET sock, const SOCKADDR *address, int size);
 int connect(SOCKET sock, const SOCKADDR *address, int size);

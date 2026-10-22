@@ -59,7 +59,7 @@ GT2Result gti2CreateSocket(GT2Socket *socketOut, const char *localAddress, int o
                            int incomingBufferSize, gt2SocketErrorCallback onSocketError, GTI2ProtocolType protocol) {
     gsi_u16 port;
     SOCSockAddrIn address;
-    GTI2Socket *socket;
+    GTI2Socket *socketTemp;
     gsi_u32 ip;
     int addressSize;
 
@@ -73,37 +73,38 @@ GT2Result gti2CreateSocket(GT2Socket *socketOut, const char *localAddress, int o
     if (!gt2StringToAddress(localAddress, &ip, &port)) {
         return 4;
     }
-    socket = gsimalloc(sizeof(GTI2Socket));
-    if (socket == NULL) {
+    socketTemp = gsimalloc(sizeof(GTI2Socket));
+    if (socketTemp == NULL) {
         return 1;
     }
-    memset(socket, 0, sizeof(GTI2Socket));
-    socket->handle = -1;
-    socket->incomingBufferSize = incomingBufferSize;
-    socket->outgoingBufferSize = outgoingBufferSize;
-    socket->onSocketError = onSocketError;
-    socket->connections = TableNew2(sizeof(GT2Connection), 0x20, 2, gti2ConnectionHash, gti2ConnectionCompare, NULL);
-    if (socket->connections == NULL) {
-        gsifree(socket);
+    memset(socketTemp, 0, sizeof(GTI2Socket));
+    socketTemp->socket = -1;
+    socketTemp->incomingBufferSize = incomingBufferSize;
+    socketTemp->outgoingBufferSize = outgoingBufferSize;
+    socketTemp->socketErrorCallback = onSocketError;
+    socketTemp->connections =
+        TableNew2(sizeof(GT2Connection), 0x20, 2, gti2ConnectionHash, gti2ConnectionCompare, NULL);
+    if (socketTemp->connections == NULL) {
+        gsifree(socketTemp);
         return 1;
     }
-    socket->closedConnections = func_ov011_02171514(sizeof(GT2Connection), 4, gti2ConnectionFree);
-    if (socket->closedConnections == NULL) {
-        TableFree(socket->connections);
-        gsifree(socket);
+    socketTemp->closedConnections = ArrayNew(sizeof(GT2Connection), 4, gti2ConnectionFree);
+    if (socketTemp->closedConnections == NULL) {
+        TableFree(socketTemp->connections);
+        gsifree(socketTemp);
         return 1;
     }
-    socket->handle = gsiSocket(2, 2, 0);
-    socket->protocol = protocol;
+    socketTemp->socket = socket(2, 2, 0);
+    socketTemp->protocolType = protocol;
     if (protocol == GTI2AdHocProtocol) {
-        socket->protocolOffset = 0;
+        socketTemp->protocolOffset = 0;
     } else {
-        socket->protocolOffset = protocol;
+        socketTemp->protocolOffset = protocol;
     }
-    if (socket->handle == -1) {
-        TableFree(socket->connections);
-        func_ov011_02171558(socket->closedConnections);
-        gsifree(socket);
+    if (socketTemp->socket == -1) {
+        TableFree(socketTemp->connections);
+        ArrayFree(socketTemp->closedConnections);
+        gsifree(socketTemp);
         return 3;
     }
     memset(&address, 0, sizeof(address));
@@ -111,19 +112,19 @@ GT2Result gti2CreateSocket(GT2Socket *socketOut, const char *localAddress, int o
     address.addr.addr = ip;
     address.port = GTI2_SWAP16(port);
     if (protocol != GTI2AdHocProtocol) {
-        if (bind(socket->handle, (SOCKADDR *)&address, sizeof(address)) == -1) {
-            closesocket(socket->handle);
-            TableFree(socket->connections);
-            func_ov011_02171558(socket->closedConnections);
-            gsifree(socket);
+        if (bind(socketTemp->socket, (SOCKADDR *)&address, sizeof(address)) == -1) {
+            closesocket(socketTemp->socket);
+            TableFree(socketTemp->connections);
+            ArrayFree(socketTemp->closedConnections);
+            gsifree(socketTemp);
             return 3;
         }
     }
     addressSize = sizeof(address);
-    getsockname(socket->handle, (SOCKADDR *)&address, &addressSize);
-    socket->ip = address.addr.addr;
-    socket->port = GTI2_SWAP16(address.port);
-    *socketOut = socket;
+    getsockname(socketTemp->socket, (SOCKADDR *)&address, &addressSize);
+    socketTemp->ip = address.addr.addr;
+    socketTemp->port = GTI2_SWAP16(address.port);
+    *socketOut = socketTemp;
     return 0;
 }
 
@@ -132,15 +133,15 @@ void gti2CloseSocket(GT2Socket socket) {
         socket->close = gsi_true;
         return;
     }
-    closesocket(socket->handle);
+    closesocket(socket->socket);
     TableFree(socket->connections);
-    func_ov011_02171558(socket->closedConnections);
+    ArrayFree(socket->closedConnections);
     gsifree(socket);
     SocketShutDown();
 }
 
 void gti2Listen(GT2Socket socket, gt2ConnectAttemptCallback callback) {
-    socket->onConnectAttempt = callback;
+    socket->connectAttemptCallback = callback;
 }
 
 // Allocates a connection
@@ -162,28 +163,28 @@ GT2Result gti2NewSocketConnection(GT2Socket socket, GT2Connection *connectionOut
         connection->port = port;
         connection->socket = socket;
         connection->startTime = current_time();
-        connection->lastSendTime = connection->startTime;
+        connection->lastSend = connection->startTime;
         connection->serialNumber = 0;
         connection->expectedSerialNumber = 0;
-        if (!gti2AllocateBuffer(&connection->incoming, socket->incomingBufferSize)) {
+        if (!gti2AllocateBuffer(&connection->incomingBuffer, socket->incomingBufferSize)) {
             goto fail;
         }
-        if (!gti2AllocateBuffer(&connection->outgoing, socket->outgoingBufferSize)) {
+        if (!gti2AllocateBuffer(&connection->outgoingBuffer, socket->outgoingBufferSize)) {
             goto fail;
         }
-        connection->incomingMessages = func_ov011_02171514(sizeof(GTI2IncomingBufferMessage), 0x40, NULL);
-        if (connection->incomingMessages == NULL) {
+        connection->incomingBufferMessages = ArrayNew(sizeof(GTI2IncomingBufferMessage), 0x40, NULL);
+        if (connection->incomingBufferMessages == NULL) {
             goto fail;
         }
-        connection->outgoingMessages = func_ov011_02171514(sizeof(GTI2OutgoingBufferMessage), 0x40, NULL);
-        if (connection->outgoingMessages == NULL) {
+        connection->outgoingBufferMessages = ArrayNew(sizeof(GTI2OutgoingBufferMessage), 0x40, NULL);
+        if (connection->outgoingBufferMessages == NULL) {
             goto fail;
         }
-        connection->sendFilters = func_ov011_02171514(sizeof(gt2SendFilterCallback), 2, NULL);
+        connection->sendFilters = ArrayNew(sizeof(gt2SendFilterCallback), 2, NULL);
         if (connection->sendFilters == NULL) {
             goto fail;
         }
-        connection->receiveFilters = func_ov011_02171514(sizeof(gt2ReceiveFilterCallback), 2, NULL);
+        connection->receiveFilters = ArrayNew(sizeof(gt2ReceiveFilterCallback), 2, NULL);
         if (connection->receiveFilters == NULL) {
             goto fail;
         }
@@ -195,19 +196,19 @@ GT2Result gti2NewSocketConnection(GT2Socket socket, GT2Connection *connectionOut
     }
 fail:
     if (connection != NULL) {
-        gsifree(connection->incoming.data);
-        gsifree(connection->outgoing.data);
-        if (connection->incomingMessages != NULL) {
-            func_ov011_02171558(connection->incomingMessages);
+        gsifree(connection->incomingBuffer.buffer);
+        gsifree(connection->outgoingBuffer.buffer);
+        if (connection->incomingBufferMessages != NULL) {
+            ArrayFree(connection->incomingBufferMessages);
         }
-        if (connection->outgoingMessages != NULL) {
-            func_ov011_02171558(connection->outgoingMessages);
+        if (connection->outgoingBufferMessages != NULL) {
+            ArrayFree(connection->outgoingBufferMessages);
         }
         if (connection->sendFilters != NULL) {
-            func_ov011_02171558(connection->sendFilters);
+            ArrayFree(connection->sendFilters);
         }
         if (connection->receiveFilters != NULL) {
-            func_ov011_02171558(connection->receiveFilters);
+            ArrayFree(connection->receiveFilters);
         }
         gsifree(connection);
     }
@@ -222,10 +223,10 @@ void gti2FreeSocketConnection(GT2Connection connection) {
         return;
     }
     if (connection->state == 7) {
-        count = func_ov011_02171588(connection->socket->closedConnections);
+        count = ArrayLength(connection->socket->closedConnections);
         for (i = 0; i < count; i++) {
-            if (connection == *(GT2Connection *)func_ov011_0217158c(connection->socket->closedConnections, i)) {
-                func_ov011_02171668(connection->socket->closedConnections, i);
+            if (connection == *(GT2Connection *)ArrayNth(connection->socket->closedConnections, i)) {
+                ArrayDeleteAt(connection->socket->closedConnections, i);
                 return;
             }
         }
@@ -239,7 +240,7 @@ GT2Bool gti2SocketSend(GT2Socket socket, unsigned int ip, unsigned short port, c
     int error;
 
     gti2MessageCheck(&message, &length);
-    if (socket->protocol != GTI2AdHocProtocol && !CanSendOnSocket(socket->handle)) {
+    if (socket->protocolType != GTI2AdHocProtocol && !CanSendOnSocket(socket->socket)) {
         return gsi_true;
     }
     SOCSockAddrIn address = { 0 };
@@ -247,9 +248,9 @@ GT2Bool gti2SocketSend(GT2Socket socket, unsigned int ip, unsigned short port, c
     address.family = 2;
     address.addr.addr = ip;
     address.port = GTI2_SWAP16(port);
-    result = sendto(socket->handle, message, length, 0, (SOCKADDR *)&address, sizeof(address));
+    result = sendto(socket->socket, message, length, 0, (SOCKADDR *)&address, sizeof(address));
     if (result == -1) {
-        error = GOAGetLastError(socket->handle);
+        error = GOAGetLastError(socket->socket);
         if (error == -15) {
             if (!gti2HandleConnectionReset(socket, ip, port)) {
                 return gsi_false;
@@ -264,7 +265,7 @@ GT2Bool gti2SocketSend(GT2Socket socket, unsigned int ip, unsigned short port, c
             gti2SocketError(socket);
             return gsi_false;
         }
-    } else if (socket->onSendDump != NULL) {
+    } else if (socket->sendDumpCallback != NULL) {
         if (!gti2DumpCallback(socket, gti2SocketFindConnection(socket, ip, port), ip, port, gsi_false, message, length,
                               gsi_true)) {
             return gsi_false;
@@ -300,8 +301,8 @@ GT2Bool gti2SocketConnectionsThink(GT2Socket socket) {
 void gti2FreeClosedConnections(GT2Socket socket) {
     int i;
 
-    for (i = func_ov011_02171588(socket->closedConnections) - 1; i >= 0; i--) {
-        gti2FreeSocketConnection(*(GT2Connection *)func_ov011_0217158c(socket->closedConnections, i));
+    for (i = ArrayLength(socket->closedConnections) - 1; i >= 0; i--) {
+        gti2FreeSocketConnection(*(GT2Connection *)ArrayNth(socket->closedConnections, i));
     }
 }
 

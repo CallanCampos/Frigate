@@ -21,15 +21,15 @@ GHTTPBool ghiParseURL(GHIConnection *connection) {
     if (connection == NULL) {
         return gsi_false;
     }
-    url = connection->url;
+    url = connection->URL;
     if (url == NULL) {
         return gsi_false;
     }
     if (strncmp(url, "http://", 7) == 0) {
-        connection->secure = gsi_false;
+        connection->protocol = gsi_false;
         url += 7;
     } else if (strncmp(url, "https://", 8) == 0) {
-        connection->secure = gsi_true;
+        connection->protocol = gsi_true;
         url += 8;
     } else {
         return gsi_false;
@@ -54,7 +54,7 @@ GHTTPBool ghiParseURL(GHIConnection *connection) {
         do {
             url++;
         } while (url[0] != '\0' && url[0] != '/');
-    } else if (connection->secure == gsi_true) {
+    } else if (connection->protocol == gsi_true) {
         connection->serverPort = 443;
     } else {
         connection->serverPort = 80;
@@ -92,19 +92,19 @@ void ghiDoSocketInit(GHIConnection *connection) {
         return;
     }
 
-    if (connection->secure == gsi_true && connection->encryptor.engine == 0) {
+    if (connection->protocol == gsi_true && connection->encryptor.mEngine == 0) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_WarmError,
                       "Encryption engine not set for HTTPS.  Using default engine\r\n");
         ghttpSetRequestEncryptionEngine(connection->request, 5);
-    } else if (connection->secure != gsi_true && connection->encryptor.engine != 0) {
+    } else if (connection->protocol != gsi_true && connection->encryptor.mEngine != 0) {
         ghttpSetRequestEncryptionEngine(connection->request, 0);
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_WarmError,
                       "Encryption engine set for unsecured URL. Removing encryption.\r\n");
     }
 
-    if (connection->secure == gsi_true && connection->encryptor.open == 0) {
+    if (connection->protocol == gsi_true && connection->encryptor.mInitialized == 0) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Debug, "Initializing SSL engine\n");
-        if (connection->encryptor.init(connection, &connection->encryptor) == 3) {
+        if (connection->encryptor.mInitFunc(connection, &connection->encryptor) == 3) {
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_WarmError,
                           "Failed to initialize SSL engine\n");
             connection->completed = gsi_true;
@@ -120,30 +120,30 @@ void ghiDoSocketInit(GHIConnection *connection) {
 void ghiDoHostLookup(GHIConnection *connection) {
     char *host;
 
-    if (connection->hostLookup != NULL) {
+    if (connection->handle != NULL) {
         connection->state = 2;
         ghiCallProgressCallback(connection, NULL, 0);
         return;
     }
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Host Lookup\n");
-    host = connection->proxyAddress;
+    host = connection->proxyOverrideServer;
     if (host == NULL) {
         host = ghiProxyAddress;
         if (host == NULL) {
             host = connection->serverAddress;
         }
     }
-    connection->serverIp = inet_addr(host);
-    if (connection->serverIp == -1) {
-        if (gsiStartResolvingHostname(host, &connection->hostLookup) == -1) {
+    connection->serverIP = inet_addr(host);
+    if (connection->serverIP == -1) {
+        if (gsiStartResolvingHostname(host, &connection->handle) == -1) {
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_HotError, "Thread Creation Failed\n");
-            connection->hostLookup = NULL;
+            connection->handle = NULL;
             connection->completed = gsi_true;
             connection->result = 4;
             return;
         }
     }
-    if (connection->serverIp == -1) {
+    if (connection->serverIP == -1) {
         connection->state = 2;
         ghiCallProgressCallback(connection, NULL, 0);
     } else {
@@ -154,20 +154,20 @@ void ghiDoHostLookup(GHIConnection *connection) {
 
 // Waits for the lookup to end
 void ghiDoLookupPending(GHIConnection *connection) {
-    connection->serverIp = gsiGetResolvedIP(connection->hostLookup);
-    if (connection->serverIp == -1) {
+    connection->serverIP = gsiGetResolvedIP(connection->handle);
+    if (connection->serverIP == -1) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_HotError, "Error resolving hostname\n");
-        connection->hostLookup = NULL;
+        connection->handle = NULL;
         connection->completed = gsi_true;
         connection->result = 4;
         return;
     }
-    if (connection->serverIp == 0) {
+    if (connection->serverIP == 0) {
         connection->state = 2;
         ghiCallProgressCallback(connection, NULL, 0);
         return;
     }
-    connection->hostLookup = NULL;
+    connection->handle = NULL;
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "DNS lookup complete\n");
     connection->state = 3;
     ghiCallProgressCallback(connection, NULL, 0);
@@ -179,7 +179,7 @@ void ghiDoConnecting(GHIConnection *connection) {
 
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Connecting\n");
     if (connection->socket == -1) {
-        connection->socket = gsiSocket(2, 1, 0);
+        connection->socket = socket(2, 1, 0);
         if (connection->socket == -1) {
             connection->completed = gsi_true;
             connection->result = 5;
@@ -193,29 +193,29 @@ void ghiDoConnecting(GHIConnection *connection) {
             return;
         }
         if (connection->throttle != 0) {
-            SetReceiveBufferSize(connection->socket, ghiThrottleBytes);
+            SetReceiveBufferSize(connection->socket, ghiThrottleBufferSize);
         }
-        if (connection->encryptor.engine == 4) {
-            if (connection->encryptor.start(connection, &connection->encryptor) == 3) {
+        if (connection->encryptor.mEngine == 4) {
+            if (connection->encryptor.mStartFunc(connection, &connection->encryptor) == 3) {
                 connection->completed = gsi_true;
                 connection->result = 0x11;
                 return;
             }
-            connection->encryptor.engine = 0;
+            connection->encryptor.mEngine = 0;
         }
 
         {
             SOCSockAddrIn address = { 0 };
 
             address.family = 2;
-            if (connection->proxyAddress != NULL) {
-                address.port = GHI_SWAP16(connection->proxyPort);
+            if (connection->proxyOverrideServer != NULL) {
+                address.port = GHI_SWAP16(connection->proxyOverridePort);
             } else if (ghiProxyAddress != NULL) {
                 address.port = GHI_SWAP16(ghiProxyPort);
             } else {
                 address.port = GHI_SWAP16(connection->serverPort);
             }
-            address.addr.addr = connection->serverIp;
+            address.addr.addr = connection->serverIP;
             result = connect(connection->socket, (SOCKADDR *)&address, 8);
         }
         if (result == -1) {
@@ -246,7 +246,7 @@ void ghiDoConnecting(GHIConnection *connection) {
             return;
         }
         if (result == 1 && ready != 0) {
-            if (connection->encryptor.engine == 0) {
+            if (connection->encryptor.mEngine == 0) {
                 connection->state = 5;
             } else {
                 connection->state = 4;
@@ -262,42 +262,42 @@ void ghiDoSecuringSession(GHIConnection *connection) {
     char buffer[0x401];
     int result;
 
-    if (connection->encryptor.unk_0C == 0) {
+    if (connection->encryptor.mSessionStarted == 0) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Securing Session\n");
-        if (connection->encryptor.start != NULL) {
-            if (connection->encryptor.start(connection, &connection->encryptor) == 3) {
+        if (connection->encryptor.mStartFunc != NULL) {
+            if (connection->encryptor.mStartFunc(connection, &connection->encryptor) == 3) {
                 connection->completed = gsi_true;
                 connection->result = 0x11;
                 return;
             }
         }
-        if (connection->encryptor.active != 0) {
+        if (connection->encryptor.mSessionEstablished != 0) {
             connection->state = 5;
             ghiCallProgressCallback(connection, NULL, 0);
             return;
         }
     }
 
-    if (connection->encryptor.unk_1C != 0) {
-        if (connection->encryptor.start != NULL) {
-            if (connection->encryptor.start(connection, &connection->encryptor) == 3) {
+    if (connection->encryptor.mLibSendsHandshakeMessages != 0) {
+        if (connection->encryptor.mStartFunc != NULL) {
+            if (connection->encryptor.mStartFunc(connection, &connection->encryptor) == 3) {
                 connection->completed = gsi_true;
                 connection->result = 0x11;
                 return;
             }
         }
-        if (connection->encryptor.active != 0) {
+        if (connection->encryptor.mSessionEstablished != 0) {
             connection->state = 5;
             ghiCallProgressCallback(connection, NULL, 0);
         }
         return;
     }
 
-    if (connection->sendBuffer.pos < connection->sendBuffer.length) {
+    if (connection->sendBuffer.pos < connection->sendBuffer.len) {
         if (!ghiSendBufferedData(connection)) {
             return;
         }
-        if (connection->sendBuffer.pos < connection->sendBuffer.length) {
+        if (connection->sendBuffer.pos < connection->sendBuffer.len) {
             return;
         }
         ghiResetBuffer(&connection->sendBuffer);
@@ -321,7 +321,7 @@ void ghiDoSecuringSession(GHIConnection *connection) {
         connection->result = 0x11;
         return;
     }
-    if (connection->encryptor.active != 0) {
+    if (connection->encryptor.mSessionEstablished != 0) {
         connection->state = 5;
         ghiCallProgressCallback(connection, NULL, 0);
     }
@@ -334,14 +334,14 @@ void ghiDoSendingRequest(GHIConnection *connection) {
     char length[16];
 
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment, "Sending Request\n");
-    if (connection->sendBuffer.length == 0) {
-        if (connection->encryptor.engine == 0 || connection->encryptor.mode == 0) {
+    if (connection->sendBuffer.len == 0) {
+        if (connection->encryptor.mEngine == 0 || connection->encryptor.mEncryptOnBuffer == 0) {
             buffer = &connection->sendBuffer;
         } else {
             buffer = &connection->encodeBuffer;
         }
 
-        if (connection->post != NULL && !connection->postingState.finished) {
+        if (connection->post != NULL && !connection->postingState.completed) {
             method = "POST ";
         } else {
             method = "HEAD ";
@@ -350,8 +350,8 @@ void ghiDoSendingRequest(GHIConnection *connection) {
             }
         }
         ghiAppendDataToBuffer(buffer, method, 0);
-        if (connection->proxyAddress != NULL || ghiProxyAddress != NULL) {
-            ghiAppendDataToBuffer(buffer, connection->url, 0);
+        if (connection->proxyOverrideServer != NULL || ghiProxyAddress != NULL) {
+            ghiAppendDataToBuffer(buffer, connection->URL, 0);
         } else {
             ghiAppendDataToBuffer(buffer, connection->requestPath, 0);
         }
@@ -367,27 +367,27 @@ void ghiDoSendingRequest(GHIConnection *connection) {
             ghiAppendDataToBuffer(buffer, "\r\n", 2);
         }
 
-        if (connection->headers == NULL || strstr(connection->headers, "User-Agent") == NULL) {
+        if (connection->sendHeaders == NULL || strstr(connection->sendHeaders, "User-Agent") == NULL) {
             ghiAppendHeaderToBuffer(buffer, "User-Agent", "GameSpyHTTP/1.0");
         }
-        if (connection->keepAlive) {
+        if (connection->persistConnection) {
             ghiAppendHeaderToBuffer(buffer, "Connection", "Keep-Alive");
         } else {
             ghiAppendHeaderToBuffer(buffer, "Connection", "close");
         }
 
-        if (connection->post != NULL && !connection->postingState.finished) {
+        if (connection->post != NULL && !connection->postingState.completed) {
             OS_SPrintf(length, "%d", connection->postingState.totalBytes);
             ghiAppendHeaderToBuffer(buffer, "Content-Length", length);
             ghiAppendHeaderToBuffer(buffer, "Content-Type", ghiPostGetContentType(connection));
         }
-        if (connection->headers != NULL) {
-            ghiAppendDataToBuffer(buffer, connection->headers, 0);
+        if (connection->sendHeaders != NULL) {
+            ghiAppendDataToBuffer(buffer, connection->sendHeaders, 0);
         }
         ghiAppendDataToBuffer(buffer, "\r\n", 2);
 
-        if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
-            if (!ghiEncryptDataToBuffer(&connection->sendBuffer, buffer->data, buffer->length)) {
+        if (connection->encryptor.mEngine != 0 && connection->encryptor.mEncryptOnBuffer == 1) {
+            if (!ghiEncryptDataToBuffer(&connection->sendBuffer, buffer->data, buffer->len)) {
                 connection->completed = gsi_true;
                 connection->result = 0x11;
                 return;
@@ -396,9 +396,9 @@ void ghiDoSendingRequest(GHIConnection *connection) {
         }
     }
 
-    if (ghiSendBufferedData(connection) && connection->sendBuffer.pos >= connection->sendBuffer.length) {
+    if (ghiSendBufferedData(connection) && connection->sendBuffer.pos >= connection->sendBuffer.len) {
         ghiResetBuffer(&connection->sendBuffer);
-        if (connection->post != NULL && !connection->postingState.finished) {
+        if (connection->post != NULL && !connection->postingState.completed) {
             connection->state = 6;
         } else {
             connection->state = 7;
@@ -426,7 +426,7 @@ void ghiDoPosting(GHIConnection *connection) {
         return;
     }
     if (result == 3) {
-        connection->postingState.isXml = gsi_false;
+        connection->postingState.waitPostContinue = gsi_false;
         return;
     }
     if (bytesPosted != connection->postingState.bytesPosted) {
@@ -434,7 +434,7 @@ void ghiDoPosting(GHIConnection *connection) {
     }
     if (result == 1) {
         ghiPostCleanupState(connection);
-        connection->postingState.finished = gsi_true;
+        connection->postingState.completed = gsi_true;
         connection->state = 7;
         ghiCallProgressCallback(connection, NULL, 0);
     }
@@ -481,10 +481,10 @@ static GHTTPBool ghiParseStatus(GHIConnection *connection) {
 
     for (; (c = connection->recvBuffer.data[textEnd]) != '\0' && ghiIsSpace(c); textEnd++) {
     }
-    connection->httpMajor = major;
-    connection->httpMinor = minor;
+    connection->statusMajorVersion = major;
+    connection->statusMinorVersion = minor;
     connection->statusCode = code;
-    connection->statusTextPos = textEnd;
+    connection->statusStringIndex = textEnd;
     return gsi_true;
 }
 
@@ -503,7 +503,7 @@ void ghiDoReceivingStatus(GHIConnection *connection) {
         return;
     }
     if (result == 0) {
-        if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
+        if (connection->encryptor.mEngine != 0 && connection->encryptor.mEncryptOnBuffer == 1) {
             if (!ghiAppendDataToBuffer(&connection->decodeBuffer, buffer, size)) {
                 return;
             }
@@ -526,9 +526,9 @@ void ghiDoReceivingStatus(GHIConnection *connection) {
         if (!ghiParseStatus(connection)) {
             return;
         }
-        connection->headersPos = lineLength + 2;
-        if (connection->statusCode == 100 && connection->postingState.isXml != 0) {
-            connection->postingState.isXml = gsi_false;
+        connection->headerStringIndex = lineLength + 2;
+        if (connection->statusCode == 100 && connection->postingState.waitPostContinue != 0) {
+            connection->postingState.waitPostContinue = gsi_false;
             ghiResetBuffer(&connection->recvBuffer);
             connection->state = 6;
             ghiCallProgressCallback(connection, NULL, 0);
@@ -549,16 +549,16 @@ static GHTTPBool ghiDeliverIncomingFileData(GHIConnection *connection, const cha
     const char *delivered = NULL;
     int deliveredSize = 0;
 
-    connection->bytesReceived += size;
-    if (connection->bytesReceived == connection->totalSize || connection->closing != 0) {
+    connection->fileBytesReceived += size;
+    if (connection->fileBytesReceived == connection->totalSize || connection->connectionClosed != 0) {
         connection->completed = gsi_true;
     }
     if (connection->type == GHIGET) {
-        if (!ghiAppendDataToBuffer(&connection->fileBuffer, data, size)) {
+        if (!ghiAppendDataToBuffer(&connection->getFileBuffer, data, size)) {
             return gsi_false;
         }
-        delivered = connection->fileBuffer.data;
-        deliveredSize = connection->fileBuffer.length;
+        delivered = connection->getFileBuffer.data;
+        deliveredSize = connection->getFileBuffer.len;
     } else if (connection->type == GHISAVE) {
         if (size != 0) {
             connection->completed = gsi_true;
@@ -576,7 +576,7 @@ static GHTTPBool ghiDeliverIncomingFileData(GHIConnection *connection, const cha
 }
 
 // The size of the chunk that a chunk header tells, or -1
-static int ghiGetChunkSize(GHIConnection *connection) {
+static int ghiParseChunkSize(GHIConnection *connection) {
     int size;
 
     if (STD_TSScanf(connection->chunkHeader, "%x", &size) != 1) {
@@ -586,55 +586,55 @@ static int ghiGetChunkSize(GHIConnection *connection) {
 }
 
 // Adds to the header of the chunk that is being read
-static void ghiAppendChunkHeader(GHIConnection *connection, const char *data, int size) {
+static void ghiAppendToChunkHeaderBuffer(GHIConnection *connection, const char *data, int size) {
     int count;
 
-    if (size != 0 && connection->chunkHeaderLength < 10) {
-        count = 10 - connection->chunkHeaderLength;
+    if (size != 0 && connection->chunkHeaderLen < 10) {
+        count = 10 - connection->chunkHeaderLen;
         if (count >= size) {
             count = size;
         }
-        memcpy(connection->chunkHeader + connection->chunkHeaderLength, data, count);
-        connection->chunkHeaderLength += count;
-        connection->chunkHeader[connection->chunkHeaderLength] = '\0';
+        memcpy(connection->chunkHeader + connection->chunkHeaderLen, data, count);
+        connection->chunkHeaderLen += count;
+        connection->chunkHeader[connection->chunkHeaderLen] = '\0';
     }
 }
 
 // Sends the file's bytes that came to the game, taking them out of their chunks if the file comes in chunks. Returns
 // gsi_false if the request failed
 GHTTPBool ghiProcessIncomingFileData(GHIConnection *connection, const char *data, int size) {
-    if (connection->chunked) {
+    if (connection->chunkedTransfer) {
         while (size > 0) {
-            if (connection->chunkState == 0) {
+            if (connection->chunkReadingState == 0) {
                 const char *lineEnd = strchr(data, '\n');
                 int chunkSize;
 
                 if (lineEnd != NULL) {
-                    ghiAppendChunkHeader(connection, data, lineEnd - data);
+                    ghiAppendToChunkHeaderBuffer(connection, data, lineEnd - data);
                     size -= lineEnd + 1 - data;
                     data = lineEnd + 1;
-                    chunkSize = ghiGetChunkSize(connection);
-                    connection->chunkRemaining = chunkSize;
+                    chunkSize = ghiParseChunkSize(connection);
+                    connection->chunkBytesLeft = chunkSize;
                     if (chunkSize == -1) {
                         connection->completed = gsi_true;
                         connection->result = 7;
                         return gsi_false;
                     }
                     if (chunkSize == 0) {
-                        connection->chunkState = 3;
+                        connection->chunkReadingState = 3;
                         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_RawDump,
                                       "Reading footer\n");
                     } else {
-                        connection->chunkState = 1;
+                        connection->chunkReadingState = 1;
                         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_RawDump,
                                       "Reading %d byte chunk\n", chunkSize);
                     }
                 } else {
-                    ghiAppendChunkHeader(connection, data, size);
+                    ghiAppendToChunkHeaderBuffer(connection, data, size);
                     return gsi_true;
                 }
-            } else if (connection->chunkState == 1) {
-                int count = connection->chunkRemaining;
+            } else if (connection->chunkReadingState == 1) {
+                int count = connection->chunkBytesLeft;
 
                 if (count >= size) {
                     count = size;
@@ -646,11 +646,11 @@ GHTTPBool ghiProcessIncomingFileData(GHIConnection *connection, const char *data
                 }
                 data += count;
                 size -= count;
-                connection->chunkRemaining -= count;
-                if (connection->chunkRemaining == 0) {
-                    connection->chunkState = 2;
+                connection->chunkBytesLeft -= count;
+                if (connection->chunkBytesLeft == 0) {
+                    connection->chunkReadingState = 2;
                 }
-            } else if (connection->chunkState == 2) {
+            } else if (connection->chunkReadingState == 2) {
                 const char *lineEnd = strchr(data, '\n');
 
                 if (lineEnd == NULL) {
@@ -659,11 +659,11 @@ GHTTPBool ghiProcessIncomingFileData(GHIConnection *connection, const char *data
                 size -= lineEnd + 1 - data;
                 data = lineEnd + 1;
                 connection->chunkHeader[0] = '\0';
-                connection->chunkHeaderLength = 0;
-                connection->chunkRemaining = 0;
-                connection->chunkState = 0;
+                connection->chunkHeaderLen = 0;
+                connection->chunkBytesLeft = 0;
+                connection->chunkReadingState = 0;
                 gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_RawDump, "Read chunk footer\n");
-            } else if (connection->chunkState == 3) {
+            } else if (connection->chunkReadingState == 3) {
                 connection->completed = gsi_true;
                 gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_RawDump,
                               "Finished reading chunks\n");
@@ -715,7 +715,7 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
         return;
     }
     if (result == 0) {
-        if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
+        if (connection->encryptor.mEngine != 0 && connection->encryptor.mEncryptOnBuffer == 1) {
             if (!ghiAppendDataToBuffer(&connection->decodeBuffer, buffer, size)) {
                 ghiFreeIfSet(buffer);
                 return;
@@ -735,7 +735,7 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
     }
 
     data = connection->recvBuffer.data;
-    headersPos = connection->headersPos;
+    headersPos = connection->headerStringIndex;
     headers = data + headersPos;
     if (connection->statusCode / 100 == 1 && (strncmp(headers, "\r\n", 2) == 0 || strncmp(headers, "\n\n", 2) == 0)) {
         skipCR = gsi_false;
@@ -752,19 +752,19 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
         }
         headersEnd[0] = '\0';
         body = headersEnd + 2;
-        bodyLength = connection->recvBuffer.length - (body - connection->recvBuffer.data);
-        connection->recvBuffer.length = headersEnd - connection->recvBuffer.data + 1;
-        connection->recvBuffer.pos = connection->recvBuffer.length;
+        bodyLength = connection->recvBuffer.len - (body - connection->recvBuffer.data);
+        connection->recvBuffer.len = headersEnd - connection->recvBuffer.data + 1;
+        connection->recvBuffer.pos = connection->recvBuffer.len;
 
         if (connection->statusCode / 100 == 1) {
             if (bodyLength != 0) {
                 memmove(connection->recvBuffer.data, body, bodyLength + 1);
-                connection->recvBuffer.length = bodyLength;
+                connection->recvBuffer.len = bodyLength;
             } else {
                 ghiResetBuffer(&connection->recvBuffer);
             }
-            if (connection->postingState.isXml != 0) {
-                connection->postingState.isXml = gsi_false;
+            if (connection->postingState.waitPostContinue != 0) {
+                connection->postingState.waitPostContinue = gsi_false;
                 connection->state = 6;
                 ghiCallProgressCallback(connection, NULL, 0);
             }
@@ -797,16 +797,16 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
                 }
                 end[0] = '\0';
                 if (location[0] == '/') {
-                    connection->redirectUrl = gsimalloc(strlen(connection->serverAddress) + 14 + strlen(location));
-                    if (connection->redirectUrl == NULL) {
+                    connection->redirectURL = gsimalloc(strlen(connection->serverAddress) + 14 + strlen(location));
+                    if (connection->redirectURL == NULL) {
                         connection->completed = gsi_true;
                         connection->result = 1;
                     }
-                    OS_SPrintf(connection->redirectUrl, "http://%s:%d%s", connection->serverAddress,
+                    OS_SPrintf(connection->redirectURL, "http://%s:%d%s", connection->serverAddress,
                                connection->serverPort, location);
                 } else {
-                    connection->redirectUrl = goastrdup(location);
-                    if (connection->redirectUrl == NULL) {
+                    connection->redirectURL = goastrdup(location);
+                    if (connection->redirectURL == NULL) {
                         connection->completed = gsi_true;
                         connection->result = 1;
                     }
@@ -844,12 +844,12 @@ void ghiDoReceivingHeaders(GHIConnection *connection) {
             connection->totalSize = atol(digits);
         }
 
-        connection->chunked = strstr(headers, "Transfer-Encoding: chunked") != NULL ? gsi_true : gsi_false;
-        if (connection->chunked) {
+        connection->chunkedTransfer = strstr(headers, "Transfer-Encoding: chunked") != NULL ? gsi_true : gsi_false;
+        if (connection->chunkedTransfer) {
             connection->chunkHeader[0] = '\0';
-            connection->chunkHeaderLength = 0;
-            connection->chunkRemaining = 0;
-            connection->chunkState = 0;
+            connection->chunkHeaderLen = 0;
+            connection->chunkBytesLeft = 0;
+            connection->chunkReadingState = 0;
         }
         if (connection->type == GHIHEAD || connection->type == GHIPOST) {
             connection->completed = gsi_true;
@@ -894,49 +894,49 @@ void ghiDoReceivingFile(GHIConnection *connection) {
         result = ghiDoReceive(connection, buffer, &size);
         if (result == 1) {
             ghiFreeIfSet(buffer);
-            if (connection->lastRecvTime == 0) {
-                connection->lastRecvTime = current_time();
+            if (connection->receiveFileIdleTime == 0) {
+                connection->receiveFileIdleTime = current_time();
                 return;
             }
-            if (current_time() - connection->lastRecvTime < 30000) {
+            if (current_time() - connection->receiveFileIdleTime < 30000) {
                 return;
             }
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_HotError,
-                          "Receive File Idle Timeout %d ===== \r\n", current_time() - connection->lastRecvTime);
-            connection->lastRecvTime = 0;
+                          "Receive File Idle Timeout %d ===== \r\n", current_time() - connection->receiveFileIdleTime);
+            connection->receiveFileIdleTime = 0;
             connection->completed = gsi_true;
             connection->result = 19;
             return;
         }
-        connection->lastRecvTime = 0;
+        connection->receiveFileIdleTime = 0;
         if (result == 3) {
             ghiFreeIfSet(buffer);
             return;
         }
         if (result == 2) {
             connection->completed = gsi_true;
-            if (connection->totalSize > 0 && connection->bytesReceived < connection->totalSize) {
+            if (connection->totalSize > 0 && connection->fileBytesReceived < connection->totalSize) {
                 connection->result = 15;
             }
             ghiFreeIfSet(buffer);
             return;
         }
 
-        if (connection->encryptor.engine != 0 && connection->encryptor.mode == 1) {
+        if (connection->encryptor.mEngine != 0 && connection->encryptor.mEncryptOnBuffer == 1) {
             int received;
 
             if (!ghiAppendDataToBuffer(&connection->decodeBuffer, buffer, size)) {
                 ghiFreeIfSet(buffer);
                 return;
             }
-            connection->recvBuffer.length = connection->recvBuffer.pos;
+            connection->recvBuffer.len = connection->recvBuffer.pos;
             if (!ghiDecryptReceivedData(connection)) {
                 connection->completed = gsi_true;
                 connection->result = 0x11;
                 ghiFreeIfSet(buffer);
                 return;
             }
-            received = connection->recvBuffer.length - connection->recvBuffer.pos;
+            received = connection->recvBuffer.len - connection->recvBuffer.pos;
             if (received != 0) {
                 if (!ghiProcessIncomingFileData(connection, connection->recvBuffer.data + connection->recvBuffer.pos,
                                                 received)) {

@@ -234,8 +234,8 @@ static int FindRequest(reqtype_t reqtype, int localid, int profileid) {
     if (serverreqs == NULL) {
         return -1;
     }
-    for (i = 0; i < func_ov011_02171588(serverreqs); i++) {
-        req = func_ov011_0217158c(serverreqs, i);
+    for (i = 0; i < ArrayLength(serverreqs); i++) {
+        req = ArrayNth(serverreqs, i);
         if (req->reqtype == reqtype && req->localid == localid && req->profileid == profileid) {
             return i;
         }
@@ -257,7 +257,7 @@ static void ProcessPlayerAuth(const char *buf, int len) {
     if (reqindex == -1) {
         return;
     }
-    ((StatsServerRequest *)func_ov011_0217158c(serverreqs, reqindex))->profileid = pid;
+    ((StatsServerRequest *)ArrayNth(serverreqs, reqindex))->profileid = pid;
     CallReqCallback(reqindex, pid > 0, 0, errmsg, 0);
 }
 
@@ -273,7 +273,7 @@ static void ProcessGetPid(const char *buf, int len) {
     if (reqindex == -1) {
         return;
     }
-    ((StatsServerRequest *)func_ov011_0217158c(serverreqs, reqindex))->profileid = pid;
+    ((StatsServerRequest *)ArrayNth(serverreqs, reqindex))->profileid = pid;
     CallReqCallback(reqindex, pid > 0, 0, NULL, 0);
 }
 
@@ -363,10 +363,10 @@ static int ProcessInBuffer(char *buff, int len) {
 static void CallReqCallback(int reqindex, int success, gsi_u32 modified, char *data, int length) {
     StatsServerRequest *req;
 
-    if (reqindex < 0 || reqindex >= func_ov011_02171588(serverreqs)) {
+    if (reqindex < 0 || reqindex >= ArrayLength(serverreqs)) {
         return;
     }
-    req = func_ov011_0217158c(serverreqs, reqindex);
+    req = ArrayNth(serverreqs, reqindex);
     if (req->callback != NULL) {
         switch (req->reqtype) {
         case rt_authcb:
@@ -385,7 +385,7 @@ static void CallReqCallback(int reqindex, int success, gsi_u32 modified, char *d
             break;
         }
     }
-    func_ov011_02171668(serverreqs, reqindex);
+    ArrayDeleteAt(serverreqs, reqindex);
 }
 
 // Calls the callbacks of the requests left, when the connection is lost, with "Connection Lost"
@@ -395,14 +395,14 @@ static void ClosePendingCallbacks(void) {
     if (serverreqs == NULL) {
         return;
     }
-    for (i = func_ov011_02171588(serverreqs) - 1; i >= 0; i--) {
+    for (i = ArrayLength(serverreqs) - 1; i >= 0; i--) {
         char connerror[] = "\x13\x1D\x1\x4\x0\x0\x0\x28\x1F\x6\x45\x34\x3F\x1\x1B";
 
         enc = enc3;
         xcode_buf(connerror, sizeof(connerror) - 1);
         CallReqCallback(i, 0, 0, connerror, 0);
     }
-    func_ov011_02171558(serverreqs);
+    ArrayFree(serverreqs);
     serverreqs = NULL;
 }
 
@@ -413,7 +413,7 @@ int GetTeamIndex(statsgame_t game, int tnum) {
     if (game == NULL) {
         return tnum;
     }
-    return *(int *)func_ov011_0217158c(game->teamnums, tnum);
+    return *(int *)ArrayNth(game->teamnums, tnum);
 }
 
 int GetPlayerIndex(statsgame_t game, int pnum) {
@@ -423,7 +423,7 @@ int GetPlayerIndex(statsgame_t game, int pnum) {
     if (game == NULL) {
         return pnum;
     }
-    return *(int *)func_ov011_0217158c(game->playernums, pnum);
+    return *(int *)ArrayNth(game->playernums, pnum);
 }
 
 // Applies an operation to a bucket of the game, or creates the bucket with the value

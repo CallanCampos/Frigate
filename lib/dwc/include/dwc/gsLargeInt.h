@@ -10,8 +10,8 @@
 
 // A number of up to 64 words, the lowest first, and how many of them it uses (GameSpy's gsLargeInt_t)
 typedef struct gsLargeInt_s {
-    gsi_u32 length;
-    gsi_u32 data[0x40];
+    gsi_u32 mLength;
+    gsi_u32 mData[0x40];
 } gsLargeInt_t;
 
 // The power of a number modulo an odd modulus, which gives gsi_false for a modulus of 0 or an even one

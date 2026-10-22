@@ -83,9 +83,9 @@
 #define GPI_PEER_DISCONNECTED 106
 
 typedef struct GPIBuddyStatus GPIBuddyStatus;
-typedef struct GPIBuddyStatusInfo GPIBuddyStatusInfo;
+typedef struct _GPIBuddyStatusInfo GPIBuddyStatusInfo;
 typedef struct GPIInfoCache GPIInfoCache;
-typedef struct GPIPeer GPIPeer;
+typedef struct GPIPeer_s GPIPeer;
 
 // A text that grows as it is written to (gpiBuffer.c): len of size bytes are used, and pos is how far it was sent or
 typedef enum _GPIBool { GPIFalse, GPITrue } GPIBool;
@@ -115,7 +115,7 @@ typedef struct GPICallbackData {
 
 // An operation in progress (gpiOperation.c), in the connection's list: its kind and state, its data (GPIConnectData,
 // GPISearchData or nothing), the app's callback for its end, and the id of the server's messages that answer it
-typedef struct GPIOperation {
+typedef struct GPIOperation_s {
     int type;
     void *data;
     GPIBool blocking;
@@ -123,7 +123,7 @@ typedef struct GPIOperation {
     int state;
     int id;
     GPResult result;
-    struct GPIOperation *pnext;
+    struct GPIOperation_s *pnext;
 } GPIOperation;
 
 // What a connect operation keeps (gpiConnect.c): the server's challenge and ours, the hash of the password, and the
@@ -156,7 +156,7 @@ struct GPIBuddyStatus {
     GPEnum quietModeFlags;
 };
 
-struct GPIBuddyStatusInfo {
+struct _GPIBuddyStatusInfo {
     int buddyIndex;
     GPEnum statusState;
     char *richStatus;
@@ -222,7 +222,7 @@ typedef struct GPIProfile {
     gsi_bool blocked;
     int blockIndex;
     gsi_bool buddyOrBlockCache;
-    gsi_bool deleted;
+    gsi_bool deletedLocally;
 } GPIProfile;
 
 // The table of the profiles, by their ids, with how many there are, and how many buddies and blocked players
@@ -234,18 +234,18 @@ typedef struct GPIProfileList {
 } GPIProfileList;
 
 // An operation that a peer waits on (gpiPeer.c), with the app's callback and when it times out, and the queue of them
-typedef struct GPIPeerOp {
-    int type;
+typedef struct _GPIPeerOp {
+    int state;
     void *userData;
     GPCallback callback;
-    struct GPIPeerOp *next;
-    int state;
+    struct _GPIPeerOp *next;
+    int type;
     gsi_time timeout;
 } GPIPeerOp;
 
-typedef struct GPIPeerOpQueue {
-    GPIPeerOp *first;
+typedef struct _GPIPeerOpQueue {
     GPIPeerOp *opList;
+    GPIPeerOp *first;
     GPIPeerOp *last;
 } GPIPeerOpQueue;
 
@@ -257,15 +257,15 @@ typedef struct GPIMessage {
 } GPIMessage;
 
 // What names a file transfer (gpiTransfer.c): the profile that sends it, a count and a time
-typedef struct GPITransferID {
+typedef struct GPITransferID_s {
     int profileid;
     unsigned int count;
     unsigned int time;
 } GPITransferID;
 
-// A peer (gpiPeer.c): a buddy that messages go to directly, through the Udp Engine (dwc/gt2.h), in the connection's
-// list. initiated is set on the side that connected
-struct GPIPeer {
+// A peer (gpiPeer.c): a buddy that messages go to directly, through the Udp Engine (dwc/gsUdpEngine.h), in the
+// connection's list. initiated is set on the side that connected
+struct GPIPeer_s {
     int state;
     GPIBool initiated;
     unsigned int ip;
@@ -277,7 +277,7 @@ struct GPIPeer {
     GPIBuffer outputBuffer;
     DArray messages; // of GPIMessage
     GPIPeerOpQueue peerOpQueue;
-    struct GPIPeer *pnext;
+    struct GPIPeer_s *pnext;
 };
 
 // A search of the search manager (gpiSearch.c): its kind, the socket and its buffers, what it looks for, and whether it
@@ -306,7 +306,7 @@ typedef struct GPISearchData {
     gsi_time searchStartTime;
     int *revBuddyProfileIds;
     int numOfRevBuddyProfiles;
-    int searchProfileId;
+    int profile;
     int maxResults;
 } GPISearchData;
 

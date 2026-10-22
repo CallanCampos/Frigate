@@ -552,7 +552,7 @@ void DWC_ShutdownFriendsMatch(void) {
         DWCi_ShutdownMatch();
         DWCi_ShutdownTransport();
         if (sMatchRoot.fm->gt2Socket != NULL) {
-            func_ov011_0217d158(sMatchRoot.fm->gt2Socket);
+            gt2CloseSocket(sMatchRoot.fm->gt2Socket);
             sMatchRoot.fm->gt2Socket = NULL;
         }
         DWC_Free(4, sMatchRoot.fm, 0);
@@ -933,14 +933,13 @@ int DWCi_GT2Startup(void) {
         return 0;
     }
     port = DWCi_GetMathRand32(0x4000) + 0xc000;
-    result =
-        func_ov011_0217d144(&sMatchRoot.fm->gt2Socket, func_ov011_0217ed14(0, port, NULL),
-                            sMatchRoot.fm->gt2SendBufSize, sMatchRoot.fm->gt2RecvBufSize, DWCi_GT2SocketErrorCallback);
+    result = gt2CreateSocket(&sMatchRoot.fm->gt2Socket, gt2AddressToString(0, port, NULL),
+                             sMatchRoot.fm->gt2SendBufSize, sMatchRoot.fm->gt2RecvBufSize, DWCi_GT2SocketErrorCallback);
     if (DWCi_HandleGT2Error(result)) {
         return result;
     }
-    func_ov011_0217d188(sMatchRoot.fm->gt2Socket, DWCi_GT2ConnectAttemptCallback);
-    func_ov011_0217d3a0(sMatchRoot.fm->gt2Socket, DWCi_GT2UnrecognizedMessageCallback);
+    gt2Listen(sMatchRoot.fm->gt2Socket, DWCi_GT2ConnectAttemptCallback);
+    gt2SetUnrecognizedMessageCallback(sMatchRoot.fm->gt2Socket, DWCi_GT2UnrecognizedMessageCallback);
     return result;
 }
 
@@ -1600,7 +1599,7 @@ static int DWCi_QR2Startup(s32 profileId) {
     retries = 0;
     do {
         result = qr2_init_socketA(&DWCi_GetMatchCnt()->qr2Obj, gt2GetSocketSOCKET(DWCi_GetMatchCnt()->fm->gt2Socket),
-                                  func_ov011_0217d38c(DWCi_GetMatchCnt()->fm->gt2Socket), DWCi_GetMatchCnt()->gameName,
+                                  gt2GetLocalPort(DWCi_GetMatchCnt()->fm->gt2Socket), DWCi_GetMatchCnt()->gameName,
                                   DWCi_GetMatchCnt()->secretKey, 1, 1, DWCi_QR2ServerKeyCallback,
                                   DWCi_QR2PlayerKeyCallback, DWCi_QR2TeamKeyCallback, DWCi_QR2KeyListCallback,
                                   DWCi_QR2CountCallback, DWCi_QR2AddErrorCallback, NULL);
@@ -1797,7 +1796,7 @@ static void DWCi_MatchProcess(int a0) {
             qr2_think(DWCi_GetMatchCnt()->qr2Obj);
         }
         if (DWCi_GetMatchCnt()->fm != NULL) {
-            func_ov011_0217d168(DWCi_GetMatchCnt()->fm->gt2Socket);
+            gt2Think(DWCi_GetMatchCnt()->fm->gt2Socket);
         }
         return;
     }
@@ -2094,7 +2093,7 @@ static void DWCi_MatchProcess(int a0) {
         NNFreeNegotiateList();
     }
     if (DWCi_GetMatchCnt()->fm != NULL) {
-        func_ov011_0217d168(DWCi_GetMatchCnt()->fm->gt2Socket);
+        gt2Think(DWCi_GetMatchCnt()->fm->gt2Socket);
     }
     if (DWCi_GetMatchCnt()->state == 0x15 &&
         OS_TicksToMilliSeconds(OS_GetTick() - DWCi_GetMatchCnt()->closedTime) > 3000) {
@@ -2153,7 +2152,7 @@ static void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection conne
         return;
     }
     if (DWCi_GetMatchCnt() == NULL || DWCi_GetMatchCnt()->state != 6 || DWCi_GetMatchCnt()->cancelState != 0) {
-        func_ov011_0217d198(connection, "Init state", -1);
+        gt2Reject(connection, "Init state", -1);
         return;
     }
     if (message != NULL && length != 0) {
@@ -2161,7 +2160,7 @@ static void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection conne
     }
     slot = DWCi_GT2GetConnectionListIdx();
     if (slot == -1) {
-        func_ov011_0217d198(connection, "Server full", -1);
+        gt2Reject(connection, "Server full", -1);
         if (func_ov011_02168468() == 1) {
             DWCi_StopResendingMatchCommand();
             DWCi_SetMatchStatus(1);
@@ -2175,12 +2174,12 @@ static void DWCi_GT2ConnectAttemptCallback(GT2Socket socket, GT2Connection conne
             DWCi_GetMatchCnt()->self.hostIp = ip;
             DWCi_GetMatchCnt()->self.hostPort = MATCH_SWAP16(port);
         } else {
-            func_ov011_0217d198(connection, "Unknown connect attempt", -1);
+            gt2Reject(connection, "Unknown connect attempt", -1);
             return;
         }
     }
     DWCi_GetMatchCnt()->nnFinishTime = 0;
-    if (!func_ov011_0217d190(connection, DWCi_GetMatchCnt()->gt2Callbacks)) {
+    if (!gt2Accept(connection, DWCi_GetMatchCnt()->gt2Callbacks)) {
         DWCi_StopMatching(6, -80410);
         return;
     }
@@ -2241,9 +2240,9 @@ static void DWCi_GT2ConnectedCallback(GT2Connection connection, GT2Result result
             }
             DWCi_FormatProfileID(text, 0x18);
             work = DWCi_GetMatchCnt();
-            address = func_ov011_0217ed14(DWCi_GetMatchCnt()->self.hostIp, DWCi_GetMatchCnt()->self.hostPort, NULL);
-            status = func_ov011_0217d1a0(work->fm->gt2Socket, NULL, address, text, -1, 5000,
-                                         DWCi_GetMatchCnt()->gt2Callbacks, FALSE);
+            address = gt2AddressToString(DWCi_GetMatchCnt()->self.hostIp, DWCi_GetMatchCnt()->self.hostPort, NULL);
+            status =
+                gt2Connect(work->fm->gt2Socket, NULL, address, text, -1, 5000, DWCi_GetMatchCnt()->gt2Callbacks, FALSE);
             if (status == 1) {
                 DWCi_HandleMatchGT2Error(status);
                 return;
@@ -2806,7 +2805,7 @@ static int DWCi_NNStartupAsync(int reset, u32 token, DWCNodeInfo *peer) {
             DWCi_GetMatchCnt()->target.cookie = token;
         } else {
             hostInfo[0] = SOC_GetHostID();
-            hostInfo[1] = func_ov011_0217d38c(DWCi_GetMatchCnt()->fm->gt2Socket);
+            hostInfo[1] = gt2GetLocalPort(DWCi_GetMatchCnt()->fm->gt2Socket);
             int sent = DWCi_SendMatchCommand(6, peer->profileId, peer->publicIp, peer->publicPort, hostInfo, 2);
             DWCi_GetMatchCnt()->cmdCount = 0;
             if (sent != 0) {
@@ -2844,7 +2843,7 @@ static int DWCi_DoNatNegotiationAsync(MatchTarget *target) {
     if (target->kind == 0) {
         DWCMatchControl *work = DWCi_GetMatchCnt();
         if (DWCi_HandleSBError(ServerBrowserSendNatNegotiateCookieToServerA(
-                work->sbObj, func_ov011_0217ed14(target->ip, 0, 0), target->port, target->cookie)) != 0) {
+                work->sbObj, gt2AddressToString(target->ip, 0, 0), target->port, target->cookie)) != 0) {
             return 2;
         }
     }
@@ -2936,7 +2935,7 @@ static int DWCi_SendSBMsgCommand(int type, u32 ip, u16 port, const u32 *data, in
     DWCi_MakeMatchCommandPacket(&packet, type, data, count);
     for (i = 0; i < 1; i++) {
         result =
-            ServerBrowserSendMessageToServerA(DWCi_GetMatchCnt()->sbObj, func_ov011_0217ed14(ip, 0, NULL), port,
+            ServerBrowserSendMessageToServerA(DWCi_GetMatchCnt()->sbObj, gt2AddressToString(ip, 0, NULL), port,
                                               (const char *)&packet, packet.header.size + sizeof(MatchPacketHeader));
         if (result == 0 || result != 2) {
             break;
@@ -2960,7 +2959,7 @@ static int DWCi_SendGPBuddyMsgCommand(void *gp, u8 command, int id, const char *
         MI_CpuCopy8(text, end, textLength);
         end[textLength] = 0;
     }
-    return gpSendBuddyMessage(gp, id, buffer);
+    return gpSendBuddyMessageA(gp, id, buffer);
 }
 
 static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 port, const u32 *data, int count) {
@@ -5365,9 +5364,9 @@ static void DWCi_NNCompletedCallback(NegotiateResult result, SOCKET gameSocket, 
                 DWCi_SetMatchStatus(DWCi_GetMatchCnt()->state == 0xe ? 0xf : 6);
                 DWCi_GetMatchCnt()->retries = 0;
                 DWCi_FormatProfileID(buffer, 0x18);
-                status = func_ov011_0217d1a0(
+                status = gt2Connect(
                     DWCi_GetMatchCnt()->fm->gt2Socket, 0,
-                    func_ov011_0217ed14(DWCi_GetMatchCnt()->self.hostIp, DWCi_GetMatchCnt()->self.hostPort, 0), buffer,
+                    gt2AddressToString(DWCi_GetMatchCnt()->self.hostIp, DWCi_GetMatchCnt()->self.hostPort, 0), buffer,
                     -1, 5000, DWCi_GetMatchCnt()->gt2Callbacks, 0);
                 if (DWCi_GetMatchCnt()->memberConnecting != 0 && status != 0) {
                     DWCi_GetNodeInfoByProfileID(DWCi_GetMatchCnt()->self.profileId)->connectFailureCount++;

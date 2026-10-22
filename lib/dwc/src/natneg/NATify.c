@@ -127,9 +127,9 @@ static int Think(SOCKET sock, NAT *nat) {
             if (type == 2) {
                 // The packet's fields after the port type are not aligned on the wire
                 memcpy(&packet, data, 21);
-                memcpy(&packet.packet.init.localIp, &data[15], 4);
-                memcpy(&packet.packet.init.localPort, &data[19], 2);
-                switch (packet.packet.init.portType) {
+                memcpy(&packet.Packet.init.localip, &data[15], 4);
+                memcpy(&packet.Packet.init.localport, &data[19], 2);
+                switch (packet.Packet.init.porttype) {
                 case 1:
                     gotERT1 = gsi_true;
                     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
@@ -153,8 +153,8 @@ static int Think(SOCKET sock, NAT *nat) {
                 }
             } else if (type == 11) {
                 memcpy(&packet, data, 21);
-                memcpy(&packet.packet.init.localIp, &data[15], 4);
-                memcpy(&packet.packet.init.localPort, &data[19], 2);
+                memcpy(&packet.Packet.init.localip, &data[15], 4);
+                memcpy(&packet.Packet.init.localport, &data[19], 2);
                 packet.cookie = NN_SWAP32(packet.cookie);
                 switch (packet.cookie) {
                 case 0:
@@ -172,8 +172,8 @@ static int Think(SOCKET sock, NAT *nat) {
                 }
                 nat->mappings[packet.cookie].privateIp = GetLocalIP();
                 nat->mappings[packet.cookie].privatePort = NN_SWAP16(GetLocalPort(sock));
-                nat->mappings[packet.cookie].publicIp = packet.packet.init.localIp;
-                nat->mappings[packet.cookie].publicPort = NN_SWAP16(packet.packet.init.localPort);
+                nat->mappings[packet.cookie].publicIp = packet.Packet.init.localip;
+                nat->mappings[packet.cookie].publicPort = NN_SWAP16(packet.Packet.init.localport);
                 gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Comment,
                               "Got ADDRESS REPLY %d from: %s\n", packet.cookie,
                               AddressToString(from.addr.addr, NN_SWAP16(from.port), NULL));

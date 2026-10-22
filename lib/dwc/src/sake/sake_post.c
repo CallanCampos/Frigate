@@ -1,35 +1,36 @@
 #include "sake_internal.h"
 
-// Posting a request's message to the storage server, whose URL is made once from the game's name.
+// Posting a request's message to the storage server, whose URL is made once from the game's name. With sake_error.c
+// it is GameSpy's sakeRequest.c, whose names it has where the code shows them.
 
-static void Sake_PostMessage(SAKERequest request);
+static void sakeiExecuteRequest(SAKERequest request);
 
 // The URL of the storage server, which the Wi-Fi library sets up (in gdb.c) once it knows the server it uses
-char gSakeStorageUrl[128];
+char sakeiSoapUrl[128];
 
-static void Sake_PostMessage(SAKERequest request) {
+static void sakeiExecuteRequest(SAKERequest request) {
     GSSoapTask *http;
 
-    if (gSakeStorageUrl[0] == '\0') {
-        OS_SNPrintf(gSakeStorageUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
-                    request->sake->gameName);
+    if (sakeiSoapUrl[0] == '\0') {
+        OS_SNPrintf(sakeiSoapUrl, 128, "http://%s.sake.gs.nintendowifi.net/SakeStorageServer/StorageServer.asmx",
+                    request->mSake->mGameName);
     }
-    http = gsiExecuteSoap(gSakeStorageUrl, request->type->soapAction, request->writer, Sake_OnResponse, request);
+    http = gsiExecuteSoap(sakeiSoapUrl, request->mInfo->mSoapAction, request->mSoapRequest, sakeiSoapCallback, request);
     if (http != NULL) {
-        request->type->http = http->handle;
+        request->mInfo->http = http->mCoreTask;
     } else {
-        request->type->http = NULL;
+        request->mInfo->http = NULL;
     }
 }
 
-SAKEStartRequestResult Sake_Submit(SAKERequest request, SAKEIRequestInfo *type) {
+SAKEStartRequestResult sakeiStartRequest(SAKERequest request, SAKEIRequestInfo *type) {
     int error;
 
-    request->type = type;
-    error = Sake_BuildMessage(request);
+    request->mInfo = type;
+    error = sakeiSetupRequest(request);
     if (error != 0) {
         return error;
     }
-    Sake_PostMessage(request);
+    sakeiExecuteRequest(request);
     return 0;
 }

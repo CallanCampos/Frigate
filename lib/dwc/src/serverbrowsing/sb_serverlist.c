@@ -10,8 +10,7 @@
 // AddServerToDeadlist, SBFreeDeadList, SBAllocateServerList, ErrorDisconnect, the Buffer* functions,
 // SetupListChallenge, FreePopularValues, FreeKeyList, InitCryptKey, ServerSizeForFlags, ParseServerIPPort,
 // SBSetLastListErrorPtr and ProcessDeleteServer), as are SBOverrideMasterServer, g_sortserverlist and
-// ErrorDisconnect's QUERY_ERROR; ListStringHash, the later SDK's StringHash, is ours, since sb_server.c has its own
-// StringHash
+// ErrorDisconnect's QUERY_ERROR and StringHash, which sb_server.c also has a static of
 
 // The master servers' port, and how many master servers a game's name picks from
 #define MSPORT2 28910
@@ -193,16 +192,16 @@ void SBServerListSort(SBServerList *slist, SBBool ascending, SortInfo sortinfo) 
 }
 
 void SBServerListAppendServer(SBServerList *slist, SBServer server) {
-    func_ov011_021715a4(slist->servers, &server);
+    ArrayAppend(slist->servers, &server);
     slist->ListCallback(slist, slc_serveradded, server, slist->instance);
 }
 
 int SBServerListFindServer(SBServerList *slist, SBServer findserver) {
-    int numservers = func_ov011_02171588(slist->servers);
+    int numservers = ArrayLength(slist->servers);
     int i;
 
     for (i = 0; i < numservers; i++) {
-        if (findserver == *(SBServer *)func_ov011_0217158c(slist->servers, i)) {
+        if (findserver == *(SBServer *)ArrayNth(slist->servers, i)) {
             return i;
         }
     }
@@ -214,9 +213,9 @@ int SBServerListFindServerByIP(SBServerList *slist, goa_uint32 ip, unsigned shor
     SBServer server;
     int i;
 
-    numservers = func_ov011_02171588(slist->servers);
+    numservers = ArrayLength(slist->servers);
     for (i = 0; i < numservers; i++) {
-        server = *(SBServer *)func_ov011_0217158c(slist->servers, i);
+        server = *(SBServer *)ArrayNth(slist->servers, i);
         if (SBServerGetPublicInetAddress(server) == ip && SBServerGetPublicQueryPortNBO(server) == port) {
             return i;
         }
@@ -235,19 +234,19 @@ static void AddServerToDeadlist(SBServerList *slist, SBServer server) {
 }
 
 void SBServerListRemoveAt(SBServerList *slist, int index) {
-    SBServer server = *(SBServer *)func_ov011_0217158c(slist->servers, index);
+    SBServer server = *(SBServer *)ArrayNth(slist->servers, index);
 
     slist->ListCallback(slist, slc_serverdeleted, server, slist->instance);
-    func_ov011_02171668(slist->servers, index);
+    ArrayDeleteAt(slist->servers, index);
     AddServerToDeadlist(slist, server);
 }
 
 int SBServerListCount(SBServerList *slist) {
-    return func_ov011_02171588(slist->servers);
+    return ArrayLength(slist->servers);
 }
 
 SBServer SBServerListNth(SBServerList *slist, int i) {
-    return *(SBServer *)func_ov011_0217158c(slist->servers, i);
+    return *(SBServer *)ArrayNth(slist->servers, i);
 }
 
 void SBFreeDeadList(SBServerList *slist) {
@@ -268,17 +267,17 @@ void SBFreeDeadList(SBServerList *slist) {
 
 void SBServerListClear(SBServerList *slist) {
     int i;
-    int nservers = func_ov011_02171588(slist->servers);
+    int nservers = ArrayLength(slist->servers);
 
     for (i = 0; i < nservers; i++) {
-        AddServerToDeadlist(slist, *(SBServer *)func_ov011_0217158c(slist->servers, i));
+        AddServerToDeadlist(slist, *(SBServer *)ArrayNth(slist->servers, i));
     }
     ArrayClear(slist->servers);
     SBFreeDeadList(slist);
 }
 
 void SBAllocateServerList(SBServerList *slist) {
-    slist->servers = func_ov011_02171514(sizeof(SBServer), 100, NULL);
+    slist->servers = ArrayNew(sizeof(SBServer), 100, NULL);
     slist->deadlist = NULL;
 }
 
@@ -371,7 +370,7 @@ static void ErrorDisconnect(SBServerList *slist) {
 }
 
 // The hash of a game's name, which picks its master server
-static int ListStringHash(const char *s, int numbuckets) {
+static int StringHash(const char *s, int numbuckets) {
     gsi_u32 hashcode = 0;
 
     while (*s != '\0') {
@@ -387,7 +386,7 @@ static SBError ServerListConnect(SBServerList *slist) {
     char masterHostname[128];
     int masterIndex;
 
-    masterIndex = ListStringHash(slist->queryforgamename, NUM_MASTER_SERVERS);
+    masterIndex = StringHash(slist->queryforgamename, NUM_MASTER_SERVERS);
     if (SBOverrideMasterServer != NULL) {
         gsiSafeStrcpyA(masterHostname, SBOverrideMasterServer, sizeof(masterHostname));
     } else {
@@ -404,7 +403,7 @@ static SBError ServerListConnect(SBServerList *slist) {
         memcpy(&saddr.addr, hent->addrList[0], sizeof(saddr.addr));
     }
     if (slist->slsocket == -1) {
-        slist->slsocket = gsiSocket(2, 1, 0);
+        slist->slsocket = socket(2, 1, 0);
         if (slist->slsocket == -1) {
             return sbe_socketerror;
         }
@@ -591,10 +590,10 @@ static void FreeKeyList(SBServerList *slist) {
     if (slist->keylist == NULL) {
         return;
     }
-    for (i = 0; i < func_ov011_02171588(slist->keylist); i++) {
-        SBReleaseStr(slist, ((KeyInfo *)func_ov011_0217158c(slist->keylist, i))->keyName);
+    for (i = 0; i < ArrayLength(slist->keylist); i++) {
+        SBReleaseStr(slist, ((KeyInfo *)ArrayNth(slist->keylist, i))->keyName);
     }
-    func_ov011_02171558(slist->keylist);
+    ArrayFree(slist->keylist);
     slist->keylist = NULL;
 }
 
@@ -619,7 +618,7 @@ void SBServerListCleanup(SBServerList *slist) {
     SBServerListClear(slist);
     SBRefStrHashCleanup(slist);
     if (slist->servers != NULL) {
-        func_ov011_02171558(slist->servers);
+        ArrayFree(slist->servers);
     }
     slist->servers = NULL;
 }
@@ -690,9 +689,9 @@ static int AllKeysPresent(SBServerList *slist, char *buf, int len) {
     int i;
     int strindex;
 
-    numkeys = func_ov011_02171588(slist->keylist);
+    numkeys = ArrayLength(slist->keylist);
     for (i = 0; i < numkeys; i++) {
-        switch (((KeyInfo *)func_ov011_0217158c(slist->keylist, i))->keyType) {
+        switch (((KeyInfo *)ArrayNth(slist->keylist, i))->keyType) {
         case KEYTYPE_BYTE:
             buf++;
             len--;
@@ -794,9 +793,9 @@ static int ParseServer(SBServerList *slist, SBServer server, char *buf, int len,
         SBServerSetICMPIP(server, ip);
     }
     if (flags & HAS_KEYS_FLAG) {
-        numkeys = func_ov011_02171588(slist->keylist);
+        numkeys = ArrayLength(slist->keylist);
         for (i = 0; i < numkeys; i++) {
-            KeyInfo *ki = func_ov011_0217158c(slist->keylist, i);
+            KeyInfo *ki = ArrayNth(slist->keylist, i);
 
             switch (ki->keyType) {
             case KEYTYPE_BYTE:
@@ -968,14 +967,14 @@ static SBError ProcessMainListData(SBServerList *slist) {
                 break;
             }
             slist->expectedelements = (gsi_u8)inbuf[0];
-            slist->keylist = func_ov011_02171514(sizeof(KeyInfo), slist->expectedelements, NULL);
+            slist->keylist = ArrayNew(sizeof(KeyInfo), slist->expectedelements, NULL);
             if (slist->keylist == NULL) {
                 return sbe_allocerror;
             }
             inbuf++;
             inlen--;
         }
-        while (slist->expectedelements > func_ov011_02171588(slist->keylist)) {
+        while (slist->expectedelements > ArrayLength(slist->keylist)) {
             KeyInfo ki;
             int keylen;
 
@@ -988,11 +987,11 @@ static SBError ProcessMainListData(SBServerList *slist) {
             }
             ki.keyType = (gsi_u8)inbuf[0];
             ki.keyName = SBRefStr(slist, inbuf + 1);
-            func_ov011_021715a4(slist->keylist, &ki);
+            ArrayAppend(slist->keylist, &ki);
             inbuf += keylen + 1;
             inlen -= keylen + 1;
         }
-        if (slist->expectedelements > func_ov011_02171588(slist->keylist)) {
+        if (slist->expectedelements > ArrayLength(slist->keylist)) {
             break;
         }
         slist->pstate = pi_uniquevaluelist;
@@ -1071,7 +1070,7 @@ static SBError ProcessPushKeyList(SBServerList *slist, char *buf, int len) {
     if (slist->keylist != NULL) {
         FreeKeyList(slist);
     }
-    slist->keylist = func_ov011_02171514(sizeof(KeyInfo), numkeys, NULL);
+    slist->keylist = ArrayNew(sizeof(KeyInfo), numkeys, NULL);
     if (slist->keylist == NULL) {
         return sbe_allocerror;
     }
@@ -1088,7 +1087,7 @@ static SBError ProcessPushKeyList(SBServerList *slist, char *buf, int len) {
         }
         ki.keyType = (gsi_u8)buf[0];
         ki.keyName = SBRefStr(slist, buf + 1);
-        func_ov011_021715a4(slist->keylist, &ki);
+        ArrayAppend(slist->keylist, &ki);
         buf += keylen + 1;
         len -= keylen + 1;
     }

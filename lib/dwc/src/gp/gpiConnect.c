@@ -6,7 +6,7 @@
 #include "dwc/gpiPeer.h"
 #include "dwc/gpiProfile.h"
 #include "dwc/gpiUtility.h"
-#include "dwc/gt2.h"
+#include "dwc/gsUdpEngine.h"
 #include "dwc/md5.h"
 
 // GameSpy GP's login to the connection manager (gpiConnect.c). The functions' names, from pret/pokerevo's Wii build,
@@ -24,7 +24,7 @@ static GPIBool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile 
 
 // The host of the connection manager, and the characters of randomString's challenges, which are defined after
 // randomString, as their order in .data shows
-static char sConnectionManagerHostname[64] = "gpcm.gs.nintendowifi.net";
+static char GPConnectionManagerHostname[64] = "gpcm.gs.nintendowifi.net";
 static char sCharacters[63];
 
 static void randomString(char *buffer, int numChars) {
@@ -45,16 +45,16 @@ static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operatio
     int error;
 
     strncpy(iconnection->mHeader, "gamespygp", 0x10);
-    if (!Gt2_IsInitialized()) {
+    if (!gsUdpEngineIsInitialized()) {
         port = GPI_PEER_PORT;
         gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice, "Initializing UDP Layer\n");
-        result = Gt2_CreateSocket(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+        result = gsUdpEngineInitialize(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         if (result != 0) {
             while (result != 0 && port < GPI_PEER_PORT + 100) {
                 gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Comment,
                               "Port %d failed, trying next port\n", port);
                 port++;
-                result = Gt2_CreateSocket(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+                result = gsUdpEngineInitialize(port, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
             }
             if (result != 0) {
                 gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
@@ -70,10 +70,11 @@ static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operatio
     } else {
         gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice,
                       "UDP Layer already initialized, using existing port.\n");
-        iconnection->peerPort = Gt2_GetLocalPort();
+        iconnection->peerPort = gsUdpEngineGetLocalPort();
     }
-    if (Gt2_Connect(iconnection->mHeader, iconnection->mHeader, NULL, gpiPeerAcceptedCallback, gpiPeerLeftCallback,
-                    gpiPeerPingReplyCallback, gpiPeerMessageCallback, connection) != 0) {
+    if (gsUdpEngineAddMsgHandler(iconnection->mHeader, iconnection->mHeader, NULL, gpiPeerAcceptedCallback,
+                                 gpiPeerLeftCallback, gpiPeerPingReplyCallback, gpiPeerMessageCallback,
+                                 connection) != 0) {
         gpiSetError(connection, 8, "There was an error starting the UDP Layer.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
@@ -81,7 +82,7 @@ static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operatio
     if (iconnection->firewall) {
         iconnection->peerPort = 0;
     }
-    iconnection->cmSocket = gsiSocket(2, 1, 0);
+    iconnection->cmSocket = socket(2, 1, 0);
     if (iconnection->cmSocket == -1) {
         gpiSetError(connection, 5, "There was an error creating a socket.");
         gpiCallErrorCallback(connection, 3, 1);
@@ -94,8 +95,8 @@ static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operatio
     }
     SOCSockAddrIn address = { 0 };
     address.family = 2;
-    if (inet_addr(sConnectionManagerHostname) == -1) {
-        SOCHostEnt *host = SOC_GetHostByName(sConnectionManagerHostname);
+    if (inet_addr(GPConnectionManagerHostname) == -1) {
+        SOCHostEnt *host = SOC_GetHostByName(GPConnectionManagerHostname);
         if (host == NULL) {
             gpiSetError(connection, 5, "Could not resolve connection mananger host name.");
             gpiCallErrorCallback(connection, 3, 1);
@@ -103,7 +104,7 @@ static GPResult gpiStartConnect(GPConnection *connection, GPIOperation *operatio
         }
         address.addr.addr = *(gsi_u32 *)host->addrList[0];
     } else {
-        address.addr.addr = inet_addr(sConnectionManagerHostname);
+        address.addr.addr = inet_addr(GPConnectionManagerHostname);
     }
     address.port = GPI_CONNECTION_MANAGER_PORT;
     if (connect(iconnection->cmSocket, (SOCKADDR *)&address, sizeof(address)) == -1) {
@@ -509,7 +510,7 @@ static GPIBool gpiDisconnectCleanupProfile(GPConnection *connection, GPIProfile 
         gsifree(profile->buddyStatusInfo->gameMapName);
         profile->buddyStatusInfo->gameMapName = NULL;
         if (profile->buddyStatusInfo->extendedInfoKeys != NULL) {
-            func_ov011_02171558(profile->buddyStatusInfo->extendedInfoKeys);
+            ArrayFree(profile->buddyStatusInfo->extendedInfoKeys);
             profile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
         gsifree(profile->buddyStatusInfo);
@@ -554,10 +555,10 @@ void gpiDisconnect(GPConnection *connection, GPIBool tellServer) {
         iconnection->userid = 0;
         iconnection->profileid = 0;
     }
-    if (Gt2_IsInitialized()) {
-        Gt2_CancelConnect(iconnection->mHeader);
-        if (Gt2_IsIdle() && Gt2_HasNoAppCallbacks()) {
-            Gt2_CloseSocket();
+    if (gsUdpEngineIsInitialized()) {
+        gsUdpEngineRemoveMsgHandler(iconnection->mHeader);
+        if (gsUdpEngineNoMoreMsgHandlers() && gsUdpEngineNoApp()) {
+            gsUdpEngineShutdown();
         }
     }
     gsifree(iconnection->socketBuffer.buffer);
@@ -591,7 +592,7 @@ void gpiDisconnect(GPConnection *connection, GPIBool tellServer) {
     }
 }
 
-int gpiProcessRemoteAuthReply(GPConnection *connection, const char *input) {
+int gpiProcessRemoteAuthResponse(GPConnection *connection, const char *input) {
     GPIConnection *iconnection = *connection;
     char buffer[0x200];
 

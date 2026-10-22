@@ -4,27 +4,27 @@
 // GameSpy's helpers (gsPlatformUtil.c). The ROM names neither the file nor its functions: the file is the later SDK's,
 // and the functions are GameSpy's as pret's pokerevo Wii build has them (nonport.s), or the later SDK's
 // (gsiStringToInt64, gsiInt64ToString, gsiSecondsToDate, gsiDateToSeconds, QuartToTrip, TripToQuart, B64Decode,
-// B64DecodeLen and the stream); RandomNext and RandomGenerate are ours
+// B64DecodeLen, the stream, nextlongrand, longrand and the statics, urlSafeEncodeing in its spelling)
 
-static gsi_u32 RandomNext(gsi_u32 seed);
-static gsi_u32 RandomGenerate(void);
+static gsi_u32 nextlongrand(gsi_u32 seed);
+static gsi_u32 longrand(void);
 static void QuartToTrip(const char *quart, char *trip, int count);
 static void TripToQuart(const char *trip, char *quart, int count);
 
 // The last two digits and the padding of base 64's three alphabets, defined in the reverse order of the ROM's, as MWCC
 // lays out these statics backwards
 static const char alternateEncoding[3] = { '[', ']', '_' };
-static const char urlSafeEncoding[3] = { '-', '_', '=' };
+static const char urlSafeEncodeing[3] = { '-', '_', '=' };
 static const char defaultEncoding[3] = { '+', '/', '=' };
 // The names of the days and the months, which no code of the ROM reads
 const char _dnames[] = "SunMonTueWedThuFriSat";
 const char _mnames[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
-static gsi_u32 sRandSeed = 1;
+static gsi_u32 randomnum = 1;
 // The days before each month, less one, in a leap year and in another year
 static int _lpdays[13] = { -1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 static int _days[13] = { -1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364 };
-static GSTime sDate;
+static GSTime tb;
 
 gsi_i64 gsiStringToInt64(const char *text) {
     return atoll(text);
@@ -120,7 +120,7 @@ void msleep(gsi_time milliseconds) {
 GSTime *gsiSecondsToDate(const int *seconds) {
     int time = *seconds;
     gsi_bool leap = gsi_false;
-    GSTime *date = &sDate;
+    GSTime *date = &tb;
     int year;
     int yday;
     int month;
@@ -235,7 +235,7 @@ int gsiDateToSeconds(GSTime *date) {
 }
 
 // The next number of the Park-Miller generator (16807 times the seed, modulo 2^31 - 1), without a division
-static gsi_u32 RandomNext(gsi_u32 seed) {
+static gsi_u32 nextlongrand(gsi_u32 seed) {
     gsi_u32 lo;
     gsi_u32 hi;
 
@@ -254,12 +254,12 @@ static gsi_u32 RandomNext(gsi_u32 seed) {
     return lo;
 }
 
-static gsi_u32 RandomGenerate(void) {
-    return sRandSeed = RandomNext(sRandSeed);
+static gsi_u32 longrand(void) {
+    return randomnum = nextlongrand(randomnum);
 }
 
 void Util_RandSeed(unsigned long seed) {
-    sRandSeed = seed != 0 ? seed & 0x7fffffff : 1;
+    randomnum = seed != 0 ? seed & 0x7fffffff : 1;
 }
 
 int Util_RandInt(int low, int high) {
@@ -269,7 +269,7 @@ int Util_RandInt(int low, int high) {
     if (range == 0) {
         return low;
     }
-    value = RandomGenerate() % range;
+    value = longrand() % range;
     return value + low;
 }
 
@@ -315,7 +315,7 @@ void B64Decode(const char *input, char *output, int length, int *outputLength, i
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
@@ -386,7 +386,7 @@ void B64Encode(const char *input, char *output, int length, int encodingType) {
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
@@ -437,7 +437,7 @@ int B64DecodeLen(const char *input, int encodingType) {
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
@@ -459,7 +459,7 @@ int B64DecodeLen(const char *input, int encodingType) {
 
 void B64InitEncodeStream(B64StreamData *data, const char *input, int length, int encodingType) {
     data->input = input;
-    data->length = length;
+    data->len = length;
     data->encodingType = encodingType;
 }
 
@@ -467,7 +467,7 @@ gsi_bool B64EncodeStream(B64StreamData *data, char output[4]) {
     const char *encoding;
     int i;
 
-    if (data->length <= 0) {
+    if (data->len <= 0) {
         return gsi_false;
     }
     switch (data->encodingType) {
@@ -475,15 +475,15 @@ gsi_bool B64EncodeStream(B64StreamData *data, char output[4]) {
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
         break;
     }
-    TripToQuart(data->input, output, data->length >= 3 ? 3 : data->length);
+    TripToQuart(data->input, output, data->len >= 3 ? 3 : data->len);
     data->input += 3;
-    data->length -= 3;
+    data->len -= 3;
     for (i = 0; i < 4; i++) {
         if (output[i] <= 25) {
             output[i] += 'A';
@@ -497,9 +497,9 @@ gsi_bool B64EncodeStream(B64StreamData *data, char output[4]) {
             output[i] = encoding[1];
         }
     }
-    if (data->length < 0) {
+    if (data->len < 0) {
         output[3] = encoding[2];
-        if (data->length == -2) {
+        if (data->len == -2) {
             output[2] = encoding[2];
         }
     }

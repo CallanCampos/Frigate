@@ -20,9 +20,9 @@
     ((gsi_u8)((gsi_u32)(x) >> 24) | ((gsi_u32)(x) >> 8 & 0xff00) | ((gsi_u32)(x) << 8 & 0xff0000) |                    \
      ((gsi_u32)(x) << 24 & 0xff000000))
 
-#define QR2_MAX_DATA_SIZE 0x578
-#define QR2_REQUEST_KEY_LEN 4
-#define QR2_RECENT_CLIENT_MESSAGES_TO_TRACK 10
+#define MAX_DATA_SIZE 0x578
+#define REQUEST_KEY_LEN 4
+#define RECENT_CLIENT_MESSAGES_TO_TRACK 10
 #define QR2_IPVERIFY_ARRAY_SIZE 200
 
 // A packet as it is built: its bytes and how many are used
@@ -31,14 +31,14 @@ typedef struct qr2_keybuffer_s *qr2_keybuffer_t;
 typedef struct qr2_buffer_s *qr2_buffer_t;
 
 struct qr2_buffer_s {
-    char buffer[QR2_MAX_DATA_SIZE];
+    char buffer[MAX_DATA_SIZE];
     int len;
 };
 
 // The keys of a type that the game has values for
 struct qr2_keybuffer_s {
     gsi_u8 keys[MAX_REGISTERED_KEYS];
-    int numKeys;
+    int numkeys;
 };
 
 // The types of keys, the later SDK's qr2_key_type
@@ -76,7 +76,7 @@ typedef void (*cdkey_process_t)(char *data, int len, SOCKADDR *sender);
 struct qr2_ipverify_info_s {
     SOCKADDR_IN addr;
     gsi_u32 challenge;
-    gsi_time createTime;
+    gsi_time createtime;
 };
 
 // A reporting game
@@ -84,7 +84,7 @@ struct qr2_implementation_s {
     SOCKET hbSock;
     char gamename[64];
     char secretKey[64];
-    char instanceKey[QR2_REQUEST_KEY_LEN];
+    char instanceKey[REQUEST_KEY_LEN];
     qr2_serverkeycallback_t serverKeyCallback;
     qr2_playerteamkeycallback_t playerKeyCallback;
     qr2_playerteamkeycallback_t teamKeyCallback;
@@ -106,7 +106,7 @@ struct qr2_implementation_s {
     int natNegotiate;
     SOCKADDR_IN hbAddr;
     cdkey_process_t cdkeyProcess;
-    int clientMessageKeys[QR2_RECENT_CLIENT_MESSAGES_TO_TRACK];
+    int clientMessageKeys[RECENT_CLIENT_MESSAGES_TO_TRACK];
     int curMessageKey;
     unsigned int publicIp;
     unsigned short publicPort;

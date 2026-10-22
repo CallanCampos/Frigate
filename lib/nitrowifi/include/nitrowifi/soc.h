@@ -217,7 +217,7 @@ extern const SOCLConfig *SOCLiConfigPtr;
 // The wait between CPS's yields, which DWC's AC sets to 4 before SOC_Startup
 extern u32 SOCLiYieldWait;
 // TRUE for a handle that is no socket of the list and not in the trash, or that is a socket SOCL_Close has not run on
-// (gsiCloseSocketSecure, SOC_Close's caller in DWC's GameSpy code, asks it after a failed close; no counterpart in
+// (closesocketsure, SOC_Close's caller in DWC's GameSpy code, asks it after a failed close; no counterpart in
 // pokediamond's NitroWiFi)
 BOOL SOCL_IsNotClosing(int socket);
 // The address of the host (socl_cleanup.c), which DWC's GameSpy code also gives as the local host's

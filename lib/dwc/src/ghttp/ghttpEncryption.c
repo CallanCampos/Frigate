@@ -51,34 +51,34 @@ GHTTPBool ghttpSetRequestEncryptionEngine(GHTTPRequest request, GHTTPEncryptionE
     if (engine == 5) {
         engine = 4;
     }
-    if (connection->encryptor.engine == engine) {
+    if (connection->encryptor.mEngine == engine) {
         return gsi_true;
     }
-    if (connection->encryptor.state != NULL && connection->encryptor.engine != engine) {
+    if (connection->encryptor.mInterface != NULL && connection->encryptor.mEngine != engine) {
         return gsi_false;
     }
-    if (engine == 0 && strncmp(connection->url, "https://", 8) == 0) {
+    if (engine == 0 && strncmp(connection->URL, "https://", 8) == 0) {
         return gsi_false;
     }
 
-    connection->encryptor.engine = engine;
+    connection->encryptor.mEngine = engine;
     if (engine == 0) {
-        connection->encryptor.state = NULL;
+        connection->encryptor.mInterface = NULL;
         return gsi_true;
     }
-    connection->encryptor.state = NULL;
-    connection->encryptor.init = ghiEncryptorSslInitFunc;
-    connection->encryptor.start = ghiEncryptorSslStartFunc;
-    connection->encryptor.cleanup = ghiEncryptorSslCleanupFunc;
-    connection->encryptor.encrypt = ghiEncryptorSslEncryptFunc;
-    connection->encryptor.decrypt = ghiEncryptorSslDecryptFunc;
-    connection->encryptor.open = gsi_false;
-    connection->encryptor.unk_0C = 0;
-    connection->encryptor.active = gsi_false;
-    connection->encryptor.mode = 1;
-    connection->encryptor.established = gsi_false;
-    connection->encryptor.unk_1C = 0;
-    connection->encryptor.secure = 1;
+    connection->encryptor.mInterface = NULL;
+    connection->encryptor.mInitFunc = ghiEncryptorSslInitFunc;
+    connection->encryptor.mStartFunc = ghiEncryptorSslStartFunc;
+    connection->encryptor.mCleanupFunc = ghiEncryptorSslCleanupFunc;
+    connection->encryptor.mEncryptFunc = ghiEncryptorSslEncryptFunc;
+    connection->encryptor.mDecryptFunc = ghiEncryptorSslDecryptFunc;
+    connection->encryptor.mInitialized = gsi_false;
+    connection->encryptor.mSessionStarted = 0;
+    connection->encryptor.mSessionEstablished = gsi_false;
+    connection->encryptor.mEncryptOnBuffer = 1;
+    connection->encryptor.mEncryptOnSend = gsi_false;
+    connection->encryptor.mLibSendsHandshakeMessages = 0;
+    connection->encryptor.mNotInCloseSocket = 1;
     return gsi_true;
 }
 
@@ -93,7 +93,7 @@ GHTTPBool ghiEncyptorSetRootCAList(const char *url, GHICertList *rootCA) {
     return ghiEncryptorSetTwlRootCA(url, rootCA);
 }
 
-GHTTPBool ghiEncryptorRemoveRootCAList(const char *url) {
+GHTTPBool ghiEncyptorCleanupRootCAList(const char *url) {
     return ghiEncryptorCleanupTwlRootCA(url);
 }
 
@@ -112,8 +112,8 @@ GHICertList *ghiEncryptorGetRootCAList(const char *url) {
                       __FUNCTION__, 786, url, sRootCAList);
         return NULL;
     }
-    key.url = ghiCopyHost((char *)url);
-    index = func_ov011_021716ac(sRootCAList, &key, ghiCompareRootCAEntries, 0, gsi_true);
+    key.url = ghiGetServerAddressFromUrl((char *)url);
+    index = ArraySearch(sRootCAList, &key, ghiCompareRootCAEntries, 0, gsi_true);
     gsifree(key.url);
     if (index == -1) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_HotError,
@@ -121,7 +121,7 @@ GHICertList *ghiEncryptorGetRootCAList(const char *url) {
                       url);
         return NULL;
     }
-    return ((GHIRootCAEntry *)func_ov011_0217158c(sRootCAList, index))->certList;
+    return ((GHIRootCAEntry *)ArrayNth(sRootCAList, index))->certList;
 }
 
 static void ghiFreeRootCAEntry(void *element) {
@@ -143,7 +143,7 @@ GHTTPBool ghiEncryptorSetTwlRootCA(const char *url, GHICertList *rootCA) {
         return gsi_false;
     }
     if (sRootCAList == NULL) {
-        sRootCAList = func_ov011_02171514(sizeof(GHIRootCAEntry), 1, ghiFreeRootCAEntry);
+        sRootCAList = ArrayNew(sizeof(GHIRootCAEntry), 1, ghiFreeRootCAEntry);
         if (sRootCAList == NULL) {
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Memory, GSIDebugLevel_HotError,
                           "%s(@%s:%d):SSL - Out of memory. Cannot allocate memory for ghttpCertList\n", GHI_FILE,
@@ -151,15 +151,15 @@ GHTTPBool ghiEncryptorSetTwlRootCA(const char *url, GHICertList *rootCA) {
             return gsi_false;
         }
     }
-    entry.url = ghiCopyHost((char *)url);
+    entry.url = ghiGetServerAddressFromUrl((char *)url);
     entry.certList = rootCA;
     entry.refCount = 1;
-    index = func_ov011_021716ac(sRootCAList, &entry, ghiCompareRootCAEntries, 0, gsi_true);
+    index = ArraySearch(sRootCAList, &entry, ghiCompareRootCAEntries, 0, gsi_true);
     if (index == -1) {
         ArrayInsertSorted(sRootCAList, &entry, ghiCompareRootCAEntries);
     } else {
         gsifree(entry.url);
-        ((GHIRootCAEntry *)func_ov011_0217158c(sRootCAList, index))->refCount++;
+        ((GHIRootCAEntry *)ArrayNth(sRootCAList, index))->refCount++;
     }
     return gsi_true;
 }
@@ -175,21 +175,21 @@ GHTTPBool ghiEncryptorCleanupTwlRootCA(const char *url) {
                       __FUNCTION__, 891, url, sRootCAList);
         return gsi_false;
     }
-    key.url = ghiCopyHost((char *)url);
-    index = func_ov011_021716ac(sRootCAList, &key, ghiCompareRootCAEntries, 0, gsi_true);
+    key.url = ghiGetServerAddressFromUrl((char *)url);
+    index = ArraySearch(sRootCAList, &key, ghiCompareRootCAEntries, 0, gsi_true);
     if (index == -1) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, result,
                       "%s(@%s:%d):SSL - Could not find Url in the Cert List. url=%s\n", GHI_FILE, __FUNCTION__, 906,
                       url);
         result = gsi_false;
     } else {
-        GHIRootCAEntry *entry = func_ov011_0217158c(sRootCAList, index);
+        GHIRootCAEntry *entry = ArrayNth(sRootCAList, index);
 
         entry->refCount--;
         if (entry->refCount <= 0) {
-            func_ov011_02171668(sRootCAList, index);
-            if (func_ov011_02171588(sRootCAList) == 0) {
-                func_ov011_02171558(sRootCAList);
+            ArrayDeleteAt(sRootCAList, index);
+            if (ArrayLength(sRootCAList) == 0) {
+                ArrayFree(sRootCAList);
                 sRootCAList = NULL;
             }
         }
@@ -273,28 +273,28 @@ GHIEncryptionResult ghiEncryptorSslInitFunc(GHIConnection *connection, GHIEncryp
 
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug, "%s(@%s:%d)\r\n", GHI_FILE, __FUNCTION__,
                   1047);
-    encryptor->state = gsimalloc(sizeof(GHIEncryptorState));
-    if (encryptor->state == NULL) {
+    encryptor->mInterface = gsimalloc(sizeof(GHIEncryptorState));
+    if (encryptor->mInterface == NULL) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Memory, GSIDebugLevel_WarmError,
                       "%s(@%s:%d):Failed to allocate SSL interface (out of memory: %d bytes)\r\n", GHI_FILE,
                       __FUNCTION__, 1061, 8);
         return 3;
     }
-    memset(encryptor->state, 0, sizeof(GHIEncryptorState));
-    state = encryptor->state;
-    state->ssl = ghiTwlSSLInit(connection->url);
+    memset(encryptor->mInterface, 0, sizeof(GHIEncryptorState));
+    state = encryptor->mInterface;
+    state->ssl = ghiTwlSSLInit(connection->URL);
     state->started = gsi_false;
     if (state->ssl == NULL) {
         gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug,
                       "%s(@%s:%d):GameSpy SSL (TWL) certificate is uninitialized\r\n", GHI_FILE, __FUNCTION__, 1073);
         return 3;
     }
-    encryptor->open = gsi_true;
-    encryptor->unk_0C = 0;
-    encryptor->active = gsi_false;
-    encryptor->mode = 0;
-    encryptor->established = gsi_true;
-    encryptor->unk_1C = 1;
+    encryptor->mInitialized = gsi_true;
+    encryptor->mSessionStarted = 0;
+    encryptor->mSessionEstablished = gsi_false;
+    encryptor->mEncryptOnBuffer = 0;
+    encryptor->mEncryptOnSend = gsi_true;
+    encryptor->mLibSendsHandshakeMessages = 1;
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug,
                   "%s(@%s:%d):GameSpy SSL (TWL engine) initialized\r\n", GHI_FILE, __FUNCTION__, 1085);
     return 1;
@@ -302,7 +302,7 @@ GHIEncryptionResult ghiEncryptorSslInitFunc(GHIConnection *connection, GHIEncryp
 
 // Turns the socket of the connection into an SSL one, once. Returns 1 for done and 3 for an error
 GHIEncryptionResult ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncryptor *encryptor) {
-    GHIEncryptorState *state = encryptor->state;
+    GHIEncryptorState *state = encryptor->mInterface;
     int error;
 
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug, "%s(@%s:%d)\r\n", GHI_FILE, __FUNCTION__,
@@ -351,8 +351,8 @@ GHIEncryptionResult ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncry
         }
         state->started = gsi_true;
     }
-    encryptor->unk_0C = 1;
-    encryptor->active = gsi_true;
+    encryptor->mSessionStarted = 1;
+    encryptor->mSessionEstablished = gsi_true;
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug, "%s(@%s:%d)return success\r\n", GHI_FILE,
                   __FUNCTION__, 1154);
     return 1;
@@ -360,12 +360,13 @@ GHIEncryptionResult ghiEncryptorSslStartFunc(GHIConnection *connection, GHIEncry
 
 // What the common code calls to send and receive through the SSL, and the functions to encrypt and decrypt: they do
 // nothing here, since the SSL library does all of it in the socket
-GHIEncryptionResult ghiEncryptorSend(GHIConnection *connection, GHIEncryptor *encryptor, const char *data, int size,
-                                     int *sent) {
+GHIEncryptionResult ghiEncryptorSslEncryptSend(GHIConnection *connection, GHIEncryptor *encryptor, const char *data,
+                                               int size, int *sent) {
     return 1;
 }
 
-GHIEncryptionResult ghiEncryptorRecv(GHIConnection *connection, GHIEncryptor *encryptor, char *buffer, int *size) {
+GHIEncryptionResult ghiEncryptorSslDecryptRecv(GHIConnection *connection, GHIEncryptor *encryptor, char *buffer,
+                                               int *size) {
     return 1;
 }
 
@@ -385,17 +386,17 @@ GHIEncryptionResult ghiEncryptorSslCleanupFunc(GHIConnection *connection, GHIEnc
     gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug,
                   "%s(@%s:%d):GameSpy SSL (Twl) engine cleanup called\r\n", GHI_FILE, __FUNCTION__, 1237);
     if (encryptor != NULL) {
-        state = encryptor->state;
+        state = encryptor->mInterface;
         if (state != NULL) {
             if (state->ssl != NULL) {
                 gsifree(state->ssl);
             }
             gsifree(state);
-            encryptor->state = NULL;
+            encryptor->mInterface = NULL;
         }
-        encryptor->open = gsi_false;
-        encryptor->unk_0C = 0;
-        encryptor->active = gsi_false;
+        encryptor->mInitialized = gsi_false;
+        encryptor->mSessionStarted = 0;
+        encryptor->mSessionEstablished = gsi_false;
     }
     return gsi_true;
 }

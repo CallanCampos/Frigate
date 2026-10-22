@@ -677,7 +677,7 @@ int DWCi_SetGPStatus(int status, const char *statusString, const char *locationS
     if (locationString == NULL) {
         locationString = ((GPIConnection *)*sFriend.control->pGpObj)->lastLocationString;
     }
-    return gpSetStatus(sFriend.control->pGpObj, status, statusString, locationString);
+    return gpSetStatusA(sFriend.control->pGpObj, status, statusString, locationString);
 }
 
 // Tells the game that a friend became a buddy, and its status
@@ -771,8 +771,8 @@ static void DWCi_UpdateFriendReq(DWCFriendData *friendList, int friendListLen) {
                 }
             } else if (DWC_GetGsProfileId(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx]) == -1) {
                 DWC_LoginIdToUserName(DWCi_GetUserData(), &friendList[sFriend.control->buddyUpdateIdx], loginName);
-                gpProfileSearch(sFriend.control->pGpObj, NULL, NULL, NULL, NULL, loginName, 0, 0,
-                                (GPCallback)DWCi_GPProfileSearchCallback, (void *)sFriend.control->buddyUpdateIdx);
+                gpProfileSearchA(sFriend.control->pGpObj, NULL, NULL, NULL, NULL, loginName, 0, 0,
+                                 (GPCallback)DWCi_GPProfileSearchCallback, (void *)sFriend.control->buddyUpdateIdx);
                 sFriend.control->buddyUpdateState = 2;
                 return;
             }
@@ -855,7 +855,7 @@ static int DWCi_RefreshFriendListAll(DWCFriendData *friendList, int friendListLe
 }
 
 static int DWCi_GPSendBuddyRequest(int profileId) {
-    int result = gpSendBuddyRequest(sFriend.control->pGpObj, profileId, "");
+    int result = gpSendBuddyRequestA(sFriend.control->pGpObj, profileId, "");
 
     DWCi_HandleFriendGPError(result);
     return result;
@@ -1099,7 +1099,7 @@ static void DWCi_GPGetReverseBuddiesListCallback(GPConnection *connection, GPGet
         }
         for (i = 0; i < sFriend.control->friendListLen; i++) {
             if (DWC_GetFriendDataType(&sFriend.control->friendList[i]) == DWC_ACC_FRIENDDATA_GS_PROFILE_ID) {
-                for (j = 0; j < arg->numOfUniqueMatchs; j++) {
+                for (j = 0; j < arg->numOfUniqueMatches; j++) {
                     if (arg->matches[j].profile ==
                         DWC_GetGsProfileId(DWCi_GetUserData(), &sFriend.control->friendList[i])) {
                         if (!DWCi_Acc_IsBuddyFlag(&sFriend.control->friendList[i])) {
@@ -1112,7 +1112,7 @@ static void DWCi_GPGetReverseBuddiesListCallback(GPConnection *connection, GPGet
                         break;
                     }
                 }
-                if (j == arg->numOfUniqueMatchs && DWCi_Acc_IsBuddyFlag(&sFriend.control->friendList[i]) == TRUE) {
+                if (j == arg->numOfUniqueMatches && DWCi_Acc_IsBuddyFlag(&sFriend.control->friendList[i]) == TRUE) {
                     sFriend.control->friendListChanged = 1;
                     DWCi_Acc_SetBuddyFlag(&sFriend.control->friendList[i], FALSE);
                 }
@@ -1243,14 +1243,14 @@ static void DWCi_GPConnectCallback(GPConnection *connection, GPConnectResponseAr
 
     sLogin->connectFlag = FALSE;
     OS_SNPrintf(consoleId, 0x1f, "%s:%016llu", DWCi_Np_GetConsoleName(), DWCi_Np_GetConsoleId());
-    if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_FIRSTNAME, consoleId)) != 0) {
+    if (DWCi_HandleLoginGPError(gpSetInfosA(connection, GP_INFO_FIRSTNAME, consoleId)) != 0) {
         return;
     }
     DWCi_Acc_U64ToString32(DWCi_Auth_GetConsoleUserId(), 43, userId);
-    if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_AIMNAME, userId)) != 0) {
+    if (DWCi_HandleLoginGPError(gpSetInfosA(connection, GP_INFO_AIMNAME, userId)) != 0) {
         return;
     }
-    if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_ZIPCODE, DWCi_Np_GetAppGameName())) != 0) {
+    if (DWCi_HandleLoginGPError(gpSetInfosA(connection, GP_INFO_ZIPCODE, DWCi_Np_GetAppGameName())) != 0) {
         return;
     }
     if (arg->result == 0) {
@@ -1286,8 +1286,8 @@ static void DWCi_GPConnect(GPCallback callback, int nextState) {
 
     sLogin->connectTick = now;
     sLogin->connectFlag = TRUE;
-    if (DWCi_HandleLoginGPError(gpConnectPreAuthenticated(sLogin->pGpObj, sLogin->authToken, sLogin->partnerChallenge,
-                                                          1, 0, callback, NULL)) == 0) {
+    if (DWCi_HandleLoginGPError(gpConnectPreAuthenticatedA(sLogin->pGpObj, sLogin->authToken, sLogin->partnerChallenge,
+                                                           1, 0, callback, NULL)) == 0) {
         sLogin->state = nextState;
     }
 }
@@ -1354,7 +1354,7 @@ static void DWCi_GPGetInfoCallback(GPConnection *connection, GPGetInfoResponseAr
         if (sLogin->state == 3) {
             if (arg->lastname[0] == 0) {
                 DWCi_Acc_LoginIdToUserName(&sLogin->userdata->pseudo, sLogin->gamecode, loginName);
-                if (DWCi_HandleLoginGPError(gpSetInfos(connection, GP_INFO_LASTNAME, loginName)) != 0) {
+                if (DWCi_HandleLoginGPError(gpSetInfosA(connection, GP_INFO_LASTNAME, loginName)) != 0) {
                     return;
                 }
                 sLogin->state = 4;

@@ -14,7 +14,7 @@ GPResult gpiConnect(GPConnection *connection, const char nick[GP_NICK_LEN], cons
 GPResult gpiProcessConnect(GPConnection *connection, GPIOperation *operation, const char *input);
 GPResult gpiCheckConnect(GPConnection *connection);
 void gpiDisconnect(GPConnection *connection, GPIBool tellServer);
-// Handles the server's "\\rar\\", which gives the namespace and the partner of the login (the name is ours)
-int gpiProcessRemoteAuthReply(GPConnection *connection, const char *input);
+// Handles the server's "\\rar\\", which gives the namespace and the partner of the login
+int gpiProcessRemoteAuthResponse(GPConnection *connection, const char *input);
 
 #endif // POKEBW2_DWC_GPICONNECT_H

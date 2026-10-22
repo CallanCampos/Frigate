@@ -87,7 +87,7 @@ GHTTPRequest ghttpGetExA(const char *url, const char *headers, char *buffer, int
                          GHTTPBool throttle, GHTTPBool blocking, ghttpProgressCallback progress,
                          ghttpCompletedCallback completed, void *param);
 void ghttpThink(void);
-GHTTPBool ghttpThinkRequest(GHTTPRequest request);
+GHTTPBool ghttpRequestThink(GHTTPRequest request);
 void ghttpCancelRequest(GHTTPRequest request);
 GHTTPState ghttpGetState(GHTTPRequest request);
 void ghttpSetMaxRecvTime(GHTTPRequest request, gsi_time time);
@@ -96,8 +96,8 @@ void ghttpPostSetAutoFree(GHTTPPost post, GHTTPBool autoFree);
 void ghttpFreePost(GHTTPRequest request, GHTTPPost post);
 GHTTPBool ghttpPostAddXml(GHTTPPost post, GSXmlStreamWriter writer);
 // Adds a file made of bytes in memory to a post (a form), with the name of its field, the name of the file and its type
-GHTTPBool ghttpPostAddFileFromMemory(GHTTPPost post, const gsi_char *name, const char *buffer, int bufferLen,
-                                     const gsi_char *reportFilename, const gsi_char *contentType);
+GHTTPBool ghiPostAddFileFromMemory(GHTTPPost post, const gsi_char *name, const char *buffer, int bufferLen,
+                                   const gsi_char *reportFilename, const gsi_char *contentType);
 GHTTPBool ghttpSetRequestEncryptionEngine(GHTTPRequest request, GHTTPEncryptionEngine engine);
 
 #endif // POKEBW2_DWC_GHTTP_H

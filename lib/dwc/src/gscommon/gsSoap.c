@@ -25,29 +25,29 @@ GSSoapTask *gsiExecuteSoapWithTimeout(const char *url, const char *service, GSXm
     if (soap == NULL) {
         return NULL;
     }
-    soap->callbackFunc = func;
-    soap->customFunc = NULL;
-    soap->url = url;
-    soap->service = service;
-    soap->requestSoap = request;
-    soap->postData = NULL;
-    soap->responseSoap = NULL;
-    soap->responseBuffer = NULL;
-    soap->userData = userData;
-    soap->requestResult = GHTTPSuccess;
-    soap->completed = gsi_false;
+    soap->mCallbackFunc = func;
+    soap->mCustomFunc = NULL;
+    soap->mURL = url;
+    soap->mService = service;
+    soap->mRequestSoap = request;
+    soap->mPostData = NULL;
+    soap->mResponseSoap = NULL;
+    soap->mResponseBuffer = NULL;
+    soap->mUserData = userData;
+    soap->mRequestResult = GHTTPSuccess;
+    soap->mCompleted = gsi_false;
     task = gsiCoreCreateTask();
     if (task == NULL) {
         gsifree(soap);
         return NULL;
     }
-    task->callbackFunc = gsiSoapTaskCallback;
-    task->executeFunc = gsiSoapTaskExecute;
-    task->thinkFunc = gsiSoapTaskThink;
-    task->cleanupFunc = gsiSoapTaskCleanup;
-    task->cancelFunc = gsiSoapTaskCancel;
-    task->taskData = soap;
-    soap->handle = task;
+    task->mCallbackFunc = gsiSoapTaskCallback;
+    task->mExecuteFunc = gsiSoapTaskExecute;
+    task->mThinkFunc = gsiSoapTaskThink;
+    task->mCleanupFunc = gsiSoapTaskCleanup;
+    task->mCancelFunc = gsiSoapTaskCancel;
+    task->mTaskData = soap;
+    soap->mCoreTask = task;
     gsiCoreExecuteTask(task, timeout);
     return soap;
 }
@@ -57,25 +57,25 @@ GSSoapTask *gsiExecuteSoapCustom(const char *url, const char *service, GSXmlStre
     GSSoapTask *soap = gsimalloc(sizeof(GSSoapTask));
     GSTask *task;
 
-    soap->callbackFunc = func;
-    soap->customFunc = customFunc;
-    soap->url = url;
-    soap->service = service;
-    soap->requestSoap = request;
-    soap->postData = NULL;
-    soap->responseSoap = NULL;
-    soap->responseBuffer = NULL;
-    soap->userData = userData;
-    soap->requestResult = GHTTPSuccess;
-    soap->completed = gsi_false;
+    soap->mCallbackFunc = func;
+    soap->mCustomFunc = customFunc;
+    soap->mURL = url;
+    soap->mService = service;
+    soap->mRequestSoap = request;
+    soap->mPostData = NULL;
+    soap->mResponseSoap = NULL;
+    soap->mResponseBuffer = NULL;
+    soap->mUserData = userData;
+    soap->mRequestResult = GHTTPSuccess;
+    soap->mCompleted = gsi_false;
     task = gsiCoreCreateTask();
-    task->callbackFunc = gsiSoapTaskCallback;
-    task->executeFunc = gsiSoapTaskExecute;
-    task->thinkFunc = gsiSoapTaskThink;
-    task->cleanupFunc = gsiSoapTaskCleanup;
-    task->cancelFunc = gsiSoapTaskCancel;
-    task->taskData = soap;
-    soap->handle = task;
+    task->mCallbackFunc = gsiSoapTaskCallback;
+    task->mExecuteFunc = gsiSoapTaskExecute;
+    task->mThinkFunc = gsiSoapTaskThink;
+    task->mCleanupFunc = gsiSoapTaskCleanup;
+    task->mCancelFunc = gsiSoapTaskCancel;
+    task->mTaskData = soap;
+    soap->mCoreTask = task;
     gsiCoreExecuteTask(task, 0);
     return soap;
 }
@@ -85,15 +85,15 @@ static GHTTPBool gsiSoapTaskHttpCompletedCallback(GHTTPRequest request, GHTTPRes
                                                   GHTTPByteCount bufferLen, void *param) {
     GSSoapTask *soap = param;
 
-    soap->requestResult = result;
-    soap->completed = gsi_true;
-    soap->responseBuffer = buffer;
+    soap->mRequestResult = result;
+    soap->mCompleted = gsi_true;
+    soap->mResponseBuffer = buffer;
     if (result == GHTTPSuccess) {
-        soap->responseSoap = gsXmlCreateStreamReader();
-        if (soap->responseSoap == NULL) {
-            soap->requestResult = GHTTPOutOfMemory;
-        } else if (gsXmlParseXml(soap->responseSoap, buffer, bufferLen) == gsi_false) {
-            soap->requestResult = GHTTPBadResponse;
+        soap->mResponseSoap = gsXmlCreateStreamReader();
+        if (soap->mResponseSoap == NULL) {
+            soap->mRequestResult = GHTTPOutOfMemory;
+        } else if (gsXmlParseBuffer(soap->mResponseSoap, buffer, bufferLen) == gsi_false) {
+            soap->mRequestResult = GHTTPBadResponse;
         }
     }
     return GHTTPFalse;
@@ -102,59 +102,59 @@ static GHTTPBool gsiSoapTaskHttpCompletedCallback(GHTTPRequest request, GHTTPRes
 static GSTaskResult gsiSoapTaskThink(void *task) {
     GSSoapTask *soap = task;
 
-    if (soap->completed != gsi_false) {
+    if (soap->mCompleted != gsi_false) {
         return GSTaskResult_Finished;
     }
-    ghttpThinkRequest(soap->requestId);
+    ghttpRequestThink(soap->mRequestId);
     return GSTaskResult_InProgress;
 }
 
 static void gsiSoapTaskExecute(void *task) {
     GSSoapTask *soap = task;
 
-    soap->postData = ghttpNewPost();
-    if (soap->postData == NULL) {
-        soap->completed = gsi_true;
-        soap->requestResult = GHTTPOutOfMemory;
+    soap->mPostData = ghttpNewPost();
+    if (soap->mPostData == NULL) {
+        soap->mCompleted = gsi_true;
+        soap->mRequestResult = GHTTPOutOfMemory;
         return;
     }
-    ghttpPostSetAutoFree(soap->postData, GHTTPFalse);
-    ghttpPostAddXml(soap->postData, soap->requestSoap);
-    if (soap->customFunc != NULL) {
-        soap->customFunc(soap->postData, soap->userData);
+    ghttpPostSetAutoFree(soap->mPostData, GHTTPFalse);
+    ghttpPostAddXml(soap->mPostData, soap->mRequestSoap);
+    if (soap->mCustomFunc != NULL) {
+        soap->mCustomFunc(soap->mPostData, soap->mUserData);
     }
-    soap->requestId = ghttpGetExA(soap->url, soap->service, NULL, 0, soap->postData, GHTTPFalse, GHTTPFalse, NULL,
-                                  gsiSoapTaskHttpCompletedCallback, soap);
+    soap->mRequestId = ghttpGetExA(soap->mURL, soap->mService, NULL, 0, soap->mPostData, GHTTPFalse, GHTTPFalse, NULL,
+                                   gsiSoapTaskHttpCompletedCallback, soap);
 }
 
 static void gsiSoapTaskCancel(void *task) {
     GSSoapTask *soap = task;
 
-    if (soap->completed == gsi_false) {
-        if (soap->requestId >= 0) {
-            ghttpCancelRequest(soap->requestId);
+    if (soap->mCompleted == gsi_false) {
+        if (soap->mRequestId >= 0) {
+            ghttpCancelRequest(soap->mRequestId);
         }
-        soap->requestResult = GHTTPRequestCancelled;
+        soap->mRequestResult = GHTTPRequestCancelled;
     }
 }
 
 static void gsiSoapTaskCallback(void *task, GSTaskResult result) {
     GSSoapTask *soap = task;
 
-    soap->callbackFunc(soap->requestResult, soap->requestSoap, soap->responseSoap, soap->userData);
+    soap->mCallbackFunc(soap->mRequestResult, soap->mRequestSoap, soap->mResponseSoap, soap->mUserData);
 }
 
 static gsi_bool gsiSoapTaskCleanup(void *task) {
     GSSoapTask *soap = task;
 
-    if (soap->responseSoap != NULL) {
-        gsXmlFreeReader(soap->responseSoap);
+    if (soap->mResponseSoap != NULL) {
+        gsXmlFreeReader(soap->mResponseSoap);
     }
-    if (soap->responseBuffer != NULL) {
-        gsifree(soap->responseBuffer);
+    if (soap->mResponseBuffer != NULL) {
+        gsifree(soap->mResponseBuffer);
     }
-    if (soap->postData != NULL) {
-        ghttpFreePost(soap->requestId, soap->postData);
+    if (soap->mPostData != NULL) {
+        ghttpFreePost(soap->mRequestId, soap->mPostData);
     }
     gsifree(soap);
     return gsi_true;

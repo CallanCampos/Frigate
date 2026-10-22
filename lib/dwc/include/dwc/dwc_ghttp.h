@@ -62,10 +62,10 @@ BOOL DWCi_SetGHTTPRootCA(const char *url);
 BOOL DWCi_RemoveGHTTPRootCA(const char *url);
 // Starts a request for a URL, with a buffer of this size or one the client grows, and a post or none; returns the
 // request, or an error below 0
-int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, GHTTPPost *post,
-                       DWCGHTTPProgressCallback progress, DWCGHTTPCompletedCallback completed, void *param);
-int DWC_GetGHTTPData(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressCallback progress,
-                     DWCGHTTPCompletedCallback completed, void *param);
+int DWC_GetGHTTPDataEx2(const char *url, int bufferSize, BOOL freeBuffer, GHTTPPost *post,
+                        DWCGHTTPProgressCallback progress, DWCGHTTPCompletedCallback completed, void *param);
+int DWC_GetGHTTPDataEx(const char *url, int bufferSize, BOOL freeBuffer, DWCGHTTPProgressCallback progress,
+                       DWCGHTTPCompletedCallback completed, void *param);
 void DWC_CancelGHTTPRequest(int request);
 
 #endif // POKEBW2_DWC_DWC_GHTTP_H

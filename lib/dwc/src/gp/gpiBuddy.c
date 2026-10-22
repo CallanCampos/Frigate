@@ -217,7 +217,7 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection *connection, const char *input)
             gpiSetErrorString(connection, "Out of memory.");
             return 1;
         }
-        if (iconnection->connectState == GPI_CONNECTED && profile->deleted) {
+        if (iconnection->connectState == GPI_CONNECTED && profile->deletedLocally) {
             gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_WarmError,
                           "Deliberately ignoring Buddy Message Status update from profile id [%i], "
                           "\t\t\t\tbecause could not be found in the local buddy list. It must have been "
@@ -370,7 +370,7 @@ GPResult gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *inp
         gpiSetErrorString(connection, "Out of memory.");
         return 1;
     }
-    if (!profile->blocked && !profile->deleted) {
+    if (!profile->blocked && !profile->deletedLocally) {
         buddyStatusInfo = profile->buddyStatusInfo;
         if (buddyStatusInfo == NULL) {
             profile->buddyStatusInfo = gsimalloc(sizeof(GPIBuddyStatusInfo));
@@ -386,7 +386,7 @@ GPResult gpiProcessRecvBuddyStatusInfo(GPConnection *connection, const char *inp
             } else {
                 profile->buddyStatusInfo->buddyIndex = iconnection->profileList.numBuddies++;
             }
-            profile->buddyStatusInfo->extendedInfoKeys = func_ov011_02171514(sizeof(GPIKey), 1, gpiStatusInfoKeyFree);
+            profile->buddyStatusInfo->extendedInfoKeys = ArrayNew(sizeof(GPIKey), 1, gpiStatusInfoKeyFree);
             buddyStatusInfo = profile->buddyStatusInfo;
             if (buddyStatusInfo->extendedInfoKeys == NULL) {
                 gpiSetErrorString(connection, "Out of memory.");
@@ -528,7 +528,7 @@ GPResult gpiProcessRecvBuddyList(GPConnection *connection, const char *input) {
         memset(profile->buddyStatus, 0, sizeof(GPIBuddyStatus));
         profile->buddyStatus->buddyIndex = iconnection->profileList.numBuddies++;
         profile->buddyStatus->status = 0;
-        gpiSetBuddyDeleted(connection, profileid, gsi_false);
+        gpiBuddyDeletedLocally(connection, profileid, gsi_false);
     }
     return 0;
 }
@@ -624,8 +624,8 @@ GPResult gpiBuddyHandleKeyRequest(GPConnection *connection, GPIPeer *peer) {
 
 // Finds the operation of a peer that waits for the reply to a keys request
 #define GPI_FIND_KEYS_OP(op, peer)                                                                                     \
-    for ((op) = (peer)->peerOpQueue.opList; (op) != NULL; (op) = (op)->next) {                                         \
-        if ((op)->state == GPI_BM_KEYS_REQUEST) {                                                                      \
+    for ((op) = (peer)->peerOpQueue.first; (op) != NULL; (op) = (op)->next) {                                          \
+        if ((op)->type == GPI_BM_KEYS_REQUEST) {                                                                       \
             break;                                                                                                     \
         }                                                                                                              \
     }
@@ -659,7 +659,7 @@ GPResult gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *b
         if (op == NULL) {
             return 0;
         }
-        if (op->state == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
+        if (op->type == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
             arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
             callbackNone.callback = op->callback;
             callbackNone.param = op->userData;
@@ -686,7 +686,7 @@ GPResult gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *b
             if (op == NULL) {
                 return 0;
             }
-            if (op->state == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
+            if (op->type == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
                 arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
                 callbackEmpty.callback = op->callback;
                 callbackEmpty.param = op->userData;
@@ -722,7 +722,7 @@ GPResult gpiBuddyHandleKeyReply(GPConnection *connection, GPIPeer *peer, char *b
             if (op == NULL) {
                 return 0;
             }
-            if (op->state == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
+            if (op->type == GPI_BM_KEYS_REQUEST && op->callback != NULL) {
                 arg = gsimalloc(sizeof(GPGetBuddyStatusInfoKeysArg));
                 callbackKeys.callback = op->callback;
                 callbackKeys.param = op->userData;
@@ -797,7 +797,7 @@ GPResult gpiDeleteBuddy(GPConnection *connection, GPProfile profile, GPIBool sen
         gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, pProfile->profileId);
         gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\final\\");
     }
-    gpiSetBuddyDeleted(connection, profile, gsi_true);
+    gpiBuddyDeletedLocally(connection, profile, gsi_true);
     buddyStatus = pProfile->buddyStatus;
     if (buddyStatus != NULL) {
         index = buddyStatus->buddyIndex;
@@ -825,7 +825,7 @@ GPResult gpiDeleteBuddy(GPConnection *connection, GPProfile profile, GPIBool sen
         // NULL and never freed
 #ifdef BUGFIX
         if (pProfile->buddyStatusInfo->extendedInfoKeys != NULL) {
-            func_ov011_02171558(pProfile->buddyStatusInfo->extendedInfoKeys);
+            ArrayFree(pProfile->buddyStatusInfo->extendedInfoKeys);
             pProfile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
         gsifree(pProfile->buddyStatusInfo);
@@ -834,7 +834,7 @@ GPResult gpiDeleteBuddy(GPConnection *connection, GPProfile profile, GPIBool sen
         gsifree(pProfile->buddyStatusInfo);
         pProfile->buddyStatusInfo = NULL;
         if (pProfile->buddyStatusInfo->extendedInfoKeys != NULL) {
-            func_ov011_02171558(pProfile->buddyStatusInfo->extendedInfoKeys);
+            ArrayFree(pProfile->buddyStatusInfo->extendedInfoKeys);
             pProfile->buddyStatusInfo->extendedInfoKeys = NULL;
         }
 #endif
@@ -844,7 +844,7 @@ GPResult gpiDeleteBuddy(GPConnection *connection, GPProfile profile, GPIBool sen
     return 0;
 }
 
-int gpiSetBuddyDeleted(GPConnection *connection, int profile, gsi_bool deleted) {
+int gpiBuddyDeletedLocally(GPConnection *connection, int profile, gsi_bool deleted) {
     GPIProfile *pProfile;
 
     if (profile <= 0) {
@@ -852,7 +852,7 @@ int gpiSetBuddyDeleted(GPConnection *connection, int profile, gsi_bool deleted) 
         return 2;
     }
     if (gpiGetProfile(connection, profile, &pProfile)) {
-        pProfile->deleted = deleted;
+        pProfile->deletedLocally = deleted;
     }
     return 0;
 }
