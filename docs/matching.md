@@ -3336,6 +3336,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   instructions are unchanged. MSL's `register_atexit.c`, `console_io.c` and `call_static_initializers.c` emit the ROM's
   48-byte `.exceptix` prefix, with four relocations to their functions; leaf console procedures emit no entries.
   Keep this as the compiler's section rather than writing a C table of its encoding.
+- A leading zero block in an autoload can contain its empty static-initializer list and alignment fill. Both ROMs'
+  ITCM autoload entries specify `0x01ff8000` as the initializer start; `boot_BootstrapExec` passes that field to
+  `func_02004d50`, which copies pointers through the first null. The word at `0x01ff8000` is that terminator,
+  followed by 28 zero bytes before `mainRenderer` at the next 32-byte boundary, `0x01ff8020`. Check the original
+  autoload metadata and startup code before treating such a gap as a missing source file or assembly function.
+
 - A local array with an initializer goes in a `.rodata` section of its own, ahead of the file's shared one; a struct
   of the same bytes copied from a static gives the same inline `ldrb`/`strb` pairs and keeps the static in declaration
   order in the shared section. NitroWiFi's `WCM_FindVendorIE` matches, with the file's `.rodata`, only with its OUI as
