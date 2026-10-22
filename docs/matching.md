@@ -2547,10 +2547,14 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   through) is never taken. Branch optimization, which runs after register allocation, sends a branch to a block that
   is a lone `b` on to that `b`'s target, so an `if` whose body falls into a `b` leaves no block there; when the
   original's out-of-range branches share the `b` after an `if` body, that `if`'s test still branched to it, because
-  the block after the `if` held another instruction at that stage that the final code no longer has. A test function
-  shows it with a copy between two variables that end up in one register (`int k = f(); if (k == X) { ... } last =
-  k;`): the `bne` keeps that `b`, and earlier branches to the loop's end take it. `dwcutil_ac.c`'s `UtilAc_Run`
-  differs only this way (its row).
+  the block after the `if` held another instruction at that stage that the final code no longer has: a copy between
+  two variables that end up in one register or stack slot. A `static inline` that takes a variable by value and
+  returns it makes that copy: `dwcutil_ac.c`'s `UtilAc_Run` matches with its session key taken by
+  `retries = UtilAc_TakeSessionKey(sAcMessage, retries);`, whose `if (type == 0x101)` sets `retries = 0;` among the
+  key's stores and ends in `return retries;`. The parameter and the result share `retries`'s stack slot, so the copy
+  back after the `if` leaves no code, but the type test's `bne` still went to it, and case 4's two failed tests then
+  share the `b` after the key block. With the key block written in place, the `bne` goes on to the loop's test and all
+  three take a later `b` the fixer adds.
 - Identical statements in different branches are merged, so a branch that jumps into the middle of another block had
   the same code in the source. For example, `if (a) { x = 3; y = 19; } else { x = 0; y = 19; }` compiles differently
   from `x = a ? 3 : 0; y = 19;`. A run of jumps to one store, as in the start menu's `StartMenu_MoveCursor`, is the

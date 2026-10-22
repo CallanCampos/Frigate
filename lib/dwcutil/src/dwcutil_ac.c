@@ -1833,6 +1833,27 @@ static int UtilAc_MakeResult(void) {
     return result;
 }
 
+// Takes the session key from the AP's answer to our hello when that is what its first item holds, and moves on to
+// asking for the settings with it. Returns the count of retries to go on with, 0 once it has the key
+static inline int UtilAc_TakeSessionKey(const u8 *message, int retries) {
+    u32 now;
+    u32 length;
+    u32 type;
+    const u8 *data = UtilAc_FirstItem(message, &type, &length);
+
+    if (type == 0x101) {
+        now = UtilAc_GetMilliseconds();
+        memcpy(sAcSessionKey, data, 8);
+        UtilAc_Md5(sAcSessionKey + 8, (u8 *)&now, sizeof(now));
+        retries = 0;
+        sAcStep = 7;
+        sAcState = AC_STATE_KEY;
+        sAcConfig.deadline = 0xffffffff;
+        UtilAc_NotifyStatus();
+    }
+    return retries;
+}
+
 // The setup, step by step: scan until an access point opens its setup, join it, wait for its hello and answer it,
 // take the session key, ask for the settings with it, take them, and say so. Returns 1, or a negative number
 static int UtilAc_Run(void) {
@@ -1843,10 +1864,6 @@ static int UtilAc_Run(void) {
     BOOL done = FALSE;
     SocAddrIn address;
     SocAddrIn from;
-    u32 type;
-    u32 length;
-    u32 now;
-    const u8 *data;
 
     sAcStep = 1;
     while (!done && !sAcCancel) {
@@ -1920,17 +1937,7 @@ static int UtilAc_Run(void) {
                 done = TRUE;
             } else if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
                        UtilAc_ParseBody(sAcPacket, 3, sAcMessage, sAcKey)) {
-                data = UtilAc_FirstItem(sAcMessage, &type, &length);
-                if (type == 0x101) {
-                    now = UtilAc_GetMilliseconds();
-                    memcpy(sAcSessionKey, data, 8);
-                    UtilAc_Md5(sAcSessionKey + 8, (u8 *)&now, sizeof(now));
-                    retries = 0;
-                    sAcStep = 7;
-                    sAcState = AC_STATE_KEY;
-                    sAcConfig.deadline = 0xffffffff;
-                    UtilAc_NotifyStatus();
-                }
+                retries = UtilAc_TakeSessionKey(sAcMessage, retries);
             } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
                 sAcStep = 5;
             }
