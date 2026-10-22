@@ -223,6 +223,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
   `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
 
+- A loop's character and index swapped although every order of the locals was tried: read the character into an
+  `int c;` declared first at the top. (matching.md: "declared first at the top")
+- Don't try `register` for allocation or a counter that nothing reads: MWCC 2.0/sp2 ignores it. A `const` on an
+  initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
+
 ## Stack slots or frame size
 
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
@@ -573,6 +578,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
   calls; check the SDK inline's mask (`y2 & 0xff`, not `(u8)y2`). (matching.md: "An `ands` with 0xffff kept")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
+- A round-up to 32 with `ands` against a -32 derived from a register 0x1f (`subs rX, #0x3f`) where ours has `bics`:
+  the sum is done in 64 bits, `((u64)ptr + 0x1f) & ~0x1f`. (matching.md: "the sum done in 64 bits")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
@@ -861,6 +868,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   argument after the loop. (matching.md: "A search loop whose normal exit")
 - A static loaded in the loop on each pass where the ROM loads it once below the entry test, with a store through
   a pointer in the loop: declare the static inside the function. (matching.md: "A function-local `static` is hoisted")
+- A second loop counter that the original zeroes, stores and steps but never reads: the same variable is also read as a
+  value before the loop (`i = f(); if (i > n) { n = i; }`), which keeps its steps. (matching.md: "drops a loop counter
+  that only indexes")
 
 ## Switches
 

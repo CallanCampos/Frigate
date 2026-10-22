@@ -31,8 +31,9 @@ static void Set_WLLA_LINK_STAT(WLLA_LINK_STAT *result, const WMBssDesc *bss, int
 static void aoss_apc_callback(int event, int param);
 static void alarmCallback(void *arg);
 
-static WCMWepDesc sWep;
-static WMBssDesc sBss;
+// 32-byte aligned, as the ROM places them, which also keeps AOSSi_WLANConnect's empty loop
+static WCMWepDesc sWep ATTRIBUTE_ALIGN(32);
+static WMBssDesc sBss ATTRIBUTE_ALIGN(32);
 static OSMessageQueue sAossApQueue;
 static OSMessage sAossApMessages[4];
 DWCAossFreeFunc gAossApFree = NULL;
@@ -365,6 +366,13 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
         while (running) {
             OS_ReceiveMessage(&sAossApQueue, &message, OS_MESSAGE_BLOCK);
             switch ((int)message) {
+            case 18:
+                if (!connected) {
+                    running = FALSE;
+                }
+                break;
+            case 19:
+                break;
             case 4:
             case DWC_WCM_EVENT_SEARCHING:
                 break;
@@ -405,13 +413,6 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
                     running = FALSE;
                 }
                 break;
-            case 18:
-                if (!connected) {
-                    running = FALSE;
-                }
-                break;
-            case 19:
-                break;
             case 0:
             case 1:
             case 2:
@@ -424,8 +425,6 @@ int AOSSi_WLANConnect(const WLLA_CONNECT_PARAM *param, WLLA_LINK_STAT *result) {
             case 15:
             case 16:
             case 17:
-                running = FALSE;
-                break;
             default:
                 running = FALSE;
                 break;

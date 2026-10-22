@@ -72,6 +72,15 @@ tools that show the differences.
   first: `key_data_savedata.c`'s `KeyDataSave_SetTrainerDefeated` and `KeyDataSave_SetFlag` clear with
   `mask = 0xffffffff; mask ^= 1 << bit; keyData->flags &= mask;`, and set with
   `mask = 1; mask <<= bit; keyData->flags |= mask;`, where `|= 1 << bit` adds a register copy.
+- A round-up to 32 that adds the 0x1f from a register and masks with an `ands` against a -32 derived from it
+  (`movs r1, #0x1f; adds r2, r0, r1; adds r0, r1, #0; subs r0, #0x3f; ands r3, r0`), where every 32-bit spelling
+  gives `adds r0, #0x1f` and `bics` (`& ~0x1f`, `& -32`, `/ 32 * 32`, `>> 5 << 5`, locals, inline helpers), is the
+  sum done in 64 bits: MWCC folds 64-bit constants only after its 32-bit passes, so both stay values in registers.
+  `dwcutil_ac.c`'s `InitAtermApcNetwork` matches with `(void *)(((u64)sAcBlock + 0x1f) & ~0x1f)` (a `0x1fULL` literal
+  or an `s64` cast compile the same), while `UtilAcWcm_Start` in the same file rounds in 32 bits with `bics`.
+- A `char` read into an `int` local declared first at the top (`int c; int value = 0; int i;`, `c = text[i];` in
+  the loop) takes another register than a `char` declared in the loop or an `int` declared later: `dwcutil_ac.c`'s
+  `AsciiToHex` swapped its character and index between `r1` and `r3` with every other order and type.
 - One swap temporary declared first and shared by two swaps gets other registers than one in each swap's block:
   `clact.c`'s `ClAct_IsCellInViewTransformed`. A pointer local to a copy loop's source array, `const u16 *name = src->nickname;`,
   moves which values get registers around the loop: `fld_btl_inst_tool.c`'s `genSubwayBtlInstitutePoke`, which
@@ -300,6 +309,11 @@ Same instructions, registers swapped.
 - An element address computed before an inline helper's argument calls, and kept in a register while the loop counter
   spills, is the address passed to the helper: `CtvtCall_CreateActor(sys, &call->rows[i].frame, ...)` stores through
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
+- A spilled counter in the lowest named slot, below the loop-invariant temporaries, can be a counter whose other
+  pieces live in registers: `dwcutil_ac.c`'s `CheckAccessPoint` counts its first and last loops with `i`, which
+  stays on the stack for the `*index = i` after them, and puts `i` at `sp+0xc` only when the loop between them, kept
+  in `r6`, counts with `i` too; that loop counting with `j` or a counter of its own leaves `i` among the declared
+  locals in every declaration order.
 - Two loops that reuse one counter and both spill it share its stack slots in the order MWCC splits the variable,
   not in declaration order; giving the second loop a counter of its own, as `pos` in the same function, moves it.
   A counter of its own also moves registers: `pos_handlers.c`'s `HandlerPosLunarDance` gives its PP loop `j` and its
@@ -357,6 +371,14 @@ Same instructions, registers swapped.
   pointer grows the frame from 0x10 to 0x1c and computes a separate address. Declaring `finished` before `slot`, then
   assigning its zero after `slot` is initialized, copies the saved zero into the loop counter instead of reloading the
   stack slot. The two timing calls also need the picture number narrowed to `u8` after adding 32.
+- A stack buffer's address that the original computes once before a loop into a saved register (`add r4, sp, #4`),
+  while calls in the loop still rebuild it from `sp`, is a pointer to the buffer assigned in the loop body. MWCC folds
+  `text`, `&text[0]` and an inline helper's pointer parameter back into `sp`-relative addresses, but hoists
+  `char *key = text;` declared in the loop, and the hoisted pointer then outranks a result that the original keeps on
+  the stack. The DWC utility's `StoreNetParam` (`dwcutil_ac.c`) matches with the WEP key switch in the loop and
+  every use of the key text through `key`; the same pointer at function scope is hoisted to the function's start
+  instead (59 bytes), and an inline helper taking the text, the key and the result in any shape keeps the result in
+  `r7` (292 to 300 bytes).
 - A loop-invariant field read through a `const` pointer parameter, which the original keeps in `ip`, `r7` or a stack
   slot across the loop, can be a load MWCC hoisted itself. Written as a local before the loop it keeps the same
   copies but rotates the registers of the loop's own locals and swaps the order the parameters are spilled in:
@@ -2556,6 +2578,21 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   before its switch, whose `b` the callback's early `return` above it then shares, and `break;` ending its cases;
   with the switch inside `if (!stream->paused) { ... }` and the running case ending in `return;`, that `bne` took
   a later `b` the case's `return` had put on the return label.
+- MWCC 2.0's Thumb fixer for `b<cond>` out of range (sp2's `mwccarm.exe`, 0x515630) goes from the function's last
+  branch back to its first. For each one it finds the first block after it that starts with a `b` to the same label
+  and is a branch target, and goes through that `b` if it is in range; otherwise it inverts the branch around a new
+  `b`, which the branches before it can then take. A `b` that only closes a block (a case's `break` reached by falling
+  through) is never taken. Branch optimization, which runs after register allocation, sends a branch to a block that
+  is a lone `b` on to that `b`'s target, so an `if` whose body falls into a `b` leaves no block there; when the
+  original's out-of-range branches share the `b` after an `if` body, that `if`'s test still branched to it, because
+  the block after the `if` held another instruction at that stage that the final code no longer has: a copy between
+  two variables that end up in one register or stack slot. A `static inline` that takes a variable by value and
+  returns it makes that copy: `dwcutil_ac.c`'s `AutoConfigThreadEx` matches with its session key taken by
+  `retries = UtilAc_TakeSessionKey(sAcMessage, retries);`, whose `if (type == 0x101)` sets `retries = 0;` among the
+  key's stores and ends in `return retries;`. The parameter and the result share `retries`'s stack slot, so the copy
+  back after the `if` leaves no code, but the type test's `bne` still went to it, and case 4's two failed tests then
+  share the `b` after the key block. With the key block written in place, the `bne` goes on to the loop's test and all
+  three take a later `b` the fixer adds.
 - Identical statements in different branches are merged, so a branch that jumps into the middle of another block had
   the same code in the source. For example, `if (a) { x = 3; y = 19; } else { x = 0; y = 19; }` compiles differently
   from `x = a ? 3 : 0; y = 19;`. A run of jumps to one store, as in the start menu's `StartMenu_MoveCursor`, is the
@@ -3050,6 +3087,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   reads. Under the attribute `IrcLink_Poll` matches with `if (IrcLink.connectCallback)`, while `!= NULL` compares with
   the zero it has just stored (`cmp r2, r1` for the original's `cmp r2, #0`; An instruction too many or too few:
   "A pointer compared with `NULL`").
+  The DWC utility's `AOSSi_WLANConnect` (`dwc_aoss_ap.c`, 2.0/sp2) is the same case: its empty loop over the SSID,
+  entered with a `b`, and its `connected` flag kept in a register from its first 0 (where MWCC otherwise folds the 0
+  into the stores) come only with its file statics `sWep` and `sBss`, both on 32-byte boundaries in the ROM, declared
+  `ATTRIBUTE_ALIGN(32)`: 335 bytes became 31.
   In overlay 139's `UpdateScroll` the attribute on any object or member the function reads also keeps the two reads
   of `list->dragDelta` in the arms of an `||` from being merged (4 bytes more), and leaves its index-first table read
   as it is (Instruction order: "that MWCC shares between two accesses").
@@ -3104,6 +3145,25 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `break` written in place leaves the counter as it is. The inline also walks its table with a post-incremented pointer
   (`ldr r8, [fp], #4`) from `value <= *table++`. libVCT's `vct_encode_g711_ulaw` (`vct_buffer.c`) reaches its size only with
   G.711's `search(val, table, size)` as a `static inline` (its row).
+- A counted loop that reads through a post-incremented pointer copies the counter's start into a register of its own
+  after the guard and loads from the stepped pointer indexed by that copy (`adds r7, r6, #0`, then
+  `ldrsb r1, [r5, r7]; adds r5, r5, #1` beside the load), and only when the counter's test is signed. `dwcutil_ac.c`'s
+  `GetWLanSetElement` matches with `p += PutHex(p, *data++);` under `i < (int)length`: `data[i]` (or
+  `((const s8 *)data)[i]`) indexes by the counter and steps the pointer after the call, and the `u32` length's
+  unsigned test (`bcc`) gives no copy at all. The copy's register can push a value that the loop doesn't use onto the
+  stack: there the start of the message's items, stored as the message and then as the message plus 8. NHTTP's
+  `NHTTPi_getUrlEncodedSize2` (`c = *s++;` under `i < length`) shows the same copy.
+- Two identical conditional branches in a row ahead of a loop (`cmp r4, #0; ble end; ble end`) are an `if (n > 0)`
+  around a `for` whose counter was set before the `if`: `int i = 0; ... if (length > 0) { for (; i < length; i++) ... }`
+  in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `dwcutil_ac.c`'s `ScanAP` (still in its row). A
+  bare `for`, or the `if` without the earlier start, gives one branch.
+- MWCC 2.0 drops a loop counter that only indexes what the loop steps by pointer, with all its stores and steps, unless
+  the same variable is read as a value elsewhere before the loop. `dwcutil_ac.c`'s `ScanAP` copies the access
+  points with `for (; j < count; j++)`, storing to `scan->Bssid[i]` and stepping `i` after `bss++`; the original
+  zeroes, stores and steps `i` without reading it, and so does ours once the same `i` holds the AP list's length in the
+  event loop before (`i = UtilAcWcm_GetApList(...); if (i > count) { count = i; ... }`). Assigned in the `if`'s
+  condition, read only by a `switch`, or read after the loop, it is dropped. The loop's part of a variable reused this
+  way is spilled to the lowest slot, below the loop's temporaries.
 
 ## Switches
 
@@ -4009,3 +4069,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   buffer out through a cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect`
   gets the sector index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops
   by `slot + banks`. Look the function up there before grinding registers.
+
+- MWCC 2.0/sp2 (`-O4,p`) ignores the `register` storage class: `register` on any local or parameter leaves the code
+  byte-identical, with or without register pressure, and a `register` counter that is stepped but never read is
+  dropped like any other. `dwcutil_ac.c`'s `CheckAccessPoint` and `ScanAP` gave the same bytes with it on every
+  local and parameter, alone and in pairs. A top-level `const` on an `int` or pointer parameter changes nothing either,
+  but a `const` on an initialized local can: `ScanAP`'s `const int size` swaps `size`'s stack slot with the copy
+  loop's entry pointer.
