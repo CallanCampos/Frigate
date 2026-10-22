@@ -24,22 +24,22 @@ static struct {
     void *paletteDest;
 } sBgBuffer;
 
-void DWCUtilBgBuffer_Init(const void *screen) {
-    sBgBuffer.buffer = DWCUtilHeap_AllocClear(sizeof(DWCUtilBgBuffer), 4);
+void DWCi_SCREENlInit(const void *screen) {
+    sBgBuffer.buffer = DWCi_HEAPlAllocEx(sizeof(DWCUtilBgBuffer), 4);
     MIi_CpuCopyFast(screen, sBgBuffer.buffer->screen, sizeof(sBgBuffer.buffer->screen));
-    sBgBuffer.buffer->task = DWCUtilTask_Create(1, DWCUtilBgBuffer_UploadTask, NULL, 120);
+    sBgBuffer.buffer->task = DWCi_TSKlForm(1, DWCUtilBgBuffer_UploadTask, NULL, 120);
 }
 
-void DWCUtilBgBuffer_Exit(void) {
-    DWCUtilTask_Remove(1, sBgBuffer.buffer->task);
-    DWCUtilHeap_FreeAndNull(&sBgBuffer.buffer);
+void DWCi_SCREENlEnd(void) {
+    DWCi_TSKlDeleteEx(1, sBgBuffer.buffer->task);
+    DWCi_HEAPlFree_(&sBgBuffer.buffer);
 }
 
-void DWCUtilBgBuffer_MarkDirty(void) {
+void DWCi_SCREENlRenew(void) {
     sBgBuffer.buffer->dirty = TRUE;
 }
 
-void DWCUtilBgBuffer_CopyRows(const u16 *src, int offset, int width, int rows) {
+void DWCi_SCREENlCopy(const u16 *src, int offset, int width, int rows) {
     int i;
     u16 *dest = sBgBuffer.buffer->screen + offset;
 
@@ -58,23 +58,23 @@ static void DWCUtilBgBuffer_UploadTask(DWCUtilTask *task, void *arg) {
     }
 }
 
-void DWCUtilBgBuffer_LoadPaletteRow(const void *palette, int src, int dest) {
+void DWCi_SCREENlCopyPalette(const void *palette, int src, int dest) {
     sBgBuffer.paletteSrc = (const u8 *)palette + src * 32;
     sBgBuffer.paletteDest = (void *)(HW_BG_PLTT + dest * 32);
-    DWCUtilTask_Create(1, DWCUtilBgBuffer_LoadPaletteRowTask, NULL, 120);
+    DWCi_TSKlForm(1, DWCUtilBgBuffer_LoadPaletteRowTask, NULL, 120);
 }
 
 static void DWCUtilBgBuffer_LoadPaletteRowTask(DWCUtilTask *task, void *arg) {
     MI_CpuCopy16(sBgBuffer.paletteSrc, sBgBuffer.paletteDest, 32);
-    DWCUtilTask_QueueRemoval(1, task);
+    DWCi_TSKlDelete(1, task);
 }
 
 void DWCUtilBgBuffer_LoadPalette(const void *palette) {
     sBgBuffer.paletteSrc = palette;
-    DWCUtilTask_Create(1, DWCUtilBgBuffer_LoadPaletteTask, NULL, 120);
+    DWCi_TSKlForm(1, DWCUtilBgBuffer_LoadPaletteTask, NULL, 120);
 }
 
 static void DWCUtilBgBuffer_LoadPaletteTask(DWCUtilTask *task, void *arg) {
     MI_CpuCopy16(sBgBuffer.paletteSrc, (void *)HW_BG_PLTT, 0x200);
-    DWCUtilTask_QueueRemoval(1, task);
+    DWCi_TSKlDelete(1, task);
 }

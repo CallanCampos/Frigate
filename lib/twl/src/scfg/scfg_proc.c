@@ -31,7 +31,7 @@ typedef struct SCFGWork {
 
 static SCFGWork scfgWork;
 
-static void SCFGi_CommonCallback(u32 tag, u32 data, BOOL err);
+static void SCFGi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err);
 
 void SCFG_Init(void) {
     PXI_SetFifoRecvCallback(PXI_FIFO_TAG_SCFG, SCFGi_CommonCallback);
@@ -39,7 +39,7 @@ void SCFG_Init(void) {
 }
 
 void SCFG_SetCpuSpeed(SCFGCpuSpeed speed) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (speed != (reg_SCFG_CLK & SCFG_CLK_CPU_2X)) {
         SCFGi_SwitchCpuSpeed(speed);
@@ -47,7 +47,7 @@ void SCFG_SetCpuSpeed(SCFGCpuSpeed speed) {
     OS_RestoreInterrupts(irq);
 }
 
-static void SCFGi_CommonCallback(u32 tag, u32 data, BOOL err) {
+static void SCFGi_CommonCallback(PXIFifoTag tag, u32 data, BOOL err) {
     u16 index = (data & SCFG_PXI_INDEX_MASK) >> SCFG_PXI_INDEX_SHIFT;
     u16 type = (data & SCFG_PXI_TYPE_MASK) >> SCFG_PXI_TYPE_SHIFT;
     u16 value = data & SCFG_PXI_DATA_MASK;

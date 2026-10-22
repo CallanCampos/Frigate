@@ -4,7 +4,8 @@
 // "WDS!" and four bytes of the beacon's BSSID, and kept when their CRC-16 is right. Its callers are the scan of
 // dwc_wdsscan.c and the connection of dwc_connectinet.c, which decrypts a beacon with WDS_DecryptBeaconInfo on its own.
 //
-// The WDS_ names are ours, taken from what the code does.
+// The names are NitroDWC's own, as its libraries' symbols and ntrtwl's reconstruction of NitroDWC have them,
+// where the code shows them; the WDS_ ones are ours, taken from what the code does.
 
 #include "dwc/wds.h"
 #include "nitro/math.h"
@@ -31,7 +32,7 @@ typedef struct WDSWork {
     u8 scanBuf[WDS_SCAN_BUF_SIZE];
     WMScanExParam scanParam;
     WMCallbackFunc callback; // the caller's, called when a scan is done
-    WDSBeaconInfo infos[WDS_MAX_ENTRIES];
+    WDSApInfo infos[WDS_MAX_ENTRIES];
     u16 signals[WDS_MAX_ENTRIES];
     u16 tgids[WDS_MAX_ENTRIES]; // the TGID of each beacon taken in, to take each parent in once
     int count;                  // how many entries are in use
@@ -42,10 +43,10 @@ typedef struct WDSWork {
     CRYPTORC4Context rc4;
 } WDSWork;
 
-static u8 WDS_RssiToSignal(u8 rssi);
-static void WDS_OnScan(void *arg);
-static int WDS_GetEntry(int index, WDSEntry *out);
-static BOOL WDS_IsPrintable(const u8 *text);
+static u8 WDSGetRssi8(u8 rssi);
+static void WDSScanCallback(void *arg);
+static int WDS_GetApInfoByIndex(int index, WDSBriefApInfo *out);
+static BOOL IsValidApnum(const u8 *text);
 
 static WDSWork *sWdsWork;
 
@@ -53,7 +54,7 @@ static WDSWork *sWdsWork;
 static const u32 sKeyPrefix = 'WDS!';
 
 // Turns the RSSI of a scan result into the signal strength that the entries keep
-static u8 WDS_RssiToSignal(u8 rssi) {
+static u8 WDSGetRssi8(u8 rssi) {
     int strength = rssi >> 2;
 
     if ((rssi & 2) == 0) {
@@ -63,7 +64,7 @@ static u8 WDS_RssiToSignal(u8 rssi) {
 }
 
 // The callback of the scan. It takes in the beacons that are new and well-formed, then tells the caller
-static void WDS_OnScan(void *arg) {
+static void WDSScanCallback(void *arg) {
     WMStartScanExCallback *result = arg;
     // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
     unsigned long i;
@@ -92,7 +93,7 @@ static void WDS_OnScan(void *arg) {
 
             if (WDS_DecryptBeaconInfo(&sWdsWork->rc4, &sWdsWork->crc, &sWdsWork->crcTable, result->bssDesc[i],
                                       &sWdsWork->infos[sWdsWork->next])) {
-                sWdsWork->signals[sWdsWork->next] = WDS_RssiToSignal(result->bssDesc[i]->rssi);
+                sWdsWork->signals[sWdsWork->next] = WDSGetRssi8(result->bssDesc[i]->rssi);
                 sWdsWork->tgids[sWdsWork->next] = result->bssDesc[i]->gameInfo.tgid;
                 sWdsWork->next = (sWdsWork->next + 1) % WDS_MAX_ENTRIES;
                 sWdsWork->count++;
@@ -109,7 +110,7 @@ static void WDS_OnScan(void *arg) {
     }
 }
 
-u32 WDS_GetWorkSize(void) {
+u32 WDS_GetWorkAreaSize(void) {
     return (sizeof(WDSWork) + 31) & ~31;
 }
 
@@ -121,7 +122,7 @@ int WDS_Initialize(void *work, WMCallbackFunc callback, u16 dmaNo) {
     }
 
     sWdsWork = work;
-    MI_CpuFill8(sWdsWork, 0, WDS_GetWorkSize());
+    MI_CpuFill8(sWdsWork, 0, WDS_GetWorkAreaSize());
     sWdsWork->state = WDS_STATE_IDLE;
     sWdsWork->crc = 0;
     MATHi_CRC16InitTableRev(&sWdsWork->crcTable, 0xa001);
@@ -166,7 +167,7 @@ int WDS_StartScan(WMCallbackFunc callback) {
     sWdsWork->callback = callback;
     sWdsWork->state = WDS_STATE_SCANNING;
 
-    result = WM_StartScanEx(WDS_OnScan, &sWdsWork->scanParam);
+    result = WM_StartScanEx(WDSScanCallback, &sWdsWork->scanParam);
     if (result == WM_ERRCODE_OPERATING) {
         result = 0;
     }
@@ -190,7 +191,7 @@ int WDS_EndScan(WMCallbackFunc callback) {
 }
 
 // Gives out the entry at an index of the ring, with its signal strength
-static int WDS_GetEntry(int index, WDSEntry *out) {
+static int WDS_GetApInfoByIndex(int index, WDSBriefApInfo *out) {
     if (sWdsWork->state != WDS_STATE_SCANNED) {
         return -1;
     }
@@ -198,27 +199,27 @@ static int WDS_GetEntry(int index, WDSEntry *out) {
         return -1;
     }
 
-    MI_CpuFill8(out, 0, sizeof(WDSEntry));
-    out->valid = TRUE;
-    out->signal = sWdsWork->signals[index];
-    MI_CpuCopy8(&sWdsWork->infos[index], &out->info, sizeof(WDSBeaconInfo));
+    MI_CpuFill8(out, 0, sizeof(WDSBriefApInfo));
+    out->isvalid = TRUE;
+    out->rssi = sWdsWork->signals[index];
+    MI_CpuCopy8(&sWdsWork->infos[index], &out->apinfo, sizeof(WDSApInfo));
     return 0;
 }
 
-int WDS_GetEntries(WDSEntry *entries) {
+int WDS_GetApInfoAll(WDSBriefApInfo *entries) {
     int i;
 
     if (sWdsWork->state != WDS_STATE_SCANNED) {
         return -1;
     }
 
-    MI_CpuFill8(entries, 0, WDS_MAX_ENTRIES * sizeof(WDSEntry));
+    MI_CpuFill8(entries, 0, WDS_MAX_ENTRIES * sizeof(WDSBriefApInfo));
     for (i = 0; i < WDS_MAX_ENTRIES; i++) {
-        entries[i].valid = FALSE;
+        entries[i].isvalid = FALSE;
     }
 
     for (i = 0; i < sWdsWork->count; i++) {
-        if (WDS_GetEntry(i, &entries[i]) == -1) {
+        if (WDS_GetApInfoByIndex(i, &entries[i]) == -1) {
             break;
         }
     }
@@ -226,7 +227,7 @@ int WDS_GetEntries(WDSEntry *entries) {
 }
 
 BOOL WDS_DecryptBeaconInfo(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *table, const WMBssDesc *desc,
-                           WDSBeaconInfo *out) {
+                           WDSApInfo *out) {
     u8 key[8];
     u16 calculated;
 
@@ -234,25 +235,25 @@ BOOL WDS_DecryptBeaconInfo(CRYPTORC4Context *context, u16 *crc, MATHCRC16Table *
         return FALSE;
     }
 
-    MI_CpuCopy8(desc->gameInfo.userGameInfo, out, sizeof(WDSBeaconInfo));
+    MI_CpuCopy8(desc->gameInfo.userGameInfo, out, sizeof(WDSApInfo));
     MI_CpuCopy8(&sKeyPrefix, key, 4);
     MI_CpuCopy8(&desc->bssid[2], &key[4], 4);
     CRYPTO_RC4Init(context, key, sizeof(key));
-    CRYPTO_RC4Encrypt(context, out, sizeof(WDSBeaconInfo), out);
+    CRYPTO_RC4Encrypt(context, out, sizeof(WDSApInfo), out);
 
     // The accumulator is updated here, but the check below does its own calculation
-    MATHi_CRC16UpdateRev(table, crc, out, offsetof(WDSBeaconInfo, crc));
-    calculated = MATH_CalcCRC16(table, out, offsetof(WDSBeaconInfo, crc));
+    MATHi_CRC16UpdateRev(table, crc, out, offsetof(WDSApInfo, crc));
+    calculated = MATH_CalcCRC16(table, out, offsetof(WDSApInfo, crc));
     if (calculated == out->crc || out->crc == 0) {
         return TRUE;
     }
 
-    MI_CpuFill8(out, 0, sizeof(WDSBeaconInfo));
+    MI_CpuFill8(out, 0, sizeof(WDSApInfo));
     return FALSE;
 }
 
 // Whether ten bytes are all printable ASCII
-static BOOL WDS_IsPrintable(const u8 *text) {
+static BOOL IsValidApnum(const u8 *text) {
     int i;
 
     for (i = 0; i < 10; i++) {
@@ -263,8 +264,8 @@ static BOOL WDS_IsPrintable(const u8 *text) {
     return TRUE;
 }
 
-BOOL WDS_IsBeaconInfoValid(const WDSBeaconInfo *info) {
-    if ((info->flags & 2) && WDS_IsPrintable(info->spotInfo) && info->wepMode <= 3) {
+BOOL WDS_IsBeaconInfoValid(const WDSApInfo *info) {
+    if ((info->infoflag & 2) && IsValidApnum(info->apnum) && info->encryptflag <= 3) {
         return TRUE;
     }
     return FALSE;

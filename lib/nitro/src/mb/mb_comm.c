@@ -1,82 +1,84 @@
 // The parent side of the multiboot library's talk with its children: it keeps each child's state, takes in what the
-// children send and chooses the next frame to send (libmb). The names are descriptive, except swan's MB_Comm*
+// children send and chooses the next frame to send (libmb). It is the SDK's mb_parent.c, as ntrtwl's reconstruction of
+// NitroSDK has it. The names are NitroSDK's, as that reconstruction has them, except sLastFile, ours for what the SDK
+// keeps as a static of MBi_CommParentSendDLFileInfo
 #include "mb_private.h"
 
 // The file whose block was sent last, so that the next frame goes to the next file
 static u8 sLastFile = 0xff;
 // The files that a child asked a block of in this round of frames
-static u32 sBlockRequestMask;
+static u32 any_recv_bitmap;
 
-static BOOL MBComm_IsValidAid(u16 aid);
-static void MBComm_NotifyState(u16 aid, u32 state, void *arg);
-static void MBComm_SetState(u16 aid, u32 state, void *arg);
-static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid);
-static void MBComm_ReadMPData(const WMMpRecvBuf *mp);
-static int MBComm_SendFrame(u8 type, u16 aidBitmap);
-static int MBComm_SendFileInfo(void);
-static void MBComm_LoadCacheBlock(MBTask *task);
-static int MBComm_SendBlock(void);
-static void MBComm_SendNextFrame(void);
-static void MBComm_AdvanceSendCursor(u32 file);
-static u16 MBComm_MaxBlock(u32 a, u32 b);
-static void MBComm_NotifyError(u16 aid, u16 errcode);
+static BOOL IsChildAidValid(u16 aid);
+static void MBi_CommChangeParentStateCallbackOnly(u16 aid, u32 state, void *arg);
+static void MBi_CommChangeParentState(u16 aid, u32 state, void *arg);
+static void MBi_CommParentRecvDataPerChild(const WMMpRecvData *recv, u16 aid);
+static void MBi_CommParentRecvData(const WMMpRecvHeader *mp);
+static int MBi_CommParentSendMsg(u8 type, u16 aidBitmap);
+static int MBi_CommParentSendDLFileInfo(void);
+static void MBi_ReloadCache(MBiTaskInfo *task);
+static int MBi_CommParentSendBlock(void);
+static void MBi_CommParentSendData(void);
+static void MBi_calc_sendblock(u32 file);
+static u16 MBi_calc_nextsendblock(u32 a, u32 b);
+static void MBi_CommCallParentError(u16 aid, u16 errcode);
 
 void MB_CommSetParentStateCallback(MBCommPStateCallback callback) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
-    MB_PARENT_WORK->callback = callback;
+    pPwork->parent_callback = callback;
     OS_RestoreInterrupts(irq);
 }
 
 const MBUserInfo *MB_CommGetChildUser(u16 childAid) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
-    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid)) {
-        MI_CpuCopy8(&MB_PARENT_WORK->childUser[childAid - 1], &MB_PARENT_WORK->childUserCopy, sizeof(MBUserInfo));
+    if (mbc != NULL && IsChildAidValid(childAid)) {
+        MI_CpuCopy8(&pPwork->childUser[childAid - 1], &pPwork->childUserBuf, sizeof(MBUserInfo));
         OS_RestoreInterrupts(irq);
-        return &MB_PARENT_WORK->childUserCopy;
+        return &pPwork->childUserBuf;
     }
     OS_RestoreInterrupts(irq);
     return NULL;
 }
 
 BOOL MB_CommIsBootable(u16 childAid) {
-    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid) &&
-        MB_PARENT_WORK->childState[childAid - 1] == MB_COMM_PSTATE_SEND_COMPLETE) {
+    if (mbc != NULL && IsChildAidValid(childAid) &&
+        pPwork->p_comm_state[childAid - 1] == MB_COMM_PSTATE_SEND_COMPLETE) {
         return TRUE;
     }
     return FALSE;
 }
 
 BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     u16 response;
     u16 state;
 
     switch (ack) {
     case MB_COMM_RESPONSE_REQUEST_KICK:
         state = MB_COMM_PSTATE_REQUESTED;
-        response = MB_COMM_RESPONSE_KICK;
+        response = MB_COMM_USER_REQ_KICK;
         break;
     case MB_COMM_RESPONSE_REQUEST_ACCEPT:
         state = MB_COMM_PSTATE_REQUESTED;
-        response = MB_COMM_RESPONSE_ACCEPT;
+        response = MB_COMM_USER_REQ_ACCEPT;
         break;
     case MB_COMM_RESPONSE_REQUEST_DOWNLOAD:
         state = MB_COMM_PSTATE_WAIT_TO_SEND;
-        response = MB_COMM_RESPONSE_DOWNLOAD;
+        response = MB_COMM_USER_REQ_SEND_START;
         break;
     case MB_COMM_RESPONSE_REQUEST_BOOT:
         state = MB_COMM_PSTATE_SEND_COMPLETE;
-        response = MB_COMM_RESPONSE_BOOT;
+        response = MB_COMM_USER_REQ_BOOT;
         break;
     default:
         OS_RestoreInterrupts(irq);
         return FALSE;
     }
 
-    if (gMBCommWork != NULL && MBComm_IsValidAid(childAid) && state == MB_PARENT_WORK->childState[childAid - 1]) {
-        MB_PARENT_WORK->response[childAid - 1] = response;
+    if (mbc != NULL && IsChildAidValid(childAid) && state == pPwork->p_comm_state[childAid - 1]) {
+        pPwork->req2child[childAid - 1] = response;
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
@@ -85,80 +87,80 @@ BOOL MB_CommResponseRequest(u16 childAid, MBCommResponseRequestType ack) {
 }
 
 // Records a child's state and tells the callback
-static void MBComm_SetState(u16 aid, u32 state, void *arg) {
-    if (MBComm_IsValidAid(aid)) {
-        MB_PARENT_WORK->childState[aid - 1] = state;
+static void MBi_CommChangeParentState(u16 aid, u32 state, void *arg) {
+    if (IsChildAidValid(aid)) {
+        pPwork->p_comm_state[aid - 1] = state;
     }
-    MBComm_NotifyState(aid, state, arg);
+    MBi_CommChangeParentStateCallbackOnly(aid, state, arg);
 }
 
-static void MBComm_NotifyState(u16 aid, u32 state, void *arg) {
-    MBCommParentWork *work = MB_PARENT_WORK;
+static void MBi_CommChangeParentStateCallbackOnly(u16 aid, u32 state, void *arg) {
+    MB_CommPWork *work = pPwork;
 
-    if (work->callback != NULL) {
-        work->callback(aid, state, arg);
+    if (work->parent_callback != NULL) {
+        work->parent_callback(aid, state, arg);
     }
 }
 
 // What the library's wireless layer reports to the parent
-void MBComm_OnWmEvent(u16 event, void *arg) {
+void MBi_CommParentCallback(u16 event, void *arg) {
     switch (event) {
-    case MB_WM_EVENT_INIT_COMPLETE:
-        MBComm_SetState(0, MB_COMM_PSTATE_INIT_COMPLETE, arg);
+    case MB_CALLBACK_INIT_COMPLETE:
+        MBi_CommChangeParentState(0, MB_COMM_PSTATE_INIT_COMPLETE, arg);
         break;
-    case MB_WM_EVENT_CONNECTED: {
+    case MB_CALLBACK_CHILD_CONNECTED: {
         WMStartParentCallback *cb = arg;
 
         if (cb->aid != 0 && cb->aid < 16) {
-            MBComm_SetState(cb->aid, MB_COMM_PSTATE_CONNECTED, arg);
+            MBi_CommChangeParentState(cb->aid, MB_COMM_PSTATE_CONNECTED, arg);
         }
         break;
     }
-    case MB_WM_EVENT_DISCONNECTED: {
+    case MB_CALLBACK_CHILD_DISCONNECTED: {
         WMStartParentCallback *cb = arg;
 
         if (cb->aid == 0 || cb->aid >= 16) {
             break;
         }
-        MB_PARENT_WORK->childUnk148a[cb->aid - 1] = 0;
-        MI_CpuFill8(&MB_PARENT_WORK->childRequestGgid[cb->aid - 1], 0, sizeof(u32));
-        MI_CpuFill8(&MB_PARENT_WORK->childUser[cb->aid - 1], 0, sizeof(MBUserInfo));
-        MBFrame_ClearChild(cb->aid);
-        MB_PARENT_WORK->response[cb->aid - 1] = 0;
+        pPwork->childversion[cb->aid - 1] = 0;
+        MI_CpuFill8(&pPwork->childggid[cb->aid - 1], 0, sizeof(u32));
+        MI_CpuFill8(&pPwork->childUser[cb->aid - 1], 0, sizeof(MBUserInfo));
+        MBi_ClearParentPieceBuffer(cb->aid);
+        pPwork->req2child[cb->aid - 1] = 0;
         MBComm_LeaveFile(cb->aid);
-        if (MB_PARENT_WORK->childBitmap & (1 << cb->aid)) {
-            MB_PARENT_WORK->childCount--;
-            MB_PARENT_WORK->childBitmap &= ~(1 << cb->aid);
+        if (pPwork->child_entry_bmp & (1 << cb->aid)) {
+            pPwork->child_num--;
+            pPwork->child_entry_bmp &= ~(1 << cb->aid);
         }
-        if (MB_PARENT_WORK->childState[cb->aid - 1] == MB_COMM_PSTATE_BOOT_REQUEST) {
-            MBComm_SetState(cb->aid, MB_COMM_PSTATE_BOOT_STARTABLE, NULL);
+        if (pPwork->p_comm_state[cb->aid - 1] == MB_COMM_PSTATE_BOOT_REQUEST) {
+            MBi_CommChangeParentState(cb->aid, MB_COMM_PSTATE_BOOT_STARTABLE, NULL);
         }
-        MBComm_SetState(cb->aid, MB_COMM_PSTATE_DISCONNECTED, arg);
-        MB_PARENT_WORK->childState[cb->aid - 1] = MB_COMM_PSTATE_NONE;
+        MBi_CommChangeParentState(cb->aid, MB_COMM_PSTATE_DISCONNECTED, arg);
+        pPwork->p_comm_state[cb->aid - 1] = MB_COMM_PSTATE_NONE;
         break;
     }
-    case MB_WM_EVENT_MP_RECEIVED:
-        MBComm_ReadMPData(arg);
+    case MB_CALLBACK_MP_PARENT_RECV:
+        MBi_CommParentRecvData(arg);
         break;
-    case MB_WM_EVENT_END:
+    case MB_CALLBACK_END_COMPLETE:
         break;
-    case MB_WM_EVENT_MP_READY:
-        MBComm_SendNextFrame();
+    case MB_CALLBACK_MP_SEND_ENABLE:
+        MBi_CommParentSendData();
         break;
-    case MB_WM_EVENT_BEACON_SENT: {
+    case MB_CALLBACK_BEACON_SENT: {
         u8 i;
 
         for (i = 0; i < 16; i++) {
-            if (MB_PARENT_WORK->files[i].valid && MB_PARENT_WORK->files[i].changedMask != 0) {
-                MBGameInfo_Update(&MB_PARENT_WORK->files[i].record, MB_PARENT_WORK->childUser,
-                                  MB_PARENT_WORK->files[i].memberMask, MB_PARENT_WORK->files[i].changedMask);
-                MB_PARENT_WORK->files[i].changedMask = 0;
+            if (pPwork->fileinfo[i].valid && pPwork->fileinfo[i].changedMask != 0) {
+                MB_UpdateGameInfoMember(&pPwork->fileinfo[i].record, pPwork->childUser, pPwork->fileinfo[i].memberMask,
+                                        pPwork->fileinfo[i].changedMask);
+                pPwork->fileinfo[i].changedMask = 0;
             }
         }
-        MBGameInfo_Send(MBWm_GetGgid(), MBWm_GetTgid(), MBWm_GetAttribute());
+        MB_SendGameInfoBeacon(MBi_GetGgid(), MBi_GetTgid(), MBi_GetAttribute());
         break;
     }
-    case MB_WM_EVENT_ERROR: {
+    case MB_CALLBACK_API_ERROR: {
         WMCallback *cb = arg;
 
         switch (cb->errcode) {
@@ -168,17 +170,17 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
         case 6:
         case 8:
         case 9:
-            MBComm_NotifyError(0, MB_ERRCODE_FATAL);
+            MBi_CommCallParentError(0, MB_ERRCODE_FATAL);
             break;
         // The table of the switch runs to 15, so a case of that value goes with the default
         case 15:
         default:
-            MBComm_NotifyError(0, MB_ERRCODE_WM_FAILURE);
+            MBi_CommCallParentError(0, MB_ERRCODE_WM_FAILURE);
             break;
         }
         break;
     }
-    case MB_WM_EVENT_WM_ERROR: {
+    case MB_CALLBACK_ERROR: {
         WMCallback *cb = arg;
 
         switch (cb->apiid) {
@@ -193,26 +195,26 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
         case 21:
         case 25:
         case 29:
-            MBComm_NotifyError(0, MB_ERRCODE_FATAL);
+            MBi_CommCallParentError(0, MB_ERRCODE_FATAL);
             break;
         // The original's switch is one table from 0 to 29, which takes at least two more cases that go with the
         // default; which ones can't be told
-        case MB_WM_API_RESET:
-        case MB_WM_API_END:
+        case WM_APIID_RESET:
+        case WM_APIID_END:
         default:
-            MBComm_NotifyError(0, MB_ERRCODE_WM_FAILURE);
+            MBi_CommCallParentError(0, MB_ERRCODE_WM_FAILURE);
             break;
         }
         break;
     }
     }
 
-    if (event == MB_WM_EVENT_END) {
-        MBCommParentWork *work = MB_PARENT_WORK;
-        MBCommPStateCallback callback = work->callback;
+    if (event == MB_CALLBACK_END_COMPLETE) {
+        MB_CommPWork *work = pPwork;
+        MBCommPStateCallback callback = work->parent_callback;
 
-        MI_CpuClearFast(work, sizeof(MBCommParentWork));
-        gMBCommWork = NULL;
+        MI_CpuClearFast(work, sizeof(MB_CommPWork));
+        mbc = NULL;
         if (callback != NULL) {
             callback(0, MB_COMM_PSTATE_END, NULL);
         }
@@ -220,110 +222,110 @@ void MBComm_OnWmEvent(u16 event, void *arg) {
 }
 
 // Takes in a frame that a child sent
-static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
-    MBChildFrame frame;
-    const MBChildRequest *request;
+static void MBi_CommParentRecvDataPerChild(const WMMpRecvData *recv, u16 aid) {
+    MBCommChildBlockHeader frame;
+    const MBCommRequestData *request;
     u32 state;
 
     if (aid == 0 || aid > 15) {
         return;
     }
-    request = MBFrame_Decode(recv->data, &frame, aid);
-    state = MB_PARENT_WORK->childState[aid - 1];
+    request = MBi_SetRecvBufferFromChild((const u8 *)&recv->cdata[0], &frame, aid);
+    state = pPwork->p_comm_state[aid - 1];
 
     switch (frame.type) {
-    case MB_FRAME_REQUEST:
+    case MB_COMM_TYPE_CHILD_FILEREQ:
         if (request == NULL) {
             return;
         }
         if (state == MB_COMM_PSTATE_CONNECTED) {
-            MBChildRequest req;
+            MBCommRequestData req;
 
-            MI_CpuCopy8(request, &req, MB_CHILD_REQUEST_SIZE);
-            MB_PARENT_WORK->childRequestGgid[aid - 1] = req.ggid;
-            MB_PARENT_WORK->childUnk148a[aid - 1] = req.unk_1a;
-            MI_CpuCopy8(&req.user, &MB_PARENT_WORK->childUser[aid - 1], sizeof(MBUserInfo));
-            MB_PARENT_WORK->childUser[aid - 1].playerNo = aid;
-            MBComm_SetState(aid, MB_COMM_PSTATE_REQUESTED, &req.user);
+            MI_CpuCopy8(request, &req, MB_COMM_REQ_DATA_SIZE);
+            pPwork->childggid[aid - 1] = req.ggid;
+            pPwork->childversion[aid - 1] = req.version;
+            MI_CpuCopy8(&req.userinfo, &pPwork->childUser[aid - 1], sizeof(MBUserInfo));
+            pPwork->childUser[aid - 1].playerNo = aid;
+            MBi_CommChangeParentState(aid, MB_COMM_PSTATE_REQUESTED, &req.userinfo);
         }
         if (state == MB_COMM_PSTATE_REQUESTED) {
             u8 i;
             u8 count = 0;
-            u8 file = request->fileNo;
+            u8 file = request->fileid;
 
-            if (file >= 16 || !MB_PARENT_WORK->files[file].valid ||
-                MB_PARENT_WORK->childRequestGgid[aid - 1] != MB_PARENT_WORK->files[file].registry->ggid) {
-                MB_PARENT_WORK->response[aid - 1] = MB_COMM_RESPONSE_KICK;
+            if (file >= 16 || !pPwork->fileinfo[file].valid ||
+                pPwork->childggid[aid - 1] != pPwork->fileinfo[file].registry->ggid) {
+                pPwork->req2child[aid - 1] = MB_COMM_USER_REQ_KICK;
             } else {
                 for (i = 0; i < 16; i++) {
-                    if (MB_PARENT_WORK->files[file].memberMask & (1 << i)) {
+                    if (pPwork->fileinfo[file].memberMask & (1 << i)) {
                         count++;
                     }
                 }
-                if (count >= MB_PARENT_WORK->files[file].registry->maxPlayerNum) {
-                    MB_PARENT_WORK->response[aid - 1] = 0;
-                    MBComm_SetState(aid, MB_COMM_PSTATE_MEMBER_FULL, NULL);
+                if (count >= pPwork->fileinfo[file].registry->maxPlayerNum) {
+                    pPwork->req2child[aid - 1] = 0;
+                    MBi_CommChangeParentState(aid, MB_COMM_PSTATE_MEMBER_FULL, NULL);
                     return;
                 }
             }
 
-            switch (MB_PARENT_WORK->response[aid - 1]) {
-            case MB_COMM_RESPONSE_ACCEPT:
-                if (MB_PARENT_WORK->childBitmap & (1 << aid)) {
+            switch (pPwork->req2child[aid - 1]) {
+            case MB_COMM_USER_REQ_ACCEPT:
+                if (pPwork->child_entry_bmp & (1 << aid)) {
                     break;
                 }
-                MB_PARENT_WORK->childCount++;
-                MB_PARENT_WORK->childBitmap |= 1 << aid;
-                MB_PARENT_WORK->childFile[aid - 1] = file;
-                MB_PARENT_WORK->files[file].memberMask |= 1 << aid;
-                MB_PARENT_WORK->files[file].changedMask |= 1 << aid;
-                MB_PARENT_WORK->response[aid - 1] = 0;
-                MBComm_SetState(aid, MB_COMM_PSTATE_REQ_ACCEPTED, NULL);
+                pPwork->child_num++;
+                pPwork->child_entry_bmp |= 1 << aid;
+                pPwork->fileid_of_child[aid - 1] = file;
+                pPwork->fileinfo[file].memberMask |= 1 << aid;
+                pPwork->fileinfo[file].changedMask |= 1 << aid;
+                pPwork->req2child[aid - 1] = 0;
+                MBi_CommChangeParentState(aid, MB_COMM_PSTATE_REQ_ACCEPTED, NULL);
                 break;
-            case MB_COMM_RESPONSE_KICK:
-                MB_PARENT_WORK->response[aid - 1] = 0;
-                MBComm_SetState(aid, MB_COMM_PSTATE_KICKED, NULL);
+            case MB_COMM_USER_REQ_KICK:
+                pPwork->req2child[aid - 1] = 0;
+                MBi_CommChangeParentState(aid, MB_COMM_PSTATE_KICKED, NULL);
                 break;
             }
         }
         break;
-    case MB_FRAME_DOWNLOAD_REQUEST:
+    case MB_COMM_TYPE_CHILD_ACCEPT_FILEINFO:
         if (state == MB_COMM_PSTATE_REQ_ACCEPTED) {
-            MBComm_SetState(aid, MB_COMM_PSTATE_WAIT_TO_SEND, NULL);
+            MBi_CommChangeParentState(aid, MB_COMM_PSTATE_WAIT_TO_SEND, NULL);
         } else if (state == MB_COMM_PSTATE_WAIT_TO_SEND) {
-            if (MB_PARENT_WORK->response[aid - 1] == MB_COMM_RESPONSE_DOWNLOAD) {
-                u8 file = MB_PARENT_WORK->childFile[aid - 1];
+            if (pPwork->req2child[aid - 1] == MB_COMM_USER_REQ_SEND_START) {
+                u8 file = pPwork->fileid_of_child[aid - 1];
 
-                MB_PARENT_WORK->files[file].downloadMask |= 1 << aid;
-                MB_PARENT_WORK->files[file].sendCursor = 0;
-                MB_PARENT_WORK->response[aid - 1] = 0;
-                MBComm_SetState(aid, MB_COMM_PSTATE_SEND_PROCEED, NULL);
+                pPwork->fileinfo[file].downloadMask |= 1 << aid;
+                pPwork->fileinfo[file].sendCursor = 0;
+                pPwork->req2child[aid - 1] = 0;
+                MBi_CommChangeParentState(aid, MB_COMM_PSTATE_SEND_PROCEED, NULL);
             }
         }
         break;
-    case MB_FRAME_BLOCK_REQUEST:
+    case MB_COMM_TYPE_CHILD_CONTINUE:
         if (state == MB_COMM_PSTATE_SEND_PROCEED) {
-            u8 file = MB_PARENT_WORK->childFile[aid - 1];
+            u8 file = pPwork->fileid_of_child[aid - 1];
 
             if (file != 0xff) {
-                MB_PARENT_WORK->files[file].requestedBlock =
-                    MBComm_MaxBlock(MB_PARENT_WORK->files[file].requestedBlock, frame.value);
-                sBlockRequestMask |= 1 << file;
+                pPwork->fileinfo[file].requestedBlock =
+                    MBi_calc_nextsendblock(pPwork->fileinfo[file].requestedBlock, frame.value);
+                any_recv_bitmap |= 1 << file;
             }
         }
         break;
-    case MB_FRAME_DOWNLOAD_DONE:
+    case MB_COMM_TYPE_CHILD_STOPREQ:
         if (state == MB_COMM_PSTATE_SEND_PROCEED) {
-            u8 file = MB_PARENT_WORK->childFile[aid - 1];
+            u8 file = pPwork->fileid_of_child[aid - 1];
 
             if (file != 0xff) {
-                MB_PARENT_WORK->files[file].downloadMask &= (u16) ~(1 << aid);
-                MBComm_SetState(aid, MB_COMM_PSTATE_SEND_COMPLETE, NULL);
+                pPwork->fileinfo[file].downloadMask &= (u16) ~(1 << aid);
+                MBi_CommChangeParentState(aid, MB_COMM_PSTATE_SEND_COMPLETE, NULL);
             }
         } else if (state == MB_COMM_PSTATE_SEND_COMPLETE) {
-            if (MB_PARENT_WORK->response[aid - 1] == MB_COMM_RESPONSE_BOOT) {
-                MB_PARENT_WORK->response[aid - 1] = 0;
-                MBComm_SetState(aid, MB_COMM_PSTATE_BOOT_REQUEST, NULL);
+            if (pPwork->req2child[aid - 1] == MB_COMM_USER_REQ_BOOT) {
+                pPwork->req2child[aid - 1] = 0;
+                MBi_CommChangeParentState(aid, MB_COMM_PSTATE_BOOT_REQUEST, NULL);
             }
         }
         break;
@@ -334,50 +336,50 @@ static void MBComm_ProcessChildFrame(const WMMpRecvData *recv, u16 aid) {
 }
 
 // Reads what every child sent in the last round
-static void MBComm_ReadMPData(const WMMpRecvBuf *mp) {
+static void MBi_CommParentRecvData(const WMMpRecvHeader *mp) {
     u16 i;
     u16 aid;
 
     for (i = 0; i < 16; i++) {
-        if (MB_PARENT_WORK->files[i].valid) {
-            MB_PARENT_WORK->files[i].requestedBlock = 0;
+        if (pPwork->fileinfo[i].valid) {
+            pPwork->fileinfo[i].requestedBlock = 0;
         }
     }
-    sBlockRequestMask = 0;
+    any_recv_bitmap = 0;
     for (aid = 1; aid <= 15; aid++) {
         const WMMpRecvData *recv = WM_ReadMPData(mp, aid);
 
         if (recv != NULL && recv->length != 0xffff && recv->length != 0) {
-            MBComm_ProcessChildFrame(recv, aid);
+            MBi_CommParentRecvDataPerChild(recv, aid);
         }
     }
 }
 
 // Sends a frame with nothing but its type
-static int MBComm_SendFrame(u8 type, u16 aidBitmap) {
-    MBFrame frame;
+static int MBi_CommParentSendMsg(u8 type, u16 aidBitmap) {
+    MBCommParentBlockHeader frame;
 
     frame.type = type;
-    MBFrame_Encode(&frame, gMBCommWork->sendBuf);
-    return MBComm_FlushAndSend(6, aidBitmap, gMBCommWork->sendBuf);
+    MBi_MakeParentSendBuffer(&frame, mbc->sendbuf);
+    return MBi_BlockHeaderEnd(6, aidBitmap, mbc->sendbuf);
 }
 
 // Sends the description of one file to the children that were accepted and want it, the files in turn
-static int MBComm_SendFileInfo(void) {
+static int MBi_CommParentSendDLFileInfo(void) {
     u8 count[16];
-    MBFrame frame;
+    MBCommParentBlockHeader frame;
     s8 file = -1;
     u16 aidBitmap = 0;
     u8 *out;
     u16 aid;
     u8 i;
-    MBCommParentWork *work;
+    MB_CommPWork *work;
 
     MI_CpuFill8(count, 0, sizeof(count));
-    work = MB_PARENT_WORK;
+    work = pPwork;
     for (aid = 1; aid <= 15; aid++) {
-        if (work->childState[aid - 1] == MB_COMM_PSTATE_REQ_ACCEPTED) {
-            count[work->childFile[aid - 1]]++;
+        if (work->p_comm_state[aid - 1] == MB_COMM_PSTATE_REQ_ACCEPTED) {
+            count[work->fileid_of_child[aid - 1]]++;
         }
     }
     {
@@ -385,48 +387,48 @@ static int MBComm_SendFileInfo(void) {
 
         for (i = 0; i < 16; i++) {
             next = (next + 1) % 16;
-            if (work->files[next].valid && count[next] != 0) {
+            if (work->fileinfo[next].valid && count[next] != 0) {
                 file = next;
                 break;
             }
         }
     }
     if (file == -1) {
-        return MB_SEND_NOTHING;
+        return MB_SENDFUNC_STATE_ERR;
     }
     sLastFile = file;
     for (aid = 1; aid <= 15; aid++) {
-        if (work->childState[aid - 1] == MB_COMM_PSTATE_REQ_ACCEPTED && file == work->childFile[aid - 1]) {
+        if (work->p_comm_state[aid - 1] == MB_COMM_PSTATE_REQ_ACCEPTED && file == work->fileid_of_child[aid - 1]) {
             aidBitmap |= 1 << aid;
         }
     }
-    frame.type = MB_FRAME_FILE_INFO;
-    frame.value = file;
-    out = MBFrame_Encode(&frame, work->common.sendBuf);
+    frame.type = MB_COMM_TYPE_PARENT_DL_FILEINFO;
+    frame.fid = file;
+    out = MBi_MakeParentSendBuffer(&frame, work->common.sendbuf);
     if (out != NULL) {
-        MI_CpuCopy8(&MB_PARENT_WORK->files[file], out, 0xe4);
+        MI_CpuCopy8(&pPwork->fileinfo[file], out, 0xe4);
     }
-    return MBComm_FlushAndSend(0xea, aidBitmap, gMBCommWork->sendBuf);
+    return MBi_BlockHeaderEnd(0xea, aidBitmap, mbc->sendbuf);
 }
 
 // Reads the part of the program that a child will want soon into the cache
-static void MBComm_LoadCacheBlock(MBTask *task) {
-    MBCache *cache = task->arg1;
-    MBCacheEntry *entry = task->arg0;
-    u32 size = entry->size;
+static void MBi_ReloadCache(MBiTaskInfo *task) {
+    MBiCacheList *cache = task->arg1;
+    MBiCacheInfo *entry = task->arg0;
+    u32 size = entry->len;
     FSFile file;
     FSArchive *archive;
 
-    archive = FS_FindArchive(cache->archiveName, cache->nameLength);
+    archive = FS_FindArchive(cache->arc_name, cache->arc_name_len);
     if (archive == NULL) {
-        archive = cache->archive;
+        archive = cache->arc_pointer;
     }
     if (OS_IsRunOnTwl()) {
         if (archive == FS_FindArchive("rom", 3)) {
             const MBTwlRomHeader *header = CARD_GetOwnRomHeaderTWL();
             u32 firstEnd = header->ntrRegionOffset + header->ntrRegionSize;
             u32 secondEnd = header->twlRegionOffset + header->twlRegionSize;
-            u32 offset = entry->offset;
+            u32 offset = entry->src;
 
             if (offset < firstEnd && offset + size > firstEnd) {
                 size = firstEnd - offset;
@@ -436,100 +438,95 @@ static void MBComm_LoadCacheBlock(MBTask *task) {
         }
     }
     FS_InitFile(&file);
-    if (FS_OpenFileDirect(&file, archive, entry->offset, entry->offset + size, -1)) {
-        if (size == FS_ReadFile(&file, entry->buf, size)) {
-            entry->state = MB_CACHE_ENTRY_READY;
+    if (FS_OpenFileDirect(&file, archive, entry->src, entry->src + size, -1)) {
+        if (size == FS_ReadFile(&file, entry->ptr, size)) {
+            entry->state = MB_CACHE_STATE_READY;
         }
         FS_CloseFile(&file);
     }
-    if (entry->state != MB_CACHE_ENTRY_READY) {
-        entry->offset = 0;
-        entry->state = MB_CACHE_ENTRY_READY;
+    if (entry->state != MB_CACHE_STATE_READY) {
+        entry->src = 0;
+        entry->state = MB_CACHE_STATE_READY;
     }
 }
 
 // Sends the next block of a file to the children that are downloading it
-static int MBComm_SendBlock(void) {
-    MBBlockSource source;
-    MBTask *task;
+static int MBi_CommParentSendBlock(void) {
+    MB_BlockInfo source;
+    MBiTaskInfo *task;
     u32 offsetInSegment;
-    MBFrame frame;
+    MBCommParentBlockHeader frame;
     u32 tableOffset;
-    MBCache *cache;
+    MBiCacheList *cache;
     u8 *out;
     u8 i;
 
-    if (MB_PARENT_WORK->fileCount == 0) {
-        return MB_SEND_NOTHING;
+    if (pPwork->file_num == 0) {
+        return MB_SENDFUNC_STATE_ERR;
     }
     for (i = 0; i < 16; i++) {
-        MB_PARENT_WORK->fileCursor = (MB_PARENT_WORK->fileCursor + 1) % 16;
-        if (MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].valid &&
-            MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].downloadMask != 0) {
+        pPwork->cur_fileid = (pPwork->cur_fileid + 1) % 16;
+        if (pPwork->fileinfo[pPwork->cur_fileid].valid && pPwork->fileinfo[pPwork->cur_fileid].downloadMask != 0) {
             break;
         }
     }
     if (i == 16) {
-        return MB_SEND_NOTHING;
+        return MB_SENDFUNC_STATE_ERR;
     }
-    MBComm_AdvanceSendCursor(MB_PARENT_WORK->fileCursor);
-    if (!MBFile_LocateBlock(&source, &MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].layout,
-                            MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].sendCursor,
-                            &MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor])) {
-        return MB_SEND_NOTHING;
+    MBi_calc_sendblock(pPwork->cur_fileid);
+    if (!MBi_get_blockinfo(&source, &pPwork->fileinfo[pPwork->cur_fileid].layout,
+                           pPwork->fileinfo[pPwork->cur_fileid].sendCursor, &pPwork->fileinfo[pPwork->cur_fileid])) {
+        return MB_SENDFUNC_STATE_ERR;
     }
-    frame.type = MB_FRAME_BLOCK;
-    frame.value = MB_PARENT_WORK->fileCursor;
-    frame.value2 = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].sendCursor;
-    out = MBFrame_Encode(&frame, gMBCommWork->sendBuf);
-    offsetInSegment =
-        source.bufAddr - MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].layout.segOffset[source.segment];
-    tableOffset = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].segmentRomOffsets[source.segment];
-    cache = MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].cache;
-    if (!MBCache_Read(cache, offsetInSegment + tableOffset, out, source.size)) {
-        task = &MB_PARENT_WORK->task;
-        if (!MBTask_IsBusy(task)) {
-            if (cache->missCounter != 0) {
-                cache->missCounter--;
+    frame.type = MB_COMM_TYPE_PARENT_DATA;
+    frame.fid = pPwork->cur_fileid;
+    frame.seqno = pPwork->fileinfo[pPwork->cur_fileid].sendCursor;
+    out = MBi_MakeParentSendBuffer(&frame, mbc->sendbuf);
+    offsetInSegment = source.offset - pPwork->fileinfo[pPwork->cur_fileid].layout.seg_src_offset[source.segment_no];
+    tableOffset = pPwork->fileinfo[pPwork->cur_fileid].segmentRomOffsets[source.segment_no];
+    cache = pPwork->fileinfo[pPwork->cur_fileid].cache;
+    if (!MBi_ReadFromCache(cache, offsetInSegment + tableOffset, out, source.size)) {
+        task = &pPwork->cur_task;
+        if (!MBi_IsTaskBusy(task)) {
+            if (cache->lifetime != 0) {
+                cache->lifetime--;
             } else {
-                MBCacheEntry *entries = cache->entries;
-                MBCacheEntry *oldest = NULL;
+                MBiCacheInfo *entries = cache->list;
+                MBiCacheInfo *oldest = NULL;
                 int n;
 
-                for (n = 0; n < MB_CACHE_ENTRY_COUNT; n++) {
-                    MBCacheEntry *candidate = &entries[n];
+                for (n = 0; n < MB_CACHE_INFO_MAX; n++) {
+                    MBiCacheInfo *candidate = &entries[n];
 
-                    if (candidate->state == MB_CACHE_ENTRY_READY &&
-                        (oldest == NULL || oldest->offset > candidate->offset)) {
+                    if (candidate->state == MB_CACHE_STATE_READY && (oldest == NULL || oldest->src > candidate->src)) {
                         oldest = candidate;
                     }
                 }
                 if (oldest == NULL) {
                     OS_Terminate();
                 }
-                cache->missCounter = 2;
-                oldest->state = MB_CACHE_ENTRY_LOADING;
-                oldest->offset = (offsetInSegment + tableOffset) & ~0x1f;
+                cache->lifetime = 2;
+                oldest->state = MB_CACHE_STATE_BUSY;
+                oldest->src = (offsetInSegment + tableOffset) & ~0x1f;
                 task->arg0 = oldest;
                 task->arg1 = cache;
-                MBTask_Add(task, MBComm_LoadCacheBlock, NULL, 4);
+                MBi_SetTask(task, MBi_ReloadCache, NULL, 4);
             }
         }
-        return MB_SEND_NOTHING;
+        return MB_SENDFUNC_STATE_ERR;
     }
-    return MBComm_FlushAndSend(source.size + 6, MB_PARENT_WORK->files[MB_PARENT_WORK->fileCursor].downloadMask,
-                               gMBCommWork->sendBuf);
+    return MBi_BlockHeaderEnd(source.size + 6, pPwork->fileinfo[pPwork->cur_fileid].downloadMask, mbc->sendbuf);
 }
 
 // Sends what the children's states ask for: the frames that tell them how it went, else a block of a file
-static void MBComm_SendNextFrame(void) {
+static void MBi_CommParentSendData(void) {
     u16 want[5];
     u16 aid;
     int result;
 
     MIi_CpuClear16(0, want, sizeof(want));
     for (aid = 1; aid <= 15; aid++) {
-        switch (MB_PARENT_WORK->childState[aid - 1]) {
+        switch (pPwork->p_comm_state[aid - 1]) {
         case MB_COMM_PSTATE_CONNECTED:
             want[0] |= 1 << aid;
             break;
@@ -549,47 +546,47 @@ static void MBComm_SendNextFrame(void) {
     }
 
     if (want[3] != 0) {
-        result = MBComm_SendFrame(MB_FRAME_BOOT, want[3]);
+        result = MBi_CommParentSendMsg(MB_COMM_TYPE_PARENT_BOOTREQ, want[3]);
     } else if (want[0] != 0) {
-        result = MBComm_SendFrame(MB_FRAME_CONNECTED, want[0]);
+        result = MBi_CommParentSendMsg(MB_COMM_TYPE_PARENT_SENDSTART, want[0]);
     } else if (want[4] != 0) {
-        result = MBComm_SendFrame(MB_FRAME_MEMBER_FULL, want[4]);
+        result = MBi_CommParentSendMsg(MB_COMM_TYPE_PARENT_MEMBER_FULL, want[4]);
     } else if (want[2] != 0) {
-        result = MBComm_SendFrame(MB_FRAME_KICK, want[2]);
+        result = MBi_CommParentSendMsg(MB_COMM_TYPE_PARENT_KICKREQ, want[2]);
     } else if (want[1] != 0) {
-        result = MBComm_SendFileInfo();
+        result = MBi_CommParentSendDLFileInfo();
     } else {
-        result = MBComm_SendBlock();
+        result = MBi_CommParentSendBlock();
     }
-    if (result == MB_SEND_NOTHING) {
-        MBComm_SendFrame(MB_FRAME_NONE, 0xffff);
+    if (result == MB_SENDFUNC_STATE_ERR) {
+        MBi_CommParentSendMsg(MB_COMM_TYPE_DUMMY, 0xffff);
     }
 }
 
 // Moves the block that a file sends next on, or back to the one that a child asked for
-static void MBComm_AdvanceSendCursor(u32 file) {
-    if ((sBlockRequestMask & (1 << file)) == 0) {
+static void MBi_calc_sendblock(u32 file) {
+    if ((any_recv_bitmap & (1 << file)) == 0) {
         return;
     }
-    if (MB_PARENT_WORK->files[file].valid == 0 || MB_PARENT_WORK->files[file].downloadMask == 0) {
+    if (pPwork->fileinfo[file].valid == 0 || pPwork->fileinfo[file].downloadMask == 0) {
         return;
     }
-    if (MB_PARENT_WORK->files[file].requestedBlock <= MB_PARENT_WORK->files[file].sendCursor &&
-        MB_PARENT_WORK->files[file].sendCursor <= MB_PARENT_WORK->files[file].requestedBlock + 2) {
-        MB_PARENT_WORK->files[file].sendCursor++;
+    if (pPwork->fileinfo[file].requestedBlock <= pPwork->fileinfo[file].sendCursor &&
+        pPwork->fileinfo[file].sendCursor <= pPwork->fileinfo[file].requestedBlock + 2) {
+        pPwork->fileinfo[file].sendCursor++;
     } else {
-        MB_PARENT_WORK->files[file].sendCursor = MB_PARENT_WORK->files[file].requestedBlock;
+        pPwork->fileinfo[file].sendCursor = pPwork->fileinfo[file].requestedBlock;
     }
 }
 
-static u16 MBComm_MaxBlock(u32 a, u32 b) {
+static u16 MBi_calc_nextsendblock(u32 a, u32 b) {
     if (b <= a) {
         b = a;
     }
     return b;
 }
 
-static BOOL MBComm_IsValidAid(u16 aid) {
+static BOOL IsChildAidValid(u16 aid) {
     if (aid >= 1 && aid <= 15) {
         return TRUE;
     }
@@ -597,9 +594,9 @@ static BOOL MBComm_IsValidAid(u16 aid) {
 }
 
 // Tells the callback about an error
-static void MBComm_NotifyError(u16 aid, u16 errcode) {
+static void MBi_CommCallParentError(u16 aid, u16 errcode) {
     MBErrorStatus status;
 
     status.errcode = errcode;
-    MBComm_NotifyState(aid, MB_COMM_PSTATE_ERROR, &status);
+    MBi_CommChangeParentStateCallbackOnly(aid, MB_COMM_PSTATE_ERROR, &status);
 }

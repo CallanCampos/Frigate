@@ -75,7 +75,7 @@ static u32 func_ov257_021ac694(u8 *data, u32 pos, BOOL bigEndian) {
 
 // Reads the APP1 segment at pos: the 0th IFD, the Exif IFD, then the maker note, the Interoperability IFD and the 1st
 // IFD in the order they are stored
-static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 option) {
+static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, int *posOut, u32 option) {
     u16 len;
     u16 tag;
     u16 count;
@@ -304,21 +304,21 @@ static int func_ov257_021ac6f0(u8 *data, u32 size, u32 pos, s32 *posOut, u32 opt
     return EXIF_RESULT_NEXT_SEGMENT;
 }
 
-int func_ov257_021acc20(u8 *data, u32 size, s32 *pos, u32 option) {
+s32 SSP_ExifDecode(u8 *src, u32 src_size, int *cur, u32 option) {
     int result;
-    u32 start = *pos;
+    u32 start = *cur;
 
     sMakerNoteData1 = 0;
     sMakerNoteData1Size = 0;
     sMakerNoteData2 = 0;
     sMakerNoteData2Size = 0;
     sSoftwareLength = 0;
-    result = func_ov257_021ac6f0(data, size, start, pos, option);
+    result = func_ov257_021ac6f0(src, src_size, start, cur, option);
     if (sMakerNoteData1 != 0) {
-        sMakerNoteData1 += (u32)data + TIFF_HEADER_OFFSET;
+        sMakerNoteData1 += (u32)src + TIFF_HEADER_OFFSET;
     }
     if (sMakerNoteData2 != 0) {
-        sMakerNoteData2 += (u32)data + TIFF_HEADER_OFFSET;
+        sMakerNoteData2 += (u32)src + TIFF_HEADER_OFFSET;
     }
     return result;
 }

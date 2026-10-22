@@ -373,7 +373,7 @@ static void BtlvEffvm_SideResetTask(TCB *tcb, void *data);
 static void BtlvEffvm_ParticleUploadTask(TCB *tcb, void *data);
 static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data);
 static void BtlvEffvm_PalAnimTaskRemove(TCB *tcb);
-static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, int count);
+static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, s32 count);
 static BOOL BtlvEffvm_IsGaugeKeptEffect(u32 move);
 
 // The camera's positions and targets (.data), the particles' camera vectors, the effects that keep the gauges, the
@@ -4424,7 +4424,7 @@ static void BtlvEffvm_PalAnimTask(TCB *tcb, void *data) {
         }
         offset = (work->palettes[work->index] - 8) * 16;
         file = GFL_G2DIOReadNCLR(ARCID_BTLV_EFFVM_PAL_ANIM, work->fileId, &palette, HEAPID_TAIL(work->wk->heapId));
-        MIi_CpuCopy16((u16 *)palette->rawData + offset,
+        MIi_CpuCopy16((u16 *)palette->pRawData + offset,
                       PaletteFade_GetUnfadedBuffer(BtlvEffect_GetPaletteFade(), 0) + 0x80, 0x20);
         PaletteFade_ApplyPalette(BtlvEffect_GetPaletteFade(), 8, 0);
         GFL_HeapFree(file);
@@ -4448,7 +4448,7 @@ static void BtlvEffvm_PalAnimTaskRemove(TCB *tcb) {
     GFL_HeapFree(work);
 }
 
-static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, int count) {
+static void BtlvEffvm_ScaleAllMcss(fx32 scaleX, fx32 scaleY, int frames, int wait, s32 count) {
     BtlvMcssPos i;
     fx32 scale;
     VecFx32 dest;

@@ -227,8 +227,8 @@ static void FieldLight_FlushCore(const FieldLight *light, FieldFog *fog, G3DLigh
                 GFL_G3DLightSetColor(lights, i, &zeroColor);
             }
         }
-        NNS_G3DSetMatDifAmb(light->current.materials[0], light->current.materials[1], TRUE);
-        NNS_G3DSetMatSpeEmi(light->current.materials[2], light->current.materials[3], FALSE);
+        NNS_G3dGlbMaterialColorDiffAmb(light->current.materials[0], light->current.materials[1], TRUE);
+        NNS_G3dGlbMaterialColorSpecEmi(light->current.materials[2], light->current.materials[3], FALSE);
         FieldFog_SetColor(fog, light->current.materials[4]);
         G3X_SetClearColor(light->current.materials[5], 31, 0x7fff, 0, FALSE);
     }

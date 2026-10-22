@@ -19,7 +19,7 @@ static s16 sSpkBuffer[VCT_FRAME_SAMPLES];
 static s16 sDelayLine[2048];
 
 // Filters a frame in place with a high-pass filter and returns the mean of the squares of the result
-u32 VCT_FilterFrame(s16 *samples, int bytes) {
+u32 HPFFilter(s16 *samples, int bytes) {
     s16 input = samples[0];
     int scaled = input * 0xe9f;
     int minusInput = -scaled;
@@ -52,7 +52,7 @@ u32 VCT_FilterFrame(s16 *samples, int bytes) {
 
 #define MAX_DELAY_LINE (sizeof(sDelayLine) / sizeof(s16))
 
-static inline s16 ProcessSample(s16 spkSample) {
+static inline s16 process_sample_unroll(s16 spkSample) {
     int acc = 0;
 
     sDelayLine[sCounterIn] = spkSample;
@@ -80,7 +80,7 @@ static inline s16 ProcessSample(s16 spkSample) {
 
 static s16 sInitialCoefficients[6] = { -5637, 16445, -14404, 11473, -12246, 892 };
 
-void VCT_InitEcho(void) {
+void InitFIRFilter(void) {
     s16 *coeffs = sInitialCoefficients;
     int delay = 1635;
     int i;
@@ -97,13 +97,13 @@ void VCT_InitEcho(void) {
 }
 
 // Keeps the frame that was played, to know what the microphone heard of it
-void VCT_SaveFarEnd(s16 *samples, int bytes) {
+void vct_set_speaker_samples(s16 *samples, int bytes) {
     MIi_CpuCopyFast(samples, sSpkBuffer, bytes);
 }
 
 // Runs the speaker's frame through a filter of the echo's way back, and turns the microphone down by more the louder
 // the echo is
-static void SuppressEcho(s16 *mic, s16 *far, u32 bytes, u32 rms) {
+static void DoFIRFilter(s16 *mic, s16 *far, u32 bytes, u32 rms) {
     int i;
     u64 sum = 0;
     u32 gain;
@@ -111,7 +111,7 @@ static void SuppressEcho(s16 *mic, s16 *far, u32 bytes, u32 rms) {
 
     bytes /= sizeof(s16);
     for (i = 0; i < bytes; i++) {
-        far[i] = ProcessSample(far[i]);
+        far[i] = process_sample_unroll(far[i]);
         sum += far[i] * far[i];
         far[i] = mic[i];
     }
@@ -136,6 +136,6 @@ static void SuppressEcho(s16 *mic, s16 *far, u32 bytes, u32 rms) {
     }
 }
 
-void VCT_CancelEcho(s16 *samples, int bytes, u32 rms) {
-    SuppressEcho(samples, sSpkBuffer, bytes, rms);
+void vct_process_fir(s16 *samples, int bytes, u32 rms) {
+    DoFIRFilter(samples, sSpkBuffer, bytes, rms);
 }

@@ -6,9 +6,9 @@ static void OSi_IrqCallback(int index);
 
 // The interrupt bit that each callback is for: DMA0 to 3, then NDMA0 to 3, then Timer0 to 3
 static u16 OSi_IrqCallbackInfoIndex[OSi_IRQCALLBACK_NUM] = {
-    OS_IE_DMA0_SHIFT,   OS_IE_DMA0_SHIFT + 1,   OS_IE_DMA0_SHIFT + 2,   OS_IE_DMA0_SHIFT + 3,
+    REG_OS_IE_D0_SHIFT, REG_OS_IE_D0_SHIFT + 1, REG_OS_IE_D0_SHIFT + 2, REG_OS_IE_D0_SHIFT + 3,
     OS_IE_NDMA0_SHIFT,  OS_IE_NDMA0_SHIFT + 1,  OS_IE_NDMA0_SHIFT + 2,  OS_IE_NDMA0_SHIFT + 3,
-    OS_IE_TIMER0_SHIFT, OS_IE_TIMER0_SHIFT + 1, OS_IE_TIMER0_SHIFT + 2, OS_IE_TIMER0_SHIFT + 3,
+    REG_OS_IE_T0_SHIFT, REG_OS_IE_T0_SHIFT + 1, REG_OS_IE_T0_SHIFT + 2, REG_OS_IE_T0_SHIFT + 3,
 };
 
 // NitroSDK's OSi_IrqCallbackInfo: the callback and argument of each, which OSi_IrqCallback clears when it runs it

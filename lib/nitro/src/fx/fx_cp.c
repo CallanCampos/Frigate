@@ -16,7 +16,7 @@ fx32 FX_Inv(fx32 denom) {
     return FX_GetDivResult();
 }
 
-fx64 FX_InvFx64c(fx32 denom) {
+fx64c FX_InvFx64c(fx32 denom) {
     FX_InvAsync(denom);
     while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
     }
@@ -33,7 +33,7 @@ fx32 FX_Sqrt(fx32 x) {
 }
 
 fx32 FX_InvSqrt(fx32 x) {
-    fx64 inv;
+    fx64c inv;
 
     if (x > 0) {
         FX_InvAsync(x);
@@ -46,7 +46,7 @@ fx32 FX_InvSqrt(fx32 x) {
     return 0;
 }
 
-fx64 FX_GetDivResultFx64c(void) {
+fx64c FX_GetDivResultFx64c(void) {
     while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
     }
     return reg_CP_DIV_RESULT;
@@ -88,16 +88,16 @@ void FX_DivAsync(fx32 numer, fx32 denom) {
 
 s32 FX_DivS32(s32 numer, s32 denom) {
     reg_CP_DIVCNT = 0;
-    reg_CP_DIV_NUMER_LO = numer;
+    reg_CP_DIV_NUMER_L = numer;
     reg_CP_DIV_DENOM = (u32)denom;
     while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
     }
-    return reg_CP_DIV_RESULT_LO;
+    return reg_CP_DIV_RESULT_L;
 }
 
 s32 FX_ModS32(s32 numer, s32 denom) {
     reg_CP_DIVCNT = 0;
-    reg_CP_DIV_NUMER_LO = numer;
+    reg_CP_DIV_NUMER_L = numer;
     reg_CP_DIV_DENOM = (u32)denom;
     while (reg_CP_DIVCNT & REG_CP_BUSY_MASK) {
     }

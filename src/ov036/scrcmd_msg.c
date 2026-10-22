@@ -319,7 +319,7 @@ static void ActorMsgWin_MulVecInvCamRot(VecFx32 *vec, G3DCamera *camera) {
     GFL_G3DCameraGetLookatTarget(camera, &target);
     MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     MI_Copy36B(&lookAt, &rot);
-    MAT3_Invert(&rot, &rot);
+    MTX_Inverse33(&rot, &rot);
     MTX_MultVec33(vec, &rot, vec);
 }
 

@@ -4,12 +4,12 @@
 
 // GameSpy GP's helpers (gpiUtility.c). The functions' names, from pret/pokerevo's Wii build, are in dwc/gp.h
 
-void strzcpy(char *dest, const char *src, u32 len) {
+void strzcpy(char *dest, const char *src, size_t len) {
     strncpy(dest, src, len);
     *(dest + len - 1) = '\0';
 }
 
-BOOL gpiCheckForError(GPConnection *connection, const char *input, BOOL callErrorCallback) {
+GPIBool gpiCheckForError(GPConnection *connection, const char *input, GPIBool callErrorCallback) {
     char buffer[16];
     GPIConnection *iconnection = *connection;
 
@@ -24,12 +24,12 @@ BOOL gpiCheckForError(GPConnection *connection, const char *input, BOOL callErro
             int fatal = strstr(input, "\\fatal\\") != NULL ? 1 : 0;
             gpiCallErrorCallback(connection, 4, fatal ? 1 : 0);
         }
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-BOOL gpiValueForKeyWithIndex(const char *command, const char *key, int *index, char *value, int len) {
+GPIBool gpiValueForKeyWithIndex(const char *command, const char *key, int *index, char *value, int len) {
     const char *start;
     const char *found;
     char delimiter = key[0];
@@ -39,7 +39,7 @@ BOOL gpiValueForKeyWithIndex(const char *command, const char *key, int *index, c
     start = command += *index;
     found = strstr(command, key);
     if (found == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     found += strlen(key);
     len--;
@@ -49,10 +49,10 @@ BOOL gpiValueForKeyWithIndex(const char *command, const char *key, int *index, c
     }
     value[i] = '\0';
     *index += (found - start) + strlen(value);
-    return TRUE;
+    return gsi_true;
 }
 
-BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) {
+GPIBool gpiValueForKey(const char *command, const char *key, char *value, int len) {
     const char *found;
     char delimiter = key[0];
     int c;
@@ -60,7 +60,7 @@ BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) 
 
     found = strstr(command, key);
     if (found == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     found += strlen(key);
     len--;
@@ -69,28 +69,28 @@ BOOL gpiValueForKey(const char *command, const char *key, char *value, int len) 
         i++;
     }
     value[i] = '\0';
-    return TRUE;
+    return gsi_true;
 }
 
-int gpiCheckSocketConnect(GPConnection *connection, int sock, int *state) {
+GPResult gpiCheckSocketConnect(GPConnection *connection, SOCKET sock, int *state) {
     int writeFlag = 0;
     int exceptFlag = 0;
     int result = GSISocketSelect(sock, NULL, &writeFlag, &exceptFlag);
 
     if (result == -1) {
-        gsDebugFormat(1, 0, 1, "Error connecting\n");
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError, "Error connecting\n");
         gpiSetError(connection, 5, "There was an error checking for a completed connection.");
         gpiCallErrorCallback(connection, 3, 1);
         return 3;
     }
     if (result > 0) {
         if (exceptFlag) {
-            gsDebugFormat(1, 0, 1, "Connection rejected\n");
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError, "Connection rejected\n");
             *state = 4;
             return 0;
         }
         if (writeFlag) {
-            gsDebugFormat(1, 0, 8, "Connection accepted\n");
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Notice, "Connection accepted\n");
             *state = 3;
             return 0;
         }
@@ -107,7 +107,7 @@ int gpiCheckSocketConnect(GPConnection *connection, int sock, int *state) {
         return 3;                                                                                                      \
     } while (0)
 
-int gpiReadKeyAndValue(GPConnection *connection, const char *buffer, int *index, char *key, char *value) {
+GPResult gpiReadKeyAndValue(GPConnection *connection, const char *buffer, int *index, char key[512], char value[512]) {
     const char *start;
     int c;
     int i;
@@ -142,7 +142,7 @@ int gpiReadKeyAndValue(GPConnection *connection, const char *buffer, int *index,
     return 0;
 }
 
-void gpiSetError(GPConnection *connection, int errorCode, const char *errorString) {
+void gpiSetError(GPConnection *connection, GPErrorCode errorCode, const char *errorString) {
     GPIConnection *iconnection = *connection;
 
     strzcpy(iconnection->errorString, errorString, 256);
@@ -155,8 +155,8 @@ void gpiSetErrorString(GPConnection *connection, const char *errorString) {
 
 void gpiEncodeString(const char *unencodedString, char *encodedString) {
     char scrambled[32];
-    u32 i;
-    u32 length;
+    gsi_u32 i;
+    gsi_u32 length;
     char key;
 
     length = strlen(unencodedString);

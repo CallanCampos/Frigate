@@ -1383,7 +1383,7 @@ u32 InfinityDungeon_GetSlotRoom(InfinityDungeon *dungeon, u32 floor, int slot) {
     return 0;
 }
 
-u32 InfinityDungeon_GetTrainerSlot(InfinityDungeon *dungeon, u32 floor, u32 room, u8 trainer) {
+u32 InfinityDungeon_GetTrainerSlot(InfinityDungeon *dungeon, unsigned int floor, unsigned int room, u8 trainer) {
     int total = 0;
     int i;
 

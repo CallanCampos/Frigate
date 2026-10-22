@@ -32,7 +32,7 @@ SPLManager *SPLManager_New(SPLAllocFunc alloc, u16 maxEmitters, u16 maxParticles
     mgr->maxPolygonID = maxPolyID;
     mgr->currentPolygonID = mgr->minPolygonID;
     mgr->fixPolygonID = fixPolyID;
-    mgr->reverseDrawOrder = FALSE;
+    mgr->drawOldestFirst = FALSE;
     mgr->reserved = 0;
     mgr->alloc = alloc;
     mgr->activeEmitters.count = 0;
@@ -263,7 +263,7 @@ void SPLManager_Draw(SPLManager *mgr, const MtxFx43 *viewMatrix) {
 
     G3X_AlphaBlend(TRUE);
     mgr->viewMatrix = viewMatrix;
-    if (!mgr->reverseDrawOrder) {
+    if (!mgr->drawOldestFirst) {
         for (emitter = mgr->activeEmitters.first; emitter != NULL; emitter = emitter->next) {
             mgr->drawEmitter = emitter;
             if (!emitter->state.hidden) {

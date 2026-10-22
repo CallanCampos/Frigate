@@ -165,7 +165,7 @@ u32 WifiList_GetFriendSlotCount(WifiList *wifiList) {
 }
 
 void WifiList_RemoveFriend(WifiList *wifiList, u32 index) {
-    s32 i;
+    int i;
     s32 last = WIFI_LIST_FRIEND_MAX - 1;
 
     if (index >= WIFI_LIST_FRIEND_MAX) {

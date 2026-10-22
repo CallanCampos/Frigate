@@ -17,20 +17,20 @@ int RTCi_ProcessExCommand(void) {
     RTCWork *work = RTCi_GetSysWork();
     int result = RTC_RESULT_SUCCESS;
 
-    switch (work->command) {
+    switch (work->sequence) {
     case RTC_COMMAND_EX_READ_TIME24: {
         const u8 *time = (const u8 *)HW_RTC_RAW_TIME;
 
-        *(u32 *)work->data[0] = time[0] | (time[1] << 8) | (time[2] << 16);
+        *(u32 *)work->buffer[0] = time[0] | (time[1] << 8) | (time[2] << 16);
         break;
     }
     case RTC_COMMAND_EX_READ_TIME16:
-        *(u16 *)work->data[0] = *(const u16 *)HW_RTC_RAW_TIME;
+        *(u16 *)work->buffer[0] = *(const u16 *)HW_RTC_RAW_TIME;
         break;
     case RTC_COMMAND_EX_NOP:
         break;
     default:
-        work->busy = FALSE;
+        work->index = FALSE;
         result = RTC_RESULT_INVALID_COMMAND;
         break;
     }

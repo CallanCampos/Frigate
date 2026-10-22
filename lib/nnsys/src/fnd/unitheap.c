@@ -5,37 +5,37 @@
 // none of them by name. The game never makes one, so only what the unit heap allocator in allocator.c reaches is
 // left; creating a unit heap was dead-stripped
 
-static NNSiFndUnitBlock *TakeFreeUnit(NNSiFndUnitFreeList *list);
+static NNSiFndUntHeapMBlockHead *PopMBlock(NNSiFndUntMBlockList *list);
 
 // The unit heap's own head, just after the common one
-static inline NNSiFndUnitHeap *UnitHeapOf(NNSiFndHeapHead *heap) {
-    return (NNSiFndUnitHeap *)(AddrOf(heap) + sizeof(NNSiFndHeapHead));
+static inline NNSiFndUntHeapHead *GetUnitHeapHeadPtrFromHeapHead(NNSiFndHeapHead *heap) {
+    return (NNSiFndUntHeapHead *)(NNSiGetUIntPtr(heap) + sizeof(NNSiFndHeapHead));
 }
 
 // Unchains the first free block, or returns NULL when there is none
-static NNSiFndUnitBlock *TakeFreeUnit(NNSiFndUnitFreeList *list) {
-    NNSiFndUnitBlock *first = list->head;
+static NNSiFndUntHeapMBlockHead *PopMBlock(NNSiFndUntMBlockList *list) {
+    NNSiFndUntHeapMBlockHead *first = list->head;
 
     if (first != NULL) {
-        list->head = first->next;
+        list->head = first->pMBlkHdNext;
     }
     return first;
 }
 
-void *NNS_FndUnitHeapAlloc(NNSFndHeapHandle heap) {
-    NNSiFndUnitHeap *unitHeap = UnitHeapOf(heap);
-    NNSiFndUnitBlock *block = TakeFreeUnit(&unitHeap->freeList);
+void *NNS_FndAllocFromUnitHeap(NNSFndHeapHandle heap) {
+    NNSiFndUntHeapHead *unitHeap = GetUnitHeapHeadPtrFromHeapHead(heap);
+    NNSiFndUntHeapMBlockHead *block = PopMBlock(&unitHeap->mbFreeList);
 
     if (block != NULL) {
-        FillAllocMemory(heap, block, unitHeap->unitSize);
+        FillAllocMemory(heap, block, unitHeap->mBlkSize);
     }
     return block;
 }
 
-void NNS_FndUnitHeapFree(NNSFndHeapHandle heap, void *memBlock) {
-    NNSiFndUnitHeap *unitHeap = UnitHeapOf(heap);
-    NNSiFndUnitBlock *block = memBlock;
+void NNS_FndFreeToUnitHeap(NNSFndHeapHandle heap, void *memBlock) {
+    NNSiFndUntHeapHead *unitHeap = GetUnitHeapHeadPtrFromHeapHead(heap);
+    NNSiFndUntHeapMBlockHead *block = memBlock;
 
-    block->next = unitHeap->freeList.head;
-    unitHeap->freeList.head = block;
+    block->pMBlkHdNext = unitHeap->mbFreeList.head;
+    unitHeap->mbFreeList.head = block;
 }

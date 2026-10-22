@@ -1483,9 +1483,9 @@ static void TrainerCard_ResetAffine(void) {
 
 // The trainer's picture on the front
 static void TrainerCard_DrawTrainer(TrainerCardWork *wk) {
-    GFL_BGSysLoadChar(7, wk->charData->rawData, wk->charData->size, 0);
-    GFL_BGSysLoadScrArea(7, 21, 2, 10, 11, wk->scrData->rawData, 21, 2, wk->scrData->width / 8,
-                         wk->scrData->height / 8);
+    GFL_BGSysLoadChar(7, wk->charData->pRawData, wk->charData->szByte, 0);
+    GFL_BGSysLoadScrArea(7, 21, 2, 10, 11, wk->scrData->rawData, 21, 2, wk->scrData->screenWidth / 8,
+                         wk->scrData->screenHeight / 8);
     GFL_BGSysLoadScr(7);
 }
 
@@ -1584,7 +1584,7 @@ static void TrainerCard_UpdateSignBlink(TrainerCardWork *wk) {
 }
 
 static void TrainerCard_AnimatePalette(TrainerCardWork *wk) {
-    u16 *colors = wk->palData->rawData;
+    u16 *colors = wk->palData->pRawData;
 
     wk->palFrame++;
     if (wk->palFrame > 8) {
@@ -1870,7 +1870,7 @@ static void TrainerCard_InitRank(TrainerCardWork *wk) {
 static void TrainerCard_LoadRankPalette(TrainerCardWork *wk) {
     NNSG2dPaletteData *palette;
     void *file = GFL_G2DIOReadNCLR(ARCID_TRAINER_CARD_GRA, 15, &palette, HEAPID_TRAINER_CARD_SCREEN);
-    u16 *colors = palette->rawData;
+    u16 *colors = palette->pRawData;
 
     MI_CpuCopy8(colors, wk->rankPalette[0], 0x20);
     MI_CpuCopy8(colors + 16, wk->rankPalette[1], 0x20);

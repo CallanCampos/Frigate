@@ -426,7 +426,7 @@ void Box2Obj_LoadTrayPokeIcons(Box2SysWork *syswk, u32 tray) {
         } else {
             pkm = Box2Main_GetBoxPkm(syswk, tray, i);
             buf = ReadPokeIconChar(syswk->app, pkm, &chr);
-            MIi_CpuCopy32(chr->rawData, syswk->app->pokeIconChar[i], 0x200);
+            MIi_CpuCopy32(chr->pRawData, syswk->app->pokeIconChar[i], 0x200);
             GFL_HeapFree(buf);
             syswk->app->pokeIconPal[i] = GetPokeIconPalette(syswk, pkm);
             syswk->app->pokeIconExist[i] = TRUE;
@@ -499,7 +499,7 @@ static void SetPokeIcon(Box2SysWork *syswk, BoxPkm *pkm, u32 id) {
     NNSG2dCharacterData *chr;
     void *buf = ReadPokeIconChar(syswk->app, pkm, &chr);
 
-    TransferIconChar(syswk->app, chr->rawData, id, GetPokeIconPalette(syswk, pkm));
+    TransferIconChar(syswk->app, chr->pRawData, id, GetPokeIconPalette(syswk, pkm));
     GFL_HeapFree(buf);
 }
 
@@ -829,9 +829,9 @@ void Box2Obj_PickUpRangeIcons(Box2SysWork *syswk, u32 pos, int width, int height
     int i;
     int j;
     Box2AppWork *app;
-    u32 y;
+    unsigned int y;
     u32 x;
-    u32 rowWidth;
+    unsigned int rowWidth;
     s16 px;
     s16 py;
     u8 tmp;
@@ -858,7 +858,7 @@ void Box2Obj_PutDownRangeIcons(Box2AppWork *app, u32 pos, int width, int height)
     s16 px;
     s16 py;
     u32 x;
-    u32 y;
+    unsigned int y;
     int i;
     int j;
     u8 tmp;
@@ -1162,8 +1162,7 @@ void Box2Obj_MoveItemOutline(Box2AppWork *app) {
 
 static void CreateFixedActors(Box2SysWork *syswk) {
     Box2AppWork *app = syswk->app;
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long i;
+    u32 i;
 
     app->actors[0] = CreateActor(app, &sActorData[0]);
     app->actors[1] = CreateActor(app, &sActorData[1]);
@@ -1200,7 +1199,7 @@ static void CreateFixedActors(Box2SysWork *syswk) {
     Box2Obj_SetToolButtons(syswk, 9, TRUE);
 }
 
-void Box2Obj_SetToolButtons(Box2SysWork *syswk, u32 set, BOOL visible) {
+void Box2Obj_SetToolButtons(Box2SysWork *syswk, unsigned int set, BOOL visible) {
     int i;
 
     if (syswk->param->mode != 2 && syswk->param->mode != 4 && syswk->param->mode != 3) {
@@ -1421,7 +1420,7 @@ void Box2Obj_MakeTrayIconChar(Box2SysWork *syswk, u32 tray) {
     NNSG2dCharacterData *chr;
     void *buf = GFL_G2DIOReadOBJNCGR(ARCID_BOX2, 71, TRUE, &chr, HEAPID_BOX2_APP);
 
-    MI_CpuCopy8(chr->rawData, syswk->app->trayIconChar[tray], 0x400);
+    MI_CpuCopy8(chr->pRawData, syswk->app->trayIconChar[tray], 0x400);
     GFL_HeapFree(buf);
     ReplaceTrayIconColor(syswk, syswk->app->trayIconChar[tray], Box2Main_GetWallPaperNumber(syswk, tray), 8, 0x400);
     DrawTrayIconPokes(syswk, tray, syswk->app->trayIconChar[tray]);

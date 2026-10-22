@@ -79,7 +79,7 @@ static void GFL_ArcSysInitArcHandle(FSFile *file, u32 arcId) {
         u32 size = ((const NarcFATBEntry *)sArcSys.table)[arcId].end;
 
         size -= ((const NarcFATBEntry *)sArcSys.table)[arcId].start;
-        FS_CreateFileFromMemory(file, (const void *)((const NarcFATBEntry *)sArcSys.table)[arcId].start, size);
+        FS_CreateFileFromMemory(file, (void *)((const NarcFATBEntry *)sArcSys.table)[arcId].start, size);
     }
 }
 
@@ -174,7 +174,7 @@ ArcTool *GFL_ArcSysCreateFileHandle(u32 arcId, HeapID heapId) {
     return handle;
 }
 
-ArcTool *GFL_ArcSysCreateMemoryHandle(const void *data, u32 size, HeapID heapId) {
+ArcTool *GFL_ArcSysCreateMemoryHandle(void *data, u32 size, HeapID heapId) {
     ArcTool *handle = GFL_HeapAllocate(heapId, sizeof(ArcTool), FALSE, "arc_tool.c", 543);
 
     FS_InitFile(&handle->file);

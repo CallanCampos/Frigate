@@ -538,8 +538,8 @@ void WorldTrade_TransPokeGraphic(PartyPkm *pkm) {
     u32 arcId;
     u32 palette;
 
-    DC_FlushRange(charData->rawData, 0x1200);
-    GX_LoadOBJ(charData->rawData, 0x3f80, 0x1200);
+    DC_FlushRange(charData->pRawData, 0x1200);
+    GX_LoadOBJ(charData->pRawData, 0x3f80, 0x1200);
     GFL_HeapFree(buf);
 
     arcId = GetPokemonGraphicsARCID();

@@ -1,6 +1,6 @@
 // NitroSDK's CARD library, the game card's ROM: the commands to the card through its registers, reading the ROM a page
-// at a time with the CPU or with a DMA channel, and the setup of the reads. The file name is a guess, from NitroSDK's
-// card_rom.c; the library has no file name string.
+// at a time with the CPU or with a DMA channel, and the setup of the reads. The file name is NitroSDK's (card_rom.c, as
+// ntrtwl's reconstruction of NitroSDK has it); the library has no file name string.
 #include "nitro/card.h"
 #include "nitro/hw.h"
 #include "nitro/mi.h"
@@ -10,7 +10,7 @@
 // The card's registers are in nitro/hw.h
 
 // The control word of the ROM header for the card's normal commands
-#define CARD_ROM_HEADER_NORMAL_CONTROL (((const ROMHeader *)HW_CARD_ROM_HEADER)->normalCommandControl)
+#define CARD_ROM_HEADER_NORMAL_CONTROL (((const CARDRomHeader *)HW_CARD_ROM_HEADER)->normalCommandControl)
 // The bit of the boot card's ID that says that the card has the refresh command
 #define CARD_ROM_ID_HAS_REFRESH 0x20000000
 
@@ -111,7 +111,7 @@ static u32 CARDi_ReadRomIDCore(void) {
     reg_MI_MCCNT1 = ((CARD_ROM_HEADER_NORMAL_CONTROL & ~REG_MI_MCCNT1_PC_MASK) | REG_MI_MCCNT1_START_MASK |
                      REG_MI_MCCNT1_RESB_MASK | REG_MI_MCCNT1_PC_4B) &
                     ~REG_MI_MCCNT1_L1_MASK;
-    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_READY_MASK) == 0) {
+    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_RDY_MASK) == 0) {
     }
     return reg_MI_MCD1;
 }
@@ -125,7 +125,7 @@ static u32 CARDi_ReadRomStatus(void) {
     reg_MI_MCCNT1 = ((CARD_ROM_HEADER_NORMAL_CONTROL & ~REG_MI_MCCNT1_PC_MASK) | REG_MI_MCCNT1_START_MASK |
                      REG_MI_MCCNT1_RESB_MASK | REG_MI_MCCNT1_PC_4B) &
                     ~REG_MI_MCCNT1_L1_MASK;
-    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_READY_MASK) == 0) {
+    while ((reg_MI_MCCNT1 & REG_MI_MCCNT1_RDY_MASK) == 0) {
     }
     return reg_MI_MCD1;
 }
@@ -175,7 +175,7 @@ u32 CARDi_ReadRomWithCPU(void *arg, void *dst, u32 src, u32 len) {
             i = 0;
             do {
                 control = reg_MI_MCCNT1;
-                if ((control & REG_MI_MCCNT1_READY_MASK) != 0) {
+                if ((control & REG_MI_MCCNT1_RDY_MASK) != 0) {
                     u32 word = reg_MI_MCD1;
                     if (i < CARD_ROM_PAGE_SIZE / 4) {
                         buffer[i++] = word;
@@ -224,7 +224,7 @@ static void CARDi_OnRomDmaInterrupt(void) {
 
 // Has the DMA channel receive the first page, and leaves the rest to the interrupt
 void CARDi_ReadRomWithDMA(CARDiRomDmaRead *read) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     sRomDmaActive = read;
     OS_SetIrqFunction(OS_IE_CARD_DATA, CARDi_OnRomDmaInterrupt);
     OS_ResetRequestIrqMask(OS_IE_CARD_DATA);
@@ -298,7 +298,7 @@ static void CARDi_ReadRomTask(CARDiCommon *p) {
 
 // CARDi_ReadRom: reads len bytes of the ROM from the offset src, by DMA if the channel and the addresses allow it, else
 // with the reader on the thread. Waits for the end unless async
-void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async) {
+void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async) {
     CARDiCommon *p = &cardi_common;
     u32 dmaNo;
     CARD_CheckEnabled();
@@ -316,7 +316,7 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
     if (dmaNo <= 3) {
         p->dmaInterface->Stop(dmaNo);
     }
-    p->src = src + cardi_rom_base;
+    p->src = (u32)src + cardi_rom_base;
     p->dst = (u32)dst;
     p->len = len;
     sRomDmaRead.callback = CARDi_OnReadRomDmaDone;
@@ -326,7 +326,7 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
     sRomDmaRead.len = p->len;
     sRomDmaRead.unk_18 = 0;
     if (sRomReader == CARDi_ReadRomWithCPU && CARDi_CanReadRomWithDMA(p->dma, (u32)dst, p->src, len)) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         if (sInvalidateIC) {
             CARDi_ICInvalidateSmart((void *)p->dst, p->len, p->icInvalidateThreshold);
         }
@@ -350,10 +350,10 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
 void CARDi_InitRom(void) {
     sRomReader = CARDi_ReadRomWithCPU;
     if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
-        if (CARD_GetOwnRomHeader()->romSize != 0) {
+        if (CARD_GetOwnRomHeader()->rom_size != 0) {
             u16 lockId = OS_GetLockID();
             CARD_LockRom(lockId);
-            CARDi_ReadRomWithCPU(NULL, sRomAuthCode, CARD_GetOwnRomHeader()->romSize, sizeof(sRomAuthCode));
+            CARDi_ReadRomWithCPU(NULL, sRomAuthCode, CARD_GetOwnRomHeader()->rom_size, sizeof(sRomAuthCode));
             CARD_UnlockRom(lockId);
             OS_ReleaseLockID(lockId);
         }

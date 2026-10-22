@@ -4,66 +4,67 @@
 // GameSpy's helpers (gsPlatformUtil.c). The ROM names neither the file nor its functions: the file is the later SDK's,
 // and the functions are GameSpy's as pret's pokerevo Wii build has them (nonport.s), or the later SDK's
 // (gsiStringToInt64, gsiInt64ToString, gsiSecondsToDate, gsiDateToSeconds, QuartToTrip, TripToQuart, B64Decode,
-// B64DecodeLen and the stream); RandomNext and RandomGenerate are ours
+// B64DecodeLen, the stream, nextlongrand, longrand and the statics, urlSafeEncodeing in its spelling)
 
-static u32 RandomNext(u32 seed);
-static u32 RandomGenerate(void);
+static gsi_u32 nextlongrand(gsi_u32 seed);
+static gsi_u32 longrand(void);
 static void QuartToTrip(const char *quart, char *trip, int count);
 static void TripToQuart(const char *trip, char *quart, int count);
 
 // The last two digits and the padding of base 64's three alphabets, defined in the reverse order of the ROM's, as MWCC
 // lays out these statics backwards
 static const char alternateEncoding[3] = { '[', ']', '_' };
-static const char urlSafeEncoding[3] = { '-', '_', '=' };
+static const char urlSafeEncodeing[3] = { '-', '_', '=' };
 static const char defaultEncoding[3] = { '+', '/', '=' };
 // The names of the days and the months, which no code of the ROM reads
 const char _dnames[] = "SunMonTueWedThuFriSat";
 const char _mnames[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
-static u32 sRandSeed = 1;
+static gsi_u32 randomnum = 1;
 // The days before each month, less one, in a leap year and in another year
 static int _lpdays[13] = { -1, 30, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 static int _days[13] = { -1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364 };
-static GSTime sDate;
+static struct tm tb;
 
-s64 gsiStringToInt64(const char *text) {
+gsi_i64 gsiStringToInt64(const char *text) {
     return atoll(text);
 }
 
-int gsiInt64ToString(char *text, s64 value) {
-    return OS_SPrintf(text, "%lld", value);
+void gsiInt64ToString(char text[33], gsi_i64 value) {
+    OS_SPrintf(text, "%lld", value);
 }
 
-// The lookup of a host: what was left of GameSpy's thread, and the address
-typedef struct GSIResolveHostname {
-    u32 unused;
-    u32 ip;
-} GSIResolveHostname;
+// The lookup of a host: the name, which the DS's lookup doesn't keep, and the address
+typedef struct GSIResolveHostnameInfo {
+    char *hostname;
+    unsigned int ip;
+} GSIResolveHostnameInfo;
 
-int gsiStartResolvingHostname(const char *host, void **lookup) {
-    SocHostEnt *entry;
-    GSIResolveHostname *resolve;
+int gsiStartResolvingHostname(const char *host, GSIResolveHostnameHandle *lookup) {
+    HOSTENT *entry;
+    GSIResolveHostnameInfo *resolve;
 
-    gsDebugFormat(8, 3, 0x10, "(NON-Asynchrounous) DNS lookup starting\n");
+    gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_State, GSIDebugLevel_Comment,
+                  "(NON-Asynchrounous) DNS lookup starting\n");
     entry = SOC_GetHostByName(host);
     if (entry == NULL) {
         return -1;
     }
-    resolve = gsimalloc(sizeof(GSIResolveHostname));
+    resolve = gsimalloc(sizeof(GSIResolveHostnameInfo));
     if (resolve == NULL) {
         return -1;
     }
-    resolve->ip = *(u32 *)entry->addrList[0];
+    resolve->ip = *(unsigned int *)entry->addrList[0];
     *lookup = resolve;
     return 0;
 }
 
-void gsiCancelResolvingHostname(void *lookup) {
+void gsiCancelResolvingHostname(GSIResolveHostnameHandle lookup) {
     gsifree(lookup);
 }
 
-int gsiGetResolvedIP(void *lookup) {
-    int ip = ((GSIResolveHostname *)lookup)->ip;
+unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle lookup) {
+    unsigned int ip = lookup->ip;
 
     gsifree(lookup);
     return ip;
@@ -100,15 +101,15 @@ void SocketStartUp(void) {
 void SocketShutDown(void) {
 }
 
-u32 current_time(void) {
+gsi_time current_time(void) {
     return OS_TicksToMilliSeconds(OS_GetTick());
 }
 
-u32 current_time_hires(void) {
+gsi_time current_time_hires(void) {
     return OS_TicksToMicroSeconds(OS_GetTick());
 }
 
-void msleep(u32 milliseconds) {
+void msleep(gsi_time milliseconds) {
     OS_Sleep(milliseconds);
 }
 
@@ -116,10 +117,10 @@ void msleep(u32 milliseconds) {
 #define ADD_OVERFLOWS(a, b, sum) (((a) >= 0 && (b) >= 0 && (sum) < 0) || ((a) < 0 && (b) < 0 && (sum) >= 0))
 #define MUL_OVERFLOWS(a, b, product) ((a) ? ((product) / (a) != (b)) : 0)
 
-GSTime *gsiSecondsToDate(const int *seconds) {
-    int time = *seconds;
-    BOOL leap = FALSE;
-    GSTime *date = &sDate;
+struct tm *gsiSecondsToDate(const time_t *seconds) {
+    time_t time = *seconds;
+    gsi_bool leap = gsi_false;
+    struct tm *date = &tb;
     int year;
     int yday;
     int month;
@@ -146,54 +147,54 @@ GSTime *gsiSecondsToDate(const int *seconds) {
             }
         }
     }
-    date->year = year;
+    date->tm_year = year;
     yday = time / 86400;
-    date->yday = yday;
+    date->tm_yday = yday;
     time -= yday * 86400;
     days = leap ? _lpdays : _days;
     month = 1;
     while (days[month] < yday) {
         month++;
     }
-    date->mon = month - 1;
-    date->mday = date->yday - days[date->mon];
-    date->wday = (*seconds / 86400 + 4) % 7;
-    date->hour = time / 3600;
-    time -= date->hour * 3600;
-    date->min = time / 60;
-    date->sec = time - date->min * 60;
-    date->isdst = 0;
+    date->tm_mon = month - 1;
+    date->tm_mday = date->tm_yday - days[date->tm_mon];
+    date->tm_wday = (*seconds / 86400 + 4) % 7;
+    date->tm_hour = time / 3600;
+    time -= date->tm_hour * 3600;
+    date->tm_min = time / 60;
+    date->tm_sec = time - date->tm_min * 60;
+    date->tm_isdst = 0;
     return date;
 }
 
-int gsiDateToSeconds(GSTime *date) {
-    int value = date->year;
+time_t gsiDateToSeconds(struct tm *date) {
+    time_t value = date->tm_year;
     int days;
     int sum;
     int addend;
-    GSTime *result;
+    struct tm *result;
 
     if (value < 69 || value > 139) {
         return -1;
     }
-    if (date->mon < 0 || date->mon > 11) {
-        value += date->mon / 12;
-        date->mon = date->mon % 12;
-        if (date->mon < 0) {
-            date->mon += 12;
+    if (date->tm_mon < 0 || date->tm_mon > 11) {
+        value += date->tm_mon / 12;
+        date->tm_mon = date->tm_mon % 12;
+        if (date->tm_mon < 0) {
+            date->tm_mon += 12;
             value--;
         }
         if (value < 69 || value > 139) {
             return -1;
         }
     }
-    days = _days[date->mon];
-    if ((value & 3) == 0 && date->mon > 1) {
+    days = _days[date->tm_mon];
+    if ((value & 3) == 0 && date->tm_mon > 1) {
         days++;
     }
     sum = (value - 1 >> 2) + 365 * (value - 70) - 17;
     sum += days;
-    addend = date->mday;
+    addend = date->tm_mday;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -202,7 +203,7 @@ int gsiDateToSeconds(GSTime *date) {
     if (MUL_OVERFLOWS(value, 24, sum)) {
         return -1;
     }
-    addend = date->hour;
+    addend = date->tm_hour;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -211,7 +212,7 @@ int gsiDateToSeconds(GSTime *date) {
     if (MUL_OVERFLOWS(value, 60, sum)) {
         return -1;
     }
-    addend = date->min;
+    addend = date->tm_min;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -220,7 +221,7 @@ int gsiDateToSeconds(GSTime *date) {
     if (MUL_OVERFLOWS(value, 60, sum)) {
         return -1;
     }
-    addend = date->sec;
+    addend = date->tm_sec;
     value = sum + addend;
     if (ADD_OVERFLOWS(sum, addend, value)) {
         return -1;
@@ -234,9 +235,9 @@ int gsiDateToSeconds(GSTime *date) {
 }
 
 // The next number of the Park-Miller generator (16807 times the seed, modulo 2^31 - 1), without a division
-static u32 RandomNext(u32 seed) {
-    u32 lo;
-    u32 hi;
+static gsi_u32 nextlongrand(gsi_u32 seed) {
+    gsi_u32 lo;
+    gsi_u32 hi;
 
     lo = 16807 * (seed & 0xffff);
     hi = 16807 * (seed >> 16);
@@ -253,22 +254,22 @@ static u32 RandomNext(u32 seed) {
     return lo;
 }
 
-static u32 RandomGenerate(void) {
-    return sRandSeed = RandomNext(sRandSeed);
+static gsi_u32 longrand(void) {
+    return randomnum = nextlongrand(randomnum);
 }
 
-void Util_RandSeed(u32 seed) {
-    sRandSeed = seed != 0 ? seed & 0x7fffffff : 1;
+void Util_RandSeed(unsigned long seed) {
+    randomnum = seed != 0 ? seed & 0x7fffffff : 1;
 }
 
 int Util_RandInt(int low, int high) {
-    u32 range = high - low;
+    gsi_u32 range = high - low;
     int value;
 
     if (range == 0) {
         return low;
     }
-    value = RandomGenerate() % range;
+    value = longrand() % range;
     return value + low;
 }
 
@@ -287,7 +288,7 @@ static void QuartToTrip(const char *quart, char *trip, int count) {
 
 // Turns up to three bytes into four base 64 digits (values from 0 to 63)
 static void TripToQuart(const char *trip, char *quart, int count) {
-    u8 triple[3];
+    gsi_u8 triple[3];
     int i;
 
     for (i = 0; i < count; i++) {
@@ -314,7 +315,7 @@ void B64Decode(const char *input, char *output, int length, int *outputLength, i
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
@@ -385,7 +386,7 @@ void B64Encode(const char *input, char *output, int length, int encodingType) {
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
@@ -436,7 +437,7 @@ int B64DecodeLen(const char *input, int encodingType) {
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
@@ -458,31 +459,31 @@ int B64DecodeLen(const char *input, int encodingType) {
 
 void B64InitEncodeStream(B64StreamData *data, const char *input, int length, int encodingType) {
     data->input = input;
-    data->length = length;
+    data->len = length;
     data->encodingType = encodingType;
 }
 
-BOOL B64EncodeStream(B64StreamData *data, char output[4]) {
+gsi_bool B64EncodeStream(B64StreamData *data, char output[4]) {
     const char *encoding;
     int i;
 
-    if (data->length <= 0) {
-        return FALSE;
+    if (data->len <= 0) {
+        return gsi_false;
     }
     switch (data->encodingType) {
     case 1:
         encoding = alternateEncoding;
         break;
     case 2:
-        encoding = urlSafeEncoding;
+        encoding = urlSafeEncodeing;
         break;
     default:
         encoding = defaultEncoding;
         break;
     }
-    TripToQuart(data->input, output, data->length >= 3 ? 3 : data->length);
+    TripToQuart(data->input, output, data->len >= 3 ? 3 : data->len);
     data->input += 3;
-    data->length -= 3;
+    data->len -= 3;
     for (i = 0; i < 4; i++) {
         if (output[i] <= 25) {
             output[i] += 'A';
@@ -496,11 +497,11 @@ BOOL B64EncodeStream(B64StreamData *data, char output[4]) {
             output[i] = encoding[1];
         }
     }
-    if (data->length < 0) {
+    if (data->len < 0) {
         output[3] = encoding[2];
-        if (data->length == -2) {
+        if (data->len == -2) {
             output[2] = encoding[2];
         }
     }
-    return TRUE;
+    return gsi_true;
 }

@@ -2,10 +2,12 @@
 #define POKEBW2_POKE_NET_INTERNAL_H
 
 #include "types.h"
+#include "dwc/dwc.h"
 #include "dwc/error.h"
 #include "dwc/ext.h"
 #include "dwc/memfunc.h"
 #include "nitro/os.h"
+#include "nitrowifi/cps.h"
 #include "nitrowifi/soc.h"
 #include "poke_net/poke_net_gds.h"
 
@@ -25,28 +27,10 @@ typedef struct {
 #define POKE_NET_REQUEST_HEADER_SIZE (POKE_NET_SIZE_LENGTH + sizeof(POKE_NET_REQUESTCOMMON))
 #define POKE_NET_RESPONSE_HEADER_SIZE (POKE_NET_SIZE_LENGTH + sizeof(POKE_NET_RESPONSE))
 
-// The settings of an SSL connection, which the socket library reads: its own state, the server's name, the callback
-// that judges a certificate (it returns the error to fail with, 0 for none) and the certificate authorities trusted
-typedef struct POKE_NET_SSL_CA_INFO {
-    const char *Dn;
-    int ModuloLength;
-    const u8 *Modulo;
-    int ExponentLength;
-    const u8 *Exponent;
-} POKE_NET_SSL_CA_INFO;
-
-typedef struct POKE_NET_SSL_CONNECTION POKE_NET_SSL_CONNECTION;
-typedef int (*POKE_NET_SSL_AUTH_CALLBACK)(int result, POKE_NET_SSL_CONNECTION *connection, int level);
-
-struct POKE_NET_SSL_CONNECTION {
-    u8 State[0x800];
-    char *ServerName;
-    u8 unk804[0xc];
-    POKE_NET_SSL_AUTH_CALLBACK AuthCallback;
-    POKE_NET_SSL_CA_INFO **CaInfo;
-    int CaInfoCount;
-    u8 unk81C[0x14];
-};
+// The SSL settings take NitroWiFi's types: a connection (CPSSslConnection) whose server's name, certificate callback
+// and certificate authorities (CPSCaInfo) the client fills in. The callback judges a certificate: it returns the error
+// to fail with, 0 for none
+typedef int (*POKE_NET_SSL_AUTH_CALLBACK)(int result, CPSSslConnection *connection, int level);
 
 // poke_net.c: the request engine
 BOOL POKE_NET_Initialize(const char *url, u16 port, POKE_NET_REQUESTCOMMON_AUTH *auth);
@@ -88,11 +72,11 @@ s32 POKE_NET_GetResponseMaxSize(s32 reqno);
 
 // poke_net_ssl.c
 void POKE_NET_SSL_Setup(void);
-void POKE_NET_SSL_SetConnection(POKE_NET_SSL_CONNECTION *connection);
+void POKE_NET_SSL_SetConnection(CPSSslConnection *connection);
 void POKE_NET_SSL_SetAuthCallback(POKE_NET_SSL_AUTH_CALLBACK callback);
-void POKE_NET_SSL_SetCaInfo(POKE_NET_SSL_CA_INFO **caInfo, int count);
-void POKE_NET_SSL_StartConnection(const char *serverName, POKE_NET_SSL_CONNECTION *connection);
-void POKE_NET_SSL_EndConnection(POKE_NET_SSL_CONNECTION *connection);
+void POKE_NET_SSL_SetCaInfo(CPSCaInfo **caInfo, int count);
+void POKE_NET_SSL_StartConnection(const char *serverName, CPSSslConnection *connection);
+void POKE_NET_SSL_EndConnection(CPSSslConnection *connection);
 
 // The C library's memcpy as the compiler builds it in: a copy of a constant size is done in place
 #define POKE_NET_Memcpy __memcpy
@@ -100,20 +84,5 @@ void POKE_NET_SSL_EndConnection(POKE_NET_SSL_CONNECTION *connection);
 // The socket library of overlay 11: resolving a host's name to an address in host order (0 if it fails), and an
 // address as text
 u32 CPS_Resolve(const char *host);
-
-// The token of the Nintendo Wi-Fi Connection's service locator: the request for it, which fills the result as it
-// succeeds, and the step of the request, which gives its state
-typedef struct {
-    BOOL status;
-    char svlhost[64 + 1];
-    char svltoken[POKE_NET_SVL_TOKEN_LENGTH + 1];
-} DWCSvlResult;
-enum {
-    DWC_SVL_STATE_SUCCESS = 3,
-    DWC_SVL_STATE_ERROR,
-    DWC_SVL_STATE_CANCELED,
-};
-BOOL DWC_SVLGetTokenAsync(const char *svc, void *result);
-int DWC_SVLProcess(void);
 
 #endif // POKEBW2_POKE_NET_INTERNAL_H

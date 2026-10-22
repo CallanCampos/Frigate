@@ -2,10 +2,10 @@
 """Give a compiled object's functions the second names that the configs record as labels.
 
     object_aliases.py build/b2_us/lib/msl/src/fp/fp_fastI.unaliased.o build/b2_us/lib/msl/src/fp/fp_fastI.o \\
-        _ll_mul=_ull_mul _dadd=__aeabi_dadd ...
+        _ll_mul=_ull_mul ...
 
-MSL's runtime routines have two names each, the runtime's (`_ll_mul`, `_dadd`) and another the code also calls
-(`_ull_mul`, or swan's `__aeabi_dadd`), and dsd keeps the second as a label at the function's start. A delinked object
+A runtime routine of MSL's can have two names that the code calls, such as `_ull_mul` and `_ll_mul`, and dsd keeps
+the second as a label at the function's start. A delinked object
 defines both; an object that MWCC compiles from an `asm` function defines one, since MWCC's ARM assembler takes no
 `entry` and ignores an alias attribute or pragma. The linker can't give the other either: a symbol that its script
 assigns has no ARM or Thumb type, so a Thumb `bl` to it stays a `bl` where an ARM routine needs a `blx`. So this adds

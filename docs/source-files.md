@@ -15,7 +15,16 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
   and the file is named for what it does, never for an overlay number.
 - **Status.** "complete" files link their compiled C. "partial" files link the original code until every function
   matches and the data they use is written; `docs/nonmatching-functions.md` lists the functions in C that do not match.
-- The functions outside every file are in the gaps that dsd leaves between them, in original assembly.
+- Functions outside every file remain in the gaps that dsd leaves between them, in original assembly.
+  A gap can also contain linker-generated metadata or alignment fill, as in ITCM below.
+
+ITCM's 15 functions are in five complete source files in both versions, covering `0x01ff8020`-`0x01ff939c`.
+The leading `0x01ff8000`-`0x01ff8020` gap contains the empty static-initializer list's zero terminator
+and alignment fill: each original ROM's autoload entry points its initializer field at `0x01ff8000`,
+and the startup code copies initializer pointers through the first zero. The final four bytes through
+`0x01ff93a0` are zero alignment fill, and ITCM has no BSS. These ranges require no additional source
+registration. Resolving the compiled objects' calls and pool references reproduces each original
+ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 ### Overlay 0
 
@@ -136,9 +145,9 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `gsPlatformUtil.c` | `0x0216e250`–`0x0216ea4c` | 25 | complete | descriptive |
 | `gsSoap.c` | `0x0216ea4c`–`0x0216ec58` | 9 | complete | descriptive |
 | `gsStringUtil.c` | `0x0216ec58`–`0x0216eea8` | 7 | complete | descriptive |
-| `gt2.c` | `0x0216eea8`–`0x0216fbf8` | 27 | partial | descriptive |
-| `gsXML.c` | `0x0216fbf8`–`0x021713e0` | 49 | complete | descriptive |
-| `gs_screen_print.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
+| `gsUdpEngine.c` | `0x0216eea8`–`0x0216fbe0` | 26 | partial | descriptive |
+| `gsXML.c` | `0x0216fbe0`–`0x021713e0` | 50 | complete | descriptive |
+| `screen.c` | `0x021713e0`–`0x021714cc` | 4 | complete | descriptive |
 | `darray.c` | `0x021714cc`–`0x02171818` | 20 | complete | descriptive |
 | `hashtable.c` | `0x02171818`–`0x021719fc` | 9 | complete | descriptive |
 | `md5c.c` | `0x021719fc`–`0x0217241c` | 10 | complete | descriptive |
@@ -189,7 +198,7 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `musical_stage_sys.c` | `0x02151f90`–`0x021522d8` | 9 | complete | string at `0x0216dff4` |
 | `musical_program.c` | `0x021522d8`–`0x0215264c` | 15 | complete | string at `0x0216e008` |
 | `event_colosseum_battle.c` | `0x0215264c`–`0x0215291c` | 3 | complete | descriptive |
-| `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | partial | string at `0x0216e0a8` |
+| `delivery_beacon.c` | `0x0215291c`–`0x02152c0c` | 22 | complete | string at `0x0216e0a8` |
 | `delivery_irc.c` | `0x02152c0c`–`0x02153160` | 27 | complete | string at `0x0216e180` |
 | `mystery_gift_pokemon.c` | `0x02153160`–`0x021535dc` | 1 | complete | descriptive |
 | `intrude_work.c` | `0x021535dc`–`0x0215366c` | 12 | complete | descriptive |
@@ -1581,10 +1590,10 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `plist_battle.c` | `0x021a0d38`–`0x021a1944` | 18 | complete | string at `0x021a4d1c` |
 | `plist_demo.c` | `0x021a1944`–`0x021a23e8` | 21 | complete | string at `0x021a4d2c` |
 | `status_rcv.c` | `0x021a23e8`–`0x021a30f8` | 7 | complete | descriptive |
-| `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | partial | descriptive |
+| `dsprot_run.c` | `0x021a30f8`–`0x021a33fc` | 6 | complete | descriptive |
 | `dsprot_stub_check.c` | `0x021a33fc`–`0x021a37b0` | 5 | complete | descriptive |
 | `dsprot_decrypt.c` | `0x021a37b0`–`0x021a3ab0` | 5 | complete | descriptive |
-| `dsprot_detect.c` | `0x021a3ab0`–`0x021a4484` | 14 | partial | descriptive |
+| `dsprot_detect.c` | `0x021a3ab0`–`0x021a4484` | 6 (+8 generated veneers) | complete | descriptive |
 | `dsprot_cipher.c` | `0x021a4484`–`0x021a49dc` | 8 | complete | descriptive |
 
 ### Overlay 166
@@ -2332,16 +2341,18 @@ game's `src/gfl` and `src/system` and the libraries linked there (NitroSDK, TwlS
 | `wifibattlematch_link_competition.c` | `0x021b57dc`–`0x021b8cc8` | 46 | complete | descriptive |
 | `wifibattlematch_net.c` | `0x021b8cc8`–`0x021bc058` | 100 | partial | string at `0x021bff6c` |
 | `wifibattlematch_net_fields.c` | `0x021bc058`–`0x021bc218` | 5 | partial | descriptive |
-| `sake.c` | `0x021bc218`–`0x021bc4fc` | 19 | complete | descriptive |
-| `sake_error.c` | `0x021bc4fc`–`0x021bc7c4` | 3 | complete | descriptive |
-| `sake_post.c` | `0x021bc7c4`–`0x021bc82c` | 2 | complete | descriptive |
-| `sake_storage.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
-| `sake_records.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
+| `sakeMain.c` | `0x021bc218`–`0x021bc478` | 16 | complete | descriptive |
+| `sakeRequest.c` | `0x021bc478`–`0x021bc82c` | 8 | complete | descriptive |
+| `sakeRequestModify.c` | `0x021bc82c`–`0x021bcc04` | 11 | complete | descriptive |
+| `sakeRequestRead.c` | `0x021bcc04`–`0x021bd43c` | 25 | complete | descriptive |
 | `dwc_sc.c` | `0x021bd43c`–`0x021bda1c` | 29 | complete | descriptive |
-| `dwc_competition.c` | `0x021bda1c`–`0x021be474` | 45 | complete | descriptive |
-| `dwc_competition_soap.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
+| `sciInterface.c` | `0x021bda1c`–`0x021bdbdc` | 7 | complete | descriptive |
+| `sciMain.c` | `0x021bdbdc`–`0x021bde88` | 20 | complete | descriptive |
+| `sciReport.c` | `0x021bde88`–`0x021be340` | 14 | complete | descriptive |
+| `sciSerialize.c` | `0x021be340`–`0x021be474` | 4 | complete | descriptive |
+| `sciWebServices.c` | `0x021be474`–`0x021beaa0` | 10 | complete | descriptive |
 | `gdb.c` | `0x021beaa0`–`0x021bf63c` | 26 | complete | descriptive |
-| `dwc_auth.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
+| `AuthService.c` | `0x021bf63c`–`0x021bfcd8` | 8 | partial | descriptive |
 
 ### Overlay 261
 

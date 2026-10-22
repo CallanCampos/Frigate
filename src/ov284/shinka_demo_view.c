@@ -910,7 +910,7 @@ static SpritePieces *ShinkaDemoPieces_Create(u32 species, u32 form, u32 sex, BOO
     pieces->characterFile =
         GFL_G2DIOReadOBJNCGR(GetPokemonGraphicsARCID(), characterNo, TRUE, &pieces->character, heapId);
     pieces->paletteFile = GFL_G2DIOReadNCLR(GetPokemonGraphicsARCID(), paletteNo, &pieces->palette, heapId);
-    src = pieces->character->rawData;
+    src = pieces->character->pRawData;
     pixels = GFL_BitmapGetPixelData(pieces->bitmap);
     MIi_CpuClear32(0, pixels, 16 * 16 * 32);
     // The sprite's characters come in cells of 64 by 64, 32 by 64, 64 by 32 and 32 by 32 pixels
@@ -940,7 +940,7 @@ static SpritePieces *ShinkaDemoPieces_Create(u32 species, u32 form, u32 sex, BOO
     }
     GFL_BitmapMakeLinear(pieces->bitmap, FALSE, heapId);
     NNS_GfdRegisterNewVramTransferTask(0, texAddr, GFL_BitmapGetPixelData(pieces->bitmap), 16 * 16 * 32);
-    NNS_GfdRegisterNewVramTransferTask(1, plttAddr, pieces->palette->rawData, 16 * sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(1, plttAddr, pieces->palette->pRawData, 16 * sizeof(GXRgb));
     return pieces;
 }
 
@@ -1600,7 +1600,7 @@ static void ShinkaDemoPieces_UpdateFade(SpritePieces *pieces, HeapID heapId) {
 
 // Blends the sprite's palette toward fadeColor by fadeValue out of 31, except its transparent color
 static void ShinkaDemoPieces_ApplyFade(SpritePieces *pieces, HeapID heapId) {
-    GXRgb *src = pieces->palette->rawData;
+    GXRgb *src = pieces->palette->pRawData;
     s16 fadeR = pieces->fadeColor & 0x1f;
     s16 fadeG = (pieces->fadeColor & 0x3e0) >> 5;
     s16 fadeB = (pieces->fadeColor & 0x7c00) >> 10;

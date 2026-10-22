@@ -53,7 +53,7 @@ typedef struct {
     s32 count;
 } MoveDataCache;
 
-static s32 PML_MoveGetParamCore(const MoveData *data, u32 param);
+static s32 PML_MoveGetParamCore(const MoveData *data, unsigned int param);
 static BOOL PML_MoveGetFlagCore(const MoveData *data, u32 flag);
 
 static MoveDataCache *sMoveDataCache;
@@ -90,7 +90,7 @@ s32 PML_MoveGetParam(u16 move, u32 param) {
     return PML_MoveGetParamCore(PML_MoveGetData(move), param);
 }
 
-static s32 PML_MoveGetParamCore(const MoveData *data, u32 param) {
+static s32 PML_MoveGetParamCore(const MoveData *data, unsigned int param) {
     switch (param) {
     case MOVE_PARAM_TYPE:
         return data->type;

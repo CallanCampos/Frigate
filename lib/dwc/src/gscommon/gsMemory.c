@@ -5,10 +5,10 @@
 // pret's pokerevo Wii build has them (gsiMemoryCallbacksSet, gsimalloc, gsirealloc and gsifree in nonport.s), with the
 // later SDK's names for the defaults
 
-static void *_gsi_malloc(u32 size);
+static void *_gsi_malloc(size_t size);
 static void _gsi_free(void *ptr);
-static void *_gsi_realloc(void *ptr, u32 size);
-static void *_gsi_memalign(u32 align, u32 size);
+static void *_gsi_realloc(void *ptr, size_t size);
+static void *_gsi_memalign(size_t align, size_t size);
 
 // The functions that the allocations go through
 static struct {
@@ -18,7 +18,7 @@ static struct {
     gsMemalignCB memalign;
 } sMemoryCallbacks = { _gsi_malloc, _gsi_free, _gsi_realloc, _gsi_memalign };
 
-static void *_gsi_malloc(u32 size) {
+static void *_gsi_malloc(size_t size) {
     return malloc(size);
 }
 
@@ -26,12 +26,12 @@ static void _gsi_free(void *ptr) {
     free(ptr);
 }
 
-static void *_gsi_realloc(void *ptr, u32 size) {
+static void *_gsi_realloc(void *ptr, size_t size) {
     return realloc(ptr, size);
 }
 
 // MSL has no memalign: this allocates size bytes, zeroed, as size / align elements of align bytes
-static void *_gsi_memalign(u32 align, u32 size) {
+static void *_gsi_memalign(size_t align, size_t size) {
     return calloc(size / align, align);
 }
 
@@ -42,11 +42,11 @@ void gsiMemoryCallbacksSet(gsMallocCB malloc, gsFreeCB free, gsReallocCB realloc
     sMemoryCallbacks.memalign = memalign;
 }
 
-void *gsimalloc(u32 size) {
+void *gsimalloc(size_t size) {
     return sMemoryCallbacks.malloc(size);
 }
 
-void *gsirealloc(void *ptr, u32 size) {
+void *gsirealloc(void *ptr, size_t size) {
     return sMemoryCallbacks.realloc(ptr, size);
 }
 

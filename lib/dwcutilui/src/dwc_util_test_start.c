@@ -19,20 +19,20 @@
 #include "nitro/os.h"
 
 static BOOL DWCUtilTestStart_IsLidClosed(void);
-static void DWCUtilTestStart_LoadGraphics(void);
-static void DWCUtilTestStart_FadeIn(void);
-static void DWCUtilTestStart_WaitFadeIn(void);
-static void DWCUtilTestStart_WaitButtons(void);
-static void DWCUtilTestStart_Main(void);
-static void DWCUtilTestStart_HandleInput(void);
-static void func_ov182_021b4e60(void);
-static void DWCUtilTestStart_HandleChoice(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilTestStart_DisableButtons(void);
-static void DWCUtilTestStart_FadeOut(void);
-static void DWCUtilTestStart_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilTestStart_PollTest(void);
-static void DWCUtilTestStart_WaitDialog(void);
-static void DWCUtilTestStart_WaitDialogClosed(void);
+static void procError(void);
+static void procError1(void);
 
 // Whether the test reached its first step; FALSE when it was ended or failed
 static u8 sTestStartPassed;
@@ -47,17 +47,17 @@ static BOOL DWCUtilTestStart_IsLidClosed(void) {
 
 void DWCUtilTestStart_Init(void) {
     sTestStartPassed = FALSE;
-    DWCUtilTestStart_LoadGraphics();
-    DWCUtilBgOverlay_ShowConnectionSet();
-    DWCUtilScreen_Start(0x37, -1, 0);
-    DWCUtilGfxResource_ShowStep(2);
-    DWCUtilGfxResource_ShowMessage(0x24);
-    DWCUtilUiEffect_Init(0);
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_COMMENTlDispEx(0x37, -1, 0);
+    DWCi_CMNlStep(2);
+    DWCi_CMNlMsgDraw(0x24);
+    DWCi_ANIMElInitEx(0);
     DWCUtilSound_PlaySe(0xb);
-    DWCUtilMain_SetUpdate(DWCUtilTestStart_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilTestStart_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/jbBgStep3.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/ybBgStep3.ncl.l", GX_LoadBGPltt);
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
@@ -68,127 +68,126 @@ static void DWCUtilTestStart_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilTestStart_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
 // Starts the test once the screens have faded in
-static void DWCUtilTestStart_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilConnection_Start();
-        DWCUtilGfxResource_ShowButtons(1);
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_RAKUlInit();
+        DWCi_CMNlButton(1);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilTestStart_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilTestStart_Main(void) {
+static void procScene(void) {
     OS_Sleep(10);
     DWCUtilTestStart_PollTest();
-    DWCUtilTestStart_HandleInput();
-    func_ov182_021b4e60();
-    DWCUtilTestStart_HandleChoice();
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilTestStart_HandleInput(void) {
-    if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+static void input(void) {
+    if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
     } else if (DWCUtilTestStart_IsLidClosed()) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+        DWCi_BTNlSet(0);
     }
 }
 
-static void func_ov182_021b4e60(void) {
+static void draw(void) {
 }
 
 // The button ends the test
-static void DWCUtilTestStart_HandleChoice(void) {
-    if (DWCUtilUiObject_GetState() == 0) {
+static void button(void) {
+    if (DWCi_BTNlGet() == 0) {
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_DisableButtons);
+        DWCi_ChangeScene(DWCUtilTestStart_DisableButtons);
     }
 }
 
 static void DWCUtilTestStart_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilTestStart_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilTestStart_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
         if (!sTestStartPassed) {
-            DWCUtilUiObject_Exit();
+            DWCi_BTNlEnd();
         }
         if (!sTestStartPassed) {
-            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+            DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilTestStart_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) == 0 && (sTestStartPassed || DWCUtilFade_IsActive(1) == 0) &&
-        DWCUtilUiObject_IsIdle()) {
-        DWCUtilUiEffect_Destroy();
-        DWCUtilText_DestroyScreenBg(0);
+static void endScene2(void) {
+    if (DWCi_EFFlCheck(0) == 0 && (sTestStartPassed || DWCi_EFFlCheck(1) == 0) && DWCi_BTNlIsEnd()) {
+        DWCi_ANIMElEnd();
+        DWCi_FNTlDeleteBgLcd(0);
         if (!sTestStartPassed) {
-            DWCUtilScreen_Stop();
+            DWCi_COMMENTlDelete();
             DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sTestStartPassed) {
-            DWCUtilConnection_Stop();
-            DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
+            DWCi_RAKUlEnd();
+            DWCi_SetParam_(2, 1);
+            DWCi_ChangeScene(DWCUtilScreenWay_Init);
         } else {
-            DWCUtilMain_SetLayout(0, 0);
-            DWCUtilMain_SetUpdate(DWCUtilTestProgress_Init);
+            DWCi_SetParam_(0, 0);
+            DWCi_ChangeScene(DWCUtilTestProgress_Init);
         }
     }
 }
 
 // What the test reports
 static void DWCUtilTestStart_PollTest(void) {
-    switch (DWCUtilConnection_GetState()) {
+    switch (DWCi_RAKUlGetState()) {
     case 1:
         sTestStartPassed = TRUE;
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_DisableButtons);
+        DWCi_ChangeScene(DWCUtilTestStart_DisableButtons);
         break;
     case 4:
         sTestStartPassed = FALSE;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(9);
         DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
-        DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitDialog);
+        DWCi_BTNlDisable();
+        DWCi_ChangeScene(procError);
         break;
     }
 }
 
-static void DWCUtilTestStart_WaitDialog(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+static void procError(void) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_WaitDialogClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(procError1);
     }
 }
 
-static void DWCUtilTestStart_WaitDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilMain_SetUpdate(DWCUtilTestStart_DisableButtons);
+static void procError1(void) {
+    if (!DWCi_WINlIsInit()) {
+        DWCi_ChangeScene(DWCUtilTestStart_DisableButtons);
     }
 }

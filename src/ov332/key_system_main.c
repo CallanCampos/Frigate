@@ -380,7 +380,7 @@ static void KeySystemBG_Load(KeySystemBG *bg, HeapID heapId) {
     GFL_BGSysLoadArcNCGRStatic(arc, 4, 1, 10, 0, FALSE, heapId);
 
     file = GFL_G2DIOReadNCLRArc(arc, 0, &palette, heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(&colors[0], bg->palettes[0], sizeof(bg->palettes[0]));
     MI_CpuCopy8(&colors[16], bg->palettes[1], sizeof(bg->palettes[1]));
     MI_CpuCopy8(&colors[32], bg->palettes[2], sizeof(bg->palettes[2]));

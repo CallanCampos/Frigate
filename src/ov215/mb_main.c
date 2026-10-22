@@ -252,7 +252,7 @@ void MailBox_LoadBGGraphics(MailBoxWork *work) {
     loadBGScrToVramByFileNoReserveNegAlign(arc, 37, 3, 0, 0, TRUE, HEAPID_MAILBOX_VIEW);
     GFL_G2DIOLoadArcNCLRDefault(arc, 39, PALTYPE_MAIN_BG, 0, 0, HEAPID_MAILBOX_VIEW);
     file = GFL_G2DIOReadBGNCGRArc(arc, 38, TRUE, &character, HEAPID_MAILBOX_VIEW);
-    chars = character->rawData;
+    chars = character->pRawData;
     MIi_CpuCopyFast(chars + 0x100, work->view->tileA, 0x20);
     MIi_CpuCopyFast(chars + 0x100, work->view->tileB, 0x20);
     GFL_HeapFree(file);

@@ -10,51 +10,50 @@
 // as pret's pokerevo Wii build has them (natneg.s), and FindNegotiatorForCookie, AddNegotiator, RemoveNegotiator,
 // CheckMagic, SendReportPacket, SendPingPacket, NameToIp, ResolveServer, ResolveServers, SendConnectAck, NNMagicData
 // and the statics are named after the later SDK. The pre-init packets (the cookie's client ID, SendPreInitPacket and
-// ProcessPreInitPacket) are newer than both, and those names are ours, and so are FinishNegotiator and NNSendPacket,
-// NNGetLocalIP and NNGetLocalPort (the later SDK's SendPacket, GetLocalIP and GetLocalPort, whose names
-// gsAvailable.c and NATify.c have)
+// ProcessPreInitPacket) are newer than both, and those names are ours; RemoveFinishedNegotiator, SendPacket,
+// GetLocalIP and GetLocalPort are the later SDK's too (gsAvailable.c and NATify.c have statics of the same names)
 
 // One negotiation with a partner. The guessed address is the partner's public one, as the server or its pings give
 // it, and remoteAddr the one that the negotiation ended with
 typedef struct NATNegotiator {
-    int gameSock;
+    SOCKET gameSock;
     int cookie;
     int clientIndex;
     NegotiateProgressFunc progressCallback;
     NegotiateCompletedFunc completedCallback;
     void *userData;
-    int negotiateSock;
-    int state;
-    BOOL initAckRecv[4];
+    SOCKET negotiateSock;
+    NegotiateState state;
+    int initAckRecv[4];
     int retryCount;
     int maxRetryCount;
-    u32 retryTime;
-    u32 guessedIp;
-    u16 guessedPort;
-    u8 gotRemoteData;
-    u8 sendGotRemoteData; // whether the partner has this side's data, so that the negotiation can finish
-    int result;
-    int connectedSocket;
-    SocAddrIn remoteAddr;
+    unsigned long retryTime;
+    unsigned int guessedIp;
+    unsigned short guessedPort;
+    unsigned char gotRemoteData;
+    unsigned char sendGotRemoteData; // whether the partner has this side's data, so that the negotiation can finish
+    NegotiateResult result;
+    SOCKET connectedSocket;
+    SOCKADDR_IN remoteAddr;
 } NATNegotiator;
 
-u8 NNMagicData[NATNEG_MAGIC_LEN] = { 0xfd, 0xfc, 0x1e, 0x66, 0x6a, 0xb2 };
+gsi_u8 NNMagicData[NATNEG_MAGIC_LEN] = { 0xfd, 0xfc, 0x1e, 0x66, 0x6a, 0xb2 };
 
 // The NAT detection's state, which NNThink checks while a detection runs, and the servers' names (to use instead of
 // natneg1 to natneg3 of the game's domain) and addresses. With -ipa file, MWCC lays a file's .bss out in an order of
 // its own; this order of the definitions gives the ROM's, which starts with negotiateList
 static NatDetectionResultsFunc natifyCallback;
 static char *Matchup3Hostname;
-static u32 natifyStartTime;
+static gsi_u32 natifyStartTime;
 static char *Matchup2Hostname;
 static int natMappingScheme;
-static u32 matchup2ip;
-static u32 matchup1ip;
+static gsi_u32 matchup2ip;
+static gsi_u32 matchup1ip;
 static int clientId;
-static DArray *negotiateList;
+static DArray negotiateList;
 static char *Matchup1Hostname;
-static BOOL activeNatify;
-static u32 matchup3ip;
+static gsi_bool activeNatify;
+static gsi_u32 matchup3ip;
 static NAT nat;
 static int natType = 6;
 static int mappingSock = -1;
@@ -64,26 +63,26 @@ static int GetClientID(void);
 static NATNegotiator *FindNegotiatorForCookie(int cookie);
 static NATNegotiator *AddNegotiator(void);
 static void RemoveNegotiator(NATNegotiator *neg);
-static BOOL CheckMagic(const char *data);
-static int NNSendPacket(int sock, u32 toAddr, u16 toPort, const void *data, int length);
-static u32 NNGetLocalIP(void);
-static u16 NNGetLocalPort(int sock);
+static int CheckMagic(const char *data);
+static int SendPacket(SOCKET sock, unsigned int toAddr, unsigned short toPort, void *data, int length);
+static unsigned int GetLocalIP(void);
+static unsigned short GetLocalPort(SOCKET sock);
 static void SendReportPacket(NATNegotiator *neg);
-static void StartReport(NATNegotiator *neg, int result, int socket, SocAddrIn *remoteAddr);
+static void StartReport(NATNegotiator *neg, NegotiateResult result, SOCKET socket, SOCKADDR_IN *remoteAddr);
 static void SendPreInitPacket(NATNegotiator *neg);
 static void SendInitPackets(NATNegotiator *neg);
 static void SendPingPacket(NATNegotiator *neg);
-static BOOL CheckNatifyStatus(int sock);
-static u32 NameToIp(const char *name);
-static u32 ResolveServer(const char *overrideHostname, const char *defaultHostname);
-static BOOL ResolveServers(void);
-static void FinishNegotiator(NATNegotiator *neg);
+static gsi_bool CheckNatifyStatus(SOCKET sock);
+static unsigned int NameToIp(const char *name);
+static unsigned int ResolveServer(const char *overrideHostname, const char *defaultHostname);
+static int ResolveServers(void);
+static void RemoveFinishedNegotiator(NATNegotiator *neg);
 static void NegotiateThink(NATNegotiator *neg);
-static void SendConnectAck(NATNegotiator *neg, SocAddrIn *toAddr);
-static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr);
-static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr);
+static void SendConnectAck(NATNegotiator *neg, SOCKADDR_IN *toAddr);
+static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr);
+static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr);
 static void ProcessPreInitPacket(NATNegotiator *neg, NatNegPacket *packet);
-static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr);
+static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr);
 
 // The random ID that the pre-init packets give the servers, picked once
 static int GetClientID(void) {
@@ -103,8 +102,8 @@ static NATNegotiator *FindNegotiatorForCookie(int cookie) {
     if (negotiateList == NULL) {
         return NULL;
     }
-    for (i = 0; i < func_ov011_02171588(negotiateList); i++) {
-        NATNegotiator *neg = func_ov011_0217158c(negotiateList, i);
+    for (i = 0; i < ArrayLength(negotiateList); i++) {
+        NATNegotiator *neg = ArrayNth(negotiateList, i);
 
         if (neg->cookie == cookie) {
             return neg;
@@ -117,18 +116,18 @@ static NATNegotiator *AddNegotiator(void) {
     NATNegotiator neg = { 0 };
 
     if (negotiateList == NULL) {
-        negotiateList = func_ov011_02171514(sizeof(NATNegotiator), 4, NULL);
+        negotiateList = ArrayNew(sizeof(NATNegotiator), 4, NULL);
     }
-    func_ov011_021715a4(negotiateList, &neg);
-    return func_ov011_0217158c(negotiateList, func_ov011_02171588(negotiateList) - 1);
+    ArrayAppend(negotiateList, &neg);
+    return ArrayNth(negotiateList, ArrayLength(negotiateList) - 1);
 }
 
 static void RemoveNegotiator(NATNegotiator *neg) {
     int i;
 
-    for (i = 0; i < func_ov011_02171588(negotiateList); i++) {
-        if (neg == func_ov011_0217158c(negotiateList, i)) {
-            func_ov011_02171634(negotiateList, i);
+    for (i = 0; i < ArrayLength(negotiateList); i++) {
+        if (neg == ArrayNth(negotiateList, i)) {
+            ArrayRemoveAt(negotiateList, i);
             return;
         }
     }
@@ -136,31 +135,32 @@ static void RemoveNegotiator(NATNegotiator *neg) {
 
 void NNFreeNegotiateList(void) {
     if (negotiateList != NULL) {
-        gsDebugFormat(7, 3, 8, "NNFreeNegotiateList: Freeing %d negotiators\n", func_ov011_02171588(negotiateList));
-        func_ov011_02171558(negotiateList);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_State, GSIDebugLevel_Notice,
+                      "NNFreeNegotiateList: Freeing %d negotiators\n", ArrayLength(negotiateList));
+        ArrayFree(negotiateList);
         negotiateList = NULL;
     }
 }
 
-static BOOL CheckMagic(const char *data) {
+static int CheckMagic(const char *data) {
     return memcmp(data, NNMagicData, NATNEG_MAGIC_LEN) == 0;
 }
 
-static int NNSendPacket(int sock, u32 toAddr, u16 toPort, const void *data, int length) {
-    SocAddrIn address;
+static int SendPacket(SOCKET sock, unsigned int toAddr, unsigned short toPort, void *data, int length) {
+    SOCSockAddrIn address;
 
     address.family = 2;
     address.port = NN_SWAP16(toPort);
-    address.addr = toAddr;
-    return sendto(sock, data, length, 0, &address, sizeof(SocAddrIn));
+    address.addr.addr = toAddr;
+    return sendto(sock, data, length, 0, (SOCKADDR *)&address, sizeof(SOCSockAddrIn));
 }
 
 // The first address of the console that isn't the loopback one and is a private one, else the last one
-static u32 NNGetLocalIP(void) {
+static unsigned int GetLocalIP(void) {
     int i;
-    SocHostEnt *host;
-    u32 *addr;
-    u32 localIp = 0;
+    HOSTENT *host;
+    IN_ADDR *addr;
+    gsi_u32 localIp = 0;
 
     host = getlocalhost();
     if (host == NULL) {
@@ -170,11 +170,11 @@ static u32 NNGetLocalIP(void) {
         if (host->addrList[i] == NULL) {
             break;
         }
-        addr = (u32 *)host->addrList[i];
-        if (*(u32 *)host->addrList[i] == NN_SWAP32(0x7f000001)) {
+        addr = (IN_ADDR *)host->addrList[i];
+        if (addr->addr == NN_SWAP32(0x7f000001)) {
             continue;
         }
-        localIp = *addr;
+        localIp = addr->addr;
         if (IsPrivateIP(addr)) {
             return localIp;
         }
@@ -183,11 +183,11 @@ static u32 NNGetLocalIP(void) {
 }
 
 // The port (in network order) that a socket is bound to, or 0
-static u16 NNGetLocalPort(int sock) {
-    SocAddrIn address;
-    int size = sizeof(SocAddrIn);
+static unsigned short GetLocalPort(SOCKET sock) {
+    SOCSockAddrIn address;
+    int size = sizeof(SOCSockAddrIn);
 
-    if (getsockname(sock, &address, &size) == -1) {
+    if (getsockname(sock, (SOCKADDR *)&address, &size) == -1) {
         return 0;
     }
     return address.port;
@@ -198,33 +198,36 @@ static void SendReportPacket(NATNegotiator *neg) {
 
     memcpy(packet.magic, NNMagicData, NATNEG_MAGIC_LEN);
     packet.version = 4;
-    packet.packetType = 13;
+    packet.packettype = 13;
     packet.cookie = NN_SWAP32(neg->cookie);
-    packet.packet.report.clientIndex = neg->clientIndex;
-    packet.packet.report.negResult = neg->result == 0 ? TRUE : FALSE;
-    packet.packet.report.natType = natType;
-    packet.packet.report.natMappingScheme = natMappingScheme;
+    packet.Packet.report.clientindex = neg->clientIndex;
+    packet.Packet.report.negResult = neg->result == 0 ? gsi_true : gsi_false;
+    packet.Packet.report.natType = natType;
+    packet.Packet.report.natMappingScheme = natMappingScheme;
     if (strlen(__GSIACGamename) > 0) {
-        memcpy(packet.packet.report.gamename, __GSIACGamename, sizeof(packet.packet.report.gamename));
+        memcpy(packet.Packet.report.gamename, __GSIACGamename, sizeof(packet.Packet.report.gamename));
     }
-    gsDebugFormat(7, 0, 8, "SendReportPacket(cookie=%d): Sending REPORT to %s:%d (result: %d)\n", neg->cookie,
-                  SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901, packet.packet.report.negResult);
-    NNSendPacket(neg->negotiateSock, matchup1ip, 27901, &packet, 73);
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "SendReportPacket(cookie=%d): Sending REPORT to %s:%d (result: %d)\n", neg->cookie,
+                  SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901, packet.Packet.report.negResult);
+    SendPacket(neg->negotiateSock, matchup1ip, 27901, &packet, 73);
 }
 
-static void StartReport(NATNegotiator *neg, int result, int socket, SocAddrIn *remoteAddr) {
+static void StartReport(NATNegotiator *neg, NegotiateResult result, SOCKET socket, SOCKADDR_IN *remoteAddr) {
     neg->result = result;
     neg->connectedSocket = socket;
     if (remoteAddr != NULL) {
         memcpy(&neg->remoteAddr, remoteAddr, sizeof(neg->remoteAddr));
     }
     if (result == 2 || result == 1) {
-        gsDebugFormat(7, 3, 8, "StartReport(cookie=%d): Negotiation failed, cancelling\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_State, GSIDebugLevel_Notice,
+                      "StartReport(cookie=%d): Negotiation failed, cancelling\n", neg->cookie);
         neg->state = 5;
         neg->completedCallback(neg->result, neg->connectedSocket, &neg->remoteAddr, neg->userData);
         NNCancel(neg->cookie);
     } else {
-        gsDebugFormat(7, 3, 8, "StartReport(cookie=%d): Negotiation finished, sending report\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_State, GSIDebugLevel_Notice,
+                      "StartReport(cookie=%d): Negotiation finished, sending report\n", neg->cookie);
         SendReportPacket(neg);
         neg->state = 7;
         neg->retryTime = current_time() + 500;
@@ -239,12 +242,13 @@ static void SendPreInitPacket(NATNegotiator *neg) {
 
     memcpy(packet.magic, NNMagicData, NATNEG_MAGIC_LEN);
     packet.version = 4;
-    packet.packetType = 15;
+    packet.packettype = 15;
     packet.cookie = NN_SWAP32(neg->cookie);
-    packet.packet.preInit.clientIndex = neg->clientIndex;
-    packet.packet.preInit.clientId = GetClientID();
-    gsDebugFormat(7, 0, 8, "Sending PREINIT to %s:%d\n", SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901);
-    NNSendPacket(neg->negotiateSock, matchup1ip, 27901, &packet, 18);
+    packet.Packet.preInit.clientindex = neg->clientIndex;
+    packet.Packet.preInit.clientID = GetClientID();
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Sending PREINIT to %s:%d\n",
+                  SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901);
+    SendPacket(neg->negotiateSock, matchup1ip, 27901, &packet, 18);
     if (neg->state == 1) {
         neg->retryTime = current_time() + 10000;
         neg->maxRetryCount = 12;
@@ -258,17 +262,17 @@ static void SendPreInitPacket(NATNegotiator *neg) {
 static void SendInitPackets(NATNegotiator *neg) {
     char buffer[21 + sizeof(__GSIACGamename)];
     NatNegPacket *packet = (NatNegPacket *)buffer;
-    u32 localIp;
-    u16 localPort;
+    gsi_u32 localIp;
+    gsi_u16 localPort;
     int packetLength;
 
     memcpy(packet->magic, NNMagicData, NATNEG_MAGIC_LEN);
-    packet->packetType = 0;
+    packet->packettype = 0;
     packet->version = 4;
     packet->cookie = NN_SWAP32(neg->cookie);
-    packet->packet.init.clientIndex = neg->clientIndex;
-    packet->packet.init.useGamePort = neg->gameSock == -1 ? 0 : 1;
-    localIp = NN_SWAP32(NNGetLocalIP());
+    packet->Packet.init.clientindex = neg->clientIndex;
+    packet->Packet.init.usegameport = neg->gameSock == -1 ? 0 : 1;
+    localIp = NN_SWAP32(GetLocalIP());
     // The address and the port follow the port type and the flags on the wire, unaligned
     buffer[15] = localIp >> 24;
     buffer[16] = localIp >> 16;
@@ -278,31 +282,35 @@ static void SendInitPackets(NATNegotiator *neg) {
     buffer[20] = 0;
     strcpy(buffer + 21, __GSIACGamename);
     packetLength = 21 + strlen(__GSIACGamename) + 1;
-    if (packet->packet.init.useGamePort && !neg->initAckRecv[0]) {
-        packet->packet.init.portType = 0;
-        gsDebugFormat(7, 0, 8, "Sending INIT (GP) to %s:%d...\n", SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901);
-        NNSendPacket(neg->gameSock, matchup1ip, 27901, packet, packetLength);
+    if (packet->Packet.init.usegameport && !neg->initAckRecv[0]) {
+        packet->Packet.init.porttype = 0;
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Sending INIT (GP) to %s:%d...\n",
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901);
+        SendPacket(neg->gameSock, matchup1ip, 27901, packet, packetLength);
     }
     if (!neg->initAckRecv[1]) {
-        packet->packet.init.portType = 1;
-        gsDebugFormat(7, 0, 8, "SendInitPackets(cookie=%d): Sending INIT (NN1) to %s:%d...\n", neg->cookie,
-                      SOC_InetNtoA(*(SocInAddr *)&matchup1ip), 27901);
-        NNSendPacket(neg->negotiateSock, matchup1ip, 27901, packet, packetLength);
+        packet->Packet.init.porttype = 1;
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "SendInitPackets(cookie=%d): Sending INIT (NN1) to %s:%d...\n", neg->cookie,
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup1ip), 27901);
+        SendPacket(neg->negotiateSock, matchup1ip, 27901, packet, packetLength);
     }
-    localPort = NN_SWAP16(NNGetLocalPort(packet->packet.init.useGamePort ? neg->gameSock : neg->negotiateSock));
+    localPort = NN_SWAP16(GetLocalPort(packet->Packet.init.usegameport ? neg->gameSock : neg->negotiateSock));
     buffer[19] = localPort >> 8;
     buffer[20] = localPort;
     if (!neg->initAckRecv[2]) {
-        packet->packet.init.portType = 2;
-        gsDebugFormat(7, 0, 8, "SendInitPackets(cookie=%d): Sending INIT (NN2) to %s:%d...\n", neg->cookie,
-                      SOC_InetNtoA(*(SocInAddr *)&matchup2ip), 27901);
-        NNSendPacket(neg->negotiateSock, matchup2ip, 27901, packet, packetLength);
+        packet->Packet.init.porttype = 2;
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "SendInitPackets(cookie=%d): Sending INIT (NN2) to %s:%d...\n", neg->cookie,
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup2ip), 27901);
+        SendPacket(neg->negotiateSock, matchup2ip, 27901, packet, packetLength);
     }
     if (!neg->initAckRecv[3]) {
-        packet->packet.init.portType = 3;
-        gsDebugFormat(7, 0, 8, "SendInitPackets(cookie=%d): Sending INIT (NN3) to %s:%d...\n", neg->cookie,
-                      SOC_InetNtoA(*(SocInAddr *)&matchup3ip), 27901);
-        NNSendPacket(neg->negotiateSock, matchup3ip, 27901, packet, packetLength);
+        packet->Packet.init.porttype = 3;
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "SendInitPackets(cookie=%d): Sending INIT (NN3) to %s:%d...\n", neg->cookie,
+                      SOC_InetNtoA(*(SOCInAddr *)&matchup3ip), 27901);
+        SendPacket(neg->negotiateSock, matchup3ip, 27901, packet, packetLength);
     }
     neg->state = 2;
     neg->retryTime = current_time() + 500;
@@ -314,29 +322,29 @@ static void SendPingPacket(NATNegotiator *neg) {
 
     memcpy(packet.magic, NNMagicData, NATNEG_MAGIC_LEN);
     packet.version = 4;
-    packet.packetType = 7;
+    packet.packettype = 7;
     packet.cookie = NN_SWAP32(neg->cookie);
-    packet.packet.connect.remoteIp = neg->guessedIp;
-    packet.packet.connect.remotePort = NN_SWAP16(neg->guessedPort);
-    packet.packet.connect.gotYourData = neg->gotRemoteData;
-    packet.packet.connect.finished = neg->gotRemoteData && neg->sendGotRemoteData ? 1 : 0;
-    gsDebugFormat(7, 0, 8, "SendPingPacket(cookie=%d): Sending PING to %s:%d (got remote data: %d)\n", neg->cookie,
-                  SOC_InetNtoA(*(SocInAddr *)&neg->guessedIp), neg->guessedPort, neg->gotRemoteData);
-    NNSendPacket(neg->gameSock != -1 ? neg->gameSock : neg->negotiateSock, neg->guessedIp, neg->guessedPort, &packet,
-                 20);
+    packet.Packet.connect.remoteIP = neg->guessedIp;
+    packet.Packet.connect.remotePort = NN_SWAP16(neg->guessedPort);
+    packet.Packet.connect.gotyourdata = neg->gotRemoteData;
+    packet.Packet.connect.finished = neg->gotRemoteData && neg->sendGotRemoteData ? 1 : 0;
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "SendPingPacket(cookie=%d): Sending PING to %s:%d (got remote data: %d)\n", neg->cookie,
+                  SOC_InetNtoA(*(SOCInAddr *)&neg->guessedIp), neg->guessedPort, neg->gotRemoteData);
+    SendPacket(neg->gameSock != -1 ? neg->gameSock : neg->negotiateSock, neg->guessedIp, neg->guessedPort, &packet, 20);
     neg->retryTime = current_time() + 700;
     neg->maxRetryCount = 7;
 }
 
-static BOOL CheckNatifyStatus(int sock) {
-    BOOL active = TRUE;
-    BOOL success = FALSE;
+static gsi_bool CheckNatifyStatus(SOCKET sock) {
+    gsi_bool active = gsi_true;
+    gsi_bool success = gsi_false;
 
     if (sock != -1) {
         if (current_time() - natifyStartTime < 10000) {
             active = NatifyThink(sock, &nat);
         } else {
-            active = FALSE;
+            active = gsi_false;
         }
         if (!active) {
             success = DetermineNatType(&nat);
@@ -356,9 +364,9 @@ static BOOL CheckNatifyStatus(int sock) {
     return active;
 }
 
-static u32 NameToIp(const char *name) {
-    u32 ip;
-    SocHostEnt *host;
+static unsigned int NameToIp(const char *name) {
+    gsi_u32 ip;
+    SOCHostEnt *host;
 
     ip = inet_addr(name);
     if (ip == -1) {
@@ -366,12 +374,12 @@ static u32 NameToIp(const char *name) {
         if (host == NULL) {
             return 0;
         }
-        ip = *(u32 *)host->addrList[0];
+        ip = *(gsi_u32 *)host->addrList[0];
     }
     return ip;
 }
 
-static u32 ResolveServer(const char *overrideHostname, const char *defaultHostname) {
+static unsigned int ResolveServer(const char *overrideHostname, const char *defaultHostname) {
     const char *hostname;
     char hostnameBuffer[64];
 
@@ -384,7 +392,7 @@ static u32 ResolveServer(const char *overrideHostname, const char *defaultHostna
     return NameToIp(hostname);
 }
 
-static BOOL ResolveServers(void) {
+static int ResolveServers(void) {
     if (matchup1ip == 0) {
         matchup1ip = ResolveServer(Matchup1Hostname, "natneg1.gs.nintendowifi.net");
     }
@@ -395,31 +403,36 @@ static BOOL ResolveServers(void) {
         matchup3ip = ResolveServer(Matchup3Hostname, "natneg3.gs.nintendowifi.net");
     }
     if (matchup1ip == 0 || matchup2ip == 0 || matchup3ip == 0) {
-        return FALSE;
+        return gsi_false;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-int NNBeginNegotiationWithSocket(int gameSocket, int cookie, int clientIndex, NegotiateProgressFunc progress,
-                                 NegotiateCompletedFunc completed, void *userData) {
+NegotiateError NNBeginNegotiationWithSocket(SOCKET gameSocket, int cookie, int clientIndex,
+                                            NegotiateProgressFunc progress, NegotiateCompletedFunc completed,
+                                            void *userData) {
     NATNegotiator *neg;
 
-    if (__GSIACResult != 1) {
-        gsDebugFormat(7, 0, 4, "NNBeginNegotiationWithSocket(cookie=%d): Backend not available\n", cookie);
+    if (__GSIACResult != GSIACAvailable) {
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                      "NNBeginNegotiationWithSocket(cookie=%d): Backend not available\n", cookie);
         return 2;
     }
     if (!ResolveServers()) {
-        gsDebugFormat(7, 0, 4, "NNBeginNegotiationWithSocket(cookie=%d): DNS resolve to NN servers failed\n", cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                      "NNBeginNegotiationWithSocket(cookie=%d): DNS resolve to NN servers failed\n", cookie);
         return 3;
     }
     neg = AddNegotiator();
     if (neg == NULL) {
-        gsDebugFormat(7, 2, 1, "NNBeginNegotiationWithSocket: Failed to allocate negotiator\n");
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Memory, GSIDebugLevel_HotError,
+                      "NNBeginNegotiationWithSocket: Failed to allocate negotiator\n");
         return 1;
     }
-    neg->negotiateSock = gsiSocket(2, 2, 0);
+    neg->negotiateSock = socket(2, 2, 0);
     if (neg->negotiateSock == -1) {
-        gsDebugFormat(7, 0, 1, "NNBeginNegotiationWithSocket: Failed to create negotiate socket\n");
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_HotError,
+                      "NNBeginNegotiationWithSocket: Failed to create negotiate socket\n");
         RemoveNegotiator(neg);
         return 2;
     }
@@ -438,11 +451,12 @@ int NNBeginNegotiationWithSocket(int gameSocket, int cookie, int clientIndex, Ne
     neg->maxRetryCount = 0;
     SendPreInitPacket(neg);
     {
-        SocAddrIn address;
-        int size = sizeof(SocAddrIn);
+        SOCSockAddrIn address;
+        int size = sizeof(SOCSockAddrIn);
 
-        getsockname(neg->negotiateSock, &address, &size);
-        gsDebugFormat(7, 0, 8, "Negotiate Socket: %d\n", NN_SWAP16(address.port));
+        getsockname(neg->negotiateSock, (SOCKADDR *)&address, &size);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Negotiate Socket: %d\n",
+                      NN_SWAP16(address.port));
     }
     return 0;
 }
@@ -451,10 +465,12 @@ void NNCancel(int cookie) {
     NATNegotiator *neg = FindNegotiatorForCookie(cookie);
 
     if (neg == NULL) {
-        gsDebugFormat(7, 4, 4, "NNCancel(cookie=%d): Failed to find negotiator\n", cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Misc, GSIDebugLevel_Warning,
+                      "NNCancel(cookie=%d): Failed to find negotiator\n", cookie);
         return;
     }
-    gsDebugFormat(7, 4, 8, "NNCancel(cookie=%d): Cancelling negotiator\n", cookie);
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Misc, GSIDebugLevel_Notice,
+                  "NNCancel(cookie=%d): Cancelling negotiator\n", cookie);
     if (neg->negotiateSock != -1) {
         closesocket(neg->negotiateSock);
         neg->negotiateSock = -1;
@@ -463,7 +479,7 @@ void NNCancel(int cookie) {
 }
 
 // Cancels a negotiation that is done; one without the game's socket keeps its own, which it ended with
-static void FinishNegotiator(NATNegotiator *neg) {
+static void RemoveFinishedNegotiator(NATNegotiator *neg) {
     if (neg->gameSock == -1) {
         neg->negotiateSock = -1;
     }
@@ -472,16 +488,18 @@ static void FinishNegotiator(NATNegotiator *neg) {
 
 static void NegotiateThink(NATNegotiator *neg) {
     static char indata[0x200];
-    SocAddrIn saddr;
-    int saddrlen = sizeof(SocAddrIn);
+    SOCSockAddrIn saddr;
+    int saddrlen = sizeof(SOCSockAddrIn);
     int error;
 
     if (neg == NULL) {
-        gsDebugFormat(7, 4, 4, "NegotiateThink: NULL negotiator\n");
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Misc, GSIDebugLevel_Warning,
+                      "NegotiateThink: NULL negotiator\n");
         return;
     }
     if (neg->state == 6) {
-        gsDebugFormat(7, 2, 8, "NegotiateThink(cookie=%d): Removing canceled negotiator\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Memory, GSIDebugLevel_Notice,
+                      "NegotiateThink(cookie=%d): Removing canceled negotiator\n", neg->cookie);
         RemoveNegotiator(neg);
         return;
     }
@@ -490,9 +508,10 @@ static void NegotiateThink(NATNegotiator *neg) {
             if (!CanReceiveOnSocket(neg->negotiateSock)) {
                 break;
             }
-            error = recvfrom(neg->negotiateSock, indata, sizeof(indata), 0, &saddr, &saddrlen);
+            error = recvfrom(neg->negotiateSock, indata, sizeof(indata), 0, (SOCKADDR *)&saddr, &saddrlen);
             if (error == -1) {
-                gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): RECV SOCKET ERROR: %d\n", neg->cookie,
+                gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                              "NegotiateThink(cookie=%d): RECV SOCKET ERROR: %d\n", neg->cookie,
                               GOAGetLastError(neg->negotiateSock));
                 break;
             }
@@ -505,7 +524,8 @@ static void NegotiateThink(NATNegotiator *neg) {
     if (neg->state == 0 || neg->state == 1 || neg->state == 2 || neg->state == 4) {
         if (current_time() > neg->retryTime) {
             if (neg->retryCount > neg->maxRetryCount) {
-                gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): Last init packet resend timed out\n", neg->cookie);
+                gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                              "NegotiateThink(cookie=%d): Last init packet resend timed out\n", neg->cookie);
                 if (neg->state == 0 || neg->state == 1 || neg->state == 2) {
                     StartReport(neg, 2, -1, NULL);
                 } else {
@@ -513,8 +533,9 @@ static void NegotiateThink(NATNegotiator *neg) {
                 }
             } else {
                 neg->retryCount++;
-                gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): Resending init packets (retryCount=%d)\n",
-                              neg->cookie, neg->retryCount);
+                gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                              "NegotiateThink(cookie=%d): Resending init packets (retryCount=%d)\n", neg->cookie,
+                              neg->retryCount);
                 if (neg->state == 0 || neg->state == 1) {
                     SendPreInitPacket(neg);
                 } else if (neg->state == 2) {
@@ -526,16 +547,19 @@ static void NegotiateThink(NATNegotiator *neg) {
         }
     }
     if (neg->state == 3 && current_time() > neg->retryTime) {
-        gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): Failed to receive any pings from partner\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "NegotiateThink(cookie=%d): Failed to receive any pings from partner\n", neg->cookie);
         StartReport(neg, 1, -1, NULL);
     }
     if (neg->state == 4 && current_time() > neg->retryTime) {
         if (neg->retryCount > neg->maxRetryCount) {
-            gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): Last ping packet resend timed out\n", neg->cookie);
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                          "NegotiateThink(cookie=%d): Last ping packet resend timed out\n", neg->cookie);
             StartReport(neg, 3, -1, NULL);
         } else {
             neg->retryCount++;
-            gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): Resending ping packet (retryCount=%d)\n", neg->cookie,
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                          "NegotiateThink(cookie=%d): Resending ping packet (retryCount=%d)\n", neg->cookie,
                           neg->retryCount);
             SendPingPacket(neg);
             neg->retryTime = current_time() + 700;
@@ -543,30 +567,33 @@ static void NegotiateThink(NATNegotiator *neg) {
     }
     if (neg->state == 7 && current_time() > neg->retryTime) {
         if (neg->retryCount > neg->maxRetryCount) {
-            gsDebugFormat(7, 3, 8, "NegotiateThink(cookie=%d): Last report packet resend timed out, finishing\n",
-                          neg->cookie);
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_State, GSIDebugLevel_Notice,
+                          "NegotiateThink(cookie=%d): Last report packet resend timed out, finishing\n", neg->cookie);
             neg->state = 5;
         } else {
             SendReportPacket(neg);
             neg->retryCount++;
-            gsDebugFormat(7, 0, 8, "NegotiateThink(cookie=%d): Resending report packet (retryCount=%d)\n", neg->cookie,
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                          "NegotiateThink(cookie=%d): Resending report packet (retryCount=%d)\n", neg->cookie,
                           neg->retryCount);
             neg->retryTime = current_time() + 500;
         }
     }
     if (neg->state == 5 || neg->state == 8) {
         if (neg->sendGotRemoteData) {
-            gsDebugFormat(7, 3, 8,
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_State, GSIDebugLevel_Notice,
                           "NegotiateThink(cookie=%d): Both sides are finished, no need to linger, cancelling\n",
                           neg->cookie);
         } else if (current_time() > neg->retryTime) {
-            gsDebugFormat(7, 3, 8, "NegotiateThink(cookie=%d): Finished negotiator is done lingering, cancelling\n",
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_State, GSIDebugLevel_Notice,
+                          "NegotiateThink(cookie=%d): Finished negotiator is done lingering, cancelling\n",
                           neg->cookie);
         }
-        FinishNegotiator(neg);
+        RemoveFinishedNegotiator(neg);
     }
     if (neg->state == 6) {
-        gsDebugFormat(7, 2, 8, "NegotiateThink(cookie=%d): Removing canceled negotiator post-update\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Memory, GSIDebugLevel_Notice,
+                      "NegotiateThink(cookie=%d): Removing canceled negotiator post-update\n", neg->cookie);
         RemoveNegotiator(neg);
     }
 }
@@ -578,84 +605,91 @@ void NNThink(void) {
         activeNatify = CheckNatifyStatus(mappingSock) && CheckNatifyStatus(ertSock);
     }
     if (negotiateList != NULL) {
-        for (i = func_ov011_02171588(negotiateList) - 1; i >= 0; i--) {
-            NegotiateThink(func_ov011_0217158c(negotiateList, i));
+        for (i = ArrayLength(negotiateList) - 1; i >= 0; i--) {
+            NegotiateThink(ArrayNth(negotiateList, i));
         }
     }
 }
 
-static void SendConnectAck(NATNegotiator *neg, SocAddrIn *toAddr) {
+static void SendConnectAck(NATNegotiator *neg, SOCKADDR_IN *toAddr) {
     NatNegPacket packet;
 
     memcpy(packet.magic, NNMagicData, NATNEG_MAGIC_LEN);
     packet.version = 4;
-    packet.packetType = 6;
+    packet.packettype = 6;
     packet.cookie = NN_SWAP32(neg->cookie);
-    packet.packet.init.clientIndex = neg->clientIndex;
-    gsDebugFormat(7, 0, 8, "SendConnectAck(cookie=%d): Sending connect ack...\n", neg->cookie);
-    NNSendPacket(neg->negotiateSock, toAddr->addr, NN_SWAP16(toAddr->port), &packet, 21);
+    packet.Packet.init.clientindex = neg->clientIndex;
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "SendConnectAck(cookie=%d): Sending connect ack...\n", neg->cookie);
+    SendPacket(neg->negotiateSock, toAddr->addr.addr, NN_SWAP16(toAddr->port), &packet, 21);
 }
 
-static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr) {
-    gsDebugFormat(7, 0, 8, "ProcessConnectPacket(cookie=%d): Got connect packet (finish code: %d), guess: %s:%d\n",
-                  neg->cookie, packet->packet.connect.finished,
-                  SOC_InetNtoA(*(SocInAddr *)&packet->packet.connect.remoteIp),
-                  NN_SWAP16(packet->packet.connect.remotePort));
-    if (packet->packet.connect.finished == 0) {
+static void ProcessConnectPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr) {
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "ProcessConnectPacket(cookie=%d): Got connect packet (finish code: %d), guess: %s:%d\n", neg->cookie,
+                  packet->Packet.connect.finished, SOC_InetNtoA(*(SOCInAddr *)&packet->Packet.connect.remoteIP),
+                  NN_SWAP16(packet->Packet.connect.remotePort));
+    if (packet->Packet.connect.finished == 0) {
         SendConnectAck(neg, fromAddr);
     }
     if (neg->state >= 4) {
-        gsDebugFormat(7, 0, 8,
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
                       "ProcessConnectPacket(cookie=%d): Got connect packet while already connected, ignoring\n",
                       neg->cookie);
         return;
     }
-    if (packet->packet.connect.finished != 0) {
+    if (packet->Packet.connect.finished != 0) {
         int errcode = 4;
 
-        if (packet->packet.connect.finished == 1) {
-            gsDebugFormat(7, 0, 8, "ProcessConnectPacket(cookie=%d): deadbeat partner\n", neg->cookie);
+        if (packet->Packet.connect.finished == 1) {
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                          "ProcessConnectPacket(cookie=%d): deadbeat partner\n", neg->cookie);
             errcode = 1;
-        } else if (packet->packet.connect.finished == 2) {
-            gsDebugFormat(7, 0, 8, "ProcessConnectPacket(cookie=%d): init timeout\n", neg->cookie);
+        } else if (packet->Packet.connect.finished == 2) {
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                          "ProcessConnectPacket(cookie=%d): init timeout\n", neg->cookie);
             errcode = 2;
         }
         StartReport(neg, errcode, -1, NULL);
         return;
     }
-    neg->guessedIp = packet->packet.connect.remoteIp;
-    neg->guessedPort = NN_SWAP16(packet->packet.connect.remotePort);
+    neg->guessedIp = packet->Packet.connect.remoteIP;
+    neg->guessedPort = NN_SWAP16(packet->Packet.connect.remotePort);
     neg->retryCount = 0;
     neg->state = 4;
     neg->progressCallback(neg->state, neg->userData);
     SendPingPacket(neg);
 }
 
-static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr) {
-    gsDebugFormat(7, 0, 8, "ProcessPingPacket(cookie=%d): Got ping from: %s:%d (gotmydata: %d, finished: %d)\n",
-                  neg->cookie, SOC_InetNtoA(*(SocInAddr *)&fromAddr->addr), NN_SWAP16(fromAddr->port),
-                  packet->packet.connect.gotYourData, packet->packet.connect.finished);
+static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr) {
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "ProcessPingPacket(cookie=%d): Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", neg->cookie,
+                  SOC_InetNtoA(fromAddr->addr), NN_SWAP16(fromAddr->port), packet->Packet.connect.gotyourdata,
+                  packet->Packet.connect.finished);
     if (neg->state < 4) {
-        gsDebugFormat(7, 0, 8, "ProcessPingPacket(cookie=%d): Received ping before ns_connectping state, ignoring\n",
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "ProcessPingPacket(cookie=%d): Received ping before ns_connectping state, ignoring\n",
                       neg->cookie);
         return;
     }
-    gsDebugFormat(7, 0, 8, "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n",
-                  SOC_InetNtoA(*(SocInAddr *)&fromAddr->addr), NN_SWAP16(fromAddr->port),
-                  packet->packet.connect.gotYourData, packet->packet.connect.finished);
-    neg->guessedIp = fromAddr->addr;
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", SOC_InetNtoA(fromAddr->addr),
+                  NN_SWAP16(fromAddr->port), packet->Packet.connect.gotyourdata, packet->Packet.connect.finished);
+    neg->guessedIp = fromAddr->addr.addr;
     neg->guessedPort = NN_SWAP16(fromAddr->port);
     neg->gotRemoteData = 1;
-    neg->sendGotRemoteData = packet->packet.connect.gotYourData ? 1 : 0;
+    neg->sendGotRemoteData = packet->Packet.connect.gotyourdata ? 1 : 0;
     SendPingPacket(neg);
     if (neg->state == 4 && neg->sendGotRemoteData) {
-        gsDebugFormat(7, 0, 8, "ProcessPingPacket(cookie=%d): CONNECT FINISHED, starting report\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "ProcessPingPacket(cookie=%d): CONNECT FINISHED, starting report\n", neg->cookie);
         StartReport(neg, 0, neg->gameSock != -1 ? neg->gameSock : neg->negotiateSock, fromAddr);
     }
 }
 
 static void ProcessPreInitPacket(NATNegotiator *neg, NatNegPacket *packet) {
-    gsDebugFormat(7, 0, 8, "Got preinit ack with state %d\n", packet->packet.preInit.state);
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Got preinit ack with state %d\n",
+                  packet->Packet.preInit.state);
     if (neg->state != 1) {
         neg->state = 1;
         neg->progressCallback(neg->state, neg->userData);
@@ -663,7 +697,7 @@ static void ProcessPreInitPacket(NATNegotiator *neg, NatNegPacket *packet) {
         neg->retryCount = 0;
         neg->maxRetryCount = 12;
     }
-    switch (packet->packet.preInit.state) {
+    switch (packet->Packet.preInit.state) {
     case 0:
         break;
     case 1:
@@ -674,14 +708,15 @@ static void ProcessPreInitPacket(NATNegotiator *neg, NatNegPacket *packet) {
     }
 }
 
-static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrIn *fromAddr) {
-    switch (packet->packetType) {
+static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR_IN *fromAddr) {
+    switch (packet->packettype) {
     case 1:
-        if (packet->packet.init.portType > 3) {
+        if (packet->Packet.init.porttype > 3) {
             return;
         }
-        gsDebugFormat(7, 0, 8, "Got init ack for port %d\n", packet->packet.init.portType);
-        neg->initAckRecv[packet->packet.init.portType] = TRUE;
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Got init ack for port %d\n",
+                      packet->Packet.init.porttype);
+        neg->initAckRecv[packet->Packet.init.porttype] = gsi_true;
         if (neg->state == 2) {
             if (neg->initAckRecv[1] && neg->initAckRecv[2] && neg->initAckRecv[3] &&
                 (neg->gameSock == -1 || neg->initAckRecv[0])) {
@@ -692,39 +727,43 @@ static void ProcessInitPacket(NATNegotiator *neg, NatNegPacket *packet, SocAddrI
         }
         break;
     case 2:
-        gsDebugFormat(7, 0, 8, "Got ERT\n");
-        packet->packetType = 3;
-        NNSendPacket(neg->negotiateSock, fromAddr->addr, NN_SWAP16(fromAddr->port), packet, 21);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice, "Got ERT\n");
+        packet->packettype = 3;
+        SendPacket(neg->negotiateSock, fromAddr->addr.addr, NN_SWAP16(fromAddr->port), packet, 21);
         break;
     case 14:
-        gsDebugFormat(7, 0, 8, "ProcessInitPacket(cookie=%d): Got REPORT_ACK, finishing\n", neg->cookie);
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                      "ProcessInitPacket(cookie=%d): Got REPORT_ACK, finishing\n", neg->cookie);
         neg->state = 8;
         break;
     }
 }
 
-void NNProcessData(char *data, int length, SocAddrIn *fromAddr) {
+void NNProcessData(char *data, int length, SOCKADDR_IN *fromAddr) {
     NatNegPacket packet;
     NATNegotiator *neg;
-    u8 type;
+    gsi_u8 type;
 
     if (!CheckMagic(data)) {
-        gsDebugFormat(7, 0, 4, "NNProcessData: Invalid packet header, ignoring\n");
+        gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                      "NNProcessData: Invalid packet header, ignoring\n");
         return;
     }
     type = data[7];
-    gsDebugFormat(7, 0, 8, "NNProcessData: Packet type: %d, %d bytes (%s:%d)\n", type, length,
-                  SOC_InetNtoA(*(SocInAddr *)&fromAddr->addr), NN_SWAP16(fromAddr->port));
+    gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
+                  "NNProcessData: Packet type: %d, %d bytes (%s:%d)\n", type, length, SOC_InetNtoA(fromAddr->addr),
+                  NN_SWAP16(fromAddr->port));
     if (type == 5 || type == 7) {
         if (length < 20) {
-            gsDebugFormat(7, 0, 4, "NNProcessData: CONNECT or CONNECT_PING packet too small, ignoring\n");
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                          "NNProcessData: CONNECT or CONNECT_PING packet too small, ignoring\n");
             return;
         }
         memcpy(&packet, data, 20);
         neg = FindNegotiatorForCookie(NN_SWAP32(packet.cookie));
         if (neg == NULL) {
-            gsDebugFormat(7, 0, 4, "NNProcessData(cookie=%d): Failed to find negotiator, ignoring\n",
-                          NN_SWAP32(packet.cookie));
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                          "NNProcessData(cookie=%d): Failed to find negotiator, ignoring\n", NN_SWAP32(packet.cookie));
             return;
         }
         if (type == 5) {
@@ -743,14 +782,15 @@ void NNProcessData(char *data, int length, SocAddrIn *fromAddr) {
         }
     } else {
         if (length < 21) {
-            gsDebugFormat(7, 0, 4, "NNProcessData: non-CONNECT/CONNECT_PING packet too small, ignoring\n");
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                          "NNProcessData: non-CONNECT/CONNECT_PING packet too small, ignoring\n");
             return;
         }
         memcpy(&packet, data, 21);
         neg = FindNegotiatorForCookie(NN_SWAP32(packet.cookie));
         if (neg == NULL) {
-            gsDebugFormat(7, 0, 4, "NNProcessData(cookie=%d): Failed to find negotiator, ignoring\n",
-                          NN_SWAP32(packet.cookie));
+            gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Warning,
+                          "NNProcessData(cookie=%d): Failed to find negotiator, ignoring\n", NN_SWAP32(packet.cookie));
             return;
         }
         ProcessInitPacket(neg, &packet, fromAddr);

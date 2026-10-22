@@ -826,7 +826,7 @@ static void func_ov194_021c2930(PokemonTradeWork *wk) {
     NNSG2dPaletteData *palette;
     ArcTool *arc = GFL_ArcSysCreateFileHandle(0x75, wk->heapId);
     void *file = GFL_G2DIOReadNCLRArc(arc, 0x48, &palette, wk->heapId);
-    u16 *colors = palette->rawData;
+    u16 *colors = palette->pRawData;
 
     DC_FlushRange(&colors[16], 16 * sizeof(GXRgb));
     MI_CpuMove(&colors[16], &colors[17], 15 * sizeof(GXRgb));

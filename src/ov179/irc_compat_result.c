@@ -941,7 +941,7 @@ static void IrcCompatFlash_Init(IrcCompatFlash *flash, u16 unk0, u8 score, HeapI
     loadBGScrToVramByFileNoReserveNegAlign(arc, 17, 3, 0, 0, FALSE, heapId);
     GFL_ArcToolFree(arc);
     file = GFL_G2DIOReadNCLR(ARCID_IRC_COMPAT, 16, &palette, heapId);
-    src = palette->rawData;
+    src = palette->pRawData;
     MI_CpuCopy8(src, flash->target, sizeof(flash->target));
     MI_CpuCopy8(src + 0x80, flash->target, sizeof(flash->target));
     GFL_HeapFree(file);

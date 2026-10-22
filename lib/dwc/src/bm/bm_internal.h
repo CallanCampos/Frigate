@@ -14,13 +14,13 @@ int func_0205dd40(u32 page, const void *src, u32 size);
 
 // dwc_nvram.c. The first call of any of these finds where the Wi-Fi settings are, once: 0x400 bytes before the user
 // settings, whose offset the NVRAM's header holds. Returns 0, or -1 when the header can't be read
-int func_0205dbc0(void);
+int DWCi_BACKUPlInit(void);
 // The version byte of the NVRAM's header, 0x10 for 0xff, or 0 when it can't be read. The extra pages of the settings
 // (0x11 to 0x13) are only there from 0x20 on
 u32 func_0205dc78(void);
 
 // dwc_bm_check.c. Checks the Wi-Fi settings of an NTR or of a TWL console in a work area of 0x1000 bytes, repairs what
-// can be and returns 0, or one of the negative DWCBmCheckResult values of dwc/bm.h
+// can be and returns 0, or one of the negative DWCBMInitResult values of dwc/bm.h
 int func_0205e094(void *work);
 int func_0205e0f0(void *work);
 

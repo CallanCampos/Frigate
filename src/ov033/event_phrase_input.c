@@ -21,7 +21,7 @@
 // The longest name of modes 5 to 7
 static const u8 sMaxLengths[3] = { 8, 8, 8 };
 
-GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *parent, u32 mode, u16 *result) {
+GameEvent *EventPhraseInput_Create(GameSystem *gsys, Field *field, GameEvent *parent, unsigned int mode, u16 *result) {
     GameEvent *event;
     struct EventPhraseInputData *data;
     SaveControl *save;

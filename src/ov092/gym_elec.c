@@ -475,7 +475,7 @@ void GymElec_ReapplyProgress(Field *field) {
 }
 
 void GymElec_SetBrightness(Field *field, s32 brightness) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
+    GX_SetMasterBrightness(brightness);
 }
 
 static GymElecSave *GymElec_GetSave(Field *field) {

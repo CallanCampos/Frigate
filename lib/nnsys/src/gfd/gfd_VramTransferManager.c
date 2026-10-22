@@ -3,23 +3,22 @@
 #include "nnsys/gfd.h"
 
 // NitroSystem's gfd_VramTransferManager.c: a queue of transfers to VRAM, registered at any time and done in the next
-// V-blank. The function and static names are the SDK's, from pokediamond's disassembly, except the queue helpers and
-// GfdClearVramTransferQueue, named here. swan calls NNS_GfdInitVramTransferManager gfxUploadQueueBind,
-// GfdClearVramTransferQueue gfxUploadQueueReset, NNS_GfdDoVramTransfer gfxExecUploadRequests,
-// NNS_GfdRegisterNewVramTransferTask gfxUploadAsync,
-// the queue functions Push, GetFront, GetEnd and Pop gfxNotifyUploadRequested, gfxUploadQueueGetCurrentRequest,
-// gfxAllocUploadRequest and gfxUploadQueueAdvance, DoTransfer_ gfxUpload, the DoTransfer functions gfxUploadFunc_*,
-// the queue s_VramTransferManager g_GfxUploadQueue, NextQueueIndex gfxUploadQueueGetNextIndex, IsQueueFull and
-// IsQueueEmpty gfxUploadQueueIsFull and gfxUploadQueueIsEmpty, ResetTaskQueue_ gfxUploadQueueResetCore, and the
-// transfer table transFunc GFX_UPLOAD_FUNCS
+// V-blank. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them. swan calls
+// NNS_GfdInitVramTransferManager gfxUploadQueueBind, NNS_GfdClearVramTransferManagerTask gfxUploadQueueReset,
+// NNS_GfdDoVramTransfer gfxExecUploadRequests, NNS_GfdRegisterNewVramTransferTask gfxUploadAsync, the queue functions
+// Push, GetFront, GetEnd and Pop gfxNotifyUploadRequested, gfxUploadQueueGetCurrentRequest, gfxAllocUploadRequest and
+// gfxUploadQueueAdvance, DoTransfer_ gfxUpload, the DoTransfer functions gfxUploadFunc_*, the queue
+// s_VramTransferManager g_GfxUploadQueue, GetNextIndex_ gfxUploadQueueGetNextIndex, IsVramTransferTaskQueueFull_ and
+// IsVramTransferTaskQueueEmpty_ gfxUploadQueueIsFull and gfxUploadQueueIsEmpty, ResetTaskQueue_
+// gfxUploadQueueResetCore, and the transfer table transFunc GFX_UPLOAD_FUNCS
 
-typedef void (*GfdTransferFunc)(const void *pSrc, u32 dstAddr, u32 szByte);
+typedef void (*TransferFunc)(const void *pSrc, u32 dstAddr, u32 szByte);
 
-static GfdVramTransferQueue s_VramTransferManager;
+static NNSGfdVramTransferTaskQueue s_VramTransferManager;
 
-static u16 NextQueueIndex(const GfdVramTransferQueue *queue, u16 index);
-static BOOL IsQueueFull(const GfdVramTransferQueue *queue);
-static BOOL IsQueueEmpty(const GfdVramTransferQueue *queue);
+static u16 GetNextIndex_(const NNSGfdVramTransferTaskQueue *queue, u16 index);
+static BOOL IsVramTransferTaskQueueFull_(const NNSGfdVramTransferTaskQueue *queue);
+static BOOL IsVramTransferTaskQueueEmpty_(const NNSGfdVramTransferTaskQueue *queue);
 static void DoTransfer3dTex(const void *pSrc, u32 dstAddr, u32 szByte);
 static void DoTransfer3dTexPltt(const void *pSrc, u32 dstAddr, u32 szByte);
 static void DoTransfer3dClearImageColor(const void *pSrc, u32 dstAddr, u32 szByte);
@@ -57,18 +56,18 @@ static void DoTransfer2dBGExtPlttSub(const void *pSrc, u32 dstAddr, u32 szByte);
 static void DoTransfer2dObjOamSub(const void *pSrc, u32 dstAddr, u32 szByte);
 static void DoTransfer2dObjCharSub(const void *pSrc, u32 dstAddr, u32 szByte);
 static void DoTransfer_(const NNSGfdVramTransferTask *task);
-static void ResetTaskQueue_(GfdVramTransferQueue *queue);
+static void ResetTaskQueue_(NNSGfdVramTransferTaskQueue *queue);
 
-static u16 NextQueueIndex(const GfdVramTransferQueue *queue, u16 index) {
-    return (u16)((index + 1) % queue->capacity);
+static u16 GetNextIndex_(const NNSGfdVramTransferTaskQueue *queue, u16 index) {
+    return (u16)((index + 1) % queue->lengthOfArray);
 }
 
-static BOOL IsQueueFull(const GfdVramTransferQueue *queue) {
-    return queue->count == queue->capacity ? TRUE : FALSE;
+static BOOL IsVramTransferTaskQueueFull_(const NNSGfdVramTransferTaskQueue *queue) {
+    return queue->numTasks == queue->lengthOfArray ? TRUE : FALSE;
 }
 
-static BOOL IsQueueEmpty(const GfdVramTransferQueue *queue) {
-    return queue->count == 0 ? TRUE : FALSE;
+static BOOL IsVramTransferTaskQueueEmpty_(const NNSGfdVramTransferTaskQueue *queue) {
+    return queue->numTasks == 0 ? TRUE : FALSE;
 }
 
 static void DoTransfer3dTex(const void *pSrc, u32 dstAddr, u32 szByte) {
@@ -234,7 +233,7 @@ static void DoTransfer2dObjCharSub(const void *pSrc, u32 dstAddr, u32 szByte) {
 
 static void DoTransfer_(const NNSGfdVramTransferTask *task) {
     // Indexed by NNS_GFD_DST_TYPE
-    static const GfdTransferFunc transFunc[NNS_GFD_DST_MAX] = {
+    static const TransferFunc transFunc[NNS_GFD_DST_MAX] = {
         DoTransfer3dTex,
         DoTransfer3dTexPltt,
         DoTransfer3dClearImageColor,
@@ -272,69 +271,69 @@ static void DoTransfer_(const NNSGfdVramTransferTask *task) {
         DoTransfer2dObjOamSub,
         DoTransfer2dObjCharSub,
     };
-    GfdTransferFunc fn = transFunc[task->type];
+    TransferFunc fn = transFunc[task->type];
 
     DC_FlushRange(task->pSrc, task->szByte);
     fn(task->pSrc, task->dstAddr, task->szByte);
 }
 
-static void ResetTaskQueue_(GfdVramTransferQueue *queue) {
-    queue->head = queue->tail = 0;
-    queue->count = 0;
-    queue->pendingBytes = 0;
+static void ResetTaskQueue_(NNSGfdVramTransferTaskQueue *queue) {
+    queue->idxFront = queue->idxRear = 0;
+    queue->numTasks = 0;
+    queue->totalSize = 0;
 }
 
-BOOL NNSi_GfdPushVramTransferTaskQueue(GfdVramTransferQueue *queue) {
-    if (!IsQueueFull(queue)) {
-        queue->tail = NextQueueIndex(queue, queue->tail);
-        queue->count++;
+BOOL NNSi_GfdPushVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue) {
+    if (!IsVramTransferTaskQueueFull_(queue)) {
+        queue->idxRear = GetNextIndex_(queue, queue->idxRear);
+        queue->numTasks++;
         return TRUE;
     }
     return FALSE;
 }
 
-NNSGfdVramTransferTask *NNSi_GfdGetFrontVramTransferTaskQueue(GfdVramTransferQueue *queue) {
-    return &queue->tasks[queue->head];
+NNSGfdVramTransferTask *NNSi_GfdGetFrontVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue) {
+    return &queue->pTaskArray[queue->idxFront];
 }
 
-NNSGfdVramTransferTask *NNSi_GfdGetEndVramTransferTaskQueue(GfdVramTransferQueue *queue) {
-    return &queue->tasks[queue->tail];
+NNSGfdVramTransferTask *NNSi_GfdGetEndVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue) {
+    return &queue->pTaskArray[queue->idxRear];
 }
 
-BOOL NNSi_GfdPopVramTransferTaskQueue(GfdVramTransferQueue *queue) {
-    if (!IsQueueEmpty(queue)) {
-        queue->head = NextQueueIndex(queue, queue->head);
-        queue->count--;
+BOOL NNSi_GfdPopVramTransferTaskQueue(NNSGfdVramTransferTaskQueue *queue) {
+    if (!IsVramTransferTaskQueueEmpty_(queue)) {
+        queue->idxFront = GetNextIndex_(queue, queue->idxFront);
+        queue->numTasks--;
         return TRUE;
     }
     return FALSE;
 }
 
 void NNS_GfdInitVramTransferManager(NNSGfdVramTransferTask *pTaskArray, u32 lengthOfArray) {
-    s_VramTransferManager.tasks = pTaskArray;
-    s_VramTransferManager.capacity = lengthOfArray;
+    s_VramTransferManager.pTaskArray = pTaskArray;
+    s_VramTransferManager.lengthOfArray = lengthOfArray;
     ResetTaskQueue_(&s_VramTransferManager);
 }
 
-void GfdClearVramTransferQueue(void) {
+void NNS_GfdClearVramTransferManagerTask(void) {
     ResetTaskQueue_(&s_VramTransferManager);
 }
 
 void NNS_GfdDoVramTransfer(void) {
-    GfdVramTransferQueue *queue = &s_VramTransferManager;
+    NNSGfdVramTransferTaskQueue *queue = &s_VramTransferManager;
     NNSGfdVramTransferTask *task = NNSi_GfdGetFrontVramTransferTaskQueue(queue);
 
     while (NNSi_GfdPopVramTransferTaskQueue(queue)) {
         DoTransfer_(task);
-        queue->pendingBytes -= task->szByte;
+        queue->totalSize -= task->szByte;
         task = NNSi_GfdGetFrontVramTransferTaskQueue(queue);
     }
 }
 
-BOOL NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_TYPE type, u32 dstAddr, const void *pSrc, u32 szByte) {
-    GfdVramTransferQueue *queue = &s_VramTransferManager;
+BOOL NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_TYPE type, u32 dstAddr, void *pSrc, u32 szByte) {
+    NNSGfdVramTransferTaskQueue *queue = &s_VramTransferManager;
 
-    if (!IsQueueFull(queue)) {
+    if (!IsVramTransferTaskQueueFull_(queue)) {
         NNSGfdVramTransferTask *task = NNSi_GfdGetEndVramTransferTaskQueue(queue);
 
         task->type = type;
@@ -342,7 +341,7 @@ BOOL NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_TYPE type, u32 dstAddr, cons
         task->dstAddr = dstAddr;
         task->szByte = szByte;
         NNSi_GfdPushVramTransferTaskQueue(queue);
-        queue->pendingBytes += task->szByte;
+        queue->totalSize += task->szByte;
         return TRUE;
     }
     return FALSE;

@@ -53,6 +53,7 @@ src/ov165/status_rcv.c:
     .text       start:0x021a2428 end:0x021a3138
 
 lib/dsprot/src/dsprot_run.c:
+    complete
     .text       start:0x021a3138 end:0x021a343c
     .rodata     start:0x021a4cc4 end:0x021a4cdc
     .ctor       start:0x021a4d08 end:0x021a4d0c
@@ -70,6 +71,7 @@ lib/dsprot/src/dsprot_decrypt.c:
     .bss        start:0x021a4d84 end:0x021a4da0
 
 lib/dsprot/src/dsprot_detect.c:
+    complete
     .text       start:0x021a3af0 end:0x021a44c4
     .rodata     start:0x021a4ce4 end:0x021a4cec
     .ctor       start:0x021a4d14 end:0x021a4d18

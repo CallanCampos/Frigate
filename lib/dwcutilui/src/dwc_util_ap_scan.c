@@ -5,9 +5,9 @@
 #include "nitro/os.h"
 #include "nitro/wm.h"
 
-static BOOL DWCUtilApScan_StartScan(void);
-static void DWCUtilApScan_WmCallback(void *arg);
-static void DWCUtilApScan_StoreResults(const WMStartScanExCallback *cb);
+static BOOL startScan(void);
+static void callback(void *arg);
+static void renewInfo(const WMStartScanExCallback *cb);
 
 #define DWC_UTIL_AP_SCAN_MAX 20
 
@@ -30,23 +30,23 @@ static const WMScanExParam sApScanParam = {
 
 static DWCUtilApScan *sApScan;
 
-void DWCUtilApScan_Init(void) {
+void DWCi_SEARCHlInit(void) {
     if (sApScan == NULL) {
-        sApScan = DWCUtilHeap_AllocClear(sizeof(DWCUtilApScan), 32);
+        sApScan = DWCi_HEAPlAllocEx(sizeof(DWCUtilApScan), 32);
     }
 }
 
-void DWCUtilApScan_Exit(void) {
+void DWCi_SEARCHlEnd(void) {
     if (sApScan != NULL) {
         while (WM_GetAllowedChannel() != 0x8000) {
         }
-        DWCUtilHeap_FreeAndNull(&sApScan);
+        DWCi_HEAPlFree_(&sApScan);
     }
 }
 
-BOOL DWCUtilApScan_Start(void) {
+BOOL DWCi_SEARCHlBegin(void) {
     MI_CpuClear16(sApScan->entries, sizeof(sApScan->entries));
-    if (WM_Initialize(sApScan, DWCUtilApScan_WmCallback, 3) != WM_ERRCODE_OPERATING) {
+    if (WM_Initialize(sApScan, callback, 3) != WM_ERRCODE_OPERATING) {
         return FALSE;
     }
     do {
@@ -55,37 +55,37 @@ BOOL DWCUtilApScan_Start(void) {
     sApScan->param = sApScanParam;
     sApScan->param.scanBuf = (WMBssDesc *)sApScan->scanBuffer;
     sApScan->param.maxChannelTime = WM_GetDispersionScanPeriod();
-    if (DWCUtilApScan_StartScan()) {
+    if (startScan()) {
         return TRUE;
     }
     return FALSE;
 }
 
-static BOOL DWCUtilApScan_StartScan(void) {
-    if (WM_StartScanEx(DWCUtilApScan_WmCallback, &sApScan->param) == WM_ERRCODE_OPERATING) {
+static BOOL startScan(void) {
+    if (WM_StartScanEx(callback, &sApScan->param) == WM_ERRCODE_OPERATING) {
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL DWCUtilApScan_Stop(void) {
+BOOL DWCi_SEARCHlStop(void) {
     sApScan->stopping = TRUE;
     WM_ReadStatus(&sApScan->status);
     if (sApScan->status.state != WM_STATE_IDLE) {
-        if (WM_Reset(DWCUtilApScan_WmCallback) != WM_ERRCODE_OPERATING) {
+        if (WM_Reset(callback) != WM_ERRCODE_OPERATING) {
             return FALSE;
         }
         do {
             WM_ReadStatus(&sApScan->status);
         } while (sApScan->status.state != WM_STATE_IDLE);
     }
-    if (WM_End(DWCUtilApScan_WmCallback) != WM_ERRCODE_OPERATING) {
+    if (WM_End(callback) != WM_ERRCODE_OPERATING) {
         return FALSE;
     }
     return TRUE;
 }
 
-int DWCUtilApScan_GetEntries(DWCUtilApEntry **entries) {
+int DWCi_SEARCHlGetApInfo(DWCUtilApEntry **entries) {
     int count = 0;
     DWCUtilApEntry *list = sApScan->entries;
     int i;
@@ -100,17 +100,17 @@ int DWCUtilApScan_GetEntries(DWCUtilApEntry **entries) {
 }
 
 // The callback of the wireless: the scan is started again after each channel, and takes the access points found
-static void DWCUtilApScan_WmCallback(void *arg) {
+static void callback(void *arg) {
     WMStartScanExCallback *cb = arg;
 
     if (cb->errcode == WM_ERRCODE_SUCCESS && !sApScan->stopping && cb->apiid == WM_APIID_START_SCAN_EX) {
         switch (cb->state) {
         case WM_STATECODE_PARENT_FOUND:
-            DWCUtilApScan_StoreResults(cb);
-            DWCUtilApScan_StartScan();
+            renewInfo(cb);
+            startScan();
             break;
         case WM_STATECODE_PARENT_NOT_FOUND:
-            DWCUtilApScan_StartScan();
+            startScan();
             break;
         default:
             OS_Terminate();
@@ -120,7 +120,7 @@ static void DWCUtilApScan_WmCallback(void *arg) {
 }
 
 // Keeps the access points found that have an SSID and aren't a game's, in the entry of their BSSID or a free one
-static void DWCUtilApScan_StoreResults(const WMStartScanExCallback *cb) {
+static void renewInfo(const WMStartScanExCallback *cb) {
     DWCUtilApEntry *list = sApScan->entries;
     WMOtherElements elements;
     WMBssDesc *desc;

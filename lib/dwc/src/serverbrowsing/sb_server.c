@@ -15,7 +15,7 @@
 static int StringHash(const char *s, int numbuckets);
 
 // The table of the shared texts of every server, of SBRefString
-static HashTable *g_SBRefStrList = NULL;
+static HashTable g_SBRefStrList = NULL;
 
 static int RefStringHash(const void *elem, int numbuckets) {
     return StringHash(((const SBRefString *)elem)->str, numbuckets);
@@ -29,7 +29,7 @@ static void RefStringFree(void *elem) {
     gsifree((char *)((SBRefString *)elem)->str);
 }
 
-HashTable *SBRefStrHash(SBServerList *slist) {
+HashTable SBRefStrHash(SBServerList *slist) {
     if (g_SBRefStrList == NULL) {
         g_SBRefStrList = TableNew2(sizeof(SBRefString), 100, 2, RefStringHash, RefStringCompare, RefStringFree);
     }
@@ -44,30 +44,31 @@ void SBRefStrHashCleanup(SBServerList *slist) {
 }
 
 void SBServerFree(void *elem) {
-    SBServer *server = *(SBServer **)elem;
+    SBServer server = *(SBServer *)elem;
 
     TableFree(server->keyvals);
     server->keyvals = NULL;
     gsifree(server);
 }
 
-void SBServerAddKeyValue(SBServer *server, const char *keyname, const char *value) {
+void SBServerAddKeyValue(SBServer server, const char *keyname, const char *value) {
     SBKeyValuePair kv;
 
     kv.key = SBRefStr(NULL, keyname);
     kv.value = SBRefStr(NULL, value);
     TableEnter(server->keyvals, &kv);
-    gsDebugFormat(4, 4, 0x10, "SBServerAddKeyValue added %s\\%s\r\n", keyname, value);
+    gsDebugFormat(GSIDebugCat_SB, GSIDebugType_Misc, GSIDebugLevel_Comment, "SBServerAddKeyValue added %s\\%s\r\n",
+                  keyname, value);
 }
 
-void SBServerAddIntKeyValue(SBServer *server, const char *keyname, int value) {
+void SBServerAddIntKeyValue(SBServer server, const char *keyname, int value) {
     char stemp[20];
 
     OS_SPrintf(stemp, "%d", value);
     SBServerAddKeyValue(server, keyname, stemp);
 }
 
-const char *SBServerGetStringValueA(SBServer *server, const char *keyname, const char *def) {
+const char *SBServerGetStringValueA(SBServer server, const char *keyname, const char *def) {
     SBKeyValuePair kv;
     SBKeyValuePair *ptr;
 
@@ -83,7 +84,7 @@ const char *SBServerGetStringValueA(SBServer *server, const char *keyname, const
     return ptr->value;
 }
 
-int SBServerGetIntValueA(SBServer *server, const char *key, int idefault) {
+int SBServerGetIntValueA(SBServer server, const char *key, int idefault) {
     const char *s;
     const char *s2;
 
@@ -98,13 +99,13 @@ int SBServerGetIntValueA(SBServer *server, const char *key, int idefault) {
         return idefault;
     }
     s2 = (*s != '-') ? s : s + 1;
-    if (!isdigit((u8)*s2)) {
+    if (!isdigit((gsi_u8)*s2)) {
         return idefault;
     }
     return atol(s);
 }
 
-double SBServerGetFloatValueA(SBServer *server, const char *key, double fdefault) {
+double SBServerGetFloatValueA(SBServer server, const char *key, double fdefault) {
     const char *s = SBServerGetStringValueA(server, key, NULL);
 
     if (s == NULL) {
@@ -113,45 +114,45 @@ double SBServerGetFloatValueA(SBServer *server, const char *key, double fdefault
     return atof(s);
 }
 
-u32 SBServerGetPublicInetAddress(SBServer *server) {
+unsigned int SBServerGetPublicInetAddress(SBServer server) {
     return server->publicip;
 }
 
-u16 SBServerGetPublicQueryPort(SBServer *server) {
+unsigned short SBServerGetPublicQueryPort(SBServer server) {
     return SB_SWAP16(server->publicport);
 }
 
-u16 SBServerGetPublicQueryPortNBO(SBServer *server) {
+unsigned short SBServerGetPublicQueryPortNBO(SBServer server) {
     return server->publicport;
 }
 
-BOOL SBServerHasPrivateAddress(SBServer *server) {
+SBBool SBServerHasPrivateAddress(SBServer server) {
     if ((server->flags & PRIVATE_IP_FLAG) == PRIVATE_IP_FLAG) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-u32 SBServerGetPrivateInetAddress(SBServer *server) {
+unsigned int SBServerGetPrivateInetAddress(SBServer server) {
     return server->privateip;
 }
 
-u16 SBServerGetPrivateQueryPort(SBServer *server) {
+unsigned short SBServerGetPrivateQueryPort(SBServer server) {
     return SB_SWAP16(server->privateport);
 }
 
-void SBServerSetNext(SBServer *server, SBServer *next) {
+void SBServerSetNext(SBServer server, SBServer next) {
     server->next = next;
 }
 
-SBServer *SBServerGetNext(SBServer *server) {
+SBServer SBServerGetNext(SBServer server) {
     return server->next;
 }
 
 // Whether a key of the old protocol's answer is one of the server's, not of the answer
 static int CheckValidKey(char *key) {
     const char *InvalidKeys[] = { "queryid", "final" };
-    u32 i;
+    gsi_u32 i;
 
     for (i = 0; i < NELEMS(InvalidKeys); i++) {
         if (strcmp(key, InvalidKeys[i]) == 0) {
@@ -182,7 +183,7 @@ static char *mytok(char *instr, char delim) {
     return result;
 }
 
-void SBServerParseKeyVals(SBServer *server, char *keyvals) {
+void SBServerParseKeyVals(SBServer server, char *keyvals) {
     char *k;
     char *v;
 
@@ -201,13 +202,13 @@ void SBServerParseKeyVals(SBServer *server, char *keyvals) {
 
 // QR2's answer: the server's keys and values, then the players' and the teams', each a count, the names of their keys
 // and the values of every player or team, which are added as the key's name and the player's number
-void SBServerParseQR2FullKeysSingle(SBServer *server, char *data, int len) {
+void SBServerParseQR2FullKeysSingle(SBServer server, char *data, int len) {
     int dlen;
     char *k;
     char *v;
     char *keys;
     int nkeys;
-    u16 nunits;
+    gsi_u16 nunits;
     int pflag;
     int i;
     int j;
@@ -277,12 +278,12 @@ void SBServerParseQR2FullKeysSingle(SBServer *server, char *data, int len) {
 
 // A part of QR2's answer that is split in several: "splitnum", the part's number (with 0x80 on the last), and then
 // sections of the server's keys and values, or of a key of the players or teams with a first number and its values
-void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
+void SBServerParseQR2FullKeysSplit(SBServer server, char *data, int len) {
     int dlen;
     char *k;
     char *v;
-    u32 packetNum = 0;
-    BOOL isFinal = FALSE;
+    gsi_u32 packetNum = 0;
+    gsi_bool isFinal = gsi_false;
 
     if (*data == '\0') {
         return;
@@ -300,17 +301,17 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
     if (len < 1) {
         return;
     }
-    packetNum = (u8)*data;
+    packetNum = (gsi_u8)*data;
     data++;
     len--;
     if ((packetNum & 0x80) == 0x80) {
-        isFinal = TRUE;
+        isFinal = gsi_true;
         packetNum ^= 0x80;
     }
     if (packetNum > 7) {
         return;
     }
-    if (isFinal == TRUE) {
+    if (isFinal == gsi_true) {
         // The parts after the last one never come
         server->splitResponseBitmap |= (char)(0xff << packetNum);
     } else {
@@ -327,7 +328,8 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
         data++;
         len--;
         if (keyType < 0 || keyType > 2) {
-            gsDebugFormat(4, 0, 2, "Split packet parse error, invalid key type! (%d)\r\n", keyType);
+            gsDebugFormat(GSIDebugCat_SB, GSIDebugType_Network, GSIDebugLevel_WarmError,
+                          "Split packet parse error, invalid key type! (%d)\r\n", keyType);
             return;
         }
         while (*data != '\0') {
@@ -378,7 +380,8 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
         }
         if (len > 0) {
             if (*data != '\0') {
-                gsDebugFormat(4, 0, 2, "Split packet parse error, NULL byte expected!\r\n");
+                gsDebugFormat(GSIDebugCat_SB, GSIDebugType_Network, GSIDebugLevel_WarmError,
+                              "Split packet parse error, NULL byte expected!\r\n");
                 return;
             }
             data++;
@@ -388,7 +391,7 @@ void SBServerParseQR2FullKeysSplit(SBServer *server, char *data, int len) {
 }
 
 static int StringHash(const char *s, int numbuckets) {
-    u32 hashcode = 0;
+    gsi_u32 hashcode = 0;
 
     while (*s != '\0') {
         hashcode = hashcode * 0x9ccf9319 + tolower(*s);
@@ -416,12 +419,12 @@ static int KeyValCompareKey(const void *entry1, const void *entry2) {
     return strcmpi(((const SBKeyValuePair *)entry1)->key, ((const SBKeyValuePair *)entry2)->key);
 }
 
-int SBServerGetPing(SBServer *server) {
+int SBServerGetPing(SBServer server) {
     return server->updatetime;
 }
 
-SBServer *SBAllocServer(SBServerList *slist, u32 publicip, u16 publicport) {
-    SBServer *server = gsimalloc(sizeof(SBServer));
+SBServer SBAllocServer(SBServerList *slist, goa_uint32 publicip, unsigned short publicport) {
+    SBServer server = gsimalloc(sizeof(struct _SBServer));
 
     if (server == NULL) {
         return NULL;
@@ -443,32 +446,32 @@ SBServer *SBAllocServer(SBServerList *slist, u32 publicip, u16 publicport) {
     return server;
 }
 
-void SBServerSetFlags(SBServer *server, u8 flags) {
+void SBServerSetFlags(SBServer server, unsigned char flags) {
     server->flags = flags;
 }
 
-void SBServerSetPrivateAddr(SBServer *server, u32 ip, u16 port) {
+void SBServerSetPrivateAddr(SBServer server, goa_uint32 ip, unsigned short port) {
     server->privateip = ip;
     server->privateport = port;
 }
 
-void SBServerSetICMPIP(SBServer *server, u32 icmpip) {
+void SBServerSetICMPIP(SBServer server, goa_uint32 icmpip) {
     server->icmpip = icmpip;
 }
 
-void SBServerSetState(SBServer *server, u8 state) {
+void SBServerSetState(SBServer server, unsigned char state) {
     server->state = state;
 }
 
-u8 SBServerGetState(SBServer *server) {
+unsigned char SBServerGetState(SBServer server) {
     return server->state;
 }
 
-BOOL SBIsNullServer(SBServer *server) {
+int SBIsNullServer(SBServer server) {
     if (server == SBNullServer) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-SBServer *SBNullServer = NULL;
+SBServer SBNullServer = NULL;

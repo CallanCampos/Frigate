@@ -1,7 +1,7 @@
-// NitroSDK/TwlSDK OS: the console type and whether the program runs on a DSi. The file name is a guess, from
-// OS_IsRunOnEmulator, which the console type has a bit for (the SDK's os_emulator.c); whether the DSi check belongs
-// here or in a file of its own that has the last 0x20 bytes of .bss is not known. Built with -ipa file: the file's
-// statics are reached from one base.
+// NitroSDK/TwlSDK OS: the console type and whether the program runs on a DSi. The file name is NitroSDK's: ntrtwl's
+// reconstruction of NitroSDK has OS_GetConsoleType and OS_IsRunOnEmulator in its os_emulator.c; whether the DSi check
+// belongs here or in a file of its own that has the last 0x20 bytes of .bss is not known. Built with -ipa file: the
+// file's statics are reached from one base.
 #include "nitro/os.h"
 
 // SCFG_A9ROM, whose low two bits say that the program runs in the DSi's mode (the DS compatible mode leaves them 0)
@@ -11,7 +11,7 @@
 // booted adds to it (indexed by OS_GetBootType)
 #define OS_CONSOLE_TWL_BASE 0x01800004
 #define OS_CONSOLE_NITRO_BASE 0x80000001
-#define OS_CONSOLE_UNKNOWN 0xffffffff
+#define OSi_CONSOLE_NOT_DETECT 0xffffffff
 
 static u32 func_0207ac60(void);
 
@@ -19,7 +19,7 @@ static u32 func_0207ac60(void);
 static struct {
     u32 unk_00;
     u32 consoleType;
-} sConsole = { 0xffffffff, OS_CONSOLE_UNKNOWN };
+} sConsole = { 0xffffffff, OSi_CONSOLE_NOT_DETECT };
 
 static struct {
     u32 unk_00;
@@ -34,7 +34,7 @@ static const u32 sBootTypeConsoleBits[5] = {
 
 // NitroSDK's OS_GetConsoleType: the console type, worked out once
 u32 OS_GetConsoleType(void) {
-    if (sConsole.consoleType == OS_CONSOLE_UNKNOWN) {
+    if (sConsole.consoleType == OSi_CONSOLE_NOT_DETECT) {
         if (OS_IsRunOnTwl()) {
             sConsole.consoleType = OS_CONSOLE_TWL_BASE;
         } else {

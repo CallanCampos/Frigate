@@ -34,19 +34,19 @@ typedef struct DWCUtilOptionMenu {
     GXOamAttr *cursor;
 } DWCUtilOptionMenu;
 
-static void DWCUtilOptionMenu_LoadGraphics(void);
-static void DWCUtilOptionMenu_FadeIn(void);
-static void DWCUtilOptionMenu_WaitFadeIn(void);
-static void DWCUtilOptionMenu_WaitButtons(void);
-static void DWCUtilOptionMenu_Main(void);
-static void DWCUtilOptionMenu_HandleInput(void);
-static void func_ov182_021af524(void);
-static void DWCUtilOptionMenu_HandleChoice(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilOptionMenu_DisableButtons(void);
-static void DWCUtilOptionMenu_FadeOut(void);
-static void DWCUtilOptionMenu_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 static void DWCUtilOptionMenu_MoveCursor(int direction);
-static void DWCUtilOptionMenu_HighlightSelection(void);
+static void dispPush(void);
 
 // The palette rows that light up each button
 static const u8 sButtonRows[3] = { 1, 2, 3 };
@@ -69,32 +69,32 @@ void DWCUtilOptionMenu_Init(void) {
     static const u16 cursorPos[2] = { 0xe0, 0x84 };
 
     sOptionMenu.started = FALSE;
-    DWCUtilOptionMenu_LoadGraphics();
-    DWCUtilBgOverlay_Show(0x10);
-    DWCUtilSubScreen_LoadScreen(3);
-    DWCUtilScreen_Start(0x39, -1, 0);
+    initGraphics();
+    DWCi_HLlLoad(0x10);
+    DWCi_STEPlChangeScr(3);
+    DWCi_COMMENTlDispEx(0x39, -1, 0);
     sOptionMenu.cursor = DWCUtilCell_AllocOam(0, 0x5b);
     G2_SetOBJPosition(sOptionMenu.cursor, cursorPos[0], cursorPos[1]);
     G2_SetOBJPriority(sOptionMenu.cursor, 3);
-    DWCUtilButtonSprites_ShowFour(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
-                                  sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
-    DWCUtilMain_SetUpdate(DWCUtilOptionMenu_FadeIn);
+    DWCi_FOCUSlDisp4(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
+                     sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
+    DWCi_ChangeScene(procInit);
 }
 
 // Loads the menu's graphics; without a Wi-Fi ID, the rows of the erasing's and the move's buttons are greyed out
-static void DWCUtilOptionMenu_LoadGraphics(void) {
+static void initGraphics(void) {
     char plttPath[] = "char/ybBgOption.ncl.l";
     char rowsPlttPath[] = "char/ybBgOption1.ncl.l";
     u8 *pltt;
-    DWCBmWifiIdInfo info;
+    DWCWiFiInfo info;
     int i;
 
     DWCUtilGfxResource_Load("char/jbBgOption.ncg.l", GX_LoadBG2Char);
     DWCUtilGfxResource_Load("char/jb5OptMenu.nsc.l", GX_LoadBG2Scr);
-    sOptionMenu.palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(rowsPlttPath), NULL, 4);
-    pltt = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(plttPath), NULL, 4);
-    DWCBm_GetWifiIdInfo(&info);
-    if (info.id == 0) {
+    sOptionMenu.palette = DWCUtilRomResource_LoadFile(DWCi_Char(rowsPlttPath), NULL, 4);
+    pltt = DWCUtilRomResource_LoadFile(DWCi_Char(plttPath), NULL, 4);
+    DWCi_BM_GetWiFiInfo(&info);
+    if (info.attestedUserId == 0) {
         u8 *src = pltt + 0xc0;
         u8 *dest = pltt + 0x40;
 
@@ -106,134 +106,133 @@ static void DWCUtilOptionMenu_LoadGraphics(void) {
     }
     DC_FlushRange(pltt, 0x200);
     GX_LoadBGPltt(pltt, 0, 0x200);
-    DWCUtilRomResource_FreeFile(pltt);
+    DWCi_ARClRelease(pltt);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG1Priority(3);
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilOptionMenu_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilOptionMenu_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilOptionMenu_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(0);
-        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(0);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilOptionMenu_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilOptionMenu_Main(void) {
-    DWCUtilOptionMenu_HandleInput();
-    func_ov182_021af524();
-    DWCUtilOptionMenu_HandleChoice();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilOptionMenu_HandleInput(void) {
+static void input(void) {
     u32 i;
 
     for (i = 0; i < 3; i++) {
-        if (DWCUtilTouch_IsTriggeredIn(sButtonRects[i])) {
-            DWCUtilUiObject_SetStateIfIdle(1);
+        if (DWCi_TPlCheckTrigger(sButtonRects[i])) {
+            DWCi_BTNlSet(1);
             sOptionMenu.selection = i;
-            DWCUtilButtonSprites_ShowFour(
-                sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
-                sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
+            DWCi_FOCUSlDisp4(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
+                             sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
             return;
         }
     }
-    if (DWCUtilTouch_IsKeyPressed(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
-    } else if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(1);
+    } else if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
+    } else if (DWCi_IPTlCheckRepeat(0x40)) {
         DWCUtilOptionMenu_MoveCursor(1);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+    } else if (DWCi_IPTlCheckRepeat(0x80)) {
         DWCUtilOptionMenu_MoveCursor(3);
     }
 }
 
-static void func_ov182_021af524(void) {
+static void draw(void) {
 }
 
 // Without a Wi-Fi ID, only the console's information can be chosen
-static void DWCUtilOptionMenu_HandleChoice(void) {
-    DWCBmWifiIdInfo info;
+static void button(void) {
+    DWCWiFiInfo info;
 
-    switch (DWCUtilUiObject_GetState()) {
+    switch (DWCi_BTNlGet()) {
     case 0:
         DWCUtilSound_PlaySe(7);
         break;
     case 1:
-        DWCBm_GetWifiIdInfo(&info);
-        if (sOptionMenu.selection != 0 && info.id == 0) {
+        DWCi_BM_GetWiFiInfo(&info);
+        if (sOptionMenu.selection != 0 && info.attestedUserId == 0) {
             DWCUtilSound_PlaySe(9);
-            DWCUtilUiObject_SetState(-1);
+            DWCi_BTNlSetForce(-1);
             return;
         }
         DWCUtilSound_PlaySe(6);
-        DWCUtilOptionMenu_HighlightSelection();
+        dispPush();
         sOptionMenu.started = TRUE;
         break;
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(DWCUtilOptionMenu_DisableButtons);
+    DWCi_ChangeScene(DWCUtilOptionMenu_DisableButtons);
 }
 
 static void DWCUtilOptionMenu_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilOptionMenu_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilOptionMenu_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
         if (sOptionMenu.started) {
-            DWCUtilUiObject_Exit();
+            DWCi_BTNlEnd();
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilOptionMenu_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
-static void DWCUtilOptionMenu_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
-        DWCUtilOamBuf_Free(sOptionMenu.cursor);
-        DWCUtilButtonSprites_Hide();
-        DWCUtilScreen_Stop();
-        DWCUtilRomResource_FreeFile(sOptionMenu.palette);
+static void endScene2(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
+        DWCi_MOV_MBP_GetChildBmp(sOptionMenu.cursor);
+        DWCi_FOCUSlDelete();
+        DWCi_COMMENTlDelete();
+        DWCi_ARClRelease(sOptionMenu.palette);
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sOptionMenu.started) {
-            DWCUtilMain_SetLayout(0, 0);
-            DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
+            DWCi_SetParam_(0, 0);
+            DWCi_ChangeScene(DWCi_SceneMenu);
         } else {
             switch (sOptionMenu.selection) {
             case 0:
-                DWCUtilMain_SetLayout(0, 1);
-                DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InitInfo);
+                DWCi_SetParam_(0, 1);
+                DWCi_ChangeScene(DWCi_SceneOptInfo);
                 break;
             case 1:
-                DWCUtilMain_SetLayout(0, 1);
-                DWCUtilMain_SetUpdate(DWCUtilInfoMenu_InitErase);
+                DWCi_SetParam_(0, 1);
+                DWCi_ChangeScene(DWCUtilInfoMenu_InitErase);
                 break;
             case 2:
-                DWCUtilMain_SetLayout(0, 1);
-                DWCUtilMain_SetUpdate(DWCUtilPromptYesNo_Init);
+                DWCi_SetParam_(0, 1);
+                DWCi_ChangeScene(DWCUtilPromptYesNo_Init);
                 break;
             }
         }
@@ -248,12 +247,12 @@ static void DWCUtilOptionMenu_MoveCursor(int direction) {
         sOptionMenu.selection = FX_ModS32(sOptionMenu.selection + 1, 3);
     }
     DWCUtilSound_PlaySe(8);
-    DWCUtilButtonSprites_ShowFour(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
-                                  sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
+    DWCi_FOCUSlDisp4(sCursorRects[sOptionMenu.selection][0], sCursorRects[sOptionMenu.selection][2],
+                     sCursorRects[sOptionMenu.selection][1], sCursorRects[sOptionMenu.selection][3]);
 }
 
 // Lights up the chosen button with its row of the palette
-static void DWCUtilOptionMenu_HighlightSelection(void) {
-    DWCUtilBgBuffer_LoadPaletteRow(sOptionMenu.palette, sButtonRows[sOptionMenu.selection],
-                                   sButtonRows[sOptionMenu.selection]);
+static void dispPush(void) {
+    DWCi_SCREENlCopyPalette(sOptionMenu.palette, sButtonRows[sOptionMenu.selection],
+                            sButtonRows[sOptionMenu.selection]);
 }

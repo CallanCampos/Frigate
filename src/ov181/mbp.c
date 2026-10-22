@@ -137,7 +137,7 @@ void MBP_Init(HeapID heapId, u32 ggid, u32 tgid) {
     myUser.playerNo = 0;
     mbpState = (const MBPState){ MBP_STATE_STOP, 0, 0, 0, 0, 0, 0 };
     sCWork = allocConfigDSSoftwareFeature(sHeapId, MB_SYSTEM_BUF_SIZE, "mbp.c", 160);
-    if (MB_Init(sCWork, &myUser, ggid, tgid, MBP_DMA_NO) != MB_SUCCESS) {
+    if (MB_Init(sCWork, &myUser, ggid, tgid, MBP_DMA_NO) != MB_ERRCODE_SUCCESS) {
         GFL_ASSERT_MSG(0, "ERROR in MB_Init\n");
     }
     MB_SetParentCommParam(MB_COMM_PARENT_SEND_MIN, MBP_CHILD_MAX);
@@ -147,7 +147,7 @@ void MBP_Init(HeapID heapId, u32 ggid, u32 tgid) {
 
 void MBP_Start(const MBGameRegistry *gameInfo, u16 channel) {
     MBP_ChangeState(MBP_STATE_ENTRY);
-    if (MB_StartParent(channel) != MB_SUCCESS) {
+    if (MB_StartParent(channel) != MB_ERRCODE_SUCCESS) {
         MBP_ChangeState(MBP_STATE_ERROR);
         return;
     }

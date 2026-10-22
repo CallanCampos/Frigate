@@ -29,7 +29,7 @@ void InfinityDungeon_ShuffleU16(u16 *array, int count, InfinityDungeonRandom *rn
 // The room of the floor that a trainer slot is in
 u32 InfinityDungeon_GetSlotRoom(InfinityDungeon *dungeon, u32 floor, int slot);
 // The trainer slot of a floor that is the trainer-th of the room
-u32 InfinityDungeon_GetTrainerSlot(InfinityDungeon *dungeon, u32 floor, u32 room, u8 trainer);
+u32 InfinityDungeon_GetTrainerSlot(InfinityDungeon *dungeon, unsigned int floor, unsigned int room, u8 trainer);
 // infinity_dungeon_rooms.c: the templates of the rooms and their NPCs, the tables that go with the ranks and the layout
 const InfinityDungeonNpc *InfinityDungeon_GetNpc(u16 npc);
 const InfinityDungeonRoomTemplate *InfinityDungeon_GetRoomTemplate(u16 type);

@@ -7,7 +7,7 @@
 // The ROM does not embed this source file's name; dwc_util_string.c is descriptive.
 
 // The length of the string, at most max
-int DWCUtilString_Length(const u8 *str, int max);
+int DWCi_MOV_WH_SetUserGameInfo(const u8 *str, int max);
 // Copies the string into the size characters at dst, widening each byte, and returns its length
 int DWCUtilString_Widen(u16 *dst, const u8 *src, int size);
 

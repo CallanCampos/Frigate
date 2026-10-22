@@ -1,8 +1,7 @@
-// The rest of the wireless manager's calls (libwm, TwlSDK's wm/ARM9/src/wm_etc.c, by its place in the library: the
-// file name is a guess): the WEP key, the game's information in the beacon, the beacon indication, the life times of
-// the connections and the measure of a channel. Each checks the state and the arguments, registers the callback and
-// sends the command to the ARM7. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// The rest of the wireless manager's calls (libwm, TwlSDK's wm/ARM9/src/wm_etc.c, by its place in the library; ntrtwl's
+// reconstruction of NitroSDK has the same file): the WEP key, the game's information in the beacon, the beacon
+// indication, the life times of the connections and the measure of a channel. Each checks the state and the arguments,
+// registers the callback and sends the command to the ARM7. The names are NitroSDK's, as that reconstruction has them
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
@@ -14,13 +13,13 @@ typedef struct {
     u16 edThreshold;
     u16 channel;
     u16 measureTime;
-} WmMeasureChannelCommand;
+} WMMeasureChannelReq;
 
 // The game's information in the beacon is copied here, where the ARM7 reads it. The cache is cleaned in whole lines of
 // 32 bytes, so the buffer's size is WM_SIZE_USER_GAMEINFO (0x70) rounded up
 static u8 tmpUserGameInfoBuf[0x80] ATTRIBUTE_ALIGN(32);
 
-int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
+WMErrCode WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const u16 *wepKey) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -35,15 +34,15 @@ int WM_SetWEPKey(WMCallbackFunc callback, u16 wepMode, const void *wepKey) {
         }
         DC_StoreRange(wepKey, 0x50);
     }
-    WMi_SetCallbackTable(WM_APIID_SET_WEP_KEY, callback);
-    result = WMi_SendCommand(WM_APIID_SET_WEP_KEY, 2, wepMode, wepKey);
+    WMi_SetCallbackTable(WM_APIID_SET_WEPKEY, callback);
+    result = WMi_SendCommand(WM_APIID_SET_WEPKEY, 2, wepMode, wepKey);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const void *wepKey) {
+WMErrCode WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const u8 *wepKey) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -58,8 +57,8 @@ int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const voi
         }
         DC_StoreRange(wepKey, 0x50);
     }
-    WMi_SetCallbackTable(WM_APIID_SET_WEP_KEY_EX, callback);
-    result = WMi_SendCommand(WM_APIID_SET_WEP_KEY_EX, 3, wepMode, wepKey, wepKeyId);
+    WMi_SetCallbackTable(WM_APIID_SET_WEPKEY_EX, callback);
+    result = WMi_SendCommand(WM_APIID_SET_WEPKEY_EX, 3, wepMode, wepKey, wepKeyId);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
@@ -67,7 +66,8 @@ int WM_SetWEPKeyEx(WMCallbackFunc callback, u16 wepMode, u16 wepKeyId, const voi
 }
 
 // The information is at most WM_SIZE_USER_GAMEINFO bytes
-int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid, u8 attr) {
+WMErrCode WM_SetGameInfo(WMCallbackFunc callback, const u16 *userGameInfo, u16 gameInfoSize, u32 ggid, u16 tgid,
+                         u8 attr) {
     int result = WMi_CheckStateEx(2, WM_STATE_PARENT, WM_STATE_MP_PARENT);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -81,8 +81,8 @@ int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameIn
     }
     MI_CpuCopy16(userGameInfo, tmpUserGameInfoBuf, gameInfoSize);
     DC_StoreRange(tmpUserGameInfoBuf, gameInfoSize);
-    WMi_SetCallbackTable(WM_APIID_SET_GAME_INFO, callback);
-    result = WMi_SendCommand(WM_APIID_SET_GAME_INFO, 5, tmpUserGameInfoBuf, gameInfoSize, ggid, tgid, attr);
+    WMi_SetCallbackTable(WM_APIID_SET_GAMEINFO, callback);
+    result = WMi_SendCommand(WM_APIID_SET_GAMEINFO, 5, tmpUserGameInfoBuf, gameInfoSize, ggid, tgid, attr);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
@@ -90,7 +90,7 @@ int WM_SetGameInfo(WMCallbackFunc callback, const void *userGameInfo, u16 gameIn
 }
 
 // Enable is 0 or 1
-int WM_SetBeaconIndication(WMCallbackFunc callback, int enable) {
+WMErrCode WM_SetBeaconIndication(WMCallbackFunc callback, u16 enable) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -107,23 +107,23 @@ int WM_SetBeaconIndication(WMCallbackFunc callback, int enable) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime) {
+WMErrCode WM_SetLifeTime(WMCallbackFunc callback, u16 tableNumber, u16 camLifeTime, u16 frameLifeTime, u16 mpLifeTime) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
-    WMi_SetCallbackTable(WM_APIID_SET_LIFE_TIME, callback);
-    result = WMi_SendCommand(WM_APIID_SET_LIFE_TIME, 4, tableNumber, camLifeTime, frameLifeTime, mpLifeTime);
+    WMi_SetCallbackTable(WM_APIID_SET_LIFETIME, callback);
+    result = WMi_SendCommand(WM_APIID_SET_LIFETIME, 4, tableNumber, camLifeTime, frameLifeTime, mpLifeTime);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime) {
+WMErrCode WM_MeasureChannel(WMCallbackFunc callback, u16 ccaMode, u16 edThreshold, u16 channel, u16 measureTime) {
     int result;
-    WmMeasureChannelCommand cmd;
+    WMMeasureChannelReq cmd;
 
     // The SDK fetches the system work here and doesn't use it
     WMi_GetSystemWork();

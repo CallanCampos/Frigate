@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_GAMESTATS_INTERNAL_H
 
 #include "types.h"
+#include "dwc/dwc_ghttp.h"
 #include "dwc/error.h"
 // Overlay 11's base 64 (B64Encode)
 #include "dwc/gsPlatformUtil.h"
@@ -20,18 +21,6 @@ char *strncpy(char *dest, const char *src, u32 size);
 int strncmp(const char *a, const char *b, u32 size);
 void *memcpy(void *dest, const void *src, u32 size);
 
-// The front half of overlay 189: the HTTP client of the game statistics
-// Starts and ends the client, and runs it once; the first starts one more user of it
-BOOL DWC_InitGHTTP(int unused);
-BOOL DWC_ShutdownGHTTP(void);
-BOOL DWC_ProcessGHTTP(void);
-// The callback with the answer, its size and the status, and the one when the request has been sent
-typedef void (*GamestatsAnsweredFunc)(char *data, int size, int status, void *arg);
-typedef void (*GamestatsSentFunc)(void);
-// Starts a request for the URL and returns its number, or a negative number
-int DWC_GetGHTTPData(const char *url, int a1, int a2, GamestatsSentFunc sent, GamestatsAnsweredFunc answered,
-                     void *arg);
-// Cancels a request
-void DWC_CancelGHTTPRequest(int request);
+// The front half of overlay 189, DWC's use of the HTTP client, is in dwc/dwc_ghttp.h
 
 #endif // POKEBW2_DWC_GAMESTATS_INTERNAL_H

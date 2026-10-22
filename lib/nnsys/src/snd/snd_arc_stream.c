@@ -7,20 +7,22 @@
 
 // NitroSystem's sound archive stream players (NNS_SndArcStrm): a stream of the archive played on one of its stream
 // players, its file read and, for IMA-ADPCM, decoded by a thread of its own as the stream asks for each block. The
-// file's name is a guess, NitroSystem's sndarc_stream.c from memory with the snd_ prefix the other sound files take.
-// swan names NNS_SndArcStrmInit NNS_SndArcStrmInit and CreateThread and ThreadProc CreateThread and
-// ThreadProc; the rest swan doesn't name. The block filling follows the public decompilations of NitroSystem that
-// pret's pokeplatinum and pokeheartgold build (github.com/ntrtwl/NitroSystem) and of Kingdom Hearts Re:coded
-// (github.com/kh-recoded-decomp/kh-recoded-decomp)
+// SDK's file is sndarc_stream.c. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them,
+// except the STRM_ macros, StrmFileHeader, StrmHead and sArcStrm, which are ours (sArcStrm groups three of
+// NitroSystem's statics); what is newer than that reconstruction, such as the bigger stream records, keeps our names
+// too. swan names NNS_SndArcStrmInit, CreateThread, StrmThread and sArcStrm NNS_SndStreamInit, NNS_SndStreamThreadInit,
+// NNS_SndStreamThreadProc and g_NNSSndStreamExists; the rest swan doesn't name. The block filling follows the public
+// decompilations of NitroSystem that pret's pokeplatinum and pokeheartgold build (github.com/ntrtwl/NitroSystem) and of
+// Kingdom Hearts Re:coded (github.com/kh-recoded-decomp/kh-recoded-decomp)
 
-#define STRM_PLAYER_NUM 4
-#define STRM_COMMAND_NUM 8
+#define NNS_SND_STRM_PLAYER_NUM 4
+#define COMMAND_BUFFER_NUM 8
 #define STRM_CHANNEL_MAX 6
 #define STRM_BUFFER_SIZE_PER_CH 0x800
 #define STRM_THREAD_STACK_SIZE 0x1000
 #define STRM_INTERVAL 4
 #define STRM_END_WAIT 4
-#define STRM_ADPCM_BUFFER_SIZE 0x200
+#define BLOCK_SIZE 0x200
 #define STRM_ADPCM_HEADER_SIZE 4
 #define STRM_ADPCM_INDEX_MAX 88
 
@@ -36,7 +38,7 @@ typedef struct StrmHead {
     u8 format;
     u8 loopFlag;
     u8 numChannels;
-    u8 padding;
+    u8 pad_;
     u16 sampleRate;
     u16 timer;
     u32 loopStart;
@@ -57,21 +59,21 @@ typedef struct StrmFileHeader {
 
 // The IMA-ADPCM decoder's state of a channel, which a block's data starts with
 typedef struct AdpcmState {
-    s16 pcm;
-    u8 index;
+    s16 prevSample;
+    u8 prevIndex;
 } AdpcmState;
 
-typedef struct NNSSndArcStrmPlayer NNSSndArcStrmPlayer;
+typedef struct NNSSndStrmPlayer NNSSndStrmPlayer;
 
 // How a player reads its file: from the ROM, or from memory when the file is loaded
-typedef BOOL (*StrmFileOpenFunc)(NNSSndArcStrmPlayer *player, u32 fileId);
-typedef void (*StrmFileCloseFunc)(NNSSndArcStrmPlayer *player);
-typedef int (*StrmFileReadFunc)(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset);
-typedef void (*StrmFileCancelFunc)(NNSSndArcStrmPlayer *player);
+typedef BOOL (*StrmFileOpenFunc)(NNSSndStrmPlayer *player, u32 fileId);
+typedef void (*StrmFileCloseFunc)(NNSSndStrmPlayer *player);
+typedef int (*StrmFileReadFunc)(NNSSndStrmPlayer *player, void *buffer, int size, u32 offset);
+typedef void (*StrmFileCancelFunc)(NNSSndStrmPlayer *player);
 
 // endWait counts the blocks played after the data ended before the player stops; prepared is set once the first
 // block is read. volume is the archive's, userVolume ours, both indices of the decibel table
-struct NNSSndArcStrmPlayer {
+struct NNSSndStrmPlayer {
     NNSSndStrm stream;
     FSFile file;
     union {
@@ -118,61 +120,61 @@ struct NNSSndArcStrmPlayer {
 };
 
 // A block for the thread to fill, as the stream's callback asked for it
-typedef struct StrmCommand {
+typedef struct LoadCommand {
     NNSFndLink link;
-    NNSSndArcStrmPlayer *player;
+    NNSSndStrmPlayer *player;
     NNSSndStrmCallbackStatus status;
     int numChannels;
     void *buffer[STRM_CHANNEL_MAX];
-    u32 len;
-} StrmCommand;
+    u32 bufLen;
+} LoadCommand;
 
 // A thread that fills blocks, woken when a command is added to its list
-typedef struct StrmThread {
+typedef struct NNSSndStrmThread {
     OSThread thread;
     u64 stack[STRM_THREAD_STACK_SIZE / sizeof(u64)];
-    OSThreadQueue queue;
+    OSThreadQueue threadQ;
     OSMutex mutex;
     NNSFndList commandList;
-} StrmThread;
+} NNSSndStrmThread;
 
-static BOOL SetupPlayers(NNSSndHeapHandle heap);
-static NNSSndArcStrmPlayer *AllocPlayer(NNSSndStrmHandle *handle, int playerNo, int prio);
-static void DeactivatePlayer(NNSSndArcStrmPlayer *player);
-static BOOL PreparePlayer(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *info, int playerNo, int prio, int strmNo,
-                          u32 offset, NNSSndStrmCallback strmCallback, void *strmCallbackArg,
-                          NNSSndArcStrmCallback callback, void *callbackArg);
-static void StopPlayer(NNSSndArcStrmPlayer *player, int fadeFrames);
-static void ShutdownStrmPlayer(NNSSndArcStrmPlayer *player);
-static void ClosePlayer(NNSSndArcStrmPlayer *player);
-static BOOL AllocChannel(NNSSndArcStrmPlayer *player, int numChannels, const u8 chNoList[]);
-static void FreeChannel(NNSSndArcStrmPlayer *player);
-static void CreateThread(StrmThread *thread, u32 prio);
-static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player);
-static StrmCommand *PopCommand(NNSFndList *list);
-static StrmCommand *AllocCommand(void);
-static void FreeCommand(StrmCommand *command);
-static void HeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
-static void ArcStrmCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
-                            NNSSndStrmFormat format, void *arg);
-static void StartNextStrm(NNSSndArcStrmPlayer *player);
-static void ProcessCommand(StrmCommand *command);
-static void SetFileFuncs(NNSSndArcStrmPlayer *player, u32 fileId);
-static BOOL OpenRomFile(NNSSndArcStrmPlayer *player, u32 fileId);
-static void CloseRomFile(NNSSndArcStrmPlayer *player);
-static int ReadRomFile(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset);
-static void CancelRomFile(NNSSndArcStrmPlayer *player);
-static BOOL OpenMemFile(NNSSndArcStrmPlayer *player, u32 fileId);
-static void CloseMemFile(NNSSndArcStrmPlayer *player);
-static int ReadMemFile(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset);
-static void CancelMemFile(NNSSndArcStrmPlayer *player);
-static void ThreadProc(void *arg);
+static BOOL NNS_SndArcStrmSetupPlayer(NNSSndHeapHandle heap);
+static NNSSndStrmPlayer *AllocPlayer(NNSSndStrmHandle *handle, int playerNo, int prio);
+static void FreePlayer(NNSSndStrmPlayer *player);
+static BOOL PrepareStrm(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *info, int playerNo, int prio, int strmNo,
+                        u32 offset, NNSSndStrmCallback strmCallback, void *strmCallbackArg,
+                        NNSSndArcStrmCallback callback, void *callbackArg);
+static void StopStrm(NNSSndStrmPlayer *player, int fadeFrames);
+static void ForceStopStrm(NNSSndStrmPlayer *player);
+static void ShutdownPlayer(NNSSndStrmPlayer *player);
+static BOOL AllocChannel(NNSSndStrmPlayer *player, int numChannels, const u8 chNoList[]);
+static void FreeChannel(NNSSndStrmPlayer *player);
+static void CreateThread(NNSSndStrmThread *thread, u32 prio);
+static void RemoveCommandByPlayer(NNSFndList *list, NNSSndStrmPlayer *player);
+static LoadCommand *ReadCommandBuffer(NNSFndList *list);
+static LoadCommand *AllocCommandBuffer(void);
+static void FreeCommandBuffer(LoadCommand *command);
+static void DisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
+static void StrmCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
+                         NNSSndStrmFormat format, void *arg);
+static void OnDataEnd(NNSSndStrmPlayer *player);
+static void MakeWaveData(LoadCommand *command);
+static void SetupStreamFunction(NNSSndStrmPlayer *player, u32 fileId);
+static BOOL OpenFileStream(NNSSndStrmPlayer *player, u32 fileId);
+static void CloseFileStream(NNSSndStrmPlayer *player);
+static int ReadFileStream(NNSSndStrmPlayer *player, void *buffer, int size, u32 offset);
+static void CancelFileStream(NNSSndStrmPlayer *player);
+static BOOL OpenMemoryStream(NNSSndStrmPlayer *player, u32 fileId);
+static void CloseMemoryStream(NNSSndStrmPlayer *player);
+static int ReadMemoryStream(NNSSndStrmPlayer *player, void *buffer, int size, u32 offset);
+static void CancelMemoryStream(NNSSndStrmPlayer *player);
+static void StrmThread(void *arg);
 
-static const s8 sAdpcmIndexTable[16] = {
+static const s8 cAdpcmIndexTable[16] = {
     -1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8,
 };
 
-static const s16 sAdpcmStepTable[STRM_ADPCM_INDEX_MAX + 1] = {
+static const s16 cAdpcmStepSizeTable[STRM_ADPCM_INDEX_MAX + 1] = {
     7,    8,     9,     10,    11,    12,    13,    14,    16,    17,    19,    21,    23,    25,    28,
     31,   34,    37,    41,    45,    50,    55,    60,    66,    73,    80,    88,    97,    107,   118,
     130,  143,   157,   173,   190,   209,   230,   253,   279,   307,   337,   371,   408,   449,   494,
@@ -182,41 +184,41 @@ static const s16 sAdpcmStepTable[STRM_ADPCM_INDEX_MAX + 1] = {
 };
 
 // prepareThread, when set, fills the first block of each stream instead of the stream thread. The decoding buffer
-// holds a block of ADPCM data while it is decoded, under sDecodeMutex
+// holds a block of ADPCM data while it is decoded, under sDecodeBufferMutex
 static struct {
     BOOL initialized;
-    StrmThread *prepareThread;
+    NNSSndStrmThread *prepareThread;
     void *decodeBuffer;
 } sArcStrm;
 static NNSFndList sFreeCommandList;
-static OSMutex sDecodeMutex;
-static StrmCommand sStrmCommands[STRM_COMMAND_NUM];
+static OSMutex sDecodeBufferMutex;
+static LoadCommand sLoadCommandBuffer[COMMAND_BUFFER_NUM];
 // The decoding buffer's explicit alignment is a guess, which the ROM can't show: 4 to 16 fit its address (0x1b0
 // bytes into a section at 0x02149950, so not 32). The card reads blocks into it, and NNS_SndArcStrmInit, which
 // takes the buffer's address, keeps its loops entered with a branch to the test only with an alignment
-static u32 sDecodeBuffer[STRM_ADPCM_BUFFER_SIZE / sizeof(u32)] ATTRIBUTE_ALIGN(4);
-static NNSSndArcStrmPlayer sPlayers[STRM_PLAYER_NUM];
-static StrmThread sThread;
+static u32 sDecodeBufferArea[BLOCK_SIZE / sizeof(u32)] ATTRIBUTE_ALIGN(4);
+static NNSSndStrmPlayer sStrmPlayer[NNS_SND_STRM_PLAYER_NUM];
+static NNSSndStrmThread sStrmThread;
 
 void NNS_SndArcStrmInit(u32 threadPrio, NNSSndHeapHandle heap) {
     int i;
     int playerNo;
 
     if (sArcStrm.initialized) {
-        SetupPlayers(heap);
+        NNS_SndArcStrmSetupPlayer(heap);
         return;
     }
     sArcStrm.initialized = TRUE;
 
     NNS_FndInitList(&sFreeCommandList, 0);
-    for (i = 0; i < STRM_COMMAND_NUM; i++) {
-        NNS_FndAppendListObject(&sFreeCommandList, &sStrmCommands[i]);
+    for (i = 0; i < COMMAND_BUFFER_NUM; i++) {
+        NNS_FndAppendListObject(&sFreeCommandList, &sLoadCommandBuffer[i]);
     }
-    OS_InitMutex(&sDecodeMutex);
-    sArcStrm.decodeBuffer = sDecodeBuffer;
+    OS_InitMutex(&sDecodeBufferMutex);
+    sArcStrm.decodeBuffer = sDecodeBufferArea;
 
-    for (playerNo = 0; playerNo < STRM_PLAYER_NUM; playerNo++) {
-        NNSSndArcStrmPlayer *player = &sPlayers[playerNo];
+    for (playerNo = 0; playerNo < NNS_SND_STRM_PLAYER_NUM; playerNo++) {
+        NNSSndStrmPlayer *player = &sStrmPlayer[playerNo];
 
         player->flags.active = FALSE;
         FS_InitFile(&player->file);
@@ -228,17 +230,17 @@ void NNS_SndArcStrmInit(u32 threadPrio, NNSSndHeapHandle heap) {
         player->allocCount = 0;
     }
 
-    SetupPlayers(heap);
-    CreateThread(&sThread, threadPrio);
+    NNS_SndArcStrmSetupPlayer(heap);
+    CreateThread(&sStrmThread, threadPrio);
 }
 
 // Gives each player its channels from the archive's stream player info and, with a heap, its buffer
-static BOOL SetupPlayers(NNSSndHeapHandle heap) {
+static BOOL NNS_SndArcStrmSetupPlayer(NNSSndHeapHandle heap) {
     int playerNo;
     int i;
 
-    for (playerNo = 0; playerNo < STRM_PLAYER_NUM; playerNo++) {
-        NNSSndArcStrmPlayer *player = &sPlayers[playerNo];
+    for (playerNo = 0; playerNo < NNS_SND_STRM_PLAYER_NUM; playerNo++) {
+        NNSSndStrmPlayer *player = &sStrmPlayer[playerNo];
         const NNSSndArcStrmPlayerInfo *info = NNS_SndArcGetStrmPlayerInfo(playerNo);
 
         if (info == NULL) {
@@ -251,12 +253,12 @@ static BOOL SetupPlayers(NNSSndHeapHandle heap) {
 
         if (heap != NNS_SND_HEAP_INVALID_HANDLE) {
             u32 size = player->numChannels * STRM_BUFFER_SIZE_PER_CH;
-            void *buffer = NNS_SndHeapAlloc(heap, size, HeapDisposeCallback, (u32)player, 0);
+            void *buffer = NNS_SndHeapAlloc(heap, size, DisposeCallback, (u32)player, 0);
 
             if (buffer == NULL) {
                 return FALSE;
             }
-            ShutdownStrmPlayer(player);
+            ForceStopStrm(player);
             player->buffer = buffer;
             player->bufSize = size;
         }
@@ -270,16 +272,16 @@ BOOL NNS_SndArcStrmPrepare(NNSSndStrmHandle *handle, int strmNo, u32 offset) {
     if (info == NULL) {
         return FALSE;
     }
-    return PreparePlayer(handle, info, info->playerNo, info->playerPrio, strmNo, offset, NULL, NULL, NULL, NULL);
+    return PrepareStrm(handle, info, info->playerNo, info->playerPrio, strmNo, offset, NULL, NULL, NULL, NULL);
 }
 
 // A check through this inline loads the handle's player again for the use after it
-static inline BOOL IsValidHandle(const NNSSndStrmHandle *handle) {
+static inline BOOL NNS_SndStrmHandleIsValid(const NNSSndStrmHandle *handle) {
     return handle->player != NULL;
 }
 
-void NNS_SndArcStrmPreparedStart(NNSSndStrmHandle *handle) {
-    if (IsValidHandle(handle)) {
+void NNS_SndArcStrmStartPrepared(NNSSndStrmHandle *handle) {
+    if (NNS_SndStrmHandleIsValid(handle)) {
         handle->player->flags.startReq = TRUE;
     }
 }
@@ -288,21 +290,21 @@ BOOL NNS_SndArcStrmStart(NNSSndStrmHandle *handle, int strmNo, u32 offset) {
     if (!NNS_SndArcStrmPrepare(handle, strmNo, offset)) {
         return FALSE;
     }
-    NNS_SndArcStrmPreparedStart(handle);
+    NNS_SndArcStrmStartPrepared(handle);
     return TRUE;
 }
 
 void NNS_SndArcStrmStop(NNSSndStrmHandle *handle, int fadeFrames) {
-    if (IsValidHandle(handle)) {
-        StopPlayer(handle->player, fadeFrames);
+    if (NNS_SndStrmHandleIsValid(handle)) {
+        StopStrm(handle->player, fadeFrames);
     }
 }
 
-void NNS_SndArcStrmInitHandle(NNSSndStrmHandle *handle) {
+void NNS_SndStrmHandleInit(NNSSndStrmHandle *handle) {
     handle->player = NULL;
 }
 
-void NNS_SndArcStrmReleaseHandle(NNSSndStrmHandle *handle) {
+void NNS_SndStrmHandleRelease(NNSSndStrmHandle *handle) {
     if (handle->player != NULL) {
         handle->player->handle = NULL;
         handle->player = NULL;
@@ -310,9 +312,9 @@ void NNS_SndArcStrmReleaseHandle(NNSSndStrmHandle *handle) {
 }
 
 u32 NNS_SndArcStrmGetCurrentPlayingPos(NNSSndStrmHandle *handle) {
-    NNSSndArcStrmPlayer *player;
+    NNSSndStrmPlayer *player;
 
-    if (!IsValidHandle(handle)) {
+    if (!NNS_SndStrmHandleIsValid(handle)) {
         return 0;
     }
     player = handle->player;
@@ -321,7 +323,7 @@ u32 NNS_SndArcStrmGetCurrentPlayingPos(NNSSndStrmHandle *handle) {
 }
 
 BOOL NNS_SndArcStrmAllocChannel(int playerNo) {
-    NNSSndArcStrmPlayer *player = &sPlayers[playerNo];
+    NNSSndStrmPlayer *player = &sStrmPlayer[playerNo];
 
     if (player->flags.active) {
         return FALSE;
@@ -333,25 +335,25 @@ BOOL NNS_SndArcStrmAllocChannel(int playerNo) {
 }
 
 void NNS_SndArcStrmFreeChannel(int playerNo) {
-    FreeChannel(&sPlayers[playerNo]);
+    FreeChannel(&sStrmPlayer[playerNo]);
 }
 
 // A volume 0 to 127 in decibels, as NitroSDK's SND_CalcDecibel gives it
-static inline s16 CalcDecibel(int scale) {
+static inline s16 SND_CalcDecibel(int scale) {
     return SNDi_DecibelTable[scale];
 }
 
 void NNSi_SndArcStrmMain(void) {
-    NNSSndArcStrmPlayer *player;
+    NNSSndStrmPlayer *player;
     int volume;
     int i;
 
-    for (i = 0, player = sPlayers; i < STRM_PLAYER_NUM; i++, player++) {
+    for (i = 0, player = sStrmPlayer; i < NNS_SND_STRM_PLAYER_NUM; i++, player++) {
         if (!player->flags.active) {
             continue;
         }
         if (player->endWait == 0) {
-            ShutdownStrmPlayer(player);
+            ForceStopStrm(player);
             continue;
         }
 
@@ -363,29 +365,29 @@ void NNSi_SndArcStrmMain(void) {
 
         if (player->flags.playing) {
             NNSi_SndFaderUpdate(&player->fader);
-            volume = CalcDecibel(NNSi_SndFaderGet(&player->fader) >> 8) + CalcDecibel(player->volume) +
-                     CalcDecibel(player->userVolume);
+            volume = SND_CalcDecibel(NNSi_SndFaderGet(&player->fader) >> 8) + SND_CalcDecibel(player->volume) +
+                     SND_CalcDecibel(player->userVolume);
             if (volume != player->curVolume) {
                 NNS_SndStrmSetVolume(&player->stream, volume);
                 player->curVolume = volume;
             }
 
             if (player->flags.autoStop && NNSi_SndFaderIsFinished(&player->fader)) {
-                ShutdownStrmPlayer(player);
+                ForceStopStrm(player);
             }
         }
     }
 }
 
 // Takes a player for handle, stopping what it plays if prio is at least its priority
-static NNSSndArcStrmPlayer *AllocPlayer(NNSSndStrmHandle *handle, int playerNo, int prio) {
-    NNSSndArcStrmPlayer *player;
+static NNSSndStrmPlayer *AllocPlayer(NNSSndStrmHandle *handle, int playerNo, int prio) {
+    NNSSndStrmPlayer *player;
 
     if (handle->player != NULL) {
-        NNS_SndArcStrmReleaseHandle(handle);
+        NNS_SndStrmHandleRelease(handle);
     }
 
-    player = &sPlayers[playerNo];
+    player = &sStrmPlayer[playerNo];
     if (player->buffer == NULL) {
         return NULL;
     }
@@ -393,7 +395,7 @@ static NNSSndArcStrmPlayer *AllocPlayer(NNSSndStrmHandle *handle, int playerNo, 
         if (prio < player->prio) {
             return NULL;
         }
-        ShutdownStrmPlayer(player);
+        ForceStopStrm(player);
     }
 
     player->prio = prio;
@@ -403,7 +405,7 @@ static NNSSndArcStrmPlayer *AllocPlayer(NNSSndStrmHandle *handle, int playerNo, 
     return player;
 }
 
-static void DeactivatePlayer(NNSSndArcStrmPlayer *player) {
+static void FreePlayer(NNSSndStrmPlayer *player) {
     if (player->handle != NULL) {
         player->handle->player = NULL;
         player->handle = NULL;
@@ -414,10 +416,10 @@ static void DeactivatePlayer(NNSSndArcStrmPlayer *player) {
 }
 
 // Opens the stream on a player and sets its stream up, from offset milliseconds in
-static BOOL PreparePlayer(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *info, int playerNo, int prio, int strmNo,
-                          u32 offset, NNSSndStrmCallback strmCallback, void *strmCallbackArg,
-                          NNSSndArcStrmCallback callback, void *callbackArg) {
-    NNSSndArcStrmPlayer *player;
+static BOOL PrepareStrm(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *info, int playerNo, int prio, int strmNo,
+                        u32 offset, NNSSndStrmCallback strmCallback, void *strmCallbackArg,
+                        NNSSndArcStrmCallback callback, void *callbackArg) {
+    NNSSndStrmPlayer *player;
     NNSSndStrmFormat format;
     int numChannels;
 
@@ -426,9 +428,9 @@ static BOOL PreparePlayer(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *inf
         return FALSE;
     }
 
-    SetFileFuncs(player, info->fileId);
+    SetupStreamFunction(player, info->fileId);
     if (!player->open(player, info->fileId)) {
-        DeactivatePlayer(player);
+        FreePlayer(player);
         return FALSE;
     }
 
@@ -468,7 +470,7 @@ static BOOL PreparePlayer(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *inf
     }
 
     numChannels = player->header.head.numChannels;
-    if (info->flags & NNS_SND_ARC_STRM_FLAG_STEREO) {
+    if (info->flags & NNS_SND_ARC_STRM_FORCE_STEREO) {
         numChannels = 2;
     }
     if (numChannels > player->numChannels) {
@@ -478,14 +480,14 @@ static BOOL PreparePlayer(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *inf
 
     if (!AllocChannel(player, numChannels, player->chNoList)) {
         player->close(player);
-        DeactivatePlayer(player);
+        FreePlayer(player);
         return FALSE;
     }
     if (!NNS_SndStrmSetup(&player->stream, format, player->buffer, player->bufSize * numChannels / player->numChannels,
-                          player->header.head.timer, STRM_INTERVAL, ArcStrmCallback, player)) {
+                          player->header.head.timer, STRM_INTERVAL, StrmCallback, player)) {
         FreeChannel(player);
         player->close(player);
-        DeactivatePlayer(player);
+        FreePlayer(player);
         return FALSE;
     }
 
@@ -497,13 +499,13 @@ static BOOL PreparePlayer(NNSSndStrmHandle *handle, const NNSSndArcStrmInfo *inf
 }
 
 // Fades the player out over fadeFrames, then stops it
-static void StopPlayer(NNSSndArcStrmPlayer *player, int fadeFrames) {
+static void StopStrm(NNSSndStrmPlayer *player, int fadeFrames) {
     if (!player->flags.playing) {
-        ShutdownStrmPlayer(player);
+        ForceStopStrm(player);
         return;
     }
     if (fadeFrames == 0) {
-        ShutdownStrmPlayer(player);
+        ForceStopStrm(player);
         return;
     }
     NNSi_SndFaderSet(&player->fader, 0, fadeFrames);
@@ -511,8 +513,8 @@ static void StopPlayer(NNSSndArcStrmPlayer *player, int fadeFrames) {
     player->prio = 0;
 }
 
-static void ShutdownStrmPlayer(NNSSndArcStrmPlayer *player) {
-    OS_LockMutex(&sThread.mutex);
+static void ForceStopStrm(NNSSndStrmPlayer *player) {
+    OS_LockMutex(&sStrmThread.mutex);
     if (sArcStrm.prepareThread != NULL) {
         OS_LockMutex(&sArcStrm.prepareThread->mutex);
     }
@@ -523,27 +525,27 @@ static void ShutdownStrmPlayer(NNSSndArcStrmPlayer *player) {
     if (player->flags.active) {
         player->cancel(player);
     }
-    ClosePlayer(player);
+    ShutdownPlayer(player);
 
-    OS_UnlockMutex(&sThread.mutex);
+    OS_UnlockMutex(&sStrmThread.mutex);
     if (sArcStrm.prepareThread != NULL) {
         OS_UnlockMutex(&sArcStrm.prepareThread->mutex);
     }
 }
 
-static void ClosePlayer(NNSSndArcStrmPlayer *player) {
+static void ShutdownPlayer(NNSSndStrmPlayer *player) {
     if (player->flags.active) {
         FreeChannel(player);
         player->close(player);
-        ClearCommands(&sThread.commandList, player);
+        RemoveCommandByPlayer(&sStrmThread.commandList, player);
         if (sArcStrm.prepareThread != NULL) {
-            ClearCommands(&sArcStrm.prepareThread->commandList, player);
+            RemoveCommandByPlayer(&sArcStrm.prepareThread->commandList, player);
         }
-        DeactivatePlayer(player);
+        FreePlayer(player);
     }
 }
 
-static BOOL AllocChannel(NNSSndArcStrmPlayer *player, int numChannels, const u8 chNoList[]) {
+static BOOL AllocChannel(NNSSndStrmPlayer *player, int numChannels, const u8 chNoList[]) {
     if (player->allocCount == 0) {
         if (!NNS_SndStrmAllocChannel(&player->stream, numChannels, chNoList)) {
             return FALSE;
@@ -553,7 +555,7 @@ static BOOL AllocChannel(NNSSndArcStrmPlayer *player, int numChannels, const u8 
     return TRUE;
 }
 
-static void FreeChannel(NNSSndArcStrmPlayer *player) {
+static void FreeChannel(NNSSndStrmPlayer *player) {
     if (player->allocCount != 0) {
         player->allocCount--;
         if (player->allocCount == 0) {
@@ -562,35 +564,35 @@ static void FreeChannel(NNSSndArcStrmPlayer *player) {
     }
 }
 
-static void CreateThread(StrmThread *thread, u32 prio) {
-    OS_CreateThread(&thread->thread, ThreadProc, thread, thread->stack + STRM_THREAD_STACK_SIZE / sizeof(u64),
+static void CreateThread(NNSSndStrmThread *thread, u32 prio) {
+    OS_CreateThread(&thread->thread, StrmThread, thread, thread->stack + STRM_THREAD_STACK_SIZE / sizeof(u64),
                     STRM_THREAD_STACK_SIZE, prio);
     NNS_FndInitList(&thread->commandList, 0);
     OS_InitMutex(&thread->mutex);
-    OS_InitThreadQueue(&thread->queue);
+    OS_InitThreadQueue(&thread->threadQ);
     OS_WakeupThreadDirect(&thread->thread);
 }
 
 // Drops the commands of player from list
-static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player) {
-    u32 enabled = OS_DisableInterrupts();
-    StrmCommand *command = NNS_FndGetNextListObject(list, NULL);
+static void RemoveCommandByPlayer(NNSFndList *list, NNSSndStrmPlayer *player) {
+    OSIntrMode enabled = OS_DisableInterrupts();
+    LoadCommand *command = NNS_FndGetNextListObject(list, NULL);
 
     while (command != NULL) {
-        StrmCommand *next = NNS_FndGetNextListObject(list, command);
+        LoadCommand *next = NNS_FndGetNextListObject(list, command);
 
         if (command->player == player) {
             NNS_FndRemoveListObject(list, command);
-            FreeCommand(command);
+            FreeCommandBuffer(command);
         }
         command = next;
     }
     OS_RestoreInterrupts(enabled);
 }
 
-static StrmCommand *PopCommand(NNSFndList *list) {
-    u32 enabled = OS_DisableInterrupts();
-    StrmCommand *command = NNS_FndGetNextListObject(list, NULL);
+static LoadCommand *ReadCommandBuffer(NNSFndList *list) {
+    OSIntrMode enabled = OS_DisableInterrupts();
+    LoadCommand *command = NNS_FndGetNextListObject(list, NULL);
 
     if (command != NULL) {
         NNS_FndRemoveListObject(list, command);
@@ -600,9 +602,9 @@ static StrmCommand *PopCommand(NNSFndList *list) {
     return command;
 }
 
-static StrmCommand *AllocCommand(void) {
-    u32 enabled = OS_DisableInterrupts();
-    StrmCommand *command = NNS_FndGetNextListObject(&sFreeCommandList, NULL);
+static LoadCommand *AllocCommandBuffer(void) {
+    OSIntrMode enabled = OS_DisableInterrupts();
+    LoadCommand *command = NNS_FndGetNextListObject(&sFreeCommandList, NULL);
 
     if (command != NULL) {
         NNS_FndRemoveListObject(&sFreeCommandList, command);
@@ -611,27 +613,27 @@ static StrmCommand *AllocCommand(void) {
     return command;
 }
 
-static void FreeCommand(StrmCommand *command) {
-    u32 enabled = OS_DisableInterrupts();
+static void FreeCommandBuffer(LoadCommand *command) {
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     NNS_FndAppendListObject(&sFreeCommandList, command);
     OS_RestoreInterrupts(enabled);
 }
 
 // The sound heap frees a player's buffer
-static void HeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
-    NNSSndArcStrmPlayer *player = (NNSSndArcStrmPlayer *)data1;
+static void DisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
+    NNSSndStrmPlayer *player = (NNSSndStrmPlayer *)data1;
 
     if (mem != player->buffer) {
         return;
     }
 
-    OS_LockMutex(&sThread.mutex);
+    OS_LockMutex(&sStrmThread.mutex);
     if (sArcStrm.prepareThread != NULL) {
         OS_LockMutex(&sArcStrm.prepareThread->mutex);
     }
 
-    ShutdownStrmPlayer(player);
+    ForceStopStrm(player);
     player->buffer = NULL;
     player->bufSize = 0;
     player->numChannels = 0;
@@ -640,56 +642,56 @@ static void HeapDisposeCallback(void *mem, u32 size, u32 data1, u32 data2) {
         player->allocCount = 0;
     }
 
-    OS_UnlockMutex(&sThread.mutex);
+    OS_UnlockMutex(&sStrmThread.mutex);
     if (sArcStrm.prepareThread != NULL) {
         OS_UnlockMutex(&sArcStrm.prepareThread->mutex);
     }
 }
 
 // The stream asks for a block: queue it for a thread, dropping the oldest of the player's when two are waiting
-static void ArcStrmCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
-                            NNSSndStrmFormat format, void *arg) {
-    NNSSndArcStrmPlayer *player = arg;
-    StrmCommand *command;
-    StrmThread *thread;
+static void StrmCallback(NNSSndStrmCallbackStatus status, int numChannels, void *buffer[], u32 len,
+                         NNSSndStrmFormat format, void *arg) {
+    NNSSndStrmPlayer *player = arg;
+    LoadCommand *command;
+    NNSSndStrmThread *thread;
     int i;
 
     if (player->cmdCount >= 2) {
-        for (command = NNS_FndGetNextListObject(&sThread.commandList, NULL); command != NULL;
-             command = NNS_FndGetNextListObject(&sThread.commandList, command)) {
+        for (command = NNS_FndGetNextListObject(&sStrmThread.commandList, NULL); command != NULL;
+             command = NNS_FndGetNextListObject(&sStrmThread.commandList, command)) {
             if (command->player == player) {
                 break;
             }
         }
         for (i = 0; i < command->numChannels; i++) {
-            MI_CpuFill8(command->buffer[i], 0, command->len);
+            MI_CpuFill8(command->buffer[i], 0, command->bufLen);
         }
-        NNS_FndRemoveListObject(&sThread.commandList, command);
+        NNS_FndRemoveListObject(&sStrmThread.commandList, command);
         player->cmdCount--;
-        FreeCommand(command);
+        FreeCommandBuffer(command);
     }
 
-    command = AllocCommand();
+    command = AllocCommandBuffer();
     command->player = player;
     command->status = status;
     command->numChannels = numChannels;
     for (i = 0; i < numChannels; i++) {
         command->buffer[i] = buffer[i];
     }
-    command->len = len;
+    command->bufLen = len;
 
-    thread = &sThread;
+    thread = &sStrmThread;
     if (status == NNS_SND_STRM_CALLBACK_SETUP && sArcStrm.prepareThread != NULL) {
         thread = sArcStrm.prepareThread;
     }
     player->cmdCount++;
     NNS_FndAppendListObject(&thread->commandList, command);
-    OS_WakeupThread(&thread->queue);
+    OS_WakeupThread(&thread->threadQ);
 }
 
 // The data ended: ask the callback for the stream to play next, which must have the same sample rate, and be PCM8
 // if this one is
-static void StartNextStrm(NNSSndArcStrmPlayer *player) {
+static void OnDataEnd(NNSSndStrmPlayer *player) {
     NNSSndArcStrmCallbackInfo info;
     NNSSndArcStrmCallbackParam param;
     const NNSSndArcStrmInfo *strmInfo;
@@ -711,7 +713,7 @@ static void StartNextStrm(NNSSndArcStrmPlayer *player) {
     format = player->header.head.format;
     sampleRate = player->header.head.sampleRate;
     player->close(player);
-    SetFileFuncs(player, strmInfo->fileId);
+    SetupStreamFunction(player, strmInfo->fileId);
     if (!player->open(player, strmInfo->fileId)) {
         return;
     }
@@ -737,17 +739,17 @@ static void StartNextStrm(NNSSndArcStrmPlayer *player) {
 
 // Decodes one IMA-ADPCM sample. Written as the public decompilation github.com/ntrtwl/NitroSystem has it, with the
 // locals assigned after their declarations, the sample before the index: initialized in their declarations, they give
-// ProcessCommand other registers and a shorter frame
+// MakeWaveData other registers and a shorter frame
 static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
     int step;
     int pcm;
     int index;
     int diff;
 
-    pcm = state->pcm;
-    index = state->index;
+    pcm = state->prevSample;
+    index = state->prevIndex;
 
-    step = sAdpcmStepTable[index];
+    step = cAdpcmStepSizeTable[index];
 
     diff = step >> 3;
     if (nibble & 4) {
@@ -772,7 +774,7 @@ static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
         }
     }
 
-    index += sAdpcmIndexTable[nibble];
+    index += cAdpcmIndexTable[nibble];
 
     if (index < 0) {
         index = 0;
@@ -780,15 +782,15 @@ static inline s16 DecodeAdpcm(AdpcmState *state, int nibble) {
         index = STRM_ADPCM_INDEX_MAX;
     }
 
-    state->pcm = pcm;
-    state->index = index;
+    state->prevSample = pcm;
+    state->prevIndex = index;
 
     return pcm;
 }
 
 // Fills a block: reads the stream's data from where it is, by block of the file, decoding ADPCM to PCM16
-static void ProcessCommand(StrmCommand *command) {
-    NNSSndArcStrmPlayer *player = command->player;
+static void MakeWaveData(LoadCommand *command) {
+    NNSSndStrmPlayer *player = command->player;
     BOOL loop;
     // NitroSDK's u32, an unsigned long, as in sbc.c: as an unsigned int it takes a late spill slot instead of its
     // declared one (Kingdom Hearts Re:coded's decompilation has a long)
@@ -803,7 +805,7 @@ static void ProcessCommand(StrmCommand *command) {
     u32 samples;
     u32 dataSize;
     // The read's result's type, which it is compared with: as a u32 it is a converted copy in a late slot
-    s32 readSize;
+    int readSize;
     int ch;
 
     if (player->flags.dataEnd && player->endWait > 0) {
@@ -811,7 +813,7 @@ static void ProcessCommand(StrmCommand *command) {
     }
 
     bufOffset = 0;
-    len = command->len;
+    len = command->bufLen;
     while (len != 0) {
         if (player->flags.dataEnd) {
             for (ch = 0; ch < command->numChannels; ch++) {
@@ -887,10 +889,10 @@ static void ProcessCommand(StrmCommand *command) {
             dest = readDest = (u8 *)command->buffer[ch] + bufOffset;
 
             if (ch < player->header.head.numChannels) {
-                s32 result;
+                int result;
 
                 if (player->header.head.format == STRM_FORMAT_ADPCM) {
-                    OS_LockMutex(&sDecodeMutex);
+                    OS_LockMutex(&sDecodeBufferMutex);
                     readDest = sArcStrm.decodeBuffer;
                 }
                 result = player->read(player, readDest, readSize, fileOffset + ch * blockSize);
@@ -900,7 +902,7 @@ static void ProcessCommand(StrmCommand *command) {
                     loop = FALSE;
                     player->flags.dataEnd = TRUE;
                     if (player->header.head.format == STRM_FORMAT_ADPCM) {
-                        OS_UnlockMutex(&sDecodeMutex);
+                        OS_UnlockMutex(&sDecodeBufferMutex);
                     }
                     break;
                 }
@@ -938,7 +940,7 @@ static void ProcessCommand(StrmCommand *command) {
                         *out++ = DecodeAdpcm(state, *src & 0xf);
                         pos++;
                     }
-                    OS_UnlockMutex(&sDecodeMutex);
+                    OS_UnlockMutex(&sDecodeBufferMutex);
                 }
             } else if (player->flags.singleChannel) {
                 MI_CpuFill8(dest, 0, dataSize);
@@ -958,19 +960,19 @@ static void ProcessCommand(StrmCommand *command) {
             bufOffset += dataSize;
             len -= dataSize;
             if (player->flags.dataEnd && player->callback != NULL) {
-                StartNextStrm(player);
+                OnDataEnd(player);
             }
         }
     }
 
     if (player->strmCallback != NULL) {
-        player->strmCallback(command->status, command->numChannels, command->buffer, command->len,
+        player->strmCallback(command->status, command->numChannels, command->buffer, command->bufLen,
                              player->header.head.format == STRM_FORMAT_PCM8 ? NNS_SND_STRM_FORMAT_PCM8
                                                                             : NNS_SND_STRM_FORMAT_PCM16,
                              player->strmCallbackArg);
     }
     for (ch = 0; ch < command->numChannels; ch++) {
-        DC_FlushRange(command->buffer[ch], command->len);
+        DC_FlushRange(command->buffer[ch], command->bufLen);
     }
     if (command->status == NNS_SND_STRM_CALLBACK_SETUP) {
         player->prepared = TRUE;
@@ -978,27 +980,27 @@ static void ProcessCommand(StrmCommand *command) {
 }
 
 // A file in the ROM is read through the archive's file; one loaded is copied from memory
-static void SetFileFuncs(NNSSndArcStrmPlayer *player, u32 fileId) {
+static void SetupStreamFunction(NNSSndStrmPlayer *player, u32 fileId) {
     if (NNS_SndArcGetFileAddress(fileId) == NULL) {
-        player->open = OpenRomFile;
-        player->close = CloseRomFile;
-        player->read = ReadRomFile;
-        player->cancel = CancelRomFile;
+        player->open = OpenFileStream;
+        player->close = CloseFileStream;
+        player->read = ReadFileStream;
+        player->cancel = CancelFileStream;
     } else {
-        player->open = OpenMemFile;
-        player->close = CloseMemFile;
-        player->read = ReadMemFile;
-        player->cancel = CancelMemFile;
+        player->open = OpenMemoryStream;
+        player->close = CloseMemoryStream;
+        player->read = ReadMemoryStream;
+        player->cancel = CancelMemoryStream;
     }
 }
 
-static BOOL OpenRomFile(NNSSndArcStrmPlayer *player, u32 fileId) {
+static BOOL OpenFileStream(NNSSndStrmPlayer *player, u32 fileId) {
     const char *path;
 
     if (NNS_SndArcReadFile(fileId, &player->header, sizeof(player->header), 0) != sizeof(player->header)) {
         return FALSE;
     }
-    if (!FS_OpenFileFast(&player->file, NNSi_SndArcGetFileID())) {
+    if (!FS_OpenFileFast(&player->file, NNS_SndArcGetFileID())) {
         path = NNSi_SndArcGetFilePath();
         if (path != NULL && !FS_OpenFileEx(&player->file, path, FS_FILEMODE_R)) {
             return FALSE;
@@ -1008,53 +1010,53 @@ static BOOL OpenRomFile(NNSSndArcStrmPlayer *player, u32 fileId) {
     return TRUE;
 }
 
-static void CloseRomFile(NNSSndArcStrmPlayer *player) {
+static void CloseFileStream(NNSSndStrmPlayer *player) {
     FS_CloseFile(&player->file);
 }
 
-static int ReadRomFile(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset) {
+static int ReadFileStream(NNSSndStrmPlayer *player, void *buffer, int size, u32 offset) {
     FS_SeekFile(&player->file, player->fileOffset + offset, FS_SEEK_SET);
     return FS_ReadFile(&player->file, buffer, size);
 }
 
-static void CancelRomFile(NNSSndArcStrmPlayer *player) {
+static void CancelFileStream(NNSSndStrmPlayer *player) {
     FS_CancelFile(&player->file);
 }
 
-static BOOL OpenMemFile(NNSSndArcStrmPlayer *player, u32 fileId) {
+static BOOL OpenMemoryStream(NNSSndStrmPlayer *player, u32 fileId) {
     player->fileAddress = NNS_SndArcGetFileAddress(fileId);
     MI_CpuCopy8(player->fileAddress, &player->header, sizeof(player->header));
     return TRUE;
 }
 
-static void CloseMemFile(NNSSndArcStrmPlayer *player) {
+static void CloseMemoryStream(NNSSndStrmPlayer *player) {
 }
 
-static int ReadMemFile(NNSSndArcStrmPlayer *player, void *buffer, int size, u32 offset) {
+static int ReadMemoryStream(NNSSndStrmPlayer *player, void *buffer, int size, u32 offset) {
     MI_CpuCopy8(player->fileAddress + offset, buffer, size);
     return size;
 }
 
-static void CancelMemFile(NNSSndArcStrmPlayer *player) {
+static void CancelMemoryStream(NNSSndStrmPlayer *player) {
 }
 
 // Sleeps until woken, then fills the blocks of its list
-static void ThreadProc(void *arg) {
-    StrmThread *thread = arg;
+static void StrmThread(void *arg) {
+    NNSSndStrmThread *thread = arg;
 
     while (TRUE) {
-        StrmCommand *command;
+        LoadCommand *command;
 
-        OS_SleepThread(&thread->queue);
+        OS_SleepThread(&thread->threadQ);
         while (TRUE) {
             OS_LockMutex(&thread->mutex);
-            command = PopCommand(&thread->commandList);
+            command = ReadCommandBuffer(&thread->commandList);
             if (command == NULL) {
                 OS_UnlockMutex(&thread->mutex);
                 break;
             }
-            ProcessCommand(command);
-            FreeCommand(command);
+            MakeWaveData(command);
+            FreeCommandBuffer(command);
             OS_UnlockMutex(&thread->mutex);
         }
     }

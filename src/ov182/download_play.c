@@ -136,7 +136,7 @@ void DownloadPlay_Init(u32 ggid, u32 tgid) {
     user.playerNo = 0;
     sWork->state = (const DownloadPlayState){ 0 };
     sWork->mbWorkp = sWork->mbWork;
-    if (MB_Init(sWork->mbWorkp, &user, ggid, tgid, DOWNLOAD_PLAY_DMA_NO) != MB_SUCCESS) {
+    if (MB_Init(sWork->mbWorkp, &user, ggid, tgid, DOWNLOAD_PLAY_DMA_NO) != MB_ERRCODE_SUCCESS) {
         OS_Terminate();
     }
     MB_SetParentCommParam(MB_COMM_PARENT_SEND_MIN, DOWNLOAD_PLAY_CHILD_MAX);
@@ -146,7 +146,7 @@ void DownloadPlay_Init(u32 ggid, u32 tgid) {
 
 void DownloadPlay_Start(const MBGameRegistry *gameInfo, u16 channel) {
     DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_ENTRY);
-    if (MB_StartParent(channel) != MB_SUCCESS) {
+    if (MB_StartParent(channel) != MB_ERRCODE_SUCCESS) {
         DownloadPlay_ChangeState(DOWNLOAD_PLAY_STATE_ERROR);
         return;
     }

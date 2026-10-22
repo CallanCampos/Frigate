@@ -16,8 +16,11 @@
 // each message encrypted with AES key wrap. Under it are a second copy of the wrapper around the WCM (dwc_wcm.c), with
 // its events in a ring of four, and in the middle Rijndael's reference AES (rijndael-alg-fst.c) and RFC 1321's MD5.
 // The original has all of it in one object: the AES's tables sort among the setup's state and the MD5's padding sits
-// among the other code's data. The ROM names none of it: the names are ours, those of the AES and MD5 code after their
-// references
+// among the other code's data. The ROM names none of it: the names are the DWC utility library's own, as that library's
+// symbols and debug information have them (its atermset.c), where the code shows them, and ours elsewhere, those of the
+// AES and MD5 code after their references. Its copies of the APC_ functions of dwc_wcm.c keep names of ours, since the
+// copies in dwc_wcm.c have them in the same overlay, and so do Free and alarmCallback, which dwc_aoss.c and
+// dwc_aoss_ap.c have
 
 // Where the wrapper is (the same numbers as in dwc_wcm.c)
 enum {
@@ -49,7 +52,7 @@ enum {
 #define RESULT_NO_THREADS (-9)
 #define RESULT_BUSY (-10)
 
-// The state that the setup reports (DWCUtilAcStatus's)
+// The state that the setup reports (ATERMApConfigState's)
 enum {
     AC_STATE_IDLE,
     AC_STATE_SCANNING,
@@ -66,7 +69,7 @@ typedef struct {
     BOOL debug;    // 0x04: formats the MAC addresses (for a print that is left out)
     u32 stackSize; // 0x08
     u32 deadline;  // 0x0c: in milliseconds, 0xffffffff for none
-    int apCount;   // 0x10: DWCUtilAc_Start's, which nothing reads
+    int apCount;   // 0x10: ATERMi_ApConfigStart's, which nothing reads
 } UtilAcConfig;
 
 typedef struct MacAddress {
@@ -74,105 +77,105 @@ typedef struct MacAddress {
 } MacAddress;
 
 // A key of the settings
-typedef struct UtilAcWepKey {
-    u32 format; // 0x00: 1 for a key in hex
-    u32 type;   // 0x04
-    char key[0x20];
-} UtilAcWepKey;
+typedef struct _WS_11G_ENCRYPT_KEY {
+    u32 KeyType;   // 0x00: 1 for a key in hex
+    u32 KeyLength; // 0x04
+    char KeyData[0x20];
+} _WS_11G_ENCRYPT_KEY;
 
 // The settings that the access point sends
-typedef struct UtilAcSettings {
+typedef struct WS_11G_PROFILE_DATA {
     u8 unk_000[0x100];
     char ssid[0x20]; // 0x100
     u8 unk_120[0xc];
-    u32 security; // 0x12c: 0 none, 1 WEP, 2 and 3 a passphrase
-    u32 keyCount; // 0x130
+    u32 EncryptMode; // 0x12c: 0 none, 1 WEP, 2 and 3 a passphrase
+    u32 keyCount;    // 0x130
     u8 unk_134[0x28];
-    UtilAcWepKey keys[4]; // 0x15c
-    u8 passphrase[0x48];  // 0x1fc
+    _WS_11G_ENCRYPT_KEY SharedKey[4]; // 0x15c
+    u8 Passphrase[0x48];              // 0x1fc
     u8 unk_244[0x10];
-} UtilAcSettings;
+} WS_11G_PROFILE_DATA;
 
 // An access point that a scan found, and the scan
-typedef struct UtilAcScanEntry {
+typedef struct WLAN_BSSID {
     u32 ssidLength;
     u8 ssid[0x24];
-    u8 bssid[6];
-    u16 secure;
-} UtilAcScanEntry;
+    u8 MacAddress[6];
+    u16 Privacy;
+} WLAN_BSSID;
 
-typedef struct UtilAcScan {
-    u32 count;
-    UtilAcScanEntry entries[1];
-} UtilAcScan;
+typedef struct BSSID_LIST {
+    u32 NumberOfItems;
+    WLAN_BSSID Bssid[1];
+} BSSID_LIST;
 
 typedef struct HelloId {
     u8 bytes[7];
 } HelloId;
 
-static void UtilAcWcm_Notify(WCMNotice *notice);
-static BOOL UtilAcWcm_Abort(void);
+static void APCi_Notify(WCMNotice *notice);
+static BOOL APCi_MoveIdleState(void);
 static int UtilAcWcm_GetApList(void *dest, int max);
 static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 option);
 static BOOL UtilAcWcm_Disconnect(void);
 static BOOL UtilAcWcm_Cleanup(void);
 static BOOL UtilAcWcm_Connect(const void *bssDesc, const void *wepDesc, u32 option);
 static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size);
-static int UtilAcWcm_GetState(void);
-static void *UtilAc_SocAlloc(u32 name, s32 size);
-static void UtilAc_SocFree(u32 name, void *ptr, s32 size);
-static void UtilAc_ClearEvents(void);
-static int UtilAc_PopEvent(void);
-static void UtilAc_OnEvent(int event, int param);
+static int APC_GetState(void);
+static void *soAlloc(u32 name, s32 size);
+static void soFree(u32 name, void *ptr, s32 size);
+static void AtermApc_InitEventBuf(void);
+static int AtermApc_GetEvent(void);
+static void AtermApc_callback(int event, int param);
 static void UtilAc_OnAlarm(void *arg);
-static int UtilAc_StartWcm(int apCount);
-static int UtilAc_EndWcm(void);
-static int UtilAc_Connect(void);
-static void UtilAc_Disconnect(void);
-static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous, int *index);
-static int UtilAc_Scan(void);
-static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, const void *data, int length);
-static int UtilAc_Broadcast(int sock, const void *data, int length);
-static int UtilAc_Send(int sock, const SocAddrIn *from, const void *data, int length);
-static const u8 *UtilAc_ParsePacket(const u8 *packet, u32 *type, u32 *length);
-static const u8 *UtilAc_NextItem(const u8 **cursor, const u8 *end, u32 *type, u32 *length);
-static const u8 *UtilAc_FirstItem(const u8 *message, u32 *type, u32 *length);
-static int UtilAc_BuildPacket(u8 *out, int type, u8 *message, int length, const u8 *key);
-static u8 *UtilAc_AppendItem(u8 *out, int type, const void *data, int length);
-static int UtilAc_BuildMessage(u8 *out, int type, const void *data, int length);
-static int UtilAc_ParseHello(const u8 *packet, int *secure);
-static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key);
-static int UtilAc_BuildHello(u8 *out);
-static int UtilAc_GetMacAddress(u8 *mac);
-static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from);
-static int UtilAc_ParseSettings(const u8 *message);
-static int UtilAc_ParseHex(u8 *out, const char *text, int length);
-static int UtilAc_MakeResult(void);
-static int UtilAc_Run(void);
-static void UtilAc_Thread(void *arg);
-static int UtilAc_AesWrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength);
-static int UtilAc_AesUnwrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength);
-static void UtilAc_Xor8(const u8 *a, const u8 *b, u8 *out);
+static int InitAtermApcNetwork(int apCount);
+static int FreeAtermApcNetwork(void);
+static int ConnectAP(void);
+static void DisconnectAP(void);
+static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, int *index);
+static int ScanAP(void);
+static int SendFrameViaInterface(int sock, const SOCSockAddrIn *to, const u8 *ownAddress, const void *data, int length);
+static int SendBroadcast(int sock, const void *data, int length);
+static int SendFrame(int sock, const SOCSockAddrIn *from, const void *data, int length);
+static const u8 *GetFrameData(const u8 *packet, u32 *type, u32 *length);
+static const u8 *GetElementData(const u8 **cursor, const u8 *end, u32 *type, u32 *length);
+static const u8 *GetFirstElement(const u8 *message, u32 *type, u32 *length);
+static int SetFrameData(u8 *out, int type, u8 *message, int length, const u8 *key);
+static u8 *SetElementData(u8 *out, int type, const void *data, int length);
+static int SetSingleElement(u8 *out, int type, const void *data, int length);
+static int IsSearchCommand(const u8 *packet, int *secure);
+static int GetCommandElement(const u8 *packet, int type, u8 *out, const u8 *key);
+static int SetSearchRes(u8 *out);
+static int GetAdapterMac(u8 *mac);
+static int GetMacEncKey(u8 *key, const SOCSockAddrIn *from);
+static int GetWLanSetElement(const u8 *message);
+static int AsciiToHex(u8 *out, const char *text, int length);
+static int StoreNetParam(void);
+static int AutoConfigThreadEx(void);
+static void AutoConfigThread(void *arg);
+static int keywrap_encrypt(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength);
+static int keywrap_decrypt(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength);
+static void aeskw_xor64(const u8 *a, const u8 *b, u8 *out);
 static int rijndaelKeySetupEnc(u32 *rk, const u8 *cipherKey, int keyBits);
 static int rijndaelKeySetupDec(u32 *rk, const u8 *cipherKey, int keyBits);
 static void rijndaelEncrypt(const u32 *rk, int Nr, const u8 *pt, u8 *ct);
 static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt);
-static void UtilAc_MD5Init(HashContext *context);
-static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen);
-static void UtilAc_MD5Final(u8 *digest, HashContext *context);
-static void UtilAc_MD5Transform(u32 *state, const u8 *block);
-static void UtilAc_MD5Encode(u8 *output, const u32 *input, u32 length);
-static void UtilAc_MD5Decode(u32 *output, const u8 *input, u32 length);
-static void UtilAc_MD5Memcpy(u8 *output, const u8 *input, u32 length);
-static void UtilAc_MD5Memset(char *output, int value, u32 length);
-static void UtilAc_Md5(u8 *digest, const u8 *data, u32 length);
-static u32 UtilAc_GetMilliseconds(void);
-static void *UtilAc_Calloc(int count, int size);
+static void MY_MD5Init(MD5_CTX *context);
+static void MY_MD5Update(MD5_CTX *context, const u8 *input, u32 inputLen);
+static void MY_MD5Final(u8 *digest, MD5_CTX *context);
+static void MD5Transform(u32 *state, const u8 *block);
+static void Encode(u8 *output, const u32 *input, u32 length);
+static void Decode(u32 *output, const u8 *input, u32 length);
+static void MD5_memcpy(u8 *output, const u8 *input, u32 length);
+static void MD5_memset(char *output, int value, u32 length);
+static void MD5Encode(u8 *digest, const u8 *data, u32 length);
+static u32 GetTickCount(void);
+static void *Calloc(int count, int size);
 static void UtilAc_Free(void *ptr);
-static int UtilAc_FormatHexByte(char *out, s8 value);
-static int UtilAc_FormatMacAddress(char *out, const s8 *mac);
-static int UtilAc_GetStatus(DWCUtilAcStatus *status);
-static void UtilAc_NotifyStatus(void);
+static int PutHex(char *out, s8 value);
+static int PutMac(char *out, const s8 *mac);
+static int ATERMi_ApConfigGetState(ATERMApConfigState *status);
+static void SendNotify(void);
 
 // MWCC 2.0 gives each of these a section of its own and lays them out in the reverse of their definitions
 static u8 sAcPacket[0x800];
@@ -190,28 +193,36 @@ static UtilAcConfig sAcConfig = { sAcMessage + 8, TRUE, 0x800, 0xffffffff, 0x40 
 static char sAcHostName[12]; // Defined before the socket functions, where the ROM's .data has it
 // Fixed addresses on the access point's network, in network order: 192.168.0.176/24, with 192.168.0.200 as the
 // gateway and 192.168.0.32 as the DNS server
-static SocConfig sAcSocConfig = {
-    0x01000000,
-    UtilAc_SocAlloc,
-    UtilAc_SocFree,
-    FALSE,
-    0xb000a8c0,
-    0x00ffffff,
-    0xc800a8c0,
-    0x2000a8c0,
+static SOCConfig sAcSocConfig = {
+    SOC_VENDOR_NINTENDO,
+    SOC_VERSION,
+    soAlloc,
+    soFree,
     0,
+    { 0xb000a8c0 },
+    { 0x00ffffff },
+    { 0xc800a8c0 },
+    { 0x2000a8c0 },
+    { 0 },
     0x1000,
     0x1000,
     0,
     0,
-    { 0, 0, 0, 0, 0, (u32)sAcHostName, 4, 0, 0 },
+    0,
+    NULL,
+    NULL,
+    NULL,
+    sAcHostName,
+    4,
+    0,
+    0,
 };
 // The setup's state, defined with initializers so that the functions reach it from one base. MWCC 2.0 lays out the
 // initialized objects defined above a file's first function by size with one heapsort, each in its own section (.bss,
 // .data or .rodata), and this order of definitions gives the ROM's layout. Rijndael's tables take part: defined among
 // the state, the ten tables of 1024 bytes come out in the ROM's order (Td2 to Td4, Te0 to Te4, Td0, Td1)
-static UtilAcSettings sAcSettings = { 0 };
-static DWCUtilAcResult sAcResult = { 0 };
+static WS_11G_PROFILE_DATA sAcSettings = { 0 };
+static ATERMApConfigParam sAcResult = { 0 };
 static OSThread sAcThread = { 0 };
 static OSMutex sAcSocMutex = { 0 };
 static int sAcEvents[4] = { 0 };
@@ -549,7 +560,7 @@ static int sAcStatusResult = 0; // 1, or the negative error that ended the setup
 static int sAcApCount = 0;
 static int sAcEventRead = 0;
 static u32 sAcSearchOption = 0;
-static int sAcStep = 0; // The step of UtilAc_Run
+static int sAcStep = 0; // The step of AutoConfigThreadEx
 static int sAcMessageSize = 0;
 static BOOL sAcConnected = FALSE; // Whether it joined the access point
 static void (*sAcFree)(void *ptr) = NULL;
@@ -562,7 +573,7 @@ static BOOL sAcWcmStarted = FALSE; // Whether the WCM is started
 static void *(*sAcAlloc)(u32 size) = NULL;
 static void *sAcWcmWork = NULL;
 
-static void UtilAcWcm_Notify(WCMNotice *notice) {
+static void APCi_Notify(WCMNotice *notice) {
     if (notice == NULL) {
         return;
     }
@@ -743,7 +754,7 @@ static void UtilAcWcm_Notify(WCMNotice *notice) {
 }
 
 // Stops what the state says is under way, and reports whether the WCM took it
-static BOOL UtilAcWcm_Abort(void) {
+static BOOL APCi_MoveIdleState(void) {
     switch (sAcWcmState) {
     case STATE_SEARCHING:
         if (WCM_SearchAsync(NULL, NULL, 0) != WCM_RESULT_ACCEPT) {
@@ -756,7 +767,7 @@ static BOOL UtilAcWcm_Abort(void) {
         }
         break;
     case STATE_INITIALIZED:
-        if (WCM_StartupAsync(sAcWcmConfig, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sAcWcmConfig, APCi_Notify) != WCM_RESULT_ACCEPT) {
             return FALSE;
         }
         break;
@@ -805,7 +816,7 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
         }
     } else {
         MI_CpuFill8(sAcBssid, 0xff, 6);
-        sAcSearchBssid = (u8 *)WCMiAnyBssid;
+        sAcSearchBssid = (u8 *)WCM_Bssid_Any;
     }
     sAcSearchEssid = sAcEssid;
     if (essid != NULL && essidLength > 0 && essidLength < 0x20) {
@@ -817,7 +828,7 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
         }
     } else {
         MI_CpuFill8(sAcEssid, 0xff, 0x20);
-        sAcSearchEssid = (u8 *)WCMiAnyEssid;
+        sAcSearchEssid = (u8 *)WCM_Essid_Any;
     }
     if (sAcWcmState == STATE_IDLE) {
         if (WCM_SearchAsync(sAcBssid, sAcSearchEssid, sAcSearchOption) == WCM_RESULT_ACCEPT) {
@@ -825,7 +836,7 @@ static BOOL UtilAcWcm_Search(const u8 *bssid, const u8 *essid, int essidLength, 
             OS_RestoreInterrupts(irq);
             return TRUE;
         }
-    } else if (UtilAcWcm_Abort() == TRUE) {
+    } else if (APCi_MoveIdleState() == TRUE) {
         sAcWcmState = STATE_SEARCH_STARTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
@@ -858,7 +869,7 @@ static BOOL UtilAcWcm_Cleanup(void) {
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    if (UtilAcWcm_Abort() == TRUE) {
+    if (APCi_MoveIdleState() == TRUE) {
         sAcWcmState = STATE_CLEANING_UP;
         OS_RestoreInterrupts(irq);
         return TRUE;
@@ -877,7 +888,7 @@ static BOOL UtilAcWcm_Connect(const void *bssDesc, const void *wepDesc, u32 opti
         MI_CpuFill8(sAcWepDesc, 0, 0x60);
     }
     MIi_CpuCopy32(bssDesc, sAcBssDesc, WCM_APLIST_SIZE);
-    if (UtilAcWcm_Abort() == TRUE) {
+    if (APCi_MoveIdleState() == TRUE) {
         sAcWcmState = STATE_CONNECTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
@@ -914,7 +925,7 @@ static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size) {
         sAcWcmState = STATE_INITIALIZED;
     }
     if (sAcWcmState == STATE_INITIALIZED) {
-        if (WCM_StartupAsync(sAcWcmConfig, UtilAcWcm_Notify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sAcWcmConfig, APCi_Notify) != WCM_RESULT_ACCEPT) {
             OS_RestoreInterrupts(irq);
             return FALSE;
         }
@@ -926,12 +937,12 @@ static BOOL UtilAcWcm_Start(DWCWcmCallback callback, void *work, u32 size) {
     return FALSE;
 }
 
-static int UtilAcWcm_GetState(void) {
+static int APC_GetState(void) {
     return sAcWcmState;
 }
 
 // The allocator of the sockets, which can be called from the setup's thread and the socket layer's
-static void *UtilAc_SocAlloc(u32 name, s32 size) {
+static void *soAlloc(u32 name, s32 size) {
     void *ptr;
 
     if (size > 0) {
@@ -943,7 +954,7 @@ static void *UtilAc_SocAlloc(u32 name, s32 size) {
     return NULL;
 }
 
-static void UtilAc_SocFree(u32 name, void *ptr, s32 size) {
+static void soFree(u32 name, void *ptr, s32 size) {
     if (ptr != NULL && size > 0) {
         OS_LockMutex(&sAcSocMutex);
         sAcFree(ptr);
@@ -951,7 +962,7 @@ static void UtilAc_SocFree(u32 name, void *ptr, s32 size) {
     }
 }
 
-static void UtilAc_ClearEvents(void) {
+static void AtermApc_InitEventBuf(void) {
     u32 irq = OS_DisableInterrupts();
     int i;
 
@@ -964,7 +975,7 @@ static void UtilAc_ClearEvents(void) {
 }
 
 // The oldest event of the ring, or 0 for none
-static int UtilAc_PopEvent(void) {
+static int AtermApc_GetEvent(void) {
     u32 irq = OS_DisableInterrupts();
     int read = sAcEventRead;
     int event;
@@ -983,7 +994,7 @@ static int UtilAc_PopEvent(void) {
 }
 
 // The WCM wrapper's callback, which puts the event in the ring unless it is full
-static void UtilAc_OnEvent(int event, int param) {
+static void AtermApc_callback(int event, int param) {
     int write = sAcEventWrite;
     int read = sAcEventRead;
 
@@ -998,32 +1009,34 @@ static void UtilAc_OnEvent(int event, int param) {
 }
 
 static void UtilAc_OnAlarm(void *arg) {
-    UtilAc_OnEvent((int)arg, 0);
+    AtermApc_callback((int)arg, 0);
 }
 
 // Starts the WCM with room for the access points, and waits until it has; 1, or a negative number
-static int UtilAc_StartWcm(int apCount) {
+static int InitAtermApcNetwork(int apCount) {
     BOOL waiting = TRUE;
     int result;
     int wcmSize;
+    int size;
 
     sAcApCount = apCount;
-    UtilAc_ClearEvents();
+    AtermApc_InitEventBuf();
     wcmSize = apCount * 0xd0;
     sAcBlock = sAcAlloc(wcmSize + 0x24d0 + apCount * WCM_APLIST_SIZE);
     if (sAcBlock == NULL) {
         return RESULT_NO_MEMORY;
     }
-    sAcWcmBuffer = (void *)(((int)sAcBlock + 0x1f) & ~0x1f);
-    sAcApList = (u8 *)(((int)sAcWcmBuffer + wcmSize + 0x2490 + 0x1f) & ~0x1f);
-    if (!UtilAcWcm_Start(UtilAc_OnEvent, sAcWcmBuffer, wcmSize + 0x2490)) {
+    sAcWcmBuffer = (void *)(((u64)sAcBlock + 0x1f) & ~0x1f);
+    size = wcmSize + 0x2490;
+    sAcApList = (u8 *)(((u64)sAcWcmBuffer + size + 0x1f) & ~0x1f);
+    if (!UtilAcWcm_Start(AtermApc_callback, sAcWcmBuffer, size)) {
         return RESULT_WIRELESS;
     }
     do {
         int event;
 
         OS_Sleep(10);
-        while ((event = UtilAc_PopEvent()) != 0) {
+        while ((event = AtermApc_GetEvent()) != 0) {
             switch (event) {
             case DWC_WCM_EVENT_SEARCH_AROUND:
             case DWC_WCM_EVENT_FOUND_AP:
@@ -1042,7 +1055,7 @@ static int UtilAc_StartWcm(int apCount) {
     return result;
 }
 
-static int UtilAc_EndWcm(void) {
+static int FreeAtermApcNetwork(void) {
     BOOL waiting = TRUE;
 
     if (UtilAcWcm_Cleanup()) {
@@ -1050,7 +1063,7 @@ static int UtilAc_EndWcm(void) {
             int event;
 
             OS_Sleep(10);
-            while ((event = UtilAc_PopEvent()) != 0) {
+            while ((event = AtermApc_GetEvent()) != 0) {
                 switch (event) {
                 case DWC_WCM_EVENT_SEARCH_AROUND:
                 case DWC_WCM_EVENT_FOUND_AP:
@@ -1073,7 +1086,7 @@ static int UtilAc_EndWcm(void) {
 }
 
 // Connects to the setup's access point, without a key, and starts the sockets
-static int UtilAc_Connect(void) {
+static int ConnectAP(void) {
     BOOL waiting = TRUE;
     int result = RESULT_WIRELESS;
     OSAlarm alarm;
@@ -1090,7 +1103,7 @@ static int UtilAc_Connect(void) {
     do {
         int event;
 
-        if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+        if (GetTickCount() >= sAcConfig.deadline) {
             result = RESULT_SCAN_TIMEOUT;
             break;
         }
@@ -1099,7 +1112,7 @@ static int UtilAc_Connect(void) {
             break;
         }
         OS_Sleep(10);
-        while ((event = UtilAc_PopEvent()) != 0) {
+        while ((event = AtermApc_GetEvent()) != 0) {
             switch (event) {
             case DWC_WCM_EVENT_SEARCH_AROUND:
             case DWC_WCM_EVENT_FOUND_AP:
@@ -1125,7 +1138,7 @@ static int UtilAc_Connect(void) {
         }
     } while (waiting);
     OS_CancelAlarm(&alarm);
-    while (UtilAc_PopEvent() != 0) {
+    while (AtermApc_GetEvent() != 0) {
     }
     if (result > 0) {
         sAcConnected = TRUE;
@@ -1138,7 +1151,7 @@ static int UtilAc_Connect(void) {
     return result;
 }
 
-static void UtilAc_Disconnect(void) {
+static void DisconnectAP(void) {
     BOOL waiting = TRUE;
 
     if (sAcConnected) {
@@ -1147,7 +1160,7 @@ static void UtilAc_Disconnect(void) {
                 int event;
 
                 OS_Sleep(10);
-                while ((event = UtilAc_PopEvent()) != 0) {
+                while ((event = AtermApc_GetEvent()) != 0) {
                     switch (event) {
                     case DWC_WCM_EVENT_SEARCH_AROUND:
                     case DWC_WCM_EVENT_FOUND_AP:
@@ -1172,60 +1185,64 @@ static void UtilAc_Disconnect(void) {
 
 // Looks for the access point that opened its setup: one that was secured in the scan before and is open now, or else
 // one named "******" in this scan and not in the one before. Gives its place in the scan
-static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous, int *index) {
+static int CheckAccessPoint(const BSSID_LIST *scan, const BSSID_LIST *previous, int *index) {
     int found = 0;
     int result = 0;
     int i;
     int j;
+    const WLAN_BSSID *entry = scan->Bssid;
+    const WLAN_BSSID *old = previous->Bssid;
 
-    for (i = 0; i < scan->count; i++) {
+    for (i = 0; i < scan->NumberOfItems; i++) {
         char name[0x22] = { 0 };
-        const UtilAcScanEntry *entry = &scan->entries[i];
 
         memcpy(name, entry->ssid, 0x20);
         name[entry->ssidLength] = 0;
-        for (j = 0; j < previous->count; j++) {
-            const UtilAcScanEntry *old = &previous->entries[j];
-
+        for (j = 0; j < previous->NumberOfItems; j++) {
             if (entry->ssidLength == 0 || entry->ssidLength > 0x20) {
                 break;
             }
             if (entry->ssidLength == 1 && (entry->ssid[0] == 0 || entry->ssid[0] == ' ')) {
                 break;
             }
-            if (memcmp(name, old->ssid, strlen(name)) == 0 && memcmp(entry->bssid, old->bssid, 6) == 0 &&
-                entry->secure != old->secure && entry->secure == 0) {
+            if (memcmp(name, old->ssid, strlen(name)) == 0 && memcmp(entry->MacAddress, old->MacAddress, 6) == 0 &&
+                entry->Privacy != old->Privacy && entry->Privacy == 0) {
                 found = 1;
                 break;
             }
+            old++;
         }
         if (found) {
             break;
         }
+        entry++;
+        old = previous->Bssid;
     }
     if (!found) {
         char name[0x22] = { 0 };
-        int foundOld = 0;
         int foundNew = 0;
+        int foundOld = 0;
 
-        for (j = 0; j < previous->count; j++) {
-            memcpy(name, previous->entries[j].ssid, 0x20);
-            name[previous->entries[j].ssidLength] = 0;
-            if (memcmp(name, "******", strlen("******")) == 0 && previous->entries[j].secure == 0) {
+        entry = scan->Bssid;
+        old = previous->Bssid;
+        for (i = 0; i < previous->NumberOfItems; i++) {
+            memcpy(name, old->ssid, 0x20);
+            name[old->ssidLength] = 0;
+            if (memcmp(name, "******", strlen("******")) == 0 && old->Privacy == 0) {
                 foundOld = 1;
                 break;
             }
+            old++;
         }
-        for (i = 0; i < scan->count; i++) {
-            const UtilAcScanEntry *entry = &scan->entries[i];
-
+        for (i = 0; i < scan->NumberOfItems; i++) {
             memcpy(name, entry->ssid, 0x20);
             name[entry->ssidLength] = 0;
             if (strlen(name) == strlen("******") && memcmp(name, "******", strlen("******")) == 0 &&
-                entry->secure == 0) {
+                entry->Privacy == 0) {
                 foundNew = 1;
                 break;
             }
+            entry++;
         }
         if (foundNew && !foundOld) {
             found = 1;
@@ -1239,26 +1256,28 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
 }
 
 // Scans for the access points until one opens its setup; 1 when one did, or a negative number
-static int UtilAc_Scan(void) {
-    UtilAcScan *scan = NULL;
-    UtilAcScan *previous = NULL;
+static int ScanAP(void) {
     int result = RESULT_NO_MEMORY;
-    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
-    int round;
     int foundIndex = 0;
     char text[0x20];
+    int round;
+    int j;
+    int i;
+    int size = sAcApCount * sizeof(WLAN_BSSID) + sizeof(BSSID_LIST);
+    BSSID_LIST *scan = NULL;
+    BSSID_LIST *previous = NULL;
 
-    scan = UtilAc_Calloc(1, size);
+    scan = Calloc(1, size);
     if (scan != NULL) {
-        previous = UtilAc_Calloc(1, size);
+        previous = Calloc(1, size);
         if (previous != NULL) {
             for (round = 0; round < 30 && !sAcCancel; round++) {
                 OSAlarm alarm;
-                BOOL waiting = TRUE;
-                int count = 0;
-                int i;
+                BOOL waiting;
+                int count;
+                WMBssDesc *bss;
 
-                if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+                if (GetTickCount() >= sAcConfig.deadline) {
                     break;
                 }
                 if (!UtilAcWcm_Search(NULL, NULL, 0, 0x30bffe)) {
@@ -1267,14 +1286,16 @@ static int UtilAc_Scan(void) {
                 }
                 OS_CreateAlarm(&alarm);
                 OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm, (void *)EVENT_SCAN_TIMEOUT);
+                waiting = TRUE;
+                count = 0;
                 do {
                     int event;
 
                     OS_Sleep(10);
-                    if (UtilAc_GetMilliseconds() >= sAcConfig.deadline || sAcCancel) {
+                    if (GetTickCount() >= sAcConfig.deadline || sAcCancel) {
                         break;
                     }
-                    while ((event = UtilAc_PopEvent()) != 0) {
+                    while ((event = AtermApc_GetEvent()) != 0) {
                         switch (event) {
                         case DWC_WCM_EVENT_SEARCH_AROUND:
                         case DWC_WCM_EVENT_SEARCHING:
@@ -1283,17 +1304,15 @@ static int UtilAc_Scan(void) {
                         case EVENT_SCAN_TIMEOUT:
                             waiting = FALSE;
                             break;
-                        case DWC_WCM_EVENT_FOUND_AP: {
-                            int found = UtilAcWcm_GetApList(sAcApList, sAcApCount);
-
-                            if (found > count) {
-                                count = found;
+                        case DWC_WCM_EVENT_FOUND_AP:
+                            i = UtilAcWcm_GetApList(sAcApList, sAcApCount);
+                            if (i > count) {
+                                count = i;
                                 OS_CancelAlarm(&alarm);
                                 OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm,
                                             (void *)EVENT_SCAN_TIMEOUT);
                             }
                             break;
-                        }
                         case DWC_WCM_EVENT_SEARCH_ENDED:
                             waiting = FALSE;
                             break;
@@ -1318,44 +1337,48 @@ static int UtilAc_Scan(void) {
                     }
                 } while (waiting);
                 OS_CancelAlarm(&alarm);
-                while (UtilAc_PopEvent() != 0) {
+                while (AtermApc_GetEvent() != 0) {
                 }
                 if (sAcCancel) {
                     break;
                 }
+                i = 0;
                 if (count >= sAcApCount) {
                     result = RESULT_TOO_MANY_APS;
                     goto done;
                 }
-                for (i = 0; i < count; i++) {
-                    WMBssDesc *bss = (WMBssDesc *)sAcApList + i;
-
-                    memcpy(scan->entries[i].ssid, bss->ssid, 0x20);
-                    scan->entries[i].ssidLength = bss->ssidLength;
-                    scan->entries[i].ssid[bss->ssidLength] = 0;
-                    if (bss->capaInfo & 0x10) {
-                        scan->entries[i].secure = 1;
-                    } else {
-                        scan->entries[i].secure = 0;
+                bss = (WMBssDesc *)sAcApList;
+                j = 0;
+                if (count > 0) {
+                    for (; j < count; j++) {
+                        memcpy(scan->Bssid[i].ssid, bss->ssid, 0x20);
+                        scan->Bssid[i].ssidLength = bss->ssidLength;
+                        scan->Bssid[i].ssid[bss->ssidLength] = 0;
+                        if (bss->capaInfo & 0x10) {
+                            scan->Bssid[i].Privacy = 1;
+                        } else {
+                            scan->Bssid[i].Privacy = 0;
+                        }
+                        memcpy(scan->Bssid[i].MacAddress, bss->bssid, 6);
+                        bss++;
+                        i++;
                     }
-                    memcpy(scan->entries[i].bssid, bss->bssid, 6);
                 }
-                scan->count = count;
-                if (sAcState != AC_STATE_SCANNING && UtilAc_FindSetupAp(scan, previous, &foundIndex)) {
-                    UtilAcScanEntry *entry = &scan->entries[foundIndex];
+                scan->NumberOfItems = count;
+                if (sAcState != AC_STATE_SCANNING && CheckAccessPoint(scan, previous, &foundIndex)) {
+                    WLAN_BSSID *entry = &scan->Bssid[foundIndex];
 
                     sAcApIndex = foundIndex;
                     strcpy(sAcApSsid, entry->ssid);
-                    memcpy(sAcApMac, entry->bssid, 6);
-                    UtilAc_FormatMacAddress(text, (s8 *)sAcApMac);
-                    result = RESULT_OK;
-                    goto done;
+                    memcpy(sAcApMac, entry->MacAddress, 6);
+                    PutMac(text, (s8 *)sAcApMac);
+                    break;
                 }
                 memcpy(previous, scan, size);
                 sAcState = AC_STATE_SCANNED;
-                UtilAc_NotifyStatus();
+                SendNotify();
             }
-            if (round >= 30 || UtilAc_GetMilliseconds() > sAcConfig.deadline) {
+            if (round >= 30 || GetTickCount() > sAcConfig.deadline) {
                 result = RESULT_SCAN_TIMEOUT;
             } else if (sAcCancel) {
                 result = RESULT_CANCELLED;
@@ -1376,7 +1399,7 @@ done:
 
 // The name that the console gives (the word before the 4 points to it, as in dwc_ac_soc.c's configuration), and the
 // MD5's padding (md5c.c's PADDING). MWCC 2.0 writes data defined between functions out with the next function, and the
-// ROM's .data has these two after UtilAc_FindSetupAp's literal and before UtilAc_MakeIds', so they are defined here
+// ROM's .data has these two after CheckAccessPoint's literal and before GetMacEncKey', so they are defined here
 static char sAcHostName[] = "NINTENDO-DS";
 static u8 PADDING[64] = { 0x80 };
 
@@ -1384,7 +1407,8 @@ static u8 PADDING[64] = { 0x80 };
 #define SWAP16(value) ((u16)((((value) >> 8) & 0xff) | (((value) << 8) & 0xff00)))
 
 // Sends to the address, on the port the address has; ownAddress is not used
-static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, const void *data, int length) {
+static int SendFrameViaInterface(int sock, const SOCSockAddrIn *to, const u8 *ownAddress, const void *data,
+                                 int length) {
     int result = SOC_SendTo(sock, data, length, 0, to);
 
     if (result < 0) {
@@ -1394,27 +1418,27 @@ static int UtilAc_SendTo(int sock, const SocAddrIn *to, const u8 *ownAddress, co
 }
 
 // Sends to everyone on port 486
-static int UtilAc_Broadcast(int sock, const void *data, int length) {
-    SocAddrIn to;
+static int SendBroadcast(int sock, const void *data, int length) {
+    SOCSockAddrIn to;
     u8 ownAddress[4];
 
-    to.len = sizeof(SocAddrIn);
-    to.family = POKE_NET_SOC_AF_INET;
-    to.addr = 0xffffffff;
+    to.len = sizeof(SOCSockAddrIn);
+    to.family = SOC_AF_INET;
+    to.addr.addr = 0xffffffff;
     to.port = 486;
     SOC_U32to4U8(SOCL_GetHostID(), ownAddress);
-    return UtilAc_SendTo(sock, &to, ownAddress, data, length);
+    return SendFrameViaInterface(sock, &to, ownAddress, data, length);
 }
 
 // Answers whoever sent to us, by a broadcast; from is not used
-static int UtilAc_Send(int sock, const SocAddrIn *from, const void *data, int length) {
-    return UtilAc_Broadcast(sock, data, length);
+static int SendFrame(int sock, const SOCSockAddrIn *from, const void *data, int length) {
+    return SendBroadcast(sock, data, length);
 }
 
 // A packet is a type, the length of its message, the message, and the sum of all the bytes before it, all numbers in
 // network order. A message is a header of 8 bytes, whose first number is the length of the items after it, and the
 // items, each a type, a length and the data, padded so that the next one starts at a multiple of 8
-static const u8 *UtilAc_ParsePacket(const u8 *packet, u32 *type, u32 *length) {
+static const u8 *GetFrameData(const u8 *packet, u32 *type, u32 *length) {
     const u8 *end;
     const u8 *p;
     u32 sum = 0;
@@ -1431,7 +1455,7 @@ static const u8 *UtilAc_ParsePacket(const u8 *packet, u32 *type, u32 *length) {
     return packet + 6;
 }
 
-static const u8 *UtilAc_NextItem(const u8 **cursor, const u8 *end, u32 *type, u32 *length) {
+static const u8 *GetElementData(const u8 **cursor, const u8 *end, u32 *type, u32 *length) {
     const u8 *item = *cursor;
 
     if (item >= end) {
@@ -1443,14 +1467,14 @@ static const u8 *UtilAc_NextItem(const u8 **cursor, const u8 *end, u32 *type, u3
     return item + 4;
 }
 
-static const u8 *UtilAc_FirstItem(const u8 *message, u32 *type, u32 *length) {
+static const u8 *GetFirstElement(const u8 *message, u32 *type, u32 *length) {
     const u8 *cursor = message + 8;
 
-    return UtilAc_NextItem(&cursor, cursor + SWAP16(*(u16 *)message), type, length);
+    return GetElementData(&cursor, cursor + SWAP16(*(u16 *)message), type, length);
 }
 
 // Makes a packet of the type from the message, whose header is ours to fill in, encrypted with the key if there is one
-static int UtilAc_BuildPacket(u8 *out, int type, u8 *message, int length, const u8 *key) {
+static int SetFrameData(u8 *out, int type, u8 *message, int length, const u8 *key) {
     u8 *p = out;
     u32 sum = 0;
     u8 *q;
@@ -1465,7 +1489,7 @@ static int UtilAc_BuildPacket(u8 *out, int type, u8 *message, int length, const 
     message[7] = 0;
     *(u16 *)message = SWAP16((u16)(length - 8));
     if (key != NULL) {
-        UtilAc_AesWrap(out + 6, message, length, key, 0x10);
+        keywrap_encrypt(out + 6, message, length, key, 0x10);
         length += 8;
     } else {
         memcpy(out + 6, message, length);
@@ -1488,7 +1512,7 @@ static int UtilAc_BuildPacket(u8 *out, int type, u8 *message, int length, const 
 }
 
 // Writes an item and returns where the next one goes
-static u8 *UtilAc_AppendItem(u8 *out, int type, const void *data, int length) {
+static u8 *SetElementData(u8 *out, int type, const void *data, int length) {
     int padding;
 
     out[0] = 0;
@@ -1506,7 +1530,7 @@ static u8 *UtilAc_AppendItem(u8 *out, int type, const void *data, int length) {
 }
 
 // A message of one item
-static int UtilAc_BuildMessage(u8 *out, int type, const void *data, int length) {
+static int SetSingleElement(u8 *out, int type, const void *data, int length) {
     u8 *end;
 
     out[0] = 0;
@@ -1517,19 +1541,19 @@ static int UtilAc_BuildMessage(u8 *out, int type, const void *data, int length) 
     out[5] = 0;
     out[6] = 0;
     out[7] = 0;
-    end = UtilAc_AppendItem(out + 8, type, data, length);
+    end = SetElementData(out + 8, type, data, length);
     *(u16 *)out = end - out - 8;
     return end - out;
 }
 
 // Reads the hello of the access point: its version and mode, which must be 1, and whether it asks for more
-static int UtilAc_ParseHello(const u8 *packet, int *secure) {
+static int IsSearchCommand(const u8 *packet, int *secure) {
     u32 type;
     u32 length;
     u32 itemType;
     u32 itemLength;
     const u8 *end;
-    const u8 *message = UtilAc_ParsePacket(packet, &type, &length);
+    const u8 *message = GetFrameData(packet, &type, &length);
     const u8 *cursor = message;
     const u8 *data;
     u32 version = 0;
@@ -1544,7 +1568,7 @@ static int UtilAc_ParseHello(const u8 *packet, int *secure) {
     }
     end = message + length;
     cursor = message + 8;
-    while ((data = UtilAc_NextItem(&cursor, end, &itemType, &itemLength)) != NULL) {
+    while ((data = GetElementData(&cursor, end, &itemType, &itemLength)) != NULL) {
         switch (itemType) {
         case 1:
             version = SWAP16(*(u16 *)data);
@@ -1569,10 +1593,10 @@ static int UtilAc_ParseHello(const u8 *packet, int *secure) {
 }
 
 // The message of a packet of the type, decrypted with the key if there is one; its length, or 0
-static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key) {
+static int GetCommandElement(const u8 *packet, int type, u8 *out, const u8 *key) {
     u32 packetType;
     u32 length;
-    const u8 *message = UtilAc_ParsePacket(packet, &packetType, &length);
+    const u8 *message = GetFrameData(packet, &packetType, &length);
 
     if (message == NULL) {
         return 0;
@@ -1581,7 +1605,7 @@ static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key) 
         return 0;
     }
     if (key != NULL) {
-        UtilAc_AesUnwrap(out, message, length, key, 0x10);
+        keywrap_decrypt(out, message, length, key, 0x10);
         length -= 8;
     } else {
         memcpy(out, message, length);
@@ -1590,7 +1614,7 @@ static int UtilAc_ParseBody(const u8 *packet, int type, u8 *out, const u8 *key) 
 }
 
 // The hello of this side
-static int UtilAc_BuildHello(u8 *out) {
+static int SetSearchRes(u8 *out) {
     struct {
         u16 version;
         HelloId id;
@@ -1599,25 +1623,25 @@ static int UtilAc_BuildHello(u8 *out) {
 
     data.version = 0x100;
     data.id = sAcHelloId;
-    end = UtilAc_AppendItem(sAcConfig.items, 1, &data.version, sizeof(data.version));
-    end = UtilAc_AppendItem(end, 2, &data.version, sizeof(data.version));
+    end = SetElementData(sAcConfig.items, 1, &data.version, sizeof(data.version));
+    end = SetElementData(end, 2, &data.version, sizeof(data.version));
     if (sAcSecure) {
-        end = UtilAc_AppendItem(end, 5, &data.version, sizeof(data.version));
+        end = SetElementData(end, 5, &data.version, sizeof(data.version));
     }
-    end = UtilAc_AppendItem(end, 3, &data.id, sizeof(data.id));
+    end = SetElementData(end, 3, &data.id, sizeof(data.id));
     if (sAcSecure) {
-        end = UtilAc_AppendItem(end, 4, sAcOwnMac, 6);
+        end = SetElementData(end, 4, sAcOwnMac, 6);
     }
-    return UtilAc_BuildPacket(out, 2, sAcMessage, end - sAcConfig.items + 8, NULL);
+    return SetFrameData(out, 2, sAcMessage, end - sAcConfig.items + 8, NULL);
 }
 
-static int UtilAc_GetMacAddress(u8 *mac) {
+static int GetAdapterMac(u8 *mac) {
     OS_GetMacAddress(mac);
     return 1;
 }
 
 // Makes the key of the first exchange; from is not used
-static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
+static int GetMacEncKey(u8 *key, const SOCSockAddrIn *from) {
     char ownText[0x20];
     char apText[0x20];
     MacAddress ap;
@@ -1626,7 +1650,7 @@ static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
     memcpy(key + 12, "WARP", 4);
     memcpy(&ap, sAcApMac, 6);
     ap.bytes[0] &= 0xfd;
-    UtilAc_GetMacAddress(own.bytes);
+    GetAdapterMac(own.bytes);
     memcpy(sAcOwnMac, &own, 6);
     if (memcmp(&ap, &own, 6) <= 0) {
         memcpy(key, &own, 6);
@@ -1636,16 +1660,16 @@ static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
         memcpy(key + 6, &own, 6);
     }
     if (sAcConfig.debug) {
-        UtilAc_FormatMacAddress(ownText, (s8 *)own.bytes);
-        UtilAc_FormatMacAddress(apText, (s8 *)ap.bytes);
+        PutMac(ownText, (s8 *)own.bytes);
+        PutMac(apText, (s8 *)ap.bytes);
     }
     return 1;
 }
 
 // Takes the items of the message with the settings; whether it named the network
-static int UtilAc_ParseSettings(const u8 *message) {
+static int GetWLanSetElement(const u8 *message) {
     const u8 *cursor = message + 8;
-    const u8 *end = cursor + SWAP16(*(u16 *)message);
+    const u8 *end;
     const u8 *data;
     u32 type;
     u32 length;
@@ -1653,7 +1677,8 @@ static int UtilAc_ParseSettings(const u8 *message) {
     int i;
     u16 value;
 
-    while ((data = UtilAc_NextItem(&cursor, end, &type, &length)) != NULL) {
+    end = cursor + SWAP16(*(u16 *)message);
+    while ((data = GetElementData(&cursor, end, &type, &length)) != NULL) {
         switch (type) {
         case 0x201:
             memset(sAcSettings.ssid, 0, 0x20);
@@ -1661,18 +1686,18 @@ static int UtilAc_ParseSettings(const u8 *message) {
             found = 1;
             break;
         case 0x202:
-            sAcSettings.security = SWAP16(*(u16 *)data);
+            sAcSettings.EncryptMode = SWAP16(*(u16 *)data);
             break;
         case 0x203:
             value = SWAP16(*(u16 *)data);
             for (i = 0; i < 4; i++) {
-                sAcSettings.keys[i].format = value;
+                sAcSettings.SharedKey[i].KeyType = value;
             }
             break;
         case 0x204:
             value = SWAP16(*(u16 *)data);
             for (i = 0; i < 4; i++) {
-                sAcSettings.keys[i].type = value;
+                sAcSettings.SharedKey[i].KeyLength = value;
             }
             break;
         case 0x205:
@@ -1682,20 +1707,20 @@ static int UtilAc_ParseSettings(const u8 *message) {
         case 0x207:
         case 0x208:
         case 0x209:
-            memset(sAcSettings.keys[type - 0x206].key, 0, 0x20);
-            if (sAcSettings.keys[0].format == 1) {
-                char *p = sAcSettings.keys[type - 0x206].key;
+            memset(sAcSettings.SharedKey[type - 0x206].KeyData, 0, 0x20);
+            if (sAcSettings.SharedKey[0].KeyType == 1) {
+                char *p = sAcSettings.SharedKey[type - 0x206].KeyData;
 
-                for (i = 0; i < length; i++) {
-                    p += UtilAc_FormatHexByte(p, data[i]);
+                for (i = 0; i < (int)length; i++) {
+                    p += PutHex(p, *data++);
                 }
             } else {
-                memcpy(sAcSettings.keys[type - 0x206].key, data, length);
+                memcpy(sAcSettings.SharedKey[type - 0x206].KeyData, data, length);
             }
             break;
         case 0x20a:
-            memset(sAcSettings.passphrase, 0, 0x48);
-            memcpy(sAcSettings.passphrase, data, length);
+            memset(sAcSettings.Passphrase, 0, 0x48);
+            memcpy(sAcSettings.Passphrase, data, length);
             break;
         }
     }
@@ -1703,13 +1728,13 @@ static int UtilAc_ParseSettings(const u8 *message) {
 }
 
 // Turns a key in hex digits into its bytes; 0 at a character that is no digit
-static int UtilAc_ParseHex(u8 *out, const char *text, int length) {
-    int i;
+static int AsciiToHex(u8 *out, const char *text, int length) {
+    int c;
     int value = 0;
+    int i;
 
     for (i = 0; i < length; i++) {
-        char c = text[i];
-
+        c = text[i];
         switch (c) {
         case '0':
         case '1':
@@ -1752,77 +1777,69 @@ static int UtilAc_ParseHex(u8 *out, const char *text, int length) {
     return 1;
 }
 
-// Turns the settings into the result; 1, or RESULT_BAD_KEY when the keys make no sense
-// Sets a WEP key and the result's mode from the key's text: 5, 13 or 16 characters, or twice as many hex digits.
-// FALSE when the length is none of those
-static inline BOOL UtilAc_SetKey(u8 *key, const char *text, u32 length) {
-    switch (length) {
-    case 0:
-        break;
-    case 5:
-        sAcResult.wepMode = 1;
-        memcpy(key, text, 5);
-        break;
-    case 10:
-        sAcResult.wepMode = 1;
-        UtilAc_ParseHex(key, text, 10);
-        break;
-    case 13:
-        sAcResult.wepMode = 2;
-        memcpy(key, text, 13);
-        break;
-    case 26:
-        sAcResult.wepMode = 2;
-        UtilAc_ParseHex(key, text, 26);
-        break;
-    case 16:
-        sAcResult.wepMode = 3;
-        memcpy(key, text, 16);
-        break;
-    case 32:
-        sAcResult.wepMode = 3;
-        UtilAc_ParseHex(key, text, 32);
-        break;
-    default:
-        return FALSE;
-    }
-    return TRUE;
-}
-
-static int UtilAc_MakeResult(void) {
+// Turns the settings into the result; 1, or RESULT_BAD_KEY when the keys make no sense. A WEP key is 5, 13 or 16
+// characters, or twice as many hex digits, and its length sets the result's mode
+static int StoreNetParam(void) {
     int result = RESULT_OK;
     char text[0x21];
     int i;
 
     strcpy(sAcResult.ssid, sAcSettings.ssid);
-    switch (sAcSettings.security) {
+    switch (sAcSettings.EncryptMode) {
     case 0:
-        sAcResult.wepMode = 0;
+        sAcResult.auth_mode = 0;
         break;
     case 1:
         if (sAcSettings.keyCount == 0) {
             result = RESULT_BAD_KEY;
         } else {
-            sAcResult.keyCount = sAcSettings.keyCount;
+            sAcResult.wepkeyid = sAcSettings.keyCount;
             for (i = 0; i < 4; i++) {
-                u32 length;
+                char *key = text;
 
-                memcpy(text, sAcSettings.keys[i].key, 0x20);
-                text[0x20] = 0;
-                length = strlen(text);
-                if (!UtilAc_SetKey(sAcResult.keys[i], text, length)) {
+                memcpy(key, sAcSettings.SharedKey[i].KeyData, 0x20);
+                key[0x20] = 0;
+                switch (strlen(key)) {
+                case 0:
+                    break;
+                case 5:
+                    sAcResult.auth_mode = 1;
+                    memcpy(sAcResult.wepkey[i], key, 5);
+                    break;
+                case 10:
+                    sAcResult.auth_mode = 1;
+                    AsciiToHex(sAcResult.wepkey[i], key, 10);
+                    break;
+                case 13:
+                    sAcResult.auth_mode = 2;
+                    memcpy(sAcResult.wepkey[i], key, 13);
+                    break;
+                case 26:
+                    sAcResult.auth_mode = 2;
+                    AsciiToHex(sAcResult.wepkey[i], key, 26);
+                    break;
+                case 16:
+                    sAcResult.auth_mode = 3;
+                    memcpy(sAcResult.wepkey[i], key, 16);
+                    break;
+                case 32:
+                    sAcResult.auth_mode = 3;
+                    AsciiToHex(sAcResult.wepkey[i], key, 32);
+                    break;
+                default:
                     result = RESULT_BAD_KEY;
+                    break;
                 }
             }
         }
         break;
     case 2:
-        sAcResult.wepMode = 4;
-        memcpy(sAcResult.passphrase, sAcSettings.passphrase, 0x40);
+        sAcResult.auth_mode = 4;
+        memcpy(sAcResult.wpakey, sAcSettings.Passphrase, 0x40);
         break;
     case 3:
-        sAcResult.wepMode = 5;
-        memcpy(sAcResult.passphrase, sAcSettings.passphrase, 0x40);
+        sAcResult.auth_mode = 5;
+        memcpy(sAcResult.wpakey, sAcSettings.Passphrase, 0x40);
         break;
     default:
         result = RESULT_BAD_KEY;
@@ -1831,37 +1848,54 @@ static int UtilAc_MakeResult(void) {
     return result;
 }
 
+// Takes the session key from the AP's answer to our hello when that is what its first item holds, and moves on to
+// asking for the settings with it. Returns the count of retries to go on with, 0 once it has the key
+static inline int UtilAc_TakeSessionKey(const u8 *message, int retries) {
+    u32 now;
+    u32 length;
+    u32 type;
+    const u8 *data = GetFirstElement(message, &type, &length);
+
+    if (type == 0x101) {
+        now = GetTickCount();
+        memcpy(sAcSessionKey, data, 8);
+        MD5Encode(sAcSessionKey + 8, (u8 *)&now, sizeof(now));
+        retries = 0;
+        sAcStep = 7;
+        sAcState = AC_STATE_KEY;
+        sAcConfig.deadline = 0xffffffff;
+        SendNotify();
+    }
+    return retries;
+}
+
 // The setup, step by step: scan until an access point opens its setup, join it, wait for its hello and answer it,
 // take the session key, ask for the settings with it, take them, and say so. Returns 1, or a negative number
-static int UtilAc_Run(void) {
+static int AutoConfigThreadEx(void) {
     int sock = 0;
     int result = RESULT_FAILED;
     u32 sentAt = 0;
     int retries = 0;
     BOOL done = FALSE;
-    SocAddrIn address;
-    SocAddrIn from;
-    u32 type;
-    u32 length;
-    u32 now;
-    const u8 *data;
+    SOCSockAddrIn address;
+    SOCSockAddrIn from;
 
     sAcStep = 1;
     while (!done && !sAcCancel) {
         OS_Sleep(500);
         switch (sAcStep) {
         case 1:
-            result = UtilAc_Scan();
+            result = ScanAP();
             if (result != RESULT_OK) {
                 done = TRUE;
             } else {
                 sAcState = AC_STATE_FOUND;
-                UtilAc_NotifyStatus();
+                SendNotify();
                 sAcStep = 2;
             }
             break;
         case 2:
-            result = UtilAc_Connect();
+            result = ConnectAP();
             if (result != RESULT_OK) {
                 done = TRUE;
             } else {
@@ -1869,16 +1903,16 @@ static int UtilAc_Run(void) {
             }
             break;
         case 3:
-            sock = SOC_Socket(POKE_NET_SOC_AF_INET, 2, 0);
+            sock = SOC_Socket(SOC_AF_INET, 2, 0);
             if (sock < 0) {
                 result = RESULT_WIRELESS;
                 done = TRUE;
             } else {
                 memset(&address, 0, sizeof(address));
-                address.len = sizeof(SocAddrIn);
-                address.family = POKE_NET_SOC_AF_INET;
+                address.len = sizeof(SOCSockAddrIn);
+                address.family = SOC_AF_INET;
                 address.port = 486;
-                address.addr = 0;
+                address.addr.addr = 0;
                 result = SOC_Bind(sock, &address);
                 if (result < 0) {
                     result = RESULT_WIRELESS;
@@ -1889,62 +1923,52 @@ static int UtilAc_Run(void) {
             }
             break;
         case 4:
-            if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+            if (GetTickCount() >= sAcConfig.deadline) {
                 SOC_Close(sock);
                 result = RESULT_SCAN_TIMEOUT;
                 done = TRUE;
             } else {
-                from.len = sizeof(SocAddrIn);
-                UtilAc_MakeIds(sAcKey, &from);
+                from.len = sizeof(SOCSockAddrIn);
+                GetMacEncKey(sAcKey, &from);
                 if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
-                    UtilAc_ParseHello(sAcPacket, &sAcSecure)) {
-                    sAcConfig.deadline = UtilAc_GetMilliseconds() + 30000;
+                    IsSearchCommand(sAcPacket, &sAcSecure)) {
+                    sAcConfig.deadline = GetTickCount() + 30000;
                     sAcStep = 5;
                     sAcState = AC_STATE_HELLO;
-                    UtilAc_NotifyStatus();
+                    SendNotify();
                 }
             }
             break;
         case 5:
-            sAcPacketSize = UtilAc_BuildHello(sAcPacket);
-            UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
-            sentAt = UtilAc_GetMilliseconds();
+            sAcPacketSize = SetSearchRes(sAcPacket);
+            SendFrame(sock, &from, sAcPacket, sAcPacketSize);
+            sentAt = GetTickCount();
             sAcStep = 6;
             break;
         case 6:
-            if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
+            if (GetTickCount() >= sAcConfig.deadline) {
                 SOC_Close(sock);
                 result = RESULT_HELLO_TIMEOUT;
                 done = TRUE;
             } else if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
-                       UtilAc_ParseBody(sAcPacket, 3, sAcMessage, sAcKey)) {
-                data = UtilAc_FirstItem(sAcMessage, &type, &length);
-                if (type == 0x101) {
-                    now = UtilAc_GetMilliseconds();
-                    memcpy(sAcSessionKey, data, 8);
-                    UtilAc_Md5(sAcSessionKey + 8, (u8 *)&now, sizeof(now));
-                    retries = 0;
-                    sAcStep = 7;
-                    sAcState = AC_STATE_KEY;
-                    sAcConfig.deadline = 0xffffffff;
-                    UtilAc_NotifyStatus();
-                }
-            } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
+                       GetCommandElement(sAcPacket, 3, sAcMessage, sAcKey)) {
+                retries = UtilAc_TakeSessionKey(sAcMessage, retries);
+            } else if (GetTickCount() >= sentAt + 1000) {
                 sAcStep = 5;
             }
             break;
         case 7:
-            sAcMessageSize = UtilAc_BuildMessage(sAcMessage, 0x102, sAcSessionKey + 8, 8);
-            sAcPacketSize = UtilAc_BuildPacket(sAcPacket, 4, sAcMessage, sAcMessageSize, sAcKey);
-            UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
-            sentAt = UtilAc_GetMilliseconds();
+            sAcMessageSize = SetSingleElement(sAcMessage, 0x102, sAcSessionKey + 8, 8);
+            sAcPacketSize = SetFrameData(sAcPacket, 4, sAcMessage, sAcMessageSize, sAcKey);
+            SendFrame(sock, &from, sAcPacket, sAcPacketSize);
+            sentAt = GetTickCount();
             memset(&sAcSettings, 0, sizeof(sAcSettings));
             sAcStep = 8;
             break;
         case 8:
             if (SOC_RecvFrom(sock, sAcPacket, sizeof(sAcPacket), 4, &from) > 0 &&
-                (sAcMessageSize = UtilAc_ParseBody(sAcPacket, 5, sAcMessage, sAcSessionKey)) != 0 &&
-                UtilAc_ParseSettings(sAcMessage)) {
+                (sAcMessageSize = GetCommandElement(sAcPacket, 5, sAcMessage, sAcSessionKey)) != 0 &&
+                GetWLanSetElement(sAcMessage)) {
                 if (sAcSettings.ssid[0] != 0) {
                     sAcHasSsid = TRUE;
                 } else {
@@ -1952,7 +1976,7 @@ static int UtilAc_Run(void) {
                 }
                 retries = 0;
                 sAcStep = 9;
-            } else if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
+            } else if (GetTickCount() >= sentAt + 1000) {
                 if (++retries >= 10) {
                     SOC_Close(sock);
                     result = RESULT_WIRELESS;
@@ -1963,24 +1987,24 @@ static int UtilAc_Run(void) {
             }
             break;
         case 9:
-            sAcMessageSize = UtilAc_BuildMessage(sAcMessage, 0x301, &sAcHasSsid, 1);
-            sAcPacketSize = UtilAc_BuildPacket(sAcPacket, 6, sAcMessage, sAcMessageSize, sAcSessionKey);
-            if (UtilAcWcm_GetState() != STATE_CONNECTED) {
+            sAcMessageSize = SetSingleElement(sAcMessage, 0x301, &sAcHasSsid, 1);
+            sAcPacketSize = SetFrameData(sAcPacket, 6, sAcMessage, sAcMessageSize, sAcSessionKey);
+            if (APC_GetState() != STATE_CONNECTED) {
                 // The connection is gone: wait a second and give up on the answer
-                sentAt = UtilAc_GetMilliseconds() + 1000;
+                sentAt = GetTickCount() + 1000;
                 retries = 10;
                 sAcStep = 10;
             } else {
-                UtilAc_Send(sock, &from, sAcPacket, sAcPacketSize);
-                sentAt = UtilAc_GetMilliseconds();
+                SendFrame(sock, &from, sAcPacket, sAcPacketSize);
+                sentAt = GetTickCount();
                 sAcStep = 10;
             }
             break;
         case 10:
-            if (UtilAc_GetMilliseconds() >= sentAt + 1000) {
+            if (GetTickCount() >= sentAt + 1000) {
                 if (++retries >= 10) {
                     done = TRUE;
-                    result = UtilAc_MakeResult();
+                    result = StoreNetParam();
                 } else {
                     sAcStep = 9;
                 }
@@ -1998,18 +2022,18 @@ static int UtilAc_Run(void) {
 }
 
 // The thread of the setup
-static void UtilAc_Thread(void *arg) {
-    int result = UtilAc_Run();
+static void AutoConfigThread(void *arg) {
+    int result = AutoConfigThreadEx();
 
     sAcStatusResult = result;
-    UtilAc_Disconnect();
+    DisconnectAP();
     if (result == RESULT_OK) {
         sAcState = AC_STATE_DONE;
     } else {
         sAcState = AC_STATE_FAILED;
     }
     sAcConfig.deadline = 0xffffffff;
-    UtilAc_NotifyStatus();
+    SendNotify();
 }
 
 #define BSWAP64(value)                                                                                                 \
@@ -2019,7 +2043,7 @@ static void UtilAc_Thread(void *arg) {
      (((value) & 0x00ff000000000000ULL) >> 40) | (((value) & 0xff00000000000000ULL) >> 56))
 
 // AES key wrap (RFC 3394): the output is 8 bytes longer than the input
-static int UtilAc_AesWrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength) {
+static int keywrap_encrypt(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength) {
     u64 t;
     u32 iv[2];
     u8 block[16];
@@ -2046,7 +2070,7 @@ static int UtilAc_AesWrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 
             memcpy(block + 8, out + i * sizeof(u64), 8);
             rijndaelEncrypt(rk, Nr, block, block);
             t = BSWAP64((u64)n * j + i);
-            UtilAc_Xor8(block, (u8 *)&t, block);
+            aeskw_xor64(block, (u8 *)&t, block);
             memcpy(out + i * sizeof(u64), block + 8, 8);
         }
     }
@@ -2054,7 +2078,7 @@ static int UtilAc_AesWrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 
     return 1;
 }
 
-static int UtilAc_AesUnwrap(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength) {
+static int keywrap_decrypt(u8 *out, const u8 *in, u32 length, const u8 *key, u32 keyLength) {
     u64 t;
     u32 iv[2];
     u8 block[16];
@@ -2085,7 +2109,7 @@ static int UtilAc_AesUnwrap(u8 *out, const u8 *in, u32 length, const u8 *key, u3
     for (j = 5; j >= 0; j--) {
         for (i = n; i > 0; i--) {
             t = BSWAP64((u64)n * j + i);
-            UtilAc_Xor8(block, (u8 *)&t, block);
+            aeskw_xor64(block, (u8 *)&t, block);
             memcpy(block + 8, out + (i - 1) * sizeof(u64), 8);
             rijndaelDecrypt(rk, Nr, block, block);
             memcpy(out + (i - 1) * sizeof(u64), block + 8, 8);
@@ -2097,7 +2121,7 @@ static int UtilAc_AesUnwrap(u8 *out, const u8 *in, u32 length, const u8 *key, u3
     return result;
 }
 
-static void UtilAc_Xor8(const u8 *a, const u8 *b, u8 *out) {
+static void aeskw_xor64(const u8 *a, const u8 *b, u8 *out) {
     out[0] = a[0] ^ b[0];
     out[1] = a[1] ^ b[1];
     out[2] = a[2] ^ b[2];
@@ -2308,8 +2332,8 @@ static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt) {
     PUTU32(pt + 12, s3);
 }
 
-// RFC 1321's MD5 (md5c.c), as in GameSpy's copy in overlay 11 (lib/dwc/src/gamespy/md5c.c), with the functions named
-// after the reference's: UtilAc_MD5Init is its MD5Init, UtilAc_MD5Memcpy its MD5_memcpy, and so on
+// RFC 1321's MD5 (md5c.c), as in GameSpy's copy in overlay 11 (lib/dwc/src/gamespy/md5c.c), with the names that the
+// utility library gives it: the reference's own, but for MY_MD5Init, MY_MD5Update and MY_MD5Final, which it prefixes
 
 #define S11 7
 #define S12 12
@@ -2360,11 +2384,11 @@ static void rijndaelDecrypt(const u32 *rk, int Nr, const u8 *ct, u8 *pt) {
         (a) += (b);                                                                                                    \
     }
 
-static void UtilAc_MD5Init(HashContext *context) {
-    func_ov011_021719fcInline(context);
+static void MY_MD5Init(MD5_CTX *context) {
+    MD5InitInline(context);
 }
 
-static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen) {
+static void MY_MD5Update(MD5_CTX *context, const u8 *input, u32 inputLen) {
     u32 i;
     u32 index;
     u32 partLen;
@@ -2376,40 +2400,40 @@ static void UtilAc_MD5Update(HashContext *context, const u8 *input, u32 inputLen
     context->count[1] += (inputLen >> 29);
     partLen = 64 - index;
     if (inputLen >= partLen) {
-        UtilAc_MD5Memcpy(&context->buffer[index], input, partLen);
-        UtilAc_MD5Transform(context->state, context->buffer);
+        MD5_memcpy(&context->buffer[index], input, partLen);
+        MD5Transform(context->state, context->buffer);
         for (i = partLen; i + 63 < inputLen; i += 64) {
-            UtilAc_MD5Transform(context->state, &input[i]);
+            MD5Transform(context->state, &input[i]);
         }
         index = 0;
     } else {
         i = 0;
     }
-    UtilAc_MD5Memcpy(&context->buffer[index], &input[i], inputLen - i);
+    MD5_memcpy(&context->buffer[index], &input[i], inputLen - i);
 }
 
-static void UtilAc_MD5Final(u8 *digest, HashContext *context) {
+static void MY_MD5Final(u8 *digest, MD5_CTX *context) {
     u8 bits[8];
     u32 index;
     u32 padLen;
 
-    UtilAc_MD5Encode(bits, context->count, 8);
+    Encode(bits, context->count, 8);
     index = (context->count[0] >> 3) & 0x3f;
     padLen = (index < 56) ? (56 - index) : (120 - index);
-    UtilAc_MD5Update(context, PADDING, padLen);
-    UtilAc_MD5Update(context, bits, 8);
-    UtilAc_MD5Encode(digest, context->state, 16);
-    UtilAc_MD5Memset((char *)context, 0, sizeof(*context));
+    MY_MD5Update(context, PADDING, padLen);
+    MY_MD5Update(context, bits, 8);
+    Encode(digest, context->state, 16);
+    MD5_memset((char *)context, 0, sizeof(*context));
 }
 
-static void UtilAc_MD5Transform(u32 *state, const u8 *block) {
+static void MD5Transform(u32 *state, const u8 *block) {
     u32 a = state[0];
     u32 b = state[1];
     u32 c = state[2];
     u32 d = state[3];
     u32 x[16];
 
-    UtilAc_MD5Decode(x, block, 64);
+    Decode(x, block, 64);
 
     FF(a, b, c, d, x[0], S11, 0xd76aa478);
     FF(d, a, b, c, x[1], S12, 0xe8c7b756);
@@ -2484,10 +2508,10 @@ static void UtilAc_MD5Transform(u32 *state, const u8 *block) {
     state[2] += c;
     state[3] += d;
 
-    UtilAc_MD5Memset((char *)x, 0, sizeof(x));
+    MD5_memset((char *)x, 0, sizeof(x));
 }
 
-static void UtilAc_MD5Encode(u8 *output, const u32 *input, u32 length) {
+static void Encode(u8 *output, const u32 *input, u32 length) {
     u32 i;
     u32 j;
 
@@ -2499,7 +2523,7 @@ static void UtilAc_MD5Encode(u8 *output, const u32 *input, u32 length) {
     }
 }
 
-static void UtilAc_MD5Decode(u32 *output, const u8 *input, u32 length) {
+static void Decode(u32 *output, const u8 *input, u32 length) {
     u32 i;
     u32 j;
 
@@ -2509,7 +2533,7 @@ static void UtilAc_MD5Decode(u32 *output, const u8 *input, u32 length) {
     }
 }
 
-static void UtilAc_MD5Memcpy(u8 *output, const u8 *input, u32 length) {
+static void MD5_memcpy(u8 *output, const u8 *input, u32 length) {
     u32 i;
 
     for (i = 0; i < length; i++) {
@@ -2517,7 +2541,7 @@ static void UtilAc_MD5Memcpy(u8 *output, const u8 *input, u32 length) {
     }
 }
 
-static void UtilAc_MD5Memset(char *output, int value, u32 length) {
+static void MD5_memset(char *output, int value, u32 length) {
     u32 i;
 
     for (i = 0; i < length; i++) {
@@ -2526,19 +2550,19 @@ static void UtilAc_MD5Memset(char *output, int value, u32 length) {
 }
 
 // The 16 bytes of the MD5 of the data
-static void UtilAc_Md5(u8 *digest, const u8 *data, u32 length) {
-    HashContext context;
+static void MD5Encode(u8 *digest, const u8 *data, u32 length) {
+    MD5_CTX context;
 
-    UtilAc_MD5Init(&context);
-    UtilAc_MD5Update(&context, data, length);
-    UtilAc_MD5Final(digest, &context);
+    MY_MD5Init(&context);
+    MY_MD5Update(&context, data, length);
+    MY_MD5Final(digest, &context);
 }
 
-static u32 UtilAc_GetMilliseconds(void) {
+static u32 GetTickCount(void) {
     return OS_TicksToMilliSeconds(OS_GetTick());
 }
 
-static void *UtilAc_Calloc(int count, int size) {
+static void *Calloc(int count, int size) {
     int total = count * size;
     void *ptr = sAcAlloc(total);
 
@@ -2553,7 +2577,7 @@ static void UtilAc_Free(void *ptr) {
 }
 
 // Writes the two hex digits of a byte, in capitals; their count
-static int UtilAc_FormatHexByte(char *out, s8 value) {
+static int PutHex(char *out, s8 value) {
     char *p = out;
     u8 byte = value;
     int i;
@@ -2577,12 +2601,12 @@ static int UtilAc_FormatHexByte(char *out, s8 value) {
 }
 
 // Writes a MAC address as hex digits with colons; the count of the characters
-static int UtilAc_FormatMacAddress(char *out, const s8 *mac) {
+static int PutMac(char *out, const s8 *mac) {
     char *p = out;
     int i;
 
     for (i = 0; i < 6; i++) {
-        p += UtilAc_FormatHexByte(p, *mac++);
+        p += PutHex(p, *mac++);
         if (i < 5) {
             *p++ = ':';
         }
@@ -2591,8 +2615,8 @@ static int UtilAc_FormatMacAddress(char *out, const s8 *mac) {
     return p - out;
 }
 
-int DWCUtilAc_Start(u32 priority, int apCount, DWCUtilAcCallback callback, void *(*alloc)(u32 size),
-                    void (*free)(void *ptr), u32 stackSize) {
+int ATERMi_ApConfigStart(u32 priority, int apCount, DWCUtilAcCallback callback, void *(*alloc)(u32 size),
+                         void (*free)(void *ptr), u32 stackSize) {
     int result;
 
     if (sAcState >= AC_STATE_SCANNING && sAcState <= AC_STATE_KEY) {
@@ -2604,7 +2628,7 @@ int DWCUtilAc_Start(u32 priority, int apCount, DWCUtilAcCallback callback, void 
     sAcAlloc = alloc;
     sAcFree = free;
     sAcConfig.stackSize = stackSize;
-    result = UtilAc_StartWcm(apCount);
+    result = InitAtermApcNetwork(apCount);
     sAcWcmStarted = TRUE;
     if (result < 0) {
         sAcStatusResult = result;
@@ -2619,19 +2643,19 @@ int DWCUtilAc_Start(u32 priority, int apCount, DWCUtilAcCallback callback, void 
         sAcStatusResult = RESULT_NO_THREADS;
         return RESULT_NO_THREADS;
     }
-    OS_CreateThread(&sAcThread, UtilAc_Thread, NULL, (u8 *)sAcStack + (sAcConfig.stackSize & ~7), sAcConfig.stackSize,
-                    priority);
+    OS_CreateThread(&sAcThread, AutoConfigThread, NULL, (u8 *)sAcStack + (sAcConfig.stackSize & ~7),
+                    sAcConfig.stackSize, priority);
     sAcState = AC_STATE_SCANNING;
-    sAcConfig.deadline = UtilAc_GetMilliseconds() + 60000;
+    sAcConfig.deadline = GetTickCount() + 60000;
     sAcCancel = FALSE;
     memset(&sAcResult, 0, sizeof(sAcResult));
-    UtilAc_NotifyStatus();
+    SendNotify();
     OS_WakeupThreadDirect(&sAcThread);
     sAcRunning = TRUE;
     return RESULT_OK;
 }
 
-int DWCUtilAc_Cancel(void) {
+int ATERMi_ApConfigEnd(void) {
     if (sAcRunning) {
         int state = sAcState;
 
@@ -2652,11 +2676,11 @@ int DWCUtilAc_Cancel(void) {
         }
         sAcRunning = FALSE;
         if (state != sAcState) {
-            UtilAc_NotifyStatus();
+            SendNotify();
         }
     }
     if (sAcWcmStarted > 0) {
-        int result = UtilAc_EndWcm();
+        int result = FreeAtermApcNetwork();
 
         sAcWcmStarted = FALSE;
         return result;
@@ -2664,25 +2688,25 @@ int DWCUtilAc_Cancel(void) {
     return RESULT_BUSY;
 }
 
-static int UtilAc_GetStatus(DWCUtilAcStatus *status) {
+static int ATERMi_ApConfigGetState(ATERMApConfigState *status) {
     status->state = sAcState;
     if (sAcConfig.deadline == 0xffffffff) {
-        status->timeLeft = 0xffffffff;
+        status->timeout = 0xffffffff;
     } else {
-        status->timeLeft = sAcConfig.deadline - UtilAc_GetMilliseconds();
+        status->timeout = sAcConfig.deadline - GetTickCount();
     }
     status->result = sAcStatusResult;
     return 1;
 }
 
-BOOL DWCUtilAc_GetResult(DWCUtilAcResult *result) {
+BOOL ATERMi_ApConfigGetResult(ATERMApConfigParam *result) {
     memcpy(result, &sAcResult, sizeof(sAcResult));
     return TRUE;
 }
 
-static void UtilAc_NotifyStatus(void) {
-    DWCUtilAcStatus status;
+static void SendNotify(void) {
+    ATERMApConfigState status;
 
-    UtilAc_GetStatus(&status);
+    ATERMi_ApConfigGetState(&status);
     sAcCallback(&status);
 }

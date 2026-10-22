@@ -62,7 +62,7 @@ struct PMSIVWordWin {
 static void PMSIVWordWin_SetupActors(PMSIVWordWin *wk);
 static void PMSIVWordWin_ClearScrollArea(PMSIVWordWin *wk, int vector);
 static void PMSIVWordWin_ResetScroll(PMSIVWordWin *wk);
-static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, u32 index, u32 y);
+static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, unsigned int index, u32 y);
 
 PMSIVWordWin *PMSIVWordWin_Create(PMSInputView *vwk, const PMSInputWork *mwk, const PMSInputData *dwk) {
     PMSIVWordWin *wk = GFL_HeapAllocate(HEAPID_PMS_INPUT, sizeof(PMSIVWordWin), FALSE, "pmsiv_wordwin.c", 154);
@@ -389,7 +389,7 @@ static void PMSIVWordWin_ResetScroll(PMSIVWordWin *wk) {
     GFL_BGSysMoveBG(2, BG_MOVE_SET_Y, 8);
 }
 
-static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, u32 index, u32 y) {
+static void PMSIVWordWin_PrintWord(PMSIVWordWin *wk, unsigned int index, u32 y) {
     Font *font = PMSIView_GetFont(wk->vwk);
     int height;
     u32 x;

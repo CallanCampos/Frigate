@@ -15,9 +15,9 @@
 // GameSpy GP's connection and its main loop (gpi.c). The functions' names, from pret/pokerevo's Wii build (the later
 // SDK's for gpiInitialize and gpiDestroy), are in dwc/gp.h
 
-static BOOL gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data);
+static GPIBool gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data);
 
-int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
+GPResult gpiInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
     GPIConnection *iconnection;
     int i;
     int result;
@@ -30,10 +30,10 @@ int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int 
     memset(iconnection, 0, sizeof(GPIConnection));
     iconnection->errorString[0] = '\0';
     iconnection->errorCode = 0;
-    iconnection->infoCaching = TRUE;
-    iconnection->infoCachingBuddyAndBlockOnly = FALSE;
-    iconnection->simulation = FALSE;
-    iconnection->firewall = FALSE;
+    iconnection->infoCaching = gsi_true;
+    iconnection->infoCachingBuddyAndBlockOnly = gsi_false;
+    iconnection->simulation = gsi_false;
+    iconnection->firewall = gsi_false;
     iconnection->productID = productID;
     iconnection->namespaceID = namespaceID;
     iconnection->partnerID = partnerID;
@@ -60,7 +60,7 @@ int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int 
 void gpiDestroy(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
 
-    gpiDisconnect(connection, TRUE);
+    gpiDisconnect(connection, gsi_true);
     gpiStatusInfoKeysDestroy(connection);
     TableFree(iconnection->profileList.profileTable);
     gsifree(iconnection);
@@ -68,18 +68,18 @@ void gpiDestroy(GPConnection *connection) {
 }
 
 // Forgets what a profile knew of the last login, for gpiReset
-static BOOL gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data) {
+static GPIBool gpiResetProfile(GPConnection *connection, GPIProfile *profile, void *data) {
     profile->buddyStatus = NULL;
     profile->buddyStatusInfo = NULL;
     profile->authSig = NULL;
     profile->requestCount = 0;
     profile->peerSig = NULL;
-    profile->blocked = FALSE;
-    profile->buddyOrBlockCache = FALSE;
-    return TRUE;
+    profile->blocked = gsi_false;
+    profile->buddyOrBlockCache = gsi_false;
+    return gsi_true;
 }
 
-int gpiReset(GPConnection *connection) {
+GPResult gpiReset(GPConnection *connection) {
     GPIConnection *iconnection = *connection;
     int result;
 
@@ -135,7 +135,7 @@ int gpiReset(GPConnection *connection) {
     iconnection->profileid = 0;
     iconnection->sessKey = 0;
     iconnection->numSearches = 0;
-    iconnection->fatalError = FALSE;
+    iconnection->fatalError = gsi_false;
     iconnection->peerList = NULL;
     iconnection->lastStatusState = -1;
     iconnection->lastStatusString[0] = '\0';
@@ -144,19 +144,19 @@ int gpiReset(GPConnection *connection) {
     return 0;
 }
 
-int gpiProcessConnectionManager(GPConnection *connection) {
+GPResult gpiProcessConnectionManager(GPConnection *connection) {
     GPIConnection *iconnection;
     GPIOperation *operation;
     int len;
-    BOOL connClosed;
+    GPIBool connClosed;
     int result;
-    BOOL loop;
+    gsi_bool loop;
     char *next;
     char *input;
     char *str;
-    u32 now;
+    gsi_u32 now;
 
-    connClosed = FALSE;
+    connClosed = gsi_false;
     iconnection = *connection;
     now = current_time();
     do {
@@ -164,8 +164,8 @@ int gpiProcessConnectionManager(GPConnection *connection) {
         if (iconnection->outputBuffer.len > 0) {
             iconnection->kaTransmit = now;
         }
-        result =
-            gpiSendFromBuffer(connection, iconnection->cmSocket, &iconnection->outputBuffer, &connClosed, TRUE, "CM");
+        result = gpiSendFromBuffer(connection, iconnection->cmSocket, &iconnection->outputBuffer, &connClosed, gsi_true,
+                                   "CM");
         if (result != 0) {
             return result;
         }
@@ -183,7 +183,8 @@ int gpiProcessConnectionManager(GPConnection *connection) {
         while ((next = strstr(iconnection->socketBuffer.buffer, "\\final\\")) != NULL) {
             iconnection->kaTransmit = now;
             *next = '\0';
-            gsDebugFormat(1, 0, 0x20, "CMD: %s\n", iconnection->socketBuffer.buffer);
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_RawDump, "CMD: %s\n",
+                          iconnection->socketBuffer.buffer);
             len = next - iconnection->socketBuffer.buffer;
             if (len > iconnection->inputBufferSize) {
                 int increase = len;
@@ -210,7 +211,8 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                 int id = atol(str + 4);
 
                 if (!gpiFindOperationByID(connection, &operation, id)) {
-                    gsDebugFormat(1, 0, 1, "No matching operation found for id %d\n", id);
+                    gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
+                                  "No matching operation found for id %d\n", id);
                 } else {
                     result = gpiProcessOperation(connection, operation, iconnection->inputBuffer);
                     if (result != 0) {
@@ -218,7 +220,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                     }
                 }
             } else {
-                if (gpiCheckForError(connection, input, TRUE)) {
+                if (gpiCheckForError(connection, input, gsi_true)) {
                     return 4;
                 }
                 input = iconnection->inputBuffer;
@@ -229,7 +231,7 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                     }
                 } else if (strncmp(input, "\\ka\\", 4) != 0) {
                     if (strncmp(input, "\\lt\\", 4) == 0) {
-                        gpiValueForKey(input, "\\lt\\", iconnection->loginTicket.ticket, 25);
+                        gpiValueForKey(input, "\\lt\\", iconnection->loginTicket, 25);
                     } else if (strncmp(input, "\\bsi\\", 5) == 0) {
                         result = gpiProcessRecvBuddyStatusInfo(connection, input);
                         if (result != 0) {
@@ -246,12 +248,13 @@ int gpiProcessConnectionManager(GPConnection *connection) {
                             return result;
                         }
                     } else if (strncmp(input, "\\rar\\", 5) == 0) {
-                        result = gpiProcessRemoteAuthReply(connection, input);
+                        result = gpiProcessRemoteAuthResponse(connection, input);
                         if (result != 0) {
                             return result;
                         }
                     } else {
-                        gsDebugFormat(1, 0, 1, "Received an unrecognized message.\n");
+                        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_HotError,
+                                      "Received an unrecognized message.\n");
                     }
                 }
             }
@@ -274,12 +277,12 @@ int gpiProcessConnectionManager(GPConnection *connection) {
     return 0;
 }
 
-int gpiProcess(GPConnection *connection, int blockingOperationID) {
+GPResult gpiProcess(GPConnection *connection, int blockingOperationID) {
     GPIConnection *iconnection = *connection;
     GPIOperation *operation;
     GPIOperation *delOperation;
     int result = 0;
-    BOOL loop;
+    gsi_bool loop;
     int callbackResult;
 
     if (iconnection->connectState == GPI_CONNECTING) {
@@ -324,7 +327,7 @@ int gpiProcess(GPConnection *connection, int blockingOperationID) {
         return callbackResult;
     }
     if (iconnection->fatalError) {
-        gpiDisconnect(connection, FALSE);
+        gpiDisconnect(connection, gsi_false);
         gpiReset(connection);
     }
     return result;

@@ -366,12 +366,12 @@ static void ResearchRadar_LoadSubBG(HeapID heapId) {
 
     file = GFL_ArcToolReadHeapNew(handle, 9, heapId);
     NNS_G2dGetUnpackedPaletteData(file, &palette);
-    GFL_BGSysUploadStdPalette(RESEARCH_BG_SUB_BACK, palette->rawData, 0x200, 0);
+    GFL_BGSysUploadStdPalette(RESEARCH_BG_SUB_BACK, palette->pRawData, 0x200, 0);
     GFL_HeapFree(file);
 
     file = GFL_ArcToolReadHeapNew(handle, 10, heapId);
     NNS_G2dGetUnpackedBGCharacterData(file, &character);
-    GFL_BGSysLoadChar(RESEARCH_BG_SUB_BACK, character->rawData, character->size, 0);
+    GFL_BGSysLoadChar(RESEARCH_BG_SUB_BACK, character->pRawData, character->szByte, 0);
     GFL_HeapFree(file);
 
     file = GFL_ArcToolReadHeapNew(handle, 11, heapId);
@@ -405,12 +405,12 @@ static void ResearchRadar_LoadMainBG(HeapID heapId) {
 
     file = GFL_ArcToolReadHeapNew(handle, 0, heapId);
     NNS_G2dGetUnpackedPaletteData(file, &palette);
-    GFL_BGSysUploadStdPalette(RESEARCH_BG_MAIN_FRAME, palette->rawData, 0x200, 0);
+    GFL_BGSysUploadStdPalette(RESEARCH_BG_MAIN_FRAME, palette->pRawData, 0x200, 0);
     GFL_HeapFree(file);
 
     file = GFL_ArcToolReadHeapNew(handle, 1, heapId);
     NNS_G2dGetUnpackedBGCharacterData(file, &character);
-    GFL_BGSysLoadChar(RESEARCH_BG_MAIN_FRAME, character->rawData, character->size, 0);
+    GFL_BGSysLoadChar(RESEARCH_BG_MAIN_FRAME, character->pRawData, character->szByte, 0);
     GFL_HeapFree(file);
 
     file = GFL_ArcToolReadHeapNew(handle, 2, heapId);

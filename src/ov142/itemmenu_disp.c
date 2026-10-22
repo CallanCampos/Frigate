@@ -994,7 +994,7 @@ void ItemMenuDisp_ClearMsgWindow(ItemMenuWork *work) {
 // Opens the item menu with the messages of its entries
 void ItemMenuDisp_OpenItemMenu(ItemMenuWork *work, u32 *msgIds, s32 count) {
     AppTaskMenuInit init;
-    s32 i;
+    int i;
 
     init.heapId = work->heapId;
     init.itemCount = count;
@@ -1021,7 +1021,7 @@ void ItemMenuDisp_OpenItemMenu(ItemMenuWork *work, u32 *msgIds, s32 count) {
 // Opens the sort menu with the messages of its entries
 void ItemMenuDisp_OpenSortMenu(ItemMenuWork *work, u32 *msgIds, s32 count) {
     AppTaskMenuInit init;
-    s32 i;
+    int i;
 
     init.heapId = work->heapId;
     init.itemCount = count;
@@ -1299,12 +1299,12 @@ void ItemMenuDisp_DrawQuantityFrame(ItemMenuWork *work) {
 
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
         u16 *tiles = (u16 *)screen->rawData;
-        s32 count = (screen->width / 8) * (screen->height / 8);
+        s32 count = (screen->screenWidth / 8) * (screen->screenHeight / 8);
 
         for (; i < count; i++) {
             tiles[i] += (u16)work->bg3Chars | (3 << 12);
         }
-        GFL_BGSysLoadScrAreaAll(3, screen->rawData, 16, 12, screen->width / 8, screen->height / 8);
+        GFL_BGSysLoadScrAreaAll(3, screen->rawData, 16, 12, screen->screenWidth / 8, screen->screenHeight / 8);
         GFL_BGSysQueueScrLoad(3);
     }
     GFL_HeapFree(file);

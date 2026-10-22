@@ -69,7 +69,7 @@ int NHTTPi_DestroyConnection(NHttpConnection *connection) {
     if (NHTTPi_RemoveWaiter(mutexInfo, connection) > 0) {
         return 0;
     }
-    if (connection->request != NULL && connection->request->sent == 0) {
+    if (connection->request != NULL && connection->request->isStarted == 0) {
         NHTTP_DestroyRequest(root, connection->request);
     }
     if (connection->response != NULL) {
@@ -151,7 +151,7 @@ int NHTTPGetConnectionState(int handle) {
 int NHTTPGetBodyBuffer(int handle, char **buffer, int *size) {
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP());
     NHttpConnection *connection = NHTTPi_GetConnection(mutexInfo, (NHttpConnection *)handle);
-    NHttpResponse *response;
+    NHTTPRes *response;
 
     if (connection != NULL) {
         response = NHTTPi_Connection2Response(mutexInfo, connection);
@@ -168,7 +168,7 @@ int NHTTPGetBodyBuffer(int handle, char **buffer, int *size) {
 void *NHTTPGetUserParam(int handle) {
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP());
     NHttpConnection *connection = NHTTPi_GetConnection(mutexInfo, (NHttpConnection *)handle);
-    NHttpResponse *response;
+    NHTTPRes *response;
 
     if (connection != NULL) {
         response = NHTTPi_Connection2Response(mutexInfo, connection);
@@ -195,7 +195,7 @@ int NHTTPGetConnectionError(int handle) {
 int NHTTPGetProgress(int handle, int *received, int *size) {
     NHttpMutexInfo *mutexInfo = NHTTPi_GetMutexInfoP(NHTTPi_GetSystemInfoP());
     NHttpConnection *connection = NHTTPi_GetConnection(mutexInfo, (NHttpConnection *)handle);
-    NHttpResponse *response;
+    NHTTPRes *response;
 
     if (connection != NULL) {
         response = NHTTPi_Connection2Response(mutexInfo, connection);

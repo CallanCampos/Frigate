@@ -26,7 +26,7 @@ static void buildingEnterVBlankCallback(void *data) {
         zoom = sEffect.scale + sScaleStep;
         sEffect.scale = zoom;
         scale = FX32_CONST(1.0f / zoom);
-        MAT2_Scaling(&mtx, scale, scale);
+        MTX_Scale22_(&mtx, scale, scale);
         G2_SetBG2Affine(&mtx, 128, 92, 0, 0);
     }
 }

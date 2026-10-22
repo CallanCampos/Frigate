@@ -17,20 +17,20 @@ struct DWCUtilOamNode {
     u8 count;
 };
 
-void DWCUtilOam_Init(void);
-void DWCUtilOam_Exit(void);
+void DWCi_CELLlInit(void);
+void DWCi_CELLlEnd(void);
 // A run of count entries, the first free one from the front if fromFront, else from the back
-DWCUtilOamNode *DWCUtilOam_Alloc(int screen, int count, BOOL fromFront);
+DWCUtilOamNode *DWCi_CELLlForm(int screen, int count, BOOL fromFront);
 // Hides the run's entries and frees it
-void DWCUtilOam_Free(DWCUtilOamNode *node);
-GXOamAttr *DWCUtilOam_GetEntry(DWCUtilOamNode *node, int index);
-int DWCUtilOam_GetCount(DWCUtilOamNode *node);
+void DWCi_CELLlDelete(DWCUtilOamNode *node);
+GXOamAttr *DWCi_CELLlGetObj(DWCUtilOamNode *node, int index);
+int DWCi_CELLlGetObjNum(DWCUtilOamNode *node);
 // The functions that change the run's entries change the one at index, or every entry if index is negative
-void DWCUtilOam_SetEffect(DWCUtilOamNode *node, int index, int effect, int rsParam);
-void DWCUtilOam_SetMode(DWCUtilOamNode *node, int index, int mode, int cParam);
+void DWCi_CELLlSetEffect(DWCUtilOamNode *node, int index, int effect, int rsParam);
+void DWCi_CELLlSetPalette(DWCUtilOamNode *node, int index, int mode, int cParam);
 // Moves the entry, or the whole run with its first entry at (x, y)
-void DWCUtilOam_SetNodePosition(DWCUtilOamNode *node, int index, int x, int y);
-void DWCUtilOam_SetPriority(DWCUtilOamNode *node, int index, int priority);
-void DWCUtilOam_GetNodePosition(DWCUtilOamNode *node, int index, int *x, int *y);
+void DWCi_CELLlSetPosition(DWCUtilOamNode *node, int index, int x, int y);
+void DWCi_CELLlSetPriority(DWCUtilOamNode *node, int index, int priority);
+void DWCi_CELLlGetPosition(DWCUtilOamNode *node, int index, int *x, int *y);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_OAM_H

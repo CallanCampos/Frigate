@@ -684,7 +684,7 @@ static inline void WipeLineWnd_SetLine(WipeLineWnd *lines, int index, s32 line) 
 
 static void WipeLineWnd_HBlank(void *data) {
     WipeLineWnd *lines = data;
-    s32 line = GX_GetVCount();
+    int line = GX_GetVCount();
 
     if (line < 192) {
         line++;

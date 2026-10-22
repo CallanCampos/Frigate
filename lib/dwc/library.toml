@@ -1,5 +1,5 @@
 # Nintendo's DWC (Wi-Fi Connection), built apart from the game with dsi/1.2. Every file compiles alike under dsi/1.1p1
-# and dsi/1.2 in both versions except dwc_account.c, whose DWCi_Acc_CreateLoginId loads entropy[i] through its own
+# and dsi/1.2 in both versions except dwc_account.c, whose DWCi_Acc_CreateTempLoginId loads entropy[i] through its own
 # indexed address only from dsi/1.2 on (to dsi/1.3p1), as the original does. Most of DWC in
 # overlays 189 and 260 is Thumb code, so Thumb is the default here; the voice chat library libVCT (overlay 29, vct/) is
 # ARM code at -O4,p and is set per file below. Probed on libVCT in all of dsi/1.1 to dsi/1.6sp2, 2.0/* and 1.2/*: dsi/1.1
@@ -34,7 +34,7 @@ flags = [
 "vct/vct_buffer.c" = ["-nothumb"]
 "vct/vct_session.c" = ["-nothumb", "-ipa file"]
 # vct_dsp.c was one file once, but the ROM's range of it is four, each with its own `-ipa file` layout: the `.bss` runs
-# `sPacketPool`; `sNoiseFloor` with `sLoudnessHistory`; and `sEcho` with its arrays and buffers are each sorted by size
+# `sPacketPool`; `sNoiseFloor` with `E2scales`; and `sEcho` with its arrays and buffers are each sorted by size
 # (the 2-byte `shift` first), which one file's statics could not be. The packet pool and the mixer compile alike with
 # or without it
 "vct/vct_packet_pool.c" = ["-nothumb"]
@@ -55,10 +55,10 @@ flags = [
 "ghttp/ghttpEncryption.c" = ["-ipa file"]
 # The authentication service (overlay 260) has its 257-byte RSA modulus in a section of its own, 4-aligned after the
 # exponent, which only -ipa file gives
-"auth/dwc_auth.c" = ["-ipa file"]
+"auth/AuthService.c" = ["-ipa file"]
 # The connection test (overlay 11) reaches its globals from one base
 "auth/dwc_conntest.c" = ["-ipa file"]
-# The profanity check (overlay 11) has DWCi_Prof_ParseResult's local table of field names, and its strings, at the head
+# The profanity check (overlay 11) has DWCi_Prof_ParseResponse's local table of field names, and its strings, at the head
 # of its .data, as -ipa file sorts local initializers ahead of the functions' strings
 "auth/dwc_profanity.c" = ["-ipa file"]
 # Each root certificate of the HTTPS connection (overlay 11) is a file of its own whose name and key, of 64 bytes or

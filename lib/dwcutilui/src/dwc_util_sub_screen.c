@@ -57,15 +57,15 @@ static void *sSubScreenData;
 void DWCUtilSubScreen_SlideInRow(int step) {
     int i;
 
-    sSubScreenRow = DWCUtilHeap_AllocClear(sizeof(DWCUtilSubScreenRow), 4);
+    sSubScreenRow = DWCi_HEAPlAllocEx(sizeof(DWCUtilSubScreenRow), 4);
     for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
         sSubScreenRow->objects[i] = DWCUtilCell_AllocOamRun(1, sSubScreenCells[step][i], TRUE);
-        DWCUtilOam_SetPriority(sSubScreenRow->objects[i], -1, 0);
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, -42, sSubScreenPositions[i][1]);
-        DWCUtilOam_SetMode(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
+        DWCi_CELLlSetPriority(sSubScreenRow->objects[i], -1, 0);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, -42, sSubScreenPositions[i][1]);
+        DWCi_CELLlSetPalette(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
     }
-    sSubScreenRow->task = DWCUtilTask_Create(0, DWCUtilSubScreen_SlideInObject0Task, NULL, 120);
-    DWCUtilSubScreen_LoadScreen(step);
+    sSubScreenRow->task = DWCi_TSKlForm(0, DWCUtilSubScreen_SlideInObject0Task, NULL, 120);
+    DWCi_STEPlChangeScr(step);
     DWCUtilSound_PlaySe(0xd);
 }
 
@@ -75,18 +75,18 @@ static void DWCUtilSubScreen_SlideInObject0Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[0], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[0], 0, &x, &y);
     x += 8;
     if (x < 0x20 || x > 0x100) {
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x20;
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject1Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject1Task);
     }
 }
 
@@ -95,18 +95,18 @@ static void DWCUtilSubScreen_SlideInObject1Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[1], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[1], 0, &x, &y);
     x += 8;
     if (x < 0x50 || x > 0x100) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x50;
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject2Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject2Task);
     }
 }
 
@@ -115,18 +115,18 @@ static void DWCUtilSubScreen_SlideInObject2Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[2], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[2], 0, &x, &y);
     x += 8;
     if (x < 0x68 || x > 0x100) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x68;
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject3Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject3Task);
     }
 }
 
@@ -135,18 +135,18 @@ static void DWCUtilSubScreen_SlideInObject3Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[3], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[3], 0, &x, &y);
     x += 8;
     if (x < 0x98 || x > 0x100) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x98;
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInObject4Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInObject4Task);
     }
 }
 
@@ -154,40 +154,40 @@ static void DWCUtilSubScreen_SlideInObject4Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[4], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[4], 0, &x, &y);
     x += 8;
     if (x < 0xb0 || x > 0x100) {
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[4], -1, x, 0x21);
     } else {
         x = 0xb0;
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideInDoneTask);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideInDoneTask);
     }
 }
 
 static void DWCUtilSubScreen_SlideInDoneTask(DWCUtilTask *task, void *arg) {
-    DWCUtilTask_QueueRemoval(0, task);
+    DWCi_TSKlDelete(0, task);
     sSubScreenRow->task = NULL;
 }
 
-void DWCUtilSubScreen_SlideOutRow(void) {
+void DWCi_STEPlEnd(void) {
     sSubScreenRow->leaving = TRUE;
-    sSubScreenRow->task = DWCUtilTask_Create(0, DWCUtilSubScreen_SlideOutObject4Task, NULL, 120);
+    sSubScreenRow->task = DWCi_TSKlForm(0, DWCUtilSubScreen_SlideOutObject4Task, NULL, 120);
 }
 
-void DWCUtilSubScreen_ChangeRow(int step) {
+void DWCi_STEPlChange(int step) {
     int i;
 
     for (i = 0; i < SUB_SCREEN_OBJECTS; i += 2) {
-        DWCUtilCell_Copy(1, sSubScreenCells[step][i], DWCUtilOam_GetEntry(sSubScreenRow->objects[i], 0));
-        DWCUtilOam_SetPriority(sSubScreenRow->objects[i], -1, 0);
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, sSubScreenPositions[i][0], sSubScreenPositions[i][1]);
-        DWCUtilOam_SetMode(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
+        DWCUtilCell_Copy(1, sSubScreenCells[step][i], DWCi_CELLlGetObj(sSubScreenRow->objects[i], 0));
+        DWCi_CELLlSetPriority(sSubScreenRow->objects[i], -1, 0);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, sSubScreenPositions[i][0], sSubScreenPositions[i][1]);
+        DWCi_CELLlSetPalette(sSubScreenRow->objects[i], -1, 0, sSubScreenPalettes[step][i]);
     }
-    DWCUtilSubScreen_LoadScreen(step);
+    DWCi_STEPlChangeScr(step);
 }
 
-BOOL DWCUtilSubScreen_IsSliding(void) {
+BOOL DWCi_STEPlGet(void) {
     if (sSubScreenRow->task != NULL) {
         return TRUE;
     }
@@ -200,14 +200,14 @@ static void DWCUtilSubScreen_SlideOutObject4Task(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[4], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[4], 0, &x, &y);
     x -= 8;
     if (x > 0x98) {
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[4], -1, x, 0x21);
     } else {
         x = 0x98;
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[4], -1, x, 0x21);
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject3Task);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[4], -1, x, 0x21);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject3Task);
     }
 }
 
@@ -216,18 +216,18 @@ static void DWCUtilSubScreen_SlideOutObject3Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[3], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[3], 0, &x, &y);
     x -= 8;
     if (x > 0x68) {
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x68;
         for (i = 3; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject2Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject2Task);
     }
 }
 
@@ -236,18 +236,18 @@ static void DWCUtilSubScreen_SlideOutObject2Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[2], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[2], 0, &x, &y);
     x -= 8;
     if (x > 0x50) {
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x50;
         for (i = 2; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject1Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject1Task);
     }
 }
 
@@ -256,18 +256,18 @@ static void DWCUtilSubScreen_SlideOutObject1Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[1], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[1], 0, &x, &y);
     x -= 8;
     if (x > 0x20) {
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
     } else {
         x = 0x20;
         for (i = 1; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+            DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
         }
-        DWCUtilTask_SetCallback(task, DWCUtilSubScreen_SlideOutObject0Task);
+        DWCi_TSKlChangeFunc(task, DWCUtilSubScreen_SlideOutObject0Task);
     }
 }
 
@@ -277,21 +277,21 @@ static void DWCUtilSubScreen_SlideOutObject0Task(DWCUtilTask *task, void *arg) {
     int y;
     int i;
 
-    DWCUtilOam_GetNodePosition(sSubScreenRow->objects[0], 0, &x, &y);
+    DWCi_CELLlGetPosition(sSubScreenRow->objects[0], 0, &x, &y);
     x -= 8;
     for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-        DWCUtilOam_SetNodePosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
+        DWCi_CELLlSetPosition(sSubScreenRow->objects[i], -1, x, sSubScreenPositions[i][1]);
     }
     if (x <= 0x1d6 && x >= 0x100) {
-        DWCUtilTask_QueueRemoval(0, task);
+        DWCi_TSKlDelete(0, task);
         for (i = 0; i < SUB_SCREEN_OBJECTS; i++) {
-            DWCUtilOam_Free(sSubScreenRow->objects[i]);
+            DWCi_CELLlDelete(sSubScreenRow->objects[i]);
         }
-        DWCUtilHeap_FreeAndNull(&sSubScreenRow);
+        DWCi_HEAPlFree_(&sSubScreenRow);
     }
 }
 
-BOOL DWCUtilSubScreen_IsNotSlidingOut(void) {
+BOOL DWCi_STEPlIsEnd(void) {
     DWCUtilSubScreenRow *row = sSubScreenRow;
 
     if (row == NULL) {
@@ -303,14 +303,14 @@ BOOL DWCUtilSubScreen_IsNotSlidingOut(void) {
     return FALSE;
 }
 
-void DWCUtilSubScreen_LoadScreen(int screen) {
-    sSubScreenData = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(sSubScreenNames[screen]), NULL, 4);
-    DWCUtilTask_Create(1, DWCUtilSubScreen_LoadScreenTask, NULL, 120);
+void DWCi_STEPlChangeScr(int screen) {
+    sSubScreenData = DWCUtilRomResource_LoadFile(DWCi_Char(sSubScreenNames[screen]), NULL, 4);
+    DWCi_TSKlForm(1, DWCUtilSubScreen_LoadScreenTask, NULL, 120);
 }
 
 static void DWCUtilSubScreen_LoadScreenTask(DWCUtilTask *task, void *arg) {
     DC_FlushRange(sSubScreenData, 0x600);
     GXS_LoadBG1Scr(sSubScreenData, 0, 0x600);
-    DWCUtilRomResource_FreeFile(sSubScreenData);
-    DWCUtilTask_QueueRemoval(1, task);
+    DWCi_ARClRelease(sSubScreenData);
+    DWCi_TSKlDelete(1, task);
 }

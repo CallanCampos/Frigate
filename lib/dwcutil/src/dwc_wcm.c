@@ -4,7 +4,9 @@
 #include "nitro/os.h"
 
 // The wrapper that DWC's settings put around the wireless connection manager (WCM, see wcm.h): one operation runs at a
-// time, a state says which, and a callback is told how each ends. The ROM names none of it; the names are ours.
+// time, a state says which, and a callback is told how each ends. The ROM names none of it; the names are
+// the DWC utility library's own, as that library's symbols and debug information have them (its apc.c), where the code
+// shows them, and ours elsewhere.
 
 // Where the wrapper is
 enum {
@@ -23,7 +25,7 @@ typedef struct {
     void *wcmWork;           // 0x00
     u32 searchOption;        // 0x04
     WCMConfig *config;       // 0x08
-    u32 connectOption;       // 0x0c, passed to WCM_SetSearchOption during connection setup
+    u32 connectOption;       // 0x0c, passed to WCM_UpdateOption during connection setup
     const u8 *bssid;         // 0x10
     const u8 *essid;         // 0x14
     int state;               // 0x18
@@ -37,10 +39,10 @@ static u8 sEssid[0x20];
 static u8 sBssid[6];
 static WcmWrapper sWcm;
 
-static void WcmNotify(WCMNotice *notice);
-static BOOL WcmAbort(void);
+static void APCi_Notify(WCMNotice *notice);
+static BOOL APCi_MoveIdleState(void);
 
-static void WcmNotify(WCMNotice *notice) {
+static void APCi_Notify(WCMNotice *notice) {
     if (notice == NULL) {
         return;
     }
@@ -210,7 +212,7 @@ static void WcmNotify(WCMNotice *notice) {
 }
 
 // Stops what the state says is under way, and reports whether the WCM took it
-static BOOL WcmAbort(void) {
+static BOOL APCi_MoveIdleState(void) {
     switch (sWcm.state) {
     case STATE_SEARCHING:
         if (WCM_SearchAsync(NULL, NULL, 0) != WCM_RESULT_ACCEPT) {
@@ -223,7 +225,7 @@ static BOOL WcmAbort(void) {
         }
         break;
     case STATE_INITIALIZED:
-        if (WCM_StartupAsync(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sWcm.config, APCi_Notify) != WCM_RESULT_ACCEPT) {
             return FALSE;
         }
         break;
@@ -239,7 +241,7 @@ static BOOL WcmAbort(void) {
     return TRUE;
 }
 
-int DWC_Wcm_GetApList(void *dest, int max) {
+int APC_GetAPList(void *dest, int max) {
     u8 *out = dest;
     int count;
     int i;
@@ -259,7 +261,7 @@ int DWC_Wcm_GetApList(void *dest, int max) {
     return count;
 }
 
-BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 option) {
+BOOL APC_SearchStart(const u8 *bssid, const u8 *essid, int essidLength, u32 option) {
     u32 irq = OS_DisableInterrupts();
     int i;
 
@@ -271,7 +273,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         sWcm.bssid = sBssid;
     } else {
         MI_CpuFill8(sBssid, 0xff, 6);
-        sWcm.bssid = WCMiAnyBssid;
+        sWcm.bssid = WCM_Bssid_Any;
     }
     if (essid != NULL && essidLength > 0 && essidLength <= 0x20) {
         for (i = 0; i < essidLength; i++) {
@@ -283,7 +285,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
         sWcm.essid = sEssid;
     } else {
         MI_CpuFill8(sEssid, 0xff, 0x20);
-        sWcm.essid = WCMiAnyEssid;
+        sWcm.essid = WCM_Essid_Any;
     }
     if (sWcm.state == STATE_IDLE) {
         if (WCM_SearchAsync(sWcm.bssid, sWcm.essid, sWcm.searchOption) == WCM_RESULT_ACCEPT) {
@@ -291,7 +293,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
             OS_RestoreInterrupts(irq);
             return TRUE;
         }
-    } else if (WcmAbort() == TRUE) {
+    } else if (APCi_MoveIdleState() == TRUE) {
         sWcm.state = STATE_SEARCH_STARTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
@@ -300,7 +302,7 @@ BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 optio
     return FALSE;
 }
 
-BOOL DWC_Wcm_EndSearch(void) {
+BOOL APC_SearchEnd(void) {
     u32 irq = OS_DisableInterrupts();
 
     if (sWcm.state == STATE_SEARCHING && WCM_SearchAsync(NULL, NULL, 0) == WCM_RESULT_ACCEPT) {
@@ -312,7 +314,7 @@ BOOL DWC_Wcm_EndSearch(void) {
     return FALSE;
 }
 
-BOOL DWC_Wcm_Disconnect(void) {
+BOOL APC_Disconnect(void) {
     u32 irq = OS_DisableInterrupts();
 
     if (sWcm.state == STATE_CONNECTED && WCM_DisconnectAsync() == WCM_RESULT_ACCEPT) {
@@ -324,7 +326,7 @@ BOOL DWC_Wcm_Disconnect(void) {
     return FALSE;
 }
 
-BOOL DWC_Wcm_Cleanup(void) {
+BOOL APC_End(void) {
     u32 irq = OS_DisableInterrupts();
 
     if (sWcm.state == STATE_IDLE) {
@@ -336,7 +338,7 @@ BOOL DWC_Wcm_Cleanup(void) {
         OS_RestoreInterrupts(irq);
         return TRUE;
     }
-    if (WcmAbort() == TRUE) {
+    if (APCi_MoveIdleState() == TRUE) {
         sWcm.state = STATE_CLEANING_UP;
         OS_RestoreInterrupts(irq);
         return TRUE;
@@ -345,7 +347,7 @@ BOOL DWC_Wcm_Cleanup(void) {
     return FALSE;
 }
 
-BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
+BOOL APC_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
     u32 irq = OS_DisableInterrupts();
 
     sWcm.connectOption = option;
@@ -355,7 +357,7 @@ BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
         MI_CpuFill8(sWcm.wepDesc, 0, 0x50);
     }
     MIi_CpuCopy32(bssDesc, sWcm.bssDesc, 0xc0);
-    if (WcmAbort() == TRUE) {
+    if (APCi_MoveIdleState() == TRUE) {
         sWcm.state = STATE_CONNECTING;
         OS_RestoreInterrupts(irq);
         return TRUE;
@@ -370,7 +372,7 @@ BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option) {
     return FALSE;
 }
 
-BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size) {
+BOOL APC_Init(DWCWcmCallback callback, void *work, u32 size) {
     u32 irq = OS_DisableInterrupts();
     u8 *buf = work;
 
@@ -391,7 +393,7 @@ BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size) {
         sWcm.state = STATE_INITIALIZED;
     }
     if (sWcm.state == STATE_INITIALIZED) {
-        if (WCM_StartupAsync(sWcm.config, WcmNotify) != WCM_RESULT_ACCEPT) {
+        if (WCM_StartupAsync(sWcm.config, APCi_Notify) != WCM_RESULT_ACCEPT) {
             OS_RestoreInterrupts(irq);
             return FALSE;
         }

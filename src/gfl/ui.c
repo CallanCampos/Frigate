@@ -42,13 +42,13 @@ void GFL_HIDInit(HeapID heapId, u32 mode) {
     ui->mode = mode;
     ui->batteryLevel = 5;
     if (mode == 0) {
-        u32 backlight;
+        PMBackLightSwitch backlight;
 
         PM_GetBackLight(NULL, &backlight);
         ui->backlight = backlight;
     }
     if (mode == 1) {
-        u32 backlight;
+        PMBackLightSwitch backlight;
 
         PM_GetBackLight(NULL, &backlight);
         ui->backlight = backlight;
@@ -245,7 +245,7 @@ static void CallLidOpenCallback(SystemUI *ui) {
 // Reads the battery level every ten seconds
 static void battery(void) {
     u16 level;
-    u32 battery;
+    PMBattery battery;
 
     if (OS_GetVBlankCount() % 600 == 1) {
         if (OS_IsRunOnTwl()) {
@@ -337,8 +337,8 @@ static void sleepSetup(void) {
 void GFL_HIDDoSoftReset(u32 parameter) {
     SystemUI *ui = GCTX_HIDGetInstance();
 
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
+    GX_SetMasterBrightness(16);
+    GXS_SetMasterBrightness(16);
     GFL_NetExit(0);
     for (;;) {
         if (GFL_NetIsNotInitialized() && CARD_TryWaitBackupAsync()) {

@@ -53,7 +53,7 @@ struct WipeHBlank {
 };
 
 // Starts a wipe of the screens mode picks, with the pattern typeMain or typeSub over division steps of sync frames
-void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, int division, int sync, u32 heapId);
+void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, s32 division, s32 sync, u32 heapId);
 // Runs a frame of the wipe
 void GFL_WipeMain(void);
 BOOL GFL_WipeIsFinished(void);

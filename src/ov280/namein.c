@@ -668,7 +668,7 @@ static void KeyHighlight_Init(KeyHighlight *highlight, u32 type, NameEntryObjs *
         highlight->actors[i] = NameEntryObjs_Get(objs, 18 + i);
     }
     file = GFL_G2DIOReadNCLR(ARCID_NAMEIN_GRAPHIC, 2, &palette, heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     for (i = 0; i < 16; i++) {
         highlight->baseColor[i] = colors[16 + i];
     }

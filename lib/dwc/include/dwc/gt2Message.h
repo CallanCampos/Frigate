@@ -1,29 +1,29 @@
 #ifndef POKEBW2_DWC_GT2MESSAGE_H
 #define POKEBW2_DWC_GT2MESSAGE_H
 
-#include "types.h"
 #include "dwc/gt2Main.h"
+#include "dwc/nonport.h"
 
 // The messages of GameSpy's GT2 (gt2Message.c), in overlay 11: receiving datagrams and handling them, and building
-// the messages a connection sends. Each returns FALSE when a callback closed the socket. The file and its functions
+// the messages a connection sends. Each returns gsi_false when a callback closed the socket. The file and its functions
 // are named after GameSpy's, as pret/pokerevo's Wii build has them (asm/SDK/DWC/gamespy/gt2Message.s) and GameSpy's
 // gt2Message.c names them
 
 // The socket errors of a datagram to an address
-BOOL gti2HandleConnectionReset(GTI2Socket *socket, u32 ip, u16 port);
-BOOL gti2HandleHostUnreachable(GTI2Socket *socket, u32 ip, u16 port, BOOL send);
+GT2Bool gti2HandleConnectionReset(GT2Socket socket, unsigned int ip, unsigned short port);
+GT2Bool gti2HandleHostUnreachable(GT2Socket socket, unsigned int ip, unsigned short port, GT2Bool send);
 // Handles every datagram waiting on the socket
-BOOL gti2ReceiveMessages(GTI2Socket *socket);
-BOOL gti2SendClientChallenge(GTI2Connection *connection, const u8 *challenge);
-BOOL gti2SendAccept(GTI2Connection *connection);
-BOOL gti2SendReject(GTI2Connection *connection, const void *message, int length);
-BOOL gti2SendClose(GTI2Connection *connection);
-BOOL gti2SendKeepAlive(GTI2Connection *connection);
-BOOL gti2SendAck(GTI2Connection *connection);
+GT2Bool gti2ReceiveMessages(GT2Socket socket);
+GT2Bool gti2SendClientChallenge(GT2Connection connection, const char challenge[]);
+GT2Bool gti2SendAccept(GT2Connection connection);
+GT2Bool gti2SendReject(GT2Connection connection, const GT2Byte *message, int length);
+GT2Bool gti2SendClose(GT2Connection connection);
+GT2Bool gti2SendKeepAlive(GT2Connection connection);
+GT2Bool gti2SendAck(GT2Connection connection);
 // Tells the peer the connection is closed
-BOOL gti2SendClosed(GTI2Connection *connection);
+GT2Bool gti2SendClosed(GT2Connection connection);
 // gti2ResendMessage resends a reliable message the peer hasn't acked, and gti2Send sends the app's message
-BOOL gti2ResendMessage(GTI2Connection *connection, GTI2OutgoingMessage *message);
-BOOL gti2Send(GTI2Connection *connection, const void *message, int length, BOOL reliable);
+GT2Bool gti2ResendMessage(GT2Connection connection, GTI2OutgoingBufferMessage *message);
+GT2Bool gti2Send(GT2Connection connection, const GT2Byte *message, int length, GT2Bool reliable);
 
 #endif // POKEBW2_DWC_GT2MESSAGE_H

@@ -601,7 +601,7 @@ void func_ov033_021782f4(FieldScriptEnv *env, GameData *gameData, MysteryGift *g
     PlayerInfo *playerInfo;
     TrainerCardSave *card;
     u32 value;
-    u32 i;
+    unsigned int i;
 
     playerInfo = GetGameDataPlayerInfo(gameData);
     card = getTrainerCardDataBlkAddress(gameData);

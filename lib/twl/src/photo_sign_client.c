@@ -24,7 +24,7 @@ typedef struct {
     u8 *mac;
 } MacParam;
 
-static void PhotoSign_FifoCallback(u32 fifoTag, u32 data, BOOL err);
+static void PhotoSign_FifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err);
 static int PhotoSign_WaitResult(void);
 
 static OSMessage sMessages[1];
@@ -35,7 +35,7 @@ static BOOL sInitialized;
 
 // Takes the words the ARM7 sends: a MAC's result goes to the callback and ends the command, another result to the
 // thread that waits for it
-static void PhotoSign_FifoCallback(u32 fifoTag, u32 data, BOOL err) {
+static void PhotoSign_FifoCallback(PXIFifoTag fifoTag, u32 data, BOOL err) {
     u32 command;
 
     if (err) {

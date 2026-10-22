@@ -510,7 +510,7 @@ static void PokeList_InitGraphics(PokeListWork *wk) {
     ClActSys_Create(&clactSetup, &vramConfig, wk->heapId);
     GFL_BGSysSetBGEnabledA(GX_PLANEMASK_OBJ, TRUE);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
-    GfdClearVramTransferQueue();
+    NNS_GfdClearVramTransferManagerTask();
 }
 
 void PokeList_CreateBG0(PokeListWork *wk) {
@@ -541,7 +541,7 @@ void PokeList_Init3D(PokeListWork *wk) {
 }
 
 static void PokeList_ExitGraphics(PokeListWork *wk) {
-    GfdClearVramTransferQueue();
+    NNS_GfdClearVramTransferManagerTask();
     ClActSys_Delete();
     PokeList_ReleaseBG0(wk);
     GFL_BGSysReleaseBG(3);

@@ -560,8 +560,8 @@ static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void DebugGameStart_InitBG(DebugGameStartWork *wk) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetVRAMBanks(&sDebugVRAMConfig);

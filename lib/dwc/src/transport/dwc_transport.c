@@ -10,13 +10,14 @@
 #include "nitro/os.h"
 
 // GT2's send, which the pool sends again through
-typedef int (*DWCTransportSendFunc)(GTI2Connection *connection, const void *message, int length, BOOL reliable);
+typedef GT2Result (*DWCTransportSendFunc)(GT2Connection connection, const GT2Byte *message, int length,
+                                          GT2Bool reliable);
 
 // The header that comes before the game's data and the match's own: its size and kind, and the marks "DT"
 typedef struct DWCTransportHeader {
     u32 size;
     u16 type;
-    char magic[2];
+    char magicStrings[2];
 } DWCTransportHeader;
 
 // The file's own functions, which aren't static: as statics MWCC inlines the small ones into their callers
@@ -25,7 +26,7 @@ void DWCs_ClearSendPool(void);
 BOOL DWCs_HasSendPoolSpace(void);
 BOOL DWCs_FlushSendPool(void);
 BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send);
-BOOL DWCs_AddToSendPool(GTI2Connection *connection, const void *data, int size);
+BOOL DWCs_AddToSendPool(GT2Connection connection, const void *data, int size);
 BOOL DWCi_IsSendableReliable(u8 aid, int type);
 void DWCs_EncodeHeader(DWCTransportHeader *header, int type, int size);
 u16 DWCs_DecodeHeader(const void *data);
@@ -36,17 +37,17 @@ DWCTransportConnection *DWCs_GetTransConnection(u8 aid);
 u8 DWCs_GetSendState(u8 aid);
 u8 DWCs_GetRecvState(u8 aid);
 void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable);
-void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, int size);
-void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, int size);
+void DWCs_HandleReliableMessage(GT2Connection connection, const void *data, int size);
+void DWCs_HandleUnreliableMessage(GT2Connection connection, const void *data, int size);
 void DWCs_RecvDataHeader(u8 aid, const void *data, int size);
 void DWCs_RecvDataBody(u8 aid, const void *data, int size);
 void DWCs_RecvSystemDataBody(u8 aid, const void *data, int size);
 int DWCs_GetOutgoingBufferFreeSize(u8 aid);
-void DWCs_ResetLastRecvTime(GTI2Connection *connection);
+void DWCs_ResetLastRecvTime(GT2Connection connection);
 
 // A copy of data that GT2 could not take yet, to be sent again to its connection
 typedef struct TransportSendNode {
-    GTI2Connection *connection;
+    GT2Connection connection;
     void *data;
     int size;
     struct TransportSendNode *next;
@@ -93,7 +94,7 @@ BOOL DWCs_HasSendPoolSpace(void) {
 }
 
 BOOL DWCs_FlushSendPool(void) {
-    return DWCs_FlushSendPoolWith(func_ov011_0217d290);
+    return DWCs_FlushSendPoolWith(gt2Send);
 }
 
 BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
@@ -130,7 +131,7 @@ BOOL DWCs_FlushSendPoolWith(DWCTransportSendFunc send) {
     return node == NULL;
 }
 
-BOOL DWCs_AddToSendPool(GTI2Connection *connection, const void *data, int size) {
+BOOL DWCs_AddToSendPool(GT2Connection connection, const void *data, int size) {
     TransportSendNode **link = &sSendPool.head;
     TransportSendNode *node;
 
@@ -185,7 +186,7 @@ BOOL DWC_SendReliable(u8 aid, const void *data, int size) {
     return DWCi_SendReliable(1, aid, data, size);
 }
 
-BOOL DWCi_SendReliable(int type, u8 aid, const void *data, int size) {
+BOOL DWCi_SendReliable(u16 type, u8 aid, const void *data, int size) {
     DWCTransportConnection *connection = DWCs_GetTransConnection(aid);
     int n;
     DWCTransportHeader header;
@@ -267,7 +268,7 @@ BOOL DWC_SetRecvBuffer(u8 netId, void *buffer, int size) {
     return TRUE;
 }
 
-BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param) {
+BOOL DWC_SetUserSendCallback(DWCUserSendCallback func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -276,7 +277,7 @@ BOOL DWC_SetUserSendCallback(DWCSendFunc func, void *param) {
     return TRUE;
 }
 
-BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param) {
+BOOL DWC_SetUserRecvCallback(DWCUserRecvCallback func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -285,7 +286,7 @@ BOOL DWC_SetUserRecvCallback(DWCRecvFunc func, void *param) {
     return TRUE;
 }
 
-BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param) {
+BOOL DWC_SetUserRecvTimeoutCallback(DWCUserRecvTimeoutCallback func, void *param) {
     if (sTransport == NULL) {
         return FALSE;
     }
@@ -295,7 +296,7 @@ BOOL DWC_SetUserRecvTimeoutCallback(DWCTimeoutFunc func, void *param) {
 }
 
 void DWCs_EncodeHeader(DWCTransportHeader *header, int type, int size) {
-    strncpy(header->magic, "DT", 2);
+    strncpy(header->magicStrings, "DT", 2);
     header->type = type;
     header->size = size;
 }
@@ -304,7 +305,7 @@ u16 DWCs_DecodeHeader(const void *data) {
     DWCTransportHeader header;
 
     MI_CpuCopy8(data, &header, sizeof(DWCTransportHeader));
-    if (memcmp(header.magic, "DT", 2) == 0) {
+    if (memcmp(header.magicStrings, "DT", 2) == 0) {
         return header.type;
     }
     return 0;
@@ -330,12 +331,12 @@ int DWCs_GetRequiredHeaderSize(int type) {
     }
 }
 
-BOOL DWC_SetRecvTimeoutTime(u8 netId, int timeout) {
+BOOL DWC_SetRecvTimeoutTime(u8 netId, u32 timeout) {
     if (sTransport == NULL) {
         return FALSE;
     }
-    sTransport->connections[netId].recvTimeout = timeout;
-    sTransport->connections[netId].recvTimeoutTime = OS_GetTick();
+    sTransport->connections[netId].recvTimeoutTime = timeout;
+    sTransport->connections[netId].previousRecvTick = OS_GetTick();
     return TRUE;
 }
 
@@ -362,7 +363,7 @@ void DWCi_InitTransport(DWCTransportInfo *info) {
     DWCs_InitSendPool();
 }
 
-void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable) {
+void DWCi_RecvCallback(GT2Connection connection, GT2Byte *message, int length, GT2Bool reliable) {
     if (sTransport == NULL || message == NULL || length == 0) {
         return;
     }
@@ -374,7 +375,7 @@ void DWCi_RecvCallback(GTI2Connection *connection, const void *message, int leng
     }
 }
 
-void DWCi_PingCallback(GTI2Connection *connection, u32 latency) {
+void DWCi_PingCallback(GT2Connection connection, int latency) {
     if (sTransport->pingCallback != NULL) {
         u8 aid = DWCi_GetConnectionAID(connection);
 
@@ -423,15 +424,15 @@ void DWCi_TransportProcess(void) {
         if (DWC_IsValidAID(aid)) {
             u64 current = OS_GetTick();
             u32 limit;
-            DWCTimeoutFunc callback;
+            DWCUserRecvTimeoutCallback callback;
 
             connection = DWCs_GetTransConnection(aid);
             callback = sTransport->recvTimeoutCallback;
             if (callback != NULL) {
-                limit = connection->recvTimeout;
-                if (limit != 0 && (u32)OS_TicksToMilliSeconds(current - connection->recvTimeoutTime) > limit) {
+                limit = connection->recvTimeoutTime;
+                if (limit != 0 && (u32)OS_TicksToMilliSeconds(current - connection->previousRecvTick) > limit) {
                     callback(aid, sTransport->recvTimeoutParam);
-                    connection->recvTimeoutTime = current;
+                    connection->previousRecvTick = current;
                 }
             }
         }
@@ -503,21 +504,21 @@ u8 DWCs_GetRecvState(u8 aid) {
 // Sends data to a machine; reliable data that GT2 can't take now goes to the pool, and is lost with an error when the
 // pool is full
 void DWCs_Send(u8 aid, const void *data, int size, BOOL reliable) {
-    GTI2Connection *connection = DWCi_GetGT2Connection(aid);
+    GT2Connection connection = DWCi_GetGT2Connection(aid);
 
     if (reliable) {
-        if (!DWCs_FlushSendPool() || func_ov011_0217d290(connection, data, size, reliable)) {
+        if (!DWCs_FlushSendPool() || gt2Send(connection, data, size, reliable)) {
             if (!DWCs_AddToSendPool(connection, data, size)) {
                 DWCi_SetError(DWC_ERROR_NETWORK, -0x17d5e);
             }
         }
     } else {
-        func_ov011_0217d290(connection, data, size, reliable);
+        gt2Send(connection, data, size, reliable);
     }
 }
 
 void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay) {
-    GTI2Connection *connection;
+    GT2Connection connection;
     BOOL viaServer = FALSE;
     TransportRelayHeader *header;
 
@@ -542,17 +543,17 @@ void DWCi_SendUnreliable(u8 from, u8 aid, const void *data, int size, BOOL relay
         header->aids = 1 << aid;
         MI_CpuCopy8(data, header + 1, size);
         size += sizeof(TransportRelayHeader);
-        func_ov011_0217d290(connection, header, size, FALSE);
+        gt2Send(connection, (const GT2Byte *)header, size, FALSE);
         size = 0;
         if (header != NULL) {
             DWC_Free(4, header, size);
         }
     } else {
-        func_ov011_0217d290(connection, data, size, FALSE);
+        gt2Send(connection, data, size, FALSE);
     }
 }
 
-void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, int size) {
+void DWCs_HandleReliableMessage(GT2Connection connection, const void *data, int size) {
     u8 aid = DWCi_GetConnectionAID(connection);
     u16 type;
 
@@ -587,7 +588,7 @@ void DWCs_HandleReliableMessage(GTI2Connection *connection, const void *data, in
     }
 }
 
-void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, int size) {
+void DWCs_HandleUnreliableMessage(GT2Connection connection, const void *data, int size) {
     const u8 *bytes = data;
     u8 aid = DWCi_GetConnectionAID(connection);
     BOOL relayed = FALSE;
@@ -645,8 +646,8 @@ void DWCs_HandleUnreliableMessage(GTI2Connection *connection, const void *data, 
     if (sTransport->recvCallback != NULL) {
         sTransport->recvCallback(aid, (u8 *)bytes, size, sTransport->recvParam);
     }
-    if (sTransport->recvTimeoutCallback != NULL && transport->recvTimeout != 0) {
-        transport->recvTimeoutTime = OS_GetTick();
+    if (sTransport->recvTimeoutCallback != NULL && transport->recvTimeoutTime != 0) {
+        transport->previousRecvTick = OS_GetTick();
     }
 }
 
@@ -701,8 +702,8 @@ void DWCs_RecvDataBody(u8 aid, const void *data, int size) {
             sTransport->recvCallback(aid, connection->recvBuffer, total, sTransport->recvParam);
         }
     }
-    if (sTransport->recvTimeoutCallback != NULL && connection->recvTimeout != 0) {
-        connection->recvTimeoutTime = OS_GetTick();
+    if (sTransport->recvTimeoutCallback != NULL && connection->recvTimeoutTime != 0) {
+        connection->previousRecvTick = OS_GetTick();
     }
 }
 
@@ -729,7 +730,7 @@ void DWCs_RecvSystemDataBody(u8 aid, const void *data, int size) {
 
 // The free space of GT2's buffer to a machine, less what the transport keeps for itself
 int DWCs_GetOutgoingBufferFreeSize(u8 aid) {
-    int n = func_ov011_0217d394(DWCi_GetGT2Connection(aid)) - 0x207;
+    int n = gt2GetOutgoingBufferFreeSpace(DWCi_GetGT2Connection(aid)) - 0x207;
 
     if (n <= 0) {
         return 0;
@@ -737,7 +738,7 @@ int DWCs_GetOutgoingBufferFreeSize(u8 aid) {
     return n;
 }
 
-void DWCs_ResetLastRecvTime(GTI2Connection *connection) {
+void DWCs_ResetLastRecvTime(GT2Connection connection) {
     u8 aid = DWCi_GetConnectionAID(connection);
 
     if (aid < 0x20 && aid != DWC_GetMyAID()) {

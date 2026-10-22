@@ -2,7 +2,7 @@
 // before the sleep, and the exit sequence, with its callbacks, that the power button and the power-off start. The
 // object is one with main's pm.c, whose statics PMi_ExitType and PMi_AutoExitFlag this part reaches at offsets of
 // pm.c's first objects. The file name is inferred from main's half, as card_rom_twl.c's is; the PM_ functions have
-// TwlSDK's names, the others are ours
+// the names of the TWL-SDK Function Reference Manual, the others are ours
 #include "nitro/gx.h"
 #include "nitro/mi.h"
 #include "nitro/os.h"
@@ -18,8 +18,6 @@
 // The wait between two reads of the vertical blank count
 #define PM_VBLANK_WAIT_CYCLES 0x32
 
-// The vertical blank count of the shared memory, which the vertical blank interrupt increments
-#define PM_VBLANK_COUNT (*(vu32 *)0x02fffc3c)
 // The word of main memory that a restart after an exit notification clears
 #define PM_RESET_PARAM (*(u32 *)0x02000300)
 // The shared memory of the handshake with the ARM7 before the exit, and the byte that says the ARM9 is done
@@ -78,10 +76,10 @@ void PMi_StopNDma(u32 ndmaNo) {
     }
 }
 
-void PMi_ProcessExitRequest(u32 exitType) {
+void PMi_ProcessExitRequest(PMExitFactor exitType) {
     if (PMi_TryLockExit()) {
         PMi_ExitType = exitType;
-        PMi_CallCallbackList(PMi_PreExitCallbackList);
+        PMi_ExecuteList(PMi_PreExitCallbackList);
         if (PMi_AutoExitFlag) {
             PM_ReadyToExit();
         }
@@ -101,7 +99,7 @@ static void PMi_SyncExitWithOtherProc(void) {
     PM_EXIT_SYNC_DONE = TRUE;
 }
 
-u32 PMi_GetExitType(void) {
+PMExitFactor PM_GetExitFactor(void) {
     return PMi_ExitType;
 }
 
@@ -109,16 +107,16 @@ void PM_AppendPreExitCallback(PMExitCallbackInfo *info) {
     PMi_InsertList(&PMi_PreExitCallbackList, info, 0xff, 0);
 }
 
-void PM_InsertPreExitCallback(PMExitCallbackInfo *info, int priority) {
+void PM_InsertPostExitCallback(PMExitCallbackInfo *info, int priority) {
     PMi_InsertList(&PMi_PostExitCallbackList, info, priority, 0);
 }
 
-void PM_DeletePreExitCallback(PMExitCallbackInfo *info) {
+void PM_DeletePostExitCallback(PMExitCallbackInfo *info) {
     PMi_DeleteList(&PMi_PostExitCallbackList, info);
 }
 
 void PMi_ExecutePostExitCallbackList(void) {
-    PMi_CallCallbackList(PMi_PostExitCallbackList);
+    PMi_ExecuteList(PMi_PostExitCallbackList);
 }
 
 void PM_SetAutoExit(BOOL enabled) {
@@ -135,13 +133,13 @@ static void PMi_ExecuteExit(BOOL reset) {
     int i;
     u16 result;
 
-    PMi_CallCallbackList(PMi_PostExitCallbackList);
+    PMi_ExecuteList(PMi_PostExitCallbackList);
     GX_DispOff();
     GXS_DispOff();
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM7);
     for (i = 0; i < 3; i++) {
-        u32 count = PM_VBLANK_COUNT;
-        while (count == PM_VBLANK_COUNT) {
+        u32 count = *(vu32 *)HW_VBLANK_COUNT_BUF;
+        while (count == *(vu32 *)HW_VBLANK_COUNT_BUF) {
             OS_SpinWaitSysCycles(PM_VBLANK_WAIT_CYCLES);
         }
     }
@@ -168,13 +166,13 @@ static void PMi_ExecuteExit(BOOL reset) {
 
     OS_DisableInterrupts();
     MI_StopAllDma();
-    MI_StopNDmaChannels();
+    MI_StopAllNDma();
     PMi_SyncExitWithOtherProc();
     OSi_TerminateCore();
 }
 
 static BOOL PMi_TryLockExit(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (PMi_ExitLocked) {
         OS_RestoreInterrupts(enabled);

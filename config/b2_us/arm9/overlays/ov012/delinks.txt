@@ -37,6 +37,7 @@ src/ov012/event_colosseum_battle.c:
     .data       start:0x0216e01c end:0x0216e034
 
 src/ov012/delivery_beacon.c:
+    complete
     .text       start:0x0215291c end:0x02152c0c
     .rodata     start:0x0216af34 end:0x0216af3c
     .data       start:0x0216e034 end:0x0216e110

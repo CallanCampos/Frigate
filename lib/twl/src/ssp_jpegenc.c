@@ -26,13 +26,6 @@
 #define SSP_JPEG_THUMBNAIL 0x1
 #define SSP_JPEG_YUV422 0x100
 
-// Sampling factors
-enum {
-    SSP_JPEG_444 = 1,
-    SSP_JPEG_420,
-    SSP_JPEG_422,
-};
-
 // A Huffman table in the encoder's work memory: the counts of codes of each length and the values, as the DHT segment
 // holds them, and the code and code length of each value
 typedef struct {
@@ -630,13 +623,13 @@ static u32 JpegEnc_GetWorkSize(u32 width, u32 height, u32 sampling) {
     u32 chromBlocksX, chromBlocksY;
 
     switch (sampling) {
-    case SSP_JPEG_444:
+    case SSP_JPEG_OUTPUT_YUV444:
         break;
-    case SSP_JPEG_420:
+    case SSP_JPEG_OUTPUT_YUV420:
         vFactor = 2;
         hFactor = 2;
         break;
-    case SSP_JPEG_422:
+    case SSP_JPEG_OUTPUT_YUV422:
         hFactor = 2;
         break;
     }
@@ -663,7 +656,7 @@ u32 SSP_GetJpegEncoderBufferSize(u32 width, u32 height, u32 sampling, u32 option
         }
     }
     size = JpegEnc_GetWorkSize(width, height, sampling);
-    thumbnailSize = JpegEnc_GetWorkSize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, SSP_JPEG_444);
+    thumbnailSize = JpegEnc_GetWorkSize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, SSP_JPEG_OUTPUT_YUV444);
     if (size > thumbnailSize) {
         return size + (thumbnail ? THUMBNAIL_BUFFER_SIZE * 2 : 0);
     } else {
@@ -887,13 +880,13 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     JpegEncHuffWork *huffWork;
 
     switch (sampling) {
-    case SSP_JPEG_444:
+    case SSP_JPEG_OUTPUT_YUV444:
         break;
-    case SSP_JPEG_420:
+    case SSP_JPEG_OUTPUT_YUV420:
         vFactor = 2;
         hFactor = 2;
         break;
-    case SSP_JPEG_422:
+    case SSP_JPEG_OUTPUT_YUV422:
         hFactor = 2;
         break;
     }
@@ -959,16 +952,16 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
         convert(src, width, height, (u8 *)work + yOffset);
     }
     JpegEnc_TransformH1V1((u8 *)work + yOffset, work->divisors[0], &components[0], width);
-    if (sampling == SSP_JPEG_444) {
+    if (sampling == SSP_JPEG_OUTPUT_YUV444) {
         JpegEnc_TransformH1V1((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
-    } else if (sampling == SSP_JPEG_420) {
+    } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
         JpegEnc_TransformH2V2((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
     } else {
         JpegEnc_TransformH2V1((u8 *)work + cbOffset, work->divisors[1], &components[1], width);
     }
-    if (sampling == SSP_JPEG_444) {
+    if (sampling == SSP_JPEG_OUTPUT_YUV444) {
         JpegEnc_TransformH1V1((u8 *)work + crOffset, work->divisors[1], &components[2], width);
-    } else if (sampling == SSP_JPEG_420) {
+    } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
         JpegEnc_TransformH2V2((u8 *)work + crOffset, work->divisors[1], &components[2], width);
     } else {
         JpegEnc_TransformH2V1((u8 *)work + crOffset, work->divisors[1], &components[2], width);
@@ -1061,11 +1054,11 @@ static u32 JpegEnc_Encode(const void *src, u8 *dst, u32 limit, JpegEncWork *work
     }
     for (i = 0; i < mcusY; i++) {
         for (x = 0; x < mcusX; x++) {
-            if (sampling == SSP_JPEG_444) {
+            if (sampling == SSP_JPEG_OUTPUT_YUV444) {
                 if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x, i)) {
                     return 0;
                 }
-            } else if (sampling == SSP_JPEG_420) {
+            } else if (sampling == SSP_JPEG_OUTPUT_YUV420) {
                 if (!JpegEnc_EncodeBlock(dcLum, acLum, &components[0], dst, &pos, x * 2, i * 2)) {
                     return 0;
                 }
@@ -1127,17 +1120,17 @@ static BOOL JpegEnc_CheckParameters(u32 width, u32 height, u32 sampling) {
         return FALSE;
     }
     switch (sampling) {
-    case SSP_JPEG_444:
+    case SSP_JPEG_OUTPUT_YUV444:
         if ((width & 7) != 0 || (height & 7) != 0) {
             return FALSE;
         }
         break;
-    case SSP_JPEG_420:
+    case SSP_JPEG_OUTPUT_YUV420:
         if ((width & 15) != 0 || (height & 15) != 0) {
             return FALSE;
         }
         break;
-    case SSP_JPEG_422:
+    case SSP_JPEG_OUTPUT_YUV422:
         if ((width & 15) != 0 || (height & 7) != 0) {
             return FALSE;
         }
@@ -1177,7 +1170,7 @@ u32 SSP_StartJpegEncoder(const void *src, u8 *dst, u32 limit, u8 *work, u32 widt
         }
         thumbnailSize = JpegEnc_Encode(thumbnailBuffer + THUMBNAIL_BUFFER_SIZE, thumbnailBuffer, THUMBNAIL_BUFFER_SIZE,
                                        (JpegEncWork *)work, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, thumbnailQuality,
-                                       SSP_JPEG_422, TRUE, NULL, 0, convert);
+                                       SSP_JPEG_OUTPUT_YUV422, TRUE, NULL, 0, convert);
         if (thumbnailSize == 0) {
             return 0;
         }

@@ -1,5 +1,5 @@
-// NitroSDK's SND (snd_bank.c, a guess from the SDK's file names): the links between a bank and the wave archives
-// that hold its waves, the walk over a bank's instruments, and the table of a wave archive's wave addresses.
+// NitroSDK's SND (snd_bank.c, as ntrtwl's reconstruction of NitroSDK has it): the links between a bank and the wave
+// archives that hold its waves, the walk over a bank's instruments, and the table of a wave archive's wave addresses.
 #include "nitro/os.h"
 #include "nitro/snd.h"
 
@@ -45,7 +45,7 @@ void SND_DestroyBank(SNDBankData *bank) {
     int i;
 
     SNDi_LockMutex();
-    for (i = 0; i < SND_BANK_WAVEARC_MAX; i++) {
+    for (i = 0; i < SND_BANK_TO_WAVEARC_MAX; i++) {
         SNDWaveArc *waveArc = bank->waveArcLink[i].waveArc;
 
         if (waveArc != NULL) {
@@ -109,7 +109,7 @@ BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos 
         case SND_INST_PCM:
         case SND_INST_PSG:
         case SND_INST_NOISE:
-        case SND_INST_DIRECT_PCM:
+        case SND_INST_DIRECTPCM:
         case SND_INST_NULL: {
             const SNDInstParam *param = (const SNDInstParam *)((const u8 *)bank + offset);
 
@@ -121,7 +121,7 @@ BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos 
             const SNDDrumSet *drumSet = (const SNDDrumSet *)((const u8 *)bank + offset);
 
             while (pos->index < drumSet->max - drumSet->min + 1) {
-                *inst = drumSet->instData[pos->index];
+                *inst = drumSet->instOffset[pos->index];
                 pos->index++;
                 return TRUE;
             }
@@ -134,7 +134,7 @@ BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos 
                 if (keySplit->key[pos->index] == 0) {
                     break;
                 }
-                *inst = keySplit->instData[pos->index];
+                *inst = keySplit->instOffset[pos->index];
                 pos->index++;
                 return TRUE;
             }
@@ -153,8 +153,8 @@ u32 SND_GetWaveDataCount(const SNDWaveArc *waveArc) {
 // NitroSDK's SND_SetWaveDataAddress: the address that a wave of the archive is loaded at
 void SND_SetWaveDataAddress(SNDWaveArc *waveArc, int index, const SNDWaveData *address) {
     SNDi_LockMutex();
-    waveArc->offsetTable[index] = (u32)address;
-    DC_StoreRange(&waveArc->offsetTable[index], sizeof(u32));
+    waveArc->waveOffset[index] = (u32)address;
+    DC_StoreRange(&waveArc->waveOffset[index], sizeof(u32));
     SNDi_UnlockMutex();
 }
 
@@ -165,7 +165,7 @@ const SNDWaveData *SND_GetWaveDataAddress(const SNDWaveArc *waveArc, int index) 
     u32 offset;
 
     SNDi_LockMutex();
-    offset = waveArc->offsetTable[index];
+    offset = waveArc->waveOffset[index];
     if (offset != 0) {
         wave = (const SNDWaveData *)offset;
         if (offset < 0x02000000) {

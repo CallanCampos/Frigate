@@ -6,24 +6,24 @@
 // pointers in place. A version 1.0 file's glyphs have no rotation flags
 
 // A file's header checks, which the code shows as inlines: the inner two build their result with an if and return it as
-// a u32, and IsBinFileValid tests the pointer once more before them
-static inline u32 IsSignatureValid(const NNSG2dBinaryFileHeader *pHeader, u32 signature) {
+// a u32, and NNS_G2dIsBinFileValid tests the pointer once more before them
+static inline u32 NNSi_G2dIsBinFileSignatureValid(const NNSG2dBinaryFileHeader *pHeader, u32 signature) {
     if (pHeader != NULL && pHeader->signature == signature) {
         return TRUE;
     }
     return FALSE;
 }
 
-static inline u32 IsVersionValid(const NNSG2dBinaryFileHeader *pHeader, u16 version) {
+static inline u32 NNSi_G2dIsBinFileVersionValid(const NNSG2dBinaryFileHeader *pHeader, u16 version) {
     if (pHeader != NULL && pHeader->version >= version) {
         return TRUE;
     }
     return FALSE;
 }
 
-static inline BOOL IsBinFileValid(const NNSG2dBinaryFileHeader *pHeader, u32 signature, u16 version) {
+static inline BOOL NNS_G2dIsBinFileValid(const NNSG2dBinaryFileHeader *pHeader, u32 signature, u16 version) {
     if (pHeader != NULL) {
-        return IsSignatureValid(pHeader, signature) && IsVersionValid(pHeader, version);
+        return NNSi_G2dIsBinFileSignatureValid(pHeader, signature) && NNSi_G2dIsBinFileVersionValid(pHeader, version);
     }
     return FALSE;
 }
@@ -32,9 +32,9 @@ BOOL NNSi_G2dGetUnpackedFont(void *pNftrFile, NNSG2dFontInformation **ppFont) {
     NNSG2dBinaryBlockHeader *pBlk;
     BOOL bOldVer = FALSE;
 
-    if (!IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x102) &&
-        !IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x101)) {
-        if (!IsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x100)) {
+    if (!NNS_G2dIsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x102) &&
+        !NNS_G2dIsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x101)) {
+        if (!NNS_G2dIsBinFileValid(pNftrFile, NNS_G2D_BINFILE_SIG_FONTDATA, 0x100)) {
             OS_Terminate();
         }
         bOldVer = TRUE;
@@ -57,17 +57,17 @@ void NNSi_G2dUnpackNFT(NNSG2dBinaryFileHeader *pHeader) {
     NNSG2dBinaryBlockHeader *pBlk = (NNSG2dBinaryBlockHeader *)((u8 *)pHeader + pHeader->headerSize);
     int i;
 
-    for (i = 0; i < pHeader->numBlocks; i++) {
+    for (i = 0; i < pHeader->dataBlocks; i++) {
         switch (pBlk->kind) {
         case NNS_G2D_BINBLK_SIG_FINFDATA: {
             NNSG2dFontInformation *pInfo = (NNSG2dFontInformation *)(pBlk + 1);
 
-            NNSi_G2dUnpackOffset(pInfo->pGlyph, pHeader);
+            NNS_G2D_UNPACK_OFFSET_PTR(pInfo->pGlyph, pHeader);
             if (pInfo->pWidth != NULL) {
-                NNSi_G2dUnpackOffset(pInfo->pWidth, pHeader);
+                NNS_G2D_UNPACK_OFFSET_PTR(pInfo->pWidth, pHeader);
             }
             if (pInfo->pMap != NULL) {
-                NNSi_G2dUnpackOffset(pInfo->pMap, pHeader);
+                NNS_G2D_UNPACK_OFFSET_PTR(pInfo->pMap, pHeader);
             }
             break;
         }
@@ -75,7 +75,7 @@ void NNSi_G2dUnpackNFT(NNSG2dBinaryFileHeader *pHeader) {
             NNSG2dFontWidth *pWidth = (NNSG2dFontWidth *)(pBlk + 1);
 
             if (pWidth->pNext != NULL) {
-                NNSi_G2dUnpackOffset(pWidth->pNext, pHeader);
+                NNS_G2D_UNPACK_OFFSET_PTR(pWidth->pNext, pHeader);
             }
             break;
         }
@@ -83,7 +83,7 @@ void NNSi_G2dUnpackNFT(NNSG2dBinaryFileHeader *pHeader) {
             NNSG2dFontCodeMap *pMap = (NNSG2dFontCodeMap *)(pBlk + 1);
 
             if (pMap->pNext != NULL) {
-                NNSi_G2dUnpackOffset(pMap->pNext, pHeader);
+                NNS_G2D_UNPACK_OFFSET_PTR(pMap->pNext, pHeader);
             }
             break;
         }

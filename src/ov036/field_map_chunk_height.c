@@ -506,14 +506,14 @@ void FieldChunkAccessor_GetTerrainCore(MapTerrainSamplerOutput *out, u32 layer, 
     fx32 dx;
 
     if (shape == TILE_SHAPE_PLANE) {
-        u32 slope = tile->slope * 3;
+        unsigned int slope = tile->slope * 3;
         u16 offsetId = tile->offset;
 
         VEC_Fx16Set(&out->layers[layer].normal, slopes[slope], slopes[slope + 1], -slopes[slope + 2]);
         offset = MAP_HEIGHT_OFFSET_TABLE[offsetId];
     } else if (shape == TILE_SHAPE_SPLIT) {
         MapHeightSplit *split = (MapHeightSplit *)&data->tiles[data->width * data->height] + tile->offset;
-        u32 slope;
+        unsigned int slope;
         u16 offsetId;
 
         if (tile->diagonal == 0) {

@@ -24,7 +24,7 @@ void GFL_SndStreamInit(HeapID heapId) {
     sSndStream = GFL_HeapAllocate(heapId, sizeof(SndStream), FALSE, "snd_strm.c", 65);
     MI_CpuFill8(sSndStream, 0, sizeof(SndStream));
     NNS_SndArcStrmInit(SND_STREAM_THREAD_PRIORITY, GFL_SndGetHeap());
-    NNS_SndArcStrmInitHandle(&sSndStream->handle);
+    NNS_SndStrmHandleInit(&sSndStream->handle);
     NNS_SndArcStrmAllocChannel(SND_STREAM_PLAYER);
 }
 
@@ -32,7 +32,7 @@ void GFL_SndStreamFree(void) {
     if (sSndStream != NULL) {
         NNS_SndArcStrmFreeChannel(SND_STREAM_PLAYER);
         if (sSndStream->handle.player == NULL) {
-            NNS_SndArcStrmReleaseHandle(&sSndStream->handle);
+            NNS_SndStrmHandleRelease(&sSndStream->handle);
         }
         GFL_HeapFree(sSndStream);
         sSndStream = NULL;
@@ -48,7 +48,7 @@ BOOL GFL_SndStreamCheckInit(void) {
 
 void GFL_SndStreamPlay(u32 stream) {
     if (sSndStream->prepared && sSndStream->stream == stream) {
-        NNS_SndArcStrmPreparedStart(&sSndStream->handle);
+        NNS_SndArcStrmStartPrepared(&sSndStream->handle);
         return;
     }
     GFL_SndStreamReset();
@@ -74,7 +74,7 @@ void GFL_SndStreamFadeStop(u32 frames) {
 
 static void GFL_SndStreamReset(void) {
     if (sSndStream->handle.player == NULL) {
-        NNS_SndArcStrmReleaseHandle(&sSndStream->handle);
-        NNS_SndArcStrmInitHandle(&sSndStream->handle);
+        NNS_SndStrmHandleRelease(&sSndStream->handle);
+        NNS_SndStrmHandleInit(&sSndStream->handle);
     }
 }

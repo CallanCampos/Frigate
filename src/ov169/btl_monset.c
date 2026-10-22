@@ -196,9 +196,8 @@ void BtlMonSet_RemoveFainted(BtlMonSet *set) {
 }
 
 void SortBySpeed(BtlMonSet *set, BtlServerFlow *flow) {
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long i;
-    unsigned long j;
+    u32 i;
+    u32 j;
 
     if (set->count > 1) {
         for (i = 0; i < set->count; i++) {

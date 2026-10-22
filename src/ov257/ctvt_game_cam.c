@@ -210,7 +210,8 @@ static const u16 sCtvtGameCamPromptMessages[2][3] = {
 static BOOL sCtvtGameCamDspBusy;
 
 // TwlSDK's DSP_Scaling, which scales a whole image
-static inline BOOL DSP_Scaling(const void *src, void *dst, u16 width, u16 height, f32 rx, f32 ry, int mode) {
+static inline BOOL DSP_Scaling(const void *src, void *dst, u16 width, u16 height, f32 rx, f32 ry,
+                               DSPGraphicsScalingMode mode) {
     if (OS_IsRunOnTwl() && !sCtvtGameCamDspBusy) {
         return DSPi_ScalingCore(src, dst, width, height, rx, ry, mode, 0, 0, width, height, NULL, FALSE);
     }
@@ -561,7 +562,7 @@ static void CtvtGameCamCamera_TakePicture(CtvtGameCamCamera *camera, void *dest,
         MIi_CpuCopy32((u16 *)camera->frame + (i + y) * 256 + x, crop + i * width, width * 2);
     }
     scale = 0.5009f;
-    DSP_Scaling(crop, dest, width, height, scale, scale, 2);
+    DSP_Scaling(crop, dest, width, height, scale, scale, DSP_GRAPHICS_SCALING_MODE_BILINEAR);
     DSP_UnloadGraphics();
     CameraSystem_InitDsp(camera->cameraSystem);
     GFL_NetFreeAligned32(crop);

@@ -23,22 +23,22 @@ static DWCUtilUiEffect *sEffect;
 
 static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg);
 
-void DWCUtilUiEffect_Init(u8 variant) {
+void DWCi_ANIMElInitEx(u8 variant) {
     int mode = 4;
 
-    sEffect = DWCUtilHeap_AllocClear(sizeof(DWCUtilUiEffect), 4);
+    sEffect = DWCi_HEAPlAllocEx(sizeof(DWCUtilUiEffect), 4);
     sEffect->variant = variant;
     sEffect->oam = DWCUtilCell_AllocOam(0, 0x47);
     sEffect->oam->attr2 = (sEffect->oam->attr2 & 0xfffff3ff) | (mode << 8);
     G2_SetOBJMode(sEffect->oam, GX_OAM_MODE_NORMAL, sEffectData.palettes[variant]);
     G2_SetOBJPosition(sEffect->oam, sEffectData.positions[0].x, sEffectData.positions[0].y);
-    sEffect->task = DWCUtilTask_Create(1, DWCUtilUiEffect_Update, NULL, 0x78);
+    sEffect->task = DWCi_TSKlForm(1, DWCUtilUiEffect_Update, NULL, 0x78);
 }
 
-void DWCUtilUiEffect_Destroy(void) {
-    DWCUtilTask_Remove(1, sEffect->task);
-    DWCUtilOamBuf_Free(sEffect->oam);
-    DWCUtilHeap_FreeAndNull(&sEffect);
+void DWCi_ANIMElEnd(void) {
+    DWCi_TSKlDeleteEx(1, sEffect->task);
+    DWCi_MOV_MBP_GetChildBmp(sEffect->oam);
+    DWCi_HEAPlFree_(&sEffect);
 }
 
 static void DWCUtilUiEffect_Update(DWCUtilTask *task, void *arg) {

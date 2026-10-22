@@ -110,23 +110,23 @@ data_ov201_021b7b64 kind:data(any) addr:0x021b7b64
 data_ov201_021b7b8c kind:data(any) addr:0x021b7b8c
 data_ov201_021b7b90 kind:data(any) addr:0x021b7b90
 data_ov201_021b7b94 kind:data(any) addr:0x021b7b94
-data_ov201_021b7b98 kind:data(any) addr:0x021b7b98
-data_ov201_021b7b9c kind:data(any) addr:0x021b7b9c
-data_ov201_021b7ba0 kind:data(any) addr:0x021b7ba0
-data_ov201_021b7bb4 kind:data(any) addr:0x021b7bb4
-data_ov201_021b7c0c kind:data(any) addr:0x021b7c0c
+sPOKE_NET_SSL_CaExponent kind:data(any) addr:0x021b7b98
+sPOKE_NET_SSL_CaInfoList kind:data(any) addr:0x021b7b9c
+sPOKE_NET_SSL_CaInfo kind:data(any) addr:0x021b7ba0
+sPOKE_NET_SSL_CaDn kind:data(any) addr:0x021b7bb4
+sPOKE_NET_SSL_CaModulo kind:data(any) addr:0x021b7c0c
 data_ov201_021b81bd kind:bss addr:0x021b81bd ambiguous
 data_ov201_021b8279 kind:bss addr:0x021b8279 ambiguous
 data_ov201_021b83b5 kind:bss addr:0x021b83b5 ambiguous
 data_ov201_021b84a0 kind:bss addr:0x021b84a0
-data_ov201_021b8ca0 kind:bss addr:0x021b8ca0
+gPOKE_NET_Control kind:bss addr:0x021b8ca0
 data_ov201_021b8ca6 kind:bss addr:0x021b8ca6
 data_ov201_021b8de0 kind:bss addr:0x021b8de0
 data_ov201_021b8ea0 kind:bss addr:0x021b8ea0
 data_ov201_021b8f14 kind:bss addr:0x021b8f14
 data_ov201_021b8fd4 kind:bss addr:0x021b8fd4
 data_ov201_021b8fec kind:bss addr:0x021b8fec
-data_ov201_021b90b8 kind:bss addr:0x021b90b8
+sPOKE_NET_SslConnection kind:bss addr:0x021b90b8
 data_ov201_021b9175 kind:bss addr:0x021b9175 ambiguous
 data_ov201_021b9189 kind:bss addr:0x021b9189 ambiguous
 data_ov201_021b9195 kind:bss addr:0x021b9195 ambiguous
@@ -134,7 +134,7 @@ data_ov201_021b919d kind:bss addr:0x021b919d ambiguous
 data_ov201_021b93ec kind:bss addr:0x021b93ec ambiguous
 data_ov201_021b95ec kind:bss addr:0x021b95ec ambiguous
 data_ov201_021b97f4 kind:bss addr:0x021b97f4 ambiguous
-data_ov201_021b98e8 kind:bss addr:0x021b98e8
-data_ov201_021b98ec kind:bss addr:0x021b98ec
-data_ov201_021b990c kind:bss addr:0x021b990c
+sPOKE_NET_SSL_Connection kind:bss addr:0x021b98e8
+sPOKE_NET_SSL_Entropy kind:bss addr:0x021b98ec
+sPOKE_NET_SSL_DefaultConnection kind:bss addr:0x021b990c
 data_ov201_021b9964 kind:bss addr:0x021b9964 ambiguous

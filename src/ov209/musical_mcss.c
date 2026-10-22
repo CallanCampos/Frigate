@@ -184,7 +184,7 @@ void MusicalMcss_UpdateSystem(MusicalMcssSys *sys) {
 // The current frame of an animation, as the SRT it may hold
 static inline void MusicalMcss_GetAnimSrt(const NNSG2dAnimController *animCtrl, NNSG2dAnimDataSRT *srt) {
     switch ((u16)animCtrl->pAnimSequence->animType) {
-    case NNS_G2D_ANIMELEM_INDEX:
+    case NNS_G2D_ANIMELEMENT_INDEX:
         srt->index = *(u16 *)animCtrl->pCurrent->pContent;
         srt->rotZ = 0;
         srt->sx = FX32_ONE;
@@ -192,10 +192,10 @@ static inline void MusicalMcss_GetAnimSrt(const NNSG2dAnimController *animCtrl, 
         srt->px = 0;
         srt->py = 0;
         break;
-    case NNS_G2D_ANIMELEM_INDEX_SRT:
+    case NNS_G2D_ANIMELEMENT_INDEX_SRT:
         *srt = *(NNSG2dAnimDataSRT *)animCtrl->pCurrent->pContent;
         break;
-    case NNS_G2D_ANIMELEM_INDEX_T: {
+    case NNS_G2D_ANIMELEMENT_INDEX_T: {
         NNSG2dAnimDataT *data = animCtrl->pCurrent->pContent;
 
         srt->index = data->index;
@@ -251,7 +251,7 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
     }
     MTX_Inverse43(&NNS_G3dGlb.cameraMtx, &invCamera);
     MI_Copy36B(&invCamera, &rotation);
-    MAT3_To4x4(&rotation, &billboard);
+    MTX_Copy33To44_(&rotation, &billboard);
 
     for (i = 0; i < sys->count; i++) {
         NNSG2dMultiCellAnimation *mcAnim;
@@ -263,7 +263,7 @@ void MusicalMcss_DrawSystem(MusicalMcssSys *sys, MusicalMcssCellCallback callbac
         mcss = sys->mcss[i];
         imageProxy = &mcss->imageProxy;
         mcAnim = &mcss->mcAnim;
-        cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimArray;
+        cellAnims = (NNSG2dMCCellAnimation **)&mcss->mcAnim.multiCellInstance.pCellAnimInstasnces;
         z = 0;
         MusicalMcss_GetAnimSrt(&mcAnim->animCtrl, &mcSrt);
         pos.x = mcss->pos.x;
@@ -600,7 +600,7 @@ static void MusicalMcss_Load(MusicalMcssSys *sys, int index, MCSSLoadInfo *info,
     load->charFile = GFL_G2DIOReadBGNCGR(info->arcId, info->character, TRUE, &load->chars, mcss->heapId);
     load->plttFile = GFL_G2DIOReadNCLR(info->arcId, info->palette, &load->pltt, mcss->heapId);
     if (info->bin == MUSICAL_POKEGRA_SPINDA_BIN) {
-        MCSS_DrawSpindaSpots(load->chars->rawData, info->unk20);
+        MCSS_DrawSpindaSpots(load->chars->pRawData, info->unk20);
     }
     if (atVBlank == TRUE) {
         GFL_VBlankTCBAdd(MusicalMcss_LoadTask, load, 0);

@@ -332,8 +332,8 @@ static inline void PdwAccDisp_InitCycle(PdwAccPaletteCycle *cycle, ArcTool *arc,
 
     MI_CpuFill8(cycle, 0, sizeof(*cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    MI_CpuCopy8(palette->rawData, cycle->palettes, sizeof(cycle->palettes));
-    MI_CpuCopy8(palette->rawData, cycle->blended, sizeof(cycle->palettes));
+    MI_CpuCopy8(palette->pRawData, cycle->palettes, sizeof(cycle->palettes));
+    MI_CpuCopy8(palette->pRawData, cycle->blended, sizeof(cycle->palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps

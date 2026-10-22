@@ -402,8 +402,8 @@ void StaActing_Term(StaActing *stage) {
     if (stage->strmPlaying == TRUE) {
         GFL_SndBGMClearLoadedData();
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0, 31, 31);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     StaActing_TermAppealEffect(stage);

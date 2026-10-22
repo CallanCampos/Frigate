@@ -1,12 +1,13 @@
 #include "nitro/mi.h"
 #include "snd_internal.h"
 
-// NitroSystem's sound archive (NNS_SndArc): opening one, as a file of the ROM or wholly in memory, and finding the
-// info of its sequences, banks, wave archives, streams, players and groups and its files' places. swan names
-// NNS_SndArcGetSeqInfo, NNS_SndArcGetSeqArcInfo, NNS_SndArcGetBankInfo, NNS_SndArcGetWaveArcInfo and
-// NNS_SndArcGetFileAddress; the other names are NitroSystem's by their code, and the file name is a guess
+// NitroSystem's sound archive (NNS_SndArc): opening one, as a file of the ROM or wholly in memory, and finding the info
+// of its sequences, banks, wave archives, streams, players and groups and its files' places. The SDK's file is
+// sndarc.c. The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, and swan's are the same
+// where it has them, except GetAddress and GetInfo, which are ours, and NNSi_SndArcGetFilePath, which reads a field
+// newer than that reconstruction
 
-static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag);
+static BOOL NNS_SndArcSetup(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag);
 static void InfoDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
 static void FatDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
 static void SymbolDisposeCallback(void *mem, u32 size, u32 data1, u32 data2);
@@ -34,7 +35,7 @@ BOOL NNS_SndArcInit(NNSSndArc *arc, const char *filePath, NNSSndHeapHandle heap,
     }
     arc->file_open = TRUE;
 
-    if (!SetupArc(arc, heap, symbolLoadFlag)) {
+    if (!NNS_SndArcSetup(arc, heap, symbolLoadFlag)) {
         return FALSE;
     }
 
@@ -43,7 +44,7 @@ BOOL NNS_SndArcInit(NNSSndArc *arc, const char *filePath, NNSSndHeapHandle heap,
 }
 
 // Reads the header, and with a heap the info, the file table and, if symbolLoadFlag, the symbols
-static BOOL SetupArc(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag) {
+static BOOL NNS_SndArcSetup(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoadFlag) {
     s32 readSize;
 
     if (!FS_SeekFile(&arc->file, 0, FS_SEEK_SET)) {
@@ -172,15 +173,15 @@ const NNSSndArcStrmInfo *NNS_SndArcGetStrmInfo(int strmNo) {
 }
 
 const NNSSndArcPlayerInfo *NNS_SndArcGetPlayerInfo(int playerNo) {
-    return GetInfo(sCurrent, GetAddress(sCurrent->info, sCurrent->info->playerOffset), playerNo);
+    return GetInfo(sCurrent, GetAddress(sCurrent->info, sCurrent->info->playerInfoOffset), playerNo);
 }
 
 const NNSSndArcStrmPlayerInfo *NNS_SndArcGetStrmPlayerInfo(int playerNo) {
-    return GetInfo(sCurrent, GetAddress(sCurrent->info, sCurrent->info->strmPlayerOffset), playerNo);
+    return GetInfo(sCurrent, GetAddress(sCurrent->info, sCurrent->info->strmPlayerInfoOffset), playerNo);
 }
 
 const NNSSndArcGroupInfo *NNS_SndArcGetGroupInfo(int groupNo) {
-    return GetInfo(sCurrent, GetAddress(sCurrent->info, sCurrent->info->groupOffset), groupNo);
+    return GetInfo(sCurrent, GetAddress(sCurrent->info, sCurrent->info->groupInfoOffset), groupNo);
 }
 
 u32 NNS_SndArcGetFileOffset(u32 fileId) {
@@ -202,7 +203,7 @@ u32 NNS_SndArcGetFileSize(u32 fileId) {
 }
 
 // Reads at most size bytes from offset in the file, loadBlockSize bytes at a time
-int NNS_SndArcReadFile(u32 fileId, void *buffer, int size, int offset) {
+s32 NNS_SndArcReadFile(u32 fileId, void *buffer, s32 size, s32 offset) {
     NNSSndArc *arc = sCurrent;
     const NNSSndArcFileInfo *fileInfo;
     int blockSize;
@@ -249,7 +250,7 @@ int NNS_SndArcReadFile(u32 fileId, void *buffer, int size, int offset) {
     return readSize;
 }
 
-FSFileID NNSi_SndArcGetFileID(void) {
+FSFileID NNS_SndArcGetFileID(void) {
     return sCurrent->fileId;
 }
 
@@ -257,7 +258,7 @@ const char *NNSi_SndArcGetFilePath(void) {
     return sCurrent->filePath;
 }
 
-const void *NNS_SndArcGetFileAddress(u32 fileId) {
+void *NNS_SndArcGetFileAddress(u32 fileId) {
     const NNSSndArcFat *fat = sCurrent->fat;
 
     if (fileId >= fat->count) {
@@ -266,11 +267,11 @@ const void *NNS_SndArcGetFileAddress(u32 fileId) {
     return fat->files[fileId].mem;
 }
 
-void NNS_SndArcSetFileAddress(u32 fileId, const void *address) {
+void NNS_SndArcSetFileAddress(u32 fileId, void *address) {
     sCurrent->fat->files[fileId].mem = address;
 }
 
-void NNS_SndArcSetLoadBlockSize(int size) {
+void NNS_SndArcSetLoadBlockSize(s32 size) {
     sCurrent->loadBlockSize = size;
 }
 

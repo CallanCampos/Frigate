@@ -124,7 +124,7 @@ void GFL_G3DSysCreate(BOOL frmTexVramMgr, u32 texVramSize, BOOL frmPltVramMgr, u
     g_G3DSystem.sys->frmPltVramMgr = frmPltVramMgr;
     NNS_G3dInit();
     G3X_InitMtxStack();
-    NNS_G3DRenderStateInit();
+    NNS_G3dGlbInit();
     if (dtcmAllocSize != 0) {
         u32 size = dtcmAllocSize;
 
@@ -262,9 +262,9 @@ void GFL_G3DSysMtxSetProjection(const G3DCameraProjection *projection) {
 
 void GFL_G3DSysLightSet(u8 lightId, const Light *light) {
     g_G3DSystem.sys->lights[lightId] = *light;
-    NNS_G3DSetLightVector(lightId, g_G3DSystem.sys->lights[lightId].direction.x,
+    NNS_G3dGlbLightVector(lightId, g_G3DSystem.sys->lights[lightId].direction.x,
                           g_G3DSystem.sys->lights[lightId].direction.y, g_G3DSystem.sys->lights[lightId].direction.z);
-    NNS_G3DSetLightColor(lightId, g_G3DSystem.sys->lights[lightId].color);
+    NNS_G3dGlbLightColor(lightId, g_G3DSystem.sys->lights[lightId].color);
 }
 
 void GFL_G3DSysMtxGetViewLookAt(FxLookAt *dest) {
@@ -304,10 +304,10 @@ static void GFL_G3DSysMtxSetFlushMode(int mode) {
         g_G3DSystem.sys->flush = NNS_G3dGlbFlush;
         break;
     case G3D_FLUSH_VP:
-        g_G3DSystem.sys->flush = NNS_G3DFlushViewProjection;
+        g_G3DSystem.sys->flush = NNS_G3dGlbFlushVP;
         break;
     case G3D_FLUSH_WVP:
-        g_G3DSystem.sys->flush = NNS_G3DFlushModelViewProjection;
+        g_G3DSystem.sys->flush = NNS_G3dGlbFlushWVP;
         break;
     }
 }
@@ -448,11 +448,11 @@ BOOL GFL_G3DResUploadTexData(void *resource) {
         if (!GFL_G3DResAllocPltMem(tex, &pltKey)) {
             return FALSE;
         }
-        NNS_G3DResTexSetGfdKeys(tex, texKey, tex4x4Key);
-        NNS_G3DResTexSetPltGfdKey(tex, pltKey);
+        NNS_G3dTexSetTexKey(tex, texKey, tex4x4Key);
+        NNS_G3dPlttSetPlttKey(tex, pltKey);
         DC_FlushRange(data, data->fileSize);
-        NNS_G3DResTexUploadTex(tex, TRUE);
-        NNS_G3DResTexUploadPlt(tex, TRUE);
+        NNS_G3dTexLoad(tex, TRUE);
+        NNS_G3dPlttLoad(tex, TRUE);
         return TRUE;
     }
     return FALSE;
@@ -505,8 +505,8 @@ BOOL GFL_G3DResSetupTexData(void *resource) {
         if (!GFL_G3DResAllocPltMem(tex, &pltKey)) {
             return FALSE;
         }
-        NNS_G3DResTexSetGfdKeys(tex, texKey, tex4x4Key);
-        NNS_G3DResTexSetPltGfdKey(tex, pltKey);
+        NNS_G3dTexSetTexKey(tex, texKey, tex4x4Key);
+        NNS_G3dPlttSetPlttKey(tex, pltKey);
         return TRUE;
     }
     return FALSE;
@@ -518,8 +518,8 @@ BOOL GFL_G3DResUploadTexDataCore(void *resource) {
 
     if (tex != NULL) {
         DC_FlushRange(data, data->fileSize);
-        NNS_G3DResTexUploadTex(tex, TRUE);
-        NNS_G3DResTexUploadPlt(tex, TRUE);
+        NNS_G3dTexLoad(tex, TRUE);
+        NNS_G3dPlttLoad(tex, TRUE);
         return TRUE;
     }
     return FALSE;
@@ -530,8 +530,8 @@ NNSG3dResTex *GFL_G3DResGetTexData(void *resource) {
 }
 
 static BOOL GFL_G3DResAllocTexMem(NNSG3dResTex *tex, NNSGfdTexKey *texKey, NNSGfdTexKey *tex4x4Key) {
-    u32 texSize = NNS_G3DResTexGetTexDataSize(tex);
-    u32 tex4x4Size = NNS_G3dTexGetRequiredSize4x4(tex);
+    u32 texSize = NNS_G3dTexGetRequiredSize(tex);
+    u32 tex4x4Size = NNS_G3dTex4x4GetRequiredSize(tex);
 
     if (texSize != 0) {
         *texKey = NNS_GfdAllocTexVram(texSize, FALSE, 0);
@@ -554,7 +554,7 @@ static BOOL GFL_G3DResAllocTexMem(NNSG3dResTex *tex, NNSGfdTexKey *texKey, NNSGf
 }
 
 static BOOL GFL_G3DResAllocPltMem(NNSG3dResTex *tex, NNSGfdPlttKey *pltKey) {
-    u32 size = NNS_G3DResTexGetPaletteDataSize(tex);
+    u32 size = NNS_G3dPlttGetRequiredSize(tex);
 
     if (size != 0) {
         *pltKey = NNS_GfdAllocPlttVram(size, tex->tex4x4Info.flag & NNS_G3D_RESPLTT_USEPLTT4, 0);
@@ -639,7 +639,7 @@ G3DModel *GFL_G3DMdlCreate(void *resource, u32 modelId, void *texture) {
         NNS_G3dBindMdlTex(mdl, tex);
         NNS_G3dBindMdlPltt(mdl, tex);
     }
-    NNS_G3DModelAttachResource(model->renderObj, mdl);
+    NNS_G3dRenderObjInit(model->renderObj, mdl);
     return model;
 }
 
@@ -679,8 +679,8 @@ void *GFL_G3DAnmCreate(G3DModel *model, void *resource, u32 anmIdx) {
     if (GFL_G3DMdlGetTexResource(model) != NULL) {
         tex = NNS_G3dGetTex(model->texResource->data);
     }
-    animation->anmObj = NNS_G3DAnimationAlloc(&g_G3DSystem.sys->allocator, anm, mdl);
-    NNS_G3DAnimationCreate(animation->anmObj, anm, mdl, tex);
+    animation->anmObj = NNS_G3dAllocAnmObj(&g_G3DSystem.sys->allocator, anm, mdl);
+    NNS_G3dAnmObjInit(animation->anmObj, anm, mdl, tex);
     return animation;
 }
 
@@ -748,7 +748,7 @@ BOOL GFL_G3DActorBindAnm(G3DActor *actor, u16 anmIdx) {
     if (animation == NULL) {
         return FALSE;
     }
-    NNS_G3DAnimationBind(actor->model->renderObj, animation->anmObj);
+    NNS_G3dRenderObjAddAnmObj(actor->model->renderObj, animation->anmObj);
     return TRUE;
 }
 
@@ -949,7 +949,7 @@ void GFL_G3DSysDispatchDraw(NNSG3dRenderObj *renderObj) {
     if (g_G3DSystem.sys->drawCallback != NULL) {
         g_G3DSystem.sys->drawCallback(renderObj, g_G3DSystem.sys->drawArg);
     }
-    NNS_G3DDraw(renderObj);
+    NNS_G3dDraw(renderObj);
 }
 
 void GFL_G3DSysResetGeometryCounter(void) {

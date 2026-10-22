@@ -901,7 +901,7 @@ void func_ov194_021c3e9c(PokemonTradeWork *wk, int box) {
                 icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
             }
             file = GFL_G2DIOReadBGNCGRArc(arc, icon, FALSE, &chars, wk->heapId);
-            MI_CpuCopy8(chars->rawData, wk->iconCharData + slot * 0x200, 0x200);
+            MI_CpuCopy8(chars->pRawData, wk->iconCharData + slot * 0x200, 0x200);
             slot++;
             GFL_HeapFree(file);
         }
@@ -2167,7 +2167,7 @@ void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         file = GFL_G2DIOReadNSCRArc(arc, 6, FALSE, &screen, wk->heapId);
     }
     cells = (u16 *)screen->rawData;
-    for (i = 0; i < screen->size / 2; i++) {
+    for (i = 0; i < screen->szByte / 2; i++) {
         cells[i] += CHAR_POS(wk->bg2Chars);
     }
     if (side == 0) {

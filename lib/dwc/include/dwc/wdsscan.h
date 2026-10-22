@@ -11,13 +11,13 @@
 
 // Starts the scan, allocating its work: the result goes in settings, and dmaNo is the DMA channel of the wireless
 // manager. The return value is always TRUE, and the caller ignores it
-BOOL DWCi_WdsScan_Start(DWCInetApSettings *settings, u16 dmaNo);
-// Takes a step of the scan: DWC_INET_SCAN_SCANNING while it runs, DWC_INET_SCAN_FOUND once it found an access point
-// (in the settings), DWC_INET_SCAN_FAILED if it failed or was never started
-int DWCi_WdsScan_Process(void);
+BOOL DWC_AC_StartupGetWDSInfo(DWCWDSData *settings, u16 dmaNo);
+// Takes a step of the scan: DWC_WDS_STATE_PROCESS while it runs, DWC_WDS_STATE_COMPLETED once it found an access point
+// (in the settings), DWC_WDS_STATE_FAILED if it failed or was never started
+int DWC_AC_ProcessGetWDSInfo(void);
 // Asks the scan to stop: a scan that is waiting for its time to run out ends at the next step
 void DWCi_WdsScan_Stop(void);
 // Frees the scan's work
-void DWCi_WdsScan_Free(void);
+void DWC_AC_CleanupGetWDSInfo(void);
 
 #endif // POKEBW2_DWC_WDSSCAN_H

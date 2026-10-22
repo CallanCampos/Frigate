@@ -1,5 +1,8 @@
-#include "dwc/gp.h"
+#include <string.h>
+// Before dwc/ext.h: MWCC builds gpGetLoginTicket's memcpy in place, as the ROM does, only when <string.h> declares
+// memcpy first
 #include "dwc/ext.h"
+#include "dwc/gp.h"
 #include "dwc/gpi.h"
 #include "dwc/gpiBuddy.h"
 #include "dwc/gpiBuffer.h"
@@ -13,8 +16,8 @@
 // gpGetReverseBuddiesList and gpGetLoginTicket), are in dwc/gp.h. A simulated connection answers everything with
 // empty results
 
-int gpInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
-    if (__GSIACResult != 1) {
+GPResult gpInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID) {
+    if (__GSIACResult != GSIACAvailable) {
         return 2;
     }
     if (connection == NULL) {
@@ -29,7 +32,7 @@ void gpDestroy(GPConnection *connection) {
     }
 }
 
-int gpProcess(GPConnection *connection) {
+GPResult gpProcess(GPConnection *connection) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -41,7 +44,7 @@ int gpProcess(GPConnection *connection) {
     return gpiProcess(connection, 0);
 }
 
-int gpSetCallback(GPConnection *connection, int func, GPCallback callback, void *param) {
+GPResult gpSetCallback(GPConnection *connection, GPEnum func, GPCallback callback, void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -56,8 +59,9 @@ int gpSetCallback(GPConnection *connection, int func, GPCallback callback, void 
     return 0;
 }
 
-int gpConnectPreAuthenticated(GPConnection *connection, const char *authtoken, const char *partnerchallenge,
-                              int firewall, int blocking, GPCallback callback, void *param) {
+GPResult gpConnectPreAuthenticatedA(GPConnection *connection, const gsi_char *authtoken,
+                                    const gsi_char *partnerchallenge, GPEnum firewall, GPEnum blocking,
+                                    GPCallback callback, void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -79,7 +83,7 @@ int gpConnectPreAuthenticated(GPConnection *connection, const char *authtoken, c
         callback(connection, &arg, param);
         return 0;
     }
-    return gpiConnect(connection, "", "", "", "", authtoken, partnerchallenge, NULL, firewall, FALSE, blocking,
+    return gpiConnect(connection, "", "", "", "", authtoken, partnerchallenge, NULL, firewall, gsi_false, blocking,
                       callback, param);
 }
 
@@ -89,7 +93,7 @@ void gpDisconnect(GPConnection *connection) {
 
     if (connection != NULL && (iconnection = *connection) != NULL && !iconnection->simulation) {
         state = iconnection->connectState;
-        gpiDisconnect(connection, TRUE);
+        gpiDisconnect(connection, gsi_true);
         gpiReset(connection);
         if (state == GPI_CONNECTED) {
             iconnection->connectState = GPI_DISCONNECTED;
@@ -97,9 +101,9 @@ void gpDisconnect(GPConnection *connection) {
     }
 }
 
-int gpProfileSearch(GPConnection *connection, const char *nick, const char *uniquenick, const char *email,
-                    const char *firstname, const char *lastname, int icquin, int blocking, GPCallback callback,
-                    void *param) {
+GPResult gpProfileSearchA(GPConnection *connection, const gsi_char *nick, const gsi_char *uniquenick,
+                          const gsi_char *email, const gsi_char *firstname, const gsi_char *lastname, int icquin,
+                          GPEnum blocking, GPCallback callback, void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -120,7 +124,8 @@ int gpProfileSearch(GPConnection *connection, const char *nick, const char *uniq
                             param);
 }
 
-int gpGetInfo(GPConnection *connection, int profile, int checkCache, int blocking, GPCallback callback, void *param) {
+GPResult gpGetInfo(GPConnection *connection, GPProfile profile, GPEnum checkCache, GPEnum blocking, GPCallback callback,
+                   void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL || profile == 0) {
@@ -143,7 +148,7 @@ int gpGetInfo(GPConnection *connection, int profile, int checkCache, int blockin
     return gpiGetInfo(connection, profile, checkCache, blocking, callback, param);
 }
 
-int gpSetInfos(GPConnection *connection, int info, const char *value) {
+GPResult gpSetInfosA(GPConnection *connection, GPEnum info, const gsi_char *value) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -159,7 +164,7 @@ int gpSetInfos(GPConnection *connection, int info, const char *value) {
     return gpiSetInfos(connection, info, value);
 }
 
-int gpSendBuddyRequest(GPConnection *connection, int profile, const char *reason) {
+GPResult gpSendBuddyRequestA(GPConnection *connection, GPProfile profile, const gsi_char *reason) {
     GPIConnection *iconnection;
     char reasonFixed[1025];
     int i;
@@ -185,7 +190,7 @@ int gpSendBuddyRequest(GPConnection *connection, int profile, const char *reason
             reasonFixed[i] = '/';
         }
     }
-    gpiSetBuddyDeleted(connection, profile, FALSE);
+    gpiBuddyDeletedLocally(connection, profile, gsi_false);
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\addbuddy\\");
     gpiAppendStringToBuffer(connection, &iconnection->outputBuffer, "\\sesskey\\");
     gpiAppendIntToBuffer(connection, &iconnection->outputBuffer, iconnection->sessKey);
@@ -197,7 +202,7 @@ int gpSendBuddyRequest(GPConnection *connection, int profile, const char *reason
     return 0;
 }
 
-int gpAuthBuddyRequest(GPConnection *connection, int profile) {
+GPResult gpAuthBuddyRequest(GPConnection *connection, GPProfile profile) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -213,7 +218,7 @@ int gpAuthBuddyRequest(GPConnection *connection, int profile) {
     return gpiAuthBuddyRequest(connection, profile);
 }
 
-int gpDenyBuddyRequest(GPConnection *connection, int profile) {
+GPResult gpDenyBuddyRequest(GPConnection *connection, GPProfile profile) {
     GPIConnection *iconnection;
     GPIProfile *pProfile;
 
@@ -241,7 +246,7 @@ int gpDenyBuddyRequest(GPConnection *connection, int profile) {
     return 0;
 }
 
-int gpGetNumBuddies(GPConnection *connection, int *numBuddies) {
+GPResult gpGetNumBuddies(GPConnection *connection, int *numBuddies) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -255,7 +260,7 @@ int gpGetNumBuddies(GPConnection *connection, int *numBuddies) {
     return 0;
 }
 
-int gpGetBuddyStatus(GPConnection *connection, int index, GPBuddyStatus *status) {
+GPResult gpGetBuddyStatus(GPConnection *connection, int index, GPBuddyStatus *status) {
     GPIConnection *iconnection;
     GPIProfile *profile;
     int numBuddies;
@@ -299,7 +304,7 @@ int gpGetBuddyStatus(GPConnection *connection, int index, GPBuddyStatus *status)
     return 0;
 }
 
-int gpGetBuddyIndex(GPConnection *connection, int profile, int *index) {
+GPResult gpGetBuddyIndex(GPConnection *connection, GPProfile profile, int *index) {
     GPIConnection *iconnection;
     GPIProfile *pProfile;
 
@@ -320,26 +325,26 @@ int gpGetBuddyIndex(GPConnection *connection, int profile, int *index) {
     return 0;
 }
 
-BOOL gpIsBuddy(GPConnection *connection, int profile) {
+int gpIsBuddy(GPConnection *connection, GPProfile profile) {
     GPIConnection *iconnection;
     GPIProfile *pProfile;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
-        return FALSE;
+        return gsi_false;
     }
     if (iconnection->simulation) {
-        return FALSE;
+        return gsi_false;
     }
     if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatus != NULL) {
-        return TRUE;
+        return gsi_true;
     }
     if (gpiGetProfile(connection, profile, &pProfile) && pProfile->buddyStatusInfo != NULL) {
-        return TRUE;
+        return gsi_true;
     }
-    return FALSE;
+    return gsi_false;
 }
 
-int gpDeleteBuddy(GPConnection *connection, int profile) {
+GPResult gpDeleteBuddy(GPConnection *connection, GPProfile profile) {
     GPIConnection *iconnection;
     int result;
 
@@ -353,14 +358,15 @@ int gpDeleteBuddy(GPConnection *connection, int profile) {
         gpiSetErrorString(connection, "The connection has already been disconnected.");
         return 2;
     }
-    result = gpiDeleteBuddy(connection, profile, TRUE);
+    result = gpiDeleteBuddy(connection, profile, gsi_true);
     if (result != 0) {
         return result;
     }
     return 0;
 }
 
-int gpSetStatus(GPConnection *connection, int status, const char *statusString, const char *locationString) {
+GPResult gpSetStatusA(GPConnection *connection, GPEnum status, const gsi_char *statusString,
+                      const gsi_char *locationString) {
     GPIConnection *iconnection;
     char statusStringFixed[256];
     char locationStringFixed[256];
@@ -416,7 +422,7 @@ int gpSetStatus(GPConnection *connection, int status, const char *statusString, 
     return 0;
 }
 
-int gpSendBuddyMessage(GPConnection *connection, int profile, const char *message) {
+GPResult gpSendBuddyMessageA(GPConnection *connection, GPProfile profile, const gsi_char *message) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -436,8 +442,8 @@ int gpSendBuddyMessage(GPConnection *connection, int profile, const char *messag
     return gpiSendBuddyMessage(connection, profile, GPI_BM_MESSAGE, message, 0, NULL);
 }
 
-int gpGetReverseBuddiesList(GPConnection *connection, int *targets, int numOfTargets, int blocking, GPCallback callback,
-                            void *param) {
+GPResult gpGetReverseBuddiesList(GPConnection *connection, GPProfile *targets, int numOfTargets, GPEnum blocking,
+                                 GPCallback callback, void *param) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
@@ -460,12 +466,12 @@ int gpGetReverseBuddiesList(GPConnection *connection, int *targets, int numOfTar
     return gpiOthersBuddyList(connection, targets, numOfTargets, blocking, callback, param);
 }
 
-int gpGetLoginTicket(GPConnection *connection, GPLoginTicket *loginTicket) {
+GPResult gpGetLoginTicket(GPConnection *connection, char loginTicket[GP_LOGIN_TICKET_LEN]) {
     GPIConnection *iconnection;
 
     if (connection == NULL || (iconnection = *connection) == NULL) {
         return 2;
     }
-    *loginTicket = iconnection->loginTicket;
+    memcpy(loginTicket, iconnection->loginTicket, GP_LOGIN_TICKET_LEN);
     return 0;
 }

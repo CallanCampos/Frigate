@@ -77,7 +77,7 @@ DSD_BINARIES = {
 # stored register where the game reloads the field. dsi/1.1p1 to dsi/1.3p1 generate identical code for everything
 # tested so far, while dsi/1.6 does not match the game.
 MWCC_VERSION = "dsi/1.1p1"
-# The linker only places delinked objects, so its version does not affect matching
+# The linker places objects and generates DS Protect's legacy interworking glue
 MWLD_VERSION = "dsi/1.1"
 
 # The compiler reads its sources as Shift JIS, from sjiswrap: in the default ASCII, a character whose second byte is
@@ -365,7 +365,7 @@ LD_FLAGS = [
     "-interworking",
     "-map closure,unused",
     "-msgstyle gcc",
-    "-m Entry",
+    "-m _start",
 ]
 
 
@@ -571,12 +571,34 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
             compiled.append(obj)
         objects.append(f["object_to_link"])
 
-    # The LTD autoload's objects are linked as an overlay group, for their veneers, see tools/build/ltd_objects.py
-    link_objects = build_dir / "objects_link.txt"
-    n.build([link_objects], "ltd_objects", [objects_file, lcf_file], implicit=["tools/build/ltd_objects.py"])
+    # Preserve the LTD autoload grouping in both the private prelink and final link.
+    grouped_objects = build_dir / "objects_link.txt"
+    n.build([grouped_objects], "ltd_objects", [objects_file, lcf_file],
+            implicit=["tools/build/ltd_objects.py"])
+
+    # Keep DS Protect's legacy interworking glue separate from its compiler object.
+    # Objdiff still uses the compiler output; only the final link uses the derived one.
+    link_objects = objects
+    link_response = grouped_objects
+    dsprot_path = build_dir / "lib/dsprot/src/dsprot_detect.o"
+    dsprot_object = next((obj for obj in objects if Path(obj) == dsprot_path), None)
+    if dsprot_object is not None:
+        veneer_dir = build_dir / "interworking"
+        veneer_object = veneer_dir / "dsprot_detect.o"
+        link_response = veneer_dir / "objects.txt"
+        veneer_inputs = {"objects": grouped_objects, "lcf": link_lcf,
+                         "source_object": dsprot_object, "veneer_object": veneer_object,
+                         "response": link_response, "scratch": veneer_dir / "prelink"}
+        n.build([veneer_object, link_response], "dsprot_veneers", objects,
+                implicit=[link_lcf, grouped_objects, "tools/build/restore_dsprot_veneers.py",
+                          ROOT / "tools/mwccarm" / MWLD_VERSION / "mwldarm.exe"],
+                variables={key: shlex.quote(str(value)).replace("$", "$$")
+                           for key, value in veneer_inputs.items()})
+        link_objects = [str(veneer_object) if obj == dsprot_object else obj for obj in objects]
+
     arm9_o = build_dir / "arm9.o"
-    n.build([arm9_o], "mwld", objects, implicit=[link_lcf, link_objects],
-            variables={"objects": link_objects, "lcf": link_lcf})
+    n.build([arm9_o], "mwld", link_objects, implicit=[link_lcf, link_response],
+            variables={"objects": link_response, "lcf": link_lcf})
 
     # The ROM's file system is the extracted one, with the archives built from source in place of the extracted ones.
     # The tree is made first, so that no archive is written through a link into extract/.
@@ -750,6 +772,16 @@ def main():
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
+    # Pass the runner as one executable path and the normal flags as argv data.
+    # The helper changes -proc only for its private prelink.
+    veneer_linker = shlex.quote(str(mwld)).replace("$", "$$")
+    veneer_flags = shlex.quote(json.dumps(shlex.split(" ".join(LD_FLAGS)))).replace("$", "$$")
+    n.rule("dsprot_veneers", "$python tools/build/restore_dsprot_veneers.py "
+           "--objects $objects --lcf $lcf --source-object $source_object "
+           "--output-object $veneer_object --output-response $response --scratch $scratch "
+           f"--runner $wine --linker {veneer_linker} --link-flags {veneer_flags} "
+           "--section OV165 --expected-count 8",
+           "Generating DS Protect interworking veneers for $veneer_object")
     # Scripts go through the C preprocessor, so that they can include the constant headers
     n.rule("as", f"{shlex.quote(clang)} --target=armv5te-none-eabi -x assembler-with-cpp -c $as_includes $defines "
            "-MD -MF $dep -o $out $in", "Assembling $in", depfile="$dep", deps="gcc")

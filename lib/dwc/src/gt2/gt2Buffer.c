@@ -3,43 +3,43 @@
 
 // GameSpy GT2's byte buffers (gt2Buffer.c)
 
-BOOL gti2AllocateBuffer(GTI2Buffer *buffer, int capacity) {
-    buffer->data = gsimalloc(capacity);
-    if (buffer->data == NULL) {
-        return FALSE;
+GT2Bool gti2AllocateBuffer(GTI2Buffer *buffer, int capacity) {
+    buffer->buffer = gsimalloc(capacity);
+    if (buffer->buffer == NULL) {
+        return gsi_false;
     }
-    buffer->capacity = capacity;
-    return TRUE;
+    buffer->size = capacity;
+    return gsi_true;
 }
 
-int gti2GetBufferFreeSpace(GTI2Buffer *buffer) {
-    return buffer->capacity - buffer->length;
+int gti2GetBufferFreeSpace(const GTI2Buffer *buffer) {
+    return buffer->size - buffer->len;
 }
 
-void gti2BufferWriteByte(GTI2Buffer *buffer, u8 value) {
-    buffer->data[buffer->length++] = value;
+void gti2BufferWriteByte(GTI2Buffer *buffer, GT2Byte value) {
+    buffer->buffer[buffer->len++] = value;
 }
 
-void gti2BufferWriteUShort(GTI2Buffer *buffer, u16 value) {
-    buffer->data[buffer->length++] = value >> 8;
-    buffer->data[buffer->length++] = value;
+void gti2BufferWriteUShort(GTI2Buffer *buffer, unsigned short value) {
+    buffer->buffer[buffer->len++] = value >> 8;
+    buffer->buffer[buffer->len++] = value;
 }
 
-void gti2BufferWriteData(GTI2Buffer *buffer, const void *data, int size) {
+void gti2BufferWriteData(GTI2Buffer *buffer, const GT2Byte *data, int size) {
     if (data == NULL || size == 0) {
         return;
     }
     if (size == -1) {
         size = strlen(data);
     }
-    memcpy(buffer->data + buffer->length, data, size);
-    buffer->length += size;
+    memcpy(buffer->buffer + buffer->len, data, size);
+    buffer->len += size;
 }
 
 void gti2BufferShorten(GTI2Buffer *buffer, int offset, int size) {
     if (offset == -1) {
-        offset = buffer->length - size;
+        offset = buffer->len - size;
     }
-    memmove(buffer->data + offset, buffer->data + offset + size, buffer->length - offset - size);
-    buffer->length -= size;
+    memmove(buffer->buffer + offset, buffer->buffer + offset + size, buffer->len - offset - size);
+    buffer->len -= size;
 }

@@ -67,7 +67,7 @@ void MusPokeDraw_SetFront(MusPokeDraw *poke, BOOL front);
 void MusPokeDraw_SetFlip(MusPokeDraw *poke, BOOL flip);
 void MusPokeDraw_SetTexBase(MusPokeDrawSys *sys, u32 base);
 void MusPokeDraw_SetPlttBase(MusPokeDrawSys *sys, u32 base);
-MusPokeDrawEquipPos *MusPokeDraw_GetEquipPos(MusPokeDraw *poke, u32 pos);
+MusPokeDrawEquipPos *MusPokeDraw_GetEquipPos(MusPokeDraw *poke, int pos);
 VecFx32 *MusPokeDraw_GetMarkPos4(MusPokeDraw *poke);
 VecFx32 *MusPokeDraw_GetMarkPos5(MusPokeDraw *poke);
 
