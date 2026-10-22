@@ -859,6 +859,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   argument after the loop. (matching.md: "A search loop whose normal exit")
 - A static loaded in the loop on each pass where the ROM loads it once below the entry test, with a store through
   a pointer in the loop: declare the static inside the function. (matching.md: "A function-local `static` is hoisted")
+- A second loop counter that the original zeroes, stores and steps but never reads: the same variable is also read as a
+  value before the loop (`i = f(); if (i > n) { n = i; }`), which keeps its steps. (matching.md: "drops a loop counter
+  that only indexes")
 
 ## Switches
 

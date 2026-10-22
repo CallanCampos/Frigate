@@ -3142,6 +3142,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   around a `for` whose counter was set before the `if`: `int i = 0; ... if (length > 0) { for (; i < length; i++) ... }`
   in NHTTP's `NHTTPi_getUrlEncodedSize2`, and the copy loop of `dwcutil_ac.c`'s `UtilAc_Scan` (still in its row). A
   bare `for`, or the `if` without the earlier start, gives one branch.
+- MWCC 2.0 drops a loop counter that only indexes what the loop steps by pointer, with all its stores and steps, unless
+  the same variable is read as a value elsewhere before the loop. `dwcutil_ac.c`'s `UtilAc_Scan` copies the access
+  points with `for (; j < count; j++)`, storing to `scan->entries[i]` and stepping `i` after `bss++`; the original
+  zeroes, stores and steps `i` without reading it, and so does ours once the same `i` holds the AP list's length in the
+  event loop before (`i = UtilAcWcm_GetApList(...); if (i > count) { count = i; ... }`). Assigned in the `if`'s
+  condition, read only by a `switch`, or read after the loop, it is dropped. The loop's part of a variable reused this
+  way is spilled to the lowest slot, below the loop's temporaries.
 
 ## Switches
 
