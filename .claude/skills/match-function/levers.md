@@ -216,6 +216,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A loop's character and index swapped although every order of the locals was tried: read the character into an
   `int c;` declared first at the top. (matching.md: "declared first at the top")
+- Don't try `register` for allocation or a counter that nothing reads: MWCC 2.0/sp2 ignores it. A `const` on an
+  initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
 
 ## Stack slots or frame size
 

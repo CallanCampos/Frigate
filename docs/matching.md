@@ -4028,3 +4028,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   cursor and puts the rest under `if (end > hi) ... else`, and its `CARDi_ReadRomHashImageDirect` gets the sector
   index from a `static inline`; `mi_sharedWram_twl.c`'s `MIi_ReserveWramSlotCore` bounds both loops by
   `slot + banks`. Look the function up there before grinding registers.
+
+- MWCC 2.0/sp2 (`-O4,p`) ignores the `register` storage class: `register` on any local or parameter leaves the code
+  byte-identical, with or without register pressure, and a `register` counter that is stepped but never read is
+  dropped like any other. `dwcutil_ac.c`'s `UtilAc_FindSetupAp` and `UtilAc_Scan` gave the same bytes with it on every
+  local and parameter, alone and in pairs. A top-level `const` on an `int` or pointer parameter changes nothing either,
+  but a `const` on an initialized local can: `UtilAc_Scan`'s `const int size` swaps `size`'s stack slot with the copy
+  loop's entry pointer.
