@@ -2540,6 +2540,17 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   before its switch, whose `b` the callback's early `return` above it then shares, and `break;` ending its cases;
   with the switch inside `if (!stream->paused) { ... }` and the running case ending in `return;`, that `bne` took
   a later `b` the case's `return` had put on the return label.
+- MWCC 2.0's Thumb fixer for `b<cond>` out of range (sp2's `mwccarm.exe`, 0x515630) goes from the function's last
+  branch back to its first. For each one it finds the first block after it that starts with a `b` to the same label
+  and is a branch target, and goes through that `b` if it is in range; otherwise it inverts the branch around a new
+  `b`, which the branches before it can then take. A `b` that only closes a block (a case's `break` reached by falling
+  through) is never taken. Branch optimization, which runs after register allocation, sends a branch to a block that
+  is a lone `b` on to that `b`'s target, so an `if` whose body falls into a `b` leaves no block there; when the
+  original's out-of-range branches share the `b` after an `if` body, that `if`'s test still branched to it, because
+  the block after the `if` held another instruction at that stage that the final code no longer has. A test function
+  shows it with a copy between two variables that end up in one register (`int k = f(); if (k == X) { ... } last =
+  k;`): the `bne` keeps that `b`, and earlier branches to the loop's end take it. `dwcutil_ac.c`'s `UtilAc_Run`
+  differs only this way (its row).
 - Identical statements in different branches are merged, so a branch that jumps into the middle of another block had
   the same code in the source. For example, `if (a) { x = 3; y = 19; } else { x = 0; y = 19; }` compiles differently
   from `x = a ? 3 : 0; y = 19;`. A run of jumps to one store, as in the start menu's `StartMenu_MoveCursor`, is the
