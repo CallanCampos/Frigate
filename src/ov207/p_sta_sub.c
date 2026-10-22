@@ -276,7 +276,7 @@ void PStaSub_FreeActors(PStatusWork *wk, PStaSubWork *sub) {
 void PStaSub_Load(PStatusWork *wk, PStaSubWork *sub) {
     BoxPkm *pkm = PStatus_GetBoxPkm(wk);
     u32 species;
-    void *personal;
+    PersonalData *personal;
 
     if (wk->param->dataType == PSTATUS_DATA_PARTY) {
         sub->frontShown = PokeParty_GetSlotExists(wk->param->party, wk->partyIndex);

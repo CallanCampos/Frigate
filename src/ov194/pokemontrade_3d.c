@@ -615,7 +615,7 @@ void func_ov194_021c23a4(PokemonTradeWork *wk, int side, BOOL front, PartyPkm *p
     if (mirror) {
         u16 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         u16 form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
-        void *personal = PML_PersonalLoad(species, form, wk->heapId);
+        PersonalData *personal = PML_PersonalLoad(species, form, wk->heapId);
         // The species' flag that its sprite is never mirrored
         u32 noMirror = PML_PersonalGetParam(personal, 34);
 

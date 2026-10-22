@@ -767,7 +767,7 @@ static void dittoAbilFix(EggParents *parents, EggData *egg, EggRandom *rnd) {
 }
 
 static void FetchEggBaseHappiness(EggData *egg, HeapID heapId) {
-    void *personal = PML_PersonalLoad(egg->species, egg->form, heapId);
+    PersonalData *personal = PML_PersonalLoad(egg->species, egg->form, heapId);
     u32 happiness = PML_PersonalGetParam(personal, PERSONAL_HATCH_CYCLES);
 
     PML_PersonalFree(personal);
@@ -1056,7 +1056,7 @@ static void createEggPkm(PartyPkm *pkm, const EggData *egg, PlayerInfo *info, u3
 static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 item) {
     u32 flags;
     u32 bit;
-    void *personal;
+    PersonalData *personal;
 
     if (species >= SPECIES_GENESECT) {
         return FALSE;

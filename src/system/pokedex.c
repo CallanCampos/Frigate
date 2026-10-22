@@ -410,7 +410,7 @@ u16 getNumberOfForms(u16 species) {
 
 void PokeDex_GetShownSexRareForm(PokeDexSave *pokedex, u16 species, u32 *sex, u32 *rare, u32 *form, HeapID heapId) {
     int entry = getIndexNumOfPkmForm(species);
-    void *personal;
+    PersonalData *personal;
 
     if (entry != -1) {
         int index = getIndexPokemonWithForms(species);

@@ -81,9 +81,9 @@ void PML_PersonalFetchBW1(u16 species, u16 form, PersonalData *dest);
 u32 PML_PersonalGetParamSingle(u16 species, u16 form, u32 param);
 // The same from Black and White's personal data, which the musical's sprites still follow
 u32 PML_PersonalGetParamSingleBW1(u16 species, u16 form, u32 param);
-void *PML_PersonalLoad(u16 species, u16 form, HeapID heapId);
-u32 PML_PersonalGetParam(void *personal, u32 param);
-void PML_PersonalFree(void *personal);
+PersonalData *PML_PersonalLoad(u16 species, u16 form, HeapID heapId);
+u32 PML_PersonalGetParam(PersonalData *personal, u32 param);
+void PML_PersonalFree(PersonalData *personal);
 #define LEARNSET_MAX 26
 #define LEARNSET_END 0xffff
 

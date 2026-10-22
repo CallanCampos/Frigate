@@ -40,20 +40,18 @@ void PML_LearnsetLvUpLoad(u16 species, u16 form, LearnsetEntry *dest) {
     GFL_ArcSysRead(dest, ARCID_LEARNSETS, PML_PersonalGetDatID(species, form));
 }
 
-void *PML_PersonalLoad(u16 species, u16 form, HeapID heapId) {
+PersonalData *PML_PersonalLoad(u16 species, u16 form, HeapID heapId) {
     PersonalData *personal = GFL_HeapAllocate(heapId, sizeof(PersonalData), FALSE, "poke_personal.c", 124);
 
     PML_PersonalFetchBW2(species, form, personal);
     return personal;
 }
 
-void PML_PersonalFree(void *personal) {
+void PML_PersonalFree(PersonalData *personal) {
     GFL_HeapFree(personal);
 }
 
-u32 PML_PersonalGetParam(void *personal, u32 param) {
-    PersonalData *data = personal;
-
+u32 PML_PersonalGetParam(PersonalData *data, u32 param) {
     switch (param) {
     case 0:
         return data->hp;

@@ -762,7 +762,7 @@ static u8 getPkmAbilSlotNumber(BoxPkm *pkm) {
     int slot = ABILITY_SLOT_1;
     u32 species = PML_PkmGetParam(pkm, PKM_PARAM_SPECIES, NULL);
     u32 form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
-    void *personal = PML_PersonalLoadBW2(species, form);
+    PersonalData *personal = PML_PersonalLoadBW2(species, form);
     u32 pid = PML_PkmGetParam(pkm, PKM_PARAM_PID, NULL);
     u32 mask = 0x10000;
 

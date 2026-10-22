@@ -1050,7 +1050,7 @@ static PartyPkm *CygnusData_CreatePokemon(const CygnusData *data, u32 index, Hea
         int badges = getBadgeCount(getTrainerCardDataBlkAddress(data->gameData));
         u8 level = sLevelsByBadges[MATH_CLAMP(badges, 0, NELEMS(sLevelsByBadges) - 1)];
         PartyPkm *pkm = PokeParty_NewTempPkm(species, level, id, heapId);
-        void *personal;
+        PersonalData *personal;
 
         PokeParty_CreatePkm(pkm, species, level, id, -1, pid);
         PokeParty_ChangeForme(pkm, form);
@@ -1246,7 +1246,7 @@ static void CygnusData_ReadEntries(CygnusData *data, const u32 *words, HeapID he
 }
 
 static BOOL CygnusData_IsPokemonValid(u16 species, u8 form, u8 sex, HeapID heapId) {
-    void *personal;
+    PersonalData *personal;
     u32 formCount;
     u32 sexRatio;
 

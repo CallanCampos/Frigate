@@ -259,7 +259,7 @@ void StaActPoke_SetScrollOffset(StaActPokeSys *sys, u16 scroll) {
 StaActPoke *StaActPoke_CreatePoke(StaActPokeSys *sys, MusicalPoke *musPoke) {
     u8 i;
     StaActPoke *poke;
-    void *personal;
+    PersonalData *personal;
     BOOL show;
 
     // BUG: The search runs over 9 Pokémon, where the system has 4

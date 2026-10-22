@@ -185,7 +185,7 @@ struct ZukanInfo {
     /* 0x1b8 */ MsgData *givenMsgs[3];
     /* 0x1c4 */ ArcTool *arcs[ZUKAN_INFO_ARC_COUNT];
     /* 0x1e0 */ MsgData *msgs[ZUKAN_INFO_MSG_COUNT];
-    /* 0x26c */ void *personal;
+    /* 0x26c */ PersonalData *personal;
     /* 0x270 */ StrBuf *labels[ZUKAN_INFO_STRBUF_COUNT];
     /* 0x2b0 */ u16 *formNameTable;
 };
@@ -1246,7 +1246,7 @@ static void ZukanInfo_FreeTypeIcons(ZukanInfo *info) {
 
 // Shows the Pokémon's types in the slot, in the game's language or in another one
 static void ZukanInfo_ShowTypes(ZukanInfo *info, u32 language, u32 slot) {
-    void *personal = info->personal;
+    PersonalData *personal = info->personal;
     u8 type1 = PML_PersonalGetParam(personal, PERSONAL_TYPE_1);
     u8 type2 = PML_PersonalGetParam(personal, PERSONAL_TYPE_2);
 

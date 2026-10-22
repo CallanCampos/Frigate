@@ -116,7 +116,7 @@ static u8 func_ov194_021c2b08(BoxPkm *pkm, HeapID heapId) {
     if (PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
         if (!PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL)) {
             u16 form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
-            void *personal = PML_PersonalLoad(species, form, heapId);
+            PersonalData *personal = PML_PersonalLoad(species, form, heapId);
             color = PML_PersonalGetParam(personal, 33);
             PML_PersonalFree(personal);
         } else {

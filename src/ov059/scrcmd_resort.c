@@ -649,7 +649,7 @@ BOOL ResortCmd_ShortenEggSteps(VM *vm, FieldScriptEnv *env) {
     PartyPkm *pkm;
     u32 species;
     u32 form;
-    void *personal;
+    PersonalData *personal;
     u32 cycles;
 
     FieldScriptEnv_GetScriptWork(env);

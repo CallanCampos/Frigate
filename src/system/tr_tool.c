@@ -752,7 +752,7 @@ static void TrainerUtil_CalcBasePID(u32 species, u32 form, u8 genderAbility, u32
     int ability = (genderAbility & 0xf0) >> 4;
 
     if (genderAbility != 0) {
-        void *personal = PML_PersonalLoad(species, form, heapId);
+        PersonalData *personal = PML_PersonalLoad(species, form, heapId);
 
         if (sex != 0) {
             *pidBase = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);
