@@ -1247,11 +1247,11 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
 // Scans for the access points until one opens its setup; 1 when one did, or a negative number
 static int UtilAc_Scan(void) {
     UtilAcScan *scan = NULL;
-    UtilAcScan *previous = NULL;
     int result = RESULT_NO_MEMORY;
-    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
+    UtilAcScan *previous = NULL;
     int round;
     int foundIndex = 0;
+    int size = sAcApCount * sizeof(UtilAcScanEntry) + sizeof(UtilAcScan);
     char text[0x20];
 
     scan = UtilAc_Calloc(1, size);
@@ -1260,9 +1260,10 @@ static int UtilAc_Scan(void) {
         if (previous != NULL) {
             for (round = 0; round < 30 && !sAcCancel; round++) {
                 OSAlarm alarm;
-                BOOL waiting = TRUE;
-                int count = 0;
+                BOOL waiting;
+                int count;
                 int i;
+                WMBssDesc *bss;
 
                 if (UtilAc_GetMilliseconds() >= sAcConfig.deadline) {
                     break;
@@ -1273,6 +1274,8 @@ static int UtilAc_Scan(void) {
                 }
                 OS_CreateAlarm(&alarm);
                 OS_SetAlarm(&alarm, OS_MilliSecondsToTicks(2000), UtilAc_OnAlarm, (void *)EVENT_SCAN_TIMEOUT);
+                waiting = TRUE;
+                count = 0;
                 do {
                     int event;
 
@@ -1329,22 +1332,25 @@ static int UtilAc_Scan(void) {
                 if (sAcCancel) {
                     break;
                 }
+                i = 0;
                 if (count >= sAcApCount) {
                     result = RESULT_TOO_MANY_APS;
                     goto done;
                 }
-                for (i = 0; i < count; i++) {
-                    WMBssDesc *bss = (WMBssDesc *)sAcApList + i;
-
-                    memcpy(scan->entries[i].ssid, bss->ssid, 0x20);
-                    scan->entries[i].ssidLength = bss->ssidLength;
-                    scan->entries[i].ssid[bss->ssidLength] = 0;
-                    if (bss->capaInfo & 0x10) {
-                        scan->entries[i].secure = 1;
-                    } else {
-                        scan->entries[i].secure = 0;
+                bss = (WMBssDesc *)sAcApList;
+                if (count > 0) {
+                    for (; i < count; i++) {
+                        memcpy(scan->entries[i].ssid, bss->ssid, 0x20);
+                        scan->entries[i].ssidLength = bss->ssidLength;
+                        scan->entries[i].ssid[bss->ssidLength] = 0;
+                        if (bss->capaInfo & 0x10) {
+                            scan->entries[i].secure = 1;
+                        } else {
+                            scan->entries[i].secure = 0;
+                        }
+                        memcpy(scan->entries[i].bssid, bss->bssid, 6);
+                        bss++;
                     }
-                    memcpy(scan->entries[i].bssid, bss->bssid, 6);
                 }
                 scan->count = count;
                 if (sAcState != AC_STATE_SCANNING && UtilAc_FindSetupAp(scan, previous, &foundIndex)) {
@@ -1354,8 +1360,7 @@ static int UtilAc_Scan(void) {
                     strcpy(sAcApSsid, entry->ssid);
                     memcpy(sAcApMac, entry->bssid, 6);
                     UtilAc_FormatMacAddress(text, (s8 *)sAcApMac);
-                    result = RESULT_OK;
-                    goto done;
+                    break;
                 }
                 memcpy(previous, scan, size);
                 sAcState = AC_STATE_SCANNED;
@@ -1651,7 +1656,7 @@ static int UtilAc_MakeIds(u8 *key, const SocAddrIn *from) {
 // Takes the items of the message with the settings; whether it named the network
 static int UtilAc_ParseSettings(const u8 *message) {
     const u8 *cursor = message + 8;
-    const u8 *end = cursor + SWAP16(*(u16 *)message);
+    const u8 *end;
     const u8 *data;
     u32 type;
     u32 length;
@@ -1659,6 +1664,7 @@ static int UtilAc_ParseSettings(const u8 *message) {
     int i;
     u16 value;
 
+    end = cursor + SWAP16(*(u16 *)message);
     while ((data = UtilAc_NextItem(&cursor, end, &type, &length)) != NULL) {
         switch (type) {
         case 0x201:
@@ -1692,8 +1698,8 @@ static int UtilAc_ParseSettings(const u8 *message) {
             if (sAcSettings.keys[0].format == 1) {
                 char *p = sAcSettings.keys[type - 0x206].key;
 
-                for (i = 0; i < length; i++) {
-                    p += UtilAc_FormatHexByte(p, data[i]);
+                for (i = 0; i < (int)length; i++) {
+                    p += UtilAc_FormatHexByte(p, *data++);
                 }
             } else {
                 memcpy(sAcSettings.keys[type - 0x206].key, data, length);
