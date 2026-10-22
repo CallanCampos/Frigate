@@ -331,7 +331,7 @@ static void *LoadWaveArcTable(u32 fileId, NNSSndHeapHandle heap, BOOL bSetAddr) 
 
 // Clears the file from arc's file table if mem is where it was loaded
 static void ClearFileAddress(void *mem, NNSSndArc *arc, u32 fileId) {
-    u32 enabled;
+    OSIntrMode enabled;
     NNSSndArc *current;
 
     if (arc != NULL) {

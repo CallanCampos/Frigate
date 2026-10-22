@@ -304,7 +304,7 @@ void CPS_Startup(CPSConfig *config) {
 
 // CPS_CalmDown
 int CPS_CalmDown(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     BOOL ended = OS_IsThreadTerminated(&sScavengerThread);
 
     if (!ended && !sCalmDown) {

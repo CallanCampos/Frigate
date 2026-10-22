@@ -131,7 +131,7 @@ static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *pack
     if (size < 0x10) {
         return -1;
     }
-    if (gVCTSettings.unkC == 1) {
+    if (gVCTSettings.listenMode == 1) {
         return -3;
     }
     if (command >= 5) {
@@ -150,7 +150,7 @@ static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *pack
     return 0;
 }
 
-int VCT_Request(VCTSession *session, int command) {
+int VCT_Request(VCTSession *session, VCTRequestCode command) {
     if (gVCTSettings.mode == 2) {
         return -3;
     }
@@ -184,7 +184,7 @@ static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *pac
     return 0;
 }
 
-int VCT_Respond(VCTSession *session, int command) {
+int VCT_Respond(VCTSession *session, VCTResponseCode command) {
     if (gVCTSettings.mode == 2) {
         return -3;
     }
@@ -251,7 +251,7 @@ BOOL VCT_InitSessions(VCTConfig *config) {
     sSessionPool.usedList = NULL;
     sSessionState.mask = 0;
     sSessionState.count = 0;
-    gVCTSettings.unk14 = 0;
+    gVCTSettings.autoResponse = 0;
     sSessionPool.clock = OS_GetTick;
     sSessionPool.randomMultiplier = 0x5d588b65;
     sSessionPool.randomIncrement = 0x269ec3;
@@ -270,7 +270,7 @@ void VCT_CheckTimeout(void) {
     if (gVCTSettings.mode != 2) {
         return;
     }
-    if (gVCTSettings.unkC == 0) {
+    if (gVCTSettings.listenMode == 0) {
         return;
     }
     if (sRequestTime == 0) {
@@ -297,7 +297,7 @@ BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEve
     if (packet->length != sizeof(VCTControlPacket)) {
         return HandleClosePacket(packet, result);
     }
-    if (gVCTSettings.unkC == 0) {
+    if (gVCTSettings.listenMode == 0) {
         return HandlePeerPacket(packet, result);
     }
     return HandleHostPacket(packet, result);

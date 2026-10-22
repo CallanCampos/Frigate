@@ -9,13 +9,41 @@
 // are ours, in the SDK's style. DWC_FRIEND_FLAG_4 and _5, and the DWCi_Acc_ functions of flags 4 and 5, are
 // placeholders until the overlay 11 code that uses them (0x0215e572, 0x0215ead6) shows what they mean.
 
-// A DWCAccFriendData of the SDK. Its first word holds the high 11 bits of a 43-bit user ID in its low bits and 21 bits
-// of flags above them; the bottom two flag bits are the kind of ID that the other two words hold
-typedef struct DWCFriendData {
-    u32 header;
-    u32 word1;
-    u32 word2;
-} DWCFriendData;
+// The SDK's DWCAccFriendData and its four views, as NitroDWC's base/dwc_account.h has them. Its first word holds the
+// high 11 bits of a 43-bit user ID in its low bits and 21 bits of flags above them; the bottom two flag bits are the
+// kind of ID that the other two words hold
+typedef struct DWCAccFlag {
+    u32 flags;
+    u32 reserved;
+    u32 reserved1;
+} DWCAccFlag;
+
+typedef struct DWCAccLoginId {
+    u32 id_data;
+    u32 userid_lo32;
+    u32 playerid;
+} DWCAccLoginId;
+
+typedef struct DWCAccFriendKey {
+    u32 id_data;
+    u32 friendkey_lo32;
+    u32 friendkey_hi32;
+} DWCAccFriendKey;
+
+typedef struct DWCAccGsProfileId {
+    u32 id_data;
+    int id;
+    u32 reserved;
+} DWCAccGsProfileId;
+
+typedef union DWCAccFriendData {
+    DWCAccFlag flags;
+    DWCAccLoginId login_id;
+    DWCAccFriendKey friend_key;
+    DWCAccGsProfileId gs_profile_id;
+} DWCAccFriendData;
+
+typedef DWCAccFriendData DWCFriendData;
 
 // The kinds of friend data
 #define DWC_FRIEND_TYPE_NONE 0
@@ -35,28 +63,30 @@ typedef struct DWCFriendData {
 #define DWC_FRIEND_FLAG_5 0x20
 
 // A DWCAccUserData of the SDK, which the save keeps for the player
-typedef struct DWCUserData {
-    u32 size;
+typedef struct DWCAccUserData {
+    int size;
     // The login ID that the library made for this save: the console's Wi-Fi ID and a random player ID
-    DWCFriendData pseudo;
+    DWCAccLoginId pseudo;
     // The login ID that the server has authenticated for the profile, once there is one
-    DWCFriendData authentic;
-    s32 gsProfileId;
+    DWCAccLoginId authentic;
+    int gsProfileId;
     // Bit 0 is set while the data has changed and is still to be saved
-    u32 flags;
+    int flags;
     u32 gameCode;
-    u8 unk28[0x14];
+    int reserved[5];
     // Of the 0x3c bytes before it
     u32 crc32;
-} DWCUserData;
+} DWCAccUserData;
+
+typedef DWCAccUserData DWCUserData;
 
 #define DWC_USER_DATA_DIRTY 0x1
 
 // The user ID of a login ID: 43 bits
-u64 DWCi_Acc_GetUserId(const DWCFriendData *loginId);
+u64 DWCi_Acc_GetUserId(const DWCAccLoginId *loginId);
 // Sets the user ID of a login ID and its player ID
-void DWCi_Acc_SetUserId(DWCFriendData *loginId, u64 userId);
-void DWCi_Acc_SetPlayerId(DWCFriendData *loginId, u32 playerId);
+void DWCi_Acc_SetUserId(DWCAccLoginId *loginId, u64 userId);
+void DWCi_Acc_SetPlayerId(DWCAccLoginId *loginId, u32 playerId);
 
 // Whether friend data is a buddy: a confirmed profile ID that has the buddy flag; whether it is a confirmed profile ID;
 // whether it has the buddy flag and whether it has the fifth
@@ -77,13 +107,13 @@ BOOL DWC_CheckFriendKey(const DWCUserData *userData, u64 friendKey);
 // Writes the low bits of a value as base 32 text, the most significant digit first, and a NUL
 void DWCi_Acc_EncodeBase32(u64 value, int bits, char *dest);
 // The login name of a login ID in a game: 20 characters and a NUL
-void DWCi_Acc_CreateLoginName(const DWCFriendData *loginId, u32 gameCode, char *dest);
+void DWCi_Acc_CreateLoginName(const DWCAccLoginId *loginId, u32 gameCode, char *dest);
 // Makes a login ID from the console's Wi-Fi ID (or the pending one, while none is confirmed) and a random player ID
-void DWCi_Acc_CreateLoginId(DWCFriendData *loginId);
+void DWCi_Acc_CreateLoginId(DWCAccLoginId *loginId);
 // Whether a login ID is made from the console's Wi-Fi ID (or the pending one)
-BOOL DWCi_Acc_IsConsoleLoginId(const DWCFriendData *loginId);
+BOOL DWCi_Acc_IsConsoleLoginId(const DWCAccLoginId *loginId);
 // Whether friend data is a login ID; whether the user data has an authenticated one
-BOOL DWCi_Acc_IsLoginId(const DWCFriendData *friendData);
+BOOL DWCi_Acc_IsLoginId(const DWCAccLoginId *loginId);
 BOOL DWCi_Acc_HasAuthenticLoginId(const DWCUserData *userData);
 BOOL DWC_IsValidFriendData(const DWCFriendData *friendData);
 BOOL DWCi_IsValidFriendData(const DWCFriendData *friendData);
@@ -94,20 +124,20 @@ BOOL DWC_CheckUserData(const DWCUserData *userData);
 BOOL DWC_CheckValidConsole(const DWCUserData *userData);
 BOOL DWC_CheckHasProfile(const DWCUserData *userData);
 // Authenticates a login ID for a profile ID
-void DWCi_Acc_SetAuthenticLoginId(DWCUserData *userData, const DWCFriendData *loginId, s32 profileId);
+void DWCi_Acc_SetAuthenticLoginId(DWCUserData *userData, const DWCAccLoginId *loginId, int profileId);
 // Whether the user data has changed since it was saved; and clears that
 BOOL DWC_CheckDirtyFlag(const DWCUserData *userData);
 void DWC_ClearDirtyFlag(DWCUserData *userData);
 // The friend key of friend data, or 0 when it is not one
 u64 DWC_GetFriendKey(const DWCFriendData *friendData);
-s32 DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendData);
+int DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendData);
 // The player's own friend key, or 0 while the player has no profile ID
 u64 DWC_CreateFriendKey(const DWCUserData *userData);
 // Makes friend data from a friend key
 void DWC_CreateFriendKeyToken(DWCFriendData *token, u64 friendKey);
 void DWC_CreateExchangeToken(const DWCUserData *userData, DWCFriendData *token);
 // Makes friend data from a profile ID
-void DWCi_Acc_CreateProfileIdToken(DWCFriendData *token, s32 profileId);
+void DWCi_Acc_CreateProfileIdToken(DWCFriendData *token, int profileId);
 // The login name of a login ID in the user data's game
 void DWCi_Acc_GetLoginName(const DWCUserData *userData, const DWCFriendData *loginId, char *dest);
 // Whether two friends' data name the same friend

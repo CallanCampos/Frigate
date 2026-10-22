@@ -110,7 +110,7 @@ static int SOCLi_CopyCPSBuffer(SOCLSocket *socket, void *buf, int len, u16 *remo
     CPSInAddr sender_ip;
     int result;
     u8 *data;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     data = SOCLi_ReadCPSBuffer(socket, &avail, &local_port, &sender_port, &sender_ip);
     if (data != NULL) {
@@ -309,7 +309,7 @@ static int SOCLi_ConsumeCallBack(void *arg) {
 
 static int SOCLi_ConsumeCPSBuffer(SOCLSocket *socket) {
     SOCLRecvPipe *pipe = socket->recv_pipe;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int consume_len = pipe->cps_read_len;
 
     if (consume_len != 0) {
@@ -324,7 +324,7 @@ static int SOCLi_ReadUdpBuffer(SOCLSocket *socket, void *buf, int len, u16 *remo
                                s32 block) {
     SOCLRecvPipe *pipe = socket->recv_pipe;
     SOCLUdpPacket *packet;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int result;
 
     packet = pipe->udp_head;
@@ -376,7 +376,7 @@ BOOL SOCLi_UdpRecvCallback(u8 *data, u32 len, CPSSoc *soc) {
     SOCLSocket *socket = (SOCLSocket *)soc;
     SOCLRecvPipe *pipe = socket->recv_pipe;
     SOCLUdpPacket *packet;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (pipe->udp_queued_max >= pipe->udp_queued + len) {
         packet = SOCLiConfigPtr->alloc(len + sizeof(SOCLUdpPacket));

@@ -12,16 +12,33 @@
 // the game's own code for it. The ROM names none of its functions, so the names say what the code does; the one name
 // the ROM gives is the field `aid` of the configuration, from an assertion.
 
-// Called with an event for a session. The events are numbers: 1, 4 and 8 for a request, 7 for the voice starting, and
-// 2, 3, 9, 11 and 12 for a refusal, a close or the end of it
-typedef void (*VCTCallback)(u8 aid, int event, VCTSession *session, void *userData);
+// The events of a session: 1, 4 and 8 for a request, 7 for the voice starting, and 2, 3, 9, 11 and 12 for a refusal, a
+// close or the end of it. The SDK's VCTEvent (ntrtwl's libvct, include/vct.h)
+typedef enum VCTEvent {
+    VCT_EVENT_NONE,
+    VCT_EVENT_INCOMING,
+    VCT_EVENT_REJECT,
+    VCT_EVENT_BUSY,
+    VCT_EVENT_CANCEL,
+    VCT_EVENT_NOTIFY_FREE,
+    VCT_EVENT_NOTIFY_BUSY,
+    VCT_EVENT_CONNECTED,
+    VCT_EVENT_RESPONDBYE,
+    VCT_EVENT_DISCONNECTED,
+    VCT_EVENT_CONTACT,
+    VCT_EVENT_TIMEOUT,
+    VCT_EVENT_ABORT,
+} VCTEvent;
+
+// Called with an event for a session
+typedef void (*VCTCallback)(u8 aid, VCTEvent event, VCTSession *session, void *userData);
 
 struct VCTConfig {
     // Memory for the sessions, and how many there are, at most 8
     VCTSession *sessions;
     u32 sessionCount;
     // 1, 2 or 3. In the first the application chooses to ask and to answer for each machine
-    int mode;
+    VCTMode mode;
     // The ID of this machine in the match, below 32
     u8 aid;
     u8 pad[3];
@@ -38,6 +55,6 @@ void VCT_Shutdown(void);
 // Runs the library a tick
 void VCT_Tick(void);
 // Takes in a packet that another machine has sent, returning FALSE for one that is not meant for the library
-BOOL VCT_ReceivePacket(u8 aid, void *data, int size);
+BOOL VCT_ReceivePacket(u8 aid, u8 *data, int size);
 
 #endif // POKEBW2_DWC_VCT_H

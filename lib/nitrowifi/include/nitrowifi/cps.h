@@ -16,6 +16,16 @@
 
 typedef u32 CPSInAddr;
 
+// A certificate authority that the SSL layer accepts (NitroWiFi's ssl.h): its distinguished name, the RSA modulus of
+// its public key and the key's public exponent
+typedef struct CPSCaInfo {
+    char *dn;
+    int modulus_len;
+    u8 *modulus;
+    int exponent_len;
+    u8 *exponent;
+} CPSCaInfo;
+
 // What CPS_Startup takes
 typedef struct CPSConfig {
     u32 mode;                 // CPS_MODE_*

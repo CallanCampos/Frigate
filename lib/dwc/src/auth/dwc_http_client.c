@@ -43,7 +43,7 @@ void *DWCi_NasRootCerts[12] = {
 // Whether the request that runs leaves the server's certificate unchecked (a URL other than the retail server's)
 int DWCi_HttpTestServer;
 
-int DWC_Http_Create(DWCHttp *http, const DWCHttpParam *config) {
+DWCHttpError DWC_Http_Create(DWCHttp *http, DWCHttpParam *config) {
     DWCHttpAlloc alloc = config->alloc;
 
     MI_CpuFill8(http, 0, sizeof(DWCHttp));
@@ -75,7 +75,7 @@ int DWC_Http_Create(DWCHttp *http, const DWCHttpParam *config) {
     return http->result;
 }
 
-BOOL DWC_Http_FinishHeader(DWCHttp *http) {
+DWCHttpError DWC_Http_FinishHeader(DWCHttp *http) {
     char length[8];
     int size;
 
@@ -318,7 +318,7 @@ static int DWCi_Http_MakeRequestLine(DWCHttp *http) {
     const char *format = "POST /%s HTTP/1.0\r\nContent-type: application/x-www-form-urlencoded\r\nHost: %s\r\n\r\n";
     int length;
 
-    if (http->param.get != 0) {
+    if (http->param.action != DWC_HTTP_POST) {
         format = "GET /%s HTTP/1.0\r\nHost: %s\r\n\r\n";
     }
     length = strlen(http->host) + (strlen(format) - 4 + strlen(http->path));
@@ -329,7 +329,7 @@ static int DWCi_Http_MakeRequestLine(DWCHttp *http) {
     return 0;
 }
 
-int DWC_Http_Add_HeaderItem(DWCHttp *http, const char *name, const char *value) {
+DWCHttpError DWC_Http_Add_HeaderItem(DWCHttp *http, char *name, char *value) {
     int length;
     DWCHttpBuffer *request = &http->request;
     char *line;
@@ -349,7 +349,7 @@ int DWC_Http_Add_HeaderItem(DWCHttp *http, const char *name, const char *value) 
     return 0;
 }
 
-int DWC_Http_Add_PostBase64Item(DWCHttp *http, const char *name, const void *value, int size) {
+DWCHttpError DWC_Http_Add_PostBase64Item(DWCHttp *http, const char *name, const char *value, unsigned long size) {
     DWCHttpBuffer *request = &http->request;
     const char *format = "%s=";
     int encoded;
@@ -378,7 +378,7 @@ int DWC_Http_Add_PostBase64Item(DWCHttp *http, const char *name, const void *val
     return 0;
 }
 
-int DWC_Http_Add_Body(DWCHttp *http, const char *text) {
+DWCHttpError DWC_Http_Add_Body(DWCHttp *http, const char *text) {
     int length;
     DWCHttpBuffer *request = &http->request;
     int room;
@@ -526,7 +526,7 @@ static int DWCi_Http_AddLabelValue(DWCHttp *http, NasFieldTable *table, const ch
     return 0;
 }
 
-int DWC_Http_ParseResult(DWCHttp *http, int headersOnly) {
+BOOL DWC_Http_ParseResult(DWCHttp *http, BOOL headersOnly) {
     NasFieldTable table;
     char savedColon;
     char savedEnd;
@@ -635,7 +635,7 @@ int DWC_Http_ParseResult(DWCHttp *http, int headersOnly) {
     return 1;
 }
 
-const char *DWC_Http_GetResult(DWCHttp *http, const char *name) {
+char *DWC_Http_GetResult(DWCHttp *http, char *name) {
     int i;
 
     for (i = 0; i < 32; i++) {
@@ -649,7 +649,7 @@ const char *DWC_Http_GetResult(DWCHttp *http, const char *name) {
     return NULL;
 }
 
-int DWC_Http_GetBase64DecodedResult(DWCHttp *http, const char *name, char *dest, int size) {
+int DWC_Http_GetBase64DecodedResult(DWCHttp *http, char *name, char *dest, unsigned long size) {
     const char *value = DWC_Http_GetResult(http, name);
     u32 length;
 
@@ -663,7 +663,7 @@ int DWC_Http_GetBase64DecodedResult(DWCHttp *http, const char *name, char *dest,
     return length;
 }
 
-int DWC_Http_GetRawResult(DWCHttp *http, const char *name, char *dest, int size) {
+BOOL DWC_Http_GetRawResult(DWCHttp *http, char *name, char *dest, int size) {
     const char *value = DWC_Http_GetResult(http, name);
     int length;
 

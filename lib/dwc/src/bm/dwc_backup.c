@@ -102,7 +102,7 @@ BOOL DWCBm_ReadAllNtrPages(void *buf) {
     return ReadNtrPages(buf, 0, 4);
 }
 
-BOOL DWCBm_WriteNtrPages(void *buf, const u32 flags[4], void *scratch) {
+BOOL DWCBm_WriteNtrPages(void *buf, const BOOL flags[4], void *scratch) {
     DWCBmNtrPage *pages = buf;
     int index;
 
@@ -115,7 +115,7 @@ BOOL DWCBm_WriteNtrPages(void *buf, const u32 flags[4], void *scratch) {
     return func_02056e74() != 0;
 }
 
-void DWCBm_SetPackedWifiIdInfo(const void *packed) {
+void DWCBm_SetPackedWifiIdInfo(const u8 *packed) {
     MI_CpuCopy8(packed, sWifiId.packed, DWC_BM_PACKED_SIZE);
 }
 
@@ -134,7 +134,7 @@ u8 DWCBm_CountMaskBits(const u8 *mask) {
     return bits;
 }
 
-void DWCBm_MakeMask(u32 bits, u8 *mask) {
+void DWCBm_MakeMask(int bits, u8 *mask) {
     int i;
     u32 value = 0xFFFFFFFF ^ (0xFFFFFFFF >> bits);
 
@@ -185,6 +185,6 @@ const u8 *DWCBm_PackWifiIdInfo(const DWCBmWifiIdInfo *info) {
     return sWifiId.packed;
 }
 
-const u8 *DWCBm_GetPackedWifiIdInfo(void) {
+const void *DWCBm_GetPackedWifiIdInfo(void) {
     return sWifiId.packed;
 }

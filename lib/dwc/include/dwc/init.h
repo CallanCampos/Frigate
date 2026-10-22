@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_INIT_H
 
 #include "types.h"
+#include "dwc/memfunc.h"
 
 // Starting DWC (TWL-DWC 5.3's dwc_init.c, in ARM9 main). The ROM names none of it; the SDK's names are in the comments,
 // where the code shows them.
@@ -23,8 +24,7 @@ extern const char DWCi_Signature[];
 
 // Starts the library for the retail servers with the game's name and code, and the allocator and deallocator it uses,
 // and returns one of the results above: DWC_InitForProduction
-int DWC_InitForProduction(const char *gameName, u32 gameCode, void *(*alloc)(u32, u32, int),
-                          void (*free)(u32, void *, u32));
+int DWC_InitForProduction(const char *gameName, u32 gameCode, DWCAllocFunc alloc, DWCFreeFunc free);
 // The game code that the library was started with
 u32 DWCi_GetGameCode(void);
 

@@ -573,7 +573,7 @@ static void CreateThread(StrmThread *thread, u32 prio) {
 
 // Drops the commands of player from list
 static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     StrmCommand *command = NNS_FndGetNextListObject(list, NULL);
 
     while (command != NULL) {
@@ -589,7 +589,7 @@ static void ClearCommands(NNSFndList *list, NNSSndArcStrmPlayer *player) {
 }
 
 static StrmCommand *PopCommand(NNSFndList *list) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     StrmCommand *command = NNS_FndGetNextListObject(list, NULL);
 
     if (command != NULL) {
@@ -601,7 +601,7 @@ static StrmCommand *PopCommand(NNSFndList *list) {
 }
 
 static StrmCommand *AllocCommand(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     StrmCommand *command = NNS_FndGetNextListObject(&sFreeCommandList, NULL);
 
     if (command != NULL) {
@@ -612,7 +612,7 @@ static StrmCommand *AllocCommand(void) {
 }
 
 static void FreeCommand(StrmCommand *command) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     NNS_FndAppendListObject(&sFreeCommandList, command);
     OS_RestoreInterrupts(enabled);

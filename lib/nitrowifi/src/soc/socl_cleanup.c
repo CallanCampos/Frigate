@@ -43,7 +43,7 @@ void SOCLi_CleanupCPS(void) {
 // Closes the sockets that SOCL_Close has not run on, except the UDP send socket; EINPROGRESS while any is left
 static int SOCL_CloseAll(void) {
     SOCLSocket *socket;
-    u32 irq;
+    OSIntrMode irq;
 
     while (TRUE) {
         irq = OS_DisableInterrupts();
@@ -120,7 +120,7 @@ CPSInAddr SOCL_Resolve(const char *name) {
 CPSInAddr SOCL_InetAtoH(const char *name) {
     CPSInAddr dns1, dns2;
     CPSInAddr ip;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     dns1 = CPSDnsIp[0];
     dns2 = CPSDnsIp[1];

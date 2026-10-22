@@ -90,13 +90,13 @@ BOOL DWCBm_WriteWifiIdInfo(const DWCBmWifiIdInfo *info, void *work);
 BOOL DWCBm_ReadAllNtrPages(void *buf);
 // Writes the pages of the NTR settings that the four flags select, from a page buffer. The scratch buffer of 0x100
 // bytes, 32-byte aligned, is for the write to use
-BOOL DWCBm_WriteNtrPages(void *buf, const u32 flags[4], void *scratch);
+BOOL DWCBm_WriteNtrPages(void *buf, const BOOL flags[4], void *scratch);
 // Keeps the packed Wi-Fi ID of a page, as the settings were last read
-void DWCBm_SetPackedWifiIdInfo(const void *packed);
+void DWCBm_SetPackedWifiIdInfo(const u8 *packed);
 // The number of bits that the four bytes of a network mask have set
 u8 DWCBm_CountMaskBits(const u8 *mask);
 // The four bytes of the mask that has the given number of its high bits set
-void DWCBm_MakeMask(u32 bits, u8 *mask);
+void DWCBm_MakeMask(int bits, u8 *mask);
 // Whether an address has bits that the mask leaves to the host, if it is a usable address (DWCBm_IsUsableAddress)
 BOOL DWCBm_HasHostBits(const u8 *address, const u8 *mask);
 // Whether the first byte of an address is neither 0, 127 nor above 223
@@ -106,7 +106,7 @@ BOOL func_02056e74(void);
 // Packs an ID and returns the packed bytes, DWC_BM_PACKED_SIZE of them, which are kept
 const u8 *DWCBm_PackWifiIdInfo(const DWCBmWifiIdInfo *info);
 // The packed Wi-Fi ID that the settings were last read with
-const u8 *DWCBm_GetPackedWifiIdInfo(void);
+const void *DWCBm_GetPackedWifiIdInfo(void);
 
 // What the checks of dwc_bm_check.c return: 0 when the settings are whole, or were made whole again without losing a
 // connection, or a negative number for what failed or was lost. DWC_InitForProduction takes any of them as the settings

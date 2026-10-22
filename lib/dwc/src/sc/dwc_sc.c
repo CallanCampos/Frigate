@@ -29,8 +29,8 @@ static void Sc_OnSubmitReport(ScClient *client, int status, int error, void *use
 static ScState sScState;
 
 int Sc_Startup(int gameId, int server) {
-    const char *authToken;
-    const char *challenge;
+    char *authToken;
+    char *challenge;
     int error;
 
     gsCoreInitialize();

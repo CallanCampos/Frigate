@@ -81,7 +81,7 @@ const char *DWCi_Auth_GetCustomNas(void) {
     return DWCi_AuthConfig.url;
 }
 
-int DWC_Auth_Create(const DWCAuthParam *init, DWCHttp *http) {
+DWCAuthError DWC_Auth_Create(DWCAuthParam *init, void *http) {
     DWCHttpAlloc alloc = init->alloc;
 
     if (sNas.work != NULL) {
@@ -151,7 +151,7 @@ void DWC_Auth_Join(void) {
     }
 }
 
-int DWC_Auth_GetError(void) {
+DWCAuthError DWC_Auth_GetError(void) {
     int step;
 
     if (sNas.work == NULL) {
@@ -407,7 +407,7 @@ static int DWCi_Auth_AddPostItems(DWCHttp *http, const char *gameCode, const u16
         }
     }
     if (wcslen(name) != 0) {
-        if (DWC_Http_Add_PostBase64Item(http, "ingamesn", name, wcslen(name) * 2) != 0) {
+        if (DWC_Http_Add_PostBase64Item(http, "ingamesn", (const char *)name, wcslen(name) * 2) != 0) {
             return 8;
         }
     }
@@ -614,7 +614,7 @@ static BOOL DWCi_Auth_GetInfo(NasAuthInfo *info, const DWCBmWifiIdInfo *user) {
     return TRUE;
 }
 
-BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, const NasAuthInfo *info, int sendSsid) {
+BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, NasAuthInfo *info, BOOL sendSsid) {
     char text[0x21];
 
     OS_SNPrintf(text, 0x21, "%03d%03d", 5, 3);
@@ -654,7 +654,8 @@ BOOL DWCi_Auth_AddCommonItems(DWCHttp *http, const NasAuthInfo *info, int sendSs
     if (DWC_Http_Add_PostBase64Item(http, "devtime", info->deviceTime, strlen(info->deviceTime)) != 0) {
         return FALSE;
     }
-    if (DWC_Http_Add_PostBase64Item(http, "devname", info->deviceName, wcslen(info->deviceName) * 2) != 0) {
+    if (DWC_Http_Add_PostBase64Item(http, "devname", (const char *)info->deviceName, wcslen(info->deviceName) * 2) !=
+        0) {
         return FALSE;
     }
     if (sendSsid == 1) {

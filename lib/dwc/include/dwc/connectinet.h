@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_CONNECTINET_H
 
 #include "types.h"
+#include "nitro/wm.h"
 
 // Connecting to the internet (TWL-DWC 5.3's dwc_connectinet.c, in ARM9 main): the library starts the auto connect of
 // the DS and DSi (AC) with the console's Wi-Fi settings, and when that fails it looks for a Nintendo Zone access point
@@ -12,8 +13,8 @@
 // What a connection is in (DWCInetControl.state), and what DWC_GetInetStatus reports. The names follow the SDK's
 // DWC_CONNECTINET_STATE_* and its order from memory; the code confirms IDLE, OPERATING, CONNECTED, DISCONNECTED, ERROR
 // and FATAL_ERROR (the game's caller waits for CONNECTED), and OPERATED as the state the poll sets once the AC has a
-// result. DISCONNECTING is only ever reported, never kept
-enum {
+// result. DISCONNECTING is only ever reported, never kept. The SDK's DWCInetResult
+typedef enum DWCInetResult {
     // There is no connection control
     DWC_CONNECTINET_STATE_NOT_INITIALIZED = 0,
     // Started, not connecting yet
@@ -31,7 +32,7 @@ enum {
     DWC_CONNECTINET_STATE_ERROR = 7,
     // The connection failed for good
     DWC_CONNECTINET_STATE_FATAL_ERROR = 8,
-};
+} DWCInetResult;
 
 // Where the connection is with the WDS scan (DWCInetControl.scanStage)
 enum {
@@ -88,11 +89,11 @@ BOOL DWC_CheckInet(void);
 // Takes the next step of the connection: DWC_ProcessInet
 void DWC_ProcessInet(void);
 // The connection's state, one of the above: DWC_GetInetStatus
-int DWC_GetInetStatus(void);
+DWCInetResult DWC_GetInetStatus(void);
 // Ends the connection and frees the control, waiting for the AC to finish: DWC_CleanupInet
 void DWC_CleanupInet(void);
 // How good the link is, from 0 to 3: DWC_GetLinkLevel
-int DWC_GetLinkLevel(void);
+WMLinkLevel DWC_GetLinkLevel(void);
 // What the game calls every frame once it is connected: takes a step of the connection (DWC_ProcessInet), and if the
 // link was lost sets the error for it and returns TRUE: DWC_UpdateConnection
 BOOL DWC_UpdateConnection(void);

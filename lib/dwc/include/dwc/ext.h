@@ -59,7 +59,7 @@ char *strstr(const char *s, const char *find);
 
 // Gets the token and the challenge that the player logs in to the authentication service with, returning FALSE (and
 // leaving them) while the player isn't logged in
-BOOL DWCi_GetAuthInfo(const char **authToken, const char **challenge);
+BOOL DWCi_GetAuthInfo(char **authToken, char **challenge);
 
 // The login ticket of the player's profile, which the Wi-Fi library keeps; returns FALSE if it has none
 BOOL DWCi_GetLoginTicket(SakeLoginTicket *ticket);

@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_AC_H
 
 #include "types.h"
+#include "dwc/nasfunc.h"
 #include "nitro/wm.h"
 #include "nitrowifi/soc.h"
 #include "nitrowifi/wcm.h"
@@ -19,13 +20,13 @@
 #define DWC_AC_WORK_MAIN 0x01       // the control block: 0xcc bytes
 #define DWC_AC_WORK_WCM 0x02        // the wireless connection manager's work: 0x4800 bytes
 #define DWC_AC_WORK_SOC_CONFIG 0x04 // the SocConfig that SOC_Startup is given (dwc_ac_soc.c): 0x58 bytes
-#define DWC_AC_WORK_MEMFUNCS 0x08   // the memory functions again, DWCAcMemFuncs: 0xc bytes
+#define DWC_AC_WORK_MEMFUNCS 0x08   // the connection test's DWCNetcheckParam: 0xc bytes
 #define DWC_AC_WORK_SEARCH 0x10     // the search's work: 0x14d8 bytes
 
 // The allocator and the deallocator that auto-connect is given, the same that DWC gives to the library. The name is
-// always 1 here
-typedef void *(*DWCAcAllocFunc)(u32 name, u32 size);
-typedef void (*DWCAcFreeFunc)(u32 name, void *ptr, u32 size);
+// always 1 here. The SDK's DWCACAlloc and DWCACFree (NitroDWC's base/dwc_connectinet.h)
+typedef void *(*DWCAcAllocFunc)(u32 name, s32 size);
+typedef void (*DWCAcFreeFunc)(u32 name, void *ptr, s32 size);
 
 // What DWCAc_Create is given, 0x14 bytes
 typedef struct DWCAcParam {
@@ -40,14 +41,6 @@ typedef struct DWCAcParam {
     u8 ignoreEula;             // 0x10; DWCAcSearchWork.ignoreEula
     u8 unk_11[3];
 } DWCAcParam;
-
-// The block of the flag DWC_AC_WORK_MEMFUNCS, 0xc bytes: the allocator and the deallocator again, which the socket
-// layer is started with
-typedef struct DWCAcMemFuncs {
-    DWCAcAllocFunc alloc;
-    DWCAcFreeFunc free;
-    void *unk_08;
-} DWCAcMemFuncs;
 
 // The control block, 0xcc bytes. Only the bytes that the files seen so far touch are named
 typedef struct DWCAcMain {
@@ -323,17 +316,5 @@ void DWCAc_OnWcmNotify(WCMNotice *notice);
 // Steps the teardown whose state is *state (DWCAcMain.failedState): the sockets down first, if the state is over 10,
 // and then the wireless manager to idle. TRUE when it is over, with *state 0, or has failed, with *state 0x12
 BOOL DWCAc_StepTeardown(u8 *state);
-
-// Overlay 11's connection test and its teardown (0x0216b14c to 0x0216b2cc, one file that is not written yet), which
-// the states 13 and 14 of dwc_ac_soc.c run, by the 52xxx errors it leads to in dwc_ac_result.c. The first starts the
-// test from the memory functions (copied) and answers 0 once it is going, 4 if it has no memory;
-// DWC_Netcheck_Abort ends CPS's threads and DWC_Netcheck_Destroy then lets go of its memory; DWC_Netcheck_GetError
-// answers 0 while the test is not over, else its state (11 if it went well), and DWC_Netcheck_GetReturnCode its result.
-// They are here, and not in dwc/dwc.h with overlay 11's other functions, for the DWCAcMemFuncs that the first takes
-int DWC_Netcheck_Create(const DWCAcMemFuncs *funcs);
-void DWC_Netcheck_Destroy(void);
-void DWC_Netcheck_Abort(void);
-u32 DWC_Netcheck_GetError(void);
-u32 DWC_Netcheck_GetReturnCode(void);
 
 #endif // POKEBW2_DWC_AC_H

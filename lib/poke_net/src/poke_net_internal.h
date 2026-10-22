@@ -2,6 +2,7 @@
 #define POKEBW2_POKE_NET_INTERNAL_H
 
 #include "types.h"
+#include "dwc/dwc.h"
 #include "dwc/error.h"
 #include "dwc/ext.h"
 #include "dwc/memfunc.h"
@@ -100,20 +101,5 @@ void POKE_NET_SSL_EndConnection(POKE_NET_SSL_CONNECTION *connection);
 // The socket library of overlay 11: resolving a host's name to an address in host order (0 if it fails), and an
 // address as text
 u32 CPS_Resolve(const char *host);
-
-// The token of the Nintendo Wi-Fi Connection's service locator: the request for it, which fills the result as it
-// succeeds, and the step of the request, which gives its state
-typedef struct {
-    BOOL status;
-    char svlhost[64 + 1];
-    char svltoken[POKE_NET_SVL_TOKEN_LENGTH + 1];
-} DWCSvlResult;
-enum {
-    DWC_SVL_STATE_SUCCESS = 3,
-    DWC_SVL_STATE_ERROR,
-    DWC_SVL_STATE_CANCELED,
-};
-BOOL DWC_SVLGetTokenAsync(const char *svc, void *result);
-int DWC_SVLProcess(void);
 
 #endif // POKEBW2_POKE_NET_INTERNAL_H

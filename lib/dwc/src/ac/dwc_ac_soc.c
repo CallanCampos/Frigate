@@ -185,7 +185,7 @@ static u8 DWCAc_StartConnectionTest(void) {
 // candidate is given up, with a note if CPS found its address already in use, and SOC goes down (11)
 static u8 DWCAc_WaitConnectionTest(DWCAcSearchWork *work) {
     DWCAcMain *main = DWCAc_GetBlock(DWC_AC_WORK_MAIN);
-    u32 status = DWC_Netcheck_GetError();
+    DWCNetcheckError status = DWC_Netcheck_GetError();
 
     if (status != 0) {
         if (main->candidateType == DWCAc_GetApTypeOfId(work->kind)) {

@@ -83,7 +83,7 @@ static void NetCommonDownload_FreeSession(NetCommonDownloadSession *session);
 static void NetCommonDownload_Wait(NetCommonDownloadSession *session, u32 *state, u32 nextState);
 static void NetCommonDownload_Cleanup(NetCommonDownloadSession *session, u32 error, u32 *state, u32 nextState,
                                       u32 failState);
-static void NetCommonDownload_OnNdEvent(u32 reason, u32 error, int serverError);
+static void NetCommonDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError);
 static BOOL NetCommonDownload_IsZero(const u32 *data, u32 size);
 
 static const u8 sModeCommands[2][5] = {
@@ -636,7 +636,7 @@ static void NetCommonDownload_Cleanup(NetCommonDownloadSession *session, u32 err
     }
 }
 
-static void NetCommonDownload_OnNdEvent(u32 reason, u32 error, int serverError) {
+static void NetCommonDownload_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError) {
     sNdState.ready = TRUE;
     sNdState.done = TRUE;
     sNdState.error = error;

@@ -130,21 +130,21 @@ static BOOL DWCRap_AttemptCallback(void *param);
 static void DWCRap_MatchFailed(void);
 static BOOL DWCRap_SendAck(const void *data, int size);
 static void DWCRap_FlushAck(void);
-static void DWCRap_LoginCallback(int error);
+static void DWCRap_LoginCallback(DWCError error, int profileId, void *param);
 static void DWCRap_TimeoutCallback(u8 aid, void *param);
-static void DWCRap_UpdateServersCallback(int error);
+static void DWCRap_UpdateServersCallback(DWCError error, BOOL isChanged, void *param);
 static void DWCRap_FriendStatusCallback(int index, u8 status, const char *location, void *param);
 static void DWCRap_DeleteFriendCallback(int deleteIndex, int srcIndex, void *param);
 static void DWCRap_BuddyCallback(int index, void *param);
 static void DWCRap_ResetIdleFrames(void);
 static void DWCRap_SetRecvTimeouts(void);
 static void DWCRap_OnMatched(int index);
-static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static int DWCRap_EvalCallback(int index, void *param);
 static void DWCRap_SendCallback(int size, u8 aid, void *param);
 static void DWCRap_SetPeerVctReady(u32 header);
 static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param);
-static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
+static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int index, void *param);
 static u32 DWCRap_HandleError(void);
 static BOOL DWCRap_CanPing(void);
 static BOOL DWCRap_SendIdlePing(int index);
@@ -152,8 +152,8 @@ static u32 DWCRap_Update(void);
 static void DWCRap_VctEndCallback(void);
 static void DWCRap_StartVct(HeapID heapId);
 static void DWCRap_UpdateFriendStatus(void);
-static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
-static void DWCRap_FriendMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static void DWCRap_ConnectedCallback(int index, void *param);
 static void DWCRap_FreeRecvBuffer(int aid);
 static void DWCRap_AllocRecvBuffer(int aid);
@@ -502,7 +502,7 @@ static void DWCRap_FlushAck(void) {
     }
 }
 
-static void DWCRap_LoginCallback(int error) {
+static void DWCRap_LoginCallback(DWCError error, int profileId, void *param) {
     if (DWC_CheckDirtyFlag(_dWork->userData)) {
         DWC_ClearDirtyFlag(_dWork->userData);
         _dWork->userDataDirty = 1;
@@ -524,7 +524,7 @@ static void DWCRap_TimeoutCallback(u8 aid, void *param) {
     }
 }
 
-static void DWCRap_UpdateServersCallback(int error) {
+static void DWCRap_UpdateServersCallback(DWCError error, BOOL isChanged, void *param) {
     if (error == 0) {
         DWCRap_SetState(DWCRAP_STATE_READY);
     } else {
@@ -580,7 +580,7 @@ static void DWCRap_OnMatched(int index) {
     DWCRap_SetRecvTimeouts();
 }
 
-static void DWCRap_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     if (error == 0) {
         if (cancel == 0) {
             DWCRap_OnMatched(index);
@@ -647,7 +647,7 @@ static void DWCRap_RecvCallback(u8 aid, u8 *data, int size, void *param) {
 }
 // clang-format on
 
-static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index, void *param) {
+static void DWCRap_ClosedCallback(DWCError error, BOOL a1, BOOL a2, u8 aid, int index, void *param) {
     if (aid < DWCRAP_NETID_MAX) {
         _dWork->sending = 0;
         _dWork->retryCount = 0;
@@ -682,8 +682,8 @@ static void DWCRap_ClosedCallback(int error, BOOL a1, BOOL a2, u8 aid, int index
 // Asks the library about its error and the game's functions what to do about it, and returns the error's kind
 static u32 DWCRap_HandleError(void) {
     int code;
-    int type;
-    int error;
+    DWCErrorType type;
+    DWCError error;
     u32 result = 0;
 
     error = DWC_GetLastErrorEx(&code, &type);
@@ -1047,7 +1047,7 @@ int DWCRap_GetErrorKind(int code, int type) {
 
 BOOL DWCRap_RequestClose(BOOL a0) {
     int code;
-    int type;
+    DWCErrorType type;
 
     if (DWC_GetLastErrorEx(&code, &type)) {
         DWC_ClearError();
@@ -1201,7 +1201,7 @@ int DWCRap_GetFriendIndex(void) {
     return -1;
 }
 
-static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_AnybodyMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     BOOL failed = FALSE;
 
     _dWork->matchingBusy = 0;
@@ -1234,7 +1234,7 @@ static void DWCRap_AnybodyMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL 
     }
 }
 
-static void DWCRap_FriendMatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCRap_FriendMatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     _dWork->matchingBusy = 0;
     if (error == 0 && cancel == 0) {
         DWCRap_OnMatched(index);

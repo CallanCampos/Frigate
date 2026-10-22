@@ -2,6 +2,7 @@
 #define POKEBW2_DWC_VCT_INTERNAL_H
 
 #include "types.h"
+#include "dwc/transport.h"
 #include "dwc/vct.h"
 
 // The voice chat library libVCT (the ROM carries its version string, "[SDK+Nintendo:libVCT 1.4.1]"), which sends the
@@ -29,24 +30,26 @@ extern const char VCTi_Signature[];
 #define VCT_TYPE_SYNC 0x41
 #define VCT_TYPE_BROADCAST 0xff
 
-// What the library keeps of its configuration
+// Whether this machine listens as a client or as the server of the transceiver mode: the SDK's VCTListenMode (ntrtwl's
+// libvct, src/vct_main.h)
+typedef enum VCTListenMode {
+    VCT_LISTEN_MODE_CLIENT = 0,
+    VCT_LISTEN_MODE_SERVER,
+} VCTListenMode;
+
+// What the library keeps of its configuration (the SDK's VCTi_Globals)
 struct VCTSettings {
     u8 aid;
     u8 hostAid;
     u8 pad2[2];
     VCTCallback callback;
     void *userData;
-    int unkC;
-    int mode;
-    int unk14;
+    VCTListenMode listenMode;
+    VCTMode mode;
+    int autoResponse;
 };
 
 extern VCTSettings gVCTSettings;
-
-// Send a packet to the machine with the given ID, from DWC in overlay 11 (neither has a header yet): the first for
-// voice, the second for control packets
-BOOL DWC_SendUnreliable(u8 aid, const void *data, int size);
-BOOL DWC_SendReliable(u8 aid, const void *data, int size);
 
 // The hardware's divider and square root unit
 #define REG_DIVCNT (*(vu16 *)0x04000280)

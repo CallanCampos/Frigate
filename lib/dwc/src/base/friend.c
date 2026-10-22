@@ -129,7 +129,7 @@ BOOL DWC_GetDateTime(RTCDate *date, RTCTime *time) {
     return TRUE;
 }
 
-BOOL DWC_SVLGetTokenAsync(const char *svc, void *buffer) {
+BOOL DWC_SVLGetTokenAsync(char *svc, DWCSvlResult *buffer) {
     DWCBmWifiId id;
     BOOL started;
 
@@ -137,7 +137,7 @@ BOOL DWC_SVLGetTokenAsync(const char *svc, void *buffer) {
     if (!id.isSet) {
         return FALSE;
     }
-    if (!DWC_Svl_Init(DWC_Alloc, DWC_Free)) {
+    if (!DWC_Svl_Init((DWCHttpAlloc)DWC_Alloc, (DWCHttpFree)DWC_Free)) {
         return FALSE;
     }
     if (strlen(svc) == 0) {
@@ -152,10 +152,10 @@ BOOL DWC_SVLGetTokenAsync(const char *svc, void *buffer) {
     return TRUE;
 }
 
-int DWC_SVLProcess(void) {
-    int state = DWC_Svl_Process();
+DWCSvlState DWC_SVLProcess(void) {
+    DWCSvlState state = DWC_Svl_Process();
 
-    if ((u32)(state - 3) <= 2) {
+    if (state == DWC_SVL_STATE_ERROR || state == DWC_SVL_STATE_SUCCESS || state == DWC_SVL_STATE_CANCELED) {
         DWC_Svl_Cleanup();
     }
     return state;
@@ -172,13 +172,13 @@ BOOL DWC_NASLoginAsync(void) {
     }
     MI_CpuFill8(sNasLogin, 0, sizeof(NasLogin));
     MI_CpuCopy8("", sNasLogin->param.gsbrcd, 9);
-    sNasLogin->param.alloc = DWC_Alloc;
-    sNasLogin->param.free = DWC_Free;
+    sNasLogin->param.alloc = (DWCHttpAlloc)DWC_Alloc;
+    sNasLogin->param.free = (DWCHttpFree)DWC_Free;
     DWC_Auth_Create(&sNasLogin->param, &sNasLogin->http);
     return TRUE;
 }
 
-int DWC_NASLoginProcess(void) {
+DWCNasLoginState DWC_NASLoginProcess(void) {
     DWCAuthResult result;
 
     if (sNasLogin == NULL) {
@@ -413,11 +413,11 @@ static u8 DWC_GetFriendStatusDataSC(const DWCFriendData *friendData, u8 *scm, u8
     if (statusData == NULL || *size == -1) {
         return status;
     }
-    DWC_Base64Decode(encoded, strlen(encoded), (u8 *)statusData, *size);
+    DWC_Base64Decode(encoded, strlen(encoded), statusData, *size);
     return status;
 }
 
-BOOL DWC_SetOwnStatusData(const char *statusData, int size) {
+BOOL DWC_SetOwnStatusData(const char *statusData, u32 size) {
     char encoded[0x100];
     int length;
     BOOL result;
@@ -425,7 +425,7 @@ BOOL DWC_SetOwnStatusData(const char *statusData, int size) {
     if (sFriend.control == NULL || !DWCi_CheckLogin()) {
         return FALSE;
     }
-    length = DWC_Base64Encode((const u8 *)statusData, size, encoded, 0xff);
+    length = DWC_Base64Encode(statusData, size, encoded, 0xff);
     if (length == -1) {
         return FALSE;
     }
@@ -437,7 +437,7 @@ BOOL DWC_SetOwnStatusData(const char *statusData, int size) {
     return result;
 }
 
-BOOL DWC_SetBuddyFriendCallback(void (*callback)(int index, void *param), void *param) {
+BOOL DWC_SetBuddyFriendCallback(DWCBuddyFriendCallback callback, void *param) {
     if (sFriend.control == NULL) {
         return FALSE;
     }
@@ -472,10 +472,10 @@ void DWCi_FriendInit(DWCFriendControl *control, GPConnection *connection, const 
     sFriend.control->deleteParam = NULL;
     sFriend.control->buddyCallback = NULL;
     sFriend.control->buddyParam = NULL;
-    sFriend.control->persLoginCallback = 0;
-    sFriend.control->persLoginParam = 0;
-    sFriend.control->saveCallback = 0;
-    sFriend.control->loadCallback = 0;
+    sFriend.control->persLoginCallback = NULL;
+    sFriend.control->persLoginParam = NULL;
+    sFriend.control->saveCallback = NULL;
+    sFriend.control->loadCallback = NULL;
     sFriend.control->profileIds = NULL;
     for (; i < friendListLen; i++) {
         DWCi_Acc_SetFlag5(&sFriend.control->friendList[i], FALSE);
@@ -590,7 +590,7 @@ void DWCi_UpdateServersAsync(const char *authToken, const char *partnerChallenge
     sFriend.control->updateSteps++;
 }
 
-void DWCi_StopFriendProcess(int error, int code) {
+void DWCi_StopFriendProcess(DWCError error, int code) {
     if (sFriend.control != NULL && error != DWC_ERROR_NONE) {
         DWCi_SetError(error, code);
         if (DWCi_IsUpdatingServers()) {
@@ -1180,7 +1180,7 @@ DWCUserData *DWCi_GetUserData(void) {
     return NULL;
 }
 
-void DWCi_StopLogin(int error, int code) {
+void DWCi_StopLogin(DWCError error, int code) {
     if (sLogin != NULL && error != DWC_ERROR_NONE) {
         DWCi_SetError(error, code);
         if (sLogin->callback != NULL) {
@@ -1312,7 +1312,8 @@ static BOOL DWCi_RemoteLogin(void) {
         DWCi_Acc_CreateLoginName(&sLogin->tempLoginId, sLogin->gameCode, sLogin->loginName);
         userId = 0;
     }
-    return DWCi_Auth_StartAuthentication(sLogin->playerName, &sLogin->loginName[9], userId, DWC_Alloc, DWC_Free);
+    return DWCi_Auth_StartAuthentication(sLogin->playerName, &sLogin->loginName[9], userId, (DWCHttpAlloc)DWC_Alloc,
+                                         (DWCHttpFree)DWC_Free);
 }
 
 // Waits for the authentication server, then connects to GP with the profile of the user data, or looks for it
@@ -1391,7 +1392,7 @@ static BOOL DWCi_CheckLogin(void) {
     return FALSE;
 }
 
-BOOL DWCi_GetAuthInfo(const char **authToken, const char **challenge) {
+BOOL DWCi_GetAuthInfo(char **authToken, char **challenge) {
     if (!DWCi_CheckLogin()) {
         return FALSE;
     }

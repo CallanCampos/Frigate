@@ -55,7 +55,7 @@ typedef struct MatchTarget {
 
 // Called when a suspension of the match ends, with whether it was canceled
 typedef void (*MatchCallback)(int, int, int);
-typedef void (*MatchNotifyFunc)(int error, BOOL cancel, BOOL self, BOOL isServer, int index, void *param);
+typedef void (*MatchNotifyFunc)(DWCError error, BOOL cancel, BOOL self, BOOL isServer, int index, void *param);
 typedef int (*MatchCheckFunc)(void *userData, u32 param);
 
 typedef struct FriendsMatchControl FriendsMatchControl;
@@ -300,9 +300,9 @@ static s32 DWCi_DeleteAID(u8 netId);
 static u32 DWCi_GetAIDBitmapFromList(const u8 *netIds, int count);
 static int DWCi_HandleGPError(int result);
 static int DWCi_HandleGT2Error(int result);
-static void DWCi_LoginCallback(int error, int profileId, void *param);
-static void DWCi_UpdateServersCallback(int error, int count, void *param);
-static void DWCi_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+static void DWCi_LoginCallback(DWCError error, int profileId, void *param);
+static void DWCi_UpdateServersCallback(DWCError error, BOOL isChanged, void *param);
+static void DWCi_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 static void DWCi_GPErrorCallback(GPConnection *connection, void *arg, void *param);
 static void DWCi_GPRecvBuddyMessageCallback(GPConnection *connection, void *arg, void *param);
 static void DWCi_GT2ReceivedCallback(GTI2Connection *connection, const void *message, int length, BOOL reliable);
@@ -631,7 +631,7 @@ void DWC_ProcessFriendsMatch(void) {
     }
 }
 
-BOOL DWC_LoginAsync(const u16 *name, const char *reserved, void (*callback)(int error), void *param) {
+BOOL DWC_LoginAsync(const u16 *name, const char *reserved, DWCLoginCallback callback, void *param) {
     int len;
 
     if (name == NULL) {
@@ -640,7 +640,7 @@ BOOL DWC_LoginAsync(const u16 *name, const char *reserved, void (*callback)(int 
     if (DWCi_IsError() || sMatchRoot.fm->state != 0) {
         return FALSE;
     }
-    sMatchRoot.fm->loginCallback = (DWCLoginCallback)callback;
+    sMatchRoot.fm->loginCallback = callback;
     sMatchRoot.fm->loginParam = param;
     if (name == NULL || name[0] == 0) {
         len = 0;
@@ -663,14 +663,13 @@ BOOL DWC_LoginAsync(const u16 *name, const char *reserved, void (*callback)(int 
     return TRUE;
 }
 
-BOOL DWC_UpdateServersAsync(const char *name, void (*callback)(int error), void *userData,
-                            void (*statusCallback)(int index, u8 status, const char *location, void *param),
-                            void *statusParam, void (*deleteCallback)(int deleteIndex, int srcIndex, void *param),
-                            void *deleteParam) {
+BOOL DWC_UpdateServersAsync(const char *name, DWCUpdateServersCallback callback, void *userData,
+                            DWCFriendStatusCallback statusCallback, void *statusParam,
+                            DWCDeleteFriendListCallback deleteCallback, void *deleteParam) {
     if (DWCi_IsError() || sMatchRoot.fm->state < 3 || DWCi_IsUpdatingServers()) {
         return FALSE;
     }
-    sMatchRoot.fm->updateCallback = (DWCUpdateServersCallback)callback;
+    sMatchRoot.fm->updateCallback = callback;
     sMatchRoot.fm->updateParam = userData;
     DWCi_UpdateServersAsync(sMatchRoot.fm->login.authToken, sMatchRoot.fm->login.partnerChallenge,
                             DWCi_UpdateServersCallback, 0, statusCallback, statusParam, deleteCallback, deleteParam);
@@ -831,7 +830,7 @@ int DWC_CloseConnectionHard(u8 netId) {
     return -3;
 }
 
-BOOL DWC_GetNumConnectionHost(void) {
+int DWC_GetNumConnectionHost(void) {
     if (sMatchRoot.fm == NULL || !func_ov011_02160d88()) {
         return 0;
     }
@@ -865,7 +864,7 @@ int DWC_GetAIDList(u8 **netIds) {
     return DWCi_GetNumNodeInfo();
 }
 
-int DWC_GetAIDBitmap(void) {
+u32 DWC_GetAIDBitmap(void) {
     u8 *netIds;
 
     if (sMatchRoot.fm == NULL || !func_ov011_02160d88()) {
@@ -1146,7 +1145,7 @@ int DWCi_CloseConnectionHard(u8 netId) {
     return 0;
 }
 
-static void DWCi_LoginCallback(int error, int profileId, void *param) {
+static void DWCi_LoginCallback(DWCError error, int profileId, void *param) {
     if (error == 0) {
         sMatchRoot.fm->profileId = profileId;
         DWCi_SetState(3);
@@ -1159,11 +1158,11 @@ static void DWCi_LoginCallback(int error, int profileId, void *param) {
     }
 }
 
-static void DWCi_UpdateServersCallback(int error, int count, void *param) {
-    sMatchRoot.fm->updateCallback(error, count, sMatchRoot.fm->updateParam);
+static void DWCi_UpdateServersCallback(DWCError error, BOOL isChanged, void *param) {
+    sMatchRoot.fm->updateCallback(error, isChanged, sMatchRoot.fm->updateParam);
 }
 
-static void DWCi_MatchedCallback(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
+static void DWCi_MatchedCallback(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param) {
     if (error == 0 && cancel) {
         if (sMatchRoot.fm->match.state == 0) {
             DWCi_SetState(3);
@@ -2330,7 +2329,7 @@ static void DWCi_ClearQR2Key(void) {
     }
 }
 
-void DWCi_ProcessMatchSynPacket(u8 aid, int type, const void *data) {
+void DWCi_ProcessMatchSynPacket(u8 aid, u16 type, const void *data) {
     if (func_ov011_021686a0()) {
         func_ov011_02162bf8(aid, type, data);
     } else {
@@ -3459,7 +3458,7 @@ static int DWCi_ProcessRecvMatchCommand(int type, s32 profileId, u32 ip, u32 por
 }
 
 // Tells the game about the match, passing on the match's player and the game's own parameter
-static inline void MatchNotify(int error, BOOL cancel, BOOL self, BOOL isServer) {
+static inline void MatchNotify(DWCError error, BOOL cancel, BOOL self, BOOL isServer) {
     DWCi_GetMatchCnt()->notifyFunc(error, cancel, self, isServer,
                                    DWCi_GetFriendListIndex(DWCi_GetMatchCnt()->cbEventPid),
                                    DWCi_GetMatchCnt()->notifyParam);

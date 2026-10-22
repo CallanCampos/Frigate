@@ -21,7 +21,7 @@ BOOL SOCL_IsClosed(int socket) {
 
 BOOL SOCL_IsNotClosing(int socket) {
     SOCLSocket *s = (SOCLSocket *)socket;
-    u32 irq;
+    OSIntrMode irq;
 
     if (socket <= 0) {
         return FALSE;
@@ -46,7 +46,7 @@ BOOL SOCL_IsNotClosing(int socket) {
 int SOCL_Close(int socket) {
     SOCLSocket *s = (SOCLSocket *)socket;
     SOCLCommandPacket *packet;
-    u32 irq;
+    OSIntrMode irq;
 
     if (socket <= 0) {
         return SOCL_EINVAL;
@@ -85,7 +85,7 @@ int SOCL_Close(int socket) {
 static int SOCLi_CloseCallBack(void *arg) {
     SOCLiCommandClose *cpacket = (SOCLiCommandClose *)arg;
     SOCLSocket *socket = cpacket->h.socket;
-    u32 irq;
+    OSIntrMode irq;
 
     if (SOCLi_SocketIsTCP(socket)) {
         OS_JoinThread(&socket->send_pipe->base.thread);
@@ -105,7 +105,7 @@ static int SOCLi_CloseCallBack(void *arg) {
 }
 
 static void SOCLi_CleanupSocket(SOCLSocket *socket) {
-    u32 irq;
+    OSIntrMode irq;
     s8 flag;
 
     if (socket == NULL) {
@@ -143,7 +143,7 @@ static void SOCLi_CleanupSocket(SOCLSocket *socket) {
 // Waits for the pipe's thread to end, and answers the commands that it never ran with an error
 static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
     OSMessage message;
-    u32 irq;
+    OSIntrMode irq;
 
     if (pipe == NULL) {
         return;
@@ -168,7 +168,7 @@ static void SOCLi_FreeCommandPipe(SOCLCommandPipe *pipe) {
 }
 
 void SOCLi_TrashSocket(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     while (SOCLiSocketListTrash != NULL) {
         SOCLi_CleanupSocket(SOCLiSocketListTrash);

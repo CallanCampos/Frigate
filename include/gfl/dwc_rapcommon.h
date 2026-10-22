@@ -2,6 +2,7 @@
 #define POKEBW2_GFL_DWC_RAPCOMMON_H
 
 #include "types.h"
+#include "dwc/memfunc.h"
 #include "gfl/heap.h"
 
 // dwc_rapcommon.c, in overlay 11: what the Wi-Fi connection shares with the applications that use it
@@ -16,8 +17,8 @@ void DWCRapCommon_EndSubHeap(void);
 // The heap to delete with the second heap
 void DWCRapCommon_SetSubHeapOwner(HeapID heapId);
 // The library's allocator and deallocator
-void *DWCRapCommon_Alloc(u32 name, u32 size, int align);
-void DWCRapCommon_Free(u32 name, void *ptr, u32 size);
+void *DWCRapCommon_Alloc(DWCAllocType name, u32 size, int align);
+void DWCRapCommon_Free(DWCAllocType name, void *ptr, u32 size);
 // Creates and destroys the work and the library's heap
 void DWCRapCommon_Create(HeapID heapId, u32 size);
 void DWCRapCommon_Delete(void);

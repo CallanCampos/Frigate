@@ -126,8 +126,8 @@ void DWC_ConnectInetAsync(void) {
         param.dmaNo = sInet.control->dmaNo;
         param.radioOn = sInet.control->powerMode;
         param.rwin = sInet.control->rwin;
-        param.alloc = DWC_Alloc;
-        param.free = DWC_Free;
+        param.alloc = (DWCAcAllocFunc)DWC_Alloc;
+        param.free = (DWCAcFreeFunc)DWC_Free;
         param.ignoreEula = sInet.control->skipEulaCheck;
         sInet.control->state = DWC_CONNECTINET_STATE_OPERATING;
         if (!DWCAc_Create(&param)) {
@@ -198,7 +198,7 @@ void DWC_ProcessInet(void) {
     }
 }
 
-int DWC_GetInetStatus(void) {
+DWCInetResult DWC_GetInetStatus(void) {
     int status;
 
     if (sInet.control == NULL) {
@@ -305,7 +305,7 @@ static BOOL DWCi_Inet_IsLinkLost(void) {
     return FALSE;
 }
 
-int DWC_GetLinkLevel(void) {
+WMLinkLevel DWC_GetLinkLevel(void) {
     return WCM_UpdateLinkQuality();
 }
 
@@ -317,7 +317,7 @@ static void DWCi_ApInfo_SetSpotInfo(const char *spotInfo, DWCApInfo *apInfo) {
 BOOL DWC_GetApInfo(DWCApInfo *apInfo) {
     u16 ssidLength;
     char spotInfo[10];
-    u32 irq;
+    OSIntrMode irq;
     u8 *bssid;
     u8 *ssid;
 

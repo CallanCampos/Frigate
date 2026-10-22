@@ -64,7 +64,7 @@ void DpwBt_Process(void) {
     const u8 *answer;
     int size;
     int type;
-    int group;
+    DWCErrorType group;
 
     switch (sDpwBtWork.state) {
     case 2:

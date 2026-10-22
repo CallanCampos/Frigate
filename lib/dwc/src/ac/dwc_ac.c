@@ -12,11 +12,11 @@
 
 // The pointers to the five blocks of memory, which DWCAc_GetBlock gives out by their flags
 typedef struct DWCAcBlocks {
-    void *wcm;               // DWC_AC_WORK_WCM
-    void *socConfig;         // DWC_AC_WORK_SOC_CONFIG
-    DWCAcMemFuncs *memFuncs; // DWC_AC_WORK_MEMFUNCS
-    DWCAcMain *main;         // DWC_AC_WORK_MAIN
-    DWCAcSearchWork *search; // DWC_AC_WORK_SEARCH
+    void *wcm;                  // DWC_AC_WORK_WCM
+    void *socConfig;            // DWC_AC_WORK_SOC_CONFIG
+    DWCNetcheckParam *memFuncs; // DWC_AC_WORK_MEMFUNCS
+    DWCAcMain *main;            // DWC_AC_WORK_MAIN
+    DWCAcSearchWork *search;    // DWC_AC_WORK_SEARCH
 } DWCAcBlocks;
 
 static DWCAcBlocks sBlocks;
@@ -39,7 +39,7 @@ static BOOL DWCAc_CheckWirelessAllowed(void);
 // and, on a DSi, the DSi's), and the wireless manager. FALSE if the wireless manager does not start
 BOOL DWCAc_Create(DWCAcParam *param) {
     DWCAcMain *main;
-    DWCAcMemFuncs *funcs;
+    DWCNetcheckParam *funcs;
     DWCAcSearchWork *work;
     s32 result;
 
@@ -54,11 +54,11 @@ BOOL DWCAc_Create(DWCAcParam *param) {
     sBlocks.search = DWCAc_AllocBlock(DWC_AC_WORK_SEARCH, sizeof(DWCAcSearchWork));
     sBlocks.wcm = DWCAc_AllocBlock(DWC_AC_WORK_WCM, 0x4800);
     sBlocks.socConfig = DWCAc_AllocBlock(DWC_AC_WORK_SOC_CONFIG, 0x58);
-    sBlocks.memFuncs = DWCAc_AllocBlock(DWC_AC_WORK_MEMFUNCS, sizeof(DWCAcMemFuncs));
+    sBlocks.memFuncs = DWCAc_AllocBlock(DWC_AC_WORK_MEMFUNCS, sizeof(DWCNetcheckParam));
     MI_CpuClear32(sBlocks.search, sizeof(DWCAcSearchWork));
     MI_CpuClear32(sBlocks.wcm, 0x4800);
     MI_CpuClear32(sBlocks.socConfig, 0x58);
-    MI_CpuClear32(sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
+    MI_CpuClear32(sBlocks.memFuncs, sizeof(DWCNetcheckParam));
     work = sBlocks.search;
     work->dmaNo = param->dmaNo;
     work->radioOn = param->radioOn;
@@ -67,7 +67,7 @@ BOOL DWCAc_Create(DWCAcParam *param) {
     funcs = sBlocks.memFuncs;
     funcs->alloc = param->alloc;
     funcs->free = param->free;
-    funcs->unk_08 = NULL;
+    funcs->bmWorkArea = NULL;
     work->mode = param->mode;
     work->skipConnectionTest = param->skipConnectionTest;
     work->rssiPacked = param->rssiPacked;
@@ -350,7 +350,7 @@ static void DWCAc_FreeAllBlocks(void) {
         void *block = DWCAc_GetBlock(DWC_AC_WORK_MEMFUNCS);
 
         main->allocated &= ~DWC_AC_WORK_MEMFUNCS;
-        main->free(1, block, sizeof(DWCAcMemFuncs));
+        main->free(1, block, sizeof(DWCNetcheckParam));
     }
     if (main->allocated & DWC_AC_WORK_SOC_CONFIG) {
         void *block = DWCAc_GetBlock(DWC_AC_WORK_SOC_CONFIG);
@@ -505,7 +505,7 @@ u8 DWCAc_GetApTypeOfId(u8 id) {
 
 // Lets go of the two blocks that only the search and the connection used
 static void DWCAc_FreeSearchBlocks(void) {
-    DWCAc_FreeBlock(DWC_AC_WORK_MEMFUNCS, sBlocks.memFuncs, sizeof(DWCAcMemFuncs));
+    DWCAc_FreeBlock(DWC_AC_WORK_MEMFUNCS, sBlocks.memFuncs, sizeof(DWCNetcheckParam));
     DWCAc_FreeBlock(DWC_AC_WORK_SEARCH, sBlocks.search, sizeof(DWCAcSearchWork));
 }
 

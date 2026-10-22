@@ -185,7 +185,7 @@ BOOL DWC_SendReliable(u8 aid, const void *data, int size) {
     return DWCi_SendReliable(1, aid, data, size);
 }
 
-BOOL DWCi_SendReliable(int type, u8 aid, const void *data, int size) {
+BOOL DWCi_SendReliable(u16 type, u8 aid, const void *data, int size) {
     DWCTransportConnection *connection = DWCs_GetTransConnection(aid);
     int n;
     DWCTransportHeader header;
@@ -330,7 +330,7 @@ int DWCs_GetRequiredHeaderSize(int type) {
     }
 }
 
-BOOL DWC_SetRecvTimeoutTime(u8 netId, int timeout) {
+BOOL DWC_SetRecvTimeoutTime(u8 netId, u32 timeout) {
     if (sTransport == NULL) {
         return FALSE;
     }

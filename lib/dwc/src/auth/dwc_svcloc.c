@@ -46,7 +46,7 @@ void DWC_Svl_Cleanup(void) {
     }
 }
 
-BOOL DWC_Svl_GetTokenAsync(const char *service, DWCSvlResult *result) {
+BOOL DWC_Svl_GetTokenAsync(char *service, DWCSvlResult *result) {
     DWCHttpParam config;
     NasAuthInfo info;
     NasLocator *locator;
@@ -58,7 +58,7 @@ BOOL DWC_Svl_GetTokenAsync(const char *service, DWCSvlResult *result) {
     }
     locator = sLocator;
     config.url = DWCi_AuthConfig.url;
-    config.get = 0;
+    config.action = DWC_HTTP_POST;
     config.bufferSize = 0x1000;
     config.alloc = locator->alloc;
     config.free = locator->free;
@@ -97,7 +97,7 @@ BOOL DWC_Svl_GetTokenAsync(const char *service, DWCSvlResult *result) {
     return TRUE;
 }
 
-int DWC_Svl_Process(void) {
+DWCSvlState DWC_Svl_Process(void) {
     if (sLocator == NULL) {
         return 0;
     }

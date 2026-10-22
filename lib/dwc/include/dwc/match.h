@@ -3,6 +3,8 @@
 
 #include "types.h"
 #include "dwc/account.h"
+#include "dwc/error.h"
+#include "dwc/friend.h"
 #include "dwc/gp.h"
 #include "dwc/gt2Main.h"
 
@@ -41,15 +43,14 @@ void DWC_InitFriendsMatch(DWCUserData *userData, int productId, const char *secr
 void DWC_ShutdownFriendsMatch(void);
 void DWC_ProcessFriendsMatch(void);
 // Logs in with the player's name, which FALSE says could not start
-BOOL DWC_LoginAsync(const u16 *name, const char *reserved, void (*callback)(int error), void *param);
+BOOL DWC_LoginAsync(const u16 *name, const char *reserved, DWCLoginCallback callback, void *param);
 // Updates the friend list with the servers
-BOOL DWC_UpdateServersAsync(const char *name, void (*callback)(int error), void *userData,
-                            void (*statusCallback)(int index, u8 status, const char *location, void *param),
-                            void *statusParam, void (*deleteCallback)(int deleteIndex, int srcIndex, void *param),
-                            void *deleteParam);
+BOOL DWC_UpdateServersAsync(const char *name, DWCUpdateServersCallback callback, void *userData,
+                            DWCFriendStatusCallback statusCallback, void *statusParam,
+                            DWCDeleteFriendListCallback deleteCallback, void *deleteParam);
 
 // Matching: with the key and number, anybody, or a friend, and the callbacks that tell how it went
-typedef void (*DWCMatchedFunc)(int error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
+typedef void (*DWCMatchedFunc)(DWCError error, BOOL cancel, BOOL a2, BOOL a3, int index, void *param);
 typedef void (*DWCNewClientFunc)(int index, void *param);
 typedef BOOL (*DWCAttemptFunc)(void *param);
 BOOL DWC_ConnectToAnybodyAsync(int type, u8 numEntry, const char *query, DWCMatchedFunc matched, void *matchedParam,
@@ -62,7 +63,7 @@ BOOL DWC_ConnectToGameServerAsync(int type, int friendIndex, DWCMatchedFunc matc
                                   int *attemptParam, void *param);
 
 // The function called when a connection to another machine has been closed, which FALSE says could not be set
-typedef void (*DWCClosedFunc)(int error, BOOL a1, BOOL a2, u8 netId, int index, void *param);
+typedef void (*DWCClosedFunc)(DWCError error, BOOL a1, BOOL a2, u8 netId, int index, void *param);
 BOOL DWC_SetConnectionClosedCallback(DWCClosedFunc func, void *param);
 // Closes every connection at once: 0 once closing, 1 when there were none (or matching was canceled), -1 when it can't
 int DWC_CloseAllConnectionsHard(void);
@@ -72,10 +73,10 @@ int DWC_CloseConnectionHard(u8 netId);
 
 // The machines: how many there are, this machine's aid, the list of the aids, the aids as a bitmap, and whether an
 // aid is another machine of the match
-BOOL DWC_GetNumConnectionHost(void);
+int DWC_GetNumConnectionHost(void);
 u8 DWC_GetMyAID(void);
 int DWC_GetAIDList(u8 **aids);
-int DWC_GetAIDBitmap(void);
+u32 DWC_GetAIDBitmap(void);
 BOOL DWC_IsValidAID(u8 netId);
 // Whether this machine is the server of the match (its dwc_hoststate is 2)
 BOOL DWC_IsServerMyself(void);
@@ -97,7 +98,7 @@ u8 DWC_AddMatchKeyString(u8 keyId, const char *key, const char *value);
 int DWC_GetMatchIntValue(int index, const char *key, int defaultValue);
 
 // Takes a command that came from another machine of the match through the transport
-void DWCi_ProcessMatchSynPacket(u8 aid, int type, const void *data);
+void DWCi_ProcessMatchSynPacket(u8 aid, u16 type, const void *data);
 // Sets the player's GameSpy Presence status with the match's numbers: its size (SCM), its machines (SCN), the version
 // (VER) and whether it is closed (LCK)
 int DWCi_GPSetServerStatus(int status);

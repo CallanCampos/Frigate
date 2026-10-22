@@ -368,7 +368,7 @@ static void EncodeAdpcm2(u8 *dst, s16 *src, u32 count, VCTAdpcmState *state) {
 }
 
 // Decodes a packet of ADPCM: the state it starts from, then bytes of codes at the given number of bits a sample
-void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits) {
+void VCT_DecodeAdpcm(u8 *packet, s16 *dst, u32 size, VCTCodec bits) {
     VCTAdpcmState state;
 
     state.predictor = ((VCTAdpcmState *)packet)->predictor;
@@ -387,7 +387,7 @@ void VCT_DecodeAdpcm(u8 *packet, s16 *dst, int size, int bits) {
 }
 
 // Encodes count samples to a packet of ADPCM, which starts with the state before the first sample
-void VCT_EncodeAdpcm(u8 *packet, s16 *src, int count, VCTAdpcmState *state, int bits) {
+void VCT_EncodeAdpcm(u8 *packet, s16 *src, u32 count, VCTAdpcmState *state, VCTCodec bits) {
     VCTAdpcmState *header = (VCTAdpcmState *)packet;
 
     header->predictor = state->predictor;

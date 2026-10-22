@@ -33,7 +33,7 @@ static int sActiveCounts[VCT_SLOT_MAX];
 static VCTList sActiveList;
 
 void VCT_ResetActiveList(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int i;
 
     sActiveList.tail = NULL;
@@ -45,8 +45,8 @@ void VCT_ResetActiveList(void) {
 }
 
 // Frees the packets in the order of arrival that belong to a slot
-void VCT_FreeActiveOfSlot(int slot) {
-    u32 irq = OS_DisableInterrupts();
+void VCT_FreeActiveOfSlot(u32 slot) {
+    OSIntrMode irq = OS_DisableInterrupts();
     VCTPacket *packet;
 
     for (packet = VCT_FindActiveBySlot(slot); packet != NULL; packet = VCT_FindActiveBySlot(slot)) {
@@ -58,7 +58,7 @@ void VCT_FreeActiveOfSlot(int slot) {
 }
 
 void VCT_FreeAllActive(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     VCTPacket *packet = sActiveList.head;
     int i;
 
@@ -77,7 +77,7 @@ void VCT_FreeAllActive(void) {
 }
 
 int VCT_AppendActive(VCTPacket *packet) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sActiveList.head == NULL) {
         sActiveList.head = packet;
@@ -99,13 +99,13 @@ VCTPacket *VCT_GetActiveHead(void) {
     return sActiveList.head;
 }
 
-int VCT_GetActiveCount(int slot) {
+int VCT_GetActiveCount(u32 slot) {
     return sActiveCounts[slot];
 }
 
-VCTPacket *VCT_FindActiveBySlot(int slot) {
+VCTPacket *VCT_FindActiveBySlot(u32 slot) {
     VCTPacket *packet = sActiveList.head;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     for (; packet != NULL; packet = packet->next) {
         if (packet->slot == slot) {
@@ -118,7 +118,7 @@ VCTPacket *VCT_FindActiveBySlot(int slot) {
 }
 
 int VCT_RemoveActive(VCTPacket *packet) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (packet->prev != NULL) {
         packet->prev->next = packet->next;
@@ -213,8 +213,8 @@ void VCT_DecodePcm8(s8 *src, s16 *dst, u32 count) {
     }
 }
 
-void VCT_ClearSlotQueues(int slot) {
-    u32 irq = OS_DisableInterrupts();
+void VCT_ClearSlotQueues(u32 slot) {
+    OSIntrMode irq = OS_DisableInterrupts();
 
     sQueueTails[slot] = NULL;
     sQueueHeads[slot] = NULL;
@@ -222,8 +222,8 @@ void VCT_ClearSlotQueues(int slot) {
     OS_RestoreInterrupts(irq);
 }
 
-void VCT_FlushSlotQueue(int slot) {
-    u32 irq = OS_DisableInterrupts();
+void VCT_FlushSlotQueue(u32 slot) {
+    OSIntrMode irq = OS_DisableInterrupts();
     VCTPacket *packet = sQueueHeads[slot];
 
     while (packet != NULL) {
@@ -242,7 +242,7 @@ void VCT_FlushSlotQueue(int slot) {
 }
 
 void VCT_FlushAllQueues(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int slot;
 
     for (slot = 0; slot < VCT_SLOT_MAX; slot++) {
@@ -264,7 +264,7 @@ void VCT_FlushAllQueues(void) {
 
 // Puts a packet in a slot's queue before the packets with higher sequence numbers
 int VCT_InsertSorted(VCTPacket *packet, u32 slot) {
-    u32 irq;
+    OSIntrMode irq;
     VCTPacket *at;
 
     if (packet == NULL) {
@@ -305,8 +305,8 @@ inserted:
     return sQueueCounts[slot];
 }
 
-VCTPacket *VCT_PeekQueue(int slot) {
-    u32 irq = OS_DisableInterrupts();
+VCTPacket *VCT_PeekQueue(u32 slot) {
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sQueueHeads[slot] != NULL) {
         OS_RestoreInterrupts(irq);
@@ -317,7 +317,7 @@ VCTPacket *VCT_PeekQueue(int slot) {
 }
 
 static int PopQueue(int slot) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sQueueHeads[slot] != NULL) {
         VCTPacket *next = sQueueHeads[slot]->next;
@@ -334,11 +334,11 @@ static int PopQueue(int slot) {
     return sQueueCounts[slot];
 }
 
-int VCT_GetQueueCount(int slot) {
+int VCT_GetQueueCount(u32 slot) {
     return sQueueCounts[slot];
 }
 
-void VCT_InitReceiver(VCTReceiver *receiver, int slot, int aid) {
+void VCT_InitReceiver(VCTReceiver *receiver, u32 slot, int aid) {
     MI_CpuFill8(receiver, 0, 0x28);
     receiver->playoutDelay = 0x134df;
     receiver->lastDelay = 0;

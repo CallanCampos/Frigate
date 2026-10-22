@@ -10,7 +10,7 @@ static s32 SOCLi_GetReadBufferOccpiedSize(const SOCLSocket *socket);
 int SOCL_GetStatus(int s) {
     SOCLSocket *socket = (SOCLSocket *)s;
     int status = 0;
-    u32 irq;
+    OSIntrMode irq;
 
     if (SOCL_SocketIsInvalid(socket)) {
         status |= SOCL_STATUS_INVALID;

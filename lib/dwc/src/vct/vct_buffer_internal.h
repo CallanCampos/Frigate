@@ -2,30 +2,31 @@
 #define POKEBW2_DWC_VCT_BUFFER_INTERNAL_H
 
 #include "types.h"
+#include "dwc/vct_audio.h"
 #include "struct_decls.h"
 
 // What one machine's voice has gone through on the way to being played
 struct VCTReceiver {
     u32 avgDelay;
     u32 playoutDelay;
-    int queuedCount;
+    u32 queuedCount;
     int skewDifference;
     u32 lastSequenceSeen;
-    int lostCount;
-    int unk18;
-    int lateCount;
-    int playedCount;
-    int codec;
+    u32 lostCount;
+    u32 unk18;
+    u32 lateCount;
+    u32 playedCount;
+    VCTCodec codec;
     u32 lastDelay;
     u32 avgDelayCopy;
     u32 syncSequence;
-    int slot;
+    u32 slot;
     int aid;
     VCTPacket *held;
     int unk40;
     u64 firstArrival;
     u32 firstTimestamp;
-    int unk50;
+    u32 unk50;
     u32 lastSequence;
     u32 lastPlayedSequence;
     int needsReset;
@@ -47,24 +48,24 @@ struct VCTReceiver {
 
 // vct_buffer.c: the packets on their way out and in
 void VCT_ResetActiveList(void);
-void VCT_FreeActiveOfSlot(int slot);
+void VCT_FreeActiveOfSlot(u32 slot);
 void VCT_FreeAllActive(void);
 int VCT_AppendActive(VCTPacket *packet);
 VCTPacket *VCT_GetActiveHead(void);
-int VCT_GetActiveCount(int slot);
-VCTPacket *VCT_FindActiveBySlot(int slot);
+int VCT_GetActiveCount(u32 slot);
+VCTPacket *VCT_FindActiveBySlot(u32 slot);
 int VCT_RemoveActive(VCTPacket *packet);
 void VCT_EncodeMulaw(u8 *dst, s16 *src, u32 count);
 void VCT_DecodeMulaw(u8 *src, s16 *dst, u32 count);
 void VCT_EncodePcm8(u8 *dst, s16 *src, u32 count);
 void VCT_DecodePcm8(s8 *src, s16 *dst, u32 count);
-void VCT_ClearSlotQueues(int slot);
-void VCT_FlushSlotQueue(int slot);
+void VCT_ClearSlotQueues(u32 slot);
+void VCT_FlushSlotQueue(u32 slot);
 void VCT_FlushAllQueues(void);
 int VCT_InsertSorted(VCTPacket *packet, u32 slot);
-VCTPacket *VCT_PeekQueue(int slot);
-int VCT_GetQueueCount(int slot);
-void VCT_InitReceiver(VCTReceiver *receiver, int slot, int aid);
+VCTPacket *VCT_PeekQueue(u32 slot);
+int VCT_GetQueueCount(u32 slot);
+void VCT_InitReceiver(VCTReceiver *receiver, u32 slot, int aid);
 void VCT_DropHeld(VCTReceiver *receiver);
 int VCT_SetHeld(VCTReceiver *receiver, VCTPacket *packet);
 BOOL VCT_UpdateTiming(VCTReceiver *receiver, VCTPacket *packet);

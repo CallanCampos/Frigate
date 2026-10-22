@@ -125,7 +125,7 @@ s32 WCM_Init(void *work, s32 size) {
 }
 
 s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     s32 requiredSize = 0;
 
     if (sWcmAnchor.work != NULL) {
@@ -176,7 +176,7 @@ s32 WCM_InitCore(void *work, s32 size, s32 requestedMode) {
 }
 
 s32 WCM_Finish(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);
@@ -212,7 +212,7 @@ static BOOL WCM_GetRequiredWorkSize(s32 *size, s32 mode) {
 }
 
 s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
-    u32 irq;
+    OSIntrMode irq;
     s32 result;
 
     irq = OS_DisableInterrupts();
@@ -261,7 +261,7 @@ s32 WCM_StartupAsync(WCMConfig *config, WCMNotify notify) {
 }
 
 s32 WCM_CleanupAsync(void) {
-    u32 irq;
+    OSIntrMode irq;
     WCMWork *work;
     s32 result;
 
@@ -311,7 +311,7 @@ s32 WCM_SearchAsync(void *bssid, void *essid, u32 option) {
 }
 
 static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 option) {
-    u32 irq;
+    OSIntrMode irq;
     WCMWork *work;
     s32 result;
 
@@ -340,7 +340,7 @@ static s32 WCM_SearchAsyncWithParams(const u8 *bssid, const u8 *essid, u32 optio
 }
 
 s32 WCM_StopSearchAsync(void) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     if (sWcmAnchor.work == NULL) {
         OS_RestoreInterrupts(irq);

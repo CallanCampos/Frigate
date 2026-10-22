@@ -34,8 +34,8 @@ static void DWCUtilAutoConnect_FadeOut(void);
 static void DWCUtilAutoConnect_WaitFadeOut(void);
 static void DWCUtilAutoConnect_EndAutoConnect(void);
 static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg);
-static void *DWCUtilAutoConnect_Alloc(u32 name, u32 size);
-static void DWCUtilAutoConnect_Free(u32 name, void *ptr, u32 size);
+static void *DWCUtilAutoConnect_Alloc(u32 name, s32 size);
+static void DWCUtilAutoConnect_Free(u32 name, void *ptr, s32 size);
 
 // What auto-connect is started with: the utility's allocator, DMA channel 3 and the radio on
 static const DWCAcParam sAutoConnectParam = { DWCUtilAutoConnect_Alloc, DWCUtilAutoConnect_Free, 3, 1, 0, 0, 0, 0, 0 };
@@ -185,10 +185,10 @@ static void DWCUtilAutoConnect_ProcessTask(DWCUtilTask *task, void *arg) {
     }
 }
 
-static void *DWCUtilAutoConnect_Alloc(u32 name, u32 size) {
+static void *DWCUtilAutoConnect_Alloc(u32 name, s32 size) {
     return DWCUtilHeap_AllocClear(size, 0x20);
 }
 
-static void DWCUtilAutoConnect_Free(u32 name, void *ptr, u32 size) {
+static void DWCUtilAutoConnect_Free(u32 name, void *ptr, s32 size) {
     DWCUtilHeap_Free(ptr);
 }

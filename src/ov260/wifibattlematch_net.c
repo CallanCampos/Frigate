@@ -272,7 +272,7 @@ static u32 WifiBattleMatchNet_GetHttpResultMessage(u32 result);
 static void WifiBattleMatchNet_StartDownloadWait(WifiBattleMatchNet *p_wk, u32 nextState);
 static void WifiBattleMatchNet_StartDownloadEnd(WifiBattleMatchNet *p_wk, u32 nextState);
 static void WifiBattleMatchNet_StartDownloadCancel(WifiBattleMatchNet *p_wk, u32 nextState);
-static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError);
+static void WifiBattleMatchNet_OnDownload(DWCNdCallbackReason reason, DWCNdError error, int serverError);
 static u32 WifiBattleMatchNet_GetDwcResult(u32 code);
 static u32 WifiBattleMatchNet_GetGdbResult(u32 code, u32 subCode1, u32 subCode2);
 static u32 WifiBattleMatchNet_GetTimeoutResult(u32 code);
@@ -2414,7 +2414,7 @@ static void WifiBattleMatchNet_StartDownloadCancel(WifiBattleMatchNet *p_wk, u32
     }
 }
 
-static void WifiBattleMatchNet_OnDownload(u32 reason, u32 error, int serverError) {
+static void WifiBattleMatchNet_OnDownload(DWCNdCallbackReason reason, DWCNdError error, int serverError) {
     switch (error) {
     case DWC_ND_ERROR_NONE:
     case DWC_ND_ERROR_ALLOC:

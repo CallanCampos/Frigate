@@ -61,7 +61,7 @@ typedef struct DWCTransportInfo {
 BOOL DWC_SendReliable(u8 aid, const void *data, int size);
 BOOL DWC_SendUnreliable(u8 aid, const void *data, int size);
 // Sends data of a kind (1 the game's, 2 to 4 the match's own) to a machine, returning FALSE if it can't be sent now
-BOOL DWCi_SendReliable(int type, u8 aid, const void *data, int size);
+BOOL DWCi_SendReliable(u16 type, u8 aid, const void *data, int size);
 // Starts the transport in the memory the match gives it, and ends it
 void DWCi_InitTransport(DWCTransportInfo *info);
 void DWCi_ShutdownTransport(void);

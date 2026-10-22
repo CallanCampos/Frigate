@@ -34,15 +34,14 @@ typedef struct NdBufferFullEvent {
     BOOL grow;
 } NdBufferFullEvent;
 
-// The thread's memory: what DWC_NdInitAsync was given, the connection's information, the thread's stack and the thread
+// The thread's memory: what DWC_NdInitAsync was given, the connection's information (the service locator's host and
+// token), the thread's stack and the thread
 typedef struct NdWork {
     char gameCode[0x20];
     char password[0x20];
     // Whether the thread set the library up
     BOOL started;
-    u8 unk44[4];
-    char host[0x41];
-    char authToken[0x12f];
+    DWCSvlResult svl;
     u8 stack[0x800];
     OSThread thread;
 } NdWork;
@@ -110,7 +109,7 @@ static void *NdAlloc(u32 size, int align);
 static void NdFree(void *ptr);
 static void NdFreeWork(void);
 static void ThreadMain(void *arg);
-static void NdSetResult(u32 reason, u32 error, int code);
+static void NdSetResult(DWCNdCallbackReason reason, DWCNdError error, int code);
 static void FreeAttrs(void);
 static BOOL SetAttr(int index, const char *text);
 static BOOL SetAttrs(const char *attr1, const char *attr2, const char *attr3);
@@ -211,13 +210,13 @@ static void ThreadMain(void *arg) {
         case 3: {
             NdWork *work = sDwcNdState.work;
 
-            if (strlen(work->host) + strlen("https:///download") > 0xff) {
+            if (strlen(work->svl.svlhost) + strlen("https:///download") > 0xff) {
                 NdSetResult(DWC_ND_CBREASON_INITIALIZE, ND_ERROR_FATAL, -1);
                 return;
             }
-            OS_SNPrintf(url, 0x100, "https://%s/download", work->host);
+            OS_SNPrintf(url, 0x100, "https://%s/download", work->svl.svlhost);
             work = sDwcNdState.work;
-            if (DWC_Base64Encode(work->authToken, strlen(work->authToken), token, 0x190) < 0) {
+            if (DWC_Base64Encode(work->svl.svltoken, strlen(work->svl.svltoken), token, 0x190) < 0) {
                 NdSetResult(DWC_ND_CBREASON_INITIALIZE, ND_ERROR_FATAL, -1);
                 return;
             }
@@ -248,7 +247,7 @@ static void ThreadMain(void *arg) {
 }
 
 // Records the result of a call, for NdReportResults to give the game
-static void NdSetResult(u32 reason, u32 error, int code) {
+static void NdSetResult(DWCNdCallbackReason reason, DWCNdError error, int code) {
     if (error != 0) {
         SetWifiError(error, code);
     }
@@ -263,7 +262,7 @@ static void NdSetResult(u32 reason, u32 error, int code) {
     OS_UnlockMutex(&sNdMutex);
 }
 
-BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *password) {
+BOOL DWC_NdInitAsync(DWCNdCallback callback, char *gameCode, char *password) {
     if (DWCi_IsError()) {
         return FALSE;
     }
@@ -290,7 +289,7 @@ BOOL DWC_NdInitAsync(DWCNdCallback callback, const char *gameCode, const char *p
     sDwcNdState.work->started = FALSE;
     strncpy(sDwcNdState.work->gameCode, gameCode, 0x1f);
     strncpy(sDwcNdState.work->password, password, 0x1f);
-    if (!DWC_SVLGetTokenAsync("9000", sDwcNdState.work->unk44)) {
+    if (!DWC_SVLGetTokenAsync("9000", &sDwcNdState.work->svl)) {
         NdFree(sDwcNdState.work);
         sDwcNdState.work = NULL;
         return FALSE;
@@ -358,7 +357,7 @@ BOOL DWC_NdSetAttr(const char *attr1, const char *attr2, const char *attr3) {
     return SetAttrs(attr1, attr2, attr3);
 }
 
-BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
+BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, unsigned int offset, unsigned int count) {
     if (DWCi_IsError()) {
         return FALSE;
     }
@@ -380,7 +379,7 @@ BOOL DWC_NdGetFileListAsync(DWCNdFileInfo *files, u32 offset, u32 count) {
     return FALSE;
 }
 
-BOOL DWC_NdGetFileAsync(DWCNdFileInfo *file, void *buffer, u32 size) {
+BOOL DWC_NdGetFileAsync(DWCNdFileInfo *file, char *buffer, unsigned int size) {
     BOOL result;
 
     if (DWCi_IsError()) {

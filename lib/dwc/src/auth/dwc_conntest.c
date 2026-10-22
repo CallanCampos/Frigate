@@ -18,7 +18,7 @@ typedef struct NasPrWork {
     int state;
     int result;
     u8 unk_1008[0x100];
-    DWCAcMemFuncs memFuncs;
+    DWCNetcheckParam memFuncs;
     char *redirectUrl;
     char *hotspotUrl;
     OSThread thread;
@@ -52,7 +52,7 @@ u8 DWCi_ConnTestUnk18[0x18];
 DWCHttpParam DWCi_ConnTestConfig;
 DWCAuthParam DWCi_ConnTestInit;
 
-int DWC_Netcheck_Create(const DWCAcMemFuncs *init) {
+DWCNetcheckError DWC_Netcheck_Create(DWCNetcheckParam *init) {
     DWCHttpAlloc alloc = init->alloc;
 
     if (DWCi_ConnTestWork != NULL) {
@@ -114,7 +114,7 @@ void DWC_Netcheck_Abort(void) {
     }
 }
 
-u32 DWC_Netcheck_GetError(void) {
+DWCNetcheckError DWC_Netcheck_GetError(void) {
     int state;
 
     OS_LockMutex(&DWCi_ConnTestWork->lock);
@@ -123,7 +123,7 @@ u32 DWC_Netcheck_GetError(void) {
     return state;
 }
 
-u32 DWC_Netcheck_GetReturnCode(void) {
+int DWC_Netcheck_GetReturnCode(void) {
     return DWCi_ConnTestWork->result;
 }
 
@@ -155,7 +155,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
 
     for (;;) {
         DWCi_ConnTestConfig.url = sConnTest.url;
-        DWCi_ConnTestConfig.get = 1;
+        DWCi_ConnTestConfig.action = DWC_HTTP_GET;
         DWCi_ConnTestConfig.bufferSize = 0x1000;
         DWCi_ConnTestConfig.alloc = alloc;
         DWCi_ConnTestConfig.free = free;
@@ -204,7 +204,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
                 DWCi_ConnTestWork->result = -6;
                 DWC_Http_Destroy(DWCi_ConnTestHttp);
                 DWCi_ConnTestConfig.url = DWCi_AuthConfig.url;
-                DWCi_ConnTestConfig.get = 0;
+                DWCi_ConnTestConfig.action = DWC_HTTP_POST;
                 DWCi_ConnTestConfig.bufferSize = 0x200;
                 DWCi_ConnTestConfig.alloc = alloc;
                 DWCi_ConnTestConfig.free = free;
@@ -313,7 +313,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
         }
         DWCi_ConnTestWork->result = -4;
         DWCi_ConnTestConfig.url = DWCi_AuthConfig.url;
-        DWCi_ConnTestConfig.get = 0;
+        DWCi_ConnTestConfig.action = DWC_HTTP_POST;
         DWCi_ConnTestConfig.bufferSize = 0x1000;
         DWCi_ConnTestConfig.alloc = alloc;
         DWCi_ConnTestConfig.free = free;
@@ -483,7 +483,7 @@ static void DWCi_Netcheck_Thread(void *arg) {
         DWC_Http_Destroy(DWCi_ConnTestHttp);
         DWCi_ConnTestWork->result = -5;
         DWCi_ConnTestConfig.url = url;
-        DWCi_ConnTestConfig.get = 0;
+        DWCi_ConnTestConfig.action = DWC_HTTP_POST;
         DWCi_ConnTestConfig.bufferSize = 0x1000;
         DWCi_ConnTestConfig.alloc = alloc;
         DWCi_ConnTestConfig.free = free;

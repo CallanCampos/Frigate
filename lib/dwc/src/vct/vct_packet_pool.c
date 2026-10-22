@@ -46,7 +46,7 @@ void VCT_ClearPacketPool(void) {
 
 VCTPacket *VCT_AllocPacket(void) {
     VCTPacket *packet = NULL;
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     VCTPacket *head = sPacketPool.freeList;
 
     if (head != NULL) {
@@ -58,7 +58,7 @@ VCTPacket *VCT_AllocPacket(void) {
 }
 
 void VCT_FreePacket(VCTPacket *packet) {
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
 
     packet->nextFree = sPacketPool.freeList;
     sPacketPool.freeList = packet;

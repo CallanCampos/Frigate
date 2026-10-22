@@ -42,7 +42,7 @@ BOOL VCT_Init(VCTConfig *config) {
     gVCTSettings.callback = config->callback;
     gVCTSettings.userData = config->userData;
     gVCTSettings.mode = config->mode;
-    gVCTSettings.unkC = 0;
+    gVCTSettings.listenMode = 0;
     if (config->aid >= VCT_AID_MAX) {
         return FALSE;
     }
@@ -85,7 +85,7 @@ void VCT_Tick(void) {
     }
 }
 
-BOOL VCT_ReceivePacket(u8 aid, void *data, int size) {
+BOOL VCT_ReceivePacket(u8 aid, u8 *data, int size) {
     VCTEventResult result;
 
     switch (DispatchPacket(aid, data, size, &result)) {

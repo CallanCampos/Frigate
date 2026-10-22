@@ -6,20 +6,20 @@
 
 // The last error and its code
 typedef struct DWCErrorInfo {
-    int error;
+    DWCError error;
     int code;
 } DWCErrorInfo;
 
 static DWCErrorInfo sErrorInfo;
 
-int DWC_GetLastError(int *code) {
+DWCError DWC_GetLastError(int *code) {
     if (code != NULL) {
         *code = sErrorInfo.code;
     }
     return sErrorInfo.error;
 }
 
-int DWC_GetLastErrorEx(int *code, int *type) {
+DWCError DWC_GetLastErrorEx(int *code, DWCErrorType *type) {
     if (code != NULL) {
         *code = sErrorInfo.code;
     }
@@ -86,7 +86,7 @@ BOOL DWCi_IsError(void) {
     return sErrorInfo.error != DWC_ERROR_NONE;
 }
 
-void DWCi_SetError(int error, int code) {
+void DWCi_SetError(DWCError error, int code) {
     if (sErrorInfo.error != DWC_ERROR_FATAL) {
         sErrorInfo.error = error;
         sErrorInfo.code = code;

@@ -27,15 +27,15 @@ static BOOL DWCi_Acc_IsFriendKeyOf(u64 friendKey, u32 gameCode, int useMd5);
 static BOOL DWCi_Acc_IsDirty(const DWCUserData *userData);
 static void DWCi_Acc_ClearDirty(DWCUserData *userData);
 static BOOL DWCi_Acc_SetBitField(u32 *word, u32 value, u32 shift, u32 mask);
-static u32 DWCi_Acc_GetPlayerId(const DWCFriendData *loginId);
-static u64 DWCi_Acc_GetFriendKey(const DWCFriendData *friendData);
-static u32 DWCi_Acc_GetProfileId(const DWCFriendData *friendData);
-static void DWCi_Acc_SetFriendKey(DWCFriendData *friendData, u64 friendKey);
-static void DWCi_Acc_SetProfileId(DWCFriendData *friendData, s32 profileId);
-static u32 DWCi_Acc_GetFlags(const DWCFriendData *friendData);
-static int DWCi_Acc_GetType(const DWCFriendData *friendData);
-static void DWCi_Acc_SetFlags(DWCFriendData *friendData, u32 flags);
-static void DWCi_Acc_SetType(DWCFriendData *friendData, int type);
+static u32 DWCi_Acc_GetPlayerId(const DWCAccLoginId *loginId);
+static u64 DWCi_Acc_GetFriendKey(const DWCAccFriendKey *friendKey);
+static int DWCi_Acc_GetProfileId(const DWCAccGsProfileId *profileId);
+static void DWCi_Acc_SetFriendKey(DWCAccFriendKey *data, u64 friendKey);
+static void DWCi_Acc_SetProfileId(DWCAccGsProfileId *data, int profileId);
+static u32 DWCi_Acc_GetFlags(const DWCAccFlag *flags);
+static int DWCi_Acc_GetType(const DWCAccFlag *flags);
+static void DWCi_Acc_SetFlags(DWCAccFlag *data, u32 flags);
+static void DWCi_Acc_SetType(DWCAccFlag *data, int type);
 static u64 DWCi_Acc_MakeFriendKey(u32 profileId, u32 gameCode, BOOL useMd5);
 static u32 DWCi_Acc_GetProfileIdFromFriendKey(u64 friendKey, u32 gameCode);
 static void DWCi_Acc_CreateUserData(DWCUserData *userData, u32 gameCode);
@@ -50,52 +50,52 @@ static BOOL DWCi_Acc_SetBitField(u32 *word, u32 value, u32 shift, u32 mask) {
 }
 
 // The 43-bit user ID of a login ID
-u64 DWCi_Acc_GetUserId(const DWCFriendData *loginId) {
-    return ((u64)(loginId->header & USER_ID_HIGH_MASK) << 32) | loginId->word1;
+u64 DWCi_Acc_GetUserId(const DWCAccLoginId *loginId) {
+    return ((u64)(loginId->id_data & USER_ID_HIGH_MASK) << 32) | loginId->userid_lo32;
 }
 
 // The player ID of a login ID
-static u32 DWCi_Acc_GetPlayerId(const DWCFriendData *loginId) {
-    return loginId->word2;
+static u32 DWCi_Acc_GetPlayerId(const DWCAccLoginId *loginId) {
+    return loginId->playerid;
 }
 
 // The friend key of friend data that holds one
-static u64 DWCi_Acc_GetFriendKey(const DWCFriendData *friendData) {
-    return ((u64)friendData->word2 << 32) | friendData->word1;
+static u64 DWCi_Acc_GetFriendKey(const DWCAccFriendKey *friendKey) {
+    return ((u64)friendKey->friendkey_hi32 << 32) | friendKey->friendkey_lo32;
 }
 
 // The profile ID of friend data that holds one
-static u32 DWCi_Acc_GetProfileId(const DWCFriendData *friendData) {
-    return friendData->word1;
+static int DWCi_Acc_GetProfileId(const DWCAccGsProfileId *profileId) {
+    return profileId->id;
 }
 
 // Sets the user ID of a login ID; the header keeps what it had if the ID's high bits don't fit in 11
-void DWCi_Acc_SetUserId(DWCFriendData *loginId, u64 userId) {
-    DWCi_Acc_SetBitField(&loginId->header, userId >> 32, 0, USER_ID_HIGH_MASK);
-    loginId->word1 = (u32)userId;
+void DWCi_Acc_SetUserId(DWCAccLoginId *loginId, u64 userId) {
+    DWCi_Acc_SetBitField(&loginId->id_data, userId >> 32, 0, USER_ID_HIGH_MASK);
+    loginId->userid_lo32 = (u32)userId;
 }
 
-void DWCi_Acc_SetPlayerId(DWCFriendData *loginId, u32 playerId) {
-    loginId->word2 = playerId;
+void DWCi_Acc_SetPlayerId(DWCAccLoginId *loginId, u32 playerId) {
+    loginId->playerid = playerId;
 }
 
-static void DWCi_Acc_SetFriendKey(DWCFriendData *friendData, u64 friendKey) {
-    friendData->word1 = (u32)friendKey;
-    friendData->word2 = friendKey >> 32;
+static void DWCi_Acc_SetFriendKey(DWCAccFriendKey *data, u64 friendKey) {
+    data->friendkey_lo32 = (u32)friendKey;
+    data->friendkey_hi32 = friendKey >> 32;
 }
 
-static void DWCi_Acc_SetProfileId(DWCFriendData *friendData, s32 profileId) {
-    friendData->word1 = profileId;
+static void DWCi_Acc_SetProfileId(DWCAccGsProfileId *data, int profileId) {
+    data->id = profileId;
 }
 
 // The 21 bits of flags, kind included
-static u32 DWCi_Acc_GetFlags(const DWCFriendData *friendData) {
-    return (friendData->header >> FLAGS_SHIFT) & FLAGS_MASK;
+static u32 DWCi_Acc_GetFlags(const DWCAccFlag *flags) {
+    return (flags->flags >> FLAGS_SHIFT) & FLAGS_MASK;
 }
 
 // The kind of friend data
-static int DWCi_Acc_GetType(const DWCFriendData *friendData) {
-    return DWCi_Acc_GetFlags(friendData) & TYPE_MASK;
+static int DWCi_Acc_GetType(const DWCAccFlag *flags) {
+    return DWCi_Acc_GetFlags(flags) & TYPE_MASK;
 }
 
 BOOL DWC_IsBuddyFriendData(const DWCFriendData *friendData) {
@@ -106,77 +106,77 @@ BOOL DWC_IsBuddyFriendData(const DWCFriendData *friendData) {
 }
 
 BOOL DWCi_Acc_IsAuthentic(const DWCFriendData *friendData) {
-    if (DWCi_Acc_GetType(friendData) == DWC_FRIEND_TYPE_PROFILE_ID) {
-        return (DWCi_Acc_GetFlags(friendData) & DWC_FRIEND_FLAG_AUTHENTIC) == DWC_FRIEND_FLAG_AUTHENTIC;
+    if (DWCi_Acc_GetType(&friendData->flags) == DWC_FRIEND_TYPE_PROFILE_ID) {
+        return (DWCi_Acc_GetFlags(&friendData->flags) & DWC_FRIEND_FLAG_AUTHENTIC) == DWC_FRIEND_FLAG_AUTHENTIC;
     }
     return FALSE;
 }
 
 BOOL DWCi_Acc_IsBuddyFlag(const DWCFriendData *friendData) {
-    return (DWCi_Acc_GetFlags(friendData) & DWC_FRIEND_FLAG_BUDDY) == DWC_FRIEND_FLAG_BUDDY;
+    return (DWCi_Acc_GetFlags(&friendData->flags) & DWC_FRIEND_FLAG_BUDDY) == DWC_FRIEND_FLAG_BUDDY;
 }
 
 BOOL DWCi_Acc_IsFlag5(const DWCFriendData *friendData) {
-    return (DWCi_Acc_GetFlags(friendData) & DWC_FRIEND_FLAG_5) == DWC_FRIEND_FLAG_5;
+    return (DWCi_Acc_GetFlags(&friendData->flags) & DWC_FRIEND_FLAG_5) == DWC_FRIEND_FLAG_5;
 }
 
 int DWC_GetFriendDataType(const DWCFriendData *friendData) {
-    return DWCi_Acc_GetType(friendData);
+    return DWCi_Acc_GetType(&friendData->flags);
 }
 
 // Sets the flags, kind included
-static void DWCi_Acc_SetFlags(DWCFriendData *friendData, u32 flags) {
-    DWCi_Acc_SetBitField(&friendData->header, flags, FLAGS_SHIFT, FLAGS_MASK);
+static void DWCi_Acc_SetFlags(DWCAccFlag *data, u32 flags) {
+    DWCi_Acc_SetBitField(&data->flags, flags, FLAGS_SHIFT, FLAGS_MASK);
 }
 
 // Sets the kind of friend data
-static void DWCi_Acc_SetType(DWCFriendData *friendData, int type) {
-    u32 flags = DWCi_Acc_GetFlags(friendData) & ~TYPE_MASK;
+static void DWCi_Acc_SetType(DWCAccFlag *data, int type) {
+    u32 flags = DWCi_Acc_GetFlags(data) & ~TYPE_MASK;
 
-    DWCi_Acc_SetFlags(friendData, flags | type);
+    DWCi_Acc_SetFlags(data, flags | type);
 }
 
 void DWCi_Acc_SetAuthentic(DWCFriendData *friendData) {
     u32 flags;
 
-    if (DWCi_Acc_GetType(friendData) != DWC_FRIEND_TYPE_PROFILE_ID) {
+    if (DWCi_Acc_GetType(&friendData->flags) != DWC_FRIEND_TYPE_PROFILE_ID) {
         return;
     }
-    flags = DWCi_Acc_GetFlags(friendData) | DWC_FRIEND_FLAG_AUTHENTIC;
-    DWCi_Acc_SetFlags(friendData, flags);
+    flags = DWCi_Acc_GetFlags(&friendData->flags) | DWC_FRIEND_FLAG_AUTHENTIC;
+    DWCi_Acc_SetFlags(&friendData->flags, flags);
 }
 
 void DWCi_Acc_SetBuddyFlag(DWCFriendData *friendData, BOOL on) {
     u32 flags;
 
     if (on) {
-        flags = DWCi_Acc_GetFlags(friendData) | DWC_FRIEND_FLAG_BUDDY;
+        flags = DWCi_Acc_GetFlags(&friendData->flags) | DWC_FRIEND_FLAG_BUDDY;
     } else {
-        flags = DWCi_Acc_GetFlags(friendData) & ~DWC_FRIEND_FLAG_BUDDY;
+        flags = DWCi_Acc_GetFlags(&friendData->flags) & ~DWC_FRIEND_FLAG_BUDDY;
     }
-    DWCi_Acc_SetFlags(friendData, flags);
+    DWCi_Acc_SetFlags(&friendData->flags, flags);
 }
 
 void DWCi_Acc_SetFlag4(DWCFriendData *friendData, BOOL on) {
     u32 flags;
 
     if (on) {
-        flags = DWCi_Acc_GetFlags(friendData) | DWC_FRIEND_FLAG_4;
+        flags = DWCi_Acc_GetFlags(&friendData->flags) | DWC_FRIEND_FLAG_4;
     } else {
-        flags = DWCi_Acc_GetFlags(friendData) & ~DWC_FRIEND_FLAG_4;
+        flags = DWCi_Acc_GetFlags(&friendData->flags) & ~DWC_FRIEND_FLAG_4;
     }
-    DWCi_Acc_SetFlags(friendData, flags);
+    DWCi_Acc_SetFlags(&friendData->flags, flags);
 }
 
 void DWCi_Acc_SetFlag5(DWCFriendData *friendData, BOOL on) {
     u32 flags;
 
     if (on) {
-        flags = DWCi_Acc_GetFlags(friendData) | DWC_FRIEND_FLAG_5;
+        flags = DWCi_Acc_GetFlags(&friendData->flags) | DWC_FRIEND_FLAG_5;
     } else {
-        flags = DWCi_Acc_GetFlags(friendData) & ~DWC_FRIEND_FLAG_5;
+        flags = DWCi_Acc_GetFlags(&friendData->flags) & ~DWC_FRIEND_FLAG_5;
     }
-    DWCi_Acc_SetFlags(friendData, flags);
+    DWCi_Acc_SetFlags(&friendData->flags, flags);
 }
 
 // The friend key of a profile ID: the ID, and above it a 7-bit checksum of the ID and the game code, which is a CRC-8
@@ -249,7 +249,7 @@ void DWCi_Acc_EncodeBase32(u64 value, int bits, char *dest) {
 
 // The login name for a login ID and a game: the user ID as 9 digits, the game code's 4 characters and the player ID as
 // 7 digits
-void DWCi_Acc_CreateLoginName(const DWCFriendData *loginId, u32 gameCode, char *dest) {
+void DWCi_Acc_CreateLoginName(const DWCAccLoginId *loginId, u32 gameCode, char *dest) {
     char userIdText[21];
     char playerIdText[21];
 
@@ -268,7 +268,7 @@ static void DWCi_Acc_CreateUserData(DWCUserData *userData, u32 gameCode) {
     userData->gsProfileId = 0;
     userData->gameCode = gameCode;
     DWCi_Acc_CreateLoginId(&userData->pseudo);
-    DWCi_Acc_SetType(&userData->authentic, DWC_FRIEND_TYPE_NONE);
+    DWCi_Acc_SetType((DWCAccFlag *)&userData->authentic, DWC_FRIEND_TYPE_NONE);
     MATHi_CRC32InitTableRev(&table, CRC32_POLY);
     userData->crc32 = MATH_CalcCRC32(&table, userData, USER_DATA_CHECKED_SIZE);
     userData->flags |= DWC_USER_DATA_DIRTY;
@@ -276,7 +276,7 @@ static void DWCi_Acc_CreateUserData(DWCUserData *userData, u32 gameCode) {
 
 // Makes a login ID of the console's Wi-Fi ID (the pending one until the first is confirmed) and a random player ID,
 // from a generator that is seeded with the console's entropy
-void DWCi_Acc_CreateLoginId(DWCFriendData *loginId) {
+void DWCi_Acc_CreateLoginId(DWCAccLoginId *loginId) {
     DWCBmWifiId wifiId;
     u32 entropy[8];
     MATHRandContext32 rand;
@@ -294,11 +294,11 @@ void DWCi_Acc_CreateLoginId(DWCFriendData *loginId) {
         DWCi_Acc_SetUserId(loginId, wifiId.pendingId);
     }
     DWCi_Acc_SetPlayerId(loginId, MATH_Rand32(&rand, 0));
-    DWCi_Acc_SetType(loginId, DWC_FRIEND_TYPE_LOGIN_ID);
+    DWCi_Acc_SetType((DWCAccFlag *)loginId, DWC_FRIEND_TYPE_LOGIN_ID);
 }
 
 // Whether a login ID is made of the console's Wi-Fi ID (or the pending one)
-BOOL DWCi_Acc_IsConsoleLoginId(const DWCFriendData *loginId) {
+BOOL DWCi_Acc_IsConsoleLoginId(const DWCAccLoginId *loginId) {
     DWCBmWifiId wifiId;
 
     DWCBm_GetWifiId(&wifiId);
@@ -310,8 +310,8 @@ BOOL DWCi_Acc_IsConsoleLoginId(const DWCFriendData *loginId) {
 }
 
 // Whether friend data is a login ID
-BOOL DWCi_Acc_IsLoginId(const DWCFriendData *friendData) {
-    return DWCi_Acc_GetType(friendData) == DWC_FRIEND_TYPE_LOGIN_ID;
+BOOL DWCi_Acc_IsLoginId(const DWCAccLoginId *loginId) {
+    return DWCi_Acc_GetType((const DWCAccFlag *)loginId) == DWC_FRIEND_TYPE_LOGIN_ID;
 }
 
 // Whether the user data has an authenticated login ID
@@ -320,7 +320,7 @@ BOOL DWCi_Acc_HasAuthenticLoginId(const DWCUserData *userData) {
 }
 
 BOOL DWC_IsValidFriendData(const DWCFriendData *friendData) {
-    return DWCi_Acc_GetType(friendData) != DWC_FRIEND_TYPE_NONE;
+    return DWCi_Acc_GetType(&friendData->flags) != DWC_FRIEND_TYPE_NONE;
 }
 
 BOOL DWCi_IsValidFriendData(const DWCFriendData *friendData) {
@@ -344,7 +344,7 @@ BOOL DWC_CheckUserData(const DWCUserData *userData) {
 BOOL DWC_CheckValidConsole(const DWCUserData *userData) {
     DWCBmWifiId wifiId;
 
-    if (DWCi_Acc_GetType(&userData->authentic) == DWC_FRIEND_TYPE_NONE) {
+    if (DWCi_Acc_GetType((const DWCAccFlag *)&userData->authentic) == DWC_FRIEND_TYPE_NONE) {
         return TRUE;
     }
     DWCBm_GetWifiId(&wifiId);
@@ -359,7 +359,7 @@ BOOL DWC_CheckHasProfile(const DWCUserData *userData) {
 }
 
 // Authenticates a login ID for a profile, which marks the user data as changed
-void DWCi_Acc_SetAuthenticLoginId(DWCUserData *userData, const DWCFriendData *loginId, s32 profileId) {
+void DWCi_Acc_SetAuthenticLoginId(DWCUserData *userData, const DWCAccLoginId *loginId, int profileId) {
     MATHCRC32Table table;
 
     userData->authentic = *loginId;
@@ -391,18 +391,18 @@ static void DWCi_Acc_ClearDirty(DWCUserData *userData) {
 
 // The friend key of friend data, or 0 if it is of another kind
 u64 DWC_GetFriendKey(const DWCFriendData *friendData) {
-    if (DWCi_Acc_GetType(friendData) != DWC_FRIEND_TYPE_FRIEND_KEY) {
+    if (DWCi_Acc_GetType(&friendData->flags) != DWC_FRIEND_TYPE_FRIEND_KEY) {
         return 0;
     }
-    return DWCi_Acc_GetFriendKey(friendData);
+    return DWCi_Acc_GetFriendKey(&friendData->friend_key);
 }
 
-s32 DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendData) {
-    switch (DWCi_Acc_GetType(friendData)) {
+int DWC_GetGsProfileId(const DWCUserData *userData, const DWCFriendData *friendData) {
+    switch (DWCi_Acc_GetType(&friendData->flags)) {
     case DWC_FRIEND_TYPE_FRIEND_KEY:
-        return DWCi_Acc_GetProfileIdFromFriendKey(DWCi_Acc_GetFriendKey(friendData), userData->gameCode);
+        return DWCi_Acc_GetProfileIdFromFriendKey(DWCi_Acc_GetFriendKey(&friendData->friend_key), userData->gameCode);
     case DWC_FRIEND_TYPE_PROFILE_ID:
-        return DWCi_Acc_GetProfileId(friendData);
+        return DWCi_Acc_GetProfileId(&friendData->gs_profile_id);
     case DWC_FRIEND_TYPE_LOGIN_ID:
         return -1;
     default:
@@ -422,48 +422,48 @@ u64 DWC_CreateFriendKey(const DWCUserData *userData) {
 
 void DWC_CreateFriendKeyToken(DWCFriendData *token, u64 friendKey) {
     MI_CpuFill8(token, 0, sizeof(DWCFriendData));
-    DWCi_Acc_SetFriendKey(token, friendKey);
-    DWCi_Acc_SetType(token, DWC_FRIEND_TYPE_FRIEND_KEY);
+    DWCi_Acc_SetFriendKey(&token->friend_key, friendKey);
+    DWCi_Acc_SetType(&token->flags, DWC_FRIEND_TYPE_FRIEND_KEY);
 }
 
 void DWC_CreateExchangeToken(const DWCUserData *userData, DWCFriendData *token) {
     MI_CpuFill8(token, 0, sizeof(DWCFriendData));
     if (!DWCi_Acc_HasAuthenticLoginId(userData)) {
-        *token = userData->pseudo;
+        token->login_id = userData->pseudo;
         return;
     }
-    DWCi_Acc_SetProfileId(token, userData->gsProfileId);
-    DWCi_Acc_SetType(token, DWC_FRIEND_TYPE_PROFILE_ID);
+    DWCi_Acc_SetProfileId(&token->gs_profile_id, userData->gsProfileId);
+    DWCi_Acc_SetType(&token->flags, DWC_FRIEND_TYPE_PROFILE_ID);
 }
 
-void DWCi_Acc_CreateProfileIdToken(DWCFriendData *token, s32 profileId) {
+void DWCi_Acc_CreateProfileIdToken(DWCFriendData *token, int profileId) {
     MI_CpuFill8(token, 0, sizeof(DWCFriendData));
-    DWCi_Acc_SetProfileId(token, profileId);
-    DWCi_Acc_SetType(token, DWC_FRIEND_TYPE_PROFILE_ID);
+    DWCi_Acc_SetProfileId(&token->gs_profile_id, profileId);
+    DWCi_Acc_SetType(&token->flags, DWC_FRIEND_TYPE_PROFILE_ID);
 }
 
 void DWCi_Acc_GetLoginName(const DWCUserData *userData, const DWCFriendData *loginId, char *dest) {
-    DWCi_Acc_CreateLoginName(loginId, userData->gameCode, dest);
+    DWCi_Acc_CreateLoginName(&loginId->login_id, userData->gameCode, dest);
 }
 
 BOOL DWC_IsEqualFriendData(const DWCFriendData *friendData, const DWCFriendData *other) {
-    int type = DWCi_Acc_GetType(friendData);
+    int type = DWCi_Acc_GetType(&friendData->flags);
 
-    if (type != DWCi_Acc_GetType(other)) {
+    if (type != DWCi_Acc_GetType(&other->flags)) {
         return FALSE;
     }
     if (type == DWC_FRIEND_TYPE_PROFILE_ID) {
-        return DWCi_Acc_GetProfileId(friendData) == DWCi_Acc_GetProfileId(other);
+        return DWCi_Acc_GetProfileId(&friendData->gs_profile_id) == DWCi_Acc_GetProfileId(&other->gs_profile_id);
     }
     if (type == DWC_FRIEND_TYPE_LOGIN_ID) {
-        if (DWCi_Acc_GetUserId(friendData) == DWCi_Acc_GetUserId(other) &&
-            DWCi_Acc_GetPlayerId(friendData) == DWCi_Acc_GetPlayerId(other)) {
+        if (DWCi_Acc_GetUserId(&friendData->login_id) == DWCi_Acc_GetUserId(&other->login_id) &&
+            DWCi_Acc_GetPlayerId(&friendData->login_id) == DWCi_Acc_GetPlayerId(&other->login_id)) {
             return TRUE;
         }
         return FALSE;
     }
     if (type == DWC_FRIEND_TYPE_FRIEND_KEY) {
-        return DWCi_Acc_GetFriendKey(friendData) == DWCi_Acc_GetFriendKey(other);
+        return DWCi_Acc_GetFriendKey(&friendData->friend_key) == DWCi_Acc_GetFriendKey(&other->friend_key);
     }
     return FALSE;
 }

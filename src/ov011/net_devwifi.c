@@ -193,7 +193,7 @@ static int NetDevWifi_GetSignalLevel(void) {
 
 static BOOL NetDevWifi_IsError(void) {
     int code;
-    int type;
+    DWCErrorType type;
     GFLNetErrorInfo *info;
     int result = DWC_GetLastErrorEx(&code, &type);
 

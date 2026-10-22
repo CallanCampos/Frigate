@@ -53,8 +53,8 @@ static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, voi
                            NNSSndStrmFormat format, void *arg);
 static BOOL RequestVoice(u8 aid);
 static BOOL AcceptVoice(u8 aid);
-static void ManualCallback(u8 aid, int event, VCTSession *session, void *userData);
-static void SessionCallback(u8 aid, int event, VCTSession *session, void *userData);
+static void ManualCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData);
+static void SessionCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData);
 static void DropSession(VCTSession *session);
 static void StartStream(void);
 
@@ -152,7 +152,7 @@ static BOOL AcceptVoice(u8 aid) {
     return FALSE;
 }
 
-static void ManualCallback(u8 aid, int event, VCTSession *session, void *userData) {
+static void ManualCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData) {
     switch (event) {
     case 9:
         DropSession(session);
@@ -166,7 +166,7 @@ static void ManualCallback(u8 aid, int event, VCTSession *session, void *userDat
     }
 }
 
-static void SessionCallback(u8 aid, int event, VCTSession *session, void *userData) {
+static void SessionCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData) {
     switch (event) {
     case 1:
         if (sVChatWork->requestSession != NULL) {

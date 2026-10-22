@@ -10,50 +10,54 @@
 // The error that none has set, and the numbers that the part that failed gives: the SDK's DWCError, in its order
 // (recalled from the SDK, which the types that DWC_GetLastErrorEx gives them fit). The numbers from 14 to 22 are left
 // bare
-#define DWC_ERROR_NONE 0
-#define DWC_ERROR_DS_MEMORY_ANY 1
-#define DWC_ERROR_AUTH_ANY 2
-#define DWC_ERROR_AUTH_OUT_OF_SERVICE 3
-#define DWC_ERROR_AUTH_STOP_SERVICE 4
-#define DWC_ERROR_AC_ANY 5
-#define DWC_ERROR_NETWORK 6
-#define DWC_ERROR_GHTTP_ANY 7
-#define DWC_ERROR_DISCONNECTED 8
-// The one error that stays: nothing replaces it, and clearing leaves it
-#define DWC_ERROR_FATAL 9
-#define DWC_ERROR_FRIENDS_SHORTAGE 10
-#define DWC_ERROR_NOT_FRIEND_SERVER 11
-#define DWC_ERROR_SERVER_FULL 12
-#define DWC_ERROR_ND_ANY 13
+typedef enum DWCError {
+    DWC_ERROR_NONE = 0,
+    DWC_ERROR_DS_MEMORY_ANY = 1,
+    DWC_ERROR_AUTH_ANY = 2,
+    DWC_ERROR_AUTH_OUT_OF_SERVICE = 3,
+    DWC_ERROR_AUTH_STOP_SERVICE = 4,
+    DWC_ERROR_AC_ANY = 5,
+    DWC_ERROR_NETWORK = 6,
+    DWC_ERROR_GHTTP_ANY = 7,
+    DWC_ERROR_DISCONNECTED = 8,
+    // The one error that stays: nothing replaces it, and clearing leaves it
+    DWC_ERROR_FATAL = 9,
+    DWC_ERROR_FRIENDS_SHORTAGE = 10,
+    DWC_ERROR_NOT_FRIEND_SERVER = 11,
+    DWC_ERROR_SERVER_FULL = 12,
+    DWC_ERROR_ND_ANY = 13,
+} DWCError;
 
 // What a caller does about an error, which DWC_GetLastErrorEx gives from the error: the SDK's DWCErrorType, in its
 // order. The callers (DWCRap_HandleError) confirm 1 (they clear it and go on), 3 (they end the friends match), 5 (they
 // end the download of files) and treat 6 like 3; 2, 4 and 7 are named by the SDK's order
-#define DWC_ETYPE_NO_ERROR 0
-// Ends by itself, once the caller has cleared it
-#define DWC_ETYPE_LIGHT 1
-// Is shown to the player
-#define DWC_ETYPE_SHOW_ERROR 2
-// Ends the friends match
-#define DWC_ETYPE_SHUTDOWN_FM 3
-// Ends the GameSpy request (the callers shut the stats part down for the codes of its range, as for a type 2)
-#define DWC_ETYPE_SHUTDOWN_GHTTP 4
-// Ends the download of the server's files
-#define DWC_ETYPE_SHUTDOWN_ND 5
-// Ends the connection
-#define DWC_ETYPE_DISCONNECT 6
-// Cannot be recovered from
-#define DWC_ETYPE_FATAL 7
+typedef enum DWCErrorType {
+    DWC_ETYPE_NO_ERROR = 0,
+    // Ends by itself, once the caller has cleared it
+    DWC_ETYPE_LIGHT = 1,
+    // Is shown to the player
+    DWC_ETYPE_SHOW_ERROR = 2,
+    // Ends the friends match
+    DWC_ETYPE_SHUTDOWN_FM = 3,
+    // Ends the GameSpy request (the callers shut the stats part down for the codes of its range, as for a type 2)
+    DWC_ETYPE_SHUTDOWN_GHTTP = 4,
+    // Ends the download of the server's files
+    DWC_ETYPE_SHUTDOWN_ND = 5,
+    // Ends the connection
+    DWC_ETYPE_DISCONNECT = 6,
+    // Cannot be recovered from
+    DWC_ETYPE_FATAL = 7,
+} DWCErrorType;
 
 // Returns the last error, 0 if there is none, and its code through code if that is not NULL: DWC_GetLastError
-int DWC_GetLastError(int *code);
+DWCError DWC_GetLastError(int *code);
 // The same with the type of the error through type, if that is not NULL: DWC_GetLastErrorEx
-int DWC_GetLastErrorEx(int *code, int *type);
+DWCError DWC_GetLastErrorEx(int *code, DWCErrorType *type);
 // Clears the error, unless it is the fatal one: DWC_ClearError
 void DWC_ClearError(void);
 // Whether there is an error: DWCi_IsError
 BOOL DWCi_IsError(void);
 // Sets the error and its code, unless the fatal one is set: DWCi_SetError
-void DWCi_SetError(int error, int code);
+void DWCi_SetError(DWCError error, int code);
 
 #endif // POKEBW2_DWC_ERROR_H

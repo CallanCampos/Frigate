@@ -289,7 +289,7 @@ static void DWCUtilWifiSettings_WritePage(int index) {
     u8 status = sWifiSettings->pages[index].connection.status;
     u32 bit = 1 << index;
     BOOL used = FALSE;
-    u32 write[DWC_UTIL_SETTINGS_PAGES];
+    BOOL write[DWC_UTIL_SETTINGS_PAGES];
     void *scratch;
     int i;
 

@@ -63,7 +63,7 @@ static int SOCLi_CreateSocketCallBack(void *arg) {
 
 static SOCLSocket *SOCLi_StartupSocket(const SOCLSocketParam *param) {
     u32 size = SOCLi_GetSizeSocket(param);
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     SOCLSocket *socket = (SOCLSocket *)SOCLiConfigPtr->alloc(size);
 
     if (socket != NULL) {

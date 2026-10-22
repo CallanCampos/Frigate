@@ -611,7 +611,7 @@ void POKE_NET_Sleep(s32 msec) {
 // Fetches the token of the Nintendo Wi-Fi Connection's service locator, once, into the request that waits to be sent
 BOOL POKE_NET_GetSvlToken(void) {
     DWCSvlResult result;
-    int type;
+    DWCErrorType type;
     int code;
 
     if (gPOKE_NET_Control.HasSvlToken == TRUE) {

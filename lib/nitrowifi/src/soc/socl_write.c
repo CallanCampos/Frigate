@@ -94,7 +94,7 @@ static int SOCLi_WriteBuffer(SOCLSocket *socket, const u8 *buf, s32 len, u16 rem
 static s32 SOCLi_AllocWriteBuffer(SOCLSocket *socket, s32 len, s32 chunk, s32 *write_pos, s32 block) {
     SOCLSendPipe *pipe = socket->send_pipe;
     s32 free;
-    u32 irq;
+    OSIntrMode irq;
 
     if (chunk > len) {
         chunk = len;
@@ -246,7 +246,7 @@ static int SOCLi_WriteCallBack(void *arg) {
 // The largest size that fits a whole number of the connection's segments, for TCP
 static int SOCLi_GetOptimumSendBufLen(int len) {
     CPSSoc *soc = (CPSSoc *)OS_GetCurrentThread()->specific[0];
-    u32 irq = OS_DisableInterrupts();
+    OSIntrMode irq = OS_DisableInterrupts();
     int unit;
     int mss;
     int win;

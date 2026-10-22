@@ -12,16 +12,6 @@
 // listens; the packets of the other machines are decoded, wait in a queue each (vct_buffer.c), and are mixed and played
 // once their time comes.
 
-// How the samples of a frame are coded
-typedef enum VCTCodec {
-    VCT_CODEC_PCM8,
-    VCT_CODEC_MULAW,
-    VCT_CODEC_ADPCM2,
-    VCT_CODEC_ADPCM3,
-    VCT_CODEC_ADPCM4,
-    VCT_CODEC_MAX,
-} VCTCodec;
-
 // The bytes of a slot of the send queue: room for an uncoded frame, 0x450 bytes (the 12-byte header, 4 bytes of
 // ADPCM state and 0x440 bytes of samples), most likely rounded up to 32 bytes so that both slots of the 32-aligned
 // queue start on a cache line
@@ -178,7 +168,7 @@ void VCT_DetachSession(VCTSession *session) {
 }
 
 // Hands a frame of the microphone's samples to the library to send, returning whether it took it
-BOOL VCT_SubmitSamples(void *samples, int size) {
+BOOL VCT_SubmitSamples(void *samples, u32 size) {
     VCTVoicePacket *packet;
     u32 i;
     BOOL hasSender = FALSE;
@@ -287,7 +277,7 @@ static BOOL ReceiveSlot(u8 *dst, int size, int slot, u32 *heardMask) {
 
 // Mixes the voices that are due into a frame of samples, returning whether there is any, and sets the bits of the
 // machines heard
-BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask) {
+BOOL VCT_ReadSamples(void *dst, u32 size, u32 *heardMask) {
     BOOL heard;
     u32 slot;
 
@@ -327,7 +317,7 @@ BOOL VCT_ReadSamples(void *dst, int size, u32 *heardMask) {
     return heard;
 }
 
-BOOL VCT_SetCodec(int codec) {
+BOOL VCT_SetCodec(VCTCodec codec) {
     if (codec >= VCT_CODEC_MAX) {
         return FALSE;
     }
@@ -507,8 +497,8 @@ int VCT_DecodeReceived(void) {
     VCTPacket *first = VCT_GetActiveHead();
     int i;
     int count;
-    int slot;
-    u32 irq;
+    u32 slot;
+    OSIntrMode irq;
 
     if (first == NULL) {
         return 0;

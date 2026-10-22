@@ -24,11 +24,11 @@ typedef struct DWCMemFuncs {
 
 static DWCMemFuncs sMemFuncs;
 
-static void *DWC_ReallocEx(u32 name, void *ptr, u32 oldSize, u32 newSize, int align);
+static void *DWC_ReallocEx(DWCAllocType name, void *ptr, u32 oldSize, u32 newSize, int align);
 static DWCMemHeader *DWCi_GetMemHeader(void *ptr);
 static void *DWCi_InitMemHeader(DWCMemHeader *header, u32 size);
 static u32 DWCi_GetMemSize(void *ptr);
-static void *DWC_Realloc(u32 name, void *ptr, u32 oldSize, u32 newSize);
+static void *DWC_Realloc(DWCAllocType name, void *ptr, u32 oldSize, u32 newSize);
 
 // The header of a block
 static DWCMemHeader *DWCi_GetMemHeader(void *ptr) {
@@ -52,11 +52,11 @@ void DWCi_SetMemFunc(DWCAllocFunc alloc, DWCFreeFunc free) {
     sMemFuncs.free = free;
 }
 
-void *DWC_Alloc(u32 name, u32 size) {
+void *DWC_Alloc(DWCAllocType name, u32 size) {
     return DWC_AllocEx(name, size, DWC_MEM_ALIGN);
 }
 
-void *DWC_AllocEx(u32 name, u32 size, int align) {
+void *DWC_AllocEx(DWCAllocType name, u32 size, int align) {
     DWCMemHeader *header = sMemFuncs.alloc(name, size + sizeof(DWCMemHeader), align);
 
     if (header == NULL) {
@@ -65,7 +65,7 @@ void *DWC_AllocEx(u32 name, u32 size, int align) {
     return DWCi_InitMemHeader(header, size);
 }
 
-void DWC_Free(u32 name, void *ptr, u32 size) {
+void DWC_Free(DWCAllocType name, void *ptr, u32 size) {
     DWCMemHeader *header;
 
     if (ptr == NULL) {
@@ -76,11 +76,11 @@ void DWC_Free(u32 name, void *ptr, u32 size) {
 }
 
 // Gives a block another size, keeping what fits of its contents. The old size is not read: the header has it
-static void *DWC_Realloc(u32 name, void *ptr, u32 oldSize, u32 newSize) {
+static void *DWC_Realloc(DWCAllocType name, void *ptr, u32 oldSize, u32 newSize) {
     return DWC_ReallocEx(name, ptr, oldSize, newSize, DWC_MEM_ALIGN);
 }
 
-static void *DWC_ReallocEx(u32 name, void *ptr, u32 oldSize, u32 newSize, int align) {
+static void *DWC_ReallocEx(DWCAllocType name, void *ptr, u32 oldSize, u32 newSize, int align) {
     void *newPtr = DWC_AllocEx(name, newSize, align);
 
     if (newPtr == NULL) {
@@ -94,11 +94,11 @@ static void *DWC_ReallocEx(u32 name, void *ptr, u32 oldSize, u32 newSize, int al
     return newPtr;
 }
 
-void *DWCi_GsAlloc(u32 size) {
+void *DWCi_GsAlloc(size_t size) {
     return DWC_Alloc(DWC_ALLOCTYPE_GS, size);
 }
 
-void *DWCi_GsRealloc(void *ptr, u32 size) {
+void *DWCi_GsRealloc(void *ptr, size_t size) {
     return DWC_Realloc(DWC_ALLOCTYPE_GS, ptr, size, size);
 }
 
@@ -106,6 +106,6 @@ void DWCi_GsFree(void *ptr) {
     DWC_Free(DWC_ALLOCTYPE_GS, ptr, 0);
 }
 
-void *DWCi_GsMemalign(u32 align, u32 size) {
+void *DWCi_GsMemalign(size_t align, size_t size) {
     return DWC_AllocEx(DWC_ALLOCTYPE_GS, size, align);
 }

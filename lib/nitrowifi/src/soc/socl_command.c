@@ -122,7 +122,7 @@ void SOCLi_CommandPacketHandler(void *arg) {
 
     while (1) {
         int result;
-        u32 irq;
+        OSIntrMode irq;
 
         OS_ReadMessage(&pipe->queue, (OSMessage *)&packet, OS_MESSAGE_BLOCK);
         if (packet == NULL) {
