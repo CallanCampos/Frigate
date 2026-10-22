@@ -570,7 +570,7 @@ static int Upload_SubSeqNameCheckStart(WorldTradeWork *wk) {
     MI_CpuFill8(&wk->nameCheck, 0, sizeof(WorldTradeNameCheck));
     wk->nameCheck.unk24 = HEAPID_WORLDTRADE;
     str = GFL_StrBufGetStringPtr(name);
-    for (i = 0; i < (u32)GFL_StrBufGetCharCount(name) + 1; i++) {
+    for (i = 0; i < GFL_StrBufGetCharCount(name) + 1; i++) {
         u16 c = str[i];
 
         if (c == GFL_StrBufGetTerminator()) {
@@ -608,7 +608,7 @@ static int Upload_SubSeqNameCheckWait(WorldTradeWork *wk) {
 
             GFL_MsgDataFree(msgData);
             src = GFL_StrBufGetStringPtr(str);
-            for (i = 0; i < 7 && i < (u32)GFL_StrBufGetCharCount(str); i++) {
+            for (i = 0; i < 7 && i < GFL_StrBufGetCharCount(str); i++) {
                 dest[i] = src[i];
             }
             dest[i] = GFL_StrBufGetTerminator();
