@@ -300,6 +300,11 @@ Same instructions, registers swapped.
 - An element address computed before an inline helper's argument calls, and kept in a register while the loop counter
   spills, is the address passed to the helper: `CtvtCall_CreateActor(sys, &call->rows[i].frame, ...)` stores through
   a `ClActor **`, where `call->rows[i].frame = CtvtCall_CreateActor(...)` computes the address after the call.
+- A spilled counter in the lowest named slot, below the loop-invariant temporaries, can be a counter whose other
+  pieces live in registers: `dwcutil_ac.c`'s `UtilAc_FindSetupAp` counts its first and last loops with `i`, which
+  stays on the stack for the `*index = i` after them, and puts `i` at `sp+0xc` only when the loop between them, kept
+  in `r6`, counts with `i` too; that loop counting with `j` or a counter of its own leaves `i` among the declared
+  locals in every declaration order.
 - Two loops that reuse one counter and both spill it share its stack slots in the order MWCC splits the variable,
   not in declaration order; giving the second loop a counter of its own, as `pos` in the same function, moves it.
   A counter of its own also moves registers: `pos_handlers.c`'s `HandlerPosLunarDance` gives its PP loop `j` and its

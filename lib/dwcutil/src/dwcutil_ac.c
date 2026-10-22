@@ -1179,16 +1179,15 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
     int result = 0;
     int i;
     int j;
+    const UtilAcScanEntry *entry = scan->entries;
+    const UtilAcScanEntry *old = previous->entries;
 
     for (i = 0; i < scan->count; i++) {
         char name[0x22] = { 0 };
-        const UtilAcScanEntry *entry = &scan->entries[i];
 
         memcpy(name, entry->ssid, 0x20);
         name[entry->ssidLength] = 0;
         for (j = 0; j < previous->count; j++) {
-            const UtilAcScanEntry *old = &previous->entries[j];
-
             if (entry->ssidLength == 0 || entry->ssidLength > 0x20) {
                 break;
             }
@@ -1200,27 +1199,31 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
                 found = 1;
                 break;
             }
+            old++;
         }
         if (found) {
             break;
         }
+        entry++;
+        old = previous->entries;
     }
     if (!found) {
         char name[0x22] = { 0 };
-        int foundOld = 0;
         int foundNew = 0;
+        int foundOld = 0;
 
-        for (j = 0; j < previous->count; j++) {
-            memcpy(name, previous->entries[j].ssid, 0x20);
-            name[previous->entries[j].ssidLength] = 0;
-            if (memcmp(name, "******", strlen("******")) == 0 && previous->entries[j].secure == 0) {
+        entry = scan->entries;
+        old = previous->entries;
+        for (i = 0; i < previous->count; i++) {
+            memcpy(name, old->ssid, 0x20);
+            name[old->ssidLength] = 0;
+            if (memcmp(name, "******", strlen("******")) == 0 && old->secure == 0) {
                 foundOld = 1;
                 break;
             }
+            old++;
         }
         for (i = 0; i < scan->count; i++) {
-            const UtilAcScanEntry *entry = &scan->entries[i];
-
             memcpy(name, entry->ssid, 0x20);
             name[entry->ssidLength] = 0;
             if (strlen(name) == strlen("******") && memcmp(name, "******", strlen("******")) == 0 &&
@@ -1228,6 +1231,7 @@ static int UtilAc_FindSetupAp(const UtilAcScan *scan, const UtilAcScan *previous
                 foundNew = 1;
                 break;
             }
+            entry++;
         }
         if (foundNew && !foundOld) {
             found = 1;
