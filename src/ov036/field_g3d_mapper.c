@@ -476,15 +476,15 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
     u32 chunksPerLayer;
     fx32 layerHeight;
     fx32 halfSpan;
-    int width;
+    u16 width;
     u32 span;
     s32 adjacentLayerOffset;
     u32 chunkId;
     u32 locatorIndex;
     s32 chunkIndex;
     fx32 layerY;
-    s32 chunkX;
-    s32 chunkZ;
+    int chunkX;
+    int chunkZ;
 
     width = mapper->matrixWidth;
     chunksPerLayer = mapper->matrixWidth * mapper->matrixHeight;

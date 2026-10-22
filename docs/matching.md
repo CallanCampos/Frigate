@@ -3340,6 +3340,12 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   stretches its Pokémon.
 - MWCC doesn't fold float arithmetic on a local variable that holds a constant, so `size / 2.0f` stays a call when
   `size` is a variable, while an expression of literals is folded.
+- The field animation tasks share a scaled square-root curve, `sqrt(coefficient * time)`: the spin in
+  `field_task_manager.c` uses `distance * distance / duration` as its coefficient, while the zoom in
+  `fieldmap_tcb_camera_zoom.c` uses normalized time and a unit coefficient. A shared `f32` inline retains the
+  zoom's multiply by 1.0f and leaves the spin unchanged. Its product is computed as `f32` before the C library's
+  double-precision `sqrt`, and its result is converted back to `f32`. The shared header and helper name are
+  descriptive guesses.
 - `compiler_probe.py` skips relocated words, so a wrong addend, such as a table index that the compiler folds into a
   literal pool address, or a call to the wrong runtime helper needs a separate relocation check. A module check
   catches it only when the file's C is linked; incomplete files still link their original assembly. Division and

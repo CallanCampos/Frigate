@@ -910,6 +910,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A call inside `FX32_CONST(...)` is made three times; the game passes a local. (matching.md: "FX32_CONST")
 - A literal in a compound assignment (`y += 0.01f`) is passed second. (matching.md: "compound assignment keeps")
 - Float arithmetic on a local holding a constant isn't folded. (matching.md: "doesn't fold float arithmetic")
+- A zoom's unit multiply before `sqrt` belongs to the scaled square-root curve also used with a varying coefficient
+  by the actor spin; keep the shared curve's product and result at `f32`. (matching.md: "scaled square-root curve")
 - Division and modulo call `_s32_div_f` or `_u32_div_f` by signedness. A `u8`/`u16` promotes to signed `int`.
   (matching.md: "_s32_div_f")
 - `_ll_udiv` on sign-extended operands is an `int` cast to `u64`.
