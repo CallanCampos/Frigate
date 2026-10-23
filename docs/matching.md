@@ -2094,7 +2094,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   #n` between an `ldrb` and its `beq` is a doubling in the source, `x * 2`, `x << 1` or `x + x`, where a plain byte
   test, through any type (`_Bool` included), cast or inline, is `cmp r0, #0`: `btlv_effect.c`'s `BtlvEffect_Init`
   tests its background's seasonal flag with `ldrb r0, [r0, #1]; lsls r0, r0, #1; beq`, the only such test in either
-  binary (a row).
+  binary (a row). The doubling can also be an address: MWCC folds `&a[x] != a` (or `a + x == a`) to
+  `x * sizeof(*a) != 0` and drops the base, whatever it is, so over 2-byte elements the test is the same
+  `lsls #1; beq`. Only `==` and `!=` fold: an ordering keeps the address and a `cmp`, a difference becomes a
+  signed halving, and a comparison with `NULL` keeps the address.
+- A loop whose body doesn't depend on its counter, `for (i = 0; i < n; i++) x = c;`, is removed: what's left is
+  one test of `n`, `cmp; ble` (`bls` for a `u32` counter). A pointer loop (`p < end`, `p != end`) or an `i != n`
+  test keeps its loop.
 - Masks written with `~` clear bits with `bic`. The game's `and` with a constant such as `0xef` is `x &= (u8)~FLAG`.
   In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
   so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
