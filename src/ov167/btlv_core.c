@@ -1471,7 +1471,7 @@ BOOL BtlvCore_WaitRankEffect(BtlvCore *core, u32 arg1) {
 }
 
 void BtlvCore_StartWaitMsg(BtlvCore *core) {
-    BtlvEffect_SetIdleEffectMode(3);
+    BtlvEffect_SetIdleEffectMode(BTLV_IDLE_EFFECT_WAIT_MSG);
     BtlvScu_StartWaitMsg(core->scu);
 }
 

@@ -463,7 +463,7 @@ void func_ov167_0219fe44(BtlServerFlow *flow) {
                 } else {
                     count = BtlPosPoke_GetEmptyPositions(&flow->posPoke, i, clientIds) + 1;
                 }
-                BtlServerCmdQueue_Put(flow->queue, 0x29, (u8)i, (u8)count);
+                BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_SHOOTER_ENERGY, (u8)i, (u8)count);
             }
         }
     }
@@ -476,7 +476,7 @@ void ServerControl_Rotation(BtlServerFlow *flow, u8 clientId, u8 slot) {
 
     if (slot != 1 && slot != 0) {
         party = GetPartyData(flow->pokeCon, clientId);
-        BtlServerCmdQueue_Put(flow->queue, 0x48, clientId, slot);
+        BtlServerCmdQueue_Put(flow->queue, SC_ROTATION, clientId, slot);
         BattleParty_Rotate(party, slot, &outMon, &inMon);
         if (!IsFainted(outMon)) {
             ServerControl_ClearMonDependentEffects(flow, outMon, TRUE);
@@ -1170,7 +1170,7 @@ void ServerControl_MoveCore(BtlServerFlow *handler, u8 clientId, u8 firstSlot, u
     BtlPosPoke_Swap(&handler->posPoke, firstPos, secondPos);
     BattleParty_Swap(party, firstSlot, secondSlot);
     if (!flag) {
-        BtlServerCmdQueue_Put(handler->queue, 0x44, clientId, firstPos, secondPos);
+        BtlServerCmdQueue_Put(handler->queue, SC_SWAP_POS, clientId, firstPos, secondPos);
         first = BattleParty_GetMon(party, firstSlot);
         second = BattleParty_GetMon(party, secondSlot);
         if (!IsFainted(first)) {
@@ -1224,9 +1224,9 @@ BOOL ServerControl_Escape(BtlServerFlow *flow, BattleMon *mon) {
     }
     if (clientId == playerClientId) {
         IncRecord(flow->mainModule, 0x4e);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x49, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x49, SC_MSG_ARG_END);
     } else {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x36b, GetMonID(mon), 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x36b, GetMonID(mon), SC_MSG_ARG_END);
     }
     if (clientId == playerClientId) {
         flow->unk786++;
@@ -1319,16 +1319,17 @@ BOOL ServerControl_EscapeCore(BtlServerFlow *flow, BattleMon *mon, BOOL arg2, BO
             if (!result) {
                 if (isEnemy) {
                     if (BtlSetup_GetBattleType(flow->mainModule) == 0) {
-                        BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, 0x4b, 0x56a, GetMonID(mon), 0xffff0000);
+                        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, 0x4b, 0x56a, GetMonID(mon),
+                                                 SC_MSG_ARG_END);
                     }
                 } else {
-                    BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, 0x48, 0x56a, 0xffff0000);
+                    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, 0x48, 0x56a, SC_MSG_ARG_END);
                 }
             }
             flow->unk78A_2 = TRUE;
         }
     } else if (GetCommMode(flow->mainModule) && !flow->unk78A_2) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xc6, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xc6, SC_MSG_ARG_END);
         flow->unk78A_2 = TRUE;
     }
     BtlClientIDList_Add(&flow->clientIdList, clientId);
@@ -1366,7 +1367,7 @@ void ServerControl_SwitchInCore(BtlServerFlow *flow, u8 clientId, u8 pos, u8 slo
     u8 monId;
 
     party = GetPartyData(flow->pokeCon, clientId);
-    BtlServerCmdQueue_Put(flow->queue, 0x2a, clientId);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_SETUP_ILLUSION, clientId);
     UpdatePartyIllusionDisguises(flow->mainModule, party, clientId);
     if (pos != slot) {
         BattleParty_Swap(party, pos, slot);
@@ -1382,13 +1383,13 @@ void ServerControl_SwitchInCore(BtlServerFlow *flow, u8 clientId, u8 pos, u8 slo
     if (BtlSetup_GetBattleStyle(flow->mainModule) == 3 && GetClientBattlerCount(flow->mainModule, clientId) <= pos) {
         flow->unk7C1[monId] = FALSE;
     }
-    BtlServerCmdQueue_Put(flow->queue, 0x12, clientId, pos, slot, (u16)flow->unk10);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_SEND_IN, clientId, pos, slot, (u16)flow->unk10);
     BtlPosPoke_SetMon(&flow->posPoke, GetClientBattlePos(flow->mainModule, clientId, pos), monId, flow->pokeCon);
 }
 
 void ServerControl_SwitchInFillSlot(BtlServerFlow *handler, u8 target, u8 slot, u8 slotAgain, BOOL flag) {
     ServerControl_SwitchInCore(handler, target, slot, slotAgain);
-    BtlServerCmdQueue_Put(handler->queue, 0x3d, target, slot, slotAgain, (u8)flag);
+    BtlServerCmdQueue_Put(handler->queue, SC_SEND_OUT, target, slot, slotAgain, (u8)flag);
 }
 
 BOOL ServerControl_AfterSwitchIn(BtlServerFlow *handler) {
@@ -1479,7 +1480,7 @@ void ServerDisplay_RecallMessage(BtlServerFlow *flow, BattleMon *mon) {
     u8 monId;
 
     monId = GetMonID(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x3b, GetClientIDFromMonID(monId), monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_RECALL_MSG, GetClientIDFromMonID(monId), monId);
 }
 
 void ServerControl_ChangePokemon(BtlServerFlow *flow, BattleMon *mon, u8 slot) {
@@ -1529,7 +1530,7 @@ void ServerControl_SwitchOutCore(BtlServerFlow *flow, BattleMon *mon, u32 effect
     monId = GetMonID(mon);
     pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, monId);
     if (pos != 6) {
-        BtlServerCmdQueue_Put(flow->queue, 0x3c, pos, effect);
+        BtlServerCmdQueue_Put(flow->queue, SC_RECALL, pos, effect);
     }
     ActionOrder_ForceDone(flow, monId);
     state = PushState(&flow->actionState, 0xd0f);
@@ -1537,7 +1538,7 @@ void ServerControl_SwitchOutCore(BtlServerFlow *flow, BattleMon *mon, u32 effect
     PopState(&flow->actionState, state, 0xd11);
     ServerControl_ClearMonDependentEffects(flow, mon, FALSE);
     Clear_ForSwitch(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x20, GetMonID(mon));
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_CLEAR_FOR_SWITCH, GetMonID(mon));
     BtlPosPoke_RemoveMon(&flow->posPoke, monId);
 }
 
@@ -1682,7 +1683,7 @@ void ServerControl_Fight(BtlServerFlow *flow, BattleMon *mon, BattleAction *acti
         ServerControl_ClearChargeState(flow, mon);
     }
     if (GetTurnFlag(mon, 0xb)) {
-        BtlServerCmdQueue_Put(flow->queue, 0x31, GetMonID(mon), 0);
+        BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, GetMonID(mon), 0);
         ServerControl_SkyDropCheckRelease(flow, mon, FALSE);
     }
     ServerControl_MoveSeqEnd(flow, mon, actualMove, work.result);
@@ -1849,7 +1850,7 @@ BOOL ServerControl_CheckPledgeCombo(BtlServerFlow *flow, BattleMon *mon, u16 mov
             partnerId = GetMonID(partner);
             BattleMon_SetTurnFlag(mon, 0xa);
             BattleMon_SetComboMove(partner, monId, move);
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x47a, monId, partnerId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x47a, monId, partnerId, SC_MSG_ARG_END);
             ActionOrder_InterruptReserve(flow, partnerId);
             return TRUE;
         }
@@ -1868,7 +1869,7 @@ BOOL ServerControl_CheckDelayMove(BtlServerFlow *flow, BattleMon *mon, u16 move,
     if (result) {
         pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
         if (BattleHandler_Result(flow) == 2) {
-            BtlServerCmdQueue_Put(flow->queue, 0x30, pos, target, move, 0);
+            BtlServerCmdQueue_Put(flow->queue, SC_MOVE_ANIM, pos, target, move, 0);
             ServerControl_DelayMoveDecide(flow, mon);
             work->result = 1;
         } else {
@@ -2001,8 +2002,8 @@ BOOL ServerEvent_CheckMoveSteal(BtlServerFlow *flow, BattleMon *mon, u16 move, v
 }
 
 void ServerDisplay_MoveAnimation(BtlServerFlow *flow, BattleMon *mon, u16 move, u8 target) {
-    BtlServerCmdQueue_Put(flow->queue, 0x30, MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon)), target,
-                          move, 0);
+    BtlServerCmdQueue_Put(flow->queue, SC_MOVE_ANIM, MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon)),
+                          target, move, 0);
 }
 
 BOOL IsPlayerMon(BtlServerFlow *flow, BattleMon *mon) {
@@ -2053,7 +2054,7 @@ BOOL ServerControl_ExecuteMove(BtlServerFlow *flow, BattleMon *mon, u16 move, vo
         }
     }
     BtlMonSet_Clear(flow->unk860);
-    reserved = SCQUE_RESERVE_Pos(flow->queue, 0x30);
+    reserved = SCQUE_RESERVE_Pos(flow->queue, SC_MOVE_ANIM);
     BattleMoveEffectState_SetTargets(flow->moveEffect, flow, mon, targets);
     state = PushState(&flow->actionState, 0x10b8);
     result = ServerEvent_MoveExecuteStart(flow, mon, move, targets);
@@ -2314,7 +2315,7 @@ void ServerControl_RemoveNoEffectTargets(BtlServerFlow *flow, BtlFlowMoveParam *
         while ((target = BtlMonSet_GetNext(targets)) != NULL) {
             if (GetTurnFlag(target, 7) && !ServerEvent_CheckProtectBreak(flow, mon, target, param->move)) {
                 BtlMonSet_Remove(targets, target);
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x20b, GetMonID(target), 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x20b, GetMonID(target), SC_MSG_ARG_END);
             }
         }
     }
@@ -2340,7 +2341,7 @@ BOOL ServerControl_CheckNoEffect(BtlServerFlow *flow, BtlFlowMoveParam *param, B
             BattleHandler_SetString(flow, &flow->message);
             BattleHandler_StrClear(&flow->message);
         } else if (BattleHandler_Result(flow) == 0 && !silent) {
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xd2, GetMonID(target), 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xd2, GetMonID(target), SC_MSG_ARG_END);
         }
     }
     PopState(&flow->actionState, state, 0x12da);
@@ -2486,7 +2487,8 @@ BOOL ServerEvent_CheckHit(BtlServerFlow *flow, BattleMon *mon, BattleMon *target
 
 void ServerControl_PutMoveAnimation(BtlServerFlow *flow, u16 move, BattleMoveEffectState *effect, u32 reserved) {
     u32 shown = effect->unk00 ? effect->unk00 : move;
-    BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserved, 0x30, effect->pos1, effect->pos2, shown, effect->index);
+    BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserved, SC_MOVE_ANIM, effect->pos1, effect->pos2, shown,
+                                  effect->index);
     effect->index = 0;
     effect->unk05_1 = 1;
 }
@@ -2537,7 +2539,7 @@ BOOL ServerControl_StartChargeTurn(BtlServerFlow *flow, BattleMon *mon, u8 pos, 
         if (BtlMonSet_GetCount(targets)) {
             targetPos = GetBattlePos(&flow->posPoke, GetMonID(BtlMonSet_Get(targets, 0)));
         }
-        BtlServerCmdQueue_Put(flow->queue, 0x30, pos, targetPos, move, 0);
+        BtlServerCmdQueue_Put(flow->queue, SC_MOVE_ANIM, pos, targetPos, move, 0);
     }
     PopState(&flow->actionState, state, 0x1445);
     if (result) {
@@ -2545,10 +2547,10 @@ BOOL ServerControl_StartChargeTurn(BtlServerFlow *flow, BattleMon *mon, u8 pos, 
         ServerEvent_ChargeStartFixed(flow, mon);
         PopState(&flow->actionState, state, 0x144b);
         if (IsSemiInvulnMove(mon)) {
-            BtlServerCmdQueue_Put(flow->queue, 0x31, GetMonID(mon), 1);
+            BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, GetMonID(mon), 1);
         }
         if (id != 0x1f) {
-            BtlServerCmdQueue_Put(flow->queue, 0x31, id, 1);
+            BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, id, 1);
         }
     } else if (!failed) {
         ServerDisplay_MoveFailed(flow, mon, move);
@@ -2581,7 +2583,7 @@ BOOL ServerControl_SkyDropCatch(BtlServerFlow *flow, BattleMon *attacker, Battle
             ServerControl_AddCondition(flow, target, attacker, 0x21, cond, FALSE, FALSE, NULL);
             return TRUE;
         }
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x20b, GetMonID(target), 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x20b, GetMonID(target), SC_MSG_ARG_END);
         *failed = TRUE;
     }
     return FALSE;
@@ -2596,13 +2598,13 @@ void ServerControl_SkyDropCheckRelease(BtlServerFlow *flow, BattleMon *mon, BOOL
             ServerControl_CureCondition(flow, target, 0x21, 0);
             scPut_ResetContFlag(flow, target, 3);
             if (DoesBattleMonExist(&flow->posPoke, targetId)) {
-                BtlServerCmdQueue_Put(flow->queue, 0x31, targetId, 0);
+                BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, targetId, 0);
                 ServerDisplay_SkyDropTargetAppear(flow, target, 0x465);
             }
         }
         ServerControl_SetMonCounter(flow, mon, 4, 0);
         if (!flag && !IsFainted(mon)) {
-            BtlServerCmdQueue_Put(flow->queue, 0x31, GetMonID(mon), 0);
+            BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, GetMonID(mon), 0);
         }
     }
 }
@@ -2711,7 +2713,7 @@ BOOL ServerControl_CheckMoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, 
         ServerDisplay_AddEffectAtPosition(flow, mon, 0x256);
     } else if (thawedByMove && status == 3) {
         ServerControl_CureStatus(flow, mon, status, FALSE);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x12f, GetMonID(mon), move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x12f, GetMonID(mon), move, SC_MSG_ARG_END);
     }
     return FALSE;
 }
@@ -2755,13 +2757,13 @@ u32 ServerEvent_CheckMoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, u32
 
 BOOL ServerControl_CheckConfusion(BtlServerFlow *flow, BattleMon *mon) {
     if (flow->unk1F7C == 3) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xbc, GetMonID(mon), 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xbc, GetMonID(mon), SC_MSG_ARG_END);
         return TRUE;
     }
     if (CheckCondition(mon, 6)) {
         if (BattleMon_TickConfusion(mon)) {
             ServerControl_CureCondition(flow, mon, 6, 0);
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x15f, GetMonID(mon), 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x15f, GetMonID(mon), SC_MSG_ARG_END);
             return FALSE;
         }
         ServerDisplay_Confused(flow, mon);
@@ -2826,7 +2828,7 @@ void ServerControl_MoveFail(BtlServerFlow *flow, BattleMon *mon, u16 move, s32 c
             break;
         case 0x17: {
             BattleCondition cond = BtlCalc_MakeStatusCondition(2);
-            BtlServerCmdQueue_Put(flow->queue, 0x31, GetMonID(mon), 0);
+            BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, GetMonID(mon), 0);
             ServerDisplay_AddCondition(flow, mon, 2, cond);
             ServerDisplay_AddEffectAtPosition(flow, mon, 0x256);
             break;
@@ -2843,78 +2845,78 @@ void ServerDisplay_MoveFailMessage(BtlServerFlow *flow, BattleMon *mon, u16 move
 
     switch (cause) {
     case 2:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x135, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x135, monId, SC_MSG_ARG_END);
         break;
     case 3:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x114, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x114, monId, SC_MSG_ARG_END);
         break;
     case 4:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x123, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x123, monId, SC_MSG_ARG_END);
         break;
     case 6:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x16b, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x16b, monId, SC_MSG_ARG_END);
         break;
     case 7:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x16e, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x16e, monId, SC_MSG_ARG_END);
         break;
     case 8:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x150, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x150, monId, SC_MSG_ARG_END);
         break;
     case 9:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x253, monId, move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x253, monId, move, SC_MSG_ARG_END);
         break;
     case 0x12:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x1bd, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x1bd, monId, SC_MSG_ARG_END);
         break;
     case 0xa:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x23b, monId, move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x23b, monId, move, SC_MSG_ARG_END);
         break;
     case 0xb:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x244, monId, move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x244, monId, move, SC_MSG_ARG_END);
         break;
     case 0xc:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x24d, monId, move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x24d, monId, move, SC_MSG_ARG_END);
         break;
     case 0xd:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x37a, monId, move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x37a, monId, move, SC_MSG_ARG_END);
         break;
     case 0xe:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x37d, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x37d, monId, SC_MSG_ARG_END);
         break;
     case 0xf:
-        BtlServerCmdQueue_Put(flow->queue, 0x57, monId);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x1c3, monId, 0xffff0000);
-        BtlServerCmdQueue_Put(flow->queue, 0x58, monId);
+        BtlServerCmdQueue_Put(flow->queue, SC_ABILITY_POPUP_IN, monId);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x1c3, monId, SC_MSG_ARG_END);
+        BtlServerCmdQueue_Put(flow->queue, SC_ABILITY_POPUP_OUT, monId);
         break;
     case 0x14:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x43e, monId, move, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x43e, monId, move, SC_MSG_ARG_END);
         break;
     case 0x16:
         if (CheckCondition(mon, 2)) {
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xc2, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xc2, monId, SC_MSG_ARG_END);
         } else {
             u8 index = BattleRandom(4);
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xbc + index, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xbc + index, monId, SC_MSG_ARG_END);
         }
         break;
     case 0x17:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0xc1, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0xc1, monId, SC_MSG_ARG_END);
         break;
     case 1:
         ServerDisplay_MoveMessage(flow, mon, move);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x52, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x52, monId, SC_MSG_ARG_END);
         break;
     case 0x13:
     case 0x19:
         break;
     default:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x47, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x47, monId, SC_MSG_ARG_END);
         break;
     }
 }
 
 void ServerControl_SetMonCounter(BtlServerFlow *flow, BattleMon *mon, u32 counter, u8 value) {
-    BtlServerCmdQueue_Put(flow->queue, 0x25, GetMonID(mon), (u8)counter, value);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_SET_COUNTER, GetMonID(mon), (u8)counter, value);
     COUNTER_Set(mon, counter, value);
 }
 
@@ -2961,9 +2963,9 @@ void ServerControl_DecrementPPCore(BtlServerFlow *flow, BattleMon *mon, u8 moveI
     if (!ReturnZero(flow->mainModule, 5)) {
         u8 monId = GetMonID(mon);
         Move_DecrementPP(mon, moveIndex, amount);
-        BtlServerCmdQueue_Put(flow->queue, 4, monId, moveIndex, amount);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_SUBTRACT_PP, monId, moveIndex, amount);
         Move_SetUsed(mon, moveIndex);
-        BtlServerCmdQueue_Put(flow->queue, 6, monId, moveIndex);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_SET_MOVE_USED, monId, moveIndex);
     }
 }
 
@@ -3113,7 +3115,7 @@ u32 ServerControl_DamageAllTargets(BtlServerFlow *flow, BtlFlowMoveParam *param,
     BtlMonSet_CopyOpponents(targets, attacker, flow->unk85C);
     ServerControl_CalcDamageList(flow, attacker, flow->unk858, param, data, ratio, flow->unk86C);
     ServerControl_CalcDamageList(flow, attacker, flow->unk85C, param, data, ratio, flow->unk870);
-    *reserved = SCQUE_RESERVE_Pos(flow->queue, 0x30);
+    *reserved = SCQUE_RESERVE_Pos(flow->queue, SC_MOVE_ANIM);
     if (BtlMonSet_GetCount(flow->unk858)) {
         damage +=
             ServerControl_DamageList(flow, param, attacker, flow->unk858, flow->unk86C, flow->unk4B4, ratio, flags);
@@ -3141,8 +3143,8 @@ u32 ServerControl_DamageMultiHit(BtlServerFlow *flow, BtlFlowMoveParam *param, B
     if (IsBattleSceneOff(flow->mainModule)) {
         targetPos = GetBattlePos(&flow->posPoke, GetMonID(target));
         if (targetPos != 6) {
-            BtlServerCmdQueue_Put(flow->queue, 0x4e, GetBattlePos(&flow->posPoke, GetMonID(attacker)), targetPos,
-                                  0x27e);
+            BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BETWEEN_POS, GetBattlePos(&flow->posPoke, GetMonID(attacker)),
+                                  targetPos, 0x27e);
         }
     }
     {
@@ -3156,7 +3158,8 @@ u32 ServerControl_DamageMultiHit(BtlServerFlow *flow, BtlFlowMoveParam *param, B
                 effect->enabled = 1;
                 effect->unk05_1 = 1;
             }
-            BtlServerCmdQueue_Put(flow->queue, 0x30, flow->moveEffect->pos1, flow->moveEffect->pos2, param->move, 0);
+            BtlServerCmdQueue_Put(flow->queue, SC_MOVE_ANIM, flow->moveEffect->pos1, flow->moveEffect->pos2,
+                                  param->move, 0);
             ServerControl_CalcDamageList(flow, attacker, targets, param, data, 0x1000, flow->unk870);
             damage +=
                 ServerControl_DamageList(flow, param, attacker, targets, flow->unk870, flow->unk4B4, 0x1000, flags);
@@ -3175,13 +3178,13 @@ u32 ServerControl_DamageMultiHit(BtlServerFlow *flow, BtlFlowMoveParam *param, B
     }
     if (hits != 0) {
         ServerDisplay_EffectivenessMessage(flow, flow->unk4B4->unk05);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x20, hits, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x20, hits, SC_MSG_ARG_END);
     }
     if (IsFainted(target)) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0, GetMonID(target), 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0, GetMonID(target), SC_MSG_ARG_END);
     }
     if (targetPos != 6) {
-        BtlServerCmdQueue_Put(flow->queue, 0x4d, GetBattlePos(&flow->posPoke, GetMonID(attacker)), 0x291);
+        BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BY_POS, GetBattlePos(&flow->posPoke, GetMonID(attacker)), 0x291);
     }
     flow->unk789 = 0x1f;
     return damage;
@@ -3303,9 +3306,9 @@ void ServerControl_CheckDamageToRecover(BtlServerFlow *flow, BattleMon *attacker
 
 void ServerDisplay_EffectivenessMessage(BtlServerFlow *flow, s32 effectiveness) {
     if (effectiveness < 3) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x4f, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x4f, SC_MSG_ARG_END);
     } else if (effectiveness > 3) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x4e, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x4e, SC_MSG_ARG_END);
     }
 }
 
@@ -3361,7 +3364,7 @@ void ServerControl_Endure(BtlServerFlow *flow, BattleMon *mon, u32 cause) {
 
     switch (cause) {
     case 1:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x202, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x202, monId, SC_MSG_ARG_END);
         break;
     case 3:
     default:
@@ -3408,7 +3411,8 @@ void ServerControl_RecordDamage(BtlServerFlow *flow, u8 attackerPos, BattleMon *
 
     BattleMonDamageRecord_Init(&record, attackerId, attackerPos, param->move, param->type, damage);
     BattleMon_AddDamageRecord(target, &record);
-    BtlServerCmdQueue_Put(flow->queue, 0x2d, targetId, attackerId, attackerPos, param->type, param->move, damage);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_DAMAGE_RECORD, targetId, attackerId, attackerPos, param->type,
+                          param->move, damage);
 }
 
 void ServerControl_DamageAdditionalEffect(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *attacker,
@@ -3739,7 +3743,7 @@ BOOL ServerControl_UseHeldItem(BtlServerFlow *flow, BattleMon *mon) {
             u32 itemState;
             u32 reserved;
 
-            reserved = SCQUE_RESERVE_Pos(flow->queue, 0x42);
+            reserved = SCQUE_RESERVE_Pos(flow->queue, SC_USE_HELD_ITEM);
             itemState = PushStateUseItem(&flow->actionState, item, 0x1d04);
             ServerEvent_EquipItem(flow, mon);
             if (BattleHandler_Result(flow) != 2) {
@@ -3747,7 +3751,7 @@ BOOL ServerControl_UseHeldItem(BtlServerFlow *flow, BattleMon *mon) {
             }
             PopState(&flow->actionState, itemState, 0x1d09);
             if (result) {
-                BtlServerCmdQueue_PutReserved(flow->queue, reserved, 0x42, GetMonID(mon));
+                BtlServerCmdQueue_PutReserved(flow->queue, reserved, SC_USE_HELD_ITEM, GetMonID(mon));
                 if (ItemGetParam(item, 0x10)) {
                     ServerControl_ChangeHeldItem(flow, mon, 0, TRUE);
                 }
@@ -3785,7 +3789,7 @@ void ServerControl_ChangeHeldItem(BtlServerFlow *flow, BattleMon *mon, u16 item,
         scPut_SetContFlag(flow, mon, 0xf);
     }
     ItemEvent_RemoveItem(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x1e, monId, item);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_SET_ITEM, monId, item);
     SetItem(mon, item);
     if (item != 0) {
         ItemEvent_AddItem(mon);
@@ -3795,7 +3799,7 @@ void ServerControl_ChangeHeldItem(BtlServerFlow *flow, BattleMon *mon, u16 item,
     PopState(&flow->actionState, state, 0x1d4f);
     if (consume) {
         ConsumeItem(mon, oldItem);
-        BtlServerCmdQueue_Put(flow->queue, 0x17, monId, oldItem);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_CONSUME_ITEM, monId, oldItem);
         ServerDisplay_SetTurnFlag(flow, mon, 8);
     }
 }
@@ -4054,7 +4058,7 @@ void ServerControl_AddCondition(BtlServerFlow *flow, BattleMon *target, BattleMo
     if (condition == 3 && GetBattleMonSpecies(target) == 0x1ec && GetBattleMonStat(target, 0x13) == 1) {
         AbilityEvent_RemoveItem(target);
         ChangeForm(target, 0);
-        BtlServerCmdQueue_Put(flow->queue, 0x4f, GetMonID(target), 0);
+        BtlServerCmdQueue_Put(flow->queue, SC_CHANGE_FORM, GetMonID(target), 0);
         AbilityEvent_AddItem(target);
         ServerDisplay_SkyDropTargetAppear(flow, target, 0xde);
     }
@@ -4292,7 +4296,7 @@ BOOL ServerControl_StatChangeCore(BtlServerFlow *flow, u8 monId, BattleMon *mon,
         u8 targetId = GetMonID(mon);
         if (monId != targetId) {
             if (showFail) {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xd2, targetId, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xd2, targetId, SC_MSG_ARG_END);
             }
             return FALSE;
         }
@@ -4369,10 +4373,10 @@ void ServerControl_SimpleRecover(BtlServerFlow *flow, u16 move, BattleMon *mon, 
                 if (!effect->enabled) {
                     effect->enabled = 1;
                 }
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x183, targetId, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x183, targetId, SC_MSG_ARG_END);
             }
         } else if (IsMonFullHP(target)) {
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x37d, targetId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x37d, targetId, SC_MSG_ARG_END);
         }
     }
 }
@@ -4398,7 +4402,7 @@ BOOL ServerControl_RecoverHPCheckFail(BtlServerFlow *flow, BattleMon *mon) {
 BOOL ServerControl_RecoverHPCheckFailSpecial(BtlServerFlow *flow, BattleMon *mon, BOOL showMessage) {
     if (CheckCondition(mon, 0xf)) {
         if (showMessage) {
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x377, GetMonID(mon), 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x377, GetMonID(mon), SC_MSG_ARG_END);
             flow->unk78A_5 = 1;
         }
         return TRUE;
@@ -4409,7 +4413,7 @@ BOOL ServerControl_RecoverHPCheckFailSpecial(BtlServerFlow *flow, BattleMon *mon
 void ServerControl_RecoverHPCore(BtlServerFlow *flow, BattleMon *mon, u16 amount) {
     u8 pos = GetBattlePos(&flow->posPoke, GetMonID(mon));
     if (pos != 6) {
-        BtlServerCmdQueue_Put(flow->queue, 0x4d, pos, 0x263);
+        BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BY_POS, pos, 0x263);
     }
     ServerDisplay_SimpleHP(flow, mon, amount, TRUE);
 }
@@ -4493,9 +4497,9 @@ void ServerControl_OHKO(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon 
 void ServerControl_OHKOSuccess(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u32 critical) {
     u8 monId = GetMonID(mon);
     HPZero(mon);
-    BtlServerCmdQueue_Put(flow->queue, 3, monId);
-    BtlServerCmdQueue_Put(flow->queue, 0x32, monId, (u8)critical, param->move);
-    BtlServerCmdQueue_Put(flow->queue, 0x34, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_ZERO_HP, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_DAMAGE, monId, (u8)critical, param->move);
+    BtlServerCmdQueue_Put(flow->queue, SC_ONE_HIT_KO, monId);
 }
 
 void ServerControl_OHKOSurvived(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u32 critical, u32 cause,
@@ -4506,7 +4510,7 @@ void ServerControl_OHKOSurvived(BtlServerFlow *flow, BattleMon *mon, BtlFlowMove
     ServerDisplay_DecreaseHP(flow, mon, damage);
     move = param->move;
     monId = GetMonID(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x32, monId, (u8)critical, move);
+    BtlServerCmdQueue_Put(flow->queue, SC_DAMAGE, monId, (u8)critical, move);
     ServerControl_Endure(flow, mon, cause);
 }
 
@@ -4516,8 +4520,8 @@ u16 ServerControl_OHKOSubstitute(BtlServerFlow *flow, BattleMon *mon, BtlFlowMov
 
     monId = GetMonID(mon);
     damage = BattleMon_GetSubstituteHP(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x34, monId);
-    BtlServerCmdQueue_Put(flow->queue, 0x32, monId, (u8)critical, param->move);
+    BtlServerCmdQueue_Put(flow->queue, SC_ONE_HIT_KO, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_DAMAGE, monId, (u8)critical, param->move);
     ServerControl_BreakSubstitute(flow, mon);
     return damage;
 }
@@ -4588,7 +4592,7 @@ BOOL ServerControl_ForceSwitchCore(BtlServerFlow *flow, BattleMon *attacker, Bat
                 BattleHandler_SetString(flow, string);
             }
             ServerControl_SwitchInFillSlot(flow, clientPos[1], clientPos[0], slot, FALSE);
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x34d, newMonId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x34d, newMonId, SC_MSG_ARG_END);
             ServerControl_AfterSwitchIn(flow);
         } else {
             return FALSE;
@@ -4700,7 +4704,7 @@ BOOL ServerControl_ChangeWeatherCheck(BtlServerFlow *flow, u8 weather, u8 durati
 
 void ServerControl_ChangeWeatherCore(BtlServerFlow *flow, u8 weather, u8 duration) {
     FieldStatusSetWeather(weather, duration);
-    BtlServerCmdQueue_Put(flow->queue, 0x3f, weather, duration);
+    BtlServerCmdQueue_Put(flow->queue, SC_WEATHER_START, weather, duration);
     ServerControl_ChangeWeatherAfter(flow, weather);
 }
 
@@ -4724,14 +4728,14 @@ u8 ServerEvent_IncreaseMoveWeatherTurns(BtlServerFlow *flow, u8 weather, BattleM
 
 BOOL ServerControl_FieldEffectCore(BtlServerFlow *flow, u32 effect, BattleCondition value, u8 dependPoke) {
     if (FieldStatusAddEffect(effect, value)) {
-        BtlServerCmdQueue_Put(flow->queue, 0x21, (u8)effect, value.raw);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_FIELD_EFFECT, (u8)effect, value.raw);
         return TRUE;
     }
     if (dependPoke) {
         u8 monId = Condition_GetMonID(value);
         if (monId != 0x1f) {
             FieldStatusAddDependPoke(effect, monId);
-            BtlServerCmdQueue_Put(flow->queue, 0x22, (u8)effect, monId);
+            BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_FIELD_EFFECT_DEPEND_MON, (u8)effect, monId);
             return TRUE;
         }
     }
@@ -4777,7 +4781,7 @@ void ServerControl_UncategorizedMove(BtlServerFlow *flow, BtlFlowMoveParam *para
                 }
             }
             if (result <= 1 && showFail && !flow->unk78A_4) {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x47, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x47, SC_MSG_ARG_END);
             }
             PopState(&flow->actionState, state, 0x23a9);
             break;
@@ -4808,8 +4812,8 @@ void ServerControl_SkillSwap(BtlServerFlow *flow, BattleMon *mon, void *targets)
         if (!effect->enabled) {
             effect->enabled = 1;
         }
-        BtlServerCmdQueue_Put(flow->queue, 0x4a, monId, targetId, (u16)targetAbility, (u16)ability);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x1fc, monId, 0xffff0000);
+        BtlServerCmdQueue_Put(flow->queue, SC_SWAP_ABILITY, monId, targetId, (u16)targetAbility, (u16)ability);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x1fc, monId, SC_MSG_ARG_END);
         state = PushState(&flow->actionState, 0x23c4);
         ServerEvent_ChangeAbilityBefore(flow, monId, ability, targetAbility);
         ServerEvent_ChangeAbilityBefore(flow, targetId, targetAbility, ability);
@@ -4817,8 +4821,8 @@ void ServerControl_SkillSwap(BtlServerFlow *flow, BattleMon *mon, void *targets)
         ChangeAbility(mon, targetAbility);
         ChangeAbility(target, ability);
         AbilityEvent_Swap(mon, target);
-        BtlServerCmdQueue_Put(flow->queue, 0x58, monId);
-        BtlServerCmdQueue_Put(flow->queue, 0x58, targetId);
+        BtlServerCmdQueue_Put(flow->queue, SC_ABILITY_POPUP_OUT, monId);
+        BtlServerCmdQueue_Put(flow->queue, SC_ABILITY_POPUP_OUT, targetId);
         if (ability != targetAbility) {
             state2 = PushState(&flow->actionState, 0x23d4);
             ServerEvent_ChangeAbilityAfter(flow, monId);
@@ -4842,7 +4846,7 @@ void ServerControl_SkillSwap(BtlServerFlow *flow, BattleMon *mon, void *targets)
             }
         }
     } else {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x47, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x47, SC_MSG_ARG_END);
     }
 }
 
@@ -4868,9 +4872,9 @@ BOOL ServerControl_Substitute(BtlServerFlow *flow, BattleMon *mon) {
                 ServerDisplay_SimpleHP(flow, mon, -cost, TRUE);
                 ServerControl_CheckItemReaction(flow, mon, 1);
                 BattleMon_SetSubstituteHP(mon, cost);
-                BtlServerCmdQueue_Put(flow->queue, 0x27, GetMonID(mon), (u16)cost);
-                BtlServerCmdQueue_Put(flow->queue, 0x51, pos);
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x311, GetMonID(mon), 0xffff0000);
+                BtlServerCmdQueue_Put(flow->queue, SC_OP_CREATE_SUBSTITUTE, GetMonID(mon), (u16)cost);
+                BtlServerCmdQueue_Put(flow->queue, SC_SUBSTITUTE_CREATE, pos);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x311, GetMonID(mon), SC_MSG_ARG_END);
                 return TRUE;
             }
         }
@@ -4901,8 +4905,8 @@ void ServerControl_BreakSubstitute(BtlServerFlow *flow, BattleMon *mon) {
     u8 pos = GetBattlePos(&flow->posPoke, monId);
     ServerDisplay_SkyDropTargetAppear(flow, mon, 0x31a);
     ResetSpActPriority(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x28, monId);
-    BtlServerCmdQueue_Put(flow->queue, 0x52, pos);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_DELETE_SUBSTITUTE, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_SUBSTITUTE_DELETE, pos);
 }
 
 void ServerControl_DamageReaction(BtlServerFlow *flow, BattleMon *attacker, BattleMon *target, BtlFlowMoveParam *param,
@@ -4990,7 +4994,7 @@ BOOL ServerControl_TurnCheck(BtlServerFlow *flow) {
     switch (flow->unk77E) {
     case 1:
         flow->unk77E++;
-        BtlServerCmdQueue_Put(flow->queue, 0x56, 0);
+        BtlServerCmdQueue_Put(flow->queue, SC_HIDE_MSG_WINDOW, 0);
         result = FALSE;
         if (ServerControl_TurnCheckWeather(flow, monSet)) {
             result = TRUE;
@@ -5037,7 +5041,7 @@ BOOL ServerControl_TurnCheck(BtlServerFlow *flow) {
         while ((mon = BtlMonSet_GetNext(monSet)) != NULL) {
             BattleMon_EndTurn(mon);
             ComboMove_ClearParam(mon);
-            BtlServerCmdQueue_Put(flow->queue, 0x2e, GetMonID(mon));
+            BtlServerCmdQueue_Put(flow->queue, SC_OP_TURN_CHECK, GetMonID(mon));
         }
         ServerControl_TripleBattleShiftToCenter(flow);
         BattleEvent_RemoveIsolatedItems();
@@ -5077,7 +5081,8 @@ void ServerControl_TripleBattleShiftToCenter(BtlServerFlow *flow) {
                 u8 firstSlot = GetPosIndexInClient(flow->mainModule, firstPos);
                 u8 secondSlot = GetPosIndexInClient(flow->mainModule, secondPos);
                 if (firstSlot == secondSlot && !IsTripleCenterPos(firstPos)) {
-                    BtlServerCmdQueue_Put(flow->queue, 0x50, firstClient, firstSlot, secondClient, secondSlot);
+                    BtlServerCmdQueue_Put(flow->queue, SC_MOVE_TO_CENTER, firstClient, firstSlot, secondClient,
+                                          secondSlot);
                     ServerControl_MoveCore(flow, firstClient, firstSlot, 1, TRUE);
                     ServerControl_MoveCore(flow, secondClient, secondSlot, 1, TRUE);
                     ServerControl_AfterMove(flow, firstClient, firstSlot, 1);
@@ -5114,7 +5119,7 @@ void ServerControl_CommPlayerSupportHeal(BtlServerFlow *flow) {
                     amount >>= 1;
                 }
                 if (amount != 0 && ServerControl_RecoverHP(flow, mon, amount, FALSE)) {
-                    BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x53, 4, monId, 0xffff0000);
+                    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x53, 4, monId, SC_MSG_ARG_END);
                     CommPlayerSupport_SetUsed(passPower);
                 }
             }
@@ -5182,7 +5187,7 @@ BOOL ServerControl_TurnCheckConditions(BtlServerFlow *flow, void *monSet) {
             break;
         }
     }
-    BtlServerCmdQueue_Put(flow->queue, 0x15, (u8)count, (u8)index, BtlCalc_PackMonIDs(monIds));
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_CONDITION_TURN_CHECK, (u8)count, (u8)index, BtlCalc_PackMonIDs(monIds));
     return ServerControl_CheckExpGain(flow);
 }
 
@@ -5274,13 +5279,13 @@ void ServerDisplay_SideEffectEnd(BtlServerFlow *flow, u32 effect, u32 side) {
         break;
     }
     if (message >= 0) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, side, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, side, SC_MSG_ARG_END);
     }
 }
 
 void ServerControl_TurnCheckFieldEffects(BtlServerFlow *flow) {
     FieldStatusTurnCheck(ServerControl_FieldEffectEndCallback, flow);
-    BtlServerCmdQueue_Put(flow->queue, 0x2f, 0);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_FIELD_TURN_CHECK, 0);
 }
 
 void ServerControl_FieldEffectEndCallback(u32 effect, BtlServerFlow *flow) {
@@ -5305,9 +5310,9 @@ void ServerControl_FieldEffectEnd(BtlServerFlow *flow, u32 effect) {
         break;
     }
     if (message >= 0) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, SC_MSG_ARG_END);
     }
-    BtlServerCmdQueue_Put(flow->queue, 0x24, (u8)effect);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_REMOVE_FIELD_EFFECT, (u8)effect);
     if (effect == 7) {
         BattleMon *mon;
 
@@ -5328,7 +5333,7 @@ BOOL ServerControl_TurnCheckWeather(BtlServerFlow *flow, void *monSet) {
     BattleMon *mon;
 
     if (ended != 0) {
-        BtlServerCmdQueue_Put(flow->queue, 0x40, ended);
+        BtlServerCmdQueue_Put(flow->queue, SC_WEATHER_END, ended);
         ServerControl_ChangeWeatherAfter(flow, 0);
         return FALSE;
     }
@@ -5414,10 +5419,10 @@ BOOL ServerControl_CheckFainted(BtlServerFlow *flow, BattleMon *mon) {
         BtlFaintRec_Add(&flow->faintRec, monId);
         if (!BtlSetup_IsBattleType(flow->mainModule, 0x200) || GetClientIDFromMonID(monId) == 0) {
             if (flow->unk789 != monId) {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0, monId, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0, monId, SC_MSG_ARG_END);
             }
         }
-        BtlServerCmdQueue_Put(flow->queue, 0x39, monId);
+        BtlServerCmdQueue_Put(flow->queue, SC_FAINT, monId);
         ServerControl_ClearMonDependentEffects(flow, mon, FALSE);
         Clear_ForFainted(mon);
         if (GetClientIDFromMonID(monId) == GetPlayerClientID(flow->mainModule)) {
@@ -5481,10 +5486,10 @@ void ServerControl_ClearMonDependentEffects(BtlServerFlow *flow, BattleMon *mon,
     BtlFlowMonIter_SetRotation(&iter, flow);
     while (BtlFlowMonIter_Next(&iter, flow, &other)) {
         BattleMon_CureConditionsFromMon(other, monId);
-        BtlServerCmdQueue_Put(flow->queue, 0x2c, GetMonID(other), monId);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_CURE_MON_DEPENDENT_CONDITIONS, GetMonID(other), monId);
     }
     FieldStatusRemoveDependPoke(monId);
-    BtlServerCmdQueue_Put(flow->queue, 0x23, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_REMOVE_FIELD_EFFECT_DEPEND_MON, monId);
     if (!ServerControl_CheckMatchup(flow) && (u16)GetBattleMonStat(mon, 0x11) == 0x7f) {
         ServerControl_UnnerveAction(flow, mon);
     }
@@ -5512,7 +5517,7 @@ BOOL ServerControl_CheckExpGain(BtlServerFlow *flow) {
                 func_ov167_021bc6ac(GetPokeParam(flow->pokeCon, 0));
                 if (BtlSetup_GetBattleType(flow->mainModule) == 0 && !flow->unk78A_1 &&
                     ServerControl_CheckMatchup(flow) && ServerControl_PlayerSideHasMons(flow)) {
-                    BtlServerCmdQueue_Put(flow->queue, 0x55, GetWinBGM(flow->mainModule));
+                    BtlServerCmdQueue_Put(flow->queue, SC_PLAY_BGM, GetWinBGM(flow->mainModule));
                     flow->unk78A_1 = 1;
                 }
                 if (ServerControl_GainExpFromFainted(flow, mon)) {
@@ -5558,13 +5563,13 @@ BOOL ServerControl_GiveExp(BtlServerFlow *flow, BattleParty *party, const BtlFlo
                     message = 0x2a;
                 }
                 monId = GetMonID(mon);
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, (u16)message, monId, exp, 0xffff0000);
-                BtlServerCmdQueue_Put(flow->queue, 0x3e, monId, entry->hp, entry->attack, entry->defense, entry->speed,
-                                      entry->spAttack, entry->spDefense);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, (u16)message, monId, exp, SC_MSG_ARG_END);
+                BtlServerCmdQueue_Put(flow->queue, SC_ADD_EVS, monId, entry->hp, entry->attack, entry->defense,
+                                      entry->speed, entry->spAttack, entry->spDefense);
                 remaining = exp;
                 while (BattleMon_AddExp(mon, &remaining, &flow->levelUp)) {
                 }
-                BtlServerCmdQueue_Put(flow->queue, 0x45, monId, exp);
+                BtlServerCmdQueue_Put(flow->queue, SC_EXP_GAIN, monId, exp);
                 AddRecord(flow->mainModule, 0x1b, exp);
                 result = TRUE;
             }
@@ -5580,7 +5585,7 @@ BOOL ServerControl_HideTurnCancel(BtlServerFlow *flow, BattleMon *mon, u32 flag)
         if (CheckCondition(mon, 0x1a)) {
             ServerControl_CureCondition(flow, mon, 0x1a, 0);
         }
-        BtlServerCmdQueue_Put(flow->queue, 0x31, monId, 0);
+        BtlServerCmdQueue_Put(flow->queue, SC_SET_MON_VISIBLE, monId, 0);
         ActionOrder_ForceDone(flow, monId);
         return TRUE;
     }
@@ -5594,7 +5599,7 @@ void func_ov167_021a8f8c(BtlFlowUnk1B54 *work) {
 void ServerDisplay_AddEffectAtPosition(BtlServerFlow *flow, BattleMon *mon, u32 effect) {
     u8 pos = GetBattlePos(&flow->posPoke, GetMonID(mon));
     if (pos != 6) {
-        BtlServerCmdQueue_Put(flow->queue, 0x4d, pos, effect);
+        BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BY_POS, pos, effect);
     }
 }
 
@@ -5604,45 +5609,45 @@ void ServerDisplay_MustRecharge(BtlServerFlow *flow, BattleMon *mon) {
 
 void ServerDisplay_Confused(BtlServerFlow *flow, BattleMon *mon) {
     ServerDisplay_AddEffectAtPosition(flow, mon, 0x25b);
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x15c, GetMonID(mon), 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x15c, GetMonID(mon), SC_MSG_ARG_END);
 }
 
 void ServerDisplay_InLove(BtlServerFlow *flow, BattleMon *mon) {
     u8 move = GetDisabledMove(mon, 7);
     ServerDisplay_AddEffectAtPosition(flow, mon, 0x25c);
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x14d, GetMonID(mon), move, 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x14d, GetMonID(mon), move, SC_MSG_ARG_END);
 }
 
 void ServerDisplay_ConfusionDamage(BtlServerFlow *flow, BattleMon *mon, u32 damage) {
     u8 monId = GetMonID(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x36, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_CONFUSION_DAMAGE, monId);
     ServerDisplay_SimpleHP(flow, mon, -damage, TRUE);
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x50, monId, 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x50, monId, SC_MSG_ARG_END);
 }
 
 void ServerControl_CureStatus(BtlServerFlow *flow, BattleMon *mon, u32 status, BOOL flag) {
     u8 monId = GetMonID(mon);
 
     CureCondition(mon);
-    BtlServerCmdQueue_Put(flow->queue, 0x10, monId);
-    BtlServerCmdQueue_Put(flow->queue, 0x35, monId, 0);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_CURE_CONDITION, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_SET_GAUGE_STATUS, monId, 0);
     if (flag) {
         switch (status) {
         case 2:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x138, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x138, monId, SC_MSG_ARG_END);
             break;
         case 3:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x126, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x126, monId, SC_MSG_ARG_END);
             break;
         default:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x156, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x156, monId, SC_MSG_ARG_END);
             break;
         }
     }
 }
 
 void ServerDisplay_MoveMessage(BtlServerFlow *flow, BattleMon *mon, u16 move) {
-    BtlServerCmdQueue_Put(flow->queue, 0x59, GetMonID(mon), move);
+    BtlServerCmdQueue_Put(flow->queue, SC_MOVE_MSG, GetMonID(mon), move);
 }
 
 void ServerControl_CureCondition(BtlServerFlow *flow, BattleMon *mon, s32 condition, BattleCondition *prev) {
@@ -5653,13 +5658,13 @@ void ServerControl_CureCondition(BtlServerFlow *flow, BattleMon *mon, s32 condit
         }
         if (condition < 6) {
             CureCondition(mon);
-            BtlServerCmdQueue_Put(flow->queue, 0x10, monId);
+            BtlServerCmdQueue_Put(flow->queue, SC_OP_CURE_CONDITION, monId);
             if (GetBattlePos(&flow->posPoke, monId) != 6) {
-                BtlServerCmdQueue_Put(flow->queue, 0x35, monId, 0);
+                BtlServerCmdQueue_Put(flow->queue, SC_SET_GAUGE_STATUS, monId, 0);
             }
         } else {
             CureMoveCondition(mon, condition);
-            BtlServerCmdQueue_Put(flow->queue, 0x11, monId, (u16)condition);
+            BtlServerCmdQueue_Put(flow->queue, SC_OP_CURE_MOVE_CONDITION, monId, (u16)condition);
         }
     }
 }
@@ -5707,19 +5712,19 @@ s32 ConvertConditionCode(BattleMon *mon, s32 *condition) {
 }
 
 void ServerDisplay_MoveFailed(BtlServerFlow *flow, BattleMon *mon, u16 move) {
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x47, 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x47, SC_MSG_ARG_END);
 }
 
 void ServerDisplay_MoveAvoided(BtlServerFlow *flow, BattleMon *mon, u16 move) {
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xd5, GetMonID(mon), 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xd5, GetMonID(mon), SC_MSG_ARG_END);
 }
 
 void ServerDisplay_DoesntAffect(BtlServerFlow *flow, BattleMon *mon) {
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xd2, GetMonID(mon), 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xd2, GetMonID(mon), SC_MSG_ARG_END);
 }
 
 void ServerDisplay_Unaffected(BtlServerFlow *flow, BattleMon *mon) {
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xd8, GetMonID(mon), 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xd8, GetMonID(mon), SC_MSG_ARG_END);
 }
 
 void ServerDisplay_Damage(BtlServerFlow *flow, BtlFlowMoveParam *param, u32 count, u32 *effectiveness, BattleMon **mons,
@@ -5749,7 +5754,7 @@ void ServerDisplay_Damage(BtlServerFlow *flow, BtlFlowMoveParam *param, u32 coun
     } else {
         kind = 1;
     }
-    BtlServerCmdQueue_Put(flow->queue, 0x33, (u8)count, (u8)kind, param->move);
+    BtlServerCmdQueue_Put(flow->queue, SC_DAMAGE_PLURAL, (u8)count, (u8)kind, param->move);
     for (i = 0; i < count; i++) {
         BtlServerCmdQueue_PutByte(flow->queue, GetMonID(mons[i]));
     }
@@ -5783,13 +5788,13 @@ void ServerDisplay_EffectivenessMessageMulti(BtlServerFlow *flow, u32 count, u32
             }
             switch (superEffective) {
             case 1:
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 6, monIds[0], 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 6, monIds[0], SC_MSG_ARG_END);
                 break;
             case 2:
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 9, monIds[0], monIds[1], 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 9, monIds[0], monIds[1], SC_MSG_ARG_END);
                 break;
             case 3:
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xc, monIds[0], monIds[1], monIds[2], 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xc, monIds[0], monIds[1], monIds[2], SC_MSG_ARG_END);
                 break;
             }
         }
@@ -5802,20 +5807,21 @@ void ServerDisplay_EffectivenessMessageMulti(BtlServerFlow *flow, u32 count, u32
             }
             switch (notVeryEffective) {
             case 1:
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xf, monIds[0], 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xf, monIds[0], SC_MSG_ARG_END);
                 break;
             case 2:
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x12, monIds[0], monIds[1], 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x12, monIds[0], monIds[1], SC_MSG_ARG_END);
                 break;
             case 3:
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x15, monIds[0], monIds[1], monIds[2], 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x15, monIds[0], monIds[1], monIds[2],
+                                         SC_MSG_ARG_END);
                 break;
             }
         }
     } else if (superEffective) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x4e, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x4e, SC_MSG_ARG_END);
     } else if (notVeryEffective) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x4f, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x4f, SC_MSG_ARG_END);
     }
 }
 
@@ -5826,9 +5832,9 @@ void ServerDisplay_CriticalHitMessage(BtlServerFlow *flow, u32 count, BattleMon 
     for (i = 0; i < count; i++) {
         if (critical[i]) {
             if (multipleTargets) {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x180, GetMonID(mons[i]), 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x180, GetMonID(mons[i]), SC_MSG_ARG_END);
             } else {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x51, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x51, SC_MSG_ARG_END);
             }
         }
     }
@@ -5836,19 +5842,19 @@ void ServerDisplay_CriticalHitMessage(BtlServerFlow *flow, u32 count, BattleMon 
 
 // Function names from swan.
 void ServerDisplay_AbilityPopupAdd(BtlServerFlow *handler, BattleMon *mon) {
-    BtlServerCmdQueue_Put(handler->queue, 0x57, GetMonID(mon));
+    BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_IN, GetMonID(mon));
 }
 
 void ServerDisplay_AbilityPopupRemove(BtlServerFlow *handler, BattleMon *mon) {
-    BtlServerCmdQueue_Put(handler->queue, 0x58, GetMonID(mon));
+    BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_OUT, GetMonID(mon));
 }
 
 void ServerDisplay_StatChangeLimit(BtlServerFlow *flow, BattleMon *mon, u32 stat, s32 change) {
     u8 monId = GetMonID(mon);
     if (change > 0) {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x99, monId, stat, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x99, monId, stat, SC_MSG_ARG_END);
     } else {
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xae, monId, stat, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xae, monId, stat, SC_MSG_ARG_END);
     }
 }
 
@@ -5857,20 +5863,20 @@ void ServerDisplay_StatChange(BtlServerFlow *flow, BattleMon *mon, u32 stat, s32
 
     if (change > 0) {
         u32 actual = BattleMon_RaiseStatStage(mon, stat, change);
-        BtlServerCmdQueue_Put(flow->queue, 9, monId, (u8)stat, (u8)actual);
-        BtlServerCmdQueue_Put(flow->queue, 0x37, monId, (u8)stat, (u8)actual);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_RAISE_STAT_STAGE, monId, (u8)stat, (u8)actual);
+        BtlServerCmdQueue_Put(flow->queue, SC_STAT_UP_EFFECT, monId, (u8)stat, (u8)actual);
         if (flag) {
             if (context == 0) {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x1b, monId, stat, actual, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x1b, monId, stat, actual, SC_MSG_ARG_END);
             } else {
-                BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x3aa, monId, context, stat, actual, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x3aa, monId, context, stat, actual, SC_MSG_ARG_END);
             }
         }
     } else {
         u32 actual = BattleMon_LowerStatStage(mon, stat, -change);
-        BtlServerCmdQueue_Put(flow->queue, 0xa, monId, (u8)stat, (u8)actual);
-        BtlServerCmdQueue_Put(flow->queue, 0x38, monId, (u8)stat, (u8)actual);
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x5a, monId, stat, actual, 0xffff0000);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_LOWER_STAT_STAGE, monId, (u8)stat, (u8)actual);
+        BtlServerCmdQueue_Put(flow->queue, SC_STAT_DOWN_EFFECT, monId, (u8)stat, (u8)actual);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x5a, monId, stat, actual, SC_MSG_ARG_END);
     }
 }
 
@@ -5879,12 +5885,12 @@ void ServerDisplay_SimpleHP(BtlServerFlow *flow, BattleMon *mon, s32 amount, BOO
 
     if (amount > 0) {
         HPAdd(mon, amount);
-        BtlServerCmdQueue_Put(flow->queue, 2, monId, (u16)amount);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_HP, monId, (u16)amount);
     } else if (amount < 0) {
         ServerDisplay_DecreaseHP(flow, mon, -amount);
     }
     if (show && GetBattlePos(&flow->posPoke, monId) != 6) {
-        BtlServerCmdQueue_Put(flow->queue, 0x41, monId);
+        BtlServerCmdQueue_Put(flow->queue, SC_UPDATE_HP_GAUGE, monId);
     }
 }
 
@@ -5893,21 +5899,21 @@ void ServerDisplay_FaintPokemon(BtlServerFlow *flow, BattleMon *mon, u32 flag) {
     u8 monId = GetMonID(mon);
 
     HPZero(mon);
-    BtlServerCmdQueue_Put(flow->queue, 3, monId);
-    BtlServerCmdQueue_Put(flow->queue, 0x43, monId, flag);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_ZERO_HP, monId);
+    BtlServerCmdQueue_Put(flow->queue, SC_FAINT_HP_GAUGE, monId, flag);
 }
 
 void ServerDisplay_AddCondition(BtlServerFlow *flow, BattleMon *mon, s32 condition, BattleCondition value) {
     u8 monId = GetMonID(mon);
 
     SetMoveCondition(mon, condition, value);
-    BtlServerCmdQueue_Put(flow->queue, 0xf, monId, (u8)condition, value);
+    BtlServerCmdQueue_Put(flow->queue, SC_OP_SET_CONDITION, monId, (u8)condition, value);
     // The major status conditions show an icon, and a bad poisoning has its own after the last of them
     if (condition < CONDITION_CONFUSION) {
         if (condition == CONDITION_POISON && Condition_IsBadlyPoisoned(value)) {
             condition = CONDITION_POISON + 1;
         }
-        BtlServerCmdQueue_Put(flow->queue, 0x35, monId, condition);
+        BtlServerCmdQueue_Put(flow->queue, SC_SET_GAUGE_STATUS, monId, condition);
     }
 }
 
@@ -5918,66 +5924,66 @@ void AddConditionCheckFailStandard(BtlServerFlow *flow, BattleMon *mon, u32 caus
     case 1:
         switch (condition) {
         case CONDITION_POISON:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xf9, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xf9, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_BURN:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x10b, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x10b, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_PARALYSIS:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x11a, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x11a, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_SLEEP:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x13b, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x13b, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_FREEZE:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x129, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x129, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_CONFUSION:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x162, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x162, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_HEAL_BLOCK:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0x18, monId, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0x18, monId, SC_MSG_ARG_END);
             break;
         case CONDITION_PERISH_SONG:
             return;
         case CONDITION_NONE:
         default:
-            BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x47, 0xffff0000);
+            BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x47, SC_MSG_ARG_END);
             break;
         }
         flow->unk78A_4 = 1;
         break;
     case 2:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, 0xd2, monId, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, 0xd2, monId, SC_MSG_ARG_END);
         flow->unk78A_4 = 1;
         break;
     default:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, 0x47, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, 0x47, SC_MSG_ARG_END);
         flow->unk78A_4 = 1;
         break;
     }
 }
 
 void ServerDisplay_SkyDropTargetAppear(BtlServerFlow *flow, BattleMon *mon, u16 message) {
-    BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, message, GetMonID(mon), 0xffff0000);
+    BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, message, GetMonID(mon), SC_MSG_ARG_END);
 }
 
 void ServerDisplay_StandardMessage(BtlServerFlow *flow, u16 message, u32 count, const u32 *args) {
     switch (count) {
     default:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, SC_MSG_ARG_END);
         break;
     case 1:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, args[0], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, args[0], SC_MSG_ARG_END);
         break;
     case 2:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, args[0], args[1], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, args[0], args[1], SC_MSG_ARG_END);
         break;
     case 3:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, args[0], args[1], args[2], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, args[0], args[1], args[2], SC_MSG_ARG_END);
         break;
     case 4:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5a, message, args[0], args[1], args[2], args[3], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD, message, args[0], args[1], args[2], args[3], SC_MSG_ARG_END);
         break;
     }
 }
@@ -5985,20 +5991,21 @@ void ServerDisplay_StandardMessage(BtlServerFlow *flow, u16 message, u32 count, 
 void ServerDisplay_StandardMessageEx(BtlServerFlow *flow, u16 message, u16 soundEffect, u32 count, const u32 *args) {
     switch (count) {
     default:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, message, soundEffect, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, message, soundEffect, SC_MSG_ARG_END);
         break;
     case 1:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, message, soundEffect, args[0], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, message, soundEffect, args[0], SC_MSG_ARG_END);
         break;
     case 2:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, message, soundEffect, args[0], args[1], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, message, soundEffect, args[0], args[1], SC_MSG_ARG_END);
         break;
     case 3:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, message, soundEffect, args[0], args[1], args[2], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, message, soundEffect, args[0], args[1], args[2],
+                                 SC_MSG_ARG_END);
         break;
     case 4:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5c, message, soundEffect, args[0], args[1], args[2], args[3],
-                                 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_STD_SE, message, soundEffect, args[0], args[1], args[2], args[3],
+                                 SC_MSG_ARG_END);
         break;
     }
 }
@@ -6006,19 +6013,19 @@ void ServerDisplay_StandardMessageEx(BtlServerFlow *flow, u16 message, u16 sound
 void ServerDisplay_SetMessage(BtlServerFlow *flow, u16 message, u32 count, const u32 *args) {
     switch (count) {
     default:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, message, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, message, SC_MSG_ARG_END);
         break;
     case 1:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, message, args[0], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, message, args[0], SC_MSG_ARG_END);
         break;
     case 2:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, message, args[0], args[1], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, message, args[0], args[1], SC_MSG_ARG_END);
         break;
     case 3:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, message, args[0], args[1], args[2], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, message, args[0], args[1], args[2], SC_MSG_ARG_END);
         break;
     case 4:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5b, message, args[0], args[1], args[2], args[3], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET, message, args[0], args[1], args[2], args[3], SC_MSG_ARG_END);
         break;
     }
 }
@@ -6026,20 +6033,21 @@ void ServerDisplay_SetMessage(BtlServerFlow *flow, u16 message, u32 count, const
 void ServerDisplay_SetMessageEx(BtlServerFlow *flow, u16 message, u16 soundEffect, u32 count, const u32 *args) {
     switch (count) {
     default:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5d, message, soundEffect, 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET_SE, message, soundEffect, SC_MSG_ARG_END);
         break;
     case 1:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5d, message, soundEffect, args[0], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET_SE, message, soundEffect, args[0], SC_MSG_ARG_END);
         break;
     case 2:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5d, message, soundEffect, args[0], args[1], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET_SE, message, soundEffect, args[0], args[1], SC_MSG_ARG_END);
         break;
     case 3:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5d, message, soundEffect, args[0], args[1], args[2], 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET_SE, message, soundEffect, args[0], args[1], args[2],
+                                 SC_MSG_ARG_END);
         break;
     case 4:
-        BtlServerCmdQueue_PutMsg(flow->queue, 0x5d, message, soundEffect, args[0], args[1], args[2], args[3],
-                                 0xffff0000);
+        BtlServerCmdQueue_PutMsg(flow->queue, SC_MSG_SET_SE, message, soundEffect, args[0], args[1], args[2], args[3],
+                                 SC_MSG_ARG_END);
         break;
     }
 }
@@ -6047,7 +6055,7 @@ void ServerDisplay_SetMessageEx(BtlServerFlow *flow, u16 message, u16 soundEffec
 void ServerDisplay_DecreaseHP(BtlServerFlow *flow, BattleMon *mon, u32 damage) {
     if (!ReturnZero(flow->mainModule, 4)) {
         HPSub(mon, damage);
-        BtlServerCmdQueue_Put(flow->queue, 1, GetMonID(mon), (u16)damage);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_SUBTRACT_HP, GetMonID(mon), (u16)damage);
     }
 }
 
@@ -6056,31 +6064,31 @@ void ServerDisplay_RecoverPP(BtlServerFlow *flow, BattleMon *mon, u8 slot, u8 am
 
     if (original) {
         Move_IncrementPP_Org(mon, slot, amount);
-        BtlServerCmdQueue_Put(flow->queue, 8, monId, slot, amount);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_ORIGINAL_PP, monId, slot, amount);
     } else {
         Move_IncrementPP(mon, slot, amount);
-        BtlServerCmdQueue_Put(flow->queue, 7, monId, slot, amount);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_ADD_PP, monId, slot, amount);
     }
 }
 
 void ServerDisplay_UseHeldItem(BtlServerFlow *flow, BattleMon *mon) {
-    BtlServerCmdQueue_Put(flow->queue, 0x42, GetMonID(mon));
+    BtlServerCmdQueue_Put(flow->queue, SC_USE_HELD_ITEM, GetMonID(mon));
 }
 
 // Function names from swan.
 void scPut_SetContFlag(BtlServerFlow *handler, BattleMon *mon, u32 flag) {
     BattleMon_SetConditionFlag(mon, flag);
-    BtlServerCmdQueue_Put(handler->queue, 0x19, GetMonID(mon), flag);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_CONDITION_FLAG, GetMonID(mon), flag);
 }
 
 void scPut_ResetContFlag(BtlServerFlow *handler, BattleMon *mon, u32 flag) {
     BattleMon_ClearConditionFlag(mon, flag);
-    BtlServerCmdQueue_Put(handler->queue, 0x1a, GetMonID(mon), flag);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_CLEAR_CONDITION_FLAG, GetMonID(mon), flag);
 }
 
 void ServerDisplay_SetTurnFlag(BtlServerFlow *handler, BattleMon *mon, u32 flag) {
     BattleMon_SetTurnFlag(mon, flag);
-    BtlServerCmdQueue_Put(handler->queue, 0x1b, GetMonID(mon), flag);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_TURN_FLAG, GetMonID(mon), flag);
 }
 
 void ServerControl_UpdateIllusion(BtlServerFlow *flow, BtlFlowClientList *list) {
@@ -6089,7 +6097,7 @@ void ServerControl_UpdateIllusion(BtlServerFlow *flow, BtlFlowClientList *list) 
 
     for (i = 0; i < list->count; i++) {
         party = GetPartyData(flow->pokeCon, list->clientIds[i]);
-        BtlServerCmdQueue_Put(flow->queue, 0x2a, list->clientIds[i]);
+        BtlServerCmdQueue_Put(flow->queue, SC_OP_SETUP_ILLUSION, list->clientIds[i]);
         UpdatePartyIllusionDisguises(flow->mainModule, party, list->clientIds[i]);
     }
 }
@@ -6709,25 +6717,25 @@ void ServerControl_ViewEffect(BtlServerFlow *flow, u16 effect, u8 pos1, u8 pos2,
     if (reserved) {
         switch (posCount) {
         case 0:
-            BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserve, 0x4c, effect);
+            BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserve, SC_EFFECT, effect);
             break;
         case 1:
-            BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserve, 0x4d, pos1, effect);
+            BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserve, SC_EFFECT_BY_POS, pos1, effect);
             break;
         case 2:
-            BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserve, 0x4e, pos1, pos2, effect);
+            BtlServerCmdQueue_PutReserved(flow->queue, (u16)reserve, SC_EFFECT_BETWEEN_POS, pos1, pos2, effect);
             break;
         }
     } else {
         switch (posCount) {
         case 0:
-            BtlServerCmdQueue_Put(flow->queue, 0x4c, effect);
+            BtlServerCmdQueue_Put(flow->queue, SC_EFFECT, effect);
             break;
         case 1:
-            BtlServerCmdQueue_Put(flow->queue, 0x4d, pos1, effect);
+            BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BY_POS, pos1, effect);
             break;
         case 2:
-            BtlServerCmdQueue_Put(flow->queue, 0x4e, pos1, pos2, effect);
+            BtlServerCmdQueue_Put(flow->queue, SC_EFFECT_BETWEEN_POS, pos1, pos2, effect);
             break;
         }
     }
@@ -8087,7 +8095,7 @@ u8 BattleHandler_RecoverHP(BtlServerFlow *handler, const BattleHandlerRecoverHPP
             if (param->string.enabled) {
                 BattleHandler_SetString(handler, &param->string);
             } else if (itemId != 0) {
-                BtlServerCmdQueue_PutMsg(handler->queue, 0x5b, 0x38c, param->targetIndex, itemId, 0xffff0000);
+                BtlServerCmdQueue_PutMsg(handler->queue, SC_MSG_SET, 0x38c, param->targetIndex, itemId, SC_MSG_ARG_END);
             }
         }
         if (param->popup) {
@@ -8338,8 +8346,8 @@ u8 BattleHandler_SetStatStage(BtlServerFlow *handler, const BattleHandlerSetStat
             BattleMon_SetStatStage(mon, 5, param->speed);
             BattleMon_SetStatStage(mon, 6, param->accuracy);
             BattleMon_SetStatStage(mon, 7, param->evasion);
-            BtlServerCmdQueue_Put(handler->queue, 0xb, param->monIndex, param->attack, param->defense, param->spAttack,
-                                  param->spDefense, param->speed, param->accuracy, param->evasion);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_STAT_STAGES, param->monIndex, param->attack, param->defense,
+                                  param->spAttack, param->spDefense, param->speed, param->accuracy, param->evasion);
             return TRUE;
         }
     }
@@ -8352,7 +8360,7 @@ u8 BattleHandler_RecoverStatStage(BtlServerFlow *handler, BattleHandlerRecoverSt
 
     mon = GetPokeParam(handler->pokeCon, param->monIndex);
     if (!IsFainted(mon)) {
-        BtlServerCmdQueue_Put(handler->queue, 0xc, param->monIndex);
+        BtlServerCmdQueue_Put(handler->queue, SC_OP_RECOVER_STAT_STAGES, param->monIndex);
         return StatStageRecover(mon);
     }
     return FALSE;
@@ -8367,7 +8375,7 @@ u8 BattleHandler_ResetStatStage(BtlServerFlow *handler, BattleHandlerResetStatSt
     for (i = 0; i < param->count; i++) {
         mon = GetPokeParam(handler->pokeCon, param->monIndices[i]);
         if (!IsFainted(mon)) {
-            BtlServerCmdQueue_Put(handler->queue, 0xd, param->monIndices[i]);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_RESET_STAT_STAGES, param->monIndices[i]);
             StatStageReset(mon);
             result = TRUE;
         }
@@ -8383,23 +8391,23 @@ u8 BattleHandler_SetStatus(BtlServerFlow *handler, const BattleHandlerSetStatusP
         mon = GetPokeParam(handler->pokeCon, param->monIndex);
         if (param->setAttack) {
             SetBaseStatus(mon, 8, param->attack);
-            BtlServerCmdQueue_Put(handler->queue, 0x13, param->monIndex, 8, (u8)param->attack);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_BASE_STAT, param->monIndex, 8, (u8)param->attack);
         }
         if (param->setDefense) {
             SetBaseStatus(mon, 9, param->defense);
-            BtlServerCmdQueue_Put(handler->queue, 0x13, param->monIndex, 9, (u8)param->defense);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_BASE_STAT, param->monIndex, 9, (u8)param->defense);
         }
         if (param->setSpAttack) {
             SetBaseStatus(mon, 10, param->spAttack);
-            BtlServerCmdQueue_Put(handler->queue, 0x13, param->monIndex, 10, (u8)param->spAttack);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_BASE_STAT, param->monIndex, 10, (u8)param->spAttack);
         }
         if (param->setSpDefense) {
             SetBaseStatus(mon, 11, param->spDefense);
-            BtlServerCmdQueue_Put(handler->queue, 0x13, param->monIndex, 11, (u8)param->spDefense);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_BASE_STAT, param->monIndex, 11, (u8)param->spDefense);
         }
         if (param->setSpeed) {
             SetBaseStatus(mon, 12, param->speed);
-            BtlServerCmdQueue_Put(handler->queue, 0x13, param->monIndex, 12, (u8)param->speed);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_BASE_STAT, param->monIndex, 12, (u8)param->speed);
         }
         BattleHandler_SetString(handler, &param->string);
         return TRUE;
@@ -8429,11 +8437,11 @@ u8 BattleHandler_ChangeType(BtlServerFlow *handler, BattleHandlerChangeTypeParam
     if (DoesBattleMonExist(&handler->posPoke, param->monIndex)) {
         mon = GetPokeParam(handler->pokeCon, param->monIndex);
         if (!IsFainted(mon) && !IsArceus(GetBattleMonSpecies(mon))) {
-            BtlServerCmdQueue_Put(handler->queue, 0x16, param->monIndex, param->type);
+            BtlServerCmdQueue_Put(handler->queue, SC_OP_CHANGE_TYPE, param->monIndex, param->type);
             ChangePokeType(mon, param->type);
             if (!param->suppressMessage && PokeTypePair_IsMonotype(param->type)) {
-                BtlServerCmdQueue_PutMsg(handler->queue, 0x5b, 0x380, param->monIndex,
-                                         PokeTypePair_GetType1(param->type), 0xffff0000);
+                BtlServerCmdQueue_PutMsg(handler->queue, SC_MSG_SET, 0x380, param->monIndex,
+                                         PokeTypePair_GetType1(param->type), SC_MSG_ARG_END);
             }
             return TRUE;
         }
@@ -8630,25 +8638,25 @@ u8 BattleHandler_AbilityChange(BtlServerFlow *handler, BattleHandlerAbilityChang
     }
     if (param->force || param->ability != oldAbility) {
         if (param->popup) {
-            BtlServerCmdQueue_Put(handler->queue, 0x57, (u8)param->monIndex);
+            BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_IN, (u8)param->monIndex);
         }
-        BtlServerCmdQueue_Put(handler->queue, 0x49, (u8)param->targetIndex, param->ability);
+        BtlServerCmdQueue_Put(handler->queue, SC_CHANGE_ABILITY, (u8)param->targetIndex, param->ability);
         BattleHandler_SetString(handler, &param->string);
         state = PushState(&handler->actionState, 0x3cf6);
         ServerEvent_ChangeAbilityBefore(handler, param->targetIndex, oldAbility, param->ability);
         PopState(&handler->actionState, state, 0x3cf8);
         AbilityEvent_RemoveItem(mon);
         ChangeAbility(mon, param->ability);
-        BtlServerCmdQueue_Put(handler->queue, 0x1d, (u8)param->targetIndex, param->ability);
+        BtlServerCmdQueue_Put(handler->queue, SC_OP_CHANGE_ABILITY, (u8)param->targetIndex, param->ability);
         AbilityEvent_AddItem(mon);
-        BtlServerCmdQueue_Put(handler->queue, 0x58, (u8)param->targetIndex);
+        BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_OUT, (u8)param->targetIndex);
         if (oldAbility != param->ability) {
             state = PushState(&handler->actionState, 0x3d06);
             ServerEvent_ChangeAbilityAfter(handler, param->targetIndex);
             PopState(&handler->actionState, state, 0x3d08);
         }
         if (param->popup) {
-            BtlServerCmdQueue_Put(handler->queue, 0x58, (u8)param->monIndex);
+            BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_OUT, (u8)param->monIndex);
         }
         if (!CheckCondition(mon, 16)) {
             if (oldAbility == 0x67) {
@@ -8682,20 +8690,20 @@ u8 BattleHandler_SetItem(BtlServerFlow *handler, BattleHandlerSetItemParam *para
         }
     }
     if (param->popup) {
-        BtlServerCmdQueue_Put(handler->queue, 0x57, (u8)param->monIndex);
+        BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_IN, (u8)param->monIndex);
     }
     BattleHandler_SetString(handler, &param->string);
     ServerControl_ChangeHeldItem(handler, mon, param->item, 0);
     if (param->popup) {
-        BtlServerCmdQueue_Put(handler->queue, 0x58, (u8)param->monIndex);
+        BtlServerCmdQueue_Put(handler->queue, SC_ABILITY_POPUP_OUT, (u8)param->monIndex);
     }
     if (param->clearConsumed) {
         ClearConsumedItem(mon);
-        BtlServerCmdQueue_Put(handler->queue, 0x2b, (u8)param->targetIndex);
+        BtlServerCmdQueue_Put(handler->queue, SC_OP_CLEAR_CONSUMED_ITEM, (u8)param->targetIndex);
     }
     if (param->clearOtherConsumed) {
         ClearConsumedItem(GetPokeParam(handler->pokeCon, param->otherIndex));
-        BtlServerCmdQueue_Put(handler->queue, 0x2b, (u8)param->otherIndex);
+        BtlServerCmdQueue_Put(handler->queue, SC_OP_CLEAR_CONSUMED_ITEM, (u8)param->otherIndex);
     }
     ServerControl_CheckItemReaction(handler, mon, 0);
     return TRUE;
@@ -8775,11 +8783,11 @@ u8 BattleHandler_ForceUseItem(BtlServerFlow *handler, BattleHandlerForceUseItemP
     if (!IsFainted(mon)) {
         temp = ItemEvent_TempAdd(mon, param->item);
         if (temp != NULL) {
-            reserve = SCQUE_RESERVE_Pos(handler->queue, 0x42);
+            reserve = SCQUE_RESERVE_Pos(handler->queue, SC_USE_HELD_ITEM);
             state = PushState(&handler->actionState, 0x3db8);
             ServerEvent_EquipTempItem(handler, mon, param->monIndex2);
             if (BattleHandler_Result(handler) == 2) {
-                BtlServerCmdQueue_PutReserved(handler->queue, reserve, 0x42, param->monIndex);
+                BtlServerCmdQueue_PutReserved(handler->queue, reserve, SC_USE_HELD_ITEM, param->monIndex);
             }
             PopState(&handler->actionState, state, 0x3dbf);
             ItemEvent_TempRemove(temp);
@@ -8807,8 +8815,8 @@ u8 BattleHandler_UpdateMove(BtlServerFlow *handler, const BattleHandlerUpdateMov
     BattleMon *mon;
 
     mon = GetPokeParam(handler->pokeCon, param->monIndex);
-    BtlServerCmdQueue_Put(handler->queue, 0x1f, param->monIndex, param->slot, param->maxPP, param->updateCurrent,
-                          param->move);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_UPDATE_MOVE, param->monIndex, param->slot, param->maxPP,
+                          param->updateCurrent, param->move);
     Move_UpdateID(mon, param->slot, param->move, param->maxPP, param->updateCurrent);
     return TRUE;
 }
@@ -8903,10 +8911,10 @@ u8 BattleHandler_BatonPass(BtlServerFlow *handler, BattleHandlerBatonPassParam *
         ServerEvent_GastroAcidConfirmed(handler, target);
     }
     CopyBatonPassParams(target, source);
-    BtlServerCmdQueue_Put(handler->queue, 0x26, param->sourceMonIndex, param->targetMonIndex);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_BATON_PASS, param->sourceMonIndex, param->targetMonIndex);
     if (IsSubstituteActive(target)) {
         pos = GetBattlePos(&handler->posPoke, param->targetMonIndex);
-        BtlServerCmdQueue_Put(handler->queue, 0x51, pos);
+        BtlServerCmdQueue_Put(handler->queue, SC_SUBSTITUTE_CREATE, pos);
     }
     return TRUE;
 }
@@ -8931,7 +8939,7 @@ u8 BattleHandler_Revive(BtlServerFlow *handler, BattleHandlerReviveParam *param)
 
     mon = GetPokeParam(handler->pokeCon, param->monIndex);
     HPAdd(mon, param->amount);
-    BtlServerCmdQueue_Put(handler->queue, 2, param->monIndex, param->amount);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_ADD_HP, param->monIndex, param->amount);
     handler->unk7A9[param->monIndex] = 0;
     BattleHandler_SetString(handler, &param->string);
     pos = MonIDToBattlePos(handler->mainModule, handler->pokeCon, param->monIndex);
@@ -8950,7 +8958,7 @@ u8 BattleHandler_SetWeight(BtlServerFlow *handler, BattleHandlerSetWeightParam *
 
     mon = GetPokeParam(handler->pokeCon, param->monIndex);
     SetWeight(mon, param->weight);
-    BtlServerCmdQueue_Put(handler->queue, 0x14, param->monIndex, param->weight);
+    BtlServerCmdQueue_Put(handler->queue, SC_OP_SET_WEIGHT, param->monIndex, param->weight);
     BattleHandler_SetString(handler, &param->string);
     return TRUE;
 }
@@ -9038,7 +9046,7 @@ u8 BattleHandler_Transform(BtlServerFlow *handler, BattleHandlerTransformParam *
             RemoveForceAll(mon);
             AbilityEvent_RemoveItem(mon);
             AbilityEvent_AddItem(mon);
-            BtlServerCmdQueue_Put(handler->queue, 0x53, monId, targetId);
+            BtlServerCmdQueue_Put(handler->queue, SC_TRANSFORM, monId, targetId);
             BattleHandler_SetString(handler, &param->string);
             if (param->popup) {
                 ServerDisplay_AbilityPopupRemove(handler, mon);
@@ -9061,7 +9069,7 @@ u8 BattleHandler_IllusionBreak(BtlServerFlow *handler, BattleHandlerIllusionBrea
         mon = GetPokeParam(handler->pokeCon, param->monIndex);
         if (IsIllusionEnabled(mon)) {
             IllusionBreak(mon);
-            BtlServerCmdQueue_Put(handler->queue, 0x4b, param->monIndex);
+            BtlServerCmdQueue_Put(handler->queue, SC_ILLUSION_BREAK, param->monIndex);
             BattleHandler_SetString(handler, &param->string);
             return TRUE;
         }
@@ -9100,7 +9108,7 @@ u8 BattleHandler_GravityCheck(BtlServerFlow *handler, BattleHandlerGravityCheckP
             changed = TRUE;
         }
         if (changed) {
-            BtlServerCmdQueue_PutMsg(handler->queue, 0x5b, 0x43b, monIds[i], 0xffff0000);
+            BtlServerCmdQueue_PutMsg(handler->queue, SC_MSG_SET, 0x43b, monIds[i], SC_MSG_ARG_END);
         }
     }
     return TRUE;
@@ -9120,7 +9128,7 @@ u8 BattleHandler_HideTurnCancel(BtlServerFlow *handler, BattleHandlerHideTurnPar
 // Function name from swan.
 u8 BattleHandler_EffectAtPos(BtlServerFlow *handler, const BattleHandlerEffectAtPosParam *param) {
     if (param->hideMessageWindow) {
-        BtlServerCmdQueue_Put(handler->queue, 0x56, 0);
+        BtlServerCmdQueue_Put(handler->queue, SC_HIDE_MSG_WINDOW, 0);
     }
     ServerControl_ViewEffect(handler, param->effect, param->pos1, param->pos2, param->reserved, param->reserve);
     BattleHandler_SetString(handler, &param->string);
@@ -9129,7 +9137,7 @@ u8 BattleHandler_EffectAtPos(BtlServerFlow *handler, const BattleHandlerEffectAt
 
 // Function name from swan.
 u8 BattleHandler_RemoveMessageWindow(BtlServerFlow *handler, BattleHandlerHeader *header) {
-    BtlServerCmdQueue_Put(handler->queue, 0x56, 0);
+    BtlServerCmdQueue_Put(handler->queue, SC_HIDE_MSG_WINDOW, 0);
     return TRUE;
 }
 
@@ -9146,7 +9154,7 @@ u8 BattleHandler_ChangeForm(BtlServerFlow *handler, BattleHandlerChangeFormParam
                 ServerDisplay_AbilityPopupAdd(handler, mon);
             }
             ChangeForm(mon, param->form);
-            BtlServerCmdQueue_Put(handler->queue, 0x4f, param->monIndex, param->form);
+            BtlServerCmdQueue_Put(handler->queue, SC_CHANGE_FORM, param->monIndex, param->form);
             BattleHandler_SetString(handler, &param->string);
             if (param->popup) {
                 ServerDisplay_AbilityPopupRemove(handler, mon);
