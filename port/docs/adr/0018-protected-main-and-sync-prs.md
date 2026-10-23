@@ -26,7 +26,10 @@ The hourly sync proposes one frozen PR on a dedicated branch. It never auto-merg
 review is pending. Incoming code runs only in read-only PR CI; publishing uses trusted git/gh logic. Both ROM SHA1s
 and native tests are a separately required local status on the tested commit. Local sync publishes topic PRs too.
 Conflicts, rewritten history, reference notifications and workflow imports remain explicit inspection points.
-Merge commits are the sole merge method, preserving upstream ancestry. No long-lived bot credential is added.
+Merge commits are the sole merge method, preserving upstream ancestry. A dedicated GitHub App now authenticates
+only the scheduled topic push and PR creation so PR CI starts automatically. Its installation is limited to Frigate
+and Contents/Pull requests write; it has no bypass, workflow-write or local-verification status authority. The App
+private key is an Actions secret; each job mints and revokes its own short-lived token. Missing setup fails visibly.
 
 [REPOSITORY-POLICY.md](../REPOSITORY-POLICY.md) records settings and readback commands; [SYNC.md](../SYNC.md) is the
 operational procedure. Imported root instructions and workflows remain unchanged to reduce future merge conflicts;
@@ -56,11 +59,21 @@ port-owned instructions explicitly override their direct-publishing guidance.
 ## Alternatives and consequences
 
 Direct automated main updates would bypass the requested review point and leave port compatibility dependent on
-later validation. A PAT or GitHub App could make bot-created PR checks start without approval, but the default
-short-lived token and an explicit workflow approval are sufficient for one maintainer. A second integration branch,
+later validation. The initial default-token design required approval before bot-created PR checks ran. The owner
+subsequently requested automatic CI; a dedicated, narrowly scoped GitHub App provides that without a personal
+access token or review/check bypass. A second integration branch,
 submodule conversion, or copied decomp snapshot would add synchronization work without solving review enforcement.
 
 Main advances more slowly but every update has recorded CI, local validation and review. Frozen proposals avoid
 hourly approval churn. Owner-authored work still has an auditable PR, even where the owner must use the narrowly
 scoped review exception. GitHub cannot prove a maintainer's local attestation or prevent the owner editing the rules;
 keep the scripts, payloads and procedure reviewable and audit settings after access changes.
+
+## Amendment: automatic sync PR CI (2026-10-22)
+
+The owner requested automatic CI for scheduled sync proposals. Keep the frozen proposal, workflow-change guard,
+reference/history checks, owner code review and separate local ROM verification. Replace only the publisher's
+credential. The App requests Contents and Pull requests write explicitly; it never posts even a pending local
+verification status, and it never approves or merges. GitHub's Pull requests write permission is broader than PR
+creation, so the trusted publisher's small command surface and protected-main rules remain part of the boundary.
+[SYNC.md](../SYNC.md#set-up-the-dedicated-sync-app) records exact setup and failure behavior.

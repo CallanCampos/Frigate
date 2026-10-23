@@ -86,8 +86,8 @@ name, and the decision is otherwise unchanged.
   merge would conflict there. Upstream's `build.yml`, which fetches the ROMs with a key the port repository doesn't
   have, is turned off there with `gh workflow disable` rather than edited.
 - **Staying current.** The hourly Action proposes one bounded upstream merge PR, preserving full upstream history
-  and port adaptations. It leaves a pending PR unchanged. The owner reviews imported changes, approves public PR CI,
-  and validates both ROM SHA1s and native tests on the exact PR head before merge. The local sync opens topic PRs
+  and port adaptations. It leaves a pending PR unchanged; the dedicated App starts public PR CI automatically.
+  The owner reviews and approves imported changes, and validates both ROM SHA1s and native tests on the exact PR head before merge. The local sync opens topic PRs
   too; no sync pushes `main`. Contributors and maintainer feature work start from Frigate's reviewed `main`.
   [SYNC.md](SYNC.md) gives the procedures; [ADR 0018](adr/0018-protected-main-and-sync-prs.md) supersedes direct sync
   publishing and defines the two rulesets that protect `main`.

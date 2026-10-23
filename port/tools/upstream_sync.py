@@ -12,7 +12,6 @@ import subprocess
 import sys
 
 REPO = 'CallanCampos/Frigate'
-CONTEXT = 'Frigate local verification'
 PREFIX = 'codex/upstream-sync-'
 REFERENCE = re.compile(r'[\w.-]+/[\w.-]+#\d+|github\.com/[^/\s]+/[^/\s]+/(?:issues|pull|discussions)/\d+', re.I)
 
@@ -40,19 +39,13 @@ def validate_branch(branch):
     git('check-ref-format', '--branch', branch)
 
 
-def status(head, state):
-    run('gh', 'api', '--method', 'POST', f'repos/{REPO}/statuses/{head}', '-f', f'state={state}', '-f', f'context={CONTEXT}', '-f', 'description=' + ('Both ROM SHA1s and host build/tests verified locally' if state == 'success' else 'Maintainer must verify both ROM SHA1s and host build/tests'))
-
-
 def publish(branch):
     validate_branch(branch)
-    head = git('rev-parse', 'HEAD')
     existing = pending()
     if existing and any(p['headRefName'] != branch for p in existing):
         raise RuntimeError('A bounded upstream sync PR is already pending: ' + existing[0]['url'])
     # Ordinary push only: updates can never replace previously published history.
     subprocess.run(['git', 'push', 'origin', f'HEAD:refs/heads/{branch}'], check=True)
-    status(head, 'pending')
     if existing:
         print(existing[0]['url'])
         return
@@ -60,7 +53,7 @@ def publish(branch):
     if os.environ.get('GITHUB_ACTIONS') != 'true' and run('gh', 'api', 'user', '--jq', '.login').lower() == 'callancampos':
         reviewer = []
     print(gh('pr', 'create', '--base', 'main', '--head', branch, *reviewer, '--title', 'Merge upstream decomp updates', '--body',
-             'Bounded upstream merge preserving Frigate changes. Review the full merge and approve the PR workflows. '
+             'Bounded upstream merge preserving Frigate changes. Review the full merge and its PR CI results. '
              'Before merging, a maintainer must run the local sync on this exact head to verify both ROM SHA1s and the host build/tests. '
              'The hourly sync leaves this PR unchanged while it is open.'))
 
