@@ -100,6 +100,10 @@ static inline void SetBit(u8 *bits, u16 index) {
     bits[index >> 3] |= (u8)(1 << (index & 7));
 }
 
+static inline void ClearBit(u8 *bits, u16 index) {
+    bits[index >> 3] &= (u8)((1 << (index & 7)) ^ 0xff);
+}
+
 static inline BOOL CheckBit(const u8 *bits, u16 index) {
     if (bits[index >> 3] & (1 << (index & 7))) {
         return TRUE;
@@ -112,6 +116,11 @@ static inline void SetSpeciesBit(u8 *bits, u16 species) {
     u16 bit = species - 1;
 
     bits[bit >> 3] |= (u8)(1 << (bit & 7));
+}
+
+static inline void ClearSpeciesBit(u8 *bits, u16 species) {
+    species--;
+    bits[species >> 3] &= (u8)((1 << (species & 7)) ^ 0xff);
 }
 
 static inline BOOL CheckSpeciesBit(const u8 *bits, u16 species) {
@@ -138,6 +147,15 @@ static inline BOOL CheckSeen(const PokeDexSave *pokedex, u16 kind, u16 species) 
 
 static inline BOOL CheckShown(const PokeDexSave *pokedex, u16 kind, u16 species) {
     return CheckSpeciesBit(pokedex->shown + kind * POKEDEX_SPECIES_BYTES, species);
+}
+
+// The lists of the forms and the species shown, of normal or shiny Pokémon and of a kind
+static inline u8 *ShownFormList(PokeDexSave *pokedex, u32 rare) {
+    return pokedex->shownForms + rare * POKEDEX_FORM_BYTES;
+}
+
+static inline u8 *ShownSpeciesList(PokeDexSave *pokedex, u32 kind) {
+    return pokedex->shown + kind * POKEDEX_SPECIES_BYTES;
 }
 
 static BOOL PML_PkmIsBadMonsNo(u16 species) {
@@ -332,35 +350,25 @@ u16 PokeDex_GetLastSpecies(PokeDexSave *pokedex) {
 }
 
 void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
-    int index = 0;
-    u32 i = 0;
+    u32 i;
     u32 j;
-    u8 *shown;
-    u16 bit;
-    u32 byte;
-    u32 flag;
-    u8 mask;
+    u32 index;
 
+    index = 0;
+    i = 0;
     do {
         if (species == pokemonFormList[i].species) {
-            u32 count = pokemonFormList[i].count;
-            u8 *normalForms = pokedex->shownForms;
-            u8 *rareForms = pokedex->shownForms + POKEDEX_FORM_BYTES;
-
-            for (j = 0; j < count; j++) {
-                u16 formBit = index + j;
-                u8 formMask = (1 << (formBit & 7)) ^ 0xff;
-
-                normalForms[formBit >> 3] &= formMask;
-                rareForms[formBit >> 3] &= formMask;
+            for (j = 0; j < pokemonFormList[i].count; j++) {
+                ClearBit(ShownFormList(pokedex, 0), index + j);
+                ClearBit(ShownFormList(pokedex, 1), index + j);
             }
-            if (form >= count) {
+            if (form >= pokemonFormList[i].count) {
                 form = 0;
             }
             if (rare == TRUE) {
-                SetBit(pokedex->shownForms + POKEDEX_FORM_BYTES, index + form);
+                SetBit(ShownFormList(pokedex, 1), index + form);
             } else {
-                SetBit(pokedex->shownForms, index + form);
+                SetBit(ShownFormList(pokedex, 0), index + form);
             }
             break;
         }
@@ -368,31 +376,26 @@ void addToDex(PokeDexSave *pokedex, u16 species, u32 sex, BOOL rare, u32 form) {
         i++;
     } while (pokemonFormList[i].species != 0);
 
-    bit = species - 1;
-    shown = pokedex->shown;
-    byte = bit >> 3;
-    flag = 1 << (bit & 7);
-    mask = flag ^ 0xff;
     for (i = 0; i < POKEDEX_KIND_COUNT; i++) {
-        shown[i * POKEDEX_SPECIES_BYTES + byte] &= mask;
+        ClearSpeciesBit(ShownSpeciesList(pokedex, i), species);
     }
     if (sex == GENDER_MALE) {
         if (rare == TRUE) {
-            pokedex->shown[POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit(ShownSpeciesList(pokedex, POKEDEX_KIND_RARE_MALE), species);
         } else {
-            pokedex->shown[POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit(ShownSpeciesList(pokedex, POKEDEX_KIND_MALE), species);
         }
     } else if (sex == GENDER_FEMALE) {
         if (rare == TRUE) {
-            pokedex->shown[POKEDEX_KIND_RARE_FEMALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit(ShownSpeciesList(pokedex, POKEDEX_KIND_RARE_FEMALE), species);
         } else {
-            pokedex->shown[POKEDEX_KIND_FEMALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit(ShownSpeciesList(pokedex, POKEDEX_KIND_FEMALE), species);
         }
     } else {
         if (rare == TRUE) {
-            pokedex->shown[POKEDEX_KIND_RARE_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit(ShownSpeciesList(pokedex, POKEDEX_KIND_RARE_MALE), species);
         } else {
-            pokedex->shown[POKEDEX_KIND_MALE * POKEDEX_SPECIES_BYTES + byte] |= (u8)flag;
+            SetSpeciesBit(ShownSpeciesList(pokedex, POKEDEX_KIND_MALE), species);
         }
     }
 }

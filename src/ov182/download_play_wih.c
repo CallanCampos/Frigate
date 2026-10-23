@@ -107,7 +107,7 @@ static BOOL func_ov182_021b9cc0(void) {
     WMErrCode result;
 
     func_ov182_021b9be4(WIH_STATE_BUSY);
-    wepMode = gWork.work->unk_13ac(gWork.work->wepKey);
+    wepMode = gWork.work->unk_13ac(gWork.work->wepKey, &gWork.work->sParentParam);
     result = WM_SetWEPKey(func_ov182_021b9d04, wepMode, gWork.work->wepKey);
     if (result != WM_ERRCODE_OPERATING) {
         func_ov182_021b9c34(result);
@@ -597,10 +597,12 @@ BOOL func_ov182_021ba42c(void) {
     gWork.work->sParentParam.userGameInfo = NULL;
     gWork.work->sParentParam.userGameInfoLength = 0;
     gWork.work->sScanFilter = NULL;
-    if (func_ov182_021ba48c()) {
+    switch (func_ov182_021ba48c()) {
+    case FALSE:
+        return FALSE;
+    default:
         return TRUE;
     }
-    return FALSE;
 }
 
 // The wireless indication callback: an error that it cannot recover from ends the game
@@ -651,7 +653,6 @@ static void func_ov182_021ba4c0(void *arg) {
 BOOL func_ov182_021ba4f8(u16 mode, u16 tgid, u16 channel) {
     if (gWork.work->sysState != WIH_STATE_IDLE) {
         OS_Terminate();
-        return FALSE;
     }
     gWork.work->recvBufSize = 0x180;
     gWork.work->sendBufSize = 0xe0;

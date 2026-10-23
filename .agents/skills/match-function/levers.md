@@ -250,8 +250,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
-- Rail movement's cached line/length allocation differs between caller snapshots passed as parameters and snapshots
-  owned by directional inlines; the latter improves the still-partial function. (matching.md: "snapshot ownership")
+- A dispatcher's `static inline` handlers allocating unlike the original: write them as the arms of the one function,
+  each arm's locals in its block. (matching.md: "Four `static inline` handlers")
 - A local slotted above the temporaries where the original's value sits among them: the expression written at each
   use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
 - A NitroSystem (2.0/sp2) function's spill slots in another order: locals are slotted function scope first, then

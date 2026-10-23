@@ -919,13 +919,12 @@ Same code, other `sp` offsets or frame size.
   `static inline MysteryCardView_LoadIcon` that declares `arc` itself. A call's result held in a local before it
   is passed on (`date = MysteryCard_GetDateBitmap(card); GFL_BitmapCopy(date, ...)`) also moves the next
   argument's common subexpressions after the call, where the nested call computes them before it.
-- `RailUnit_MoveOnLine` allocates its cached line and length differently when its four directional inlines read
-  them from `unit` at entry instead of receiving caller snapshots as parameters. Both versions then consume the
-  original's total 0x80 stack bytes: six pushed words plus 0x68, against five plus 0x6c in the ROM. The forward
-  path keeps length in `r7`; the other three still spill it. The call-labelled aligned difference falls from
-  608 to 348 rows, but the function grows from 0x890 to 0x894 against 0x888, so it remains partial. This is evidence
-  for allocation changing with snapshot ownership, not proof of original inline boundaries. Moving the reads
-  crosses only scalar direction helpers; every snapshot still precedes calls that can change the unit.
+- Four `static inline` handlers called from one dispatcher do not allocate like the same code written as the arms of
+  one function: `field_rail.c`'s `RailUnit_MoveOnLine` matches only with the line and length read once at the top
+  and each direction's code in its own `if` arm, with the arm's points and lines declared in the arm and each
+  candidate line's length and width in the block that uses them. As four inlines it was 0x894 against 0x888 with
+  over 300 aligned rows, whatever the snapshots' ownership. The width compared with `MATH_ABS(unit->side)` is an
+  `s32` local of its block; held in the `u32` direction local it gives `blo` for `blt`.
 - A constant held in a stack slot and loaded at each use, where ours builds it with `movs` and keeps a copy in a
   saved register, can be an inlined helper's parameter passed that constant: MWCC sets the parameter as a copy of
   a register holding the value and spills it, then loads the value from its slot where the code needs it. Overlay

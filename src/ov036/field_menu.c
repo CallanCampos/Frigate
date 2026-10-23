@@ -148,7 +148,8 @@ static inline GXRgb FieldMenu_InterpolateCursorColor(const FieldMenuCursorColor 
     s32 blue = phase * (end->blue - start->blue) / FX32_CONST(2) + start->blue;
     s32 green = phase * (end->green - start->green) / FX32_CONST(2) + start->green;
 
-    return GX_RGB(red, green, blue);
+    // Packed by hand rather than with GX_RGB: the original combines blue and green before red.
+    return (GXRgb)(red | ((blue << 10) | (green << 5)));
 }
 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu);

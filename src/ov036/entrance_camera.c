@@ -659,7 +659,12 @@ void EntranceCamera_ConfigureDefaultDeparture(EntranceCamera *camera) {
         }
         FieldCameraAnimationController_PrepareCamera(camera->controller);
         FieldCamera_GetAnimationCoords(camera->camera, &animation->src);
-        FieldCamera_GetAnimationCoords(camera->camera, dst);
+        {
+            // Never read: a leftover whose zeroing the compiler keeps
+            VecFx32 unused = { 0, 0, 0 };
+
+            FieldCamera_GetAnimationCoords(camera->camera, dst);
+        }
         switch (dir) {
         case DIR_UP:
             dst->distance = 0x2d << 14;

@@ -69,8 +69,8 @@ extern const char data_ov182_021c1ab4[]; // the finalize ends what the helper is
 typedef void (*WHLogPrint)(u32 level, const char *format, ...);
 // What the scan calls with each child that connects, to say whether it may stay
 typedef BOOL (*WHScanFilter)(WMStartParentCallback *info);
-// What fills the WEP key of the work and gives the mode to set the wireless to
-typedef u16 (*WHWepKeySetup)(u16 *key);
+// What fills the WEP key of the work, given the parent parameter, and gives the mode to set the wireless to
+typedef u16 (*WHWepKeySetup)(u16 *key, const WMParentParam *parentParam);
 
 // The helper's work, which the DS Download Play parent allocates: DownloadPlayWork's loaderContext is one of these,
 // and the parent's own state fills the gap between the two ends of it

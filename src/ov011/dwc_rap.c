@@ -225,7 +225,6 @@ static void DWCRap_Delete(void) {
 
 // Connects to the internet, logs in, and updates the friend list
 static u32 DWCRap_UpdateLogin(void) {
-    u16 name[2];
     OSOwnerInfo owner;
     DWCFriendData *friendList;
     int friendListLen;
@@ -263,10 +262,12 @@ static u32 DWCRap_UpdateLogin(void) {
         }
         DWC_InitFriendsMatch(_dWork->userData, 0x2fc6, "tXH2sN", 0, 0, friendList, friendListLen);
         _dWork->friendsMatchActive = 1;
-        name[0] = 0;
-        name[1] = 0;
-        OS_GetOwnerInfo(&owner);
-        DWC_LoginAsync(name, NULL, DWCRap_LoginCallback, NULL);
+        {
+            u16 name[2] = { 0, 0 };
+
+            OS_GetOwnerInfo(&owner);
+            DWC_LoginAsync(name, NULL, DWCRap_LoginCallback, NULL);
+        }
         DWCRap_SetState(DWCRAP_STATE_LOGIN);
         // fall through
     case DWCRAP_STATE_LOGIN:
