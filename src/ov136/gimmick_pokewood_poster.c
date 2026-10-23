@@ -95,7 +95,7 @@ static void PokewoodPoster_StepAnimations(GimmickWork *work) {
 static void PokewoodPoster_LoadPoster(GimmickWork *work, u32 poster) {
     HeapID heapId = HEAPID_TAIL(Field_GetHeapID(work->field));
     PokewoodSave *save = PokewoodSave_Get(GSYS_GetGameData(Field_GetGameSystem(work->field)));
-    void *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
+    G3DResource *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
     int series = PokewoodSave_GetLastSeries(save, poster);
 
     if (series > 0) {

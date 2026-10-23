@@ -175,7 +175,7 @@ G3DResource *GFL_G3DMdlGetTexResource(G3DModel *model);
 G3DAnimation *GFL_G3DAnmCreate(G3DModel *model, G3DResource *resource, u32 a2);
 void GFL_G3DAnmFree(G3DAnimation *animation);
 NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(G3DAnimation *animation);
-G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count);
+G3DActor *GFL_G3DActorCreate(G3DModel *model, G3DAnimation **animations, int count);
 void GFL_G3DActorFree(G3DActor *actor);
 
 G3DLight *GFL_G3DLightCreate(const LightSetupList *setup, HeapID heapId);

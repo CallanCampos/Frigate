@@ -20,14 +20,14 @@ typedef struct {
 
 typedef struct {
     G3DActor *actor;
-    void *anms[4];
+    G3DAnimation *anms[4];
     G3DModel *mdl;
 } FesKiraObj;
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes[4];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[4];
     FesKiraObj obj;
     FesKiraSpec spec;
 } FieldEffectFesKira;

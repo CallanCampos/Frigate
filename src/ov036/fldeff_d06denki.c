@@ -16,9 +16,9 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes[D06DENKI_MDL_COUNT];
-    void *anmRes[D06DENKI_ANM_COUNT];
-    void *anm;
+    G3DResource *mdlRes[D06DENKI_MDL_COUNT];
+    G3DResource *anmRes[D06DENKI_ANM_COUNT];
+    G3DAnimation *anm;
     G3DModel *mdl;
     G3DActor *actor;
 } FieldEffectD06Denki;
@@ -51,7 +51,7 @@ typedef struct {
     u8 lit;
     u8 litDone;
     G3DActor *stoneActor;
-    void *anms[2];
+    G3DAnimation *anms[2];
     G3DModel *stoneMdl;
     VecFx32 glowPos;
     G3DActor *glowActor;
@@ -63,7 +63,7 @@ typedef struct {
     VecFx32 pos;
     u8 lit;
     G3DActor *actor;
-    void *anms[2];
+    G3DAnimation *anms[2];
     G3DModel *mdl;
 } MarkTask;
 

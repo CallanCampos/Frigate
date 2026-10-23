@@ -807,7 +807,7 @@ void CtvtGame_LoadBalloonPictures(CtvtGame *game, u8 netId, u8 color) {
     }
     for (i = 0; i < 3; i++) {
         u16 count = GFL_G3DMgrGetSceneResCount(game->g3d, game->scenes[netId]);
-        void *resource = GFL_G3DMgrGetResource(game->g3d, i + count * netId);
+        G3DResource *resource = GFL_G3DMgrGetResource(game->g3d, i + count * netId);
 
         dest = NNS_GfdGetTexKeyAddr(GFL_G3DResGetTexVRAMHandle(resource)) + 0x2000 / 32;
         if (selfNetId == color) {
@@ -2312,7 +2312,7 @@ static void CtvtGame_InitResults(CommTvtWork *sys, CtvtGame *game) {
     for (netId = 0; netId < 4; netId++) {
         for (j = 0; j < 2; j++) {
             u16 count = GFL_G3DMgrGetSceneResCount(game->g3d, game->scenes[netId]);
-            void *resource = GFL_G3DMgrGetResource(game->g3d, j + count * netId);
+            G3DResource *resource = GFL_G3DMgrGetResource(game->g3d, j + count * netId);
 
             NNSGfdTexKey key = GFL_G3DResGetTexVRAMHandle(resource);
 

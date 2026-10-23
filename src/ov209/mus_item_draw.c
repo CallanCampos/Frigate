@@ -139,11 +139,11 @@ BOOL MusItemDraw_GetItemFlag9(MusItemDraw *item) {
     return MusItemData_GetFlag9(item->data);
 }
 
-void *MusItemDraw_LoadTexResource(u16 itemId) {
+G3DResource *MusItemDraw_LoadTexResource(u16 itemId) {
     return GFL_G3DSysReadArcSysResource(ARCID_MUSICAL_ITEM, MusItemDraw_GetTexFileId(itemId));
 }
 
-void MusItemDraw_FreeTexResource(void *resource) {
+void MusItemDraw_FreeTexResource(G3DResource *resource) {
     GFL_G3DResFree(resource);
 }
 
@@ -161,7 +161,7 @@ static u16 MusItemDraw_GetFreeIndex(MusItemDrawSys *sys) {
     return i;
 }
 
-MusItemDraw *MusItemDraw_AddItem(MusItemDrawSys *sys, u16 itemId, void *texResource, const VecFx32 *pos) {
+MusItemDraw *MusItemDraw_AddItem(MusItemDrawSys *sys, u16 itemId, G3DResource *texResource, const VecFx32 *pos) {
     int index = MusItemDraw_GetFreeIndex(sys);
     u32 size;
     u8 width;
@@ -233,7 +233,7 @@ void MusItemDraw_ChangeItem(MusItemDrawSys *sys, MusItemDraw *item, u16 itemId, 
     item->update = TRUE;
 }
 
-void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, void *texResource) {
+void MusItemDraw_SetShadowPalette(MusItemDrawSys *sys, MusItemDraw *item, G3DResource *texResource) {
     if (item->shadow == FALSE) {
         u32 plttAddr;
         NNSGfdPlttKey plttKey;

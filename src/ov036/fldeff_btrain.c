@@ -12,8 +12,8 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes[BTRAIN_COUNT];
-    void *anmRes[BTRAIN_ANM_COUNT];
+    G3DResource *mdlRes[BTRAIN_COUNT];
+    G3DResource *anmRes[BTRAIN_ANM_COUNT];
     G3DModel *mdl[BTRAIN_COUNT];
 } FieldEffectBTrain;
 
@@ -31,7 +31,7 @@ typedef struct {
     FieldEffectBTrain *effect;
     u32 trainIdx;
     G3DActor *actor;
-    void *anm[BTRAIN_ANM_COUNT];
+    G3DAnimation *anm[BTRAIN_ANM_COUNT];
 } BTrainTask;
 
 static void func_ov036_021c64d0(FieldEffectBTrain *effect, u32 trainIdx);

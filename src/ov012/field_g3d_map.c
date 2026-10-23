@@ -91,7 +91,7 @@ void FieldChunk_LoadFullSync(FieldChunk *chunk) {
     chunk->disableStreamer = FALSE;
 }
 
-BOOL FieldChunk_Draw(FieldChunk *chunk, void *camera) {
+BOOL FieldChunk_Draw(FieldChunk *chunk, G3DCamera *camera) {
     BOOL drawn = FALSE;
 
     if (FieldChunk_RenderMap(chunk) == TRUE) {
@@ -313,7 +313,7 @@ BOOL FieldChunk_RenderMap(FieldChunk *chunk) {
     return drawn;
 }
 
-void FieldChunk_RenderProps(FieldChunk *chunk, void *camera) {
+void FieldChunk_RenderProps(FieldChunk *chunk, G3DCamera *camera) {
     FieldPropResInstanceHandle *handles = chunk->propResBank->handles;
     u32 count = chunk->propResBank->count;
     s32 i;

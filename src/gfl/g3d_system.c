@@ -664,7 +664,7 @@ G3DAnimation *GFL_G3DAnmCreate(G3DModel *model, G3DResource *resource, u32 anmId
     NNSG3dResTex *tex = NULL;
     void *anm;
     NNSG3dResMdl *mdl;
-    void *data;
+    NNSG3dResFileHeader *data;
 
     animation->magic = G3D_ANM_MAGIC;
     data = resource->data;
@@ -691,7 +691,7 @@ NNSG3dAnmObj *GFL_G3DAnmGetRenderObj(G3DAnimation *animation) {
     return animation->anmObj;
 }
 
-G3DActor *GFL_G3DActorCreate(G3DModel *model, void **animations, int count) {
+G3DActor *GFL_G3DActorCreate(G3DModel *model, G3DAnimation **animations, int count) {
     G3DActor *actor = GFL_HeapAllocate(g_G3DSystem.sys->heapId, sizeof(G3DActor), FALSE, "g3d_system.c", 1882);
     int i;
 

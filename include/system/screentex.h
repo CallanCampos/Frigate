@@ -18,7 +18,7 @@ enum {
 };
 
 // A texture resource of one 256x192 direct color texture, at the capture bank in the texture VRAM
-void *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank);
+G3DResource *GFL_G3DScreenTexCreate(HeapID heapId, u32 bank);
 // Captures the screen to the bank over the next frames, then copies it to destBank if that is another bank
 void GFL_G3DScreenTexCapture(u32 bank, u32 destBank);
 // Draws the actor with a fixed camera that looks at it from the front, turned a quarter around the X axis

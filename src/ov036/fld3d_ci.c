@@ -1031,7 +1031,7 @@ static BOOL EventFieldEffectPokeSpriteSub_ControlEffect(GameEvent *event, Fld3DC
 static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
     PokeSpriteParam *param;
     HeapID heapId = ci->heapId;
-    void *res;
+    G3DResource *res;
     u8 *charRaw;
     u8 *pixels;
     int i;
@@ -1157,7 +1157,7 @@ static BOOL func_ov036_021bc838(u16 effectId) {
 
 static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *palName, u32 charFile, u32 palFile,
                                  u8 width, u8 height, u8 srcStride, u8 srcOffset, u8 resource, u8 palOffset) {
-    void *res;
+    G3DResource *res;
     NNSG3dResTex *tex;
     u32 texAddr;
     u32 palAddr;
@@ -1387,7 +1387,7 @@ static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDat
                                                       const char *texName, const char *palName, u32 messageId,
                                                       u16 color, u16 color2, BOOL measure) {
     MsgData *msgData;
-    void *res = GFL_G3DMgrGetResource(ci->mgr, 0);
+    G3DResource *res = GFL_G3DMgrGetResource(ci->mgr, 0);
     HeapID heapId = ci->heapId;
     u16 *raw;
     StrBuf *str;

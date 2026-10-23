@@ -491,7 +491,7 @@ void FieldPropResource_Free(FieldPropResource *resource) {
 void FieldPropResInstance_Init(FieldPropSystem *system, FieldPropResInstance *instance, FieldPropResource *resource) {
     FieldPropResAnmHeader *header = FieldPropResInfo_GetAnmHeader(resource->info);
     G3DModel *model = GFL_G3DMdlCreate(resource->model, 0, system->textureResource);
-    void *animations[4];
+    G3DAnimation *animations[4];
     s32 i;
     FieldPropAnmControllerType type;
 
@@ -552,7 +552,7 @@ void FieldPropAnmController_RTC_Init(FieldPropSystem *system, FieldPropResInstan
 
 void FieldPropResInstance_Free(FieldPropResInstance *instance) {
     G3DModel *model;
-    void *animation;
+    G3DAnimation *animation;
     s32 count;
     s32 i;
 
@@ -685,7 +685,7 @@ void FieldPropResInstance_AnmSetPlayInv(FieldPropResInstance *instance, u32 anim
     s32 i;
     u32 offset;
     u32 index;
-    void *animationObj;
+    G3DAnimation *animationObj;
     NNSG3dAnmObj *renderObj;
     fx32 frame;
 

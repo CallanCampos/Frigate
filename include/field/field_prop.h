@@ -73,8 +73,8 @@ struct FieldPropResInfo {
 // A prop's loaded resources, 0x18 bytes. Layout from swan.
 struct FieldPropResource {
     FieldPropResInfo *info;
-    void *model;
-    void *animations[4];
+    G3DResource *model;
+    G3DResource *animations[4];
 };
 
 // A prop placed in a chunk's data. Layout from swan's field_static_prop.h.
@@ -141,7 +141,7 @@ struct FieldPropSystem {
 };
 
 struct FieldPropResInstance {
-    void *actor;
+    G3DActor *actor;
     FieldPropResource *resource;
     u32 animationState[4];
 };

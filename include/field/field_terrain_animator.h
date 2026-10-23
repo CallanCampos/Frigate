@@ -28,14 +28,14 @@ typedef struct {
     u16 idPat;
 } FieldTerrainAnimatorSetup;
 
-FieldTerrainAnimator *FieldTerrainAnimator_Create(const FieldTerrainAnimatorSetup *setup, void *mapTextures,
+FieldTerrainAnimator *FieldTerrainAnimator_Create(const FieldTerrainAnimatorSetup *setup, G3DResource *mapTextures,
                                                   HeapID heapId);
 void FieldTerrainAnimator_Free(FieldTerrainAnimator *animator);
 void FieldTerrainAnimator_Update(FieldTerrainAnimator *animator);
 FieldTerrainSRTAnimatorChunkState *FieldTerrainAnimator_GetChunkState(FieldTerrainAnimator *animator, u32 chunkIndex);
 // Binds the chunk's SRT animation to its model and textures, in the render object
-void FieldTerrainSRTAnimatorChunkState_Bind(FieldTerrainSRTAnimatorChunkState *state, void *model, void *textures,
-                                            NNSG3dRenderObj *renderObj);
+void FieldTerrainSRTAnimatorChunkState_Bind(FieldTerrainSRTAnimatorChunkState *state, G3DResource *model,
+                                            G3DResource *textures, NNSG3dRenderObj *renderObj);
 void FieldTerrainSRTAnimatorChunkState_ClearUsedFlag(FieldTerrainSRTAnimatorChunkState *state);
 
 #endif // POKEBW2_FIELD_FIELD_TERRAIN_ANIMATOR_H

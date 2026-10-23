@@ -136,11 +136,11 @@ typedef struct {
 
 // A 3D model with two animations
 typedef struct {
-    void *resource;
-    void *animationResources[2];
+    G3DResource *resource;
+    G3DResource *animationResources[2];
     G3DModel *model;
     G3DActor *actor;
-    void *animations[2];
+    G3DAnimation *animations[2];
     SRTMatrix transform;
     int animation;
     BOOL animationDone;
@@ -699,7 +699,7 @@ static void IrcSyncCheck_G3DInit(void) {
 
 static void IrcSyncCheckModel_Init(IrcSyncCheckModel *model, ArcTool *arc, const u16 *fileIds, u32 polygonId,
                                    HeapID heapId) {
-    void *texture;
+    G3DResource *texture;
     NNSG3dRenderObj *renderObj;
     int i;
 

@@ -161,7 +161,7 @@ void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper) {
     }
 }
 
-void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass) {
+void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass) {
     VecFx32 savedPos;
     VecFx32 pos;
     u32 index;
@@ -782,7 +782,7 @@ ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper) {
     return mapper->resortMap;
 }
 
-FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, void *mapTextures,
+FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId) {
     GND_ANIME_WK.chunkCapacity = chunkCapacity;
     if (anmInfo->srtAnimeId == 0xffffffff) {

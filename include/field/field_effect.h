@@ -125,7 +125,7 @@ void func_ov036_021a3ad4(FieldEffectTask *task, VecFx32 *pos);
 void func_ov036_021a3ae8(FieldEffectTask *task, const VecFx32 *pos);
 void *func_ov036_021a3afc(FieldEffectTask *task);
 void FieldEffects_SetLuminanceTable(FieldEffects *effects, const u8 *table);
-void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, void *resource);
+void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, G3DResource *resource);
 
 // fldeff_namipoke.c: the Pokémon an actor surfs on, facing dir at pos, and how it follows the actor (0: it doesn't, 1:
 // it bobs under the actor, 2: the actor's offset is left alone), which can change; and whether its wake shows

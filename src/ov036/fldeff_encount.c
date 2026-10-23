@@ -29,15 +29,15 @@ typedef struct {
 
 typedef struct {
     G3DActor *actor;
-    void *anms[4];
+    G3DAnimation *anms[4];
     G3DModel *mdl;
 } EncountEffectObj;
 
 typedef struct {
     FieldEffects *effects;
     u32 unk04;
-    void *mdlRes[4];
-    void *anmRes[4];
+    G3DResource *mdlRes[4];
+    G3DResource *anmRes[4];
     EncountEffectObj objs[4];
     EncountEffectSpec spec;
 } FieldEffectEncount;

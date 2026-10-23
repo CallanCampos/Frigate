@@ -32,7 +32,7 @@ enum {
 typedef struct {
     FieldActor *actor;
     G3DModel *model;
-    void *anm;
+    G3DAnimation *anm;
     G3DActor *g3dActor;
     u16 serial; // the oldest is freed when there is no room
     u16 frame;
@@ -40,15 +40,15 @@ typedef struct {
 
 typedef struct {
     UnionEffSlot slot[FOCUS_SLOT_MAX];
-    void *res_nsbmd;
-    void *res_nsbca;
+    G3DResource *res_nsbmd;
+    G3DResource *res_nsbca;
     u16 serial;
 } FocusMan;
 
 typedef struct {
     UnionEffSlot slot[MARK_SLOT_MAX];
-    void *res_nsbmd_tomo;
-    void *res_nsbmd_asonda;
+    G3DResource *res_nsbmd_tomo;
+    G3DResource *res_nsbmd_asonda;
     u16 serial;
 } MarkMan;
 
