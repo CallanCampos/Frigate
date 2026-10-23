@@ -2748,9 +2748,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ten-line ARM function does the same with any plain statement there. A statement that ends in a conditional branch
   doesn't: of `if (sEnableEchoCancel) { vct_set_speaker_samples(dst, size); }` written in both arms only the calls are merged, and
   each arm keeps its own test. The original's separate `bl; b exit` in libVCT's `VCT_ReceiveAudio` (`vct_audio.c`),
-  whose next statement is that test, came back only with a statement ending the outer then-arm that emits nothing
-  but keeps its block, `heard = received;` between two flags that share a register, which only shapes code there
-  (its row).
+  whose next statement is that test, comes back with the library's own inline, `vct_receive_mixed_audio`, returning
+  from each arm of its size test: `return heard;` ends the then-arm and `return FALSE;` the else-arm. Inlined, the
+  then-arm's return is a copy into the result, which emits nothing but keeps the arm's block, so the inner clear
+  doesn't reach the join directly. With libVCT 1.3.1's single `return flag;` after the `if`/`else`, the two
+  clears merge (0x118 against 0x11c). The game's libVCT is 1.4.1 (`vct_version.c`).
 - A field set to a different constant at the end of each arm of an `if`/`else` is cross-jumped at its store: each
   arm loads the base and builds its constant in the same registers, and the first ends in `b` to the other's `str`.
   `dwc_rap.c`'s `DWCRap_Connect` stores `_dWork->matchType` so after each arm's call; a local set in each arm and
