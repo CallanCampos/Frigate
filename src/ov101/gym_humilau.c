@@ -43,8 +43,10 @@
 #define ACTOR_LEADER_WAVES 22
 
 // The platforms' models' animations: 0 floats, looping; 1 tilts the platform under the player's step
-#define ANM_FLOAT 0
-#define ANM_TILT 1
+enum {
+    ANM_FLOAT,
+    ANM_TILT,
+};
 
 // The platforms float this far below the ground
 #define PLATFORM_Y FX32_CONST(-4)

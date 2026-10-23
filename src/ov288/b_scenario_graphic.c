@@ -43,8 +43,10 @@
 #define BG_PAGES 7
 
 #define TEXT_COLOR 0x440
-#define ALIGN_CENTER 2
-#define ALIGN_RIGHT 1
+enum {
+    ALIGN_RIGHT = 1,
+    ALIGN_CENTER,
+};
 
 #define PALETTE_KEEP (-1)
 

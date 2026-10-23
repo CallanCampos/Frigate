@@ -28,10 +28,12 @@
 // guessed
 
 // The modes that the connection screen is entered with
-#define ENTER_MODE_LOGIN 0x13
-#define ENTER_MODE_LOGOUT 0x14
-// Logging in again after an error
-#define ENTER_MODE_RELOGIN 0x15
+enum {
+    ENTER_MODE_LOGIN = 0x13,
+    ENTER_MODE_LOGOUT,
+    // Logging in again after an error
+    ENTER_MODE_RELOGIN,
+};
 
 // The connection screen's steps
 enum {

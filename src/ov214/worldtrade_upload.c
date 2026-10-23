@@ -106,18 +106,22 @@ enum {
 };
 
 // What the screen was started for
-#define UPLOAD_MODE_UPLOAD 7
-#define UPLOAD_MODE_DOWNLOAD 8
-#define UPLOAD_MODE_EXCHANGE 9
-#define UPLOAD_MODE_DOWNLOAD_EX 10
-#define UPLOAD_MODE_SERVER_CHECK 11
-#define UPLOAD_MODE_POKEMON_EVO_SAVE 12
+enum {
+    UPLOAD_MODE_UPLOAD = 7,
+    UPLOAD_MODE_DOWNLOAD,
+    UPLOAD_MODE_EXCHANGE,
+    UPLOAD_MODE_DOWNLOAD_EX,
+    UPLOAD_MODE_SERVER_CHECK,
+    UPLOAD_MODE_POKEMON_EVO_SAVE,
+};
 
 // How the trade demo is started
-#define DEMO_MODE_UPLOAD 7
-#define DEMO_MODE_DOWNLOAD 8
-#define DEMO_MODE_EXCHANGE 9
-#define DEMO_MODE_DOWNLOAD_EX 10
+enum {
+    DEMO_MODE_UPLOAD = 7,
+    DEMO_MODE_DOWNLOAD,
+    DEMO_MODE_EXCHANGE,
+    DEMO_MODE_DOWNLOAD_EX,
+};
 
 // How the connection screen is started to log in again
 #define ENTER_MODE_RELOGIN 0x15

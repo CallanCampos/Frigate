@@ -25,9 +25,11 @@
 #include "system/wipe.h"
 
 // Errors of the account screens' own, beside the server's
-#define PDWACC_ERROR_SERVICE_UNAVAILABLE 0xfff1
-#define PDWACC_ERROR_BAD_GATEWAY 0xfff2
-#define PDWACC_ERROR_HTTP 0xfff3
+enum {
+    PDWACC_ERROR_SERVICE_UNAVAILABLE = 0xfff1,
+    PDWACC_ERROR_BAD_GATEWAY,
+    PDWACC_ERROR_HTTP,
+};
 
 // The request that creates the account, sending the save data
 #define PDWACC_REQUEST_CREATE 9

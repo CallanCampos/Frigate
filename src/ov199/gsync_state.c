@@ -48,10 +48,12 @@
 #define HEAPID_GSYNC 0x62
 
 // Errors of Game Sync's own, beside the server's
-#define GSYNC_ERROR_DOWNLOAD 0xfff0
-#define GSYNC_ERROR_SERVICE_UNAVAILABLE 0xfff1
-#define GSYNC_ERROR_BAD_GATEWAY 0xfff2
-#define GSYNC_ERROR_HTTP 0xfff3
+enum {
+    GSYNC_ERROR_DOWNLOAD = 0xfff0,
+    GSYNC_ERROR_SERVICE_UNAVAILABLE,
+    GSYNC_ERROR_BAD_GATEWAY,
+    GSYNC_ERROR_HTTP,
+};
 
 // The kinds of file Game Sync downloads
 enum {

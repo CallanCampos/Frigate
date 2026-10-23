@@ -14,9 +14,11 @@
 // leaves them, named after the ROM's "t_download_save.c". The names are ours
 
 // Which version a tournament is for: only the one the game is, or both
-#define T_DOWNLOAD_KIND_WHITE2 0
-#define T_DOWNLOAD_KIND_BLACK2 1
-#define T_DOWNLOAD_KIND_BOTH 2
+enum {
+    T_DOWNLOAD_KIND_WHITE2,
+    T_DOWNLOAD_KIND_BLACK2,
+    T_DOWNLOAD_KIND_BOTH,
+};
 
 // The bit of the work's saveFlags that says save slot i holds a tournament
 #define T_DOWNLOAD_SAVE_FLAG_SLOT(i) (1 << ((i) + T_DOWNLOAD_SAVE_FLAG_SLOT_SHIFT))

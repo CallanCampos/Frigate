@@ -40,15 +40,19 @@
 
 // The fields of the info that JoinAvenue_GetParam reads and JoinAvenueInfo_SetParam sets: the avenue's rank, and the
 // popularity points toward the next rank
-#define RESORT_INFO_RANK 2
-#define RESORT_INFO_POPULARITY 3
+enum {
+    RESORT_INFO_RANK = 2,
+    RESORT_INFO_POPULARITY,
+};
 
 // The values of the ResortWork that the visits use: the group of the day's visits and their count, then a flag for
 // each of the eight people who has had a visit
-#define RESORT_WORK_GROUP 9
-#define RESORT_WORK_VISITS 10
-#define RESORT_WORK_MET_FIRST 11
-#define RESORT_WORK_MET_LAST 18
+enum {
+    RESORT_WORK_GROUP = 9,
+    RESORT_WORK_VISITS,
+    RESORT_WORK_MET_FIRST,
+    RESORT_WORK_MET_LAST = 18,
+};
 
 // The base of the messages of the page of a ranking in SCRIPT_TEXT_GLOBAL_10685
 #define RESORT_MSG_RANK_PAGE 2173

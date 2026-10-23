@@ -96,9 +96,11 @@ void MailBox_FreeWindows(MailBoxWork *work) {
     BmpWin_FreeAllocator();
 }
 
-#define MAILBOX_ALIGN_LEFT 0
-#define MAILBOX_ALIGN_RIGHT 1
-#define MAILBOX_ALIGN_CENTER 2
+enum {
+    MAILBOX_ALIGN_LEFT,
+    MAILBOX_ALIGN_RIGHT,
+    MAILBOX_ALIGN_CENTER,
+};
 
 // Starts printing a string into the window the state belongs to
 static void MailBox_PrintString(BmpWin *window, StrBuf *str, MailBoxPrintState *state, PrintQueue *queue, int x, int y,

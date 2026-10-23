@@ -23,11 +23,13 @@
 #define MODEL_WHITE_LEVEL 5
 #define MODEL_LEVEL_COUNT 10
 // The models of the effects
-#define MODEL_EFFECT_0 10
-#define MODEL_EFFECT_1 11
-#define MODEL_START_EFFECT 12
-#define MODEL_LEAVE_EFFECT 13
-#define MODEL_COUNT 14
+enum {
+    MODEL_EFFECT_0 = 10,
+    MODEL_EFFECT_1,
+    MODEL_START_EFFECT,
+    MODEL_LEAVE_EFFECT,
+    MODEL_COUNT,
+};
 
 // A level counts for one lit model every 6 levels, up to 4
 #define LEVELS_PER_STEP 6

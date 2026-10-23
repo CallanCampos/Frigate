@@ -43,31 +43,37 @@
 #define ARCID_ZUKAN_DATA 97
 
 // What the search's lists are of
-#define LIST_SPECIES 0
-#define LIST_NATURE 1
-#define LIST_ABILITY 2
-#define LIST_SEX 3
-#define LIST_ITEM 4
-#define LIST_MARKING 5
-#define LIST_SPECIES_LETTER 8
-#define LIST_LETTER 9
-#define LIST_ABILITY_LETTER 10
-#define LIST_LETTER_2 11
+enum {
+    LIST_SPECIES,
+    LIST_NATURE,
+    LIST_ABILITY,
+    LIST_SEX,
+    LIST_ITEM,
+    LIST_MARKING,
+    LIST_SPECIES_LETTER = 8,
+    LIST_LETTER,
+    LIST_ABILITY_LETTER,
+    LIST_LETTER_2,
+};
 
 // The criteria of Box2SearchParam that SetCriterion sets
-#define CRITERION_SPECIES 0
-#define CRITERION_ITEM 1
-#define CRITERION_NATURE 2
-#define CRITERION_ABILITY 3
-#define CRITERION_SEX 4
-#define CRITERION_MARKS 5
-#define CRITERION_ACTIVE 6
+enum {
+    CRITERION_SPECIES,
+    CRITERION_ITEM,
+    CRITERION_NATURE,
+    CRITERION_ABILITY,
+    CRITERION_SEX,
+    CRITERION_MARKS,
+    CRITERION_ACTIVE,
+};
 
-// The sequence that ends the search
-#define SEQ_END 39
-#define SEQ_LIST_WAIT 37
-#define SEQ_BUTTON_ANM 38
-#define SEQ_TOUCH_BAR_ANM 40
+enum {
+    SEQ_LIST_WAIT = 37,
+    SEQ_BUTTON_ANM,
+    // The sequence that ends the search
+    SEQ_END,
+    SEQ_TOUCH_BAR_ANM,
+};
 
 #define WINDOW_INFO 14
 

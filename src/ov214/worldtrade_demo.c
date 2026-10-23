@@ -21,10 +21,12 @@
 // ours, guessed
 
 // How the demo was reached, the screen's mode
-#define DEMO_MODE_UPLOAD 7
-#define DEMO_MODE_DOWNLOAD 8
-#define DEMO_MODE_EXCHANGE 9
-#define DEMO_MODE_DOWNLOAD_EX 10
+enum {
+    DEMO_MODE_UPLOAD = 7,
+    DEMO_MODE_DOWNLOAD,
+    DEMO_MODE_EXCHANGE,
+    DEMO_MODE_DOWNLOAD_EX,
+};
 
 // The upload screen's mode that saves the evolved Pokémon
 #define UPLOAD_MODE_POKEMON_EVO_SAVE 12

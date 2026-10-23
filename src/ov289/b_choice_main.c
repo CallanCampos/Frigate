@@ -54,8 +54,10 @@
 
 #define TEXT_X 0x70
 #define TEXT_COLOR 0x440
-#define ALIGN_CENTER 2
-#define ALIGN_RIGHT 1
+enum {
+    ALIGN_RIGHT = 1,
+    ALIGN_CENTER,
+};
 
 // The states of the choice screen
 enum {

@@ -47,10 +47,12 @@
 
 // The cell actors of a card, by index: the Pokémon, the player's badge and mark, the stars of the rank, and the held
 // items
-#define CARD_ACTOR_BADGE 7
-#define CARD_ACTOR_MARK 8
-#define CARD_ACTOR_STAR 9
-#define CARD_ACTOR_ITEM 15
+enum {
+    CARD_ACTOR_BADGE = 7,
+    CARD_ACTOR_MARK,
+    CARD_ACTOR_STAR,
+    CARD_ACTOR_ITEM = 15,
+};
 
 // The resources of the backdrop, by index: its palettes, characters and cells, of the main screen and then of the sub
 // screen

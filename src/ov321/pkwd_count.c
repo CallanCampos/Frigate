@@ -40,9 +40,11 @@
 #define LOAD_COUNT_MAX 8
 
 // The ways to align a text on its x
-#define ALIGN_LEFT 0
-#define ALIGN_RIGHT 1
-#define ALIGN_CENTER 2
+enum {
+    ALIGN_LEFT,
+    ALIGN_RIGHT,
+    ALIGN_CENTER,
+};
 
 // The flags of the work
 #define FLAG_WIPE_IN_DONE 0x1

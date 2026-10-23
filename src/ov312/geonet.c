@@ -65,16 +65,22 @@
 #define PLACE_MAX 1024
 
 // The marks: one for each UNITY_TOWER_REGION_* state but none, and the one at the middle of the screen
-#define MARK_CURSOR 4
-#define MARK_COUNT 5
+enum {
+    MARK_CURSOR = 4,
+    MARK_COUNT,
+};
 
-#define BUTTON_VIEW 0
-#define BUTTON_QUIT 1
-#define BUTTON_COUNT 2
+enum {
+    BUTTON_VIEW,
+    BUTTON_QUIT,
+    BUTTON_COUNT,
+};
 
-#define WINDOW_INFO 0
-#define WINDOW_PLACE 3
-#define WINDOW_COUNT 4
+enum {
+    WINDOW_INFO,
+    WINDOW_PLACE = 3,
+    WINDOW_COUNT,
+};
 
 // The frames' characters and palettes
 #define FRAME_MESSAGE_CHAR 4

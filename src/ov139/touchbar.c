@@ -36,9 +36,11 @@ enum {
 };
 
 // The resources of TouchBarGfx::res
-#define TOUCHBAR_RES_PALETTE 0
-#define TOUCHBAR_RES_CHARS 1
-#define TOUCHBAR_RES_CELL_ANIMS 2
+enum {
+    TOUCHBAR_RES_PALETTE,
+    TOUCHBAR_RES_CHARS,
+    TOUCHBAR_RES_CELL_ANIMS,
+};
 
 // An icon of the bar's own, by icon number
 typedef struct {

@@ -59,9 +59,11 @@
 
 // MusicalPoke.unk78 of a Pokémon that uses a hand prop when it appeals, and at random, often or now and then;
 // smaller values are the frame to use it on
-#define STA_ACTING_USE_ON_APPEAL 0xfffd
-#define STA_ACTING_USE_SOMETIMES 0xfffe
-#define STA_ACTING_USE_OFTEN 0xffff
+enum {
+    STA_ACTING_USE_ON_APPEAL = 0xfffd,
+    STA_ACTING_USE_SOMETIMES,
+    STA_ACTING_USE_OFTEN,
+};
 
 // How far the stage scrolls, and the curtain opens
 #define STA_ACTING_SCROLL_MAX 256

@@ -11,8 +11,10 @@
 #include "system/game_data.h"
 
 // The states of a download that wait for the download library
-#define DOWNLOAD_WAIT 100
-#define DOWNLOAD_WAIT_CLEANUP 200
+enum {
+    DOWNLOAD_WAIT = 100,
+    DOWNLOAD_WAIT_CLEANUP = 200,
+};
 // A wait that takes longer than this many frames times out
 #define DOWNLOAD_TIMEOUT 7200
 

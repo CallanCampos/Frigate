@@ -64,30 +64,36 @@
 #define BG_MESSAGE 4
 
 // The windows: the values, the options' names, the title, the explanation and the question
-#define WINDOW_COUNT 19
 #define LABEL_COUNT 16
-#define WINDOW_OPTION 11
-#define WINDOW_TITLE 16
-#define WINDOW_MESSAGE 17
-#define WINDOW_CONFIRM 18
+enum {
+    WINDOW_OPTION = 11,
+    WINDOW_TITLE = 16,
+    WINDOW_MESSAGE,
+    WINDOW_CONFIRM,
+    WINDOW_COUNT,
+};
 
 // The actors: the values' frames from ACTOR_ITEM on
 #define ACTOR_COUNT 14
 #define ACTOR_ITEM 2
 
 // The options and all their values
-#define OPTION_COUNT 5
-#define OPTION_TEXT_SPEED 0
-#define OPTION_BATTLE_SCENE 1
-#define OPTION_BATTLE_STYLE 2
-#define OPTION_SOUND 3
-#define OPTION_SAVE_BEFORE_IR 4
+enum {
+    OPTION_TEXT_SPEED,
+    OPTION_BATTLE_SCENE,
+    OPTION_BATTLE_STYLE,
+    OPTION_SOUND,
+    OPTION_SAVE_BEFORE_IR,
+    OPTION_COUNT,
+};
 #define ITEM_COUNT 11
 
 // The cursor: an option, or one of the buttons
-#define CURSOR_CONFIRM 5
-#define CURSOR_QUIT 6
-#define CURSOR_MAX 6
+enum {
+    CURSOR_CONFIRM = OPTION_COUNT,
+    CURSOR_QUIT,
+    CURSOR_MAX = CURSOR_QUIT,
+};
 
 // The top and bottom of the rows on the screen
 #define ROWS_TOP 24
