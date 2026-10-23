@@ -65,7 +65,7 @@ MWCCARM_URL = "https://decomp.aetias.com/files/mwccarm.zip"
 # changes are upstreamed. Its dsi-hybrid branch is released as DSD_VERSION; after a new release, bump it and
 # configure.py replaces tools/dsd.
 DSD_REPO = "https://github.com/fuddlesworth/ds-decomp"
-DSD_VERSION = "v0.12.1-dsi.4"
+DSD_VERSION = "v0.12.1-dsi.5"
 # Release binary of each platform, by (sys.platform, machine)
 DSD_BINARIES = {
     ("linux", "x86_64"): "dsd-linux-x86_64",
@@ -213,12 +213,6 @@ ROM_BLOBS = {
     "rom/dsp/dsp_g711_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_G711Image"),
     "rom/dsp/dsp_graphics_image.inc": ("dsi/ltd_autoload_0.bin", "ltd_autoload_0", "DSP_GraphicsImage"),
 }
-
-
-def overlay_digest_includes(version: str) -> list[str]:
-    """Returns the include files, under the generated headers, of a version's overlay table digest and overlay digests,
-    which lib/nitro/src/fs/fs_overlay_digest.c includes and tools/build/overlay_digests.py writes in that order."""
-    return [f"rom/{version}/overlay_table_digest.inc", f"rom/{version}/overlay_digests.inc"]
 
 
 def library_of(source: Path) -> tuple[str, list[str]] | None:
@@ -827,8 +821,13 @@ def main():
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
     n.rule("complete_report", "$python tools/build/complete_report.py $in $out", "Counting complete files in $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
+    # A regeneration keeps the options that chose the tools, so that a build with another dsd keeps it
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),
-                      *([f"--shift {args.shift:#x}"] if args.shift else [])]
+                      *([f"--shift {args.shift:#x}"] if args.shift else []),
+                      *([f"--dsd {shlex.quote(str(args.dsd.resolve()))}"] if args.dsd else []),
+                      *(["--dsd-from-source"] if args.dsd_from_source else []),
+                      *([f"--wine {shlex.quote(args.wine)}"] if args.wine else []),
+                      *(["--no-download"] if args.no_download else [])]
     n.rule("configure", f"$python configure.py {' '.join(configure_args)}", "Reconfiguring", generator="1")
     # Formats the sources and headers in place with clang-format and .clang-format
     n.rule("format", "clang-format -i $in", "Formatting")
@@ -871,15 +870,6 @@ def main():
                 implicit=["tools/build/rom_blob.py", Path("extract") / versions[0] / "config.yaml"],
                 variables={"module": str(Path("extract") / versions[0] / module), "name": name})
         constant_headers.append(output)
-    # Each version's digests of its overlays, computed from its base ROM (tools/build/overlay_digests.py)
-    n.rule("overlay_digests", "$python tools/build/overlay_digests.py $in $key $out", "Generating $out", restat="1")
-    for version in versions:
-        outputs = [Path(GENERATED_INCLUDE_DIR) / include for include in overlay_digest_includes(version)]
-        extract_dir = Path("extract") / version
-        n.build(outputs, "overlay_digests", [Path("orig") / f"baserom_{version}.nds"],
-                implicit=["tools/build/overlay_digests.py", extract_dir / "config.yaml"],
-                variables={"key": str(extract_dir / "arm9" / "hmac_sha1_key.bin")})
-        constant_headers += outputs
     n.build(["constants_headers"], "phony", constant_headers)
 
     checks, configs = [], []
