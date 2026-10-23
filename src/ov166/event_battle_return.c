@@ -186,7 +186,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             PokeParty_Copy(prm->setup->party[0], party);
             pokerusHandler(party);
             pokerusSpread(party);
-            if (prm->setup->unkA8 == BTL_RESULT_VICTORY) {
+            if (prm->setup->result == BTL_RESULT_VICTORY) {
                 EventBattleReturn_PickupItems(party);
             }
             EventBattleReturn_BurmyForms(prm, party,
@@ -200,7 +200,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
             }
         }
         EventBattleReturn_NaturalCure(party);
-        if (prm->setup->unkA8 == BTL_RESULT_CAPTURE) {
+        if (prm->setup->result == BTL_RESULT_CAPTURE) {
             wk->pkm = PokeParty_GetPkm(prm->setup->party[1], prm->setup->unkAC);
             if (PokeParty_GetPkmCount(party) >= PokeParty_GetCapacity(party)) {
                 box = BoxSaveAccessor_GetLastOpenedBox(boxes);
@@ -296,7 +296,7 @@ static BOOL EventBattleReturn_Main(GameProc *proc, u32 *state, void *param, void
         break;
     case 4:
         if (!wk->musicDone) {
-            if (prm->setup->unkA8 == BTL_RESULT_CAPTURE && wk->evolveMask != 0) {
+            if (prm->setup->result == BTL_RESULT_CAPTURE && wk->evolveMask != 0) {
                 if (!wk->musicFading) {
                     GFL_SndBGMFadeOut(30);
                     wk->musicFading = TRUE;
@@ -367,7 +367,7 @@ static void EventBattleReturn_CheckLevelUps(EventBattleReturnWork *wk, EventBatt
     int i;
     u32 levelBefore;
 
-    switch (setup->unkA8) {
+    switch (setup->result) {
     case BTL_RESULT_VICTORY:
     case BTL_RESULT_FLEE:
     case BTL_RESULT_CAPTURE:

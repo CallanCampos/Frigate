@@ -1,5 +1,6 @@
 #include "types.h"
 #include "battle/battle_rec_tool.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "field/bsubway_scr.h"
@@ -628,7 +629,7 @@ BOOL BSubwayCmd_Tool(VM *vm, FieldScriptEnv *env) {
     case 332:
         if (bsw->btlSetup == NULL) {
             *retWk = 0;
-        } else if (bsw->btlSetup->unkA8 == 1) {
+        } else if (bsw->btlSetup->result == BTL_RESULT_VICTORY) {
             *retWk = 1;
         } else {
             *retWk = 0;

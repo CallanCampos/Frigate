@@ -13,6 +13,7 @@
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
 #include "battle/btl_net.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "constants/pokemon.h"
@@ -196,19 +197,19 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         } else {
             battle->players->base.unk44 = 4;
         }
-        switch (battle->setup->unkA8) {
-        case 1:
-        case 4:
+        switch (battle->setup->result) {
+        case BTL_RESULT_VICTORY:
+        case BTL_RESULT_FLEE_FOE:
             battle->players->base.result = 0;
             break;
-        case 0:
-        case 3:
+        case BTL_RESULT_DEFEAT:
+        case BTL_RESULT_FLEE:
             battle->players->base.result = 1;
             break;
-        case 2:
+        case BTL_RESULT_DRAW:
             battle->players->base.result = 2;
             break;
-        case 6:
+        case BTL_RESULT_6:
             wk->timer = 0;
             queue = FALSE;
             *state = 15;

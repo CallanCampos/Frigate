@@ -3458,7 +3458,7 @@ u32 BtlMain_DetermineResult(BtlMainModule *mainModule) {
         }
         result = mainModule->result;
     }
-    mainModule->setup->unkA8 = result;
+    mainModule->setup->result = result;
     return result;
 }
 
@@ -3619,7 +3619,7 @@ void BtlMain_StoreResultStats(BtlMainModule *mainModule) {
     setup->unkD6 = BtlServerFlow_GetPlayerNotVeryEffectiveHitCount(flow);
     setup->unkD7 = BtlServerFlow_GetFoeImmuneHitCount(flow);
     setup->unkD8 = BtlServerFlow_GetFoeNotVeryEffectiveHitCount(flow);
-    if (setup->unkA8 == 1) {
+    if (setup->result == BTL_RESULT_VICTORY) {
         setup->unkD9 = 1;
     }
     party = GetPartyData(&mainModule->pokeCons[1], 0);

@@ -91,7 +91,8 @@ struct BtlSetup {
     u16 unkA0;
     u16 unkA2;
     u32 unkA4;
-    u32 unkA8;
+    // How the battle ended, a BTL_RESULT_*
+    u32 result;
     u8 unkAC;
     u8 unkAD;
     u8 unkAE;

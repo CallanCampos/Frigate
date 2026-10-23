@@ -1,4 +1,5 @@
 #include "types.h"
+#include "battle/btl_result.h"
 #include "battle/btl_setup.h"
 #include "battle/regulation.h"
 #include "battle/trainer_data.h"
@@ -240,7 +241,7 @@ static void BtlSetup_LoadGameData(BtlSetup *setup, GameData *gameData, BtlFieldS
     MI_CpuCopy8(status, &setup->fieldSituation.env, sizeof(BtlFieldEnv));
     setup->fieldSituation.bgm = SEQ_BGM_VS_NORAPOKE;
     setup->fieldSituation.unk12 = SEQ_BGM_WIN1;
-    setup->unkA8 = 1;
+    setup->result = BTL_RESULT_VICTORY;
     if (EventWork_FlagGet(GameData_GetEventWork(gameData), EVENT_FLAG_0x096b)) {
         BtlSetup_SetFlag(setup, 2);
     }

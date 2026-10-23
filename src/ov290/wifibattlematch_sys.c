@@ -687,9 +687,9 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
     u8 hpPercent;
 
     sys->battleResult.battleStyle = setup->battleStyle;
-    sys->battleResult.result = setup->unkA8;
+    sys->battleResult.result = setup->result;
     sys->battleResult.unk10 = setup->unkDD_0;
-    sys->battleResult.result = setup->unkA8;
+    sys->battleResult.result = setup->result;
     WifiBattleMatchSys_CountAlive(battle->setup, &aliveOwn, &aliveOther);
     sys->battleResult.aliveOwn = aliveOwn;
     sys->battleResult.aliveOther = aliveOther;
@@ -1021,7 +1021,7 @@ static void WifiBattleMatchSys_BuildReport(WifiBattleMatchReport *report, PokePa
     report->hour = time.hour;
     report->minute = time.minute;
     report->unk48 = unk14;
-    report->result = setup->unkA8;
+    report->result = setup->result;
     WifiBattleMatchSys_CountAlive(setup, &alive[0], &alive[1]);
     report->aliveOwn = alive[0];
     report->aliveOther = alive[1];
