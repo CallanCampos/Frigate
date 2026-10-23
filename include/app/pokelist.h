@@ -85,17 +85,21 @@ typedef struct {
 #define POKELIST_PLATE_COUNT 6
 
 // The message window's shapes
-#define POKELIST_MESSAGE_WINDOW_SHORT 0
-#define POKELIST_MESSAGE_WINDOW_SHORTER 1
-#define POKELIST_MESSAGE_WINDOW_MENU 2
-#define POKELIST_MESSAGE_WINDOW_WIDE 3
-#define POKELIST_MESSAGE_WINDOW_NONE 4
+enum {
+    POKELIST_MESSAGE_WINDOW_SHORT,
+    POKELIST_MESSAGE_WINDOW_SHORTER,
+    POKELIST_MESSAGE_WINDOW_MENU,
+    POKELIST_MESSAGE_WINDOW_WIDE,
+    POKELIST_MESSAGE_WINDOW_NONE,
+};
 
 // A plate's entry in a battle's selection, when it is not one of the order's places from 0
-#define POKELIST_ENTRY_ABLE 6
-#define POKELIST_ENTRY_UNABLE 7
-// Not a battle's selection, or an empty slot
-#define POKELIST_ENTRY_EMPTY 8
+enum {
+    POKELIST_ENTRY_ABLE = 6,
+    POKELIST_ENTRY_UNABLE,
+    // Not a battle's selection, or an empty slot
+    POKELIST_ENTRY_EMPTY,
+};
 #define POKELIST_CL_RES_COUNT 23
 #define CL_RES_NONE 0xffffffff
 // The palettes, characters and cell animations in PokeListWork's clResources
@@ -265,6 +269,7 @@ u32 PokeListPlate_CheckEntry(PokeListWork *wk, PokeListPlate *plate);
 PokeListMessage *PokeListMessage_Create(PokeListWork *wk);
 void PokeListMessage_Free(PokeListWork *wk, PokeListMessage *msg);
 void PokeListMessage_Update(PokeListWork *wk, PokeListMessage *msg);
+// windowType is a POKELIST_MESSAGE_WINDOW_*
 void PokeListMessage_Open(PokeListWork *wk, PokeListMessage *msg, u32 windowType);
 void PokeListMessage_Close(PokeListWork *wk, PokeListMessage *msg);
 BOOL PokeListMessage_IsOpen(PokeListWork *wk, PokeListMessage *msg);

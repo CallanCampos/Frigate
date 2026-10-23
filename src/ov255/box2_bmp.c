@@ -734,16 +734,16 @@ void Box2Bmp_PrintDenyMsg(Box2SysWork *syswk, u32 type, u32 index) {
     u32 msgId;
 
     switch (type) {
-    case 2:
+    case BOX2_MOVE_ERR_MAIL:
         msgId = 46;
         break;
-    case 3:
+    case BOX2_MOVE_ERR_LAST_BATTLER:
         msgId = 47;
         break;
-    case 4:
+    case BOX2_MOVE_ERR_EGG:
         msgId = 50;
         break;
-    case 6:
+    case BOX2_MOVE_ERR_NOT_SLEEPY:
         msgId = 52;
         break;
     }

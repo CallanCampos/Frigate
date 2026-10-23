@@ -797,7 +797,8 @@ static void BattleChampionshipFlow_MenuTaskWifiEntry(WifiBattleMatchTask *task, 
         }
         break;
     case 6:
-        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff, 2);
+        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff,
+                                    WIFIBATTLEMATCH_MSG_QUEUE_WAIT_ICON);
         *seq = 7;
         break;
     case 7:
@@ -841,7 +842,8 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         break;
     case 1:
         WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData,
-                                    EntreeForest_Text_RecognizeAchievementBattlePresent, 1);
+                                    EntreeForest_Text_RecognizeAchievementBattlePresent,
+                                    WIFIBATTLEMATCH_MSG_STREAM_KEY);
         *seq = 2;
         break;
     case 2:
@@ -857,7 +859,7 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         WordSetNumber(menu->wordSet, 1, GameData_GetCounter(menu->param.gameData), 2, 0, 1);
         GFL_WordSetFormatStrbuf(menu->wordSet, menu->strBuf, text);
         GFL_StrBufFree(text);
-        WifiBattleMatchMsgBox_PrintStr(menu->param.msgBox, menu->strBuf, 3);
+        WifiBattleMatchMsgBox_PrintStr(menu->param.msgBox, menu->strBuf, WIFIBATTLEMATCH_MSG_STREAM);
         *seq = 4;
         break;
     case 4:
@@ -880,7 +882,8 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
         }
         break;
     case 6:
-        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff, 2);
+        WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, EntreeForest_Text_SavingDontTurnOff,
+                                    WIFIBATTLEMATCH_MSG_QUEUE_WAIT_ICON);
         *seq = 7;
         break;
     case 7:
@@ -994,11 +997,11 @@ static s32 BattleChampionshipFlow_MenuGetListChoice(BattleChampionshipMenu *menu
 }
 
 static void BattleChampionshipFlow_MenuPrint(BattleChampionshipMenu *menu, u32 msgId) {
-    WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, msgId, 1);
+    WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->param.msgData, msgId, WIFIBATTLEMATCH_MSG_STREAM_KEY);
 }
 
 static void BattleChampionshipFlow_MenuPrintScript(BattleChampionshipMenu *menu, u32 msgId) {
-    WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->scriptMsgData, msgId, 1);
+    WifiBattleMatchMsgBox_Print(menu->param.msgBox, menu->scriptMsgData, msgId, WIFIBATTLEMATCH_MSG_STREAM_KEY);
 }
 
 static BOOL BattleChampionshipFlow_MenuIsPrinted(BattleChampionshipMenu *menu) {

@@ -142,9 +142,11 @@ enum {
 #define SCROLL_HEIGHT 512
 
 // Palettes of the items' screens
-#define ITEM_PALETTE_NORMAL 1
-#define ITEM_PALETTE_SELECTED 2
-#define ITEM_PALETTE_BLINK 3
+enum {
+    ITEM_PALETTE_NORMAL = 1,
+    ITEM_PALETTE_SELECTED,
+    ITEM_PALETTE_BLINK,
+};
 
 typedef struct {
     u16 screenFile;

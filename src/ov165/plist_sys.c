@@ -315,7 +315,7 @@ BOOL PokeList_Main(PokeListWork *wk) {
                     PokeListMenu_FreeButton(wk->buttons[1]);
                     wk->buttons[0] = NULL;
                     wk->buttons[1] = NULL;
-                    PokeListMessage_Open(wk, wk->message, 0);
+                    PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
                     PokeListMessage_Print(wk, wk->message, 0xbc);
                     PokeListMessage_ShowWaitIcon(wk, wk->message);
                 }
@@ -907,7 +907,7 @@ static void PokeList_ShowModeMessage(PokeListWork *wk) {
     GFL_BGSysLoadScr(0);
     switch (wk->param->mode) {
     case 0:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 9);
         wk->showShortcutButtons = TRUE;
         break;
@@ -922,38 +922,38 @@ static void PokeList_ShowModeMessage(PokeListWork *wk) {
         break;
     case 5:
     case 16:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 0xd);
         wk->showShortcutButtons = FALSE;
         wk->unk28 = FALSE;
         break;
     case 9:
     case 14:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 0xc);
         wk->showShortcutButtons = FALSE;
         wk->unk28 = FALSE;
         break;
     case 6:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 0xe);
         wk->showShortcutButtons = FALSE;
         wk->unk28 = FALSE;
         break;
     case 18:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 0x10);
         wk->showShortcutButtons = FALSE;
         break;
     case 3:
     case 25:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 9);
         wk->showShortcutButtons = FALSE;
         break;
     case 21:
     case 27:
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 0xaf);
         ClActor_SetVisible(wk->exitButton, FALSE);
         wk->showShortcutButtons = FALSE;
@@ -1027,7 +1027,7 @@ static void PokeList_SelectPokemon(PokeListWork *wk) {
                 wk->param->result = 10;
                 wk->state = 23;
                 wk->showShortcutButtons = FALSE;
-                PokeListMessage_Open(wk, wk->message, 0);
+                PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
                 PokeListMessage_Print(wk, wk->message, 0x12);
                 func_ov165_0219bb68(wk);
             }
@@ -1185,7 +1185,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
         }
         PokeListMessage_CreateWordSet(wk, wk->message);
         PokeListMessage_SetPkmName(wk, wk->message, 0, wk->pkm);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, 0x13);
         PokeListMessage_FreeWordSet(wk, wk->message);
         break;
@@ -1204,7 +1204,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
         }
         PokeListMessage_CreateWordSet(wk, wk->message);
         PokeListMessage_SetPkmName(wk, wk->message, 0, wk->pkm);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, 0x13);
         PokeListMessage_FreeWordSet(wk, wk->message);
         break;
@@ -1214,7 +1214,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
         items[2] = 16;
         PokeListMessage_CreateWordSet(wk, wk->message);
         PokeListMessage_SetPkmName(wk, wk->message, 0, wk->pkm);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, PokeList_GetItemMenuMessage(wk, wk->param->item));
         PokeListMessage_FreeWordSet(wk, wk->message);
         break;
@@ -1231,7 +1231,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
         }
         PokeListMessage_CreateWordSet(wk, wk->message);
         PokeListMessage_SetPkmName(wk, wk->message, 0, wk->pkm);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, 0x13);
         PokeListMessage_FreeWordSet(wk, wk->message);
         break;
@@ -1241,7 +1241,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
             items[1] = 0;
             items[2] = 6;
             items[3] = 16;
-            PokeListMessage_Open(wk, wk->message, 2);
+            PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
             PokeListMessage_Print(wk, wk->message, 0xae);
         } else {
             items[0] = 0;
@@ -1249,7 +1249,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
             items[2] = 16;
             PokeListMessage_CreateWordSet(wk, wk->message);
             PokeListMessage_SetPkmName(wk, wk->message, 0, wk->pkm);
-            PokeListMessage_Open(wk, wk->message, 2);
+            PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
             PokeListMessage_Print(wk, wk->message, 0x13);
             PokeListMessage_FreeWordSet(wk, wk->message);
         }
@@ -1267,7 +1267,7 @@ static void PokeList_OpenMenu(PokeListWork *wk) {
         }
         PokeListMessage_CreateWordSet(wk, wk->message);
         PokeListMessage_SetPkmName(wk, wk->message, 0, wk->pkm);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, 0x13);
         PokeListMessage_FreeWordSet(wk, wk->message);
         break;
@@ -2137,7 +2137,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
         wk->state = 3;
         wk->pkm = NULL;
         wk->showShortcutButtons = FALSE;
-        PokeListMessage_Open(wk, wk->message, 0);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
         PokeListMessage_Print(wk, wk->message, 0xb);
         func_ov165_0219bb68(wk);
         break;
@@ -2151,7 +2151,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
         };
 
         func_ov165_0219ceec(wk);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, 0x14);
         if (item == ITEM_GRISEOUS_ORB && species == SPECIES_GIRATINA) {
             PokeListMenu_Open(wk, wk->menu, itemMenus[1]);
@@ -2165,7 +2165,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
         u32 mailMenu[5] = { 12, 13, 23, 6, 16 };
 
         func_ov165_0219ceec(wk);
-        PokeListMessage_Open(wk, wk->message, 2);
+        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_MENU);
         PokeListMessage_Print(wk, wk->message, 0x14);
         PokeListMenu_Open(wk, wk->menu, mailMenu);
         GFL_BGSysLoadScr(0);
@@ -2284,7 +2284,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
             wk->state = 22;
             wk->pkm = NULL;
             wk->showShortcutButtons = FALSE;
-            PokeListMessage_Open(wk, wk->message, 0);
+            PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
             PokeListMessage_Print(wk, wk->message, 0xb);
             func_ov165_0219bb68(wk);
         }
@@ -2347,7 +2347,7 @@ static void PokeList_DoMenuItem(PokeListWork *wk) {
                         wk->pkm = NULL;
                         wk->state = 4;
                         wk->showShortcutButtons = FALSE;
-                        PokeListMessage_Open(wk, wk->message, 0);
+                        PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_SHORT);
                         PokeListMessage_Print(wk, wk->message, 0x11);
                         func_ov165_0219bb68(wk);
                     } else {
@@ -2406,7 +2406,7 @@ void PokeList_ShowMessage(PokeListWork *wk, u32 msgId, BOOL waitInput, void (*do
     wk->state = 7;
     wk->msgWaitInput = waitInput;
     wk->msgDoneFunc = doneFunc;
-    PokeListMessage_Open(wk, wk->message, 3);
+    PokeListMessage_Open(wk, wk->message, POKELIST_MESSAGE_WINDOW_WIDE);
     PokeListMessage_PrintStream(wk, wk->message, msgId, waitInput);
     ClActor_SetVisible(wk->exitButton, FALSE);
     ClActor_SetVisible(wk->shortcutButton, FALSE);

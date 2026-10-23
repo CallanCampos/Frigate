@@ -61,8 +61,10 @@ enum {
 #endif
 
 // The search's kinds
-#define GTSNEGO_MODE_ANYONE 0
-#define GTSNEGO_MODE_RENDEZVOUS 1
+enum {
+    GTSNEGO_MODE_ANYONE,
+    GTSNEGO_MODE_RENDEZVOUS,
+};
 
 // The level range a rendezvous with anyone of the Pal Pad searches with
 #define GTSNEGO_LEVEL_RENDEZVOUS 4

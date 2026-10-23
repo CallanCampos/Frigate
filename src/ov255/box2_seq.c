@@ -1339,19 +1339,19 @@ static int Box2Seq_ArrangeMoveEnd(Box2SysWork *syswk) {
     case BOX2_MOVE_ERR_MAIL:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintDenyMsg(syswk, 2, 24);
+        Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_MAIL, 24);
         return 24;
     case BOX2_MOVE_ERR_LAST_BATTLER:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintDenyMsg(syswk, 3, 24);
+        Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_LAST_BATTLER, 24);
         return 24;
-    case 4:
+    case BOX2_MOVE_ERR_EGG:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintDenyMsg(syswk, 4, 24);
+        Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_EGG, 24);
         return 24;
-    case 5:
+    case BOX2_MOVE_ERR_BATTLE_BOX_LOCKED:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
         Box2Bmp_PrintBattleBoxLocked(syswk, 0);
@@ -1375,7 +1375,7 @@ static int Box2Seq_ArrangeMoveErrClose(Box2SysWork *syswk) {
     if (CursorMove_IsCursorVisible(syswk->app->cursorMove) == TRUE) {
         Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, TRUE);
     }
-    Box2Bmp_ClearMsgWindow(syswk->app, syswk->app->moveErr == 5 ? 27 : 24);
+    Box2Bmp_ClearMsgWindow(syswk->app, syswk->app->moveErr == BOX2_MOVE_ERR_BATTLE_BOX_LOCKED ? 27 : 24);
     Box2Main_PutMessageFrame(syswk);
     if (syswk->param->mode == 2) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == TRUE) {
@@ -1957,19 +1957,19 @@ static int Box2Seq_RangeMoveEnd(Box2SysWork *syswk) {
     case BOX2_MOVE_ERR_MAIL:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintDenyMsg(syswk, 2, 24);
+        Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_MAIL, 24);
         return 39;
     case BOX2_MOVE_ERR_LAST_BATTLER:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintDenyMsg(syswk, 3, 24);
+        Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_LAST_BATTLER, 24);
         return 39;
-    case 4:
+    case BOX2_MOVE_ERR_EGG:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
-        Box2Bmp_PrintDenyMsg(syswk, 4, 24);
+        Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_EGG, 24);
         return 39;
-    case 5:
+    case BOX2_MOVE_ERR_BATTLE_BOX_LOCKED:
         GFL_SndSEPlay(SEQ_SE_BEEP);
         Box2Obj_ShowCursor(syswk, 0);
         Box2Bmp_PrintBattleBoxLocked(syswk, 0);
@@ -1993,7 +1993,7 @@ static int Box2Seq_RangeMoveErrClose(Box2SysWork *syswk) {
     if (CursorMove_IsCursorVisible(syswk->app->cursorMove) == TRUE) {
         Box2Obj_SetVisible(syswk->app, BOX2_ACTOR_CURSOR, TRUE);
     }
-    Box2Bmp_ClearMsgWindow(syswk->app, syswk->app->moveErr == 5 ? 27 : 24);
+    Box2Bmp_ClearMsgWindow(syswk->app, syswk->app->moveErr == BOX2_MOVE_ERR_BATTLE_BOX_LOCKED ? 27 : 24);
     Box2Main_PutMessageFrame(syswk);
     if (syswk->param->mode == 2) {
         if (Box2Frame_IsBoxListIn(syswk->app->bgWinFrame) == TRUE) {
@@ -5247,12 +5247,12 @@ static int Box2Seq_DreamWorldPick(Box2SysWork *syswk) {
         return Box2Seq_RunVFunc(syswk, Box2Main_VFuncFrameMove, 87);
     case 1:
         if (Box2Main_GetPokeParam(syswk, syswk->pos, syswk->tray, PKM_PARAM_IS_EGG, NULL) != 0) {
-            Box2Bmp_PrintDenyMsg(syswk, 4, 24);
+            Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_EGG, 24);
             syswk->nextSeq = 14;
             return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
         }
         if (Box2Main_IsSpeciesFlagged(syswk, syswk->pos) == FALSE) {
-            Box2Bmp_PrintDenyMsg(syswk, 6, 27);
+            Box2Bmp_PrintDenyMsg(syswk, BOX2_MOVE_ERR_NOT_SLEEPY, 27);
             syswk->nextSeq = 14;
             return Box2Seq_Goto(syswk, BOX2SEQ_TRGWAIT);
         }

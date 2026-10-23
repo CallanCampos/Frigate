@@ -36,10 +36,13 @@
 // the team's Pokémon, with a jingle for the rank. A, B or a touch closes it. Named after the ROM's "th_award_graphic.c"
 // (the other file of the overlay is th_award_graphic.c)
 
-#define BG_FRAME 1
-#define BG_BACKDROP 2
-#define BG_TEXT 3
-#define BG_SUB_C_GEAR 4
+// The BGs: the main screen's frame, backdrop and text, and the sub screen's C-Gear
+enum {
+    BG_FRAME = 1,
+    BG_BACKDROP,
+    BG_TEXT,
+    BG_SUB_C_GEAR,
+};
 
 enum {
     WINDOW_BATTLE_KIND = 1,
@@ -198,9 +201,9 @@ static BOOL ThAward_Init(GameProc *proc, u32 *state, void *param, void *work) {
     wk->graphic = ThAwardGraphic_Create(1, wk->heapId);
     wk->font = GFL_FontCreate(ARCID_FONT, 0, 0, 0, wk->heapId);
     wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
-    GFL_BGSysSetBGPriority(1, 2);
-    GFL_BGSysSetBGPriority(2, 1);
-    GFL_BGSysSetBGPriority(3, 0);
+    GFL_BGSysSetBGPriority(BG_FRAME, 2);
+    GFL_BGSysSetBGPriority(BG_BACKDROP, 1);
+    GFL_BGSysSetBGPriority(BG_TEXT, 0);
     wk->vblankTask = GFL_VBlankTCBAdd(ThAward_VBlank, wk, 1);
     record = ThAward_GetRecord(wk->param);
     if (record->valid == 0) {
