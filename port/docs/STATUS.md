@@ -28,46 +28,41 @@ level that doesn't exist yet says "not yet"; no field is left out.
 
 ## 2026-10-23: the field's entry: root heaps in host memory, MSL's division, CONTINUE and New Game into the field
 
-- **Upstream:** `0bed98c4c3` (upstream merge #478), merged into Frigate's `main` by PR 13 (`72749b5a0d`), which this
-  branch merges. The field's frames need upstream's `b62c655bfa` (upstream merge #481, `Field.colorPostFX` typed for the
-  host), which reaches Frigate with the sync after PR 13 (PR 16): they were verified on a scratch merge of this branch
-  with `b62c655bfa` in a throwaway worktree, never committed.
-- **Port:** `PORT_SHA`, on the topic branch `port-field-entry`; its draft pull request waits on that sync.
+- **Upstream:** `b62c655bfa` (upstream merge #481), merged into Frigate's `main` by PR 16 (`6a1ace981b`), which this
+  branch merges; its typed `Field.colorPostFX` is what the field needs beside this branch. Until PR 16 merged, the
+  field's frames were verified on a scratch merge of this branch with `b62c655bfa` in a throwaway worktree, never
+  committed, with the same results as below.
+- **Port:** `PORT_SHA`, on the topic branch `port-field-entry`.
 - **ROM:** T0 passes on the branch's head after the merge of `main`: Black 2 `e51e6dfb8678a3d19dcd2a10691b96a569ca0abb`
   and White 2 `b5d7490be7b415b8f1e672a53e978a9cc667e56a`. The two game files changed are complete, so the SHA1s prove
-  them; `check_mwcc_neutral.py` finds `heapsys.c` identical to upstream `0a12a2bd3e` in both versions and
-  `field_transition.c` different only in the literal's spelling (`0x06800000` for `0x6800000`). No incomplete file and
-  no decomp header changed, so no compiler probe was needed.
-- **Host build:** T1 passes on macOS arm64, RelWithDebInfo, both versions (`build/port`, `build/port-w2`), and on the
-  scratch merge, both versions and Black 2's sanitized program, strict and survey. clang-format 23.1.1 is clean on every
-  changed C file.
-- **Tests:** on the branch (no field until the sync), full ctest: Black 2, 294 passed, 11 failed and 1 skipped of 306;
-  White 2, 291 passed, 11 failed and 1 skipped of 303. The failures are `main`'s ten (measured on `8ca29313d1` by the
-  deep dive of 2026-10-23, 302 tests: `asm_oracle`'s stale names, the continue sequences that expected the old trap, and
-  the seven tests of the test launcher, which need the field) and `replay_new_game_house`, which waits for the sync: the
-  field crashes there three frames after it shows. Every test that passes on `main` passes (Black 2 compared with the
-  dive's run; White 2 fails the same eleven). On the scratch merge with
-  `b62c655bfa`, full ctest: Black 2, 297 passed, 8 failed and 1 skipped of 306; White 2, 294 passed, 8 failed and 1
-  skipped of 303. `oracle_continue` and `oracle_continue_starter` (T4) pass in both versions: every frame against
-  melonDS to port frame 3,900, the field's 464 among them (Black 2 3,879 of 3,879, 1,480 exact; White 2 3,871 of 3,871,
-  1,482 exact; from the starter save 1,479 and 1,481), the room's 3D 25 pixels beyond the pixel tolerance, the lookout's
-  141 to 143 on its trees' edges, of the 245 allowed; no known difference added, and no clock shows.
-  `replay_new_game_house` (T3) passes in both versions: 18,800 frames, New Game through the field and the house to the
-  field menu's SAVE, 16 screens in Black 2 and 15 in White 2 by the oracle's hashes, the field menu's and the save
-  dialog's bottom screens with the clock (12:04) among them. The failures there are `asm_oracle` (`main`'s) and the
-  seven launcher tests, whose launcher now steps aside because the field opens ("no app was opened"): retiring it is the
-  next task. T5, the house replay on the scratch merge, Black 2: the strict sanitized build stops at the field's first
-  load on a field effect task's misaligned work, and the survey build runs all 18,800 frames and shows all 16 screens
-  with three open findings, none in a root heap's host memory ([sanitizers.md](sanitizers.md), R6, H5 and H6). T6: the
-  house replay writes its save; `replay_same_save` passes. T2: `hal_msl` (MSL's division against hand-worked values) and
-  `hal_heap_policy` pass. T7 not run.
-- **Tiers:** unchanged: no config change, and the two game files define the same functions; not remeasured.
+  them; `check_mwcc_neutral.py` finds `heapsys.c` identical to upstream's in both versions and `field_transition.c`
+  different only in the literal's spelling (`0x06800000` for `0x6800000`). No incomplete file and no decomp header
+  changed, so no compiler probe was needed.
+- **Host build:** T1 passes on macOS arm64, RelWithDebInfo, both versions (`build/port`, `build/port-w2`), and Black 2's
+  sanitized program, strict and survey. No changed file warns; before the sync, the full build's 723 warnings were the
+  same per flag as `main`'s. clang-format 23.1.1 is clean on every changed C file.
+- **Tests:** full ctest on the head: Black 2, 297 passed, 8 failed and 1 skipped of 306; White 2, 294 passed, 8 failed
+  and 1 skipped of 303. The failures are `asm_oracle` (`main`'s: stale names in its tests) and the seven tests of the
+  test launcher, which now steps aside because the field opens ("no app was opened"): retiring it is the next task.
+  Before the sync, the branch failed only `main`'s ten and `replay_new_game_house`, which needed the field, so every
+  test that passes on `main` passes. `oracle_continue` and `oracle_continue_starter` (T4) pass in both versions: every
+  frame against melonDS to port frame 3,900, the field's 464 among them (Black 2 3,879 of 3,879, 1,480 exact; White 2
+  3,871 of 3,871, 1,482 exact; from the starter save 1,479 and 1,481), the room's 3D 25 pixels beyond the pixel
+  tolerance, the lookout's 141 to 143 on its trees' and hills' edges, of the 245 allowed; no known difference added, and
+  no clock shows. `replay_new_game_house` (T3) passes in both versions: 18,800 frames, New Game through the field and
+  the house to the field menu's SAVE, 16 screens in Black 2 and 15 in White 2 by the oracle's hashes, the field menu's
+  and the save dialog's bottom screens with the clock (12:04) among them. T5, the house replay in Black 2 (on the
+  scratch merge): the strict sanitized build stops at the field's first load on a field effect task's misaligned work,
+  and the survey build runs all 18,800 frames and shows all 16 screens with three open findings, none in a root heap's
+  host memory ([sanitizers.md](sanitizers.md), R6, H5 and H6). T6: the house replay writes its save; `replay_same_save`
+  passes. T2: `hal_msl` (MSL's division against hand-worked values) and `hal_heap_policy` pass. T7 not run.
+- **Tiers:** unchanged by this branch: no config change, and the two game files define the same functions; not
+  remeasured.
 - **Trap stubs:** 30 function stubs (31 before: `_u32_div_f` now has its routine) and 22 data placeholders per version.
   CONTINUE and New Game to the save reach none. Without MSL's routine New Game stopped on `_u32_div_f` at frame 14,902,
   the change of map into the house (`FieldLensFlareData_BytesToEntryCount`). The next one on the story's path is
   `data_ov167_021d7490`, at a battle's first move.
-- **64-bit warnings:** the build's 723 warnings, the same per flag as `origin/main`'s build log of the deep dive; no
-  pointer/int cast added. The four-family audit was not rerun.
+- **64-bit warnings:** no pointer/int cast added, and no changed file warns. The four-family audit was not rerun.
 - **Work done:** [ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md): `GFL_HeapAddRoot`'s Hook
   (`PORT_HEAP_ROOT_MEMORY`, `PORT_HEAP_SIZE`) gives every root heap the game creates in its own memory host memory of
   its root size, kept for that memory (the field's `g_FieldHeapMemory`, the trade screen's, GFL's extra heap); before it
@@ -78,11 +73,10 @@ level that doesn't exist yet says "not yet"; no field is left out.
   `check_screens.py` takes `3d` for a screen with 3D; `replay_new_game_house` and its two tables. The oracle README, the
   HAL and tests guides, the feature map, the glossary (MSL), MODDING.md and lessons.md say so, and sanitizers.md has the
   field's first survey.
-- **Next:** once the sync after PR 13 merges, merge `main` here, verify again and take the pull request out of draft;
-  then retire the test launcher (the field menu reaches every app; plan A-2), then phase 3's exit route (A-3).
-- **Blockers:** the sync PR with `b62c655bfa` (PR 16) for the field's frames on `main`. Beyond the house: the
-  encounters' and battles' host fixes (track C) and `data_ov167_021d7490` (overlay 167, under another contributor's
-  claim).
+- **Next:** retire the test launcher now that the field menu reaches every app (plan A-2), then phase 3's exit route
+  (A-3).
+- **Blockers:** none for the field's entry. Beyond the house: the encounters' and battles' host fixes and the field's
+  sanitizer findings (track C), and `data_ov167_021d7490` (overlay 167, under another contributor's claim).
 
 ## 2026-10-22: reviewed upstream SDK sync completed
 

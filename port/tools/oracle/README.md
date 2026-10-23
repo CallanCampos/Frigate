@@ -588,7 +588,7 @@ first pass there, port frame 3,438 against oracle frame 5,452, and the counts pa
 field's process table in the sync of 2026-10-22; the port then stopped itself after frame 3,436 when the field's heap
 ran out, until [ADR 0021](../../docs/adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md) gave the root
 heaps in the game's own memory host memory, and it crashed three frames later until upstream typed
-`Field.colorPostFX` for the host (`b62c655bfa`, the sync after PR 13).
+`Field.colorPostFX` for the host (`b62c655bfa`, merged into Frigate by PR 16).
 
 ## Sound
 

@@ -7,12 +7,11 @@ has is the game's whole source, compiled into the program, so a change to the ga
 
 Two limits shape everything below:
 
-- **The field opens with the next sync.** The field engine's C is in, and the host gives the field's heap the room
-  its larger structs need ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)); with
-  upstream's typed `Field.colorPostFX`, which arrives with the sync after PR 13, CONTINUE and New Game go into the
-  field and the house. Beyond the house, encounters and battles wait on more fixes and on one table of overlay 167
-  that has no C yet. The test launcher steps aside automatically, so its earlier app comparisons do not establish
-  current field or app coverage. See [STATUS.md](STATUS.md).
+- **The field opens; what lies beyond the house waits.** The field engine's C is in, and the host gives the field's
+  heap the room its larger structs need ([ADR 0021](adr/0021-root-heaps-in-the-games-own-memory-from-host-memory.md)),
+  so CONTINUE and New Game go into the field and the house. Beyond the house, encounters and battles wait on more
+  fixes and on one table of overlay 167 that has no C yet. The test launcher steps aside automatically, so its earlier
+  app comparisons do not establish current field or app coverage. See [STATUS.md](STATUS.md).
 - **Frigate reads the game's data from the player's ROM, and checks it.** The program accepts only a dump of the
   version it was built for, by its SHA-1 or by every NitroFS file's ([../hal/rom/port_rom.h](../hal/rom/port_rom.h)),
   so a patched ROM is refused. Changing data files (text, species, trainers, maps) needs the layered file system of

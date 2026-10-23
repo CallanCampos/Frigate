@@ -62,9 +62,9 @@ and ran the 28,600 frames of the Route 19 route from the starter save, through a
 
 ## Consequences
 
-- The field opens at CONTINUE and in New Game. The field also needs `Field.colorPostFX` typed for the host's 16-byte
-  struct. Upstream's `b62c655bfa` does that, and it reaches Frigate with the sync after PR 13. Until then the field
-  crashes in `FieldSkillMapEff_Draw` a few frames after it opens, where it used to stop at the heap.
+- The field opens at CONTINUE and in New Game. It also needed `Field.colorPostFX` typed for the host's 16-byte
+  struct, which upstream's `b62c655bfa` did, merged into Frigate by PR 16: before it, the field crashed in
+  `FieldSkillMapEff_Draw` a few frames after it opened, where it used to stop at the heap.
 - GFL's extra heap moves from the OS heap's block into host memory at boot, on every run, and is four times as large.
   The boot, the opening, the title and the start menu are unchanged: their replays and oracle sequences pass as they
   did.
