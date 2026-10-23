@@ -348,6 +348,7 @@ struct CommEntryMenu {
     u8 sendMemberList;
     u8 memberListPending;
     u8 memberListSent;
+    // The members the leader checks on before the activity starts, as bits
     u8 checkMask;
     HeapID heapId;
     // The leader's answer, and its info
@@ -388,7 +389,10 @@ static const ListMenuRequest sLeaderListRequest = {
     .height = 10,
 };
 
-static const CommEntryMessages sCommEntryMessages[] = {
+// The messages of each activity. The alignment is a guess from the code of the table's readers: MWCC enters the loop
+// of a function that reads an aligned object at its test (docs/matching.md), as CommEntryMenu_UpdateLeader's is, and
+// the table's White 2 address allows nothing above 4.
+static const CommEntryMessages sCommEntryMessages[] ATTRIBUTE_ALIGN(4) = {
     [COMM_ENTRY_MENU_MULTI_BATTLE] = {
         CommEntryMenu_Text_SeekingMultiBattleParticipants,
         CommEntryMenu_Text_WillCancelMultiBattle,
@@ -487,11 +491,6 @@ static BOOL CommEntryMenu_SendCancel(BOOL toAll);
 static void CommEntryMenu_RecvMemberList(int netId, int size, const void *data, void *work, NetHandle *handle);
 static BOOL CommEntryMenu_SendMemberList(CommEntryMemberList *list, u32 netIds, BOOL toAll);
 
-// The messages of the menu's activity
-static inline const CommEntryMessages *CommEntryMenu_GetMessages(CommEntryMenu *menu) {
-    return &sCommEntryMessages[menu->mode];
-}
-
 // The MAC address of the member that a row shows
 static inline u8 *CommEntryMenu_GetShownMac(CommEntryMenu *menu, int row) {
     return menu->shownMacs[row];
@@ -500,11 +499,6 @@ static inline u8 *CommEntryMenu_GetShownMac(CommEntryMenu *menu, int row) {
 // This machine's beacon, which the activity's network setup gives
 static inline CommEntryBeacon *CommEntryMenu_GetBeacon(void) {
     return GFL_NetGetInitData()->getBeaconData(GFL_NetGetWork());
-}
-
-// Whether the member of a network ID is one the leader checks on before the activity starts
-static inline BOOL CommEntryMenu_IsChecked(CommEntryMenu *menu, u32 netId) {
-    return menu->checkMask & 1 << netId;
 }
 
 static const NetCommand sCommEntryNetCommands[] = {
@@ -736,11 +730,11 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
     case COMM_ENTRY_LEADER_SEQ_WAIT_CHECK:
         mask = 1 << GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
-        for (i = 0; (i < COMM_ENTRY_MEMBER_MAX) ? TRUE : FALSE; i++) {
-            if (i != GFL_NetGetHandleNetId(NetHandle_GetOwn()) && CommEntryMenu_IsChecked(menu, i)) {
+        for (i = 0; i < COMM_ENTRY_MEMBER_MAX; i++) {
+            if (i != GFL_NetGetHandleNetId(NetHandle_GetOwn()) && (menu->checkMask & 1 << i)) {
                 if (GFL_NetIsNegotiated(i) == TRUE) {
                     if (menu->readyMask & 1 << i) {
-                        mask |= 1U << i;
+                        mask |= 1 << i;
                     }
                 } else {
                     menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_CANCEL;
@@ -794,7 +788,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         }
         break;
     case COMM_ENTRY_LEADER_SEQ_PRINT_ERROR:
-        CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
+        CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].error);
         menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_LEADER_SEQ_WAIT_ERROR:
@@ -833,7 +827,7 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
 static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
     switch (menu->seq) {
     case COMM_ENTRY_SELECT_SEQ_PRINT_CHOOSE:
-        CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->chooseLeader);
+        CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].chooseLeader);
         menu->seq++;
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_CHOOSE:
@@ -920,7 +914,7 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         }
         break;
     case COMM_ENTRY_SELECT_SEQ_PRINT_ERROR:
-        CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
+        CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].error);
         menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_SELECT_SEQ_WAIT_ERROR:
@@ -1027,7 +1021,7 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
         }
         break;
     case COMM_ENTRY_JOIN_SEQ_PRINT_ERROR:
-        CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
+        CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].error);
         menu->seq = COMM_ENTRY_JOIN_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_JOIN_SEQ_WAIT_ERROR:
@@ -1145,7 +1139,7 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
         }
         break;
     case COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_ERROR:
-        CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
+        CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].error);
         menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR;
         break;
     case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR:
@@ -1416,7 +1410,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
     }
     switch (yesNo->seq) {
     case COMM_ENTRY_CANCEL_SEQ_PRINT:
-        CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->cancelAsk);
+        CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].cancelAsk);
         yesNo->seq++;
         break;
     case COMM_ENTRY_CANCEL_SEQ_OPEN:
@@ -1434,7 +1428,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
             yesNo->result = COMM_ENTRY_ASK_NO;
             yesNo->seq = COMM_ENTRY_CANCEL_SEQ_KEEP;
         } else if (CommEntryMenu_CountAccepted(menu) <= 1) {
-            CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->cancelled);
+            CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].cancelled);
             yesNo->seq = COMM_ENTRY_CANCEL_SEQ_CANCEL;
         } else {
             // Members have joined: ask again, since they will be disbanded
@@ -1454,7 +1448,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
         func_ov036_02187ea0(yesNo->window);
         yesNo->window = NULL;
         if (answer == MSGBG_YES_NO_YES) {
-            CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->cancelled);
+            CommEntryMenu_PrintMessage(menu, sCommEntryMessages[menu->mode].cancelled);
             yesNo->seq++;
         } else {
             yesNo->result = COMM_ENTRY_ASK_NO;
@@ -1474,7 +1468,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
         yesNo->seq = COMM_ENTRY_CANCEL_SEQ_END;
         break;
     case COMM_ENTRY_CANCEL_SEQ_END:
-        if (yesNo->window != NULL) {
+        if (yesNo->window) {
             func_ov036_02187ea0(yesNo->window);
             yesNo->window = NULL;
         }
@@ -1545,7 +1539,7 @@ static void CommEntryMenu_CreateWindows(CommEntryMenu *menu) {
     }
     menu->membersWin = FieldMsgBG_CreateMoneyWin(msgBGSys, menu->msgData, 2, 6, 18, bottom - 6);
     menu->titleWin = FieldMsgBG_CreateMoneyWin(msgBGSys, menu->msgData, 2, 1, 28, 2);
-    func_ov036_02187c34(menu->titleWin, 0, 0, CommEntryMenu_GetMessages(menu)->title);
+    func_ov036_02187c34(menu->titleWin, 0, 0, sCommEntryMessages[menu->mode].title);
 }
 
 static void CommEntryMenu_FreeWindows(CommEntryMenu *menu) {
@@ -1584,6 +1578,7 @@ static void CommEntryMenu_DrawMember(CommEntryMenu *menu, CommEntryMember *membe
 
 // Clears a row whose member left
 static void CommEntryMenu_ClearMember(CommEntryMenu *menu, CommEntryMember *member, u32 netId) {
+    // The getter indexes by an int row and the copy by the u32 netId, so each computes the row's address
     if (GFL_STD_MemCmp(CommEntryMenu_GetShownMac(menu, netId), sNoMac, sizeof(sNoMac)) != 0) {
         CommEntryMenu_ClearRow(menu, netId);
         MI_CpuCopy8(sNoMac, menu->shownMacs[netId], sizeof(sNoMac));

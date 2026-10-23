@@ -148,8 +148,8 @@ static inline GXRgb FieldMenu_InterpolateCursorColor(const FieldMenuCursorColor 
     s32 blue = phase * (end->blue - start->blue) / FX32_CONST(2) + start->blue;
     s32 green = phase * (end->green - start->green) / FX32_CONST(2) + start->green;
 
-    // Packed by hand rather than with GX_RGB: the original combines blue and green before red.
-    return (GXRgb)(red | ((blue << 10) | (green << 5)));
+    // Packs the channels from the highest field down, as palanm.c and fld3d_ci.c pack theirs
+    return (blue << GX_RGB_B_SHIFT) | (green << GX_RGB_G_SHIFT) | red;
 }
 
 static void FieldMenu_RestoreSubscreenOnCancel(FieldMenu *menu);
@@ -192,7 +192,7 @@ static const u16 FIELD_MENU_NAME_MESSAGES[FIELD_MENU_ITEM_MAX] = {
 // The screen of each kind of menu
 static const u32 FIELD_MENU_SCREEN_FILES[FIELD_MENU_TYPE_MAX] = { 0x12, 0x14, 0x14, 0x13, 0x14, 0x14, 0x12 };
 
-// The two colors of the cursor, each fading between its first and second endpoint.
+// The cursor's colors 0 and 1, each pulsing between a start and an end endpoint
 static const FieldMenuCursorColor sCursorColorEndpoints[2][2] = {
     { { 9, 31, 18 }, { 17, 31, 23 } },
     { { 0, 25, 18 }, { 31, 31, 31 } },
@@ -666,13 +666,14 @@ static void LoadFieldMenuTexts(FieldMenu *menu, ArcTool *arc, u8 menuType) {
 // Pulses the cursor's colors
 static void FieldMenu_PulseCursorTCB(TCB *tcb, void *data) {
     FieldMenu *menu = data;
-    fx32 t = GFL_MathSinDegWrap((u16)menu->cursorFadeFrame) + FX32_ONE;
-    GXRgb colors[2];
+    fx32 t = GFL_MathSinDegWrap(menu->cursorFadeFrame) + FX32_ONE;
+    GXRgb cursorColor0;
+    GXRgb cursorColor1;
 
-    colors[1] = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[0][0], &sCursorColorEndpoints[0][1], t);
-    GXS_LoadOBJPltt(&colors[1], 0x142, sizeof(GXRgb));
-    colors[0] = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[1][0], &sCursorColorEndpoints[1][1], t);
-    GXS_LoadOBJPltt(&colors[0], 0x15e, sizeof(GXRgb));
+    cursorColor0 = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[0][0], &sCursorColorEndpoints[0][1], t);
+    GXS_LoadOBJPltt(&cursorColor0, 0x142, sizeof(GXRgb));
+    cursorColor1 = FieldMenu_InterpolateCursorColor(&sCursorColorEndpoints[1][0], &sCursorColorEndpoints[1][1], t);
+    GXS_LoadOBJPltt(&cursorColor1, 0x15e, sizeof(GXRgb));
     menu->cursorFadeFrame += 6;
 }
 
