@@ -198,6 +198,12 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
   to the same bytes under MWCC, a hook macro that compiles away, a rare `#ifdef PLATFORM_PC` block), each proven
   neutral for the ROM build and listed in [game-changes.md](game-changes.md). Both ROMs still build byte for byte from
   this tree. Decomp files are never copied into `port/` ([ADR 0001](adr/0001-repository-and-upstream-sync.md)).
+- **Upstream and every other change reach `main` through reviewed pull requests**
+  ([ADR 0018](adr/0018-protected-main-and-sync-prs.md)). [upstream_sync.py](../tools/upstream_sync.py) proposes one
+  bounded upstream merge at a time that keeps its history, [sync_upstream.sh](../tools/sync_upstream.sh)
+  `--verify-pr` builds both ROMs and tests the host on a pull request's exact head, and the rulesets
+  ([../tools/main-ruleset.json](../tools/main-ruleset.json), [REPOSITORY-POLICY.md](REPOSITORY-POLICY.md)) keep
+  `main` to that path ([SYNC.md](SYNC.md)).
 - **Native means compiled from the C.** No ARM code from the ROM runs, and there is no CPU emulator. A function with
   no C yet is a trap stub that stops the game with its name; the C comes from the decomp, never from a stand-in in
   `port/`. The ROM is the player's, read at run time; nothing from it is committed (PLAN.md §1).
@@ -237,7 +243,13 @@ The decisions behind them are architecture decision records ([adr/](adr/README.m
 
 Each part of the game, the decomp's code that implements it, the port's code that serves it, and the tests that cover
 it. "Whole program" tests are the replays and oracle sequences, which run the game itself
-([../tests/README.md](../tests/README.md)). The latest sync imports the field engine's C, including `FIELDMAP_PROC_FUNCS`. New Game's 10,600-frame replay passes; an extended trace reaches `FieldmapProc_Init` and stops at frame 10,759 because the external field heap is too small for the host's allocations. The test launcher now steps aside automatically, so its earlier app comparisons do not establish current field or app coverage.
+([../tests/README.md](../tests/README.md)).
+
+The decomp now has the field engine's C, `FIELDMAP_PROC_FUNCS` included. New Game's 10,600-frame replay passes, but on
+the host the field doesn't open yet: an extended trace reaches `FieldmapProc_Init` and stops at frame 10,759, because
+the field's external heap, a fixed buffer the size of the DS's, is too small for the host's allocations
+([STATUS.md](STATUS.md)). The test launcher steps aside now that the field has C, so its earlier comparisons of the
+field menu's apps don't show where the field or the apps stand today.
 
 | Feature | Game code (decomp) | Port modules | Tests | Where it stands |
 | --- | --- | --- | --- | --- |
@@ -282,10 +294,3 @@ The planned parts ([PLAN.md §4.3](PLAN.md#43-directory-structure)) have no dire
 ## Glossary
 
 The DS's hardware, Nintendo's libraries and Frigate's own terms, from ARM7 to VBlank: [GLOSSARY.md](GLOSSARY.md).
-
-## Contribution and upstream validation
-
-The source ownership boundaries above are maintained by [reviewed sync PRs](SYNC.md).
-[upstream_sync.py](../tools/upstream_sync.py) publishes bounded history-preserving proposals;
-[sync_upstream.sh](../tools/sync_upstream.sh) verifies ROMs and native tests on the exact proposed head.
-[The ruleset payloads](../tools/main-ruleset.json) and [review policy](REPOSITORY-POLICY.md) protect main.

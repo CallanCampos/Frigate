@@ -157,7 +157,7 @@ asm oracle, each spike, the artwork) lists its files there.
 | `hal/` | The platform layer: host C for the parts of the DS that the game reaches through Nintendo's SDK, one directory per SDK module or ARM7 service (threads and time, memory, VRAM, DMA, the ROM, files and overlays, saves and the cartridge's infrared chip, sound, touch, the clock, power, input), and `host/`, the host operating system's services where macOS, Linux and Windows differ | [hal/README.md](hal/README.md) |
 | `gfx/` | The renderers: the 2D engines line by line, the geometry engine, the 3D rasterizer, display capture | [gfx/README.md](gfx/README.md) |
 | `audio/` | The sound output: the default device and the WAV dump | [audio/README.md](audio/README.md) |
-| `include/` | `port_host.h`, force-included into every decomp file of the host build | [include/README.md](include/README.md) |
+| `include/` | What the decomp's C needs to compile for a host: `port_host.h`, force-included into every decomp file of the host build; `wchar.h`, the DS's 16-bit wide strings in place of the C library's; and `port_wcm.h`, the Wi-Fi workspace's host size | [include/README.md](include/README.md) |
 | `cmake/` | The host build's fragments, one per module, with its tests, and the build's options | [cmake/README.md](cmake/README.md) |
 | `tests/` | Unit, integration, replay and oracle tests, one directory per module | [tests/README.md](tests/README.md) |
 | `tools/` | The build's generators, the upstream sync, the macOS packaging, the melonDS oracle, the measurement scripts | [tools/README.md](tools/README.md) |
@@ -171,9 +171,9 @@ asm oracle, each spike, the artwork) lists its files there.
 [PLAN.md §4.3](docs/PLAN.md#43-directory-structure) also places `vfs/`, `save/`, `mod/`, `features/`, `net/`, `ui/`,
 `third_party/` and the GPU renderer's `gfx/gpu/` and `gfx/shaders/`, which appear as their phases start. Outside
 `port/`, Frigate's own files are `.github/README.md` (the repository's landing page), `.github/workflows/port-sync.yml`
-(the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized, and the
-macOS distribution build), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the port PR template and
-`port_*.yml` issue templates. Game-source changes outside these port-owned paths are listed in
+(the hourly upstream PR proposal) and `.github/workflows/port-ci.yml` (the host build and tests, plain and sanitized,
+the macOS distribution build and the sync tooling's tests), plus `.github/CODEOWNERS`, `.github/CONTRIBUTING.md`, the
+port PR template and `port_*.yml` issue templates. Game-source changes outside these port-owned paths are listed in
 [docs/game-changes.md](docs/game-changes.md).
 
 ## Where to go next

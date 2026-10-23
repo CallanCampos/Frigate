@@ -21,7 +21,11 @@ A bug fix, a refactor or anything one comment explains needs no ADR.
 - Numbers are given in the order ADRs are written, starting at 0001, and never reused. The decisions below that are
   waiting for an ADR take the next free number when someone writes them.
 - 0014, the sanitized build's ADR, was written on the branch `port-sanitizers` as 0013 before the Windows build's took
-  that number, and became 0014 when the branch merged; the next free number is 0019.
+  that number, and became 0014 when the branch merged.
+- Three numbers are reserved for decisions whose work has started on branches of their own, so that those branches
+  don't collide when they merge: 0019 for the pointer-cast guard against a classified baseline, 0020 for one program
+  for both versions (D6) and 0021 for root heaps in host memory. A branch whose ADR took another number before the
+  reservation renumbers it when it merges. The next free number is 0022.
 - An accepted ADR isn't rewritten. Only its status line changes: to "superseded by NNNN" when a later ADR replaces
   it, or to "accepted; amended by NNNN" when a later ADR changes part of it. Typos and broken links may be fixed.
 - Each ADR gets a row in the index below in the same commit.
@@ -58,9 +62,8 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 
 | ADR | Decision | Plan | Status |
 | --- | --- | --- | --- |
-| [0001](0001-repository-and-upstream-sync.md) | Repository and upstream sync | D1, §4.1 | accepted; amended by [0002](0002-solo-project-no-upstream-posts.md) |
+| [0001](0001-repository-and-upstream-sync.md) | Repository and upstream sync | D1, §4.1 | accepted; amended by [0002](0002-solo-project-no-upstream-posts.md) and [0018](0018-protected-main-and-sync-prs.md) |
 | [0002](0002-solo-project-no-upstream-posts.md) | A solo project with no upstream posts | D10, §9 | accepted; amended by [0017](0017-external-contributions.md) |
-| [0018](0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs | D1, §4.1, §8 | Accepted |
 | [0003](0003-ad-hoc-signing-no-apple-developer-account.md) | Ad-hoc signing, no Apple Developer account | D11, §7, §10 | accepted |
 | [0004](0004-ds-addresses-by-header-translation.md) | DS addresses by build-time header translation | D3, §4.5 | accepted |
 | [0005](0005-platform-boundary-as-built.md) | The platform boundary as built | D3, D5, §4.5, §4.7 | accepted |
@@ -75,7 +78,8 @@ What becomes easier, what becomes harder, what must be watched, and what would m
 | [0014](0014-sanitized-build-game-heaps-poisoned-ds-isms-ignorelisted.md) | The sanitized build: the game's heaps poisoned in place, the DS-isms ignorelisted | §4.5, §6, §7 phase 5 | accepted |
 | [0015](0015-universal-macos-app-for-macos-11.md) | A universal macOS app for macOS 11, with the pinned SDL3 linked statically | D11, §7 | accepted |
 | [0016](0016-3d-frame-in-bands-on-worker-threads.md) | The 3D frame drawn in bands on worker threads, the game on one | §4.6, §7 phase 5 | accepted |
-| [0017](0017-external-contributions.md) | External contributions through forks and pull requests | D1, D10, §9 | accepted |
+| [0017](0017-external-contributions.md) | External contributions through forks and pull requests | D1, D10, §9 | accepted; amended by [0018](0018-protected-main-and-sync-prs.md) |
+| [0018](0018-protected-main-and-sync-prs.md) | Protected main and reviewed upstream syncs | D1, §4.1, §8 | accepted |
 
 ## Decisions waiting for an ADR
 
