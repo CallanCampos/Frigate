@@ -382,7 +382,7 @@ static GameEventReturnCode SurveyTextEvent_Run(GameEvent *event, u32 *state, voi
 GameEvent *SurveyTextEvent_Create(GameSystem *gsys) {
     GameEvent *event;
     SurveyTextWork *work;
-    event = GameEvent_Create(gsys, NULL, SurveyTextEvent_Run, 0x20);
+    event = GameEvent_Create(gsys, NULL, SurveyTextEvent_Run, sizeof(SurveyTextWork));
     work = GameEvent_GetData(event);
     SurveyTextWork_Init(work, gsys);
     return event;
@@ -391,7 +391,7 @@ GameEvent *SurveyTextEvent_Create(GameSystem *gsys) {
 void SurveyTextWork_Init(SurveyTextWork *work, GameSystem *gsys) {
     Field *field;
     field = GSYS_GetField(gsys);
-    MI_CpuFill8(work, 0, 0x20);
+    MI_CpuFill8(work, 0, sizeof(SurveyTextWork));
     work->heapId = Field_GetHeapID(field);
     work->gameSystem = gsys;
     work->gameData = GSYS_GetGameData(gsys);
