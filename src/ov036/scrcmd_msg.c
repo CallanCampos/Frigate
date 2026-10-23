@@ -77,7 +77,7 @@ static void SystemMsgWin_Open(FieldScriptEnv *env, u8 pos) {
     FieldMsgWin *window;
     u32 row = MSG_WIN_ROW_TOP;
 
-    if (FieldScriptSubEvent_IsRegistered(1)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         func_ov036_02188660(getMapDisplayInfoPtr(env));
         return;
     }
@@ -117,13 +117,13 @@ static void SystemMsgWin_Open(FieldScriptEnv *env, u8 pos) {
     window = func_ov036_02188498(fieldWork->msgBGSys, msgData, row);
     ActorMsgWin_SetPosActual(env, pos);
     setMapDisplayInfoPtr(env, window);
-    FieldScriptSubEvent_Register(1);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_SYSTEM_MSG);
 }
 
 static void SystemMsgWin_Close(FieldScriptEnv *env) {
     WaitIcon *icon;
 
-    if (FieldScriptSubEvent_IsRegistered(1)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         func_ov036_02188504(getMapDisplayInfoPtr(env));
         icon = GetSpecialMessageIconPtr(env);
         if (icon != NULL) {
@@ -131,7 +131,7 @@ static void SystemMsgWin_Close(FieldScriptEnv *env) {
             SetSpecialMessageIconPtr(env, NULL);
         }
         setMapDisplayInfoPtr(env, NULL);
-        FieldScriptSubEvent_Unregister(1);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_SYSTEM_MSG);
     }
 }
 
@@ -173,7 +173,7 @@ BOOL s0037_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env) {
     WaitIcon *icon;
     BmpWin *window;
 
-    if (!FieldScriptSubEvent_IsRegistered(1)) {
+    if (!FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         return FALSE;
     }
     icon = GetSpecialMessageIconPtr(env);
@@ -407,31 +407,31 @@ u8 ActorMsgWin_CalcWinPosAuto(FieldActor *player, const VecFx32 *pos) {
 static BOOL ScriptNative_ActorMsgWinWaitClosed(VM *vm, void *env) {
     if (func_ov036_021887f4(getMapDisplayInfoPtr(env)) == TRUE) {
         setMapDisplayInfoPtr(env, NULL);
-        FieldScriptSubEvent_Unregister(2);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_ACTOR_MSG);
         return TRUE;
     }
     return FALSE;
 }
 
 static void ActorMsgWin_CloseAsync(VM *vm, FieldScriptEnv *env) {
-    if (FieldScriptSubEvent_IsRegistered(2)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
         func_ov036_021887d4(getMapDisplayInfoPtr(env));
         VM_SetNativeCallback(vm, ScriptNative_ActorMsgWinWaitClosed);
     }
 }
 
 static void ActorMsgWin_CloseImmediate(FieldScriptEnv *env) {
-    if (FieldScriptSubEvent_IsRegistered(2)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
         func_ov036_02188818(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
-        FieldScriptSubEvent_Unregister(2);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_ACTOR_MSG);
     }
 }
 
 static void ActorMsgWin_CreateWindow(FieldScriptEnv *env, FieldMsgBG *msgBGSys, u32 type, const VecFx32 *pos,
                                      StrBuf *strbuf, u32 frameType, u32 tail) {
     setMapDisplayInfoPtr(env, ActorMsgWin_CheckAndCreate(msgBGSys, type, pos, strbuf, frameType, tail));
-    FieldScriptSubEvent_Register(2);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_ACTOR_MSG);
 }
 
 // Moves the balloon with its actor. force recomputes the offset even when the actor hasn't moved
@@ -475,7 +475,7 @@ static BOOL SetupActorMessageWindow(FieldScriptEnv *env, StrBuf *strbuf, u16 act
     if (actor == NULL) {
         return FALSE;
     }
-    if (FieldScriptSubEvent_IsRegistered(2)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
         func_ov036_02188844(getMapDisplayInfoPtr(env), strbuf);
     } else {
         actorWork = GetFieldScriptActorWk(env);
@@ -613,7 +613,7 @@ BOOL s0087_TrainerSayMessage(VM *vm, FieldScriptEnv *env) {
     if (scriptId == 0x29f9) {
         trainerId += 0x500;
     }
-    if (FieldScriptSubEvent_IsRegistered(2)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
         return TRUE;
     }
     TrainerMsg_Load(trainerId, msgType, strbuf, FieldScriptEnv_GetHeapID(env));
@@ -666,7 +666,7 @@ BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 frameType, u8 
     if (pos != MSG_WIN_POS_TOP) {
         row = MSG_WIN_ROW_BOTTOM;
     }
-    if (FieldScriptSubEvent_IsRegistered(3)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
         window = getMapDisplayInfoPtr(env);
         func_ov036_02188ae8(window);
     } else {
@@ -674,16 +674,16 @@ BOOL loadMsgBox(VM *vm, FieldScriptEnv *env, StrBuf *message, u32 frameType, u8 
         setMapDisplayInfoPtr(env, window);
     }
     func_ov036_02188ba4(window, 8, 0, message);
-    FieldScriptSubEvent_Register(3);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_MSG);
     VM_SetNativeCallback(vm, ScriptNative_InfoMsgWinWait);
     return TRUE;
 }
 
 static void InfoMsgWin_Close(FieldScriptEnv *env) {
-    if (FieldScriptSubEvent_IsRegistered(3)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
         func_ov036_02188ab0(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
-        FieldScriptSubEvent_Unregister(3);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_MSG);
     }
 }
 
@@ -725,7 +725,7 @@ BOOL s003A_MultiMsg(VM *vm, FieldScriptEnv *env) {
     }
     func_ov036_02188ddc(fieldWork->msgBGSys, strbuf, index, x, y, width, height);
     GFL_StrBufFree(strbuf);
-    FieldScriptSubEvent_Register(5);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_MULTI_MSG);
     return FALSE;
 }
 
@@ -734,17 +734,17 @@ BOOL s003B_MsgWinCloseNo(VM *vm, FieldScriptEnv *env) {
 
     func_ov036_02188e90(fieldWork->msgBGSys, VM_Read16(vm));
     if (!func_ov036_02188ed0(fieldWork->msgBGSys)) {
-        FieldScriptSubEvent_Unregister(5);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_MULTI_MSG);
     }
     return FALSE;
 }
 
 static void NumberedMsgWins_CloseAll(FieldScriptEnv *env) {
-    if (FieldScriptSubEvent_IsRegistered(5)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MULTI_MSG)) {
         ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
 
         func_ov036_02188e9c(fieldWork->msgBGSys);
-        FieldScriptSubEvent_Unregister(5);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_MULTI_MSG);
     }
 }
 
@@ -766,7 +766,7 @@ static void SignMsgWin_Close(FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     Font *font;
 
-    if (FieldScriptSubEvent_IsRegistered(4)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SIGN)) {
         func_ov036_0218903c(getMapDisplayInfoPtr(env));
         font = ScriptWork_GetSignFont(work);
         ScriptWork_SetSignFont(work, NULL);
@@ -774,7 +774,7 @@ static void SignMsgWin_Close(FieldScriptEnv *env) {
             GFL_FontFree(font);
         }
         setMapDisplayInfoPtr(env, NULL);
-        FieldScriptSubEvent_Unregister(4);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_SIGN);
     }
 }
 
@@ -788,7 +788,7 @@ BOOL s0043_MsgPlaceSign(VM *vm, FieldScriptEnv *env) {
     setMapDisplayInfoPtr(env, func_ov036_02188f28(fieldWork->msgBGSys, type));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
     VM_SetNativeCallback(vm, ScriptNative_SignMsgWinWait);
-    FieldScriptSubEvent_Register(4);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_SIGN);
     return TRUE;
 }
 
@@ -807,7 +807,7 @@ BOOL func_ov036_021a9554(VM *vm, FieldScriptEnv *env) {
     setMapDisplayInfoPtr(env, func_ov036_02188f34(fieldWork2->msgBGSys, type, font));
     LoadFieldScriptMessage(env, SCRIPT_MSG_FILE, msgId);
     VM_SetNativeCallback(vm, ScriptNative_SignMsgWinWait);
-    FieldScriptSubEvent_Register(4);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_SIGN);
     return TRUE;
 }
 
@@ -822,10 +822,10 @@ BOOL func_ov036_021a95ec(FinishScriptSubEventsWork *work, u32 *state) {
 }
 
 static void CheckerMsgWin_Close(FieldScriptEnv *env) {
-    if (FieldScriptSubEvent_IsRegistered(6)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_CHECKER_MSG)) {
         CheckerMsgWin_Free(getMapDisplayInfoPtr(env));
         setMapDisplayInfoPtr(env, NULL);
-        FieldScriptSubEvent_Unregister(6);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_CHECKER_MSG);
     }
 }
 
@@ -851,7 +851,7 @@ BOOL s0045_CheckerMsg(VM *vm, FieldScriptEnv *env) {
     setMapDisplayInfoPtr(env, window);
     CheckerMsgWin_PrintStrBuf(window, 4, 4, strbuf);
     VM_SetNativeCallback(vm, ScriptNative_CheckerMsgWinWait);
-    FieldScriptSubEvent_Register(6);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_CHECKER_MSG);
     return TRUE;
 }
 
@@ -866,19 +866,19 @@ BOOL func_ov036_021a96ec(FinishScriptSubEventsWork *work, u32 *state) {
 }
 
 BOOL s003F_MsgWinCloseAll(VM *vm, FieldScriptEnv *env) {
-    if (FieldScriptSubEvent_IsRegistered(1)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         SystemMsgWin_Close(env);
     }
-    if (FieldScriptSubEvent_IsRegistered(3)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
         InfoMsgWin_Close(env);
     }
-    if (FieldScriptSubEvent_IsRegistered(4)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SIGN)) {
         SignMsgWin_Close(env);
     }
-    if (FieldScriptSubEvent_IsRegistered(6)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_CHECKER_MSG)) {
         CheckerMsgWin_Close(env);
     }
-    if (FieldScriptSubEvent_IsRegistered(2)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
         ActorMsgWin_CloseAsync(vm, env);
     }
     return TRUE;
@@ -893,11 +893,11 @@ static BOOL ScriptNative_AdvanceMessages(VM *vm, void *env) {
         GFL_SndSEPlay(SEQ_SE_MESSAGE);
         return TRUE;
     }
-    if (FieldScriptSubEvent_IsRegistered(1)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_SYSTEM_MSG)) {
         func_ov036_02188630(window);
-    } else if (FieldScriptSubEvent_IsRegistered(3)) {
+    } else if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG)) {
         func_ov036_02188c90(window);
-    } else if (FieldScriptSubEvent_IsRegistered(2)) {
+    } else if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_ACTOR_MSG)) {
         func_ov036_021889c8(window);
     } else {
         return TRUE;
@@ -915,10 +915,10 @@ BOOL s0033_MsgSetAutoscrolls(VM *vm, FieldScriptEnv *env) {
 
     if (VM_Read16(vm)) {
         func_ov036_021879cc(fieldWork->msgBGSys, TRUE);
-        FieldScriptSubEvent_Register(9);
+        FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_AUTOSCROLL);
     } else {
         func_ov036_021879cc(fieldWork->msgBGSys, FALSE);
-        FieldScriptSubEvent_Unregister(9);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_AUTOSCROLL);
     }
     return FALSE;
 }
@@ -926,9 +926,9 @@ BOOL s0033_MsgSetAutoscrolls(VM *vm, FieldScriptEnv *env) {
 BOOL func_ov036_021a9808(FinishScriptSubEventsWork *work, u32 *state) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(work->scriptWork);
 
-    if (FieldScriptSubEvent_IsRegistered(9)) {
+    if (FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_AUTOSCROLL)) {
         func_ov036_021879cc(fieldWork->msgBGSys, FALSE);
-        FieldScriptSubEvent_Unregister(9);
+        FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_AUTOSCROLL);
     }
     return TRUE;
 }

@@ -15,11 +15,6 @@
 #include "system/iss_sys.h"
 #include "system/vm.h"
 
-// The script's sub events of sound, which FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS finishes when the script ends
-#define SCRIPT_SUB_EVENT_BGM_PUSH 10
-#define SCRIPT_SUB_EVENT_BGM_VOLUME 12
-#define SCRIPT_SUB_EVENT_BGM_PLAY 13
-
 // The players of the sound effects that ScriptWork_GetSEBitMask tracks
 #define SE_PLAYER_COUNT 5
 

@@ -297,10 +297,32 @@ typedef struct {
     s32 count;
 } FinishScriptSubEventsWork;
 
+// The script's sub events, which run beside it until it ends: FieldScriptSubEvent_Register's IDs, by which
+// FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS finishes them. 14 has no finish function
+enum {
+    SCRIPT_SUB_EVENT_EV_CAMERA,
+    // The message windows: the system's, an actor's balloon, the message that the mouth moves with, a sign, the
+    // numbered windows and the checkered window
+    SCRIPT_SUB_EVENT_SYSTEM_MSG,
+    SCRIPT_SUB_EVENT_ACTOR_MSG,
+    SCRIPT_SUB_EVENT_MSG,
+    SCRIPT_SUB_EVENT_SIGN,
+    SCRIPT_SUB_EVENT_MULTI_MSG,
+    SCRIPT_SUB_EVENT_CHECKER_MSG,
+    SCRIPT_SUB_EVENT_NDEMO,
+    SCRIPT_SUB_EVENT_SUBSCREEN,
+    SCRIPT_SUB_EVENT_AUTOSCROLL,
+    SCRIPT_SUB_EVENT_BGM_PUSH,
+    SCRIPT_SUB_EVENT_GAME_COMM_PAUSE,
+    SCRIPT_SUB_EVENT_BGM_VOLUME,
+    SCRIPT_SUB_EVENT_BGM_PLAY,
+    SCRIPT_SUB_EVENT_MAX = 15,
+};
+
 // Returns TRUE once the sub event is finished
 typedef BOOL (*FieldScriptSubEventFinishFunc)(FinishScriptSubEventsWork *work, u32 *state);
 
-extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[15];
+extern const FieldScriptSubEventFinishFunc FIELD_SCRIPT_SUB_EVENT_FINISH_FUNCS[SCRIPT_SUB_EVENT_MAX];
 // scrcmd_network.c: tries to boot the game's communication again
 BOOL GameCommPause_Finish(FinishScriptSubEventsWork *work, u32 *state);
 // scrcmd_ndemo.c
