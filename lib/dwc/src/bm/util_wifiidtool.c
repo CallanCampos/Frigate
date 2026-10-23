@@ -18,11 +18,11 @@ static const u8 DWCi_util_wifiid_exctable[8] = { 1, 2, 0, 4, 3, 5, 6, 7 };
 const u8 WifiIdTool_InverseNibbleSubstitution[16] = { 7, 2, 5, 10, 11, 0, 13, 15, 12, 1, 6, 8, 4, 9, 3, 14 };
 static const u8 DWCi_util_wifiid_ttable[16] = { 5, 9, 1, 14, 12, 2, 10, 0, 11, 13, 3, 4, 8, 6, 15, 7 };
 
-static u64 DWCi_Util_WiFiId_scrambleUid(u32 salt, u32 nic, u32 notNintendo, u32 type);
+static u64 DWCi_Util_WiFiId_scrambleUid(u16 salt, u32 nic, u8 notNintendo, u8 type);
 
 // Makes a pending ID of 43 bits from the salt, the last three bytes of the MAC address, whether the first three are
 // not Nintendo's, and a type of 2 bits (always 0), and scrambles it
-static u64 DWCi_Util_WiFiId_scrambleUid(u32 salt, u32 nic, u32 notNintendo, u32 type) {
+static u64 DWCi_Util_WiFiId_scrambleUid(u16 salt, u32 nic, u8 notNintendo, u8 type) {
     union {
         u64 value;
         u8 bytes[8];
@@ -59,14 +59,12 @@ static u64 DWCi_Util_WiFiId_scrambleUid(u32 salt, u32 nic, u32 notNintendo, u32 
 }
 
 BOOL DWCi_AUTH_GetNewWiFiInfo(DWCWiFiInfo *info) {
+    u8 notNintendo;
     u8 mac[6];
+    u32 nic;
+    s64 seed;
     RTCDate date;
     RTCTime time;
-    u8 notNintendo;
-    u32 seed;
-    s64 seconds;
-    u32 oui;
-    u32 nic;
 
     DWCi_BM_GetWiFiInfo(info);
     RTC_Init();
@@ -76,33 +74,32 @@ BOOL DWCi_AUTH_GetNewWiFiInfo(DWCWiFiInfo *info) {
     if (RTC_GetTime(&time) != 0) {
         return FALSE;
     }
-    seconds = RTC_ConvertDateTimeToSecond(&date, &time);
-    if (seconds < 0) {
+    seed = RTC_ConvertDateTimeToSecond(&date, &time);
+    if (seed < 0) {
         return FALSE;
     }
     if (OS_IsTickAvailable()) {
         // BUG: adds the address of the tick function, not the tick count that its call would give
 #ifdef BUGFIX
-        seconds += OS_GetTick();
+        seed += OS_GetTick();
 #else
-        seconds += (u32)OS_GetTick;
+        seed += (u32)OS_GetTick;
 #endif
     }
     OS_GetMacAddress(mac);
-    oui = (mac[0] << 16) | (mac[1] << 8) | mac[2];
-    notNintendo = oui != NINTENDO_OUI;
+    notNintendo = (((mac[0] << 16) | (mac[1] << 8) | mac[2]) != NINTENDO_OUI) ? 1 : 0;
     nic = (mac[3] << 16) | (mac[4] << 8) | mac[5];
-    seed = (u32)seconds * 0x5D588B65 + 0x269EC3;
-    info->pass = ((seed >> 16) * 1000) >> 16;
+    seed = (u32)seed * 0x5D588B65 + 0x269EC3;
+    info->pass = (((u32)seed >> 16) * 1000) >> 16;
     info->attestedUserId = 0;
     if (info->randomHistory == 0) {
         info->notAttestedId = 0;
         while (info->notAttestedId == 0) {
-            seed = seed * 0x5D588B65 + 0x269EC3;
-            while (seed == 0) {
-                seed = seed * 0x5D588B65 + 0x269EC3;
+            seed = (u32)seed * 0x5D588B65 + 0x269EC3;
+            while ((u32)seed == 0) {
+                seed = (u32)seed * 0x5D588B65 + 0x269EC3;
             }
-            info->randomHistory = seed;
+            info->randomHistory = (u16)seed;
             info->notAttestedId = DWCi_Util_WiFiId_scrambleUid(info->randomHistory, nic, notNintendo, 0);
         }
     } else {
@@ -134,14 +131,12 @@ BOOL DWCi_AUTH_UpDateWiFiID(DWCWiFiInfo *info, void *work) {
 }
 
 BOOL DWCi_AUTH_RemakeWiFiID(DWCWiFiInfo *info) {
+    u8 notNintendo;
     u8 mac[6] = { 0, 0, 0, 0, 0, 0 };
+    u32 nic;
+    s64 seed;
     RTCDate date;
     RTCTime time;
-    u8 notNintendo;
-    u32 seed;
-    s64 seconds;
-    u32 nic;
-    u32 oui;
 
     DWCi_BM_GetWiFiInfo(info);
     RTC_Init();
@@ -151,31 +146,30 @@ BOOL DWCi_AUTH_RemakeWiFiID(DWCWiFiInfo *info) {
     if (RTC_GetTime(&time) != 0) {
         return FALSE;
     }
-    seconds = RTC_ConvertDateTimeToSecond(&date, &time);
-    if (seconds < 0) {
+    seed = RTC_ConvertDateTimeToSecond(&date, &time);
+    if (seed < 0) {
         return FALSE;
     }
     if (OS_IsTickAvailable()) {
         // BUG: adds the address of the tick function, not the tick count that its call would give
 #ifdef BUGFIX
-        seconds += OS_GetTick();
+        seed += OS_GetTick();
 #else
-        seconds += (u32)OS_GetTick;
+        seed += (u32)OS_GetTick;
 #endif
     }
     OS_GetMacAddress(mac);
-    oui = (mac[0] << 16) | (mac[1] << 8) | mac[2];
-    notNintendo = oui != NINTENDO_OUI;
+    notNintendo = (((mac[0] << 16) | (mac[1] << 8) | mac[2]) != NINTENDO_OUI) ? 1 : 0;
     nic = (mac[3] << 16) | (mac[4] << 8) | mac[5];
-    seed = (u32)seconds * 0x5D588B65 + 0x269EC3;
-    info->pass = ((seed >> 16) * 1000) >> 16;
+    seed = (u32)seed * 0x5D588B65 + 0x269EC3;
+    info->pass = (((u32)seed >> 16) * 1000) >> 16;
     info->notAttestedId = 0;
     while (info->notAttestedId == 0) {
-        seed = seed * 0x5D588B65 + 0x269EC3;
-        while (seed == 0 || info->randomHistory == (u16)seed) {
-            seed = seed * 0x5D588B65 + 0x269EC3;
+        seed = (u32)seed * 0x5D588B65 + 0x269EC3;
+        while ((u32)seed == 0 || info->randomHistory == (u16)seed) {
+            seed = (u32)seed * 0x5D588B65 + 0x269EC3;
         }
-        info->randomHistory = seed;
+        info->randomHistory = (u16)seed;
         info->notAttestedId = DWCi_Util_WiFiId_scrambleUid(info->randomHistory, nic, notNintendo, 0);
     }
     return TRUE;

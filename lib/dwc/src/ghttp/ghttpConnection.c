@@ -50,8 +50,9 @@ int ghiFindFreeSlot(void) {
 
 // Makes a connection in a free slot, with nothing set but its buffers. Returns NULL if it can't
 GHIConnection *ghiNewConnection(void) {
-    int slot;
+    GHTTPBool result;
     GHIConnection *connection;
+    int slot;
 
     ghiLock();
     slot = ghiFindFreeSlot();
@@ -102,20 +103,27 @@ GHIConnection *ghiNewConnection(void) {
     connection->proxyOverrideServer = NULL;
     connection->encryptor.mInterface = NULL;
     connection->encryptor.mInitialized = gsi_false;
-    connection->handle = NULL;
     connection->receiveFileIdleTime = 0;
+    connection->handle = NULL;
 
-    if (ghiInitBuffer(connection, &connection->sendBuffer, 0x800, 0x1000) &&
-        ghiInitBuffer(connection, &connection->encodeBuffer, 0x800, 0x400) &&
-        ghiInitBuffer(connection, &connection->recvBuffer, 0x800, 0x800) &&
-        ghiInitBuffer(connection, &connection->decodeBuffer, 0x800, 0x400)) {
-        sConnections.activeCount++;
-        ghiUnlock();
-        return connection;
+    result = ghiInitBuffer(connection, &connection->sendBuffer, 0x800, 0x1000);
+    if (result) {
+        result = ghiInitBuffer(connection, &connection->encodeBuffer, 0x800, 0x400);
     }
-    ghiFreeConnection(connection);
+    if (result) {
+        result = ghiInitBuffer(connection, &connection->recvBuffer, 0x800, 0x800);
+    }
+    if (result) {
+        result = ghiInitBuffer(connection, &connection->decodeBuffer, 0x800, 0x400);
+    }
+    if (!result) {
+        ghiFreeConnection(connection);
+        ghiUnlock();
+        return NULL;
+    }
+    sConnections.activeCount++;
     ghiUnlock();
-    return NULL;
+    return connection;
 }
 
 // Ends the connection's lookup of its host and its socket, and says if that went well

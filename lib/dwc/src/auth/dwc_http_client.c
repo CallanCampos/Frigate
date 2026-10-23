@@ -177,21 +177,20 @@ static BOOL DWCi_Http_CheckHeaderReceived(DWCHttp *http) {
 
 static void DWCi_Http_Thread(void *arg) {
     DWCHttp *http = arg;
-    CPSInAddr ip;
-    u64 lastData;
-    u32 length;
-    int headersDone = 0;
     CPSSoc *soc = &http->soc;
     DWCHttpSslConnection *con = &http->con;
     DWCHttpBuffer *response = &http->rep;
-    int timeout = http->param.timeout;
-    char *request;
-    int sent;
-    int room;
-    int size;
+    u32 copyLength;
+    CPSInAddr ip;
     u8 *data;
-    char *old;
+    s32 length;
+    u64 lastData;
+    u64 now;
+    int timeout;
+    u32 connectError;
+    int headersDone = 0;
 
+    timeout = http->param.timeout;
     if (timeout <= 0) {
         timeout = 60000;
     }
@@ -212,15 +211,16 @@ static void DWCi_Http_Thread(void *arg) {
         CPS_SetSsl(TRUE);
     }
     CPS_SocBind(0, http->port, ip);
-    if (CPS_TcpConnect() != 0) {
+    connectError = CPS_TcpConnect();
+    if (connectError != 0) {
         http->error = 3;
         CPS_SocRelease();
         CPS_SocUnRegister();
         return;
     }
-    request = http->req.buffer;
-    sent = CPS_SocWrite((u8 *)request, strlen(request));
-    if (sent <= 0) {
+    data = (u8 *)http->req.buffer;
+    length = CPS_SocWrite(data, strlen((const char *)data));
+    if (length <= 0) {
         http->error = 5;
         goto cleanup;
     }
@@ -237,43 +237,40 @@ static void DWCi_Http_Thread(void *arg) {
             http->error = 5;
             goto cleanup;
         }
-        size = CPS_SocGetLength();
-        length = size;
-        if (size < 0) {
+        length = CPS_SocGetLength();
+        if (length < 0) {
             break;
         }
-        if (size > 0) {
+        if (length > 0) {
             lastData = OS_GetTick();
-            data = CPS_SocRead(&length);
+            data = CPS_SocRead((u32 *)&length);
             if (data == NULL) {
                 break;
             }
-            room = response->buffer_tail - 1 - response->write_index;
-            size = length;
-            if (size >= room) {
-                size = room;
-            }
-            MI_CpuCopy8(data, response->write_index, size);
-            old = response->write_index;
-            response->write_index = old + size;
-            old[size] = 0;
+            copyLength = (length < response->buffer_tail - 1 - response->write_index)
+                             ? length
+                             : response->buffer_tail - 1 - response->write_index;
+            MI_CpuCopy8(data, response->write_index, copyLength);
+            response->write_index += copyLength;
+            *response->write_index = 0;
             if (headersDone == 1) {
                 OS_LockMutex(&http->content_len_mutex);
-                http->receivedbody_len += size;
+                http->receivedbody_len += copyLength;
                 OS_UnlockMutex(&http->content_len_mutex);
             } else {
                 headersDone = DWCi_Http_CheckHeaderReceived(http);
             }
-            if (length > size) {
+            if (length > copyLength) {
                 CPS_SocConsume(length);
                 break;
             }
-            CPS_SocConsume(size);
+            CPS_SocConsume(copyLength);
         }
         if (http->content_len >= 0 && http->receivedbody_len >= http->content_len) {
             break;
         }
-        if (OS_TicksToMilliSeconds(OS_GetTick() - lastData) > timeout) {
+        now = OS_GetTick();
+        if (OS_TicksToMilliSeconds(now - lastData) > timeout) {
             http->error = 6;
             goto cleanup;
         }

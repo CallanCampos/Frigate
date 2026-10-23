@@ -396,44 +396,40 @@ static gsi_bool gsiLargeIntSubDivide(gsi_u32 *a, gsi_u32 aLength, const gsi_u32 
 
 // Squares a number and takes the remainder of the division by the modulus
 static gsi_bool gsLargeIntSquareMod(const gsLargeInt_t *value, const gsLargeInt_t *modulus, gsLargeInt_t *result) {
-    int count = value->mLength;
-    gsi_u64 carry = 0;
-    gsi_u32 bit = 0;
-    int length = 0;
     int i;
     int j;
+    int count = value->mLength;
+    gsi_u64 carry = 0;
+    int bit = 0;
     gsi_bool ok;
+    gsi_u32 length = 0;
 
     gsiLargeIntTimerStart(GSLintTimerSquareMod);
     gsi_u32 squares[0x80] = { 0 };
     gsi_u32 cross[0x80] = { 0 };
     for (i = 1; i < count; i++) {
         for (j = 0; j < i; j++) {
-            gsi_u64 product = (gsi_u64)value->mData[i] * value->mData[j];
-            gsi_u64 total = carry + ((gsi_u64)cross[i + j] + product);
-
-            cross[i + j] = (gsi_u32)total;
-            carry = total >> 32;
+            carry += (gsi_u64)value->mData[i] * value->mData[j] + cross[i + j];
+            cross[i + j] = (gsi_u32)carry;
+            carry >>= 32;
         }
         if (carry != 0) {
-            cross[i + j] = carry;
-            carry = 0;
+            cross[i + j] = (gsi_u32)carry;
+            carry >>= 32;
         }
     }
     for (i = 0; i < count * 2; i++) {
-        gsi_u32 word = cross[i];
-
-        cross[i] = bit + word * 2;
-        bit = (word & 0x80000000) == 0x80000000;
+        j = (cross[i] & 0x80000000) == 0x80000000 ? 1 : 0;
+        cross[i] = (cross[i] << 1) + bit;
+        bit = j;
     }
     for (i = 0; i < count; i++) {
-        gsi_u64 square = (gsi_u64)value->mData[i] * value->mData[i];
-
-        squares[i * 2] = (gsi_u32)square;
-        squares[i * 2 + 1] = square >> 32;
+        carry = (gsi_u64)value->mData[i] * value->mData[i];
+        squares[i * 2] = (gsi_u32)carry;
+        squares[i * 2 + 1] = (gsi_u32)(carry >> 32);
     }
     length = count * 2;
-    gsiLargeIntAdd(cross, count * 2, squares, count * 2, squares, (gsi_u32 *)&length, 0x80);
+    gsiLargeIntAdd(cross, length, squares, length, squares, &length, 0x80);
     ok = gsiLargeIntDiv(squares, length, modulus, NULL, result);
     gsiLargeIntTimerStop(GSLintTimerSquareMod);
     return ok;
@@ -568,12 +564,15 @@ static gsi_bool gsiLargeIntMultM(gsLargeInt_t *a, gsLargeInt_t *b, const gsLarge
         carry = 0;
         factor = (gsi_u64)inverse * *p;
         q = p;
-        for (m = modulus->mData; m <= modulusLast; m++) {
-            product = (gsi_u64)factor * *m;
-            product = carry + ((gsi_u64)*q + product);
-            *q = (gsi_u32)product;
-            carry = product >> 32;
-            q++;
+        m = modulus->mData;
+        if (m <= modulusLast) {
+            for (; m <= modulusLast; m++) {
+                product = (gsi_u64)factor * *m;
+                product = carry + ((gsi_u64)*q + product);
+                *q = (gsi_u32)product;
+                carry = product >> 32;
+                q++;
+            }
         }
         for (; carry != 0 && q <= work + length - 1; q++) {
             gsi_u64 sum = (gsi_u64)*q + carry;
@@ -604,12 +603,15 @@ static gsi_bool gsiLargeIntMultM(gsLargeInt_t *a, gsLargeInt_t *b, const gsLarge
 
 // Finds the word that, with the modulus, makes the Montgomery reduction work: the negated inverse of the lowest word
 static gsi_bool gsiLargeIntInverseMod(const gsLargeInt_t *modulus, gsi_u32 *result) {
-    gsi_u32 i;
     gsi_u64 x = 2;
     gsi_u64 y = 1;
+    gsi_u32 i;
 
     for (i = 2; i <= 32; i++) {
-        if (x < ((modulus->mData[0] * y) & (2 * x - 1))) {
+        gsi_u64 mask = (x << 1) - 1;
+        gsi_u64 product = (gsi_u64)modulus->mData[0] * y;
+
+        if (x < (product & mask)) {
             y += x;
         }
         x <<= 1;

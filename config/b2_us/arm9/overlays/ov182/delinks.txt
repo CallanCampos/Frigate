@@ -16,6 +16,7 @@ lib/dwcutil/src/dwc_wcm.c:
     .bss        start:0x021c2aa0 end:0x021c2af0
 
 lib/dwcutil/src/dwc_aoss.c:
+    complete
     .text       start:0x021a49d0 end:0x021a6c1c
     .rodata     start:0x021bd2e4 end:0x021bd2e8
     .data       start:0x021c05d0 end:0x021c0648

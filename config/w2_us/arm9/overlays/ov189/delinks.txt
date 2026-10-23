@@ -116,6 +116,7 @@ lib/dwc/src/ghttp/ghttpCommon.c:
     .bss        start:0x021b28a8 end:0x021b28b0
 
 lib/dwc/src/ghttp/ghttpConnection.c:
+    complete
     .text       start:0x021a1e4c end:0x021a2418
     .data       start:0x021ad3b4 end:0x021ad40c
     .bss        start:0x021b28b0 end:0x021b28c0

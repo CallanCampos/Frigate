@@ -1787,6 +1787,7 @@ lib/dwc/src/bm/dwc_bm_init.c:
     .text       start:0x02056f48 end:0x02056fb4
 
 lib/dwc/src/bm/util_wifiidtool.c:
+    complete
     .text       start:0x02056fb4 end:0x020575d0
     .rodata     start:0x020940b0 end:0x020940d8
 
