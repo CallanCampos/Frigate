@@ -134,7 +134,7 @@ struct MMSys {
     NoGridMapper *noGridMapper;
     Field *field;
     u16 *cameraAngle;
-    void *colorPostFx;
+    FieldColorPostFX *colorPostFx;
     // The count of cached configs and their object codes, then the configs, from the word after the even count of codes
     u16 *actorConfigCache;
 };

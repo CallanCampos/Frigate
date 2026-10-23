@@ -14,6 +14,7 @@
 #include "gfl/tcb.h"
 #include "gfl/tcbl.h"
 #include "nnsys/g2d.h"
+#include "save/high_link.h"
 #include "struct_decls.h"
 #include "system/app_keycursor.h"
 #include "system/bmp_oam.h"
@@ -161,7 +162,7 @@ struct FMissionView {
     WifiList *wifiList;
     LinkFestival *festival;
     FestMissionConfig *config;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     FestivalText *festText;
     // The Pass Power of the player's first slot
     u32 passPower;

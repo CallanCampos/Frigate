@@ -116,7 +116,7 @@ struct FieldG3DMapper {
     FieldTerrainAnimator *terrainAnimator;
     void *wfbc;
     ResortMapCreateWork *resortMap;
-    void *heightEx;
+    HeightExList *heightEx;
 };
 
 FieldG3DMapper *FieldG3DMapper_Create(HeapID heapId, u16 season);
@@ -126,10 +126,12 @@ BOOL FieldG3DMapper_Update(FieldG3DMapper *mapper);
 void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper);
 // pass is a FIELD_G3D_RENDER_PHASE_
 void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass);
-void *func_ov036_02184590(FieldG3DMapper *mapper);
-void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx);
+HeightExList *func_ov036_02184590(FieldG3DMapper *mapper);
+void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
+                              FieldColorPostFX *colorPostFx);
 void FieldG3DMapper_FreeMap(FieldG3DMapper *mapper);
-void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx);
+void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
+                                    FieldColorPostFX *colorPostFx);
 void FieldG3DMapper_FreeMapTextures(FieldG3DMapper *mapper);
 void FieldG3DMapper_SetPlayerPos(FieldG3DMapper *mapper, const VecFx32 *position);
 u32 FieldG3DMapper_GetBasePosChunkHandleIdx(FieldG3DMapper *mapper);

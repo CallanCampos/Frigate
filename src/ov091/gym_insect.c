@@ -564,7 +564,7 @@ static void GymInsect_EffectTask(TCB *tcb, void *data) {
 
 static void GymInsect_InitAreas(Field *field) {
     int i;
-    void *list = func_ov036_02184590(Field_GetG3DMapper(field));
+    HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(field));
 
     for (i = 0; i < NELEMS(sAreas); i++) {
         func_ov036_021ba624(i, sAreas[i].x, sAreas[i].z, sAreas[i].width, sAreas[i].depth, sAreas[i].value,

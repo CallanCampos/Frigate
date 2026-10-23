@@ -53,7 +53,7 @@ typedef struct {
     u16 choices[5];
 } FesMissionQuiz;
 
-// Overlay 36's Funfest gimmick, as Field_GetFesGimmick returns it (overlay 73's RivalSelectContext is the same one)
+// Overlay 36's Funfest gimmick, as Field_GetFesGimmick returns it. Overlays 26, 71 and 73 take it too
 struct FesGimmick {
     GameSystem *gsys;
     GameData *gameData;
@@ -68,11 +68,14 @@ struct FesGimmick {
     FieldActor *playerActor;
     EventData *eventData;
     EventWork *eventWork;
-    void *effects;
-    void *railSystem;
+    FieldEffects *effects;
+    FieldRailSystem *railSystem;
     u32 unk38;
-    void *unk3C;
-    FesMissionWork *work;
+    // The sparkles of a mission of type 4, which overlay 71 shows
+    FieldEffectTask *sparkles;
+    // The mission's work in the festival's entries, by the mission's kind: a FesMissionWork, a FestSparkleWork or
+    // the hollows' RivalEntry list
+    void *work;
     FesMissionQuiz quiz;
 };
 

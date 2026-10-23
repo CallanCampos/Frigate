@@ -887,7 +887,7 @@ static GameEvent *CheckPerStepEvents(FieldInteractWk *wk, Field *field, RailPosi
         updateFollowerModel(gameData);
     }
     if (wk->stepped || wk->verticalOnly) {
-        void *gimmick;
+        FesGimmick *gimmick;
 
         event = CheckPhenomenonEvent(field, gsys, gameData);
         if (event != NULL) {

@@ -644,7 +644,6 @@ typedef struct ResortWork ResortWork;
 typedef struct RingtoneSys RingtoneSys;
 typedef struct RivalDataSave RivalDataSave;
 typedef struct RivalEntry RivalEntry;
-typedef struct RivalSelectContext RivalSelectContext;
 typedef struct RespawnZoneInfo RespawnZoneInfo;
 typedef struct SaveBlockDef SaveBlockDef;
 typedef struct SaveControl SaveControl;

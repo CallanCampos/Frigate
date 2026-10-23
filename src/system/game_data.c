@@ -273,11 +273,11 @@ PlayerState *GameData_GetPlayerState(GameData *gameData) {
     return &gameData->playerStates[GAME_DATA_PLAYER_MINE];
 }
 
-void *GameData_GetPassPowerLevels(GameData *gameData, u32 netId) {
+PassPowerLevel *GameData_GetPassPowerLevels(GameData *gameData, u32 netId) {
     return &gameData->levels[netId];
 }
 
-void *GameData_GetMyPassPowerLevels(GameData *gameData) {
+PassPowerLevel *GameData_GetMyPassPowerLevels(GameData *gameData) {
     return GameData_GetPassPowerLevels(gameData, GAME_DATA_LEVELS_MINE);
 }
 
@@ -896,7 +896,7 @@ WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData) {
     return &gameData->wbtSystem;
 }
 
-void *GameData_GetWbtSave(GameData *gameData) {
+WbtSave *GameData_GetWbtSave(GameData *gameData) {
     return TrialHouseSave_GetWbtSave(gameData->saveControl);
 }
 

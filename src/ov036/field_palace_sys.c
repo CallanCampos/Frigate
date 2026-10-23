@@ -62,7 +62,7 @@ void FieldPalaceSys_Free(FieldPalaceSys *sys) {
     GFL_HeapFree(sys);
 }
 
-void *FieldPalaceSys_GetLuminanceTable(FieldPalaceSys *sys) {
+u8 *FieldPalaceSys_GetLuminanceTable(FieldPalaceSys *sys) {
     return sys->luminanceTable;
 }
 

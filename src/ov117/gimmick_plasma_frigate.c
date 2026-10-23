@@ -928,7 +928,7 @@ static BOOL GimmickPlasmaFrigate_FindLinkedModel(PlasmaFrigateWork *work, u16 mo
 }
 
 static void GimmickPlasmaFrigate_ClearAreas(PlasmaFrigateWork *work) {
-    void *list = func_ov036_02184590(Field_GetG3DMapper(work->field));
+    HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(work->field));
     int count = func_ov036_021ba684(list);
     int i;
 
@@ -939,7 +939,7 @@ static void GimmickPlasmaFrigate_ClearAreas(PlasmaFrigateWork *work) {
 
 // Sets the area of the panel, and merges or splits those of the panels that go together
 static void GimmickPlasmaFrigate_SetPanelArea(PlasmaFrigateWork *work, int panel, int mode) {
-    void *list = func_ov036_02184590(Field_GetG3DMapper(work->field));
+    HeightExList *list = func_ov036_02184590(Field_GetG3DMapper(work->field));
     const PanelArea *area;
     int first;
 

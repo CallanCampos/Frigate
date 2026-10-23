@@ -261,7 +261,7 @@ static int GetLevelSteps(u16 level) {
 static u8 GimmickFunfestLevels_ShowLevels(GameData *gameData, FieldExpObjSystem *expObj, EntralinkCommWork *commWork) {
     u32 netId = GameData_GetBeaconNetID(gameData);
     int offset;
-    void *levels;
+    PassPowerLevel *levels;
     int whiteSteps;
     int blackSteps;
     SRTMatrix *matrix;

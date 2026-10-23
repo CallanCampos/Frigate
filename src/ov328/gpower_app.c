@@ -1503,7 +1503,7 @@ static BOOL GPowerApp_CheckAnyInput(GPowerApp *work) {
 }
 
 static void GPowerApp_LoadPrices(GPowerApp *work) {
-    void *data = PassPowerData_Create(work->heapId);
+    PassPowerData *data = PassPowerData_Create(work->heapId);
     int i;
 
     for (i = 0; i < work->param->highLinkCount; i++) {

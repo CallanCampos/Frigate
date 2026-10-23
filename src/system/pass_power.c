@@ -182,11 +182,11 @@ static void PassPower_DeactivateEffect(int effect) {
     }
 }
 
-void *PassPowerData_Create(HeapID heapId) {
+PassPowerData *PassPowerData_Create(HeapID heapId) {
     return GFL_ArcSysReadHeapNew(ARCID_PASS_POWER, 0, heapId);
 }
 
-void PassPowerData_Free(void *data) {
+void PassPowerData_Free(PassPowerData *data) {
     GFL_HeapFree(data);
 }
 

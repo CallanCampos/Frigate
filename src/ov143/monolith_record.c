@@ -242,7 +242,7 @@ static void MonolithRecord_FreeWindows(MonolithRecordWork *rw) {
 }
 
 static void MonolithRecord_Draw(MonolithScreenParam *screen, MonolithWork *wk, MonolithRecordWork *rw) {
-    void *records;
+    FunfestSave *records;
     StrBuf *str;
     StrBuf *expanded;
     u32 value;

@@ -313,7 +313,7 @@ PokeParty *SaveControl_GetPokePartySave(SaveControl *save);
 WorldTradeData *SaveControl_GetWorldTradeData(SaveControl *save);
 DreamWorldSave *getDreamWorldStuffAddress(SaveControl *save);
 HighLinkSave *getHighLinkBlockAddress(SaveControl *save);
-void *FestRecords_GetFromSave(SaveControl *save);
+FunfestSave *FestRecords_GetFromSave(SaveControl *save);
 // The Funfest mission records of FestRecords_GetFromSave's block: missions hosted, joined and completed, the most
 // participants and the best score
 u16 FestRecords_GetHosted(FunfestSave *a0);
@@ -327,11 +327,11 @@ u16 FestRecords_GetTopScores(FunfestSave *a0);
 // A Funfest mission's record in FestRecords_GetFromSave's block, by the mission's index, which is 0 for an index past
 // the missions: a 14-bit count, another count, the highest level cleared (0 to 4) and whether the mission is new, which
 // FestRecords_ClearMissionNew clears
-u16 FestRecords_GetMissionCount(void *records, u8 mission);
-u16 FestRecords_GetMissionBest(void *records, u8 mission);
+u16 FestRecords_GetMissionCount(FunfestSave *records, u8 mission);
+u16 FestRecords_GetMissionBest(FunfestSave *records, u8 mission);
 u32 FestRecords_GetMissionLevel(FunfestSave *records, u8 mission);
 BOOL FestRecords_IsMissionNew(FunfestSave *records, u8 mission);
-void FestRecords_ClearMissionNew(void *records, u8 mission);
+void FestRecords_ClearMissionNew(FunfestSave *records, u8 mission);
 KeyInfoSave *getKeyInfoSaveBlk(SaveControl *save);
 // Whether a key system key is unlocked
 BOOL KeyInfo_IsKeyUnlocked(KeyInfoSave *keyInfo, u32 key);

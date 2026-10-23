@@ -25,7 +25,7 @@ typedef struct G3DModel G3DModel;
 G3DCurve *GFL_G3DCurveCreateToLoadBufferEntire(HeapID heapId, u32 arcId, u16 fileId, void *buffer, u32 bufferSize);
 G3DCurve *GFL_G3DCurveCreateToLoadBuffer(HeapID heapId, u32 arcId, u32 fileId, u32 preloadCount, void *buffer,
                                          u32 bufferSize);
-void GFL_G3DResBindData(void *resource, u32 kind, void *data);
+void GFL_G3DResBindData(G3DResource *resource, u32 kind, void *data);
 BOOL GFL_G3DCurveFrameStepLoop(G3DCurve *curve, fx32 step);
 BOOL GFL_G3DCurveGetNowTranslation(G3DCurve *curve, VecFx32 *translation);
 BOOL GFL_G3DCurveGetNowRotation(G3DCurve *curve, VecFx32 *rotation);
@@ -147,11 +147,11 @@ BOOL GFL_G3DSysUsesFrmTexVramMgr(void);
 BOOL GFL_G3DSysUsesFrmPlttVramMgr(void);
 // Resources, each a file of a model, textures or an animation
 G3DResource *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId);
-void *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId);
-void *GFL_G3DSysReadFSResource(const char *path, u32 fileId);
+G3DResource *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId);
+G3DResource *GFL_G3DSysReadFSResource(const char *path, u32 fileId);
 // The size of a resource, for one allocated outside the 3D system, which GFL_G3DResSetup sets up with its file
 u32 GFL_G3DResGetAllocSize(void);
-void GFL_G3DResSetup(void *resource, void *data);
+void GFL_G3DResSetup(G3DResource *resource, void *data);
 BOOL GFL_G3DResCheckType(G3DResource *resource, u32 type);
 BOOL GFL_G3DResIsTexUploadDone(G3DResource *resource);
 // Puts a resource's textures and palettes in VRAM, and frees them; SetupTexData only allocates the VRAM, and

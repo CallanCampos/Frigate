@@ -190,11 +190,12 @@ void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass) {
     }
 }
 
-void *func_ov036_02184590(FieldG3DMapper *mapper) {
+HeightExList *func_ov036_02184590(FieldG3DMapper *mapper) {
     return mapper->heightEx;
 }
 
-void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx) {
+void FieldG3DMapper_CreateMap(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
+                              FieldColorPostFX *colorPostFx) {
     FieldChunkConfig chunkConfig;
     int i;
     FieldChunk *chunk;
@@ -284,7 +285,8 @@ void FieldG3DMapper_FreeMap(FieldG3DMapper *mapper) {
     FieldG3DMapper_FreeMapTextures(mapper);
 }
 
-void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config, void *colorPostFx) {
+void FieldG3DMapper_LoadMapTextures(FieldG3DMapper *mapper, const FieldG3DMapperConfig *config,
+                                    FieldColorPostFX *colorPostFx) {
     switch (config->isSharedTexResource) {
     case TRUE: {
         const FieldG3DMapperTextureFile *textures = &config->textures;

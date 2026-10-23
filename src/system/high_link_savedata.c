@@ -33,12 +33,12 @@ void setupProbabilityTable(PassPowerLevel *levels) {
     probabilityLoop((SurveyProbabilityState *)levels);
 }
 
-u16 PassPowerLevel_GetWhite(void *levels) {
-    return ((PassPowerLevel *)levels)->level1;
+u16 PassPowerLevel_GetWhite(PassPowerLevel *levels) {
+    return levels->level1;
 }
 
-u16 PassPowerLevel_GetBlack(void *levels) {
-    return ((PassPowerLevel *)levels)->level2;
+u16 PassPowerLevel_GetBlack(PassPowerLevel *levels) {
+    return levels->level2;
 }
 
 // Adds to the White level, up to 999, and returns how much was added

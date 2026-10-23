@@ -121,8 +121,8 @@ u32 PassPower_GetDepletedID(void);
 // Ends the pass power that runs with the effect of the given one
 void PassPower_Deactivate(u32 passPower, PassPowerData *data);
 // The pass powers' table, read from its archive
-void *PassPowerData_Create(HeapID heapId);
-void PassPowerData_Free(void *data);
+PassPowerData *PassPowerData_Create(HeapID heapId);
+void PassPowerData_Free(PassPowerData *data);
 // A pass power's effect and its price in Pass Orbs, from the table of PassPowerData_Create
 u8 PassPowerData_GetEffect(PassPowerData *data, u32 passPower);
 u16 PassPowerData_GetPrice(PassPowerData *data, u32 passPower);
@@ -149,15 +149,15 @@ u32 PassPower_ApplyLuckyEncProb(u32 row);
 u32 PassPower_ApplyLuckyShiny(u32 rolls);
 
 // Two levels of what GameData_GetMyPassPowerLevels returns, which the pass powers need
-u16 PassPowerLevel_GetWhite(void *levels);
-u16 PassPowerLevel_GetBlack(void *levels);
+u16 PassPowerLevel_GetWhite(PassPowerLevel *levels);
+u16 PassPowerLevel_GetBlack(PassPowerLevel *levels);
 // Overlay 12's pass_power_check.c: whether a pass power is unlocked, nearly or not, and how many are
 enum {
     PASS_POWER_UNLOCKED,
     PASS_POWER_NEAR,
     PASS_POWER_LOCKED,
 };
-u32 CheckPassPowerUnlocked(void *data, int index, void *levels, u8 *flags);
-u32 GetUnlockedPassPowerCount(void *data, void *levels, u8 *flags);
+u32 CheckPassPowerUnlocked(PassPowerData *data, int index, PassPowerLevel *levels, u8 *flags);
+u32 GetUnlockedPassPowerCount(PassPowerData *data, PassPowerLevel *levels, u8 *flags);
 
 #endif // POKEBW2_SAVE_HIGH_LINK_H

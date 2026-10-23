@@ -12,7 +12,7 @@ u32 TrialHouseSave_GetSize(void) {
 
 void TrialHouseSave_Init(TrialHouseSave *save) {
     MI_CpuFill8(save, 0, sizeof(TrialHouseSave));
-    WbtSave_Init(save->unk5C);
+    WbtSave_Init(&save->wbt);
 }
 
 TrialHouseSave *TrialHouseSave_Get(SaveControl *save) {

@@ -316,9 +316,7 @@ u32 GFL_G3DResGetAllocSize(void) {
     return sizeof(G3DResource);
 }
 
-void GFL_G3DResBindData(void *resource, u32 kind, void *data) {
-    G3DResource *res = resource;
-
+void GFL_G3DResBindData(G3DResource *res, u32 kind, void *data) {
     switch (kind) {
     case G3D_BIND_MDL:
         res->type = G3D_RES_TYPE_MDL;
@@ -334,8 +332,7 @@ void GFL_G3DResBindData(void *resource, u32 kind, void *data) {
     res->magic = G3D_RES_MAGIC;
 }
 
-void GFL_G3DResSetup(void *resource, void *data) {
-    G3DResource *res = resource;
+void GFL_G3DResSetup(G3DResource *res, void *data) {
     NNSG3dResFileHeader *header = data;
     u16 type;
 
@@ -373,14 +370,14 @@ G3DResource *GFL_G3DSysReadArcSysResource(u32 arcId, u32 fileId) {
     return res;
 }
 
-void *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId) {
+G3DResource *GFL_G3DSysReadArcToolResource(ArcTool *handle, u32 fileId) {
     G3DResource *res = GFL_HeapAllocate(g_G3DSystem.sys->heapId, sizeof(G3DResource), FALSE, "g3d_system.c", 712);
 
     GFL_G3DResSetup(res, GFL_ArcToolReadHeapNew(handle, fileId, g_G3DSystem.sys->heapId));
     return res;
 }
 
-void *GFL_G3DSysReadFSResource(const char *path, u32 fileId) {
+G3DResource *GFL_G3DSysReadFSResource(const char *path, u32 fileId) {
     G3DResource *res = GFL_HeapAllocate(g_G3DSystem.sys->heapId, sizeof(G3DResource), FALSE, "g3d_system.c", 732);
 
     GFL_G3DResSetup(res, GFL_ArcSysReadHeapNewDirect(path, fileId, g_G3DSystem.sys->heapId));
