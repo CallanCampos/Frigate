@@ -37,8 +37,8 @@ enum {
 static u16 sSoftwareLength;
 static u16 sMakerNoteData1Size;
 static u16 sMakerNoteData2Size;
-static u32 sMakerNoteData1;
-static u32 sMakerNoteData2;
+static uptr sMakerNoteData1;
+static uptr sMakerNoteData2;
 BOOL data_ov257_021b6240;
 static char sDateTime[20];
 static char sSoftware[32];
@@ -315,10 +315,10 @@ s32 SSP_ExifDecode(u8 *src, u32 src_size, int *cur, u32 option) {
     sSoftwareLength = 0;
     result = func_ov257_021ac6f0(src, src_size, start, cur, option);
     if (sMakerNoteData1 != 0) {
-        sMakerNoteData1 += (u32)src + TIFF_HEADER_OFFSET;
+        sMakerNoteData1 += (uptr)src + TIFF_HEADER_OFFSET;
     }
     if (sMakerNoteData2 != 0) {
-        sMakerNoteData2 += (u32)src + TIFF_HEADER_OFFSET;
+        sMakerNoteData2 += (uptr)src + TIFF_HEADER_OFFSET;
     }
     return result;
 }

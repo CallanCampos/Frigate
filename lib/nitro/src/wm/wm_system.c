@@ -67,7 +67,7 @@ static int WmInitCore(void *wmSysBuf, u16 dmaNo, u32 size) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_INVALID_PARAM;
     }
-    if ((u32)wmSysBuf & 0x1f) {
+    if ((uptr)wmSysBuf & 0x1f) {
         OS_RestoreInterrupts(irq);
         return WM_ERRCODE_INVALID_PARAM;
     }

@@ -464,7 +464,7 @@ static void GFL_BGSysTransferUncomp(const void *src, void *dest, u32 size) {
         MI_UncompressLZ8(src, dest);
         return;
     }
-    if ((u32)src % 4 == 0 && (u32)dest % 4 == 0 && (u16)size % 4 == 0) {
+    if ((uptr)src % 4 == 0 && (uptr)dest % 4 == 0 && (u16)size % 4 == 0) {
         MIi_CpuCopy32(src, dest, size);
         return;
     }

@@ -380,7 +380,7 @@ static void GFL_BitmapCopyArea_IDX4_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                 if (dx >= 0 && dy >= 0) {
                     srcPixel = PIXEL_ADDR_16(src->pixels, sx, sy, srcTilesX);
                     destPixels = (u16 *)PIXEL_ADDR_16(dest->pixels, dx, dy, destTilesX);
-                    if ((u32)destPixels & 1) {
+                    if ((uptr)destPixels & 1) {
                         destPixels = (u16 *)((u8 *)destPixels - 1);
                         odd = TRUE;
                     } else {
@@ -404,7 +404,7 @@ static void GFL_BitmapCopyArea_IDX4_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                 if (dx >= 0 && dy >= 0) {
                     srcPixel = PIXEL_ADDR_16(src->pixels, sx, sy, srcTilesX);
                     destPixels = (u16 *)PIXEL_ADDR_16(dest->pixels, dx, dy, destTilesX);
-                    if ((u32)destPixels & 1) {
+                    if ((uptr)destPixels & 1) {
                         destPixels = (u16 *)((u8 *)destPixels - 1);
                         odd = TRUE;
                     } else {
@@ -459,7 +459,7 @@ static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                 if (dx >= 0 && dy >= 0) {
                     srcPixel = PIXEL_ADDR_256(src->pixels, sx, sy, srcTilesX);
                     destPixel = PIXEL_ADDR_256(dest->pixels, dx, dy, destTilesX);
-                    if ((u32)destPixel & 1) {
+                    if ((uptr)destPixel & 1) {
                         destPixel--;
                         pixels = (srcPixel[0] << 8) | srcPixel[-1];
                     } else {
@@ -475,7 +475,7 @@ static void GFL_BitmapCopyArea_IDX8_VRAM(const GFLBitmap *src, GFLBitmap *dest, 
                 if (dx >= 0 && dy >= 0) {
                     srcPixel = PIXEL_ADDR_256(src->pixels, sx, sy, srcTilesX);
                     destPixel = PIXEL_ADDR_256(dest->pixels, dx, dy, destTilesX);
-                    if ((u32)destPixel & 1) {
+                    if ((uptr)destPixel & 1) {
                         destPixel--;
                         pixels = (srcPixel[0] << 8) | srcPixel[-1];
                     } else {
@@ -567,7 +567,7 @@ static void GFL_BitmapFillArea_IDX4_VRAM(GFLBitmap *bitmap, s16 x, s16 y, u16 wi
         for (i = x; i < xEnd; i++) {
             if (i >= 0 && j >= 0) {
                 pixels = (u16 *)PIXEL_ADDR_16(bitmap->pixels, i, j, tilesX);
-                if ((u32)pixels & 1) {
+                if ((uptr)pixels & 1) {
                     pixels = (u16 *)((u8 *)pixels - 1);
                     odd = TRUE;
                 } else {
