@@ -473,11 +473,20 @@ upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)) 
 - `git push` to the `upstream` or `fork` remote, to a URL of either repository, or to a remote that pushes to one,
   including the branch's push remote when the command names none, and URLs that `git -c`, `git config` or
   `git remote` set earlier in the same command;
-- a `git push` to the port (`CallanCampos/Frigate`, or its old name) that would update or delete `main`: a refspec
-  whose destination is `main` (`main`, `HEAD:main`, `+topic:refs/heads/main`, `:main`, `--delete main`), a glob or a
-  destination the shell computes, `--all`, `--branches` or `--mirror`, or no refspec from a checkout on `main` or
-  whose `push.default` sends its branch to `main`. GitHub's rules refuse such a push on the server; the guard refuses
-  it before it runs, and lets a dry run through;
+- a `git push` to the port (`CallanCampos/Frigate`, its old name, or a URL that a `url.<base>.insteadOf` set by
+  `git -c` or an earlier `git config` rewrites to it) that would update or delete `main`. GitHub's rules refuse such a
+  push on the server; the guard refuses it before it runs, lets a dry run through, and works out the branches a push
+  updates as git does:
+  - a destination of `main`, `heads/main` or `refs/heads/main` (`HEAD:main`, `+topic:refs/heads/main`, `:main`,
+    `--delete main`);
+  - a refspec without a colon that is `main`, that is `HEAD`, `@` or `head` on `main`, or that `remote.<name>.push` or
+    `push.default=upstream` sends to `main`;
+  - the matching refspec `:`, `--all`, `--branches`, `--mirror`, a glob, or a destination the shell computes;
+  - with no refspec, the remote's push refspecs, else the branch that `push.default` sends;
+  - the settings come from `git -c`, from `git config` earlier in the command and from the checkout, and the current
+    branch and its upstream are as a `git switch`, `git checkout` or `git branch` earlier in the command leaves them.
+    Settings it can't read (`--config-env`, `GIT_CONFIG_PARAMETERS`, `GIT_CONFIG_COUNT`) and a branch it can't name
+    (`git switch -`) make it refuse;
 - a `git push` to GitHub that would add commits whose messages name an issue, pull request or discussion of any
   repository (`OWNER/REPO#N` or its URL), as `sync_upstream.sh` refuses them with exit status 5. The commits are those
   the pushed refs reach and the remote's tracking refs don't, with what a `git merge`, `rebase`, `reset`, `checkout`
@@ -491,7 +500,8 @@ upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)) 
 Reads pass, and so does text that only mentions these names, such as a grep, an echo or a local file: the guard splits
 the command as a shell would, here-documents, `$(...)`, `bash -c` and `find -exec` included, and checks a write's own
 text, the files it reads and its here-document. It sees only the command, the files it names and the repository's
-commits, so a script that runs gh or git itself isn't checked; it backs up CLAUDE.md's rules and doesn't replace them.
+commits, so a script or a git alias that runs gh or git itself isn't checked; it backs up CLAUDE.md's rules and
+doesn't replace them.
 `python3 port/tools/hooks/port_guard.py --self-test` runs its test cases.
 
 ## Syncing with the decomp

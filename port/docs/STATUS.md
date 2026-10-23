@@ -62,7 +62,7 @@ old entry gets is its `PORT_SHA` filled in.
   `app_universal_slices`, which only a distribution build has, and a timing gate now and then (`frame_times_new_game` on
   the head, `frame_times_title` on main), over its budget while the load average was above the cores
   (`frame_times.py --max-load`); each passed in another run. The sync tooling's 14 tests pass,
-  `port_guard.py --self-test` passes 145 of 145, and actionlint finds nothing in `port-ci.yml` but its unknown
+  `port_guard.py --self-test` passes 183 of 183, and actionlint finds nothing in `port-ci.yml` but its unknown
   `ubuntu-26.04` label. T5 not run locally (no code a sanitizer checks changed; CI's sanitized jobs run on the PR); T7
   not run (nothing visible changed).
 - **Tiers:** unchanged from the entry below, on the head too: per version, a 37,546 functions, b 3,472, c zero.
@@ -78,8 +78,22 @@ old entry gets is its `PORT_SHA` filled in.
     ROM's symbols no longer have), and `test_mi.py` gives `MI_CpuFill8` its fill value as the `u8` it now takes, with
     bytes whose high bit is set and clear.
   - **The write guard:** `port_guard.py` refuses a push that would update or delete Frigate's `main` (ADR 0018), before
-    GitHub's rules refuse it on the server, with 20 more self-test cases (145 of 145 pass), and its docstring and
-    message no longer call the port a solo project.
+    GitHub's rules refuse it on the server, and its docstring and message no longer call the port a solo project. Its
+    first version read only a refspec's literal destination, `HEAD` and the checkout's own settings; the review of this
+    change found pushes that git sends to `main` and it let through, each shown against a scratch bare repository with
+    git 2.50.1. It now works out a push's branches as `set_refspecs` in git's `builtin/push.c` does: the matching
+    refspec `:` and `+:`; `heads/main`, which git takes as `refs/heads/main`; `@` and, on macOS's file system, `head`
+    for `HEAD`; a refspec without a colon that `remote.<name>.push` or `push.default=upstream` maps to `main` (`HEAD`
+    and `@` it doesn't); settings from `git -c` and from `git config` earlier in the command, which it refuses when it
+    can't read them (`--config-env`, `GIT_CONFIG_PARAMETERS`, `GIT_CONFIG_COUNT`); a `url.<base>.insteadOf` toward the
+    port; and the branch and upstream that a `git switch`, `git checkout` or `git branch` earlier in the command
+    leaves, so `git switch main && git push origin HEAD` is refused. It doesn't expand git aliases, which the
+    docstring and README's guard section now say with the rest. The self-test has 58 more cases than main's 125
+    (183 of 183 pass). A differential run of 38 commands, each given to the guard and then run against a scratch
+    bare repository (git 2.50.1), found no push that updated `main` and that the guard let through. The guard refused
+    five that left `main` alone: two whose `git branch -m main` or `git checkout --track origin/main` failed because
+    `main` exists, a `--delete main` that the bare repository refuses for its current branch, and two after
+    `git switch -`, whose branch the guard can't name.
   - **The sync:** the PR body that `upstream_sync.py` writes gives the verification's commands, `gh pr checkout N` and
     `port/tools/sync_upstream.sh --verify-pr N`; `port-ci.yml`'s header says how the ROMs are checked under ADR 0018 and
     names the sync-tooling job and the aggregate `Frigate CI`. SYNC.md and CONTRIBUTING: a sync's merge commit carries
