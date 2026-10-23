@@ -855,6 +855,7 @@ overlays/ov011 0x020050c4 remove_orphan_reloc .
 overlays/ov011 0x0215208e reloc_module overlay(32)
 overlays/ov011 0x02152708 add_reloc load,main,0x020050ac
 overlays/ov011 0x02155e68 add_reloc load,main,0x020050c4
+overlays/ov011 0x02158b58 add_function compare_fqdn:thumb:0x48
 overlays/ov011 0x0215a5fc add_reloc load,main,0x020050f0
 overlays/ov011 0x02160e10 section_start lib/dwc/src/match/dwc_match.c:.text
 overlays/ov011 0x0216c7ea reloc_module overlay(189)

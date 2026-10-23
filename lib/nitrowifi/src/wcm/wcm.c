@@ -36,15 +36,6 @@ struct WCMApList {
     u32 data[WCM_APLIST_SIZE / sizeof(u32)]; // a WMBssDesc's prefix; bytes 0x40..0xbf hold packed IEs, not WMGameInfo
 };
 
-// The vendor-specific information element that carries a DSi beacon's game info, which starts with the info's magic
-// number
-typedef struct WCMVendorIE {
-    u8 id;
-    u8 length;
-    u8 unk_02[8];
-    u16 magicNumber;
-} WCMVendorIE;
-
 // The caller's AP list buffer (WCMConfig.pbdbuffer), read as a header followed by up to apMax WCMApList records
 typedef struct WCMApListHeader {
     u32 count;
@@ -94,7 +85,6 @@ static WCMApList *WcmSearchApList(const u8 *bssid);
 static WCMApList *WcmSearchIndexedApList(u32 id);
 static void WcmAppendApList(WCMApList *entry);
 static void *WCM_FindVendorIE(const WMBssDesc *bss);
-static void *WCM_GetInformationElement(const void *frame, u8 tag, const u8 *oui);
 static void WCMi_InitCpsif(void);
 static s32 WCM_AssembleSendFrame(s32 mode, void *dest, const void *header, u32 headerLen, const void *data,
                                  u32 dataLen);
@@ -1017,13 +1007,14 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
     }
     if (OS_IsRunOnTwl()) {
         if (work->wirelessMode == 2) {
-            WCMVendorIE *ie = NULL;
+            NWMInfoElements *ie = NULL;
 
             if (bss->otherElementCount != 0) {
-                ie = WCM_GetInformationElement(bss, 0xdd, oui.bytes);
+                ie = NWM_GetVenderInfoElements((NWMBssDesc *)bss, 0xdd, oui.bytes);
             }
             if (ie != NULL) {
-                const WMGameInfo *info = (const WMGameInfo *)&ie->magicNumber;
+                // The game info starts 8 bytes into the element's data
+                const WMGameInfo *info = (const WMGameInfo *)&ie->element[4];
 
                 if (info->magicNumber == 1) {
                     return (void *)info;
@@ -1046,10 +1037,6 @@ static void *WCM_FindVendorIE(const WMBssDesc *bss) {
         }
     }
     return NULL;
-}
-
-static void *WCM_GetInformationElement(const void *frame, u8 tag, const u8 *oui) {
-    return NWM_GetVenderInfoElements((NWMBssDesc *)frame, tag, oui);
 }
 
 static void WCMi_InitCpsif(void) {

@@ -6566,7 +6566,6 @@ overlays/ov011 0x0215c808 WcmSearchIndexedApList
 overlays/ov011 0x0215c83c WcmAppendApList
 overlays/ov011 0x0215c8b0 WCM_FillApEntry
 overlays/ov011 0x0215ca04 WCM_FindVendorIE
-overlays/ov011 0x0215cabc WCM_GetInformationElement
 overlays/ov011 0x0215cac4 WCMi_InitCpsif
 overlays/ov011 0x0215caf8 WCMi_CpsifRecvCallback
 overlays/ov011 0x0215cb0c WCM_GetGlobal

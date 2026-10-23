@@ -10,16 +10,11 @@
 #include "nitro/math.h"
 #include "nitro/os.h"
 #include <stdlib.h>
-
-// What gamestats.c calls outside itself, none of it with a name in the ROM
+#include <string.h>
 
 // The main module's Wi-Fi library (its allocator and its error), NitroSDK's formatted texts and the C library are in
-// the headers above, but for the C library's string functions: MWCC builds them in place (memcpy of a size it knows,
-// strlen) when <string.h> declares them, where the ROM calls them
-u32 strlen(const char *s);
-char *strncpy(char *dest, const char *src, u32 size);
-int strncmp(const char *a, const char *b, u32 size);
-void *memcpy(void *dest, const void *src, u32 size);
+// the headers above. Through <string.h>, MWCC copies the 20-byte secret in place, as the ROM does, and calls memcpy
+// for the larger copies
 
 // The front half of overlay 189, DWC's use of the HTTP client, is in dwc/dwc_ghttp.h
 
