@@ -2100,7 +2100,13 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   #n` between an `ldrb` and its `beq` is a doubling in the source, `x * 2`, `x << 1` or `x + x`, where a plain byte
   test, through any type (`_Bool` included), cast or inline, is `cmp r0, #0`: `btlv_effect.c`'s `BtlvEffect_Init`
   tests its background's seasonal flag with `ldrb r0, [r0, #1]; lsls r0, r0, #1; beq`, the only such test in either
-  binary (a row).
+  binary (a row). The doubling can also be an address: MWCC folds `&a[x] != a` (or `a + x == a`) to
+  `x * sizeof(*a) != 0` and drops the base, whatever it is, so over 2-byte elements the test is the same
+  `lsls #1; beq`. Only `==` and `!=` fold: an ordering keeps the address and a `cmp`, a difference becomes a
+  signed halving, and a comparison with `NULL` keeps the address.
+- A loop whose body doesn't depend on its counter, `for (i = 0; i < n; i++) x = c;`, is removed: what's left is
+  one test of `n`, `cmp; ble` (`bls` for a `u32` counter). A pointer loop (`p < end`, `p != end`) or an `i != n`
+  test keeps its loop.
 - Masks written with `~` clear bits with `bic`. The game's `and` with a constant such as `0xef` is `x &= (u8)~FLAG`.
   In ARM code a `vu16` register cleared with `reg &= ~M` gets the mask narrowed to 16 bits, which is no ARM immediate,
   so it is an `and` with a pool word (`0xfeff`), while `reg = reg & ~M` keeps `bic #M`: the LTD's `camera.c` writes
@@ -2747,9 +2753,11 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   ten-line ARM function does the same with any plain statement there. A statement that ends in a conditional branch
   doesn't: of `if (sEnableEchoCancel) { vct_set_speaker_samples(dst, size); }` written in both arms only the calls are merged, and
   each arm keeps its own test. The original's separate `bl; b exit` in libVCT's `VCT_ReceiveAudio` (`vct_audio.c`),
-  whose next statement is that test, came back only with a statement ending the outer then-arm that emits nothing
-  but keeps its block, `heard = received;` between two flags that share a register, which only shapes code there
-  (its row).
+  whose next statement is that test, comes back with the library's own inline, `vct_receive_mixed_audio`, returning
+  from each arm of its size test: `return heard;` ends the then-arm and `return FALSE;` the else-arm. Inlined, the
+  then-arm's return is a copy into the result, which emits nothing but keeps the arm's block, so the inner clear
+  doesn't reach the join directly. With libVCT 1.3.1's single `return flag;` after the `if`/`else`, the two
+  clears merge (0x118 against 0x11c). The game's libVCT is 1.4.1 (`vct_version.c`).
 - A field set to a different constant at the end of each arm of an `if`/`else` is cross-jumped at its store: each
   arm loads the base and builds its constant in the same registers, and the first ends in `b` to the other's `str`.
   `dwc_rap.c`'s `DWCRap_Connect` stores `_dWork->matchType` so after each arm's call; a local set in each arm and

@@ -1271,6 +1271,8 @@ overlays/ov029 0x0219729c remove_reloc
 overlays/ov029 0x021973e0 section_end lib/dwc/src/vct/vct_audio.c:.data
 overlays/ov029 0x02197418 section_start lib/dwc/src/vct/vct_dsp.c:.data
 overlays/ov029 0x02197424 add_data data_ov029_02197424
+overlays/ov029 0x02197424 remove_symbol
+overlays/ov029 0x02197440 section_end lib/dwc/src/vct/vct_dsp.c:.data
 overlays/ov029 0x02198358 section_end lib/dwc/src/vct/vct_audio.c:.bss
 overlays/ov029 0x02198358 section_start lib/dwc/src/vct/vct_buffer.c:.bss
 overlays/ov029 0x02198408 section_start lib/dwc/src/vct/vct_dsp.c:.bss
