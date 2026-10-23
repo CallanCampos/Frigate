@@ -55,33 +55,28 @@ static DWCUtilUsbScan *sUsbScan;
 
 BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
     OSOwnerInfo info;
-    int result;
-    OSTick tick;
+    OSTick startTick;
 
     sUsbScan = DWCi_HEAPlAllocEx(sizeof(DWCUtilUsbScan), 32);
     sUsbScan->callback = callback;
-    tick = OS_GetTick();
-    sUsbScan->startTick = tick;
-    result = WM_Initialize(sUsbScan, cbWm, 3);
-    if (result != WM_ERRCODE_OPERATING) {
-        goto fail;
+    startTick = OS_GetTick();
+    sUsbScan->startTick = startTick;
+    if (WM_Initialize(sUsbScan, cbWm, 3) == WM_ERRCODE_OPERATING) {
+        do {
+            WM_ReadStatus(&sUsbScan->status);
+        } while (sUsbScan->status.state != WM_STATE_IDLE);
+        sUsbScan->param = sUsbScanParam;
+        sUsbScan->param.scanBuf = (WMBssDesc *)sUsbScan->scanBuffer;
+        sUsbScan->param.maxChannelTime = WM_GetDispersionScanPeriod();
+        OS_GetOwnerInfo(&info);
+        MI_CpuCopy8(sUsbScanSsid, sUsbScan->param.ssid, 8);
+        sUsbScan->param.ssid[9] = TRUE;
+        MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
+        if (DWCUtilUsbScan_StartScan()) {
+            sUsbScan->task = DWCi_TSKlForm(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
+            return TRUE;
+        }
     }
-    do {
-        WM_ReadStatus(&sUsbScan->status);
-    } while (sUsbScan->status.state != WM_STATE_IDLE);
-    sUsbScan->param = sUsbScanParam;
-    sUsbScan->param.scanBuf = (WMBssDesc *)sUsbScan->scanBuffer;
-    sUsbScan->param.maxChannelTime = WM_GetDispersionScanPeriod();
-    OS_GetOwnerInfo(&info);
-    MI_CpuCopy8(sUsbScanSsid, sUsbScan->param.ssid, 8);
-    sUsbScan->param.ssid[9] = TRUE;
-    MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
-    if (!DWCUtilUsbScan_StartScan()) {
-        goto fail;
-    }
-    sUsbScan->task = DWCi_TSKlForm(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
-    return TRUE;
-fail:
     DWCi_HEAPlFree_(&sUsbScan);
     return FALSE;
 }
@@ -191,9 +186,10 @@ static void scanFirst(const WMStartScanExCallback *cb) {
 // The scans after the first: a connector that didn't take the console and now does is the result
 static void scanWait(const WMStartScanExCallback *cb) {
     int i;
+    WMBssDesc *desc;
     DWCUtilUsbScan *scan;
     int count;
-    int j;
+    s32 j;
 
     if (sUsbScan->pending) {
         if (sUsbScan->callback != NULL) {
@@ -204,9 +200,12 @@ static void scanWait(const WMStartScanExCallback *cb) {
     DC_InvalidateRange(sUsbScan->scanBuffer, sizeof(sUsbScan->scanBuffer));
     i = 0;
     count = cb->bssDescCount;
+    if (count <= 0) {
+        return;
+    }
     scan = sUsbScan;
-    for (; i < count; i++) {
-        WMBssDesc *desc = cb->bssDesc[i];
+    do {
+        desc = cb->bssDesc[i];
 
         if (memcmp(desc->ssid, sUsbScanSsid, 8) == 0 && (desc->ssid[9] & 1)) {
             for (j = 0; j < USB_SCAN_CONNECTORS; j++) {
@@ -223,7 +222,8 @@ static void scanWait(const WMStartScanExCallback *cb) {
                 }
             }
         }
-    }
+        i++;
+    } while (i < count);
 }
 
 // The result of the first scan, once it has run for USB_SCAN_TIME: a connector that takes the console, some that do

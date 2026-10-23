@@ -804,11 +804,15 @@ static void send_ip(u8 *buf, u32 len, u8 *data, u32 dataLen, CPSInAddr ip, u8 pr
 // send_ping: sends an echo request
 static void send_ping(u8 *data, u32 len, CPSSoc *soc) {
     u16 *icmp = (u16 *)(soc->sndbuf.data + CPS_SNDBUF_HEADER);
+    u16 sequence;
 
     icmp[0] = 8;
     icmp[2] = (u32)OS_GetCurrentThread();
     icmp[1] = 0;
-    icmp[3] = soc->local_port = sPingSeq++;
+    sequence = sPingSeq;
+    soc->local_port = sequence;
+    sPingSeq = sequence + 1;
+    icmp[3] = sequence;
     CPS_PUT16(&icmp[1], invert_checksum(calc_checksum_do(data, len, calc_checksum_do(icmp, 8, 0))));
     send_ip((u8 *)icmp, 8, data, len, soc->remote_ip, CPS_PROTO_ICMP);
 }
@@ -2349,7 +2353,6 @@ static void set_fixed_ip(void) {
 }
 
 // Whether the address check callback rejects the address DHCP gave
-// scavenger: once a second, runs DHCP and drops what timed out
 static inline BOOL CPSi_AddressRejected(void) {
     return sAddressCheck != NULL ? sAddressCheck() == 0 : FALSE;
 }
@@ -2363,7 +2366,6 @@ static void scavenger(void *arg) {
     u32 now;
     int i;
     OSThread *thread;
-    BOOL rejected;
 
     sCalmDown = FALSE;
     state = DHCP_STATE_INIT;
@@ -2401,11 +2403,7 @@ static void scavenger(void *arg) {
                             set_fixed_ip();
                             state = DHCP_STATE_DONE;
                         } else {
-                            rejected = FALSE;
-                            if (sAddressCheck != NULL && !sAddressCheck()) {
-                                rejected = TRUE;
-                            }
-                            if (rejected) {
+                            if (CPSi_AddressRejected()) {
                                 reset_network_vars(CPS_NOIP_REASON_REJECTED);
                                 set_fixed_ip();
                                 state = DHCP_STATE_DONE;

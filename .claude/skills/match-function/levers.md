@@ -7,6 +7,23 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Rebuilt hash-context offsets across a digest phase: borrow a typed context pointer for all its operations.
+  (matching.md: "one typed context pointer for a digest phase")
+- Adjacent scratch partitions in different saved registers: derive each typed region from its predecessor.
+  (matching.md: "derives each adjacent scratch region")
+- Missing digit reload after a byte store: check the inferred pointer qualification against mutable callers.
+  (matching.md: "observed MWCC alias behavior")
+
+- A numeric query field copied through an extra register: share the meaningful query-result local with the
+  count case (`DWCi_QR2ServerKeyCallback`). (matching.md: "shares an `int value`")
+- An alternating buffer's index reloaded after a byte copy: snapshot the selected index in its unsigned type and
+  use it for both the copy and return (`value_for_key`). (matching.md: "selected alternating buffer")
+- A by-value IPv4 formatter argument loaded differently from a struct field: name the `IN_ADDR` value before the
+  call (`ProcessPingPacket`). (matching.md: "before its second diagnostic")
+
+- A 64-bit product's masked high word in the wrong register: calculate the product in a local of its own, then
+  mask it (`gsiLargeIntInverseMod`). (matching.md: "64-bit product calculated before it is masked")
+
 - Saved-result lifetimes and widespread register differences in a nested check runner: recover its semantic
   inline boundaries and probe per-source `-ipa file`, including loader-owned constructor data.
   (matching.md: "Nested inline boundaries and file-level interprocedural analysis")
@@ -234,12 +251,17 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Stack slots or frame size
 
+- A write result missing its store to a later read's output slot: use one transfer-length local for both operations
+  (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
+
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
   inline read through a `const` pointer. (matching.md: "a progress snapshot")
 - Edge and corner sums unexpectedly shared, with fewer spills: signed edge arithmetic can coexist with unsigned
   corner arithmetic; cast the operands, not only the result. (matching.md: "Signed and unsigned sums")
 - Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
   (matching.md: "A `static inline` accessor that returns a field cast")
+- SHA-1's five-round groups with separate index/counter spills: reuse the message-word index and round-group
+  counter across the stages (`CPSi_sha1_block`). (matching.md: "One word index `t` and one group counter `i`")
 - A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
   (matching.md: "The rounds of a hash written as statements")
 - A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
@@ -323,6 +345,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   despite word-sized spill accesses. (matching.md: "source-availability mask in the parameter")
 
 ## Instructions in another order (scheduling)
+
+- Packet sequence stores in another order: snapshot the current sequence across the global increment.
+  (matching.md: "snapshots the current `u16` sequence")
 
 - Two field loads in the other order, with every other instruction right: the field the original loads first may be
   `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
@@ -507,6 +532,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   use of the incremented value gets its own copy of the sum. (matching.md: "whose only use is the copy")
 
 ## An instruction too many or too few
+
+- Context snapshot copy calls differ: recover explicit SDK copies (`rcv_finished`).
+  (matching.md: "saves and restores whole transcript contexts")
 
 - A zero text-origin component missing from measured bounds: `CalcMsgWindowDimensions` shares a paired origin's
   field-by-field inline initializer with printer placement. (matching.md: "bounds include both components")
@@ -712,6 +740,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   literal: read it through a pointer local of the block's struct. (matching.md: "read through a pointer local")
 
 ## Branches and block layout
+
+- A single conditional-branch byte differs: verify both destinations and return values before tuning allocation.
+  (matching.md: "A near match can still contain a wrong branch condition")
 
 - Each arm of an `if`/`else` ending in `ldr base; movs rN, #k; b` to a shared `str`: the field is stored in each
   arm, not through a local stored after the join. (matching.md: "cross-jumped at its store")
@@ -954,6 +985,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Data and sections
 
+- Duplicate protocol literals pooled once, with two independently grouped sets of globals: verify original
+  source boundaries (`dwc_main.c`/`dwc_match.c`). (matching.md: "boundary at `DWC_AddMatchKeyInt`")
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
   (matching.md: "`dsi/1.2` with `-Cpp_exceptions on` emits exception indices")
 - A live empty assertion filename before earlier allocation literals: recover its named data object and probe

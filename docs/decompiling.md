@@ -106,7 +106,10 @@ Game code needs the `dsi` builds: the evolution demo's view matches 36 of its 56
 25 with `1.2`.
 
 `tools/decomp/compiler_probe.py` compiles a C file with every version and compares each function against the
-game, ignoring relocated bytes. For example:
+game, ignoring relocated bytes. It resolves local function names within the source's registered ranges in
+`delinks.txt`, including the owning delinked object for encrypted code. An unregistered probe source can use only
+globally unique function names; ambiguous names are reported rather than matched to the first symbol. The permuter
+setup uses the same source ownership when choosing the original code and relocations. For example:
 
 ```sh
 .venv/bin/python tools/decomp/compiler_probe.py tools/compiler_tests/main_loops.c

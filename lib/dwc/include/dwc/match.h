@@ -8,11 +8,11 @@
 #include "dwc/gp.h"
 #include "dwc/gt2Main.h"
 
-// DWC's matchmaking (dwc_match.c, a guessed name), in overlay 11: the friends match control that the game starts, logs
-// in and runs every frame, the matching with anybody or with a friend, and the machines of a match, each with its ID
-// in the match (its aid). The ROM names none of it: the functions take the SDK's names, from NitroDWC's and the Wii
-// DWC's dwc_main.c and dwc_match.c and, for the API with a topology, the newer Wii DWC's headers; the ones that BW2's
-// DWC added have names of ours in their style
+// DWC's friends-match front end (dwc_main.c) and matching core (dwc_match.c), in overlay 11: login, friends, matching
+// and the machines of a match, each with its ID (its aid). The file names are guesses based on the SDK and the
+// original separate string pools and statics. The functions take the SDK's names, from NitroDWC's and the Wii DWC's
+// dwc_main.c and dwc_match.c and, for the API with a topology, the newer Wii DWC's headers; the ones that BW2's DWC
+// added have names of ours in their style.
 
 // A machine of the match, as the match's list keeps it: its profile ID, its public and local addresses, the address
 // of the host it was reached through, its aid, whether it is behind a NAT (it has a private address), how often

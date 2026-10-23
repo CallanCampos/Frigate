@@ -124,11 +124,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
 | `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | complete | descriptive |
-| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | partial | descriptive |
+| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
-| `dwc_match.c` | `0x0215fa0c`–`0x02168818` | 210 | partial | descriptive |
+| `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
+| `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
 | `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | partial | descriptive |
 | `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |
@@ -177,7 +178,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
-| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
+| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | complete | descriptive |
 | `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | complete | descriptive |
 | `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
 | `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |

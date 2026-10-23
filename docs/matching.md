@@ -8,6 +8,22 @@ tools that show the differences.
 
 ## Registers
 
+- Repeated hash operations can retain one typed context pointer for a digest phase. NitroWiFi's `create_ms_sub`
+  and `auth_cert` match with borrowed `CPSMd5Ctx *` or `CPSSha1Ctx *` locals used by every operation in that phase.
+  `finished_md5` and `finished_sha1` also keep that pointer and call each sender-label branch directly.
+- NitroWiFi's `CPSi_big_modinv` derives each adjacent scratch region from the preceding region with a typed pointer
+  addition. Computing every region separately from the scratch base changes the saved pointers and frame.
+- NitroWiFi's `CPSi_char_from_big` reloads its input digit after writing the low byte only with the recovered mutable
+  `u16 *` source type and an advancing destination parameter. Both callers supply mutable allocated digit buffers.
+  This is observed MWCC alias behavior for this function, rather than a general guarantee about `const` in C.
+
+- DWC's `DWCi_QR2ServerKeyCallback` shares an `int value` between its node-count and suspension queries,
+  assigning the suspension field before passing it to `qr2_buffer_add_int`. This preserves the original field-load
+  lifetime while naming the numeric query result rather than introducing a one-case matching temporary.
+- DWC's `func_ov011_021683b8` starts its deadline from `OS_GetTick()`, then accumulates its fixed 3000 ms,
+  active-peer and position-dependent waits. The separate fixed-delay update spills the current tick's high word
+  before the first addition, as the original does; folding that term into the initializer spills it later.
+
 - Nested inline boundaries and file-level interprocedural analysis can explain saved-result lifetimes and register
   allocation. DS Protect's `DSProt_RunChecks` matches with an inline Boolean checksum helper inside an inline
   queue runner, whose result the public function returns. Its flashcart check uses an inline test returning
@@ -302,6 +318,18 @@ Same instructions, registers swapped.
 - A product assigned to a variable of its own goes to a new register, with its operand copied there first
   (`mov r2, r1; mul r2, r0`), while a product used in place multiplies into the operand's register. The Join Avenue
   shop's arrow is placed with `row = ...; y = row * rowHeight; pos.y = y + 22;`.
+- DWC's `gsiLargeIntInverseMod` needs its 64-bit product calculated before it is masked, in a local of its own:
+  `gsi_u64 product = (gsi_u64)modulus->mData[0] * y;`, compared as `x < (product & mask)`. With the multiplication
+  and mask in the comparison, the high-word `and` copies the mask into its destination; the separate product copies
+  the product's high word instead, as the original does under `dsi/1.2`.
+- GameSpy's `value_for_key` keeps the selected alternating buffer in a `gsi_u32 index`, read from `valueindex`
+  before the byte-copy loop and used for both the copy destination and the return value. This keeps the scaled
+  index and array base across the copy and matches the original final address calculation; an `int` snapshot
+  instead makes the function four bytes longer under `dsi/1.2`.
+- GameSpy's `ProcessPingPacket` needs an `IN_ADDR senderIp`, set from `fromAddr->addr` just
+  before its second diagnostic, with `SOC_InetNtoA(senderIp)` as the formatter argument. Passing the named IPv4
+  value reproduces the original's field-address load and by-value argument where passing the field expression
+  directly does not.
 - Two stores of the same constant share a register when chained, and not when written as two initializers.
   `second = first = TRUE;` stores `first` first. `nearXZ = FALSE; nearY = FALSE;` in that order loads the zero twice,
   while the other order shares it. A longer chain also stores from the right: NitroSystem G3D's `maya.c` zeroes nine
@@ -745,6 +773,20 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
+  round macro (`SHA1_ROUND`) instead of copying the five state words after each round. The first fifteen rounds use
+  direct words, followed by word 15 and four expanded words; the later stages each run four groups over the circular
+  schedule. Its majority expression is `(b & (c | d)) | (c & d)`. One word index `t` and one group counter `i`
+  reused across the stages give the original spill lifetimes; separate first-word and expanded-word indexes leave 68 bytes different
+  even with the original size and operations. Its `CPSi_sha1_calc` sets the buffered index to zero before the first
+  compression call, after filling the partial block, which spills the old index during the copy and matches its
+  update function too.
+
+- DWC's `DWCi_Http_Thread` uses one transfer-length local for `CPS_SocWrite`'s result and the later
+  `CPS_SocRead` output. Keeping the write result in a separate `sent` local drops the original's store to the
+  address-taken length slot. The shared `u32 length`, with `(s32)length <= 0` for the write error check, restores
+  that store and reduces the difference from 242 bytes to 37; the remaining stack slots still differ.
+
 - `RailMath_RailToWorldSlerpXZ` keeps raw signed position and length at the original stack slots when they form
   a progress snapshot and an inline reads that snapshot through a `const` pointer to compute its fixed-point ratio.
   Height interpolation reads the same raw fields, retaining its multiply-before-divide rounding. The ratio helper
@@ -1176,6 +1218,10 @@ Same code, other `sp` offsets or frame size.
   is still stored and reloaded as a word, so those instructions alone do not establish its source width.
 
 ## Instruction order
+
+- NitroWiFi's `send_ping` snapshots the current `u16` sequence after initializing the ICMP header. The socket port
+  receives that value, the global advances, and the packet receives the saved value. Chained postincrement changes
+  the order of the stores; the meaningful local preserves the value being serialized across the state update.
 
 - A `volatile` field is loaded in source order and never reused: NitroWiFi's `SOCLi_GetWriteBufferFreeSize` loads
   `write_pos` before `read_pos`, as the original does, only with `write_pos` `volatile` (the writers move it while the
@@ -1782,6 +1828,9 @@ Same instructions, scheduled in another order.
   inline against the SDK's own definition before writing a local copy with its terms swapped.
 
 ## An instruction too many or too few
+
+- NitroWiFi's `rcv_finished` saves and restores whole transcript contexts with explicit `MI_CpuCopy8` calls.
+  Structure assignment changes the runtime-copy shape and frame even though it expresses the same snapshot.
 
 - `field_msgbg.c`'s `CalcMsgWindowDimensions` keeps `adds r0, r0, #0` after the font-height call when its pixel
   bounds include both components of a local text origin, assigned field by field by an inline initializer. The
@@ -2518,6 +2567,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `twl ? 0x02fffe60 : 0x027ffe60` gave two literals and a select.
 
 ## Branches and block layout
+
+- A near match can still contain a wrong branch condition. NitroWiFi's `CPSi_SslGetLength` differed by one branch
+  byte because its terminal socket condition used AND where the ROM requires OR. Check the destinations and return
+  values of conditional branches before treating a small difference as register allocation.
 
 - An early exit with its own call, `if (work == NULL) { OS_RestoreInterrupts(irq); return 0; }`, then straight-line
   code, where one condition (`work != NULL && ...`) with one shared restore is 8 bytes short: NitroWiFi's
@@ -3453,6 +3506,18 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   registers written one by one, and matches in the same register allocation as `HPFFilter`.
 
 ## Data and sections
+
+- DWC's friends-match front end and matching core are separate source files. A boundary at `DWC_AddMatchKeyInt`
+  gives the front end its 20-byte string pool and four connection statics, and the core its 776-byte initialized
+  data and two statics. Their separate copies of `SCM`, `SCN`, `GPCM` and `MAT` then arise from normal per-file
+  string pooling; the combined file pools them once and puts `sMatchChance` before the front-end strings.
+  The split also restores the core's data-relative `sMatchChance` target in `DWCi_MatchProcess`, whose instructions
+  already match. Both data pools, the core's constant data and all six BSS object addresses match in both versions.
+  Shared types and calls belong in `dwc/match_internal.h`; no data objects need external linkage. Objdiff still
+  reports three argument differences in `DWCi_MatchProcess`: the original object relocates its internal Thumb BLs
+  to local labels with addend -4, while MWCC resolves the same branch bytes directly. The displayed relocated
+  destinations are four bytes early. The valid relocation records remain; this function is not counted as matched
+  by the current report despite the matching final instructions and targets.
 
 - `dsi/1.2` with `-Cpp_exceptions on` emits exception indices for C functions with stack frames even when their
   instructions are unchanged. MSL's `register_atexit.c`, `console_io.c` and `call_static_initializers.c` emit the ROM's

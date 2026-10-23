@@ -334,6 +334,7 @@ lib/dwc/src/natneg/NATify.c:
     .bss        start:0x02191c2c end:0x02191e78
 
 lib/dwc/src/natneg/natneg.c:
+    complete
     .text       start:0x0217f4d0 end:0x021807b4
     .data       start:0x02189244 end:0x02189dd4
     .bss        start:0x02191e78 end:0x02192180
@@ -465,7 +466,12 @@ lib/dwc/src/auth/dwc_rootcert_rsa_secure_server.c:
     .data       start:0x02186de0 end:0x02186ebc
 
 lib/dwc/src/match/dwc_match.c:
-    .text       start:0x0215fa4c end:0x02168858
+    .text       start:0x02160e50 end:0x02168858
     .rodata     start:0x02185054 end:0x0218506c
-    .data       start:0x021857fc end:0x02185b18
-    .bss        start:0x0218e058 end:0x0218e958
+    .data       start:0x02185810 end:0x02185b18
+    .bss        start:0x0218e200 end:0x0218e958
+
+lib/dwc/src/base/dwc_main.c:
+    .text       start:0x0215fa4c end:0x02160e50
+    .data       start:0x021857fc end:0x02185810
+    .bss        start:0x0218e058 end:0x0218e200
