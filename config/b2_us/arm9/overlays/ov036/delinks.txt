@@ -355,6 +355,7 @@ src/ov036/field_camera_anime.c:
     .data       start:0x021d4b98 end:0x021d4bb0
 
 src/ov036/field_msgbg.c:
+    complete
     .text       start:0x021876d0 end:0x0218a7f8
     .rodata     start:0x021ca9ac end:0x021caab4
     .data       start:0x021d4bb0 end:0x021d4bc0

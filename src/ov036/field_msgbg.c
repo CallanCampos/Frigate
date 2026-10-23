@@ -1755,14 +1755,17 @@ static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId) {
     GFL_G2DIOLoadNCLR(ARCID_WINFRAME, 2, PALTYPE_MAIN_BG, 0, slot * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE, heapId);
 }
 
-// The checker frame uses fixed WINFRAME tiles; style does not select another tile set.
+// The checker frame uses fixed WINFRAME tiles: style no longer selects a block of them, and the block's first tile,
+// which the tile is offset from, is always the first of the file
 static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, CheckerFrameTile tile) {
     NNSG2dCharacterData *charData;
+    CheckerFrameTile first = CHECKER_FRAME_TOP_LEFT;
     u8 *pixels = GFL_BitmapGetPixelData(bitmap);
     void *file = GFL_ArcSysReadHeapNewLZ(ARCID_WINFRAME, 7, FALSE, heapId);
 
     NNS_G2dGetUnpackedBGCharacterData(file, &charData);
-    MI_CpuCopy((u8 *)charData->pRawData + tile * BGSYS_TILE_SIZE_16, pixels, BGSYS_TILE_SIZE_16);
+    MI_CpuCopy((u8 *)charData->pRawData + first * BGSYS_TILE_SIZE_16 + tile * BGSYS_TILE_SIZE_16, pixels,
+               BGSYS_TILE_SIZE_16);
     GFL_HeapFree(file);
 }
 
