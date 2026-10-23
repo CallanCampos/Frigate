@@ -129,8 +129,8 @@ static void WifiBattleMatchLink_HideRankCard(WifiBattleMatchLinkRandom *link);
 static void WifiBattleMatchLink_CreatePartnerCard(WifiBattleMatchLinkRandom *link, WifiBattleMatchPlayer *partner);
 static void WifiBattleMatchLink_DeletePartnerCard(WifiBattleMatchLinkRandom *link);
 static BOOL WifiBattleMatchLink_IsPartnerCardDone(WifiBattleMatchLinkRandom *link);
-static BOOL WifiBattleMatchLink_UpdateRecord(void *results, u32 battleType, WifiBattleMatchLinkRandom *link);
-static void WifiBattleMatchLink_AddMatchResult(void *results, u32 battleType, u32 matchResult);
+static BOOL WifiBattleMatchLink_UpdateRecord(RndMatchData *results, u32 battleType, WifiBattleMatchLinkRandom *link);
+static void WifiBattleMatchLink_AddMatchResult(RndMatchData *results, u32 battleType, u32 matchResult);
 static void WifiBattleMatchLink_CreateMenu(WifiBattleMatchLinkRandom *link, u32 kind);
 static void WifiBattleMatchLink_DeleteMenu(WifiBattleMatchLinkRandom *link);
 static s32 WifiBattleMatchLink_GetMenuSelection(WifiBattleMatchLinkRandom *link);
@@ -2011,9 +2011,12 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
     if (kind == 0) {
         titleMsg = 1;
         info.titleMsg = link->param->param->unk4;
-        info.unk4 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 0);
-        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
-        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);
+        info.unk4 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                          RNDMATCH_FIELD_RATING);
+        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                           RNDMATCH_FIELD_WIN);
+        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                           RNDMATCH_FIELD_LOSE);
         info.unkC = info.unk10 + info.unk12;
         if (info.unk4 == 0 && info.unkC == 0) {
             info.unk4 = 1500;
@@ -2022,8 +2025,8 @@ static void WifiBattleMatchLink_CreateRankCard(WifiBattleMatchLinkRandom *link, 
         titleMsg = 0;
         info.titleMsg = link->param->param->unk4;
         info.unk4 = 0;
-        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 1);
-        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
+        info.unk10 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_WIN);
+        info.unk12 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_LOSE);
         info.unkC = info.unk10 + info.unk12;
     }
     info.look = PlayerInfo_GetUnionView(playerInfo);
@@ -2092,7 +2095,7 @@ static BOOL WifiBattleMatchLink_IsPartnerCardDone(WifiBattleMatchLinkRandom *lin
     return WifiBattleMatchPartnerCard_SlideIn(link->partnerCard);
 }
 
-static BOOL WifiBattleMatchLink_UpdateRecord(void *results, u32 battleType, WifiBattleMatchLinkRandom *link) {
+static BOOL WifiBattleMatchLink_UpdateRecord(RndMatchData *results, u32 battleType, WifiBattleMatchLinkRandom *link) {
     u32 rating;
     u32 first;
     u32 second;
@@ -2125,28 +2128,28 @@ static BOOL WifiBattleMatchLink_UpdateRecord(void *results, u32 battleType, Wifi
         second = link->param->ratings->results[2].second;
         break;
     }
-    if (rating != RndMatchData_GetParam(results, battleType + 5, 0) ||
-        first != RndMatchData_GetParam(results, battleType + 5, 1) ||
-        second != RndMatchData_GetParam(results, battleType + 5, 2)) {
+    if (rating != RndMatchData_GetParam(results, battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_RATING) ||
+        first != RndMatchData_GetParam(results, battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_WIN) ||
+        second != RndMatchData_GetParam(results, battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_LOSE)) {
         changed = TRUE;
     } else {
         changed = FALSE;
     }
-    RndMatchData_SetParam(results, battleType + 5, 0, rating);
-    RndMatchData_SetParam(results, battleType + 5, 1, first);
-    RndMatchData_SetParam(results, battleType + 5, 2, second);
+    RndMatchData_SetParam(results, battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_RATING, rating);
+    RndMatchData_SetParam(results, battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_WIN, first);
+    RndMatchData_SetParam(results, battleType + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_LOSE, second);
     return changed;
 }
 
-static void WifiBattleMatchLink_AddMatchResult(void *results, u32 battleType, u32 matchResult) {
+static void WifiBattleMatchLink_AddMatchResult(RndMatchData *results, u32 battleType, u32 matchResult) {
     switch (matchResult) {
     case 1:
     case 4:
-        RndMatchData_IncParam(results, battleType, 1);
+        RndMatchData_IncParam(results, battleType, RNDMATCH_FIELD_WIN);
         break;
     case 0:
     case 3:
-        RndMatchData_IncParam(results, battleType, 2);
+        RndMatchData_IncParam(results, battleType, RNDMATCH_FIELD_LOSE);
         break;
     }
 }
@@ -2240,23 +2243,28 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchPlayer *player, Wif
     MI_CpuCopy8(info, player, PlayerInfo_GetSize());
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
     if (link->param->mode == 0) {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                                RNDMATCH_FIELD_WIN);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                                RNDMATCH_FIELD_LOSE);
     } else {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 1);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_WIN);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_LOSE);
     }
     player->gsid = WifiList_GetMyGSID(GameData_GetWifiList(gameData));
 }
 
 static void WifiBattleMatchLink_UpdatePlayerRecord(WifiBattleMatchPlayer *player, WifiBattleMatchLinkRandom *link) {
     if (link->param->mode == 0) {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 1);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 2);
-        player->unk34 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + 5, 0);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                                RNDMATCH_FIELD_WIN);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                                RNDMATCH_FIELD_LOSE);
+        player->unk34 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
+                                              RNDMATCH_FIELD_RATING);
     } else {
-        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 1);
-        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, 2);
+        player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_WIN);
+        player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4, RNDMATCH_FIELD_LOSE);
     }
 }
 

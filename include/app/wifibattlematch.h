@@ -22,13 +22,15 @@ struct WifiBattleMatchPlayer {
     // The console's address, which the live competition keeps of the players it met
     u8 mac[6];
     u8 unk26[2];
-    // The record's results 1, 2 and 0 (the live competition's LiveMatchData_GetCount)
+    // The wins, losses and battles played of the record: the live competition's LIVEMATCH_COUNT_WON,
+    // LIVEMATCH_COUNT_LOST and LIVEMATCH_COUNT_PLAYED, or the random matches' RNDMATCH_FIELD_WIN and
+    // RNDMATCH_FIELD_LOSE
     u32 record1;
     u32 record2;
     u32 record0;
     u32 unk34;
     PMSData sentence;
-    // Field 2 of the player's entry in the tournament block, which the two players compare
+    // The cup ID of the player's entry in the tournament block (TOURNAMENT_FIELD_CUP_ID), which the two players compare
     u32 entryField2;
     // 100, which overlay 290 and the live competition check with BattleRec_IsVersionSupported
     u32 unk44;

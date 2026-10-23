@@ -76,7 +76,7 @@ typedef struct {
     u32 action;
     WifiBattleMatchParam *param;
     u32 result;
-    void *record;
+    RndMatchData *record;
     WifiBattleMatchPlayer *player;
     WifiBattleMatchPlayer *otherPlayer;
     void *unk1C;

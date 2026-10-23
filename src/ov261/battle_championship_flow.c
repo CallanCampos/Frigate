@@ -907,7 +907,7 @@ static void BattleChampionshipFlow_MenuTaskReward(WifiBattleMatchTask *task, u32
 
 static void BattleChampionshipFlow_MenuOpenList(BattleChampionshipMenu *menu, u32 kind) {
     u32 layout;
-    void *tournament = getTournamentBlockAddress(GameData_GetSaveControl(menu->param.gameData));
+    TournamentBlock *tournament = getTournamentBlockAddress(GameData_GetSaveControl(menu->param.gameData));
     WifiBattleMatchMenuParam param;
     TournamentEntry *entry;
     u8 x, y, width, height;

@@ -29,7 +29,12 @@ enum {
 };
 
 // The fields of a team's record, for TournamentTeam_GetField
-enum { TOURNAMENT_TEAM_SPECIES, TOURNAMENT_TEAM_FORM, TOURNAMENT_TEAM_HAS_ITEM, TOURNAMENT_TEAM_GENDER };
+enum {
+    TOURNAMENT_TEAM_SPECIES,
+    TOURNAMENT_TEAM_FORM,
+    TOURNAMENT_TEAM_HAS_ITEM,
+    TOURNAMENT_TEAM_GENDER,
+};
 
 struct TournamentEntry {
     Regulation regulation;
@@ -46,7 +51,7 @@ struct TournamentEntry {
     s8 endYear;
     s8 endMonth;
     s8 endDay;
-    // Field 10 of TournamentEntry_GetField
+    // A state from 1 to 5, which the competitions and the Wi-Fi login set as the entry goes on
     s8 unk15B;
     // What picks the card's colors, and whether an opponent already battled may be battled again
     u8 variant;
@@ -72,31 +77,30 @@ struct TournamentBlock {
 
 u32 getSizeofTourneyBlock(void);
 // An entry's regulation, which is the entry itself, and a parameter of the regulation. The battle type is 0x15
-Regulation *TournamentEntry_GetRegulation(void *entry);
+Regulation *TournamentEntry_GetRegulation(TournamentEntry *entry);
 // The entry's data of 0x92 bytes
 void *TournamentEntry_GetCardData(TournamentEntry *entry);
-// An entry's field, and setting it. The Wi-Fi login reads field 2 and field 10 and sets field 10
-u32 TournamentEntry_GetField(void *entry, u32 field);
-void TournamentEntry_SetField(void *entry, u32 field, u32 value);
+// An entry's field (a TOURNAMENT_FIELD_*), and setting it
+u32 TournamentEntry_GetField(TournamentEntry *entry, u32 field);
+void TournamentEntry_SetField(TournamentEntry *entry, u32 field, u32 value);
 // Checks the CRC of an entry
 BOOL TournamentEntry_CheckCRC(TournamentEntry *entry);
 // The CRC16 of the first 0x15e bytes of an entry
-u16 CRC16_350bytes(const void *entry);
+u16 CRC16_350bytes(const TournamentEntry *entry);
 // An entry of the block
-void *TournamentBlock_GetEntry(TournamentBlock *block, u32 index);
+TournamentEntry *TournamentBlock_GetEntry(TournamentBlock *block, u32 index);
 // Copies an entry into the block
 void TournamentBlock_SetEntry(TournamentBlock *block, u32 index, const TournamentEntry *entry);
 // Clears a team's record
-void TournamentTeam_Clear(void *record);
-// The block's other entries, of 0x1e bytes
-void *TournamentBlock_GetTeam(TournamentBlock *block, u32 index);
-// A field of the Pokémon number index of such an entry: the species (0), the form (1), whether it holds an item (2)
-// and its gender (3)
-u32 TournamentTeam_GetField(void *record, u32 field, u8 index);
+void TournamentTeam_Clear(TournamentTeam *team);
+// The record of the team entered with an entry
+TournamentTeam *TournamentBlock_GetTeam(TournamentBlock *block, u32 index);
+// A field (a TOURNAMENT_TEAM_*) of the team's Pokémon number index
+u32 TournamentTeam_GetField(TournamentTeam *team, u32 field, u8 index);
 // Fills a team's record from a party
-void TournamentTeam_SetFromParty(void *record, PokeParty *party);
+void TournamentTeam_SetFromParty(TournamentTeam *team, PokeParty *party);
 void clearTournamentBlock(void *block);
-void *getTournamentBlockAddress(SaveControl *save);
+TournamentBlock *getTournamentBlockAddress(SaveControl *save);
 // Clears the player's VS data
 void clearVSPlayer(void);
 

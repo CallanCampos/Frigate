@@ -37,18 +37,6 @@ enum {
 #define BR_RNDMATCH_MSGWIN_MAX 18
 #define BR_RNDMATCH_PRINT_COLOR 0x3da0
 
-// The battle types of a mode, and where the Rating mode's results are in the Random Matchup records, after the Free
-// mode's
-#define BR_RNDMATCH_BTL_TYPE_MAX 5
-#define BR_RNDMATCH_RECORD_RATE BR_RNDMATCH_BTL_TYPE_MAX
-
-// The fields of a result of the Random Matchup records
-enum {
-    BR_RNDMATCH_FIELD_RATING,
-    BR_RNDMATCH_FIELD_WIN,
-    BR_RNDMATCH_FIELD_LOSE,
-};
-
 typedef struct {
     BmpOamSys *bmpoam;
     PrintQueue *que;
@@ -303,27 +291,27 @@ static void BrRndMatch_CreateRating(BrRndMatchWork *wk, BrRndMatchProcParam *p) 
             break;
         case 7:
             WordSetNumber(wordSet, 0,
-                          RndMatchData_GetParam(p->record, BR_RNDMATCH_RECORD_RATE + 0, BR_RNDMATCH_FIELD_RATING), 4, 1,
+                          RndMatchData_GetParam(p->record, RNDMATCH_RECORD_RATING + 0, RNDMATCH_FIELD_RATING), 4, 1,
                           TRUE);
             break;
         case 8:
             WordSetNumber(wordSet, 0,
-                          RndMatchData_GetParam(p->record, BR_RNDMATCH_RECORD_RATE + 1, BR_RNDMATCH_FIELD_RATING), 4, 1,
+                          RndMatchData_GetParam(p->record, RNDMATCH_RECORD_RATING + 1, RNDMATCH_FIELD_RATING), 4, 1,
                           TRUE);
             break;
         case 9:
             WordSetNumber(wordSet, 0,
-                          RndMatchData_GetParam(p->record, BR_RNDMATCH_RECORD_RATE + 2, BR_RNDMATCH_FIELD_RATING), 4, 1,
+                          RndMatchData_GetParam(p->record, RNDMATCH_RECORD_RATING + 2, RNDMATCH_FIELD_RATING), 4, 1,
                           TRUE);
             break;
         case 10:
             WordSetNumber(wordSet, 0,
-                          RndMatchData_GetParam(p->record, BR_RNDMATCH_RECORD_RATE + 3, BR_RNDMATCH_FIELD_RATING), 4, 1,
+                          RndMatchData_GetParam(p->record, RNDMATCH_RECORD_RATING + 3, RNDMATCH_FIELD_RATING), 4, 1,
                           TRUE);
             break;
         case 11:
             WordSetNumber(wordSet, 0,
-                          RndMatchData_GetParam(p->record, BR_RNDMATCH_RECORD_RATE + 4, BR_RNDMATCH_FIELD_RATING), 4, 1,
+                          RndMatchData_GetParam(p->record, RNDMATCH_RECORD_RATING + 4, RNDMATCH_FIELD_RATING), 4, 1,
                           TRUE);
             break;
         default:
@@ -364,10 +352,10 @@ static void BrRndMatch_CreateRate(BrRndMatchWork *wk, BrRndMatchProcParam *p) {
         wk->msgWin[i] = BrMsgWin_Init(1, data->x, data->y, data->w, data->h, 14, wk->que, wk->heapId);
         BrMsgWin_SetPos(wk->msgWin[i], 0, 1, BR_MSGWIN_POS_ABSOLUTE);
         if (8 <= i && i <= 12) {
-            value = RndMatchData_GetParam(p->record, i - 8 + BR_RNDMATCH_RECORD_RATE, BR_RNDMATCH_FIELD_WIN);
+            value = RndMatchData_GetParam(p->record, i - 8 + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_WIN);
             isFormat = TRUE;
         } else if (13 <= i && i <= 17) {
-            value = RndMatchData_GetParam(p->record, i - 13 + BR_RNDMATCH_RECORD_RATE, BR_RNDMATCH_FIELD_LOSE);
+            value = RndMatchData_GetParam(p->record, i - 13 + RNDMATCH_RECORD_RATING, RNDMATCH_FIELD_LOSE);
             isFormat = TRUE;
         } else {
             str = GFL_MsgDataLoadStrbufNew(msg, data->msgID);
@@ -407,10 +395,10 @@ static void BrRndMatch_CreateFree(BrRndMatchWork *wk, BrRndMatchProcParam *p) {
         wk->msgWin[i] = BrMsgWin_Init(1, data->x, data->y, data->w, data->h, 14, wk->que, wk->heapId);
         BrMsgWin_SetPos(wk->msgWin[i], 0, 1, BR_MSGWIN_POS_ABSOLUTE);
         if (8 <= i && i <= 12) {
-            value = RndMatchData_GetParam(p->record, i - 8, BR_RNDMATCH_FIELD_WIN);
+            value = RndMatchData_GetParam(p->record, i - 8, RNDMATCH_FIELD_WIN);
             isFormat = TRUE;
         } else if (13 <= i && i <= 17) {
-            value = RndMatchData_GetParam(p->record, i - 13, BR_RNDMATCH_FIELD_LOSE);
+            value = RndMatchData_GetParam(p->record, i - 13, RNDMATCH_FIELD_LOSE);
             isFormat = TRUE;
         } else {
             str = GFL_MsgDataLoadStrbufNew(msg, data->msgID);

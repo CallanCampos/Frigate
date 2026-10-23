@@ -380,7 +380,7 @@ static BtlSetup *EventPokewood_LoadDownloadedSetup(GameSystem *gsys, Field *fiel
         BtlSetup_Reset(setup);
         BtlSetup_InitForRecord(setup, gameData, heapId);
         BattleRec_LoadToolOverlay();
-        movie = Pokewood_GetLoadedMovieField(0, 0);
+        movie = Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0);
         BattleRecTool_LoadSetup(setup, 1, heapId);
         BattleRec_UnloadToolOverlay();
         EventPokewood_FinishWatchSetup(gameData, setup, movie, heapId);
@@ -496,7 +496,7 @@ static void EventPokewood_InitTitleParam(PokewoodTitleParam *title, BtlSetup *se
     MsgData *msgData;
 
     BattleRec_LoadToolOverlay();
-    Pokewood_GetLoadedMovieField(2, (u32)pkm);
+    Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_PKM_0, (u32)pkm);
     species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_SPECIES_NAMES, HEAPID_TAIL(HEAPID_GAMEEVENT));
     GFL_MsgDataLoadStrbuf(msgData, species, name);
@@ -648,7 +648,7 @@ static void EventPokewood_LoadSlotInfo(GameData *gameData, HeapID heapId, Pokewo
     BattleRec_LoadToolOverlay();
     for (slot = 0; slot < 8; slot++) {
         if (Pokewood_LoadDownloadedMovie(saveControl, heapId, slot) == 1) {
-            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(0, 0)] + 1;
+            param->slotInfo[slot] = sSlotInfo[Pokewood_GetLoadedMovieField(POKEWOOD_BLOCK_FIELD_UNKDF, 0)] + 1;
         } else {
             param->slotInfo[slot] = 0;
         }

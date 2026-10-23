@@ -516,8 +516,8 @@ static BOOL WifiBattleMatchSys_FinishList(WifiBattleMatchChain *chain, void *par
 static void *WifiBattleMatchSys_CreateBattleParam(WifiBattleMatchChain *chain, HeapID heapId, WifiBattleMatchSys *sys) {
     WifiBattleMatchBattleParam *param;
     Regulation *regulation;
-    void *tournament;
-    void *entry;
+    TournamentBlock *tournament;
+    TournamentEntry *entry;
     BOOL ownsRegulation = FALSE;
     u32 fileId;
     u32 battleType;
@@ -680,7 +680,7 @@ static BOOL WifiBattleMatchSys_FinishBattle(WifiBattleMatchChain *chain, void *p
     BtlSetup *setup = battle->setup;
     u32 result = battle->result;
     Regulation *regulation;
-    void *entry;
+    TournamentEntry *entry;
     u32 value;
     u8 aliveOther;
     u8 aliveOwn;
