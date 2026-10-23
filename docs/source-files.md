@@ -177,7 +177,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
-| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
+| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | complete | descriptive |
 | `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | complete | descriptive |
 | `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
 | `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |

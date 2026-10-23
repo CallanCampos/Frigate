@@ -672,8 +672,10 @@ static void ProcessPingPacket(NATNegotiator *neg, NatNegPacket *packet, SOCKADDR
                       neg->cookie);
         return;
     }
+    IN_ADDR senderIp = fromAddr->addr;
+
     gsDebugFormat(GSIDebugCat_NatNeg, GSIDebugType_Network, GSIDebugLevel_Notice,
-                  "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", SOC_InetNtoA(fromAddr->addr),
+                  "Got ping from: %s:%d (gotmydata: %d, finished: %d)\n", SOC_InetNtoA(senderIp),
                   NN_SWAP16(fromAddr->port), packet->Packet.connect.gotyourdata, packet->Packet.connect.finished);
     neg->guessedIp = fromAddr->addr.addr;
     neg->guessedPort = NN_SWAP16(fromAddr->port);
