@@ -7,6 +7,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- An alternating buffer's index reloaded after a byte copy: snapshot the selected index in its unsigned type and
+  use it for both the copy and return (`value_for_key`). (matching.md: "selected alternating buffer")
+- A by-value IPv4 formatter argument loaded differently from a struct field: name the `IN_ADDR` value before the
+  call (`ProcessPingPacket`). (matching.md: "before its second diagnostic")
+
 - A 64-bit product's masked high word in the wrong register: calculate the product, then mask it with `&=`
   (`gsiLargeIntInverseMod`). (matching.md: "64-bit product calculated before it is masked")
 
@@ -236,6 +241,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
 
 ## Stack slots or frame size
+
+- A write result missing its store to a later read's output slot: use one transfer-length local for both operations
+  (`DWCi_Http_Thread`). (matching.md: "one transfer-length local")
 
 - Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
   inline read through a `const` pointer. (matching.md: "a progress snapshot")

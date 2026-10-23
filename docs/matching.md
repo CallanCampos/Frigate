@@ -302,6 +302,13 @@ Same instructions, registers swapped.
   `gsi_u64 product = modulus->mData[0] * y; product &= 2 * x - 1;`. The comparison then uses `product`.
   With the multiplication and mask in the comparison, the high-word `and` copies the mask into its destination;
   the separate product update copies the product's high word instead, as the original does under `dsi/1.2`.
+- GameSpy's `value_for_key` keeps the selected alternating buffer in a `gsi_u32 index`, read from `valueindex`
+  before the byte-copy loop and used for both the copy destination and the return value. This keeps the scaled
+  index and array base across the copy and matches the original final address calculation; an `int` snapshot
+  instead makes the function four bytes longer under `dsi/1.2`.
+- GameSpy's `ProcessPingPacket` needs an `IN_ADDR senderIp = fromAddr->addr` before its second diagnostic, with
+  `SOC_InetNtoA(senderIp)` as the formatter argument. Passing the named IPv4 value reproduces the original's
+  field-address load and by-value argument where passing the field expression directly does not.
 - Two stores of the same constant share a register when chained, and not when written as two initializers.
   `second = first = TRUE;` stores `first` first. `nearXZ = FALSE; nearY = FALSE;` in that order loads the zero twice,
   while the other order shares it. A longer chain also stores from the right: NitroSystem G3D's `maya.c` zeroes nine
@@ -734,6 +741,11 @@ Same instructions, registers swapped.
   `u32 value; int i; int bit;` declared in that order.
 
 ## Stack slots
+
+- DWC's `DWCi_Http_Thread` uses one transfer-length local for `CPS_SocWrite`'s result and the later
+  `CPS_SocRead` output. Keeping the write result in a separate `sent` local drops the original's store to the
+  address-taken length slot. The shared `u32 length`, with `(s32)length <= 0` for the write error check, restores
+  that store and reduces the difference from 242 bytes to 37; the remaining stack slots still differ.
 
 - `RailMath_RailToWorldSlerpXZ` keeps raw signed position and length at the original stack slots when they form
   a progress snapshot and an inline reads that snapshot through a `const` pointer to compute its fixed-point ratio.
