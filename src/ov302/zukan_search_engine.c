@@ -189,7 +189,7 @@ BOOL ZukanSearchEngine_Step(ZukanSearchEngine *engine, HeapID heapId, u16 *count
                 }
             }
             if (engine->criteria->color != CRITERIA_ANY) {
-                u8 color = PML_PersonalGetParam(engine->personal, 0x21);
+                u8 color = PML_PersonalGetParam(engine->personal, PERSONAL_COLOR);
 
                 if (color != engine->criteria->color) {
                     engine->excluded[i] = 1;

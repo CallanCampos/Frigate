@@ -1506,7 +1506,7 @@ static void DrawTrayIconPokes(Box2SysWork *syswk, u32 tray, u8 *chr) {
                 if (PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL) == 0) {
                     form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
                     personal = PML_PersonalLoad(species, form, HEAPID_BOX2_APP);
-                    color = PML_PersonalGetParam(personal, 33);
+                    color = PML_PersonalGetParam(personal, PERSONAL_COLOR);
                     PML_PersonalFree(personal);
                 } else if (species == SPECIES_MANAPHY) {
                     color = 1;

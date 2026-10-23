@@ -178,9 +178,9 @@ static BOOL WifiBattleMatchLink_RandomInit(GameProc *proc, u32 *state, void *par
                                                     HEAPID_WIFIBATTLEMATCH_LINK);
     WifiBattleMatchLinkIcon_SetShown(link->linkIcon, FALSE);
     if (linkParam->result != 0) {
-        if (linkParam->mode == 0) {
+        if (linkParam->mode == LINK_MODE_RATING) {
             WifiBattleMatchLink_ShowRankCard(link, 0);
-        } else if (linkParam->mode == 1) {
+        } else if (linkParam->mode == LINK_MODE_FREE) {
             if (linkParam->result == 1) {
                 WifiBattleMatchLink_AddMatchResult(linkParam->record, linkParam->param->unk4,
                                                    linkParam->battleResult->result);
@@ -280,19 +280,19 @@ static void WifiBattleMatchLink_TaskStart(WifiBattleMatchTask *task, u32 *seq, v
         WifiBattleMatchNet_CancelMatch(link->net);
         // fall through
     case 1:
-        if (param->mode == 0) {
+        if (param->mode == LINK_MODE_RATING) {
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_TaskRatingResult);
             return;
-        } else if (param->mode == 1) {
+        } else if (param->mode == LINK_MODE_FREE) {
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_TaskFreeResult);
             return;
         }
         break;
     case 3:
-        if (param->mode == 0) {
+        if (param->mode == LINK_MODE_RATING) {
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_TaskRatingAfterBattle);
             return;
-        } else if (param->mode == 1) {
+        } else if (param->mode == LINK_MODE_FREE) {
             WifiBattleMatchTask_SetFunc(task, WifiBattleMatchLink_TaskFreeAfterBattle);
         }
         break;
@@ -2071,10 +2071,10 @@ static void WifiBattleMatchLink_CreatePartnerCard(WifiBattleMatchLinkRandom *lin
 
     if (link->partnerCard == NULL) {
         unit = WifiBattleMatchGraphic_GetClActUnit(link->graphic);
-        if (link->param->mode == 0) {
+        if (link->param->mode == LINK_MODE_RATING) {
             shown = 1;
             kind = 2;
-        } else if (link->param->mode == 1) {
+        } else if (link->param->mode == LINK_MODE_FREE) {
             shown = 0;
             kind = 3;
         }
@@ -2242,7 +2242,7 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchPlayer *player, Wif
     info = GetGameDataPlayerInfo(gameData);
     MI_CpuCopy8(info, player, PlayerInfo_GetSize());
     CGearPhrases_Get(CGearPhrases_GetBlock(save), 0, &player->sentence);
-    if (link->param->mode == 0) {
+    if (link->param->mode == LINK_MODE_RATING) {
         player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
                                                 RNDMATCH_FIELD_WIN);
         player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
@@ -2255,7 +2255,7 @@ static void WifiBattleMatchLink_FillOwnPlayer(WifiBattleMatchPlayer *player, Wif
 }
 
 static void WifiBattleMatchLink_UpdatePlayerRecord(WifiBattleMatchPlayer *player, WifiBattleMatchLinkRandom *link) {
-    if (link->param->mode == 0) {
+    if (link->param->mode == LINK_MODE_RATING) {
         player->record1 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,
                                                 RNDMATCH_FIELD_WIN);
         player->record2 = RndMatchData_GetParam(link->param->record, link->param->param->unk4 + RNDMATCH_RECORD_RATING,

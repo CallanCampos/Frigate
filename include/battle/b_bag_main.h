@@ -41,9 +41,10 @@ typedef struct {
 
 // The first of each kind of actor in BBagWork's actors
 enum {
-    BBAG_ACTOR_ITEM = 0,    // 0-5 the page's items, 6 the last used or the chosen item
-    BBAG_ACTOR_COST = 7,    // 8 per item slot: the cost, then 7 gauge pips (mode 1)
-    BBAG_ACTOR_ENERGY = 55, // 8: the energy left and spent
+    BBAG_ACTOR_ITEM = 0,       // 0-5 the page's items
+    BBAG_ACTOR_SHOWN_ITEM = 6, // the last used item on the pockets' page, or the chosen item
+    BBAG_ACTOR_COST = 7,       // 8 per item slot: the cost, then 7 gauge pips (mode 1)
+    BBAG_ACTOR_ENERGY = 55,    // 8: the energy left and spent
     BBAG_ACTOR_MAX = 63,
 };
 

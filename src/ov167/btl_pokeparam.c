@@ -40,7 +40,7 @@ BattleMon *BattleMon_Create(PartyPkm *src, u8 monId, HeapID heapId) {
     mon->core.baseForm = PokeParty_GetParam(src, PKM_PARAM_FORM, NULL);
     mon->core.baseAbility = PokeParty_GetParam(src, PKM_PARAM_ABILITY, NULL);
     mon->core.level = PokeParty_GetParam(src, PKM_PARAM_LEVEL, NULL);
-    mon->core.unk1a = PML_PersonalGetParamSingle(mon->core.species, mon->core.baseForm, 1);
+    mon->core.unk1a = PML_PersonalGetParamSingle(mon->core.species, mon->core.baseForm, PERSONAL_BASE_ATTACK);
     setupBySrcData(mon, src, TRUE, TRUE);
     mon->moveCount = GetNumMoves(mon, src, TRUE);
     mon->unk143 = 0;

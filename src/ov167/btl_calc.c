@@ -501,7 +501,7 @@ u32 CalcBaseExpGain(BattleMon *mon, s32 levelDiff) {
         levelDiff = 0;
     }
     level = (u16)levelDiff + GetBattleMonStat(mon, 0xf);
-    baseExp = PML_PersonalGetParamSingle(species, form, 9);
+    baseExp = PML_PersonalGetParamSingle(species, form, PERSONAL_BASE_EXP);
     return baseExp * level / 5;
 }
 
@@ -580,7 +580,7 @@ u32 BtlCalc_GetTrainerPrizeMoney(BtlSetupTrainer *trainer, PokeParty *party) {
 
         if (count != 0) {
             PartyPkm *pkm = PokeParty_GetPkm(party, count - 1);
-            u32 baseMoney = TrainerData_GetParam(trainer->trainerId, 10);
+            u32 baseMoney = TrainerData_GetParam(trainer->trainerId, TRAINER_PARAM_MONEY);
 
             return PokeParty_GetParam(pkm, PKM_PARAM_LEVEL, NULL) * baseMoney * 4;
         }

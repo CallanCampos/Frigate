@@ -921,7 +921,7 @@ static BOOL CheckBallCapture(BtlServerFlow *flow, BattleMon *mon, BattleMon *tar
     }
     species = GetBattleMonSpecies(target);
     form = GetBattleMonStat(target, 0x13);
-    rate *= (u16)PML_PersonalGetParamSingle(species, form, 8);
+    rate *= (u16)PML_PersonalGetParamSingle(species, form, PERSONAL_CATCH_RATE);
     rate = (u32)FX_MUL(rate, GetBallCaptureMod(flow, mon, target, item)) / maxHP;
     switch (GetBattleMonStatus(target)) {
     case 2:
