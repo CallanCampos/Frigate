@@ -108,7 +108,7 @@ void MailData_SetMessage(MailData *mail, const PMSData *src, u8 index) {
     }
 }
 
-void *MailBox_GetFromGameData(GameData *gameData) {
+MailData *MailBox_GetFromGameData(GameData *gameData) {
     return SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), SAVE_BLOCK_MAIL);
 }
 

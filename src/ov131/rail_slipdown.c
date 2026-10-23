@@ -57,7 +57,7 @@ struct RailSlipdown {
 
 static void RailSlipdown_Task(TCB *tcb, void *data);
 
-void *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOOL stopPlayer) {
+RailSlipdown *RailSlipdown_Create(GameSystem *gsys, Field *field, FieldActor *actor, BOOL stopPlayer) {
     RailSlipdown *work;
 
     work = GFL_HeapAllocate(Field_GetHeapID(field), sizeof(RailSlipdown), TRUE, "rail_slipdown.c", 128);

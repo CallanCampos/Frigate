@@ -4,6 +4,7 @@
 // Function names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 #include "types.h"
+#include "save/zukan_habitat_savedata.h"
 #include "struct_decls.h"
 
 // The Medal Rally's medals, save block 0x44
@@ -40,7 +41,7 @@ struct MedalBox {
     u8 manualShown;
     u8 padding3FF;
     // The Pokédex's habitat list
-    u8 habitatList[0x96];
+    ZukanHabitatSave habitatList;
 };
 
 #define MEDAL_RANK_MAX 4
@@ -70,12 +71,12 @@ u8 MedalBox_IsManualShown(MedalBox *box);
 void MedalBox_SetManualShown(MedalBox *box);
 MedalBox *SaveControl_GetMedalBox(SaveControl *save);
 // The Pokédex's habitat list in the block
-void *MedalBox_GetHabitatList(MedalBox *box);
+ZukanHabitatSave *MedalBox_GetHabitatList(MedalBox *box);
 
 // The Pokédex's habitat list, kept in the medal box's block: the zone it shows, its season and its kind of habitat.
 // These functions come from a later file than the medal box's, which has no header yet
-void ZukanHabitatSave_Init(void *data);
-void *SaveControl_GetZukanHabitatSave(SaveControl *save);
+void ZukanHabitatSave_Init(ZukanHabitatSave *data);
+ZukanHabitatSave *SaveControl_GetZukanHabitatSave(SaveControl *save);
 void ZukanHabitatSave_SetZone(ZukanHabitatSave *data, u16 zone);
 u16 ZukanHabitatSave_GetZone(ZukanHabitatSave *data);
 void ZukanHabitatSave_SetSeason(ZukanHabitatSave *data, u32 season);

@@ -7,30 +7,69 @@
 
 // Species data
 
-#define PERSONAL_TYPE_1 6
-#define PERSONAL_TYPE_2 7
-#define PERSONAL_ABILITY_1 26
-#define PERSONAL_ABILITY_2 27
-#define PERSONAL_ABILITY_HIDDEN 28
-#define PERSONAL_SEX_RATIO 20
-#define PERSONAL_HATCH_CYCLES 21
-#define PERSONAL_FRIENDSHIP 22
-#define PERSONAL_GROWTH_RATE 23
-// The offset of the forms' sprites (not from swan)
-#define PERSONAL_FORM_SPRITE_OFFSET 31
-#define PERSONAL_FORM_COUNT 32
-// Whether the forms only change the palette, as Arceus's do (not from swan)
-// Whether the sprite may be flipped
-#define PERSONAL_SPRITE_FLIP 34
-#define PERSONAL_PALETTE_FORMS 35
-// Not from swan: a flag that keeps the summary screen's sprite from bouncing, and the weight
-#define PERSONAL_NO_BOUNCE 16
-#define PERSONAL_WEIGHT 38
-// Not from swan: the first of the four words of TM and HM flags, the free move tutors' flags, and the first of the
-// four words of the paid move tutors' flags
-#define PERSONAL_MACHINES_1 39
-#define PERSONAL_TUTORS 43
-#define PERSONAL_TUTOR_PAID_1 44
+// The fields that PML_PersonalGetParam reads, by number, each one of PersonalData's
+enum {
+    // The base stats (not from swan)
+    PERSONAL_BASE_HP,
+    PERSONAL_BASE_ATTACK,
+    PERSONAL_BASE_DEFENSE,
+    PERSONAL_BASE_SPEED,
+    PERSONAL_BASE_SP_ATTACK,
+    PERSONAL_BASE_SP_DEFENSE,
+    PERSONAL_TYPE_1,
+    PERSONAL_TYPE_2,
+    // Not from swan: the catch rate, the experience that defeating it gives, and the effort values, by stat
+    PERSONAL_CATCH_RATE,
+    PERSONAL_BASE_EXP,
+    PERSONAL_EV_HP,
+    PERSONAL_EV_ATTACK,
+    PERSONAL_EV_DEFENSE,
+    PERSONAL_EV_SPEED,
+    PERSONAL_EV_SP_ATTACK,
+    PERSONAL_EV_SP_DEFENSE,
+    // Not from swan: a flag that keeps the summary screen's sprite from bouncing
+    PERSONAL_NO_BOUNCE,
+    // The three items of PersonalData.items (not from swan)
+    PERSONAL_ITEM_1,
+    PERSONAL_ITEM_2,
+    PERSONAL_ITEM_3,
+    PERSONAL_SEX_RATIO,
+    PERSONAL_HATCH_CYCLES,
+    PERSONAL_FRIENDSHIP,
+    PERSONAL_GROWTH_RATE,
+    // The egg groups (not from swan)
+    PERSONAL_EGG_GROUP_1,
+    PERSONAL_EGG_GROUP_2,
+    PERSONAL_ABILITY_1,
+    PERSONAL_ABILITY_2,
+    PERSONAL_ABILITY_HIDDEN,
+    // Not from swan: the flee rate, and the file of the first other form, or 0
+    PERSONAL_FLEE_RATE,
+    PERSONAL_FORM_FILE,
+    // The offset of the forms' sprites (not from swan)
+    PERSONAL_FORM_SPRITE_OFFSET,
+    PERSONAL_FORM_COUNT,
+    // The color the Pokédex searches by, a COLOR_* (not from swan)
+    PERSONAL_COLOR,
+    // A flag that keeps the sprite from being mirrored (not from swan)
+    PERSONAL_NO_FLIP,
+    // Whether the forms only change the palette, as Arceus's do (not from swan)
+    PERSONAL_PALETTE_FORMS,
+    // Not from swan: PersonalData.stage, the height and the weight, the four words of TM and HM flags, the free move
+    // tutors' flags, and the four words of the paid move tutors' flags
+    PERSONAL_STAGE,
+    PERSONAL_HEIGHT,
+    PERSONAL_WEIGHT,
+    PERSONAL_MACHINES_1,
+    PERSONAL_MACHINES_2,
+    PERSONAL_MACHINES_3,
+    PERSONAL_MACHINES_4,
+    PERSONAL_TUTORS,
+    PERSONAL_TUTOR_PAID_1,
+    PERSONAL_TUTOR_PAID_2,
+    PERSONAL_TUTOR_PAID_3,
+    PERSONAL_TUTOR_PAID_4,
+};
 
 // A species' data, the files of ARCID_PERSONAL. PML_PersonalGetParam reads its fields by number
 typedef struct {
@@ -65,7 +104,7 @@ typedef struct {
     u16 formSpriteOffset;
     u8 formCount;
     u8 color : 6;
-    u8 spriteFlip : 1;
+    u8 noFlip : 1;
     u8 paletteForms : 1;
     u16 baseExp;
     u16 height;

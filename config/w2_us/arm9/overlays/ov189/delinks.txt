@@ -89,6 +89,7 @@ lib/dwc/src/nhttp/nhttp_response.c:
     .data       start:0x021ad1a8 end:0x021ad1b8
 
 lib/dwc/src/nhttp/d_nhttp.c:
+    complete
     .text       start:0x021a07ac end:0x021a0a78
     .data       start:0x021ad2d0 end:0x021ad2d4
 
@@ -116,6 +117,7 @@ lib/dwc/src/ghttp/ghttpCommon.c:
     .bss        start:0x021b28a8 end:0x021b28b0
 
 lib/dwc/src/ghttp/ghttpConnection.c:
+    complete
     .text       start:0x021a1e4c end:0x021a2418
     .data       start:0x021ad3b4 end:0x021ad40c
     .bss        start:0x021b28b0 end:0x021b28c0
@@ -126,6 +128,7 @@ lib/dwc/src/ghttp/ghttpMain.c:
     .bss        start:0x021b28e4 end:0x021b28e8
 
 lib/dwc/src/ghttp/ghttpPost.c:
+    complete
     .text       start:0x021a30b4 end:0x021a4154
     .rodata     start:0x021acdb4 end:0x021acdb8
     .data       start:0x021adb1c end:0x021add70

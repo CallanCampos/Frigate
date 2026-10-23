@@ -11,10 +11,10 @@
 #define PERAP_VOICE_DECODED_SAMPLES (PERAP_VOICE_SAMPLES * 4)
 #define PERAP_VOICE_DECODED_SIZE 8180
 
-typedef struct {
+struct PerapVoice {
     BOOL exists;
     u8 voice[PERAP_VOICE_SAMPLES / 2];
-} PerapVoice;
+};
 
 u32 PerapVoice_GetSize(void);
 void initChatotChatter(PerapVoice *chatter);

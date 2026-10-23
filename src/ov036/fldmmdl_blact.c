@@ -42,7 +42,7 @@ typedef struct {
     u8 sizeIdx;
     u8 atlasIdx;
     u32 unkC;
-    void *resource;
+    G3DResource *resource;
 } AsyncResource;
 
 // An actor that waits for its material
@@ -54,7 +54,7 @@ typedef struct {
     u8 atlasIdx;
     u8 ctrlType;
     u8 state;
-    void *resource;
+    G3DResource *resource;
     void (*callback)(u16 index, void *data);
     void *callbackData;
     VecFx32 pos;
@@ -90,7 +90,7 @@ struct FieldBlAct {
     UnloadEntry *unloader;
 };
 
-static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, void *resource, u32 sizeIdx, u32 atlasIdx);
+static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, G3DResource *resource, u32 sizeIdx, u32 atlasIdx);
 static void FieldBlAct_FreeSingleUseMaterial(BlActSys *sys, u32 texMat);
 static u16 FldActSys_AddBlActDefault(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat);
 static u16 FldActSys_AddBlAct(MMSys *system, VecFx32 *pos, u32 sizeIdx, u32 ctrlType, u16 mat, u32 lights);
@@ -107,7 +107,7 @@ static void FldBlAct_RemoveCachedMat(MatCache *cache, u16 objCode);
 static BOOL FldBlAct_FindCachedMat(MatCache *cache, u16 objCode, u16 *mat, u16 *flags);
 static void FldBlAct_InitMatCache(FieldBlAct *blact, int count);
 static void FldBlAct_FreeCachedMaterials(FieldBlAct *blact);
-static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, void *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx,
+static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, G3DResource *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx,
                                         u32 flags);
 static void FldBlAct_LoadConfigMaterial(FieldBlAct *blact, const FieldActorConfig *config, u32 flags);
 static void FldBlAct_UnloadCachedMaterial(FieldBlAct *blact, u16 objCode);
@@ -134,7 +134,8 @@ static void FldBlAct_UpdateUnloadEntry(FieldBlAct *blact, UnloadEntry *entry);
 static void FldBlAct_UpdateAsyncDelete(FieldBlAct *blact);
 static BOOL FldBlAct_IsUnloadPending(FieldBlAct *blact, FieldActor *actor, u16 index);
 static const FieldBillboardAnimSet *FieldBlAct_GetBillboardAnimSet(u32 ctrlType);
-static u16 FldBlAct_LoadMaterial(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, void *resource, int mode);
+static u16 FldBlAct_LoadMaterial(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, G3DResource *resource,
+                                 int mode);
 
 // The scale of the billboard actors' scene
 static const VecFx32 BLACT_SCENE_SCALE = { 0x7000, 0x7000, 0x7000 };
@@ -147,7 +148,7 @@ static const u16 MMDL_TEXTURE_ATLAS_SIZE_BITS[64] = {
     0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77,
 };
 
-static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, void *resource, u32 sizeIdx, u32 atlasIdx) {
+static u32 BlActSys_LoadSingleUseTexMaterial(BlActSys *sys, G3DResource *resource, u32 sizeIdx, u32 atlasIdx) {
     u32 material = -1;
 
     if (GFL_G3DResUploadTexData(resource) == TRUE) {
@@ -304,7 +305,7 @@ static u16 FldActSys_AddBlActWithPalette(MMSys *system, VecFx32 *pos, u32 sizeId
     u16 actor = FldActSys_AddBlActDefault(system, pos, sizeIdx, ctrlType, mat);
 
     if (palMat != BLACT_NONE) {
-        BlActSys_ShareActorPltt(((FieldBlAct *)FldActSys_GetFieldBlAct(system))->sys, actor, palMat);
+        BlActSys_ShareActorPltt(FldActSys_GetFieldBlAct(system)->sys, actor, palMat);
     }
     return actor;
 }
@@ -506,7 +507,7 @@ static void FldBlAct_FreeCachedMaterials(FieldBlAct *blact) {
     FldBlAct_FreeMatCache(&blact->cache);
 }
 
-static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, void *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx,
+static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, G3DResource *resource, u16 objCode, u32 sizeIdx, u8 atlasIdx,
                                         u32 flags) {
     int mode = -1;
     u16 mat;
@@ -520,7 +521,7 @@ static void FldBlAct_LoadCachedMaterial(FieldBlAct *blact, void *resource, u16 o
 
 static void FldBlAct_LoadConfigMaterial(FieldBlAct *blact, const FieldActorConfig *config, u32 flags) {
     const FieldActorResGroup *group = GetNPCMdlInfoG2DRscGroup(config);
-    void *resource = GFL_G3DSysReadArcToolResource(GetMMSysDataArcHandle(blact->system), group->res1);
+    G3DResource *resource = GFL_G3DSysReadArcToolResource(GetMMSysDataArcHandle(blact->system), group->res1);
 
     FldBlAct_LoadCachedMaterial(blact, resource, config->uid, config->billboardSize, config->spriteAtlasSize, flags);
 }
@@ -1004,7 +1005,8 @@ static const FieldBillboardAnimSet *FieldBlAct_GetBillboardAnimSet(u32 ctrlType)
     return &FIELD_BILLBOARD_ANIM_SETS[ctrlType];
 }
 
-static u16 FldBlAct_LoadMaterial(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, void *resource, int mode) {
+static u16 FldBlAct_LoadMaterial(FieldBlAct *blact, u16 objCode, u32 sizeIdx, u32 atlasIdx, G3DResource *resource,
+                                 int mode) {
     BlActMatRequest request;
     const BillboardSize *size;
 

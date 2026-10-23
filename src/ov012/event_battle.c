@@ -357,7 +357,7 @@ GameEvent *EventCaptureDemo_Create(GameSystem *gsys, Field *field, HeapID heapId
 
 GameEvent *LoadTradedPokemonBattleStats(GameSystem *gsys, Field *field, u32 a2, u32 a3, u32 trainerId, u32 a5,
                                         u32 flags, u32 index) {
-    void *block = GetTradedPokemonBlock(GSYS_GetGameData(gsys));
+    TradedPokemonSave *block = GetTradedPokemonBlock(GSYS_GetGameData(gsys));
     GameEvent *event = EventTrainerBattleCall_Create(gsys, field, a2, a3, trainerId, a5, flags);
 
     if (TradedPokemonSave_IsTraded(block, index)) {
@@ -400,7 +400,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
         (*state)++;
         break;
     case 3:
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), TRUE);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_BATTLE);
         CommPlayerSupport_Init(GameData_GetCommPlayerSupport(gameData));
         GSYS_QueueProcAsEvent(event, OVERLAY_ID(167), &data_ov167_021d6ce0, wk->setup);
         (*state)++;
@@ -418,7 +418,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
 
         GFL_OvlLoad(OVERLAY_ID(337));
         DSProt_Init();
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FALSE);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(gameData), FLD_STATUS_BUSY_NONE);
         CommPlayerSupport_EndBattle(GameData_GetCommPlayerSupport(gameData));
         index = OS_GetVBlankCount() & 1;
         data_ov337_02182440 = index;
@@ -558,7 +558,7 @@ static void EventBattleCall_BroadcastBattleResult(EventBattleCallWork *work) {
     PokeParty *party = GameData_GetParty(work->gameData);
     PartyPkm *pkm = PokeParty_GetPkm(party, isEggInParty(party));
 
-    if (setup->unkA8 != 0 && setup->unkA8 != 2) {
+    if (setup->result != BTL_RESULT_DEFEAT && setup->result != BTL_RESULT_DRAW) {
         u16 species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
         StrBuf *name = GFL_StrBufCreate(12, HEAPID_TAIL(4));
         u16 hp, maxHp;
@@ -586,16 +586,16 @@ static void EventBattleCall_BroadcastBattleResult(EventBattleCallWork *work) {
     }
     switch (setup->battleType) {
     case 0:
-        if (setup->unkA8 == 3) {
+        if (setup->result == BTL_RESULT_FLEE) {
             EventBattleCall_BroadcastWildBattle(setup, 2);
-        } else if (setup->unkA8 == 4) {
+        } else if (setup->result == BTL_RESULT_FLEE_FOE) {
             EventBattleCall_BroadcastWildBattle(setup, 3);
-        } else if (setup->unkA8 == 1) {
+        } else if (setup->result == BTL_RESULT_VICTORY) {
             EventBattleCall_BroadcastWildBattle(setup, 1);
         }
         break;
     case 1:
-        if (setup->unkA8 == 1 && !(work->flags & 4)) {
+        if (setup->result == BTL_RESULT_VICTORY && !(work->flags & 4)) {
             EventBattleCall_BroadcastTrainerBattle(setup->trainers[1]->trainerId, 1);
         }
         break;
@@ -606,7 +606,7 @@ static void EventBattleCall_RecordEnemyFled(EventBattleCallWork *work) {
     BtlSetup *setup = work->setup;
     GameRecords *records = GameData_GetRecords(GSYS_GetGameData(work->gsys));
 
-    if (setup->battleType == 0 && setup->unkA8 == 4) {
+    if (setup->battleType == 0 && setup->result == BTL_RESULT_FLEE_FOE) {
         RecordAddOne(records, 0x4f);
     }
 }
@@ -631,11 +631,11 @@ u32 GetWildBattleResultByCombined(u32 result) {
 }
 
 static BOOL EventBattleCall_IsResultDefeat(EventBattleCallWork *work) {
-    return IsBattleResultDefeat(work->setup->unkA8, work->setup->battleType);
+    return IsBattleResultDefeat(work->setup->result, work->setup->battleType);
 }
 
 static void EventBattleCall_SyncGameDataOnReturn(EventBattleCallWork *work, GameData *gameData) {
-    GameData_SetLastBtlResult(gameData, work->setup->unkA8);
+    GameData_SetLastBtlResult(gameData, work->setup->result);
     EventBattleCall_BroadcastBattleResult(work);
     EventBattleCall_RecordEnemyFled(work);
     ResetWeather(work->gsys, PlayerState_GetZoneID(GameData_GetPlayerState(gameData)));

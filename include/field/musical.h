@@ -20,9 +20,9 @@
 struct MusicalCommWork {
     MusicalEventWork *event;
     // Overlay 211's communication work
-    void *comm;
+    MusCommWork *comm;
     // Overlay 36's menu
-    void *menu;
+    CommEntryMenu *menu;
     IrcBattleMatchParam ircMatch;
     u16 *result;
     u16 value;

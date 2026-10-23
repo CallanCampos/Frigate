@@ -155,7 +155,7 @@ static void WbtSubscreen_Exit(WbtSubscreen *work) {
 static void WbtSubscreen_FuncNone(WbtSubscreen *work) {
 }
 
-WbtSubscreen *WbtSubscreen_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys) {
+WbtSubscreen *WbtSubscreen_Create(CGearSettings *saveData, FieldSubscreen *subscreen, GameSystem *gsys) {
     WbtSubscreen *work = GFL_HeapAllocate(HEAPID_FIELDMAP, sizeof(WbtSubscreen), TRUE, "wbt_subscreen.c", 426);
     work->heapId = HEAPID_FIELDMAP;
     work->gsys = gsys;

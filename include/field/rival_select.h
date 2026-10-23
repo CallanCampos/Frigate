@@ -14,7 +14,6 @@ struct RivalEntry {
     u8 unk6;
 };
 
-RivalEntry *LinkFestival_GetEntries(LinkFestival *festival);
 u8 getHollowNum(RivalDataSave *save);
 
 RivalEntry *RivalSelect_GetEntry(FesGimmick *gimmick, u32 id);

@@ -46,7 +46,7 @@ void CDemo_InitGraphics(CDemoWork *work) {
     GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_5, GX_BG0_AS_2D);
     G2_SetBG2ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, GX_BG_BMPSCRBASE_0x00000);
     G2_SetBG3ControlDCBmp(GX_BG_SCRSIZE_DCBMP_256x256, GX_BG_AREAOVER_XLU, (GXBGBmpScrBase)(0x20000 / 0x4000));
-    MAT2_SetScaleRot(&matrix, 0, FX32_ONE, FX32_ONE, 0);
+    MAT2_SetScaleRot(&matrix, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
     G2_SetBG2Affine(&matrix, 0, 0, 0, 0);
     G2_SetBG3Affine(&matrix, 0, 0, 0, 0);
     screen = GFL_HeapAllocate(HEAPID_TAIL(HEAPID_CDEMO), 0x18000, TRUE, "cdemo_main.c", 90);

@@ -80,24 +80,24 @@ BSubwayScrWork *func_ov033_0217b478(GameSystem *gsys, u16 a1, u16 a2) {
             func_ov033_0217bd88(bsw, score);
         }
         value = bsw->playMode;
-        BSubwayPlayData_SetData(bsw->unk70, 0, &value);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &value);
     } else {
-        bsw->playMode = BSubwayPlayData_GetData(bsw->unk70, 0, NULL);
+        bsw->playMode = BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_MODE, NULL);
         bsw->memberCount = func_ov033_0217bdc0(bsw->playMode);
-        if (BSubwayPlayData_GetData(bsw->unk70, 10, NULL) != 0) {
+        if (BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_9, NULL) != 0) {
             func_ov033_0217bd34(bsw);
         }
-        BSubwayPlayData_GetData(bsw->unk70, 5, bsw->memberSlots);
-        BSubwayPlayData_GetData(bsw->unk70, 8, bsw->unk32);
+        BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
+        BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNKC, bsw->unk32);
         if (bsw->playMode == 2 || bsw->playMode == 7) {
-            bsw->unkC_5 = (u8)BSubwayPlayData_GetData(bsw->unk70, 9, NULL);
-            BSubwayPlayData_GetData(bsw->unk70, 6, &bsw->teamConfigs[bsw->unkC_5]);
+            bsw->unkC_5 = (u8)BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_6, NULL);
+            BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK28, &bsw->teamConfigs[bsw->unkC_5]);
             level = 303;
             if (getTrainerGender(&GameData_GetPlayerState(gameData)->playerInfo) != 0) {
                 level -= 3;
             }
             teamIndex = bsw->unkC_5;
-            count = BSubwayPlayData_GetData(bsw->unk70, 7, NULL);
+            count = BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_0, NULL);
             func_ov033_0217c2c4(bsw, &bsw->unk2C8[teamIndex], level + teamIndex, count, &bsw->teamConfigs[teamIndex],
                                 bsw->heapId);
         }
@@ -137,7 +137,7 @@ void func_ov033_0217b6b4(BSubwayScrWork *bsw) {
         mode = 8;
     }
     bsw->playMode = mode;
-    BSubwayPlayData_SetData(bsw->unk70, 0, &mode);
+    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &mode);
     if (BSubwayScoreData_HasStage(bsw->unk74, bsw->playMode) == 1) {
         score = BSubwayScoreData_GetStreak(bsw->unk74, bsw->playMode);
         func_ov033_0217bd88(bsw, score);
@@ -150,15 +150,15 @@ void func_ov033_0217b708(BSubwayScrWork *bsw) {
     u8 value;
 
     value = bsw->playMode;
-    BSubwayPlayData_SetData(bsw->unk70, 0, &value);
-    BSubwayPlayData_SetData(bsw->unk70, 5, bsw->memberSlots);
-    BSubwayPlayData_SetData(bsw->unk70, 8, bsw->unk32);
+    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &value);
+    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
+    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNKC, bsw->unk32);
     BSubwayPlayData_SetSaveFlag(bsw->unk70, 1);
     if (bsw->playMode == 2 || bsw->playMode == 7) {
         value = bsw->unkC_5;
-        BSubwayPlayData_SetData(bsw->unk70, 9, &value);
-        BSubwayPlayData_SetData(bsw->unk70, 6, &bsw->teamConfigs[bsw->unkC_5]);
-        BSubwayPlayData_SetData(bsw->unk70, 7, bsw->unk664 + bsw->unkC_5);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_6, &value);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK28, &bsw->teamConfigs[bsw->unkC_5]);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_0, bsw->unk664 + bsw->unkC_5);
     }
 }
 
@@ -168,7 +168,7 @@ void func_ov033_0217b790(BSubwayScrWork *bsw, GameSystem *gsys) {
     s32 i;
 
     bsw->memberCount = func_ov033_0217bdc0(bsw->playMode);
-    BSubwayPlayData_GetData(bsw->unk70, 5, bsw->memberSlots);
+    BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
     party = func_ov033_0217bd60(bsw);
     for (i = 0; i < bsw->memberCount; i++) {
         pkm = PokeParty_GetPkm(party, bsw->memberSlots[i]);
@@ -181,15 +181,15 @@ void func_ov033_0217b7e8(BSubwayScrWork *bsw) {
     u8 value;
 
     value = bsw->playMode;
-    BSubwayPlayData_SetData(bsw->unk70, 0, &value);
+    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &value);
     BSubwayPlayData_ResetRound(bsw->unk70);
-    BSubwayPlayData_SetData(bsw->unk70, 5, bsw->memberSlots);
+    BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK8, bsw->memberSlots);
     BSubwayPlayData_SetSaveFlag(bsw->unk70, 1);
     if (bsw->playMode == 2 || bsw->playMode == 7) {
         value = bsw->unkC_5;
-        BSubwayPlayData_SetData(bsw->unk70, 9, &value);
-        BSubwayPlayData_SetData(bsw->unk70, 6, &bsw->teamConfigs[bsw->unkC_5]);
-        BSubwayPlayData_SetData(bsw->unk70, 7, bsw->unk664 + bsw->unkC_5);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_6, &value);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK28, &bsw->teamConfigs[bsw->unkC_5]);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_UNK0_0, bsw->unk664 + bsw->unkC_5);
     }
 }
 
@@ -202,7 +202,7 @@ u16 func_ov033_0217b86c(GameSystem *gsys) {
     save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     play = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_PLAY);
     score = SaveControl_GetBlockPtr(save, SAVE_BLOCK_BSUBWAY_SCORE);
-    mode = BSubwayPlayData_GetData(play, 0, NULL);
+    mode = BSubwayPlayData_GetData(play, BSUBWAY_PLAY_MODE, NULL);
     BSubwayPlayData_ResetRound(play);
     BSubwayScoreData_ResetStage(score, mode);
     return mode;
@@ -234,7 +234,7 @@ u16 func_ov033_0217b8ec(BSubwayScrWork *bsw) {
 
     if (bsw->playMode == 4) {
         reward = 0;
-        if ((u16)BSubwayPlayData_GetData(bsw->unk70, 11, NULL) == 1) {
+        if ((u16)BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_10, NULL) == 1) {
             index = (s8)BSubwayScoreData_GetWifiRank(bsw->unk74);
             if (index < 0) {
                 index = 0;
@@ -433,7 +433,7 @@ u16 func_ov033_0217bcb4(BSubwayScoreData *score, GameSystem *gsys, u32 op) {
     case 0:
         return value;
     case 3:
-        BSubwayScoreData_SetFlag(score, 0, 2);
+        BSubwayScoreData_SetFlag(score, 0, BSUBWAY_FLAG_RESET);
         if (value == 10) {
             return 0;
         }
@@ -447,7 +447,7 @@ u16 func_ov033_0217bcb4(BSubwayScoreData *score, GameSystem *gsys, u32 op) {
         if (limit >= sWifiRankLoseLimits[value - 1]) {
             BSubwayScoreData_DecWifiRank(score);
             BSubwayScoreData_SetWifiLoseCount(score, 2);
-            BSubwayScoreData_SetFlag(score, 0, 2);
+            BSubwayScoreData_SetFlag(score, 0, BSUBWAY_FLAG_RESET);
             return 1;
         }
         return 0;
@@ -465,7 +465,7 @@ void func_ov033_0217bd34(BSubwayScrWork *bsw) {
 }
 
 PokeParty *func_ov033_0217bd60(BSubwayScrWork *bsw) {
-    if (BSubwayPlayData_GetData(bsw->unk70, 10, NULL) == 0) {
+    if (BSubwayPlayData_GetData(bsw->unk70, BSUBWAY_PLAY_UNK0_9, NULL) == 0) {
         return GameData_GetParty(bsw->gameData);
     }
     return bsw->allocatedBuffer;
@@ -545,9 +545,9 @@ void func_ov033_0217be2c(BSubwayScrWork *bsw, SaveControl *save, u32 a2, u32 a3)
     case 4:
         func_ov033_0217c010(bsw, save, 1);
         mode = bsw->playMode;
-        BSubwayPlayData_SetData(bsw->unk70, 0, &mode);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_MODE, &mode);
         mode = BSubwayPlayData_GetRound(bsw->unk70) + 1;
-        BSubwayPlayData_SetData(bsw->unk70, 1, &mode);
+        BSubwayPlayData_SetData(bsw->unk70, BSUBWAY_PLAY_ROUND, &mode);
         BSubwayScoreData_CalcWifiScore(bsw->unk74, bsw->unk70);
         return;
     case 1:

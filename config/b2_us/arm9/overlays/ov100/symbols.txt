@@ -9,10 +9,10 @@ GymVirbank_StepAnimations kind:function(thumb,size=0xc) addr:0x021eee40
 GymVirbank_InitMusic kind:function(thumb,size=0x160) addr:0x021eee4c
 GymVirbank_UpdateMusicVolume kind:function(thumb,size=0x58) addr:0x021eefac
 GymVirbank_GetVolumeIndex kind:function(thumb,size=0x88) addr:0x021ef004
-data_ov100_021ef08c kind:data(any) addr:0x021ef08c
-data_ov100_021ef0a4 kind:data(any) addr:0x021ef0a4
-data_ov100_021ef0b4 kind:data(any) addr:0x021ef0b4
-data_ov100_021ef0d8 kind:data(any) addr:0x021ef0d8
+sAnimations kind:data(any) addr:0x021ef08c
+sSceneSetup kind:data(any) addr:0x021ef0a4
+sResources kind:data(any) addr:0x021ef0b4
+sActors kind:data(any) addr:0x021ef0d8
 data_ov100_021ef0f5 kind:data(any) addr:0x021ef0f5 ambiguous
 data_ov100_021ef105 kind:data(any) addr:0x021ef105 ambiguous
 data_ov100_021ef108 kind:data(any) addr:0x021ef108

@@ -26,9 +26,9 @@ MarshalRoomState_SetPlatformDown kind:function(thumb,size=0x4) addr:0x021ef2d8
 MarshalRoomState_IsPlatformDown kind:function(thumb,size=0x4) addr:0x021ef2dc
 MarshalRoom_CreateCameraShakeTask kind:function(thumb,size=0x3c) addr:0x021ef2e0
 MarshalRoom_CameraShakeTask kind:function(thumb,size=0x148) addr:0x021ef31c
-data_ov124_021ef464 kind:data(any) addr:0x021ef464
-data_ov124_021ef46c kind:data(any) addr:0x021ef46c
-data_ov124_021ef474 kind:data(any) addr:0x021ef474
-data_ov124_021ef480 kind:data(any) addr:0x021ef480
-data_ov124_021ef490 kind:data(any) addr:0x021ef490
-data_ov124_021ef4d0 kind:data(any) addr:0x021ef4d0
+sModel3Animations kind:data(any) addr:0x021ef464
+sModel0Animations kind:data(any) addr:0x021ef46c
+sModel1Animations kind:data(any) addr:0x021ef474
+sSceneSetup kind:data(any) addr:0x021ef480
+sActors kind:data(any) addr:0x021ef490
+sResources kind:data(any) addr:0x021ef4d0

@@ -426,10 +426,12 @@ static void PokemonTradeDemoDown_Run(PokemonTradeWork *wk) {
         PokemonTradeDemoDown_CreateActor(wk);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x10a)) {
-        GFL_WipeSet(0, 0, 0, 0x7fff, PokemonTradeDemoDown_Frame(20), TRUE, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, PokemonTradeDemoDown_Frame(20),
+                    TRUE, wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x12d)) {
-        GFL_WipeSet(0, 1, 1, 0x7fff, PokemonTradeDemoDown_Frame(25), TRUE, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, PokemonTradeDemoDown_Frame(25), TRUE,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x14a)) {
         MCSS_Show(wk->mcss[2]);
@@ -578,16 +580,20 @@ static void PokemonTradeDemoDown_Run(PokemonTradeWork *wk) {
         MCSS_ResumeAnimation(wk->mcss[3]);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x28b)) {
-        GFL_WipeSet(0, 0, 0, 0x7fff, PokemonTradeDemoDown_Frame(10), TRUE, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, PokemonTradeDemoDown_Frame(10),
+                    TRUE, wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x2b5)) {
-        GFL_WipeSet(0, 1, 1, 0x7fff, PokemonTradeDemoDown_Frame(25), TRUE, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, PokemonTradeDemoDown_Frame(25), TRUE,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x380)) {
-        GFL_WipeSet(0, 0, 0, 0x7fff, PokemonTradeDemoDown_Frame(30), TRUE, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0x7fff, PokemonTradeDemoDown_Frame(30),
+                    TRUE, wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x3ca)) {
-        GFL_WipeSet(0, 1, 1, 0x7fff, PokemonTradeDemoDown_Frame(30), TRUE, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0x7fff, PokemonTradeDemoDown_Frame(30), TRUE,
+                    wk->heapId);
     }
     if (wk->timer == PokemonTradeDemoDown_Frame(0x4c1)) {
         PokemonTradeDemoDown_FreeMove(wk, 0);

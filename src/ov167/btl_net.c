@@ -67,11 +67,13 @@ typedef struct {
     BtlNetRecvBuffer serverCmd;
     // By net id
     BtlNetRecvBuffer clientReplies[4];
-    // By net id
+    // By net id, what the machine sent by the exchange: a PokeParty, PerapVoice or PlayerInfo
     void *recvBuffers[4];
     u32 recvSizes[4];
     // By client id
     PokeParty *parties[4];
+    // The party packet exchange's BtlNetPartyPacket as it arrives, or the trainer exchange's BtlCommTrainerData, which
+    // BtlNet_GetPlayerInfo also reads as a PlayerInfo
     void *tempBuffer;
     u32 tempSize;
     union {
@@ -100,7 +102,7 @@ static void RecvPlayerInfo(int netId, int size, const void *data, void *work, Ne
 static void *GetTrainerRecvBuffer(int netId, void *work, int size);
 static void RecvTrainer(int netId, int size, const void *data, void *work, NetHandle *handle);
 static BtlCommTrainerData *CreateCommTrainerData(const BtlSetupTrainer *trainer, HeapID heapId);
-static void FreeCommTrainerData(void *data);
+static void FreeCommTrainerData(BtlCommTrainerData *data);
 static void *GetReplyRecvBuffer(int netId, void *work, int size);
 static void RecvReply(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void RecvServerCmd(int netId, int size, const void *data, void *work, NetHandle *handle);
@@ -360,7 +362,7 @@ BOOL BtlNet_AreChattersReceived(void) {
 }
 
 // A client's Chatot cry, or NULL
-void *BtlNet_GetChatter(u8 clientId) {
+PerapVoice *BtlNet_GetChatter(u8 clientId) {
     u8 netId = GetClientNetId(clientId);
 
     if (netId != 40 && sWork->recvSizes[netId] != 0) {
@@ -503,7 +505,7 @@ BOOL BtlNet_IsTrainerReceived(void) {
     return FALSE;
 }
 
-void *BtlNet_GetTrainer(void) {
+BtlCommTrainerData *BtlNet_GetTrainer(void) {
     return sWork->tempBuffer;
 }
 
@@ -530,7 +532,7 @@ static BtlCommTrainerData *CreateCommTrainerData(const BtlSetupTrainer *trainer,
     return data;
 }
 
-static void FreeCommTrainerData(void *data) {
+static void FreeCommTrainerData(BtlCommTrainerData *data) {
     GFL_HeapFree(data);
 }
 

@@ -250,8 +250,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An archive handle or other local in a low slot where the original has it above the optimizer's temporaries:
   move the block that uses it into a `static inline` that declares it. (matching.md: "A local of an inlined
   helper")
-- Rail movement's cached line/length allocation differs between caller snapshots passed as parameters and snapshots
-  owned by directional inlines; the latter improves the still-partial function. (matching.md: "snapshot ownership")
+- A dispatcher's `static inline` handlers allocating unlike the original: write them as the arms of the one function,
+  each arm's locals in its block. (matching.md: "Four `static inline` handlers")
 - A local slotted above the temporaries where the original's value sits among them: the expression written at each
   use, which CSE shares as a temporary. (matching.md: "expression written at two uses")
 - A NitroSystem (2.0/sp2) function's spill slots in another order: locals are slotted function scope first, then
@@ -578,6 +578,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (matching.md: "The same goes for a returned flag")
 - A local loaded again for a call after tests of it that share one load: the local and the callee's parameter are
   an enum. (matching.md: "tests its stat")
+- A variadic function's named parameter read back from its stack slot for a call where ours keeps it in a register,
+  or two stores through out-parameters in an order ours can't give: the value is an enum at every step, the callee's
+  parameter and the field included. (matching.md: "typed so at every step")
 - A local array's element loaded again after a call: it was read through a pointer to the element, set in the
   loop. (matching.md: "A local array's element is never loaded again")
 - An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
@@ -708,6 +711,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Branches and block layout
 
+- Each arm of an `if`/`else` ending in `ldr base; movs rN, #k; b` to a shared `str`: the field is stored in each
+  arm, not through a local stored after the join. (matching.md: "cross-jumped at its store")
 - An early exit 8 bytes short, or a call's result returned through another layout: give the exit its own call
   and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
@@ -885,6 +890,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   (`case 3: case 4: default:`). (matching.md: "the empty labels set the jump table's range")
 - An extra block that sets the default's value in a case: let the case fall through into `default`, and stack an
   empty case on `default:` where the SDK compiled out a warning. (matching.md: "A case that falls through")
+- A case's table entry at the `b` ending the case before it, where an empty case goes to the switch's end: the case held
+  a debug print compiled out; write `(void)0;` with a comment (2.0/sp2). (matching.md: "compiled out to `(void)0`")
 - Cases are laid out in source order, not by value. (matching.md: "Switch cases are laid out in source order")
 - `case -1:` tested on its own before a jump table the original folds it into (`adds r0, #1; cmp`): the switch is on
   a `u32`; make the value (or the function returning it) signed. (matching.md: "takes `-1` in")

@@ -42,7 +42,7 @@ static const u16 sStatParams[] = {
 };
 
 static u32 PokeList_GetItemEffect(u16 item) {
-    void *data = PML_ItemReadDataFile(item, 0, HEAPID_POKELIST);
+    void *data = PML_ItemReadDataFile(item, ITEM_FILE_DATA, HEAPID_POKELIST);
     s32 cures;
     s32 effort;
 

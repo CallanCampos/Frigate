@@ -19,7 +19,7 @@ struct StaActBg {
     G3DResource *mdlRes;
     G3DResource *anmRes[3];
     G3DModel *mdl;
-    void *anms[3];
+    G3DAnimation *anms[3];
     G3DActor *actor;
 };
 

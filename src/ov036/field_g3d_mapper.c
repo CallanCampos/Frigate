@@ -161,7 +161,7 @@ void FieldG3DMapper_CallAllLoaderUpdate(FieldG3DMapper *mapper) {
     }
 }
 
-void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, void *camera, u32 pass) {
+void FieldG3D_RenderFieldmap(FieldG3DMapper *mapper, G3DCamera *camera, u32 pass) {
     VecFx32 savedPos;
     VecFx32 pos;
     u32 index;
@@ -478,23 +478,25 @@ void FieldG3DMapper_GenLocators3(FieldG3DMapper *mapper, const VecFx32 *playerPo
     u32 chunksPerLayer;
     fx32 layerHeight;
     fx32 halfSpan;
-    u16 width;
-    u32 span;
-    s32 adjacentLayerOffset;
-    u32 chunkId;
-    u32 locatorIndex;
-    s32 chunkIndex;
     fx32 layerY;
-    int chunkX;
+    fx32 span;
+    u16 width;
     int chunkZ;
+    s32 adjacentLayerOffset;
+    int chunkX;
+    u32 layerOffset;
+    s32 chunkIndex;
+    u32 locatorIndex;
+    u32 chunkId;
 
     width = mapper->matrixWidth;
-    chunksPerLayer = mapper->matrixWidth * mapper->matrixHeight;
+    chunksPerLayer = width * mapper->matrixHeight;
     span = mapper->chunkSpan;
-    halfSpan = FX_Div(span, FX32_CONST(2));
+    halfSpan = FX_Div(mapper->chunkSpan, FX32_CONST(2));
     layerHeight = mapper->unk08;
     layer = FX_Div(playerPos->y, layerHeight) >> FX32_SHIFT;
-    if (playerPos->y - layer * layerHeight > layerHeight / 2) {
+    layerOffset = playerPos->y - layer * layerHeight;
+    if (layerOffset > layerHeight / 2) {
         adjacentLayerOffset = 1;
     } else {
         adjacentLayerOffset = -1;
@@ -782,7 +784,7 @@ ResortMapCreateWork *func_ov036_02185304(FieldG3DMapper *mapper) {
     return mapper->resortMap;
 }
 
-FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, void *mapTextures,
+FieldTerrainAnimator *FieldG3DMapper_CreateTerrainAnimator(u16 chunkCapacity, G3DResource *mapTextures,
                                                            const FieldTerrainAnmInfo *anmInfo, u32 heapId) {
     GND_ANIME_WK.chunkCapacity = chunkCapacity;
     if (anmInfo->srtAnimeId == 0xffffffff) {

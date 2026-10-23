@@ -13,8 +13,8 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *mdlRes;
-    void *anmRes[ROCK_SMASH_ANM_COUNT];
+    G3DResource *mdlRes;
+    G3DResource *anmRes[ROCK_SMASH_ANM_COUNT];
     TCB *uploadTcb;
     // Set once the model's textures are in VRAM
     BOOL uploaded;
@@ -29,7 +29,7 @@ typedef struct {
 typedef struct {
     FieldEffectRockSmash *effect;
     G3DActor *actor;
-    void *anms[ROCK_SMASH_ANM_COUNT];
+    G3DAnimation *anms[ROCK_SMASH_ANM_COUNT];
     G3DModel *mdl;
 } RockSmashTask;
 

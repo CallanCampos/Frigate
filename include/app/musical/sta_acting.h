@@ -6,6 +6,7 @@
 // in field/musical_stage_sys.h for overlay 12's proc
 
 #include "types.h"
+#include "app/musical/mus_item_data.h"
 #include "app/musical/sta_act_obj.h"
 #include "struct_decls.h"
 
@@ -68,7 +69,7 @@ void StaActing_PlayWave(StaActing *stage, u16 waveArc, u16 a2, u16 a3);
 void StaActing_PlayBgm(StaActing *stage, u32 bgm);
 void StaActing_StopBgm(StaActing *stage);
 // Overlay 210's table of the props, which the item draw system holds
-void *StaActing_GetItemData(StaActing *stage);
+MusItemData *StaActing_GetItemData(StaActing *stage);
 // Asks to use the prop at an equip position of the player's Pokémon
 void StaActing_UseItem(StaActing *stage, u32 equipPos);
 // Whether a prop of the player's Pokémon is being used

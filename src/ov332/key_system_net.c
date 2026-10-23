@@ -36,7 +36,7 @@ struct KeySystemNet {
     u32 count;
     u32 timer;
     NHttpRap *http;
-    void *ov181Work;
+    MBDataConv *ov181Work;
     u16 heapId;
     BOOL error;
     u32 errorCode;
@@ -127,7 +127,7 @@ static GFLNetInitData sNetInitData = {
     0x10,
     1,
     0,
-    4,
+    GFL_NET_TYPE_IRC_WIRELESS,
     1,
     NET_COMMAND_BASE >> 8,
     { 0xfe, 0xff, 0, 0 },

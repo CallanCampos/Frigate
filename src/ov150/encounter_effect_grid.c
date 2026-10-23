@@ -111,7 +111,7 @@ static BOOL EncEffGrid_Update(EncEffGrid *grid) {
 }
 
 void EncEffGrid_ClearAndDraw(EncEff *effect) {
-    void *eventData = EncEff_GetEventData(effect);
+    EncEffCaptureWork *eventData = EncEff_GetEventData(effect);
     EncEffGrid *grid = EncEff_GetWorkArea(effect);
 
     G3X_SetClearColor(grid->unk3078, 31, 0x7fff, 0, FALSE);

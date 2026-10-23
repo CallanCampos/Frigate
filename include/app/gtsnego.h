@@ -8,11 +8,14 @@
 
 #define OVERLAY_GTSNEGO OVERLAY_ID(195)
 
-#define GTSNEGO_RESULT_RETRY_LOGIN 0
-#define GTSNEGO_RESULT_EXIT 1
-// A partner is being searched for or was found: anyone, or one of the people of the Pal Pad
-#define GTSNEGO_RESULT_ANYONE 2
-#define GTSNEGO_RESULT_RENDEZVOUS 3
+// What the search leaves in GtsNegoParam's result
+enum {
+    GTSNEGO_RESULT_RETRY_LOGIN,
+    GTSNEGO_RESULT_EXIT,
+    // A partner is being searched for or was found: anyone, or one of the people of the Pal Pad
+    GTSNEGO_RESULT_ANYONE,
+    GTSNEGO_RESULT_RENDEZVOUS,
+};
 
 #define GTSNEGO_MET_COUNT 100
 
@@ -32,6 +35,7 @@ typedef struct {
     // The IDs of the partners found before, which are not matched again, and where the next one goes
     u32 metIds[GTSNEGO_MET_COUNT];
     int metIndex;
+    // A GTSNEGO_RESULT_*
     u32 result;
 } GtsNegoParam;
 

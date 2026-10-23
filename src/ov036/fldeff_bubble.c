@@ -15,9 +15,9 @@
 
 typedef struct {
     FieldEffects *effects;
-    void *res[BUBBLE_RES_COUNT];
+    G3DResource *res[BUBBLE_RES_COUNT];
     G3DModel *mdl;
-    void *anms[BUBBLE_ANM_COUNT];
+    G3DAnimation *anms[BUBBLE_ANM_COUNT];
     G3DActor *actor;
 } FieldEffectBubble;
 

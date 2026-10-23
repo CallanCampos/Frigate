@@ -163,7 +163,7 @@ static void NoGear_Release(NoGearWork *work) {
 static void NoGear_Idle(NoGearWork *work) {
 }
 
-NoGearWork *NoGear_Create(void *saveData, FieldSubscreen *subscreen, GameSystem *gsys) {
+NoGearWork *NoGear_Create(CGearSettings *saveData, FieldSubscreen *subscreen, GameSystem *gsys) {
     NoGearWork *work = GFL_HeapAllocate(HEAPID_FIELDMAP, sizeof(NoGearWork), TRUE, "no_gear.c", 376);
 
     work->heapId = HEAPID_FIELDMAP;

@@ -88,7 +88,7 @@ static const GFLNetInitData sLiveBattleMatchIrcNetInit = {
     0x10,
     1,
     0,
-    3,
+    GFL_NET_TYPE_IRC,
     1,
     0x1f,
     {0xff, 0xff, 0xff, 0xff},
@@ -288,13 +288,13 @@ BOOL LiveBattleMatchIrc_TakeReady(LiveBattleMatchIrc *irc, u32 *flag) {
     return arrived;
 }
 
-void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, void *buffer) {
+void LiveBattleMatchIrc_StartDelivery(LiveBattleMatchIrc *p_wk, TournamentEntry *buffer) {
     DeliveryIrcInit init;
 
     MI_CpuFill8(&init, 0, sizeof(DeliveryIrcInit));
     init.code = LIVEBATTLEMATCH_IRC_DELIVERY_CODE;
     init.data[0].datasize = LIVEBATTLEMATCH_IRC_DELIVERY_SIZE;
-    init.data[0].pData = buffer;
+    init.data[0].pData = (u8 *)buffer;
     init.unk04 = 0;
     init.heapId = p_wk->heapId;
     init.data[0].region = region;

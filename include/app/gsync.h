@@ -14,14 +14,16 @@
 #define OVERLAY_GSYNC OVERLAY_ID(199)
 
 // Results of the Game Sync procs
-#define GSYNC_RESULT_NONE 0
-#define GSYNC_RESULT_ACCOUNT 1
-#define GSYNC_RESULT_CONNECT 2
-#define GSYNC_RESULT_WIFI_SETTINGS 3
-#define GSYNC_RESULT_NO_POKEMON 4
-#define GSYNC_RESULT_SELECT_POKEMON 5
-#define GSYNC_RESULT_DONE 6
-#define GSYNC_RESULT_RETRY_LOGIN 7
+enum {
+    GSYNC_RESULT_NONE,
+    GSYNC_RESULT_ACCOUNT,
+    GSYNC_RESULT_CONNECT,
+    GSYNC_RESULT_WIFI_SETTINGS,
+    GSYNC_RESULT_NO_POKEMON,
+    GSYNC_RESULT_SELECT_POKEMON,
+    GSYNC_RESULT_DONE,
+    GSYNC_RESULT_RETRY_LOGIN,
+};
 
 // Errors of Game Sync's own, beside the server's, which the account screens share but for GSYNC_ERROR_DOWNLOAD
 enum {
@@ -52,6 +54,7 @@ typedef struct {
     GSyncAccountInfo accountInfo;
     BOOL hasAccountInfo;
     u8 loginBuffer[0x174];
+    // A GSYNC_RESULT_*
     u32 gsyncResult;
     BOOL bgmPushed;
     u16 boxTray;
@@ -78,8 +81,10 @@ typedef struct {
 } PdwAccParam;
 
 // Whether the account screens create the account or only show the Game Sync ID
-#define PDWACC_MODE_CREATE 0
-#define PDWACC_MODE_SHOW_ID 1
+enum {
+    PDWACC_MODE_CREATE,
+    PDWACC_MODE_SHOW_ID,
+};
 
 // The Game Sync menu (gsync_menu.c): Game Sync, the Wi-Fi settings or back
 extern const GameProcFunctions GSYNC_MENU_PROC_FUNCTIONS;

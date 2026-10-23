@@ -20,14 +20,14 @@ struct TrialHouseWork {
     u32 selectionFlag;
     // The battle's statistics, which TrialHouseCalcPointScore scores
     u16 stats[12];
-    void *saveBuffer;
+    BattleExaminationSave *saveBuffer;
     u32 initState;
 };
 
 struct TrialHouseEventData {
     // How the Battle Test's data is received
     DeliveryInit init;
-    void *subwork;
+    DeliveryBeaconWork *subwork;
     GameSystem *gsys;
     TrialHouseWork *work;
     u16 *result;
@@ -38,7 +38,7 @@ struct TrialHouseEffectEvent {
     GameSystem *gsys;
     void *buffer;
     u32 mode;
-    void *effect;
+    FieldSaveAnime *effect;
 };
 
 extern const char data_ov033_0217c630[];

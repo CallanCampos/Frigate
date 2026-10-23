@@ -457,7 +457,7 @@ BOOL func_ov012_02155d30(VM *vm, FieldScriptEnv *env) {
     u16 *value = ScriptReadVar(vm, env);
     GameData *gameData = FieldScriptEnv_GetGameData(env);
     PlayerState *playerState = GameData_GetPlayerState(gameData);
-    void *timeSig = getTimeSigBlkAddress(GameData_GetSaveControl(gameData));
+    TimeSigSave *timeSig = getTimeSigBlkAddress(GameData_GetSaveControl(gameData));
 
     *value = UnionView_GetTrainerClass(PlayerInfo_GetUnionView(&playerState->playerInfo));
     *flag = TimeSigSave_IsUnionViewChanged(timeSig);

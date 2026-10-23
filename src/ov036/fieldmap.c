@@ -55,6 +55,7 @@
 #include "gfl/arc.h"
 #include "gfl/blact.h"
 #include "gfl/bmpwin.h"
+#include "gfl/calctool.h"
 #include "gfl/clact.h"
 #include "gfl/g3d.h"
 #include "gfl/graphics.h"
@@ -286,7 +287,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         field->msgBGSys = CreateFieldMsgBGSystem(field->heapId, field->g3dCamera);
         field->moneyWin = NULL;
         field->placeName = FieldPlaceName_Create(gsys, HEAPID_FIELD_PLACE_NAME, field->msgBGSys);
-        field->unk34 = FieldFMissionInfo_Create(gsys, field->heapId);
+        field->fmissionInfo = FieldFMissionInfo_Create(gsys, field->heapId);
         field->skillMapEff =
             FieldSkillMapEff_Create(FieldStatus_GetFlashPerms(GameData_GetFieldStatus(field->gameData)), field->heapId);
         field->cameraSystem = FieldCamera_Create(GetZoneDefaultCameraIndex(field->zoneId), 0, field->g3dCamera,
@@ -333,7 +334,7 @@ u32 FieldRoutine_MapLoad(GameSystem *gsys, Field *field) {
         FieldEffects_SetLuminanceTable(field->fieldEffects, FieldPalaceSys_GetLuminanceTable(field->palaceSys));
         FieldEffects_Load(field->fieldEffects, STATIC_LOADED_FIELD_EFFECT_IDS, data_ov036_021d0388);
         if (GetZoneIsUnionRoom(field->zoneId) == TRUE || IsZone150Or151(field->zoneId) == TRUE) {
-            field->unkA0 = UnionEff_Create(field->heapId);
+            field->unionEffect = UnionEff_Create(field->heapId);
         }
         break;
     case 4: {
@@ -458,7 +459,7 @@ u32 FieldRoutine_MapSpawnFinish(GameSystem *gsys, Field *field) {
 
 u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     if (GSYS_GetNowEvent(field->gameSystem) == NULL) {
-        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(field->gameData), FALSE);
+        FieldStatus_SetBusyFlag(GameData_GetFieldStatus(field->gameData), FLD_STATUS_BUSY_NONE);
     }
     if (GameData_CheckEventsPaused(field->gameData)) {
         return 0;
@@ -477,8 +478,8 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     if (field->placeName != NULL) {
         func_ov036_021b4ff8(field->placeName);
     }
-    if (field->unk34 != NULL) {
-        FieldFMissionInfo_Update(field->unk34);
+    if (field->fmissionInfo != NULL) {
+        FieldFMissionInfo_Update(field->fmissionInfo);
     }
     FieldSkillMapEff_Update(field->skillMapEff);
     FieldPlayer_SyncState(field->player);
@@ -493,8 +494,8 @@ u32 FieldRoutine_Run(GameSystem *gsys, Field *field) {
     }
     Field_UpdateGimmick(field);
     FieldEffects_Update(field->fieldEffects);
-    if (field->unkA0 != NULL) {
-        UnionEff_Update(field->unkA0);
+    if (field->unionEffect != NULL) {
+        UnionEff_Update(field->unionEffect);
     }
     FieldAsyncProcManager_Update(field->asyncProcManager);
     if (field->msgBGSys != NULL) {
@@ -537,8 +538,8 @@ u32 FieldRoutine_RunAltFrame(GameSystem *gsys, Field *field) {
     if (field->placeName != NULL) {
         func_ov036_021b5064(field->placeName);
     }
-    if (field->unk34 != NULL) {
-        FieldFMissionInfo_UpdateDisplay(field->unk34);
+    if (field->fmissionInfo != NULL) {
+        FieldFMissionInfo_UpdateDisplay(field->fmissionInfo);
     }
     MI_SetMainMemoryPriority(MI_PROCESSOR_ARM9);
     FieldG3D_RenderPhase2(field);
@@ -558,8 +559,8 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     FieldPlayer_SyncState(field->player);
     FieldAsyncProcManager_Free(field->asyncProcManager);
     GameCommSys_FieldDelete(GSYS_GetGameCommSystem(gsys), field);
-    if (field->unk34 != NULL) {
-        FieldFMissionInfo_Free(field->unk34);
+    if (field->fmissionInfo != NULL) {
+        FieldFMissionInfo_Free(field->fmissionInfo);
     }
     if (field->placeName != NULL) {
         FieldPlaceName_Free(field->placeName);
@@ -572,9 +573,9 @@ u32 FieldRoutine_MapUnload(GameSystem *gsys, Field *field) {
     gameData = GSYS_GetGameData(gsys);
     GameData_SetLastSubscreen(gameData, FieldSubscreen_Free(field->subscreen));
     FieldEffects_Free(field->fieldEffects);
-    if (field->unkA0 != NULL) {
-        UnionEff_Free(field->unkA0);
-        field->unkA0 = NULL;
+    if (field->unionEffect != NULL) {
+        UnionEff_Free(field->unionEffect);
+        field->unionEffect = NULL;
     }
     func_ov036_021990d8(field->weatherSystem);
     field->weatherSystem = NULL;
@@ -766,8 +767,8 @@ FieldG3DObjSystem *Field_GetG3DObjSys(Field *field) {
     return field->g3DObjSystem;
 }
 
-void *func_ov036_0218051c(Field *field) {
-    return field->unkA0;
+UnionEffect *func_ov036_0218051c(Field *field) {
+    return field->unionEffect;
 }
 
 EncountSystem *Field_GetEncountSystem(Field *field) {
@@ -846,7 +847,7 @@ void FieldG2D_SetLCDConfig(void) {
 void FieldG2D_Prepare3DSurface(Field *field) {
     MtxFx22 mtx;
 
-    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
+    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
     G2_SetBG2Affine(&mtx, 0, 0, 0, 0);
     GFL_BGSysSet3DBGPriority(3);
     func_ov036_02187760(field->msgBGSys);
@@ -855,13 +856,13 @@ void FieldG2D_Prepare3DSurface(Field *field) {
 void func_ov036_02180630(Field *field) {
     MtxFx22 mtx;
 
-    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, 0);
+    MAT2_SetScaleRot(&mtx, 0, FX32_ONE, FX32_ONE, MAT2_ROT_IDX);
     G2_SetBG2Affine(&mtx, 0, 0, 0, 0);
     GFL_BGSysSet3DBGPriority(3);
     func_ov036_0218776c(field->msgBGSys);
 }
 
-void *FieldG2D_GetDispControl(Field *field) {
+FieldDispControl *FieldG2D_GetDispControl(Field *field) {
     return field->dispControl;
 }
 
@@ -1009,7 +1010,7 @@ void Field_LoadEdgeColorTable(AreaData *area, u16 zoneId) {
 void Field_LoadActorMatColorPreset(Field *field) {
     HeapID heapId = HEAPID_TAIL(field->heapId);
     u32 presetId = AreaData_GetActorMatColorID(field->areaData);
-    void *preset = FldActMatColorPreset_Create(heapId);
+    FldActMatColorPreset *preset = FldActMatColorPreset_Create(heapId);
 
     FldActMatColorPreset_Load(preset, presetId);
     FldActMatColorPreset_Apply(preset, BlActSys_GetScene(field->actorBlAct));
@@ -1151,7 +1152,7 @@ void Field_SwapZoneBGM(Field *field, u32 zoneId) {
 }
 
 void Field_SwapWeather(Field *field, u32 zoneId) {
-    void *weather = Field_GetWeatherSystem(field);
+    FieldWeather *weather = Field_GetWeatherSystem(field);
     u16 weatherId;
 
     ResetWeather(field->gameSystem, zoneId);
@@ -1348,8 +1349,8 @@ void FieldRenderPhase2_Fieldmap(Field *field) {
     FieldG3DObjSystem_Draw(field->g3DObjSystem);
     BlActSys_Draw(field->actorBlAct, field->g3dCamera, field->g3dLights);
     BlActSys_Draw(field->wildEffectBlAct, field->g3dCamera, field->g3dLights);
-    if (field->unkA0 != NULL) {
-        UnionEff_Draw(field->unkA0);
+    if (field->unionEffect != NULL) {
+        UnionEff_Draw(field->unionEffect);
     }
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], field->objectProjectionMatrixOffset / 2);
@@ -1397,7 +1398,7 @@ FieldSkillMapEff *Field_GetSkillMapEff(Field *field) {
     return field->skillMapEff;
 }
 
-void *Field_GetSceneArea(Field *field) {
+FieldSceneArea *Field_GetSceneArea(Field *field) {
     return field->sceneArea;
 }
 
@@ -1429,7 +1430,7 @@ void Field_SetEffectRunningFlag(Field *field, BOOL flag) {
     field->effectRunningFlag = flag;
 }
 
-void *Field_GetNDemoDataHandle(Field *field) {
+FaceUpWork **Field_GetNDemoDataHandle(Field *field) {
     return &field->nDemoData;
 }
 

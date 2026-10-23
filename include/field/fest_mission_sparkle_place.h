@@ -2,6 +2,7 @@
 #define POKEBW2_FIELD_FEST_MISSION_SPARKLE_PLACE_H
 
 #include "types.h"
+#include "field/fest_mission_sparkle.h"
 #include "struct_decls.h"
 
 // Overlay 24: the Funfest missions of type 4, on entering a zone. It picks which of the zone's places get a sparkle
@@ -9,7 +10,7 @@
 // the file; the name is a guess from what it does.
 
 // On entering a zone: picks the places of the mission's sparkles and what they give
-void FestSparklePlace_OnZoneEnter(RivalEntry *entry, GameSystem *gsys, LinkFestival *festival,
-                                  FestMissionConfig *config, u16 zoneId);
+void FestSparklePlace_OnZoneEnter(FestSparkleWork *work, GameSystem *gsys, LinkFestival *festival,
+                                  FestMissionConfig *mission, u16 zoneId);
 
 #endif // POKEBW2_FIELD_FEST_MISSION_SPARKLE_PLACE_H

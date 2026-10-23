@@ -17,6 +17,7 @@
 #include "battle/tr_ai.h"
 #include "battle/trainer_data.h"
 #include "constants/arc.h"
+#include "constants/battle.h"
 #include "constants/text_banks.h"
 #include "gfl/bmpwin.h"
 #include "gfl/clact.h"
@@ -61,7 +62,7 @@ struct BtlvCore {
     StrBuf *strbuf;
     Font *font;
     Font *font2;
-    void *unkB8;
+    BattleAction *unkB8;
     BattleMon *mon;
     u32 monId;
     u32 result;
@@ -393,14 +394,14 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 6:
         if (BtlvCore_WaitMsg(core) && BtlvScd_IsIdle(core->scd)) {
-            BtlvScu_StartMoveEffect(core->scu, 0, 1, 0x21, PML_MoveGetParam(0x21, 0x1b), 0, 0);
+            BtlvScu_StartMoveEffect(core->scu, 0, 1, 0x21, PML_MoveGetParam(0x21, MOVE_PARAM_TARGET), 0, 0);
             (*seq)++;
         }
         break;
     case 7:
         if (BtlvScu_WaitMoveEffect(core->scu)) {
             mon = BtlvCore_GetMonAtViewPos(core, 1);
-            BtlvEffect_CalcGaugeHP(1, (s32)GetBattleMonStat(mon, 0xe) / 6);
+            BtlvEffect_CalcGaugeHP(1, (s32)GetBattleMonStat(mon, BATTLEMON_MAX_HP) / 6);
             BtlvEffect_StartDamage(1, 0x21);
             BtlvCore_PlaySE(core, 0x564);
             (*seq)++;
@@ -414,7 +415,7 @@ BOOL BtlvCore_CmdCaptureDemo(BtlvCore *core, s32 *seq, void *work) {
         break;
     case 9:
         if (BtlvCore_WaitMsg(core)) {
-            BtlvScu_StartMoveEffect(core->scu, 1, 0, 0x2d, PML_MoveGetParam(0x2d, 0x1b), 0, 0);
+            BtlvScu_StartMoveEffect(core->scu, 1, 0, 0x2d, PML_MoveGetParam(0x2d, MOVE_PARAM_TARGET), 0, 0);
             (*seq)++;
         }
         break;
@@ -561,7 +562,7 @@ BOOL BtlvCore_RunMainProc(BtlvCore *core) {
     return TRUE;
 }
 
-void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, void *arg3) {
+void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, BattleAction *arg3) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg3;
@@ -581,7 +582,7 @@ u32 BtlvCore_WaitCommandSelect(BtlvCore *core) {
     return 0;
 }
 
-void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
+void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg2;
@@ -589,7 +590,7 @@ void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
     BtlvCore_SetMainProc(core, BtlvCore_ProcWaitSelect);
 }
 
-void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, void *arg2) {
+void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, BattleAction *arg2) {
     BattleMon *mon;
 
     mon = param->mons[0].mon;
@@ -621,7 +622,7 @@ BOOL BtlvCore_WaitMoveSelect(BtlvCore *core) {
     return BtlvCore_RunMainProc(core);
 }
 
-void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
+void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg2;

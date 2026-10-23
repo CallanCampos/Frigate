@@ -91,8 +91,10 @@ typedef struct {
 } MysteryGiftSaveData; // size: 0xa94
 
 // What mgEncryptData and mgDecryptData encrypt: the save's block, or the gifts kept outside the save (save_outside.c)
-#define MG_DATA_OUTSIDE 0
-#define MG_DATA_SAVE 1
+enum {
+    MG_DATA_OUTSIDE,
+    MG_DATA_SAVE,
+};
 
 // The mystery gifts the game works on: the save's block, or the gifts outside the save when there is no save yet
 struct MysteryGiftSave {

@@ -19,7 +19,7 @@ typedef struct {
     MusicalShot *shot;
     MusicalSave *save;
     // Overlay 211's communication work
-    void *comm;
+    MusCommWork *comm;
 } MusicalShotParam;
 
 extern GameProcFunctions MUSICAL_SHOT_PROC_FUNCTIONS;

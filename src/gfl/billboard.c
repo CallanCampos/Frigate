@@ -140,7 +140,7 @@ static BOOL BlActScene_GetAvailMatSlotIdx(BlActScene *scene, u32 *idx) {
     return FALSE;
 }
 
-static void BlActMaterial_BindTexture(BlActMaterial *material, void *texResource) {
+static void BlActMaterial_BindTexture(BlActMaterial *material, G3DResource *texResource) {
     material->texResource = texResource;
     if (!GFL_G3DResUploadTexData(texResource)) {
         material->texAddr = 0;
@@ -169,7 +169,7 @@ static void BlActMaterial_Set(BlActMaterial *material, u32 format, int size, u8 
     material->facesPerColumn = material->texHeight / material->faceHeight;
 }
 
-u32 BlActScene_AddMaterialNewTex(BlActScene *scene, void *texResource, u32 format, int size, u8 faceWidth,
+u32 BlActScene_AddMaterialNewTex(BlActScene *scene, G3DResource *texResource, u32 format, int size, u8 faceWidth,
                                  u8 faceHeight) {
     u32 idx;
 
@@ -207,8 +207,8 @@ u32 BlActScene_AddMaterialExistTex(BlActScene *scene, NNSGfdTexKey texKey, NNSGf
 }
 
 void BlActScene_TrimMatTex(BlActScene *scene, u32 material) {
-    void *texResource = scene->materials[material].texResource;
-    void *data = GFL_G3DResGetResData(texResource);
+    G3DResource *texResource = scene->materials[material].texResource;
+    NNSG3dResFileHeader *data = GFL_G3DResGetResData(texResource);
     NNSG3dResTex *tex = GFL_G3DResGetTexData(texResource);
 
     GFL_HeapResize(data, (u8 *)tex + tex->texInfo.ofsTex - (u8 *)data);

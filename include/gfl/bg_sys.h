@@ -14,25 +14,32 @@
 // The BG system's setups. Names and layouts from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 // BG sizes in pixels
-#define BGRES_128x128 0
-#define BGRES_256x256 1
-#define BGRES_256x512 2
-#define BGRES_512x256 3
-#define BGRES_512x512 4
-#define BGRES_1024x1024 5
+enum {
+    BGRES_128x128,
+    BGRES_256x256,
+    BGRES_256x512,
+    BGRES_512x256,
+    BGRES_512x512,
+    BGRES_1024x1024,
+};
 
 // A text BG has a screen of 16-bit map entries. An affine BG has 8-bit entries, and an extended BG is an affine BG
 // with 16-bit entries
-#define BGMODE_TEXT 0
-#define BGMODE_AFFINE 1
-#define BGMODE_EXTENDED 2
+enum {
+    BGMODE_TEXT,
+    BGMODE_AFFINE,
+    BGMODE_EXTENDED,
+};
 
-#define BG_MOVE_SET_X 0
-#define BG_MOVE_RIGHT 1
-#define BG_MOVE_LEFT 2
-#define BG_MOVE_SET_Y 3
-#define BG_MOVE_DOWN 4
-#define BG_MOVE_UP 5
+// Changes to a BG's offset: set x, add to it or subtract from it, and the same for y
+enum {
+    BG_MOVE_SET_X,
+    BG_MOVE_RIGHT,
+    BG_MOVE_LEFT,
+    BG_MOVE_SET_Y,
+    BG_MOVE_DOWN,
+    BG_MOVE_UP,
+};
 
 typedef struct {
     u32 x;
@@ -73,21 +80,23 @@ enum {
 #define BGSYS_TILE_SIZE_256 0x40
 
 // Changes to an affine BG's transform, continuing the BG_MOVE_* values
-#define BG_ROTATE_SET 0
-#define BG_ROTATE_ADD 1
-#define BG_ROTATE_SUB 2
-#define BG_SCALE_SET_X 3
-#define BG_SCALE_ADD_X 4
-#define BG_SCALE_SUB_X 5
-#define BG_SCALE_SET_Y 6
-#define BG_SCALE_ADD_Y 7
-#define BG_SCALE_SUB_Y 8
-#define BG_CENTER_SET_X 9
-#define BG_CENTER_ADD_X 10
-#define BG_CENTER_SUB_X 11
-#define BG_CENTER_SET_Y 12
-#define BG_CENTER_ADD_Y 13
-#define BG_CENTER_SUB_Y 14
+enum {
+    BG_ROTATE_SET,
+    BG_ROTATE_ADD,
+    BG_ROTATE_SUB,
+    BG_SCALE_SET_X,
+    BG_SCALE_ADD_X,
+    BG_SCALE_SUB_X,
+    BG_SCALE_SET_Y,
+    BG_SCALE_ADD_Y,
+    BG_SCALE_SUB_Y,
+    BG_CENTER_SET_X,
+    BG_CENTER_ADD_X,
+    BG_CENTER_SUB_X,
+    BG_CENTER_SET_Y,
+    BG_CENTER_ADD_Y,
+    BG_CENTER_SUB_Y,
+};
 
 // The palette argument of GFL_BGSysFillScrArea, other than a palette number: keep each entry's palette, or take it
 // from the tile

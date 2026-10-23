@@ -10,10 +10,12 @@
 // are ours
 
 // The directions of the links between positions
-#define CURSOR_MOVE_UP 0
-#define CURSOR_MOVE_DOWN 1
-#define CURSOR_MOVE_LEFT 2
-#define CURSOR_MOVE_RIGHT 3
+enum {
+    CURSOR_MOVE_UP,
+    CURSOR_MOVE_DOWN,
+    CURSOR_MOVE_LEFT,
+    CURSOR_MOVE_RIGHT,
+};
 
 // A link with this bit goes back to the position the cursor came from, if it came along the opposite link
 #define CURSOR_MOVE_LINK_RETURN 0x80
@@ -21,15 +23,17 @@
 #define CURSOR_MOVE_NO_LINK 0xff
 
 // What the update functions return, besides the position chosen with A or by touch
-#define CURSOR_MOVE_NONE (-1)
-#define CURSOR_MOVE_CANCEL (-2)
-#define CURSOR_MOVE_MOVED (-3)
-#define CURSOR_MOVE_CURSOR_ON (-4)
-// A key pushed against the edge: right, left, down and up
-#define CURSOR_MOVE_EDGE_RIGHT (-5)
-#define CURSOR_MOVE_EDGE_LEFT (-6)
-#define CURSOR_MOVE_EDGE_DOWN (-7)
-#define CURSOR_MOVE_EDGE_UP (-8)
+enum {
+    CURSOR_MOVE_NONE = -1,
+    CURSOR_MOVE_CANCEL = -2,
+    CURSOR_MOVE_MOVED = -3,
+    CURSOR_MOVE_CURSOR_ON = -4,
+    // A key pushed against the edge: right, left, down and up
+    CURSOR_MOVE_EDGE_RIGHT = -5,
+    CURSOR_MOVE_EDGE_LEFT = -6,
+    CURSOR_MOVE_EDGE_DOWN = -7,
+    CURSOR_MOVE_EDGE_UP = -8,
+};
 
 // A position of the cursor. A table of them ends with rect.top TOUCH_RECT_END
 typedef struct {

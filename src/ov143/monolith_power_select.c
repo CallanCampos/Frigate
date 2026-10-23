@@ -576,9 +576,9 @@ static BOOL MonolithPower_Exit(GameProc *proc, u32 *state, void *param, void *wo
 }
 
 static void MonolithPower_CreateBGs(void) {
-    GFL_BGSysCreateBG(MONOLITH_POWER_BG_TEXT, &sMonolithPowerBGSetups[0], 0);
-    GFL_BGSysCreateBG(MONOLITH_POWER_BG_FRAME, &sMonolithPowerBGSetups[1], 0);
-    GFL_BGSysCreateBG(MONOLITH_POWER_BG_LIST, &sMonolithPowerBGSetups[2], 0);
+    GFL_BGSysCreateBG(MONOLITH_POWER_BG_TEXT, &sMonolithPowerBGSetups[0], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_POWER_BG_FRAME, &sMonolithPowerBGSetups[1], BGMODE_TEXT);
+    GFL_BGSysCreateBG(MONOLITH_POWER_BG_LIST, &sMonolithPowerBGSetups[2], BGMODE_TEXT);
     GFL_BGSysFillScrArea(MONOLITH_POWER_BG_TEXT, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_POWER_BG_FRAME, 0, 0, 0, 32, 32, 17);
     GFL_BGSysFillScrArea(MONOLITH_POWER_BG_LIST, 0, 0, 0, 32, 32, 17);

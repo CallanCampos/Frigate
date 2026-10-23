@@ -1656,7 +1656,7 @@ LinkFestival_SetShownTotal kind:function(thumb,size=0x8) addr:0x02014830
 LinkFestival_GetSecondsGained kind:function(thumb,size=0x4) addr:0x02014838
 LinkFestival_ClearSecondsGained kind:function(thumb,size=0x6) addr:0x0201483c
 LinkFestival_IsNewZoneFromOutside kind:function(thumb,size=0x20) addr:0x02014844
-LinkFestival_GetEntries kind:function(thumb,size=0xc) addr:0x02014864
+LinkFestival_GetMissionWork kind:function(thumb,size=0xc) addr:0x02014864
 LinkFestival_GetTotalScore kind:function(thumb,size=0x38) addr:0x02014870
 LinkFestival_IsTargetReached kind:function(thumb,size=0x22) addr:0x020148a8
 LinkFestival_IsMissionOver kind:function(thumb,size=0x54) addr:0x020148cc
@@ -9058,7 +9058,7 @@ sNetSys kind:bss addr:0x02141898
 _pBaseWork kind:bss addr:0x0214189c
 _pCommandWork kind:bss addr:0x021418a0
 _pNetState kind:bss addr:0x021418a4
-data_021418a8 kind:bss addr:0x021418a8
+sNet kind:bss addr:0x021418a8
 NetIwSys kind:bss addr:0x021418b8
 netLdataWork kind:bss addr:0x021418bc
 sGFLStd kind:bss addr:0x021418c0

@@ -414,7 +414,7 @@ void FieldEffects_SetLuminanceTable(FieldEffects *effects, const u8 *table) {
 }
 
 // Recolor the texture's palettes through the luminance table, if the map has one
-void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, void *resource) {
+void FieldEffects_ApplyLuminanceTable(FieldEffects *effects, G3DResource *resource) {
     NNSG3dResTex *tex;
 
     if (effects->luminanceTable != NULL) {

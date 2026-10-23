@@ -19,7 +19,7 @@ enum {
 
 typedef struct {
     FieldEffects *effects;
-    void *resources[GYOE_KIND_COUNT];
+    G3DResource *resources[GYOE_KIND_COUNT];
     G3DModel *models[GYOE_KIND_COUNT];
     G3DActor *actors[GYOE_KIND_COUNT];
     // How far the bubbles are drawn toward the camera, so that nothing hides them

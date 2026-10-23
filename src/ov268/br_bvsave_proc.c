@@ -240,7 +240,7 @@ static void BrBvSave_SeqDownload(BrSeq *p_seqwk, u32 *p_seq, void *p_wk_adrs) {
             u32 value;
             BattleRecVideo *video;
 
-            if (BrNet_GetDownloadVideo(p_wk->p_param->net, (void **)&video, &value)) {
+            if (BrNet_GetDownloadVideo(p_wk->p_param->net, &video, &value)) {
                 BOOL isSaved;
                 u64 number;
                 int i;

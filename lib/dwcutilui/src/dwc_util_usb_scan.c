@@ -55,26 +55,33 @@ static DWCUtilUsbScan *sUsbScan;
 
 BOOL DWCi_USBAPlBegin(DWCUtilUsbScanCallback callback) {
     OSOwnerInfo info;
+    int result;
+    OSTick tick;
 
     sUsbScan = DWCi_HEAPlAllocEx(sizeof(DWCUtilUsbScan), 32);
     sUsbScan->callback = callback;
-    sUsbScan->startTick = OS_GetTick();
-    if (WM_Initialize(sUsbScan, cbWm, 3) == WM_ERRCODE_OPERATING) {
-        do {
-            WM_ReadStatus(&sUsbScan->status);
-        } while (sUsbScan->status.state != WM_STATE_IDLE);
-        sUsbScan->param = sUsbScanParam;
-        sUsbScan->param.scanBuf = (WMBssDesc *)sUsbScan->scanBuffer;
-        sUsbScan->param.maxChannelTime = WM_GetDispersionScanPeriod();
-        OS_GetOwnerInfo(&info);
-        MI_CpuCopy8(sUsbScanSsid, sUsbScan->param.ssid, 8);
-        sUsbScan->param.ssid[9] = TRUE;
-        MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
-        if (DWCUtilUsbScan_StartScan()) {
-            sUsbScan->task = DWCi_TSKlForm(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
-            return TRUE;
-        }
+    tick = OS_GetTick();
+    sUsbScan->startTick = tick;
+    result = WM_Initialize(sUsbScan, cbWm, 3);
+    if (result != WM_ERRCODE_OPERATING) {
+        goto fail;
     }
+    do {
+        WM_ReadStatus(&sUsbScan->status);
+    } while (sUsbScan->status.state != WM_STATE_IDLE);
+    sUsbScan->param = sUsbScanParam;
+    sUsbScan->param.scanBuf = (WMBssDesc *)sUsbScan->scanBuffer;
+    sUsbScan->param.maxChannelTime = WM_GetDispersionScanPeriod();
+    OS_GetOwnerInfo(&info);
+    MI_CpuCopy8(sUsbScanSsid, sUsbScan->param.ssid, 8);
+    sUsbScan->param.ssid[9] = TRUE;
+    MI_CpuCopy8(info.nickName, &sUsbScan->param.ssid[12], info.nickNameLength * 2);
+    if (!DWCUtilUsbScan_StartScan()) {
+        goto fail;
+    }
+    sUsbScan->task = DWCi_TSKlForm(0, DWCUtilUsbScan_FirstResultTask, NULL, 120);
+    return TRUE;
+fail:
     DWCi_HEAPlFree_(&sUsbScan);
     return FALSE;
 }

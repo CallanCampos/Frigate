@@ -73,7 +73,7 @@ static void func_ov036_021bea20(FieldEffectSplash *splash) {
     FieldG3DObjSystem_FreeResGroup(objSys, splash->resGroup);
 }
 
-void func_ov036_021bea3c(void *effects, FieldActor *actor) {
+void func_ov036_021bea3c(FieldEffects *effects, FieldActor *actor) {
     SplashTaskParams params;
 
     params.splash = FieldEffects_GetHandleData(effects, 16);

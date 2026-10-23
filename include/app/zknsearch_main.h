@@ -18,9 +18,6 @@
 // Not from swan: the search screen's heap
 #define HEAPID_ZUKAN_SEARCH 0x7b
 
-// The shortcut of the search screen that the Y button registers
-#define SHORTCUT_POKEDEX_SEARCH 19
-
 #define ZKNSEARCH_NONE 0xff
 
 #define ZKNSEARCH_SHAPE_COUNT 14

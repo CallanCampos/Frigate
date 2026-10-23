@@ -542,8 +542,8 @@ void FieldCamera_ClearBind(FieldCamera *camera) {
     camera->bind = NULL;
 }
 
-void *FieldCamera_GetBind(FieldCamera *camera) {
-    return (void *)camera->bind;
+const VecFx32 *FieldCamera_GetBind(FieldCamera *camera) {
+    return camera->bind;
 }
 
 void FieldCamera_ResetBind(FieldCamera *camera) {
@@ -554,8 +554,8 @@ void FieldCamera_SetRefBind(FieldCamera *camera, const VecFx32 *bind) {
     camera->refBind = bind;
 }
 
-void *FieldCamera_GetRefBind(FieldCamera *camera) {
-    return (void *)camera->refBind;
+const VecFx32 *FieldCamera_GetRefBind(FieldCamera *camera) {
+    return camera->refBind;
 }
 
 static void FieldCamera_SetZNear(FieldCamera *camera, fx32 zNear) {

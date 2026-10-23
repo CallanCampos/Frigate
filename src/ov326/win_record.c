@@ -384,7 +384,7 @@ static BOOL WinRecord_Init(GameProc *proc, u32 *state, void *param, void *work) 
     wk->printQueue = PrintQueue_CreateDefault(wk->heapId);
     wk->wordSet = GFL_WordSetSystemCreateDefault(wk->heapId);
     WinRecord_InitWork(wk);
-    GFL_WipeSet(0, 1, 1, 0, 6, 1, wk->heapId);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, wk->heapId);
     return TRUE;
 }
 
@@ -437,7 +437,7 @@ static BOOL WinRecord_Main(GameProc *proc, u32 *state, void *param, void *work) 
         }
         break;
     case 2:
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, wk->heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, wk->heapId);
         (*state)++;
         break;
     case 3:

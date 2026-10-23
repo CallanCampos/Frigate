@@ -50,7 +50,7 @@ struct BeaconSearchWork {
     u32 timer;
     BeaconSearchBeacon beacon;
     BeaconSearchFound found;
-    void *unk88;
+    WihDwcWork *unk88;
 };
 
 static void GameBeaconSearch_OnNetInit(void *work);
@@ -96,7 +96,7 @@ static const GFLNetInitData data_ov012_0216d6a8 = {
     4,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     0,
     3,
     {0x2c, 1, 0, 0},
