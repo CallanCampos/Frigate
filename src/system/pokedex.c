@@ -52,14 +52,6 @@ static const u16 UNOVA_DEX_COMPLETION_EXCLUSIONS[] = {
     SPECIES_VICTINI,
 };
 
-static const PokeDexEvaluation data_0208f814[] = {
-    { 39, 1311 }, { 99, 1312 }, { 159, 1313 }, { 229, 1314 }, { 296, 1315 }, { 0, 1316 },
-};
-
-static const PokeDexEvaluation data_0208f82c[] = {
-    { 159, 1311 }, { 349, 1312 }, { 449, 1313 }, { 549, 1314 }, { 635, 1315 }, { 0, 1316 },
-};
-
 // clang-format off
 static const u16 NATIONAL_DEX_COMPLETION_EXCLUSIONS[] = {
     SPECIES_MEW,     SPECIES_CELEBI,  SPECIES_JIRACHI, SPECIES_DEOXYS,   SPECIES_PHIONE,
@@ -68,21 +60,6 @@ static const u16 NATIONAL_DEX_COMPLETION_EXCLUSIONS[] = {
 };
 
 // clang-format on
-
-static const PokeDexEvaluation data_0208f85e[] = {
-    { 14, 4 },   { 29, 5 },   { 44, 6 },   { 64, 7 },   { 84, 8 },   { 104, 9 },  { 134, 10 }, { 164, 11 },
-    { 194, 12 }, { 224, 13 }, { 244, 14 }, { 264, 15 }, { 284, 16 }, { 296, 17 }, { 0, 17 },
-};
-
-static const PokeDexEvaluation data_0208f89a[] = {
-    { 14, 19 },  { 29, 20 },  { 44, 21 },  { 64, 22 },  { 84, 23 },  { 104, 24 }, { 134, 25 }, { 164, 26 },
-    { 194, 27 }, { 224, 28 }, { 244, 29 }, { 264, 30 }, { 284, 31 }, { 296, 32 }, { 0, 32 },
-};
-
-static const PokeDexEvaluation data_0208f8d8[] = {
-    { 49, 44 },  { 104, 45 }, { 164, 46 }, { 229, 47 }, { 289, 48 }, { 344, 49 }, { 394, 50 }, { 444, 51 }, { 494, 52 },
-    { 529, 53 }, { 559, 54 }, { 579, 55 }, { 599, 56 }, { 614, 57 }, { 629, 58 }, { 635, 59 }, { 0, 59 },
-};
 
 // clang-format off
 static const PokeDexFormEntry pokemonFormList[] = {
@@ -742,6 +719,26 @@ static u16 PokeDex_LookupEvaluation(const PokeDexEvaluation *table, int count) {
 }
 
 void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, u16 *message, u16 *count, u16 *unk) {
+    static const PokeDexEvaluation unovaUnks[] = {
+        { 39, 1311 }, { 99, 1312 }, { 159, 1313 }, { 229, 1314 }, { 296, 1315 }, { 0, 1316 },
+    };
+    static const PokeDexEvaluation nationalUnks[] = {
+        { 159, 1311 }, { 349, 1312 }, { 449, 1313 }, { 549, 1314 }, { 635, 1315 }, { 0, 1316 },
+    };
+    static const PokeDexEvaluation unovaSeenMessages[] = {
+        { 14, 4 },   { 29, 5 },   { 44, 6 },   { 64, 7 },   { 84, 8 },   { 104, 9 },  { 134, 10 }, { 164, 11 },
+        { 194, 12 }, { 224, 13 }, { 244, 14 }, { 264, 15 }, { 284, 16 }, { 296, 17 }, { 0, 17 },
+    };
+    static const PokeDexEvaluation unovaCaughtMessages[] = {
+        { 14, 19 },  { 29, 20 },  { 44, 21 },  { 64, 22 },  { 84, 23 },  { 104, 24 }, { 134, 25 }, { 164, 26 },
+        { 194, 27 }, { 224, 28 }, { 244, 29 }, { 264, 30 }, { 284, 31 }, { 296, 32 }, { 0, 32 },
+    };
+    static const PokeDexEvaluation nationalCaughtMessages[] = {
+        { 49, 44 },  { 104, 45 }, { 164, 46 }, { 229, 47 }, { 289, 48 }, { 344, 49 },
+        { 394, 50 }, { 444, 51 }, { 494, 52 }, { 529, 53 }, { 559, 54 }, { 579, 55 },
+        { 599, 56 }, { 614, 57 }, { 629, 58 }, { 635, 59 }, { 0, 59 },
+    };
+
     PokeDex_IsNationalObtained(pokedex);
     *message = 5;
     *count = 0;
@@ -754,8 +751,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = PokeDex_LookupEvaluation(data_0208f89a, *count);
-        *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
+        *message = PokeDex_LookupEvaluation(unovaCaughtMessages, *count);
+        *unk = PokeDex_LookupEvaluation(unovaUnks, PokeDex_GetCaughtNoUnovaPermissive(pokedex, heapId));
         break;
     case POKEDEX_EVALUATION_REGIONAL_SEEN:
         *count = PokeDex_GetSeenNoUnova(pokedex, heapId);
@@ -764,8 +761,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = PokeDex_LookupEvaluation(data_0208f85e, *count);
-        *unk = PokeDex_LookupEvaluation(data_0208f814, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
+        *message = PokeDex_LookupEvaluation(unovaSeenMessages, *count);
+        *unk = PokeDex_LookupEvaluation(unovaUnks, PokeDex_GetSeenNoUnovaPermissive(pokedex, heapId));
         break;
     case POKEDEX_EVALUATION_NATIONAL_CAUGHT:
         *count = PokeDex_GetCaughtNo(pokedex, heapId);
@@ -774,8 +771,8 @@ void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, 
             *unk = 1316;
             return;
         }
-        *message = PokeDex_LookupEvaluation(data_0208f8d8, *count);
-        *unk = PokeDex_LookupEvaluation(data_0208f82c, PokeDex_GetCaughtNoPermissive(pokedex));
+        *message = PokeDex_LookupEvaluation(nationalCaughtMessages, *count);
+        *unk = PokeDex_LookupEvaluation(nationalUnks, PokeDex_GetCaughtNoPermissive(pokedex));
         break;
     }
 }

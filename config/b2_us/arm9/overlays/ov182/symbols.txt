@@ -1481,7 +1481,7 @@ data_ov182_021c1498 kind:data(any) addr:0x021c1498
 data_ov182_021c14ac kind:data(any) addr:0x021c14ac
 data_ov182_021c14c4 kind:data(any) addr:0x021c14c4
 data_ov182_021c14dc kind:data(any) addr:0x021c14dc
-data_ov182_021c14f4 kind:data(any) addr:0x021c14f4
+DownloadPlay_ChildBmps kind:data(any) addr:0x021c14f4
 data_ov182_021c1568 kind:data(any) addr:0x021c1568
 data_ov182_021c1580 kind:data(any) addr:0x021c1580
 data_ov182_021c159c kind:data(any) addr:0x021c159c

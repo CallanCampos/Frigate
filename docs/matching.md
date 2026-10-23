@@ -3630,6 +3630,19 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   global that nothing reads gets a section of its own among the strings. The string literals of such initializers
   each get a section of their own, laid out by size after the shared section, and their equal sizes don't follow
   `rodata_order.py`'s model: two pairs stay swapped in every order of the tables tried.
+- The string literals of a data initializer take part in the size sort: each is listed as the initializer is read,
+  in its order and just before the object it initializes, and `rodata_order.py`'s `heapsort` then places them, each
+  in a section of its own (fitted on 30 random files and on the six orders of `download_play.c`'s tables). A
+  tentative `.bss` definition is listed after everything else, and a `const` scalar whose address code takes comes
+  after that, wherever it is defined: `wifibattlematch_net.c`'s `sCmd2402Data` reorders every 4-byte tie. Overlay
+  182's `download_play.c` matches with its callback names, state names and child bitmaps as three tables in that
+  order. The bitmap table is all zeros, which goes to `.bss` unless `#pragma explicit_zero_data on` covers it; in
+  `.data` it is the shared section's smallest object, which the ROM sorts between two 24-byte strings. The pragma
+  covers that table alone: over the whole file, `DownloadPlay_Init`'s zeroed compound literal becomes a `.rodata`
+  template that the ROM doesn't have.
+- A function-local `const` scalar with an initializer, `static` or not, is emitted in `.rodata` even when every read
+  of it folds (`const u32 n = 11;` gives a 4-byte `_ZZ...E1n_0`), while a file-scope `static const` scalar that code
+  only reads is dropped.
 - Static data is sorted by size. MWCC lists each object of a section when it is declared, a local struct initializer
   when its function is, and heapsorts the list by size starting from the last object declared. Equal sizes come out
   in no declared order: palanm.c's three 4-byte weights declared R, G, B lie G, R, B (`rodata_order.py --permute`
