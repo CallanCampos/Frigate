@@ -98,7 +98,7 @@ enum {
 #define SIGN_PAGE_SCROLL_SPEED 4
 
 // The checker window's frame characters in their WINFRAME file, eight to a row
-enum {
+typedef enum {
     CHECKER_FRAME_TOP_LEFT,
     CHECKER_FRAME_TOP,
     CHECKER_FRAME_TOP_RIGHT,
@@ -108,7 +108,7 @@ enum {
     CHECKER_FRAME_BOTTOM_LEFT = 0x10,
     CHECKER_FRAME_BOTTOM,
     CHECKER_FRAME_BOTTOM_RIGHT,
-};
+} CheckerFrameTile;
 
 // The planes that the second BG's windows are alpha blended over
 #define MSGBG_BLEND_PLANES_UNDER                                                                                       \
@@ -310,7 +310,7 @@ static BOOL func_ov036_02189660(const StrBuf *src, StrBuf *dest, u32 line);
 static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line, u8 color);
 static BOOL func_ov036_021896f0(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color);
 static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId);
-static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile);
+static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, CheckerFrameTile tile);
 static void CheckerMsgWin_DrawFrame(GFLBitmap *bitmap, u32 style, HeapID heapId);
 static void FieldMsgBG_DrawTextLines(u16 x, u16 y, GFLBitmap *bitmap, Font *font, const StrBuf *text, HeapID heapId);
 static void MsgBGCursor_Init(MsgBGCursor *cursor, FieldMsgBG *sys);
@@ -1756,7 +1756,7 @@ static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId) {
 }
 
 // The checker frame uses fixed WINFRAME tiles; style does not select another tile set.
-static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile) {
+static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, CheckerFrameTile tile) {
     NNSG2dCharacterData *charData;
     u8 *pixels = GFL_BitmapGetPixelData(bitmap);
     void *file = GFL_ArcSysReadHeapNewLZ(ARCID_WINFRAME, 7, FALSE, heapId);
