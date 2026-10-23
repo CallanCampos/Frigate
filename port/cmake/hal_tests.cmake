@@ -49,6 +49,13 @@ add_executable(test_hal_msl tests/hal/test_msl.c hal/msl/fp_fastI.c)
 target_link_libraries(test_hal_msl PRIVATE port_decomp_env)
 add_test(NAME hal_msl COMMAND test_hal_msl)
 
+# The heaps' host sizes and the host memory of the root heaps the game creates in its own (port/hal/gfl/heap_policy.c,
+# ADR 0021), with the program's options given by the test
+add_executable(test_hal_heap_policy tests/hal/test_heap_policy.c hal/gfl/heap_policy.c)
+target_link_libraries(test_hal_heap_policy PRIVATE port_decomp_env)
+target_include_directories(test_hal_heap_policy PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME hal_heap_policy COMMAND test_hal_heap_policy)
+
 # DWC authentication names use MSL's 16-bit code units, independently of the host libc's wchar_t ABI.
 add_executable(test_hal_wstring tests/hal/test_wstring.c hal/stubs/wstring_host.c hal/stubs/extras_string.c)
 target_link_libraries(test_hal_wstring PRIVATE port_decomp_env)
