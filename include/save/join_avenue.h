@@ -354,22 +354,22 @@ u32 JoinAvenuePersonList_MergeEntry(JoinAvenuePersonList *list, const JoinAvenue
 u32 JoinAvenuePersonList_AddVisitor(JoinAvenuePersonList *list, const JoinAvenueVisitor *visitor);
 u32 JoinAvenuePersonList_AddPerson(JoinAvenuePersonList *list, const JoinAvenuePerson *src);
 BOOL JoinAvenuePerson_IsEmpty(JoinAvenuePerson *person);
-void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam param, u32 value);
+void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam param, uptr value);
 JoinAvenueInfo *JoinAvenue_GetInfo(JoinAvenueSave *joinAvenue);
 void JoinAvenueInfo_Init(JoinAvenueInfo *info);
 // A field of the info, which reads into the buffer for the avenue's names
-u32 JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer);
+uptr JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer);
 JoinAvenuePersonList *JoinAvenue_GetPersonList(JoinAvenueSave *joinAvenue);
 // Records an activity of the player's, the latest of the four recent ones
 void JoinAvenue_RecordActivity(u32 id);
 // Sets a field of the info
-void JoinAvenueInfo_SetParam(JoinAvenueInfo *info, u32 param, u32 value);
+void JoinAvenueInfo_SetParam(JoinAvenueInfo *info, u32 param, uptr value);
 void JoinAvenueInfo_ResetDaily(JoinAvenueInfo *info, BOOL fullDay);
 // Where the info and occupants of the save are, for the functions that don't take them
 void setImportantJABlockAddresses(SaveControl *save);
 
 // A person's fields. joinAveTextHandler reads one, into the buffer for a name
-u32 joinAveTextHandler(const JoinAvenuePerson *person, JoinAvenuePersonParam param, void *buffer);
+uptr joinAveTextHandler(const JoinAvenuePerson *person, JoinAvenuePersonParam param, void *buffer);
 // Allocates a person, frees one and clears one
 JoinAvenuePerson *JoinAvenuePerson_Create(HeapID heapId);
 void JoinAvenuePerson_Free(JoinAvenuePerson *person);
@@ -411,8 +411,8 @@ void JoinAvenueEntry_Init(JoinAvenueEntry *entry, PlayerInfo *playerInfo, u16 sp
 void JoinAvenueEntry_Clear(JoinAvenueEntry *entry);
 BOOL JoinAvenueEntry_IsEmpty(JoinAvenueEntry *entry);
 BOOL JoinAvenueEntry_IsValid(JoinAvenueEntry *entry);
-u32 JoinAvenueEntry_GetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buffer);
-void JoinAvenueEntry_SetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, u32 value);
+uptr JoinAvenueEntry_GetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, void *buffer);
+void JoinAvenueEntry_SetParam(JoinAvenueEntry *entry, JoinAvenuePersonParam param, uptr value);
 u32 JoinAvenueEntry_Random(JoinAvenueEntry *entry, int count, u32 max);
 // Whether the person has the extra data of the index
 BOOL JoinAvenuePerson_HasExtraData(JoinAvenuePerson *person, u32 index);
@@ -452,8 +452,8 @@ void JoinAvenueRecord_Free(JoinAvenueRecord *record);
 void JoinAvenueRecord_Clear(JoinAvenueRecord *record);
 BOOL JoinAvenueRecord_IsEmpty(JoinAvenueRecord *record);
 // A field of a record, which reads into the buffer for a name, as joinAveTextHandler does for a person
-u32 JoinAvenueRecord_GetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *buffer);
-void JoinAvenueRecord_SetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, u32 value);
+uptr JoinAvenueRecord_GetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, void *buffer);
+void JoinAvenueRecord_SetParam(JoinAvenueRecord *record, JoinAvenuePersonParam param, uptr value);
 // Makes the record of a person, or of an entry, at the slot and row
 void JoinAvenueRecord_InitFromPerson(JoinAvenueRecord *record, const JoinAvenuePerson *person, u32 slot, u32 row,
                                      u16 shopKind);

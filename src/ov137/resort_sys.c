@@ -1944,16 +1944,16 @@ static void ResortEntry_Fill(JoinAvenueEntry *entry, u16 shopKind, ResortBinary 
 
     msgData = GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(heapId));
     buf = GFL_MsgDataLoadStrbufNew(msgData, nameMessage);
-    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_NAME, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_NAME, (uptr)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     buf = GFL_MsgDataLoadStrbufNew(msgData, greetingMessage);
-    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_GREETING, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_GREETING, (uptr)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     buf = GFL_MsgDataLoadStrbufNew(msgData, message1);
-    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE1, (uptr)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     buf = GFL_MsgDataLoadStrbufNew(msgData, message2);
-    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE2, (u32)GFL_StrBufGetStringPtr(buf));
+    JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE2, (uptr)GFL_StrBufGetStringPtr(buf));
     GFL_StrBufFree(buf);
     JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_GENDER, gender);
     JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_TRAINER_TYPE, trainerType);
@@ -2026,11 +2026,11 @@ static void ResortEntry_Setup(ResortSys *sys, GameData *gameData, JoinAvenueEntr
     if (shopKind == 4) {
         JoinAvenueEntry_SetParam(
             entry, JOIN_AVE_PARAM_GREETING,
-            (u32)TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))));
+            (uptr)TrainerGameInfo_GetGreeting(getTrainerGameInfoAddress(GameData_GetSaveControl(gameData))));
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE1, message);
-        JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE1, (u32)message);
+        JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE1, (uptr)message);
         joinAveTextHandler(player, JOIN_AVE_PARAM_MESSAGE2, message);
-        JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE2, (u32)message);
+        JoinAvenueEntry_SetParam(entry, JOIN_AVE_PARAM_MESSAGE2, (uptr)message);
     }
 }
 
