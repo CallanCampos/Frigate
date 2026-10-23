@@ -470,7 +470,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         }
         GFL_BGSysSetBGEnabled(2, FALSE);
         GX_SetBankForLCDC(8);
-        MIi_CpuClearFast(0, (void *)0x6800000, 0x20000);
+        MIi_CpuClearFast(0, (void *)HW_LCDC_VRAM, 0x20000);
         GX_DisableBankForLCDC();
         GX_SetBankForBG(GX_VRAM_BG_128_D);
         resetBuildingEnterVBlankCallback();
