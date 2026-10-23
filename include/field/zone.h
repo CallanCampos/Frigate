@@ -134,10 +134,13 @@ extern const u16 GEAR_STATION_PLATFORM_ZONES[9];
 #define ZONE_RAIL_NONE 0xffffffff
 #define ZONE_CAMERA_NONE 0xffff
 
-// Spawns at a position instead of a warp, warpId is -1
+// ZoneSpawnInfo's changeType: a spawn at the warp warpId, or at a position with warpId -1. SetupZoneWarpArrival sets
+// the arrival at a warp's destination, or 3 for a warp whose destId is 0x100
 enum {
-    ZONE_SPAWN_CHANGE_TYPE_POSITION = 1,
-    ZONE_SPAWN_CHANGE_TYPE_3 = 3,
+    ZONE_SPAWN_CHANGE_TYPE_WARP,
+    ZONE_SPAWN_CHANGE_TYPE_POSITION,
+    ZONE_SPAWN_CHANGE_TYPE_WARP_ARRIVAL,
+    ZONE_SPAWN_CHANGE_TYPE_3,
 };
 
 enum {

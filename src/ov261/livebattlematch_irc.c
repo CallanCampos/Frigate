@@ -88,7 +88,7 @@ static const GFLNetInitData sLiveBattleMatchIrcNetInit = {
     0x10,
     1,
     0,
-    3,
+    GFL_NET_TYPE_IRC,
     1,
     0x1f,
     {0xff, 0xff, 0xff, 0xff},

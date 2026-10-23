@@ -154,7 +154,7 @@ static const GFLNetInitData sNetInit = {
     4,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     0,
     9,
     { 0x2c, 1, 0, 0 },

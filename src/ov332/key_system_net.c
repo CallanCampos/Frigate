@@ -127,7 +127,7 @@ static GFLNetInitData sNetInitData = {
     0x10,
     1,
     0,
-    4,
+    GFL_NET_TYPE_IRC_WIRELESS,
     1,
     NET_COMMAND_BASE >> 8,
     { 0xfe, 0xff, 0, 0 },

@@ -77,7 +77,7 @@ const GFLNetInitData *NetIw_Start(const GFLNetInitData *pNetInit, void *work) {
     sys->exitCallback = pNetInit->endCallback;
     sys->getBeaconData = pNetInit->getBeaconData;
     sys->getBeaconSize = pNetInit->getBeaconSize;
-    sys->aNetInit.bNetType = 3;
+    sys->aNetInit.bNetType = GFL_NET_TYPE_IRC;
     sys->aNetInit.endCallback = NetIw_EndedCallback;
     sys->aNetInit.getBeaconData = NetIw_GetBeaconData;
     sys->aNetInit.getBeaconSize = NetIw_GetBeaconSize;
@@ -243,7 +243,7 @@ void NetIw_Update(void) {
         break;
     case 4:
         if (!GFL_NetIsInitialized()) {
-            sys->aNetInit.bNetType = 3;
+            sys->aNetInit.bNetType = GFL_NET_TYPE_IRC;
             sys->aNetInit.endCallback = NetIw_EndedCallback;
             if (sys->gameCommandBase != 0) {
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
@@ -289,7 +289,7 @@ void NetIw_Update(void) {
                 sys->aNetInit.negotiationCommandBase = 0;
                 sys->aNetInit.gameCommandBase = sys->gameCommandBase;
             }
-            sys->aNetInit.bNetType = 0;
+            sys->aNetInit.bNetType = GFL_NET_TYPE_WIRELESS;
             sys->aNetInit.endCallback = sys->exitCallback;
             sys->aNetInit.bMPMode = sys->bMPMode;
             GFL_NetInit(&sys->aNetInit, NULL, sys->work);
@@ -359,7 +359,7 @@ void NetIw_Update(void) {
         break;
     case 14:
         if (!GFL_NetIsInitialized()) {
-            sys->aNetInit.bNetType = 3;
+            sys->aNetInit.bNetType = GFL_NET_TYPE_IRC;
             sys->aNetInit.endCallback = NetIw_EndedCallback;
             sys->connected = FALSE;
             sys->ended = FALSE;

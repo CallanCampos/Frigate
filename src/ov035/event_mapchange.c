@@ -1474,8 +1474,8 @@ void GameData_UpdateJoinAvenueForZone(GameData *gameData, u16 zoneId) {
     }
 
     if (IsZoneJoinAvenue(zoneId)) {
-        u16 param =
-            JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), 5, 0);
+        u16 param = JoinAvenue_GetParam(
+            JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(gameData))), JOIN_AVE_INFO_SEASON, 0);
         GameData_SetJoinAvenueSeason(gameData, param);
         JoinAvenue_RecordActivity(0x18);
     }

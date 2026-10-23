@@ -65,10 +65,10 @@ typedef struct {
     u16 value;
 } ResortKeyValue;
 
-// What the avenue's ranks unlock, in order
+// What the avenue's ranks unlock, in order: the info's fields of the unlock's flags, pending and given
 typedef struct {
-    u32 infoParamA;
-    u32 infoParamB;
+    u32 pendingParam;
+    u32 unlockedParam;
     u32 id;
     BOOL (*check)(ResortSys *sys, GameData *gameData);
     BOOL flag;
@@ -156,10 +156,14 @@ static const ResortPeopleRow sPeopleRows[RESORT_PERSON_COUNT] = {
 // clang-format on
 // clang-format off
 static const ResortUnlock sUnlocks[RESORT_SHOP_KIND_COUNT] = {
-    {16, 8, 1, ResortUnlock_Always, FALSE},     {17, 9, 2, ResortUnlock_Always, FALSE},
-    {19, 11, 4, ResortUnlock_Always, FALSE},    {20, 12, 5, ResortUnlock_Always, FALSE},
-    {18, 10, 3, ResortUnlock_Always, FALSE},    {21, 13, 6, ResortUnlock_FlagSet, FALSE},
-    {22, 14, 7, ResortUnlock_AllPeople, FALSE}, {23, 14, 8, ResortUnlock_Always, TRUE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_1, JOIN_AVE_INFO_UNLOCKED_1, 1, ResortUnlock_Always, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_2, JOIN_AVE_INFO_UNLOCKED_2, 2, ResortUnlock_Always, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_4, JOIN_AVE_INFO_UNLOCKED_4, 4, ResortUnlock_Always, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_5, JOIN_AVE_INFO_UNLOCKED_5, 5, ResortUnlock_Always, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_3, JOIN_AVE_INFO_UNLOCKED_3, 3, ResortUnlock_Always, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_6, JOIN_AVE_INFO_UNLOCKED_6, 6, ResortUnlock_FlagSet, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_7, JOIN_AVE_INFO_UNLOCKED_7, 7, ResortUnlock_AllPeople, FALSE},
+    {JOIN_AVE_INFO_UNLOCK_PENDING_8, JOIN_AVE_INFO_UNLOCKED_7, 8, ResortUnlock_Always, TRUE},
 };
 
 // clang-format on
@@ -896,9 +900,9 @@ u32 ResortSys_AddPopularity(ResortSys *sys, GameData *gameData, u32 points, u16 
 
     if (shop != 0) {
         if (shop == 8) {
-            JoinAvenueInfo_SetParam(info, 0x17, 1);
+            JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_UNLOCK_PENDING_8, 1);
         }
-        JoinAvenueInfo_SetParam(info, shop + 15, 1);
+        JoinAvenueInfo_SetParam(info, shop + JOIN_AVE_INFO_UNLOCK_PENDING_1 - 1, 1);
         newShop = TRUE;
     } else {
         newShop = FALSE;
@@ -942,8 +946,8 @@ u32 ResortSys_AddShopExperience(JoinAvenuePerson *person, ResortSys *sys, u32 po
     JoinAvenueShop_SetField(shop, 0, ResortShopData_FindShop(shopData, kind, *level, column1));
     newRow = ResortShopData_GetPersonShop(shopData, person);
     if (ResortSys_AreAllShopsMaxLevel(sys)) {
-        JoinAvenueInfo_SetParam(info, 0x1b, 1);
-        JoinAvenueInfo_SetParam(info, 0x1a, 0);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_MAX_LEVEL_WEEK, 1);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_MAX_LEVEL_DAYS, 0);
     }
     if (ResortShopData_GetShopParam(shopRow, 6) != ResortShopData_GetShopParam(newRow, 6)) {
         return 2;
@@ -952,7 +956,7 @@ u32 ResortSys_AddShopExperience(JoinAvenuePerson *person, ResortSys *sys, u32 po
 }
 
 u32 ResortSys_GetInfoFlag1b(ResortSys *sys) {
-    return JoinAvenue_GetParam(ResortSys_GetInfo(sys), 0x1b, NULL);
+    return JoinAvenue_GetParam(ResortSys_GetInfo(sys), JOIN_AVE_INFO_MAX_LEVEL_WEEK, NULL);
 }
 
 // Whether all of the occupants' shops are at the highest level
@@ -1047,7 +1051,7 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         u32 gender = getTrainerGender(GetGameDataPlayerInfo(gameData));
         u16 name[11];
 
-        JoinAvenue_GetParam(info, 1, name);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_TITLE, name);
         GFL_StrBufLoadString(buf, name);
         GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, gender, 1, 2);
         GFL_StrBufFree(buf);
@@ -1156,14 +1160,15 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         StrBuf *buf = GFL_StrBufCreate(21, HEAPID_TAIL(heapId));
         u16 name[21];
 
-        JoinAvenue_GetParam(info, 0, name);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_NAME, name);
         GFL_StrBufLoadString(buf, name);
         GFL_WordSetSetStrbuf(wordSet, wordIndex, buf, 2, 1, 2);
         GFL_StrBufFree(buf);
         break;
     }
     case 17:
-        WordSetNumber(wordSet, wordIndex, 7 - JoinAvenue_GetParam(info, 0x1a, NULL), 1, NUM_PAD_NONE, TRUE);
+        WordSetNumber(wordSet, wordIndex, 7 - JoinAvenue_GetParam(info, JOIN_AVE_INFO_MAX_LEVEL_DAYS, NULL), 1,
+                      NUM_PAD_NONE, TRUE);
         break;
     case 9: {
         const u16 *shopRow = ResortShopData_GetPersonShop(shopData, joinPerson);
@@ -1537,7 +1542,7 @@ u32 ResortSys_GetUnlock(ResortSys *sys, GameData *gameData) {
     for (i = 0; i < RESORT_SHOP_KIND_COUNT; i++) {
         const ResortUnlock *unlock = &sUnlocks[i];
 
-        if (unlock->check(sys, gameData) && JoinAvenue_GetParam(info, unlock->infoParamA, NULL) != 0) {
+        if (unlock->check(sys, gameData) && JoinAvenue_GetParam(info, unlock->pendingParam, NULL) != 0) {
             return sUnlocks[i].id;
         }
     }
@@ -1573,13 +1578,13 @@ u32 ResortSys_GetUnlockForRank(ResortSys *sys, GameData *gameData, u32 rank) {
         if (rank >= ResortBinary_Get(ranks, ResortSys_FindUnlockRow(ranks, unlock->id), 0)) {
             rankReached = TRUE;
         }
-        if (JoinAvenue_GetParam(info, unlock->infoParamB, NULL) != 0) {
+        if (JoinAvenue_GetParam(info, unlock->unlockedParam, NULL) != 0) {
             blocked = FALSE;
             if (unlock->flag == 0) {
                 blocked = TRUE;
             }
         }
-        if (JoinAvenue_GetParam(info, unlock->infoParamA, NULL) != 0) {
+        if (JoinAvenue_GetParam(info, unlock->pendingParam, NULL) != 0) {
             blocked = TRUE;
         }
         if (unlock->check(sys, gameData)) {
@@ -2229,7 +2234,7 @@ u32 ResortSys_GetVisitPoints(ResortSys *sys, ResortPersonData *data) {
     u32 shopPoints;
 
     ResortSys_GetWork(sys);
-    base = JoinAvenue_GetParam(info, 5, NULL);
+    base = JoinAvenue_GetParam(info, JOIN_AVE_INFO_SEASON, NULL);
     RTC_GetCachedDate(&date);
     shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 0);
     shopKind = ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0);
@@ -2282,7 +2287,7 @@ BOOL ResortSys_HasShopKind(ResortSys *sys, GameData *gameData, u32 a2) {
     u32 i;
 
     if (a2 == 5) {
-        return JoinAvenue_GetParam(info, 13, NULL);
+        return JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNLOCKED_6, NULL);
     }
 
     trainerIdMod = getTrainerID(GetGameDataPlayerInfo(gameData)) % 7;

@@ -90,11 +90,17 @@ typedef struct {
 // The most machines that can connect
 #define GFL_NET_MACHINE_MAX 8
 
-// The kinds of connection: Wi-Fi through DWC, and the others through the wireless or infrared devices
+// The kinds of connection: the wireless, Wi-Fi through DWC, infrared, infrared that changes to the wireless once linked
+// (net_irc_wireless.c), and the wireless started for listening (WM_InitializeForListening), which is otherwise run as
+// the wireless is
 enum {
-    GFL_NET_TYPE_WIFI = 1,
+    GFL_NET_TYPE_WIRELESS,
+    GFL_NET_TYPE_WIFI,
     GFL_NET_TYPE_WIFI_LOBBY,
-    GFL_NET_TYPE_WIFI_GTS = 6,
+    GFL_NET_TYPE_IRC,
+    GFL_NET_TYPE_IRC_WIRELESS,
+    GFL_NET_TYPE_WIRELESS_LISTEN,
+    GFL_NET_TYPE_WIFI_GTS,
 };
 
 // What the network device does, wireless or Wi-Fi; the code calls each through GFLNetSys

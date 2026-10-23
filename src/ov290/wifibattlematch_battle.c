@@ -41,9 +41,6 @@
 // The heap of the proc that runs the battle
 #define HEAPID_WIFIBATTLEMATCH_BATTLE 0x58
 
-// GFLNetInitData.bNetType of an infrared connection
-#define NET_TYPE_IRC 3
-
 // The battle proc's work
 typedef struct {
     GameProcManager *manager;
@@ -160,7 +157,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             *state = 9;
         }
         if (GFL_NetIsInitialized()) {
-            if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+            if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
                 if (wk->timer++ > 600) {
                     NetCommand_RemoveTable(0x100);
                     wk->commandsSet = FALSE;
@@ -182,7 +179,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
             *state = 11;
         }
         if (GFL_NetIsInitialized()) {
-            if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+            if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
                 if (wk->timer++ > 600) {
                     *state = 11;
                     wk->timer = 0;
@@ -274,7 +271,7 @@ static BOOL WifiBattleMatchSys_BattleProcMain(GameProc *proc, u32 *state, void *
         break;
     }
     if (GFL_NetIsInitialized() && running != TRUE) {
-        if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+        if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 battle->result = 1;

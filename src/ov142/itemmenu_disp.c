@@ -1336,17 +1336,17 @@ void ItemMenuDisp_DrawQuantity(ItemMenuWork *work, s32 quantity) {
 u32 ItemMenuDisp_GetPocketShortcut(s32 pocket) {
     switch (pocket) {
     case BAG_POCKET_ITEMS:
-        return 12;
+        return SHORTCUT_BAG_ITEMS;
     case BAG_POCKET_BERRIES:
-        return 15;
+        return SHORTCUT_BAG_BERRIES;
     case BAG_POCKET_MEDICINE:
-        return 13;
+        return SHORTCUT_BAG_MEDICINE;
     case BAG_POCKET_TMS_HMS:
-        return 14;
+        return SHORTCUT_BAG_TMS_HMS;
     case BAG_POCKET_KEY_ITEMS:
-        return 16;
+        return SHORTCUT_BAG_KEY_ITEMS;
     case BAG_POCKET_FREE_SPACE:
-        return 17;
+        return SHORTCUT_BAG_FREE_SPACE;
     }
 }
 

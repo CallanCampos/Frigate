@@ -399,7 +399,7 @@ BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     shop->work.npc = ResortShop_GetNPC(field);
     shop->gsys = gsys;
     shop->work.person = ResortSys_GetScriptPerson(env, shop->work.people);
-    if (JoinAvenue_GetParam(shop->work.info, 13, 0) != 0) {
+    if (JoinAvenue_GetParam(shop->work.info, JOIN_AVE_INFO_UNLOCKED_6, 0) != 0) {
         shop->work.unk300 = TRUE;
     } else {
         shop->work.unk300 = FALSE;
@@ -1944,7 +1944,7 @@ static u32 ResortShop_GetDiscountedPrice(ResortShopWork *wk, u32 price) {
     } else {
         rate = FX32_ONE;
     }
-    rank = JoinAvenue_GetParam(wk->info, 2, 0);
+    rank = JoinAvenue_GetParam(wk->info, JOIN_AVE_INFO_RANK, 0);
     if (rank > 40) {
         rank = 40;
     }

@@ -400,13 +400,14 @@ BOOL NetSystem_Update(void) {
         WmIcon_SetStrength(sys->pDevTable->getSignalLevel());
     }
     if (!sNetSys->stopped && !NetSystem_HasError()) {
-        if (!ini->bMPMode && (ini->bNetType == 0 || ini->bNetType == 5)) {
+        if (!ini->bMPMode &&
+            (ini->bNetType == GFL_NET_TYPE_WIRELESS || ini->bNetType == GFL_NET_TYPE_WIRELESS_LISTEN)) {
             NetSystem_UpdateDataSharing();
             NetSystem_ReadRecvRings();
-        } else if (ini->bNetType == 3 || ini->bNetType == 4) {
+        } else if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
             NetSystem_UpdateInfrared();
             NetSystem_ReadRecvRings();
-        } else if (ini->bNetType == 1 || ini->bNetType == 2) {
+        } else if (ini->bNetType == GFL_NET_TYPE_WIFI || ini->bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
             NetSystem_UpdateWifiSend();
             NetSystem_ReadRecvRings();
         } else {
@@ -419,7 +420,7 @@ BOOL NetSystem_Update(void) {
                 NetSystem_ReadRecvRings();
             }
         }
-        if (ini->bNetType != 1 && ini->bNetType != 2) {
+        if (ini->bNetType != GFL_NET_TYPE_WIFI && ini->bNetType != GFL_NET_TYPE_WIFI_LOBBY) {
             sys->pDevTable->update(sNetSys->connectBits);
         }
         NetCommand_UpdateHugeSend();
@@ -619,7 +620,8 @@ static void NetSystem_UpdateMPSendStep(void) {
                                       NetSystem_OnMPSendDone)) {
                 NetSystem_SetSendState(1, 1134);
             }
-        } else if (GFL_NetGetInitData()->bNetType == 3 || GFL_NetGetInitData()->bNetType == 4) {
+        } else if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC ||
+                   GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
             if (!sys->pDevTable->canSend()) {
                 NetSystem_SetSendState(1, 1141);
             } else {
@@ -635,7 +637,8 @@ static void NetSystem_UpdateMPSendStep(void) {
         NetSystem_RecvServerPacket(0, sNetSys->mpSendData, NetSystem_GetParentPacketSize());
         NetSystem_SetSendState(3, 1165);
     }
-    if (!sys->pDevTable->isConnected() || GFL_NetGetInitData()->bNetType == 3 || GFL_NetGetInitData()->bNetType == 4) {
+    if (!sys->pDevTable->isConnected() || GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC ||
+        GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         NetSystem_SetSendState(4, 1170);
     }
 }
@@ -667,7 +670,7 @@ static void NetSystem_UpdateMPSend(void) {
     GFLNetSys *sys = GFL_NetGetSys();
     GFLNetInitData *pNetIni = GFL_NetGetInitData();
 
-    if (pNetIni->bNetType == 1 || pNetIni->bNetType == 2) {
+    if (pNetIni->bNetType == GFL_NET_TYPE_WIFI || pNetIni->bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
         if (!NetSystem_IsMachineConnected(0)) {
             return;
         }
@@ -681,7 +684,7 @@ static void NetSystem_UpdateMPSend(void) {
                 NetSystem_CountSends();
             }
         }
-    } else if (pNetIni->bNetType == 3 || pNetIni->bNetType == 4) {
+    } else if (pNetIni->bNetType == GFL_NET_TYPE_IRC || pNetIni->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         if (sState.sendState == 4) {
             NetSystem *net = sNetSys;
 
@@ -805,7 +808,8 @@ static BOOL NetSystem_WritePacket(u8 *packet, NetQueue *queue, int size, u8 seq)
     packet[PACKET_FLAGS] = queue->pending == FALSE ? PACKET_FLAG_FIRST : PACKET_FLAG_CONTINUED;
     queue->pending = FALSE;
     packet[PACKET_CONNECT_BITS] = sys->pDevTable->getConnectBits();
-    if (NetQueue_IsEmpty(queue) || ((ini->bNetType == 3 || ini->bNetType == 4) && sys->pDevTable->unkB0() == TRUE)) {
+    if (NetQueue_IsEmpty(queue) || ((ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) &&
+                                    sys->pDevTable->unkB0() == TRUE)) {
         packet[PACKET_FLAGS] = PACKET_FLAGS_NONE;
         return FALSE;
     }
@@ -1016,7 +1020,7 @@ BOOL NetSystem_IsMachineConnected(u16 netId) {
     if (sNetSys == NULL) {
         return FALSE;
     }
-    if (ini->bNetType == 1 || ini->bNetType == 2) {
+    if (ini->bNetType == GFL_NET_TYPE_WIFI || ini->bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
         if (sNetSys->wifiConnected && sys->pDevTable->getNetId() != -1) {
             if (netId == 0) {
                 return TRUE;
@@ -1027,7 +1031,7 @@ BOOL NetSystem_IsMachineConnected(u16 netId) {
         }
         return FALSE;
     }
-    if (ini->bNetType == 3 || ini->bNetType == 4) {
+    if (ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS) {
         if ((netId < 2 || netId == GFL_NET_NETID_SERVER) && sys->pDevTable->isConnected()) {
             return TRUE;
         }
@@ -1074,7 +1078,8 @@ BOOL NetSystem_IsDeviceReady(void) {
     GFLNetSys *sys = GFL_NetGetSys();
     GFLNetInitData *ini = GFL_NetGetInitData();
 
-    if (sNetSys != NULL && (ini->bNetType == 1 || ini->bNetType == 2 || ini->bNetType == 3 || ini->bNetType == 4)) {
+    if (sNetSys != NULL && (ini->bNetType == GFL_NET_TYPE_WIFI || ini->bNetType == GFL_NET_TYPE_WIFI_LOBBY ||
+                            ini->bNetType == GFL_NET_TYPE_IRC || ini->bNetType == GFL_NET_TYPE_IRC_WIRELESS)) {
         return TRUE;
     }
     return sys->pDevTable->isRunning();
@@ -1085,7 +1090,7 @@ u16 NetSystem_GetNetId(void) {
         GFLNetSys *sys = GFL_NetGetSys();
         GFLNetInitData *ini = GFL_NetGetInitData();
 
-        if (ini->bNetType == 1 || ini->bNetType == 2) {
+        if (ini->bNetType == GFL_NET_TYPE_WIFI || ini->bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
             int netId = sys->pDevTable->getNetId();
 
             if (netId != -1) {
@@ -1147,7 +1152,7 @@ void NetSystem_SetWifiConnected(u8 a0) {
 void NetSystem_SetMPSendEnabled(BOOL a0) {
     GFLNetInitData *ini = GFL_NetGetInitData();
 
-    if (ini->bNetType == 1 || ini->bNetType == 2) {
+    if (ini->bNetType == GFL_NET_TYPE_WIFI || ini->bNetType == GFL_NET_TYPE_WIFI_LOBBY) {
         sNetSys->mpSendEnabled = a0;
         if (a0) {
             sNetSys->serverSends = 0;
@@ -1175,7 +1180,8 @@ BOOL NetSystem_IsDataShareOk(void) {
     if (sNetSys != NULL) {
         GFLNetInitData *ini = GFL_NetGetInitData();
 
-        if (!ini->bMPMode && (ini->bNetType == 0 || ini->bNetType == 5)) {
+        if (!ini->bMPMode &&
+            (ini->bNetType == GFL_NET_TYPE_WIRELESS || ini->bNetType == GFL_NET_TYPE_WIRELESS_LISTEN)) {
             return sNetSys->dataShareOk;
         }
     }

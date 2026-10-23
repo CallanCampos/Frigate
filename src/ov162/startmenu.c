@@ -1138,7 +1138,7 @@ static void StartMenu_InitWindows(StartMenuWork *wk) {
     if (joinAvenue) {
         joinAvenueInfo = JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(wk->save));
         name = GFL_StrBufCreate(64, HEAPID_STARTMENU);
-        GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, 0, 0));
+        GFL_StrBufLoadString(name, (const u16 *)JoinAvenue_GetParam(joinAvenueInfo, JOIN_AVE_INFO_NAME, 0));
         GFL_WordSetSetStrbuf(wk->wordSet, 0, name, 2, 1, 2);
         GFL_StrBufFree(name);
     }

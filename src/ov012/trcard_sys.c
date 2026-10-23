@@ -342,7 +342,7 @@ void TrainerCardData_FillExtras(TrainerCardData *data, GameData *gameData, HeapI
     }
     data->pwtWins = wins;
     data->unk688 = RecordGet(records, 0x83);
-    JoinAvenue_GetParam(avenue, 0, data->avenueName);
+    JoinAvenue_GetParam(avenue, JOIN_AVE_INFO_NAME, data->avenueName);
     data->unk68A = RecordGet(records, 0x7f);
     data->unk684 = FestRecords_GetCompleted(unk);
     eventWork = GameData_GetEventWork(gameData);

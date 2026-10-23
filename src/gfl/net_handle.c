@@ -369,7 +369,7 @@ void NetHandle_Update(void) {
     {
         GFLNetInitData *ini = GFL_NetGetInitData();
 
-        if (ini->bNetType != 4) {
+        if (ini->bNetType != GFL_NET_TYPE_IRC_WIRELESS) {
             handle = NetHandle_GetOwn();
             if (handle->infoPending == TRUE) {
                 if (ini->getInfo != NULL && ini->getInfoSize != NULL) {

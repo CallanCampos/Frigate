@@ -325,135 +325,135 @@ GameEventReturnCode EventShortcutCallDirect_Callback(GameEvent *event, u32 *stat
 
 u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
     switch (item) {
-    case 0:
+    case SHORTCUT_BICYCLE:
         input->eventId = 0;
         return 1;
-    case 1:
-        input->appId = 8;
+    case SHORTCUT_TOWN_MAP:
+        input->appId = FIELD_APP_TOWNMAP;
         return 0;
-    case 2:
-        input->appId = 12;
+    case SHORTCUT_VS_RECORDER:
+        input->appId = FIELD_APP_BATTLE_RECORDER;
         return 0;
-    case 3:
-        input->appId = 9;
+    case SHORTCUT_PAL_PAD:
+        input->appId = FIELD_APP_WIFI_NOTE;
         return 0;
-    case 4:
+    case SHORTCUT_SUPER_ROD:
         input->eventId = 4;
         return 1;
-    case 5:
+    case SHORTCUT_DOWSING_MCHN:
         input->eventId = 5;
         return 1;
-    case 6:
-        input->appId = 0;
+    case SHORTCUT_GRACIDEA:
+        input->appId = FIELD_APP_POKELIST;
         input->appParam = 466;
         return 0;
-    case 7:
-        input->appId = 0;
+    case SHORTCUT_DNA_SPLICERS_FUSE:
+        input->appId = FIELD_APP_POKELIST;
         input->appParam = 628;
         return 0;
-    case 8:
-        input->appId = 0;
+    case SHORTCUT_DNA_SPLICERS_SEPARATE:
+        input->appId = FIELD_APP_POKELIST;
         input->appParam = 629;
         return 0;
-    case 9:
-        input->appId = 7;
+    case SHORTCUT_PSTATUS_INFO:
+        input->appId = FIELD_APP_POKESTATUS;
         input->appParam = 0;
         return 0;
-    case 10:
-        input->appId = 7;
+    case SHORTCUT_PSTATUS_SKILL:
+        input->appId = FIELD_APP_POKESTATUS;
         input->appParam = 1;
         return 0;
-    case 11:
-        input->appId = 7;
+    case SHORTCUT_PSTATUS_RIBBON:
+        input->appId = FIELD_APP_POKESTATUS;
         input->appParam = 2;
         return 0;
-    case 12:
-        input->appId = 2;
+    case SHORTCUT_BAG_ITEMS:
+        input->appId = FIELD_APP_BAG;
         input->appParam = 0;
         return 0;
-    case 13:
-        input->appId = 2;
+    case SHORTCUT_BAG_MEDICINE:
+        input->appId = FIELD_APP_BAG;
         input->appParam = 1;
         return 0;
-    case 14:
-        input->appId = 2;
+    case SHORTCUT_BAG_TMS_HMS:
+        input->appId = FIELD_APP_BAG;
         input->appParam = 2;
         return 0;
-    case 15:
-        input->appId = 2;
+    case SHORTCUT_BAG_BERRIES:
+        input->appId = FIELD_APP_BAG;
         input->appParam = 3;
         return 0;
-    case 16:
-        input->appId = 2;
+    case SHORTCUT_BAG_KEY_ITEMS:
+        input->appId = FIELD_APP_BAG;
         input->appParam = 4;
         return 0;
-    case 17:
-        input->appId = 2;
+    case SHORTCUT_BAG_FREE_SPACE:
+        input->appId = FIELD_APP_BAG;
         input->appParam = 5;
         return 0;
-    case 18:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_LIST:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 1;
         return 0;
-    case 19:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_SEARCH:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 6;
         return 0;
-    case 20:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_INFO:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 2;
         return 0;
-    case 21:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_MAP:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 3;
         return 0;
-    case 22:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_VOICE:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 4;
         return 0;
-    case 23:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_FORM:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 5;
         return 0;
-    case 31:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_AWARDS:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 7;
         return 0;
-    case 32:
-        input->appId = 1;
+    case SHORTCUT_POKEDEX_HABITAT:
+        input->appId = FIELD_APP_ZUKAN;
         input->appParam = 8;
         return 0;
-    case 24:
-        input->appId = 3;
+    case SHORTCUT_TRAINER_CARD_FRONT:
+        input->appId = FIELD_APP_TRAINER_CARD;
         input->appParam = 1;
         return 0;
-    case 25:
-        input->appId = 3;
+    case SHORTCUT_TRAINER_CARD_BACK:
+        input->appId = FIELD_APP_TRAINER_CARD;
         input->appParam = 2;
         return 0;
-    case 26:
-        input->appId = 3;
+    case SHORTCUT_TRAINER_CARD_BADGES:
+        input->appId = FIELD_APP_TRAINER_CARD;
         input->appParam = 3;
         return 0;
-    case 27:
-        input->appId = 5;
+    case SHORTCUT_CONFIG_PANEL:
+        input->appId = FIELD_APP_CONFIG;
         return 0;
-    case 28:
-        input->appId = 13;
+    case SHORTCUT_XTRANSCEIVER:
+        input->appId = FIELD_APP_XTRANSCEIVER;
         return 0;
-    case 29:
-        input->appId = 14;
+    case SHORTCUT_MEDAL_BOX:
+        input->appId = FIELD_APP_MEDALBOX;
         return 0;
-    case 30:
-        input->appId = 0;
+    case SHORTCUT_POKELIST:
+        input->appId = FIELD_APP_POKELIST;
         input->appParam = -1;
         return 0;
-    case 33:
-        input->appId = 0;
+    case SHORTCUT_REVEAL_GLASS:
+        input->appId = FIELD_APP_POKELIST;
         input->appParam = 638;
         return 0;
     default:
-        input->appId = 1;
+        input->appId = FIELD_APP_ZUKAN;
         return 0;
     }
 }
@@ -461,34 +461,34 @@ u32 ShortcutMenu_SetKeyItemID(FieldAppCallInput *input, u32 item) {
 BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
     *invalid = 0;
     switch (item) {
-    case 0:
+    case SHORTCUT_BICYCLE:
         *action = 0;
         return TRUE;
-    case 1:
+    case SHORTCUT_TOWN_MAP:
         *action = 1;
         return TRUE;
-    case 2:
+    case SHORTCUT_VS_RECORDER:
         *action = 6;
         return TRUE;
-    case 3:
+    case SHORTCUT_PAL_PAD:
         *action = 2;
         return TRUE;
-    case 4:
+    case SHORTCUT_SUPER_ROD:
         *action = 5;
         return TRUE;
-    case 5:
+    case SHORTCUT_DOWSING_MCHN:
         *action = 9;
         return TRUE;
-    case 28:
+    case SHORTCUT_XTRANSCEIVER:
         *action = 10;
         return TRUE;
-    case 29:
+    case SHORTCUT_MEDAL_BOX:
         *action = 11;
         return TRUE;
-    case 6:
-    case 7:
-    case 8:
-    case 33:
+    case SHORTCUT_GRACIDEA:
+    case SHORTCUT_DNA_SPLICERS_FUSE:
+    case SHORTCUT_DNA_SPLICERS_SEPARATE:
+    case SHORTCUT_REVEAL_GLASS:
         return FALSE;
     default:
         *invalid = 1;

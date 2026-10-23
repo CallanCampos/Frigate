@@ -328,14 +328,14 @@ static const VecFx32 sCameraTargetOffsets[] = {
 
 // clang-format off
 static const SpecialPokeMartHeader SPECIAL_POKE_MART_HEADERS[] = {
-    { 0xf7, { 26, 27, 28, 29, 30, 31 } },
-    { 0xf8, { 32, 33, 34, 35, 36, 37 } },
-    { 0xf9, { 38, 39, 40, 41, 42, 43 } },
-    { 0xfa, { 44, 45, 46, 47, 48, 49 } },
-    { 0xef, { 50, 51, 52, 53, 54, 55 } },
-    { 0xf0, { 56, 57, 58, 59, 60, 61 } },
-    { 0xf1, { 62, 63, 64, 65, 66, 67 } },
-    { 0xf2, { 68, 69, 70, 71, 72, 73 } },
+    { SHOP_ID_SPECIAL_MART_0_FIRST, { 26, 27, 28, 29, 30, 31 } },
+    { SHOP_ID_SPECIAL_MART_0_FIRST + 1, { 32, 33, 34, 35, 36, 37 } },
+    { SHOP_ID_SPECIAL_MART_0_FIRST + 2, { 38, 39, 40, 41, 42, 43 } },
+    { SHOP_ID_SPECIAL_MART_0_LAST, { 44, 45, 46, 47, 48, 49 } },
+    { SHOP_ID_SPECIAL_MART_1_FIRST, { 50, 51, 52, 53, 54, 55 } },
+    { SHOP_ID_SPECIAL_MART_1_FIRST + 1, { 56, 57, 58, 59, 60, 61 } },
+    { SHOP_ID_SPECIAL_MART_1_FIRST + 2, { 62, 63, 64, 65, 66, 67 } },
+    { SHOP_ID_SPECIAL_MART_1_LAST, { 68, 69, 70, 71, 72, 73 } },
 };
 
 // clang-format on
@@ -552,14 +552,14 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     case SHOP_ID_BP_TMS:
         shop->shopId = shopId;
         break;
-    case 0xef:
-    case 0xf0:
-    case 0xf1:
-    case 0xf2:
-    case 0xf7:
-    case 0xf8:
-    case 0xf9:
-    case 0xfa:
+    case SHOP_ID_SPECIAL_MART_1_FIRST:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_1_LAST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_0_LAST:
         shop->shopId = shopId;
         break;
     case SHOP_ID_MOVE_TUTOR_NACRENE:
@@ -745,14 +745,14 @@ static void ShopUI_Init(GameSystem *gsys, ShopUIWork *wk, u32 shopId, u32 subId)
         wk->listMode = SHOP_LIST_TMS;
         ShopUI_LoadBPShopItems(wk, 1);
         break;
-    case 0xef:
-    case 0xf0:
-    case 0xf1:
-    case 0xf2:
-    case 0xf7:
-    case 0xf8:
-    case 0xf9:
-    case 0xfa:
+    case SHOP_ID_SPECIAL_MART_1_FIRST:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_1_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_1_LAST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 1:
+    case SHOP_ID_SPECIAL_MART_0_FIRST + 2:
+    case SHOP_ID_SPECIAL_MART_0_LAST:
         ShopUI_LoadSpecialPokeMartItems(wk, shopId);
         break;
     case SHOP_ID_MOVE_TUTOR_NACRENE:

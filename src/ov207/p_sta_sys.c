@@ -28,9 +28,6 @@
 // The summary screen's core: setting up and tearing down the screens, the main loop, the buttons of the bottom
 // screen, changing the page or the Pokémon behind a mosaic, and printing for the pages. The file's name is a guess
 
-// The shortcut of the info page; the skill and ribbon pages' follow it
-#define SHORTCUT_PSTATUS_INFO 9
-
 // The BG palettes of each screen, in the version's colors
 #ifdef BLACK2
 #define NCLR_MAIN_BG 1

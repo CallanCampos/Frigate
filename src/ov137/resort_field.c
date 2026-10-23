@@ -366,7 +366,7 @@ void ResortField_Setup(Field *field) {
     sysSetup.entries = JoinAvenue_GetEntryList(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
     work->sys = ResortSys_Create(&sysSetup, unk, heapId);
-    flag = JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL);
+    flag = JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), JOIN_AVE_INFO_UNOPENED, NULL);
     ResortField_AddSpecialEntry(work->sys, gameData, heapId);
     ResortField_AddInitialEntries(work->sys, gameData, heapId);
     unk2 = ResortWork_Get(unk, 8);
@@ -1489,7 +1489,7 @@ static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPerson
     }
     case 6: {
         u16 name[11];
-        JoinAvenue_GetParam(info, 1, name);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_TITLE, name);
         GFL_StrBufLoadString(bubble->strbuf, name);
         style = 1;
         break;
@@ -1840,7 +1840,8 @@ static void ResortSceneAnim1_End(ResortFieldScene *scene) {
 static void ResortField_AddInitialEntries(ResortSys *sys, GameData *gameData, HeapID heapId) {
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
 
-    if (JoinAvenue_GetParam(info, 7, NULL) == 0 && JoinAvenue_GetParam(info, 6, NULL) == 0) {
+    if (JoinAvenue_GetParam(info, JOIN_AVE_INFO_UNOPENED, NULL) == 0 &&
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_ENTRIES_ADDED, NULL) == 0) {
         SaveControl *save = GameData_GetSaveControl(gameData);
         JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(save);
         void *entry;
@@ -1886,7 +1887,7 @@ static void ResortField_AddInitialEntries(ResortSys *sys, GameData *gameData, He
             }
         }
         JoinAvenueEntry_Free(entry);
-        JoinAvenueInfo_SetParam(info, 6, 1);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_ENTRIES_ADDED, 1);
     }
 }
 
@@ -1898,7 +1899,8 @@ static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, Heap
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(save);
     BOOL add = FALSE;
 
-    if (EventWork_FlagGet(eventWork, 2400) && JoinAvenue_GetParam(info, 24, NULL) == 0) {
+    if (EventWork_FlagGet(eventWork, 2400) &&
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_SPECIAL_ENTRY_CHECKED, NULL) == 0) {
         JoinAvenueEntryList *entries = ResortSys_GetEntries(sys);
         u32 i;
 
@@ -1911,15 +1913,16 @@ static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, Heap
                 break;
             }
         }
-        JoinAvenueInfo_SetParam(info, 24, 1);
+        JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_SPECIAL_ENTRY_CHECKED, 1);
     }
     if (add) {
-        u16 chance = ResortBinary_Get(table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, 2, NULL)), 10);
+        u16 chance = ResortBinary_Get(
+            table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL)), 10);
         if (JoinAvenueInfo_Random(info, 21, 100) < chance) {
             void *entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
             ResortSys_MakeShopEntry(sys, gameData, entry, 5, 0, heapId);
             if (JoinAvenue_Add(joinAvenue, gameData, entry, 2) == 2) {
-                JoinAvenueInfo_SetParam(info, 25, 0);
+                JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_UNK_DC_13, 0);
             }
             JoinAvenueEntry_Free(entry);
         }
@@ -1951,7 +1954,7 @@ void ResortField0_Setup(Field *field) {
     sysSetup.entries = JoinAvenue_GetEntryList(joinAvenue);
     sysSetup.info = JoinAvenue_GetInfo(joinAvenue);
     work->sys = ResortSys_Create(&sysSetup, unk, heapId);
-    if (JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), 7, NULL) == 0) {
+    if (JoinAvenue_GetParam(ResortSys_GetInfo(work->sys), JOIN_AVE_INFO_UNOPENED, NULL) == 0) {
         fill = TRUE;
     }
 

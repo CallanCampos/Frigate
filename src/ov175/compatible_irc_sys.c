@@ -141,7 +141,7 @@ static const GFLNetInitData sCompatibleIrcSysNetInit = {
     0x10,
     1,
     0,
-    3,
+    GFL_NET_TYPE_IRC,
     1,
     0xd,
     { 0x2c, 1, 0, 0 },

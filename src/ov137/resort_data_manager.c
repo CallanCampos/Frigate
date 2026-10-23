@@ -202,7 +202,7 @@ u32 ResortSlots_FindEmpty(ResortSlots *slots, u32 row) {
 
 u16 ResortData_RaffleShopItem(ResortPersonData *data, void *a1, void *a2, JoinAvenueInfo *info) {
     u32 value = ResortData_Roll(data, 0, 100);
-    u32 row = ResortBinary_FindRange(a2, JoinAvenue_GetParam(info, 2, 0));
+    u32 row = ResortBinary_FindRange(a2, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, 0));
     if (value < ResortBinary_Get(a2, row, 8)) {
         u16 shopRow = ResortBinary_Get(a2, row, 7);
         u32 prize = join_ave_raffle_shop(a1, shopRow, ResortData_Roll(data, 1, ResortBinary_Get(a1, shopRow, 0)));

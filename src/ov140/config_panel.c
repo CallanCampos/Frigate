@@ -53,8 +53,6 @@
 // quit. The ROM has no name for this file; "config_panel.c" is a guess
 
 #define HEAPID_CONFIG_PANEL 0x1c
-// The options screen's shortcut
-#define SHORTCUT_CONFIG_PANEL 27
 
 #define BG_COUNT 6
 #define BG_BAR 0

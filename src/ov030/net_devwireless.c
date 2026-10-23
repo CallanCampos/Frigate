@@ -106,7 +106,7 @@ static BOOL NetDevWireless_Init(HeapID heapId, void *sys, WHCallback callback, v
     sDevWireless = GFL_HeapAllocate(heapId, sizeof(NetDevWireless), TRUE, "net_devwireless.c", 180);
     sDevWireless->sys = sys;
     flag = TRUE;
-    if (GFL_NetGetInitData()->bNetType != 5) {
+    if (GFL_NetGetInitData()->bNetType != GFL_NET_TYPE_WIRELESS_LISTEN) {
         flag = FALSE;
     }
     return NetWhpipe_Init(heapId, callback, work, flag);

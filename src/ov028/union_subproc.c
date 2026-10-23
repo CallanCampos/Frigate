@@ -99,9 +99,9 @@ GameEvent *UnionCommand_CreateEvent(GameSystem *gsys, Field *field, UnionSystem 
 static const UnionCommandInfo sUnionCommands[] = {
     { NULL, 0, 0 },
     { UnionCommand_TrainerCard, 2, 1 },
-    { UnionCommand_Trade, 0x18, 1 },
+    { UnionCommand_Trade, UNION_ACTIVITY_TRADE, 1 },
     { UnionCommand_App, 3, 0 },
-    { UnionCommand_App, 0x19, 0 },
+    { UnionCommand_App, UNION_ACTIVITY_EGG_TRADE, 0 },
     { UnionCommand_WarpA, 4, 4 },
     { UnionCommand_WarpA, 5, 5 },
     { UnionCommand_WarpA, 6, 6 },

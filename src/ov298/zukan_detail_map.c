@@ -48,9 +48,6 @@
 #define ARCID_POKEICON 7
 #define ARCID_ZUKAN_AREA 176
 
-// The Pokédex's shortcut for the Y button, which the touch bar's check box registers
-#define SHORTCUT_POKEDEX_MAP 21
-
 // The event flags that show the water and fishing habitats
 #define FLAG_HABITAT_WATER 0x987
 #define FLAG_HABITAT_FISHING 0x985

@@ -593,9 +593,9 @@ void func_ov036_021b5660(PlaceName *wk) {
         return;
     }
     if (IsZoneJoinAvenue(zoneId)) {
-        GFL_StrBufLoadString(
-            wk->name, (const u16 *)JoinAvenue_GetParam(
-                          JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(GameData_GetSaveControl(wk->gameData))), 0, 0));
+        GFL_StrBufLoadString(wk->name, (const u16 *)JoinAvenue_GetParam(JoinAvenue_GetInfo(SaveControl_GetJoinAvenue(
+                                                                            GameData_GetSaveControl(wk->gameData))),
+                                                                        JOIN_AVE_INFO_NAME, 0));
     } else {
         GFL_MsgDataLoadStrbuf(wk->msgData, nameId, wk->name);
     }
