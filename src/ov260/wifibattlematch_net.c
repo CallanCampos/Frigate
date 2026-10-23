@@ -915,7 +915,7 @@ static int WifiBattleMatchNet_Eval(int index, void *work) {
 }
 
 void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 rule,
-                                    const WifiBattleMatchLinkBattleResult *battleResult, u32 a5) {
+                                    const WifiBattleMatchBattleResult *battleResult, u32 a5) {
     p_wk->unk1498 = 0;
     p_wk->state = WBM_REPORT_SEQ_SYNC;
     p_wk->unk1ac = 1;

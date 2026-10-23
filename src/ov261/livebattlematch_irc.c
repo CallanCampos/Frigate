@@ -1,5 +1,6 @@
 #include "types.h"
 #include "app/livebattlematch_irc.h"
+#include "app/wifibattlematch.h"
 #include "field/delivery_irc.h"
 #include "field/net_devirc.h"
 #include "gfl/heap.h"
@@ -233,13 +234,13 @@ BOOL LiveBattleMatchIrc_StepEnd(LiveBattleMatchIrc *irc) {
     return FALSE;
 }
 
-BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, void *data) {
+BOOL LiveBattleMatchIrc_SendPlayerData(LiveBattleMatchIrc *irc, WifiBattleMatchPlayer *data) {
     u8 partnerId = GFL_NetGetHandleNetId(NetHandle_GetOwn()) ? 0 : 1;
     NetHandle *handle = NetHandle_GetOwn();
 
     return GFL_NetSendCommandToMachine(handle, partnerId, LIVEBATTLEMATCH_IRC_COMMAND_PLAYER_DATA,
-                                       PokeParty_GetSaveDataSize() + LIVEBATTLEMATCH_PLAYER_HEADER_SIZE, data, TRUE,
-                                       TRUE, TRUE);
+                                       PokeParty_GetSaveDataSize() + sizeof(WifiBattleMatchPlayer), data, TRUE, TRUE,
+                                       TRUE);
 }
 
 BOOL LiveBattleMatchIrc_TakePlayerData(LiveBattleMatchIrc *irc, void **data) {
