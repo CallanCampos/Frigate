@@ -70,7 +70,7 @@ struct Field {
     fx32 actorYOffset;
     fx32 objectProjectionMatrixOffset;
     const FieldmapCtrlVTable *ctrlVTable;
-    void *controller;
+    FieldmapCtrl *controller;
     TCBManager *tcbManager;
     void *tcbManagerHeap;
     FieldGimmickWorkBlock gimmickWork;

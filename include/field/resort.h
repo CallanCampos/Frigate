@@ -16,6 +16,14 @@ typedef struct ResortSys ResortSys;
 typedef struct ResortPeople ResortPeople;
 typedef struct ResortPerson ResortPerson;
 typedef struct ResortPersonData ResortPersonData;
+
+// What a ResortPersonData is the data of, by its type (ResortData_GetType): a person of the avenue or of a list, a
+// person who has left or a person to come
+typedef union {
+    JoinAvenuePerson person;
+    JoinAvenueRecord record;
+    JoinAvenueEntry entry;
+} ResortDataPerson;
 typedef struct ResortNPC ResortNPC;
 typedef struct ResortSlots ResortSlots;
 
@@ -138,14 +146,14 @@ BOOL ResortSlots_IsEmpty(ResortSlots *slots, u32 row, u32 pos);
 ResortPersonData *ResortSlots_GetData(ResortSlots *slots, u32 row, u32 pos);
 u32 ResortSlots_FindEmpty(ResortSlots *slots, u32 row);
 u16 ResortData_RaffleShopItem(ResortPersonData *data, void *a1, void *a2, JoinAvenueInfo *info);
-ResortPersonData *ResortData_Create(HeapID heapId, void *person, u32 kind, u16 index);
+ResortPersonData *ResortData_Create(HeapID heapId, ResortDataPerson *person, u32 kind, u16 index);
 void ResortData_Free(ResortPersonData *data);
 void ResortData_Clear(ResortPersonData *data);
 BOOL ResortData_IsEmpty(ResortPersonData *data);
 u32 ResortData_GetParam(ResortPersonData *data, JoinAvenuePersonParam param, void *buffer);
 void ResortData_SetParam(ResortPersonData *data, JoinAvenuePersonParam param, u32 value);
 // The person, entry or record of the data, by its kind
-void *ResortData_GetPerson(ResortPersonData *data);
+ResortDataPerson *ResortData_GetPerson(ResortPersonData *data);
 u32 ResortData_GetType(ResortPersonData *data);
 u32 ResortData_GetKind(ResortPersonData *data);
 u32 ResortData_GetIndex(ResortPersonData *data);

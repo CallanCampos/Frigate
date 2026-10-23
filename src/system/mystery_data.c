@@ -20,11 +20,16 @@ static MysteryGift *getUsedCard(MysteryGiftSave *save, u32 slot);
 static BOOL hasFreeSlot(MysteryGiftSave *save);
 static u32 getKind(MysteryGiftSave *save);
 static u32 getCardMax(MysteryGiftSave *save);
-static void *getData(MysteryGiftSave *save);
+static MysteryGiftData *getData(MysteryGiftSave *save);
 static u8 *getReceivedFlags(MysteryGiftSave *save);
 static MysteryGift *getCard(MysteryGiftSave *save, u32 slot);
 static void encrypt(MysteryGiftSave *save);
 static void decrypt(MysteryGiftSave *save);
+
+union MysteryGiftData {
+    SaveOutsideGifts outside;
+    MysteryGiftSaveData save;
+};
 
 u32 MysteryGiftSaveData_GetSize(void) {
     return sizeof(MysteryGiftSaveData);
@@ -35,7 +40,7 @@ void MysteryGiftSaveData_Init(MysteryGiftSaveData *data) {
 
     MI_CpuFill8(&save, 0, sizeof(MysteryGiftSave));
     save.kind = MG_DATA_SAVE;
-    save.data = data;
+    save.data = (MysteryGiftData *)data;
     MI_CpuFill8(data, 0, sizeof(MysteryGiftSaveData));
     encrypt(&save);
 }
@@ -304,10 +309,10 @@ void MysteryGiftSave_Load(MysteryGiftSave *giftSave, SaveControl *save, u32 mode
     } else {
         GFL_OvlLoad(OVERLAY_SAVE_OUTSIDE);
         giftSave->outside = SaveOutside_Load(heapId);
-        giftSave->data = SaveOutside_GetGifts(giftSave->outside);
+        giftSave->data = (MysteryGiftData *)SaveOutside_GetGifts(giftSave->outside);
         giftSave->kind = MG_DATA_OUTSIDE;
         if (!SaveOutside_IsGiftsLoaded(giftSave->outside)) {
-            MI_CpuFill8(giftSave->data, 0, sizeof(SaveOutsideGifts));
+            MI_CpuFill8(&giftSave->data->outside, 0, sizeof(SaveOutsideGifts));
             encrypt(giftSave);
         }
     }
@@ -339,16 +344,16 @@ static u32 getCardMax(MysteryGiftSave *save) {
     return 0;
 }
 
-static void *getData(MysteryGiftSave *save) {
+static MysteryGiftData *getData(MysteryGiftSave *save) {
     return save->data;
 }
 
 static u8 *getReceivedFlags(MysteryGiftSave *save) {
     switch (save->kind) {
     case MG_DATA_OUTSIDE:
-        return ((SaveOutsideGifts *)getData(save))->receivedFlags;
+        return getData(save)->outside.receivedFlags;
     case MG_DATA_SAVE:
-        return ((MysteryGiftSaveData *)getData(save))->receivedFlags;
+        return getData(save)->save.receivedFlags;
     }
     return NULL;
 }
@@ -357,20 +362,20 @@ static MysteryGift *getCard(MysteryGiftSave *save, u32 slot) {
     getCardMax(save);
     switch (save->kind) {
     case MG_DATA_OUTSIDE:
-        return &((SaveOutsideGifts *)getData(save))->cards[slot];
+        return &getData(save)->outside.cards[slot];
     case MG_DATA_SAVE:
-        return &((MysteryGiftSaveData *)getData(save))->cards[slot];
+        return &getData(save)->save.cards[slot];
     }
     return NULL;
 }
 
 static void encrypt(MysteryGiftSave *save) {
-    void *data = getData(save);
+    MysteryGiftData *data = getData(save);
     mgEncryptData(data, getKind(save));
 }
 
 static void decrypt(MysteryGiftSave *save) {
-    void *data = getData(save);
+    MysteryGiftData *data = getData(save);
     mgDecryptData(data, getKind(save));
 }
 

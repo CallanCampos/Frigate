@@ -122,16 +122,8 @@ typedef struct {
     u8 pad;
 } MsgBGInput;
 
-// The state of a window's wait-for-input cursor
-struct MsgBGCursor {
-    u8 shown;
-    u8 frame;
-    u8 timer;
-    GFLBitmap *bitmap;
-};
-
 // Prints strings in a window through the system's print queue
-typedef struct {
+struct MsgBGPrinter {
     FieldMsgBG *sys;
     BOOL idle;
     Font *font;
@@ -140,20 +132,6 @@ typedef struct {
     BmpWin *window;
     StrBuf *strbuf;
     PrintWindow printWindow;
-} MsgBGPrinter;
-
-// A message balloon over an actor, which shakes as it opens
-struct ActorMsgWin {
-    u8 unk0;
-    u8 type;
-    s16 shake;
-    StrBuf *strbuf;
-    TalkMsgWinSys *talk;
-    MsgBGCursor cursor;
-    FieldMsgBG *sys;
-    const VecFx32 *posSource;
-    VecFx32 pos;
-    u8 unk28[12];
 };
 
 // A message in a numbered talk window
@@ -193,22 +171,11 @@ struct FieldMsgBG {
 };
 
 // A message printed a character at a time
-typedef struct {
+struct MsgStream {
     u16 unk0;
     u16 wait;
     PrintStream *stream;
     FieldMsgBG *sys;
-} MsgStream;
-
-// The talk and system message windows
-struct FieldMsgWin {
-    BmpWin *window;
-    MsgStream *stream;
-    MsgBGPrinter *printer;
-    MsgData *msgData;
-    StrBuf *strbuf;
-    FieldMsgBG *sys;
-    MsgBGCursor cursor;
 };
 
 // The money and list windows
@@ -224,45 +191,6 @@ struct ListMenuUI {
     BmpWin *window;
     ListMenuOption *options;
     BmpMenuList *list;
-};
-
-// The info message window, drawn with the talk window's frame, which shakes as it opens
-struct InfoMsgWin {
-    MsgBGCursor cursor;
-    StrBuf *strbuf;
-    FieldMsgBG *sys;
-    TalkMsgWinSys *talk;
-    MsgData *msgData;
-    BmpWin *window;
-    MsgStream *stream;
-    MsgBGPrinter *printer;
-    u32 state;
-    s16 shake;
-};
-
-// The sign window, which scrolls in from below and shows its message two lines at a time
-struct SignMsgWin {
-    FieldMsgBG *sys;
-    BmpWin *window;
-    GFLBitmap *nextPage;
-    GFLBitmap *page;
-    const StrBuf *src;
-    StrBuf *line;
-    u32 state;
-    s32 scroll;
-    u32 pageScroll;
-    u32 lineNo;
-    MsgBGCursor cursor;
-    Font *font;
-};
-
-// The checker window, whose frame is drawn in its own bitmap
-struct CheckerMsgWin {
-    BmpWin *window;
-    u32 unk4;
-    FieldMsgBG *sys;
-    GFLBitmap *cursorBack;
-    MsgBGCursor cursor;
 };
 
 static MsgBGPrinter *MsgBGPrinter_Create(FieldMsgBG *sys, MsgData *msgData, BmpWin *window);

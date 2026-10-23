@@ -409,7 +409,7 @@ u8 func_ov167_0219a004(BtlSetup *setup) {
 
 void BtlMain_SetupPlayerAndParties(BtlMainModule *mainModule, BtlSetup *setup) {
     u32 i;
-    void *chatter;
+    PerapVoice *chatter;
     u8 chatterFlags[4];
 
     mainModule->playerClientId = setup->fieldSituation.unk19;
@@ -1200,7 +1200,7 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
 BOOL BtlMain_CommExchangeChatter(BtlMainModule *mainModule, s32 *state) {
     BtlSetup *setup = mainModule->setup;
     u32 i;
-    void *chatter;
+    PerapVoice *chatter;
 
     if (BtlNet_CheckError()) {
         mainModule->unk473_0 = 1;

@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "field/field.h"
+#include "field/field_msgbg.h"
 #include "field/stadium_script.h"
 #include "field/trainer_script.h"
 #include "gfl/heap.h"
@@ -77,16 +78,26 @@ typedef struct {
     VecFx32 offset;
 } ScriptActorWork;
 
+// The message window a script has open, which its sub-event says the kind of: the system message window, the info
+// window, the sign, the checker window or the balloon over an actor
+typedef union {
+    FieldMsgWin system;
+    InfoMsgWin info;
+    SignMsgWin sign;
+    CheckerMsgWin checker;
+    ActorMsgWin actor;
+} ScriptMsgWin;
+
 struct ScriptSubwork {
     ScriptWork *work;
     GameSystem *gsys;
     GameData *gameData;
     MMSys *mmSys;
-    void *playerGridEventTCB;
+    TCB *playerGridEventTCB;
     FieldAcmdTCB *acmdTasks[8];
     ScriptListMenu listMenu;
     ScriptActorWork actorWork;
-    void *mapDisplayInfo;
+    ScriptMsgWin *mapDisplayInfo;
     WaitIcon *specialMessageIcon;
     u8 actorMsgPosActual;
     u8 actorMsgPos;
@@ -150,8 +161,8 @@ void ListMenu_ShowDescription(BmpMenuList *list, s32 value, u8 a2);
 FieldMsgBG *FieldScriptEnv_GetMsgBGSys(FieldScriptEnv *env);
 MsgData *GetFieldScriptMsgData(FieldScriptEnv *env);
 u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env);
-void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info);
-void *getMapDisplayInfoPtr(FieldScriptEnv *env);
+void setMapDisplayInfoPtr(FieldScriptEnv *env, ScriptMsgWin *info);
+ScriptMsgWin *getMapDisplayInfoPtr(FieldScriptEnv *env);
 void SetSpecialMessageIconPtr(FieldScriptEnv *env, WaitIcon *icon);
 WaitIcon *GetSpecialMessageIconPtr(FieldScriptEnv *env);
 ScriptActorWork *GetFieldScriptActorWk(FieldScriptEnv *env);
@@ -351,8 +362,8 @@ u16 FieldScriptEnv_GetZoneID(FieldScriptEnv *env);
 HeapID FieldScriptEnv_GetHeapID(FieldScriptEnv *env);
 u16 GetScriptEnvZoneID(FieldScriptEnv *env);
 ScriptWork *FieldScriptEnv_GetScriptWork(FieldScriptEnv *env);
-void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, void *task);
-void *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env);
+void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, TCB *task);
+TCB *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env);
 FieldActorAnmProc *ScriptWork_GetActorAnmProc(ScriptWork *work);
 void ScriptWork_SetActorAnmProc(ScriptWork *work, FieldActorAnmProc *proc);
 void ScriptWork_SetStadiumTrainers(ScriptWork *work, StadiumTrainerEntry *trainers);

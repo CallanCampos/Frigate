@@ -333,7 +333,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
                ResortSys_PickByGender(gender, 1120, 1128);
     }
     case 6: {
-        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 0);
+        u16 shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(&ResortData_GetPerson(data)->person), 0);
 
         return ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0) +
                ResortSys_PickByGender(gender, 328, 336);
@@ -518,7 +518,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
     case 116:
         return ResortSys_PickByGender(gender, 154, 171);
     case 86: {
-        u16 level = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 1);
+        u16 level = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(&ResortData_GetPerson(data)->person), 1);
 
         if (level >= 9) {
             return ResortSys_PickByGender(gender, 80, 85);
@@ -614,9 +614,9 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
 
         query -= 12;
         occupant = ResortDatas_Get(datas, 0, query);
-        shopName =
-            ResortShopData_GetShopParam(ResortShopData_GetPersonShop(shopData, ResortData_GetPerson(occupant)), 0);
-        shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(occupant)), 0);
+        shopName = ResortShopData_GetShopParam(
+            ResortShopData_GetPersonShop(shopData, &ResortData_GetPerson(occupant)->person), 0);
+        shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(&ResortData_GetPerson(occupant)->person), 0);
         name = ResortSys_FormatShopText(shopData, occupant, shopId, heapId);
         GFL_WordSetSetStrbuf(wordSet, 0, name, ResortData_GetParam(occupant, JOIN_AVE_PARAM_GENDER, NULL), 1, 2);
         GFL_StrBufFree(name);
@@ -626,7 +626,7 @@ u16 ResortSys_GetScriptValue(u32 query, ResortSys *sys, ResortPersonData *data, 
         u32 message;
         u32 candidates[9] = { 0 };
         s32 count = 0;
-        JoinAvenuePerson *person = ResortData_GetPerson(data);
+        JoinAvenuePerson *person = &ResortData_GetPerson(data)->person;
         BOOL hasRecord = FALSE;
         s32 i;
         u32 pick;
@@ -971,7 +971,7 @@ BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys) {
         if (data == NULL) {
             break;
         }
-        if (JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 1) != 9) {
+        if (JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(&ResortData_GetPerson(data)->person), 1) != 9) {
             return FALSE;
         }
     }
@@ -995,11 +995,11 @@ void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, Resort
         break;
     case 0xfe:
         data = ResortPerson_GetData(person);
-        joinPerson = ResortData_GetPerson(data);
+        joinPerson = &ResortData_GetPerson(data)->person;
         break;
     default:
         data = ResortDatas_GetByScript(ResortSys_GetDatas(sys), who, index);
-        joinPerson = ResortData_GetPerson(data);
+        joinPerson = &ResortData_GetPerson(data)->person;
         break;
     }
 
@@ -1808,7 +1808,7 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
     u16 slot;
 
     if (dataKind == kind) {
-        JoinAvenuePerson *person = ResortData_GetPerson(data);
+        JoinAvenuePerson *person = &ResortData_GetPerson(data)->person;
         u16 oldShopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(person), 0);
         const u16 *shop = ResortShopData_GetShop(shopData, oldShopId);
         u16 column2 = ResortShopData_GetShopParam(shop, 2);
@@ -1835,24 +1835,25 @@ u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind) {
     if (ResortSys_GetEmptyData(sys, ResortData_GetMakeKind(kind), row, &slot, &made)) {
         switch (sMakeKinds[kind][dataKind]) {
         case 1:
-            JoinAvenuePerson_InitFromPerson(ResortData_GetPerson(made), ResortData_GetPerson(data), shopData, slot,
-                                            row);
+            JoinAvenuePerson_InitFromPerson(&ResortData_GetPerson(made)->person, &ResortData_GetPerson(data)->person,
+                                            shopData, slot, row);
             break;
         case 2:
-            JoinAvenuePerson_InitFromEntry(ResortData_GetPerson(made), ResortData_GetPerson(data), shopData, slot, row);
+            JoinAvenuePerson_InitFromEntry(&ResortData_GetPerson(made)->person, &ResortData_GetPerson(data)->entry,
+                                           shopData, slot, row);
             break;
         case 3: {
-            JoinAvenueRecord *record = ResortData_GetPerson(made);
+            JoinAvenueRecord *record = &ResortData_GetPerson(made)->record;
             u16 shopKind = ResortData_GetIndex(made);
 
-            JoinAvenueRecord_InitFromPerson(record, ResortData_GetPerson(data), slot, (u16)row, shopKind);
+            JoinAvenueRecord_InitFromPerson(record, &ResortData_GetPerson(data)->person, slot, (u16)row, shopKind);
             break;
         }
         case 4: {
-            JoinAvenueRecord *record = ResortData_GetPerson(made);
+            JoinAvenueRecord *record = &ResortData_GetPerson(made)->record;
             u16 shopKind = ResortData_GetIndex(made);
 
-            JoinAvenueRecord_InitFromEntry(record, ResortData_GetPerson(data), slot, (u16)row, shopKind);
+            JoinAvenueRecord_InitFromEntry(record, &ResortData_GetPerson(data)->entry, slot, (u16)row, shopKind);
             break;
         }
         default:
@@ -2236,7 +2237,7 @@ u32 ResortSys_GetVisitPoints(ResortSys *sys, ResortPersonData *data) {
     ResortSys_GetWork(sys);
     base = JoinAvenue_GetParam(info, JOIN_AVE_INFO_SEASON, NULL);
     RTC_GetCachedDate(&date);
-    shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 0);
+    shopId = JoinAvenueShop_GetField(JoinAvenuePerson_GetShop(&ResortData_GetPerson(data)->person), 0);
     shopKind = ResortShopData_GetShopParam(ResortShopData_GetShop(shopData, shopId), 0);
     trainerType = UnionView_FindTrainerType((u8)ResortData_GetParam(data, JOIN_AVE_PARAM_TRAINER_TYPE, NULL));
     if (trainerType >= 8) {

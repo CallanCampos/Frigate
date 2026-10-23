@@ -14,7 +14,7 @@
 #include "system/vm.h"
 
 BOOL ScriptNative_SurfTCBWait(VM *vm, void *env) {
-    void *tcb;
+    TCB *tcb;
 
     tcb = FieldScriptEnv_GetPlayerGridEventTCB(env);
     if (FieldSurfTCB_CheckEnd(tcb) == TRUE) {
@@ -32,7 +32,7 @@ BOOL s00C5_CallSurf(VM *vm, FieldScriptEnv *env) {
     u16 direction;
     HeapID heapId;
     u32 tileType;
-    void *tcb;
+    TCB *tcb;
 
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
     player = Field_GetPlayer(field);
@@ -48,7 +48,7 @@ BOOL s00C5_CallSurf(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL ScriptNative_WaterfallTCBWait(VM *vm, void *env) {
-    void *tcb;
+    TCB *tcb;
 
     tcb = FieldScriptEnv_GetPlayerGridEventTCB(env);
     if (FieldWaterfallTCB_CheckEnd(tcb) == TRUE) {
@@ -63,7 +63,7 @@ BOOL s00C6_CallWaterfall(VM *vm, FieldScriptEnv *env) {
     HeapID heapId;
     u32 direction;
     u32 param;
-    void *tcb;
+    TCB *tcb;
 
     heapId = FieldScriptEnv_GetHeapID(env);
     player = Field_GetPlayer(GSYS_GetField(FieldScriptEnv_GetGameSystem(env)));

@@ -96,10 +96,12 @@ enum {
     MG_DATA_SAVE,
 };
 
+// The gifts of a MysteryGiftSave by its kind, a MysteryGiftSaveData or a SaveOutsideGifts, which mystery_data.c defines
+typedef union MysteryGiftData MysteryGiftData;
+
 // The mystery gifts the game works on: the save's block, or the gifts outside the save when there is no save yet
 struct MysteryGiftSave {
-    // A MysteryGiftSaveData, or a SaveOutsideGifts for MG_DATA_OUTSIDE
-    void *data;
+    MysteryGiftData *data;
     u32 kind;
     // The card's data outside the save, for MG_DATA_OUTSIDE
     SaveOutside *outside;

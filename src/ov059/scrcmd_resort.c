@@ -152,7 +152,7 @@ BOOL ResortCmd_GetValue(VM *vm, FieldScriptEnv *env) {
         *var = ResortPerson_GetParam(person, JOIN_AVE_PARAM_SHOP_KIND, NULL);
         break;
     case 9:
-        *var = JoinAvenueShop_GetFlag(JoinAvenuePerson_GetShop(ResortData_GetPerson(data)), 0);
+        *var = JoinAvenueShop_GetFlag(JoinAvenuePerson_GetShop(&ResortData_GetPerson(data)->person), 0);
         break;
     case 10:
         *var = JoinAvenueOccupants_CountPeople(occupants) == 8 ? TRUE : FALSE;
@@ -1775,7 +1775,7 @@ BOOL ResortCmd_RecreatePeople(VM *vm, FieldScriptEnv *env) {
     case 6:
     case 7:
         ResortPeople_Recreate(people, ResortPeople_FindByJoinAvenuePerson(
-                                          people, ResortData_GetPerson(ResortDatas_Get(unk30, 0, index))));
+                                          people, &ResortData_GetPerson(ResortDatas_Get(unk30, 0, index))->person));
         break;
     case 8: {
         u32 i;

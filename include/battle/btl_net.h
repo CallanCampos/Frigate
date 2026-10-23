@@ -7,6 +7,7 @@
 #include "battle/btl_setup.h"
 #include "gfl/heap.h"
 #include "gfl/net_command.h"
+#include "save/chatter.h"
 #include "struct_decls.h"
 
 void BtlNet_Init(NetHandle *netHandle, u16 clientMask, HeapID heapId);
@@ -25,7 +26,7 @@ BOOL BtlNet_ArePartiesReceived(void);
 void BtlNet_BeginChatterExchange(void);
 BOOL BtlNet_SendChatter(void *chatter);
 BOOL BtlNet_AreChattersReceived(void);
-void *BtlNet_GetChatter(u8 clientId);
+PerapVoice *BtlNet_GetChatter(u8 clientId);
 void BtlNet_EndChatterExchange(void);
 BOOL BtlNet_SendPartyPacket(BtlNetPartyPacket *data);
 BOOL BtlNet_IsClientPartyReceived(u8 clientId);

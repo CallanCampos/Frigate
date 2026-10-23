@@ -122,7 +122,7 @@ static BOOL ResortPerson_HasActor(ResortPerson *person, FieldActor *actor) {
 }
 
 JoinAvenuePerson *ResortPerson_GetJoinAvenuePerson(ResortPerson *person) {
-    return ResortData_GetPerson(person->data);
+    return &ResortData_GetPerson(person->data)->person;
 }
 
 void ResortPerson_UpdateObjCode(ResortPerson *person) {
@@ -145,7 +145,7 @@ static void ResortPerson_Recreate(ResortPerson *person, const ResortPersonSetup 
 }
 
 JoinAvenueShop *ResortPerson_GetShop(ResortPerson *person) {
-    return JoinAvenuePerson_GetShop(ResortData_GetPerson(person->data));
+    return JoinAvenuePerson_GetShop(&ResortData_GetPerson(person->data)->person);
 }
 
 void ResortPerson_MoveToHome(ResortPerson *person) {
@@ -179,7 +179,7 @@ void ResortPerson_GetFacingPos(ResortPerson *person, u16 *x, u16 *z, u16 *dir) {
 }
 
 static BOOL ResortPerson_IsJoinAvenuePerson(ResortPerson *person, JoinAvenuePerson *joinPerson) {
-    if (ResortData_GetPerson(person->data) == joinPerson) {
+    if (&ResortData_GetPerson(person->data)->person == joinPerson) {
         return TRUE;
     }
     return FALSE;

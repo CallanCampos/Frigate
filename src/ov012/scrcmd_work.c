@@ -97,11 +97,11 @@ u16 GetFieldScriptMsgFileNo(FieldScriptEnv *env) {
     return env->msgFileNo;
 }
 
-void setMapDisplayInfoPtr(FieldScriptEnv *env, void *info) {
+void setMapDisplayInfoPtr(FieldScriptEnv *env, ScriptMsgWin *info) {
     env->subwork->mapDisplayInfo = info;
 }
 
-void *getMapDisplayInfoPtr(FieldScriptEnv *env) {
+ScriptMsgWin *getMapDisplayInfoPtr(FieldScriptEnv *env) {
     return env->subwork->mapDisplayInfo;
 }
 
@@ -117,11 +117,11 @@ ScriptActorWork *GetFieldScriptActorWk(FieldScriptEnv *env) {
     return &env->subwork->actorWork;
 }
 
-void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, void *task) {
+void FieldScriptEnv_SetPlayerGridEventTCB(FieldScriptEnv *env, TCB *task) {
     env->subwork->playerGridEventTCB = task;
 }
 
-void *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env) {
+TCB *FieldScriptEnv_GetPlayerGridEventTCB(FieldScriptEnv *env) {
     return env->subwork->playerGridEventTCB;
 }
 

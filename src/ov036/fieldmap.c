@@ -739,11 +739,11 @@ u16 Field_GetPlayerStateZoneID(Field *field) {
     return field->playerZoneState.zoneId;
 }
 
-void *Field_GetController(Field *field) {
+FieldmapCtrl *Field_GetController(Field *field) {
     return field->controller;
 }
 
-void Field_SetController(Field *field, void *controller) {
+void Field_SetController(Field *field, FieldmapCtrl *controller) {
     field->controller = controller;
 }
 
@@ -782,7 +782,7 @@ u32 Field_GetControllerTypeID(Field *field) {
 u32 Field_GetResolvedControllerTypeID(Field *field) {
     u32 type = sResolvedControllerTypes[field->ctrlVTable->typeId];
     if (type == 2) {
-        type = FieldmapCtrlHybrid_GetActiveTypeID(field->controller);
+        type = FieldmapCtrlHybrid_GetActiveTypeID(&field->controller->hybrid);
     }
     return type;
 }

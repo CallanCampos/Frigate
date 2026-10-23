@@ -8,13 +8,6 @@
 #include "gfl/heap.h"
 #include "gfl/key.h"
 
-typedef struct {
-    u16 heapId;
-    Field *field;
-    u32 unk08;
-    BOOL updateDisable;
-} FieldmapCtrlGrid;
-
 static void FieldmapCtrlGrid_Create(Field *field, VecFx32 *pos, u16 dir);
 static void FieldmapCtrlGrid_Free(Field *field);
 static void FieldmapCtrlGrid_Update(Field *field, VecFx32 *pos);
@@ -26,13 +19,12 @@ const FieldmapCtrlVTable FIELDMAP_CTRL_GRID = {
 
 static void FieldmapCtrlGrid_Create(Field *field, VecFx32 *pos, u16 dir) {
     HeapID heapId = Field_GetHeapID(field);
-    FieldmapCtrlGrid *controller =
-        GFL_HeapAllocate(heapId, sizeof(FieldmapCtrlGrid), TRUE, "fieldmap_ctrl_grid.c", 104);
+    FieldmapCtrl *controller = GFL_HeapAllocate(heapId, sizeof(FieldmapCtrlGrid), TRUE, "fieldmap_ctrl_grid.c", 104);
     FieldPlayer *player;
     FieldActor *actor;
 
-    controller->heapId = heapId;
-    controller->field = field;
+    controller->grid.heapId = heapId;
+    controller->grid.field = field;
     player = Field_GetPlayer(field);
     actor = FieldPlayer_GetActor(player);
     CheckSetActorFaceDir(actor, dir);
@@ -46,7 +38,7 @@ static void FieldmapCtrlGrid_Free(Field *field) {
 }
 
 static void FieldmapCtrlGrid_Update(Field *field, VecFx32 *pos) {
-    FieldmapCtrlGrid *controller = Field_GetController(field);
+    FieldmapCtrlGrid *controller = &Field_GetController(field)->grid;
     FieldPlayer *player = Field_GetPlayer(field);
 
     if (!controller->updateDisable) {
@@ -66,7 +58,7 @@ static VecFx32 *FieldmapCtrlGrid_GetPos(Field *field) {
 }
 
 void FieldmapCtrlGrid_SetUpdateDisable(Field *field, BOOL disable) {
-    FieldmapCtrlGrid *controller = Field_GetController(field);
+    FieldmapCtrlGrid *controller = &Field_GetController(field)->grid;
 
     controller->updateDisable = disable;
 }

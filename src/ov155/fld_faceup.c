@@ -367,12 +367,12 @@ static BOOL FaceUp_UpdateFadeIn(FaceUpWork *work) {
 
 static void FaceUp_Task(TCB *tcb, void *data) {
     FaceUpWork *work = data;
-    void *window;
+    ScriptMsgWin *window;
     u32 msgState;
 
     if (!work->talkEnded && FieldScriptSubEvent_IsRegistered(SCRIPT_SUB_EVENT_MSG) &&
         (window = getMapDisplayInfoPtr(work->env)) != NULL) {
-        msgState = func_ov036_02188cbc(window);
+        msgState = func_ov036_02188cbc(&window->info);
         if (msgState == 0) {
             work->mouth.stopped = FALSE;
             work->waitingForMsg = FALSE;
