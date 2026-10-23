@@ -124,7 +124,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
 | `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | complete | descriptive |
-| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | partial | descriptive |
+| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |

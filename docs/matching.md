@@ -742,6 +742,15 @@ Same instructions, registers swapped.
 
 ## Stack slots
 
+- NitroWiFi's `CPSi_sha1_block` runs its rounds in groups of five, rotating the arguments of a two-statement
+  round macro instead of copying the five state words after each round. The first fifteen rounds use direct words,
+  followed by word 15 and four expanded words; the later stages each run four groups over the circular schedule.
+  Its majority expression is `(b & (c | d)) | (c & d)`. One `wordIndex` and one `group` counter reused across the
+  stages give the original spill lifetimes; separate first-word and expanded-word indexes leave 68 bytes different
+  even with the original size and operations. Its `CPSi_sha1_calc` sets the buffered index to zero before the first
+  compression call, after filling the partial block, which spills the old index during the copy and matches its
+  update function too.
+
 - DWC's `DWCi_Http_Thread` uses one transfer-length local for `CPS_SocWrite`'s result and the later
   `CPS_SocRead` output. Keeping the write result in a separate `sent` local drops the original's store to the
   address-taken length slot. The shared `u32 length`, with `(s32)length <= 0` for the write error check, restores

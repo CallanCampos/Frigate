@@ -251,6 +251,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   corner arithmetic; cast the operands, not only the result. (matching.md: "Signed and unsigned sums")
 - Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
   (matching.md: "A `static inline` accessor that returns a field cast")
+- SHA-1's five-round groups with separate index/counter spills: reuse the message-word index and round-group
+  counter across the stages (`CPSi_sha1_block`). (matching.md: "One `wordIndex` and one `group` counter")
 - A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
   (matching.md: "The rounds of a hash written as statements")
 - A local in a saved register where the original spills it and keeps a zero there for two field stores: put another
