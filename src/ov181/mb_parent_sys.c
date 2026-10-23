@@ -11,6 +11,7 @@
 #include "constants/version.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
+#include "gfl/backup_system.h"
 #include "gfl/bg_sys.h"
 #include "gfl/bmp.h"
 #include "gfl/bmpwin.h"
@@ -100,6 +101,73 @@ enum {
     MB_PARENT_STATE_WAIT_TIMEOUT,
     MB_PARENT_STATE_RESULT,
     MB_PARENT_STATE_NO_WIRELESS,
+};
+
+// The steps of the distribution, MBParent_UpdateDistribution's (the wireless, the measure of the channels, DS Download
+// Play's entry and the wireless's end), and then of the save that the Pokémon received are stored with, which
+// MBParent_UpdateTransfer runs in step with the child, in the work's distributionSeq
+enum {
+    MB_PARENT_DIST_SEQ_START_WIRELESS,
+    MB_PARENT_DIST_SEQ_MEASURE_CHANNEL,
+    MB_PARENT_DIST_SEQ_START_MBP,
+    MB_PARENT_DIST_SEQ_ENTRY,
+    MB_PARENT_DIST_SEQ_COMPLETE,
+    MB_PARENT_DIST_SEQ_DONE,
+    MB_PARENT_DIST_SEQ_END_WIRELESS,
+    MB_PARENT_DIST_SEQ_WAIT_WIRELESS_END,
+    MB_PARENT_DIST_SEQ_STOPPED,
+    MB_PARENT_SAVE_SEQ_SEND_SYNC_1,
+    MB_PARENT_SAVE_SEQ_WAIT_SYNC_1,
+    MB_PARENT_SAVE_SEQ_START,
+    MB_PARENT_SAVE_SEQ_WAIT_LAST,
+    MB_PARENT_SAVE_SEQ_WAIT_CHILD_START,
+    MB_PARENT_SAVE_SEQ_SEND_SYNC_3 = 16,
+    MB_PARENT_SAVE_SEQ_SEND_SYNC_4,
+    MB_PARENT_SAVE_SEQ_WAIT_SYNC_4 = 19,
+    MB_PARENT_SAVE_SEQ_WAIT_FRAMES,
+    MB_PARENT_SAVE_SEQ_FINISH,
+    MB_PARENT_SAVE_SEQ_SEND_SYNC_2,
+};
+
+// The steps of the cancel of the distribution, in MBParent_UpdateEntry: none, the question printed, the yes/no menu,
+// its answer and the cancel
+enum {
+    MB_PARENT_CANCEL_SEQ_NONE,
+    MB_PARENT_CANCEL_SEQ_PRINT,
+    MB_PARENT_CANCEL_SEQ_ASK,
+    MB_PARENT_CANCEL_SEQ_ANSWER,
+    MB_PARENT_CANCEL_SEQ_CANCELLED,
+};
+
+// The steps of MBParent_UpdateResult, for the start menu's transfer: the result the child sends, the questions about
+// it and their answers, the Pokémon received, and the item the child offers
+enum {
+    MB_PARENT_RESULT_SEQ_WAIT_RESULT,
+    MB_PARENT_RESULT_SEQ_ASK_RECEIVE,
+    MB_PARENT_RESULT_SEQ_RECEIVE_ANSWER,
+    MB_PARENT_RESULT_SEQ_PRINT_MORE,
+    MB_PARENT_RESULT_SEQ_WAIT_MORE_MSG,
+    MB_PARENT_RESULT_SEQ_PRINT_FLAG1,
+    MB_PARENT_RESULT_SEQ_ASK_FLAG1,
+    MB_PARENT_RESULT_SEQ_FLAG1_ANSWER,
+    MB_PARENT_RESULT_SEQ_ASK_FLAG2,
+    MB_PARENT_RESULT_SEQ_FLAG2_ANSWER,
+    MB_PARENT_RESULT_SEQ_PRINT_CONFIRM,
+    MB_PARENT_RESULT_SEQ_ASK_CONFIRM,
+    MB_PARENT_RESULT_SEQ_CONFIRM_ANSWER,
+    MB_PARENT_RESULT_SEQ_SEND_ANSWER,
+    MB_PARENT_RESULT_SEQ_RECEIVE_POKEMON,
+    MB_PARENT_RESULT_SEQ_ACK_POKEMON,
+    MB_PARENT_RESULT_SEQ_WAIT_RECEIVED_MSG,
+    MB_PARENT_RESULT_SEQ_PRINT_BOX_FULL,
+    MB_PARENT_RESULT_SEQ_WAIT_BOX_FULL_MSG,
+    MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO,
+    MB_PARENT_RESULT_SEQ_ASK_ITEM,
+    MB_PARENT_RESULT_SEQ_ITEM_ANSWER,
+    MB_PARENT_RESULT_SEQ_WAIT_ITEM_OWNED_MSG,
+    MB_PARENT_RESULT_SEQ_SEND_ITEM_ANSWER,
+    MB_PARENT_RESULT_SEQ_WAIT_ITEM_MSG,
+    MB_PARENT_RESULT_SEQ_FINISH,
 };
 
 typedef struct {
@@ -194,7 +262,7 @@ static BOOL sWirelessDone;
 static BOOL sTitleOnSub;
 
 static void MBParent_Init(MBParentWork *wk) {
-    wk->resultSeq = 0;
+    wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_RESULT;
     wk->state = MB_PARENT_STATE_WIPE_IN;
     wk->startMenu = wk->param->startMenu;
     MBParent_InitGraphics(wk);
@@ -461,7 +529,7 @@ static BOOL MBParent_Main(MBParentWork *wk) {
     case MB_PARENT_STATE_STORE_POKEMON:
         MBParent_ReceivePokemon(wk);
         wk->state = MB_PARENT_STATE_SAVE;
-        wk->distributionSeq = 9;
+        wk->distributionSeq = MB_PARENT_SAVE_SEQ_SEND_SYNC_1;
         break;
     case MB_PARENT_STATE_SAVE:
         MBParent_UpdateTransfer(wk);
@@ -774,8 +842,8 @@ static void MBParent_SetupGameInfo(MBParentWork *wk) {
     u16 introLength;
     int i;
 
-    wk->distributionSeq = 0;
-    wk->cancelSeq = 0;
+    wk->distributionSeq = MB_PARENT_DIST_SEQ_START_WIRELESS;
+    wk->cancelSeq = MB_PARENT_CANCEL_SEQ_NONE;
     wk->gameName = GFL_HeapAllocate(wk->heapId, 0x60, TRUE, "mb_parent_sys.c", 1368);
     wk->gameIntro = GFL_HeapAllocate(wk->heapId, 0xc0, TRUE, "mb_parent_sys.c", 1369);
     MBUtilMsg_SetWindow(wk->msg, 1);
@@ -804,8 +872,8 @@ static void MBParent_SetupGameInfo(MBParentWork *wk) {
 #endif
     nameLength = GFL_StrBufGetCharCount(name);
     introLength = GFL_StrBufGetCharCount(intro);
-    MIi_CpuCopy16(GFL_StrBufGetStringPtr(name), wk->gameName, nameLength * 2);
-    MIi_CpuCopy16(GFL_StrBufGetStringPtr(intro), wk->gameIntro, introLength * 2);
+    MI_CpuCopy16(GFL_StrBufGetStringPtr(name), wk->gameName, nameLength * 2);
+    MI_CpuCopy16(GFL_StrBufGetStringPtr(intro), wk->gameIntro, introLength * 2);
     GFL_StrBufFree(name);
     GFL_StrBufFree(intro);
     // The child's font has the characters of the game's charset at other codes
@@ -865,7 +933,7 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         return FALSE;
     }
     switch (wk->distributionSeq) {
-    case 0:
+    case MB_PARENT_DIST_SEQ_START_WIRELESS:
         sWirelessDone = FALSE;
         wk->wirelessStarted = TRUE;
         WH_Initialize(wk->heapId, MBParent_OnWirelessDone, 0);
@@ -875,15 +943,15 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         } else {
             WmIcon_SetScreen(TRUE, wk->heapId);
         }
-        wk->distributionSeq = 1;
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_MEASURE_CHANNEL;
         GCTX_HIDSetSoftResetCallback(MBParent_SoftResetCallback, wk);
         break;
-    case 1:
+    case MB_PARENT_DIST_SEQ_MEASURE_CHANNEL:
         if (WH_GetSystemState() == WH_SYSSTATE_IDLE && WH_StartMeasureChannel() == TRUE) {
-            wk->distributionSeq = 2;
+            wk->distributionSeq = MB_PARENT_DIST_SEQ_START_MBP;
         }
         break;
-    case 2:
+    case MB_PARENT_DIST_SEQ_START_MBP:
         if (WH_GetSystemState() == WH_SYSSTATE_MEASURECHANNEL) {
             PlayerInfo *playerInfo = GetGameDataPlayerInfo(wk->param->gameData);
 
@@ -902,13 +970,13 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
                 MBUtilMsg_Print(wk->msg, 0x14, TextSpeed_GetCurrentWait());
             }
             MBUtilMsg_FreeWordSet(wk->msg);
-            wk->distributionSeq = 3;
+            wk->distributionSeq = MB_PARENT_DIST_SEQ_ENTRY;
         }
         break;
-    case 3:
+    case MB_PARENT_DIST_SEQ_ENTRY:
         MBParent_UpdateEntry(wk);
         break;
-    case 4:
+    case MB_PARENT_DIST_SEQ_COMPLETE:
         MBUtilMsg_ClearWindow(wk->msg);
         MBUtilMsg_SetWindow(wk->msg, 1);
         if (wk->startMenu == FALSE) {
@@ -918,22 +986,22 @@ static BOOL MBParent_UpdateDistribution(MBParentWork *wk) {
         }
         MBUtilMsg_SetShowWaitIcon(wk->msg, 1);
         ClActor_SetSequence(wk->cancelButton, 15);
-        wk->distributionSeq = 5;
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_DONE;
         break;
-    case 5:
+    case MB_PARENT_DIST_SEQ_DONE:
         wk->distributionDone = TRUE;
-        wk->distributionSeq = 6;
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_END_WIRELESS;
         break;
-    case 8:
-        wk->distributionSeq = 6;
+    case MB_PARENT_DIST_SEQ_STOPPED:
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_END_WIRELESS;
         break;
-    case 6:
+    case MB_PARENT_DIST_SEQ_END_WIRELESS:
         sWirelessDone = FALSE;
         WH_End(MBParent_OnWirelessDone);
         wk->wirelessStarted = FALSE;
-        wk->distributionSeq = 7;
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_WAIT_WIRELESS_END;
         break;
-    case 7:
+    case MB_PARENT_DIST_SEQ_WAIT_WIRELESS_END:
         if (sWirelessDone == TRUE) {
             GCTX_HIDSetSoftResetCallback(NULL, NULL);
             WH_Release();
@@ -975,11 +1043,11 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
     MBP_GetState();
     switch (MBP_GetState()) {
     case MBP_STATE_ENTRY:
-        if (wk->cancelSeq == 0) {
+        if (wk->cancelSeq == MB_PARENT_CANCEL_SEQ_NONE) {
             int hit = GFL_HIDGetTouchPressedRect(sCancelButtonRect);
 
             if (GCTX_HIDGetPressedKeys() == PAD_BUTTON_B || (hit == 0 && wk->startMenu == FALSE)) {
-                wk->cancelSeq = 1;
+                wk->cancelSeq = MB_PARENT_CANCEL_SEQ_PRINT;
                 ClActor_SetSequence(wk->cancelButton, 9);
                 ClActor_SetAutoAnim(wk->cancelButton, TRUE);
                 GFL_SndSEPlay(SEQ_SE_CANCEL1);
@@ -989,17 +1057,17 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
         }
         break;
     case MBP_STATE_COMPLETE:
-        wk->distributionSeq = 4;
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_COMPLETE;
         break;
     case MBP_STATE_ERROR:
         MBP_Cancel();
         break;
     case MBP_STATE_STOP:
-        wk->distributionSeq = 8;
+        wk->distributionSeq = MB_PARENT_DIST_SEQ_STOPPED;
         break;
     }
     switch (wk->cancelSeq) {
-    case 1:
+    case MB_PARENT_CANCEL_SEQ_PRINT:
         MBUtilMsg_ClearWindow(wk->msg);
         ClActor_SetSequence(wk->cancelButton, 15);
         if (wk->startMenu == FALSE) {
@@ -1009,19 +1077,19 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
             MBUtilMsg_SetWindow(wk->msg, 5);
             MBUtilMsg_Print(wk->msg, 0x2a, TextSpeed_GetCurrentWait());
         }
-        wk->cancelSeq = 2;
+        wk->cancelSeq = MB_PARENT_CANCEL_SEQ_ASK;
         break;
-    case 2:
+    case MB_PARENT_CANCEL_SEQ_ASK:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
             if (wk->startMenu == FALSE) {
                 MBUtilMsg_CreateYesNoMenu(wk->msg, 0);
             } else {
                 MBUtilMsg_CreateConfirm(wk->msg, 0);
             }
-            wk->cancelSeq = 3;
+            wk->cancelSeq = MB_PARENT_CANCEL_SEQ_ANSWER;
         }
         break;
-    case 3: {
+    case MB_PARENT_CANCEL_SEQ_ANSWER: {
         int answer;
 
         if (wk->startMenu == FALSE) {
@@ -1033,7 +1101,7 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
             GFL_ASSERT_MSG(MBP_GetState() == MBP_STATE_ENTRY, "state is not[MBP_STATE_ENTRY][%d]!!!\n", MBP_GetState());
             MBParent_SetPalParkResult(wk, 4);
             MBP_Cancel();
-            wk->cancelSeq = 4;
+            wk->cancelSeq = MB_PARENT_CANCEL_SEQ_CANCELLED;
         } else if (answer == 2) {
             PlayerInfo *playerInfo = GetGameDataPlayerInfo(wk->param->gameData);
 
@@ -1057,7 +1125,7 @@ static void MBParent_UpdateEntry(MBParentWork *wk) {
                 MBUtilMsg_Print(wk->msg, 0x14, TextSpeed_GetCurrentWait());
             }
             MBUtilMsg_FreeWordSet(wk->msg);
-            wk->cancelSeq = 0;
+            wk->cancelSeq = MB_PARENT_CANCEL_SEQ_NONE;
         }
         break;
     }
@@ -1185,62 +1253,62 @@ static void MBParent_Dummy(MBParentWork *wk) {
 
 static void MBParent_UpdateTransfer(MBParentWork *wk) {
     switch (wk->distributionSeq) {
-    case 9:
+    case MB_PARENT_SAVE_SEQ_SEND_SYNC_1:
         if (MBUtilMsg_IsQueueDone(wk->msg) == TRUE && MBUtilMsg_IsPrintDone(wk->msg) == TRUE &&
             MBComm_IsSaveReady(wk->comm) == TRUE &&
             MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_1, GFL_RandomLC(20) + 10) == TRUE) {
-            wk->distributionSeq = 10;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_WAIT_SYNC_1;
         }
         break;
-    case 10:
+    case MB_PARENT_SAVE_SEQ_WAIT_SYNC_1:
         if (MBComm_IsSaveSync1(wk->comm) == TRUE) {
-            wk->distributionSeq = 11;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_START;
         }
         break;
-    case 11:
+    case MB_PARENT_SAVE_SEQ_START:
         GameData_StartSave(wk->param->gameData);
-        wk->distributionSeq = 12;
+        wk->distributionSeq = MB_PARENT_SAVE_SEQ_WAIT_LAST;
         break;
-    case 12:
-        if (GameData_UpdateSave(wk->param->gameData) == 1) {
-            wk->distributionSeq = 13;
+    case MB_PARENT_SAVE_SEQ_WAIT_LAST:
+        if (GameData_UpdateSave(wk->param->gameData) == SAVE_RESULT_LAST) {
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_WAIT_CHILD_START;
         }
         break;
-    case 13:
+    case MB_PARENT_SAVE_SEQ_WAIT_CHILD_START:
         if (MBComm_IsSaveStarted(wk->comm) == TRUE) {
             wk->waitFrames = GFL_RandomLC(20) + 10;
-            wk->distributionSeq = 20;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_WAIT_FRAMES;
         }
         break;
-    case 20:
+    case MB_PARENT_SAVE_SEQ_WAIT_FRAMES:
         wk->waitFrames--;
         if (wk->waitFrames == 0) {
-            wk->distributionSeq = 21;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_FINISH;
         }
         break;
-    case 21:
-        if (GameData_UpdateSave(wk->param->gameData) == 2) {
-            wk->distributionSeq = 22;
+    case MB_PARENT_SAVE_SEQ_FINISH:
+        if (GameData_UpdateSave(wk->param->gameData) == SAVE_RESULT_OK) {
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_SEND_SYNC_2;
         }
         break;
-    case 22:
+    case MB_PARENT_SAVE_SEQ_SEND_SYNC_2:
         if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_2, 0) == TRUE) {
-            wk->distributionSeq = 16;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_SEND_SYNC_3;
         }
         // fallthrough
-    case 16:
+    case MB_PARENT_SAVE_SEQ_SEND_SYNC_3:
         if (MBComm_IsSaveMidReached(wk->comm) == TRUE &&
             MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_3, 0) == TRUE) {
-            wk->distributionSeq = 17;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_SEND_SYNC_4;
             wk->waitFrames = 0;
         }
         break;
-    case 17:
+    case MB_PARENT_SAVE_SEQ_SEND_SYNC_4:
         if (MBComm_IsSaved(wk->comm) == TRUE && MBComm_SendCommand(wk->comm, MB_COMM_CMD_SAVE_SYNC_4, 0) == TRUE) {
-            wk->distributionSeq = 19;
+            wk->distributionSeq = MB_PARENT_SAVE_SEQ_WAIT_SYNC_4;
         }
         break;
-    case 19:
+    case MB_PARENT_SAVE_SEQ_WAIT_SYNC_4:
         if (MBComm_IsSaveSync4(wk->comm) == TRUE) {
             wk->state = MB_PARENT_STATE_SAVED;
         }
@@ -1250,7 +1318,7 @@ static void MBParent_UpdateTransfer(MBParentWork *wk) {
 
 static void MBParent_UpdateResult(MBParentWork *wk) {
     switch (wk->resultSeq) {
-    case 0:
+    case MB_PARENT_RESULT_SEQ_WAIT_RESULT:
         if (MBComm_GetState(wk->comm) == 10 || MBComm_GetState(wk->comm) == 12) {
             MBUtilMsg_Print(wk->msg, 0x29, TextSpeed_GetCurrentWait());
             MBUtilMsg_ShowWindow(wk->msg, 1);
@@ -1279,19 +1347,19 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
 #endif
                 MBUtilMsg_ShowWindow(wk->msg, 1);
                 MBUtilMsg_FreeWordSet(wk->msg);
-                wk->resultSeq = 1;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_ASK_RECEIVE;
             } else {
-                wk->resultSeq = 19;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO;
             }
         }
         break;
-    case 1:
+    case MB_PARENT_RESULT_SEQ_ASK_RECEIVE:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
             MBUtilMsg_CreateConfirm(wk->msg, 1);
-            wk->resultSeq = 2;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_RECEIVE_ANSWER;
         }
         break;
-    case 2:
+    case MB_PARENT_RESULT_SEQ_RECEIVE_ANSWER:
         wk->answer = MBUtilMsg_UpdateConfirm(wk->msg);
         if (wk->answer == 1) {
             u16 count = MBComm_GetResultCount(wk->comm);
@@ -1300,16 +1368,16 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
             MBUtilMsg_ForgetConfirm(wk->msg);
             if (space < count) {
                 wk->boxFull = TRUE;
-                wk->resultSeq = 13;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
             } else {
                 wk->boxFull = FALSE;
-                wk->resultSeq = 3;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_MORE;
             }
         } else if (wk->answer == 2) {
-            wk->resultSeq = 13;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
         }
         break;
-    case 3:
+    case MB_PARENT_RESULT_SEQ_PRINT_MORE:
         if (MBComm_GetResultMoreCount(wk->comm) != 0) {
             u16 count = MBComm_GetResultCount(wk->comm);
 
@@ -1320,85 +1388,85 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
             MBUtilMsg_Print(wk->msg, 0x24, TextSpeed_GetCurrentWait());
             MBUtilMsg_ShowWindow(wk->msg, 1);
             MBUtilMsg_FreeWordSet(wk->msg);
-            wk->resultSeq = 4;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_MORE_MSG;
         } else {
-            wk->resultSeq = 5;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_FLAG1;
         }
         break;
-    case 4:
+    case MB_PARENT_RESULT_SEQ_WAIT_MORE_MSG:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            wk->resultSeq = 5;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_FLAG1;
         }
         break;
-    case 5:
+    case MB_PARENT_RESULT_SEQ_PRINT_FLAG1:
         if (MBComm_GetResultFlag1(wk->comm) == TRUE) {
             MBUtilMsg_ClearWindow(wk->msg);
             MBUtilMsg_SetWindow(wk->msg, 5);
             MBUtilMsg_Print(wk->msg, 0x1a, TextSpeed_GetCurrentWait());
-            wk->resultSeq = 6;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_ASK_FLAG1;
         } else {
-            wk->resultSeq = 13;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
         }
         break;
-    case 6:
+    case MB_PARENT_RESULT_SEQ_ASK_FLAG1:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
             MBUtilMsg_CreateConfirm(wk->msg, 1);
-            wk->resultSeq = 7;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_FLAG1_ANSWER;
         }
         break;
-    case 7: {
+    case MB_PARENT_RESULT_SEQ_FLAG1_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
         if (answer == 1) {
             if (MBComm_GetResultFlag2(wk->comm) == TRUE) {
                 MBUtilMsg_Print(wk->msg, 0x1b, TextSpeed_GetCurrentWait());
-                wk->resultSeq = 8;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_ASK_FLAG2;
             } else {
-                wk->resultSeq = 13;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
             }
         } else if (answer == 2) {
-            wk->resultSeq = 10;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_CONFIRM;
         }
         break;
     }
-    case 8:
+    case MB_PARENT_RESULT_SEQ_ASK_FLAG2:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
             MBUtilMsg_CreateConfirm(wk->msg, 1);
-            wk->resultSeq = 9;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_FLAG2_ANSWER;
         }
         break;
-    case 9: {
+    case MB_PARENT_RESULT_SEQ_FLAG2_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
         if (answer == 1) {
-            wk->resultSeq = 13;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
         } else if (answer == 2) {
-            wk->resultSeq = 10;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_CONFIRM;
         }
         break;
     }
-    case 10:
+    case MB_PARENT_RESULT_SEQ_PRINT_CONFIRM:
         MBUtilMsg_Print(wk->msg, 0x1c, TextSpeed_GetCurrentWait());
-        wk->resultSeq = 11;
+        wk->resultSeq = MB_PARENT_RESULT_SEQ_ASK_CONFIRM;
         break;
-    case 11:
+    case MB_PARENT_RESULT_SEQ_ASK_CONFIRM:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
             MBUtilMsg_CreateConfirm(wk->msg, 1);
-            wk->resultSeq = 12;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_CONFIRM_ANSWER;
         }
         break;
-    case 12: {
+    case MB_PARENT_RESULT_SEQ_CONFIRM_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
         if (answer == 1) {
             wk->answer = 2;
-            wk->resultSeq = 13;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ANSWER;
         } else if (answer == 2) {
-            wk->resultSeq = 5;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_FLAG1;
         }
         break;
     }
-    case 13: {
+    case MB_PARENT_RESULT_SEQ_SEND_ANSWER: {
         u32 reply;
 
         if (wk->answer == 1) {
@@ -1412,23 +1480,23 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
         }
         if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_ANSWER, reply) == TRUE) {
             if (reply == 0) {
-                wk->resultSeq = 14;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_RECEIVE_POKEMON;
                 MBUtilMsg_ClearWindow(wk->msg);
                 MBUtilMsg_SetWindow(wk->msg, 1);
                 MBUtilMsg_PrintAtOnce(wk->msg, 0x19);
                 MBUtilMsg_SetShowWaitIcon(wk->msg, 1);
             } else if (reply == 2) {
-                wk->resultSeq = 17;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_PRINT_BOX_FULL;
             } else {
-                wk->resultSeq = 19;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO;
             }
         }
         break;
     }
-    case 14:
+    case MB_PARENT_RESULT_SEQ_RECEIVE_POKEMON:
         if (MBComm_IsPokemonReceived(wk->comm) == TRUE) {
             MBParent_StorePokemon(wk);
-            wk->resultSeq = 15;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_ACK_POKEMON;
         }
         if (MBComm_HasMore(wk->comm) == TRUE) {
             u16 count = MBComm_GetResultCount(wk->comm);
@@ -1440,51 +1508,51 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
             MBUtilMsg_Print(wk->msg, 0x1e, TextSpeed_GetCurrentWait());
             MBUtilMsg_ShowWindow(wk->msg, 1);
             MBUtilMsg_FreeWordSet(wk->msg);
-            wk->resultSeq = 16;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_RECEIVED_MSG;
             wk->receivedMore = TRUE;
         }
         break;
-    case 15:
+    case MB_PARENT_RESULT_SEQ_ACK_POKEMON:
         if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_ACK, 0) == TRUE) {
             MBComm_ClearPokemon(wk->comm);
-            wk->resultSeq = 14;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_RECEIVE_POKEMON;
         }
         break;
-    case 16:
+    case MB_PARENT_RESULT_SEQ_WAIT_RECEIVED_MSG:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            wk->resultSeq = 19;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO;
         }
         break;
-    case 17:
+    case MB_PARENT_RESULT_SEQ_PRINT_BOX_FULL:
         MBUtilMsg_ClearWindow(wk->msg);
         MBUtilMsg_SetWindow(wk->msg, 5);
         MBUtilMsg_Print(wk->msg, 0x18, TextSpeed_GetCurrentWait());
-        wk->resultSeq = 18;
+        wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_BOX_FULL_MSG;
         break;
-    case 18:
+    case MB_PARENT_RESULT_SEQ_WAIT_BOX_FULL_MSG:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            wk->resultSeq = 19;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO;
         }
         break;
-    case 19:
+    case MB_PARENT_RESULT_SEQ_WAIT_ITEM_INFO:
         if (MBComm_HasItemInfo(wk->comm) == TRUE) {
             if (MBComm_HasItem(wk->comm) == TRUE) {
                 MBUtilMsg_ClearWindow(wk->msg);
                 MBUtilMsg_SetWindow(wk->msg, 5);
                 MBUtilMsg_Print(wk->msg, 0x1f, TextSpeed_GetCurrentWait());
-                wk->resultSeq = 20;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_ASK_ITEM;
             } else {
-                wk->resultSeq = 25;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_FINISH;
             }
         }
         break;
-    case 20:
+    case MB_PARENT_RESULT_SEQ_ASK_ITEM:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            wk->resultSeq = 21;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_ITEM_ANSWER;
             MBUtilMsg_CreateConfirm(wk->msg, 1);
         }
         break;
-    case 21: {
+    case MB_PARENT_RESULT_SEQ_ITEM_ANSWER: {
         int answer = MBUtilMsg_UpdateConfirm(wk->msg);
 
         if (answer == 1 || answer == 2) {
@@ -1495,24 +1563,24 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
 
             if (answer == 1 && isOneShotDRObtained(trainerCard, 0, playerInfo) == TRUE) {
                 wk->answer = 2;
-                wk->resultSeq = 22;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_OWNED_MSG;
                 MBUtilMsg_ClearWindow(wk->msg);
                 MBUtilMsg_SetWindow(wk->msg, 1);
                 MBUtilMsg_Print(wk->msg, 0x25, TextSpeed_GetCurrentWait());
                 MBUtilMsg_ShowWindow(wk->msg, 1);
             } else {
                 wk->answer = answer;
-                wk->resultSeq = 23;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ITEM_ANSWER;
             }
         }
         break;
     }
-    case 22:
+    case MB_PARENT_RESULT_SEQ_WAIT_ITEM_OWNED_MSG:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            wk->resultSeq = 23;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_SEND_ITEM_ANSWER;
         }
         break;
-    case 23: {
+    case MB_PARENT_RESULT_SEQ_SEND_ITEM_ANSWER: {
         BOOL accept = TRUE;
 
         if (wk->answer != 1) {
@@ -1531,19 +1599,19 @@ static void MBParent_UpdateResult(MBParentWork *wk) {
                 setOneShotDRObtained(trainerCard, 0, playerInfo);
                 BagSave_AddItem(bag, ITEM_LOCK_CAPSULE, 1, wk->heapId);
                 wk->receivedItem = TRUE;
-                wk->resultSeq = 24;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_WAIT_ITEM_MSG;
             } else {
-                wk->resultSeq = 25;
+                wk->resultSeq = MB_PARENT_RESULT_SEQ_FINISH;
             }
         }
         break;
     }
-    case 24:
+    case MB_PARENT_RESULT_SEQ_WAIT_ITEM_MSG:
         if (MBUtilMsg_IsPrintDone(wk->msg) == TRUE) {
-            wk->resultSeq = 25;
+            wk->resultSeq = MB_PARENT_RESULT_SEQ_FINISH;
         }
         break;
-    case 25:
+    case MB_PARENT_RESULT_SEQ_FINISH:
         if (wk->receivedMore == TRUE || wk->receivedItem == TRUE) {
             if (MBComm_SendCommand(wk->comm, MB_COMM_CMD_FINISH, 0) == TRUE) {
                 wk->state = MB_PARENT_STATE_WAIT_ACK;
