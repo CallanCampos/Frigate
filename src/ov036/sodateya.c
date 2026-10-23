@@ -51,9 +51,6 @@ static const DayCareStatParamTable sInheritedIVParams;
 static const DayCareStatParamTable sEggIVParams;
 static const DayCareMoveParamTable sEggMoveParams;
 
-#define PERSONAL_EGG_GROUP_1 24
-#define PERSONAL_EGG_GROUP_2 25
-
 // The day care's work area
 struct DayCare {
     HeapID heapId;
@@ -1069,13 +1066,13 @@ static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 it
     if (bit < 32) {
         flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1);
     } else if (bit < 64) {
-        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1 + 1);
+        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_2);
         bit -= 32;
     } else if (bit < 96) {
-        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1 + 2);
+        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_3);
         bit -= 64;
     } else {
-        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_1 + 3);
+        flags = PML_PersonalGetParam(personal, PERSONAL_MACHINES_4);
         bit -= 96;
     }
     PML_PersonalFree(personal);
