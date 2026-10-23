@@ -31,8 +31,8 @@ tools that show the differences.
   `dsprot_run_multi.c`'s four runners match only with the checksum helper inside an inline queue runner; without
   `-ipa file` they keep the 14 bytes of the loop's registers that `dsprot_run.c` has without it.
   `dsprot_detect_multi.c`'s two flashcart checks are the inline test, with their codes as its arguments. Written flat
-  they were 8 bytes larger, rebuilding the page's address in each of the three reads. Flat with `dsprot_detect.c`'s
-  reader under `-ipa file`, they had the original's size and 260 bytes of registers and slots off. An inline reached
+  they are 8 bytes larger, rebuilding the page's address in each of the three reads. Flat with `dsprot_detect.c`'s
+  reader under `-ipa file`, they have the original's size and 260 bytes of registers and slots off. An inline reached
   through another inline is emitted out of line without `-ipa file`. The four files match their functions, data and
   relocations in both versions with per-source `-ipa file`; other DS Protect sources keep their own settings. The
   loader-owned static constructor registrations need `__attribute__((used))` under this analysis because their
