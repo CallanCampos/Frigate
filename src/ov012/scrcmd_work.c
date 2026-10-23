@@ -105,11 +105,11 @@ void *getMapDisplayInfoPtr(FieldScriptEnv *env) {
     return env->subwork->mapDisplayInfo;
 }
 
-void SetSpecialMessageIconPtr(FieldScriptEnv *env, void *icon) {
+void SetSpecialMessageIconPtr(FieldScriptEnv *env, WaitIcon *icon) {
     env->subwork->specialMessageIcon = icon;
 }
 
-void *GetSpecialMessageIconPtr(FieldScriptEnv *env) {
+WaitIcon *GetSpecialMessageIconPtr(FieldScriptEnv *env) {
     return env->subwork->specialMessageIcon;
 }
 
@@ -161,11 +161,11 @@ void SetScrEnvNowPkmVoice(FieldScriptEnv *env, u32 voice) {
     env->subwork->nowPkmVoice = voice;
 }
 
-void *FieldScriptEnv_GetElevatorTable(FieldScriptEnv *env) {
+ElevatorFloor *FieldScriptEnv_GetElevatorTable(FieldScriptEnv *env) {
     return env->subwork->elevatorTable;
 }
 
-void FieldScriptEnv_SetElevatorTable(FieldScriptEnv *env, void *table) {
+void FieldScriptEnv_SetElevatorTable(FieldScriptEnv *env, ElevatorFloor *table) {
     env->subwork->elevatorTable = table;
 }
 

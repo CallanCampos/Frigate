@@ -209,16 +209,16 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
 
             switch (work->target) {
             case 0:
-                JoinAvenueInfo_SetParam(info, 0, (u32)str);
+                JoinAvenueInfo_SetParam(info, 0, (uptr)str);
                 break;
             case 1:
-                JoinAvenueInfo_SetParam(info, 1, (u32)str);
+                JoinAvenueInfo_SetParam(info, 1, (uptr)str);
                 break;
             case 2:
-                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
+                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (uptr)str);
                 break;
             case 3:
-                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE2, (u32)str);
+                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE2, (uptr)str);
                 break;
             }
         } else if (work->target == 0) {
@@ -231,7 +231,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, HEAPID_GAMEEVENT);
             GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
             GFL_MsgDataFree(msgData);
-            JoinAvenueInfo_SetParam(info, 0, (u32)name);
+            JoinAvenueInfo_SetParam(info, 0, (uptr)name);
         }
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);

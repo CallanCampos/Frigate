@@ -10,6 +10,16 @@
 
 #define WIFI_STATUS_MAC_SIZE 6
 
+// The game modes of a status (WIFI_STATUS_GetGameMode) that have a name. The eight battles follow
+// WIFIP2PMATCH_GAMEMODE_BATTLE, by battle mode and rule
+enum {
+    WIFIP2PMATCH_GAMEMODE_VCHAT = 4,
+    WIFIP2PMATCH_GAMEMODE_TVT,
+    WIFIP2PMATCH_GAMEMODE_TRADE,
+    WIFIP2PMATCH_GAMEMODE_BATTLE,
+};
+#define WIFIP2PMATCH_GAMEMODE_MAX 15
+
 typedef struct {
     // The GameSpy profile ID
     s32 profileId;

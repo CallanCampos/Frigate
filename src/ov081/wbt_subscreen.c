@@ -23,9 +23,11 @@
 // The most entries a table of resources can have before its 0xff terminator
 #define RES_MAX 4
 
-#define WINDOW_TOURNAMENT 0
-#define WINDOW_STYLE 1
-#define WINDOW_MAX 2
+enum {
+    WINDOW_TOURNAMENT,
+    WINDOW_STYLE,
+    WINDOW_MAX,
+};
 
 typedef void (*WbtSubscreenFunc)(WbtSubscreen *work);
 

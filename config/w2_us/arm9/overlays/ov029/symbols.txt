@@ -153,12 +153,12 @@ sSession kind:bss addr:0x021983e0
 data_ov029_021983b4 kind:bss addr:0x021983f4
 data_ov029_021983cc kind:bss addr:0x0219840c
 sPacketPool kind:bss addr:0x02198424
-sNoiseFloor kind:bss addr:0x0219842c
+sNoiseThreshold kind:bss addr:0x0219842c
 E2scales kind:bss addr:0x02198438
 sEcho kind:bss addr:0x02198448
-sEchoCoefficients kind:bss addr:0x0219845c
-sEchoTaps kind:bss addr:0x02198474
-sFarEnd kind:bss addr:0x0219848c
-sEchoHistory kind:bss addr:0x021988cc
+sH kind:bss addr:0x0219845c
+sTap kind:bss addr:0x02198474
+sSpkBuffer kind:bss addr:0x0219848c
+sDelayLine kind:bss addr:0x021988cc
 sLibrary kind:bss addr:0x021998cc
 vct kind:bss addr:0x021998d8

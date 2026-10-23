@@ -22,7 +22,7 @@ WbtSystem *WbtCmd_GetSystem(FieldScriptEnv *env) {
 
 // Counts a win of the tournament in the save
 static void WbtCmd_IncrementWinCount(WbtSystem *sys, FieldScriptEnv *env) {
-    void *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
+    WbtSave *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     int record = WbtTournament_GetRecord(WbtSystem_GetTournament(sys), WbtSystem_GetType(sys));
 
     if (record < 29) {
@@ -34,7 +34,7 @@ static void WbtCmd_IncrementWinCount(WbtSystem *sys, FieldScriptEnv *env) {
 // Tournament with type 17. It stops at 9999
 static u16 WbtCmd_CountWins(FieldScriptEnv *env, int tournament, u8 type) {
     u32 total = 0;
-    void *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
+    WbtSave *save = GameData_GetWbtSave(FieldScriptEnv_GetGameData(env));
     u32 start;
     u32 end;
     u32 i;

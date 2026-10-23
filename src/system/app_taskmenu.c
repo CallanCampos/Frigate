@@ -34,15 +34,17 @@
 
 // The frame's tiles: the corners and edges, then three tiles for the icon of each item type from 1
 #define FRAME_TILE_SIZE 0x20
-#define FRAME_TILE_TOP_LEFT 0
-#define FRAME_TILE_TOP 1
-#define FRAME_TILE_TOP_RIGHT 2
-#define FRAME_TILE_LEFT 3
-#define FRAME_TILE_CENTER 4
-#define FRAME_TILE_RIGHT 5
-#define FRAME_TILE_BOTTOM_LEFT 6
-#define FRAME_TILE_BOTTOM 7
-#define FRAME_TILE_BOTTOM_RIGHT 8
+enum {
+    FRAME_TILE_TOP_LEFT,
+    FRAME_TILE_TOP,
+    FRAME_TILE_TOP_RIGHT,
+    FRAME_TILE_LEFT,
+    FRAME_TILE_CENTER,
+    FRAME_TILE_RIGHT,
+    FRAME_TILE_BOTTOM_LEFT,
+    FRAME_TILE_BOTTOM,
+    FRAME_TILE_BOTTOM_RIGHT,
+};
 #define FRAME_TILE_ICON(type) (((type) - 1) * 3 + 9)
 
 // The color of a button's palette that pulses

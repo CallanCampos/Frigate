@@ -80,8 +80,8 @@ data_ov062_021e6908 kind:data(any) addr:0x021e6908
 data_ov062_021e6935 kind:data(any) addr:0x021e6935 ambiguous
 POKEWOOD_SCRIPT_COMMANDS kind:data(any) addr:0x021e6944 ambiguous
 data_ov062_021e69b4 kind:data(any) addr:0x021e69b4
-data_ov062_021e69e0 kind:data(any) addr:0x021e69e0
-data_ov062_021e6a40 kind:data(any) addr:0x021e6a40
-data_ov062_021e6a4c kind:data(any) addr:0x021e6a4c
+sSeries kind:data(any) addr:0x021e69e0
+sAmounts kind:data(any) addr:0x021e6a40
+sFameChanges kind:data(any) addr:0x021e6a4c
 data_ov062_021e6a58 kind:data(any) addr:0x021e6a58
 data_ov062_021e6a6c kind:data(any) addr:0x021e6a6c

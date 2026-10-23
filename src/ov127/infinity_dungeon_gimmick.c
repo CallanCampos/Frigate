@@ -35,9 +35,11 @@
 
 // The objects that the models of the scene give: the doors by their index, then the pair that the machine shows one
 // of, and the lift
-#define OBJECT_MACHINE_A 1
-#define OBJECT_MACHINE_B 2
-#define OBJECT_LIFT 3
+enum {
+    OBJECT_MACHINE_A = 1,
+    OBJECT_MACHINE_B,
+    OBJECT_LIFT,
+};
 
 // The archive of the models
 #define ARC_INFINITY_DUNGEON 0x104

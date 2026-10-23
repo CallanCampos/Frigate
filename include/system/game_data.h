@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "gfl/heap.h"
+#include "save/high_link.h"
 #include "struct_decls.h"
 
 // The city of the player's version, which a key from Unova Link can switch
@@ -57,7 +58,7 @@ CityState *GameData_GetMyCityState(GameData *gameData);
 // Adds seconds to the play time
 void GameData_UpdateTime(GameData *gameData, u32 seconds);
 // The levels that unlock the pass powers, which PassPowerLevel_GetWhite and PassPowerLevel_GetBlack read
-void *GameData_GetMyPassPowerLevels(GameData *gameData);
+PassPowerLevel *GameData_GetMyPassPowerLevels(GameData *gameData);
 u16 GameData_GetMyCity(GameData *gameData);
 // The C-Gear power request, which GameData_SaveCGearPowerRequest puts aside
 u8 GameData_GetCGearPowerRequest(GameData *gameData);
@@ -151,7 +152,7 @@ u8 GameData_GetPlayerCount(GameData *gameData);
 // The net ID of the player whose beacon is shown
 u8 GameData_GetBeaconNetID(GameData *gameData);
 // The player's Entralink levels, as GameData_GetMyPassPowerLevels returns for the player's own
-void *GameData_GetPassPowerLevels(GameData *gameData, u32 netId);
+PassPowerLevel *GameData_GetPassPowerLevels(GameData *gameData, u32 netId);
 void GameData_SetPlayerCount(GameData *gameData, u32 a1);
 void GameData_SetNetID(GameData *gameData, u32 a1);
 void GameData_SetBeaconNetID(GameData *gameData, u32 a1);
@@ -165,7 +166,7 @@ PokewoodSystem **GameData_GetPokewoodSystemPtr(GameData *gameData);
 // Where the Pokémon World Tournament keeps its WbtSystem while the player is at the tournament
 WbtSystem **GameData_GetWbtSystemPtr(GameData *gameData);
 // The Pokémon World Tournament's save data
-void *GameData_GetWbtSave(GameData *gameData);
+WbtSave *GameData_GetWbtSave(GameData *gameData);
 // The save's play time
 PlayTime *GameData_GetPlayTime(GameData *gameData);
 void GameData_SetJoinAvenueSeason(GameData *gameData, u8 a1);

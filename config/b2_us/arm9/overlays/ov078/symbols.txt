@@ -17,8 +17,8 @@ Tint_InitFadeOut kind:function(thumb,size=0xe) addr:0x021e9388
 Tint_FadeOut kind:function(thumb,size=0x4c) addr:0x021e9398
 Tint_Exit kind:function(thumb,size=0x16) addr:0x021e93e4
 Tint_ObjFunc kind:function(thumb,size=0x2) addr:0x021e93fc
-data_ov078_021e9400 kind:data(any) addr:0x021e9400
-data_ov078_021e9424 kind:data(any) addr:0x021e9424
+sLevels kind:data(any) addr:0x021e9400
+sColors kind:data(any) addr:0x021e9424
 TINT_WEATHER_14 kind:data(any) addr:0x021e94c0
 TINT_WEATHER_10 kind:data(any) addr:0x021e950c
 data_ov078_021e9520 kind:data(any) addr:0x021e9520 ambiguous

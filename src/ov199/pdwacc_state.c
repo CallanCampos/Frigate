@@ -24,11 +24,6 @@
 #include "system/game_data.h"
 #include "system/wipe.h"
 
-// Errors of the account screens' own, beside the server's
-#define PDWACC_ERROR_SERVICE_UNAVAILABLE 0xfff1
-#define PDWACC_ERROR_BAD_GATEWAY 0xfff2
-#define PDWACC_ERROR_HTTP 0xfff3
-
 // The request that creates the account, sending the save data
 #define PDWACC_REQUEST_CREATE 9
 
@@ -92,16 +87,16 @@ const GameProcFunctions PDWACC_PROC_FUNCTIONS = {
 static BOOL PdwAcc_CheckHttpStatus(PdwAccWork *wk, int status) {
     switch (status) {
     case 503:
-        wk->error = PDWACC_ERROR_SERVICE_UNAVAILABLE;
+        wk->error = GSYNC_ERROR_SERVICE_UNAVAILABLE;
         PdwAcc_ChangeState(wk, PdwAcc_StateError, 153);
         return TRUE;
     case 502:
-        wk->error = PDWACC_ERROR_BAD_GATEWAY;
+        wk->error = GSYNC_ERROR_BAD_GATEWAY;
         PdwAcc_ChangeState(wk, PdwAcc_StateError, 157);
         return TRUE;
     default:
         if (status >= 400) {
-            wk->error = PDWACC_ERROR_HTTP;
+            wk->error = GSYNC_ERROR_HTTP;
             PdwAcc_ChangeState(wk, PdwAcc_StateError, 163);
             return TRUE;
         }
@@ -194,11 +189,11 @@ static void PdwAcc_StateError(PdwAccWork *wk) {
     if (wk->http != NULL) {
         NHttpRap_EndRequest(wk->http);
     }
-    if (wk->error == PDWACC_ERROR_SERVICE_UNAVAILABLE) {
+    if (wk->error == GSYNC_ERROR_SERVICE_UNAVAILABLE) {
         msgId = 22;
-    } else if (wk->error == PDWACC_ERROR_BAD_GATEWAY) {
+    } else if (wk->error == GSYNC_ERROR_BAD_GATEWAY) {
         msgId = 23;
-    } else if (wk->error == PDWACC_ERROR_HTTP) {
+    } else if (wk->error == GSYNC_ERROR_HTTP) {
         msgId = 20;
     } else if (wk->error >= 11) {
         msgId = 20;

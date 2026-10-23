@@ -25,7 +25,7 @@ data_ov136_021eefe0 kind:data(any) addr:0x021eefe0
 data_ov136_021eefe1 kind:data(any) addr:0x021eefe1 ambiguous
 data_ov136_021eeff0 kind:data(any) addr:0x021eeff0
 data_ov136_021ef000 kind:data(any) addr:0x021ef000
-data_ov136_021ef010 kind:data(any) addr:0x021ef010
+sPosterTexNames kind:data(any) addr:0x021ef010
 data_ov136_021ef011 kind:data(any) addr:0x021ef011 ambiguous
-data_ov136_021ef020 kind:data(any) addr:0x021ef020
+sPosterPlttNames kind:data(any) addr:0x021ef020
 sTileWidth kind:data(any) addr:0x021eef5c

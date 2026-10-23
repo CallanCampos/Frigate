@@ -12,9 +12,11 @@
 // back, and the places of its props, which the sprite's marker cells give as it is drawn
 
 // The marker cells: two of kinds 4 and 5, and one for each prop position from kind 7
-#define MUS_POKE_DRAW_CELL_MARK4 4
-#define MUS_POKE_DRAW_CELL_MARK5 5
-#define MUS_POKE_DRAW_CELL_EQUIP 7
+enum {
+    MUS_POKE_DRAW_CELL_MARK4 = 4,
+    MUS_POKE_DRAW_CELL_MARK5,
+    MUS_POKE_DRAW_CELL_EQUIP = 7,
+};
 
 static void MusPokeDraw_CellCallback(u32 kind, MusicalMcssCellInfo *info, void *work);
 static void MusPokeDraw_GetLoadInfo(MusicalPoke *musPoke, MCSSLoadInfo *info, BOOL back);

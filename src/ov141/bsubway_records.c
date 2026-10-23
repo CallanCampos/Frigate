@@ -76,14 +76,18 @@ enum {
 };
 
 // The pages' arrows
-#define PAGE_PREV 0
-#define PAGE_NEXT 1
+enum {
+    PAGE_PREV,
+    PAGE_NEXT,
+};
 
 // What the touch and key input gives besides the cursor's choices
-#define INPUT_PREV_PAGE 0
-#define INPUT_NEXT_PAGE 1
-#define INPUT_BACK 2
-#define INPUT_NONE (-1)
+enum {
+    INPUT_PREV_PAGE,
+    INPUT_NEXT_PAGE,
+    INPUT_BACK,
+    INPUT_NONE = -1,
+};
 
 typedef struct {
     u32 bg;

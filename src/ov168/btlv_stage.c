@@ -32,7 +32,7 @@ typedef struct {
 
 // The stage's work, 0xc4 bytes
 struct BtlvStage {
-    void *models[2];         // 0x00  the grounds' model resources, with their textures
+    G3DResource *models[2];  // 0x00  the grounds' model resources, with their textures
     u16 anmCount;            // 0x08
     u16 anmResCount;         // 0x0a  how many of anmResources were allocated
     BtlvStageAnm *anms[2];   // 0x0c

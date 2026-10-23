@@ -11,9 +11,6 @@
 #include "nitro/fx.h"
 #include "struct_decls.h"
 
-// The UID of the player's actor
-#define ACTOR_UID_PLAYER 0xff
-
 // The functions of an actor's kind of scene node, by its config's sceneNodeType: onDelete when the actor is deleted
 // or its model is changed, suspend and wakeUp around a suspension of the system
 typedef struct {
@@ -137,7 +134,7 @@ struct MMSys {
     NoGridMapper *noGridMapper;
     Field *field;
     u16 *cameraAngle;
-    void *colorPostFx;
+    FieldColorPostFX *colorPostFx;
     // The count of cached configs and their object codes, then the configs, from the word after the even count of codes
     u16 *actorConfigCache;
 };

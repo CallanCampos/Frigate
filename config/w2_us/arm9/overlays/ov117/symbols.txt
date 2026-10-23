@@ -53,12 +53,12 @@ GimmickPlasmaFrigate_SetSavedVar kind:function(thumb,size=0x6) addr:0x021efd10
 GimmickPlasmaFrigate_GetSavedVar kind:function(thumb,size=0x6) addr:0x021efd18
 GimmickPlasmaFrigate_SetSaved kind:function(thumb,size=0x6) addr:0x021efd20
 GimmickPlasmaFrigate_GetSaved kind:function(thumb,size=0x4) addr:0x021efd28
-data_ov117_021efd00 kind:data(any) addr:0x021efd2c
-data_ov117_021efd08 kind:data(any) addr:0x021efd34
-data_ov117_021efd10 kind:data(any) addr:0x021efd3c
-data_ov117_021efd18 kind:data(any) addr:0x021efd44
-data_ov117_021efd24 kind:data(any) addr:0x021efd50
-data_ov117_021efd30 kind:data(any) addr:0x021efd5c
+sGroupAAnimations kind:data(any) addr:0x021efd2c
+sSwitchAnimations kind:data(any) addr:0x021efd34
+sAreaValues kind:data(any) addr:0x021efd3c
+sPanelAnimations kind:data(any) addr:0x021efd44
+sEffectBAnimations kind:data(any) addr:0x021efd50
+sEffectAAnimations kind:data(any) addr:0x021efd5c
 data_ov117_021efd3c kind:data(any) addr:0x021efd68
 data_ov117_021efd4c kind:data(any) addr:0x021efd78
 data_ov117_021efd5c kind:data(any) addr:0x021efd88
@@ -67,19 +67,19 @@ data_ov117_021efd8c kind:data(any) addr:0x021efdb8
 data_ov117_021efdbc kind:data(any) addr:0x021efde8
 data_ov117_021efdec kind:data(any) addr:0x021efe18
 data_ov117_021efe40_w2_us kind:data(any) addr:0x021efe40 ambiguous
-data_ov117_021efe1c kind:data(any) addr:0x021efe48
-data_ov117_021efe5c kind:data(any) addr:0x021efe88
+sAreasOn kind:data(any) addr:0x021efe48
+sAreasOff kind:data(any) addr:0x021efe88
 data_ov117_021efe5d kind:data(any) addr:0x021efe89
 data_ov117_021efe5e kind:data(any) addr:0x021efe8a
 data_ov117_021efe5f kind:data(any) addr:0x021efe8b
-data_ov117_021efe9c kind:data(any) addr:0x021efec8
+sPanelPairs kind:data(any) addr:0x021efec8
 data_ov117_021efea0 kind:data(any) addr:0x021efecc
 data_ov117_021eff0c kind:data(any) addr:0x021eff38
 data_ov117_021f0001_w2_us kind:data(any) addr:0x021f0001 ambiguous
-data_ov117_021effe4 kind:data(any) addr:0x021f0010
+sPanelPlacements kind:data(any) addr:0x021f0010
 data_ov117_021f0086_w2_us kind:data(any) addr:0x021f0086 ambiguous
 data_ov117_021f0105_w2_us kind:data(any) addr:0x021f0105 ambiguous
-data_ov117_021f00e4 kind:data(any) addr:0x021f0110
+sIndicatorPlacements kind:data(any) addr:0x021f0110
 data_ov117_021f021e_w2_us kind:data(any) addr:0x021f021e ambiguous
 data_ov117_021f0204 kind:data(any) addr:0x021f0230
-data_ov117_021f0580 kind:data(any) addr:0x021f05a0
+sPanelIndicators kind:data(any) addr:0x021f05a0

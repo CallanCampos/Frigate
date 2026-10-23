@@ -12,7 +12,6 @@
 // random matches and the Wi-Fi competition (rndmatch_savedata.c), and the mark of a match in progress. The ROM has no
 // string for the file, so the name is a guess. Block 0x3b.
 
-#define SAVE_BLOCK_RECORD 0x3b
 // A match in progress is over after an hour
 #define MATCH_TIMEOUT_SECONDS (60 * 60)
 

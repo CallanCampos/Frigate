@@ -5,12 +5,12 @@ GimmickNuvema_PlayModel kind:function(thumb,size=0x60) addr:0x021eee5c
 GimmickNuvema_CreateWaitEvent kind:function(thumb,size=0x14) addr:0x021eeebc
 GimmickNuvema_WaitEvent kind:function(thumb,size=0x1e) addr:0x021eeed0
 data_ov133_021eeeb0 kind:data(any) addr:0x021eeef0
-data_ov133_021eeeb8 kind:data(any) addr:0x021eeef8
+sDaySceneSetup kind:data(any) addr:0x021eeef8
 data_ov133_021eeec0 kind:data(any) addr:0x021eef00 ambiguous
 data_ov133_021eeec8 kind:data(any) addr:0x021eef08
 data_ov133_021eeec9 kind:data(any) addr:0x021eef09 ambiguous
-data_ov133_021eeed8 kind:data(any) addr:0x021eef18
-data_ov133_021eeee8 kind:data(any) addr:0x021eef28
-data_ov133_021eef0c kind:data(any) addr:0x021eef4c
+sNightSceneSetup kind:data(any) addr:0x021eef18
+sDayResources kind:data(any) addr:0x021eef28
+sNightResources kind:data(any) addr:0x021eef4c
 data_ov133_021eef29 kind:data(any) addr:0x021eef69 ambiguous
 data_ov133_021eef30 kind:data(any) addr:0x021eef70

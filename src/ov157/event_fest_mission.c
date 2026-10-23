@@ -54,11 +54,11 @@ typedef struct {
     void *window;
     u8 unk1C[8];
     MMSys *actorSystem;
-    void *fesGimmick;
+    FesGimmick *fesGimmick;
     u8 unk2C[8];
     MsgData *msgData;
     WordSet *wordSet;
-    void *passPowerData;
+    PassPowerData *passPowerData;
     u32 unk40;
     LinkFestival *festival;
     // Copied from a FestMissionConfig, the same 0x2c bytes: FestMissionConfig and FestMission are two layouts of one
@@ -233,7 +233,7 @@ static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state,
 static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 *state, void *data) {
     FestMissionEventWork *work = data;
     SaveControl *save;
-    void *records;
+    FunfestSave *records;
     MedalBox *medalBox;
     u16 joinedCount;
     u16 hostedCount;

@@ -8,7 +8,6 @@
 // movie's best result and the last series filmed. The ROM has no string for the file, so the name is a guess; the
 // movie that is loaded is pokewood_rec.c's. Block 0x47.
 
-#define SAVE_BLOCK_POKEWOOD 0x47
 #define POKEWOOD_SCORE_NONE (-9999)
 #define POKEWOOD_LEVEL_POINTS_MAX 99
 

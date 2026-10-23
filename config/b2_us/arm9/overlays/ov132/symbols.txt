@@ -10,15 +10,15 @@ GimmickDT9_CreateWaitThrownDoneEvent kind:function(thumb,size=0x1c) addr:0x021ef
 GimmickDT9_ThrowEvent kind:function(thumb,size=0xb2) addr:0x021ef0b8
 GimmickDT9_PastFifthFrameEvent kind:function(thumb,size=0x2a) addr:0x021ef16c
 GimmickDT9_ThrownDoneEvent kind:function(thumb,size=0x2a) addr:0x021ef198
-data_ov132_021ef1c4 kind:data(any) addr:0x021ef1c4
-data_ov132_021ef1d0 kind:data(any) addr:0x021ef1d0
-data_ov132_021ef1e0 kind:data(any) addr:0x021ef1e0
-data_ov132_021ef1f0 kind:data(any) addr:0x021ef1f0
+sThrownAnimations kind:data(any) addr:0x021ef1c4
+sReleaseAnimations kind:data(any) addr:0x021ef1d0
+sSceneSetupBlack2 kind:data(any) addr:0x021ef1e0
+sSceneSetupWhite2 kind:data(any) addr:0x021ef1f0
 data_ov132_021ef200 kind:data(any) addr:0x021ef200
 data_ov132_021ef211 kind:data(any) addr:0x021ef211 ambiguous
-data_ov132_021ef220 kind:data(any) addr:0x021ef220
+sResourcesWhite2 kind:data(any) addr:0x021ef220
 data_ov132_021ef231 kind:data(any) addr:0x021ef231 ambiguous
 data_ov132_021ef289 kind:data(any) addr:0x021ef289 ambiguous
-data_ov132_021ef28c kind:data(any) addr:0x021ef28c
+sResourcesBlack2 kind:data(any) addr:0x021ef28c
 data_ov132_021ef29d kind:data(any) addr:0x021ef29d ambiguous
 data_ov132_021ef2e1 kind:data(any) addr:0x021ef2e1 ambiguous

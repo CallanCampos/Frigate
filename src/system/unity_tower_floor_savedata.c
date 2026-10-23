@@ -7,8 +7,6 @@
 // while the game runs. The ROM has no string for the file, so the name is descriptive; unity_tower_savedata.c is the
 // tower's survey. Block 0x3e.
 
-#define SAVE_BLOCK_UNITY_TOWER_FLOOR 0x3e
-
 u32 UnityTowerSave_GetBlockSize(void) {
     return UNITY_TOWER_FLOOR_BLOCK_SIZE;
 }

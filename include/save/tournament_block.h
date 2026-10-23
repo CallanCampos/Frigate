@@ -85,7 +85,7 @@ u16 CRC16_350bytes(const void *entry);
 // An entry of the block
 void *TournamentBlock_GetEntry(TournamentBlock *block, u32 index);
 // Copies an entry into the block
-void TournamentBlock_SetEntry(TournamentBlock *block, u32 index, const void *entry);
+void TournamentBlock_SetEntry(TournamentBlock *block, u32 index, const TournamentEntry *entry);
 // Clears a team's record
 void TournamentTeam_Clear(void *record);
 // The block's other entries, of 0x1e bytes

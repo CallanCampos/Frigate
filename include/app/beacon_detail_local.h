@@ -51,13 +51,6 @@ enum {
     BEACON_DETAIL_ACTOR_COUNT,
 };
 
-// The touch bar's icons
-enum {
-    BEACON_DETAIL_ICON_RETURN = 1,
-    BEACON_DETAIL_ICON_NEXT = 2,
-    BEACON_DETAIL_ICON_PREV = 3,
-};
-
 // The sequences of the screen's main function
 enum {
     BEACON_DETAIL_SEQ_INIT,

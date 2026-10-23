@@ -89,7 +89,7 @@ static void ActivateHiddenHollowMission(HollowEventWork *work);
 static u32 GetHiddenHollowMissionLevel(u32 hollow);
 
 BOOL s0294_HiddenHollowGetParam(VM *vm, FieldScriptEnv *env) {
-    void *gimmick;
+    FesGimmick *gimmick;
     Field *field;
     u8 slot;
     RivalDataSave *rival;
@@ -192,7 +192,7 @@ BOOL s0295_HiddenHollowReset(VM *vm, FieldScriptEnv *env) {
     RivalDataSave *rival;
     u32 hollow;
     BOOL mission;
-    void *gimmick;
+    FesGimmick *gimmick;
 
     gameData = FieldScriptEnv_GetGameData(env);
     field = GSYS_GetField(FieldScriptEnv_GetGameSystem(env));
@@ -275,7 +275,7 @@ static void CreateHiddenHollowWarpPosVec(VecFx32 *pos, u32 x, u32 y, u32 z) {
 
 static void SetupHiddenHollowEvents(HollowEventWork *work) {
     u32 type = getTypeOfFilledSlot(work->rival, work->hollow);
-    void *gimmick = Field_GetFesGimmick(work->field);
+    FesGimmick *gimmick = Field_GetFesGimmick(work->field);
 
     if (!hollowFesMissions(gimmick, work->hollow)) {
         switch (type) {
@@ -426,14 +426,14 @@ BOOL s02E5_HiddenHollowSet(VM *vm, FieldScriptEnv *env) {
 }
 
 static void CreateMissionHiddenHollowPokemonActor(HollowEventWork *work) {
-    void *gimmick = Field_GetFesGimmick(work->field);
+    FesGimmick *gimmick = Field_GetFesGimmick(work->field);
     RivalEntry *entry = RivalSelect_GetEntry(gimmick, work->hollow);
 
     CreateHiddenHollowPokemonActor(work->actors, entry->unk4, entry->unk1, entry->unk6, 1, 0x15);
 }
 
 static void ActivateHiddenHollowMission(HollowEventWork *work) {
-    void *gimmick;
+    FesGimmick *gimmick;
 
     getTypeOfFilledSlot(work->rival, work->hollow);
     gimmick = Field_GetFesGimmick(work->field);

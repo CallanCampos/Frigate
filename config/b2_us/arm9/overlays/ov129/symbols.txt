@@ -38,28 +38,28 @@ SpPokeEvent_WaitFrame kind:function(thumb,size=0x4a) addr:0x021efae8
 SpPokeEvent_WaitAnimEnd kind:function(thumb,size=0x44) addr:0x021efb34
 SpPokeEvent_CreateAppear kind:function(thumb,size=0xa0) addr:0x021efb78
 SpPokeEvent_AppearMain kind:function(thumb,size=0xb4) addr:0x021efc18
-data_ov129_021efccc kind:data(any) addr:0x021efccc
-data_ov129_021efcd4 kind:data(any) addr:0x021efcd4
-data_ov129_021efcdc kind:data(any) addr:0x021efcdc
-data_ov129_021efce8 kind:data(any) addr:0x021efce8
-data_ov129_021efcf4 kind:data(any) addr:0x021efcf4
-data_ov129_021efd00 kind:data(any) addr:0x021efd00
-data_ov129_021efd10 kind:data(any) addr:0x021efd10
-data_ov129_021efd20 kind:data(any) addr:0x021efd20
-data_ov129_021efd30 kind:data(any) addr:0x021efd30
-data_ov129_021efd40 kind:data(any) addr:0x021efd40
-data_ov129_021efd58 kind:data(any) addr:0x021efd58
-data_ov129_021efd74 kind:data(any) addr:0x021efd74
-data_ov129_021efd94 kind:data(any) addr:0x021efd94
-data_ov129_021efdc4 kind:data(any) addr:0x021efdc4
+sActor2AnimsB kind:data(any) addr:0x021efccc
+sActor2AnimsD kind:data(any) addr:0x021efcd4
+sActor1Anims kind:data(any) addr:0x021efcdc
+sActor2AnimsC kind:data(any) addr:0x021efce8
+sActor0Anims kind:data(any) addr:0x021efcf4
+sSceneD kind:data(any) addr:0x021efd00
+sSceneB kind:data(any) addr:0x021efd10
+sSceneC kind:data(any) addr:0x021efd20
+sSceneA kind:data(any) addr:0x021efd30
+sActorAnimCounts kind:data(any) addr:0x021efd40
+sSwordAnims kind:data(any) addr:0x021efd58
+sActorsA kind:data(any) addr:0x021efd74
+sActorsB kind:data(any) addr:0x021efd94
+sActorsC kind:data(any) addr:0x021efdc4
 data_ov129_021efdf4 kind:data(any) addr:0x021efdf4
 data_ov129_021efe00 kind:data(any) addr:0x021efe00 ambiguous
-data_ov129_021efe3c kind:data(any) addr:0x021efe3c
-data_ov129_021efe9c kind:data(any) addr:0x021efe9c
-data_ov129_021efefc kind:data(any) addr:0x021efefc
-data_ov129_021eff80 kind:data(any) addr:0x021eff80
+sResourcesA kind:data(any) addr:0x021efe3c
+sActorsD kind:data(any) addr:0x021efe9c
+sResourcesB kind:data(any) addr:0x021efefc
+sResourcesC kind:data(any) addr:0x021eff80
 data_ov129_021f0001 kind:data(any) addr:0x021f0001 ambiguous
-data_ov129_021f0010 kind:data(any) addr:0x021f0010
+sResourcesD kind:data(any) addr:0x021f0010
 data_ov129_021f0086 kind:data(any) addr:0x021f0086 ambiguous
 data_ov129_021f0105 kind:data(any) addr:0x021f0105 ambiguous
 data_ov129_021f0120 kind:data(any) addr:0x021f0120

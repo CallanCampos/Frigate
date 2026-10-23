@@ -240,7 +240,7 @@ BOOL s01DE_PassPowerPopDepletedID(VM *vm, FieldScriptEnv *env) {
 
     *depletedId = PassPower_GetDepletedID();
     if (*depletedId != PASS_POWER_NONE) {
-        void *data = PassPowerData_Create(HEAPID_TAIL(HEAPID_FIELDMAP));
+        PassPowerData *data = PassPowerData_Create(HEAPID_TAIL(HEAPID_FIELDMAP));
 
         PassPower_Deactivate(*depletedId, data);
         PassPowerData_Free(data);

@@ -1,4 +1,5 @@
 #include "types.h"
+#include "app/ui/print_msg.h"
 #include "battle/b_scenario_graphic.h"
 #include "battle/b_scenario_main.h"
 #include "battle/btlv_effect.h"
@@ -50,7 +51,6 @@
 #define TEXT_COLOR_LABEL 0x3c40
 #define TEXT_COLOR_MALE 0x18a0
 #define TEXT_COLOR_FEMALE 0x1060
-#define ALIGN_CENTER 2
 
 // The lines of a script page, and the most a script has
 #define SCRIPT_PAGE_LINES 2
@@ -718,12 +718,12 @@ static void BScenarioMain_PrintSummary(BScenarioWork *work, BOOL update) {
     }
     BScenarioMain_PrintLabels(work, PAGE_SUMMARY);
     for (i = 0; i < 3; i++) {
-        u32 align = 0;
+        u32 align = PRINT_ALIGN_LEFT;
         int x = 0;
         StrBuf *str;
 
         if (i == 0) {
-            align = ALIGN_CENTER;
+            align = PRINT_ALIGN_CENTER;
             x = TEXT_X_CENTER;
         }
         str = GFL_MsgDataLoadStrbufNew(work->msgData[0], scenario + sBScenarioSummaryMessages[i]);
@@ -989,29 +989,29 @@ static void BScenarioMain_PrintScript(BScenarioWork *work, BOOL update) {
     if (!update) {
         BScenarioMain_PrintLabels(work, PAGE_SCRIPT);
         str = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[CAST_MSG_SLASH]);
-        BScenarioGraphic_Print(work, sBScenarioScriptWindowIndices[SCRIPT_WINDOW_SLASH], 0, 0, str, 0, TEXT_COLOR, TRUE,
-                               FALSE);
+        BScenarioGraphic_Print(work, sBScenarioScriptWindowIndices[SCRIPT_WINDOW_SLASH], 0, 0, str, PRINT_ALIGN_LEFT,
+                               TEXT_COLOR, TRUE, FALSE);
         GFL_StrBufFree(str);
         work->flags |= BSCENARIO_FLAG_PAGE;
     }
     str = GFL_MsgDataLoadStrbufNew(work->msgData[1],
                                    work->scriptPage * SCRIPT_PAGE_LINES + sBScenarioScriptMessages[SCRIPT_MSG_SCENES]);
-    BScenarioGraphic_Print(work, 1, 0, 0, str, 0, TEXT_COLOR, FALSE, FALSE);
+    BScenarioGraphic_Print(work, 1, 0, 0, str, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(str);
     str = GFL_MsgDataLoadStrbufNew(work->msgData[1],
                                    work->scriptPage * SCRIPT_PAGE_LINES + sBScenarioScriptMessages[SCRIPT_MSG_ORDERS]);
-    BScenarioGraphic_Print(work, sBScenarioScriptWindowIndices[SCRIPT_WINDOW_ORDERS], 0, 0, str, 0, TEXT_COLOR, FALSE,
-                           FALSE);
+    BScenarioGraphic_Print(work, sBScenarioScriptWindowIndices[SCRIPT_WINDOW_ORDERS], 0, 0, str, PRINT_ALIGN_LEFT,
+                           TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(str);
     if (work->scriptPage * SCRIPT_PAGE_LINES + 1 < work->scriptLines) {
         str = GFL_MsgDataLoadStrbufNew(work->msgData[1], work->scriptPage * SCRIPT_PAGE_LINES +
                                                              sBScenarioScriptMessages[SCRIPT_MSG_SCENES] + 1);
-        BScenarioGraphic_Print(work, 2, 0, 0, str, 0, TEXT_COLOR, FALSE, FALSE);
+        BScenarioGraphic_Print(work, 2, 0, 0, str, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
         GFL_StrBufFree(str);
         str = GFL_MsgDataLoadStrbufNew(work->msgData[1], work->scriptPage * SCRIPT_PAGE_LINES +
                                                              sBScenarioScriptMessages[SCRIPT_MSG_ORDERS] + 1);
-        BScenarioGraphic_Print(work, sBScenarioScriptWindowIndices[SCRIPT_WINDOW_ORDERS] + 1, 0, 0, str, 0, TEXT_COLOR,
-                               FALSE, FALSE);
+        BScenarioGraphic_Print(work, sBScenarioScriptWindowIndices[SCRIPT_WINDOW_ORDERS] + 1, 0, 0, str,
+                               PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
         GFL_StrBufFree(str);
     } else {
         BScenarioGraphic_ClearWindow(work, 2);
@@ -1024,8 +1024,8 @@ static void BScenarioMain_PrintScript(BScenarioWork *work, BOOL update) {
     } else {
         BScenarioGraphic_SetMarker(work, 0, 0, FALSE);
     }
-    BScenarioGraphic_PrintNumber(work, 6, 0, 0, work->scriptPage + 1, 2, 0, TRUE);
-    BScenarioGraphic_PrintNumber(work, 7, 0, 0, BScenarioMain_GetScriptPageCount(work), 2, 0, TRUE);
+    BScenarioGraphic_PrintNumber(work, 6, 0, 0, work->scriptPage + 1, 2, PRINT_ALIGN_LEFT, TRUE);
+    BScenarioGraphic_PrintNumber(work, 7, 0, 0, BScenarioMain_GetScriptPageCount(work), 2, PRINT_ALIGN_LEFT, TRUE);
 }
 
 static void BScenarioMain_CastInit(BScenarioWork *work) {
@@ -1257,7 +1257,7 @@ static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
     StrBuf *speciesStr = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[CAST_MSG_SPECIES]);
     WordSet_LoadSpeciesName(work->wordSet, 0, (u16)species);
     GFL_WordSetFormatStrbuf(work->wordSet, buffer, speciesStr);
-    BScenarioGraphic_Print(work, 1, 0, 0, buffer, 0, TEXT_COLOR, FALSE, FALSE);
+    BScenarioGraphic_Print(work, 1, 0, 0, buffer, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(speciesStr);
 
     int sexMsg = CAST_MSG_MALE;
@@ -1270,7 +1270,7 @@ static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
     if (sex != GENDER_UNKNOWN) {
         StrBuf *sexStr = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[sexMsg]);
 
-        BScenarioGraphic_Print(work, 1, 0x3e, 0, sexStr, 0, color, FALSE, TRUE);
+        BScenarioGraphic_Print(work, 1, 0x3e, 0, sexStr, PRINT_ALIGN_LEFT, color, FALSE, TRUE);
         GFL_StrBufFree(sexStr);
     }
 
@@ -1278,14 +1278,14 @@ static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
     StrBuf *levelStr = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[CAST_MSG_LEVEL]);
     WordSetNumber(work->wordSet, 0, level, 3, 0, TRUE);
     GFL_WordSetFormatStrbuf(work->wordSet, buffer, levelStr);
-    BScenarioGraphic_Print(work, 2, 0, 0, buffer, 0, TEXT_COLOR, FALSE, FALSE);
+    BScenarioGraphic_Print(work, 2, 0, 0, buffer, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(levelStr);
 
     int item = work->mons[work->castIndex].item;
     StrBuf *itemStr = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[CAST_MSG_ITEM]);
     loadItemNameToStrbuf(work->wordSet, 0, item);
     GFL_WordSetFormatStrbuf(work->wordSet, buffer, itemStr);
-    BScenarioGraphic_Print(work, 4, 0, 0, buffer, 0, TEXT_COLOR, FALSE, FALSE);
+    BScenarioGraphic_Print(work, 4, 0, 0, buffer, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(itemStr);
 
     for (i = 0; i < 4; i++) {
@@ -1296,7 +1296,7 @@ static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
 
             loadMoveNameToStrbuf(work->wordSet, 0, move);
             GFL_WordSetFormatStrbuf(work->wordSet, buffer, moveStr);
-            BScenarioGraphic_Print(work, i + 5, 0, 0, buffer, 0, TEXT_COLOR, FALSE, FALSE);
+            BScenarioGraphic_Print(work, i + 5, 0, 0, buffer, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
             GFL_StrBufFree(moveStr);
         } else {
             BScenarioGraphic_ClearWindow(work, i + 5);
@@ -1307,7 +1307,7 @@ static void BScenarioMain_PrintCast(BScenarioWork *work, BOOL update) {
     StrBuf *abilityStr = GFL_MsgDataLoadStrbufNew(work->msgData[0], sBScenarioCastMessages[CAST_MSG_ABILITY]);
     loadAbilityNameToStrbuf(work->wordSet, 0, ability);
     GFL_WordSetFormatStrbuf(work->wordSet, buffer, abilityStr);
-    BScenarioGraphic_Print(work, 10, 0, 0, buffer, 0, TEXT_COLOR, FALSE, FALSE);
+    BScenarioGraphic_Print(work, 10, 0, 0, buffer, PRINT_ALIGN_LEFT, TEXT_COLOR, FALSE, FALSE);
     GFL_StrBufFree(abilityStr);
     GFL_StrBufFree(buffer);
 }
@@ -1446,10 +1446,10 @@ static void BScenarioMain_PrintLabels(BScenarioWork *work, int page) {
         if (labels[i].dark == TRUE) {
             color = TEXT_COLOR;
         }
-        align = 0;
+        align = PRINT_ALIGN_LEFT;
         x = 0;
         if (label == 0) {
-            align = ALIGN_CENTER;
+            align = PRINT_ALIGN_CENTER;
             x = TEXT_X_CENTER;
         }
         str = GFL_MsgDataLoadStrbufNew(work->msgData[msgData], sBScenarioLabelMessages[label]);
