@@ -22,8 +22,14 @@ typedef void (*DWCRapDisconnectFunc)(u8 netId, void *work);
 
 // Whether the Wi-Fi connection has been started
 BOOL DWCRap_IsInitialized(void);
-// Starts the connection with the player's user data and friend list, returning 0, or 1 or 2 if the user data is
-// invalid
+// What DWCRap_Init returns: the connection started, or the user data has no profile or is not this console's
+enum {
+    DWCRAP_INIT_OK,
+    DWCRAP_INIT_NO_PROFILE,
+    DWCRAP_INIT_INVALID_CONSOLE,
+};
+
+// Starts the connection with the player's user data and friend list, returning DWCRAP_INIT_*
 int DWCRap_Init(void *userData, DWCFriendData *friendList);
 // Sets the functions that machines' data goes to: the one called on the parent, and the one on the children
 void DWCRap_SetRecvFuncs(GFLNetRecvFunc parentFunc, GFLNetRecvFunc childFunc);

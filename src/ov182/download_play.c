@@ -410,12 +410,12 @@ u16 DownloadPlay_GetState(void) {
 }
 
 u16 DownloadPlay_GetChildBmp(int bmpType) {
-    DownloadPlay_Tables.childBmps[0] = &sWork->state.connectChildBmp;
-    DownloadPlay_Tables.childBmps[1] = &sWork->state.requestChildBmp;
-    DownloadPlay_Tables.childBmps[2] = &sWork->state.entryChildBmp;
-    DownloadPlay_Tables.childBmps[3] = &sWork->state.downloadChildBmp;
-    DownloadPlay_Tables.childBmps[4] = &sWork->state.bootableChildBmp;
-    DownloadPlay_Tables.childBmps[5] = &sWork->state.rebootChildBmp;
+    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_CONNECT] = &sWork->state.connectChildBmp;
+    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_REQUEST] = &sWork->state.requestChildBmp;
+    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_ENTRY] = &sWork->state.entryChildBmp;
+    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_DOWNLOAD] = &sWork->state.downloadChildBmp;
+    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_BOOTABLE] = &sWork->state.bootableChildBmp;
+    DownloadPlay_Tables.childBmps[DOWNLOAD_PLAY_BMP_REBOOT] = &sWork->state.rebootChildBmp;
     return *DownloadPlay_Tables.childBmps[bmpType];
 }
 

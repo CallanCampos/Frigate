@@ -31,7 +31,7 @@ struct PokeDexSave {
     u32 habitatListEnabled : 1;
     // Set to 1 when the player is given the Pokédex, which the list's search and the detail screen check
     u32 given : 8;
-    // Which Pokédex the detail screen counts (PokeDex_GetMode)
+    // Which Pokédex the list shows and the detail screen counts, a DEX_* value (PokeDex_GetMode)
     u32 mode : 2;
     // The species that the Pokédex's list was last on
     u32 lastSpecies : 10;
@@ -58,9 +58,16 @@ void PokeDex_EnableHabitatList(PokeDexSave *pokedex);
 BOOL PokeDex_IsHabitatListEnabled(PokeDexSave *pokedex);
 void givePlayerPokedex(PokeDexSave *pokedex);
 u32 PokeDex_IsGiven(PokeDexSave *pokedex);
-// Which Pokédex the detail screen counts: 0 the regional one, 1 the national one, 2 the national one once obtained
+// Which Pokédex the list shows and the detail screen counts: the regional one, the national one, or the habitat list,
+// which the list's select button goes to when the player does not have the national one
+enum {
+    DEX_REGIONAL,
+    DEX_NATIONAL,
+    DEX_HABITAT,
+};
+
 u32 PokeDex_GetMode(PokeDexSave *pokedex);
-// Sets which Pokédex the detail screen counts, with PokeDex_GetMode's values
+// Sets which Pokédex the list shows, a DEX_* value
 void PokeDex_SetMode(PokeDexSave *pokedex, u32 mode);
 BOOL PokeDex_IsCaught(PokeDexSave *pokedex, u16 species);
 BOOL PokeDex_IsSeen(PokeDexSave *pokedex, u16 species);
@@ -96,7 +103,13 @@ BOOL PokeDex_IsCompleteNational(PokeDexSave *pokedex);
 BOOL PokeDex_IsCompleteUnova(PokeDexSave *pokedex, HeapID heapId);
 BOOL PokeDex_IsSeenAllUnova(PokeDexSave *pokedex, HeapID heapId);
 // What the professor says of the Pokédex: the message, the count it tells and unk, which the tables give for the count
-// without the mythical species. Mode 1 is the national Pokédex's caught, 2 the regional one's seen and 3 its caught
+// without the mythical species, for one of these modes
+enum {
+    POKEDEX_EVALUATION_NATIONAL_CAUGHT = 1,
+    POKEDEX_EVALUATION_REGIONAL_SEEN,
+    POKEDEX_EVALUATION_REGIONAL_CAUGHT,
+};
+
 void PokeDex_GetEvaluationParams(PokeDexSave *pokedex, u16 mode, HeapID heapId, u16 *message, u16 *count, u16 *unk);
 
 #endif // POKEBW2_SAVE_POKEDEX_H

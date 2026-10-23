@@ -335,9 +335,9 @@ static void PMSIView_CmdInit(TCB *tcb, void *data) {
     GFL_G2DIOLoadArcNCLR(arc, 4, 4, 0x80, 0xa0, 0x20, HEAPID_PMS_INPUT);
 
     cwk->vwk->colors[0] = GX_RGB(11, 10, 10);
-    NNS_GfdRegisterNewVramTransferTask(31, 0xbc, &cwk->vwk->colors[0], sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0xbc, &cwk->vwk->colors[0], sizeof(GXRgb));
     cwk->vwk->colors[1] = GX_RGB(20, 20, 21);
-    NNS_GfdRegisterNewVramTransferTask(31, 0xbe, &cwk->vwk->colors[1], sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0xbe, &cwk->vwk->colors[1], sizeof(GXRgb));
 
     GFL_BGSysLoadArcNCGRStatic(arc, 18, 7, 0, 0, FALSE, HEAPID_PMS_INPUT);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 24, 7, 0, 0, FALSE, HEAPID_PMS_INPUT);

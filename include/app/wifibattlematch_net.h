@@ -2,6 +2,7 @@
 #define POKEBW2_APP_WIFIBATTLEMATCH_NET_H
 
 #include "types.h"
+#include "dwc/competition.h"
 #include "gfl/heap.h"
 #include "gfl/proc.h"
 #include "struct_decls.h"
@@ -10,6 +11,84 @@
 // Its functions have no names yet, only their addresses; what they do is said at each
 
 typedef struct WifiBattleMatchNet WifiBattleMatchNet;
+
+// What the machines' and the requests' main functions return: 0 while they run, 1 once done and 2 when they failed.
+// The HTTP requests and the check of Pokémon return 3 when the server answered with an error
+enum {
+    WBM_NET_RUNNING,
+    WBM_NET_SUCCESS,
+    WBM_NET_FAILED,
+    WBM_NET_SERVER_ERROR,
+};
+
+// What WifiBattleMatchNet_DownloadMain returns: 0 while it runs, 1 once the file is in, 2 when there was no file or
+// its CRC was wrong, and 3 on an error
+enum {
+    WBM_DOWNLOAD_RUNNING,
+    WBM_DOWNLOAD_SUCCESS,
+    WBM_DOWNLOAD_NO_FILE,
+    WBM_DOWNLOAD_ERROR,
+};
+
+// How an error ends for the player, as WifiBattleMatchNet_CheckError returns it: nothing, the Wi-Fi connection lost,
+// the competition failed or the game's network error. They are what DWCRapCommon_CheckError and the error converters
+// answer
+typedef enum {
+    WBM_RESULT_OK,
+    WBM_RESULT_DISCONNECTED,
+    WBM_RESULT_FAILED,
+    WBM_RESULT_NET_ERROR,
+    WBM_RESULT_TIMEOUT,
+} WifiBattleMatchNetResult;
+
+// The modes of WifiBattleMatchNet_StartMatch, which are the value of the matching key "mod": the Wi-Fi competition's
+// and the rating battle's match on the players' ratings, disconnects and cup, and the free battle's takes anybody.
+// Mode 1 asserts. WifiBattleMatchNet_StartReport's kind is the competition's or the rating battle's
+enum {
+    WBM_MATCH_MODE_COMPETITION,
+    WBM_MATCH_MODE_UNUSED,
+    WBM_MATCH_MODE_RATING,
+    WBM_MATCH_MODE_FREE,
+};
+
+// The rules of a battle, the matching key "rul" and the format of a report: the report of each has the fields of its
+// numbers of wins and losses and of its rating
+enum {
+    WBM_RULE_SINGLE,
+    WBM_RULE_DOUBLE,
+    WBM_RULE_TRIPLE,
+    WBM_RULE_ROTATION,
+    WBM_RULE_SHOOTER,
+};
+
+// The reports of WifiBattleMatchNet_StartReport: the one when a battle starts, and the one with its result
+enum {
+    WBM_REPORT_MODE_START,
+    WBM_REPORT_MODE_RESULT,
+};
+
+// What WifiBattleMatchNet_StartPokemonCheck checks: one Pokémon's data, or a PokeParty
+enum {
+    WBM_POKEMON_CHECK_ONE,
+    WBM_POKEMON_CHECK_PARTY,
+};
+
+// What a player offers in a match, which is sent to the other player whole
+typedef struct {
+    const GSLoginCertificate *certificate;
+    SCIReport *connection;
+    u8 unk8[0x28];
+    u8 unk30[0x28];
+    u8 unk58[0x10];
+} WifiBattleMatchNetInfo;
+
+// What overlay 290 shares with this file: the player's ID in the Sake database, the player's side and the other
+// player's
+typedef struct {
+    s32 sake_recordID;
+    WifiBattleMatchNetInfo mine;
+    WifiBattleMatchNetInfo theirs;
+} WifiBattleMatchNetData;
 
 // What the matching of two players is looking for: the rating, the disconnects, the cup and the number of matches
 typedef struct {
@@ -127,21 +206,22 @@ typedef struct {
     u32 slot;
 } WifiBattleMatchNetRecordData;
 
-WifiBattleMatchNet *WifiBattleMatchNet_Create(void *a0, GameData *gameData, void *loginBuffer, HeapID heapId);
+WifiBattleMatchNet *WifiBattleMatchNet_Create(WifiBattleMatchNetData *data, GameData *gameData, void *loginBuffer,
+                                              HeapID heapId);
 void WifiBattleMatchNet_Delete(WifiBattleMatchNet *p_wk);
 // Does nothing
 void WifiBattleMatchNet_Nop(WifiBattleMatchNet *p_wk);
 // Starts a timing sync with the number, and checks whether the other machine reached it too
 void WifiBattleMatchNet_StartSync(WifiBattleMatchNet *p_wk, u32 syncId);
 BOOL WifiBattleMatchNet_CheckSync(WifiBattleMatchNet *p_wk);
-// Checks the network's state and the error that was found, returning how it ends (0 for none)
+// Checks the network's state and the error that was found, returning how it ends (a WifiBattleMatchNetResult)
 u32 WifiBattleMatchNet_CheckError(WifiBattleMatchNet *p_wk, u32 a1, u32 a2);
-// Resets the state of the machines that follow; 0 while running, 1 when done and 2 on failure
+// Resets the state of the machines that follow, whose main functions return WBM_NET_*
 void WifiBattleMatchNet_ResetLogin(WifiBattleMatchNet *p_wk);
 u32 WifiBattleMatchNet_LoginMain(WifiBattleMatchNet *p_wk);
-// Sets the match query and its keys for the mode, and the machine that runs it; 0 while it runs, 1 once matched, 2
-// on failure
-void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 a3,
+// Sets the match query and its keys for the mode (WBM_MATCH_MODE_*) and the rule (WBM_RULE_*), and the machine that
+// runs it; WBM_NET_SUCCESS once matched
+void WifiBattleMatchNet_StartMatch(WifiBattleMatchNet *p_wk, u32 mode, u32 a2, u32 rule,
                                    const WifiBattleMatchNetKeys *keys);
 u32 WifiBattleMatchNet_MatchMain(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_CancelMatch(WifiBattleMatchNet *p_wk);
@@ -152,13 +232,15 @@ BOOL WifiBattleMatchNet_TakeCmd2402(WifiBattleMatchNet *p_wk);
 BOOL WifiBattleMatchNet_SendPerson(WifiBattleMatchNet *p_wk);
 BOOL WifiBattleMatchNet_TakePerson(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_SetGuest(WifiBattleMatchNet *p_wk, u32 value);
-void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 a3, const u32 *a4, u32 a5);
+// Starts a report (WBM_REPORT_MODE_*) of a kind (WBM_MATCH_MODE_COMPETITION or WBM_MATCH_MODE_RATING), with the
+// battle's rule (WBM_RULE_*) and result for WBM_REPORT_MODE_RESULT
+void WifiBattleMatchNet_StartReport(WifiBattleMatchNet *p_wk, u32 mode, u32 kind, u32 rule, const u32 *a4, u32 a5);
 u32 WifiBattleMatchNet_ReportMain(WifiBattleMatchNet *p_wk, u32 *out);
 u32 WifiBattleMatchNet_GetReceivedValue(WifiBattleMatchNet *p_wk);
-// Reads the table of fields of a kind into out; 0 while it runs, 1 when done and 2 on failure
+// Reads the table of fields of a kind (WBM_READ_*) into out
 void WifiBattleMatchNet_StartRead(WifiBattleMatchNet *p_wk, int recordId, int kind, void *out);
 u32 WifiBattleMatchNet_ReadMain(WifiBattleMatchNet *p_wk);
-// Writes a record of a kind; 0 while it runs, 1 when done and 2 on failure
+// Writes a record of a kind (WBM_WRITE_*)
 void WifiBattleMatchNet_StartWrite(WifiBattleMatchNet *p_wk, int kind, void *data);
 u32 WifiBattleMatchNet_WriteMain(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_StartCreateRecord(WifiBattleMatchNet *p_wk);
@@ -184,6 +266,7 @@ void WifiBattleMatchNet_StartPostRequest(WifiBattleMatchNet *p_wk, const void *i
 u32 WifiBattleMatchNet_PostRequestMain(WifiBattleMatchNet *p_wk);
 void WifiBattleMatchNet_StartNameCheck(WifiBattleMatchNet *p_wk, PlayerInfo *info, u16 a2);
 BOOL WifiBattleMatchNet_NameCheckMain(WifiBattleMatchNet *p_wk, u32 *out);
+// Checks a Pokémon or a team, by the kind (WBM_POKEMON_CHECK_*)
 void WifiBattleMatchNet_StartPokemonCheck(WifiBattleMatchNet *p_wk, void *data, int kind);
 u32 WifiBattleMatchNet_PokemonCheckMain(WifiBattleMatchNet *p_wk, WifiBattleMatchNetCheck *out);
 void WifiBattleMatchNet_ShowIcon(WifiBattleMatchNet *p_wk, int a1);

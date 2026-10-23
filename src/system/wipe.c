@@ -97,8 +97,10 @@ void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, s32 division, s
     Wipe_SetMode(mode, sys);
     WipeHBlank_Init(&sWipe.hblank);
     color = Wipe_GetColor(sys, color);
-    WipeScreen_Init(&sWipe.main, typeMain, division, sync, 0, NULL, 0, &sWipe.wnd, &sWipe.hblank, heapId, color);
-    WipeScreen_Init(&sWipe.sub, typeSub, division, sync, 0, NULL, 1, &sWipe.wnd, &sWipe.hblank, heapId, color);
+    WipeScreen_Init(&sWipe.main, typeMain, division, sync, WIPE_SEQ_INIT, NULL, 0, &sWipe.wnd, &sWipe.hblank, heapId,
+                    color);
+    WipeScreen_Init(&sWipe.sub, typeSub, division, sync, WIPE_SEQ_INIT, NULL, 1, &sWipe.wnd, &sWipe.hblank, heapId,
+                    color);
     sWipe.active = TRUE;
     WipeScreen_Run(&sWipe.control.mainActive, &sWipe.main);
     WipeScreen_Run(&sWipe.control.subActive, &sWipe.sub);
@@ -133,10 +135,10 @@ void GFL_WipeForceEnd(void) {
     WipeHBlank_Remove(&sWipe.hblank, 0);
     WipeHBlank_Remove(&sWipe.hblank, 1);
     if (sWipe.control.mainActive) {
-        sWipe.main.seq = 2;
+        sWipe.main.seq = WIPE_SEQ_EXIT;
     }
     if (sWipe.control.subActive) {
-        sWipe.sub.seq = 2;
+        sWipe.sub.seq = WIPE_SEQ_EXIT;
     }
     WipeScreen_Run(&sWipe.control.mainActive, &sWipe.main);
     WipeScreen_Run(&sWipe.control.subActive, &sWipe.sub);

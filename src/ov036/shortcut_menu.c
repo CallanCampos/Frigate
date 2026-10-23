@@ -197,8 +197,7 @@ void *func_ov036_021bedd8(GameData *gameData, u32 mode, ShortcutMenuPos *listPos
     return work;
 }
 
-void func_ov036_021bf004(void *app) {
-    ShortcutMenuApp *work = app;
+void func_ov036_021bf004(ShortcutMenuApp *work) {
     int i;
 
     G2_BlendNone();
@@ -220,8 +219,7 @@ void func_ov036_021bf004(void *app) {
     GFL_HeapFree(work);
 }
 
-void func_ov036_021bf088(void *app) {
-    ShortcutMenuApp *work = app;
+void func_ov036_021bf088(ShortcutMenuApp *work) {
     int i;
 
     if (!func_ov036_021bf198(work)) {
@@ -276,16 +274,12 @@ void func_ov036_021bf088(void *app) {
     }
 }
 
-u32 func_ov036_021bf198(void *app) {
-    ShortcutMenuApp *work = app;
-
+u32 func_ov036_021bf198(ShortcutMenuApp *work) {
     PrintQueue_Main(work->menuQueue);
     return PrintDone(&work->menu);
 }
 
-void func_ov036_021bf1ac(void *app) {
-    ShortcutMenuApp *work = app;
-
+void func_ov036_021bf1ac(ShortcutMenuApp *work) {
     if (work->state == STATE_CLOSED) {
         work->code = 0;
         work->item = 0xff;
@@ -294,16 +288,13 @@ void func_ov036_021bf1ac(void *app) {
     }
 }
 
-void func_ov036_021bf1d0(void *app) {
-    ShortcutMenuApp *work = app;
-
+void func_ov036_021bf1d0(ShortcutMenuApp *work) {
     if (work->state == STATE_INPUT) {
         work->state = STATE_CLOSING;
     }
 }
 
-BOOL func_ov036_021bf1e4(void *app) {
-    ShortcutMenuApp *work = app;
+BOOL func_ov036_021bf1e4(ShortcutMenuApp *work) {
     BOOL busy = TRUE;
 
     if (work->state != STATE_SCROLL_IN && work->state != STATE_SCROLL_OUT) {
@@ -312,9 +303,7 @@ BOOL func_ov036_021bf1e4(void *app) {
     return busy;
 }
 
-u32 func_ov036_021bf1f8(void *app, u32 *item) {
-    ShortcutMenuApp *work = app;
-
+u32 func_ov036_021bf1f8(ShortcutMenuApp *work, u32 *item) {
     if (item != NULL) {
         *item = work->item;
     }

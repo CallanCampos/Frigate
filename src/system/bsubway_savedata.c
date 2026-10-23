@@ -448,7 +448,7 @@ u16 BSubwayWifiData_GetLeaderRoom(BSubwayWifiData *data) {
     return data->leaderRoom;
 }
 
-void *BSubwayWifiData_AllocLeaders(BSubwayWifiData *data, HeapID heapId) {
+BSubwayWifiLeader *BSubwayWifiData_AllocLeaders(BSubwayWifiData *data, HeapID heapId) {
     BSubwayWifiLeader *leaders = GFL_HeapAllocate(heapId, sizeof(data->leaders), TRUE, "bsubway_savedata.c", 1288);
 
     MI_CpuCopy8(data->leaders, leaders, sizeof(data->leaders));
@@ -456,8 +456,7 @@ void *BSubwayWifiData_AllocLeaders(BSubwayWifiData *data, HeapID heapId) {
 }
 
 // How many leaders a list has
-int BSubwayWifiLeader_CountList(void *list) {
-    BSubwayWifiLeader *leaders = list;
+int BSubwayWifiLeader_CountList(BSubwayWifiLeader *leaders) {
     int i;
     int count = 0;
 
@@ -469,8 +468,6 @@ int BSubwayWifiLeader_CountList(void *list) {
     return count;
 }
 
-u32 BSubwayWifiLeader_GetID(void *entry) {
-    BSubwayWifiLeader *leader = entry;
-
+u32 BSubwayWifiLeader_GetID(BSubwayWifiLeader *leader) {
     return leader->id[0] | (leader->id[1] << 8) | (leader->id[2] << 16) | (leader->id[3] << 24);
 }

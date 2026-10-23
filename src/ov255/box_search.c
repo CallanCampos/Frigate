@@ -2112,7 +2112,7 @@ static void PrintAbilityInfo(BoxSearchWork *wk, u32 ability) {
 
 // Prints a species' name and types
 static void PrintSpeciesInfo(BoxSearchWork *wk, u32 species) {
-    void *personal = PML_PersonalLoad(species, 0, wk->heapId);
+    PersonalData *personal = PML_PersonalLoad(species, 0, wk->heapId);
     u32 type1 = PML_PersonalGetParam(personal, PERSONAL_TYPE_1);
     u32 type2 = PML_PersonalGetParam(personal, PERSONAL_TYPE_2);
     StrBuf *fmt;

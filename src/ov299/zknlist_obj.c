@@ -351,7 +351,7 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
     ZukanActorTemplate template = { { 48, 48, 0, 0, 1 }, CHAR_RES_MON, RES_MON, RES_MON, 0, CLACT_SURFACE_MAIN };
     u32 sex, form, rare;
     ArcTool *arc;
-    void *personal;
+    PersonalData *personal;
     u32 id, prevId;
     u32 paletteOffset;
 

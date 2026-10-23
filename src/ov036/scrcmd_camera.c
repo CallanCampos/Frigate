@@ -12,9 +12,6 @@
 #include "system/game_system.h"
 #include "system/vm.h"
 
-// The script's sub event of the event camera, which FieldScriptSubEventFinish_EvCamera ends with the script
-#define SCRIPT_SUB_EVENT_EV_CAMERA 0
-
 // A stored camera position, from archive 161
 typedef struct {
     u16 pitch;

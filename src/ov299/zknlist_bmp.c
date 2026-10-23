@@ -137,7 +137,7 @@ static void ZknListBmp_LoadWindowBG(ZknListWork *wk, u32 window) {
 
 static void ZknListBmp_PutTitle(ZknListWork *wk) {
     ZknListBmp_LoadWindowBG(wk, ZKNLIST_WIN_TITLE);
-    if (PokeDex_GetMode(wk->param->pokedex) == 1) {
+    if (PokeDex_GetMode(wk->param->pokedex) == DEX_NATIONAL) {
         ZknListBmp_Print(wk, ZKNLIST_WIN_TITLE, GameStart3_Text_NationalPokedex, 0, 4, COLOR_ITEM, PRINT_ALIGN_LEFT);
     } else {
         ZknListBmp_Print(wk, ZKNLIST_WIN_TITLE, GameStart3_Text_UnovaPokedex, 0, 4, COLOR_ITEM, PRINT_ALIGN_LEFT);
@@ -174,7 +174,7 @@ void ZknListBmp_PutCounts(ZknListWork *wk) {
     u32 seen;
     u32 caught;
 
-    if (PokeDex_GetMode(wk->param->pokedex) == 1) {
+    if (PokeDex_GetMode(wk->param->pokedex) == DEX_NATIONAL) {
         seen = PokeDex_GetSeenNoNational(wk->param->pokedex);
         caught = PokeDex_GetCaughtNoNational(wk->param->pokedex);
     } else {
@@ -206,7 +206,7 @@ void ZknListBmp_PrintItem(ZknListWork *wk, PrintWindow *window, StrBuf *name, u3
     StrBuf *strbuf;
 
     // The list holds national numbers
-    if (PokeDex_GetMode(wk->param->pokedex) != 1) {
+    if (PokeDex_GetMode(wk->param->pokedex) != DEX_NATIONAL) {
         number = wk->regionalNumbers[number];
     }
     strbuf = GFL_MsgDataLoadStrbufNew(wk->msgData, GameStart3_Text_Empty_4);

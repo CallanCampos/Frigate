@@ -72,7 +72,7 @@ enum {
 #define FMISSION_SLIDE_FRAMES 8
 #define FMISSION_HIGHLIGHT_FRAMES 60
 
-typedef struct {
+struct FieldFMissionInfo {
     // This file never uses unk0, unk4 or unk24, which the allocation zeroes
     u32 unk0;
     u32 unk4;
@@ -102,7 +102,7 @@ typedef struct {
     // Where each actor rests
     ClActorPos positions[FMISSION_ACTOR_COUNT];
     TCBExManager *tasks;
-} FieldFMissionInfo;
+};
 
 // A task that slides count actors from first into place, from yOffset away, over timer frames
 typedef struct {
@@ -159,9 +159,7 @@ void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId) {
     return info;
 }
 
-void FieldFMissionInfo_Free(void *work) {
-    FieldFMissionInfo *info = work;
-
+void FieldFMissionInfo_Free(FieldFMissionInfo *info) {
     GFL_TCBExMgrFreeTasks(info->tasks);
     GFL_TCBExMgrFree(info->tasks);
     FieldFMissionInfo_DeleteActors(info);
@@ -169,9 +167,7 @@ void FieldFMissionInfo_Free(void *work) {
     GFL_HeapFree(info);
 }
 
-void FieldFMissionInfo_Update(void *work) {
-    FieldFMissionInfo *info = work;
-
+void FieldFMissionInfo_Update(FieldFMissionInfo *info) {
     if (isFesMissionAvailable(info->config)) {
         BOOL running = Field_IsEventRunning(info->field);
 
@@ -190,9 +186,7 @@ void FieldFMissionInfo_Update(void *work) {
     }
 }
 
-void FieldFMissionInfo_UpdateDisplay(void *work) {
-    FieldFMissionInfo *info = work;
-
+void FieldFMissionInfo_UpdateDisplay(FieldFMissionInfo *info) {
     if (isFesMissionAvailable(info->config) && info->shown) {
         FieldFMissionInfo_UpdateTime(info, FALSE);
         info->groupVisible = FieldFMissionInfo_IsGroupVisible(info);

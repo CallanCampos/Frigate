@@ -97,6 +97,19 @@ enum {
 #define SIGN_SCROLL_SPEED 0xc
 #define SIGN_PAGE_SCROLL_SPEED 4
 
+// The checker window's frame characters in their WINFRAME file, eight to a row
+enum {
+    CHECKER_FRAME_TOP_LEFT,
+    CHECKER_FRAME_TOP,
+    CHECKER_FRAME_TOP_RIGHT,
+    CHECKER_FRAME_LEFT = 8,
+    CHECKER_FRAME_CENTER,
+    CHECKER_FRAME_RIGHT,
+    CHECKER_FRAME_BOTTOM_LEFT = 0x10,
+    CHECKER_FRAME_BOTTOM,
+    CHECKER_FRAME_BOTTOM_RIGHT,
+};
+
 // The planes that the second BG's windows are alpha blended over
 #define MSGBG_BLEND_PLANES_UNDER                                                                                       \
     (GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG1 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ)
@@ -284,7 +297,7 @@ static void MsgStream_Free(MsgStream *stream);
 static u32 MsgStream_Update(MsgStream *stream);
 static FieldMsgWin *func_ov036_021882c0(FieldMsgBG *sys, MsgData *msgData, u16 x, u16 y, u16 width, u16 height);
 static void ActorMsgWin_Create(FieldMsgBG *sys, ActorMsgWin *win, u32 type, const VecFx32 *pos, StrBuf *strbuf,
-                               u32 frameType, u32 tailBase);
+                               u32 frameType, u32 tail);
 static void func_ov036_02188a00(FieldMsgBG *sys, InfoMsgWin *win, u32 x, u32 y, u16 width, u16 height, u32 frameType);
 static void func_ov036_02188cc0(FieldMsgBG *sys, NumberedMsgWin *win, StrBuf *strbuf, u16 index, u8 x, u8 y, u8 width,
                                 u8 height, u32 userId, u32 frameType);
@@ -318,7 +331,7 @@ static void func_ov036_0218a3e0(TCB *tcb, void *data);
 static void func_ov036_0218a408(u32 create, u32 alphaBlend);
 static void func_ov036_0218a4a4(FieldMsgBG *sys);
 static void func_ov036_0218a4dc(u32 bg, HeapID heapId);
-static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 mode);
+static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 step);
 static void setAlphaBlend(BOOL on);
 static BmpWin *FieldMsgBG_CreateBmpWin(u32 bg, u32 heapId, u32 x, u32 y, u16 w, u16 h, u16 pal);
 static void func_ov036_0218a668(BmpWin *win);
@@ -333,7 +346,7 @@ static BOOL MsgBGInput_GetAutoAdvance(MsgBGInput *input);
 static s32 MsgBGInput_GetTextWait(MsgBGInput *input);
 static BOOL func_ov036_0218a760(MsgBGInput *input);
 static BOOL func_ov036_0218a798(MsgBGInput *input, BOOL fast);
-static void func_ov036_0218a7d8(PrintStream *stream, u32 mode);
+static void func_ov036_0218a7d8(PrintStream *stream, BOOL fast);
 
 FieldMsgBG *CreateFieldMsgBGSystem(HeapID heapId, G3DCamera *camera) {
     FieldMsgBG *sys = GFL_HeapAllocate(heapId, sizeof(FieldMsgBG), TRUE, "field_msgbg.c", 422);
@@ -931,9 +944,9 @@ static u32 MsgStream_Update(MsgStream *stream) {
     switch (state) {
     case PRINT_STREAM_RUNNING:
         if (func_ov036_0218a760(&stream->sys->input)) {
-            func_ov036_0218a7d8(stream->stream, 1);
+            func_ov036_0218a7d8(stream->stream, TRUE);
         } else {
-            func_ov036_0218a7d8(stream->stream, 0);
+            func_ov036_0218a7d8(stream->stream, FALSE);
         }
         break;
     case PRINT_STREAM_PAUSED:
@@ -943,7 +956,7 @@ static u32 MsgStream_Update(MsgStream *stream) {
             }
             PrintStream_Continue(stream->stream);
             state = PRINT_STREAM_RUNNING;
-            func_ov036_0218a7d8(stream->stream, 0);
+            func_ov036_0218a7d8(stream->stream, FALSE);
         }
         break;
     case PRINT_STREAM_DONE:
@@ -1129,7 +1142,7 @@ BmpWin *func_ov036_021886b0(FieldMsgWin *win) {
 }
 
 static void ActorMsgWin_Create(FieldMsgBG *sys, ActorMsgWin *win, u32 type, const VecFx32 *pos, StrBuf *strbuf,
-                               u32 frameType, u32 tailBase) {
+                               u32 frameType, u32 tail) {
     win->posSource = pos;
     win->pos = *pos;
     sys->palette = MSGBG_PLTT_TALK;
@@ -1140,11 +1153,11 @@ static void ActorMsgWin_Create(FieldMsgBG *sys, ActorMsgWin *win, u32 type, cons
     setAlphaBlend(FALSE);
     switch (type) {
     case ACTOR_MSG_WIN_TOP:
-        ActorMsgWin_CreateAtTop(win->talk, ACTOR_MSG_WIN_TOP, pos, strbuf, 15, frameType, tailBase,
+        ActorMsgWin_CreateAtTop(win->talk, ACTOR_MSG_WIN_TOP, pos, strbuf, 15, frameType, tail,
                                 MsgBGInput_GetTextWait(&sys->input));
         break;
     case ACTOR_MSG_WIN_BOTTOM:
-        ActorMsgWin_CreateAtBottom(win->talk, ACTOR_MSG_WIN_BOTTOM, pos, strbuf, 15, frameType, tailBase,
+        ActorMsgWin_CreateAtBottom(win->talk, ACTOR_MSG_WIN_BOTTOM, pos, strbuf, 15, frameType, tail,
                                    MsgBGInput_GetTextWait(&sys->input));
         break;
     default:
@@ -1162,12 +1175,12 @@ static void ActorMsgWin_Create(FieldMsgBG *sys, ActorMsgWin *win, u32 type, cons
 }
 
 ActorMsgWin *ActorMsgWin_CheckAndCreate(FieldMsgBG *sys, s32 type, const VecFx32 *pos, StrBuf *strbuf, u32 frameType,
-                                        u32 tailBase) {
+                                        u32 tail) {
     if (type < ACTOR_MSG_WIN_COUNT) {
         ActorMsgWin *win = &sys->actorWins[type];
 
         if (win->talk == NULL) {
-            ActorMsgWin_Create(sys, win, type, pos, strbuf, frameType, tailBase);
+            ActorMsgWin_Create(sys, win, type, pos, strbuf, frameType, tail);
             return win;
         }
     }
@@ -1234,9 +1247,9 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
             BmpWin_FlushChar(win);
         }
         if (func_ov036_0218a760(&actorWin->sys->input)) {
-            func_ov036_0218a7d8(stream, 1);
+            func_ov036_0218a7d8(stream, TRUE);
         } else {
-            func_ov036_0218a7d8(stream, 0);
+            func_ov036_0218a7d8(stream, FALSE);
         }
         break;
     case PRINT_STREAM_PAUSED:
@@ -1251,7 +1264,7 @@ BOOL func_ov036_02188884(ActorMsgWin *actorWin) {
             }
             PrintStream_Continue(stream);
             MsgBGCursor_Clear(&actorWin->cursor, bitmap, MSGBG_COLOR_BG);
-            func_ov036_0218a7d8(stream, 0);
+            func_ov036_0218a7d8(stream, FALSE);
         }
         BmpWin_FlushChar(win);
         break;
@@ -1760,45 +1773,45 @@ static void CheckerMsgWin_DrawFrame(GFLBitmap *bitmap, u32 style, HeapID heapId)
     u16 tilesH = GFL_BitmapGetHeight(bitmap) >> 3;
     GFLBitmap *tile = GFL_BitmapCreate(1, 1, BGSYS_TILE_SIZE_16, heapId);
 
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 9);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_CENTER);
     for (y = 0; y < tilesH; y++) {
         for (x = 0; x < tilesW; x++) {
             GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
         }
     }
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 1);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_TOP);
     for (x = 0; x < tilesW; x++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, 0, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0x11);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_BOTTOM);
     y = tilesH - 1;
     for (x = 0; x < tilesW; x++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 8);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_LEFT);
     for (y = 0; y < tilesH; y++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, 0, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0xa);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_RIGHT);
     x = tilesW - 1;
     for (y = 0; y < tilesH; y++) {
         GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     }
     x = 0;
     y = 0;
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_TOP_LEFT);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     x = tilesW - 1;
     y = 0;
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 2);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_TOP_RIGHT);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     x = 0;
     y = tilesH - 1;
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0x10);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_BOTTOM_LEFT);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     x = tilesW - 1;
     y = tilesH - 1;
-    CheckerMsgWin_LoadFrameTile(tile, style, heapId, 0x12);
+    CheckerMsgWin_LoadFrameTile(tile, style, heapId, CHECKER_FRAME_BOTTOM_RIGHT);
     GFL_BitmapCopyArea(tile, bitmap, 0, 0, x * 8, y * 8, 8, 8, GFL_BITMAP_NO_COLOR_KEY);
     GFL_BitmapFree(tile);
 }
@@ -2244,15 +2257,15 @@ static void func_ov036_0218a4dc(u32 bg, HeapID heapId) {
     func_ov036_02189f10(heapId);
 }
 
-static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 mode) {
-    if (mode == 0) {
+static void func_ov036_0218a524(u32 bg, HeapID heapId, u32 step) {
+    if (step == MSGBG_LOAD_PALETTES) {
         GFL_BGSysLoadNCLRDefault(ARCID_FONT, 5, PALTYPE_MAIN_BG, MSGBG_PLTT_TALK * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE,
                                  heapId);
         GFL_BGSysLoadNCLRDefault(ARCID_FONT, 7, PALTYPE_MAIN_BG, MSGBG_PLTT_BG2 * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE,
                                  heapId);
-    } else if (mode == 1) {
+    } else if (step == MSGBG_LOAD_SYSTEM_FRAME) {
         LoadSysMsgBox(bg, MSGBG_CHAR_FRAME, MSGBG_PLTT_BG2_FRAME, 0, heapId);
-    } else if (mode == 2) {
+    } else if (step == MSGBG_LOAD_LIST_FRAME) {
         func_ov036_02189f10(heapId);
     }
 }
@@ -2389,8 +2402,8 @@ static BOOL func_ov036_0218a798(MsgBGInput *input, BOOL fast) {
     return FALSE;
 }
 
-static void func_ov036_0218a7d8(PrintStream *stream, u32 mode) {
-    if (mode == 1) {
+static void func_ov036_0218a7d8(PrintStream *stream, BOOL fast) {
+    if (fast == TRUE) {
         PrintStream_SetFastWait(stream, TextSpeed_GetWait(2));
     } else {
         PrintStream_ClearFast(stream);

@@ -90,7 +90,7 @@ static void PokemonTradeIrcDemo_InitSide(PokemonTradeWork *wk, u8 *ownedByPlayer
     u32 species;
     u32 form;
     u32 noBounceParam;
-    void *personal;
+    PersonalData *personal;
 
     if (partner) {
         if (PokemonTrade_IsNegoType(wk)) {

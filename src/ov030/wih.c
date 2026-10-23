@@ -386,11 +386,11 @@ static BOOL WH_StateInStartScan(void) {
     u32 channel;
 
     if (allowed == 0x8000) {
-        WH_ReportError(3);
+        WH_ReportError(WM_ERRCODE_ILLEGAL_STATE);
         return FALSE;
     }
     if (allowed == 0) {
-        WH_ReportError(0x16);
+        WH_ReportError(WH_ERRCODE_NO_RADIO);
         return FALSE;
     }
     channel = _pWmInfo->sScanChannel;
@@ -847,8 +847,8 @@ BOOL WH_StartMeasureChannel(void) {
     _pWmInfo->sMinBusy = 101;
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
     result = WH_StateInMeasureChannel(1);
-    if (result == 0x18) {
-        WH_ReportError(0x18);
+    if (result == WH_ERRCODE_NOMORE_CHANNEL) {
+        WH_ReportError(WH_ERRCODE_NOMORE_CHANNEL);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
         return FALSE;
     }
@@ -860,25 +860,25 @@ BOOL WH_StartMeasureChannel(void) {
     return TRUE;
 }
 
-// Measures the next channel that is allowed, from the one given. 0x18 once there are none left
+// Measures the next channel that is allowed, from the one given. WH_ERRCODE_NOMORE_CHANNEL once there are none left
 static u16 WH_StateInMeasureChannel(u16 channel) {
     u16 allowed = WM_GetAllowedChannel();
 
     if (allowed == 0x8000) {
-        WH_ReportError(3);
+        WH_ReportError(WM_ERRCODE_ILLEGAL_STATE);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
-        return 3;
+        return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (allowed == 0) {
-        WH_ReportError(0x16);
+        WH_ReportError(WH_ERRCODE_NO_RADIO);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
-        return 0x18;
+        return WH_ERRCODE_NOMORE_CHANNEL;
     }
     if (!((1 << (channel - 1)) & allowed)) {
         do {
             channel++;
             if (channel > 16) {
-                return 0x18;
+                return WH_ERRCODE_NOMORE_CHANNEL;
             }
         } while (!((1 << (channel - 1)) & allowed));
     }
@@ -905,7 +905,7 @@ static void WH_StateOutMeasureChannel(void *arg) {
         _pWmInfo->sBestBitmap |= 1 << (channel - 1);
     }
     next = WH_StateInMeasureChannel(channel + 1);
-    if (next == 0x18 && _pWmInfo->sSysState != WH_SYSSTATE_ERROR) {
+    if (next == WH_ERRCODE_NOMORE_CHANNEL && _pWmInfo->sSysState != WH_SYSSTATE_ERROR) {
         WH_ChangeSysState(WH_SYSSTATE_MEASURECHANNEL);
         return;
     }

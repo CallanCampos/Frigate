@@ -22,13 +22,36 @@
 #define CHAR_NEWLINE 0xfffe
 #define STRCMD_CHAR 0xf000
 
-#define STRCMD_CATEGORY_LAYOUT 0xbd
-#define STRCMD_CATEGORY_STREAM 0xbe
-#define STRCMD_CATEGORY_COLOR 0xff
+// The stream commands, which only a stream carries out: page breaks that scroll or clear the window, waits, the
+// callback's events (for the next call, or from then on), clearing the window and the speed
+enum {
+    STRCMD_STREAM_PAGE_SCROLL,
+    STRCMD_STREAM_PAGE_CLEAR,
+    STRCMD_STREAM_WAIT,
+    STRCMD_STREAM_SET_WAIT,
+    STRCMD_STREAM_RESET_WAIT,
+    STRCMD_STREAM_EVENT,
+    STRCMD_STREAM_SET_EVENT,
+    STRCMD_STREAM_RESET_EVENT,
+    STRCMD_STREAM_CLEAR_WINDOW,
+    STRCMD_STREAM_SPEED,
+};
 
-// A color of letter, shadow and background indices
-#define TEXT_COLOR(letter, shadow, background)                                                                         \
-    ((((letter) & 0x1f) << 10) | (((shadow) & 0x1f) << 5) | ((background) & 0x1f))
+// STRCMD_STREAM_SPEED's parameter: the stream's own speed, or one text speed faster or slower than the save's
+enum {
+    STRCMD_SPEED_DEFAULT,
+    STRCMD_SPEED_FASTER,
+    STRCMD_SPEED_SLOWER,
+};
+
+// The color command, whose parameter is a color, or STRCMD_COLOR_DEFAULT for the renderer's default color
+enum {
+    STRCMD_COLOR_SET,
+};
+
+#define STRCMD_COLOR_DEFAULT 0xff
+
+// The indices of a PRINT_COLOR
 #define TEXT_COLOR_LETTER(color) ((u8)(((color) >> 10) & 0x1f))
 #define TEXT_COLOR_SHADOW(color) ((u8)(((color) >> 5) & 0x1f))
 #define TEXT_COLOR_BACKGROUND(color) ((u8)((color) & 0x1f))
@@ -106,11 +129,6 @@ struct PrintStream {
     u32 nextEvent;
     u32 event;
     TextRenderer renderer;
-};
-
-enum {
-    PRINT_STREAM_PAGE_SCROLL,
-    PRINT_STREAM_PAGE_CLEAR,
 };
 
 GFLBitmap *g_TextRendererTempBitmap;
@@ -224,7 +242,7 @@ BOOL PrintQueue_Main(PrintQueue *queue) {
     }
 
     GFL_TextRndGetGlobalColors(&savedLetter, &savedShadow, &savedBackground);
-    savedColor = TEXT_COLOR(savedLetter, savedShadow, savedBackground);
+    savedColor = PRINT_COLOR(savedLetter, savedShadow, savedBackground);
     setColor = timeout;
     if (queue->job->colorState == TEXT_RND_COLOR_GLOBAL || queue->job->colorState == TEXT_RND_COLOR_APPLIED) {
         letter = TEXT_COLOR_LETTER(queue->job->defaultColor);
@@ -369,13 +387,13 @@ static void GFL_TextRndBind(TextRenderer *renderer, Font *font, GFLBitmap *bitma
     renderer->startY = renderer->y;
     renderer->colorState = TEXT_RND_COLOR_PENDING;
     GFL_TextRndGetGlobalColors(&letter, &shadow, &background);
-    renderer->color = TEXT_COLOR(letter, shadow, background);
+    renderer->color = PRINT_COLOR(letter, shadow, background);
     renderer->defaultColor = renderer->color;
 }
 
 static void GFL_TextRndSetDefaultColor(TextRenderer *renderer, u16 color) {
     u16 newColor =
-        TEXT_COLOR(TEXT_COLOR_LETTER(color), TEXT_COLOR_SHADOW(color), TEXT_COLOR_BACKGROUND(renderer->color));
+        PRINT_COLOR(TEXT_COLOR_LETTER(color), TEXT_COLOR_SHADOW(color), TEXT_COLOR_BACKGROUND(renderer->color));
 
     renderer->defaultColor = color;
     renderer->color = newColor;
@@ -462,20 +480,20 @@ static void GFL_TextRndDrawCharProc_IDX8(GFLBitmap *bitmap, int x, int y, Font *
 
 static const u16 *GFL_TextRndExecLayoutCmd(TextRenderer *renderer, const u16 *cmd) {
     switch (StrCmd_Index(cmd)) {
-    case 0: {
+    case STRCMD_LAYOUT_COLOR: {
         u8 letter = StrCmd_Param(cmd, 0);
         u8 shadow = StrCmd_Param(cmd, 1);
         u8 background = StrCmd_Param(cmd, 2);
 
         GFL_TextRndUpdateColorIndexLUT(letter, shadow, background);
-        renderer->defaultColor = TEXT_COLOR(letter, shadow, background);
+        renderer->defaultColor = PRINT_COLOR(letter, shadow, background);
         break;
     }
-    case 1:
+    case STRCMD_LAYOUT_RESTORE_COLOR:
         GFL_TextRndUpdateColorIndexLUT(TEXT_COLOR_LETTER(renderer->color), TEXT_COLOR_SHADOW(renderer->color),
                                        TEXT_COLOR_BACKGROUND(renderer->color));
         break;
-    case 3: {
+    case STRCMD_LAYOUT_ALIGN_RIGHT: {
         // Aligns the line to the right, less a margin
         int width = GFL_BitmapGetWidth(renderer->bitmap) - renderer->startX;
         int lineWidth = GFL_FontGetLineWidth(cmd, renderer->font, 0, NULL);
@@ -484,7 +502,7 @@ static const u16 *GFL_TextRndExecLayoutCmd(TextRenderer *renderer, const u16 *cm
         renderer->x = renderer->startX + (width - lineWidth) - 1 - margin;
         break;
     }
-    case 2: {
+    case STRCMD_LAYOUT_CENTER: {
         // Centers the line
         int width = GFL_BitmapGetWidth(renderer->bitmap) - renderer->startX;
         int lineWidth = GFL_FontGetLineWidth(cmd, renderer->font, 0, NULL);
@@ -496,10 +514,10 @@ static const u16 *GFL_TextRndExecLayoutCmd(TextRenderer *renderer, const u16 *cm
         }
         break;
     }
-    case 4:
+    case STRCMD_LAYOUT_MOVE_X:
         renderer->x = renderer->x + (s16)StrCmd_Param(cmd, 0);
         break;
-    case 5:
+    case STRCMD_LAYOUT_SET_X:
         renderer->x = StrCmd_Param(cmd, 0);
         break;
     }
@@ -507,10 +525,10 @@ static const u16 *GFL_TextRndExecLayoutCmd(TextRenderer *renderer, const u16 *cm
 }
 
 static const u16 *GFL_TextRndExecColorCmd(TextRenderer *renderer, const u16 *cmd) {
-    if (StrCmd_Index(cmd) == 0) {
+    if (StrCmd_Index(cmd) == STRCMD_COLOR_SET) {
         u8 color = StrCmd_Param(cmd, 0);
 
-        if (color == 0xff) {
+        if (color == STRCMD_COLOR_DEFAULT) {
             GFL_TextRndUpdateColorIndexLUT(TEXT_COLOR_LETTER(renderer->defaultColor),
                                            TEXT_COLOR_SHADOW(renderer->defaultColor),
                                            TEXT_COLOR_BACKGROUND(renderer->defaultColor));
@@ -519,7 +537,7 @@ static const u16 *GFL_TextRndExecColorCmd(TextRenderer *renderer, const u16 *cmd
             u8 background = TEXT_COLOR_BACKGROUND(renderer->color);
 
             GFL_TextRndUpdateColorIndexLUT(color * 2 + 1, color * 2 + 2, background);
-            renderer->defaultColor = TEXT_COLOR((u8)(color * 2 + 1), (u8)(color * 2 + 2), background);
+            renderer->defaultColor = PRINT_COLOR((u8)(color * 2 + 1), (u8)(color * 2 + 2), background);
         }
     }
     return StrCmd_Skip(cmd);
@@ -749,7 +767,7 @@ static void PrintStream_ExecStreamCmd(PrintStream *stream) {
     BOOL pageBreak = FALSE;
 
     switch (StrCmd_Index(stream->cursor)) {
-    case 0:
+    case STRCMD_STREAM_PAGE_SCROLL:
         pageBreak = TRUE;
         stream->state = PRINT_STREAM_PAUSED;
         stream->pageMode = PRINT_STREAM_PAGE_SCROLL;
@@ -758,7 +776,7 @@ static void PrintStream_ExecStreamCmd(PrintStream *stream) {
         stream->renderer.x = stream->renderer.startX;
         stream->renderer.y = 0;
         break;
-    case 1:
+    case STRCMD_STREAM_PAGE_CLEAR:
         pageBreak = TRUE;
         stream->state = PRINT_STREAM_PAUSED;
         stream->pageMode = PRINT_STREAM_PAGE_CLEAR;
@@ -767,28 +785,28 @@ static void PrintStream_ExecStreamCmd(PrintStream *stream) {
         stream->renderer.x = stream->renderer.startX;
         stream->renderer.y = 0;
         break;
-    case 2:
+    case STRCMD_STREAM_WAIT:
         stream->waitTimer = StrCmd_Param(stream->cursor, 0);
         break;
-    case 3:
+    case STRCMD_STREAM_SET_WAIT:
         stream->wait = StrCmd_Param(stream->cursor, 0);
         break;
-    case 4:
+    case STRCMD_STREAM_RESET_WAIT:
         stream->wait = stream->baseWait;
         break;
-    case 9: {
+    case STRCMD_STREAM_SPEED: {
         u8 steps[2];
 
         switch ((u8)StrCmd_Param(stream->cursor, 0)) {
-        case 0:
+        case STRCMD_SPEED_DEFAULT:
         default:
             steps[0] = stream->baseWait;
             steps[1] = stream->baseCharsPerStep;
             break;
-        case 1:
+        case STRCMD_SPEED_FASTER:
             PrintStream_GetWaitSteps(TextSpeed_GetFasterWait(), steps);
             break;
-        case 2:
+        case STRCMD_SPEED_SLOWER:
             PrintStream_GetWaitSteps(TextSpeed_GetSlowerWait(), steps);
             break;
         }
@@ -796,18 +814,18 @@ static void PrintStream_ExecStreamCmd(PrintStream *stream) {
         stream->charsPerStep = steps[1];
         break;
     }
-    case 5:
+    case STRCMD_STREAM_EVENT:
         stream->event = StrCmd_Param(stream->cursor, 0);
         break;
-    case 6:
+    case STRCMD_STREAM_SET_EVENT:
         stream->nextEvent = StrCmd_Param(stream->cursor, 0);
         stream->event = StrCmd_Param(stream->cursor, 0);
         break;
-    case 7:
+    case STRCMD_STREAM_RESET_EVENT:
         stream->nextEvent = stream->defaultEvent;
         stream->event = stream->defaultEvent;
         break;
-    case 8:
+    case STRCMD_STREAM_CLEAR_WINDOW:
         GFL_BitmapFill(stream->bitmap, stream->backgroundColor);
         break;
     }
@@ -1005,8 +1023,8 @@ u16 GFL_StrCmdGetIdentChar(void) {
 
 BOOL GFL_StrCmdIsWordSet(const u16 *cmd) {
     switch (StrCmd_Category(cmd)) {
-    case 1:
-    case 2:
+    case STRCMD_CATEGORY_WORD:
+    case STRCMD_CATEGORY_NUMBER:
         return TRUE;
     }
     return FALSE;

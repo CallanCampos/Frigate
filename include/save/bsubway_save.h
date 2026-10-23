@@ -5,6 +5,7 @@
 #include "gfl/heap.h"
 #include "nitro/rtc.h"
 #include "struct_decls.h"
+#include "system/pms_data.h"
 
 // The Battle Subway's save blocks: 0x38 the current play, 0x39 the scores, which include the Battle Points, and 0x3a
 #define SAVE_BLOCK_BSUBWAY_PLAY 0x38
@@ -94,13 +95,19 @@ typedef struct {
     u8 paddingEE[2];
 } BSubwayWifiPlayer;
 
-// A leader of a Wi-Fi room: 0x22 bytes, a name and the rest (overlays 50 and 141 keep their own BSubwayRecord)
+// A leader of a Wi-Fi room: a player's name and place, and the message that they left
 typedef struct {
     u16 name[8];
-    u8 unk10[4];
+    u8 unk10[2];
+    u8 country;
+    u8 area;
     // A 32-bit ID, lowest byte first
     u8 id[4];
-    u8 unk18[10];
+    PMSData message;
+    u8 unk20_0 : 1;
+    u8 female : 1;
+    u8 unk20_2 : 6;
+    u8 unk21;
 } BSubwayWifiLeader;
 
 // Block 0x3a: the Wi-Fi train's downloaded data
@@ -179,8 +186,8 @@ void BSubwayWifiData_SetLeaders(BSubwayWifiData *data, const void *leaders, u8 r
 u16 BSubwayWifiData_GetLeaderRank(BSubwayWifiData *data);
 u16 BSubwayWifiData_GetLeaderRoom(BSubwayWifiData *data);
 // Allocates a copy of the block's list of 0x22-byte leaders
-void *BSubwayWifiData_AllocLeaders(BSubwayWifiData *data, HeapID heapId);
-int BSubwayWifiLeader_CountList(void *list);
-u32 BSubwayWifiLeader_GetID(void *entry);
+BSubwayWifiLeader *BSubwayWifiData_AllocLeaders(BSubwayWifiData *data, HeapID heapId);
+int BSubwayWifiLeader_CountList(BSubwayWifiLeader *list);
+u32 BSubwayWifiLeader_GetID(BSubwayWifiLeader *leader);
 
 #endif // POKEBW2_SAVE_BSUBWAY_SAVE_H

@@ -3,6 +3,7 @@
 #include "constants/arc.h"
 #include "constants/sound.h"
 #include "field/field_sound.h"
+#include "field/intrude_work.h"
 #include "gfl/arc.h"
 #include "gfl/arc_util.h"
 #include "gfl/bg_sys.h"

@@ -406,7 +406,7 @@ BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     }
     shop->fadeIn = ResortShop_FadeIn;
     shop->fadeOut = ResortShop_FadeOut;
-    shop->work.msgBase = ResortPerson_GetParam(shop->work.person, 2, NULL);
+    shop->work.msgBase = ResortPerson_GetParam(shop->work.person, JOIN_AVE_PARAM_GENDER, NULL);
     *shop->work.vars[0] = 0;
     shop->work.mode = mode;
     switch (mode) {
@@ -903,7 +903,7 @@ static BOOL ResortShop_UpdateRecords(GameSystem *gsys, ResortShopWork *wk, u8 mo
 
         joinAveTextHandler(wk->selected->person, JOIN_AVE_PARAM_NAME, name);
         GFL_StrBufLoadString(strbuf, name);
-        gender = joinAveTextHandler(wk->selected->person, 2, NULL);
+        gender = joinAveTextHandler(wk->selected->person, JOIN_AVE_PARAM_GENDER, NULL);
         GFL_WordSetSetStrbuf(wk->wordSet, 2, strbuf, gender, 1, 2);
         GFL_StrBufFree(strbuf);
         ResortShop_PrintMessage(wk, wk->msgs[2]);
@@ -1090,16 +1090,16 @@ static void ResortShop_MakeRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode
         wk->entries[n].id = i;
         wk->entries[n].kind = 0;
         wk->entries[n].price = 0;
-        wk->entries[n].item = JoinAvenueRecord_GetParam(record, 3, NULL);
+        wk->entries[n].item = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_TRAINER_TYPE, NULL);
         wk->entries[n].count = 0;
         wk->entries[n].person = record;
-        a = JoinAvenueRecord_GetParam(record, 21, NULL);
-        b = JoinAvenueRecord_GetParam(record, 22, NULL);
-        c = JoinAvenueRecord_GetParam(record, 23, NULL);
+        a = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_YEAR, NULL);
+        b = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_MONTH, NULL);
+        c = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_DAY, NULL);
         labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_10);
         descriptionFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, n + 37);
-        gender = JoinAvenueRecord_GetParam(record, 2, NULL);
-        JoinAvenueRecord_GetParam(record, 4, name);
+        gender = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_GENDER, NULL);
+        JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_NAME, name);
         nameBuf = GFL_StrBufCreate(8, wk->heapId);
         GFL_StrBufLoadString(nameBuf, name);
         label = GFL_StrBufCreate(64, wk->heapId);
@@ -1145,7 +1145,7 @@ static void ResortShop_MakePersonEntries(ResortShopWork *wk, u8 mode, u8 subMode
         wk->entries[n].id = i;
         wk->entries[n].kind = 0;
         wk->entries[n].price = 0;
-        wk->entries[n].item = joinAveTextHandler(person, 3, NULL);
+        wk->entries[n].item = joinAveTextHandler(person, JOIN_AVE_PARAM_TRAINER_TYPE, NULL);
         wk->entries[n].count = 0;
         wk->entries[n].person = person;
         ResortShop_MakePersonEntry(wk, data, n, &wk->entries[n]);
@@ -1172,13 +1172,13 @@ static void ResortShop_SwapRecordEntries(ResortShopWork *wk, u8 mode, u8 subMode
         void *record = wk->entries[i].person;
         StrBuf *labelFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_10);
         StrBuf *descriptionFormat = GFL_MsgDataLoadStrbufNew(wk->msgData, i + 37);
-        u8 gender = JoinAvenueRecord_GetParam(record, 2, NULL);
-        u16 a = JoinAvenueRecord_GetParam(record, 21, NULL);
-        u16 b = JoinAvenueRecord_GetParam(record, 22, NULL);
-        u16 c = JoinAvenueRecord_GetParam(record, 23, NULL);
+        u8 gender = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_GENDER, NULL);
+        u16 a = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_YEAR, NULL);
+        u16 b = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_MONTH, NULL);
+        u16 c = JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_DAY, NULL);
         StrBuf *nameBuf;
 
-        JoinAvenueRecord_GetParam(record, 4, name);
+        JoinAvenueRecord_GetParam(record, JOIN_AVE_PARAM_NAME, name);
         nameBuf = GFL_StrBufCreate(8, wk->heapId);
         GFL_StrBufLoadString(nameBuf, name);
         WordSetNumber(wk->wordSet, 1, i + 1, 1, NUM_PAD_NONE, 1);
@@ -1711,9 +1711,9 @@ static StrBuf *ResortShop_MakePersonDescription(ResortShopWork *wk, JoinAvenuePe
     MsgData *msgData =
         GFL_MsgSysLoadData(FALSE, ARCID_SCRIPT_MESSAGE, SCRIPT_TEXT_GLOBAL_10685, HEAPID_TAIL(wk->heapId));
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, shop + 42);
-    u16 a = joinAveTextHandler(person, 21, NULL);
-    u16 b = joinAveTextHandler(person, 22, NULL);
-    u16 c = joinAveTextHandler(person, 23, NULL);
+    u16 a = joinAveTextHandler(person, JOIN_AVE_PARAM_YEAR, NULL);
+    u16 b = joinAveTextHandler(person, JOIN_AVE_PARAM_MONTH, NULL);
+    u16 c = joinAveTextHandler(person, JOIN_AVE_PARAM_DAY, NULL);
     u32 level = JoinAvenueShop_GetField(flags, 1);
     StrBuf *shopName = GFL_MsgDataLoadStrbufNew(msgData, shop + 280);
 
@@ -1738,7 +1738,7 @@ static void ResortShop_MakePersonEntry(ResortShopWork *wk, ResortPersonData *dat
     StrBuf *name = ResortSys_FormatShopText(wk->shops, data, flag, wk->heapId);
     StrBuf *description = ResortShop_MakePersonDescription(wk, person);
     StrBuf *format = GFL_MsgDataLoadStrbufNew(wk->msgData, ScrcmdResortShop_Text_Empty_11);
-    u8 gender = joinAveTextHandler(person, 2, NULL);
+    u8 gender = joinAveTextHandler(person, JOIN_AVE_PARAM_GENDER, NULL);
 
     WordSetNumber(wk->wordSet, 1, index + 1, 1, NUM_PAD_NONE, 1);
     GFL_WordSetSetStrbuf(wk->wordSet, 0, name, gender, 1, 2);
@@ -1848,20 +1848,20 @@ static void ResortShop_ApplyRecordOrder(ResortShopWork *wk, u8 mode, u8 subMode)
             if (i != wk->entries[i].id) {
                 u16 otherId = wk->entries[wk->entries[i].id].id;
                 void *a = JoinAvenueOccupants_GetRecord(wk->occupants, wk->entries[i].id);
-                u32 a1 = JoinAvenueRecord_GetParam(a, 1, NULL);
-                u16 a0 = JoinAvenueRecord_GetParam(a, 0, NULL);
-                u16 a31 = JoinAvenueRecord_GetParam(a, 31, NULL);
+                u32 a1 = JoinAvenueRecord_GetParam(a, JOIN_AVE_PARAM_ROW, NULL);
+                u16 a0 = JoinAvenueRecord_GetParam(a, JOIN_AVE_PARAM_SLOT, NULL);
+                u16 a31 = JoinAvenueRecord_GetParam(a, JOIN_AVE_PARAM_SHOP_KIND, NULL);
                 void *b = JoinAvenueOccupants_GetRecord(wk->occupants, otherId);
-                u32 b1 = JoinAvenueRecord_GetParam(b, 1, NULL);
-                u16 b0 = JoinAvenueRecord_GetParam(b, 0, NULL);
-                u16 b31 = JoinAvenueRecord_GetParam(b, 31, NULL);
+                u32 b1 = JoinAvenueRecord_GetParam(b, JOIN_AVE_PARAM_ROW, NULL);
+                u16 b0 = JoinAvenueRecord_GetParam(b, JOIN_AVE_PARAM_SLOT, NULL);
+                u16 b31 = JoinAvenueRecord_GetParam(b, JOIN_AVE_PARAM_SHOP_KIND, NULL);
 
-                JoinAvenueRecord_SetParam(a, 0, b0);
-                JoinAvenueRecord_SetParam(a, 1, b1);
-                JoinAvenueRecord_SetParam(a, 31, b31);
-                JoinAvenueRecord_SetParam(b, 0, a0);
-                JoinAvenueRecord_SetParam(b, 1, a1);
-                JoinAvenueRecord_SetParam(b, 31, a31);
+                JoinAvenueRecord_SetParam(a, JOIN_AVE_PARAM_SLOT, b0);
+                JoinAvenueRecord_SetParam(a, JOIN_AVE_PARAM_ROW, b1);
+                JoinAvenueRecord_SetParam(a, JOIN_AVE_PARAM_SHOP_KIND, b31);
+                JoinAvenueRecord_SetParam(b, JOIN_AVE_PARAM_SLOT, a0);
+                JoinAvenueRecord_SetParam(b, JOIN_AVE_PARAM_ROW, a1);
+                JoinAvenueRecord_SetParam(b, JOIN_AVE_PARAM_SHOP_KIND, a31);
                 MI_CpuCopy8(a, record, sizeof(record));
                 MI_CpuCopy8(b, a, sizeof(record));
                 MI_CpuCopy8(record, b, sizeof(record));
@@ -1893,16 +1893,16 @@ static void ResortShop_ApplyPersonOrder(ResortShopWork *wk, u8 mode, u8 subMode)
             if (i != j) {
                 u16 otherId = ResortShop_GetEntry(wk, j)->id;
                 JoinAvenuePerson *a = JoinAvenueOccupants_GetPerson(wk->occupants, wk->entries[i].id);
-                u32 a1 = joinAveTextHandler(a, 1, NULL);
-                u16 a0 = joinAveTextHandler(a, 0, NULL);
+                u32 a1 = joinAveTextHandler(a, JOIN_AVE_PARAM_ROW, NULL);
+                u16 a0 = joinAveTextHandler(a, JOIN_AVE_PARAM_SLOT, NULL);
                 JoinAvenuePerson *b = JoinAvenueOccupants_GetPerson(wk->occupants, otherId);
-                u32 b1 = joinAveTextHandler(b, 1, NULL);
-                u16 b0 = joinAveTextHandler(b, 0, NULL);
+                u32 b1 = joinAveTextHandler(b, JOIN_AVE_PARAM_ROW, NULL);
+                u16 b0 = joinAveTextHandler(b, JOIN_AVE_PARAM_SLOT, NULL);
 
-                JoinAvenuePerson_SetParam(a, 0, b0);
-                JoinAvenuePerson_SetParam(a, 1, b1);
-                JoinAvenuePerson_SetParam(b, 0, a0);
-                JoinAvenuePerson_SetParam(b, 1, a1);
+                JoinAvenuePerson_SetParam(a, JOIN_AVE_PARAM_SLOT, b0);
+                JoinAvenuePerson_SetParam(a, JOIN_AVE_PARAM_ROW, b1);
+                JoinAvenuePerson_SetParam(b, JOIN_AVE_PARAM_SLOT, a0);
+                JoinAvenuePerson_SetParam(b, JOIN_AVE_PARAM_ROW, a1);
                 MI_CpuCopy8(a, person, sizeof(person));
                 MI_CpuCopy8(b, a, sizeof(person));
                 MI_CpuCopy8(person, b, sizeof(person));

@@ -692,5 +692,5 @@ static void DebugGameStart_CycleCursorColor(DebugGameStartWork *wk) {
     r = 25 + ((-20 * t) >> FX32_SHIFT);
     g = 30 + ((-15 * t) >> FX32_SHIFT);
     wk->cursorColor = GX_RGB(r, g, b);
-    NNS_GfdRegisterNewVramTransferTask(15, 3 * 0x20 + 6 * 2, &wk->cursorColor, sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 3 * 0x20 + 6 * 2, &wk->cursorColor, sizeof(GXRgb));
 }

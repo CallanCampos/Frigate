@@ -515,7 +515,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
             GFL_BGSysSetLCDConfig(&lcdConfig);
         }
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x4084;
-        GX_SetBankForBG(8);
+        GX_SetBankForBG(GX_VRAM_BG_128_D);
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 4, 0, 0);
         GFL_BGSysSetBGEnabled(2, 1);
         {

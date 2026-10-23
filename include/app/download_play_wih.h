@@ -35,6 +35,13 @@ enum {
     WIH_CONNECTMODE_DS_CHILD,
 };
 
+// The helper's own errors, which it keeps as the first error after the manager's (WMErrCode): the wireless has no
+// channel it may use, and no channel is left to measure. Overlay 30's helper reports the same numbers
+enum {
+    WIH_ERRCODE_NO_RADIO = 0x16,
+    WIH_ERRCODE_NOMORE_CHANNEL = 0x18,
+};
+
 // The state names, one per state before WIH_STATE_FATAL, which the state change passes to the work's log
 extern const char *const stateNames[];
 

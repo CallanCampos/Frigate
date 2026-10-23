@@ -576,7 +576,7 @@ static int Search_TouchPanelFunc(WorldTradeWork *wk) {
 }
 
 static void Search_DecideFunc(WorldTradeWork *wk, int decide) {
-    void *personal;
+    PersonalData *personal;
     int sexSelection;
 
     switch (decide) {
@@ -619,7 +619,7 @@ static void Search_DecideFunc(WorldTradeWork *wk, int decide) {
 
 static int Search_SubSeqMain(WorldTradeWork *wk) {
     int touch = Search_TouchPanelFunc(wk);
-    void *personal;
+    PersonalData *personal;
     int sexSelection;
     int pos;
 
@@ -1005,7 +1005,7 @@ static int Search_SubSeqPokenameSelectList(WorldTradeWork *wk) {
 
 static int Search_SubSeqPokenameSelectWait(WorldTradeWork *wk) {
     u32 ret = WorldTrade_Input_Main(wk->inputWork);
-    void *personal;
+    PersonalData *personal;
     int sexSelection;
 
     switch (ret) {

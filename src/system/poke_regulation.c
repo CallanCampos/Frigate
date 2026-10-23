@@ -542,8 +542,7 @@ void *PokeRegulation_CreatePrintMsg(Regulation *regulation, WordSet *wordset, He
     return printMsg;
 }
 
-void PokeRegulation_FreePrintMsg(void *data) {
-    RegulationPrintMsg *printMsg = data;
+void PokeRegulation_FreePrintMsg(RegulationPrintMsg *printMsg) {
     int i;
 
     for (i = 0; i < PRINT_MSG_RULE_COUNT; i++) {

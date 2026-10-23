@@ -40,6 +40,13 @@ enum {
     WH_SYSSTATE_FATAL,
 };
 
+// The helper's own errors, which it numbers after the manager's (WMErrCode): the wireless has no channel it may use,
+// and no channel is left to measure
+enum {
+    WH_ERRCODE_NO_RADIO = 0x16,
+    WH_ERRCODE_NOMORE_CHANNEL = 0x18,
+};
+
 // How a machine connects (WH_CONNECTMODE_*): in the multi-point mode, with the keys shared, or with the data shared
 enum {
     WH_CONNECTMODE_MP_PARENT,

@@ -1567,10 +1567,12 @@ Same instructions, scheduled in another order.
   `PrintWindow_Print`. A block-scoped local set from the field before the call does the same: bmp_menu.c's
   `BmpMenu_PrintOptions` loads the queue first because its loop body declares `PrintQueue *queue` and a `u8 y`.
   save_error.c's `displayLightBlueErrorWindow` reads `chars->size` before calling `G2_GetBG1CharPtr()` only
-  through NitroSDK's `MI_CpuCopy16` inline over `MIi_CpuCopy16`. The same goes for a field read before a call that
-  could change it, such as a `MI_CpuFill8` of the struct that holds it: pdwacc_disp.c reads the heap ID before
-  clearing its palette cycle only as the argument of a `static inline` helper that clears the cycle and then uses the
-  heap ID.
+  through NitroSDK's `MI_CpuCopy16` inline over `MIi_CpuCopy16`, as overlay 181's copies of the game's name and
+  introduction load their destination before `GFL_StrBufGetStringPtr(name)` (mb_parent_sys.c's
+  `MBParent_SetupGameInfo`, mb_parent_dataconv_sys.c's `MBDataConv_CreateRegistry`). The same goes for a field
+  read before a call that could change it, such as a `MI_CpuFill8` of the struct that holds it: pdwacc_disp.c reads
+  the heap ID before clearing its palette cycle only as the argument of a `static inline` helper that clears the
+  cycle and then uses the heap ID.
 - Two stores through a pointer read from a struct, with one load of the pointer where ours loads it again after the
   first store, were made by an inlined helper that takes the pointer, such as `PrintWindow_Init(header.printWindow,
   window)` in `ShopUI_CreateConfirmDialog`.
@@ -2532,7 +2534,9 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
   `||` chain of `==` tests of consecutive constants; a written `(u16)(x - C) <= n` subtracts instead.
   `billboard_act.c`'s `BlActSys_GetActorLastCmd` tests the last animation command this way, and `pml_item.c`'s
   `PML_ItemIsNotSpecialMonsball` its nine balls, with `0xfe14` from the literal pool and `cmp #8; bls`, where
-  `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice.
+  `item < ITEM_FAST_BALL || item > ITEM_PARK_BALL` builds the constant with `movs`/`lsls` and compares twice. Even a
+  written `(u16)(x + 0xfffe) <= 1`, which gives the same adds, can allocate the function's registers differently:
+  frame_list.c's `UpdateScroll` matches only with `nextState == LIST_STATE_BAR || nextState == LIST_STATE_DRAG`.
 - An inline that returns a condition, `return a && b;`, builds the flag ahead of the tests (`movs r1, #0`, the
   tests, `movs r1, #1`) where the original's `movs r0, #1`, `b`, `movs r0, #0` after the tests is
   `if (a && b) { return TRUE; } return FALSE;` (2.0/sp2): `g2d_Animation.c`'s `ShouldAnmCtrlMoveNext_`, the test of

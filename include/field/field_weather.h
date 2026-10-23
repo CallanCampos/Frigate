@@ -119,13 +119,13 @@ BOOL Sunny_FadeOut(WeatherTask *task, u32 arg, HeapID heapId);
 BOOL Sunny_Exit(WeatherTask *task, u32 arg, HeapID heapId);
 void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void *fogCtrl, FieldSound *sound, u16 season,
                           HeapID heapId);
-void func_ov036_021990d8(void *weather);
+void func_ov036_021990d8(FieldWeather *weather);
 void FieldWeather_Update(void *weather, HeapID heapId);
-void FieldWeather_Draw(void *weather);
-BOOL func_ov036_0219917c(void *weather);
-void SetWeatherInit(void *weather, u16 weatherId, HeapID heapId);
+void FieldWeather_Draw(FieldWeather *weather);
+BOOL func_ov036_0219917c(FieldWeather *weather);
+void SetWeatherInit(FieldWeather *weather, u16 weatherId, HeapID heapId);
 void func_ov036_02199208(void *weather, u32 weatherId);
 // Sets the weather at once, without a transition
-void func_ov036_02199210(void *weather, u32 weatherId);
+void func_ov036_02199210(FieldWeather *weather, u32 weatherId);
 
 #endif // POKEBW2_FIELD_FIELD_WEATHER_H

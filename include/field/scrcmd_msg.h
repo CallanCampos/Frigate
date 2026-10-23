@@ -9,6 +9,19 @@
 #include "struct_decls.h"
 #include "system/vm.h"
 
+// Where a script's message window opens: across the top or the bottom of the screen, AUTO away from the player for a
+// balloon over an actor, and the balloons offset to the left or the right of their actor. The positions are stored as
+// u8s (ActorMsgWin_SetPosActual)
+enum {
+    MSG_WIN_POS_AUTO,
+    MSG_WIN_POS_TOP,
+    MSG_WIN_POS_BOTTOM,
+    MSG_WIN_POS_TOP_LEFT,
+    MSG_WIN_POS_BOTTOM_LEFT,
+    MSG_WIN_POS_TOP_RIGHT,
+    MSG_WIN_POS_BOTTOM_RIGHT,
+};
+
 BOOL s0034_SystemMsg(VM *vm, FieldScriptEnv *env);
 BOOL s0035_SystemMsgAsync(VM *vm, FieldScriptEnv *env);
 BOOL s0037_MsgSetLoadingSpinner(VM *vm, FieldScriptEnv *env);

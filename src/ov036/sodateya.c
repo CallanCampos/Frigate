@@ -54,27 +54,6 @@ static const DayCareMoveParamTable sEggMoveParams;
 #define PERSONAL_EGG_GROUP_1 24
 #define PERSONAL_EGG_GROUP_2 25
 
-#define LEARNSET_MAX 26
-#define LEARNSET_END 0xffff
-
-// A move a species learns at a level
-typedef struct {
-    u16 move;
-    u16 level;
-} LearnsetEntry;
-
-static inline BOOL LearnsetEntry_IsEnd(LearnsetEntry entry) {
-    return entry.move == LEARNSET_END && entry.level == LEARNSET_END;
-}
-
-static inline u16 LearnsetEntry_GetMove(LearnsetEntry entry) {
-    return entry.move;
-}
-
-static inline u16 LearnsetEntry_GetLevel(LearnsetEntry entry) {
-    return entry.level;
-}
-
 // The day care's work area
 struct DayCare {
     HeapID heapId;
@@ -788,7 +767,7 @@ static void dittoAbilFix(EggParents *parents, EggData *egg, EggRandom *rnd) {
 }
 
 static void FetchEggBaseHappiness(EggData *egg, HeapID heapId) {
-    void *personal = PML_PersonalLoad(egg->species, egg->form, heapId);
+    PersonalData *personal = PML_PersonalLoad(egg->species, egg->form, heapId);
     u32 happiness = PML_PersonalGetParam(personal, PERSONAL_HATCH_CYCLES);
 
     PML_PersonalFree(personal);
@@ -1077,7 +1056,7 @@ static void createEggPkm(PartyPkm *pkm, const EggData *egg, PlayerInfo *info, u3
 static BOOL canPkmLearnTMItemNumber(HeapID heapId, u16 species, u16 form, u16 item) {
     u32 flags;
     u32 bit;
-    void *personal;
+    PersonalData *personal;
 
     if (species >= SPECIES_GENESECT) {
         return FALSE;

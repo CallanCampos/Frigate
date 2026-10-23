@@ -445,7 +445,7 @@ static void PokeList_UpdateGlow(PokeListWork *wk) {
             }
         }
     }
-    NNS_GfdRegisterNewVramTransferTask(15, 0xc0, wk->colors, sizeof(wk->colors));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 0xc0, wk->colors, sizeof(wk->colors));
 }
 
 static void PokeList_VBlank(TCB *tcb, void *data) {
@@ -514,7 +514,7 @@ static void PokeList_InitGraphics(PokeListWork *wk) {
 }
 
 void PokeList_CreateBG0(PokeListWork *wk) {
-    GX_SetGraphicsMode(1, 0, 0);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     PokeList_CreateBG(&sBG0Setup, 0, 0);
 }
 
@@ -526,14 +526,14 @@ void PokeList_Init3D(PokeListWork *wk) {
     // a guess: the eight colors that G3X_SetEdgeColorTable takes, for the edge marking turned on below
     static const GXRgb sEdgeColors[8] = { 0 };
 
-    GX_SetGraphicsMode(1, 0, 1);
+    GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_3D);
     GFL_G3DSysCreate(FALSE, 1, FALSE, 1, 0, wk->heapId, NULL);
     G2_SetBG0Priority(0);
     G3X_EdgeMarking(TRUE);
     G3X_AntiAlias(TRUE);
     G3X_AlphaBlend(TRUE);
-    wk->camera = GFL_G3DCameraCreate(2, 0, 0x50d7, 0, 0x6bca, FX32_ONE, FX32_CONST(128), 0, &sCameraPos, &sCameraUp,
-                                     &sCameraTarget, wk->heapId);
+    wk->camera = GFL_G3DCameraCreate(G3DCAM_PROJECTION_ORTHO, 0, 0x50d7, 0, 0x6bca, FX32_ONE, FX32_CONST(128), 0,
+                                     &sCameraPos, &sCameraUp, &sCameraTarget, wk->heapId);
     GFL_G3DCameraFlush(wk->camera);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, GX_PLANEMASK_BG2,
                        GX_PLANEMASK_BG1 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ, 16, 10);

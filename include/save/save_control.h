@@ -135,19 +135,19 @@ void *SaveControl_GetUploadData(SaveControl *save, u32 *size);
 // The sizes of a downloaded C-Gear skin and Pokédex skin, and a Pokédex skin block's valid flag
 u32 CGearPictureSave_GetSize(void);
 u32 PokedexSkinSave_GetSize(void);
-void PokedexSkinSave_SetValid(void *block, u32 valid);
+void PokedexSkinSave_SetValid(PokedexSkinSave *block, u32 valid);
 // A Pokédex skin block's characters and palette, and whether it is valid
-void *PokedexSkinSave_GetChars(void *block);
-void *PokedexSkinSave_GetPalette(void *block);
-BOOL PokedexSkinSave_IsValid(void *block);
+void *PokedexSkinSave_GetChars(PokedexSkinSave *block);
+void *PokedexSkinSave_GetPalette(PokedexSkinSave *block);
+BOOL PokedexSkinSave_IsValid(PokedexSkinSave *block);
 // Reads the downloaded musical's save block (6) into a new work, its archive and the archive's size, and frees it
 void *MusicalDist_Load(GameData *gameData, HeapID heapId);
-void MusicalDist_Free(void *work);
-void *MusicalDist_GetData(void *work);
-u32 MusicalDist_GetDataSize(void *work);
+void MusicalDist_Free(MusicalDistWork *work);
+void *MusicalDist_GetData(MusicalDistWork *work);
+u32 MusicalDist_GetDataSize(MusicalDistWork *work);
 // Imports a downloaded musical, a step a frame until it returns TRUE
 void *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId);
-BOOL MusicalDist_WriteStep(void *work);
+BOOL MusicalDist_WriteStep(MusicalDistWork *work);
 void *getAddressOfExtraSaveBlk(SaveControl *save, u32 block, u32 arg2);
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *save, u32 block);
 u32 SaveControl_GetStatus(SaveControl *save);
@@ -236,17 +236,17 @@ void KeyDataSave_SetMoney(KeyDataSave *keyData, u32 value);
 RivalDataSave *getHollow_RivalData(SaveControl *save);
 // Save block 0x42, and setting a byte of it
 void *getHollow_RivalBlk(SaveControl *save);
-void HollowRivalSave_SetMeetingToday(void *rival, u32 value);
+void HollowRivalSave_SetMeetingToday(HollowRivalSave *rival, u32 value);
 // The rival's hollow data: a value of an index, a flag of an index, and the hollows visited
-void HollowRivalSave_SetValue(void *block, u32 index, u16 value);
-u16 HollowRivalSave_GetValue(void *block, u16 index);
-void HollowRivalSave_SetFlag(void *block, u16 index, u32 value);
-void HollowRivalSave_ClearMeeting(void *block);
-u16 HollowRivalSave_GetMeeting(void *block);
-void HollowRivalSave_SetHasSpecies(void *block, u32 value);
-void HollowRivalSave_SetSpecies(void *block, u16 value);
-void HollowRivalSave_SetMet(void *block, u32 value);
-BOOL func_0200ffd4(void *block, int index);
+void HollowRivalSave_SetValue(HollowRivalSave *block, u32 index, u16 value);
+u16 HollowRivalSave_GetValue(HollowRivalSave *block, u16 index);
+void HollowRivalSave_SetFlag(HollowRivalSave *block, u16 index, u32 value);
+void HollowRivalSave_ClearMeeting(HollowRivalSave *block);
+u16 HollowRivalSave_GetMeeting(HollowRivalSave *block);
+void HollowRivalSave_SetHasSpecies(HollowRivalSave *block, u32 value);
+void HollowRivalSave_SetSpecies(HollowRivalSave *block, u16 value);
+void HollowRivalSave_SetMet(HollowRivalSave *block, u32 value);
+BOOL func_0200ffd4(HollowRivalSave *block, int index);
 // The C-Gear's save block (getCGearDataBlkAddress)
 // Copies the C-Gear's record at index, 4 u16
 void Misc_AddMetTrainer(RivalDataSave *rivalData, u32 id);
@@ -304,21 +304,21 @@ HighLinkSave *getHighLinkBlockAddress(SaveControl *save);
 void *FestRecords_GetFromSave(SaveControl *save);
 // The Funfest mission records of FestRecords_GetFromSave's block: missions hosted, joined and completed, the most
 // participants and the best score
-u16 FestRecords_GetHosted(void *a0);
-u16 FestRecords_GetJoined(void *a0);
+u16 FestRecords_GetHosted(FunfestSave *a0);
+u16 FestRecords_GetJoined(FunfestSave *a0);
 // Count one more mission hosted and joined, up to 9999, and return the new count
-u16 FestRecords_AddHosted(void *records);
-u16 FestRecords_AddJoined(void *records);
-u16 FestRecords_GetCompleted(void *a0);
-u8 FestRecords_GetMostParticipants(void *a0);
-u16 FestRecords_GetTopScores(void *a0);
+u16 FestRecords_AddHosted(FunfestSave *records);
+u16 FestRecords_AddJoined(FunfestSave *records);
+u16 FestRecords_GetCompleted(FunfestSave *a0);
+u8 FestRecords_GetMostParticipants(FunfestSave *a0);
+u16 FestRecords_GetTopScores(FunfestSave *a0);
 // A Funfest mission's record in FestRecords_GetFromSave's block, by the mission's index, which is 0 for an index past
 // the missions: a 14-bit count, another count, the highest level cleared (0 to 4) and whether the mission is new, which
 // FestRecords_ClearMissionNew clears
 u16 FestRecords_GetMissionCount(void *records, u8 mission);
 u16 FestRecords_GetMissionBest(void *records, u8 mission);
-u32 FestRecords_GetMissionLevel(void *records, u8 mission);
-BOOL FestRecords_IsMissionNew(void *records, u8 mission);
+u32 FestRecords_GetMissionLevel(FunfestSave *records, u8 mission);
+BOOL FestRecords_IsMissionNew(FunfestSave *records, u8 mission);
 void FestRecords_ClearMissionNew(void *records, u8 mission);
 KeyInfoSave *getKeyInfoSaveBlk(SaveControl *save);
 // Whether a key system key is unlocked

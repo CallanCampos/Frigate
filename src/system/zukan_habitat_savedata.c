@@ -21,9 +21,7 @@ void *SaveControl_GetZukanHabitatSave(SaveControl *save) {
     return MedalBox_GetHabitatList(SaveControl_GetMedalBox(save));
 }
 
-u8 ZukanHabitatSave_GetHabitatField(void *data, u8 habitat, u32 type) {
-    ZukanHabitatSave *save = data;
-
+u8 ZukanHabitatSave_GetHabitatField(ZukanHabitatSave *save, u8 habitat, u32 type) {
     switch (type) {
     case ZUKAN_HABITAT_TYPE_0:
         return save->habitats[habitat].type0;
@@ -57,39 +55,27 @@ void ZukanHabitatSave_SetHabitatField(ZukanHabitatSave *save, u8 habitat, u32 ty
     }
 }
 
-void ZukanHabitatSave_SetZone(void *data, u16 zone) {
-    ZukanHabitatSave *save = data;
-
+void ZukanHabitatSave_SetZone(ZukanHabitatSave *save, u16 zone) {
     save->zone = zone;
 }
 
-u16 ZukanHabitatSave_GetZone(void *data) {
-    ZukanHabitatSave *save = data;
-
+u16 ZukanHabitatSave_GetZone(ZukanHabitatSave *save) {
     return save->zone;
 }
 
-void ZukanHabitatSave_SetSeason(void *data, u32 season) {
-    ZukanHabitatSave *save = data;
-
+void ZukanHabitatSave_SetSeason(ZukanHabitatSave *save, u32 season) {
     save->season = season;
 }
 
-u8 ZukanHabitatSave_GetSeason(void *data) {
-    ZukanHabitatSave *save = data;
-
+u8 ZukanHabitatSave_GetSeason(ZukanHabitatSave *save) {
     return save->season;
 }
 
-void ZukanHabitatSave_SetType(void *data, u16 type) {
-    ZukanHabitatSave *save = data;
-
+void ZukanHabitatSave_SetType(ZukanHabitatSave *save, u16 type) {
     save->type = type;
 }
 
-u8 ZukanHabitatSave_GetType(void *data) {
-    ZukanHabitatSave *save = data;
-
+u8 ZukanHabitatSave_GetType(ZukanHabitatSave *save) {
     return save->type;
 }
 

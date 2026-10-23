@@ -19,7 +19,7 @@
 #define CURVE_FILE_FRAMES 8
 
 struct G3DCurve {
-    u16 heapId;
+    HeapID heapId;
     ArcTool *arc;
     u32 fileId;
     u32 frameCount;

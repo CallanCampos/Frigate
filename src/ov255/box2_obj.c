@@ -1487,7 +1487,7 @@ static void DrawTrayIconPokes(Box2SysWork *syswk, u32 tray, u8 *chr) {
     u8 px;
     u8 py;
     u32 species;
-    void *personal;
+    PersonalData *personal;
     u8 y;
     u16 color;
     u16 form;

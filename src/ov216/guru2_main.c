@@ -1767,8 +1767,8 @@ static void Guru2Main_Draw(Guru2MainWork *g2m) {
     GFL_G3DSysReset();
     GFL_G3DCameraFlush(g2m->camera.camera);
     GFL_G3DSysMtxViewFlush();
-    NNS_G3dGlbLightVector(0, 0, -FX32_ONE, 0);
-    NNS_G3dGlbLightColor(0, GX_RGB(31, 31, 31));
+    NNS_G3dGlbLightVector(GX_LIGHTID_0, 0, -FX32_ONE, 0);
+    NNS_G3dGlbLightColor(GX_LIGHTID_0, GX_RGB(31, 31, 31));
     NNS_G3dGlbMaterialColorDiffAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
     NNS_G3dGlbMaterialColorSpecEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
     Guru2Main_DrawBG3D(g2m);

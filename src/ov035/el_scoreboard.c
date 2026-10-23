@@ -70,6 +70,6 @@ void ElScoreboard_Update(ElScoreboard *board) {
 }
 
 void ElScoreboard_UploadPalette(ElScoreboardPaletteTarget *target, s32 frame) {
-    NNS_GfdRegisterNewVramTransferTask(1, target->vramOffset + (u16)target->palette * 8,
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, target->vramOffset + (u16)target->palette * 8,
                                        sScoreboardPalettes[(frame & 0x1f) / 8], 8);
 }

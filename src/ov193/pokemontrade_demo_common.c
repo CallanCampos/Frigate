@@ -108,7 +108,7 @@ static void PokemonTradeDemoCommon_InitSide(PokemonTradeWork *wk, u8 *ownedByPla
     form = PokeParty_GetParam(pkm, PKM_PARAM_FORM, NULL);
     isEgg = PokeParty_GetParam(pkm, PKM_PARAM_IS_EGG, NULL);
     if (isEgg == FALSE) {
-        void *personal = PML_PersonalLoad(species, form, wk->heapId);
+        PersonalData *personal = PML_PersonalLoad(species, form, wk->heapId);
 
         noHop = PML_PersonalGetParam(personal, PERSONAL_NO_BOUNCE);
         PML_PersonalFree(personal);

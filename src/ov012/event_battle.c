@@ -3,7 +3,6 @@
 // Function and data names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 #include "types.h"
 #include "app/event_battle_return.h"
-#include "app/ov337.h"
 #include "battle/battle_proc.h"
 #include "battle/btl_result.h"
 #include "battle/btl_setup.h"
@@ -12,6 +11,7 @@
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/version.h"
+#include "dsprot/dsprot.h"
 #include "field/badge_gate.h"
 #include "field/encounter.h"
 #include "field/event_battle.h"
@@ -88,10 +88,10 @@ static BOOL EventBattleCall_IsResultDefeat(EventBattleCallWork *work);
 static void EventBattleCall_SyncGameDataOnReturn(EventBattleCallWork *work, GameData *gameData);
 static void EventBattleCall_Setup(EventBattleCallWork *work, GameSystem *gsys, BtlSetup *setup);
 static void EventBattleCall_ReleaseBtlSetup(EventBattleCallWork *work);
-static void *EventBattleCall_DSProtTamper1(u32 *seed, void *work);
-static void *EventBattleCall_DSProtNop1(u32 *seed, void *work);
-static void *EventBattleCall_DSProtTamper3(u32 *seed, void *work);
-static void *EventBattleCall_DSProtNop3(u32 *seed, void *work);
+static void *EventBattleCall_DSProtTamper1(void *seed, void *work);
+static void *EventBattleCall_DSProtNop1(void *seed, void *work);
+static void *EventBattleCall_DSProtTamper3(void *seed, void *work);
+static void *EventBattleCall_DSProtNop3(void *seed, void *work);
 
 // The result of a wild battle for each battle result
 static const u8 WILD_BATTLE_RESULT[7] = { 0xff, 2, 0xff, 1, 1, 0, 0 };
@@ -437,7 +437,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
-        if (checksum == 0x9f75a8d6) {
+        if (checksum == DSPROT_CHECKSUM) {
             DSProt_CallRunChecks1(&seed, wk);
         } else {
             data_ov337_02182444[data_ov337_02182440 ^ 1](&seed, wk);
@@ -462,7 +462,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
             checksum ^= (*code >> shift) | (*code << (32 - shift));
             code++;
         }
-        if (checksum == 0x9f75a8d6) {
+        if (checksum == DSPROT_CHECKSUM) {
             DSProt_CallRunChecks3(&seed, wk);
         } else {
             data_ov337_02182444[data_ov337_02182440 ^ 1](&seed, wk);
@@ -515,7 +515,7 @@ static GameEventReturnCode EventBattleCall_Callback(GameEvent *event, u32 *state
 
 // The kind of beacon for the trainer: 0 for some classes, 1 for others and 2 for the rest
 static u32 EventBattleCall_GetTrainerBeaconKind(u16 trainerId) {
-    u16 trainerClass = TrainerData_GetParam(trainerId, 1);
+    u16 trainerClass = TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS);
     u32 group = GetTrainerClassBGMGroupId(trainerClass);
     u32 i;
 
@@ -658,26 +658,26 @@ static void EventBattleCall_ReleaseBtlSetup(EventBattleCallWork *work) {
 }
 
 // The fallbacks of the anti-piracy checks
-static void *EventBattleCall_DSProtTamper1(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtTamper1(void *seed, void *work) {
     GFL_RandomMT();
     GFL_RandomMT();
-    *seed += 0x3d1;
+    *(u32 *)seed += 0x3d1;
     return seed;
 }
 
-static void *EventBattleCall_DSProtNop1(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtNop1(void *seed, void *work) {
     GFL_RandomMT();
     GFL_RandomMT();
     return work;
 }
 
-static void *EventBattleCall_DSProtTamper3(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtTamper3(void *seed, void *work) {
     GFL_RandomMT();
     GFL_RandomMT();
-    *seed += 0x9d;
+    *(u32 *)seed += 0x9d;
     return seed;
 }
 
-static void *EventBattleCall_DSProtNop3(u32 *seed, void *work) {
+static void *EventBattleCall_DSProtNop3(void *seed, void *work) {
     return work;
 }

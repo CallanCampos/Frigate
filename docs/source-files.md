@@ -1395,7 +1395,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `print_msg.c` | `0x0219a2a4`–`0x0219a438` | 3 | complete | descriptive |
 | `msgsearch.c` | `0x0219a438`–`0x0219a584` | 4 | complete | string at `0x0219ce38` |
 | `yesno_menu.c` | `0x0219a584`–`0x0219af1c` | 8 | complete | string at `0x0219ce44` |
-| `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | partial | string at `0x0219ce54` |
+| `frame_list.c` | `0x0219af1c`–`0x0219cd18` | 55 | complete | string at `0x0219ce54` |
 
 ### Overlay 140
 
@@ -1777,11 +1777,11 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 
 | File | `.text` (Black 2) | Functions | Status | Name |
 | --- | --- | --- | --- | --- |
-| `mb_parent_sys.c` | `0x0219ce80`–`0x0219eec8` | 28 | partial | string at `0x021a4354` |
+| `mb_parent_sys.c` | `0x0219ce80`–`0x0219eec8` | 28 | complete | string at `0x021a4354` |
 | `mbp.c` | `0x0219eec8`–`0x0219f580` | 16 | complete | string at `0x021a4650` |
 | `mb_comm_sys.c` | `0x0219f580`–`0x0219fc0c` | 47 | complete | string at `0x021a46a8` |
 | `mb_util_msg.c` | `0x0219fc0c`–`0x021a039c` | 26 | complete | string at `0x021a46b8` |
-| `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | partial | string at `0x021a46c8` |
+| `mb_parent_dataconv_sys.c` | `0x021a039c`–`0x021a092c` | 15 | complete | string at `0x021a46c8` |
 | `mb_comm.c` | `0x021a092c`–`0x021a1698` | 18 | partial | descriptive |
 | `mb_segment.c` | `0x021a1698`–`0x021a2040` | 11 | complete | descriptive |
 | `mb_gameinfo.c` | `0x021a2040`–`0x021a2638` | 14 | partial | descriptive |

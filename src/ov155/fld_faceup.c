@@ -24,9 +24,6 @@
 // The face-up (the file name is the ROM's): a close-up of a character's face over the field. The face is on BG 2 and
 // its eyes and mouth on BG 3, where two animations write the frames' map entries, which a VBlank task loads
 
-// The script sub event of the message that the mouth moves with (scrcmd_work.c tests it as well)
-#define SCRIPT_SUB_EVENT_MSG 3
-
 #define FACEUP_BG_FACE 2
 #define FACEUP_BG_PARTS 3
 

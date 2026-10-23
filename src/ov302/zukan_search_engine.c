@@ -63,7 +63,7 @@ struct ZukanSearchEngine {
     u8 *shapes;
     u16 formCount;
     u16 *forms;
-    void *personal;
+    PersonalData *personal;
     u16 resultCount;
     u16 *result;
 };

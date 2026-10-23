@@ -18,8 +18,10 @@ u32 func_ov012_0215364c(GameCommSys *commSys, GameData *gameData);
 u32 func_ov012_02153650(GameCommSys *commSys);
 void func_ov012_02153654(GameCommSys *commSys);
 u32 Intrude_GetAlertState(GameCommSys *commSys);
-u32 func_ov012_0215365c(void);
-u32 func_ov012_02153660(void);
+// For the Xtransceiver's screen in the field (comm_tvt_field.c): the number of the player calling, and whether that
+// caller is ready, given the name
+u32 func_ov012_0215365c(GameCommSys *commSys);
+BOOL func_ov012_02153660(GameCommSys *commSys, StrBuf *name);
 u32 func_ov012_02153664(GameCommSys *commSys);
 void func_ov012_02153668(GameCommSys *commSys);
 

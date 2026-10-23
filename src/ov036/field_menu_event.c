@@ -46,7 +46,7 @@ static GameEventReturnCode EventFieldMenuReturn_Callback(GameEvent *event, u32 *
             actorSystem = Field_GetActorSystem(work->field);
             gameData = GSYS_GetGameData(GameEvent_GetGameSystem(event));
             DisableAllActorsMovement(actorSystem);
-            GameData_SetFieldMenuItem(gameData, 1);
+            GameData_SetFieldMenuItem(gameData, FIELD_MENU_ITEM_POKEMON);
             FieldSubscreen_ReqChange(Field_GetSubscreen(work->field), work->screenId);
             work->seq++;
         }

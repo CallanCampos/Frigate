@@ -120,10 +120,6 @@ BOOL BtlvScu_WaitLevelUpWinStats(BtlvScu *scu);
 void BtlvScu_StartLevelUpWinClose(BtlvScu *scu);
 BOOL BtlvScu_WaitLevelUpWinClose(BtlvScu *scu);
 
-// The battle's selection screens, which share an address range with the bag
-void BScenarioMain_Start(void *param);
-void BChoiceMain_Start(void *param);
-
 BtlvCore *BtlvCore_Create(BtlMainModule *mainModule, BtlClient *client, BtlPokeCon *pokeCon, u32 arg3, HeapID heapId);
 void BtlvCore_ResetGraphics(HeapID heapId);
 void BtlvCore_Delete(BtlvCore *viewCore);

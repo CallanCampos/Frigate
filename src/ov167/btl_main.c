@@ -1127,7 +1127,7 @@ BOOL BtlMain_CommExchangeTrainers(BtlMainModule *mainModule, s32 *state) {
                         strBuf = GFL_MsgDataLoadStrbufNew(msgData, TEXT_HIDDEN_TRAINER_NAME);
                         GFL_MsgDataFree(msgData);
                         str = GFL_StrBufGetStringPtr(strBuf);
-                        for (; j < 15 && j < (u32)GFL_StrBufGetCharCount(strBuf); j++) {
+                        for (; j < 15 && j < GFL_StrBufGetCharCount(strBuf); j++) {
                             name[j] = str[j];
                         }
                         name[j] = GFL_StrBufGetTerminator();

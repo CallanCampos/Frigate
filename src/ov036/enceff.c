@@ -290,7 +290,7 @@ void EventBattleCall_DecideEnvWild(s32 species, s32 form, s32 a2, BOOL a3, Field
 }
 
 void EventBattleCall_DecideEnvTrainer(u32 trainerId, Field *field, u32 *encEffect, u16 *bgm) {
-    u32 trainerClass = TrainerData_GetParam(trainerId, 1);
+    u32 trainerClass = TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS);
     u32 bgmGroup = GetTrainerClassBGMGroupId(trainerClass);
     u8 special = GetTrainerClassSpecialId(trainerClass);
     u32 tileType;

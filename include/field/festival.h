@@ -98,7 +98,7 @@ struct FestMissionEntry {
 };
 
 void *Field_GetFesGimmick(Field *field);
-BOOL FesGimmick_IsCurrent(void *gimmick, u32 type);
+BOOL FesGimmick_IsCurrent(FesGimmick *gimmick, u32 type);
 // Whether the Hidden Grotto has a Funfest mission
 BOOL hollowFesMissions(void *gimmick, u32 id);
 // Whether the Funfest mission keeps phenomena off the tile
@@ -107,7 +107,7 @@ BOOL func_ov036_021b6758(void *gimmick, u16 x, u16 z, fx32 height);
 void func_ov036_021b67d8(void *gimmick, PokeParty *party);
 // The number the salesman's messages are offset by, when gimmick 5 is current
 u32 func_ov036_021b67bc(void *gimmick);
-void DeleteFunfestActor(void *gimmick, u16 zoneId, u8 actorIndex);
+void DeleteFunfestActor(FesGimmick *gimmick, u16 zoneId, u8 actorIndex);
 void func_ov036_021b65e8(void *gimmick);
 BOOL func_ov036_021b6690(void *gimmick);
 // The event of the Funfest mission at a grid or rail position, or NULL
@@ -167,14 +167,14 @@ int LinkFestival_UpdateMember(LinkFestival *festival, FestMissionEntry *entry, u
 void LinkFestival_StartTimer(LinkFestival *festival, u32 arg1);
 u32 GetTrainerCardTextMSGID(u32 type);
 void *FieldFMissionInfo_Create(GameSystem *gsys, HeapID heapId);
-void FieldFMissionInfo_Free(void *work);
-void FieldFMissionInfo_Update(void *work);
-void FieldFMissionInfo_UpdateDisplay(void *work);
+void FieldFMissionInfo_Free(FieldFMissionInfo *work);
+void FieldFMissionInfo_Update(FieldFMissionInfo *work);
+void FieldFMissionInfo_UpdateDisplay(FieldFMissionInfo *work);
 void *FesGimmick_Create(GameSystem *gsys, Field *field, HeapID heapId);
 void FesGimmick_Free(void *gimmick);
-void FesGimmick_BindActorSystem(void *gimmick, MMSys *actorSystem);
-void FesGimmick_BindPlayer(void *gimmick, void *effects, FieldPlayer *player);
-void func_ov036_021b65d4(void *gimmick);
-void func_ov036_021b6660(void *gimmick);
+void FesGimmick_BindActorSystem(FesGimmick *gimmick, MMSys *actorSystem);
+void FesGimmick_BindPlayer(FesGimmick *gimmick, void *effects, FieldPlayer *player);
+void func_ov036_021b65d4(FesGimmick *gimmick);
+void func_ov036_021b6660(FesGimmick *gimmick);
 
 #endif // POKEBW2_FIELD_FESTIVAL_H

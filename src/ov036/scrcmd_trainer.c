@@ -174,8 +174,9 @@ BOOL s008B_TrainerBGMPlayPush(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 trainerId = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work,
-                         EventBGMPlayPush_Create(gsys, GetTrainerClassEyeBGMID(TrainerData_GetParam(trainerId, 1))));
+    ScriptWork_CallEvent(
+        work,
+        EventBGMPlayPush_Create(gsys, GetTrainerClassEyeBGMID(TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS))));
     return TRUE;
 }
 
@@ -195,7 +196,8 @@ BOOL s0090_TrainerBGMPlay(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     u16 trainerId = ScriptReadAny(vm, env);
 
-    ScriptWork_CallEvent(work, EventBGMPlay_Create(gsys, GetTrainerClassEyeBGMID(TrainerData_GetParam(trainerId, 1))));
+    ScriptWork_CallEvent(
+        work, EventBGMPlay_Create(gsys, GetTrainerClassEyeBGMID(TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS))));
     return TRUE;
 }
 
@@ -213,9 +215,9 @@ BOOL s0092_TrainerGetFieldAction(VM *vm, FieldScriptEnv *env) {
     u16 trainerId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    if (TrainerData_GetParam(trainerId, 9)) {
+    if (TrainerData_GetParam(trainerId, TRAINER_PARAM_HEALS)) {
         action = 1;
-    } else if (TrainerData_GetParam(trainerId, 11)) {
+    } else if (TrainerData_GetParam(trainerId, TRAINER_PARAM_REWARD_ITEM)) {
         action = 2;
     } else {
         action = 0;
@@ -228,7 +230,7 @@ BOOL s0093_TrainerGetPrizeItem(VM *vm, FieldScriptEnv *env) {
     u16 trainerId = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
-    *result = TrainerData_GetParam(trainerId, 11);
+    *result = TrainerData_GetParam(trainerId, TRAINER_PARAM_REWARD_ITEM);
     return FALSE;
 }
 

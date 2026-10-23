@@ -64,8 +64,8 @@ struct MysteryNet {
     BOOL exited;
     MysteryNetDownload download;
     SaveControl *save;
-    void *beacon;
-    void *irc;
+    DeliveryBeaconWork *beacon;
+    DeliveryIrcWork *irc;
     u32 unk7A0;
     u8 buffer[MYSTERY_NET_BUFFER_SIZE];
     u32 result;

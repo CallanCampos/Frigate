@@ -605,7 +605,7 @@ static void PMSIVMenu_UpdateColors(PMSIVMenu *wk) {
 
         wk->pulse[i] = GX_RGB(r, g, b);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0x56, wk->pulse, sizeof(wk->pulse));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0x56, wk->pulse, sizeof(wk->pulse));
 }
 
 static void PMSIVMenu_StartTypeButtonPulse(PMSIVMenu *wk, u32 button) {

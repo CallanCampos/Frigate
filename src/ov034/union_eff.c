@@ -50,10 +50,10 @@ typedef struct {
     u16 serial;
 } MarkMan;
 
-typedef struct {
+struct UnionEffect {
     FocusMan focus;
     MarkMan mark;
-} UnionEffect;
+};
 
 static void UnionEff_LoadFocus(FocusMan *focus_man, HeapID heapId);
 static void UnionEff_UnloadFocus(FocusMan *focus_man);
@@ -132,9 +132,7 @@ void *UnionEff_Create(HeapID heapId) {
     return eff;
 }
 
-void UnionEff_Free(void *work) {
-    UnionEffect *eff = work;
-
+void UnionEff_Free(UnionEffect *eff) {
     if (eff != NULL) {
         UnionEff_ExitMarks(&eff->mark);
         UnionEff_UnloadMarks(&eff->mark);
@@ -144,42 +142,33 @@ void UnionEff_Free(void *work) {
     }
 }
 
-void UnionEff_Update(void *work) {
-    UnionEffect *eff = work;
-
+void UnionEff_Update(UnionEffect *eff) {
     if (eff != NULL) {
         UnionEff_UpdateMarks(&eff->mark);
         UnionEff_UpdateFocus(&eff->focus);
     }
 }
 
-void UnionEff_Draw(void *work) {
-    UnionEffect *eff = work;
-
+void UnionEff_Draw(UnionEffect *eff) {
     if (eff != NULL) {
         UnionEff_DrawMarks(&eff->mark);
         UnionEff_DrawFocus(&eff->focus);
     }
 }
 
-void UnionEff_AddFocus(void *work, FieldActor *actor) {
-    UnionEffect *eff = work;
-
+void UnionEff_AddFocus(UnionEffect *eff, FieldActor *actor) {
     if (eff != NULL) {
         UnionEff_StartFocus(&eff->focus, actor);
     }
 }
 
-void UnionEff_AddMark(void *work, FieldActor *actor, BOOL asonda) {
-    UnionEffect *eff = work;
-
+void UnionEff_AddMark(UnionEffect *eff, FieldActor *actor, BOOL asonda) {
     if (eff != NULL) {
         UnionEff_StartMark(&eff->mark, actor, asonda);
     }
 }
 
-void UnionEff_RemoveMark(void *work, FieldActor *actor) {
-    UnionEffect *eff = work;
+void UnionEff_RemoveMark(UnionEffect *eff, FieldActor *actor) {
     MarkMan *mark_man = &eff->mark;
     int i;
 

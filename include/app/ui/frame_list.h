@@ -11,19 +11,37 @@
 // frame_list.c: A list of items that scrolls, with a scroll bar and arrows
 typedef struct FrameList FrameList;
 
-// What FrameList_Main returns besides the position of the item chosen
-#define FRAMELIST_NONE (-1)
+// What FrameList_Main returns besides the position of the item chosen: what the list did this frame
+enum {
+    FRAMELIST_CURSOR_SHOWN = -12,
+    FRAMELIST_CURSOR_MOVE,
+    FRAMELIST_SCROLL,
+    FRAMELIST_BAR,
+    FRAMELIST_DRAG,
+    FRAMELIST_PAGE_UP,
+    FRAMELIST_PAGE_DOWN,
+    FRAMELIST_CURSOR_TOP,
+    FRAMELIST_CURSOR_BOTTOM,
+    FRAMELIST_JUMP_TOP,
+    FRAMELIST_JUMP_BOTTOM,
+    FRAMELIST_NONE,
+};
 
 // What an entry of a list's touch table does when it is touched (FrameListTouch's action)
-#define FRAMELIST_TOUCH_ITEM 0
-#define FRAMELIST_TOUCH_BAR 1
-#define FRAMELIST_TOUCH_UP 2
-#define FRAMELIST_TOUCH_DOWN 3
-#define FRAMELIST_TOUCH_PAGE_UP 4
-#define FRAMELIST_TOUCH_PAGE_DOWN 5
-#define FRAMELIST_TOUCH_TOP 6
-#define FRAMELIST_TOUCH_BOTTOM 7
-#define FRAMELIST_TOUCH_ITEM_DECIDE 8
+enum {
+    FRAMELIST_TOUCH_ITEM,
+    FRAMELIST_TOUCH_BAR,
+    FRAMELIST_TOUCH_UP,
+    FRAMELIST_TOUCH_DOWN,
+    FRAMELIST_TOUCH_PAGE_UP,
+    FRAMELIST_TOUCH_PAGE_DOWN,
+    FRAMELIST_TOUCH_TOP,
+    FRAMELIST_TOUCH_BOTTOM,
+    FRAMELIST_TOUCH_ITEM_DECIDE,
+};
+
+// FrameListLayout's bg2 when the list has no second BG
+#define FRAMELIST_BG_NONE 0xff
 
 // A rectangle of the list's rows and buttons
 typedef struct {
@@ -42,7 +60,7 @@ typedef struct {
 // The first 20 bytes of the setup: where the list is, the size of its rows and the windows they are printed in
 typedef struct {
     u8 bg;
-    u8 bg2; // the second BG the rows scroll onto, or 0xff
+    u8 bg2; // the second BG the rows scroll onto, or FRAMELIST_BG_NONE
     u8 x;
     s8 y;
     u8 width;
