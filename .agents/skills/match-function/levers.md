@@ -530,9 +530,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - A narrowing before an `and` into a `u8` field: `x &= mask` narrows the mask, `x = x & mask` doesn't.
   (matching.md: "compound assignment to a narrow field")
-- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, not a bit field or a
-  shifted or masked `u16`, which load the whole container (`ldrh`); a `_Bool` tests with `cmp` too. (matching.md:
-  "A bit field is loaded at its container's width")
+- `ldrb; lsls #n; beq` where ours has `cmp r0, #0`: a doubling such as `x * 2` in the source, or `&a[x] != a` over
+  elements of `1 << n` bytes, which folds to it; not a bit field or a shifted or masked `u16`, which load the
+  whole container (`ldrh`); a `_Bool` tests with `cmp` too. (matching.md: "A bit field is loaded at its
+  container's width", "The doubling can also be an address")
 - A signed `/ 2` narrowed in separate steps before a loop (`asrs #1; lsls #0x10; asrs #0x10`, ours `lsls #0xf`):
   compute the value inside the loop body from a narrow local. (matching.md: "A signed halving kept apart")
 - A reload between two stores of one value: a chained `a = b = v;`; separate statements store the narrowed value
@@ -794,6 +795,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Loops
 
+- A loop in the source that the original has as one `cmp; ble` of its bound: MWCC removes a loop whose body doesn't
+  depend on its counter. (matching.md: "doesn't depend on its counter")
 - An unrolled loop over tables with the wrong registers and spills: step the tables by pointer (`*p++`) instead of
   indexing them. (matching.md: "A table read in an unrolled loop")
 - `scSubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
