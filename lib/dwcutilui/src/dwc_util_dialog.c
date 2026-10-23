@@ -17,8 +17,8 @@ static void DWCUtilDialog_SlideUpTask(DWCUtilTask *task, void *arg);
 static void DWCUtilDialog_ChooseTask(DWCUtilTask *task, void *arg);
 static void DWCUtilDialog_TimerTask(DWCUtilTask *task, void *arg);
 static void DWCUtilDialog_MoveTo(int y);
-static void DWCUtilDialog_ClipObjects(DWCUtilOamNode *node, int top);
-static void DWCUtilDialog_LightButton(int button);
+static void dispCell(DWCUtilOamNode *node, int top);
+static void pushButton(int button);
 static void DWCUtilDialog_CloseDelayTask(DWCUtilTask *task, void *arg);
 static void DWCUtilDialog_SlideDownTask(DWCUtilTask *task, void *arg);
 static void DWCUtilDialog_BrightenTask(DWCUtilTask *task, void *arg);
@@ -85,48 +85,48 @@ void DWCUtilDialog_Open(int msgIndex, int layout, BOOL fade, int slot, int value
     u16 *str;
     int i;
 
-    str = DWCUtilMsg_GetWithDigit(gDWCUtilMsg, msgIndex, slot, value);
-    sDialog = DWCUtilHeap_AllocClear(sizeof(DWCUtilDialog), 4);
+    str = DWCi_MSGlGetEx(gDWCUtilMsg, msgIndex, slot, value);
+    sDialog = DWCi_HEAPlAllocEx(sizeof(DWCUtilDialog), 4);
     sDialog->layout = layout;
     sDialog->choice = -2;
     sDialog->fade = fade;
     G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 0x1f, 0);
     sDialog->frame = DWCUtilCell_AllocOamRun(0, sDialogFrameCells[layout], FALSE);
-    DWCUtilOam_SetNodePosition(sDialog->frame, -1, 0x100, 0);
-    DWCUtilOam_SetPriority(sDialog->frame, -1, 0);
+    DWCi_CELLlSetPosition(sDialog->frame, -1, 0x100, 0);
+    DWCi_CELLlSetPriority(sDialog->frame, -1, 0);
     for (i = 0; i < sDialogButtonCounts[layout]; i++) {
         sDialog->buttons[i] = DWCUtilCell_AllocOamRun(0, sDialogButtonCells[layout][i], FALSE);
-        DWCUtilOam_SetNodePosition(sDialog->buttons[i], -1, 0x100, 0);
-        DWCUtilOam_SetPriority(sDialog->buttons[i], -1, 0);
+        DWCi_CELLlSetPosition(sDialog->buttons[i], -1, 0x100, 0);
+        DWCi_CELLlSetPriority(sDialog->buttons[i], -1, 0);
     }
-    sDialog->text = DWCUtilText_CreateObj(0, 0x20, 0xc, 1, &textObjCount, 0);
-    sDialog->textObjects = DWCUtilOam_Alloc(0, textObjCount, FALSE);
-    DWCUtilText_DrawRect(sDialog->text, 0, 0, sDialogTextSizes[layout][0], sDialogTextSizes[layout][1], 2,
-                         DWCUtilGfxResource_GetTextFlags(), str);
-    DWCUtilText_ShowObj(sDialog->text, 0x100, 0, sDialog->textObjects, 0);
-    DWCUtilDisplay_SetWindowPlanes(0, 0, 0x1f, FALSE);
-    DWCUtilDisplay_SetWindowPlanes(0, 1, 0x1f, textEffects[sDialog->layout]);
-    DWCUtilDisplay_SetWindowPlanes(0, 3, 0x1f, TRUE);
-    DWCUtilDisplay_SetWindow(0, 1, sDialogWindowRect);
+    sDialog->text = DWCi_FNTlFormEx(0, 0x20, 0xc, 1, &textObjCount, 0);
+    sDialog->textObjects = DWCi_CELLlForm(0, textObjCount, FALSE);
+    DWCi_FNTlDrawRect(sDialog->text, 0, 0, sDialogTextSizes[layout][0], sDialogTextSizes[layout][1], 2,
+                      DWCi_CMNlFontFlag(), str);
+    DWCi_FNTlDisp(sDialog->text, 0x100, 0, sDialog->textObjects, 0);
+    DWCi_GXlSetWndPlane(0, 0, 0x1f, FALSE);
+    DWCi_GXlSetWndPlane(0, 1, 0x1f, textEffects[sDialog->layout]);
+    DWCi_GXlSetWndPlane(0, 3, 0x1f, TRUE);
+    DWCi_GXlSetWndPosition(0, 1, sDialogWindowRect);
     DWCUtilDialog_MoveTo(0xc0);
     GX_SetVisibleWnd(GX_WNDMASK_W0 | GX_WNDMASK_W1);
     if (fade) {
-        sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_DarkenTask, NULL, 120);
+        sDialog->task = DWCi_TSKlForm(1, DWCUtilDialog_DarkenTask, NULL, 120);
     } else {
-        sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_SlideUpTask, NULL, 120);
+        sDialog->task = DWCi_TSKlForm(1, DWCUtilDialog_SlideUpTask, NULL, 120);
     }
 }
 
-void DWCUtilDialog_Close(void) {
-    DWCUtilTask_QueueRemoval(0, sDialog->task);
-    sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_CloseDelayTask, NULL, 120);
+void DWCi_WINlEnd(void) {
+    DWCi_TSKlDelete(0, sDialog->task);
+    sDialog->task = DWCi_TSKlForm(1, DWCUtilDialog_CloseDelayTask, NULL, 120);
 }
 
-int DWCUtilDialog_GetChoice(void) {
+int DWCi_WINlGet(void) {
     return sDialog->choice;
 }
 
-BOOL DWCUtilDialog_IsOpen(void) {
+BOOL DWCi_WINlIsInit(void) {
     if (sDialog != NULL) {
         return TRUE;
     }
@@ -138,7 +138,7 @@ static void DWCUtilDialog_DarkenTask(DWCUtilTask *task, void *arg) {
     sDialog->brightness--;
     G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, sDialog->brightness);
     if (sDialog->brightness <= -12) {
-        DWCUtilTask_SetCallback(task, DWCUtilDialog_SlideUpTask);
+        DWCi_TSKlChangeFunc(task, DWCUtilDialog_SlideUpTask);
     }
 }
 
@@ -147,7 +147,7 @@ static void DWCUtilDialog_SlideUpTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    DWCUtilOam_GetNodePosition(sDialog->frame, 0, &x, &y);
+    DWCi_CELLlGetPosition(sDialog->frame, 0, &x, &y);
     y -= 12;
     if (y > sDialogFramePositions[sDialog->layout][1]) {
         DWCUtilDialog_MoveTo(y);
@@ -155,11 +155,11 @@ static void DWCUtilDialog_SlideUpTask(DWCUtilTask *task, void *arg) {
     }
     DWCUtilDialog_MoveTo(sDialogFramePositions[sDialog->layout][1]);
     if (sDialog->layout == DIALOG_LAYOUT_TIMED) {
-        sDialog->task = DWCUtilTask_Create(0, DWCUtilDialog_TimerTask, NULL, 120);
+        sDialog->task = DWCi_TSKlForm(0, DWCUtilDialog_TimerTask, NULL, 120);
     } else {
-        sDialog->task = DWCUtilTask_Create(0, DWCUtilDialog_ChooseTask, NULL, 120);
+        sDialog->task = DWCi_TSKlForm(0, DWCUtilDialog_ChooseTask, NULL, 120);
     }
-    DWCUtilTask_QueueRemoval(1, task);
+    DWCi_TSKlDelete(1, task);
 }
 
 // The buttons: a touch on one, or A or B, chooses it
@@ -170,20 +170,20 @@ static void DWCUtilDialog_ChooseTask(DWCUtilTask *task, void *arg) {
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         DWCUtilDisplay_SetRectFromSize(sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][i]],
                                        sDialogButtonSizes[sDialog->layout], rect);
-        if (DWCUtilTouch_IsTriggeredIn(rect)) {
+        if (DWCi_TPlCheckTrigger(rect)) {
             sDialog->choice = i;
             break;
         }
     }
-    if (DWCUtilTouch_IsKeyPressed(1)) {
+    if (DWCi_IPTlCheckTrigger(1)) {
         sDialog->choice = sDialogKeyButtons[sDialog->layout][0];
     }
-    if (DWCUtilTouch_IsKeyPressed(2)) {
+    if (DWCi_IPTlCheckTrigger(2)) {
         sDialog->choice = sDialogKeyButtons[sDialog->layout][1];
     }
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         if (i == sDialog->choice) {
-            DWCUtilDialog_LightButton(i);
+            pushButton(i);
             return;
         }
     }
@@ -194,8 +194,8 @@ static void DWCUtilDialog_TimerTask(DWCUtilTask *task, void *arg) {
     sDialog->choice = -1;
     sDialog->frames++;
     if (sDialog->frames >= 120) {
-        DWCUtilTask_QueueRemoval(0, task);
-        sDialog->task = DWCUtilTask_Create(1, DWCUtilDialog_CloseDelayTask, NULL, 120);
+        DWCi_TSKlDelete(0, task);
+        sDialog->task = DWCi_TSKlForm(1, DWCUtilDialog_CloseDelayTask, NULL, 120);
     }
 }
 
@@ -207,15 +207,14 @@ static void DWCUtilDialog_MoveTo(int y) {
     int bottom;
     int top;
 
-    DWCUtilOam_SetNodePosition(sDialog->frame, -1, sDialogFramePositions[sDialog->layout][0], y);
-    DWCUtilOam_SetNodePosition(sDialog->textObjects, -1, sDialogFramePositions[sDialog->layout][0] + 8, y + 8);
-    DWCUtilDialog_ClipObjects(sDialog->frame, y);
-    DWCUtilDialog_ClipObjects(sDialog->textObjects, y);
+    DWCi_CELLlSetPosition(sDialog->frame, -1, sDialogFramePositions[sDialog->layout][0], y);
+    DWCi_CELLlSetPosition(sDialog->textObjects, -1, sDialogFramePositions[sDialog->layout][0] + 8, y + 8);
+    dispCell(sDialog->frame, y);
+    dispCell(sDialog->textObjects, y);
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         pos = sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][i]];
-        DWCUtilOam_SetNodePosition(sDialog->buttons[i], -1, pos[0],
-                                   y + pos[1] - sDialogFramePositions[sDialog->layout][1]);
-        DWCUtilDialog_ClipObjects(sDialog->buttons[i], y);
+        DWCi_CELLlSetPosition(sDialog->buttons[i], -1, pos[0], y + pos[1] - sDialogFramePositions[sDialog->layout][1]);
+        dispCell(sDialog->buttons[i], y);
     }
     top = (u8)y;
     if (top >= 0xc0) {
@@ -230,42 +229,41 @@ static void DWCUtilDialog_MoveTo(int y) {
     DWCUtilDisplay_SetRect(sDialogFramePositions[sDialog->layout][0], top,
                            sDialogFramePositions[sDialog->layout][0] + sDialogWindowSizes[sDialog->layout][0], bottom,
                            rect);
-    DWCUtilDisplay_SetWindow(0, 0, rect);
+    DWCi_GXlSetWndPosition(0, 0, rect);
 }
 
 // Hides the objects of a node that are above top or below the screen
-static void DWCUtilDialog_ClipObjects(DWCUtilOamNode *node, int top) {
-    int count = DWCUtilOam_GetCount(node);
+static void dispCell(DWCUtilOamNode *node, int top) {
+    int count = DWCi_CELLlGetObjNum(node);
     int x;
     int y;
     int effect;
     int i;
 
     for (i = 0; i < count; i++) {
-        DWCUtilOam_GetNodePosition(node, i, &x, &y);
+        DWCi_CELLlGetPosition(node, i, &x, &y);
         if (y >= top && y < 0xc0) {
             effect = 0;
         } else {
             effect = 0x200;
         }
-        DWCUtilOam_SetEffect(node, i, effect, 0);
+        DWCi_CELLlSetEffect(node, i, effect, 0);
     }
 }
 
 // Lights the button chosen
-static void DWCUtilDialog_LightButton(int button) {
-    DWCUtilCell_Copy(0, sDialogButtonCells[sDialog->layout][button] + 1,
-                     DWCUtilOam_GetEntry(sDialog->buttons[button], 0));
-    DWCUtilOam_SetNodePosition(sDialog->buttons[button], -1,
-                               sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][0],
-                               sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][1]);
-    DWCUtilOam_SetPriority(sDialog->buttons[button], -1, 0);
+static void pushButton(int button) {
+    DWCUtilCell_Copy(0, sDialogButtonCells[sDialog->layout][button] + 1, DWCi_CELLlGetObj(sDialog->buttons[button], 0));
+    DWCi_CELLlSetPosition(sDialog->buttons[button], -1,
+                          sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][0],
+                          sDialogButtonPositions[sDialog->layout][sDialogButtonSlots[sDialog->layout][button]][1]);
+    DWCi_CELLlSetPriority(sDialog->buttons[button], -1, 0);
 }
 
 static void DWCUtilDialog_CloseDelayTask(DWCUtilTask *task, void *arg) {
     sDialog->delay++;
     if (sDialog->delay >= 8) {
-        DWCUtilTask_SetCallback(task, DWCUtilDialog_SlideDownTask);
+        DWCi_TSKlChangeFunc(task, DWCUtilDialog_SlideDownTask);
     }
 }
 
@@ -274,14 +272,14 @@ static void DWCUtilDialog_SlideDownTask(DWCUtilTask *task, void *arg) {
     int x;
     int y;
 
-    DWCUtilOam_GetNodePosition(sDialog->frame, 0, &x, &y);
+    DWCi_CELLlGetPosition(sDialog->frame, 0, &x, &y);
     y += 12;
     DWCUtilDialog_MoveTo(y);
     if (y >= 0xc0) {
         if (sDialog->fade) {
-            DWCUtilTask_SetCallback(task, DWCUtilDialog_BrightenTask);
+            DWCi_TSKlChangeFunc(task, DWCUtilDialog_BrightenTask);
         } else {
-            DWCUtilTask_SetCallback(task, DWCUtilDialog_DestroyTask);
+            DWCi_TSKlChangeFunc(task, DWCUtilDialog_DestroyTask);
         }
     }
 }
@@ -290,7 +288,7 @@ static void DWCUtilDialog_BrightenTask(DWCUtilTask *task, void *arg) {
     sDialog->brightness++;
     G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, sDialog->brightness);
     if (sDialog->brightness >= 0) {
-        DWCUtilTask_SetCallback(task, DWCUtilDialog_DestroyTask);
+        DWCi_TSKlChangeFunc(task, DWCUtilDialog_DestroyTask);
     }
 }
 
@@ -298,14 +296,14 @@ static void DWCUtilDialog_DestroyTask(DWCUtilTask *task, void *arg) {
     int i;
 
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
-    DWCUtilOam_Free(sDialog->frame);
-    DWCUtilOam_Free(sDialog->textObjects);
+    DWCi_CELLlDelete(sDialog->frame);
+    DWCi_CELLlDelete(sDialog->textObjects);
     for (i = 0; i < sDialogButtonCounts[sDialog->layout]; i++) {
         if (sDialog->buttons[i] != NULL) {
-            DWCUtilOam_Free(sDialog->buttons[i]);
+            DWCi_CELLlDelete(sDialog->buttons[i]);
         }
     }
-    DWCUtilText_DestroyObj(sDialog->text);
-    DWCUtilTask_QueueRemoval(1, task);
-    DWCUtilHeap_FreeAndNull(&sDialog);
+    DWCi_FNTlDelete(sDialog->text);
+    DWCi_TSKlDelete(1, task);
+    DWCi_HEAPlFree_(&sDialog);
 }

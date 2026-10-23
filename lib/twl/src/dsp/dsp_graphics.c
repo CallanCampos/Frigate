@@ -11,7 +11,7 @@
 typedef struct DSPScalingRequest {
     const void *src;
     void *dst;
-    u16 mode;
+    DSPGraphicsScalingMode mode;
     u16 imageWidth;
     u16 imageHeight;
     u16 scaleX; // the scale in thousandths
@@ -33,19 +33,19 @@ static void func_0270734c(void *arg);
 static DSPPipe sGraphicsPipe;
 static u16 sGraphicsResult;
 static volatile BOOL sGraphicsAsync;
-static void (*sGraphicsCallback)(void);
+static DSP_GraphicsCallback sGraphicsCallback;
 // Cleared by func_0270734c in the DSP's interrupt
 static volatile BOOL sGraphicsBusy;
 static BOOL sGraphicsLoaded;
 static DSPProcessContext sGraphicsContext;
 
 // Opens the component's image, as a file of memory, in file
-BOOL DSP_OpenStaticComponentGraphicsCore(FSFile *file) {
+void DSPi_OpenStaticComponentGraphicsCore(FSFile *file) {
     if (!FS_IsAvailable()) {
         FS_Init(FS_DMA_NOT_USE);
     }
     FS_InitFile(file);
-    return FS_CreateFileFromMemory(file, DSP_GraphicsImage, DSP_COMPONENT_IMAGE_SIZE);
+    FS_CreateFileFromMemory(file, (void *)DSP_GraphicsImage, DSP_COMPONENT_IMAGE_SIZE);
 }
 
 // The DSP's answer to an asynchronous scaling: whether it worked or not, the scaling is over, and only a success is
@@ -67,13 +67,13 @@ static void func_0270734c(void *arg) {
 }
 
 // Starts the process from the image in file, into the banks of WRAM B and C that slotB and slotC allow
-BOOL DSP_LoadGraphicsCore(FSFile *file, int slotB, int slotC) {
+BOOL DSPi_LoadGraphicsCore(FSFile *file, int slotB, int slotC) {
     if (!sGraphicsLoaded) {
         sGraphicsBusy = FALSE;
         sGraphicsAsync = FALSE;
         DSP_InitProcessContext(&sGraphicsContext, "graphics");
-        sGraphicsContext.flags |= DSP_PROCESS_USING_OS;
-        DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), func_0270734c, NULL);
+        sGraphicsContext.flags |= DSP_PROCESS_FLAG_USING_OS;
+        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), func_0270734c, NULL);
         if (DSP_ExecuteProcess(&sGraphicsContext, file, slotB, slotC)) {
             sGraphicsLoaded = TRUE;
         }
@@ -82,7 +82,7 @@ BOOL DSP_LoadGraphicsCore(FSFile *file, int slotB, int slotC) {
     return sGraphicsLoaded;
 }
 
-void DSP_UnloadGraphicsCore(void) {
+void DSPi_UnloadGraphicsCore(void) {
     if (sGraphicsLoaded) {
         DSP_QuitProcess(&sGraphicsContext);
         sGraphicsLoaded = FALSE;
@@ -91,8 +91,9 @@ void DSP_UnloadGraphicsCore(void) {
 
 // Scales the area at (x, y) of a width by height image from src to dst. If async, returns TRUE at once and calls
 // callback when the DSP is done; if not, waits for the DSP and returns whether it scaled the image
-BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry, u16 mode, u16 x,
-                      u16 y, u16 width, u16 height, void (*callback)(void), BOOL async) {
+BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeight, f32 rx, f32 ry,
+                      DSPGraphicsScalingMode mode, u16 x, u16 y, u16 width, u16 height, DSP_GraphicsCallback callback,
+                      BOOL async) {
     DSPScalingRequest request;
     if (sGraphicsBusy) {
         return FALSE;
@@ -101,9 +102,9 @@ BOOL DSPi_ScalingCore(const void *src, void *dst, u16 imageWidth, u16 imageHeigh
     sGraphicsCallback = callback;
     sGraphicsAsync = async;
     if (async) {
-        DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), func_0270734c, NULL);
+        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), func_0270734c, NULL);
     } else {
-        DSP_SetCallback(&sGraphicsContext, 1 << (DSP_EVENT_REPLY_SHIFT + DSP_GRAPHICS_REPLY), NULL, NULL);
+        DSP_SetProcessHook(&sGraphicsContext, DSP_HOOK_REPLY_(DSP_GRAPHICS_REPLY), NULL, NULL);
     }
     DSP_SendData(0, 1);
     request.src = src;

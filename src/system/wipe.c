@@ -87,7 +87,7 @@ static const WipeFunc WIPE_FUNCTIONS[] = {
 
 static WipeSys sWipe;
 
-void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, int division, int sync, u32 heapId) {
+void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, s32 division, s32 sync, u32 heapId) {
     WipeSys *sys;
 
     sync /= GFL_FadeGetUpdateFreq();
@@ -97,8 +97,10 @@ void GFL_WipeSet(int mode, int typeMain, int typeSub, u16 color, int division, i
     Wipe_SetMode(mode, sys);
     WipeHBlank_Init(&sWipe.hblank);
     color = Wipe_GetColor(sys, color);
-    WipeScreen_Init(&sWipe.main, typeMain, division, sync, 0, NULL, 0, &sWipe.wnd, &sWipe.hblank, heapId, color);
-    WipeScreen_Init(&sWipe.sub, typeSub, division, sync, 0, NULL, 1, &sWipe.wnd, &sWipe.hblank, heapId, color);
+    WipeScreen_Init(&sWipe.main, typeMain, division, sync, WIPE_SEQ_INIT, NULL, 0, &sWipe.wnd, &sWipe.hblank, heapId,
+                    color);
+    WipeScreen_Init(&sWipe.sub, typeSub, division, sync, WIPE_SEQ_INIT, NULL, 1, &sWipe.wnd, &sWipe.hblank, heapId,
+                    color);
     sWipe.active = TRUE;
     WipeScreen_Run(&sWipe.control.mainActive, &sWipe.main);
     WipeScreen_Run(&sWipe.control.subActive, &sWipe.sub);
@@ -133,10 +135,10 @@ void GFL_WipeForceEnd(void) {
     WipeHBlank_Remove(&sWipe.hblank, 0);
     WipeHBlank_Remove(&sWipe.hblank, 1);
     if (sWipe.control.mainActive) {
-        sWipe.main.seq = 2;
+        sWipe.main.seq = WIPE_SEQ_EXIT;
     }
     if (sWipe.control.subActive) {
-        sWipe.sub.seq = 2;
+        sWipe.sub.seq = WIPE_SEQ_EXIT;
     }
     WipeScreen_Run(&sWipe.control.mainActive, &sWipe.main);
     WipeScreen_Run(&sWipe.control.subActive, &sWipe.sub);
@@ -184,9 +186,9 @@ void Wipe_SetBackdropColor(u16 color) {
 
 void setBrightnessForEngine(int screen, int brightness) {
     if (screen == 0) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, brightness);
+        GX_SetMasterBrightness(brightness);
     } else {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, brightness);
+        GXS_SetMasterBrightness(brightness);
     }
 }
 

@@ -109,12 +109,12 @@ static BOOL BootScreens_Main(GameProc *proc, u32 *state, void *param, void *work
         GFL_BGSysCreateBG(1, &sBootBGSetupMain, BGMODE_TEXT);
         GFL_BGSysCreateBG(5, &sBootBGSetupSub, BGMODE_TEXT);
         if (bootParam->skipLogos == TRUE) {
-            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+            GX_SetMasterBrightness(-16);
+            GXS_SetMasterBrightness(-16);
             wk->state = STATE_LOAD_COPYRIGHT;
         } else {
-            GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
+            GX_SetMasterBrightness(16);
+            GXS_SetMasterBrightness(16);
             wk->state = STATE_LOAD_LOGOS;
         }
         break;

@@ -6,13 +6,13 @@
 #include <string.h>
 #include <wchar.h>
 
-// DWC utility's opaque SOC options include a host pointer in slot 5; its static relocation must retain every bit.
+// DWC utility's SOC configuration keeps its hostname pointer whole after upstream named the SDK fields.
 static const char sHostName[] = "NINTENDO-DS";
-static const SocConfig sSocConfig = { .unk_34 = { 0, 0, 0, 0, 0, (uptr)sHostName, 4, 0, 0 } };
+static const SOCConfig sSocConfig = { .hostName = sHostName, .rdhcp = 4 };
 
 int main(void) {
-    _Static_assert(sizeof(sSocConfig.unk_34[5]) == sizeof(void *), "SOC options preserve native pointers");
-    assert((const char *)sSocConfig.unk_34[5] == sHostName);
+    _Static_assert(sizeof(sSocConfig.hostName) == sizeof(void *), "SOC options preserve native pointers");
+    assert((const char *)sSocConfig.hostName == sHostName);
     _Static_assert(sizeof(wchar_t) == 2, "DS strings use 16-bit code units");
     const wchar_t source[] = { 0x41, 0x3042, 0xd83d, 0xde00, 0x42, 0 };
     wchar_t copy[7] = { 0, 0, 0, 0, 0, 0, 0x1234 };

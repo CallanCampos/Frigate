@@ -1,7 +1,9 @@
 #include "types.h"
 #include "app/bag.h"
 #include "battle/b_bag_main.h"
+#include "battle/b_choice_main.h"
 #include "battle/b_plist_main.h"
+#include "battle/b_scenario_main.h"
 #include "battle/btl_client.h"
 #include "battle/btl_main.h"
 #include "battle/btl_poke_select.h"
@@ -39,31 +41,6 @@ typedef struct BtlvCmdEntry {
     BtlvMainProc proc;
 } BtlvCmdEntry;
 
-// Overlay 288's parameters
-typedef struct BtlvOv288Param {
-    Font *font;
-    HeapID heapId;
-    u8 done;
-    u8 unk07;
-    PokeParty *unk08;
-    u32 unk0C;
-    u32 unk10;
-    u32 unk14;
-    u32 unk18;
-} BtlvOv288Param;
-
-// Overlay 289's parameters
-typedef struct BtlvOv289Param {
-    Font *font;
-    HeapID heapId;
-    u8 done;
-    u8 unk07;
-    u32 unk08;
-    StrBuf *unk0C[4];
-    u32 *unk1C;
-    u32 unk20;
-} BtlvOv289Param;
-
 typedef struct BtlvViewParam {
     u32 unk00;
     u32 unk04;
@@ -90,8 +67,8 @@ struct BtlvCore {
     u32 result;
     BBagParam ov286;
     BPlistParam ov287;
-    BtlvOv288Param ov288;
-    BtlvOv289Param ov289;
+    BScenarioParam ov288;
+    BChoiceParam ov289;
     BtlvPokeSelectParam *selectParam;
     BtlvViewParam unk1A0;
     BtlvSelectTargetParam *unk1B0;
@@ -992,17 +969,17 @@ void BtlvCore_StartScenario(BtlvCore *core, u32 arg1) {
         core->ov288.done = FALSE;
         core->ov288.heapId = core->heapId;
         core->ov288.font = core->font;
-        core->ov288.unk18 = 0;
-        core->ov288.unk14 = 0;
-        core->ov288.unk08 = GetClientPokeParty(core->mainModule, 1);
-        core->ov288.unk0C = GetStudioMovieId(core->mainModule);
-        core->ov288.unk10 = arg1;
+        core->ov288.abort = 0;
+        core->ov288.close = 0;
+        core->ov288.party = GetClientPokeParty(core->mainModule, 1);
+        core->ov288.scenario = GetStudioMovieId(core->mainModule);
+        core->ov288.scene = arg1;
         core->subSeq = 1;
     }
 }
 
 void BtlvCore_QuitScenario(BtlvCore *core) {
-    core->ov288.unk14 = 1;
+    core->ov288.close = 1;
 }
 
 BOOL BtlvCore_WaitScenario(BtlvCore *core) {
@@ -1049,18 +1026,18 @@ void BtlvCore_StartChoice(BtlvCore *core) {
         core->ov289.done = FALSE;
         core->ov289.heapId = core->heapId;
         core->ov289.font = core->font;
-        core->ov289.unk20 = 0;
+        core->ov289.skip = 0;
         core->subSeq = 1;
     }
 }
 
 void BtlvCore_SetupChoice(BtlvCore *core, u32 arg1, u32 *arg2) {
-    core->ov289.unk08 = arg1;
-    core->ov289.unk1C = arg2;
+    core->ov289.count = arg1;
+    core->ov289.result = arg2;
 }
 
 void BtlvCore_SetChoiceStr(BtlvCore *core, u32 index, StrBuf *value) {
-    core->ov289.unk0C[index] = value;
+    core->ov289.strs[index] = value;
 }
 
 BOOL BtlvCore_WaitChoice(BtlvCore *core) {
@@ -1494,7 +1471,7 @@ BOOL BtlvCore_WaitRankEffect(BtlvCore *core, u32 arg1) {
 }
 
 void BtlvCore_StartWaitMsg(BtlvCore *core) {
-    BtlvEffect_SetIdleEffectMode(3);
+    BtlvEffect_SetIdleEffectMode(BTLV_IDLE_EFFECT_WAIT_MSG);
     BtlvScu_StartWaitMsg(core->scu);
 }
 

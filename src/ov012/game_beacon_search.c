@@ -39,7 +39,7 @@ typedef struct {
     u8 mac[6];
 } BeaconSearchFound;
 
-typedef struct {
+struct BeaconSearchWork {
     GameData *gameData;
     GameCommSys *commSys;
     // 0 once the network ended, 1 once it started, 2 once the scan is set up
@@ -51,7 +51,7 @@ typedef struct {
     BeaconSearchBeacon beacon;
     BeaconSearchFound found;
     void *unk88;
-} BeaconSearchWork;
+};
 
 static void GameBeaconSearch_OnNetInit(void *work);
 static void GameBeaconSearch_OnNetExit(void *work);
@@ -348,8 +348,6 @@ static BeaconSearchBeacon *GameBeaconSearch_PickBetterBeacon(BeaconSearchBeacon 
     return other;
 }
 
-void GameBeaconSearch_StartType35Wait(void *work) {
-    BeaconSearchWork *search = work;
-
+void GameBeaconSearch_StartType35Wait(BeaconSearchWork *search) {
     search->timer = 1800;
 }

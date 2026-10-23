@@ -216,13 +216,13 @@ static void func_ov036_021b4078(FieldEffectTask *task, void *work) {
     mtx = saved;
     mtx.m[3][2] += FX_Mul(mtx.m[2][2], offset);
     NNS_G3dGlbSetProjectionMtx(&mtx);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
     MTX_Identity33_(&status.rotation);
     func_ov036_021a3ad4(task, &status.translation);
     GFL_G3DSysDrawObjBBoxCull(gyoeTask->params.gyoe->actors[gyoeTask->params.kind], &status);
     NNS_G3dGlbSetProjectionMtx(&saved);
-    NNS_G3DFlushRenderState();
+    NNS_G3dGlbFlushP();
     NNS_G3dGeFlushBuffer();
 }
 
@@ -258,7 +258,7 @@ static void func_ov036_021b41a0(G3DCamera *camera, const VecFx32 *src, VecFx32 *
     GFL_G3DCameraGetLookatTarget(camera, &target);
     MTX_LookAt(&camPos, &camUp, &target, &lookAt);
     MI_Copy36B(&lookAt, &rot);
-    MAT3_Invert(&rot, &rot);
+    MTX_Inverse33(&rot, &rot);
     MTX_MultVec33(src, &rot, dest);
 }
 

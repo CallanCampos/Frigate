@@ -1188,7 +1188,7 @@ void BtlvMcss_ReloadSprite(BtlvMcss *work, int pos, const MCSSLoadInfo *info) {
     MCSS_Reload(work->mcssSys, work->entries[index].mcss, dst);
 }
 
-u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, s32 speed, int volume, int arg4, int arg5, int arg6) {
+u32 BtlvMcss_PlayCry(BtlvMcss *work, int pos, int speed, int volume, int arg4, int arg5, int arg6) {
     int index = BtlvMcss_GetIndex(work, pos);
     s32 pan;
     BtlMainModule *mainModule;

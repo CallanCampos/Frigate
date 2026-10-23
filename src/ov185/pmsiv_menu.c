@@ -570,7 +570,7 @@ static void PMSIVMenu_SetupSearchButtons(PMSIVMenu *wk) {
 static void PMSIVMenu_SetupColors(PMSIVMenu *wk) {
     NNSG2dPaletteData *palette;
     void *buf = GFL_G2DIOReadNCLR(ARCID_PMSI, 7, &palette, HEAPID_PMS_INPUT);
-    u16 *colors = palette->rawData;
+    u16 *colors = palette->pRawData;
 
     MI_CpuCopy8(&colors[75], wk->pulseFrom, sizeof(wk->pulseFrom));
     MI_CpuCopy8(&colors[59], wk->pulseTo, sizeof(wk->pulseTo));
@@ -605,7 +605,7 @@ static void PMSIVMenu_UpdateColors(PMSIVMenu *wk) {
 
         wk->pulse[i] = GX_RGB(r, g, b);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0x56, wk->pulse, sizeof(wk->pulse));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0x56, wk->pulse, sizeof(wk->pulse));
 }
 
 static void PMSIVMenu_StartTypeButtonPulse(PMSIVMenu *wk, u32 button) {

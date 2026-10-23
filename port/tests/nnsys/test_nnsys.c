@@ -86,7 +86,7 @@ static u8 *Copy(const u8 *file, size_t size) {
 static void MakeNCGR(u8 *file, u16 height) {
     memset(file, 0, NCGR_SIZE);
     FileHeader(file, 0x4e434752, 0x0101, 1);
-    Block(file, 0x10, NNS_G2D_BINBLK_SIG_CHARDATA, 0x08 + 0x18 + 0x40);
+    Block(file, 0x10, NNS_G2D_BINBLK_SIG_CHARACTERDATA, 0x08 + 0x18 + 0x40);
     W16(file, 0x18, height);
     W16(file, 0x1a, 4);
     W32(file, 0x1c, GX_TEXFMT_PLTT16);
@@ -110,10 +110,10 @@ static void ScenarioCharacter(void) {
     MakeNCGR(original, 2);
     file = Copy(original, NCGR_SIZE);
     CHECK(NNS_G2dGetUnpackedCharacterData(file, &character));
-    CHECK(character->height == 2 && character->width == 4);
-    CHECK(character->pixelFormat == GX_TEXFMT_PLTT16 && character->mappingType == 0x10);
-    CHECK(character->characterFormat == 0 && character->size == 0x40);
-    CHECK(character->rawData == file + 0x30);
+    CHECK(character->H == 2 && character->W == 4);
+    CHECK(character->pixelFmt == GX_TEXFMT_PLTT16 && character->mappingType == 0x10);
+    CHECK(character->characterFmt == 0 && character->szByte == 0x40);
+    CHECK(character->pRawData == file + 0x30);
     // The file stays as it was, and unpacking it again, for OBJ or BG, gives the same tree
     CHECK(memcmp(file, original, NCGR_SIZE) == 0);
     CHECK(NNS_G2dGetUnpackedCharacterData(file, &again) && again == character);
@@ -130,12 +130,12 @@ static void ScenarioCharacter(void) {
     file = Copy(original, NCGR_SIZE);
     NNS_G2dUnpackNCG((NNSG2dCharacterData *)(file + 0x18));
     character = port_reloc_find(file + 0x18, PORT_RELOC_G2D_CHARACTER);
-    CHECK(character != NULL && character->height == 2 && character->mappingType == 0x10);
-    CHECK(character != NULL && character->size == 0x40 && character->rawData == file + 0x30);
+    CHECK(character != NULL && character->H == 2 && character->mappingType == 0x10);
+    CHECK(character != NULL && character->szByte == 0x40 && character->pRawData == file + 0x30);
     port_reloc_release_range(file, NCGR_SIZE);
     NNS_G2dUnpackBGNCG((NNSG2dCharacterData *)(file + 0x18));
     character = port_reloc_find(file + 0x18, PORT_RELOC_G2D_CHARACTER);
-    CHECK(character != NULL && character->width == 4 && character->rawData == file + 0x30);
+    CHECK(character != NULL && character->W == 4 && character->pRawData == file + 0x30);
     CHECK(memcmp(file, original, NCGR_SIZE) == 0);
     port_reloc_release_range(file, NCGR_SIZE);
     CHECK(port_reloc_count() == 0);
@@ -156,7 +156,7 @@ static void MakeNCLR(u8 *file) {
     for (int i = 0; i < 0x20; i++) {
         file[0x28 + i] = (u8)i;
     }
-    Block(file, NCLR_PCMP, NNS_G2D_BINBLK_SIG_PALETTECOMPRESSINFO, 0x08 + 0x08 + 0x04);
+    Block(file, NCLR_PCMP, NNS_G2D_BINBLK_SIG_PALETTECOMPINFO, 0x08 + 0x08 + 0x04);
     W16(file, NCLR_PCMP + 8, 2);
     W16(file, NCLR_PCMP + 10, 0xbeef);
     W32(file, NCLR_PCMP + 12, 0x08);
@@ -175,11 +175,11 @@ static void ScenarioPalette(void) {
     file = Copy(original, NCLR_SIZE);
     CHECK(NNS_G2dGetUnpackedPaletteCompressInfo(file, &info));
     CHECK(NNS_G2dGetUnpackedPaletteData(file, &palette));
-    CHECK(palette->format == GX_TEXFMT_PLTT16 && palette->extendedPalette == 1 && palette->size == 0x20);
-    CHECK(palette->rawData == file + 0x28);
-    CHECK(info->numPalette == 2 && info->pad == 0xbeef);
-    CHECK(info->paletteIndexTable == file + NCLR_PCMP + 16);
-    CHECK(((u16 *)info->paletteIndexTable)[1] == 9);
+    CHECK(palette->fmt == GX_TEXFMT_PLTT16 && palette->bExtendedPlt == 1 && palette->szByte == 0x20);
+    CHECK(palette->pRawData == file + 0x28);
+    CHECK(info->numPalette == 2 && info->pad16 == 0xbeef);
+    CHECK(info->pPlttIdxTbl == file + NCLR_PCMP + 16);
+    CHECK(((u16 *)info->pPlttIdxTbl)[1] == 9);
     CHECK(memcmp(file, original, NCLR_SIZE) == 0);
     CHECK(port_reloc_count() == 2);
     port_reloc_release_range(file + 4, 1);
@@ -192,8 +192,8 @@ static void ScenarioPalette(void) {
     NNSi_G2dUnpackNCLCmpInfo((NNSG2dPaletteCompressInfo *)(file + NCLR_PCMP + 8));
     palette = port_reloc_find(file + 0x18, PORT_RELOC_G2D_PALETTE);
     info = port_reloc_find(file + NCLR_PCMP + 8, PORT_RELOC_G2D_PALETTE_CMP);
-    CHECK(palette != NULL && palette->size == 0x20 && palette->rawData == file + 0x28);
-    CHECK(info != NULL && info->numPalette == 2 && info->paletteIndexTable == file + NCLR_PCMP + 16);
+    CHECK(palette != NULL && palette->szByte == 0x20 && palette->pRawData == file + 0x28);
+    CHECK(info != NULL && info->numPalette == 2 && info->pPlttIdxTbl == file + NCLR_PCMP + 16);
     CHECK(memcmp(file, original, NCLR_SIZE) == 0);
     port_reloc_release_range(file, NCLR_SIZE);
     CHECK(port_reloc_count() == 0);
@@ -218,7 +218,7 @@ static size_t MakeNCER(u8 *file, BOOL withBR) {
 
     memset(file, 0, size);
     FileHeader(file, 0x4e434552, 0x0101, 1);
-    Block(file, 0x10, NNS_G2D_BINBLK_SIG_CELLBANK, (u32)(size - 0x10));
+    Block(file, 0x10, NNS_G2D_BLKSIG_CELLBANK, (u32)(size - 0x10));
     W16(file, CEBK_AT + 0, 2);
     W16(file, CEBK_AT + 2, withBR ? NNS_G2D_CELLBK_ATTR_CELLWITHBR : 0);
     W32(file, CEBK_AT + 4, CEBK_CELLS);
@@ -247,7 +247,7 @@ static size_t MakeNCER(u8 *file, BOOL withBR) {
     W32(file, CEBK_AT + transfer + 12, 0x80);
     W32(file, CEBK_AT + transfer + 16, 0x180);
     W32(file, CEBK_AT + transfer + 20, 0x40);
-    W32(file, CEBK_AT + ext, NNS_G2D_USEREXDATA_CELLATTR);
+    W32(file, CEBK_AT + ext, NNS_G2D_USEREXBLK_CELLATTR);
     W32(file, CEBK_AT + ext + 4, 0x20);
     W16(file, CEBK_AT + attrBank, 2);
     W16(file, CEBK_AT + attrBank + 2, 1);
@@ -276,15 +276,15 @@ static void CheckCellBank(BOOL withBR) {
     CHECK(bank->pStringBank == (void *)(uintptr_t)0x1234);
     // The decomp's own accessor, at the host's cell size
     cell = NNS_G2dGetCellDataByIdx(bank, 0);
-    CHECK(cell->numOAMAttrs == 1 && cell->cellAttr == 0x0805 && cell->pOamAttrArray == oam);
+    CHECK(cell->numOAMAttrs == 1 && cell->cellAttr == 0x0805 && (const u8 *)cell->pOamAttrArray == oam);
     CHECK(NNSi_G2dGetCellBoundingSphereR(cell) == 5 << 2);
     cell = NNS_G2dGetCellDataByIdx(bank, 1);
-    CHECK(cell->numOAMAttrs == 2 && cell->pOamAttrArray == oam + 6);
+    CHECK(cell->numOAMAttrs == 2 && (const u8 *)(const u8 *)cell->pOamAttrArray == oam + 6);
     CHECK(NNS_G2dGetCellDataByIdx(bank, 2) == NULL);
     if (withBR) {
-        CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 0))->boundingRect.maxBounding.x == 7);
-        CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 0))->boundingRect.minBounding.y == -7);
-        CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 1))->boundingRect.maxBounding.x == 12);
+        CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 0))->boundingRect.maxX == 7);
+        CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 0))->boundingRect.minY == -7);
+        CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 1))->boundingRect.maxX == 12);
     }
     CHECK(NNS_G2dCellDataBankHasVramTransferData(bank));
     CHECK(bank->pVramTransferData->szByteMax == 0x200);
@@ -317,7 +317,7 @@ static void ScenarioMultiCellBank(void) {
     const NNSG2dUserExCellAttrBank *attrs;
 
     FileHeader(original, 0x4e4d4352, 0x0100, 1);
-    Block(original, 0x10, NNS_G2D_BINBLK_SIG_MULTICELLBANK, 0x08 + END);
+    Block(original, 0x10, NNS_G2D_BLKSIG_MULTICELLBANK, 0x08 + END);
     W16(original, AT, 2);
     W32(original, AT + 4, CELLS);
     W32(original, AT + 8, HIER);
@@ -334,7 +334,7 @@ static void ScenarioMultiCellBank(void) {
         W16(original, AT + HIER + i * 8 + 2, (u16)(-i));
         W16(original, AT + HIER + i * 8 + 6, (u16)(i << 8));
     }
-    W32(original, AT + EXT, NNS_G2D_USEREXDATA_CELLATTR);
+    W32(original, AT + EXT, NNS_G2D_USEREXBLK_CELLATTR);
     W32(original, AT + EXT + 4, 0x14);
     W16(original, AT + ATTR, 1);
     W16(original, AT + ATTR + 2, 1);
@@ -345,7 +345,7 @@ static void ScenarioMultiCellBank(void) {
     file = Copy(original, AT + END);
     CHECK(NNS_G2dGetUnpackedMultiCellBank(file, &bank));
     CHECK(bank->numMultiCellData == 2 && bank->pStringBank == (void *)(uintptr_t)0x777);
-    CHECK(bank->pHierarchyDataArray == file + AT + HIER);
+    CHECK((const u8 *)bank->pHierarchyDataArray == file + AT + HIER);
     cell = NNS_G2dGetMultiCellDataByIdx(bank, 1);
     CHECK(cell != NULL && cell->numNodes == 2 && cell->numCellAnim == 2);
     CHECK(cell != NULL && cell->pHierDataArray[0].animSequenceIdx == 11 && cell->pHierDataArray[1].nodeAttr == 2 << 8);
@@ -361,7 +361,7 @@ static void ScenarioMultiCellBank(void) {
     file = Copy(original, AT + END);
     NNS_G2dUnpackNMC((NNSG2dMultiCellDataBank *)(file + AT));
     bank = port_reloc_find(file + AT, PORT_RELOC_G2D_MULTICELL);
-    CHECK(bank != NULL && bank->numMultiCellData == 2 && bank->pHierarchyDataArray == file + AT + HIER);
+    CHECK(bank != NULL && bank->numMultiCellData == 2 && (const u8 *)bank->pHierarchyDataArray == file + AT + HIER);
     CHECK(bank != NULL && bank->pMultiCellDataArray[1].pHierDataArray == (void *)(file + AT + HIER + 8));
     attrs = bank != NULL ? NNS_G2dGetUserExCellAttrBankFromMCBank(bank) : NULL;
     CHECK(attrs != NULL && attrs->pCellAttrArray[0].pAttr == (u32 *)(file + AT + ATTR + 0x0c));
@@ -394,7 +394,7 @@ static void ScenarioAnimBank(void) {
     size_t attrWords = attrFrames + 0x0c;
 
     FileHeader(original, 0x4e414e52, 0x0100, 1);
-    Block(original, 0x10, NNS_G2D_BINBLK_SIG_ANIMBANK, 0x08 + END);
+    Block(original, 0x10, NNS_G2D_BLKSIG_ANIMBANK, 0x08 + END);
     W16(original, AT, 2);
     W16(original, AT + 2, 4);
     W32(original, AT + 4, SEQS);
@@ -404,12 +404,12 @@ static void ScenarioAnimBank(void) {
     W32(original, AT + 20, EXT);
     // Sequence 0: frames 0 and 1; sequence 1: frame 3. Frame 2 is no sequence's
     W16(original, AT + SEQS, 2);
-    W32(original, AT + SEQS + 4, NNS_G2D_ANIMELEM_INDEX_T);
+    W32(original, AT + SEQS + 4, NNS_G2D_ANIMELEMENT_INDEX_T);
     W32(original, AT + SEQS + 8, NNS_G2D_ANIMATIONPLAYMODE_FORWARD_LOOP);
     W32(original, AT + SEQS + 12, 0);
     W16(original, AT + SEQS + 16, 1);
     W16(original, AT + SEQS + 18, 0);
-    W32(original, AT + SEQS + 20, NNS_G2D_ANIMELEM_INDEX);
+    W32(original, AT + SEQS + 20, NNS_G2D_ANIMELEMENT_INDEX);
     W32(original, AT + SEQS + 24, NNS_G2D_ANIMATIONPLAYMODE_FORWARD);
     W32(original, AT + SEQS + 28, 3 * 8);
     for (int k = 0; k < 4; k++) {
@@ -417,7 +417,7 @@ static void ScenarioAnimBank(void) {
         W16(original, AT + FRAMES + k * 8 + 4, (u16)(4 + k));
         W16(original, AT + DATA + k * 8, (u16)(100 + k));
     }
-    W32(original, AT + EXT, NNS_G2D_USEREXDATA_ANMATTR);
+    W32(original, AT + EXT, NNS_G2D_USEREXBLK_ANMATTR);
     W32(original, AT + EXT + 4, END - EXT);
     W16(original, AT + ATTR, 2);
     W16(original, AT + ATTR + 2, 1);
@@ -438,18 +438,18 @@ static void ScenarioAnimBank(void) {
 
     file = Copy(original, AT + END);
     CHECK(NNS_G2dGetUnpackedAnimBank(file, &bank));
-    CHECK(bank->numSequences == 2 && bank->numTotalFrames == 4 && bank->pAnimationData == file + AT + DATA);
+    CHECK(bank->numSequences == 2 && bank->numTotalFrames == 4 && bank->pAnimContents == file + AT + DATA);
     seq = NNS_G2dGetAnimSequenceByIdx(bank, 0);
-    CHECK(seq != NULL && seq->numFrames == 2 && seq->animType == NNS_G2D_ANIMELEM_INDEX_T);
+    CHECK(seq != NULL && seq->numFrames == 2 && seq->animType == NNS_G2D_ANIMELEMENT_INDEX_T);
     CHECK(seq != NULL && seq->playMode == NNS_G2D_ANIMATIONPLAYMODE_FORWARD_LOOP);
-    CHECK(seq != NULL && seq->pAnmFrameArray == &bank->pFrameArray[0]);
+    CHECK(seq != NULL && seq->pAnmFrameArray == &bank->pFrameArrayHead[0]);
     CHECK(seq != NULL && ((const NNSG2dAnimDataT *)seq->pAnmFrameArray[1].pContent)->index == 101);
     CHECK(seq != NULL && seq->pAnmFrameArray[1].frames == 5);
     seq = NNS_G2dGetAnimSequenceByIdx(bank, 1);
-    CHECK(seq != NULL && seq->pAnmFrameArray == &bank->pFrameArray[3]);
+    CHECK(seq != NULL && seq->pAnmFrameArray == &bank->pFrameArrayHead[3]);
     CHECK(seq != NULL && *(const u16 *)seq->pAnmFrameArray[0].pContent == 103);
     // The frame no sequence reaches keeps its offset, as on the DS
-    CHECK(bank->pFrameArray[2].pContent == (void *)(uintptr_t)16);
+    CHECK(bank->pFrameArrayHead[2].pContent == (void *)(uintptr_t)16);
     CHECK(NNS_G2dGetAnimSequenceByIdx(bank, 2) == NULL);
     attrs = NNS_G2dGetUserExAnimAttrBank(bank);
     CHECK(attrs != NULL && attrs->numSequences == 2 && attrs->numAttribute == 1);
@@ -472,9 +472,9 @@ static void ScenarioAnimBank(void) {
     NNS_G2dUnpackNAN((NNSG2dAnimBankData *)(file + AT));
     bank = port_reloc_find(file + AT, PORT_RELOC_G2D_ANIM_BANK);
     seq = bank != NULL ? NNS_G2dGetAnimSequenceByIdx(bank, 1) : NULL;
-    CHECK(seq != NULL && seq->pAnmFrameArray == &bank->pFrameArray[3]);
+    CHECK(seq != NULL && seq->pAnmFrameArray == &bank->pFrameArrayHead[3]);
     CHECK(seq != NULL && *(const u16 *)seq->pAnmFrameArray[0].pContent == 103);
-    CHECK(bank != NULL && bank->pFrameArray[2].pContent == (void *)(uintptr_t)16);
+    CHECK(bank != NULL && bank->pFrameArrayHead[2].pContent == (void *)(uintptr_t)16);
     attrs = bank != NULL ? NNS_G2dGetUserExAnimAttrBank(bank) : NULL;
     seqAttr = attrs != NULL ? NNS_G2dGetUserExAnimSequenceAttr(attrs, 0) : NULL;
     CHECK(seqAttr != NULL && seqAttr->pAnmFrmAttrArray[1].pAttr[0] == 0x5003);
@@ -503,7 +503,7 @@ static void ScenarioAnimFrames(void) {
     PortG2dAnimStats before = *port_g2d_anim_stats();
 
     FileHeader(original, 0x4e414e52, 0x0100, 1);
-    Block(original, 0x10, NNS_G2D_BINBLK_SIG_ANIMBANK, 0x08 + END);
+    Block(original, 0x10, NNS_G2D_BLKSIG_ANIMBANK, 0x08 + END);
     W16(original, AT, 4);
     W16(original, AT + 2, 4);
     W32(original, AT + 4, SEQS);
@@ -511,7 +511,7 @@ static void ScenarioAnimFrames(void) {
     W32(original, AT + 12, DATA);
     for (int i = 0; i < 4; i++) {
         W16(original, AT + SEQS + i * 0x10, sequences[i].numFrames);
-        W32(original, AT + SEQS + i * 0x10 + 4, NNS_G2D_ANIMELEM_INDEX);
+        W32(original, AT + SEQS + i * 0x10 + 4, NNS_G2D_ANIMELEMENT_INDEX);
         W32(original, AT + SEQS + i * 0x10 + 8, NNS_G2D_ANIMATIONPLAYMODE_FORWARD);
         W32(original, AT + SEQS + i * 0x10 + 12, sequences[i].offset);
     }
@@ -529,26 +529,26 @@ static void ScenarioAnimFrames(void) {
     CHECK(NNS_G2dGetUnpackedAnimBank(file, &bank));
     // Every frame of the bank's is reached by a sequence that starts on a frame, once or more: each is relocated once
     for (int k = 0; k < 4; k++) {
-        CHECK(bank->pFrameArray[k].pContent == animData + k * 8 && bank->pFrameArray[k].frames == 4 + k);
+        CHECK(bank->pFrameArrayHead[k].pContent == animData + k * 8 && bank->pFrameArrayHead[k].frames == 4 + k);
     }
     seq = NNS_G2dGetAnimSequenceByIdx(bank, 0);
     other = NNS_G2dGetAnimSequenceByIdx(bank, 1);
-    CHECK(seq->pAnmFrameArray == &bank->pFrameArray[0] && other->pAnmFrameArray == &bank->pFrameArray[1]);
+    CHECK(seq->pAnmFrameArray == &bank->pFrameArrayHead[0] && other->pAnmFrameArray == &bank->pFrameArrayHead[1]);
     CHECK(seq->pAnmFrameArray[1].pContent == animData + 8 && other->pAnmFrameArray[0].pContent == animData + 8);
     CHECK(port_g2d_anim_stats()->framesSharedBySequences == before.framesSharedBySequences + 1);
     CHECK(port_g2d_anim_stats()->framesNeverRelocated == before.framesNeverRelocated);
     // Past the last frame: frame 3, then the animation data's first 8 bytes read as a frame
     seq = NNS_G2dGetAnimSequenceByIdx(bank, 2);
-    CHECK(seq->numFrames == 2 && seq->pAnmFrameArray != &bank->pFrameArray[3]);
+    CHECK(seq->numFrames == 2 && seq->pAnmFrameArray != &bank->pFrameArrayHead[3]);
     CHECK(seq->pAnmFrameArray[0].pContent == animData + 3 * 8 && seq->pAnmFrameArray[0].frames == 7);
     CHECK(seq->pAnmFrameArray[1].pContent == animData + 100 && seq->pAnmFrameArray[1].frames == 0x40);
-    CHECK(seq->pAnmFrameArray[1].pad == 0);
+    CHECK(seq->pAnmFrameArray[1].pad16 == 0);
     CHECK(*(const u16 *)seq->pAnmFrameArray[0].pContent == 103);
     // From the middle of frame 0: its frames and pad as the content's offset, then frame 1's offset as frames and pad
     seq = NNS_G2dGetAnimSequenceByIdx(bank, 3);
-    CHECK(seq->numFrames == 1 && seq->pAnmFrameArray != &bank->pFrameArray[0]);
+    CHECK(seq->numFrames == 1 && seq->pAnmFrameArray != &bank->pFrameArrayHead[0]);
     CHECK(seq->pAnmFrameArray[0].pContent == animData + 4);
-    CHECK(seq->pAnmFrameArray[0].frames == 8 && seq->pAnmFrameArray[0].pad == 0);
+    CHECK(seq->pAnmFrameArray[0].frames == 8 && seq->pAnmFrameArray[0].pad16 == 0);
     CHECK(memcmp(file, original, AT + END) == 0);
     port_reloc_release_range(file, AT + END);
     CHECK(port_reloc_count() == 0);
@@ -810,7 +810,7 @@ static void ScenarioHeaps(void) {
     other = NNS_FndAllocFromExpHeapEx(heap, NCGR_SIZE, 4);
     memcpy(block, file, NCGR_SIZE);
     memcpy(other, file, NCGR_SIZE);
-    CHECK(NNS_G2dGetUnpackedCharacterData(block, &character) && character->rawData == block + 0x30);
+    CHECK(NNS_G2dGetUnpackedCharacterData(block, &character) && character->pRawData == block + 0x30);
     CHECK(NNS_G2dGetUnpackedCharacterData(other, &character));
     CHECK(port_reloc_count() == 2);
     NNS_FndFreeToExpHeap(heap, block);
@@ -835,7 +835,7 @@ static void ScenarioHeaps(void) {
     memcpy(other, file, NCGR_SIZE);
     CHECK(NNS_G2dGetUnpackedCharacterData(block, &character));
     CHECK(NNS_G2dGetUnpackedCharacterData(other, &character));
-    NNS_FndFreeToFrmHeap(frameHeap, NNS_FND_FRMHEAP_RELEASE_HIGH);
+    NNS_FndFreeToFrmHeap(frameHeap, NNS_FND_FRMHEAP_FREE_TAIL);
     CHECK(port_reloc_count() == 1 && port_reloc_find(block + 0x18, PORT_RELOC_G2D_CHARACTER) != NULL);
     CHECK(NNS_FndRecordStateForFrmHeap(frameHeap, 7));
     other = NNS_FndAllocFromFrmHeapEx(frameHeap, NCGR_SIZE, 4);
@@ -847,7 +847,7 @@ static void ScenarioHeaps(void) {
     CHECK(port_reloc_count() == 3);
     CHECK(NNS_FndFreeByStateToFrmHeap(frameHeap, 7));
     CHECK(port_reloc_count() == 1 && port_reloc_find(block + 0x18, PORT_RELOC_G2D_CHARACTER) != NULL);
-    NNS_FndFreeToFrmHeap(frameHeap, NNS_FND_FRMHEAP_RELEASE_LOW);
+    NNS_FndFreeToFrmHeap(frameHeap, NNS_FND_FRMHEAP_FREE_HEAD);
     CHECK(port_reloc_count() == 0);
     block = NNS_FndAllocFromFrmHeapEx(frameHeap, NCGR_SIZE, 4);
     memcpy(block, file, NCGR_SIZE);
@@ -858,18 +858,18 @@ static void ScenarioHeaps(void) {
     // A unit heap, set up by hand: the game never makes one, so the SDK's creator was dead-stripped
     {
         NNSiFndHeapHead *head = memory;
-        NNSiFndUnitHeap *unitHeap = (NNSiFndUnitHeap *)(head + 1);
+        NNSiFndUntHeapHead *unitHeap = (NNSiFndUntHeapHead *)(head + 1);
         u8 *unit = (u8 *)memory + 0x100;
 
         memset(memory, 0, 0x100);
         head->heapStart = unit;
         head->heapEnd = unit + 0x200;
-        unitHeap->unitSize = 0x100;
-        unitHeap->freeList.head = NULL;
+        unitHeap->mBlkSize = 0x100;
+        unitHeap->mbFreeList.head = NULL;
         memcpy(unit, file, NCGR_SIZE);
         CHECK(NNS_G2dGetUnpackedCharacterData(unit, &character));
-        NNS_FndUnitHeapFree(head, unit);
-        CHECK(port_reloc_count() == 0 && unitHeap->freeList.head == (NNSiFndUnitBlock *)unit);
+        NNS_FndFreeToUnitHeap(head, unit);
+        CHECK(port_reloc_count() == 0 && unitHeap->mbFreeList.head == (NNSiFndUntHeapMBlockHead *)unit);
     }
     free(memory);
 }
@@ -896,7 +896,7 @@ static void ScenarioReuse(void) {
     memcpy(buffer, cells, size);
     CHECK(NNS_G2dGetUnpackedCellBank(buffer, &again) && again == bank);
     CHECK(bank->cellBankAttr == NNS_G2D_CELLBK_ATTR_CELLWITHBR);
-    CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 1))->boundingRect.maxBounding.x == 12);
+    CHECK(((const NNSG2dCellDataWithBR *)NNS_G2dGetCellDataByIdx(bank, 1))->boundingRect.maxX == 12);
     CHECK(port_reloc_count() == 1);
     // A different OAM attribute keeps the host structs: only the bytes a tree is built from count
     firstArray = bank->pCellDataArrayHead;
@@ -908,7 +908,7 @@ static void ScenarioReuse(void) {
     {
         NNSG2dCharacterData *character;
 
-        CHECK(NNS_G2dGetUnpackedCharacterData(buffer, &character) && character->height == 5);
+        CHECK(NNS_G2dGetUnpackedCharacterData(buffer, &character) && character->H == 5);
     }
     CHECK(port_reloc_count() == 2);
     CHECK(port_reloc_release_range(buffer, sizeof(buffer)) == 2);
@@ -930,11 +930,11 @@ static void ScenarioRefill(void) {
         MakeNCLR(file);
         memcpy(buffer, file, NCLR_SIZE);
         CHECK(NNS_G2dGetUnpackedPaletteData(buffer, &palette));
-        palette->rawData = (u8 *)palette->rawData + 0x10;
-        palette->size -= 0x10;
+        palette->pRawData = (u8 *)palette->pRawData + 0x10;
+        palette->szByte -= 0x10;
         memcpy(buffer, file, NCLR_SIZE);
         CHECK(NNS_G2dGetUnpackedPaletteData(buffer, &again) && again == palette);
-        CHECK(palette->size == 0x20 && palette->rawData == buffer + 0x28);
+        CHECK(palette->szByte == 0x20 && palette->pRawData == buffer + 0x28);
         CHECK(port_reloc_release_range(buffer, sizeof(buffer)) == 1);
     }
     // Characters whose mapping the game rewrites, as clact.c does for the OBJ VRAM mode
@@ -948,7 +948,7 @@ static void ScenarioRefill(void) {
         character->mappingType = GX_OBJVRAMMODE_CHAR_1D_128K;
         memcpy(buffer, file, NCGR_SIZE);
         CHECK(NNS_G2dGetUnpackedCharacterData(buffer, &again) && again == character);
-        CHECK(character->mappingType == 0x10 && character->height == 6);
+        CHECK(character->mappingType == 0x10 && character->H == 6);
         CHECK(port_reloc_release_range(buffer, sizeof(buffer)) == 1);
     }
     // A cell bank whose cells, transfer data and attributes are changed: back in the same host structs
@@ -965,10 +965,10 @@ static void ScenarioRefill(void) {
         CHECK(NNS_G2dGetUnpackedCellBank(buffer, &bank));
         cells = (NNSG2dCellDataWithBR *)bank->pCellDataArrayHead;
         transfer = bank->pVramTransferData;
-        attrs = (NNSG2dUserExCellAttrBank *)(bank->pExtendedData + 1);
+        attrs = (NNSG2dUserExCellAttrBank *)((NNSG2dUserExDataBlock *)bank->pExtendedData + 1);
         attrArray = attrs->pCellAttrArray;
         cells[1].cellData.numOAMAttrs = 99;
-        cells[0].boundingRect.maxBounding.x = 99;
+        cells[0].boundingRect.maxX = 99;
         transfer->szByteMax = 0;
         bank->pVramTransferData = NULL;
         attrArray[0].pAttr = NULL;
@@ -976,9 +976,10 @@ static void ScenarioRefill(void) {
         memcpy(buffer, file, size);
         CHECK(NNS_G2dGetUnpackedCellBank(buffer, &again) && again == bank);
         CHECK(bank->numCells == 2 && bank->pCellDataArrayHead == &cells->cellData);
-        CHECK(cells[1].cellData.numOAMAttrs == 2 && cells[0].boundingRect.maxBounding.x == 7);
+        CHECK(cells[1].cellData.numOAMAttrs == 2 && cells[0].boundingRect.maxX == 7);
         CHECK(bank->pVramTransferData == transfer && transfer->szByteMax == 0x200);
-        CHECK((NNSG2dUserExCellAttrBank *)(bank->pExtendedData + 1) == attrs && attrs->pCellAttrArray == attrArray);
+        CHECK((NNSG2dUserExCellAttrBank *)((NNSG2dUserExDataBlock *)bank->pExtendedData + 1) == attrs &&
+              attrs->pCellAttrArray == attrArray);
         CHECK(attrArray[0].pAttr != NULL && attrArray[0].pAttr[0] == 0xaaaa0001);
         CHECK(port_reloc_release_range(buffer, sizeof(buffer)) == 1);
     }

@@ -119,7 +119,7 @@ static u32 sExifEncMakerNoteData2Size;
 static BOOL sExifEncDateTimeSet;
 static u8 *sExifEncMakerNoteData1;
 static u32 sExifEncSoftwareLength;
-u32 ExifEnc_SignMode;
+BOOL ExifEnc_SignMode;
 static u8 *sExifEncWriteBuffer;
 static char sExifEncDateTime[20];
 static char sExifEncSoftware[32];

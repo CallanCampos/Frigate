@@ -235,8 +235,8 @@ static BOOL WH_StateInStartParentMP(void) {
     _pWmInfo->sSendBufSize = WM_GetMPSendBufferSize();
     _pWmInfo->sRecvBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sRecvBufSize + 0x20, "wih.c", 1192);
     _pWmInfo->sSendBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sSendBufSize + 0x20, "wih.c", 1193);
-    result = WM_StartMP(WH_StateOutStartParentMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
-                        _pWmInfo->sSendBufSize, GFL_NetGetGameCommandBase() == 0x35 ? 1 : 2);
+    result = WM_StartMP(WH_StateOutStartParentMP, (u16 *)_pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize,
+                        (u16 *)_pWmInfo->sSendBuf, _pWmInfo->sSendBufSize, GFL_NetGetGameCommandBase() == 0x35 ? 1 : 2);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -386,11 +386,11 @@ static BOOL WH_StateInStartScan(void) {
     u32 channel;
 
     if (allowed == 0x8000) {
-        WH_ReportError(3);
+        WH_ReportError(WM_ERRCODE_ILLEGAL_STATE);
         return FALSE;
     }
     if (allowed == 0) {
-        WH_ReportError(0x16);
+        WH_ReportError(WH_ERRCODE_NO_RADIO);
         return FALSE;
     }
     channel = _pWmInfo->sScanChannel;
@@ -628,8 +628,8 @@ static BOOL WH_StateInStartChildMP(void) {
     _pWmInfo->sSendBufSize = WM_GetMPSendBufferSize();
     _pWmInfo->sRecvBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sRecvBufSize + 0x20, "wih.c", 2043);
     _pWmInfo->sSendBuf = allocConfigDSSoftwareFeature(_pWmInfo->sHeapId, _pWmInfo->sSendBufSize + 0x20, "wih.c", 2044);
-    result = WM_StartMP(WH_StateOutStartChildMP, _pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize, _pWmInfo->sSendBuf,
-                        _pWmInfo->sSendBufSize, GFL_NetGetGameCommandBase() == 0x35 ? 1 : 2);
+    result = WM_StartMP(WH_StateOutStartChildMP, (u16 *)_pWmInfo->sRecvBuf, _pWmInfo->sRecvBufSize,
+                        (u16 *)_pWmInfo->sSendBuf, _pWmInfo->sSendBufSize, GFL_NetGetGameCommandBase() == 0x35 ? 1 : 2);
     if (result != WM_ERRCODE_OPERATING) {
         WH_ReportError(result);
         return FALSE;
@@ -783,7 +783,7 @@ static void WH_PortReceiveCallback(void *arg) {
     }
     if (_pWmInfo->sReceiver != NULL) {
         if (cb->state == WM_STATECODE_PORT_RECV) {
-            _pWmInfo->sReceiver(cb->aid, cb->data, cb->length);
+            _pWmInfo->sReceiver(cb->aid, (u8 *)cb->data, cb->length);
         } else if (cb->state == WM_STATECODE_DISCONNECTED) {
             _pWmInfo->sReceiver(cb->aid, NULL, 0);
         }
@@ -847,8 +847,8 @@ BOOL WH_StartMeasureChannel(void) {
     _pWmInfo->sMinBusy = 101;
     WH_ChangeSysState(WH_SYSSTATE_BUSY);
     result = WH_StateInMeasureChannel(1);
-    if (result == 0x18) {
-        WH_ReportError(0x18);
+    if (result == WH_ERRCODE_NOMORE_CHANNEL) {
+        WH_ReportError(WH_ERRCODE_NOMORE_CHANNEL);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
         return FALSE;
     }
@@ -860,25 +860,25 @@ BOOL WH_StartMeasureChannel(void) {
     return TRUE;
 }
 
-// Measures the next channel that is allowed, from the one given. 0x18 once there are none left
+// Measures the next channel that is allowed, from the one given. WH_ERRCODE_NOMORE_CHANNEL once there are none left
 static u16 WH_StateInMeasureChannel(u16 channel) {
     u16 allowed = WM_GetAllowedChannel();
 
     if (allowed == 0x8000) {
-        WH_ReportError(3);
+        WH_ReportError(WM_ERRCODE_ILLEGAL_STATE);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
-        return 3;
+        return WM_ERRCODE_ILLEGAL_STATE;
     }
     if (allowed == 0) {
-        WH_ReportError(0x16);
+        WH_ReportError(WH_ERRCODE_NO_RADIO);
         WH_ChangeSysState(WH_SYSSTATE_ERROR);
-        return 0x18;
+        return WH_ERRCODE_NOMORE_CHANNEL;
     }
     if (!((1 << (channel - 1)) & allowed)) {
         do {
             channel++;
             if (channel > 16) {
-                return 0x18;
+                return WH_ERRCODE_NOMORE_CHANNEL;
             }
         } while (!((1 << (channel - 1)) & allowed));
     }
@@ -905,7 +905,7 @@ static void WH_StateOutMeasureChannel(void *arg) {
         _pWmInfo->sBestBitmap |= 1 << (channel - 1);
     }
     next = WH_StateInMeasureChannel(channel + 1);
-    if (next == 0x18 && _pWmInfo->sSysState != WH_SYSSTATE_ERROR) {
+    if (next == WH_ERRCODE_NOMORE_CHANNEL && _pWmInfo->sSysState != WH_SYSSTATE_ERROR) {
         WH_ChangeSysState(WH_SYSSTATE_MEASURECHANNEL);
         return;
     }
@@ -1089,12 +1089,12 @@ BOOL WH_SendData(u8 *data, u16 size, WHSendCallback callback) {
 
 // WH_GetSharedDataAdr: the data of the machine of the AID, from the last step of the data sharing
 u8 *WH_GetSharedDataAdr(u16 netId) {
-    return WM_GetSharedDataAddress(&_pWmInfo->sDataSharing, &_pWmInfo->sDataSet, netId);
+    return (u8 *)WM_GetSharedDataAddress(&_pWmInfo->sDataSharing, &_pWmInfo->sDataSet, netId);
 }
 
 // WH_StepDS: shares the data given, for the machines to read the next step
 BOOL WH_StepDS(u8 *data) {
-    int result = WM_StepDataSharing(&_pWmInfo->sDataSharing, data, &_pWmInfo->sDataSet);
+    int result = WM_StepDataSharing(&_pWmInfo->sDataSharing, (const u16 *)data, &_pWmInfo->sDataSet);
 
     if (result == 7) {
         return FALSE;

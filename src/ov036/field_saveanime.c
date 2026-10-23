@@ -19,7 +19,7 @@
 #include "system/game_data.h"
 #include "system/game_system.h"
 
-typedef struct {
+struct FieldSaveAnime {
     Field *field;
     BmpWin *window;
     u16 offsetX;
@@ -28,7 +28,7 @@ typedef struct {
     GFLBitmap *bitmap;
     int timer;
     u32 frame;
-} FieldSaveAnime;
+};
 
 // How long each frame of the icon shows, and which frame of the bitmap follows
 typedef struct {
@@ -60,27 +60,21 @@ void *func_ov036_021c6cc8(HeapID heapId, Field *field) {
     return anime;
 }
 
-void func_ov036_021c6cf8(void *effect) {
-    FieldSaveAnime *anime = effect;
-
+void func_ov036_021c6cf8(FieldSaveAnime *anime) {
     func_ov036_021c6d3c(anime);
     func_ov036_021c6f54(anime);
     func_ov036_021c6db8(anime);
     GFL_HeapFree(anime);
 }
 
-void func_ov036_021c6d14(void *effect) {
-    FieldSaveAnime *anime = effect;
-
+void func_ov036_021c6d14(FieldSaveAnime *anime) {
     GFL_BGSysClearBG(3);
     anime->timer = 0;
     func_ov036_021c6f64(anime);
     anime->tcb = GFL_VBlankTCBAdd(func_ov036_021c6fec, anime, 128);
 }
 
-void func_ov036_021c6d3c(void *effect) {
-    FieldSaveAnime *anime = effect;
-
+void func_ov036_021c6d3c(FieldSaveAnime *anime) {
     if (anime->tcb != NULL) {
         GFL_TCBRemove(anime->tcb);
         anime->tcb = NULL;

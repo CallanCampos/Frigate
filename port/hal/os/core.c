@@ -522,7 +522,7 @@ static void RaiseEvent(EventKind kind, u64 when, int timerNo) {
         } else if (line < VBLANK_LINE && port_os_scanline_hook != NULL) {
             QueueWork((int)line);
         }
-        if ((dispstat & REG_GX_DISPSTAT_VCI_MASK) && VCountSetting(dispstat) == line) {
+        if ((dispstat & REG_GX_DISPSTAT_VQI_MASK) && VCountSetting(dispstat) == line) {
             RequestIF(OS_IE_V_COUNT);
         }
         break;

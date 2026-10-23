@@ -70,15 +70,15 @@ void port_tp_get_touch(int *touching, int *x, int *y) {
 }
 
 // Two points of the screen, a quarter of its width and height in from opposite corners, and their raw values
-void port_tp7_calibration(NVRAMTouchCalibration *calibration) {
-    calibration->screenX1 = SCREEN_WIDTH / 8;
-    calibration->screenY1 = SCREEN_HEIGHT / 8;
-    calibration->screenX2 = SCREEN_WIDTH - SCREEN_WIDTH / 8;
-    calibration->screenY2 = SCREEN_HEIGHT - SCREEN_HEIGHT / 8;
-    calibration->rawX1 = TP_RAW_VALUE(calibration->screenX1);
-    calibration->rawY1 = TP_RAW_VALUE(calibration->screenY1);
-    calibration->rawX2 = TP_RAW_VALUE(calibration->screenX2);
-    calibration->rawY2 = TP_RAW_VALUE(calibration->screenY2);
+void port_tp7_calibration(NVRAMConfigTpCalibData *calibration) {
+    calibration->dx1 = SCREEN_WIDTH / 8;
+    calibration->dy1 = SCREEN_HEIGHT / 8;
+    calibration->dx2 = SCREEN_WIDTH - SCREEN_WIDTH / 8;
+    calibration->dy2 = SCREEN_HEIGHT - SCREEN_HEIGHT / 8;
+    calibration->raw_x1 = TP_RAW_VALUE(calibration->dx1);
+    calibration->raw_y1 = TP_RAW_VALUE(calibration->dy1);
+    calibration->raw_x2 = TP_RAW_VALUE(calibration->dx2);
+    calibration->raw_y2 = TP_RAW_VALUE(calibration->dy2);
 }
 
 // A sample of the touch now, in the shared memory. Without a touch the coordinates are 0

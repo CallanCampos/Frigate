@@ -298,6 +298,6 @@ void GSyncMessage_FormatGSyncId(GSyncMessage *msg, u32 id) {
 
         code >>= 5;
         GFL_StrBufAppend(strBuf, sGSyncIdChars[index]);
-        GFL_StrCmdBuild(strBuf, 0xbd, 4, 1, params);
+        GFL_StrCmdBuild(strBuf, STRCMD_CATEGORY_LAYOUT, STRCMD_LAYOUT_MOVE_X, 1, params);
     }
 }

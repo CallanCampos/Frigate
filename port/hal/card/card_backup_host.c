@@ -57,7 +57,7 @@ static void CARDi_RequestStreamCommandCore(CARDiCommon *p) {
     CARDRequestMode reqMode = p->reqMode;
     int reqRetry = p->reqRetry;
     u32 size = CARD_BACKUP_PAGE_SIZE;
-    OSi_ReferSymbol(CARDi_BackupSignature);
+    SDK_REFER_SYMBOL(cardi_backup_assert);
     if (reqType == CARD_REQ_ERASE_SECTOR_BACKUP) {
         size = CARD_GetBackupSectorSize();
     } else if (reqType == CARD_REQ_ERASE_SUBSECTOR_BACKUP) {

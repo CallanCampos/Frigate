@@ -37,7 +37,7 @@ SOCLSocketParam SOCLSocketParamUDPSend = {
 // The allocator and deallocator that SOC_Startup was given
 static SocFreeFunc FreeFunc_SOC;
 static SocAllocFunc AllocFunc_SOC;
-static SocHostEnt sHostEnt;
+static SOCHostEnt sHostEnt;
 // What SOC_GetHostByName gives: the address, the list of addresses (one, and NULL), and the name
 static u32 sHostAddr;
 static u8 *sHostAddrList[2];
@@ -48,31 +48,27 @@ static char sHostName[0x104];
 static void *AllocFunc_SOCL(u32 size);
 static void FreeFunc_SOCL(void *ptr);
 
-static inline u16 SOC_Swap16(u16 value) {
-    return ((value >> 8) & 0xff) | ((value << 8) & 0xff00);
-}
-
-static inline u32 SOC_Swap32(u32 value) {
-    return ((value >> 24) & 0xff) | ((value >> 8) & 0xff00) | ((value << 8) & 0xff0000) | ((value << 24) & 0xff000000);
-}
-
 int SOC_Socket(int domain, int type, int protocol) {
-    if (type == POKE_NET_SOC_SOCK_STREAM) {
+    if (type == SOC_SOCK_STREAM) {
         return SOCL_CreateSocket(&SOCLSocketParamTCP);
     }
     return SOCL_CreateSocket(&SOCLSocketParamUDP);
 }
 
-int SOC_Bind(int sock, const SocAddrIn *address) {
-    return SOCL_Bind((SOCLSocket *)sock, SOC_Swap16(address->port));
+int SOC_Bind(int sock, const void *sockAddr) {
+    const SOCSockAddrIn *address = (const SOCSockAddrIn *)sockAddr;
+
+    return SOCL_Bind(sock, SOC_NtoHs(address->port));
 }
 
-int SOC_Connect(int sock, const SocAddrIn *address) {
-    return SOCL_Connect(sock, SOC_Swap16(address->port), SOC_Swap32(address->addr));
+int SOC_Connect(int sock, const void *sockAddr) {
+    const SOCSockAddrIn *address = (const SOCSockAddrIn *)sockAddr;
+
+    return SOCL_Connect(sock, SOC_NtoHs(address->port), SOC_NtoHl(address->addr.addr));
 }
 
-int SOC_Read(int sock, void *buffer, int size, int flags) {
-    return SOCLi_ReadFrom((SOCLSocket *)sock, buffer, size, NULL, NULL, flags);
+int SOC_Recv(int sock, void *buffer, int size, int flags) {
+    return SOCL_ReadFrom(sock, buffer, size, NULL, NULL, flags);
 }
 
 int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from) {
@@ -80,43 +76,45 @@ int SOC_RecvFrom(int sock, void *buffer, int size, int flags, void *from) {
     CPSInAddr ip;
     int result;
 
-    result = SOCLi_ReadFrom((SOCLSocket *)sock, buffer, size, &port, &ip, flags);
+    result = SOCL_ReadFrom(sock, buffer, size, &port, &ip, flags);
     if (result >= 0 && from != NULL) {
-        SocAddrIn *addr = (SocAddrIn *)from;
+        SOCSockAddrIn *addr = (SOCSockAddrIn *)from;
 
-        addr->port = SOC_Swap16(port);
-        addr->addr = SOC_Swap32(ip);
+        addr->port = SOC_HtoNs(port);
+        addr->addr.addr = SOC_HtoNl(ip);
     }
     return result;
 }
 
 int SOC_Send(int sock, const void *buffer, int size, int flags) {
-    return SOCL_WriteTo((SOCLSocket *)sock, buffer, size, 0, 0, flags);
+    return SOCL_WriteTo(sock, buffer, size, 0, 0, flags);
 }
 
-int SOC_SendTo(int sock, const void *buffer, int size, int flags, const SocAddrIn *to) {
+int SOC_SendTo(int sock, const void *buffer, int size, int flags, const void *sockTo) {
+    const SOCSockAddrIn *to;
     u16 port;
     CPSInAddr ip;
 
-    if (to != NULL) {
-        port = SOC_Swap16(to->port);
-        ip = SOC_Swap32(to->addr);
+    if (sockTo != NULL) {
+        to = (const SOCSockAddrIn *)sockTo;
+        port = SOC_NtoHs(to->port);
+        ip = SOC_NtoHl(to->addr.addr);
     } else {
         port = 0;
         ip = 0;
     }
-    return SOCL_WriteTo((SOCLSocket *)sock, buffer, size, port, ip, flags);
+    return SOCL_WriteTo(sock, buffer, size, port, ip, flags);
 }
 
 int SOC_Shutdown(int sock, int how) {
-    return SOCL_Shutdown((SOCLSocket *)sock);
+    return SOCL_Shutdown(sock);
 }
 
 int SOC_Close(int sock) {
     return SOCL_Close(sock);
 }
 
-SocHostEnt *SOC_GetHostByName(const char *host) {
+SOCHostEnt *SOC_GetHostByName(const char *host) {
     CPSInAddr addr = SOCL_Resolve(host);
 
     if (addr == 0) {
@@ -126,16 +124,17 @@ SocHostEnt *SOC_GetHostByName(const char *host) {
     STD_CopyLString(sHostName, host, 0x101);
     sHostEnt.name = sHostName;
     sHostEnt.aliases = NULL;
-    sHostEnt.addrType = POKE_NET_SOC_AF_INET;
+    sHostEnt.addrType = SOC_AF_INET;
     sHostEnt.addrLength = 4;
     sHostEnt.addrList = sHostAddrList;
     sHostAddrList[0] = (u8 *)&sHostAddr;
     sHostAddrList[1] = NULL;
-    sHostAddr = SOC_Swap32(addr);
+    sHostAddr = SOC_HtoNl(addr);
     return &sHostEnt;
 }
 
-int SOC_GetSockName(int sock, SocAddrIn *address) {
+int SOC_GetSockName(int sock, void *sockAddr) {
+    SOCSockAddrIn *address = (SOCSockAddrIn *)sockAddr;
     CPSInAddr host_ip;
     u32 port;
 
@@ -148,19 +147,19 @@ int SOC_GetSockName(int sock, SocAddrIn *address) {
         port = 0;
     }
     address->len = 8;
-    address->family = POKE_NET_SOC_AF_INET;
-    address->port = SOC_Swap16(port);
-    address->addr = SOC_Swap32(host_ip);
+    address->family = SOC_AF_INET;
+    address->port = SOC_HtoNs(port);
+    address->addr.addr = SOC_HtoNl(host_ip);
     return 0;
 }
 
-u32 SOC_GetHostID(void) {
-    return SOC_Swap32(SOCL_GetHostID());
+long SOC_GetHostID(void) {
+    return (long)SOC_HtoNl(SOCL_GetHostID());
 }
 
 // The SDK's name, which is wrong: it sets the DNS servers
-int SOC_GetResolver(const u32 *dns1, const u32 *dns2) {
-    return SOCL_SetResolver(SOC_Swap32(*dns1), SOC_Swap32(*dns2));
+int SOC_SetResolver(const SOCInAddr *dns1, const SOCInAddr *dns2) {
+    return SOCL_SetResolver(SOC_NtoHl(dns1->addr), SOC_NtoHl(dns2->addr));
 }
 
 int SOC_Fcntl(int sock, int command, int flags) {
@@ -208,13 +207,13 @@ static void FreeFunc_SOCL(void *ptr) {
     }
 }
 
-int SOC_Startup(const SocConfig *config) {
-    sSoclConfig.use_dhcp = config->useDhcp == 1 ? TRUE : FALSE;
-    sSoclConfig.host_ip.my_ip = SOC_Swap32(config->addr);
-    sSoclConfig.host_ip.net_mask = SOC_Swap32(config->netmask);
-    sSoclConfig.host_ip.gateway_ip = SOC_Swap32(config->gateway);
-    sSoclConfig.host_ip.dns_ip[0] = SOC_Swap32(config->dns1);
-    sSoclConfig.host_ip.dns_ip[1] = SOC_Swap32(config->dns2);
+int SOC_Startup(const SOCConfig *config) {
+    sSoclConfig.use_dhcp = config->flag == SOC_FLAG_DHCP ? TRUE : FALSE;
+    sSoclConfig.host_ip.my_ip = SOC_NtoHl(config->addr.addr);
+    sSoclConfig.host_ip.net_mask = SOC_NtoHl(config->netmask.addr);
+    sSoclConfig.host_ip.gateway_ip = SOC_NtoHl(config->router.addr);
+    sSoclConfig.host_ip.dns_ip[0] = SOC_NtoHl(config->dns1.addr);
+    sSoclConfig.host_ip.dns_ip[1] = SOC_NtoHl(config->dns2.addr);
     sSoclConfig.alloc = AllocFunc_SOCL;
     sSoclConfig.free = FreeFunc_SOCL;
     AllocFunc_SOC = config->alloc;
@@ -229,28 +228,28 @@ int SOC_Cleanup(void) {
     return SOCL_Cleanup();
 }
 
-char *SOC_InetNtoA(SocInAddr addr) {
-    SOC_InetNtoP(POKE_NET_SOC_AF_INET, &addr, sInetNtoABuffer, 16);
+char *SOC_InetNtoA(SOCInAddr addr) {
+    SOC_InetNtoP(SOC_AF_INET, &addr, sInetNtoABuffer, 16);
     return sInetNtoABuffer;
 }
 
-int SOC_InetAtoN(const char *text, u32 *address) {
+int SOC_InetAtoN(const char *text, SOCInAddr *address) {
     CPSInAddr ip = SOCL_InetAtoH(text);
 
     if (ip == 0) {
         return 0;
     }
     if (address != NULL) {
-        *address = SOC_Swap32(ip);
+        address->addr = SOC_HtoNl(ip);
     }
     return 1;
 }
 
-char *SOC_InetNtoP(int family, const void *address, char *buffer, u32 size) {
+const char *SOC_InetNtoP(int family, const void *address, char *buffer, unsigned int size) {
     u32 ip;
     u8 octets[4];
 
-    if (family != POKE_NET_SOC_AF_INET) {
+    if (family != SOC_AF_INET) {
         return NULL;
     }
     if (size < 16) {
@@ -269,22 +268,24 @@ void SOC_U32to4U8(u32 value, u8 *bytes) {
     bytes[3] = value;
 }
 
-int SOC_Poll(SocPollFd *fds, u32 count, s64 ticks) {
+int SOC_Poll(SOCPollFD *fds, unsigned int count, OSTick timeout) {
     BOOL timed;
+    s64 ticks;
     int ready;
-    SocPollFd *fd;
+    SOCPollFD *fd;
     u32 i;
 
     if (count == 0 || fds == NULL) {
         return 0;
     }
-    timed = ticks != -1;
+    timed = timeout != (OSTick)-1;
+    ticks = (s64)timeout;
     while (1) {
         fd = fds;
         ready = 0;
         for (i = 0; i < count; i++, fd++) {
             int mask = fd->events | 0xe0;
-            int status = SOCL_GetStatus((SOCLSocket *)fd->fd) & mask;
+            int status = SOCL_GetStatus(fd->fd) & mask;
 
             if (status != 0) {
                 ready++;

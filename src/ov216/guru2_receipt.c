@@ -174,7 +174,7 @@ typedef int (*Guru2ReceiptSeqFunc)(Guru2ReceiptWork *wk, int procSeq);
 static UnionApp *Guru2Receipt_GetUnionApp(Guru2ReceiptWork *wk);
 static void Guru2Receipt_OnJoin(u8 netId, UnionAppMember *member, void *work);
 static void Guru2Receipt_OnLeave(u8 netId, UnionAppMember *member, void *work);
-static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data);
+static void Guru2Receipt_UpdatePalAnim(TCB *tcb, Guru2ReceiptWork *data);
 static void Guru2Receipt_VBlank(TCB *tcb, void *data);
 static void Guru2Receipt_UpdatePrint(Guru2ReceiptWork *wk);
 static void Guru2Receipt_SetVRAMBanks(void);
@@ -425,8 +425,7 @@ static const Guru2ReceiptPalAnimStep sPalAnimSteps[] = {
 
 // clang-format on
 
-static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
-    Guru2ReceiptWork *wk = data;
+static void Guru2Receipt_UpdatePalAnim(TCB *tcb, Guru2ReceiptWork *wk) {
     Guru2ReceiptPalAnim *anim = &wk->palAnim;
 
     if (anim->active) {
@@ -436,7 +435,7 @@ static void Guru2Receipt_UpdatePalAnim(TCB *tcb, void *data) {
             if (sPalAnimSteps[anim->index].palette == 0xff) {
                 anim->index = 0;
             }
-            GX_LoadOBJPltt((u8 *)anim->palette->rawData + sPalAnimSteps[anim->index].palette * 0x20, 0, 0x20);
+            GX_LoadOBJPltt((u8 *)anim->palette->pRawData + sPalAnimSteps[anim->index].palette * 0x20, 0, 0x20);
         } else {
             wk->palAnim.counter++;
         }
@@ -1442,7 +1441,7 @@ static void Guru2Receipt_SetActorLook(Guru2ReceiptWork *wk, NNSG2dPaletteData *p
     NNSG2dCharacterData *character;
     void *file;
 
-    GX_LoadOBJPltt((u8 *)palette->rawData + sLookPalettes[look] * 0x20, id * 0x20, 0x20);
+    GX_LoadOBJPltt((u8 *)palette->pRawData + sLookPalettes[look] * 0x20, id * 0x20, 0x20);
     file = GFL_G2DIOReadOBJNCGR(ARCID_WIFI_UNIONCHAR, look + 1, FALSE, &character, HEAPID_GURU2);
     ClActSys_ReplaceCharData(wk->resources[GURU2_RECEIPT_RES_CHAR + id], character);
     GFL_HeapFree(file);

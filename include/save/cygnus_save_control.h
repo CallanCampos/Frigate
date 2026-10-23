@@ -34,7 +34,7 @@ struct DreamRadarSave {
 #define CYGNUS_DATA_BROKEN 3
 
 // The data on the card, at CYGNUS_DATA_CARD_OFFSET
-typedef struct {
+struct CygnusSaveData {
     // 1 once the game has read the data
     u32 state;
     u32 seed;
@@ -47,7 +47,7 @@ typedef struct {
     u32 words[CYGNUS_DATA_WORD_MAX];
     // getCRC16 of the words
     u16 crc;
-} CygnusSaveData; // size: 0x98
+}; // size: 0x98
 
 u32 getDreamRadarSaveSize(void);
 void initDreamRadarSave(DreamRadarSave *save);

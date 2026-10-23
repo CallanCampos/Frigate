@@ -12,7 +12,7 @@ int WM_CheckInitialized(void) {
 // On a DS there is no such library, which its return code calls an illegal state
 int NWM_CheckInitialized(void) {
     if (OS_IsRunOnTwl()) {
-        return func_02702698();
+        return NWMi_CheckInitialized();
     }
     return WM_ERRCODE_ILLEGAL_STATE;
 }

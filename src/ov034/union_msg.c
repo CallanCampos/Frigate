@@ -306,19 +306,19 @@ u16 UnionMsg_GetBusyMessage(u8 gender) {
     return sMsgPair_0230[gender];
 }
 
-u16 UnionMsg_GetShowCardMessage(u32 row, u8 gender) {
+u16 UnionMsg_GetShowCardMessage(unsigned int row, u8 gender) {
     return sMsgPairs_04cc[row - 2][gender];
 }
 
-u16 UnionMsg_GetCardMissingMessage(u32 row, u8 gender) {
+u16 UnionMsg_GetCardMissingMessage(unsigned int row, u8 gender) {
     return sMsgPairs_0530[row - 2][gender];
 }
 
-u16 UnionMsg_GetOfferMessage(u32 row) {
+u16 UnionMsg_GetOfferMessage(unsigned int row) {
     return sTable_0424[row - 2];
 }
 
-u16 UnionMsg_GetDeclinedMessage(u32 row) {
+u16 UnionMsg_GetDeclinedMessage(unsigned int row) {
     return sTable_0458[row - 2];
 }
 

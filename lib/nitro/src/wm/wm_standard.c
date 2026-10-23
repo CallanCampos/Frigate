@@ -1,8 +1,8 @@
-// The wireless manager's standard operations (libwm, TwlSDK's wm/ARM9/src/wm_standard.c, by its place in the library:
-// the file name is a guess): starting and stopping the manager and its power, setting a parent up and starting it, the
-// scan, the connection of a child and its disconnection. Each checks the state and the arguments, registers the
-// callback and sends the command to the ARM7. The public functions have the SDK's names, from what
-// they do; the static ones' names are ours
+// The wireless manager's standard operations (libwm, TwlSDK's wm/ARM9/src/wm_standard.c, by its place in the library;
+// ntrtwl's reconstruction of NitroSDK has the same file): starting and stopping the manager and its power, setting a
+// parent up and starting it, the scan, the connection of a child and its disconnection. Each checks the state and the
+// arguments, registers the callback and sends the command to the ARM7. The names are NitroSDK's, as that reconstruction
+// has them
 #include "nitro/mi.h"
 #include "nitro/os.h"
 #include "nitro/wm.h"
@@ -20,25 +20,25 @@ typedef struct {
     u16 ssidLength;
     u8 ssid[32];
     u16 ssidMatchLength;
-    u8 unk_38[4];
-} WmStartScanExCommand;
+    u8 rsv[4];
+} WMStartScanExReq;
 
 // What it sends to start the connection of a child. Its size is 0x28; the halfword at 0x24 is not set
 typedef struct {
     u16 apiid;
-    u16 unk_02;
-    const WMBssDesc *bssDesc;
+    u16 reserved;
+    const WMBssDesc *pInfo;
     u8 ssid[24];
     BOOL powerSave;
-    u16 unk_24;
+    u16 reserved2;
     u16 authMode;
-} WmStartConnectCommand;
+} WMStartConnectReq;
 
 static int WMi_EnableEx(WMCallbackFunc callback, int flags);
 static int WMi_InitializeEx(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo, int flags);
 static BOOL WmCheckParentParameter(const WMParentParam *param);
 
-int WM_Enable(WMCallbackFunc callback) {
+WMErrCode WM_Enable(WMCallbackFunc callback) {
     return WMi_EnableEx(callback, 0);
 }
 
@@ -53,14 +53,14 @@ static int WMi_EnableEx(WMCallbackFunc callback, int flags) {
     WMi_SetCallbackTable(WM_APIID_ENABLE, callback);
     WMi_RegisterSleepCallback();
     w9b = WMi_GetSystemWork();
-    result = WMi_SendCommand(WM_APIID_ENABLE, 4, w9b->wm7buf, w9b->status, w9b->indBuf, flags);
+    result = WMi_SendCommand(WM_APIID_ENABLE, 4, w9b->WM7, w9b->status, w9b->fifo7to9, flags);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_Disable(WMCallbackFunc callback) {
+WMErrCode WM_Disable(WMCallbackFunc callback) {
     int result = WMi_CheckStateEx(1, WM_STATE_STOP);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -74,7 +74,7 @@ int WM_Disable(WMCallbackFunc callback) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_PowerOn(WMCallbackFunc callback) {
+WMErrCode WM_PowerOn(WMCallbackFunc callback) {
     int result = WMi_CheckStateEx(1, WM_STATE_STOP);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -88,7 +88,7 @@ int WM_PowerOn(WMCallbackFunc callback) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_PowerOff(WMCallbackFunc callback) {
+WMErrCode WM_PowerOff(WMCallbackFunc callback) {
     int result = WMi_CheckStateEx(1, WM_STATE_IDLE);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -102,12 +102,12 @@ int WM_PowerOff(WMCallbackFunc callback) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_Initialize(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo) {
+WMErrCode WM_Initialize(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo) {
     return WMi_InitializeEx(wmSysBuf, callback, dmaNo, 0);
 }
 
 // Like WM_Initialize, with a fourth argument: the flags to the ARM7 are bit 0, and bit 1 as well if the argument is 0
-int WM_InitializeForListening(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo, int extra) {
+WMErrCode WM_InitializeForListening(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo, BOOL extra) {
     int flags = 1;
 
     if (extra == 0) {
@@ -127,14 +127,14 @@ static int WMi_InitializeEx(void *wmSysBuf, WMCallbackFunc callback, u16 dmaNo, 
     WMi_SetCallbackTable(WM_APIID_INITIALIZE, callback);
     WMi_RegisterSleepCallback();
     w9b = WMi_GetSystemWork();
-    result = WMi_SendCommand(WM_APIID_INITIALIZE, 4, w9b->wm7buf, w9b->status, w9b->indBuf, flags);
+    result = WMi_SendCommand(WM_APIID_INITIALIZE, 4, w9b->WM7, w9b->status, w9b->fifo7to9, flags);
     if (result != WM_ERRCODE_SUCCESS) {
         return result;
     }
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_Reset(WMCallbackFunc callback) {
+WMErrCode WM_Reset(WMCallbackFunc callback) {
     int result = WMi_CheckIdle();
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -148,7 +148,7 @@ int WM_Reset(WMCallbackFunc callback) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_End(WMCallbackFunc callback) {
+WMErrCode WM_End(WMCallbackFunc callback) {
     int result = WMi_CheckStateEx(1, WM_STATE_IDLE);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -162,7 +162,7 @@ int WM_End(WMCallbackFunc callback) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_SetParentParameter(WMCallbackFunc callback, WMParentParam *param) {
+WMErrCode WM_SetParentParameter(WMCallbackFunc callback, const WMParentParam *param) {
     int result = WMi_CheckStateEx(1, WM_STATE_IDLE);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -218,7 +218,7 @@ static BOOL WmCheckParentParameter(const WMParentParam *param) {
 }
 
 // Starts the parent; the flag goes to the ARM7 as the argument of the command
-int WMi_StartParentEx(WMCallbackFunc callback, int enable) {
+WMErrCode WMi_StartParentEx(WMCallbackFunc callback, BOOL enable) {
     WMArm9Buf *w9b;
     int result = WMi_CheckStateEx(1, WM_STATE_IDLE);
 
@@ -239,11 +239,11 @@ int WMi_StartParentEx(WMCallbackFunc callback, int enable) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_StartParent(WMCallbackFunc callback) {
+WMErrCode WM_StartParent(WMCallbackFunc callback) {
     return WMi_StartParentEx(callback, TRUE);
 }
 
-int WM_EndParent(WMCallbackFunc callback) {
+WMErrCode WM_EndParent(WMCallbackFunc callback) {
     int result = WMi_CheckStateEx(1, WM_STATE_PARENT);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -258,8 +258,8 @@ int WM_EndParent(WMCallbackFunc callback) {
 }
 
 // Scans the channels of the list for parents. The scan type is 0 to 3, 2 and 3 matching the SSID
-int WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param) {
-    WmStartScanExCommand cmd;
+WMErrCode WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param) {
+    WMStartScanExReq cmd;
     int result = WMi_CheckStateEx(3, WM_STATE_IDLE, WM_STATE_CLASS1, WM_STATE_SCAN);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -305,7 +305,7 @@ int WM_StartScanEx(WMCallbackFunc callback, const WMScanExParam *param) {
     return WM_ERRCODE_OPERATING;
 }
 
-int WM_EndScan(WMCallbackFunc callback) {
+WMErrCode WM_EndScan(WMCallbackFunc callback) {
     int result = WMi_CheckStateEx(1, WM_STATE_SCAN);
 
     if (result != WM_ERRCODE_SUCCESS) {
@@ -320,8 +320,9 @@ int WM_EndScan(WMCallbackFunc callback) {
 }
 
 // Connects to the parent that the scan found; the SSID is the 24 bytes that the child gives, or none
-int WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave, u16 authMode) {
-    WmStartConnectCommand cmd;
+WMErrCode WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u8 *ssid, BOOL powerSave,
+                            u16 authMode) {
+    WMStartConnectReq cmd;
     WMArm9Buf *w9b;
     int result = WMi_CheckStateEx(1, WM_STATE_IDLE);
 
@@ -341,7 +342,7 @@ int WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u
     WMi_SetCallbackTable(WM_APIID_START_CONNECT, callback);
 
     cmd.apiid = WM_APIID_START_CONNECT;
-    cmd.bssDesc = bssDesc;
+    cmd.pInfo = bssDesc;
     if (ssid != NULL) {
         MI_CpuCopy8(ssid, cmd.ssid, sizeof(cmd.ssid));
     } else {
@@ -357,7 +358,7 @@ int WM_StartConnectEx(WMCallbackFunc callback, const WMBssDesc *bssDesc, const u
 }
 
 // A child leaves its parent with AID 0; a parent drops the child with the AID, which must be connected
-int WM_Disconnect(WMCallbackFunc callback, u16 aid) {
+WMErrCode WM_Disconnect(WMCallbackFunc callback, u16 aid) {
     WMArm9Buf *w9b = WMi_GetSystemWork();
     int result =
         WMi_CheckStateEx(5, WM_STATE_PARENT, WM_STATE_MP_PARENT, WM_STATE_CHILD, WM_STATE_MP_CHILD, WM_STATE_DCF_CHILD);
@@ -369,8 +370,8 @@ int WM_Disconnect(WMCallbackFunc callback, u16 aid) {
         if (aid < 1 || aid > 15) {
             return WM_ERRCODE_INVALID_PARAM;
         }
-        DC_InvalidateRange(&w9b->status->childBitmap, 2);
-        if (!(w9b->status->childBitmap & (1 << aid))) {
+        DC_InvalidateRange(&w9b->status->child_bitmap, 2);
+        if (!(w9b->status->child_bitmap & (1 << aid))) {
             return WM_ERRCODE_NO_CHILD;
         }
     } else if (aid != 0) {

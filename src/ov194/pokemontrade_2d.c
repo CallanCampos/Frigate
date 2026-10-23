@@ -116,7 +116,7 @@ static u8 func_ov194_021c2b08(BoxPkm *pkm, HeapID heapId) {
     if (PML_PkmGetParam(pkm, PKM_PARAM_SPECIES_VALID, NULL)) {
         if (!PML_PkmGetParam(pkm, PKM_PARAM_IS_EGG, NULL)) {
             u16 form = PML_PkmGetParam(pkm, PKM_PARAM_FORM, NULL);
-            void *personal = PML_PersonalLoad(species, form, heapId);
+            PersonalData *personal = PML_PersonalLoad(species, form, heapId);
             color = PML_PersonalGetParam(personal, 33);
             PML_PersonalFree(personal);
         } else {
@@ -724,7 +724,8 @@ static void func_ov194_021c3904(PokemonTradeWork *wk, BoxSaveAccessor *boxes, in
             slot += box * 30;
             ClActor_GetSurfacePos(wk->icons[index][i], &screenPos, CLACT_VRAM_SUB);
             if (async == TRUE && screenPos.x >= -16 && screenPos.x <= 272) {
-                if (!NNS_GfdRegisterNewVramTransferTask(35, proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
+                if (!NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_CHAR_SUB,
+                                                        proxy.vramLocation.baseAddrOfVram[NNS_G2D_VRAM_TYPE_2DSUB],
                                                         wk->iconCharData + slot * 0x200, 0x200)) {
                     MI_CpuCopy8(
                         wk->iconCharData + slot * 0x200,
@@ -901,7 +902,7 @@ void func_ov194_021c3e9c(PokemonTradeWork *wk, int box) {
                 icon = PokeParty_GetIconIndex(0, 0, 0, FALSE);
             }
             file = GFL_G2DIOReadBGNCGRArc(arc, icon, FALSE, &chars, wk->heapId);
-            MI_CpuCopy8(chars->rawData, wk->iconCharData + slot * 0x200, 0x200);
+            MI_CpuCopy8(chars->pRawData, wk->iconCharData + slot * 0x200, 0x200);
             slot++;
             GFL_HeapFree(file);
         }
@@ -1115,7 +1116,7 @@ static void func_ov194_021c4324(void) {
     G3X_AntiAlias(TRUE);
     G3X_AlphaBlend(TRUE);
     G3X_EdgeMarking(FALSE);
-    G3X_SetFog(TRUE, 0, 0, 0);
+    G3X_SetFog(TRUE, GX_FOGBLEND_COLOR_ALPHA, GX_FOGSLOPE_0x8000, 0);
     G3X_SetClearColor(GX_RGB(0, 0, 0), 0, 0x7fff, 63, FALSE);
     G3_ViewPort(0, 0, 255, 191);
     for (i = 0; i < NELEMS(sLights); i++) {
@@ -2167,7 +2168,7 @@ void func_ov194_021c5d10(PokemonTradeWork *wk, int side, PartyPkm *pkm) {
         file = GFL_G2DIOReadNSCRArc(arc, 6, FALSE, &screen, wk->heapId);
     }
     cells = (u16 *)screen->rawData;
-    for (i = 0; i < screen->size / 2; i++) {
+    for (i = 0; i < screen->szByte / 2; i++) {
         cells[i] += CHAR_POS(wk->bg2Chars);
     }
     if (side == 0) {

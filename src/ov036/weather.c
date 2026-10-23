@@ -17,7 +17,7 @@
 #include "gfl/tcb.h"
 #include "system/zone_weather.h"
 
-typedef struct {
+struct FieldWeather {
     Field3DBg *layers[2];
     u16 transition;
     u16 state;
@@ -30,7 +30,7 @@ typedef struct {
     WeatherTask *tasks[2];
     s32 overlayId;
     TCB *tcb;
-} FieldWeather;
+};
 
 typedef struct WeatherOverlay {
     WeatherData *data;
@@ -100,8 +100,7 @@ void *func_ov036_02199004(FieldCamera *camera, void *light, FieldFog *fog, void 
     return weather;
 }
 
-void func_ov036_021990d8(void *weatherPtr) {
-    FieldWeather *weather = weatherPtr;
+void func_ov036_021990d8(FieldWeather *weather) {
     s32 i;
 
     GFL_TCBRemove(weather->tcb);
@@ -131,8 +130,7 @@ void FieldWeather_Update(void *weatherPtr, HeapID heapId) {
     }
 }
 
-void FieldWeather_Draw(void *weatherPtr) {
-    FieldWeather *weather = weatherPtr;
+void FieldWeather_Draw(FieldWeather *weather) {
     s32 i;
 
     if (weather) {
@@ -142,8 +140,7 @@ void FieldWeather_Draw(void *weatherPtr) {
     }
 }
 
-BOOL func_ov036_0219917c(void *weatherPtr) {
-    FieldWeather *weather = weatherPtr;
+BOOL func_ov036_0219917c(FieldWeather *weather) {
     s32 i;
 
     if (weather) {
@@ -156,8 +153,7 @@ BOOL func_ov036_0219917c(void *weatherPtr) {
     return FALSE;
 }
 
-void SetWeatherInit(void *weatherPtr, u16 weatherId, HeapID heapId) {
-    FieldWeather *weather = weatherPtr;
+void SetWeatherInit(FieldWeather *weather, u16 weatherId, HeapID heapId) {
     s32 i;
 
     if (weatherId == weather->current && weatherId != 0) {
@@ -178,16 +174,12 @@ void func_ov036_02199208(void *weather, u32 weatherId) {
     func_ov036_02199260(weather, weatherId);
 }
 
-void func_ov036_02199210(void *weatherPtr, u32 weatherId) {
-    FieldWeather *weather = weatherPtr;
-
+void func_ov036_02199210(FieldWeather *weather, u32 weatherId) {
     func_ov036_02199260(weather, weatherId);
     weather->fadeIn = FALSE;
 }
 
-u16 func_ov036_02199220(void *weatherPtr) {
-    FieldWeather *weather = weatherPtr;
-
+u16 func_ov036_02199220(FieldWeather *weather) {
     return weather->current;
 }
 

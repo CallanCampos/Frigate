@@ -142,7 +142,7 @@ static void BBagMain_Task(TCB *tcb, void *data) {
 
 static int BBagMain_StateInit(BBagWork *work) {
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXS_SetMasterBrightness(-16);
     work->tcbExMgr = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->cursor = BAppCursor_Create(work->param->heapId);
     BBagMain_InitBG(work);
@@ -183,7 +183,7 @@ static int BBagMain_StateInit(BBagWork *work) {
 
 static int BBagMain_StateInitLauncher(BBagWork *work) {
     G2S_BlendNone();
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GXS_SetMasterBrightness(-16);
     work->tcbExMgr = GFL_TCBExMgrCreate(work->param->heapId, work->param->heapId, 1, 4);
     work->cursor = BAppCursor_Create(work->param->heapId);
     BBagMain_InitBG(work);

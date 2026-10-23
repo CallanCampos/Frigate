@@ -61,24 +61,34 @@ u32 DSProt_Crc32(const u8 *data, u32 size) {
     return ~crc;
 }
 
-// Reads the 0x200 bytes at a card address with the card's registers, restoring the command registers and the
+static inline u32 DSProt_GetRomSize(void) {
+    const CARDRomHeader *header;
+    u32 size;
+    header = (const CARDRomHeader *)CARD_GetRomHeader();
+    size = 1 << (header->device_size + 17);
+    return size;
+}
+
+// Reads a byte range at a card address with the card's registers, restoring the command registers and the
 // memory controller afterwards. `flag` is the sixth byte of the command. The register block is reached from a base
 // built at run time (1 shifted by 26) and a second pointer to 0x04000000 for the command bytes, the way the original's
 // constants are built.
-static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
-    u32 page;
-    int i;
-    u16 exmemcnt = reg_MI_EXMEMCNT;
-    vu8 *regs;
-    int offset;
-    u32 control;
-    u32 header;
+static inline void DSProt_ReadCardRaw(void *dest, u32 address, s32 size, u8 flag) {
     u8 savedCommand[8];
     u32 base;
+    vu8 *regs;
+    u32 header;
+    u32 control;
+    s32 offset;
+    u16 exmemcnt;
+    u32 page;
+    u32 word;
+    int i;
 
-    regs = (vu8 *)0x04000000;
     base = 1;
     base <<= REG_BASE_SHIFT;
+    regs = (vu8 *)0x04000000;
+    exmemcnt = reg_MI_EXMEMCNT;
     reg_MI_EXMEMCNT &= ~0x0800;
     header = 5;
     header += *(vu8 *)(base + OFFSET_SCFG_A9ROM) & 1;
@@ -86,7 +96,7 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
     header -= 13;
     header <<= 5;
     control = (*(u32 *)header & ~0x07000000) | 0xa1000000;
-    offset = -(int)(address & 0x1ff);
+    offset = -(s32)(address & 0x1ff);
     while (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x80000000) {
     }
     *(vu8 *)(base + OFFSET_AUXSPICNT_H) = 0x80;
@@ -94,7 +104,7 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
         savedCommand[i] = REG_ROMCMD(i);
     }
     page = address + offset;
-    while (offset < 0x200) {
+    while (offset < size) {
         regs[OFFSET_ROMCMD + 0] = 0xb7;
         regs[OFFSET_ROMCMD + 1] = page >> 24;
         regs[OFFSET_ROMCMD + 2] = page >> 16;
@@ -106,11 +116,12 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
         *(vu32 *)(base + OFFSET_ROMCTRL) = control;
         do {
             if (*(vu32 *)(base + OFFSET_ROMCTRL) & 0x800000) {
-                u32 word = *(vu32 *)(base + OFFSET_CARD_DATA);
+                word = *(vu32 *)(base + OFFSET_CARD_DATA);
 
-                if (offset >= 0 && offset < 0x200) {
-                    // style-ok: byte-offset the page is a plain word buffer; indexing it by words scales the offset
-                    *(u32 *)((u8 *)dest + offset) = word;
+                if (offset >= 0 && offset < size) {
+                    // The address is an integer sum here, where overlay 337's copy (dsprot_detect_multi.c) adds to a
+                    // u8 pointer: MWCC compiles the two differently, and the ROM's copies differ the same way
+                    *(u32 *)((u32)dest + offset) = word;
                 }
                 offset += 4;
             }
@@ -125,20 +136,23 @@ static inline void DSProt_ReadCardRaw(u32 *dest, u32 address, u32 flag) {
 
 // Reads the same places of the card with the card's registers and through the SDK, and crashes the game if a
 // flashcart gives different data
-u32 DSProt_CheckFlashcart(void) {
-    u32 page[128];
+static inline u32 DSProt_TestCard(u32 passCode, u32 failCode) {
     u32 crcs[20];
-    u16 lockId;
-    u32 offset = 0x7000;
-    u32 address = 0x1000;
+    u32 page[128];
     int i;
+    u32 address;
+    u32 offset;
+    u16 lockId;
+
+    offset = 0x7000;
+    address = 0x1000;
 
     lockId = OS_GetLockID();
     CARD_LockRom(lockId);
     for (i = 0; i < 6; i++) {
-        DSProt_ReadCardRaw(page, address + (1 << (CARD_GetRomHeader()->deviceSize + 17)), 0);
+        DSProt_ReadCardRaw(page, address + DSProt_GetRomSize(), 0x200, 0);
         crcs[i] = DSProt_Crc32((u8 *)page, 0x200);
-        CARDi_ReadRom(-1, address + offset, page, 0x200, 0, 0, 0);
+        CARD_ReadRom((u32)-1, (const void *)(address + offset), page, 0x200);
         crcs[i + 6] = DSProt_Crc32((u8 *)page, 0x200);
         if (i < 3) {
             address += 0x200;
@@ -151,17 +165,17 @@ u32 DSProt_CheckFlashcart(void) {
     }
     address += 0x1e000;
     for (; i < 8; i++) {
-        DSProt_ReadCardRaw(page, address, 0);
+        DSProt_ReadCardRaw(page, address, 0x200, 0);
         crcs[i + 6] = DSProt_Crc32((u8 *)page, 0x200);
-        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
+        CARD_ReadRom((u32)-1, (const void *)address, page, 0x200);
         crcs[i + 8] = DSProt_Crc32((u8 *)page, 0x200);
         address += 0x1000;
     }
     address -= 0x1d000;
     for (; i < 10; i++) {
-        DSProt_ReadCardRaw(page, address, 0x11);
+        DSProt_ReadCardRaw(page, address, 0x200, 0x11);
         crcs[i + 8] = DSProt_Crc32((u8 *)page, 0x200);
-        CARDi_ReadRom(-1, address, page, 0x200, 0, 0, 0);
+        CARD_ReadRom((u32)-1, (const void *)address, page, 0x200);
         crcs[i + 10] = DSProt_Crc32((u8 *)page, 0x200);
         address += 0x1000;
     }
@@ -173,26 +187,31 @@ u32 DSProt_CheckFlashcart(void) {
     for (i = 0; i < 3; i++) {
         if (crcs[6] != crcs[i]) {
             DSProt_CallCrash(NULL, NULL);
-            return 0xb177;
+            return failCode;
         }
     }
     if (crcs[6] == crcs[7] && crcs[6] == crcs[8]) {
         DSProt_CallCrash(NULL, NULL);
-        return 0xb177;
+        return failCode;
     }
     if (crcs[4] != crcs[10] || crcs[5] != crcs[11]) {
         DSProt_CallCrash(NULL, NULL);
-        return 0xb177;
+        return failCode;
     }
     if (crcs[12] != crcs[14] || crcs[13] != crcs[15]) {
         DSProt_CallCrash(NULL, NULL);
-        return 0xb177;
+        return failCode;
     }
     if (crcs[16] != crcs[18] || crcs[17] != crcs[19]) {
         DSProt_CallCrash(NULL, NULL);
-        return 0xb177;
+        return failCode;
     }
-    return 0xaa65;
+    return passCode;
+}
+
+// The two possible results are the check's prime-encoded Boolean values.
+u32 DSProt_CheckFlashcart(void) {
+    return DSProt_TestCard(0xaa65, 0xb177);
 }
 
 // Hand-written, as every DSProt_Call* is: checksums DSProt_Dispatch from the address and word count packed in its
@@ -318,4 +337,5 @@ asm void DSProt_DecryptDetect(void) {
 #pragma define_section ctor ".ctor"                                                                                    \
                             ".ctor"                                                                                    \
                             ".ctor" abs32 RW
-__declspec(ctor) static void (*const sDecryptDetect)(void) = DSProt_DecryptDetect;
+// The loader, rather than C code, references this registration.
+__attribute__((used)) __declspec(ctor) static void (*const sDecryptDetect)(void) = DSProt_DecryptDetect;

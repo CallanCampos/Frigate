@@ -17,18 +17,18 @@
 #include "nitro/gx.h"
 #include "nitro/os.h"
 
-static void DWCUtilError_LoadGraphics(void);
+static void initGraphics(void);
 static void DWCUtilError_DrawMessage(void);
-static void DWCUtilError_FadeIn(void);
-static void DWCUtilError_WaitFadeIn(void);
-static void DWCUtilError_WaitButtons(void);
-static void DWCUtilError_Main(void);
-static void DWCUtilError_HandleInput(void);
-static void func_ov182_021b2c4c(void);
-static void DWCUtilError_HandleChoice(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilError_DisableButtons(void);
-static void DWCUtilError_FadeOut(void);
-static void DWCUtilError_WaitFadeOut(void);
+static void endScene1(void);
+static void endScene2(void);
 
 // The font of the message by language, the message's box (left, top, width and height), and where the code is drawn
 // by language
@@ -42,12 +42,12 @@ static const u16 sErrorCodePos[7][2] = {
 static int sErrorCode;
 
 void DWCUtilError_Init(void) {
-    DWCUtilError_LoadGraphics();
+    initGraphics();
     DWCUtilError_DrawMessage();
-    DWCUtilMain_SetUpdate(DWCUtilError_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilError_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/jb4Error.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -68,7 +68,7 @@ static void DWCUtilError_DrawMessage(void) {
     u16 x;
     u16 y;
 
-    DWCUtilMain_GetScreenArgs(NULL, &from);
+    DWCi_GetParam2_(NULL, &from);
     code = sErrorCode;
     if (code >= -20099) {
         type = 0;
@@ -148,99 +148,99 @@ static void DWCUtilError_DrawMessage(void) {
         type = 2;
     }
 
-    text = DWCUtilText_CreateBg(0, sErrorFonts[DWCUtilMain_GetLanguage()]);
-    msg = DWCUtilMsg_Get(gDWCUtilMsg, type);
+    text = DWCi_FNTlFormBgEx(0, sErrorFonts[DWCi_Language()]);
+    msg = DWCi_MSGlGet(gDWCUtilMsg, type);
     OS_SNPrintf(digits, sizeof(digits), "%d", -sErrorCode);
     DWCUtilString_Widen(str, (u8 *)digits, 8);
-    y = sErrorCodePos[DWCUtilMain_GetLanguage()][1];
-    x = sErrorCodePos[DWCUtilMain_GetLanguage()][0];
-    DWCUtilText_DrawCentered(text, x, y, 2, 10, str, 0);
-    DWCUtilText_DrawRect(text, sErrorMsgRect[0], sErrorMsgRect[1], sErrorMsgRect[2], sErrorMsgRect[3], 2,
-                         DWCUtilGfxResource_GetTextFlags(), msg);
+    y = sErrorCodePos[DWCi_Language()][1];
+    x = sErrorCodePos[DWCi_Language()][0];
+    DWCi_FNTlDrawStringEx(text, x, y, 2, 10, str, 0);
+    DWCi_FNTlDrawRect(text, sErrorMsgRect[0], sErrorMsgRect[1], sErrorMsgRect[2], sErrorMsgRect[3], 2,
+                      DWCi_CMNlFontFlag(), msg);
     DWCUtilText_MarkDirty(text);
 }
 
-static void DWCUtilError_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilError_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(4);
-        DWCUtilMain_SetUpdate(DWCUtilError_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(4);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilError_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilError_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilError_Main(void) {
-    DWCUtilError_HandleInput();
-    func_ov182_021b2c4c();
-    DWCUtilError_HandleChoice();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilError_HandleInput(void) {
-    if (DWCUtilTouch_IsKeyPressed(1)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+static void input(void) {
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(0);
     }
 }
 
-static void func_ov182_021b2c4c(void) {
+static void draw(void) {
 }
 
-static void DWCUtilError_HandleChoice(void) {
-    if (DWCUtilUiObject_GetState() == 0) {
+static void button(void) {
+    if (DWCi_BTNlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilMain_SetUpdate(DWCUtilError_DisableButtons);
+        DWCi_ChangeScene(DWCUtilError_DisableButtons);
     }
 }
 
 static void DWCUtilError_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilError_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilError_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
-        DWCUtilUiObject_Exit();
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilError_WaitFadeOut);
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
+        DWCi_BTNlEnd();
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
 // Goes back to the first screen of the connection settings, or to the settings of the connection
-static void DWCUtilError_WaitFadeOut(void) {
+static void endScene2(void) {
     int from;
 
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0 && DWCUtilUiObject_IsIdle()) {
-        DWCUtilText_DestroyScreenBg(0);
-        DWCUtilScreen_Stop();
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0 && DWCi_BTNlIsEnd()) {
+        DWCi_FNTlDeleteBgLcd(0);
+        DWCi_COMMENTlDelete();
         DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-        DWCUtilMain_GetScreenArgs(NULL, &from);
+        DWCi_GetParam2_(NULL, &from);
         if (from != 0) {
-            DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(DWCUtilScreenAp_Init);
+            DWCi_SetParam_(2, 1);
+            DWCi_ChangeScene(DWCUtilScreenAp_Init);
         } else {
-            DWCUtilMain_SetLayout(2, 0);
-            DWCUtilMain_SetScreenArgs(0, 0);
-            DWCUtilAddressSettings_SetFrom(0);
-            DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
+            DWCi_SetParam_(2, 0);
+            DWCi_SetParam2_(0, 0);
+            DWCi_SetListReturn(0);
+            DWCi_ChangeScene(DWCUtilAddressSettings_Init);
         }
     }
 }
 
-void DWCUtilError_SetCode(int code) {
+void DWCi_SetErrorCode(int code) {
     sErrorCode = code;
 }

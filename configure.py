@@ -24,6 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(ROOT))
+from tools.build.object_aliases import label_aliases  # noqa: E402
 from tools.data.gen_constants import ordered_files  # noqa: E402
 from tools.data.graphics_archive import GRAPHICS, directory_archive  # noqa: E402
 from tools.text.pms_words import CATEGORIES as PMS_WORD_CATEGORIES  # noqa: E402
@@ -76,7 +77,7 @@ DSD_BINARIES = {
 # stored register where the game reloads the field. dsi/1.1p1 to dsi/1.3p1 generate identical code for everything
 # tested so far, while dsi/1.6 does not match the game.
 MWCC_VERSION = "dsi/1.1p1"
-# The linker only places delinked objects, so its version does not affect matching
+# The linker places objects and generates DS Protect's legacy interworking glue
 MWLD_VERSION = "dsi/1.1"
 
 # The compiler reads its sources as Shift JIS, from sjiswrap: in the default ASCII, a character whose second byte is
@@ -110,6 +111,11 @@ CC_FLAGS = [
 LIB_DIR = ROOT / "lib"
 
 
+# The assembler flags of each library that has assembly sources, from library.toml's asm_flags: a library's hand-written
+# assembly (MSL's runtime, fp_fastI.s) is assembled by the mwasmarm of its compiler's version
+LIBRARY_ASM_FLAGS: dict[str, list[str]] = {}
+
+
 def load_libraries() -> dict[str, tuple[str, list[str]]]:
     """Returns the compiler and flags of each library with sources, keyed by its source directory ("lib/spl/src/")."""
     libraries = {}
@@ -123,6 +129,8 @@ def load_libraries() -> dict[str, tuple[str, list[str]]]:
             library = tomllib.load(f)
         src = f"{(lib / 'src').relative_to(ROOT).as_posix()}/"
         libraries[src] = (library["compiler"], [*library["flags"], ENCODING_FLAG])
+        if "asm_flags" in library:
+            LIBRARY_ASM_FLAGS[src] = library["asm_flags"]
         for path, flags in library.get("file_flags", {}).items():
             FILE_FLAGS[src + path] = flags
         for path, compiler in library.get("file_compilers", {}).items():
@@ -222,6 +230,15 @@ def library_of(source: Path) -> tuple[str, list[str]] | None:
         return None
     library = next((library for prefix, library in LIBRARIES.items() if relative.startswith(prefix)), None)
     return (FILE_COMPILERS.get(relative, library[0]), file_flags(source, library[1])) if library else None
+
+
+def source_assembler(source: Path) -> tuple[str, list[str]]:
+    """Returns the compiler version whose mwasmarm assembles a library's assembly source, and its flags."""
+    relative = (ROOT / source).resolve().relative_to(ROOT).as_posix()
+    prefix = next((prefix for prefix in LIBRARIES if relative.startswith(prefix)), None)
+    if prefix is None or prefix not in LIBRARY_ASM_FLAGS:
+        sys.exit(f"{relative}: assembly sources are built only in a library whose library.toml has asm_flags")
+    return FILE_COMPILERS.get(relative, LIBRARIES[prefix][0]), LIBRARY_ASM_FLAGS[prefix]
 
 
 @dataclass(frozen=True)
@@ -364,7 +381,7 @@ LD_FLAGS = [
     "-interworking",
     "-map closure,unused",
     "-msgstyle gcc",
-    "-m Entry",
+    "-m _start",
 ]
 
 
@@ -549,24 +566,61 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     as_defines = " ".join(f"-D{define}" for define in version_defines)
     objects = []
     compiled = []
+    # A function's second names, kept as labels in the configs, which the compiled object gets added, see
+    # tools/build/object_aliases.py
+    aliases = label_aliases(arm9_config.parent)
     for f in files:
         source = Path(f["name"])
         if source.suffix in (".c", ".cpp") and source.exists():
             obj = build_dir / source.with_suffix(".o")
             settings = source_compiler(source)
             rule = f"mwcc_{LIBRARY_COMPILERS.index(settings.compiler)}" if settings.is_library else "mwcc"
-            variables = {"defines": defines, "dep": obj.with_suffix(".d")}
+            source_aliases = aliases.get(source.as_posix())
+            compiler_obj = obj.with_suffix(".unaliased.o") if source_aliases else obj
+            variables = {"defines": defines, "dep": compiler_obj.with_suffix(".d")}
             variables["flags"] = " ".join(settings.flags)
-            n.build([obj], rule, [source], variables=variables, order_only=["constants_headers"])
+            n.build([compiler_obj], rule, [source], variables=variables, order_only=["constants_headers"])
+            if source_aliases:
+                n.build([obj], "object_aliases", [compiler_obj], implicit=["tools/build/object_aliases.py"],
+                        variables={"aliases": " ".join(f"{label}={function}"
+                                                       for label, function in sorted(source_aliases.items()))})
+            compiled.append(obj)
+        elif source.suffix == ".s" and source.exists():
+            obj = build_dir / source.with_suffix(".o")
+            compiler, asm_flags = source_assembler(source)
+            n.build([obj], f"mwasm_{LIBRARY_COMPILERS.index(compiler)}", [source],
+                    variables={"flags": " ".join(asm_flags)})
             compiled.append(obj)
         objects.append(f["object_to_link"])
 
-    # The LTD autoload's objects are linked as an overlay group, for their veneers, see tools/build/ltd_objects.py
-    link_objects = build_dir / "objects_link.txt"
-    n.build([link_objects], "ltd_objects", [objects_file, lcf_file], implicit=["tools/build/ltd_objects.py"])
+    # Preserve the LTD autoload grouping in both the private prelink and final link.
+    grouped_objects = build_dir / "objects_link.txt"
+    n.build([grouped_objects], "ltd_objects", [objects_file, lcf_file],
+            implicit=["tools/build/ltd_objects.py"])
+
+    # Keep DS Protect's legacy interworking glue separate from its compiler object.
+    # Objdiff still uses the compiler output; only the final link uses the derived one.
+    link_objects = objects
+    link_response = grouped_objects
+    dsprot_path = build_dir / "lib/dsprot/src/dsprot_detect.o"
+    dsprot_object = next((obj for obj in objects if Path(obj) == dsprot_path), None)
+    if dsprot_object is not None:
+        veneer_dir = build_dir / "interworking"
+        veneer_object = veneer_dir / "dsprot_detect.o"
+        link_response = veneer_dir / "objects.txt"
+        veneer_inputs = {"objects": grouped_objects, "lcf": link_lcf,
+                         "source_object": dsprot_object, "veneer_object": veneer_object,
+                         "response": link_response, "scratch": veneer_dir / "prelink"}
+        n.build([veneer_object, link_response], "dsprot_veneers", objects,
+                implicit=[link_lcf, grouped_objects, "tools/build/restore_dsprot_veneers.py",
+                          ROOT / "tools/mwccarm" / MWLD_VERSION / "mwldarm.exe"],
+                variables={key: shlex.quote(str(value)).replace("$", "$$")
+                           for key, value in veneer_inputs.items()})
+        link_objects = [str(veneer_object) if obj == dsprot_object else obj for obj in objects]
+
     arm9_o = build_dir / "arm9.o"
-    n.build([arm9_o], "mwld", objects, implicit=[link_lcf, link_objects],
-            variables={"objects": link_objects, "lcf": link_lcf})
+    n.build([arm9_o], "mwld", link_objects, implicit=[link_lcf, link_response],
+            variables={"objects": link_response, "lcf": link_lcf})
 
     # The ROM's file system is the extracted one, with the archives built from source in place of the extracted ones.
     # The tree is made first, so that no archive is written through a link into extract/.
@@ -646,12 +700,17 @@ def add_version(n: Writer, version: str, dsd: Path, bugfix: bool, shift: int) ->
     # Context files for decomp.me scratches, made by objdiff
     for obj in compiled:
         source = obj.relative_to(build_dir).with_suffix(".c")
+        if not source.exists():
+            continue
         n.build([obj.with_suffix(f".ctx{source.suffix}")], "ctx", [source], variables={"defines": defines},
                 order_only=["constants_headers"])
 
     # Progress report, compares every delinked object with its compiled counterpart
+    # objdiff's report, then complete files counted as matched, which the ROM checks prove (tools/build/complete_report.py)
+    objdiff_report = build_dir / "report.objdiff.json"
+    n.build([objdiff_report], "report", [], implicit=["objdiff.json", *compiled, *delink_outputs])
     report = build_dir / "report.json"
-    n.build([report], "report", [], implicit=["objdiff.json", *compiled, *delink_outputs])
+    n.build([report], "complete_report", [objdiff_report], implicit=["tools/build/complete_report.py"])
     n.build([f"{version}_progress"], "progress", [report])
     # The checks also compile every source file, so that an incomplete file, whose object only feeds the report and
     # is never linked, can't stop compiling without the default build noticing.
@@ -732,10 +791,26 @@ def main():
         n.rule(f"mwcc_{i}", f"mkdir -p $$(dirname $out) && MWCIncludes=. $wine $sjiswrap {shlex.quote(str(lib_mwcc))} "
                "$flags $defines -gccdep -MD $includes -o $out $in && $python tools/build/fix_depfile.py $dep",
                "Compiling $in", depfile="$dep", deps="gcc")
+    # A library's assembly sources, with the mwasmarm of its compiler's version
+    for i, compiler in enumerate(LIBRARY_COMPILERS):
+        lib_mwasm = tools_dir / "mwccarm" / compiler / "mwasmarm.exe"
+        n.rule(f"mwasm_{i}", f"mkdir -p $$(dirname $out) && $wine {shlex.quote(str(lib_mwasm))} $flags -o $out $in",
+               "Assembling $in")
+    n.rule("object_aliases", "$python tools/build/object_aliases.py $in $out $aliases", "Adding labels to $out")
     n.rule("lcf_symbols", "$python tools/build/lcf_symbols.py $in $out", "Adding NitroSDK's symbols to $out")
     n.rule("shift_lcf", "$python tools/build/shift_lcf.py $in $out $amount", "Shifting $in")
     n.rule("ltd_objects", "$python tools/build/ltd_objects.py $in $out", "Grouping the LTD autoload's objects in $out")
     n.rule("mwld", f"$wine {shlex.quote(str(mwld))} {' '.join(LD_FLAGS)} @$objects $lcf -o $out", "Linking $out")
+    # Pass the runner as one executable path and the normal flags as argv data.
+    # The helper changes -proc only for its private prelink.
+    veneer_linker = shlex.quote(str(mwld)).replace("$", "$$")
+    veneer_flags = shlex.quote(json.dumps(shlex.split(" ".join(LD_FLAGS)))).replace("$", "$$")
+    n.rule("dsprot_veneers", "$python tools/build/restore_dsprot_veneers.py "
+           "--objects $objects --lcf $lcf --source-object $source_object "
+           "--output-object $veneer_object --output-response $response --scratch $scratch "
+           f"--runner $wine --linker {veneer_linker} --link-flags {veneer_flags} "
+           "--section OV165 --expected-count 8",
+           "Generating DS Protect interworking veneers for $veneer_object")
     # Scripts go through the C preprocessor, so that they can include the constant headers
     n.rule("as", f"{shlex.quote(clang)} --target=armv5te-none-eabi -x assembler-with-cpp -c $as_includes $defines "
            "-MD -MF $dep -o $out $in", "Assembling $in", depfile="$dep", deps="gcc")
@@ -761,6 +836,7 @@ def main():
     n.rule("objdiff_config", f"$python tools/build/objdiff_config.py $version --dsd $dsd "
            f"--compiler {DECOMP_ME_COMPILER} --c-flags '{decomp_me_flags}' -o $out", "Writing $out")
     n.rule("report", f"{tools_dir / 'objdiff-cli'} report generate -p . -o $out", "Generating $out")
+    n.rule("complete_report", "$python tools/build/complete_report.py $in $out", "Counting complete files in $out")
     n.rule("progress", "$python tools/build/progress.py $in", "Progress")
     configure_args = [*args.versions, *(["--bugfix"] if args.bugfix else []),
                       *([f"--shift {args.shift:#x}"] if args.shift else [])]

@@ -390,7 +390,7 @@ static void GSyncDisp_VBlank(TCB *task, void *work) {
     ClActSys_VBlank();
     timer = ++disp->paletteTimer;
     if (timer % 10 == 1) {
-        u8 *palette = disp->bgPalette->rawData;
+        u8 *palette = disp->bgPalette->pRawData;
 
         GX_LoadBGPltt(palette + (timer / 10 + 2) * 0x20, 2 * 0x20, 0x20);
         GXS_LoadBGPltt(palette + (timer / 10 + 2) * 0x20, 2 * 0x20, 0x20);
@@ -822,11 +822,11 @@ void GSyncDisp_LoadFloatGraphics(GSyncDisp *disp) {
         if (item != ITEM_NONE) {
             file = GFL_ArcToolReadHeapNew(itemArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_PLTT), disp->heapId);
             NNS_G2dGetUnpackedPaletteData(file, &palette);
-            MI_CpuCopy8(palette->rawData, disp->floatGraphics[i].palette, sizeof(disp->floatGraphics[i].palette));
+            MI_CpuCopy8(palette->pRawData, disp->floatGraphics[i].palette, sizeof(disp->floatGraphics[i].palette));
             GFL_HeapFree(file);
             file = GFL_ArcToolReadHeapNew(itemArc, GetItemGraphicsDatID(item, ITEM_FILE_ICON_CHAR), disp->heapId);
             NNS_G2dGetUnpackedBGCharacterData(file, &chars);
-            MI_CpuCopy8(chars->rawData, disp->floatGraphics[i].chars, sizeof(disp->floatGraphics[i].chars));
+            MI_CpuCopy8(chars->pRawData, disp->floatGraphics[i].chars, sizeof(disp->floatGraphics[i].chars));
             GFL_HeapFree(file);
         }
     }
@@ -845,7 +845,7 @@ void GSyncDisp_LoadFloatGraphics(GSyncDisp *disp) {
 
             file = GFL_ArcToolReadHeapNew(iconArc, icon, disp->heapId);
             NNS_G2dGetUnpackedBGCharacterData(file, &chars);
-            MI_CpuCopy8(chars->rawData, disp->floatGraphics[index].chars, sizeof(disp->floatGraphics[index].chars));
+            MI_CpuCopy8(chars->pRawData, disp->floatGraphics[index].chars, sizeof(disp->floatGraphics[index].chars));
             GFL_HeapFree(file);
             disp->floatGraphics[index].paletteNum = paletteNum;
         }

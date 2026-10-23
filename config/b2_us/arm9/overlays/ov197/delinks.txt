@@ -23,6 +23,7 @@ src/ov197/mystery_util.c:
     .data       start:0x021be9a0 end:0x021be9b0
 
 src/ov197/mystery_album.c:
+    complete
     .text       start:0x021b99e0 end:0x021bd068
     .rodata     start:0x021be610 end:0x021be884
     .data       start:0x021be9b0 end:0x021be9c0

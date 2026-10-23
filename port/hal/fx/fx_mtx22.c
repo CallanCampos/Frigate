@@ -10,7 +10,7 @@ void MTX_Identity22_(MtxFx22 *mtx) {
     mtx->_11 = FX32_ONE;
 }
 
-void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y) {
+void MTX_Scale22_(MtxFx22 *mtx, fx32 x, fx32 y) {
     mtx->_00 = x;
     mtx->_01 = 0;
     mtx->_10 = 0;

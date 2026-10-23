@@ -19,7 +19,7 @@ static void OSi_AllocateCardBus(void);
 static void OSi_FreeCardBus(void);
 
 // Whether OS_InitLock has run
-static BOOL sLockInitialized;
+static BOOL isInitialized;
 
 // NitroSDK's OSi_SyncWithOtherProc: a handshake through four bytes of shared memory that the other processor runs
 // the opposite half of. With c 0 it writes a counter into p[0] until the other side echoes it into p[1], or says in
@@ -60,10 +60,10 @@ void OSi_SyncWithOtherProc(int c, vu8 *p) {
 }
 
 void OS_InitLock(void) {
-    if (sLockInitialized) {
+    if (isInitialized) {
         return;
     }
-    sLockInitialized = TRUE;
+    isInitialized = TRUE;
     *(u32 *)HW_INIT_LOCK_BUF = 0xffffffff;
     *(u32 *)(HW_INIT_LOCK_BUF + 4) = 0xffff0000;
     MI_CpuClear32((void *)(HW_INIT_LOCK_BUF + 0x10), 0x28);
@@ -88,7 +88,7 @@ s32 OS_LockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void)) {
 }
 
 static s32 OSi_DoUnlockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void), BOOL disableFiq) {
-    u32 irq;
+    OSIntrMode irq;
 
     if (lockID != lockp->ownerID) {
         return OS_UNLOCK_ERROR;
@@ -117,7 +117,7 @@ s32 OS_UnlockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void)) {
 
 // NitroSDK's OSi_DoTryLockByWord: swaps the ID into the flag, and if the flag was clear it has the lock
 static s32 OSi_DoTryLockByWord(u16 lockID, OSLockWord *lockp, void (*ctrl)(void), BOOL disableFiq) {
-    u32 irq;
+    OSIntrMode irq;
     s32 lastLockFlag;
 
     if (disableFiq) {
@@ -203,7 +203,7 @@ static void OSi_FreeCardBus(void) {
     reg_MI_EXMEMCNT = (u16)(reg_MI_EXMEMCNT | EXMEMCNT_CARD_ARM7);
 }
 
-u16 OS_ReadOwnerOfLockWord(const OSLockWord *lockp) {
+u16 OS_ReadOwnerOfLockWord(OSLockWord *lockp) {
     return lockp->ownerID;
 }
 

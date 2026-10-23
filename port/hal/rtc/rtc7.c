@@ -142,9 +142,9 @@ void port_rtc7_store_raw(void) {
     PortRtcTime now;
 
     port_rtc_now(&now);
-    work->realTimeClock[0] =
+    work->real_time_clock[0] =
         Bcd(now.year - RTC_FIRST_YEAR) | Bcd(now.month) << 8 | Bcd(now.day) << 16 | (u32)now.week << 24;
-    work->realTimeClock[1] =
+    work->real_time_clock[1] =
         Bcd(now.hour) | (now.hour >= 12 ? 1u << 6 : 0) | Bcd(now.minute) << 8 | Bcd(now.second) << 16;
 }
 

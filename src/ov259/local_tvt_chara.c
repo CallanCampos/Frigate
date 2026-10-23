@@ -604,7 +604,7 @@ static void LocalTvtFace_ReadChars(LocalTvtFace *face, ArcTool *arc, u32 fileId,
 }
 
 static void LocalTvtFace_CopyChars(LocalTvtFace *face, u32 srcOffset, u32 destOffset, u32 size) {
-    MIi_CpuCopy32((u8 *)face->charData->rawData + srcOffset, (void *)(HW_BG_VRAM + destOffset), size);
+    MIi_CpuCopy32((u8 *)face->charData->pRawData + srcOffset, (void *)(HW_BG_VRAM + destOffset), size);
 }
 
 static void LocalTvtFace_CreateName(LocalTvtFace *face, LocalTvtChara *chara, HeapID heapId) {

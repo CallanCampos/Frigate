@@ -57,7 +57,8 @@ static struct {
     u16 status;       // what the component last reported
     int i2sFrequency; // which of the two I2S sample rates is set
     u8 unk_08[0xc];
-    BOOL requestOn; // the ARM7 got func_02704858's request, until the answer to func_02704940's
+    BOOL requestOn; // the ARM7 got SNDEXi_PreProcessForShutterSound's request, until the answer to
+                    // SNDEXi_PostProcessForShutterSound's
     BOOL playing;   // a play command was sent, until the component stopped and the alarm ran out
     u8 unk_1c[8];
 } sShutter;
@@ -84,7 +85,7 @@ static inline u32 ReadU32(const u8 *p) {
 
 // The answer to the ARM7's request that ends the shutter sound
 static void func_02705f64(SNDEXResult result, void *arg) {
-    if (result == SNDEX_RESULT_BUSY) {
+    if (result == SNDEX_RESULT_EXCLUSIVE) {
         OS_Terminate();
     }
     if (result != SNDEX_RESULT_SUCCESS) {
@@ -117,7 +118,7 @@ static void func_02705fac(void *userData, int port, int direction) {
         OS_CreateAlarm(&sStopAlarm);
         OS_SetAlarm(&sStopAlarm, OS_MilliSecondsToTicks(SHUTTER_STOP_DELAY), func_02705f98, NULL);
         if (sPriority == AUDIO_PRIORITY_HIGHEST) {
-            func_02704940(func_02705f64, NULL);
+            SNDEXi_PostProcessForShutterSound(func_02705f64, NULL);
         }
         sPriority = AUDIO_PRIORITY_IDLE;
     }
@@ -145,7 +146,7 @@ static void func_027060b4(const void *src, u32 length, int mode, int priority) {
 }
 
 // Plays the WAV file at src, if it fits the I2S's sample rate
-BOOL DSP_PlayShutterSoundCore(const void *src, u32 length) {
+BOOL DSPi_PlayShutterSoundCore(const void *src, u32 length) {
     const u8 *file = src;
     u32 dataSize;
     u32 sampleRate;
@@ -169,7 +170,7 @@ BOOL DSP_PlayShutterSoundCore(const void *src, u32 length) {
         return FALSE;
     }
     OS_SpinWaitSysCycles(SHUTTER_REQUEST_DELAY_CYCLES);
-    while (func_02704858() != SNDEX_RESULT_SUCCESS) {
+    while (SNDEXi_PreProcessForShutterSound() != SNDEX_RESULT_SUCCESS) {
         OS_Sleep(1);
     }
     func_027060b4(file + WAV_HEADER_SIZE, dataSize, AUDIO_PLAY_MODE_ONCE, AUDIO_PRIORITY_HIGHEST);
@@ -178,7 +179,7 @@ BOOL DSP_PlayShutterSoundCore(const void *src, u32 length) {
 }
 
 // Stops the sound
-void DSP_StopSoundCore(void) {
+void DSPi_StopSoundCore(void) {
     DSPProcessContext *context = DSP_FindProcess(NULL);
 
     if (context != NULL && sShutter.playing) {
@@ -186,6 +187,6 @@ void DSP_StopSoundCore(void) {
     }
 }
 
-BOOL DSP_IsShutterSoundPlayingCore(void) {
+BOOL DSPi_IsShutterSoundPlayingCore(void) {
     return sShutter.playing | sShutter.requestOn;
 }

@@ -138,8 +138,8 @@ PMSInputView *PMSIView_Create(const PMSInputWork *mwk, const PMSInputData *dwk) 
         vwk->actUnit = ClActUnit_Create(128, 0, HEAPID_PMS_INPUT);
         GFL_BGSysCreate(HEAPID_PMS_INPUT);
         BmpWin_InitAllocator(HEAPID_PMS_INPUT);
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+        GX_SetMasterBrightness(-16);
+        GXS_SetMasterBrightness(-16);
         vwk->mainTask = GFL_TCBMgrAddTask(PMSInput_GetTCBManager(mwk), PMSIView_MainTask, vwk, 2);
         vwk->vintrTask = PMSIView_AddVTask(PMSIView_VintrTask, vwk, 1);
         for (i = 0; i < PMSIV_COMMAND_MAX; i++) {
@@ -335,9 +335,9 @@ static void PMSIView_CmdInit(TCB *tcb, void *data) {
     GFL_G2DIOLoadArcNCLR(arc, 4, 4, 0x80, 0xa0, 0x20, HEAPID_PMS_INPUT);
 
     cwk->vwk->colors[0] = GX_RGB(11, 10, 10);
-    NNS_GfdRegisterNewVramTransferTask(31, 0xbc, &cwk->vwk->colors[0], sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0xbc, &cwk->vwk->colors[0], sizeof(GXRgb));
     cwk->vwk->colors[1] = GX_RGB(20, 20, 21);
-    NNS_GfdRegisterNewVramTransferTask(31, 0xbe, &cwk->vwk->colors[1], sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0xbe, &cwk->vwk->colors[1], sizeof(GXRgb));
 
     GFL_BGSysLoadArcNCGRStatic(arc, 18, 7, 0, 0, FALSE, HEAPID_PMS_INPUT);
     loadBGScrToVramByFileNoReserveNegAlign(arc, 24, 7, 0, 0, FALSE, HEAPID_PMS_INPUT);

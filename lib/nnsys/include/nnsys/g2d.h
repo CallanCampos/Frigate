@@ -4,38 +4,42 @@
 #include "types.h"
 #include "nitro/fx.h"
 #include "nitro/gx.h"
+#include "nnsys/gfd.h"
+
+// NitroSystem's 2D graphics (NNS_G2d). The names are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them,
+// where the code shows them, and ours elsewhere; swan's names are noted where they differ
 
 typedef struct {
-    u32 format;
-    u32 extendedPalette;
-    u32 size;
-    void *rawData;
+    GXTexFmt fmt;
+    BOOL bExtendedPlt;
+    u32 szByte;
+    void *pRawData;
 } NNSG2dPaletteData;
 
 typedef struct {
-    u16 height;
-    u16 width;
-    u32 pixelFormat;
-    u32 mappingType;
-    u32 characterFormat;
-    u32 size;
-    void *rawData;
+    u16 H;
+    u16 W;
+    GXTexFmt pixelFmt;
+    GXOBJVRamModeChar mappingType;
+    u32 characterFmt;
+    u32 szByte;
+    void *pRawData;
 } NNSG2dCharacterData;
 
 typedef struct {
-    u16 width;
-    u16 height;
+    u16 screenWidth;
+    u16 screenHeight;
     u16 colorMode;
-    u16 format;
-    u32 size;
+    u16 screenFormat;
+    u32 szByte;
     u32 rawData[1];
 } NNSG2dScreenData;
 
 // The palettes present in a palette file that holds only some of them
 typedef struct {
     u16 numPalette;
-    u16 pad;
-    void *paletteIndexTable;
+    u16 pad16;
+    void *pPlttIdxTbl;
 } NNSG2dPaletteCompressInfo;
 
 // A block of a file's user extended data, found by its kind
@@ -44,7 +48,7 @@ typedef struct {
     u32 blkSize;
 } NNSG2dUserExDataBlock;
 
-// A G2D file: its header, then numBlocks blocks, each starting with its kind and its size with this header. These are
+// A G2D file: its header, then dataBlocks blocks, each starting with its kind and its size with this header. These are
 // the SDK's own types, though G3D's resource files have the same layout
 typedef struct {
     u32 signature;
@@ -52,7 +56,7 @@ typedef struct {
     u16 version;
     u32 fileSize;
     u16 headerSize;
-    u16 numBlocks;
+    u16 dataBlocks;
 } NNSG2dBinaryFileHeader;
 
 typedef struct {
@@ -60,18 +64,20 @@ typedef struct {
     u32 size;
 } NNSG2dBinaryBlockHeader;
 
-#define NNS_G2D_BINBLK_SIG_CHARDATA 0x43484152            // 'CHAR'
-#define NNS_G2D_BINBLK_SIG_PALETTEDATA 0x504C5454         // 'PLTT'
-#define NNS_G2D_BINBLK_SIG_PALETTECOMPRESSINFO 0x50434D50 // 'PCMP'
-#define NNS_G2D_BINBLK_SIG_SCREENDATA 0x5343524E          // 'SCRN'
-#define NNS_G2D_BINBLK_SIG_MULTICELLBANK 0x4D43424B       // 'MCBK'
-#define NNS_G2D_BINBLK_SIG_CELLBANK 0x4345424B            // 'CEBK'
-#define NNS_G2D_BINBLK_SIG_ANIMBANK 0x41424E4B            // 'ABNK'
+#define NNS_G2D_BINBLK_SIG_CHARACTERDATA 0x43484152   // 'CHAR'
+#define NNS_G2D_BINBLK_SIG_PALETTEDATA 0x504C5454     // 'PLTT'
+#define NNS_G2D_BINBLK_SIG_PALETTECOMPINFO 0x50434D50 // 'PCMP'
+#define NNS_G2D_BINBLK_SIG_SCRDATA 0x5343524E         // 'SCRN'
+#define NNS_G2D_BLKSIG_MULTICELLBANK 0x4D43424B       // 'MCBK'
+#define NNS_G2D_BLKSIG_CELLBANK 0x4345424B            // 'CEBK'
+#define NNS_G2D_BLKSIG_ANIMBANK 0x41424E4B            // 'ABNK'
 
-#define NNS_G2D_USEREXDATA_CELLATTR 0x55434154
-#define NNS_G2D_USEREXDATA_ANMATTR 0x55414154
+#define NNS_G2D_USEREXBLK_CELLATTR 0x55434154
+#define NNS_G2D_USEREXBLK_ANMATTR 0x55414154
 
-static inline const NNSG2dUserExDataBlock *NNSi_G2dGetUserExDataBlkByID(const NNSG2dUserExDataBlock *blk, u32 id) {
+static inline const NNSG2dUserExDataBlock *NNSi_G2dGetUserExDataBlkByID(const void *pExtendData, u32 id) {
+    const NNSG2dUserExDataBlock *blk = pExtendData;
+
     if (blk != NULL && blk->blkTypeID == id) {
         return blk;
     }
@@ -90,17 +96,26 @@ typedef struct {
 } NNSG2dFVec2;
 
 typedef struct {
-    NNSG2dSVec2 maxBounding;
-    NNSG2dSVec2 minBounding;
+    s16 maxX;
+    s16 maxY;
+    s16 minX;
+    s16 minY;
 } NNSG2dCellBoundingRectS16;
 
-#define NNSi_G2D_CELLATTR_BOUNDINGSPHERE_MASK 0x3f
-#define NNSi_G2D_CELLATTR_BOUNDINGRECT_SHIFT 11
+#define NNS_G2D_CELL_BS_R_MASK 0x3f
+#define NNS_G2D_CELL_HAS_BR_SHIFT 11
+
+// A cell's OAM, its first three attributes
+typedef struct {
+    u16 attr0;
+    u16 attr1;
+    u16 attr2;
+} NNSG2dCellOAMAttrData;
 
 typedef struct {
     u16 numOAMAttrs;
     u16 cellAttr;
-    void *pOamAttrArray;
+    NNSG2dCellOAMAttrData *pOamAttrArray;
 } NNSG2dCellData;
 
 // A cell of a bank whose cells have bounding rects
@@ -110,7 +125,7 @@ typedef struct {
 } NNSG2dCellDataWithBR;
 
 static inline u8 NNSi_G2dGetCellBoundingSphereR(const NNSG2dCellData *cell) {
-    u8 r = cell->cellAttr & NNSi_G2D_CELLATTR_BOUNDINGSPHERE_MASK;
+    u8 r = cell->cellAttr & NNS_G2D_CELL_BS_R_MASK;
 
     return r << 2;
 }
@@ -129,23 +144,28 @@ typedef struct {
 // A cell bank's attributes: whether its cells are NNSG2dCellDataWithBR
 #define NNS_G2D_CELLBK_ATTR_CELLWITHBR 0x1
 
+// How a cell bank's characters are mapped
+typedef enum {
+    NNS_G2D_CHARACTERMAPPING_1D_32,
+    NNS_G2D_CHARACTERMAPPING_1D_64,
+    NNS_G2D_CHARACTERMAPPING_1D_128,
+    NNS_G2D_CHARACTERMAPPING_1D_256,
+    NNS_G2D_CHARACTERMAPPING_2D,
+    NNS_G2D_CHARACTERMAPPING_MAX,
+} NNSG2dCharacterDataMappingType;
+
 typedef struct NNSG2dCellDataBank {
     u16 numCells;
     u16 cellBankAttr;
     NNSG2dCellData *pCellDataArrayHead;
-    u32 mappingMode;
+    NNSG2dCharacterDataMappingType mappingMode;
     NNSG2dVramTransferData *pVramTransferData;
     void *pStringBank;
-    NNSG2dUserExDataBlock *pExtendedData;
+    void *pExtendedData;
 } NNSG2dCellDataBank;
 
-// Returns u32 and tests with an if: as a BOOL, or returning the comparison, MWCC folds the 0/1 result into the test
-// that uses it, where g2d_CellAnimation.c's ApplyCurrentAnimResult_ builds it and tests it again
-static inline u32 NNS_G2dCellDataBankHasVramTransferData(const NNSG2dCellDataBank *bank) {
-    if (bank->pVramTransferData != NULL) {
-        return TRUE;
-    }
-    return FALSE;
+static inline BOOL NNS_G2dCellDataBankHasVramTransferData(const NNSG2dCellDataBank *bank) {
+    return (BOOL)(bank->pVramTransferData != NULL);
 }
 
 // A multi-cell: its nodes, each a cell animation at a position
@@ -164,11 +184,11 @@ typedef struct {
 
 typedef struct NNSG2dMultiCellDataBank {
     u16 numMultiCellData;
-    u16 pad;
+    u16 pad16;
     NNSG2dMultiCellData *pMultiCellDataArray;
-    void *pHierarchyDataArray;
+    NNSG2dMultiCellHierarchyData *pHierarchyDataArray;
     void *pStringBank;
-    NNSG2dUserExDataBlock *pExtendedData;
+    void *pExtendedData;
 } NNSG2dMultiCellDataBank;
 
 // The user extended attributes of cells, numAttribute words each
@@ -183,7 +203,7 @@ typedef struct {
 } NNSG2dUserExCellAttrBank;
 
 static inline const NNSG2dUserExCellAttrBank *NNS_G2dGetUserExCellAttrBankFromCellBank(const NNSG2dCellDataBank *bank) {
-    const NNSG2dUserExDataBlock *blk = NNSi_G2dGetUserExDataBlkByID(bank->pExtendedData, NNS_G2D_USEREXDATA_CELLATTR);
+    const NNSG2dUserExDataBlock *blk = NNSi_G2dGetUserExDataBlkByID(bank->pExtendedData, NNS_G2D_USEREXBLK_CELLATTR);
 
     if (blk != NULL) {
         return (const NNSG2dUserExCellAttrBank *)(blk + 1);
@@ -193,7 +213,7 @@ static inline const NNSG2dUserExCellAttrBank *NNS_G2dGetUserExCellAttrBankFromCe
 
 static inline const NNSG2dUserExCellAttrBank *
 NNS_G2dGetUserExCellAttrBankFromMCBank(const NNSG2dMultiCellDataBank *bank) {
-    const NNSG2dUserExDataBlock *blk = NNSi_G2dGetUserExDataBlkByID(bank->pExtendedData, NNS_G2D_USEREXDATA_CELLATTR);
+    const NNSG2dUserExDataBlock *blk = NNSi_G2dGetUserExDataBlkByID(bank->pExtendedData, NNS_G2D_USEREXBLK_CELLATTR);
 
     if (blk != NULL) {
         return (const NNSG2dUserExCellAttrBank *)(blk + 1);
@@ -204,9 +224,9 @@ NNS_G2dGetUserExCellAttrBankFromMCBank(const NNSG2dMultiCellDataBank *bank) {
 // Animations: banks of sequences of frames. A frame's content is an index, an NNSG2dAnimDataSRT or an
 // NNSG2dAnimDataT, by the sequence's animType (its low 8 bits, as the multi-cell animation reads it)
 enum {
-    NNS_G2D_ANIMELEM_INDEX,
-    NNS_G2D_ANIMELEM_INDEX_SRT,
-    NNS_G2D_ANIMELEM_INDEX_T,
+    NNS_G2D_ANIMELEMENT_INDEX,
+    NNS_G2D_ANIMELEMENT_INDEX_SRT,
+    NNS_G2D_ANIMELEMENT_INDEX_T,
 };
 
 typedef struct {
@@ -220,7 +240,7 @@ typedef struct {
 
 typedef struct {
     u16 index;
-    u16 pad;
+    u16 pad_;
     s16 px;
     s16 py;
 } NNSG2dAnimDataT;
@@ -228,34 +248,35 @@ typedef struct {
 typedef struct {
     void *pContent;
     u16 frames;
-    u16 pad;
+    u16 pad16;
 } NNSG2dAnimFrameData;
 
 // How a sequence plays: once or looping, forward or forward and then back
-enum {
+typedef enum {
     NNS_G2D_ANIMATIONPLAYMODE_INVALID,
     NNS_G2D_ANIMATIONPLAYMODE_FORWARD,
     NNS_G2D_ANIMATIONPLAYMODE_FORWARD_LOOP,
     NNS_G2D_ANIMATIONPLAYMODE_REVERSE,
     NNS_G2D_ANIMATIONPLAYMODE_REVERSE_LOOP,
-};
+    NNS_G2D_ANIMATIONPLAYMODE_MAX,
+} NNSG2dAnimationPlayMode;
 
 typedef struct {
     u16 numFrames;
     u16 loopStartFrameIdx;
     u32 animType;
-    u32 playMode;
+    NNSG2dAnimationPlayMode playMode;
     NNSG2dAnimFrameData *pAnmFrameArray;
-} NNSG2dAnimSequence;
+} NNSG2dAnimSequenceData;
 
 typedef struct NNSG2dAnimBankData {
     u16 numSequences;
     u16 numTotalFrames;
-    NNSG2dAnimSequence *pSequenceArrayHead;
-    NNSG2dAnimFrameData *pFrameArray;
-    void *pAnimationData;
+    NNSG2dAnimSequenceData *pSequenceArrayHead;
+    NNSG2dAnimFrameData *pFrameArrayHead;
+    void *pAnimContents;
     void *pStringBank;
-    NNSG2dUserExDataBlock *pExtendedData;
+    void *pExtendedData;
 } NNSG2dAnimBankData;
 
 // The user extended attributes of animation sequences and their frames, numAttribute words each
@@ -265,7 +286,7 @@ typedef struct {
 
 typedef struct {
     u16 numFrames;
-    u16 pad;
+    u16 pad16;
     u32 *pAttr;
     NNSG2dUserExAnimFrameAttr *pAnmFrmAttrArray;
 } NNSG2dUserExAnimSequenceAttr;
@@ -277,7 +298,7 @@ typedef struct {
 } NNSG2dUserExAnimAttrBank;
 
 static inline const NNSG2dUserExAnimAttrBank *NNS_G2dGetUserExAnimAttrBank(const NNSG2dAnimBankData *bank) {
-    const NNSG2dUserExDataBlock *blk = NNSi_G2dGetUserExDataBlkByID(bank->pExtendedData, NNS_G2D_USEREXDATA_ANMATTR);
+    const NNSG2dUserExDataBlock *blk = NNSi_G2dGetUserExDataBlkByID(bank->pExtendedData, NNS_G2D_USEREXBLK_ANMATTR);
 
     if (blk != NULL) {
         return (const NNSG2dUserExAnimAttrBank *)(blk + 1);
@@ -294,83 +315,92 @@ static inline const NNSG2dUserExAnimSequenceAttr *NNS_G2dGetUserExAnimSequenceAt
 }
 
 // Plays an animation sequence, with a callback at the last frame, at every frame or at one frame
-enum {
+typedef NNSG2dAnimFrameData NNSG2dAnimFrame;
+typedef NNSG2dAnimSequenceData NNSG2dAnimSequence;
+
+typedef enum {
     NNS_G2D_ANMCALLBACKTYPE_NONE,
     NNS_G2D_ANMCALLBACKTYPE_LAST_FRM,
     NNS_G2D_ANMCALLBACKTYPE_SPEC_FRM,
     NNS_G2D_ANMCALLBACKTYPE_EVER_FRM,
-};
+    AnmCallbackType_MAX,
+} NNSG2dAnmCallbackType;
 
 typedef void (*NNSG2dAnmCallBackPtr)(uptr param, fx32 currentFrame);
 
 typedef struct {
-    u32 type;
+    NNSG2dAnmCallbackType type;
     uptr param;
     NNSG2dAnmCallBackPtr pFunc;
     u16 frameIdx;
-} NNSG2dCallBackFunctor;
+    u16 pad16_;
+} NNSG2dCallBackFunctor, NNSG2dAnimCallBackFunctor;
 
 typedef struct {
-    const NNSG2dAnimFrameData *pCurrent;
-    const NNSG2dAnimFrameData *pActiveCurrent;
+    const NNSG2dAnimFrame *pCurrent;
+    const NNSG2dAnimFrame *pActiveCurrent;
     BOOL bReverse;
     BOOL bActive;
     fx32 currentTime;
     fx32 speed;
-    u32 overriddenPlayMode;
+    NNSG2dAnimationPlayMode overriddenPlayMode;
     const NNSG2dAnimSequence *pAnimSequence;
-    NNSG2dCallBackFunctor callbackFunctor;
+    NNSG2dAnimCallBackFunctor callbackFunctor;
 } NNSG2dAnimController;
 
-// The scale, rotation and translation of an animated cell, with flags for which of them are set. The flag and type
-// names, and the union with a matrix, which NNSi_G2dSrtcSetInitialValue's 0x18-byte clear suggests, are guesses
-enum {
+// The scale, rotation and translation of an animated cell, with flags for which of them are set, or a matrix
+typedef enum {
     NNS_G2D_SRTCONTROLTYPE_INVALID,
     NNS_G2D_SRTCONTROLTYPE_SRT,
-};
+    NNS_G2D_SRTCONTROLTYPE_MTX2D,
+    NNS_G2D_SRTCONTROLTYPE_MTX3D,
+    NNS_G2D_SRTCONTROLTYPE_MAX,
+} NNSG2dSRTControlType;
 
 enum {
-    NNS_G2D_SRTFLAG_IDENTITY = 0,
-    NNS_G2D_SRTFLAG_SCALE = 1 << 1,
-    NNS_G2D_SRTFLAG_ROTZ = 1 << 2,
-    NNS_G2D_SRTFLAG_TRANS = 1 << 3,
+    NNS_G2D_AFFINEENABLE_NONE = 0,
+    NNS_G2D_AFFINEENABLE_SCALE = 1 << 1,
+    NNS_G2D_AFFINEENABLE_ROTATE = 1 << 2,
+    NNS_G2D_AFFINEENABLE_TRANS = 1 << 3,
 };
 
-typedef struct {
-    NNSG2dFVec2 scale;
-    NNSG2dSVec2 trans;
-    u16 rotZ;
-    u16 SRT_EnableFlag;
-} NNSG2dSRT;
+typedef union {
+    struct {
+        NNSG2dFVec2 scale;
+        NNSG2dSVec2 trans;
+        u16 rotZ;
+        u16 SRT_EnableFlag;
+    };
+    MtxFx32 mtx;
+} NNSG2dSRTData;
 
 typedef struct {
-    u32 type;
-    union {
-        NNSG2dSRT srtData;
-        MtxFx32 affineMtx;
-    } data;
+    NNSG2dSRTControlType type;
+    NNSG2dSRTData srtData;
 } NNSG2dSRTControl;
 
 void NNSi_G2dSrtcSetTrans(NNSG2dSRTControl *srtCtrl, s16 x, s16 y);
 void NNSi_G2dSrtcSetSRTRotZ(NNSG2dSRTControl *srtCtrl, u16 rotZ);
 void NNSi_G2dSrtcSetSRTScale(NNSG2dSRTControl *srtCtrl, fx32 sx, fx32 sy);
-void NNSi_G2dSrtcInitControl(NNSG2dSRTControl *srtCtrl, u32 type);
+void NNSi_G2dSrtcInitControl(NNSG2dSRTControl *srtCtrl, NNSG2dSRTControlType type);
 void NNSi_G2dSrtcSetInitialValue(NNSG2dSRTControl *srtCtrl);
 
-// A node of a multi-cell: its content, visible or not, at a position. The node type names are guesses
-enum {
+// A node of a multi-cell: its content, visible or not, at a position
+typedef enum {
     NNS_G2D_NODETYPE_INVALID,
     NNS_G2D_NODETYPE_CELL,
-};
+    NNS_G2D_NODETYPE_MULTICELL,
+    NNS_G2D_NODETYPE_MAX,
+} NNSG2dNodeType;
 
 typedef struct {
     void *pContent;
-    u32 type;
+    NNSG2dNodeType type;
     BOOL bVisible;
     NNSG2dSRTControl srtCtrl;
 } NNSG2dNode;
 
-void NNSi_G2dInitializeNode(NNSG2dNode *node, u32 type);
+void NNSi_G2dInitializeNode(NNSG2dNode *node, NNSG2dNodeType type);
 
 // A cell animation, and a multi-cell one, which animates cell animations together
 #define NNS_G2D_INVALID_CELL_TRANSFER_STATE_HANDLE 0xffffffff
@@ -383,25 +413,28 @@ typedef struct {
     NNSG2dSRTControl srtCtrl;
 } NNSG2dCellAnimation;
 
-enum {
+typedef NNSG2dAnimBankData NNSG2dCellAnimBankData;
+typedef NNSG2dAnimSequence NNSG2dMultiCellAnimSequence;
+
+typedef enum {
     NNS_G2D_MCTYPE_DONOT_SHARE_CELLANIM,
     NNS_G2D_MCTYPE_SHARE_CELLANIM,
-};
+} NNSG2dMCType;
 
 // A multi-cell's cell animations: with NNS_G2D_MCTYPE_SHARE_CELLANIM, an array of NNSG2dMCCellAnimation that nodes
 // share by their cell animation index; otherwise an NNSG2dNode per node, each with its own cell animation
 typedef struct {
     const NNSG2dMultiCellData *pCurrentMultiCell;
-    const NNSG2dAnimBankData *pAnimDataBank;
-    u32 mcType;
-    void *pCellAnimArray;
+    const NNSG2dCellAnimBankData *pAnimDataBank;
+    NNSG2dMCType mcType;
+    void *pCellAnimInstasnces;
 } NNSG2dMultiCellInstance;
 
 // totalVideoFrame counts the frames of the multi-cells shown before the current one, for the nodes that play on
 typedef struct {
     NNSG2dAnimController animCtrl;
     u16 totalVideoFrame;
-    u16 pad;
+    u16 pad16;
     NNSG2dMultiCellInstance multiCellInstance;
     const NNSG2dMultiCellDataBank *pMultiCellDataBank;
     NNSG2dSRTControl srtCtrl;
@@ -451,16 +484,16 @@ const NNSG2dMultiCellData *NNS_G2dGetMultiCellDataByIdx(const NNSG2dMultiCellDat
 void NNS_G2dUnpackNAN(NNSG2dAnimBankData *bank);
 
 // NNS_G2dGetAnimSequenceByIdx, and controlling an animation
-const NNSG2dAnimSequence *NNS_G2dGetAnimSequenceByIdx(const NNSG2dAnimBankData *bank, u16 idx);
-void *NNS_G2dGetAnimCtrlCurrentElement(const NNSG2dAnimController *animCtrl);
+const NNSG2dAnimSequenceData *NNS_G2dGetAnimSequenceByIdx(const NNSG2dAnimBankData *bank, u16 idx);
+void *NNS_G2dGetAnimCtrlCurrentElement(NNSG2dAnimController *animCtrl);
 BOOL NNS_G2dTickAnimCtrl(NNSG2dAnimController *animCtrl, fx32 frames);
 BOOL NNS_G2dSetAnimCtrlCurrentFrame(NNSG2dAnimController *animCtrl, u16 frameIdx);
 u16 NNS_G2dGetAnimCtrlCurrentFrame(const NNSG2dAnimController *animCtrl);
 void NNS_G2dInitAnimCtrl(NNSG2dAnimController *animCtrl);
-void NNS_G2dInitAnimCallBackFunctor(NNSG2dCallBackFunctor *functor);
+void NNS_G2dInitAnimCallBackFunctor(NNSG2dAnimCallBackFunctor *functor);
 void NNS_G2dResetAnimCtrlState(NNSG2dAnimController *animCtrl);
 void NNS_G2dBindAnimCtrl(NNSG2dAnimController *animCtrl, const NNSG2dAnimSequence *seq);
-void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, u32 type, uptr param,
+void NNS_G2dSetAnimCtrlCallBackFunctor(NNSG2dAnimController *animCtrl, NNSG2dAnmCallbackType type, uptr param,
                                        NNSG2dAnmCallBackPtr pFunc);
 void NNS_G2dSetAnimCtrlCallBackFunctorAtAnimFrame(NNSG2dAnimController *animCtrl, uptr param,
                                                   NNSG2dAnmCallBackPtr pFunc, u16 frameIdx);
@@ -480,23 +513,24 @@ void NNS_G2dRestartCellAnimation(NNSG2dCellAnimation *cellAnim);
 void NNS_G2dSetCellAnimationSpeed(NNSG2dCellAnimation *cellAnim, fx32 speed);
 
 // Multi-cell animations, whose work is NNS_G2dGetMCWorkAreaSize bytes
-u32 NNS_G2dGetMCWorkAreaSize(const NNSG2dMultiCellDataBank *bank, u32 mcType);
-void NNS_G2dInitMCAnimationInstance(NNSG2dMultiCellAnimation *mcAnim, void *work, const NNSG2dAnimBankData *anims,
-                                    const NNSG2dCellDataBank *cells, const NNSG2dMultiCellDataBank *mcBank, u32 mcType);
-void NNS_G2dSetAnimSequenceToMCAnimation(NNSG2dMultiCellAnimation *mcAnim, const NNSG2dAnimSequence *seq);
+u32 NNS_G2dGetMCWorkAreaSize(const NNSG2dMultiCellDataBank *bank, NNSG2dMCType mcType);
+void NNS_G2dInitMCAnimationInstance(NNSG2dMultiCellAnimation *mcAnim, void *work, const NNSG2dCellAnimBankData *anims,
+                                    const NNSG2dCellDataBank *cells, const NNSG2dMultiCellDataBank *mcBank,
+                                    NNSG2dMCType mcType);
+void NNS_G2dSetAnimSequenceToMCAnimation(NNSG2dMultiCellAnimation *mcAnim, const NNSG2dMultiCellAnimSequence *seq);
 void NNS_G2dTickMCInstance(NNSG2dMultiCellInstance *instance, fx32 frames);
 void NNS_G2dTickMCAnimation(NNSG2dMultiCellAnimation *mcAnim, fx32 frames);
 void NNS_G2dSetMCAnimationCurrentFrame(NNSG2dMultiCellAnimation *mcAnim, u16 frameIdx);
 void NNS_G2dSetMCAnimationSpeed(NNSG2dMultiCellAnimation *mcAnim, fx32 speed);
 // Restarts each cell animation of a multi-cell instance
-void NNS_G2dRestartMCCellAnimations(NNSG2dMultiCellInstance *instance);
+void NNS_G2dResetMCCellAnimationAll(NNSG2dMultiCellInstance *instance);
 void NNS_G2dRestartMCAnimation(NNSG2dMultiCellAnimation *mcAnim);
 
 // Called for each node of a multi-cell instance with its cell animation; returning FALSE stops the traversal
 typedef BOOL (*NNSG2dMCTraverseNodeCallBack)(u32 param, const NNSG2dMultiCellHierarchyData *node,
                                              NNSG2dCellAnimation *cellAnim, u16 nodeIdx);
 
-void NNS_G2dTraverseMCNodes(const NNSG2dMultiCellInstance *instance, NNSG2dMCTraverseNodeCallBack callback, u32 param);
+void NNS_G2dTraverseMCNodes(NNSG2dMultiCellInstance *instance, NNSG2dMCTraverseNodeCallBack callback, u32 param);
 
 // Where an image or palette is in VRAM, for the 3D engine and each 2D engine, and loading one there
 typedef enum {
@@ -504,7 +538,7 @@ typedef enum {
     NNS_G2D_VRAM_TYPE_2DMAIN,
     NNS_G2D_VRAM_TYPE_2DSUB,
     NNS_G2D_VRAM_TYPE_MAX,
-} NNSG2dVRamType;
+} NNS_G2D_VRAM_TYPE;
 
 #define NNS_G2D_VRAM_ADDR_NONE 0xffffffff
 
@@ -514,8 +548,8 @@ typedef struct {
 
 // Sets every address of a location to NNS_G2D_VRAM_ADDR_NONE
 void NNSi_G2dInitializeVRamLocation(NNSG2dVRamLocation *location);
-void NNSi_G2dSetVramLocation(NNSG2dVRamLocation *location, NNSG2dVRamType type, u32 addr);
-u32 NNSi_G2dGetVramLocation(const NNSG2dVRamLocation *location, NNSG2dVRamType type);
+void NNSi_G2dSetVramLocation(NNSG2dVRamLocation *location, NNS_G2D_VRAM_TYPE type, u32 addr);
+u32 NNSi_G2dGetVramLocation(const NNSG2dVRamLocation *location, NNS_G2D_VRAM_TYPE type);
 
 // The SDK's enums: the renderer core shifts the mapping type's fields as signed
 typedef struct {
@@ -533,28 +567,29 @@ typedef struct {
 } NNSG2dImageProxy;
 
 typedef struct {
-    u32 fmt;
+    GXTexFmt fmt;
     BOOL bExtendedPlt;
     NNSG2dVRamLocation vramLocation;
 } NNSG2dImagePaletteProxy;
 
 void NNS_G2dInitImageProxy(NNSG2dImageProxy *proxy);
-void NNS_G2dSetImageLocation(NNSG2dImageProxy *proxy, NNSG2dVRamType type, u32 addr);
-u32 NNS_G2dGetImageLocation(const NNSG2dImageProxy *proxy, NNSG2dVRamType type);
-BOOL NNS_G2dIsImageReadyToUse(const NNSG2dImageProxy *proxy, NNSG2dVRamType type);
+void NNS_G2dSetImageLocation(NNSG2dImageProxy *proxy, NNS_G2D_VRAM_TYPE type, u32 addr);
+u32 NNS_G2dGetImageLocation(const NNSG2dImageProxy *proxy, NNS_G2D_VRAM_TYPE type);
+BOOL NNS_G2dIsImageReadyToUse(const NNSG2dImageProxy *proxy, NNS_G2D_VRAM_TYPE type);
 void NNS_G2dInitImagePaletteProxy(NNSG2dImagePaletteProxy *proxy);
-void NNS_G2dSetImagePaletteLocation(NNSG2dImagePaletteProxy *proxy, NNSG2dVRamType type, u32 addr);
-u32 NNS_G2dGetImagePaletteLocation(const NNSG2dImagePaletteProxy *proxy, NNSG2dVRamType type);
-BOOL NNS_G2dIsImagePaletteReadyToUse(const NNSG2dImagePaletteProxy *proxy, NNSG2dVRamType type);
-void NNS_G2dLoadImage1DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type,
+void NNS_G2dSetImagePaletteLocation(NNSG2dImagePaletteProxy *proxy, NNS_G2D_VRAM_TYPE type, u32 addr);
+u32 NNS_G2dGetImagePaletteLocation(const NNSG2dImagePaletteProxy *proxy, NNS_G2D_VRAM_TYPE type);
+BOOL NNS_G2dIsImagePaletteReadyToUse(const NNSG2dImagePaletteProxy *proxy, NNS_G2D_VRAM_TYPE type);
+void NNS_G2dLoadImage1DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NNS_G2D_VRAM_TYPE type,
                                NNSG2dImageProxy *proxy);
-void NNS_G2dLoadImage2DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type,
+void NNS_G2dLoadImage2DMapping(const NNSG2dCharacterData *data, u32 baseAddr, NNS_G2D_VRAM_TYPE type,
                                NNSG2dImageProxy *proxy);
-void NNS_G2dLoadImageVramTransfer(const NNSG2dCharacterData *data, u32 baseAddr, NNSG2dVRamType type,
+void NNS_G2dLoadImageVramTransfer(const NNSG2dCharacterData *data, u32 baseAddr, NNS_G2D_VRAM_TYPE type,
                                   NNSG2dImageProxy *proxy);
-void NNS_G2dLoadPalette(const NNSG2dPaletteData *data, u32 addr, NNSG2dVRamType type, NNSG2dImagePaletteProxy *proxy);
+void NNS_G2dLoadPalette(const NNSG2dPaletteData *data, u32 addr, NNS_G2D_VRAM_TYPE type,
+                        NNSG2dImagePaletteProxy *proxy);
 void NNS_G2dLoadPaletteEx(const NNSG2dPaletteData *data, const NNSG2dPaletteCompressInfo *cmpInfo, u32 addr,
-                          NNSG2dVRamType type, NNSG2dImagePaletteProxy *proxy);
+                          NNS_G2D_VRAM_TYPE type, NNSG2dImagePaletteProxy *proxy);
 
 // The OAM managers, each of a range of OAMs of an engine, which they fill each frame and send at the vertical blank
 typedef enum {
@@ -572,14 +607,15 @@ typedef struct {
     u16 fromIdx;
     u16 toIdx;
     u16 currentIdx;
-} NNSG2dOamManagedRegion;
+} NNSG2dOAMManageArea;
 
 typedef struct {
     NNSG2dOamType type;
-    NNSG2dOamManagedRegion managedAttrRegion;
-    NNSG2dOamManagedRegion managedAffineRegion;
-    u16 managerID;
-    BOOL bFastTransferMode;
+    NNSG2dOAMManageArea managedAttrArea;
+    NNSG2dOAMManageArea managedAffineArea;
+    u16 GUID;
+    u16 pad16_;
+    BOOL bFastTransferEnable;
     fx32 spriteZoffsetStep;
 } NNSG2dOamManagerInstance;
 
@@ -598,12 +634,12 @@ typedef struct {
     NNSG2dFVec2 sizeView;
 } NNSG2dViewRect;
 
-enum {
+typedef enum {
     NNS_G2D_SURFACETYPE_MAIN3D,
     NNS_G2D_SURFACETYPE_MAIN2D,
     NNS_G2D_SURFACETYPE_SUB2D,
     NNS_G2D_SURFACETYPE_MAX,
-};
+} NNSG2dSurfaceType;
 
 typedef BOOL (*NNSG2dOamRegisterFunction)(const GXOamAttr *oam, u16 affineIdx, BOOL doubleAffine);
 typedef u16 (*NNSG2dAffineRegisterFunction)(const MtxFx22 *mtx);
@@ -613,51 +649,63 @@ typedef BOOL (*NNSG2dRndCellCullingFunction)(const NNSG2dCellData *cell, const M
 // The renderer core, which draws a cell's OAMs to one surface (g2d_RendererCore.c), with the current matrix: its
 // translation and a matrix cache for 2D surfaces, or a 4x3 matrix for the 3D surface. The callbacks before a cell or an
 // OAM may clear bDrawEnable to skip it
-enum {
+typedef enum {
     NNS_G2D_RND_AFFINE_OVERWRITE_NONE,
     NNS_G2D_RND_AFFINE_OVERWRITE_NORMAL,
     NNS_G2D_RND_AFFINE_OVERWRITE_DOUBLE,
-};
+} NNSG2dRendererAffineTypeOverwiteMode;
 
 #define NNS_G2D_RENDERERFLIP_NONE 0
 #define NNS_G2D_RENDERERFLIP_H 0x1
 #define NNS_G2D_RENDERERFLIP_V 0x2
 
-struct NNSG2dRenderSurface;
+struct NNSG2dRndCoreInstance;
 struct NNSG2dRndCore2DMtxCache;
 
+typedef void (*NNSG2dRndCoreDrawCellCallBack)(struct NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell);
+typedef void (*NNSG2dRndCoreDrawOamCallBack)(struct NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell,
+                                             u16 oamIdx);
+
+// The surface the core draws to
+typedef struct {
+    NNSG2dViewRect viewRect;
+    BOOL bActive;
+    NNSG2dSurfaceType type;
+    NNSG2dRndCoreDrawCellCallBack pBeforeDrawCellBackFunc;
+    NNSG2dRndCoreDrawCellCallBack pAfterDrawCellBackFunc;
+    NNSG2dRndCoreDrawOamCallBack pBeforeDrawOamBackFunc;
+    NNSG2dRndCoreDrawOamCallBack pAfterDrawOamBackFunc;
+} NNSG2dRndCoreSurface;
+
 typedef struct NNSG2dRndCoreInstance {
-    struct NNSG2dRenderSurface *pCurrentTargetSurface;
-    u32 affineOverwriteMode;
-    const NNSG2dImageProxy *pImageProxy;
-    const NNSG2dImagePaletteProxy *pPaletteProxy;
+    NNSG2dRndCoreSurface *pCurrentTargetSurface;
+    NNSG2dRendererAffineTypeOverwiteMode affineOverwriteMode;
+    const NNSG2dImageProxy *pImgProxy;
+    const NNSG2dImagePaletteProxy *pPltProxy;
     u32 base2DCharOffset;
     u32 baseTexAddr3D;
     u32 basePltAddr3D;
     NNSG2dOamRegisterFunction pFuncOamRegister;
     NNSG2dAffineRegisterFunction pFuncOamAffineRegister;
     u32 flipFlag;
-    const struct NNSG2dRndCore2DMtxCache *pCurrentMxtCacheFor2D;
-    const MtxFx32 *pCurrentMtx;
+    struct NNSG2dRndCore2DMtxCache *pCurrentMtxCacheFor2D;
+    const MtxFx32 *pCurrentMxt;
     BOOL bDrawEnable;
     fx32 zFor3DSoftwareSprite;
     // The OAM being drawn, which the callbacks before an OAM may change
     GXOamAttr currentOam;
-    MtxFx43 mtx3D;
+    MtxFx43 mtxFor3DGE;
 } NNSG2dRndCoreInstance;
 
 // A 2D affine matrix that the renderer shares among the cells drawn with it, with its affine parameter index per
 // surface affineIndex[flip][type - NNS_G2D_SURFACETYPE_MAIN2D], by OAM flip (H in bit 0, V in bit 1) and 2D surface
-// type, is NNS_G2D_OAM_AFFINE_IDX_NOT_CACHED until the core registers the flipped matrix for it
+// type, is MtxCache_NOT_AVAILABLE until the core registers the flipped matrix for it
 typedef struct NNSG2dRndCore2DMtxCache {
     MtxFx22 m22;
     u16 affineIndex[4][NNS_G2D_SURFACETYPE_MAX - NNS_G2D_SURFACETYPE_MAIN2D];
 } NNSG2dRndCore2DMtxCache;
 
-#define NNS_G2D_OAM_AFFINE_IDX_NOT_CACHED 0xffff
-
-typedef void (*NNSG2dRndCoreDrawCellCallBack)(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell);
-typedef void (*NNSG2dRndCoreDrawOamCallBack)(NNSG2dRndCoreInstance *core, const NNSG2dCellData *cell, u16 oamIdx);
+#define MtxCache_NOT_AVAILABLE 0xffff
 
 struct NNSG2dRendererInstance;
 struct NNSG2dRenderSurface;
@@ -666,19 +714,24 @@ typedef void (*NNSG2dRndDrawCellCallBack)(struct NNSG2dRendererInstance *rend, s
 typedef void (*NNSG2dRndDrawOamCallBack)(struct NNSG2dRendererInstance *rend, struct NNSG2dRenderSurface *surface,
                                          const NNSG2dCellData *cell, u16 oamIdx, const MtxFx32 *mtx);
 
-// The first six fields are the core's surface (NNSG2dRndCoreSurface in the SDK, flattened here); the renderer sets
-// the core's callbacks to its own, which call the surface's
+// A renderer's surface starts with the core's; the renderer sets the core's callbacks to its own, which call the
+// surface's
 typedef struct NNSG2dRenderSurface {
-    NNSG2dViewRect viewRect;
-    BOOL bActive;
-    u32 type;
-    NNSG2dRndCoreDrawCellCallBack pBeforeDrawCellBackFuncCore;
-    NNSG2dRndCoreDrawCellCallBack pAfterDrawCellBackFuncCore;
-    NNSG2dRndCoreDrawOamCallBack pBeforeDrawOamBackFuncCore;
-    NNSG2dRndCoreDrawOamCallBack pAfterDrawOamBackFuncCore;
+    union {
+        NNSG2dRndCoreSurface coreSurface;
+        struct {
+            NNSG2dViewRect viewRect;
+            BOOL bActive;
+            NNSG2dSurfaceType type;
+            NNSG2dRndCoreDrawCellCallBack pBeforeDrawCellBackFuncCore;
+            NNSG2dRndCoreDrawCellCallBack pAfterDrawCellBackFuncCore;
+            NNSG2dRndCoreDrawOamCallBack pBeforeDrawOamBackFuncCore;
+            NNSG2dRndCoreDrawOamCallBack pAfterDrawOamBackFuncCore;
+        };
+    };
     NNSG2dOamRegisterFunction pFuncOamRegister;
     NNSG2dAffineRegisterFunction pFuncOamAffineRegister;
-    struct NNSG2dRenderSurface *pNextSurface;
+    void *pNextSurface;
     NNSG2dRndCellCullingFunction pFuncVisibilityCulling;
     NNSG2dRndDrawCellCallBack pBeforeDrawCellBackFunc;
     NNSG2dRndDrawCellCallBack pAfterDrawCellBackFunc;
@@ -720,9 +773,10 @@ typedef struct NNSG2dRendererInstance {
     u32 overwriteEnableFlag;
     u16 overwritePriority;
     u16 overwritePlttNo;
-    u32 overwriteObjMode;
+    GXOamMode overwriteObjMode;
     BOOL overwriteMosaicFlag;
     u16 overwritePlttNoOffset;
+    u16 pad16_;
 } NNSG2dRendererInstance;
 
 void NNS_G2dInitRenderer(NNSG2dRendererInstance *rend);
@@ -750,30 +804,23 @@ static inline void NNS_G2dSetRendererOverwriteDisable(NNSG2dRendererInstance *re
     rend->overwriteEnableFlag &= ~flag;
 }
 
-// The width and height in pixels of each OAM shape and size, by [shape][size] (g2d_OAM.c). The names are
-// pokediamond's
+// The width and height in pixels of each OAM shape and size, by [shape][size] (g2d_OAM.c)
 extern const u16 NNSi_objSizeWTbl[3][4];
 extern const u16 NNSi_objSizeHTbl[3][4];
 
-static inline u16 NNS_G2dGetOamSizeX(const GXOamShape *shape) {
+static inline int NNS_G2dGetOamSizeX(const GXOamShape *shape) {
     return NNSi_objSizeWTbl[(*shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT]
                            [(*shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT];
 }
 
-static inline u16 NNS_G2dGetOamSizeY(const GXOamShape *shape) {
+static inline int NNS_G2dGetOamSizeY(const GXOamShape *shape) {
     return NNSi_objSizeHTbl[(*shape & GX_OAM_ATTR0_SHAPE_MASK) >> GX_OAM_ATTR01_SHAPE_SHIFT]
                            [(*shape & GX_OAM_ATTR01_SIZE_MASK) >> GX_OAM_ATTR01_SIZE_SHIFT];
 }
 
-// A cell's OAM, its first three attributes, and copying one to an OAM
-typedef struct {
-    u16 attr0;
-    u16 attr1;
-    u16 attr2;
-} NNSG2dCellOAMAttrData;
-
+// Copying a cell's OAM to an OAM
 static inline void NNS_G2dCopyCellAsOamAttr(const NNSG2dCellData *cell, u16 idx, GXOamAttr *dst) {
-    const NNSG2dCellOAMAttrData *src = (const NNSG2dCellOAMAttrData *)cell->pOamAttrArray + idx;
+    const NNSG2dCellOAMAttrData *src = cell->pOamAttrArray + idx;
 
     dst->attr0 = src->attr0;
     dst->attr1 = src->attr1;
@@ -783,7 +830,7 @@ static inline void NNS_G2dCopyCellAsOamAttr(const NNSG2dCellData *cell, u16 idx,
 // Drawing an OAM as a textured quad with the 3D engine (g2d_OamSoftwareSpriteDraw.c). The correction function may
 // change the texture coordinates of a flipped OAM; the Z offset, when on, is added to each sprite's Z and moved by the
 // step after each one
-typedef void (*NNSG2dOamSoftEmuUVFlipCorrectFunc)(fx32 *u0, fx32 *v0, fx32 *u1, fx32 *v1, BOOL flipH, BOOL flipV);
+typedef void (*NNS_G2dOamSoftEmuUVFlipCorrectFunc)(fx32 *u0, fx32 *v0, fx32 *u1, fx32 *v1, BOOL flipH, BOOL flipV);
 
 void NNS_G2dDrawOneOam3DDirectWithPosFast(s16 posX, s16 posY, s16 posZ, const GXOamAttr *oam,
                                           const NNSG2dImageAttr *texImageAttr, u32 texBaseAddr, u32 pltBaseAddr);
@@ -800,23 +847,23 @@ void NNS_G2dPopMtx(u16 num);
 void NNS_G2dTranslate(fx32 x, fx32 y, fx32 z);
 void NNS_G2dScale(fx32 x, fx32 y, fx32 z);
 void NNS_G2dRotZ(fx32 sin, fx32 cos);
-const NNSG2dPaletteSwapTable *NNS_G2dGetRendererPaletteTbl(const NNSG2dRendererInstance *rend);
+const NNSG2dPaletteSwapTable *NNS_G2dGetRendererPaletteTbl(NNSG2dRendererInstance *rend);
 void NNS_G2dSetRendererImageProxy(NNSG2dRendererInstance *rend, const NNSG2dImageProxy *imgProxy,
                                   const NNSG2dImagePaletteProxy *pltProxy);
 
-// While the renderer draws a multi-cell animation that shares its cell animations: the cell animation being drawn,
-// and the matrix cache each one was drawn with. The renderer addresses it by its own symbol, as it does only what
-// another file defines, and it lies in the .bss after the renderer's (0x021435d8 in Black 2), so the file after
-// g2d_Renderer.c defines it. The names are guesses
+// While the renderer draws a multi-cell animation that shares its cell animations: the cell animation being drawn, and
+// the matrix cache each one was drawn with. The renderer addresses it by its own symbol, as it does only what another
+// file defines, and it lies in the .bss after the renderer's (0x021435d8 in Black 2), so the file after g2d_Renderer.c
+// defines it. In NitroSystem, mcRenderState_ is a static of g2d_Renderer.c; NNSi_G2D_MC_CELLANIM_MAX is ours
 #define NNSi_G2D_MC_CELLANIM_MAX 256
 
 typedef struct {
     u16 currentCellAnimIdx;
-    NNSG2dRndCore2DMtxCache *cellAnimMtxCache[NNSi_G2D_MC_CELLANIM_MAX];
+    NNSG2dRndCore2DMtxCache *cellAnimMtxCacheTbl[NNSi_G2D_MC_CELLANIM_MAX];
     BOOL bDrawMC;
-} NNSiG2dMCRenderState;
+} MCRenderState;
 
-extern NNSiG2dMCRenderState NNSi_G2dMCRenderState;
+extern MCRenderState mcRenderState_;
 
 // The renderer core (g2d_RendererCore.c), as the renderer uses it
 void NNS_G2dInitRndCore(NNSG2dRndCoreInstance *core);
@@ -824,11 +871,11 @@ void NNS_G2dSetRndCoreImageProxy(NNSG2dRndCoreInstance *core, const NNSG2dImageP
                                  const NNSG2dImagePaletteProxy *pltProxy);
 void NNS_G2dSetRndCoreOamRegisterFunc(NNSG2dRndCoreInstance *core, NNSG2dOamRegisterFunction oamRegister,
                                       NNSG2dAffineRegisterFunction affineRegister);
-void NNS_G2dSetRndCoreAffineOverwriteMode(NNSG2dRndCoreInstance *core, u32 mode);
+void NNS_G2dSetRndCoreAffineOverwriteMode(NNSG2dRndCoreInstance *core, NNSG2dRendererAffineTypeOverwiteMode mode);
 void NNS_G2dSetRndCoreCurrentMtx3D(const MtxFx32 *mtx);
-void NNS_G2dSetRndCoreCurrentMtx2D(const MtxFx32 *mtx, const NNSG2dRndCore2DMtxCache *cache);
+void NNS_G2dSetRndCoreCurrentMtx2D(const MtxFx32 *mtx, NNSG2dRndCore2DMtxCache *cache);
 void NNS_G2dSetRndCore3DSoftSpriteZvalue(NNSG2dRndCoreInstance *core, fx32 z);
-void NNS_G2dSetRndCoreSurface(NNSG2dRndCoreInstance *core, NNSG2dRenderSurface *surface);
+void NNS_G2dSetRndCoreSurface(NNSG2dRndCoreInstance *core, NNSG2dRndCoreSurface *surface);
 BOOL NNS_G2dIsRndCoreFlipH(const NNSG2dRndCoreInstance *core);
 BOOL NNS_G2dIsRndCoreFlipV(const NNSG2dRndCoreInstance *core);
 void NNS_G2dSetRndCoreFlipMode(NNSG2dRndCoreInstance *core, BOOL flipH, BOOL flipV);
@@ -843,8 +890,8 @@ void NNSi_G2dResetOamSoftEmuAutoZOffset(void);
 void NNSi_G2dSetOamSoftEmuAutoZOffsetStep(fx32 step);
 fx32 NNSi_G2dGetOamSoftEmuAutoZOffsetStep(void);
 
-// ab = a * b for 2D affine matrices; ab may be b. swan's name: the code shows no SDK name
-void MAT32_Mul(const MtxFx32 *a, const MtxFx32 *b, MtxFx32 *ab);
+// ab = a * b for 2D affine matrices; ab may be b
+void NNSi_G2dMtxConcat32(const MtxFx32 *a, const MtxFx32 *b, MtxFx32 *ab); // swan's MAT32_Mul
 
 // The cell transfer state manager, which transfers the characters of cell animations made with
 // NNS_G2dInitCellAnimationVramTransfered through a callback
@@ -855,15 +902,16 @@ typedef struct {
     const void *pSrcNCBR;
     u32 szSrcData;
     BOOL bActive;
-    u32 bDrawn;             // A bit per NNSG2dVRamType, set when the cell is drawn by that engine
-    u32 bTransferRequested; // A bit per NNSG2dVRamType
+    u32 bDrawn;             // A bit per NNS_G2D_VRAM_TYPE, set when the cell is drawn by that engine
+    u32 bTransferRequested; // A bit per NNS_G2D_VRAM_TYPE
     u32 srcOffset;
     u32 szByte;
 } NNSG2dCellTransferState;
 
-typedef BOOL (*NNSG2dDmaCallBack)(u32 type, u32 dstAddr, void *pSrc, u32 szByte);
+typedef BOOL (*VramTransferTaskRegisterFuncPtr)(NNS_GFD_DST_TYPE type, u32 dstAddr, void *pSrc, u32 szByte);
 
-void NNS_G2dInitCellTransferStateManager(NNSG2dCellTransferState *states, u32 numCellState, NNSG2dDmaCallBack callback);
+void NNS_G2dInitCellTransferStateManager(NNSG2dCellTransferState *states, u32 numCellState,
+                                         VramTransferTaskRegisterFuncPtr callback);
 void NNS_G2dUpdateCellTransferStateManager(void);
 u32 NNS_G2dGetNewCellTransferStateHandle(void);
 void NNS_G2dFreeCellTransferStateHandle(u32 handle);
@@ -980,7 +1028,7 @@ static inline const NNSG2dCharWidths *NNS_G2dFontGetCharWidths(const NNSG2dFont 
     return NNS_G2dFontGetCharWidthsFromIndex(pFont, idx);
 }
 
-static inline int NNS_G2dFontGetLineFeed(const NNSG2dFont *pFont) {
+static inline s8 NNS_G2dFontGetLineFeed(const NNSG2dFont *pFont) {
     return pFont->pRes->linefeed;
 }
 
@@ -1016,6 +1064,7 @@ struct NNSG2dCharCanvas {
     int areaWidth;
     int areaHeight;
     u8 dstBpp;
+    u8 reserved[3];
     u32 param;
     const NNSiG2dCharCanvasVTable *vtable;
 };
@@ -1025,17 +1074,31 @@ typedef enum {
     NNS_G2D_CHARA_COLORMODE_256 = 8,
 } NNSG2dCharaColorMode;
 
+// The width of a text BG's screen, in characters
+typedef enum {
+    NNS_G2D_TEXT_BG_WIDTH_256 = 32,
+    NNS_G2D_TEXT_BG_WIDTH_512 = 64,
+} NNSG2dTextBGWidth;
+
+// The OBJ VRAM's character boundary in 1D mapping
+typedef enum {
+    NNS_G2D_OBJVRAMMODE_32K = 0,
+    NNS_G2D_OBJVRAMMODE_64K = 1,
+    NNS_G2D_OBJVRAMMODE_128K = 2,
+    NNS_G2D_OBJVRAMMODE_256K = 3,
+} NNSG2dOBJVramMode;
+
 void NNS_G2dCharCanvasInitForBG(NNSG2dCharCanvas *pCC, void *charBase, int areaWidth, int areaHeight,
                                 NNSG2dCharaColorMode colorMode);
 void NNS_G2dCharCanvasInitForOBJ1D(NNSG2dCharCanvas *pCC, void *charBase, int areaWidth, int areaHeight,
                                    NNSG2dCharaColorMode colorMode);
 // Draws a character with its top left at x, y in color cl and returns its width
 int NNS_G2dCharCanvasDrawChar(const NNSG2dCharCanvas *pCC, const NNSG2dFont *pFont, int x, int y, int cl, u16 ccode);
-void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop, int scnWidth,
-                             int charNo, int cplt);
-int NNS_G2dCalcRequireOBJ1D(u32 areaWidth, u32 areaHeight);
-int NNS_G2dArrangeOBJ1D(GXOamAttr *oam, int areaWidth, int areaHeight, int x, int y, int color, int charName,
-                        int vramMode);
+void NNS_G2dMapScrToCharText(void *scnBase, int areaWidth, int areaHeight, int areaLeft, int areaTop,
+                             NNSG2dTextBGWidth scnWidth, int charNo, int cplt);
+int NNSi_G2dCalcRequiredOBJ(u32 areaWidth, u32 areaHeight);
+int NNS_G2dArrangeOBJ1D(GXOamAttr *oam, int areaWidth, int areaHeight, int x, int y, GXOamColorMode color, int charName,
+                        NNSG2dOBJVramMode vramMode);
 
 // Text canvases: a font drawing into a character canvas, with spacing between characters and lines. Text is drawn in
 // the direction dir, (1, 0) for horizontal text, the line feed going 90 degrees clockwise from it. The flags place the
@@ -1059,7 +1122,7 @@ static inline void NNS_G2dTextCanvasInit(NNSG2dTextCanvas *pTxn, const NNSG2dCha
 typedef struct {
     s8 x;
     s8 y;
-} NNSG2dTextDirection;
+} NNSiG2dTextDirection;
 
 #define NNS_G2D_VERTICALORIGIN_TOP 0x1
 #define NNS_G2D_VERTICALORIGIN_MIDDLE 0x2
@@ -1075,10 +1138,10 @@ typedef struct {
 #define NNS_G2D_HORIZONTALALIGN_RIGHT 0x800
 
 void NNSi_G2dTextCanvasDrawString(const NNSG2dTextCanvas *pTxn, int x, int y, int cl, const void *str,
-                                  const void **ppEnd, NNSG2dTextDirection dir);
+                                  const void **ppEnd, NNSiG2dTextDirection dir);
 void NNSi_G2dTextCanvasDrawText(const NNSG2dTextCanvas *pTxn, int x, int y, int cl, u32 flags, const void *txt,
-                                NNSG2dTextDirection dir);
+                                NNSiG2dTextDirection dir);
 void NNSi_G2dTextCanvasDrawTextRect(const NNSG2dTextCanvas *pTxn, int x, int y, int w, int h, int cl, u32 flags,
-                                    const void *txt, NNSG2dTextDirection dir);
+                                    const void *txt, NNSiG2dTextDirection dir);
 
 #endif // POKEBW2_NNSYS_G2D_H

@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "dwc/account.h"
+#include "dwc/error.h"
 #include "dwc/gp.h"
 #include "nitro/os.h"
 
@@ -14,16 +15,28 @@
 
 // The callbacks of the friend list's update: its end, with whether the list changed; a friend's status; a friend
 // that was a copy of another and was deleted; and a friend that became a buddy
-typedef void (*DWCUpdateServersCallback)(int error, BOOL isChanged, void *param);
+typedef void (*DWCUpdateServersCallback)(DWCError error, BOOL isChanged, void *param);
 typedef void (*DWCFriendStatusCallback)(int index, u8 status, const char *statusString, void *param);
 typedef void (*DWCDeleteFriendListCallback)(int deletedIndex, int srcIndex, void *param);
 typedef void (*DWCBuddyFriendCallback)(int index, void *param);
+// The callbacks of the persistent storage server's login, saving and loading (NitroDWC's base/dwc_friend.h)
+typedef void (*DWCStorageLoginCallback)(DWCError error, void *param);
+typedef void (*DWCSaveToServerCallback)(BOOL success, BOOL isPublic, void *param);
+typedef void (*DWCLoadFromServerCallback)(BOOL success, int index, char *data, int len, void *param);
+
+// The friend list's states: the SDK's DWCFriendState
+typedef enum DWCFriendState {
+    DWC_FRIEND_STATE_INIT = 0,
+    DWC_FRIEND_STATE_PERS_LOGIN,
+    DWC_FRIEND_STATE_LOGON,
+    DWC_FRIEND_STATE_NUM,
+} DWCFriendState;
 
 // The friend list's state, which dwc_match.c gives the memory for
 typedef struct DWCFriendControl {
     // 0 until the update starts, 1 while it runs and 2 once it is over
-    int state;
-    GPConnection *connection;
+    DWCFriendState state;
+    GPConnection *pGpObj;
     // How many times GameSpy's GP has been run, and when it was last
     u32 gpProcessCount;
     OSTick lastGpProcess;
@@ -39,7 +52,7 @@ typedef struct DWCFriendControl {
     // Nonzero while the persistent storage server is logged in to
     int persLogin;
     // The player's profile ID, which nothing sets
-    u32 profileID;
+    int profileID;
     // The player's name
     const u16 *playerName;
     DWCUpdateServersCallback updateCallback;
@@ -52,40 +65,54 @@ typedef struct DWCFriendControl {
     void *buddyParam;
     // The callbacks of the persistent storage server's login, saving and loading, which nothing sets (the SDK's
     // persLoginCallback, persLoginParam, saveCallback and loadCallback, in its order)
-    u32 persLoginCallback;
-    u32 persLoginParam;
-    u32 saveCallback;
-    u32 loadCallback;
+    DWCStorageLoginCallback persLoginCallback;
+    void *persLoginParam;
+    DWCSaveToServerCallback saveCallback;
+    DWCLoadFromServerCallback loadCallback;
     // The profile IDs whose reverse buddies are asked for
     int *profileIds;
 } DWCFriendControl;
 
 // The callback of the login, with its error and the profile ID that logged in
-typedef void (*DWCLoginCallback)(int error, int profileId, void *param);
+typedef void (*DWCLoginCallback)(DWCError error, int profileId, void *param);
+
+// The login's states: the SDK's DWCLoginState
+typedef enum DWCLoginState {
+    DWC_LOGIN_STATE_INIT = 0,
+    DWC_LOGIN_STATE_REMOTE_AUTH,
+    DWC_LOGIN_STATE_CONNECTING,
+    DWC_LOGIN_STATE_GPGETINFO,
+    DWC_LOGIN_STATE_GPSETINFO,
+    DWC_LOGIN_STATE_CONNECTED,
+    DWC_LOGIN_STATE_NUM,
+} DWCLoginState;
 
 // The login's state, which dwc_match.c gives the memory for
 typedef struct DWCLoginControl {
-    GPConnection *connection;
+    GPConnection *pGpObj;
     // 0 before the login, 1 while the authentication server is asked, 2 to 4 while GP logs in (with the user data's
     // profile, or looking for it with the login ID) and 5 once logged in
-    int state;
-    int productId;
-    u32 gameCode;
+    DWCLoginState state;
+    int productID;
+    u32 gamecode;
     const u16 *playerName;
     DWCLoginCallback callback;
     void *param;
-    DWCUserData *userData;
-    u8 unk_20[0x10];
+    DWCUserData *userdata;
+    // The SDK's work of the backup manager, HTTP client and start of the login, which this version leaves unused
+    void *bmwork;
+    void *http;
+    OSTick startTick;
     // Whether GP is being connected to, and since when
-    BOOL connecting;
+    u32 connectFlag;
     OSTick connectTick;
     // The login ID that the login uses until the user data has an authenticated one
-    DWCFriendData tempLoginId;
+    DWCstAccLoginId tempLoginId;
     // What the authentication server gave for GP's login
     char authToken[0x100];
     char partnerChallenge[0x100];
     // The login name: the user ID, the game code and the player ID as text
-    char loginName[21];
+    char username[21];
 } DWCLoginControl;
 
 // The server's date and time, and the "Date" header of the authentication server's answer, such as
@@ -114,7 +141,7 @@ void DWCi_UpdateServersAsync(const char *authToken, const char *partnerChallenge
                              DWCUpdateServersCallback updateCallback, void *updateParam,
                              DWCFriendStatusCallback statusCallback, void *statusParam,
                              DWCDeleteFriendListCallback deleteCallback, void *deleteParam);
-void DWCi_StopFriendProcess(int error, int code);
+void DWCi_StopFriendProcess(DWCError error, int code);
 void DWCi_GPRecvBuddyRequestCallback(GPConnection *connection, GPRecvBuddyRequestArg *arg, void *param);
 BOOL DWCi_GPRecvBuddyAuthCallback(GPConnection *connection, GPRecvBuddyAuthArg *arg, void *param);
 void DWCi_GPRecvBuddyStatusCallback(GPConnection *connection, GPRecvBuddyStatusArg *arg, void *param);
@@ -135,7 +162,7 @@ void DWCi_LoginInit(DWCLoginControl *control, DWCUserData *userData, GPConnectio
 BOOL DWCi_LoginAsync(void);
 void DWCi_LoginProcess(void);
 DWCUserData *DWCi_GetUserData(void);
-void DWCi_StopLogin(int error, int code);
+void DWCi_StopLogin(DWCError error, int code);
 void DWCi_ShutdownLogin(void);
 
 #endif // POKEBW2_DWC_FRIEND_H

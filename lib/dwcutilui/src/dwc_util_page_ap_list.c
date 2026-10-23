@@ -72,30 +72,30 @@ typedef struct DWCUtilApListPos {
     u16 scroll;
 } DWCUtilApListPos;
 
-static void DWCUtilPageApList_LoadGraphics(void);
+static void initGraphics(void);
 static void DWCUtilPageApList_CreateScrollbar(void);
 static void DWCUtilPageApList_CreateIcons(void);
-static void DWCUtilPageApList_FadeIn(void);
-static void DWCUtilPageApList_WaitFadeIn(void);
-static void DWCUtilPageApList_WaitButtons(void);
-static void DWCUtilPageApList_Main(void);
-static void DWCUtilPageApList_HandleInput(void);
-static void DWCUtilPageApList_HandleScrollbar(void);
-static void DWCUtilPageApList_HandleChoice(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
+static void input(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilPageApList_DisableButtons(void);
-static void DWCUtilPageApList_FadeOut(void);
-static void DWCUtilPageApList_WaitFadeOut(void);
-static void DWCUtilPageApList_DrawRows(void);
-static void DWCUtilPageApList_DrawSsid(int index, int row);
-static void DWCUtilPageApList_SetRowIcons(int index, int row);
-static void DWCUtilPageApList_MoveRows(void);
+static void endScene1(void);
+static void endScene2(void);
+static void drawApInfo(void);
+static void drawAp(int index, int row);
+static void drapApObj(int index, int row);
+static void setOffset(void);
 static void DWCUtilPageApList_ScrollUpTask(DWCUtilTask *task, void *arg);
 static void DWCUtilPageApList_ScrollDownTask(DWCUtilTask *task, void *arg);
 static void DWCUtilPageApList_ScrollBgTask(DWCUtilTask *task, void *arg);
 static void DWCUtilPageApList_DrawCursor(void);
 static void DWCUtilPageApList_MoveCursor(int direction);
-static void DWCUtilPageApList_ScrollUp(void);
-static void DWCUtilPageApList_ScrollDown(void);
+static void scrollUp(void);
+static void scrollDown(void);
 static void DWCUtilPageApList_HighlightButton(void);
 static void DWCUtilPageApList_WaitDialog(void);
 static void DWCUtilPageApList_WaitDialogClosed(void);
@@ -119,35 +119,35 @@ static DWCUtilApList *sApList;
 void DWCUtilPageApList_Init(void) {
     int again;
 
-    sApList = DWCUtilHeap_AllocClear(sizeof(DWCUtilApList), 4);
-    DWCUtilMain_GetScreenArgs(&again, NULL);
+    sApList = DWCi_HEAPlAllocEx(sizeof(DWCUtilApList), 4);
+    DWCi_GetParam2_(&again, NULL);
     if (again == 0) {
         sApListPos.cursor = 0;
         sApListPos.scroll = 0;
     }
-    sApList->count = DWCUtilApScan_GetEntries(&sApList->entries);
-    DWCUtilPageApList_LoadGraphics();
-    DWCUtilBgOverlay_ShowConnectionSet();
-    DWCUtilScreen_Start(0x34, -1, 0);
-    DWCUtilGfxResource_ShowStep(2);
+    sApList->count = DWCi_SEARCHlGetApInfo(&sApList->entries);
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_COMMENTlDispEx(0x34, -1, 0);
+    DWCi_CMNlStep(2);
     DWCUtilPageApList_CreateScrollbar();
     DWCUtilPageApList_CreateIcons();
-    sApList->text = DWCUtilText_CreateBg(0, 0);
-    sApList->vblankTask = DWCUtilTask_Create(1, DWCUtilPageApList_ScrollBgTask, NULL, 0x6e);
-    DWCUtilPageApList_DrawRows();
+    sApList->text = DWCi_FNTlFormBgEx(0, 0);
+    sApList->vblankTask = DWCi_TSKlForm(1, DWCUtilPageApList_ScrollBgTask, NULL, 0x6e);
+    drawApInfo();
     DWCUtilPageApList_DrawCursor();
-    DWCUtilMain_SetUpdate(DWCUtilPageApList_FadeIn);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilPageApList_LoadGraphics(void) {
+static void initGraphics(void) {
     char backPath[] = "char/xb4ApListBack.nsc.l";
     char palettePath[] = "char/ybBgStep31.ncl.l";
 
     DWCUtilGfxResource_Load("char/jb4ApList.nsc.l", GX_LoadBG3Scr);
-    sApList->backScreen = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(backPath), NULL, 4);
-    DWCUtilBgBuffer_Init(sApList->backScreen);
-    DWCUtilBgBuffer_MarkDirty();
-    sApList->palette = DWCUtilRomResource_LoadFile(DWCUtilGfxResource_LocalizePath(palettePath), NULL, 4);
+    sApList->backScreen = DWCUtilRomResource_LoadFile(DWCi_Char(backPath), NULL, 4);
+    DWCi_SCREENlInit(sApList->backScreen);
+    DWCi_SCREENlRenew();
+    sApList->palette = DWCUtilRomResource_LoadFile(DWCi_Char(palettePath), NULL, 4);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
     G2_SetBG0Priority(3);
@@ -205,60 +205,59 @@ static void DWCUtilPageApList_CreateIcons(void) {
     }
 }
 
-static void DWCUtilPageApList_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ,
-                      8);
-    DWCUtilDisplay_ShowPlanes(1, GX_PLANEMASK_BG0);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilPageApList_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0,
+                  GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 8);
+    DWCi_GXlInvisible(1, GX_PLANEMASK_BG0);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilPageApList_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(1) == 0 && DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(0);
-        DWCUtilMain_SetUpdate(DWCUtilPageApList_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(1) == 0 && DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(0);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilPageApList_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilPageApList_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilPageApList_Main(void) {
-    DWCUtilPageApList_HandleInput();
-    DWCUtilPageApList_HandleScrollbar();
-    DWCUtilPageApList_HandleChoice();
+static void procScene(void) {
+    input();
+    draw();
+    button();
 }
 
-static void DWCUtilPageApList_HandleInput(void) {
+static void input(void) {
     int i;
 
     if (sApList->scrollTask != NULL || sApList->dragging) {
         return;
     }
-    if (DWCUtilTouch_IsTriggeredIn(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckTrigger(gDWCUtilTouchScreenRect)) {
         sApList->touched = -1;
         for (i = 0; i < NELEMS(sApListRowRects); i++) {
-            if (DWCUtilTouch_IsTriggeredIn(sApListRowRects[i])) {
+            if (DWCi_TPlCheckTrigger(sApListRowRects[i])) {
                 if (i < AP_LIST_ROWS) {
                     sApList->touched = i;
                     break;
                 }
-                DWCUtilUiObject_SetStateIfIdle(1);
+                DWCi_BTNlSet(1);
                 sApListPos.cursor = i;
                 DWCUtilPageApList_DrawCursor();
                 return;
             }
         }
     }
-    if (DWCUtilTouch_IsReleasedIn(gDWCUtilTouchScreenRect)) {
+    if (DWCi_TPlCheckRelease(gDWCUtilTouchScreenRect)) {
         for (i = 0; i < AP_LIST_ROWS; i++) {
-            if (DWCUtilTouch_IsReleasedIn(sApListRowRects[i])) {
+            if (DWCi_TPlCheckRelease(sApListRowRects[i])) {
                 if (sApList->touched != i) {
                     break;
                 }
@@ -266,39 +265,39 @@ static void DWCUtilPageApList_HandleInput(void) {
                     DWCUtilSound_PlaySe(9);
                     break;
                 }
-                DWCUtilUiObject_SetStateIfIdle(1);
+                DWCi_BTNlSet(1);
                 sApListPos.cursor = i;
                 DWCUtilPageApList_DrawCursor();
                 return;
             }
         }
     }
-    if (DWCUtilTouch_IsKeyPressed(1)) {
-        DWCUtilUiObject_SetStateIfIdle(1);
-        DWCUtilScrollbar_Lock();
-    } else if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
-    } else if (DWCUtilTouch_IsKeyRepeated(0x200)) {
-        DWCUtilPageApList_ScrollDown();
-    } else if (DWCUtilTouch_IsKeyReleased(0x200)) {
+    if (DWCi_IPTlCheckTrigger(1)) {
+        DWCi_BTNlSet(1);
+        DWCi_SBlDisable();
+    } else if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
+    } else if (DWCi_IPTlCheckRepeat(0x200)) {
+        scrollDown();
+    } else if (DWCi_IPTlCheckRelease(0x200)) {
         sApList->atEnd = FALSE;
-    } else if (DWCUtilTouch_IsKeyRepeated(0x100)) {
-        DWCUtilPageApList_ScrollUp();
-    } else if (DWCUtilTouch_IsKeyReleased(0x100)) {
+    } else if (DWCi_IPTlCheckRepeat(0x100)) {
+        scrollUp();
+    } else if (DWCi_IPTlCheckRelease(0x100)) {
         sApList->atEnd = FALSE;
-    } else if (DWCUtilTouch_IsKeyRepeated(0x40)) {
+    } else if (DWCi_IPTlCheckRepeat(0x40)) {
         DWCUtilPageApList_MoveCursor(1);
-    } else if (DWCUtilTouch_IsKeyReleased(0x40)) {
+    } else if (DWCi_IPTlCheckRelease(0x40)) {
         sApList->atEnd = FALSE;
-    } else if (DWCUtilTouch_IsKeyRepeated(0x80)) {
+    } else if (DWCi_IPTlCheckRepeat(0x80)) {
         DWCUtilPageApList_MoveCursor(3);
-    } else if (DWCUtilTouch_IsKeyReleased(0x80)) {
+    } else if (DWCi_IPTlCheckRelease(0x80)) {
         sApList->atEnd = FALSE;
     }
 }
 
 // The scroll bar: its handle dragged, or its arrows
-static void DWCUtilPageApList_HandleScrollbar(void) {
+static void draw(void) {
     int offset;
 
     if (sApList->scrollTask != NULL) {
@@ -307,32 +306,32 @@ static void DWCUtilPageApList_HandleScrollbar(void) {
     if (sApList->dragDelay != 0) {
         sApList->dragDelay--;
     }
-    switch (DWCUtilScrollbar_GetEvent()) {
+    switch (DWCi_SBlGetState()) {
     case 1:
         sApList->dragging = TRUE;
-        DWCUtilUiObject_Disable();
+        DWCi_BTNlDisable();
         break;
     case 2:
         if (sApList->dragDelay == 0) {
-            DWCUtilButtonSprites_Hide();
-            sApListPos.scroll = FX_DivS32(DWCUtilScrollbar_GetPos() * sApList->scrollMax, sApList->barLength);
-            DWCUtilPageApList_DrawRows();
+            DWCi_FOCUSlDelete();
+            sApListPos.scroll = FX_DivS32(DWCi_SBlGet() * sApList->scrollMax, sApList->barLength);
+            drawApInfo();
             sApList->dragDelay = 4;
         }
         break;
     case 3:
         sApList->dragging = FALSE;
-        DWCUtilUiObject_Enable();
-        sApListPos.scroll = FX_DivS32(DWCUtilScrollbar_GetPos() * sApList->scrollMax, sApList->barLength);
+        DWCi_BTNlEnable();
+        sApListPos.scroll = FX_DivS32(DWCi_SBlGet() * sApList->scrollMax, sApList->barLength);
         DWCUtilSound_PlaySe(0x13);
-        DWCUtilPageApList_DrawRows();
+        drawApInfo();
         offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
         if (offset == 0) {
             DWCUtilPageApList_DrawCursor();
         } else if (offset < AP_LIST_ROW_HEIGHT / 2) {
-            sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
+            sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
         } else {
-            sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollDownTask, NULL, 0x78);
+            sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollDownTask, NULL, 0x78);
         }
         break;
     case 4:
@@ -343,7 +342,7 @@ static void DWCUtilPageApList_HandleScrollbar(void) {
             }
         } else {
             DWCUtilSound_PlaySe(0x13);
-            sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
+            sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
         }
         break;
     case 6:
@@ -354,7 +353,7 @@ static void DWCUtilPageApList_HandleScrollbar(void) {
             }
         } else {
             DWCUtilSound_PlaySe(0x13);
-            sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollDownTask, NULL, 0x78);
+            sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollDownTask, NULL, 0x78);
         }
         break;
     case 5:
@@ -364,13 +363,13 @@ static void DWCUtilPageApList_HandleScrollbar(void) {
     }
 }
 
-static void DWCUtilPageApList_HandleChoice(void) {
+static void button(void) {
     int index;
 
     if (sApList->scrollTask != NULL || sApList->dragging) {
         return;
     }
-    switch (DWCUtilUiObject_GetState()) {
+    switch (DWCi_BTNlGet()) {
     case 0:
         DWCUtilSound_PlaySe(7);
         break;
@@ -383,10 +382,10 @@ static void DWCUtilPageApList_HandleChoice(void) {
             index = sApListPos.cursor + FX_DivS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
             if (sApList->entries[index].security == 2) {
                 DWCUtilSound_PlaySe(9);
-                DWCUtilScrollbar_Lock();
-                DWCUtilUiObject_Disable();
+                DWCi_SBlDisable();
+                DWCi_BTNlDisable();
                 DWCUtilDialog_Open(0xe, 1, 1, -1, 0);
-                DWCUtilMain_SetUpdate(DWCUtilPageApList_WaitDialog);
+                DWCi_ChangeScene(DWCUtilPageApList_WaitDialog);
                 return;
             }
             sApList->confirmed = TRUE;
@@ -397,106 +396,106 @@ static void DWCUtilPageApList_HandleChoice(void) {
     default:
         return;
     }
-    DWCUtilMain_SetUpdate(DWCUtilPageApList_DisableButtons);
+    DWCi_ChangeScene(DWCUtilPageApList_DisableButtons);
 }
 
 static void DWCUtilPageApList_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilPageApList_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(endScene1);
 }
 
-static void DWCUtilPageApList_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
+static void endScene1(void) {
+    if (DWCi_EFFlCheck(1) == 0) {
         if (sApList->confirmed) {
-            DWCUtilUiObject_Exit();
+            DWCi_BTNlEnd();
         } else {
-            DWCUtilUiObject_Disable();
+            DWCi_BTNlDisable();
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-        DWCUtilFade_Start(
-            DWC_UTIL_FADE_TO_WHITE, 0,
-            GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilPageApList_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_BG3 | GX_BLEND_PLANEMASK_OBJ,
+                      8);
+        DWCi_ChangeScene(endScene2);
     }
 }
 
 // Frees the list and goes on: back, to the button's screen, or to the chosen access point's security key
-static void DWCUtilPageApList_WaitFadeOut(void) {
+static void endScene2(void) {
     int i;
 
-    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0 || !DWCUtilUiObject_IsIdle()) {
+    if (DWCi_EFFlCheck(1) != 0 || DWCi_EFFlCheck(0) != 0 || !DWCi_BTNlIsEnd()) {
         return;
     }
-    DWCUtilTask_Remove(1, sApList->vblankTask);
+    DWCi_TSKlDeleteEx(1, sApList->vblankTask);
     for (i = 0; i < AP_LIST_ROWS + 1; i++) {
         if (sApList->securityOams[i] != NULL) {
-            DWCUtilOamBuf_Free(sApList->securityOams[i]);
+            DWCi_MOV_MBP_GetChildBmp(sApList->securityOams[i]);
         }
         if (sApList->signalOams[i] != NULL) {
-            DWCUtilOamBuf_Free(sApList->signalOams[i]);
+            DWCi_MOV_MBP_GetChildBmp(sApList->signalOams[i]);
         }
     }
-    DWCUtilText_DestroyBg(sApList->text);
-    DWCUtilScrollbar_Destroy();
-    DWCUtilButtonSprites_Hide();
-    DWCUtilScreen_Stop();
-    DWCUtilBgBuffer_Exit();
-    DWCUtilRomResource_FreeFile(sApList->backScreen);
-    DWCUtilRomResource_FreeFile(sApList->palette);
+    DWCi_FNTlDeleteBg(sApList->text);
+    DWCi_SBlEnd();
+    DWCi_FOCUSlDelete();
+    DWCi_COMMENTlDelete();
+    DWCi_SCREENlEnd();
+    DWCi_ARClRelease(sApList->backScreen);
+    DWCi_ARClRelease(sApList->palette);
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_BG3 | GX_PLANEMASK_OBJ);
     G2_SetBG0Offset(0, 0);
     G2_SetBG2Offset(0, 0);
     if (!sApList->confirmed) {
-        DWCUtilApScan_Exit();
-        DWCUtilWifiSettings_EditConnection(DWCUtilWifiSettings_GetEdit()->index);
-        DWCUtilMain_SetLayout(2, 0);
-        DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
+        DWCi_SEARCHlEnd();
+        DWCi_SETTINGlSetSetting(DWCUtilWifiSettings_GetEdit()->index);
+        DWCi_SetParam_(2, 0);
+        DWCi_ChangeScene(DWCUtilScreenWay_Init);
     } else if (sApListPos.cursor == AP_LIST_BUTTON) {
-        DWCUtilApScan_Exit();
-        DWCUtilMain_SetLayout(0, 1);
-        DWCUtilMain_SetUpdate(DWCUtilApSearch_Init);
+        DWCi_SEARCHlEnd();
+        DWCi_SetParam_(0, 1);
+        DWCi_ChangeScene(DWCUtilApSearch_Init);
     } else {
-        DWCUtilWifiSettings_SetSsid(sApList->entries[sApList->chosen].ssid);
-        DWCUtilMain_SetLayout(0, 0);
+        DWCi_SETTINGlSetSsid(sApList->entries[sApList->chosen].ssid);
+        DWCi_SetParam_(0, 0);
         if (sApList->entries[sApList->chosen].security != 0) {
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetScreenArgs(1, 1);
-            DWCUtilMain_SetUpdate(DWCUtilWepKeyboard_Init);
+            DWCi_SetParam_(0, 1);
+            DWCi_SetParam2_(1, 1);
+            DWCi_ChangeScene(DWCUtilWepKeyboard_Init);
         } else {
-            DWCUtilMain_SetLayout(0, 1);
-            DWCUtilMain_SetScreenArgs(0, 1);
-            DWCUtilMain_SetUpdate(DWCUtilAutoConnectIntro_Init);
+            DWCi_SetParam_(0, 1);
+            DWCi_SetParam2_(0, 1);
+            DWCi_ChangeScene(DWCUtilAutoConnectIntro_Init);
         }
     }
-    DWCUtilHeap_FreeAndNull(&sApList);
+    DWCi_HEAPlFree_(&sApList);
 }
 
 // Draws the rows on the screen from the scroll
-static void DWCUtilPageApList_DrawRows(void) {
+static void drawApInfo(void) {
     int top = FX_DivS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
     int rows = sApList->count;
     int row;
     int index;
 
-    DWCUtilText_Clear(sApList->text, 0);
+    DWCi_FNTlClear(sApList->text, 0);
     if (rows > AP_LIST_ROWS + 1) {
         rows = AP_LIST_ROWS + 1;
     }
     for (row = 0, index = top; row < rows; row++) {
-        DWCUtilPageApList_DrawSsid(index++, row);
+        drawAp(index++, row);
     }
     for (row = 0; row < rows; row++) {
-        DWCUtilPageApList_SetRowIcons(top++, row);
+        drapApObj(top++, row);
     }
     DWCUtilText_MarkDirty(sApList->text);
-    DWCUtilPageApList_MoveRows();
+    setOffset();
 }
 
 // The access point's SSID, on two lines when it is longer than 16 characters
-static void DWCUtilPageApList_DrawSsid(int index, int row) {
-    int length = DWCUtilString_Length(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
+static void drawAp(int index, int row) {
+    int length = DWCi_MOV_WH_SetUserGameInfo(sApList->entries[index].ssid, sizeof(sApList->entries[index].ssid));
     int y = row * AP_LIST_ROW_HEIGHT;
     u16 line[17];
     int count;
@@ -513,18 +512,18 @@ static void DWCUtilPageApList_DrawSsid(int index, int row) {
     for (i = 0; i < count; i++) {
         line[i] = sApList->entries[index].ssid[i];
     }
-    DWCUtilText_DrawCentered(sApList->text, 10, y, 2, 10, line, 1);
+    DWCi_FNTlDrawStringEx(sApList->text, 10, y, 2, 10, line, 1);
     if (length > 16) {
         MI_CpuFill8(line, 0, sizeof(line));
         for (i = 0; i < length - 16; i++) {
             line[i] = sApList->entries[index].ssid[16 + i];
         }
         y += 12;
-        DWCUtilText_DrawCentered(sApList->text, 10, y, 2, 10, line, 1);
+        DWCi_FNTlDrawStringEx(sApList->text, 10, y, 2, 10, line, 1);
     }
 }
 
-static void DWCUtilPageApList_SetRowIcons(int index, int row) {
+static void drapApObj(int index, int row) {
     if (index >= sApList->count) {
         return;
     }
@@ -533,7 +532,7 @@ static void DWCUtilPageApList_SetRowIcons(int index, int row) {
 }
 
 // Moves the icons to the rows' places from the scroll, and has the BGs follow at the next VBlank
-static void DWCUtilPageApList_MoveRows(void) {
+static void setOffset(void) {
     int y = 0x36 - FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
     int rows = sApList->count;
     int row;
@@ -553,8 +552,8 @@ static void DWCUtilPageApList_MoveRows(void) {
 static void DWCUtilPageApList_ScrollUpTask(DWCUtilTask *task, void *arg) {
     int offset;
 
-    DWCUtilScrollbar_Lock();
-    DWCUtilButtonSprites_Hide();
+    DWCi_SBlDisable();
+    DWCi_FOCUSlDelete();
     if (sApListPos.scroll > 4) {
         sApListPos.scroll -= 4;
     } else {
@@ -562,20 +561,20 @@ static void DWCUtilPageApList_ScrollUpTask(DWCUtilTask *task, void *arg) {
     }
     offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
     if (offset == AP_LIST_ROW_HEIGHT - 4) {
-        DWCUtilPageApList_DrawRows();
+        drawApInfo();
         return;
     }
     if (offset > AP_LIST_ROW_HEIGHT - 4) {
         sApListPos.scroll += AP_LIST_ROW_HEIGHT - offset;
         offset = 0;
     }
-    DWCUtilPageApList_MoveRows();
+    setOffset();
     if (offset == 0) {
-        DWCUtilScrollbar_SetPos(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
-        DWCUtilScrollbar_Unlock();
+        DWCi_SBlSet(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
+        DWCi_SBlEnable();
         DWCUtilPageApList_DrawCursor();
         sApList->scrollTask = NULL;
-        DWCUtilTask_QueueRemoval(0, task);
+        DWCi_TSKlDelete(0, task);
     }
 }
 
@@ -583,21 +582,21 @@ static void DWCUtilPageApList_ScrollUpTask(DWCUtilTask *task, void *arg) {
 static void DWCUtilPageApList_ScrollDownTask(DWCUtilTask *task, void *arg) {
     int offset;
 
-    DWCUtilScrollbar_Lock();
-    DWCUtilButtonSprites_Hide();
+    DWCi_SBlDisable();
+    DWCi_FOCUSlDelete();
     sApListPos.scroll += 4;
     offset = FX_ModS32(sApListPos.scroll, AP_LIST_ROW_HEIGHT);
     if (offset >= 4) {
-        DWCUtilPageApList_MoveRows();
+        setOffset();
         return;
     }
     sApListPos.scroll -= offset;
-    DWCUtilPageApList_DrawRows();
-    DWCUtilScrollbar_SetPos(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
-    DWCUtilScrollbar_Unlock();
+    drawApInfo();
+    DWCi_SBlSet(FX_DivS32(sApListPos.scroll * sApList->barLength, sApList->scrollMax));
+    DWCi_SBlEnable();
     DWCUtilPageApList_DrawCursor();
     sApList->scrollTask = NULL;
-    DWCUtilTask_QueueRemoval(0, task);
+    DWCi_TSKlDelete(0, task);
 }
 
 static void DWCUtilPageApList_ScrollBgTask(DWCUtilTask *task, void *arg) {
@@ -617,8 +616,7 @@ static void DWCUtilPageApList_DrawCursor(void) {
     if (cursor >= AP_LIST_ROWS) {
         pair = 3;
     }
-    DWCUtilButtonSprites_ShowPair(pair, sApListCursorRects[cursor][0], sApListCursorRects[cursor][2],
-                                  sApListCursorRects[cursor][1]);
+    DWCi_FOCUSlDisp(pair, sApListCursorRects[cursor][0], sApListCursorRects[cursor][2], sApListCursorRects[cursor][1]);
 }
 
 // Moves the cursor up (1) or down (3), scrolling the list at its ends
@@ -632,7 +630,7 @@ static void DWCUtilPageApList_MoveCursor(int direction) {
                 sApListPos.cursor = AP_LIST_BUTTON;
             } else {
                 DWCUtilSound_PlaySe(0x13);
-                sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
+                sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
                 return;
             }
         } else if (sApList->count > 1) {
@@ -655,7 +653,7 @@ static void DWCUtilPageApList_MoveCursor(int direction) {
         if (direction == 1) {
             sApListPos.cursor--;
         } else {
-            DWCUtilPageApList_ScrollDown();
+            scrollDown();
             return;
         }
         break;
@@ -665,8 +663,8 @@ static void DWCUtilPageApList_MoveCursor(int direction) {
         } else {
             sApListPos.scroll = 0;
             sApListPos.cursor = 0;
-            DWCUtilPageApList_DrawRows();
-            DWCUtilScrollbar_SetPos(0);
+            drawApInfo();
+            DWCi_SBlSet(0);
         }
         break;
     }
@@ -682,7 +680,7 @@ static void DWCUtilPageApList_MoveCursor(int direction) {
 }
 
 // Scrolls the list up by a row
-static void DWCUtilPageApList_ScrollUp(void) {
+static void scrollUp(void) {
     if (sApListPos.scroll == 0) {
         if (!sApList->atEnd) {
             DWCUtilSound_PlaySe(9);
@@ -690,12 +688,12 @@ static void DWCUtilPageApList_ScrollUp(void) {
         }
     } else {
         DWCUtilSound_PlaySe(0x13);
-        sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
+        sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollUpTask, NULL, 0x78);
     }
 }
 
 // Scrolls the list down by a row
-static void DWCUtilPageApList_ScrollDown(void) {
+static void scrollDown(void) {
     if (sApListPos.scroll == sApList->scrollMax || sApList->count <= AP_LIST_ROWS) {
         if (!sApList->atEnd) {
             DWCUtilSound_PlaySe(9);
@@ -703,7 +701,7 @@ static void DWCUtilPageApList_ScrollDown(void) {
         }
     } else {
         DWCUtilSound_PlaySe(0x13);
-        sApList->scrollTask = DWCUtilTask_Create(0, DWCUtilPageApList_ScrollDownTask, NULL, 0x78);
+        sApList->scrollTask = DWCi_TSKlForm(0, DWCUtilPageApList_ScrollDownTask, NULL, 0x78);
     }
 }
 
@@ -711,21 +709,21 @@ static void DWCUtilPageApList_ScrollDown(void) {
 static void DWCUtilPageApList_HighlightButton(void) {
     u8 rows[] = { 2 };
 
-    DWCUtilBgBuffer_LoadPaletteRow(sApList->palette, rows[0], rows[0]);
+    DWCi_SCREENlCopyPalette(sApList->palette, rows[0], rows[0]);
 }
 
 static void DWCUtilPageApList_WaitDialog(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilPageApList_WaitDialogClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(DWCUtilPageApList_WaitDialogClosed);
     }
 }
 
 static void DWCUtilPageApList_WaitDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilUiObject_Enable();
-        DWCUtilScrollbar_Unlock();
-        DWCUtilMain_SetUpdate(DWCUtilPageApList_Main);
+    if (!DWCi_WINlIsInit()) {
+        DWCi_BTNlEnable();
+        DWCi_SBlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }

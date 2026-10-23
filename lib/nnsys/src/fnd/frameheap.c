@@ -2,87 +2,90 @@
 #include "nnsys/fnd.h"
 
 // NitroSystem's frame heaps (NNS_Fnd). Allocating moves one pointer up from the bottom or another down from the top;
-// nothing is freed on its own, only everything from one end, or everything since a recorded state. swan calls none
-// of them by name. Their two allocators would share expheap.c's static names, so here they say which heap they serve
+// nothing is freed on its own, only everything from one end, or everything since a recorded state. swan names only
+// InitFrameHeap, as InitHeapBaseFRMH. AllocFromHead and AllocFromTail have the names of expheap.c's statics, as they do
+// in NitroSystem
 
-#define FRMHEAP_SIGNATURE 0x46524D48 // 'FRMH'
+#define NNSI_FRMHEAP_SIGNATURE 0x46524D48 // 'FRMH'
 
 // The heap needs room for its heads
-#define MIN_HEAP_SIZE (sizeof(NNSiFndHeapHead) + sizeof(NNSiFndFrameHeap))
+#define MIN_HEAP_SIZE (sizeof(NNSiFndHeapHead) + sizeof(NNSiFndFrmHeapHead))
 
 static NNSiFndHeapHead *InitFrameHeap(void *start, void *end, u16 optFlag);
-static void *AllocFromHeadForFrmHeap(NNSiFndFrameHeap *frmHeap, u32 size, int alignment);
-static void *AllocFromTailForFrmHeap(NNSiFndFrameHeap *frmHeap, u32 size, int alignment);
-static void FrameHeapReleaseLow(NNSiFndHeapHead *heap);
-static void FrameHeapReleaseHigh(NNSiFndHeapHead *heap);
+static void *AllocFromHead(NNSiFndFrmHeapHead *frmHeap, u32 size, int alignment);
+static void *AllocFromTail(NNSiFndFrmHeapHead *frmHeap, u32 size, int alignment);
+static void FreeHead(NNSiFndHeapHead *heap);
+static void FreeTail(NNSiFndHeapHead *heap);
 
 // The frame heap's own head, just after the common one
-static inline NNSiFndFrameHeap *FrmHeapOf(NNSiFndHeapHead *heap) {
-    return (NNSiFndFrameHeap *)(AddrOf(heap) + sizeof(NNSiFndHeapHead));
+static inline NNSiFndFrmHeapHead *GetFrmHeapHeadPtrFromHeapHead(NNSiFndHeapHead *heap) {
+    return (NNSiFndFrmHeapHead *)(NNSiGetUIntPtr(heap) + sizeof(NNSiFndHeapHead));
 }
 
-static inline NNSiFndHeapHead *HeapOf(NNSiFndFrameHeap *frmHeap) {
-    return (NNSiFndHeapHead *)(AddrOf(frmHeap) - sizeof(NNSiFndHeapHead));
+static inline NNSiFndHeapHead *GetHeapHeadPtrFromFrmHeapHead(NNSiFndFrmHeapHead *frmHeap) {
+    return (NNSiFndHeapHead *)(NNSiGetUIntPtr(frmHeap) - sizeof(NNSiFndHeapHead));
 }
 
 static NNSiFndHeapHead *InitFrameHeap(void *start, void *end, u16 optFlag) {
     NNSiFndHeapHead *heap = start;
-    NNSiFndFrameHeap *frmHeap = FrmHeapOf(heap);
+    NNSiFndFrmHeapHead *frmHeap = GetFrmHeapHeadPtrFromHeapHead(heap);
 
-    NNSi_FndInitHeapHead(heap, FRMHEAP_SIGNATURE, (void *)(AddrOf(frmHeap) + sizeof(NNSiFndFrameHeap)), end, optFlag);
-    frmHeap->low = heap->heapStart;
-    frmHeap->high = heap->heapEnd;
-    frmHeap->lastMark = NULL;
+    NNSi_FndInitHeapHead(heap, NNSI_FRMHEAP_SIGNATURE, (void *)(NNSiGetUIntPtr(frmHeap) + sizeof(NNSiFndFrmHeapHead)),
+                         end, optFlag);
+    frmHeap->headAllocator = heap->heapStart;
+    frmHeap->tailAllocator = heap->heapEnd;
+    frmHeap->pState = NULL;
     return heap;
 }
 
-static void *AllocFromHeadForFrmHeap(NNSiFndFrameHeap *frmHeap, u32 size, int alignment) {
-    void *block = (void *)((AddrOf(frmHeap->low) + (alignment - 1)) & ~(alignment - 1));
-    void *newHead = (void *)(AddrOf(block) + size);
+static void *AllocFromHead(NNSiFndFrmHeapHead *frmHeap, u32 size, int alignment) {
+    void *block = (void *)((NNSiGetUIntPtr(frmHeap->headAllocator) + (alignment - 1)) & ~(alignment - 1));
+    void *newHead = (void *)(NNSiGetUIntPtr(block) + size);
 
-    if (AddrOf(newHead) > AddrOf(frmHeap->high)) {
+    if (NNSiGetUIntPtr(newHead) > NNSiGetUIntPtr(frmHeap->tailAllocator)) {
         return NULL;
     }
-    FillAllocMemory(HeapOf(frmHeap), frmHeap->low, BytesBetween(frmHeap->low, newHead));
-    frmHeap->low = newHead;
+    FillAllocMemory(GetHeapHeadPtrFromFrmHeapHead(frmHeap), frmHeap->headAllocator,
+                    GetOffsetFromPtr(frmHeap->headAllocator, newHead));
+    frmHeap->headAllocator = newHead;
     return block;
 }
 
-static void *AllocFromTailForFrmHeap(NNSiFndFrameHeap *frmHeap, u32 size, int alignment) {
-    void *block = (void *)((AddrOf(frmHeap->high) - size) & ~(alignment - 1));
+static void *AllocFromTail(NNSiFndFrmHeapHead *frmHeap, u32 size, int alignment) {
+    void *block = (void *)((NNSiGetUIntPtr(frmHeap->tailAllocator) - size) & ~(alignment - 1));
 
-    if (AddrOf(block) < AddrOf(frmHeap->low)) {
+    if (NNSiGetUIntPtr(block) < NNSiGetUIntPtr(frmHeap->headAllocator)) {
         return NULL;
     }
-    FillAllocMemory(HeapOf(frmHeap), block, BytesBetween(block, frmHeap->high));
-    frmHeap->high = block;
+    FillAllocMemory(GetHeapHeadPtrFromFrmHeapHead(frmHeap), block, GetOffsetFromPtr(block, frmHeap->tailAllocator));
+    frmHeap->tailAllocator = block;
     return block;
 }
 
 // Frees everything taken from the bottom, and forgets the recorded states, which lived there
-static void FrameHeapReleaseLow(NNSiFndHeapHead *heap) {
-    NNSiFndFrameHeap *frmHeap = FrmHeapOf(heap);
+static void FreeHead(NNSiFndHeapHead *heap) {
+    NNSiFndFrmHeapHead *frmHeap = GetFrmHeapHeadPtrFromHeapHead(heap);
 
-    frmHeap->low = heap->heapStart;
-    frmHeap->lastMark = NULL;
+    frmHeap->headAllocator = heap->heapStart;
+    frmHeap->pState = NULL;
 }
 
 // Frees everything taken from the top, in the recorded states as well
-static void FrameHeapReleaseHigh(NNSiFndHeapHead *heap) {
-    NNSiFndFrameHeap *frmHeap = FrmHeapOf(heap);
-    NNSiFndFrameHeapMark *state;
+static void FreeTail(NNSiFndHeapHead *heap) {
+    NNSiFndFrmHeapHead *frmHeap = GetFrmHeapHeadPtrFromHeapHead(heap);
+    NNSiFndFrmHeapState *state;
 
-    for (state = frmHeap->lastMark; state != NULL; state = state->prev) {
-        state->high = heap->heapEnd;
+    for (state = frmHeap->pState; state != NULL; state = state->pPrevState) {
+        state->tailAllocator = heap->heapEnd;
     }
-    frmHeap->high = heap->heapEnd;
+    frmHeap->tailAllocator = heap->heapEnd;
 }
 
 NNSFndHeapHandle NNS_FndCreateFrmHeapEx(void *startAddress, u32 size, u16 optFlag) {
-    void *end = (void *)((AddrOf(startAddress) + size) & ~3);
+    void *end = (void *)((NNSiGetUIntPtr(startAddress) + size) & ~3);
 
-    startAddress = (void *)((AddrOf(startAddress) + 3) & ~3);
-    if (AddrOf(startAddress) > AddrOf(end) || BytesBetween(startAddress, end) < MIN_HEAP_SIZE) {
+    startAddress = (void *)((NNSiGetUIntPtr(startAddress) + 3) & ~3);
+    if (NNSiGetUIntPtr(startAddress) > NNSiGetUIntPtr(end) || GetOffsetFromPtr(startAddress, end) < MIN_HEAP_SIZE) {
         return NULL;
     }
     return InitFrameHeap(startAddress, end, optFlag);
@@ -94,56 +97,56 @@ void NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap) {
 
 // A negative alignment takes the block from the top
 void *NNS_FndAllocFromFrmHeapEx(NNSFndHeapHandle heap, u32 size, int alignment) {
-    NNSiFndFrameHeap *frmHeap = FrmHeapOf(heap);
+    NNSiFndFrmHeapHead *frmHeap = GetFrmHeapHeadPtrFromHeapHead(heap);
 
     if (size == 0) {
         size = 1;
     }
     size = (size + 3) & ~3;
     if (alignment >= 0) {
-        return AllocFromHeadForFrmHeap(frmHeap, size, alignment);
+        return AllocFromHead(frmHeap, size, alignment);
     } else {
-        return AllocFromTailForFrmHeap(frmHeap, size, -alignment);
+        return AllocFromTail(frmHeap, size, -alignment);
     }
 }
 
-// mode is a set of NNS_FND_FRMHEAP_RELEASE_* ends to free
+// mode is a set of NNS_FND_FRMHEAP_FREE_* ends to free
 void NNS_FndFreeToFrmHeap(NNSFndHeapHandle heap, int mode) {
-    if (mode & NNS_FND_FRMHEAP_RELEASE_LOW) {
-        FrameHeapReleaseLow(heap);
+    if (mode & NNS_FND_FRMHEAP_FREE_HEAD) {
+        FreeHead(heap);
     }
-    if (mode & NNS_FND_FRMHEAP_RELEASE_HIGH) {
-        FrameHeapReleaseHigh(heap);
+    if (mode & NNS_FND_FRMHEAP_FREE_TAIL) {
+        FreeTail(heap);
     }
 }
 
 // Saves both pointers under tag, in a record taken from the bottom of the heap. Returns FALSE when there's no
 // room for it
 BOOL NNS_FndRecordStateForFrmHeap(NNSFndHeapHandle heap, u32 tag) {
-    NNSiFndFrameHeap *frmHeap = FrmHeapOf(heap);
-    void *headBefore = frmHeap->low;
-    NNSiFndFrameHeapMark *record = AllocFromHeadForFrmHeap(frmHeap, sizeof(NNSiFndFrameHeapMark), 4);
+    NNSiFndFrmHeapHead *frmHeap = GetFrmHeapHeadPtrFromHeapHead(heap);
+    void *headBefore = frmHeap->headAllocator;
+    NNSiFndFrmHeapState *record = AllocFromHead(frmHeap, sizeof(NNSiFndFrmHeapState), 4);
 
     if (record == NULL) {
         return FALSE;
     }
-    record->tag = tag;
-    record->low = headBefore;
-    record->high = frmHeap->high;
-    record->prev = frmHeap->lastMark;
-    frmHeap->lastMark = record;
+    record->tagName = tag;
+    record->headAllocator = headBefore;
+    record->tailAllocator = frmHeap->tailAllocator;
+    record->pPrevState = frmHeap->pState;
+    frmHeap->pState = record;
     return TRUE;
 }
 
 // Goes back to the state saved under tag, or to the latest one when tag is 0. Returns FALSE when there's no
 // such state
 BOOL NNS_FndFreeByStateToFrmHeap(NNSFndHeapHandle heap, u32 tag) {
-    NNSiFndFrameHeap *frmHeap = FrmHeapOf(heap);
-    NNSiFndFrameHeapMark *record = frmHeap->lastMark;
+    NNSiFndFrmHeapHead *frmHeap = GetFrmHeapHeadPtrFromHeapHead(heap);
+    NNSiFndFrmHeapState *record = frmHeap->pState;
 
     if (tag != 0) {
-        for (; record != NULL; record = record->prev) {
-            if (record->tag == tag) {
+        for (; record != NULL; record = record->pPrevState) {
+            if (record->tagName == tag) {
                 break;
             }
         }
@@ -151,8 +154,8 @@ BOOL NNS_FndFreeByStateToFrmHeap(NNSFndHeapHandle heap, u32 tag) {
     if (record == NULL) {
         return FALSE;
     }
-    frmHeap->low = record->low;
-    frmHeap->high = record->high;
-    frmHeap->lastMark = record->prev;
+    frmHeap->headAllocator = record->headAllocator;
+    frmHeap->tailAllocator = record->tailAllocator;
+    frmHeap->pState = record->pPrevState;
     return TRUE;
 }

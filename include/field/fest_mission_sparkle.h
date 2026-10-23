@@ -29,7 +29,7 @@ typedef struct {
     u8 placeIndex[FEST_SPARKLE_MAX];
     // What a sparkle gives, passed to the script that finds it
     u16 values[FEST_SPARKLE_MAX];
-    s32 zoneCount;
+    int zoneCount;
     FestSparkleZone zones[6];
 } FestSparkleWork;
 

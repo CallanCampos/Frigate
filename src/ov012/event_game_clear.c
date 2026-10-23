@@ -230,7 +230,7 @@ void SetGameClearStaffRollParam(GameClearWork *work) {
 }
 
 void SetGameClearStatusSequence(GameClearWork *work) {
-    u32 index = 0;
+    unsigned int index = 0;
 
     work->states[1] = 2;
     work->states[2] = 3;

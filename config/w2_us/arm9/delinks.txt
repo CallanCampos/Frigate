@@ -917,6 +917,7 @@ lib/nnsys/src/g2d/g2d_OamSoftwareSpriteDraw.c:
     .bss        start:0x02143a2c end:0x02143a38
 
 lib/nnsys/src/g2d/g2d_RendererCore.c:
+    complete
     .text       start:0x02063194 end:0x02063b5c
     .rodata     start:0x02094398 end:0x020943b0
     .bss        start:0x02143a48 end:0x02143a4c
@@ -1098,6 +1099,7 @@ lib/nnsys/src/g3d/basic.c:
     .text       start:0x02069f6c end:0x02069fe8
 
 lib/nnsys/src/g3d/maya.c:
+    complete
     .text       start:0x02069fe8 end:0x0206a740
     .data       start:0x0209b4e0 end:0x0209b500
 
@@ -2064,6 +2066,7 @@ lib/nitro/src/os/os_printf.c:
     .text       start:0x0207a2bc end:0x0207a310
 
 lib/nitro/src/os/os_thread.c:
+    complete
     .text       start:0x0207a310 end:0x0207ab30
     .bss        start:0x0214c250 end:0x0214c4c4
 
@@ -2524,7 +2527,8 @@ lib/msl/src/extras_string.c:
     complete
     .text       start:0x0208c1d8 end:0x0208c250
 
-lib/msl/src/fp/fp_fastI.c:
+lib/msl/src/fp/fp_fastI.s:
+    complete
     .text       start:0x0208c250 end:0x0208ed0c
 
 lib/msl/src/runtime/register_atexit.c:

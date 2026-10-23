@@ -200,8 +200,8 @@ static BOOL PMSSelect_Init(GameProc *proc, u32 *state, void *param, void *work) 
     PMSSelectParam *selectParam = param;
 
     GFL_OvlLoad(OVERLAY_APP_UI);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_HeapCreateChild(HEAPID_USER, HEAPID_PMS_SELECT, 0x1c000);
     wk = GFL_ProcInitSubsystem(proc, sizeof(PMSSelectWork), HEAPID_PMS_SELECT);
     MI_CpuFill8(wk, 0, sizeof(PMSSelectWork));
@@ -463,8 +463,8 @@ static void PMSSelect_BGUnload(PMSSelectBG *bg) {
 static void PMSSelect_BGDrawPlate(PMSSelectBG *bg, u8 line, u32 palette, BOOL active) {
     int i;
     NNSG2dScreenData *screen = bg->screen;
-    int width = screen->width / 8;
-    int height = screen->height / 8;
+    int width = screen->screenWidth / 8;
+    int height = screen->screenHeight / 8;
     u16 *entries = (u16 *)screen->rawData;
 
     if (active) {
@@ -528,8 +528,8 @@ static void PMSSelect_BGResetPlateFade(PMSSelectBG *bg) {
 static void PMSSelect_BGDrawPlateEdge(PMSSelectBG *bg, u32 palette) {
     int i;
     NNSG2dScreenData *screen = bg->screen;
-    int width = screen->width / 8;
-    int height = screen->height / 8;
+    int width = screen->screenWidth / 8;
+    int height = screen->screenHeight / 8;
     u16 *entries = (u16 *)screen->rawData;
 
     for (i = 0; i < width * height; i++) {

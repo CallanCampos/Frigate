@@ -211,7 +211,7 @@ void PMSWordSave_SetLanguageFlag(PMSWordSave *save, u32 bit) {
 }
 
 BOOL PMSWord_AreEquivalent(u16 word, u16 other) {
-    u32 i;
+    unsigned int i;
     int j;
     int k;
 

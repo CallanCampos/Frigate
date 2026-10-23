@@ -634,7 +634,7 @@ static void TestDispStatGatesBlanks(void) {
 
     OS_SetIrqFunction(OS_IE_V_COUNT, VCountHandler);
     OS_EnableIrqMask(OS_IE_V_COUNT);
-    reg_GX_DISPSTAT = REG_GX_DISPSTAT_VBI_MASK | REG_GX_DISPSTAT_VCI_MASK | (100 << 8);
+    reg_GX_DISPSTAT = REG_GX_DISPSTAT_VBI_MASK | REG_GX_DISPSTAT_VQI_MASK | (100 << 8);
     OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     Log("main frame %u", port_os_frame());
     EXPECT_LOG("vblank 1 (irq mode 1, line 192)", "HBlank on in IE only: 0 hblanks",
@@ -1066,8 +1066,8 @@ static void TestArenas(void) {
         (int)((uintptr_t)OS_GetArenaLo(OS_ARENA_MAIN) - lo));
     Log("too large: %d", OS_AllocFromArenaLo(OS_ARENA_ITCM, 1u << 30, 4) == NULL);
     OS_SetIrqStackChecker();
-    Log("IRQ stack magic at 0x3f7c %d, at 0x3780 %d", *(const u32 *)(dtcm + 0x3f7c) == OS_STACK_BEGIN_MAGIC,
-        *(const u32 *)(dtcm + 0x3780) == OS_STACK_END_MAGIC);
+    Log("IRQ stack magic at 0x3f7c %d, at 0x3780 %d", *(const u32 *)(dtcm + 0x3f7c) == OSi_STACK_CHECKNUM_BOTTOM,
+        *(const u32 *)(dtcm + 0x3780) == OSi_STACK_CHECKNUM_TOP);
     EXPECT_LOG("main arena 4x the DS's 1, aligned 1", "ITCM arena 4x the DS's 1",
                "DTCM arena from 0xc0 to 0x1f80 of DTCM", "extended arena 1 1", "allocated at lo 1, lo moved by 128",
                "too large: 1", "IRQ stack magic at 0x3f7c 1, at 0x3780 1");
@@ -1324,7 +1324,7 @@ static void TestWaitVCount0(void) {
 
 // OS_InitVAlarm starts each run with an empty queue: the first run leaves an alarm set for line 100, the second sets
 // one for line 50 and waits a frame, and only the second's fires
-static OSVAlarm sVAlarms[2];
+static OSiVAlarm sVAlarms[2];
 
 static void LoggingVAlarm(void *arg) {
     Log("valarm %s at line %u", (const char *)arg, port_os_vcount());
@@ -1355,19 +1355,19 @@ static void TestWcmWorkspace(void) {
 
     Boot(VBlankHandler);
     memset(workspace, 0x5a, sizeof(workspace));
-    Check(DWC_Wcm_Start(NULL, NULL, 0) == FALSE, "DWC rejects a missing workspace");
-    Check(DWC_Wcm_Start(NULL, workspace, 32) == FALSE, "DWC rejects a workspace smaller than its partition");
+    Check(APC_Init(NULL, NULL, 0) == FALSE, "DWC rejects a missing workspace");
+    Check(APC_Init(NULL, workspace, 32) == FALSE, "DWC rejects a workspace smaller than its partition");
     for (size_t i = 0; i < sizeof(workspace); i++) {
         Check(workspace[i] == 0x5a, "DWC does not write outside an invalid workspace");
     }
     Check(WCM_Init(workspace, -1) == 6, "WCM rejects a negative count before clearing memory");
     Check(workspace[0] == 0x5a, "the negative count leaves the buffer alone");
     Check(WCM_Init(workspace, PORT_WCM_DS_WORK_SIZE - 32) == 6, "WCM enforces the native DS backend extent");
-    Check(WCM_GetWork() == NULL, "a short workspace is not installed");
+    Check(WCMi_GetSystemWork() == NULL, "a short workspace is not installed");
     result = WCM_Init(workspace, PORT_WCM_DS_WORK_SIZE);
     Check(result == 0, "the native workspace initializes");
     if (result == 0) {
-        WCMWork *work = WCM_GetWork();
+        WCMWork *work = WCMi_GetSystemWork();
 
         Check(work == (WCMWork *)workspace, "WCM retains the complete workspace address");
         work->scanCount = 0x12345678;

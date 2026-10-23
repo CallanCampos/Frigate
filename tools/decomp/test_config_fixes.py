@@ -21,7 +21,7 @@ class FakeMapper:
                           (MODULE, 0x5010, "w2_us"): 0x6010}
         self.error = None
 
-    def map(self, module, addr, version):
+    def map(self, module, addr, version, section=None):
         self.calls.append((module, addr, version))
         if self.error:
             raise SystemExit(self.error)
@@ -216,7 +216,7 @@ class OrphanRelocationTests(ConfigFixFixture):
         self.assertEqual(self.mapper.calls, [(".", SOURCE, "w2_us")])
 
     def test_add_reloc_source_mapping_failure_after_destination_map_prevents_primary_mutation(self):
-        def mapping(module, addr, version):
+        def mapping(module, addr, version, section=None):
             if module == MODULE:
                 raise SystemExit("source mapping failed")
             return MAPPED
@@ -263,6 +263,33 @@ class OrphanRelocationTests(ConfigFixFixture):
         after = self.snapshot()
         fixes.apply_everywhere(self.mapper, MODULE, 0x5010, "add_label", "alias")
         self.assertEqual(self.snapshot(), after)
+
+    def test_remove_label_drops_only_that_label_in_both_versions(self):
+        for version, addr in [("b2_us", 0x5010), ("w2_us", 0x6010)]:
+            path = fixes.config_dir(version, MODULE) / "symbols.txt"
+            path.write_text(f"function kind:function(thumb,size=0x10) addr:{addr:#010x}\n"
+                            f"alias kind:label(thumb) addr:{addr:#010x}\n"
+                            f"other kind:label(thumb) addr:{addr:#010x}\n")
+        fixes.apply_everywhere(self.mapper, MODULE, 0x5010, "remove_label", "alias")
+        for version, addr in [("b2_us", 0x5010), ("w2_us", 0x6010)]:
+            path = fixes.config_dir(version, MODULE) / "symbols.txt"
+            self.assertEqual(path.read_text(),
+                             f"function kind:function(thumb,size=0x10) addr:{addr:#010x}\n"
+                             f"other kind:label(thumb) addr:{addr:#010x}\n")
+        after = self.snapshot()
+        fixes.apply_everywhere(self.mapper, MODULE, 0x5010, "remove_label", "alias")
+        self.assertEqual(self.snapshot(), after)
+
+    def test_cli_remove_label_drops_the_recorded_add_label(self):
+        for version, addr in [("b2_us", 0x5010), ("w2_us", 0x6010)]:
+            path = fixes.config_dir(version, MODULE) / "symbols.txt"
+            path.write_text(f"function kind:function(thumb,size=0x10) addr:{addr:#010x}\n")
+        self.cli("add-label", MODULE, "alias", "0x5010")
+        self.assertIn((MODULE, 0x5010, "add_label", "alias"), fixes.load_fixes())
+        self.cli("remove-label", MODULE, "alias", "0x5010")
+        self.assertEqual(fixes.load_fixes(), [])
+        path = fixes.config_dir("b2_us", MODULE) / "symbols.txt"
+        self.assertEqual(path.read_text(), "function kind:function(thumb,size=0x10) addr:0x00005010\n")
 
     def test_planning_text_transforms_never_writes_and_wrapper_preserves_output(self):
         symbol = "item kind:data(any) addr:0x00005010\n"

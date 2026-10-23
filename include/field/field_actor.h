@@ -388,9 +388,9 @@ void SpawnAllZoneNPCs(MMSys *mmSys, ZoneNPC *npcs, s32 zoneId, u32 count, EventW
 
 BOOL FldAct_CheckAcmdEnd(FieldActor *actor);
 void *FldActMatColorPreset_Create(HeapID heapId);
-void FldActMatColorPreset_Free(void *preset);
-void FldActMatColorPreset_Load(void *preset, u32 presetId);
-void FldActMatColorPreset_Apply(void *preset, BlActScene *scene);
+void FldActMatColorPreset_Free(FldActMatColorPreset *preset);
+void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId);
+void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene);
 void FldActSys_AttachField(MMSys *system, HeapID heapId, GameData *gameData, Field *field, FieldG3DMapper *mapper,
                            NoGridMapper *noGridMapper, void *colorPostFx);
 void FldActSys_InitBlAct(MMSys *system, BlActSys *blAct, u32 count);

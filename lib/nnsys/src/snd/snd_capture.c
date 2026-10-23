@@ -2,45 +2,44 @@
 #include "nitro/os.h"
 #include "snd_internal.h"
 
-// NitroSystem's capture (NNSi_SndCapture), which records the mixer's output into a buffer and plays it back on
-// channels of its own, for reverb and effects. Only what the sound library's main loop and sleep callbacks call is
-// left in the game; the functions that start a capture were stripped. The file name is a guess, from NitroSystem's
-// names for its sound files
+// NitroSystem's capture (NNSi_SndCapture), which records the mixer's output into a buffer and plays it back on channels
+// of its own, for reverb and effects. Only what the sound library's main loop and sleep callbacks call is left in the
+// game; the functions that start a capture were stripped. The SDK's file is capture.c, and the names are NitroSystem's,
+// as ntrtwl's reconstruction of NitroSystem has them, except sCaptureReserved and sCaptureThreadFlag, which are ours
 
-#define CAPTURE_MSG_NUM 8
+#define THREAD_MESSAGE_BUF_SIZE 8
 
-static void StopCapture(void);
+static void NNSi_SndCaptureStop(void);
 
 // MWCC lays these out in reverse order of declaration: the flag first and the capture last. sCaptureReserved and
-// sCaptureMsgBuf were used only by the functions that start a capture, which the linker dropped, so their names
-// are guesses
-static NNSiSndCaptureInfo sCaptureInfo;
-static OSMessage sCaptureMsgBuf[CAPTURE_MSG_NUM];
-static OSMessageQueue sMsgQ;
+// sMesgBuf were used only by the functions that start a capture, which the linker dropped
+static CaptureParam sCapParam;
+static OSMessage sMesgBuf[THREAD_MESSAGE_BUF_SIZE];
+static OSMessageQueue sMesgQ;
 static u32 sCaptureReserved;
 static BOOL sCaptureThreadFlag;
 
 void NNSi_SndCaptureInit(void) {
     sCaptureThreadFlag = FALSE;
-    sCaptureInfo.active = FALSE;
+    sCapParam.active = FALSE;
 }
 
 void NNSi_SndCaptureMain(void) {
-    NNSiSndCaptureInfo *info = &sCaptureInfo;
+    CaptureParam *info = &sCapParam;
     NNSSndFader *fader;
     int volume;
 
     if (!info->active) {
         return;
     }
-    if (info->type != NNSi_SND_CAPTURE_TYPE_REVERB) {
+    if (info->type != NNS_SND_CAPTURE_TYPE_REVERB) {
         return;
     }
 
     fader = &info->fader;
     NNSi_SndFaderUpdate(fader);
     if (info->fadeStopFlag && NNSi_SndFaderIsFinished(fader)) {
-        StopCapture();
+        NNSi_SndCaptureStop();
         return;
     }
 
@@ -51,8 +50,8 @@ void NNSi_SndCaptureMain(void) {
     }
 }
 
-static void StopCapture(void) {
-    NNSiSndCaptureInfo *info = &sCaptureInfo;
+static void NNSi_SndCaptureStop(void) {
+    CaptureParam *info = &sCapParam;
     BOOL alarmFlag;
     u32 tag;
 
@@ -66,7 +65,7 @@ static void StopCapture(void) {
         tag = SND_GetCurrentCommandTag();
         SND_FlushCommand(SND_COMMAND_BLOCK);
         SND_WaitForCommandProc(tag);
-        while (OS_ReceiveMessage(&sMsgQ, NULL, OS_MESSAGE_NOBLOCK)) {
+        while (OS_ReceiveMessage(&sMesgQ, NULL, OS_MESSAGE_NOBLOCK)) {
         }
     }
 
@@ -77,16 +76,16 @@ static void StopCapture(void) {
         NNS_SndUnlockChannel(info->lockChBitFlag);
     }
     if (alarmFlag) {
-        NNSi_SndFreeAlarm(info->alarmNo);
+        NNS_SndFreeAlarm(info->alarmNo);
     }
-    if (info->type == NNSi_SND_CAPTURE_TYPE_EFFECT) {
+    if (info->type == NNS_SND_CAPTURE_TYPE_EFFECT) {
         SND_SetOutputSelector(0, 0, 0, 0);
     }
     info->active = FALSE;
 }
 
 void NNSi_SndCaptureBeginSleep(void) {
-    NNSiSndCaptureInfo *info = &sCaptureInfo;
+    CaptureParam *info = &sCapParam;
     u32 tag;
 
     if (!info->active) {
@@ -100,7 +99,7 @@ void NNSi_SndCaptureBeginSleep(void) {
 }
 
 void NNSi_SndCaptureEndSleep(void) {
-    NNSiSndCaptureInfo *info = &sCaptureInfo;
+    CaptureParam *info = &sCapParam;
 
     if (!info->active) {
         return;

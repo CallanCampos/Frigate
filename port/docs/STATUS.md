@@ -2,7 +2,7 @@
 
 Where the port stands, newest entry first. A session adds an entry after each local sync with
 `port/tools/sync_upstream.sh` and each finished task ([PLAN.md §8](PLAN.md#8-how-each-development-iteration-runs)), in
-the same commit as the work it records; the hourly `port-sync` Action's merges get no entry of their own
+the same commit as the work it records; a proposed hourly `port-sync` PR gets no completed-sync entry
 ([SYNC.md](SYNC.md)). The plan of record is [PLAN.md](PLAN.md); every change outside `port/` is in
 [game-changes.md](game-changes.md).
 
@@ -26,6 +26,68 @@ level that doesn't exist yet says "not yet"; no field is left out.
 | Next | The next task: the earliest unmet exit criterion of the current phase that the decomp allows |
 | Blockers | What waits on upstream or on a decision, with issue numbers |
 
+## 2026-10-22: prepared upstream SDK sync (owner review pending)
+
+- **Upstream:** `d4a30c66b066b2d231c7e9fd5aa83b3daca157c2`, a frozen proposal of 110 commits after
+  `fc478a9ee5`. This entry records preparation; the sync has not merged into Frigate main.
+- **Port:** [PR 10](https://github.com/CallanCampos/Frigate/pull/10), topic `codex/upstream-sync-resolve`: resolved
+  upstream merge `bde1702ad1`, native follow-ups `fef44d52dc` and `d307558232`, and reviewed-main integration
+  `be0a08a14f` and `efe30f24c8` (main `297e28d37c`). The final two upstream commits are imported by
+  real merge `8c314b0f4c`, preserving both upstream parents and trailers.
+- **ROM:** exact-head T0 validation remains pending. Both ROM SHA1s are required by PR 10's
+  `Frigate local verification` status; its checks and description record the final exact-head results. No checksum or
+  decomp configuration was changed to accommodate the port.
+- **MWCC-neutrality:** the historical `03674114e` proof covered 1,779 C files in both versions (3,558
+  file/version comparisons). The sweep passed 3,554; its four stale samples of `friend.c` and `dwcutil_ac.c` were
+  cleared by a final 8/8 targeted rerun that also covered `vm.c` and `os_thread.c`. The later expheap change passes
+  2/2. The final two-commit extension replaces one excluded MSL C file with upstream's unchanged assembly source;
+  the only other MSL header change is a comment. There are now 1,778 C files and one library assembly source.
+  Main's reviewed PR 7 changes three pointer-cast-only files, rechecked against `d4a30c66b` in both versions (6/6), and a
+  complete trade module whose added cast token relies on PR 7's object comparison and final ROM checks, rather than
+  token identity. This is not a claim that all final C files have identical token streams.
+  Evidence: `/tmp/frigate-sync-neutral.log`, `/tmp/frigate-sync-neutral-final-targets.log`,
+  `/tmp/frigate-sync-neutral-expheap.log` and `/tmp/frigate-sync-neutral-pr7-final.log`.
+- **Host build:** preliminary T1 passes on macOS arm64 for Black 2 (`build/port`) and White 2 (`build/port-w2`), in
+  `/tmp/frigate-sync-host6.log` and `/tmp/frigate-sync-host-w2.log`. These precede the final follow-ups; both versions'
+  final builds and T2/T3/T6 suites remain required by exact-head local verification. The previous `f2fb61a30a`
+  verifier passed both ROM SHA1s and its Black 2 build; its suite completed with 284 passes and 18 skips. It stopped
+  after Black 2 to integrate reviewed main and the final two upstream commits before repeating the exact-head gate.
+- **Tests:** NNS serialized-layout checks pass. The expheap query regression fails with the old address locals and
+  passes with native-width locals, including ASan/UBSan. Hosted Linux function-sanitizer reports identified three
+  native PXI callbacks whose tag parameter did not match `PXIFifoTag`; all three now use the exact SDK signature and
+  pass focused native type checks. Hosted CI is rerun on the updated proposal. The first local Black 2 non-timing
+  suite was interrupted under heavy build contention; four routes expired their watchdog while hashing the ROM,
+  before game startup. Final-head complete serial suites remain pending; no gameplay pass is claimed from that
+  interrupted run. Full optional T4, local T5 routes and T7 were not run.
+- **Tiers:** per version, a 37,546 functions (+396), b 3,472 (-396), c zero. Code bytes: Black 2 a 3,435,848,
+  White 2 a 3,435,936 (+66,714 each), and b 414,418 (-66,714 each). Excluded veneers remain 2,384; included SDK
+  assembly definitions total 225 (+1): 178 inline-assembly flags and 47 functions now owned by MSL's `.s` file.
+  The representation change is not native C progress. No-build evidence:
+  `/tmp/frigate-sync-progress-final/{b2_us,w2_us}/functions.tsv`.
+  Source coverage does not establish native gameplay readiness.
+- **Trap stubs:** unchanged: 31 function traps and 22 data placeholders per version in the generated native sources.
+- **64-bit warnings:** final normalized all-TU measurement pending; native compiler warnings remain visible in the
+  build logs.
+- **Work done:** resolved 27 upstream merge conflicts and adopted SDK function, enum, member and prototype names in
+  the HAL and its regression tests. Native `u32`/`s32` remain 32-bit while MWCC keeps upstream's SDK `long` types.
+  Preserved pointer-wide callbacks, address arithmetic, sound handles, native heap extents and DS-layout checks.
+  Retired the obsolete RTC/misc-save long overrides, opaque SOC-option array override and duplicate trainer-card
+  parameter fix because upstream now supplies the correct shared types. Added a native implementation of the newly
+  recovered assembly thread-availability getter; DWC auth callbacks retain the native 32-bit ABI. The host-header
+  generator excludes upstream's new MSL `time.h`, leaving native libc in use. Byte-sized `MI_CpuFill8` follows
+  upstream's prototype, widens before its high-half shift and gains a high-bit byte regression. The separate
+  word-valued `MI_CpuFill` retains its high-bit regression cases. The expheap query retains native address ordering
+  across a 4 GiB boundary; all byte counts stay 32-bit. MSL's hand-written runtime is assembled by upstream's
+  versioned assembler for ROMs and remains replaced by native libc/libm. Required-check documentation now records
+  GitHub's workflow-name limitation and requires the exact-head local status's maintainer creator to be inspected.
+- **Next:** complete PR 10's exact-head ROM/native gate and normalized warning measurement, then obtain the owner's
+  explicit review before any main merge. The App publisher is configured and verified; automatic CI is validation,
+  not owner approval. Issue 6 remains open until the sync is verified and resolved through review.
+- **Blockers:** final validation and human review pending. No upstream rewrite, cross-repository commit references
+  or upstream workflow commits occur in this proposal. The upstream target is frozen at `d4a30c66b`. No upstream post
+  was made, and the existing field-entry heap blocker is unchanged. The conflict-marker-looking line in upstream's `docs/nonmatching-functions.md:74` is byte-identical
+  to the pinned upstream file; it is preserved and excluded only from the aggregate imported diff-marker check.
+
 ## 2026-10-22: automatic sync PR CI and dedicated App
 
 - **Upstream:** `fc478a9ee5`; no new decomp sync or game change.
@@ -41,9 +103,12 @@ level that doesn't exist yet says "not yet"; no field is left out.
   review rule disables last-push approval to avoid the sole owner's update/review deadlock, retaining stale-review
   dismissal, owner code review, required checks and local verification. App setup stays in [SYNC.md](SYNC.md); App `5435198` is installed only on Frigate, with its two write scopes
   verified and a trial token revoked. Its variable/secret are configured and default-token PR creation/approval is off.
-- **Next:** validate and merge the App publisher PR, then test a bounded sync proposal with automatic hosted CI.
-- **Blockers:** live App publishing awaits the protected publisher PR merge. Automatic CI does not remove explicit
-  owner approval before contributor/sync PR merges. The solo owner-authored review exception remains.
+- **Next:** the App publisher merged through reviewed [PR 9](https://github.com/CallanCampos/Frigate/pull/9)
+  as `e8c3d8eefa`, with all required checks passing. Its
+  [publisher trial](https://github.com/CallanCampos/Frigate/actions/runs/39888464945) succeeded, found the
+  existing PR 10 and left it unchanged, then revoked its token. Review the bounded sync proposal separately.
+- **Blockers:** no App-setup blocker remains. Automatic CI does not remove explicit owner approval before
+  contributor/sync PR merges. The solo owner-authored review exception remains.
 
 ## 2026-10-22: protected main and reviewed sync proposals
 

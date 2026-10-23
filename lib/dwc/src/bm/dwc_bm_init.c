@@ -12,16 +12,16 @@
 int DWC_BM_Init(void *work) {
     int result;
 
-    MI_CpuFill8(work, 0, DWC_BM_WORK_SIZE);
+    MI_CpuFill8(work, 0, DWC_BM_INIT_WORK_SIZE);
     if (OS_IsRunOnTwl()) {
         result = func_0205e0f0(work);
     } else {
         result = func_0205e094(work);
     }
-    MI_CpuFill8(work, 0, DWC_BM_WORK_SIZE);
+    MI_CpuFill8(work, 0, DWC_BM_INIT_WORK_SIZE);
     if (!DWCBm_ReadAllNtrPages(work)) {
-        return DWC_BM_CHECK_READ_FAILED;
+        return DWC_BM_INIT_READ_ERROR;
     }
-    DWCBm_SetPackedWifiIdInfo(((DWCBmNtrPage *)work)->wifiId);
+    DWCi_BACKUPlSetWiFi(((DWCMemPage *)work)->wifi);
     return result;
 }

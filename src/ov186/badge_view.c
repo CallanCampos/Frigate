@@ -557,7 +557,7 @@ static void BadgeView_LoadBG(BadgeViewWork *wk) {
     GFL_BGSysLoadScr(7);
     wk->palRes = GFL_G2DIOReadNCLRArc(arc, 0, &wk->palData, HEAPID_TRAINER_CARD_SCREEN);
     file = GFL_G2DIOReadNCLR(ARCID_TRAINER_CARD_GRA, 7, &palette, HEAPID_TRAINER_CARD_SCREEN);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(colors, wk->palette[0], 0x20);
     MI_CpuCopy8(colors + 16, wk->palette[1], 0x20);
     GFL_HeapFree(file);
@@ -1461,7 +1461,7 @@ static void BadgeView_PlayBadgeSE(BadgeViewWork *wk, int badge) {
 
 static void BadgeView_LoadBadgePalette(BadgeViewWork *wk, int badge) {
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, badge * 0x20,
-                                       (u8 *)wk->palData->rawData + badge * 0x20, 0x20);
+                                       (u8 *)wk->palData->pRawData + badge * 0x20, 0x20);
 }
 
 static void BadgeView_LoadBadgePalettes(BadgeViewWork *wk) {

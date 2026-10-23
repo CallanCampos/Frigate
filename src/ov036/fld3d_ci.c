@@ -515,7 +515,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
             GFL_BGSysSetLCDConfig(&lcdConfig);
         }
         reg_G2_BG2CNT = (reg_G2_BG2CNT & 0x43) | 0x4084;
-        GX_SetBankForBG(8);
+        GX_SetBankForBG(GX_VRAM_BG_128_D);
         G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 4, 0, 0);
         GFL_BGSysSetBGEnabled(2, 1);
         {
@@ -1060,7 +1060,7 @@ static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
     ci->palette = NULL;
     ci->charData = GFL_G2DIOReadOBJNCGR(GetPokemonGraphicsARCID(), charFile, TRUE, &ci->character, heapId);
     ci->paletteData = GFL_G2DIOReadNCLR(GetPokemonGraphicsARCID(), palFile, &ci->palette, heapId);
-    charRaw = ci->character->rawData;
+    charRaw = ci->character->pRawData;
     pixels = GFL_BitmapGetPixelData(ci->bitmap);
     MIi_CpuClear32(0, pixels, 0x2000);
     for (i = 0; i < 8; i++) {
@@ -1089,7 +1089,7 @@ static void EventFieldEffectPokeSpriteSub_ConvertSprite(Fld3DCi *ci) {
     }
     GFL_BitmapMakeLinear(ci->bitmap, FALSE, heapId);
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(ci->bitmap), 0x2000);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, ci->palette->rawData, 32);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, ci->palette->pRawData, 32);
     GFL_HeapGetFreeSize(ci->heapId);
 }
 
@@ -1177,7 +1177,7 @@ static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *p
     ci->palette = NULL;
     ci->charData = GFL_G2DIOReadBGNCGR(ARCID_FLD3D_CI, charFile, TRUE, &ci->character, heapId);
     ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FLD3D_CI, palFile, &ci->palette, heapId);
-    charRaw = ci->character->rawData;
+    charRaw = ci->character->pRawData;
     pixels = GFL_BitmapGetPixelData(ci->bitmap);
     MIi_CpuClear32(0, pixels, width * height * 32);
     for (row = 0; row < height; row++) {
@@ -1188,7 +1188,7 @@ static void Fld3DCi_ConvG2DToG3D(Fld3DCi *ci, const char *texName, const char *p
     GFL_BitmapMakeLinear(ci->bitmap, FALSE, heapId);
     NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_VRAM, texAddr, GFL_BitmapGetPixelData(ci->bitmap),
                                        width * height * 32);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, (u8 *)ci->palette->rawData + palOffset * 32,
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_3D_TEX_PLTT, palAddr, (u8 *)ci->palette->pRawData + palOffset * 32,
                                        32);
     GFL_HeapGetFreeSize(ci->heapId);
 }
@@ -1431,7 +1431,7 @@ static void EventFieldEffectCutinSub_DrawStrToTexture(PlayerInfo *info, RivalDat
         }
     }
     ci->paletteData = GFL_G2DIOReadNCLR(ARCID_FONT, 5, &ci->palette, heapId);
-    raw = ci->palette->rawData;
+    raw = ci->palette->pRawData;
     raw[1] = color;
     raw[2] = color2;
     G3DTextDraw_CreateResource(res, texName, (u32)raw, palName, str, (u16)width, 0, 0x440, heapId, &resource);
@@ -1539,16 +1539,16 @@ static void Fld3DCi_AllFadeTCB(TCB *tcb, void *work) {
 
 static void Fld3DCiFadeState_Apply(Fld3DCiFade *fade) {
     if (fade->flags & 1) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -(fade->current >> 12));
+        GX_SetMasterBrightness(-(fade->current >> 12));
     }
     if (fade->flags & 2) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -(fade->current >> 12));
+        GXS_SetMasterBrightness(-(fade->current >> 12));
     }
     if (fade->flags & 4) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, fade->current >> 12);
+        GX_SetMasterBrightness(fade->current >> 12);
     }
     if (fade->flags & 8) {
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, fade->current >> 12);
+        GXS_SetMasterBrightness(fade->current >> 12);
     }
 }
 

@@ -161,7 +161,7 @@ static void TestBusReadyTags(void) {
     CHECK(OS_GetSystemWork()->pxiHandleChecker[PXI_PROC_ARM9] == 0);
 }
 
-static void LoggingCallback(u32 tag, u32 data, BOOL err) {
+static void LoggingCallback(PXIFifoTag tag, u32 data, BOOL err) {
     Log("ARM9 tag %u data %#x err %d", tag, data, err);
 }
 
@@ -362,7 +362,7 @@ static void TestPmBatteryBacklight(void) {
 
 // SystemInit's sequence (machine_use.c): the amplifier is off; and the game's microphone code turns it on
 static void TestPmAmp(void) {
-    int amp = -1;
+    PMAmpSwitch amp = (PMAmpSwitch)-1;
 
     Boot();
     PM_Init();
@@ -536,7 +536,7 @@ static void TestNvramUserInfo(void) {
     CHECK(OS_GetOwnerRtcOffset() == 0);
     CHECK(config->unk_00 == 5);
     CHECK((config->unk_70 >> 16) == Crc16(0xffff, (const u8 *)config, 0x70));
-    CHECK(config->touch.screenX1 == 32 && config->touch.rawX1 == 32 * 16 + 8);
+    CHECK(config->tp.dx1 == 32 && config->tp.raw_x1 == 32 * 16 + 8);
 }
 
 // What NVRAM_ReadDataBytes gets: the user settings' copies, the header's fields, a slot, into static memory and into
@@ -596,8 +596,8 @@ static void TestRtcFixedTime(void) {
 
     Boot();
     // The registers the ARM7 left at boot, for os_entropy.c: BCD, with the afternoon flag
-    CHECK(work->realTimeClock[0] == (0x12 | 0x06 << 8 | 0x23 << 16 | 6u << 24));
-    CHECK(work->realTimeClock[1] == (0x13 | 0x40 | 0x45 << 8 | 0x56 << 16));
+    CHECK(work->real_time_clock[0] == (0x12 | 0x06 << 8 | 0x23 << 16 | 6u << 24));
+    CHECK(work->real_time_clock[1] == (0x13 | 0x40 | 0x45 << 8 | 0x56 << 16));
     RTC_Init();
     CHECK(RTC_GetDateTime(&date, &time) == RTC_RESULT_SUCCESS);
     CHECK(date.year == 12 && date.month == 6 && date.day == 23 && date.week == RTC_WEEK_SATURDAY);
@@ -631,7 +631,7 @@ static void TestRtcRunsWithClock(void) {
     CHECK(date.year == 0 && date.month == 1 && date.day == 1);
 }
 
-static void LogRtcDone(int result, void *arg) {
+static void LogRtcDone(RTCResult result, void *arg) {
     Log("callback %d (%s)", result, (const char *)arg);
 }
 
@@ -694,9 +694,9 @@ static void TestCtrdgEmpty(void) {
     Boot();
     CTRDG_Init();
     CHECK(PXI_IsCallbackReady(PXI_FIFO_TAG_CTRDG, PXI_PROC_ARM9));
-    CHECK(CTRDG_MODULE_INFO->romCheck == 0xffff);
+    CHECK(CTRDG_MODULE_INFO->moduleID == 0xffff);
     CHECK(!CTRDG_IsExisting());
-    SVC_CpuSet(&fill, words, SVC_CPUSET_FILL | SVC_CPUSET_32BIT | 3);
+    SVC_CpuSet(&fill, words, MI_DMA_SRC_FIX | MI_DMA_32BIT_BUS | 3);
     CHECK(words[0] == fill && words[2] == fill && words[3] == 4);
     SVC_CpuSet(&halves[1], &halves[0], 1);
     CHECK(halves[0] == 2 && halves[2] == 3);
@@ -724,9 +724,9 @@ static void TestMicSilence(void) {
     param.buffer = sMicBuffer;
     param.size = sizeof(sMicBuffer);
     param.rate = MIC_SAMPLING_RATE_8180;
-    param.loop = FALSE;
-    param.fullCallback = MicFull;
-    param.fullArg = NULL;
+    param.loop_enable = FALSE;
+    param.full_callback = MicFull;
+    param.full_arg = NULL;
     CHECK(MIC_StartLimitedSampling(&param) == MIC_RESULT_SUCCESS);
     while (sMicFull == 0 && frames < 60) {
         WaitFrames(1);
@@ -742,12 +742,12 @@ static void TestMicSilence(void) {
     CHECK(MIC_GetLastSamplingAddress() == sMicBuffer + sizeof(sMicBuffer) - 1);
     // The shared memory's word, which OS_GetLowEntropyData mixes in: the last sample's place over mic.c's fixed base,
     // the same wherever the host put the buffer
-    CHECK(OS_GetSystemWork()->micLastAddress == 0x02000000 + sizeof(sMicBuffer) - 1);
+    CHECK(OS_GetSystemWork()->mic_last_address == 0x02000000 + sizeof(sMicBuffer) - 1);
     CHECK(MIC_StopLimitedSampling() == MIC_RESULT_ILLEGAL_STATUS);
 
     memset(sMicBuffer, 0x55, sizeof(sMicBuffer));
     param.type = MIC_SAMPLING_TYPE_SIGNED_12BIT;
-    param.loop = TRUE;
+    param.loop_enable = TRUE;
     CHECK(MIC_StartAutoSampling(&param) == MIC_RESULT_SUCCESS);
     WaitFrames(20);
     CHECK(sMicFull == 1);
@@ -904,7 +904,7 @@ static void TestSndSequenceVariables(void) {
     SNDi_SharedWork->player[2].variable[0] = 77;
     StartSequence(2, sSeqVariables, 0);
     start = port_os_frame();
-    CHECK(SNDi_SharedWork->player[2].variable[0] == SND_VARIABLE_UNSET);
+    CHECK(SNDi_SharedWork->player[2].variable[0] == SND_DEFAULT_VARIABLE);
     WaitFrames(8);
     CHECK(SNDi_SharedWork->player[2].variable[0] == 3);
     while (SND_GetPlayerStatus() != 0 && port_os_frame() - start < 120) {
@@ -1030,8 +1030,8 @@ static void TestSndDriverInfo(void) {
     tag = SND_GetCurrentCommandTag();
     SND_FlushCommand(SND_COMMAND_BLOCK);
     SND_WaitForCommandProc(tag);
-    CHECK(sDriverInfo.player[0].trackIndex[0] == 0);
-    CHECK(sDriverInfo.player[3].trackIndex[1] == SND_TRACK_INDEX_NONE);
+    CHECK(sDriverInfo.player[0].tracks[0] == 0);
+    CHECK(sDriverInfo.player[3].tracks[1] == SND_INVALID_TRACK_INDEX);
     CHECK(SND_ReadTrackInfo(&sDriverInfo, 3, 0, &track));
     CHECK(track.volume == 127 && track.pan == 64 && track.chCount == 0);
     CHECK(!SND_ReadTrackInfo(&sDriverInfo, 3, 1, &track));

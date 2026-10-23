@@ -20,13 +20,19 @@ The rules, with their wrong and right forms and when they don't apply, are in
 5. **Declarations in the owner's header**: no `extern` or another file's prototype in a `.c`. A file's own data is
    defined in it from the ROM's bytes.
 6. **`volatile` only where the hardware or another thread needs it**, proven by a probe, with a comment.
-7. **No `asm` in `src/`.** In `lib/` only for code the SDK wrote in assembly, with a comment, guarded from clang-format.
+7. **No `asm` in `src/`.** In `lib/` only for code the SDK wrote in assembly, with a comment, guarded from clang-format;
+   a library that is assembly as a whole is a `.s` file assembled by mwasmarm (MSL's `fp_fastI.s`).
 8. **Comments explain the code**: no `TODO`, no narration of the matching.
 9. **Names**: swan's, the SDK's in `lib/`, ours through `rename_symbol.py`; no stale `func_`/`data_` names.
 10. **Bugs**: `// BUG:` with an `#ifdef BUGFIX` fix.
 11. **clang-format 23.1.1** on every file changed; `asm`, hand-laid-out tables and `GFL_ASSERT`s with operators guarded.
 12. **Nonmatching rows** in the present tense: what differs now and what was tried, no history.
 13. **The Codex copies** of skills and hooks change with them.
+14. **The SDK's types**: `u32`/`s32` are `long`, the SDK's constants as the SDK has them; a declaration takes the
+    original's type (`int`/`unsigned int` where it compiles so), never a cast or a changed typedef.
+15. **Structure**: a value set (sequence numbers, results, kinds, modes) is an `enum` and its constants are passed,
+    not numbers; a parameter takes the struct it always points to, not `void *`; a type is defined once, in its
+    owner's header; a table of records is an array of a struct. Storage keeps its original type.
 
 Natural C wins over a match: a function that matches only through a workaround keeps the natural C and gets a row,
 and a complete file goes back to partial.

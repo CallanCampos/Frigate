@@ -40,7 +40,7 @@
 // (L1). RESB is the card's reset line
 #define REG_MI_MCCNT1_START_MASK 0x80000000
 #define REG_MI_MCCNT1_RESB_MASK 0x20000000
-#define REG_MI_MCCNT1_READY_MASK 0x00800000
+#define REG_MI_MCCNT1_RDY_MASK 0x00800000
 #define REG_MI_MCCNT1_PC_MASK 0x07000000
 #define REG_MI_MCCNT1_PC_512B 0x01000000
 #define REG_MI_MCCNT1_PC_4B 0x07000000
@@ -78,6 +78,9 @@
 
 // VBlank counter in shared memory, from the DSi mirror of main memory
 #define HW_VBLANK_COUNT_BUF 0x02fffc3c
+// The end of the instruction TCM, and where the DS's cartridge slot is mapped
+#define HW_ITCM_END 0x02000000
+#define HW_CTRDG_ROM 0x08000000
 // The ROM header that the card's boot leaves at the end of main memory, the copy of it that the system keeps, and the
 // header of a DSi game, which the system leaves in the memory the processors share
 #define HW_CARD_ROM_HEADER 0x02fffa80

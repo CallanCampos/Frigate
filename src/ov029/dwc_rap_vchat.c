@@ -53,8 +53,8 @@ static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, voi
                            NNSSndStrmFormat format, void *arg);
 static BOOL RequestVoice(u8 aid);
 static BOOL AcceptVoice(u8 aid);
-static void ManualCallback(u8 aid, int event, VCTSession *session, void *userData);
-static void SessionCallback(u8 aid, int event, VCTSession *session, void *userData);
+static void ManualCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData);
+static void SessionCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData);
 static void DropSession(VCTSession *session);
 static void StartStream(void);
 
@@ -64,13 +64,13 @@ static void InitHardware(void) {
     MIC_Init();
     PM_Init();
     PM_SetAmp(PM_AMP_ON);
-    PM_SetAmpGain(3);
-    VCT_SetVad(TRUE);
+    PM_SetAmpGain(PM_AMPGAIN_160);
+    VCT_EnableVAD(TRUE);
     NNS_SndInit();
     NNS_SndStrmInit((NNSSndStrm *)sVChatWork->stream);
     MIi_CpuClearFast(0, sVChatWork->silence, VCT_SAMPLE_BYTES);
     sVChatWork->tickBudget = 0;
-    VCT_SetEchoCancel(TRUE);
+    VCT_EnableEchoCancel(TRUE);
 }
 
 static void MicCallback(MICResult result, void *arg) {
@@ -105,10 +105,10 @@ static void StreamCallback(NNSSndStrmCallbackStatus status, int numChannels, voi
         samples = sVChatWork->silence;
     }
     for (i = 0; i < numChannels; i++) {
-        VCT_ReadSamples(buffer[i], len, NULL);
+        VCT_ReceiveAudio(buffer[i], len, NULL);
     }
     if (sVChatWork->stalled == 0) {
-        VCT_SubmitSamples(samples, len);
+        VCT_SendAudio(samples, len);
     }
     sVChatWork->micState = 2;
 }
@@ -118,17 +118,17 @@ static BOOL RequestVoice(u8 aid) {
     int ret;
 
     if (sVChatWork->requestSession == NULL) {
-        session = VCT_AllocSession(aid);
+        session = VCT_CreateSession(aid);
         if (session == NULL) {
             return FALSE;
         }
-        ret = VCT_Request(session, 0);
+        ret = VCT_Request(session, VCT_REQUEST_INVITE);
     } else {
         session = sVChatWork->requestSession;
-        ret = VCT_Request(session, 0);
+        ret = VCT_Request(session, VCT_REQUEST_INVITE);
     }
     if (ret) {
-        VCT_ReleaseSession(session);
+        VCT_DeleteSession(session);
         sVChatWork->requestSession = NULL;
         return FALSE;
     }
@@ -141,10 +141,10 @@ static BOOL AcceptVoice(u8 aid) {
 
     if (sVChatWork->requestSession != NULL && sVChatWork->requestSession->state == 4) {
         result = FALSE;
-        if (VCT_Respond(sVChatWork->requestSession, 0)) {
+        if (VCT_Response(sVChatWork->requestSession, VCT_RESPONSE_OK)) {
             return result;
         }
-        if (VCT_AttachSession(sVChatWork->requestSession)) {
+        if (VCT_StartStreaming(sVChatWork->requestSession)) {
             result = TRUE;
         }
         return result;
@@ -152,13 +152,13 @@ static BOOL AcceptVoice(u8 aid) {
     return FALSE;
 }
 
-static void ManualCallback(u8 aid, int event, VCTSession *session, void *userData) {
+static void ManualCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData) {
     switch (event) {
     case 9:
         DropSession(session);
         break;
     case 7:
-        VCT_AttachSession(session);
+        VCT_StartStreaming(session);
         break;
     case 12:
         DropSession(session);
@@ -166,31 +166,31 @@ static void ManualCallback(u8 aid, int event, VCTSession *session, void *userDat
     }
 }
 
-static void SessionCallback(u8 aid, int event, VCTSession *session, void *userData) {
+static void SessionCallback(u8 aid, VCTEvent event, VCTSession *session, void *userData) {
     switch (event) {
     case 1:
         if (sVChatWork->requestSession != NULL) {
-            VCT_Respond(session, 3);
-            VCT_ReleaseSession(session);
+            VCT_Response(session, VCT_RESPONSE_BUSY_HERE);
+            VCT_DeleteSession(session);
         } else {
             sVChatWork->requestSession = session;
         }
         break;
     case 8:
-        VCT_Respond(session, 0);
+        VCT_Response(session, VCT_RESPONSE_OK);
         DropSession(session);
         break;
     case 9:
         DropSession(session);
         break;
     case 4:
-        VCT_Respond(session, 4);
+        VCT_Response(session, VCT_RESPONSE_TERMINATED);
         DropSession(session);
         break;
     case 7:
-        if (session->active != sVChatWork->callbackKind) {
+        if (session->mode != sVChatWork->callbackKind) {
             DropSession(session);
-        } else if (VCT_AttachSession(session)) {
+        } else if (VCT_StartStreaming(session)) {
             sVChatWork->phase = 2;
         }
         break;
@@ -206,8 +206,8 @@ static void SessionCallback(u8 aid, int event, VCTSession *session, void *userDa
 }
 
 static void DropSession(VCTSession *session) {
-    VCT_DetachSession(session);
-    VCT_ReleaseSession(session);
+    VCT_StopStreaming(session);
+    VCT_DeleteSession(session);
     sVChatWork->requestSession = NULL;
     DWCRap_ResetVoiceChat();
 }
@@ -226,10 +226,10 @@ void DWCRapVChat_Update(BOOL stalled) {
         sVChatWork->tickBudget = 0;
     }
     sVChatWork->lastTick = now;
-    VCT_Tick();
+    VCT_Main();
     if (sVChatWork->tickBudget >= 0x411a) {
         do {
-            VCT_Tick();
+            VCT_Main();
             sVChatWork->tickBudget -= 0x411a;
         } while (sVChatWork->tickBudget >= 0x411a);
     }
@@ -264,7 +264,7 @@ BOOL DWCRapVChat_ReceivePacket(int aid, u8 *data, int size) {
     if (sVChatWork == NULL) {
         return FALSE;
     }
-    if (VCT_ReceivePacket(aid, data, size)) {
+    if (VCT_HandleData(aid, data, size)) {
         return TRUE;
     }
     return FALSE;
@@ -291,9 +291,9 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     } else {
         sVChatWork->micParam.rate = 0x1001;
     }
-    sVChatWork->micParam.loop = TRUE;
-    sVChatWork->micParam.fullCallback = NULL;
-    sVChatWork->micParam.fullArg = NULL;
+    sVChatWork->micParam.loop_enable = TRUE;
+    sVChatWork->micParam.full_callback = NULL;
+    sVChatWork->micParam.full_arg = NULL;
     sVChatWork->micRunning = TRUE;
     NNS_SndStrmAllocChannel((NNSSndStrm *)sVChatWork->stream, 1, channels);
     NNS_SndStrmSetVolume((NNSSndStrm *)sVChatWork->stream, 0);
@@ -304,8 +304,8 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
     sVChatWork->requestSession = NULL;
     config.mode = 1;
     sVChatWork->callbackKind = 1;
-    config.sessions = &sVChatWork->session;
-    config.sessionCount = count;
+    config.session = &sVChatWork->session;
+    config.numSession = count;
     config.aid = DWC_GetMyAID();
     GFL_ASSERT((config.aid != -1));
     if (sVChatWork->callbackKind == 3) {
@@ -314,13 +314,13 @@ void DWCRapVChat_Start(HeapID heapId, int codec, int count) {
         config.callback = SessionCallback;
     }
     config.userData = NULL;
-    config.buffer = sVChatWork->packetMemory;
-    config.bufferSize = 0x23c0 * count + 32;
+    config.audioBuffer = sVChatWork->packetMemory;
+    config.audioBufferSize = 0x23c0 * count + 32;
     VCT_Init(&config);
     sVChatWork->stalled = 0;
     VCT_SetCodec(codec);
     StartStream();
-    VCT_SetEchoCancel(TRUE);
+    VCT_EnableEchoCancel(TRUE);
 }
 
 static void StartStream(void) {
@@ -334,12 +334,12 @@ void DWCRapVChat_RequestEnd(void) {
         return;
     }
     if (sVChatWork->phase == 1) {
-        if (VCT_Request(sVChatWork->requestSession, 2)) {
+        if (VCT_Request(sVChatWork->requestSession, VCT_REQUEST_CANCEL)) {
             DWCRap_ResetVoiceChat();
             return;
         }
     }
-    if (VCT_Request(sVChatWork->requestSession, 1)) {
+    if (VCT_Request(sVChatWork->requestSession, VCT_REQUEST_BYE)) {
         DWCRap_ResetVoiceChat();
     }
 }
@@ -360,10 +360,10 @@ void DWCRapVChat_End(void) {
         }
         NNS_SndStrmStop((NNSSndStrm *)sVChatWork->stream);
         NNS_SndStrmFreeChannel((NNSSndStrm *)sVChatWork->stream);
-        VCT_Shutdown();
+        VCT_Cleanup();
         PM_SetAmp(PM_AMP_OFF);
-        DWCRapCommon_Free(0, sVChatWork->packetMemory, 0);
-        DWCRapCommon_Free(0, sVChatWork, 0);
+        DWCRapCommon_Free(DWC_ALLOCTYPE_AUTH, sVChatWork->packetMemory, 0);
+        DWCRapCommon_Free(DWC_ALLOCTYPE_AUTH, sVChatWork, 0);
         sVChatWork = NULL;
         if (onEnd != NULL) {
             onEnd();
@@ -376,7 +376,7 @@ BOOL DWCRapVChat_GetSpeaking(void) {
     s32 levels[4];
 
     if (sVChatWork != NULL) {
-        VCT_GetCaptureLevels(levels);
+        VCT_GetVADInfo(levels);
         if (levels[1] > 2) {
             return levels[0];
         }
@@ -392,7 +392,7 @@ BOOL DWCRapVChat_AddHeard(u32 netIds, int myNetId) {
     }
     for (i = 0; i < 2; i++) {
         if (i != myNetId && (netIds & (1 << i)) && sVChatWork->heard[i] != 1) {
-            if (VCT_AddSession(i)) {
+            if (VCT_AddConferenceClient(i)) {
                 return FALSE;
             }
             sVChatWork->heard[i] = 1;
@@ -409,7 +409,7 @@ BOOL DWCRapVChat_RemoveHeard(int myNetId) {
     }
     for (i = 0; i < 2; i++) {
         if (i != myNetId && sVChatWork->heard[i] == 1) {
-            if (VCT_RemoveSession(i)) {
+            if (VCT_RemoveConferenceClient(i)) {
                 return FALSE;
             }
             sVChatWork->heard[i] = 0;
@@ -423,9 +423,9 @@ void DWCRapVChat_SetMuted(BOOL muted) {
         sVChatWork->muted = muted;
         if (sVChatWork->requestSession != NULL) {
             if (muted) {
-                VCT_DetachSession(sVChatWork->requestSession);
+                VCT_StopStreaming(sVChatWork->requestSession);
             } else {
-                VCT_AttachSession(sVChatWork->requestSession);
+                VCT_StartStreaming(sVChatWork->requestSession);
             }
         }
     }

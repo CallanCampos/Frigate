@@ -65,13 +65,13 @@ void FieldFlashG3D_Draw(FieldFlashG3D *flash, fx32 scale, u32 alpha) {
         transform.scale.x = scale;
         transform.scale.y = FX_Mul(scale, height);
         transform.scale.z = FX32_CONST(4);
-        MI_Copy36B(NNS_G3DGetInvViewMatrix(), &transform.rotation);
+        MI_Copy36B(NNS_G3dGlbGetInvV(), &transform.rotation);
         mdl = GFL_G3DMdlGetEngineModel(GFL_G3DActorGetMdl(flash->actor))->resMdl;
         NNS_G3dMdlSetMdlLightEnableFlag(mdl, 0, 0);
         NNS_G3dMdlSetMdlPolygonID(mdl, 0, 0);
-        NNS_G3dMdlSetMdlCullMode(mdl, 0, 2);
+        NNS_G3dMdlSetMdlCullMode(mdl, 0, GX_CULL_BACK);
         NNS_G3dMdlSetMdlAlpha(mdl, 0, alpha);
-        NNS_G3dMdlSetMdlPolygonMode(mdl, 0, 0);
+        NNS_G3dMdlSetMdlPolygonMode(mdl, 0, GX_POLYGONMODE_MODULATE);
         GFL_G3DSysDrawObj(flash->actor, &transform);
     }
 }

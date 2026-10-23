@@ -386,7 +386,7 @@ static const TrClassResource TRAINER_CLASS_RESOURCES[TRAINER_CLASS_COUNT] = {
     [TRAINER_CLASS_PKMN_TRAINER_COLRESS_235] = { TRAINER_SPRITE_TEAM_PLASMA_COLRESS, 0, SEQ_BGM_EYE_01 },
 };
 
-u32 TrainerData_GetParam(int trainerId, u32 param) {
+u32 TrainerData_GetParam(int trainerId, TrainerDataParam param) {
     TrainerData data;
     u32 value;
 
@@ -752,7 +752,7 @@ static void TrainerUtil_CalcBasePID(u32 species, u32 form, u8 genderAbility, u32
     int ability = (genderAbility & 0xf0) >> 4;
 
     if (genderAbility != 0) {
-        void *personal = PML_PersonalLoad(species, form, heapId);
+        PersonalData *personal = PML_PersonalLoad(species, form, heapId);
 
         if (sex != 0) {
             *pidBase = PML_PersonalGetParam(personal, PERSONAL_SEX_RATIO);

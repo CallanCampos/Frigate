@@ -10,12 +10,12 @@
 // The ROM does not embed this source file's name; dwc_util_menu.c is descriptive.
 void DWCUtilMenu_Open(void);
 // Slides the keypad down and frees it
-void DWCUtilMenu_Close(void);
-u8 DWCUtilMenu_GetKey(void);
-void DWCUtilMenu_SetLeftEnabled(u8 enabled);
-void DWCUtilMenu_SetDigitsEnabled(u8 enabled);
-void DWCUtilMenu_SetRightEnabled(u8 enabled);
+void DWCi_KB10lEnd(void);
+u8 DWCi_KB10lGet(void);
+void DWCi_KB10lSetErase(u8 enabled);
+void DWCi_KB10lSetInput(u8 enabled);
+void DWCi_KB10lSetShift(u8 enabled);
 // Whether the keypad exists, until it has slid down
-BOOL DWCUtilMenu_IsOpen(void);
+BOOL DWCi_KB10lIsInit(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_MENU_H

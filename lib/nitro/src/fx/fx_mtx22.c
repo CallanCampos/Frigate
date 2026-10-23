@@ -1,6 +1,6 @@
 // NitroSDK's libfx fx_mtx22.c: the 2x2 fixed point matrix functions, at the start of libfx in ARM9 main. The file split
 // is by function group (libfx's source files are one per matrix size) and fairly sure; the names are the SDK's.
-// MTX_Identity22_ and MAT2_Scaling store through stm with writeback, which MWCC does not generate (MAT2_Scaling even
+// MTX_Identity22_ and MTX_Scale22_ store through stm with writeback, which MWCC does not generate (MTX_Scale22_ even
 // stores a single register that way), and MTX_Rot22_ stores in an order MWCC does not schedule for the same C, so
 // these three were hand-written assembly and are asm functions here.
 #include "nitro/fx.h"
@@ -21,9 +21,10 @@ asm void MTX_Identity22_(MtxFx22 *mtx) {
 // clang-format on
 #pragma thumb on
 
-// clang-format off
 #ifndef PLATFORM_PC // port/hal has the host version
-asm void MAT2_Scaling(MtxFx22 *mtx, fx32 x, fx32 y) {
+// Stores through stm with writeback, which MWCC does not generate
+// clang-format off
+asm void MTX_Scale22_(MtxFx22 *mtx, fx32 x, fx32 y) {
     stmia r0!, {r1}
     mov r1, #0
     str r2, [r0, #8]

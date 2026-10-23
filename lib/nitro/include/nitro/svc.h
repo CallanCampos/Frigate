@@ -2,6 +2,7 @@
 #define POKEBW2_NITRO_SVC_H
 
 #include "types.h"
+#include "nitro/mi.h"
 
 // The BIOS calls (NitroSDK's SVC_* functions, its libsyscall), Thumb stubs at the start of ARM9 main that each run one
 // SWI (secure_area.c). swan's names are noted at each
@@ -10,14 +11,12 @@
 void SVC_WaitByLoop(u32 cycles);
 
 // SVC_CpuSet: copies or fills the words or halfwords the mode gives (the count in its low bits, the flags below), from
-// src to dest. A fill reads src once
-#define SVC_CPUSET_FILL 0x01000000
-#define SVC_CPUSET_32BIT 0x04000000
+// src to dest: MI_DMA_SRC_FIX fills, reading src once, and MI_DMA_32BIT_BUS moves words
 void SVC_CpuSet(const void *src, void *dest, u32 mode); // swan's CpuSet
 // SVC_CpuSetFast: SVC_CpuSet for words, 32 bytes at a time
 void SVC_CpuSetFast(const void *src, void *dest, u32 mode); // swan's CpuFastSet
 // SVC_GetCRC16: the BIOS's CRC-16 of the data, from the first value of the sum
-u16 SVC_GetCRC16(u16 start, const void *data, u32 length); // swan's GetCRC16
+u16 SVC_GetCRC16(u32 start, const void *data, u32 length); // swan's GetCRC16
 
 // SVC_Div and SVC_DivRem: the quotient and the remainder of a signed division
 s32 SVC_Div(s32 number, s32 denom);    // swan's Div
@@ -26,7 +25,7 @@ s32 SVC_DivRem(s32 number, s32 denom); // swan's Mod
 u16 SVC_Sqrt(u32 value); // swan's Sqrt
 
 // SVC_UnpackBits: widens each unit of src's bits to the destination's unit, by the parameters at param
-void SVC_UnpackBits(const void *src, void *dest, const void *param); // swan's BitUnPack
+void SVC_UnpackBits(const void *src, void *dest, const MIUnpackBitsParam *param); // swan's BitUnPack
 // The BIOS's decompressors: LZ77 and run-length data to memory a byte at a time (SVC_UncompressLZ8, swan's
 // LZ77UnCompReadNormalWrite8bit, and SVC_UncompressRL8, swan's RLUnCompReadNormalWrite8bit), and LZ77, Huffman and
 // run-length data read through the stream callbacks to memory a halfword at a time, which return the size written or a
@@ -34,9 +33,11 @@ void SVC_UnpackBits(const void *src, void *dest, const void *param); // swan's B
 // swan's LZ77UnCompReadByCallbackWrite16bit, HuffUnCompReadByCallback and RLUnCompReadByCallbackWrite16bit)
 void SVC_UncompressLZ8(const void *src, void *dest);
 void SVC_UncompressRL8(const void *src, void *dest);
-s32 SVC_UncompressLZ16FromDevice(const void *src, void *dest, const void *param, const void *callbacks);
-s32 SVC_UncompressHuffmanFromDevice(const void *src, void *dest, u8 *tree, const void *callbacks);
-s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *param, const void *callbacks);
+s32 SVC_UncompressLZ16FromDevice(const void *src, void *dest, const void *param,
+                                 const MIReadStreamCallbacks *callbacks);
+s32 SVC_UncompressHuffmanFromDevice(const void *src, void *dest, u8 *tree, const MIReadStreamCallbacks *callbacks);
+s32 SVC_UncompressRL16FromDevice(const void *src, void *dest, const void *param,
+                                 const MIReadStreamCallbacks *callbacks);
 
 // SVC_WaitIntr: halts until one of the interrupts of irqFlags occurs, after clearing those that already have if clear
 void SVC_WaitIntr(BOOL clear, u32 irqFlags); // swan's IntrWait

@@ -267,17 +267,17 @@ void EventSeasonBanner_LoadGraphics(u8 season, HeapID heapId) {
 
     file = GFL_ArcToolReadHeapNew(handle, paletteId, heapId);
     NNS_G2dGetUnpackedPaletteData(file, &palette);
-    GFL_BGSysUploadStdPalette(SEASON_BANNER_BG, palette->rawData, 0x20, 0);
+    GFL_BGSysUploadStdPalette(SEASON_BANNER_BG, palette->pRawData, 0x20, 0);
     GFL_HeapFree(file);
 
     file = GFL_ArcToolReadHeapNew(handle, characterId, heapId);
     NNS_G2dGetUnpackedBGCharacterData(file, &character);
-    GFL_BGSysLoadChar(SEASON_BANNER_BG, character->rawData, character->size, 0);
+    GFL_BGSysLoadChar(SEASON_BANNER_BG, character->pRawData, character->szByte, 0);
     GFL_HeapFree(file);
 
     file = GFL_ArcToolReadHeapNew(handle, screenId, heapId);
     NNS_G2dGetUnpackedScreenData(file, &screen);
-    GFL_BGSysLoadScrCore(SEASON_BANNER_BG, screen->rawData, screen->size, 0);
+    GFL_BGSysLoadScrCore(SEASON_BANNER_BG, screen->rawData, screen->szByte, 0);
     GFL_HeapFree(file);
 
     GFL_ArcToolFree(handle);
@@ -301,8 +301,7 @@ void EventSeasonBanner_UpdateRenderFXFieldOpen(const EventSeasonBanner *wk, u32 
         if (wk->season == wk->endSeason) {
             s32 alpha = (s32)((f32)wk->timer / (f32)wk->duration * 16.0f);
             G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 8, 0x11, 16 - alpha, alpha);
-            GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR,
-                                     (s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
+            GXS_SetMasterBrightness((s32)((f32)wk->timer / (f32)wk->duration * 16.0f + -16.0f));
         } else {
             G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, (s32)(0.0f - (f32)wk->timer / (f32)wk->duration * 16.0f));
         }
@@ -362,7 +361,7 @@ void EventSeasonBanner_ProcessState(EventSeasonBanner *wk, u32 *state, u32 newSt
     case SEASON_BANNER_STATE_FADE_IN:
         GFL_BGSysSetBGEnabled(SEASON_BANNER_BG, TRUE);
         GFL_BGSysSetBGEnabled(0, FALSE);
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+        GX_SetMasterBrightness(0);
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, 8, -16);
         wk->duration = EventSeasonBanner_GetFadeInTime(wk);
         break;

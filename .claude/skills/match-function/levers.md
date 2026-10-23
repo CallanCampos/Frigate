@@ -7,10 +7,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## Registers swapped
 
+- Saved-result lifetimes and widespread register differences in a nested check runner: recover its semantic
+  inline boundaries and probe per-source `-ipa file`, including loader-owned constructor data.
+  (matching.md: "Nested inline boundaries and file-level interprocedural analysis")
+
+- Registers differ around an indirect log call: read the ROM format string and check every variadic argument before
+  tuning allocation. (matching.md: "A missing variadic log argument")
 - A function of a handle or a `void *` whose registers differ: take the parameter as the SDK does (`int s`, `void *`)
   and cast it inside. (matching.md: "A handle parameter cast inside")
 - An `[rn, rm]` store through an unpacked offset with its registers swapped: assign an assigning macro's result
-  again, `p = NNSi_G2dUnpackOffset(p, base)`. (matching.md: "A macro that assigns")
+  again, `p = NNS_G2D_UNPACK_OFFSET_PTR(p, base)`. (matching.md: "A macro that assigns")
 - Rows of a matrix product whose registers rotate: the row of `a` in locals and a destination pointer of its own.
   (matching.md: "They match only with the row of `a` in locals")
 - Two of several independent statements with their registers swapped: write the other one first.
@@ -59,11 +65,11 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A `u64`'s low and high words in each other's registers before it goes to a 64-bit hardware register: write it in
   one `u64` store, not two 32-bit halves. (matching.md: "64-bit hardware register in one store")
 - A checksum comparison with swapped `cmp` operands: store the `u8` call result in a local before comparing it
-  with the parameter, as `Aoss_Decrypt` does. (matching.md: "`Aoss_Decrypt` needs the `u8`")
+  with the parameter, as `DecodeRC4` does. (matching.md: "`DecodeRC4` needs the `u8`")
 - Locals get registers in declaration order: reorder the declarations. (matching.md: "declaration order of locals")
   Declaring every local first and assigning them below moves both registers and slots (matching.md: "declared first")
 - A pointer needs an earlier slot but a later store: declare it without an initializer and assign it after other
-  pointers, as in `Aoss_ParseWep` and `Aoss_ParsePsk`. (matching.md: "A pointer that must")
+  pointers, as in `GetWEPData` and `GetWPAData`. (matching.md: "A pointer that must")
 - An element pointer grows the frame and replaces the original's struct-base-plus-index field access: index the
   member at each use; declare a saved flag before a zeroed index and assign the flag afterward if the loop counter
   must copy that index's zero. (matching.md: "each received picture is accessed")
@@ -106,11 +112,20 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - Registers of a scheduled function swapped although every order of the computation was tried: write the `volatile`
   stores first, and read fields at each use. (matching.md: "registers still follow the source order")
 - A loop counter in a higher callee-saved register than the compiler's temporaries, with every instruction right:
-  declare it `unsigned long`, the SDK's `u32`. (matching.md: "`WDS_OnScan`")
+  declare it `u32`, the SDK's `unsigned long`, not `unsigned int`. (matching.md: "`WDSScanCallback`")
 - An array entry's address recomputed after a call, where the original keeps it from before the call in a saved
-  register: declare the index `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
+  register: declare the index `u32`, the SDK's `unsigned long`. (matching.md: "`SortBySpeed` recomputes")
+- A constant added or subtracted before an index where ours folds it into the base, or the reverse: the index, count
+  or field's type, `int`/`unsigned int` against `u32`/`s32`. (matching.md: "Game Freak's code mixes the SDK's types")
+- A caller's scheduling or stack slots differ only around a call: the callee's parameter type, `int` against `long`.
+  (matching.md: "A narrow argument passed to a parameter")
+- A loop's setup registers swapped in a function that calls an inline with `u16` bounds: declare the inline's index
+  parameters `int` (`g2d_OAM.c`'s `LoadAffine_`, 14 bytes to 4).
+- A field read through a pointer parameter folded where the original builds the address, or the reverse: the original
+  uses the pointer once more or less, or a `*(T *)&p->m` cast stands in for the field's real type. (matching.md:
+  "depends on how many references")
 - Two locals of a large function swapped against their use counts: the declaration order decides there. (matching.md:
-  "`FSi_GetPathDefault`")
+  "`FSi_GetPathCommand`")
 - A `cmp rX, rN` against a register that holds 0, with other registers moved around it, where the original has
   `cmp rX, #0`: test the pointer as `if (p)`, not against `NULL`. (matching.md: "A pointer compared with `NULL`")
 - A zero kept in a saved register across a call and returned for `FALSE` (`movne r0, r6`), where the original
@@ -212,8 +227,17 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `(table[i] + (j + key[k])) & 0xff`. A named `in = src + i` pointer that takes the counter's register: index
   `src[i + k]` directly. (matching.md: "An RC4 key schedule's swap")
 
+- A loop's character and index swapped although every order of the locals was tried: read the character into an
+  `int c;` declared first at the top. (matching.md: "declared first at the top")
+- Don't try `register` for allocation or a counter that nothing reads: MWCC 2.0/sp2 ignores it. A `const` on an
+  initialized local can move its stack slot. (matching.md: "ignores the `register` storage class")
+
 ## Stack slots or frame size
 
+- Raw rail progress spilled as converted scalars: keep the signed position/length snapshot and let its ratio
+  inline read through a `const` pointer. (matching.md: "a progress snapshot")
+- Edge and corner sums unexpectedly shared, with fewer spills: signed edge arithmetic can coexist with unsigned
+  corner arithmetic; cast the operands, not only the result. (matching.md: "Signed and unsigned sums")
 - Spilled locals in reversed slots around an accessor's result: read the field directly, typed as the SDK has it.
   (matching.md: "A `static inline` accessor that returns a field cast")
 - A hash's unrolled rounds spilled differently: write each round as statements, and the counter as `int`.
@@ -304,8 +328,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   `volatile`; prove it by probing without it. (matching.md: "A `volatile` field is loaded in source order")
 - A swapped scalar's byte-copy address or registers differ: a `const u8 *` object-representation view with fixed
   byte stores matches both SC integer writers. (matching.md: "A swapped scalar serialized")
-- `ScClient_Reset`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer locals.
-  (matching.md: "`ScClient_Reset` matches")
+- `sciInterfaceDestroy`'s marker-store addresses match with uniform direct unsigned-byte views instead of pointer
+  locals. (matching.md: "`sciInterfaceDestroy` matches")
 - Consecutive reads from `[p, i]` then `[r, #1]`, `[r, #2]`, or a `- 1` folded into a table's literal address, where
   ours adds to the index each time: write the pointer sum, `*(p + i + 1)`. (matching.md: "A pointer sum and an index")
 - An inline's loads with a field's offset folded in (`[r, #4 + k]`), where the original adds the row to a base
@@ -484,6 +508,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 ## An instruction too many or too few
 
+- A zero text-origin component missing from measured bounds: `CalcMsgWindowDimensions` shares a paired origin's
+  field-by-field inline initializer with printer placement. (matching.md: "bounds include both components")
 - Cut-in text allocation heap IDs: pass `HEAPID_TAIL` at each call; saved `u32` and `HeapID` locals change
   narrowing and sharing. (matching.md: "`fld3d_ci.c`'s `EventFieldEffectCutinSub_DrawStrToTexture`")
 
@@ -556,10 +582,12 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - An `ands` with a run-time 0xffff before a `strh`, shared by two stores: a packed-byte expression in two inline
   calls; check the SDK inline's mask (`y2 & 0xff`, not `(u8)y2`). (matching.md: "An `ands` with 0xffff kept")
 - Masks written with `~` give `bic`; an `and` with `0xef` is `x &= (u8)~FLAG`. (matching.md: "Masks written with")
+- A round-up to 32 with `ands` against a -32 derived from a register 0x1f (`subs rX, #0x3f`) where ours has `bics`:
+  the sum is done in 64 bits, `((u64)ptr + 0x1f) & ~0x1f`. (matching.md: "the sum done in 64 bits")
 - ARM `and` with a 16-bit pool mask on a `vu16` register where ours has `bic`, or the reverse: `reg &= ~M` gives the
   `and`, `reg = reg & ~M` the `bic`. (matching.md: "no ARM immediate")
 - MWCC doesn't propagate constants into enum-typed variables: a loop that checks its bound before the first pass, or
-  a sum that adds a counter known to be 0, has an enum counter. `ScReport_SetPlayer` keeps its known-zero error
+  a sum that adds a counter known to be 0, has an enum counter. `scReportSetPlayerData` keeps its known-zero error
   test with the real `SCResult` type. (matching.md: "enum type")
 - A constant kept in a callee-saved register for calls, then reduced at run time before a field store
   (`subs r6, #0x20; str r6, [r5, #8]`), where ours folds it: assign the field, then update it in place,
@@ -683,8 +711,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
   and return, or return through a `result` local. (matching.md: "An early exit with its own call")
 - A flag set in several cases and tested at the end to pick a shared block, where the original branches straight to
   it with fewer registers pushed: forward gotos to labelled tail blocks. (matching.md: "chosen by a flag tested")
-- `ScClient_OnCreateSession` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
-  (matching.md: "`ScClient_OnCreateSession` keeps")
+- `sciWsCreateSessionCallback` keeps three `bne; b` pairs with failure-first parser tests and success in the `else`.
+  (matching.md: "`sciWsCreateSessionCallback` keeps")
 - A combined `&&` camera check moves a copied parameter, where the original has two false branches with the same
   call: nest the checks and write that call in both false arms. (matching.md: "tests `cameraEnabled` first")
 - A 0/1 flag built with branches (`bne; movs r1, #1; b; movs r1, #0`) where ours is set-then-clear: the flag's
@@ -768,8 +796,8 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - An unrolled loop over tables with the wrong registers and spills: step the tables by pointer (`*p++`) instead of
   indexing them. (matching.md: "A table read in an unrolled loop")
-- `ScClient_SubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
-  (matching.md: "`ScClient_SubmitReport` needs")
+- `scSubmitReport` needs a `u32` digest-clear counter for `subs; bne`; its signed counter adds a compare.
+  (matching.md: "`scSubmitReport` needs")
 - A running offset's `movs rN, #0` placed before hoisted loop invariants where the original zeroes it after: write
   it as a counter times the step. (matching.md: "A loop offset that starts at 0")
 - A loop counter stored and reloaded where the original keeps it in a register for the test (2.0/sp2): put it last
@@ -844,6 +872,9 @@ text to `grep -n` there. Entries without a key come from later work and still be
   argument after the loop. (matching.md: "A search loop whose normal exit")
 - A static loaded in the loop on each pass where the ROM loads it once below the entry test, with a store through
   a pointer in the loop: declare the static inside the function. (matching.md: "A function-local `static` is hoisted")
+- A second loop counter that the original zeroes, stores and steps but never reads: the same variable is also read as a
+  value before the loop (`i = f(); if (i > n) { n = i; }`), which keeps its steps. (matching.md: "drops a loop counter
+  that only indexes")
 
 ## Switches
 
@@ -879,14 +910,16 @@ text to `grep -n` there. Entries without a key come from later work and still be
 - A call inside `FX32_CONST(...)` is made three times; the game passes a local. (matching.md: "FX32_CONST")
 - A literal in a compound assignment (`y += 0.01f`) is passed second. (matching.md: "compound assignment keeps")
 - Float arithmetic on a local holding a constant isn't folded. (matching.md: "doesn't fold float arithmetic")
+- A zoom's unit multiply before `sqrt` belongs to the scaled square-root curve also used with a varying coefficient
+  by the actor spin; keep the shared curve's product and result at `f32`. (matching.md: "scaled square-root curve")
 - Division and modulo call `_s32_div_f` or `_u32_div_f` by signedness. A `u8`/`u16` promotes to signed `int`.
   (matching.md: "_s32_div_f")
-- `__aeabi_uldivmod` on sign-extended operands is an `int` cast to `u64`; MWCC calls it `_ll_udiv`.
+- `_ll_udiv` on sign-extended operands is an `int` cast to `u64`.
   (matching.md: "A 64-bit division")
 - A 64-bit division calls `_ll_sdiv` for signed operands and `_ll_udiv` for unsigned; the probe masks the
   call, so link the file to check which. (matching.md: "and `_ll_sdiv`")
-- An integer converted to float calls `__aeabi_i2f` when signed and `_ffltu` when unsigned; a `u8` or `u16`
-  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `__aeabi_i2f` wants an `int` local. The
+- An integer converted to float calls `_fflt` when signed and `_ffltu` when unsigned; a `u8` or `u16`
+  converted to `f32`, by a cast or as a float operand, is unsigned, so a ROM `_fflt` wants an `int` local. The
   probe masks it. (matching.md: "`_ffltu`")
 - A `u64` division by 64 that calls `_ll_udiv` where ours shifts: the function reads an object with an explicit
   alignment. (matching.md: "An explicit alignment")
@@ -913,6 +946,10 @@ text to `grep -n` there. Entries without a key come from later work and still be
 
 - MSL exception indices before ordinary rodata: restore `-Cpp_exceptions on` and register the emitted `.exceptix`.
   (matching.md: "`dsi/1.2` with `-Cpp_exceptions on` emits exception indices")
+- A live empty assertion filename before earlier allocation literals: recover its named data object and probe
+  per-function IPA with `explicit_zero_data on`; compare all data and pool targets.
+  (matching.md: "A named `static char name[]")
+
 - A local array initializer's bytes in a `.rodata` section of their own: copy a struct from a static instead.
   (matching.md: "A local array with an initializer goes in a `.rodata` section of its own")
 - A `.bss` static reached through a literal of its own where the original reaches it from the section's base: give
@@ -1063,12 +1100,12 @@ may be one the original's global optimizer gave up on, or one that reads an obje
 `WorldTrade_NationSortListMake` matched with its table aligned (with no address evidence that the original aligned it),
 as did `NNS_SndArcStrmInit` with its decode buffer aligned and `BtlvInput_DrawMoveTiles` with its palette table aligned
 (the alignment gave its loop entry and the reloads after each call; inline getters gave the order of its call
-arguments), and `MBGameInfo_SendMembers` shows the same symptom in its row. The lever never applies to a function
+arguments), and `MBi_SendVolatBeacon` shows the same symptom in its row. The lever never applies to a function
 whose original rotates its loops, since the attribute enters every loop of the function with a `b`: `MCSS_MakeMosaic`,
 `addToDex` and libVCT's five rows reload and recompute like the aligned cases but rotate their loops, and no
 placement helps them. A loop-free function shows it too: the attribute stops a field's offset folding into the
 literal (`&G.field` as one pool word) and keeps two reads of a field apart, so an original with such a pool word or
-a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `SetAffinedOamPosition_` show.
+a merged read wasn't compiled under it, as G2D's `NNS_G2dPushMtx` and `DoAffineTransforme_` show.
 Ask first whether the function reads an aligned object, then try a 0/1 loop test: `Country_IsValidPlace`, which showed
 it too and came within a byte under `optimization_level 1` or `2`, matched at -O4 with one (matching.md: "has a test
 whose value is 0/1").

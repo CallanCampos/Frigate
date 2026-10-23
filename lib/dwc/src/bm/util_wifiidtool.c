@@ -11,18 +11,18 @@
 #define NINTENDO_OUI 0x0009BF
 
 // Where each of the first five bytes of the scrambled ID goes
-static const u8 sByteOrder[8] = { 1, 2, 0, 4, 3, 5, 6, 7 };
+static const u8 DWCi_util_wifiid_exctable[8] = { 1, 2, 0, 4, 3, 5, 6, 7 };
 // What each nibble of those bytes is replaced by; the inverse, which the descrambling of an ID would use, is the table
 // below. The ROM keeps it between the other two, but no code that is left reads it: MWCC drops a table that is static
 // and read by nothing, so it is a global
 const u8 WifiIdTool_InverseNibbleSubstitution[16] = { 7, 2, 5, 10, 11, 0, 13, 15, 12, 1, 6, 8, 4, 9, 3, 14 };
-static const u8 sNibbleSubstitution[16] = { 5, 9, 1, 14, 12, 2, 10, 0, 11, 13, 3, 4, 8, 6, 15, 7 };
+static const u8 DWCi_util_wifiid_ttable[16] = { 5, 9, 1, 14, 12, 2, 10, 0, 11, 13, 3, 4, 8, 6, 15, 7 };
 
-static u64 MakeScrambledId(u32 salt, u32 nic, u32 notNintendo, u32 type);
+static u64 DWCi_Util_WiFiId_scrambleUid(u32 salt, u32 nic, u32 notNintendo, u32 type);
 
 // Makes a pending ID of 43 bits from the salt, the last three bytes of the MAC address, whether the first three are
 // not Nintendo's, and a type of 2 bits (always 0), and scrambles it
-static u64 MakeScrambledId(u32 salt, u32 nic, u32 notNintendo, u32 type) {
+static u64 DWCi_Util_WiFiId_scrambleUid(u32 salt, u32 nic, u32 notNintendo, u32 type) {
     union {
         u64 value;
         u8 bytes[8];
@@ -36,11 +36,12 @@ static u64 MakeScrambledId(u32 salt, u32 nic, u32 notNintendo, u32 type) {
         id.bytes[i] ^= 0xD6;
     }
     for (i = 0; i < 5; i++) {
-        id.bytes[i] = (sNibbleSubstitution[(id.bytes[i] >> 4) & 0xF] << 4) | sNibbleSubstitution[id.bytes[i] & 0xF];
+        id.bytes[i] =
+            (DWCi_util_wifiid_ttable[(id.bytes[i] >> 4) & 0xF] << 4) | DWCi_util_wifiid_ttable[id.bytes[i] & 0xF];
     }
     MI_CpuCopy8(id.bytes, copy, 8);
     for (i = 0; i < 5; i++) {
-        id.bytes[sByteOrder[i]] = copy[i];
+        id.bytes[DWCi_util_wifiid_exctable[i]] = copy[i];
     }
     // Keeps the 43 bits (five bytes and three bits) and rotates them left by one
     id.bytes[7] = 0;
@@ -57,7 +58,7 @@ static u64 MakeScrambledId(u32 salt, u32 nic, u32 notNintendo, u32 type) {
     return id.value;
 }
 
-BOOL DWCBm_MakePendingWifiId(DWCBmWifiIdInfo *info) {
+BOOL DWCi_AUTH_GetNewWiFiInfo(DWCWiFiInfo *info) {
     u8 mac[6];
     RTCDate date;
     RTCTime time;
@@ -67,7 +68,7 @@ BOOL DWCBm_MakePendingWifiId(DWCBmWifiIdInfo *info) {
     u32 oui;
     u32 nic;
 
-    DWCBm_GetWifiIdInfo(info);
+    DWCi_BM_GetWiFiInfo(info);
     RTC_Init();
     if (RTC_GetDate(&date) != 0) {
         return FALSE;
@@ -96,47 +97,47 @@ BOOL DWCBm_MakePendingWifiId(DWCBmWifiIdInfo *info) {
     notNintendo = oui != NINTENDO_OUI;
     nic = (mac[3] << 16) | (mac[4] << 8) | mac[5];
     seed = (u32)seconds * 0x5D588B65 + 0x269EC3;
-    info->number = ((seed >> 16) * 1000) >> 16;
-    info->id = 0;
-    if (info->salt == 0) {
-        info->pendingId = 0;
-        while (info->pendingId == 0) {
+    info->pass = ((seed >> 16) * 1000) >> 16;
+    info->attestedUserId = 0;
+    if (info->randomHistory == 0) {
+        info->notAttestedId = 0;
+        while (info->notAttestedId == 0) {
             seed = seed * 0x5D588B65 + 0x269EC3;
             while (seed == 0) {
                 seed = seed * 0x5D588B65 + 0x269EC3;
             }
-            info->salt = seed;
-            info->pendingId = MakeScrambledId(info->salt, nic, notNintendo, 0);
+            info->randomHistory = seed;
+            info->notAttestedId = DWCi_Util_WiFiId_scrambleUid(info->randomHistory, nic, notNintendo, 0);
         }
     } else {
-        info->pendingId = 0;
-        while (info->pendingId == 0) {
-            info->salt++;
-            info->pendingId = MakeScrambledId(info->salt, nic, notNintendo, 0);
+        info->notAttestedId = 0;
+        while (info->notAttestedId == 0) {
+            info->randomHistory++;
+            info->notAttestedId = DWCi_Util_WiFiId_scrambleUid(info->randomHistory, nic, notNintendo, 0);
         }
     }
     return TRUE;
 }
 
-BOOL DWCBm_MakeAndSaveWifiId(void *work) {
-    DWCBmWifiIdInfo info;
+BOOL DWCi_AUTH_MakeWiFiID(void *work) {
+    DWCWiFiInfo info;
 
-    if (DWCBm_MakePendingWifiId(&info) == FALSE) {
+    if (DWCi_AUTH_GetNewWiFiInfo(&info) == FALSE) {
         return FALSE;
     }
-    return DWCBm_WriteWifiIdInfo(&info, work) != 0;
+    return DWCi_BM_SetWiFiInfo(&info, work) != 0;
 }
 
-BOOL DWCBm_ConfirmWifiId(DWCBmWifiIdInfo *info, void *work) {
-    DWCBmWifiIdInfo stored;
+BOOL DWCi_AUTH_UpDateWiFiID(DWCWiFiInfo *info, void *work) {
+    DWCWiFiInfo stored;
 
-    DWCBm_GetWifiIdInfo(&stored);
-    info->id = info->pendingId;
-    info->pendingId = stored.pendingId;
-    return DWCBm_WriteWifiIdInfo(info, work) != 0;
+    DWCi_BM_GetWiFiInfo(&stored);
+    info->attestedUserId = info->notAttestedId;
+    info->notAttestedId = stored.notAttestedId;
+    return DWCi_BM_SetWiFiInfo(info, work) != 0;
 }
 
-BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info) {
+BOOL DWCi_AUTH_RemakeWiFiID(DWCWiFiInfo *info) {
     u8 mac[6] = { 0, 0, 0, 0, 0, 0 };
     RTCDate date;
     RTCTime time;
@@ -146,7 +147,7 @@ BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info) {
     u32 nic;
     u32 oui;
 
-    DWCBm_GetWifiIdInfo(info);
+    DWCi_BM_GetWiFiInfo(info);
     RTC_Init();
     if (RTC_GetDate(&date) != 0) {
         return FALSE;
@@ -175,37 +176,37 @@ BOOL DWCBm_RenewPendingWifiId(DWCBmWifiIdInfo *info) {
     notNintendo = oui != NINTENDO_OUI;
     nic = (mac[3] << 16) | (mac[4] << 8) | mac[5];
     seed = (u32)seconds * 0x5D588B65 + 0x269EC3;
-    info->number = ((seed >> 16) * 1000) >> 16;
-    info->pendingId = 0;
-    while (info->pendingId == 0) {
+    info->pass = ((seed >> 16) * 1000) >> 16;
+    info->notAttestedId = 0;
+    while (info->notAttestedId == 0) {
         seed = seed * 0x5D588B65 + 0x269EC3;
-        while (seed == 0 || info->salt == (u16)seed) {
+        while (seed == 0 || info->randomHistory == (u16)seed) {
             seed = seed * 0x5D588B65 + 0x269EC3;
         }
-        info->salt = seed;
-        info->pendingId = MakeScrambledId(info->salt, nic, notNintendo, 0);
+        info->randomHistory = seed;
+        info->notAttestedId = DWCi_Util_WiFiId_scrambleUid(info->randomHistory, nic, notNintendo, 0);
     }
     return TRUE;
 }
 
-void DWCBm_GetWifiId(DWCBmWifiId *out) {
-    DWCBmWifiIdInfo info;
+void DWC_Auth_GetId(DWCAuthWiFiId *out) {
+    DWCWiFiInfo info;
 
-    DWCBm_GetWifiIdInfo(&info);
-    out->id = info.id;
-    out->pendingId = info.pendingId;
-    if (info.id != 0) {
-        out->isSet = TRUE;
+    DWCi_BM_GetWiFiInfo(&info);
+    out->uId = info.attestedUserId;
+    out->notAttestedId = info.notAttestedId;
+    if (info.attestedUserId != 0) {
+        out->flag = TRUE;
     } else {
-        out->isSet = FALSE;
+        out->flag = FALSE;
     }
 }
 
-BOOL DWCBm_HasNoWifiId(void) {
-    DWCBmWifiIdInfo info;
+BOOL DWC_Auth_CheckWiFiIDNeedCreate(void) {
+    DWCWiFiInfo info;
 
-    DWCBm_GetWifiIdInfo(&info);
-    if (info.pendingId == 0 && info.id == 0) {
+    DWCi_BM_GetWiFiInfo(&info);
+    if (info.notAttestedId == 0 && info.attestedUserId == 0) {
         return TRUE;
     }
     return FALSE;

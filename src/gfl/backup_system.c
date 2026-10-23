@@ -453,8 +453,8 @@ static u32 SaveData_LoadWithBackup(SaveData *sv, u32 heapId, BOOL checkCount, u3
     u8 *mainData;
     u8 *backupData;
     u16 *crcs;
-    u32 offset;
-    u32 size;
+    unsigned int offset;
+    unsigned int size;
     u32 end;
     u32 copyIndex;
     u8 *data;

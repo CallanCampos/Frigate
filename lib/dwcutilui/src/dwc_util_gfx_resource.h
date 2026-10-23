@@ -9,16 +9,16 @@
 
 // The path with the language's letter in place of its sixth character, unless that is 'x', or 'y' and the language
 // isn't 0
-char *DWCUtilGfxResource_LocalizePath(const char *path);
+char *DWCi_Char(const char *path);
 // Reads the file, localized, and hands it to upload, a GX_Load function
 void DWCUtilGfxResource_Load(const char *path, void (*upload)(const void *, u32, u32));
-// Shows the buttons of the layout set through DWCUtilMain_SetLayout
-void DWCUtilGfxResource_ShowStep(int variant);
-void DWCUtilGfxResource_ShowButtons(int variant);
+// Shows the buttons of the layout set through DWCi_SetParam_
+void DWCi_CMNlStep(int variant);
+void DWCi_CMNlButton(int variant);
 // Draws the message into the main screen's message box, alone or under a string
-void DWCUtilGfxResource_ShowMessage(int msgIndex);
-void DWCUtilGfxResource_ShowMessageWithString(const void *str, int msgIndex);
+void DWCi_CMNlMsgDraw(int msgIndex);
+void DWCi_CMNlMsgNameDraw(const void *str, int msgIndex);
 // The text flags of the utility's language
-u32 DWCUtilGfxResource_GetTextFlags(void);
+u32 DWCi_CMNlFontFlag(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_GFX_RESOURCE_H

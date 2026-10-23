@@ -8,12 +8,12 @@
 // dwc/gp.h for the names)
 
 void gpiStatusInfoKeyFree(void *element);
-int gpiStatusInfoKeysInit(GPConnection *connection);
+GPResult gpiStatusInfoKeysInit(GPConnection *connection);
 void gpiStatusInfoKeysDestroy(GPConnection *connection);
-int gpiStatusInfoAddKey(GPConnection *connection, DArray *keys, const char *keyName, const char *keyValue);
-int gpiStatusInfoSetKey(GPConnection *connection, DArray *keys, const char *keyName, const char *newValue);
-int gpiStatusInfoGetKey(GPConnection *connection, DArray *keys, const char *keyName, char **keyValue);
+GPResult gpiStatusInfoAddKey(GPConnection *connection, DArray keys, const char *keyName, const char *keyValue);
+GPResult gpiStatusInfoSetKey(GPConnection *connection, DArray keys, const char *keyName, const char *newValue);
+GPResult gpiStatusInfoGetKey(GPConnection *connection, DArray keys, const char *keyName, char **keyValue);
 // Writes the keys of the connection's status as "\\keys\\<count>" and the base-64 names and values
-int gpiSaveKeysToBuffer(GPConnection *connection, char **buffer);
+GPResult gpiSaveKeysToBuffer(GPConnection *connection, char **buffer);
 
 #endif // POKEBW2_DWC_GPIKEYS_H

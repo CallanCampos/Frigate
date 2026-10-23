@@ -185,7 +185,7 @@ struct ZukanInfo {
     /* 0x1b8 */ MsgData *givenMsgs[3];
     /* 0x1c4 */ ArcTool *arcs[ZUKAN_INFO_ARC_COUNT];
     /* 0x1e0 */ MsgData *msgs[ZUKAN_INFO_MSG_COUNT];
-    /* 0x26c */ void *personal;
+    /* 0x26c */ PersonalData *personal;
     /* 0x270 */ StrBuf *labels[ZUKAN_INFO_STRBUF_COUNT];
     /* 0x2b0 */ u16 *formNameTable;
 };
@@ -199,7 +199,7 @@ static void ZukanInfo_PrintStrbuf(HeapID heapId, BmpWin *window, PrintQueue *pri
 static void ZukanInfo_PrintMessage(HeapID heapId, BmpWin *window, MsgData *msgData, PrintQueue *printQueue, Font *font,
                                    u32 messageId, u16 x, u16 y, u16 color, u32 align, WordSet *wordSet);
 static void ZukanInfo_PrintEntry(ZukanInfo *info);
-static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, u32 language);
+static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, unsigned int language);
 static void ZukanInfo_ClearWindows(ZukanInfo *info);
 static void ZukanInfo_FlushWindows(ZukanInfo *info);
 static void ZukanInfo_InitLabelWindows(ZukanInfo *info);
@@ -415,7 +415,7 @@ ZukanInfo *ZukanInfo_Create(HeapID heapId, u16 species, u16 form, u16 sex, u16 r
     file = GFL_HeapAllocate(info->heapId, size, FALSE, "zukan_info.c", 1425);
     GFL_ArcToolRead(arc, ZUKAN_GRA_PALETTE, file);
     NNS_G2dGetUnpackedPaletteData(file, &palette);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     for (i = 0; i < 5; i++) {
         info->glowColorsA[i] = colors[0x11 + i];
         info->glowColorsB[i] = colors[0x21 + i];
@@ -965,7 +965,7 @@ static void ZukanInfo_PrintEntry(ZukanInfo *info) {
     ZukanInfo_FlushWindows(info);
 }
 
-static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, u32 language) {
+static void ZukanInfo_PrintEntryInLanguage(ZukanInfo *info, unsigned int language) {
     MsgData *labels = info->msgs[ZUKAN_INFO_MSG_LABELS];
     MsgData *categories = info->msgs[ZUKAN_INFO_MSG_OTHER_CATEGORIES + language];
     MsgData *heights = info->msgs[ZUKAN_INFO_MSG_OTHER_HEIGHTS + language];
@@ -1246,7 +1246,7 @@ static void ZukanInfo_FreeTypeIcons(ZukanInfo *info) {
 
 // Shows the Pokémon's types in the slot, in the game's language or in another one
 static void ZukanInfo_ShowTypes(ZukanInfo *info, u32 language, u32 slot) {
-    void *personal = info->personal;
+    PersonalData *personal = info->personal;
     u8 type1 = PML_PersonalGetParam(personal, PERSONAL_TYPE_1);
     u8 type2 = PML_PersonalGetParam(personal, PERSONAL_TYPE_2);
 
@@ -1373,7 +1373,7 @@ static void ZukanInfo_ShowTypesInLanguage(ZukanInfo *info, u32 type1, u32 type2,
 
     file = GFL_G2DIOReadBGNCGRArc(info->arcs[ZUKAN_INFO_ARC_ZUKAN_GRA], sTypeIconFiles[language], FALSE, &character,
                                   info->heapId);
-    tiles = character->rawData;
+    tiles = character->pRawData;
     for (i = 0; i < 2; i++) {
         info->typeChars[slot][i] = -1;
         type = types[i];

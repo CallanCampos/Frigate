@@ -16,7 +16,8 @@ static NNSiFndHeapHead *FindContainHeap(NNSFndList *list, const void *memBlock) 
 
     for (candidate = NNS_FndGetNextListObject(list, NULL); candidate != NULL;
          candidate = NNS_FndGetNextListObject(list, candidate)) {
-        if (AddrOf(candidate->heapStart) <= AddrOf(memBlock) && AddrOf(memBlock) < AddrOf(candidate->heapEnd)) {
+        if (NNSiGetUIntPtr(candidate->heapStart) <= NNSiGetUIntPtr(memBlock) &&
+            NNSiGetUIntPtr(memBlock) < NNSiGetUIntPtr(candidate->heapEnd)) {
             NNSiFndHeapHead *inner = FindContainHeap(&candidate->childList, memBlock);
 
             if (inner != NULL) {

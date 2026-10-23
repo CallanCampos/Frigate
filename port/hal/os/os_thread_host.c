@@ -9,7 +9,8 @@
 //     32-bit words ((u32)func, (u32)arg, stackBottom), which truncates 64-bit pointers;
 //   - OS_DestroyThread is kept, but wrapped, so that the host learns that the thread's fiber will never run again.
 // OSi_ExitThread_ArgSpecified's exit-stack branch has the same truncation; BW2 never sets an exit stack, and the
-// host's OS_InitContext stops the program if it ever runs.
+// host's OS_InitContext stops the program if it ever runs. The newly recovered OS_IsThreadAvailable getter is
+// assembly too; the source guards it on hosts and this wrapper reads the same initialization flag.
 #define OS_InitThread OSi_DsInitThread
 #define OS_CreateThread OSi_DsCreateThread
 #define OS_KillThread OSi_DsKillThread
@@ -33,10 +34,10 @@ void OS_DestroyThread(OSThread *thread);
 // never sees, so its stack bounds stay 0 and no magic words are written; and the pointer that the DS announces at
 // HW_THREADINFO_MAIN, for the ARM7 and debuggers, has no reader on a host
 void OS_InitThread(void) {
-    if (OSi_ThreadInitialized) {
+    if (OSi_IsThreadInitialized) {
         return;
     }
-    OSi_ThreadInitialized = TRUE;
+    OSi_IsThreadInitialized = TRUE;
     OSi_CurrentThreadPtr = &OSi_ThreadInfo.current;
 
     OSi_LauncherThread.priority = OS_THREAD_LAUNCHER_PRIORITY;
@@ -79,8 +80,8 @@ void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *st
     thread->stackBottom = 0;
     thread->stackTop = 0;
     thread->stackWarningOffset = 0;
-    *(u32 *)((u8 *)stack - 8) = OS_STACK_BEGIN_MAGIC;
-    *(u32 *)stackEnd = OS_STACK_END_MAGIC;
+    *(u32 *)((u8 *)stack - 8) = OSi_STACK_CHECKNUM_BOTTOM;
+    *(u32 *)stackEnd = OSi_STACK_CHECKNUM_TOP;
     OS_InitThreadQueue(&thread->joinQueue);
 
     OS_InitContext(&thread->context, 0, 0);
@@ -137,11 +138,16 @@ void port_osi_reset_threads(void) {
     OSi_CurrentThreadPtr = NULL;
     OSi_SystemCallbackInSwitchThread = NULL;
     OSi_RescheduleCount = 0;
-    OSi_ThreadInitialized = FALSE;
+    OSi_IsThreadInitialized = FALSE;
     sThreadState.unk_00 = 0;
     sThreadState.exitStack = 0;
     sThreadState.idCount = 0;
     memset(&OSi_ThreadInfo, 0, sizeof(OSi_ThreadInfo));
     memset(&OSi_IdleThread, 0, sizeof(OSi_IdleThread));
     memset(&OSi_LauncherThread, 0, sizeof(OSi_LauncherThread));
+}
+
+// The SDK getter is ARM assembly; native code reads the same initialization flag.
+BOOL OS_IsThreadAvailable(void) {
+    return OSi_IsThreadInitialized;
 }

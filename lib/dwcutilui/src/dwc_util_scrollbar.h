@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// The events of the scroll bar, from DWCUtilScrollbar_GetEvent
+// The events of the scroll bar, from DWCi_SBlGetState
 enum {
     DWC_UTIL_SCROLLBAR_NONE,
     DWC_UTIL_SCROLLBAR_GRAB,     // the handle was touched
@@ -19,13 +19,13 @@ enum {
 // one that can't be dragged for 0) that travels range pixels down from x, y, an arrow above and an arrow below.
 // The ROM does not embed this source file's name; dwc_util_scrollbar.c is descriptive.
 void DWCUtilScrollbar_Create(int kind, int range, u16 x, u16 y, int pos);
-void DWCUtilScrollbar_Destroy(void);
+void DWCi_SBlEnd(void);
 // The handle's position, in pixels from the top of the bar, and the event of this frame
-u8 DWCUtilScrollbar_GetPos(void);
-u8 DWCUtilScrollbar_GetEvent(void);
-void DWCUtilScrollbar_SetPos(int pos);
+u8 DWCi_SBlGet(void);
+u8 DWCi_SBlGetState(void);
+void DWCi_SBlSet(int pos);
 // Unlocks and locks the scroll bar
-void DWCUtilScrollbar_Unlock(void);
-void DWCUtilScrollbar_Lock(void);
+void DWCi_SBlEnable(void);
+void DWCi_SBlDisable(void);
 
 #endif // POKEBW2_DWCUTIL_DWC_UTIL_SCROLLBAR_H

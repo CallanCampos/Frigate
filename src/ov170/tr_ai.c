@@ -2060,7 +2060,7 @@ BOOL AIJumpByMoveEffect(VM *vm, void *work) {
     u32 mode = VM_Read32(vm);
     s32 max = VM_Read32(vm);
     const u16 *table = (const u16 *)(vm->pc + (s32)VM_Read32(vm));
-    s32 index;
+    int index;
     BOOL end = FALSE;
 
     if (mode == 0) {

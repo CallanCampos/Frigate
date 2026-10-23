@@ -2,43 +2,44 @@
 // extfs_fopen) opens a range of memory as a file of an archive that has no name, no tables and the default functions
 // that read memory (its base is 0, so a position is an address). Its hook also answers FS_COMMAND_READDIR by listing
 // the registered archives, as the entries of a root directory. The file name is a guess from the function's purpose; no
-// string in the ROM names it. The functions have NitroSDK's names where they are known.
+// string in the ROM names it, and ntrtwl's reconstruction of NitroSDK 4.2 has this code in fs_mem.c. The functions and
+// objects have NitroSDK's names, as that reconstruction has them.
 
 #include "nitro/fs.h"
 #include "nitro/os.h"
 #include "nitro/std.h"
 
-static FSArchive sMemoryArchive; // swan's g_ExtFileSystem
-static BOOL sMemoryArchiveReady;
+static FSArchive fsi_arc_mem; // swan's g_ExtFileSystem
+static BOOL fsi_mem_init;
 
 // The hook of the memory archive: a directory read lists the archives, and the commands that look for a path or a
 // number are not supported. The directory's position is the archive it reads next
-static FSResult FSi_MemoryArchiveProc(FSFile *file, FSCommandType command) {
+static FSResult FSi_MemArchiveProc(FSFile *file, FSCommandType command) {
     FSResult result;
 
     switch (command) {
     case FS_COMMAND_READDIR: {
-        FSArchive *arc = (FSArchive *)file->body.dir.pos.position;
+        FSArchive *arc = (FSArchive *)file->body.dir.pos.pos;
         FSDirEntry *entry = file->arg.readDirectory.entry;
         const char *name;
 
         if (arc == NULL) {
-            entry->nameLength = 0;
-            entry->isDirectory = FALSE;
+            entry->name_len = 0;
+            entry->is_directory = FALSE;
             result = FS_RESULT_FAILURE;
         } else {
             name = FS_GetArchiveName(arc);
-            entry->nameLength = STD_GetStringLength(name) + 1;
-            entry->isDirectory = TRUE;
+            entry->name_len = STD_GetStringLength(name) + 1;
+            entry->is_directory = TRUE;
             if (!file->arg.readDirectory.skipName) {
                 STD_TSPrintf(entry->name, "%s:", name);
                 entry->id.dir.arc = file->arc;
-                entry->id.dir.dirId = 0;
-                entry->id.dir.fileId = 0;
-                entry->id.dir.position = 0;
+                entry->id.dir.own_id = 0;
+                entry->id.dir.index = 0;
+                entry->id.dir.pos = 0;
             }
             result = FS_RESULT_SUCCESS;
-            file->body.dir.pos.position = (u32)arc->next;
+            file->body.dir.pos.pos = (u32)arc->next;
         }
         break;
     }
@@ -57,22 +58,22 @@ static FSResult FSi_MemoryArchiveProc(FSFile *file, FSCommandType command) {
 
 // Makes the memory archive once: its hook set for every command, and nothing of the tables. The program ends if it
 // cannot be mounted
-static void FSi_InitMemoryArchive(void) {
-    u32 interrupts = OS_DisableInterrupts();
+static void FSi_InitMem(void) {
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
-    if (!sMemoryArchiveReady || !FS_IsArchiveLoaded(&sMemoryArchive)) {
-        FS_InitArchive(&sMemoryArchive);
-        FS_SetArchiveProc(&sMemoryArchive, FSi_MemoryArchiveProc, 0xffffffff);
-        if (!FS_LoadArchive(&sMemoryArchive, 0, 0, 0, 0, 0, NULL, NULL)) {
+    if (!fsi_mem_init || !FS_IsArchiveLoaded(&fsi_arc_mem)) {
+        FS_InitArchive(&fsi_arc_mem);
+        FS_SetArchiveProc(&fsi_arc_mem, FSi_MemArchiveProc, 0xffffffff);
+        if (!FS_LoadArchive(&fsi_arc_mem, 0, 0, 0, 0, 0, NULL, NULL)) {
             OS_Terminate();
         }
-        sMemoryArchiveReady = TRUE;
+        fsi_mem_init = TRUE;
     }
     OS_RestoreInterrupts(interrupts);
 }
 
 // NitroSDK's FS_CreateFileFromMemory: opens the memory from data to data + size as a file
-BOOL FS_CreateFileFromMemory(FSFile *file, const void *data, u32 size) {
-    FSi_InitMemoryArchive();
-    return FS_OpenFileDirect(file, &sMemoryArchive, (u32)data, (u32)data + size, 0);
+BOOL FS_CreateFileFromMemory(FSFile *file, void *data, u32 size) {
+    FSi_InitMem();
+    return FS_OpenFileDirect(file, &fsi_arc_mem, (u32)data, (u32)data + size, 0);
 }

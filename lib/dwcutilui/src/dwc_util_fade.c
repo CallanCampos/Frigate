@@ -16,20 +16,20 @@ typedef struct DWCUtilFade {
 
 static DWCUtilFade *sFades;
 
-static void DWCUtilFade_UpdateTask(DWCUtilTask *task, void *arg);
-static void DWCUtilFade_WaitTask(DWCUtilTask *task, void *arg);
+static void taskFade(DWCUtilTask *task, void *arg);
+static void taskWait(DWCUtilTask *task, void *arg);
 
-void DWCUtilFade_Init(void) {
-    sFades = DWCUtilHeap_AllocClear(sizeof(DWCUtilFade) * 2, 4);
+void DWCi_EFFlInit(void) {
+    sFades = DWCi_HEAPlAllocEx(sizeof(DWCUtilFade) * 2, 4);
     G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, DWC_UTIL_FADE_PLANES, 16);
     G2x_SetBlendBrightness_(REG_DB_BLDCNT_ADDR, DWC_UTIL_FADE_PLANES, 16);
 }
 
-void DWCUtilFade_Exit(void) {
-    DWCUtilHeap_FreeAndNull(&sFades);
+void DWCi_EFFlEnd(void) {
+    DWCi_HEAPlFree_(&sFades);
 }
 
-u8 DWCUtilFade_IsActive(int screen) {
+u8 DWCi_EFFlCheck(int screen) {
     DWCUtilFade *fade;
 
     if (screen == 1) {
@@ -40,7 +40,7 @@ u8 DWCUtilFade_IsActive(int screen) {
     return fade->active;
 }
 
-BOOL DWCUtilFade_Start(int type, int screen, u32 planes, int length) {
+BOOL DWCi_EFFlFade(int type, int screen, u32 planes, int length) {
     s8 start[4] = { -16, 0, 16, 0 };
     DWCUtilFade *fade;
 
@@ -57,7 +57,7 @@ BOOL DWCUtilFade_Start(int type, int screen, u32 planes, int length) {
     } else {
         G2x_SetBlendBrightness_(REG_BLDCNT_ADDR, planes, start[type]);
     }
-    fade->task = DWCUtilTask_Create(1, DWCUtilFade_UpdateTask, fade, 200);
+    fade->task = DWCi_TSKlForm(1, taskFade, fade, 200);
     fade->frame = 0;
     fade->type = type;
     fade->length = length;
@@ -65,7 +65,7 @@ BOOL DWCUtilFade_Start(int type, int screen, u32 planes, int length) {
     return TRUE;
 }
 
-static void DWCUtilFade_UpdateTask(DWCUtilTask *task, void *arg) {
+static void taskFade(DWCUtilTask *task, void *arg) {
     // Bit 0: the brightness falls to 0; bit 4: it is a darkening
     u8 flags[4] = { 0x11, 0x10, 0x01, 0x00 };
     s8 end[4] = { 0, -16, 0, 16 };
@@ -88,29 +88,29 @@ static void DWCUtilFade_UpdateTask(DWCUtilTask *task, void *arg) {
             G2x_ChangeBlendBrightness_(REG_BLDCNT_ADDR, end[fade->type]);
         }
         fade->active = FALSE;
-        DWCUtilTask_QueueRemoval(1, task);
+        DWCi_TSKlDelete(1, task);
     }
 }
 
-BOOL DWCUtilFade_StartWait(int length) {
+BOOL DWCi_EFFlWait(int length) {
     DWCUtilFade *fade = sFades;
 
     if (fade->active) {
         return FALSE;
     }
-    fade->task = DWCUtilTask_Create(1, DWCUtilFade_WaitTask, fade, 200);
+    fade->task = DWCi_TSKlForm(1, taskWait, fade, 200);
     fade->frame = 0;
     fade->length = length;
     fade->active = TRUE;
     return TRUE;
 }
 
-static void DWCUtilFade_WaitTask(DWCUtilTask *task, void *arg) {
+static void taskWait(DWCUtilTask *task, void *arg) {
     DWCUtilFade *fade = arg;
 
     fade->frame++;
     if (fade->frame >= fade->length) {
         fade->active = FALSE;
-        DWCUtilTask_QueueRemoval(1, task);
+        DWCi_TSKlDelete(1, task);
     }
 }

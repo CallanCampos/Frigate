@@ -12,7 +12,7 @@
 // (snd7_handle_pointer). A handle is never taken for an offset, since it is above 0x02000000, and is the same for the
 // same pointer. The ARM7 reads the same fields. On a host the decomp's snd.h declares the link fields as 32-bit words
 // too (port/docs/game-changes.md), so NitroSystem's loader and the game, which read a wave archive's waveCount and
-// offsetTable themselves, find them at the DS's offsets. The handles are also the game's to use (snd_handle.h, and
+// waveOffset themselves, find them at the DS's offsets. The handles are also the game's to use (snd_handle.h, and
 // port_host.h for the decomp's files), for NitroSystem's file table, which keeps file addresses the same way.
 #include "hal/pxi/pxi_bus.h"
 #include "hal/snd7/snd7_internal.h"
@@ -185,7 +185,7 @@ void SND_DestroyBank(SNDBankData *bank) {
     int i;
 
     SNDi_LockMutex();
-    for (i = 0; i < SND_BANK_WAVEARC_MAX; i++) {
+    for (i = 0; i < SND_BANK_TO_WAVEARC_MAX; i++) {
         if (Read32(Link(bank, i), LINK_WAVEARC) != 0) {
             Unlink(Link(bank, i));
         }
@@ -235,7 +235,7 @@ BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos 
         case SND_INST_PCM:
         case SND_INST_PSG:
         case SND_INST_NOISE:
-        case SND_INST_DIRECT_PCM:
+        case SND_INST_DIRECTPCM:
         case SND_INST_NULL:
             memcpy(&inst->param, data, sizeof(inst->param));
             pos->prgNo++;

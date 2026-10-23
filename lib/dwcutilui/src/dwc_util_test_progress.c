@@ -19,14 +19,14 @@
 #include "nitro/os.h"
 
 static BOOL DWCUtilTestProgress_IsLidClosed(void);
-static void DWCUtilTestProgress_LoadGraphics(void);
-static void DWCUtilTestProgress_FadeIn(void);
-static void DWCUtilTestProgress_WaitFadeIn(void);
-static void DWCUtilTestProgress_WaitButtons(void);
-static void DWCUtilTestProgress_Main(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procInit2(void);
+static void procScene(void);
 static void DWCUtilTestProgress_HandleInput(void);
-static void func_ov182_021b46c4(void);
-static void DWCUtilTestProgress_HandleChoice(void);
+static void draw(void);
+static void button(void);
 static void DWCUtilTestProgress_DisableButtons(void);
 static void DWCUtilTestProgress_FadeOut(void);
 static void DWCUtilTestProgress_WaitFadeOut(void);
@@ -47,14 +47,14 @@ static BOOL DWCUtilTestProgress_IsLidClosed(void) {
 
 void DWCUtilTestProgress_Init(void) {
     sTestProgressPassed = FALSE;
-    DWCUtilTestProgress_LoadGraphics();
-    DWCUtilBgOverlay_ShowConnectionSet();
-    DWCUtilGfxResource_ShowMessage(0x25);
-    DWCUtilUiEffect_Init(1);
-    DWCUtilMain_SetUpdate(DWCUtilTestProgress_FadeIn);
+    initGraphics();
+    DWCi_HLlLoadSet();
+    DWCi_CMNlMsgDraw(0x25);
+    DWCi_ANIMElInitEx(1);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilTestProgress_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -63,124 +63,123 @@ static void DWCUtilTestProgress_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilTestProgress_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilTestProgress_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilGfxResource_ShowButtons(1);
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitButtons);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_CMNlButton(1);
+        DWCi_ChangeScene(procInit2);
     }
 }
 
-static void DWCUtilTestProgress_WaitButtons(void) {
-    if (DWCUtilUiObject_GetState() != -2) {
-        DWCUtilUiObject_Enable();
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_Main);
+static void procInit2(void) {
+    if (DWCi_BTNlGet() != -2) {
+        DWCi_BTNlEnable();
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilTestProgress_Main(void) {
+static void procScene(void) {
     OS_Sleep(10);
     DWCUtilTestProgress_PollTest();
     DWCUtilTestProgress_HandleInput();
-    func_ov182_021b46c4();
-    DWCUtilTestProgress_HandleChoice();
+    draw();
+    button();
 }
 
 static void DWCUtilTestProgress_HandleInput(void) {
-    if (DWCUtilTouch_IsKeyPressed(2)) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+    if (DWCi_IPTlCheckTrigger(2)) {
+        DWCi_BTNlSet(0);
     } else if (DWCUtilTestProgress_IsLidClosed()) {
-        DWCUtilUiObject_SetStateIfIdle(0);
+        DWCi_BTNlSet(0);
     }
 }
 
-static void func_ov182_021b46c4(void) {
+static void draw(void) {
 }
 
 // The button ends the test
-static void DWCUtilTestProgress_HandleChoice(void) {
-    if (DWCUtilUiObject_GetState() == 0) {
+static void button(void) {
+    if (DWCi_BTNlGet() == 0) {
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(7);
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_DisableButtons);
+        DWCi_ChangeScene(DWCUtilTestProgress_DisableButtons);
     }
 }
 
 static void DWCUtilTestProgress_DisableButtons(void) {
-    DWCUtilUiObject_Disable();
-    DWCUtilFade_StartWait(8);
-    DWCUtilMain_SetUpdate(DWCUtilTestProgress_FadeOut);
+    DWCi_BTNlDisable();
+    DWCi_EFFlWait(8);
+    DWCi_ChangeScene(DWCUtilTestProgress_FadeOut);
 }
 
 static void DWCUtilTestProgress_FadeOut(void) {
-    if (DWCUtilFade_IsActive(1) == 0) {
+    if (DWCi_EFFlCheck(1) == 0) {
         if (!sTestProgressPassed) {
-            DWCUtilUiObject_Exit();
+            DWCi_BTNlEnd();
         }
         if (!sTestProgressPassed) {
-            DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+            DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
         }
-        DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                          GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitFadeOut);
+        DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0,
+                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
+        DWCi_ChangeScene(DWCUtilTestProgress_WaitFadeOut);
     }
 }
 
 static void DWCUtilTestProgress_WaitFadeOut(void) {
-    if (DWCUtilFade_IsActive(0) == 0 && (sTestProgressPassed || DWCUtilFade_IsActive(1) == 0) &&
-        DWCUtilUiObject_IsIdle()) {
-        DWCUtilUiEffect_Destroy();
-        DWCUtilText_DestroyScreenBg(0);
+    if (DWCi_EFFlCheck(0) == 0 && (sTestProgressPassed || DWCi_EFFlCheck(1) == 0) && DWCi_BTNlIsEnd()) {
+        DWCi_ANIMElEnd();
+        DWCi_FNTlDeleteBgLcd(0);
         if (!sTestProgressPassed) {
-            DWCUtilScreen_Stop();
+            DWCi_COMMENTlDelete();
             DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
         }
         DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
         if (!sTestProgressPassed) {
-            DWCUtilConnection_Stop();
-            DWCUtilMain_SetLayout(2, 1);
-            DWCUtilMain_SetUpdate(DWCUtilScreenWay_Init);
+            DWCi_RAKUlEnd();
+            DWCi_SetParam_(2, 1);
+            DWCi_ChangeScene(DWCUtilScreenWay_Init);
         } else {
-            DWCUtilMain_SetLayout(0, 0);
-            DWCUtilMain_SetUpdate(DWCUtilTestConnect_Init);
+            DWCi_SetParam_(0, 0);
+            DWCi_ChangeScene(DWCUtilTestConnect_Init);
         }
     }
 }
 
 // What the test reports
 static void DWCUtilTestProgress_PollTest(void) {
-    switch (DWCUtilConnection_GetState()) {
+    switch (DWCi_RAKUlGetState()) {
     case 2:
         sTestProgressPassed = TRUE;
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_DisableButtons);
+        DWCi_ChangeScene(DWCUtilTestProgress_DisableButtons);
         break;
     case 4:
         sTestProgressPassed = FALSE;
         DWCUtilSound_StopSe();
         DWCUtilSound_PlaySe(9);
         DWCUtilDialog_Open(0xd, 1, 1, -1, 0);
-        DWCUtilUiObject_Disable();
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitDialog);
+        DWCi_BTNlDisable();
+        DWCi_ChangeScene(DWCUtilTestProgress_WaitDialog);
         break;
     }
 }
 
 static void DWCUtilTestProgress_WaitDialog(void) {
-    if (DWCUtilDialog_GetChoice() == 0) {
+    if (DWCi_WINlGet() == 0) {
         DWCUtilSound_PlaySe(6);
-        DWCUtilDialog_Close();
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_WaitDialogClosed);
+        DWCi_WINlEnd();
+        DWCi_ChangeScene(DWCUtilTestProgress_WaitDialogClosed);
     }
 }
 
 static void DWCUtilTestProgress_WaitDialogClosed(void) {
-    if (!DWCUtilDialog_IsOpen()) {
-        DWCUtilMain_SetUpdate(DWCUtilTestProgress_DisableButtons);
+    if (!DWCi_WINlIsInit()) {
+        DWCi_ChangeScene(DWCUtilTestProgress_DisableButtons);
     }
 }

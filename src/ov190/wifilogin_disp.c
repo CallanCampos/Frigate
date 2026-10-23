@@ -511,8 +511,8 @@ static inline void WifiLoginDisp_InitCycle(WifiLoginDisp *disp, ArcTool *arc, He
 
     MI_CpuFill8(&disp->cycle, 0, sizeof(disp->cycle));
     file = GFL_G2DIOReadNCLRArc(arc, 2, &palette, heapId);
-    MI_CpuCopy8(palette->rawData, disp->cycle.palettes, sizeof(disp->cycle.palettes));
-    MI_CpuCopy8(palette->rawData, disp->cycle.blended, sizeof(disp->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, disp->cycle.palettes, sizeof(disp->cycle.palettes));
+    MI_CpuCopy8(palette->pRawData, disp->cycle.blended, sizeof(disp->cycle.palettes));
     GFL_HeapFree(file);
 
     // Colors 4 to 10 of each palette, blended into the next in 4 steps
@@ -677,8 +677,8 @@ static void WifiLoginDisp_HBlank(TCB *task, void *work) {
     int line = (reg_GX_VCOUNT + (disp->waveOffset + 1)) % WIFILOGIN_WAVE_COUNT;
 
     if (reg_GX_DISPSTAT & REG_GX_DISPSTAT_HBLK_MASK) {
-        reg_G2_BG1OFS = disp->wave[line] & REG_G2_BGOFS_HOFFSET_MASK;
-        reg_G2S_DB_BG2OFS = disp->wave[line] & REG_G2_BGOFS_HOFFSET_MASK;
+        reg_G2_BG1OFS = disp->wave[line] & REG_G2_BG0OFS_HOFFSET_MASK;
+        reg_G2S_DB_BG2OFS = disp->wave[line] & REG_G2_BG0OFS_HOFFSET_MASK;
     }
 }
 

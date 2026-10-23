@@ -351,7 +351,7 @@ void ZknListObj_PutMon(ZknListWork *wk, u16 species) {
     ZukanActorTemplate template = { { 48, 48, 0, 0, 1 }, CHAR_RES_MON, RES_MON, RES_MON, 0, CLACT_SURFACE_MAIN };
     u32 sex, form, rare;
     ArcTool *arc;
-    void *personal;
+    PersonalData *personal;
     u32 id, prevId;
     u32 paletteOffset;
 
@@ -471,9 +471,9 @@ static void ZknListObj_LoadIcon(ZknListWork *wk, u32 id, u16 species, u16 form, 
                                          HEAPID_ZUKAN_LIST | HEAPID_TAIL_BIT);
 
     if (touchScreen == TRUE) {
-        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_MAIN);
+        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->pRawData, 0x400, 0, CLACT_VRAM_MAIN);
     } else {
-        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->rawData, 0x400, 0, CLACT_VRAM_SUB);
+        ClActSys_WriteCharData(ClActor_GetCharIdx(wk->actors[id]), chars->pRawData, 0x400, 0, CLACT_VRAM_SUB);
     }
     GFL_HeapFree(file);
     GFL_ArcToolFree(arc);

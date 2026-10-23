@@ -7,7 +7,7 @@ NitroWiFi's SSL, SOCL/SOC and WCM layers. Their remaining reconstruction differe
 
 ## Pointers and layouts
 
-[`ssl.c`](../lib/nitrowifi/src/ssl/ssl.c)'s `SSLContext` mixes pointers with fields recovered at original ARM32
+[`ssl.c`](../lib/nitrowifi/src/ssl/ssl.c)'s `CPSSslConnection` mixes pointers with fields recovered at original ARM32
 offsets. Its `key_storage` union overlays generated key bytes with pointer slots assigned after generation.
 [`wcm.c`](../lib/nitrowifi/src/wcm/wcm.c)'s work, global and AP-list structures also contain pointers, thread queues,
 alarms and mutexes. Their recovered DS sizes and offsets do not establish a native 64-bit layout. Host object
@@ -17,15 +17,15 @@ representations and any original binary layouts remain separate porting question
 on the DS. Their representation and conversion to host socket handles need a separate audit before a native port;
 the recovered SDK declarations retain their original ABI.
 
-`WCM_NotifyResult` forwards mixed pointer/integer payloads through 32-bit words. `WCM_Notify` assembles its notice
+`WCM_NotifyResult` forwards mixed pointer/integer payloads through 32-bit words. `WcmNotifyEx` assembles its notice
 and extra payload fields on the stack, then calls the registered callback synchronously. A wider pointer
 representation alone would not extend that temporary notice's lifetime. The declarations and lifetime contract
 are in [`wcm_internal.h`](../lib/nitrowifi/include/nitrowifi/wcm_internal.h).
 
 ## Hardware and synchronization
 
-`WCM_SetState` masks IRQs around state/alarm transitions and rearms the alarm for requested state 9.
-`WCM_ReleaseIrqOwnedMutex` recognizes the address of `OS_IrqHandler` as an owner marker, decrements the recursion
+`WcmSetPhase` masks IRQs around state/alarm transitions and rearms the alarm for requested state 9.
+`WcmCpsifUnlockMutexInIRQ` recognizes the address of `OS_IrqHandler` as an owner marker, decrements the recursion
 count, and wakes the queue when ownership clears. That marker cannot be treated as an ordinary thread object.
 The mapping of these operations to host synchronization and timers is unresolved.
 
@@ -34,7 +34,7 @@ work-storage tail remains unmapped. These recovered calls do not identify a host
 
 ## Storage and lifetimes
 
-`WCM_SetConfig` borrows and aligns the caller's AP-list allocation. `WCM_FillApEntry` copies a descriptor prefix
+`WcmConfigure` borrows and aligns the caller's AP-list allocation. `WCM_FillApEntry` copies a descriptor prefix
 and selected information elements into a record. The connected SSID and AP-MAC getters return interior pointers
 into connection storage; the SSID has a separate length and need not be NUL-terminated. AP-list clearing
 invalidates borrowed list records. These contracts are described in
@@ -47,7 +47,7 @@ buffer-reuse requirements need to be preserved when replacing that path.
 SSL's retained receive pointer, length and position are distinct from its handshake scratch. A buffer can be
 owned before the application-record-ready flag is set. Certificate parsing also keeps borrowed pointers into
 certificate bytes alongside copied fields. Storage changes need a lifetime audit of the parser, record
-dispatcher, `CPS_SslRead` and release paths together.
+dispatcher, `CPSi_SslRead` and release paths together.
 
 [`poke_net_ssl.c`](../lib/poke_net/src/poke_net_ssl.c) retains a caller-supplied connection template. Starting a
 connection copies the template, retaining its borrowed CA list, records and key bytes; a non-NULL server name
@@ -109,7 +109,7 @@ Keep these observed units and completion stages explicit when replacing the DS b
 
 ## Word and byte order
 
-[`md5.c`](../lib/nitrowifi/src/ssl/md5.c)'s `MD5Encode` and `MD5Decode` use native copies, relying on little-endian
+[`md5.c`](../lib/nitrowifi/src/ssl/md5.c)'s `char_from_long` and `long_from_char` use native copies, relying on little-endian
 words. [`sha1.c`](../lib/nitrowifi/src/ssl/sha1.c) converts words explicitly in its big-endian helpers. Fixed-width
 `u32` state words alone do not remove MD5's endian dependency.
 
@@ -138,7 +138,7 @@ bypass branch; a divisor shorter than `n` digits keeps that read within the thre
 initialize the extra digit.
 Both originals contain the same access; an extra readable digit alone does not prove arithmetic correctness.
 
-`BigInt_ModExp` has exactly three regions after its scratch pointer. When its SSL caller sets `n` to a positive
+`CPSi_big_power` has exactly three regions after its scratch pointer. When its SSL caller sets `n` to a positive
 modulus byte count of at least two, the modulus needs at most `ceil(n/2) < n` digits, which excludes that extra
 read. Fast exponentiation's direct divisions have five regions physically available. Its inverse has three
 regions and depends on the valid radix/Euclidean length invariants. The radix marker at `work[modLen]` must also

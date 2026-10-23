@@ -3,36 +3,37 @@
 // ghttpCallbacks: the calls to the game's callbacks of a request
 
 // Tells the game that the request has ended, with its result and the data that it received. If the game doesn't want
-// the buffer (the callback returns FALSE), the buffer stays
+// the buffer (the callback returns gsi_false), the buffer stays
 void ghiCallCompletedCallback(GHIConnection *connection) {
-    GHICompletedFunc completed;
+    ghttpCompletedCallback completed;
     char *buffer;
 
     if (connection->result != 0) {
-        gsDebugFormat(8, 0, 2, "Socket Error: %d\n", connection->socketError);
+        gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_WarmError, "Socket Error: %d\n",
+                      connection->socketError);
     }
     completed = connection->completedCallback;
     if (completed != NULL) {
-        BOOL keep;
+        GHTTPBool keep;
 
-        if (connection->type == 0) {
-            buffer = connection->fileBuffer.data;
+        if (connection->type == GHIGET) {
+            buffer = connection->getFileBuffer.data;
         } else {
             buffer = NULL;
         }
-        keep = completed(connection->request, connection->result, buffer, connection->bytesReceived,
+        keep = completed(connection->request, connection->result, buffer, connection->fileBytesReceived,
                          connection->callbackParam);
         if (buffer != NULL && !keep) {
-            connection->fileBuffer.dontFree = TRUE;
+            connection->getFileBuffer.dontFree = gsi_true;
         }
     }
 }
 
-void ghiCallProgressCallback(GHIConnection *connection, const char *buffer, int length) {
-    GHIProgressFunc progress = connection->progressCallback;
+void ghiCallProgressCallback(GHIConnection *connection, const char *buffer, GHTTPByteCount length) {
+    ghttpProgressCallback progress = connection->progressCallback;
 
     if (progress != NULL) {
-        progress(connection->request, connection->state, buffer, length, connection->bytesReceived,
+        progress(connection->request, connection->state, buffer, length, connection->fileBytesReceived,
                  connection->totalSize, connection->callbackParam);
     }
 }
@@ -41,7 +42,6 @@ void ghiCallPostCallback(GHIConnection *connection) {
     if (connection->postingState.callback != NULL) {
         connection->postingState.callback(connection->request, connection->postingState.bytesPosted,
                                           connection->postingState.totalBytes, connection->postingState.index,
-                                          func_ov011_02171588(connection->postingState.states),
-                                          connection->callbackParam);
+                                          ArrayLength(connection->postingState.states), connection->callbackParam);
     }
 }

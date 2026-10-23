@@ -8,6 +8,7 @@
 #include "types.h"
 #include "battle/btl_setup.h"
 #include "battle/btlv_b_gauge.h"
+#include "battle/btlv_mcss.h"
 #include "gfl/heap.h"
 #include "gfl/tcb.h"
 #include "nitro/fx.h"
@@ -23,10 +24,24 @@ typedef struct BtlvMoveEffectParam {
     s32 unk10;         // 0x10 its arg4, PML_MoveGetParam(move, 27); BtlvEffect_StartMove keeps a byte of it
 } BtlvMoveEffectParam; // size 0x14
 
+// How BtlvEffTool_Move moves a value
+enum {
+    // Straight to the end
+    BTLV_EFFTOOL_MOVE_JUMP,
+    // Toward the end by a step every few frames
+    BTLV_EFFTOOL_MOVE_STEP,
+    // Back and forth, turning after each turn, and back to the start
+    BTLV_EFFTOOL_MOVE_SWING,
+    // The same, turning after every other turn: btlv_camera.c's shake
+    BTLV_EFFTOOL_MOVE_SHAKE,
+    // Moved as BTLV_EFFTOOL_MOVE_STEP here; btlv_bg.c instead adds the end to the value each frame
+    BTLV_EFFTOOL_MOVE_SCROLL,
+};
+
 // A value moving toward a goal, or swinging back and forth, by a step every few frames. The effect tools' work,
 // 0x3c bytes, stepped by btlv_effect.c's tools
 typedef struct {
-    s32 type;          // 0x00  0: jump to the end, 1 and 4: move to the end, 2 and 3: swing, back to the start
+    s32 type;          // 0x00  BTLV_EFFTOOL_MOVE_*
     VecFx32 start;     // 0x04
     VecFx32 end;       // 0x10
     VecFx32 step;      // 0x1c
@@ -81,8 +96,8 @@ BOOL BtlvEffect_IsBusy(void);
 void BtlvEffect_AddPokemon(PartyPkm *pkm, u32 viewPos);
 void BtlvEffect_DelPokemon(u32 viewPos);
 BOOL BtlvEffect_CheckExist(int pos);
-void BtlvEffect_SetTrainer(s32 trainerType, u32 pos, fx32 x, fx32 y, fx32 z);
-void BtlvEffect_DelTrainer(u32 pos);
+void BtlvEffect_SetTrainer(s32 trainerType, BtlvMcssPos pos, fx32 x, fx32 y, fx32 z);
+void BtlvEffect_DelTrainer(BtlvMcssPos pos);
 void BtlvEffect_SetPokeAnimeSpeed(u8 viewPos, fx32 speed);
 
 // The gauges and the ball gauges
@@ -105,15 +120,32 @@ void BtlvEffect_AddBallGauge(const BtlvBGaugeParam *param);
 void BtlvEffect_DelBallGauge(u32 side);
 BOOL BtlvEffect_IsBallGaugeBusy(u32 side);
 
-// target: 0 the stage, 1 the field, 2 both, 3 the palettes, 4 all
+// What BtlvEffect_StartPaletteFade and BtlvEffect_IsPaletteFading fade
+enum {
+    BTLV_EFFECT_FADE_STAGE,
+    BTLV_EFFECT_FADE_FIELD,
+    BTLV_EFFECT_FADE_STAGE_FIELD,
+    BTLV_EFFECT_FADE_PALETTES,
+    BTLV_EFFECT_FADE_ALL,
+};
+
 void BtlvEffect_StartPaletteFade(u32 target, u8 evy, u8 targetEvy, u8 wait, u16 color);
 BOOL BtlvEffect_IsPaletteFading(u32 target);
-// target: 0 the stage, 1 the field, 2 BG 3, 3 and 4 the stage's sides
+// What BtlvEffect_SetVanish hides
+enum {
+    BTLV_EFFECT_VANISH_STAGE,
+    BTLV_EFFECT_VANISH_FIELD,
+    BTLV_EFFECT_VANISH_BG3,
+    // The stage's sides
+    BTLV_EFFECT_VANISH_STAGE_SIDE_1ST,
+    BTLV_EFFECT_VANISH_STAGE_SIDE_2ND,
+};
+
 void BtlvEffect_SetVanish(u32 target, BOOL hide);
 // Turns a side of a rotation battle; mode 1 does nothing
 void BtlvEffect_StartRotation(u8 mode, u32 side, u32 arg2);
 void BtlvEffect_SwapPokemon(u8 pos1, u8 pos2);
-s32 BtlvEffect_GetTrainerIndex(u32 pos);
+s32 BtlvEffect_GetTrainerIndex(BtlvMcssPos pos);
 
 // The timer
 void BtlvEffect_CreateTimer(u16 gameLimitTime, u16 cmdLimitTime);
@@ -121,6 +153,12 @@ void BtlvEffect_SetTimerVisible(int which, BOOL visible, BOOL restart);
 BOOL BtlvEffect_IsTimeUp(int which);
 
 BOOL BtlvEffect_CheckExistPokemon(u8 pos);
+// How BtlvEffect_ZoomCamera brings the camera to an enemy position: at once, or over frames
+enum {
+    BTLV_EFFECT_ZOOM_SET,
+    BTLV_EFFECT_ZOOM_MOVE,
+};
+
 void BtlvEffect_ZoomCamera(u32 pos, u32 mode, int frames, int wait, int brakeFrames);
 
 // The work and its parts
@@ -164,6 +202,15 @@ void BtlvEffect_EndTask(TCB *tcb);
 void BtlvEffect_EndTaskGroup(u32 group);
 
 // The effects played while the battle waits for input
+enum {
+    BTLV_IDLE_EFFECT_OFF,
+    // Stopped by a key or a touch
+    BTLV_IDLE_EFFECT_ON,
+    // While the player picks a command (btlv_input.c), and while a communication's wait message shows (btlv_core.c)
+    BTLV_IDLE_EFFECT_COMMAND,
+    BTLV_IDLE_EFFECT_WAIT_MSG,
+};
+
 void BtlvEffect_SetIdleEffectMode(u32 mode);
 void BtlvEffect_StopIdleEffect(void);
 void BtlvEffect_RestartIdleEffect(u32 mode);

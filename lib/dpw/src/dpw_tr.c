@@ -60,7 +60,7 @@ void DpwTr_Process(void) {
     const u8 *answer;
     int size;
     int type;
-    int group;
+    DWCErrorType group;
 
     switch (sDpwTrWork.state) {
     case 2:
@@ -513,7 +513,7 @@ s32 DpwTr_GetResult(void) {
     return sDpwTrWork.result;
 }
 
-void DpwTr_Upload(Dpw_Tr_Data *data, const void *sign, u32 size) {
+void DpwTr_Upload(const Dpw_Tr_Data *data, const void *sign, u32 size) {
     memcpy(sDpwTrWork.request, data, 0x128);
     sDpwTrWork.requestId = 0;
     memcpy(sDpwTrWork.signature, sign, size);
@@ -663,7 +663,7 @@ void DpwTr_SearchEx(const Dpw_Tr_PokemonSearchDataEx *search, Dpw_Tr_Data *resul
     }
 }
 
-void DpwTr_Exchange(s32 id, Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void *sign, u32 size) {
+void DpwTr_Exchange(s32 id, const Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void *sign, u32 size) {
     sDpwTrWork.resultData = result;
     memcpy(sDpwTrWork.request, upload, 0x128);
     sDpwTrWork.requestId = id;
@@ -703,7 +703,7 @@ void DpwTr_GetServerState(void) {
 }
 
 void DpwTr_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *result) {
-    OS_GetMacAddress(profile->unk1C);
+    OS_GetMacAddress(profile->macAddress);
     memcpy(sDpwTrWork.request, profile, 0x64);
     sDpwTrWork.resultData = result;
     Gamestats_Start(sDpwTrServerType, DPW_GAMESTATS_KEY);

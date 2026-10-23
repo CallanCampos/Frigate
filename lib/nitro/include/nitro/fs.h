@@ -22,8 +22,8 @@ typedef enum FSResult {
     FS_RESULT_PERMISSION_DENIED = 9,
     FS_RESULT_NO_ENTRY = 11,
     FS_RESULT_PROC_ASYNC = 0x100,
-    // What an archive's command hook (FSProc) returns to leave the command to the archive's own functions, this time
-    // (UNKNOWN) or for good (DEFAULT, which clears the command's bit of the hook's mask)
+    // What an archive's command hook (FS_ARCHIVE_PROC_FUNC) returns to leave the command to the archive's own
+    // functions, this time (UNKNOWN) or for good (DEFAULT, which clears the command's bit of the hook's mask)
     FS_RESULT_PROC_UNKNOWN = 0x101,
     FS_RESULT_PROC_DEFAULT = 0x102,
 } FSResult;
@@ -93,9 +93,9 @@ typedef struct FSFileID {
 // archive's name table
 typedef struct FSDirPos {
     FSArchive *arc;
-    u16 dirId;
-    u16 fileId;
-    u32 position;
+    u16 own_id;
+    u16 index;
+    u32 pos;
 } FSDirPos;
 
 // What a directory's entry is: a file, by archive and number, or a directory, by position
@@ -105,14 +105,14 @@ typedef union FSEntryId {
 } FSEntryId;
 
 // The longest name that a directory entry of the ROM's name table holds
-#define FS_ENTRY_NAME_LEN_MAX 127
+#define FS_FILE_NAME_MAX 127
 
 // A directory entry as the archive's name table has it
 typedef struct FSDirEntry {
     FSEntryId id;
-    u32 isDirectory;
-    u32 nameLength;
-    char name[FS_ENTRY_NAME_LEN_MAX + 1];
+    u32 is_directory;
+    u32 name_len;
+    char name[FS_FILE_NAME_MAX + 1];
 } FSDirEntry;
 
 // What an archive of the TWL file system tells about a path (FS_COMMAND_GETPATHINFO) and about a directory entry
@@ -278,23 +278,23 @@ typedef struct FSOpenDirectoryArgs {
 } FSOpenDirectoryArgs;
 
 // The bits of FSArchive.flag
-#define FS_ARCHIVE_FLAG_REGISTERED 0x01   // its name is in the list of archives
-#define FS_ARCHIVE_FLAG_MOUNTED 0x02      // its interface is set; FS_FindArchive only finds a mounted one
-#define FS_ARCHIVE_FLAG_TABLE_LOADED 0x04 // its tables were loaded into memory (FS_LoadArchiveTables)
-#define FS_ARCHIVE_FLAG_SUSPENDED 0x08    // it does not start commands
-#define FS_ARCHIVE_FLAG_ACTIVE 0x10       // it has run FS_COMMAND_ACTIVATE and not yet FS_COMMAND_IDLE
-#define FS_ARCHIVE_FLAG_CANCELING 0x20    // a file asked to cancel its command
-#define FS_ARCHIVE_FLAG_SUSPENDING 0x40   // FS_SuspendArchive waits for the running command to end
-#define FS_ARCHIVE_FLAG_UNMOUNTING 0x80   // it is being unmounted and takes no more commands
+#define FS_ARCHIVE_FLAG_REGISTER 0x01   // its name is in the list of archives
+#define FS_ARCHIVE_FLAG_LOADED 0x02     // its interface is set; FS_FindArchive only finds a mounted one
+#define FS_ARCHIVE_FLAG_TABLE_LOAD 0x04 // its tables were loaded into memory (FS_LoadArchiveTables)
+#define FS_ARCHIVE_FLAG_SUSPEND 0x08    // it does not start commands
+#define FS_ARCHIVE_FLAG_RUNNING 0x10    // it has run FS_COMMAND_ACTIVATE and not yet FS_COMMAND_IDLE
+#define FS_ARCHIVE_FLAG_CANCELING 0x20  // a file asked to cancel its command
+#define FS_ARCHIVE_FLAG_SUSPENDING 0x40 // FS_SuspendArchive waits for the running command to end
+#define FS_ARCHIVE_FLAG_UNLOADING 0x80  // it is being unmounted and takes no more commands
 
 // An archive's functions to read and write its storage: the position counts from the archive's base. The default ones
 // copy from and to memory at the base
-typedef FSResult (*FSReadFunc)(FSArchive *arc, void *buffer, u32 position, u32 length);
-typedef FSResult (*FSWriteFunc)(FSArchive *arc, const void *buffer, u32 position, u32 length);
+typedef FSResult (*FS_ARCHIVE_READ_FUNC)(FSArchive *arc, void *buffer, u32 position, u32 length);
+typedef FSResult (*FS_ARCHIVE_WRITE_FUNC)(FSArchive *arc, const void *buffer, u32 position, u32 length);
 
 // A hook that an archive runs a command through before the default one: it returns FS_RESULT_PROC_UNKNOWN to leave the
 // command to the default
-typedef FSResult (*FSProc)(FSFile *file, FSCommandType command);
+typedef FSResult (*FS_ARCHIVE_PROC_FUNC)(FSFile *file, FSCommandType command);
 
 // What an archive that has a file allocation table and a name table keeps after the common part of FSArchive; its
 // userdata points here. The tables are read from the storage, at positions counted from the base, or from memory once
@@ -302,17 +302,17 @@ typedef FSResult (*FSProc)(FSFile *file, FSCommandType command);
 typedef struct FSArchiveTables {
     u32 base;
     u32 fat;
-    u32 fatSize;
+    u32 fat_size;
     u32 fnt;
-    u32 fntSize;
-    u32 fatBackup;
-    u32 fntBackup;
-    void *loadedMemory; // where FS_LoadArchiveTables put the tables, NULL if it did not
-    FSReadFunc readFunc;
-    FSWriteFunc writeFunc;
-    u32 unk_28;
-    FSProc proc;
-    u32 procMask; // the commands (1 << FSCommandType) that proc is run for
+    u32 fnt_size;
+    u32 fat_bak;
+    u32 fnt_bak;
+    void *load_mem; // where FS_LoadArchiveTables put the tables, NULL if it did not
+    FS_ARCHIVE_READ_FUNC read_func;
+    FS_ARCHIVE_WRITE_FUNC write_func;
+    u32 table_func;
+    FS_ARCHIVE_PROC_FUNC proc;
+    u32 proc_flag; // the commands (1 << FSCommandType) that proc is run for
 } FSArchiveTables;
 
 // A file system's archive, such as "rom": a name, and the queue of the commands that its files send, run one at a time
@@ -334,13 +334,13 @@ struct FSArchive {
 };
 
 // The bits of FSFile.stat, under the command in bits 8 to 15
-#define FS_FILE_STATUS_BUSY 0x01     // it has a command that did not end
-#define FS_FILE_STATUS_CANCEL 0x02   // it asked to cancel it
-#define FS_FILE_STATUS_BLOCKING 0x04 // a thread waits for it
-#define FS_FILE_STATUS_ENDED 0x08    // the archive ended the command that a thread waits for
-#define FS_FILE_STATUS_IS_FILE 0x10  // it is an open file
-#define FS_FILE_STATUS_IS_DIR 0x20   // it is an open directory
-#define FS_FILE_STATUS_RUNNING 0x40  // its command was started
+#define FS_FILE_STATUS_BUSY 0x01      // it has a command that did not end
+#define FS_FILE_STATUS_CANCEL 0x02    // it asked to cancel it
+#define FS_FILE_STATUS_BLOCKING 0x04  // a thread waits for it
+#define FS_FILE_STATUS_ENDED 0x08     // the archive ended the command that a thread waits for
+#define FS_FILE_STATUS_IS_FILE 0x10   // it is an open file
+#define FS_FILE_STATUS_IS_DIR 0x20    // it is an open directory
+#define FS_FILE_STATUS_OPERATING 0x40 // its command was started
 #define FS_FILE_STATUS_COMMAND_SHIFT 8
 // What a command sets and its end clears
 #define FS_FILE_STATUS_PROGRESS_MASK 0xcf
@@ -387,7 +387,7 @@ typedef struct FSFileRangeArgs {
 } FSFileRangeArgs;
 
 // The words that the default commands of an archive with tables work on, which the interface functions set in the
-// file before they run the command (fs_call_filecmd)
+// file before they run the command (FSi_TranslateCommand)
 typedef union FSFileCommandArgs {
     struct {
         void *buffer;
@@ -425,7 +425,7 @@ struct FSFile {
 };
 
 // NitroSDK's FS_GetResultCode: what the file's last command returned
-static inline FSResult FS_GetResultCode(const FSFile *file) {
+static inline FSResult FS_GetResultCode(volatile const FSFile *file) {
     return file->error;
 }
 
@@ -453,13 +453,20 @@ static inline BOOL FS_IsFile(volatile const FSFile *file) {
 
 // NitroSDK's FS_IsArchiveLoaded: whether the archive is mounted
 static inline BOOL FS_IsArchiveLoaded(volatile const FSArchive *arc) {
-    return (arc->flag & FS_ARCHIVE_FLAG_MOUNTED) ? TRUE : FALSE;
+    return (arc->flag & FS_ARCHIVE_FLAG_LOADED) ? TRUE : FALSE;
 }
 
 // NitroSDK's FS_IsArchiveSuspended: whether the archive is suspended
 static inline BOOL FS_IsArchiveSuspended(volatile const FSArchive *arc) {
-    return (arc->flag & FS_ARCHIVE_FLAG_SUSPENDED) ? TRUE : FALSE;
+    return (arc->flag & FS_ARCHIVE_FLAG_SUSPEND) ? TRUE : FALSE;
 }
+
+// Where FS_SeekFile counts the offset from
+typedef enum {
+    FS_SEEK_SET = 0,
+    FS_SEEK_CUR = 1,
+    FS_SEEK_END = 2,
+} FSSeekFileMode;
 
 void FS_InitFile(FSFile *file);                      // swan's finit
 BOOL FS_OpenFile(FSFile *file, const char *path);    // swan's romfs_fopen
@@ -467,9 +474,9 @@ u32 FS_GetFileLength(FSFile *file);                  // swan's romfs_fgetsize
 u32 FS_GetLength(FSFile *file);                      // swan's GetFileSize
 s32 FS_ReadFile(FSFile *file, void *dest, s32 size); // swan's romfs_fread
 s32 FS_WriteFile(FSFile *file, const void *src, s32 size);
-BOOL FS_CloseFile(FSFile *file);                                        // swan's romfs_fclose
-BOOL FS_SeekFile(FSFile *file, s32 offset, int whence);                 // swan's romfs_fseek
-BOOL FS_CreateFileFromMemory(FSFile *file, const void *data, u32 size); // swan's extfs_fopen
+BOOL FS_CloseFile(FSFile *file);                                   // swan's romfs_fclose
+BOOL FS_SeekFile(FSFile *file, s32 offset, FSSeekFileMode whence); // swan's romfs_fseek
+BOOL FS_CreateFileFromMemory(FSFile *file, void *data, u32 size);  // swan's extfs_fopen
 // The position in the file
 u32 FS_GetFilePosition(FSFile *file); // swan's romfs_ftell
 // The ROM archive's shortcuts for the length and the position of a file: they set *value and return TRUE when the
@@ -477,13 +484,11 @@ u32 FS_GetFilePosition(FSFile *file); // swan's romfs_ftell
 BOOL FSi_GetFileLengthIfProc(FSFile *file, u32 *length);
 BOOL FSi_GetFilePositionIfProc(FSFile *file, u32 *position);
 // Opens a file that is a range of an archive's data, from start to end
-BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, int fileId); // swan's fopen_raw
+BOOL FS_OpenFileDirect(FSFile *file, FSArchive *archive, u32 start, u32 end, u32 fileId); // swan's fopen_raw
 // The archive of a name of the given length, or NULL. NitroSDK's FS_FindArchive
 FSArchive *FS_FindArchive(const char *name, int nameLength);
 // A field of the file: where its data starts in its archive. NitroSDK's FS_GetFileImageTop
 u32 FS_GetFileImageTop(const FSFile *file);
-
-#define FS_SEEK_SET 0
 
 #define FS_FILEMODE_R 1
 
@@ -497,9 +502,12 @@ void FS_CancelFile(FSFile *file);
 // The target is the processor, MI_PROCESSOR_ARM9 (nitro/mi.h)
 #define FS_DMA_NOT_USE 0xffffffff
 
+// The number of an overlay, from 0 in each processor's table
+typedef u32 FSOverlayID;
+
 // The bits of FSOverlayInfo.flag. An image that is compressed expands in place (backward LZ). One with a digest in the
 // table of the build has it checked, unless the game booted from the ROM
-#define FS_OVERLAY_FLAG_COMPRESS 0x01
+#define FS_OVERLAY_FLAG_COMP 0x01
 #define FS_OVERLAY_FLAG_AUTH 0x02
 
 // The size of an overlay's header in a table of them, in the ROM or in memory, which FSOverlayInfo starts with
@@ -522,10 +530,10 @@ typedef struct FSOverlayInfo {
     u32 fileSize;
 } FSOverlayInfo;
 
-BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, u32 id); // swan's sys_read_overlay_header
-BOOL FS_LoadOverlay(MIProcessor target, u32 id);                          // swan's sys_load_overlay
-BOOL FS_UnloadOverlay(MIProcessor target, u32 id);                        // swan's sys_unload_overlay
-u32 FS_SetDefaultDMA(u32 dma);                                            // swan's fs_set_dma_id
+BOOL FS_LoadOverlayInfo(FSOverlayInfo *info, MIProcessor target, FSOverlayID id); // swan's sys_read_overlay_header
+BOOL FS_LoadOverlay(MIProcessor target, FSOverlayID id);                          // swan's sys_load_overlay
+BOOL FS_UnloadOverlay(MIProcessor target, FSOverlayID id);                        // swan's sys_unload_overlay
+u32 FS_SetDefaultDMA(u32 dma);                                                    // swan's fs_set_dma_id
 
 // The digests of the overlays that the build makes, one of 20 bytes for each overlay in the order of their numbers, and
 // the end of the table
@@ -546,28 +554,28 @@ void FSi_InitOverlay(void);
 // NitroSDK's FSi_GetOverlayBinarySize: the size of an overlay's image in the ROM, without its zeroed data
 u32 FSi_GetOverlayBinarySize(const FSOverlayInfo *info); // swan's sys_get_overlay_size
 // NitroSDK's FS_ClearOverlayImage: invalidates the caches over the overlay's memory and clears its zeroed data
-void FS_ClearOverlayImage(const FSOverlayInfo *info); // swan's sys_prepare_overlay_area
+void FS_ClearOverlayImage(FSOverlayInfo *info); // swan's sys_prepare_overlay_area
 // NitroSDK's FS_GetOverlayFileID: the archive and the number of the overlay's file
 FSFileID FS_GetOverlayFileID(const FSOverlayInfo *info); // swan's sys_get_overlay_file_id
 // NitroSDK's FS_LoadOverlayImage: reads the overlay's image into its memory
-BOOL FS_LoadOverlayImage(const FSOverlayInfo *info); // swan's sys_mount_overlay
+BOOL FS_LoadOverlayImage(FSOverlayInfo *info); // swan's sys_mount_overlay
 // NitroSDK's FS_StartOverlay: checks the image's digest, expands it and calls its static initializers
-void FS_StartOverlay(const FSOverlayInfo *info); // swan's sys_start_overlay
+void FS_StartOverlay(FSOverlayInfo *info); // swan's sys_start_overlay
 // NitroSDK's FS_EndOverlay: calls the destructors of the objects that the overlay made, and forgets them
-void FS_EndOverlay(const FSOverlayInfo *info);         // swan's sys_call_ovl_dtors
-BOOL FS_UnloadOverlayImage(const FSOverlayInfo *info); // swan's sys_unmount_overlay
+void FS_EndOverlay(FSOverlayInfo *info);         // swan's sys_call_ovl_dtors
+BOOL FS_UnloadOverlayImage(FSOverlayInfo *info); // swan's sys_unmount_overlay
 
 // An archive with a file allocation table and a name table (fs_command_default.c): NitroSDK's FS_LoadArchive, which
 // gives the archive its tables (counted from the base) and the functions that read and write the storage, NULL for the
 // ones that copy from and to memory at the base, and mounts it
 // swan's fs_bind
-BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FSReadFunc readFunc,
-                    FSWriteFunc writeFunc);
+BOOL FS_LoadArchive(FSArchive *arc, u32 base, u32 fat, u32 fatSize, u32 fnt, u32 fntSize, FS_ARCHIVE_READ_FUNC readFunc,
+                    FS_ARCHIVE_WRITE_FUNC writeFunc);
 // NitroSDK's FS_UnloadArchive: unmounts the archive
 BOOL FS_UnloadArchive(FSArchive *arc);
 // NitroSDK's FS_SetArchiveProc: sets the hook that is run for the commands of the mask, 1 << FSCommandType, before the
 // archive's own. Neither goes without the other
-void FS_SetArchiveProc(FSArchive *arc, FSProc proc, u32 procMask);
+void FS_SetArchiveProc(FSArchive *arc, FS_ARCHIVE_PROC_FUNC proc, u32 procMask);
 // NitroSDK's FS_LoadArchiveTables: copies the archive's tables into the memory given, which keeps them for reads from
 // then on. Returns the size of memory it needs, and loads them if it was given that much
 u32 FS_LoadArchiveTables(FSArchive *arc, void *memory, u32 memorySize);
@@ -608,16 +616,16 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
 BOOL FS_SetCurrentDirectory(const char *path);
 int FSi_IncrementSjisPositionToSlash(const char *path, int position);
 BOOL FS_ChangeDir(const char *path);
-// Opens a file that is a range of the ROM, from start, for size bytes. The name is swan's
-BOOL romfs_fopen_raw(FSFile *file, u32 start, u32 size);
+// Opens a file that is a range of the ROM, from start, for size bytes
+BOOL FS_CreateFileFromRom(FSFile *file, u32 start, u32 size); // swan's romfs_fopen_raw
 
-// The ROM archive (fs_rom.c) and the file system as a whole (fs_api.c): NitroSDK's FSi_InitRomArchive, which makes the
+// The ROM archive (fs_rom.c) and the file system as a whole (fs_api.c): NitroSDK's FSi_InitRom, which makes the
 // archive "rom" with the default DMA channel (FS_DMA_NOT_USE for none); FS_Init, which runs it and the overlays' setup
-// once; FS_IsAvailable; and FS_LoadTable, which loads the ROM archive's tables into the memory given, as
+// once; FS_IsAvailable; and FS_TryLoadTable, which loads the ROM archive's tables into the memory given, as
 // FS_LoadArchiveTables does for any archive
-void FSi_InitRomArchive(u32 dma); // swan's fs_init_core
-void FS_Init(u32 dma);            // swan's fs_init
-BOOL FS_IsAvailable(void);        // swan's fs_init_check
-u32 FS_LoadTable(void *memory, u32 size);
+void FSi_InitRom(u32 dma); // swan's fs_init_core
+void FS_Init(u32 dma);     // swan's fs_init
+BOOL FS_IsAvailable(void); // swan's fs_init_check
+u32 FS_TryLoadTable(void *memory, u32 size);
 
 #endif // POKEBW2_NITRO_FS_H

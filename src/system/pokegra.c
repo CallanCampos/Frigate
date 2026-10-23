@@ -178,7 +178,7 @@ u32 GetPokemonBinFileDataNo(u32 arcId, u32 species, u32 form, u32 sex, BOOL rare
 }
 
 void PokeGra_CellCharsToImage(NNSG2dCharacterData *chars, HeapID heapId) {
-    u8 *raw = chars->rawData;
+    u8 *raw = chars->pRawData;
     u8 *buf = GFL_HeapAllocate(HEAPID_TAIL(heapId), POKEGRA_CHARS_SIZE, TRUE, "pokegra.c", 256);
     u32 offset;
     int i;
@@ -206,7 +206,7 @@ void PokeGra_CellCharsToImage(NNSG2dCharacterData *chars, HeapID heapId) {
 
 // Puts an image that PokeGra_CellCharsToImage made back as the four OBJs' characters
 static void PokeGra_ImageToCellChars(NNSG2dCharacterData *chars, HeapID heapId) {
-    u8 *raw = chars->rawData;
+    u8 *raw = chars->pRawData;
     u8 *buf = GFL_HeapAllocate(HEAPID_TAIL(heapId), POKEGRA_CHARS_SIZE, TRUE, "pokegra.c", 313);
     u32 offset;
     int i;
@@ -236,7 +236,7 @@ static void PokeGra_ImageToCellChars(NNSG2dCharacterData *chars, HeapID heapId) 
 // nibble across and its high nibble down, from -8 to 7 pixels. Only the pixels of the face's colors (1 to 3) are
 // spotted
 static void PokeGra_DrawSpindaSpots(NNSG2dCharacterData *chars, u32 personality) {
-    u8 *raw = chars->rawData;
+    u8 *raw = chars->pRawData;
     int i, j;
     for (i = 0; i < 4; i++) {
         const SpindaSpotPixel *spot = sSpindaSpots[i];

@@ -1,75 +1,75 @@
 #include "gfdi_LinkedListVramMan_Common.h"
 
 // NitroSystem's linked-list VRAM allocator, shared by the texture and palette managers. pokediamond's link map has the
-// file as gfdi_linkedlist (cut at 15 characters); the rest of the name is a guess
+// file as gfdi_linkedlist (cut at 15 characters), and ntrtwl's reconstruction of NitroSystem has the whole name
 
-// A free span being grown by the blocks that touch it, from lo up to hi
+// A free span being grown by the blocks that touch it, from start up to end
 typedef struct {
-    u32 lo;
-    u32 hi;
-} GfdVramSpan;
+    u32 start;
+    u32 end;
+} NNSiGfdLnkMemRegion;
 
-static BOOL AbsorbTouchingBlocks(GfdVramFreeList *list, GfdVramBlock **pool, GfdVramSpan *span);
+static BOOL TryToMergeBlockRegion_(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool, NNSiGfdLnkMemRegion *span);
 
-static inline void PushBlock(GfdVramBlock **head, GfdVramBlock *block) {
+static inline void InsertBlock_(NNSiGfdLnkVramBlock **head, NNSiGfdLnkVramBlock *block) {
     if (*head != NULL) {
-        (*head)->prev = block;
+        (*head)->pBlkPrev = block;
     }
-    block->next = *head;
-    block->prev = NULL;
+    block->pBlkNext = *head;
+    block->pBlkPrev = NULL;
     *head = block;
 }
 
-static inline void UnlinkBlock(GfdVramBlock **head, GfdVramBlock *block) {
-    GfdVramBlock *before = block->prev;
-    GfdVramBlock *after = block->next;
+static inline void RemoveBlock_(NNSiGfdLnkVramBlock **head, NNSiGfdLnkVramBlock *block) {
+    NNSiGfdLnkVramBlock *before = block->pBlkPrev;
+    NNSiGfdLnkVramBlock *after = block->pBlkNext;
 
     if (before != NULL) {
-        before->next = after;
+        before->pBlkNext = after;
     } else {
         *head = after;
     }
     if (after != NULL) {
-        after->prev = before;
+        after->pBlkPrev = before;
     }
 }
 
-static inline GfdVramBlock *TakePoolBlock(GfdVramBlock **pool) {
-    GfdVramBlock *block = *pool;
+static inline NNSiGfdLnkVramBlock *GetNewBlock_(NNSiGfdLnkVramBlock **pool) {
+    NNSiGfdLnkVramBlock *block = *pool;
 
     if (block != NULL) {
-        *pool = block->next;
+        *pool = block->pBlkNext;
     }
     return block;
 }
 
-static inline void SetBlock(GfdVramBlock *block, u32 start, u32 size) {
-    block->start = start;
-    block->size = size;
-    block->prev = NULL;
-    block->next = NULL;
+static inline void InitBlockFromPrams_(NNSiGfdLnkVramBlock *block, u32 start, u32 size) {
+    block->addr = start;
+    block->szByte = size;
+    block->pBlkPrev = NULL;
+    block->pBlkNext = NULL;
 }
 
 // Moves the free blocks that touch the span into it, and their blocks back to the pool, and returns whether there
 // were any
-static BOOL AbsorbTouchingBlocks(GfdVramFreeList *list, GfdVramBlock **pool, GfdVramSpan *span) {
-    GfdVramBlock *block = list->head;
-    GfdVramBlock *next;
+static BOOL TryToMergeBlockRegion_(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool, NNSiGfdLnkMemRegion *span) {
+    NNSiGfdLnkVramBlock *block = list->pFreeList;
+    NNSiGfdLnkVramBlock *next;
     BOOL absorbed = FALSE;
 
     while (block != NULL) {
-        next = block->next;
+        next = block->pBlkNext;
 
-        if (block->start == span->hi) {
-            span->hi = block->start + block->size;
-            UnlinkBlock(&list->head, block);
-            PushBlock(pool, block);
+        if (block->addr == span->end) {
+            span->end = block->addr + block->szByte;
+            RemoveBlock_(&list->pFreeList, block);
+            InsertBlock_(pool, block);
             absorbed |= TRUE;
         }
-        if (span->lo == block->start + block->size) {
-            span->lo = block->start;
-            UnlinkBlock(&list->head, block);
-            PushBlock(pool, block);
+        if (span->start == block->addr + block->szByte) {
+            span->start = block->addr;
+            RemoveBlock_(&list->pFreeList, block);
+            InsertBlock_(pool, block);
             absorbed |= TRUE;
         }
 
@@ -78,40 +78,41 @@ static BOOL AbsorbTouchingBlocks(GfdVramFreeList *list, GfdVramBlock **pool, Gfd
     return absorbed;
 }
 
-void NNSi_GfdInitLnkVramMan(GfdVramFreeList *list) {
-    list->head = NULL;
+void NNSi_GfdInitLnkVramMan(NNSiGfdLnkVramMan *list) {
+    list->pFreeList = NULL;
 }
 
-GfdVramBlock *NNSi_GfdInitLnkVramBlockPool(GfdVramBlock *blocks, u32 count) {
+NNSiGfdLnkVramBlock *NNSi_GfdInitLnkVramBlockPool(NNSiGfdLnkVramBlock *blocks, u32 count) {
     u32 i;
 
     for (i = 0; i < count - 1; i++) {
-        blocks[i].next = &blocks[i + 1];
-        blocks[i + 1].prev = &blocks[i];
+        blocks[i].pBlkNext = &blocks[i + 1];
+        blocks[i + 1].pBlkPrev = &blocks[i];
     }
-    blocks[0].prev = NULL;
-    (blocks + count - 1)->next = NULL;
+    blocks[0].pBlkPrev = NULL;
+    (blocks + count - 1)->pBlkNext = NULL;
     return blocks;
 }
 
-BOOL NNSi_GfdAddNewFreeBlock(GfdVramFreeList *list, GfdVramBlock **pool, u32 start, u32 size) {
-    GfdVramBlock *block = TakePoolBlock(pool);
+BOOL NNSi_GfdAddNewFreeBlock(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool, u32 start, u32 size) {
+    NNSiGfdLnkVramBlock *block = GetNewBlock_(pool);
 
     if (block != NULL) {
-        SetBlock(block, start, size);
-        PushBlock(&list->head, block);
+        InitBlockFromPrams_(block, start, size);
+        InsertBlock_(&list->pFreeList, block);
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL NNSi_GfdAllocLnkVram(GfdVramFreeList *list, GfdVramBlock **pool, u32 *outAddr, u32 size) {
+BOOL NNSi_GfdAllocLnkVram(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool, u32 *outAddr, u32 size) {
     return NNSi_GfdAllocLnkVramAligned(list, pool, outAddr, size, 0);
 }
 
-BOOL NNSi_GfdAllocLnkVramAligned(GfdVramFreeList *list, GfdVramBlock **pool, u32 *outAddr, u32 size, u32 align) {
-    GfdVramBlock *block = list->head;
-    GfdVramBlock *chosen = NULL;
+BOOL NNSi_GfdAllocLnkVramAligned(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool, u32 *outAddr, u32 size,
+                                 u32 align) {
+    NNSiGfdLnkVramBlock *block = list->pFreeList;
+    NNSiGfdLnkVramBlock *chosen = NULL;
     u32 addr;
     u32 taken;
     u32 skipped;
@@ -119,39 +120,39 @@ BOOL NNSi_GfdAllocLnkVramAligned(GfdVramFreeList *list, GfdVramBlock **pool, u32
     // The first free block that holds the size once its start is aligned
     while (block != NULL) {
         if (align > 1) {
-            addr = (block->start + (align - 1)) & ~(align - 1);
-            skipped = addr - block->start;
+            addr = (block->addr + (align - 1)) & ~(align - 1);
+            skipped = addr - block->addr;
             taken = size + skipped;
         } else {
-            addr = block->start;
+            addr = block->addr;
             skipped = 0;
             taken = size;
         }
 
-        if (block->size >= taken) {
+        if (block->szByte >= taken) {
             chosen = block;
             break;
         }
-        block = block->next;
+        block = block->pBlkNext;
     }
 
     if (chosen != NULL) {
         // What aligning skips stays free, as a block of its own
         if (skipped > 0) {
-            GfdVramBlock *gap = TakePoolBlock(pool);
+            NNSiGfdLnkVramBlock *gap = GetNewBlock_(pool);
 
             if (gap == NULL) {
                 goto fail;
             }
-            SetBlock(gap, chosen->start, skipped);
-            PushBlock(&list->head, gap);
+            InitBlockFromPrams_(gap, chosen->addr, skipped);
+            InsertBlock_(&list->pFreeList, gap);
         }
 
-        chosen->size -= taken;
-        chosen->start += taken;
-        if (chosen->size == 0) {
-            UnlinkBlock(&list->head, chosen);
-            PushBlock(pool, chosen);
+        chosen->szByte -= taken;
+        chosen->addr += taken;
+        if (chosen->szByte == 0) {
+            RemoveBlock_(&list->pFreeList, chosen);
+            InsertBlock_(pool, chosen);
         }
         *outAddr = addr;
         return TRUE;
@@ -162,41 +163,41 @@ fail:
     return FALSE;
 }
 
-void NNSi_GfdMergeAllFreeBlocks(GfdVramFreeList *list, GfdVramBlock **pool) {
-    GfdVramBlock *block = list->head;
+void NNSi_GfdMergeAllFreeBlocks(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool) {
+    NNSiGfdLnkVramBlock *block = list->pFreeList;
 
     while (block != NULL) {
-        GfdVramSpan span;
+        NNSiGfdLnkMemRegion span;
 
-        span.lo = block->start;
-        span.hi = block->start + block->size;
-        if (AbsorbTouchingBlocks(list, pool, &span)) {
+        span.start = block->addr;
+        span.end = block->addr + block->szByte;
+        if (TryToMergeBlockRegion_(list, pool, &span)) {
             // The list changed, so start over
-            block->start = span.lo;
-            block->size = span.hi - span.lo;
-            block = list->head;
+            block->addr = span.start;
+            block->szByte = span.end - span.start;
+            block = list->pFreeList;
         } else {
-            block = block->next;
+            block = block->pBlkNext;
         }
     }
 }
 
-BOOL NNSi_GfdFreeLnkVram(GfdVramFreeList *list, GfdVramBlock **pool, u32 addr, u32 size) {
-    GfdVramSpan span;
-    GfdVramBlock *block;
+BOOL NNSi_GfdFreeLnkVram(NNSiGfdLnkVramMan *list, NNSiGfdLnkVramBlock **pool, u32 addr, u32 size) {
+    NNSiGfdLnkMemRegion span;
+    NNSiGfdLnkVramBlock *block;
 
-    span.lo = addr;
-    span.hi = addr + size;
-    AbsorbTouchingBlocks(list, pool, &span);
+    span.start = addr;
+    span.end = addr + size;
+    TryToMergeBlockRegion_(list, pool, &span);
 
-    block = TakePoolBlock(pool);
+    block = GetNewBlock_(pool);
     if (block == NULL) {
         return FALSE;
     }
-    block->start = span.lo;
-    block->size = span.hi - span.lo;
-    block->prev = NULL;
-    block->next = NULL;
-    PushBlock(&list->head, block);
+    block->addr = span.start;
+    block->szByte = span.end - span.start;
+    block->pBlkPrev = NULL;
+    block->pBlkNext = NULL;
+    InsertBlock_(&list->pFreeList, block);
     return TRUE;
 }

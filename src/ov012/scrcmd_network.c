@@ -84,7 +84,7 @@ BOOL s013D_GameCommPause(VM *vm, FieldScriptEnv *env) {
         break;
     }
     GSYS_SetGameCommPaused(gsys, 1);
-    FieldScriptSubEvent_Register(11);
+    FieldScriptSubEvent_Register(SCRIPT_SUB_EVENT_GAME_COMM_PAUSE);
     return TRUE;
 }
 
@@ -94,7 +94,7 @@ BOOL s013E_GameCommResume(VM *vm, FieldScriptEnv *env) {
     gsys = FieldScriptEnv_GetGameSystem(env);
     GSYS_SetGameCommPaused(gsys, 0);
     GSYS_TryBootGameComm(gsys);
-    FieldScriptSubEvent_Unregister(11);
+    FieldScriptSubEvent_Unregister(SCRIPT_SUB_EVENT_GAME_COMM_PAUSE);
     return TRUE;
 }
 

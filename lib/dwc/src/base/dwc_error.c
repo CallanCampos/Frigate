@@ -6,20 +6,20 @@
 
 // The last error and its code
 typedef struct DWCErrorInfo {
-    int error;
+    DWCError error;
     int code;
 } DWCErrorInfo;
 
 static DWCErrorInfo sErrorInfo;
 
-int DWC_GetLastError(int *code) {
+DWCError DWC_GetLastError(int *code) {
     if (code != NULL) {
         *code = sErrorInfo.code;
     }
     return sErrorInfo.error;
 }
 
-int DWC_GetLastErrorEx(int *code, int *type) {
+DWCError DWC_GetLastErrorEx(int *code, DWCErrorType *type) {
     if (code != NULL) {
         *code = sErrorInfo.code;
     }
@@ -56,13 +56,13 @@ int DWC_GetLastErrorEx(int *code, int *type) {
         case DWC_ERROR_ND_ANY:
             *type = DWC_ETYPE_SHUTDOWN_ND;
             break;
-        case 14:
-        case 16:
-        case 18:
+        case DWC_ERROR_ND_HTTP:
+        case DWC_ERROR_SVL_HTTP:
+        case DWC_ERROR_PROF_HTTP:
             *type = DWC_ETYPE_DISCONNECT;
             break;
-        case 15:
-        case 17:
+        case DWC_ERROR_SVL_ANY:
+        case DWC_ERROR_PROF_ANY:
         case 19:
         case 20:
             *type = DWC_ETYPE_SHOW_ERROR;
@@ -86,7 +86,7 @@ BOOL DWCi_IsError(void) {
     return sErrorInfo.error != DWC_ERROR_NONE;
 }
 
-void DWCi_SetError(int error, int code) {
+void DWCi_SetError(DWCError error, int code) {
     if (sErrorInfo.error != DWC_ERROR_FATAL) {
         sErrorInfo.error = error;
         sErrorInfo.code = code;

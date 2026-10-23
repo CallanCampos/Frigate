@@ -27,15 +27,23 @@ This setting has been applied and read back; changing the JSON alone does not ch
 
 Required checks (names are a compatibility interface):
 
-- `Compile src/ and lib/`: every decomp C file compiled for both game versions without ROMs.
+- `Compile src/ and lib/`: every decomp C file compiled and library assembly source assembled for both versions
+  without ROMs.
 - `Code standards`: inherited decomp style and consistency checks.
 - `Frigate CI`: aggregate that succeeds only when every native build/test group and sync tooling tests succeed.
 - `Frigate local verification`: both local ROM SHA1s and native host build/tests on the exact PR head.
 
-The three Actions checks are bound to the GitHub Actions integration (15368). Local verification is a commit status
-set by the authenticated maintainer, not a public runner; only trusted writers can submit statuses. GitHub cannot
-prove an attestation's truth, so maintainers must use the build-running verification command. No self-hosted runner
-with ROMs or write credentials processes untrusted PRs. Inspect code before executing it locally.
+The three Actions checks are bound to the GitHub Actions integration (`15368`), but a required check name does not
+identify a workflow definition. Review workflow changes before relying on their results. `Frigate local verification`
+is an unbound commit status because the maintainer's user account posts it; a same-named Actions job is not proof of
+local verification. Before every merge, inspect the latest REST commit status on the **exact PR head** whose context
+is `Frigate local verification`: it must have state `success` and creator `CallanCampos` (user ID `145432210`). A status
+on an earlier head does not count. GitHub's name/source rules and this limitation are documented in
+[troubleshooting required checks](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks)
+and [available rules for rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging).
+
+GitHub cannot prove an attestation's truth: inspect code before executing it locally and use the build-running
+verification command. No privileged self-hosted runner with ROMs or write credentials processes untrusted PRs.
 
 Merge commits are the only enabled merge method. In particular, never squash or rebase upstream sync PRs: the real
 upstream parent and `Upstream-Commit` trailer make later imports preserve history and port modifications. Automatic

@@ -1,20 +1,15 @@
 #include "snd_internal.h"
 #include <stddef.h>
 
-// NitroSystem's sequence players (NNS_SndPlayer), which share the driver's 16 players among the sequences of 32
-// player numbers by priority, and the handles that sequences are controlled through. The file name is a guess, from
-// NitroSystem's names for its sound files. NNS_SndPlayerSetPlayerVolume, NNS_SndPlayerSetVolume,
-// NNS_SndPlayerSetTrackPitch, NNS_SndPlayerSetTrackModDepth and NNS_SndPlayerSetTrackModSpeed are
-// NNS_SndPlayerSetPlayerVolume, NNS_SndPlayerSetVolume, NNS_SndPlayerSetTrackPitch, NNS_SndPlayerSetTrackModDepth and
-// NNS_SndPlayerSetTrackModSpeed by their code
+// NitroSystem's sequence players (NNS_SndPlayer), which share the driver's 16 players among the sequences of 32 player
+// numbers by priority, and the handles that sequences are controlled through. The SDK's file is player.c, and the names
+// are NitroSystem's, as ntrtwl's reconstruction of NitroSystem has them, except NNS_SND_VOLUME_MAX and
+// SND_TRACK_MASK_ALL, which are ours
 
 #define NNS_SND_PLAYER_NUM 32
-#define SND_PLAYER_NUM 16
 
 #define NNS_SND_VOLUME_MAX 127
 #define SND_TRACK_MASK_ALL 0xffff
-// The quietest volume in decibels, which a sequence fading out stops at
-#define SND_VOLUME_DB_MIN -723
 
 // A player number: its sequences playing, by priority, and its free heaps
 struct NNSSndPlayer {
@@ -28,13 +23,13 @@ struct NNSSndPlayer {
 // A heap of a player number, made in a sound heap, and the sequence player using it if any
 struct NNSSndPlayerHeap {
     NNSFndLink link;
-    NNSSndHeapHandle heap;
+    NNSSndHeapHandle handle;
     NNSSndSeqPlayer *player;
     int playerNo;
 };
 
-static void StopSeq(NNSSndSeqPlayer *seqPlayer, int fadeFrame);
-static void PauseSeq(NNSSndSeqPlayer *seqPlayer, BOOL flag);
+static void NNSi_SndPlayerStopSeq(NNSSndSeqPlayer *seqPlayer, int fadeFrame);
+static void NNSi_SndPlayerPause(NNSSndSeqPlayer *seqPlayer, BOOL flag);
 static void InitPlayer(NNSSndSeqPlayer *seqPlayer);
 static void InsertPlayerList(NNSSndPlayer *player, NNSSndSeqPlayer *seqPlayer);
 static void InsertPrioList(NNSSndSeqPlayer *seqPlayer);
@@ -50,7 +45,7 @@ static NNSSndSeqPlayer sSeqPlayer[SND_PLAYER_NUM];
 static NNSSndPlayer sPlayer[NNS_SND_PLAYER_NUM];
 
 // A volume 0 to 127 in decibels, as NitroSDK's SND_CalcDecibel gives it
-static inline int CalcDecibel(int scale) {
+static inline int SND_CalcDecibel(int scale) {
     return SNDi_DecibelTable[scale];
 }
 
@@ -80,24 +75,24 @@ BOOL NNS_SndPlayerCreateHeap(int playerNo, NNSSndHeapHandle heap, u32 size) {
     }
     playerHeap->player = NULL;
     playerHeap->playerNo = playerNo;
-    playerHeap->heap = NULL;
+    playerHeap->handle = NULL;
 
     frmHeap = NNS_SndHeapCreate(playerHeap + 1, size);
     if (frmHeap == NULL) {
         return FALSE;
     }
-    playerHeap->heap = frmHeap;
+    playerHeap->handle = frmHeap;
 
     NNS_FndAppendListObject(&sPlayer[playerNo].heapList, playerHeap);
     return TRUE;
 }
 
 void NNS_SndPlayerStopSeq(NNSSndHandle *handle, int fadeFrame) {
-    StopSeq(handle->player, fadeFrame);
+    NNSi_SndPlayerStopSeq(handle->player, fadeFrame);
 }
 
 void NNS_SndPlayerPause(NNSSndHandle *handle, BOOL flag) {
-    PauseSeq(handle->player, flag);
+    NNSi_SndPlayerPause(handle->player, flag);
 }
 
 void NNS_SndHandleInit(NNSSndHandle *handle) {
@@ -121,7 +116,7 @@ int NNS_SndPlayerCountPlayingSeqBySeqNo(int seqNo) {
     NNSSndSeqPlayer *seqPlayer = NULL;
 
     while ((seqPlayer = NNS_FndGetNextListObject(&sPrioList, seqPlayer)) != NULL) {
-        if (seqPlayer->seqType == NNS_SND_SEQ_TYPE_SEQ && seqPlayer->seqNo == seqNo) {
+        if (seqPlayer->seqType == NNS_SND_PLAYER_SEQ_TYPE_SEQ && seqPlayer->seqNo == seqNo) {
             count++;
         }
     }
@@ -158,49 +153,49 @@ void NNS_SndPlayerSetChannelPriority(NNSSndHandle *handle, int prio) {
     SND_SetPlayerChannelPriority(handle->player->playerNo, prio);
 }
 
-void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u32 trackBitMask, BOOL flag) {
+void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u16 trackBitMask, BOOL flag) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackMute(handle->player->playerNo, trackBitMask, flag);
 }
 
-void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u32 trackBitMask, int muteType) {
+void NNS_SndPlayerSetTrackMuteEx(NNSSndHandle *handle, u16 trackBitMask, NNSSndSeqMute muteType) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackMuteEx(handle->player->playerNo, trackBitMask, muteType);
 }
 
-void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u32 trackBitMask, int volume) {
+void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u16 trackBitMask, int volume) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    SND_SetTrackVolume(handle->player->playerNo, trackBitMask, CalcDecibel(volume));
+    SND_SetTrackVolume(handle->player->playerNo, trackBitMask, SND_CalcDecibel(volume));
 }
 
-void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u32 trackBitMask, int pitch) {
+void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u16 trackBitMask, int pitch) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackPitch(handle->player->playerNo, trackBitMask, pitch);
 }
 
-void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u32 trackBitMask, int pan) {
+void NNS_SndPlayerSetTrackPan(NNSSndHandle *handle, u16 trackBitMask, int pan) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackPan(handle->player->playerNo, trackBitMask, pan);
 }
 
-void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u32 trackBitMask, int depth) {
+void NNS_SndPlayerSetTrackModDepth(NNSSndHandle *handle, u16 trackBitMask, int depth) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
     SND_SetTrackModDepth(handle->player->playerNo, trackBitMask, depth);
 }
 
-void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u32 trackBitMask, int speed) {
+void NNS_SndPlayerSetTrackModSpeed(NNSSndHandle *handle, u16 trackBitMask, int speed) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
@@ -214,19 +209,19 @@ void NNS_SndPlayerSetTempoRatio(NNSSndHandle *handle, int ratio) {
     SND_SetPlayerTempoRatio(handle->player->playerNo, ratio);
 }
 
-void NNSi_SndPlayerSetSeqNo(NNSSndHandle *handle, int seqNo) {
+void NNS_SndPlayerSetSeqNo(NNSSndHandle *handle, int seqNo) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    handle->player->seqType = NNS_SND_SEQ_TYPE_SEQ;
+    handle->player->seqType = NNS_SND_PLAYER_SEQ_TYPE_SEQ;
     handle->player->seqNo = seqNo;
 }
 
-void NNSi_SndPlayerSetSeqArcNo(NNSSndHandle *handle, int seqArcNo, int index) {
+void NNS_SndPlayerSetSeqArcNo(NNSSndHandle *handle, int seqArcNo, int index) {
     if (!NNS_SndHandleIsValid(handle)) {
         return;
     }
-    handle->player->seqType = NNS_SND_SEQ_TYPE_SEQARC;
+    handle->player->seqType = NNS_SND_PLAYER_SEQ_TYPE_SEQARC;
     handle->player->seqNo = seqArcNo;
     handle->player->seqArcIndex = index;
 }
@@ -295,8 +290,8 @@ void NNSi_SndPlayerMain(void) {
 
         NNSi_SndFaderUpdate(&seqPlayer->fader);
 
-        volume = CalcDecibel(seqPlayer->initVolume) + CalcDecibel(seqPlayer->extVolume) +
-                 CalcDecibel(seqPlayer->player->volume) + CalcDecibel(NNSi_SndFaderGet(&seqPlayer->fader) >> 8);
+        volume = SND_CalcDecibel(seqPlayer->initVolume) + SND_CalcDecibel(seqPlayer->extVolume) +
+                 SND_CalcDecibel(seqPlayer->player->volume) + SND_CalcDecibel(NNSi_SndFaderGet(&seqPlayer->fader) >> 8);
         if (volume < -0x8000) {
             volume = -0x8000;
         } else if (volume > 0x7fff) {
@@ -367,7 +362,7 @@ void NNSi_SndPlayerStartSeq(NNSSndSeqPlayer *seqPlayer, const void *seqBase, u32
     seqPlayer->status = NNS_SND_SEQ_PLAYER_STATUS_PLAY;
 }
 
-static void StopSeq(NNSSndSeqPlayer *seqPlayer, int fadeFrame) {
+static void NNSi_SndPlayerStopSeq(NNSSndSeqPlayer *seqPlayer, int fadeFrame) {
     if (seqPlayer == NULL) {
         return;
     }
@@ -383,7 +378,7 @@ static void StopSeq(NNSSndSeqPlayer *seqPlayer, int fadeFrame) {
     seqPlayer->status = NNS_SND_SEQ_PLAYER_STATUS_FADEOUT;
 }
 
-static void PauseSeq(NNSSndSeqPlayer *seqPlayer, BOOL flag) {
+static void NNSi_SndPlayerPause(NNSSndSeqPlayer *seqPlayer, BOOL flag) {
     if (seqPlayer == NULL) {
         return;
     }
@@ -405,15 +400,15 @@ NNSSndHeapHandle NNSi_SndPlayerAllocHeap(int playerNo, NNSSndSeqPlayer *seqPlaye
 
     heap->player = seqPlayer;
     seqPlayer->heap = heap;
-    NNS_SndHeapClear(heap->heap);
-    return heap->heap;
+    NNS_SndHeapClear(heap->handle);
+    return heap->handle;
 }
 
 static void InitPlayer(NNSSndSeqPlayer *seqPlayer) {
     seqPlayer->pauseFlag = FALSE;
     seqPlayer->startFlag = FALSE;
     seqPlayer->prepareFlag = FALSE;
-    seqPlayer->seqType = NNS_SND_SEQ_TYPE_INVALID;
+    seqPlayer->seqType = NNS_SND_PLAYER_SEQ_TYPE_INVALID;
     seqPlayer->volume = 0;
     seqPlayer->initVolume = NNS_SND_VOLUME_MAX;
     seqPlayer->extVolume = NNS_SND_VOLUME_MAX;
@@ -497,10 +492,10 @@ static void ShutdownPlayer(NNSSndSeqPlayer *seqPlayer) {
 static void PlayerHeapDisposeCallback(void *mem, u32 size, uptr data1, uptr data2) {
     NNSSndPlayerHeap *playerHeap = mem;
 
-    if (playerHeap->heap == NULL) {
+    if (playerHeap->handle == NULL) {
         return;
     }
-    NNS_SndHeapDestroy(playerHeap->heap);
+    NNS_SndHeapDestroy(playerHeap->handle);
 
     if (playerHeap->player != NULL) {
         playerHeap->player->heap = NULL;

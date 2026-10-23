@@ -22,7 +22,7 @@ void OS_GetOwnerInfoEx(OSOwnerInfoEx *info) {
     info->nickName[OS_OWNERINFO_NICKNAME_MAX] = 0;
     info->comment[OS_OWNERINFO_COMMENT_MAX] = 0;
     if (OS_IsRunOnTwl()) {
-        TWLSettings *settings = TWL_SETTINGS;
+        OSTWLSettingsData *settings = TWL_SETTINGS;
 
         info->country = settings->country;
         info->language = settings->language;
@@ -43,7 +43,7 @@ BOOL OS_IsAvailableWireless(void) {
 // TwlSDK's OS_IsAgreeEULA: FALSE on a DS
 BOOL OS_IsAgreeEULA(void) {
     if (OS_IsRunOnTwl()) {
-        return (TWL_SETTINGS->eulaFlags & 1) != 0;
+        return (TWL_SETTINGS->flags.isAgreeEULAFlagList & 1) != 0;
     }
     return FALSE;
 }
@@ -51,7 +51,7 @@ BOOL OS_IsAgreeEULA(void) {
 // TwlSDK's OS_GetAgreedEULAVersion: 0 on a DS
 u8 OS_GetAgreedEULAVersion(void) {
     if (OS_IsRunOnTwl()) {
-        return TWL_SETTINGS->agreedEULAVersion;
+        return TWL_SETTINGS->agreeEulaVersion[0];
     }
     return 0;
 }
@@ -65,7 +65,7 @@ u8 OS_GetROMHeaderEULAVersion(void) {
 }
 
 // The DSi's parental controls, NULL on a DS
-TWLParentalControl *OS_GetParentalControlInfoPtr(void) {
+OSTWLParentalControl *OS_GetParentalControlInfoPtr(void) {
     if (OS_IsRunOnTwl()) {
         return &TWL_SETTINGS->parentalControl;
     }

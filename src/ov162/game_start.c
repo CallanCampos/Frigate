@@ -560,8 +560,8 @@ static BOOL DebugGameStart_Main(GameProc *proc, u32 *state, void *param, void *w
 }
 
 static void DebugGameStart_InitBG(DebugGameStartWork *wk) {
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     GFL_BGSysSetEnabledBGsA(0);
     GFL_BGSysSetEnabledBGsB(0);
     GFL_BGSysSetVRAMBanks(&sDebugVRAMConfig);
@@ -692,5 +692,5 @@ static void DebugGameStart_CycleCursorColor(DebugGameStartWork *wk) {
     r = 25 + ((-20 * t) >> FX32_SHIFT);
     g = 30 + ((-15 * t) >> FX32_SHIFT);
     wk->cursorColor = GX_RGB(r, g, b);
-    NNS_GfdRegisterNewVramTransferTask(15, 3 * 0x20 + 6 * 2, &wk->cursorColor, sizeof(GXRgb));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 3 * 0x20 + 6 * 2, &wk->cursorColor, sizeof(GXRgb));
 }

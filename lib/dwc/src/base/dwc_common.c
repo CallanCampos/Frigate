@@ -8,9 +8,9 @@
 static const char *sBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-";
 
 // Encodes the bytes in groups of three, each as four characters
-int DWC_Base64Encode(const u8 *src, u32 srcLen, char *dst, u32 dstLen) {
+int DWC_Base64Encode(const char *src, const u32 srcLen, char *dst, const u32 dstLen) {
     u32 count;
-    const u8 *end;
+    const char *end;
     char *out;
     u32 outLen = srcLen / 3 * 4 + (srcLen % 3 != 0 ? 4 : 0);
 
@@ -44,11 +44,11 @@ int DWC_Base64Encode(const u8 *src, u32 srcLen, char *dst, u32 dstLen) {
 }
 
 // Decodes the text in groups of four characters, each as three bytes
-int DWC_Base64Decode(const char *src, int srcLen, u8 *dst, u32 dstLen) {
+int DWC_Base64Decode(const char *src, int srcLen, char *dst, const u32 dstLen) {
     int bits;
     int i;
     int outLen;
-    u8 *out;
+    char *out;
     int size;
 
     if (srcLen & 3) {

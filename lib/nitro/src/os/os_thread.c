@@ -29,7 +29,7 @@ static OSSwitchThreadCallback OSi_SystemCallbackInSwitchThread;
 // How many times the scheduler has been locked (NitroSDK's OS_DisableScheduler), which stops it from switching
 static u32 OSi_RescheduleCount;
 // Whether OS_InitThread has run (NitroSDK's OS_IsThreadAvailable), which other code reads
-BOOL OSi_ThreadInitialized;
+BOOL OSi_IsThreadInitialized;
 // A word that code the link removed used, the stack that a thread that ends runs the end on when it is not zero, and
 // the last ID that was given to a thread
 static struct {
@@ -226,10 +226,10 @@ static void OSi_RescheduleThread(void) {
 void OS_InitThread(void) {
     u32 stackTop;
 
-    if (OSi_ThreadInitialized) {
+    if (OSi_IsThreadInitialized) {
         return;
     }
-    OSi_ThreadInitialized = TRUE;
+    OSi_IsThreadInitialized = TRUE;
     OSi_CurrentThreadPtr = &OSi_ThreadInfo.current;
 
     OSi_LauncherThread.priority = OS_THREAD_LAUNCHER_PRIORITY;
@@ -247,8 +247,8 @@ void OS_InitThread(void) {
     OSi_LauncherThread.stackBottom = HW_IRQ_STACK_END;
     OSi_LauncherThread.stackTop = stackTop;
     OSi_LauncherThread.stackWarningOffset = 0;
-    *(u32 *)(OSi_LauncherThread.stackBottom - 8) = OS_STACK_BEGIN_MAGIC;
-    *(u32 *)OSi_LauncherThread.stackTop = OS_STACK_END_MAGIC;
+    *(u32 *)(OSi_LauncherThread.stackBottom - 8) = OSi_STACK_CHECKNUM_BOTTOM;
+    *(u32 *)OSi_LauncherThread.stackTop = OSi_STACK_CHECKNUM_TOP;
     OS_InitThreadQueue(&OSi_LauncherThread.joinQueue);
 
     OSi_ThreadInfo.isNeedRescheduling = FALSE;
@@ -262,14 +262,22 @@ void OS_InitThread(void) {
     OSi_IdleThread.state = OS_THREAD_STATE_READY;
 }
 
-BOOL OS_IsThreadAvailable(void) {
-    return OSi_ThreadInitialized;
+#ifndef PLATFORM_PC // port/hal/os/os_thread_host.c supplies the native getter
+// NitroSDK's assembly getter for whether OS_InitThread has run, as in ntrtwl's SDK and pret's pokediamond.
+// clang-format off
+asm BOOL OS_IsThreadAvailable(void) {
+    ldr r0, =OSi_IsThreadInitialized
+    ldr r0, [r0, #0]
+    bx lr
 }
+#endif
+
+// clang-format on
 
 // NitroSDK's OS_CreateThread: sets up a thread, which stays asleep until it is started. The stack is where it begins,
 // and the end of the function makes the thread exit
 void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *stack, u32 stackSize, u32 prio) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u32 id = OSi_GetUnusedThreadId();
     u32 stackTop;
 
@@ -283,8 +291,8 @@ void OS_CreateThread(OSThread *thread, void (*func)(void *), void *arg, void *st
     stackTop = (u32)stack - stackSize;
     thread->stackTop = stackTop;
     thread->stackWarningOffset = 0;
-    *(u32 *)(thread->stackBottom - 8) = OS_STACK_BEGIN_MAGIC;
-    *(u32 *)thread->stackTop = OS_STACK_END_MAGIC;
+    *(u32 *)(thread->stackBottom - 8) = OSi_STACK_CHECKNUM_BOTTOM;
+    *(u32 *)thread->stackTop = OSi_STACK_CHECKNUM_TOP;
     OS_InitThreadQueue(&thread->joinQueue);
 
     OS_InitContext(&thread->context, (u32)func, (u32)stack - 8);
@@ -357,7 +365,7 @@ static void OSi_ExitThread_Destroy(void) {
 
 // NitroSDK's OS_DestroyThread: ends a thread, waking the ones that wait for it
 void OS_DestroyThread(OSThread *thread) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (OSi_ThreadInfo.current == thread) {
         OSi_ExitThread_Destroy();
@@ -383,7 +391,7 @@ void OS_KillThread(OSThread *thread, void *arg) {
 
 // NitroSDK's OSi_KillThreadWithPriority: makes the end of a thread run next, at the priority
 static void OSi_KillThreadWithPriority(OSThread *thread, void *arg, u32 priority) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u32 stack;
 
     if (thread == OSi_ThreadInfo.current) {
@@ -416,7 +424,7 @@ static void OSi_CancelThreadAlarmForSleep(OSThread *thread) {
 
 // Waits for a thread to end
 void OS_JoinThread(OSThread *thread) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (thread->state != OS_THREAD_STATE_TERMINATED) {
         OS_SleepThread(&thread->joinQueue);
@@ -433,7 +441,7 @@ BOOL OS_IsThreadTerminated(const OSThread *thread) {
 
 // TwlSDK's OS_SleepThreadDirect: puts a thread to sleep in a queue
 void OS_SleepThreadDirect(OSThread *thread, OSThreadQueue *queue) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (thread->state == OS_THREAD_STATE_READY) {
         if (queue != NULL) {
@@ -448,7 +456,7 @@ void OS_SleepThreadDirect(OSThread *thread, OSThreadQueue *queue) {
 
 // NitroSDK's OS_SleepThread: puts the running thread to sleep in a queue
 void OS_SleepThread(OSThreadQueue *queue) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSThread *current = *OSi_CurrentThreadPtr;
 
     if (queue != NULL) {
@@ -462,7 +470,7 @@ void OS_SleepThread(OSThreadQueue *queue) {
 
 // NitroSDK's OS_WakeupThread: makes all the threads in a queue ready
 void OS_WakeupThread(OSThreadQueue *queue) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     if (queue->head != NULL) {
         while (queue->head != NULL) {
@@ -480,7 +488,7 @@ void OS_WakeupThread(OSThreadQueue *queue) {
 
 // NitroSDK's OS_WakeupThreadDirect: makes a thread ready
 void OS_WakeupThreadDirect(OSThread *thread) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     thread->state = OS_THREAD_STATE_READY;
     OSi_RescheduleThread();
@@ -498,7 +506,7 @@ static OSThread *OS_SelectThread(void) {
 }
 
 void OS_RescheduleThread(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     OSi_RescheduleThread();
     OS_RestoreInterrupts(enabled);
@@ -512,7 +520,7 @@ void OS_YieldThread(void) {
     OSThread *beforeCurrent;
     OSThread *thread;
     OSThread *prev;
-    u32 enabled;
+    OSIntrMode enabled;
 
     beforeCurrent = NULL;
     current = OSi_ThreadInfo.current;
@@ -554,7 +562,7 @@ void OS_YieldThread(void) {
 BOOL OS_SetThreadPriority(OSThread *thread, u32 priority) {
     OSThread *found = OSi_ThreadInfo.list;
     OSThread *prev = NULL;
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
 
     while (found != NULL && found != thread) {
         prev = found;
@@ -588,7 +596,7 @@ u32 OS_GetThreadPriority(const OSThread *thread) {
 void OS_Sleep(u32 msec) {
     OSAlarm alarm;
     OSThread *thread;
-    u32 enabled;
+    OSIntrMode enabled;
 
     OS_CreateAlarm(&alarm);
     thread = *OSi_CurrentThreadPtr;
@@ -611,7 +619,7 @@ static void OSi_SleepAlarmCallback(void *arg) {
 }
 
 OSSwitchThreadCallback OS_SetSwitchThreadCallback(OSSwitchThreadCallback callback) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     OSSwitchThreadCallback previous = OSi_ThreadInfo.switchCallback;
 
     OSi_ThreadInfo.switchCallback = callback;
@@ -628,10 +636,14 @@ static void OSi_IdleThreadProc(void *arg) {
 
 // Gives the count it had
 u32 OS_DisableScheduler(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
+    // BUG: When the nested-lock count is saturated, the original returns an uninitialized count.
+#ifdef BUGFIX
+    u32 old = OSi_RescheduleCount;
+#else
     u32 old;
+#endif
 
-    // As in the SDK, old is left unset when the count is at its maximum, which 0xffffffff nested locks would take
     if (OSi_RescheduleCount < 0xffffffff) {
         old = OSi_RescheduleCount++;
     }
@@ -640,7 +652,7 @@ u32 OS_DisableScheduler(void) {
 }
 
 u32 OS_EnableScheduler(void) {
-    u32 enabled = OS_DisableInterrupts();
+    OSIntrMode enabled = OS_DisableInterrupts();
     u32 old = 0;
 
     if (OSi_RescheduleCount != 0) {

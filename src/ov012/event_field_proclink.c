@@ -1,8 +1,11 @@
 #include "types.h"
 #include "app/bag.h"
 #include "app/battle_recorder.h"
+#include "app/config_panel.h"
+#include "app/medalbox.h"
 #include "app/p_status.h"
 #include "app/pokelist.h"
+#include "app/townmap.h"
 #include "app/wifi_note.h"
 #include "app/xtransceiver.h"
 #include "app/zukan.h"
@@ -35,42 +38,6 @@
 #include "system/game_data.h"
 #include "system/game_event.h"
 #include "system/game_system.h"
-
-// The params of the apps that no header describes yet
-
-// The town map
-typedef struct {
-    u32 mode;
-    u32 result;
-    u16 zoneId;
-    s16 escapeZoneId;
-    u32 unk0C;
-    u32 unk10;
-    GameSystem *gsys;
-} TownMapParam;
-
-typedef struct {
-    u32 result;
-    GameSystem *gsys;
-} Ov140Param;
-
-typedef struct {
-    GameData *gameData;
-    u32 result;
-} Ov204Param;
-
-typedef struct {
-    u32 unk0;
-    u32 unk4;
-    u16 unk8;
-    GameData *gameData;
-    GameSystem *gsys;
-} Ov259Param;
-
-typedef struct {
-    GameData *gameData;
-    u32 result;
-} Ov145Param;
 
 // clang-format off
 const FieldProcLink FIELD_PROC_LINK_LIST[15] = {
@@ -757,16 +724,16 @@ void *FieldAppCall_CreateTownMapParam(FieldAppCallWork *work, s32 appParam, s32 
     PlayerState *playerState;
     GameData *gameData;
 
-    param->mode = TRUE;
+    param->mode = TOWNMAP_MODE_VIEW;
     param->gsys = work->input->gameSystem;
     playerState = GameData_GetPlayerState(GSYS_GetGameData(work->input->gameSystem));
     gameData = GSYS_GetGameData(work->input->gameSystem);
     param->zoneId = PlayerState_GetZoneID(playerState);
     param->escapeZoneId = GameData_GetEscapeRopeZone(gameData)->zoneId;
-    if (work->input->appId == 0) {
-        param->mode = FALSE;
+    if (work->input->appId == FIELD_APP_POKELIST) {
+        param->mode = TOWNMAP_MODE_FLY;
     } else {
-        param->mode = TRUE;
+        param->mode = TOWNMAP_MODE_VIEW;
     }
     return param;
 }
@@ -776,35 +743,35 @@ u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *data) {
 
     if (work->input->appId == 8) {
         switch (param->result) {
-        case 0:
+        case TOWNMAP_RESULT_RETURN:
             return 0;
-        case 1:
+        case TOWNMAP_RESULT_CLOSE:
             return 1;
         default:
             return 1;
         }
     } else if (work->input->appId == FIELD_APP_BAG) {
         switch (param->result) {
-        case 0:
+        case TOWNMAP_RESULT_RETURN:
             work->nextAppId = FIELD_APP_BAG;
             return FIELD_APP_RESULT_NEXT;
-        case 1:
+        case TOWNMAP_RESULT_CLOSE:
             return 1;
         default:
             return 1;
         }
-    } else if (work->input->appId == 0) {
+    } else if (work->input->appId == FIELD_APP_POKELIST) {
         switch (param->result) {
-        case 0:
+        case TOWNMAP_RESULT_RETURN:
             work->nextAppId = FIELD_APP_POKELIST;
             return FIELD_APP_RESULT_NEXT;
-        case 1:
+        case TOWNMAP_RESULT_CLOSE:
             return 1;
-        case 2:
+        case TOWNMAP_RESULT_FLY:
             work->input->eventId = 4;
             work->input->eventValue = param->zoneId;
-            work->input->unk38 = param->unk0C;
-            work->input->unk3C = param->unk10;
+            work->input->unk38 = param->warpX;
+            work->input->unk3C = param->warpZ;
             work->input->unk40 = 0;
             RecordAddOne(GameData_GetRecords(GSYS_GetGameData(param->gsys)), 0x2a);
             return 2;
@@ -816,16 +783,16 @@ u32 FieldAppCall_GetTownMapResult(FieldAppCallWork *work, void *data) {
 }
 
 void *FieldAppCall_CreateConfigParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
-    Ov140Param *param;
+    ConfigPanelParam *param;
 
     getTrainerDataBlkAddress(GameData_GetSaveControl(GSYS_GetGameData(work->input->gameSystem)));
-    param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov140Param), TRUE, "event_field_proclink.c", 1926);
+    param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ConfigPanelParam), TRUE, "event_field_proclink.c", 1926);
     param->gsys = work->input->gameSystem;
     return param;
 }
 
 u32 FieldAppCall_GetConfigResult(FieldAppCallWork *work, void *data) {
-    Ov140Param *param = data;
+    ConfigPanelParam *param = data;
 
     if (param->result) {
         return 1;
@@ -842,24 +809,25 @@ void FieldAppCall_CallSave(FieldAppCallWork *work, s32 appParam) {
 }
 
 void *FieldAppCall_CreateWifiNoteParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
-    Ov204Param *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov204Param), TRUE, "event_field_proclink.c", 1997);
+    WifiNoteParam *param =
+        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(WifiNoteParam), TRUE, "event_field_proclink.c", 1997);
 
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
     return param;
 }
 
 u32 FieldAppCall_GetWifiNoteResult(FieldAppCallWork *work, void *data) {
-    Ov204Param *param = data;
+    WifiNoteParam *param = data;
 
     if (work->input->appId == 9) {
         switch (param->result) {
-        case 0:
+        case WIFI_NOTE_RESULT_RETURN:
             return 0;
         default:
             return 1;
         }
     }
-    if (param->result == 0) {
+    if (param->result == WIFI_NOTE_RESULT_RETURN) {
         work->nextAppId = FIELD_APP_BAG;
         return FIELD_APP_RESULT_NEXT;
     }
@@ -1027,10 +995,11 @@ u32 FieldAppCall_GetBattleRecorderResult(FieldAppCallWork *work, void *data) {
 }
 
 void *FieldAppCall_CreateXtransceiverParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
-    Ov259Param *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov259Param), TRUE, "event_field_proclink.c", 2417);
+    LocalTvtParam *param =
+        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(LocalTvtParam), TRUE, "event_field_proclink.c", 2417);
 
-    param->unk0 = 1;
-    param->unk8 = 4;
+    param->mode = LOCAL_TVT_MODE_CALL;
+    param->scriptId = 4;
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
     param->gsys = work->input->gameSystem;
     return param;
@@ -1045,20 +1014,21 @@ u32 FieldAppCall_GetXtransceiverResult(FieldAppCallWork *work, void *param) {
 }
 
 void *FieldAppCall_CreateMedalBoxParam(FieldAppCallWork *work, s32 appParam, s32 prevAppId, const void *prevParam) {
-    Ov145Param *param = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(Ov145Param), TRUE, "event_field_proclink.c", 2496);
+    MedalBoxParam *param =
+        GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(MedalBoxParam), TRUE, "event_field_proclink.c", 2496);
 
     param->gameData = GSYS_GetGameData(work->input->gameSystem);
     return param;
 }
 
 u32 FieldAppCall_GetMedalBoxResult(FieldAppCallWork *work, void *data) {
-    Ov145Param *param = data;
+    MedalBoxParam *param = data;
 
     if (work->input->appId == 14) {
         switch (param->result) {
-        case 0:
+        case MEDALBOX_RESULT_RETURN:
             return 0;
-        case 1:
+        case MEDALBOX_RESULT_EXIT:
             return 1;
         default:
             return 1;
@@ -1066,10 +1036,10 @@ u32 FieldAppCall_GetMedalBoxResult(FieldAppCallWork *work, void *data) {
     }
     if (work->input->appId == FIELD_APP_BAG) {
         switch (param->result) {
-        case 0:
+        case MEDALBOX_RESULT_RETURN:
             work->nextAppId = FIELD_APP_BAG;
             return FIELD_APP_RESULT_NEXT;
-        case 1:
+        case MEDALBOX_RESULT_EXIT:
             return 1;
         default:
             return 1;

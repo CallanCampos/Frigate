@@ -215,8 +215,8 @@ static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state,
             break;
         case FIELD_FADE_IN_BLACK:
             if (fade->useSubscreenMasterBrightness == TRUE) {
-                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+                GX_SetMasterBrightness(-16);
+                GXS_SetMasterBrightness(-16);
                 resetLCD = TRUE;
             }
             *state = 2;
@@ -226,8 +226,8 @@ static GameEventReturnCode FieldFadeEvent_Callback(GameEvent *event, u32 *state,
             break;
         case FIELD_FADE_IN_WHITE:
             if (fade->useSubscreenMasterBrightness == TRUE) {
-                GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 16);
-                GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 16);
+                GX_SetMasterBrightness(16);
+                GXS_SetMasterBrightness(16);
                 resetLCD = TRUE;
             }
             *state = 4;

@@ -99,6 +99,24 @@ enum {
     RECORD_WAIT_PLAY_END,
 };
 
+// What the voice icon shows: the talk button free, the member's own voice recording, or the button not usable (another
+// member talking, no microphone, nobody to talk to); VOICE_ICON_MAX is none of them, so that the first is drawn
+enum {
+    VOICE_ICON_READY,
+    VOICE_ICON_TALKING,
+    VOICE_ICON_BUSY,
+    VOICE_ICON_MAX,
+};
+
+// Which of the speed buttons is touched: the ones that speed the voice up, or the ones that slow it down
+enum {
+    SPEED_TOUCH_UP,
+    SPEED_TOUCH_DOWN,
+};
+
+// speedTouch when no speed button is held
+#define SPEED_TOUCH_NONE 0xff
+
 struct CtvtTalk {
     int state;
     int next;
@@ -171,7 +189,7 @@ static void CtvtTalk_AskExit(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_UpdateExitMenu(CommTvtWork *sys, CtvtTalk *talk);
 static BOOL CtvtTalk_CheckDisconnect(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_ResetWave(CommTvtWork *sys, CtvtTalk *talk);
-static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, long pos, u16 size);
+static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, s32 pos, u16 size);
 static BOOL CtvtTalk_IsTalkButtonTouched(CommTvtWork *sys, CtvtTalk *talk, BOOL held);
 static void CtvtTalk_OpenGameWindow(CommTvtWork *sys, CtvtTalk *talk);
 static void CtvtTalk_CloseGameWindow(CommTvtWork *sys, CtvtTalk *talk);
@@ -293,10 +311,10 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     ClActor_SetVisible(talk->talkButton, TRUE);
     ClActor_SetAutoAnim(talk->talkButton, TRUE);
 
-    talk->voiceIconState = 0;
+    talk->voiceIconState = VOICE_ICON_READY;
     talk->state = TALK_STATE_FADE_IN;
     talk->waitSound = FALSE;
-    talk->shownVoiceIconState = 3;
+    talk->shownVoiceIconState = VOICE_ICON_MAX;
     talk->waveWindow = BmpWin_CreateDynamic(4, 8, 3, 16, 8, 10, TRUE);
     talk->messageWindow = BmpWin_CreateDynamic(4, 1, 1, 30, 4, 10, TRUE);
     GFL_BitmapFill(BmpWin_GetBitmap(talk->waveWindow), 0);
@@ -317,10 +335,10 @@ void CtvtTalk_Enter(CommTvtWork *sys, CtvtTalk *talk) {
     talker = CtvtComm_GetTalker(sys, CommTvt_GetComm(sys));
     if (talker != 0xff) {
         func_ov257_021aad74(sys, talker);
-        talk->voiceIconState = 2;
+        talk->voiceIconState = VOICE_ICON_BUSY;
     }
     if (!CtvtMic_IsReady(talk->mic)) {
-        talk->voiceIconState = 2;
+        talk->voiceIconState = VOICE_ICON_BUSY;
     }
     if (CommTvt_GetSelfIndex(sys) != 0 || func_ov257_021aab3c(sys) == TRUE || talk->notAlone == TRUE) {
         ClActor_SetAnimFrame(talk->gameButtons[0], 1);
@@ -867,7 +885,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
     }
 
     if (memberCount == 1 || !CtvtMic_IsReady(talk->mic)) {
-        talk->voiceIconState = 2;
+        talk->voiceIconState = VOICE_ICON_BUSY;
     } else {
         u8 self = CtvtComm_GetSelfNetId(sys, comm);
         u8 talker = CtvtComm_GetTalker(sys, comm);
@@ -880,7 +898,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
                     talk->requestCooldown = CTVT_TALK_COOLDOWN;
                 }
             }
-            talk->voiceIconState = 2;
+            talk->voiceIconState = VOICE_ICON_BUSY;
         } else {
             BOOL touched = CtvtTalk_IsTalkButtonTouched(sys, talk, FALSE);
 
@@ -890,7 +908,7 @@ static void CtvtTalk_UpdateMain(CommTvtWork *sys, CtvtTalk *talk) {
                 talk->flashing = TRUE;
                 talk->flashFrame = 0;
             }
-            talk->voiceIconState = 0;
+            talk->voiceIconState = VOICE_ICON_READY;
         }
     }
 
@@ -983,7 +1001,7 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
     switch (talk->next) {
     case RECORD_START:
         if (CtvtMic_StartRecording(talk->mic) == TRUE) {
-            talk->voiceIconState = 1;
+            talk->voiceIconState = VOICE_ICON_TALKING;
             talk->next = RECORD_RECORDING;
             talk->chunk = 0;
             talk->chunkPending = FALSE;
@@ -997,7 +1015,7 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
         }
         if (CtvtMic_IsRecording(talk->mic) == FALSE) {
             talk->next = RECORD_SENDING;
-            talk->voiceIconState = 2;
+            talk->voiceIconState = VOICE_ICON_BUSY;
         }
         CtvtTalk_DrawWave(sys, talk, (const s16 *)((u8 *)CtvtMic_GetBuffer(talk->mic) + 0x800), 9,
                           CtvtMic_GetRecordedSize(talk->mic), 0xc000);
@@ -1069,9 +1087,9 @@ static void CtvtTalk_UpdateRecord(CommTvtWork *sys, CtvtTalk *talk) {
 
 static void CtvtTalk_UpdateVoiceIcon(CommTvtWork *sys, CtvtTalk *talk) {
     if (talk->voiceIconState != talk->shownVoiceIconState) {
-        if (talk->voiceIconState == 1) {
+        if (talk->voiceIconState == VOICE_ICON_TALKING) {
             ClActor_SetSequence(talk->voiceIcon, 23);
-        } else if (talk->voiceIconState == 2) {
+        } else if (talk->voiceIconState == VOICE_ICON_BUSY) {
             ClActor_SetSequence(talk->voiceIcon, 35);
         } else {
             ClActor_SetSequence(talk->voiceIcon, 24);
@@ -1088,20 +1106,20 @@ static void CtvtTalk_UpdateSpeed(CommTvtWork *sys, CtvtTalk *talk) {
     if (trig != TOUCH_RECT_NONE) {
         talk->speedRepeat = 0;
         if (trig <= 1) {
-            talk->speedTouch = 0;
-            dir = 0;
+            talk->speedTouch = SPEED_TOUCH_UP;
+            dir = SPEED_TOUCH_UP;
         } else {
-            talk->speedTouch = 1;
-            dir = 1;
+            talk->speedTouch = SPEED_TOUCH_DOWN;
+            dir = SPEED_TOUCH_DOWN;
         }
     } else if (cont != TOUCH_RECT_NONE) {
         BOOL same = FALSE;
 
         if (cont <= 1) {
-            if (talk->speedTouch == 0) {
+            if (talk->speedTouch == SPEED_TOUCH_UP) {
                 same = TRUE;
             }
-        } else if (talk->speedTouch == 1) {
+        } else if (talk->speedTouch == SPEED_TOUCH_DOWN) {
             same = TRUE;
         }
         if (same == TRUE) {
@@ -1111,19 +1129,19 @@ static void CtvtTalk_UpdateSpeed(CommTvtWork *sys, CtvtTalk *talk) {
                 talk->speedRepeat = 10;
             }
         } else {
-            talk->speedTouch = 0xff;
+            talk->speedTouch = SPEED_TOUCH_NONE;
         }
     } else {
-        talk->speedTouch = 0xff;
+        talk->speedTouch = SPEED_TOUCH_NONE;
     }
 
-    if (dir == 0) {
+    if (dir == SPEED_TOUCH_UP) {
         if (talk->speed < CTVT_TALK_SPEEDS - 1) {
             changed = TRUE;
             talk->speed++;
             ClActor_SetSequence(talk->speedCursor, talk->speed + 25);
         }
-    } else if (dir == 1 && talk->speed != 0) {
+    } else if (dir == SPEED_TOUCH_DOWN && talk->speed != 0) {
         changed = TRUE;
         talk->speed--;
         ClActor_SetSequence(talk->speedCursor, talk->speed + 25);
@@ -1140,10 +1158,9 @@ static void CtvtTalk_DrawWaveLine(CommTvtWork *sys, CtvtTalk *talk, u8 *pixels, 
     int dx = MATH_ABS(x0 - x1);
     int dy = MATH_ABS(y0 - y1);
     int steps;
-    // The SDK's fx32 and s32 are long, which copies y0 for the loop after the loop's guard
-    long stepX, stepY;
-    long offsetX, offsetY;
-    long i;
+    fx32 stepX, stepY;
+    fx32 offsetX, offsetY;
+    s32 i;
 
     steps = (dx > dy ? dx : dy) + 1;
     stepX = FX32_CONST(x1 - x0) / steps;
@@ -1337,7 +1354,7 @@ static void CtvtTalk_ResetWave(CommTvtWork *sys, CtvtTalk *talk) {
 }
 
 // `pos` is a long, the SDK's s32, which leaves `size` in its stack slot and `color` in a saved register
-static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, long pos, u16 size) {
+static void CtvtTalk_DrawWave(CommTvtWork *sys, CtvtTalk *talk, const s16 *samples, u8 color, s32 pos, u16 size) {
     u32 end;
     u8 *pixels;
     BOOL drawn;

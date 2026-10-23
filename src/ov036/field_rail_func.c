@@ -4,12 +4,22 @@
 // of RailMath_RailToWorldNoCurve and RailMath_RailToWorldSlerpXYZ in field_rail.c's sort, its first up vector can only
 // come before both defaults as a shared const, and with them here, as a local initializer like the others.
 // func_ov036_021b21dc, which only field_rail.c's CalculateRailCurves calls, could open this file as well
-// RailMath_SlerpDirections and RailMath_TryProjectWorldPointToSegment are our descriptive names.
+// RailMath_SlerpDirections, RailMath_TryProjectWorldPointToSegment and the progress helper are our descriptive names.
 #include "types.h"
 #include "field/field_camera.h"
 #include "field/field_rail.h"
 #include "gfl/std.h"
 #include "nitro/fx.h"
+
+// Position and length in the line's own units, before fixed-point conversion.
+typedef struct {
+    s32 position;
+    s32 length;
+} RailLineProgress;
+
+static inline fx32 RailLineProgress_GetRatio(const RailLineProgress *progress) {
+    return FX_Div(progress->position << FX32_SHIFT, progress->length << FX32_SHIFT);
+}
 
 static void RailMath_SlerpDirections(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t);
 static void InterpolateRailPointsGlobal(VecFx32 *out, const VecFx32 *a, const VecFx32 *b, fx32 t);
@@ -56,13 +66,14 @@ void RailMath_RailToWorldNoCurve(RailUnit *unit, VecFx32 *out) {
     RailPoint *p1;
     VecFx32 *start;
     fx32 t;
-    s32 posV;
+    RailLineProgress progress;
     s32 posH;
     s32 width;
 
     GetCurrentLine(unit);
-    posV = GetCurrentLinePosV(unit);
-    t = FX_Div(posV << 12, GetCurrentLineLength(unit) << 12);
+    progress.position = GetCurrentLinePosV(unit);
+    progress.length = GetCurrentLineLength(unit);
+    t = RailLineProgress_GetRatio(&progress);
     p0 = GetCurrentRailLinePoint1(unit);
     p1 = GetCurrentRailLinePoint2(unit);
     start = &p0->pos;
@@ -93,8 +104,7 @@ void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out) {
     VecFx32 dir;
     VecFx32 side;
     VecFx32 cross;
-    fx32 length;
-    fx32 posV;
+    RailLineProgress progress;
     fx32 t;
     s32 posH;
     s32 width;
@@ -105,11 +115,11 @@ void RailMath_RailToWorldSlerpXZ(RailUnit *unit, VecFx32 *out) {
     point1 = GetCurrentRailLinePoint2(unit);
     pos0 = &point0->pos;
     pos1 = &point1->pos;
-    posV = GetCurrentLinePosV(unit) << FX32_SHIFT;
-    length = GetCurrentLineLength(unit) << FX32_SHIFT;
-    t = FX_Div(posV, length);
+    progress.position = GetCurrentLinePosV(unit);
+    progress.length = GetCurrentLineLength(unit);
+    t = RailLineProgress_GetRatio(&progress);
     out->y = pos1->y - pos0->y;
-    out->y = FX_Div(FX_Mul(out->y, posV), length);
+    out->y = FX_Div(FX_Mul(out->y, progress.position << FX32_SHIFT), progress.length << FX32_SHIFT);
     out->y += pos0->y;
     curve = RailUnit_GetCurve(unit);
     center.x = curve->center.x;
@@ -150,8 +160,7 @@ void RailMath_RailToWorldSlerpXYZ(RailUnit *unit, VecFx32 *out) {
     VecFx32 side;
     VecFx32 cross;
     fx32 t;
-    s32 posV;
-    s32 length;
+    RailLineProgress progress;
     s32 posH;
     s32 width;
     fx32 offset;
@@ -161,9 +170,9 @@ void RailMath_RailToWorldSlerpXYZ(RailUnit *unit, VecFx32 *out) {
     p1 = GetCurrentRailLinePoint2(unit);
     pos0 = &p0->pos;
     pos1 = &p1->pos;
-    posV = GetCurrentLinePosV(unit);
-    length = GetCurrentLineLength(unit);
-    t = FX_Div(posV << 12, length << 12);
+    progress.position = GetCurrentLinePosV(unit);
+    progress.length = GetCurrentLineLength(unit);
+    t = RailLineProgress_GetRatio(&progress);
     curve = RailUnit_GetCurve(unit);
     center.x = curve->center.x;
     center.y = curve->center.y;
@@ -235,7 +244,7 @@ BOOL RailMath_WorldToRailNoCurve(u32 lineId, FieldRailSystem *rail, const VecFx3
     if (front <= w0 + (u32)(base * (w1 - w0)) / (u32)length + 0x10) {
         outPos->componentIsLine = 1;
         outPos->componentId = lineId;
-        outPos->railDirection = 3;
+        outPos->railDirection = RAIL_DIR_DOWN;
         if (cross.y >= 0) {
             outPos->posSide = func_ov036_021b0d2c(front);
         } else {
@@ -280,7 +289,7 @@ BOOL RailMath_WorldToRailSlerp(u32 lineId, FieldRailSystem *rail, const VecFx32 
     }
     step = 1;
     outPos->componentIsLine = 1;
-    outPos->railDirection = 3;
+    outPos->railDirection = RAIL_DIR_DOWN;
     outPos->componentId = lineId;
     outPos->posSide = 0;
     outPos->posFront = 0;

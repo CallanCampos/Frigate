@@ -9,15 +9,15 @@
 // event.
 
 // The sessions that are free and in use, the clock and the random number generator's constants
-struct VCTSessionPool {
-    VCTSession *freeList;
-    VCTSession *usedList;
+struct SessionInfo {
+    VCTSession *free;
+    VCTSession *use;
     u64 (*clock)(void);
     u32 randomMultiplier;
     u32 randomIncrement;
     // A session to answer from for a machine that cannot be given one, and the one session of the second mode
-    VCTSession pending;
-    VCTSession host;
+    VCTSession tmp;
+    VCTSession trans;
 };
 
 struct VCTSessionState {
@@ -26,26 +26,26 @@ struct VCTSessionState {
     u32 mask;
 };
 
-static VCTSession *AllocFromPool(u8 aid);
-static int SendRequest(VCTSession *session, int command);
-static int SendResponse(VCTSession *session, int command);
-static void FillBroadcastFields(VCTSession *session, VCTControlPacket *packet);
-static int SendBroadcast(VCTSession *session, VCTControlPacket *packet);
-static void BroadcastCommand(int flag);
-static void InitSession(VCTSession *session, u8 aid);
-static BOOL SendControl(VCTSession *session, VCTControlPacket *packet);
-static int GetEvent(VCTControlPacket *packet, VCTSession *session);
-static int InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command);
-static int ReplyTransition(VCTSession *session, VCTControlPacket *packet);
-static BOOL CanStart(VCTSession *session);
-static int CheckTransition(VCTSession *session, VCTControlPacket *packet);
-static VCTSession *FindSession(int aid);
-static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size);
-static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size);
-static BOOL HandlePeerPacket(VCTControlPacket *packet, VCTEventResult *result);
-static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result);
-static BOOL HandleClosePacket(VCTControlPacket *packet, VCTEventResult *result);
-static BOOL HandleCommand4(VCTControlPacket *packet, VCTEventResult *result);
+static VCTSession *vct_create_session_impl(u8 aid);
+static int vct_request_impl(VCTSession *session, int command);
+static int vct_response_impl(VCTSession *session, int command);
+static void vct_add_notify_aid_list(VCTSession *session, SSPHeader *packet);
+static int vct_send_notify_impl(VCTSession *session, SSPHeader *packet);
+static void vct_send_notify(int flag);
+static void vct_init_session(VCTSession *session, u8 aid);
+static BOOL vct_send_ssp(VCTSession *session, SSPHeader *packet);
+static int vct_dispatch_session(SSPHeader *packet, VCTSession *session);
+static int vct_build_ssp_header(VCTSession *session, SSPHeader *packet, u8 command);
+static int vct_check_recv_state(VCTSession *session, SSPHeader *packet);
+static BOOL vct_check_multisession(VCTSession *session);
+static int vct_check_send_state(VCTSession *session, SSPHeader *packet);
+static VCTSession *vct_find_session(int aid);
+static int vct_build_request_data(VCTSession *session, u32 command, SSPHeader *packet, u32 size);
+static int vct_build_response_data(VCTSession *session, u32 command, SSPHeader *packet, u32 size);
+static BOOL vct_handle_ssp_client(SSPHeader *packet, VCTResult *result);
+static BOOL vct_handle_ssp_server(SSPHeader *packet, VCTResult *result);
+static BOOL vct_response_reject(SSPHeader *packet, VCTResult *result);
+static BOOL vct_handle_notify(SSPHeader *packet, VCTResult *result);
 
 // The events that a packet gives the application, by the command of the broadcast and of the direct packet
 static const u8 sBroadcastEvents[5] = { 1, 8, 4, 10, 0 };
@@ -54,22 +54,22 @@ static const u8 sDirectEvents[7] = { 7, 12, 2, 3, 9, 2, 0 };
 // What a control packet does to a machine in each state (a row each), by the command (a column each: those of a
 // broadcast packet, then those of a direct one): the next state, -1 to take no notice, or -2 to refuse. The first two
 // tables are for when the packet is a reply, the others for when it is a request, one of each for the first mode.
-static const s8 sReplyTableMode1[6][11] = {
+static const s8 sRecvState[6][11] = {
     { 4, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 2, 0, 0, 0, -1, 0 },
     { -2, 5, 5, -2, -1, -1, -1, -1, -1, -1, -1 },  { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1 },
     { -2, -2, 5, -2, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -2, -1, 0, 0, -1, -1, 0, -1 },
 };
-static const s8 sReplyTableOther[6][11] = {
+static const s8 sTransRecvState[6][11] = {
     { -2, -2, -2, 3, -1, -1, 0, -1, -1, -1, -1 },   { -2, -2, -2, -3, -1, 2, 0, 0, 0, -1, 0 },
     { -2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1 }, { -2, 0, -2, -3, -1, -1, -1, -1, -1, -1, -1 },
     { -2, -2, -2, -3, -1, -1, -1, -1, -1, -1, -1 }, { -2, -2, -2, -3, -1, 0, 0, -1, -1, 0, -1 },
 };
-static const s8 sCheckTableMode1[6][11] = {
+static const s8 sSendState[6][11] = {
     { 1, -2, -2, -2, -2, -2, 0, 0, 0, -2, -2 },   { -2, -2, 5, -2, -2, -2, 0, -2, -2, -2, -2 },
     { -2, 5, -2, -2, -2, -2, 0, -2, -2, -2, -2 }, { -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 },
     { -2, -2, -2, -2, -2, 2, 0, 0, 0, -2, 0 },    { -2, -2, -2, -2, -2, 0, 0, -2, -2, 0, -2 },
 };
-static const s8 sCheckTableOther[6][11] = {
+static const s8 sTransSendState[6][11] = {
     { -2, -2, -2, 1, -1, -2, 0, 0, 0, -2, -2 },   { -2, 5, 5, -2, -1, -2, 0, -2, -2, -2, -2 },
     { -2, 5, -2, -2, -1, -2, 0, -2, -2, -2, -2 }, { -2, -2, -2, -2, -1, -2, 0, -2, -2, -2, -2 },
     { -2, -2, -2, -2, -1, 3, 0, 0, 0, -2, 0 },    { -2, -2, -2, -2, -1, 0, 0, -2, -2, 0, -2 },
@@ -78,43 +78,43 @@ static const s8 sCheckTableOther[6][11] = {
 // How long to wait for an answer, in clock ticks
 static u64 sRequestTimeout = 15709687;
 
-static VCTSessionPool sSessionPool;
+static SessionInfo sSession;
 // When the last request was sent, or 0
 static u64 sRequestTime;
 static VCTSessionState sSessionState;
 
-VCTSession *VCT_AllocSession(u8 aid) {
-    if (gVCTSettings.mode == 0 || gVCTSettings.mode == 2) {
+VCTSession *VCT_CreateSession(u8 aid) {
+    if (vct.SSPMode == 0 || vct.SSPMode == 2) {
         return NULL;
     }
-    return AllocFromPool(aid);
+    return vct_create_session_impl(aid);
 }
 
-BOOL VCT_ReleaseSession(VCTSession *session) {
+BOOL VCT_DeleteSession(VCTSession *session) {
     VCTSession *previous = NULL;
-    VCTSession *current = sSessionPool.usedList;
+    VCTSession *current = sSession.use;
 
     if (session == NULL) {
         return FALSE;
     }
-    if (gVCTSettings.mode == 2) {
-        if (session == &sSessionPool.host) {
-            sSessionPool.host.active = 0;
+    if (vct.SSPMode == 2) {
+        if (session == &sSession.trans) {
+            sSession.trans.mode = 0;
         }
         return TRUE;
     }
     while (current != NULL) {
         if (current == session) {
-            session->active = 0;
+            session->mode = 0;
             if (previous != NULL) {
                 previous->next = session->next;
             } else if (current->next != NULL) {
-                sSessionPool.usedList = current->next;
+                sSession.use = current->next;
             } else {
-                sSessionPool.usedList = NULL;
+                sSession.use = NULL;
             }
-            session->next = sSessionPool.freeList;
-            sSessionPool.freeList = session;
+            session->next = sSession.free;
+            sSession.free = session;
             return TRUE;
         }
         previous = current;
@@ -124,41 +124,41 @@ BOOL VCT_ReleaseSession(VCTSession *session) {
 }
 
 // Makes a control packet to send as a request, returning 0 or what is wrong with it
-static int BuildRequest(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size) {
+static int vct_build_request_data(VCTSession *session, u32 command, SSPHeader *packet, u32 size) {
     if (session == NULL) {
         return -1;
     }
     if (size < 0x10) {
         return -1;
     }
-    if (gVCTSettings.unkC == 1) {
+    if (vct.listenMode == 1) {
         return -3;
     }
     if (command >= 5) {
         return -3;
     }
-    packet->type = VCT_TYPE_BROADCAST;
-    InitControlPacket(session, packet, command);
-    if (!CheckTransition(session, packet)) {
+    packet->method = VCT_METHOD_REQUEST;
+    vct_build_ssp_header(session, packet, command);
+    if (!vct_check_send_state(session, packet)) {
         return -3;
     }
-    if (gVCTSettings.mode == 1 && command == 0) {
-        if (!CanStart(session)) {
+    if (vct.SSPMode == 1 && command == 0) {
+        if (!vct_check_multisession(session)) {
             return -3;
         }
     }
     return 0;
 }
 
-int VCT_Request(VCTSession *session, int command) {
-    if (gVCTSettings.mode == 2) {
+int VCT_Request(VCTSession *session, VCTRequestCode command) {
+    if (vct.SSPMode == 2) {
         return -3;
     }
-    return SendRequest(session, command);
+    return vct_request_impl(session, command);
 }
 
 // Makes a control packet to send as a reply
-static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *packet, u32 size) {
+static int vct_build_response_data(VCTSession *session, u32 command, SSPHeader *packet, u32 size) {
     if (session == NULL) {
         return -1;
     }
@@ -168,109 +168,109 @@ static int BuildResponse(VCTSession *session, u32 command, VCTControlPacket *pac
     if (command >= 6) {
         return -3;
     }
-    packet->type = VCT_TYPE_CONTROL;
-    InitControlPacket(session, packet, command);
+    packet->method = VCT_METHOD_RESPONSE;
+    vct_build_ssp_header(session, packet, command);
     if (command == 0) {
-        if (gVCTSettings.mode == 1 && session->state == 4) {
-            if (!CanStart(session)) {
+        if (vct.SSPMode == 1 && session->state == 4) {
+            if (!vct_check_multisession(session)) {
                 return -3;
             }
         }
-        session->mask = session->aid != 0 ? 1 << session->aid : 1;
+        session->aidBitmap = session->aid != 0 ? 1 << session->aid : 1;
     }
-    if (!CheckTransition(session, packet)) {
+    if (!vct_check_send_state(session, packet)) {
         return -3;
     }
     return 0;
 }
 
-int VCT_Respond(VCTSession *session, int command) {
-    if (gVCTSettings.mode == 2) {
+int VCT_Response(VCTSession *session, VCTResponseCode command) {
+    if (vct.SSPMode == 2) {
         return -3;
     }
-    return SendResponse(session, command);
+    return vct_response_impl(session, command);
 }
 
-int VCT_AddSession(u8 aid) {
+int VCT_AddConferenceClient(u8 aid) {
     VCTSession *session;
 
-    if (gVCTSettings.mode != 3) {
+    if (vct.SSPMode != 3) {
         return -2;
     }
     if (sSessionState.count == 3) {
         return -6;
     }
-    if (aid == gVCTSettings.aid) {
+    if (aid == vct.myAID) {
         return -1;
     }
-    if (FindSession(aid) != NULL) {
+    if (vct_find_session(aid) != NULL) {
         return 0;
     }
-    session = VCT_AllocSession(aid);
+    session = VCT_CreateSession(aid);
     if (session == NULL) {
         return -1;
     }
     session->aid = aid;
-    session->origin = aid;
+    session->talking = aid;
     session->state = 2;
-    session->mask = 1 << aid;
-    gVCTSettings.callback(aid, 7, session, gVCTSettings.userData);
+    session->aidBitmap = 1 << aid;
+    vct.callback(aid, 7, session, vct.userData);
     sSessionState.count++;
     return 0;
 }
 
-int VCT_RemoveSession(u8 aid) {
+int VCT_RemoveConferenceClient(u8 aid) {
     VCTSession *session;
 
-    if (gVCTSettings.mode != 3) {
+    if (vct.SSPMode != 3) {
         return -2;
     }
-    session = FindSession(aid);
+    session = vct_find_session(aid);
     if (session == NULL) {
         return -1;
     }
-    gVCTSettings.callback(aid, 9, session, gVCTSettings.userData);
+    vct.callback(aid, 9, session, vct.userData);
     sSessionState.count--;
     return 0;
 }
 
-BOOL VCT_InitSessions(VCTConfig *config) {
-    u32 i;
+BOOL vct_init_ssp(VCTConfig *config) {
+    unsigned int i;
 
-    if (config->sessions == NULL || config->sessionCount == 0 || config->sessionCount > 8) {
+    if (config->session == NULL || config->numSession == 0 || config->numSession > 8) {
         return FALSE;
     }
-    sSessionPool.freeList = config->sessions;
-    MI_CpuFill8(config->sessions, 0, config->sessionCount * sizeof(VCTSession));
-    MI_CpuFill8(&sSessionPool.host, 0, sizeof(VCTSession));
-    MI_CpuFill8(&sSessionPool.pending, 0, sizeof(VCTSession));
-    for (i = 0; i < config->sessionCount - 1; i++) {
-        sSessionPool.freeList[i].next = &sSessionPool.freeList[i + 1];
+    sSession.free = config->session;
+    MI_CpuFill8(config->session, 0, config->numSession * sizeof(VCTSession));
+    MI_CpuFill8(&sSession.trans, 0, sizeof(VCTSession));
+    MI_CpuFill8(&sSession.tmp, 0, sizeof(VCTSession));
+    for (i = 0; i < config->numSession - 1; i++) {
+        sSession.free[i].next = &sSession.free[i + 1];
     }
-    (sSessionPool.freeList + config->sessionCount - 1)->next = NULL;
-    sSessionPool.usedList = NULL;
+    (sSession.free + config->numSession - 1)->next = NULL;
+    sSession.use = NULL;
     sSessionState.mask = 0;
     sSessionState.count = 0;
-    gVCTSettings.unk14 = 0;
-    sSessionPool.clock = OS_GetTick;
-    sSessionPool.randomMultiplier = 0x5d588b65;
-    sSessionPool.randomIncrement = 0x269ec3;
+    vct.autoResponse = 0;
+    sSession.clock = OS_GetTick;
+    sSession.randomMultiplier = 0x5d588b65;
+    sSession.randomIncrement = 0x269ec3;
     return TRUE;
 }
 
-void VCT_ClearSessions(void) {
-    sSessionPool.usedList = NULL;
-    sSessionPool.freeList = NULL;
+void vct_finish_ssp(void) {
+    sSession.use = NULL;
+    sSession.free = NULL;
 }
 
 // Gives up on a request that has gone unanswered for too long
-void VCT_CheckTimeout(void) {
+void vct_check_timeout(void) {
     u64 now = OS_GetTick();
 
-    if (gVCTSettings.mode != 2) {
+    if (vct.SSPMode != 2) {
         return;
     }
-    if (gVCTSettings.unkC == 0) {
+    if (vct.listenMode == 0) {
         return;
     }
     if (sRequestTime == 0) {
@@ -280,125 +280,125 @@ void VCT_CheckTimeout(void) {
         return;
     }
     sRequestTime = 0;
-    sSessionPool.host.active = 0;
-    sSessionPool.host.state = 0;
-    BroadcastCommand(0);
-    gVCTSettings.callback(sSessionPool.host.aid, 9, &sSessionPool.host, gVCTSettings.userData);
+    sSession.trans.mode = 0;
+    sSession.trans.state = 0;
+    vct_send_notify(0);
+    vct.callback(sSession.trans.aid, 9, &sSession.trans, vct.userData);
 }
 
 // Takes in a control packet, returning whether it has given the application an event
-BOOL VCT_HandleControlPacket(int aid, VCTControlPacket *packet, int size, VCTEventResult *result) {
-    if (size != sizeof(VCTControlPacket)) {
+BOOL vct_handle_ssp(int aid, SSPHeader *packet, int size, VCTResult *result) {
+    if (size != sizeof(SSPHeader)) {
         return FALSE;
     }
-    if (packet->from != aid || packet->to != gVCTSettings.aid) {
+    if (packet->from != aid || packet->to != vct.myAID) {
         return FALSE;
     }
-    if (packet->length != sizeof(VCTControlPacket)) {
-        return HandleClosePacket(packet, result);
+    if (packet->version != sizeof(SSPHeader)) {
+        return vct_response_reject(packet, result);
     }
-    if (gVCTSettings.unkC == 0) {
-        return HandlePeerPacket(packet, result);
+    if (vct.listenMode == 0) {
+        return vct_handle_ssp_client(packet, result);
     }
-    return HandleHostPacket(packet, result);
+    return vct_handle_ssp_server(packet, result);
 }
 
-static VCTSession *AllocFromPool(u8 aid) {
+static VCTSession *vct_create_session_impl(u8 aid) {
     VCTSession *session;
 
     if (aid >= VCT_AID_MAX) {
         return NULL;
     }
-    if (aid == gVCTSettings.aid) {
+    if (aid == vct.myAID) {
         return NULL;
     }
-    session = sSessionPool.freeList;
+    session = sSession.free;
     if (session == NULL) {
         return NULL;
     }
-    sSessionPool.freeList = session->next;
-    InitSession(session, aid);
-    session->next = sSessionPool.usedList;
-    sSessionPool.usedList = session;
+    sSession.free = session->next;
+    vct_init_session(session, aid);
+    session->next = sSession.use;
+    sSession.use = session;
     return session;
 }
 
-static int SendRequest(VCTSession *session, int command) {
-    VCTControlPacket packet;
-    int result = BuildRequest(session, command, &packet, sizeof(packet));
+static int vct_request_impl(VCTSession *session, int command) {
+    SSPHeader packet;
+    int result = vct_build_request_data(session, command, &packet, sizeof(packet));
 
     if (result != 0) {
         return result;
     }
-    if (!SendControl(session, &packet)) {
+    if (!vct_send_ssp(session, &packet)) {
         return -4;
     }
     return 0;
 }
 
-static int SendResponse(VCTSession *session, int command) {
-    VCTControlPacket packet;
-    int result = BuildResponse(session, command, &packet, sizeof(packet));
+static int vct_response_impl(VCTSession *session, int command) {
+    SSPHeader packet;
+    int result = vct_build_response_data(session, command, &packet, sizeof(packet));
 
     if (result != 0) {
         return result;
     }
-    if (!SendControl(session, &packet)) {
+    if (!vct_send_ssp(session, &packet)) {
         return -4;
     }
     return 0;
 }
 
-static void FillBroadcastFields(VCTSession *session, VCTControlPacket *packet) {
-    if (packet->flag == 1) {
-        packet->origin = session->aid;
-        packet->argument = sSessionState.mask;
+static void vct_add_notify_aid_list(VCTSession *session, SSPHeader *packet) {
+    if (packet->info == 1) {
+        packet->talking = session->aid;
+        packet->aidBitmap = sSessionState.mask;
     }
 }
 
 // Sends a control packet to every machine of the voice chat, returning 0 if there was one it reached
-static int SendBroadcast(VCTSession *session, VCTControlPacket *packet) {
+static int vct_send_notify_impl(VCTSession *session, SSPHeader *packet) {
     int sent = 0;
     u8 aid;
 
-    FillBroadcastFields(session, packet);
+    vct_add_notify_aid_list(session, packet);
     for (aid = 0; aid < VCT_AID_MAX; aid++) {
-        if ((sSessionState.mask & (aid != 0 ? 1 << aid : 1)) && aid != gVCTSettings.aid) {
+        if ((sSessionState.mask & (aid != 0 ? 1 << aid : 1)) && aid != vct.myAID) {
             packet->to = aid;
-            if (DWC_SendReliable(aid, packet, sizeof(VCTControlPacket))) {
+            if (DWC_SendReliable(aid, packet, sizeof(SSPHeader))) {
                 sent++;
             }
         }
     }
-    if (packet->flag == 1) {
-        session->mask = sSessionState.mask;
-    } else if (packet->flag == 0) {
-        session->mask = 0;
+    if (packet->info == 1) {
+        session->aidBitmap = sSessionState.mask;
+    } else if (packet->info == 0) {
+        session->aidBitmap = 0;
     }
     return sent == 0 ? -4 : 0;
 }
 
-static void BroadcastCommand(int flag) {
-    VCTControlPacket packet;
+static void vct_send_notify(int flag) {
+    SSPHeader packet;
 
-    packet.type = VCT_TYPE_BROADCAST;
-    InitControlPacket(&sSessionPool.host, &packet, 4);
-    packet.flag = flag;
-    SendBroadcast(&sSessionPool.host, &packet);
+    packet.method = VCT_METHOD_REQUEST;
+    vct_build_ssp_header(&sSession.trans, &packet, 4);
+    packet.info = flag;
+    vct_send_notify_impl(&sSession.trans, &packet);
 }
 
-static void InitSession(VCTSession *session, u8 aid) {
+static void vct_init_session(VCTSession *session, u8 aid) {
     memset(session, 0, sizeof(VCTSession));
-    session->active = gVCTSettings.mode;
+    session->mode = vct.SSPMode;
     session->state = 0;
     session->aid = aid;
 }
 
-static BOOL SendControl(VCTSession *session, VCTControlPacket *packet) {
-    if (packet->type == VCT_TYPE_BROADCAST && packet->command == 4) {
-        SendBroadcast((VCTSession *)session, packet);
+static BOOL vct_send_ssp(VCTSession *session, SSPHeader *packet) {
+    if (packet->method == VCT_METHOD_REQUEST && packet->code == 4) {
+        vct_send_notify_impl((VCTSession *)session, packet);
     } else {
-        if (!DWC_SendReliable(session->aid, packet, sizeof(VCTControlPacket))) {
+        if (!DWC_SendReliable(session->aid, packet, sizeof(SSPHeader))) {
             return FALSE;
         }
     }
@@ -406,45 +406,45 @@ static BOOL SendControl(VCTSession *session, VCTControlPacket *packet) {
 }
 
 // The event that a control packet gives the application, if any
-static int GetEvent(VCTControlPacket *packet, VCTSession *session) {
-    session->origin = packet->origin;
-    if (packet->type == VCT_TYPE_BROADCAST) {
-        if (packet->command == 0) {
-            session->mask = session->aid != 0 ? 1 << session->aid : 1;
+static int vct_dispatch_session(SSPHeader *packet, VCTSession *session) {
+    session->talking = packet->talking;
+    if (packet->method == VCT_METHOD_REQUEST) {
+        if (packet->code == 0) {
+            session->aidBitmap = session->aid != 0 ? 1 << session->aid : 1;
         }
-        return sBroadcastEvents[packet->command];
-    } else if (packet->type == VCT_TYPE_CONTROL) {
-        if (packet->command == 0) {
+        return sBroadcastEvents[packet->code];
+    } else if (packet->method == VCT_METHOD_RESPONSE) {
+        if (packet->code == 0) {
             if (session->state == 1) {
-                session->mask = session->aid != 0 ? 1 << session->aid : 1;
+                session->aidBitmap = session->aid != 0 ? 1 << session->aid : 1;
                 return 7;
             }
             return session->state == 5 ? 9 : 12;
         }
-        return sDirectEvents[packet->command];
+        return sDirectEvents[packet->code];
     }
     return 12;
 }
 
 // Fills in a control packet from this machine to the session's. It returns 0, which no caller reads
-static int InitControlPacket(VCTSession *session, VCTControlPacket *packet, u8 command) {
+static int vct_build_ssp_header(VCTSession *session, SSPHeader *packet, u8 command) {
     packet->magic = VCT_PACKET_MAGIC;
-    packet->length = sizeof(VCTControlPacket);
-    packet->command = command;
-    packet->from = gVCTSettings.aid;
+    packet->version = sizeof(SSPHeader);
+    packet->code = command;
+    packet->from = vct.myAID;
     packet->to = session->aid;
-    packet->flag = 0;
-    packet->origin = gVCTSettings.aid;
-    packet->argument = 0;
+    packet->info = 0;
+    packet->talking = vct.myAID;
+    packet->aidBitmap = 0;
     return 0;
 }
 
 // Moves a session on by a reply, returning what the table says
-static int ReplyTransition(VCTSession *session, VCTControlPacket *packet) {
-    int column = packet->command;
+static int vct_check_recv_state(VCTSession *session, SSPHeader *packet) {
+    int column = packet->code;
     int next;
 
-    if (packet->type == VCT_TYPE_CONTROL) {
+    if (packet->method == VCT_METHOD_RESPONSE) {
         column += 5;
     }
     if ((u32)column >= 11) {
@@ -453,34 +453,34 @@ static int ReplyTransition(VCTSession *session, VCTControlPacket *packet) {
     if (column < 0) {
         return -1;
     }
-    if (gVCTSettings.mode == 1) {
-        next = sReplyTableMode1[session->state][column];
+    if (vct.SSPMode == 1) {
+        next = sRecvState[session->state][column];
     } else {
-        next = sReplyTableOther[session->state][column];
+        next = sTransRecvState[session->state][column];
     }
     switch (next) {
     case -1:
         return next;
     case -2:
-        SendResponse(session, 1);
+        vct_response_impl(session, 1);
         session->state = 0;
-        session->active = 0;
+        session->mode = 0;
         return next;
     case -3:
-        SendResponse(session, 3);
+        vct_response_impl(session, 3);
         session->state = 0;
-        session->active = 0;
+        session->mode = 0;
         return next;
     default:
         return next;
     }
 }
 
-static BOOL CanStart(VCTSession *session) {
+static BOOL vct_check_multisession(VCTSession *session) {
     VCTSession *other;
 
-    for (other = sSessionPool.usedList; other != NULL; other = other->next) {
-        if (other->active != 0 && other->state == 2 && session != other) {
+    for (other = sSession.use; other != NULL; other = other->next) {
+        if (other->mode != 0 && other->state == 2 && session != other) {
             return FALSE;
         }
     }
@@ -488,11 +488,11 @@ static BOOL CanStart(VCTSession *session) {
 }
 
 // Moves a session on by a request, returning 0 if it is refused
-static int CheckTransition(VCTSession *session, VCTControlPacket *packet) {
-    int column = packet->command;
+static int vct_check_send_state(VCTSession *session, SSPHeader *packet) {
+    int column = packet->code;
     int next;
 
-    if (packet->type == VCT_TYPE_CONTROL) {
+    if (packet->method == VCT_METHOD_RESPONSE) {
         column += 5;
     }
     if ((u32)column >= 11) {
@@ -501,10 +501,10 @@ static int CheckTransition(VCTSession *session, VCTControlPacket *packet) {
     if (column < 0) {
         return -1;
     }
-    if (gVCTSettings.mode == 1) {
-        next = sCheckTableMode1[session->state][column];
+    if (vct.SSPMode == 1) {
+        next = sSendState[session->state][column];
     } else {
-        next = sCheckTableOther[session->state][column];
+        next = sTransSendState[session->state][column];
     }
     if (next == -1) {
         return TRUE;
@@ -516,77 +516,77 @@ static int CheckTransition(VCTSession *session, VCTControlPacket *packet) {
     return TRUE;
 }
 
-static VCTSession *FindSession(int aid) {
-    VCTSession *session = sSessionPool.usedList;
+static VCTSession *vct_find_session(int aid) {
+    VCTSession *session = sSession.use;
 
-    if (gVCTSettings.mode == 2) {
-        if (sSessionPool.host.active != 0 && sSessionPool.host.aid == aid) {
-            return &sSessionPool.host;
+    if (vct.SSPMode == 2) {
+        if (sSession.trans.mode != 0 && sSession.trans.aid == aid) {
+            return &sSession.trans;
         }
         return NULL;
     }
     for (; session != NULL; session = session->next) {
-        if (session->active != 0 && session->aid == aid) {
+        if (session->mode != 0 && session->aid == aid) {
             return session;
         }
     }
     return NULL;
 }
 
-static BOOL HandlePeerPacket(VCTControlPacket *packet, VCTEventResult *result) {
+static BOOL vct_handle_ssp_client(SSPHeader *packet, VCTResult *result) {
     VCTSession *session;
     int next;
 
-    if (packet->type == VCT_TYPE_BROADCAST) {
-        if (packet->command == 4) {
-            return HandleCommand4(packet, result);
+    if (packet->method == VCT_METHOD_REQUEST) {
+        if (packet->code == 4) {
+            return vct_handle_notify(packet, result);
         }
-        if (packet->command == 3) {
+        if (packet->code == 3) {
             return FALSE;
         }
     }
-    session = FindSession(packet->from);
+    session = vct_find_session(packet->from);
     if (session != NULL) {
-        next = ReplyTransition(session, packet);
+        next = vct_check_recv_state(session, packet);
         switch (next) {
         case -1:
             return FALSE;
         case -2:
             result->event = 12;
-            session->active = 0;
+            session->mode = 0;
             result->session = session;
             return TRUE;
         }
-        result->event = GetEvent(packet, session);
+        result->event = vct_dispatch_session(packet, session);
         result->session = session;
         session->state = next;
         return result->event != 0;
     }
-    session = AllocFromPool(packet->from);
+    session = vct_create_session_impl(packet->from);
     if (session == NULL) {
-        InitSession(&sSessionPool.pending, packet->from);
-        SendResponse(&sSessionPool.pending, 3);
+        vct_init_session(&sSession.tmp, packet->from);
+        vct_response_impl(&sSession.tmp, 3);
         return FALSE;
     }
-    next = ReplyTransition(session, packet);
+    next = vct_check_recv_state(session, packet);
     if (next == -2 || next == -1) {
-        VCT_ReleaseSession(session);
+        VCT_DeleteSession(session);
         return FALSE;
     }
-    result->event = GetEvent(packet, session);
+    result->event = vct_dispatch_session(packet, session);
     result->session = session;
     session->state = next;
     return result->event != 0;
 }
 
-static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
+static BOOL vct_handle_ssp_server(SSPHeader *packet, VCTResult *result) {
     VCTSession *host;
     int next;
 
-    if (sSessionPool.host.active == 2) {
-        if (sSessionPool.host.aid == packet->from) {
-            host = &sSessionPool.host;
-            next = ReplyTransition(host, packet);
+    if (sSession.trans.mode == 2) {
+        if (sSession.trans.aid == packet->from) {
+            host = &sSession.trans;
+            next = vct_check_recv_state(host, packet);
             switch (next) {
             case -2:
                 result->event = 12;
@@ -596,96 +596,96 @@ static BOOL HandleHostPacket(VCTControlPacket *packet, VCTEventResult *result) {
             case -1:
                 return FALSE;
             }
-            result->event = GetEvent(packet, host);
+            result->event = vct_dispatch_session(packet, host);
             result->session = host;
             host->state = next;
         } else {
-            BroadcastCommand(1);
+            vct_send_notify(1);
             return FALSE;
         }
     } else {
         if (!(sSessionState.mask & (packet->from != 0 ? 1 << packet->from : 1))) {
             return FALSE;
         }
-        sSessionPool.host.aid = packet->from;
-        sSessionPool.host.active = 2;
-        sSessionPool.host.state = 0;
-        host = &sSessionPool.host;
-        next = ReplyTransition(host, packet);
+        sSession.trans.aid = packet->from;
+        sSession.trans.mode = 2;
+        sSession.trans.state = 0;
+        host = &sSession.trans;
+        next = vct_check_recv_state(host, packet);
         switch (next) {
         case -3:
         case -2:
         case -1:
-            sSessionPool.host.active = 0;
+            sSession.trans.mode = 0;
             return FALSE;
         }
-        result->event = GetEvent(packet, host);
+        result->event = vct_dispatch_session(packet, host);
         result->session = host;
         host->state = next;
     }
     if (result->event == 10) {
-        BroadcastCommand(1);
+        vct_send_notify(1);
         sRequestTime = OS_GetTick();
     } else {
-        BroadcastCommand(0);
+        vct_send_notify(0);
         sRequestTime = 0;
     }
     return TRUE;
 }
 
-static BOOL HandleClosePacket(VCTControlPacket *packet, VCTEventResult *result) {
+static BOOL vct_response_reject(SSPHeader *packet, VCTResult *result) {
     VCTSession *session;
 
-    if (packet->type == VCT_TYPE_BROADCAST && packet->command == 4) {
+    if (packet->method == VCT_METHOD_REQUEST && packet->code == 4) {
         return FALSE;
     }
-    session = FindSession(packet->from);
+    session = vct_find_session(packet->from);
     if (session != NULL) {
         result->event = 2;
         result->session = session;
-        session->active = 0;
-        SendResponse(session, 2);
+        session->mode = 0;
+        vct_response_impl(session, 2);
         return TRUE;
     }
-    InitSession(&sSessionPool.pending, packet->from);
-    SendResponse(&sSessionPool.pending, 2);
+    vct_init_session(&sSession.tmp, packet->from);
+    vct_response_impl(&sSession.tmp, 2);
     return FALSE;
 }
 
-static BOOL HandleCommand4(VCTControlPacket *packet, VCTEventResult *result) {
-    if (gVCTSettings.mode != 2) {
+static BOOL vct_handle_notify(SSPHeader *packet, VCTResult *result) {
+    if (vct.SSPMode != 2) {
         return FALSE;
     }
-    if (gVCTSettings.hostAid != packet->from) {
+    if (vct.serverAID != packet->from) {
         return FALSE;
     }
-    switch (packet->flag) {
+    switch (packet->info) {
     case 0:
-        if (sSessionPool.host.active == 0) {
+        if (sSession.trans.mode == 0) {
             return FALSE;
         }
-        if (sSessionPool.host.state == 5 || sSessionPool.host.state == 2) {
+        if (sSession.trans.state == 5 || sSession.trans.state == 2) {
             result->event = 9;
         } else {
             result->event = 5;
         }
-        sSessionPool.host.active = 0;
-        sSessionPool.host.state = 0;
-        result->session = &sSessionPool.host;
+        sSession.trans.mode = 0;
+        sSession.trans.state = 0;
+        result->session = &sSession.trans;
         break;
     case 1:
-        sSessionPool.host.active = 2;
-        if (packet->origin == gVCTSettings.aid) {
-            sSessionPool.host.state = 2;
+        sSession.trans.mode = 2;
+        if (packet->talking == vct.myAID) {
+            sSession.trans.state = 2;
             result->event = 7;
-            sSessionPool.host.mask = packet->argument;
+            sSession.trans.aidBitmap = packet->aidBitmap;
         } else {
-            sSessionPool.host.state = 3;
+            sSession.trans.state = 3;
             result->event = 6;
-            sSessionPool.host.mask = packet->origin != 0 ? 1 << packet->origin : 1;
+            sSession.trans.aidBitmap = packet->talking != 0 ? 1 << packet->talking : 1;
         }
-        sSessionPool.host.origin = packet->origin;
-        result->session = &sSessionPool.host;
+        sSession.trans.talking = packet->talking;
+        result->session = &sSession.trans;
         break;
     default:
         return FALSE;

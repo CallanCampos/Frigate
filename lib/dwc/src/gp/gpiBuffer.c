@@ -2,7 +2,7 @@
 #include "dwc/ext.h"
 #include "dwc/gpiCallback.h"
 #include "dwc/gpiUtility.h"
-#include "dwc/gt2.h"
+#include "dwc/gsUdpEngine.h"
 
 // GameSpy GP's growing texts and their sending and receiving (gpiBuffer.c). The functions' names, from
 // pret/pokerevo's Wii build, are in dwc/gp.h
@@ -10,8 +10,8 @@
 // The room that the Udp Engine takes for its own header in each message to a peer
 #define GPI_PEER_HEADER_SIZE 23
 
-static int gpiSendData(GPConnection *connection, int sock, char *buffer, int bufferLen, BOOL *closed, int *sent,
-                       const char *id);
+static GPResult gpiSendData(GPConnection *connection, SOCKET sock, const char *buffer, int bufferLen, GPIBool *closed,
+                            int *sent, char id[3]);
 
 // How many sends and receives the debug texts have counted
 static struct {
@@ -19,7 +19,7 @@ static struct {
     int received;
 } sCount;
 
-int gpiAppendCharToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, int c) {
+GPResult gpiAppendCharToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, char c) {
     char *output = outputBuffer->buffer;
     int len = outputBuffer->len;
     int size = outputBuffer->size;
@@ -40,7 +40,8 @@ int gpiAppendCharToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, int
     return 0;
 }
 
-int gpiAppendStringToBufferLen(GPConnection *connection, GPIBuffer *outputBuffer, const char *string, int stringLen) {
+GPResult gpiAppendStringToBufferLen(GPConnection *connection, GPIBuffer *outputBuffer, const char *string,
+                                    int stringLen) {
     int len;
     int size;
     char *output;
@@ -67,19 +68,19 @@ int gpiAppendStringToBufferLen(GPConnection *connection, GPIBuffer *outputBuffer
     return 0;
 }
 
-int gpiAppendStringToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, const char *buffer) {
+GPResult gpiAppendStringToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, const char *buffer) {
     return gpiAppendStringToBufferLen(connection, outputBuffer, buffer, strlen(buffer));
 }
 
-int gpiAppendIntToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, int num) {
+GPResult gpiAppendIntToBuffer(GPConnection *connection, GPIBuffer *outputBuffer, int num) {
     char intValue[16];
 
     OS_SPrintf(intValue, "%d", num);
     return gpiAppendStringToBuffer(connection, outputBuffer, intValue);
 }
 
-static int gpiSendData(GPConnection *connection, int sock, char *buffer, int bufferLen, BOOL *closed, int *sent,
-                       const char *id) {
+static GPResult gpiSendData(GPConnection *connection, SOCKET sock, const char *buffer, int bufferLen, GPIBool *closed,
+                            int *sent, char id[3]) {
     int rcode = send(sock, buffer, bufferLen, 0);
     int error;
     char *copy;
@@ -95,47 +96,49 @@ static int gpiSendData(GPConnection *connection, int sock, char *buffer, int buf
             return 3;
         }
         *sent = 0;
-        *closed = FALSE;
+        *closed = gsi_false;
     } else if (rcode == 0) {
-        gsDebugFormat(1, 0, 16, "SENDXXXX(%s): Connection closed\n", id);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Comment, "SENDXXXX(%s): Connection closed\n",
+                      id);
         *sent = 0;
-        *closed = TRUE;
+        *closed = gsi_true;
     } else {
         copy = gsimalloc(rcode + 1);
         memcpy(copy, buffer, rcode);
         copy[rcode] = '\0';
-        gsDebugFormat(1, 0, 32, "SENT%04d(%s): %s\n", sCount.sent++, id, copy);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_RawDump, "SENT%04d(%s): %s\n", sCount.sent++,
+                      id, copy);
         gsifree(copy);
         *sent = rcode;
-        *closed = FALSE;
+        *closed = gsi_false;
     }
     return 0;
 }
 
 // The Udp Engine sends a peer's messages as they are given, so a single character is never sent on its own
-int gpiSendOrBufferChar(GPConnection *connection, GPIPeer *peer, int c) {
+GPResult gpiSendOrBufferChar(GPConnection *connection, GPIPeer *peer, char c) {
     return 0;
 }
 
 int gpiSendOrBufferStringLen(GPConnection *connection, GPIPeer *peer, const char *string, int stringLen) {
     GPIConnection *iconnection = *connection;
     int sent = 0;
-    u32 freeSpace;
+    gsi_u32 freeSpace;
 
     if (stringLen == 0) {
         return 0;
     }
-    if (peer->outputBuffer.len - peer->outputBuffer.pos == 0 && func_ov011_02171588(peer->messages) == 0) {
-        // Gt2_Close gives the free space of the connection's outgoing buffer
-        if (stringLen <= Gt2_Close(peer->ip, peer->port) - GPI_PEER_HEADER_SIZE) {
-            Gt2_Send(peer->ip, peer->port, iconnection->mHeader, string, stringLen, TRUE);
+    if (peer->outputBuffer.len - peer->outputBuffer.pos == 0 && ArrayLength(peer->messages) == 0) {
+        // gsUdpEngineGetPeerOutBufferFreeSpace gives the free space of the connection's outgoing buffer
+        if (stringLen <= gsUdpEngineGetPeerOutBufferFreeSpace(peer->ip, peer->port) - GPI_PEER_HEADER_SIZE) {
+            gsUdpEngineSendMessage(peer->ip, peer->port, iconnection->mHeader, string, stringLen, gsi_true);
             sent = stringLen;
             stringLen = 0;
         } else {
-            freeSpace = Gt2_Close(peer->ip, peer->port);
+            freeSpace = gsUdpEngineGetPeerOutBufferFreeSpace(peer->ip, peer->port);
             if (freeSpace > GPI_PEER_HEADER_SIZE) {
                 sent = freeSpace - GPI_PEER_HEADER_SIZE;
-                Gt2_Send(peer->ip, peer->port, iconnection->mHeader, string, sent, TRUE);
+                gsUdpEngineSendMessage(peer->ip, peer->port, iconnection->mHeader, string, sent, gsi_true);
                 stringLen -= sent;
             }
         }
@@ -150,17 +153,17 @@ int gpiSendOrBufferStringLen(GPConnection *connection, GPIPeer *peer, const char
     return 0;
 }
 
-int gpiSendOrBufferString(GPConnection *connection, GPIPeer *peer, char *string) {
+GPResult gpiSendOrBufferString(GPConnection *connection, GPIPeer *peer, char *string) {
     return gpiSendOrBufferStringLen(connection, peer, string, strlen(string));
 }
 
-int gpiRecvToBuffer(GPConnection *connection, int sock, GPIBuffer *inputBuffer, int *bytesRead, BOOL *connClosed,
-                    const char *id) {
+GPResult gpiRecvToBuffer(GPConnection *connection, SOCKET sock, GPIBuffer *inputBuffer, int *bytesRead,
+                         GPIBool *connClosed, char id[3]) {
     char *buffer = inputBuffer->buffer;
     int len = inputBuffer->len;
     int size = inputBuffer->size;
     int total = 0;
-    BOOL closed = FALSE;
+    gsi_bool closed = gsi_false;
     int rcode;
     int error;
     char *copy;
@@ -184,13 +187,15 @@ int gpiRecvToBuffer(GPConnection *connection, int sock, GPIBuffer *inputBuffer, 
                 return 3;
             }
         } else if (rcode == 0) {
-            closed = TRUE;
-            gsDebugFormat(1, 0, 16, "RECVXXXX(%s): Connection closed\n", id);
+            closed = gsi_true;
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_Comment,
+                          "RECVXXXX(%s): Connection closed\n", id);
         } else {
             copy = gsimalloc(rcode + 1);
             memcpy(copy, buffer + len, rcode);
             copy[rcode] = '\0';
-            gsDebugFormat(1, 0, 32, "RECV%04d(%s): %s\n", sCount.received++, id, copy);
+            gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_RawDump, "RECV%04d(%s): %s\n",
+                          sCount.received++, id, copy);
             gsifree(copy);
             len += rcode;
             total += rcode;
@@ -198,7 +203,7 @@ int gpiRecvToBuffer(GPConnection *connection, int sock, GPIBuffer *inputBuffer, 
         buffer[len] = '\0';
     } while (rcode >= 0 && !closed && total < 0x20000);
     if (total != 0) {
-        gsDebugFormat(1, 0, 32, "RECVTOTL(%s): %d\n", id, total);
+        gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Network, GSIDebugLevel_RawDump, "RECVTOTL(%s): %d\n", id, total);
     }
     inputBuffer->buffer = buffer;
     inputBuffer->len = len;
@@ -208,14 +213,14 @@ int gpiRecvToBuffer(GPConnection *connection, int sock, GPIBuffer *inputBuffer, 
     return 0;
 }
 
-int gpiSendFromBuffer(GPConnection *connection, int sock, GPIBuffer *outputBuffer, BOOL *connClosed, BOOL clipSentData,
-                      const char *id) {
+GPResult gpiSendFromBuffer(GPConnection *connection, SOCKET sock, GPIBuffer *outputBuffer, GPIBool *connClosed,
+                           GPIBool clipSentData, char id[3]) {
     char *buffer = outputBuffer->buffer;
     int len = outputBuffer->len;
     int pos = outputBuffer->pos;
     int total;
     int remaining = len - pos;
-    BOOL closed;
+    GPIBool closed;
     int sent;
     int rcode;
 
@@ -249,15 +254,15 @@ int gpiSendFromBuffer(GPConnection *connection, int sock, GPIBuffer *outputBuffe
     return 0;
 }
 
-int gpiSendBufferToPeer(GPConnection *connection, u32 ip, u16 port, GPIBuffer *outputBuffer, BOOL *connClosed,
-                        BOOL clipSentData) {
+GPResult gpiSendBufferToPeer(GPConnection *connection, unsigned int ip, unsigned short port, GPIBuffer *outputBuffer,
+                             GPIBool *connClosed, GPIBool clipSentData) {
     int len;
     int remaining;
     char *buffer;
     int pos;
     int total;
-    u32 freeSpace;
-    int state;
+    gsi_u32 freeSpace;
+    GSUdpPeerState state;
     GPIConnection *iconnection = *connection;
 
     buffer = outputBuffer->buffer;
@@ -268,18 +273,19 @@ int gpiSendBufferToPeer(GPConnection *connection, u32 ip, u16 port, GPIBuffer *o
     if (remaining == 0) {
         return 0;
     }
-    // Gt2_Close gives the free space of the connection's outgoing buffer
-    if (remaining <= Gt2_Close(ip, port) - GPI_PEER_HEADER_SIZE) {
-        Gt2_Send(ip, port, iconnection->mHeader, buffer + pos, remaining, TRUE);
+    // gsUdpEngineGetPeerOutBufferFreeSpace gives the free space of the connection's outgoing buffer
+    if (remaining <= gsUdpEngineGetPeerOutBufferFreeSpace(ip, port) - GPI_PEER_HEADER_SIZE) {
+        gsUdpEngineSendMessage(ip, port, iconnection->mHeader, buffer + pos, remaining, gsi_true);
         total = remaining;
         remaining = 0;
     } else {
         do {
-            freeSpace = Gt2_Close(ip, port) - GPI_PEER_HEADER_SIZE;
+            freeSpace = gsUdpEngineGetPeerOutBufferFreeSpace(ip, port) - GPI_PEER_HEADER_SIZE;
             if (freeSpace <= GPI_PEER_HEADER_SIZE) {
                 break;
             }
-            if (Gt2_Send(ip, port, iconnection->mHeader, buffer + (pos + total), freeSpace, TRUE) == 8) {
+            if (gsUdpEngineSendMessage(ip, port, iconnection->mHeader, buffer + (pos + total), freeSpace, gsi_true) ==
+                8) {
                 break;
             }
             total += freeSpace;
@@ -296,16 +302,17 @@ int gpiSendBufferToPeer(GPConnection *connection, u32 ip, u16 port, GPIBuffer *o
     }
     outputBuffer->len = len;
     outputBuffer->pos = pos;
-    Gt2_GetConnectionState(ip, port, &state);
+    gsUdpEngineGetPeerState(ip, port, &state);
     if (state == 3) {
-        *connClosed = TRUE;
+        *connClosed = gsi_true;
     } else {
-        *connClosed = FALSE;
+        *connClosed = gsi_false;
     }
     return 0;
 }
 
-int gpiReadMessageFromBuffer(GPConnection *connection, GPIBuffer *inputBuffer, char **message, int *type, int *len) {
+GPResult gpiReadMessageFromBuffer(GPConnection *connection, GPIBuffer *inputBuffer, char **message, int *type,
+                                  int *len) {
     char *str;
     char intValue[16];
     int messageLen;
@@ -342,7 +349,7 @@ int gpiReadMessageFromBuffer(GPConnection *connection, GPIBuffer *inputBuffer, c
     return 0;
 }
 
-int gpiClipBufferToPosition(GPConnection *connection, GPIBuffer *buffer) {
+GPResult gpiClipBufferToPosition(GPConnection *connection, GPIBuffer *buffer) {
     if (buffer == NULL || buffer->buffer == NULL || buffer->pos == 0) {
         return 0;
     }

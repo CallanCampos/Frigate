@@ -50,7 +50,7 @@ struct LiveBattleMatchFlow {
     void *record;
     void *entry;
     // The competition data that the infrared delivery brings
-    u8 delivered[0x160];
+    TournamentEntry delivered;
     u32 result;
     LiveBattleMatchFlowParam param;
     HeapID heapId;
@@ -296,7 +296,7 @@ static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, v
         LiveBattleMatchFlow_PrintAndWait(wk, task, seq, 32, FALSE, 31, 14);
         break;
     case 14:
-        LiveBattleMatchIrc_StartDelivery(wk->irc, wk->delivered);
+        LiveBattleMatchIrc_StartDelivery(wk->irc, &wk->delivered);
         *seq = 15;
         break;
     case 15:
@@ -353,10 +353,11 @@ static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, v
         }
         break;
     case 21:
-        if (TournamentEntry_CheckCRC(wk->delivered)) {
-            if (TournamentEntry_GetField(wk->delivered, TOURNAMENT_FIELD_VERSION_MASK) & LIVEBATTLEMATCH_VERSION_MASK) {
+        if (TournamentEntry_CheckCRC(&wk->delivered)) {
+            if (TournamentEntry_GetField(&wk->delivered, TOURNAMENT_FIELD_VERSION_MASK) &
+                LIVEBATTLEMATCH_VERSION_MASK) {
                 if (TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_CUP_ID) ==
-                    TournamentEntry_GetField(wk->delivered, TOURNAMENT_FIELD_CUP_ID)) {
+                    TournamentEntry_GetField(&wk->delivered, TOURNAMENT_FIELD_CUP_ID)) {
                     switch (TournamentEntry_GetField(wk->entry, TOURNAMENT_FIELD_UNK15B)) {
                     case 4:
                         *seq = 27;
@@ -386,10 +387,10 @@ static void LiveBattleMatchFlow_StepEntry(WifiBattleMatchTask *task, u32 *seq, v
         void *block = getTournamentBlockAddress(GameData_GetSaveControl(wk->param.gameData));
         void *records = TournamentBlock_GetTeam(block, 1);
 
-        TournamentEntry_SetField(wk->delivered, TOURNAMENT_FIELD_UNK15B, 1);
+        TournamentEntry_SetField(&wk->delivered, TOURNAMENT_FIELD_UNK15B, 1);
         LiveMatchData_Init(wk->record);
         TournamentTeam_Clear(records);
-        TournamentBlock_SetEntry(block, 1, wk->delivered);
+        TournamentBlock_SetEntry(block, 1, &wk->delivered);
         GameData_StartSave(wk->param.gameData);
         *seq = 24;
         break;

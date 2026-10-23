@@ -6,6 +6,7 @@
 #include "gfl/heap.h"
 #include "gfl/overlay.h"
 #include "gfl/proc.h"
+#include "struct_decls.h"
 
 // Overlay 144, the town map (townmap.c, townmap_grh.c, and townmap_data.c in app/townmap/, whose table of places other
 // overlays load too). The ROM names townmap.c and townmap_grh.c; the names of their functions and types are ours
@@ -34,6 +35,21 @@ enum {
     // With a place to fly to
     TOWNMAP_RESULT_FLY,
 };
+
+// The parameters of the process, which the field's callers allocate
+typedef struct {
+    // TOWNMAP_MODE_*
+    u32 mode;
+    // TOWNMAP_RESULT_*
+    u32 result;
+    // The zone the player is in, then the zone picked to fly to
+    u16 zoneId;
+    u16 escapeZoneId;
+    // Where to land in the zone picked
+    u32 warpX;
+    u32 warpZ;
+    GameSystem *gsys;
+} TownMapParam;
 
 // townmap.c
 extern const GameProcFunctions TOWNMAP_PROC_FUNCTIONS;

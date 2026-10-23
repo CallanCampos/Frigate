@@ -10,7 +10,7 @@
 //   - NNS_FndDestroyExpHeap, NNS_FndDestroyFrmHeap: the whole heap, its heads included
 //   - NNS_FndFreeToFrmHeap: everything from the bottom, from the top or both
 //   - NNS_FndFreeByStateToFrmHeap: what was allocated at either end since the recorded state
-//   - NNS_FndUnitHeapFree: one unit
+//   - NNS_FndFreeToUnitHeap: one unit
 // Memory the game reuses without one of these (a static or stack buffer, or the OS arena) is seen when a file there is
 // loaded again: the loaders check a registered tree against the file's bytes before returning it.
 //
@@ -62,15 +62,15 @@ void port_sdk_NNS_FndFreeToExpHeap(NNSFndHeapHandle heap, void *memBlock);
 void port_sdk_NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap);
 void port_sdk_NNS_FndFreeToFrmHeap(NNSFndHeapHandle heap, int mode);
 BOOL port_sdk_NNS_FndFreeByStateToFrmHeap(NNSFndHeapHandle heap, u32 tag);
-void port_sdk_NNS_FndUnitHeapFree(NNSFndHeapHandle heap, void *memBlock);
+void port_sdk_NNS_FndFreeToUnitHeap(NNSFndHeapHandle heap, void *memBlock);
 
 // The frame and unit heaps' own heads follow the common one, as frameheap.c and unitheap.c find them
-static NNSiFndFrameHeap *FrameHeapOf(NNSFndHeapHandle heap) {
-    return (NNSiFndFrameHeap *)((u8 *)heap + sizeof(NNSiFndHeapHead));
+static NNSiFndFrmHeapHead *FrameHeapOf(NNSFndHeapHandle heap) {
+    return (NNSiFndFrmHeapHead *)((u8 *)heap + sizeof(NNSiFndHeapHead));
 }
 
-static NNSiFndUnitHeap *UnitHeapOf(NNSFndHeapHandle heap) {
-    return (NNSiFndUnitHeap *)((u8 *)heap + sizeof(NNSiFndHeapHead));
+static NNSiFndUntHeapHead *UnitHeapOf(NNSFndHeapHandle heap) {
+    return (NNSiFndUntHeapHead *)((u8 *)heap + sizeof(NNSiFndHeapHead));
 }
 
 // [from, to), when it isn't empty
@@ -250,34 +250,34 @@ void NNS_FndDestroyFrmHeap(NNSFndHeapHandle heap) {
 
 // What a frame heap frees is what it held before and no longer holds: the bottom shrinks to a lower low, the top to a
 // higher high
-static void ReleaseFrameHeapChange(void *lowBefore, void *highBefore, NNSiFndFrameHeap *frmHeap) {
-    FreeBetween(frmHeap->low, lowBefore);
-    FreeBetween(highBefore, frmHeap->high);
+static void ReleaseFrameHeapChange(void *lowBefore, void *highBefore, NNSiFndFrmHeapHead *frmHeap) {
+    FreeBetween(frmHeap->headAllocator, lowBefore);
+    FreeBetween(highBefore, frmHeap->tailAllocator);
 }
 
 void NNS_FndFreeToFrmHeap(NNSFndHeapHandle heap, int mode) {
-    NNSiFndFrameHeap *frmHeap = FrameHeapOf(heap);
-    void *low = frmHeap->low;
-    void *high = frmHeap->high;
+    NNSiFndFrmHeapHead *frmHeap = FrameHeapOf(heap);
+    void *low = frmHeap->headAllocator;
+    void *high = frmHeap->tailAllocator;
 
     port_sdk_NNS_FndFreeToFrmHeap(heap, mode);
     ReleaseFrameHeapChange(low, high, frmHeap);
 }
 
 BOOL NNS_FndFreeByStateToFrmHeap(NNSFndHeapHandle heap, u32 tag) {
-    NNSiFndFrameHeap *frmHeap = FrameHeapOf(heap);
-    void *low = frmHeap->low;
-    void *high = frmHeap->high;
+    NNSiFndFrmHeapHead *frmHeap = FrameHeapOf(heap);
+    void *low = frmHeap->headAllocator;
+    void *high = frmHeap->tailAllocator;
     BOOL result = port_sdk_NNS_FndFreeByStateToFrmHeap(heap, tag);
 
     ReleaseFrameHeapChange(low, high, frmHeap);
     return result;
 }
 
-void NNS_FndUnitHeapFree(NNSFndHeapHandle heap, void *memBlock) {
-    u32 unitSize = UnitHeapOf(heap)->unitSize;
+void NNS_FndFreeToUnitHeap(NNSFndHeapHandle heap, void *memBlock) {
+    u32 unitSize = UnitHeapOf(heap)->mBlkSize;
 
-    port_sdk_NNS_FndUnitHeapFree(heap, memBlock);
+    port_sdk_NNS_FndFreeToUnitHeap(heap, memBlock);
     ReleaseBetween(memBlock, (u8 *)memBlock + unitSize);
 }
 

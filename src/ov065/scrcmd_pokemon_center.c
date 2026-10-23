@@ -90,8 +90,8 @@ typedef BOOL (*MedalCheck)(MedalCheckContext *ctx, GameData *gameData, u32 thres
 static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, HeapID heapId);
 static void PokemonCenter_AcknowledgeMedal(FieldScriptEnv *env);
 static void PokemonCenter_DiscoverInitialMedals(FieldScriptEnv *env);
-static void PokemonCenter_CheckSpecialMedal(u16 medal, u32 check, u32 threshold, GameData *gameData, MedalBox *box,
-                                            MedalCheckContext *ctx, HeapID heapId);
+static void PokemonCenter_CheckSpecialMedal(u16 medal, unsigned int check, u32 threshold, GameData *gameData,
+                                            MedalBox *box, MedalCheckContext *ctx, HeapID heapId);
 static BOOL PokemonCenter_ClearCaughtTypes(BOOL *typesCaught, u8 type1, u8 type2);
 static void PokemonCenter_CheckBoxPkm(BoxPkm *pkm, MedalCheckContext *ctx);
 static void PokemonCenter_CheckPartyPkm(MedalCheckContext *ctx, PartyPkm *pkm);
@@ -280,8 +280,8 @@ static void PokemonCenter_CheckMedals(GameData *gameData, SaveControl *p_sv, Hea
 
 static MedalCheck sMedalChecks[];
 
-static void PokemonCenter_CheckSpecialMedal(u16 medal, u32 check, u32 threshold, GameData *gameData, MedalBox *box,
-                                            MedalCheckContext *ctx, HeapID heapId) {
+static void PokemonCenter_CheckSpecialMedal(u16 medal, unsigned int check, u32 threshold, GameData *gameData,
+                                            MedalBox *box, MedalCheckContext *ctx, HeapID heapId) {
     BOOL result = FALSE;
     MedalCheck func = sMedalChecks[check - MEDAL_CHECK_FIRST];
 

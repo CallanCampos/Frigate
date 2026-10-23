@@ -21,29 +21,29 @@
 #define ROM_REGION (*(const char *)(HW_ROM_HEADER_BUF + 0xf))
 
 // The profanity check's state (0x1d64 bytes): its HTTP client, the words it asked about and where the answers go
-typedef struct NasWordWork {
+typedef struct DWCProfWorkarea {
     DWCHttp http;
-    BOOL active;
+    BOOL http_initialized;
     char url[0x104];
-    char *flags;
-    int *profaneCount;
-    int count;
-} NasWordWork;
+    char *result;
+    int *badwordsnum;
+    int wordsnum;
+} DWCProfWorkarea;
 
-static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *type, int timeout, char *flags,
-                                   int *profaneCount, const char *region);
-static BOOL DWCi_Prof_ParseResult(void);
-static void *DWCi_Prof_Alloc(u32 name, u32 size);
-static void DWCi_Prof_Free(u32 name, void *ptr, u32 size);
+static BOOL DWCi_CheckProfanityAsync(const u16 **words, int count, const char *type, int timeout, char *flags,
+                                     int *profaneCount, const char *region);
+static BOOL DWCi_Prof_ParseResponse(void);
+static void *DWCi_Prof_Alloc(u32 name, s32 size);
+static void DWCi_Prof_Free(u32 name, void *ptr, s32 size);
 
-static NasWordWork *sWords = NULL;
+static DWCProfWorkarea *sWords = NULL;
 
-static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *type, int timeout, char *flags,
-                                   int *profaneCount, const char *region) {
+static BOOL DWCi_CheckProfanityAsync(const u16 **words, int count, const char *type, int timeout, char *flags,
+                                     int *profaneCount, const char *region) {
     int total;
     u16 *joined = NULL;
     DWCHttpParam config;
-    NasAuthInfo info;
+    DWCCalInfo info;
     int i;
     int position;
     int next;
@@ -63,33 +63,34 @@ static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *typ
         return FALSE;
     }
     MI_CpuFill8(flags, 0, count);
-    sWords = DWC_Alloc(0, sizeof(NasWordWork));
+    sWords = DWC_Alloc(0, sizeof(DWCProfWorkarea));
     if (sWords != NULL) {
-        MI_CpuFill8(sWords, 0, sizeof(NasWordWork));
-        sWords->active = 0;
-        MI_CpuFill8(&info, 0, sizeof(NasAuthInfo));
-        sWords->flags = flags;
-        sWords->profaneCount = profaneCount;
-        sWords->count = count;
-        strncpy(sWords->url, DWCi_AuthConfig.url, 0x100);
+        MI_CpuFill8(sWords, 0, sizeof(DWCProfWorkarea));
+        sWords->http_initialized = 0;
+        MI_CpuFill8(&info, 0, sizeof(DWCCalInfo));
+        sWords->result = flags;
+        sWords->badwordsnum = profaneCount;
+        sWords->wordsnum = count;
+        strncpy(sWords->url, DWCauthhttpparam.url, 0x100);
         sWords->url[0x100] = 0;
         found = strstr(sWords->url, "/ac");
         if (found != NULL) {
             MI_CpuCopy8("/pr", found, 4);
             config.url = sWords->url;
-            config.get = 0;
-            config.bufferSize = 0x400;
+            config.action = DWCHTTP_POST;
+            config.len_recvbuf = 0x400;
             config.alloc = DWCi_Prof_Alloc;
             config.free = DWCi_Prof_Free;
-            config.ignoreCa = 0;
+            config.ignoreca = 0;
             if (timeout <= 0) {
                 config.timeout = 10000;
             } else {
                 config.timeout = timeout;
             }
             if (DWC_Http_Create(&sWords->http, &config) == 0) {
-                sWords->active = 1;
-                if (DWCi_Auth_GetCurrentInfo(&info) && DWCi_Auth_AddCommonItems(&sWords->http, &info, DWCi_SendSsid) &&
+                sWords->http_initialized = 1;
+                if (DWC_Auth_GetCalInfoFromNVRAM(&info) &&
+                    DWC_Auth_SetCalInfoToHttp(&sWords->http, &info, DWCishotspot) &&
                     DWC_Http_Add_PostBase64Item(&sWords->http, "wregion", region, 1) == 0 &&
                     DWC_Http_Add_PostBase64Item(&sWords->http, "wenc", "UTF-16LE", 8) == 0 &&
                     (type == NULL || DWC_Http_Add_PostBase64Item(&sWords->http, "wtype", type, 4) == 0) &&
@@ -106,7 +107,8 @@ static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *typ
                             joined[next] = 9;
                             position = next + 1;
                         }
-                        if (DWC_Http_Add_PostBase64Item(&sWords->http, "words", joined, (total - 1) * 2) == 0) {
+                        if (DWC_Http_Add_PostBase64Item(&sWords->http, "words", (const char *)joined,
+                                                        (total - 1) * 2) == 0) {
                             DWC_Free(0, joined, 0);
                             joined = NULL;
                             if (DWC_Http_FinishHeader(&sWords->http) == 0) {
@@ -125,7 +127,7 @@ static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *typ
         DWC_Free(0, joined, 0);
     }
     if (sWords != NULL) {
-        if (sWords->active == 1) {
+        if (sWords->http_initialized == 1) {
             DWC_Http_Destroy(&sWords->http);
         }
         DWC_Free(0, sWords, 0);
@@ -135,7 +137,7 @@ static BOOL DWCi_Prof_StartRequest(const u16 **words, int count, const char *typ
 }
 
 BOOL DWC_CheckProfanityExAsync(const u16 **words, int count, const char *type, int timeout, char *flags,
-                               int *profaneCount, int mode) {
+                               int *profaneCount, DWCProfRegion mode) {
     char region;
 
     if (mode == 0x80) {
@@ -143,10 +145,10 @@ BOOL DWC_CheckProfanityExAsync(const u16 **words, int count, const char *type, i
     } else {
         region = ROM_REGION;
     }
-    return DWCi_Prof_StartRequest(words, count, type, timeout, flags, profaneCount, &region);
+    return DWCi_CheckProfanityAsync(words, count, type, timeout, flags, profaneCount, &region);
 }
 
-int DWC_CheckProfanityProcess(void) {
+DWCProfState DWC_CheckProfanityProcess(void) {
     int result;
     u32 code;
 
@@ -154,25 +156,25 @@ int DWC_CheckProfanityProcess(void) {
         return 0;
     }
     if (OS_IsThreadTerminated(&sWords->http.thread) == TRUE) {
-        code = DWCAc_GetApType();
+        code = DWC_AC_GetApType();
         if (code == 0xff || code > 99) {
             code = 99;
         }
-        switch (sWords->http.result) {
-        case DWC_HTTP_DONE:
-            if (!DWCi_Prof_ParseResult()) {
+        switch (sWords->http.error) {
+        case DWCHTTP_E_FINISH:
+            if (!DWCi_Prof_ParseResponse()) {
                 result = 3;
             } else {
                 result = 2;
             }
             break;
-        case DWC_HTTP_DNS_ERROR:
+        case DWCHTTP_E_DNSERR:
             DWCi_SetError(8, -52100 - code);
             result = 3;
             break;
-        case DWC_HTTP_CONNECT_ERROR:
+        case DWCHTTP_E_CONERR:
         case 4:
-        case DWC_HTTP_TIMEOUT:
+        case DWCHTTP_E_RECVTOUT:
             DWCi_SetError(0x12, -33010);
             result = 3;
             break;
@@ -190,8 +192,8 @@ int DWC_CheckProfanityProcess(void) {
     return result;
 }
 
-static BOOL DWCi_Prof_ParseResult(void) {
-    const char *names[8] = { "prwordsJ", "prwordsE", "prwordsP", "prwordsK", "prwordsC" };
+static BOOL DWCi_Prof_ParseResponse(void) {
+    char *names[8] = { "prwordsJ", "prwordsE", "prwordsP", "prwordsK", "prwordsC" };
     int gotAny = 0;
     u32 i;
     DWCHttp *http = &sWords->http;
@@ -230,29 +232,29 @@ static BOOL DWCi_Prof_ParseResult(void) {
                             }
                             if (length != 0) {
                                 gotAny = 1;
-                                if (length < sWords->count) {
+                                if (length < sWords->wordsnum) {
                                     goto fail;
                                 }
-                                for (j = 0; j < sWords->count; j++) {
+                                for (j = 0; j < sWords->wordsnum; j++) {
                                     if (flagText[j] == '1') {
-                                        sWords->flags[j] |= (char)(1 << i);
+                                        sWords->result[j] |= (char)(1 << i);
                                     }
                                 }
                             }
                         }
                     }
                     length = DWC_Http_GetBase64DecodedResult(http, "prwords", flagText, 0x33);
-                    if (length < 0 || length == 0 || length < sWords->count) {
+                    if (length < 0 || length == 0 || length < sWords->wordsnum) {
                         goto fail;
                     }
-                    *sWords->profaneCount = 0;
-                    for (j = 0; j < sWords->count; j++) {
+                    *sWords->badwordsnum = 0;
+                    for (j = 0; j < sWords->wordsnum; j++) {
                         if (flagText[j] == '1') {
-                            (*sWords->profaneCount)++;
+                            (*sWords->badwordsnum)++;
                             if (gotAny != 0) {
-                                sWords->flags[j] |= 0x80;
+                                sWords->result[j] |= 0x80;
                             } else {
-                                sWords->flags[j] = 1;
+                                sWords->result[j] = 1;
                             }
                         }
                     }
@@ -266,10 +268,10 @@ fail:
     return FALSE;
 }
 
-static void *DWCi_Prof_Alloc(u32 name, u32 size) {
+static void *DWCi_Prof_Alloc(u32 name, s32 size) {
     return DWC_Alloc(0, size);
 }
 
-static void DWCi_Prof_Free(u32 name, void *ptr, u32 size) {
+static void DWCi_Prof_Free(u32 name, void *ptr, s32 size) {
     DWC_Free(0, ptr, size);
 }

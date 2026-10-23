@@ -398,11 +398,11 @@ void BtlSetup_SetTrainerLocal(EncountSystem *encountSystem, BtlSetup *setup, u32
 
     BtlSetup_Reset(setup);
     SaveBtlFieldStatus(&status, encountSystem->gameData, encountSystem->field);
-    terrain = GetTrainerClassBattlePedestal(TrainerData_GetParam(trainerId, 1));
+    terrain = GetTrainerClassBattlePedestal(TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS));
     if (terrain != 0x14) {
         status.terrain = terrain;
     }
-    status.bgId = CheckOverridenTrainerBattleBG(TrainerData_GetParam(trainerId, 1), status.bgId);
+    status.bgId = CheckOverridenTrainerBattleBG(TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS), status.bgId);
     switch (style) {
     case 1:
         if (partnerId) {

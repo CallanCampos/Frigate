@@ -37,7 +37,7 @@ from tools.decomp.compile_all import generate_constants  # noqa: E402
 # The decomp's own C library headers in include/, written for MWCC's MSL. The host build uses the host's C library
 LIBC_HEADERS = {
     "ctype.h", "errno.h", "float.h", "limits.h", "locale.h", "math.h", "stdarg.h", "stddef.h", "stdio.h",
-    "stdlib.h", "string.h", "wchar.h",
+    "stdlib.h", "string.h", "time.h", "wchar.h",
 }
 
 

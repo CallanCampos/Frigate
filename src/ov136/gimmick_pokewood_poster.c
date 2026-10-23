@@ -120,18 +120,18 @@ static void PokewoodPoster_WriteImage(void *texResource, const char *texName, co
     void *characterFile = GFL_G2DIOReadBGNCGR(ARCID_GIMMICK_POKEWOOD_POSTER, image * 2 + 1, TRUE, &character, heapId);
     void *paletteFile = GFL_G2DIOReadNCLR(ARCID_GIMMICK_POKEWOOD_POSTER, image * 2, &palette, heapId);
     GFLBitmap *bitmap =
-        GFL_BitmapWrap(character->rawData, sTileWidth, sTileHeight, sTilePixels * sTilePixels / 2, heapId);
+        GFL_BitmapWrap(character->pRawData, sTileWidth, sTileHeight, sTilePixels * sTilePixels / 2, heapId);
 
     GFL_BitmapMakeLinear(bitmap, FALSE, heapId);
 
     GX_BeginLoadTex();
-    DC_FlushRange(character->rawData, 0x800);
-    GX_LoadTex(character->rawData, texAddr, 0x800);
+    DC_FlushRange(character->pRawData, 0x800);
+    GX_LoadTex(character->pRawData, texAddr, 0x800);
     GX_EndLoadTex();
 
     GX_BeginLoadTexPltt();
-    DC_FlushRange(palette->rawData, 0x20);
-    GX_LoadTexPltt(palette->rawData, plttAddr, 0x20);
+    DC_FlushRange(palette->pRawData, 0x20);
+    GX_LoadTexPltt(palette->pRawData, plttAddr, 0x20);
     GX_EndLoadTexPltt();
 
     GFL_HeapFree(characterFile);

@@ -481,7 +481,7 @@ static void FieldSubscreen_FieldMenu_Init(FieldSubscreen *subscreen, u32 previou
     GFL_BGSysFillScr(BGSYS_BG_SUB, 0);
     GFL_BGSysSetBGEnabledB(GX_PLANEMASK_OBJ, TRUE);
     subscreen->work = FieldMenu_Create(HEAPID_FIELD_MENU, subscreen->heapId, subscreen, subscreen->field, open);
-    if (FieldMenu_GetMenuType(gameData, eventWork, zoneId) != 1) {
+    if (FieldMenu_GetMenuType(gameData, eventWork, zoneId) != FIELD_MENU_TYPE_UNION_ROOM) {
         InfoWin_Init(BGSYS_BG_SUB, 14, gameData, subscreen->heapId);
     }
     FieldMenu_LoadBar(subscreen->heapId, open);
@@ -492,7 +492,7 @@ static void FieldSubscreen_FieldMenu_Terminate(FieldSubscreen *subscreen) {
     u32 zoneId = PlayerState_GetZoneID(GSYS_GetPlayerState(gsys));
     GameData *gameData = GSYS_GetGameData(gsys);
 
-    if (FieldMenu_GetMenuType(gameData, GameData_GetEventWork(gameData), zoneId) != 1) {
+    if (FieldMenu_GetMenuType(gameData, GameData_GetEventWork(gameData), zoneId) != FIELD_MENU_TYPE_UNION_ROOM) {
         InfoWin_Exit();
     }
     FieldMenu_Free(subscreen->work);

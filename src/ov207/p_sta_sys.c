@@ -346,7 +346,7 @@ static void PStatus_InitGraphics(PStatusWork *wk) {
 }
 
 static void PStatus_ExitGraphics(PStatusWork *wk) {
-    GfdClearVramTransferQueue();
+    NNS_GfdClearVramTransferManagerTask();
     MCSSSys_Free(wk->mcssSys);
     GFL_G3DCameraFree(wk->camera);
     GFL_G3DSysFree();
@@ -798,7 +798,7 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
             }
             wk->cursorPltt[i] = GX_RGB(r, g, b);
         }
-        NNS_GfdRegisterNewVramTransferTask(14, 0x6c, wk->cursorPltt, sizeof(wk->cursorPltt));
+        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0x6c, wk->cursorPltt, sizeof(wk->cursorPltt));
     }
     for (i = 0; i < 16; i++) {
         s8 r;
@@ -831,7 +831,7 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
         }
         wk->tabPltt[i] = GX_RGB(r, g, b);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0x180, wk->tabPltt, sizeof(wk->tabPltt));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0x180, wk->tabPltt, sizeof(wk->tabPltt));
 
     for (i = 12; i <= 14; i++) {
         s8 r;
@@ -879,7 +879,7 @@ static void PStatus_AnimatePalettes(PStatusWork *wk) {
         }
         wk->buttonPltt[i] = GX_RGB(r, g, b);
     }
-    NNS_GfdRegisterNewVramTransferTask(14, 0x1a0, wk->buttonPltt, sizeof(wk->buttonPltt));
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_OBJ_PLTT_MAIN, 0x1a0, wk->buttonPltt, sizeof(wk->buttonPltt));
 }
 
 void PStatus_EnableInput(PStatusWork *wk, BOOL enable) {

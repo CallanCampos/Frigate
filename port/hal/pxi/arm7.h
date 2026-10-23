@@ -43,7 +43,7 @@ void port_mic7_frame(u64 cycles);
 // The firmware's user settings that the ARM7 puts in the system area at boot (nvram7.c, from port_nvram_settings), and
 // the touch screen's calibration in them, which the touch panel's raw samples follow (tp7.c)
 void port_nvram7_fill_user_info(NVRAMConfig *config);
-void port_tp7_calibration(NVRAMTouchCalibration *calibration);
+void port_tp7_calibration(NVRAMConfigTpCalibData *calibration);
 
 // The clock chip's date and time registers as the ARM7 leaves them in the shared memory (OSSystemWork's
 // realTimeClock, read by rtc_api.c and os_entropy.c), for the host's clock now (rtc7.c)

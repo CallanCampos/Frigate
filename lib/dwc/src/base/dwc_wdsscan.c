@@ -16,35 +16,35 @@
 // Where the scan is. The ones that wait for a callback are named for what is in progress
 enum {
     // Nothing started: start the wireless manager
-    SCAN_STATE_START,
-    SCAN_STATE_STARTING,
+    APP_STATE_WDSINIT,
+    APP_STATE_WDSWAITINIT,
     // The wireless manager is up (or the time is not out): start a scan of the channels
-    SCAN_STATE_START_SCAN,
-    SCAN_STATE_SCANNING,
+    APP_STATE_WDSSCAN,
+    APP_STATE_WDSWAITSCAN,
     // A scan took in its beacons: scan again until the time is out
-    SCAN_STATE_SCANNED,
+    APP_STATE_WDSCOMPLETESCAN,
     // The time is out: stop the scan
-    SCAN_STATE_STOP_SCAN,
-    SCAN_STATE_STOPPING_SCAN,
+    APP_STATE_WDSENDSCAN,
+    APP_STATE_WDSWAITENDSCAN,
     // The scan is stopped: read its beacons, and end the wireless manager
-    SCAN_STATE_STOPPED,
-    SCAN_STATE_ENDING,
+    APP_STATE_WDSCOMPLETEENDSCAN,
+    APP_STATE_WDSWAITEND,
     // The wireless manager is down: hand over the strongest access point
-    SCAN_STATE_ENDED,
+    APP_STATE_WDSCOMPLETEEND,
     // Something failed: end the wireless manager
-    SCAN_STATE_FAIL,
+    APP_STATE_ERRORENDPROCESS,
     // The scan has failed, which every step from here on reports
-    SCAN_STATE_FAILED,
+    APP_STATE_ERROREND,
 };
 
 // What the scan keeps besides the work of wds.c, 0x794 bytes
 typedef struct WdsScanData {
     // Where the access point is put
-    DWCInetApSettings *settings;
+    DWCWDSData *settings;
     u16 dmaNo;
     // The tick of the first scan
     u64 startTick;
-    WDSEntry entries[WDS_MAX_ENTRIES];
+    WDSBriefApInfo entries[WDS_MAX_ENTRIES];
     // The entry with the strongest signal, -1 if there is none
     int best;
 } WdsScanData;
@@ -59,64 +59,64 @@ typedef struct DWCWdsScan {
 
 static DWCWdsScan sWdsScan;
 
-static void DWCi_WdsScan_OnInitialized(void *arg);
-static void DWCi_WdsScan_OnScanned(void *arg);
-static void DWCi_WdsScan_OnScanStopped(void *arg);
-static void DWCi_WdsScan_OnEnded(void *arg);
-static void DWCi_WdsScan_OnFailed(void *arg);
+static void WDS_Initialize_CB(void *arg);
+static void WDS_StartScan_CB(void *arg);
+static void WDS_EndScan_CB(void *arg);
+static void WDS_End_CB(void *arg);
+static void WDS_Error_End_CB(void *arg);
 
-BOOL DWCi_WdsScan_Start(DWCInetApSettings *settings, u16 dmaNo) {
-    sWdsScan.wds = DWC_Alloc(DWC_ALLOCTYPE_AC, WDS_GetWorkSize());
+BOOL DWC_AC_StartupGetWDSInfo(DWCWDSData *settings, u16 dmaNo) {
+    sWdsScan.wds = DWC_Alloc(DWC_ALLOCTYPE_AC, WDS_GetWorkAreaSize());
     sWdsScan.data = DWC_Alloc(DWC_ALLOCTYPE_AC, sizeof(WdsScanData));
     MI_CpuFill8(sWdsScan.data, 0, sizeof(WdsScanData));
     sWdsScan.data->settings = settings;
     sWdsScan.data->dmaNo = dmaNo;
-    sWdsScan.state = SCAN_STATE_START;
+    sWdsScan.state = APP_STATE_WDSINIT;
     return TRUE;
 }
 
-int DWCi_WdsScan_Process(void) {
+int DWC_AC_ProcessGetWDSInfo(void) {
     int i;
     u16 strongest;
     int result;
 
     if (sWdsScan.wds == NULL || sWdsScan.data == NULL) {
-        return DWC_INET_SCAN_FAILED;
+        return DWC_WDS_STATE_FAILED;
     }
-    result = DWC_INET_SCAN_SCANNING;
+    result = DWC_WDS_STATE_PROCESS;
     switch (sWdsScan.state) {
-    case SCAN_STATE_START:
-        sWdsScan.state = SCAN_STATE_STARTING;
-        if (WDS_Initialize(sWdsScan.wds, DWCi_WdsScan_OnInitialized, sWdsScan.data->dmaNo) != 0) {
-            sWdsScan.state = SCAN_STATE_FAILED;
+    case APP_STATE_WDSINIT:
+        sWdsScan.state = APP_STATE_WDSWAITINIT;
+        if (WDS_Initialize(sWdsScan.wds, WDS_Initialize_CB, sWdsScan.data->dmaNo) != 0) {
+            sWdsScan.state = APP_STATE_ERROREND;
         }
         break;
-    case SCAN_STATE_START_SCAN:
-        sWdsScan.state = SCAN_STATE_SCANNING;
-        if (WDS_StartScan(DWCi_WdsScan_OnScanned) == 0) {
+    case APP_STATE_WDSSCAN:
+        sWdsScan.state = APP_STATE_WDSWAITSCAN;
+        if (WDS_StartScan(WDS_StartScan_CB) == 0) {
             if (sWdsScan.data->startTick == 0) {
                 sWdsScan.data->startTick = OS_GetTick();
             }
         } else {
-            sWdsScan.state = SCAN_STATE_FAIL;
+            sWdsScan.state = APP_STATE_ERRORENDPROCESS;
         }
         break;
-    case SCAN_STATE_SCANNED:
+    case APP_STATE_WDSCOMPLETESCAN:
         if (OS_TicksToMilliSeconds(OS_GetTick() - sWdsScan.data->startTick) < SCAN_TIME) {
-            sWdsScan.state = SCAN_STATE_START_SCAN;
+            sWdsScan.state = APP_STATE_WDSSCAN;
         } else {
-            sWdsScan.state = SCAN_STATE_STOP_SCAN;
+            sWdsScan.state = APP_STATE_WDSENDSCAN;
         }
         break;
-    case SCAN_STATE_STOP_SCAN:
-        sWdsScan.state = SCAN_STATE_STOPPING_SCAN;
-        if (WDS_EndScan(DWCi_WdsScan_OnScanStopped) != 0) {
-            sWdsScan.state = SCAN_STATE_FAIL;
+    case APP_STATE_WDSENDSCAN:
+        sWdsScan.state = APP_STATE_WDSWAITENDSCAN;
+        if (WDS_EndScan(WDS_EndScan_CB) != 0) {
+            sWdsScan.state = APP_STATE_ERRORENDPROCESS;
         }
         break;
-    case SCAN_STATE_STOPPED:
-        if (WDS_GetEntries(sWdsScan.data->entries) != 0) {
-            sWdsScan.state = SCAN_STATE_FAIL;
+    case APP_STATE_WDSCOMPLETEENDSCAN:
+        if (WDS_GetApInfoAll(sWdsScan.data->entries) != 0) {
+            sWdsScan.state = APP_STATE_ERRORENDPROCESS;
         }
         // Reads the beacons the scan took in, and picks the one of the strongest signal (the last, among equals) that
         // wds.c takes for a Nintendo Zone's. If they cannot be read, the entries are still the zeros the scan started
@@ -125,55 +125,55 @@ int DWCi_WdsScan_Process(void) {
         sWdsScan.data->best = -1;
         strongest = 0;
         for (; i < WDS_MAX_ENTRIES; i++) {
-            if (WDS_IsBeaconInfoValid(&sWdsScan.data->entries[i].info) && sWdsScan.data->entries[i].valid) {
-                if (sWdsScan.data->entries[i].signal >= strongest) {
+            if (WDS_IsBeaconInfoValid(&sWdsScan.data->entries[i].apinfo) && sWdsScan.data->entries[i].isvalid) {
+                if (sWdsScan.data->entries[i].rssi >= strongest) {
                     sWdsScan.data->best = i;
-                    strongest = sWdsScan.data->entries[i].signal;
+                    strongest = sWdsScan.data->entries[i].rssi;
                 }
             }
         }
-        sWdsScan.state = SCAN_STATE_ENDING;
-        if (WDS_End(DWCi_WdsScan_OnEnded) != 0) {
-            sWdsScan.state = SCAN_STATE_FAILED;
+        sWdsScan.state = APP_STATE_WDSWAITEND;
+        if (WDS_End(WDS_End_CB) != 0) {
+            sWdsScan.state = APP_STATE_ERROREND;
         }
         break;
-    case SCAN_STATE_ENDED:
+    case APP_STATE_WDSCOMPLETEEND:
         if (sWdsScan.data->best < 0) {
-            sWdsScan.state = SCAN_STATE_FAILED;
+            sWdsScan.state = APP_STATE_ERROREND;
             break;
         }
         // The wireless manager is down: the strongest access point becomes the settings to connect with, from what its
         // beacon gives
-        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.ssid, sWdsScan.data->settings->ssid,
+        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].apinfo.ssid, sWdsScan.data->settings->ssid,
                     sizeof(sWdsScan.data->settings->ssid));
-        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.wepKey, sWdsScan.data->settings->wepKey,
-                    sizeof(sWdsScan.data->settings->wepKey));
-        sWdsScan.data->settings->wepMode = sWdsScan.data->entries[sWdsScan.data->best].info.wepMode;
-        sWdsScan.data->settings->mtu = sWdsScan.data->entries[sWdsScan.data->best].info.mtu;
-        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].info.spotInfo, sWdsScan.data->settings->spotInfo,
-                    sizeof(sWdsScan.data->settings->spotInfo));
-        result = DWC_INET_SCAN_FOUND;
+        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].apinfo.wepkey, sWdsScan.data->settings->wep,
+                    sizeof(sWdsScan.data->settings->wep));
+        sWdsScan.data->settings->wepMode = sWdsScan.data->entries[sWdsScan.data->best].apinfo.encryptflag;
+        sWdsScan.data->settings->mtu = sWdsScan.data->entries[sWdsScan.data->best].apinfo.mtu;
+        MI_CpuCopy8(sWdsScan.data->entries[sWdsScan.data->best].apinfo.apnum, sWdsScan.data->settings->apnum,
+                    sizeof(sWdsScan.data->settings->apnum));
+        result = DWC_WDS_STATE_COMPLETED;
         break;
-    case SCAN_STATE_FAIL:
-        sWdsScan.state = SCAN_STATE_ENDING;
-        if (WDS_End(DWCi_WdsScan_OnFailed) != 0) {
-            sWdsScan.state = SCAN_STATE_FAILED;
+    case APP_STATE_ERRORENDPROCESS:
+        sWdsScan.state = APP_STATE_WDSWAITEND;
+        if (WDS_End(WDS_Error_End_CB) != 0) {
+            sWdsScan.state = APP_STATE_ERROREND;
         }
         break;
-    case SCAN_STATE_FAILED:
-        result = DWC_INET_SCAN_FAILED;
+    case APP_STATE_ERROREND:
+        result = DWC_WDS_STATE_FAILED;
         break;
     }
     return result;
 }
 
 void DWCi_WdsScan_Stop(void) {
-    if (sWdsScan.state == SCAN_STATE_SCANNED) {
-        sWdsScan.state = SCAN_STATE_STOP_SCAN;
+    if (sWdsScan.state == APP_STATE_WDSCOMPLETESCAN) {
+        sWdsScan.state = APP_STATE_WDSENDSCAN;
     }
 }
 
-void DWCi_WdsScan_Free(void) {
+void DWC_AC_CleanupGetWDSInfo(void) {
     if (sWdsScan.wds != NULL) {
         DWC_Free(DWC_ALLOCTYPE_AC, sWdsScan.wds, 0);
         sWdsScan.wds = NULL;
@@ -186,22 +186,22 @@ void DWCi_WdsScan_Free(void) {
 
 // The wireless manager's callbacks: the wireless manager is up, a scan has taken in its beacons, the scan is stopped,
 // the wireless manager is ended after a scan, and after a failure
-static void DWCi_WdsScan_OnInitialized(void *arg) {
-    sWdsScan.state = SCAN_STATE_START_SCAN;
+static void WDS_Initialize_CB(void *arg) {
+    sWdsScan.state = APP_STATE_WDSSCAN;
 }
 
-static void DWCi_WdsScan_OnScanned(void *arg) {
-    sWdsScan.state = SCAN_STATE_SCANNED;
+static void WDS_StartScan_CB(void *arg) {
+    sWdsScan.state = APP_STATE_WDSCOMPLETESCAN;
 }
 
-static void DWCi_WdsScan_OnScanStopped(void *arg) {
-    sWdsScan.state = SCAN_STATE_STOPPED;
+static void WDS_EndScan_CB(void *arg) {
+    sWdsScan.state = APP_STATE_WDSCOMPLETEENDSCAN;
 }
 
-static void DWCi_WdsScan_OnEnded(void *arg) {
-    sWdsScan.state = SCAN_STATE_ENDED;
+static void WDS_End_CB(void *arg) {
+    sWdsScan.state = APP_STATE_WDSCOMPLETEEND;
 }
 
-static void DWCi_WdsScan_OnFailed(void *arg) {
-    sWdsScan.state = SCAN_STATE_FAILED;
+static void WDS_Error_End_CB(void *arg) {
+    sWdsScan.state = APP_STATE_ERROREND;
 }

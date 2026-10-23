@@ -11,10 +11,10 @@
 
 void SVC_CpuSet(const void *src, void *dest, u32 mode) {
     u32 count = mode & SVC_CPUSET_COUNT_MASK;
-    BOOL fill = (mode & SVC_CPUSET_FILL) != 0;
+    BOOL fill = (mode & MI_DMA_SRC_FIX) != 0;
     u32 i;
 
-    if (mode & SVC_CPUSET_32BIT) {
+    if (mode & MI_DMA_32BIT_BUS) {
         const vu32 *from = (const vu32 *)((uintptr_t)src & ~(uintptr_t)3);
         vu32 *to = (vu32 *)((uintptr_t)dest & ~(uintptr_t)3);
         u32 value = *from;

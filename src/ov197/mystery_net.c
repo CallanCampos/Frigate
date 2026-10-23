@@ -64,8 +64,8 @@ struct MysteryNet {
     BOOL exited;
     MysteryNetDownload download;
     SaveControl *save;
-    void *beacon;
-    void *irc;
+    DeliveryBeaconWork *beacon;
+    DeliveryIrcWork *irc;
     u32 unk7A0;
     u8 buffer[MYSTERY_NET_BUFFER_SIZE];
     u32 result;
@@ -112,7 +112,7 @@ static void *MysteryNet_GetInfo(void *work);
 static int MysteryNet_GetInfoSize(void *work);
 static BOOL MysteryNet_IsSameInfo(u32 a, u32 b);
 static void MysteryNet_OnExit(void *work);
-static void MysteryNet_OnNdEvent(u32 reason, u32 error, int serverError);
+static void MysteryNet_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError);
 static void MysteryNet_SetNdDone(void);
 static u32 Mystery_ParseHex(const char *str);
 static BOOL Mystery_IsZero(const u32 *data, u32 size);
@@ -839,7 +839,7 @@ static void MysteryNet_OnExit(void *work) {
     net->exited = TRUE;
 }
 
-static void MysteryNet_OnNdEvent(u32 reason, u32 error, int serverError) {
+static void MysteryNet_OnNdEvent(DWCNdCallbackReason reason, DWCNdError error, int serverError) {
     sNdState.ready = TRUE;
     sNdState.error = error;
     MysteryNet_SetNdDone();

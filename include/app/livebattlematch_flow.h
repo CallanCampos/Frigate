@@ -72,9 +72,9 @@ u32 LiveBattleMatchFlow_GetResult(LiveBattleMatchFlow *flow);
 
 // Functions of the save and battle video code that have no header yet
 // Checks the CRC of a tournament entry
-BOOL TournamentEntry_CheckCRC(void *entry);
+BOOL TournamentEntry_CheckCRC(TournamentEntry *entry);
 // Copies an entry into the block
-void TournamentBlock_SetEntry(void *block, u32 index, const void *entry);
+void TournamentBlock_SetEntry(TournamentBlock *block, u32 index, const void *entry);
 // Clears an entry of the block's other entries, which are 0x1e bytes
 void TournamentTeam_Clear(void *record);
 // Fills an entry of the block's other entries with the team's species and moves
@@ -83,10 +83,10 @@ void TournamentTeam_SetFromParty(void *record, PokeParty *party);
 BOOL BattleRec_HasVideo(void);
 // The live competition's record: clears it and gives it this console's address, adds to a result by an amount, gets and
 // sets the 6-byte address of a result by its place and a byte after it, and whether an address is among the results
-void LiveMatchData_Init(void *record);
-void LiveMatchData_AddCount(void *record, u32 index, int amount);
-void LiveMatchData_SetOpponentMacAddress(void *record, u32 place, const u8 *mac);
-void LiveMatchData_SetOpponentParam(void *record, u32 place, u32 byte, u8 value);
-BOOL LiveMatchData_HasOpponent(void *record, const u8 *mac);
+void LiveMatchData_Init(LiveMatchData *record);
+void LiveMatchData_AddCount(LiveMatchData *record, u32 index, int amount);
+void LiveMatchData_SetOpponentMacAddress(LiveMatchData *record, u32 place, const u8 *mac);
+void LiveMatchData_SetOpponentParam(LiveMatchData *record, u32 place, u32 byte, u8 value);
+BOOL LiveMatchData_HasOpponent(LiveMatchData *record, const u8 *mac);
 
 #endif // POKEBW2_APP_LIVEBATTLEMATCH_FLOW_H

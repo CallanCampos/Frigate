@@ -3,8 +3,9 @@
 
 #include "types.h"
 
-// NitroSDK's cartridge library (libctrdg): the slot 2 of the DS, for GBA cartridges and other devices. The functions
-// have the names of the SDK functions they appear to be
+// NitroSDK's cartridge library (libctrdg): the slot 2 of the DS, for GBA cartridges and other devices. The names are
+// NitroSDK's, as ntrtwl's reconstruction of NitroSDK has them, where it has the code, and ours, in the SDK's style,
+// elsewhere
 
 // What the console's start-up code noted about the cartridge, in the part of main memory the DSi mirrors at this
 // address (the DS has it at 0x027ffc30): the halfword of the cartridge's ROM that identifies it, the flags and the
@@ -12,12 +13,12 @@
 #define HW_CTRDG_MODULE_INFO_BUF 0x02fffc30
 
 typedef struct {
-    u16 romCheck; // The halfword that the ROM had at the address that the library checks
-    u8 unk_02[3];
+    u16 moduleID; // The halfword that the ROM had at the address that the library checks
+    u8 exLsiID[3];
     u8 isAgbCartridge : 1; // The ROM has the header of a GBA cartridge, so its game code can be compared
-    u8 pulledOut : 1;      // The library found that the cartridge was pulled out or exchanged
+    u8 detectPullOut : 1;  // The library found that the cartridge was pulled out or exchanged
     u8 unk_05 : 6;
-    u8 unk_06[2];
+    u16 makerCode;
     u32 gameCode; // The cartridge's game code
 } CTRDGModuleInfo;
 

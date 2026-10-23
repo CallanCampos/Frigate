@@ -13,14 +13,14 @@
 #define STD_HAS_ZERO_BYTE(word) (~((((word) & STD_LOW7_MASK) + STD_LOW7_MASK) | (word) | STD_LOW7_MASK))
 
 // The flags of a conversion in STD_TVSScanf
-#define STD_SCANF_PLUS 0x0002
-#define STD_SCANF_NEGATIVE 0x0008
-#define STD_SCANF_LONG 0x0020
-#define STD_SCANF_SHORT 0x0040
-#define STD_SCANF_LONG_LONG 0x0080
-#define STD_SCANF_CHAR 0x0100
-#define STD_SCANF_UNSIGNED 0x1000
-#define STD_SCANF_SUPPRESS 0x2000
+#define flag_plus 0x0002
+#define flag_minus 0x0008
+#define flag_l1 0x0020
+#define flag_h1 0x0040
+#define flag_l2 0x0080
+#define flag_h2 0x0100
+#define flag_unsigned 0x1000
+#define flag_ignored 0x2000
 
 // Sets the bit of a character in a set of 256 bits
 #define STD_SET_BIT(set, c) ((set)[(u32)(c) >> 5] |= 1 << ((u32)(c) & 31))
@@ -337,7 +337,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         width = 0;
         conv = *fmt;
         if (conv == '*') {
-            flags |= STD_SCANF_SUPPRESS;
+            flags |= flag_ignored;
             fmt++;
             conv = *fmt;
         }
@@ -351,9 +351,9 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             fmt++;
             conv = *fmt;
             if (conv != 'h') {
-                flags |= STD_SCANF_SHORT;
+                flags |= flag_h1;
             } else {
-                flags |= STD_SCANF_CHAR;
+                flags |= flag_h2;
                 fmt++;
                 conv = *fmt;
             }
@@ -362,9 +362,9 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             fmt++;
             conv = *fmt;
             if (conv != 'l') {
-                flags |= STD_SCANF_LONG;
+                flags |= flag_l1;
             } else {
-                flags |= STD_SCANF_LONG_LONG;
+                flags |= flag_l2;
                 fmt++;
                 conv = *fmt;
             }
@@ -383,16 +383,16 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
             break;
         case 'u':
             radix = 10;
-            flags |= STD_SCANF_UNSIGNED;
+            flags |= flag_unsigned;
             break;
         case 'p':
         case 'x':
         case 'X':
             radix = 16;
-            flags |= STD_SCANF_UNSIGNED;
+            flags |= flag_unsigned;
             break;
         case 'n':
-            if (!(flags & STD_SCANF_SUPPRESS)) {
+            if (!(flags & flag_ignored)) {
                 count--;
             }
             fmt++;
@@ -416,9 +416,9 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         }
         for (;;) {
             if (c == '+') {
-                flags |= STD_SCANF_PLUS;
+                flags |= flag_plus;
             } else if (c == '-') {
-                flags |= STD_SCANF_NEGATIVE;
+                flags |= flag_minus;
             } else {
                 break;
             }
@@ -472,18 +472,18 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         if (digits == 0) {
             break;
         }
-        if (flags & STD_SCANF_NEGATIVE) {
+        if (flags & flag_minus) {
             value = -value;
         }
         matched = TRUE;
     storeValue:
-        if (!(flags & STD_SCANF_SUPPRESS)) {
+        if (!(flags & flag_ignored)) {
             count++;
-            if (flags & STD_SCANF_CHAR) {
+            if (flags & flag_h2) {
                 *va_arg(args, u8 *) = value;
-            } else if (flags & STD_SCANF_SHORT) {
+            } else if (flags & flag_h1) {
                 *va_arg(args, u16 *) = value;
-            } else if (flags & STD_SCANF_LONG_LONG) {
+            } else if (flags & flag_l2) {
                 *va_arg(args, u64 *) = value;
             } else {
                 *va_arg(args, u32 *) = value;
@@ -494,7 +494,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         dstStart = NULL;
         dst = NULL;
         fmt++;
-        if (!(flags & STD_SCANF_SUPPRESS)) {
+        if (!(flags & flag_ignored)) {
             dst = va_arg(args, char *);
             dstStart = dst;
         }
@@ -590,7 +590,7 @@ int STD_TVSScanf(const char *src, const char *fmt, va_list args) {
         }
 
         matched = TRUE;
-        if (!(flags & STD_SCANF_SUPPRESS)) {
+        if (!(flags & flag_ignored)) {
             count++;
             setDst = va_arg(args, char *);
         }

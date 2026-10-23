@@ -112,7 +112,7 @@ void BtlvCamera_MoveTo(BtlvCamera *camera, const VecFx32 *pos, const VecFx32 *ta
 
 // Shakes the camera sideways (dir 1) or vertically by amplitude: count full swings of 4 * frames steps
 void BtlvCamera_Shake(BtlvCamera *camera, int dir, fx32 amplitude, int unused, int frames, int wait, int count) {
-    camera->shake.type = 3;
+    camera->shake.type = BTLV_EFFTOOL_MOVE_SHAKE;
     camera->shake.stepTime = frames;
     camera->shake.stepTimeReset = frames;
     camera->shake.wait = 0;

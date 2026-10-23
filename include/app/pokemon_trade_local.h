@@ -287,7 +287,7 @@ struct PokemonTradeWork {
     u8 unkF8C[0x8];
     int unkF94;
     int unkF98;
-    u32 unkF9C;
+    int unkF9C;
     int unkFA0;
     // The Pokémon each player offers in a negotiation: their slots, boxes and copies
     int negoSlot[2][3];

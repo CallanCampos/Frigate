@@ -73,7 +73,7 @@ BOOL GFL_StrBufCmp(const StrBuf *a, const StrBuf *b) {
     return FALSE;
 }
 
-u16 GFL_StrBufGetCharCount(const StrBuf *strbuf) {
+u32 GFL_StrBufGetCharCount(const StrBuf *strbuf) {
     return strbuf->length;
 }
 
@@ -95,8 +95,8 @@ void GFL_StrBufLoadString(StrBuf *strbuf, const u16 *src) {
     strbuf->chars[strbuf->length] = sTerminator;
 }
 
-void GFL_StrBufLoadFixedString(StrBuf *strbuf, const u16 *str, u32 length) {
-    u32 i;
+void GFL_StrBufLoadFixedString(StrBuf *strbuf, const u16 *str, unsigned int length) {
+    unsigned int i;
 
     if (length <= strbuf->size) {
         for (i = 0; i < length - 1; i++) {

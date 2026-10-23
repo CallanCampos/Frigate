@@ -402,8 +402,8 @@ void StaActing_Term(StaActing *stage) {
     if (stage->strmPlaying == TRUE) {
         GFL_SndBGMClearLoadedData();
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     G2x_SetBlendAlpha_(REG_BLDCNT_ADDR, 0, 0, 31, 31);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
     StaActing_TermAppealEffect(stage);
@@ -809,7 +809,7 @@ static void StaActing_UpdatePalette(StaActing *stage) {
                                        (u8)((stage->paletteBase[i] & GX_RGB_B_MASK) >> GX_RGB_B_SHIFT) +
                                            (s8)((stage->paletteDiffB[i] * ratio) >> FX32_SHIFT));
     }
-    NNS_GfdRegisterNewVramTransferTask(31, 0, stage->paletteWork, 0x20);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_SUB, 0, stage->paletteWork, 0x20);
 }
 
 static void StaActing_InitMessage(StaActing *stage) {

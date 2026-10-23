@@ -27,7 +27,7 @@ void SND_WaitForCommandProc(u32 tag);
 
 void SND_WaitForCommandProc(u32 tag) {
     if (!SND_IsFinishedCommandTag(tag) && snd7_holds_packet(tag)) {
-        SNDi_WakeArm7();
+        RequestCommandProc();
     }
     SNDi_DsWaitForCommandProc(tag);
 }

@@ -64,7 +64,7 @@ static void KeySystemNet_OnConnect(void *work);
 static void KeySystemNet_OnStart(void *work, BOOL a1);
 static void KeySystemNet_OnDisconnect(void *work);
 static void KeySystemNet_Receive(int netId, int size, const void *data, void *work, NetHandle *handle);
-static BOOL KeySystemNet_CanRequest(KeySystemNet *net, u32 request);
+static BOOL KeySystemNet_CanRequest(KeySystemNet *net, unsigned int request);
 static void KeySystemNet_Stop(KeySystemNet *net);
 static void KeySystemNet_OnError(KeySystemNet *net);
 static void KeySystemNet_OnWifiError(void *work, int a1, int code, int error);
@@ -821,7 +821,7 @@ KeySystemNetRequest *KeySystemNet_GetRequest(KeySystemNet *net) {
     return &net->request;
 }
 
-static BOOL KeySystemNet_CanRequest(KeySystemNet *net, u32 request) {
+static BOOL KeySystemNet_CanRequest(KeySystemNet *net, unsigned int request) {
     u32 state = KeySystemNet_GetState(net);
     BOOL allowed = FALSE;
 

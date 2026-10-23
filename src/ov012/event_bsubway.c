@@ -103,13 +103,6 @@ typedef struct {
     StrBuf *strbuf;
 } BSubwayLeaderMsgData;
 
-// A leader of the Battle Subway, as the save keeps it: an entry of block 0x3a's list
-typedef struct {
-    u8 unk00[0x18];
-    PMSData message;
-    u8 unk20[2];
-} BSubwayLeader;
-
 static BOOL BSubwayCommBattleProc_Init(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL BSubwayCommBattleProc_Exit(GameProc *proc, u32 *state, void *param, void *work);
 static BOOL BSubwayCommBattleProc_Main(GameProc *proc, u32 *state, void *param, void *work);
@@ -525,7 +518,7 @@ GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId
     u8 winPos;
     FieldCamera *camera;
     VecFx32 offset;
-    BSubwayLeader *leaders;
+    BSubwayWifiLeader *leaders;
     u32 winX;
     u32 winY;
 
@@ -539,8 +532,8 @@ GameEvent *EventBSubwayLeaderMsg_Create(GameSystem *gsys, u16 index, u16 actorId
     data->pos.x += offset.x;
     data->pos.y += offset.y;
     data->pos.z += offset.z;
-    leaders = BSubwayWifiData_AllocLeaders(SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), 0x3a),
-                                           HEAPID_GAMEEVENT);
+    leaders = BSubwayWifiData_AllocLeaders(
+        SaveControl_GetBlockPtr(GameData_GetSaveControl(gameData), SAVE_BLOCK_BSUBWAY_3A), HEAPID_GAMEEVENT);
     data->strbuf = PMSData_ToString(&leaders[index].message, HEAPID_GAMEEVENT);
     GFL_HeapFree(leaders);
     func_ov036_021a8c00(winPos, &winX, &winY);

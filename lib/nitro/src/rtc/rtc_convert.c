@@ -12,7 +12,7 @@
 #define RTC_SECOND_MAX 3155759999LL
 
 // The days of the year before each month, in a year that is not a leap year
-static s32 sRtcDaysBeforeMonth[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+static s32 sDayOfYear[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 // NitroSDK's RTC_ConvertDateToDay. The month is checked twice, once with the rest of the date and once before it
 // indexes the table
@@ -23,7 +23,7 @@ s32 RTC_ConvertDateToDay(const RTCDate *date) {
         date->week >= 7 || date->month < 1 || date->month > 12) {
         return -1;
     }
-    days = date->day - 1 + sRtcDaysBeforeMonth[date->month - 1];
+    days = date->day - 1 + sDayOfYear[date->month - 1];
     if (date->month >= 3 && (date->year & 3) == 0) {
         days++;
     }
@@ -50,9 +50,9 @@ s64 RTC_ConvertDateTimeToSecond(const RTCDate *date, const RTCTime *time) {
     return (s64)days * RTC_SECONDS_PER_DAY + seconds;
 }
 
-// NitroSDK's RTCi_ConvertDayToDate: the year, then the month and the day of the month in it. The days are clamped to
+// NitroSDK's RTC_ConvertDayToDate: the year, then the month and the day of the month in it. The days are clamped to
 // the end of 2099
-void RTCi_ConvertDayToDate(RTCDate *date, s32 day) {
+void RTC_ConvertDayToDate(RTCDate *date, s32 day) {
     u32 year;
     int prev;
     int month;
@@ -93,9 +93,9 @@ void RTCi_ConvertDayToDate(RTCDate *date, s32 day) {
         day--;
     }
     for (month = 11; month >= 0; month--) {
-        if (day >= sRtcDaysBeforeMonth[month]) {
+        if (day >= sDayOfYear[month]) {
             date->month = month + 1;
-            date->day = day - sRtcDaysBeforeMonth[month] + 1;
+            date->day = day - sDayOfYear[month] + 1;
             return;
         }
     }
@@ -121,12 +121,12 @@ void RTC_ConvertSecondToDateTime(RTCDate *date, RTCTime *time, s64 seconds) {
         seconds = RTC_SECOND_MAX;
     }
     RTCi_ConvertSecondToTime(time, seconds % RTC_SECONDS_PER_DAY);
-    RTCi_ConvertDayToDate(date, seconds / RTC_SECONDS_PER_DAY);
+    RTC_ConvertDayToDate(date, seconds / RTC_SECONDS_PER_DAY);
 }
 
 // NitroSDK's RTC_GetDayOfWeek, by Zeller's congruence with January and February as the months 11 and 12 of the year
 // before
-RTCWeek RTC_GetDayOfWeek(const RTCDate *date) {
+RTCWeek RTC_GetDayOfWeek(RTCDate *date) {
     int month;
     int year;
     int day;

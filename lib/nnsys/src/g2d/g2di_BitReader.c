@@ -1,7 +1,8 @@
 #include "g2di_BitReader.h"
 
-// NitroSystem's glyph bit reader, which the character canvas reads glyphs with. The file name is a guess: the function
-// sits alone after the font loader, before the UTF-16 splitter, and only g2d_CharCanvas.c calls it
+// NitroSystem's glyph bit reader, which the character canvas reads glyphs with. The file name is NitroSystem's, as
+// ntrtwl's reconstruction of NitroSystem has it: the function sits alone after the font loader, before the UTF-16
+// splitter, and only g2d_CharCanvas.c calls it
 
 u32 NNSi_G2dBitReaderRead(NNSiG2dBitReader *reader, int nBits) {
     u32 ret = reader->bits;

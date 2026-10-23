@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Compile every C file in src/ and lib/ for each version, with the compiler and flags configure.py gives it, and
-report compiler diagnostics, including warnings on successful compilations. Only a nonzero compiler exit status
+"""Compile every C file in src/ and lib/, and assemble every library assembly file, for each version, with the tools
+and flags configure.py gives them, and report compiler diagnostics, including warnings on successful compilations. Only a nonzero compiler exit status
 counts as failure. It needs no base ROM, so CI runs it on every push and pull request; matching is still checked
 by `ninja` with the ROMs.
 
@@ -20,7 +20,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from configure import (GENERATED_INCLUDE_DIR, INCLUDE_DIRS, ROM_BLOBS, TEXT_ARCHIVES,  # noqa: E402
-                       VERSIONS, download_tools, overlay_digest_includes, source_compiler, mwcc_command)
+                       VERSIONS, download_tools, overlay_digest_includes, source_assembler, source_compiler,
+                       mwcc_command)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.build import overlay_digests, rom_blob  # noqa: E402
 from tools.data.gen_constants import generate  # noqa: E402
@@ -39,15 +40,21 @@ class CompileResult:
 
 
 def compile_file(source: Path, version: str, out_dir: Path) -> CompileResult:
-    """Compiles one file, retaining its exit status and both diagnostic streams."""
+    """Compiles or assembles one file, retaining its exit status and both diagnostic streams."""
+    obj = out_dir / version / source.with_suffix(".o")
+    obj.parent.mkdir(parents=True, exist_ok=True)
+    if source.suffix == ".s":
+        compiler, flags = source_assembler(source)
+        command = [*mwcc_command(TOOLS / "mwccarm" / compiler / "mwasmarm.exe"),
+                   *(arg for flag in flags for arg in shlex.split(flag)), "-o", str(obj), str(source)]
+        proc = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        return CompileResult(source, version, proc.returncode, proc.stdout, proc.stderr)
     settings = source_compiler(source)
     compiler, flags = settings.compiler, settings.flags
     env = os.environ.copy()
     if settings.is_library:
         # Match configure.py's library rules: older compilers require this system include path.
         env["MWCIncludes"] = "."
-    obj = out_dir / version / source.with_suffix(".o")
-    obj.parent.mkdir(parents=True, exist_ok=True)
     command = [
         *mwcc_command(TOOLS / "mwccarm" / compiler / "mwccarm.exe"),
         *(arg for flag in flags for arg in shlex.split(flag)),
@@ -112,7 +119,7 @@ def main():
 
     download_tools(TOOLS)
     generate_constants()
-    sources = sorted(p.relative_to(ROOT) for pattern in ("src/**/*.c", "lib/*/src/**/*.c") for p in ROOT.glob(pattern))
+    sources = sorted(p.relative_to(ROOT) for pattern in ("src/**/*.c", "lib/*/src/**/*.c", "lib/*/src/**/*.s") for p in ROOT.glob(pattern))
     versions = args.version or list(VERSIONS)
     with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor(args.jobs) as pool:
         jobs = [pool.submit(compile_file, source, version, Path(tmp)) for version in versions for source in sources]

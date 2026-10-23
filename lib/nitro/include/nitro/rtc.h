@@ -13,12 +13,12 @@ typedef enum {
     RTC_WEEK_SATURDAY,
 } RTCWeek;
 
-// The SDK types the date as unsigned long (the game's u32 is unsigned int): RTC_ConvertDateToDay folds the - 1 of its
-// table index into the table's address only for that type
+// The date's fields are u32, the SDK's unsigned long: RTC_ConvertDateToDay folds the - 1 of its table index into the
+// table's address only for that type
 typedef struct {
-    ulong32 year;
-    ulong32 month;
-    ulong32 day;
+    u32 year;
+    u32 month;
+    u32 day;
     RTCWeek week;
 } RTCDate;
 
@@ -58,21 +58,21 @@ typedef enum {
 #define RTC_PXI_RESULT_BUSY 3
 #define RTC_PXI_RESULT_FATAL_ERROR 4
 
-// The callbacks of the asynchronous functions take their result as an int
-typedef void (*RTCCallback)(int result, void *arg);
-typedef void (*RTCAlarmCallback)(void);
+// The callbacks of the asynchronous functions, called with the result
+typedef void (*RTCCallback)(RTCResult result, void *arg);
+typedef void (*RTCInterrupt)(void);
 
 // The work of the command under way (NitroSDK's RTCWork, which main's rtc_api.c keeps after a flag that says the
 // library is set up; TwlSDK's code in the LTD autoload gets it from RTCi_GetSysWork)
 typedef struct RTCWork {
-    vu32 lock;                      // 0x00: set from the start of a command to the end of its answer
-    RTCCallback callback;           // 0x04: called with the result when the command is done
-    void *data[2];                  // 0x08: where a command reads or writes its date, time or value
-    void *callbackArg;              // 0x10
-    u32 command;                    // 0x14: the sequence that the answer of the ARM7 goes on with
-    u32 busy;                       // 0x18: set while commands that the sequence sent are still to be answered
-    RTCAlarmCallback alarmCallback; // 0x1c: called when the ARM7 says the alarm went off
-    int commonResult;               // 0x20: the result of the functions that wait for it
+    u32 lock;               // 0x00: set from the start of a command to the end of its answer
+    RTCCallback callback;   // 0x04: called with the result when the command is done
+    void *buffer[2];        // 0x08: where a command reads or writes its date, time or value
+    void *callbackArg;      // 0x10
+    u32 sequence;           // 0x14: the sequence that the answer of the ARM7 goes on with
+    u32 index;              // 0x18: set while commands that the sequence sent are still to be answered
+    RTCInterrupt interrupt; // 0x1c: called when the ARM7 says the alarm went off
+    RTCResult commonResult; // 0x20: the result of the functions that wait for it
 } RTCWork;
 
 // NitroSDK's RTC_Init: starts listening to the ARM7's RTC driver, once
@@ -80,13 +80,13 @@ void RTC_Init(void);
 // NitroSDK's RTC_GetDateAsync, RTC_GetDate, RTC_GetTimeAsync and RTC_GetTime: read the clock and fill the date or the
 // time. The asynchronous ones answer by calling the callback; the others wait for the answer. Each returns
 // RTC_RESULT_SUCCESS when it read the clock
-int RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg);
-int RTC_GetDate(RTCDate *date);
-int RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg);
-int RTC_GetTime(RTCTime *time);
+RTCResult RTC_GetDateAsync(RTCDate *date, RTCCallback callback, void *arg);
+RTCResult RTC_GetDate(RTCDate *date);
+RTCResult RTC_GetTimeAsync(RTCTime *time, RTCCallback callback, void *arg);
+RTCResult RTC_GetTime(RTCTime *time);
 // NitroSDK's RTC_GetDateTimeAsync and RTC_GetDateTime
-int RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg);
-int RTC_GetDateTime(RTCDate *date, RTCTime *time);
+RTCResult RTC_GetDateTimeAsync(RTCDate *date, RTCTime *time, RTCCallback callback, void *arg);
+RTCResult RTC_GetDateTime(RTCDate *date, RTCTime *time);
 // The work of the command under way, for TwlSDK's RTC code in the LTD autoload
 RTCWork *RTCi_GetSysWork(void);
 
@@ -104,12 +104,12 @@ s32 RTC_ConvertDateToDay(const RTCDate *date);
 s32 RTCi_ConvertTimeToSecond(const RTCTime *time);
 // NitroSDK's RTC_ConvertDateTimeToSecond: the seconds since 2000-01-01, or -1 for an invalid date or time
 s64 RTC_ConvertDateTimeToSecond(const RTCDate *date, const RTCTime *time);
-// NitroSDK's RTCi_ConvertDayToDate and RTCi_ConvertSecondToTime: the date that a number of days since 2000-01-01 make,
+// NitroSDK's RTC_ConvertDayToDate and RTCi_ConvertSecondToTime: the date that a number of days since 2000-01-01 make,
 // and the time that a number of seconds since midnight make
-void RTCi_ConvertDayToDate(RTCDate *date, s32 day);
+void RTC_ConvertDayToDate(RTCDate *date, s32 day);
 void RTCi_ConvertSecondToTime(RTCTime *time, s32 second);
 // NitroSDK's RTC_ConvertSecondToDateTime: the date and time a number of seconds since 2000-01-01 make
 void RTC_ConvertSecondToDateTime(RTCDate *date, RTCTime *time, s64 seconds);
-RTCWeek RTC_GetDayOfWeek(const RTCDate *date);
+RTCWeek RTC_GetDayOfWeek(RTCDate *date);
 
 #endif // POKEBW2_NITRO_RTC_H

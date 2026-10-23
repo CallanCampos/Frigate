@@ -5,7 +5,8 @@
 
 // The wrapper that DWC's settings in overlay 182 put around the wireless connection manager (WCM): it starts the WCM,
 // searches for access points, connects to one and cleans up, one operation at a time, and reports to a callback. The
-// ROM names none of it; the names are ours
+// ROM names none of it; the names are the DWC utility library's own, as that library's symbols and debug information
+// have them (its apc.c), where the code shows them, and ours elsewhere
 
 // What the callback is called with
 enum {
@@ -33,18 +34,18 @@ typedef void (*DWCWcmCallback)(int event, int param);
 
 // Starts the WCM in a work the caller gives (a description of the access point to leave room for, the WCM's own work
 // and the buffers of its access point list); TRUE when the start is taken. Needs at least 0x2700 bytes
-BOOL DWC_Wcm_Start(DWCWcmCallback callback, void *work, u32 size);
+BOOL APC_Init(DWCWcmCallback callback, void *work, u32 size);
 // Searches for the access point with the given BSSID (or any) and ESSID of the given length (or any)
-BOOL DWC_Wcm_Search(const u8 *bssid, const u8 *essid, int essidLength, u32 option);
+BOOL APC_SearchStart(const u8 *bssid, const u8 *essid, int essidLength, u32 option);
 // Copies up to max descriptions (0xc0 bytes each) of the access points found to dest and counts all of them
-int DWC_Wcm_GetApList(void *dest, int max);
+int APC_GetAPList(void *dest, int max);
 // Stops the search
-BOOL DWC_Wcm_EndSearch(void);
+BOOL APC_SearchEnd(void);
 // Disconnects
-BOOL DWC_Wcm_Disconnect(void);
+BOOL APC_Disconnect(void);
 // Cleans the WCM up
-BOOL DWC_Wcm_Cleanup(void);
+BOOL APC_End(void);
 // Connects to the access point with the description and the WEP key
-BOOL DWC_Wcm_Connect(const void *bssDesc, const void *wepDesc, u32 option);
+BOOL APC_Connect(const void *bssDesc, const void *wepDesc, u32 option);
 
 #endif // POKEBW2_DWCUTIL_DWC_WCM_H

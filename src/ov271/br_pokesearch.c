@@ -110,8 +110,9 @@ static void BrPokeSearch_ExitLetterWin(BrPokeSearch *p_wk);
 static void BrPokeSearch_InitList(BrPokeSearch *p_wk);
 static void BrPokeSearch_ExitList(BrPokeSearch *p_wk);
 static u32 BrPokeSearch_CheckTouch(BrPokeSearch *p_wk);
-static BOOL BrPokeSearch_IsLetterSeen(PokeDexSave *pokedex, u32 letter, const u16 *table);
-static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, u32 letter, const u16 *table, u32 *num, HeapID heapId);
+static BOOL BrPokeSearch_IsLetterSeen(PokeDexSave *pokedex, unsigned int letter, const u16 *table);
+static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, unsigned int letter, const u16 *table, u32 *num,
+                                        HeapID heapId);
 static u16 *BrPokeSearch_LoadMonsTable(HeapID heapId, u32 *num);
 
 BrPokeSearch *BrPokeSearch_Init(PokeDexSave *pokedex, BrRes *res, ClActUnit *unit, BmpOamSys *bmpoam, BrFade *fade,
@@ -397,7 +398,7 @@ static u32 BrPokeSearch_CheckTouch(BrPokeSearch *p_wk) {
     return BR_POKESEARCH_LETTER_NONE;
 }
 
-static BOOL BrPokeSearch_IsLetterSeen(PokeDexSave *pokedex, u32 letter, const u16 *table) {
+static BOOL BrPokeSearch_IsLetterSeen(PokeDexSave *pokedex, unsigned int letter, const u16 *table) {
     u32 i;
     u32 end = sc_pokesearch_letter_index[letter + 1];
     BOOL ret = FALSE;
@@ -410,7 +411,8 @@ static BOOL BrPokeSearch_IsLetterSeen(PokeDexSave *pokedex, u32 letter, const u1
     return ret;
 }
 
-static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, u32 letter, const u16 *table, u32 *num, HeapID heapId) {
+static u16 *BrPokeSearch_CreateMonsList(PokeDexSave *pokedex, unsigned int letter, const u16 *table, u32 *num,
+                                        HeapID heapId) {
     u16 *buff;
     u32 i;
     u32 end = sc_pokesearch_letter_index[letter + 1];

@@ -5,6 +5,7 @@
 
 #include "types.h"
 #include "battle/btl_calc.h"
+#include "battle/btl_rec.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
 #include "struct_decls.h"
@@ -23,7 +24,7 @@ BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u
                                u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
                                HeapID heapId);
 void BattleClient_Delete(BtlClient *client);
-void BattleClient_SetRecPlayData(BtlClient *client, void *data);
+void BattleClient_SetRecPlayData(BtlClient *client, BtlRecReader *reader);
 void BattleClient_SetCmdCheckServer(BtlClient *client, BtlServer *server);
 BtlAdapter *BattleClient_GetAdapter(BtlClient *client);
 BOOL BattleClient_Main(BtlClient *client);

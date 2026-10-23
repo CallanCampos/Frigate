@@ -285,7 +285,7 @@ void loadTrainerTypeText(WordSet *wordSet, u32 index, u8 trainerType) {
 }
 
 void loadTrainerTypeToStrbuf(WordSet *wordSet, u32 index, u32 trainerId) {
-    loadTrainerTypeText(wordSet, index, TrainerData_GetParam(trainerId, 1));
+    loadTrainerTypeText(wordSet, index, TrainerData_GetParam(trainerId, TRAINER_PARAM_CLASS));
 }
 
 void loadTrainerTypeWithArticleToStrbuf(WordSet *wordSet, u32 index, u8 trainerType) {
@@ -440,7 +440,7 @@ void GFL_WordSetFormatStrbuf(WordSet *wordSet, StrBuf *dest, const StrBuf *src) 
                 if (buf->attr.addLayoutCmd) {
                     u16 param = 0x54;
 
-                    GFL_StrCmdBuild(buf->strbuf, 0xbd, 4, 1, &param);
+                    GFL_StrCmdBuild(buf->strbuf, STRCMD_CATEGORY_LAYOUT, STRCMD_LAYOUT_MOVE_X, 1, &param);
                 }
                 GFL_StrBufUncompress(dest, wordSet->bufs[i].strbuf);
                 str = GFL_StrCmdSkipCommand(str);

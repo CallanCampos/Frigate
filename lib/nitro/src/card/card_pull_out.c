@@ -24,7 +24,7 @@ typedef struct {
 
 static CARDPullOutState sCardPullOut;
 
-static void CARDi_PulledOutCallback(u32 tag, u32 data, BOOL err);
+static void CARDi_PulledOutCallback(PXIFifoTag tag, u32 data, BOOL err);
 static void CARD_TerminateForPulledOut(void);
 static void CARDi_SendtoPxi(u32 data, u32 wait);
 
@@ -36,7 +36,7 @@ void CARD_InitPulledOutCallback(void) {
     sCardPullOut.callback = NULL;
 }
 
-static void CARDi_PulledOutCallback(u32 tag, u32 data, BOOL err) {
+static void CARDi_PulledOutCallback(PXIFifoTag tag, u32 data, BOOL err) {
     u32 command = data & CARD_PXI_COMMAND_MASK;
     if (command == CARD_PXI_COMMAND_PULLED_OUT) {
         if (!sCardPullOut.pulledOut) {
@@ -78,7 +78,7 @@ static void CARD_TerminateForPulledOut(void) {
     CARDi_SendtoPxi(CARD_PXI_COMMAND_TERMINATE, 1);
     MI_StopAllDma();
     if (OS_IsRunOnTwl()) {
-        MI_StopNDmaChannels();
+        MI_StopAllNDma();
     }
     OS_Terminate();
 }
@@ -87,7 +87,7 @@ void CARDi_CheckPulledOutCore(u32 cardId) {
     // volatile: the boot card ID in the shared work is written by the ARM7, and the original reads it into a stack slot
     volatile u32 bootCardId = OS_GetSystemWork()->bootCardId;
     if (cardId != bootCardId) {
-        u32 irq = OS_DisableInterrupts();
+        OSIntrMode irq = OS_DisableInterrupts();
         CARDi_PulledOutCallback(PXI_FIFO_TAG_CARD, CARD_PXI_COMMAND_PULLED_OUT, FALSE);
         OS_RestoreInterrupts(irq);
     }

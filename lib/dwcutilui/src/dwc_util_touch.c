@@ -49,10 +49,10 @@ static inline u16 PAD_Read(void) {
     return (u16)(((reg_PAD_KEYINPUT | *(vu16 *)HW_BUTTON_XY_BUF) ^ PAD_ALL_MASK) & PAD_ALL_MASK);
 }
 
-void DWCUtilTouch_Init(void) {
+void DWCi_IPTlInit(void) {
     TPCalibrateParam calibrate;
 
-    sTouch.input = DWCUtilHeap_AllocClear(sizeof(DWCUtilInput), 4);
+    sTouch.input = DWCi_HEAPlAllocEx(sizeof(DWCUtilInput), 4);
     if (!TP_GetUserInfo(&calibrate)) {
         OS_Terminate();
     }
@@ -62,23 +62,23 @@ void DWCUtilTouch_Init(void) {
     if (TP_CheckError(TP_REQUEST_COMMAND_FLAG_AUTO_ON)) {
         OS_Terminate();
     }
-    DWCUtilTouch_Update();
+    DWCi_IPTlRead();
 }
 
-void DWCUtilTouch_Exit(void) {
+void DWCi_IPTlEnd(void) {
     do {
         TP_RequestAutoSamplingStopAsync();
         TP_WaitBusy(TP_REQUEST_COMMAND_FLAG_AUTO_OFF);
     } while (TP_CheckError(TP_REQUEST_COMMAND_FLAG_AUTO_OFF));
-    DWCUtilHeap_FreeAndNull(&sTouch.input);
+    DWCi_HEAPlFree_(&sTouch.input);
 }
 
-void DWCUtilTouch_Update(void) {
-    DWCUtilTouch_UpdateKeys();
-    DWCUtilTouch_UpdatePanel();
+void DWCi_IPTlRead(void) {
+    readKey();
+    readTouch();
 }
 
-void DWCUtilTouch_UpdateKeys(void) {
+void readKey(void) {
     u16 pad = PAD_Read();
     // Up hides down, and left hides right
     u16 held = pad & ~((pad & 0x40) << 1) & ~((pad & 0x20) >> 1);
@@ -105,7 +105,7 @@ void DWCUtilTouch_UpdateKeys(void) {
     }
 }
 
-void DWCUtilTouch_UpdatePanel(void) {
+void readTouch(void) {
     int i;
     BOOL wasTouching = sTouch.input->touching ? TRUE : FALSE;
     u8 touching = FALSE;
@@ -141,28 +141,28 @@ void DWCUtilTouch_UpdatePanel(void) {
     }
 }
 
-BOOL DWCUtilTouch_IsKeyPressed(u16 keys) {
+BOOL DWCi_IPTlCheckTrigger(u16 keys) {
     if (PAD_DetectFold()) {
         return FALSE;
     }
     return keys == (sTouch.input->pressed & keys);
 }
 
-BOOL DWCUtilTouch_IsKeyRepeated(u16 keys) {
+BOOL DWCi_IPTlCheckRepeat(u16 keys) {
     if (PAD_DetectFold()) {
         return FALSE;
     }
     return keys == (sTouch.input->repeated & keys);
 }
 
-BOOL DWCUtilTouch_IsKeyReleased(u16 keys) {
+BOOL DWCi_IPTlCheckRelease(u16 keys) {
     if (PAD_DetectFold()) {
         return FALSE;
     }
     return keys == (sTouch.input->released & keys);
 }
 
-BOOL DWCUtilTouch_IsTouchedIn(const u16 *rect) {
+BOOL DWCi_TPlCheck(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -189,7 +189,7 @@ BOOL DWCUtilTouch_IsTouchedIn(const u16 *rect) {
     return TRUE;
 }
 
-BOOL DWCUtilTouch_IsTriggeredIn(const u16 *rect) {
+BOOL DWCi_TPlCheckTrigger(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -216,7 +216,7 @@ BOOL DWCUtilTouch_IsTriggeredIn(const u16 *rect) {
     return TRUE;
 }
 
-BOOL DWCUtilTouch_IsRepeatedIn(const u16 *rect) {
+BOOL DWCi_TPlCheckRepeat(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -243,7 +243,7 @@ BOOL DWCUtilTouch_IsRepeatedIn(const u16 *rect) {
     return TRUE;
 }
 
-BOOL DWCUtilTouch_IsReleasedIn(const u16 *rect) {
+BOOL DWCi_TPlCheckRelease(const u16 *rect) {
     u16 x;
     u16 y;
 
@@ -270,7 +270,7 @@ BOOL DWCUtilTouch_IsReleasedIn(const u16 *rect) {
     return TRUE;
 }
 
-BOOL DWCUtilTouch_IsTriggeredInArea(const u16 *area) {
+BOOL DWCi_TPlCheckATrigger(const u16 *area) {
     u16 rect[4];
 
     if (PAD_DetectFold()) {
@@ -280,10 +280,10 @@ BOOL DWCUtilTouch_IsTriggeredInArea(const u16 *area) {
     rect[1] = area[1];
     rect[2] = area[0] + area[2];
     rect[3] = area[1] + area[3];
-    return DWCUtilTouch_IsTriggeredIn(rect);
+    return DWCi_TPlCheckTrigger(rect);
 }
 
-BOOL DWCUtilTouch_GetPoint(u16 *point) {
+BOOL DWCi_TPlGet(u16 *point) {
     DWCUtilInput *input;
 
     if (PAD_DetectFold()) {

@@ -307,26 +307,26 @@ static BOOL SameStructPointer(Compare *c, const char *what, u32 ds, const void *
 }
 
 static void CompareCharacter(Compare *c, u32 at, const NNSG2dCharacterData *h) {
-    Same(c, "character height", R16(c, at), h->height);
-    Same(c, "character width", R16(c, at + 2), h->width);
-    Same(c, "character pixelFormat", R32(c, at + 4), h->pixelFormat);
+    Same(c, "character height", R16(c, at), h->H);
+    Same(c, "character width", R16(c, at + 2), h->W);
+    Same(c, "character pixelFormat", R32(c, at + 4), h->pixelFmt);
     Same(c, "character mappingType", R32(c, at + 8), h->mappingType);
-    Same(c, "character characterFormat", R32(c, at + 12), h->characterFormat);
-    Same(c, "character size", R32(c, at + 16), h->size);
-    SamePointer(c, "character rawData", R32(c, at + 20), h->rawData);
+    Same(c, "character characterFormat", R32(c, at + 12), h->characterFmt);
+    Same(c, "character size", R32(c, at + 16), h->szByte);
+    SamePointer(c, "character rawData", R32(c, at + 20), h->pRawData);
 }
 
 static void ComparePalette(Compare *c, u32 at, const NNSG2dPaletteData *h) {
-    Same(c, "palette format", R32(c, at), h->format);
-    Same(c, "palette extendedPalette", R32(c, at + 4), h->extendedPalette);
-    Same(c, "palette size", R32(c, at + 8), h->size);
-    SamePointer(c, "palette rawData", R32(c, at + 12), h->rawData);
+    Same(c, "palette format", R32(c, at), h->fmt);
+    Same(c, "palette extendedPalette", R32(c, at + 4), h->bExtendedPlt);
+    Same(c, "palette size", R32(c, at + 8), h->szByte);
+    SamePointer(c, "palette rawData", R32(c, at + 12), h->pRawData);
 }
 
 static void ComparePaletteCmp(Compare *c, u32 at, const NNSG2dPaletteCompressInfo *h) {
     Same(c, "pcmp numPalette", R16(c, at), h->numPalette);
-    Same(c, "pcmp pad", R16(c, at + 2), h->pad);
-    SamePointer(c, "pcmp paletteIndexTable", R32(c, at + 4), h->paletteIndexTable);
+    Same(c, "pcmp pad", R16(c, at + 2), h->pad16);
+    SamePointer(c, "pcmp paletteIndexTable", R32(c, at + 4), h->pPlttIdxTbl);
 }
 
 static void CompareUserExCellAttrs(Compare *c, u32 blk, const NNSG2dUserExDataBlock *h) {
@@ -363,10 +363,10 @@ static void CompareCellBank(Compare *c, u32 at, const NNSG2dCellDataBank *h) {
             if (withBR) {
                 const NNSG2dCellBoundingRectS16 *rect = &((const NNSG2dCellDataWithBR *)cell)->boundingRect;
 
-                Same(c, "cell maxBounding.x", R16(c, ds + 8), (u16)rect->maxBounding.x);
-                Same(c, "cell maxBounding.y", R16(c, ds + 10), (u16)rect->maxBounding.y);
-                Same(c, "cell minBounding.x", R16(c, ds + 12), (u16)rect->minBounding.x);
-                Same(c, "cell minBounding.y", R16(c, ds + 14), (u16)rect->minBounding.y);
+                Same(c, "cell maxX", R16(c, ds + 8), (u16)rect->maxX);
+                Same(c, "cell maxY", R16(c, ds + 10), (u16)rect->maxY);
+                Same(c, "cell minX", R16(c, ds + 12), (u16)rect->minX);
+                Same(c, "cell minY", R16(c, ds + 14), (u16)rect->minY);
             }
         }
     }
@@ -388,7 +388,7 @@ static void CompareMultiCellBank(Compare *c, u32 at, const NNSG2dMultiCellDataBa
     u32 cells = R32(c, at + 4);
 
     Same(c, "mc bank numMultiCellData", R16(c, at), h->numMultiCellData);
-    Same(c, "mc bank pad", R16(c, at + 2), h->pad);
+    Same(c, "mc bank pad", R16(c, at + 2), h->pad16);
     SamePointer(c, "mc bank pHierarchyDataArray", R32(c, at + 8), h->pHierarchyDataArray);
     SamePointer(c, "mc bank pStringBank", R32(c, at + 12), h->pStringBank);
     if (SameStructPointer(c, "mc bank pMultiCellDataArray", cells, h->pMultiCellDataArray)) {
@@ -409,7 +409,7 @@ static void CompareMultiCellBank(Compare *c, u32 at, const NNSG2dMultiCellDataBa
 static void CompareFrame(Compare *c, u32 ds, const NNSG2dAnimFrameData *frame) {
     SamePointer(c, "frame pContent", R32(c, ds), frame->pContent);
     Same(c, "frame frames", R16(c, ds + 4), frame->frames);
-    Same(c, "frame pad", R16(c, ds + 6), frame->pad);
+    Same(c, "frame pad", R16(c, ds + 6), frame->pad16);
 }
 
 static void CompareAnimBank(Compare *c, u32 at, const NNSG2dAnimBankData *h, int format) {
@@ -418,11 +418,11 @@ static void CompareAnimBank(Compare *c, u32 at, const NNSG2dAnimBankData *h, int
 
     Same(c, "anim bank numSequences", R16(c, at), h->numSequences);
     Same(c, "anim bank numTotalFrames", R16(c, at + 2), h->numTotalFrames);
-    SamePointer(c, "anim bank pAnimationData", R32(c, at + 12), h->pAnimationData);
+    SamePointer(c, "anim bank pAnimationData", R32(c, at + 12), h->pAnimContents);
     SamePointer(c, "anim bank pStringBank", R32(c, at + 16), h->pStringBank);
-    if (SameStructPointer(c, "anim bank pFrameArray", frames, h->pFrameArray)) {
+    if (SameStructPointer(c, "anim bank pFrameArray", frames, h->pFrameArrayHead)) {
         for (u16 k = 0; k < h->numTotalFrames && !c->simFailed; k++) {
-            CompareFrame(c, frames + k * 8, &h->pFrameArray[k]);
+            CompareFrame(c, frames + k * 8, &h->pFrameArrayHead[k]);
         }
     }
     if (SameStructPointer(c, "anim bank pSequenceArrayHead", sequences, h->pSequenceArrayHead)) {
@@ -439,7 +439,7 @@ static void CompareAnimBank(Compare *c, u32 at, const NNSG2dAnimBankData *h, int
                 // Where the DS's frames are the bank's, the host's must be the bank's too
                 if (seqFrames >= frames && (seqFrames - frames) % 8 == 0 &&
                     (seqFrames - frames) / 8 + seq->numFrames <= h->numTotalFrames &&
-                    seq->pAnmFrameArray != &h->pFrameArray[(seqFrames - frames) / 8]) {
+                    seq->pAnmFrameArray != &h->pFrameArrayHead[(seqFrames - frames) / 8]) {
                     Report(c, "sequence pAnmFrameArray isn't the bank's", seqFrames,
                            (u64)(uintptr_t)seq->pAnmFrameArray);
                 }
@@ -452,11 +452,12 @@ static void CompareAnimBank(Compare *c, u32 at, const NNSG2dAnimBankData *h, int
     if (SameStructPointer(c, "anim bank pExtendedData", R32(c, at + 20), h->pExtendedData)) {
         u32 blk = R32(c, at + 20);
         u32 attrBank = blk + 8;
-        const NNSG2dUserExAnimAttrBank *bank = (const NNSG2dUserExAnimAttrBank *)(h->pExtendedData + 1);
+        const NNSG2dUserExDataBlock *header = h->pExtendedData;
+        const NNSG2dUserExAnimAttrBank *bank = (const NNSG2dUserExAnimAttrBank *)(header + 1);
 
         sCounts[format].extended++;
-        Same(c, "exdata blkTypeID", R32(c, blk), h->pExtendedData->blkTypeID);
-        Same(c, "exdata blkSize", R32(c, blk + 4), h->pExtendedData->blkSize);
+        Same(c, "exdata blkTypeID", R32(c, blk), header->blkTypeID);
+        Same(c, "exdata blkSize", R32(c, blk + 4), header->blkSize);
         Same(c, "anim attrs numSequences", R16(c, attrBank), bank->numSequences);
         Same(c, "anim attrs numAttribute", R16(c, attrBank + 2), bank->numAttribute);
         if (SameStructPointer(c, "anim attrs pAnmSeqAttrArray", R32(c, attrBank + 4), bank->pAnmSeqAttrArray)) {
@@ -465,7 +466,7 @@ static void CompareAnimBank(Compare *c, u32 at, const NNSG2dAnimBankData *h, int
                 u32 ds = R32(c, attrBank + 4) + s * 12;
 
                 Same(c, "seq attr numFrames", R16(c, ds), seqAttr->numFrames);
-                Same(c, "seq attr pad", R16(c, ds + 2), seqAttr->pad);
+                Same(c, "seq attr pad", R16(c, ds + 2), seqAttr->pad16);
                 SamePointer(c, "seq attr pAttr", R32(c, ds + 4), seqAttr->pAttr);
                 if (SameStructPointer(c, "seq attr pAnmFrmAttrArray", R32(c, ds + 8), seqAttr->pAnmFrmAttrArray)) {
                     for (u16 f = 0; f < seqAttr->numFrames && !c->simFailed; f++) {
@@ -779,22 +780,22 @@ static void CheckFile(const u8 *bytes, u32 size, BOOL compressed) {
     switch (format) {
     case FORMAT_NCGR:
     case FORMAT_NCBR:
-        ok = CheckBlock(&c, format, PORT_RELOC_G2D_CHARACTER, NNS_G2D_BINBLK_SIG_CHARDATA, hostFile, fileSize);
+        ok = CheckBlock(&c, format, PORT_RELOC_G2D_CHARACTER, NNS_G2D_BINBLK_SIG_CHARACTERDATA, hostFile, fileSize);
         break;
     case FORMAT_NCLR:
         ok = CheckBlock(&c, format, PORT_RELOC_G2D_PALETTE, NNS_G2D_BINBLK_SIG_PALETTEDATA, hostFile, fileSize) &&
-             CheckBlock(&c, format, PORT_RELOC_G2D_PALETTE_CMP, NNS_G2D_BINBLK_SIG_PALETTECOMPRESSINFO, hostFile,
+             CheckBlock(&c, format, PORT_RELOC_G2D_PALETTE_CMP, NNS_G2D_BINBLK_SIG_PALETTECOMPINFO, hostFile,
                         fileSize);
         break;
     case FORMAT_NCER:
-        ok = CheckBlock(&c, format, PORT_RELOC_G2D_CELL_BANK, NNS_G2D_BINBLK_SIG_CELLBANK, hostFile, fileSize);
+        ok = CheckBlock(&c, format, PORT_RELOC_G2D_CELL_BANK, NNS_G2D_BLKSIG_CELLBANK, hostFile, fileSize);
         break;
     case FORMAT_NMCR:
-        ok = CheckBlock(&c, format, PORT_RELOC_G2D_MULTICELL, NNS_G2D_BINBLK_SIG_MULTICELLBANK, hostFile, fileSize);
+        ok = CheckBlock(&c, format, PORT_RELOC_G2D_MULTICELL, NNS_G2D_BLKSIG_MULTICELLBANK, hostFile, fileSize);
         break;
     case FORMAT_NANR:
     case FORMAT_NMAR:
-        ok = CheckBlock(&c, format, PORT_RELOC_G2D_ANIM_BANK, NNS_G2D_BINBLK_SIG_ANIMBANK, hostFile, fileSize);
+        ok = CheckBlock(&c, format, PORT_RELOC_G2D_ANIM_BANK, NNS_G2D_BLKSIG_ANIMBANK, hostFile, fileSize);
         break;
     case FORMAT_NFTR: {
         PortG2dFont *font = port_g2d_unpack(PORT_RELOC_G2D_FONT, hostFile, fileSize, hostFile);

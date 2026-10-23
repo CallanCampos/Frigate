@@ -1162,7 +1162,7 @@ static void PkwdBook_LoadPoster(PkwdBookWork *wk, u32 graphicIdx, BOOL deferred)
         GFL_BGSysQueueScrLoad(2);
         chars += graphicIdx;
         charFile = GFL_G2DIOReadBGNCGRArc(arc, chars->fileId, FALSE, &charData, wk->heapId);
-        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG2_CHAR_MAIN, 0, charData->rawData, 0x4000);
+        NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG2_CHAR_MAIN, 0, charData->pRawData, 0x4000);
         GFL_ArcToolFree(arc);
         GFL_HeapFree(screenFile);
         GFL_HeapFree(charFile);
@@ -2534,8 +2534,8 @@ static s32 PkwdBook_GetMovie(PkwdBookWork *wk, s32 index) {
 
 // Has the VBlank send the palettes of a series to the upper screen
 static void PkwdBook_TransferSeriesPalette(PkwdBookWork *wk, u32 series) {
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 0, wk->palettes[series]->rawData, 5 * 0x20);
-    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 5 * 0x20, wk->textPalettes[series]->rawData,
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 0, wk->palettes[series]->pRawData, 5 * 0x20);
+    NNS_GfdRegisterNewVramTransferTask(NNS_GFD_DST_2D_BG_PLTT_MAIN, 5 * 0x20, wk->textPalettes[series]->pRawData,
                                        3 * 0x20);
 }
 

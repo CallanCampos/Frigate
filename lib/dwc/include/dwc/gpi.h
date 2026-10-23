@@ -1,10 +1,12 @@
 #ifndef POKEBW2_DWC_GPI_H
 #define POKEBW2_DWC_GPI_H
 
-#include "types.h"
 #include "dwc/darray.h"
 #include "dwc/gp.h"
+#include "dwc/gsPlatformSocket.h"
 #include "dwc/hashtable.h"
+#include "dwc/nonport.h"
+#include <time.h>
 
 // The state of a connection of GameSpy's GP (gpi.c) and the layouts that the files of GP share, in overlay 11, after
 // GameSpy's gpi.h and the headers of its gpi*.c (see dwc/gp.h for the names). The functions of each file are in its
@@ -82,11 +84,13 @@
 #define GPI_PEER_DISCONNECTED 106
 
 typedef struct GPIBuddyStatus GPIBuddyStatus;
-typedef struct GPIBuddyStatusInfo GPIBuddyStatusInfo;
+typedef struct _GPIBuddyStatusInfo GPIBuddyStatusInfo;
 typedef struct GPIInfoCache GPIInfoCache;
-typedef struct GPIPeer GPIPeer;
+typedef struct GPIPeer_s GPIPeer;
 
 // A text that grows as it is written to (gpiBuffer.c): len of size bytes are used, and pos is how far it was sent or
+typedef enum _GPIBool { GPIFalse, GPITrue } GPIBool;
+
 // read
 typedef struct GPIBuffer {
     char *buffer;
@@ -112,15 +116,15 @@ typedef struct GPICallbackData {
 
 // An operation in progress (gpiOperation.c), in the connection's list: its kind and state, its data (GPIConnectData,
 // GPISearchData or nothing), the app's callback for its end, and the id of the server's messages that answer it
-typedef struct GPIOperation {
+typedef struct GPIOperation_s {
     int type;
     void *data;
-    BOOL blocking;
+    GPIBool blocking;
     GPICallback callback;
     int state;
     int id;
-    int result;
-    struct GPIOperation *pnext;
+    GPResult result;
+    struct GPIOperation_s *pnext;
 } GPIOperation;
 
 // What a connect operation keeps (gpiConnect.c): the server's challenge and ours, the hash of the password, and the
@@ -132,7 +136,7 @@ typedef struct GPIConnectData {
     char authtoken[256];
     char partnerchallenge[256];
     char cdkey[65];
-    BOOL newuser;
+    GPIBool newuser;
 } GPIConnectData;
 
 // A key of a status and its value (gpiKeys.c)
@@ -145,31 +149,31 @@ typedef struct GPIKey {
 // info of one (from "\bsi\"), with the addresses of its game and the keys of its status
 struct GPIBuddyStatus {
     int buddyIndex;
-    int status;
+    GPEnum status;
     char *statusString;
     char *locationString;
-    u32 ip;
-    u16 port;
-    int quietModeFlags;
+    unsigned int ip;
+    unsigned short port;
+    GPEnum quietModeFlags;
 };
 
-struct GPIBuddyStatusInfo {
+struct _GPIBuddyStatusInfo {
     int buddyIndex;
-    int statusState;
+    GPEnum statusState;
     char *richStatus;
     char *gameType;
     char *gameVariant;
     char *gameMapName;
-    int sessionFlags;
-    u32 buddyIp;
-    u16 buddyPort;
-    u32 hostIp;
-    u32 hostPrivateIp;
-    u16 queryPort;
-    u16 hostPort;
-    int quietModeFlags;
+    unsigned int sessionFlags;
+    unsigned int buddyIp;
+    unsigned short buddyPort;
+    unsigned int hostIp;
+    unsigned int hostPrivateIp;
+    unsigned short queryPort;
+    unsigned short hostPort;
+    GPEnum quietModeFlags;
     int productId;
-    DArray *extendedInfoKeys;
+    DArray extendedInfoKeys;
 };
 
 // The info of a profile that the server gave (gpiInfo.c), which the profile keeps when the connection caches info
@@ -189,8 +193,8 @@ struct GPIInfoCache {
     int birthday;
     int birthmonth;
     int birthyear;
-    int sex;
-    int publicmask;
+    GPEnum sex;
+    GPEnum publicmask;
     char *aimname;
     int pic;
     int occupationid;
@@ -216,33 +220,33 @@ typedef struct GPIProfile {
     char *authSig;
     int requestCount;
     char *peerSig;
-    BOOL blocked;
+    gsi_bool blocked;
     int blockIndex;
-    BOOL buddyOrBlockCache;
-    BOOL deleted;
+    gsi_bool buddyOrBlockCache;
+    gsi_bool deletedLocally;
 } GPIProfile;
 
 // The table of the profiles, by their ids, with how many there are, and how many buddies and blocked players
 typedef struct GPIProfileList {
-    HashTable *profileTable;
+    HashTable profileTable;
     int num;
     int numBuddies;
     int numBlocked;
 } GPIProfileList;
 
 // An operation that a peer waits on (gpiPeer.c), with the app's callback and when it times out, and the queue of them
-typedef struct GPIPeerOp {
-    int type;
+typedef struct _GPIPeerOp {
+    int state;
     void *userData;
     GPCallback callback;
-    struct GPIPeerOp *next;
-    int state;
-    u32 timeout;
+    struct _GPIPeerOp *next;
+    int type;
+    gsi_time timeout;
 } GPIPeerOp;
 
-typedef struct GPIPeerOpQueue {
-    GPIPeerOp *first;
+typedef struct _GPIPeerOpQueue {
     GPIPeerOp *opList;
+    GPIPeerOp *first;
     GPIPeerOp *last;
 } GPIPeerOpQueue;
 
@@ -254,27 +258,27 @@ typedef struct GPIMessage {
 } GPIMessage;
 
 // What names a file transfer (gpiTransfer.c): the profile that sends it, a count and a time
-typedef struct GPITransferID {
+typedef struct GPITransferID_s {
     int profileid;
-    u32 count;
-    u32 time;
+    unsigned int count;
+    unsigned int time;
 } GPITransferID;
 
-// A peer (gpiPeer.c): a buddy that messages go to directly, through the Udp Engine (dwc/gt2.h), in the connection's
-// list. initiated is set on the side that connected
-struct GPIPeer {
+// A peer (gpiPeer.c): a buddy that messages go to directly, through the Udp Engine (dwc/gsUdpEngine.h), in the
+// connection's list. initiated is set on the side that connected
+struct GPIPeer_s {
     int state;
-    BOOL initiated;
-    u32 ip;
-    u16 port;
-    int profile;
-    int timeout;
+    GPIBool initiated;
+    unsigned int ip;
+    unsigned short port;
+    GPProfile profile;
+    time_t timeout;
     int nackCount;
     GPIBuffer inputBuffer;
     GPIBuffer outputBuffer;
-    DArray *messages; // of GPIMessage
+    DArray messages; // of GPIMessage
     GPIPeerOpQueue peerOpQueue;
-    struct GPIPeer *pnext;
+    struct GPIPeer_s *pnext;
 };
 
 // A search of the search manager (gpiSearch.c): its kind, the socket and its buffers, what it looks for, and whether it
@@ -282,7 +286,7 @@ struct GPIPeer {
 // have (the names are ours)
 typedef struct GPISearchData {
     int type;
-    int sock;
+    SOCKET sock;
     GPIBuffer inputBuffer;
     GPIBuffer outputBuffer;
     char nick[31];
@@ -298,22 +302,22 @@ typedef struct GPISearchData {
     int icquin;
     int skip;
     int productID;
-    BOOL processing;
-    BOOL remove;
-    u32 searchStartTime;
+    GPIBool processing;
+    GPIBool remove;
+    gsi_time searchStartTime;
     int *revBuddyProfileIds;
     int numOfRevBuddyProfiles;
-    int searchProfileId;
+    int profile;
     int maxResults;
 } GPISearchData;
 
 // The state of a connection, which GPConnection points to. The status info and the transfers aren't used here
 typedef struct GPIConnection {
     char errorString[256];
-    BOOL infoCaching;
-    BOOL infoCachingBuddyAndBlockOnly;
-    BOOL simulation;
-    BOOL firewall;
+    GPIBool infoCaching;
+    GPIBool infoCachingBuddyAndBlockOnly;
+    GPIBool simulation;
+    GPIBool firewall;
     char nick[31];
     char uniquenick[21];
     char email[51];
@@ -323,31 +327,31 @@ typedef struct GPIConnection {
     int profileid;
     int partnerID;
     GPICallback callbacks[GPI_NUM_CALLBACKS];
-    int cmSocket;
+    SOCKET cmSocket;
     int connectState;
     GPIBuffer socketBuffer;
     char *inputBuffer;
     int inputBufferSize;
     GPIBuffer outputBuffer;
     char mHeader[16]; // the header of the Udp Engine's messages
-    u16 peerPort;
+    unsigned short peerPort;
     int nextOperationID;
     int numSearches;
-    int lastStatusState;
-    u32 hostIp;
-    u32 hostPrivateIp;
-    u16 queryPort;
-    u16 hostPort;
-    u32 sessionFlags;
+    GPEnum lastStatusState;
+    unsigned int hostIp;
+    unsigned int hostPrivateIp;
+    unsigned short queryPort;
+    unsigned short hostPort;
+    unsigned int sessionFlags;
     char richStatus[256];
     char gameType[33];
     char gameVariant[33];
     char gameMapName[33];
-    DArray *extendedInfoKeys; // of GPIKey
+    DArray extendedInfoKeys; // of GPIKey
     char lastStatusString[256];
     char lastLocationString[256];
-    int errorCode;
-    BOOL fatalError;
+    GPErrorCode errorCode;
+    GPIBool fatalError;
     void *diskCache;
     GPIOperation *operationList;
     GPIProfileList profileList;
@@ -356,19 +360,19 @@ typedef struct GPIConnection {
     GPICallbackData *lastCallback;
     GPIBuffer updateproBuffer;
     GPIBuffer updateuiBuffer;
-    DArray *transfers;
-    u32 nextTransferID;
+    DArray transfers;
+    unsigned int nextTransferID;
     int productID;
     int namespaceID;
-    GPLoginTicket loginTicket;
-    int quietModeFlags;
-    u32 kaTransmit; // when the last message was sent or received, for the keep-alives
+    char loginTicket[GP_LOGIN_TICKET_LEN];
+    GPEnum quietModeFlags;
+    gsi_time kaTransmit; // when the last message was sent or received, for the keep-alives
 } GPIConnection;
 
-int gpiInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID);
+GPResult gpiInitialize(GPConnection *connection, int productID, int namespaceID, int partnerID);
 void gpiDestroy(GPConnection *connection);
-int gpiReset(GPConnection *connection);
-int gpiProcessConnectionManager(GPConnection *connection);
-int gpiProcess(GPConnection *connection, int blockingOperationID);
+GPResult gpiReset(GPConnection *connection);
+GPResult gpiProcessConnectionManager(GPConnection *connection);
+GPResult gpiProcess(GPConnection *connection, int blockingOperationID);
 
 #endif // POKEBW2_DWC_GPI_H

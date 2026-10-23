@@ -11,26 +11,26 @@
 #include "dwc_util_text.h"
 #include "nitro/gx.h"
 
-static void DWCUtilAutoConnectOk_LoadGraphics(void);
-static void DWCUtilAutoConnectOk_FadeIn(void);
-static void DWCUtilAutoConnectOk_WaitFadeIn(void);
-static void DWCUtilAutoConnectOk_Main(void);
-static void func_ov182_021b6490(void);
+static void initGraphics(void);
+static void procInit(void);
+static void procInit1(void);
+static void procScene(void);
+static void draw(void);
 static void DWCUtilAutoConnectOk_FadeOut(void);
-static void DWCUtilAutoConnectOk_WaitFadeOut(void);
-static void DWCUtilAutoConnectOk_UpdateTimer(void);
+static void endScene1(void);
+static void wait(void);
 
 // The frames since the message appeared
 static u8 sAutoConnectOkFrames;
 
 void DWCUtilAutoConnectOk_Init(void) {
     sAutoConnectOkFrames = 0;
-    DWCUtilAutoConnectOk_LoadGraphics();
-    DWCUtilGfxResource_ShowMessage(0x2d);
-    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_FadeIn);
+    initGraphics();
+    DWCi_CMNlMsgDraw(0x2d);
+    DWCi_ChangeScene(procInit);
 }
 
-static void DWCUtilAutoConnectOk_LoadGraphics(void) {
+static void initGraphics(void) {
     DWCUtilGfxResource_Load("char/xb4Multi.nsc.l", GX_LoadBG2Scr);
     G2S_SetBG0Priority(3);
     G2S_SetBG1Priority(3);
@@ -38,82 +38,82 @@ static void DWCUtilAutoConnectOk_LoadGraphics(void) {
     G2_SetBG2Priority(3);
 }
 
-static void DWCUtilAutoConnectOk_FadeIn(void) {
-    DWCUtilFade_Start(DWC_UTIL_FADE_FROM_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilDisplay_ShowPlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_WaitFadeIn);
+static void procInit(void) {
+    DWCi_EFFlFade(DWC_UTIL_FADE_FROM_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_GXlInvisible(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
+    DWCi_ChangeScene(procInit1);
 }
 
-static void DWCUtilAutoConnectOk_WaitFadeIn(void) {
-    if (DWCUtilFade_IsActive(0) == 0) {
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_Main);
+static void procInit1(void) {
+    if (DWCi_EFFlCheck(0) == 0) {
+        DWCi_ChangeScene(procScene);
     }
 }
 
-static void DWCUtilAutoConnectOk_Main(void) {
-    DWCUtilAutoConnectOk_UpdateTimer();
-    func_ov182_021b6490();
+static void procScene(void) {
+    wait();
+    draw();
 }
 
-static void func_ov182_021b6490(void) {
+static void draw(void) {
 }
 
 static void DWCUtilAutoConnectOk_FadeOut(void) {
     int from;
 
-    DWCUtilMain_GetScreenArgs(NULL, &from);
+    DWCi_GetParam2_(NULL, &from);
     if (from != 0) {
-        DWCUtilSubScreen_SlideOutRow();
+        DWCi_STEPlEnd();
     }
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
-    DWCUtilFade_Start(DWC_UTIL_FADE_TO_WHITE, 0,
-                      GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ, 8);
-    DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_WaitFadeOut);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 1, GX_BLEND_PLANEMASK_BG0, 8);
+    DWCi_EFFlFade(DWC_UTIL_FADE_TO_WHITE, 0, GX_BLEND_PLANEMASK_BG0 | GX_BLEND_PLANEMASK_BG2 | GX_BLEND_PLANEMASK_OBJ,
+                  8);
+    DWCi_ChangeScene(endScene1);
 }
 
 // Once the fades and the buttons are done, back to the settings of the connection, or to the menu that the utility
 // was started from
-static void DWCUtilAutoConnectOk_WaitFadeOut(void) {
+static void endScene1(void) {
     int from;
 
-    if (DWCUtilFade_IsActive(1) != 0 || DWCUtilFade_IsActive(0) != 0) {
+    if (DWCi_EFFlCheck(1) != 0 || DWCi_EFFlCheck(0) != 0) {
         return;
     }
-    if (!DWCUtilSubScreen_IsNotSlidingOut()) {
+    if (!DWCi_STEPlIsEnd()) {
         return;
     }
-    DWCUtilText_DestroyScreenBg(0);
-    DWCUtilScreen_Stop();
+    DWCi_FNTlDeleteBgLcd(0);
+    DWCi_COMMENTlDelete();
     DWCUtilDisplay_HidePlanes(1, GX_PLANEMASK_BG0);
     DWCUtilDisplay_HidePlanes(0, GX_PLANEMASK_BG0 | GX_PLANEMASK_BG2 | GX_PLANEMASK_OBJ);
-    DWCUtilMain_SetLayout(2, 1);
-    DWCUtilMain_GetScreenArgs(NULL, &from);
+    DWCi_SetParam_(2, 1);
+    DWCi_GetParam2_(NULL, &from);
     if (from == 0) {
-        DWCUtilMain_SetScreenArgs(0, 0);
-        DWCUtilMain_SetUpdate(DWCUtilAddressSettings_Init);
+        DWCi_SetParam2_(0, 0);
+        DWCi_ChangeScene(DWCUtilAddressSettings_Init);
     } else {
-        DWCUtilMain_SetUpdate(DWCUtilMainMenu_Init);
+        DWCi_ChangeScene(DWCi_SceneMenu);
     }
 }
 
 // After three seconds, ends the utility's run when it was started for the connection test alone
-static void DWCUtilAutoConnectOk_UpdateTimer(void) {
+static void wait(void) {
     int from;
 
     sAutoConnectOkFrames++;
     if (sAutoConnectOkFrames >= 180) {
-        DWCUtilMain_GetScreenArgs(NULL, &from);
-        switch (DWCUtilMain_GetStartScreen()) {
+        DWCi_GetParam2_(NULL, &from);
+        switch (DWCi_Entry()) {
         case 0:
             break;
         case 1:
             if (from != 0) {
-                DWCUtilMain_SetUpdate(DWCUtilMainMenu_ExitUtility);
+                DWCi_ChangeScene(DWCUtilMainMenu_ExitUtility);
                 return;
             }
             break;
         }
-        DWCUtilMain_SetUpdate(DWCUtilAutoConnectOk_FadeOut);
+        DWCi_ChangeScene(DWCUtilAutoConnectOk_FadeOut);
     }
 }

@@ -333,8 +333,8 @@ void GFL_NetErrClearKeepDark(void) {
 void GFL_NetErrApplyBrightness(void) {
     GFLNetErrWork *work = &g_GflNetErr;
 
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
+    GX_SetMasterBrightness(work->brightness);
+    GXS_SetMasterBrightness(work->subBrightness);
 }
 
 static void GFL_NetErrWaitVBlank(void) {
@@ -547,10 +547,10 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
     if (!GFL_NetErrIsReady()) {
         return;
     }
-    work->brightness = GXx_GetMasterBrightness_(REG_MASTER_BRIGHT_ADDR);
-    work->subBrightness = GXx_GetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    work->brightness = GX_GetMasterBrightness();
+    work->subBrightness = GXS_GetMasterBrightness();
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     if (!disconnecting) {
         work->hBlankIrq = GX_HBlankIntr(FALSE);
         work->vBlankIrq = GX_VBlankIntr(FALSE);
@@ -594,8 +594,8 @@ static void GFL_NetErrDispInit(u32 fatal, BOOL disconnecting) {
         loadErrorBackground(ERROR_WINDOW_NET);
         GFL_NetErrDispMessage(fatal, disconnecting);
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
+    GXS_SetMasterBrightness(0);
 }
 
 // Puts back what the screens showed
@@ -607,8 +607,8 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     if (!GFL_NetErrIsReady()) {
         return;
     }
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, -16);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, -16);
+    GX_SetMasterBrightness(-16);
+    GXS_SetMasterBrightness(-16);
     *(u16 *)HW_DB_BG_PLTT = work->subBackdrop;
     GFL_BGSysSetEnabledBGsB(work->subEnabledBGs);
     reg_G2_BLDCNT = work->blend;
@@ -633,8 +633,8 @@ static void GFL_NetErrRestore(BOOL keepDark) {
     GX_VBlankIntr(work->vBlankIrq);
     OS_WaitIrq(TRUE, OS_IE_V_BLANK);
     if (!keepDark) {
-        GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, work->brightness);
-        GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, work->subBrightness);
+        GX_SetMasterBrightness(work->brightness);
+        GXS_SetMasterBrightness(work->subBrightness);
     }
 }
 
@@ -659,23 +659,23 @@ static void loadErrorBackground(int window) {
     arcId = FATAL_ERROR_G2D_RESIDS[window].arcId;
     file = GFL_ArcSysReadHeapNewLZ(arcId, FATAL_ERROR_G2D_RESIDS[window].charId, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedBGCharacterData(file, &chars)) {
-        DC_FlushRange(chars->rawData, chars->size);
-        MI_CpuCopy16(chars->rawData, G2_GetBG1CharPtr(), chars->size);
+        DC_FlushRange(chars->pRawData, chars->szByte);
+        MI_CpuCopy16(chars->pRawData, G2_GetBG1CharPtr(), chars->szByte);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(arcId, FATAL_ERROR_G2D_RESIDS[window].screenId, FALSE, HEAPID_USER);
     if (NNS_G2dGetUnpackedScreenData(file, &screen)) {
-        DC_FlushRange(screen->rawData, screen->size);
-        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->size);
+        DC_FlushRange(screen->rawData, screen->szByte);
+        MI_CpuCopy16(screen->rawData, G2_GetBG1ScrPtr(), screen->szByte);
     }
     GFL_HeapFree(file);
 
     file = GFL_ArcSysReadHeapNewLZ(arcId, FATAL_ERROR_G2D_RESIDS[window].plttId, FALSE, HEAPID_USER);
     NNS_G2dGetUnpackedPaletteCompressInfo(file, &compressInfo);
     if (NNS_G2dGetUnpackedPaletteData(file, &palette)) {
-        DC_FlushRange(palette->rawData, SAVED_PLTT_SIZE);
-        MI_CpuCopy16(palette->rawData, (void *)HW_BG_PLTT, SAVED_PLTT_SIZE);
+        DC_FlushRange(palette->pRawData, SAVED_PLTT_SIZE);
+        MI_CpuCopy16(palette->pRawData, (void *)HW_BG_PLTT, SAVED_PLTT_SIZE);
     }
     GFL_HeapFree(file);
 }

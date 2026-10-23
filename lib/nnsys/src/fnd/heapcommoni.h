@@ -14,16 +14,16 @@ typedef struct {
 } NNSiMemRegion;
 
 // The address of p, for arithmetic
-static inline uptr AddrOf(const void *p) {
+static inline uptr NNSiGetUIntPtr(const void *p) {
     return (uptr)p;
 }
 
 // How many bytes lie from from up to to
-static inline u32 BytesBetween(const void *from, const void *to) {
-    return AddrOf(to) - AddrOf(from);
+static inline u32 GetOffsetFromPtr(const void *from, const void *to) {
+    return NNSiGetUIntPtr(to) - NNSiGetUIntPtr(from);
 }
 
-// The heap's options (NNS_FND_HEAP_CLEAR_ON_ALLOC) sit in the low byte of its attribute
+// The heap's options (NNS_FND_HEAP_OPT_0_CLEAR) sit in the low byte of its attribute
 #define HEAP_OPT_MASK 0xFF
 
 static inline u16 GetOptForHeap(const NNSiFndHeapHead *heap) {
@@ -32,7 +32,7 @@ static inline u16 GetOptForHeap(const NNSiFndHeapHead *heap) {
 
 // Zeroes memory just handed out, when the heap asked for it
 static inline void FillAllocMemory(NNSiFndHeapHead *heap, void *address, u32 size) {
-    if (GetOptForHeap(heap) & NNS_FND_HEAP_CLEAR_ON_ALLOC) {
+    if (GetOptForHeap(heap) & NNS_FND_HEAP_OPT_0_CLEAR) {
         MI_CpuClear32(address, size);
     }
 }

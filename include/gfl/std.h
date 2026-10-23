@@ -13,7 +13,7 @@
 void initTableArea(HeapID heapId);
 // Compares size bytes, returning the difference of the first that differ
 s32 GFL_STD_MemCmp(const void *a, const void *b, u32 size);
-u32 GFL_STD_StrLen(const char *str);
+int GFL_STD_StrLen(const char *str);
 // Compares two strings with STD_CompareString, whatever swan's name says
 int _STD_CompareNString(const char *a, const char *b);
 // Seeds the Mersenne Twister of GFL_RandomMT
@@ -55,6 +55,14 @@ void GFL_DebugAssertFailEx(const char *file, u32 line, const char *format, ...);
             GFL_DebugAssertFail("", 0, #expression);                                                                   \
         }                                                                                                              \
     } while (0)
+// A failed assertion with file metadata supplied by its caller.
+#define GFL_ASSERT_WITH_FILE(file, expression)                                                                         \
+    do {                                                                                                               \
+        if (!(expression)) {                                                                                           \
+            GFL_DebugAssertFail(file, 0, #expression);                                                                 \
+        }                                                                                                              \
+    } while (0)
+
 #define GFL_ASSERT_MSG(expression, ...)                                                                                \
     do {                                                                                                               \
         if (!(expression)) {                                                                                           \

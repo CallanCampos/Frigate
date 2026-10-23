@@ -7,7 +7,7 @@
 //     the DS's does, with the same 32-bit range, and notes the file with the pointer the game gave;
 //   - the memory archive's hook, which gets every command with its file, reads and writes a noted file through its
 //     pointer (FS_COMMAND_READFILE, FS_COMMAND_WRITEFILE, as the default commands would at the file's position) and
-//     forgets it when it is closed. Every other command goes to the decomp's hook, FSi_MemoryArchiveProc.
+//     forgets it when it is closed. Every other command goes to the decomp's hook, FSi_MemArchiveProc.
 // A file is found by its FSFile, then checked against the range noted with it. A copy of an FSFile, which the noted
 // one doesn't name, is found by its range among the noted files when they all agree on the memory it names. A read or
 // write the host can't place stops the program with a message, rather than guess the pointer from its low 32 bits.
@@ -150,18 +150,18 @@ static FSResult FSi_HostMemoryArchiveProc(FSFile *file, FSCommandType command) {
         FSi_ForgetMemoryFile(file);
         return FS_RESULT_SUCCESS;
     default:
-        return FSi_MemoryArchiveProc(file, command);
+        return FSi_MemArchiveProc(file, command);
     }
 }
 
 // NitroSDK's FS_CreateFileFromMemory: the decomp's, then the host's hook on the memory archive and the file noted with
 // its pointer
-BOOL FS_CreateFileFromMemory(FSFile *file, const void *data, u32 size) {
+BOOL FS_CreateFileFromMemory(FSFile *file, void *data, u32 size) {
     BOOL opened = FSi_DsCreateFileFromMemory(file, data, size);
-    FSArchiveTables *tables = sMemoryArchive.userdata;
+    FSArchiveTables *tables = fsi_arc_mem.userdata;
 
     if (tables->proc != FSi_HostMemoryArchiveProc) {
-        FS_SetArchiveProc(&sMemoryArchive, FSi_HostMemoryArchiveProc, 0xffffffff);
+        FS_SetArchiveProc(&fsi_arc_mem, FSi_HostMemoryArchiveProc, 0xffffffff);
     }
     if (opened) {
         FSi_NoteMemoryFile(file, data);

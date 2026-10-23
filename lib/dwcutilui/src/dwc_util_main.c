@@ -50,9 +50,9 @@ typedef struct DWCUtilMain {
 static char sNasUrl[] = "https://nas.nintendowifi.net/ac";
 static DWCUtilMain sMain;
 
-static BOOL DWCUtilMain_CheckParams(int language, int param);
-static void DWCUtilMain_InitSystem(void);
-static void DWCUtilMain_InitGraphics(void);
+static BOOL checkParam(int language, int param);
+static void initGame(void);
+static void initGraph(void);
 static void DWCUtilMain_Exit(void);
 
 int DWC_StartUtility(void *work, int language, int param) {
@@ -62,18 +62,18 @@ int DWC_StartUtility(void *work, int language, int param) {
         return -2;
     }
     sMain.work = work;
-    if (!DWCUtilMain_CheckParams(language, param)) {
+    if (!checkParam(language, param)) {
         return -1;
     }
     nasUrl = DWCi_Auth_GetCustomNas();
     DWC_Auth_SetCustomNas(sNasUrl);
     sMain.finished = FALSE;
-    DWCUtilMain_InitSystem();
-    DWCUtilMain_InitGraphics();
+    initGame();
+    initGraph();
     DWCUtilSound_Init();
-    DWCUtilMain_SetUpdate(DWCUtilMainMenu_InitUtility);
+    DWCi_ChangeScene(DWCUtilMainMenu_InitUtility);
     do {
-        DWCUtilTouch_Update();
+        DWCi_IPTlRead();
         sMain.update();
         DWCUtilTask_Run(0);
         DWCUtilTouch_UpdateLid();
@@ -85,7 +85,7 @@ int DWC_StartUtility(void *work, int language, int param) {
     return 0;
 }
 
-static BOOL DWCUtilMain_CheckParams(int language, int param) {
+static BOOL checkParam(int language, int param) {
     sMain.language = language;
     sMain.param.raw = param;
     if (language < 0 || language > 6) {
@@ -106,7 +106,7 @@ static BOOL DWCUtilMain_CheckParams(int language, int param) {
     return TRUE;
 }
 
-static void DWCUtilMain_InitSystem(void) {
+static void initGame(void) {
     void *work;
 
     OS_DisableIrq();
@@ -125,26 +125,26 @@ static void DWCUtilMain_InitSystem(void) {
     RTC_Init();
     GX_DispOff();
     GXS_DispOff();
-    DWCUtilBank_Init();
-    DWCUtilHeap_Init(sMain.work);
-    DWCUtilIrq_Init();
-    DWCUtilTask_Init();
+    DWCi_ClearVram();
+    DWCi_HEAPlInit(sMain.work);
+    DWCi_ITRlIntr();
+    DWCi_TSKlInit();
     DWCUtilRomResource_Init();
-    DWCUtilTouch_Init();
-    DWCUtilFade_Init();
-    work = DWCUtilHeap_AllocClear(DWC_BM_WORK_SIZE, 0x20);
+    DWCi_IPTlInit();
+    DWCi_EFFlInit();
+    work = DWCi_HEAPlAllocEx(DWC_BM_INIT_WORK_SIZE, 0x20);
     DWC_BM_Init(work);
-    DWCUtilHeap_FreeAndNull(&work);
+    DWCi_HEAPlFree_(&work);
 }
 
-static void DWCUtilMain_InitGraphics(void) {
+static void initGraph(void) {
     GX_VBlankIntr(FALSE);
     GX_SetBankForBG(GX_VRAM_BG_128_A);
     GX_SetBankForOBJ(GX_VRAM_OBJ_128_B);
     GX_SetGraphicsMode(GX_DISPMODE_GRAPHICS, GX_BGMODE_0, GX_BG0_AS_2D);
     GX_SetVisiblePlane(0);
     GX_SetVisibleWnd(GX_WNDMASK_NONE);
-    GXx_SetMasterBrightness_(REG_MASTER_BRIGHT_ADDR, 0);
+    GX_SetMasterBrightness(0);
     GX_SetOBJVRamModeChar(GX_OBJVRAMMODE_CHAR_1D_128K);
     G2_BG0Mosaic(FALSE);
     G2_BG1Mosaic(FALSE);
@@ -160,7 +160,7 @@ static void DWCUtilMain_InitGraphics(void) {
     GXS_SetGraphicsMode(GX_BGMODE_0);
     GXS_SetVisiblePlane(0);
     GXS_SetVisibleWnd(GX_WNDMASK_NONE);
-    GXx_SetMasterBrightness_(REG_DB_MASTER_BRIGHT_ADDR, 0);
+    GXS_SetMasterBrightness(0);
     GXS_SetOBJVRamModeChar(GX_OBJVRAMMODE_CHAR_1D_32K);
     G2S_BG0Mosaic(FALSE);
     G2S_BG1Mosaic(FALSE);
@@ -186,10 +186,10 @@ static void DWCUtilMain_InitGraphics(void) {
     GX_SetBGScrOffset(GX_BGSCROFFSET_0x00000);
     GX_SetBGCharOffset(GX_BGCHAROFFSET_0x00000);
     GX_SetDispSelect(GX_DISP_SELECT_SUB_MAIN);
-    DWCUtilText_Init();
-    DWCUtilOamBuf_Init();
-    DWCUtilVramAlloc_Init();
-    DWCUtilOam_Init();
+    DWCi_FNTlInit();
+    DWCi_OBJlInit();
+    DWCi_OVRlInit();
+    DWCi_CELLlInit();
     GX_DispOn();
     GXS_DispOn();
     GX_VBlankIntr(TRUE);
@@ -198,31 +198,31 @@ static void DWCUtilMain_InitGraphics(void) {
 static void DWCUtilMain_Exit(void) {
     GX_DispOff();
     GXS_DispOff();
-    func_ov182_021bd0c8();
+    DWCi_SetLedNormal();
     PM_SetLCDPower(TRUE);
-    DWCUtilTouch_Exit();
-    DWCUtilIrq_Exit();
-    DWCUtilSound_Exit();
-    DWCUtilOam_Exit();
-    DWCUtilOamBuf_Exit();
-    DWCUtilText_Exit();
-    DWCUtilFade_Exit();
-    DWCUtilRomResource_Exit();
-    DWCUtilTask_Exit();
-    DWCUtilHeap_Exit();
+    DWCi_IPTlEnd();
+    DWCi_ITRlEnd();
+    DWCi_SNDlEnd();
+    DWCi_CELLlEnd();
+    DWCi_OBJlEnd();
+    DWCi_FNTlEnd();
+    DWCi_EFFlEnd();
+    DWCi_ARClEnd();
+    DWCi_TSKlEnd();
+    DWCi_HEAPlEnd();
     DWCUtilBank_Exit();
 }
 
-void DWCUtilMain_SetUpdate(void (*update)(void)) {
+void DWCi_ChangeScene(void (*update)(void)) {
     sMain.update = update;
 }
 
-void DWCUtilMain_SetLayout(u32 value0, u32 value1) {
+void DWCi_SetParam_(u32 value0, u32 value1) {
     sMain.value0 = value0;
     sMain.value1 = value1;
 }
 
-void DWCUtilMain_GetLayout(u32 *value0, u32 *value1) {
+void DWCi_GetParam_(u32 *value0, u32 *value1) {
     if (value0 != NULL) {
         *value0 = sMain.value0;
     }
@@ -231,12 +231,12 @@ void DWCUtilMain_GetLayout(u32 *value0, u32 *value1) {
     }
 }
 
-void DWCUtilMain_SetScreenArgs(int value2, int value3) {
+void DWCi_SetParam2_(int value2, int value3) {
     sMain.value2 = value2;
     sMain.value3 = value3;
 }
 
-void DWCUtilMain_GetScreenArgs(int *value2, int *value3) {
+void DWCi_GetParam2_(int *value2, int *value3) {
     if (value2 != NULL) {
         *value2 = sMain.value2;
     }
@@ -245,26 +245,26 @@ void DWCUtilMain_GetScreenArgs(int *value2, int *value3) {
     }
 }
 
-u8 DWCUtilMain_GetLanguage(void) {
+u8 DWCi_Language(void) {
     return sMain.language;
 }
 
-u32 DWCUtilMain_GetStartScreen(void) {
+u32 DWCi_Entry(void) {
     return sMain.param.fields.mode;
 }
 
-BOOL DWCUtilMain_HasFlag(u32 mask) {
+BOOL DWCi_Flag(u32 mask) {
     if (mask & sMain.param.fields.flags) {
         return TRUE;
     }
     return FALSE;
 }
 
-void DWCUtilMain_Finish(void) {
+void DWCi_EndUtility(void) {
     sMain.finished = TRUE;
 }
 
-u8 func_ov182_021ae058(void) {
+u8 kDWCi_Language(void) {
     u8 language = sMain.language;
 
     if (language == 6) {

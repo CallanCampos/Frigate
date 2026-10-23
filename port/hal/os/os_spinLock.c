@@ -181,7 +181,7 @@ static void OSi_FreeCardBus(void) {
     reg_MI_EXMEMCNT = (u16)(reg_MI_EXMEMCNT | EXMEMCNT_CARD_ARM7);
 }
 
-u16 OS_ReadOwnerOfLockWord(const OSLockWord *lockp) {
+u16 OS_ReadOwnerOfLockWord(OSLockWord *lockp) {
     return lockp->ownerID;
 }
 

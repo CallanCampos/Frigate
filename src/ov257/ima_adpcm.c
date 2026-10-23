@@ -6,7 +6,7 @@
 
 typedef struct {
     s16 predicted;
-    s8 index;
+    s8 prevIndex;
 } AdpcmState;
 
 static void Adpcm_EncodeSamples(const s16 *src, u8 *dst, int count, AdpcmState *state);
@@ -37,12 +37,12 @@ static AdpcmState sAdpcm[2];
 
 void Adpcm_ResetEncoder(void) {
     sAdpcm[ADPCM_ENCODE].predicted = 0;
-    sAdpcm[ADPCM_ENCODE].index = 0;
+    sAdpcm[ADPCM_ENCODE].prevIndex = 0;
 }
 
 void Adpcm_ResetDecoder(void) {
     sAdpcm[ADPCM_DECODE].predicted = 0;
-    sAdpcm[ADPCM_DECODE].index = 0;
+    sAdpcm[ADPCM_DECODE].prevIndex = 0;
 }
 
 u32 Adpcm_Encode(const s16 *src, u32 size, u8 *dst) {
@@ -99,7 +99,7 @@ static s8 Adpcm_EncodeSample(s16 sample, AdpcmState *state) {
     int index;
 
     predicted = state->predicted;
-    index = state->index;
+    index = state->prevIndex;
     step = sStepTable[index];
 
     diff = sample - predicted;
@@ -148,7 +148,7 @@ static s8 Adpcm_EncodeSample(s16 sample, AdpcmState *state) {
     }
 
     state->predicted = predicted;
-    state->index = index;
+    state->prevIndex = index;
     return code & 0xf;
 }
 
@@ -159,7 +159,7 @@ static s16 Adpcm_DecodeSample(u8 code, AdpcmState *state) {
     int delta;
 
     predicted = state->predicted;
-    index = state->index;
+    index = state->prevIndex;
     step = sStepTable[index];
 
     delta = step >> 3;
@@ -193,6 +193,6 @@ static s16 Adpcm_DecodeSample(u8 code, AdpcmState *state) {
     }
 
     state->predicted = predicted;
-    state->index = index;
+    state->prevIndex = index;
     return predicted;
 }

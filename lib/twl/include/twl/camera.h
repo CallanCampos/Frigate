@@ -9,7 +9,9 @@
 
 // TwlSDK's camera library, in the DSi's LTD autoload. The game calls it through the SDK's inline functions, which only
 // call the library when the game runs on a DSi (OS_IsRunOnTwl, swan's hw_isDSi), so the check is inlined at every call.
-// The functions have the names of the SDK functions they implement, from how the Xtransceiver uses them.
+// The functions, types and values have the names of the TWL-SDK Function Reference Manual (the public functions and
+// types) and of libntr's reconstruction of TwlSDK's headers (the Core functions, the asynchronous ones and the
+// interrupt bits), from what each function does and the PXI command it sends.
 
 typedef enum {
     CAMERA_RESULT_SUCCESS = 0,
@@ -37,13 +39,14 @@ typedef enum {
 } CAMERAContext;
 
 typedef enum {
-    CAMERA_SIZE_DSI_VGA,  // 640 x 480
+    CAMERA_SIZE_VGA,      // 640 x 480
     CAMERA_SIZE_QVGA,     // 320 x 240
     CAMERA_SIZE_QQVGA,    // 160 x 120
     CAMERA_SIZE_CIF,      // 352 x 288
     CAMERA_SIZE_QCIF,     // 176 x 144
     CAMERA_SIZE_DS_LCD,   // 256 x 192
-    CAMERA_SIZE_DS_LCDX4, // 512 x 384
+    CAMERA_SIZE_DS_LCDx4, // 512 x 384
+    CAMERA_SIZE_MAX,
 } CAMERASize;
 
 typedef enum {
@@ -57,9 +60,10 @@ typedef enum {
 
 typedef enum {
     CAMERA_FLIP_NONE,
-    CAMERA_FLIP_HORIZONTAL,
     CAMERA_FLIP_VERTICAL,
+    CAMERA_FLIP_HORIZONTAL,
     CAMERA_FLIP_REVERSE,
+    CAMERA_FLIP_MAX,
 } CAMERAFlip;
 
 // The color temperatures of the white balance's presets; AUTO is what the sensor sets by itself
@@ -71,6 +75,22 @@ typedef enum {
     CAMERA_WHITE_BALANCE_6000K,
     CAMERA_WHITE_BALANCE_7000K,
 } CAMERAWhiteBalance;
+
+typedef enum {
+    CAMERA_FRAME_RATE_15,
+    CAMERA_FRAME_RATE_15_TO_5,
+    CAMERA_FRAME_RATE_15_TO_2,
+    CAMERA_FRAME_RATE_8_5,
+    CAMERA_FRAME_RATE_5,
+    CAMERA_FRAME_RATE_20,
+    CAMERA_FRAME_RATE_20_TO_5,
+    CAMERA_FRAME_RATE_30,
+    CAMERA_FRAME_RATE_30_TO_5,
+    CAMERA_FRAME_RATE_15_TO_10,
+    CAMERA_FRAME_RATE_20_TO_10,
+    CAMERA_FRAME_RATE_30_TO_10,
+    CAMERA_FRAME_RATE_MAX,
+} CAMERAFrameRate;
 
 typedef enum {
     CAMERA_OUTPUT_YUV,
@@ -98,7 +118,6 @@ CAMERAResult CAMERA_I2CInitCore(CAMERASelect camera);
 CAMERAResult CAMERA_I2CActivateCore(CAMERASelect camera);
 CAMERAResult CAMERA_I2CSizeExCore(CAMERASelect camera, CAMERAContext context, CAMERASize size);
 CAMERAResult CAMERA_I2CEffectExCore(CAMERASelect camera, CAMERAContext context, CAMERAEffect effect);
-// CAMERA_I2CAutoExposureCore and CAMERA_I2CAutoWhiteBalanceCore, though which is which is a guess
 CAMERAResult CAMERA_I2CAutoExposureCore(CAMERASelect camera, BOOL on);
 CAMERAResult CAMERA_I2CAutoWhiteBalanceCore(CAMERASelect camera, BOOL on);
 void CAMERA_SetVsyncCallbackCore(CAMERAIntrCallback callback);
@@ -116,14 +135,21 @@ u32 CAMERA_GetBytesAtOnceCore(u16 width);
 u16 CAMERA_SizeToWidthCore(CAMERASize size);
 u16 CAMERA_SizeToHeightCore(CAMERASize size);
 
+// The interface's VSync interrupt: none, or on the falling or the rising edge (bits 8 and 9 of its control)
+typedef enum {
+    CAMERA_INTR_VSYNC_NONE = 0 << 8,
+    CAMERA_INTR_VSYNC_NEGATIVE_EDGE = 2 << 8,
+    CAMERA_INTR_VSYNC_POSITIVE_EDGE = 3 << 8,
+} CAMERAIntrVsync;
+
 // camera.c's other functions on the camera interface's registers (SCFG_CLK and the control word at 0x04004202), which
-// camera_api.c calls while it starts the camera, stops it and handles its interrupt. The three named ones have guesses
-// in the SDK's style, not its names
-void CAMERA_ResetCore(void);                 // resets the interface and its camera clock
-BOOL CAMERA_IsBufferErrorCore(void);         // whether the interface reports a buffer error (bit 4 of its control)
-void CAMERA_SetInterruptEnableCore(BOOL on); // sets or clears the interface's interrupt enable (bit 11 of its control)
-void func_0270223c(u32 bits);                // replaces bits 8 and 9 of the interface's control
-void func_02702268(BOOL on);                 // sets or clears bit 10 of the interface's control
+// camera_api.c calls while it starts the camera, stops it and handles its interrupt. CAMERA_GetErrorStatusCore is the
+// manual's; the three interrupt setters are libntr's (camera_intr.h)
+void CAMERA_ResetCore(void);                      // resets the interface and its camera clock
+BOOL CAMERA_GetErrorStatusCore(void);             // whether the interface reports a buffer error (bit 4 of its control)
+void CAMERA_SetMasterInterruptCore(BOOL enabled); // the interface's interrupt enable (bit 11 of its control)
+void CAMERA_SetVsyncInterruptCore(CAMERAIntrVsync type); // bits 8 and 9 of the interface's control
+void CAMERA_SetBufferErrorInterruptCore(BOOL enabled);   // the buffer error's interrupt (bit 10 of its control)
 
 static inline CAMERAResult CAMERA_Init(void) {
     if (OS_IsRunOnTwl() == TRUE) {
@@ -240,9 +266,9 @@ static inline void CAMERA_ClearBuffer(void) {
     }
 }
 
-static inline BOOL CAMERA_IsBufferError(void) {
+static inline BOOL CAMERA_GetErrorStatus(void) {
     if (OS_IsRunOnTwl() == TRUE) {
-        return CAMERA_IsBufferErrorCore();
+        return CAMERA_GetErrorStatusCore();
     }
     return FALSE;
 }
@@ -285,7 +311,7 @@ static inline u16 CAMERA_SizeToHeight(CAMERASize size) {
 
 static inline void CAMERA_DmaRecvAsync(u32 ndmaNo, void *dest, u32 unit, u32 length, MINDmaCallback callback,
                                        void *arg) {
-    MIi_CameraNDmaRecv(ndmaNo, dest, unit / 4, length, 0, callback, arg);
+    MI_Camera_NDmaRecvAsync(ndmaNo, dest, unit / 4, length, 0, callback, arg);
 }
 
 #endif // POKEBW2_TWL_CAMERA_H

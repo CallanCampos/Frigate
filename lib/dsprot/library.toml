@@ -18,3 +18,8 @@ flags = [
     "-nolink",
     "-msgstyle gcc",
 ]
+
+# The nested inline check runners use file-level interprocedural analysis.
+[file_flags]
+"dsprot_run.c" = ["-ipa file"]
+"dsprot_detect.c" = ["-ipa file"]

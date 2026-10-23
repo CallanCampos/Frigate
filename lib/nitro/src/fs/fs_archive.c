@@ -1,6 +1,6 @@
 // NitroSDK's file system (libfs): the archives, the queue of the commands that their files send, and the paths that
-// name a file in an archive ("rom:/dir/file"). The file name is a guess from NitroSDK's own layout (fs_archive.c); no
-// string in the ROM names it. The functions have NitroSDK's names where they are known.
+// name a file in an archive ("rom:/dir/file"). The file name is NitroSDK's (fs_archive.c, as ntrtwl's reconstruction
+// of NitroSDK has it); no string in the ROM names it. The functions have NitroSDK's names where they are known.
 
 #include "nitro/fs.h"
 #include "nitro/mi.h"
@@ -54,7 +54,7 @@ static BOOL FSi_IsEventCommand(u32 command) {
 static void FSi_EndCommand(FSFile *file, FSResult result) {
     FSArchive *arc;
     FSCommandType command;
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     arc = file->arc;
     if (arc != NULL) {
@@ -85,7 +85,7 @@ static void FSi_EndCommand(FSFile *file, FSResult result) {
 // until the archive ends it, and returns its result
 FSResult FSi_WaitForArchiveCompletion(FSFile *file, FSResult result) {
     if (result == FS_RESULT_PROC_ASYNC) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
         while (!(file->stat & FS_FILE_STATUS_ENDED)) {
             OS_SleepThread(&file->queue);
@@ -303,9 +303,9 @@ static FSResult FSi_InvokeCommand(FSFile *file, u32 command) {
 // returns the file whose command the caller has to run. A blocked thread runs its own, so none is returned for it
 static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
     FSFile *next = NULL;
-    u32 interrupts;
-    u32 activateInterrupts;
-    u32 runInterrupts;
+    OSIntrMode interrupts;
+    OSIntrMode activateInterrupts;
+    OSIntrMode runInterrupts;
     BOOL activate;
 
     interrupts = OS_DisableInterrupts();
@@ -328,10 +328,10 @@ static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
     OS_RestoreInterrupts(interrupts);
 
     activateInterrupts = OS_DisableInterrupts();
-    if (!(arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) && !(arc->flag & FS_ARCHIVE_FLAG_SUSPENDED) && arc->list != NULL) {
-        activate = start && !(arc->flag & FS_ARCHIVE_FLAG_ACTIVE);
+    if (!(arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) && !(arc->flag & FS_ARCHIVE_FLAG_SUSPEND) && arc->list != NULL) {
+        activate = start && !(arc->flag & FS_ARCHIVE_FLAG_RUNNING);
         if (activate) {
-            arc->flag |= FS_ARCHIVE_FLAG_ACTIVE;
+            arc->flag |= FS_ARCHIVE_FLAG_RUNNING;
         }
         OS_RestoreInterrupts(activateInterrupts);
         if (activate) {
@@ -340,7 +340,7 @@ static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
         runInterrupts = OS_DisableInterrupts();
         if (start || activate) {
             next = arc->list;
-            next->stat |= FS_FILE_STATUS_RUNNING;
+            next->stat |= FS_FILE_STATUS_OPERATING;
         }
         if (start && (next->stat & FS_FILE_STATUS_BLOCKING)) {
             OS_WakeupThread(&next->queue);
@@ -349,16 +349,16 @@ static FSFile *FSi_NextCommand(FSArchive *arc, BOOL start) {
         OS_RestoreInterrupts(runInterrupts);
     } else {
         if (start) {
-            if (arc->flag & FS_ARCHIVE_FLAG_ACTIVE) {
+            if (arc->flag & FS_ARCHIVE_FLAG_RUNNING) {
                 FSFile file;
 
                 FS_InitFile(&file);
                 file.arc = arc;
-                arc->flag &= ~FS_ARCHIVE_FLAG_ACTIVE;
+                arc->flag &= ~FS_ARCHIVE_FLAG_RUNNING;
                 FSi_InvokeCommand(&file, FS_COMMAND_IDLE);
             }
             if (arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) {
-                arc->flag = (arc->flag & ~FS_ARCHIVE_FLAG_SUSPENDING) | FS_ARCHIVE_FLAG_SUSPENDED;
+                arc->flag = (arc->flag & ~FS_ARCHIVE_FLAG_SUSPENDING) | FS_ARCHIVE_FLAG_SUSPEND;
                 OS_WakeupThread(&arc->queue);
             }
         }
@@ -373,9 +373,9 @@ static void FSi_ExecuteAsyncCommand(FSFile *file) {
     FSArchive *arc = file->arc;
 
     while (file != NULL) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
-        file->stat |= FS_FILE_STATUS_RUNNING;
+        file->stat |= FS_FILE_STATUS_OPERATING;
         if (file->stat & FS_FILE_STATUS_BLOCKING) {
             OS_WakeupThread(&file->queue);
             file = NULL;
@@ -394,13 +394,13 @@ static void FSi_ExecuteAsyncCommand(FSFile *file) {
 // NitroSDK's FSi_ExecuteSyncCommand: waits for a file's turn, runs its command in the calling thread, and goes on with
 // the next ones
 static void FSi_ExecuteSyncCommand(FSFile *file) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
-    while (!(file->stat & FS_FILE_STATUS_RUNNING) && (file->stat & FS_FILE_STATUS_BUSY)) {
+    while (!(file->stat & FS_FILE_STATUS_OPERATING) && (file->stat & FS_FILE_STATUS_BUSY)) {
         OS_SleepThread(&file->queue);
     }
     OS_RestoreInterrupts(interrupts);
-    if (file->stat & FS_FILE_STATUS_RUNNING) {
+    if (file->stat & FS_FILE_STATUS_OPERATING) {
         FSArchive *arc = file->arc;
         FSFile *next;
 
@@ -417,7 +417,7 @@ static void FSi_ExecuteSyncCommand(FSFile *file) {
 BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
     BOOL result = FALSE;
     FSArchive *arc = file->arc;
-    u32 interrupts;
+    OSIntrMode interrupts;
     BOOL start;
     FSFile *next;
 
@@ -438,7 +438,7 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
         file->stat |= FS_FILE_STATUS_BLOCKING;
     }
     interrupts = OS_DisableInterrupts();
-    if (arc->flag & FS_ARCHIVE_FLAG_UNMOUNTING) {
+    if (arc->flag & FS_ARCHIVE_FLAG_UNLOADING) {
         FSi_EndCommand(file, FS_RESULT_CANCELED);
     } else {
         FSFile **link = &arc->list;
@@ -450,7 +450,7 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
         }
         *link = file;
     }
-    start = arc->list == file && !(arc->flag & FS_ARCHIVE_FLAG_ACTIVE);
+    start = arc->list == file && !(arc->flag & FS_ARCHIVE_FLAG_RUNNING);
     OS_RestoreInterrupts(interrupts);
     if (file->error != FS_RESULT_CANCELED) {
         next = FSi_NextCommand(arc, start);
@@ -470,7 +470,7 @@ BOOL FSi_SendCommand(FSFile *file, FSCommandType command, BOOL blocking) {
 // NitroSDK's FS_FindArchive: finds the mounted archive of a name with the given number of characters
 FSArchive *FS_FindArchive(const char *name, int nameLength) {
     FSArchive *arc;
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     for (arc = sArchives.list; arc != NULL; arc = arc->next) {
         if (FS_IsArchiveLoaded(arc)) {
@@ -494,9 +494,9 @@ BOOL FS_SetCurrentDirectory(const char *path) {
 
     if (arc != NULL) {
         sArchives.current.arc = arc;
-        sArchives.current.dirId = 0;
-        sArchives.current.fileId = 0;
-        sArchives.current.position = 0;
+        sArchives.current.own_id = 0;
+        sArchives.current.index = 0;
+        sArchives.current.pos = 0;
         STD_CopyLString(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
         if (arc->vtbl->findPath != NULL) {
             FSFile file;
@@ -509,7 +509,7 @@ BOOL FS_SetCurrentDirectory(const char *path) {
             args.path = normalized;
             args.isDirectory = TRUE;
             if (FSi_SendCommand(&file, FS_COMMAND_FINDPATH, TRUE)) {
-                sArchives.current.dirId = args.targetId;
+                sArchives.current.own_id = args.targetId;
                 STD_CopyLString(sCurrentPath, normalized, FS_PATH_BUFFER_SIZE);
             }
         }
@@ -553,9 +553,9 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
 
     if (sArchives.current.arc == NULL) {
         sArchives.current.arc = sArchives.list;
-        sArchives.current.dirId = 0;
-        sArchives.current.position = 0;
-        sArchives.current.fileId = 0;
+        sArchives.current.own_id = 0;
+        sArchives.current.pos = 0;
+        sArchives.current.index = 0;
         sCurrentPath[0] = '\0';
     }
     if (FSi_IsSlash(path[0])) {
@@ -571,9 +571,9 @@ FSArchive *FSi_NormalizePath(const char *path, u32 *baseDirId, char *normalized)
             if (c == '\0' || FSi_IsSlash(c)) {
                 arc = sArchives.current.arc;
                 if (baseDirId != NULL) {
-                    *baseDirId = sArchives.current.dirId;
+                    *baseDirId = sArchives.current.own_id;
                 }
-                if (normalized != NULL && sArchives.current.dirId == 0 && sCurrentPath[0] != '\0') {
+                if (normalized != NULL && sArchives.current.own_id == 0 && sCurrentPath[0] != '\0') {
                     length +=
                         FSi_CopyPathPart(normalized, FS_PATH_BUFFER_SIZE, sCurrentPath, FS_PATH_BUFFER_SIZE, &overflow);
                     length += FSi_CopyPathPart(normalized + length, FS_PATH_BUFFER_SIZE - length, "/", 1, &overflow);
@@ -640,7 +640,7 @@ void FS_InitArchive(FSArchive *arc) {
 // use
 BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
     BOOL result = FALSE;
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     if (FS_FindArchive(name, nameLength) == NULL) {
         FSArchive **link = &sArchives.list;
@@ -669,7 +669,7 @@ BOOL FS_RegisterArchiveName(FSArchive *arc, const char *name, u32 nameLength) {
         } else {
             OS_Terminate();
         }
-        arc->flag |= FS_ARCHIVE_FLAG_REGISTERED;
+        arc->flag |= FS_ARCHIVE_FLAG_REGISTER;
         result = TRUE;
     }
     OS_RestoreInterrupts(interrupts);
@@ -682,7 +682,7 @@ void FS_ReleaseArchiveName(FSArchive *arc) {
         OS_Terminate();
     }
     if (arc->longName != NULL) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
         FSArchive *current = sArchives.list;
         FSArchive **link = &sArchives.list;
 
@@ -699,7 +699,7 @@ void FS_ReleaseArchiveName(FSArchive *arc) {
         }
         arc->longName = NULL;
         arc->next = NULL;
-        arc->flag &= ~FS_ARCHIVE_FLAG_REGISTERED;
+        arc->flag &= ~FS_ARCHIVE_FLAG_REGISTER;
         if (sArchives.current.arc == arc) {
             sArchives.current.arc = NULL;
         }
@@ -724,20 +724,20 @@ BOOL FS_MountArchive(FSArchive *arc, void *userdata, const FSArchiveInterface *v
     FS_InitFile(&file);
     file.arc = arc;
     FSi_InvokeCommand(&file, FS_COMMAND_MOUNT);
-    arc->flag |= FS_ARCHIVE_FLAG_MOUNTED;
+    arc->flag |= FS_ARCHIVE_FLAG_LOADED;
     return TRUE;
 }
 
 // NitroSDK's FS_UnmountArchive: cancels the commands of an archive, and runs FS_COMMAND_UNMOUNT
 BOOL FS_UnmountArchive(FSArchive *arc) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
 
     if (FS_IsArchiveLoaded(arc)) {
         BOOL suspended = FS_SuspendArchive(arc);
         FSFile *file = arc->list;
         FSFile unmountFile;
 
-        arc->flag |= FS_ARCHIVE_FLAG_UNMOUNTING;
+        arc->flag |= FS_ARCHIVE_FLAG_UNLOADING;
         while (file != NULL) {
             FSFile *following = file->next;
 
@@ -751,7 +751,7 @@ BOOL FS_UnmountArchive(FSArchive *arc) {
         FS_InitFile(&unmountFile);
         unmountFile.arc = arc;
         FSi_InvokeCommand(&unmountFile, FS_COMMAND_UNMOUNT);
-        arc->flag &= ~(FS_ARCHIVE_FLAG_UNMOUNTING | FS_ARCHIVE_FLAG_CANCELING | FS_ARCHIVE_FLAG_MOUNTED);
+        arc->flag &= ~(FS_ARCHIVE_FLAG_UNLOADING | FS_ARCHIVE_FLAG_CANCELING | FS_ARCHIVE_FLAG_LOADED);
     }
     OS_RestoreInterrupts(interrupts);
     return TRUE;
@@ -760,14 +760,14 @@ BOOL FS_UnmountArchive(FSArchive *arc) {
 // NitroSDK's FS_SuspendArchive: stops an archive from starting commands, waiting for the one it runs to end. Returns
 // FALSE if it was suspended already
 BOOL FS_SuspendArchive(FSArchive *arc) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
     BOOL result = !FS_IsArchiveSuspended(arc);
 
     if (result) {
-        if (!(arc->flag & FS_ARCHIVE_FLAG_ACTIVE)) {
-            arc->flag |= FS_ARCHIVE_FLAG_SUSPENDED;
+        if (!(arc->flag & FS_ARCHIVE_FLAG_RUNNING)) {
+            arc->flag |= FS_ARCHIVE_FLAG_SUSPEND;
         } else {
-            u32 waitInterrupts;
+            OSIntrMode waitInterrupts;
 
             arc->flag |= FS_ARCHIVE_FLAG_SUSPENDING;
             waitInterrupts = OS_DisableInterrupts();
@@ -783,12 +783,12 @@ BOOL FS_SuspendArchive(FSArchive *arc) {
 
 // NitroSDK's FS_ResumeArchive: lets a suspended archive start commands again. Returns TRUE if it was not suspended
 BOOL FS_ResumeArchive(FSArchive *arc) {
-    u32 interrupts = OS_DisableInterrupts();
+    OSIntrMode interrupts = OS_DisableInterrupts();
     BOOL result = !FS_IsArchiveSuspended(arc);
     FSFile *file;
 
     if (!result) {
-        arc->flag &= ~FS_ARCHIVE_FLAG_SUSPENDED;
+        arc->flag &= ~FS_ARCHIVE_FLAG_SUSPEND;
     }
     OS_RestoreInterrupts(interrupts);
     file = FSi_NextCommand(arc, TRUE);
@@ -804,7 +804,7 @@ void FS_NotifyArchiveAsyncEnd(FSArchive *arc, FSResult result) {
     FSFile *file = arc->list;
 
     if (file->stat & FS_FILE_STATUS_BLOCKING) {
-        u32 interrupts = OS_DisableInterrupts();
+        OSIntrMode interrupts = OS_DisableInterrupts();
 
         file->stat |= FS_FILE_STATUS_ENDED;
         file->error = result;

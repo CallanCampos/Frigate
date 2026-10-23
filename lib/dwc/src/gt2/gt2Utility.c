@@ -5,16 +5,16 @@
 
 // gt2AddressToString's two buffers, which it uses in turn; MWCC lays .bss out in the reverse order of the
 // declarations
-static char sStrings[2][22];
-static int sStringIndex;
+static char strAddressArray[2][22];
+static int nIndex;
 
-const char *func_ov011_0217ed14(u32 ip, u16 port, char *string) {
+const char *gt2AddressToString(unsigned int ip, unsigned short port, char string[22]) {
     if (string == NULL) {
-        sStringIndex ^= 1;
-        string = sStrings[sStringIndex];
+        nIndex ^= 1;
+        string = strAddressArray[nIndex];
     }
     if (ip != 0) {
-        SocInAddr address;
+        SOCInAddr address;
 
         address.addr = ip;
         if (port != 0) {
@@ -30,14 +30,14 @@ const char *func_ov011_0217ed14(u32 ip, u16 port, char *string) {
     return string;
 }
 
-BOOL gt2StringToAddress(const char *string, u32 *ipOut, u16 *portOut) {
-    u32 ip = 0;
-    u16 port;
+GT2Bool gt2StringToAddress(const char *string, unsigned int *ipOut, unsigned short *portOut) {
+    gsi_u32 ip = 0;
+    gsi_u16 port;
     char host[0x104];
     char *colon;
     char *digit;
     long number;
-    SocHostEnt *hostEnt;
+    SOCHostEnt *hostEnt;
 
     if (string == NULL || string[0] == '\0') {
         ip = 0;
@@ -57,13 +57,13 @@ BOOL gt2StringToAddress(const char *string, u32 *ipOut, u16 *portOut) {
             digit = colon + 1;
             while (*digit != '\0') {
                 if (!isdigit(*digit)) {
-                    return FALSE;
+                    return gsi_false;
                 }
                 digit++;
             }
             number = atol(colon + 1);
             if (number < 0 || number > 0xffff) {
-                return FALSE;
+                return gsi_false;
             }
             port = number;
         }
@@ -72,9 +72,9 @@ BOOL gt2StringToAddress(const char *string, u32 *ipOut, u16 *portOut) {
             if (ip == -1) {
                 hostEnt = SOC_GetHostByName(string);
                 if (hostEnt == NULL) {
-                    return FALSE;
+                    return gsi_false;
                 }
-                ip = *(u32 *)hostEnt->addrList[0];
+                ip = *(gsi_u32 *)hostEnt->addrList[0];
             }
         }
     }
@@ -84,10 +84,10 @@ BOOL gt2StringToAddress(const char *string, u32 *ipOut, u16 *portOut) {
     if (portOut != NULL) {
         *portOut = port;
     }
-    return TRUE;
+    return gsi_true;
 }
 
-void gti2MessageCheck(const void **message, int *length) {
+void gti2MessageCheck(const GT2Byte **message, int *length) {
     if (*message == NULL) {
         *message = "";
         *length = 0;

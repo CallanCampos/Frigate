@@ -13,7 +13,7 @@ typedef struct OSTitleIdList {
     u64 titleIds[OS_TITLE_ID_LIST_MAX];
 } OSTitleIdList;
 
-#define OS_TITLE_ID_LIST ((OSTitleIdList *)0x02ffd800)
+#define HW_OS_TITLE_ID_LIST 0x02ffd800
 // The same IDs, which the search reads by their own address
 #define OS_TITLE_IDS ((u64 *)0x02ffd850)
 // A title the list marks as not to be jumped to
@@ -27,7 +27,7 @@ u64 OSi_SenderTitleId;
 #pragma section LTDMAIN begin
 
 u64 OSi_FindSystemTitleId(u64 titleId, u64 mask) {
-    const OSTitleIdList *list = OS_TITLE_ID_LIST;
+    const OSTitleIdList *list = (const OSTitleIdList *)HW_OS_TITLE_ID_LIST;
     u8 count = list->count;
     int i;
 

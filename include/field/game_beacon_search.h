@@ -13,6 +13,6 @@ BOOL GameBeaconSearch_Exit(u32 *seq, void *param, void *work);
 BOOL GameBeaconSearch_ExitWait(u32 *seq, void *param, void *work);
 void GameBeaconSearch_Main(u32 *seq, void *param, void *work);
 // Waits a while before taking the beacons of type 0x35 again
-void GameBeaconSearch_StartType35Wait(void *work);
+void GameBeaconSearch_StartType35Wait(BeaconSearchWork *work);
 
 #endif // POKEBW2_FIELD_GAME_BEACON_SEARCH_H

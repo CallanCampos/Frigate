@@ -72,11 +72,6 @@ enum {
     AWARDS_RESULT_REGIONAL,
 };
 
-// Which Pokédex counts, with PokeDex_GetMode's values
-#define DEX_REGIONAL 0
-#define DEX_NATIONAL 1
-#define DEX_NATIONAL_OBTAINED 2
-
 typedef struct {
     ZukanParam *param;
     GameProcManager *procManager;
@@ -150,7 +145,7 @@ static BOOL Zukan_Init(GameProc *proc, u32 *state, void *param, void *work) {
     if (wk->param->start == ZUKAN_START_OPEN) {
         wk->state = STATE_OPEN;
     } else if (wk->param->start == ZUKAN_START_LIST) {
-        if (PokeDex_GetMode(wk->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+        if (PokeDex_GetMode(wk->param->pokedex) == DEX_HABITAT) {
             wk->state = STATE_AWARDS;
         } else {
             wk->state = STATE_LIST;
@@ -249,7 +244,7 @@ static u32 Zukan_StateAfterOpen(ZukanWork *work) {
         next = STATE_EXIT;
         break;
     case ZUKAN_OPEN_RESULT_DONE:
-        if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+        if (PokeDex_GetMode(work->param->pokedex) == DEX_HABITAT) {
             next = STATE_AWARDS;
         } else {
             next = STATE_LIST;
@@ -266,7 +261,7 @@ static u32 Zukan_StateList(ZukanWork *work) {
     work->subParam = list;
     list->gameData = work->param->gameData;
     list->pokedex = work->param->pokedex;
-    if (PokeDex_GetMode(list->pokedex) == DEX_NATIONAL_OBTAINED) {
+    if (PokeDex_GetMode(list->pokedex) == DEX_HABITAT) {
         PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
     }
     list->searched = work->searched;
@@ -349,7 +344,7 @@ static u32 Zukan_StateAfterSearch(ZukanWork *work) {
     switch (search->result) {
     case SEARCH_RESULT_FOUND:
         Zukan_FreeList(work);
-        if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+        if (PokeDex_GetMode(work->param->pokedex) == DEX_HABITAT) {
             PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
         }
         work->list = search->list;
@@ -358,7 +353,7 @@ static u32 Zukan_StateAfterSearch(ZukanWork *work) {
         next = STATE_LIST;
         break;
     case SEARCH_RESULT_CANCEL:
-        if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+        if (PokeDex_GetMode(work->param->pokedex) == DEX_HABITAT) {
             PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
         }
         work->searched = 0;
@@ -421,7 +416,7 @@ static u32 Zukan_StateAfterDetail(ZukanWork *work) {
         break;
     case ZUKAN_DETAIL_RESULT_RETURN:
         if (work->fromHabitat == 0) {
-            if (PokeDex_GetMode(work->param->pokedex) == DEX_NATIONAL_OBTAINED) {
+            if (PokeDex_GetMode(work->param->pokedex) == DEX_HABITAT) {
                 PokeDex_SetMode(work->param->pokedex, DEX_REGIONAL);
             }
             work->param->result = 0;
@@ -473,7 +468,7 @@ static u32 Zukan_StateAfterHabitat(ZukanWork *work) {
             work->page = ZUKAN_DETAIL_PAGE_MAP;
             next = STATE_DETAIL;
         } else {
-            PokeDex_SetMode(work->param->pokedex, DEX_NATIONAL_OBTAINED);
+            PokeDex_SetMode(work->param->pokedex, DEX_HABITAT);
             next = STATE_AWARDS;
         }
         work->fromHabitat = 0;
@@ -531,7 +526,7 @@ static u32 Zukan_StateAfterAwards(ZukanWork *work) {
 
         ZukanHabitatSave_SetSeason(habitat, Season_GetRealTime());
         ZukanHabitatSave_SetType(habitat, 0);
-        PokeDex_SetMode(work->param->pokedex, DEX_NATIONAL_OBTAINED);
+        PokeDex_SetMode(work->param->pokedex, DEX_HABITAT);
         next = STATE_HABITAT;
         break;
     }

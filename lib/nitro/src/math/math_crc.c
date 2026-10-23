@@ -1,4 +1,5 @@
-// NitroSDK libmath's math_crc.c: CRC-8, CRC-16 and CRC-32 through 256-entry tables.
+// NitroSDK libmath's CRC-8, CRC-16 and CRC-32 through 256-entry tables, which are in the SDK's crc.c, as ntrtwl's
+// reconstruction of NitroSDK has it.
 // The split from math_sha1.c and math.c is certain (a run of table and update functions between them).
 #include "nitro/math.h"
 

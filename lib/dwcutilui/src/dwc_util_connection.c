@@ -5,33 +5,32 @@
 #include "dwcutil/dwcutil_ac.h"
 #include "nitro/os.h"
 
-static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status);
-static void *DWCUtilConnection_Alloc(u32 size);
-static void DWCUtilConnection_Free(void *ptr);
+static void cbConfig(const ATERMApConfigState *status);
+static void *memAlloc(u32 size);
+static void memFree(void *ptr);
 
 // Defined in this file, which doesn't read it, since dwc_util_main_menu.c reaches its own .bss from the address of
 // its first static
 DWCUtilMsg *gDWCUtilMsg;
-static DWCUtilAcStatus *sStatus;
+static ATERMApConfigState *sStatus;
 
-void DWCUtilConnection_Start(void) {
-    sStatus = DWCUtilHeap_AllocClear(sizeof(DWCUtilAcStatus), -4);
-    if (DWCUtilAc_Start(0xf, 0x40, DWCUtilConnection_OnStatus, DWCUtilConnection_Alloc, DWCUtilConnection_Free,
-                        0x800) != TRUE) {
+void DWCi_RAKUlInit(void) {
+    sStatus = DWCi_HEAPlAllocEx(sizeof(ATERMApConfigState), -4);
+    if (ATERMi_ApConfigStart(0xf, 0x40, cbConfig, memAlloc, memFree, 0x800) != TRUE) {
         OS_Terminate();
     }
     OS_Sleep(10);
 }
 
-void DWCUtilConnection_Stop(void) {
-    if (DWCUtilAc_Cancel() != TRUE) {
+void DWCi_RAKUlEnd(void) {
+    if (ATERMi_ApConfigEnd() != TRUE) {
         OS_Terminate();
     }
-    DWCUtilHeap_FreeAndNull(&sStatus);
+    DWCi_HEAPlFree_(&sStatus);
 }
 
-int DWCUtilConnection_GetState(void) {
-    DWCUtilAcResult result;
+int DWCi_RAKUlGetState(void) {
+    ATERMApConfigParam result;
 
     switch (sStatus->state) {
     case 0:
@@ -44,10 +43,10 @@ int DWCUtilConnection_GetState(void) {
     case 4:
         return 2;
     case 6:
-        if (DWCUtilAc_GetResult(&result) != TRUE) {
+        if (ATERMi_ApConfigGetResult(&result) != TRUE) {
             OS_Terminate();
         }
-        if (result.wepMode >= 0 && result.wepMode <= 3 && result.keyCount == 1) {
+        if (result.auth_mode >= 0 && result.auth_mode <= 3 && result.wepkeyid == 1) {
             return 3;
         }
         return 5;
@@ -56,23 +55,23 @@ int DWCUtilConnection_GetState(void) {
     }
 }
 
-void DWCUtilConnection_SaveResult(void) {
-    DWCUtilAcResult result;
+void DWCi_RAKUlSetResult(void) {
+    ATERMApConfigParam result;
 
-    if (DWCUtilAc_GetResult(&result) != TRUE) {
+    if (ATERMi_ApConfigGetResult(&result) != TRUE) {
         OS_Terminate();
     }
-    DWCUtilWifiSettings_SaveAcResult(&result);
+    DWCi_SETTINGlSetRaku(&result);
 }
 
-static void DWCUtilConnection_OnStatus(const DWCUtilAcStatus *status) {
+static void cbConfig(const ATERMApConfigState *status) {
     *sStatus = *status;
 }
 
-static void *DWCUtilConnection_Alloc(u32 size) {
-    return DWCUtilHeap_AllocClear(size, 32);
+static void *memAlloc(u32 size) {
+    return DWCi_HEAPlAllocEx(size, 32);
 }
 
-static void DWCUtilConnection_Free(void *ptr) {
-    DWCUtilHeap_Free(ptr);
+static void memFree(void *ptr) {
+    DWCi_HEAPlFree2(ptr);
 }

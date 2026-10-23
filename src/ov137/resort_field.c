@@ -397,7 +397,8 @@ void ResortField_Setup(Field *field) {
     entries = ResortSys_GetEntries(work->sys);
     for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
         void *entry = JoinAvenueEntryList_Get(entries, i);
-        if (!JoinAvenueEntry_IsEmpty(entry) && (u16)JoinAvenueEntry_GetParam(entry, 3, NULL) == 223) {
+        if (!JoinAvenueEntry_IsEmpty(entry) &&
+            (u16)JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_TRAINER_TYPE, NULL) == 223) {
             HollowRivalSave_SetValue(block, 2, 15);
             return;
         }
@@ -517,21 +518,21 @@ static void ResortWatch_CheckLists(ResortWatch *watch) {
 
     for (i = 0; i < JoinAvenuePersonList_GetCount(watch->list); i++) {
         JoinAvenuePerson *person = JoinAvenuePersonList_Get(watch->list, i);
-        u32 value = joinAveTextHandler(person, 28, NULL);
+        u32 value = joinAveTextHandler(person, JOIN_AVE_PARAM_STATUS, NULL);
         if (!JoinAvenuePerson_IsEmpty(person) && value != 0) {
-            JoinAvenuePerson_SetParam(person, 28, 0);
+            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, 0);
             if (!watch->setup.callback(watch->setup.context, person, 2, value)) {
-                JoinAvenuePerson_SetParam(person, 28, value);
+                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, value);
             }
         }
     }
     for (j = 0; j < JoinAvenuePersonList_GetCount(watch->list2); j++) {
         JoinAvenuePerson *person = JoinAvenuePersonList_Get(watch->list2, j);
-        u32 value = joinAveTextHandler(person, 28, NULL);
+        u32 value = joinAveTextHandler(person, JOIN_AVE_PARAM_STATUS, NULL);
         if (!JoinAvenuePerson_IsEmpty(person) && value != 0) {
-            JoinAvenuePerson_SetParam(person, 28, 0);
+            JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, 0);
             if (!watch->setup.callback(watch->setup.context, person, 2, value)) {
-                JoinAvenuePerson_SetParam(person, 28, value);
+                JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_STATUS, value);
             }
         }
     }
@@ -794,7 +795,7 @@ static void ResortWalker_StartAt(ResortWalker *walker, u16 acmd, u16 dir, u16 x,
         }
     }
     ResortPerson_SetVisible(walker->person, TRUE);
-    ResortPerson_SetParam(walker->person, 38, 1);
+    ResortPerson_SetParam(walker->person, JOIN_AVE_PARAM_UNK_38, 1);
     if (walker->start != NULL) {
         walker->start(walker);
     }
@@ -823,7 +824,7 @@ static void ResortWalker_MarkObjCodeChanged(ResortWalker *walker) {
 
 static BOOL ResortWalker_IsFast(ResortWalker *walker) {
     u32 type = ResortPerson_GetAttr(walker->person, 0);
-    u32 value = ResortPerson_GetParam(walker->person, 31, NULL);
+    u32 value = ResortPerson_GetParam(walker->person, JOIN_AVE_PARAM_SHOP_KIND, NULL);
     if (type == 1 && (value == 2 || value == 3)) {
         return TRUE;
     }
@@ -839,10 +840,10 @@ static BOOL ResortWalker_IsBlocked(ResortWalker *walker, MMSys *mmSys, FieldPlay
 
 static void ResortWalker_SetupWalk(ResortWalker *walker) {
     s16 stepSpeed;
-    u16 speed = ResortPerson_GetParam(walker->person, 34, NULL);
+    u16 speed = ResortPerson_GetParam(walker->person, JOIN_AVE_PARAM_DATA_COUNT, NULL);
 
     if (ResortPerson_GetAttr(walker->person, 0) == 1) {
-        u32 value = ResortPerson_GetParam(walker->person, 31, NULL);
+        u32 value = ResortPerson_GetParam(walker->person, JOIN_AVE_PARAM_SHOP_KIND, NULL);
         if (value == 2 || value == 3) {
             speed = 7;
         }
@@ -865,7 +866,7 @@ static BOOL ResortWalker_StateCheckSteps(ResortWalker *walker, MMSys *mmSys, Fie
         walker->state = 0;
         ResortPerson_SetVisible(walker->person, FALSE);
         ResortField_SetActorPos(ResortPerson_GetActor(walker->person), 0, 0);
-        ResortPerson_SetParam(walker->person, 38, 0);
+        ResortPerson_SetParam(walker->person, JOIN_AVE_PARAM_UNK_38, 0);
         return FALSE;
     }
     walker->state = 1;
@@ -986,7 +987,7 @@ static void ResortWalker_RunStates(ResortWalker *walker, MMSys *mmSys, FieldPlay
 
 static void ResortWalker_FindStops(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants) {
     int i;
-    u16 id = ResortPerson_GetParam(walker->person, 19, NULL);
+    u16 id = ResortPerson_GetParam(walker->person, JOIN_AVE_PARAM_SHOP_ID, NULL);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetShop(shops, id), 0);
 
     GetGPosZ(ResortPerson_GetActor(walker->person));
@@ -1452,7 +1453,7 @@ static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPerson
     switch (kind) {
     case 0: {
         u16 name[10];
-        ResortData_GetParam(data, 5, name);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_GREETING, name);
         GFL_StrBufLoadString(bubble->strbuf, name);
         break;
     }
@@ -1460,28 +1461,28 @@ static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPerson
     case 3:
     default: {
         u16 text[9];
-        ResortData_GetParam(data, 88, text);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_MESSAGE1, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
     }
     case 2: {
         u16 text[9];
-        ResortData_GetParam(data, 89, text);
+        ResortData_GetParam(data, JOIN_AVE_PARAM_MESSAGE2, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 2;
         break;
     }
     case 4: {
         u16 text[9];
-        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), 88, text);
+        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), JOIN_AVE_PARAM_MESSAGE1, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
     }
     case 5: {
         u16 text[9];
-        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), 89, text);
+        joinAveTextHandler(JoinAvenueOccupants_GetPlayerPerson(occupants), JOIN_AVE_PARAM_MESSAGE2, text);
         GFL_StrBufLoadString(bubble->strbuf, text);
         style = 1;
         break;
@@ -1681,7 +1682,7 @@ static BOOL ResortFieldPeople_WatchCallbackFiltered(void *context, void *person,
     BOOL handle = FALSE;
 
     if (a2 == 1) {
-        u32 value = JoinAvenueEntry_GetParam(person, 31, NULL);
+        u32 value = JoinAvenueEntry_GetParam(person, JOIN_AVE_PARAM_SHOP_KIND, NULL);
         if (value == 2 || value == 3) {
             handle = TRUE;
         }
@@ -1904,7 +1905,8 @@ static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, Heap
         add = TRUE;
         for (i = 0; i < JoinAvenueEntryList_GetCount(entries); i++) {
             void *entry = JoinAvenueEntryList_Get(entries, i);
-            if (!JoinAvenueEntry_IsEmpty(entry) && JoinAvenueEntry_GetParam(entry, 31, NULL) == 5) {
+            if (!JoinAvenueEntry_IsEmpty(entry) &&
+                JoinAvenueEntry_GetParam(entry, JOIN_AVE_PARAM_SHOP_KIND, NULL) == 5) {
                 add = FALSE;
                 break;
             }

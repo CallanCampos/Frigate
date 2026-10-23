@@ -69,7 +69,9 @@ typedef struct {
     u32 playerId;
     u16 playerName[8];
     u32 unk18;
-    u8 unk1C[8];
+    // The console's MAC address, which the library fills in itself
+    u8 macAddress[6];
+    u8 unk22[2];
     // An e-mail address, which the server confirms (see Dpw_Common_ProfileResult)
     char mailAddr[56];
     u32 unk5C;
@@ -82,7 +84,7 @@ typedef struct {
 } Dpw_Common_ProfileResult;
 
 // Starts and ends the library, for the player's ID and friend key
-void DpwTr_Init(s32 pid, u64 friendKey, int a2);
+void DpwTr_Init(s32 pid, u64 friendKey, int server);
 void DpwTr_End(void);
 // Runs the library's requests, every frame
 void DpwTr_Process(void);
@@ -96,7 +98,7 @@ void DpwTr_SetProfile(Dpw_Common_Profile *profile, Dpw_Common_ProfileResult *res
 void DpwTr_Search(const Dpw_Tr_PokemonSearchData *search, s32 maxNum, Dpw_Tr_Data *result);
 void DpwTr_SearchEx(const Dpw_Tr_PokemonSearchDataEx *search, Dpw_Tr_Data *result);
 // Deposits a Pokémon with its signature, and ends the deposit
-void DpwTr_Upload(Dpw_Tr_Data *data, const void *sign, u32 size);
+void DpwTr_Upload(const Dpw_Tr_Data *data, const void *sign, u32 size);
 void DpwTr_UploadFinish(void);
 // Asks for the player's deposited Pokémon, and whether it was traded
 void DpwTr_Download(Dpw_Tr_Data *result);
@@ -107,7 +109,7 @@ void DpwTr_ReturnFinish(void);
 // Cancels the request
 void DpwTr_Cancel(void);
 // Trades for the Pokémon of the given ID, and ends the trade
-void DpwTr_Exchange(s32 id, Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void *sign, u32 size);
+void DpwTr_Exchange(s32 id, const Dpw_Tr_Data *upload, Dpw_Tr_Data *result, const void *sign, u32 size);
 void DpwTr_ExchangeFinish(void);
 
 #endif // POKEBW2_DPW_DPW_TR_H

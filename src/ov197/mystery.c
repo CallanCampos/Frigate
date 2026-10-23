@@ -414,7 +414,7 @@ static void MysteryActors_Init(MysteryActors *actors, ClActUnit *unit, HeapID he
     actors->cellAnims = ClActSys_LoadCellAnims(arc, 34, 37, heapId);
     actors->chars = ClActSys_LoadChars(arc, 16, FALSE, CLACT_VRAM_BOTH, heapId);
     buffer = GFL_G2DIOReadNCLRArc(arc, 8, &palette, heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(colors, actors->fromColors, sizeof(actors->fromColors));
     colors += 16;
     MI_CpuCopy8(colors, actors->toColors, sizeof(actors->toColors));
@@ -1573,7 +1573,7 @@ static void MysteryEffect_Init(MysteryEffect *effect, ClActUnit *unit, const Mys
         palNo = sKindPalettes[recv->gift.kind];
     }
     buffer = GFL_G2DIOReadNCLR(ARCID_MYSTERY, 2, &palette, heapId);
-    colors = palette->rawData;
+    colors = palette->pRawData;
     MI_CpuCopy8(colors, effect->baseColors, sizeof(effect->baseColors));
     MI_CpuCopy8(colors + palNo * 16, effect->kindColors, sizeof(effect->kindColors));
     GFL_HeapFree(buffer);
@@ -2016,7 +2016,7 @@ static u32 Mystery_GetSpriteBottom(BoxPkm *pkm, HeapID heapId) {
     PokeGra_CellCharsToImage(charData, HEAPID_TAIL(heapId));
     for (row = 11; row >= 0; row--) {
         for (col = 0; col < 12; col++) {
-            tile = (u32 *)charData->rawData + (row * 12 + col) * 8;
+            tile = (u32 *)charData->pRawData + (row * 12 + col) * 8;
             for (y = 7; y >= 0; y--) {
                 if (tile[y] != 0) {
                     if (bottom < y + row * 8) {

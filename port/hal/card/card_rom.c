@@ -52,7 +52,7 @@ static void CARDi_ReadRomTask(CARDiCommon *p) {
 // NitroSDK's CARDi_ReadRom: reads len bytes of the ROM from the offset src into dst, calling the callback with its
 // argument at the end, and waits for the end unless async. The DMA channel's number only chose, on the DS, between a
 // read by DMA and one by the CPU; a host read is the same either way
-void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async) {
+void CARDi_ReadRom(u32 dma, const void *src, void *dst, u32 len, MIDmaCallback callback, void *arg, BOOL async) {
     CARDiCommon *p = &cardi_common;
 
     CARD_CheckEnabled();
@@ -62,7 +62,8 @@ void CARDi_ReadRom(u32 dma, u32 src, void *dst, u32 len, MIDmaCallback callback,
     CARDi_WaitForTask(p, TRUE, callback, arg);
     p->dmaInterface = CARDi_GetDmaInterface(dma);
     p->dma = p->dmaInterface != NULL ? dma & 3 : (u32)-1;
-    p->src = src + cardi_rom_base;
+    // The SDK pointer carries a 32-bit cartridge offset, never a host-memory address.
+    p->src = (u32)(uptr)src + cardi_rom_base;
     p->dst = 0;
     p->len = len;
     sReadDst = dst;
@@ -79,10 +80,10 @@ void CARDi_InitRom(void) {
     port_card_boot();
     sRomReader = CARDi_ReadRomWithCPU;
     if (OS_GetBootType() == OS_BOOTTYPE_ROM) {
-        if (CARD_GetOwnRomHeader()->romSize != 0) {
+        if (CARD_GetOwnRomHeader()->rom_size != 0) {
             u16 lockId = OS_GetLockID();
             CARD_LockRom(lockId);
-            CARDi_ReadRomWithCPU(NULL, sRomAuthCode, CARD_GetOwnRomHeader()->romSize, sizeof(sRomAuthCode));
+            CARDi_ReadRomWithCPU(NULL, sRomAuthCode, CARD_GetOwnRomHeader()->rom_size, sizeof(sRomAuthCode));
             CARD_UnlockRom(lockId);
             OS_ReleaseLockID(lockId);
         }

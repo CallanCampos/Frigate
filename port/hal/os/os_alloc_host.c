@@ -31,29 +31,29 @@
 #define EXTRA_HEAP_SIZE 0x4000
 
 // os_alloc.c's rounding, on the whole address
-#define HOST_ROUND_UP_32(x) ((void *)(((uintptr_t)(x) + OS_ALLOC_ALIGNMENT - 1) & ~(uintptr_t)(OS_ALLOC_ALIGNMENT - 1)))
-#define HOST_ROUND_DOWN_32(x) ((void *)((uintptr_t)(x) & ~(uintptr_t)(OS_ALLOC_ALIGNMENT - 1)))
+#define HOST_ROUND_UP_32(x) ((void *)(((uintptr_t)(x) + ALIGNMENT - 1) & ~(uintptr_t)(ALIGNMENT - 1)))
+#define HOST_ROUND_DOWN_32(x) ((void *)((uintptr_t)(x) & ~(uintptr_t)(ALIGNMENT - 1)))
 
 // NitroSDK's OS_InitAlloc: makes the arena's table of heaps, with room for the number of them, at the start of the
 // memory that it is given, and returns where the memory that is left starts
-void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
+void *OS_InitAlloc(OSArenaId arena, void *start, void *end, int maxHeaps) {
     OSHeapInfo *info = start;
     u32 heapsSize;
     u32 irq = OS_DisableInterrupts();
     int i;
 
-    sHeapInfo[arena] = info;
-    heapsSize = maxHeaps * sizeof(OSHeap);
-    info->heaps = (OSHeap *)((u8 *)info + sizeof(OSHeapInfo));
+    OSiHeapInfo[arena] = info;
+    heapsSize = maxHeaps * sizeof(HeapDesc);
+    info->heapArray = (HeapDesc *)((u8 *)info + sizeof(OSHeapInfo));
     info->numHeaps = maxHeaps;
     for (i = 0; i < info->numHeaps; i++) {
-        OSHeap *hp = &info->heaps[i];
+        HeapDesc *hp = &info->heapArray[i];
 
         hp->size = -1;
         hp->free = hp->allocated = NULL;
     }
-    info->current = -1;
-    info->arenaStart = HOST_ROUND_UP_32((u8 *)info->heaps + heapsSize);
+    info->currentHeap = -1;
+    info->arenaStart = HOST_ROUND_UP_32((u8 *)info->heapArray + heapsSize);
     end = HOST_ROUND_DOWN_32(end);
     info->arenaEnd = end;
     OS_RestoreInterrupts(irq);
@@ -62,18 +62,18 @@ void *OS_InitAlloc(int arena, void *start, void *end, int maxHeaps) {
 
 // NitroSDK's OS_CreateHeap: makes a heap of the memory from start to end (rounded in to 0x20), and returns its number,
 // or -1 when the arena has no room for another heap
-int OS_CreateHeap(int arena, void *start, void *end) {
+int OS_CreateHeap(OSArenaId arena, void *start, void *end) {
     OSHeapInfo *info;
-    OSHeap *hp;
-    OSAllocCell *cell;
+    HeapDesc *hp;
+    Cell *cell;
     int heap;
     u32 irq = OS_DisableInterrupts();
 
-    info = sHeapInfo[arena];
+    info = OSiHeapInfo[arena];
     start = HOST_ROUND_UP_32(start);
     end = HOST_ROUND_DOWN_32(end);
     for (heap = 0; heap < info->numHeaps; heap++) {
-        hp = &info->heaps[heap];
+        hp = &info->heapArray[heap];
         if (hp->size < 0) {
             hp->size = (s32)((u8 *)end - (u8 *)start);
             cell = start;
@@ -92,17 +92,17 @@ int OS_CreateHeap(int arena, void *start, void *end) {
 
 // NitroSDK's OS_CreateExtraHeap: on a DS, makes a heap of the 16 KiB at the start of the main memory once, in the first
 // heap of the arena that is free. Gives the heap's number, or -1
-int OS_CreateExtraHeap(int arena) {
+int OS_CreateExtraHeap(OSArenaId arena) {
     OSHeapInfo *info;
-    OSHeap *hp;
-    OSAllocCell *cell;
+    HeapDesc *hp;
+    Cell *cell;
     int heap;
     u32 irq = OS_DisableInterrupts();
 
-    info = sHeapInfo[arena];
+    info = OSiHeapInfo[arena];
     if (!OS_IsRunOnTwl() && sExtraHeap.heap < 0) {
         for (heap = 0; heap < info->numHeaps; heap++) {
-            hp = &info->heaps[heap];
+            hp = &info->heapArray[heap];
             if (hp->size < 0) {
                 hp->size = EXTRA_HEAP_SIZE;
                 cell = port_hw_pointer(EXTRA_HEAP_ADDRESS);
@@ -127,7 +127,7 @@ void port_osi_reset_alloc(void) {
     int i;
 
     for (i = 0; i < OS_ARENA_MAX; i++) {
-        sHeapInfo[i] = NULL;
+        OSiHeapInfo[i] = NULL;
     }
     sExtraHeap.heap = -1;
     sExtraHeap.arena = -1;

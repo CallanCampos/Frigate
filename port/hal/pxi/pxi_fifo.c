@@ -149,7 +149,7 @@ void PXI_InitFifo(void) {
     OS_RestoreInterrupts(enabled);
 }
 
-void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
+void PXI_SetFifoRecvCallback(int fifoTag, PXIFifoCallback callback) {
     OSSystemWork *work = OS_GetSystemWork();
     u32 enabled = OS_DisableInterrupts();
 
@@ -163,7 +163,7 @@ void PXI_SetFifoRecvCallback(u32 fifoTag, PXIFifoCallback callback) {
     OS_RestoreInterrupts(enabled);
 }
 
-BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor) {
+BOOL PXI_IsCallbackReady(int fifoTag, PXIProc processor) {
     OSSystemWork *work = OS_GetSystemWork();
 
     return (work->pxiHandleChecker[processor] & (1u << fifoTag)) != 0;
@@ -171,7 +171,7 @@ BOOL PXI_IsCallbackReady(u32 fifoTag, u32 processor) {
 
 // NitroSDK's PXI_SendWordByFifo: the ARM7 takes the word at once, so the FIFO is never full. Then the interrupts that
 // the ARM7's answer raised are taken, if the ARM9 can take them now
-int PXI_SendWordByFifo(u32 fifoTag, u32 data, BOOL err) {
+int PXI_SendWordByFifo(int fifoTag, u32 data, BOOL err) {
     PXIFifoMessage message;
 
     message.raw = 0;

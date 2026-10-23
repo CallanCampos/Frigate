@@ -22,8 +22,14 @@ typedef void (*DWCRapDisconnectFunc)(u8 netId, void *work);
 
 // Whether the Wi-Fi connection has been started
 BOOL DWCRap_IsInitialized(void);
-// Starts the connection with the player's user data and friend list, returning 0, or 1 or 2 if the user data is
-// invalid
+// What DWCRap_Init returns: the connection started, or the user data has no profile or is not this console's
+enum {
+    DWCRAP_INIT_OK,
+    DWCRAP_INIT_NO_PROFILE,
+    DWCRAP_INIT_INVALID_CONSOLE,
+};
+
+// Starts the connection with the player's user data and friend list, returning DWCRAP_INIT_*
 int DWCRap_Init(void *userData, DWCFriendData *friendList);
 // Sets the functions that machines' data goes to: the one called on the parent, and the one on the children
 void DWCRap_SetRecvFuncs(GFLNetRecvFunc parentFunc, GFLNetRecvFunc childFunc);
@@ -32,7 +38,7 @@ void DWCRap_SetRequestFunc(DWCRapRequestFunc func);
 // Starts matching with whoever has the same key, as numEntry machines
 BOOL DWCRap_StartMatch(const char *key, int numEntry, BOOL a2, int a3);
 // Starts a match of numEntry machines on a query, with a function that rates the candidates
-BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalFunc evalFunc, void *evalWork);
+BOOL DWCRap_StartMatchQuery(const char *query, int numEntry, DWCEvalPlayerCallback evalFunc, void *evalWork);
 // Runs the connection for a frame
 int DWCRap_Process(int a0);
 // Sends data to the other machines, as a packet of the type

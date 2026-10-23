@@ -74,10 +74,131 @@ enum {
     COMM_ENTRY_ASK_NO,
 };
 
-// The steps of CommEntryMenu_AskCancel after the answer: the leader keeps the group, and the answer is returned
+// The steps of the leader's menu: open the windows, start the server unless the Union Room's connection is up, wait
+// for a player to connect and negotiate, add the leader itself, gather the players, ask whether the group is OK or
+// whether to cancel, wait for the synchronization, check on the members and wait for their replies, cancel or start
+// the activity or disband the group, print the error and wait, wait for the members to disconnect, print that there
+// are no members and wait, and end
 enum {
+    COMM_ENTRY_LEADER_SEQ_INIT,
+    COMM_ENTRY_LEADER_SEQ_START_SERVER,
+    COMM_ENTRY_LEADER_SEQ_WAIT_CONNECT,
+    COMM_ENTRY_LEADER_SEQ_WAIT_NEGOTIATE,
+    COMM_ENTRY_LEADER_SEQ_SEND_SELF,
+    COMM_ENTRY_LEADER_SEQ_GATHER,
+    COMM_ENTRY_LEADER_SEQ_ASK_GROUP_OK,
+    COMM_ENTRY_LEADER_SEQ_ASK_CANCEL,
+    COMM_ENTRY_LEADER_SEQ_WAIT_SYNC,
+    COMM_ENTRY_LEADER_SEQ_SEND_CHECK,
+    COMM_ENTRY_LEADER_SEQ_WAIT_CHECK,
+    COMM_ENTRY_LEADER_SEQ_SEND_CANCEL,
+    COMM_ENTRY_LEADER_SEQ_SEND_START,
+    COMM_ENTRY_LEADER_SEQ_SEND_DISBAND,
+    COMM_ENTRY_LEADER_SEQ_PRINT_ERROR,
+    COMM_ENTRY_LEADER_SEQ_WAIT_ERROR,
+    COMM_ENTRY_LEADER_SEQ_WAIT_DISCONNECT,
+    COMM_ENTRY_LEADER_SEQ_PRINT_NO_MEMBERS,
+    COMM_ENTRY_LEADER_SEQ_WAIT_NO_MEMBERS,
+    COMM_ENTRY_LEADER_SEQ_END,
+};
+
+// The steps of the menu that picks a leader: print the prompt and wait, open the list of the leaders and scan, run the
+// list, print the leader's acceptance and wait, wait for the members, synchronize and wait, print the error and wait,
+// start the network again after a refusal, and cancel and end
+enum {
+    COMM_ENTRY_SELECT_SEQ_PRINT_CHOOSE,
+    COMM_ENTRY_SELECT_SEQ_WAIT_CHOOSE,
+    COMM_ENTRY_SELECT_SEQ_START_SCAN,
+    COMM_ENTRY_SELECT_SEQ_LIST,
+    COMM_ENTRY_SELECT_SEQ_WAIT_REPLIED,
+    COMM_ENTRY_SELECT_SEQ_WAIT_MEMBERS,
+    COMM_ENTRY_SELECT_SEQ_SYNC,
+    COMM_ENTRY_SELECT_SEQ_WAIT_SYNC,
+    COMM_ENTRY_SELECT_SEQ_PRINT_ERROR,
+    COMM_ENTRY_SELECT_SEQ_WAIT_ERROR,
+    COMM_ENTRY_SELECT_SEQ_REFUSED,
+    COMM_ENTRY_SELECT_SEQ_WAIT_NET_EXIT,
+    COMM_ENTRY_SELECT_SEQ_NET_INIT,
+    COMM_ENTRY_SELECT_SEQ_WAIT_NET_INIT,
+    COMM_ENTRY_SELECT_SEQ_CANCEL,
+    COMM_ENTRY_SELECT_SEQ_END,
+};
+
+// The steps of the menu of a player that the leader accepts without asking: print the prompt, ask to join, open the
+// windows, wait for the members, synchronize and wait, print the error and wait, print the refusal and wait (which
+// nothing sets), and cancel and end
+enum {
+    COMM_ENTRY_JOIN_SEQ_PRINT_WAIT,
+    COMM_ENTRY_JOIN_SEQ_SEND_ENTRY,
+    COMM_ENTRY_JOIN_SEQ_CREATE_WINDOWS,
+    COMM_ENTRY_JOIN_SEQ_WAIT_MEMBERS,
+    COMM_ENTRY_JOIN_SEQ_SYNC,
+    COMM_ENTRY_JOIN_SEQ_WAIT_SYNC,
+    COMM_ENTRY_JOIN_SEQ_PRINT_ERROR,
+    COMM_ENTRY_JOIN_SEQ_WAIT_ERROR,
+    COMM_ENTRY_JOIN_SEQ_REFUSED,
+    COMM_ENTRY_JOIN_SEQ_WAIT_REFUSED,
+    COMM_ENTRY_JOIN_SEQ_CANCEL,
+    COMM_ENTRY_JOIN_SEQ_END,
+};
+
+// The steps of the menu of a player who asks the leader: print the prompt, ask to join, wait for the leader's reply,
+// open the windows, wait for the members, synchronize and wait, print the error and wait, print the refusal and wait,
+// and cancel and end
+enum {
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_WAIT,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_SEND_ENTRY,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REPLY,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_CREATE_WINDOWS,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_MEMBERS,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_SYNC,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_SYNC,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_ERROR,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_REFUSED,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REFUSED,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_CANCEL,
+    COMM_ENTRY_ASK_TO_JOIN_SEQ_END,
+};
+
+// The steps of CommEntryMenu_UpdateAsk and CommEntryMenu_AskGroupOk: print the question, open the yes/no menu, wait
+// for the answer, and finish
+enum {
+    COMM_ENTRY_ASK_SEQ_PRINT,
+    COMM_ENTRY_ASK_SEQ_OPEN,
+    COMM_ENTRY_ASK_SEQ_ANSWER,
+    COMM_ENTRY_ASK_SEQ_DONE,
+};
+
+// The steps of CommEntryMenu_AskCancel: print the question, open the yes/no menu and wait for the answer, ask again
+// when members have joined, and cancel; after the answer, the leader keeps the group, and the answer is returned
+enum {
+    COMM_ENTRY_CANCEL_SEQ_PRINT,
+    COMM_ENTRY_CANCEL_SEQ_OPEN,
+    COMM_ENTRY_CANCEL_SEQ_ANSWER,
+    COMM_ENTRY_CANCEL_SEQ_OPEN_AGAIN,
+    COMM_ENTRY_CANCEL_SEQ_ANSWER_AGAIN,
+    COMM_ENTRY_CANCEL_SEQ_CANCEL,
     COMM_ENTRY_CANCEL_SEQ_KEEP = 100,
     COMM_ENTRY_CANCEL_SEQ_END = 0xff,
+};
+
+// The steps of the list of the leaders: pick a leader, ask to join once connected, wait for the reply, return the
+// result, ask whether to leave and wait for the answer, and wait on the message of a leader that doesn't answer
+enum {
+    COMM_ENTRY_LIST_SEQ_PICK,
+    COMM_ENTRY_LIST_SEQ_SEND_ENTRY,
+    COMM_ENTRY_LIST_SEQ_WAIT_REPLY,
+    COMM_ENTRY_LIST_SEQ_END,
+    COMM_ENTRY_LIST_SEQ_ASK_LEAVE,
+    COMM_ENTRY_LIST_SEQ_ANSWER_LEAVE,
+    COMM_ENTRY_LIST_SEQ_WAIT_PROBLEM,
+};
+
+// The steps of CommEntryMenu_AskLeave: wait for B, and wait for the answer
+enum {
+    COMM_ENTRY_LEAVE_SEQ_WAIT_B,
+    COMM_ENTRY_LEAVE_SEQ_ANSWER,
 };
 
 // What CommEntryMenu_AskLeave returns: B wasn't pressed, the question is open, or the player leaves
@@ -304,7 +425,7 @@ static u8 CommEntryMenu_UpdateMemberList(CommEntryMenu *menu);
 static void CommEntryMenu_CheckLeft(CommEntryMenu *menu);
 static void CommEntryMenu_DrawMembers(CommEntryMenu *menu);
 static void CommEntryMenu_UpdateEntries(CommEntryMenu *menu);
-static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, u32 netId);
+static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, int netId);
 static BOOL CommEntryMenu_QueueAsk(CommEntryMenu *menu, CommEntryMember *member);
 static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu);
 static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu);
@@ -508,48 +629,48 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
     u8 mask;
     u8 i;
 
-    if (menu->seq != 0) {
+    if (menu->seq != COMM_ENTRY_LEADER_SEQ_INIT) {
         CommEntryMenu_CheckLeft(menu);
         CommEntryMenu_DrawMembers(menu);
         CommEntryMenu_SendAnswers(menu);
     }
     switch (menu->seq) {
-    case 0:
+    case COMM_ENTRY_LEADER_SEQ_INIT:
         CommEntryMenu_CreateWindows(menu);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_AwaitingParticipatingMembersB);
         menu->seq++;
         break;
-    case 1:
+    case COMM_ENTRY_LEADER_SEQ_START_SERVER:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE) {
-            menu->seq = 4;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_SELF;
         } else {
             GFL_NetStartServer();
             menu->seq++;
         }
         break;
-    case 2:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_CONNECT:
         if (NetSystem_CountConnected() > 1) {
             if (NetHandle_SendNegotiation() == TRUE) {
                 menu->seq++;
             }
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             // The cancel question's step is set and replaced at once: the menu ends without asking
-            menu->seq = 7;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_ASK_CANCEL;
             menu->result = COMM_ENTRY_MENU_CANCELLED;
-            menu->seq = 19;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_END;
         }
         break;
-    case 3:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_NEGOTIATE:
         if (NetHandle_IsNegotiated(NetHandle_GetOwn()) == TRUE) {
-            menu->seq = 4;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_SELF;
         }
         break;
-    case 4:
+    case COMM_ENTRY_LEADER_SEQ_SEND_SELF:
         if (CommEntryMenu_SendEntry(&menu->self, TRUE, menu->sendToAll) == TRUE) {
             menu->seq++;
         }
         break;
-    case 5: {
+    case COMM_ENTRY_LEADER_SEQ_GATHER: {
         int count;
         u16 msg;
 
@@ -563,27 +684,27 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         menu->nextMsg = COMM_ENTRY_NO_MESSAGE;
         if (count >= menu->maxCount || (count >= menu->minCount && (GCTX_HIDGetPressedKeys() & PAD_BUTTON_A))) {
             CommEntryMenu_SaveStates(menu);
-            menu->seq = 6;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_ASK_GROUP_OK;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-            menu->seq = 7;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_ASK_CANCEL;
         } else if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && GFL_NetGetNegotiatedCount() <= 1) {
-            menu->seq = 17;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_PRINT_NO_MEMBERS;
         } else if (msg != COMM_ENTRY_NO_MESSAGE) {
             CommEntryMenu_PrintMessage(menu, msg);
         }
         break;
     }
-    case 6: {
+    case COMM_ENTRY_LEADER_SEQ_ASK_GROUP_OK: {
         u32 answer = CommEntryMenu_AskGroupOk(menu);
 
         if (answer == COMM_ENTRY_ASK_YES) {
             GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
-            menu->seq = 9;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_CHECK;
         } else if (answer == COMM_ENTRY_ASK_NO) {
             if (CommEntryMenu_CountAccepted(menu) >= menu->maxCount) {
-                menu->seq = 7;
+                menu->seq = COMM_ENTRY_LEADER_SEQ_ASK_CANCEL;
             } else {
-                menu->seq = 5;
+                menu->seq = COMM_ENTRY_LEADER_SEQ_GATHER;
                 if (CommEntryMenu_CountAccepted(menu) > 1 && menu->mode == COMM_ENTRY_MENU_MUSICAL) {
                     menu->nextMsg = CommEntryMenu_Text_WhenGroupReadyButton;
                 } else {
@@ -593,26 +714,26 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
         }
         break;
     }
-    case 7: {
+    case COMM_ENTRY_LEADER_SEQ_ASK_CANCEL: {
         u32 answer = CommEntryMenu_AskCancel(menu);
 
         if (answer == COMM_ENTRY_ASK_YES) {
             GFL_NetSetAcceptConnect(NetHandle_GetOwn(), 0);
-            menu->seq = 13;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_DISBAND;
         } else if (answer == COMM_ENTRY_ASK_NO) {
-            menu->seq = 5;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_GATHER;
         }
         break;
     }
-    case 9:
+    case COMM_ENTRY_LEADER_SEQ_SEND_CHECK:
         if (CommEntryMenu_SendCheck(menu->sendToAll) == TRUE) {
             CommEntryMenu_SetReady(menu, GFL_NetGetHandleNetId(NetHandle_GetOwn()));
             menu->checkMask = menu->memberList.mask;
             GFL_NetSetDisconnectError(TRUE);
-            menu->seq = 10;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_CHECK;
         }
         break;
-    case 10:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_CHECK:
         mask = 1 << GFL_NetGetHandleNetId(NetHandle_GetOwn());
 
         for (i = 0;; i++) {
@@ -625,82 +746,82 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
                         mask |= 1U << i;
                     }
                 } else {
-                    menu->seq = 11;
+                    menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_CANCEL;
                     break;
                 }
             }
         }
         if (menu->checkMask == mask) {
             if (MATH_CountPopulation(menu->readyMask) < menu->minCount) {
-                menu->seq = 11;
+                menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_CANCEL;
             } else {
-                menu->seq = 12;
+                menu->seq = COMM_ENTRY_LEADER_SEQ_SEND_START;
             }
         }
         break;
-    case 11:
+    case COMM_ENTRY_LEADER_SEQ_SEND_CANCEL:
         if (CommEntryMenu_SendCancel(menu->sendToAll) == TRUE) {
             menu->checkMask = menu->memberList.mask;
             menu->result = COMM_ENTRY_MENU_CANCELLED;
-            menu->seq = 14;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_PRINT_ERROR;
         }
         break;
-    case 12:
+    case COMM_ENTRY_LEADER_SEQ_SEND_START:
         if (CommEntryMenu_SendStart(menu->sendToAll) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
-            menu->seq = 8;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_SYNC;
             menu->readyCount = MATH_CountPopulation(menu->readyMask);
             NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         }
         break;
-    case 8:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_SYNC:
         if (menu->readyCount != NetSystem_CountConnected() || menu->minCount > NetSystem_CountConnected()) {
             if (CommEntryMenu_SendCancel(menu->sendToAll) == TRUE) {
                 menu->checkMask = menu->memberList.mask;
                 menu->result = COMM_ENTRY_MENU_CANCELLED;
-                menu->seq = 14;
+                menu->seq = COMM_ENTRY_LEADER_SEQ_PRINT_ERROR;
             }
         } else if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) ==
                    TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
-            menu->seq = 19;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_END;
             // Stop the players who look for a leader from finding this one
             CommEntryMenu_GetBeacon()->gameId = 0;
         }
         break;
-    case 13:
+    case COMM_ENTRY_LEADER_SEQ_SEND_DISBAND:
         if (CommEntryMenu_SendCancel(menu->sendToAll) == TRUE) {
             menu->checkMask = menu->memberList.mask;
             menu->result = COMM_ENTRY_MENU_CANCELLED;
-            menu->seq = 16;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_DISCONNECT;
         }
         break;
-    case 14:
+    case COMM_ENTRY_LEADER_SEQ_PRINT_ERROR:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
-        menu->seq = 15;
+        menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_ERROR;
         break;
-    case 15:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_ERROR:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
-            menu->seq = 16;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_DISCONNECT;
         }
         break;
-    case 16:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_DISCONNECT:
         // Wait for the members to disconnect
         if (CommEntryMenu_AnyConnected(menu->checkMask) == FALSE) {
-            menu->seq = 19;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_END;
         }
         break;
-    case 17:
+    case COMM_ENTRY_LEADER_SEQ_PRINT_NO_MEMBERS:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_ThereNoMembersMulti);
-        menu->seq = 18;
+        menu->seq = COMM_ENTRY_LEADER_SEQ_WAIT_NO_MEMBERS;
         break;
-    case 18:
+    case COMM_ENTRY_LEADER_SEQ_WAIT_NO_MEMBERS:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_CANCELLED;
-            menu->seq = 19;
+            menu->seq = COMM_ENTRY_LEADER_SEQ_END;
         }
         break;
-    case 19:
+    case COMM_ENTRY_LEADER_SEQ_END:
         CommEntryMenu_FreeWindows(menu);
         return TRUE;
     }
@@ -714,16 +835,16 @@ static BOOL CommEntryMenu_UpdateLeader(CommEntryMenu *menu) {
 // The menu that picks a leader from the beacons heard and asks to join it
 static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
     switch (menu->seq) {
-    case 0:
+    case COMM_ENTRY_SELECT_SEQ_PRINT_CHOOSE:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->chooseLeader);
         menu->seq++;
         break;
-    case 1:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_CHOOSE:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->seq++;
         }
         break;
-    case 2:
+    case COMM_ENTRY_SELECT_SEQ_START_SCAN:
         CommEntryMenu_FreeLeaderList(menu);
         CommEntryMenu_FreeWindows(menu);
         menu->list.selected = NULL;
@@ -731,42 +852,42 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         GFL_NetStartScan();
         menu->seq++;
         break;
-    case 3:
+    case COMM_ENTRY_SELECT_SEQ_LIST:
         switch (CommEntryMenu_UpdateLeaderList(menu)) {
         case COMM_ENTRY_LEADER_LIST_JOINED:
             CommEntryMenu_FreeLeaderList(menu);
             if (menu->started == TRUE) {
-                menu->seq = 6;
+                menu->seq = COMM_ENTRY_SELECT_SEQ_SYNC;
             } else if (menu->cancelled == TRUE) {
-                menu->seq = 8;
+                menu->seq = COMM_ENTRY_SELECT_SEQ_PRINT_ERROR;
             } else {
                 copyVarForText(menu->wordSet, 0, &menu->list.selected->info);
                 CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_RepliedOk);
-                menu->seq = 4;
+                menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_REPLIED;
             }
             break;
         case COMM_ENTRY_LEADER_LIST_REFUSED:
             CommEntryMenu_FreeLeaderList(menu);
-            menu->seq = 10;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_REFUSED;
             break;
         case COMM_ENTRY_LEADER_LIST_LEFT:
             CommEntryMenu_FreeLeaderList(menu);
-            menu->seq = 14;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_CANCEL;
             break;
         }
         break;
-    case 4:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_REPLIED:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_PleaseWaitBButton_2);
             CommEntryMenu_CreateWindows(menu);
             menu->seq++;
         }
         break;
-    case 5:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_MEMBERS:
         if (CommEntryMenu_AskLeave(menu) == COMM_ENTRY_LEAVE_YES) {
             CommEntryMenu_FreeWindows(menu);
             CommEntryMenu_CloseYesNo(menu);
-            menu->seq = 14;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_CANCEL;
         } else {
             if (menu->sendCheckReply == TRUE && CommEntryMenu_SendCheckReply(menu->sendToAll) == TRUE) {
                 menu->sendCheckReply = FALSE;
@@ -775,42 +896,42 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
             if (menu->started == TRUE) {
                 CommEntryMenu_FreeWindows(menu);
                 CommEntryMenu_CloseYesNo(menu);
-                menu->seq = 6;
+                menu->seq = COMM_ENTRY_SELECT_SEQ_SYNC;
             } else if (menu->cancelled == TRUE) {
                 CommEntryMenu_FreeWindows(menu);
                 CommEntryMenu_CloseYesNo(menu);
-                menu->seq = 8;
+                menu->seq = COMM_ENTRY_SELECT_SEQ_PRINT_ERROR;
             }
         }
         break;
-    case 6:
+    case COMM_ENTRY_SELECT_SEQ_SYNC:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_MembersHaveGatheredPlease);
         }
-        menu->seq = 7;
+        menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_SYNC;
         NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
-    case 7:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_SYNC:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
-            menu->seq = 15;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_END;
         } else if (menu->cancelled == TRUE) {
-            menu->seq = 8;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_PRINT_ERROR;
         }
         break;
-    case 8:
+    case COMM_ENTRY_SELECT_SEQ_PRINT_ERROR:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
-        menu->seq = 9;
+        menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_ERROR;
         break;
-    case 9:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_ERROR:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
-            menu->seq = 14;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_CANCEL;
         }
         break;
-    case 10:
+    case COMM_ENTRY_SELECT_SEQ_REFUSED:
         // The leader refused: start the network again, to pick another
         menu->netWork = GFL_NetGetWork();
         MI_CpuCopy8(GFL_NetGetInitData(), &menu->netInit, sizeof(GFLNetInitData));
@@ -818,28 +939,28 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
         GFL_NetExit(NULL);
         copyVarForText(menu->wordSet, 0, &menu->replyInfo);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_Refused);
-        menu->seq = 11;
+        menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_NET_EXIT;
         break;
-    case 11:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_NET_EXIT:
         if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
-            menu->seq = 12;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_NET_INIT;
         }
         break;
-    case 12:
+    case COMM_ENTRY_SELECT_SEQ_NET_INIT:
         GFL_NetInit(&menu->netInit, NULL, menu->netWork);
-        menu->seq = 13;
+        menu->seq = COMM_ENTRY_SELECT_SEQ_WAIT_NET_INIT;
         break;
-    case 13:
+    case COMM_ENTRY_SELECT_SEQ_WAIT_NET_INIT:
         if (GFL_NetIsInitialized() == TRUE) {
             CommEntryMenu_AddCommands(menu);
-            menu->seq = 0;
+            menu->seq = COMM_ENTRY_SELECT_SEQ_PRINT_CHOOSE;
         }
         break;
-    case 14:
+    case COMM_ENTRY_SELECT_SEQ_CANCEL:
         menu->result = COMM_ENTRY_MENU_CANCELLED;
-        menu->seq = 15;
+        menu->seq = COMM_ENTRY_SELECT_SEQ_END;
         break;
-    case 15:
+    case COMM_ENTRY_SELECT_SEQ_END:
         CommEntryMenu_FreeLeaderList(menu);
         CommEntryMenu_FreeWindows(menu);
         return TRUE;
@@ -856,24 +977,24 @@ static BOOL CommEntryMenu_UpdateSelectLeader(CommEntryMenu *menu) {
 // The menu of a player the leader accepts without asking
 static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
     switch (menu->seq) {
-    case 0:
+    case COMM_ENTRY_JOIN_SEQ_PRINT_WAIT:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_PleaseWaitBButton);
         menu->seq++;
         break;
-    case 1:
+    case COMM_ENTRY_JOIN_SEQ_SEND_ENTRY:
         if (CommEntryMenu_SendEntry(&menu->self, TRUE, menu->sendToAll) == TRUE) {
             menu->seq++;
         }
         break;
-    case 2:
+    case COMM_ENTRY_JOIN_SEQ_CREATE_WINDOWS:
         CommEntryMenu_CreateWindows(menu);
         menu->seq++;
         break;
-    case 3:
+    case COMM_ENTRY_JOIN_SEQ_WAIT_MEMBERS:
         if (CommEntryMenu_AskLeave(menu) == COMM_ENTRY_LEAVE_YES) {
             CommEntryMenu_FreeWindows(menu);
             CommEntryMenu_CloseYesNo(menu);
-            menu->seq = 10;
+            menu->seq = COMM_ENTRY_JOIN_SEQ_CANCEL;
         } else {
             if (menu->sendCheckReply == TRUE && CommEntryMenu_SendCheckReply(menu->sendToAll) == TRUE) {
                 menu->sendCheckReply = FALSE;
@@ -882,61 +1003,61 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
             if (menu->started == TRUE) {
                 CommEntryMenu_FreeWindows(menu);
                 CommEntryMenu_CloseYesNo(menu);
-                menu->seq = 4;
+                menu->seq = COMM_ENTRY_JOIN_SEQ_SYNC;
             } else if (menu->cancelled == TRUE) {
                 CommEntryMenu_FreeWindows(menu);
                 CommEntryMenu_CloseYesNo(menu);
-                menu->seq = 6;
+                menu->seq = COMM_ENTRY_JOIN_SEQ_PRINT_ERROR;
             }
         }
         break;
-    case 4:
+    case COMM_ENTRY_JOIN_SEQ_SYNC:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_MembersHaveGatheredPlease);
         }
-        menu->seq = 5;
+        menu->seq = COMM_ENTRY_JOIN_SEQ_WAIT_SYNC;
         NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
-    case 5:
+    case COMM_ENTRY_JOIN_SEQ_WAIT_SYNC:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
-            menu->seq = 11;
+            menu->seq = COMM_ENTRY_JOIN_SEQ_END;
         } else if (menu->cancelled == TRUE) {
-            menu->seq = 6;
+            menu->seq = COMM_ENTRY_JOIN_SEQ_PRINT_ERROR;
         }
         break;
-    case 6:
+    case COMM_ENTRY_JOIN_SEQ_PRINT_ERROR:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
-        menu->seq = 7;
+        menu->seq = COMM_ENTRY_JOIN_SEQ_WAIT_ERROR;
         break;
-    case 7:
+    case COMM_ENTRY_JOIN_SEQ_WAIT_ERROR:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_CANCELLED;
-            menu->seq = 11;
+            menu->seq = COMM_ENTRY_JOIN_SEQ_END;
         }
         break;
-    case 8:
+    case COMM_ENTRY_JOIN_SEQ_REFUSED:
         // Nothing sets steps 8 and 9, the leader's refusal as CommEntryMenu_UpdateAskToJoin has it. The leader
         // list's selected leader they print is NULL in this menu, which never creates the list
         GFL_NetExit(NULL);
         copyVarForText(menu->wordSet, 0, &menu->list.selected->info);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_Refused);
-        menu->seq = 9;
+        menu->seq = COMM_ENTRY_JOIN_SEQ_WAIT_REFUSED;
         break;
-    case 9:
+    case COMM_ENTRY_JOIN_SEQ_WAIT_REFUSED:
         if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_REFUSED;
-            menu->seq = 11;
+            menu->seq = COMM_ENTRY_JOIN_SEQ_END;
         }
         break;
-    case 10:
+    case COMM_ENTRY_JOIN_SEQ_CANCEL:
         menu->result = COMM_ENTRY_MENU_CANCELLED;
-        menu->seq = 11;
+        menu->seq = COMM_ENTRY_JOIN_SEQ_END;
         break;
-    case 11:
+    case COMM_ENTRY_JOIN_SEQ_END:
         CommEntryMenu_FreeWindows(menu);
         return TRUE;
     }
@@ -951,47 +1072,47 @@ static BOOL CommEntryMenu_UpdateJoin(CommEntryMenu *menu) {
 // The menu of a player who asks the leader to join
 static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
     switch (menu->seq) {
-    case 0:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_WAIT:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_PleaseWaitBButton);
         menu->seq++;
         break;
-    case 1:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_SEND_ENTRY:
         menu->reply = COMM_ENTRY_REPLY_NONE;
         if (CommEntryMenu_SendEntry(&menu->self, FALSE, menu->sendToAll) == TRUE) {
-            menu->seq = 2;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REPLY;
         }
         break;
-    case 2:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REPLY:
         if (CommEntryMenu_AskLeave(menu) == COMM_ENTRY_LEAVE_YES) {
             CommEntryMenu_FreeWindows(menu);
             // The window is closed twice, and the second call does nothing
             CommEntryMenu_CloseYesNo(menu);
             CommEntryMenu_CloseYesNo(menu);
-            menu->seq = 11;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_CANCEL;
         } else if (menu->reply == COMM_ENTRY_REPLY_ACCEPTED) {
-            menu->seq = 3;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_CREATE_WINDOWS;
             CommEntryMenu_CloseYesNo(menu);
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_AwaitingParticipatingMembersB);
         } else if (menu->reply == COMM_ENTRY_REPLY_REFUSED) {
-            menu->seq = 9;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_REFUSED;
             CommEntryMenu_CloseYesNo(menu);
         } else if (menu->started == TRUE) {
-            menu->seq = 5;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_SYNC;
             CommEntryMenu_CloseYesNo(menu);
         } else if (menu->cancelled == TRUE) {
-            menu->seq = 11;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_CANCEL;
             CommEntryMenu_CloseYesNo(menu);
         }
         break;
-    case 3:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_CREATE_WINDOWS:
         CommEntryMenu_CreateWindows(menu);
         menu->seq++;
         break;
-    case 4:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_MEMBERS:
         if (CommEntryMenu_AskLeave(menu) == COMM_ENTRY_LEAVE_YES) {
             CommEntryMenu_FreeWindows(menu);
             CommEntryMenu_CloseYesNo(menu);
-            menu->seq = 11;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_CANCEL;
         } else {
             if (menu->sendCheckReply == TRUE && CommEntryMenu_SendCheckReply(menu->sendToAll) == TRUE) {
                 menu->sendCheckReply = FALSE;
@@ -1000,59 +1121,59 @@ static BOOL CommEntryMenu_UpdateAskToJoin(CommEntryMenu *menu) {
             if (menu->started == TRUE) {
                 CommEntryMenu_FreeWindows(menu);
                 CommEntryMenu_CloseYesNo(menu);
-                menu->seq = 5;
+                menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_SYNC;
             } else if (menu->cancelled == TRUE) {
                 CommEntryMenu_FreeWindows(menu);
                 CommEntryMenu_CloseYesNo(menu);
-                menu->seq = 7;
+                menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_ERROR;
             }
         }
         break;
-    case 5:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_SYNC:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_MembersHaveGatheredPlease);
         }
-        menu->seq = 6;
+        menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_SYNC;
         NetHandle_SendTimingPair(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS);
         break;
-    case 6:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_SYNC:
         if (menu->mode == COMM_ENTRY_MENU_MULTI_BATTLE && func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
         if (NetHandle_IsTimingPairRecv(NetHandle_GetOwn(), COMM_ENTRY_SYNC_START, COMM_ENTRY_SYNC_CLASS) == TRUE) {
             menu->result = COMM_ENTRY_MENU_DONE;
-            menu->seq = 12;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_END;
         } else if (menu->cancelled == TRUE) {
-            menu->seq = 7;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_ERROR;
         }
         break;
-    case 7:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_PRINT_ERROR:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->error);
-        menu->seq = 8;
+        menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR;
         break;
-    case 8:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_ERROR:
         if (func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_CANCELLED;
-            menu->seq = 12;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_END;
         }
         break;
-    case 9:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_REFUSED:
         GFL_NetExit(NULL);
         copyVarForText(menu->wordSet, 0, &menu->replyInfo);
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_Refused);
-        menu->seq = 10;
+        menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REFUSED;
         break;
-    case 10:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_WAIT_REFUSED:
         if (GFL_NetIsEnded() == TRUE && func_ov036_021883e8(menu->msgWin) == TRUE) {
             menu->result = COMM_ENTRY_MENU_REFUSED;
-            menu->seq = 12;
+            menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_END;
         }
         break;
-    case 11:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_CANCEL:
         menu->result = COMM_ENTRY_MENU_CANCELLED;
-        menu->seq = 12;
+        menu->seq = COMM_ENTRY_ASK_TO_JOIN_SEQ_END;
         break;
-    case 12:
+    case COMM_ENTRY_ASK_TO_JOIN_SEQ_END:
         CommEntryMenu_FreeWindows(menu);
         return TRUE;
     }
@@ -1177,7 +1298,7 @@ static void CommEntryMenu_UpdateEntries(CommEntryMenu *menu) {
     }
 }
 
-static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, u32 netId) {
+static void CommEntryMenu_RemoveMember(CommEntryMenu *menu, int netId) {
     menu->members[netId].state = COMM_ENTRY_MEMBER_NONE;
 }
 
@@ -1198,16 +1319,16 @@ static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu) {
 
     if (menu->asking != FALSE && func_ov036_021883e8(menu->msgWin) != FALSE) {
         switch (yesNo->seq) {
-        case 0:
+        case COMM_ENTRY_ASK_SEQ_PRINT:
             copyVarForText(menu->wordSet, 0, &asked->info);
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_HasContactedAddGroup);
             yesNo->seq++;
             return;
-        case 1:
+        case COMM_ENTRY_ASK_SEQ_OPEN:
             yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
             yesNo->seq++;
             return;
-        case 2: {
+        case COMM_ENTRY_ASK_SEQ_ANSWER: {
             u32 answer = func_ov036_0218816c(yesNo->window);
 
             if (answer != MSGBG_YES_NO_WAITING) {
@@ -1234,9 +1355,9 @@ static void CommEntryMenu_UpdateAsk(CommEntryMenu *menu) {
             }
             break;
         }
-        case 3:
+        case COMM_ENTRY_ASK_SEQ_DONE:
             menu->asking = FALSE;
-            yesNo->seq = 0;
+            yesNo->seq = COMM_ENTRY_ASK_SEQ_PRINT;
             CommEntryMenu_UpdateEntries(menu);
             if (menu->asking == FALSE) {
                 if (CommEntryMenu_CountAccepted(menu) > 1 && menu->mode == COMM_ENTRY_MENU_MUSICAL) {
@@ -1259,15 +1380,15 @@ static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu) {
         return COMM_ENTRY_ASK_PENDING;
     }
     switch (yesNo->seq) {
-    case 0:
+    case COMM_ENTRY_ASK_SEQ_PRINT:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_GroupOk);
         yesNo->seq++;
         break;
-    case 1:
+    case COMM_ENTRY_ASK_SEQ_OPEN:
         yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
         yesNo->seq++;
         break;
-    case 2:
+    case COMM_ENTRY_ASK_SEQ_ANSWER:
         // A member who joined or left while asking makes it a no
         if (CommEntryMenu_StatesUnchanged(menu) == FALSE) {
             answer = MSGBG_YES_NO_NO;
@@ -1279,7 +1400,7 @@ static u32 CommEntryMenu_AskGroupOk(CommEntryMenu *menu) {
         }
         func_ov036_02187ea0(yesNo->window);
         yesNo->window = NULL;
-        yesNo->seq = 0;
+        yesNo->seq = COMM_ENTRY_ASK_SEQ_PRINT;
         if (answer == MSGBG_YES_NO_YES) {
             return COMM_ENTRY_ASK_YES;
         }
@@ -1297,15 +1418,15 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
         return COMM_ENTRY_ASK_PENDING;
     }
     switch (yesNo->seq) {
-    case 0:
+    case COMM_ENTRY_CANCEL_SEQ_PRINT:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->cancelAsk);
         yesNo->seq++;
         break;
-    case 1:
+    case COMM_ENTRY_CANCEL_SEQ_OPEN:
         yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
         yesNo->seq++;
         break;
-    case 2:
+    case COMM_ENTRY_CANCEL_SEQ_ANSWER:
         answer = func_ov036_0218816c(yesNo->window);
         if (answer == MSGBG_YES_NO_WAITING) {
             break;
@@ -1317,18 +1438,18 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
             yesNo->seq = COMM_ENTRY_CANCEL_SEQ_KEEP;
         } else if (CommEntryMenu_CountAccepted(menu) <= 1) {
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_GetMessages(menu)->cancelled);
-            yesNo->seq = 5;
+            yesNo->seq = COMM_ENTRY_CANCEL_SEQ_CANCEL;
         } else {
             // Members have joined: ask again, since they will be disbanded
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_IfLeaderDropsOut);
             yesNo->seq++;
         }
         break;
-    case 3:
+    case COMM_ENTRY_CANCEL_SEQ_OPEN_AGAIN:
         yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
         yesNo->seq++;
         break;
-    case 4:
+    case COMM_ENTRY_CANCEL_SEQ_ANSWER_AGAIN:
         answer = func_ov036_0218816c(yesNo->window);
         if (answer == MSGBG_YES_NO_WAITING) {
             break;
@@ -1343,7 +1464,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
             yesNo->seq = COMM_ENTRY_CANCEL_SEQ_KEEP;
         }
         break;
-    case 5:
+    case COMM_ENTRY_CANCEL_SEQ_CANCEL:
         yesNo->seq = COMM_ENTRY_CANCEL_SEQ_END;
         yesNo->result = COMM_ENTRY_ASK_YES;
         break;
@@ -1360,7 +1481,7 @@ static u32 CommEntryMenu_AskCancel(CommEntryMenu *menu) {
             func_ov036_02187ea0(yesNo->window);
             yesNo->window = NULL;
         }
-        yesNo->seq = 0;
+        yesNo->seq = COMM_ENTRY_CANCEL_SEQ_PRINT;
         return yesNo->result;
     }
     return COMM_ENTRY_ASK_PENDING;
@@ -1572,7 +1693,7 @@ static void CommEntryMenu_CreateLeaderList(CommEntryMenu *menu) {
     menu->list.options = InitListMenuOptionHeap(COMM_ENTRY_LEADER_MAX, menu->heapId);
     CommEntryMenu_BuildLeaderOptions(menu);
     menu->list.menu = func_ov036_02187e60(msgBGSys, &sLeaderListRequest, menu->list.options);
-    menu->list.seq = 0;
+    menu->list.seq = COMM_ENTRY_LIST_SEQ_PICK;
 }
 
 static void CommEntryMenu_FreeLeaderList(CommEntryMenu *menu) {
@@ -1589,13 +1710,13 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
     CommEntryLeaderList *list = &menu->list;
 
     switch (list->seq) {
-    case 0:
+    case COMM_ENTRY_LIST_SEQ_PICK:
         if (list->selected == NULL) {
             CommEntryMenu_AgeLeaders(menu);
             CommEntryMenu_ScanBeacons(menu);
             if (CommEntryMenu_UpdateLeaderListInput(menu) == FALSE) {
                 list->result = COMM_ENTRY_LEADER_LIST_LEFT;
-                list->seq = 3;
+                list->seq = COMM_ENTRY_LIST_SEQ_END;
             } else if (menu->list.changed == TRUE) {
                 CommEntryMenu_BuildLeaderOptions(menu);
                 func_ov036_02187ef8(menu->list.menu);
@@ -1608,57 +1729,57 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
         } else {
             if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
                 list->prevSeq = list->seq;
-                list->seq = 4;
+                list->seq = COMM_ENTRY_LIST_SEQ_ASK_LEAVE;
             }
             list->timer++;
             if (list->timer < COMM_ENTRY_ANSWER_TIMEOUT) {
                 break;
             }
-            list->seq = 6;
+            list->seq = COMM_ENTRY_LIST_SEQ_WAIT_PROBLEM;
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_ThereAppearsProblem);
         }
         break;
-    case 1:
+    case COMM_ENTRY_LIST_SEQ_SEND_ENTRY:
         if (NetHandle_IsNegotiated(NetHandle_GetOwn()) == TRUE) {
             menu->reply = COMM_ENTRY_REPLY_NONE;
             if (CommEntryMenu_SendEntry(&menu->self, FALSE, menu->sendToAll) == TRUE) {
-                list->seq = 2;
+                list->seq = COMM_ENTRY_LIST_SEQ_WAIT_REPLY;
             }
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             list->prevSeq = list->seq;
-            list->seq = 4;
+            list->seq = COMM_ENTRY_LIST_SEQ_ASK_LEAVE;
         }
         if (menu->cancelled != TRUE) {
             break;
         }
         list->result = COMM_ENTRY_LEADER_LIST_JOINED;
-        list->seq = 3;
+        list->seq = COMM_ENTRY_LIST_SEQ_END;
         break;
-    case 2:
+    case COMM_ENTRY_LIST_SEQ_WAIT_REPLY:
         if (menu->reply == COMM_ENTRY_REPLY_ACCEPTED) {
             list->result = COMM_ENTRY_LEADER_LIST_JOINED;
-            list->seq = 3;
+            list->seq = COMM_ENTRY_LIST_SEQ_END;
         } else if (menu->reply == COMM_ENTRY_REPLY_REFUSED) {
             list->result = COMM_ENTRY_LEADER_LIST_REFUSED;
-            list->seq = 3;
+            list->seq = COMM_ENTRY_LIST_SEQ_END;
         } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             list->prevSeq = list->seq;
-            list->seq = 4;
+            list->seq = COMM_ENTRY_LIST_SEQ_ASK_LEAVE;
         }
         if (menu->cancelled != TRUE) {
             break;
         }
         list->result = COMM_ENTRY_LEADER_LIST_JOINED;
-        list->seq = 3;
+        list->seq = COMM_ENTRY_LIST_SEQ_END;
         break;
-    case 3:
+    case COMM_ENTRY_LIST_SEQ_END:
         return list->result;
-    case 4:
+    case COMM_ENTRY_LIST_SEQ_ASK_LEAVE:
         CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_WantLeaveGroup);
         yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
-        list->seq = 5;
+        list->seq = COMM_ENTRY_LIST_SEQ_ANSWER_LEAVE;
         break;
-    case 5: {
+    case COMM_ENTRY_LIST_SEQ_ANSWER_LEAVE: {
         u32 answer = func_ov036_0218816c(yesNo->window);
 
         // The leader checked on the members: stay
@@ -1672,7 +1793,7 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
             func_ov036_02187ea0(yesNo->window);
             yesNo->window = NULL;
             list->result = COMM_ENTRY_LEADER_LIST_JOINED;
-            list->seq = 3;
+            list->seq = COMM_ENTRY_LIST_SEQ_END;
             break;
         }
         func_ov036_02187ea0(yesNo->window);
@@ -1686,15 +1807,15 @@ static u32 CommEntryMenu_UpdateLeaderList(CommEntryMenu *menu) {
             break;
         }
         list->result = COMM_ENTRY_LEADER_LIST_LEFT;
-        list->seq = 3;
+        list->seq = COMM_ENTRY_LIST_SEQ_END;
         break;
     }
-    case 6:
+    case COMM_ENTRY_LIST_SEQ_WAIT_PROBLEM:
         if (func_ov036_021883e8(menu->msgWin) != TRUE) {
             break;
         }
         list->result = COMM_ENTRY_LEADER_LIST_LEFT;
-        list->seq = 3;
+        list->seq = COMM_ENTRY_LIST_SEQ_END;
         break;
     }
     return COMM_ENTRY_LEADER_LIST_RUNNING;
@@ -1820,14 +1941,14 @@ static u32 CommEntryMenu_AskLeave(CommEntryMenu *menu) {
     CommEntryYesNo *yesNo = &menu->yesNo;
 
     switch (yesNo->seq) {
-    case 0:
+    case COMM_ENTRY_LEAVE_SEQ_WAIT_B:
         if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
             yesNo->window = func_ov036_021880d4(Field_GetMsgBGSys(menu->field), 0);
             CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_WantLeaveGroup);
-            yesNo->seq = 1;
+            yesNo->seq = COMM_ENTRY_LEAVE_SEQ_ANSWER;
         }
         break;
-    case 1: {
+    case COMM_ENTRY_LEAVE_SEQ_ANSWER: {
         u32 answer = func_ov036_0218816c(yesNo->window);
 
         if (func_ov036_0218798c(Field_GetMsgBGSys(menu->field)) == TRUE && menu->checked == TRUE) {
@@ -1837,7 +1958,7 @@ static u32 CommEntryMenu_AskLeave(CommEntryMenu *menu) {
             func_ov036_02187ea0(yesNo->window);
             yesNo->window = NULL;
             if (answer == MSGBG_YES_NO_NO) {
-                yesNo->seq = 0;
+                yesNo->seq = COMM_ENTRY_LEAVE_SEQ_WAIT_B;
                 CommEntryMenu_PrintMessage(menu, CommEntryMenu_Text_PleaseWaitBButton_2);
             } else {
                 return COMM_ENTRY_LEAVE_YES;
@@ -1856,7 +1977,7 @@ static void CommEntryMenu_CloseYesNo(CommEntryMenu *menu) {
         func_ov036_02187ea0(yesNo->window);
         yesNo->window = NULL;
     }
-    yesNo->seq = 0;
+    yesNo->seq = COMM_ENTRY_ASK_SEQ_PRINT;
 }
 
 static void CommEntryMenu_SetReply(CommEntryMenu *menu, u32 reply, const PlayerInfo *info) {

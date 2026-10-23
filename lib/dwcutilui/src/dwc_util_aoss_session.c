@@ -9,63 +9,63 @@
 typedef struct DWCUtilAoss {
     // Whether the setup succeeded
     u8 done;
-    AossParam *param;
+    AOSS_INFO *param;
 } DWCUtilAoss;
 
-static void *DWCUtilAossSession_Alloc(u32 size);
-static void DWCUtilAossSession_Free(void *ptr);
+static void *aossAlloc(u32 size);
+static void aossFree(void *ptr);
 
 static const char sClientName[] = "NINTENDO-DS";
 static DWCUtilAoss sAoss;
 
-void DWCUtilAossSession_Init(void) {
-    AossClientInfo client;
+void DWCi_AOSSlInit(void) {
+    PRODUCT_INFO client;
 
-    sAoss.param = DWCUtilHeap_AllocClear(sizeof(AossParam), 4);
+    sAoss.param = DWCi_HEAPlAllocEx(sizeof(AOSS_INFO), 4);
     sAoss.done = FALSE;
     MI_CpuClear16(&client, sizeof(client));
-    client.version = 0x50;
-    client.length = sizeof(sClientName);
-    MI_CpuCopy8(sClientName, client.data, sizeof(sClientName));
-    sAoss.param->types = AOSS_TYPE_WEP40 | AOSS_TYPE_WEP104;
-    sAoss.param->client = client;
-    sAoss.param->scanCount = 1;
-    sAoss.param->scanDelay = -1;
-    sAoss.param->sendCount = 1;
-    sAoss.param->sendDelay = -1;
-    sAoss.param->timeout = -1;
-    OS_GetMacAddress(sAoss.param->mac);
-    if (DWC_Aoss_Init(DWCUtilAossSession_Alloc, DWCUtilAossSession_Free) != 0) {
+    client.dataType = 0x50;
+    client.dataLen = sizeof(sClientName);
+    MI_CpuCopy8(sClientName, client.productName, sizeof(sClientName));
+    sAoss.param->supportSecurity = AOSS_TYPE_WEP40 | AOSS_TYPE_WEP104;
+    sAoss.param->productInfo = client;
+    sAoss.param->retryCount_Scan = 1;
+    sAoss.param->retryInterval_Scan = -1;
+    sAoss.param->retryCount_Comu = 1;
+    sAoss.param->retryInterval_Comu = -1;
+    sAoss.param->selectInterval = -1;
+    OS_GetMacAddress(sAoss.param->macAddress);
+    if (AOSSi_InitLocal(aossAlloc, aossFree) != 0) {
         OS_Terminate();
     }
 }
 
 void DWCUtilAossSession_Exit(BOOL saveKeys) {
-    DWC_Aoss_Shutdown();
-    if (saveKeys && sAoss.param->error == 0 && sAoss.done == TRUE) {
-        DWCUtilWifiSettings_SaveAossResult(&sAoss.param->result);
+    AOSSi_EndLocal();
+    if (saveKeys && sAoss.param->aossResult == 0 && sAoss.done == TRUE) {
+        DWCi_SETTINGlSetAoss(&sAoss.param->secureInfo);
     }
-    DWCUtilHeap_FreeAndNull(&sAoss.param);
+    DWCi_HEAPlFree_(&sAoss.param);
 }
 
 int DWCUtilAossSession_Run(void) {
     u8 error;
 
-    if (DWC_Aoss_Start(sAoss.param) == 0) {
+    if (AOSSi_Init(sAoss.param) == 0) {
         sAoss.done = TRUE;
         return 1;
     }
-    error = sAoss.param->error;
+    error = sAoss.param->aossResult;
     if (error == 1 || error == 3 || error == 4 || error == 5) {
         return 0;
     }
     return 2;
 }
 
-static void *DWCUtilAossSession_Alloc(u32 size) {
-    return DWCUtilHeap_AllocClear(size, 32);
+static void *aossAlloc(u32 size) {
+    return DWCi_HEAPlAllocEx(size, 32);
 }
 
-static void DWCUtilAossSession_Free(void *ptr) {
-    DWCUtilHeap_Free(ptr);
+static void aossFree(void *ptr) {
+    DWCi_HEAPlFree2(ptr);
 }

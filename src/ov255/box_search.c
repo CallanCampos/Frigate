@@ -156,7 +156,7 @@ static void BoxSearch_MainMenuCursorOn(void *work, int pos, int prevPos);
 static void BoxSearch_MainMenuCursorOff(void *work, int pos, int prevPos);
 static void BoxSearch_MainMenuCursorMove(void *work, int pos, int prevPos);
 static void BoxSearch_MainMenuCursorTouch(void *work, int pos, int prevPos);
-static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, u32 type);
+static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, unsigned int type);
 static void BoxSearch_ShowSwitch(BoxSearchWork *wk);
 static void BoxSearch_LoadStrings(BoxSearchWork *wk);
 static void BoxSearch_FreeStrings(BoxSearchWork *wk);
@@ -1614,8 +1614,7 @@ static int BoxSearch_SeqMarkingOpen(BoxSearchWork *wk, int seq) {
 
 // The list of markings, which turns each on and off
 static int BoxSearch_SeqMarkingList(BoxSearchWork *wk, int seq) {
-    // The SDK's u32 is unsigned long, which MWCC indexes with differently than unsigned int
-    unsigned long ret;
+    u32 ret;
     u32 i;
     int pos;
     u32 on;
@@ -1822,7 +1821,7 @@ static void BoxSearch_MainMenuCursorMove(void *work, int pos, int prevPos) {
 static void BoxSearch_MainMenuCursorTouch(void *work, int pos, int prevPos) {
 }
 
-static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, u32 type) {
+static void BoxSearch_SetSwitchAnims(BoxSearchWork *wk, unsigned int type) {
     ClActor_SetSequence(wk->actors[9], data_ov255_021d8f00[type - 7][0]);
     ClActor_SetSequence(wk->actors[10], data_ov255_021d8f00[type - 7][1]);
 }
@@ -2113,7 +2112,7 @@ static void PrintAbilityInfo(BoxSearchWork *wk, u32 ability) {
 
 // Prints a species' name and types
 static void PrintSpeciesInfo(BoxSearchWork *wk, u32 species) {
-    void *personal = PML_PersonalLoad(species, 0, wk->heapId);
+    PersonalData *personal = PML_PersonalLoad(species, 0, wk->heapId);
     u32 type1 = PML_PersonalGetParam(personal, PERSONAL_TYPE_1);
     u32 type2 = PML_PersonalGetParam(personal, PERSONAL_TYPE_2);
     StrBuf *fmt;

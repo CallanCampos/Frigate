@@ -1767,10 +1767,10 @@ static void Guru2Main_Draw(Guru2MainWork *g2m) {
     GFL_G3DSysReset();
     GFL_G3DCameraFlush(g2m->camera.camera);
     GFL_G3DSysMtxViewFlush();
-    NNS_G3DSetLightVector(0, 0, -FX32_ONE, 0);
-    NNS_G3DSetLightColor(0, GX_RGB(31, 31, 31));
-    NNS_G3DSetMatDifAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
-    NNS_G3DSetMatSpeEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
+    NNS_G3dGlbLightVector(GX_LIGHTID_0, 0, -FX32_ONE, 0);
+    NNS_G3dGlbLightColor(GX_LIGHTID_0, GX_RGB(31, 31, 31));
+    NNS_G3dGlbMaterialColorDiffAmb(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
+    NNS_G3dGlbMaterialColorSpecEmi(GX_RGB(31, 31, 31), GX_RGB(31, 31, 31), FALSE);
     Guru2Main_DrawBG3D(g2m);
     Guru2Main_DrawDisc(g2m);
     Guru2Main_DrawObjects(g2m);
@@ -1962,51 +1962,51 @@ static void Guru2Main_LoadBGs(Guru2MainWork *g2m) {
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_BG_NCLR, FALSE);
     NNS_G2dGetUnpackedPaletteData(file, &g2m->paletteData);
-    PaletteFade_LoadData(g2m->fade, g2m->paletteData->rawData, 0, 0, 0x40);
+    PaletteFade_LoadData(g2m->fade, g2m->paletteData->pRawData, 0, 0, 0x40);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_SUB_NCLR, FALSE);
     NNS_G2dGetUnpackedPaletteData(file, &g2m->paletteData);
-    PaletteFade_LoadData(g2m->fade, g2m->paletteData->rawData, 1, 0, 0x40);
+    PaletteFade_LoadData(g2m->fade, g2m->paletteData->pRawData, 1, 0, 0x40);
     GFL_HeapFree(file);
     PaletteFade_BlendPalettes(g2m->fade, 1, 0xffff, 8, GX_RGB(0, 0, 0));
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_BG_NCGR, FALSE);
     NNS_G2dGetUnpackedCharacterData(file, &g2m->charData);
-    GFL_BGSysLoadChar(3, g2m->charData->rawData, g2m->charData->size, 0);
+    GFL_BGSysLoadChar(3, g2m->charData->pRawData, g2m->charData->szByte, 0);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_SUB_BG2_NCGR, FALSE);
     NNS_G2dGetUnpackedCharacterData(file, &g2m->charData);
-    GFL_BGSysLoadChar(6, g2m->charData->rawData, g2m->charData->size, 0);
+    GFL_BGSysLoadChar(6, g2m->charData->pRawData, g2m->charData->szByte, 0);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_SUB_BG3_NCGR, FALSE);
     NNS_G2dGetUnpackedCharacterData(file, &g2m->charData);
-    GFL_BGSysLoadChar(7, g2m->charData->rawData, g2m->charData->size, 0);
+    GFL_BGSysLoadChar(7, g2m->charData->pRawData, g2m->charData->szByte, 0);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_BG2_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
-    GFL_BGSysBufferScrDefault(2, g2m->screenData->rawData, g2m->screenData->size);
+    GFL_BGSysBufferScrDefault(2, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(2);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_BG3_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
-    GFL_BGSysBufferScrDefault(3, g2m->screenData->rawData, g2m->screenData->size);
+    GFL_BGSysBufferScrDefault(3, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(3);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_BUTTON_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
-    GFL_BGSysBufferScrDefault(6, g2m->screenData->rawData, g2m->screenData->size);
+    GFL_BGSysBufferScrDefault(6, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(6);
     GFL_HeapFree(file);
 
     file = Guru2Main_LoadFile(g2m, NARC_GURU2_SUB_BG3_NSCR, FALSE);
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
-    GFL_BGSysBufferScrDefault(7, g2m->screenData->rawData, g2m->screenData->size);
+    GFL_BGSysBufferScrDefault(7, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(7);
     GFL_HeapFree(file);
 }
@@ -2025,7 +2025,7 @@ static void Guru2Main_LoadButtonScreen(Guru2MainWork *g2m, u32 fileId) {
     void *file = Guru2Main_LoadFile(g2m, fileId, FALSE);
 
     NNS_G2dGetUnpackedScreenData(file, &g2m->screenData);
-    GFL_BGSysBufferScrDefault(6, g2m->screenData->rawData, g2m->screenData->size);
+    GFL_BGSysBufferScrDefault(6, g2m->screenData->rawData, g2m->screenData->szByte);
     GFL_BGSysLoadScr(6);
     GFL_HeapFree(file);
 }

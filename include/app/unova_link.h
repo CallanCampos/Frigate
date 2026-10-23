@@ -390,7 +390,7 @@ typedef struct {
     u32 msgIds[KEY_SYSTEM_SCROLL_LIST_MAX];
     u32 values[KEY_SYSTEM_SCROLL_LIST_MAX];
     ClActor *icons[KEY_SYSTEM_SCROLL_LIST_MAX];
-    u32 count;
+    int count;
     u16 bg;
     u16 palette;
     u16 unkA8;

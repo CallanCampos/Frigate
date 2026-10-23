@@ -352,7 +352,7 @@ static BOOL ReadInstData(const u8 *bank, const u8 *bankEnd, int prgNo, int key, 
     case SND_INST_PCM:
     case SND_INST_PSG:
     case SND_INST_NOISE:
-    case SND_INST_DIRECT_PCM:
+    case SND_INST_DIRECTPCM:
     case SND_INST_NULL:
         if (!snd7_read_bytes(bank, bankEnd, data, &bytes[2], INST_SIZE - 2)) {
             return FALSE;
@@ -429,7 +429,7 @@ static BOOL NoteOn(Snd7ExChannel *channel, int key, int velocity, s32 length, co
     }
     switch (inst->type) {
     case SND_INST_PCM:
-    case SND_INST_DIRECT_PCM: {
+    case SND_INST_DIRECTPCM: {
         const u8 *wave = NULL;
         const u8 *waveEnd = NULL;
         Snd7WaveParam param;
@@ -509,7 +509,7 @@ static void TrackNote(Snd7Track *track, Snd7Player *player, int key, int velocit
             }
             switch (inst.type) {
             case SND_INST_PCM:
-            case SND_INST_DIRECT_PCM:
+            case SND_INST_DIRECTPCM:
                 allowed = 0xffff;
                 break;
             case SND_INST_PSG:
@@ -1063,7 +1063,7 @@ void snd7_prepare_seq(int playerNo, const u8 *seqBase, const u8 *seqEnd, u32 seq
     if (snd7_shared != NULL) {
         snd7_shared->player[player->myNo].tickCounter = 0;
         for (i = 0; i < SND_PLAYER_VARIABLE_MAX; i++) {
-            snd7_shared->player[player->myNo].variable[i] = SND_VARIABLE_UNSET;
+            snd7_shared->player[player->myNo].variable[i] = SND_DEFAULT_VARIABLE;
         }
     }
     trackNo = AllocTrack();

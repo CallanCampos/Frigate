@@ -13,21 +13,21 @@ static void SOCLi_DhcpTimeout(void);
 static BOOL SOCL_LinkIsOn(void);
 
 // The explicit zeros and this order lay the globals out as the original's .bss, which the code reaches from one base
-SOCLSocket *SOCLiUDPSendSocket = NULL;
-u32 SOCLiDhcpState = 0;
+int SOCLiUDPSendSocket = 0;
+int SOCLiDhcpState = 0;
 CPSInAddr SOCLiRequestedIP = 0;
 u32 SOCLiYieldWait = 0;
 CPSConfig SOCLiCPSConfig = { 0 };
 // SOCLiConfigPtr's NULL is in .data, before the default buffer size
 #pragma explicit_zero_data on
-SOCLConfig *SOCLiConfigPtr = NULL;
+const SOCLConfig *SOCLiConfigPtr = NULL;
 #pragma explicit_zero_data reset
 u32 SOCLiDefaultLanBufferSize = 0x4000;
 
-int SOCL_Startup(SOCLConfig *config) {
+int SOCL_Startup(const SOCLConfig *config) {
     int result;
 
-    OSi_ReferSymbol(SOCLi_Signature);
+    SDK_USING_MIDDLEWARE(SOCLi_Signature);
     if (SOCLiConfigPtr != NULL) {
         return 0;
     }
@@ -46,14 +46,14 @@ static int SOCLi_StartupSOCL(void) {
     int result = SOCLi_StartupCommandPacketQueue(SOCLiConfigPtr->cmd_packet_max);
 
     if (result >= 0) {
-        SOCLiUDPSendSocket = (SOCLSocket *)SOCL_CreateSocket(&SOCLSocketParamUDPSend);
+        SOCLiUDPSendSocket = SOCL_CreateSocket(&SOCLSocketParamUDPSend);
     }
     return result;
 }
 
 static void SOCLi_StartupCPS(void) {
     CPSConfig *cps = &SOCLiCPSConfig;
-    SOCLConfig *config = SOCLiConfigPtr;
+    const SOCLConfig *config = SOCLiConfigPtr;
 
     MI_CpuFill8(cps, 0, sizeof(CPSConfig));
     cps->alloc = config->alloc;
@@ -91,17 +91,17 @@ static void SOCLi_StartupCPS(void) {
 
     CPSMyIp = 0;
     if (config->use_dhcp) {
-        SOCLiDhcpState = SOCLI_DHCP_REQUESTED;
+        SOCLiDhcpState = SOCL_DHCP_REQUEST;
         cps->mode = 0;
         cps->dhcp_callback = SOCLi_DhcpTimeout;
         cps->requested_ip = SOCLiRequestedIP;
     } else {
         SOCLiDhcpState = 0;
-        cps->mode = CPS_MODE_STATIC_IP;
+        cps->mode = CPS_DONOTUSE_DHCP;
         cps->dhcp_callback = SOCLi_SetMyIP;
     }
     CPS_SetThreadPriority(config->cps_thread_prio ? config->cps_thread_prio : 11);
-    WCM_SetRecvDCFCallback(CPSi_RecvCallback);
+    WCM_SetRecvDCFCallback(CPSi_RecvCallbackFunc);
     CPS_SetScavengerCallback(SOCLi_TrashSocket);
     CPS_SetAddressCheckCallback(SOCLi_AddressCheckCallback);
     CPS_Startup(cps);
@@ -109,18 +109,18 @@ static void SOCLi_StartupCPS(void) {
 
 // The address of the config's own, which CPS calls for when it does without DHCP
 static void SOCLi_SetMyIP(void) {
-    SOCLConfig *config = SOCLiConfigPtr;
+    const SOCLConfig *config = SOCLiConfigPtr;
 
     CPSMyIp = config->host_ip.my_ip;
     CPSNetMask = config->host_ip.net_mask;
     CPSGatewayIp = config->host_ip.gateway_ip;
     CPSDnsIp[0] = config->host_ip.dns_ip[0];
     CPSDnsIp[1] = config->host_ip.dns_ip[1];
-    SOCLiDhcpState |= SOCLI_DHCP_DONE;
+    SOCLiDhcpState |= SOCL_DHCP_CALLBACK;
 }
 
 static void SOCLi_DhcpTimeout(void) {
-    SOCLiDhcpState |= SOCLI_DHCP_DONE;
+    SOCLiDhcpState |= SOCL_DHCP_CALLBACK;
 }
 
 static BOOL SOCL_LinkIsOn(void) {

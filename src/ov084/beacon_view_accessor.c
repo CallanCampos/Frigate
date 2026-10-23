@@ -13,21 +13,6 @@
 // this file; "beacon_view_accessor.c" is a guess from overlay 85's "fmission_log_accessor_fv.c", which is at the same
 // place in the Funfest mission's view
 
-#define BEACON_STATUS_RECORD_MAX 8
-
-// beacon_status.c's struct, which its header doesn't give
-struct BeaconStatus {
-    GameBeaconInfoTable table;
-    u8 greetingChanged[2];
-    u8 logTop;
-    // The records reached whose Pass Powers are still to be offered, the oldest first
-    u8 recordCount;
-    u8 records[BEACON_STATUS_RECORD_MAX];
-    u32 givenPassPower;
-    StrBuf *givenName;
-    StrBuf *greeting;
-};
-
 BOOL BeaconView_GetMissionOffer(LinkFestival *festival, FestMissionConfig *dest, StrBuf *name) {
     int i;
     FestMissionOffers *offers = &festival->offers;
