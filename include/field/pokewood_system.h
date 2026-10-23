@@ -70,7 +70,7 @@ void *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys);
 void PokewoodSystem_CopyCast(PokewoodSystem *sys, GameData *gameData, PokeParty *party);
 void PokewoodSystem_SetResultFlag(PokewoodSystem *sys, GameData *gameData, u32 movie, u32 result);
 void Pokewood_CheckMedals(GameData *gameData);
-void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32 movie);
+void PokewoodSystem_SetRecord(PokewoodSystem *sys, const BtlSetup *setup, u32 movie);
 void PokewoodSystem_KeepBestRecord(GameData *gameData, PokewoodSystem *sys);
 void PokewoodSystem_RecordScore(GameData *gameData, PokewoodSystem *sys);
 void PokewoodSystem_AddGradePoints(GameData *gameData, PokewoodSystem *sys, u32 result, u32 slot);

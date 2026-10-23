@@ -619,11 +619,12 @@ static GameEventReturnCode EventPokewood_RunWatch(GameEvent *event, u32 *state, 
             if (var != NULL) {
                 *var = (wk->setup->unkA8 != 3) ? TRUE : FALSE;
                 if (*var != 0) {
-                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->unk124);
-                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->unk124, param->slot);
+                    PokewoodSystem_SetResultFlag(sys, gameData, wk->setup->unkDF, wk->setup->studioEnding);
+                    PokewoodSystem_AddGradePoints(gameData, sys, wk->setup->studioEnding, param->slot);
                     PokewoodSave_SetFlag(save, 5, wk->setup->unkDF);
                     Pokewood_CheckMedals(gameData);
-                    EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->unk124, wk->setup->unk130);
+                    EventPokewood_UnlockMovies(save, gameData, wk->setup->unkDF, wk->setup->studioEnding,
+                                               wk->setup->studioScore);
                 }
             }
         }

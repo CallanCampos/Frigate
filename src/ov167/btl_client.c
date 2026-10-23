@@ -1714,13 +1714,13 @@ static void Studio_SaveChoice(BtlClient *client, s32 scene, u32 value) {
 static u32 Studio_GetEnding(BtlClient *client) {
     BtlSetup *setup = GetBattleSetup(client->mainModule);
 
-    return setup->unk124;
+    return setup->studioEnding;
 }
 
 static void Studio_SetEnding(BtlClient *client, u32 value) {
     BtlSetup *setup = GetBattleSetup(client->mainModule);
 
-    setup->unk124 = value;
+    setup->studioEnding = value;
 }
 
 static void Studio_DecideEnding(BtlClient *client, const BtlScriptedRules *rules, s32 scene) {
@@ -4618,7 +4618,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
     case EXIT_TRAINER_SEQ_STUDIO_SCENE:
         if (Studio_PlayScene(client)) {
             setup = GetBattleSetup(client->mainModule);
-            setup->unk130 = StudioScore_CalcTotal(client, &client->studio.score);
+            setup->studioScore = StudioScore_CalcTotal(client, &client->studio.score);
             return TRUE;
         }
         break;
@@ -4630,7 +4630,7 @@ static BOOL BattleClient_ExitTrainerBattle(BtlClient *client, s32 *seq) {
                 Studio_FindScene(rules, &client->studio, client->turnCount, func_ov167_0219c9e0(client->mainModule));
             Studio_ScoreEndScene(client, rules, score);
             Studio_DecideEnding(client, rules, score);
-            setup->unk130 = StudioScore_CalcTotal(client, &client->studio.score);
+            setup->studioScore = StudioScore_CalcTotal(client, &client->studio.score);
             return TRUE;
         }
         break;
@@ -7231,11 +7231,11 @@ static void Studio_UpdateAudience(BtlClient *client) {
 static void Studio_PlayEndingBgm(BtlMainModule *mainModule) {
     BtlSetup *setup = GetBattleSetupParam(mainModule);
 
-    if (setup->unk124 == 0) {
+    if (setup->studioEnding == 0) {
         BtlvEffect_PlayBgm(func_ov167_0219bf08(mainModule));
-    } else if (setup->unk124 == 1) {
+    } else if (setup->studioEnding == 1) {
         BtlvEffect_PlayBgm(GetWinBGM(mainModule));
-    } else if (setup->unk124 == 2) {
+    } else if (setup->studioEnding == 2) {
         BtlvEffect_PlayBgm(func_ov167_0219bf14(mainModule));
     }
 }
