@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
-"""PreToolUse guard for port sessions: nothing the port does may write to the decomp's repositories.
+"""PreToolUse guard for port sessions: nothing the port does may write to the decomp's repositories or push Frigate's
+main.
 
-The port is a solo project (port/docs/adr/0002-solo-project-no-upstream-posts.md). A port session never writes to
-fuddlesworth/pokebw2 (upstream) or to CallanCampos/pokebw2 (the user's decomp fork): no gh write, no gh api call that
-changes something, no git push. The port's own writes never link an upstream issue or pull request, because GitHub
-shows such a link on upstream's timeline, and never @-mention upstream's people (UPSTREAM_PEOPLE), because a mention
-can notify them. Commit messages name no issue, pull request or discussion of any repository (OWNER/REPO#N or its URL),
-and a push to GitHub that would add such a commit is refused, as port/tools/sync_upstream.sh refuses it (exit 5).
-Reading upstream stays allowed.
+Frigate takes the decomp's code by sync and posts nothing upstream; it accepts outside contributions through forks and
+pull requests (port/docs/adr/0002-solo-project-no-upstream-posts.md, amended by
+port/docs/adr/0017-external-contributions.md). A port session never writes to fuddlesworth/pokebw2 (upstream) or to
+CallanCampos/pokebw2 (the user's decomp fork): no gh write, no gh api call that changes something, no git push. The
+port's own writes never link an upstream issue or pull request, because GitHub shows such a link on upstream's
+timeline, and never @-mention upstream's people (UPSTREAM_PEOPLE), because a mention can notify them. Commit messages
+name no issue, pull request or discussion of any repository (OWNER/REPO#N or its URL), and a push to GitHub that would
+add such a commit is refused, as port/tools/sync_upstream.sh refuses it (exit 5). Reading upstream stays allowed.
+
+Frigate's main changes only through reviewed pull requests (port/docs/adr/0018-protected-main-and-sync-prs.md). GitHub's
+rules refuse a push to it on the server; the guard refuses it here first: a git push to the port (CallanCampos/Frigate,
+or its old name) that would update or delete main, through a refspec (main, HEAD:main, +topic:refs/heads/main, :main,
+--delete main, a glob or a destination the shell computes), --all, --branches or --mirror, or with no refspec from a
+checkout on main (or whose push.default sends its branch to main). A dry run passes.
 
 The guard reads the shell command of a Bash, Monitor or terminal panel (mcp__terminal__run_in_terminal) call and
 refuses it when the command would do one of those. It splits the command the way a shell would (quotes, operators,
@@ -29,6 +37,8 @@ import sys
 import tempfile
 
 PORT = "callancampos/frigate"
+# The port under both its names: GitHub redirects the old one, so a push to either reaches Frigate's main
+PORT_NAMES = {PORT, "callancampos/pokebw2-native"}
 FORBIDDEN = {
     "fuddlesworth/pokebw2": "upstream (fuddlesworth/pokebw2)",
     "callancampos/pokebw2": "the decomp fork (CallanCampos/pokebw2)",
@@ -1128,7 +1138,70 @@ class Guard:
             if repo in FORBIDDEN:
                 self.block(f"`git push {remote}`: that remote pushes to {FORBIDDEN[repo]}")
                 return
+        self.check_main(remote, urls, refspecs, flags, cwd)
         self.check_pushed_commits(remote, urls, refspecs, flags, cwd)
+
+    def current_destinations(self, cwd):
+        """The branches of the remote that a git push with no refspec updates from cwd, as push.default sends the
+        current branch: its own name (simple, current), its upstream branch (upstream), or every branch (matching,
+        given as "*"); none on a detached HEAD, where git refuses such a push."""
+        branch = self.git(cwd, ["symbolic-ref", "--quiet", "--short", "HEAD"])
+        if not branch:
+            return []
+        mode = (self.git(cwd, ["config", "--get", "push.default"]) or "simple").lower()
+        if mode == "nothing":
+            return []
+        if mode == "matching":
+            return ["*"]
+        if mode in ("upstream", "tracking"):
+            merge = self.git(cwd, ["config", "--get", f"branch.{branch}.merge"])
+            return [merge] if merge else []
+        return [branch]
+
+    def check_main(self, remote, urls, refspecs, flags, cwd):
+        """Refuses a push to the port that would update or delete its main, which changes only through a reviewed pull
+        request (ADR 0018). The destinations are the refspecs' (a refspec without a colon pushes to its own name, HEAD
+        to the current branch's), the names --delete deletes, the remote's configured push refspecs when the command
+        gives none, and else the current branch's destination."""
+        if flags & {"--dry-run", "-n"} or not any(parse_repo(url) in PORT_NAMES for url in urls):
+            return
+        shown = f"`git push {remote}`"
+        rule = ("Frigate's main changes only through a reviewed pull request "
+                "(port/docs/adr/0018-protected-main-and-sync-prs.md); push a topic branch and open one")
+        if flags & {"--all", "--branches", "--mirror"}:
+            self.block(f"{shown} with {' '.join(sorted(flags & {'--all', '--branches', '--mirror'}))} pushes every "
+                       f"branch, main among them. {rule}")
+            return
+        deleting = bool(flags & {"--delete", "-d"})
+        specs = list(refspecs)
+        if not specs and not deleting:
+            configured = self.git(cwd, ["config", "--get-all", f"remote.{remote}.push"]) if cwd else None
+            specs = configured.split() if configured else None
+        if specs is None:
+            if cwd is None:
+                self.block(f"{shown} without a refspec, in a directory the guard can't tell; name the branch")
+                return
+            destinations = [(destination, False) for destination in self.current_destinations(cwd)]
+        else:
+            destinations = []  # (the remote branch, whether the push deletes it)
+            for spec in specs:
+                source, colon, destination = spec.lstrip("+").partition(":")
+                if not colon or deleting:
+                    destination = source
+                if destination == "HEAD":
+                    if cwd is None:
+                        self.block(f"{shown} pushes HEAD in a directory the guard can't tell; name the branch")
+                        return
+                    destination = self.git(cwd, ["symbolic-ref", "--quiet", "--short", "HEAD"]) or ""
+                destinations.append((destination, deleting or (bool(colon) and not source)))
+        for destination, deletes in destinations:
+            name = destination.removeprefix("refs/heads/")
+            if computed(name):
+                self.block(f"{shown} names its destination through a variable ({destination}); write it out. {rule}")
+            elif "*" in name:
+                self.block(f"{shown} pushes to {destination}, which matches main. {rule}")
+            elif name == "main":
+                self.block(f"{shown} {'deletes' if deletes else 'updates'} main. {rule}")
 
     def resolve(self, cwd, revision):
         """The commit a revision names in cwd, or None."""
@@ -1191,12 +1264,14 @@ class Guard:
             )
 
 
-MESSAGE = """port_guard refused this command. The port is a solo project: a port session never writes to
-fuddlesworth/pokebw2 (upstream) or CallanCampos/pokebw2 (the decomp fork), and the port's writes never link
-upstream issues or pull requests or @-mention upstream's people (port/docs/adr/0002-solo-project-no-upstream-posts.md).
+MESSAGE = """port_guard refused this command. A port session never writes to fuddlesworth/pokebw2 (upstream) or
+CallanCampos/pokebw2 (the decomp fork); the port's writes never link upstream issues or pull requests or @-mention
+upstream's people (port/docs/adr/0002-solo-project-no-upstream-posts.md, amended by ADR 0017); and Frigate's main
+changes only through reviewed pull requests (port/docs/adr/0018-protected-main-and-sync-prs.md).
 {reasons}
-Port writes name the port: gh ... -R CallanCampos/Frigate, git push origin. Decomp work, claims included,
-belongs to a session the user starts in the decomp checkout. Stop and tell the user; don't route around this guard."""
+Port writes name the port: gh ... -R CallanCampos/Frigate, git push origin TOPIC-BRANCH. Decomp work, claims
+included, belongs to a session the user starts in the decomp checkout. Stop and tell the user; don't route around
+this guard."""
 
 
 def main():
@@ -1253,6 +1328,25 @@ CHECKOUTS = {
         "branch.main.remote": "origin",
         "HEAD": "main",
     },
+    # A worktree on a topic branch, and one whose branch was made from origin/main and tracks it under
+    # push.default=upstream, where a git push with no refspec goes to main
+    "/w/port-topic": {
+        "remote.origin.url": PORT_URL,
+        "remote.origin.gh-resolved": "base",
+        "branch.topic.remote": "origin",
+        "branch.topic.merge": "refs/heads/topic",
+        "HEAD": "topic",
+        "refs": {"HEAD", "topic", "main"},
+    },
+    "/w/port-tracks-main": {
+        "remote.origin.url": PORT_URL,
+        "remote.origin.gh-resolved": "base",
+        "push.default": "upstream",
+        "branch.topic.remote": "origin",
+        "branch.topic.merge": "refs/heads/main",
+        "HEAD": "topic",
+        "refs": {"HEAD", "topic", "main"},
+    },
     "/w/decomp": {
         "remote.origin.url": UPSTREAM_URL,
         "remote.fork.url": FORK_URL,
@@ -1303,6 +1397,7 @@ def self_test():
             f.write("query { viewer { login } }\n")
         missing = os.path.join(tmp, "missing.graphql")
         port, decomp, nodefault = "/w/port", "/w/decomp", "/w/port-nodefault"
+        topic, tracks_main = "/w/port-topic", "/w/port-tracks-main"
         upstream_env = {"GH_REPO": "fuddlesworth/pokebw2"}
         heredoc_link = 'git commit -m "$(cat <<\'EOF\'\nRecord the sync\n\nRefs fuddlesworth/pokebw2#315\nEOF\n)"'
         heredoc_text = (
@@ -1395,6 +1490,24 @@ def self_test():
             (True, port, "git merge --squash upstream/main", {}),
             (True, port, "git push origin linked:main", {}),
             (True, port, "git fetch upstream && git merge upstream/main && git push origin main", {}),
+            # Frigate's main changes only through pull requests (ADR 0018): a push that updates or deletes it
+            (True, port, "git push origin HEAD:main", {}),
+            (True, port, "git push origin main 2>&1 | tail -5", {}),
+            (True, port, "git push", {}),
+            (True, port, "git push origin", {}),
+            (True, port, "git push -u origin HEAD", {}),
+            (True, topic, "git push origin HEAD:refs/heads/main", {}),
+            (True, topic, "git push --force-with-lease origin +topic:main", {}),
+            (True, topic, "git push origin --delete main", {}),
+            (True, topic, "git push origin :main", {}),
+            (True, topic, "git push --all origin", {}),
+            (True, topic, "git push --mirror origin", {}),
+            (True, topic, "git push origin 'refs/heads/*:refs/heads/*'", {}),
+            (True, topic, "git push origin \"HEAD:$TARGET\"", {}),
+            (True, topic, "git push https://github.com/CallanCampos/Frigate.git topic:main", {}),
+            (True, topic, "git push git@github.com:CallanCampos/pokebw2-native.git HEAD:main", {}),
+            (True, topic, "git -C /w/port push origin topic:main", {}),
+            (True, tracks_main, "git push", {}),
             (False, port, "gh issue view 80 -R fuddlesworth/pokebw2 --comments", {}),
             (False, port, "gh issue list --repo fuddlesworth/pokebw2 --state open --json number,title", {}),
             (False, port, "gh pr view 345 -R fuddlesworth/pokebw2 --json files", {}),
@@ -1433,12 +1546,15 @@ def self_test():
             (False, port, "curl -s -H \"Authorization: bearer $(gh auth token)\" https://api.github.com/graphql "
              "-d '{\"query\":\"query { viewer { login } }\"}'", {}),
             (False, port, "gh api repos/CallanCampos/Frigate/issues -f body=fuddlesworth/pokebw2@462e901", {}),
-            (False, port, "git push origin HEAD:main", {}),
-            (False, port, "git push", {}),
-            (False, port, "git push origin main 2>&1 | tail -5", {}),
+            (False, port, "git push origin HEAD:port-topic", {}),
+            (False, port, "git push origin main:port-topic 2>&1 | tail -5", {}),
             (False, port, "git push origin --delete old-branch", {}),
             (False, port, "git push --dry-run origin linked:main", {}),
             (False, port, "git checkout -b new-branch && git push -u origin new-branch", {}),
+            (False, topic, "git push", {}),
+            (False, topic, "git push -u origin HEAD", {}),
+            (False, topic, "git push origin topic:refs/heads/topic", {}),
+            (False, topic, "git push ../scratch.git HEAD:main", {}),
             (False, port, "git fetch upstream && git merge upstream/main", {}),
             (False, port, "git remote set-url --push upstream DISABLED-port-never-pushes-upstream", {}),
             (False, port, "git log --oneline upstream/main | head -5", {}),

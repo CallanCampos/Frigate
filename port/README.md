@@ -458,8 +458,9 @@ same as in the script:
 ### The write guard
 
 `port/tools/hooks/port_guard.py` refuses a Bash, Monitor or terminal panel command that would write to
-`fuddlesworth/pokebw2` or to the decomp fork `CallanCampos/pokebw2`, link an upstream issue from the port, or
-@-mention upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)):
+`fuddlesworth/pokebw2` or to the decomp fork `CallanCampos/pokebw2`, link an upstream issue from the port, @-mention
+upstream's people ([ADR 0002](docs/adr/0002-solo-project-no-upstream-posts.md)) or push Frigate's `main`
+([ADR 0018](docs/adr/0018-protected-main-and-sync-prs.md)):
 
 - a gh subcommand that writes (create, comment, close, edit, merge, review, fork, transfer and the rest) when `-R`,
   `GH_REPO` or a repository or URL argument names either repository, or when it names none and gh's default here
@@ -472,6 +473,11 @@ same as in the script:
 - `git push` to the `upstream` or `fork` remote, to a URL of either repository, or to a remote that pushes to one,
   including the branch's push remote when the command names none, and URLs that `git -c`, `git config` or
   `git remote` set earlier in the same command;
+- a `git push` to the port (`CallanCampos/Frigate`, or its old name) that would update or delete `main`: a refspec
+  whose destination is `main` (`main`, `HEAD:main`, `+topic:refs/heads/main`, `:main`, `--delete main`), a glob or a
+  destination the shell computes, `--all`, `--branches` or `--mirror`, or no refspec from a checkout on `main` or
+  whose `push.default` sends its branch to `main`. GitHub's rules refuse such a push on the server; the guard refuses
+  it before it runs, and lets a dry run through;
 - a `git push` to GitHub that would add commits whose messages name an issue, pull request or discussion of any
   repository (`OWNER/REPO#N` or its URL), as `sync_upstream.sh` refuses them with exit status 5. The commits are those
   the pushed refs reach and the remote's tracking refs don't, with what a `git merge`, `rebase`, `reset`, `checkout`
