@@ -1,4 +1,3 @@
-#include "gfl/backup_system.h"
 #include "system/game_data.h"
 #include "types.h"
 #include "constants/directions.h"
@@ -15,6 +14,7 @@
 #include "field/player_state.h"
 #include "field/unity_tower.h"
 #include "field/zone.h"
+#include "gfl/backup_system.h"
 #include "gfl/heap.h"
 #include "gfl/random.h"
 #include "gfl/sound.h"

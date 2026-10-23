@@ -9,7 +9,7 @@
 static const u16 OVL55_57_ZONES[] = { 193 };
 static const u16 OVL63_ZONES[] = { 573 };
 static const u16 OVL65_ZONES[] = { 1,   8,   20,  41,  65,  99,  109, 115, 122, 398,
-                                           407, 413, 425, 435, 443, 454, 460, 472, 602, 146 };
+                                   407, 413, 425, 435, 443, 454, 460, 472, 602, 146 };
 static const u16 OVL58_59_ZONES[] = { 490, 491 };
 static const u16 OVL66_ZONES[] = { 604, 427, 139, 213 };
 static const u16 OVL55_56_ZONES[] = { 192 };
