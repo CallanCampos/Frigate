@@ -40,7 +40,7 @@ FestivalText_LoadMission kind:function(thumb,size=0xa) addr:0x02170cf8
 FestMission_GetMessage kind:function(thumb,size=0x8c) addr:0x02170d04
 FestMission_GetResultMessage kind:function(thumb,size=0x8c) addr:0x02170d90
 FestMission_SetTargetWord kind:function(thumb,size=0x24) addr:0x02170e1c
-data_ov027_02170e40 kind:data(any) addr:0x02170e40
+sProbabilities kind:data(any) addr:0x02170e40
 data_ov027_02170ffd kind:data(any) addr:0x02170ffd ambiguous
 data_ov027_0217105d kind:data(any) addr:0x0217105d ambiguous
 data_ov027_021711c0 kind:data(any) addr:0x021711c0

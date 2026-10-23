@@ -37,7 +37,7 @@ WbtMakeMatch_GetParty kind:function(thumb,size=0x30) addr:0x021efb04
 WbtMakeMatch_LoadBattleBoxParty kind:function(thumb,size=0x2c) addr:0x021efb34
 WbtMakeMatch_SetupPokeList kind:function(thumb,size=0x54) addr:0x021efb60
 WbtMakeMatch_SetupPStatus kind:function(thumb,size=0x40) addr:0x021efbb4
-data_ov135_021efbf4 kind:data(any) addr:0x021efbf4
-data_ov135_021efbfc kind:data(any) addr:0x021efbfc
-data_ov135_021efc04 kind:data(any) addr:0x021efc04
+sSecondPlace kind:data(any) addr:0x021efbf4
+sFirstPlace kind:data(any) addr:0x021efbfc
+sThirdPlace kind:data(any) addr:0x021efc04
 data_ov135_021efc20 kind:data(any) addr:0x021efc20

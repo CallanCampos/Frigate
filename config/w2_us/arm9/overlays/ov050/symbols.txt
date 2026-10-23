@@ -71,16 +71,16 @@ ScriptNative_BSubwayBattleRecSaveWait kind:function(thumb,size=0x80) addr:0x021e
 BSubway_GetModeRegulation kind:function(thumb,size=0x2e) addr:0x021e6fa0
 BSubway_GetZonePlayMode kind:function(thumb,size=0x44) addr:0x021e6fd0
 BSubway_GetPlayerObjCode kind:function(thumb,size=0x32) addr:0x021e7014
-data_ov050_021e7008 kind:data(any) addr:0x021e7048
-data_ov050_021e701a kind:data(any) addr:0x021e705a
-data_ov050_021e702c kind:data(any) addr:0x021e706c
-data_ov050_021e7040 kind:data(any) addr:0x021e7080
-data_ov050_021e7054 kind:data(any) addr:0x021e7094
-data_ov050_021e706c kind:data(any) addr:0x021e70ac
-data_ov050_021e7090 kind:data(any) addr:0x021e70d0
+sTable7008 kind:data(any) addr:0x021e7048
+sTable701a kind:data(any) addr:0x021e705a
+sTable702c kind:data(any) addr:0x021e706c
+sTable7040 kind:data(any) addr:0x021e7080
+sTable7054 kind:data(any) addr:0x021e7094
+sTable706c kind:data(any) addr:0x021e70ac
+sWarpZones kind:data(any) addr:0x021e70d0
 data_ov050_021e70b4 kind:data(any) addr:0x021e70f4
 data_ov050_021e70dc kind:data(any) addr:0x021e711c
-data_ov050_021e7134 kind:data(any) addr:0x021e7174
+sWarpPositions kind:data(any) addr:0x021e7174
 data_ov050_021e71a0 kind:data(any) addr:0x021e71e0
 data_ov050_021e7264 kind:data(any) addr:0x021e72a4 ambiguous
 data_ov050_021e742d kind:data(any) addr:0x021e746d ambiguous

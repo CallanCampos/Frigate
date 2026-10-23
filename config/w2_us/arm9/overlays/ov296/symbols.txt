@@ -59,14 +59,14 @@ ZukanInfo_GetFootprintCellFile kind:function(thumb,size=0x14) addr:0x0219f9fc
 ZukanInfo_GetFootprintAnimFile kind:function(thumb,size=0x14) addr:0x0219fa10
 ZukanInfo_GetFootprintFormArcId kind:function(thumb,size=0x4) addr:0x0219fa24
 ZukanInfo_GetFootprintFormFile kind:function(thumb,size=0x94) addr:0x0219fa28
-data_ov296_0219fa7c kind:data(any) addr:0x0219fabc
-data_ov296_0219fa88 kind:data(any) addr:0x0219fac8
-data_ov296_0219fa94 kind:data(any) addr:0x0219fad4
-data_ov296_0219faa0 kind:data(any) addr:0x0219fae0
-data_ov296_0219faac kind:data(any) addr:0x0219faec
-data_ov296_0219fac8 kind:data(any) addr:0x0219fb08
+sHeightX kind:data(any) addr:0x0219fabc
+sWeightX kind:data(any) addr:0x0219fac8
+sTypeIconFiles kind:data(any) addr:0x0219fad4
+sEntryX kind:data(any) addr:0x0219fae0
+sArcIds kind:data(any) addr:0x0219faec
+sTypeIconTiles kind:data(any) addr:0x0219fb08
 data_ov296_0219faec kind:data(any) addr:0x0219fb2c
-data_ov296_0219fafc kind:data(any) addr:0x0219fb3c
-data_ov296_0219fb3c kind:data(any) addr:0x0219fb7c
+sLabelMessages kind:data(any) addr:0x0219fb3c
+sMsgBanks kind:data(any) addr:0x0219fb7c
 data_ov296_0219fba0 kind:data(any) addr:0x0219fbe0
 data_ov296_0219fba4 kind:data(any) addr:0x0219fbe4 ambiguous
