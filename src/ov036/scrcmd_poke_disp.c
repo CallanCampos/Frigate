@@ -156,7 +156,7 @@ BOOL func_ov036_021c7698(VM *vm, FieldScriptEnv *env) {
 BOOL s019A_CGearControlWarning(VM *vm, FieldScriptEnv *env) {
     ScriptFieldWork *fieldWork = ScriptWork_GetFieldWork(FieldScriptEnv_GetScriptWork(env));
     HeapID heapId = Field_GetHeapID(fieldWork->field);
-    void *msgBGSys = Field_GetMsgBGSys(fieldWork->field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(fieldWork->field);
 
     if (VM_Read16(vm)) {
         MsgData *msgData =

@@ -10,9 +10,11 @@
 // names are swan's (https://github.com/ds-pokemon-hacking/swan, GPL-3.0)
 
 // The reasons of FriendshipManagerCalc, rows of its table. Only those the code shows are named
-#define FRIENDSHIP_REASON_LEVEL_UP_PARTY 2
-#define FRIENDSHIP_REASON_WALK 3
-#define FRIENDSHIP_REASON_COUNT 8
+enum {
+    FRIENDSHIP_REASON_LEVEL_UP_PARTY = 2,
+    FRIENDSHIP_REASON_WALK,
+    FRIENDSHIP_REASON_COUNT = 8,
+};
 
 // The friendship of walking, which a Pokémon gets half the times
 void happinessAdd(PartyPkm *pkm, u16 zoneId, HeapID heapId);

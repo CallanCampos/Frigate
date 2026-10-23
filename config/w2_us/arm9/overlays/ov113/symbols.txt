@@ -8,10 +8,10 @@ GimmickHumilau_FreeScene kind:function(thumb,size=0xc) addr:0x021eeea8
 GimmickHumilau_StepAnimations kind:function(thumb,size=0xc) addr:0x021eeeb4
 GimmickHumilau_PlayActor kind:function(thumb,size=0x5e) addr:0x021eeec0
 GimmickHumilau_JumpEvent kind:function(thumb,size=0xf8) addr:0x021eef20
-data_ov113_021eefd8 kind:data(any) addr:0x021ef018
-data_ov113_021eefe0 kind:data(any) addr:0x021ef020
+sAnimations kind:data(any) addr:0x021ef018
+sActors kind:data(any) addr:0x021ef020
 data_ov113_021eefe1 kind:data(any) addr:0x021ef021 ambiguous
-data_ov113_021eeff0 kind:data(any) addr:0x021ef030
-data_ov113_021ef000 kind:data(any) addr:0x021ef040
+sSceneSetup kind:data(any) addr:0x021ef030
+sResources kind:data(any) addr:0x021ef040
 data_ov113_021ef011 kind:data(any) addr:0x021ef051 ambiguous
-data_ov113_021ef024 kind:data(any) addr:0x021ef064
+sJumpHeights kind:data(any) addr:0x021ef064

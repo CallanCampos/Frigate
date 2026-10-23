@@ -29,7 +29,7 @@ static void PokewoodPoster_Init(GimmickWork *work);
 static void PokewoodPoster_Free(GimmickWork *work);
 static void PokewoodPoster_StepAnimations(GimmickWork *work);
 static void PokewoodPoster_LoadPoster(GimmickWork *work, u32 poster);
-static void PokewoodPoster_WriteImage(void *texResource, const char *texName, const char *plttName, u32 image,
+static void PokewoodPoster_WriteImage(G3DResource *texResource, const char *texName, const char *plttName, u32 image,
                                       HeapID heapId);
 static u32 PokewoodPoster_GetTexAddr(const NNSG3dResTex *tex, const NNSG3dResDictTexData *texData);
 static u32 PokewoodPoster_GetPlttAddr(const NNSG3dResTex *tex, const NNSG3dResDictPlttData *plttData);
@@ -95,7 +95,7 @@ static void PokewoodPoster_StepAnimations(GimmickWork *work) {
 static void PokewoodPoster_LoadPoster(GimmickWork *work, u32 poster) {
     HeapID heapId = HEAPID_TAIL(Field_GetHeapID(work->field));
     PokewoodSave *save = PokewoodSave_Get(GSYS_GetGameData(Field_GetGameSystem(work->field)));
-    void *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
+    G3DResource *texResource = GFL_G3DMdlGetTexResource(GFL_G3DActorGetMdl(FieldExpObj_GetActor(work->expObj, 0, 0)));
     int series = PokewoodSave_GetLastSeries(save, poster);
 
     if (series > 0) {
@@ -103,7 +103,7 @@ static void PokewoodPoster_LoadPoster(GimmickWork *work, u32 poster) {
     }
 }
 
-static void PokewoodPoster_WriteImage(void *texResource, const char *texName, const char *plttName, u32 image,
+static void PokewoodPoster_WriteImage(G3DResource *texResource, const char *texName, const char *plttName, u32 image,
                                       HeapID heapId) {
     // A poster's size in tiles and a tile's in pixels. The reads are folded, but a function's constants stay in
     // .rodata, as three bytes of 8; which 8 is which is a guess

@@ -15,7 +15,7 @@
 
 BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data =
+    MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -26,7 +26,7 @@ BOOL s02B2_MemoryLinkCheckFlag(VM *vm, FieldScriptEnv *env) {
 
 BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data =
+    MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -37,7 +37,7 @@ BOOL s02B3_MemoryLinkGetVar(VM *vm, FieldScriptEnv *env) {
 
 BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data =
+    MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     u16 index = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
@@ -49,7 +49,7 @@ BOOL s02B4_MemoryLinkIsPlayerLinked(VM *vm, FieldScriptEnv *env) {
 // Puts the name of the entry in the buffer
 BOOL s02B5_WordSetMemoryLinkPlayerName(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
-    void *data =
+    MemoryLinkSave *data =
         SaveControl_GetMemoryLink(GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env))));
     WordSet *wordSet = ScriptWork_GetWordSet(work);
     HeapID heapId = FieldScriptEnv_GetHeapID(env);
@@ -70,7 +70,7 @@ BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
-    void *data = SaveControl_GetMemoryLink(save);
+    MemoryLinkSave *data = SaveControl_GetMemoryLink(save);
     u16 mode = ScriptReadAny(vm, env);
     u16 *result = ScriptReadVar(vm, env);
 
@@ -96,7 +96,7 @@ BOOL s02B6_MemoryLinkCheckMusical(VM *vm, FieldScriptEnv *env) {
 BOOL s02B7_MemoryLinkAddMusicalProps(VM *vm, FieldScriptEnv *env) {
     ScriptWork *work = FieldScriptEnv_GetScriptWork(env);
     SaveControl *save = GameData_GetSaveControl(GSYS_GetGameData(FieldScriptEnv_GetGameSystem(env)));
-    void *data = SaveControl_GetMemoryLink(save);
+    MemoryLinkSave *data = SaveControl_GetMemoryLink(save);
     MusicalSave *musical = getAddressOfMusicalDataInfo(save);
     u16 *result = ScriptReadVar(vm, env);
     const u8 *props = (const u8 *)MemoryLinkSave_GetValue(data, MEMORY_LINK_KIND_PROPS, NULL);

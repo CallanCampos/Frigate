@@ -73,7 +73,7 @@ struct MusShotInfo {
     AppTaskMenu *menu;
     AppTaskMenuRes *menuRes;
     // Overlay 211's communication work, or NULL
-    void *comm;
+    MusCommWork *comm;
     ClActUnit *clactUnit;
     u32 returnPalette;
     u32 returnChars;
@@ -142,7 +142,7 @@ static const BGSetup MUS_SHOT_INFO_BG7_SETUP = {
     FALSE,
 };
 
-MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSave, void *comm, HeapID heapId) {
+MusShotInfo *MusShotInfo_Create(MusicalShot *shot, MusicalSave *save, BOOL askSave, MusCommWork *comm, HeapID heapId) {
     MusShotInfo *info = GFL_HeapAllocate(heapId, sizeof(MusShotInfo), TRUE, "mus_shot_info.c", 141);
 
     info->heapId = heapId;

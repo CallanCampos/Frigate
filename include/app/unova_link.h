@@ -266,10 +266,10 @@ struct KeySystemWork {
     // key_system_flow.c's
     KeySystemKeySelect keySelect;
     // ov331's work, with the other save
-    void *ov331Work;
+    SaveOutside *ov331Work;
     KeyInfoSave *keyInfo;
     // The Memory Link's data in the save
-    void *memoryLink;
+    MemoryLinkSave *memoryLink;
     // The Black or White save linked
     WBSaveData *wbData;
     KeySystemNet *net;

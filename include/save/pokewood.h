@@ -143,7 +143,7 @@ void clearPokewoodBlock(PokewoodBlock *block);
 u32 getSizeOfPokewoodBlock(void);
 void allocatePokewoodBlk(HeapID heapId);
 void freeAndClearPokewoodBlk(void);
-void setPokewoodBlk(const void *src);
+void setPokewoodBlk(const PokewoodBlock *src);
 // Loads the downloaded movie of a slot (0 to 7): 1 when it loaded and its checksum is right, 2 when the checksum is
 // wrong, 0 when the slot is empty and 4 when it failed
 u32 Pokewood_LoadDownloadedMovie(SaveControl *save, HeapID heapId, u32 slot);
@@ -155,7 +155,7 @@ u32 Pokewood_GetLoadedMovieField(u32 field, u32 a1);
 // Loads the default movie into the Pokewood block and checks its checksum, whatever the arguments are
 u32 loadPokewoodAndCheck(SaveControl *save, HeapID heapId, u32 slot);
 // Copies the Pokewood block to dest
-void savePokewoodBlk(void *dest);
+void savePokewoodBlk(PokewoodBlock *dest);
 // Saves the Pokewood block to a slot, a step each call, with state starting at 0; 2 and 3 are the results once done
 u32 Pokewood_SaveDownloadedMovie(GameData *gameData, HeapID heapId, u32 slot, u16 *state);
 

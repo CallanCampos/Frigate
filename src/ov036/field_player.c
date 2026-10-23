@@ -529,7 +529,7 @@ void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 he
     FieldPlayerRail_UpdateMovement(player->nogrid, pressedKeys, heldKeys);
 }
 
-void func_ov036_0219ace8(FieldPlayer *player, const void *pos) {
+void func_ov036_0219ace8(FieldPlayer *player, const RailPosition *pos) {
     func_ov036_0219cf48(player->nogrid, pos);
 }
 
@@ -541,7 +541,7 @@ BOOL func_ov036_0219ad00(FieldPlayer *player) {
     return func_ov036_0219d018(player->nogrid);
 }
 
-void *func_ov036_0219ad0c(FieldPlayer *player) {
+RailUnit *func_ov036_0219ad0c(FieldPlayer *player) {
     return func_ov036_0219d05c(player->nogrid);
 }
 

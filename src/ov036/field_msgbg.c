@@ -98,7 +98,7 @@ enum {
 #define SIGN_PAGE_SCROLL_SPEED 4
 
 // The checker window's frame characters in their WINFRAME file, eight to a row
-enum {
+typedef enum {
     CHECKER_FRAME_TOP_LEFT,
     CHECKER_FRAME_TOP,
     CHECKER_FRAME_TOP_RIGHT,
@@ -108,7 +108,7 @@ enum {
     CHECKER_FRAME_BOTTOM_LEFT = 0x10,
     CHECKER_FRAME_BOTTOM,
     CHECKER_FRAME_BOTTOM_RIGHT,
-};
+} CheckerFrameTile;
 
 // The planes that the second BG's windows are alpha blended over
 #define MSGBG_BLEND_PLANES_UNDER                                                                                       \
@@ -310,7 +310,7 @@ static BOOL func_ov036_02189660(const StrBuf *src, StrBuf *dest, u32 line);
 static BOOL func_ov036_02189674(GFLBitmap *bitmap, Font *font, const StrBuf *src, StrBuf *dest, u32 *line, u8 color);
 static BOOL func_ov036_021896f0(GFLBitmap *dest, GFLBitmap *src1, GFLBitmap *src2, int amount, u16 color);
 static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId);
-static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile);
+static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, CheckerFrameTile tile);
 static void CheckerMsgWin_DrawFrame(GFLBitmap *bitmap, u32 style, HeapID heapId);
 static void FieldMsgBG_DrawTextLines(u16 x, u16 y, GFLBitmap *bitmap, Font *font, const StrBuf *text, HeapID heapId);
 static void MsgBGCursor_Init(MsgBGCursor *cursor, FieldMsgBG *sys);
@@ -1755,14 +1755,17 @@ static void CheckerMsgWin_LoadPalette(u32 bg, u32 slot, HeapID heapId) {
     GFL_G2DIOLoadNCLR(ARCID_WINFRAME, 2, PALTYPE_MAIN_BG, 0, slot * MSGBG_PLTT_SIZE, MSGBG_PLTT_SIZE, heapId);
 }
 
-// The checker frame uses fixed WINFRAME tiles; style does not select another tile set.
-static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, u32 tile) {
+// The checker frame uses fixed WINFRAME tiles: style no longer selects a block of them, and the block's first tile,
+// which the tile is offset from, is always the first of the file
+static void CheckerMsgWin_LoadFrameTile(GFLBitmap *bitmap, u32 style, HeapID heapId, CheckerFrameTile tile) {
     NNSG2dCharacterData *charData;
+    CheckerFrameTile first = CHECKER_FRAME_TOP_LEFT;
     u8 *pixels = GFL_BitmapGetPixelData(bitmap);
     void *file = GFL_ArcSysReadHeapNewLZ(ARCID_WINFRAME, 7, FALSE, heapId);
 
     NNS_G2dGetUnpackedBGCharacterData(file, &charData);
-    MI_CpuCopy((u8 *)charData->pRawData + tile * BGSYS_TILE_SIZE_16, pixels, BGSYS_TILE_SIZE_16);
+    MI_CpuCopy((u8 *)charData->pRawData + first * BGSYS_TILE_SIZE_16 + tile * BGSYS_TILE_SIZE_16, pixels,
+               BGSYS_TILE_SIZE_16);
     GFL_HeapFree(file);
 }
 

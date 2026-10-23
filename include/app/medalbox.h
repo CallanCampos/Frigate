@@ -12,11 +12,14 @@
 #define OVERLAY_MEDALBOX OVERLAY_ID(145)
 
 // What the screen returns in MedalBoxParam's result
-#define MEDALBOX_RESULT_RETURN 0
-#define MEDALBOX_RESULT_EXIT 1
+enum {
+    MEDALBOX_RESULT_RETURN,
+    MEDALBOX_RESULT_EXIT,
+};
 
 typedef struct {
     GameData *gameData;
+    // A MEDALBOX_RESULT_*
     u32 result;
 } MedalBoxParam;
 

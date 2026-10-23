@@ -405,10 +405,10 @@ static BOOL IrcRhythmCheck_Init(GameProc *proc, u32 *state, void *param, void *w
     IrcRhythmCountdown_Init(&wk->countdown, &wk->graphic, HEAP_ID);
     IrcRhythmWindow_InitWithColor(&wk->titleWindow, 7, 6, 3, 20, 5, 8, 1, TRUE, HEAP_ID);
     IrcRhythmWindow_PrintMsgCentered(&wk->titleWindow, &wk->text, BtlMain7_Text_RhythmCheck);
-    GFL_BGSysScaleBGReq(7, 3, 0x1000);
-    GFL_BGSysScaleBGReq(7, 6, 0x1000);
-    GFL_BGSysAdjustBGOriginReq(7, 9, 0x80);
-    GFL_BGSysAdjustBGOriginReq(7, 12, 0x28);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_X, 0x1000);
+    GFL_BGSysScaleBGReq(7, BG_SCALE_SET_Y, 0x1000);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_X, 0x80);
+    GFL_BGSysAdjustBGOriginReq(7, BG_CENTER_SET_Y, 0x28);
     IrcRhythmWindow_InitWithColor(&wk->hintWindow, 2, 8, 10, 16, 2, 13, 0, FALSE, HEAP_ID);
     IrcRhythmNet_Init(&wk->net, wk->param->sys);
     IrcRhythmData_Clear(&wk->data);

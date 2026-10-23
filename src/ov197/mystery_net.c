@@ -56,7 +56,7 @@ typedef struct {
 
 struct MysteryNet {
     MysteryNetSeq seq;
-    void *wifiWork;
+    WihDwcWork *wifiWork;
     u8 info[0x20];
     u8 unk34[0x20];
     u32 beaconFlags;
@@ -154,7 +154,7 @@ static const GFLNetInitData sNetInit = {
     4,
     1,
     0,
-    0,
+    GFL_NET_TYPE_WIRELESS,
     0,
     9,
     { 0x2c, 1, 0, 0 },

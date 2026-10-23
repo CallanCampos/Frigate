@@ -14,12 +14,12 @@
 #define FEST_MISSION_SCORE_MAX 9999
 #define FEST_MISSION_SECONDS_MAX 3599
 
-// The part of a Funfest mission that its beacons send: the first 0x14 bytes of a FestMissionConfig, laid out as
-// FestMission's (field/fest_mission_data.h)
+// The part of a Funfest mission that its beacons send, the first 0x14 bytes of a FestMissionConfig, packed
 typedef struct {
     // FEST_MISSION_NONE when there is no mission
     u32 index : 7;
     u32 level : 3;
+    // The species or item the mission is about
     u32 target : 10;
     u32 unk0_20 : 10;
     u32 unk0_30 : 1;
@@ -49,7 +49,9 @@ typedef struct {
     u8 resultMessageId;
 } FestMissionInfo;
 
-// A Funfest mission's config, as GetFestMissionCfg returns it. A mission's beacons send its first 0x14 bytes
+// A Funfest mission at a level: what fest_mission_data.c's FestMission_Load fills from the missions' archive, and the
+// config that the festival keeps of the mission it runs (GetFestMissionCfg). A mission's beacons send its first 0x14
+// bytes
 struct FestMissionConfig {
     // unk00[0] and seed together tell one mission from another
     union {
@@ -57,13 +59,7 @@ struct FestMissionConfig {
         u32 unk00[5];
     };
     // header.kind is the kind of mission, which picks the overlay that runs it on the field
-    union {
-        FestMissionHeader header;
-        struct {
-            u8 type;
-            u8 unk15[3];
-        };
-    };
+    FestMissionHeader header;
     // The player's score in the mission, at most FEST_MISSION_SCORE_MAX
     u16 missionId;
     u8 unk1A;
@@ -72,7 +68,7 @@ struct FestMissionConfig {
     u32 unk20;
     // When the mission's time started, in the RTC's seconds, or -1 until it starts (FestMissionConfig_StartTimer)
     s64 startSeconds;
-};
+}; // size: 0x2c
 
 FestMissionConfig *allocateForFestMission(HeapID heapId);
 void ClearFesMissionCfg(FestMissionConfig *config);

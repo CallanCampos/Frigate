@@ -124,11 +124,12 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `socl_ssl.c` | `0x02158174`–`0x02158250` | 3 | complete | descriptive |
 | `ssl.c` | `0x02158250`–`0x0215a6b4` | 60 | partial | descriptive |
 | `md5.c` | `0x0215a6b4`–`0x0215ab04` | 6 | complete | descriptive |
-| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | partial | descriptive |
+| `sha1.c` | `0x0215ab04`–`0x0215b1d8` | 8 | complete | descriptive |
 | `ssl_rc4.c` | `0x0215b1d8`–`0x0215b274` | 2 | complete | descriptive |
 | `biginteger.c` | `0x0215b274`–`0x0215bbec` | 19 | partial | descriptive |
 | `wcm.c` | `0x0215bbec`–`0x0215dd74` | 93 | partial | descriptive |
-| `dwc_match.c` | `0x0215fa0c`–`0x02168818` | 210 | partial | descriptive |
+| `dwc_main.c` | `0x0215fa0c`–`0x02160e10` | 49 | partial | descriptive |
+| `dwc_match.c` | `0x02160e10`–`0x02168818` | 161 | partial | descriptive |
 | `dwc_nasfunc.c` | `0x021694d4`–`0x0216a408` | 30 | complete | descriptive |
 | `dwc_http_client.c` | `0x0216a408`–`0x0216b14c` | 25 | partial | descriptive |
 | `dwc_conntest.c` | `0x0216b14c`–`0x0216bbe4` | 8 | partial | descriptive |
@@ -177,7 +178,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `gt2Socket.c` | `0x0217e768`–`0x0217ed14` | 15 | complete | descriptive |
 | `gt2Utility.c` | `0x0217ed14`–`0x0217ee90` | 3 | complete | descriptive |
 | `NATify.c` | `0x0217ee90`–`0x0217f490` | 7 | complete | descriptive |
-| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | partial | descriptive |
+| `natneg.c` | `0x0217f490`–`0x02180774` | 29 | complete | descriptive |
 | `qr2.c` | `0x02180774`–`0x02181fb0` | 35 | complete | descriptive |
 | `qr2regkeys.c` | `0x02181fb0`–`0x02182040` | 2 | partial | descriptive |
 | `sb_crypt.c` | `0x02182040`–`0x02182220` | 5 | complete | descriptive |
@@ -521,10 +522,10 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fieldmap.c` | `0x0217f73c`–`0x021814dc` | 125 | complete | string at `0x021d4b20` |
 | `fieldmap_event.c` | `0x021814dc`–`0x0218304c` | 55 | complete | descriptive |
 | `field_buildmodel.c` | `0x0218304c`–`0x02184244` | 85 | complete | string at `0x021d4b2c` |
-| `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | partial | string at `0x021d4b4c` |
+| `field_g3d_mapper.c` | `0x02184244`–`0x021856a0` | 57 | complete | string at `0x021d4b4c` |
 | `field_camera.c` | `0x021856a0`–`0x02186ed0` | 84 | complete | string at `0x021d4b88` |
 | `field_camera_anime.c` | `0x02186ed0`–`0x021876d0` | 34 | complete | string at `0x021d4b98` |
-| `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | partial | string at `0x021d4bb0` |
+| `field_msgbg.c` | `0x021876d0`–`0x0218a7f8` | 177 | complete | string at `0x021d4bb0` |
 | `field_map_chunk_wb.c` | `0x0218a7f8`–`0x0218a8f8` | 2 | complete | descriptive |
 | `field_map_chunk_gc.c` | `0x0218a8f8`–`0x0218aa7c` | 3 | complete | descriptive |
 | `field_map_chunk_ng.c` | `0x0218aa7c`–`0x0218ab60` | 2 | complete | descriptive |
@@ -561,7 +562,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fieldmap_ctrl_hybrid.c` | `0x0219e430`–`0x0219e9d0` | 13 | complete | string at `0x021d4f44` |
 | `field_ground_anime.c` | `0x0219e9d0`–`0x0219f178` | 32 | complete | string at `0x021d4f5c` |
 | `event_entrance_effect.c` | `0x0219f178`–`0x0219fa10` | 25 | complete | descriptive |
-| `field_menu.c` | `0x0219fa10`–`0x021a0a1c` | 27 | partial | string at `0x021d4f74` |
+| `field_menu.c` | `0x0219fa10`–`0x021a0a1c` | 27 | complete | string at `0x021d4f74` |
 | `enc_pokeset.c` | `0x021a0a1c`–`0x021a1640` | 27 | complete | descriptive |
 | `field_encount.c` | `0x021a1640`–`0x021a1fdc` | 20 | complete | string at `0x021d4f84` |
 | `effect_encount.c` | `0x021a1fdc`–`0x021a29d0` | 30 | complete | string at `0x021d4f94` |
@@ -585,7 +586,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_word.c` | `0x021a7724`–`0x021a7eb8` | 36 | complete | descriptive |
 | `scrcmd_mapchange.c` | `0x021a7eb8`–`0x021a82bc` | 9 | complete | descriptive |
 | `scrcmd_menu.c` | `0x021a82bc`–`0x021a861c` | 11 | complete | descriptive |
-| `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | partial | descriptive |
+| `scrcmd_msg.c` | `0x021a861c`–`0x021a98c4` | 65 | complete | descriptive |
 | `scrcmd_fldmmdl.c` | `0x021a98c4`–`0x021aad44` | 50 | complete | string at `0x021d514c` |
 | `scrcmd_gym.c` | `0x021aad44`–`0x021ab218` | 28 | complete | descriptive |
 | `scrcmd_fade.c` | `0x021ab218`–`0x021ab73c` | 18 | complete | descriptive |
@@ -599,8 +600,8 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `scrcmd_fld_battle.c` | `0x021aea40`–`0x021aedf4` | 9 | complete | string at `0x021d5204` |
 | `scrcmd_pokemon_misc.c` | `0x021aedf4`–`0x021afa2c` | 27 | complete | descriptive |
 | `scrcmd_pokemon_fld.c` | `0x021afa2c`–`0x021afcd4` | 4 | complete | string at `0x021d5218` |
-| `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | partial | descriptive |
-| `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | partial | string at `0x021d5238` |
+| `scrcmd_misc.c` | `0x021afcd4`–`0x021b0228` | 16 | complete | descriptive |
+| `field_rail.c` | `0x021b0228`–`0x021b2404` | 107 | complete | string at `0x021d5238` |
 | `field_rail_func.c` | `0x021b2404`–`0x021b3a3c` | 30 | complete | descriptive |
 | `rail_attr.c` | `0x021b3a3c`–`0x021b3bac` | 13 | complete | string at `0x021d525c` |
 | `field_nogrid_mapper.c` | `0x021b3bac`–`0x021b3e50` | 18 | complete | string at `0x021d5268` |
@@ -613,7 +614,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `field_fmission_info.c` | `0x021b5b7c`–`0x021b64b0` | 26 | complete | string at `0x021d5360` |
 | `fes_gimmick.c` | `0x021b64b0`–`0x021b6824` | 18 | complete | string at `0x021d5378` |
 | `place_name_letter.c` | `0x021b6824`–`0x021b733c` | 39 | complete | string at `0x021d53b0` |
-| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | partial | string at `0x021d53c4` |
+| `entrance_camera.c` | `0x021b733c`–`0x021b7f7c` | 53 | complete | string at `0x021d53c4` |
 | `field_gimmick.c` | `0x021b7f7c`–`0x021b804c` | 4 | complete | descriptive |
 | `fld_exp_obj.c` | `0x021b804c`–`0x021b86d4` | 24 | complete | string at `0x021d53d8` |
 | `field_transition.c` | `0x021b86d4`–`0x021b9494` | 45 | complete | descriptive |
@@ -643,7 +644,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `fldeff_iaigiri.c` | `0x021c2ddc`–`0x021c3180` | 13 | complete | string at `0x021d55c0` |
 | `party_select_list.c` | `0x021c3180`–`0x021c3c34` | 30 | complete | string at `0x021d55f8` |
 | `field_bbd_color.c` | `0x021c3c34`–`0x021c3d9c` | 6 | complete | string at `0x021d5620` |
-| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | partial | string at `0x021d5634` |
+| `comm_entry_menu.c` | `0x021c3d9c`–`0x021c5d7c` | 75 | complete | string at `0x021d5634` |
 | `enceff.c` | `0x021c5d7c`–`0x021c649c` | 21 | complete | string at `0x021d5648` |
 | `fldeff_btrain.c` | `0x021c649c`–`0x021c66e8` | 11 | complete | string at `0x021d5654` |
 | `fldeff_hide.c` | `0x021c66e8`–`0x021c6934` | 11 | complete | string at `0x021d5664` |
@@ -1852,7 +1853,7 @@ ITCM image byte for byte, including the existing original-SDK assembly routines.
 | `dwc_util_sub_screen.c` | `0x021b8154`–`0x021b8834` | 18 | complete | descriptive |
 | `dwc_util_usb_scan.c` | `0x021b8834`–`0x021b8cf0` | 8 | partial | descriptive |
 | `dwc_util_dialog.c` | `0x021b8cf0`–`0x021b93e8` | 15 | complete | descriptive |
-| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | partial | descriptive |
+| `download_play.c` | `0x021b93e8`–`0x021b9bbc` | 19 | complete | descriptive |
 | `dwc_util_rom_resource.c` | `0x021bb18c`–`0x021bb480` | 9 | complete | descriptive |
 | `dwc_util_oam.c` | `0x021bb480`–`0x021bb8dc` | 11 | partial | descriptive |
 | `dwc_util_cell.c` | `0x021bb8dc`–`0x021bba6c` | 10 | complete | descriptive |

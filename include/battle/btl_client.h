@@ -20,7 +20,7 @@ void BattleClient_AddShooterEnergy(BtlClient *client, u8 value);
 BOOL BattleClient_IsGameTimeUp(BtlClient *client);
 BOOL BattleClient_IsRecPlayCanceled(BtlClient *client);
 
-BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle,
+BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, NetHandle *netHandle,
                                u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
                                HeapID heapId);
 void BattleClient_Delete(BtlClient *client);

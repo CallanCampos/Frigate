@@ -156,6 +156,6 @@ MedalBox *SaveControl_GetMedalBox(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_MEDAL_BOX);
 }
 
-void *MedalBox_GetHabitatList(MedalBox *box) {
-    return box->habitatList;
+ZukanHabitatSave *MedalBox_GetHabitatList(MedalBox *box) {
+    return &box->habitatList;
 }

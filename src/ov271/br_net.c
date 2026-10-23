@@ -186,11 +186,11 @@ BOOL BrNet_GetUploadVideoNumber(BrNet *net, u64 *number) {
     return isEnd;
 }
 
-BOOL BrNet_GetDownloadVideo(BrNet *net, void **video, u32 *value) {
+BOOL BrNet_GetDownloadVideo(BrNet *net, BattleRecVideo **video, u32 *value) {
     BOOL isEnd = net->downloadVideoEnd;
 
     if (isEnd) {
-        *value = GdsRapResponse_GetBattleVideo(&net->gdsrap, (BattleRecVideo **)video);
+        *value = GdsRapResponse_GetBattleVideo(&net->gdsrap, video);
     }
     return isEnd;
 }

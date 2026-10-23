@@ -166,7 +166,7 @@ void CtvtDraw_Enter(CommTvtWork *sys, CtvtDraw *draw) {
     GFL_G2DIOLoadNSCRSync(arc, AppMenuCommon_GetBarScreenFile(), 0, 0x60, 0, 0x600, FALSE, heapId);
     GFL_BGSysSetScrPaletteNo(0, 0, 21, 32, 3, 0);
     GFL_BGSysLoadScr(0);
-    GFL_BGSysMoveBG(0, 3, 0);
+    GFL_BGSysMoveBG(0, BG_MOVE_SET_Y, 0);
     GFL_ArcToolFree(arc);
 
     setup.x = 16;
@@ -312,7 +312,7 @@ void CtvtDraw_Leave(CommTvtWork *sys, CtvtDraw *draw) {
     ClActor_Delete(draw->penMenu);
     GFL_BGSysClearScr(0);
     GFL_BGSysLoadScr(0);
-    GFL_BGSysMoveBG(0, 3, 0);
+    GFL_BGSysMoveBG(0, BG_MOVE_SET_Y, 0);
     GFL_BGSysClearScr(6);
     GFL_BGSysLoadScr(6);
     GFL_BGSysSetBGEnabled(5, TRUE);
@@ -329,9 +329,9 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
     switch (draw->state) {
     case DRAW_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         } else {
-            GFL_WipeSet(4, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         }
         draw->state = DRAW_STATE_WAIT_FADE_IN;
         break;
@@ -347,7 +347,7 @@ int CtvtDraw_Main(CommTvtWork *sys, CtvtDraw *draw) {
         if (draw->waitSound && CtvtCamera_IsSoundDone(sys, camera) != TRUE) {
             break;
         }
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         draw->state = DRAW_STATE_WAIT_FADE_OUT;
         draw->drawEnabled = FALSE;
         break;
@@ -853,7 +853,7 @@ static void CtvtDraw_UpdateSlide(CommTvtWork *sys, CtvtDraw *draw) {
         }
     }
     if (moved == TRUE) {
-        GFL_BGSysMoveBGReq(0, 3, CTVT_DRAW_SLIDE - draw->slide);
+        GFL_BGSysMoveBGReq(0, BG_MOVE_SET_Y, CTVT_DRAW_SLIDE - draw->slide);
         for (i = 0; i < CTVT_DRAW_BUTTONS; i++) {
             ClActorPos pos;
 

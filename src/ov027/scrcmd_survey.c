@@ -225,7 +225,7 @@ BOOL s0201_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
     int best;
     u16 msgId;
     SaveControl *save;
-    void *survey;
+    SurveySave *survey;
     int count;
     int total;
 
@@ -249,16 +249,16 @@ BOOL s0201_SurveyGetPopularOptionMsgID(VM *vm, FieldScriptEnv *env) {
 }
 
 BOOL SurveyCmd_WriteOwnAnswer(VM *vm, FieldScriptEnv *env) {
-    void *survey;
+    u8 *answers;
     u32 question;
     u32 answer;
 
     FieldScriptEnv_GetScriptWork(env);
-    survey = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))));
+    answers = SurveySave_GetOwnAnswers(SurveySave_Get(GameData_GetSaveControl(FieldScriptEnv_GetGameData(env))));
     question = ScriptReadAny(vm, env);
     answer = ScriptReadAny(vm, env);
-    SurveySave_WriteAnswer(survey, question, answer);
-    GameBeaconSys_SetSurveyAnswers(survey);
+    SurveySave_WriteAnswer(answers, question, answer);
+    GameBeaconSys_SetSurveyAnswers(answers);
     return FALSE;
 }
 
@@ -314,7 +314,7 @@ BOOL SurveyCmd_GetCurrentRemaining(VM *vm, FieldScriptEnv *env) {
 }
 
 u16 Survey_GetCurrentAnswersLeft(SaveControl *save) {
-    void *survey;
+    SurveySave *survey;
     u16 index;
     u32 maximum;
     u8 count;

@@ -53,57 +53,57 @@ void PML_PersonalFree(PersonalData *personal) {
 
 u32 PML_PersonalGetParam(PersonalData *data, u32 param) {
     switch (param) {
-    case 0:
+    case PERSONAL_BASE_HP:
         return data->hp;
-    case 1:
+    case PERSONAL_BASE_ATTACK:
         return data->attack;
-    case 2:
+    case PERSONAL_BASE_DEFENSE:
         return data->defense;
-    case 3:
+    case PERSONAL_BASE_SPEED:
         return data->speed;
-    case 4:
+    case PERSONAL_BASE_SP_ATTACK:
         return data->spAttack;
-    case 5:
+    case PERSONAL_BASE_SP_DEFENSE:
         return data->spDefense;
     case PERSONAL_TYPE_1:
         return data->type1;
     case PERSONAL_TYPE_2:
         return data->type2;
-    case 8:
+    case PERSONAL_CATCH_RATE:
         return data->catchRate;
-    case 9:
+    case PERSONAL_BASE_EXP:
         return data->baseExp;
-    case 10:
+    case PERSONAL_EV_HP:
         return data->evHP;
-    case 11:
+    case PERSONAL_EV_ATTACK:
         return data->evAttack;
-    case 12:
+    case PERSONAL_EV_DEFENSE:
         return data->evDefense;
-    case 13:
+    case PERSONAL_EV_SPEED:
         return data->evSpeed;
-    case 14:
+    case PERSONAL_EV_SP_ATTACK:
         return data->evSpAttack;
-    case 15:
+    case PERSONAL_EV_SP_DEFENSE:
         return data->evSpDefense;
     case PERSONAL_NO_BOUNCE:
         return data->noBounce;
-    case 17:
+    case PERSONAL_ITEM_1:
         return data->items[0];
-    case 18:
+    case PERSONAL_ITEM_2:
         return data->items[1];
-    case 19:
+    case PERSONAL_ITEM_3:
         return data->items[2];
     case PERSONAL_SEX_RATIO:
         return data->sexRatio;
     case PERSONAL_HATCH_CYCLES:
         return data->hatchCycles;
-    case 22:
+    case PERSONAL_FRIENDSHIP:
         return data->friendship;
-    case 23:
+    case PERSONAL_GROWTH_RATE:
         return data->growthRate;
-    case 24:
+    case PERSONAL_EGG_GROUP_1:
         return data->eggGroup1;
-    case 25:
+    case PERSONAL_EGG_GROUP_2:
         return data->eggGroup2;
     case PERSONAL_ABILITY_1:
         return data->abilities[0];
@@ -111,43 +111,43 @@ u32 PML_PersonalGetParam(PersonalData *data, u32 param) {
         return data->abilities[1];
     case PERSONAL_ABILITY_HIDDEN:
         return data->abilities[2];
-    case 29:
+    case PERSONAL_FLEE_RATE:
         return data->fleeRate;
-    case 30:
+    case PERSONAL_FORM_FILE:
         return data->formFile;
     case PERSONAL_FORM_SPRITE_OFFSET:
         return data->formSpriteOffset;
     case PERSONAL_FORM_COUNT:
         return data->formCount;
-    case 33:
+    case PERSONAL_COLOR:
         return data->color;
-    case PERSONAL_SPRITE_FLIP:
-        return data->spriteFlip;
+    case PERSONAL_NO_FLIP:
+        return data->noFlip;
     case PERSONAL_PALETTE_FORMS:
         return data->paletteForms;
-    case 36:
+    case PERSONAL_STAGE:
         return data->stage;
-    case 37:
+    case PERSONAL_HEIGHT:
         return data->height;
     case PERSONAL_WEIGHT:
         return data->weight;
-    case 39:
+    case PERSONAL_MACHINES_1:
         return data->machines[0];
-    case 40:
+    case PERSONAL_MACHINES_2:
         return data->machines[1];
-    case 41:
+    case PERSONAL_MACHINES_3:
         return data->machines[2];
-    case 42:
+    case PERSONAL_MACHINES_4:
         return data->machines[3];
-    case 43:
+    case PERSONAL_TUTORS:
         return data->tutors[0];
-    case 44:
+    case PERSONAL_TUTOR_PAID_1:
         return data->tutors[1];
-    case 45:
+    case PERSONAL_TUTOR_PAID_2:
         return data->tutors[2];
-    case 46:
+    case PERSONAL_TUTOR_PAID_3:
         return data->tutors[3];
-    case 47:
+    case PERSONAL_TUTOR_PAID_4:
         return data->tutors[4];
     }
     return 0;

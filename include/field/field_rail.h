@@ -136,7 +136,7 @@ struct RailUnit {
     s32 width;
     fx32 tileWidth;
     u32 dir;
-    RailDataHandle *handle;
+    const RailDataHandle *handle;
     RailDisabledLines *disabled;
     u8 movePending;
     s8 moveProgress; // Attempted sixteenths toward the current 16-sixteenth request

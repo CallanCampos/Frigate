@@ -21,9 +21,6 @@
 
 #define HEAPID_WIFIBATTLEMATCH_SUBPROC 0x58
 
-// GFLNetInitData.bNetType of an infrared connection
-#define NET_TYPE_IRC 3
-
 typedef struct {
     u32 state;
     PokeParty *party;
@@ -129,7 +126,7 @@ static BOOL WifiBattleMatchList_Main(GameProc *proc, u32 *state, void *param, vo
 
     // A failed connection ends the screens
     if (GFL_NetIsInitialized()) {
-        if (GFL_NetGetInitData()->bNetType == NET_TYPE_IRC) {
+        if (GFL_NetGetInitData()->bNetType == GFL_NET_TYPE_IRC) {
             if (GFL_NetErrCheck()) {
                 GFL_NetErrMarkShown();
                 list->result = 2;

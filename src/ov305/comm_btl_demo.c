@@ -1400,7 +1400,7 @@ static void CommBtlDemoG3D_AddEmitters(CommBtlDemoG3D *g3d, const VecFx32 *pos) 
 // Binds one of the texture's palettes to the materials of an actor's model that use another
 static BOOL CommBtlDemoG3D_BindPalette(G3DActor *actor, u32 plttToMatListIdx, u32 plttNameIdx) {
     G3DModel *model = GFL_G3DActorGetMdl(actor);
-    void *texResource = GFL_G3DMdlGetTexResource(model);
+    G3DResource *texResource = GFL_G3DMdlGetTexResource(model);
     NNSG3dResMdl *resMdl = GFL_G3DMdlGetEngineModel(model)->resMdl;
     NNSG3dResTex *tex = GFL_G3DResGetTexData(texResource);
 

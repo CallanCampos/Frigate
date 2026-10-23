@@ -290,37 +290,50 @@ struct JoinAvenueOccupants {
 };
 
 struct JoinAvenueInfo {
+    // The avenue's name and title, which the player gives
     u16 name[21];
-    u16 name2[21];
+    u16 title[21];
     u32 visitorIds[JOIN_AVE_VISITOR_ID_COUNT];
-    u32 unkD4;
+    // The popularity points toward the next rank
+    u32 popularity;
     u16 rank;
-    u16 unkDA;
-    u32 unkDC_0 : 1;
-    u32 unkDC_1 : 1;
-    u32 unkDC_2 : 1;
-    u32 unkDC_3 : 1;
-    u32 unkDC_4 : 1;
-    u32 unkDC_5 : 1;
-    u32 unkDC_6 : 1;
-    u32 unkDC_7 : 1;
-    u32 unkDC_8 : 1;
-    u32 unkDC_9 : 1;
-    u32 unkDC_10 : 1;
-    u32 unkDC_11 : 1;
-    u32 unkDC_12 : 1;
+    // What GameData_SetJoinAvenueSeason takes on entering the avenue, and the first row of the visits' points of the
+    // shops, four to a shop kind
+    u16 season;
+    // Whether the initial entries were added; the daily reset clears it
+    u32 entriesAdded : 1;
+    // Set from the start until a script clears it. While it is, the town map shows no landmarks at the avenue, no
+    // initial entries are added and only the entries of shop kinds 2 and 3 may take the first place
+    u32 unopened : 1;
+    // The ranks' unlocks of resort_sys.c's table, by their place in it: whether each was given, then whether each
+    // was reached and waits for the script that gives it
+    u32 unlocked1 : 1;
+    u32 unlocked2 : 1;
+    u32 unlocked4 : 1;
+    u32 unlocked5 : 1;
+    u32 unlocked3 : 1;
+    u32 unlockPending1 : 1;
+    u32 unlockPending2 : 1;
+    u32 unlockPending4 : 1;
+    u32 unlockPending5 : 1;
+    u32 unlockPending3 : 1;
+    // Whether the special entry was tried since the daily reset, once event flag 2400 is set
+    u32 specialEntryChecked : 1;
+    // Set by a script and cleared when the special entry joins
     u32 unkDC_13 : 1;
-    u32 unkDC_14 : 1;
-    u32 unkDC_15 : 1;
-    u32 unkDC_16 : 1;
-    u32 unkDC_17 : 1;
-    u32 unkDC_18 : 1;
-    u32 unkDC_19 : 1;
+    u32 unlocked6 : 1;
+    u32 unlockPending6 : 1;
+    u32 unlocked7 : 1;
+    u32 unlockPending7 : 1;
+    u32 unlocked8 : 1;
+    u32 unlockPending8 : 1;
     u16 visitorIdCount;
     u16 visitorIdIndex;
     u32 seed;
-    u16 unkE8;
-    u16 unkEA;
+    // Set when every occupant's shop reaches the highest level, and the days since, after seven of which the daily
+    // reset clears both
+    u16 maxLevelDays;
+    u16 maxLevelWeek;
 };
 
 // Save block 0x43 (join_avenue_savedata.c, a descriptive name): the people met, the entries, the occupants and the
@@ -366,18 +379,45 @@ BOOL JoinAvenuePerson_IsEmpty(JoinAvenuePerson *person);
 void JoinAvenuePerson_SetParam(JoinAvenuePerson *person, JoinAvenuePersonParam param, u32 value);
 JoinAvenueInfo *JoinAvenue_GetInfo(JoinAvenueSave *joinAvenue);
 void JoinAvenueInfo_Init(JoinAvenueInfo *info);
-// The fields of the info that JoinAvenue_GetParam reads and JoinAvenueInfo_SetParam sets that overlay 137 names: the
-// avenue's rank, and the popularity points toward the next rank
+// The fields of the info that JoinAvenue_GetParam reads and JoinAvenueInfo_SetParam sets, in JoinAvenueInfo's names.
+// The unlock k of resort_sys.c's table (1 to 8, whose bits are in the table's order) has its flags at
+// JOIN_AVE_INFO_UNLOCKED_1 + k - 1 and JOIN_AVE_INFO_UNLOCK_PENDING_1 + k - 1; unlock 6 lets shops of kind 5 be run
 enum {
-    JOIN_AVE_INFO_RANK = 2,
+    JOIN_AVE_INFO_NAME,
+    JOIN_AVE_INFO_TITLE,
+    JOIN_AVE_INFO_RANK,
     JOIN_AVE_INFO_POPULARITY,
+    JOIN_AVE_INFO_SEED,
+    JOIN_AVE_INFO_SEASON,
+    JOIN_AVE_INFO_ENTRIES_ADDED,
+    JOIN_AVE_INFO_UNOPENED,
+    JOIN_AVE_INFO_UNLOCKED_1,
+    JOIN_AVE_INFO_UNLOCKED_2,
+    JOIN_AVE_INFO_UNLOCKED_3,
+    JOIN_AVE_INFO_UNLOCKED_4,
+    JOIN_AVE_INFO_UNLOCKED_5,
+    JOIN_AVE_INFO_UNLOCKED_6,
+    JOIN_AVE_INFO_UNLOCKED_7,
+    JOIN_AVE_INFO_UNLOCKED_8,
+    JOIN_AVE_INFO_UNLOCK_PENDING_1,
+    JOIN_AVE_INFO_UNLOCK_PENDING_2,
+    JOIN_AVE_INFO_UNLOCK_PENDING_3,
+    JOIN_AVE_INFO_UNLOCK_PENDING_4,
+    JOIN_AVE_INFO_UNLOCK_PENDING_5,
+    JOIN_AVE_INFO_UNLOCK_PENDING_6,
+    JOIN_AVE_INFO_UNLOCK_PENDING_7,
+    JOIN_AVE_INFO_UNLOCK_PENDING_8,
+    JOIN_AVE_INFO_SPECIAL_ENTRY_CHECKED,
+    JOIN_AVE_INFO_UNK_DC_13,
+    JOIN_AVE_INFO_MAX_LEVEL_DAYS,
+    JOIN_AVE_INFO_MAX_LEVEL_WEEK,
 };
-// A field of the info, which reads into the buffer for the avenue's names
+// A field of the info, which reads into the buffer for the name and title
 u32 JoinAvenue_GetParam(JoinAvenueInfo *info, u32 param, void *buffer);
 JoinAvenuePersonList *JoinAvenue_GetPersonList(JoinAvenueSave *joinAvenue);
 // Records an activity of the player's, the latest of the four recent ones
 void JoinAvenue_RecordActivity(u32 id);
-// Sets a field of the info
+// Sets a field of the info: the name and title from a pointer. The seed can't be set
 void JoinAvenueInfo_SetParam(JoinAvenueInfo *info, u32 param, u32 value);
 void JoinAvenueInfo_ResetDaily(JoinAvenueInfo *info, BOOL fullDay);
 // Where the info and occupants of the save are, for the functions that don't take them
@@ -411,7 +451,7 @@ BOOL JoinAvenueEntryList_MergeEntry(JoinAvenueEntryList *list, const JoinAvenueE
 // Called with an entry by overlay 137, which counts a result of 2 and stops at 0
 u32 JoinAvenue_Add(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3);
 void JoinAvenue_ResetAddStep(JoinAvenueSave *joinAvenue);
-BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out);
+BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, JoinAvenueVisitor *work, u32 a3, u32 *out);
 // The visitor of a beacon
 JoinAvenueVisitor *JoinAvenueVisitor_Create(HeapID heapId);
 void JoinAvenueVisitor_Free(JoinAvenueVisitor *visitor);

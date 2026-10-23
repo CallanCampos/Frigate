@@ -44,7 +44,7 @@
 #define CTVT_TALK_KEYS (PAD_BUTTON_A | PAD_BUTTON_R)
 
 // The steps of the talk mode
-enum {
+typedef enum {
     TALK_STATE_FADE_IN,
     TALK_STATE_WAIT_FADE_IN,
     TALK_STATE_FADE_OUT_TO_GAME,
@@ -80,7 +80,7 @@ enum {
     TALK_STATE_WAIT_SYNC_EXIT,
     TALK_STATE_ALONE,
     TALK_STATE_WAIT_ALONE,
-};
+} CtvtTalkState;
 
 // What the talk mode goes on to, in next
 enum {
@@ -101,12 +101,12 @@ enum {
 
 // What the voice icon shows: the talk button free, the member's own voice recording, or the button not usable (another
 // member talking, no microphone, nobody to talk to); VOICE_ICON_MAX is none of them, so that the first is drawn
-enum {
+typedef enum {
     VOICE_ICON_READY,
     VOICE_ICON_TALKING,
     VOICE_ICON_BUSY,
     VOICE_ICON_MAX,
-};
+} CtvtTalkVoiceIcon;
 
 // Which of the speed buttons is touched: the ones that speed the voice up, or the ones that slow it down
 enum {
@@ -118,7 +118,7 @@ enum {
 #define SPEED_TOUCH_NONE 0xff
 
 struct CtvtTalk {
-    int state;
+    CtvtTalkState state;
     int next;
     BOOL waitSound;
     u8 requestCooldown;
@@ -150,8 +150,8 @@ struct CtvtTalk {
     ClActor *exitButton;
     ClActor *voiceIcon;
     ClActor *gameButtons[2];
-    int voiceIconState;
-    int shownVoiceIconState;
+    CtvtTalkVoiceIcon voiceIconState;
+    CtvtTalkVoiceIcon shownVoiceIconState;
     BmpWin *gameWindow;
     BmpWin *gameWindowSub;
     BOOL gameWindowPending;
@@ -388,9 +388,9 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
     switch (talk->state) {
     case TALK_STATE_FADE_IN:
         if (func_ov257_021aaa74(sys) == TRUE) {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         } else {
-            GFL_WipeSet(4, 1, 1, 0, 6, 1, heapId);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, heapId);
         }
         talk->state = TALK_STATE_WAIT_FADE_IN;
         break;
@@ -400,7 +400,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         }
         break;
     case TALK_STATE_FADE_OUT_TO_GAME:
-        GFL_WipeSet(4, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         func_ov257_021aaa78(sys, FALSE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;
@@ -414,7 +414,7 @@ int CtvtTalk_Main(CommTvtWork *sys, CtvtTalk *talk) {
         if (talk->waitSound && CtvtCamera_IsSoundDone(sys, camera) != TRUE) {
             break;
         }
-        GFL_WipeSet(0, 0, 0, 0, 6, 1, heapId);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, heapId);
         func_ov257_021aaa78(sys, TRUE);
         talk->state = TALK_STATE_WAIT_FADE_OUT;
         break;

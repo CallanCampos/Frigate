@@ -38,9 +38,9 @@ struct TimeSigSave {
 
 u32 TimeSigSave_GetSize(void);
 void TimeSigSave_Init(TimeSigSave *timeSig);
-void *getTimeSigBlkAddress(SaveControl *save);
+TimeSigSave *getTimeSigBlkAddress(SaveControl *save);
 // The block's first 0x600 bytes, which the trainer card copies
-void *TimeSigSave_GetSignature(void *timeSig);
+u32 *TimeSigSave_GetSignature(TimeSigSave *timeSig);
 BOOL TimeSigSave_HasSignature(TimeSigSave *timeSig);
 u8 TimeSigSave_IsUnionViewChanged(TimeSigSave *timeSig);
 void TimeSigSave_SetUnionViewChanged(TimeSigSave *timeSig);

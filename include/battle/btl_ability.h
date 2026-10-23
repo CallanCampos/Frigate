@@ -108,7 +108,7 @@ const BattleEventHandlerEntry *EventAddSimple(u32 *priority);
 void HandlerLeafGuard(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 void HandlerLeafGuardYawnCheck(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);
 const BattleEventHandlerEntry *EventAddLeafGuard(u32 *priority);
-BOOL HandlerCommonGuardStatus(void *flow, u32 monId, u32 status);
+BOOL HandlerCommonGuardStatus(BtlServerFlow *flow, u32 monId, u32 status);
 void CommonAbilityCureStatus(BtlServerFlow *flow, u8 monId, u32 status);
 void CommonAbilityCureStatusCore(BtlServerFlow *flow, u8 monId, u32 status);
 void HandlerLimberStatus(BattleEventItem *item, BtlServerFlow *flow, u8 monId, s32 *work);

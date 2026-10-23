@@ -38,7 +38,7 @@ typedef struct {
 typedef struct {
     GameSystem *gsys;
     VecFx32 pos;
-    void *msgWin;
+    ActorMsgWin *msgWin;
     StrBuf *strbuf;
     u32 unk18;
 } BtlInstTrainerMsgWork;
@@ -131,7 +131,7 @@ static GameEventReturnCode EventBtlInstPokeSelect_Callback(GameEvent *event, u32
 GameEvent *EventBtlInstTrainerMsg_Create(GameSystem *gsys, BSubwayTrainer *trainers, u32 index, u16 actorId) {
     GameEvent *event;
     GameData *gameData = GSYS_GetGameData(gsys);
-    void *msgBGSys = Field_GetMsgBGSys(GSYS_GetField(gsys));
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(GSYS_GetField(gsys));
     BtlInstTrainerMsgWork *work;
 
     event = GameEvent_Create(gsys, NULL, EventBtlInstTrainerMsg_Callback, sizeof(BtlInstTrainerMsgWork));

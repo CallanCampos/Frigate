@@ -38,7 +38,7 @@ void SaveOutside_EraseKeys(HeapID heapId);
 BOOL SaveOutside_IsKeysLoaded(SaveOutside *work);
 BOOL SaveOutside_IsKeysBroken(SaveOutside *work);
 // The key system's data: the key information, then the Memory Link's
-void *SaveOutside_GetKeyData(SaveOutside *work);
+KeySystemData *SaveOutside_GetKeyData(SaveOutside *work);
 // Copies the key information into the save
 void SaveOutside_CopyKeysToSave(SaveOutside *work, SaveControl *save);
 

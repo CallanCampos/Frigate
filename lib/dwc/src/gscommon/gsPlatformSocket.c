@@ -1,5 +1,7 @@
 #include "dwc/gsPlatformSocket.h"
 #include "dwc/gsDebug.h"
+// MWCC copies the address in sendto in place, as the ROM does, only when <string.h> declares memcpy
+#include <string.h>
 
 // GameSpy's sockets (gsPlatformSocket.c). The ROM names neither the file nor its functions: the file is the later
 // SDK's, and the functions are GameSpy's, as pret's pokerevo Wii build has them (nonport.s), or the later SDK's
@@ -89,7 +91,7 @@ int send(SOCKET sock, const char *buffer, int size, int flags) {
 int sendto(SOCKET sock, const char *buffer, int size, int flags, const SOCKADDR *address, int addressSize) {
     SOCKADDR remote;
 
-    remote = *address;
+    memcpy(&remote, address, sizeof(remote));
     remote.len = addressSize;
     return CheckRcode(SOC_SendTo(sock, buffer, size, flags, &remote), -1);
 }

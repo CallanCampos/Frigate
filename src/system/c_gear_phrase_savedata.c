@@ -14,20 +14,18 @@ void CGearPhrases_Init(PMSData *phrases) {
     PMSData_InitPreset(&phrases[4], 3);
 }
 
-void *CGearPhrases_GetBlock(SaveControl *save) {
+CGearSave *CGearPhrases_GetBlock(SaveControl *save) {
     return getCGearDataBlkAddress(save);
 }
 
-void *getCGearDataBlkAddress(SaveControl *save) {
+CGearSave *getCGearDataBlkAddress(SaveControl *save) {
     return SaveControl_GetBlockPtr(save, SAVE_BLOCK_CGEAR);
 }
 
-void CGearPhrases_Get(void *cgear, u32 index, PMSData *sentence) {
-    PMSData *phrases = cgear;
-
-    *sentence = phrases[index];
+void CGearPhrases_Get(CGearSave *cgear, u32 index, PMSData *sentence) {
+    *sentence = cgear->phrases[index];
 }
 
-void CGearPhrases_Set(PMSData *phrases, u32 index, const PMSData *sentence) {
-    phrases[index] = *sentence;
+void CGearPhrases_Set(CGearSave *cgear, u32 index, const PMSData *sentence) {
+    cgear->phrases[index] = *sentence;
 }

@@ -41,7 +41,8 @@ still linked, and objdiff shows how close it is.
 ## Rules
 
 - **Both ROMs stay byte for byte.** Every PR ends with `ninja` passing, which compiles every source file, complete or
-  not, and checks every module and both SHA1s.
+  not, and checks every module and both SHA1s, and with no compiler warnings: `tools/decomp/compile_all.py` compiles
+  every file of both versions and fails on any warning, as CI does.
   Black 2 and White 2 share the source, with `BLACK2`/`WHITE2` defines where they differ.
 - **Change configs only with the scripts** (`add_source_file.py`, `mark_complete.py`, `rename_symbol.py`,
   `config_fixes.py`). They update both versions and keep the changes when the configs are regenerated.

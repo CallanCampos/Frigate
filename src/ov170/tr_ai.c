@@ -651,7 +651,7 @@ BOOL TrAI_ChooseMoveAndTarget(VM *vm, TrAIContext *wk) {
     }
     wk->chosenTarget = targets[GFL_RandomMTRange(count)];
     wk->chosenMove = wk->bestMoves[wk->chosenTarget];
-    if (GetMoveData(wk, MoveGetID(wk->attacker, wk->chosenMove), 27) == 1 && !(wk->chosenTarget & 1)) {
+    if (GetMoveData(wk, MoveGetID(wk->attacker, wk->chosenMove), MOVE_PARAM_TARGET) == 1 && !(wk->chosenTarget & 1)) {
         wk->chosenTarget = wk->attackerPos;
     }
     move = MoveGetID(wk->attacker, wk->chosenMove);

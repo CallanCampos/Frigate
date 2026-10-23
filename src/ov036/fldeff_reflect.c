@@ -77,7 +77,7 @@ static void func_ov036_021b49a4(FieldEffectReflect *effect) {
 static void func_ov036_021b49a8(FieldEffectReflect *effect) {
 }
 
-void func_ov036_021b49ac(MMSys *mmSys, FieldActor *actor, void *effects, u32 type) {
+void func_ov036_021b49ac(MMSys *mmSys, FieldActor *actor, FieldEffects *effects, u32 type) {
     ReflectTaskParams params;
 
     FieldEffects_GetField(effects);

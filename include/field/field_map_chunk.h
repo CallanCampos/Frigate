@@ -52,7 +52,7 @@ typedef struct {
 struct FieldChunkContext {
     FieldTerrainSRTAnimatorChunkState *srtAnimatorState;
     FieldPropSystem *propSystem;
-    void *wfbc;
+    FieldWFBC *wfbc;
     ResortMapCreateWork *resortMap;
     u32 chunkIndex;
     u16 heapId;
@@ -85,11 +85,11 @@ struct FieldChunk {
     const FieldChunkVTable *vtable;
     NNSG3dRenderObj *model;
     NNSG3dRenderObj modelObj;
-    void *modelRsc;
-    void *texRsc;
+    G3DResource *modelRsc;
+    G3DResource *texRsc;
     u32 textureVRAM;
     u32 paletteVRAM;
-    void *mapTextures;
+    G3DResource *mapTextures;
     FieldPropResBank *propResBank;
     FieldPropInstance *propInstances;
     FieldPropInstance *propInstances2;
@@ -99,17 +99,17 @@ struct FieldChunk {
     u32 unkAC;
     FieldChunkLoader loader;
     void *container;
-    void *context;
+    FieldChunkContext *context;
 };
 
 FieldChunk *FieldChunk_Create(const FieldChunkConfig *config, HeapID heapId);
 void FieldChunk_Free(FieldChunk *chunk);
 void FieldChunk_CallLoaderUpdate(FieldChunk *chunk);
 void FieldChunk_LoadFullSync(FieldChunk *chunk);
-BOOL FieldChunk_Draw(FieldChunk *chunk, void *camera);
+BOOL FieldChunk_Draw(FieldChunk *chunk, G3DCamera *camera);
 void FieldChunk_BindArc(FieldChunk *chunk, u32 arcId, HeapID heapId);
 void FieldChunk_UnbindArc(FieldChunk *chunk);
-void FieldChunk_BindMapTextures(FieldChunk *chunk, void *textures);
+void FieldChunk_BindMapTextures(FieldChunk *chunk, G3DResource *textures);
 void FieldChunk_UnbindMapTextures(FieldChunk *chunk);
 void FieldChunk_BindPropResInstanceBank(FieldChunk *chunk, FieldPropResBank *bank);
 void FieldChunk_UnbindPropResInstanceBank(FieldChunk *chunk);
@@ -119,7 +119,7 @@ void FieldChunk_Disable(FieldChunk *chunk);
 void FieldChunk_BeginLoad(FieldChunk *chunk, u32 datID);
 BOOL FieldChunk_UpdateStreamLoad(FieldChunk *chunk);
 BOOL FieldChunk_RenderMap(FieldChunk *chunk);
-void FieldChunk_RenderProps(FieldChunk *chunk, void *camera);
+void FieldChunk_RenderProps(FieldChunk *chunk, G3DCamera *camera);
 BOOL FieldChunk_IsTerrainReady(FieldChunk *chunk);
 void FieldChunk_GetTerrain(MapTerrainSamplerOutput *out, FieldChunk *chunk, const VecFx32 *pos, fx32 a3);
 void FieldChunk_GetTerrainBaseLayer(MapTerrainSamplerOutput *out, FieldChunk *chunk, const VecFx32 *pos, fx32 a3);
@@ -143,15 +143,15 @@ void FieldChunk_GetDatID(FieldChunk *chunk, u32 *datID);
 void FieldChunk_GetRawDataLength(FieldChunk *chunk, u32 *length);
 void FieldChunk_BindModel(FieldChunk *chunk, void *model);
 void FieldChunk_UnbindModel(FieldChunk *chunk);
-void *FieldChunk_GetModelResource(FieldChunk *chunk);
+G3DResource *FieldChunk_GetModelResource(FieldChunk *chunk);
 void FieldChunk_FreeTexRsc(FieldChunk *chunk);
-void *FieldChunk_GetUsedTexRsc(FieldChunk *chunk);
+G3DResource *FieldChunk_GetUsedTexRsc(FieldChunk *chunk);
 void FieldChunk_SetupModel(FieldChunk *chunk);
 NNSG3dRenderObj *FieldChunk_GetModel(FieldChunk *chunk);
 void FieldChunk_ResetStreamer(FieldChunk *chunk);
 
-void *FieldChunk_GetUsedTexRscCore(FieldChunk *chunk);
-void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, void *resource, void *texture);
+G3DResource *FieldChunk_GetUsedTexRscCore(FieldChunk *chunk);
+void FieldChunk_LinkMdlTex(NNSG3dRenderObj *model, G3DResource *resource, G3DResource *texture);
 
 // The kinds of chunk, by the magic at the start of their files
 // field_map_chunk_wb.c

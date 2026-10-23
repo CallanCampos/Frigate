@@ -1,4 +1,5 @@
 #include "types.h"
+#include "battle/btl_setup.h"
 #include "constants/pokemon.h"
 #include "field/pokewood_system.h"
 #include "gfl/arc.h"
@@ -21,16 +22,6 @@ typedef struct {
     u8 movies[5];
     u8 medal;
 } PokewoodSeries;
-
-// The battle's results, which PokewoodSystem_SetRecord keeps
-typedef struct {
-    u8 unk0[0x24];
-    PokeParty *party;
-    u8 unk28[0xfc];
-    u32 result;
-    u8 unk128[8];
-    s32 score;
-} PokewoodBattleResult;
 
 // What PokewoodSystem_AddGradePoints adds for each result
 static s32 sAmounts[] = { 1, 3, 15 };
@@ -123,7 +114,7 @@ u16 PokewoodSystem_GetSaveSlot(PokewoodSystem *sys) {
     return sys->unkDA;
 }
 
-void *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys) {
+PokewoodBlock *PokewoodSystem_GetPokewoodBlk(PokewoodSystem *sys) {
     return sys->pokewoodBlk;
 }
 
@@ -221,9 +212,8 @@ void Pokewood_CheckMedals(GameData *gameData) {
     }
 }
 
-void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32 movie) {
-    const PokewoodBattleResult *result = battleResult;
-    PokeParty *party = result->party;
+void PokewoodSystem_SetRecord(PokewoodSystem *sys, const BtlSetup *setup, u32 movie) {
+    PokeParty *party = setup->party[0];
     PokewoodRecord record;
     PartyPkm *pkm;
     u32 species;
@@ -231,7 +221,7 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32
     int i = 0;
 
     MI_CpuFill8(&record, 0, sizeof(record));
-    record.score = result->score;
+    record.score = setup->studioScore;
     for (; i < PokeParty_GetPkmCount(party); i++) {
         pkm = PokeParty_GetPkm(party, i);
         species = PokeParty_GetParam(pkm, PKM_PARAM_SPECIES, NULL);
@@ -242,7 +232,7 @@ void PokewoodSystem_SetRecord(PokewoodSystem *sys, const void *battleResult, u32
         }
     }
     sys->record = record;
-    sys->unkF4 = result->result;
+    sys->unkF4 = setup->studioEnding;
 }
 
 void PokewoodSystem_KeepBestRecord(GameData *gameData, PokewoodSystem *sys) {

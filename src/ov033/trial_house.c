@@ -40,7 +40,7 @@ void func_ov033_0217acd4(GameSystem *gsys, TrialHouseWork *work) {
     u32 state;
     SaveControl *save;
     void *buffer;
-    void *extraSave;
+    BattleExaminationSave *extraSave;
 
     save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x79);
@@ -140,7 +140,7 @@ void func_ov033_0217ade8(TrialHouseWork *work, u32 mode) {
 void func_ov033_0217ae5c(GameSystem *gsys, TrialHouseWork *work, u32 mode) {
     SaveControl *save;
     void *buffer;
-    void *extra;
+    BattleExaminationSave *extra;
 
     save = GameData_GetSaveControl(GSYS_GetGameData(gsys));
     buffer = GFL_HeapAllocate(0x8004, 0x800, TRUE, "trial_house.c", 0x14c);
@@ -172,7 +172,7 @@ GameEvent *func_ov033_0217aee8(GameSystem *gsys, TrialHouseWork *work, u16 *resu
     data->timeout = 0;
     data->init.code = 0x2e;
     data->init.data[0].datasize = BattleExamination_GetSize();
-    data->init.data[0].pData = work->saveBuffer;
+    data->init.data[0].pData = (u8 *)work->saveBuffer;
     data->init.data[0].region = region;
 #ifdef BLACK2
     data->init.data[0].mask = 0x800000;
@@ -190,7 +190,7 @@ GameEventReturnCode func_ov033_0217af5c(GameEvent *event, u32 *state, void *arg)
     GameSystem *gsys;
     GameData *gameData;
     TrialHouseSave *save;
-    void *saveBuffer;
+    BattleExaminationSave *saveBuffer;
     u32 a;
     u32 b;
     u32 c;
@@ -423,7 +423,7 @@ GameEventReturnCode func_ov033_0217b3ac(GameEvent *event, u32 *state, void *arg)
     TrialHouseEffectEvent *data;
     GameData *gameData;
     SaveControl *save;
-    void *extraSave;
+    BattleExaminationSave *extraSave;
 
     data = arg;
     gameData = GSYS_GetGameData(data->gsys);

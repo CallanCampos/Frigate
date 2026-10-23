@@ -10,15 +10,19 @@
 // Screen wipes (wipe.c): a pattern that covers or uncovers each screen over a number of steps, in black or white
 
 // Which screens wipe, and in which order
-#define WIPE_MODE_BOTH 0
-#define WIPE_MODE_MAIN_FIRST 1
-#define WIPE_MODE_SUB_FIRST 2
-#define WIPE_MODE_MAIN 3
-#define WIPE_MODE_SUB 4
+enum {
+    WIPE_MODE_BOTH,
+    WIPE_MODE_MAIN_FIRST,
+    WIPE_MODE_SUB_FIRST,
+    WIPE_MODE_MAIN,
+    WIPE_MODE_SUB,
+};
 
 // The patterns: each even one covers the screen and the odd one after it uncovers it
-#define WIPE_TYPE_FADE_OUT 0
-#define WIPE_TYPE_FADE_IN 1
+enum {
+    WIPE_TYPE_FADE_OUT,
+    WIPE_TYPE_FADE_IN,
+};
 
 // The colors a wipe covers with; WIPE_COLOR_LAST is the color the last wipe covered with
 #define WIPE_COLOR_BLACK 0

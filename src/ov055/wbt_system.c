@@ -116,12 +116,12 @@ void WbtSystem_SetUseBattleBox(WbtSystem *sys, u8 value) {
     sys->unk13A8 = value;
 }
 
-void WbtSystem_SetPartyList(WbtSystem *sys, void *value) {
-    sys->unk13CC = value;
+void WbtSystem_SetPartyList(WbtSystem *sys, WbtPartyList *list) {
+    sys->partyList = list;
 }
 
-void *WbtSystem_GetPartyList(WbtSystem *sys) {
-    return sys->unk13CC;
+WbtPartyList *WbtSystem_GetPartyList(WbtSystem *sys) {
+    return sys->partyList;
 }
 
 void WbtSystem_SetRentalMode(WbtSystem *sys, u32 value) {

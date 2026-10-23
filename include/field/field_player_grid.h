@@ -9,9 +9,11 @@
 #include "struct_decls.h"
 
 // How a held direction continues the player's movement, which FieldPlayerGrid_GetMoveDirContType returns
-#define MOVE_DIR_CONT_NONE 0
-#define MOVE_DIR_CONT_MOVE 1
-#define MOVE_DIR_CONT_TURN 2
+enum {
+    MOVE_DIR_CONT_NONE,
+    MOVE_DIR_CONT_MOVE,
+    MOVE_DIR_CONT_TURN,
+};
 
 FieldPlayerGrid *FieldPlayerGrid_Create(FieldPlayerCore *core, HeapID heapId);
 void FieldPlayerGrid_Free(FieldPlayerGrid *grid);

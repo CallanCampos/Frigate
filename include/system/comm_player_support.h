@@ -10,12 +10,14 @@
 // the player's Pokémon once, and names the player who gave it. Our names
 
 // The support given
-#define COMM_PLAYER_SUPPORT_NONE 0
-// Heals half or all of a Pokémon's HP
-#define COMM_PLAYER_SUPPORT_HEAL_HALF 1
-#define COMM_PLAYER_SUPPORT_HEAL_FULL 2
-// The battle has used it
-#define COMM_PLAYER_SUPPORT_USED 3
+enum {
+    COMM_PLAYER_SUPPORT_NONE,
+    // Heals half or all of a Pokémon's HP
+    COMM_PLAYER_SUPPORT_HEAL_HALF,
+    COMM_PLAYER_SUPPORT_HEAL_FULL,
+    // The battle has used it
+    COMM_PLAYER_SUPPORT_USED,
+};
 
 CommPlayerSupport *CommPlayerSupport_Create(HeapID heapId);
 void CommPlayerSupport_Free(CommPlayerSupport *support);

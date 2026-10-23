@@ -6,9 +6,6 @@
 #include "gfl/net.h"
 #include "struct_decls.h"
 
-// The communication work of a show, whose layout only mus_comm_func.c needs
-typedef struct MusCommWork MusCommWork;
-
 // mus_comm_func.c, overlay 211, which the ROM names: the musical's communication between the players of a show
 
 void MusComm_Boot(HeapID heapId, GameSystem *gsys, GameCommSys *comm, u16 value);

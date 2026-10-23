@@ -13,7 +13,7 @@
 static BOOL StatusRcv_PPUp(PartyPkm *pkm, u32 slot, u32 count);
 static void StatusRcv_RestoreHp(PartyPkm *pkm, u32 hp, u32 maxHp, u32 amount);
 static s32 StatusRcv_AddEffort(s32 effort, s32 total, s32 add, s32 noLimit);
-static BOOL StatusRcv_CanChangeFriendship(PartyPkm *pkm, void *data);
+static BOOL StatusRcv_CanChangeFriendship(PartyPkm *pkm, ItemData *data);
 static BOOL StatusRcv_ChangeFriendship(PartyPkm *pkm, s32 friendship, s32 add, u16 item, u16 zoneId, u32 heapId);
 
 BOOL StatusRcv_CanUseItem(PartyPkm *pkm, u16 item, u16 pos, u32 heapId) {
@@ -30,7 +30,7 @@ BOOL StatusRcv_CanUseItem(PartyPkm *pkm, u16 item, u16 pos, u32 heapId) {
     s32 noLimit;
     s32 effort;
 
-    data = PML_ItemReadDataFile(item, 0, heapId);
+    data = PML_ItemReadDataFile(item, ITEM_FILE_DATA, heapId);
     if (PML_ItemGetParam(data, 14) != 1) {
         GFL_HeapFree(data);
         return FALSE;
@@ -242,7 +242,7 @@ BOOL StatusRcv_UseItem(PartyPkm *pkm, u16 item, u16 pos, u16 zoneId, u32 heapId)
     s32 friendship;
     s32 effort;
 
-    data = PML_ItemReadDataFile(item, 0, heapId);
+    data = PML_ItemReadDataFile(item, ITEM_FILE_DATA, heapId);
     if (PML_ItemGetParam(data, 14) != 1) {
         GFL_HeapFree(data);
         return changed;
@@ -546,7 +546,7 @@ static s32 StatusRcv_AddEffort(s32 effort, s32 total, s32 add, s32 noLimit) {
 }
 
 // Whether the item raises the Pokémon's friendship, by the amount for its range
-static BOOL StatusRcv_CanChangeFriendship(PartyPkm *pkm, void *data) {
+static BOOL StatusRcv_CanChangeFriendship(PartyPkm *pkm, ItemData *data) {
     s32 friendship = PokeParty_GetParam(pkm, PKM_PARAM_HAPPINESS, NULL);
 
     if (friendship >= 255) {

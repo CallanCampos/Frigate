@@ -37,7 +37,7 @@
 typedef struct {
     Field *field;
     PdcWork *pdcWork;
-    void *returnWork;
+    EventPdcReturnParam *returnWork;
     PartyPkm *pkm;
     BtlFieldStatus status;
     EntreeForestPokemon pokemon;

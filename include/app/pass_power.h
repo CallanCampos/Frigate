@@ -12,12 +12,14 @@
 #define OVERLAY_PASS_POWER_APP OVERLAY_ID(328)
 
 // What the screen returns in PassPowerParam's result
-#define PASS_POWER_APP_NONE 0
-// A Pass Power was chosen, the param's passPower
-#define PASS_POWER_APP_USE 1
-#define PASS_POWER_APP_ENTRALINK 2
-// The game system ended the screen
-#define PASS_POWER_APP_ABORTED 3
+enum {
+    PASS_POWER_APP_NONE,
+    // A Pass Power was chosen, the param's passPower
+    PASS_POWER_APP_USE,
+    PASS_POWER_APP_ENTRALINK,
+    // The game system ended the screen
+    PASS_POWER_APP_ABORTED,
+};
 
 struct PassPowerEntry {
     u8 id;

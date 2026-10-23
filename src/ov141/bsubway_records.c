@@ -268,7 +268,7 @@ static BOOL BSubwayRecords_Init(GameProc *proc, u32 *state, void *param, void *w
     BSubwayRecords_CreateCursor(wk);
     BSubwayRecords_UpdateArrows(wk, wk->page, wk->pageCount);
     BSubwayRecords_ShowPage(wk, wk->page);
-    GFL_WipeSet(0, 1, 1, 0, 16, TRUE, HEAPID_BSUBWAY_RECORDS);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 16, TRUE, HEAPID_BSUBWAY_RECORDS);
     GFL_NetSetIconScreen(TRUE, HEAPID_BSUBWAY_RECORDS);
     return TRUE;
 }
@@ -576,7 +576,7 @@ static BOOL BSubwayRecords_StateWaitBack(BSubwayRecordsWork *wk) {
 }
 
 static BOOL BSubwayRecords_StateFadeOut(BSubwayRecordsWork *wk) {
-    GFL_WipeSet(0, 0, 0, 0, 16, TRUE, HEAPID_BSUBWAY_RECORDS);
+    GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 16, TRUE, HEAPID_BSUBWAY_RECORDS);
     wk->state = STATE_WAIT_FADE_OUT;
     return TRUE;
 }

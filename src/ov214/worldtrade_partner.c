@@ -119,11 +119,11 @@ int WorldTrade_Partner_Init(WorldTradeWork *wk, int seq) {
 
     if (wk->subProcessMode == WT_MODE_PARTNER_FROM_PARTNER) {
         if (GX_GetMasterBrightness() == -16 && GXS_GetMasterBrightness() != -16) {
-            GFL_WipeSet(3, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
         } else if (GX_GetMasterBrightness() != -16 && GXS_GetMasterBrightness() == -16) {
-            GFL_WipeSet(4, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_SUB, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
-            GFL_WipeSet(0, 1, 1, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 6, 1, HEAPID_WORLDTRADE);
         }
     }
 
@@ -332,7 +332,7 @@ static void Partner_FreeWork(WorldTradeWork *wk) {
 static int Partner_SubSeqStart(WorldTradeWork *wk) {
     ClActor_SetVisible(wk->promptDsAct, FALSE);
     if (wk->subProcessMode == WT_MODE_PARTNER_FROM_SEARCH) {
-        GFL_WipeSet(0, 1, 1, 0, 16, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_IN, WIPE_TYPE_FADE_IN, 0, 16, 1, HEAPID_WORLDTRADE);
         wk->subprocessSeq = PARTNER_SEQ_RETURN_SCREEN1;
     } else {
         wk->subprocessSeq = PARTNER_SEQ_MAIN;
@@ -375,7 +375,7 @@ static int Partner_SubSeqMain(WorldTradeWork *wk) {
         WorldTrade_SetNextSeq(wk, PARTNER_SEQ_MESSAGE_WAIT, PARTNER_SEQ_YESNO);
         GFL_SndSEPlay(0x54c);
     } else if (GCTX_HIDGetPressedKeys() & PAD_BUTTON_B) {
-        GFL_WipeSet(0, 0, 0, 0, 16, 1, HEAPID_WORLDTRADE);
+        GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 16, 1, HEAPID_WORLDTRADE);
         wk->subprocessSeq = PARTNER_SEQ_EXCHANGE_SCREEN2;
         GFL_SndSEPlay(0x551);
     } else if (GCTX_HIDGetPressedKeys() & PAD_KEY_LEFT) {
@@ -399,7 +399,7 @@ static int Partner_SubSeqMain(WorldTradeWork *wk) {
             WorldTrade_SetNextSeq(wk, PARTNER_SEQ_MESSAGE_WAIT, PARTNER_SEQ_YESNO);
             GFL_SndSEPlay(0x54c);
         } else if (ret == 1) {
-            GFL_WipeSet(0, 0, 0, 0, 16, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 16, 1, HEAPID_WORLDTRADE);
             wk->subprocessSeq = PARTNER_SEQ_EXCHANGE_SCREEN2;
             GFL_SndSEPlay(0x551);
         }
@@ -411,9 +411,9 @@ static int Partner_SubSeqEnd(WorldTradeWork *wk) {
     ClActor_SetVisible(wk->partnerCursorAct, FALSE);
     if (wk->subProcessMode != WT_MODE_SEARCH_PARTNER_RETURN) {
         if (wk->subProcessMode == WT_MODE_EXCHANGE_SELECT) {
-            GFL_WipeSet(0, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_BOTH, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         } else {
-            GFL_WipeSet(3, 0, 0, 0, 6, 1, HEAPID_WORLDTRADE);
+            GFL_WipeSet(WIPE_MODE_MAIN, WIPE_TYPE_FADE_OUT, WIPE_TYPE_FADE_OUT, 0, 6, 1, HEAPID_WORLDTRADE);
         }
     }
     wk->subprocessSeq = PARTNER_SEQ_START;

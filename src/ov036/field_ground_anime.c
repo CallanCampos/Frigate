@@ -56,10 +56,10 @@ typedef struct {
     int *textureSizes;
     fx32 *frameCounters;
     u32 targetCount;
-    void *worldTextures;
+    G3DResource *worldTextures;
     void *gfbtpData;
     GFBTPController gfbtpController;
-    void *privateTextures;
+    G3DResource *privateTextures;
 } FieldTerrainTexPatAnimation;
 
 typedef struct {
@@ -93,23 +93,24 @@ static FieldTerrainSRTAnimatorChunkState *FieldTerrainSRTAnimator_GetChunkState(
 static void FieldTerrainSRTAnimatorChunkState_Init(FieldTerrainSRTAnimatorChunkState *state, void *resAnm,
                                                    HeapID heapId);
 static void FieldTerrainSRTAnimatorChunkState_Free(FieldTerrainSRTAnimatorChunkState *state);
-static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, void *model,
-                                                       void *textures, NNSG3dRenderObj *renderObj);
+static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, G3DResource *model,
+                                                       G3DResource *textures, NNSG3dRenderObj *renderObj);
 static void FieldTerrainSRTAnimatorChunkState_ClearUsedFlagCore(FieldTerrainSRTAnimatorChunkState *state);
 static fx32 FieldTerrainSRTAnimatorChunkState_SetFrame(FieldTerrainSRTAnimatorChunkState *state, fx32 frame);
 static void FieldTerrainAnimator_LoadTexPat(FieldTerrainTexPatAnimator *animator, u16 arcId, u16 fileId,
-                                            void *worldTextures, HeapID heapId);
+                                            G3DResource *worldTextures, HeapID heapId);
 static void FieldTerrainTexPatAnimator_Free(FieldTerrainTexPatAnimator *animator);
 static void FieldTerrainTexPatAnimator_Update(FieldTerrainTexPatAnimator *animator, fx32 step);
 static void FieldTerrainTexPatAnimation_Init(FieldTerrainTexPatAnimation *animation,
-                                             FieldTerrainTexPatAnimationPack *pack, u32 index, void *worldTextures,
-                                             HeapID heapId);
+                                             FieldTerrainTexPatAnimationPack *pack, u32 index,
+                                             G3DResource *worldTextures, HeapID heapId);
 static void FieldTerrainTexPatAnimation_Free(FieldTerrainTexPatAnimation *animation);
 static void FieldTerrainTexPatAnimation_Update(FieldTerrainTexPatAnimation *animation, fx32 step);
 static BOOL FieldTerrainTexPatAnimation_HasData(FieldTerrainTexPatAnimation *animation);
-static int FieldTerrainTexPatAnimation_MatchTextureVRAMAddress(void *worldTextures, void *textures, u32 textureIndex);
-static int FieldTerrainTexPatAnimation_GetTextureSize(void *textures, u32 textureIndex);
-static void *FieldTerrainTexPatAnimation_GetTextureAddress(void *textures, u32 textureIndex);
+static int FieldTerrainTexPatAnimation_MatchTextureVRAMAddress(G3DResource *worldTextures, G3DResource *textures,
+                                                               u32 textureIndex);
+static int FieldTerrainTexPatAnimation_GetTextureSize(G3DResource *textures, u32 textureIndex);
+static void *FieldTerrainTexPatAnimation_GetTextureAddress(G3DResource *textures, u32 textureIndex);
 static void *FieldTerrainTexPatAnimationPack_GetGFBTP(FieldTerrainTexPatAnimationPack *pack, u32 index);
 static void *FieldTerrainTexPatAnimationPack_GetNSBTX(FieldTerrainTexPatAnimationPack *pack, u32 index);
 static GFBTPValue GFBTPController_GetValue(const GFBTPController *controller, u32 target, u32 frame);
@@ -122,7 +123,7 @@ static void GFBTPController_LoadFile(void *data, GFBTPController *controller);
 static const u8 TEX_FMT_PIXELS_PER_BYTE[8] = { 0xff, 1, 4, 2, 1, 0xff, 1, 0xff };
 static const u16 TEXIMAGE_DIM_TO_PIXELS[8] = { 8, 16, 32, 64, 128, 256, 512, 1024 };
 
-FieldTerrainAnimator *FieldTerrainAnimator_Create(const FieldTerrainAnimatorSetup *setup, void *mapTextures,
+FieldTerrainAnimator *FieldTerrainAnimator_Create(const FieldTerrainAnimatorSetup *setup, G3DResource *mapTextures,
                                                   HeapID heapId) {
     FieldTerrainAnimator *animator =
         GFL_HeapAllocate(heapId, sizeof(FieldTerrainAnimator), TRUE, "field_ground_anime.c", 214);
@@ -161,8 +162,8 @@ FieldTerrainSRTAnimatorChunkState *FieldTerrainAnimator_GetChunkState(FieldTerra
     return FieldTerrainSRTAnimator_GetChunkState(&animator->srtAnimator, chunkIndex);
 }
 
-void FieldTerrainSRTAnimatorChunkState_Bind(FieldTerrainSRTAnimatorChunkState *state, void *model, void *textures,
-                                            NNSG3dRenderObj *renderObj) {
+void FieldTerrainSRTAnimatorChunkState_Bind(FieldTerrainSRTAnimatorChunkState *state, G3DResource *model,
+                                            G3DResource *textures, NNSG3dRenderObj *renderObj) {
     FieldTerrainSRTAnimatorChunkState_BindCore(state, model, textures, renderObj);
 }
 
@@ -244,8 +245,8 @@ static inline NNSG3dResMdl *FieldTerrainSRTAnimatorChunkState_GetFirstMdl(const 
     return NULL;
 }
 
-static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, void *model,
-                                                       void *textures, NNSG3dRenderObj *renderObj) {
+static void FieldTerrainSRTAnimatorChunkState_BindCore(FieldTerrainSRTAnimatorChunkState *state, G3DResource *model,
+                                                       G3DResource *textures, NNSG3dRenderObj *renderObj) {
     NNSG3dResMdl *mdl = FieldTerrainSRTAnimatorChunkState_GetFirstMdl(NNS_G3dGetMdlSet(GFL_G3DResGetResData(model)));
     NNSG3dResTex *tex;
 
@@ -275,7 +276,7 @@ static fx32 FieldTerrainSRTAnimatorChunkState_SetFrame(FieldTerrainSRTAnimatorCh
 }
 
 static void FieldTerrainAnimator_LoadTexPat(FieldTerrainTexPatAnimator *animator, u16 arcId, u16 fileId,
-                                            void *worldTextures, HeapID heapId) {
+                                            G3DResource *worldTextures, HeapID heapId) {
     u32 i;
 
     animator->animationPack = GFL_ArcSysReadHeapNewLZ(arcId, fileId, FALSE, heapId);
@@ -309,8 +310,8 @@ static void FieldTerrainTexPatAnimator_Update(FieldTerrainTexPatAnimator *animat
 }
 
 static void FieldTerrainTexPatAnimation_Init(FieldTerrainTexPatAnimation *animation,
-                                             FieldTerrainTexPatAnimationPack *pack, u32 index, void *worldTextures,
-                                             HeapID heapId) {
+                                             FieldTerrainTexPatAnimationPack *pack, u32 index,
+                                             G3DResource *worldTextures, HeapID heapId) {
     u32 i;
 
     animation->worldTextures = worldTextures;
@@ -397,7 +398,8 @@ static BOOL FieldTerrainTexPatAnimation_HasData(FieldTerrainTexPatAnimation *ani
     return FALSE;
 }
 
-static int FieldTerrainTexPatAnimation_MatchTextureVRAMAddress(void *worldTextures, void *textures, u32 textureIndex) {
+static int FieldTerrainTexPatAnimation_MatchTextureVRAMAddress(G3DResource *worldTextures, G3DResource *textures,
+                                                               u32 textureIndex) {
     NNSG3dResTex *worldTex = GFL_G3DResGetTexData(worldTextures);
     NNSG3dResTex *tex = GFL_G3DResGetTexData(textures);
     const NNSG3dResName *name;
@@ -413,7 +415,7 @@ static int FieldTerrainTexPatAnimation_MatchTextureVRAMAddress(void *worldTextur
     return ((data->texImageParam & 0xffff) << 3) + NNS_GfdGetTexKeyAddr(worldTex->texInfo.vramKey);
 }
 
-static int FieldTerrainTexPatAnimation_GetTextureSize(void *textures, u32 textureIndex) {
+static int FieldTerrainTexPatAnimation_GetTextureSize(G3DResource *textures, u32 textureIndex) {
     NNSG3dResTex *tex = GFL_G3DResGetTexData(textures);
     const NNSG3dResDictTexData *data = tex != NULL ? NNS_G3dGetResDataByIdx(&tex->dict, textureIndex) : NULL;
     u32 param = data->texImageParam;
@@ -427,7 +429,7 @@ static int FieldTerrainTexPatAnimation_GetTextureSize(void *textures, u32 textur
                                                 REG_G3_TEXIMAGE_PARAM_TEXFMT_SHIFT];
 }
 
-static void *FieldTerrainTexPatAnimation_GetTextureAddress(void *textures, u32 textureIndex) {
+static void *FieldTerrainTexPatAnimation_GetTextureAddress(G3DResource *textures, u32 textureIndex) {
     NNSG3dResTex *tex = GFL_G3DResGetTexData(textures);
     const NNSG3dResDictTexData *data = tex != NULL ? NNS_G3dGetResDataByIdx(&tex->dict, textureIndex) : NULL;
 

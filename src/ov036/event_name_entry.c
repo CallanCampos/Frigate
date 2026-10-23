@@ -151,12 +151,12 @@ GameEvent *JoinAvenueNameEntry_Create(u16 target, GameSystem *gsys, u16 *result,
     default:
         mode = NAME_ENTRY_AVENUE_NAME;
         maxLength = 10;
-        JoinAvenue_GetParam(info, 0, buffer);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_NAME, buffer);
         break;
     case 1:
         mode = NAME_ENTRY_AVENUE_TITLE;
         maxLength = 10;
-        JoinAvenue_GetParam(info, 1, buffer);
+        JoinAvenue_GetParam(info, JOIN_AVE_INFO_TITLE, buffer);
         break;
     case 2:
         mode = NAME_ENTRY_FAVORITE_PHRASE;
@@ -209,10 +209,10 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
 
             switch (work->target) {
             case 0:
-                JoinAvenueInfo_SetParam(info, 0, (u32)str);
+                JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_NAME, (u32)str);
                 break;
             case 1:
-                JoinAvenueInfo_SetParam(info, 1, (u32)str);
+                JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_TITLE, (u32)str);
                 break;
             case 2:
                 JoinAvenuePerson_SetParam(person, JOIN_AVE_PARAM_MESSAGE1, (u32)str);
@@ -231,7 +231,7 @@ static GameEventReturnCode JoinAvenueNameEntry_Callback(GameEvent *event, u32 *s
             msgData = GFL_MsgSysLoadData(FALSE, ARCID_SYSTEM_MESSAGE, TEXT_BANK_PLACE_NAMES, HEAPID_GAMEEVENT);
             GFL_MsgDataLoadRawStr(msgData, 0x79, name, 0x15);
             GFL_MsgDataFree(msgData);
-            JoinAvenueInfo_SetParam(info, 0, (u32)name);
+            JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_NAME, (u32)name);
         }
         if (work->result != NULL) {
             *work->result = (work->nameEntry->unk1C != 1);

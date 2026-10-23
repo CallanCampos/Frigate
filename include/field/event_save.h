@@ -11,7 +11,7 @@ struct EventSaveWork {
     SaveControl *save;
     GameSystem *gameSystem;
     Field *field;
-    void *msgBgSys;
+    FieldMsgBG *msgBgSys;
     u16 heapId;
     u16 pad12;
     u32 *result;
@@ -20,7 +20,8 @@ struct EventSaveWork {
     ReportWork *report;
 };
 
-GameEvent *EventSave_Create(GameSystem *gsys, Field *field, u16 heapId, void *msgBgSys, u32 screenId, u32 *result);
+GameEvent *EventSave_Create(GameSystem *gsys, Field *field, u16 heapId, FieldMsgBG *msgBgSys, u32 screenId,
+                            u32 *result);
 GameEventReturnCode EventSave_Callback(GameEvent *event, u32 *state, void *data);
 // Callbacks of the save in FIELD_PROC_LINK_LIST
 void FieldProcLink_CallInfDungeonRetire(FieldAppCallWork *work, s32 appParam);

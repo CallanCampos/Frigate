@@ -262,7 +262,7 @@ void ElboardMessage_Stop(ElboardMessage *message) {
     }
 }
 
-BOOL GimmickGateZoneData_Load(void *dest, u32 arcId, u32 fileId) {
+BOOL GimmickGateZoneData_Load(GimmickGateZoneData *dest, u32 arcId, u32 fileId) {
     GFL_ArcSysReadRange(dest, arcId, fileId, 0, 0x7c);
     return TRUE;
 }

@@ -83,7 +83,7 @@ void CalcPlayerActionPossibilities(Field *field, PlayerActionPossibilities *acti
     if (GetZoneFlagsEnableEscapeRope(action->zoneId) == TRUE) {
         action->flags |= 0x80;
     }
-    if (FieldStatus_GetFlashPerms(GameData_GetFieldStatus(GSYS_GetGameData(action->gsys))) & 1) {
+    if (FieldStatus_GetFlashPerms(GameData_GetFieldStatus(GSYS_GetGameData(action->gsys))) & FLD_FLASH_ALLOW) {
         action->flags |= 0x20;
     }
     if (GetAbyssalRuinsDiveZoneID(field, &diveZone) == TRUE) {
