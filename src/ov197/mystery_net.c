@@ -56,7 +56,7 @@ typedef struct {
 
 struct MysteryNet {
     MysteryNetSeq seq;
-    void *wifiWork;
+    WihDwcWork *wifiWork;
     u8 info[0x20];
     u8 unk34[0x20];
     u32 beaconFlags;

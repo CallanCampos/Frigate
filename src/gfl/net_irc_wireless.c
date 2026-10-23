@@ -22,7 +22,7 @@ typedef struct {
     GFLNetInitData aNetInit;
     void *work;
     // The filter of the infrared machines to link with (NetIw_SetPeerFilter)
-    void *peerFilter;
+    GFLNetPeerFilter peerFilter;
     // The game's callbacks from its init data
     void *(*getBeaconData)(void *work);
     int (*getBeaconSize)(void *work);
@@ -110,8 +110,8 @@ BOOL NetIw_IsRunning(void) {
     return FALSE;
 }
 
-void NetIw_SetPeerFilter(void *a0) {
-    NetIwSys->peerFilter = a0;
+void NetIw_SetPeerFilter(GFLNetPeerFilter filter) {
+    NetIwSys->peerFilter = filter;
 }
 
 void (*NetIw_SetCallbacks(void (*a0)(void *work), void (*a1)(void *work, BOOL a1),

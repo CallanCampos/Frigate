@@ -682,7 +682,7 @@ BattleEventItem *ItemEvent_TempAdd(BattleMon *mon, u16 itemId) {
     return NULL;
 }
 
-void ItemEvent_TempRemove(void *temp) {
+void ItemEvent_TempRemove(BattleEventItem *temp) {
     BattleEventItem_Remove(temp);
 }
 

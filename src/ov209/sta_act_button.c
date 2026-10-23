@@ -118,7 +118,7 @@ void StaActButton_UpdateSystem(StaActButton *sys) {
 
 static void StaActButton_InitGraphic(StaActButton *sys) {
     u8 i;
-    void *itemData = StaActing_GetItemData(sys->stage);
+    MusItemData *itemData = StaActing_GetItemData(sys->stage);
     ArcTool *arc;
     ClActorSetup setup;
     ClActorSetup effectSetup;

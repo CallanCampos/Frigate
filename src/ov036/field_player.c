@@ -529,7 +529,7 @@ void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 he
     FieldPlayerRail_UpdateMovement(player->nogrid, pressedKeys, heldKeys);
 }
 
-void func_ov036_0219ace8(FieldPlayer *player, const void *pos) {
+void func_ov036_0219ace8(FieldPlayer *player, const RailPosition *pos) {
     func_ov036_0219cf48(player->nogrid, pos);
 }
 

@@ -8,12 +8,12 @@
 
 // The 8-byte work that the device keeps while it runs
 typedef struct {
-    void *sys;
+    GFLNetSys *sys;
     // Called when the wireless has ended
     void (*endCallback)(BOOL ok);
 } NetDevWireless;
 
-static BOOL NetDevWireless_Init(HeapID heapId, void *sys, WHCallback callback, void *work);
+static BOOL NetDevWireless_Init(HeapID heapId, GFLNetSys *sys, WHCallback callback, void *work);
 static BOOL NetDevWireless_Begin(void (*callback)(BOOL ok));
 static int NetDevWireless_Update(u16 connectBits);
 static BOOL NetDevWireless_Unk10(int a0, int a1);
@@ -97,7 +97,7 @@ const GFLNetDevTable *NetDevWireless_GetTable(void) {
     return &sNetDevWirelessTable;
 }
 
-static BOOL NetDevWireless_Init(HeapID heapId, void *sys, WHCallback callback, void *work) {
+static BOOL NetDevWireless_Init(HeapID heapId, GFLNetSys *sys, WHCallback callback, void *work) {
     BOOL flag;
 
     if (sDevWireless != NULL) {

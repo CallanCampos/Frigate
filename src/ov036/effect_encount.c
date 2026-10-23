@@ -40,10 +40,10 @@ typedef struct {
 } EffectEncountCandidates;
 
 struct EffectEncountState {
-    void *fieldEffects;
+    FieldEffects *fieldEffects;
     EffectEncountCandidates candidates;
     // The phenomenon's field effect
-    void *effect;
+    FieldEffectTask *effect;
     // The steps between phenomena, and the chance of one, in tenths of a percent
     u16 steps;
     u16 chance;

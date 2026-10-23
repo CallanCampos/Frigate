@@ -9,6 +9,7 @@
 #include "app/wifibattlematch.h"
 #include "app/wifibattlematch_battle.h"
 #include "app/wifibattlematch_link.h"
+#include "app/wifibattlematch_net.h"
 #include "app/wifibattlematch_subproc.h"
 #include "battle/battle_proc.h"
 #include "battle/battle_rec_tool.h"
@@ -105,7 +106,7 @@ struct WifiBattleMatchSys {
     WifiBattleMatchLinkAccount account;
     WifiBattleMatchLinkRanking ranking;
     WifiBattleMatchLinkRatings ratings;
-    u8 unk7D4[0xd4];
+    WifiBattleMatchNetData unk7D4;
     u32 unk8A8;
     BOOL unk8AC;
 };
@@ -369,7 +370,7 @@ static void *WifiBattleMatchSys_CreateNetParam(WifiBattleMatchChain *chain, Heap
     param->unk1C = sys->unk40;
     param->unk20 = &sys->unk1CC;
     param->report = &sys->report;
-    param->unk3C = sys->unk7D4;
+    param->unk3C = &sys->unk7D4;
     param->unk28 = &sys->unk8A8;
     param->battleResult = &sys->battleResult;
     param->account = &sys->account;
@@ -799,7 +800,7 @@ static void *WifiBattleMatchSys_CreateExchangeParam(WifiBattleMatchChain *chain,
     param->gameData = &sys->param.gameData;
     param->party = sys->party;
     param->otherParty = sys->otherParty;
-    param->unk14 = sys->unk7D4;
+    param->unk14 = &sys->unk7D4;
     param->unk18 = &sys->unk8A8;
     if (sys->mode == 1) {
         param->mode = WIFIBATTLEMATCH_EXCHANGE_IRC;

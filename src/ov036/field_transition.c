@@ -485,7 +485,7 @@ GameEventReturnCode func_ov036_021b8e10(GameEvent *event, u32 *state, void *data
         (*state)++;
         break;
     case 4: {
-        void *msgBGSys = Field_GetMsgBGSys(work->field);
+        FieldMsgBG *msgBGSys = Field_GetMsgBGSys(work->field);
         if (!func_ov036_021878bc(msgBGSys)) {
             break;
         }

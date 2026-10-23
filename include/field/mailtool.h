@@ -30,7 +30,7 @@ typedef struct MailParam {
     SaveControl *save;
     MailData *mail;
     // The save's block of mail
-    void *mailBox;
+    MailData *mailBox;
 } MailParam;
 
 // Writes a new mail of the given design, to give to the party Pokémon in partySlot

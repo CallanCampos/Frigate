@@ -62,7 +62,7 @@ struct BtlvCore {
     StrBuf *strbuf;
     Font *font;
     Font *font2;
-    void *unkB8;
+    BattleAction *unkB8;
     BattleMon *mon;
     u32 monId;
     u32 result;
@@ -562,7 +562,7 @@ BOOL BtlvCore_RunMainProc(BtlvCore *core) {
     return TRUE;
 }
 
-void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, void *arg3) {
+void BtlvCore_StartCommandSelect(BtlvCore *core, BattleMon *mon, u32 arg2, BattleAction *arg3) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg3;
@@ -582,7 +582,7 @@ u32 BtlvCore_WaitCommandSelect(BtlvCore *core) {
     return 0;
 }
 
-void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
+void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg2;
@@ -590,7 +590,7 @@ void BtlvCore_StartMoveSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
     BtlvCore_SetMainProc(core, BtlvCore_ProcWaitSelect);
 }
 
-void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, void *arg2) {
+void BtlvCore_StartRotationSelect(BtlvCore *core, BtlvSelectTargetParam *param, BattleAction *arg2) {
     BattleMon *mon;
 
     mon = param->mons[0].mon;
@@ -622,7 +622,7 @@ BOOL BtlvCore_WaitMoveSelect(BtlvCore *core) {
     return BtlvCore_RunMainProc(core);
 }
 
-void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, void *arg2) {
+void BtlvCore_StartTargetSelect(BtlvCore *core, BattleMon *mon, BattleAction *arg2) {
     core->mon = mon;
     core->monId = GetMonID(mon);
     core->unkB8 = arg2;

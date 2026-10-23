@@ -69,7 +69,7 @@ extern const u8 data_ov027_021711c0[8];
 
 FestivalText *getTextFileForFestMissions(HeapID heapId);
 void FestivalText_Free(FestivalText *text);
-void *FestMissionData_LoadHeaders(ArcTool *arc, HeapID heapId);
+FestMissionHeader *FestMissionData_LoadHeaders(ArcTool *arc, HeapID heapId);
 void FestMissionData_Load(ArcTool *arc, u8 index, FestMissionData *dest);
 // All the missions
 FestMissionData *FestMissionData_LoadAll(ArcTool *arc, HeapID heapId);

@@ -30,14 +30,14 @@
 #include "system/rtc.h"
 
 static u8 CollectTargetsSingle(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                               void *targets);
+                               BtlMonSet *targets);
 static u8 GetCurseTargetPos(BtlServerFlow *flow, BtlFlowMoveParam *param, BattleMon *mon, u8 pos, u8 targetPos);
 static u8 CollectTargetsDouble(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                               void *targets);
+                               BtlMonSet *targets);
 static u8 CollectTargetsTriple(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                               void *targets);
+                               BtlMonSet *targets);
 static BOOL RetargetFromFaintedFoe(BtlServerFlow *flow, u32 style, BattleMon *mon, BtlFlowMoveParam *param, u8 target,
-                                   void *targets);
+                                   BtlMonSet *targets);
 static BattleMon *GetOpposingMonAt(BtlServerFlow *flow, u8 pos, u8 index);
 static BattleMon *GetAllyMonAt(BtlServerFlow *flow, u8 pos);
 static u8 RedirectMoveTarget(BtlServerFlow *flow, BattleMon *mon, BtlFlowMoveParam *param, u8 targetId);
@@ -88,7 +88,7 @@ static u32 JudgeByRemainingMons(BtlServerFlow *flow, const u8 *alive, const u8 *
 static void GetSideHP(BtlServerFlow *flow, s32 *hp, s32 *percent, u8 side);
 
 // Fills targets with the mons a move hits, from its target type and the battle style
-u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, void *targets) {
+u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, BtlMonSet *targets) {
     u32 style;
     u8 redirect;
     u8 count;
@@ -130,7 +130,7 @@ u8 CollectMoveTargets(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMov
 
 // The targets in a single or rotation battle
 static u8 CollectTargetsSingle(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                               void *targets) {
+                               BtlMonSet *targets) {
     u8 pos;
 
     pos = MonIDToBattlePos(flow->mainModule, flow->pokeCon, GetMonID(mon));
@@ -183,7 +183,7 @@ static u8 GetCurseTargetPos(BtlServerFlow *flow, BtlFlowMoveParam *param, Battle
 
 // The targets in a double battle
 static u8 CollectTargetsDouble(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                               void *targets) {
+                               BtlMonSet *targets) {
     u8 pos;
     u8 targetPos;
     BattleMon *single;
@@ -251,7 +251,7 @@ static u8 CollectTargetsDouble(BtlServerFlow *flow, BattleMon *mon, u8 target, B
 
 // The targets in a triple battle, where only the mons next to each other reach each other
 static u8 CollectTargetsTriple(BtlServerFlow *flow, BattleMon *mon, u8 target, BtlFlowMoveParam *param, u8 redirect,
-                               void *targets) {
+                               BtlMonSet *targets) {
     u8 pos;
     const AdjacentOpponentData *adjacent;
     u8 targetPos;
@@ -343,7 +343,7 @@ static u8 CollectTargetsTriple(BtlServerFlow *flow, BattleMon *mon, u8 target, B
 // When a single target has fainted before the move, the move goes to the nearest foe still standing instead, or the
 // one with more HP, or a random one of two
 static BOOL RetargetFromFaintedFoe(BtlServerFlow *flow, u32 style, BattleMon *mon, BtlFlowMoveParam *param, u8 target,
-                                   void *targets) {
+                                   BtlMonSet *targets) {
     BattleMon *fainted;
     u8 pos;
     u8 numPositions;

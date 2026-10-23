@@ -36,7 +36,7 @@ struct KeySystemNet {
     u32 count;
     u32 timer;
     NHttpRap *http;
-    void *ov181Work;
+    MBDataConv *ov181Work;
     u16 heapId;
     BOOL error;
     u32 errorCode;

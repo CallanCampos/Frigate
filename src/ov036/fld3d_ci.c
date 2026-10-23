@@ -621,7 +621,7 @@ static GameEventReturnCode EventFieldEffect_Callback(GameEvent *event, u32 *stat
         (*state)++;
         break;
     case 13: {
-        void *msgBGSys;
+        FieldMsgBG *msgBGSys;
         PlaceName *placeName;
 
         if (ci->dimDone == 0) {

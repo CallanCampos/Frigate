@@ -55,7 +55,7 @@ NameEntryParam *setupPokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLengt
 }
 
 NameEntryParam *pokemonNameEntry(HeapID heapId, PartyPkm *pkm, u32 maxLength, const StrBuf *name, StrBuf *unkC,
-                                 void *unk10, u32 unk14, TrainerGameInfoSave *gameInfo) {
+                                 BoxSaveAccessor *unk10, u32 unk14, TrainerGameInfoSave *gameInfo) {
     NameEntryParam *param = setupPokemonNameEntry(heapId, pkm, maxLength, name, gameInfo);
 
     param->unkC = unkC;

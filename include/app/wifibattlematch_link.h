@@ -87,7 +87,7 @@ typedef struct {
     WifiBattleMatchLinkAccount *account;
     WifiBattleMatchLinkRanking *unk34;
     WifiBattleMatchLinkRatings *ratings;
-    void *unk3C;
+    WifiBattleMatchNetData *unk3C;
     BOOL *unk40;
     u32 unk44;
 } WifiBattleMatchLinkParam;

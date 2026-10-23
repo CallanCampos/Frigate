@@ -175,7 +175,7 @@ static GameEventReturnCode EventFaceUpStart_Callback(GameEvent *event, u32 *stat
 }
 
 static void FaceUp_LoadGraphics(FaceUpWork *work, Field *field) {
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     BGSetup setup;
     u32 charFile;
     u32 scrFile;

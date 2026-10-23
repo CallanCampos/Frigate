@@ -1487,7 +1487,7 @@ const BattleEventHandlerEntry *EventAddOblivious(u32 *priority) {
     return sHandlersOblivious;
 }
 
-BOOL HandlerCommonGuardStatus(void *flow, u32 monId, u32 status) {
+BOOL HandlerCommonGuardStatus(BtlServerFlow *flow, u32 monId, u32 status) {
     if (BattleEventVar_GetValue(4) == monId) {
         if (BattleEventVar_GetValue(0x1d) == status) {
             return BattleEventVar_RewriteValue(0x41, 1);

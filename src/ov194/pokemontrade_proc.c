@@ -258,7 +258,7 @@ void func_ov194_021b76e0(PokemonTradeWork *wk) {
 }
 
 static BOOL func_ov194_021b7708(PokemonTradeWork *wk) {
-    void *save = MailBox_GetFromGameData(wk->gameData);
+    MailData *save = MailBox_GetFromGameData(wk->gameData);
     BOOL ret = FALSE;
     if (MailBox_GetFreeSlot(save, 0) == -1) {
         ret = TRUE;

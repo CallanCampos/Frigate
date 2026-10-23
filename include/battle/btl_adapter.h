@@ -33,7 +33,7 @@ enum {
 // Sets up the adapters, sharing one per client unless commMode is set
 void BtlAdapter_InitSystem(u8 commMode);
 void BtlAdapter_QuitSystem(void);
-BtlAdapter *BtlAdapter_Create(void *netHandle, u8 clientId, BOOL flag, HeapID heapId);
+BtlAdapter *BtlAdapter_Create(NetHandle *netHandle, u8 clientId, BOOL flag, HeapID heapId);
 void BtlAdapter_ResetState(BtlAdapter *adapter);
 void BtlAdapter_Delete(BtlAdapter *adapter);
 void BtlAdapter_ClearNetReplies(void);

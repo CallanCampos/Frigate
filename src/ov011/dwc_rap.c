@@ -64,7 +64,7 @@ typedef struct {
     u8 data[0xfc];
     DWCFriendData *friendList;
     void *unk104;
-    void *userData;
+    DWCUserData *userData;
     DWCInetControl inetControl;
     void *recvBuf[2];
     // Errors that came up in the library, until they are given to the game
@@ -179,7 +179,7 @@ BOOL DWCRap_IsInitialized(void) {
     return FALSE;
 }
 
-int DWCRap_Init(void *userData, DWCFriendData *friendList) {
+int DWCRap_Init(DWCUserData *userData, DWCFriendData *friendList) {
     GFLNetInitData *netInit = GFL_NetGetInitData();
     int i;
 

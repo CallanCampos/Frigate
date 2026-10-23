@@ -840,7 +840,7 @@ typedef struct {
 static const u8 sAIItemMaxMons[4] = { 6, 4, 2, 1 };
 // The points a movie scores for its star's fame
 // The messages of an escape, by its kind
-BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, void *netHandle,
+BtlClient *BattleClient_Create(BtlMainModule *mainModule, BtlPokeCon *pokeCon, u8 commMode, NetHandle *netHandle,
                                u16 clientId, u16 numCoverPos, u8 isAI, u32 arg7, BOOL recPlay, MATHRandContext32 *rand,
                                HeapID heapId) {
     BtlClient *client = GFL_HeapAllocate(heapId, sizeof(BtlClient), TRUE, "btl_client.c", 0x281);

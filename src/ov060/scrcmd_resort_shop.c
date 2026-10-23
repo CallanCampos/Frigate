@@ -110,14 +110,14 @@ struct ResortShopWork {
     u16 listShown;
     ResortShopUpdateFunc update;
     ResortPeople *people;
-    void *npc;
+    ResortNPC *npc;
     ResortSys *sys;
-    void *shops;
+    ResortShopData *shops;
     const u16 *row;
-    void *table;
-    void *flags;
+    ResortBinary *table;
+    JoinAvenueShop *flags;
     JoinAvenueOccupants *occupants;
-    void *datas;
+    ResortPersonData **datas;
     ResortPerson *person;
     JoinAvenueInfo *info;
     u16 *vars[5];
@@ -338,7 +338,7 @@ static void ResortShop_PrintMessageInFrame(ResortShopWork *wk, u32 msgId);
 static void ResortShop_PrintEntryMessage(ResortShopWork *wk, u32 msgId, ResortShopEntry *entry);
 static void ResortShop_ClearListScreen(u32 which);
 static ResortPeople *ResortShop_GetPeople(Field *field);
-static void *ResortShop_GetNPC(Field *field);
+static ResortNPC *ResortShop_GetNPC(Field *field);
 static void ResortShop_CreateItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
 static void ResortShop_DestroyItemList(GameSystem *gsys, ResortShopWork *wk, u8 mode, u8 subMode);
 static void ResortShop_ItemCursorCallback(BmpMenuList *list, s32 value, u8 a2);
@@ -373,7 +373,7 @@ BOOL ResortShopCmd_Open(VM *vm, FieldScriptEnv *env) {
     GameData *gameData = GSYS_GetGameData(gsys);
     Field *field = GSYS_GetField(gsys);
     void **ptr = ScriptWork_GetUserHeapPtr(FieldScriptEnv_GetScriptWork(env));
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     ResortSys *sys = ResortSys_Get(field);
     ResortShop *shop = GFL_HeapAllocate(HEAPID_GAMEEVENT, sizeof(ResortShop), TRUE, "scrcmd_resort_shop.c", 375);
 
@@ -1643,7 +1643,7 @@ static ResortPeople *ResortShop_GetPeople(Field *field) {
     return people;
 }
 
-static void *ResortShop_GetNPC(Field *field) {
+static ResortNPC *ResortShop_GetNPC(Field *field) {
     void *npc = NULL;
 
     if (Field_CheckGimmickWorkPassword(field, 0)) {

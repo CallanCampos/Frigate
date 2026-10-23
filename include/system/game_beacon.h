@@ -5,6 +5,7 @@
 #include "gfl/heap.h"
 #include "save/join_avenue.h"
 #include "struct_decls.h"
+#include "system/fest_mission.h"
 
 // Names from swan (https://github.com/ds-pokemon-hacking/swan, GPL-3.0), except the GameBeaconSys_*, GameBeacon_* and
 // GameBeaconSendSlot_* names and the types' names, which are ours. The global GameBeaconSys is named after the ROM's
@@ -43,7 +44,9 @@ typedef union {
         u16 unk06;
         u32 key;
     } gift;
-    // Types 0x3c to 0x67: the Funfest mission's data (LinkFestival_FillMissionInfo), and for type 0x67 a text
+    // Types 0x3c to 0x67: the Funfest mission's data (LinkFestival_FillMissionInfo)
+    FestMissionInfo missionInfo;
+    // Type 0x67's text, written over the mission's data after its first word
     struct {
         u32 unk00;
         u16 text[8];
@@ -221,7 +224,7 @@ BOOL GameBeacon_IsSpecialSpecies(u16 species);
 void GameBeacon_StoreText(const StrBuf *str, u16 *dest);
 // Whether a received beacon changed the survey's results since the last call
 u8 GameBeaconSys_PopSurveyUpdated(void);
-void GameBeaconSys_SetSurveyAnswers(const void *answers);
+void GameBeaconSys_SetSurveyAnswers(const u8 *answers);
 void GameBeaconSys_SetCountryRegion(u8 country, u8 region);
 void GameBeaconSys_SetSurveyRank(u8 rank);
 // Sets the C-Gear record, a sentence (CGearPhrases_Get)

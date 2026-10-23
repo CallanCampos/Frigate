@@ -166,7 +166,7 @@ typedef struct BeaconViewWork {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *parent;
+    FieldSubscreen *parent;
     FieldDispControl *dispControl;
     TrainerCardSave *trainerCard;
     BagSave *bag;
@@ -273,7 +273,7 @@ typedef struct BeaconViewWork {
 } BeaconViewWork;
 
 // beacon_view_setup.c
-BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent);
+BeaconViewWork *BeaconView_Create(GameSystem *gsys, FieldSubscreen *parent);
 void BeaconView_Free(BeaconViewWork *work);
 void BeaconView_RequestEvent(BeaconViewWork *work, u16 request);
 void BeaconView_ClearEventRequest(BeaconViewWork *work);
@@ -281,7 +281,7 @@ void BeaconView_ClearEventRequest(BeaconViewWork *work);
 GameEvent *BeaconView_CreateEvent(BeaconViewWork *work, BOOL enabled);
 
 // beacon_view.c
-BeaconViewWork *BeaconView_Init(GameSystem *gsys, void *parent);
+BeaconViewWork *BeaconView_Init(GameSystem *gsys, FieldSubscreen *parent);
 void BeaconView_Exit(BeaconViewWork *work);
 void BeaconView_Update(BeaconViewWork *work, BOOL active);
 BOOL BeaconView_Draw(BeaconViewWork *work);

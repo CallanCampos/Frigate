@@ -334,7 +334,7 @@ static void func_ov194_021bf0c4(PokemonTradeWork *wk) {
     void *copy;
     if ((copy = wk->backup.mail) != NULL) {
         GameData *gameData = wk->gameData;
-        void *block;
+        MailData *block;
         // The save is fetched and left unused, as if the block once came from it
         GameData_GetSaveControl(gameData);
         block = MailBox_GetFromGameData(gameData);
@@ -429,7 +429,7 @@ static void func_ov194_021bf278(PokemonTradeWork *wk) {
         if (param->box != BoxSaveAccessor_GetAvailableBoxCount(wk->boxes)) {
             pkm = PokeParty_GetPkm(param->party, 0);
             if (PML_ItemIsMail(PokeParty_GetParam(pkm, PKM_PARAM_ITEM, NULL))) {
-                void *block = MailBox_GetFromGameData(wk->gameData);
+                MailData *block = MailBox_GetFromGameData(wk->gameData);
                 int mailSlot = MailBox_GetFreeSlot(block, 0);
                 if (mailSlot != -1) {
                     MailData *mail = CreateMailData(wk->heapId);

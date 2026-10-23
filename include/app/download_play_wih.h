@@ -68,7 +68,7 @@ extern const char data_ov182_021c1ab4[]; // the finalize ends what the helper is
 // pointer. Nothing in this build sets it
 typedef void (*WHLogPrint)(u32 level, const char *format, ...);
 // What the scan calls with each child that connects, to say whether it may stay
-typedef BOOL (*WHScanFilter)(void *info);
+typedef BOOL (*WHScanFilter)(WMStartParentCallback *info);
 // What fills the WEP key of the work and gives the mode to set the wireless to
 typedef u16 (*WHWepKeySetup)(u16 *key);
 

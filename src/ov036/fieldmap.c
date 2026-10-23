@@ -1010,7 +1010,7 @@ void Field_LoadEdgeColorTable(AreaData *area, u16 zoneId) {
 void Field_LoadActorMatColorPreset(Field *field) {
     HeapID heapId = HEAPID_TAIL(field->heapId);
     u32 presetId = AreaData_GetActorMatColorID(field->areaData);
-    void *preset = FldActMatColorPreset_Create(heapId);
+    FldActMatColorPreset *preset = FldActMatColorPreset_Create(heapId);
 
     FldActMatColorPreset_Load(preset, presetId);
     FldActMatColorPreset_Apply(preset, BlActSys_GetScene(field->actorBlAct));
@@ -1152,7 +1152,7 @@ void Field_SwapZoneBGM(Field *field, u32 zoneId) {
 }
 
 void Field_SwapWeather(Field *field, u32 zoneId) {
-    void *weather = Field_GetWeatherSystem(field);
+    FieldWeather *weather = Field_GetWeatherSystem(field);
     u16 weatherId;
 
     ResetWeather(field->gameSystem, zoneId);

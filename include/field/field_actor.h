@@ -390,7 +390,7 @@ void ConvGXZToVector(s16 x, s16 z, VecFx32 *pos);
 void SpawnAllZoneNPCs(MMSys *mmSys, ZoneNPC *npcs, s32 zoneId, u32 count, EventWork *eventWork);
 
 BOOL FldAct_CheckAcmdEnd(FieldActor *actor);
-void *FldActMatColorPreset_Create(HeapID heapId);
+FldActMatColorPreset *FldActMatColorPreset_Create(HeapID heapId);
 void FldActMatColorPreset_Free(FldActMatColorPreset *preset);
 void FldActMatColorPreset_Load(FldActMatColorPreset *preset, u32 presetId);
 void FldActMatColorPreset_Apply(FldActMatColorPreset *preset, BlActScene *scene);
@@ -483,7 +483,7 @@ typedef struct {
     u16 tileFlagsOrigY;
     u16 tileFlags;
     const FieldActorConfig *config;
-    void *effects;
+    FieldEffects *effects;
     u8 season;
 } ActorTerrainEffectParam;
 

@@ -54,7 +54,7 @@ void BattleServer_AttachClient(BtlServer *server, BtlAdapter *adapter, u8 client
     ServerClient_SetParty(&server->clients[clientId], party, numCoverPos);
 }
 
-void BattleServer_AttachNetClient(BtlServer *server, u32 mode, void *netHandle, u8 clientId, u8 numCoverPos) {
+void BattleServer_AttachNetClient(BtlServer *server, u32 mode, NetHandle *netHandle, u8 clientId, u8 numCoverPos) {
     BattleParty *party = GetPartyData(server->pokeCon, clientId);
     BtlAdapter *adapter = BtlAdapter_Create(netHandle, clientId, TRUE, server->heapId);
 

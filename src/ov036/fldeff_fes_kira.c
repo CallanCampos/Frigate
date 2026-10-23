@@ -50,7 +50,7 @@ typedef struct {
     FesKira kiras[FES_KIRA_MAX];
 } FesKiraTask;
 
-static void *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
+static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId);
 static void func_ov036_021a5a58(FieldEffectFesKira *effect);
 static void func_ov036_021a5a90(FesKiraObj *obj, FieldEffectFesKira *effect);
 static void func_ov036_021a5afc(FesKiraObj *obj, FieldEffectFesKira *effect);
@@ -83,7 +83,7 @@ void func_ov036_021a5a20(FieldEffects *effects, void *data) {
     GFL_HeapFree(data);
 }
 
-static void *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
+static FieldEffectFesKira *func_ov036_021a5a34(FieldEffects *effects, HeapID heapId) {
     FieldEffectFesKira *effect = GFL_HeapAllocate(heapId, sizeof(FieldEffectFesKira), TRUE, "fldeff_fes_kira.c", 179);
 
     effect->effects = effects;

@@ -337,7 +337,7 @@ typedef struct {
     NNSG2dScreenData *backScrn;
     u32 unk14;
     // NULL while the view does not exist
-    void *buttonMan;
+    ButtonMan *buttonMan;
     // What is known of each friend, by friend number - 1: 0 nothing, 1 registered, 2 in the room
     u8 friendState[WIFIP2PMATCH_MEMBER_MAX];
     u8 page;
@@ -382,7 +382,7 @@ typedef struct {
     // The Battle Box as a party, NULL if it is empty
     PokeParty *battleBoxParty;
     u8 unk0D0[8];
-    void *trainerData;
+    TrainerDataSave *trainerData;
     WordSet *wordSet;
     MsgData *msgData;
     // The messages about Nintendo WFC

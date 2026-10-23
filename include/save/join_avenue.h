@@ -451,7 +451,7 @@ BOOL JoinAvenueEntryList_MergeEntry(JoinAvenueEntryList *list, const JoinAvenueE
 // Called with an entry by overlay 137, which counts a result of 2 and stops at 0
 u32 JoinAvenue_Add(JoinAvenueSave *joinAvenue, GameData *gameData, void *entry, u32 a3);
 void JoinAvenue_ResetAddStep(JoinAvenueSave *joinAvenue);
-BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, void *work, u32 a3, u32 *out);
+BOOL JoinAvenue_AddStepwise(JoinAvenueSave *joinAvenue, GameData *gameData, JoinAvenueVisitor *work, u32 a3, u32 *out);
 // The visitor of a beacon
 JoinAvenueVisitor *JoinAvenueVisitor_Create(HeapID heapId);
 void JoinAvenueVisitor_Free(JoinAvenueVisitor *visitor);

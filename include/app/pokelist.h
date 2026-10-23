@@ -2,6 +2,7 @@
 #define POKEBW2_APP_POKELIST_H
 
 #include "types.h"
+#include "app/p_status.h"
 #include "field/player_action.h"
 #include "gfl/arc_util.h"
 #include "gfl/clact.h"
@@ -30,7 +31,7 @@ typedef struct {
 typedef struct {
     PokeParty *party;
     BagSave *bag;
-    void *unk08;
+    MailData *unk08;
     TrainerDataSave *trainerData;
     // The Pokémon fused with Kyurem (getReshZekBlkAddress)
     ReshZekSave *reshZek;
@@ -144,7 +145,7 @@ struct PokeListWork {
     u16 glowAngle;
     u8 unk108;
     u8 enteredCount;
-    void *buttons[2];
+    AppTaskMenuWin *buttons[2];
     u16 unk114;
     u16 unk116;
     u8 waitTimer;
@@ -189,7 +190,7 @@ struct PokeListWork {
     u16 timerColors[16];
     u16 timerBlink;
     BOOL timeUp;
-    void *taskMenuRes;
+    AppTaskMenuRes *taskMenuRes;
     G3DCamera *camera;
     void *particleHeaps[2];
     ParticleSystem *particles[2];
@@ -211,7 +212,7 @@ extern GameProcFunctions POKELIST_PROC_FUNCTIONS;
 void PokeListParam_Setup(PokeListParam *param, GameData *gameData, u32 mode, PokeParty *party);
 // Allocates the parameters and fills them in with PokeListParam_Setup
 PokeListParam *PokeListParam_Create(GameData *gameData, u32 mode, PokeParty *party, HeapID heapId);
-GameEvent *EventPokeList_Create(GameSystem *gsys, Field *field, PokeListParam *param, void *summaryParam);
+GameEvent *EventPokeList_Create(GameSystem *gsys, Field *field, PokeListParam *param, PStatusParam *summaryParam);
 
 // plist_sys.c
 BOOL PokeList_Init(PokeListWork *wk);
@@ -298,11 +299,11 @@ void PokeListMenu_OpenYesNo(PokeListWork *wk, PokeListMenu *menu);
 void PokeListMenu_Close(PokeListWork *wk, PokeListMenu *menu);
 void PokeListMenu_Update(PokeListWork *wk, PokeListMenu *menu);
 u32 PokeListMenu_GetPicked(PokeListWork *wk, PokeListMenu *menu);
-void *PokeListMenu_CreateButton(PokeListWork *wk, PokeListMenu *menu, u32 msgId, u8 x, u8 y, BOOL isBack);
-void PokeListMenu_FreeButton(void *button);
-void PokeListMenu_UpdateButton(void *button);
-void PokeListMenu_SetButtonActive(void *button, BOOL active);
-void PokeListMenu_SetButtonPressed(void *button, BOOL pressed);
+AppTaskMenuWin *PokeListMenu_CreateButton(PokeListWork *wk, PokeListMenu *menu, u32 msgId, u8 x, u8 y, BOOL isBack);
+void PokeListMenu_FreeButton(AppTaskMenuWin *button);
+void PokeListMenu_UpdateButton(AppTaskMenuWin *button);
+void PokeListMenu_SetButtonActive(AppTaskMenuWin *button, BOOL active);
+void PokeListMenu_SetButtonPressed(AppTaskMenuWin *button, BOOL pressed);
 
 // plist_item.c
 BOOL PokeList_IsItemForMove(PokeListWork *wk, u16 item);

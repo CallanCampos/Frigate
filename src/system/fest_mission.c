@@ -206,7 +206,7 @@ static BOOL FestMissionConfig_AnyTarget(const FestMissionConfig *config, u32 val
 BOOL FestMissionConfig_FromBeacon(FestMissionConfig *config, const GameBeacon *beacon) {
     ClearFesMissionCfg(config);
     if (GameBeacon_IsMissionType(beacon)) {
-        config->info = *(const FestMissionInfo *)&beacon->payload;
+        config->info = beacon->payload.missionInfo;
         config->missionId = beacon->arg.mission.missionId;
         config->unk1A = beacon->arg.mission.unk;
         config->seed = beacon->missionWord;

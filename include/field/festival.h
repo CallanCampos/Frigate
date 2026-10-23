@@ -132,8 +132,8 @@ u32 FestMission_RandExcluding(MATHRandContext32 *rand, u32 max, const u32 *list,
 LinkFestival *CreateLinkFestival(HeapID heapId, GameSystem *gsys);
 void FreeLinkFestival(LinkFestival *festival);
 void LinkFestival_Update(LinkFestival *festival);
-// Copies the current mission's beacon data to mission, with value
-void LinkFestival_FillMissionInfo(LinkFestival *festival, void *mission, u16 value);
+// Copies the current mission's beacon data to info, with value
+void LinkFestival_FillMissionInfo(LinkFestival *festival, FestMissionInfo *info, u16 value);
 // The player's score in the mission
 u16 LinkFestival_GetScore(LinkFestival *festival);
 // The mission's seconds left
@@ -161,7 +161,7 @@ u32 LinkFestival_AddMissionScore(GameSystem *gsys, u32 a1, u32 a2);
 // The players in the mission, or 0 without one
 int LinkFestival_GetMemberCount(LinkFestival *festival);
 // Remembers a mission seen while none is on
-void LinkFestival_AddRecord(LinkFestival *festival, void *mission);
+void LinkFestival_AddRecord(LinkFestival *festival, FestMissionConfig *config);
 // Whether a mission of a beacon is not to be offered
 BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config);
 // A score for best: the player's own when name is NULL

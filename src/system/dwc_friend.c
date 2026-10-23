@@ -136,7 +136,7 @@ static void addFriend(GameData *gameData, PlayerInfo *info, const void *friendDa
     WifiList_SetFriendParam(wifiList, index, WIFI_LIST_FRIEND_TRAINER_VIEW, PlayerInfo_GetUnionView(info));
 }
 
-BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const void *friendData, HeapID heapId) {
+BOOL WifiList_AddFriend(GameData *gameData, PlayerInfo *info, const DWCFriendData *friendData, HeapID heapId) {
     WifiList *wifiList = GameData_GetWifiList(gameData);
     int i;
 

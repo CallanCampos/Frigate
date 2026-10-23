@@ -504,7 +504,7 @@ BOOL ShortcutMenu_GetActionFromKeyItem(s32 item, u32 *action, u32 *invalid) {
 void ShortcutMenu_Open(u32 arg0, ShortcutMenuWork *work) {
     GameData *gameData;
     ShortcutMenuPos *listPos;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
 
     if (work->app == NULL && work->done == 0) {
         GFL_BGSysSetBGEnabled(1, 0);

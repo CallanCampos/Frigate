@@ -129,12 +129,12 @@ struct FieldScriptEnv {
 // The work a field subprocess's callback gets, which the callback frees
 typedef struct {
     void *resource;
-    void *data;
+    u16 *data;
 } ScriptProcCallbackWork;
 
 struct ScriptOverlayWork {
     void *resource;
-    void *data;
+    BagScriptResult *data;
     void (*cleanup)(ScriptOverlayWork *work);
 };
 

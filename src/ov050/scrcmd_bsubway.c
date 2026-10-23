@@ -64,7 +64,7 @@ typedef struct {
 typedef struct {
     FieldScriptEnv *env;
     u16 *var;
-    void *window;
+    ListMenuUI *window;
     u32 message;
 } BSubwayMsgEvent;
 

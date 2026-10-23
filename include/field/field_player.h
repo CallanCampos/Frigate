@@ -32,7 +32,7 @@ BOOL func_ov036_0219a5dc(FieldPlayer *player);
 BOOL FieldPlayer_CheckRunningShoesFlag(FieldPlayer *player);
 void FieldPlayer_UpdateGridMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys, u32 flags);
 void FieldPlayer_UpdateRailMovement(FieldPlayer *player, u32 pressedKeys, u32 heldKeys);
-void func_ov036_0219ace8(FieldPlayer *player, const void *pos);
+void func_ov036_0219ace8(FieldPlayer *player, const RailPosition *pos);
 void func_ov036_0219acf4(FieldPlayer *player);
 BOOL func_ov036_0219ad00(FieldPlayer *player);
 RailUnit *func_ov036_0219ad0c(FieldPlayer *player);

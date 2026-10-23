@@ -308,7 +308,7 @@ void loadLocationNameToStrbuf(WordSet *wordSet, u32 index, u32 placeNameId) {
     GFL_WordSetLoadMsg(wordSet, index, TEXT_BANK_PLACE_NAMES, placeNameId);
 }
 
-void loadBoxNameForDisplay(WordSet *wordSet, u32 index, void *boxData, u32 box) {
+void loadBoxNameForDisplay(WordSet *wordSet, u32 index, BoxSaveAccessor *boxData, u32 box) {
     loadBoxNameToStrbuf(boxData, box, wordSet->tmp);
     GFL_WordSetCopyStrbuf(wordSet, index, wordSet->tmp, NULL);
 }

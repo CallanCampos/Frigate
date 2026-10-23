@@ -104,8 +104,8 @@ typedef struct {
     ResortWalker walkers[RESORT_WALKERS];
     FieldPlayer *player;
     MMSys *mmSys;
-    void *shops;
-    void *unkb1c;
+    ResortShopData *shops;
+    ResortBinary *unkb1c;
     JoinAvenueOccupants *occupants;
 } ResortWalkers;
 
@@ -138,7 +138,7 @@ typedef struct {
     u16 count;
     u16 bubbleIndexes[3];
     u16 state;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     ResortPersonData **datas;
     JoinAvenueInfo *info;
     JoinAvenueOccupants *occupants;
@@ -194,8 +194,8 @@ static void ResortWatch_SetCallback(ResortWatch *watch, ResortWatchCallback call
 static void ResortWatch_MarkChanged(ResortWatch *watch);
 static void ResortWatch_CheckLists(ResortWatch *watch);
 static void ResortWatch_CheckEntries(ResortWatch *watch);
-static ResortWalkers *ResortWalkers_Create(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
-                                           JoinAvenueOccupants *occupants);
+static ResortWalkers *ResortWalkers_Create(HeapID heapId, MMSys *mmSys, FieldPlayer *player, ResortShopData *shops,
+                                           ResortBinary *unkb1c, JoinAvenueOccupants *occupants);
 static void ResortWalkers_Free(ResortWalkers *walkers);
 static void ResortWalkers_Update(ResortWalkers *walkers, Field *field);
 static void ResortWalkers_Place(ResortWalkers *walkers, u32 mode);
@@ -207,7 +207,7 @@ static ResortWalker *ResortWalkers_Find(ResortWalkers *walkers, ResortPerson *pe
 static void ResortWalker_Init(ResortWalker *walker, HeapID heapId);
 static void ResortWalker_Release(ResortWalker *walker);
 static void ResortWalker_Update(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static void ResortWalker_Assign(ResortWalker *walker, ResortPerson *person, void *shops, void *unkb1c,
+static void ResortWalker_Assign(ResortWalker *walker, ResortPerson *person, ResortShopData *shops, ResortBinary *unkb1c,
                                 JoinAvenueOccupants *occupants);
 static void ResortWalker_Clear(ResortWalker *walker);
 static BOOL ResortWalker_IsPerson(const ResortWalker *walker, ResortPerson *person);
@@ -226,7 +226,8 @@ static BOOL ResortWalker_StateWaitStep(ResortWalker *walker, MMSys *mmSys, Field
 static BOOL ResortWalker_StateLookAround(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
 static BOOL ResortWalker_StateStopAtShop(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
 static void ResortWalker_RunStates(ResortWalker *walker, MMSys *mmSys, FieldPlayer *player);
-static void ResortWalker_FindStops(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants);
+static void ResortWalker_FindStops(ResortWalker *walker, ResortShopData *shops, ResortBinary *unkb1c,
+                                   JoinAvenueOccupants *occupants);
 static BOOL ResortWalker_CheckStop(ResortWalker *walker, FieldPlayer *player);
 static void ResortWalkerMove_Unk4(FieldActor *actor);
 static void ResortWalkerMove_Update(FieldActor *actor);
@@ -239,7 +240,7 @@ static void ResortWalkerGroup_Place(ResortWalkerGroup *group, u32 mode);
 static void ResortWalkerGroup_Add(ResortWalkerGroup *group, u16 slot, ResortWalker *walker);
 static void ResortWalkerGroup_Remove(ResortWalkerGroup *group, u16 slot);
 static BOOL ResortField_GetWalkerPlace(ResortPerson *person, u16 *group, u16 *slot);
-static ResortBubbles *ResortBubbles_Create(HeapID heapId, void *msgBGSys, ResortPersonData **datas,
+static ResortBubbles *ResortBubbles_Create(HeapID heapId, FieldMsgBG *msgBGSys, ResortPersonData **datas,
                                            JoinAvenueInfo *info, JoinAvenueOccupants *occupants, BOOL enabled);
 static void ResortBubbles_Free(ResortBubbles *bubbles);
 static void ResortBubbles_Update(ResortBubbles *bubbles, Field *field);
@@ -251,11 +252,11 @@ static void ResortBubbles_UpdateInterval(ResortBubbles *bubbles);
 static ResortPersonData *ResortBubbles_PickData(ResortBubbles *bubbles);
 static void ResortBubble_Init(ResortBubble *bubble, u16 index, HeapID heapId);
 static void ResortBubble_Free(ResortBubble *bubble);
-static void ResortBubble_Update(ResortBubble *bubble, void *msgBGSys);
+static void ResortBubble_Update(ResortBubble *bubble, FieldMsgBG *msgBGSys);
 static BOOL ResortBubble_Overlaps(u16 a, u16 b, BOOL mode);
-static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
+static void ResortBubble_Show(ResortBubble *bubble, FieldMsgBG *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
                               JoinAvenueOccupants *occupants, MsgData *msgData, u32 kind, BOOL mode);
-static void ResortBubble_Hide(ResortBubble *bubble, void *msgBGSys);
+static void ResortBubble_Hide(ResortBubble *bubble, FieldMsgBG *msgBGSys);
 static void ResortBubble_Reset(ResortBubble *bubble);
 static BOOL ResortBubble_IsDone(ResortBubble *bubble);
 static ResortFieldPeople *ResortFieldPeople_Create(HeapID heapId, ResortSys *sys, MMSys *mmSys, FieldPlayer *player,
@@ -343,7 +344,7 @@ void ResortField_Setup(Field *field) {
     u32 unk2;
     MMSys *mmSys;
     ResortNPCSetup npcSetup;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     ResortPersonData **datas;
     JoinAvenueInfo *info;
     JoinAvenueOccupants *occupants;
@@ -551,8 +552,8 @@ static void ResortWatch_CheckEntries(ResortWatch *watch) {
     }
 }
 
-static ResortWalkers *ResortWalkers_Create(HeapID heapId, MMSys *mmSys, FieldPlayer *player, void *shops, void *unkb1c,
-                                           JoinAvenueOccupants *occupants) {
+static ResortWalkers *ResortWalkers_Create(HeapID heapId, MMSys *mmSys, FieldPlayer *player, ResortShopData *shops,
+                                           ResortBinary *unkb1c, JoinAvenueOccupants *occupants) {
     int i;
     ResortWalkers *walkers = GFL_HeapAllocate(heapId, sizeof(ResortWalkers), TRUE, "resort_field.c", 950);
 
@@ -696,7 +697,7 @@ static void ResortWalker_Update(ResortWalker *walker, MMSys *mmSys, FieldPlayer 
     }
 }
 
-static void ResortWalker_Assign(ResortWalker *walker, ResortPerson *person, void *shops, void *unkb1c,
+static void ResortWalker_Assign(ResortWalker *walker, ResortPerson *person, ResortShopData *shops, ResortBinary *unkb1c,
                                 JoinAvenueOccupants *occupants) {
     ResortWalker_Clear(walker);
     walker->person = person;
@@ -985,7 +986,8 @@ static void ResortWalker_RunStates(ResortWalker *walker, MMSys *mmSys, FieldPlay
     }
 }
 
-static void ResortWalker_FindStops(ResortWalker *walker, void *shops, void *unkb1c, JoinAvenueOccupants *occupants) {
+static void ResortWalker_FindStops(ResortWalker *walker, ResortShopData *shops, ResortBinary *unkb1c,
+                                   JoinAvenueOccupants *occupants) {
     int i;
     u16 id = ResortPerson_GetParam(walker->person, JOIN_AVE_PARAM_SHOP_ID, NULL);
     u16 shop = ResortShopData_GetShopParam(ResortShopData_GetShop(shops, id), 0);
@@ -1157,7 +1159,7 @@ static BOOL ResortField_GetWalkerPlace(ResortPerson *person, u16 *group, u16 *sl
     return FALSE;
 }
 
-static ResortBubbles *ResortBubbles_Create(HeapID heapId, void *msgBGSys, ResortPersonData **datas,
+static ResortBubbles *ResortBubbles_Create(HeapID heapId, FieldMsgBG *msgBGSys, ResortPersonData **datas,
                                            JoinAvenueInfo *info, JoinAvenueOccupants *occupants, BOOL enabled) {
     int i;
     ResortBubbles *bubbles = GFL_HeapAllocate(heapId, sizeof(ResortBubbles), TRUE, "resort_field.c", 2612);
@@ -1403,7 +1405,7 @@ static void ResortBubble_Free(ResortBubble *bubble) {
     MI_CpuFill8(bubble, 0, sizeof(ResortBubble));
 }
 
-static void ResortBubble_Update(ResortBubble *bubble, void *msgBGSys) {
+static void ResortBubble_Update(ResortBubble *bubble, FieldMsgBG *msgBGSys) {
     if (bubble->active) {
         bubble->timer++;
         if (bubble->timer >= 60) {
@@ -1440,7 +1442,7 @@ static BOOL ResortBubble_Overlaps(u16 a, u16 b, BOOL mode) {
     return (aBottom >= by) & ((ay <= bBottom) & ((ax <= bRight) & (aRight >= bx)));
 }
 
-static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
+static void ResortBubble_Show(ResortBubble *bubble, FieldMsgBG *msgBGSys, ResortPersonData *data, JoinAvenueInfo *info,
                               JoinAvenueOccupants *occupants, MsgData *msgData, u32 kind, BOOL mode) {
     u32 style;
     u8 width;
@@ -1508,7 +1510,7 @@ static void ResortBubble_Show(ResortBubble *bubble, void *msgBGSys, ResortPerson
                         style);
 }
 
-static void ResortBubble_Hide(ResortBubble *bubble, void *msgBGSys) {
+static void ResortBubble_Hide(ResortBubble *bubble, FieldMsgBG *msgBGSys) {
     if (bubble->active) {
         func_ov036_02188e90(msgBGSys, bubble->index);
         ResortBubble_Reset(bubble);
@@ -1844,7 +1846,7 @@ static void ResortField_AddInitialEntries(ResortSys *sys, GameData *gameData, He
         JoinAvenue_GetParam(info, JOIN_AVE_INFO_ENTRIES_ADDED, NULL) == 0) {
         SaveControl *save = GameData_GetSaveControl(gameData);
         JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(save);
-        void *entry;
+        JoinAvenueEntry *entry;
         u32 unk;
         u8 badges;
         u8 rank;
@@ -1893,7 +1895,7 @@ static void ResortField_AddInitialEntries(ResortSys *sys, GameData *gameData, He
 
 static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
-    void *table = ResortSys_GetRanks(sys);
+    ResortBinary *table = ResortSys_GetRanks(sys);
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     EventWork *eventWork = GameData_GetEventWork(gameData);
     JoinAvenueSave *joinAvenue = SaveControl_GetJoinAvenue(save);
@@ -1919,7 +1921,7 @@ static void ResortField_AddSpecialEntry(ResortSys *sys, GameData *gameData, Heap
         u16 chance = ResortBinary_Get(
             table, ResortBinary_FindRange(table, JoinAvenue_GetParam(info, JOIN_AVE_INFO_RANK, NULL)), 10);
         if (JoinAvenueInfo_Random(info, 21, 100) < chance) {
-            void *entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
+            JoinAvenueEntry *entry = JoinAvenueEntry_Create(HEAPID_TAIL(heapId));
             ResortSys_MakeShopEntry(sys, gameData, entry, 5, 0, heapId);
             if (JoinAvenue_Add(joinAvenue, gameData, entry, 2) == 2) {
                 JoinAvenueInfo_SetParam(info, JOIN_AVE_INFO_UNK_DC_13, 0);

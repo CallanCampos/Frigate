@@ -25,7 +25,7 @@ typedef struct {
     u16 item;                  // 0x16  out, 0 for none
     u8 cost;                   // 0x18  out, the item's Launcher cost in mode 1, else 0
     u8 done;                   // 0x19
-    void *bagCursor;           // 0x1c  the bag's saved cursor
+    BagCursor *bagCursor;      // 0x1c  the bag's saved cursor
     BOOL quit;                 // 0x20  1 leaves with the fade
     BOOL abort;                // 0x24  1 leaves at once
     u8 ballError;              // 0x28  0, or 1-5: why a Poké Ball can't be thrown

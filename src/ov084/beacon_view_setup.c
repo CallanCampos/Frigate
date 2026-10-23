@@ -126,7 +126,7 @@ static void BeaconView_DeleteScreenActors(BeaconViewWork *work);
 static void BeaconView_InitPanel(BeaconViewWork *work, u8 id);
 static void BeaconView_FreePanel(BeaconViewWork *work, u8 id);
 
-BeaconViewWork *BeaconView_Create(GameSystem *gsys, void *parent) {
+BeaconViewWork *BeaconView_Create(GameSystem *gsys, FieldSubscreen *parent) {
     BeaconViewWork *work = GFL_HeapAllocate(HEAPID_FIELD_MENU, sizeof(BeaconViewWork), TRUE, "beacon_view_setup.c", 91);
 
     work->gsys = gsys;

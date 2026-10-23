@@ -50,8 +50,8 @@ typedef struct {
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
-    void *msgBGSys;
-    void *window;
+    FieldMsgBG *msgBGSys;
+    MoneyWin *window;
     u8 unk1C[8];
     MMSys *actorSystem;
     FesGimmick *fesGimmick;
@@ -73,15 +73,15 @@ typedef struct {
 
 typedef struct {
     u32 state;
-    void *window;
+    FieldMsgWin *window;
     BOOL waitButton;
 } FestMissionMsgWork;
 
 static void FestMissionEvent_Init(FestMissionEventWork *work, GameSystem *gsys, Field *field);
 static void FestMissionEvent_Exit(FestMissionEventWork *work);
-static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData, u16 messageId,
-                                BOOL waitButton);
-static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData,
+static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
+                                u16 messageId, BOOL waitButton);
+static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
                                       u16 messageId);
 static GameEventReturnCode FestMissionMsg_Callback(GameEvent *event, u32 *state, void *data);
 static GameEventReturnCode EventFestMissionStart_Callback(GameEvent *event, u32 *state, void *data);
@@ -187,8 +187,8 @@ static void FestMissionEvent_Exit(FestMissionEventWork *work) {
 }
 
 // Shows a message in a chained event, which ends when it is printed or, with waitButton, when a button is pressed
-static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData, u16 messageId,
-                                BOOL waitButton) {
+static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
+                                u16 messageId, BOOL waitButton) {
     GameEvent *event = GameEvent_Create(gsys, NULL, FestMissionMsg_Callback, sizeof(FestMissionMsgWork));
     FestMissionMsgWork *work = GameEvent_GetData(event);
 
@@ -198,7 +198,7 @@ static void FestMissionMsg_Call(GameSystem *gsys, GameEvent *parent, void *msgBG
     GameEvent_ChainNext(parent, event);
 }
 
-static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, void *msgBGSys, MsgData *msgData,
+static void FestMissionMsg_CallNoWait(GameSystem *gsys, GameEvent *parent, FieldMsgBG *msgBGSys, MsgData *msgData,
                                       u16 messageId) {
     FestMissionMsg_Call(gsys, parent, msgBGSys, msgData, messageId, FALSE);
 }

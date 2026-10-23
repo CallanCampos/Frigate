@@ -101,9 +101,9 @@ void func_ov036_021ba6bc(u8 index, BOOL inUse, HeightExList *list);
 // Overlay 36's field_fade.c: whether a grid position is in the rectangle of an entry of the list
 BOOL func_ov036_021ba594(s32 x, s32 z, const HeightExEntry *entry);
 // The mapper's WFBC work
-void *func_ov036_0218adac(HeapID heapId);
-void func_ov036_0218add0(void *wfbc);
-void func_ov036_0218ade0(void *wfbc, CityState *city, BOOL isOther, HeapID heapId);
+FieldWFBC *func_ov036_0218adac(HeapID heapId);
+void func_ov036_0218add0(FieldWFBC *wfbc);
+void func_ov036_0218ade0(FieldWFBC *wfbc, CityState *city, BOOL isOther, HeapID heapId);
 void FieldSubscreen_ChangeImm(FieldSubscreen *subscreen, u32 mode);
 BOOL FieldTaskManager_IsIdle(FieldTaskManager *taskManager);
 u32 FieldTaskManager_GetActiveTaskCount(FieldTaskManager *taskManager);
@@ -169,7 +169,7 @@ u32 GetZoneMapType2(u16 zoneId);
 void SetupLoadZoneMapTypeData(u16 zoneId, AreaData *area, FieldG3DMapperConfig *config, MapMatrix *matrix);
 const FieldmapCtrlVTable *GetZoneFieldmapCtrlVTable(u16 zoneId);
 u32 GetFieldmapZoneHeapSize(u16 zoneId);
-PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys);
+PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys);
 void FieldPlaceName_Free(PlaceName *placeName);
 void func_ov036_021b4ff8(PlaceName *placeName);
 void func_ov036_021b5064(PlaceName *placeName);

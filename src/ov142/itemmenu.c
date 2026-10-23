@@ -137,7 +137,7 @@ static BOOL ItemMenu_ToggleItemRegistration(ItemMenuWork *work, s32 row);
 static u32 ItemMenu_GetPocketShortcut(s32 pocket);
 static void ItemMenu_TogglePocketRegistration(ItemMenuWork *work);
 static void ItemMenu_UpdatePocketRegistration(ItemMenuWork *work);
-static void ItemMenu_SetUseAction(ItemMenuWork *work, void *data, BagItem *slot, u8 *actions);
+static void ItemMenu_SetUseAction(ItemMenuWork *work, ItemData *data, BagItem *slot, u8 *actions);
 static void ItemMenu_GetItemActions(ItemMenuWork *work, u8 *actions);
 static void ItemMenu_OpenItemMenu(ItemMenuWork *work);
 static BOOL ItemMenu_IsDowsingOn(ItemMenuWork *work);
@@ -176,7 +176,7 @@ static void ItemMenu_StateFilterMenu(ItemMenuWork *work);
 static void ItemMenu_StateSortWaitMessage(ItemMenuWork *work);
 static BOOL ItemMenu_CanUseInMode(ItemMenuWork *work, u8 fieldPocket);
 static void ItemMenu_StatePocketArrowDone(ItemMenuWork *work);
-static void ItemMenu_SaveFreeSpaceFilter(void *cursor, u32 mode, u32 result, u32 freeSpaceFilter);
+static void ItemMenu_SaveFreeSpaceFilter(BagCursor *cursor, u32 mode, u32 result, u32 freeSpaceFilter);
 
 const GameProcFunctions BAG_PROC_FUNCTIONS = { ItemMenuProc_Init, ItemMenuProc_Main, ItemMenuProc_Exit };
 
@@ -1863,7 +1863,7 @@ static void ItemMenu_UpdatePocketRegistration(ItemMenuWork *work) {
 }
 
 // What the item menu's first action is: use, ride or read
-static void ItemMenu_SetUseAction(ItemMenuWork *work, void *data, BagItem *slot, u8 *actions) {
+static void ItemMenu_SetUseAction(ItemMenuWork *work, ItemData *data, BagItem *slot, u8 *actions) {
     if (PML_ItemGetParam(data, ITEM_PARAM_FIELD_FUNC)) {
         if (PML_ItemIsMail(slot->item) == TRUE) {
             actions[0] = 2;
@@ -2835,7 +2835,7 @@ static void ItemMenu_StatePocketArrowDone(ItemMenuWork *work) {
 }
 
 // Whether the Free Space keeps its filter after the bag closes, by the bag's mode and the result
-static void ItemMenu_SaveFreeSpaceFilter(void *cursor, u32 mode, u32 result, u32 freeSpaceFilter) {
+static void ItemMenu_SaveFreeSpaceFilter(BagCursor *cursor, u32 mode, u32 result, u32 freeSpaceFilter) {
     u8 keepFilter[6][23] = {
         { 1, 1, 2, 2, 0, 2, 2, 2, 2, 0, 1, 1, 2, 0, 1, 1, 1, 2, 2, 2, 1, 2, 2 },
         { 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0 },

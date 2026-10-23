@@ -143,12 +143,12 @@ void *PokedexSkinSave_GetChars(PokedexSkinSave *block);
 void *PokedexSkinSave_GetPalette(PokedexSkinSave *block);
 BOOL PokedexSkinSave_IsValid(PokedexSkinSave *block);
 // Reads the downloaded musical's save block (6) into a new work, its archive and the archive's size, and frees it
-void *MusicalDist_Load(GameData *gameData, HeapID heapId);
+MusicalDistWork *MusicalDist_Load(GameData *gameData, HeapID heapId);
 void MusicalDist_Free(MusicalDistWork *work);
 void *MusicalDist_GetData(MusicalDistWork *work);
 u32 MusicalDist_GetDataSize(MusicalDistWork *work);
 // Imports a downloaded musical, a step a frame until it returns TRUE
-void *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId);
+MusicalDistWork *MusicalDist_StartWrite(GameData *gameData, void *data, u32 size, HeapID heapId);
 BOOL MusicalDist_WriteStep(MusicalDistWork *work);
 void *getAddressOfExtraSaveBlk(SaveControl *save, u32 block, u32 arg2);
 void freeIntermediateSaveExtraBlksAfterLoad2(SaveControl *save, u32 block);
@@ -213,7 +213,7 @@ void SymbolSave_AddPokemon(AreaNPCSave *npcData, u16 species, u16 a2, u8 sex, u8
 
 // Returns a pointer to one of the save's blocks
 void *SaveControl_GetBlockPtr(SaveControl *save, u32 block);
-u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, void *a2, u32 a3);
+u32 BattleRec_IsSlotValid(SaveControl *save, HeapID a1, u32 *result, u32 a3);
 u32 BattleRec_FinishAndSaveSlot(GameData *gameData, HeapID a1, u32 a2, u32 a3, u32 a4, u16 *a5, u16 *a6);
 u32 BattleRec_IsVersionSupported(u8 a0);
 void BattleRec_LoadToolOverlay(void);

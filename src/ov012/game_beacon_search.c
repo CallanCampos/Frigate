@@ -50,7 +50,7 @@ struct BeaconSearchWork {
     u32 timer;
     BeaconSearchBeacon beacon;
     BeaconSearchFound found;
-    void *unk88;
+    WihDwcWork *unk88;
 };
 
 static void GameBeaconSearch_OnNetInit(void *work);

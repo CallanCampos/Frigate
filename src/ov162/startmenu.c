@@ -198,7 +198,7 @@ typedef struct {
     u16 *itemScreens[ITEM_COUNT];
     // Makes a screen for each item from the window with its name, which BG 1 shows
     BGWinFrame *textScreens;
-    void *unk16C;
+    BlinkPalAnm *unk16C;
     u8 items[ITEM_COUNT];
     u8 cursor;
     u8 selection;

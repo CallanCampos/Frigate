@@ -87,7 +87,7 @@ typedef struct {
     // Whether the player has pressed the switch to ride up
     BOOL elevatorSwitchPressed;
     // What the camera followed, while the freight elevator runs
-    void *cameraBind;
+    const VecFx32 *cameraBind;
 } DriftveilGymWork;
 
 // Where the pad slides the player to: how far it goes, which way, and the switch that it lands on
@@ -128,7 +128,7 @@ typedef struct {
     u8 toggle;
     fx32 amplitude;
     FieldCamera *camera;
-    void *bind;
+    const VecFx32 *bind;
     VecFx32 offset;
 } DriftveilGymShake;
 

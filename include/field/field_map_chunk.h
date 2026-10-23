@@ -52,7 +52,7 @@ typedef struct {
 struct FieldChunkContext {
     FieldTerrainSRTAnimatorChunkState *srtAnimatorState;
     FieldPropSystem *propSystem;
-    void *wfbc;
+    FieldWFBC *wfbc;
     ResortMapCreateWork *resortMap;
     u32 chunkIndex;
     u16 heapId;
@@ -99,7 +99,7 @@ struct FieldChunk {
     u32 unkAC;
     FieldChunkLoader loader;
     void *container;
-    void *context;
+    FieldChunkContext *context;
 };
 
 FieldChunk *FieldChunk_Create(const FieldChunkConfig *config, HeapID heapId);

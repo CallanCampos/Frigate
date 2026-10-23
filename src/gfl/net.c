@@ -263,8 +263,8 @@ void GFL_NetIwGetCollectedMac(u8 *mac, int index) {
     NetIw_GetCollectedMac(mac, index);
 }
 
-void GFL_NetIwSetPeerFilter(void *a0) {
-    NetIw_SetPeerFilter(a0);
+void GFL_NetIwSetPeerFilter(GFLNetPeerFilter filter) {
+    NetIw_SetPeerFilter(filter);
 }
 
 void GFL_NetIwFree(void) {

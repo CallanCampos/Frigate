@@ -47,9 +47,9 @@ typedef struct {
     u32 count;
     // The index of the avenue's zone, which is also the row of the slots
     u32 zone;
-    void *shops;
+    ResortShopData *shops;
     // A table whose columns 1 and 2 are added to a person's x and z, by the person's index
-    void *unk18;
+    ResortBinary *unk18;
 } ResortPeopleSetup;
 
 // A data and the zone of the person it makes
@@ -72,7 +72,7 @@ typedef struct {
     u32 zone;
     JoinAvenueInfo *info;
     // The NPCs' table, of ResortBinary_Load
-    void *table;
+    ResortBinary *table;
 } ResortNPCSetup;
 
 // The gimmick of the avenue's main zone, which the field sets up, ends and updates, and its parts
@@ -145,7 +145,7 @@ u32 ResortData_GetMakeKind(u32 kind);
 BOOL ResortSlots_IsEmpty(ResortSlots *slots, u32 row, u32 pos);
 ResortPersonData *ResortSlots_GetData(ResortSlots *slots, u32 row, u32 pos);
 u32 ResortSlots_FindEmpty(ResortSlots *slots, u32 row);
-u16 ResortData_RaffleShopItem(ResortPersonData *data, void *a1, void *a2, JoinAvenueInfo *info);
+u16 ResortData_RaffleShopItem(ResortPersonData *data, ResortBinary *a1, ResortBinary *a2, JoinAvenueInfo *info);
 ResortPersonData *ResortData_Create(HeapID heapId, ResortDataPerson *person, u32 kind, u16 index);
 void ResortData_Free(ResortPersonData *data);
 void ResortData_Clear(ResortPersonData *data);
@@ -220,8 +220,8 @@ u32 ResortSys_GetInfoFlag1b(ResortSys *sys);
 BOOL ResortSys_AreAllShopsMaxLevel(ResortSys *sys);
 void ResortSys_SetScriptWord(u32 type, u32 who, u16 index, u32 wordIndex, ResortSys *sys, ResortPerson *person,
                              WordSet *wordSet, GameData *gameData, HeapID heapId);
-void *ResortRecords_CreateWindow(void *msgBGSys, HeapID heapId);
-void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void *msgBGSys, WordSet *wordSet,
+MoneyWin *ResortRecords_CreateWindow(FieldMsgBG *msgBGSys, HeapID heapId);
+void ResortRecords_PrintPage(MoneyWin *window, JoinAvenueOccupants *occupants, FieldMsgBG *msgBGSys, WordSet *wordSet,
                              GameData *gameData, u32 page, HeapID heapId);
 u32 ResortSys_GetUnlock(ResortSys *sys, GameData *gameData);
 u32 ResortSys_GetUnlockForRank(ResortSys *sys, GameData *gameData, u32 rank);
@@ -233,7 +233,8 @@ ResortSys *ResortSys_Get(Field *field);
 ResortPerson *ResortSys_GetScriptPerson(FieldScriptEnv *env, ResortPeople *people);
 u32 ResortSys_MakeData(ResortSys *sys, ResortPersonData *data, u32 kind);
 StrBuf *ResortSys_FormatShopText(ResortShopData *shops, ResortPersonData *data, u16 shopId, HeapID heapId);
-void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, void *entry, u32 shopKind, u32 salt, HeapID heapId);
+void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, JoinAvenueEntry *entry, u32 shopKind, u32 salt,
+                             HeapID heapId);
 // Adds an entry (mode 1) or a record (mode 3) of a kind of shop
 void ResortSys_AddEntryOrRecord(ResortSys *sys, PlayerInfo *playerInfo, u32 mode, u32 shopKind, HeapID heapId);
 void ResortSys_ChooseVisitGroup(ResortSys *sys, ResortPersonData *a1, ResortPersonData *data);

@@ -115,7 +115,7 @@ static void RecvPlayerInfo(int netId, int size, const void *data, void *work, Ne
 static void *GetTrainerRecvBuffer(int netId, void *work, int size);
 static void RecvTrainer(int netId, int size, const void *data, void *work, NetHandle *handle);
 static BtlCommTrainerData *CreateCommTrainerData(const BtlSetupTrainer *trainer, HeapID heapId);
-static void FreeCommTrainerData(void *data);
+static void FreeCommTrainerData(BtlCommTrainerData *data);
 static void *GetReplyRecvBuffer(int netId, void *work, int size);
 static void RecvReply(int netId, int size, const void *data, void *work, NetHandle *handle);
 static void RecvServerCmd(int netId, int size, const void *data, void *work, NetHandle *handle);
@@ -545,7 +545,7 @@ static BtlCommTrainerData *CreateCommTrainerData(const BtlSetupTrainer *trainer,
     return data;
 }
 
-static void FreeCommTrainerData(void *data) {
+static void FreeCommTrainerData(BtlCommTrainerData *data) {
     GFL_HeapFree(data);
 }
 

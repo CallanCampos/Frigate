@@ -825,7 +825,7 @@ void GameBeaconSendSlot_SetMissionEx(GameBeaconSendSlot *slot, u16 type, u32 val
     config = GetFestMissionCfg(festival);
     newSlot = *slot;
     GameBeaconSendSlot_ResetB2W2Only(&newSlot);
-    LinkFestival_FillMissionInfo(festival, &beacon->payload, value);
+    LinkFestival_FillMissionInfo(festival, &beacon->payload.missionInfo, value);
     if (type == 0x67) {
         GameBeacon_StoreTextN((const StrBuf *)value, beacon->payload.mission.text, 8);
         beacon->arg.mission.unk = extra;
@@ -917,7 +917,7 @@ u8 GameBeaconSys_PopSurveyUpdated(void) {
     return updated;
 }
 
-void GameBeaconSys_SetSurveyAnswers(const void *answers) {
+void GameBeaconSys_SetSurveyAnswers(const u8 *answers) {
     GameBeaconSendSlot *slot = &GameBeaconSys->mine;
 
     MI_CpuCopy8(answers, slot->beacon.surveyAnswers, sizeof(slot->beacon.surveyAnswers));

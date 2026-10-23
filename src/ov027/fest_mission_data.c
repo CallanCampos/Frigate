@@ -32,7 +32,7 @@ void FestivalText_Free(FestivalText *text) {
     GFL_HeapFree(text);
 }
 
-void *FestMissionData_LoadHeaders(ArcTool *arc, HeapID heapId) {
+FestMissionHeader *FestMissionData_LoadHeaders(ArcTool *arc, HeapID heapId) {
     return GFL_ArcToolReadHeapNew(arc, 0, heapId);
 }
 

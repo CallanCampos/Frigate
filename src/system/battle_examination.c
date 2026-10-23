@@ -48,7 +48,7 @@ BSubwayTrainer *BattleExamination_GetTrainer(BattleExaminationSave *examination,
     return examination->trainers;
 }
 
-void BattleExamination_Load(GameData *gameData, void *saveBuffer, HeapID heapId) {
+void BattleExamination_Load(GameData *gameData, BattleExaminationSave *saveBuffer, HeapID heapId) {
     SaveControl *save = GameData_GetSaveControl(gameData);
     void *buffer = GFL_HeapAllocate(heapId, BATTLE_EXAMINATION_LOAD_SIZE, FALSE, "battle_examination.c", 153);
 

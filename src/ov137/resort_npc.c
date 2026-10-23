@@ -27,9 +27,9 @@ enum {
 };
 
 struct ResortNPC {
-    void *table;
+    ResortBinary *table;
     u32 unk4;
-    void *texts;
+    ResortBinary *texts;
     ResortNPCSetup setup;
     BOOL eventRunning;
     u32 count;

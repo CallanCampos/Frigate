@@ -37,7 +37,7 @@ struct MusItemDrawSys {
     BlActScene *blact;
     MusItemDraw *items;
     // Overlay 210's table of the props
-    void *itemData;
+    MusItemData *itemData;
     u16 count;
     GXRgb shadowPalette[16];
 };
@@ -73,6 +73,6 @@ void MusItemDraw_GetRotation(MusItemDrawSys *sys, MusItemDraw *item, u16 *rotati
 void MusItemDraw_SetUseOffset(MusItemDrawSys *sys, MusItemDraw *item, BOOL useOffset);
 BOOL MusItemDraw_GetUseOffset(MusItemDrawSys *sys, MusItemDraw *item);
 void MusItemDraw_GetItemOffset(MusItemDraw *item, s32 *offset);
-void *MusItemDraw_GetItemData(MusItemDrawSys *sys);
+MusItemData *MusItemDraw_GetItemData(MusItemDrawSys *sys);
 
 #endif // POKEBW2_APP_MUSICAL_MUS_ITEM_DRAW_H

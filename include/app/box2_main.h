@@ -113,7 +113,7 @@ struct Box2SysWork {
 
 // A text object on OAM
 typedef struct {
-    void *oam;
+    BmpOamActor *oam;
     GFLBitmap *bitmap;
 } Box2FontOam;
 
@@ -267,14 +267,14 @@ typedef struct {
 } Box2RangeSelect;
 
 struct Box2AppWork {
-    void *bmpOam;
+    BmpOamSys *bmpOam;
     Box2FontOam fontOam[10];
     u32 keyRepeatWait;
     u32 keyRepeatStart;
     TCB *vtask;
     Box2IrqWork vfunk;
     int vfuncNextSeq;
-    void *palFade;
+    PaletteFade *palFade;
     CursorMove *cursorMove;
     BGWinFrame *bgWinFrame;
     Font *font;

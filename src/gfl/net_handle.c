@@ -110,7 +110,7 @@ static NetHandle *NetHandle_Init(int netId) {
     return handle;
 }
 
-void NetHandle_InitAll(void *sys) {
+void NetHandle_InitAll(GFLNetSys *sys) {
     GFLNetInitData *ini = GFL_NetGetInitData();
     int i;
 
@@ -122,7 +122,7 @@ void NetHandle_InitAll(void *sys) {
     _pBaseWork = GFL_HeapAllocate(ini->heapId, sizeof(NetHandleBaseWork), TRUE, "net_handle.c", 229);
 }
 
-void NetHandle_FreeAll(void *sys) {
+void NetHandle_FreeAll(GFLNetSys *sys) {
     NetHandle *handle;
     int i;
 

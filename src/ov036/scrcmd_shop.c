@@ -524,7 +524,7 @@ BOOL s0149_CallFriendlyShopBuy(VM *vm, FieldScriptEnv *env) {
     GameData *gameData;
     Field *field;
     void **heapPtr;
-    void *msgBGSys;
+    FieldMsgBG *msgBGSys;
     ShopScriptWork *shop;
 
     ScriptReadVar(vm, env);

@@ -436,7 +436,7 @@ u16 GetTriggerSCRIDAtPosRail(EventData *data, EventWork *eventWork, const RailPo
     return 0xffff;
 }
 
-void *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
+ZoneBGEntity *GetZoneProxiesAndCount(EventData *data, u32 *restrict count) {
     *count = data->entityCount;
     return data->entities;
 }

@@ -84,9 +84,7 @@ ArcTool *LinkFestival_GetArchive(LinkFestival *festival) {
     return festival->archive;
 }
 
-void LinkFestival_FillMissionInfo(LinkFestival *festival, void *mission, u16 value) {
-    FestMissionInfo *info = mission;
-
+void LinkFestival_FillMissionInfo(LinkFestival *festival, FestMissionInfo *info, u16 value) {
     *info = *festival->info;
     info->unkC_0 = value;
     info->seconds = LinkFestival_GetSecondsLeft(festival);
@@ -316,19 +314,19 @@ int LinkFestival_GetMemberCount(LinkFestival *festival) {
     return festival->recordCount + 1;
 }
 
-void LinkFestival_AddRecord(LinkFestival *festival, void *mission) {
+void LinkFestival_AddRecord(LinkFestival *festival, FestMissionConfig *config) {
     if (isFesMissionAvailable(&festival->config)) {
         return;
     }
-    if (LinkFestival_HasRecord(festival, mission)) {
+    if (LinkFestival_HasRecord(festival, config)) {
         return;
     }
-    FestMissionRecord_Set(&festival->records[festival->recordIndex], mission);
+    FestMissionRecord_Set(&festival->records[festival->recordIndex], config);
     festival->recordIndex = (festival->recordIndex + 1) % LINK_FESTIVAL_RECORD_COUNT;
     if (festival->recordCount < LINK_FESTIVAL_RECORD_COUNT) {
         festival->recordCount++;
     }
-    FestMissionOffers_Remove(festival, mission);
+    FestMissionOffers_Remove(festival, config);
 }
 
 BOOL LinkFestival_ShouldSkipOffer(LinkFestival *festival, FestMissionConfig *config) {

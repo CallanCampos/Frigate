@@ -74,8 +74,8 @@ static int Enter_WifiConnectionLogoutWait(WorldTradeWork *wk);
 static int Enter_LoginCallback(void *msgWork, void *data);
 static int Enter_LogoutCallback(void *msgWork, void *data);
 static int Enter_End(WorldTradeWork *wk);
-static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork);
-static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork);
+static int Enter_ServerErrorPrint(WorldTradeWork *wk, WifiLoginMessage *msgWork);
+static int Enter_ServerErrorWait(WorldTradeWork *wk, WifiLoginMessage *msgWork);
 static void Enter_MessagePrintCore(WorldTradeWork *wk, MsgData *msgManager, int msgNo, int wait, u16 dat, int stream);
 static int Enter_PrintCommonFunc(BmpWin *win, StrBuf *str, int x, int flag, u16 color, int font,
                                  WorldTradePrint *print);
@@ -466,7 +466,7 @@ static int Enter_End(WorldTradeWork *wk) {
     return WT_SEQ_FADEOUT;
 }
 
-static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork) {
+static int Enter_ServerErrorPrint(WorldTradeWork *wk, WifiLoginMessage *msgWork) {
     int msgNo;
 
     switch (wk->connectErrorNo) {
@@ -530,7 +530,7 @@ static int Enter_ServerErrorPrint(WorldTradeWork *wk, void *msgWork) {
     return TRUE;
 }
 
-static int Enter_ServerErrorWait(WorldTradeWork *wk, void *msgWork) {
+static int Enter_ServerErrorWait(WorldTradeWork *wk, WifiLoginMessage *msgWork) {
     switch (wk->localSeq) {
     case 0:
         wk->localSeq++;

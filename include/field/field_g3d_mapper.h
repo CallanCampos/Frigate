@@ -114,7 +114,7 @@ struct FieldG3DMapper {
     G3DResource *mapTextures;
     FieldPropSystem *propSystem;
     FieldTerrainAnimator *terrainAnimator;
-    void *wfbc;
+    FieldWFBC *wfbc;
     ResortMapCreateWork *resortMap;
     HeightExList *heightEx;
 };

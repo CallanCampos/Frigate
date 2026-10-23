@@ -145,7 +145,7 @@ typedef struct {
     s32 soundStage;
     u32 cameraDefaults;
     OpelucidGymMover movers[MOVER_COUNT];
-    void *cameraBind;
+    const VecFx32 *cameraBind;
 } OpelucidGymMoveEvent;
 
 typedef struct {

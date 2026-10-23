@@ -5,6 +5,7 @@
 #include "battle/regulation.h"
 #include "gfl/heap.h"
 #include "nitro/math.h"
+#include "save/bag.h"
 #include "save/config.h"
 #include "struct_decls.h"
 #include "system/pms_data.h"
@@ -26,7 +27,7 @@ struct BtlFieldSituation {
     // The battle's music, and the music of a win
     u16 bgm;
     u16 unk12;
-    void *netHandle;
+    NetHandle *netHandle;
     u8 unk18;
     u8 unk19;
     u8 unk1a;
@@ -63,7 +64,7 @@ struct BtlSetup {
     BtlFieldSituation fieldSituation;
     // The parties of the four clients
     PokeParty *party[4];
-    void *unk34[4];
+    PlayerInfo *unk34[4];
     u8 unk44[4];
     // The trainers of the four clients
     BtlSetupTrainer *trainers[4];
@@ -74,10 +75,10 @@ struct BtlSetup {
     GameData *gameData;
     Config *config;
     BagSave *bag;
-    void *unk7C;
+    BagCursor *unk7C;
     PokeDexSave *pokedex;
     GameRecords *records;
-    void *unk88;
+    CommPlayerSupport *unk88;
     u16 unk8C;
     u16 unk8E;
     // What func_0200b760 fills in from a regulation, a RegulationUnkAC

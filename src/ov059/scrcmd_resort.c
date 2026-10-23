@@ -39,7 +39,7 @@
 
 // The page of records that ResortCmd_ShowRecords shows, while the script waits
 typedef struct {
-    void *window;
+    MoneyWin *window;
     s16 page;
     u16 state;
     u16 *var;
@@ -53,7 +53,7 @@ static const u16 sUnk7db4[2][8] = {
 
 static ResortPeople *ResortCmd_GetPeople(Field *field);
 static u16 ResortCmd_GetActorUID(FieldScriptEnv *env);
-static void *ResortCmd_GetNPC(Field *field);
+static ResortNPC *ResortCmd_GetNPC(Field *field);
 static int ResortCmd_ApplyEffortChange(int value, int others, int change);
 
 BOOL ResortCmd_StartTalk(VM *vm, FieldScriptEnv *env) {
@@ -1640,7 +1640,7 @@ static BOOL ResortCmd_UpdateRecords(VM *vm, void *data) {
     void **ptr = ScriptWork_GetUserHeapPtr(work);
     HeapID heapId = Field_GetHeapID(field);
     ResortRecordsWork *wk = *ptr;
-    void *msgBGSys = Field_GetMsgBGSys(field);
+    FieldMsgBG *msgBGSys = Field_GetMsgBGSys(field);
     WordSet *wordSet = ScriptWork_GetWordSet(work);
 
     switch (wk->state) {
@@ -1810,7 +1810,7 @@ static u16 ResortCmd_GetActorUID(FieldScriptEnv *env) {
     return GetActorUID(ScriptWork_GetParentActor(FieldScriptEnv_GetScriptWork(env)));
 }
 
-static void *ResortCmd_GetNPC(Field *field) {
+static ResortNPC *ResortCmd_GetNPC(Field *field) {
     void *unk;
 
     if (Field_CheckGimmickWorkPassword(field, 1)) {

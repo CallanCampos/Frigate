@@ -306,6 +306,6 @@ void MusItemDraw_GetItemOffset(MusItemDraw *item, s32 *offset) {
     MusItemData_GetOffset(item->data, offset);
 }
 
-void *MusItemDraw_GetItemData(MusItemDrawSys *sys) {
+MusItemData *MusItemDraw_GetItemData(MusItemDrawSys *sys) {
     return sys->itemData;
 }

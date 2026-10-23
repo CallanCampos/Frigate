@@ -1583,7 +1583,7 @@ BOOL func_ov167_0219bdfc(BtlMainModule *mainModule) {
     return FALSE;
 }
 
-void *GetCommPlayerSupport(BtlMainModule *mainModule) {
+CommPlayerSupport *GetCommPlayerSupport(BtlMainModule *mainModule) {
     if (mainModule->setup->battleType <= 1) {
         return mainModule->setup->unk88;
     }
@@ -2262,7 +2262,7 @@ BagSave *GetBagSave(BtlMainModule *mainModule) {
     return mainModule->setup->bag;
 }
 
-void *GetBagCursor(BtlMainModule *mainModule) {
+BagCursor *GetBagCursor(BtlMainModule *mainModule) {
     return mainModule->setup->unk7C;
 }
 
@@ -2713,7 +2713,7 @@ const BattleMon *GetPokeParamConst(const BtlPokeCon *pokeCon, u8 monId) {
     return pokeCon->mons[monId];
 }
 
-BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, void **out) {
+BOOL GetViewPosChatter(BtlMainModule *mainModule, u32 index, PerapVoice **out) {
     u8 clientId = GetClientIDFromPos(mainModule, ViewPosToBattlePos(mainModule, index));
 
     if (mainModule->unk3E0[clientId] != NULL) {
@@ -3288,7 +3288,7 @@ void AddRecord(BtlMainModule *mainModule, u32 record, u32 value) {
     }
 }
 
-void *func_ov167_0219db00(BtlMainModule *mainModule) {
+u8 *func_ov167_0219db00(BtlMainModule *mainModule) {
     return mainModule->setup->unk90;
 }
 
@@ -3681,7 +3681,7 @@ BtlScriptedRules *GetStudioRules(BtlMainModule *mainModule) {
     return mainModule->unk474;
 }
 
-void *func_ov167_0219e3ac(BtlMainModule *mainModule) {
+BtlMainUnk478 *func_ov167_0219e3ac(BtlMainModule *mainModule) {
     if (mainModule->unk478 == NULL) {
         return NULL;
     }
@@ -3692,5 +3692,5 @@ PokewoodCutin *GetPokewoodCutin(BtlMainModule *mainModule) {
     return mainModule->cutin;
 }
 
-void func_ov167_0219e3c8(void *data) {
+void func_ov167_0219e3c8(BtlScriptedRules *data) {
 }

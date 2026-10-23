@@ -72,7 +72,7 @@ static int BeaconView_UpdateThanks(BeaconViewWork *work);
 static int BeaconView_CheckThanksTouch(BeaconViewWork *work);
 static void BeaconView_ResetArrows(BeaconViewWork *work);
 
-BeaconViewWork *BeaconView_Init(GameSystem *gsys, void *parent) {
+BeaconViewWork *BeaconView_Init(GameSystem *gsys, FieldSubscreen *parent) {
     BeaconViewWork *work = BeaconView_Create(gsys, parent);
 
     work->printNow = TRUE;

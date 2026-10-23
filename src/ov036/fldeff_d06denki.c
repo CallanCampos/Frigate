@@ -141,7 +141,7 @@ static const FieldEffectTaskVTable MARK_TASK_VTABLE = {
     sizeof(MarkTask), MarkTask_Init, MarkTask_Delete, MarkTask_Update, MarkTask_Draw,
 };
 
-void func_ov036_021c289c(FieldActor *actor, void *effects) {
+void func_ov036_021c289c(FieldActor *actor, FieldEffects *effects) {
     VecFx32 pos;
     SparkTaskParams params;
 

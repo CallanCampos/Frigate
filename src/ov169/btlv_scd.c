@@ -1184,7 +1184,7 @@ static void BtlvScd_BuildTargetList(BtlvScdTargetList *list, BtlvScd *scd) {
     }
 }
 
-void BtlvScd_ShowRotationScreen(BtlvScd *scd, void *param) {
+void BtlvScd_ShowRotationScreen(BtlvScd *scd, BtlvInputRotationParam *param) {
     BtlvInput_SetScreen(scd->input, 5, param);
 }
 

@@ -13,16 +13,16 @@
 #include "system/time_icon.h"
 
 struct ChatotEventWork {
-    void *chatter;
+    PerapVoice *chatter;
     GameSystem *gsys;
     GameData *gameData;
     Field *field;
     FieldPlayer *player;
     PartyPkm *pkm;
     MsgData *msgData;
-    void *msgBGSys;
-    void *talkWindow;
-    void *yesNo;
+    FieldMsgBG *msgBGSys;
+    FieldMsgWin *talkWindow;
+    ListMenuUI *yesNo;
     WordSet *wordSet;
     StrBuf *strbuf;
     BmpWin *window;

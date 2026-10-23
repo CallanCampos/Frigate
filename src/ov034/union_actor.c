@@ -41,8 +41,8 @@ static FieldActor *UnionOneself_FindActor(UnionSystem *unisys, UnionBeaconEntry 
 static UnionActorSlot *UnionOneself_CreateActorSlot(UnionSystem *unisys, UnionBeaconEntry *entry, UnionMember *member,
                                                     int memberIndex, BOOL visible, FieldActor **outActor);
 static void UnionOneself_FreeActorSlot(UnionSystem *unisys, UnionBeaconEntry *entry, UnionActorSlot *slot);
-static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList, void *effWork,
-                                           UnionBeaconEntry *entry);
+static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList,
+                                           UnionEffect *effWork, UnionBeaconEntry *entry);
 static BOOL UnionOneself_IsMemberNew(UnionSystem *unisys, UnionBeaconEntry *entry, const u8 *mac);
 static BOOL UnionOneself_ShowFocus(UnionSystem *unisys, UnionBeaconEntry *entry);
 static BOOL UnionOneself_RunActor(UnionSystem *unisys, UnionActorSlot *slot, Field *field);
@@ -194,8 +194,8 @@ static void UnionOneself_FreeActorSlot(UnionSystem *unisys, UnionBeaconEntry *en
     MI_CpuFill8(slot, 0, sizeof(UnionActorSlot));
 }
 
-static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList, void *effWork,
-                                           UnionBeaconEntry *entry) {
+static void UnionOneself_UpdateEntryActors(UnionSystem *unisys, RivalDataSave *rival, WifiList *wifiList,
+                                           UnionEffect *effWork, UnionBeaconEntry *entry) {
     FieldActor *actor;
     u8 ownMac[6];
     int i;

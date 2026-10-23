@@ -1390,12 +1390,12 @@ static u32 ResortSys_ChoosePersonType(ResortPersonData *data, ResortSys *sys, Ga
     return result;
 }
 
-void *ResortRecords_CreateWindow(void *msgBGSys, HeapID heapId) {
+MoneyWin *ResortRecords_CreateWindow(FieldMsgBG *msgBGSys, HeapID heapId) {
     return FieldMsgBG_CreateMoneyWin(msgBGSys, NULL, 1, 1, 30, 22);
 }
 
 // Draws a page of the avenue's records: the people with the most of one thing, with their rank and number
-void ResortRecords_PrintPage(void *window, JoinAvenueOccupants *occupants, void *msgBGSys, WordSet *wordSet,
+void ResortRecords_PrintPage(MoneyWin *window, JoinAvenueOccupants *occupants, FieldMsgBG *msgBGSys, WordSet *wordSet,
                              GameData *gameData, u32 page, HeapID heapId) {
     ResortRankEntry entries[RESORT_PERSON_COUNT + 1];
     s32 total;
@@ -1967,7 +1967,8 @@ static void ResortEntry_Fill(JoinAvenueEntry *entry, u16 shopKind, ResortBinary 
 }
 
 // Makes an entry of a kind of shop, for the kind's row of the texts that the avenue's rank picks
-void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, void *entry, u32 shopKind, u32 salt, HeapID heapId) {
+void ResortSys_MakeShopEntry(ResortSys *sys, GameData *gameData, JoinAvenueEntry *entry, u32 shopKind, u32 salt,
+                             HeapID heapId) {
     JoinAvenueInfo *info = ResortSys_GetInfo(sys);
     JoinAvenueOccupants *occupants = ResortSys_GetOccupants(sys);
     ResortBinary *texts = ResortSys_GetTexts(sys);

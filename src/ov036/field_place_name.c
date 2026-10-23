@@ -162,7 +162,7 @@ BOOL isGameVerWhite2(void) {
     return FALSE;
 }
 
-PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, void *msgBGSys) {
+PlaceName *FieldPlaceName_Create(GameSystem *gsys, HeapID heapId, FieldMsgBG *msgBGSys) {
     PlaceName *wk = FieldPlaceName_Alloc(heapId);
     func_ov036_021b59d4(wk, gsys);
     func_ov036_021b5ae8(wk);

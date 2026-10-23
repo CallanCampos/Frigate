@@ -18,9 +18,9 @@ typedef struct {
     u16 index;
     u32 zone;
     MMSys *mmSys;
-    void *table;
-    void *shops;
-    void *unk18;
+    ResortBinary *table;
+    ResortShopData *shops;
+    ResortBinary *unk18;
     u32 unk1c;
     BOOL unk20;
 } ResortPersonSetup;
@@ -42,14 +42,14 @@ struct ResortPerson {
     ResortPersonData *data;
     const u16 *row;
     const ResortPersonType *funcs;
-    void *shops;
-    void *unk2c;
+    ResortShopData *shops;
+    ResortBinary *unk2c;
 };
 
 struct ResortPeople {
     ResortPeopleSetup setup;
     HeapID heapId;
-    void *table;
+    ResortBinary *table;
     ResortPerson *persons[];
 };
 
